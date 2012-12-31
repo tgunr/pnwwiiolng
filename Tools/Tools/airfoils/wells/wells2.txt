@@ -1,0 +1,27 @@
+
+From general6@iaw.com Wed Jun 16 22:26:20 1999
+Date: Wed, 16 Jun 1999 13:39:02 -0400
+From: Wells Sullivan <general6@iaw.com>
+To: Jonathan Hoof <hoofj@agora.rdrop.com>
+Subject: Re: Aerodynamics
+
+Attached are 2 graphs.  One for correction factor to a tapered wing (T is Tau
+= correction to induced angle of attack and d is delta = correction to induced
+drag)
+The other one is downwash angles for various taper and aspect ratio wings.
+
+So the induced drag formula looks like
+
+Cdi = Cl^2 * (1 + d) / (pi * AR)
+
+Induced AoA = 18.24 * Cl * (1 + T) / AR
+
+I'll send more on the downwash angles.  Don't have time right now!
+
+  [Part 2, Image/JPEG  36KB]
+  [Unable to print this part]
+
+
+  [Part 3, Image/JPEG  439KB]
+  [Unable to print this part]
+

@@ -1,0 +1,91 @@
+$#include "uiSound.h"
+$#include "uiChat.h"
+$#include "chatChannelTypes.h"
+$#include "uiGameEvents.h"
+$#include "phui/View.h"
+
+$pfile "..\\lua\\include.pkg"
+
+module ui
+{
+	$cfile "uiMain.h"
+	
+	int uiGameEvent(int event, const char* message);
+	int uiPlaySound(const char* file, unsigned int finite, double volume);
+	int uiChatPrintLine(const char* message);
+	int uiConsoleprintf(const char* text);
+	phui::View* uiLoadView(const char* filename, bool addtoviewport, bool show);
+	phui::View* uiFindView(const char* name);
+	void uiChatSetRadio(unsigned int radioIndex, unsigned int type);
+	unsigned int uiChatGetRadio(unsigned int radioIndex);
+	
+	enum
+	{
+		NO_CHANNEL,
+		BRIGADE_CHANNEL,
+		MISSION_CHANNEL,
+		SQUAD_CHANNEL,
+		GCI_CHANNEL,
+		CP_CHANNEL,
+		NUMBERED_CHANNEL,
+		PRIVATE_CHANNEL,
+		ADMIN_CHANNEL,
+		ORIGIN_CP_CHANNEL,
+		OBJECTIVE_CP_CHANNEL,
+		SIDE_GENERAL_CHANNEL,
+		SIDE_HELP_CHANNEL,
+		SIDE_OPS_CHANNEL,
+		MAX_CHANNEL_TYPES
+	};
+	
+	namespace phui
+	{
+		class View
+		{
+		public:
+			View* Parent() const;
+			
+			// find functions
+			View* ChildAt(unsigned int) const;
+			virtual View* FindView(const char* name) const;
+			virtual View* FindSibling(const char *name) const;
+			
+			// co-ordinate system starts bottom left, values are relative to the parent
+			float Width() const;
+			float Height() const;
+			float X() const;
+			float Y() const;
+			float Left();
+			float Right();
+			float Bottom();
+			float Top();
+			
+			void SetLeft(float left);
+			void SetRight(float right);
+			void SetBottom(float bottom);
+			void SetTop(float top);
+			
+			virtual void ResizeToAspect(int follow);
+			virtual void ResizeTo(float width, float height);
+			virtual void ResizeBy(float dw, float dh);
+			virtual void MoveTo(float x, float y);
+			virtual void MoveBy(float dx, float dy);
+			virtual void ScrollTo(float x, float y);
+			virtual void ScrollBy(float dx, float dy);
+			
+			void SetBackgroundColor(float r, float g, float b, float a = 1.0);
+			void SetBorderColor(float r, float g, float b, float a = 1.0);
+			void SetTextColor(float r, float g, float b, float a = 1.0);
+			
+			virtual void Show();
+			virtual void Hide();
+			bool IsVisible() const;
+			void SetEnable(bool enable);
+			bool Enabled() const;
+			void SetMoveOnDrag(bool b);
+			
+			virtual void Close();
+		};
+	};
+}
+

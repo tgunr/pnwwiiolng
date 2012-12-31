@@ -1,0 +1,38 @@
+diameter:
+
+is the diameter of the round impact crater NOT the diameter of the round!! (though for small arms, they will probably be the same most of the time).
+
+Used also to determine which sound to play for
+bullet fly by.
+
+# Shrapnel Effect
+# numshrapnelpieces = x (100-150 is max)
+# totalshrapnelmass = mass of shellweight is shrapnel (shellmass/2)
+
+#this is the timer for self destructive rounds. must be shorter than lifetime
+selfdestructtime  =
+
+
+# explosion sounds
+
+explosionsoundnear  = 
+explosionsoundfar  = 
+nearfardistance  = 
+
+
+# fuzetime = (time from fuze armed to explosion in miliseconds)
+# fuzestartspeedloss = (speed the round has to slow down to fuze)
+
+fuzetime = 0.0
+
+# fps machine guns should fire at accurate rates, *UNLESS THEY FIRE TRACERS* for ghost fire
+# if they fire tracers, the tracer rate should be used.
+
+# number of rounds in one clip
+cliprounds = 32
+
+# Amount of time in seconds for reloading
+reloadtime = 4
+
+# note: dispersion is in *RADIUS*
+# 0.6 degrees of dispersion results in a 60ft cone at 1000 yards

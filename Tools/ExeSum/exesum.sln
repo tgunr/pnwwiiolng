@@ -1,0 +1,23 @@
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{EAF909A5-FA59-4C3D-9431-0FCC20D5BCF9}") = "exesum", "exesum.icproj", "{4F5D97D1-DE34-4319-A407-9F7BEC7BEFA9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4F5D97D1-DE34-4319-A407-9F7BEC7BEFA9}.Debug|Win32.ActiveCfg = Debug|Win32
+		{4F5D97D1-DE34-4319-A407-9F7BEC7BEFA9}.Debug|Win32.Build.0 = Debug|Win32
+		{4F5D97D1-DE34-4319-A407-9F7BEC7BEFA9}.Release|Win32.ActiveCfg = Release|Win32
+		{4F5D97D1-DE34-4319-A407-9F7BEC7BEFA9}.Release|Win32.Build.0 = Release|Win32
+		{1924ED58-2ADF-4627-A7E3-8A47661B9805}.Release|Win32.Build.0 = Release|Win32
+		{1924ED58-2ADF-4627-A7E3-8A47661B9805}.Release|Win32.ActiveCfg = Release|Win32
+		{1924ED58-2ADF-4627-A7E3-8A47661B9805}.Debug|Win32.Build.0 = Debug|Win32
+		{1924ED58-2ADF-4627-A7E3-8A47661B9805}.Debug|Win32.ActiveCfg = Debug|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

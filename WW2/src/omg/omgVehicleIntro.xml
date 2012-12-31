@@ -1,0 +1,27 @@
+<?xml version='1.0'?>
+<!DOCTYPE class SYSTEM "omg.dtd">
+
+<class
+	namespace='Vehicle'
+	name='Intro'>
+
+	<doc>
+		<brief>Host/Client interface class for describing a new vehicle to be added to the viewer's vislist.</brief>
+		<detail>
+			Formerly called the "one time" this structure supplies the client
+			with semi-permanent details about a vehicle, sent independently
+			of the normal update stream.
+		</detail>
+	</doc>
+
+	<member type='ChatHandle'	name='handle'		brief="Game-name given to this vehicle."/>
+	<member type='ChatHandle'	name='squadHandle'	brief="Squad name (or 0) for the vehicle."/>
+	<member type='UINT32'		name='hostIndex'	brief="Host's unique index for this vehicle."/>
+	<member type='UINT32'		name='squadID'		brief="Squad ID (or 0) for the vehicle."/>
+	<member type='WEAPON_SPEC'	name='weaponSpec'	brief="Type of vehicle."/>
+	<member type='UINT32'		name='brigadeID'	brief="Brigade vehicle belongs to."/>
+	<member type='UINT8'		name='decal'		brief="Player-selected decal, or 0."/>
+	<member type='RANK_NO'		name='rank'			brief="Owner's rank."/>
+
+</class>
+

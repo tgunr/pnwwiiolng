@@ -1,0 +1,291 @@
+#include <syscfg.h> // Path is project specific.
+#include <OpenGL/OpenGL.h>
+
+#include "ddp.h"
+#include "gmlp/gmlpmain.h"
+#include "rn/rnlogo.h"
+#include "fio/fio.h"
+#include "fio/fioa.h"
+#include "fio/fiod.h"
+#include "sysmain.h"
+#include "mn/mngopt.h"
+#include "rn/rnmain.h"
+#include "mem/mem.h"
+#include "dimain.h"
+
+#if USE_OSG
+#include "osg/osgGame.h"
+#endif
+
+#define GLOBALS
+#include "include/vars.h"
+#undef GLOBALS
+
+void sysmainAddArchives();
+static int sysmainInitApp();
+
+int running = 0;
+static int _argc;
+static char** _argv;
+
+void sysmainGetCommandLineArgs(int* argc, char*** argv)
+{
+	*argc = _argc;
+	*argv = _argv;
+}
+
+void sysmainCommandLine(int argc, char** argv)
+{
+	SetCommandLine(argc, argv);
+	_argc = argc;
+	_argv = argv;
+
+#if RELEASE_CLIENT == 0
+	WantDataDir = 1;
+	HasKeyFile = 1;
+	WantedWindow = 1;
+#endif
+
+	mngoptParse("");
+}
+
+static size_t frames = 0;
+
+pthread_t mainthread = NULL;
+
+int sysmain()
+{
+	unlink(Fio::LogFileName()) ;
+
+	running = 1;
+
+	if(sysmainInitApp() != 0)
+	{
+		printf("App was not able to initialize!\n");
+		exit(0);
+	}
+
+	ddpSetupGL(WantedWidth, WantedHeight);
+
+	if(!piInit())
+	{
+		printf("piInit failed!\n");
+		printf("App was not able to initialize!\n");
+		exit(0);
+	}
+
+#if USE_OSG
+	if(!osgGameInit())
+	{
+		printf("App was not able to initialize!\n");
+		exit(0);
+	}
+#else
+	if(!rnmainGetOnlineSetting())
+	{
+		printf("App was not able to initialize!\n");
+		exit(0);
+	}
+
+	if(!rnmainInit())
+	{
+		printf("rnmainInit failed!\n");
+		printf("App was not able to initialize!\n");
+		exit(0);
+	}
+#endif
+
+    mainthread = pthread_self(); // used for debugging
+
+	while(running)
+    {
+        frames++;
+		ddpEngine(NULL);
+#ifdef IS_DEBUG
+        if ( frames % 100 == 0 )
+        {
+            //printf( "%.1f\n", 1000.0/gFPS );
+        }
+#endif
+    }
+
+	sysmainKillApp();
+
+	return 0;
+}
+
+#ifdef TESTMAC
+//extern char recording_started;
+#endif
+
+int sysmainInitApp()
+{
+#ifdef TESTMAC
+//  recording_started = 1;
+#endif
+
+	IdentityMatrix.m[0][0] = IdentityMatrix.m[1][1] = IdentityMatrix.m[2][2] = IdentityMatrix.m[3][3] = 1.0;
+	chAppDir();
+
+#if RELEASE_CLIENT == 1
+	printf("WW2OL Started\n"); fflush(stdout);
+#ifdef BETA_RELEASE
+	{
+		FILE* f = fopen("../../gizmo.key","r");
+		UINT32 key = 0;
+		if(f)
+		{
+			fscanf(f,"%d", &key);
+			HasKeyFile = (key == 0xDEADBEEF);
+			fclose(f);
+		}
+	}
+#endif
+#endif // RELEASE_CLIENT
+
+	memInit();
+	/*
+	fioSet(WantDataDir ? ISDIRECTORY : ISARCHIVE);
+	fiodSetPrepath(PREPATH);
+
+	if(!WantDataDir)
+		sysmainAddArchives();
+	*/
+	b3DSoundEnable = 1; // always want 3D enabled with OpenAL
+	//g_bRadialClutter = FALSE; // screwed on the mac at the moment
+
+	Enable_Log(LOG_ALL, WantedUserLogEnabled);
+	Set_Log_Level(LOG_INFO);
+
+#if USE_OSG
+	ddpSetD3DRender(osgGameUpdate);
+#else
+	ddpSetD3DRender(gmlpMainUpdate);
+#endif
+	ddpSetDDRender(rnlogoRender);
+
+	if(!ddpCreateWnd(0, 0, WantedWidth, WantedHeight, 32, !WantedWindow, atoi(WantedVideoCard), WantedRefreshRate))
+	{
+		printf("ddpCreateWnd failed!\n");
+		return -1;
+	}
+
+	return 0;
+}
+
+void sysmainQuit()
+{
+	running = 0;
+}
+
+void sysmainKillApp()
+{
+#if USE_OSG
+	osgGameKill();
+#endif
+
+#if RELEASE_CLIENT == 1
+	printf("WW2OL Quit\n"); fflush(stdout);
+#endif
+
+	dimainKill();
+//	ddpKill();
+}
+
+void sysmainAddArchives()
+{
+	SCHAR** fileList = NULL;
+	SINT32 numfiles, i;
+	bool foundthem=false;
+
+	fiodGetDirFileList(NULL, &fileList, &numfiles);
+	if(!fileList)
+	{
+		throw std::runtime_error("Archive directory is wrong or no archives");
+	}
+
+	for(i = 0; i < numfiles; i++)
+	{
+		const char* s = fileList[i];
+		int len = strlen(s);
+		if ( len > 4 )
+		{
+			if ( s[len-3] == 'w' && s[len-2] == 'w' && s[len-1] == '2' ) // NEW ARCHIVES
+			{
+				fioaAddArchive(s);
+				foundthem = true;
+			}
+		}
+	}
+
+	if ( ! foundthem)
+	{
+		for(i = 0; i < numfiles; i++)
+		{
+			const char* s = fileList[i];
+			int len = strlen(s);
+			if(!strncmp(fileList[i], "playarc.w2", 10)) // old archives (will be removed soon)
+			{
+				fioaAddArchive(fileList[i]);
+				foundthem = true;
+			}
+		}
+	}
+
+
+	if(fileList)
+	{
+		for(i = 0; i < numfiles; i++)
+		{
+			if(fileList[i])
+				memFree(fileList[i]);
+		}
+
+		memFree(fileList);
+	}
+
+	if ( !foundthem )
+	{
+		throw std::runtime_error("Archives not found");
+	}
+
+/*
+	SCHAR** fileList;
+	SINT32 numfiles, i;
+
+	fiodGetDirFileList(NULL, &fileList, &numfiles);
+	if(!fileList) return;
+
+  bool foundthem = false;
+
+	for(i = 0; i < numfiles; i++)
+	{
+    const char* s = fileList[i];
+    int len = strlen(s);
+    if ( len > 4 )
+    {
+      if ( s[len-1] == '2' && s[len-2] == 'w' && s[len-3] == 'w' )
+      {
+        fioaAddArchive(s);
+        foundthem = true;
+      }
+      else
+      {
+        if(!strncmp(s, "playarc.w2", 10))
+        {
+          fioaAddArchive(fileList[i]);
+          foundthem = true;
+        }
+      }
+    }
+
+		memFree(fileList[i]);
+	}
+	memFree(fileList);
+
+  if ( ! foundthem )
+  {
+		piExitProgram(__FILE__, __LINE__, "No archives found");
+  }
+ */
+}

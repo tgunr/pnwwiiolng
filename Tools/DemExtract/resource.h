@@ -1,0 +1,47 @@
+//{{NO_DEPENDENCIES}}
+// Microsoft Developer Studio generated include file.
+// Used by BareWnd.rc
+//
+#define IDI_TRAYICON                    101
+#define IDD_EXTRACT_PROPERTIES          102
+#define IDC_UPPER_LEFT_NS               1001
+#define IDC_UPPER_LEFT_EW               1002
+#define IDC_UPPER_LEFT_NS_DEGREES       1003
+#define IDC_UPPER_LEFT_NS_DEGREES_SPIN  1004
+#define IDC_UPPER_LEFT_EW_DEGREES       1005
+#define IDC_UPPER_LEFT_EW_DEGREES_SPIN  1006
+#define IDC_LOWER_RIGHT_NS              1007
+#define IDC_LOWER_RIGHT_EW              1008
+#define IDC_LOWER_RIGHT_NS_DEGREES      1009
+#define IDC_LOWER_RIGHT_NS_DEGREES_SPIN 1010
+#define IDC_LOWER_RIGHT_EW_DEGREES      1011
+#define IDC_LOWER_RIGHT_EW_DEGREES_SPIN 1012
+#define IDC_UPPER_LEFT_NS_MINUTES       1013
+#define IDC_UPPER_LEFT_NS_MINUTES_SPIN  1014
+#define IDC_UPPER_LEFT_EW_MINUTES       1015
+#define IDC_UPPER_LEFT_EW_MINUTES_SPIN  1016
+#define IDC_LOWER_RIGHT_NS_MINUTES      1017
+#define IDC_LOWER_RIGHT_NS_MINUTES_SPIN 1018
+#define IDC_LOWER_RIGHT_EW_MINUTES      1019
+#define IDC_LOWER_RIGHT_EW_MINUTES_SPIN 1020
+#define IDC_UPPER_LEFT_NS_SECONDS       1021
+#define IDC_UPPER_LEFT_NS_SECONDS_SPIN  1022
+#define IDC_UPPER_LEFT_EW_SECONDS       1023
+#define IDC_UPPER_LEFT_EW_SECONDS_SPIN  1024
+#define IDC_LOWER_RIGHT_NS_SECONDS      1025
+#define IDC_LOWER_RIGHT_NS_SECONDS_SPIN 1026
+#define IDC_LOWER_RIGHT_EW_SECONDS      1027
+#define IDC_LOWER_RIGHT_EW_SECONDS_SPIN 1028
+#define IDC_STATIC                      -1
+
+// Next default values for new objects
+// 
+#ifdef APSTUDIO_INVOKED
+#ifndef APSTUDIO_READONLY_SYMBOLS
+#define _APS_NO_MFC                     1
+#define _APS_NEXT_RESOURCE_VALUE        103
+#define _APS_NEXT_COMMAND_VALUE         40001
+#define _APS_NEXT_CONTROL_VALUE         1005
+#define _APS_NEXT_SYMED_VALUE           101
+#endif
+#endif

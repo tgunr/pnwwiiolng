@@ -1,0 +1,6 @@
+$pfile "..\\lua\\include.pkg"
+
+module cfg
+{
+	$cfile "cfgPrefs.h"
+}

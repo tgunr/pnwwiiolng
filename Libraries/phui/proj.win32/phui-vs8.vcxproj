@@ -1,0 +1,410 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Buzzard|Win32">
+      <Configuration>Buzzard</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="China|Win32">
+      <Configuration>China</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="SSE2SmartHeap|Win32">
+      <Configuration>SSE2SmartHeap</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="TestRelease|Win32">
+      <Configuration>TestRelease</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectName>phui</ProjectName>
+    <ProjectGuid>{C1B372C3-12A9-45AA-9D23-4D5024926FAB}</ProjectGuid>
+    <RootNamespace>phui</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='China|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SSE2SmartHeap|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <CLRSupport>false</CLRSupport>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='China|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='SSE2SmartHeap|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)WW2\lib\win\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='SSE2SmartHeap|Win32'">$(SolutionDir)WW2\lib\win\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='SSE2SmartHeap|Win32'">$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">$(SolutionDir)WW2\lib\win\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='China|Win32'">$(SolutionDir)WW2\lib\win\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='China|Win32'">$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">$(SolutionDir)WW2\lib\win\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">$(Configuration)\</IntDir>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\include\js;..\..\ftgl\include;..\..\freetype\include;..\include;..\..\ftgl\src\FTGL;..\..\ftgl\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>XP_WIN;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;FTGL_LIBRARY_STATIC;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <TreatWChar_tAsBuiltInType>true</TreatWChar_tAsBuiltInType>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <AssemblerOutput>
+      </AssemblerOutput>
+      <BrowseInformation>
+      </BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CallingConvention>Cdecl</CallingConvention>
+      <CompileAs>Default</CompileAs>
+      <OpenMPSupport>false</OpenMPSupport>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <PrecompiledHeaderFile>phui-precompiled-header.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>
+      </ForcedIncludeFiles>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+    </Lib>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='SSE2SmartHeap|Win32'">
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>..\include\js;..\..\ftgl\include;..\..\freetype\include;..\include;..\..\ftgl\src\FTGL;..\..\ftgl\src;..\..\..\ww2\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;XP_WIN;FTGL_LIBRARY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <OpenMPSupport>false</OpenMPSupport>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <PrecompiledHeaderFile>include/phui-precompiled-header.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>include/phui-precompiled-header.h</ForcedIncludeFiles>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <ForceSymbolReferences>_SmartHeap_malloc;_SmartHeap_new;%(ForceSymbolReferences)</ForceSymbolReferences>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <WholeProgramOptimization>false</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>..\include\js;..\..\ftgl\include;..\..\freetype\include;..\include;..\..\ftgl\src\FTGL;..\..\ftgl\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;XP_WIN;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;FTGL_LIBRARY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <AssemblerOutput>
+      </AssemblerOutput>
+      <BrowseInformation>
+      </BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>OldStyle</DebugInformationFormat>
+      <OpenMPSupport>false</OpenMPSupport>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <PrecompiledHeaderFile>include/phui-precompiled-header.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>include/phui-precompiled-header.h</ForcedIncludeFiles>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='China|Win32'">
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>..\include\js;..\..\ftgl\include;..\..\freetype\include;..\include;..\..\ftgl\src\FTGL;..\..\ftgl\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;XP_WIN;FTGL_LIBRARY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <OpenMPSupport>false</OpenMPSupport>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <PrecompiledHeaderFile>include/phui-precompiled-header.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>include/phui-precompiled-header.h</ForcedIncludeFiles>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <ForceSymbolReferences>_SmartHeap_malloc;_SmartHeap_new;%(ForceSymbolReferences)</ForceSymbolReferences>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <AdditionalIncludeDirectories>..\include\js;..\..\ftgl\include;..\..\freetype\include;..\include;..\..\ftgl\src\FTGL;..\..\ftgl\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;XP_WIN;FTGL_LIBRARY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <ExceptionHandling>Sync</ExceptionHandling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <DisableLanguageExtensions>false</DisableLanguageExtensions>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <OpenMPSupport>false</OpenMPSupport>
+      <DisableSpecificWarnings>4996</DisableSpecificWarnings>
+      <PrecompiledHeaderFile>include/phui-precompiled-header.h</PrecompiledHeaderFile>
+      <ForcedIncludeFiles>include/phui-precompiled-header.h</ForcedIncludeFiles>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <AdditionalLibraryDirectories>
+      </AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <ForceSymbolReferences>_SmartHeap_malloc;_SmartHeap_new;%(ForceSymbolReferences)</ForceSymbolReferences>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\Button.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\src\Caption.cpp" />
+    <ClCompile Include="..\src\Checkbox.cpp" />
+    <ClCompile Include="..\src\ConsoleView.cpp" />
+    <ClCompile Include="..\src\ContextMenu.cpp" />
+    <ClCompile Include="..\src\Control.cpp" />
+    <ClCompile Include="..\src\ControlValueMessage.cpp" />
+    <ClCompile Include="..\src\ConvertUTF.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\src\CSSViewDrawer.cpp" />
+    <ClCompile Include="..\src\CtxMenu.cpp" />
+    <ClCompile Include="..\src\DOM.cpp" />
+    <ClCompile Include="..\src\DropDownTask.cpp" />
+    <ClCompile Include="..\src\GLGraphicsContext.cpp" />
+    <ClCompile Include="..\src\ImageView.cpp" />
+    <ClCompile Include="..\src\IMEControl.cpp" />
+    <ClCompile Include="..\src\Invoker.cpp" />
+    <ClCompile Include="..\src\Javascript.cpp" />
+    <ClCompile Include="..\src\ListView.cpp" />
+    <ClCompile Include="..\src\Menu.cpp" />
+    <ClCompile Include="..\src\Message.cpp" />
+    <ClCompile Include="..\src\MessageFilter.cpp" />
+    <ClCompile Include="..\src\MessageHandler.cpp" />
+    <ClCompile Include="..\src\MessageLoop.cpp" />
+    <ClCompile Include="..\src\Messenger.cpp" />
+    <ClCompile Include="..\src\MirrorView.cpp" />
+    <ClCompile Include="..\src\Panel.cpp" />
+    <ClCompile Include="..\src\Periodical.cpp" />
+    <ClCompile Include="..\src\PopupMenuButton.cpp" />
+    <ClCompile Include="..\src\ProgressBar.cpp" />
+    <ClCompile Include="..\src\RadioButton.cpp" />
+    <ClCompile Include="..\src\Scalar.cpp" />
+    <ClCompile Include="..\src\Scrollbar.cpp" />
+    <ClCompile Include="..\src\Slider.cpp" />
+    <ClCompile Include="..\src\StackView.cpp" />
+    <ClCompile Include="..\src\StencilView.cpp" />
+    <ClCompile Include="..\src\TabView.cpp" />
+    <ClCompile Include="..\src\TextContainer.cpp" />
+    <ClCompile Include="..\src\TextControl.cpp" />
+    <ClCompile Include="..\src\TextView.cpp" />
+    <ClCompile Include="..\src\UIXML.cpp" />
+    <ClCompile Include="..\src\Util.cpp" />
+    <ClCompile Include="..\src\View.cpp" />
+    <ClCompile Include="..\src\Viewport.cpp" />
+    <ClCompile Include="..\src\wwiiUTF.cpp" />
+    <ClCompile Include="..\src\XMLMessage.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\ConvertUTF.h" />
+    <ClInclude Include="..\src\wwiiUTF.h" />
+    <ClInclude Include="..\include\phui\Button.h" />
+    <ClInclude Include="..\include\phui\Caption.h" />
+    <ClInclude Include="..\include\phui\Checkbox.h" />
+    <ClInclude Include="..\include\phui\ConsoleView.h" />
+    <ClInclude Include="..\include\phui\ContextMenu.h" />
+    <ClInclude Include="..\include\phui\Control.h" />
+    <ClInclude Include="..\include\phui\ControlValueMessage.h" />
+    <ClInclude Include="..\include\phui\CSSViewDrawer.h" />
+    <ClInclude Include="..\include\phui\CtxMenu.h" />
+    <ClInclude Include="..\include\phui\DOM.h" />
+    <ClInclude Include="..\include\phui\DropDownTask.h" />
+    <ClInclude Include="..\include\phui\Error.h" />
+    <ClInclude Include="..\include\phui\FTFontReplacement.h" />
+    <ClInclude Include="..\include\phui\GLGraphicsContext.h" />
+    <ClInclude Include="..\include\phui\GraphicsContext.h" />
+    <ClInclude Include="..\include\phui\ImageView.h" />
+    <ClInclude Include="..\include\phui\IMEControl.h" />
+    <ClInclude Include="..\include\phui\Invoker.h" />
+    <ClInclude Include="..\include\phui\Javascript.h" />
+    <ClInclude Include="..\include\phui\KeyCodes.h" />
+    <ClInclude Include="..\include\phui\ListView.h" />
+    <ClInclude Include="..\include\phui\Menu.h" />
+    <ClInclude Include="..\include\phui\Message.h" />
+    <ClInclude Include="..\include\phui\MessageFilter.h" />
+    <ClInclude Include="..\include\phui\MessageHandler.h" />
+    <ClInclude Include="..\include\phui\MessageLoop.h" />
+    <ClInclude Include="..\include\phui\Messenger.h" />
+    <ClInclude Include="..\include\phui\MirrorView.h" />
+    <ClInclude Include="..\include\phui\Panel.h" />
+    <ClInclude Include="..\include\phui\Periodical.h" />
+    <ClInclude Include="..\include\phui\PopupMenuButton.h" />
+    <ClInclude Include="..\include\phui\ProgressBar.h" />
+    <ClInclude Include="..\include\phui\RadioButton.h" />
+    <ClInclude Include="..\include\phui\Referenced.h" />
+    <ClInclude Include="..\include\phui\Scalar.h" />
+    <ClInclude Include="..\include\phui\Scrollbar.h" />
+    <ClInclude Include="..\include\phui\Slider.h" />
+    <ClInclude Include="..\include\phui\StackView.h" />
+    <ClInclude Include="..\include\phui\StencilView.h" />
+    <ClInclude Include="..\include\phui\TabView.h" />
+    <ClInclude Include="..\include\phui\TextContainer.h" />
+    <ClInclude Include="..\include\phui\TextControl.h" />
+    <ClInclude Include="..\include\phui\TextView.h" />
+    <ClInclude Include="..\include\phui\UIMessages.h" />
+    <ClInclude Include="..\include\phui\UIXML.h" />
+    <ClInclude Include="..\include\phui\Util.h" />
+    <ClInclude Include="..\include\phui\View.h" />
+    <ClInclude Include="..\include\phui\ViewDrawer.h" />
+    <ClInclude Include="..\include\phui\Viewport.h" />
+    <ClInclude Include="..\include\phui\XMLMessage.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

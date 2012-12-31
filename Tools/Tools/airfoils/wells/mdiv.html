@@ -1,0 +1,126 @@
+<HTML>
+<HEAD>
+  <META NAME="GENERATOR" CONTENT="Adobe PageMill 2.0 Mac">
+  <TITLE>Compressibility Drag: M<sub>Div</sub></TITLE>
+  <SCRIPT LANGUAGE="JavaScript">
+<!--Isentropic Cp Computation
+// Author: Ilan Kroo (kroo@leland.stanford.edu)  31 Dec 95
+
+function ComputeCpStar() {
+   var M0 = eval(document.forms[0].mach0.value);
+   var Mlocal = 1.0;
+   var cpisen = (Math.pow(((1+0.2*M0*M0)/(1+0.2*Mlocal*Mlocal)),3.5)-1.0)/(0.7*M0*M0);
+   document.forms[0].cp.value = Math.round(100.*cpisen)/100.;
+}
+<!-- end hiding from old browsers -->
+</SCRIPT>
+
+</HEAD>
+<BODY>
+
+<H1><!--NOEDIT-->
+<script language="javascript">
+<!--
+document.write(parent.pageID(document.location))
+//-->
+</script> 
+<!--/NOEDIT-->Compressibility Drag: M<sub>Div</sub></H1>
+
+<P><HR ALIGN=LEFT>Since M<sub>Div</sub> is 2 to 4% above M<sub>cc</sub>
+(we shall see that the '2 to 4%' is dependent on wing sweepback angle),
+we can predict the drag rise Mach number, M<sub>Div</sub> if we can predict
+M<sub>cc</sub>. If we can identify the pressure drop or more conveniently
+the local pressure coefficient, C<sub>p</sub> , required on an airfoil to accelerate
+the flow locally to exactly the speed of sound, measured or calculated crest
+pressures can be used to determine the freestream Mach numbers at which
+M= 1.0 at the crest. If p is the pressure at a point on an airfoil of an
+unswept wing, the pressure coefficient is<BR>
+<IMG SRC="images/CpEqn.gif" WIDTH="100" HEIGHT="52" ALIGN="BOTTOM"><BR>
+<BR>
+The C<sub>p</sub> may be expressed in terms of the local and freestream Mach numbers.
+Under the assumption of adiabatic flow:<BR>
+<IMG SRC="images/Cpisen.gif" WIDTH="227" HEIGHT="52" ALIGN="BOTTOM"><BR>
+<BR>
+By definition, when local Mach number M= 1.0 , C<sub>p</sub> = C<sub>p</sub>*, the critical pressure
+coeficient. Thus,<BR>
+<IMG SRC="images/CPstar.gif" WIDTH="228" HEIGHT="57" ALIGN="BOTTOM"><BR>
+<BR>
+Here is a simple calculator that provides C<sub>p</sub><sup>*</sup> given a value
+for freestream Mach number using these equations.<br>
+<form>
+<table>
+<tr><td>Freestream Mach:</td><td><INPUT NAME="mach0" TYPE="text" VALUE="0.8" SIZE="5"></td></tr>
+<tr><td>Cp*:</td><td><INPUT NAME="cp" TYPE="text" VALUE="**" SIZE="7"> </td></tr>
+</table> <INPUT NAME="name" TYPE="button" VALUE="Compute" onClick="ComputeCpStar()"> </FORM>
+<br>
+A graph of this equation is shown in figure 6. If the C<sub>p</sub> at the crest is
+known, the value of M0 for which the speed of sound occurs at the crest
+can be immediately determined. The above discussion applies to unswept wings
+and must be modified for wings with sweepback.<BR>
+<BR>
+<IMG SRC="images/CpcrestVsM.gif" WIDTH="448" HEIGHT="261" ALIGN="BOTTOM"
+NATURALSIZEFLAG="3"><BR>
+Figure 6. Variation of Pressure Coefficient at the Crest on a Modern Peaky
+Airfoil, t/c = 0.104, Re - 14.5 Million<BR>
+<BR>
+It will be noted from Figure 6 that the airfoil information required is
+C<sub>p<sub>crest</sub></sub> versus M. In Figure 6, typical wind tunnel airfoil crest C<sub>p</sub> variations
+with M are shown for several angles of attack. M<sub>cc</sub> occurs when the C<sub>p<sub>crest</sub></sub>
+versus M curve for a given angle of attack intersects the curve of C<sub>p</sub>* versus
+M. A few percent above this speed, the abrupt drag rise will start at M<sub>Div</sub>.
+The approximate relationship between M<sub>Div</sub> and M<sub>cc</sub>
+is given in the next section.<BR>
+<BR>
+If the airfoil pressure distribution is calculated by one of various complex
+theoretical methods at M = 0, the value of the crest C<sub>p</sub> can be plotted versus
+M<sub>0</sub> using the Prandtl-Glauert approximation:<BR>
+<IMG SRC="images/PGCp.gif" WIDTH="113" HEIGHT="62" ALIGN="BOTTOM"><BR>
+or the somewhat more involved Karman-Tsien relationship:<BR>
+<IMG SRC="images/KTCp.gif" WIDTH="266" HEIGHT="86" ALIGN="BOTTOM"><BR>
+<BR>
+The value of C<sub>p</sub> at the crest is an important desion characteristic of high
+speed airfoils. In general, C<sub>p<sub>crest</sub></sub> at a given C<sub>L</sub> is dependent upon the
+thickness ratio (ratio of the maximum airfoil thickness to the chord) and
+the shape of the airfoil contour.<BR>
+<BR>
+We have been describing a method of predicting M<sub>cc</sub> which is useful
+in evaluating a particular airfoil design and in understanding the nature
+of the process leading to the occurrence of significant additional drag
+on the wing. Often in an advanced design process the detailed airfoil pressure
+distribution is not available. The airfoil is probably not even selected.
+It is still possible to closely estimate the M<sub>cc</sub> from Figure
+7. This graph displays M<sub>cc</sub> as a function of airfoil mean thickness
+ratio t/c and C<sub>L</sub>. It is based on studies of the M<sub>cc</sub> of various
+airfoils representing the best state of the art for conventional 'Peaky'
+type airfoils typical of all existing late model transport aircraft. The
+significance of the term 'peaky' is discussed in the chapter on airfoils.
+Use of the chart assumes that the new aircraft will have a well developed
+peaky airfoil and that the upper surface of the wing is critical for compressibility
+drag rise. Implied in the latter assumption is a design that assures that
+elements other than the wing, i.e. fuselage. nacelles, etc., have a higher
+M than the wing. Up to design Mach numbers greater than .92 to .94 this
+is attainable. Furthermore, it is assumed that the lower surface of the
+wing is not critical. This assumption is always valid at the normal cruiselift
+coefficients but may not be true at substantially lower lift coefficients.
+Here the wing twist or washoutdesigned to approach elliptical loading at
+cruise and to avoid first stalling at the wing tips,may lead to very low
+angles of attack on the outer wing panel. The highest C<sub>p<sub>crest</sub></sub> may then occur
+on the lower surface, a condition not considered in developing figure 7.
+Thus the chart may give optimistic values of M<sub>cc</sub> at lift coefficients
+more than 0.1 to 0.15 below the design cruise lift coefficients.<BR>
+<IMG SRC="images/MccVstc.gif" WIDTH="500" HEIGHT="405" ALIGN="BOTTOM"><BR>
+Figure 7 Crest Critical Mach Number vs. C<sub>L</sub> and t/c for a Family of Peaky
+Airfoil Sections<BR>
+<BR>
+Figure 7 does not apply directly to airfoils with pressure distributions
+that look significantly different from the peaky airfoil family. Modern
+supercritical airfoils, discussed in later chapters, can achieve higher
+drag divergence Mach numbers than those suggested by the figure. Although
+the performance of such airfoil families is often a closely-guarded company
+secret, the effect can be approximated by adding an increment to the value
+of M<sub>cc</sub> shown in the figure. A very aggressive supercritical section
+might achieve a Mach number increment of 0.06, while more typically the
+increment is 0.03 to 0.04 above the peaky sections.</P>
+
+</BODY>
+</HTML>

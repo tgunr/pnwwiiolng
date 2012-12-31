@@ -1,0 +1,92 @@
+$#include "vehmain.h"
+$#include "vehType.h"
+$#include "weapSpec.h"
+$#include "persmain.h"
+
+$pfile "..\\lua\\include.pkg"
+
+module vehicle
+{
+	class vehVehicle
+	{
+		public:
+		
+		tolua_readonly unsigned int VehicleHostIndex;
+		
+		void SetPosition(double x, double y, double z);
+		void SetYaw(double y);
+		
+		vehType* GetType();
+		std::string GetHandle();
+		unsigned long long GetChatHandle();
+		unsigned int GetRank();
+		unsigned int GetSide();
+		unsigned int GetCountry();
+		int GetDecal();
+		double DistanceTo(double x, double y, double z);
+		double GetYaw();
+		double GetPos(int axis);
+		double GetTraverse(int turret, bool world);
+		double GetElevation(int turret, bool world);
+		
+		bool IsMyMissLeader();
+		bool IsMissLeader();
+		bool IsMissMate();
+		bool IsSquadMate();
+		bool IsBrigMate();
+		bool IsBldr();
+		bool IsTrnr();
+		bool IsHC();
+		bool IsMe();
+	};
+	
+	enum
+	{
+		VEH_TYPE_NONE,
+		VEH_TYPE_FLOATER,
+		VEH_TYPE_PERSON,
+		VEH_TYPE_AIR,
+		VEH_TYPE_GROUND,
+		VEH_TYPE_SEA,
+		VEH_MAXTYPE
+	};
+	
+	struct vehType
+	{
+		tolua_readonly unsigned int VehicleTypeNum;
+		tolua_readonly unsigned int Type; 				
+		tolua_readonly WEAPON_SPEC WeaponSpec;
+		tolua_readonly bool VehicleIsMultiCrew;
+		tolua_readonly bool OnlineOnly; 		  
+	
+		tolua_readonly char Id[32]; 				
+	};
+	
+	vehVehicle*	vehFindVehicleByChatHandle(unsigned int);
+	vehVehicle*	vehFindVehicle(unsigned int);
+	
+	const vehType* vehTypeGetBySpec(WEAPON_SPEC);
+	const vehType* vehtypeGetByIndex(unsigned int);
+	const vehType* vehTypeGetById(const char*);
+	
+	vehVehicle* playerGetVehicle @ vehPlayerVehicle();
+	
+	unsigned int vehmainAddSTO(const vehType* type, double x, double y, double z, float att, bool relative, const char* icon);
+	unsigned int vehmainAddSTO(const char* type, double x, double y, double z, float att, bool relative, const char* icon);
+	bool vehmainRemoveSTO(unsigned int id);
+	
+	struct WEAPON_SPEC
+	{
+		tolua_readonly unsigned char wCountry;
+		tolua_readonly unsigned char wCategory;
+		tolua_readonly unsigned char wClass;
+		tolua_readonly unsigned char wType;
+		
+		bool isNull();
+		int country();
+		int side();
+	};
+	
+	WEAPON_SPEC weapCreateSpec(int country, int category, int klass, int type);
+	WEAPON_SPEC weapCreateSpec(const char* weapString);
+}

@@ -1,0 +1,43 @@
+# Visual Studio on Windows.
+
+include_directories(
+	${GameHosts_SOURCE_DIR}/../include
+	${GameHosts_SOURCE_DIR}/../../Libraries/raknet/Source
+)
+
+set(_FORCE_INCLUDE_FLAG "/FI")
+
+add_definitions(
+	"-D_CRT_SECURE_NO_WARNINGS=1"
+	"-D_CRT_NONSTDC_NO_DEPRECATE=1"
+	"-DWIN32"
+	"-DUNICODE"
+	"-D_UNICODE"
+	"-D_HAS_ITERATOR_DEBUGGING=0"
+	"-D_SECURE_SCL=0"
+)
+
+set(_LANGUAGE_FLAGS "/Zc:wchar_t /Zc:forScope /GR")
+set(_DIAGNOSTIC_FLAGS "/WX- /FR /wd4480;4800")
+set(_DEV_FLAGS "")
+set(ARCHITECTURE "/arch:SSE2")
+
+set(_DEBUG_FLAGS "/Zi /nologo")
+set(_LANGUAGE_FLAGS "${_LANGUAGE_FLAGS} /EHsc /fp:precise")
+
+if ( CMAKE_BUILD_TYPE STREQUAL "RELEASE" AND PN_ENABLE_OPTS )
+	set(_LANGUAGE_FLAGS "${_LANGUAGE_FLAGS} /MP")
+	set(_OPTIMIZATION_FLAGS "/Ob2 /Oi /Ot /Oy /GT /GF /Gm- /MT /GS- /Gy-")
+
+	if ( OPTIMIZATION EQUAL 1 )
+		set(_OPTIMZATION_FLAG "/O1")
+	elseif ( OPTIMIZATION EQUAL 2 )
+		set(_OPTIMIZATION_FLAG "/O2")
+	elseif ( OPTIMIZATION GREATER 2 )
+		set(_OPTIMIZATION_FLAG "/Ox /GL /Gm")
+		set(_LINKER_FLAGS "/OPT:REF /OPT:ICF /LTCG")
+	endif (  )
+else ( )
+	set(_OPTIMIZATION_FLAGS "/Oy- /GF- /Gm /MT /GS /Gy")
+	set(_OPTIMIZATION_FLAG "/Od")
+endif ( )

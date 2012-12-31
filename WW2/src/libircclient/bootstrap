@@ -1,0 +1,4 @@
+#!/bin/bash
+
+aclocal && autoconf && libtoolize -f --force && automake -a --foreign
+./configure --prefix=/playnet/wwiiol/ --enable-threads

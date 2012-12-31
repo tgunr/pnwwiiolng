@@ -1,0 +1,160 @@
+BODY {
+ margin: 1px 1px 1px 1px;
+ padding: 1px 1px 1px 1px;
+ font-family: Arial, Helvetica, Sans-Serif ;
+ background-color: #ffffff ;
+}
+
+.page-heading {
+ border-top: dotted 1px blue ;
+ border-left: dotted 1px blue ;
+ border-bottom: dotted 1px blue;
+ font-family: Tahoma, Sans Serif ;
+ font-size: 12pt ;
+ font-weight: bold ;
+ background-color: #f0f4f8 ;
+ margin: -1px ;
+ padding: -1px ;
+ margin-bottom: 16px; 
+ display: table ;
+ width: 100% ;
+}
+
+.home-link, .heading, .host-page-info {
+ padding-left: 6px ;
+ padding-bottom: 3px;
+ border-right: dotted 1px blue ;
+ border-left: dotted 1px blue ;
+ display: table-cell ;
+}
+
+.home-link, .heading {
+}
+
+.home-link {
+ margin-right: 6px ;
+ padding-right: 6px ;
+ width: 8em ;
+}
+
+.heading {
+ width: 80% ;
+}
+
+.host-page-info {
+ font-weight: lighter ;
+ padding-right: 6px; 
+}
+
+.footer {
+  float: bottom ;
+  display: block ;
+  clear: both ;
+  font-size: 8pt; font-style: italic;
+  color: blue ;
+  margin-top: 16px; padding-top: 3px; border-top: dotted 1px blue;
+  text-align: right;
+}
+.footer:after {
+  content: "Powered by Teul::uWeb::Server.  Copyright (C) PlayNet Inc 2012 -- All rights reserved.";
+}
+
+h1 { font-size: 18pt ; }
+h2 { font-size: 16pt ; }
+h3 { font-size: 14pt ; }
+h4 { font-size: 12pt ; }
+
+h1, h2, .title {
+ padding-left: 4px ;
+ padding-right: 4px ;
+ background-color: #404080 ;
+ color: #f0f0b0 ;
+}
+
+.title {
+ font-size: larger ;
+}
+
+.control {
+ margin: 8px 32px 8px 32px;
+ padding: 4px 24px ;
+
+ border-left: 2px solid #c0c0ff ;
+ border-top: 2px solid #c0c0ff ;
+ border-right: 1px solid #808080 ;
+ border-bottom: 1px solid #808080 ;
+
+ background-color: #fcfcfc ;
+ font-size: smaller ;
+ font: Consolas, Cambria, Verdana, Sans-serif ;
+ text-align: center ;
+}
+
+.control input {
+ margin: 0px ;
+}
+
+.list {
+ font-size: normal; 
+}
+
+table.list {
+	border-width: 1px;
+	border-spacing: 0px;
+	border-style: solid;
+	border-color: blue;
+	border-collapse: collapse;
+}
+table.list th {
+	border-width: 1px;
+	padding: 1px;
+	border-style: dotted;
+	border-color: gray;
+	-moz-border-radius: ;
+}
+table.list td {
+	border-width: 1px;
+	padding: 1px;
+	border-style: dotted;
+	border-color: gray;
+	-moz-border-radius: ;
+}
+table.list .l0, table.list .l1 {
+ padding-top: 2px ;
+ padding-bottom: 2px ;
+}
+table.list .l0 {
+ background-color: #e3f0f7 ;
+}
+table.list .l1 {
+ background: #f7f7f7 ;
+}
+table.list tr.head {
+ background-color: #404080 ;
+ color: #f0f0b0 ;
+ font-weight: bold;
+ padding: 2px ;
+}
+table.list tr.foot {
+ border-top: 1px solid ;
+ font-style: italic ;
+}
+table.list tr.foot td, table.list tr.foot th {
+ padding: 4px 0px 2px ;
+}
+
+.list input, .list textarea, .list select, .list submit {
+ font-family: Consolas, Inconsolatas, Tahoma ;
+}
+
+.tblouter {
+ display: table;
+ border-collapse: collapse;
+}
+.tblinner {
+ display: table-cell;
+ border: 1px dotted gray ;
+ border-collapse: collapse ;
+ padding: 3px 4px 6px ;
+ margin: 2px ;
+}

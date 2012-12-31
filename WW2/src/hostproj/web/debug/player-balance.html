@@ -1,0 +1,172 @@
+<html>
+<head>
+ <title> Player-Balance Tracker </title>
+ <link rel="stylesheet" type="text/css" href="/style.css"/>
+ <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7/jquery.min.js"></script>
+ <script type="text/javascript" src="/helpers.js"></script>
+ <script type="text/javascript" src="/jqplot/jquery.jqplot.min.js"></script>
+ <script type="text/javascript" src="/jqplot/plugins/jqplot.canvasTextRenderer.min.js"></script>
+ <script type="text/javascript" src="/jqplot/plugins/jqplot.canvasAxisLabelRenderer.min.js"></script>
+ <script type="text/javascript" src="/jqplot/plugins/jqplot.dateAxisRenderer.min.js"></script>
+ <link rel="stylesheet" type="text/css" href="/jqplot/jquery.jqplot.min.css"/>
+<script type="text/javascript">
+var req = getAjaxObject();
+var dbKey = "pnPlayerBalanceStatsPoints" + document.domain ;
+var timer ;
+
+var statsPoints = [ ] ;
+var statsDraw = 0 ;
+var maxPoints = 10000 ;
+var maxLines = 20 ;
+var refreshRate = 30 ;
+var jqPlot = 0 ;
+var storage ;
+
+function addRow(row, players) {
+ var table = document.getElementById("output") ;
+ if ( table.rows.length > maxLines ) {
+  table.deleteRow(1) ;
+ }
+ table.appendChild(row) ;
+ statsPoints.push([new Date(), parseInt(players)]) ;
+ while ( statsPoints.length > maxPoints ) {
+  statsPoints.splice(0,1) ;
+ }
+ if ( storage ) { storage.setItem(dbKey, JSON.stringify(statsPoints)) ; }
+ if ( statsDraw ) { statsDraw() ; }
+ var freqEl = document.getElementById("freq") ;
+ if ( freqEl ) {
+  refreshRate = freqEl.value ;
+ }
+ timer = setTimeout("sendRequest()", refreshRate * 1000) ;
+}
+
+function parseJSON(o) {
+ var row = document.createElement("tr") ;
+ var now = makeDate(new Date()) ;
+
+ var values = [ now, o.players, o.camp.allies_spawned, o.camp.axis_spawned, o.swing_meter.in_effect, o.swing_meter.meter, o.swing_meter.delays]
+ var styles = { 'text-align' : 'center' };
+
+ for (i in values) {
+  row.appendChild(makeTD(values[i], styles)) ;
+ }
+ addRow(row, o.players) ;
+}
+
+function errorHandler(o) {
+ var row = document.createElement("tr") ;
+ var now = new Date() ;
+ row.appendChild(makeTH(makeDate(new Date()))) ;
+ var td = makeTD("<i>Unable to retrieve stats: Code " + o.status + "</i>", {'text-align':'center'}) ;
+ td.colSpan = 6;
+ row.appendChild(td) ;
+ addRow(row, 0) ;
+}
+
+function sendRequest() {
+ sendJsonRequest(req, "/player-balance.json", parseJSON, errorHandler);
+}
+
+$(function() {
+	storage = window.localStorage ;
+	if ( !storage ) { storage = localStorage ; }
+	if ( !storage ) { storage = window.sessionStorage ; }
+	if ( !storage ) { storage = sessionStorage ; }
+
+	if ( storage ) {
+	 try {
+	  var text = storage.getItem(dbKey) ;
+	  var data = JSON.parse(text) ;
+	  for ( i in data ) {
+	   statsPoints.push([new Date(data[i][0]), parseInt(data[i][1])]);
+	  }
+	 } catch ( e ) {
+	 }
+	}
+
+	// Executed after page loads.
+    var options = {
+			series:[{lineWidth:1, showMarker:false}],
+			axes:{
+				yaxis:{
+					label:'Players',
+					min: 0
+				},
+				xaxis:{
+					renderer:$.jqplot.DateAxisRenderer,
+					tickOptions: { formatString: "%H:%M:%S" }
+				}
+			},
+			resetAxes: true,
+			clear: true,
+			defaultWidth: 400,
+			defaultHeight: 160,
+			tickOptions: { formatString: "%H:%M:%S" }
+		} ;
+	statsDraw = function () {
+		if ( jqPlot ) {
+			jqPlot.series[0].data = statsPoints ;
+			jqPlot.replot({
+				resetAxes: true, clear: true, defaultWidth: 400, defaultHeight:160, axes:{yaxis:{min:0}},
+			});
+		}
+   		else { jqPlot = $.jqplot("jqGraph", [statsPoints], options) ; }
+	};
+	sendRequest() ;
+}) ;
+
+function changeFreq(e) {
+ if ( timer ) { clearTimeout(timer) ; }
+ refreshRate = e.value ;
+ timer = setTimeout("sendRequest()", refreshRate * 1000) ;
+}
+
+function clearStats() {
+ if ( timer ) { clearTimeout(timer) ; }
+ statsPoints = [] ;
+ if ( storage ) { storage.setItem(dbKey, "") ; }
+ timer = setTimeout("sendRequest()", 1000) ;
+ return false ;
+}
+</script>
+</head>
+<body>
+
+<h1 class='heading'> Map Host Population and Balance Report </h1>
+
+<div align='center'>
+<span class='control'>
+ <label>Refresh Rate:</label>
+ <input class='radio' type='radio' name='freq' value='1' onChange='changeFreq(this)'>1s</input>&nbsp;
+ <input class='radio' type='radio' name='freq' value='5' onChange='changeFreq(this)'>5s</input>&nbsp;
+ <input class='radio' type='radio' name='freq' value='10' onChange='changeFreq(this)'>10s</input>&nbsp;
+ <input class='radio' type='radio' name='freq' value='15' onChange='changeFreq(this)'>15s</input>&nbsp;
+ <input class='radio' type='radio' name='freq' value='20' onChange='changeFreq(this)'>20s</input>&nbsp;
+ <input class='radio' type='radio' name='freq' value='30' checked='checked' onChange='changeFreq(this)'>30s</input>&nbsp;
+ <input class='radio' type='radio' name='freq' value='60' onChange='changeFreq(this)'>60s</input>&nbsp;
+ <input class='radio' type='radio' name='freq' value='90' onChange='changeFreq(this)'>90s</input>&nbsp;
+ <input class='radio' type='radio' name='freq' value='120' onChange='changeFreq(this)'>2m</input>&nbsp;
+ <input class='radio' type='radio' name='freq' value='300' onChange='changeFreq(this)'>5m</input>&nbsp;
+ <input class='radio' type='radio' name='freq' value='600' onChange='changeFreq(this)'>10m</input>&nbsp;
+ <input class='radio' type='radio' name='freq' value='900' onChange='changeFreq(this)'>15m</input>
+</span>
+<span class='control'>
+ <label><input type='submit' value='Clear' onclick='clearStats(); return false;'/>
+</span>
+</div>
+
+<div id='jqGraph' style='padding-left: 8px; padding-right: 8px ; margin-left: 8px ; margin-right: 24px; height:180px'></div>
+<p/>
+
+<table style='width:100%' border='1'>
+<tbody id="output">
+ <tr><th>Time</th><th>Players</th><th>Allies</th><th>Axis</th><th>On?</th><th>Meter</th><th>Delays</th></tr>
+</tbody>
+</table>
+
+<div class='footer'/>
+
+</body>
+</html>
+

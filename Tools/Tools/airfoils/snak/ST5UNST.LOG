@@ -1,0 +1,84 @@
+ %% PLEASE DO NOT MODIFY OR DELETE THIS FILE! %% 
+ %% This file contains information about the installation of an application. %% 
+ %% It will be used to automatically remove all application components from your computer if you choose to do so. %% 
+
+
+NOTE: Beginning of the bootstrapper section
+
+CONFIG: Title: "SNACK"
+
+ACTION: TempFile: "C:\WIN95\setup1.exe"
+(File was not found or was an older version -- new file copied)
+
+ACTION: RegKey: "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion", "SharedDLLs"
+
+ACTION: SharedFile: "C:\WIN95\SYSTEM\VB5StKit.dll"
+(File was not found or was an older version -- new file copied)
+
+ACTION: SystemFile: "C:\WIN95\SYSTEM\MSVBVM50.dll"
+(File was not found or was an older version -- new file copied)
+
+ACTION: SystemFile: "C:\WIN95\SYSTEM\StdOle2.tlb"
+(File currently on disk was already up to date)
+
+ACTION: SystemFile: "C:\WIN95\SYSTEM\OleAut32.dll"
+(File currently on disk was already up to date)
+
+ACTION: SystemFile: "C:\WIN95\SYSTEM\OlePro32.dll"
+(File currently on disk was already up to date)
+
+ACTION: SystemFile: "C:\WIN95\SYSTEM\AsycFilt.dll"
+(File currently on disk was already up to date)
+
+NOTE: The file 'Ctl3d32.dll' was not copied because it is intended for use under Windows NT 3.51 only.  It is not needed under Windows 95 or NT 4.0.
+
+ACTION: SystemFile: "C:\WIN95\SYSTEM\Ctl3d32.dll"
+(File currently on disk was already up to date)
+
+ACTION: SystemFile: "C:\WIN95\SYSTEM\ComCat.dll"
+(File was not found or was an older version -- new file copied)
+
+ACTION: DllSelfRegister: "C:\WIN95\SYSTEM\MSVBVM50.dll"
+
+ACTION: TLBRegister: "C:\WIN95\SYSTEM\StdOle2.tlb"
+
+ACTION: DllSelfRegister: "C:\WIN95\SYSTEM\OleAut32.dll"
+
+ACTION: DllSelfRegister: "C:\WIN95\SYSTEM\OlePro32.dll"
+
+ACTION: DllSelfRegister: "C:\WIN95\SYSTEM\ComCat.dll"
+
+NOTE: End of the bootstrapper section
+
+NOTE: Now spawning the main Setup program 'C:\WIN95\setup1.exe'....
+
+ACTION: CreateDir: "f:\airfoil\snak"
+
+ACTION: SharedFile: "C:\WIN95\SYSTEM\COMDLG32.OCX"
+(File was not found or was an older version -- new file copied)
+
+ACTION: SharedFile: "C:\WIN95\SYSTEM\COMCTL32.OCX"
+(File was not found or was an older version -- new file copied)
+
+ACTION: PrivateFile: "f:\AIRFOIL\snak\snack.hlp"
+(File was not found or was an older version -- new file copied)
+
+ACTION: PrivateFile: "f:\AIRFOIL\snak\Snack.exe"
+(File was not found or was an older version -- new file copied)
+
+ACTION: PrivateFile: "f:\AIRFOIL\snak\readme.txt"
+(File was not found or was an older version -- new file copied)
+
+ACTION: PrivateFile: "f:\AIRFOIL\snak\order.frm"
+(File was not found or was an older version -- new file copied)
+
+ACTION: DllSelfRegister: "C:\WIN95\SYSTEM\COMDLG32.OCX"
+
+ACTION: DllSelfRegister: "C:\WIN95\SYSTEM\COMCTL32.OCX"
+
+ACTION: ShellLink: "", "SNACK"
+
+ACTION: RegKey: "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion", "App Paths\Snack.exe"
+
+ACTION: RegValue: "HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\App Paths\Snack.exe", ""
+

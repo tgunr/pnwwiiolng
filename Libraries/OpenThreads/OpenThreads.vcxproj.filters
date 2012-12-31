@@ -1,0 +1,89 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{ef864eaa-d62a-41b2-8a19-55aced14f5f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{6b68df8c-579a-45fd-821f-4f6b3d0b0ae8}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Atomic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Version.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="WIN32Condition.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Win32Mutex.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Win32Thread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Win32ThreadBarrier.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Atomic">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Barrier">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Block">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Condition">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Config">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Exports">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Mutex">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="ReadWriteMutex">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="ReentrantMutex">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="ScopedLock">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Thread">
+      <Filter>Header Files</Filter>
+    </None>
+    <None Include="Version">
+      <Filter>Header Files</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="HandleHolder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Win32BarrierPrivateData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Win32Condition.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Win32ConditionPrivateData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Win32MutexPrivateData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Win32ThreadPrivateData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

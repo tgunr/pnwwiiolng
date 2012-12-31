@@ -1,0 +1,1879 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="BetaReleaseSSE2SmartHeap|Win32">
+      <Configuration>BetaReleaseSSE2SmartHeap</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Buzzard|Win32">
+      <Configuration>Buzzard</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="China|Win32">
+      <Configuration>China</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="FullDebug|Win32">
+      <Configuration>FullDebug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MultiClient|Win32">
+      <Configuration>MultiClient</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="PublicReleaseSSE2SmartHeap|Win32">
+      <Configuration>PublicReleaseSSE2SmartHeap</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="TestRelease|Win32">
+      <Configuration>TestRelease</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{F24BABC4-A05B-4405-B107-B573096D6D58}</ProjectGuid>
+    <RootNamespace>WW2</RootNamespace>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='China|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='China|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(VCTargetsPath)Microsoft.CPP.UpgradeFromVC71.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\Debug\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">.\Debug\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">true</LinkIncremental>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">true</GenerateManifest>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='China|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='China|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='China|Win32'">false</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">false</LinkIncremental>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
+    <IgnoreImportLibrary Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">false</IgnoreImportLibrary>
+    <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</EnableManagedIncrementalBuild>
+    <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">false</EnableManagedIncrementalBuild>
+    <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">false</EnableManagedIncrementalBuild>
+    <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='China|Win32'">false</EnableManagedIncrementalBuild>
+    <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">false</EnableManagedIncrementalBuild>
+    <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">false</EnableManagedIncrementalBuild>
+    <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">false</EnableManagedIncrementalBuild>
+    <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">false</EnableManagedIncrementalBuild>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='China|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <IncludePath Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">$(DXSDK_DIR)\Include;$(IncludePath)</IncludePath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='China|Win32'">$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
+    <LibraryPath Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">$(DXSDK_DIR)\Lib\x86;$(LibraryPath)</LibraryPath>
+    <CustomBuildBeforeTargets Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    </CustomBuildBeforeTargets>
+    <PreBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</PreBuildEventUseInBuild>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">false</GenerateManifest>
+    <GenerateManifest Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">false</GenerateManifest>
+    <PreBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">true</PreBuildEventUseInBuild>
+    <PreBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">true</PreBuildEventUseInBuild>
+    <PreBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='China|Win32'">true</PreBuildEventUseInBuild>
+    <PreBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">true</PreBuildEventUseInBuild>
+    <PreBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">true</PreBuildEventUseInBuild>
+    <PreBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">true</PreBuildEventUseInBuild>
+    <PreBuildEventUseInBuild Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">true</PreBuildEventUseInBuild>
+    <TargetName Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">$(Configuration)</TargetName>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Debug/WW2.tlb</TypeLibraryName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\include;$(SolutionDir)\WW2\proj;$(SolutionDir)\WW2\proj\win;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\dd;$(SolutionDir)\WW2\src\di;$(SolutionDir)\WW2\src\mem;$(SolutionDir)\Libraries\;$(SolutionDir)\Libraries\phui\include;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\opende\include;$(SolutionDir)\Libraries\zlib-1.2.5;$(SolutionDir)\Libraries\lpng144;$(SolutionDir)\Libraries\ftgl\src;$(SolutionDir)\Libraries\freetype\include;$(SolutionDir)\Libraries\phui\include\js;$(SolutionDir)\WW2\include\lua;$(SolutionDir)\WW2\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DEBUG_WW2;ENABLE_FLOATERS;XP_WIN;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=0;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;CRASH_HANDLER;SMARTHEAP_USED;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;DIDDLE_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>Default</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>syscfg.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>$(IntDir)/Artifacts/</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)/ObjFiles/</ObjectFileName>
+      <ProgramDataBaseFileName>.\Debug/</ProgramDataBaseFileName>
+      <BrowseInformation>false</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <CompileAsManaged>false</CompileAsManaged>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>shlW32Mt.lib;imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;granny2.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(SolutionDir)\WW2\lib\win\3rdParty;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>libcmtd;libcpmtd;msvcrtd;msvcprtd;msvcrt;msvcprt;vcomp;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ForceSymbolReferences>_SmartHeap_malloc;_SmartHeap_new;%(ForceSymbolReferences)</ForceSymbolReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>.\Debug/WW2.pdb</ProgramDatabaseFile>
+      <GenerateMapFile>true</GenerateMapFile>
+      <MapFileName>$(IntDir)/Artifacts/WW2.map</MapFileName>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <CreateHotPatchableImage>Enabled</CreateHotPatchableImage>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)/Tools/revno.py $(SolutionDir)</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Generate client_revision.h</Message>
+    </PreBuildEvent>
+    <CustomBuildStep>
+      <Command>
+      </Command>
+    </CustomBuildStep>
+    <CustomBuildStep>
+      <Outputs>
+      </Outputs>
+    </CustomBuildStep>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\include;$(SolutionDir)\WW2\proj;$(SolutionDir)\WW2\proj\win;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\dd;$(SolutionDir)\WW2\src\di;$(SolutionDir)\WW2\src\mem;$(SolutionDir)\Libraries\;$(SolutionDir)\Libraries\phui\include;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\opende\include;$(SolutionDir)\Libraries\zlib-1.2.5;$(SolutionDir)\Libraries\lpng144;$(SolutionDir)\Libraries\ftgl\src;$(SolutionDir)\Libraries\freetype\include;$(SolutionDir)\Libraries\phui\include\js;$(SolutionDir)\WW2\include\lua;$(SolutionDir)\WW2\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>VEHICLES_GAME_INFO;ENABLE_FLOATERS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_CRT_SECURE_NO_WARNINGS;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;SMARTHEAP_USED;CRASH_HANDLER;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>syscfg.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <AssemblerOutput>All</AssemblerOutput>
+      <BrowseInformation>
+      </BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <CompileAsManaged>false</CompileAsManaged>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <AssemblerListingLocation>$(IntDir)/Artifacts/</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)/ObjFiles/</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;granny2.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
+      <Version>0.1</Version>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(SolutionDir)\WW2\lib\win\3rdParty;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>libcmtd;libcpmtd;msvcrtd;msvcprtd;msvcrt;msvcprt;vcomp;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ForceSymbolReferences>_SmartHeap_malloc;_SmartHeap_new;%(ForceSymbolReferences)</ForceSymbolReferences>
+      <GenerateMapFile>true</GenerateMapFile>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <TargetMachine>MachineX86</TargetMachine>
+      <MapFileName>$(IntDir)/Artifacts/WW2.map</MapFileName>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)/Tools/revno.py $(SolutionDir)</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Generate client_revision.h</Message>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\include;$(SolutionDir)\WW2\proj;$(SolutionDir)\WW2\proj\win;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\dd;$(SolutionDir)\WW2\src\di;$(SolutionDir)\WW2\src\mem;$(SolutionDir)\Libraries\;$(SolutionDir)\Libraries\phui\include;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\opende\include;$(SolutionDir)\Libraries\zlib-1.2.5;$(SolutionDir)\Libraries\lpng144;$(SolutionDir)\Libraries\ftgl\src;$(SolutionDir)\Libraries\freetype\include;$(SolutionDir)\Libraries\phui\include\js;$(SolutionDir)\WW2\include\lua;$(SolutionDir)\WW2\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>MULTI_CLIENT=1;ENABLE_FLOATERS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_CRT_SECURE_NO_WARNINGS;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;SMARTHEAP_USED;CRASH_HANDLER;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>syscfg.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <BrowseInformation>false</BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <CompileAsManaged>false</CompileAsManaged>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <WholeProgramOptimization>true</WholeProgramOptimization>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <CreateHotpatchableImage>false</CreateHotpatchableImage>
+      <AssemblerListingLocation>$(IntDir)/Artifacts/</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)/ObjFiles/</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;granny2.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(Configuration).exe</OutputFile>
+      <Version>0.1</Version>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(SolutionDir)\WW2\lib\win\3rdParty;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>libcmtd;libcpmtd;msvcrtd;msvcprtd;msvcrt;msvcprt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ForceSymbolReferences>_SmartHeap_malloc;_SmartHeap_new;%(ForceSymbolReferences)</ForceSymbolReferences>
+      <GenerateMapFile>false</GenerateMapFile>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <TargetMachine>MachineX86</TargetMachine>
+      <LinkTimeCodeGeneration>UseLinkTimeCodeGeneration</LinkTimeCodeGeneration>
+      <MapFileName>$(IntDir)/Artifacts/WW2.map</MapFileName>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)/Tools/revno.py $(SolutionDir)</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Generate client_revision.h</Message>
+    </PreBuildEvent>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\include;$(SolutionDir)\WW2\proj;$(SolutionDir)\WW2\proj\win;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\dd;$(SolutionDir)\WW2\src\di;$(SolutionDir)\WW2\src\mem;$(SolutionDir)\Libraries\;$(SolutionDir)\Libraries\phui\include;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\opende\include;$(SolutionDir)\Libraries\zlib-1.2.5;$(SolutionDir)\Libraries\lpng144;$(SolutionDir)\Libraries\ftgl\src;$(SolutionDir)\Libraries\freetype\include;$(SolutionDir)\Libraries\phui\include\js;$(SolutionDir)\WW2\include\lua;$(SolutionDir)\WW2\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;GLEW_STATIC;RELEASE_CLIENT=1;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;CRASH_HANDLER;SMARTHEAP_USED;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;ANTIHACK;DIDDLE_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>syscfg.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <AssemblerOutput>All</AssemblerOutput>
+      <BrowseInformation>
+      </BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <CompileAsManaged>false</CompileAsManaged>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <AssemblerListingLocation>$(IntDir)/Artifacts/</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)/ObjFiles/</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;granny2.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
+      <Version>0.1</Version>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(SolutionDir)\WW2\lib\win\3rdParty;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>libcmtd;libcpmtd;msvcrtd;msvcprtd;msvcrt;msvcprt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ForceSymbolReferences>_SmartHeap_malloc;_SmartHeap_new;%(ForceSymbolReferences)</ForceSymbolReferences>
+      <GenerateMapFile>true</GenerateMapFile>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <TargetMachine>MachineX86</TargetMachine>
+      <MapFileName>$(IntDir)/Artifacts/WW2.map</MapFileName>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)/Tools/revno.py $(SolutionDir)</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Generate client_revision.h</Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>_DEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+      <TypeLibraryName>.\Debug/WW2.tlb</TypeLibraryName>
+    </Midl>
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <InlineFunctionExpansion>Default</InlineFunctionExpansion>
+      <IntrinsicFunctions>false</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Neither</FavorSizeOrSpeed>
+      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\include;$(SolutionDir)\WW2\proj;$(SolutionDir)\WW2\proj\win;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\dd;$(SolutionDir)\WW2\src\di;$(SolutionDir)\WW2\src\mem;$(SolutionDir)\Libraries\;$(SolutionDir)\Libraries\phui\include;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\opende\include;$(SolutionDir)\Libraries\zlib-1.2.5;$(SolutionDir)\Libraries\lpng144;$(SolutionDir)\Libraries\ftgl\src;$(SolutionDir)\Libraries\freetype\include;$(SolutionDir)\Libraries\phui\include\js;$(SolutionDir)\WW2\include\lua;$(SolutionDir)\WW2\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>DEBUG_FPU;DEBUG_WW2;ENABLE_FLOATERS;XP_WIN;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=0;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;BUILDING_GRANNY_STATIC;XAUDIO=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>syscfg.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <AssemblerListingLocation>$(IntDir)/Artifacts/</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)/ObjFiles/</ObjectFileName>
+      <ProgramDataBaseFileName>.\Debug/</ProgramDataBaseFileName>
+      <BrowseInformation>
+      </BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <CompileAsManaged>false</CompileAsManaged>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>_DEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>shlW32Mt.lib;imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;granny2.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ShowProgress>NotSet</ShowProgress>
+      <OutputFile>$(OutDir)$(ProjectName)_x86.exe</OutputFile>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(SolutionDir)\WW2\lib\win\3rdParty;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>libcmtd;libcpmtd;msvcrtd;msvcprtd;msvcrt;msvcprt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <ProgramDatabaseFile>.\Debug/WW2.pdb</ProgramDatabaseFile>
+      <GenerateMapFile>false</GenerateMapFile>
+      <MapFileName>$(IntDir)/Artifacts/WW2.map</MapFileName>
+      <SubSystem>Windows</SubSystem>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <ImportLibrary>
+      </ImportLibrary>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)/Tools/revno.py $(SolutionDir)</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Generate client_revision.h</Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\include;$(SolutionDir)\WW2\proj;$(SolutionDir)\WW2\proj\win;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\dd;$(SolutionDir)\WW2\src\di;$(SolutionDir)\WW2\src\mem;$(SolutionDir)\Libraries\;$(SolutionDir)\Libraries\phui\include;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\opende\include;$(SolutionDir)\Libraries\zlib-1.2.5;$(SolutionDir)\Libraries\lpng144;$(SolutionDir)\Libraries\ftgl\src;$(SolutionDir)\Libraries\freetype\include;$(SolutionDir)\Libraries\phui\include\js;$(SolutionDir)\WW2\include\lua;$(SolutionDir)\WW2\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;ENABLE_FLOATERS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;ODE_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;BUILDING_GRANNY_STATIC;XAUDIO=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <FloatingPointExceptions>false</FloatingPointExceptions>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>syscfg.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <BrowseInformation>
+      </BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <CompileAsManaged>false</CompileAsManaged>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <AssemblerListingLocation>$(IntDir)/Artifacts/</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)/ObjFiles/</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;granny2.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
+      <Version>0.1</Version>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(SolutionDir)\WW2\lib\win\3rdParty;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>libcmtd;libcpmtd;msvcrtd;msvcprtd;msvcrt;msvcprt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ForceSymbolReferences>%(ForceSymbolReferences)</ForceSymbolReferences>
+      <GenerateMapFile>false</GenerateMapFile>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <TargetMachine>MachineX86</TargetMachine>
+      <MapFileName>$(IntDir)/Artifacts/WW2.map</MapFileName>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)/Tools/revno.py $(SolutionDir)</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Generate client_revision.h</Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='China|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\include;$(SolutionDir)\WW2\proj;$(SolutionDir)\WW2\proj\win;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\dd;$(SolutionDir)\WW2\src\di;$(SolutionDir)\WW2\src\mem;$(SolutionDir)\Libraries\;$(SolutionDir)\Libraries\phui\include;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\opende\include;$(SolutionDir)\Libraries\zlib-1.2.5;$(SolutionDir)\Libraries\lpng144;$(SolutionDir)\Libraries\ftgl\src;$(SolutionDir)\Libraries\freetype\include;$(SolutionDir)\Libraries\phui\include\js;$(SolutionDir)\WW2\include\lua;$(SolutionDir)\WW2\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;GLEW_STATIC;RELEASE_CLIENT=1;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;CRASH_HANDLER;SMARTHEAP_USED;GREEN_INSTALL=1;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=0;DIDDLE_ENABLED;IS_CHINA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>syscfg.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <BrowseInformation>
+      </BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <CompileAsManaged>false</CompileAsManaged>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <AssemblerListingLocation>$(IntDir)/Artifacts/</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)/ObjFiles/</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;granny2.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
+      <Version>0.1</Version>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(SolutionDir)\WW2\lib\win\3rdParty;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>libcmtd;libcpmtd;msvcrtd;msvcprtd;msvcrt;msvcprt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ForceSymbolReferences>_SmartHeap_malloc;_SmartHeap_new;%(ForceSymbolReferences)</ForceSymbolReferences>
+      <GenerateMapFile>true</GenerateMapFile>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <TargetMachine>MachineX86</TargetMachine>
+      <MapFileName>$(IntDir)/Artifacts/WW2.map</MapFileName>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)/Tools/revno.py $(SolutionDir)</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Generate client_revision.h</Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">
+    <Midl>
+      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MkTypLibCompatible>true</MkTypLibCompatible>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <TargetEnvironment>Win32</TargetEnvironment>
+    </Midl>
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\include;$(SolutionDir)\WW2\proj;$(SolutionDir)\WW2\proj\win;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\dd;$(SolutionDir)\WW2\src\di;$(SolutionDir)\WW2\src\mem;$(SolutionDir)\Libraries\;$(SolutionDir)\Libraries\phui\include;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\opende\include;$(SolutionDir)\Libraries\zlib-1.2.5;$(SolutionDir)\Libraries\lpng144;$(SolutionDir)\Libraries\ftgl\src;$(SolutionDir)\Libraries\freetype\include;$(SolutionDir)\Libraries\phui\include\js;$(SolutionDir)\WW2\include\lua;$(SolutionDir)\WW2\include</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>ENABLE_FLOATERS;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;GLEW_STATIC;RELEASE_CLIENT=1;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;CRASH_HANDLER;SMARTHEAP_USED;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;ANTIHACK;DIDDLE_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <StructMemberAlignment>Default</StructMemberAlignment>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <RuntimeTypeInfo>true</RuntimeTypeInfo>
+      <OpenMPSupport>false</OpenMPSupport>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>syscfg.h</PrecompiledHeaderFile>
+      <PrecompiledHeaderOutputFile>$(IntDir)$(TargetName).pch</PrecompiledHeaderOutputFile>
+      <AssemblerOutput>NoListing</AssemblerOutput>
+      <BrowseInformation>
+      </BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4482;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+      <CompileAsManaged>false</CompileAsManaged>
+      <MultiProcessorCompilation>false</MultiProcessorCompilation>
+      <AssemblerListingLocation>$(IntDir)/Artifacts/</AssemblerListingLocation>
+      <ObjectFileName>$(IntDir)/ObjFiles/</ObjectFileName>
+    </ClCompile>
+    <ResourceCompile>
+      <PreprocessorDefinitions>NDEBUG;platOS=OS_WIN32;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <Culture>0x0409</Culture>
+    </ResourceCompile>
+    <Link>
+      <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;granny2.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
+      <Version>0.1</Version>
+      <SuppressStartupBanner>true</SuppressStartupBanner>
+      <AdditionalLibraryDirectories>$(SolutionDir)\WW2\lib\win\3rdParty;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>libcmtd;libcpmtd;msvcrtd;msvcprtd;msvcrt;msvcprt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <ForceSymbolReferences>_SmartHeap_malloc;_SmartHeap_new;%(ForceSymbolReferences)</ForceSymbolReferences>
+      <GenerateMapFile>true</GenerateMapFile>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <RandomizedBaseAddress>true</RandomizedBaseAddress>
+      <DataExecutionPrevention>true</DataExecutionPrevention>
+      <TargetMachine>MachineX86</TargetMachine>
+      <MapFileName>$(IntDir)/Artifacts/WW2.map</MapFileName>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+    <ProjectReference>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+    </ProjectReference>
+    <PreBuildEvent>
+      <Command>$(SolutionDir)/Tools/revno.py $(SolutionDir)</Command>
+    </PreBuildEvent>
+    <PreBuildEvent>
+      <Message>Generate client_revision.h</Message>
+    </PreBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\cfg\cfgCodes.h" />
+    <ClInclude Include="..\..\src\cfg\cfgData.h" />
+    <ClInclude Include="..\..\src\cfg\cfgLoad.h" />
+    <ClInclude Include="..\..\src\cfg\cfgLua.h" />
+    <ClInclude Include="..\..\src\cfg\cfgPrefs.h" />
+    <ClInclude Include="..\..\src\cfg\cfgw2.h" />
+    <ClInclude Include="..\..\src\chat\chatBrigadeControl.h" />
+    <ClInclude Include="..\..\src\chat\chatBrigadeControlList.h" />
+    <ClInclude Include="..\..\src\chat\chatClientMessage.h" />
+    <ClInclude Include="..\..\src\chat\chatClientMessages.h" />
+    <ClInclude Include="..\..\src\chat\chatConstants.h" />
+    <ClInclude Include="..\..\src\chat\chatDefines.h" />
+    <ClInclude Include="..\..\src\chat\chatDotCommandList.h" />
+    <ClInclude Include="..\..\src\chat\chatEditString.h" />
+    <ClInclude Include="..\..\src\chat\chatEditStringMsg.h" />
+    <ClInclude Include="..\..\src\chat\chatGCIMessage.h" />
+    <ClInclude Include="..\..\src\chat\chatGroupPermissionTypes.h" />
+    <ClInclude Include="..\..\src\chat\chatHandle.h" />
+    <ClInclude Include="..\..\src\chat\chatHoldFallVote.h" />
+    <ClInclude Include="..\..\src\chat\chatHostMessage.h" />
+    <ClInclude Include="..\..\src\chat\chatLocality.h" />
+    <ClInclude Include="..\..\src\chat\chatLocalizedMessage.h" />
+    <ClInclude Include="..\..\src\chat\chatLStringIDs.h" />
+    <ClInclude Include="..\..\src\chat\chatMissionInvite.h" />
+    <ClInclude Include="..\..\src\chat\chatMissionInviteMsg.h" />
+    <ClInclude Include="..\..\src\chat\chatMissionMember.h" />
+    <ClInclude Include="..\..\src\chat\chatMissionMemberUpdates.h" />
+    <ClInclude Include="..\..\src\chat\chatMotds.h" />
+    <ClInclude Include="..\..\src\chat\chatPreference.h" />
+    <ClInclude Include="..\..\src\chat\chatPreferenceEnum.h" />
+    <ClInclude Include="..\..\src\chat\chatPrototypes.h" />
+    <ClInclude Include="..\..\src\chat\chatRecruiterList.h" />
+    <ClInclude Include="..\..\src\chat\chatServerInfo.h" />
+    <ClInclude Include="..\..\src\chat\chatSquadControl.h" />
+    <ClInclude Include="..\..\src\chat\chatSquadControlResults.h" />
+    <ClInclude Include="..\..\src\chat\chatSTOJoules.h" />
+    <ClInclude Include="..\..\src\chat\chatTimeInterval.h" />
+    <ClInclude Include="..\..\src\chat\chatTuneToChannel.h" />
+    <ClInclude Include="..\..\src\chat\chatTypes.h" />
+    <ClInclude Include="..\..\src\chat\chatUpdateChannel.h" />
+    <ClInclude Include="..\..\src\chat\chatUserNLA.h" />
+    <ClInclude Include="..\..\src\chat\chatWaypoint.h" />
+    <ClInclude Include="..\..\src\chat\chatWaypointExchg.h" />
+    <ClInclude Include="..\..\src\chat\chatWho.h" />
+    <ClInclude Include="..\..\src\chat\chatWhoList.h" />
+    <ClInclude Include="..\..\src\client\client.h" />
+    <ClInclude Include="..\..\src\client\clientBrigadeControlDescriptors.h" />
+    <ClInclude Include="..\..\src\client\clientConnections.h" />
+    <ClInclude Include="..\..\src\client\clientNetError.h" />
+    <ClInclude Include="..\..\src\client\clientResupplyIssue.h" />
+    <ClInclude Include="..\..\src\client\clientServerTrackedObjects.h" />
+    <ClInclude Include="..\..\src\client\clientSquad.h" />
+    <ClInclude Include="..\..\src\client\clientSTO.h" />
+    <ClInclude Include="..\..\src\client\clientStrtQueue.h" />
+    <ClInclude Include="..\..\src\client\GameClient.h" />
+    <ClInclude Include="..\..\src\client\ww2Client.h" />
+    <ClInclude Include="..\..\src\client_revision.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='China|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">true</ExcludedFromBuild>
+    </ClInclude>
+    <ClInclude Include="..\..\src\comm\commClientMessages.h" />
+    <ClInclude Include="..\..\src\comm\commConstants.h" />
+    <ClInclude Include="..\..\src\comm\commPackers.h" />
+    <ClInclude Include="..\..\src\comm\commTypes.h" />
+    <ClInclude Include="..\..\src\dbug\dbugExtErrors.h" />
+    <ClInclude Include="..\..\src\dd\ddp.h" />
+    <ClInclude Include="..\..\src\dd\dx3dinfo.h" />
+    <ClInclude Include="..\..\src\di\dimain.h" />
+    <ClInclude Include="..\..\src\di\dip.h" />
+    <ClInclude Include="..\..\src\di\NPClient.h" />
+    <ClInclude Include="..\..\src\draw\draw2d.h" />
+    <ClInclude Include="..\..\src\draw\draw3d.h" />
+    <ClInclude Include="..\..\src\draw\drawIcon.h" />
+    <ClInclude Include="..\..\src\draw\sneaky.h" />
+    <ClInclude Include="..\..\src\draw\TextureFont.h" />
+    <ClInclude Include="..\..\src\ez\EZLoader.h" />
+    <ClInclude Include="..\..\src\ez\EZManager.h" />
+    <ClInclude Include="..\..\src\ez\EZVehicles.h" />
+    <ClInclude Include="..\..\src\fio\fio.h" />
+    <ClInclude Include="..\..\src\fio\fioa.h" />
+    <ClInclude Include="..\..\src\fio\fiod.h" />
+    <ClInclude Include="..\..\src\fp\fpFPS.h" />
+    <ClInclude Include="..\..\src\fp\fpFPSdata.h" />
+    <ClInclude Include="..\..\src\fp\fpFPSinternal.h" />
+    <ClInclude Include="..\..\src\fp\fpHash.h" />
+    <ClInclude Include="..\..\src\fp\fpLua.h" />
+    <ClInclude Include="..\..\src\fp\fpMain.h" />
+    <ClInclude Include="..\..\src\fp\fpPPO.h" />
+    <ClInclude Include="..\..\src\fp\fpTPS.h" />
+    <ClInclude Include="..\..\src\fp\fpTPSdata.h" />
+    <ClInclude Include="..\..\src\fp\fpTPSKits.h" />
+    <ClInclude Include="..\..\src\fp\fpTPSPhysics.h" />
+    <ClInclude Include="..\..\src\fp\fpTPStypes.h" />
+    <ClInclude Include="..\..\src\fp\fpTrooperHashes.h" />
+    <ClInclude Include="..\..\src\fp\fptypes.h" />
+    <ClInclude Include="..\..\src\fx\DataFx.h" />
+    <ClInclude Include="..\..\src\fx\EmitterMgr.h" />
+    <ClInclude Include="..\..\src\fx\fxAmb.h" />
+    <ClInclude Include="..\..\src\fx\fxBlt.h" />
+    <ClInclude Include="..\..\src\fx\fxExp.h" />
+    <ClInclude Include="..\..\src\fx\fxHit.h" />
+    <ClInclude Include="..\..\src\fx\fxLgt.h" />
+    <ClInclude Include="..\..\src\fx\fxMgr.h" />
+    <ClInclude Include="..\..\src\fx\fxMisc.h" />
+    <ClInclude Include="..\..\src\fx\fxPcl.h" />
+    <ClInclude Include="..\..\src\fx\fxSnd.h" />
+    <ClInclude Include="..\..\src\fx\fxUtl.h" />
+    <ClInclude Include="..\..\src\fx\fxWeather.h" />
+    <ClInclude Include="..\..\src\fx\Particle2.h" />
+    <ClInclude Include="..\..\src\fx\ParticleMgr.h" />
+    <ClInclude Include="..\..\src\fx\postRender.h" />
+    <ClInclude Include="..\..\src\fx\stoeffects.h" />
+    <ClInclude Include="..\..\src\fx\TransformEffect.h" />
+    <ClInclude Include="..\..\src\gl\gl.h" />
+    <ClInclude Include="..\..\src\gl\gl3.h" />
+    <ClInclude Include="..\..\src\gmlp\gmlpmain.h" />
+    <ClInclude Include="..\..\src\gr2\gr2Anim.h" />
+    <ClInclude Include="..\..\src\gr2\gr2layer.h" />
+    <ClInclude Include="..\..\src\gr2\gr2layerTypes.h" />
+    <ClInclude Include="..\..\src\gr2\gr2Physics.h" />
+    <ClInclude Include="..\..\src\imap\iac.h" />
+    <ClInclude Include="..\..\src\imap\imaphack.h" />
+    <ClInclude Include="..\..\src\imap\imapLua.h" />
+    <ClInclude Include="..\..\src\imap\imapTypes.h" />
+    <ClInclude Include="..\..\src\imap\ww2func.h" />
+    <ClInclude Include="..\..\src\imap\ww2imap.h" />
+    <ClInclude Include="..\..\src\dbug\dbug.h" />
+    <ClInclude Include="..\..\src\include\defs.h" />
+    <ClInclude Include="..\..\src\include\mobileSpawnEnums.h" />
+    <ClInclude Include="..\..\src\include\platforms.h" />
+    <ClInclude Include="..\..\src\include\precompile_includes.h" />
+    <ClInclude Include="..\..\src\include\systypes.h" />
+    <ClInclude Include="..\..\src\inst\instAction.h" />
+    <ClInclude Include="..\..\src\maptools\GenerateIcons.h" />
+    <ClInclude Include="..\..\src\map\mapSupercellVislevelXfer.h" />
+    <ClInclude Include="..\..\src\math\Rand.h" />
+    <ClInclude Include="..\..\src\math\SuperFastHash.h" />
+    <ClInclude Include="..\..\src\ogl\GLCounter.h" />
+    <ClInclude Include="..\..\src\physics\HeightField.h" />
+    <ClInclude Include="..\..\src\sys\sysmainHackNonsense.h" />
+    <ClInclude Include="..\..\src\teul\teulKit.h" />
+    <ClInclude Include="..\..\src\teul\teulNetworkArray.h" />
+    <ClInclude Include="..\..\src\teul\teulNetworkMsg.h" />
+    <ClInclude Include="..\..\src\teul\teulPackers.h" />
+    <ClInclude Include="..\..\src\teul\teulTime.h" />
+    <ClInclude Include="..\..\src\include\vars.h" />
+    <ClInclude Include="..\..\src\js\jsClient.h" />
+    <ClInclude Include="..\..\src\js\jsContent.h" />
+    <ClInclude Include="..\..\src\js\jsGame.h" />
+    <ClInclude Include="..\..\src\js\jsKeymap.h" />
+    <ClInclude Include="..\..\src\js\jsMapView.h" />
+    <ClInclude Include="..\..\src\js\jsPlayer.h" />
+    <ClInclude Include="..\..\src\js\jsPosition.h" />
+    <ClInclude Include="..\..\src\js\jsStratDB.h" />
+    <ClInclude Include="..\..\src\js\jsVehicle.h" />
+    <ClInclude Include="..\..\src\ld\ldbmp.h" />
+    <ClInclude Include="..\..\src\ld\lddds.h" />
+    <ClInclude Include="..\..\src\ld\ldflt.h" />
+    <ClInclude Include="..\..\src\ld\ldmdl.h" />
+    <ClInclude Include="..\..\src\ld\ldpcx.h" />
+    <ClInclude Include="..\..\src\ld\ldpix.h" />
+    <ClInclude Include="..\..\src\ld\ldtex.h" />
+    <ClInclude Include="..\..\src\ld\ldtexture.h" />
+    <ClInclude Include="..\..\src\ld\ldwav.h" />
+    <ClInclude Include="..\..\src\list\list.h" />
+    <ClInclude Include="..\..\src\locl\loclApp.h" />
+    <ClInclude Include="..\..\src\locl\loclLang.h" />
+    <ClInclude Include="..\..\src\locl\loclMain.h" />
+    <ClInclude Include="..\..\src\log\log.h" />
+    <ClInclude Include="..\..\src\map\mapArenaDescription.h" />
+    <ClInclude Include="..\..\src\map\mapAWS.h" />
+    <ClInclude Include="..\..\src\map\mapBrigadeSummary.h" />
+    <ClInclude Include="..\..\src\map\mapClientMessages.h" />
+    <ClInclude Include="..\..\src\map\mapConstants.h" />
+    <ClInclude Include="..\..\src\map\mapHCUnitLocations.h" />
+    <ClInclude Include="..\..\src\map\mapMissionList.h" />
+    <ClInclude Include="..\..\src\map\mapPack.h" />
+    <ClInclude Include="..\..\src\map\mapPersonaSummary.h" />
+    <ClInclude Include="..\..\src\map\mapSwingMeter.h" />
+    <ClInclude Include="..\..\src\map\mapTypes.h" />
+    <ClInclude Include="..\..\src\math\euler.h" />
+    <ClInclude Include="..\..\src\math\math3d.h" />
+    <ClInclude Include="..\..\src\math\mathCollide.h" />
+    <ClInclude Include="..\..\src\math\matheul.h" />
+    <ClInclude Include="..\..\src\math\mathnum.h" />
+    <ClInclude Include="..\..\src\math\mathUnitConversion.h" />
+    <ClInclude Include="..\..\src\math\mathvect.h" />
+    <ClInclude Include="..\..\SRC\math\Matrixd.h" />
+    <ClInclude Include="..\..\SRC\math\Matrixf.h" />
+    <ClInclude Include="..\..\SRC\math\Quat.h" />
+    <ClInclude Include="..\..\src\math\Vec2d.h" />
+    <ClInclude Include="..\..\src\math\Vec2f.h" />
+    <ClInclude Include="..\..\SRC\math\Vec3d.h" />
+    <ClInclude Include="..\..\SRC\math\Vec3f.h" />
+    <ClInclude Include="..\..\SRC\math\Vec4d.h" />
+    <ClInclude Include="..\..\SRC\math\Vec4f.h" />
+    <ClInclude Include="..\..\src\mem\mem.h" />
+    <ClInclude Include="..\..\src\mem\memAligned.h" />
+    <ClInclude Include="..\..\src\miss\missActiveMission.h" />
+    <ClInclude Include="..\..\src\miss\missionClientMessages.h" />
+    <ClInclude Include="..\..\src\miss\missionConstants.h" />
+    <ClInclude Include="..\..\src\miss\missionDetail.h" />
+    <ClInclude Include="..\..\src\miss\missionListUpdate.h" />
+    <ClInclude Include="..\..\src\miss\missionPack.h" />
+    <ClInclude Include="..\..\src\miss\missionResults.h" />
+    <ClInclude Include="..\..\src\miss\missionTypes.h" />
+    <ClInclude Include="..\..\src\miss\missionUtils.h" />
+    <ClInclude Include="..\..\src\ml\mlAtmo.h" />
+    <ClInclude Include="..\..\src\ml\mlCompon.h" />
+    <ClInclude Include="..\..\src\ml\mlEngine.h" />
+    <ClInclude Include="..\..\src\ml\mlfoils.h" />
+    <ClInclude Include="..\..\src\ml\mlgauges.h" />
+    <ClInclude Include="..\..\src\ml\mlgear.h" />
+    <ClInclude Include="..\..\src\ml\mlhead.h" />
+    <ClInclude Include="..\..\src\ml\mlobject.h" />
+    <ClInclude Include="..\..\src\ml\mltypes.h" />
+    <ClInclude Include="..\..\src\ml\mlutility.h" />
+    <ClInclude Include="..\..\src\ml\mlweapons.h" />
+    <ClInclude Include="..\..\src\ml\mlwndtnn.h" />
+    <ClInclude Include="..\..\src\mm\mmConstants.h" />
+    <ClInclude Include="..\..\src\mm\mmDirectSpawn.h" />
+    <ClInclude Include="..\..\src\mm\mmEnums.h" />
+    <ClInclude Include="..\..\src\mm\mmPack.h" />
+    <ClInclude Include="..\..\src\mm\mmSpawnClientMessages.h" />
+    <ClInclude Include="..\..\src\mm\mmSpawnTypes.h" />
+    <ClInclude Include="..\..\src\mn\mngopt.h" />
+    <ClInclude Include="..\..\src\ob\obc.h" />
+    <ClInclude Include="..\..\src\ob\obcd.h" />
+    <ClInclude Include="..\..\src\ob\obcs.h" />
+    <ClInclude Include="..\..\src\ob\obdlite.h" />
+    <ClInclude Include="..\..\src\ob\obdraw.h" />
+    <ClInclude Include="..\..\src\ob\obdshad.h" />
+    <ClInclude Include="..\..\src\ob\obebox.h" />
+    <ClInclude Include="..\..\src\ob\oblf.h" />
+    <ClInclude Include="..\..\src\ob\obLua.h" />
+    <ClInclude Include="..\..\src\ob\obmain.h" />
+    <ClInclude Include="..\..\src\ob\obmesh.h" />
+    <ClInclude Include="..\..\src\ob\obMgr.h" />
+    <ClInclude Include="..\..\src\ob\obplyr.h" />
+    <ClInclude Include="..\..\src\ob\obpool.h" />
+    <ClInclude Include="..\..\src\ob\obslite.h" />
+    <ClInclude Include="..\..\src\ob\obsph.h" />
+    <ClInclude Include="..\..\src\ob\obwld.h" />
+    <ClInclude Include="..\..\src\ob\stride_ptr.h" />
+    <ClInclude Include="..\..\src\ogl\ogl.h" />
+    <ClInclude Include="..\..\src\ogl\oglcfg.h" />
+    <ClInclude Include="..\..\src\ogl\oglcolors.h" />
+    <ClInclude Include="..\..\src\ogl\ogldefs.h" />
+    <ClInclude Include="..\..\src\ogl\oglGlobalStates.h" />
+    <ClInclude Include="..\..\src\ogl\oglMaterial.h" />
+    <ClInclude Include="..\..\src\ogl\oglMesh.h" />
+    <ClInclude Include="..\..\src\ogl\oglTextureObject.h" />
+    <ClInclude Include="..\..\src\ogl\oglvars.h" />
+    <ClInclude Include="..\..\src\ogl\oglVertexBuffer.h" />
+    <ClInclude Include="..\..\src\ogl\States.h" />
+    <ClInclude Include="..\..\src\ogrp\ogrptype.h" />
+    <ClInclude Include="..\..\src\pa\md5.h" />
+    <ClInclude Include="..\..\src\pa\parchive.h" />
+    <ClInclude Include="..\..\src\pa\rijndael-alg-fst.h" />
+    <ClInclude Include="..\..\src\pa\rijndael-api-fst.h" />
+    <ClInclude Include="..\..\src\parse\countryCodes.h" />
+    <ClInclude Include="..\..\src\parse\parse.h" />
+    <ClInclude Include="..\..\src\parse\parseIO.h" />
+    <ClInclude Include="..\..\src\parse\parseWor.h" />
+    <ClInclude Include="..\..\src\pers\persbombsight.h" />
+    <ClInclude Include="..\..\src\pers\persgunsight.h" />
+    <ClInclude Include="..\..\src\pers\pershud.h" />
+    <ClInclude Include="..\..\src\pers\persLua.h" />
+    <ClInclude Include="..\..\src\pers\persmain.h" />
+    <ClInclude Include="..\..\src\pers\persmsg.h" />
+    <ClInclude Include="..\..\src\pers\persrank.h" />
+    <ClInclude Include="..\..\src\pi\pi.h" />
+    <ClInclude Include="..\..\src\pi\piinfo.h" />
+    <ClInclude Include="..\..\src\pi\piogl.h" />
+    <ClInclude Include="..\..\src\pi\piTextureAtlas.h" />
+    <ClInclude Include="..\..\src\rn\rnlogo.h" />
+    <ClInclude Include="..\..\src\rn\rnmain.h" />
+    <ClInclude Include="..\..\src\rn\rntext.h" />
+    <ClInclude Include="..\..\src\rn\rntextloc.h" />
+    <ClInclude Include="..\..\src\rn\rnvis.h" />
+    <ClInclude Include="..\..\src\sdm\BuildTerrain.h" />
+    <ClInclude Include="..\..\src\sdm\sdm.h" />
+    <ClInclude Include="..\..\src\sdm\sdmHash.h" />
+    <ClInclude Include="..\..\src\sdm\StratDB.h" />
+    <ClInclude Include="..\..\src\sdm\uistrat.h" />
+    <ClInclude Include="..\..\SRC\shader\glsl.h" />
+    <ClInclude Include="..\..\src\shader\glslCloth.h" />
+    <ClInclude Include="..\..\SRC\shader\glslNormal.h" />
+    <ClInclude Include="..\..\SRC\shader\glslProgram.h" />
+    <ClInclude Include="..\..\SRC\shader\glslShader.h" />
+    <ClInclude Include="..\..\src\shader\glslSpecular.h" />
+    <ClInclude Include="..\..\SRC\shader\glslUniform.h" />
+    <ClInclude Include="..\..\src\shader\glslUniformBlock.h" />
+    <ClInclude Include="..\..\SRC\shader\glslWater.h" />
+    <ClInclude Include="..\..\src\sn\audio.h" />
+    <ClInclude Include="..\..\src\sn\SDKwavefile.h" />
+    <ClInclude Include="..\..\src\sn\sndsSoundCache.h" />
+    <ClInclude Include="..\..\src\sn\sndsSoundControl.h" />
+    <ClInclude Include="..\..\src\sn\sndsSoundControlWin.h" />
+    <ClInclude Include="..\..\src\sn\sndsSoundTypes.h" />
+    <ClInclude Include="..\..\src\spt\Random.h" />
+    <ClInclude Include="..\..\src\spt\SpeedTreeRT.h" />
+    <ClInclude Include="..\..\src\spt\sptmain.h" />
+    <ClInclude Include="..\..\src\spt\Tree.h" />
+    <ClInclude Include="..\..\src\spt\treeData.h" />
+    <ClInclude Include="..\..\src\str\stringLib.h" />
+    <ClInclude Include="..\..\src\str\striws.h" />
+    <ClInclude Include="..\..\src\str\strpool.h" />
+    <ClInclude Include="..\..\src\strt\strtCaptureState.h" />
+    <ClInclude Include="..\..\src\strt\strtClientMessages.h" />
+    <ClInclude Include="..\..\src\strt\strtConstants.h" />
+    <ClInclude Include="..\..\src\strt\strtCPFlags.h" />
+    <ClInclude Include="..\..\src\strt\strtDTL.h" />
+    <ClInclude Include="..\..\src\strt\strtEventTypes.h" />
+    <ClInclude Include="..\..\src\strt\strtFacilityWeaponList.h" />
+    <ClInclude Include="..\..\src\strt\strtLua.h" />
+    <ClInclude Include="..\..\src\strt\strtTypes.h" />
+    <ClInclude Include="..\..\src\strt\strtUpdaterPack.h" />
+    <ClInclude Include="..\..\src\strt\strtWOR.h" />
+    <ClInclude Include="..\..\src\sys\callstack.h" />
+    <ClInclude Include="..\..\src\sys\crashhandler.h" />
+    <ClInclude Include="..\..\src\sys\syscfg.h" />
+    <ClInclude Include="..\..\src\sys\sysLaunchUrl.h" />
+    <ClInclude Include="..\..\src\sys\sysmain.h" />
+    <ClInclude Include="..\..\src\sys\sysMovie.h" />
+    <ClInclude Include="..\..\src\sys\sysreg.h" />
+    <ClInclude Include="..\..\src\sys\systhread.h" />
+    <ClInclude Include="..\..\src\sys\sysWinISO.h" />
+    <ClInclude Include="..\..\SRC\tools\TangentSpaceGenerator.h" />
+    <ClInclude Include="..\..\src\trn\Filename.h" />
+    <ClInclude Include="..\..\src\trn\IdvFastMath.h" />
+    <ClInclude Include="..\..\src\trn\IdvVector.h" />
+    <ClInclude Include="..\..\src\trn\LensFlare.h" />
+    <ClInclude Include="..\..\src\trn\speedgrass.h" />
+    <ClInclude Include="..\..\src\trn\trnautogun.h" />
+    <ClInclude Include="..\..\src\trn\trncd.h" />
+    <ClInclude Include="..\..\src\trn\trncloud.h" />
+    <ClInclude Include="..\..\src\trn\trnclutter.h" />
+    <ClInclude Include="..\..\src\trn\trndata.h" />
+    <ClInclude Include="..\..\src\trn\trnfx.h" />
+    <ClInclude Include="..\..\src\trn\trngrass.h" />
+    <ClInclude Include="..\..\src\trn\trnldr.h" />
+    <ClInclude Include="..\..\src\trn\trnLua.h" />
+    <ClInclude Include="..\..\src\trn\trnmain.h" />
+    <ClInclude Include="..\..\src\trn\trnop.h" />
+    <ClInclude Include="..\..\src\trn\trnRadClutter.h" />
+    <ClInclude Include="..\..\src\trn\trnScenario.h" />
+    <ClInclude Include="..\..\src\trn\trnsky.h" />
+    <ClInclude Include="..\..\src\trn\trntod.h" />
+    <ClInclude Include="..\..\src\trn\trntypes.h" />
+    <ClInclude Include="..\..\src\trn\trnvars.h" />
+    <ClInclude Include="..\..\src\trn\trnwtr.h" />
+    <ClInclude Include="..\..\src\uimap\CustomMapLayer.h" />
+    <ClInclude Include="..\..\src\uimap\ScenarioMapRenderer.h" />
+    <ClInclude Include="..\..\src\ui\uiChat.h" />
+    <ClInclude Include="..\..\src\ui\uiDotCommands.h" />
+    <ClInclude Include="..\..\src\ui\uiGameEvents.h" />
+    <ClInclude Include="..\..\src\ui\uiKeymap.h" />
+    <ClInclude Include="..\..\src\ui\uiLua.h" />
+    <ClInclude Include="..\..\src\ui\uiMain.h" />
+    <ClInclude Include="..\..\src\ui\uiMovieView.h" />
+    <ClInclude Include="..\..\src\ui\uiSound.h" />
+    <ClInclude Include="..\..\src\ui\uiUTF.h" />
+    <ClInclude Include="..\..\src\uimap\AWSLayer.h" />
+    <ClInclude Include="..\..\src\uimap\AWSManager.h" />
+    <ClInclude Include="..\..\src\uimap\CPRenderer.h" />
+    <ClInclude Include="..\..\src\uimap\IconMapRenderer.h" />
+    <ClInclude Include="..\..\src\uimap\MapTextureRenderer.h" />
+    <ClInclude Include="..\..\src\uimap\PlayerLayer.h" />
+    <ClInclude Include="..\..\src\uimap\StrategicLayer.h" />
+    <ClInclude Include="..\..\src\uimap\SuperCellMapView.h" />
+    <ClInclude Include="..\..\src\uimap\TerrainObjectRenderer.h" />
+    <ClInclude Include="..\..\src\uimap\TopoMapRenderer.h" />
+    <ClInclude Include="..\..\src\uimap\uiMap.h" />
+    <ClInclude Include="..\..\src\uimap\uimapLua.h" />
+    <ClInclude Include="..\..\src\uimap\WaypointLayer.h" />
+    <ClInclude Include="..\..\src\updt\loginTypes.h" />
+    <ClInclude Include="..\..\src\updt\updtBackChannel.h" />
+    <ClInclude Include="..\..\src\updt\updtDeathByBuilding.h" />
+    <ClInclude Include="..\..\src\updt\updtEnums.h" />
+    <ClInclude Include="..\..\src\updt\updtFraming.h" />
+    <ClInclude Include="..\..\src\updt\updtPackers.h" />
+    <ClInclude Include="..\..\src\updt\updtTypes.h" />
+    <ClInclude Include="..\..\src\updt\updtVehicleHit.h" />
+    <ClInclude Include="..\..\src\veh\vehanim.h" />
+    <ClInclude Include="..\..\src\veh\vehcntrl.h" />
+    <ClInclude Include="..\..\src\veh\vehcomms.h" />
+    <ClInclude Include="..\..\src\veh\vehdecal.h" />
+    <ClInclude Include="..\..\src\veh\vehdecalLoader.h" />
+    <ClInclude Include="..\..\src\veh\vehfx.h" />
+    <ClInclude Include="..\..\src\veh\vehIcon.h" />
+    <ClInclude Include="..\..\src\veh\vehInterpolator.h" />
+    <ClInclude Include="..\..\src\veh\vehload.h" />
+    <ClInclude Include="..\..\src\veh\vehLua.h" />
+    <ClInclude Include="..\..\src\veh\vehmain.h" />
+    <ClInclude Include="..\..\src\veh\vehtype.h" />
+    <ClInclude Include="..\..\src\veh\vehupdate.h" />
+    <ClInclude Include="..\..\src\veh\vehVisDamage.h" />
+    <ClInclude Include="..\..\src\veh\vehxml.h" />
+    <ClInclude Include="..\..\src\weap\weapammo.h" />
+    <ClInclude Include="..\..\src\weap\weapDefs.h" />
+    <ClInclude Include="..\..\src\weap\weapfx.h" />
+    <ClInclude Include="..\..\src\weap\weapList.h" />
+    <ClInclude Include="..\..\src\weap\weapLua.h" />
+    <ClInclude Include="..\..\src\weap\weapmain.h" />
+    <ClInclude Include="..\..\src\weap\weapons.h" />
+    <ClInclude Include="..\..\src\weap\weapParser.h" />
+    <ClInclude Include="..\..\src\weap\weapSerial.h" />
+    <ClInclude Include="..\..\src\weap\weapSpec.h" />
+    <ClInclude Include="..\..\src\weap\weapType.h" />
+    <ClInclude Include="..\..\src\weap\weapWeapon.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiActivate.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiCallbacks.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiClientMessages.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiCovert.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiCryptographer.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiErrorPackers.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiErrorTypes.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiExitCodes.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiFullObjID.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiHash.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiHCUnits.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiLua.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiNetPorts.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiOpinionPoll.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiOwnershipEnums.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiPack.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiPermissions.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiRoomLists.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiServerTrackedObject.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiServerTrackedObjectPacker.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiServerTypeEnums.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiSquadMsg.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiSquads.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiString.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiTraits.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiTypes.h" />
+    <ClInclude Include="..\..\src\wwii\wwiiUTF.h" />
+    <ClInclude Include="..\..\src\physics\colliderMain.h" />
+    <ClInclude Include="..\..\src\physics\colliderQuery.h" />
+    <ClInclude Include="..\..\src\physics\odeConvert.h" />
+    <ClInclude Include="..\..\src\physics\physicsmain.h" />
+    <ClInclude Include="..\..\src\physics\physicsTypes.h" />
+    <ClInclude Include="..\..\src\xml\XMLLoader.h" />
+    <ClInclude Include="..\..\src\xml\XMLLoader2.h" />
+    <ClInclude Include="..\..\src\tut\tutGroupProgress.h" />
+    <ClInclude Include="..\..\src\tut\tutLua.h" />
+    <ClInclude Include="..\..\src\tut\TutorialManager.h" />
+    <ClInclude Include="..\..\src\lua\luaMain.h" />
+    <ClInclude Include="..\..\src\osgImport\BoundingBox.h" />
+    <ClInclude Include="..\..\src\osgImport\BoundingSphere.h" />
+    <ClInclude Include="..\..\src\osgImport\buffered_value.h" />
+    <ClInclude Include="..\..\src\osgImport\BufferObject.h" />
+    <ClInclude Include="..\..\src\osgImport\DeleteHandler.h" />
+    <ClInclude Include="..\..\src\osgImport\dxtctool.h" />
+    <ClInclude Include="..\..\src\osgImport\fast_back_stack.h" />
+    <ClInclude Include="..\..\src\osgImport\FrameBufferObject.h" />
+    <ClInclude Include="..\..\src\osgImport\Image.h" />
+    <ClInclude Include="..\..\src\osgImport\Plane.h" />
+    <ClInclude Include="..\..\src\osgImport\Polytope.h" />
+    <ClInclude Include="..\..\src\osgImport\ref_ptr.h" />
+    <ClInclude Include="..\..\src\osgImport\Referenced.h" />
+    <ClInclude Include="..\..\src\osgImport\ShadowMap.h" />
+    <ClInclude Include="..\..\src\osgImport\TexGen.h" />
+    <ClInclude Include="..\..\src\osgImport\Texture.h" />
+    <ClInclude Include="..\..\src\osgImport\Texture2D.h" />
+    <ClInclude Include="..\..\src\osgImport\Texture2DArray.h" />
+    <ClInclude Include="..\..\src\osgImport\TextureCubeMap.h" />
+    <ClInclude Include="..\..\src\osgImport\TextureRectangle.h" />
+    <ClInclude Include="..\..\src\inst\instBasicStatus.h" />
+    <ClInclude Include="..\..\src\inst\instClient.h" />
+    <ClInclude Include="..\..\src\inst\instClientStatus.h" />
+    <ClInclude Include="..\..\src\inst\instDescriptor.h" />
+    <ClInclude Include="..\..\src\inst\instListing.h" />
+    <ClInclude Include="..\..\src\inst\instTypes.h" />
+    <ClInclude Include="..\..\src\ime\IMEClient.h" />
+    <ClInclude Include="..\..\src\ime\imeMain.h" />
+    <CustomBuildStep Include="..\..\src\sqlite\sqlite3.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <CustomBuildStep Include="..\..\src\sqlite\sqlite3_config.h">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+    </CustomBuildStep>
+    <ClInclude Include="..\..\src\mc\multiClient.h" />
+    <ClInclude Include="..\..\src\mc\multiClientHelp.h" />
+    <ClInclude Include="..\..\src\scen\ScenarioManager.h" />
+    <ClInclude Include="..\..\src\scen\scenLua.h" />
+    <ClInclude Include="..\..\src\scen\scenMain.h" />
+    <ClInclude Include="..\versionNo.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\cfg\cfgData.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='China|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\src\cfg\cfgLoad.cpp" />
+    <ClCompile Include="..\..\src\cfg\cfgLua.cpp" />
+    <ClCompile Include="..\..\src\cfg\cfgPrefs.cpp" />
+    <ClCompile Include="..\..\src\cfg\cfgw2.cpp" />
+    <ClCompile Include="..\..\src\chat\chatBrigadeControl.cpp" />
+    <ClCompile Include="..\..\src\chat\chatClientMessages.cpp" />
+    <ClCompile Include="..\..\src\chat\chatEditString.cpp" />
+    <ClCompile Include="..\..\src\chat\chatHandle.cpp" />
+    <ClCompile Include="..\..\src\chat\chatMissionInvite.cpp" />
+    <ClCompile Include="..\..\src\chat\chatMissionMember.cpp" />
+    <ClCompile Include="..\..\src\chat\chatMissionStatusPacker.cpp" />
+    <ClCompile Include="..\..\src\chat\chatMotds.cpp" />
+    <ClCompile Include="..\..\src\chat\chatPackers.cpp" />
+    <ClCompile Include="..\..\src\chat\chatSquadControl.cpp" />
+    <ClCompile Include="..\..\src\chat\chatTimeInterval.cpp" />
+    <ClCompile Include="..\..\src\chat\chatWho.cpp" />
+    <ClCompile Include="..\..\src\client\client.cpp" />
+    <ClCompile Include="..\..\src\client\clientBrigadeControl.cpp" />
+    <ClCompile Include="..\..\src\client\clientConnection.cpp" />
+    <ClCompile Include="..\..\src\client\clientGlobals.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='China|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\clientServerTrackedObjects.cpp" />
+    <ClCompile Include="..\..\src\client\clientSquad.cpp" />
+    <ClCompile Include="..\..\src\client\clientStrtQueue.cpp" />
+    <ClCompile Include="..\..\src\client\GameClient.cpp" />
+    <ClCompile Include="..\..\src\client\ww2Client.cpp" />
+    <ClCompile Include="..\..\src\comm\commClientMessages.cpp" />
+    <ClCompile Include="..\..\src\comm\commPackers.cpp" />
+    <ClCompile Include="..\..\src\dd\ddp.cpp" />
+    <ClCompile Include="..\..\src\dd\dx3dinfo.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='China|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\src\di\dimain.cpp" />
+    <ClCompile Include="..\..\src\di\dip.cpp" />
+    <ClCompile Include="..\..\src\di\NPClient.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='China|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\src\draw\draw2d.cpp" />
+    <ClCompile Include="..\..\src\draw\draw3d.cpp" />
+    <ClCompile Include="..\..\src\draw\drawIcon.cpp" />
+    <ClCompile Include="..\..\src\draw\FTFontAdapted.cpp" />
+    <ClCompile Include="..\..\src\draw\FTFontReplacement.cpp" />
+    <ClCompile Include="..\..\src\draw\sneaky.cpp" />
+    <ClCompile Include="..\..\src\draw\TextureFont.cpp" />
+    <ClCompile Include="..\..\src\ez\EZLoader.cpp" />
+    <ClCompile Include="..\..\src\ez\EZManager.cpp" />
+    <ClCompile Include="..\..\src\ez\EZVehicles.cpp" />
+    <ClCompile Include="..\..\src\fio\fio.cpp" />
+    <ClCompile Include="..\..\src\fio\fioa.cpp" />
+    <ClCompile Include="..\..\src\fio\fiod.cpp" />
+    <ClCompile Include="..\..\src\fp\fpFPS.cpp" />
+    <ClCompile Include="..\..\src\fp\fpFPSdata.cpp" />
+    <ClCompile Include="..\..\src\fp\fpFPSfx.cpp" />
+    <ClCompile Include="..\..\src\fp\fpLua.cpp" />
+    <ClCompile Include="..\..\src\fp\fpMain.cpp" />
+    <ClCompile Include="..\..\src\fp\fpPPO.cpp" />
+    <ClCompile Include="..\..\src\fp\fpTPS.cpp" />
+    <ClCompile Include="..\..\src\fp\fpTPSdata.cpp" />
+    <ClCompile Include="..\..\src\fp\fpTPSKits.cpp" />
+    <ClCompile Include="..\..\src\fp\fpTPSPhysics.cpp" />
+    <ClCompile Include="..\..\src\fx\DataFx.cpp" />
+    <ClCompile Include="..\..\src\fx\EmitterMgr.cpp" />
+    <ClCompile Include="..\..\src\fx\fxAmb.cpp" />
+    <ClCompile Include="..\..\src\fx\fxBlt.cpp" />
+    <ClCompile Include="..\..\src\fx\fxExp.cpp" />
+    <ClCompile Include="..\..\src\fx\fxHit.cpp" />
+    <ClCompile Include="..\..\src\fx\fxLgt.cpp" />
+    <ClCompile Include="..\..\src\fx\fxMgr.cpp" />
+    <ClCompile Include="..\..\src\fx\fxMisc.cpp" />
+    <ClCompile Include="..\..\src\fx\fxPcl.cpp" />
+    <ClCompile Include="..\..\src\fx\fxSnd.cpp" />
+    <ClCompile Include="..\..\src\fx\fxUtl.cpp" />
+    <ClCompile Include="..\..\src\fx\fxWeather.cpp" />
+    <ClCompile Include="..\..\src\fx\Particle2.cpp" />
+    <ClCompile Include="..\..\src\fx\ParticleMgr.cpp" />
+    <ClCompile Include="..\..\src\fx\postRender.cpp" />
+    <ClCompile Include="..\..\src\fx\stoeffects.cpp" />
+    <ClCompile Include="..\..\src\fx\TransformEffect.cpp" />
+    <ClCompile Include="..\..\src\gmlp\gmlpmain.cpp" />
+    <ClCompile Include="..\..\src\gr2\gr2Anim.cpp" />
+    <ClCompile Include="..\..\src\gr2\gr2layer.cpp" />
+    <ClCompile Include="..\..\src\gr2\gr2layerTypes.cpp" />
+    <ClCompile Include="..\..\src\gr2\gr2Physics.cpp" />
+    <ClCompile Include="..\..\src\imap\iac.cpp" />
+    <ClCompile Include="..\..\src\imap\imaphack.cpp" />
+    <ClCompile Include="..\..\src\imap\imapLua.cpp" />
+    <ClCompile Include="..\..\src\imap\ww2func.cpp" />
+    <ClCompile Include="..\..\src\imap\ww2imap.cpp" />
+    <ClCompile Include="..\..\src\js\jsClient.cpp" />
+    <ClCompile Include="..\..\src\js\jsContent.cpp" />
+    <ClCompile Include="..\..\src\js\jsGame.cpp" />
+    <ClCompile Include="..\..\src\js\jsKeymap.cpp" />
+    <ClCompile Include="..\..\src\js\jsMapView.cpp" />
+    <ClCompile Include="..\..\src\js\jsPlayer.cpp" />
+    <ClCompile Include="..\..\src\js\jsPosition.cpp" />
+    <ClCompile Include="..\..\src\js\jsStratDB.cpp" />
+    <ClCompile Include="..\..\src\js\jsVehicle.cpp" />
+    <ClCompile Include="..\..\src\ld\ldbmp.cpp" />
+    <ClCompile Include="..\..\src\ld\lddds.cpp" />
+    <ClCompile Include="..\..\src\ld\ldflt.cpp" />
+    <ClCompile Include="..\..\src\ld\ldmdl.cpp" />
+    <ClCompile Include="..\..\src\ld\ldpcx.cpp" />
+    <ClCompile Include="..\..\src\ld\ldpix.cpp" />
+    <ClCompile Include="..\..\src\ld\ldtex.cpp" />
+    <ClCompile Include="..\..\src\ld\ldtexture.cpp" />
+    <ClCompile Include="..\..\src\ld\ldwav.cpp" />
+    <ClCompile Include="..\..\src\list\list.cpp" />
+    <ClCompile Include="..\..\src\locl\loclAppx.cpp" />
+    <ClCompile Include="..\..\src\locl\loclLang.cpp" />
+    <ClCompile Include="..\..\src\locl\loclMain.cpp" />
+    <ClCompile Include="..\..\src\log\log.cpp" />
+    <ClCompile Include="..\..\src\maptools\GenerateIcons.cpp" />
+    <ClCompile Include="..\..\src\map\mapArenaDescription.cpp" />
+    <ClCompile Include="..\..\src\map\mapAWS.cpp" />
+    <ClCompile Include="..\..\src\map\mapClientMessages.cpp" />
+    <ClCompile Include="..\..\src\map\mapHCUnitLocations.cpp" />
+    <ClCompile Include="..\..\src\map\mapPack.cpp" />
+    <ClCompile Include="..\..\src\math\euler.cpp" />
+    <ClCompile Include="..\..\src\math\math3d.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">Use</PrecompiledHeader>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">Use</PrecompiledHeader>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='China|Win32'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='China|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">Use</PrecompiledHeader>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">true</ExcludedFromBuild>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\src\math\mathCollide.cpp" />
+    <ClCompile Include="..\..\src\math\matheul.cpp" />
+    <ClCompile Include="..\..\src\math\mathnum.cpp" />
+    <ClCompile Include="..\..\src\math\mathUnitConversion.cpp" />
+    <ClCompile Include="..\..\src\math\mathvect.cpp" />
+    <ClCompile Include="..\..\SRC\math\Matrixd.cpp" />
+    <ClCompile Include="..\..\SRC\math\Matrixf.cpp" />
+    <ClCompile Include="..\..\SRC\math\Quat.cpp" />
+    <ClCompile Include="..\..\src\math\Rand.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='China|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='China|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\src\math\SuperFastHash.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='China|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='China|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\src\mem\mem.cpp" />
+    <ClCompile Include="..\..\src\mem\tracealloc.cpp" />
+    <ClCompile Include="..\..\src\miss\missActiveMission.cpp" />
+    <ClCompile Include="..\..\src\miss\missionClientMessages.cpp" />
+    <ClCompile Include="..\..\src\miss\missionDetail.cpp" />
+    <ClCompile Include="..\..\src\miss\missionPack.cpp" />
+    <ClCompile Include="..\..\src\miss\missionUtils.cpp" />
+    <ClCompile Include="..\..\src\ml\mlAtmo.cpp" />
+    <ClCompile Include="..\..\src\ml\mlCompon.cpp" />
+    <ClCompile Include="..\..\src\ml\mlEngine.cpp" />
+    <ClCompile Include="..\..\src\ml\mlfoils.cpp" />
+    <ClCompile Include="..\..\src\ml\mlgauges.cpp" />
+    <ClCompile Include="..\..\src\ml\mlgear.cpp" />
+    <ClCompile Include="..\..\src\ml\mlhead.cpp" />
+    <ClCompile Include="..\..\src\ml\mlImapCallbacks.cpp" />
+    <ClCompile Include="..\..\src\ml\mlInfantry.cpp" />
+    <ClCompile Include="..\..\src\ml\mlMain.cpp" />
+    <ClCompile Include="..\..\src\ml\mlobject.cpp" />
+    <ClCompile Include="..\..\src\ml\mlReadout.cpp" />
+    <ClCompile Include="..\..\src\ml\mlutility.cpp" />
+    <ClCompile Include="..\..\src\ml\mlweapons.cpp" />
+    <ClCompile Include="..\..\src\ml\mlwndtnn.cpp" />
+    <ClCompile Include="..\..\src\mm\mmPack.cpp" />
+    <ClCompile Include="..\..\src\mm\mmSpawnClientMessages.cpp" />
+    <ClCompile Include="..\..\src\mn\mngopt.cpp" />
+    <ClCompile Include="..\..\src\ob\obc.cpp" />
+    <ClCompile Include="..\..\src\ob\obcd.cpp" />
+    <ClCompile Include="..\..\src\ob\obcs.cpp" />
+    <ClCompile Include="..\..\src\ob\obdlite.cpp" />
+    <ClCompile Include="..\..\src\ob\obdraw.cpp" />
+    <ClCompile Include="..\..\src\ob\obdshad.cpp" />
+    <ClCompile Include="..\..\src\ob\obebox.cpp" />
+    <ClCompile Include="..\..\src\ob\obfx.cpp" />
+    <ClCompile Include="..\..\src\ob\oblf.cpp" />
+    <ClCompile Include="..\..\src\ob\obLua.cpp" />
+    <ClCompile Include="..\..\src\ob\obmain.cpp" />
+    <ClCompile Include="..\..\src\ob\obmesh.cpp" />
+    <ClCompile Include="..\..\src\ob\obMgr.cpp" />
+    <ClCompile Include="..\..\src\ob\obplyr.cpp" />
+    <ClCompile Include="..\..\src\ob\obpool.cpp" />
+    <ClCompile Include="..\..\src\ob\obslite.cpp" />
+    <ClCompile Include="..\..\src\ob\obsph.cpp" />
+    <ClCompile Include="..\..\src\ob\obwld.cpp" />
+    <ClCompile Include="..\..\src\ogl\GLCounter.cpp" />
+    <ClCompile Include="..\..\src\ogl\ogl.cpp" />
+    <ClCompile Include="..\..\src\ogl\oglGlobalStates.cpp" />
+    <ClCompile Include="..\..\src\ogl\oglMaterial.cpp" />
+    <ClCompile Include="..\..\src\ogl\oglMesh.cpp" />
+    <ClCompile Include="..\..\src\ogl\oglTextureObject.cpp" />
+    <ClCompile Include="..\..\src\ogl\oglVertexBuffer.cpp" />
+    <ClCompile Include="..\..\src\ogl\States.cpp" />
+    <ClCompile Include="..\..\src\ogrp\ogrpmain.cpp" />
+    <ClCompile Include="..\..\src\pa\md5c.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='China|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\src\pa\parchive.cpp" />
+    <ClCompile Include="..\..\src\pa\rijndael-alg-fst.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='China|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\src\pa\rijndael-api-fst.c">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='China|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\src\parse\countryCodes.cpp" />
+    <ClCompile Include="..\..\src\parse\parse.cpp" />
+    <ClCompile Include="..\..\src\parse\parseIO.cpp" />
+    <ClCompile Include="..\..\src\parse\parseWor.cpp" />
+    <ClCompile Include="..\..\src\pers\persbombsight.cpp" />
+    <ClCompile Include="..\..\src\pers\persgunsight.cpp" />
+    <ClCompile Include="..\..\src\pers\pershud.cpp" />
+    <ClCompile Include="..\..\src\pers\persLua.cpp" />
+    <ClCompile Include="..\..\src\pers\persmain.cpp" />
+    <ClCompile Include="..\..\src\pers\persmsg.cpp" />
+    <ClCompile Include="..\..\src\pers\persrank.cpp" />
+    <ClCompile Include="..\..\src\physics\HeightField.cpp" />
+    <ClCompile Include="..\..\src\pi\piinfoWin.cpp" />
+    <ClCompile Include="..\..\src\pi\piogl.cpp" />
+    <ClCompile Include="..\..\src\pi\piTextureAtlas.cpp" />
+    <ClCompile Include="..\..\src\rn\rnlogo.cpp" />
+    <ClCompile Include="..\..\src\rn\rnmain.cpp" />
+    <ClCompile Include="..\..\src\rn\rntext.cpp" />
+    <ClCompile Include="..\..\src\rn\rntextloc.cpp" />
+    <ClCompile Include="..\..\src\rn\rnvis.cpp" />
+    <ClCompile Include="..\..\src\sdm\BuildTerrain.cpp" />
+    <ClCompile Include="..\..\src\sdm\sdm.cpp" />
+    <ClCompile Include="..\..\src\sdm\sdmHash.cpp" />
+    <ClCompile Include="..\..\src\sdm\StratDB.cpp" />
+    <ClCompile Include="..\..\SRC\shader\glsl.cpp" />
+    <ClCompile Include="..\..\src\shader\glslCloth.cpp" />
+    <ClCompile Include="..\..\SRC\shader\glslNormal.cpp" />
+    <ClCompile Include="..\..\SRC\shader\glslProgram.cpp" />
+    <ClCompile Include="..\..\SRC\shader\glslShader.cpp" />
+    <ClCompile Include="..\..\src\shader\glslSpecular.cpp" />
+    <ClCompile Include="..\..\SRC\shader\glslUniform.cpp" />
+    <ClCompile Include="..\..\src\shader\glslUniformBlock.cpp" />
+    <ClCompile Include="..\..\SRC\shader\glslWater.cpp" />
+    <ClCompile Include="..\..\src\sn\audio.cpp" />
+    <ClCompile Include="..\..\src\sn\SDKwavefile.cpp" />
+    <ClCompile Include="..\..\src\sn\sndsSoundCache.cpp" />
+    <ClCompile Include="..\..\src\sn\sndsSoundControl.cpp" />
+    <ClCompile Include="..\..\src\sn\sndsSoundControlWin.cpp" />
+    <ClCompile Include="..\..\src\spt\sptmain.cpp" />
+    <ClCompile Include="..\..\src\spt\Tree.cpp" />
+    <ClCompile Include="..\..\src\spt\treeData.cpp" />
+    <ClCompile Include="..\..\src\src\io_mapped_file.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='China|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\src\str\stringLib.cpp" />
+    <ClCompile Include="..\..\src\str\striws.cpp" />
+    <ClCompile Include="..\..\src\str\strpool.cpp" />
+    <ClCompile Include="..\..\src\strt\strtClientMessages.cpp" />
+    <ClCompile Include="..\..\src\strt\strtLua.cpp" />
+    <ClCompile Include="..\..\src\strt\strtUpdaterPack.cpp" />
+    <ClCompile Include="..\..\src\sys\callstack.cpp" />
+    <ClCompile Include="..\..\src\sys\crashhandler.cpp" />
+    <ClCompile Include="..\..\src\sys\sysLaunchUrlWin.cpp" />
+    <ClCompile Include="..\..\src\sys\sysmain.cpp" />
+    <ClCompile Include="..\..\src\sys\sysMovieWin.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='China|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">
+      </PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">
+      </PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sys\sysreg.cpp" />
+    <ClCompile Include="..\..\src\sys\systhreadwin.cpp" />
+    <ClCompile Include="..\..\SRC\tools\TangentSpaceGenerator.cpp" />
+    <ClCompile Include="..\..\src\trn\LensFlare.cpp" />
+    <ClCompile Include="..\..\src\trn\speedgrass.cpp" />
+    <ClCompile Include="..\..\src\trn\trnautogun.cpp" />
+    <ClCompile Include="..\..\src\trn\trncd.cpp" />
+    <ClCompile Include="..\..\src\trn\trncloud.cpp" />
+    <ClCompile Include="..\..\src\trn\trnclutter.cpp" />
+    <ClCompile Include="..\..\src\trn\trndata.cpp" />
+    <ClCompile Include="..\..\src\trn\trnfx.cpp" />
+    <ClCompile Include="..\..\src\trn\trngrass.cpp" />
+    <ClCompile Include="..\..\src\trn\trnldr.cpp" />
+    <ClCompile Include="..\..\src\trn\trnLua.cpp" />
+    <ClCompile Include="..\..\src\trn\trnmain.cpp" />
+    <ClCompile Include="..\..\src\trn\trnop.cpp" />
+    <ClCompile Include="..\..\src\trn\trnRadClutter.cpp" />
+    <ClCompile Include="..\..\src\trn\trnScenario.cpp" />
+    <ClCompile Include="..\..\src\trn\trnsky.cpp" />
+    <ClCompile Include="..\..\src\trn\trntod.cpp" />
+    <ClCompile Include="..\..\src\trn\trnwtr.cpp" />
+    <ClCompile Include="..\..\src\uimap\CustomMapLayer.cpp" />
+    <ClCompile Include="..\..\src\uimap\ScenarioMapRenderer.cpp" />
+    <ClCompile Include="..\..\src\ui\uiChat.cpp" />
+    <ClCompile Include="..\..\src\ui\uiDotCommands.cpp" />
+    <ClCompile Include="..\..\src\ui\uiKeymap.cpp" />
+    <ClCompile Include="..\..\src\ui\uiLua.cpp" />
+    <ClCompile Include="..\..\src\ui\uiMain.cpp" />
+    <ClCompile Include="..\..\src\ui\uiMovieView.cpp" />
+    <ClCompile Include="..\..\src\ui\uiSound.cpp" />
+    <ClCompile Include="..\..\src\uimap\AWSLayer.cpp" />
+    <ClCompile Include="..\..\src\uimap\AWSManager.cpp" />
+    <ClCompile Include="..\..\src\uimap\CPRenderer.cpp" />
+    <ClCompile Include="..\..\src\uimap\IconMapRenderer.cpp" />
+    <ClCompile Include="..\..\src\uimap\MapTextureRenderer.cpp" />
+    <ClCompile Include="..\..\src\uimap\PlayerLayer.cpp" />
+    <ClCompile Include="..\..\src\uimap\StrategicLayer.cpp" />
+    <ClCompile Include="..\..\src\uimap\SuperCellMapView.cpp" />
+    <ClCompile Include="..\..\src\uimap\TerrainObjectRenderer.cpp" />
+    <ClCompile Include="..\..\src\uimap\TopoMapRenderer.cpp" />
+    <ClCompile Include="..\..\src\uimap\uiMap.cpp" />
+    <ClCompile Include="..\..\src\uimap\uimapLua.cpp" />
+    <ClCompile Include="..\..\src\uimap\WaypointLayer.cpp" />
+    <ClCompile Include="..\..\src\updt\updtPackers.cpp" />
+    <ClCompile Include="..\..\src\veh\vehanim.cpp" />
+    <ClCompile Include="..\..\src\veh\vehcntrl.cpp" />
+    <ClCompile Include="..\..\src\veh\vehcomms.cpp" />
+    <ClCompile Include="..\..\src\veh\vehdecal.cpp" />
+    <ClCompile Include="..\..\src\veh\vehfx.cpp" />
+    <ClCompile Include="..\..\src\veh\vehIcon.cpp" />
+    <ClCompile Include="..\..\src\veh\vehInterpolator.cpp" />
+    <ClCompile Include="..\..\src\veh\vehload.cpp" />
+    <ClCompile Include="..\..\src\veh\vehLua.cpp" />
+    <ClCompile Include="..\..\src\veh\vehmain.cpp" />
+    <ClCompile Include="..\..\src\veh\vehtype.cpp" />
+    <ClCompile Include="..\..\src\veh\vehupdate.cpp" />
+    <ClCompile Include="..\..\src\veh\vehVisDamage.cpp" />
+    <ClCompile Include="..\..\src\veh\vehxml.cpp" />
+    <ClCompile Include="..\..\src\weap\weapammo.cpp" />
+    <ClCompile Include="..\..\src\weap\weapfx.cpp" />
+    <ClCompile Include="..\..\src\weap\weapList.cpp" />
+    <ClCompile Include="..\..\src\weap\weapLua.cpp" />
+    <ClCompile Include="..\..\src\weap\weapmain.cpp" />
+    <ClCompile Include="..\..\src\weap\weapons.cpp" />
+    <ClCompile Include="..\..\src\weap\weapParser.cpp" />
+    <ClCompile Include="..\..\src\weap\weapSpec.cpp" />
+    <ClCompile Include="..\..\src\wwii\wwiiClientMessages.cpp" />
+    <ClCompile Include="..\..\src\wwii\wwiiHCUnitsCommon.cpp" />
+    <ClCompile Include="..\..\src\wwii\wwiiLua.cpp" />
+    <ClCompile Include="..\..\src\wwii\wwiiOpinionPoll.cpp" />
+    <ClCompile Include="..\..\src\wwii\wwiiServerTrackedObject.cpp" />
+    <ClCompile Include="..\..\src\wwii\wwiiServerTrackedObjectPacker.cpp" />
+    <ClCompile Include="..\..\src\wwii\wwiiSquads.cpp" />
+    <ClCompile Include="..\..\src\wwii\wwiiString.cpp" />
+    <ClCompile Include="..\..\src\wwii\wwiiSyncVar.cpp" />
+    <ClCompile Include="..\..\src\wwii\wwiiUTF.cpp" />
+    <ClCompile Include="..\..\src\physics\colliderMain.cpp" />
+    <ClCompile Include="..\..\src\physics\colliderQuery.cpp" />
+    <ClCompile Include="..\..\src\physics\odeConvert.cpp" />
+    <ClCompile Include="..\..\src\physics\physicsmain.cpp" />
+    <ClCompile Include="..\..\src\physics\physicsTypes.cpp" />
+    <ClCompile Include="..\..\src\xml\XMLLoader.cpp" />
+    <ClCompile Include="..\..\src\xml\XMLLoader2.cpp" />
+    <ClCompile Include="..\..\src\tut\tutGroupProgress.cpp" />
+    <ClCompile Include="..\..\src\tut\tutLua.cpp" />
+    <ClCompile Include="..\..\src\tut\TutorialManager.cpp" />
+    <ClCompile Include="..\..\src\lua\luaMain.cpp" />
+    <ClCompile Include="..\..\src\osgImport\BoundingBox.cpp" />
+    <ClCompile Include="..\..\src\osgImport\BoundingSphere.cpp" />
+    <ClCompile Include="..\..\src\osgImport\BufferObject.cpp" />
+    <ClCompile Include="..\..\src\osgImport\DeleteHandler.cpp" />
+    <ClCompile Include="..\..\src\osgImport\dxtctool.cpp" />
+    <ClCompile Include="..\..\src\osgImport\FrameBufferObject.cpp" />
+    <ClCompile Include="..\..\src\osgImport\Image.cpp" />
+    <ClCompile Include="..\..\src\osgImport\ReaderWriterBMP.cpp" />
+    <ClCompile Include="..\..\src\osgImport\ReaderWriterDDS.cpp" />
+    <ClCompile Include="..\..\src\osgImport\ReaderWriterTGA.cpp" />
+    <ClCompile Include="..\..\src\osgImport\Referenced.cpp" />
+    <ClCompile Include="..\..\src\osgImport\ShadowMap.cpp" />
+    <ClCompile Include="..\..\src\osgImport\TexGen.cpp" />
+    <ClCompile Include="..\..\src\osgImport\Texture.cpp" />
+    <ClCompile Include="..\..\src\osgImport\Texture2D.cpp" />
+    <ClCompile Include="..\..\src\osgImport\Texture2DArray.cpp" />
+    <ClCompile Include="..\..\src\osgImport\TextureCubeMap.cpp" />
+    <ClCompile Include="..\..\src\osgImport\TextureRectangle.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='China|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">Use</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">Use</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\src\inst\instClient.cpp" />
+    <ClCompile Include="..\..\src\inst\instCommon.cpp" />
+    <ClCompile Include="..\..\src\inst\instPackers.cpp" />
+    <ClCompile Include="..\..\src\ime\IMEClient.cpp" />
+    <ClCompile Include="..\..\src\ime\imeMain.cpp" />
+    <ClCompile Include="..\..\src\mc\multiClient.cpp" />
+    <ClCompile Include="..\..\src\scen\ScenarioManager.cpp" />
+    <ClCompile Include="..\..\src\scen\scenLua.cpp" />
+    <ClCompile Include="..\..\src\scen\scenMain.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\cursor.cur" />
+    <None Include="res\WW2.rc2" />
+    <None Include="res\wwii1.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="WW2.rc">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)\WW2\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">$(SolutionDir)\WW2\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">$(SolutionDir)\WW2\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='China|Win32'">$(SolutionDir)\WW2\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='FullDebug|Win32'">$(SolutionDir)\WW2\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">$(SolutionDir)\WW2\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='PublicReleaseSSE2SmartHeap|Win32'">$(SolutionDir)\WW2\src</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">$(SolutionDir)\WW2\src</AdditionalIncludeDirectories>
+    </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\Libraries\freetype\builds\win32\visualc\freetype.vcxproj">
+      <Project>{78b079bd-9fc7-4b9e-b4a6-96da0f00248b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\ftgl\msvc\vc8\ftgl_static.vcxproj">
+      <Project>{1d758eea-59c3-46e4-bef5-16dcca8c0b21}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\glew\build\vc6\glew_static.vcxproj">
+      <Project>{c5e233a4-ee47-427d-96e7-a3b784914109}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\imap\proj.win32\imap.vcxproj">
+      <Project>{cccfce71-8ee8-439a-a9e3-109558287b8d}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\opende\build\vs2008\ode.vcxproj">
+      <Project>{8ab66b51-5e2c-544a-aa89-117cce62c46a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\OpenThreads\OpenThreads.vcxproj">
+      <Project>{e5a6b20b-c552-4c73-b6f4-a7b43b023ad8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\phui\proj.win32\phui-vs8.vcxproj">
+      <Project>{c1b372c3-12a9-45aa-9d23-4d5024926fab}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\SpeedTree\Source\RT_StaticLib\SpeedTreeRT_StaticLib_VC9.vcxproj">
+      <Project>{f86aee86-a9ca-44da-b77b-68b06489e26e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="teulKit\teulKit.vcxproj">
+      <Project>{4f492374-dc5c-47d0-ae9f-7df7a50fdecb}</Project>
+      <Private>true</Private>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <LinkLibraryDependencies>true</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

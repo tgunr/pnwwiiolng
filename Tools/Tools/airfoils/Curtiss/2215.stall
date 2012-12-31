@@ -1,0 +1,9 @@
+2215.stall
+# stall characteristics file for the airfoil
+#
+# 
+stallposaoa_startalpha = 11
+stallposaoa_fullalpha = 27.5
+stallnegaoa_startalpha = -12
+stallnegaoa_fullalpha = -17
+clmovement = 0.13

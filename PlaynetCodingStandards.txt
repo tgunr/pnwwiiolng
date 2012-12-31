@@ -1,0 +1,246 @@
+WORK IN PROGRESS
+----------------
+
+This document is intended to describe the coding standards and styles used by Playnet.
+
+Cardinal rule: One instruction per line of code.
+
+
+. Naming
+	. Data-only structs
+		data-only struct types should be all caps, e.g.
+			struct FOO { int a, b; };
+
+	. struct/classes
+		either all caps or camel case with a leading capital letter, e.g.
+			class FOO { FOO(); };
+			class Bar { Bar(); };
+
+	. typedefs
+		either all caps or camel case with a leading capital letter, e.g.
+			typedef ChatHandle unsigned long long;
+
+	. namespaces
+		namespaces should be given camel case naems with a leading caps, e.g.
+			namespace Server
+			{
+				/* ... */
+			};
+
+	. constants
+		Constants MUST be named.
+			for (int i = 0; i < 52; ++i)	// you're fired.
+		Try to avoid #defines; use a "static const" or "enum".
+
+. Conventions
+
+	. Function parameter naming:
+		Camelcase with a lowercase first letter, e.g.
+			SINT32 haltAndCatchFire()
+			{
+				/* ... */
+			};
+
+	. Structure declaration:
+		Use
+			struct Name
+			{
+				/* members */
+			};
+		Not
+			typedef struct tagName
+			{
+				/* members */
+			} Name;
+		(The second version pollutes the namespace and slows down compilation)
+
+	
+	. Class declaration:
+		Aggressive specification of visibility is recommended but not required.
+			class Foo
+			{
+			public:
+				Foo() {}
+			public:
+				~Foo() {}
+			private:
+				Foo(const Foo&) {}	// Disable copy constructor.
+			public:
+				UINT32 getNumber();
+			};
+
+		C# styling is also acceptable:
+			class Foo
+			{
+			public: Foo() {}
+			public: ~Foo() {}
+			private: Foo(const Foo&) {}	// Disable copy constructor.
+			public: UINT32 getNumber();
+			};
+
+	. Struct/Class member names:
+		. Variables:
+			Camel case starting with a lowercase,
+			or Camel case starting with a lowercase, prefixed by "m_" e.g.
+				struct Foo
+				{
+					UINT32 bar;
+				};
+
+				class Bar
+				{
+				public:
+					UINT32 m_foo;
+				};
+
+		. Member functions:
+			Camel case starting with a lowercase letter, e.g.
+				struct Foo
+				{
+					UINT32 getFive() const { return 5; }
+				};
+
+		. Static functions:
+			Camel case starting with an uppercase letter, e.g.
+				struct Foo
+				{
+					static UINT32 GetFive() const { return 5; }
+				};
+
+		. Constructors:
+			Always use initializer lists instead of member assignment
+			when possible, e.g.
+				class Foo
+				{
+				private: UINT32 x, y, z;
+				public: Foo() : x(0), y(0), z(0) {}
+				};
+			NOT
+				class Foo
+				{
+				private: UINT32 x, y, z;
+				public: Foo() { x = 0; y = 0; z = 0; }
+				};
+			As the second form is compiled to produce code equivalent to:
+				class Foo
+				{
+				private: UINT32 x, y, z;
+				public: Foo() : x(), y(), z() { x = 0; y = 0; z = 0; }
+			which is wasteful.
+
+			. For trivial constructors, use a single line, e.g.
+				Foo() : x(0), y(0), z(0) {}
+
+			. For longer constructors, indent the initializer list by one tab,
+			  group related initializers together where possible.
+			  Comma-on-next-line is recommended but not required.
+			  e.g.
+				Bar()
+				    : x(0), y(0), z(0)
+				    , a(PI)
+				    , speed(0), accel(0)
+				    , lastX(0), lastY(0), lastZ(0)
+				    // ...
+				    {}
+
+		. Conflict avoidance in class/struct functors:
+			To avoid a conflict between a member/static function and
+			a member/static variable, suffix the paramter name in
+			functions with an underscore, e.g.
+				class Foo
+				{
+				private:
+					UINT32 m_bar;
+				public:
+					UINT32 bar() const { return m_bar; }
+				public:
+					Foo(UINT32 bar_)
+						: m_bar(bar_)
+						{}
+				};			
+
+	. Named enum-type declaration:
+		For named enum types use
+			enum Name { /* values */ };
+		NOT
+			typedef enum tagName { /* values */ } Name;
+		AND NOT
+			typedef enum { /* values */ } Name;
+
+	. Enums
+		For enum-type and enums, list one enumeration per line, e.g.
+			enum
+			{
+				Foo = -1,
+				Bar = 5,
+				Baz1 = 10,
+				Baz2,
+				Baz3
+			};
+
+
+	. Global variables:
+		ARE BAD, M'KAY? Avoid! Learn to use classes.
+
+		But when you must, prefix them with "g_", e.g.
+			SINT32 g_iNeedShooting;
+
+	. Global functions:
+		Non-member functions should always be prefixed with
+		the lowercase name of the module they are in, e.g. for a
+		function defined in the file strt/strtBlah.cpp
+			SINT32 strtExampleFunction()
+			{
+				return -1;
+			}
+
+	. Module-local variables and functions:
+		Camel case, leading lowercase letter, prefixed with an underscore, e.g.
+			static SINT32 _moduleFunction()
+			{
+				return -1;
+			}
+
+
+. Standard types
+	. Standard, cross-platform typedefs for common types are defined in
+	  include/systypes.h, which is automatically included via syscfg.h.
+	  These should be used at all times in favor of convenience types
+	  such as "int", etc, e.g.
+		UINT32 i;
+		SCHAR  c;
+	. Prefer 'bool' over 'LOGICAL', because LOGICAL is crap.
+	. 'TRUE' and 'FALSE' are defined as '1' and '0' respectively,
+	  which can cause issues when they are used as comparitors, prefer
+	  using 'true' and 'false' when possible.
+
+. Comments
+	. Comments should use the C++ "//". Avoid using C style "/* ... */".
+
+. Indentation
+	. Open and close braces are placed on their own line at the same
+	  indentation level as the outer block, e.g.
+		struct foo
+		{
+			int bar;
+		};
+
+	. "case", "default" and "break" in switch statements to be indented to the
+	  same level as the braces, e.g.
+		switch (c)
+		{
+		case 'a':
+			return "A as in aardvark";
+		break;
+		default:
+			return "A as in peAr";
+		break;
+		}
+
+. Whitespace
+	... need chris/troy on this one ...
+	- After commas,
+	- After pointer specifier, e.g. "char* ptr;" but before pointer reference, e.g. "char c = *ptr;"
+	- Before and after math operators, e.g. "a = b - c * d;"
+	- Before but not after minus sign, e.g. "a = -b - c";
+	- After semicolons in for statement, "e.g. for (a = b; a < c; a++)"

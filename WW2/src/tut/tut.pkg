@@ -1,0 +1,6 @@
+$pfile "..\\lua\\include.pkg"
+
+module tutorial
+{
+	$cfile "TutorialManager.h"
+}

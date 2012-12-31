@@ -1,0 +1,37 @@
+I got a P-38 manual today...
+
+Some points of interest
+
+Stall speeds: (15000 lbs), 94 mph gear and flaps up, 69 mph gear and flaps
+down
+17000 lbs :  100 mph G&F up, 74 mph down
+19000 lbs:  105 mph up, 78 mph down
+
+AIRSPEED LIMITATIONS:
+
+Landing gear down:  175 mph IAS
+Flaps 100% extended:  150 mph
+Flaps 50% extended:  250 mph
+Landing light extended:  140 mph
+
+Dangerous instability exists when the center of gravity is aft of 32% mac.
+(32% gear up corresponds to 28.5% gear down).  Under these tail heavy
+conditions, full down elevator will be required to prevent stalling the
+airplane if the airspeed is allowed to drop below 90 mph IAS with flaps down,
+power on, and gear up.  Tail heavy conditions may be relieved by lowering the
+landing gear.
+
+Fuel consumptions are as follows (per engine):
+
+3000rpm, 54 inches MP, 1425hp, 167 US gal/hr, critical altitude 22000' without
+ram, 24900' with ram, 15 minute limit
+
+3000rpm, 60 ", 1600 hp, 180 US gal/hr, critical alitudes 7000' without ram,
+10000' with ram, 5 minute limit
+
+2600 rpm, 44", 1100 hp, 113 US gal/hr, 31600' without ram, 34000' with ram
+
+2300 rpm, 35", 795 hp, 63 US gal/hr, 36700' without ram, 38000' with ram
+
+
+

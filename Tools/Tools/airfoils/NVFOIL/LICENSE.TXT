@@ -1,0 +1,66 @@
+English users: see bottom of the file.
+___________________________________________________________________________
+
+Licenza d' uso
+
+
+Studenti, organizzazioni non profit, organizzazioni universitarie:
+	Questo programma (in tutte le sue componenti) è "Freeware", cioe'
+si puo' liberamente copiare ed utilizzare; è comunque vietato effettuare 
+operazioni di reverse-engineering e di modifica del codice non autorizzate
+dall' autore.
+
+Organizzazioni commerciali, etc.:
+	Questo programma (in tutte le sue componenti) è "Shareware", cioe'
+si puo' liberamente copiare ed utilizzare per un massimo di 30 giorni;
+successivamente il suo uso è consentito previo pagamento di L.50.000 
+all' autore (indirizzo E-mail: tennerie@cds.unina.it). E' comunque vietato 
+effettuare operazioni di reverse-engineering e di modifica del codice non 
+autorizzate dall' autore.
+
+
+___________________________________________________________________________
+
+	Il codice è anche in vendita a L. 75.000 (contattare l' autore:
+E-mail: tennerie@cds.unina.it).
+
+	La proprietà e le limitazioni d' uso del database di profili
+allegato ad NVFoil sono specificate nei file Html in esso allegati.
+
+___________________________________________________________________________
+
+	L' USO DEL SOFTWARE E' IN OGNI CASO A PROPRIO RISCHIO!; l' autore
+non è responsabile di danni provocati dal software, dal programma di
+installazione, ne' della correttezza dei suoi risultati.
+
+
+
+___________________________________________________________________________
+
+License
+
+Students, non-profit organizzations, University:
+	This program, in all its components, is "Freeware", that is it
+can be freely copied and used; however, it's NOT permitted to 
+reverse-engineer or modify it without specific author's autorization.
+
+Commercial organizations and others:
+	This program, in all its components, is "Freeware", that is it
+can be freely copied and used for 30 days from the first download; then,
+it's possible use it after payment of 50.000 Italian lire to the author
+(E-mail address: tennerie@cds.unina.it); however, it's NOT permitted to 
+reverse-engineer or modify it without specific author's autorization.
+
+___________________________________________________________________________
+
+	I also sell the code at 75.000 Italian Lire (contact me at the
+E-mail: tennerie@cds.unina.it).
+
+	The property and limitation of UIUC airfoils database
+are specified in the HTML file in airfoils.zip.
+
+___________________________________________________________________________
+
+	THE USE OF THE SOFTWARE IS AT YOUR OWN RISK!; the author
+is not responsible neither of any damages due to the software or the
+installation program, nor of the correctness of the results.

@@ -1,0 +1,108 @@
+<?xml version='1.0'?>
+<!DOCTYPE class SYSTEM "omg.dtd">
+
+<class
+	namespace='MM'
+	name='SortieData'>
+
+	<doc>
+		<brief>Describes an ongoing or complete sortie.</brief>
+		<detail>
+			Encapsulates various pieces of sortie data into various objects.
+		</detail>
+	</doc>
+
+	<var-group name='Sortie'>
+		<doc> <brief> Outline of this sortie. </brief> </doc>
+
+		<member type='UINT32' name='sortieID' brief="Server's ID for this sortie (unique per campaign)."/>
+		<member type='Teul::NetTimeMS' name='spawned_ms' brief="TimeStamp of the sortie's spawn."/>
+		<member type='Teul::NetTimeMS' name='despawned_ms' brief="Despawn time."/>
+		<member type='FULL_OBJ_ID' name='originFac' brief="Spawn facility. May differ from mission."/>
+		<member type='FULL_OBJ_ID' name='target' brief="Target of player's current mission."/>
+		<member type='UINT32' name='flags' brief="List of flags."/>
+
+	</var-group>
+
+	<var-group name='Player'>
+		<doc> <brief> Description of the player driving the sortie. </brief> </doc>
+		<member type='UINT8' name='decal' brief="Player's decal."/>
+	</var-group>
+
+	<var-group name='Vehicle'>
+		<doc> <brief> Description of the vehicle used. </brief> </doc>
+
+		<member type='WEAPON_SPEC' name='weaponSpec' brief="Vehicle used for this sortie."/>
+		<member type='RANK_NO' name='effectiveRank' brief="Rank attributed to the vehicle."/>
+		<member type='UINT8' name='rtbState' brief="Vehicle's RTB status (or 0 for not yet despawned)."/>
+		<member type='ChatHandle' name='killedBy' brief="Callsign of killer or 0."/>
+		<member type='FULL_OBJ_ID' name='rtbFacility' brief="Where the vehicle is RTBing to."/>
+	</var-group>
+
+	<var-group name='Location'>
+		<doc> <brief> Tracking of where the vehicle is (or was) in-game. </brief> </doc>
+
+		<member type='SINT32' name='x' brief="x co-ordinate in cm"/>
+		<member type='SINT32' name='y' brief="y co-ordinate in cm"/>
+		<member type='SINT32' name='z' brief="z co-ordinate in cm"/>
+		<member type='UINT32' name='riding' brief="0 or ID of sortie being ridden."/>
+		<member type='FULL_OBJ_ID' name='nearCP' brief="Closest CP to vehicle."/>
+	</var-group>
+
+	<var-group name='Scoring'>
+		<doc> <brief> Provides summary tracking of the vehicle's actions. </brief> </doc>
+
+		<!-- bits 0-7 -->
+		<member type='UINT32' name='hits' brief="Number of vehicles hit."/>
+		<member type='UINT32' name='kills' brief="Number of vehicles killed."/>
+		<member type='UINT32' name='captures' brief="Number of facilities captured."/>
+		<member type='UINT32' name='defends' brief="Number of facilities defended."/>
+		<member type='UINT32' name='aiKills' brief="Number of AIs killed."/>
+		<member type='UINT32' name='aiRepairs' brief="Number of AIs repaired."/>
+		<member type='UINT32' name='bridgeKills' brief="Number of bridges damaged."/>
+		<member type='UINT32' name='bridgeRepairs' brief="Number of bridges repaired."/>
+
+		<!-- bits 8-15 -->
+		<member type='UINT32' name='factoryKills' brief="Number of factories damaged."/>
+		<member type='UINT32' name='firebaseKills' brief="Number of firebases damaged."/>
+		<member type='UINT32' name='resupplies' brief="Number of resupply actions."/>
+		<member type='UINT32' name='resuppliesScored' brief="Number of resupplies awarded score."/>
+		<member type='UINT32' name='guardingKills' brief="Number of kills scored from inside a cap bldg."/>
+		<member type='UINT32' name='cappingKills' brief="Number of kills scored on enemies inside a cap bldg."/>
+		<member type='UINT32' name='umsKills' brief="Number of un-manned mobile spawns killed."/>
+		<member type='UINT32' name='guardingPoints' brief="Amount of time spent 'guarding'."/>
+
+		<!-- bits 16-23 -->
+		<member type='UINT32' name='spawnees' brief="Number of mobile spawns awarded you."/>
+		<member type='UINT32' name='uniqueHits' brief="Number of unique vehicles hit."/>
+		<member type='UINT32' name='vehtypesHit' brief="Number of vehicle types hit."/>
+		<member type='UINT32' name='points' brief="Points scored (will be modified by RTB)."/>
+		<member type='UINT16' name='assists' brief="Number of kill-assists awarded."/>
+	</var-group>
+
+<!--
+	<sub-group>
+		<sub-group name='Reservation'>
+			bool isReserved ;
+			FULL_OBJ_ID facility ;
+		</sub-group>
+	</sub-group>
+-->
+
+	<function return-type='UINT32' name='sortieID' const='true'>
+		<doc><brief>Returns the sortieID.</brief></doc>
+		<code>return m_sortie.sortieID() ;</code>
+	</function>
+
+	<function return-type='UINT32' name='duration_s' const='true'>
+		<doc><brief>Returns the duration the sortie has been spawned for.</brief></doc>
+		<code>return (UINT32)(sortie().despawned_ms() - sortie().spawned_ms()) / 1000U ;</code>
+	</function>
+
+	<function return-type='TeulTimeMS' name='duration_ms' const='true'>
+		<doc><brief>Returns the duration the sortie has been spawned for.</brief></doc>
+		<code>return sortie().despawned_ms() - sortie().spawned_ms() ;</code>
+	</function>
+
+</class>
+

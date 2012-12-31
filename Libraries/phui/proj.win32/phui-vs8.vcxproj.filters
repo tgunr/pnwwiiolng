@@ -1,0 +1,309 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="src">
+      <UniqueIdentifier>{61001d38-6255-4fad-af76-f8bc48b5550c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{8762b50a-a37e-475d-9759-72ecc6e1855e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\phui">
+      <UniqueIdentifier>{ecf30016-0041-4941-afcf-e27bc0e0e4c9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\src\Button.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Caption.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Checkbox.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ConsoleView.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ContextMenu.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Control.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ControlValueMessage.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ConvertUTF.c">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\CSSViewDrawer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\CtxMenu.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\DOM.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\DropDownTask.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\GLGraphicsContext.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ImageView.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\IMEControl.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Invoker.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Javascript.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ListView.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Menu.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Message.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\MessageFilter.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\MessageHandler.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\MessageLoop.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Messenger.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\MirrorView.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Panel.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Periodical.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\PopupMenuButton.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\ProgressBar.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\RadioButton.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scalar.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Scrollbar.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Slider.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\StackView.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\StencilView.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\TabView.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\TextContainer.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\TextControl.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\TextView.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\UIXML.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Util.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\View.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\Viewport.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\wwiiUTF.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="..\src\XMLMessage.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\src\ConvertUTF.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\src\wwiiUTF.h">
+      <Filter>src</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\Button.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\Caption.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\Checkbox.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\ConsoleView.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\ContextMenu.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\Control.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\ControlValueMessage.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\CSSViewDrawer.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\CtxMenu.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\DOM.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\DropDownTask.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\Error.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\FTFontReplacement.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\GLGraphicsContext.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\GraphicsContext.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\ImageView.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\IMEControl.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\Invoker.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\Javascript.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\KeyCodes.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\ListView.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\Menu.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\Message.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\MessageFilter.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\MessageHandler.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\MessageLoop.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\Messenger.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\MirrorView.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\Panel.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\Periodical.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\PopupMenuButton.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\ProgressBar.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\RadioButton.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\Referenced.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\Scalar.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\Scrollbar.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\Slider.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\StackView.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\StencilView.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\TabView.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\TextContainer.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\TextControl.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\TextView.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\UIMessages.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\UIXML.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\Util.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\View.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\ViewDrawer.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\Viewport.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\include\phui\XMLMessage.h">
+      <Filter>include\phui</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

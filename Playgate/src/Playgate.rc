@@ -1,0 +1,297 @@
+// Microsoft Visual C++ generated resource script.
+//
+#include "resource.h"
+
+#define APSTUDIO_READONLY_SYMBOLS
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 2 resource.
+//
+#ifndef APSTUDIO_INVOKED
+#include "targetver.h"
+#endif
+#include "afxres.h"
+
+/////////////////////////////////////////////////////////////////////////////
+#undef APSTUDIO_READONLY_SYMBOLS
+
+/////////////////////////////////////////////////////////////////////////////
+// English (U.S.) resources
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+#ifdef _WIN32
+LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
+#pragma code_page(1252)
+#endif //_WIN32
+
+#ifdef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// TEXTINCLUDE
+//
+
+1 TEXTINCLUDE 
+BEGIN
+    "resource.h\0"
+END
+
+2 TEXTINCLUDE 
+BEGIN
+    "#ifndef APSTUDIO_INVOKED\r\n"
+    "#include ""targetver.h""\r\n"
+    "#endif\r\n"
+    "#include ""afxres.h""\r\n"
+    "\0"
+END
+
+3 TEXTINCLUDE 
+BEGIN
+    "#define _AFX_NO_SPLITTER_RESOURCES\r\n"
+    "#define _AFX_NO_OLE_RESOURCES\r\n"
+    "#define _AFX_NO_TRACKER_RESOURCES\r\n"
+    "#define _AFX_NO_PROPERTY_RESOURCES\r\n"
+    "\r\n"
+    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)\r\n"
+    "LANGUAGE 9, 1\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""..\\res\\Playgate.rc2""  // non-Microsoft Visual C++ edited resources\r\n"
+    "#pragma code_page(65001)\r\n"
+    "#include ""..\\res\\loc.rc""  // localization strings\r\n"
+    "#pragma code_page(1252)\r\n"
+    "#include ""afxres.rc""     // Standard components\r\n"
+    "#endif\r\n"
+    "\0"
+END
+
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icon
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDR_MAINFRAME           ICON                    "..\\res\\Playgate.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog
+//
+
+IDD_TERMS_OF_SERVICE DIALOGEX 0, 0, 425, 343
+STYLE DS_SETFONT | DS_3DLOOK | DS_FIXEDSYS | DS_CENTER | WS_POPUP
+EXSTYLE WS_EX_TOPMOST | WS_EX_APPWINDOW
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    CONTROL         "",IDC_TOS,"RichEdit20W",ES_MULTILINE | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_READONLY | WS_BORDER | WS_VSCROLL | WS_HSCROLL | WS_TABSTOP,15,106,393,198
+    PUSHBUTTON      "",IDOK,359,308,50,18
+    DEFPUSHBUTTON   "",IDCANCEL,15,308,50,18
+    CTEXT           "",IDC_HINT,65,308,294,18,SS_CENTERIMAGE | WS_BORDER
+    RTEXT           "",IDC_VERSION_NO,349,7,66,8,0,WS_EX_TRANSPARENT
+END
+
+IDD_REGION_SELECT DIALOGEX 0, 0, 288, 143
+STYLE DS_SETFONT | DS_MODALFRAME | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LISTBOX         IDC_REGION_LIST,7,12,273,85,LBS_NOINTEGRALHEIGHT | WS_VSCROLL | WS_TABSTOP
+    PUSHBUTTON      "",IDCANCEL,7,118,50,18
+    CTEXT           "Hint",IDC_HINT,7,99,273,18,SS_CENTERIMAGE | WS_BORDER,WS_EX_TRANSPARENT
+    DEFPUSHBUTTON   "",IDOK,231,118,50,18
+    RTEXT           "",IDC_VERSION_NO,222,0,66,8,0,WS_EX_TRANSPARENT
+END
+
+IDD_PLAYER_LOGON DIALOGEX 0, 0, 392, 259
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    EDITTEXT        IDC_LOGIN_NAME,116,238,76,14,ES_CENTER | ES_AUTOHSCROLL
+    EDITTEXT        IDC_PASSWORD,199,238,76,14,ES_CENTER | ES_PASSWORD | ES_AUTOHSCROLL
+    CONTROL         "",IDC_EXPLORER2,"{8856F961-340A-11D0-A96B-00C04FD705A2}",WS_TABSTOP,7,12,378,193
+    CTEXT           "Hint",IDC_HINT,7,208,378,18,SS_CENTERIMAGE | WS_BORDER
+    DEFPUSHBUTTON   "",IDOK,335,237,50,15
+    CTEXT           "",IDS_LOGIN_NAME_LABEL,116,228,76,9,NOT WS_GROUP,WS_EX_TRANSPARENT
+    CTEXT           "",IDS_PASSWORD_LABEL,199,228,76,9,NOT WS_GROUP,WS_EX_TRANSPARENT
+    PUSHBUTTON      "",IDCANCEL,7,237,50,15
+    RTEXT           "",IDC_VERSION_NO,324,0,66,8,0,WS_EX_TRANSPARENT
+END
+
+IDD_PLAYGATE_DIALOG DIALOGEX 0, 0, 452, 276
+STYLE DS_SETFONT | DS_MODALFRAME | DS_3DLOOK | DS_FIXEDSYS | WS_POPUP | WS_CAPTION | WS_SYSMENU
+EXSTYLE WS_EX_APPWINDOW
+FONT 8, "MS Shell Dlg", 400, 0, 0x1
+BEGIN
+    LISTBOX         IDC_SERVER_LIST,313,30,124,83,LBS_OWNERDRAWFIXED | LBS_HASSTRINGS | LBS_NOINTEGRALHEIGHT | WS_DISABLED | WS_TABSTOP,WS_EX_TRANSPARENT
+    DEFPUSHBUTTON   "",IDOK,395,255,50,14,WS_DISABLED
+    CONTROL         "",IDC_EXPLORER2,"{8856F961-340A-11D0-A96B-00C04FD705A2}",WS_TABSTOP,7,12,297,220
+    PUSHBUTTON      "",IDCANCEL,7,255,50,14
+    CTEXT           "Hint",IDC_HINT,7,233,437,21,SS_CENTERIMAGE | WS_BORDER
+    CONTROL         "",IDC_FTP_PROGRESS,"msctls_progress32",PBS_SMOOTH | NOT WS_VISIBLE | WS_BORDER,80,255,290,14
+    GROUPBOX        "",IDS_SERVERS_GROUP,308,8,136,110
+    LTEXT           "",IDS_SERVERS_LABEL,312,18,124,8
+    GROUPBOX        "",IDS_TOOLS_GROUP,308,119,136,113
+    RTEXT           "",IDC_VERSION_NO,384,0,66,8,0,WS_EX_TRANSPARENT
+    LTEXT           "",IDS_SERVER_NOTE,312,126,126,102
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 0,1,1,9
+ PRODUCTVERSION 0,1,1,9
+ FILEFLAGSMASK 0x3fL
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0x0L
+#endif
+ FILEOS 0x4L
+ FILETYPE 0x1L
+ FILESUBTYPE 0x0L
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+        BLOCK "040904e4"
+        BEGIN
+            VALUE "Comments", "http://www.battlegroundeurope.com/"
+            VALUE "CompanyName", "Playnet/Cornered Rat Software"
+            VALUE "FileDescription", "Battleground Europe Launcher"
+            VALUE "FileVersion", "0,1,1,9"
+            VALUE "InternalName", "Playgate.exe"
+            VALUE "LegalCopyright", "Copyright (C) 1999-2009, Playnet Inc"
+            VALUE "OriginalFilename", "Playgate.exe"
+            VALUE "ProductName", "Playgate: Battleground Europe Launcher"
+            VALUE "ProductVersion", "0.1.1.9"
+        END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+        VALUE "Translation", 0x409, 1252
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// DESIGNINFO
+//
+
+#ifdef APSTUDIO_INVOKED
+GUIDELINES DESIGNINFO 
+BEGIN
+    IDD_TERMS_OF_SERVICE, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 418
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 336
+    END
+
+    IDD_REGION_SELECT, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 281
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 136
+    END
+
+    IDD_PLAYER_LOGON, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 385
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 252
+    END
+
+    IDD_PLAYGATE_DIALOG, DIALOG
+    BEGIN
+        LEFTMARGIN, 7
+        RIGHTMARGIN, 445
+        TOPMARGIN, 7
+        BOTTOMMARGIN, 269
+    END
+END
+#endif    // APSTUDIO_INVOKED
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Dialog Info
+//
+
+IDD_PLAYER_LOGON DLGINIT
+BEGIN
+    IDC_EXPLORER2, 0x376, 160, 0
+0x0000, 0x0000, 0x004c, 0x0000, 0x3a9a, 0x0000, 0x2074, 0x0000, 0x0000, 
+0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 
+0x0000, 0x0000, 0x004c, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0001, 
+0x0000, 0xd0e0, 0x0057, 0x3573, 0x11cf, 0x69ae, 0x0008, 0x2e2b, 0x6212, 
+0x0002, 0x0000, 0x0000, 0x0000, 0x004c, 0x0000, 0x1401, 0x0002, 0x0000, 
+0x0000, 0x00c0, 0x0000, 0x0000, 0x4600, 0x0080, 0x0000, 0x0000, 0x0000, 
+0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 
+0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0001, 0x0000, 
+0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 
+    0
+END
+
+IDD_PLAYGATE_DIALOG DLGINIT
+BEGIN
+    IDC_EXPLORER2, 0x376, 160, 0
+0x0000, 0x0000, 0x004c, 0x0000, 0x2e18, 0x0000, 0x2500, 0x0000, 0x0000, 
+0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 
+0x0000, 0x0000, 0x004c, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0001, 
+0x0000, 0xd0e0, 0x0057, 0x3573, 0x11cf, 0x69ae, 0x0008, 0x2e2b, 0x6212, 
+0x0000, 0x0000, 0x0000, 0x0000, 0x004c, 0x0000, 0x1401, 0x0002, 0x0000, 
+0x0000, 0x00c0, 0x0000, 0x0000, 0x4600, 0x0080, 0x0000, 0x0000, 0x0000, 
+0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 
+0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0001, 0x0000, 
+0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 0x0000, 
+    0
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE 
+BEGIN
+    IDP_SOCKETS_INIT_FAILED "Windows sockets initialization failed."
+END
+
+#endif    // English (U.S.) resources
+/////////////////////////////////////////////////////////////////////////////
+
+
+
+#ifndef APSTUDIO_INVOKED
+/////////////////////////////////////////////////////////////////////////////
+//
+// Generated from the TEXTINCLUDE 3 resource.
+//
+#define _AFX_NO_SPLITTER_RESOURCES
+#define _AFX_NO_OLE_RESOURCES
+#define _AFX_NO_TRACKER_RESOURCES
+#define _AFX_NO_PROPERTY_RESOURCES
+
+#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_ENU)
+LANGUAGE 9, 1
+#pragma code_page(1252)
+#include "..\res\Playgate.rc2"  // non-Microsoft Visual C++ edited resources
+#pragma code_page(65001)
+#include "..\res\loc.rc"  // localization strings
+#pragma code_page(1252)
+#include "afxres.rc"     // Standard components
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+#endif    // not APSTUDIO_INVOKED
+

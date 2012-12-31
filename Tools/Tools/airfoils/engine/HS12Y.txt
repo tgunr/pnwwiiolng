@@ -1,0 +1,36 @@
+Hi, Jonathan!
+
+Seems, I have data you asked for ;-)
+
+Hispano Suiza 12Y, aka M-100, M-100A in russian serial production:
+
+Design altitude: 3300 m
+Dry weight: 484 kg
+
+> I need information on horsepower, supercharging type
+> (single-speed/two-speed, single-staged or 2-staged),
+
+Single staged, single speed supercharger.
+
+> supercharger critical
+> altitudes for each speed (basically the altitude at which the supercharger
+> cannot provide sea level pressure to the engine anymore),
+
+See files attached.
+
+> WEP limits, RPM for various modes of operation (cruise, WEP, climb, takeoff, etc),
+> manifold pressure, etc.
+
+Take-off mode: 860 HP, 2400 RPM, manifold pressure 880 mm of Me. pile
+Nominal mode:  2400RPM, 770HP@sea level, 860HP@3300m
+
+Source of data: "Aircraft Building in USSR (1917-1945)" Vol.1, TsAGI, 1992.
+
+BTW, whom do you working for now, Gunjam? :)
+
+
+With best regards,
+Arcticfox
+
+16 I` I/I A I`I
+BOEHHO-BO3DYIIIHbIE CI/I/\bI WarBirds

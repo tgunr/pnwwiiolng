@@ -1,0 +1,292 @@
+// !$*UTF8*$!
+{
+	08492F6813170B1D00C7F39E /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 086D189110607328008D80D3 /* SpeedTreeRT.cpp */;
+		name = "SpeedTreeRT.cpp: 2870";
+		rLen = 29;
+		rLoc = 95459;
+		rType = 0;
+		vrLen = 1123;
+		vrLoc = 95033;
+	};
+	08492F6913170B1D00C7F39E /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 086D189210607328008D80D3 /* SpeedTreeRT.h */;
+		rLen = 18;
+		rLoc = 29339;
+		rType = 0;
+	};
+	08492F6A13170B1D00C7F39E /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 086D189210607328008D80D3 /* SpeedTreeRT.h */;
+		name = "SpeedTreeRT.h: 566";
+		rLen = 85;
+		rLoc = 29159;
+		rType = 0;
+		vrLen = 1991;
+		vrLoc = 28049;
+	};
+	086D184810607317008D80D3 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+			repositoryNamesForRoots = {
+				"" = "";
+			};
+		};
+	};
+	086D184910607317008D80D3 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	086D185310607328008D80D3 /* Allocator.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1294, 2912}}";
+			sepNavSelRange = "{623, 0}";
+			sepNavVisRange = "{0, 1574}";
+		};
+	};
+	086D185410607328008D80D3 /* BillboardLeaf.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1308, 3872}}";
+			sepNavSelRange = "{7369, 12}";
+			sepNavVisRange = "{6892, 1034}";
+			sepNavWindowFrame = "{{597, 66}, {1376, 1068}}";
+		};
+	};
+	086D185510607328008D80D3 /* BillboardLeaf.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1396, 1424}}";
+			sepNavSelRange = "{582, 13}";
+			sepNavVisRange = "{0, 2856}";
+		};
+	};
+	086D185610607328008D80D3 /* Branch.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1294, 30556}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 1589}";
+		};
+	};
+	086D185810607328008D80D3 /* Camera.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1294, 908}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 1342}";
+		};
+	};
+	086D185910607328008D80D3 /* Debug.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1294, 1280}}";
+			sepNavSelRange = "{640, 0}";
+			sepNavVisRange = "{0, 1604}";
+		};
+	};
+	086D185A10607328008D80D3 /* DiffTracker.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1294, 1488}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 1395}";
+		};
+	};
+	086D186110607328008D80D3 /* EvalTest.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1211, 481}}";
+			sepNavSelRange = "{8, 18}";
+			sepNavVisRange = "{0, 806}";
+		};
+	};
+	086D186210607328008D80D3 /* FileAccess.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1294, 5472}}";
+			sepNavSelRange = "{705, 0}";
+			sepNavVisRange = "{0, 1374}";
+			sepNavWindowFrame = "{{15, 41}, {908, 1132}}";
+		};
+	};
+	086D186310607328008D80D3 /* FileAccess.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1294, 8352}}";
+			sepNavSelRange = "{959, 14}";
+			sepNavVisRange = "{0, 1412}";
+		};
+	};
+	086D186610607328008D80D3 /* IndexedGeometry.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1020, 13088}}";
+			sepNavSelRange = "{20729, 17}";
+			sepNavVisRange = "{20226, 1012}";
+		};
+	};
+	086D187910607328008D80D3 /* RobertDavies_Random.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {678, 6341}}";
+			sepNavSelRange = "{7656, 0}";
+			sepNavVisRange = "{7579, 237}";
+		};
+	};
+	086D187D10607328008D80D3 /* IdvSpline.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1294, 1488}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{90, 1882}";
+		};
+	};
+	086D187F10607328008D80D3 /* IdvFastMath.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1294, 792}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 914}";
+		};
+	};
+	086D188010607328008D80D3 /* IdvVector.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1294, 19488}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 1404}";
+		};
+	};
+	086D188A10607328008D80D3 /* ProjectedShadow.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1294, 784}}";
+			sepNavSelRange = "{531, 0}";
+			sepNavVisRange = "{0, 1895}";
+		};
+	};
+	086D188E10607328008D80D3 /* SimpleBillboard.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1294, 816}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 2083}";
+		};
+	};
+	086D188F10607328008D80D3 /* SpeedTreeAllocator.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1294, 1776}}";
+			sepNavSelRange = "{689, 0}";
+			sepNavVisRange = "{0, 1404}";
+		};
+	};
+	086D189010607328008D80D3 /* SpeedTreeMemory.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1294, 10320}}";
+			sepNavSelRange = "{743, 0}";
+			sepNavVisRange = "{529, 1293}";
+			sepNavWindowFrame = "{{544, 71}, {1376, 1068}}";
+		};
+	};
+	086D189110607328008D80D3 /* SpeedTreeRT.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1562, 85120}}";
+			sepNavSelRange = "{95459, 29}";
+			sepNavVisRange = "{95033, 1123}";
+		};
+	};
+	086D189210607328008D80D3 /* SpeedTreeRT.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1782, 16321}}";
+			sepNavSelRange = "{29159, 85}";
+			sepNavVisRange = "{28049, 1991}";
+		};
+	};
+	086D189310607328008D80D3 /* SpeedWind.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {840, 26129}}";
+			sepNavSelRange = "{40249, 0}";
+			sepNavVisRange = "{40191, 176}";
+		};
+	};
+	086D189510607328008D80D3 /* StructsSupport.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1211, 4464}}";
+			sepNavSelRange = "{665, 0}";
+			sepNavVisRange = "{0, 969}";
+		};
+	};
+	086D189910607328008D80D3 /* UpVector.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {2812, 2546}}";
+			sepNavSelRange = "{937, 29}";
+			sepNavVisRange = "{0, 1521}";
+		};
+	};
+	086D195E10607C9D008D80D3 /* macfixer.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1294, 784}}";
+			sepNavSelRange = "{136, 0}";
+			sepNavVisRange = "{0, 145}";
+		};
+	};
+	08FB7793FE84155DC02AAC07 /* Project object */ = {
+		activeBuildConfigurationName = Release;
+		activeSDKPreference = macosx10.5;
+		activeTarget = D2AAC045055464E500DB518D /* speedtreemac */;
+		addToTargets = (
+			D2AAC045055464E500DB518D /* speedtreemac */,
+		);
+		breakpoints = (
+		);
+		codeSenseManager = 086D184910607317008D80D3 /* Code sense */;
+		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					1237,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXConfiguration.PBXTargetDataSource.PBXTargetDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					324,
+					60,
+					20,
+					48,
+					43,
+					43,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXTargetDataSource_PrimaryAttribute,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 320011352;
+			PBXWorkspaceStateSaveDate = 320011352;
+		};
+		perUserProjectItems = {
+			08492F6813170B1D00C7F39E /* PBXTextBookmark */ = 08492F6813170B1D00C7F39E /* PBXTextBookmark */;
+			08492F6913170B1D00C7F39E /* PBXTextBookmark */ = 08492F6913170B1D00C7F39E /* PBXTextBookmark */;
+			08492F6A13170B1D00C7F39E /* PBXTextBookmark */ = 08492F6A13170B1D00C7F39E /* PBXTextBookmark */;
+		};
+		sourceControlManager = 086D184810607317008D80D3 /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	D2AAC045055464E500DB518D /* speedtreemac */ = {
+		activeExec = 0;
+	};
+}

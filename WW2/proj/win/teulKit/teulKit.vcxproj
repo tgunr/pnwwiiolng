@@ -1,0 +1,440 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Buzzard|Win32">
+      <Configuration>Buzzard</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="China|Win32">
+      <Configuration>China</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MultiClient|Win32">
+      <Configuration>MultiClient</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="SSE2SmartHeap|Win32">
+      <Configuration>SSE2SmartHeap</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="TestRelease|Win32">
+      <Configuration>TestRelease</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{4F492374-DC5C-47D0-AE9F-7DF7A50FDECB}</ProjectGuid>
+    <RootNamespace>teulKit</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='China|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SSE2SmartHeap|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+    <WholeProgramOptimization>false</WholeProgramOptimization>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='China|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='SSE2SmartHeap|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)WW2\lib\win\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">$(SolutionDir)WW2\lib\win\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='SSE2SmartHeap|Win32'">$(SolutionDir)WW2\lib\win\$(Configuration)\</OutDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">$(SolutionDir)WW2\lib\win\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='SSE2SmartHeap|Win32'">$(Configuration)\</IntDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='China|Win32'">$(SolutionDir)WW2\lib\win\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='China|Win32'">$(Configuration)\</IntDir>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">$(SolutionDir)WW2\lib\win\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">$(Configuration)\</IntDir>
+    <EnableManagedIncrementalBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</EnableManagedIncrementalBuild>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\teul;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\Libraries;$(SolutionDir)\Libraries\libevent\include;$(SolutionDir)\Libraries\libevent\WIN32-CODE;$(SolutionDir)\Libraries;$(SolutionDir)\Libraries\raknet\Source;$(SolutionDir)\Libraries\raknet</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>true</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <SmallerTypeCheck>false</SmallerTypeCheck>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>NotSet</EnableEnhancedInstructionSet>
+      <OpenMPSupport>false</OpenMPSupport>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>syscfg.h</PrecompiledHeaderFile>
+      <AssemblerOutput>
+      </AssemblerOutput>
+      <BrowseInformation>
+      </BrowseInformation>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4480</DisableSpecificWarnings>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\teul;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\Libraries;$(SolutionDir)\Libraries\libevent\include;$(SolutionDir)\Libraries\libevent\WIN32-CODE;$(SolutionDir)\Libraries;$(SolutionDir)\Libraries\raknet\Source;$(SolutionDir)\Libraries\raknet</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <OpenMPSupport>false</OpenMPSupport>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>syscfg.h</PrecompiledHeaderFile>
+      <AssemblerOutput>
+      </AssemblerOutput>
+      <BrowseInformation>
+      </BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4480</DisableSpecificWarnings>
+    </ClCompile>
+    <Lib>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='SSE2SmartHeap|Win32'">
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\teul;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\Libraries;$(SolutionDir)\Libraries\libevent\include;$(SolutionDir)\Libraries\libevent\WIN32-CODE;$(SolutionDir)\Libraries;$(SolutionDir)\Libraries\raknet\Source;$(SolutionDir)\Libraries\raknet</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <OpenMPSupport>false</OpenMPSupport>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>syscfg.h</PrecompiledHeaderFile>
+      <AssemblerOutput>All</AssemblerOutput>
+      <BrowseInformation>
+      </BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4480</DisableSpecificWarnings>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <ForceSymbolReferences>_SmartHeap_malloc;_SmartHeap_new;%(ForceSymbolReferences)</ForceSymbolReferences>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <AdditionalIncludeDirectories>
+        <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\teul;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\Libraries;$(SolutionDir)\Libraries\libevent\include;$(SolutionDir)\Libraries\libevent\WIN32-CODE;$(SolutionDir)\Libraries;$(SolutionDir)\Libraries\raknet\Source;$(SolutionDir)\Libraries\raknet</AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions);MULTI_CLIENT</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <OpenMPSupport>false</OpenMPSupport>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>syscfg.h</PrecompiledHeaderFile>
+      <AssemblerOutput>All</AssemblerOutput>
+      <BrowseInformation>
+      </BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4480</DisableSpecificWarnings>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <ForceSymbolReferences>_SmartHeap_malloc;_SmartHeap_new;%(ForceSymbolReferences)</ForceSymbolReferences>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='China|Win32'">
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\teul;$(SolutionDir)\src\sys;$(SolutionDir)\Libraries;$(SolutionDir)\Libraries\libevent\include;$(SolutionDir)\Libraries\libevent\WIN32-CODE</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <OpenMPSupport>false</OpenMPSupport>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>syscfg.h</PrecompiledHeaderFile>
+      <AssemblerOutput>All</AssemblerOutput>
+      <BrowseInformation>
+      </BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4480</DisableSpecificWarnings>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <ForceSymbolReferences>_SmartHeap_malloc;_SmartHeap_new;%(ForceSymbolReferences)</ForceSymbolReferences>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">
+    <ClCompile>
+      <Optimization>Full</Optimization>
+      <InlineFunctionExpansion>AnySuitable</InlineFunctionExpansion>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
+      <OmitFramePointers>true</OmitFramePointers>
+      <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
+      <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\teul;$(SolutionDir)\src\sys;$(SolutionDir)\Libraries;$(SolutionDir)\Libraries\libevent\include;$(SolutionDir)\Libraries\libevent\WIN32-CODE</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <StringPooling>true</StringPooling>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>false</BufferSecurityCheck>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <OpenMPSupport>false</OpenMPSupport>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>syscfg.h</PrecompiledHeaderFile>
+      <AssemblerOutput>All</AssemblerOutput>
+      <BrowseInformation>
+      </BrowseInformation>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>
+      </DebugInformationFormat>
+      <CompileAs>Default</CompileAs>
+      <DisableSpecificWarnings>4480</DisableSpecificWarnings>
+    </ClCompile>
+    <Lib>
+      <AdditionalDependencies>
+      </AdditionalDependencies>
+      <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <ForceSymbolReferences>_SmartHeap_malloc;_SmartHeap_new;%(ForceSymbolReferences)</ForceSymbolReferences>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\src\dbug\dbug.cpp">
+      <OpenMPSupport Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">false</OpenMPSupport>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='China|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='MultiClient|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='SSE2SmartHeap|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\teul\teulCallback.cpp">
+      <OpenMPSupport Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">false</OpenMPSupport>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\teul\teulDatagramPool.cpp">
+      <OpenMPSupport Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">false</OpenMPSupport>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\teul\teulEndpoint.cpp">
+      <OpenMPSupport Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">false</OpenMPSupport>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\teul\teulModCalls.cpp">
+      <OpenMPSupport Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">false</OpenMPSupport>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\teul\teulModRecv.cpp">
+      <OpenMPSupport Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">false</OpenMPSupport>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\teul\teulModSend.cpp">
+      <OpenMPSupport Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">false</OpenMPSupport>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\teul\teulModule.cpp">
+      <OpenMPSupport Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">false</OpenMPSupport>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\teul\teulNetTimeMS.cpp" />
+    <ClCompile Include="..\..\..\src\teul\teulPack.cpp">
+      <OpenMPSupport Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">false</OpenMPSupport>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\teul\teulPacket.cpp">
+      <OpenMPSupport Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">false</OpenMPSupport>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\teul\teulTransport.cpp">
+      <OpenMPSupport Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">false</OpenMPSupport>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\teul\teulUtils.cpp">
+      <OpenMPSupport Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">false</OpenMPSupport>
+    </ClCompile>
+    <ClCompile Include="..\..\..\src\wwii\wwiiCallbacks.cpp">
+      <OpenMPSupport Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">false</OpenMPSupport>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\..\Libraries\raknet\Source\RakVoice.h" />
+    <ClInclude Include="..\..\..\src\dbug\dbug.h" />
+    <ClInclude Include="..\..\..\src\dbug\dbugInternal.h" />
+    <ClInclude Include="..\..\..\src\dbug\dbugWErrno.h" />
+    <ClInclude Include="..\..\..\src\include\emem.h" />
+    <ClInclude Include="..\..\..\src\include\precompile_includes.h" />
+    <ClInclude Include="..\..\..\src\teul\teulCallbackStruct.h" />
+    <ClInclude Include="..\..\..\src\teul\teulClosingEnums.h" />
+    <ClInclude Include="..\..\..\src\teul\teulDatagram.h" />
+    <ClInclude Include="..\..\..\src\teul\teulEndpointIdleList.h" />
+    <ClInclude Include="..\..\..\src\teul\teulEndpointImpl.h" />
+    <ClInclude Include="..\..\..\src\teul\teulExceptions.h" />
+    <ClInclude Include="..\..\..\src\teul\teulExtract.h" />
+    <ClInclude Include="..\..\..\src\teul\teulFuncTypes.h" />
+    <ClInclude Include="..\..\..\src\teul\teulHeader.h" />
+    <ClInclude Include="..\..\..\src\teul\teulIPackable.h" />
+    <ClInclude Include="..\..\..\src\teul\teulLIEndpoint.h" />
+    <ClInclude Include="..\..\..\src\teul\teulNetTimeMS.h" />
+    <ClInclude Include="..\..\..\src\teul\teulPackEnums.h" />
+    <ClInclude Include="..\..\..\src\teul\teulPacketClass.h" />
+    <ClInclude Include="..\..\..\src\teul\teulPacketHeader.h" />
+    <ClInclude Include="..\..\..\src\teul\teulTimeMS.h" />
+    <ClInclude Include="..\..\..\src\teul\teulVersion.h" />
+    <ClInclude Include="..\..\..\src\updt\loginTypes.h" />
+    <ClInclude Include="..\..\..\src\mem\mem.h" />
+    <ClInclude Include="..\..\..\src\include\platforms.h" />
+    <ClInclude Include="..\..\..\src\teul\syscfg.h" />
+    <ClInclude Include="..\..\..\src\include\systypes.h" />
+    <ClInclude Include="..\..\..\src\teul\teulBasic.h" />
+    <ClInclude Include="..\..\..\src\teul\teulCallback.h" />
+    <ClInclude Include="..\..\..\src\teul\teulConnection.h" />
+    <ClInclude Include="..\..\..\src\teul\teulConnectionInstruction.h" />
+    <ClInclude Include="..\..\..\src\teul\teulConstants.h" />
+    <ClInclude Include="..\..\..\src\teul\teulDatagramPool.h" />
+    <ClInclude Include="..\..\..\src\teul\teulEndpoint.h" />
+    <ClInclude Include="..\..\..\src\teul\teulEndpointDefs.h" />
+    <ClInclude Include="..\..\..\src\teul\teulEnums.h" />
+    <ClInclude Include="..\..\..\src\teul\teulFresConstants.h" />
+    <ClInclude Include="..\..\..\src\teul\teulHousekeeper.h" />
+    <ClInclude Include="..\..\..\src\teul\teulKit.h" />
+    <ClInclude Include="..\..\..\src\teul\teulModCalls.h" />
+    <ClInclude Include="..\..\..\src\teul\teulModule.h" />
+    <ClInclude Include="..\..\..\src\teul\teulNetworkArray.h" />
+    <ClInclude Include="..\..\..\src\teul\teulNetworkMsg.h" />
+    <ClInclude Include="..\..\..\src\teul\teulNetworkObject.h" />
+    <ClInclude Include="..\..\..\src\teul\teulPackers.h" />
+    <ClInclude Include="..\..\..\src\teul\teulSerialize.h" />
+    <ClInclude Include="..\..\..\src\teul\teulSockConfig.h" />
+    <ClInclude Include="..\..\..\src\teul\teulTime.h" />
+    <ClInclude Include="..\..\..\src\teul\teulTransport.h" />
+    <ClInclude Include="..\..\..\src\teul\teulUtils.h" />
+    <ClInclude Include="..\..\..\src\wwii\wwiiCallbacks.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\..\Libraries\libevent\libevent.vcxproj">
+      <Project>{fe3e7329-9561-4bfc-9e1d-f4bddba2cbb0}</Project>
+      <Private>true</Private>
+      <ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+      <CopyLocalSatelliteAssemblies>false</CopyLocalSatelliteAssemblies>
+      <LinkLibraryDependencies>false</LinkLibraryDependencies>
+      <UseLibraryDependencyInputs>true</UseLibraryDependencyInputs>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\..\Libraries\OpenThreads\OpenThreads.vcxproj">
+      <Project>{e5a6b20b-c552-4c73-b6f4-a7b43b023ad8}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

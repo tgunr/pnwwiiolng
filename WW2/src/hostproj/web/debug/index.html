@@ -1,0 +1,41 @@
+<html>
+ <head>
+  <title> Internal Host-Management Server </title>
+  <link rel="stylesheet" type="text/css" href="/style.css"/>
+  <script type="text/javascript" src="http://code.jquery.com/jquery.min.js"></script>
+  <script type="text/javascript" src="/js/index.js"></script>
+  <script type="text/javascript" src="/js/page.js"></script>
+ </head>
+ <body>
+ <div class='tblouter'>
+  <div class='tblinner'>
+   <h3> HTML Files/Scripts. </h3>
+   <p> Debugging and micro-management pages. Some scripts will only work when served from a specific server or server type. </p>
+
+   <table class='list' width='100%'>
+    <tbody>
+     <tr class='head'><th>Description</th><th>URL</th><th>Servers</th></tr>
+    </tbody>
+    <tbody id="html-list">
+     <tr><th colspan="3">Loading...</th></tr>
+    </tbody>
+   </table>
+  </div>
+  <div class='tblinner'>
+   <h3> <a href='http://www.json.org/'>JSON</a> resources. </h3>
+   <p> Generated in real-time by the game server, served from an independent thread using the Teul::uWeb micro-webserver. </p>
+
+   <table class='list' width='100%'>
+    <tbody>
+     <tr class='head'><th>Description</th><th>URL</th></tr>
+    </tbody>
+    <tbody id="resource-list">
+     <tr><th colspan="1">Loading...</th></tr>
+    </tbody>
+   </table>
+  </div>
+ </div>
+
+ <div class='footer'/>
+ </body>
+</html>

@@ -1,0 +1,20 @@
+-Stall (feel, sounds, etc)
+-Snaproll
+-Accelerated stall (4g) at 2x stall speed
+-Prop effects (power on/power off) on drag/thrust
+-Prop effects on aileron input (full power/no power)
+-Stick feel during stall
+-Stall pitch-up magnitude
+-Power off level aileron and roll rate power on
+-Rudder position needs to counter P factor through speed range
+-Head movement
+-Cockpit pictures
+-Control response rates
+-Full rudder to no rudder oscillations
+-Rudder/Roll coupling
+-Aileron/Yaw coupling
+-Full elevator to no elevator oscillations
+-Spins?
+-Turns, how easy is it to hold just under stall
+-in a stall, tail stall 1st?
+

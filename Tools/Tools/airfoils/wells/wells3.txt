@@ -1,0 +1,77 @@
+
+From general6@iaw.com Fri Jun 18 07:37:13 1999
+Date: Thu, 17 Jun 1999 22:18:28 -0400
+From: Wells Sullivan <general6@iaw.com>
+To: Jonathan Hoof <hoofj@agora.rdrop.com>
+Subject: Re: Aerodynamics
+
+
+
+
+>
+>
+> You're referring to the effective AoA change with "wingtip" vortexes
+> right?  This (as I'm sure you know) is the "cause" of induced drag
+> (wingtip induced drag), as the flow around the wingtip (bends) the lift
+> vector.
+
+I'm saying that a fuselage would reach it's maximum lift coefficient at about 45 degrees,
+but only about 15-20 could be obtained by use of the rudder.  So really, the highest lift
+coefficient that you could get from a 'normal' fuse would be about 0.2 or so.
+
+>
+>
+> I was a bit puzzled by your equation of induced angle of attack in your
+> previous post. If I recall, it was something like
+>
+> (18.something * Cl) / AR
+>
+> what is this?  the change in AoA?  It's too large to be the new CL.  Is
+> this the deltaAoA for the tail, with Cl and AR being for the main wing?  I
+> didn't quite follow what you were referring to.
+
+I sent you the same formula only with the correction factor added in from the charts I
+sent you.  Did you get them ok?  It is a 'change' in angle of attack that gets added to
+the AoA from the 2d polar for the given lift coefficient.  It is the reason that F-16's
+and F-18's can fly at 25 degrees AoA despite their thin wings and low lift coefficients
+(relatively speaking) that probably peak at less than 10 degrees AoA.  Induced drag comes
+not only from the wingtip vortices.  There are vortices along the whole trailing edge as
+the 2 airflows meet.  Planes like the Spitfire, have little wingtip vortex as there is no
+tip! hehe
+
+>
+> You're saying the Cl moves forwards, not backwards?
+
+Yep, Cl moves forward with increased AoA and drag moves back as the flow goes turbulent.
+
+> Having the Cl move
+> backwards "limits" how far above stall AoA you can pitch the plane and
+> hold it there.
+
+> I tried this Cl/Cd movement today at work, and now the
+> damned thing won't hold a pitch angle larger than 2-3 degrees above macCl.
+
+You lost me a bit.  Did you move the Cl forward or back?  The Cl moving forward will help
+the plane pitch up.  Any negative pitching moment from drag comes from the drag being
+below the CG.  Where was the CG when you tried that?
+
+>
+> The pitching moment from having the CL move back eventually overpowers the
+> declining pitching moment from the tail surface (the tail is also stalled,
+> gaining more AoA the higher the plane's AoA reducing it's pitching
+> moment). If this is really what happens then it makes "real life" (and the
+> new sim) drastically different from WB.  It also makes it really hard to
+> put the plane into a sustained spin as you can't keep the AoA high enough
+> (my Zero at work loves to go into spiral dives that *look* like spins but
+> aren't, something WB doesn't model at all)
+
+Moving the CG back should help as well.
+
+>
+> Hehe I wish I could tell ya what planes we're modelling :) Lets just say
+> that the first part we're going to model hasn't been done in a flight
+> sim yet (as far as I know). =) =) =)
+
+Ok, no probs.  You'll let me know when it comes to beta testing? :)
+
+

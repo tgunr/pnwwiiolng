@@ -1,0 +1,80 @@
+// !$*UTF8*$!
+{
+	0859C07A109E7AC900C4ED36 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+			repositoryNamesForRoots = {
+				"" = "";
+			};
+		};
+	};
+	0859C07B109E7AC900C4ED36 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	0859C07E109E7AD000C4ED36 /* cfml.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1045, 1824}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 1498}";
+		};
+	};
+	0859C07F109E7AD000C4ED36 /* imap.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1532, 21456}}";
+			sepNavSelRange = "{37269, 0}";
+			sepNavVisRange = "{36484, 756}";
+		};
+	};
+	0859C081109E7AD000C4ED36 /* imapKeymap.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1045, 15744}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 1853}";
+		};
+	};
+	08FB7793FE84155DC02AAC07 /* Project object */ = {
+		activeBuildConfigurationName = Release;
+		activeTarget = D2AAC045055464E500DB518D /* imapmac */;
+		addToTargets = (
+			D2AAC045055464E500DB518D /* imapmac */,
+		);
+		breakpoints = (
+		);
+		codeSenseManager = 0859C07B109E7AC900C4ED36 /* Code sense */;
+		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					364,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 337719765;
+			PBXWorkspaceStateSaveDate = 337719765;
+		};
+		sourceControlManager = 0859C07A109E7AC900C4ED36 /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	D2AAC045055464E500DB518D /* imapmac */ = {
+		activeExec = 0;
+	};
+}

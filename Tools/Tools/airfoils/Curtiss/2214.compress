@@ -1,0 +1,4 @@
+mdivneutral = 0.75
+mdivpos10deg = 0.58
+mdivneg10deg = 0.67
+compressclmovement = .25

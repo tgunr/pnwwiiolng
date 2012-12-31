@@ -1,0 +1,98 @@
+<!--
+	XML Schema Definition for Object Model Generator language.
+	Author: Oliver 'kfs1' Smith <kfsone@playnet.com>
+-->
+
+<!--
+ Top level "class" element, one per file.
+ Requires 'name' attribute specifying class name,
+ Optional 'namespace' attribute to specify a namespace.
+
+ Must comprise one doc element followed by one or more
+ entity definition.
+
+ Classes can be nested.
+
+ Support for structs is not supported.
+-->
+
+<!ELEMENT class (doc, (comment|class|member|function)+)>
+<!ATTLIST class
+	namespace		CDATA		""
+	name			CDATA		#REQUIRED
+	type			CDATA		"class"
+	>
+
+<!--
+ doc element provides documentation of the class.
+ Requires at least a 'brief' element.
+ Optional single detail element.
+ Optional single returns element.
+ Optional single example element.
+ Optional single see-also element.
+-->
+
+<!ELEMENT doc (brief, detail?, returns?, example?, see-also*)>
+<!ELEMENT brief (#PCDATA)>
+<!ELEMENT detail (#PCDATA)>
+<!ELEMENT returns (#PCDATA)>
+<!ELEMENT example (#PCDATA)>
+<!ELEMENT see-also (#PCDATA)>
+
+<!ELEMENT comment (#PCDATA)>
+
+<!--
+ member element, 1+ per var-group.
+ Requires 'type' attribute which must specify a recognized variable type.
+ Requires 'name' attribute (must be unique per var-group.
+ Optional 'default' attribute.
+ Requires 'brief' attribute which describes the element.
+ Optional 'bits' attribute which allows specification of number of bits to use.
+ Optional 'static' attribute determines if this is a static member.
+-->
+
+<!ELEMENT member (vector?)>
+<!ATTLIST member 
+	type			CDATA		#REQUIRED
+	name			CDATA		#REQUIRED
+	default			CDATA		""
+	brief			CDATA		#REQUIRED
+	bits			CDATA		""
+    static    (false | true) "false"
+	>
+
+<!--
+  Array/vector dimensions for a member.
+  Requires 'capacity' integer argument specifying max number of elements.
+  Optional 'inline' attribute set to true indicates use of inline_vector instead of vector.
+-->
+
+<!ELEMENT vector EMPTY>
+<!ATTLIST vector
+  capacity CDATA  #REQUIRED
+  inline (false | true) "false">
+
+<!--
+ var-group.function element, 0+ per var-group allowed.
+ Requires 'return-type' attribute specifying the function's return type.
+ Requires 'name' attribute specifying the function name.
+ Optional 'arguments' attribute specifying the argument list, if not void.
+ Optional 'const' attribute of 'true' to enable constness.
+ Optional 'inline' attribute determines if the function should be inlined to the class definition.
+ Optional 'static' attribute determines if the function is static or not.
+ Requires <doc/> element.
+ Optional <code/> element.
+-->
+
+<!ELEMENT function (doc, code?)>
+<!ATTLIST function
+	return-type		CDATA		#REQUIRED
+	name			CDATA		#REQUIRED
+	arguments		CDATA		""
+	const			(false | true) "false"
+  inline    (false | true) "true"
+  static    (false | true) "false"
+	>
+
+<!ELEMENT code	(#PCDATA)>
+

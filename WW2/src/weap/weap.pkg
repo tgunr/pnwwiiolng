@@ -1,0 +1,22 @@
+$#include "systypes.h"
+$#include "weapType.h"
+
+$pfile "..\\lua\\include.pkg"
+
+module weapon
+{
+	struct weaponType
+	{
+		tolua_readonly const char* Name;
+		tolua_readonly unsigned int FireType;
+		tolua_readonly float RateOfFire; // in rounds/minute
+		tolua_readonly float Dispersion; // this is *RADIUS* not *DIAMETER*
+		tolua_readonly unsigned int NumRoundsInClip; // number of rounds in clip, 0 for continuous
+		tolua_readonly float ReloadTime; // time to reload the gun, in seconds
+		tolua_readonly unsigned int IsPlacedWeapon; // is weapon a "placed" weapon?
+		tolua_readonly unsigned int MaxOverSupply; // number of times start ammo this weapon can be oversupplied
+		tolua_readonly float InfResupply; // 0 - 1 float that indicates a percent of total ammo to fill on inf resupply
+		tolua_readonly int ClipType; // defaults to clip (0)
+	};
+}
+

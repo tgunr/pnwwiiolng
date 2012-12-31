@@ -1,0 +1,2690 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="cfg">
+      <UniqueIdentifier>{b6caba40-07cc-4b16-b640-a2c78271e4d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="chat">
+      <UniqueIdentifier>{7f10bddf-0c8b-4620-adca-f31763b05d4c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="client">
+      <UniqueIdentifier>{2f83f166-6acd-4938-a952-8a621ada83ab}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="comm">
+      <UniqueIdentifier>{8488defd-8342-48c8-b9cf-83b3cf44330c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="dd">
+      <UniqueIdentifier>{e201a8dd-fce3-4bd5-8bc7-41cf488abe0e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="di">
+      <UniqueIdentifier>{a2901349-d17a-41c9-8bfd-b5683001347a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="draw">
+      <UniqueIdentifier>{4f26a1c2-9b8c-4536-bef3-ae62172c53a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="fio">
+      <UniqueIdentifier>{d2c95b6c-961e-4519-8cde-e92d7a5a6fb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="fp">
+      <UniqueIdentifier>{48cb7c81-5d34-45d3-a687-6821abfae2d4}</UniqueIdentifier>
+      <Extensions>.c</Extensions>
+    </Filter>
+    <Filter Include="fx">
+      <UniqueIdentifier>{0def8a0b-f8b3-4b79-8bf0-1454952ed1f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gl">
+      <UniqueIdentifier>{35daff20-7525-4768-be77-dd90ce75d3c2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gmlp">
+      <UniqueIdentifier>{90f4d3d5-e179-4950-95f7-b5ed5eb51e4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gr2">
+      <UniqueIdentifier>{c8d34a9d-9b8a-4537-811a-dfba217a0006}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="imap">
+      <UniqueIdentifier>{3dc0116c-e733-4c5a-8f5e-e0f6143c072c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{614669eb-996c-4993-9750-bddf86aef357}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="js">
+      <UniqueIdentifier>{c8379faa-acb3-4897-bcee-985fc8db2441}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ld">
+      <UniqueIdentifier>{52f49663-edc9-4011-b1e2-a0db76cd4954}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="list">
+      <UniqueIdentifier>{fbaa24c4-8dd7-4fda-9fe5-3c1f544ac2fd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="locl">
+      <UniqueIdentifier>{34e7fe8c-70bd-4c24-b8de-b5674ef6c798}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="log">
+      <UniqueIdentifier>{16c24ed2-343f-4b3d-afa9-adfa741b76b5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="map">
+      <UniqueIdentifier>{49da950b-922c-4d2b-92fc-1237e6acc54c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="math">
+      <UniqueIdentifier>{60256eb4-4013-4423-a8df-adc00256c932}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mem">
+      <UniqueIdentifier>{8401324b-6e5f-4840-a3c7-3503373f7aa9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="miss">
+      <UniqueIdentifier>{a6637262-6ebc-4e1b-90b9-e453c4b3244e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ml">
+      <UniqueIdentifier>{73318efc-319c-4383-af33-610b1d09ee59}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mm">
+      <UniqueIdentifier>{6d336bf3-5993-434b-bc26-426dba42f697}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mn">
+      <UniqueIdentifier>{c40db519-cfa6-4987-8d19-0eef2ea41f88}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ob">
+      <UniqueIdentifier>{e9e818b2-8465-4f35-bb93-4de2c58d3902}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ogl">
+      <UniqueIdentifier>{87a17988-dca1-40fe-82f5-2a2c5ab236d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ogrp">
+      <UniqueIdentifier>{6c14e4ca-fdd4-47fa-93f7-1ccf3bf29a4b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pa">
+      <UniqueIdentifier>{a685520c-014d-4b77-9bd7-765b9696effa}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="parse">
+      <UniqueIdentifier>{3cf8ec3c-3ecf-4f75-aa1b-3bb70d458aef}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pers">
+      <UniqueIdentifier>{b1541df1-f18e-4725-bc30-130f3af93107}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="pi">
+      <UniqueIdentifier>{857927d3-ad56-4c94-9f20-9220c199ac5f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="rn">
+      <UniqueIdentifier>{7fc575ae-4c0f-4dea-9418-4d0cddd77b16}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sdm">
+      <UniqueIdentifier>{747baeec-4630-4556-9d08-b8cb81f4def2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="shader">
+      <UniqueIdentifier>{0609cdfd-ce8d-4243-97b4-175f61d24140}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sn">
+      <UniqueIdentifier>{d9df015f-f8de-469d-9f50-e3334445dbba}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="spt">
+      <UniqueIdentifier>{290bacf6-3261-4919-ad21-2014a89bd4b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="str">
+      <UniqueIdentifier>{c2585191-6648-4f59-bd3a-8503ee53aadd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="strt">
+      <UniqueIdentifier>{3572a643-2b85-4e85-afa4-eb374d9848e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="sys">
+      <UniqueIdentifier>{82320a69-dde2-4db7-8f70-cc3fac6a89d1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tools">
+      <UniqueIdentifier>{5b5b515a-88a5-4b41-886c-20ec69b705a3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="trn">
+      <UniqueIdentifier>{2f80ae08-9e16-4bd4-81a0-c9626f85a6b6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ui">
+      <UniqueIdentifier>{0ba055c8-e645-4529-a6e8-7de55a57b595}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="uimap">
+      <UniqueIdentifier>{6b1311c4-089d-42ee-87b5-104c422ba2c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="updt">
+      <UniqueIdentifier>{445b6774-be9b-4459-b1a8-4664270a5fe7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="veh">
+      <UniqueIdentifier>{d879b90a-2ae4-49fc-8f9e-39d6b96a185a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="weap">
+      <UniqueIdentifier>{a760e3b1-d39d-440d-be85-c32d659dd17f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="wwii">
+      <UniqueIdentifier>{08c462a7-8e30-4cf6-9aa3-4f066dc07981}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="res">
+      <UniqueIdentifier>{fbc1e2bf-537c-46ab-a015-3286467aa3a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="physics">
+      <UniqueIdentifier>{e621ff6e-56b6-4fc8-8a0b-0408ae186925}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="xml">
+      <UniqueIdentifier>{5be9911d-cf2d-48ec-8e19-096083e0ee09}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="tut">
+      <UniqueIdentifier>{9c6b455e-2c4b-4c0e-8421-0e891a2cc838}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="lua">
+      <UniqueIdentifier>{68fea57a-5db8-4f81-ab3a-2177b45e4d9c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="osgImport">
+      <UniqueIdentifier>{3550d3d3-04e6-4694-9587-9ae94cb8a0f9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="inst">
+      <UniqueIdentifier>{8db67bdc-a679-480c-83f6-4d80e98f5364}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ime">
+      <UniqueIdentifier>{4431c14f-ea47-46c3-9ad5-db754fa59f2e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="mc">
+      <UniqueIdentifier>{fff0b837-4e2b-4c01-b2d1-0d621158fc04}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="scen">
+      <UniqueIdentifier>{278a3048-6952-4973-b967-e03b5d16edbe}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="maptools">
+      <UniqueIdentifier>{b3694686-22c5-434b-a851-6a9c703b383d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="ez">
+      <UniqueIdentifier>{b7c6d220-78bc-49b4-b25a-3bbd0a2b919a}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\cfg\cfgCodes.h">
+      <Filter>cfg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\cfg\cfgData.h">
+      <Filter>cfg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\cfg\cfgLoad.h">
+      <Filter>cfg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\cfg\cfgLua.h">
+      <Filter>cfg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\cfg\cfgPrefs.h">
+      <Filter>cfg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\cfg\cfgw2.h">
+      <Filter>cfg</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatBrigadeControl.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatBrigadeControlList.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatClientMessage.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatClientMessages.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatConstants.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatDefines.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatEditString.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatEditStringMsg.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatGCIMessage.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatGroupPermissionTypes.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatHandle.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatHostMessage.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatLocality.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatLocalizedMessage.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatLStringIDs.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatMissionInvite.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatMissionInviteMsg.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatMissionMember.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatMissionMemberUpdates.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatMotds.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatPreference.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatPreferenceEnum.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatPrototypes.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatRecruiterList.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatServerInfo.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatSquadControl.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatSquadControlResults.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatSTOJoules.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatTimeInterval.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatTuneToChannel.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatTypes.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatUpdateChannel.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatUserNLA.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatWaypoint.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatWaypointExchg.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatWho.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatWhoList.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\client\client.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\client\clientBrigadeControlDescriptors.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\client\clientConnections.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\client\clientNetError.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\client\clientResupplyIssue.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\client\clientServerTrackedObjects.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\client\clientSquad.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\client\clientSTO.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\client\clientStrtQueue.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\client\GameClient.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\client\ww2Client.h">
+      <Filter>client</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\comm\commClientMessages.h">
+      <Filter>comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\comm\commConstants.h">
+      <Filter>comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\comm\commPackers.h">
+      <Filter>comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\comm\commTypes.h">
+      <Filter>comm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\dd\ddp.h">
+      <Filter>dd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\dd\dx3dinfo.h">
+      <Filter>dd</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\di\dimain.h">
+      <Filter>di</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\di\dip.h">
+      <Filter>di</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\di\NPClient.h">
+      <Filter>di</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\draw\draw2d.h">
+      <Filter>draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\draw\draw3d.h">
+      <Filter>draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\draw\drawIcon.h">
+      <Filter>draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\draw\sneaky.h">
+      <Filter>draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\draw\TextureFont.h">
+      <Filter>draw</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fio\fio.h">
+      <Filter>fio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fio\fioa.h">
+      <Filter>fio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fio\fiod.h">
+      <Filter>fio</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fp\fpFPS.h">
+      <Filter>fp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fp\fpFPSdata.h">
+      <Filter>fp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fp\fpFPSinternal.h">
+      <Filter>fp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fp\fpHash.h">
+      <Filter>fp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fp\fpLua.h">
+      <Filter>fp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fp\fpMain.h">
+      <Filter>fp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fp\fpPPO.h">
+      <Filter>fp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fp\fpTPS.h">
+      <Filter>fp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fp\fpTPSdata.h">
+      <Filter>fp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fp\fpTPSKits.h">
+      <Filter>fp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fp\fpTPSPhysics.h">
+      <Filter>fp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fp\fpTPStypes.h">
+      <Filter>fp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fp\fpTrooperHashes.h">
+      <Filter>fp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fp\fptypes.h">
+      <Filter>fp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fx\DataFx.h">
+      <Filter>fx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fx\EmitterMgr.h">
+      <Filter>fx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fx\fxAmb.h">
+      <Filter>fx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fx\fxBlt.h">
+      <Filter>fx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fx\fxExp.h">
+      <Filter>fx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fx\fxHit.h">
+      <Filter>fx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fx\fxLgt.h">
+      <Filter>fx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fx\fxMgr.h">
+      <Filter>fx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fx\fxMisc.h">
+      <Filter>fx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fx\fxPcl.h">
+      <Filter>fx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fx\fxSnd.h">
+      <Filter>fx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fx\fxUtl.h">
+      <Filter>fx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fx\fxWeather.h">
+      <Filter>fx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fx\Particle2.h">
+      <Filter>fx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fx\ParticleMgr.h">
+      <Filter>fx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fx\postRender.h">
+      <Filter>fx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fx\stoeffects.h">
+      <Filter>fx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\fx\TransformEffect.h">
+      <Filter>fx</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gl\gl.h">
+      <Filter>gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gl\gl3.h">
+      <Filter>gl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gmlp\gmlpmain.h">
+      <Filter>gmlp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gr2\gr2Anim.h">
+      <Filter>gr2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gr2\gr2layer.h">
+      <Filter>gr2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gr2\gr2layerTypes.h">
+      <Filter>gr2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\gr2\gr2Physics.h">
+      <Filter>gr2</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\imap\iac.h">
+      <Filter>imap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\imap\imaphack.h">
+      <Filter>imap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\imap\imapLua.h">
+      <Filter>imap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\imap\ww2func.h">
+      <Filter>imap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\imap\ww2imap.h">
+      <Filter>imap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\dbug\dbug.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\include\defs.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\include\mobileSpawnEnums.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\include\systypes.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\teul\teulKit.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\teul\teulNetworkArray.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\teul\teulNetworkMsg.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\teul\teulPackers.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\teul\teulTime.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\include\vars.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\js\jsClient.h">
+      <Filter>js</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\js\jsContent.h">
+      <Filter>js</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\js\jsGame.h">
+      <Filter>js</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\js\jsKeymap.h">
+      <Filter>js</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\js\jsMapView.h">
+      <Filter>js</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\js\jsPlayer.h">
+      <Filter>js</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\js\jsPosition.h">
+      <Filter>js</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\js\jsStratDB.h">
+      <Filter>js</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\js\jsVehicle.h">
+      <Filter>js</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ld\ldbmp.h">
+      <Filter>ld</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ld\lddds.h">
+      <Filter>ld</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ld\ldflt.h">
+      <Filter>ld</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ld\ldmdl.h">
+      <Filter>ld</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ld\ldpcx.h">
+      <Filter>ld</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ld\ldpix.h">
+      <Filter>ld</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ld\ldtex.h">
+      <Filter>ld</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ld\ldtexture.h">
+      <Filter>ld</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ld\ldwav.h">
+      <Filter>ld</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\list\list.h">
+      <Filter>list</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\locl\loclApp.h">
+      <Filter>locl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\locl\loclLang.h">
+      <Filter>locl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\locl\loclMain.h">
+      <Filter>locl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\log\log.h">
+      <Filter>log</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\map\mapArenaDescription.h">
+      <Filter>map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\map\mapAWS.h">
+      <Filter>map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\map\mapBrigadeSummary.h">
+      <Filter>map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\map\mapClientMessages.h">
+      <Filter>map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\map\mapConstants.h">
+      <Filter>map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\map\mapHCUnitLocations.h">
+      <Filter>map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\map\mapMissionList.h">
+      <Filter>map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\map\mapPack.h">
+      <Filter>map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\map\mapPersonaSummary.h">
+      <Filter>map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\map\mapSwingMeter.h">
+      <Filter>map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\map\mapTypes.h">
+      <Filter>map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\math\euler.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\math\math3d.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\math\mathCollide.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\math\matheul.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\math\mathnum.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\math\mathUnitConversion.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\math\mathvect.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SRC\math\Matrixd.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SRC\math\Matrixf.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SRC\math\Quat.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\math\Vec2d.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\math\Vec2f.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SRC\math\Vec3d.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SRC\math\Vec3f.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SRC\math\Vec4d.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SRC\math\Vec4f.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\mem\mem.h">
+      <Filter>mem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\mem\memAligned.h">
+      <Filter>mem</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\miss\missActiveMission.h">
+      <Filter>miss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\miss\missionClientMessages.h">
+      <Filter>miss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\miss\missionConstants.h">
+      <Filter>miss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\miss\missionDetail.h">
+      <Filter>miss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\miss\missionListUpdate.h">
+      <Filter>miss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\miss\missionPack.h">
+      <Filter>miss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\miss\missionResults.h">
+      <Filter>miss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\miss\missionTypes.h">
+      <Filter>miss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\miss\missionUtils.h">
+      <Filter>miss</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ml\mlAtmo.h">
+      <Filter>ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ml\mlCompon.h">
+      <Filter>ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ml\mlEngine.h">
+      <Filter>ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ml\mlfoils.h">
+      <Filter>ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ml\mlgauges.h">
+      <Filter>ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ml\mlgear.h">
+      <Filter>ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ml\mlhead.h">
+      <Filter>ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ml\mlobject.h">
+      <Filter>ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ml\mltypes.h">
+      <Filter>ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ml\mlutility.h">
+      <Filter>ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ml\mlweapons.h">
+      <Filter>ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ml\mlwndtnn.h">
+      <Filter>ml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\mm\mmConstants.h">
+      <Filter>mm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\mm\mmDirectSpawn.h">
+      <Filter>mm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\mm\mmEnums.h">
+      <Filter>mm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\mm\mmPack.h">
+      <Filter>mm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\mm\mmSpawnClientMessages.h">
+      <Filter>mm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\mm\mmSpawnTypes.h">
+      <Filter>mm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\mn\mngopt.h">
+      <Filter>mn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ob\obc.h">
+      <Filter>ob</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ob\obcd.h">
+      <Filter>ob</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ob\obcs.h">
+      <Filter>ob</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ob\obdlite.h">
+      <Filter>ob</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ob\obdraw.h">
+      <Filter>ob</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ob\obdshad.h">
+      <Filter>ob</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ob\obebox.h">
+      <Filter>ob</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ob\oblf.h">
+      <Filter>ob</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ob\obLua.h">
+      <Filter>ob</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ob\obmain.h">
+      <Filter>ob</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ob\obmesh.h">
+      <Filter>ob</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ob\obMgr.h">
+      <Filter>ob</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ob\obplyr.h">
+      <Filter>ob</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ob\obpool.h">
+      <Filter>ob</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ob\obslite.h">
+      <Filter>ob</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ob\obsph.h">
+      <Filter>ob</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ob\obwld.h">
+      <Filter>ob</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ob\stride_ptr.h">
+      <Filter>ob</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ogl\ogl.h">
+      <Filter>ogl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ogl\oglcfg.h">
+      <Filter>ogl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ogl\oglcolors.h">
+      <Filter>ogl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ogl\ogldefs.h">
+      <Filter>ogl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ogl\oglGlobalStates.h">
+      <Filter>ogl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ogl\oglMaterial.h">
+      <Filter>ogl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ogl\oglMesh.h">
+      <Filter>ogl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ogl\oglTextureObject.h">
+      <Filter>ogl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ogl\oglvars.h">
+      <Filter>ogl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ogl\oglVertexBuffer.h">
+      <Filter>ogl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ogl\States.h">
+      <Filter>ogl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ogrp\ogrptype.h">
+      <Filter>ogrp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\pa\md5.h">
+      <Filter>pa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\pa\parchive.h">
+      <Filter>pa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\pa\rijndael-alg-fst.h">
+      <Filter>pa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\pa\rijndael-api-fst.h">
+      <Filter>pa</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\parse\countryCodes.h">
+      <Filter>parse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\parse\parse.h">
+      <Filter>parse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\parse\parseIO.h">
+      <Filter>parse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\parse\parseWor.h">
+      <Filter>parse</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\pers\persbombsight.h">
+      <Filter>pers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\pers\persgunsight.h">
+      <Filter>pers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\pers\pershud.h">
+      <Filter>pers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\pers\persLua.h">
+      <Filter>pers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\pers\persmain.h">
+      <Filter>pers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\pers\persmsg.h">
+      <Filter>pers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\pers\persrank.h">
+      <Filter>pers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\pi\pi.h">
+      <Filter>pi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\pi\piinfo.h">
+      <Filter>pi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\pi\piogl.h">
+      <Filter>pi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\pi\piTextureAtlas.h">
+      <Filter>pi</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\rn\rnlogo.h">
+      <Filter>rn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\rn\rnmain.h">
+      <Filter>rn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\rn\rntext.h">
+      <Filter>rn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\rn\rntextloc.h">
+      <Filter>rn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\rn\rnvis.h">
+      <Filter>rn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sdm\BuildTerrain.h">
+      <Filter>sdm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sdm\sdm.h">
+      <Filter>sdm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sdm\sdmHash.h">
+      <Filter>sdm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sdm\StratDB.h">
+      <Filter>sdm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sdm\uistrat.h">
+      <Filter>sdm</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SRC\shader\glsl.h">
+      <Filter>shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\shader\glslCloth.h">
+      <Filter>shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SRC\shader\glslNormal.h">
+      <Filter>shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SRC\shader\glslProgram.h">
+      <Filter>shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SRC\shader\glslShader.h">
+      <Filter>shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\shader\glslSpecular.h">
+      <Filter>shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SRC\shader\glslUniform.h">
+      <Filter>shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\shader\glslUniformBlock.h">
+      <Filter>shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SRC\shader\glslWater.h">
+      <Filter>shader</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sn\audio.h">
+      <Filter>sn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sn\SDKwavefile.h">
+      <Filter>sn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sn\sndsSoundCache.h">
+      <Filter>sn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sn\sndsSoundControl.h">
+      <Filter>sn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sn\sndsSoundControlWin.h">
+      <Filter>sn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sn\sndsSoundTypes.h">
+      <Filter>sn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\spt\Random.h">
+      <Filter>spt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\spt\SpeedTreeRT.h">
+      <Filter>spt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\spt\sptmain.h">
+      <Filter>spt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\spt\Tree.h">
+      <Filter>spt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\spt\treeData.h">
+      <Filter>spt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\str\stringLib.h">
+      <Filter>str</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\str\striws.h">
+      <Filter>str</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\str\strpool.h">
+      <Filter>str</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strt\strtCaptureState.h">
+      <Filter>strt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strt\strtClientMessages.h">
+      <Filter>strt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strt\strtConstants.h">
+      <Filter>strt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strt\strtCPFlags.h">
+      <Filter>strt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strt\strtDTL.h">
+      <Filter>strt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strt\strtEventTypes.h">
+      <Filter>strt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strt\strtFacilityWeaponList.h">
+      <Filter>strt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strt\strtLua.h">
+      <Filter>strt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strt\strtTypes.h">
+      <Filter>strt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strt\strtUpdaterPack.h">
+      <Filter>strt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\strt\strtWOR.h">
+      <Filter>strt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sys\callstack.h">
+      <Filter>sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sys\crashhandler.h">
+      <Filter>sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sys\syscfg.h">
+      <Filter>sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sys\sysLaunchUrl.h">
+      <Filter>sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sys\sysmain.h">
+      <Filter>sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sys\sysMovie.h">
+      <Filter>sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sys\sysreg.h">
+      <Filter>sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sys\systhread.h">
+      <Filter>sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sys\sysWinISO.h">
+      <Filter>sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\SRC\tools\TangentSpaceGenerator.h">
+      <Filter>tools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\trn\Filename.h">
+      <Filter>trn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\trn\IdvFastMath.h">
+      <Filter>trn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\trn\IdvVector.h">
+      <Filter>trn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\trn\LensFlare.h">
+      <Filter>trn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\trn\speedgrass.h">
+      <Filter>trn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\trn\trnautogun.h">
+      <Filter>trn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\trn\trncd.h">
+      <Filter>trn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\trn\trncloud.h">
+      <Filter>trn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\trn\trnclutter.h">
+      <Filter>trn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\trn\trndata.h">
+      <Filter>trn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\trn\trnfx.h">
+      <Filter>trn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\trn\trngrass.h">
+      <Filter>trn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\trn\trnldr.h">
+      <Filter>trn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\trn\trnLua.h">
+      <Filter>trn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\trn\trnmain.h">
+      <Filter>trn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\trn\trnop.h">
+      <Filter>trn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\trn\trnRadClutter.h">
+      <Filter>trn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\trn\trnsky.h">
+      <Filter>trn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\trn\trntod.h">
+      <Filter>trn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\trn\trntypes.h">
+      <Filter>trn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\trn\trnvars.h">
+      <Filter>trn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\trn\trnwtr.h">
+      <Filter>trn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ui\uiChat.h">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ui\uiDotCommands.h">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ui\uiGameEvents.h">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ui\uiKeymap.h">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ui\uiLua.h">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ui\uiMain.h">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ui\uiMovieView.h">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ui\uiSound.h">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ui\uiUTF.h">
+      <Filter>ui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\uimap\AWSLayer.h">
+      <Filter>uimap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\uimap\AWSManager.h">
+      <Filter>uimap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\uimap\CPRenderer.h">
+      <Filter>uimap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\uimap\IconMapRenderer.h">
+      <Filter>uimap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\uimap\MapTextureRenderer.h">
+      <Filter>uimap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\uimap\PlayerLayer.h">
+      <Filter>uimap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\uimap\StrategicLayer.h">
+      <Filter>uimap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\uimap\SuperCellMapView.h">
+      <Filter>uimap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\uimap\TerrainObjectRenderer.h">
+      <Filter>uimap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\uimap\TopoMapRenderer.h">
+      <Filter>uimap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\uimap\uiMap.h">
+      <Filter>uimap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\uimap\uimapLua.h">
+      <Filter>uimap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\uimap\WaypointLayer.h">
+      <Filter>uimap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\updt\loginTypes.h">
+      <Filter>updt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\updt\updtBackChannel.h">
+      <Filter>updt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\updt\updtDeathByBuilding.h">
+      <Filter>updt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\updt\updtEnums.h">
+      <Filter>updt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\updt\updtFraming.h">
+      <Filter>updt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\updt\updtPackers.h">
+      <Filter>updt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\updt\updtTypes.h">
+      <Filter>updt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\veh\vehanim.h">
+      <Filter>veh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\veh\vehcntrl.h">
+      <Filter>veh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\veh\vehcomms.h">
+      <Filter>veh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\veh\vehdecal.h">
+      <Filter>veh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\veh\vehdecalLoader.h">
+      <Filter>veh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\veh\vehfx.h">
+      <Filter>veh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\veh\vehIcon.h">
+      <Filter>veh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\veh\vehInterpolator.h">
+      <Filter>veh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\veh\vehload.h">
+      <Filter>veh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\veh\vehLua.h">
+      <Filter>veh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\veh\vehmain.h">
+      <Filter>veh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\veh\vehtype.h">
+      <Filter>veh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\veh\vehupdate.h">
+      <Filter>veh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\veh\vehVisDamage.h">
+      <Filter>veh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\veh\vehxml.h">
+      <Filter>veh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\weap\weapammo.h">
+      <Filter>weap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\weap\weapDefs.h">
+      <Filter>weap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\weap\weapfx.h">
+      <Filter>weap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\weap\weapList.h">
+      <Filter>weap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\weap\weapLua.h">
+      <Filter>weap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\weap\weapmain.h">
+      <Filter>weap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\weap\weapons.h">
+      <Filter>weap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\weap\weapParser.h">
+      <Filter>weap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\weap\weapSerial.h">
+      <Filter>weap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\weap\weapSpec.h">
+      <Filter>weap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\weap\weapType.h">
+      <Filter>weap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\weap\weapWeapon.h">
+      <Filter>weap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiActivate.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiCallbacks.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiClientMessages.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiCovert.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiErrorPackers.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiErrorTypes.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiExitCodes.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiFullObjID.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiHash.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiHCUnits.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiLua.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiOpinionPoll.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiOwnershipEnums.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiPack.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiPermissions.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiRoomLists.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiServerTrackedObject.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiServerTrackedObjectPacker.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiServerTypeEnums.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiSquadMsg.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiSquads.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiString.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiTypes.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiUTF.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\physics\colliderMain.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\physics\colliderQuery.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\physics\odeConvert.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\physics\physicsmain.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\physics\physicsTypes.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\xml\XMLLoader.h">
+      <Filter>xml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\xml\XMLLoader2.h">
+      <Filter>xml</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\tut\tutGroupProgress.h">
+      <Filter>tut</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\tut\tutLua.h">
+      <Filter>tut</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\tut\TutorialManager.h">
+      <Filter>tut</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\lua\luaMain.h">
+      <Filter>lua</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\osgImport\BoundingBox.h">
+      <Filter>osgImport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\osgImport\BoundingSphere.h">
+      <Filter>osgImport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\osgImport\buffered_value.h">
+      <Filter>osgImport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\osgImport\BufferObject.h">
+      <Filter>osgImport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\osgImport\DeleteHandler.h">
+      <Filter>osgImport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\osgImport\dxtctool.h">
+      <Filter>osgImport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\osgImport\fast_back_stack.h">
+      <Filter>osgImport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\osgImport\FrameBufferObject.h">
+      <Filter>osgImport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\osgImport\Image.h">
+      <Filter>osgImport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\osgImport\Plane.h">
+      <Filter>osgImport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\osgImport\Polytope.h">
+      <Filter>osgImport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\osgImport\ref_ptr.h">
+      <Filter>osgImport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\osgImport\Referenced.h">
+      <Filter>osgImport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\osgImport\ShadowMap.h">
+      <Filter>osgImport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\osgImport\TexGen.h">
+      <Filter>osgImport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\osgImport\Texture.h">
+      <Filter>osgImport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\osgImport\Texture2D.h">
+      <Filter>osgImport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\osgImport\Texture2DArray.h">
+      <Filter>osgImport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\osgImport\TextureCubeMap.h">
+      <Filter>osgImport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\osgImport\TextureRectangle.h">
+      <Filter>osgImport</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\inst\instBasicStatus.h">
+      <Filter>inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\inst\instClient.h">
+      <Filter>inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\inst\instClientStatus.h">
+      <Filter>inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\inst\instDescriptor.h">
+      <Filter>inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\inst\instListing.h">
+      <Filter>inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\inst\instTypes.h">
+      <Filter>inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ime\IMEClient.h">
+      <Filter>ime</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ime\imeMain.h">
+      <Filter>ime</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\mc\multiClient.h">
+      <Filter>mc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\mc\multiClientHelp.h">
+      <Filter>mc</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\scen\ScenarioManager.h">
+      <Filter>scen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\scen\scenLua.h">
+      <Filter>scen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\scen\scenMain.h">
+      <Filter>scen</Filter>
+    </ClInclude>
+    <ClInclude Include="..\versionNo.h" />
+    <ClInclude Include="..\..\src\trn\trnScenario.h">
+      <Filter>trn</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\uimap\CustomMapLayer.h">
+      <Filter>uimap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiNetPorts.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiTraits.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\updt\updtVehicleHit.h">
+      <Filter>updt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\physics\HeightField.h">
+      <Filter>physics</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\inst\instAction.h">
+      <Filter>inst</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ogl\GLCounter.h">
+      <Filter>ogl</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\client_revision.h" />
+    <ClInclude Include="..\..\src\dbug\dbugExtErrors.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\maptools\GenerateIcons.h">
+      <Filter>maptools</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\wwii\wwiiCryptographer.h">
+      <Filter>wwii</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ez\EZLoader.h">
+      <Filter>ez</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ez\EZManager.h">
+      <Filter>ez</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\ez\EZVehicles.h">
+      <Filter>ez</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\uimap\ScenarioMapRenderer.h">
+      <Filter>uimap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\map\mapSupercellVislevelXfer.h">
+      <Filter>map</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatDotCommandList.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\chat\chatHoldFallVote.h">
+      <Filter>chat</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\sys\sysmainHackNonsense.h">
+      <Filter>sys</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\include\platforms.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\include\precompile_includes.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\imap\imapTypes.h">
+      <Filter>imap</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\math\Rand.h">
+      <Filter>math</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\math\SuperFastHash.h">
+      <Filter>math</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\src\cfg\cfgData.cpp">
+      <Filter>cfg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\cfg\cfgLoad.cpp">
+      <Filter>cfg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\cfg\cfgLua.cpp">
+      <Filter>cfg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\cfg\cfgPrefs.cpp">
+      <Filter>cfg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\cfg\cfgw2.cpp">
+      <Filter>cfg</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\chat\chatBrigadeControl.cpp">
+      <Filter>chat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\chat\chatClientMessages.cpp">
+      <Filter>chat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\chat\chatEditString.cpp">
+      <Filter>chat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\chat\chatHandle.cpp">
+      <Filter>chat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\chat\chatMissionInvite.cpp">
+      <Filter>chat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\chat\chatMissionMember.cpp">
+      <Filter>chat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\chat\chatMissionStatusPacker.cpp">
+      <Filter>chat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\chat\chatMotds.cpp">
+      <Filter>chat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\chat\chatPackers.cpp">
+      <Filter>chat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\chat\chatSquadControl.cpp">
+      <Filter>chat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\chat\chatTimeInterval.cpp">
+      <Filter>chat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\chat\chatWho.cpp">
+      <Filter>chat</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\client.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\clientBrigadeControl.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\clientConnection.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\clientGlobals.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\clientServerTrackedObjects.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\clientSquad.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\clientStrtQueue.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\GameClient.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\client\ww2Client.cpp">
+      <Filter>client</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\comm\commClientMessages.cpp">
+      <Filter>comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\comm\commPackers.cpp">
+      <Filter>comm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\dd\ddp.cpp">
+      <Filter>dd</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\dd\dx3dinfo.cpp">
+      <Filter>dd</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\di\dimain.cpp">
+      <Filter>di</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\di\dip.cpp">
+      <Filter>di</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\di\NPClient.cpp">
+      <Filter>di</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\draw\draw2d.cpp">
+      <Filter>draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\draw\draw3d.cpp">
+      <Filter>draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\draw\drawIcon.cpp">
+      <Filter>draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\draw\FTFontAdapted.cpp">
+      <Filter>draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\draw\FTFontReplacement.cpp">
+      <Filter>draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\draw\sneaky.cpp">
+      <Filter>draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\draw\TextureFont.cpp">
+      <Filter>draw</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fio\fio.cpp">
+      <Filter>fio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fio\fioa.cpp">
+      <Filter>fio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fio\fiod.cpp">
+      <Filter>fio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fp\fpFPS.cpp">
+      <Filter>fp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fp\fpFPSdata.cpp">
+      <Filter>fp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fp\fpFPSfx.cpp">
+      <Filter>fp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fp\fpLua.cpp">
+      <Filter>fp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fp\fpMain.cpp">
+      <Filter>fp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fp\fpPPO.cpp">
+      <Filter>fp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fp\fpTPS.cpp">
+      <Filter>fp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fp\fpTPSdata.cpp">
+      <Filter>fp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fp\fpTPSKits.cpp">
+      <Filter>fp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fp\fpTPSPhysics.cpp">
+      <Filter>fp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fx\DataFx.cpp">
+      <Filter>fx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fx\EmitterMgr.cpp">
+      <Filter>fx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fx\fxAmb.cpp">
+      <Filter>fx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fx\fxBlt.cpp">
+      <Filter>fx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fx\fxExp.cpp">
+      <Filter>fx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fx\fxHit.cpp">
+      <Filter>fx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fx\fxLgt.cpp">
+      <Filter>fx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fx\fxMgr.cpp">
+      <Filter>fx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fx\fxMisc.cpp">
+      <Filter>fx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fx\fxPcl.cpp">
+      <Filter>fx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fx\fxSnd.cpp">
+      <Filter>fx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fx\fxUtl.cpp">
+      <Filter>fx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fx\fxWeather.cpp">
+      <Filter>fx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fx\Particle2.cpp">
+      <Filter>fx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fx\ParticleMgr.cpp">
+      <Filter>fx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fx\postRender.cpp">
+      <Filter>fx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fx\stoeffects.cpp">
+      <Filter>fx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\fx\TransformEffect.cpp">
+      <Filter>fx</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gmlp\gmlpmain.cpp">
+      <Filter>gmlp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gr2\gr2Anim.cpp">
+      <Filter>gr2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gr2\gr2layer.cpp">
+      <Filter>gr2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gr2\gr2layerTypes.cpp">
+      <Filter>gr2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\gr2\gr2Physics.cpp">
+      <Filter>gr2</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\imap\iac.cpp">
+      <Filter>imap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\imap\imaphack.cpp">
+      <Filter>imap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\imap\imapLua.cpp">
+      <Filter>imap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\imap\ww2func.cpp">
+      <Filter>imap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\imap\ww2imap.cpp">
+      <Filter>imap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\js\jsClient.cpp">
+      <Filter>js</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\js\jsContent.cpp">
+      <Filter>js</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\js\jsGame.cpp">
+      <Filter>js</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\js\jsKeymap.cpp">
+      <Filter>js</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\js\jsMapView.cpp">
+      <Filter>js</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\js\jsPlayer.cpp">
+      <Filter>js</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\js\jsPosition.cpp">
+      <Filter>js</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\js\jsStratDB.cpp">
+      <Filter>js</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\js\jsVehicle.cpp">
+      <Filter>js</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ld\ldbmp.cpp">
+      <Filter>ld</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ld\lddds.cpp">
+      <Filter>ld</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ld\ldflt.cpp">
+      <Filter>ld</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ld\ldmdl.cpp">
+      <Filter>ld</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ld\ldpcx.cpp">
+      <Filter>ld</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ld\ldpix.cpp">
+      <Filter>ld</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ld\ldtex.cpp">
+      <Filter>ld</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ld\ldtexture.cpp">
+      <Filter>ld</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ld\ldwav.cpp">
+      <Filter>ld</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\list\list.cpp">
+      <Filter>list</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\locl\loclAppx.cpp">
+      <Filter>locl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\locl\loclLang.cpp">
+      <Filter>locl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\locl\loclMain.cpp">
+      <Filter>locl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\log\log.cpp">
+      <Filter>log</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\map\mapArenaDescription.cpp">
+      <Filter>map</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\map\mapAWS.cpp">
+      <Filter>map</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\map\mapClientMessages.cpp">
+      <Filter>map</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\map\mapHCUnitLocations.cpp">
+      <Filter>map</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\map\mapPack.cpp">
+      <Filter>map</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\math\euler.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\math\math3d.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\math\mathCollide.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\math\matheul.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\math\mathnum.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\math\mathUnitConversion.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\math\mathvect.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SRC\math\Matrixd.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SRC\math\Matrixf.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SRC\math\Quat.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\mem\mem.cpp">
+      <Filter>mem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\mem\tracealloc.cpp">
+      <Filter>mem</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\miss\missActiveMission.cpp">
+      <Filter>miss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\miss\missionClientMessages.cpp">
+      <Filter>miss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\miss\missionDetail.cpp">
+      <Filter>miss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\miss\missionPack.cpp">
+      <Filter>miss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\miss\missionUtils.cpp">
+      <Filter>miss</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ml\mlAtmo.cpp">
+      <Filter>ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ml\mlCompon.cpp">
+      <Filter>ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ml\mlEngine.cpp">
+      <Filter>ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ml\mlfoils.cpp">
+      <Filter>ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ml\mlgauges.cpp">
+      <Filter>ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ml\mlgear.cpp">
+      <Filter>ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ml\mlhead.cpp">
+      <Filter>ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ml\mlImapCallbacks.cpp">
+      <Filter>ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ml\mlInfantry.cpp">
+      <Filter>ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ml\mlMain.cpp">
+      <Filter>ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ml\mlobject.cpp">
+      <Filter>ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ml\mlReadout.cpp">
+      <Filter>ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ml\mlutility.cpp">
+      <Filter>ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ml\mlweapons.cpp">
+      <Filter>ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ml\mlwndtnn.cpp">
+      <Filter>ml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\mm\mmPack.cpp">
+      <Filter>mm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\mm\mmSpawnClientMessages.cpp">
+      <Filter>mm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\mn\mngopt.cpp">
+      <Filter>mn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ob\obc.cpp">
+      <Filter>ob</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ob\obcd.cpp">
+      <Filter>ob</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ob\obcs.cpp">
+      <Filter>ob</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ob\obdlite.cpp">
+      <Filter>ob</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ob\obdraw.cpp">
+      <Filter>ob</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ob\obdshad.cpp">
+      <Filter>ob</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ob\obebox.cpp">
+      <Filter>ob</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ob\obfx.cpp">
+      <Filter>ob</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ob\oblf.cpp">
+      <Filter>ob</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ob\obLua.cpp">
+      <Filter>ob</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ob\obmain.cpp">
+      <Filter>ob</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ob\obmesh.cpp">
+      <Filter>ob</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ob\obMgr.cpp">
+      <Filter>ob</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ob\obplyr.cpp">
+      <Filter>ob</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ob\obpool.cpp">
+      <Filter>ob</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ob\obslite.cpp">
+      <Filter>ob</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ob\obsph.cpp">
+      <Filter>ob</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ob\obwld.cpp">
+      <Filter>ob</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ogl\ogl.cpp">
+      <Filter>ogl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ogl\oglGlobalStates.cpp">
+      <Filter>ogl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ogl\oglMaterial.cpp">
+      <Filter>ogl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ogl\oglMesh.cpp">
+      <Filter>ogl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ogl\oglTextureObject.cpp">
+      <Filter>ogl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ogl\oglVertexBuffer.cpp">
+      <Filter>ogl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ogl\States.cpp">
+      <Filter>ogl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ogrp\ogrpmain.cpp">
+      <Filter>ogrp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\pa\md5c.c">
+      <Filter>pa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\pa\parchive.cpp">
+      <Filter>pa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\pa\rijndael-alg-fst.c">
+      <Filter>pa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\pa\rijndael-api-fst.c">
+      <Filter>pa</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\parse\countryCodes.cpp">
+      <Filter>parse</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\parse\parse.cpp">
+      <Filter>parse</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\parse\parseIO.cpp">
+      <Filter>parse</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\parse\parseWor.cpp">
+      <Filter>parse</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\pers\persbombsight.cpp">
+      <Filter>pers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\pers\persgunsight.cpp">
+      <Filter>pers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\pers\pershud.cpp">
+      <Filter>pers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\pers\persLua.cpp">
+      <Filter>pers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\pers\persmain.cpp">
+      <Filter>pers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\pers\persmsg.cpp">
+      <Filter>pers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\pers\persrank.cpp">
+      <Filter>pers</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\pi\piinfoWin.cpp">
+      <Filter>pi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\pi\piogl.cpp">
+      <Filter>pi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\pi\piTextureAtlas.cpp">
+      <Filter>pi</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\rn\rnlogo.cpp">
+      <Filter>rn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\rn\rnmain.cpp">
+      <Filter>rn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\rn\rntext.cpp">
+      <Filter>rn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\rn\rntextloc.cpp">
+      <Filter>rn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\rn\rnvis.cpp">
+      <Filter>rn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sdm\BuildTerrain.cpp">
+      <Filter>sdm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sdm\sdm.cpp">
+      <Filter>sdm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sdm\sdmHash.cpp">
+      <Filter>sdm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sdm\StratDB.cpp">
+      <Filter>sdm</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SRC\shader\glsl.cpp">
+      <Filter>shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\shader\glslCloth.cpp">
+      <Filter>shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SRC\shader\glslNormal.cpp">
+      <Filter>shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SRC\shader\glslProgram.cpp">
+      <Filter>shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SRC\shader\glslShader.cpp">
+      <Filter>shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\shader\glslSpecular.cpp">
+      <Filter>shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SRC\shader\glslUniform.cpp">
+      <Filter>shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\shader\glslUniformBlock.cpp">
+      <Filter>shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SRC\shader\glslWater.cpp">
+      <Filter>shader</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sn\audio.cpp">
+      <Filter>sn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sn\SDKwavefile.cpp">
+      <Filter>sn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sn\sndsSoundCache.cpp">
+      <Filter>sn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sn\sndsSoundControl.cpp">
+      <Filter>sn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sn\sndsSoundControlWin.cpp">
+      <Filter>sn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\spt\sptmain.cpp">
+      <Filter>spt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\spt\Tree.cpp">
+      <Filter>spt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\spt\treeData.cpp">
+      <Filter>spt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\str\stringLib.cpp">
+      <Filter>str</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\str\striws.cpp">
+      <Filter>str</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\str\strpool.cpp">
+      <Filter>str</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strt\strtClientMessages.cpp">
+      <Filter>strt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strt\strtLua.cpp">
+      <Filter>strt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\strt\strtUpdaterPack.cpp">
+      <Filter>strt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sys\callstack.cpp">
+      <Filter>sys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sys\crashhandler.cpp">
+      <Filter>sys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sys\sysLaunchUrlWin.cpp">
+      <Filter>sys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sys\sysmain.cpp">
+      <Filter>sys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sys\sysMovieWin.cpp">
+      <Filter>sys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sys\sysreg.cpp">
+      <Filter>sys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\sys\systhreadwin.cpp">
+      <Filter>sys</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\SRC\tools\TangentSpaceGenerator.cpp">
+      <Filter>tools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\trn\LensFlare.cpp">
+      <Filter>trn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\trn\speedgrass.cpp">
+      <Filter>trn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\trn\trnautogun.cpp">
+      <Filter>trn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\trn\trncd.cpp">
+      <Filter>trn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\trn\trncloud.cpp">
+      <Filter>trn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\trn\trnclutter.cpp">
+      <Filter>trn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\trn\trndata.cpp">
+      <Filter>trn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\trn\trnfx.cpp">
+      <Filter>trn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\trn\trngrass.cpp">
+      <Filter>trn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\trn\trnldr.cpp">
+      <Filter>trn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\trn\trnLua.cpp">
+      <Filter>trn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\trn\trnmain.cpp">
+      <Filter>trn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\trn\trnop.cpp">
+      <Filter>trn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\trn\trnRadClutter.cpp">
+      <Filter>trn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\trn\trnsky.cpp">
+      <Filter>trn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\trn\trntod.cpp">
+      <Filter>trn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\trn\trnwtr.cpp">
+      <Filter>trn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ui\uiChat.cpp">
+      <Filter>ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ui\uiDotCommands.cpp">
+      <Filter>ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ui\uiKeymap.cpp">
+      <Filter>ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ui\uiLua.cpp">
+      <Filter>ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ui\uiMain.cpp">
+      <Filter>ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ui\uiMovieView.cpp">
+      <Filter>ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ui\uiSound.cpp">
+      <Filter>ui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\uimap\AWSLayer.cpp">
+      <Filter>uimap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\uimap\AWSManager.cpp">
+      <Filter>uimap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\uimap\CPRenderer.cpp">
+      <Filter>uimap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\uimap\IconMapRenderer.cpp">
+      <Filter>uimap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\uimap\MapTextureRenderer.cpp">
+      <Filter>uimap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\uimap\PlayerLayer.cpp">
+      <Filter>uimap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\uimap\StrategicLayer.cpp">
+      <Filter>uimap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\uimap\SuperCellMapView.cpp">
+      <Filter>uimap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\uimap\TerrainObjectRenderer.cpp">
+      <Filter>uimap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\uimap\TopoMapRenderer.cpp">
+      <Filter>uimap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\uimap\uiMap.cpp">
+      <Filter>uimap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\uimap\uimapLua.cpp">
+      <Filter>uimap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\uimap\WaypointLayer.cpp">
+      <Filter>uimap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\updt\updtPackers.cpp">
+      <Filter>updt</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\veh\vehanim.cpp">
+      <Filter>veh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\veh\vehcntrl.cpp">
+      <Filter>veh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\veh\vehcomms.cpp">
+      <Filter>veh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\veh\vehdecal.cpp">
+      <Filter>veh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\veh\vehfx.cpp">
+      <Filter>veh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\veh\vehIcon.cpp">
+      <Filter>veh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\veh\vehInterpolator.cpp">
+      <Filter>veh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\veh\vehload.cpp">
+      <Filter>veh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\veh\vehLua.cpp">
+      <Filter>veh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\veh\vehmain.cpp">
+      <Filter>veh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\veh\vehtype.cpp">
+      <Filter>veh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\veh\vehupdate.cpp">
+      <Filter>veh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\veh\vehVisDamage.cpp">
+      <Filter>veh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\veh\vehxml.cpp">
+      <Filter>veh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\weap\weapammo.cpp">
+      <Filter>weap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\weap\weapfx.cpp">
+      <Filter>weap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\weap\weapList.cpp">
+      <Filter>weap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\weap\weapLua.cpp">
+      <Filter>weap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\weap\weapmain.cpp">
+      <Filter>weap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\weap\weapons.cpp">
+      <Filter>weap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\weap\weapParser.cpp">
+      <Filter>weap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\weap\weapSpec.cpp">
+      <Filter>weap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wwii\wwiiClientMessages.cpp">
+      <Filter>wwii</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wwii\wwiiHCUnitsCommon.cpp">
+      <Filter>wwii</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wwii\wwiiLua.cpp">
+      <Filter>wwii</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wwii\wwiiOpinionPoll.cpp">
+      <Filter>wwii</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wwii\wwiiServerTrackedObject.cpp">
+      <Filter>wwii</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wwii\wwiiServerTrackedObjectPacker.cpp">
+      <Filter>wwii</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wwii\wwiiSquads.cpp">
+      <Filter>wwii</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wwii\wwiiString.cpp">
+      <Filter>wwii</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wwii\wwiiSyncVar.cpp">
+      <Filter>wwii</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\wwii\wwiiUTF.cpp">
+      <Filter>wwii</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\physics\colliderMain.cpp">
+      <Filter>physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\physics\colliderQuery.cpp">
+      <Filter>physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\physics\odeConvert.cpp">
+      <Filter>physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\physics\physicsmain.cpp">
+      <Filter>physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\physics\physicsTypes.cpp">
+      <Filter>physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\xml\XMLLoader.cpp">
+      <Filter>xml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\xml\XMLLoader2.cpp">
+      <Filter>xml</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\tut\tutGroupProgress.cpp">
+      <Filter>tut</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\tut\tutLua.cpp">
+      <Filter>tut</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\tut\TutorialManager.cpp">
+      <Filter>tut</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\lua\luaMain.cpp">
+      <Filter>lua</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\osgImport\BoundingBox.cpp">
+      <Filter>osgImport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\osgImport\BoundingSphere.cpp">
+      <Filter>osgImport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\osgImport\BufferObject.cpp">
+      <Filter>osgImport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\osgImport\DeleteHandler.cpp">
+      <Filter>osgImport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\osgImport\dxtctool.cpp">
+      <Filter>osgImport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\osgImport\FrameBufferObject.cpp">
+      <Filter>osgImport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\osgImport\Image.cpp">
+      <Filter>osgImport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\osgImport\ReaderWriterBMP.cpp">
+      <Filter>osgImport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\osgImport\ReaderWriterDDS.cpp">
+      <Filter>osgImport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\osgImport\ReaderWriterTGA.cpp">
+      <Filter>osgImport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\osgImport\Referenced.cpp">
+      <Filter>osgImport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\osgImport\ShadowMap.cpp">
+      <Filter>osgImport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\osgImport\TexGen.cpp">
+      <Filter>osgImport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\osgImport\Texture.cpp">
+      <Filter>osgImport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\osgImport\Texture2D.cpp">
+      <Filter>osgImport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\osgImport\Texture2DArray.cpp">
+      <Filter>osgImport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\osgImport\TextureCubeMap.cpp">
+      <Filter>osgImport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\osgImport\TextureRectangle.cpp">
+      <Filter>osgImport</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\inst\instClient.cpp">
+      <Filter>inst</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\inst\instCommon.cpp">
+      <Filter>inst</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\inst\instPackers.cpp">
+      <Filter>inst</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ime\IMEClient.cpp">
+      <Filter>ime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ime\imeMain.cpp">
+      <Filter>ime</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\mc\multiClient.cpp">
+      <Filter>mc</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\scen\ScenarioManager.cpp">
+      <Filter>scen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\scen\scenLua.cpp">
+      <Filter>scen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\scen\scenMain.cpp">
+      <Filter>scen</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\trn\trnScenario.cpp">
+      <Filter>trn</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\uimap\CustomMapLayer.cpp">
+      <Filter>uimap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\physics\HeightField.cpp">
+      <Filter>physics</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ogl\GLCounter.cpp">
+      <Filter>ogl</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\maptools\GenerateIcons.cpp">
+      <Filter>maptools</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ez\EZLoader.cpp">
+      <Filter>ez</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ez\EZManager.cpp">
+      <Filter>ez</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\ez\EZVehicles.cpp">
+      <Filter>ez</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\uimap\ScenarioMapRenderer.cpp">
+      <Filter>uimap</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\src\io_mapped_file.cpp">
+      <Filter>fio</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\math\Rand.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\math\SuperFastHash.cpp">
+      <Filter>math</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="res\cursor.cur">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\WW2.rc2">
+      <Filter>res</Filter>
+    </None>
+    <None Include="res\wwii1.ico">
+      <Filter>res</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="WW2.rc" />
+  </ItemGroup>
+</Project>

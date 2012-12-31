@@ -1,0 +1,19 @@
+$#include "trncd.h"
+$#include "StratDB.h"
+
+$pfile "..\\lua\\include.pkg"
+
+module terrain
+{
+	class trnCDTerrainObject
+	{
+		public:
+		
+		StratDB::StratObject* StratObj();
+		const char* ObjName();
+		unsigned char ObjFlags();
+		
+		int SupercellX();
+		int SupercellY();
+	};
+}

@@ -1,0 +1,238 @@
+#include <syscfg.h> // Path is project specific.
+// Created: Thu Jun 15 16:22:35 2000
+//
+// All the code to the pack routines for the authple reside here.
+//
+// Copyright (c) 2000 Playnet, Inc., All Rights Reserved.
+// Not to be distributed in API form except as part of a
+// compiled library.
+//
+// Originating Programmer: Shane "Elmo" Wickson
+// Supporting Programmer:  Marty "Vandal" Poulin
+
+#include "teul/teulKit.h"
+#include "auth/authTypes.h"
+#include "auth/authDispatch.h"
+
+SINT32 authPackAPP_FILE_CHECK(LOGICAL mode, UCHAR* data, SINT32 offset, APP_FILE_CHECK* request, SINT32 /*size*/)
+{
+	if (request == NULL)
+		return 0;
+
+	offset = teulPackSINT32(mode,data,offset,&request->appID,0);
+	offset = teulPackUINT32(mode,data,offset,&request->presenterVersion,0);
+
+	offset = teulPackVoid(mode,data,offset,&request->fileKey,MAX_PASSWORD);
+	offset = teulPackVoid(mode,data,offset,&request->manifestKey,MAX_PASSWORD);
+
+	request->fileKey[MAX_PASSWORD-1] = '\0';
+	request->manifestKey[MAX_PASSWORD-1] = '\0';
+
+	return offset;
+}
+
+SINT32
+authPackARENA_REQ(LOGICAL mode, UCHAR* data, SINT32 offset, ARENA_REQ* request, SINT32 /*size*/)
+{
+	if (request == NULL)
+		return 0;
+
+	offset = teulPackSINT32(mode,data,offset,&request->arenaID,0);
+	offset = teulPackUINT32(mode,data,offset,&request->sessionID,0);
+	offset = teulPackUINT32(mode,data,offset,(UINT32*)&request->infoOnly,8);
+	offset = teulPackUINT32(mode,data,offset,&request->presenterVersion,0);
+
+	request->username[0] = '\0';
+	request->password[0] = '\0';
+
+	request->oVersion = 1;
+
+	return offset;
+}
+
+SINT32 authPackARENA_REQ2(LOGICAL mode, UCHAR* data, SINT32 offset, ARENA_REQ* request, SINT32 /*size*/)
+{
+	if (request == NULL)
+		return 0;
+
+	offset = teulPackSINT32(mode,data,offset,&request->arenaID,0);
+	offset = teulPackUINT32(mode,data,offset,&request->sessionID,0);
+	offset = teulPackUINT32(mode,data,offset,(UINT32*)&request->infoOnly,8);
+	offset = teulPackUINT32(mode,data,offset,&request->presenterVersion,0);
+
+	offset = teulPackVoid(mode,data,offset,&request->username,MAX_OLD_USERNAME);
+	offset = teulPackVoid(mode,data,offset,&request->password,MAX_PASSWORD);
+
+	request->username[MAX_OLD_USERNAME-1]='\0';
+	request->password[MAX_PASSWORD-1]='\0';
+
+	request->oVersion = 2;
+
+	return offset;
+}
+
+SINT32 authPackAPP_VERIFY(LOGICAL mode, UCHAR* data, SINT32 offset, APP_VERIFY* object, SINT32 /*size*/)
+{
+	if (object == NULL)
+		return 0;
+
+	offset = teulPackSINT32(mode,data,offset,&object->arenaID,0);
+	offset = teulPackSINT32(mode,data,offset,&object->sessionID,0);
+	offset = teulPackSINT32(mode,data,offset,&object->status,0);
+	offset = teulPackSINT32(mode,data,offset,&object->appID,0);
+	offset = teulPackSINT32(mode,data,offset,&object->appVersionMax,0);
+	offset = teulPackVoid(mode,data,offset,&object->appleID,4);
+
+	return offset;
+}
+
+SINT32 authPackAPP_LAUNCH_REQ(LOGICAL mode, UCHAR* data, SINT32 offset, APP_LAUNCH_REQ* request, SINT32 /*size*/)
+{
+	UINT32 ignore;
+
+	if (request == NULL)
+		return -EINVAL;
+
+	offset = teulPackVoid(mode,data,offset,&request->username,MAX_OLD_USERNAME);
+	offset = teulPackVoid(mode,data,offset,&request->password,MAX_PASSWORD);
+
+	request->username[MAX_OLD_USERNAME-1]='\0';
+	request->password[MAX_PASSWORD-1]='\0';
+
+	offset = teulPackSINT32(mode,data,offset,&request->status,0);
+	offset = teulPackSINT32(mode,data,offset,&request->arenaID,0);
+	offset = teulPackUINT32(mode,data,offset,&request->sessionID,0);
+	offset = teulPackSINT32(mode,data,offset,&request->appID,0);
+	offset = teulPackUINT32(mode,data,offset,&request->appVersion,0);
+
+	offset = teulPackSINT32(mode,data,offset,&request->cdKeySize,0);
+	offset = teulPackVoid(mode,data,offset,&(request->cdKey),request->cdKeySize);
+	request->cdKey[request->cdKeySize] = '\0';
+
+	ignore = (UINT32) request->ignoreMinorUpdates;
+	offset = teulPackUINT32(mode,data,offset,&ignore,0);
+	request->ignoreMinorUpdates = (LOGICAL) ignore;
+
+	return offset;
+}
+
+SINT32 authPackAPP_LAUNCH_REQ2(LOGICAL mode, UCHAR* data, SINT32 offset, APP_LAUNCH_REQ* request, SINT32 /*size*/)
+{
+	UINT32 ignore;
+
+	if (request == NULL)
+		return -EINVAL;
+
+	offset = teulPackVoid(mode,data,offset,&request->username,MAX_OLD_USERNAME);
+	offset = teulPackVoid(mode,data,offset,&request->password,MAX_PASSWORD);
+
+	request->username[MAX_OLD_USERNAME-1]='\0';
+	request->password[MAX_PASSWORD-1]='\0';
+
+	offset = teulPackSINT32(mode,data,offset,&request->status,0);
+	offset = teulPackSINT32(mode,data,offset,&request->arenaID,0);
+	offset = teulPackUINT32(mode,data,offset,&request->sessionID,0);
+	offset = teulPackSINT32(mode,data,offset,&request->appID,0);
+	offset = teulPackUINT32(mode,data,offset,&request->appVersion,0);
+
+	offset = teulPackSINT32(mode,data,offset,&request->cdKeySize,0);
+	offset = teulPackVoid(mode,data,offset,&(request->cdKey),request->cdKeySize);
+
+	offset = teulPackUCHAR(mode,data,offset,&request->oVersion,0);
+
+	offset = teulPackVoid(mode,data,offset,&request->fileKey,MAX_PASSWORD);
+	offset = teulPackVoid(mode,data,offset,&request->manifestKey,MAX_PASSWORD);
+
+	request->fileKey[MAX_PASSWORD-1]='\0';
+	request->manifestKey[MAX_PASSWORD-1]='\0';
+
+
+	request->cdKey[request->cdKeySize] = '\0';
+
+	ignore = (UINT32) request->ignoreMinorUpdates;
+	offset = teulPackUINT32(mode,data,offset,&ignore,0);
+	request->ignoreMinorUpdates = (LOGICAL) ignore;
+
+	return offset;
+}
+
+SINT32 authPackAPP_LAUNCH(LOGICAL mode, UCHAR* data, SINT32 offset, APP_LAUNCH* object, SINT32 /*size*/)
+{
+	if (object == NULL)
+		return -EINVAL;
+
+	offset = teulPackSINT32(mode,data,offset,&object->appID,0);
+	offset = teulPackSINT32(mode,data,offset,&object->appVersion,0);
+	offset = teulPackSINT32(mode,data,offset,&object->dataSize,0);
+
+	offset = teulPackVoid(mode,data,offset,object->data,object->dataSize);
+	object->data[object->dataSize] = '\0';
+	offset = teulPackUINT32(mode,data,offset,&object->serverIP,0);
+	offset = teulPackUINT32(mode,data,offset,&object->serverPort,0);
+	offset = teulPackUINT32(mode,data,offset,(UINT32*)&object->protocol,0);
+	offset = teulPackUINT32(mode,data,offset,&object->otp,0);
+	offset = teulPackSINT32(mode,data,offset,&object->status,0);
+	offset = teulPackVoid(mode,data,offset,&object->appleID,4);
+
+	offset = teulPackUINT32(mode,data,offset,(UINT32*)&object->action,0);
+	offset = teulPackSINT32(mode,data,offset,&object->dlAppID,0);
+
+	return offset;
+}
+
+#if platBuild == TEUL_SERVER
+
+SINT32 authPackSERVER_LOAD(LOGICAL mode, UCHAR* data, SINT32 offset, AUTH_SERVER_LOAD* object, SINT32 /*size*/)
+{
+	if (object == NULL)
+		return -EINVAL;
+
+	offset = teulPackSINT32(mode,data,offset,&object->numPlayers,0);
+	offset = teulPackUINT32(mode,data,offset,&object->hostAddress,0);
+	offset = teulPackUINT32(mode,data,offset,&object->arenaID,0);
+
+	return offset;
+}
+
+void
+Auth::Dispatch::packer(unsigned int mode, ACTION_OBJECT* a)
+{
+	a->packer(mode, &m_customerID, 0) ;
+	a->packBytes(mode, m_callsign, sizeof(m_callsign)) ;
+	a->packer(mode, &m_clientIP, 0) ;
+	a->packer(mode, &m_OTP, 0) ;
+	a->packer(mode, &m_appVersion, 0) ;
+	a->packer(mode, &m_platform, 0) ;
+}
+
+SINT32 authPackGAME_INIT(LOGICAL mode, UCHAR* data, SINT32 offset, AUTH_GAME_INIT*init, SINT32 /*size*/)
+{
+	if (init==NULL)
+		return 0;
+
+	offset = teulPackUINT32(mode,data,offset,&(init->arenaID),0);
+	offset = teulPackUINT32(mode,data,offset,&(init->hostVersion),0);
+	offset = teulPackUINT32(mode,data,offset,&(init->appID),0);
+	offset = teulPackUINT32(mode,data,offset,&(init->appVersion),0);
+	offset = teulPackUINT32(mode,data,offset,&(init->maxUsers),0);
+	offset = teulPackUINT32(mode,data,offset,&(init->port),0);
+	offset = teulPackUINT32(mode,data,offset,&(init->ipAddress),0);
+
+	offset = teulPackVoid(mode, data, offset, init->hello, 16) ;
+
+	return offset;
+}
+
+//This function packs/unpacks the hello acknowledgement
+SINT32 authPackGAME_ACK(LOGICAL mode, UCHAR* data, SINT32 offset, AUTH_GAME_ACK* object, SINT32 /*size*/)
+{
+	return teulPackUINT32(mode,data,offset,&(object->gotcha),0);
+}
+
+//Packs the init login message
+SINT32 authPackClearLoginTable(LOGICAL mode, UCHAR* data, SINT32 offset, CLEAR_LOGIN_TABLE* object, SINT32 /*size*/)
+{
+	return teulPackUINT32(mode,data,offset,&(object->init),0);
+}
+
+#endif

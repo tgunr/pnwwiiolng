@@ -1,0 +1,213 @@
+#pragma once
+// This module provides the debug print utility.
+//
+// Copyright 1999 Playnet Inc, All rights reserved
+// Not to be distributed in API form except as part of a compiled
+// library
+//
+// Originating Programmer: Marty Poulin
+
+#include <stdarg.h>
+
+#ifndef EWOULDBLOCK
+	#include	<errno.h>
+#endif
+
+#if platOS == OS_WIN32
+	#include "dbug/dbugWErrno.h"
+#endif
+
+#if platOS == OS_MACOS
+	#define NO_DEBUG_LOG
+	#define NO_DEBUG_WRITE
+#endif
+
+#define  _FL __FILE__, __LINE__
+
+namespace Debug
+{
+	enum
+	{
+		ERR_FATAL	= 	0,		// fatal error detected, exit program
+		ERR_ABORT,				// error detected, operation aborted
+		ERR_MINOR,				// error detected, routine recovered, operation continues
+		ERR_WARN,				// possible error detected, operation continues
+		ERR_NOTE,				// normal but significant
+		ERR_INFO,					// informational message
+		ERR_DBUG					// debug level message
+	,	ERROR_TYPE_SIZE
+	} ;
+	typedef unsigned int ERROR_TYPE ;
+}
+
+// always use these macro's in place of Full functions so filename and number and errType are set.
+
+#define STD_ERR		0x0010	// mirror output to stderr
+#define BARE_DEBUG	0x0080	// no extra formating, basically printf
+
+// basic parameter macros for dbugLog
+#define _FLA _FL, Debug::ERR_ABORT
+#define _FLM _FL, Debug::ERR_MINOR
+#define _FLW _FL, Debug::ERR_WARN
+#define _FLN _FL, Debug::ERR_NOTE
+#define _FLI _FL, Debug::ERR_INFO
+#define _FLD _FL, Debug::ERR_DBUG
+
+// same as above but no extra formating
+#define _FLAB _FL, (Debug::ERR_ABORT | BARE_DEBUG)
+#define _FLMB _FL, (Debug::ERR_MINOR | BARE_DEBUG)
+#define _FLWB _FL, (Debug::ERR_WARN | BARE_DEBUG)
+#define _FLNB _FL, (Debug::ERR_NOTE | BARE_DEBUG)
+#define _FLIB _FL, (Debug::ERR_INFO | BARE_DEBUG)
+#define _FLDB _FL, (Debug::ERR_DBUG | BARE_DEBUG)
+
+// make go to stderr
+#define _FLAS _FL, (Debug::ERR_ABORT | STD_ERR)
+#define _FLMS _FL, (Debug::ERR_MINOR | STD_ERR)
+#define _FLWS _FL, (Debug::ERR_WARN | STD_ERR)
+#define _FLNS _FL, (Debug::ERR_NOTE | STD_ERR)
+#define _FLIS _FL, (Debug::ERR_INFO | STD_ERR)
+#define _FLDS _FL, (Debug::ERR_DBUG | STD_ERR)
+
+// same as above but no extra formating
+#define _FLASB _FL, (Debug::ERR_ABORT | STD_ERR | BARE_DEBUG)
+#define _FLMSB _FL, (Debug::ERR_MINOR | STD_ERR | BARE_DEBUG)
+#define _FLWSB _FL, (Debug::ERR_WARN | STD_ERR | BARE_DEBUG)
+#define _FLNSB _FL, (Debug::ERR_NOTE | STD_ERR | BARE_DEBUG)
+#define _FLISB _FL, (Debug::ERR_INFO | STD_ERR | BARE_DEBUG)
+#define _FLDSB _FL, (Debug::ERR_DBUG | STD_ERR | BARE_DEBUG)
+
+// the log type parameter of dbugInit can take any of the log facilities from
+// syslog including LOG_LOCAL0-7 or be set to LOG_TO_FILE to log
+// directly to a file only.
+#define LOG_TO_FILE 1
+#define LOG_OFF	-1
+
+// Each ERROR_TYPE is associated with a syslog error level on linux
+//
+//	ERR_FATAL	= LOG_EMRG	-fatal error, system is unusable
+//	ERR_ERRALERT	= LOG_ALERT	-action should be taken immediately
+//	ERR_ABORT	= LOG_CRIT	-error condition, operation aborted
+//	ERR_MINOR	= LOG_ERR	-error detected, routine recovered, operation continues
+//	ERR_WARN	= LOG_WARN	-possible error detected, operation continues
+//	ERR_NOTE		= LOG_NOTE	-normal but significant
+//	ERR_INFO		= LOG_INFO	-informational message
+//	ERR_DBUG		= LOG_DEBUG	-debug level message
+
+namespace Debug
+{
+typedef void  (*ERROR_HANDLER) (void);
+}
+
+// dbugInit: sets the current error level to ERR_INFO, opens the debug file, and initializes
+// the error object. The log type parameter of dbugInit can take any of the log facilities from
+// syslog including LOG_LOCAL0-7 or be set to LOG_TO_FILE to log
+// directly to a file only.
+extern int dbugInit(int logType, const char* filename);
+
+// dbugClose: closes the debug file and cleans up.
+extern void	dbugClose(void);
+
+// dbugSetLogLevel: set the current debug level for display of log messages.
+extern void	dbugSetLogLevel(Debug::ERROR_TYPE level);
+
+// dbugSetWriteLevel: set the current debug level for display of dbug messages and interface to
+// the Microsoft debugger through the SetDebugErrorLevel function.
+extern void	dbugSetWriteLevel(Debug::ERROR_TYPE level);
+
+// dbugSetErrHandler: set an optional user debug handler for each errType.
+extern void	dbugSetErrHandler(Debug::ERROR_TYPE level, Debug::ERROR_HANDLER handler);
+
+// dbugSetErrno: sets Errno. Error numbers adhere to errno.h. Under win32 "dbugWErrno.h"
+// may also be included to map windows socket errors to Unix errno.  Additional errors beyond
+// those covered in errno.h and dbugWErrno.h must be added to debugExtErrno.h and must adhere to
+// windows error code conventions to eliminate problems with compatibility.
+extern void		dbugSetErrno( int err);
+
+// dbugGetErrno: returns the current error number.  Error numbers adhere to errno.h.  Under
+// win32 "dbugWErrno.h" may also be included to map windows socket errors to Unix errno.
+// Additional errors beyond those covered in errno.h and dbugWErrno.h must be added to
+// debugExtErrno.h and must adhere to windows error code conventions to eliminate problems
+// with compatibility.
+extern int		dbugGetErrno(void);
+
+static inline void	noWrite(char* /*filename*/, int /*lineno*/, unsigned int /*errType*/, char* /*fmt*/, ...)
+{
+}
+
+// dbugLog: if the current filename, lineno or string is NULL then it sets these members. The
+// paremters are output as a string to the debug file depending on the debug level selected and
+// the current error type.  calls handlers.
+extern int	_dbugLog(const char* filename, int lineno, unsigned int errType, const char* fmt, ...) __attribute__ ((format (printf,4,5))) ;
+
+extern NORETURN_FN void _LogAbort(const char* filename, int lineno, unsigned int errType, const char* assertion, const char* fmt, ...);
+#define LogAbort(...) _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, NULL, __VA_ARGS__)
+#define ABORT_UNLESS(assertion_) if ( !(assertion_) ) _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, NULL, "Assertion: !(%s)", #assertion_)
+#define ABORT_UNLESS_EX(assertion_, ...) if ( !(assertion_) ) _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, #assertion_, __VA_ARGS__)
+#define ABORT_IF(assertion_) if ( (assertion_) ) _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, NULL, "Assertion: %s", #assertion_)
+#define ABORT_IF_EX(assertion_, ...) if ( (assertion_) ) _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, #assertion_, __VA_ARGS__)
+
+#ifdef DBUG_TEST
+	#define dbugLog(x,args...) printf(args)
+#else
+	#ifdef NO_DEBUG_LOG
+		#if platOS == OS_LINUX
+			#define dbugLog(...)
+		#elif platOS == OS_WIN32
+			#define dbugLog _dbugLog
+		#elif platOS == OS_MACOS
+			#define dbugLog(...)
+		#endif
+	#else
+		#define dbugLog _dbugLog
+	#endif
+#endif
+
+#ifdef NO_DEBUG_WRITE
+
+	#if platOS == OS_LINUX
+		#define dbugWrite(...)
+	#elif platOS == OS_WIN32
+		#define dbugWrite(...)
+	#elif platOS == OS_MACOS
+		#define dbugWrite(...)
+	#endif
+
+#else
+	#define dbugWrite _dbugWrite
+#endif
+
+#if defined(BETA_RELEASE) && platOS != OS_WIN32
+# define betaLog(...) dbugLog(__VA_ARGS__)
+#else
+#  define betaLog(...)
+#endif
+
+// This is set to true when the dbug library is logging _FLD messages
+extern bool g_logDebug ;
+
+#ifndef FRONT_END
+# define DEBUG_ERR(...) dbugLog(_FLA, __VA_ARGS__)
+# define DEBUG_FATAL(...) LogAbort(__VA_ARGS__)
+#else
+# define DEBUG_ERR(...) Write_Debug(__VA_ARGS__)
+# define DEBUG_FATAL(...) Write_Log(LOG_ALL, LOG_FATAL, __VA_ARGS__)
+#endif
+
+#if platOS== OS_WIN32
+#define WriteToConsole(...)	\
+	{	\
+		char output[4096] ;	\
+		sprintf(output, __VA_ARGS__) ;	\
+		OutputDebugStringA(output) ;	\
+		OutputDebugStringA("\n") ;		\
+	}
+#elif platOS == OS_MACOS
+#define WriteToConsole(...)	\
+	{	\
+		printf(__VA_ARGS__) ;	\
+		printf("\n") ;	\
+	}
+#else
+#define WriteToConsole(...) dbugLog(_FLD, __VA_ARGS__) ;
+#endif

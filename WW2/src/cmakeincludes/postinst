@@ -1,0 +1,10 @@
+#! /bin/sh
+
+if [ -d /playnet/wwiiol/web ] ; then
+ chown -R wwiiol.wwiiol /playnet/wwiiol/web
+fi
+
+if [ -d /playnet/wwiiol/lua ] ; then
+ chown -R wwiiol.wwiiol /playnet/wwiiol/lua
+fi
+

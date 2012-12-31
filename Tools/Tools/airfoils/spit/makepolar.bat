@@ -1,0 +1,1 @@
+makepol 2212up10.pol flatplat.pol 2212up10.pol.done 3.0 1.0

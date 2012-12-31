@@ -1,0 +1,6 @@
+! Airfoil Coordinates from PANDA
+! x       	  yup     	  ylo
+  0.000000	  0.000000	 -0.000000
+  0.001		  0.001		 -0.001
+  1.000000	  0.000000	  0.000000
+end

@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<ClusterConfig version="1.0"
+	xmlns="http://www.kfs.org/XML/WWIIOL"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.kfs.org/XML/WWIIOL clusterconfig.xsd"
+	>
+
+ <General>
+  <Name>Give this cluster a name.</Name>
+  <!-- arenaID>Numeric ID for this arena</arenaID -->
+
+  <MaxPlayers>3500</MaxPlayers> <!-- Note: cluster wide -->
+  <!-- MaxQueuedPlayers>0</MaxQueuedPlayers -->
+
+  <BasePath>/playnet/</BasePath>
+  <BaseDrive>C:</BaseDrive> <!-- Optional and Windows-only -->
+ </General>
+ 
+ <Network>
+   <!-- The servers share a private network for broadcasting amongst themselves. -->
+   <ServerNet>192.168.10</ServerNet>
+   <!-- servers>127.0.1</servers --> <!-- If you wanted to run them all on a single box -->
+
+   <!-- Optional: If the cell hosts have a dedicated vpn for broadcasting between themselves... -->
+   <CellNet>192.168.11</CellNet>
+ </Network>
+
+ <Database>
+  <!-- IP of the database DBSE should talk to -->
+  <MySQL>
+    <EnableCompression>false</EnableCompression>
+  </MySQL>
+  <Game>
+    <Address>127.0.0.1</Address>
+	<!-- Port></ -->
+	<User>wwiiol</User>
+	<Password>wwiipass</Password>
+  </Game>
+  <Auth>
+    <Address>127.0.0.1</Address>
+	<!-- Port></ -->
+	<User>authuser</User>
+	<Password>authpass</Password>
+  </Auth>
+ </Database>
+ 
+ <Auth>
+  <ErrorURL>http://localhost/auth/error</ErrorURL>
+  <AppID>12</AppID>
+ </Auth>
+ 
+ <!-- The process that manages/organizes clusters. -->
+ <ClusterBoss>
+	 <Master>
+		<Address>127.0.0.1</Address>
+	</Master>
+ </ClusterBoss>
+ 
+ <StratHost>
+   <IgnoreErrors>true</IgnoreErrors>
+   <Language>en</Language>	
+   <Lua>
+     <Path>/playnet/wwiiol/lua</Path>
+	 <RCFile>rc.lua</RCFile>
+   </Lua>
+ </StratHost>
+
+ <ChatHost>
+   <!-- MaxPlayersPer>8000</MaxPlayersPer --> <!-- Maximum players supported by the chat host -->
+ </ChatHost>
+
+ <MapHost>
+   <!-- MaxPlayersPer>4000</MaxPlayersPer --> <!-- Maximum players supported by the map host -->
+ </MapHost>
+
+ <CellHost>
+   <!-- MaxPlayersPer>1500</MaxPlayersPer --> <!-- Maximum players supported by each cell host -->
+ </CellHost>
+
+ <IRC>
+   <Enabled>false</Enabled>
+   <!-- Address>ip.ad.dr.ess</Address -->
+   <!-- User>username</User -->	<!-- Not to be confused with nick, which will be set automatically -->
+   <!-- Password>ircpass</Password -->
+   <!-- Port></Port -->
+ </IRC>
+
+</ClusterConfig>

@@ -1,0 +1,211 @@
+
+                         I just sent this to IMOL.
+
+                         I am writing this to explain why I think the gun effectiveness in the WB 2.7 beta is significantly off.
+
+                         I ran some offline tests to check gun lethality. The tests consisted of 2 parts.
+
+                         Part #1 shoot down some 109s and P-51s (only) in the “Air Attack” scenario. All shots were performed at convergence using only the HS
+                         2x20mm on a spit IX or the 6x.50 Cal on an F6F or P-51. I shot down 9 planes with the Spitfire and 8 planes with the .50 cal armed aircraft.
+                         Further bncu ran very similar tests and posted the following on AGW:
+
+                         -----------
+                         As part of my testing for 2.7 beta I ran tests (offline, but later cross-checked firing at online volunteers) with every weapon WB models. 
+                         Not being satisfied with "feel" I ran 24 to 30 tests on each weapon, firing at 200-300 yards with convergence at 250, against fighters only
+                         (lethality against bombers is very dependent on your precision of aim). There's still a wide variability (standard deviation) in my results due to
+                         the variety of fighters I shot at, my own variability, and other factors, but this is mediated somewhat by the number of tests. In any case I
+                         listed, and will list here, the standard deviation I obtained. 
+                         The results here are hits/kill. Remember that drones don't (didn't) auger in when they lose important parts like engines or stabilizers, so a "kill"
+                         here is a full explosion. 
+                         Only some weapons are listed here but this should give you an idea of what's up: 
+                         UK Hispano 20mm: 5.00 ave, 2.86 std
+                         GE MG-FF 20mm: 5.33 ave, 2.48 std
+                         IJ type 99-1 20mm: 6.33 ave, 3.47 std
+                         IJ Ho5 20mm: 6.63 ave, 3.69 std
+                         SV ShVAK 20mm: 6.83 ave, 4.07 std
+                         IJ type 99-2 20mm: 7.08 ave, 3.24 std 
+                         GE MG131 13mm: 22.36 ave, 10.96 std
+                         SV UBS 12.7mm: 23.75 ave, 12.04 std
+                         US Browning .50: 27.17 ave, 16.81 std
+                         -----------
+                         My first online session in the beta yielded 257 hits and 9 kills from .50 cal guns, which computes to 57 real rounds per kill.
+
+                         All this data is consistent and seems to indicate that the number of real rounds (i.e. 2 times the number of WB rounds) to kill a single engine
+                         fighter was 10-15 20mm rounds or 50-60 .50 Cal rounds.
+
+                         Part #2 The shed test: I have run the full version of this test on every version of WB since version 2.0. Full results for 2.6 are posted at
+                         http://bmof-design.com/hooligan.htm. This sight also gives a detailed explanation of the test methodology. Suffice to say that the test
+                         consists of shooting the shed at F1 from point blank range with the different weapon sets to determine how many rounds it requires to
+                         destroy it. From this and the ROF (Rate Of Fire) information a relative lethality of each gun, and thus of each aircraft can be calculated. I ran
+                         shed tests on 4 guns. It takes the following number of real rounds to kill the shed.
+
+                         .50 Cal = 575 (note: no change from 2.6)
+                         Hispano Suiza 20mm = 132
+                         MG151/20mm = 154
+                         IJA Ho-5 20mm = 188
+
+                         The shed tests indicate that while a single good 20mm (i.e. not the early war Oerlikon models) was worth 2-3 .50 cal guns in version 2.6, they
+                         are now worth 3-4 .50 cal guns. The “Air Attack” tests confirm the shed test results.
+
+                         IMO the lethality of the weapons in WB 2.7 is significantly off. First, on average it should take significantly less than 50-60 .50 cal rounds to
+                         kill a single engine fighter. I think that the relative lethality advantage of cannon vs. heavy machine guns against single engine fighters is too
+                         large. Please consider the following evidence. Note that I have annotated my sources.
+
+                         For simplicity’s sake in the following discussions I am generally concentrating on the U.S. .50 cal round. The armor piercing capabilities of
+                         other heavy machine gun rounds should generally be similar and the penetration of 20mm rounds at practical ranges should in almost all cases
+                         exceed those of the .50 cal rounds.
+
+                         The standard WWII .50 cal AP/I round (M8 Armor Piercing/Incendiary) "can ensure a 80 to 90 percent expectation of complete penetration
+                         against 0.8in (21mm) thick armour plate at 298ft (91m)." (1)
+
+                         So what does this mean? Well the source does not specify impact angle or armor quality and or type (face-hardened or homogenous). We can
+                         probably assume that the armor in question was contemporary to the round (i.e. 1943 production). The 80-90 percent expectation or complete
+                         penetration indicates to me that this means the round will be very likely to penetrate from a range of angles. Maximum penetration for a clean
+                         90 degree hit would obviously be more. This is for a stationary shooter and target. Depending upon the geometry of an air to air engagement
+                         the impact speed of the projectile might be significantly greater or lesser than in the static case giving it potentially much more penetration.
+
+                         In non-Japanese fighter aircraft, the pilot, ammunition, oil and fuel tanks are generally protected with armor or self-sealing apparatus. For
+                         example: the pilot armor (both forward and rear) on a P-47D is 3/8” (9.5mm) thick (2). In a FW-190A8 the pilot head armor is 12mm thick and his
+                         back armor is 5 mm thick (3). The armor on these aircraft will protect the intended areas from .50 AP/I hits from some angles and in some cases.
+                         Clearly there are also cases when the round will penetrate to the critical area, work as intended and critically wound the aircraft or kill it
+                         outright. I haven't ever seen any book claim that the armor in WWII fighters was proof to anything above .30 cal guns. At practical firing
+                         ranges .50 cal guns can penetrate up to TWICE the thickness of armor typically found on one of these fighters.
+
+                         The aircraft structure, radio equipment etc.. are much less resistant to penetration than the face-hardened pilot armor. For example: A 7.9mm
+                         German mg round can penetrate 850mm (that’s correct 850!) of pine at 100m as opposed to only 5mm of steel at 100m (4). Face-hardened armor
+                         is much more resistant to penetration than aluminum aircraft structure, etc.. A round somewhat more similar to the US .50 cal was the 14.5mm
+                         anti tank round (4). It was somewhat heavier and faster (63.4g,1000m/sec) “It penetrated 40mm of armor at 100m; 35mm at 300m; 30mm at 500m;
+                         an AT rifle with this ammunition could still penetrate a light AFV's armor of 15mm at ranges of 1.5km, if the gunner was able to hit a lightly
+                         armored target at that distance.”(4) Aircraft components like the skin, radios etc…are unlikely to significantly slow an AP projectile although it
+                         might divert it or cause the incendiary or explosive to detonate before the optimal time. At any practical range, .50 AP/I and larger rounds have
+                         plenty of penetration capacity required to penetrate to any critical component of a typical fighter aircraft.
+
+                         Aircraft can be generally be killed in 2 fashions. #1 Structural Failure. #2 The magic bullet. #1 kills would be blowing off stabilizers, wings
+                         etc… Item #2 would cover any hit in the following areas with the requirements that the hit penetrates to a “critical component” and has
+                         sufficient killing effect against the target in question. Against many of these targets the “killing effect” would be incendiary (primary
+                         incendiary for an AP/I or explosive round), or secondary incendiary for a tracer or AP round). .50 cal US guns in the early war fighters were
+                         typically belted with 1 tracer followed by 2 AP and 1 incendiary. In the later years (1943+) the tracer rounds were replaced by tracer/incendiary
+                         rounds and the AP rounds were largely replace by AP/I rounds so that almost all rounds had primary incendiary capability (see the attached
+                         photo of an AP/I round penetrating a piece of armor plate). #2 kills would include hits on the pilot, fuel, engine, ammunition, coolant jacket,
+                         oxygen system, oil tank, control cables, hydrallic+oil+fuel piping. I just did a rough measurement of the presented target area of a spitfire from
+                         a cross-sectional drawing presented from the front quarter ((3) pg. 284). The major structural components take up approximately this much of
+                         the presented area:
+
+                         Forward fuselage: 19%
+                         Cockpit: 9%
+                         Read fuselage: 21%
+                         Wings: 44%
+                         Tail: 7%
+                         ----
+                         Total: 100%
+
+                         The “critical targets” take up approximately this much of the presented area:
+                         Engine/glycol/coolant jacket: 9%
+                         Oil Tank: 1%
+                         Pilot: 4%
+                         Fuel: 7%
+                         Oxygen tanks: 1%
+                         Ammo boxes: 4%
+                         Fuel pipes, cables etc.. : 1%
+                         ----
+                         Total: 27%
+
+                         From the dead 6 the critical components should take up a larger percentage of the cross section since the biggest parts of the aircraft (wings
+                         and fuselage) are presenting their smallest cross-section while many of the critical components are not presenting small cross-sections.
+                         Approximately 1 out of every 4 hits should typically be in a critical area. Some hits of course will deflect, fail to fuse, fail to have the desired
+                         effect on the critical component etc… Also some critical targets may be non-critical at the time of being damaged; an empty fuel tank or ammo
+                         box for example. Still, with an average of 1 in 4 hits impacting a critical component, it seems that a typical single engine aircraft is very unlikely
+                         to survive 15-20 .50 cal hits. With this many hits, one of them is going to cripple the aircraft except in rare cases. Effects for 20mm AP, APHE
+                         and AP/I should be more fatal. These rounds have even more excess penetration capability and are less likely to be deflected. Further if the
+                         fusing works properly, the explosion at the point of the critical component should almost invariably prove fatal. In WB 2.7 the impact of 5-10
+                         20mm on a single engine fighter is almost invariably crippling and 10-15 20mm rounds will result in an immediate kill. These results seem
+                         consistent with the large percentage of critical targets areas in a single engine fighter and the destructive capability of a 20mm round, and
+                         IMO a very welcome improvement to the lethality model.
+
+                         The evidence that I have read indicates that critical hit kills (fires, explosions, pilot kills etc..) were the primary cause of kills on fighters. I have
+                         not found this to be the case in WB where stabilizer/wing/fuselage kills play a large part. Although their damage model is better than anything
+                         else I have experienced I believe that “critical areas and penetration effects” are very poorly represented. With weapon lethality based on
+                         kinetic and explosive energy and penetration effects ignored, cannons are given a large lethality advantage against single-engine fighters that
+                         I do not believe that they should enjoy.
+
+                         Compared to APHE and AP/I rounds, HE rounds should not provide particularly more killing power against fighters due to their higher
+                         explosive content. In fact, HE rounds should probably be less effective against single engine fighters than APHE or AP/I rounds. According
+                         to Gustin’s data (5), MG151/20mm were typically belted with 2 HE (High Explosive). 2 HE/I/Tracer and 1 AP/I. The first 2 rounds (the pure HE)
+                         are Mine rounds with the unusually large explosive content. According to Gustin, the HE and HE/I rounds have no armor piercing capability
+                         so component armor would tend to provide fairly complete protection from these over the covered angles. The explosion itself of a 20mm
+                         round would be fully defeated by the armor in these aircraft. Just for comparison a US hand grenade had 113g of explosives (as opposed to
+                         18.6g for the 20mm mine rounds) and I can’t recall anybody every alleging that hand grenades had armor defeating capability against armored
+                         cars and halftracks (i.e. vehicles with armor in the 10mm thickness range). Of course, MG151s were also belted with combination of APHE,
+                         AP/I, etc… rounds. Once a Hispano or MG151 round penetrates to a critical component (cockpit or ammo box for example), if it fuses correctly
+                         the target aircraft is very likely to be dead. The important thing is that the round does penetrate. On 26 April 99 Tomb posted the following on
+                         AGW concerning a single 20mm Hispano hit on a 109:
+
+                         ------
+                         “from a recovered Me109 fighter which had been shot by an AP 20mm cannon shell from a hispano suiza cannon
+                         This shell had penetrated through the rudder ,sternpost, through various members of the fuselage ,the wireless set, two thicknesses of armour
+                         plate , both sides of the fuel tank, the back of the pilots seat, through the pilots chest removing the ribcage, through the dashboard, and out
+                         the front of the airplane, a most effective demonstration of the power of penetration of the cannon shell..”
+                         ------
+
+                         It is not clear if this was an APHE round or a solid round. If this was an APHE round the fuse did not work. If the fuse had worked the round
+                         might have exploded in the rear fuselage and demolished the radio, but it wouldn’t have killed the pilot and the plane might have made it
+                         home.
+
+                         IMO it is probably inaccurate to assume that the lethality of a round against an enemy fighter is close to being proportional to a simple sum of
+                         the average kinetic and explosive energy of the standard belted ammunition. To some extent the WB damage model does do exactly this since
+                         single-engine aircraft die far too frequently from “structural failure” and far too little from “critical hits”.
+
+                         I think the major combatants were pretty rational about their choice of armament for their aircraft. US aircraft were armed with .50s because
+                         their expected targets were single engine fighters and unarmored Japanese bombers. The theory was that the high volume of fire would result
+                         in a higher probability of some hits and that a small number of hits with heavy MG bullets was likely to cripple a single engine fighter since
+                         one of those bullets was likely to hit a critical component (pilot, engine, fuel, ammunition, etc..). As the war progressed, the Germans loaded
+                         their fighters with more and heavier cannon because they had to shoot down fairly durable 4 engine bombers. Since these bombers had a
+                         proportionally much smaller cross section of critical components, redundancy of critical components in the form of multiple pilots and
+                         engines, better fire retardant systems than fighters, etc.. they are not very likely to go down with a single critical hit. Therefore it was a safer
+                         bet to cause structural failure with HE cannon rounds. The HE mine rounds were not designed in response to any perceived weakness in the
+                         ability of 20mm guns to down fighters, but to meet the need of downing bombers. 
+
+                         Here is a quote from an earlier AGW post by –sick- on this same topic:
+
+                         ------
+                         “Contrary to popular belief, bombers were largely unarmored. Fighters, on the other hand, were heavily armored, comparable to modern IFV's
+                         in some cases (FW190 for example). This meant that penetrating a bomber was easy, penetrating a fighter was difficult. 
+                         In addition, bombers are awful spread out; lots of empty space in there. penetrating a bomber would, very likely, not result in a vital systems
+                         hit. fighters, on the other hand, are incredibly compact, with hardly a wasted cubic inch. penetrating a fighter is much more likely to damage a
+                         critical system. 
+                         This is why German rounds were designed around explosive power. penetrating the bomber was easy; the hard part was delivering enough
+                         structural damage to tear it apart. this resulted in the decision to use very high explosive densities and larger and larger rounds, neglecting
+                         muzzle velocity, rate of fire and penetrating ability. 
+                         Allied rounds (British Hispano-Suiza cannon, American Browning M2) were guns whose design favored penetration. in the case of the M2,
+                         this is because its genesis was the 1917 infantry machinegun, where penetration is all important. The Hispano-Suiza was the result of
+                         important design tradeoffs, knowing the Germans fielded only light bombers, and knowing that the weapon would have to be multi-purpose. 
+                         Also important in this equation is performance against ground targets. ground targets require both penetration and structural damage. they
+                         are the most difficult targets, because they are often highly armored, and they don’t have that nice 10-20k foot fall to do your dirty work for
+                         you. German cannon were not very useful against armored ground targets (although useful enough against trucks and such). the M2 was
+                         even, in some cases (like locomotives, where a single penetration can cause a massive steam explosion), more effective. The Hispano-Suiza
+                         was highly effective (and thus its use in the typhoon and tempest). the most effective of all, of course, was the Soviet VYa 23mm used on the
+                         Il-2. too heavy for air to air work, that gun was a monster tank killer.“
+                         ------
+
+                         A quick note about Light machine guns: Unlike heavy machineguns, these weapons lack the penetration ability to defeat protective armor in a
+                         typical fighter at almost all ranges and angles. This is why they were almost universally abandoned after the early war. These weapons should
+                         be very effective indeed against unarmored Japanese aircraft as the high rate of fire should make putting a single incendiary bullet into an
+                         unarmored critical component rather easy.
+
+                         Given that we are not going to get our new damage model anytime soon, what I would like to see is the lethality adjusted so that a
+                         single-engine fighter typically goes down with the same number of hits that typically took down a single-engine fighter in real life. Also
+                         lethality should not go down as dramatically as it does with range since as I’ve stated before, heavy machine guns and cannon have
+                         sufficient penetration to do the job at any practical range. Given the current damage model, for any particular gun it would probably best to
+                         model an ammunition belting which is optimized to kill fighters. If gun lethality against single engine fighters for light machine guns, heavy
+                         machine guns and cannon is about right, this probably means that machine guns are somewhat too lethal against buffs, cannon are
+                         insufficiently lethal against buffs, and that light machine guns are insufficiently lethal against zeros and the like. However since most
+                         engagements are between fighters, this seems to me to be a much better compromise than having heavy machine guns being drastically
+                         underpowered against fighters.
+
+                         (1) "The Browning M2 heavy machinegun", Terry J. Gandler, 1999 PRC Publishing LTD
+                         (2) “America’s Hundred Thousand, U.S. Production Fighters of World War Two”, Francis H. Dean, 1997 Schifer Publishing Ltd.
+                         (3) “The Great Book of World War II Airplanes”, various Authors, 1984 Zokeisha Publications, Ltd.
+                         (4) http://www.geocities.com/Augusta/8172/panzerfaust5.htm. 
+                         (5) http://www.geocities.com/CapeCanaveral/Hangar/8217
+
+                         Hooligan

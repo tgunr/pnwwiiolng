@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>LSMinimumSystemVersion</key>
+	<string>10.5.1</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>English</string>
+	<key>CFBundleExecutable</key>
+	<string>CFBundleExecutable-Value</string>
+	<key>CFBundleIconFile</key>
+	<string>ww2</string>
+	<key>CFBundleIdentifier</key>
+	<string>CFBundleIdentifier-Value</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>CFBundleName-Value</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<key>CFBundleVersion</key>
+	<string>CFBundleVersion-Value</string>
+	<key>CFBundleShortVersionString</key>
+	<string>CFBundleShortVersionString-Value</string>
+	<key>CFBundleSignature</key>
+	<string>pn12</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright © 1999-2010 Playnet, Inc.  All Rights Reserved.</string>
+	<key>NSMainNibFile</key>
+	<string>MainMenu</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
+</dict>
+</plist>

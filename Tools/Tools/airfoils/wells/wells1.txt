@@ -1,0 +1,136 @@
+
+From general6@iaw.com Wed Jun 16 22:25:54 1999
+Date: Wed, 16 Jun 1999 12:37:10 -0400
+From: Wells Sullivan <general6@iaw.com>
+To: Jonathan Hoof <hoofj@agora.rdrop.com>
+Subject: Re: Aerodynamics
+
+
+
+Jonathan Hoof wrote:
+
+> Long time no speak :)  I remember having some interesting discussions a
+> while back about P47s with you :)
+>
+> Saw your post on AGW about the Bf109 and Spit airfoils.  Since I'm neck
+> deep in aerodynamics right now at Playnet (don't tell anyone but I finally
+> got my first flight model flying today :) I actually understand some of
+> the things you're talking about <G> One question I had was where you were
+> getting your max Cl for the airfoil types for the 109 and Spit.
+
+The max Cl can be determined from the lift equation at the stalling speed.
+
+> And what
+> Reynolds number the CL is for (which makes significant a difference under
+> 1000000, which works out to be under 100mph for both planes if I'm not
+> mistaken).
+
+Yep, 1000000 is pretty much a minimum.  It's more critical for an R/C model.
+
+> BTW, you're claiming that induced drag is relative to the coefficient of
+> lift squared divided by pi and the aspect ratio.  That's not quite true
+> (as I suspect you know) for the 109 as it doesn't have an elliptical
+> planform.  You wouldn't know how to calculate how much the induced drag
+> constant goes up with planform would you? :)  (I don't have the formulas)
+
+This is somewhat complicated.  I don't have formulas either, but I have some
+charts and the problem is that at some point, the non-elliptical wing WILL
+have an elliptical lift distribution, probably around cruising speed (due to
+different airfoils at root and tip and washout), whereas the elliptical wing
+always has an elliptical lift distribution..  The correction factor is small
+though, less than 5% and probably wouldn't upset the relative aircraft
+performance.
+
+>
+>
+> Also found out today that if you model tail surfaces correctly and balance
+> the plane correctly that you need to model the downwash off the wings to
+> give the tail surfaces enough angle to stall the plane.  At least in the
+> Zero :)  Finally got my model stable (getting axes and rotations to work
+> right is a bear), and noticed I couldn't for the life of me get the plane
+> above about 8 degrees AoA for more than an instant.  Then when I thought
+> about it it made sense, there's no way the tail surface can "push" the
+> wings post stall on a stable aircraft (not tail-heavy or otherwise pitch
+> stable) if the relative airflow over the tail comes in the same direction
+> as the wings.  This is because of two things.  First the horizontal
+> stabilizer on the Zero uses NACA 0006 (0009? don't have my reference with
+> me) while the wing uses a variant of the NACA 23012 airfoil (Mistubishi
+> 118, if you can get me the coordinates I would be mucho happy :).  The
+> 0006 airfoil stalls at a lower AoA than the 23012 does.  But this isn't
+> the problem.  The problem is is that at 10 degrees pitch up (which puts
+> the main wings at 11 degrees or more due to incidence, depending on where
+> you're looking at along the wing) puts the stabilizer at 10 degrees pitch
+> up as well (and the zero's tail isn't inclined).  Thus the tail wants to
+> push *back* to neutral.  Of course, full elevator deflection counters this
+> to some degree, but it can't cause the tail to go post-stall since
+> stalling the tail will let you stall the wing, but it'll simply fall back
+> to a less-than-stall AoA *unless* the plane is so unstable in the pitch
+> axis that the pitch stabilizing tendancies are almost non-existant.  The
+> key I suspect is the downwash off the wings giving the tail a few degrees
+> AoA.
+
+There's a few things here.  The CG should never be in front of the CL unless
+there's some kind of ordnance or fuel or something that will move it back to a
+critical location.  The CG should always be between the 2 flying surfaces
+(wing and tail), or at the least on the CG.  The CG is usually behind the Lift
+to counter the negative pitching moment, so that the tail doesn't have to do
+it, causing trim drag.
+
+The angle of attack capability (induced angle of attack) is also related to
+the aspect ratio.  The formula is
+
+(18.24 x Cl)/AR
+
+A tail with a low aspect ratio relative to the wing would have a slightly
+higher angle of attack than the 2-dimensional plot might suggest.  Same for a
+plane with a lower wing aspect ratio.  For example, say the plot shows a max
+lift of 1.5 at 15 degrees AoA.  The corrected value with aspect ratio = 5.5
+would be 1.5 @ 20 degrees.
+
+I'll know tomorrow if the wing
+
+> downwash will do the trick when I code it up.
+
+Downwash depends on a few things too.  It depends on aspect ratio, distance
+from wing to tail and height of tail.  I made a formula for this based on some
+charts I have.  I'll send you both and you can see if it might be of any use
+to you!
+
+>
+>
+> I'm blathering I see :) Trouble is nobody at work really understands this
+> stuff so I have no one to talk to about it <G>  BTW, do you program? We're
+> looking for another programmer, if you are and you're interested and don't
+> mind moving to Dallas/Ft Worth and don't mind a probably paycut (game
+> programmer jobs aren't as lucrative as "normal" programming jobs) let me
+> know.
+
+Unfortunately, I'm not much of a programmer but I'm seriously considering
+learning!  :)  I have Visual C++ 4.0 and I'm sortof hacking my way through the
+book, but I don't spend much time with it.
+
+>
+>
+> -hoof
+>
+> PS: serously, I'd like to find a site that gives me some rough max Cl
+> numbers for various airfoils to double check my computed airfoil Cl's
+> against, so if you know of any good resources let me know.  Plus if you
+> can direct me to a program that can do full 360 degree polars for an
+> arbritrary airfoil with full boundary layer analysis, proper post-stall
+> calculations (many of the ones online are pre-stall only) I would be mucho
+> mucho grateful.
+
+Go here!
+
+http://beadec1.ea.bs.dlr.de/Airfoils/calcfoil.htm
+
+You can do from -90 to 90 and play with control surface deflections and
+stuff.  It gives you pitching moment as well as when the boundary layer goes
+turbulent and separates.  At that point, the center of lift and drag should
+move back (I don't think WB does this either...the stalls are too gentle!).
+If the center of lift is normally around 30% of the chord, I would estimate
+that it would move back to around 50% when stalled (a barn door!).  The nose
+should pitch down more prominently.
+
+

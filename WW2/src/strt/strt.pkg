@@ -1,0 +1,58 @@
+$#include "StratDB.h"
+
+$pfile "..\\lua\\include.pkg"
+
+module strat
+{
+	$cfile "strtDTL.h"
+	$cfile "strtCPFlags.h"
+	
+	namespace StratDB
+	{
+		class StratObject
+		{
+		public:
+			
+			const FULL_OBJ_ID* FullObjID();
+			
+			StratObject* ParentStratObject(); 
+			
+			int SupercellX();
+			int SupercellY();
+		
+			int Id();
+			int StratClass();
+			int StratType();
+			
+			int PosX();
+			int PosY();
+			int OriginalSide();
+			int OriginalCountry();
+		
+			int SubType();
+			const char* Name();
+			const char* Filename();
+			
+			int Side();
+			int Country();
+			
+			bool IsSpawnable();
+			bool IsDeepWaterPort();
+			
+			void SetCountry(int country);
+			void SetUpdateTime(unsigned int t);
+			void SetStratFlags(unsigned int flags);
+			void SetVisLevel(int vislevel);
+			void AddStratFlags(unsigned int flags);
+			void ClearStratFlags(unsigned int flags);
+			
+			void AddUnit(unsigned int id);
+			void RemoveUnit(unsigned int id);
+			bool IsUnitHere(unsigned int id) const;
+		};
+		
+		StratObject* FindStratObject(const FULL_OBJ_ID& id);
+		StratObject* FindStratObject(const char* cp, const char* fac);
+	};
+}
+

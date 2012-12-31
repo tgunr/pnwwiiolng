@@ -1,0 +1,104 @@
+$#include "time.h"
+$#include "hostproj/syscfg.h"
+$#include "include/platforms.h"
+$#include "parse/countryCodes.h"
+$#include "include/systypes.h"
+$#include "include/defs.h"
+$#include "dbug/dbug.h"
+$#include "dbug/dbugExtErrors.h"
+
+$#include "include/arenaLockEnums.h"
+$#include "wwii/wwiiTypes.h"
+$#include "wwii/wwiiServerTypeEnums.h"
+$#include "wwii/wwiiPermissions.h"
+$#include "wwii/wwiiOwnershipEnums.h"
+$#include "wwii/wwiiBranchEnums.h"
+$#include "wwii/wwiiConfig.h"
+$#include "wwii/wwiiFullObjID.h"
+$#include "chat/chatLStringIDs.h"
+$#include "chat/chatHandle.h"
+$#include "teul/teulTime.h"
+$#include "chat/chatDefines.h"
+
+$hfile "include/systypes.h"
+$hfile "dbug/dbug.h"
+$hfile "dbug/dbugExtErrors.h"
+
+$hfile "include/arenaLockEnums.h"
+$hfile "wwii/wwiiTypes.h"
+$hfile "wwii/wwiiServerTypeEnums.h"
+$hfile "wwii/wwiiPermissions.h"
+$hfile "wwii/wwiiOwnershipEnums.h"
+$hfile "wwii/wwiiConfig.h"
+$hfile "wwii/wwiiFullObjID.h"
+$hfile "chat/chatLStringIDs.h"
+$hfile "chat/chatHandle.h"
+$hfile "teul/teulTime.h"
+$hfile "chat/chatDefines.h"
+$hfile "wwii/wwiiBranchEnums.h"
+
+$hfile "strt/strtDTL.h"
+$#define BUILDING_TYPE int
+
+$hfile "strt/strtTypes.h"
+$hfile "wwii/wwiiHCUnits.h"
+$hfile "strt/strtHCUnits.h"
+$hfile "strt/strtCPFlags.h"
+
+$hfile "weap/weapDefs.h"
+$hfile "weap/weapSpec.h"
+$hfile "weap/weapSerial.h"
+$hfile "weap/weapWeapon.h"
+$hfile "weap/weapList.h"
+$hfile "strt/strtCPStruct.h"
+$hfile "strt/strtServerTypes.h"
+$hfile "strt/strtPostedWeaponList.h"
+$hfile "strt/strtEventQueue.h"
+$hfile "strt/strtWeaponUpdate.h"
+$hfile "strt/strtObjectiveStats.h"
+$hfile "strt/strtSupercell.h"
+$hfile "strt/strtObjectStruct.h"
+$hfile "strt/strtFacilityStruct.h"
+$hfile "strt/strtLinkStruct.h"
+$hfile "strt/strtWeaponEntry.h"
+
+$hfile "strt/strtHostMessages.h"
+$hfile "strt/strtIO.h"
+$hfile "strt/strtData.h"
+$hfile "strt/strtCP.h"
+$hfile "strt/strtFB.h"
+$hfile "chat/chatStratSupportMessages.h"
+$hfile "chat/chatSupportRPCMessages.h"
+$hfile "cnvy/cnvyMain.h"
+$hfile "strt/strtMain.h"
+$hfile "strt/strtSupply.h"
+$hfile "strt/strtEnemyReport.h"
+$hfile "strt/strtDotCommands.h"
+$hfile "strt/strtDB.h"
+$hfile "strt/strtHostDB.h"
+$hfile "strt/strtSpawn.h"
+$hfile "strt/strtTOE.h"
+$hfile "wwii/wwiiRank.h"
+$hfile "chat/chatBroadcast.h"
+$hfile "strt/strtTOETypes.h"
+$hfile "include/wthrTime.h"
+$hfile "strt/strtCaptureContribution.h"
+$hfile "strt/strtCaptureScore.h"
+$hfile "wwii/wwiiExitCodes.h"
+$hfile "strt/strtCPClass.h"
+
+$hfile "include/luaPkg.h"
+
+extern void print(const char* message) ;
+extern void warn(const char* message) ;
+extern void error(const char* message) ;
+extern void writeToLog(const char* file, const char* func, unsigned int line, const char* level, const char* facil, const char* message) ;
+extern char* ARGS(int i) ;
+extern void gmMessage(const char* message) ;
+extern const char* getCallsign(unsigned long long) ;
+
+$#include "include/luaGlue.h"
+$#include "wwii/wwiiThreads.h"
+
+extern void dbDo(const char* msg) ;
+$#define dbDo(c) DBThread::Do(DBThread::Default, "%s", c)

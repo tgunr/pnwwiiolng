@@ -1,0 +1,29 @@
+:Base FOILSIM.hlp
+:Title FoilSim Help Contents
+:Index Index for FOILSIM.hlp=FOILSIM.hlp
+1 FoilSim
+2 FoilSim Program=Hlp_MAEL_Airfoil
+2 General Description=Hlp_General_Description
+2 Airfoil Panels=Hlp_Airfoil_Panels
+2 Plotter Panels=Hlp_Plotter_Panels
+2 Probe Panel=Hlp_Probe_Panel
+2 Baseball Panels=Hlp_Baseball_Panels
+2 Printing & Saving Data=Hlp_Saving_Data
+2 Help=Hlp_Help
+2 Units=Hlp_Units
+2 About this Program=Hlp_About_
+2 Beta Testers=Hlp_Beta_Testers
+2 Available Software=Hlp_Available
+2 Theory=Hlp_Theory
+1 FoilSim Lessons
+2 General Information=Hlp_General_Information
+2 Airfoil Lessons
+3 What Factors Affect Lift=Hlp_Lift_Factors
+3 How Lift Changes=Hlp_How_Lift
+3 Flow Field Details=Hlp_Flow_Field
+3 The Lift Coefficient=Hlp_The_Lift
+2 Baseball Lessons
+3 Baseball Speed=Hlp_Baseball_Speed
+3 The Curveball=Hlp_Pressure_and
+3 The Screwball=Hlp_The_Screwball
+3 Baseball and Altitude=Hlp_Baseball_and

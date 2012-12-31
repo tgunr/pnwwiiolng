@@ -1,0 +1,11 @@
+#! /bin/sh
+
+for sub in lua web web/debug web/debug/jqplot web/debug/jqplot/plugins web/debug/js
+do
+ path="/playnet/wwiiol/${sub}"
+ if test ! -d "${path}" ; then
+  mkdir -p "${path}"
+ fi
+ chown wwiiol.wwiiol ${path}
+done
+

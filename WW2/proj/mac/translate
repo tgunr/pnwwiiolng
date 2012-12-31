@@ -1,0 +1,10 @@
+#!/bin/sh
+
+mkdir French.lproj German.lproj Italian.lproj Spanish.lproj >& /dev/null
+
+nibtool -8 -d MainMenu-French.strings English.lproj/MainMenu.nib -W French.lproj/MainMenu.nib
+nibtool -8 -d MainMenu-German.strings English.lproj/MainMenu.nib -W German.lproj/MainMenu.nib
+nibtool -8 -d MainMenu-Italian.strings English.lproj/MainMenu.nib -W Italian.lproj/MainMenu.nib
+nibtool -8 -d MainMenu-Spanish.strings English.lproj/MainMenu.nib -W Spanish.lproj/MainMenu.nib
+
+rm -rf French.lproj/MainMenu~.nib German.lproj/MainMenu~.nib Italian.lproj/MainMenu~.nib Spanish.lproj/MainMenu~.nib

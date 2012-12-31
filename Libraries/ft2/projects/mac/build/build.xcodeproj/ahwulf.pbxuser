@@ -1,0 +1,320 @@
+// !$*UTF8*$!
+{
+	0885DAD012D4D78200F23892 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 0885DAD112D4D78200F23892 /* ftheader.h */;
+		name = "ftheader.h: 771";
+		rLen = 17;
+		rLoc = 24573;
+		rType = 0;
+		vrLen = 1193;
+		vrLoc = 23568;
+	};
+	0885DAD112D4D78200F23892 /* ftheader.h */ = {
+		isa = PBXFileReference;
+		name = ftheader.h;
+		path = /Users/ahwulf/ww2ol/baseline/Libraries/ft2/include/freetype/config/ftheader.h;
+		sourceTree = "<absolute>";
+	};
+	08F41BAF12D3915C0001C6F5 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+			repositoryNamesForRoots = {
+				"" = "";
+			};
+		};
+	};
+	08F41BB012D3915C0001C6F5 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	08F41BB212D392200001C6F5 /* autofit.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1469, 798}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 1636}";
+		};
+	};
+	08F41BC012D392A40001C6F5 /* ftmac.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1469, 19266}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{6935, 1211}";
+		};
+	};
+	08F41BC512D392A40001C6F5 /* ftstroke.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1469, 38038}}";
+			sepNavSelRange = "{1352, 20}";
+			sepNavVisRange = "{0, 1766}";
+		};
+	};
+	08F41BEE12D3941D0001C6F5 /* ftlzw.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1469, 7163}}";
+			sepNavSelRange = "{1805, 10}";
+			sepNavVisRange = "{0, 2048}";
+		};
+	};
+	08F41BFB12D3941D0001C6F5 /* winfnt.c */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1412, 21679}}";
+			sepNavSelRange = "{29528, 0}";
+			sepNavVisRange = "{29462, 153}";
+		};
+	};
+	08F41C2812D39A480001C6F5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 08F41C2912D39A480001C6F5 /* afpic.c */;
+		name = "afpic.c: 21";
+		rLen = 0;
+		rLoc = 1295;
+		rType = 0;
+		vrLen = 125;
+		vrLoc = 1250;
+	};
+	08F41C2912D39A480001C6F5 /* afpic.c */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.c;
+		name = afpic.c;
+		path = /Users/ahwulf/ww2ol/baseline/Libraries/ft2/projects/mac/build/../../../src/autofit/afpic.c;
+		sourceTree = "<absolute>";
+	};
+	08F41C2A12D39A480001C6F5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 08F41BFB12D3941D0001C6F5 /* winfnt.c */;
+		name = "winfnt.c: 987";
+		rLen = 0;
+		rLoc = 29528;
+		rType = 0;
+		vrLen = 153;
+		vrLoc = 29462;
+	};
+	08F41C2B12D39A480001C6F5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 08F41BB212D392200001C6F5 /* autofit.c */;
+		name = "autofit.c: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 1636;
+		vrLoc = 0;
+	};
+	08F41C2C12D39A480001C6F5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 08F41C2D12D39A480001C6F5 /* ftmemory.h */;
+		name = "ftmemory.h: 256";
+		rLen = 0;
+		rLoc = 10685;
+		rType = 0;
+		vrLen = 1838;
+		vrLoc = 10046;
+	};
+	08F41C2D12D39A480001C6F5 /* ftmemory.h */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.h;
+		name = ftmemory.h;
+		path = /Users/ahwulf/ww2ol/baseline/Libraries/ft2/include/freetype/internal/ftmemory.h;
+		sourceTree = "<absolute>";
+	};
+	08F41C2E12D39A480001C6F5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 08F41BEE12D3941D0001C6F5 /* ftlzw.c */;
+		name = "ftlzw.c: 25";
+		rLen = 10;
+		rLoc = 1805;
+		rType = 0;
+		vrLen = 2048;
+		vrLoc = 0;
+	};
+	08F41C2F12D39A480001C6F5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 08F41BC012D392A40001C6F5 /* ftmac.c */;
+		name = "ftmac.c: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 1211;
+		vrLoc = 6935;
+	};
+	08F41C3012D39A480001C6F5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 08F41C3112D39A480001C6F5 /* ftbase.h */;
+		name = "ftbase.h: 23";
+		rLen = 10;
+		rLoc = 1304;
+		rType = 0;
+		vrLen = 1833;
+		vrLoc = 0;
+	};
+	08F41C3112D39A480001C6F5 /* ftbase.h */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.h;
+		name = ftbase.h;
+		path = /Users/ahwulf/ww2ol/baseline/Libraries/ft2/src/base/ftbase.h;
+		sourceTree = "<absolute>";
+	};
+	08F41C3212D39A480001C6F5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 08F41C3312D39A480001C6F5 /* ft2unix.h */;
+		name = "ft2unix.h: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 2094;
+		vrLoc = 1796;
+	};
+	08F41C3312D39A480001C6F5 /* ft2unix.h */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.h;
+		name = ft2unix.h;
+		path = /Users/ahwulf/ww2ol/baseline/Libraries/ft2/builds/unix/ft2unix.h;
+		sourceTree = "<absolute>";
+	};
+	08F41C3412D39A480001C6F5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 08F41C3512D39A480001C6F5 /* internal.h */;
+		name = "internal.h: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 2508;
+		vrLoc = 0;
+	};
+	08F41C3512D39A480001C6F5 /* internal.h */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.h;
+		name = internal.h;
+		path = /Users/ahwulf/ww2ol/baseline/Libraries/ft2/include/freetype/internal/internal.h;
+		sourceTree = "<absolute>";
+	};
+	08F41C3612D39A480001C6F5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 08F41BC512D392A40001C6F5 /* ftstroke.c */;
+		name = "ftstroke.c: 23";
+		rLen = 20;
+		rLoc = 1352;
+		rType = 0;
+		vrLen = 1766;
+		vrLoc = 0;
+	};
+	08F41C3712D39A480001C6F5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 08F41C3812D39A480001C6F5 /* ft2build.h */;
+		name = "ft2build.h: 34";
+		rLen = 26;
+		rLoc = 2107;
+		rType = 0;
+		vrLen = 1951;
+		vrLoc = 234;
+	};
+	08F41C3812D39A480001C6F5 /* ft2build.h */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.h;
+		name = ft2build.h;
+		path = /Users/ahwulf/ww2ol/baseline/Libraries/ft2/include/ft2build.h;
+		sourceTree = "<absolute>";
+	};
+	08F41C5312D39B670001C6F5 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 08F41C5412D39B670001C6F5 /* ftheader.h */;
+		name = "ftheader.h: 771";
+		rLen = 17;
+		rLoc = 24573;
+		rType = 0;
+		vrLen = 1185;
+		vrLoc = 23576;
+	};
+	08F41C5412D39B670001C6F5 /* ftheader.h */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.h;
+		name = ftheader.h;
+		path = /Users/ahwulf/ww2ol/baseline/Libraries/ft2/include/freetype/config/ftheader.h;
+		sourceTree = "<absolute>";
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1469, 14839}}";
+			sepNavSelRange = "{24573, 17}";
+			sepNavVisRange = "{23568, 1193}";
+		};
+	};
+	08FB7793FE84155DC02AAC07 /* Project object */ = {
+		activeArchitecturePreference = i386;
+		activeBuildConfigurationName = Debug;
+		activeTarget = D2AAC045055464E500DB518D /* build */;
+		addToTargets = (
+			D2AAC045055464E500DB518D /* build */,
+		);
+		codeSenseManager = 08F41BB012D3915C0001C6F5 /* Code sense */;
+		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					1291,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXConfiguration.PBXTargetDataSource.PBXTargetDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					1251,
+					60,
+					20,
+					48,
+					43,
+					43,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXTargetDataSource_PrimaryAttribute,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 315935310;
+			PBXWorkspaceStateSaveDate = 315935310;
+		};
+		perUserProjectItems = {
+			0885DAD012D4D78200F23892 /* PBXTextBookmark */ = 0885DAD012D4D78200F23892 /* PBXTextBookmark */;
+			08F41C2812D39A480001C6F5 /* PBXTextBookmark */ = 08F41C2812D39A480001C6F5 /* PBXTextBookmark */;
+			08F41C2A12D39A480001C6F5 /* PBXTextBookmark */ = 08F41C2A12D39A480001C6F5 /* PBXTextBookmark */;
+			08F41C2B12D39A480001C6F5 /* PBXTextBookmark */ = 08F41C2B12D39A480001C6F5 /* PBXTextBookmark */;
+			08F41C2C12D39A480001C6F5 /* PBXTextBookmark */ = 08F41C2C12D39A480001C6F5 /* PBXTextBookmark */;
+			08F41C2E12D39A480001C6F5 /* PBXTextBookmark */ = 08F41C2E12D39A480001C6F5 /* PBXTextBookmark */;
+			08F41C2F12D39A480001C6F5 /* PBXTextBookmark */ = 08F41C2F12D39A480001C6F5 /* PBXTextBookmark */;
+			08F41C3012D39A480001C6F5 /* PBXTextBookmark */ = 08F41C3012D39A480001C6F5 /* PBXTextBookmark */;
+			08F41C3212D39A480001C6F5 /* PBXTextBookmark */ = 08F41C3212D39A480001C6F5 /* PBXTextBookmark */;
+			08F41C3412D39A480001C6F5 /* PBXTextBookmark */ = 08F41C3412D39A480001C6F5 /* PBXTextBookmark */;
+			08F41C3612D39A480001C6F5 /* PBXTextBookmark */ = 08F41C3612D39A480001C6F5 /* PBXTextBookmark */;
+			08F41C3712D39A480001C6F5 /* PBXTextBookmark */ = 08F41C3712D39A480001C6F5 /* PBXTextBookmark */;
+			08F41C5312D39B670001C6F5 /* PBXTextBookmark */ = 08F41C5312D39B670001C6F5 /* PBXTextBookmark */;
+		};
+		sourceControlManager = 08F41BAF12D3915C0001C6F5 /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	D2AAC045055464E500DB518D /* build */ = {
+		activeExec = 0;
+	};
+}

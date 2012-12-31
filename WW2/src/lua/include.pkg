@@ -1,0 +1,13 @@
+typedef unsigned int LOGICAL;
+typedef unsigned char UCHAR;
+typedef	char SCHAR;
+typedef	char SINT8;
+typedef	short SINT16;
+typedef	int SINT32;
+typedef	long SINT64;
+typedef	unsigned char UINT8;
+typedef	unsigned short UINT16;
+typedef	unsigned int UINT32;
+typedef	unsigned long UINT64;
+typedef	float FLOAT32;
+typedef	double FLOAT64;

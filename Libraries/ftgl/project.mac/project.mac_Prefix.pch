@@ -1,0 +1,6 @@
+//
+// Prefix header for all source files of the 'project.mac' target in the 'project.mac' project.
+//
+
+
+#include <iostream>

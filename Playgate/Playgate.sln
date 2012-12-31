@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 10.00
+# Visual Studio 2008
+Project("{EAF909A5-FA59-4C3D-9431-0FCC20D5BCF9}") = "Playgate", "Playgate.icproj", "{84F6035D-0B7C-4601-A30E-C7D62A943FCB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Win32 = Debug|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{84F6035D-0B7C-4601-A30E-C7D62A943FCB}.Debug|Win32.ActiveCfg = Debug|Win32
+		{84F6035D-0B7C-4601-A30E-C7D62A943FCB}.Debug|Win32.Build.0 = Debug|Win32
+		{84F6035D-0B7C-4601-A30E-C7D62A943FCB}.Release|Win32.ActiveCfg = Release|Win32
+		{84F6035D-0B7C-4601-A30E-C7D62A943FCB}.Release|Win32.Build.0 = Release|Win32
+		{A755190B-E034-45F3-A255-75DCEE000361}.Debug|Win32.ActiveCfg = Debug|Win32
+		{A755190B-E034-45F3-A255-75DCEE000361}.Release|Win32.ActiveCfg = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

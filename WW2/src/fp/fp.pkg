@@ -1,0 +1,7 @@
+$pfile "..\\lua\\include.pkg"
+
+module fp
+{
+	$cfile "fpFPS.h"
+	$cfile "fpFPSdata.h"
+}

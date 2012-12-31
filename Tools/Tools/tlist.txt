@@ -1,0 +1,8 @@
+# 1 = enable, 0 = disable
+1 basic stats (short)
+1 generate new thrust curve file (shortish)
+1 engine horsepower chart (shortish)
+1 stall chart (long)
+1 top speed (long)
+1 climb data (long)
+1 roll rate (shortish)

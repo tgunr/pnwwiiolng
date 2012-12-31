@@ -1,0 +1,25 @@
+$#include "vehmain.h"
+$#include "persmain.h"
+
+$pfile "..\\lua\\include.pkg"
+
+module player
+{
+	$cfile "pershud.h"
+	
+	class Player
+	{
+	public:
+		vehVehicle* GetVehicle();
+		void ShakeHead();
+		float GetEnergy();
+		float GetHealth();
+		int GetSide();
+		int GetCountry();
+		int GetRangeSetting();
+	};
+	
+	Player* playerGetPlayer();
+	vehVehicle* playerGetVehicle();
+	unsigned int persApplyDamage(float Damage, unsigned int Position, unsigned int Location, int ATPOnly);
+}

@@ -1,0 +1,7 @@
+$pfile "..\\lua\\include.pkg"
+
+module scenario
+{
+	$cfile "ScenarioManager.h"
+}
+

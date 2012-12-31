@@ -1,0 +1,80 @@
+#pragma once
+// Created: Tue Jan 28 20:00:08 2001
+//
+// Copyright (c) 2000 Playnet, Inc., All Rights Reserved.
+// Not to be distributed in API form except as part of a
+// compiled library.
+//
+// Originating Programmer: Shane "Elmo" Wickson
+
+#include "parse/countryCodes.h"
+#include "weap/weapSerial.h"
+#include "weap/weapWeapon.h"
+
+//tolua_begin
+
+struct WEAPON_CLASS
+{
+	WEAPON_SPEC	spec;
+	bool active;
+	char  name[MAX_CLASS_NAME_LEN];
+} ;
+
+// Weapons by spec
+typedef std::map<WEAPON_SPEC,WEAPON*> WEAPON_LIST ;
+// Lists of WEAPON_ARRAYs by country+category+class
+typedef std::map<UINT32, WEAPON_LIST> WEAPON_SPAWNS ;
+
+// g_weaponList defines ALL known vehicles, including unusable ones
+extern WEAPON_LIST g_weaponList ;
+
+// g_weaponSpawns provides lists of which weapons can be spawned
+// by which category of spawner.
+extern WEAPON_SPAWNS g_weaponSpawns ;
+
+//tolua_end
+//tolua_begin
+
+// If you ever have to look up a class name.
+extern WEAPON_CLASS weaponClass[MAX_WEAP_CLASSES];
+
+// returns true once weapListInit() has been called once
+extern LOGICAL weapHasInitialized() ;
+
+// Init the structures
+extern LOGICAL weapListInit(const char* theaterPath);
+
+static inline UINT32 weapClassIndex(const WEAPON_SPEC& spec)
+{
+	return (spec.wClass > 0) ? spec.wClass : ((UINT32)spec.wCategory << 8) ;
+}
+
+// return spawn list for the spec if available
+static inline WEAPON_LIST* weapFindSpawnList(const WEAPON_SPEC& spec)
+{
+	WEAPON_SPAWNS::iterator it = g_weaponSpawns.find(weapClassIndex(spec)) ;
+	return ( it != g_weaponSpawns.end() ) ? &(it->second) : NULL ;
+}
+
+extern WWII_SIDE weapFindSide(const char* side);
+
+// turn country string into weap spec
+extern WEAPON_SPEC	weapFindCountry(const char* country);
+// turn country code string into weap spec
+extern WEAPON_SPEC	weapFindCountryFromCode(const char* cCode);
+
+// turn category aberviation string into a weap spec
+extern WEAPON_SPEC	weapFindCategory(const char* category);
+
+// find a weapon spec by its name (used to match weapon specs to names
+// from the vehicles.txt file on fe etc..) and associate it with a local index
+extern WEAPON_SPEC weapAssociateIndex(const char* weapName, UINT32 localIndex);
+
+// Add a class to the class index.
+extern void weapAddClass(UINT32 classIndex, const char* className) ;
+
+extern void weapListKill(void);
+
+extern void weapAddWeaponIndex(WEAPON* weapon) ;
+
+//tolua_end

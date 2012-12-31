@@ -1,0 +1,306 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 44;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		0857B060116BB49000D3A0EE /* xdelta3.c in Sources */ = {isa = PBXBuildFile; fileRef = 0857B05F116BB49000D3A0EE /* xdelta3.c */; };
+		0857B0C7116BBAEE00D3A0EE /* xdelta3.c in Sources */ = {isa = PBXBuildFile; fileRef = 0857B05F116BB49000D3A0EE /* xdelta3.c */; };
+		0857B0CA116BBAEE00D3A0EE /* xdelta3.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6A0FF2C0290799A04C91782 /* xdelta3.1 */; };
+		8DD76FB00486AB0100D96B5E /* xdelta3.1 in CopyFiles */ = {isa = PBXBuildFile; fileRef = C6A0FF2C0290799A04C91782 /* xdelta3.1 */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		0857B0C9116BBAEE00D3A0EE /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 8;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				0857B0CA116BBAEE00D3A0EE /* xdelta3.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+		8DD76FAF0486AB0100D96B5E /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 8;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+				8DD76FB00486AB0100D96B5E /* xdelta3.1 in CopyFiles */,
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		0857B05F116BB49000D3A0EE /* xdelta3.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = xdelta3.c; sourceTree = "<group>"; };
+		0857B061116BB4A000D3A0EE /* xdelta3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = xdelta3.h; sourceTree = "<group>"; };
+		0857B064116BB4C600D3A0EE /* xdelta3-cfgs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "xdelta3-cfgs.h"; sourceTree = "<group>"; };
+		0857B08F116BB97700D3A0EE /* xdelta3-main.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "xdelta3-main.h"; sourceTree = "<group>"; };
+		0857B0CE116BBAEE00D3A0EE /* xdelta3ppc */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = xdelta3ppc; sourceTree = BUILT_PRODUCTS_DIR; };
+		8DD76FB20486AB0100D96B5E /* xdelta3 */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = xdelta3; sourceTree = BUILT_PRODUCTS_DIR; };
+		C6A0FF2C0290799A04C91782 /* xdelta3.1 */ = {isa = PBXFileReference; lastKnownFileType = text.man; path = xdelta3.1; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		0857B0C8116BBAEE00D3A0EE /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8DD76FAD0486AB0100D96B5E /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		08FB7794FE84155DC02AAC07 /* xdelta3 */ = {
+			isa = PBXGroup;
+			children = (
+				08FB7795FE84155DC02AAC07 /* Source */,
+				C6A0FF2B0290797F04C91782 /* Documentation */,
+				1AB674ADFE9D54B511CA2CBB /* Products */,
+			);
+			name = xdelta3;
+			sourceTree = "<group>";
+		};
+		08FB7795FE84155DC02AAC07 /* Source */ = {
+			isa = PBXGroup;
+			children = (
+				0857B064116BB4C600D3A0EE /* xdelta3-cfgs.h */,
+				0857B08F116BB97700D3A0EE /* xdelta3-main.h */,
+				0857B061116BB4A000D3A0EE /* xdelta3.h */,
+				0857B05F116BB49000D3A0EE /* xdelta3.c */,
+			);
+			name = Source;
+			sourceTree = "<group>";
+		};
+		1AB674ADFE9D54B511CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				8DD76FB20486AB0100D96B5E /* xdelta3 */,
+				0857B0CE116BBAEE00D3A0EE /* xdelta3ppc */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C6A0FF2B0290797F04C91782 /* Documentation */ = {
+			isa = PBXGroup;
+			children = (
+				C6A0FF2C0290799A04C91782 /* xdelta3.1 */,
+			);
+			name = Documentation;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		0857B0C5116BBAEE00D3A0EE /* xdelta3ppc */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0857B0CB116BBAEE00D3A0EE /* Build configuration list for PBXNativeTarget "xdelta3ppc" */;
+			buildPhases = (
+				0857B0C6116BBAEE00D3A0EE /* Sources */,
+				0857B0C8116BBAEE00D3A0EE /* Frameworks */,
+				0857B0C9116BBAEE00D3A0EE /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = xdelta3ppc;
+			productInstallPath = "$(HOME)/bin";
+			productName = xdelta3;
+			productReference = 0857B0CE116BBAEE00D3A0EE /* xdelta3ppc */;
+			productType = "com.apple.product-type.tool";
+		};
+		8DD76FA90486AB0100D96B5E /* xdelta3 */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 1DEB928508733DD80010E9CD /* Build configuration list for PBXNativeTarget "xdelta3" */;
+			buildPhases = (
+				8DD76FAB0486AB0100D96B5E /* Sources */,
+				8DD76FAD0486AB0100D96B5E /* Frameworks */,
+				8DD76FAF0486AB0100D96B5E /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = xdelta3;
+			productInstallPath = "$(HOME)/bin";
+			productName = xdelta3;
+			productReference = 8DD76FB20486AB0100D96B5E /* xdelta3 */;
+			productType = "com.apple.product-type.tool";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			buildConfigurationList = 1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "xdelta3" */;
+			compatibilityVersion = "Xcode 3.0";
+			hasScannedForEncodings = 1;
+			mainGroup = 08FB7794FE84155DC02AAC07 /* xdelta3 */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				8DD76FA90486AB0100D96B5E /* xdelta3 */,
+				0857B0C5116BBAEE00D3A0EE /* xdelta3ppc */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		0857B0C6116BBAEE00D3A0EE /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0857B0C7116BBAEE00D3A0EE /* xdelta3.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		8DD76FAB0486AB0100D96B5E /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0857B060116BB49000D3A0EE /* xdelta3.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		0857B0CC116BBAEE00D3A0EE /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_MODEL_TUNING = G5;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = xdelta3ppc;
+				VALID_ARCHS = ppc;
+			};
+			name = Debug;
+		};
+		0857B0CD116BBAEE00D3A0EE /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_MODEL_TUNING = G5;
+				PRODUCT_NAME = xdelta3ppc;
+				VALID_ARCHS = ppc;
+			};
+			name = Release;
+		};
+		1DEB928608733DD80010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = xdelta3;
+				VALID_ARCHS = i386;
+			};
+			name = Debug;
+		};
+		1DEB928708733DD80010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				PRODUCT_NAME = xdelta3;
+				VALID_ARCHS = i386;
+			};
+			name = Release;
+		};
+		1DEB928A08733DD80010E9CD /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
+				GCC_MODEL_TUNING = G5;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"XD3_DEBUG=0",
+					"XD3_USE_LARGEFILE64=0",
+					"REGRESSION_TEST=1",
+					"SECONDARY_DJW=1",
+					"SECONDARY_FGK=1",
+					"XD3_MAIN=1",
+					"XD3_POSIX=1",
+					"GENERIC_ENCODE_TABLES=0",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				OTHER_CFLAGS = (
+					"-Wall",
+					"-Wshadow",
+					"-fno-builtin",
+				);
+				PREBINDING = NO;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+				WARNING_CFLAGS = "";
+			};
+			name = Debug;
+		};
+		1DEB928B08733DD80010E9CD /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
+				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"XD3_DEBUG=0",
+					"XD3_USE_LARGEFILE64=0",
+					"REGRESSION_TEST=1",
+					"SECONDARY_DJW=1",
+					"SECONDARY_FGK=1",
+					"XD3_MAIN=1",
+					"XD3_POSIX=1",
+					"GENERIC_ENCODE_TABLES=0",
+				);
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				OTHER_CFLAGS = (
+					"-Wall",
+					"-Wshadow",
+					"-fno-builtin",
+				);
+				PREBINDING = NO;
+				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.5.sdk";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0857B0CB116BBAEE00D3A0EE /* Build configuration list for PBXNativeTarget "xdelta3ppc" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0857B0CC116BBAEE00D3A0EE /* Debug */,
+				0857B0CD116BBAEE00D3A0EE /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1DEB928508733DD80010E9CD /* Build configuration list for PBXNativeTarget "xdelta3" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB928608733DD80010E9CD /* Debug */,
+				1DEB928708733DD80010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		1DEB928908733DD80010E9CD /* Build configuration list for PBXProject "xdelta3" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				1DEB928A08733DD80010E9CD /* Debug */,
+				1DEB928B08733DD80010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}

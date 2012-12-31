@@ -1,0 +1,218 @@
+// !$*UTF8*$!
+{
+	0816A456124A5551007C41C4 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 08B62FE6117EA0EB006E72F9 /* ftgl.h */;
+		name = "ftgl.h: 110";
+		rLen = 0;
+		rLoc = 3555;
+		rType = 0;
+		vrLen = 1230;
+		vrLoc = 2653;
+	};
+	0867D690FE84028FC02AAC07 /* Project object */ = {
+		activeBuildConfigurationName = Release;
+		activeTarget = D2AAC09C05546B4700DB518D /* project.mac */;
+		addToTargets = (
+			D2AAC09C05546B4700DB518D /* project.mac */,
+		);
+		codeSenseManager = 08B62F78117E5AC0006E72F9 /* Code sense */;
+		perUserDictionary = {
+			PBXConfiguration.PBXFileTableDataSource3.PBXFileTableDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					1022,
+					20,
+					48,
+					43,
+					43,
+					20,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+					PBXFileDataSource_Target_ColumnID,
+				);
+			};
+			PBXConfiguration.PBXTargetDataSource.PBXTargetDataSource = {
+				PBXFileTableDataSourceColumnSortingDirectionKey = "-1";
+				PBXFileTableDataSourceColumnSortingKey = PBXFileDataSource_Filename_ColumnID;
+				PBXFileTableDataSourceColumnWidthsKey = (
+					20,
+					982,
+					60,
+					20,
+					48,
+					43,
+					43,
+				);
+				PBXFileTableDataSourceColumnsKey = (
+					PBXFileDataSource_FiletypeID,
+					PBXFileDataSource_Filename_ColumnID,
+					PBXTargetDataSource_PrimaryAttribute,
+					PBXFileDataSource_Built_ColumnID,
+					PBXFileDataSource_ObjectSize_ColumnID,
+					PBXFileDataSource_Errors_ColumnID,
+					PBXFileDataSource_Warnings_ColumnID,
+				);
+			};
+			PBXPerProjectTemplateStateSaveDate = 306861335;
+			PBXWorkspaceStateSaveDate = 306861335;
+		};
+		perUserProjectItems = {
+			0816A456124A5551007C41C4 /* PBXTextBookmark */ = 0816A456124A5551007C41C4 /* PBXTextBookmark */;
+			08B62F7D117E5BBA006E72F9 /* PBXTextBookmark */ = 08B62F7D117E5BBA006E72F9 /* PBXTextBookmark */;
+			08B62F7E117E5BBA006E72F9 /* PBXTextBookmark */ = 08B62F7E117E5BBA006E72F9 /* PBXTextBookmark */;
+			08B63041117EA1BA006E72F9 /* PBXTextBookmark */ = 08B63041117EA1BA006E72F9 /* PBXTextBookmark */;
+			08B631A8117EA3D0006E72F9 /* PBXTextBookmark */ = 08B631A8117EA3D0006E72F9 /* PBXTextBookmark */;
+			08B631A9117EA3D0006E72F9 /* PBXTextBookmark */ = 08B631A9117EA3D0006E72F9 /* PBXTextBookmark */;
+			08B631AB117EA3D0006E72F9 /* PBXTextBookmark */ = 08B631AB117EA3D0006E72F9 /* PBXTextBookmark */;
+			08B63255117EAD17006E72F9 /* PBXTextBookmark */ = 08B63255117EAD17006E72F9 /* PBXTextBookmark */;
+		};
+		sourceControlManager = 08B62F77117E5AC0006E72F9 /* Source Control */;
+		userBuildSettings = {
+		};
+	};
+	08B62F77117E5AC0006E72F9 /* Source Control */ = {
+		isa = PBXSourceControlManager;
+		fallbackIsa = XCSourceControlManager;
+		isSCMEnabled = 0;
+		scmConfiguration = {
+			repositoryNamesForRoots = {
+				"" = "";
+			};
+		};
+	};
+	08B62F78117E5AC0006E72F9 /* Code sense */ = {
+		isa = PBXCodeSenseManager;
+		indexTemplatePath = "";
+	};
+	08B62F7D117E5BBA006E72F9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 5073E0C609E734A800EC74B6 /* project.macProj.xcconfig */;
+		name = "project.macProj.xcconfig: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 197;
+		vrLoc = 0;
+	};
+	08B62F7E117E5BBA006E72F9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 5073E0C709E734A800EC74B6 /* project.macTarget.xcconfig */;
+		name = "project.macTarget.xcconfig: 1";
+		rLen = 0;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 377;
+		vrLoc = 0;
+	};
+	08B62F91117E5CA8006E72F9 /* FTBuffer.cpp */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {999, 880}}";
+			sepNavSelRange = "{1167, 0}";
+			sepNavVisRange = "{0, 1247}";
+		};
+	};
+	08B62FE6117EA0EB006E72F9 /* ftgl.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {1200, 2336}}";
+			sepNavSelRange = "{3555, 0}";
+			sepNavVisRange = "{2653, 1230}";
+		};
+	};
+	08B63041117EA1BA006E72F9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 32BAE0B70371A74B00C91783 /* project.mac_Prefix.pch */;
+		name = "project.mac_Prefix.pch: 7";
+		rLen = 0;
+		rLoc = 124;
+		rType = 0;
+		vrLen = 124;
+		vrLoc = 0;
+	};
+	08B63045117EA210006E72F9 /* config.h */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {999, 1072}}";
+			sepNavSelRange = "{89, 0}";
+			sepNavVisRange = "{1015, 916}";
+		};
+	};
+	08B631A8117EA3D0006E72F9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 08B62F91117E5CA8006E72F9 /* FTBuffer.cpp */;
+		name = "FTBuffer.cpp: 26";
+		rLen = 0;
+		rLoc = 1167;
+		rType = 0;
+		vrLen = 1247;
+		vrLoc = 0;
+	};
+	08B631A9117EA3D0006E72F9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 08B631AA117EA3D0006E72F9 /* config.h */;
+		name = "config.h: 1";
+		rLen = 2484;
+		rLoc = 0;
+		rType = 0;
+		vrLen = 978;
+		vrLoc = 0;
+	};
+	08B631AA117EA3D0006E72F9 /* config.h */ = {
+		isa = PBXFileReference;
+		lastKnownFileType = sourcecode.c.h;
+		name = config.h;
+		path = "/Users/ahwulf/XCode/ftgl-2.1.3~rc5/config.h";
+		sourceTree = "<absolute>";
+	};
+	08B631AB117EA3D0006E72F9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 08B63045117EA210006E72F9 /* config.h */;
+		name = "config.h: 4";
+		rLen = 0;
+		rLoc = 89;
+		rType = 0;
+		vrLen = 916;
+		vrLoc = 1015;
+	};
+	08B63255117EAD17006E72F9 /* PBXTextBookmark */ = {
+		isa = PBXTextBookmark;
+		fRef = 08B62FE6117EA0EB006E72F9 /* ftgl.h */;
+		name = "ftgl.h: 110";
+		rLen = 0;
+		rLoc = 3555;
+		rType = 0;
+		vrLen = 1266;
+		vrLoc = 2617;
+	};
+	32BAE0B70371A74B00C91783 /* project.mac_Prefix.pch */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {855, 373}}";
+			sepNavSelRange = "{124, 0}";
+			sepNavVisRange = "{0, 124}";
+		};
+	};
+	5073E0C609E734A800EC74B6 /* project.macProj.xcconfig */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {855, 377}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 197}";
+		};
+	};
+	5073E0C709E734A800EC74B6 /* project.macTarget.xcconfig */ = {
+		uiCtxt = {
+			sepNavIntBoundsRect = "{{0, 0}, {855, 377}}";
+			sepNavSelRange = "{0, 0}";
+			sepNavVisRange = "{0, 377}";
+		};
+	};
+	D2AAC09C05546B4700DB518D /* project.mac */ = {
+		activeExec = 0;
+	};
+}

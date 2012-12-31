@@ -1,0 +1,91 @@
+// systypes.h
+
+#include "platform.h"
+
+#ifndef systypes_HEADER
+#define systypes_HEADER
+
+#if platOS == OS_LINUX
+#include <sys/types.h> // This is where linux keeps its system types!
+#endif
+
+#ifndef TRUE
+#define TRUE 1
+#endif
+
+#ifndef FALSE
+#define FALSE 0
+#endif
+
+#ifndef NULL
+#define NULL 0      /* just in case its not alreay taken care of */
+#endif
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+#ifndef BOOLEAN
+	typedef		unsigned char		BOOLEAN;
+#endif
+
+	// Logical types
+	typedef int				LOGICAL;
+
+	// character types
+	typedef	unsigned char		UCHAR;
+	typedef	char				SCHAR;
+
+	// Signed types
+	typedef char				SINT8;
+	typedef short				SINT16;
+	typedef int				SINT32;
+
+	// Unsigned types
+	typedef unsigned char		UINT8;
+	typedef unsigned short		UINT16;
+	typedef unsigned int			UINT32;
+
+	// Float types; single (32 bits) and double (64 bits)
+	typedef float				FLOAT32;
+	typedef double				FLOAT64;
+
+	// True and False
+	#define TRUE			1
+	#define FALSE			0
+
+	typedef struct tagFLOAT64VECTOR
+	{
+		FLOAT64 x;
+		FLOAT64 y;
+		FLOAT64 z;
+	} FLOAT64VECTOR;
+
+	typedef struct tagFLOAT64ATT
+	{
+		FLOAT64 Roll;
+		FLOAT64 Pitch;
+		FLOAT64 Yaw;
+	} FLOAT64ATT;
+
+	typedef struct tagFLOAT32VECTOR
+	{
+		FLOAT32 x;
+		FLOAT32 y;
+		FLOAT32 z;
+	} FLOAT32VECTOR;
+
+	typedef struct tagFLOAT32ATT
+	{
+		FLOAT32 Roll;
+		FLOAT32 Pitch;
+		FLOAT32 Yaw;
+	} FLOAT32ATT;
+
+
+#ifdef __cplusplus
+}
+#endif
+
+#endif

@@ -1,0 +1,61 @@
+$#include "systypes.h"
+$#include "wwiiHCUnits.h"
+
+$pfile "..\\lua\\include.pkg"
+
+module wwii
+{
+	$cfile "wwiiFullObjID.h"
+	$cfile "wwiiOwnershipEnums.h"
+	$cfile "mmEnums.h"
+	
+	enum HCUNIT_TYPE
+	{
+		HCU_GENERIC,
+		HCU_BRIGADE,
+		HCU_DIVISION,
+		MAX_HCUNIT_TYPES
+	} ;
+	
+	class HCUnit
+	{
+		void setHomeCPID(const FULL_OBJ_ID& newHomeCPID)
+		
+		// Accessors
+		UINT16 unitID();
+		UINT16 parentID();
+		HCUnit* parent();
+		WWII_COUNTRY country();
+		WWII_SIDE side();
+		BRANCH_ENUM branch();
+		const FULL_OBJ_ID& homeCPID();
+		BRANCH_ENUM movementType();
+		const char* name();
+		const ChatHandle& owner();
+		RANK_NO ownerRank();
+		UINT8 rank();
+		HCUNIT_TYPE type();
+		UCHAR unitClass();
+		const ChatHandle& handle();
+		const char* callsign();
+		const char* shortName();
+		
+		bool isAbove(const HCUnit* rhs);
+		bool isAbove(UINT16 rhs);
+		bool isBelow(UINT16 rhs);
+		bool isBelow(const HCUnit* rhs);
+		bool isBelowOrEqual(UINT16 rhs);
+		bool isBelowOrEqual(const HCUnit* rhs);
+		bool isBrigade();
+		bool isDivision();
+		bool isMarineUnit();
+		bool isParatroopUnit();
+		bool isOwner(const ChatHandle& candidate);
+		
+		static HCUnit* Lookup(UINT16 unitID);
+		static HCUnit* Lookup(UINT32 unitID);
+		static HCUnit* Lookup(const ChatHandle& handle)
+		static HCUnit* Lookup(const char* callsign);
+	};
+}
+
