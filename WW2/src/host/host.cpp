@@ -3023,9 +3023,9 @@ main(const int argc, const char* const argv[])
 	wthrInitTime();
 
 	static const UINT32 ClientTimeoutTime_ms = 40 * 1000 ;
-	retval = teulOpenListenInterface("eth0", WWII::Net::Ports::CellHost, _acceptFunction, ClientTimeoutTime_ms, TCP, _personaErrorFunction);
+	retval = teulOpenListenInterface( WWII::Net::Ports::CellHost, _acceptFunction, ClientTimeoutTime_ms, TCP, _personaErrorFunction);
 	if ( retval < 0 )
-		LogAbort("Unable to open eth0 tcp listen port %u retval:%d", WWII::Net::Ports::CellHost, retval) ;
+		LogAbort("Unable to open tcp listen port %u retval:%d", WWII::Net::Ports::CellHost, retval) ;
 
 	sprintf(hostname, "cell%u", Server::localHost & 255) ;
 

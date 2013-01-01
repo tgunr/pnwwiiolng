@@ -19,6 +19,7 @@ namespace WWII
 			{
 			// Internal ports
 				PrivateBcast = 6666					// server<->server backbone
+			,	ClusterBoss = 6001					// Main port for cluster boss.
 			,	InternalAuth = 6002					// Auth<->server interface
 			,	DebugWebServer = 6080				// Debugging web interface
 			,	ChatManagement = 27019				// For rosterClient

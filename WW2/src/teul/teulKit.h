@@ -23,8 +23,8 @@ namespace Teul { }
 
 //	initializes all variables required by the teulTransport system.
 //	flags  indicate the dbug error level (refer to dbug.h) and future options
-//	logType is the log type specified from dbug.h, allways TYPE_FILE on non unix
-//	name -  filename  logType is a file, process name for unix syslog
+//	logType is the log type specified from dbug.h, always TYPE_FILE on non Unix
+//	name -  filename  logType is a file, process name for Unix syslog
 //	confirmFnPtr is called to confirm file inbound file transfers
 //	errorFnPtr is for the user error routine, use null if not required.
 //	killFnPtr is the function that is called for cleanup when teul encounters
@@ -39,7 +39,7 @@ extern SINT32 teulInitTransport(SINT32 logType
 //	there are 48 local connections "built in" to the teul system, and each
 //	is referred to by number (starting with 0).
 
-// opens a prot [portNumber] for listening. Assumes that all callbacks have been properly
+// opens a port [portNumber] for listening. Assumes that all callbacks have been properly
 // installed.
 // [acceptFnPtr] is an optional ptr to callback function which is called when
 // a connection is made to the listening socket, and hence a new connection
@@ -53,13 +53,12 @@ extern SINT32 teulOpenListen(const UINT16 portNumber
 						, ERROR_FUNCTION* errorFnPtr
 						);
 
-// opens a port for listening on all address associated with the specified interface. "eth0" only!
-// Assumes that all callbacks have been properly installed.  returns -error_number or 0 on sucess.
+// opens a port for listening on all address associated with the host's primary interface.
+// Assumes that all callbacks have been properly installed.  returns -error_number or 0 on success.
 // connection acceptFnPtr is an optional ptr to callback function which is
 // called when a connection is made to the listening socket, and hence a new
 // connection is created.  pass NULL if you do not want this notification
-extern SINT32 teulOpenListenInterface(const SCHAR* interfaceName
-						, const UINT16 portNumber
+extern SINT32 teulOpenListenInterface(const UINT16 portNumber
 						, CONNECT_FUNCTION* acceptFnPtr
 						, const SINT32 timeout
 						, const PROTOCOL protocol

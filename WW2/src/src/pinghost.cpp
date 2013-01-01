@@ -146,7 +146,7 @@ main(int /*argc*/, char** /*argv*/)
 
 	//set up the client port, where the FE will connect to on all ips for this interface
 	SINT32 addrIndex ;
-	addrIndex = teulOpenListenInterface("eth0", WWII::Net::Ports::ConnectionList, _acceptAddrConnection, 20000, TCP, _errorFunction);
+	addrIndex = teulOpenListenInterface(WWII::Net::Ports::ConnectionList, _acceptAddrConnection, 20000, TCP, _errorFunction);
 	if ( addrIndex < 0 )
 	{
 		dbugLog(_FLA, "Unable to open connection listing interface") ;
@@ -154,7 +154,7 @@ main(int /*argc*/, char** /*argv*/)
 	}
 
 	SINT32 tcpIndex ;
-	tcpIndex = teulOpenListenInterface("eth0", WWII::Net::Ports::ConnectionTest, _acceptPingConnection, 20000, TCP, _errorFunction);
+	tcpIndex = teulOpenListenInterface(WWII::Net::Ports::ConnectionTest, _acceptPingConnection, 20000, TCP, _errorFunction);
 	if ( tcpIndex < 0 )
 	{
 		dbugLog(_FLA, "Unable to open connection test interface") ;

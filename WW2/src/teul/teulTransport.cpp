@@ -254,7 +254,7 @@ SINT32 teulOpenListen(const UINT16 portNumber
 // connection acceptFnPtr is an optional ptr to callback function which is
 // called when a connection is made to the listening socket, and hence a new
 // connection is created.  pass NULL if you do not want this notification
-SINT32 teulOpenListenInterface(const SCHAR* const interfaceName, const UINT16 portNumber
+SINT32 teulOpenListenInterface(const UINT16 portNumber
 					, CONNECT_FUNCTION* acceptFnPtr
 					, const SINT32 timeout
 					, const PROTOCOL protocol
@@ -264,27 +264,11 @@ SINT32 teulOpenListenInterface(const SCHAR* const interfaceName, const UINT16 po
 	if ( _transportClosing )
 		return -EDEADLK ;
 
-	UINT32 i;
-	SINT32 retval;
-
-	if (interfaceName == NULL)
+	for (UINT32 i = 0; i < Server::myInterface.numIP; ++i)
 	{
-		dbugLog(_FLA, "interface name is NULL");
-		return -EINVAL;
-	}
+		dbugLog(_FLD,"opening listen port on address %s port %d", teulGetAddress(Server::myInterface.addr[i].ip), portNumber);
 
-	if (strncmp(interfaceName, "eth0", sizeof("eth0")) != 0)
-	{
-		dbugLog(_FLA, "interface %s not suported yet, only interface eth0",interfaceName);
-		return -EOPNOTSUPP;
-	}
-
-	for (i = 0; i < Server::myInterface.numIP; ++i)
-	{
-
-		dbugLog(_FLD,"opening listen port on eth0 address %s port %d", teulGetAddress(Server::myInterface.addr[i].ip), portNumber);
-
-		retval = _openListen( Server::myInterface.addr[i].ip
+		const SINT32 retval = _openListen( Server::myInterface.addr[i].ip
 						,  portNumber
 						,  acceptFnPtr
 						,  timeout
