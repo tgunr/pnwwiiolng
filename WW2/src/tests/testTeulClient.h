@@ -23,7 +23,7 @@ struct ClientRole : public Role
 	static SINT32 sendHello(ACTION_OBJECT* const a)
 	{
 		UINT32* randomNo = (UINT32*)a->localRawData ;
-		Iprintf("Sending randomNo = %u, mode = %s.\n", *randomNo, callbacks[a->actionObj].c_str()) ;
+		Iprintf("Sending randomNo = %u\n", *randomNo) ;
 		a->offset = teulPackUINT32(TEUL_PACK, a->packed, a->offset, randomNo, 0) ;
 
 		return a->offset ;
@@ -33,7 +33,7 @@ struct ClientRole : public Role
 	{
 		UINT32 randomNo = 0 ;
 		a->offset = teulPackUINT32(TEUL_UNPACK, a->packed, a->offset, &randomNo, 0) ;
-		Iprintf("Receiving randomNo = %u, mode = %s, a->packed = %p, a->localRawData = %p.\n", randomNo, callbacks[a->actionObj].c_str(), a->packed, a->localRawData) ;
+		Iprintf("Receiving randomNo = %u, a->packed = %p, a->localRawData = %p.\n", randomNo, a->packed, a->localRawData) ;
 
 		sm_gotHello = true ;
 
@@ -99,6 +99,9 @@ struct ClientRole : public Role
 			REGISTER_SENDRECV(Role::Echo_Y, EchoPacketHeader::_send, EchoPacketHeader::_recv, s_cbEcho) ;
 
 			REGISTER_RECEIVEOBJ(Role::ObjTest_Y, TestObject, recvTestObject);
+
+			REGISTER_SENDER(Role::Unregistered_Y, CallbackRegister::NoDataHandler, s_cbUnregistered);
+
 		END_CALLBACK_REGISTRATION
 	}
 
@@ -558,7 +561,7 @@ struct ClientRole : public Role
 	public:
 	void TestObjectMethod(const SINT32 teulIndex)
 	{
-		if (tObjTest.isEnabled() == false)
+		if ( tObjTest.isEnabled() == false )
 			return;
 
 		Dprintf("sending object-method test packets\n");
@@ -567,6 +570,19 @@ struct ClientRole : public Role
 		outgoing.append(s_sourceTestObject);
 		outgoing.send(teulIndex);
 		WaitForTestObjectReply();
+	}
+
+	private:
+	void TestSendUnregistered(const SINT32 teulIndex)
+	{
+		// This callback is not registered on the server as a receiver,
+		// to check this behavior doesn't crash the server.
+		if ( tSendUnreg.isEnabled() == false )
+			return;
+
+		Dprintf("sending unregistered callback\n");
+
+		teulSend(teulIndex, s_cbUnregistered, NULL) ;
 	}
 
 	public: virtual void Run()
@@ -585,6 +601,10 @@ struct ClientRole : public Role
 
 		SendRandom(m_teulIndex, s_cbHello, "via unrel") ;
 		SendRandom(m_teulIndex, s_cbRelHello, "via rel") ;
+
+		TestSendUnregistered(m_teulIndex);
+
+		Delay() ;
 
 		TestDeadEndpointCollection(true, false) ;
 
@@ -629,7 +649,7 @@ struct ClientRole : public Role
 
 		TestEchoPackets() ;
 
-		Delay() ;
+		Delay();
 
 		TestObjectMethod(secondIndex);
 

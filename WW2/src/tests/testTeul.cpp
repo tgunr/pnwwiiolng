@@ -51,7 +51,6 @@
 
 // Specific tests we want to have run.
 
-std::map<TEUL_CALLBACK*, std::string> callbacks ;
 SINT32	s_lastError ;
 
 // Store any configuration settings here for cleanliness.
@@ -352,14 +351,6 @@ struct Role
 		Dprintf("Registering callbacks.\n") ;
 		RegisterCallbacks() ;
 
-		callbacks[s_cbHello] = "unrel" ;
-		callbacks[s_cbRelHello] = "rel" ;
-		callbacks[s_cbPacketTest] = "unrel" ;
-		callbacks[s_cbLargePacket] = "unrel" ;
-		callbacks[s_cbShutdown] = "unrel" ;
-		callbacks[s_cbUnencrypted] = "unrel" ;
-		callbacks[s_cbEcho] = "unrel" ;
-
 		Dprintf("Running.\n") ;
 		Run() ;
 	}
@@ -391,6 +382,7 @@ struct Role
 	static TEUL_CALLBACK* s_cbShutdown ;
 	static TEUL_CALLBACK* s_cbUnencrypted ;
 	static TEUL_CALLBACK* s_cbEcho ;
+	static TEUL_CALLBACK* s_cbUnregistered;	// At least, not as a receiver.
 
 	//////////////////////////////////////////////////////////////////////
 	// Handler for fundamental, low-level teulKit errors which occur
@@ -443,8 +435,9 @@ struct Role
 	,	Shutdown_Y
 	,	Unencrypted_Y
 	,	Echo_Y
+	,	ObjTest_Y
 		// Callbacks we don't specifically register.
-	,	ObjTest_Y = 101
+	,	Unregistered_Y = 100	// Neither send nor receive.
 	} ;
 
 	public:
@@ -579,6 +572,7 @@ TEUL_CALLBACK* Role::s_cbLargePacket ;
 TEUL_CALLBACK* Role::s_cbShutdown ;
 TEUL_CALLBACK* Role::s_cbUnencrypted ;
 TEUL_CALLBACK* Role::s_cbEcho ;
+TEUL_CALLBACK* Role::s_cbUnregistered;
 
 // Include the client role.
 #include "tests/testTeulClient.h"

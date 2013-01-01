@@ -66,6 +66,7 @@ static TestItem tKillServer("killserver", "[client] Send kill message to server 
 
 static TestItem tEncryption("encrypt", "Test encryption algorithms") ;
 
-static TestItem tEchoTest("echotest", "Send thousands of packets and wait for the server to return them.") ;
+static TestItem tEchoTest("echotest", "Send thousands of packets and wait for the server to return them") ;
 
-static TestItem tObjTest("object", "Test the receive object handler") ;
+static TestItem tObjTest("object", "Test the receive object handler");
+static TestItem tSendUnreg("sendunreg", "Test sending a callback not registered by the server");

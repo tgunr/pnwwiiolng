@@ -18,7 +18,7 @@ struct ServerRole : public Role
 	{
 		UINT32 randomNo = 0 ;
 		a->offset = teulPackUINT32(TEUL_UNPACK, a->packed, a->offset, &randomNo, 0) ;
-		Iprintf("Receiving random = %u, mode = %s.\n", randomNo, callbacks[a->actionObj].c_str()) ;
+		Iprintf("Receiving random = %u.\n", randomNo) ;
 
 		if ( tSend.isEnabled() )
 		{
@@ -40,7 +40,7 @@ struct ServerRole : public Role
 	static SINT32 sendHello(ACTION_OBJECT* const a)
 	{
 		UINT32* randomNo = (UINT32*)a->localRawData ;
-		Iprintf("Sending my random number [%u], mode = %s.\n", *randomNo, callbacks[a->actionObj].c_str()) ;
+		Iprintf("Sending my random number [%u].\n", *randomNo) ;
 		a->offset = teulPackUINT32(TEUL_PACK, a->packed, a->offset, (UINT32*)a->localRawData, 0) ;
 		return a->offset ;
 	}
