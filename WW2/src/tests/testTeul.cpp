@@ -29,7 +29,7 @@
 #include "teul/teulEndpointImpl.h"
 
 // Teul::Packet is the new API for sending data
-// that you have sized & marshalled outside of
+// that you have sized & marshaled outside of
 // the normal teulSend -> packer process.
 #include "teul/teulPacket.h"
 #include "teul/teulPacketHeader.h"
@@ -266,6 +266,28 @@ UINT64 EchoPacketHeader::s_requested = 0 ;
 
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
+// Some object-type messages.
+//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+
+#pragma pack(push, 1)
+struct TestObject
+{
+	static const size_t MaxNameLen = 32;
+	char name[MaxNameLen+1];
+	UINT32 intValue;
+	FLOAT32	floatValue;
+	bool setMeTrue;
+	bool setMeFalse;
+	UCHAR charVal;
+	FLOAT64 doubleVal;
+};
+
+static const TestObject s_sourceTestObject = { "Hello World", 74738, 3.434f, true, false, 'Q', 666.999 };
+#pragma pack(pop)
+
+//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 // "Role" base class.
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
@@ -421,6 +443,8 @@ struct Role
 	,	Shutdown_Y
 	,	Unencrypted_Y
 	,	Echo_Y
+		// Callbacks we don't specifically register.
+	,	ObjTest_Y = 101
 	} ;
 
 	public:

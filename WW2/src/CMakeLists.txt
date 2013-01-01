@@ -268,6 +268,7 @@ add_library (libwwii
 	str/strdupptr.h
 	wwii/wwiiClusterConfig.h
 	wwii/wwiiNetPorts.h
+	wwii/wwiiCallbacks.h
 )
 ADD_PCH(libwwii)
 target_link_libraries(libwwii OpenThreads)

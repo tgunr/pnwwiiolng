@@ -109,6 +109,20 @@ struct ServerRole : public Role
 		throw Teul::Error("Somehow we got into sendUnencrypted", -1) ;
 	}
 
+	static SINT32 recvTestObject(ACTION_OBJECT* a, TestObject& msg)
+	{
+		if ( memcmp(&msg, &s_sourceTestObject, sizeof(msg)) != 0 )
+			throw Teul::Error("Received invalid test object.", -EINVAL);
+
+		Iprintf("Received valid test object (%u bytes) - sending reply\n", (UINT32)sizeof(msg));
+
+		Teul::Packet outgoing(sizeof(TestObject), Role::Test_X, Role::ObjTest_Y);
+		outgoing.append(s_sourceTestObject);
+		outgoing.send(*a->endpoint);
+
+		return a->offset;
+	}
+
 	virtual int RegisterCallbacks()
 	{
 		BEGIN_CALLBACK_REGISTRATION(Role::Test_X)
@@ -123,6 +137,8 @@ struct ServerRole : public Role
 			REGISTER_RECEIVER(Role::Shutdown_Y, recvShutdown) ;
 
 			REGISTER_SENDRECV(Role::Echo_Y, EchoPacketHeader::_send, EchoPacketHeader::_recv, s_cbEcho) ;
+
+			REGISTER_RECEIVEOBJ(Role::ObjTest_Y, TestObject, recvTestObject);
 		END_CALLBACK_REGISTRATION
 	}
 

@@ -107,23 +107,23 @@ namespace Teul
 	REQUIRE_CLIENT_DATA()	;	\
 	_CastAs_& _Name_ = *(static_cast<_CastAs_*>(a->m_client)) ;
 
-// ACTION objects ae passed into each send and receive routine conatining
+// ACTION objects are passed into each send and receive routine containing
 // the information needed to create or decode a message.
 struct ACTION_OBJECT
 {
-#if defined _SUPPORT_CPP1_
-	// Required to turn ACTION_OBJECT back into POD now that
-	// a constructor exists.
-	ACTION_OBJECT() = default ;
-	ACTION_OBJECT(const ACTION_OBJECT& rhs) = default ;
-	ACTION_OBJECT& operator = (const ACTION_OBJECT& rhs) = default ;
-#else
+#if __cplusplus <= 199711L
 	ACTION_OBJECT()
 		: teulIndex(-1)
 		, actionObj(NULL), localRawData(NULL), packed(NULL), offset(0), m_size_bytes(0)
 		, fromAddress(0), fromPort(0)
 		, endpoint(NULL), m_client(NULL)
-		{}
+	{}
+#else
+	// Required to turn ACTION_OBJECT back into POD now that
+	// a constructor exists.
+	ACTION_OBJECT() = default ;
+	ACTION_OBJECT(const ACTION_OBJECT& rhs) = default ;
+	ACTION_OBJECT& operator = (const ACTION_OBJECT& rhs) = default ;
 #endif
 
 	ACTION_OBJECT(void* const packed_, const SINT32 offset_bits_, const SINT32 size_bytes_=0)

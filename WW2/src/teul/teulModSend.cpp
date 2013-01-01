@@ -59,7 +59,7 @@ teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback)
 		dbugLog(_FLA,"endpoint not open state = %d, index %d callback %d:%d ", endpoint.state(), endpoint.teulIndex(), callback.callX(), callback.callY()) ;
 		return -ETEUL_CB_CONN_DEAD;
 	}
-	if ( callback.m_sendAction == NULL)
+	if ( callback.m_sendAction == nullptr)
 	{
 		dbugLog(_FLA, "cant execute NULL callback x:%d y:%d", callback.callX(), callback.callY());
 		return -ETEUL_CB_SEND_NULL;

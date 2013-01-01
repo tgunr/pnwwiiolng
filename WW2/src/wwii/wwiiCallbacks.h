@@ -1,5 +1,6 @@
 #pragma once
 
+#include <assert.h>
 #include "teul/teulCallback.h"
 #include "teul/teulCallbackInit.h"
 
@@ -57,6 +58,9 @@
 //! Register a bi-directional teul_network entity.
 #define REGISTER_MSG(y, typeName) { assert(typeName::callback() == NULL) ; typeName::callback() = cbr.callback(y, typeName::callbackSend, typeName::callbackRecv) ; }
 
+//! Receive message to _recv<ObjType>(ACTION_OBJECT*, ObjType&)
+#define REGISTER_RECEIVEOBJ(y, objType, recvFn) cbr.receiveObj<objType>(y, recvFn)
+
 //! Terminate registration block.
 #define END_CALLBACK_REGISTRATION \
 		dbugLog(_FLI, "%s: done", __FUNCTION__) ; \
@@ -69,7 +73,6 @@
 		return -EINVAL ; \
 	}
 
-
 //////////////////////////////////////////////////////////////////////
 //! Teulkit Callback registration-wrapper class.
 //! Use the Macros in wwii/wwiiCallbacks.h instead of accessing
@@ -81,9 +84,21 @@ public:
 	CallbackRegister(UCHAR callX) ;
 	~CallbackRegister() {}
 
-	TEUL_CALLBACK* callback(UCHAR callY, ACTION* sendFn, ACTION* recvFn) ;
-	void sender(UCHAR callY, ACTION* sendFn, TEUL_CALLBACK*& toRef) { assert(toRef == NULL) ; toRef = callback(callY, sendFn, NULL) ; }
-	void receiver(UCHAR callY, ACTION* recvFn) { callback(callY, NULL, recvFn) ; }
+	TEUL_CALLBACK* callback(UCHAR callY, ACTION_FN sendFn, ACTION_FN recvFn) ;
+	void sender(UCHAR callY, ACTION_FN sendFn, TEUL_CALLBACK*& toRef) { assert(toRef == NULL) ; toRef = callback(callY, sendFn, nullptr) ; }
+	void receiver(UCHAR callY, ACTION_FN recvFn) { callback(callY, nullptr, recvFn) ; }
+	template<typename T_>
+	void receiveObj(UCHAR callY, SINT32(*recvFn)(ACTION_OBJECT*, T_&))
+	{
+		auto delegateFn = [=] (ACTION_OBJECT* const a) -> SINT32
+		{
+			if ( a->canRead<T_>() == false )
+				return -EINVAL;
+			T_& objInstance = a->read<T_>();
+			return recvFn(a, objInstance);
+		};
+		callback(callY, nullptr, delegateFn);
+	}
 
 	// No-op handler for sends
 	static SINT32 NoDataHandler(ACTION_OBJECT* const a) ;

@@ -25,13 +25,13 @@ CallbackRegister::CallbackRegister(UCHAR callX)
 }
 
 TEUL_CALLBACK*
-CallbackRegister::callback(UCHAR callY, ACTION* sendFn, ACTION* recvFn)
+CallbackRegister::callback(UCHAR callY, ACTION_FN sendFn, ACTION_FN recvFn)
 {
 	try
 	{
 		sm_ci.callY = callY ;
-		sm_ci.sendAction = sendFn ;
-		sm_ci.recvAction = recvFn ;
+		sm_ci.sendAction = sendFn;
+		sm_ci.recvAction = recvFn;
 		TEUL_CALLBACK* const newRef = teulAllocCallback(&sm_ci) ;
 
 		if ( newRef == NULL )
@@ -50,4 +50,3 @@ CallbackRegister::callback(UCHAR callY, ACTION* sendFn, ACTION* recvFn)
 		throw std::runtime_error(buf) ;	///Terminal
 	}
 }
-

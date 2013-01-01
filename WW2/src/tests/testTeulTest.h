@@ -68,3 +68,4 @@ static TestItem tEncryption("encrypt", "Test encryption algorithms") ;
 
 static TestItem tEchoTest("echotest", "Send thousands of packets and wait for the server to return them.") ;
 
+static TestItem tObjTest("object", "Test the receive object handler") ;
