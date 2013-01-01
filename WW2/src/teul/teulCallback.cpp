@@ -65,10 +65,7 @@ teulAllocCALLBACKi(Teul::CallbackInit* const ci)
 			|| (ci->sendAction != nullptr && prevObject->sendAction() != nullptr)  )
 		{
 			dbugSetErrno(EINVAL);
-			dbugLog(_FLA,"Attempt to allocate an in use callback for x:%d y:%d sendA:%p recvA:%p"
-						, ci->callX, ci->callY
-						, ci->sendAction, ci->recvAction);
-			return NULL;
+			LogAbort("cb:%u,%u Attempt to re-allocate an in use callback", ci->callX, ci->callY);
 		}
 
 		if (ci->sendAction != nullptr)
@@ -140,13 +137,10 @@ teulAllocCallback(Teul::CallbackInit* const ci)
 TEUL_CALLBACK*
 teulAllocSystemCallback(Teul::CallbackInit* const ci)
 {
-	if( ci->callX >= Teul::RestrictedCallbackRange_X || (ci->sendAction == NULL && ci->recvAction == NULL) )
-	{
-		dbugSetErrno(EINVAL);
-		dbugLog(_FLA,"Invalid Parameter for system callback %d: %d send:%p recv:%p"
-				, ci->callX, ci->callY,ci->sendAction, ci->recvAction);
-		return NULL;
-	}
+	if ( ci->callX >= Teul::RestrictedCallbackRange_X )
+		LogAbort("cb:%u,%u: Invalid system callback", ci->callX, ci->callY);
+	if ( ci->sendAction == nullptr && ci->recvAction == nullptr )
+		LogAbort(_FLA, "cb:%u,%u: Invalid send/recv parameters for system callback", ci->callX, ci->callY);
 
 	return teulAllocCALLBACKi(ci);
 }
