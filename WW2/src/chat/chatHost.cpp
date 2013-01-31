@@ -3681,7 +3681,7 @@ main(int argc, char* argv[])
 
 	//Find map server
 
-	const SINT32 clientListenInterface = teulOpenListenInterface("eth0", WWII::Net::Ports::ChatHost, _acceptPlayerConnection, 45000, TCP, _listenErrorFunction);
+	const SINT32 clientListenInterface = teulOpenListenInterface(WWII::Net::Ports::ChatHost, _acceptPlayerConnection, 45000, TCP, _listenErrorFunction);
 	ABORT_IF(clientListenInterface < 0);
 
 	dbugLog(_FLN, "Listening for players on port %u", WWII::Net::Ports::ChatHost);

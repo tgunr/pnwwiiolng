@@ -1287,8 +1287,7 @@ main(int argc, char* argv[])
 
 	//set up the client port, where the FE will connect to on all ips for this interface
 	retval = teulOpenListenInterface(
-				"eth0"
-				, WWII::Net::Ports::MapHost
+				WWII::Net::Ports::MapHost
 				, _acceptUserConnection
 				, 45000
 				, TCP

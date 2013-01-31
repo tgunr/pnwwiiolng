@@ -13,3 +13,6 @@ typedef void			(CONNECT_FUNCTION)(struct ENDPOINT& endpoint) ;
 //! Teul error handlers must take this format.
 typedef void (ERROR_FUNCTION) (SINT32 teulIndex, const UCHAR* const data, SINT32 size, const struct TEUL_CALLBACK* const object, SINT32 error);
 
+#include <functional>
+typedef std::function<SINT32(struct ACTION_OBJECT*)> ACTION_FN;
+

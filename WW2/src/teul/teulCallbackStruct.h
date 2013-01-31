@@ -57,15 +57,15 @@ struct TEUL_CALLBACK
 	UINT32		lastSent;
 	UINT32		xferRate;
 
-	ACTION*			m_sendAction;	// how to send data
-	ACTION*			m_recvAction;	// how to receive data
+	ACTION_FN	m_sendAction;	// how to send data
+	ACTION_FN	m_recvAction;	// how to receive data
 
 	UINT8			m_callX;		// the X and Y position in the callback matrix
 	UINT8			m_callY;		// the developer gets a pointer to obj,
 
 public:
-	ACTION*	sendAction() const { return m_sendAction ; }
-	ACTION*	recvAction() const { return m_recvAction ; }
+	ACTION_FN	sendAction() const { return m_sendAction ; }
+	ACTION_FN	recvAction() const { return m_recvAction ; }
 
 	const UINT8&	callX() const { return m_callX ; }
 	const UINT8&	callY() const { return m_callY ; }
@@ -75,7 +75,7 @@ public:
 
 public:
 	//! @brief Lookup a callback by it's X/Y values packed as bytes in a stream.
-	//! @detail When a callback is transmited ists stucture is flatened or packed into a
+	//! @detail When a callback is transmitted its structure is flattened or packed into a
 	//! character array.  The first 2 characters of this array are the indexes
 	//! to the callback array containing the callback.  This routine
 	//! returns the public TEUL_CALLBACK* for the supplied data.

@@ -23,7 +23,7 @@ struct ClientRole : public Role
 	static SINT32 sendHello(ACTION_OBJECT* const a)
 	{
 		UINT32* randomNo = (UINT32*)a->localRawData ;
-		Iprintf("Sending randomNo = %u, mode = %s.\n", *randomNo, callbacks[a->actionObj].c_str()) ;
+		Iprintf("Sending randomNo = %u\n", *randomNo) ;
 		a->offset = teulPackUINT32(TEUL_PACK, a->packed, a->offset, randomNo, 0) ;
 
 		return a->offset ;
@@ -33,7 +33,7 @@ struct ClientRole : public Role
 	{
 		UINT32 randomNo = 0 ;
 		a->offset = teulPackUINT32(TEUL_UNPACK, a->packed, a->offset, &randomNo, 0) ;
-		Iprintf("Receiving randomNo = %u, mode = %s, a->packed = %p, a->localRawData = %p.\n", randomNo, callbacks[a->actionObj].c_str(), a->packed, a->localRawData) ;
+		Iprintf("Receiving randomNo = %u, a->packed = %p, a->localRawData = %p.\n", randomNo, a->packed, a->localRawData) ;
 
 		sm_gotHello = true ;
 
@@ -74,6 +74,15 @@ struct ClientRole : public Role
 		return a->offset ;
 	}
 
+	static SINT32 recvTestObject(ACTION_OBJECT* a, TestObject& msg)
+	{
+		if ( memcmp(&msg, &s_sourceTestObject, sizeof(msg)) != 0 )
+			throw Teul::Error("Received invalid test object.", -EINVAL);
+		Iprintf("Received test object - looked good (%u bytes)\n", (UINT32)sizeof(msg));
+		sm_gotTestObject = true;
+		return a->offset;
+	}
+
 	virtual int RegisterCallbacks()
 	{
 		BEGIN_CALLBACK_REGISTRATION(Role::Test_X)
@@ -88,6 +97,11 @@ struct ClientRole : public Role
 			REGISTER_SENDER(Role::Shutdown_Y, CallbackRegister::NoDataHandler, s_cbShutdown) ;
 
 			REGISTER_SENDRECV(Role::Echo_Y, EchoPacketHeader::_send, EchoPacketHeader::_recv, s_cbEcho) ;
+
+			REGISTER_RECEIVEOBJ(Role::ObjTest_Y, TestObject, recvTestObject);
+
+			REGISTER_SENDER(Role::Unregistered_Y, CallbackRegister::NoDataHandler, s_cbUnregistered);
+
 		END_CALLBACK_REGISTRATION
 	}
 
@@ -522,6 +536,55 @@ struct ClientRole : public Role
 		WaitForUnencryptedReply() ;
 	}
 
+	private:
+	void WaitForTestObjectReply()
+	{
+		sm_gotTestObject = false;
+
+		if ( tObjTest.isEnabled() == false )
+			return;
+
+		Dprintf("Waiting %ums for a returned test object.\n", Config::ConnectTimeoutMS);
+
+		teulSyncClock();
+		const TeulTimeMS timeout = teulClock64 + Config::ConnectTimeoutMS;
+
+		while ( teulClock64 < timeout && sm_gotTestObject == false )
+		{
+			teulUpdateTransport(5) ;
+		}
+
+		if ( sm_gotTestObject == false )
+			throw Teul::Error("Failed to receive response to our test object reply", 0) ;
+	}
+
+	public:
+	void TestObjectMethod(const SINT32 teulIndex)
+	{
+		if ( tObjTest.isEnabled() == false )
+			return;
+
+		Dprintf("sending object-method test packets\n");
+
+		Teul::Packet outgoing(sizeof(s_sourceTestObject), Role::Test_X, Role::ObjTest_Y);
+		outgoing.append(s_sourceTestObject);
+		outgoing.send(teulIndex);
+		WaitForTestObjectReply();
+	}
+
+	private:
+	void TestSendUnregistered(const SINT32 teulIndex)
+	{
+		// This callback is not registered on the server as a receiver,
+		// to check this behavior doesn't crash the server.
+		if ( tSendUnreg.isEnabled() == false )
+			return;
+
+		Dprintf("sending unregistered callback\n");
+
+		teulSend(teulIndex, s_cbUnregistered, NULL) ;
+	}
+
 	public: virtual void Run()
 	{
 		OpenConnection() ;
@@ -538,6 +601,10 @@ struct ClientRole : public Role
 
 		SendRandom(m_teulIndex, s_cbHello, "via unrel") ;
 		SendRandom(m_teulIndex, s_cbRelHello, "via rel") ;
+
+		TestSendUnregistered(m_teulIndex);
+
+		Delay() ;
 
 		TestDeadEndpointCollection(true, false) ;
 
@@ -564,6 +631,10 @@ struct ClientRole : public Role
 
 		Delay() ;
 
+		TestObjectMethod(m_teulIndex);
+
+		Delay() ;
+
 		BulkOpenTest() ;
 
 		LongDelay() ;
@@ -577,6 +648,10 @@ struct ClientRole : public Role
 		Delay() ;
 
 		TestEchoPackets() ;
+
+		Delay();
+
+		TestObjectMethod(secondIndex);
 
 		Delay() ;
 
@@ -672,9 +747,9 @@ struct ClientRole : public Role
 	// Track whether we have received a "hello".
 	static bool sm_gotHello ;
 	static bool sm_gotUnencrypted ;
+	static bool sm_gotTestObject;
 } ;
 
 bool ClientRole::sm_gotHello = false ;
 bool ClientRole::sm_gotUnencrypted = false ;
-
-
+bool ClientRole::sm_gotTestObject = false;

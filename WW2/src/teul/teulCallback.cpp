@@ -61,21 +61,18 @@ teulAllocCALLBACKi(Teul::CallbackInit* const ci)
 	TEUL_CALLBACK* realObject;
 	if ( prevObject != NULL)
 	{
-		if (  (ci->recvAction != NULL && prevObject->recvAction() != NULL)
-			|| (ci->sendAction != NULL && prevObject->sendAction() != NULL)  )
+		if (  (ci->recvAction != nullptr && prevObject->recvAction() != nullptr)
+			|| (ci->sendAction != nullptr && prevObject->sendAction() != nullptr)  )
 		{
 			dbugSetErrno(EINVAL);
-			dbugLog(_FLA,"Attempt to allocate an in use callback for x:%d y:%d sendA:%p recvA:%p"
-						, ci->callX, ci->callY
-						, ci->sendAction, ci->recvAction);
-			return NULL;
+			LogAbort("cb:%u,%u Attempt to re-allocate an in use callback", ci->callX, ci->callY);
 		}
 
-		if (ci->sendAction != NULL)
+		if (ci->sendAction != nullptr)
 		{
 			prevObject->m_sendAction = ci->sendAction;
 		}
-		if (ci->recvAction != NULL)
+		if (ci->recvAction != nullptr)
 		{
 			prevObject->m_recvAction = ci->recvAction;
 		}
@@ -104,10 +101,10 @@ teulAllocCALLBACKi(Teul::CallbackInit* const ci)
 }
 
 // There are actually two main types of callbacks, System and User.
-// the main diferentiation is that system callbacks are preinstalled
+// the main differentiation is that system callbacks are reinstalled
 // in the teulClient (AKA teulKit) and teulServer and provide the
 // base functionality of teul.  The User callbacks are usable by
-// the aplication programmer for his application.
+// the application programmer for his application.
 
 // this allocates User Callbacks
 TEUL_CALLBACK*
@@ -119,7 +116,7 @@ teulAllocCallback(Teul::CallbackInit* const ci)
 		dbugLog(_FLA,"Invalid Parameter for callback %d: %d", ci->callX, ci->callY );
 		return NULL;
 	}
-	if ( ci->sendAction == NULL && ci->recvAction == NULL )
+	if ( ci->sendAction == nullptr && ci->recvAction == nullptr )
 	{
 		dbugSetErrno(EINVAL);
 		dbugLog(_FLA,"Invalid handlers for callback %d: %d", ci->callX, ci->callY );
@@ -140,13 +137,10 @@ teulAllocCallback(Teul::CallbackInit* const ci)
 TEUL_CALLBACK*
 teulAllocSystemCallback(Teul::CallbackInit* const ci)
 {
-	if( ci->callX >= Teul::RestrictedCallbackRange_X || (ci->sendAction == NULL && ci->recvAction == NULL) )
-	{
-		dbugSetErrno(EINVAL);
-		dbugLog(_FLA,"Invalid Parameter for system callback %d: %d send:%p recv:%p"
-				, ci->callX, ci->callY,ci->sendAction, ci->recvAction);
-		return NULL;
-	}
+	if ( ci->callX >= Teul::RestrictedCallbackRange_X )
+		LogAbort("cb:%u,%u: Invalid system callback", ci->callX, ci->callY);
+	if ( ci->sendAction == nullptr && ci->recvAction == nullptr )
+		LogAbort(_FLA, "cb:%u,%u: Invalid send/recv parameters for system callback", ci->callX, ci->callY);
 
 	return teulAllocCALLBACKi(ci);
 }

@@ -29,7 +29,7 @@
 #include "teul/teulEndpointImpl.h"
 
 // Teul::Packet is the new API for sending data
-// that you have sized & marshalled outside of
+// that you have sized & marshaled outside of
 // the normal teulSend -> packer process.
 #include "teul/teulPacket.h"
 #include "teul/teulPacketHeader.h"
@@ -51,7 +51,6 @@
 
 // Specific tests we want to have run.
 
-std::map<TEUL_CALLBACK*, std::string> callbacks ;
 SINT32	s_lastError ;
 
 // Store any configuration settings here for cleanliness.
@@ -266,6 +265,28 @@ UINT64 EchoPacketHeader::s_requested = 0 ;
 
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
+// Some object-type messages.
+//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
+
+#pragma pack(push, 1)
+struct TestObject
+{
+	static const size_t MaxNameLen = 32;
+	char name[MaxNameLen+1];
+	UINT32 intValue;
+	FLOAT32	floatValue;
+	bool setMeTrue;
+	bool setMeFalse;
+	UCHAR charVal;
+	FLOAT64 doubleVal;
+};
+
+static const TestObject s_sourceTestObject = { "Hello World", 74738, 3.434f, true, false, 'Q', 666.999 };
+#pragma pack(pop)
+
+//////////////////////////////////////////////////////////////////////
+//////////////////////////////////////////////////////////////////////
 // "Role" base class.
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
@@ -330,14 +351,6 @@ struct Role
 		Dprintf("Registering callbacks.\n") ;
 		RegisterCallbacks() ;
 
-		callbacks[s_cbHello] = "unrel" ;
-		callbacks[s_cbRelHello] = "rel" ;
-		callbacks[s_cbPacketTest] = "unrel" ;
-		callbacks[s_cbLargePacket] = "unrel" ;
-		callbacks[s_cbShutdown] = "unrel" ;
-		callbacks[s_cbUnencrypted] = "unrel" ;
-		callbacks[s_cbEcho] = "unrel" ;
-
 		Dprintf("Running.\n") ;
 		Run() ;
 	}
@@ -369,6 +382,7 @@ struct Role
 	static TEUL_CALLBACK* s_cbShutdown ;
 	static TEUL_CALLBACK* s_cbUnencrypted ;
 	static TEUL_CALLBACK* s_cbEcho ;
+	static TEUL_CALLBACK* s_cbUnregistered;	// At least, not as a receiver.
 
 	//////////////////////////////////////////////////////////////////////
 	// Handler for fundamental, low-level teulKit errors which occur
@@ -421,6 +435,9 @@ struct Role
 	,	Shutdown_Y
 	,	Unencrypted_Y
 	,	Echo_Y
+	,	ObjTest_Y
+		// Callbacks we don't specifically register.
+	,	Unregistered_Y = 100	// Neither send nor receive.
 	} ;
 
 	public:
@@ -555,6 +572,7 @@ TEUL_CALLBACK* Role::s_cbLargePacket ;
 TEUL_CALLBACK* Role::s_cbShutdown ;
 TEUL_CALLBACK* Role::s_cbUnencrypted ;
 TEUL_CALLBACK* Role::s_cbEcho ;
+TEUL_CALLBACK* Role::s_cbUnregistered;
 
 // Include the client role.
 #include "tests/testTeulClient.h"

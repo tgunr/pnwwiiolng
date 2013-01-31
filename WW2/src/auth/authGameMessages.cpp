@@ -62,7 +62,7 @@ SINT32 authInstallGameCallbacks(ERROR_FUNCTION* externErrorFn)
 
 	//The recv function setup
 	ci.callY		= AUTH_DISPATCH_Y;
-	ci.sendAction	= NULL;
+	ci.sendAction	= nullptr;
 	ci.recvAction	= _recvDISPATCH;
 
 	_AUTH_DISPATCH = teulAllocCallback(&ci);
@@ -70,14 +70,14 @@ SINT32 authInstallGameCallbacks(ERROR_FUNCTION* externErrorFn)
 	//The send function setup
 	ci.callY		= AUTH_GAME_INIT_Y;
 	ci.sendAction	= _sendGAME_INIT;
-	ci.recvAction	= NULL;
+	ci.recvAction	= nullptr;
 
 	if ( (authGAME_INIT = teulAllocCallback(&ci)) == NULL)
 		return (0-dbugGetErrno());
 
 	//The send function setup
 	ci.callY		= PLAYER_LOGIN_Y;
-	ci.sendAction	= NULL;
+	ci.sendAction	= nullptr;
 	ci.recvAction	= _recvPlayerLogin;
 
 	if ( (_PLAYER_LOGIN = teulAllocCallback(&ci)) == NULL)
@@ -86,14 +86,14 @@ SINT32 authInstallGameCallbacks(ERROR_FUNCTION* externErrorFn)
 	//The send function setup
 	ci.callY		= PLAYER_LOGIN_REPLY_Y;
 	ci.sendAction	= _sendPlayerLoginReply;
-	ci.recvAction	= NULL;
+	ci.recvAction	= nullptr;
 
 	if ( (_PLAYER_LOGIN_REPLY = teulAllocCallback(&ci)) == NULL)
 		return (0-dbugGetErrno());
 
 	//The game ack recv callback
 	ci.callY		= AUTH_GAME_ACK_Y;
-	ci.sendAction	= NULL;
+	ci.sendAction	= nullptr;
 	ci.recvAction	= _recvGAME_ACK;
 
 	if ( (_AUTH_GAME_ACK = teulAllocCallback(&ci)) == NULL)
@@ -102,7 +102,7 @@ SINT32 authInstallGameCallbacks(ERROR_FUNCTION* externErrorFn)
 	//The managementMsg send function setup
 	ci.callY		= GAME_MANAGEMENT_Y;
 	ci.sendAction	= _sendManagementMsg;
-	ci.recvAction	= NULL;
+	ci.recvAction	= nullptr;
 
 	if ( (_MANAGEMENT_MSG = teulAllocCallback(&ci)) == NULL)
 		return (0-dbugGetErrno());
@@ -110,7 +110,7 @@ SINT32 authInstallGameCallbacks(ERROR_FUNCTION* externErrorFn)
 	//server load send msg
 	ci.callY		= SERVER_LOAD_Y;
 	ci.sendAction	= _sendServerLoad;
-	ci.recvAction	= NULL;
+	ci.recvAction	= nullptr;
 
 	if ( (authSERVER_LOAD = teulAllocCallback(&ci)) == NULL)
 		return (0-dbugGetErrno());
@@ -118,7 +118,7 @@ SINT32 authInstallGameCallbacks(ERROR_FUNCTION* externErrorFn)
 	//game capacity send msg
 	ci.callY		= GAME_CAPACITY_Y;
 	ci.sendAction	= _sendGameCapacity;
-	ci.recvAction	= NULL;
+	ci.recvAction	= nullptr;
 
 	if ( (authGAME_CAPACITY = teulAllocCallback(&ci)) == NULL)
 		return (0-dbugGetErrno());
@@ -126,7 +126,7 @@ SINT32 authInstallGameCallbacks(ERROR_FUNCTION* externErrorFn)
 	//The setup for the login init message
 	ci.callY		= GAME_CLEAR_LOGIN_TABLE_Y;
 	ci.sendAction	= _sendClearLoginTable;
-	ci.recvAction	= NULL;
+	ci.recvAction	= nullptr;
 
 	if ( (_INIT_LOGIN = teulAllocCallback(&ci)) == NULL)
 		return (0-dbugGetErrno());

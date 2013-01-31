@@ -24,7 +24,7 @@ namespace Teul
 		SINT32 teulIndex ;
 	} ;
 
-	//! Error that occured at a specific iteration of a loop.
+	//! Error that occurred at a specific iteration of a loop.
 	struct IterationError : public Error
 	{
 		IterationError(size_t iter_, const char* const msg_, const SINT32 error_) : Error(msg_, error_), iter(iter_) {}

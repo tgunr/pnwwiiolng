@@ -18,7 +18,7 @@ struct ServerRole : public Role
 	{
 		UINT32 randomNo = 0 ;
 		a->offset = teulPackUINT32(TEUL_UNPACK, a->packed, a->offset, &randomNo, 0) ;
-		Iprintf("Receiving random = %u, mode = %s.\n", randomNo, callbacks[a->actionObj].c_str()) ;
+		Iprintf("Receiving random = %u.\n", randomNo) ;
 
 		if ( tSend.isEnabled() )
 		{
@@ -40,7 +40,7 @@ struct ServerRole : public Role
 	static SINT32 sendHello(ACTION_OBJECT* const a)
 	{
 		UINT32* randomNo = (UINT32*)a->localRawData ;
-		Iprintf("Sending my random number [%u], mode = %s.\n", *randomNo, callbacks[a->actionObj].c_str()) ;
+		Iprintf("Sending my random number [%u].\n", *randomNo) ;
 		a->offset = teulPackUINT32(TEUL_PACK, a->packed, a->offset, (UINT32*)a->localRawData, 0) ;
 		return a->offset ;
 	}
@@ -109,6 +109,20 @@ struct ServerRole : public Role
 		throw Teul::Error("Somehow we got into sendUnencrypted", -1) ;
 	}
 
+	static SINT32 recvTestObject(ACTION_OBJECT* a, TestObject& msg)
+	{
+		if ( memcmp(&msg, &s_sourceTestObject, sizeof(msg)) != 0 )
+			throw Teul::Error("Received invalid test object.", -EINVAL);
+
+		Iprintf("Received valid test object (%u bytes) - sending reply\n", (UINT32)sizeof(msg));
+
+		Teul::Packet outgoing(sizeof(TestObject), Role::Test_X, Role::ObjTest_Y);
+		outgoing.append(s_sourceTestObject);
+		outgoing.send(*a->endpoint);
+
+		return a->offset;
+	}
+
 	virtual int RegisterCallbacks()
 	{
 		BEGIN_CALLBACK_REGISTRATION(Role::Test_X)
@@ -123,6 +137,8 @@ struct ServerRole : public Role
 			REGISTER_RECEIVER(Role::Shutdown_Y, recvShutdown) ;
 
 			REGISTER_SENDRECV(Role::Echo_Y, EchoPacketHeader::_send, EchoPacketHeader::_recv, s_cbEcho) ;
+
+			REGISTER_RECEIVEOBJ(Role::ObjTest_Y, TestObject, recvTestObject);
 		END_CALLBACK_REGISTRATION
 	}
 
