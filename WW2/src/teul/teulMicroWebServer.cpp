@@ -285,12 +285,12 @@ _sendPhysicalFile(const unsigned int sock, const char* const rootPath, const cha
 		if ( fstat(filefd, &statBuf) < 0 )
 			throw "Inaccessible file" ;
 
-		static const char ok200[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: %s\r\nContent-Language: en\r\nContent-Encoding: UTF-8\r\nContent-Length: %" PROffT "\r\n\r\n" ;
+		static const char ok200[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: %s\r\nContent-Language: en\r\nContent-Encoding: UTF-8\r\nContent-Length: %llu\r\n\r\n" ;
 		char myBuf[sizeof(ok200) + 128] ;
 
 		const char* contentType = _getContentTypeFor(lastDot) ;
 
-		int len = sprintf(myBuf, ok200, contentType, statBuf.st_size) ;
+		int len = sprintf(myBuf, ok200, contentType, (UINT64)statBuf.st_size) ;
 		if ( write(sock, myBuf, len) > 0 )
 		{
 #if defined(HAVE_SYS_SENDFILE_H) && HAVE_SYS_SENDFILE_H == 1

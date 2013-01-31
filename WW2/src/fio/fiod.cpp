@@ -208,7 +208,7 @@ fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 	if ( mem == NULL )
 	{
 		OS_CLOSE(fd) ;
-		DEBUG_FATAL("Out of memory loading '%s' (%"PRSizeT" bytes).", filename, allocSize) ;
+		DEBUG_FATAL("Out of memory loading '%s' (%" PRSizeT " bytes).", filename, allocSize) ;
 		return false ;
 	}
 

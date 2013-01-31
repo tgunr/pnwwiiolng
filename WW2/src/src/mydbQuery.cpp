@@ -219,7 +219,7 @@ DBQuery::DBQuery(DBHANDLE& dbh, const char* query, ...) :
 	if ( stlen == -1 || stlen >= (int)(sizeof(statement) - 1) )
 	{
 		statement[80] = 0 ;
-		sprintf(statement + 80, "... SQL Query > %"PRSizeT" bytes long", sizeof(statement)-1) ;
+		sprintf(statement + 80, "... SQL Query > %" PRSizeT " bytes long", sizeof(statement)-1) ;
 		throw std::logic_error(statement) ;
 	}
 

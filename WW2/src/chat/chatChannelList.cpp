@@ -71,7 +71,7 @@ chatCreateChannel(const ChannelID& channelID, const char* const name, ChatHandle
 	break ;
 	}
 
-	dbugLog(_FLD, "ch:%llu.%u.%u.%llu channel created, numChannels now %"PRSizeT""
+	dbugLog(_FLD, "ch:%llu.%u.%u.%llu channel created, numChannels now %" PRSizeT ""
 						, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID()
 						, _channelIndex.size()) ;
 

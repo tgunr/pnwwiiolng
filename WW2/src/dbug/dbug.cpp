@@ -195,7 +195,7 @@ _openDbugFile(const char* const srcFile_)
 		}
 
 		// Delete the last file.
-		snprintf(ofn, DBUG_MAX_PATH, "%s.%"PRSizeT".log", filename, MAX_FILE_NUM + 1) ;
+		snprintf(ofn, DBUG_MAX_PATH, "%s.%" PRSizeT ".log", filename, MAX_FILE_NUM + 1) ;
 		ofn[DBUG_MAX_PATH] = 0 ;
 		unlink(ofn) ;
 

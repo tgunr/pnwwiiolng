@@ -449,7 +449,7 @@ _getAppTable()
 		LogAbort("%s: %s", __FUNCTION__, e.what()) ;
 	}
 
-	dbugLog(_FLN, "appTable initialized with %"PRSizeT" applications", appTable.size());
+	dbugLog(_FLN, "appTable initialized with %" PRSizeT " applications", appTable.size());
 
 	return true;
 }

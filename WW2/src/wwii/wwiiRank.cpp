@@ -130,7 +130,7 @@ wwiiReadRanks(DBHANDLE& dbh)
 			Rank::add(level, (Rank::TYPE)type, points, description, mask) ;
 		}
 
-		dbugLog(_FLI, "Added %u ranks, %"PRSizeT" in list", dbq.Rows(), Rank::count()) ;
+		dbugLog(_FLI, "Added %u ranks, %" PRSizeT " in list", dbq.Rows(), Rank::count()) ;
 	}
 	catch (std::exception &e)
 	{

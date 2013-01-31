@@ -147,7 +147,7 @@ dbGetWWIIConfig(DBHANDLE& dbh)
 	static bool hasRun = false ;
 	if ( !hasRun )
 	{
-		dbugLog(_FLI, "Loading db config for first time (host_config size = %"PRSizeT" bytes)", sizeof(host_config)) ;
+		dbugLog(_FLI, "Loading db config for first time (host_config size = %" PRSizeT " bytes)", sizeof(host_config)) ;
 		hasRun = true ;
 	}
 
