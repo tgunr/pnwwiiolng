@@ -126,7 +126,7 @@ Player::activate(SINT32 newIndex, PlayerStatusNode* psn)
 
 	Teul::Packet outgoing(sizeof(playerID()), CHAT_X, Chat::MAP_REFRESH_PLAYER_Y) ;
 	outgoing.append(playerID()) ;
-	serverSendPacketToType(outgoing, MAP_MISSION) ;
+	serverSendPacketToType(outgoing, MAP_HOST) ;
 
 	// If they're done loading, add them to the command list
 	readGroups() ;

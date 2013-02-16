@@ -160,6 +160,7 @@ get_ifi_info(int family, bool doAliases)
 		}
 	}
 
+	close(sockfd);
 	memFree(buf);
 	return(ifihead);	// pointer to first structure in linked list
 }

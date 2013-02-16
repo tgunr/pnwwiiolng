@@ -75,7 +75,7 @@ CPStruct::linkTo(const FULL_OBJ_ID& rhs) const
 //////////////////////////////////////////////////////////////////////
 // Check all of the firebases
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 void
 CPStruct::processFirebases(bool incoming)
 {
@@ -178,7 +178,7 @@ CPStruct::updateFriendlyLinkStatus()
 
 	m_friendlyLinked = isLinked ;
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 	resetRouteing() ;
 #endif
 }

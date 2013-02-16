@@ -45,7 +45,7 @@
 #include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiString.h"
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 #include "strt/strtHostDB.h"
 #endif
 
@@ -124,7 +124,7 @@ ObjectStruct::repairVisLevel()
 	setVisLevel(0) ;
 	setSmokeLevel(0) ;
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 # ifdef BRIDGES
 	// If we just repaired a bridge, the ownership needs to change to reflect it
 	if ( type == BUILDING_BRIDGE )
@@ -140,7 +140,7 @@ ObjectStruct::repairVisLevel()
 # endif
 
 	strtQueueVisLevelUpdate(this) ;
-#endif //STRAT_HOST
+#endif //IS_STRAT_HOST
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -152,7 +152,7 @@ ObjectStruct::damagedVisLevel(UINT32 damagedBy)
 	setVisLevel(VISLEVEL_DAMAGED) ;
 	m_damagedBy = damagedBy ;
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 # ifdef BRIDGES
 	// If we just repaired a bridge, the ownership needs to change to reflect it
 	if ( type == BUILDING_BRIDGE )
@@ -173,7 +173,7 @@ ObjectStruct::damagedVisLevel(UINT32 damagedBy)
 # endif
 
 	strtQueueVisLevelUpdate(this) ;
-#endif //STRAT_HOST
+#endif //IS_STRAT_HOST
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -712,7 +712,7 @@ _distributeRPs(CPStruct& cp, SINT32 rpsProduced, WWII_SIDE side)
 				if ( storedRPs != currentFacility->storedRPs )
 				{
 					currentFacility->storedRPs = storedRPs ;
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 					strtSaveFacility(currentFacility) ;
 #endif
 				}
@@ -730,7 +730,7 @@ _distributeRPs(CPStruct& cp, SINT32 rpsProduced, WWII_SIDE side)
 			currentFacility->storedRPs -= rpDemand ;
 			rpsProduced += rpDemand ;
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 			strtSaveFacility(currentFacility);
 #endif
 		}
@@ -970,7 +970,7 @@ _repairFacility(FacilityStruct& facility, WWII_SIDE_ACC& sa, UCHAR* lastPercentD
 		}
 	}
 	//Back Up The Facility
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 	if ( needSave || facility.capacity != originalCapacity )
 		strtSaveFacility(&facility);
 #endif
@@ -1018,7 +1018,7 @@ strtAcceptConvoy(CONVOYSTRUCT& convoy)
 			newRPs = depot->requestThreshold;
 		if ( newRPs != depot->storedRPs )
 		{
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 			depot->storedRPs = newRPs ;
 			//save Facility to DB
 			strtSaveFacility(convoy.link->endDepot);
@@ -1218,7 +1218,7 @@ ObjectStruct::applyDamage(const SINT64& joules, UINT32 originatingSortieID)
 		if ( facility->type == FACILITY_FIREBASE && facility->capacity == 0 )
 			strtProcessFirebase(Facility());
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 		strtSaveFacility(facility);
 #endif
 	}else
@@ -1250,7 +1250,7 @@ ObjectStruct::applyDamage(const SINT64& joules, UINT32 originatingSortieID)
 		repairVisLevel() ;
 	}
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 	if ( joules > SMOKE_JOULES )
 	{
 		// If they create enough joules to make smoke, bump the timer
@@ -1486,7 +1486,7 @@ _recordJoulesApplied(const ObjectStruct& object
 	) ;
 
 	// Notify the mmhost
-	const SINT32 mapIndex = serverGetPeerIndex(MAP_MISSION) ;
+	const SINT32 mapIndex = serverGetPeerIndex(MAP_HOST) ;
 	if ( appliedJoules != 0 && mapIndex >= 0 )
 	{
 		Teul::Packet outgoing(0, Strat::CallbackX, STRT_MM_DAMAGE_EVENT_Y) ;
@@ -1785,7 +1785,7 @@ _checkEnemyLinked(CPStruct& cp)
 		else
 			dbugLog(_FLI,"cp %s is NOT enemy Linked", cp.name);
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 		cp.resetRouteing() ;
 
 		// Tell everyone
@@ -1917,7 +1917,7 @@ strtResetMonkeyHead(ObjectStruct& object, UINT32 visLevel)
 
 	object.facility->recalculateCapacity() ;
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 	strtQueueVisLevelUpdate(&object);
 	strtQueueFacilityStatus(object.facility) ;
 #endif
@@ -1939,7 +1939,7 @@ strtCloseBase(FacilityStruct& facility)
 	//Set the flag on the facility indicating its closed
 	facility.setOpen(false) ;
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 	//save Facility to DB
 	strtSaveFacility(&facility);
 	strtQueueFacilityStatus(&facility) ;
@@ -1960,7 +1960,7 @@ strtOpenBase(FacilityStruct& facility)
 	//Set the flag on the facility indicating its open
 	facility.setOpen(true) ;
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 	//save Facility to DB
 	strtSaveFacility(&facility);
 	strtQueueFacilityStatus(&facility) ;

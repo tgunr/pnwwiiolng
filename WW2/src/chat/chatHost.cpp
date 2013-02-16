@@ -2311,7 +2311,7 @@ _errorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/, const
 		Player* player = PlayerInterface::Lookup(teulIndex) ;
 		if ( player != NULL )
 		{
-			chatHandleTickSample(CHAT_DAEMON, *player, *sample) ;
+			chatHandleTickSample(CHAT_HOST, *player, *sample) ;
 		}
 		else
 			dbugLog(_FLW, "t:%d clock drift host:%llu, client:%llu, delta:%lld, ratio:%.6g", teulIndex, sample->host_ms, sample->client_ms, sample->delta, sample->ratio) ;
@@ -2420,7 +2420,7 @@ _managementErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*siz
 		if ( player != NULL )
 		{
 			dbugLog(_FLW, "t:%d p:%u c:%s clock drift host:%llu, client:%llu, delta:%lld, ratio:%.6g", player->teulIndex(), player->playerID(), player->callsign(), sample->host_ms, sample->client_ms, sample->delta, sample->ratio) ;
-			chatHandleTickSample(CHAT_DAEMON, *player, *sample) ;
+			chatHandleTickSample(CHAT_HOST, *player, *sample) ;
 		}
 	}
 	else
@@ -2569,7 +2569,7 @@ _serverEnterCallback(Server::ServerInfo* server, Server::Code scode)
 
 	switch ( server->stats.type )
 	{
-	case STRAT_DAEMON:
+	case STRAT_HOST:
 		_stratHost = server->stats.address & DIRECT_MASK ;
 		_stratPort = server->stats.port ;
 	break ;
@@ -2589,7 +2589,7 @@ _serverLeaveCallback(Server::ServerInfo* server, Server::Code scode)
 
 	switch ( server->stats.type )
 	{
-	case STRAT_DAEMON:
+	case STRAT_HOST:
 		_stratHost = 0 ;
 		_stratPort = 0 ;
 	break ;
@@ -3568,6 +3568,8 @@ _runHost()
 //////////////////////////////////////////////////////////////////////
 //
 
+const char* const g_serverName = "chatd";
+
 int
 main(int argc, char* argv[])
 {
@@ -3577,8 +3579,8 @@ main(int argc, char* argv[])
 	if ( g_clusterName == NULL )
 		g_clusterName = "?undef?" ;
 
-	Teul::SetAppName("chatd") ;
-	if (teulInitTransport(LOG_TO_FILE, "chatd", _errorFunction, NULL) < 0)//_killFunction
+	Teul::SetAppName(g_serverName) ;
+	if (teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction) < 0)//_killFunction
 		LogAbort("Can't Init transport");
 
 	// Get some environment variables, Before teulGetHost
@@ -3660,7 +3662,7 @@ main(int argc, char* argv[])
 	Server::myServerInfo.stats.port = WWII::Net::Ports::ChatHost ;
 
 	serverInit(HOST_VERSION
-				, CHAT_DAEMON, CHAT_DAEMON
+				, CHAT_HOST, CHAT_HOST
 				, _serverEnterCallback
 				, _serverLeaveCallback
 				, _serverStatusCallback
@@ -3681,8 +3683,8 @@ main(int argc, char* argv[])
 
 	//Find map server
 
-	const SINT32 clientListenInterface = teulOpenListenInterface(WWII::Net::Ports::ChatHost, _acceptPlayerConnection, 45000, TCP, _listenErrorFunction);
-	ABORT_IF(clientListenInterface < 0);
+	if ( !teulOpenListenInterface(WWII::Net::Ports::ChatHost, _acceptPlayerConnection, 45000, _listenErrorFunction) )
+		LogAbort("Opening player connection ports failed.");
 
 	dbugLog(_FLN, "Listening for players on port %u", WWII::Net::Ports::ChatHost);
 
@@ -3736,7 +3738,6 @@ main(int argc, char* argv[])
 
 	_runHost() ;
 
-	teulClose(clientListenInterface) ;
 	teulClose(managementListenInterface) ;
 
 	wwiiIRCTerminate("[[ Normal shutdown ]]") ;

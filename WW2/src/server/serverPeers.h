@@ -10,7 +10,7 @@ SINT16 serverGetPeerIndex(const UINT32 ip) ;
 namespace Teul { class Packet ; }
 bool serverSendPacketToType(Teul::Packet& outgoing, const SERVER_TYPE serverType) ;
 
-//! Send a packet to ALL servers of a given type.
+//! Send a packet to ALL peering servers.
 bool serverSendPacketToPeers(Teul::Packet& outgoing) ;
 
 //! Return true if we're peering with the specified IP address.

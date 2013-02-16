@@ -112,6 +112,11 @@ static SINT32 _playerDelete(PlayerStatusNode* const psn, Server::ReleaseType rel
 extern ERROR_FUNCTION* 	extErrorFn;
 static ENDPOINT* s_broadcastEndpoint = NULL ;
 
+#if defined(SERVER_AS_ENTRY_POINT)
+UINT32 g_portOffset = 0;
+extern const char* const g_serverName;
+#endif
+
 //////////////////////////////////////////////////////////////////////
 // Private functions.
 
@@ -913,7 +918,7 @@ _serverReportAlive(unsigned int fd, const char* /*path*/, const char* /*args*/)
 						, stats.maxPlayers()
 						, stats.numPlayers()
 						) ;
-	write(fd, buffer, len) ;
+	send(fd, buffer, len, 0) ;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1703,3 +1708,32 @@ serverGetClusterCapacity()
 	return clusterCapacity ;
 }
 
+#if defined(SERVER_AS_ENTRY_POINT)
+//////////////////////////////////////////////////////////////////////
+// EXPERIMENTAL: Entry point for all server processes.
+
+int main(int argc, const char* argv[])
+{
+	if ( argc > 1 )
+	{
+		extern bool serverProcessCommandLine(int, const char**);
+		if ( !serverProcessCommandLine(argc, argv) )
+			LogAbort("Invalid command line!\n");
+	}
+
+	Teul::SetAppName(g_serverName);
+	extern ERROR_FUNCTION serverErrorFunction;
+
+	if ( teulInitTransport(LOG_TO_FILE, g_serverName, serverErrorFunction) < 0 )
+		LogAbort("Can't init transport");
+
+	serverEnableDebugWebServer();
+
+	memInit();
+
+	serverInitAddresses();
+
+	extern void serverMain();
+	serverMain();
+}
+#endif

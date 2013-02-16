@@ -25,7 +25,7 @@ Chat::Broadcast::send()
 {
 	Teul::Packet outgoing(sizeof(*this), Chat::CallbackX, Chat::BROADCAST_MESSAGE_Y) ;
 	outgoing.append(*this) ;
-	return serverSendPacketToType(outgoing, CHAT_DAEMON) ;
+	return serverSendPacketToType(outgoing, CHAT_HOST) ;
 }
 
 bool
@@ -34,7 +34,7 @@ chatSendBroadcast(Chat::BCAST_TYPE type, const instanceid_t& instanceID, UINT64 
 {
 	Teul::Packet outgoing(sizeof(Chat::Broadcast), Chat::CallbackX, Chat::BROADCAST_MESSAGE_Y) ;
 	CONSTRUCT_IN_PACKET(outgoing, Chat::Broadcast, Chat::_EVERYONE, instanceID, targetID, prefix, message, ptr0, ptr1, ptr2, ptr3, ptr4, ptr5) ;
-	return serverSendPacketToType(outgoing, CHAT_DAEMON) ;
+	return serverSendPacketToType(outgoing, CHAT_HOST) ;
 }
 
 bool
@@ -77,7 +77,7 @@ chatSendLocalizedMessage(const playerid_t playerID, LSTRING_ID prefix, LSTRING_I
 
 	Teul::Packet outgoing(sizeof(Chat::DirectMessage), Chat::CallbackX, Chat::LOCALIZED_MESSAGE_Y) ;
 	CONSTRUCT_IN_PACKET(outgoing, Chat::DirectMessage, playerID, prefix, message, ptr0, ptr1, ptr2, ptr3, ptr4, ptr5) ;
-	return serverSendPacketToType(outgoing, CHAT_DAEMON) ;
+	return serverSendPacketToType(outgoing, CHAT_HOST) ;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -113,6 +113,6 @@ chatSendTickSample(const UINT32 source, const playerid_t playerID, const void* d
 	auto* sample = CONSTRUCT_IN_PACKET(outgoing, Teul::TickSample, srcSample->host_ms, srcSample->client_ms) ;
 	sample->source = source ;
 	sample->playerID = playerID ;
-	serverSendPacketToType(outgoing, CHAT_DAEMON) ;
+	serverSendPacketToType(outgoing, CHAT_HOST) ;
 }
 

@@ -38,7 +38,7 @@
 #include "mm/mmSpawnGrantResponse.h"
 #endif
 
-#if defined(MAP_HOST)
+#if defined(IS_MAP_HOST)
 # include "map/mapPlayer.h"
 #endif
 

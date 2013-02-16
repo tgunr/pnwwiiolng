@@ -589,7 +589,7 @@ public:
 		{
 			Teul::Packet outgoing(sizeof(UINT32), MISSION_X, HOST_LOCK_MISSION_Y) ;
 			outgoing.append(player.missionID()) ;
-			serverSendPacketToType(outgoing, MAP_MISSION) ;
+			serverSendPacketToType(outgoing, MAP_HOST) ;
 			chatSetMissionOrders(player.missionID(), "Mission set to Private: No new joiners", false) ;
 			return ;
 		}

@@ -53,8 +53,42 @@
  <!-- The process that manages/organizes clusters. -->
  <ClusterBoss>
 	 <Master>
-		<Address>127.0.0.1</Address>
-	</Master>
+		 <Address>127.0.0.1</Address>
+	 </Master>
+   <Plans>
+     <Plan Name="PRODUCTION">
+       <!-- Enacted when environment variable PLAN is set to PRODUCTION -->
+       <Host Priority="0"> <!-- Priority 0: Run on Master -->
+         <Strat/>
+         <DBD/>
+       </Host>
+       <Host Priority="1"> <!-- Priority 1: Run on next available box -->
+         <Chat/>
+       </Host>
+       <Host Priority="1">
+         <Map/>
+         <Ping/>
+       </Host>
+       <Host Priority="9"> <!-- Priority 9: Run on any additional boxes -->
+         <Require>
+           <Network>192.168.11</Network>
+         </Require>
+         <Cell/>
+       </Host>
+     </Plan> <!-- PRODUCTION -->
+     <!-- Insert other plans here -->
+     <Plan>
+       <!-- Default plan -->
+       <Host Priority="0">
+         <Strat/>
+         <DBD/>
+         <Chat/>
+         <Map/>
+         <Ping/>
+         <Cell/>
+       </Host>
+     </Plan>
+   </Plans>
  </ClusterBoss>
  
  <StratHost>

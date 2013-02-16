@@ -83,7 +83,7 @@ _runTest(UINT32 address)
 int
 main(int argc, char* argv[])
 {
-	teulInitTransport(LOG_TO_FILE, "./testAuthConnect", NULL, NULL) ;
+	teulInitTransport(LOG_TO_FILE, "./testAuthConnect", NULL) ;
 
 	teulSyncClock() ;
 

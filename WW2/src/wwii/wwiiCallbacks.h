@@ -59,7 +59,7 @@
 #define REGISTER_MSG(y, typeName) { assert(typeName::callback() == NULL) ; typeName::callback() = cbr.callback(y, typeName::callbackSend, typeName::callbackRecv) ; }
 
 //! Receive message to _recv<ObjType>(ACTION_OBJECT*, ObjType&)
-#define REGISTER_RECEIVEOBJ(y, objType, recvFn) cbr.receiveObj<objType>(y, recvFn)
+#define REGISTER_RECEIVEOBJ(CallY, ObjType, RecvFn) cbr.receiveObj<ObjType>(CallY, RecvFn)
 
 //! Terminate registration block.
 #define END_CALLBACK_REGISTRATION \
@@ -90,7 +90,7 @@ public:
 	template<typename T_>
 	void receiveObj(UCHAR callY, SINT32(*recvFn)(ACTION_OBJECT*, T_&))
 	{
-		auto delegateFn = [=] (ACTION_OBJECT* const a) -> SINT32
+		auto delegateFn = [=] (ACTION_OBJECT* a) -> SINT32
 		{
 			if ( a->canRead<T_>() == false )
 				return -EINVAL;

@@ -20,6 +20,11 @@
 #include <sys/sendfile.h>
 #endif
 
+#include <event2/event.h>
+#if platOS == OS_WIN32
+# pragma comment(lib, "event.lib")
+# pragma comment(lib, "ws2_32.lib")
+#endif
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
@@ -47,7 +52,7 @@ _sendString200(const int fd, const std::string& content)
 	static const char ok200[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: text/application-json\r\nContent-Language: en\r\nContent-Encoding: UTF-8\r\nContent-Length: %u\r\n\r\n%s\n" ;
 	char* buf = new char[sizeof(ok200) + content.length() + 1] ;
 	int bytes = sprintf(buf, ok200, content.length() + 1, content.c_str()) ;
-	write(fd, buf, bytes) ;
+	send(fd, buf, bytes, 0) ;
 	delete [] buf;
 }
 
@@ -66,8 +71,8 @@ _establishListenSocket(const unsigned short port_)
 	}
 
 	// Allow re-use of the socket so server down/up doesn't cause a problem.
-	int reuse = 1 ;
-	setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (char*)&reuse, sizeof(reuse)) ;
+	evutil_make_listen_socket_reuseable(sock);
+	evutil_make_socket_closeonexec(sock);
 
 	// Describe our end of the socket we want:
 	//  IPv4 (AF_INET), all addresses (INADDR_ANY) and the specified port.
@@ -91,6 +96,8 @@ _establishListenSocket(const unsigned short port_)
 		close(sock) ;
 		return listenResult ;
 	}
+
+	evutil_make_listen_socket_reuseable(sock);
 
 	printf("uWebServer socket:%u listening on port %hu\n", sock, port_) ;
 
@@ -192,7 +199,7 @@ Teul::uWeb::Server::run()
 			continue ;
 		}
 
-		int bytes = read(newSock, buffer, sizeof(buffer) - 1) ;
+		int bytes = recv(newSock, buffer, sizeof(buffer) - 1, 0) ;
 		buffer[bytes] = 0 ;
 
 		try
@@ -204,11 +211,15 @@ Teul::uWeb::Server::run()
 			static const char errFmt[] = "HTTP/1.1 %u %s\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: text/html\r\nContent-Language: en\r\nAllow: GET\r\n\r\n<html><head><title>%u %s</title></head><body><h1>ERROR %u: %s</h1></body></html>\r\n\r\n" ;
 			char* myBuf = new char[sizeof(errFmt) + e.m_error.size() * 3 + 32] ;
 			const int len = sprintf(myBuf, errFmt, e.m_code, e.m_error.c_str(), e.m_code, e.m_error.c_str(), e.m_code, e.m_error.c_str()) ;
-			write(newSock, myBuf, len) ;
+			send(newSock, myBuf, len, 0) ;
 			delete [] myBuf;
 		}
 
+#if platOS == OS_WIN32
+		closesocket(newSock);
+#else
 		close(newSock) ;
+#endif
 	}
 }
 
@@ -220,7 +231,7 @@ _callHandler(const unsigned int sock, Teul::uWeb::Server::VirtualFileHandler han
 {
 	// Write the HTTP header first
 	static const char ok200[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: text/javascript\r\nContent-Language: en\r\nContent-Encoding: UTF-8\r\n\r\n" ;
-	write(sock, ok200, sizeof(ok200) - 1) ;
+	send(sock, ok200, sizeof(ok200) - 1, 0) ;
 
 	// Call the handler to write the content.
 	(handler)(sock, path, args) ;
@@ -278,6 +289,8 @@ _sendPhysicalFile(const unsigned int sock, const char* const rootPath, const cha
 		filepath += '/';
 #endif
 		filefd = open(filepath.c_str(), O_RDONLY);
+		if ( filefd < 0 )
+			throw "Not found";
 #endif
 
 		// Stat the file so we can get it's size, use the
@@ -291,7 +304,7 @@ _sendPhysicalFile(const unsigned int sock, const char* const rootPath, const cha
 		const char* contentType = _getContentTypeFor(lastDot) ;
 
 		int len = sprintf(myBuf, ok200, contentType, (UINT64)statBuf.st_size) ;
-		if ( write(sock, myBuf, len) > 0 )
+		if ( send(sock, myBuf, len, 0) > 0 )
 		{
 #if defined(HAVE_SYS_SENDFILE_H) && HAVE_SYS_SENDFILE_H == 1
 			// The first write might fail, if it does we don't care
@@ -304,7 +317,7 @@ _sendPhysicalFile(const unsigned int sock, const char* const rootPath, const cha
 				size_t readBytes = read(filefd, xferBuffer, sizeof(xferBuffer)) ;
 				if ( readBytes <= 0 )
 					break ;
-				size_t wroteBytes = write(sock, xferBuffer, readBytes) ;
+				size_t wroteBytes = send(sock, xferBuffer, readBytes, 0) ;
 				if ( wroteBytes < readBytes )
 					break ;
 			}

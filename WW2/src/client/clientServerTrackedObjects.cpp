@@ -204,7 +204,7 @@ bool clientReceiveServerTrackedObject(UINT16 type, ACTION_OBJECT* a)
 
 				// if this is my pilot
 				if(commander && commander == sto->owner())
-					vehmainBailout(dynamic_cast<BailoutSTO*>(sto));
+					vehmainBailout(static_cast<BailoutSTO*>(sto));
 			}
 		}
 	}

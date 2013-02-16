@@ -106,8 +106,6 @@ UINT32 myMaxUsers ;
 
 UINT32 hostAddress = 0;
 
-static bool _running = true ;
-
 static SINT32 _userConnections = 0;
 
 UINT32 mmStratInternalAddress = 0;
@@ -149,7 +147,7 @@ mapSendActivate(SINT32 teulIndex, const playerid_t playerID, const char* callsig
 {
 	WWII_ACTIVATE activate;
 
-	activate.serverType = MAP_MISSION;
+	activate.serverType = MAP_HOST;
 	activate.hostIP = Server::myServerInfo.stats.address;
 	activate.port = WWII::Net::Ports::MapHost ;
 	activate.teulIndex = 0 ;
@@ -197,7 +195,7 @@ class PersonaMirrorTo : public Server::PersonaMirror
 
 template<>
 SINT32
-PersonaMirrorTo<CHAT_DAEMON>::onComplete(SINT32 resultCode) const
+PersonaMirrorTo<CHAT_HOST>::onComplete(SINT32 resultCode) const
 {
 	Player* const player = PlayerInterface::Lookup(dispatch().m_customerID) ;
 	if ( player == NULL )
@@ -253,7 +251,7 @@ PersonaMirrorTo<_ServerType>::onComplete(SINT32 resultCode) const
 bool
 Player::mirrorToChat()
 {
-	Server::ServerInfo* const server = Server::ServerInfo::GetBest(CHAT_DAEMON);
+	Server::ServerInfo* const server = Server::ServerInfo::GetBest(CHAT_HOST);
 	if ( server == NULL )
 	{
 		dbugLog(_FLA, "No chat server for logins!") ;
@@ -274,7 +272,7 @@ Player::mirrorToChat()
 	this->log(_FLD, "mirroring to chat host %s", teulGetAddress(server->stats.address)) ;
 
 	// Create the xfer node
-	auto mirror = new PersonaMirrorTo<CHAT_DAEMON>(pxd, server, "chat") ;
+	auto mirror = new PersonaMirrorTo<CHAT_HOST>(pxd, server, "chat") ;
 
 	// Do teul magic (send the mirror instruction to the player, and forewarn chat).
 	server->mirrorPlayer(mirror) ;
@@ -436,7 +434,7 @@ _sendAuthHostStats()
 
 	// Because we redirect players to chat, players connected here
 	// won't show up.
-	SINT32 chatPlayers = serverGetPlayerCount(CHAT_DAEMON) ;
+	SINT32 chatPlayers = serverGetPlayerCount(CHAT_HOST) ;
 	if ( chatPlayers > totalPlayers )
 		totalPlayers = chatPlayers ;
 
@@ -461,12 +459,12 @@ _sendAuthHostStats()
 		lastCapReported = myMaxUsers ;
 	}
 
-	if ( _stratReady == false || Server::ServerInfo::IsAvailable(STRAT_DAEMON) == false )
+	if ( _stratReady == false || Server::ServerInfo::IsAvailable(STRAT_HOST) == false )
 	{
 		_zeroUserCapacity("No strat host available") ;
 		host_config.arena.lock = ~0 ;
 	}
-	if ( Server::ServerInfo::IsAvailable(CHAT_DAEMON) == false )
+	if ( Server::ServerInfo::IsAvailable(CHAT_HOST) == false )
 		_zeroUserCapacity("No chat host available") ;
 	else if ( Server::ServerInfo::IsAvailable(CELL_HOST) == false )
 		_zeroUserCapacity("No cell hosts available") ;
@@ -524,7 +522,7 @@ _errorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEU
 		if ( player != NULL )
 		{
 			dbugLog(_FLD, "t:%d p:%u c:%s clock drift host:%llu, client:%llu, delta:%lld, ratio:%.6g", player->teulIndex(), player->playerID(), player->callsign(), sample->host_ms, sample->client_ms, sample->delta, sample->ratio) ;
-			chatSendTickSample(MAP_MISSION, player->playerID(), data) ;
+			chatSendTickSample(MAP_HOST, player->playerID(), data) ;
 		}
 		else
 			dbugLog(_FLW, "t:%d clock drift host:%llu, client:%llu, delta:%lld, ratio:%.6g", teulIndex, sample->host_ms, sample->client_ms, sample->delta, sample->ratio) ;
@@ -533,19 +531,6 @@ _errorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEU
 	{
 		dbugLog(_FLW, "t:%d teul Error %d", teulIndex, error);
 	}
-}
-
-static void
-_kill(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error)
-{
-	dbugLog(_FLW, "t:%d called %s", teulIndex, __FUNCTION__) ;
-	Server::myServerInfo.stats.status = Server::SERVER_INITIALIZING;  //ready to receive missions
-	Server::myServerInfo.sync() ;
-
-	if ( ! _running )
-		exit(1) ;
-
-	_running = false ;
 }
 
 static const char*
@@ -616,7 +601,7 @@ _connectToStrat()
 		teulUpdateTransport(25);
 		if ( _stratReady )
 		{
-			const Server::ServerInfo* const server = Server::ServerInfo::GetBest(STRAT_DAEMON, true) ;
+			const Server::ServerInfo* const server = Server::ServerInfo::GetBest(STRAT_HOST, true) ;
 			if (server != NULL)
 			{
 				_stratHost = Server::broadcastNet & 0xffffff00;
@@ -648,7 +633,7 @@ _connectToStrat()
 static bool
 _checkChatMaster()
 {
-	Server::ServerInfo* server = Server::ServerInfo::GetBest(CHAT_DAEMON, true);
+	Server::ServerInfo* server = Server::ServerInfo::GetBest(CHAT_HOST, true);
 	if ( server == NULL )
 	{
 		_chatReady = false ;
@@ -680,7 +665,7 @@ _connectToChat()
 {
 	dbugLog(_FLN,"Waiting for chat host");
 	//Spin merrily along here until we find a chat host
-	while ( serverPeeringWithType(CHAT_DAEMON) == false )
+	while ( serverPeeringWithType(CHAT_HOST) == false )
 	{
 		if ( _checkChatMaster() )
 			return ;
@@ -778,7 +763,7 @@ static void
 _checkStratMaster()
 {
 	// Update the strat host master
-	Server::ServerInfo* server = Server::ServerInfo::GetBest(STRAT_DAEMON, true);
+	Server::ServerInfo* server = Server::ServerInfo::GetBest(STRAT_HOST, true);
 	if (server != NULL)
 	{
 		_stratHost = server->stats.address;
@@ -804,7 +789,7 @@ _serverEnterCallback(Server::ServerInfo* server, Server::Code scode)
 	dbugLog(_FLN,"server %s added code %d",teulGetAddress(server->stats.address),scode);
 #endif
 
-	if ( server->stats.type == STRAT_DAEMON && server->stats.status == Server::SERVER_ACCEPTING )
+	if ( server->stats.type == STRAT_HOST && server->stats.status == Server::SERVER_ACCEPTING )
 	{
 		dbugLog(_FLI, "strat server is accepting") ;
 		_stratReady = true ;
@@ -813,7 +798,7 @@ _serverEnterCallback(Server::ServerInfo* server, Server::Code scode)
 	_sendAuthHostStats() ;
 
 	_updateMasterInfo();
-	if ( server->stats.type == CHAT_DAEMON )
+	if ( server->stats.type == CHAT_HOST )
 	{
 		missCancelAllMobileSpawns() ;
 	}
@@ -832,7 +817,7 @@ _serverLeaveCallback(Server::ServerInfo* server, Server::Code scode)
 
 	_sendAuthHostStats() ;
 
-	if (server->stats.type==STRAT_DAEMON)
+	if (server->stats.type == STRAT_HOST)
 	{
 		dbugLog(_FLN,"lost strat connection, resetting server");
 
@@ -847,7 +832,7 @@ _serverLeaveCallback(Server::ServerInfo* server, Server::Code scode)
 
 	_updateMasterInfo();
 
-	if ( server->stats.type == CHAT_DAEMON )
+	if ( server->stats.type == CHAT_HOST )
 	{
 		missCancelAllMobileSpawns() ;
 	}
@@ -864,7 +849,7 @@ _serverStatusCallback(Server::ServerInfo* server, Server::Code scode)
 	dbugLog(_FLN,"server status changed for %s, code is %d status is %d", teulGetAddress(server->stats.address),scode, server->stats.status);
 #endif
 
-	if ( server->stats.type == STRAT_DAEMON )
+	if ( server->stats.type == STRAT_HOST )
 	{
 		if ( server->stats.status == Server::SERVER_ACCEPTING )
 		{
@@ -1171,7 +1156,7 @@ main(int argc, char* argv[])
 
 	//Open transport for logging
 	Teul::SetAppName("mmhostd") ;
-	if ( teulInitTransport(LOG_TO_FILE, "mmhostd", _errorFunction, _kill) < 0 )
+	if ( teulInitTransport(LOG_TO_FILE, "mmhostd", _errorFunction) < 0 )
 		LogAbort("Cannot initialize teulTransport") ;
 
 	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | DEF_ERR_FLAGS));
@@ -1243,7 +1228,7 @@ main(int argc, char* argv[])
 	Server::myServerInfo.stats.port = WWII::Net::Ports::MapHost;
 
 	serverInit(HOST_VERSION
-				, MAP_MISSION, AUTH_HOST
+				, MAP_HOST, AUTH_HOST
 				, _serverEnterCallback
 				, _serverLeaveCallback
 				, _serverStatusCallback
@@ -1286,14 +1271,7 @@ main(int argc, char* argv[])
 	mapLoadWeaponIndexes() ;
 
 	//set up the client port, where the FE will connect to on all ips for this interface
-	retval = teulOpenListenInterface(
-				WWII::Net::Ports::MapHost
-				, _acceptUserConnection
-				, 45000
-				, TCP
-				, _errorFunction
-				);
-	if (retval < 0)
+	if ( !teulOpenListenInterface(WWII::Net::Ports::MapHost, _acceptUserConnection, 45000, _errorFunction) )
 		LogAbort("Error allocating endpoint!");
 
 	authSetGameCapacity(0, 0, Server::myServerInfo.stats.arenaID, AL_SYNCING);
@@ -1371,7 +1349,7 @@ mapSmiteCustomer(const playerid_t playerID)
 SINT32
 mmSendToChat(TEUL_CALLBACK* callback, void* data)
 {
-	if ( serverSendCallbackToType(CHAT_DAEMON, callback, data) == false )
+	if ( serverSendCallbackToType(CHAT_HOST, callback, data) == false )
 		return -EINVAL ;
 	return 0 ;
 }

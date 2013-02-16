@@ -20,7 +20,8 @@
 #include "wwii/wwiiTypes.h"
 
 typedef std::vector<UINT32> ADDRESS_LIST ;
-extern const ADDRESS_LIST& teulGetAddresses() ;
+extern void teulGetAddresses(ADDRESS_LIST&) ;
+static ADDRESS_LIST s_addresses ;
 
 #ifdef BETA_RELEASE
 	#define DEF_ERR_LEVEL Debug::ERR_DBUG
@@ -34,8 +35,6 @@ extern const ADDRESS_LIST& teulGetAddresses() ;
 static TEUL_CALLBACK* _SEND_ADDRESSES ;
 static TEUL_CALLBACK* _XCHG_PING ;
 
-static ADDRESS_LIST _addresses ;
-
 //////////////////////////////////////////////////////////////////////
 
 static void
@@ -44,12 +43,6 @@ _errorFunction(SINT32 /* teulIndex */, const UCHAR* const /*data*/, SINT32 /*siz
 }
 
 //////////////////////////////////////////////////////////////////////
-
-static void
-_kill(SINT32 /*teulIndex*/, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 /*error*/)
-{
-	exit (0);
-}
 
 static void
 _acceptAddrConnection(ENDPOINT& endpoint)
@@ -77,11 +70,11 @@ _sendAddresses(ACTION_OBJECT* const a)
 
 	if ( !initialized )
 	{
-		UINT32 count = _addresses.size() ;
+		UINT32 count = s_addresses.size() ;
 		bufSize = teulPackUINT32(TEUL_PACK, buf, bufSize, &count, 16) ;
 		for ( UINT32 i = 0 ; i < count ; ++i )
 		{
-			bufSize = teulPackUINT32(TEUL_PACK, buf, bufSize, &_addresses[i], 0) ;
+			bufSize = teulPackUINT32(TEUL_PACK, buf, bufSize, &s_addresses[i], 0) ;
 		}
 		bufSize = teulPackUINT16(TEUL_PACK, buf, bufSize, &testPort, 0) ;
 		bufSize = teulPackUINT16(TEUL_PACK, buf, bufSize, &testProtocol, 0) ;
@@ -132,10 +125,12 @@ _registerCallbacks(void)
 //////////////////////////////////////////////////////////////////////
 // Main entry point
 
+static const char* g_serverName = "pingHost";
+
 int
 main(int /*argc*/, char** /*argv*/)
 {
-	teulInitTransport(LOG_TO_FILE, "pingHost", _errorFunction, _kill);
+	teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction);
 
 	dbugSetWriteLevel(Debug::ERR_INFO | DEF_ERR_FLAGS);
 	dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
@@ -144,31 +139,20 @@ main(int /*argc*/, char** /*argv*/)
 
 	_registerCallbacks() ;
 
-	//set up the client port, where the FE will connect to on all ips for this interface
-	SINT32 addrIndex ;
-	addrIndex = teulOpenListenInterface(WWII::Net::Ports::ConnectionList, _acceptAddrConnection, 20000, TCP, _errorFunction);
-	if ( addrIndex < 0 )
-	{
-		dbugLog(_FLA, "Unable to open connection listing interface") ;
-		exit(EINVAL) ;
-	}
+	//set up the client port, where the FE will connect to on all IPs for this interface
+	if ( !teulOpenListenInterface(WWII::Net::Ports::ConnectionList, _acceptAddrConnection, 20000, _errorFunction) )
+		LogAbort(_FLA, "Unable to open connection listing interface") ;
 
-	SINT32 tcpIndex ;
-	tcpIndex = teulOpenListenInterface(WWII::Net::Ports::ConnectionTest, _acceptPingConnection, 20000, TCP, _errorFunction);
-	if ( tcpIndex < 0 )
-	{
-		dbugLog(_FLA, "Unable to open connection test interface") ;
-		exit(EINVAL) ;
-	}
+	if ( !teulOpenListenInterface(WWII::Net::Ports::ConnectionTest, _acceptPingConnection, 20000, _errorFunction) )
+		LogAbort("Unable to open connection test interface") ;
 
-	_addresses = teulGetAddresses() ;
-
-	if ( _addresses.size() == 0 )
+	teulGetAddresses(s_addresses) ;
+	if ( s_addresses.empty() == true )
 		LogAbort("No network interfaces found") ;
 
-	for ( UINT32 i = 0 ; i < _addresses.size() ; ++i )
+	for ( UINT32 i = 0 ; i < s_addresses.size() ; ++i )
 	{
-		dbugLog(_FLI, "address #%u: %s", i, teulGetAddress(_addresses[i])) ;
+		dbugLog(_FLI, "address #%u: %s", i, teulGetAddress(s_addresses[i])) ;
 	}
 
 	while (true)

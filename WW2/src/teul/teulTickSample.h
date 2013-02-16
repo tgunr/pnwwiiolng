@@ -22,7 +22,7 @@ namespace Teul
 		TeulDeltaMS	delta ;			//!< Discrepancy
 		double		ratio ;			//!< client_ms / host_ms .. so > 1.0 = cheat
 
-		UINT32		source ;		//!< MAP_MISSION, CHAT_DAEMON, etc.
+		UINT32		source ;		//!< server type enum, e.g. CHAT_HOST.
 		playerid_t	playerID ;		//!< PlayerID
 	} ;
 #pragma pack(pop)

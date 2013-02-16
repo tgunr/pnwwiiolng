@@ -469,7 +469,7 @@ chatSendUMSKill(const Player* player, const UINT32 stoUID)
 	Teul::Packet outgoing(0, Scoring::CallbackX, Scoring::EVENT_Y) ;
 	CONSTRUCT_IN_PACKET(outgoing, Scoring::UMSKill, actShooter, stoUID) ;
 
-	return serverSendPacketToType(outgoing, MAP_MISSION) ;
+	return serverSendPacketToType(outgoing, MAP_HOST) ;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -518,7 +518,7 @@ chatSendPopulation()
 
 	dbugLog(_FLD, "sending population notice: %u:%u:%u:%u", sideCounts[0], sideCounts[1], sideCounts[2], sideCounts[3]) ;
 
-	return serverSendPacketToType(outgoing, STRAT_DAEMON) ? 0 : -ENOTCONN ;
+	return serverSendPacketToType(outgoing, STRAT_HOST) ? 0 : -ENOTCONN ;
 }
 
 
@@ -530,7 +530,7 @@ chatSendMissionDeleteRequest(const UINT32& missionID)
 {
 	Teul::Packet outgoing(0, Chat::CallbackX, Chat::MISSION_DELETION_Y) ;
 	outgoing.append(missionID) ;
-	return serverSendPacketToType(outgoing, MAP_MISSION) ? 0 : -ENOTCONN ;
+	return serverSendPacketToType(outgoing, MAP_HOST) ? 0 : -ENOTCONN ;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -660,7 +660,7 @@ chatSendBackupLeaderChange(UINT32 missionID, UINT32 playerID)
 {
 	Teul::Packet outgoing(0, Chat::CallbackX, Chat::MISSION_LEADER_CHANGE_Y) ;
 	CONSTRUCT_IN_PACKET(outgoing, LeaderChange, missionID, playerID, 0, 0, LeaderChange::_SET_BACKUP_LEADER) ;
-	serverSendPacketToType(outgoing, MAP_MISSION) ;
+	serverSendPacketToType(outgoing, MAP_HOST) ;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -671,7 +671,7 @@ chatSendLeaderChange(UINT32 missionID, UINT32 playerID, const ChatHandle& handle
 {
 	Teul::Packet outgoing(0, Chat::CallbackX, Chat::MISSION_LEADER_CHANGE_Y) ;
 	CONSTRUCT_IN_PACKET(outgoing, LeaderChange, missionID, playerID, handle, requester, LeaderChange::_SUCCESS) ;
-	serverSendPacketToType(outgoing, MAP_MISSION) ;
+	serverSendPacketToType(outgoing, MAP_HOST) ;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1445,7 +1445,7 @@ chatSendMapPersonaUpdate(playerid_t playerID, bool isSquadUpdate, UINT32 squadID
 {
 	Teul::Packet outgoing(0, Chat::CallbackX, Chat::MAP_PERSONA_UPDATE_Y) ;
 	CONSTRUCT_IN_PACKET(outgoing, MapPersonaUpdate, squadHandle, isSquadUpdate, isDecalUpdate, playerID, squadID, decal) ;
-	serverSendPacketToType(outgoing, MAP_MISSION) ;
+	serverSendPacketToType(outgoing, MAP_HOST) ;
 }
 
 //////////////////////////////////////////////////////////////////////

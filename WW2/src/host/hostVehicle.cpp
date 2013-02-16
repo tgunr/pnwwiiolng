@@ -523,7 +523,7 @@ HostVehicle::scoreResupply(const ChatHandle& ofHandle)
 		Scoring::Actor actSupplier(this, player) ;
 		Scoring::Resupply evtResup(actSupplier, ofHandle) ;
 		packet.setData(evtResup) ;
-		serverSendPacketToType(packet, MAP_MISSION) ;
+		serverSendPacketToType(packet, MAP_HOST) ;
 	}
 }
 
@@ -694,7 +694,7 @@ HostVehicle::setVehicleKilled(sortieid_t bySortieID)
 	Scoring::Death evtDeath(actVictim, actShooter, x_cm(), y_cm(), z_cm()) ;
 	packet.setData(evtDeath) ;
 
-	if ( !serverSendPacketToType(packet, MAP_MISSION) )
+	if ( !serverSendPacketToType(packet, MAP_HOST) )
 	{
 		dbugLog(_FLA, "unable to send kill message to map host") ;
 	}
@@ -869,7 +869,7 @@ HostVehicle::sendCaptureContribution(Player* const player, UINT32 status)
 							,	player->missionID()
 							,	player->brigadeID()
 						) ;
-	serverSendPacketToType(outgoing, STRAT_DAEMON) ;
+	serverSendPacketToType(outgoing, STRAT_HOST) ;
 	threadLog(_FLD, "p:%u c:%s v:%u 0 sending cap contrib for %s"
 				, seats[0], callsign(), index
 				, m_inBuildingObject && m_inBuildingObject->facility

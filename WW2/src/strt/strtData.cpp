@@ -369,7 +369,7 @@ strtEnemyLink(CPStruct& cp, bool state)
 		cp.flags |= CP_STAT_ENEMY_LINKED ;
 	else
 	{
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 		WWII_SIDE attacker = cp.attacker() ;
 		if ( cp.isCity() && attacker != WWII_NO_SIDE && !cp.isContested() )
 		{
@@ -750,11 +750,11 @@ _scPass1_objs(Supercell& sc)
 
 		newObject->setCountry(parentFacility->country, parentFacility->side) ;
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 		// Is it a production center?
 		if ( newObject->isProductionCenter() )
 			strtAddFactory(newObject) ;
-#endif // STRAT_HOST
+#endif // IS_STRAT_HOST
 	}
 }
 
@@ -768,7 +768,7 @@ _supercellsPass1()
 {
 	SUPERCELLS::iterator it ;
 
-#if defined(STRAT_HOST) || defined(MAP_HOST) || defined(CELL_HOST)
+#if defined(IS_STRAT_HOST) || defined(IS_MAP_HOST)
 	dbugLog(_FLI, "Loading data from database") ;
 	strtdbInitSupercells() ;
 #endif
@@ -898,7 +898,7 @@ _scPass2_cps(Supercell& sc)
 		CPStruct& cp = sc.cps[counter] ;
 
 		cp.m_isSupplyCenter = false ;
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 		cp.m_isRouteingConnected = false ;
 		cp.m_routeingRun = 0ULL ;
 		cp.flags &= ~CP_STAT_IN_SUPPLY ;
@@ -1129,7 +1129,7 @@ strtInitializeStratData()
 	// Load in the blitzWor modifier data
 	parseWor("/blitzWor.csv",NULL);
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 	// Load the virtual spawn classes.
 	weapLoadSpawnXML() ;
 #endif
@@ -2283,7 +2283,7 @@ static void _calcCapacity(ObjectStruct& object)
 	if (lastPercentDamage < 50 && object.percentDamage >= 50)
 		object.setVisLevel(1) ;
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 	object.recalculateCapacity() ;
 	object.Facility().recalculateCapacity() ;
 
@@ -2378,7 +2378,7 @@ _forceFacility(FacilityStruct& facility, const WWII_SIDE side, WWII_COUNTRY coun
 		else
 			facility.setCountry(country) ;
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 		strtSaveFacility(&facility) ;
 #endif
 	}
@@ -2581,7 +2581,7 @@ _checkCPStatus(CPStruct* cpList)
 			cp.controllingCountry = cp.country ;
 			cp.controllingSide = cp.side ;
 			cp.setContention(false) ;
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 			strtSaveCP(&cp);
 #endif
 			continue ;
@@ -2643,7 +2643,7 @@ _checkCPStatus(CPStruct* cpList)
 			{
 				 _setObjectsOwner(facility->objectList, facility->side, facility->country);
 				//Save the facility to the DB
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 # ifdef HEAVY_DEBUG
 				dbugLog(_FLI,"fixed facility %s saving to DB",facility->name);
 # endif // HEAVY_DEBUG
@@ -2696,7 +2696,7 @@ _checkCPStatus(CPStruct* cpList)
 			cp.setContention(true) ;
 		}
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 		if ( cp.isContested() )
 			cp.changeOwnership(cp.country, false, true) ;
 
@@ -2862,7 +2862,7 @@ strtGetFacilityByOID(UINT16 uOID)
 //////////////////////////////////////////////////////////////////////
 // Flag a CP as a supply center
 
-#ifndef STRAT_HOST
+#ifndef IS_STRAT_HOST
 void
 CPStruct::setSupplyCenter()
 {

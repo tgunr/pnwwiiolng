@@ -508,7 +508,7 @@ ChatMission::sendMobileSpawn(UINT32 playerID, const ChatHandle& handle, FLOAT64 
 {
 	dbugLog(_FLD, "mswp %s m:%u p:%u sto:%u @ %0.3g,%0.3g,%0.3g", (deployed ? "cre" : "del"), missionID(), playerID, stosUID, x, y, z) ;
 
-	ENDPOINT* const endpoint = serverPeerEndpointByType(MAP_MISSION) ;
+	ENDPOINT* const endpoint = serverPeerEndpointByType(MAP_HOST) ;
 	if ( endpoint != NULL )
 	{
 		MobileSpawnWaypoint wp(missionID(), playerID, handle, x, y, z, deployed, stosUID, 0) ;

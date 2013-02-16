@@ -426,7 +426,7 @@ teulInitEndpoints(ERROR_FUNCTION* const endpointErrorFn)
 		_endpoints[i].initialize(i) ;
 	}
 
-	dbugLog(_FLI,"Teul::MaxConnections %" PRSizeT " freeEndpoints %" PRSizeT " sizeof(ENDPOINT):%" PRSizeT " sizeof(ENDPOINTImpl):%" PRSizeT, Teul::MaxConnections, _endpoints.size(), sizeof(ENDPOINT), sizeof(EndpointImpl));
+	dbugLog(_FLI, "Teul::MaxConnections %" PRSizeT " freeEndpoints %" PRSizeT " sizeof(ENDPOINT):%" PRSizeT " sizeof(ENDPOINTImpl):%" PRSizeT, Teul::MaxConnections, _endpoints.size(), sizeof(ENDPOINT), sizeof(EndpointImpl));
 
 	ABORT_IF_EX(_freeEndpoints.empty() == true, "endpointFreeList should not be empty after initialization") ;
 }

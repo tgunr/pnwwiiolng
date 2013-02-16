@@ -39,7 +39,7 @@ extern void strtInitializeVehicleAccessLevels() ;
 
 //////////////////////////////////////////////////////////////////////
 
-#if defined STRAT_HOST
+#if defined IS_STRAT_HOST
 # include "strt/strtDatabaseSchemas.h"
 static void _updateDatabaseSchema()
 {
@@ -58,19 +58,19 @@ strtInitDB()
 	if ( !dbh.connected() )
 		dbh.connect(dbConnection) ;
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 	_updateDatabaseSchema() ;
 
 	if ( !strtInitHostDB() )
 		retval = false ;
-#endif // STRAT_HOST
+#endif // IS_STRAT_HOST
 
 	srand((UINT32)teulClock64) ;
 
 	if ( ! dbGetWWIIConfig(dbh) )
 		dbugLog(_FLA, "No configuration from database") ;
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 	wwiiReadRanks(dbh) ;
 
 	strtInitializeVehicleAccessLevels() ;
@@ -90,7 +90,7 @@ strtCloseDB()
 void
 strtLoadTOEsAndHCUnits()
 {
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 	// Read in the complete list of TOE templates so that we're ready for HCUnits.
 	strtdbLoadTOETemplates() ;
 	// Read in the list of HCUnits
@@ -134,7 +134,7 @@ _processCP(const DBRow& row, void* data, UINT32 oid)
 	cp->country = (WWII_COUNTRY)row.NextUInt() ;
 	cp->setSide(wwiiSide(cp->country)) ;
 
-#if defined(STRAT_HOST)
+#if defined(IS_STRAT_HOST)
 	if ( cp->isCity() )
 	{
 		UINT32 attackingBrigade = row.NextUInt() ;
@@ -185,7 +185,7 @@ _processObject(const DBRow& row, void* data, UINT32 oid)
 
 	object->calcPercentDamage() ;
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 	object->recalculateCapacity() ;
 #endif
 }

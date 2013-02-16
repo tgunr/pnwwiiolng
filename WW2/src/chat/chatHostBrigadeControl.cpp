@@ -857,7 +857,7 @@ _sendAttackOrder(const Player* const player
 {
 	Teul::Packet outgoing(0, Strat::CallbackX, STRT_ATTACK_ORDER_Y) ;
 	CONSTRUCT_IN_PACKET(outgoing, AttackOrder, player->chatHandle(), unit.unitID(), property->m_fid, orderType, execute) ;
-	return serverSendPacketToType(outgoing, STRAT_DAEMON) ;
+	return serverSendPacketToType(outgoing, STRAT_HOST) ;
 }
 
 //////////////////////////////////////////////////////////////////////

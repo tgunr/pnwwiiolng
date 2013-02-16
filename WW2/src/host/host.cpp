@@ -802,7 +802,7 @@ hostPlayerLeave(Player& player, PLAYER_EXIT& pe)
 		Teul::Packet outgoing(sizeof(evtDespawn), Scoring::CallbackX, Scoring::EVENT_Y) ;
 		outgoing.setUnencrypted() ;
 		outgoing.append(evtDespawn) ;
-		serverSendPacketToType(outgoing, MAP_MISSION) ;
+		serverSendPacketToType(outgoing, MAP_HOST) ;
 	}
 
 	if (pe.destination == PDEST_MAP)
@@ -994,7 +994,7 @@ hostGiveCaptureScoreToPlayers(const FULL_OBJ_ID& buildingID, WWII_SIDE forSide)
 				Scoring::Actor actCapper(player->vehicle, player) ;
 				Scoring::Capture evtCapture(actCapper, buildingID, forSide) ;
 				packet.setData(evtCapture) ;
-				serverSendPacketToType(packet, MAP_MISSION) ;
+				serverSendPacketToType(packet, MAP_HOST) ;
 			}
 		}
 	}
@@ -1018,7 +1018,7 @@ _scoreGuarding(Player* const player)
 			Scoring::Actor actGuard(player->vehicle, player) ;
 			Scoring::Guard evtGuard(actGuard, player->vehicle->m_inBuildingObject->fullObjID, player->side(), (UINT32)seconds) ;
 			packet.setData(evtGuard) ;
-			serverSendPacketToType(packet, MAP_MISSION) ;
+			serverSendPacketToType(packet, MAP_HOST) ;
 		}
 	}
 
@@ -1541,16 +1541,16 @@ _newStratHost(const Server::HeartBeat& heartbeat, const bool isEntering)
 static void
 _addNewServer(Server::ServerInfo* server, const bool isEntering)
 {
-	if ( server->stats.type == CHAT_DAEMON )
+	if ( server->stats.type == CHAT_HOST )
 	{
 		return ;
 	}
-	if ( server->stats.type == STRAT_DAEMON )
+	if ( server->stats.type == STRAT_HOST )
 	{
 		_newStratHost(server->stats, isEntering) ;
 		return ;
 	}
-	if ( server->stats.type == MAP_MISSION )
+	if ( server->stats.type == MAP_HOST )
 	{
 		_newMapHost(server->stats, isEntering) ;
 		return ;
@@ -1885,7 +1885,7 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 		vehicle->checkLocality(outgoing) ;
 	}
 	if ( outgoing.empty() == false )
-		serverSendPacketToType(outgoing, CHAT_DAEMON) ;
+		serverSendPacketToType(outgoing, CHAT_HOST) ;
 	TIMER_STOP("gvwfu_loc") ;
 }
 
@@ -2940,6 +2940,8 @@ _ircChannelMessage(irc_session_t* session, const char* event, const char* origin
 //////////////////////////////////////////////////////////////////////
 // Main entry point.
 
+static const char* g_serverName = "hostd";
+
 int
 main(const int argc, const char* const argv[])
 {
@@ -2971,8 +2973,8 @@ main(const int argc, const char* const argv[])
 	threadsReadDBEnvironment("WWII_DB_ADDRESS") ;
 	threadsSetup() ;
 
-	Teul::SetAppName("hostd") ;
-	if (teulInitTransport( LOG_TO_FILE, "hostd", _updaterErrorFunction, _killUpdater) < 0)
+	Teul::SetAppName(g_serverName) ;
+	if (teulInitTransport( LOG_TO_FILE, g_serverName, _updaterErrorFunction) < 0)
 	{
 		dbugLog(_FLA,"cant init transport");
 		exit(0);
@@ -3023,8 +3025,7 @@ main(const int argc, const char* const argv[])
 	wthrInitTime();
 
 	static const UINT32 ClientTimeoutTime_ms = 40 * 1000 ;
-	retval = teulOpenListenInterface( WWII::Net::Ports::CellHost, _acceptFunction, ClientTimeoutTime_ms, TCP, _personaErrorFunction);
-	if ( retval < 0 )
+	if ( !teulOpenListenInterface( WWII::Net::Ports::CellHost, _acceptFunction, ClientTimeoutTime_ms, _personaErrorFunction) )
 		LogAbort("Unable to open tcp listen port %u retval:%d", WWII::Net::Ports::CellHost, retval) ;
 
 	sprintf(hostname, "cell%u", Server::localHost & 255) ;
@@ -3043,7 +3044,7 @@ main(const int argc, const char* const argv[])
 
 	SINT32 initResult =
 	serverInit(HOST_VERSION
-				, CELL_HOST, MAP_MISSION
+				, CELL_HOST, MAP_HOST
 				, _serverEnterCallback
 				, _serverLeaveCallback
 				, _serverStatusCallback
@@ -3061,11 +3062,11 @@ main(const int argc, const char* const argv[])
 
 	wwiiIRCChannelMessage("-sys", "[[ Syncing ]]") ;
 
-	while ( serverPeeringWithType(STRAT_DAEMON) == false )
+	while ( serverPeeringWithType(STRAT_HOST) == false )
 	{
 		teulUpdateTransport(25);
 
-		Server::ServerInfo* const server = Server::ServerInfo::GetBest(STRAT_DAEMON, true) ;
+		Server::ServerInfo* const server = Server::ServerInfo::GetBest(STRAT_HOST, true) ;
 		if (server != NULL)
 		{
 			_stratHost = server->stats.address;
@@ -3101,7 +3102,7 @@ main(const int argc, const char* const argv[])
 	teulSyncClock() ;
 	const TeulTimeMS timeout = teulClock64 + 15 * 1000 ;
 	TeulTimeMS longTimeout = teulClock64 + 30 * 1000 ;
-	while ( teulClock64 < timeout || (teulClock64 < longTimeout && serverPeeringWithType(CHAT_DAEMON) == false) )
+	while ( teulClock64 < timeout || (teulClock64 < longTimeout && serverPeeringWithType(CHAT_HOST) == false) )
 	{
 		teulUpdateTransport(50) ;
 		threadsLogging() ;

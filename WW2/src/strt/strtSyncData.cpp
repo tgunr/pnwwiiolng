@@ -20,7 +20,7 @@
 #include "strt/strtFacilityStruct.h"
 #include "strt/strtObjectStruct.h"
 
-#if defined(MAP_HOST)
+#if defined(IS_MAP_HOST)
 # include "map/mapData.h"
 #endif
 
@@ -57,7 +57,7 @@ strtProcessSyncCPs(const STRT_SYNC_CPS& syncCPs)
 		CPStruct& cp = sc->cps[cpID] ;
 		cp.uOID = sync->uOID ;
 
-#if defined(MAP_HOST)
+#if defined(IS_MAP_HOST)
 		mapUpdateCP(&cp, (WWII_COUNTRY)sync->owner, (WWII_COUNTRY)sync->control, sync->flags, __FUNCTION__) ;
 #endif
 
@@ -156,7 +156,7 @@ strtProcessSyncBuildings(const STRT_SYNC_BUILDINGS& syncBuildings)
 		if (sc != NULL)
 		{
 			sc->objects[b].setVisLevel(syncBuildings.vislevel[i]) ;
-#if defined(MAP_HOST)
+#if defined(IS_MAP_HOST)
 			mapUpdateBuildingVisLevel(&sc->objects[b]) ;
 #endif
 		}

@@ -105,7 +105,7 @@ _callbackError(
 bool
 commInit(void)
 {
-	if ( teulInitTransport(LOG_TO_FILE, "PlayGATE", _teulKitError, NULL))
+	if ( teulInitTransport(LOG_TO_FILE, "PlayGATE", _teulKitError))
 		return false ;
 
 #ifdef DEBUG

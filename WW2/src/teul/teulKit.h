@@ -32,7 +32,6 @@ namespace Teul { }
 extern SINT32 teulInitTransport(SINT32 logType
 							, const char* name
 							, ERROR_FUNCTION* errorFnPtr
-							, ERROR_FUNCTION* killFnPtr
 							, Teul::LoggingFn* const logFnPtr = NULL
 							);
 
@@ -53,15 +52,16 @@ extern SINT32 teulOpenListen(const UINT16 portNumber
 						, ERROR_FUNCTION* errorFnPtr
 						);
 
-// opens a port for listening on all address associated with the host's primary interface.
-// Assumes that all callbacks have been properly installed.  returns -error_number or 0 on success.
-// connection acceptFnPtr is an optional ptr to callback function which is
-// called when a connection is made to the listening socket, and hence a new
-// connection is created.  pass NULL if you do not want this notification
-extern SINT32 teulOpenListenInterface(const UINT16 portNumber
+//! \brief Opens ports for all of the addresses allocated to the host's primary network interface.
+//! Assumes that all callbacks have been properly installed.
+//! \param[in] portNumber port to list on.
+//! \param[in] acceptFnPtr function to call when an incoming connection is accept()d.
+//! \param[in] timeout millisecond period after which the connection is dropped if we can't talk to it.
+//! \param[in] errorFnPtr function to call when an error occurs on this interface.
+//! \return true if all opens were successful, otherwise false. 
+extern bool teulOpenListenInterface(const UINT16 portNumber
 						, CONNECT_FUNCTION* acceptFnPtr
 						, const SINT32 timeout
-						, const PROTOCOL protocol
 						, ERROR_FUNCTION* errorFnPtr
 						);
 

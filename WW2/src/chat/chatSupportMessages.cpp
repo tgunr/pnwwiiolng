@@ -126,7 +126,7 @@ chatSendMissionDeletionNotice(const UINT32& missionID)
 {
 	Teul::Packet outgoing(0, Chat::CallbackX, Chat::MISSION_DELETION_Y) ;
 	outgoing.append(missionID) ;
-	return serverSendPacketToType(outgoing, CHAT_DAEMON) ? 0 : -ENOTCONN ;
+	return serverSendPacketToType(outgoing, CHAT_HOST) ? 0 : -ENOTCONN ;
 }
 
 // Constructor for a Chat::PersonaUpdate
@@ -190,7 +190,7 @@ BRIGADE_MOVE_MSG::receive(SINT32 teulIndex, BRIGADE_MOVE_MSG& incoming)
 SINT32
 chatSendMissionMobileSpawnWaypoint(const MobileSpawnWaypoint& wp)
 {
-	ENDPOINT* const endpoint = serverPeerEndpointByType(CHAT_DAEMON) ;
+	ENDPOINT* const endpoint = serverPeerEndpointByType(CHAT_HOST) ;
 	if ( endpoint == NULL )
 		return -ENOTCONN ;
 	MOBILE_SPAWN_WAYPOINT outbound(wp, MOBILE_SPAWN_WAYPOINT::EXCHANGE) ;

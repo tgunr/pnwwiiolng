@@ -28,16 +28,16 @@
 #include "wwii/wwiiPlayer.h"
 #include "host/hostTimeUpdate.h"
 
-#ifdef _CELL_HOST_
+#ifdef IS_CELL_HOST
 #include "host/host.h"
 #endif
 
-#if defined(MAP_HOST)
+#if defined(IS_MAP_HOST)
 #define _USE_STRAT_EVENTS
 #include "strt/strtEvents.h"
 #endif
 
-#if defined(MAP_HOST)
+#if defined(IS_MAP_HOST)
 #include "miss/mission.h"
 #include "map/mapData.h"
 #endif
@@ -114,7 +114,7 @@ _facilityStatusHandler(FULL_OBJ_ID fullObjID, WWII_COUNTRY country, CP_STATUS_FL
 		++facility->cp->armyBasesOwned[newSide] ;
 	}
 
-#if defined(MAP_HOST)
+#if defined(IS_MAP_HOST)
 	if ( facility->type == FACILITY_FIREBASE && facility->isOpen() && !open )
 	{
 		missionFirebaseDestroyed(*facility) ;
@@ -142,7 +142,7 @@ _facilityStatusHandler(FULL_OBJ_ID fullObjID, WWII_COUNTRY country, CP_STATUS_FL
 		facility->m_captureProgress = (float)captureCounter ;
 	facility->m_captureStateChanged = teulTime() - lastChange ;
 
-#if defined(MAP_HOST)
+#if defined(IS_MAP_HOST)
 	if ( hasChanged )
 	{
 		Strat::Events::Add(facility) ;
@@ -171,7 +171,7 @@ _cpStatusHandler(FULL_OBJ_ID fullObjID, WWII_COUNTRY country, WWII_COUNTRY contr
 		return ;
 #endif
 
-#if defined(MAP_HOST)
+#if defined(IS_MAP_HOST)
 	const bool hasChanged = (cp->country != country || cp->controllingCountry != controllingCountry || cp->flags != flags) ;
 	mapUpdateCP(cp, country, controllingCountry, flags, __FUNCTION__) ;
 #endif
@@ -186,7 +186,7 @@ _cpStatusHandler(FULL_OBJ_ID fullObjID, WWII_COUNTRY country, WWII_COUNTRY contr
 	cp->m_contention = (flags & CP_STAT_CONTENTION) == CP_STAT_CONTENTION ;
 	cp->m_enemyLinked = (flags & CP_STAT_ENEMY_LINKED) == CP_STAT_ENEMY_LINKED ;
 
-#if defined(MAP_HOST)
+#if defined(IS_MAP_HOST)
 	if ( hasChanged )
 		Strat::Events::Add(cp) ;
 #endif
@@ -211,13 +211,13 @@ _buildingStatusHandler(FULL_OBJ_ID fullObjID, UINT32 visLevel, UINT32 damagedBy)
 	object->m_damagedBy = damagedBy ;
 
 	// Is this a change of vis level?
-#if defined(MAP_HOST)
+#if defined(IS_MAP_HOST)
 	if ( object->m_visLevel != visLevel )
 	{
 		object->m_visLevel = visLevel ;
 		mapUpdateBuildingVisLevel(object) ;
 	}
-#elif defined(_CELL_HOST_)
+#elif defined(IS_CELL_HOST)
 	bool buildingDestroyed = false ;
 	if ( object->m_visLevel == VISLEVEL_NORMAL && visLevel > 0 )
 	{
@@ -337,7 +337,7 @@ _recvTimeUpdate(ACTION_OBJECT* const a)
 	wthrSetWeatherPattern(incoming.weather) ;
 	wthrSetFogPattern(incoming.rain) ;
 
-#ifdef _CELL_HOST_
+#ifdef IS_CELL_HOST
 	incoming.Broadcast() ;
 #endif
 

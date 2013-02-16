@@ -116,7 +116,7 @@ _sideMessage(SIDE_MESSAGE_TYPE type
 	packet.m_arg1 = (arg1) ? arg1 : "" ;
 	packet.m_arg2 = (arg2) ? arg2 : "" ;
 
-	return serverSendCallbackToType(CHAT_DAEMON, _SEND_SIDE_MESSAGE, &packet) ;
+	return serverSendCallbackToType(CHAT_HOST, _SEND_SIDE_MESSAGE, &packet) ;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -142,7 +142,7 @@ chatSendHCMessage(WWII_SIDE side, LSTRING_ID message, const char* arg1, const ch
 SINT32
 StratCommand::send()
 {
-	if ( serverSendCallbackToType(CHAT_DAEMON, _SEND_SCMD_RESULT, this) )
+	if ( serverSendCallbackToType(CHAT_HOST, _SEND_SCMD_RESULT, this) )
 		return 0 ;
 	return -EINVAL ;
 }
@@ -182,12 +182,12 @@ chatSendSCMDResult(SINT32 playerID
 void
 chatSendBrigadeMoveResult(BRIGADE_MOVE_MSG& outgoing)
 {
-	ENDPOINT* endpoint = serverPeerEndpointByType(CHAT_DAEMON) ;
+	ENDPOINT* endpoint = serverPeerEndpointByType(CHAT_HOST) ;
 	if ( endpoint != NULL )
 		outgoing.send(*endpoint) ;
 	if ( outgoing.data().m_action == BMR_APPROVED && outgoing.data().m_actionable )
 	{
-		endpoint = serverPeerEndpointByType(MAP_MISSION) ;
+		endpoint = serverPeerEndpointByType(MAP_HOST) ;
 		if ( endpoint != NULL )
 			outgoing.send(*endpoint) ;
 	}

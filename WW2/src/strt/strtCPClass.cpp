@@ -417,9 +417,9 @@ CPStruct::_changeFlags(UINT32 newFlags)
 	if ( flags != (CP_STATUS_FLAGS)newFlags )
 	{
 		flags = (CP_STATUS_FLAGS)newFlags ;
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 		strtQueueCPStatus(this) ;
-#endif // STRAT_HOST
+#endif // IS_STRAT_HOST
 	}
 }
 
@@ -653,7 +653,7 @@ CPStruct::_removeObjective(WWII_SIDE forSide)
 
 	g_objectives[forSide].erase(this) ;
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 	strtQueueCPStatus(this) ;
 	strtSaveCP(this) ;
 #endif
@@ -739,7 +739,7 @@ CPStruct::endContention()
 {
 	setContention(false) ;
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 	clearAlerts() ;
 	clearFallback() ;
 	clearOverrunHistory() ;
@@ -1220,7 +1220,7 @@ CPStruct::setAttackObjective(bool modifyObjectiveList, HCUnit* unit)
 		g_objectives[forSide].insert(this) ;
 	}
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 	strtQueueCPStatus(this) ;
 	strtSaveCP(this) ;
 #endif
@@ -1253,7 +1253,7 @@ CPStruct::setDefendObjective(WWII_SIDE forSide, bool modifyObjectiveList)
 		g_objectives[forSide].insert(this) ;
 	}
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 	strtQueueCPStatus(this) ;
 	strtSaveCP(this) ;
 #endif
@@ -1517,7 +1517,7 @@ CPStruct::setRouteing(bool isConnected)
 	else
 		flags &= ~CP_STAT_IN_SUPPLY ;
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 	strtQueueCPStatus(this) ;
 #endif
 }

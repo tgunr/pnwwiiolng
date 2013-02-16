@@ -4,8 +4,9 @@
 # cmake must be in your path.
 
 baseDir=`dirname $0`
-projParent="${baseDir}/WW2/proj"
-projDir="host"
+projParent="${baseDir}"
+projDir="build"
+relativeSrcDir="../WW2/src"
 
 hash cmake || {
   echo "'Cmake' is required to build the host."
@@ -27,4 +28,5 @@ if [ ! \( -d "${projDir}" -o -L "${projDir}" \) ] ; then
 fi
 cd "${projDir}" || exit 1
 
-cmake -G "Unix Makefiles" ../../src
+cmake -G "Unix Makefiles" "${relativeSrcDir}" $*
+

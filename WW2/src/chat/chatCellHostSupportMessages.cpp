@@ -210,7 +210,7 @@ chatSendKickNotice(const playerid_t playerID, const SCHAR* callsign, const SCHAR
 	Teul::Packet outgoing(0, Chat::CallbackX, Chat::KICK_NOTICE_Y) ;
 	CONSTRUCT_IN_PACKET(outgoing, Chat::KickNotice, playerID, chatGetHandle(callsign), problem) ;
 
-	return serverSendPacketToType(outgoing, CHAT_DAEMON) ;
+	return serverSendPacketToType(outgoing, CHAT_HOST) ;
 }
 
 void
@@ -219,6 +219,6 @@ Chat::SendModReport(const ChatHandle& handle, const Chat::ModReport report)
 	Teul::Packet outgoing(sizeof(handle) + sizeof(report), Chat::CallbackX, Chat::MOD_REPORT_Y) ;
 	outgoing.append(report) ;
 	outgoing.append(handle) ;
-	serverSendPacketToType(outgoing, CHAT_DAEMON) ;
+	serverSendPacketToType(outgoing, CHAT_HOST) ;
 }
 

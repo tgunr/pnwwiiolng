@@ -32,8 +32,6 @@ static SCHAR* program ;
 static bool bHaveRoster = false ;
 static int numClients = 0 ;
 
-static void _killExam (SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error);
-
 SINT32 connection ;
 
 static inline void
@@ -343,7 +341,7 @@ main(int argc, char* argv[])
 		port = (UINT32)atol(hostPort);
 	}
 
-	teulInitTransport(LOG_OFF, "./chatRoster", _errorFunction, _killExam);
+	teulInitTransport(LOG_OFF, "./chatRoster", _errorFunction);
 	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_NOTE));
 	dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_NOTE));
 
@@ -466,7 +464,3 @@ main(int argc, char* argv[])
 
 }
 
-void _killExam (SINT32 /*teulIndex*/, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 /*error*/)
-{
-	exit (0);
-}

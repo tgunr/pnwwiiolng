@@ -212,7 +212,7 @@ _checkArenalock(Server::ServerInfo* server, Server::Status state)
 	static UCHAR _previousLockState = 0 ;
 	static const UINT32 MMHOST_LOCK = AL_SPAWN | AL_CAPTURE | AL_KILL ;
 
-	if ( server->stats.type != MAP_MISSION )
+	if ( server->stats.type != MAP_HOST )
 		return ;
 
 	// If the map mission host goes into accepting mode while we are autolocked,
@@ -249,7 +249,7 @@ _serverEnterCallback(Server::ServerInfo* server, Server::Code scode)
 	//	firebases have changed
 	switch ( server->stats.type )
 	{
-		case MAP_MISSION:
+		case MAP_HOST:
 			_checkArenalock(server, server->stats.status) ;
 			// FALL THRU
 
@@ -274,7 +274,7 @@ _serverEnterCallback(Server::ServerInfo* server, Server::Code scode)
 			}
 		break ;
 
-		case CHAT_DAEMON:
+		case CHAT_HOST:
 			_mustSyncChatHost = true ;
 		break ;
 	}
@@ -295,10 +295,10 @@ _serverLeaveCallback(Server::ServerInfo* server, Server::Code scode)
 
 	switch ( server->stats.type )
 	{
-	case CHAT_DAEMON:
+	case CHAT_HOST:
 		_mustSyncChatHost = false ;
 	break ;
-	case MAP_MISSION:
+	case MAP_HOST:
 	break ;
 	}
 
@@ -327,7 +327,7 @@ _serverStatusCallback(Server::ServerInfo* server, Server::Code scode)
 		{
 			switch (server->stats.type)
 			{
-				case MAP_MISSION:
+				case MAP_HOST:
 				case CELL_HOST:
 				dbugLog(_FLN, "syncing %s server at %s"
 									, ((server->stats.type == CELL_HOST) ? "cell" : "map")
@@ -335,7 +335,7 @@ _serverStatusCallback(Server::ServerInfo* server, Server::Code scode)
 					strtAddSyncPeer(broadAddr) ;
 				break ;
 
-				case CHAT_DAEMON:
+				case CHAT_HOST:
 					_mustSyncChatHost = false ;
 				break ;
 			}
@@ -369,7 +369,7 @@ _housekeeping()
 	if ( !strtIsStratInitialized() )
 		return nextHouseKeep ;
 
-	if ( _mustSyncChatHost && serverPeeringWithType(CHAT_DAEMON) == true )
+	if ( _mustSyncChatHost && serverPeeringWithType(CHAT_HOST) == true )
 	{
 		strtSendChatInitialUpdates() ;
 		_mustSyncChatHost = false ;
@@ -442,6 +442,8 @@ _housekeeping()
 
 extern int tolua_stratd_open(struct lua_State*) ;
 
+const char* g_serverName = "stratd";
+
 int
 main(int argc, char* argv[])
 {
@@ -454,8 +456,8 @@ main(int argc, char* argv[])
 	if ( HostLanguage == NULL )
 		HostLanguage = "en" ;
 
-	Teul::SetAppName("strat") ;
-	if (teulInitTransport(LOG_TO_FILE, "stratd", _cnvyErrorFunction, NULL) < 0)
+	Teul::SetAppName(g_serverName) ;
+	if (teulInitTransport(LOG_TO_FILE, g_serverName, _cnvyErrorFunction) < 0)
 	{
 		LogAbort("Cannot initialize teulTransport");
 	}
@@ -482,7 +484,7 @@ main(int argc, char* argv[])
 	if ( !stratStartLua() )
 		exit(0) ;
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 	if (!strtInitDB())
 	{
 		LogAbort("Couldn't initialize database");
@@ -500,7 +502,7 @@ main(int argc, char* argv[])
 	serverOpenBroadcastIndexes() ;
 
 	serverInit(HOST_VERSION
-				, STRAT_DAEMON, STRAT_DAEMON
+				, STRAT_HOST, STRAT_HOST
 				, _serverEnterCallback
 				, _serverLeaveCallback
 				, _serverStatusCallback
@@ -525,7 +527,7 @@ main(int argc, char* argv[])
 	teulSyncClock() ;
 	TeulTimeMS cutoff = teulClock64 + 30000 ;
 	dbugLog(_FLI, "Waiting for chat server") ;
-	for ( ; teulClock64 < cutoff && serverPeeringWithType(CHAT_DAEMON) == false ; )
+	for ( ; teulClock64 < cutoff && serverPeeringWithType(CHAT_HOST) == false ; )
 	{
 		teulUpdateTransport(50) ;
 		threadsLogging() ;
@@ -629,7 +631,7 @@ main(int argc, char* argv[])
 
 	threadsLogging() ;
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 	strtCloseDB();
 #endif
 	dbugLog(_FLN,"strat system shutting down");

@@ -441,17 +441,6 @@ _teulErrorFn(const SINT32 teulIndex, const UCHAR*, SINT32, const TEUL_CALLBACK*,
 }
 
 //////////////////////////////////////////////////////////////////////
-// TeulKit telling us to shutdown.
-
-static void
-_teulKillFn(const SINT32 teulIndex, const UCHAR*, SINT32, const TEUL_CALLBACK*, SINT32 error)
-{
-	_printf("Teul Shutdown: t:%d e:%d", teulIndex, error) ;
-	teulCloseTransport() ;
-	exit(error) ;
-}
-
-//////////////////////////////////////////////////////////////////////
 // When a lua command generates output, the text is batched up by the
 // host until the command completes, at which point the host appends
 // a marker (LUA_END_SEQ). The resulting text may be sent down to us
@@ -589,7 +578,7 @@ main(int argc, char* argv[])
 		_printf("Initializing teulTransport\n") ;
 
 	Teul::SetAppName("luaClient") ;
-	teulInitTransport(LOG_TO_FILE, "./luaClient", _teulErrorFn, _teulKillFn) ;
+	teulInitTransport(LOG_TO_FILE, "./luaClient", _teulErrorFn) ;
 	dbugSetLogLevel(Debug::ERR_WARN) ;
 
 	_registerCallbacks() ;

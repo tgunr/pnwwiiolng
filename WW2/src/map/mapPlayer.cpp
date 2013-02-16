@@ -148,7 +148,7 @@ _reportPlayerDetails(unsigned int fd, const char* /*path*/, const char* /*args*/
 	}
 
 	if ( len > 0 )
-		write(fd, buffer, len) ;
+		send(fd, buffer, len, 0) ;
 }
 
 static inline UINT32

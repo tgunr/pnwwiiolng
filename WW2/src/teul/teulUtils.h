@@ -17,6 +17,11 @@ namespace Teul
 	int SetSignalHandler(int signum, void (*handler)(int)) ;
 #endif
 
+#if platBuild == TEUL_SERVER
+	//! Determine if the specified IP address is one of my public addresses or loopback.
+	bool IsMyAddress(UINT32 addr_);
+#endif
+
 	//! Get the current state of a given teulIndex.
 	//! In case of an error, *outReason will be one of:
 	//!	 -EINVAL: teulIndex was illegal.
@@ -25,13 +30,13 @@ namespace Teul
 	//!  -ENOTCONN: connection is not connected.
 	//! @param[in] teulIndex The connection to query.
 	//! @param[out] outReason 0 on a successful lookup, otherwise an error code describing the failure.
-	//! @param[out] lastRx_ms time in miliseconds since the last packet was received.
+	//! @param[out] lastRx_ms time in milliseconds since the last packet was received.
 	//! @returns true on a successful query, false if there is a problem with the teulIndex.
 	bool GetEndpointStatus(const SINT32 teulIndex, SINT32* const outReason, TeulDeltaMS* const outLastRx_ms) ;
 
 	//! Convert a host address and port number into host name (dotted decimal notation) and port number strings.
 	//! Primary purpose is to simplify future transitions to IPv6. bufLen must be large enough
-	//! to accomodate the trailing null.
+	//! to accommodate the trailing null.
 	//! @param[in] host_ value of the address to query.
 	//! @param[in] port_ value of the port number to query.
 	//! @param[in] hostBuf_ destination for the host name (dotted numeric) or NULL if not required.

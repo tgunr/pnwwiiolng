@@ -40,11 +40,11 @@ namespace Debug
 	typedef unsigned int ERROR_TYPE ;
 }
 
+#define STD_ERR				0x0010	// mirror significant output to stderr
+#define BARE_DEBUG			0x0080	// no extra formating, basically printf
+#define LOG_ALL_TO_STDERR	0x0100	// ALL logging to stderr
+
 // always use these macro's in place of Full functions so filename and number and errType are set.
-
-#define STD_ERR		0x0010	// mirror output to stderr
-#define BARE_DEBUG	0x0080	// no extra formating, basically printf
-
 // basic parameter macros for dbugLog
 #define _FLA _FL, Debug::ERR_ABORT
 #define _FLM _FL, Debug::ERR_MINOR
@@ -103,7 +103,7 @@ typedef void  (*ERROR_HANDLER) (void);
 // the error object. The log type parameter of dbugInit can take any of the log facilities from
 // syslog including LOG_LOCAL0-7 or be set to LOG_TO_FILE to log
 // directly to a file only.
-extern int dbugInit(int logType, const char* filename);
+extern void dbugInit(int logType, const char* filename);
 
 // dbugClose: closes the debug file and cleans up.
 extern void	dbugClose(void);
@@ -114,9 +114,6 @@ extern void	dbugSetLogLevel(Debug::ERROR_TYPE level);
 // dbugSetWriteLevel: set the current debug level for display of dbug messages and interface to
 // the Microsoft debugger through the SetDebugErrorLevel function.
 extern void	dbugSetWriteLevel(Debug::ERROR_TYPE level);
-
-// dbugSetErrHandler: set an optional user debug handler for each errType.
-extern void	dbugSetErrHandler(Debug::ERROR_TYPE level, Debug::ERROR_HANDLER handler);
 
 // dbugSetErrno: sets Errno. Error numbers adhere to errno.h. Under win32 "dbugWErrno.h"
 // may also be included to map windows socket errors to Unix errno.  Additional errors beyond

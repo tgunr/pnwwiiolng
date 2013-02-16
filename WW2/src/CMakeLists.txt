@@ -2,9 +2,21 @@ CMAKE_MINIMUM_REQUIRED (VERSION 2.6.4)
 PROJECT (GameHosts)
 
 ENABLE_TESTING()
-SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${GameHosts_SOURCE_DIR}/cmakeincludes")
-SET(PROJECT_DIR "${GameHosts_SOURCE_DIR}/../..")
+SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmakeincludes")
+SET(PROJECT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../..")
 SET(LIBRARIES_DIR "${PROJECT_DIR}/Libraries")
+
+SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
+
+SET(AUTH_HOST_EXE "authHost")
+SET(DBD_HOST_EXE "dbd")
+SET(CHAT_HOST_EXE "chatd")
+SET(STRAT_HOST_EXE "stratd")
+SET(MAP_HOST_EXE "mmhostd")
+SET(CELL_HOST_EXE "hostd")
+SET(PING_HOST_EXE "pingHost")
+
+SET(_LUA_HOST "stratd")
 
 IF ( PN_BUILD_TYPE MATCHES "Auth" OR PN_CLUSTER MATCHES "Auth" )
 	SET(PN_BUILD_TYPE "Auth")
@@ -25,7 +37,7 @@ IF ( UNIX AND NOT CNL )
 ENDIF ()
 MARK_AS_ADVANCED(CNL)
 
-include_directories(${GameHosts_SOURCE_DIR} ${GameHosts_SOURCE_DIR}/hostproj ${CMAKE_CURRENT_BINARY_DIR})
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/hostproj ${CMAKE_CURRENT_BINARY_DIR})
 
 IF ( UNIX AND NOT IS_DIRECTORY "/playnet/" )
 	message(SEND_ERROR "No /playnet folder")
@@ -50,19 +62,19 @@ if ( 0 )
 	 message(SEND_ERROR "Unable to find subversion executables")
  ENDIF ( NOT Subversion_FOUND )
  # Ask Subversion for info on this working copy.
- Subversion_WC_INFO(${GameHosts_SOURCE_DIR} REPO)
+ Subversion_WC_INFO(${CMAKE_CURRENT_SOURCE_DIR} REPO)
 else ( )
 # include ( cmakeincludes/FindMercurial.cmake )
 # if ( NOT MERCURIAL_FOUND )
 #  message(SEND_ERROR "Unable to find mercurial executables")
 # endif ( )
-# MERCURIAL_HG_INFO(${GameHosts_SOURCE_DIR} REPO)
+# MERCURIAL_HG_INFO(${CMAKE_CURRENT_SOURCE_DIR} REPO)
 endif ( )
 
 # Find Lua 5.1
 IF ( WIN32 )
-	SET(LUA_INCLUDE_DIR "${GameHosts_SOURCE_DIR}/../include/lua")
-	SET(LUA_LIBRARY "${GameHosts_SOURCE_DIR}/../lib/win/3rdparty/lua51.lib")
+	SET(LUA_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../include/lua")
+	SET(LUA_LIBRARY "${CMAKE_CURRENT_SOURCE_DIR}/../lib/win/3rdparty/lua51.lib")
 ENDIF ( )
 find_package(Lua51 REQUIRED)
 INCLUDE_DIRECTORIES(${LUA_INCLUDE_DIR})
@@ -72,7 +84,7 @@ INCLUDE_DIRECTORIES(${TOLUAPP_INCLUDE_DIR})
 IF ( UNIX )
 	find_program(CTAGS ctags)
 	add_custom_target(ctags
-		COMMAND ${CTAGS} -R ${GameHosts_SOURCE_DIR}/*/*.[ch]*
+		COMMAND ${CTAGS} -R ${CMAKE_CURRENT_SOURCE_DIR}/*/*.[ch]*
 		)
 	MARK_AS_ADVANCED(CTAGS)
 ENDIF ( )
@@ -82,6 +94,7 @@ IF ( WIN OR WIN32 OR WIN64 )
 	SET(LIBEVENT_INCLUDE_DIR "${LIBRARIES_DIR}/libevent/include")
 	INCLUDE_DIRECTORIES(${LIBEVENT_INCLUDE_DIR})
 	INCLUDE_DIRECTORIES(${LIBEVENT_INCLUDE_DIR}/../WIN32-CODE)
+	SET_TARGET_PROPERTIES(event PROPERTIES FOLDER "Libs")
 ENDIF ( )
 
 INCLUDE (cmakeincludes/PCHSupport.cmake)
@@ -134,8 +147,9 @@ add_library (ircclient
 	libircclient/src/libircclient.cpp
 )
 set_property(TARGET ircclient PROPERTY COMPILE_DEFINITIONS IN_BUILDING_LIBIRC=1)
+set_property(TARGET  ircclient PROPERTY FOLDER "Libs")
 IF (WIN32 OR WIN64)
-	set_property(TARGET ircclient PROPERTY COMPILE_FLAGS "${CXX_COMPILE_FLAGS} /W1")
+	SET_TARGET_PROPERTIES(ircclient PROPERTIES COMPILE_FLAGS "${CXX_COMPILE_FLAGS} /W1")
 ENDIF ( )
 
 IF ( WIN32 )
@@ -159,6 +173,7 @@ IF ( WIN32 )
 	set_property(TARGET OpenThreads PROPERTY COMPILE_DEFINITIONS OPENTHREADS_EXPORTS)
 	SET(_PCH "openthreads-precompile-pch.h")
 	SET_TARGET_PROPERTIES(OpenThreads PROPERTIES COMPILE_FLAGS "/Yu\"${_PCH}\" /FI\"${_PCH}\" /Fp\"\$(IntDir)\$(TargetName).pch\"")
+	SET_TARGET_PROPERTIES(OpenThreads PROPERTIES FOLDER "Libs")
 	SET_SOURCE_FILES_PROPERTIES(${LIBRARIES_DIR}/OpenThreads/Atomic.cpp PROPERTIES COMPILE_FLAGS "/Yc\"${_PCH}\"")
 ENDIF ( )
 
@@ -166,7 +181,6 @@ ENDIF ( )
 # teulKit services and the cluster's "server" API.
 add_library (teulserver
 	auth/authDaemon.cpp
-	dbug/dbug.cpp
 	list/listCL.cpp
 	mem/memlinux.cpp
 	server/server.cpp
@@ -200,7 +214,8 @@ add_library (teulserver
 	dbug/dbugInternal.h
 )
 ADD_PCH(teulserver)
-target_link_libraries(teulserver event ${_NETWORK_LIBRARY})
+target_link_libraries(teulserver event)
+SET_PROPERTY(TARGET teulserver PROPERTY FOLDER "Libs")
 
 # Code for any host process that has to participate in awareness of instances
 # (chat, map, cell do; strat doesn't)
@@ -215,6 +230,7 @@ add_library (instancing
 	${PCH_INCLUDE_HEADERS}
 )
 ADD_PCH(instancing)
+SET_PROPERTY(TARGET instancing PROPERTY FOLDER "Libs")
 
 # Common-to-all WWII library, provides all the basics like ChatHandle functions,
 # weapon list, database operations, wwii_config, etc.
@@ -222,6 +238,7 @@ add_library (libwwii
 	chat/chatHandle.cpp
 	chat/chatPackers.cpp
 	chat/chatTimeInterval.cpp
+	dbug/dbug.cpp
 	fio/fiod.cpp
 	inst/instCommon.cpp
 	inst/instPackers.cpp
@@ -272,16 +289,11 @@ add_library (libwwii
 )
 ADD_PCH(libwwii)
 target_link_libraries(libwwii OpenThreads)
+SET_PROPERTY(TARGET libwwii PROPERTY FOLDER "Libs")
 
 ######################################################################
 #### Client/Utility command line applications.
 
-IF ( PN_EXPERIMENTAL )
-	ADD_EXECUTABLE(clusterBoss
-		src/clusterBoss.cpp
-	)
-	target_link_libraries(clusterBoss libwwii teulserver)
-ENDIF ()
 
 IF ( NOT PN_CLUSTER STREQUAL "Auth")
 	IF ( NOT WIN32 )
@@ -295,12 +307,14 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth")
 		)
 		ADD_PCH(chatClient)
 		target_link_libraries(chatClient libwwii teulserver)
+		SET_PROPERTY(TARGET chatClient PROPERTY FOLDER "Tools")
 
 		# Provide access to the LuaVMs.
 		add_executable(luaClient
 			src/luaClient.cpp
 		)
-		target_link_libraries(luaClient teulserver readline ncurses OpenThreads)
+		target_link_libraries(luaClient libwwii teulserver readline ncurses)
+		SET_PROPERTY(TARGET luaClient PROPERTY FOLDER "Tools")
 	ENDIF ( )
 
 	# Tool for validating strings as possible gamenames.
@@ -309,6 +323,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth")
 		src/checkGameName.cpp
 	)
 	target_link_libraries(checkGameName libwwii)
+	SET_PROPERTY(TARGET checkGameName PROPERTY FOLDER "Tools")
 
 	# In theory, SDM pre-parser. In practice? Deletes SDM files that don't
 	# contain any strat data.
@@ -319,6 +334,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth")
 		${PCH_INCLUDE_HEADERS}
 	)
 	target_link_libraries(sdmpp libwwii teulserver)
+	SET_PROPERTY(TARGET sdmpp PROPERTY FOLDER "Tools")
 
 	# Analyze SDM files
 
@@ -327,6 +343,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth")
 		${PCH_INCLUDE_HEADERS}
 	)
 	target_link_libraries(sdmDump libwwii teulserver)
+	SET_PROPERTY(TARGET sdmDump PROPERTY FOLDER "Tools")
 
 	# Reads SDM files and imports portions of them into the game database.
 	# Which is a shame, because the hosts wind up reading the SDM files too
@@ -337,6 +354,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth")
 		${PCH_INCLUDE_HEADERS}
 	)
 	target_link_libraries(stratLoader libwwii teulserver ircclient ${MYSQL_LIBRARIES})
+	SET_PROPERTY(TARGET stratLoader PROPERTY FOLDER "Tools")
 
 	# Reads SDM and blitzWor data through the server's strat routines,
 	# without accessing the database, to validate a given terrain for
@@ -355,14 +373,15 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth")
 	)
 	ADD_PCH(stratValidator)
 	set_property(TARGET stratValidator PROPERTY COMPILE_DEFINITIONS CHECK_SUPPLY=1)
-	target_link_libraries(stratValidator libwwii teulserver)
+	target_link_libraries(stratValidator libwwii teulserver event)
+	SET_PROPERTY(TARGET stratValidator PROPERTY FOLDER "Tools")
 ENDIF ( )
 
 ######################################################################
 #### Server Processes
 
 # Authentication Server (auth host)
-add_executable(authHost
+add_executable(${AUTH_HOST_EXE}
 	auth/authClientData.cpp
 	auth/authDB.cpp
 	auth/authHost.cpp
@@ -375,15 +394,16 @@ add_executable(authHost
 	dbse/dbseDatabaseSchema.cpp
 	${PCH_INCLUDE_HEADERS}
 )
-ADD_PCH(authHost)
-target_link_libraries(authHost teulserver libwwii ${MYSQL_LIBRARIES} ircclient)
+ADD_PCH(${AUTH_HOST_EXE})
+target_link_libraries(${AUTH_HOST_EXE} teulserver libwwii ${MYSQL_LIBRARIES} ircclient)
+SET_PROPERTY(TARGET ${AUTH_HOST_EXE} PROPERTY FOLDER "Hosts")
 
 IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 	# Primarily communications-oriented server, the chat host.
 	# Sadly it does an awful lot of the "map/mission" server's job
 	# because the original design disconnected players from
 	# map/mission when they spawned.
-	add_executable(chatd
+	add_executable(${CHAT_HOST_EXE}
 		chat/chatBanPlayer.cpp
 		chat/chatChannelList.cpp
 		chat/chatChannelNumber.cpp
@@ -461,9 +481,10 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 
 		${PCH_INCLUDE_HEADERS}
 	)
-	ADD_PCH(chatd)
-	set_property(TARGET chatd PROPERTY COMPILE_DEFINITIONS AS_SERVER CHAT_HOST)
-	target_link_libraries(chatd libwwii teulserver instancing ${MYSQL_LIBRARIES} ircclient)
+	ADD_PCH(${CHAT_HOST_EXE})
+	set_property(TARGET ${CHAT_HOST_EXE} PROPERTY COMPILE_DEFINITIONS AS_SERVER IS_CHAT_HOST)
+	target_link_libraries(${CHAT_HOST_EXE} libwwii teulserver instancing ${MYSQL_LIBRARIES} ircclient)
+	SET_PROPERTY(TARGET ${CHAT_HOST_EXE} PROPERTY FOLDER "Hosts")
 
 	######################################################################
 	# Game World Server aka Cell Host.
@@ -476,7 +497,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 	# Unfortunately, redirection is crudely implemented, and the player
 	# actually /leaves/ the map host preventing the map host in dealing
 	# with map/mission work for any spawned players. *SIGH*
-	add_executable(hostd
+	add_executable(${CELL_HOST_EXE}
 		chat/chatCellHostSupportMessages.cpp
 		chat/chatSupportRPCMessages.cpp
 		comm/commHostMessages.cpp
@@ -515,16 +536,17 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 
 		${PCH_INCLUDE_HEADERS}
 	)
-	ADD_PCH(hostd)
-	set_property(TARGET hostd PROPERTY COMPILE_DEFINITIONS AS_SERVER _CELL_HOST_)
-	target_link_libraries(hostd libwwii teulserver instancing ${MYSQL_LIBRARIES} ircclient)
+	ADD_PCH(${CELL_HOST_EXE})
+	set_property(TARGET ${CELL_HOST_EXE} PROPERTY COMPILE_DEFINITIONS AS_SERVER IS_CELL_HOST)
+	target_link_libraries(${CELL_HOST_EXE} libwwii teulserver instancing ${MYSQL_LIBRARIES} ircclient)
+	SET_PROPERTY(TARGET ${CELL_HOST_EXE} PROPERTY FOLDER "Hosts")
 
 	######################################################################
 	# Map/Mission Host, probably better described as the "Game Login Server".
 	# This is the host to which players are forwarded from auth/playgate.
-	# See the description of "hostd" above for details on host spawning works
-	# and why the chat host has wound up doing so much of mmhostd's job.
-	add_executable(mmhostd
+	# See the description of the cell host above for details on host spawning
+	# works and why the chat host has wound up doing so much of map host's job.
+	add_executable(${MAP_HOST_EXE}
 		chat/chatGroupPermissions.cpp
 		chat/chatSupportMessages.cpp
 		chat/chatSupportRPCMessages.cpp
@@ -584,9 +606,10 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 
 		${PCH_INCLUDE_HEADERS}
 	)
-	ADD_PCH(mmhostd)
-	set_property(TARGET mmhostd PROPERTY COMPILE_DEFINITIONS AS_SERVER MAP_HOST)
-	target_link_libraries(mmhostd libwwii teulserver instancing ${MYSQL_LIBRARIES} ircclient)
+	ADD_PCH(${MAP_HOST_EXE})
+	set_property(TARGET ${MAP_HOST_EXE} PROPERTY COMPILE_DEFINITIONS AS_SERVER IS_MAP_HOST)
+	target_link_libraries(${MAP_HOST_EXE} libwwii teulserver instancing ${MYSQL_LIBRARIES} ircclient)
+	SET_PROPERTY(TARGET ${MAP_HOST_EXE} PROPERTY FOLDER "Hosts")
 
 	######################################################################
 	# Playnet's solution to an Autonomous System Number: Have multiple
@@ -596,8 +619,10 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 	# Selection is based on speed, which means that in many cases they
 	# pick the one with the highest speed and most variability/least
 	# reliability :(
-	add_executable(pinghostd src/pinghost.cpp)
-	target_link_libraries(pinghostd libwwii teulserver)
+	add_executable(${PING_HOST_EXE} src/pinghost.cpp)
+	set_property(TARGET ${PING_HOST_EXE} PROPERTY COMPILE_DEFINITIONS AS_SERVER IS_PING_HOST)
+	target_link_libraries(${PING_HOST_EXE} libwwii teulserver)
+	SET_PROPERTY(TARGET ${PING_HOST_EXE} PROPERTY FOLDER "Hosts")
 
 	######################################################################
 	# Database Proxy Daemon [deprecated].
@@ -605,7 +630,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 	# entirely single-threaded, this host process was created to offload
 	# expensive synchronous database queries.
 	# You should really use DB::Threads instead.
-	add_executable(dbd
+	add_executable(${DBD_HOST_EXE}
 		chat/chatdbHostMessages.cpp
 		chat/chatdbParser.cpp
 		dbse/dbseHost.cpp
@@ -619,8 +644,10 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 
 		${PCH_INCLUDE_HEADERS}
 	)
-	ADD_PCH(dbd)
-	target_link_libraries(dbd libwwii teulserver instancing ${MYSQL_LIBRARIES} ircclient)
+	ADD_PCH(${DBD_HOST_EXE})
+	set_property(TARGET ${DBD_HOST_EXE} PROPERTY COMPILE_DEFINITIONS AS_SERVER IS_DBD_HOST)
+	target_link_libraries(${DBD_HOST_EXE} libwwii teulserver instancing ${MYSQL_LIBRARIES} ircclient)
+	SET_PROPERTY(TARGET ${DBD_HOST_EXE} PROPERTY FOLDER "Hosts")
 
 	######################################################################
 	# Strat host: Most of the other hosts maintain copies of the strat
@@ -631,7 +658,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 	# turns out to be a real pain in the ass because you wind up writing
 	# a metric ton of network routines for communicating with it...
 	# It also hosts a Lua scripting environment.
-	add_executable(stratd
+	add_executable(${STRAT_HOST_EXE}
 		chat/chatStratSupportMessages.cpp
 		chat/chatSupportRPCMessages.cpp
 		cnvy/cnvyConvoyList.cpp
@@ -682,8 +709,8 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 
 		${PCH_INCLUDE_HEADERS}
 	)
-	ADD_PCH(stratd)
-	set_property(TARGET stratd PROPERTY COMPILE_DEFINITIONS AS_SERVER STRAT_HOST LUA_MODULE_OPEN=tolua_stratd_open CHECK_SUPPLY=1)
+	ADD_PCH(${STRAT_HOST_EXE})
+	set_property(TARGET ${STRAT_HOST_EXE} PROPERTY COMPILE_DEFINITIONS AS_SERVER IS_STRAT_HOST LUA_MODULE_OPEN=tolua_stratd_open CHECK_SUPPLY=1)
 	set_property(TARGET ${_LUA_HOST} PROPERTY DEPENDS ${_LUA_HOST}Lua.cc)
 	IF ( UNIX )
 		set_property(SOURCE ${_LUA_HOST}Lua.cc PROPERTY COMPILE_FLAGS "${COMPILE_FLAGS} -Wno-unused -Wno-unused-function")
@@ -692,7 +719,8 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 		set_property(SOURCE ${_LUA_HOST}Lua.cc PROPERTY COMPILE_FLAGS "/wd4480;4800;4305;4505")
 	ENDIF ( )
 	set_property(SOURCE ${_LUA_HOST}Lua.cc PROPERTY GENERATED true)
-	target_link_libraries(stratd libwwii ${MYSQL_LIBRARIES} teulserver ircclient ${LUA_LIBRARIES} ${TOLUAPP_LIBRARIES} )
+	target_link_libraries(${STRAT_HOST_EXE} libwwii ${MYSQL_LIBRARIES} teulserver ircclient ${LUA_LIBRARIES} ${TOLUAPP_LIBRARIES} )
+	SET_PROPERTY(TARGET ${STRAT_HOST_EXE} PROPERTY FOLDER "Hosts")
 ENDIF()
 
 ######################################################################
@@ -704,6 +732,7 @@ add_executable(testAuthConnect
 	${PCH_INCLUDE_HEADERS}
 )
 target_link_libraries(testAuthConnect libwwii teulserver)
+SET_PROPERTY(TARGET testAuthConnect PROPERTY FOLDER "Test")
 
 IF ( NOT PN_CLUSTER STREQUAL "Auth")
 	# Builds a single executable that runs all of the unit tests;
@@ -733,6 +762,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth")
 	ADD_PCH(testUnits)
 	set_property(TARGET testUnits PROPERTY COMPILE_DEFINITIONS ENABLE_TESTS)
 	target_link_libraries(testUnits libwwii teulserver)
+	SET_PROPERTY(TARGET testUnits PROPERTY FOLDER "Test")
 
 	add_test(testUnits ${EXECUTABLE_OUTPUT_PATH}/testUnits)
 ENDIF()
@@ -759,6 +789,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth")
 		teul/teulConnectionInstruction.h
 	)
 	target_link_libraries(testTeul teulserver libwwii)
+	SET_PROPERTY(TARGET testTeul PROPERTY FOLDER "Test")
 ENDIF ( )
 
 ######################################################################
@@ -780,7 +811,8 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth")
 			RUNTIME DESTINATION bin
 			COMPONENT tools
 	)
-	INSTALL(TARGETS stratd dbd pinghostd chatd mmhostd hostd
+	INSTALL(TARGETS ${GOVERNOR_HOST_EXE} ${STRAT_HOST_EXE} ${DBD_HOST_EXE} ${PING_HOST_EXE}
+					${CHAT_HOST_EXE} ${MAP_HOST_EXE} ${CELL_HOST_EXE}
 			ARCHIVE DESTINATION lib
 			LIBRARY DESTINATION lib
 			RUNTIME DESTINATION bin
@@ -788,7 +820,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth")
 	)
 ENDIF ( )
 INSTALL(TARGETS
-			authHost
+			${AUTH_HOST_EXE}
 		ARCHIVE DESTINATION lib
 		LIBRARY DESTINATION lib
 		RUNTIME DESTINATION bin
@@ -830,9 +862,8 @@ SET(CPACK_DEBIAN_PACKAGE_SECTION "Network")
 SET(CPACK_DEBIAN_PACKAGE_PRIORITY "Important")
 SET(CPACK_DEBIAN_PACKAGE_RECOMMENDS "vim, mysql-client (>= 5.1), python (>= 2.6.5), bzip2")
 SET(CPACK_DEBIAN_PACKAGE_SUGGESTS "perl (>= 5.1), etckeeper, byobu")
-SET(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${GameHosts_SOURCE_DIR}/cmakeincludes/preinst;${GameHosts_SOURCE_DIR}/cmakeincludes/postinst;")
+SET(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/cmakeincludes/preinst;${CMAKE_CURRENT_SOURCE_DIR}/cmakeincludes/postinst;")
 
 INCLUDE (CPack)		# For making installers
 
 SET(_PREV_BUILD_TYPE "${PN_BUILD_TYPE}" CACHE INTERNAL "Value of PN_BUILD_TYPE last time CMake Ran" FORCE)
-

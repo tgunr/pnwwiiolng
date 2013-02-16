@@ -215,7 +215,60 @@
                   </xs:documentation>
                 </xs:annotation>
               </xs:element>
-						</xs:all>
+              <xs:element name="Plans">
+                <xs:annotation>
+                  <xs:documentation>
+                    Describe one or more cluster layouts.
+                  </xs:documentation>
+                </xs:annotation>
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="Plan" minOccurs="1" maxOccurs="unbounded">
+                      <xs:annotation>
+                        <xs:documentation>
+                          Describes how processes should be distributed across servers.
+                        </xs:documentation>
+                      </xs:annotation>
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="Host" minOccurs="1" maxOccurs="unbounded">
+                            <xs:annotation>
+                              <xs:documentation>
+                                Describes a discrete host machine.
+                              </xs:documentation>
+                            </xs:annotation>
+                            <xs:complexType>
+                              <xs:all>
+                                <xs:element name="Require" minOccurs="0">
+                                  <xs:annotation>
+                                    <xs:documentation>
+                                      Specify one or more requirements to meet the specs of this host.
+                                    </xs:documentation>
+                                  </xs:annotation>
+                                  <xs:complexType>
+                                    <xs:choice>
+                                      <xs:element name="Network" type="t_IPv4ClassCAddress"/>
+                                    </xs:choice>
+                                  </xs:complexType>
+                                </xs:element>
+                                <xs:element name="Strat" minOccurs="0" maxOccurs="1"/>
+                                <xs:element name="DBD" minOccurs="0" maxOccurs="1"/>
+                                <xs:element name="Chat" minOccurs="0" maxOccurs="1"/>
+                                <xs:element name="Map" minOccurs="0" maxOccurs="1"/>
+                                <xs:element name="Ping" minOccurs="0" maxOccurs="1"/>
+                                <xs:element name="Cell" minOccurs="0" maxOccurs="1"/>
+                              </xs:all>
+                              <xs:attribute name="Priority" type="xs:unsignedByte" use="required"/>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                        <xs:attribute name="Name" type="xs:string"/>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+            </xs:all>
 					</xs:complexType>
 				</xs:element>
 				<xs:element name="StratHost">

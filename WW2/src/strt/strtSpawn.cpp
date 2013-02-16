@@ -862,7 +862,7 @@ POSTED_WEAPON::setMulticrew(bool isMulticrew)
 		Teul::Packet outgoing(0, Strat::CallbackX, STRT_MM_POST_LIST_Y) ;
 		CONSTRUCT_IN_PACKET(outgoing, PostListReply, action, node->m_playerID, m_facility->uOID) ;
 		outgoing.allocate<MM_POSTED_WEAPON>().copy(*this) ;
-		serverSendPacketToType(outgoing, MAP_MISSION) ;
+		serverSendPacketToType(outgoing, MAP_HOST) ;
 	}
 }
 
@@ -1242,7 +1242,7 @@ strtExpireWeapon(POSTED_WEAPON& weapon)
 void
 strtInitSpawn(void)
 {
-#if defined(STRAT_HOST)
+#if defined(IS_STRAT_HOST)
 	// Make sure all the vehicles we know about are now in the database.
 	strtdbPopulateVehTypesTable() ;
 #endif
@@ -1250,7 +1250,7 @@ strtInitSpawn(void)
 	// Now read in data from it
 	strtdbReadVehicleAccess() ;
 
-#if defined(STRAT_HOST)
+#if defined(IS_STRAT_HOST)
 	// Save any un-saved, modified CVC values
 	strtdbSaveVehicleCVCs() ;
 #endif

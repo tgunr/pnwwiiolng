@@ -47,7 +47,7 @@
 #include "wwii/wwiiThreads.h"
 #include "weap/weapLoadIndexes.h"
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 #include "strt/strtHCUnits.h"
 #endif
 

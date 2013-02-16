@@ -186,7 +186,7 @@ memReportJSON(unsigned int fd, const char* const /*path*/, const char* const /*a
 
 	offset += sprintf(buffer + offset, "\r\n}\r\n") ;
 
-	write(fd, buffer, offset) ;
+	send(fd, buffer, offset, 0) ;
 }
 #endif
 

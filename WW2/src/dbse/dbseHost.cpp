@@ -45,12 +45,6 @@ static void _errorFunction(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32
 
 }
 
-static void _killFunction (SINT32 /*teulIndex*/, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 /*error*/)
-{
-	dbugLog(_FLA, "killing host");
-	teulCloseTransport();
-}
-
 static void
 _initDB()
 {
@@ -59,18 +53,15 @@ _initDB()
 	dbugLog(_FLI, "Connected to WWII_DB") ;
 }
 
+static const char* g_serverName = "dbd";
+
 int main(int argc, char* argv[])
 {
-	UINT16 port = WWII::Net::Ports::DbsePri ;
+	UINT16 port = WWII::Net::Ports::Dbse ;
 	SINT32 listenIndex;
 
-	if ((argc > 1) && (argv[1][1] == '2'))
-	{
-		port = WWII::Net::Ports::DbseSec ;
-	}
-
-	Teul::SetAppName("dbd") ;
-	if (teulInitTransport(LOG_TO_FILE, "dbd", _errorFunction, _killFunction) < 0)
+	Teul::SetAppName(g_serverName) ;
+	if (teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction) < 0)
 	{
 		fprintf(stderr, "Unable to intialize teulTransport\n") ;
 		exit(-ENOTCONN) ;

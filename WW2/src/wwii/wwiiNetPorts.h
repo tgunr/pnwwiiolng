@@ -19,7 +19,6 @@ namespace WWII
 			{
 			// Internal ports
 				PrivateBcast = 6666					// server<->server backbone
-			,	ClusterBoss = 6001					// Main port for cluster boss.
 			,	InternalAuth = 6002					// Auth<->server interface
 			,	DebugWebServer = 6080				// Debugging web interface
 			,	ChatManagement = 27019				// For rosterClient
@@ -34,9 +33,12 @@ namespace WWII
 			,	ChatHost = 27015					// Chat host server
 			,	CellHost = 27015					// Cell host (game world) server
 
+			,	GameBase	=	27020				// Assign ports here and up.
+			,	PeerBase	=	6100				// Peer listening ports.
+			,	WebBase		=	6200				// Listen for web connections here.
+
 			,	InternalStrat = 6060				// Strat<->server interface
-			,	DbsePri = 9000						// } Database proxy primary and
-			,	DbseSec = 9099						// } secondary interfaces.
+			,	Dbse = 9000							// } Database proxy primary and
 			,	ConnectionList = 27016				// } Find best connection
 			,	ConnectionTest = 27017				// } algorithm ports
 			} ;

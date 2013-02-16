@@ -120,7 +120,7 @@ FacilityStruct::setOpen(bool toOpen)
 	open = toOpen ;
 	flags = newFlags ;
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 	strtSaveFacility(this) ;
 	strtQueueFacilityStatus(this) ;
 #endif
@@ -140,7 +140,7 @@ FacilityStruct::setCountry(WWII_COUNTRY newCountry)
 	country = newCountry ;
 	side = newSide ;
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 	strtSaveFacility(this) ;
 	strtQueueFacilityStatus(this) ;
 #endif
@@ -368,7 +368,7 @@ CaptureState::populate(const class FacilityStruct* facility
 	m_forSide = forSide ;
 }
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 //////////////////////////////////////////////////////////////////////
 // Find the spawn entry for a weapon type for a given facility
 // replaces strtFindWeaponEntry

@@ -34,9 +34,10 @@
 #include <WinInet.h>
 #include <Winineti.h>
 #include <WinIoCtl.h>
+#pragma comment(lib, "event.lib")
+#pragma comment(lib, "ws2_32.lib")
 #include <iphlpapi.h>
 #pragma comment(lib, "IPHLPAPI.lib")
-#pragma comment(lib, "Ws2_32.lib")
 #else
 #include <sys/ioctl.h>
 #include <sys/socket.h>
@@ -77,7 +78,7 @@ _getHostIPAddresses()
 	// Get a list of IPv4 network interfaces.
 	auto ifiList = get_ifi_info(AF_INET, TRUE);
 
-	// Get the addresses of upto MAX_HOSTS_IP interfaces.
+	// Get the addresses of upto MaxHostIPs interfaces.
 	auto& ifNo = Server::myInterface.numIP ;
 	ifNo = 0 ;
 	for ( auto ifi = ifiList; ifi != NULL ; ifi = ifi->ifi_next )
@@ -99,7 +100,7 @@ _getHostIPAddresses()
 						);
 
 			++ifNo ;
-			if ( ifNo >= MAX_HOSTS_IP )
+			if ( ifNo >= Server::InterfaceDescription::MaxHostIPs )
 				break ;
 		}
 	}
@@ -173,7 +174,7 @@ _getHostIPAddresses()
 
 	auto address = preferredIf->FirstUnicastAddress;
 	auto& ifNo = Server::myInterface.numIP;
-	for ( ifNo = 0; ifNo < MAX_HOSTS_IP && address != NULL; ++ifNo, address = address->Next)
+	for ( ifNo = 0; ifNo < Server::InterfaceDescription::MaxHostIPs && address != NULL; ++ifNo, address = address->Next)
 	{
 		struct sockaddr_in* saddr = (struct sockaddr_in*)(address->Address.lpSockaddr);
 		Server::myInterface.addr[ifNo].naddr = saddr->sin_addr.S_un.S_addr;
@@ -199,36 +200,6 @@ _getHostIPAddresses()
 
 SINT32 teulModStartup(ERROR_FUNCTION* errFnPtr)
 {
-#if platOS == OS_WIN32
-	SINT32 err;
-	WORD wVersionRequested;WSADATA wsaData;
-	wVersionRequested = MAKEWORD( 2, 2 );
-
-	if ( (err = WSAStartup( wVersionRequested, &wsaData)) != 0 )
-	{
-			dbugWrite(_FLA,"teulModStartup:  WSAStartup failed %d",err);
-			// Tell the user that we could not find a usable
-			// WinSock DLL.
-			return -1;
-	}
-
-	// Confirm that the WinSock DLL supports 2.2.
-	// Note that if the DLL supports versions greater
-	// than 2.2 in addition to 2.2, it will still return
-	// 2.2 in wVersion since that is the version we
-	// requested.
-	if ( 	LOBYTE( wsaData.wVersion ) != 2
-		|| HIBYTE( wsaData.wVersion ) != 2 )
-	{
-		// Tell the user that we could not find a usable
-		// WinSock DLL.
-		dbugWrite(_FLA,"teulModStartup:  WSAStartup failed : wrong version");
-		WSACleanup( );
-		return -1;
-	}
-	// The WinSock DLL is acceptable. Proceed.
-
-#endif
 #if platOS == OS_LINUX
 	signal(SIGPIPE, SIG_IGN);
 #endif
@@ -256,20 +227,29 @@ SINT32 teulModStartup(ERROR_FUNCTION* errFnPtr)
 typedef std::vector<UINT32> ADDRESS_LIST ;
 
 #if platBuild == TEUL_SERVER || platOS == OS_LINUX
-const ADDRESS_LIST&
-teulGetAddresses()
+void
+teulGetAddresses(ADDRESS_LIST& addresses)
 {
-	static ADDRESS_LIST addresses ;
-
-	if ( addresses.empty() )
+	addresses.clear();
+	for ( UINT32 i = 0 ; i < Server::myInterface.numIP ; ++i )
 	{
+		addresses.push_back(Server::myInterface.addr[i].ip) ;
+	}
+}
+
+namespace Teul
+{
+	bool IsMyAddress(UINT32 address_)
+	{
+		if ( address_ == INADDR_LOOPBACK )
+			return true;
 		for ( UINT32 i = 0 ; i < Server::myInterface.numIP ; ++i )
 		{
-			addresses.push_back(Server::myInterface.addr[i].ip) ;
+			if ( Server::myInterface.addr[i].ip == address_ )
+				return true;
 		}
+		return false;
 	}
-
-	return addresses ;
 }
 #endif
 
@@ -325,7 +305,8 @@ static const size_t UdpSndBufSize = 64 * 1024 ;
 static void
 _configureEndpointSocket(ENDPOINT& endpoint)
 {
-	evutil_make_socket_nonblocking(endpoint.socket) ;
+	evutil_make_socket_nonblocking(endpoint.socket);
+	evutil_make_socket_closeonexec(endpoint.socket);
 
 	const bool isTcp = (endpoint.protocol == TCP) ;
 

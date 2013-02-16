@@ -323,7 +323,7 @@ chatSendGCIMessage(GCI_TYPE gci_, WWII_SIDE side_, const CPStruct& cp_, const FU
 {
 	Teul::Packet outgoing(sizeof(Chat::GCIMessage), Chat::CallbackX, Chat::GAME_GCI_MESSAGE_Y) ;
 	CONSTRUCT_IN_PACKET(outgoing, Chat::GCIMessage, gci_, side_, cp_.fullObjID, facID_, cp_.name) ;
-	serverSendPacketToType(outgoing, CHAT_DAEMON) ;
+	serverSendPacketToType(outgoing, CHAT_HOST) ;
 }
 
 //////////////////////////////////////////////////////////////////////

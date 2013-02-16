@@ -268,7 +268,6 @@ struct ClientClassData
 static int clientid;
 static bool clientinited;
 
-static void killFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error);
 static void errorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error);
 
 #if(0)
@@ -2920,7 +2919,7 @@ int ww2::Client::Init(int playerID, int otp, unsigned int appVersion)
 	// go ahead and set the player ident info in it just to make sure
 	PlayerClient()->SetPlayerIdent(playerID, otp, appVersion);
 
-	int err = teulInitTransport(DBUGLOG_MODE, "wwiiClient", errorFn, killFn, clientErrorLog);
+	int err = teulInitTransport(DBUGLOG_MODE, "wwiiClient", errorFn, clientErrorLog);
 
 	if(err > -1)
 	{
@@ -3021,12 +3020,6 @@ unsigned int ww2::Client::OICOfBrigade() const
 /************************************************************************************************
 	teul callbacks
 *************************************************************************************************/
-
-static void killFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error)
-{
-	clientErrorLog("Kill function called #%d", error) ;
-    exit(-1);
-}
 
 static void errorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error)
 {

@@ -328,7 +328,7 @@ struct Role
 
 		// Initialize the teulKit transport, telling it how/where to log,
 		// and providing it with our custom error and shutdown handlers.
-		SINT32 ret = teulInitTransport(LOG_TO_FILE, moduleName, Role::transportErrorFn, Role::transportKillFn) ;
+		SINT32 ret = teulInitTransport(LOG_TO_FILE, moduleName, Role::transportErrorFn) ;
 		if ( ret < 0 )
 			throw Teul::Error("teulInitTransport failed", ret) ;
 
@@ -391,16 +391,6 @@ struct Role
 	public: static void transportErrorFn(const SINT32 teulIndex, const UCHAR*, SINT32, const TEUL_CALLBACK*, SINT32 error)
 	{
 		throw Teul::IndexError(teulIndex, "transport error", error) ;
-	}
-
-	//////////////////////////////////////////////////////////////////////
-	// Handle teul transport kill signal.
-
-	public: static void	transportKillFn(const SINT32 teulIndex, const UCHAR*, SINT32, const TEUL_CALLBACK*, SINT32 error)
-	{
-		printf("[X] t:%d got transportKill Signal [%d]", teulIndex, error) ;
-		teulCloseTransport() ;
-		throw Teul::IndexError(teulIndex, "transport kill signal received", error) ;
 	}
 
 	//////////////////////////////////////////////////////////////

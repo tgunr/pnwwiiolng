@@ -9,14 +9,13 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 #include "wwii/wwiiHash.h"
+#include "teul/teulBasic.h"
 class wwiiPlayer ;
 class Player ;
 
 // Map of players by ID
 typedef std::unordered_map<playerid_t /*playerID*/, class PlayerStatusNode*> PLAYERID_HASH ;
 typedef std::map<UINT32 /*teulIndex*/, class PlayerStatusNode*> PLAYERIDX_MAP ;
-
-extern void* teulGetPersonaData(SINT32) ;
 
 class ServerInterface
 {

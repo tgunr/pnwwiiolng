@@ -1,8 +1,8 @@
 # Visual Studio on Windows.
 
 include_directories(
-	${GameHosts_SOURCE_DIR}/../include
-	${GameHosts_SOURCE_DIR}/../../Libraries/raknet/Source
+	${CMAKE_CURRENT_SOURCE_DIR}/../include
+	${CMAKE_CURRENT_SOURCE_DIR}/../../Libraries/raknet/Source
 )
 
 set(_FORCE_INCLUDE_FLAG "/FI")

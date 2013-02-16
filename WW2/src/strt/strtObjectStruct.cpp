@@ -67,7 +67,7 @@ ObjectStruct::recalculateCapacity()
 //////////////////////////////////////////////////////////////////////
 // Strat definition is in strtHostDB.cpp
 
-#ifndef STRAT_HOST
+#ifndef IS_STRAT_HOST
 bool ObjectStruct::save() { return true ; }
 #endif
 
@@ -236,7 +236,7 @@ ObjectStruct::setVisLevel(UCHAR newLevel)
 //////////////////////////////////////////////////////////////////////
 // Stubs for a non-strat host
 
-#ifndef STRAT_HOST
+#ifndef IS_STRAT_HOST
 
 SINT32 runtime = 0 ;
 

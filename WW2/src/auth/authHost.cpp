@@ -791,13 +791,6 @@ static void _gameErrorFunction (const SINT32 teulIndex, const UCHAR* const /*dat
 	teulSetPersonaData(teulIndex, NULL);
 }
 
-static void _killAuth(const SINT32 /*teulIndex*/, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 /*error*/)
-{
-	_running = false ;
-
-	dbugLog(_FLN, "server exiting normally");
-}
-
 // process the arena request
 // Sends information about an arena or a web redirection
 LOGICAL authProcessArenaRequest(const SINT32 teulIndex, ARENA_REQ& request)
@@ -881,15 +874,18 @@ _runHost()
 //////////////////////////////////////////////////////////////////////
 // Entry point
 
-int main(int argc, char* argv[])
+const char* const g_serverName = "authHost";
+
+int
+main(int argc, char* argv[])
 {
 #ifdef BLOCK_AN_ADDRESS
 	teulGetHost(BLOCK_ADDRESS, &blockedIP);
 #endif
 
 	//Open transport for logging purposes
-	Teul::SetAppName("authHost") ;
-	if(teulInitTransport(LOG_TO_FILE, "authHost", _errorFunction, _killAuth) < 0)
+	Teul::SetAppName(g_serverName) ;
+	if(teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction) < 0)
 	{
 		fprintf(stderr, "couldn't initialize teulTransport\n") ;
 		exit(-1);
@@ -905,10 +901,6 @@ int main(int argc, char* argv[])
 	wwiiIRCAddInitialChannel("-ok", "", "Authenication approvals") ;
 
 	threadsSetup() ;
-
-//	authInitDaemon(_killAuth);
-
-	dbugLog(_FLN,"Creating server and game lists");
 
 	dbugLog(_FLN,"connecting to database");
 

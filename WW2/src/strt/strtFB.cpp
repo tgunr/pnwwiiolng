@@ -23,7 +23,7 @@
 #include "strt/strtIO.h"
 #include "wwii/wwiiConfig.h"
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 #include "strt/strtHostDB.h"
 #endif
 
@@ -345,7 +345,7 @@ strtOpenFirebase(FacilityStruct& openingFirebase)
 	}
 
 	strtQueueFacilityStatus(&openingFirebase);
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 	strtSaveFacility(&openingFirebase);
 #endif
 }
@@ -380,7 +380,7 @@ strtCloseFirebase(FacilityStruct& closingFirebase)
 		currentObject = currentObject->next;
 	}
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 	strtQueueFacilityStatus(&closingFirebase);
 	strtSaveFacility(&closingFirebase);
 #endif

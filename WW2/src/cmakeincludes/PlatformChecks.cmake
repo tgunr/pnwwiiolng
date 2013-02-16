@@ -35,5 +35,4 @@ add_definitions("-DHAVE_CONFIG_H=1")
 
 IF (WIN32 OR WIN64)
 	LINK_DIRECTORIES("${CMAKE_CURRENT_SOURCE_DIR}/../lib/win")
-	SET(_NETWORK_LIBRARY "wsock32.lib")
 ENDIF ( )

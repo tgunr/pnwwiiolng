@@ -1,22 +1,21 @@
 ######################################################################
 
-SET(SourcePCH "${GameHosts_SOURCE_DIR}/hostproj/syscfg.h")
+SET(SourcePCH "${CMAKE_CURRENT_SOURCE_DIR}/hostproj/syscfg.h")
 
 # Do all of the platform-specific configuration stuff for building.
 include ( cmakeincludes/HostConfiguration.cmake )
 
 IF ( NOT PN_CLUSTER STREQUAL "Auth" )
-	SET(_LUA_HOST "stratd")
 	# Add a rule to build the Lua glue file
-	add_custom_command(OUTPUT ${GameHosts_SOURCE_DIR}/${_LUA_HOST}Lua.cc
+	add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${_LUA_HOST}Lua.cc
 		COMMAND ${TOLUAPP_EXECUTABLE}
-			-o  ${GameHosts_SOURCE_DIR}/${_LUA_HOST}Lua.cc
+			-o  ${CMAKE_CURRENT_SOURCE_DIR}/${_LUA_HOST}Lua.cc
 			-n  game
 			-D
 			-C
 			-E  project=ww2ol
 			hostproj/${_LUA_HOST}.pkg
-		WORKING_DIRECTORY ${GameHosts_SOURCE_DIR}
+		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		MAIN_DEPENDENCY hostproj/${_LUA_HOST}.pkg
 		DEPENDS
 			${SourcePCH}
@@ -34,7 +33,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 	)
 ENDIF( )
 
-CONFIGURE_FILE( ${GameHosts_SOURCE_DIR}/hostproj/revision.h.in ${GameHosts_SOURCE_DIR}/hostproj/revision.h )
+CONFIGURE_FILE( ${CMAKE_CURRENT_SOURCE_DIR}/hostproj/revision.h.in ${CMAKE_CURRENT_SOURCE_DIR}/hostproj/revision.h )
 
 IF (NOT MSVC)
 	SET(BinaryPCH "${SourcePCH}.gch")

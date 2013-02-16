@@ -101,7 +101,7 @@ public:
 
 	TRANSFERS		m_transfers ;
 
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 	struct Throttle
 	{
 		UINT32 Check() const

@@ -128,7 +128,7 @@ namespace AWS
 }
 
 ///TEMPORARY
-#ifdef CHAT_HOST
+#ifdef IS_CHAT_HOST
 class Player ;
 extern void chatProcessAWSRequest(Player& player, const AWS::Request& request) ;
 #endif

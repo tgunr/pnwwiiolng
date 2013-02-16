@@ -192,7 +192,7 @@ static void _populateEntry(Teul::Packet& outgoing, const CPStruct* cp)
 void
 strtSendChatInitialUpdates()
 {
-	ENDPOINT* endpoint = serverPeerEndpointByType(CHAT_DAEMON) ;
+	ENDPOINT* endpoint = serverPeerEndpointByType(CHAT_HOST) ;
 	if ( endpoint == NULL )
 		return ;
 
@@ -1077,7 +1077,7 @@ AttackOrder::process()
 	// Send back the response
 	Teul::Packet outgoing(sizeof(*this), Chat::CallbackX, Chat::ATTACK_ORDER_Y) ;
 	outgoing.append(this, sizeof(*this)) ;
-	serverSendPacketToType(outgoing, CHAT_DAEMON) ;
+	serverSendPacketToType(outgoing, CHAT_HOST) ;
 }
 
 bool

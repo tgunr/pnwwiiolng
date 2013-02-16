@@ -25,10 +25,16 @@
 #define TEUL_CLIENT		0
 #define	TEUL_SERVER		1
 
-#if __cplusplus <= 19711L
-# define OVERRIDE_FN
-#else
+#if __cplusplus > 199711L || (defined(_MSC_VER) && _MSC_VER >= 1700)
 # define OVERRIDE_FN override
+#else
+# define OVERRIDE_FN
+#endif
+
+#if __cplusplus > 199711L || (defined(_MSC_VER) && _MSC_VER >= 1701)
+# define CONSTEXPR_FN constexpr
+#else
+# define CONSTEXPR_FN
 #endif
 
 // Determine which version of GCC, if any, is being used,

@@ -38,6 +38,7 @@
 	#include <winsock2.h>
 	#define wErrno WSAGetLastError()
 	#define wSetErrno WSASetLastError
+#pragma comment(lib, "ws2_32.lib")
 #endif
 
 #if !defined(_MSC_VER)
@@ -69,7 +70,6 @@ static const size_t MAX_FILE_NUM = 5 ;
 
 static const SINT32 _stdErrFileNo = OS_FILENO(stderr);
 static DebugLogger _logger;
-static Debug::ERROR_HANDLER dbugErrorHandlers[Debug::ERROR_TYPE_SIZE] ;
 
 const char* errorTypes[] = {
 	"F",		// fatal error detected, exit program
@@ -87,7 +87,7 @@ namespace Teul { namespace uWeb { class Server ; Server* s_debugServer = NULL ; 
 
 //static SINT32	theError = 0;
 static size_t _fileSize = 0;
-static void _levelHandler(SINT32 flags, UINT32 errType, const char* const text);
+static void _levelHandler(UINT32 errType, const char* const text);
 
 #if defined(REPOSITORY_INFO)
 static const char _OPEN_MSG[] = "Playnet Server Log File. Rev: " REPOSITORY_INFO CARRIAGE_RETURN ;
@@ -101,6 +101,11 @@ static const char _CLOSE_MSG[] = CARRIAGE_RETURN "Debug Message System Closed." 
 // Exposed globally so it can be tested before prior to performing otherwise expensive
 // message constructions.
 bool g_logDebug = true ;
+
+#include <OpenThreads/Mutex>
+#include <OpenThreads/ScopedLock>
+static OpenThreads::Mutex s_dbugInitMutex;
+static bool s_dbugInitialized = false;
 
 //////////////////////////////////////////////////////////////////////
 // Set errno.
@@ -374,11 +379,17 @@ _setSignal(int signum, void (*handler)(int))
 }
 #endif
 
-// dbugInit: sets the current error level to ERR_INFO, opens the debug file, and
-// initializes the error object.
-int
-dbugInit(SINT32 logType, const char* const filename)
+//////////////////////////////////////////////////////////////////////////
+// dbugInit: sets the current error level to ERR_INFO, opens the debug
+// file, and initializes the error object.
+
+void dbugInit(SINT32 logType, const char* const filename)
 {
+	OpenThreads::ScopedLock<OpenThreads::Mutex> mutexLock(s_dbugInitMutex);
+	if ( s_dbugInitialized )
+		return;
+	s_dbugInitialized = true;
+
 	setlocale(LC_CTYPE, "") ;
 
 	SINT32 file;
@@ -401,8 +412,7 @@ dbugInit(SINT32 logType, const char* const filename)
 		file = -1;
 		break;
 	default:
-		fprintf(stderr, "*** Must specify LOG_TO_FILE or LOG_OFF\n") ;
-		exit(-1) ;
+		LogAbort("Invalid initial state for logging subsystem.");
 	}
 
 	_logger.initialize(logType, level, file, filename);
@@ -418,12 +428,11 @@ dbugInit(SINT32 logType, const char* const filename)
 		|| _setSignal(SIGTERM, dbugDumpBacktrace) < 0
 		|| _setSignal(SIGBUS, dbugDumpBacktrace) < 0 )
 	{
-		fprintf(stderr, "*** Unable to install signal handlers\n") ;
-		exit(-1) ;
+		LogAbort("Unable to install signal handlers.");
 	}
 
 	static struct timeval tv;
-	gettimeofday(&tv,0);
+	gettimeofday(&tv, 0);
 	const TeulTimeMS newTimeMS = ((TeulTimeMS)tv.tv_sec * 1000LL) + (tv.tv_usec / 1000) ;
 	if ( newTimeMS < teulClock64 )
 	{
@@ -436,8 +445,6 @@ dbugInit(SINT32 logType, const char* const filename)
 		teulClockTime = (UINT32)tv.tv_sec ;
 	}
 #endif
-
-	return TRUE;
 }
 
 // dbugClose: closes the debug file and cleans up.
@@ -540,13 +547,6 @@ void dbugSetLogLevel(Debug::ERROR_TYPE level)
 	default:
 		return;
 	}
-}
-
-// set an optional user debug handler for each errType.
-void
-dbugSetErrHandler(const Debug::ERROR_TYPE level, const Debug::ERROR_HANDLER handler)
-{
-	dbugErrorHandlers[level] = handler ;
 }
 
 // dbugSetErrno: sets Errno. Error numbers adhear to errno.h. Under win32
@@ -664,7 +664,7 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 
 	_dbugOut(_logger.dbugfile, _logger.logType, _logger.errType, flags, text, len, true);
 
-	if ( flags & STD_ERR )
+	if ( (flags & LOG_ALL_TO_STDERR) || ((flags & STD_ERR) && _logger.errType <= Debug::ERR_MINOR) )
 	{
 		if ( flags & BARE_DEBUG )
 			printf("%s", text);
@@ -672,7 +672,7 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 			printf("%s%s", CARRIAGE_RETURN, text);
 	}
 
-	_levelHandler(flags, _logger.errType, text);
+	_levelHandler(_logger.errType, text);
 
 	if (retval < 0)
 		return retval;
@@ -695,7 +695,7 @@ SINT32 _dbugLog(const char* const filename, const SINT32 lineno, const UINT32 er
 			va_start(args, fmt);
 			vsnprintf(text, sizeof(text), fmt, args);
 			va_end(args);
-			_levelHandler(0, errType, text);
+			_levelHandler(errType, text);
 		}
 		return 0 ;
 	}
@@ -726,26 +726,12 @@ SINT32 _dbugWrite(char* filename, SINT32 lineno, UINT32 errType, char* fmt, ...)
 	return retval;
 }
 
-void _levelHandler(SINT32 flags, UINT32 errType, const char* const text)
+void _levelHandler(UINT32 errType, const char* const text)
 {
 	if ( errType != Debug::ERR_FATAL )
 		return ;
 
 	fprintf(stderr, "%s\n", text);
-
-	const Debug::ERROR_HANDLER& handler = dbugErrorHandlers[errType] ;
-	if ( handler != NULL )
-	{
-		if ( g_logDebug )
-		{
-			char string[255];
-			snprintf(string, sizeof(string) - 1, "calling handler %p for type %u\n", handler, errType);
-			string[sizeof(string)-1] = 0 ;
-			fprintf(stderr, "%s", string);
-			OS_WRITE(_logger.dbugfile, string, (SINT32)strlen(string));
-		}
-		handler();
-	}
 
 	abort();
 }
@@ -760,12 +746,11 @@ _LogAbort(const char* file_, int line_, unsigned int error_, const char* asserti
 	va_start(args, fmt_);
 
 #if platOS == OS_WIN32
-	(void)(error_);
-
 	if ( assertion_ == NULL || *assertion_ == 0 )
 		assertion_ = "";
 
 	const size_t roughSize = vsnprintf(_logger.m_text, sizeof(_logger.m_text), fmt_, args);
+	va_end(args);
 	const size_t maxSize = roughSize + 256 + strlen(assertion_);
 	char* message = (char*)alloca(maxSize * sizeof(char));
 	const char* caption;
@@ -780,6 +765,8 @@ _LogAbort(const char* file_, int line_, unsigned int error_, const char* asserti
 		sprintf_s(message, maxSize, "File: %s\nLine: %u\nError: %s\n", file_, line_, _logger.m_text);
 	}
 	MessageBoxA(0, message, caption, MB_OK | MB_ICONERROR | MB_APPLMODAL);
+
+	exit(error_ != 0 ? error_ : -1);
 #else
 	if ( _logger.isInitialized() )
 	{
@@ -789,8 +776,8 @@ _LogAbort(const char* file_, int line_, unsigned int error_, const char* asserti
 	}
 
 	vfprintf(stderr, fmt_, args);
-#endif
 	va_end(args);
 
 	abort();
+#endif
 }

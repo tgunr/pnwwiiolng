@@ -214,7 +214,7 @@ public:
 private:
 	WEAPON_ENTRIES	m_weaponEntries ;
 	// Lowest level handling of capture stage updates.
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 	void _setCaptureState(CaptureStage toStage, UINT16 toCounter) ;
 #else
 	void _setCaptureState(CaptureStage toStage, UINT16 toCounter) { m_captureStage = toStage ; m_captureCounter = toCounter ; m_captureStateChanged = teulTime() ; }

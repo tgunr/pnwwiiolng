@@ -51,8 +51,6 @@ void (*Teul::g_logFnPtr) (const char* const, ...) = dummyLogFn ;
 
 static LOGICAL				_transportInited,_transportClosing;
 
-static ERROR_FUNCTION*	_killFn;
-
 // For client network selection
 UINT32 _hostAddressMask = 0 ;
 
@@ -99,28 +97,31 @@ teulGetHostByName(const SCHAR* const name)
 // wrapper for inet_aton.
 // converts a doted quad string to a UINT32.
 // returns 0 if address is invalid.
-SINT32
-teulGetHost(const SCHAR* address, UINT32* host)
+bool
+teulGetHost(const SCHAR* address_, UINT32* host_)
 {
-	SINT32 retval = TRUE;
+	if (strcmp(address_, "localhost") == 0 )
+	{
+		*host_ = INADDR_LOOPBACK;
+		return true;
+	}
 
+	UINT32 host = (*host_) = 0;
 #if platOS == OS_LINUX
-	if ( (retval = inet_aton(address ,(struct in_addr*)host)) != 0)
-		*host = ntohl(*host);
-
+	if ( inet_aton(address_, (struct in_addr*)&host) == 0 )
+		return false;
 #elif platOS == OS_WIN32
-	if ( (*host = inet_addr( address )) == 0)
-		retval = 0;
-	else
-		*host = ntohl(*host);
+	host = inet_addr(address_);
+	if ( host == 0 )
+		return false;
 #elif platOS == OS_MACOS
-	retval = inet_aton(address, (struct in_addr*)host);
-	if ( retval != 0 )
-		*host = ntohl(*host);
+	if ( inet_aton(address_, (struct in_addr*)&host) == 0 )
+		return false;
 #else
 	#error "fix this, man..."
 #endif
-	return retval;
+	*host_ = ntohl(host);
+	return true;
 }
 
 // When the connection is open and connected this function
@@ -154,16 +155,6 @@ ENDPOINT::doAccept(ENDPOINT& newEndpoint)
 	{
 		dbugLog(_FLD, "t:%d accepted t:%d", this->teulIndex(), newEndpoint.teulIndex());
 	}
-}
-
-// We all have to dies some day, and this function is called as part of
-// any major teul exit. This in turn calls the user kill routine so
-// the user app can do clean up on the way out.
-void
-teulKILL(void)
-{
-	if (_killFn != NULL)
-		(_killFn) (0, NULL, 0, NULL, 0);
 }
 
 void
@@ -250,36 +241,36 @@ SINT32 teulOpenListen(const UINT16 portNumber
 
 #if platOS == OS_LINUX || platBuild == TEUL_SERVER
 // opens a port for listening on all address associated with the specified interface. "eth0" only!
-// Assumes that all callbacks have been properly installed.  returns -error_number or 0 on sucess.
+// Assumes that all callbacks have been properly installed.  returns -error_number or 0 on success.
 // connection acceptFnPtr is an optional ptr to callback function which is
 // called when a connection is made to the listening socket, and hence a new
 // connection is created.  pass NULL if you do not want this notification
-SINT32 teulOpenListenInterface(const UINT16 portNumber
+bool teulOpenListenInterface(const UINT16 portNumber
 					, CONNECT_FUNCTION* acceptFnPtr
 					, const SINT32 timeout
-					, const PROTOCOL protocol
 					, ERROR_FUNCTION* errorFnPtr
 					)
 {
 	if ( _transportClosing )
-		return -EDEADLK ;
+		return false ;
 
+	SINT32 retval;
 	for (UINT32 i = 0; i < Server::myInterface.numIP; ++i)
 	{
 		dbugLog(_FLD,"opening listen port on address %s port %d", teulGetAddress(Server::myInterface.addr[i].ip), portNumber);
 
-		const SINT32 retval = _openListen( Server::myInterface.addr[i].ip
+		retval = _openListen( Server::myInterface.addr[i].ip
 						,  portNumber
 						,  acceptFnPtr
 						,  timeout
-						,  protocol
+						,  TCP
 						,  errorFnPtr
 						);
 		if (retval < 0)
-			return retval;
+			return false;
 	}
 
-	return 0;
+	return true;
 }
 
 
@@ -408,8 +399,29 @@ _logLibEvent(int eventLevel, const char* msg)
 }
 
 static void
-_initLibEvent()
+_initializePlatform()
 {
+#if platOS == OS_WIN32
+	WSADATA wsaData;
+	WORD wVersionRequested;
+	wVersionRequested = MAKEWORD( 2, 2 );
+
+	const SINT32 err = WSAStartup(wVersionRequested, &wsaData);
+	if ( err != 0 )
+	{
+		LogAbort(_FLA, "WSAStartup failed: %d",err);
+	}
+
+	// Confirm that the WinSock DLL supports 2.2.
+	// Note that if the DLL supports versions greater
+	// than 2.2 in addition to 2.2, it will still return
+	// 2.2 in wVersion since that is the version we
+	// requested.
+	if ( LOBYTE( wsaData.wVersion ) != 2 || HIBYTE( wsaData.wVersion ) != 2 )
+		LogAbort("Wrong version of winsock library.");
+	// The WinSock DLL is acceptable. Proceed.
+#endif
+
 	event_set_log_callback(_logLibEvent) ;
 
 	// Set up the configuration.
@@ -429,7 +441,6 @@ SINT32
 teulInitTransport(SINT32 logType
 					, const char* name
 					, ERROR_FUNCTION* errorFnPtr
-					, ERROR_FUNCTION* killFnPtr
 					, Teul::LoggingFn* const logFnPtr)
 {
 	if ( _transportInited == TRUE )
@@ -444,11 +455,7 @@ teulInitTransport(SINT32 logType
 		return -EDEADLK ;
 	}
 
-	if ( ! dbugInit(logType, name))
-	{
-		fprintf(stderr,"cant init dbug!");
-		return -EINVAL;
-	}
+	dbugInit(logType, name);
 
 	const Debug::ERROR_TYPE dbugFlags = (Debug::ERROR_TYPE)STD_ERR;
 
@@ -459,17 +466,14 @@ teulInitTransport(SINT32 logType
 
 	_transportInited = TRUE;
 
-	dbugLog(_FLN, "Initializing TeulKit transport [compiled %s %s]", __DATE__, __TIME__);
+	dbugLog(_FLI, "Initializing TeulKit transport [compiled %s %s]", __DATE__, __TIME__);
 
 	_transportClosing = FALSE;
-	_killFn = killFnPtr;
-
-	dbugSetErrHandler(Debug::ERR_FATAL, teulKILL);
 
 	if ( logFnPtr )
 		Teul::g_logFnPtr = logFnPtr ;
 
-	_initLibEvent() ;
+	_initializePlatform();
 
 	teulFreeAllCallbacks();
 
@@ -606,6 +610,9 @@ GetAppName()
 {
 	return _appName ;
 }
+
+bool IsTransportInited() { return _transportInited; }
+bool IsTransportClosing() { return _transportClosing; }
 
 } // namespace Teul
 

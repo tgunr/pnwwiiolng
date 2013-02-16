@@ -174,7 +174,7 @@ _recvWWII_ACTIVATE(ACTION_OBJECT* const a)
 		clientActivateCell(a->teulIndex, TRUE, maskedAddr, activate.port);
 		_updatesSent = 0 ;
 		break;
-	case CHAT_DAEMON:
+	case CHAT_HOST:
 		break;
 	default:
 		break;

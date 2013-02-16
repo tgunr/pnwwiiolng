@@ -2,15 +2,15 @@
 
 # Specify include directories.
 include_directories(
-    ${GameHosts_SOURCE_DIR}
-	${GameHosts_SOURCE_DIR}/hostproj
-	${GameHosts_SOURCE_DIR}/include
-	${GameHosts_SOURCE_DIR}/mem
-	${GameHosts_SOURCE_DIR}/sys
+    ${CMAKE_CURRENT_SOURCE_DIR}
+	${CMAKE_CURRENT_SOURCE_DIR}/hostproj
+	${CMAKE_CURRENT_SOURCE_DIR}/include
+	${CMAKE_CURRENT_SOURCE_DIR}/mem
+	${CMAKE_CURRENT_SOURCE_DIR}/sys
 	${MYSQL_INCLUDE_DIR}
-    ${GameHosts_SOURCE_DIR}/libircclient/include
-	${GameHosts_SOURCE_DIR}/../../Libraries/raknet/Source
-	${GameHosts_SOURCE_DIR}/libevent/include
+    ${CMAKE_CURRENT_SOURCE_DIR}/libircclient/include
+	${CMAKE_CURRENT_SOURCE_DIR}/../../Libraries/raknet/Source
+	${CMAKE_CURRENT_SOURCE_DIR}/libevent/include
 )
 
 # Platform specifics.
@@ -18,15 +18,15 @@ if ( MSVC )
 
 	include ( cmakeincludes/ConfigVisualStudio.cmake )
 	include_directories(
-			${GameHosts_SOURCE_DIR}/../../Libraries
-			${GameHosts_SOURCE_DIR}/libevent/WIN32-Code
+			${CMAKE_CURRENT_SOURCE_DIR}/../../Libraries
+			${CMAKE_CURRENT_SOURCE_DIR}/libevent/WIN32-Code
 			)
 
 else ( )
 	include ( cmakeincludes/ConfigGCC.cmake )
 
 	# Raknet is in /playnet/wiiol/lib.
-	link_directories(${GameHosts_BINARY_DIR} /playnet/wwiiol/lib)
+	link_directories(${CMAKE_CURRENT_SOURCE_DIR_BINARY_DIR} /playnet/wwiiol/lib)
 
 endif ( )
 

@@ -17,9 +17,9 @@
 
 extern DBHANDLE dbh ;
 
-#if defined(MAP_HOST)
+#if defined(IS_MAP_HOST)
 # include "map/mapBrigades.h"
-#elif defined(STRAT_HOST)
+#elif defined(IS_STRAT_HOST)
 # include "strt/strtHCUnits.h"
 #endif
 
@@ -147,17 +147,17 @@ wwiiReadHCUnits()
 			switch ( typeID )
 			{
 				case HCU_BRIGADE:
-#if defined(MAP_HOST)
+#if defined(IS_MAP_HOST)
 				// On the map host we have more detailed types for some sub-types
 					newUnit = (HCUnit*)(new Brigade(unitID, parentID, countryID, branchID, movementType, unitClass, handle, name, nick, rank, homeCP, owner, ownerRank)) ;
 				break ;
-#elif defined(STRAT_HOST)
+#elif defined(IS_STRAT_HOST)
 				// Fallthru, treat brigade & division the same
 #else
 				// Fallthru
 #endif
 				case HCU_DIVISION:
-#ifdef STRAT_HOST
+#ifdef IS_STRAT_HOST
 					newUnit = (HCUnit*)(new StratHCUnit(unitID, typeID, parentID, countryID, branchID, movementType, unitClass, handle, name, nick, rank, homeCP, owner, ownerRank, startCpOID, fallbackCpOID, lastMoved, lastMovedBy, nextMove, toeTemplate)) ;
 				break ;
 #else

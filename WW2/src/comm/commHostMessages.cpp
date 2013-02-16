@@ -787,7 +787,7 @@ _sendScoringHitEvent(const HostVehicle& victim, const HostVehicle& shooter, cons
 	outgoing.setUnencrypted() ;
 
 	dbugLog(_FLD, "sending hit event [p:%u]->[p:%u] to map host", actShooter.playerID(), actTarget.playerID()) ;
-	if ( !serverSendPacketToType(outgoing, MAP_MISSION) )
+	if ( !serverSendPacketToType(outgoing, MAP_HOST) )
 	{
 		LogAbort("failed to send hit message") ;
 	}

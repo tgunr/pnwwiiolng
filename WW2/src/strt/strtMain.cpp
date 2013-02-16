@@ -288,10 +288,10 @@ strtInitializeStratSystem()
 	strtInitStratSystemFirebases(_cpList);
 	threadsLogging() ;
 
-#if defined(STRAT_HOST)
+#if defined(IS_STRAT_HOST)
 	strtdbSaveGameWorld(_cpList) ;
 	threadsLogging() ;
-#endif // STRAT_HOST
+#endif // IS_STRAT_HOST
 
 	// Put brigades onto the map
 	strtInitializeHCUnits() ;

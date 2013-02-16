@@ -31,7 +31,7 @@ typedef std::pair<UINT32,UINT32> PLAYER_REQUESTS ;
 typedef std::vector<UINT32> OVERRUNS;
 typedef std::map<UINT32,EWSReport*> EWSREPORTS ;
 typedef std::vector<PLAYER_REQUESTS> HISTORY;
-#if defined(MAP_HOST)
+#if defined(IS_MAP_HOST)
 typedef std::map<Brigade*,UINT32> ACTIVE_BRIGADES ;
 #endif
 
@@ -111,7 +111,7 @@ struct CSAFE_CPStruct
 	SINT32				m_posX, m_posY ;
 
 //tolua_end
-#if defined(MAP_HOST)
+#if defined(IS_MAP_HOST)
 	class Mission*		m_missionsFrom ;
 	class Mission*		m_missionsTo ;
 	UINT64				m_lastUpdateNo ;
@@ -135,7 +135,7 @@ public:
 		, m_attackingUnit(NULL)
 		, m_units()
 		, m_value(0)
-#if defined(MAP_HOST)
+#if defined(IS_MAP_HOST)
 		, m_brigades()
 #endif
 	{
@@ -310,7 +310,7 @@ public:
 	UINT32				m_value ;
 
 //tolua_end
-#if defined(MAP_HOST)
+#if defined(IS_MAP_HOST)
 	ACTIVE_BRIGADES		m_brigades ;
 #endif
 
@@ -318,7 +318,7 @@ private:
 	//// Helper functions
 
 	// Change the flags and, if this amounts to a change, queue for
-	// network propogation of the change
+	// network propagation of the change
 	CP_STATUS_FLAGS _alertFlags() const { return (CP_STATUS_FLAGS)(CP_STAT_OWN_HAAC|CP_STAT_OVERRUN|CP_STAT_FALLBACK) ; }
 	void _changeFlags(UINT32 newFlags) ;
 	SCMD_RESULT _fallback(WWII_SIDE side, FALLBACK_MODE mode, UINT32 playerID) ;

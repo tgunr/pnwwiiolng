@@ -30,6 +30,11 @@ namespace Teul
 	//! Get the current application name.
 	const char* GetAppName() ;
 
+	//! Is the transport initialized?
+	bool IsTransportInited();
+	//! Is the transport closing?
+	bool IsTransportClosing();
+
 	//! Get the address of an endpoint, as long as it's connected/open.
 	extern ENDPOINT* GetConnectedEndpoint(const SINT32 teulIndex) ;
 } // namespace Teul
@@ -49,8 +54,8 @@ extern void teulClose(ENDPOINT&, const UINT32 reason=0);
 //! Converts a doted quad string to a UINT32 host address.
 //! @param[in]	address			IP address to convert.
 //!	@param[out]	host			Pointer to where the address should be stored.
-//! @return 0 if address is invalid.
-extern SINT32 teulGetHost(const SCHAR* address, UINT32* host);
+//! @return false if address is invalid.
+extern bool teulGetHost(const SCHAR* address, UINT32* host);
 
 //! Converts a binary network address to a string.
 //! @deprecated Use thread-safe version instead.
@@ -104,6 +109,13 @@ extern void teulSetPersonaData(const SINT32 teulIndex, void* personaData);
 
 //! Returns the persona data for a connection, may be NULL.
 extern void* teulGetPersonaData(const SINT32 teulIndex);
+
+//! Return a pointer to a specific connection data type, or null.
+template<typename ObjType_>
+ObjType_* teulGetConnectionData(SINT32 teulIndex_)
+{
+	return static_cast<ObjType_*>(teulGetPersonaData(teulIndex_));
+}
 
 extern void teulSetNetworkMask(UINT32 address) ;
 

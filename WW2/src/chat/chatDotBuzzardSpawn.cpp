@@ -84,6 +84,6 @@ public:
 
 		Teul::Packet outgoing(0, Chat::CallbackX, Chat::BUZZARD_SPAWN_Y) ;
 		CONSTRUCT_IN_PACKET(outgoing, BuzzardSpawn, player.playerID(), true, location) ;
-		serverSendPacketToType(outgoing, MAP_MISSION) ;
+		serverSendPacketToType(outgoing, MAP_HOST) ;
 	}
 } dotBuzzardSpawn ;

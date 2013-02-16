@@ -16,7 +16,7 @@
 #include "server/serverInterface.h"
 #include "wwii/wwiiTypes.h"
 
-#if defined(MAP_HOST)
+#if defined(IS_MAP_HOST)
 #include "teul/teulServer.h"
 #include "map/mapDB.h"
 #include "chat/chatConstants.h"
@@ -48,7 +48,7 @@ static SINT32 _recvWWII_ERROR_INFO(ACTION_OBJECT* const a)
 
 	a->offset = wwiiPackERROR_INFO(TEUL_UNPACK, a->packed, a->offset, &info, 0);
 
-#if defined(MAP_HOST)
+#if defined(IS_MAP_HOST)
 	{
 		Player* player = (Player*)ServerInterface::LookupByTeulIndex(a->teulIndex) ;
 		if ( player )
@@ -68,9 +68,9 @@ static SINT32 _recvAbortedApp(ACTION_OBJECT* const a)
 		return -EINVAL ;
 	}
 
-#if defined(MAP_HOST)
+#if defined(IS_MAP_HOST)
 	mapUserAbortedApp(player) ;
-#elif defined(_CELL_HOST_)
+#elif defined(IS_CELL_HOST)
 	hostUserAbortedApp(player) ;
 #else
 	dbugLog(_FLW, "t:%d sent us a USER_ABORTED_APP that we weren't expecting") ;
