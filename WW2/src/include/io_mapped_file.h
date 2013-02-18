@@ -47,15 +47,14 @@
 	// Windows
 
 # define IO_MAP_TYPE _IMT_WINDOWS
-# if !defined(PATH_MAX)
-#  define PATH_MAX 4096		// Tut, tut.
-# endif
 
 # if defined(UNICODE)
+#  define IO_MAP_WCHAR
 #  include <wchar.h>
 #  define filename_char_t wchar_t
-#  define PATH_SEP_CHAR L'\\'
+#  define PATH_SEP_CHAR L'\\' 
 # else
+# pragma error
 #  define filename_char_t char
 #  define PATH_SEP_CHAR '\\'
 # endif
@@ -88,150 +87,157 @@ class MappedFile
 {
 public:
 	MappedFile()
-		: m_basePtr(NULL)
-		, m_endPtr(NULL)
-		, m_currentPtr(NULL)
+		: m_basePtr(nullptr)
+		, m_startPtr(nullptr)
+		, m_endPtr(nullptr)
+		, m_currentPtr(nullptr)
 		, m_size(0)
-		, m_lineNo(0)
 #if IO_MAP_TYPE == _IMT_WINDOWS
-        , m_handle(INVALID_HANDLE_VALUE)
-        , m_mapping(INVALID_HANDLE_VALUE)
+		, m_handle(INVALID_HANDLE_VALUE)
+		, m_mapping(INVALID_HANDLE_VALUE)
 #else
-        , m_fd(-1)
+		, m_fd(-1)
 #endif
-		{
-			m_filename[0] = 0 ;
-		}
+		{}
 
 	//! Create an in-memory view of a file from disk,
 	//! while trying to avoid loading it from disk.
 	//! @param[in] filename_ the file/sub-path of the file to open.
 	//! @param[in] dirname_ [optional] prefix path.
-	MappedFile(const filename_char_t* const filename_, const filename_char_t* const dirname_=NULL) ;
+	MappedFile(const filename_char_t* const filename_, const filename_char_t* const dirname_=NULL);
 
 	//! Create a viewport onto a portion of a file.
-	MappedFile(const char* start_, const char* end_, size_t lineNo_)
-		: m_basePtr(NULL)
+	MappedFile(const char* start_, const char* end_)
+		: m_basePtr(nullptr)
+		, m_startPtr(start_)
 		, m_endPtr(end_)
 		, m_currentPtr(start_)
-		, m_size(end_ - start_)
-		, m_lineNo(lineNo_)
+		, m_size(static_cast<size_t>(end_ - start_))
 #if IO_MAP_TYPE == _IMT_WINDOWS
-        , m_handle(INVALID_HANDLE_VALUE)
-        , m_mapping(INVALID_HANDLE_VALUE)
+		, m_handle(INVALID_HANDLE_VALUE)
+		, m_mapping(INVALID_HANDLE_VALUE)
 #else
-        , m_fd(-1)
+		, m_fd(-1)
 #endif
-		{
-			m_filename[0] = 0 ;
-		}
+		{}
 
-	virtual ~MappedFile() ;						// Destructor.
+	virtual ~MappedFile();					// Destructor.
 
 private:
-	MappedFile(const MappedFile& rhs_) ;		//! @internal Do not use!
+	MappedFile(const MappedFile& rhs_);		//! @internal Do not use!
 
 public:
 	// Copying mapped files is only allowed for sub-views.
-	MappedFile& operator = (const MappedFile& rhs_) ;
+	MappedFile& operator = (const MappedFile& rhs_);
 
 public:
 	//! Determine if we have read all the data.
-	bool atEof() const { return m_endPtr < m_currentPtr ; }
+	bool atEof() const { return m_endPtr < m_currentPtr; }
 
 	//! Determine if the file is mapped to something.
 #if IO_MAP_TYPE == _IMT_WINDOWS
-	bool isOpen() const { return m_mapping != INVALID_HANDLE_VALUE ; }
+	bool isOpen() const { return m_mapping != INVALID_HANDLE_VALUE; }
 #else
-	bool isOpen() const { return m_fd >= 0 ; }
+	bool isOpen() const { return m_fd >= 0; }
 #endif
 
 	//! Open a new file (closes any currently open file first).
 	//! @param[in] filename_ the file/sub-path of the file to open.
 	//! @param[in] dirname_ [optional] prefix path.
 	//! @return true if the file was opened, false otherwise.
-	bool mapFile(const filename_char_t* const filename_, const filename_char_t* const dirname_=NULL) ;
+	bool mapFile(const filename_char_t* const filename_, const filename_char_t* const dirname_=NULL);
 	//! Close and unmap the file.
 	//! @return Always returns false.
-	bool unmapFile() ;
+	bool unmapFile();
 
-	//! Look at the next character.
-	char nextCharacter() const { return atEof() ? 0 : *m_currentPtr ; }
-
-	//! Advance to the end of the current line.
-	bool advanceToEndOfLine() ;
-
-	//! Advance to the start of the next line.
-	bool advanceToNextLine() ;
-
-	//! Find where this paragraph ends.
-	bool advanceToEndOfParagraph() ;
-
-	//! Skip current whitespace.
-	//! @return true if we found a non-whitespace character,
-	//! false if we reached eof.
-	bool advanceToNonWhitespace() ;
-
-	//! Advance to the next whitespace.
-	bool advancePastCurrentWord() ;
-
-	//! Skip ahead to first non-comment content.
-	bool advanceToNextContent()
+	//! Adjust the cursor like seek().
+	size_t seekSet(size_t offset)
 	{
-		do
-		{
-			if ( advanceToNonWhitespace() )
-				return false ;
-			if ( *m_currentPtr != ';' )
-				return true ;
-		}
-		while ( advanceToNextLine() ) ;
+		if ( offset > sizeBytes() )
+			return (size_t)-1;
+		m_currentPtr = static_cast<const char*>(m_startPtr) + offset;
+		return offset;
+	}
+	size_t seekCur(size_t offset)
+	{
+		if ( offset > remainingBytes() )
+			return (size_t)-1;
+		m_currentPtr += offset;
+		return static_cast<size_t>(currentPtr() - m_startPtr);
+	}
+	size_t seekEnd(size_t offset)
+	{
+		if ( offset > sizeBytes() )
+			return (size_t)-1;
+		m_currentPtr = m_endPtr - offset;
+		return sizeBytes() - offset;
+	}
 
-		return false ;
+	//! Copy bytes from the current position to a buffer.
+	//! @note Try to avoid read() unless you absolutely need the data copied.
+	size_t read(void* into, size_t bytes)
+	{
+		const size_t bytesToRead = bytes < remainingBytes() ? bytes : remainingBytes();
+		memcpy(into, currentPtr(), bytesToRead);
+		m_currentPtr += bytesToRead;
+		return bytesToRead;
+	}
+
+	//! Copy characters from the file until we reach the next \n.
+	//! @note More expensive than just taking a pointer and finding the \n yourself.
+	size_t readline(char* into, size_t maxReadLength);
+
+	//! Treats the data at the current position as being of type T and advances past it.
+	//! @caution Only suitable for standard-layout objects.
+public:
+	template<class T>
+	typename std::enable_if<std::is_standard_layout<T>::value>::type* read()
+	{
+		if ( remainingBytes() < sizeof(T) )
+			return NULL;
+		T* ptr = currentPtr();
+		m_currentPtr += sizeof(T);
+		return ptr;
 	}
 
 public:
 	// Accesors.
 
-	//! Get the object's file name.
-	const filename_char_t* filename() const { return m_filename ; }
-	//! Get a pointer to the first byte of the file.
-	const void* basePtr() const { return m_basePtr ; }
+	//! Get a pointer to the first byte of the file unless we are a view.
+	const void* basePtr() const { return m_basePtr; }
+	//! Pointer to the first byte of our data.
+	const char* startPtr() const { return m_startPtr; }
 	//! Get a pointer to the current byte in the file.
-	const char* currentPtr() const { return m_currentPtr ; }
+	const char* currentPtr() const { return m_currentPtr; }
 	//! Get a pre-calculated pointer to the end of the file (last byte + 1).
-	const char* endPtr() const { return m_endPtr ; }
+	const char* endPtr() const { return m_endPtr; }
 	//! Get the number of bytes in the file at the time it was opened.
-	size_t sizeBytes() const { return m_size ; }
+	size_t sizeBytes() const { return m_size; }
 	//! Get the number of bytes remaining between the current position and the end pointer.
-	size_t remainingBytes() const { return (m_endPtr - m_currentPtr) ; }
-	//! For a text file, return the current line number.
-	size_t lineNo() const { return m_lineNo ; }
+	size_t remainingBytes() const { return (m_endPtr - m_currentPtr); }
 
 protected:
-	//! Name of the file.
-	filename_char_t	m_filename[PATH_MAX + 1] ;
-	//! Where the file contents actually starts.
-	void*			m_basePtr ;
+	//! First byte of data we actually own.
+	void*			m_basePtr;
+	//! First byte of the data we are viewing.
+	const char*		m_startPtr;
 	//! For convenience, where the file would end.
-	const char*		m_endPtr ;
+	const char*		m_endPtr;
 	//! Seek pointer (the next character).
-	const char*		m_currentPtr ;
+	const char*		m_currentPtr;
 
 	//! Size (in bytes) of the entire file.k
-	size_t			m_size ;
+	size_t			m_size;
 
-	//! Current line number.
-	size_t			m_lineNo ;
 
 #if IO_MAP_TYPE == _IMT_WINDOWS
 	// For windows:
-	HANDLE			m_handle ;
-	HANDLE			m_mapping ;
+	HANDLE			m_handle;
+	HANDLE			m_mapping;
 #else
-	int				m_fd ;
+	int				m_fd;
 #endif
-} ;
+};
 
 }
 

@@ -17,6 +17,8 @@
 # include "fio/fiod.h"
 #endif
 
+#include "include/io_mapped_file.h"
+
 // Instead of importing pi.h and its baggage
 typedef struct
 {
@@ -247,7 +249,7 @@ SINT32 sdmOpenFile(const SCHAR* path, UINT16 /* mode */)
 
 	sdmLoadTranslationList() ;
 
-	int fd = fioOpen(path);
+	int fd = fiodOpen(path);
 	if (fd <= -1)
 		return SDMFILE_READ_ERR;
 

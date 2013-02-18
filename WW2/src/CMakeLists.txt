@@ -263,6 +263,7 @@ add_library (libwwii
 	wwii/wwiiUTF.cpp
 	auth/authDBConnection.cpp
 	score/scoreActor.cpp
+	src/io_mapped_file.cpp
 	src/mydbQuery.cpp
 	src/myDbseWrapper.cpp
 	wwii/wwiiDBConfig.cpp
@@ -282,6 +283,7 @@ add_library (libwwii
 	wwii/wwiiClusterConfig.cpp
 
 	${PCH_INCLUDE_HEADERS}
+	include/io_mapped_file.h
 	str/strdupptr.h
 	wwii/wwiiClusterConfig.h
 	wwii/wwiiNetPorts.h

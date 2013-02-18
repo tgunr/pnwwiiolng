@@ -1,10 +1,13 @@
 #pragma once
 // The defines for the Archive portion of fiod
 
+namespace IO { class MappedFile; }
+
 extern const char* fiodGetPrepath(void);
 extern void fiodSetPrepath(char* newpath);
 
 extern bool fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize=NULL) ;
+extern IO::MappedFile* fiodGetMappedFile(int fd);
 extern int fiodOpen(const char* filename, bool userdir = false, int prereadSize = -1);
 extern int fiodOpenWrite(const char* filename, bool userdir = false);
 extern void fiodClose(int hfile);
