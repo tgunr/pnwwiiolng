@@ -139,10 +139,13 @@ extern int	_dbugLog(const char* filename, int lineno, unsigned int errType, cons
 
 extern NORETURN_FN void _LogAbort(const char* filename, int lineno, unsigned int errType, const char* assertion, const char* fmt, ...);
 #define LogAbort(...) _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, NULL, __VA_ARGS__)
-#define ABORT_UNLESS(assertion_) if ( !(assertion_) ) _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, NULL, "Assertion: !(%s)", #assertion_)
-#define ABORT_UNLESS_EX(assertion_, ...) if ( !(assertion_) ) _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, #assertion_, __VA_ARGS__)
-#define ABORT_IF(assertion_) if ( (assertion_) ) _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, NULL, "Assertion: %s", #assertion_)
-#define ABORT_IF_EX(assertion_, ...) if ( (assertion_) ) _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, #assertion_, __VA_ARGS__)
+
+// These macros assume that the condition is unlikely and try to provide the compiler an optimization hint by
+// ordering the abort as the second choice.
+#define ABORT_UNLESS(assertion_) (assertion_) ? (void)0 : (void)_LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, NULL, "Assertion: !(%s)", #assertion_)
+#define ABORT_UNLESS_EX(assertion_, ...) (assertion_) ? (void)0 : (void)_LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, #assertion_, __VA_ARGS__)
+#define ABORT_IF(assertion_) (!(assertion_)) ? (void)0 : (void)_LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, NULL, "Assertion: %s", #assertion_)
+#define ABORT_IF_EX(assertion_, ...) (!(assertion_)) ? (void)0 : (void)_LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, #assertion_, __VA_ARGS__)
 
 #ifdef DBUG_TEST
 	#define dbugLog(x,args...) printf(args)
