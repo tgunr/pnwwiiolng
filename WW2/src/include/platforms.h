@@ -82,7 +82,14 @@
 #  define NOMINMAX 1	//@ for windows.
 # endif
 # define localtime_r(x, y) localtime(x)
+# define PATH_SEPARATOR '\\'
+# define PATH_SEPSTR "\\"
+#else
+# define PATH_SEPARATOR '/'
+# define PATH_SEPSTR "/"
 #endif
+
+# define SUB_PATH(Pfx, Sfx) Pfx PATH_SEPSTR Sfx
 
 #undef DBA_ENABLE_SQLITE
 
