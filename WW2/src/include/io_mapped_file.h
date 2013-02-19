@@ -173,6 +173,13 @@ public:
 		return sizeBytes() - offset;
 	}
 
+	//! Advance to the character after the next \n or the end of file.
+	void skipline()
+	{
+		while ( !atEof() && *(m_currentPtr++) != '\n' )
+			;
+	}
+
 	//! Copy bytes from the current position to a buffer.
 	//! @note Try to avoid read() unless you absolutely need the data copied.
 	size_t read(void* into, size_t bytes)
@@ -223,6 +230,7 @@ protected:
 	const char*		m_startPtr;
 	//! For convenience, where the file would end.
 	const char*		m_endPtr;
+public:
 	//! Seek pointer (the next character).
 	const char*		m_currentPtr;
 
