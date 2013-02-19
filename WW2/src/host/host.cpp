@@ -2970,7 +2970,7 @@ main(const int argc, const char* const argv[])
 		break ;
 	}
 
-	threadsReadDBEnvironment("WWII_DB_ADDRESS") ;
+	threadsReadDBEnvironment() ;
 	threadsSetup() ;
 
 	Teul::SetAppName(g_serverName) ;

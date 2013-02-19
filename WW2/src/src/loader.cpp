@@ -21,25 +21,22 @@
 #include "dbse/dbseHandle.h"
 #include "wwii/wwiiThreads.h"
 
-#define DATA_DIRECTORY "data"
-#define TERRAIN_DIRECTORY DATA_DIRECTORY "/terrain"
-#define ORIGIN_FILE TERRAIN_DIRECTORY "/origin"
+#include "sdm/sdmConfigVars.h"
+#include "wwii/wwiidbConfigVars.h"
 
-static const char* DEFAULT_IMPORT_FILE = DATA_DIRECTORY "/importlist.txt" ;
-static const char* STRAT_DB_VAR = "STRAT_DB_ADDRESS" ;
-static const char* cluster = (getenv("WWII_CLUSTER") ? getenv("WWII_CLUSTER") : "dev") ;
+static const char* cluster = (getenv("WWII_CLUSTER") ? getenv("WWII_CLUSTER") : "dev");
 
-static bool useIrc = true ;
-static irc_session_t* ircSession ;
-static volatile bool ircConnected = false ;
-static std::string nick ;
-const char* g_appName = "stratLoader" ;
+static bool useIrc = true;
+static irc_session_t* ircSession;
+static volatile bool ircConnected = false;
+static std::string nick;
+const char* g_appName = "stratLoader";
 static char g_origin[80] = "private";
 
-struct stat statBuf ;
+struct stat statBuf;
 
-DBCONNECTION dbConnection ;
-extern DBHANDLE dbHandle ;
+DBCONNECTION dbConnection;
+extern DBHANDLE dbHandle;
 
 class IrcThread : public OpenThreads::Thread
 {
@@ -55,10 +52,10 @@ public:
 
 	virtual int cancel()
 	{
-		irc_session_t* session = m_session ;
-		m_session = NULL ;
+		irc_session_t* session = m_session;
+		m_session = nullptr;
 
-		irc_disconnect(session) ;
+		irc_disconnect(session);
 		OpenThreads::Thread::microSleep(50 * 1000);
 
 		return OpenThreads::Thread::cancel();
@@ -66,15 +63,15 @@ public:
 
 	~IrcThread()
 	{
-		if ( m_session != NULL )
-			irc_disconnect(m_session) ;
+		if ( m_session != nullptr )
+			irc_disconnect(m_session);
 	}
 
 private:
-	irc_session_t* m_session ;
+	irc_session_t* m_session;
 };
 
-static IrcThread* ircThread = NULL ;
+static IrcThread* ircThread = nullptr;
 
 SCHAR* _getValidLine(FILE* f,SINT32* line)
 {
@@ -83,13 +80,13 @@ SINT32 len;
 
 	while(!feof(f))
 	{
-		if ( fgets(s,512,f) == NULL )
-            return NULL;
+		if ( fgets(s,512,f) == nullptr )
+            return nullptr;
 
 		(*line)++;
 
 		if(feof(f))
-			return NULL;
+			return nullptr;
 
 		// # in first coloumn means a comment
 		if(s[0] == '#')
@@ -105,7 +102,7 @@ SINT32 len;
 		return s;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -114,82 +111,82 @@ SINT32 len;
 static void
 _ircConnected(irc_session_t * /*session*/, const char * /*event*/, const char * /*origin*/, const char ** /*params*/, unsigned int /*count*/)
 {
-	ircConnected = true ;
+	ircConnected = true;
 }
 
 static bool
 _ircConnect()
 {
 	if ( useIrc == false )
-		return false ;
+		return false;
 
-	if ( ircSession != NULL )
-		return true ;
+	if ( ircSession != nullptr )
+		return true;
 
-	const char* ircServer = getenv("WWII_IRC_SERVER") ;
-	if ( ircServer == NULL )
-		return false ;
+	const char* ircServer = getenv("WWII_IRC_SERVER");
+	if ( ircServer == nullptr )
+		return false;
 
-	irc_session_t* s = NULL ;
-	irc_callbacks_t callbacks ;
+	irc_session_t* s = nullptr;
+	irc_callbacks_t callbacks;
 
-	memset(&callbacks, 0, sizeof(irc_callbacks_t)) ;
-	callbacks.event_connect = _ircConnected ;
+	memset(&callbacks, 0, sizeof(irc_callbacks_t));
+	callbacks.event_connect = _ircConnected;
 
-	s = irc_create_session(&callbacks) ;
-	if ( s == NULL )
+	s = irc_create_session(&callbacks);
+	if ( s == nullptr )
 	{
-		fprintf(stderr, "could not open IRC session\n") ;
-		return false ;
+		fprintf(stderr, "could not open IRC session\n");
+		return false;
 	}
 
-	ircConnected = false ;
+	ircConnected = false;
 	if ( irc_connect(s, ircServer, 6667, "blooGit", nick.c_str(), nick.c_str(), "Strat Loader") )
 	{
-		fprintf(stderr, "connect to shivers:irc failed: %s\n", irc_strerror(irc_errno(s))) ;
-		irc_destroy_session(s) ;
-		return false ;
+		fprintf(stderr, "connect to shivers:irc failed: %s\n", irc_strerror(irc_errno(s)));
+		irc_destroy_session(s);
+		return false;
 	}
 
 	ircThread = new IrcThread(s);
 	ircThread->start();
 
-	teulSyncClock() ;
-	UINT32 cutoff = teulTime() + 30 ;
+	teulSyncClock();
+	UINT32 cutoff = teulTime() + 30;
 	while ( ircConnected == false && teulTime() < cutoff )
 	{
-		OpenThreads::Thread::microSleep(500 * 1000) ;
-		teulSyncClock() ;
+		OpenThreads::Thread::microSleep(500 * 1000);
+		teulSyncClock();
 	}
 
 	if ( ircConnected == false )
 	{
-		fprintf(stderr, "IRC session connect timed out\n") ;
-		irc_disconnect(s) ;
-		irc_destroy_session(s) ;
-		return false ;
+		fprintf(stderr, "IRC session connect timed out\n");
+		irc_disconnect(s);
+		irc_destroy_session(s);
+		return false;
 	}
 
-	ircSession = s ;
+	ircSession = s;
 
-	return true ;
+	return true;
 }
 
 static void
 _ircSendMessage(const char* channel, const char* message)
 {
 	if ( !_ircConnect() )
-		return ;
+		return;
 
-	char channelName[128] ;
+	char channelName[128];
 	if ( channel[0] == '-' )
 	{
-		sprintf(channelName, "#%s%s", cluster, channel) ;
+		sprintf(channelName, "#%s%s", cluster, channel);
 	}
 	else
-		strcpy(channelName, channel) ;
+		strcpy(channelName, channel);
 
-	irc_cmd_msg(ircSession, channelName, message) ;
+	irc_cmd_msg(ircSession, channelName, message);
 }
 
 static void
@@ -198,27 +195,27 @@ _ircStart()
 	if ( useIrc == false )
 		return;
 
-	char message[80 + sizeof(g_origin)] ;
-	sprintf(message, "%s terrain: importing new terrain from %s", cluster, g_origin) ;
-	_ircSendMessage("-sys,#servers", message) ;
+	char message[80 + sizeof(g_origin)];
+	sprintf(message, "%s terrain: importing new terrain from %s", cluster, g_origin);
+	_ircSendMessage("-sys,#servers", message);
 }
 
 static void
 _ircFinish(const TeulTimeMS& timeTaken)
 {
-	if ( ircThread == NULL || ircSession == NULL || ircConnected == false )
-		return ;
+	if ( ircThread == nullptr || ircSession == nullptr || ircConnected == false )
+		return;
 
-	FLOAT32 seconds = ((FLOAT32)timeTaken) / 1000.0f ;
-	char message[128] ;
-	sprintf(message, "%s terrain: import finished - took %.2f seconds", cluster, seconds) ;
+	FLOAT32 seconds = ((FLOAT32)timeTaken) / 1000.0f;
+	char message[128];
+	sprintf(message, "%s terrain: import finished - took %.2f seconds", cluster, seconds);
 
-	_ircSendMessage("-sys,#servers", message) ;
+	_ircSendMessage("-sys,#servers", message);
 
-	OpenThreads::Thread::microSleep(500 * 1000) ;
-	delete ircThread ;
+	OpenThreads::Thread::microSleep(500 * 1000);
+	delete ircThread;
 
-	ircThread = NULL ;
+	ircThread = nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -227,14 +224,14 @@ _ircFinish(const TeulTimeMS& timeTaken)
 static NORETURN_FN void
 usage()
 {
-	fprintf(stderr, "Usage: %s [-x tarfile] [-d directory] [-h dbHost] [-I] [-O] [filename]\n", g_appName) ;
-	fprintf(stderr, " -x tarfile      Extract data from tarfile into /playnet/ to populate terrain\n") ;
-	fprintf(stderr, " -d directory    Change directory to specified before starting\n") ;
-	fprintf(stderr, " -h dbHost       Specify IP of database [default: specified in %s]\n", STRAT_DB_VAR) ;
+	fprintf(stderr, "Usage: %s [-x tarfile] [-C directory] [-h dbHost] [-I] [-O] [filename]\n", g_appName);
+	fprintf(stderr, " -x tarfile      Extract data from tarfile into /playnet/ to populate terrain\n");
+	fprintf(stderr, " -C directory    Working directory [default: %s]\n", cv_dataDir.GetString());
+	fprintf(stderr, " -h dbHost       Specify IP of database [default: specified in %s]\n", cv_wwiiDBAddress.GetString());
 	fprintf(stderr, " -I              Disable irc\n");
 	fprintf(stderr, " -O              Disable orgin file usage\n");
-	fprintf(stderr, " filename        Name of import file [default: %s]\n", DEFAULT_IMPORT_FILE) ;
-	exit(1) ;
+	fprintf(stderr, " filename        Name of import file [default: %s]\n", cv_importFile.GetString());
+	exit(1);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -244,56 +241,30 @@ static char*
 getArgument(int argc, char** argv, int& i)
 {
 	if ( argv[i][2] != 0 )
-		return argv[i] + 2 ;
+		return argv[i] + 2;
 	else if ( i + 1 < argc && argv[i+1][0] != '-' )
-		return argv[++i] ;
-	return NULL ;
-}
-
-//////////////////////////////////////////////////////////////////////
-// Attempt to set the current working directory
-
-static void
-_changeDirectory(const char* cwd)
-{
-	if ( cwd == NULL )
-		return ;
-
-	const int cwdResult = chdir(cwd) ;
-	if ( cwdResult != 0 )
-	{
-		fprintf(stderr, "*** Unable to change directory to %s [%d]\n", cwd, cwdResult) ;
-		exit(cwdResult) ;
-	}
+		return argv[++i];
+	return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Check for a data and terrain directory
 
 static void
-_checkDirectoryStructure(const char* cwd)
+_checkDirectoryStructure()
 {
-	// Linux directory checking
-	int result = stat(DATA_DIRECTORY, &statBuf) ;
-	if ( result != 0 )
-	{
-		fprintf(stderr, "*** Unable to access %s/%s directory, check working directory\n", cwd, DATA_DIRECTORY) ;
-		exit(result) ;
-	}
-
-	result = stat(TERRAIN_DIRECTORY, &statBuf) ;
+	int result = stat(cv_terrainSubdir, &statBuf);
 	if ( result == 0 )
-		return ;
+		return;
 
-	result = OS_MKDIR(TERRAIN_DIRECTORY, 0777) ;
+	result = OS_MKDIR(cv_terrainSubdir, 0777);
 	if ( result == 0 )
 	{
-		printf("# Created terrain directory\n") ;
-		return ;
+		printf("# Created terrain directory\n");
+		return;
 	}
 
-	fprintf(stderr, "*** Unable to access %s/%s directory and unable to create", cwd, TERRAIN_DIRECTORY) ;
-	exit(result) ;
+	LogAbort("*** Unable to access or create " SUB_PATH("%s", "%s"), cv_dataDir.GetString(), cv_terrainSubdir.GetString());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -302,24 +273,24 @@ _checkDirectoryStructure(const char* cwd)
 static void
 _extract(const char* tarFile)
 {
-	if ( tarFile == NULL )
-		return ;
+	if ( tarFile == nullptr )
+		return;
 
-	int result = stat(tarFile, &statBuf) ;
+	int result = stat(tarFile, &statBuf);
 	if ( result != 0 )
 	{
-		fprintf(stderr, "Cannot stat tar file %s\n", tarFile) ;
-		exit(result) ;
+		fprintf(stderr, "Cannot stat tar file %s\n", tarFile);
+		exit(result);
 	}
 
-	std::string cmd = "tar zxf " ;
-	cmd += tarFile ;
+	std::string cmd = "tar zxf ";
+	cmd += tarFile;
 
-	result = system(cmd.c_str()) ;
+	result = system(cmd.c_str());
 	if ( result != 0 )
 	{
-		fprintf(stderr, "Extract failed: [%s returned %d]\n", cmd.c_str(), result) ;
-		exit(result) ;
+		fprintf(stderr, "Extract failed: [%s returned %d]\n", cmd.c_str(), result);
+		exit(result);
 	}
 }
 
@@ -327,22 +298,22 @@ _extract(const char* tarFile)
 // Check for an origin file
 
 static void
-_checkOriginFile(const char* cwd)
+_checkOriginFile()
 {
-	FILE* fp = fopen(ORIGIN_FILE, "rb") ;
-	if ( fp == NULL )
+	FILE* fp = fopen(cv_originFile.GetString(), "rb");
+	if ( fp == nullptr )
 	{
-		fprintf(stderr, "Unable to access %s/%s\n", cwd, ORIGIN_FILE) ;
-		exit(1) ;
+		LogAbort("Unable to access " SUB_PATH("%s", "%s")
+				, cv_dataDir.GetString(), cv_originFile.GetString());
 	}
 
-	if ( fgets(g_origin, sizeof(g_origin) - 1, fp) == NULL )
+	if ( fgets(g_origin, sizeof(g_origin) - 1, fp) == nullptr )
 	{
-	    fprintf(stderr, "Unable to read %s/%s\n", cwd, ORIGIN_FILE) ;
-	    exit(1) ;
+		LogAbort("Unable to read " SUB_PATH("%s", "%s")
+			, cv_dataDir.GetString(), cv_originFile.GetString());
 	}
 
-	fclose(fp) ;
+	fclose(fp);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -351,145 +322,143 @@ _checkOriginFile(const char* cwd)
 int
 main(int argc,char** argv)
 {
-	g_appName = argv[0] ;
+	g_appName = argv[0];
 
 	SCHAR* filename;
 	//LOGICAL moreFiles = TRUE;
 	FILE* importFile;
 	SINT32 line;
 
-	const char* cwd = NULL ;
-	const char* db = getenv(STRAT_DB_VAR) ;
-	const char* importFileName = NULL ;
-	const char* tarFile = NULL ;
+	const char* importFileName = nullptr;
+	const char* tarFile = nullptr;
 
-	bool argsOk = true ;
+	bool argsOk = true;
+#if platOS != OS_WIN32
 	bool useOrigin = true;
+#else
+	bool useOrigin = false;
+#endif
 
-	for ( int i = 1 ; i < argc ; ++i )
+	for ( int i = 1; i < argc; ++i )
 	{
+		char* arg = nullptr;
 		if ( argv[i][0] == '-' )
 		{
 			switch ( argv[i][1] )
 			{
 				case '?':
-					usage() ;
-				break ;
+					usage();
+				break;
 				case 'h':		// Database Host
-					db = getArgument(argc, argv, i) ;
-					if ( db == NULL )
-						usage() ;
-				break ;
-				case 'd':
-					cwd = getArgument(argc, argv, i) ;
-					if ( cwd == NULL )
-						usage() ;
-				break ;
+					arg = getArgument(argc, argv, i);
+					if ( arg == nullptr )
+						usage();
+					cv_wwiiDBAddress.SetString(arg);
+				break;
+				case 'd':		// Backwards compatability.
+				case 'C':
+					arg = getArgument(argc, argv, i);
+					if ( arg == nullptr )
+						usage();
+					cv_dataDir.SetString(arg);
+				break;
 				case 'x':
 					// Extract files from tar file
-					tarFile = getArgument(argc, argv, i) ;
-					if ( tarFile == NULL )
-						usage() ;
-				break ;
+					tarFile = getArgument(argc, argv, i);
+					if ( tarFile == nullptr )
+						usage();
+				break;
 				case 'I':
-					useIrc = false ;
-				break ;
+					useIrc = false;
+				break;
 				case 'O':
-					useOrigin = false;
+					useOrigin = !useOrigin;
 				break;
 				case 0:
-					fprintf(stderr, "Invalid argument '-'\n") ;
-					argsOk = false ;
-				break ;
+					fprintf(stderr, "Invalid argument '-'\n");
+					argsOk = false;
+				break;
 				default:
-					fprintf(stderr, "Unrecognized switch: %c\n", argv[i][1]) ;
-					argsOk = false ;
-				break ;
+					fprintf(stderr, "Unrecognized switch: %c\n", argv[i][1]);
+					argsOk = false;
+				break;
 			}
 		}
-		else if ( importFileName != NULL )
-			usage() ;
+		else if ( importFileName != nullptr )
+			usage();
 		else
-			importFileName = argv[i] ;
+			importFileName = argv[i];
 	}
 
 	if ( argsOk == false )
-		usage() ;
+		usage();
 
-	if ( db == NULL )
-	{
-		fprintf(stderr, "No database specified or no %s environment variable\n", STRAT_DB_VAR) ;
-		exit(1) ;
-	}
+	if ( cv_wwiiDBAddress.GetString() == nullptr || *cv_wwiiDBAddress.GetString() == 0 )
+		LogAbort("No database specified.");
 
-	if ( cwd == NULL )
-		cwd = "." ;
+	if ( cv_dataDir.GetString() == nullptr || *cv_dataDir.GetString() == 0 )
+		cv_dataDir.SetString(".");
 
-	_changeDirectory(cwd) ;
+	int result = chdir(cv_dataDir);
+	if ( result < 0 )
+		LogAbort("Unable to access working directory %s: %d", cv_dataDir.GetString(), result);
 
-	_checkDirectoryStructure(cwd) ;
+	_checkDirectoryStructure();
 
-	_extract(tarFile) ;
+	_extract(tarFile);
 
 	if ( useOrigin )
-		_checkOriginFile(cwd) ;
+		_checkOriginFile();
 
-	if ( importFileName == NULL )
-		importFileName = DEFAULT_IMPORT_FILE ;
+	if ( importFileName == nullptr )
+		importFileName = cv_importFile.GetString();
 
 	importFile = fopen(importFileName, "r");
-	if ( importFile == NULL )
-	{
-		// We are broke, do not pass go
-		fprintf(stderr, "Unable to access %s/%s\n", cwd, importFileName) ;
-		exit(1) ;
-	}
+	if ( importFile == nullptr )
+		LogAbort("Unable to access import file " SUB_PATH("%s", "%s"), cv_dataDir.GetString(), importFileName);
 
-	nick = cluster ;
-	nick += "Loader" ;
-	nick[0] = toupper(nick[0]) ;
+	nick = cluster;
+	nick += "Loader";
+	nick[0] = toupper(nick[0]);
 
-	_ircStart() ;
-	teulSyncClock() ;
-	TeulTimeMS started = teulClock64 ;
+	_ircStart();
+	teulSyncClock();
+	TeulTimeMS started = teulClock64;
 
-	threadsReadDBEnvironment("WWII_DB_ADDRESS", db) ;
+	threadsReadDBEnvironment();
 
 	if ( dbseInitStratLoader() < 0 )
-	{
-		fprintf(stderr, "Connection to database %s failed\n", db) ;
-		exit(1) ;
-	}
+		LogAbort("Database (%s:%s) connection failed.", cv_wwiiDBAddress.GetString(), cv_wwiiDBDefaultSchema.GetString());
 
-	bool errors = false ;
-	while( (filename = _getValidLine(importFile,&line)) != NULL)
+	bool errors = false;
+	while( (filename = _getValidLine(importFile,&line)) != nullptr)
 	{
 		if ( dbseLoadFile(filename) != 0 )
-			errors = true ;
+			errors = true;
 	}
 
 	if ( true == errors )
 	{
-		_ircSendMessage("-sys,#servers", "Load failed") ;
-		OpenThreads::Thread::microSleep(1 * 1000 * 1000) ;
-		fprintf(stderr, "Unable to load terrain because of errors\n") ;
-		dbseLoadFile(NULL) ;
-		exit(1) ;
+		_ircSendMessage("-sys,#servers", "Load failed");
+		OpenThreads::Thread::microSleep(1 * 1000 * 1000);
+		fprintf(stderr, "Unable to load terrain because of errors\n");
+		dbseLoadFile(nullptr);
+		exit(1);
 	}
 
-	dbseLoadFile(NULL) ;
+	dbseLoadFile(nullptr);
 
 	dbseResolveReferences();
 
 	// The SDM data doesn't handle its unique IDs very well and will
 	// assign a new Unique ID to an object that has its name or
 	// position changed, so we maintain our own unique indexes.
-	dbseSaveIndexChanges() ;
+	dbseSaveIndexChanges();
 
 	dbseCloseLoader();
 
-	teulSyncClock() ;
-	_ircFinish(teulClock64 - started) ;
+	teulSyncClock();
+	_ircFinish(teulClock64 - started);
 
 	return 0;
 }

@@ -21,6 +21,8 @@
 
 #include "dbse/dbseConnection.h"
 #include "dbse/dbseWrapper.h"
+#include "teul/teulConfigVar.h"
+#include "wwii/wwiidbConfigVars.h"
 #include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiThreadText.h"
 #include "wwii/wwiiThreadTypes.h"
@@ -28,111 +30,111 @@
 // We can't dbugLog from threads directly, so we store
 // up their log messages into a queue for logging when
 // the host has time.
-static const UINT32 LOG_LENGTH = 2048 ;
+static const UINT32 LOG_LENGTH = 2048;
 struct THREAD_LOG
 {
 	THREAD_LOG(const char* file, UINT32& line, UINT32& level)
-		: m_file(file), m_line(line), m_level(level) { m_entry[0] = m_entry[LOG_LENGTH] = 0 ; }
-	const char*		m_file ;
-	UINT32			m_line ;
-	UINT32			m_level ;
-	char			m_entry[LOG_LENGTH+1] ;
-} ;
+		: m_file(file), m_line(line), m_level(level) { m_entry[0] = m_entry[LOG_LENGTH] = 0; }
+	const char*		m_file;
+	UINT32			m_line;
+	UINT32			m_level;
+	char			m_entry[LOG_LENGTH+1];
+};
 
 // Storing information about a DB helper thread
 class DBQueueThread : public OpenThreads::Thread
 {
 private:
-	DB::handle_t*		m_conn ;
+	DB::handle_t*		m_conn;
 
 public:
-	DBQueueThread() : Thread(), m_conn(NULL) {}
-	~DBQueueThread() ;
+	DBQueueThread() : Thread(), m_conn(nullptr) {}
+	~DBQueueThread();
 
-	virtual void run() ;
-} ;
+	virtual void run();
+};
 
 class ScopedLockTry
 {
 private:
-	OpenThreads::Mutex&	m_mutex ;
-	bool m_gotLock ;
+	OpenThreads::Mutex&	m_mutex;
+	bool m_gotLock;
 	ScopedLockTry(const ScopedLockTry&);	// prevent copy
 	ScopedLockTry& operator=(const ScopedLockTry&);	// prevent assign
 public:
 	explicit ScopedLockTry(OpenThreads::Mutex& mutex_) : m_mutex(mutex_), m_gotLock(mutex_.trylock() == 0) {}
-	~ScopedLockTry() { if ( m_gotLock ) m_mutex.unlock() ; }
-	bool gotLock() const { return m_gotLock ; }
-} ;
+	~ScopedLockTry() { if ( m_gotLock ) m_mutex.unlock(); }
+	bool gotLock() const { return m_gotLock; }
+};
 
-static const UINT32 NUM_HELPER_THREADS = 2 ;
+static const UINT32 NUM_HELPER_THREADS = 2;
 
-typedef std::vector<THREAD_LOG*> LOG_QUEUE ;
-static LOG_QUEUE logQueue ;
-static size_t logQueueMax, logQueuePushes ;
-static OpenThreads::Mutex logQueueMutex ;
+typedef std::vector<THREAD_LOG*> LOG_QUEUE;
+static LOG_QUEUE logQueue;
+static size_t logQueueMax, logQueuePushes;
+static OpenThreads::Mutex logQueueMutex;
 
-static ConditionQueue<DBThreadQuery*> dbQueue ;
-DBQueueThread dbThread[NUM_HELPER_THREADS] ;
+static ConditionQueue<DBThreadQuery*> dbQueue;
+DBQueueThread dbThread[NUM_HELPER_THREADS];
 
-typedef std::pair<THREAD_CALLBACK*, void*> CALLBACK_INFO ;
-typedef std::vector<CALLBACK_INFO*> CALLBACK_QUEUE ;
-static CALLBACK_QUEUE callbackQueue ;
-static size_t cbQueueMax, cbQueuePushes ;
-static OpenThreads::Mutex callbackQueueMutex ;
+typedef std::pair<THREAD_CALLBACK*, void*> CALLBACK_INFO;
+typedef std::vector<CALLBACK_INFO*> CALLBACK_QUEUE;
+static CALLBACK_QUEUE callbackQueue;
+static size_t cbQueueMax, cbQueuePushes;
+static OpenThreads::Mutex callbackQueueMutex;
 
-extern DBCONNECTION dbConnection ;
+extern DBCONNECTION dbConnection;
 
 void
 DBQueueThread::run()
 {
-	unsigned int threadId = getThreadId() ;
+	unsigned int threadId = getThreadId();
 
-	m_conn = threadsOpenDBConnection(true) ;
-	if ( m_conn == NULL )
+	m_conn = threadsOpenDBConnection(true);
+	if ( m_conn == nullptr )
 	{
-		threadLog(_FLA, "dbc:%u Unable to obtain database connection", threadId) ;
+		threadLog(_FLA, "dbc:%u Unable to obtain database connection", threadId);
 		return;
 	}
 
-	threadLog(_FLI, "dbc:%u Connected to database", threadId) ;
+	threadLog(_FLI, "dbc:%u Connected to database", threadId);
 
-	threadIgnoreSIGPIPE() ;
+	threadIgnoreSIGPIPE();
 
-	DBThread::DBNo dbNo = DBThread::Default ;
+	DBThread::DBNo dbNo = DBThread::Default;
 
-	for ( ; ; )
+	for (;; )
 	{
-		DBThreadQuery* query = dbQueue.getNext() ;
-		if ( query == NULL )
-			continue ;
+		DBThreadQuery* query = dbQueue.getNext();
+		if ( query == nullptr )
+			continue;
 		if ( query->Execute(threadId, m_conn, &dbNo) )
-			continue ;
+			continue;
 
-		threadLog(_FLW, "dbc:%u reconnecting to database", threadId) ;
+		threadLog(_FLW, "dbc:%u reconnecting to database", threadId);
 
-		if ( m_conn != NULL )
-			mysql_close(m_conn) ;
-		m_conn = NULL ;
+		if ( m_conn != nullptr )
+			mysql_close(m_conn);
+		m_conn = nullptr;
 
 		do
 		{
-			OpenThreads::Thread::microSleep(5 * 1000) ;
-			m_conn = threadsOpenDBConnection(true) ;
-			if ( m_conn == NULL )
-				threadLog(_FLA, "dbc:%u unable to reconnect to database", threadId) ;
-		} while ( m_conn == NULL ) ;
+			OpenThreads::Thread::microSleep(5 * 1000);
+			m_conn = threadsOpenDBConnection(true);
+			if ( m_conn == nullptr )
+				threadLog(_FLA, "dbc:%u unable to reconnect to database", threadId);
+		} while ( m_conn == nullptr );
 
-		threadLog(_FLW, "dbc:%u reconnected to database", threadId) ;
+		threadLog(_FLW, "dbc:%u reconnected to database", threadId);
 	}
 }
 
 DBQueueThread::~DBQueueThread()
 {
-	if ( m_conn != NULL )
+	if ( m_conn != nullptr )
 	{
-		mysql_close(m_conn) ;
-		m_conn = NULL ;
+		mysql_close(m_conn);
+		m_conn = nullptr;
 	}
 }
 
@@ -140,53 +142,44 @@ DBQueueThread::~DBQueueThread()
 // Read the database environment from a given parameter
 
 bool
-threadsReadDBEnvironment(const char* varName, const char* const default_)
+threadsReadDBEnvironment()
 {
-	const char* db = default_;
-	if ( varName )
-	{
-		char* envDB = getenv(varName);
-		if ( envDB != NULL && envDB[0] != 0 )
-			db = envDB;
+	const char* db = cv_wwiiDBAddress.GetString();
 
-		if ( !db || *db == 0 )
-#if platOS != OS_WIN32
-			LogAbort("Unable to read %s from environment", varName) ;
+	// Under Windows, we'll assume you mean "this machine".
+#if platOS == OS_WIN32
+	if ( db == nullptr || *db == 0 )
+		db = "127.0.0.1";
 #else
-			db = "127.0.0.1";
+	if ( !db || *db == 0 )
+		LogAbort("Unable to read %s database address from", cv_wwiiDBAddress.GetName(), cv_wwiiDBAddress.GetEnvVar() ? cv_db.GetEnvVar() : "environment");
 #endif
-	}
-	else if ( default_ == NULL || *default_ == 0 )
-	{
-		LogAbort("Unable to determine database address.");
-	}
 
 	strcpy(dbConnection.host, db);
-	strcpy(dbConnection.dbName, "wwiionline");
+	strcpy(dbConnection.dbName, cv_wwiiDBDefaultSchema.GetString());
 	strcpy(dbConnection.username, "wwiiol");
 	strcpy(dbConnection.password, "freebird");
 	strcpy(dbConnection.port, "");
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Thread-safe db connection opener
 
 DB::handle_t*
-threadsOpenDBConnection(bool enableAutoCommit, const char* defaultDb)
+threadsOpenDBConnection(bool enableAutoCommit)
 {
-	DB::handle_t* newConn = dbseGetConnection(dbConnection, false) ;
+	DB::handle_t* newConn = dbseGetConnection(dbConnection, false);
 
-	if ( newConn != NULL )
+	if ( newConn != nullptr )
 	{
-		if ( defaultDb != NULL )
-			mysql_select_db(newConn, defaultDb) ;
+		mysql_select_db(newConn, dbConnection.dbName);
 
-		mysql_autocommit( newConn, (enableAutoCommit) ? 1 : 0 ) ;
+		mysql_autocommit( newConn, (enableAutoCommit) ? 1 : 0 );
 	}
 
-	return newConn ;
+	return newConn;
 }
 
 //////////////////////////////////////////////////////////////////////S
@@ -195,10 +188,10 @@ threadsOpenDBConnection(bool enableAutoCommit, const char* defaultDb)
 void
 threadsCloseDBConnection(MYSQL* conn)
 {
-	if ( conn == NULL )
-		return ;
+	if ( conn == nullptr )
+		return;
 
-	mysql_close(conn) ;
+	mysql_close(conn);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -213,11 +206,11 @@ threadIgnoreSIGPIPE()
 {
 #if platOS != OS_WIN32
 	// Mask the signal we want to ignore
-	sigset_t signal_mask ;
-	sigemptyset(&signal_mask) ;
-	sigaddset(&signal_mask, SIGPIPE) ;
+	sigset_t signal_mask;
+	sigemptyset(&signal_mask);
+	sigaddset(&signal_mask, SIGPIPE);
 
-	pthread_sigmask(SIG_BLOCK, &signal_mask, NULL) ;
+	pthread_sigmask(SIG_BLOCK, &signal_mask, nullptr);
 #else
 #endif
 }
@@ -230,9 +223,9 @@ threadsSetup()
 {
 	// Create a number of worker threads, each of which is a
 	// database thread contesting for work
-	for ( UINT32 i = 0 ; i < NUM_HELPER_THREADS ; ++i )
+	for ( UINT32 i = 0; i < NUM_HELPER_THREADS; ++i )
 	{
-		dbThread[i].start() ;
+		dbThread[i].start();
 	}
 }
 
@@ -243,7 +236,7 @@ void
 threadsEnable()
 {
 	// Try and clear out any threadLog messages from startup
-	threadsLogging() ;
+	threadsLogging();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -252,16 +245,16 @@ threadsEnable()
 void
 threadsShutdown()
 {
-	for ( UINT32 i = 0 ; i < NUM_HELPER_THREADS ; ++i )
+	for ( UINT32 i = 0; i < NUM_HELPER_THREADS; ++i )
 	{
-		dbThread[i].cancel() ;
+		dbThread[i].cancel();
 	}
 
-	OpenThreads::Thread::YieldCurrentThread() ;
-	OpenThreads::Thread::microSleep(100 * 1000) ;
+	OpenThreads::Thread::YieldCurrentThread();
+	OpenThreads::Thread::microSleep(100 * 1000);
 
 	// Clear out any pending threadLogs, but don't take too long at it
-	threadsLogging() ;
+	threadsLogging();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -279,26 +272,26 @@ threadsLogging()
 	// this cycle or we proceed and find that the queue is empty.
 	// Since we are the only consumer, the latter is unlikely.
 	if ( logQueue.empty() )
-		return false ;
+		return false;
 
-	ScopedLockTry lock(logQueueMutex) ;
+	ScopedLockTry lock(logQueueMutex);
 	if ( lock.gotLock() == false )
-		return false ;
+		return false;
 
 	if ( logQueue.size() > logQueueMax )
-		logQueueMax = logQueue.size() ;
+		logQueueMax = logQueue.size();
 
 	for ( auto it : logQueue )
 	{
-		const THREAD_LOG* entry = it ;
+		const THREAD_LOG* entry = it;
 		if ( entry->m_entry && *entry->m_entry )
-			_dbugLog(entry->m_file, entry->m_line, entry->m_level, "%s", entry->m_entry) ;
-		delete entry ;
+			_dbugLog(entry->m_file, entry->m_line, entry->m_level, "%s", entry->m_entry);
+		delete entry;
 	}
 
-	logQueue.clear() ;
+	logQueue.clear();
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -311,29 +304,29 @@ void
 threadsCallNextCallback()
 {
 	if ( callbackQueue.empty() )
-		return ;
+		return;
 
-	ScopedLockTry lock(callbackQueueMutex) ;
+	ScopedLockTry lock(callbackQueueMutex);
 	if ( lock.gotLock() == false )
-		return ;
+		return;
 
 	if ( callbackQueue.size() > cbQueueMax )
-		cbQueueMax = callbackQueue.size() ;
+		cbQueueMax = callbackQueue.size();
 
 	for ( auto it : callbackQueue )
 	{
 		try
 		{
-			it->first(it->second) ;
+			it->first(it->second);
 		}
 		catch ( std::exception& e )
 		{
-			dbugLog(_FLA, "UNHANDLED EXCEPTION THROWN BY THREAD CALLBACK: %s", e.what()) ;
+			dbugLog(_FLA, "UNHANDLED EXCEPTION THROWN BY THREAD CALLBACK: %s", e.what());
 		}
-		delete it ;
+		delete it;
 	}
 
-	callbackQueue.clear() ;
+	callbackQueue.clear();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -344,18 +337,18 @@ void
 threadLog(const char* file, UINT32 line, UINT32 level, const char* fmt, ...)
 {
 	if ( g_logDebug == false && level == Debug::ERR_DBUG )
-		return ;
+		return;
 
-	THREAD_LOG* entry = new THREAD_LOG(file, line, level) ;
+	THREAD_LOG* entry = new THREAD_LOG(file, line, level);
 
-	va_list args ;
-	va_start(args, fmt) ;
-	vsnprintf(entry->m_entry, LOG_LENGTH, fmt, args) ;
-	va_end(args) ;
+	va_list args;
+	va_start(args, fmt);
+	vsnprintf(entry->m_entry, LOG_LENGTH, fmt, args);
+	va_end(args);
 
-	OpenThreads::ScopedLock<OpenThreads::Mutex> lock(logQueueMutex) ;
-	logQueue.push_back(entry) ;
-	++logQueuePushes ;
+	OpenThreads::ScopedLock<OpenThreads::Mutex> lock(logQueueMutex);
+	logQueue.push_back(entry);
+	++logQueuePushes;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -365,7 +358,7 @@ void
 DBThreadQuery::Queue()
 {
 	// The dbQueue version of push_back uses mutex exclusion
-	dbQueue.push_back(this) ;
+	dbQueue.push_back(this);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -374,7 +367,7 @@ DBThreadQuery::Queue()
 void
 DBThread::Do(const DBThread::DBNo db_, char* queryText)
 {
-	(new DBThreadQuery(db_, "DBThread::Do(q)", queryText, DBThreadQuery::_IMMEDIATE))->Queue() ;
+	(new DBThreadQuery(db_, "DBThread::Do(q)", queryText, DBThreadQuery::_IMMEDIATE))->Queue();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -383,10 +376,10 @@ DBThread::Do(const DBThread::DBNo db_, char* queryText)
 void
 DBThread::Do(const DBThread::DBNo db_, const char* queryFormat, ...)
 {
-	va_list args ;
-	va_start(args, queryFormat) ;
-	(new DBThreadQuery(db_, "DBThread::Do(q)", DBThreadQuery::_IMMEDIATE, args, queryFormat))->Queue() ;
-	va_end(args) ;
+	va_list args;
+	va_start(args, queryFormat);
+	(new DBThreadQuery(db_, "DBThread::Do(q)", DBThreadQuery::_IMMEDIATE, args, queryFormat))->Queue();
+	va_end(args);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -395,9 +388,9 @@ DBThread::Do(const DBThread::DBNo db_, const char* queryFormat, ...)
 void
 threadCallback(THREAD_CALLBACK* fn, void* param)
 {
-	OpenThreads::ScopedLock<OpenThreads::Mutex> lock(callbackQueueMutex) ;
-	callbackQueue.push_back(new CALLBACK_INFO(fn, param)) ;
-	++cbQueuePushes ;
+	OpenThreads::ScopedLock<OpenThreads::Mutex> lock(callbackQueueMutex);
+	callbackQueue.push_back(new CALLBACK_INFO(fn, param));
+	++cbQueuePushes;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -408,48 +401,48 @@ threadCallback(THREAD_CALLBACK* fn, void* param)
 void
 StatsThread::run()
 {
-	UINT64 dbCurSize, dbMaxSize, dbUsed ;
-	UINT64 dbLastUsed = 0L ;
-	UINT64 cbCurSize, cbMaxSize, cbUsed ;
-	UINT64 cbLastUsed = 0L ;
+	UINT64 dbCurSize, dbMaxSize, dbUsed;
+	UINT64 dbLastUsed = 0L;
+	UINT64 cbCurSize, cbMaxSize, cbUsed;
+	UINT64 cbLastUsed = 0L;
 
-	threadLog(_FLI, "Stats thread active [thread #%u]", getThreadId()) ;
+	threadLog(_FLI, "Stats thread active [thread #%u]", getThreadId());
 
-	UINT32 count = 0 ;
-	for ( ; ; )
+	UINT32 count = 0;
+	for (;; )
 	{
-		static const unsigned int SleepInterval_us = (15 * 1000) * 1000 ;	// 15 seconds.
-		OpenThreads::Thread::microSleep(SleepInterval_us) ;
+		static const unsigned int SleepInterval_us = (15 * 1000) * 1000;	// 15 seconds.
+		OpenThreads::Thread::microSleep(SleepInterval_us);
 
 		if ( ++count < 4 )
-			continue ;
-		count = 0 ;
+			continue;
+		count = 0;
 
 		try
 		{
-			dbQueue.lock() ;
-			dbCurSize = dbQueue.m_queue.size() ;
-			dbMaxSize = dbQueue.m_maxSize ;
-			dbUsed = dbQueue.m_hits - dbLastUsed ;
-			dbLastUsed += dbUsed ;
-			dbQueue.unlock() ;
+			dbQueue.lock();
+			dbCurSize = dbQueue.m_queue.size();
+			dbMaxSize = dbQueue.m_maxSize;
+			dbUsed = dbQueue.m_hits - dbLastUsed;
+			dbLastUsed += dbUsed;
+			dbQueue.unlock();
 
 			{
-				OpenThreads::ScopedLock<OpenThreads::Mutex> lock(callbackQueueMutex) ;
-				cbCurSize = callbackQueue.size() ;
-				cbMaxSize = cbQueueMax ;
-				cbUsed = cbQueuePushes - cbLastUsed ;
-				cbLastUsed += cbUsed ;
+				OpenThreads::ScopedLock<OpenThreads::Mutex> lock(callbackQueueMutex);
+				cbCurSize = callbackQueue.size();
+				cbMaxSize = cbQueueMax;
+				cbUsed = cbQueuePushes - cbLastUsed;
+				cbLastUsed += cbUsed;
 			}
 
 			threadLog(_FLD, "THREADS: dbq(ttl:%llu,used:%llu,max:%llu,cur:%llu), cbq(ttl:%llu,used:%llu,max:%llu,cur:%llu)"
 							, dbLastUsed, dbUsed, dbMaxSize, dbCurSize
-							, cbLastUsed, cbUsed, cbMaxSize, cbCurSize) ;
+							, cbLastUsed, cbUsed, cbMaxSize, cbCurSize);
 
 		}
 		catch ( std::exception& e )
 		{
-			threadLog(_FLD, "statsthread: %s", e.what()) ;
+			threadLog(_FLD, "statsthread: %s", e.what());
 		}
 	}
 }

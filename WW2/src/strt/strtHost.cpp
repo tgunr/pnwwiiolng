@@ -468,7 +468,7 @@ main(int argc, char* argv[])
 	_stratGetenv();
 	serverInitAddresses(_baseHost) ;
 
-	threadsReadDBEnvironment("STRAT_DB_ADDRESS") ;
+	threadsReadDBEnvironment() ;
 	threadsSetup() ;
 
 	//set up the signal handler

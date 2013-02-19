@@ -25,7 +25,7 @@
 #include "sdm/sdmParse.h"
 #include "include/defs.h"
 
-#include "teul/teulConfigVar.h"
+#include "sdm/sdmConfigVars.h"
 
 static FILE* man;
 const char* program = "sdmpp" ;
@@ -33,14 +33,6 @@ const char* program = "sdmpp" ;
 static bool s_unlinksEnabled = true;
 static bool s_renamesEnabled = false;
 static unsigned int s_verbose;
-
-#if platOS != OS_WIN32
-CVAR_STRING(dataDir, "/playnet/data", "DATA_DIR");
-#else
-CVAR_STRING(dataDir, "c:\\playnet\\data", "DATA_DIR");
-#endif
-CVAR_STRING(importFile, "importlist.txt", "IMPORT_FILE");
-CVAR_STRING(terrainSubdir, "terrain", "TERRAIN_SUBDIR");
 
 //typedef std::map<int,std::string> XPATHS ;
 //static XPATHS xpaths ;

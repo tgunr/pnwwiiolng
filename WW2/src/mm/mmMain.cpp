@@ -1147,7 +1147,7 @@ main(int argc, char* argv[])
 	// Get some environment variables, Before teulGetHost
 	_mmGetenv();
 
-	threadsReadDBEnvironment("WWII_DB_ADDRESS") ;
+	threadsReadDBEnvironment() ;
 	mapThreadsSetup() ;
 
 	HostLanguage = getenv("STRAT_LANGUAGE") ;

@@ -70,7 +70,7 @@ int main(int argc, char* argv[])
 	dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 	dbugLog(_FLI,"Database Proxy Host starting. Compiled %s at %s", __DATE__, __TIME__);
 
-	threadsReadDBEnvironment("WWII_DB_ADDRESS") ;
+	threadsReadDBEnvironment() ;
 
 	if ( mmdbInstallHostCallbacks() || chatdbInstallHostCallbacks() )
 	{

@@ -3624,7 +3624,7 @@ main(int argc, char* argv[])
 	wwiiIRCRegisterCommand("who", _ircdotPassthru) ;
 	wwiiIRCRegisterCommand("wtf", _ircdotPassthru) ;
 
-	threadsReadDBEnvironment("WWII_DB_ADDRESS") ;
+	threadsReadDBEnvironment() ;
 	chatThreadsSetup() ;
 
 	dbugSetWriteLevel(Debug::ERR_WARN | DEF_ERR_FLAGS);
