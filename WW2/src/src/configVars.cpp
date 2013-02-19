@@ -30,6 +30,9 @@ CVAR_STRING(wwiiDBDefaultSchema, "wwiionline", "WWII_DB_SCHEMA");
 #include "wwii/wwiiConfigVars.h"
 
 CVAR_STRING(wwiiClusterName, NULL, "WWII_CLUSTER");
+CVAR_STRING(wwiiIrcServer, "", "WWII_IRC_SERVER");
+CVAR_STRING(thblitzPath, SUB_PATH("th_blitz", "weapon"), "THBLITZ_PATH");
+CVAR_STRING(blitzworPath, "blitzWor.csv", "BLITZWOR_PATH");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Read values from the environment of configuration file.

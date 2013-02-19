@@ -35,6 +35,7 @@
 #include "teul/teulTime.h"
 #include "weap/weapSpawnXML.h"
 #include "wwii/wwiiConfig.h"
+#include "wwii/wwiiConfigVars.h"
 #include "wwii/wwiiString.h"
 
 namespace Strat
@@ -609,15 +610,6 @@ _scPass1_facs(Supercell& sc)
 		_supercellCheck("FAC", newFacility->name, sc, newFacility->m_posX, newFacility->m_posY) ;
 
 		CPStruct* parentCP = strtGetCP(newFacility->cpID);
-
-		_ensureCPInitialization(parentCP) ;
-
-		if ( newFacility->supercell != NULL )
-			dbugLog(_FLW, "reinitialization of facility %s in supercell %04hx/%04hx"
-							, newFacility->name, sc.x, sc.y) ;
-
-		newFacility->supercell = &sc ;
-
 		if (parentCP == NULL)
 		{
 			dbugLog(_FLA,"Supercell %d:%d: couldn't find parent CP %d for facility %d %s"
@@ -627,6 +619,14 @@ _scPass1_facs(Supercell& sc)
 						, newFacility->name);
 			continue ;
 		}
+
+		_ensureCPInitialization(parentCP) ;
+
+		if ( newFacility->supercell != NULL )
+			dbugLog(_FLW, "reinitialization of facility %s in supercell %04hx/%04hx"
+							, newFacility->name, sc.x, sc.y) ;
+
+		newFacility->supercell = &sc ;
 
 		if ( !strtInitFacilityfromWOR(*newFacility) )
 		{
@@ -1127,7 +1127,8 @@ strtInitializeStratData()
 	atexit(_killStratData) ;
 
 	// Load in the blitzWor modifier data
-	parseWor("/blitzWor.csv",NULL);
+	if (!parseWor(cv_blitzworPath, NULL))
+		LogAbort("Unable to load blitzWor file: %s", cv_blitzworPath.GetString());
 
 #ifdef IS_STRAT_HOST
 	// Load the virtual spawn classes.

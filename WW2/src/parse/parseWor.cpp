@@ -31,6 +31,7 @@
 	#include "fio/fioDefs.h"
 	#include "fio/fiod.h"
 	#include "str/stringLib.h"
+	#include "wwii/wwiiConfigVars.h"
 #else
 	#include "fio/fio.h"
 #endif
@@ -164,9 +165,9 @@ parseWor(const char* levelfile, PARSE_CALLBACK* world)
 
 #ifndef VALIDATOR
  #if platBuild == TEUL_SERVER
-	if ( !weapHasInitialized() && !weapListInit(TH_BLITZ_PATH) )
+	if ( !weapHasInitialized() && !weapListInit(cv_thblitzPath) )
  #else
-	if ( !weapListInit("/th_blitz/weapon/") )
+	if ( !weapListInit("th_blitz/weapon") )
  #endif // TEUL_SERVER
 	{
 #if platBuild != TEUL_SERVER && !defined(CMDLINE_CLIENT)
@@ -177,7 +178,7 @@ parseWor(const char* levelfile, PARSE_CALLBACK* world)
 	}
 #endif //VALIDATOR
 
-	strncpy(_fileName,levelfile,PN_MAX_PATH);
+	strncpy(_fileName, levelfile, PN_MAX_PATH);
 
 #if platBuild == TEUL_SERVER
 	world = blank;

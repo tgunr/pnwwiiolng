@@ -37,6 +37,7 @@
 
 #include "wwii/wwiiThreads.h"
 #include "wwii/wwiiIRC.h"
+#include "wwii/wwiiConfigVars.h"
 
 void wwiiIRCDefaultChannelMsg(irc_session_t* session, const char* event, const char* origin, const char** params, unsigned int count) ;
 
@@ -71,7 +72,7 @@ static const char* _getChannelName(const char* channel, char* into, size_t intoS
 struct IRCImpl : public IRC, public OpenThreads::Thread
 {
 	IRCImpl()
-		: m_cluster(getenv("WWII_CLUSTER")), m_server(getenv("WWII_IRC_SERVER"))
+		: m_cluster(cv_wwiiClusterName), m_server(cv_wwiiIrcServer)
 		, m_initialized(false), m_active(false), m_running(false), m_joined(false)
 		, m_session(NULL)
 		, m_app(""), m_nick("")

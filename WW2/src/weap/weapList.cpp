@@ -25,10 +25,10 @@
 
 #define WEAP_IDENT_SIZE 3
 
-static LOGICAL g_weaponListIsInitialized = FALSE ;
+static LOGICAL g_weaponListIsInitialized = FALSE;
 
-typedef std::map<UINT32, WEAPON*> WEAPON_INDEXES ;
-static WEAPON_INDEXES s_weaponIndexes ;
+typedef std::map<UINT32, WEAPON*> WEAPON_INDEXES;
+static WEAPON_INDEXES s_weaponIndexes;
 
 const char* facilityTypeName[] = {	"NONE",
 									"CITY",
@@ -86,7 +86,7 @@ static const UCHAR* relation[] = {
 								};
 */
 
-const WEAPON_SERIAL NULL_WEAP_SERIAL = { { { 0, 0 }, 0, 0, 0 }, 0, NULL_WEAP_SPEC } ;
+const WEAPON_SERIAL NULL_WEAP_SERIAL = { { { 0, 0 }, 0, 0, 0 }, 0, NULL_WEAP_SPEC };
 
 const FULL_OBJ_ID nullObjID = { { 0, 0 }, 0, 0, 0 };
 
@@ -102,30 +102,30 @@ SINT16	weapCountryIndex[Parse::MAX_COUNTRY_CODES];
 WEAPON_CLASS weaponClass[MAX_WEAP_CLASSES];
 
 // All known weapons
-WEAPON_LIST g_weaponList ;
+WEAPON_LIST g_weaponList;
 
 // Weapon Category tables
-WEAPON_SPAWNS g_weaponSpawns ;
+WEAPON_SPAWNS g_weaponSpawns;
 
 // Weapons indexed by name
 #if platOS == OS_LINUX
-typedef std::unordered_map<std::string,WEAPON*> WEAPON_NAME_INDEX ;
+typedef std::unordered_map<std::string,WEAPON*> WEAPON_NAME_INDEX;
 #else
-typedef stdext::hash_map<std::string,WEAPON*> WEAPON_NAME_INDEX ;
+typedef stdext::hash_map<std::string,WEAPON*> WEAPON_NAME_INDEX;
 #endif
-static WEAPON_NAME_INDEX weaponNameIndex ;
+static WEAPON_NAME_INDEX weaponNameIndex;
 
 LOGICAL
 weapHasInitialized()
 {
-	return g_weaponListIsInitialized ;
+	return g_weaponListIsInitialized;
 }
 
 WWII_SIDE weapFindSide(const char* side)
 {
 SINT32 i;
 
-	for( i = 1; i < MAX_SIDES ; i++ )
+	for( i = 1; i < MAX_SIDES; i++ )
 	{
 		if ( !strcasecmp(wwii_side[i],side) )
 			return (WWII_SIDE)i;
@@ -141,7 +141,7 @@ WEAPON_SPEC weapFindCountryFromCode(const char* cCode)
 
 	cnum = findCountryCode(cCode);
 
-	for( i = 1 ; i < MAX_COUNTRIES ; i++ )
+	for( i = 1; i < MAX_COUNTRIES; i++ )
 	{
 		if ( weaponCountry[i].code == cnum )
 		{
@@ -193,7 +193,7 @@ WEAPON_SPEC
 weapFindClass(const char* weapClass)
 {
 	WEAPON_SPEC weap = NULL_WEAP_SPEC;
-	for ( UINT32 i = 1 ; i < MAX_WEAP_CLASSES ; i++ )
+	for ( UINT32 i = 1; i < MAX_WEAP_CLASSES; i++ )
 	{
 		if ( strcasecmp((char*)weaponClass[i].name,weapClass) == 0 )
 		{
@@ -291,34 +291,34 @@ WEAPON_SPEC
 weapAssociateIndex(const char* objName, UINT32 localIndex)
 {
 	if ( objName == NULL )
-		return NULL_WEAP_SPEC ;
+		return NULL_WEAP_SPEC;
 
 	char weapName[MAX_WEAP_NAME_LEN];
 
 	strncpy(weapName, objName, MAX_WEAP_NAME_LEN);
 	_strlwr(weapName);
 
-	WEAPON* weapon = weapLookupWeaponByName(weapName) ;
+	WEAPON* weapon = weapLookupWeaponByName(weapName);
 	if ( weapon == NULL )
 	{
 #ifdef FRONT_END
-		Write_Debug("weapon %s not defined li:%u", weapName, localIndex) ;
+		Write_Debug("weapon %s not defined li:%u", weapName, localIndex);
 #elif defined(AS_SERVER)
-		LogAbort("weap:%s li:%u no weapon to associate with", weapName, localIndex) ;
+		LogAbort("weap:%s li:%u no weapon to associate with", weapName, localIndex);
 #endif
-		return NULL_WEAP_SPEC ;
+		return NULL_WEAP_SPEC;
 	}
 
-	weapon->m_localIndex = localIndex ;
-	s_weaponIndexes[localIndex] = weapon ;
+	weapon->m_localIndex = localIndex;
+	s_weaponIndexes[localIndex] = weapon;
 
-	return weapon->spec() ;
+	return weapon->spec();
 }
 
 void
 weapAddWeaponIndex(WEAPON* weapon)
 {
-	s_weaponIndexes[weapon->m_localIndex] = weapon ;
+	s_weaponIndexes[weapon->m_localIndex] = weapon;
 }
 
 LOGICAL
@@ -327,25 +327,24 @@ weapListInit(const char* theaterPath)
 	SINT32 country,category;
 	char importFile[PN_MAX_PATH];
 
-	memset(weapCountryIndex,0,sizeof(weapCountryIndex));
-	g_weaponList.clear() ;
-	g_weaponSpawns.clear() ;
+	memset(weapCountryIndex, 0, sizeof(weapCountryIndex));
+	g_weaponList.clear();
+	g_weaponSpawns.clear();
 
-	atexit(weapListKill) ;
+	atexit(weapListKill);
 
-	snprintf(importFile, PN_MAX_PATH, "%s%s", theaterPath, "weapCountry.csv");
-
+	snprintf(importFile, PN_MAX_PATH, SUB_PATH("%s", "%s"), theaterPath, "weapCountry.csv");
 	if ( ! weapParseCountry(importFile))
 	{
-		dbugLog(_FLA,"couldnt parse country file");
-		return (FALSE);
+		dbugLog(_FLA, "couldnt parse countries file (%s)", importFile);
+		return FALSE;
 	}
 
-	snprintf(importFile, PN_MAX_PATH, "%s%s", theaterPath, "weapClasses.csv");
+	snprintf(importFile, PN_MAX_PATH, SUB_PATH("%s", "%s"), theaterPath, "weapClasses.csv");
 	if ( ! weapParseClasses(importFile))
 	{
-		dbugLog(_FLA,"couldnt parse class file");
-		return (FALSE);
+		dbugLog(_FLA, "couldnt parse class file (%s)", importFile);
+		return FALSE;
 	}
 
 	for ( country = 1; country < MAX_COUNTRIES; country++)
@@ -355,13 +354,13 @@ weapListInit(const char* theaterPath)
 
 		for ( category = 1; category < MAX_WEAP_CATEGORY; category++)
 		{
-			snprintf(importFile,PN_MAX_PATH,"%s%s%s%s"
+			snprintf(importFile,PN_MAX_PATH, "%s" PATH_SEPSTR "%s%s%s"
 					, theaterPath, Parse::countryCode[weaponCountry[country].code], wwii_category[category], "weap.csv");
 //#define LIVE_DANGEROUS
 
 			if (!weapParseWeapons(importFile,country,category) && category != _MUNITIONS )
 			{
-				dbugLog(_FLA,"couldn't parse weapons file for %s",importFile);
+				dbugLog(_FLA,"couldn't parse %u.%u weapons file (%s)", country, category, importFile);
 #ifndef LIVE_DANGEROUS
 				return (FALSE);
 #endif
@@ -376,7 +375,7 @@ weapListInit(const char* theaterPath)
 
 		for ( category = 1; category < MAX_WEAP_CATEGORY; category++)
 		{
-			snprintf(importFile,PN_MAX_PATH,"%s%s%s%s"
+			snprintf(importFile, PN_MAX_PATH, "%s" PATH_SEPSTR "%s%s%s"
 					, theaterPath, Parse::countryCode[weaponCountry[country].code], wwii_category[category], "spawn.csv");
 			if ( ! weapParseSpawn(importFile, country, category) && category != _MUNITIONS )
 			{
@@ -394,14 +393,14 @@ weapListInit(const char* theaterPath)
 void weapListKill(void)
 {
 	// Delete all the WEAPON's we allocated
-	WEAPON_LIST::iterator it ;
-	for ( it = g_weaponList.begin() ; it != g_weaponList.end() ; ++it )
+	WEAPON_LIST::iterator it;
+	for ( it = g_weaponList.begin(); it != g_weaponList.end(); ++it )
 	{
 		if ( it->second != NULL )
-			delete it->second ;
+			delete it->second;
 	}
-	g_weaponList.clear() ;
-	g_weaponSpawns.clear() ;
+	g_weaponList.clear();
+	g_weaponSpawns.clear();
 }
 
 #if platOS != OS_WIN32
@@ -413,36 +412,36 @@ const WEAPON_SPEC&
 weapFindWeaponByName(const char* name)
 {
 	if ( name == NULL || *name == 0 )
-		return NULL_WEAP_SPEC ;
+		return NULL_WEAP_SPEC;
 
-	WEAPON_NAME_INDEX::iterator it = weaponNameIndex.find(name) ;
+	WEAPON_NAME_INDEX::iterator it = weaponNameIndex.find(name);
 	if ( it == weaponNameIndex.end() || it->second == NULL )
-		return NULL_WEAP_SPEC ;
-	return it->second->spec() ;
+		return NULL_WEAP_SPEC;
+	return it->second->spec();
 }
 
 WEAPON*
 weapLookupWeaponByName(const char* name)
 {
 	if ( name == NULL || *name == 0 )
-		return NULL ;
+		return NULL;
 
-	WEAPON_NAME_INDEX::iterator it = weaponNameIndex.find(name) ;
-	return ( it != weaponNameIndex.end() ) ? it->second : NULL ;
+	WEAPON_NAME_INDEX::iterator it = weaponNameIndex.find(name);
+	return ( it != weaponNameIndex.end() ) ? it->second : NULL;
 }
 
 WEAPON*
 weapLookupWeaponByIndex(UINT32 localIndex)
 {
-	WEAPON_INDEXES::iterator it = s_weaponIndexes.find(localIndex) ;
-	return ( it != s_weaponIndexes.end() ? it->second : NULL ) ;
+	WEAPON_INDEXES::iterator it = s_weaponIndexes.find(localIndex);
+	return ( it != s_weaponIndexes.end() ? it->second : NULL );
 }
 
 // Lookup the weapon with the fast index
 WEAPON* weapLookup(const WEAPON_SPEC& spec)
 {
-	WEAPON_LIST::iterator it = g_weaponList.find(spec) ;
-	return ( it != g_weaponList.end() ) ? it->second : NULL ;
+	WEAPON_LIST::iterator it = g_weaponList.find(spec);
+	return ( it != g_weaponList.end() ) ? it->second : NULL;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -452,10 +451,10 @@ static SINT16
 _getAccessValue(const char* key)
 {
 	if ( key == NULL || *key == 0 )
-		return 0 ;
+		return 0;
 	if ( isdigit(*key) )
-		return atoi(key) ;
-	return atoi(key+1) ;
+		return atoi(key);
+	return atoi(key+1);
 }
 
 WEAPON::WEAPON(const WEAPON_SPEC& withSpec
@@ -479,16 +478,16 @@ WEAPON::WEAPON(const WEAPON_SPEC& withSpec
 	, alertDist2((UINT64)AlertDist * (UINT64)AlertDist)
 	, m_modified(false)
 {
-	strncpy(name, Name, MAX_WEAP_NAME_LEN) ;
-	strncpy(fullName, Name, MAX_WEAP_NAME_LEN) ;
-	strlwr(name) ;
+	strncpy(name, Name, MAX_WEAP_NAME_LEN);
+	strncpy(fullName, Name, MAX_WEAP_NAME_LEN);
+	strlwr(name);
 
-	memset(bias, 0, sizeof(bias)) ;
+	memset(bias, 0, sizeof(bias));
 
 	if ( weapLookupWeaponByName(name) != NULL )
-		throw std::runtime_error("multiple definitions of vehicle") ;		///Terminal
+		throw std::runtime_error("multiple definitions of vehicle");		///Terminal
 
-	weaponNameIndex[name] = this ;
+	weaponNameIndex[name] = this;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -499,9 +498,9 @@ WEAPON::~WEAPON()
 	if ( name[0] != 0 )
 	{
 		// De-register myself
-		WEAPON_NAME_INDEX::iterator it = weaponNameIndex.find(name) ;
+		WEAPON_NAME_INDEX::iterator it = weaponNameIndex.find(name);
 		if ( it != weaponNameIndex.end() && it->second == this )
-			weaponNameIndex.erase(it) ;
+			weaponNameIndex.erase(it);
 	}
 }
 
@@ -516,34 +515,34 @@ WEAPON::isPermitted(const PermissionMask& permMask, bool disableRankLimits) cons
 	switch (access())
 	{
 		case 0:
-			return true ;
+			return true;
 
 		// On the training server, drop thru to "default"
 		case 1:
-			return (disableRankLimits || permMask & (VEHICLE_LEVEL1_MASK|ALL_SPAWN)) ;
+			return (disableRankLimits || permMask & (VEHICLE_LEVEL1_MASK|ALL_SPAWN));
 		case 2:
-			return (disableRankLimits || permMask & (VEHICLE_LEVEL2_MASK|ALL_SPAWN)) ;
+			return (disableRankLimits || permMask & (VEHICLE_LEVEL2_MASK|ALL_SPAWN));
 		case 3:
-			return (disableRankLimits || permMask & (VEHICLE_LEVEL3_MASK|ALL_SPAWN)) ;
+			return (disableRankLimits || permMask & (VEHICLE_LEVEL3_MASK|ALL_SPAWN));
 		case 4:
-			return (disableRankLimits || permMask & (VEHICLE_LEVEL4_MASK|ALL_SPAWN)) ;
+			return (disableRankLimits || permMask & (VEHICLE_LEVEL4_MASK|ALL_SPAWN));
 		case 5:
-			return (disableRankLimits || permMask & (VEHICLE_LEVEL5_MASK|ALL_SPAWN)) ;
+			return (disableRankLimits || permMask & (VEHICLE_LEVEL5_MASK|ALL_SPAWN));
 		case 6:
-			return (disableRankLimits || permMask & (VEHICLE_LEVEL6_MASK|ALL_SPAWN)) ;
+			return (disableRankLimits || permMask & (VEHICLE_LEVEL6_MASK|ALL_SPAWN));
 		case 7:
-			return (disableRankLimits || permMask & (VEHICLE_LEVEL7_MASK|ALL_SPAWN)) ;
+			return (disableRankLimits || permMask & (VEHICLE_LEVEL7_MASK|ALL_SPAWN));
 		case 8:			// Skull
-			return (permMask & VEHICLE_LEVEL8_MASK) != 0 ;
+			return (permMask & VEHICLE_LEVEL8_MASK) != 0;
 		case 9:			// Buzzard and above
 		case 10:
 		case 11:
-			return (permMask & VEHICLE_LEVEL9_MASK) != 0 ;
+			return (permMask & VEHICLE_LEVEL9_MASK) != 0;
 
 		default:
 			// If this changes to 'false', the training server
 			// will need a special case version.
-			return true ;
+			return true;
 	}
 }
 

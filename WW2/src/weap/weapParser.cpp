@@ -90,7 +90,7 @@ static SINT32 _parseConstant;
 
 bool weapParseCountry(char* countryfile)
 {
-	strncpy(_fileName,countryfile,PN_MAX_PATH);
+	strncpy(_fileName, countryfile, PN_MAX_PATH);
 
 	_userCallbacks[0].function = _fillCountry;
 

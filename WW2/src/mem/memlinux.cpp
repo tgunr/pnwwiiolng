@@ -9,7 +9,6 @@
 #include "teul/teulMicroWebServer.h"
 
 extern TeulTimeMS teulClock64 ;
-static OpenThreads::Mutex m_mutex ;
 
 extern Teul::uWeb::Server* serverGetDebugWebServer() ;
 
@@ -97,8 +96,20 @@ static unsigned long long _fileLineToLong(const char* const file_, const size_t 
 	return ((unsigned long long)file_) << 32 | (unsigned long long)line_ ;
 }
 
-typedef UNORDERED_MAP<unsigned long long, Activity> HISTORY ;
-static HISTORY history ;
+typedef UNORDERED_MAP<unsigned long long, Activity> HISTORY_BASE ;
+
+struct HISTORY : HISTORY_BASE
+{
+	HISTORY() : HISTORY_BASE(), m_inUse(true), m_mutex() {}
+	~HISTORY()
+	{
+		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(m_mutex);
+		m_inUse = false;
+		OpenThreads::Thread::microSleep(10 * 1000);
+	}
+	volatile bool m_inUse;
+	OpenThreads::Mutex m_mutex ;
+} history;
 
 void*
 memCallocDebug(const size_t units_, const size_t size_, const char* const file_, const size_t line_)
@@ -109,8 +120,9 @@ memCallocDebug(const size_t units_, const size_t size_, const char* const file_,
 	if ( ptr == NULL )
 		return ptr ;
 
+	if ( history.m_inUse )
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(m_mutex) ;
+		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(history.m_mutex) ;
 		Activity& act = history[ flLong ] ;
 		act.alloc(ptr, size_) ;
 	}
@@ -131,8 +143,9 @@ memReallocDebug(void* const oldPtr_, const size_t newSize_, const char* const fi
 	memcpy(newPtr, oldHeader, sizeof(Header) + std::min(newSize_, oldSize)) ;
 	Activity* const oldAct = newPtr->m_activity ;
 
+	if ( history.m_inUse )
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(m_mutex) ;
+		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(history.m_mutex) ;
 		Activity& newAct = history[ flLong ] ;
 		oldAct->free(newPtr) ;
 		newAct.alloc(newPtr, newSize_) ;
@@ -151,8 +164,9 @@ void
 memFreeDebug(void* const oldPtr_, const char* const file_, const size_t line_)
 {
 	Header* header = Header::FromPointer(oldPtr_) ;
+	if ( history.m_inUse )
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(m_mutex) ;
+		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(history.m_mutex) ;
 		header->m_activity->free(header) ;
 	}
 
@@ -172,8 +186,9 @@ memReportJSON(unsigned int fd, const char* const /*path*/, const char* const /*a
 
 	const TeulTimeMS cutoff = teulClock64 - (5 * 60 * 1000) ;
 
+	if ( history.m_inUse )
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(m_mutex) ;
+		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(history.m_mutex) ;
 		const auto end = history.end() ;
 		for ( auto it = history.begin() ; it != end ; ++it )
 		{
@@ -183,6 +198,8 @@ memReportJSON(unsigned int fd, const char* const /*path*/, const char* const /*a
 			offset = it->second.describeJSON(it->first, buffer, sizeof(buffer), offset) ;
 		}
 	}
+	else
+		return;
 
 	offset += sprintf(buffer + offset, "\r\n}\r\n") ;
 

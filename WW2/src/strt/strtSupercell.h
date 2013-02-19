@@ -22,20 +22,20 @@ class Supercell
 public:
 	Supercell()
 		: x(0), y(0)
-		, index(NULL)
+		, index(nullptr)
 		, numCPs(0)
 		, numFacilities(0)
 		, numObjects(0)
 		, numLinks(0)
 		, numWaypoints(0)
 		, indexSize(0)
-		, cps(NULL)
-		, facilities(NULL)
-		, objects(NULL)
-		, links(NULL)
-		, facilityTable(NULL)
-		, buildingTable(NULL)
-		, m_xfer(NULL)
+		, cps(nullptr)
+		, facilities(nullptr)
+		, objects(nullptr)
+		, links(nullptr)
+		, facilityTable(nullptr)
+		, buildingTable(nullptr)
+		, m_xfer(nullptr)
 		, m_modified(false)
 		{
 		}
@@ -47,7 +47,7 @@ public:
 	SINT16			y;		//y of the supercell
 
 	// All of the numXXX members of this structure count the actual number
-	// of non-NULL entries in the array, where maxXXX is the size
+	// of non-nullptr entries in the array, where maxXXX is the size
 	// of the corresponding array.  For the normal, expected cases these
 	// will be the same.  This is just CYA for the times when the terrain
 	// editor leaves holes in the array of ojects.

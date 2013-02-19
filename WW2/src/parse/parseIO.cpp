@@ -196,17 +196,17 @@ bool parseFile(char* pathName, PARSE_CALLBACK* sectionCallbacks
 				, UINT32* lineCounter
 				)
 {
-char		func[MAX_SECT_NAME_SIZE];
-int			nargs;
-ARG_KEY		fargs[MAX_ARGS];
-ARG_KEY_HEAD keyList;// = {0,fargs};
-ARG_LIST*	argList;
-bool		funcFound, retval;
+	char		func[MAX_SECT_NAME_SIZE];
+	int			nargs;
+	ARG_KEY		fargs[MAX_ARGS];
+	ARG_KEY_HEAD keyList;// = {0,fargs};
+	ARG_LIST*	argList;
+	bool		funcFound, retval;
 
-keyList.numKeys = 0;
-keyList.keys = fargs;
+	keyList.numKeys = 0;
+	keyList.keys = fargs;
 
-	strncpy(_fileName,pathName,PN_MAX_PATH);
+	strncpy(_fileName, pathName, PN_MAX_PATH);
 
 	char* data = NULL ;
 	bool loaded = fioLoad(_fileName, data) ;

@@ -23,8 +23,7 @@
 
 #include "sdm/sdmConfigVars.h"
 #include "wwii/wwiidbConfigVars.h"
-
-static const char* cluster = (getenv("WWII_CLUSTER") ? getenv("WWII_CLUSTER") : "dev");
+#include "wwii/wwiiConfigVars.h"
 
 static bool useIrc = true;
 static irc_session_t* ircSession;
@@ -181,7 +180,7 @@ _ircSendMessage(const char* channel, const char* message)
 	char channelName[128];
 	if ( channel[0] == '-' )
 	{
-		sprintf(channelName, "#%s%s", cluster, channel);
+		sprintf(channelName, "#%s%s", cv_wwiiClusterName, channel);
 	}
 	else
 		strcpy(channelName, channel);
@@ -196,7 +195,7 @@ _ircStart()
 		return;
 
 	char message[80 + sizeof(g_origin)];
-	sprintf(message, "%s terrain: importing new terrain from %s", cluster, g_origin);
+	sprintf(message, "%s terrain: importing new terrain from %s", cv_wwiiClusterName, g_origin);
 	_ircSendMessage("-sys,#servers", message);
 }
 
@@ -208,7 +207,7 @@ _ircFinish(const TeulTimeMS& timeTaken)
 
 	FLOAT32 seconds = ((FLOAT32)timeTaken) / 1000.0f;
 	char message[128];
-	sprintf(message, "%s terrain: import finished - took %.2f seconds", cluster, seconds);
+	sprintf(message, "%s terrain: import finished - took %.2f seconds", cv_wwiiClusterName, seconds);
 
 	_ircSendMessage("-sys,#servers", message);
 
@@ -417,7 +416,7 @@ main(int argc,char** argv)
 	if ( importFile == nullptr )
 		LogAbort("Unable to access import file " SUB_PATH("%s", "%s"), cv_dataDir.GetString(), importFileName);
 
-	nick = cluster;
+	nick = cv_wwiiClusterName;
 	nick += "Loader";
 	nick[0] = toupper(nick[0]);
 

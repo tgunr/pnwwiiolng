@@ -35,6 +35,7 @@
 #include "strt/strtIO.h"
 #include "strt/strtData.h"
 #include "strt/strtDTL.h"
+#include "sdm/sdmConfigVars.h"
 #include "sdm/sdmParse.h"
 #include "include/defs.h"
 #include "wwii/wwiiConfig.h"
@@ -254,7 +255,7 @@ strtReleaseSupercells()
 static bool
 _getFilenameXY(const std::string& filename, SINT16* scx, SINT16* scy)
 {
-	UINT32 n = filename.rfind('/') + 1 ;
+	UINT32 n = filename.rfind(PATH_SEPARATOR) + 1 ;
 	if ( n >= filename.length() )
 		n = 0 ;
 	const UINT32 assigned = sscanf(filename.c_str() + n, "%hx_%hx", scx, scy) ;
@@ -267,13 +268,15 @@ _getFilenameXY(const std::string& filename, SINT16* scx, SINT16* scy)
 static void
 _readSupercells()
 {
-	static const char* _IMPORT_LIST = "./data/importlist.txt" ;
 	std::ifstream importList ;
-	std::string filename ;
+	std::string filename;
 
-	importList.open(_IMPORT_LIST, std::ifstream::in) ;
+	filename = cv_dataDir;
+	filename += PATH_SEPARATOR;
+	filename += cv_importFile;
+	importList.open(filename.c_str(), std::ifstream::in) ;
 	if ( !importList.is_open() )
-		throw std::runtime_error("Unable to open importlist") ;	///Terminal
+		LogAbort("Unable to open sdm import list: %s", filename.c_str());
 
 	bool errors = false ;
 

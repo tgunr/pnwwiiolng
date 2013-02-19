@@ -220,8 +220,6 @@ static LOGICAL _tuneOrigin(Player* player, UCHAR index, const SCHAR* handle, UIN
 static LOGICAL _tuneGM(Player* player, UCHAR index, const SCHAR* handle, UINT32 commandIndex) ;
 extern bool chatUpdateHCUnitLocations() ;
 
-const char* g_clusterName = getenv("WWII_CLUSTER") ;
-
 struct TUNE_COMMAND
 {
 	const SCHAR*	string;
@@ -3575,9 +3573,6 @@ main(int argc, char* argv[])
 {
 	serverEnableDebugWebServer() ;
 	memInit() ;
-
-	if ( g_clusterName == NULL )
-		g_clusterName = "?undef?" ;
 
 	Teul::SetAppName(g_serverName) ;
 	if (teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction) < 0)//_killFunction

@@ -166,7 +166,7 @@ _recvWWII_ACTIVATE(ACTION_OBJECT* const a)
 
 	switch (activate.serverType)
 	{
-	case MAP_MISSION:
+	case MAP_HOST:
 		clientActivateMap(a->teulIndex,TRUE, maskedAddr, activate.port);
 		_updatesSent = 0 ;
 		break;
