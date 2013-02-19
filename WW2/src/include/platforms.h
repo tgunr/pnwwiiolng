@@ -93,30 +93,13 @@
 
 #undef DBA_ENABLE_SQLITE
 
-#include "include/precompile_includes.h"
-
 #undef DBA_ENABLE_SQLITE
 
 #if defined(WIN32) || defined(WIN64)
 
-static inline UINT64 strtoull(const char* const src_, const char* const, unsigned int)
-{
-	UINT64 into = 0;
-	sscanf(src_, "%I64u", &into) ;
-	return into ;
-}
-static inline SINT64 strtoll(const char* const src_, const char* const, unsigned int)
-{
-	SINT64 into = 0 ;
-	sscanf(src_, "%I64d", &into) ;
-	return into ;
-}
-static inline FLOAT32 strtof(const char* const src_, const char* const)
-{
-	FLOAT32 into = 0 ;
-	sscanf(src_, "%f", &into) ;
-	return into ;
-}
+static inline unsigned long long strtoull(const char* const src_, const char* const, unsigned int);
+static inline signed long long strtoll(const char* const src_, const char* const, unsigned int);
+static inline float strtof(const char* const src_, const char* const);
 
 #include <io.h>
 #endif
@@ -128,5 +111,7 @@ static inline FLOAT32 strtof(const char* const src_, const char* const)
 #ifndef MAXPATHLEN
 # define MAXPATHLEN MAX_PATH
 #endif
+
+#include "include/precompile_includes.h"
 
 #include "sys/sysWinISO.h"

@@ -1,5 +1,6 @@
 #pragma once
 
+#include "dbug/dbug.h"			// For LogAbort
 #include "str/strdupptr.h"
 
 enum ConfigVarType
@@ -20,7 +21,7 @@ namespace Teul
 	class ConfigVar
 	{
 	public:
-		inline ConfigVar(const char* const name_, const char* const default_, const char* const envVarName_=nullptr);
+		inline ConfigVar(const char* const name_, const char* const default_, const char* const envVarName_);
 		inline ~ConfigVar();
 
 		enum { ValueType = VarType_ };
@@ -32,12 +33,20 @@ namespace Teul
 		inline const UINT64& GetUnsigned() const;
 		inline const SINT64& GetSigned() const;
 
+		const char* GetName() const { return m_name; }
+		const char* GetEnvVarName() const { return m_envVarName; }
+
 		inline void Set(const char* newValue_);
 		inline void SetString(const char* newValue_);
 		inline void SetUnsigned(const UINT64 newValue_);
 		inline void SetSigned(const SINT64 newValue_);
 
 		CONSTEXPR_FN bool IsNumber() const { return VarType_ == CVT_UNSIGNED_INT || VarType_ == CVT_SIGNED_INT; }
+
+		// String's provide an operator const char*
+		operator const char*() const { return GetString(); }
+		operator const UINT64&() const { return GetUnsigned(); }
+		operator const SINT64&() const { return GetSigned(); }
 
 	public:
 		// Assignment operator copies values, not names.
@@ -56,6 +65,7 @@ namespace Teul
 		enum { MaxIntStringSize = 22 };
 
 		StrDupPtr		m_name;
+		const char*		m_envVarName;
 		char*			m_value;
 
 		union
@@ -63,34 +73,11 @@ namespace Teul
 			const char*	um_ptr;
 			UINT64		um_uint64;
 			SINT64		um_sint64;
-		} m_valueUnion;
+		} m_union;
 	};
 
 	//////////
 	// Implementations.
-	template<ConfigVarType Type_>
-	ConfigVar<Type_>::ConfigVar(const char* const name_, const char* const default_, const char* const envVarName_)
-		: m_name(name_)
-		, m_value(nullptr)
-	{
-		ABORT_IF(name_ == nullptr);
-
-		m_valueUnion.um_ptr = nullptr;
-
-		if ( IsNumber() )
-			m_value = static_cast<char*>(calloc(1, MaxIntStringSize));
-
-		if ( default_ != nullptr )
-			Set(default_);
-
-		if ( envVarName_ )
-		{
-			const char* envValue = getenv(envVarName_);
-			if ( envValue != nullptr )
-				Set(envValue);
-		}
-	}
-
 	template<ConfigVarType Type_>
 	ConfigVar<Type_>::~ConfigVar()
 	{
@@ -112,7 +99,7 @@ namespace Teul
 			SetUnsigned(strtoull(newValue_, NULL, 10));
 		else
 		{
-			m_valueUnion.um_uint64 = 0ULL;
+			m_union.um_uint64 = 0ULL;
 			m_value[0] = '\0';
 		}
 	}
@@ -124,48 +111,30 @@ namespace Teul
 			SetSigned(strtoll(newValue_, NULL, 10));
 		else
 		{
-			m_valueUnion.um_sint64 = 0ULL;
+			m_union.um_sint64 = 0ULL;
 			m_value[0] = '\0';
 		}
 	}
 
-	template<> const char* ConfigVar<CVT_STRING>::GetString() const { return m_valueUnion.um_ptr;	}
-	template<> const UINT64& ConfigVar<CVT_UNSIGNED_INT>::GetUnsigned() const { return m_valueUnion.um_uint64; }
-	template<> const SINT64& ConfigVar<CVT_SIGNED_INT>::GetSigned() const { return m_valueUnion.um_sint64; }
+	template<> const char* ConfigVar<CVT_STRING>::GetString() const { return m_union.um_ptr;	}
+	template<> const UINT64& ConfigVar<CVT_UNSIGNED_INT>::GetUnsigned() const { return m_union.um_uint64; }
+	template<> const SINT64& ConfigVar<CVT_SIGNED_INT>::GetSigned() const { return m_union.um_sint64; }
 
-	template<> void ConfigVar<CVT_STRING>::SetString(const char* const newValue_)
-	{
-		if ( newValue_ == m_value )
-			return;
-		if ( m_value )
-			free(m_value);
-		m_value = newValue_ ? strdup(newValue_) : nullptr;
-		m_valueUnion.um_ptr = m_value;
-	}
-
-	template<> void ConfigVar<CVT_UNSIGNED_INT>::SetUnsigned(const UINT64 newValue_)
-	{
-		if ( newValue_ == GetUnsigned() )
-			return;
-		m_valueUnion.um_uint64 = newValue_;
-		snprintf(m_value, MaxIntStringSize, "%llu", newValue_);
-	}
-
-	template<> void ConfigVar<CVT_SIGNED_INT>::SetSigned(const SINT64 newValue_)
-	{
-		if ( newValue_ == GetSigned() )
-			return;
-		m_valueUnion.um_sint64 = newValue_;
-		snprintf(m_value, MaxIntStringSize, "%lld", newValue_);
-	}
+	template<> void ConfigVar<CVT_STRING>::SetString(const char* const newValue_);
+	template<> void ConfigVar<CVT_UNSIGNED_INT>::SetUnsigned(const UINT64 newValue_);
+	template<> void ConfigVar<CVT_SIGNED_INT>::SetSigned(const SINT64 newValue_);
 
 } // namespace Teul
 
+typedef Teul::ConfigVar<CVT_STRING> ConfigStr;
+typedef Teul::ConfigVar<CVT_UNSIGNED_INT> ConfigUint;
+typedef Teul::ConfigVar<CVT_SIGNED_INT> ConfigSint;
+
 #define CVAR_STRING(Name_, Default_, EnvName_)	\
-	Teul::ConfigVar<CVT_STRING> cv_##Name_ ( #Name_, Default_, EnvName_ )
+	ConfigStr cv_##Name_ ( #Name_, Default_, EnvName_ )
 
 #define CVAR_UINT(Name_, Default_, EnvName_)	\
-	Teul::ConfigVar<CVT_UNSIGNED_INT> cv_##Name_ ( #Name_, Default_, EnvName_ )
+	ConfigUint cv_##Name_ ( #Name_, Default_, EnvName_ )
 
 #define CVAR_SINT(Name_, Default_, EnvName_)	\
-	Teul::ConfigVar<CVT_SIGNED_INT> cv_##Name_ ( #Name_, Default_, EnvName_ )
+	ConfigSint cv_##Name_ ( #Name_, Default_, EnvName_ )

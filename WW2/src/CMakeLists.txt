@@ -1,6 +1,13 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 2.6.4)
 PROJECT (GameHosts)
 
+################################################################################
+## Configuration.
+
+IF ( UNIX AND NOT IS_DIRECTORY "/playnet/" )
+	message(SEND_ERROR "No /playnet folder")
+ENDIF ( )
+
 ENABLE_TESTING()
 SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmakeincludes")
 SET(PROJECT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../..")
@@ -27,21 +34,7 @@ IF ( PN_BUILD_TYPE MATCHES "Auth" OR PN_CLUSTER MATCHES "Auth" )
 	SET(PN_TRACER ON)
 ENDIF ( )
 
-IF ( NOT WIN32 )
-	FIND_PACKAGE(OpenThreads REQUIRED)
-ENDIF ( )
-
-FIND_LIBRARY(CNL NAMES ncurses)
-IF ( UNIX AND NOT CNL )
- MESSAGE(SEND_ERROR "ncurses library not found")
-ENDIF ()
-MARK_AS_ADVANCED(CNL)
-
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/hostproj ${CMAKE_CURRENT_BINARY_DIR})
-
-IF ( UNIX AND NOT IS_DIRECTORY "/playnet/" )
-	message(SEND_ERROR "No /playnet folder")
-ENDIF ( )
 
 # Define and validate user-specifiable options.
 include ( cmakeincludes/UserOptions.cmake )
@@ -52,53 +45,10 @@ include ( cmakeincludes/TargetEnv.cmake )
 # Do Platform specific checks and build config.h
 include ( cmakeincludes/PlatformChecks.cmake )
 
-# Include our macros etc
-find_package(MySQL REQUIRED)
+# Check various dependencies.
+include ( cmakeincludes/Dependencies.cmake )
 
-# Find SubVersion
-if ( 0 )
- find_package(Subversion REQUIRED)
- IF ( NOT Subversion_FOUND )
-	 message(SEND_ERROR "Unable to find subversion executables")
- ENDIF ( NOT Subversion_FOUND )
- # Ask Subversion for info on this working copy.
- Subversion_WC_INFO(${CMAKE_CURRENT_SOURCE_DIR} REPO)
-else ( )
-# include ( cmakeincludes/FindMercurial.cmake )
-# if ( NOT MERCURIAL_FOUND )
-#  message(SEND_ERROR "Unable to find mercurial executables")
-# endif ( )
-# MERCURIAL_HG_INFO(${CMAKE_CURRENT_SOURCE_DIR} REPO)
-endif ( )
-
-# Find Lua 5.1
-IF ( WIN32 )
-	SET(LUA_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../include/lua")
-	SET(LUA_LIBRARY "${CMAKE_CURRENT_SOURCE_DIR}/../lib/win/3rdparty/lua51.lib")
-ENDIF ( )
-find_package(Lua51 REQUIRED)
-INCLUDE_DIRECTORIES(${LUA_INCLUDE_DIR})
-find_package(Toluapp REQUIRED)
-INCLUDE_DIRECTORIES(${TOLUAPP_INCLUDE_DIR})
-
-IF ( UNIX )
-	find_program(CTAGS ctags)
-	add_custom_target(ctags
-		COMMAND ${CTAGS} -R ${CMAKE_CURRENT_SOURCE_DIR}/*/*.[ch]*
-		)
-	MARK_AS_ADVANCED(CTAGS)
-ENDIF ( )
-
-IF ( WIN OR WIN32 OR WIN64 )
-	ADD_SUBDIRECTORY("${LIBRARIES_DIR}/libevent" "${CMAKE_CURRENT_BINARY_DIR}/libevent")
-	SET(LIBEVENT_INCLUDE_DIR "${LIBRARIES_DIR}/libevent/include")
-	INCLUDE_DIRECTORIES(${LIBEVENT_INCLUDE_DIR})
-	INCLUDE_DIRECTORIES(${LIBEVENT_INCLUDE_DIR}/../WIN32-CODE)
-	SET_TARGET_PROPERTIES(event PROPERTIES FOLDER "Libs")
-ENDIF ( )
-
-INCLUDE (cmakeincludes/PCHSupport.cmake)
-
+include ( cmakeincludes/PCHSupport.cmake )
 SET(PCH_INCLUDE_HEADERS
 	hostproj/syscfg.h
 	include/platforms.h
@@ -123,6 +73,7 @@ SET(PCH_INCLUDE_HEADERS
 	server/serverServerInfo.h
 	teul/teulTime.h
 	teul/teulClosingEnums.h
+	teul/teulConfigVar.h
 	teul/teulPackers.h
 	teul/teulPackEnums.h
 	teul/teulKit.h
@@ -176,6 +127,17 @@ IF ( WIN32 )
 	SET_TARGET_PROPERTIES(OpenThreads PROPERTIES FOLDER "Libs")
 	SET_SOURCE_FILES_PROPERTIES(${LIBRARIES_DIR}/OpenThreads/Atomic.cpp PROPERTIES COMPILE_FLAGS "/Yc\"${_PCH}\"")
 ENDIF ( )
+
+# Server Config library - simple wrapper for housing all of the config vars.
+# Downside: Every tool has all of the config vars loaded.
+# Upside: Every tool has all of the config vars loaded already.
+add_library(config
+	src/configVars.cpp
+
+	sdm/sdmConfigVars.h
+	wwii/wwiidbConfigVars.h
+)
+SET_TARGET_PROPERTIES(config PROPERTIES FOLDER "Libs")
 
 # TeulServer library - this is a baseline library that provides
 # teulKit services and the cluster's "server" API.
@@ -288,9 +250,10 @@ add_library (libwwii
 	wwii/wwiiClusterConfig.h
 	wwii/wwiiNetPorts.h
 	wwii/wwiiCallbacks.h
+	wwii/wwiiThreads.h
 )
 ADD_PCH(libwwii)
-target_link_libraries(libwwii OpenThreads)
+target_link_libraries(libwwii config OpenThreads)
 SET_PROPERTY(TARGET libwwii PROPERTY FOLDER "Libs")
 
 ######################################################################
@@ -333,7 +296,9 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth")
 	# out why it leaked so much memory.
 	add_executable(sdmpp
 		sdm/sdmpp.cpp
+
 		${PCH_INCLUDE_HEADERS}
+		sdm/sdmConfigVars.h
 	)
 	target_link_libraries(sdmpp libwwii teulserver)
 	SET_PROPERTY(TARGET sdmpp PROPERTY FOLDER "Tools")
