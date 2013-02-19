@@ -17,6 +17,7 @@
 #include "cnvy/cnvyMain.h"
 #include "map/mapConstants.h"
 #include "parse/parseWor.h"
+#include "sdm/sdmConfigVars.h"
 #include "strt/strtCP.h"
 #include "strt/strtCPStruct.h"
 #include "strt/strtData.h"
@@ -1833,7 +1834,7 @@ strtVerifyStratSystem(CPStruct* cpList, UINT32 testLevel)
 	if ( strtReportDataErrors() > 0 )
 		retval = false ;
 
-	if ( getenv("STRAT_IGNORE_ERRORS") != NULL )
+	if ( cv_stratIgnoreErrors.GetUnsigned() )
 		return true ;
 
 	curTestLevel = 0 ;
@@ -1847,6 +1848,7 @@ strtReportDataErrors()
 
 	dbugLog(_FLIB, "\n") ;
 
+//	const errorLimit = cv_stratErrorLimit().GetUnsigned();
 	for ( UINT32 i = 0 ; i < MAX_ERR_CODES ; ++i )
 	{
 		if ( curTestLevel >= errorInfo[i].level && errorList[i].empty() == false )
@@ -1867,7 +1869,7 @@ strtReportDataErrors()
 				if ( list.empty() == false )
 					list += ", " ;
 
-//				if ( curTestLevel > 0 && errorList[i].size() > 80 && reportNo >= 50 && getenv("NO_ERROR_LIMIT") == NULL )
+//				if ( errorLimit > 0 && curTestLevel > 0 && errorList[i].size() > errorLimit + 10 && reportNo >= errorLimit )
 //				{
 //					char conclusion[80] ;
 //					sprintf(conclusion, "{ %u more occurances skipped }", (UINT32)(errorList[i].size() - reportNo)) ;

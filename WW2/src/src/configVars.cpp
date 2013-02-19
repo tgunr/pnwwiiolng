@@ -14,6 +14,7 @@ CVAR_STRING(importFile, "importlist.txt", "IMPORT_FILE");
 CVAR_STRING(terrainSubdir, "terrain", "TERRAIN_SUBDIR");
 CVAR_STRING(originFile, "origin", "ORIGIN_FILE");
 CVAR_STRING(stratLanguage, "en", "STRAT_LANGUAGE");
+CVAR_UINT(stratIgnoreErrors, "0", "STRAT_IGNORE_ERRORS");
 
 #include "wwii/wwiidbConfigVars.h"
 
@@ -28,6 +29,8 @@ CVAR_STRING(blitzworPath, "blitzWor.csv", "BLITZWOR_PATH");
 #include "server/serverConfigVars.h"
 CVAR_STRING(clusterName, NULL, "WWII_CLUSTER");
 CVAR_STRING(ircServer, "", "WWII_IRC_SERVER");
+CVAR_STRING(ircPassword, "blooGit", "WWII_IRC_PASSWD");
+CVAR_UINT(ircPort, "6667", "WWII_IRC_PORT");
 CVAR_UINT(arenaID, NULL, "ARENA_ID");
 CVAR_STRING(teulWebPath, "/playnet/wwiiol/web/debug", "TEUL_UWEB_PATH");
 CVAR_STRING(authErrorUrl, "http://www.wwiionline.com/auth/errors/", "AUTH_ERROR_URL");
