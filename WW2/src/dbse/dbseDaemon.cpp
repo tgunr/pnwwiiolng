@@ -12,12 +12,13 @@
 #include "teul/teulServer.h"
 #include "dbse/dbseDaemon.h"
 #include "teul/teulEndpoint.h"
+#include "server/serverConfigVars.h"
 
 static LOGICAL listening = FALSE;
 static SINT32 hostListenTCP;
 static SINT32 arenaID;
 
-extern SINT32 dbseInstallHostCallbacks(UINT32 arena) ;
+extern SINT32 dbseInstallHostCallbacks() ;
 
 static void _errorFunction(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 error)
 {
@@ -35,23 +36,9 @@ _acceptFunction(ENDPOINT& endpoint)
 	listening = TRUE;
 }
 
-static void
-_getenv()
-{
-	arenaID = 0;
-
-	const char* const s = getenv("ARENA_ID");
-    if(s && *s)
-        arenaID = atoi(s);
-    else
-	 	LogAbort("Environment not set yet. Could not fetch arenaID");
-}
-
 SINT32 dbseInitHost(UINT16 port)
 {
-	_getenv();
-
-	ABORT_IF(dbseInstallHostCallbacks(arenaID) < 0);
+	ABORT_IF(dbseInstallHostCallbacks() < 0);
 
 	dbugLog(_FLI, "Opening listensocket for arena:%d on port:%d", arenaID,port);
 

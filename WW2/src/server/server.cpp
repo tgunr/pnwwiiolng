@@ -13,6 +13,7 @@
 
 #include "server/serverFuncTypes.h"
 #include "server/server.h"
+#include "server/serverConfigVars.h"
 #include "server/serverIndexes.h"
 #include "server/serverInterfaceDescription.h"
 #include "server/serverInterface.h"
@@ -1570,14 +1571,7 @@ Teul::ConnectionInstruction::receive(SINT32 teulIndex)
 void
 serverInitAddresses(const UINT32 baseAddress)
 {
-	const char* const s = getenv("ARENA_ID") ;
-	const UINT32 arenaID = (s != NULL) ? (UINT32)atol(s) : 0 ;
-	if ( arenaID <= 0 )
-	{
-		LogAbort("Missing / invalid ARENA_ID variable") ;
-		/*ABORT*/
-	}
-	Server::myServerInfo.stats.arenaID = arenaID ;
+	Server::myServerInfo.stats.arenaID = static_cast<UINT32>(cv_arenaID.GetUnsigned());
 
 	Server::broadcastNet = baseAddress ;
 

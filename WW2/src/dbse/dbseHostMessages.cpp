@@ -13,19 +13,16 @@
 #include "teul/teulPackers.h"
 #include "wwii/wwiiCallbacks.h"
 #include "teul/teulBasic.h"
+#include "server/serverConfigVars.h"
 
 TEUL_CALLBACK*	DBSE_SEND_HANDSHAKE;
-
-static UINT32 _arenaID;
 
 static SINT32 _recvHandshake(ACTION_OBJECT* const a);
 static SINT32 _sendHandshake(ACTION_OBJECT* const a);
 
 SINT32
-dbseInstallHostCallbacks(UINT32 arena)
+dbseInstallHostCallbacks()
 {
-	_arenaID = arena;
-
 	BEGIN_CALLBACK_REGISTRATION(DBSE_GENERAL_X)
 
 		REGISTER_RECEIVER(DBSE_CLIENT_HANDSHAKE_Y, _recvHandshake) ;
@@ -48,10 +45,10 @@ static SINT32 _recvHandshake(ACTION_OBJECT* const a)
 
 	if (a->offset >= 0)
 	{
-		if (handshake.version != _arenaID)
+		if (handshake.version != static_cast<UINT32>(cv_arenaID.GetUnsigned()))
 		{
 			handshake.status = CONNECT_REFUSE;
-			handshake.version = _arenaID;
+			handshake.version = static_cast<UINT32>(cv_arenaID.GetUnsigned());
 		}else
 		{
 			handshake.status = CONNECT_ACCEPT;

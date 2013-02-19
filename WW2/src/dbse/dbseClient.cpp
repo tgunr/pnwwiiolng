@@ -12,6 +12,7 @@
 #include "dbse/dbseClientMessages.h"
 #include "teul/teulClosingEnums.h"
 #include "teul/teulEndpoint.h"
+#include "server/serverConfigVars.h"
 
 #define		DBSE_PORT		9000
 
@@ -27,7 +28,6 @@ static LOGICAL _handshakeSent;
 static bool _dbseError = true ;
 
 static SCHAR primaryAddress[128];
-static UINT32 arenaID;
 
 static SINT32 dbseOpenConnection(DBSEHOST& host);
 
@@ -90,7 +90,7 @@ dbseInit( )
 				if (!_handshakeSent)
 				{
 					dbugLog(_FLI,"connected %d code %d",hostIndex,connected);
-					dbseSendHandshake(hostIndex,arenaID);
+					dbseSendHandshake(hostIndex, static_cast<UINT32>(cv_arenaID.GetUnsigned()));
 					_handshakeSent=TRUE;
 				}
 				continue;
@@ -178,7 +178,6 @@ static void _getenv()
 {
 	SCHAR* s;
 
-    arenaID = 0;
     memset(primaryAddress,0,128);
 
     s = getenv("DBSE_PRIMARY_ADDRESS");
@@ -188,13 +187,5 @@ static void _getenv()
         sprintf(primaryAddress,"%s",s);
     else
 	 	LogAbort("Environment not set yet.  Could not fetch DBSE_PRIMARY_ADDRESS");
-
-    s = getenv("ARENA_ID");
-
-// pointer sanity check
-    if(s && *s)
-        arenaID = atoi(s);
-    else
-	 	LogAbort("Environment not set yet.  Could not fetch ARENA_ID");
 }
 

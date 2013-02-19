@@ -37,7 +37,7 @@
 
 #include "wwii/wwiiThreads.h"
 #include "wwii/wwiiIRC.h"
-#include "wwii/wwiiConfigVars.h"
+#include "server/serverConfigVars.h"
 
 void wwiiIRCDefaultChannelMsg(irc_session_t* session, const char* event, const char* origin, const char** params, unsigned int count) ;
 
@@ -72,16 +72,13 @@ static const char* _getChannelName(const char* channel, char* into, size_t intoS
 struct IRCImpl : public IRC, public OpenThreads::Thread
 {
 	IRCImpl()
-		: m_cluster(cv_wwiiClusterName), m_server(cv_wwiiIrcServer)
-		, m_initialized(false), m_active(false), m_running(false), m_joined(false)
+		:  m_initialized(false), m_active(false), m_running(false), m_joined(false)
 		, m_session(NULL)
 		, m_app(""), m_nick("")
 		, m_modes(), m_channels()
 		{}
 	virtual ~IRCImpl() {}
 
-	const char*		m_cluster ;
-	const char*		m_server ;
 	bool			m_initialized ;
 	bool			m_active ;
 	volatile bool	m_running ;
@@ -144,8 +141,8 @@ IRCImpl::run()
 		static const UINT32 IRC_PORT = 6667 ;
 
 		irc.m_joined = false ;
-			threadLog(_FLI, "IRC: Connecting %s:%u %s", m_server, IRC_PORT, m_nick.c_str()) ;
-		if ( irc_connect(m_session, m_server, IRC_PORT, ircPass, m_nick.c_str(), m_nick.c_str(), m_nick.c_str()) )
+			threadLog(_FLI, "IRC: Connecting %s:%u %s", cv_ircServer.GetString(), IRC_PORT, m_nick.c_str()) ;
+		if ( irc_connect(m_session, cv_ircServer.GetString(), IRC_PORT, ircPass, m_nick.c_str(), m_nick.c_str(), m_nick.c_str()) )
 		{
 			threadLog(_FLM, "IRC: Unable to connect: %s", irc_strerror(irc_errno(m_session))) ;
 			irc_disconnect(m_session) ;
@@ -282,7 +279,7 @@ _getChannelName(const char* const channel, char* const into, size_t intoSize)
 	while ( *src && dst < end )
 	{
 		if ( *src == '-' )
-			dst += snprintf(dst, (size_t)(end - dst), "#%s", irc.m_cluster) ;
+			dst += snprintf(dst, (size_t)(end - dst), "#%s", cv_clusterName.GetString()) ;
 		else if ( *src != '#' )
 			*(dst++) = '#' ;
 		char copied ;
@@ -307,13 +304,13 @@ wwiiIRCInitialize(UINT32 ip, bool plural)
 	if ( irc.m_initialized )
 		LogAbort("Tried to reinitialize IRC") ;
 
-	if ( irc.m_cluster == NULL )
+	if ( cv_clusterName.GetString() == NULL )
 	{
 		dbugLog(_FLA, "WWII_CLUSTER not defined") ;
 		return false ;
 	}
 
-	if ( irc.m_server == NULL || irc.m_server[0] == 0 )
+	if ( cv_ircServer.GetString() == NULL || cv_ircServer.GetString() == 0 )
 	{
 		dbugLog(_FLA, "WWII_IRC_SERVER not defined") ;
 		return false ;
@@ -326,9 +323,9 @@ wwiiIRCInitialize(UINT32 ip, bool plural)
 
 	// Plural indicates there is more than one of this type of host
 	if ( plural )
-		sprintf(buf, "%c%c%s%c%s%u", IRC::_SERVER_PREFIX, toupper(irc.m_cluster[0]), irc.m_cluster+1, toupper(appName[0]), appName+1, ip & 255) ;
+		sprintf(buf, "%c%c%s%c%s%u", IRC::_SERVER_PREFIX, toupper(cv_clusterName.GetString()[0]), cv_clusterName.GetString()+1, toupper(appName[0]), appName+1, ip & 255) ;
 	else
-		sprintf(buf, "%c%c%s%c%s", IRC::_SERVER_PREFIX, toupper(irc.m_cluster[0]), irc.m_cluster+1, toupper(appName[0]), appName+1) ;
+		sprintf(buf, "%c%c%s%c%s", IRC::_SERVER_PREFIX, toupper(cv_clusterName.GetString()[0]), cv_clusterName.GetString()+1, toupper(appName[0]), appName+1) ;
 
 	irc.m_nick = buf ;
 
@@ -358,9 +355,9 @@ wwiiIRCInitialize(UINT32 ip, bool plural)
 	wwiiIRCAddChannelIgnore("#servers") ;
 
 	// Cluster server notices
-	sprintf(buf, "#%s-sys", irc.m_cluster) ;
+	sprintf(buf, "#%s-sys", cv_clusterName.GetString()) ;
 	char title[256] ;
-	snprintf(title, 255, "CRS, GM and System messages from %s servers", irc.m_cluster) ;
+	snprintf(title, 255, "CRS, GM and System messages from %s servers", cv_clusterName.GetString()) ;
 	wwiiIRCAddInitialChannel(buf, "-nt", title) ;
 
 	// Initial modes
@@ -411,7 +408,7 @@ wwiiIRCAddInitialChannel(std::string name, const char* mode, const char* topic)
 
 	if ( name[0] == '-' )
 	{
-		name.insert(0, irc.m_cluster) ;
+		name.insert(0, cv_clusterName.GetString()) ;
 		name.insert(0, "#") ;
 	}
 
@@ -673,7 +670,7 @@ wwiiIRCDefaultNumeric(irc_session_t * session, unsigned int event, const char* o
 bool
 wwiiIRCActivate(bool includeSigHup)
 {
-	if ( irc.m_server == NULL || irc.m_server[0] == 0 )
+	if ( cv_ircServer.GetString() == NULL || *cv_ircServer.GetString() == 0 )
 	{
 		dbugLog(_FLA, "IRC: disabled") ;
 		return true ;
