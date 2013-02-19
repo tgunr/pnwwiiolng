@@ -128,18 +128,6 @@ IF ( WIN32 )
 	SET_SOURCE_FILES_PROPERTIES(${LIBRARIES_DIR}/OpenThreads/Atomic.cpp PROPERTIES COMPILE_FLAGS "/Yc\"${_PCH}\"")
 ENDIF ( )
 
-# Server Config library - simple wrapper for housing all of the config vars.
-# Downside: Every tool has all of the config vars loaded.
-# Upside: Every tool has all of the config vars loaded already.
-add_library(config
-	src/configVars.cpp
-
-	sdm/sdmConfigVars.h
-	server/serverConfigVars.h
-	wwii/wwiidbConfigVars.h
-)
-SET_TARGET_PROPERTIES(config PROPERTIES FOLDER "Libs")
-
 # TeulServer library - this is a baseline library that provides
 # teulKit services and the cluster's "server" API.
 add_library (teulserver
@@ -244,6 +232,11 @@ add_library (libwwii
 	dbse/dbseClientMessages.cpp
 	dbse/dbsePackers.cpp
 	wwii/wwiiClusterConfig.cpp
+	src/configVars.cpp
+
+	sdm/sdmConfigVars.h
+	server/serverConfigVars.h
+	wwii/wwiidbConfigVars.h
 
 	${PCH_INCLUDE_HEADERS}
 	include/io_mapped_file.h
@@ -254,7 +247,7 @@ add_library (libwwii
 	wwii/wwiiThreads.h
 )
 ADD_PCH(libwwii)
-target_link_libraries(libwwii config OpenThreads)
+target_link_libraries(libwwii OpenThreads)
 SET_PROPERTY(TARGET libwwii PROPERTY FOLDER "Libs")
 
 ######################################################################
