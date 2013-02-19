@@ -31,6 +31,7 @@
 #include "mm/mmAntiAddiction.h"
 #include "mm/mmdbClientMessages.h"
 #include "mm/mmQueries.h"
+#include "sdm/sdmConfigVars.h"
 #include "server/serverServerInfo.h"
 #include "str/stringLib.h"
 #include "strt/strtData.h"
@@ -107,13 +108,7 @@ static void
 _setArenaDescriptionHostRevision()
 {
 	char hostRevision[200] ;
-	const char* stratLanguage = getenv("STRAT_LANGUAGE") ;
-	if ( stratLanguage == NULL )
-	{
-		stratLanguage = "en" ;
-	}
-
-	snprintf(hostRevision, 199, "%s(%s)", REPOSITORY_INFO, stratLanguage) ;
+	snprintf(hostRevision, 199, "%s(%s)", REPOSITORY_INFO, cv_stratLanguage.GetString()) ;
 
 	std::string revision = hostRevision ;
 	_removePrefix(revision, "branches/") ;

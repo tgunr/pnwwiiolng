@@ -135,6 +135,7 @@ add_library(config
 	src/configVars.cpp
 
 	sdm/sdmConfigVars.h
+	server/serverConfigVars.h
 	wwii/wwiidbConfigVars.h
 )
 SET_TARGET_PROPERTIES(config PROPERTIES FOLDER "Libs")

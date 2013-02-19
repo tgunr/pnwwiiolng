@@ -48,6 +48,7 @@
 #include "mm/mmHostMessages.h"
 #include "mm/mmMain.h"
 #include "mm/mmPolls.h"
+#include "sdm/sdmConfigVars.h"
 #include "server/serverFlagsEnum.h"
 #include "server/serverFuncTypes.h"
 #include "server/server.h"
@@ -1150,10 +1151,7 @@ main(int argc, char* argv[])
 	threadsReadDBEnvironment() ;
 	mapThreadsSetup() ;
 
-	HostLanguage = getenv("STRAT_LANGUAGE") ;
-	if ( HostLanguage == NULL )
-		HostLanguage = "en" ;
-
+	HostLanguage = cv_stratLanguage.GetString();
 	//Open transport for logging
 	Teul::SetAppName("mmhostd") ;
 	if ( teulInitTransport(LOG_TO_FILE, "mmhostd", _errorFunction) < 0 )

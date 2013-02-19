@@ -32,14 +32,13 @@
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiNetPorts.h"
 #include "wwii/wwiiThreads.h"
+#include "server/serverConfigVars.h"
 #include "server/serverInterfaceDescription.h"
 #include "teul/teulAuthServer.h"
 #include "teul/teulEndpoint.h"
 
 // Support this version at least.
 #define COMPATABILITY_LEVEL 0x010120
-
-char errorUrlBase[MAX_PARAM] ;
 
 #define VERSION_ARENA_ID 26  	//arenaID that the version host connects with
 								//use this to look up gameEntry stuff for
@@ -346,18 +345,6 @@ _authenticationErrorString(WEB_ERR errorType)
 //////////////////////////////////////////////////////////////////////
 // Construct the default error url
 
-static void
-_getErrorUrl()
-{
-	static const char* errorUrlEnvVar = "AUTH_ERROR_URL" ;
-	const char* env = getenv(errorUrlEnvVar) ;
-	if ( env == NULL )
-	{
-		LogAbort("'%s' not declared - should be base url to which \"?error=<errorcode>\" is appended.", errorUrlEnvVar) ;
-	}
-	strncpy(errorUrlBase, env, MAX_PARAM-1) ;
-}
-
 static int
 __buildURL(char* into, size_t intoSize, WEB_ERR errorType, SINT32 appID, UINT32 appVersion)
 {
@@ -368,7 +355,7 @@ __buildURL(char* into, size_t intoSize, WEB_ERR errorType, SINT32 appID, UINT32 
 	const char* errString = _authenticationErrorString(errorType) ;
 	size_t size = snprintf(into, intoSize
 				, "%s?error=%s&game=%u&with=%s"
-				, errorUrlBase
+				, cv_authErrorUrl.GetString()
 				, errString, appID
 				, teulGetAddress(appVersion));
 	into[intoSize] = 0 ;
@@ -893,8 +880,6 @@ main(int argc, char* argv[])
 	const UINT32 dbugFlags = STD_ERR;
 	dbugSetWriteLevel(Debug::ERR_WARN | dbugFlags);
 	dbugSetLogLevel(Debug::ERR_INFO | dbugFlags);
-
-	_getErrorUrl() ;
 
 	wwiiIRCInitialize(Server::myInterface.addr[0].ip, false) ;
 	wwiiIRCAddInitialChannel("-err", "", "Authentication errors") ;

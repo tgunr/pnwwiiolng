@@ -21,6 +21,7 @@
 #include "dbse/dbseConnection.h"
 #include "dbse/dbseHandle.h"
 #include "include/arenaLockEnums.h"
+#include "sdm/sdmConfigVars.h"
 #include "server/serverCodeEnum.h"
 #include "server/serverFuncTypes.h"
 #include "server/server.h"
@@ -452,9 +453,7 @@ main(int argc, char* argv[])
 
 	bool runOnce = false ;
 
-	HostLanguage = getenv("STRAT_LANGUAGE") ;
-	if ( HostLanguage == NULL )
-		HostLanguage = "en" ;
+	HostLanguage = cv_stratLanguage.GetString();
 
 	Teul::SetAppName(g_serverName) ;
 	if (teulInitTransport(LOG_TO_FILE, g_serverName, _cnvyErrorFunction) < 0)

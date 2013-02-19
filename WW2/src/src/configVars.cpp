@@ -9,22 +9,15 @@
 
 #include "sdm/sdmConfigVars.h"
 
-#if platOS != OS_WIN32
 CVAR_STRING(dataDir, "/playnet/data", "DATA_DIR");
-#else
-CVAR_STRING(dataDir, "c:\\playnet\\data", "DATA_DIR");
-#endif
 CVAR_STRING(importFile, "importlist.txt", "IMPORT_FILE");
 CVAR_STRING(terrainSubdir, "terrain", "TERRAIN_SUBDIR");
 CVAR_STRING(originFile, "origin", "ORIGIN_FILE");
+CVAR_STRING(stratLanguage, "en", "STRAT_LANGUAGE");
 
 #include "wwii/wwiidbConfigVars.h"
 
-#if platOS != OS_WIN32
 CVAR_STRING(wwiiDBAddress, NULL, "WWII_DB_ADDRESS");
-#else
-CVAR_STRING(wwiiDBAddress, "127.0.0.1", "WWII_DB_ADDRESS");
-#endif
 CVAR_STRING(wwiiDBDefaultSchema, "wwiionline", "WWII_DB_SCHEMA");
 
 #include "wwii/wwiiConfigVars.h"
@@ -36,6 +29,8 @@ CVAR_STRING(blitzworPath, "blitzWor.csv", "BLITZWOR_PATH");
 CVAR_STRING(clusterName, NULL, "WWII_CLUSTER");
 CVAR_STRING(ircServer, "", "WWII_IRC_SERVER");
 CVAR_UINT(arenaID, NULL, "ARENA_ID");
+CVAR_STRING(teulWebPath, "/playnet/wwiiol/web/debug", "TEUL_UWEB_PATH");
+CVAR_STRING(authErrorUrl, "http://www.wwiionline.com/auth/errors/", "AUTH_ERROR_URL");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Read values from the environment of configuration file.
@@ -62,6 +57,7 @@ static ConfigEntries s_configEntries;
 
 static void _readConfigEntriesFromFile(IO::MappedFile& file)
 {
+	s_configEntriesRead = true;
 	s_configEntries.reserve(32);
 	const char*& cur = file.m_currentPtr;
 	while ( cur < file.endPtr() )
@@ -116,12 +112,12 @@ static const char* GetValueFromEnvironmentOrConfig(const char* const name_)
 
 	if ( s_configEntriesRead == false )
 	{
-		s_configEntriesRead = true;
 		IO::MappedFile file;
-		if ( file.mapFile(OS_ENVIRONMENT_CFG) || file.mapFile(DEF_ENVIRONMENT_CFG) )
-		{
+		// Apply defaults first.
+		if ( file.mapFile(DEF_ENVIRONMENT_CFG) )
 			_readConfigEntriesFromFile(file);
-		}
+		if ( file.mapFile(OS_ENVIRONMENT_CFG) )
+			_readConfigEntriesFromFile(file);
 	}
 
 	for ( auto& it : s_configEntries )

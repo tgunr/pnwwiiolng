@@ -887,10 +887,7 @@ serverEnableDebugWebServer(unsigned short int port_)
 	if ( port_ == 0 )
 		port_ = WWII::Net::Ports::DebugWebServer ;
 
-	const char* webPath = getenv("TEUL_UWEB_PATH") ;
-	if ( webPath == NULL || webPath[0] == 0 )
-		webPath = "/playnet/wwiiol/web/debug" ;
-	Teul::uWeb::s_debugServer = new Teul::uWeb::Server(webPath, port_) ;
+	Teul::uWeb::s_debugServer = new Teul::uWeb::Server(cv_teulWebPath.GetString(), port_) ;
 	Teul::uWeb::s_debugServer->start() ;
 
 	atexit(_killDebugWebServer) ;

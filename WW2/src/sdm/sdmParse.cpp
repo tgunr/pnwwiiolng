@@ -18,6 +18,7 @@
 #endif
 
 #include "include/io_mapped_file.h"
+#include "sdm/sdmConfigVars.h"
 
 // Instead of importing pi.h and its baggage
 typedef struct
@@ -58,13 +59,12 @@ sdmGetDtlHeader()
 }
 
 //////////////////////////////////////////////////////////////////////
-// Check to see if translations are required (governed by
-// ENV{'STRAT_LANGUAGE'}
+// Check to see if translations are required
 
 static const char*
 _getTranslationFile()
 {
-	const char* envValue = getenv("STRAT_LANGUAGE") ;
+	const char* envValue = cv_stratLanguage.GetString();
 
 	static char translationFileName[128] ;
 	if ( envValue == NULL || strcmp(envValue, "en") == 0 )
