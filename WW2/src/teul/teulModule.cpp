@@ -51,6 +51,12 @@
 #include "server/serverInterfaceDescription.h"
 #endif
 
+#if platOS == OS_LINUX
+#include "teul/teulConfigVar.h"
+CVAR_STRING(defaultInterface, NULL, "DEFAULT_IFACE", false
+			, "Name of the network interface to treat as primary.");
+#endif
+
 #if platOS != OS_WIN32
 	#include <netinet/tcp.h>
 	#include <sys/un.h>
@@ -73,7 +79,7 @@ static void
 _getHostIPAddresses()
 {
 #if platOS == OS_LINUX
-	static const char* primaryInterfaceName = "eth0" ;
+	static const char* primaryInterfaceName = cv_defaultInterface.GetString();
 
 	// Get a list of IPv4 network interfaces.
 	auto ifiList = get_ifi_info(AF_INET, TRUE);
@@ -108,18 +114,11 @@ _getHostIPAddresses()
 	if ( ifiList != NULL )
 		free_ifi_info(ifiList) ;
 #elif platOS == OS_WIN32
-	// Allow the environment to specify a preferred interface.
-	const TCHAR* preferredInterface = _tgetenv(_T("ETH0"));
-	if ( preferredInterface && *preferredInterface == 0 )
-		preferredInterface = NULL;
-
 	PIP_ADAPTER_ADDRESSES pAddresses = NULL;
 	DWORD outBufLen = 32 * 1024;	// Start with 32Kb of buffer to retrieve data.
 	DWORD dwRetVal = ERROR_BUFFER_OVERFLOW;
 
 	DWORD getAddrFlags = GAA_FLAG_INCLUDE_PREFIX | GAA_FLAG_SKIP_ANYCAST | GAA_FLAG_SKIP_MULTICAST;
-	if ( preferredInterface == NULL )
-		getAddrFlags |= GAA_FLAG_SKIP_FRIENDLY_NAME;
 
 	for ( UINT32 attempt = 0; dwRetVal == ERROR_BUFFER_OVERFLOW && attempt < 6; ++attempt )
 	{
@@ -135,12 +134,6 @@ _getHostIPAddresses()
 	PIP_ADAPTER_ADDRESSES preferredIf = NULL;
 	for ( auto curAddr = pAddresses; curAddr != NULL; curAddr = curAddr->Next )
 	{
-		if (preferredInterface && _tcsicmp(preferredInterface, curAddr->FriendlyName) == 0)
-		{
-			preferredIf = curAddr;
-			break;
-		}
-
 		// Only look for ethernet networks with IfOperStatusUp and a unicast address.
 		if ( curAddr->OperStatus != IfOperStatusUp || curAddr->FirstUnicastAddress == NULL )
 			continue;
