@@ -33,6 +33,12 @@
 #include <sys/time.h>
 #endif
 
+#if platBuild == TEUL_SERVER
+#include "teul/teulConfigVar.h"
+CVAR_STRING(defaultLogPath, NULL, "LOG_PATH", false
+				, "Default location for log files.");
+#endif
+
 #if platOS == OS_WIN32
 	#include <io.h>
 	#include <winsock2.h>
@@ -153,7 +159,11 @@ _qualifyFilename(const char* filename, char* const output, const size_t outputSi
 		strncpy(output, filename, outputSize);
 	else
 	{
+#if platBuild == TEUL_SERVER
+		const char* const defaultPath = cv_defaultLogPath.GetString();
+#else
 		const char* const defaultPath = getenv("DEFAULT_LOGDIR");
+#endif
 		if ( defaultPath && defaultPath[0] != 0 )
 		{
 			OS_MKDIR(defaultPath, 0770);
