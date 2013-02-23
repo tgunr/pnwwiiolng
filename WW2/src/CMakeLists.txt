@@ -758,9 +758,9 @@ ENDIF ( )
 
 ADD_CUSTOM_TARGET(envconfig
 	COMMAND ${CMAKE_COMMAND} -E
-		copy ${PROJECT_DIR}/environment.cfg ${CMAKE_BINARY_DIR}
+		copy ${PROJECT_DIR}/environment.cfg ${CMAKE_CURRENT_BINARY_DIR}
 	COMMAND ${CMAKE_COMMAND} -E
-		copy ${PROJECT_DIR}/environment.win.cfg ${CMAKE_BINARY_DIR}
+		copy ${PROJECT_DIR}/environment.win.cfg ${CMAKE_CURRENT_BINARY_DIR}
 	DEPENDS
 		${PROJECT_DIR}/environment.cfg
 		${PROJECT_DIR}/environment.win.cfg
