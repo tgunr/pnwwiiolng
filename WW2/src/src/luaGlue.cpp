@@ -13,6 +13,7 @@
 
 #include "include/luaGlue.h"
 #include "wwii/wwiiIRC.h"
+#include "teul/teulConfigVar.h"
 
 extern std::vector<const char*> script_args ;
 
@@ -24,6 +25,9 @@ lua_State* _luaVM ;					// General purpose/default _luaVM
 std::string _luaSource = "?" ;		// Current source for commands/scripts etc
 std::string _luaSubSystem = "?" ;	// Part of the source
 Lua::SCRIPT_RESULTS _luaOutput ;
+
+CVAR_STRING(luaRCFile, "/playnet/wwiiol/lua/rc.lua", "LUA_RC_FILE", true
+			, "Path/filename of the Lua script to execute on startup");
 
 //////////////////////////////////////////////////////////////////////
 // dbugLog wrapper that takes error level and text string
@@ -476,11 +480,7 @@ _startInterpreter()
 	tolua_game_open(_luaVM) ;
 	dbugLog(_FLI, "started Lua interpreter") ;
 
-	static const char* rcFile = "/playnet/wwiiol/lua/rc.lua" ;
-	char* envRC = getenv("LUA_RC_FILE") ;
-	if ( envRC != NULL && *envRC )
-		rcFile = envRC ;
-
+	static const char* rcFile = cv_luaRCFile.GetString();
 	if ( !_executeScript(rcFile) || _luaVM == NULL )
 	{
 		dbugLog(_FLW, "startup file failed") ;
