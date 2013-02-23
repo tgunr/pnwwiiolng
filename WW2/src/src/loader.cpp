@@ -122,8 +122,8 @@ _ircConnect()
 	if ( ircSession != nullptr )
 		return true;
 
-	const char* ircServer = getenv("WWII_IRC_SERVER");
-	if ( ircServer == nullptr )
+	const char* const ircServer = cv_ircServer.GetString();
+	if ( ircServer == nullptr || *ircServer == '\0' )
 		return false;
 
 	irc_session_t* s = nullptr;
@@ -140,7 +140,7 @@ _ircConnect()
 	}
 
 	ircConnected = false;
-	if ( irc_connect(s, ircServer, 6667, "blooGit", nick.c_str(), nick.c_str(), "Strat Loader") )
+	if ( irc_connect(s, ircServer, 6667, cv_ircPassword.GetString(), nick.c_str(), nick.c_str(), "Strat Loader") )
 	{
 		fprintf(stderr, "connect to shivers:irc failed: %s\n", irc_strerror(irc_errno(s)));
 		irc_destroy_session(s);
