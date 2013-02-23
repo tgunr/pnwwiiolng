@@ -4,6 +4,12 @@
 #include "str/strdupptr.h"
 #include "teul/teulConfigVar.h"
 
+// These are here purely to force implementation of the types.
+CVAR_STRING(force_string, NULL, NULL);
+CVAR_UINT(force_uint, NULL, NULL);
+CVAR_SINT(force_sint, NULL, NULL);
+CVAR_BOOL(force_bool, NULL, NULL);
+
 ////////////////////////////////////////////////////////////////////////////////
 // Variables.
 
@@ -20,7 +26,6 @@ CVAR_UINT(stratIgnoreErrors, "0", "STRAT_IGNORE_ERRORS");
 
 CVAR_STRING(wwiiDBAddress, NULL, "WWII_DB_ADDRESS");
 CVAR_STRING(wwiiDBDefaultSchema, "wwiionline", "WWII_DB_SCHEMA");
-CVAR_BOOL(mysqlCompression, "0", "MYSQL_COMPRESSION");
 
 #include "wwii/wwiiConfigVars.h"
 

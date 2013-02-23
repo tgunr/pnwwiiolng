@@ -5,4 +5,3 @@
 
 extern ConfigStr	cv_wwiiDBAddress;
 extern ConfigStr	cv_wwiiDBDefaultSchema;
-extern ConfigBool	cv_mysqlCompression;

@@ -21,6 +21,10 @@
 #include "wwii/wwiidbConfigVars.h"
 #include "wwii/wwiiThreads.h"
 
+#include "teul/teulConfigVar.h"
+
+CVAR_BOOL(mysqlCompression, "0", "MYSQL_COMPRESSION");
+
 //////////////////////////////////////////////////////////////////////
 // Low-level MySQL connection initialization
 
