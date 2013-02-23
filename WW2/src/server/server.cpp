@@ -29,6 +29,7 @@
 #include "server/serverTypes.h"
 #include "teul/teulAuth.h"
 #include "teul/teulAuthServer.h"
+#include "teul/teulConfigVar.h"
 #include "teul/teulConnectionInstruction.h"
 #include "teul/teulConstants.h"
 #include "teul/teulEndpoint.h"
@@ -43,6 +44,8 @@
 // bofore he is sent back to the auth Host
 static const UINT32 PLAYER_TIMEOUT = 3 * 60 * 1000 ;	// 4 minutes
 static const SINT32 PLAYER_XFER_TIMEOUT = 30 * 1000 ;	// 30 seconds
+
+CVAR_UINT(maxClusterUsers, "0", "MM_MAX_USERS");
 
 extern void serverInitializePeering() ;
 extern void serverConnectPeer(const UINT32 ip, const UINT32 type) ;
@@ -1014,16 +1017,9 @@ serverFree(void)
 UINT32
 serverGetMaxClusterUsers()
 {
-	UINT32 maxUsers = Teul::MaxClusterUsers ;
-	const char* const envValue = getenv("MM_MAX_USERS") ;
-	if ( envValue != NULL )
-	{
-		UINT32 envMaxUsers = (UINT32)atoi(envValue) ;
-		if ( envMaxUsers < Teul::MaxClusterUsers )
-			maxUsers = envMaxUsers ;
-	}
-
-	return maxUsers ;
+	const UINT32 maxUsers = Teul::MaxClusterUsers ;
+	const UINT32 maxClusterUsers = static_cast<UINT32>(cv_maxClusterUsers.GetUnsigned());
+	return ( maxClusterUsers && maxClusterUsers <= maxUsers ) ? maxClusterUsers : maxUsers;
 }
 
 //////////////////////////////////////////////////////////////////////
