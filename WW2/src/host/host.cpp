@@ -123,7 +123,9 @@ namespace Host
 #endif
 
 PLAYERS g_players ;
-UINT32 maxCellPlayers = 1250 ;
+#include "teul/teulConfigVar.h"
+CVAR_UINT(maxCellPlayers, "1250", "MAX_PLAYERS"
+		  , "Maximum number of players on this cell host.");
 static SINT32 _userConnections = 0;
 
 char hostname[32] ;
@@ -2257,7 +2259,7 @@ _runHost(void)
 		if ( !g_accepting && !g_serverReserved )
 		{
 			g_accepting = true ;
-			Server::myServerInfo.stats.m_maxPlayers = maxCellPlayers ;
+			Server::myServerInfo.stats.m_maxPlayers = cv_maxCellPlayers.GetUint32();
 			Server::myServerInfo.sync() ;
 		}
 
@@ -2770,10 +2772,6 @@ _getEnvironment()
 	s = _getEnv("BASE_ADDRESS") ;
 	teulGetHost(s, &_baseHost);
 
-	s = getenv("MAX_PLAYERS") ;
-	if ( s != NULL && isdigit(*s) )
-		maxCellPlayers = atoi(s) ;
-
 	s = _getEnv("BASE_UPDT_ADDRESS");
 	teulGetHost(s, &_baseUpdtHost);
 }
@@ -3056,7 +3054,7 @@ main(const int argc, const char* const argv[])
 				, _personaErrorFunction);
 	ABORT_IF(initResult == -EINVAL);
 
-	Server::myServerInfo.stats.m_maxPlayers = (g_serverReserved ? 0 : maxCellPlayers) ;
+	Server::myServerInfo.stats.m_maxPlayers = (g_serverReserved ? 0 : cv_maxCellPlayers.GetUint32()) ;
 
 	Server::myServerInfo.flags = (Server::Flags)(Server::SVRFLAG_SEND_PSTAT | Server::SVRFLAG_RELOGIN) ;
 

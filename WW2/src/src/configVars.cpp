@@ -5,41 +5,51 @@
 #include "teul/teulConfigVar.h"
 
 // These are here purely to force implementation of the types.
-CVAR_STRING(force_string, NULL, NULL);
-CVAR_UINT(force_uint, NULL, NULL);
-CVAR_SINT(force_sint, NULL, NULL);
-CVAR_BOOL(force_bool, NULL, NULL);
+CVAR_STRING(force_string, NULL, NULL, false, NULL);
+CVAR_UINT(force_uint, NULL, NULL, NULL);
+CVAR_SINT(force_sint, NULL, NULL, NULL);
+CVAR_BOOL(force_bool, NULL, NULL, NULL);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Variables.
 
 #include "sdm/sdmConfigVars.h"
 
-CVAR_STRING(dataDir, "/playnet/data", "DATA_DIR");
-CVAR_STRING(importFile, "importlist.txt", "IMPORT_FILE");
-CVAR_STRING(terrainSubdir, "terrain", "TERRAIN_SUBDIR");
-CVAR_STRING(originFile, "origin", "ORIGIN_FILE");
-CVAR_STRING(stratLanguage, "en", "STRAT_LANGUAGE");
-CVAR_UINT(stratIgnoreErrors, "0", "STRAT_IGNORE_ERRORS");
+CVAR_STRING(dataDir, "/playnet/data", "DATA_DIR", true
+			, "Top level directory for game data.");
+CVAR_STRING(importFile, "importlist.txt", "IMPORT_FILE", true
+			, "File which will specify sdm files to be used by the server.");
+CVAR_STRING(terrainSubdir, "terrain", "TERRAIN_SUBDIR", true
+			, "Path from DATA_DIR to the terrain sdm files and origin file.");
+CVAR_STRING(originFile, "origin", "ORIGIN_FILE", true
+			, "Name of the file which identifies where the sdm files came from.");
+CVAR_STRING(stratLanguage, "en", "STRAT_LANGUAGE", true
+			, "2-letter language code for server localization.");
 
 #include "wwii/wwiidbConfigVars.h"
 
-CVAR_STRING(wwiiDBAddress, NULL, "WWII_DB_ADDRESS");
-CVAR_STRING(wwiiDBDefaultSchema, "wwiionline", "WWII_DB_SCHEMA");
+CVAR_STRING(wwiiDBAddress, NULL, "WWII_DB_ADDRESS", true
+			, "IP address of the MySQL Database.");
+CVAR_STRING(wwiiDBDefaultSchema, "wwiionline", "WWII_DB_SCHEMA", true
+			, "Default schema for game data.");
 
 #include "wwii/wwiiConfigVars.h"
 
-CVAR_STRING(thblitzPath, SUB_PATH("th_blitz", "weapon"), "THBLITZ_PATH");
-CVAR_STRING(blitzworPath, "blitzWor.csv", "BLITZWOR_PATH");
-
 #include "server/serverConfigVars.h"
-CVAR_STRING(clusterName, NULL, "WWII_CLUSTER");
-CVAR_STRING(ircServer, "", "WWII_IRC_SERVER");
-CVAR_STRING(ircPassword, "blooGit", "WWII_IRC_PASSWD");
-CVAR_UINT(ircPort, "6667", "WWII_IRC_PORT");
-CVAR_UINT(arenaID, NULL, "ARENA_ID");
-CVAR_STRING(teulWebPath, "/playnet/wwiiol/web/debug", "TEUL_UWEB_PATH");
-CVAR_STRING(authErrorUrl, "http://www.wwiionline.com/auth/errors/", "AUTH_ERROR_URL");
+CVAR_STRING(clusterName, NULL, "WWII_CLUSTER", true
+			, "Short-name for this cluster, e.g. 'dev'");
+CVAR_STRING(ircServer, "", "WWII_IRC_SERVER", false
+			, "Address of the IRC server. If not defined, disables IRC.");
+CVAR_STRING(ircPassword, "blooGit", "WWII_IRC_PASSWD", true
+			, "Server-password for the IRC server.");
+CVAR_UINT(ircPort, "6667", "WWII_IRC_PORT"
+			, "Port to connect to the IRC server on.");
+CVAR_UINT(arenaID, NULL, "ARENA_ID"
+			, "Numeric ID for this arena.");
+CVAR_STRING(teulWebPath, "/playnet/wwiiol/web/debug", "TEUL_UWEB_PATH", true
+			, "Path to the top-level directory for the internal web server.");
+CVAR_STRING(authErrorUrl, "http://www.wwiionline.com/auth/errors/", "AUTH_ERROR_URL", true
+			, "URL to prefix authentication error URLs with.");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Read values from the environment of configuration file.
@@ -142,29 +152,37 @@ static const char* GetValueFromEnvironmentOrConfig(const char* const name_)
 // Implementations.
 
 template<ConfigVarType Type_>
-Teul::ConfigVar<Type_>::ConfigVar(const char* const name_, const char* const default_, const char* const envVarName_)
+Teul::ConfigVar<Type_>::ConfigVar(const char* const name_, const char* const default_, const char* const envVarName_, bool required_)
 	: m_name(name_)
 	, m_envVarName(envVarName_)
 	, m_value(nullptr)
+	, m_required(required_)
 {
 	ABORT_IF(name_ == nullptr);
+	ABORT_IF(required_ == true && envVarName_ == nullptr);
 
 	m_union.um_ptr = nullptr;
 
 	if ( IsNumber() )
 		m_value = static_cast<char*>(calloc(1, MaxIntStringSize));
 
-	if ( default_ != nullptr )
-		Set(default_);
-
 	if ( envVarName_ )
 	{
 		const char* envValue = GetValueFromEnvironmentOrConfig(envVarName_);
 		if ( envValue != nullptr )
+		{
+			if ( m_required == true && *envValue == 0 )
+				LogAbort("Invalid (empty) value for %s ('%s').", envVarName_);
 			Set(envValue);
-		else if ( default_ == nullptr && !envValue )
-			LogAbort("Environment variable '%s' not defined.", envVarName_);
+			return;
+		}
 	}
+
+	if ( default_ != nullptr )
+		Set(default_);
+
+	if ( m_required && (m_value == nullptr || *m_value == 0) )
+		LogAbort("Config variable %s (%s) must be defined with a non-empty value.", m_name, m_envVarName);
 }
 
 template<> void Teul::ConfigVar<CVT_BOOL>::Set(const char* const newValue_)
@@ -199,18 +217,18 @@ template<> void Teul::ConfigVar<CVT_STRING>::SetString(const char* const newValu
 	m_union.um_ptr = m_value;
 }
 
-template<> void Teul::ConfigVar<CVT_UNSIGNED_INT>::SetUnsigned(const UINT64 newValue_)
+template<> void Teul::ConfigVar<CVT_UNSIGNED_INT>::SetUint32(const UINT32 newValue_)
 {
-	if ( newValue_ == GetUnsigned() )
+	if ( newValue_ == GetUint32() )
 		return;
-	m_union.um_uint64 = newValue_;
-	snprintf(m_value, MaxIntStringSize, "%llu", newValue_);
+	m_union.um_uint32 = newValue_;
+	snprintf(m_value, MaxIntStringSize, "%u", newValue_);
 }
 
-template<> void Teul::ConfigVar<CVT_SIGNED_INT>::SetSigned(const SINT64 newValue_)
+template<> void Teul::ConfigVar<CVT_SIGNED_INT>::SetSint32(const SINT32 newValue_)
 {
-	if ( newValue_ == GetSigned() )
+	if ( newValue_ == GetSint32() )
 		return;
-	m_union.um_sint64 = newValue_;
-	snprintf(m_value, MaxIntStringSize, "%lld", newValue_);
+	m_union.um_sint32 = newValue_;
+	snprintf(m_value, MaxIntStringSize, "%d", newValue_);
 }

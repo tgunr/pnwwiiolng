@@ -90,7 +90,7 @@ dbseInit( )
 				if (!_handshakeSent)
 				{
 					dbugLog(_FLI,"connected %d code %d",hostIndex,connected);
-					dbseSendHandshake(hostIndex, static_cast<UINT32>(cv_arenaID.GetUnsigned()));
+					dbseSendHandshake(hostIndex, cv_arenaID.GetUint32());
 					_handshakeSent=TRUE;
 				}
 				continue;

@@ -14,11 +14,23 @@
 #include "teul/teulBasic.h"
 #include "mem/mem.h"
 
+#include "teul/teulConfigVar.h"
+
+CVAR_STRING(authdbAddress, NULL, "AUTH_DB", true
+			, "Address of the MySQL server hosting the auth database.");
+CVAR_STRING(authdbPort, "", "AUTH_DB_PORT", true
+			, "Port of the Auth MySQL server if not default.");
 #if defined( HAPPYOO )
-# define AUTH_PASSWORD "m4nd0l1n"			// Happyoo's auth password
+CVAR_STRING(authdbPassword, "m4nd0l1n", "AUTH_DB_PASSWD", true
+			, "Password to use for the auth database.");
 #else
-# define AUTH_PASSWORD "scalar449"			// Playnet's auth password
+CVAR_STRING(authdbPassword, "scalar449", "AUTH_DB_PASSWD", true
+			, "Password to use for the auth database.");
 #endif
+CVAR_STRING(authdbSchema, "auth", "AUTH_DB_SCHEMA", true
+			, "Schema to use for auth data.");
+CVAR_STRING(authdbUser, "authuser", "AUTH_DB_USER", true
+			, "Username when connecting to the auth database.");
 
 //////////////////////////////////////////////////////////////////////
 // Populate the supplied DBCONNECTION with details.
@@ -26,23 +38,19 @@
 void
 authGetDBConnectionInfo(DBCONNECTION* connectionInfo)
 {
-	// Look up the cannonical name/address of the auth database.
-	static const char* varName = "AUTH_DB" ;
-	char* dbAddr = getenv(varName) ;
-	if ( !dbAddr || *dbAddr == 0 )
-		LogAbort("Unable to read %s from environment", varName) ;
-
-	// Resolve it to an IP
-	UINT32* dbIp = teulGetHostByName(dbAddr) ;
+	// Look up the cannonical name/address of the auth database
+	// and resolve it to an IP
+	UINT32* dbIp = teulGetHostByName(cv_authdbAddress.GetString()) ;
 	if ( dbIp == NULL )
-		LogAbort("Invalid %s: %s (unable to resolve)", varName, dbAddr) ;
+		LogAbort("Invalid %s: %s (unable to resolve)"
+					, cv_authdbAddress.GetEnvVarName(), cv_authdbAddress.GetString()) ;
 
 	// Populate the connection info structure.
 	strcpy(connectionInfo->host, teulGetAddress(*dbIp)) ;
-	strcpy(connectionInfo->dbName, "auth") ;
-	strcpy(connectionInfo->username, "authuser") ;
-	strcpy(connectionInfo->password, AUTH_PASSWORD) ;
-	strcpy(connectionInfo->port, "") ;
+	strcpy(connectionInfo->dbName, cv_authdbSchema.GetString()) ;
+	strcpy(connectionInfo->username, cv_authdbUser.GetString()) ;
+	strcpy(connectionInfo->password, cv_authdbPassword.GetString()) ;
+	strcpy(connectionInfo->port, cv_authdbPort.GetString()) ;
 
 	// Release the list of addresses we were given
 	memFree(dbIp) ;

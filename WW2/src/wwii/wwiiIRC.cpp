@@ -135,8 +135,8 @@ IRCImpl::run()
 			m_running = true ;
 
 		irc.m_joined = false ;
-			threadLog(_FLI, "IRC: Connecting %s:%u %s", cv_ircServer.GetString(), (UINT32)cv_ircPort.GetUnsigned(), m_nick.c_str()) ;
-		if ( irc_connect(m_session, cv_ircServer.GetString(), (UINT32)cv_ircPort.GetUnsigned(), ircPass, m_nick.c_str(), m_nick.c_str(), m_nick.c_str()) )
+			threadLog(_FLI, "IRC: Connecting %s:%u %s", cv_ircServer.GetString(), cv_ircPort.GetUint32(), m_nick.c_str()) ;
+		if ( irc_connect(m_session, cv_ircServer.GetString(), cv_ircPort.GetUint32(), ircPass, m_nick.c_str(), m_nick.c_str(), m_nick.c_str()) )
 		{
 			threadLog(_FLM, "IRC: Unable to connect: %s", irc_strerror(irc_errno(m_session))) ;
 			irc_disconnect(m_session) ;

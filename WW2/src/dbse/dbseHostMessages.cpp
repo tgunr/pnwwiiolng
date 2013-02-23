@@ -45,10 +45,10 @@ static SINT32 _recvHandshake(ACTION_OBJECT* const a)
 
 	if (a->offset >= 0)
 	{
-		if (handshake.version != static_cast<UINT32>(cv_arenaID.GetUnsigned()))
+		if (handshake.version != cv_arenaID.GetUint32())
 		{
 			handshake.status = CONNECT_REFUSE;
-			handshake.version = static_cast<UINT32>(cv_arenaID.GetUnsigned());
+			handshake.version = cv_arenaID.GetUint32();
 		}else
 		{
 			handshake.status = CONNECT_ACCEPT;

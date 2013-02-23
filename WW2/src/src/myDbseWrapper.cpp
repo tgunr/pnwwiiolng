@@ -23,7 +23,8 @@
 
 #include "teul/teulConfigVar.h"
 
-CVAR_BOOL(mysqlCompression, "0", "MYSQL_COMPRESSION");
+CVAR_BOOL(mysqlCompression, "0", "MYSQL_COMPRESSION"
+		  , "Enable compression when communicating with the MySQL server");
 
 //////////////////////////////////////////////////////////////////////
 // Low-level MySQL connection initialization

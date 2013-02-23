@@ -2,6 +2,3 @@
 // Generic game configuration.
 
 #include "teul/teulConfigVar.h"
-
-extern ConfigStr cv_thblitzPath;	// Relative to datadir.
-extern ConfigStr cv_blitzworPath;	// Relative to datadir.

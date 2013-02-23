@@ -39,6 +39,13 @@
 #include "wwii/wwiiConfigVars.h"
 #include "wwii/wwiiString.h"
 
+CVAR_BOOL(stratIgnoreErrors, "0", "STRAT_IGNORE_ERRORS"
+			, "Disables sdm-loading errors from causing termination.");
+
+CVAR_STRING(blitzworPath, "blitzWor.csv", "BLITZWOR_PATH", true
+			, "DATA_DIR-relative path/filename for the blitzWor csv file");
+
+
 namespace Strat
 {
 	CPStruct*	cpList ;
@@ -1834,7 +1841,7 @@ strtVerifyStratSystem(CPStruct* cpList, UINT32 testLevel)
 	if ( strtReportDataErrors() > 0 )
 		retval = false ;
 
-	if ( cv_stratIgnoreErrors.GetUnsigned() )
+	if ( cv_stratIgnoreErrors.GetBool() )
 		return true ;
 
 	curTestLevel = 0 ;
@@ -1848,7 +1855,7 @@ strtReportDataErrors()
 
 	dbugLog(_FLIB, "\n") ;
 
-//	const errorLimit = cv_stratErrorLimit().GetUnsigned();
+//	const UINT32 errorLimit = cv_stratErrorLimit().GetUint32();
 	for ( UINT32 i = 0 ; i < MAX_ERR_CODES ; ++i )
 	{
 		if ( curTestLevel >= errorInfo[i].level && errorList[i].empty() == false )

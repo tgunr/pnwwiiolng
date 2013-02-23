@@ -45,7 +45,8 @@
 static const UINT32 PLAYER_TIMEOUT = 3 * 60 * 1000 ;	// 4 minutes
 static const SINT32 PLAYER_XFER_TIMEOUT = 30 * 1000 ;	// 30 seconds
 
-CVAR_UINT(maxClusterUsers, "0", "MM_MAX_USERS");
+CVAR_UINT(maxClusterUsers, "0", "MM_MAX_USERS"
+		  , "Maxmimum number of players on the mmhost/cluster");
 
 extern void serverInitializePeering() ;
 extern void serverConnectPeer(const UINT32 ip, const UINT32 type) ;
@@ -1018,7 +1019,7 @@ UINT32
 serverGetMaxClusterUsers()
 {
 	const UINT32 maxUsers = Teul::MaxClusterUsers ;
-	const UINT32 maxClusterUsers = static_cast<UINT32>(cv_maxClusterUsers.GetUnsigned());
+	const UINT32 maxClusterUsers = cv_maxClusterUsers.GetUint32();
 	return ( maxClusterUsers && maxClusterUsers <= maxUsers ) ? maxClusterUsers : maxUsers;
 }
 
@@ -1564,7 +1565,7 @@ Teul::ConnectionInstruction::receive(SINT32 teulIndex)
 void
 serverInitAddresses(const UINT32 baseAddress)
 {
-	Server::myServerInfo.stats.arenaID = static_cast<UINT32>(cv_arenaID.GetUnsigned());
+	Server::myServerInfo.stats.arenaID = cv_arenaID.GetUint32();
 
 	Server::broadcastNet = baseAddress ;
 
