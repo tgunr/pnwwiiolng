@@ -57,7 +57,6 @@ static const char* g_serverName = "dbd";
 
 int main(int argc, char* argv[])
 {
-	UINT16 port = WWII::Net::Ports::Dbse ;
 	SINT32 listenIndex;
 
 	Teul::SetAppName(g_serverName) ;
@@ -82,7 +81,7 @@ int main(int argc, char* argv[])
 	wwiiIRCInitialize(Server::myInterface.addr[0].ip, false) ;
 	wwiiIRCActivate(true) ;
 
-	listenIndex = dbseInitHost(port);
+	listenIndex = dbseInitHost(WWII::Net::Ports::Dbse);
 
 	OpenThreads::Thread::microSleep(50 * 1000) ;
 
