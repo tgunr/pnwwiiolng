@@ -131,6 +131,7 @@ static const char* GetValueFromEnvironmentOrConfig(const char* const name_)
 
 	if ( s_configEntriesRead == false )
 	{
+		s_configEntriesRead = true;
 		IO::MappedFile file;
 		// Apply defaults first.
 		if ( file.mapFile(DEF_ENVIRONMENT_CFG) )
@@ -182,7 +183,7 @@ Teul::ConfigVar<Type_>::ConfigVar(const char* const name_, const char* const def
 		Set(default_);
 
 	if ( m_required && (m_value == nullptr || *m_value == 0) )
-		LogAbort("Config variable %s (%s) must be defined with a non-empty value.", m_name, m_envVarName);
+		LogAbort("Config variable %s (%s) must be defined with a non-empty value.", name_, envVarName_);
 }
 
 template<> void Teul::ConfigVar<CVT_BOOL>::Set(const char* const newValue_)
