@@ -103,7 +103,7 @@ DBQueueThread::run()
 
 	DBThread::DBNo dbNo = DBThread::Default;
 
-	for (;; )
+	for ( ; ; )
 	{
 		DBThreadQuery* query = dbQueue.getNext();
 		if ( query == nullptr )
