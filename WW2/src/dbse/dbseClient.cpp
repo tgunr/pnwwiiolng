@@ -15,7 +15,7 @@
 #include "server/serverConfigVars.h"
 #include "wwii/wwiiNetPorts.h"
 
-CVAR_STRING(dbsePrimaryAddress, NULL, "DBSE_PRIMARY_ADDDRESS", true
+CVAR_STRING(dbsePrimaryAddress, NULL, "DBSE_PRIMARY_ADDRESS", true
 			, "IP address dbd clients will reach the dbd on.");
 
 static UINT32 dbseIP = 0;
