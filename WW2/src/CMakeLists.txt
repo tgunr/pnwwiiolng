@@ -754,6 +754,19 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth")
 ENDIF ( )
 
 ######################################################################
+#### Build files.
+
+ADD_CUSTOM_TARGET(envconfig
+	COMMAND ${CMAKE_COMMAND} -E
+		copy ${PROJECT_DIR}/environment.cfg ${CMAKE_BINARY_DIR}
+	COMMAND ${CMAKE_COMMAND} -E
+		copy ${PROJECT_DIR}/environment.win.cfg ${CMAKE_BINARY_DIR}
+	DEPENDS
+		${PROJECT_DIR}/environment.cfg
+		${PROJECT_DIR}/environment.win.cfg
+	)
+
+######################################################################
 #### Install rule.
 
 ###TODO: Should really be dependent on testUnits as described above. Duh.
@@ -787,6 +800,12 @@ INSTALL(TARGETS
 		RUNTIME DESTINATION bin
 		COMPONENT auth
 )
+INSTALL(FILES
+			environment.cfg
+			environment.win.cfg
+		DESTINATION bin
+		COMPONENT config
+		)
 IF ( NOT PN_CLUSTER STREQUAL "Auth")
 	INSTALL(DIRECTORY hostproj/lua/ DESTINATION lua COMPONENT lua PATTERN ".svn" EXCLUDE PATTERN ".lua")
 	INSTALL(DIRECTORY hostproj/web/ DESTINATION web COMPONENT web PATTERN ".svn" EXCLUDE)
