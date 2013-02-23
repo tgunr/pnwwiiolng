@@ -22,7 +22,7 @@ namespace Teul
 	class ConfigVar
 	{
 	public:
-		inline ConfigVar(const char* const name_, const char* const default_, const char* const envVarName_);
+		ConfigVar(const char* const name_, const char* const default_, const char* const envVarName_);
 		inline ~ConfigVar();
 
 		enum { ValueType = VarType_ };
