@@ -103,12 +103,16 @@ ChatHandleTestUnit::Run()
 {
 	// My primary test character.
 	#define Character "七"
+	#if platOS == OS_WIN32
+	# define WCharacter L"\u4e03"
+	#else
+	# define WCharacter L"七"
+	#endif
 
 	ChatHandle test ;
 	char plainCallsign[MAX_HANDLE_SIZE] ;
 	wchar_t wideCallsign[MAX_HANDLE_SIZE] ;
-	const wchar_t* bogey = L"七" ;
-	ChatHandle bogeyHandle = 9223372036854775874ULL ;
+	const ChatHandle characterHandle = 9223372036854775874ULL ;
 
 	//////////////////////////////////////////////////////////////////////
 	// First of all, make sure that the UTF8 conversion functions work
@@ -122,6 +126,7 @@ ChatHandleTestUnit::Run()
 
 			strcpy(plainCallsign, FIRST_TEST) ;
 			WWII::ConvertChars(plainCallsign, wideCallsign, sizeof(wideCallsign)) ;
+			plainCallsign[0] = 0;
 			WWII::ConvertChars(wideCallsign, plainCallsign, sizeof(plainCallsign)) ;
 
 			CRITICAL( ExpectEqual( strcmp(plainCallsign, FIRST_TEST), 0 ) ) ;
@@ -130,7 +135,7 @@ ChatHandleTestUnit::Run()
 
 		START_SUB_STAGE( "wchar->char" )
 
-			WWII::ConvertChars(bogey, plainCallsign, sizeof(plainCallsign)) ;
+			WWII::ConvertChars(WCharacter, plainCallsign, sizeof(plainCallsign)) ;
 
 			CRITICAL( ExpectEqual( strcmp(plainCallsign, Character), 0 ) ) ;
 
@@ -186,9 +191,9 @@ ChatHandleTestUnit::Run()
 
 			CRITICAL(
 				ExpectEqual( chatGetHandle(L""), 0ULL ) &&
-				ExpectEqual( chatGetHandle(L"七"), bogeyHandle ) &&
-				ExpectEqual( chatGetHandle(L"七七七七"), 9223662325642330178ULL ) &&
-				ExpectEqual( chatGetHandle(L"七abcd"), 9511615607682908226ULL )
+				ExpectEqual( chatGetHandle(WCharacter), characterHandle ) &&
+				ExpectEqual( chatGetHandle(WCharacter WCharacter WCharacter WCharacter), 9223662325642330178ULL ) &&
+				ExpectEqual( chatGetHandle(WCharacter L"abcd"), 9511615607682908226ULL )
 			) ;
 
 		END_SUB_STAGE( "Chinese wchars" )
@@ -202,7 +207,7 @@ ChatHandleTestUnit::Run()
 
 		test = chatGetHandle(Character) ;
 
-		CRITICAL( ExpectEqual(test, bogeyHandle) ) ;
+		CRITICAL( ExpectEqual(test, characterHandle) ) ;
 
 		CRITICAL(
 			ExpectTrue(chatGetCallsign(plainCallsign, test)) &&
@@ -211,7 +216,7 @@ ChatHandleTestUnit::Run()
 
 		CRITICAL(
 			ExpectTrue(chatGetCallsign(wideCallsign, test)) &&
-			ExpectEqual(wcscmp(wideCallsign, bogey), 0)
+			ExpectEqual(wcscmp(wideCallsign, WCharacter), 0)
 		) ;
 
 		CRITICAL( ExpectTrue( WWII::ConvertChars(wideCallsign, plainCallsign, sizeof(plainCallsign)) ) ) ;
@@ -263,8 +268,8 @@ ChatHandleTestUnit::Run()
 		// Operations with wchar_t* callsigns including chinese characters.
 		START_SUB_STAGE( "Chinese wchar_t* callsigns" )
 
-			ExpectEqual( chatGetHandle(L"七a丌c"), chatGetLowercaseHandle(L"七A丌C") ) ;
-			ExpectEqual( chatGetHandle(L"七kfs1"), chatGetLowercaseHandle(L"七KFS1") ) ;
+			ExpectEqual( chatGetHandle(L"\u4e03a\u4e0cc"), chatGetLowercaseHandle(L"\u4e03A\u4e0cC") ) ;
+			ExpectEqual( chatGetHandle(L"\u4e03kfs1"), chatGetLowercaseHandle(L"\u4e03KFS1") ) ;
 
 		END_SUB_STAGE( "Chinese wchar_t* callsigns" )
 
@@ -287,9 +292,9 @@ ChatHandleTestUnit::Run()
 		,	"AaAaAaAaAa", "aAaAaAaAaA"
 		, NULL
 		} ;
-		const wchar_t* goodWcharSigns[] = { L"aa", L"ab", L"AA", L"12", L"1-", L"12-", L"ZZ", L"A-A", L"A123Z", L"A-1-2-3-4", L"A12345678b", L"凸-", L"凸凸凸凸-", L"龠", L"龠龠", L"龠aa龠", L"龠aa龠a", L"龠---a", L"gamemgr-07", L"前个例子1", NULL } ;
+		const wchar_t* goodWcharSigns[] = { L"aa", L"ab", L"AA", L"12", L"1-", L"12-", L"ZZ", L"A-A", L"A123Z", L"A-1-2-3-4", L"A12345678b", L"\u51f8-", L"\u51f8\u51f8\u51f8\u51f8-", L"\u9fa0", L"\u9fa0\u9fa0", L"\u9fa0aa\u9fa0", L"\u9fa0aa\u9fa0a", L"\u9fa0---a", L"gamemgr-07", L"\u524d\u4e2a\u4f8b\u5b501", NULL } ;
 		const char* badCharSigns[] = { "-", "1", "a", "--", "abcdefghijklmnop", "凸凸凸凸凸", "冖冖冖冖冖冖冖冖", "a冖", NULL } ;
-		const wchar_t* badWcharSigns[] = { L"-", L"1", L"a", L"--", L"abcdefghijklmnop", L"凸凸凸凸凸", L"冖冖冖冖冖冖冖冖", L"a冖", L"ысдфк", NULL } ;
+		const wchar_t* badWcharSigns[] = { L"-", L"1", L"a", L"--", L"abcdefghijklmnop", L"\u51f8\u51f8\u51f8\u51f8\u51f8", L"\u5196\u5196\u5196\u5196\u5196\u5196\u5196\u5196", L"a\u5196", L"\u44b\u441\u434\u444\u43a", NULL } ;
 
 		START_SUB_STAGE( "char* callsigns" )
 
@@ -336,7 +341,7 @@ ChatHandleTestUnit::Run()
 		START_SUB_STAGE( "wchar_t* chinese callsign" )
 
 			// We validated this handle earlier.
-			TestPackHandle(L"七abcd") ;
+			TestPackHandle(WCharacter L"abcd") ;
 
 		END_SUB_STAGE( "wchar_t* chinese callsign" )
 
