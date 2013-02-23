@@ -124,7 +124,10 @@ _ircConnect()
 
 	const char* const ircServer = cv_ircServer.GetString();
 	if ( ircServer == nullptr || *ircServer == '\0' )
+	{
+		useIrc = false;
 		return false;
+	}
 
 	irc_session_t* s = nullptr;
 	irc_callbacks_t callbacks;
@@ -180,7 +183,7 @@ _ircSendMessage(const char* channel, const char* message)
 	char channelName[128];
 	if ( channel[0] == '-' )
 	{
-		sprintf(channelName, "#%s%s", cv_clusterName, channel);
+		sprintf(channelName, "#%s%s", cv_clusterName.GetString(), channel);
 	}
 	else
 		strcpy(channelName, channel);
@@ -195,7 +198,7 @@ _ircStart()
 		return;
 
 	char message[80 + sizeof(g_origin)];
-	sprintf(message, "%s terrain: importing new terrain from %s", cv_clusterName, g_origin);
+	sprintf(message, "%s terrain: importing new terrain from %s", cv_clusterName.GetString(), g_origin);
 	_ircSendMessage("-sys,#servers", message);
 }
 
@@ -207,7 +210,7 @@ _ircFinish(const TeulTimeMS& timeTaken)
 
 	FLOAT32 seconds = ((FLOAT32)timeTaken) / 1000.0f;
 	char message[128];
-	sprintf(message, "%s terrain: import finished - took %.2f seconds", cv_clusterName, seconds);
+	sprintf(message, "%s terrain: import finished - took %.2f seconds", cv_clusterName.GetString(), seconds);
 
 	_ircSendMessage("-sys,#servers", message);
 
@@ -416,7 +419,7 @@ main(int argc,char** argv)
 	if ( importFile == nullptr )
 		LogAbort("Unable to access import file " SUB_PATH("%s", "%s"), cv_dataDir.GetString(), importFileName);
 
-	nick = cv_clusterName;
+	nick = cv_clusterName.GetString();
 	nick += "Loader";
 	nick[0] = toupper(nick[0]);
 
