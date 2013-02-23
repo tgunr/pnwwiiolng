@@ -20,6 +20,7 @@ CVAR_UINT(stratIgnoreErrors, "0", "STRAT_IGNORE_ERRORS");
 
 CVAR_STRING(wwiiDBAddress, NULL, "WWII_DB_ADDRESS");
 CVAR_STRING(wwiiDBDefaultSchema, "wwiionline", "WWII_DB_SCHEMA");
+CVAR_BOOL(mysqlCompression, "0", "MYSQL_COMPRESSION");
 
 #include "wwii/wwiiConfigVars.h"
 
@@ -158,6 +159,28 @@ Teul::ConfigVar<Type_>::ConfigVar(const char* const name_, const char* const def
 			Set(envValue);
 		else if ( default_ == nullptr && !envValue )
 			LogAbort("Environment variable '%s' not defined.", envVarName_);
+	}
+}
+
+template<> void Teul::ConfigVar<CVT_BOOL>::Set(const char* const newValue_)
+{
+	if ( newValue_ == nullptr )
+	{
+		m_union.um_bool = false;
+		m_value = nullptr;
+		return;
+	}
+
+	switch ( *newValue_ )
+	{
+	case 1: case '1': case 'y': case 'Y': case 't': case 'T':
+		m_union.um_bool = true;
+		m_value = "1";
+		break;
+	default:
+		m_union.um_bool = false;
+		m_value = "0";
+		break;
 	}
 }
 

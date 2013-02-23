@@ -3,5 +3,6 @@
 
 #include "teul/teulConfigVar.h"
 
-extern ConfigStr cv_wwiiDBAddress;
-extern ConfigStr cv_wwiiDBDefaultSchema;
+extern ConfigStr	cv_wwiiDBAddress;
+extern ConfigStr	cv_wwiiDBDefaultSchema;
+extern ConfigBool	cv_mysqlCompression;

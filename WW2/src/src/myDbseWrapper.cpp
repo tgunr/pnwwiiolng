@@ -18,20 +18,8 @@
 #include <OpenThreads/Mutex>
 #include <OpenThreads/ScopedLock>
 #include <OpenThreads/Thread>
+#include "wwii/wwiidbConfigVars.h"
 #include "wwii/wwiiThreads.h"
-
-//////////////////////////////////////////////////////////////////////
-// Check the environment for "MYSQL_COMPRESS=1"
-
-static bool
-_enableMysqlCompression()
-{
-	const char* const ptr = getenv("MYSQL_COMPRESSION") ;
-	if ( ptr == NULL )
-		return false ;
-
-	return ( strcmp(ptr, "1") == 0 ) ;
-}
 
 //////////////////////////////////////////////////////////////////////
 // Low-level MySQL connection initialization
@@ -51,7 +39,7 @@ _doMyConnect(const DBCONNECTION& connection, bool autoReconnect)
 
 	// Attempt to establish the connection
 	auto flags = CLIENT_MULTI_STATEMENTS | CLIENT_MULTI_RESULTS ;
-	if ( _enableMysqlCompression() )
+	if ( cv_mysqlCompression.GetBool() )
 		flags |= CLIENT_COMPRESS ;
 
 	if ( mysql_real_connect(tempConn, connection.host, connection.username, connection.password, connection.dbName, 0, NULL, flags) == NULL )

@@ -7,7 +7,8 @@ enum ConfigVarType
 {
 	CVT_STRING,
 	CVT_UNSIGNED_INT,
-	CVT_SIGNED_INT
+	CVT_SIGNED_INT,
+	CVT_BOOL
 };
 
 namespace Teul
@@ -32,6 +33,7 @@ namespace Teul
 		inline const char* GetString() const;
 		inline const UINT64& GetUnsigned() const;
 		inline const SINT64& GetSigned() const;
+		inline bool GetBool() const;
 
 		const char* GetName() const { return m_name; }
 		const char* GetEnvVarName() const { return m_envVarName; }
@@ -40,6 +42,7 @@ namespace Teul
 		inline void SetString(const char* newValue_);
 		inline void SetUnsigned(const UINT64 newValue_);
 		inline void SetSigned(const SINT64 newValue_);
+		inline void SetBool(bool newValue_);
 
 		CONSTEXPR_FN bool IsNumber() const { return VarType_ == CVT_UNSIGNED_INT || VarType_ == CVT_SIGNED_INT; }
 
@@ -47,6 +50,7 @@ namespace Teul
 		operator const char*() const { return GetString(); }
 		operator const UINT64&() const { return GetUnsigned(); }
 		operator const SINT64&() const { return GetSigned(); }
+		operator bool() const { return GetBool(); }
 
 	public:
 		// Assignment operator copies values, not names.
@@ -73,6 +77,7 @@ namespace Teul
 			const char*	um_ptr;
 			UINT64		um_uint64;
 			SINT64		um_sint64;
+			bool		um_bool;
 		} m_union;
 	};
 
@@ -81,7 +86,7 @@ namespace Teul
 	template<ConfigVarType Type_>
 	ConfigVar<Type_>::~ConfigVar()
 	{
-		if ( m_value != nullptr )
+		if ( Type_ != CVT_BOOL && m_value != nullptr )
 			free(m_value);
 	}
 
@@ -116,19 +121,24 @@ namespace Teul
 		}
 	}
 
+	template<> void ConfigVar<CVT_BOOL>::Set(const char* const newValue_);
+
 	template<> const char* ConfigVar<CVT_STRING>::GetString() const { return m_union.um_ptr;	}
 	template<> const UINT64& ConfigVar<CVT_UNSIGNED_INT>::GetUnsigned() const { return m_union.um_uint64; }
 	template<> const SINT64& ConfigVar<CVT_SIGNED_INT>::GetSigned() const { return m_union.um_sint64; }
+	template<> bool ConfigVar<CVT_BOOL>::GetBool() const { return m_union.um_bool; }
 
 	template<> void ConfigVar<CVT_STRING>::SetString(const char* const newValue_);
 	template<> void ConfigVar<CVT_UNSIGNED_INT>::SetUnsigned(const UINT64 newValue_);
 	template<> void ConfigVar<CVT_SIGNED_INT>::SetSigned(const SINT64 newValue_);
+	template<> void ConfigVar<CVT_BOOL>::SetBool(bool newValue_);
 
 } // namespace Teul
 
 typedef Teul::ConfigVar<CVT_STRING> ConfigStr;
 typedef Teul::ConfigVar<CVT_UNSIGNED_INT> ConfigUint;
 typedef Teul::ConfigVar<CVT_SIGNED_INT> ConfigSint;
+typedef Teul::ConfigVar<CVT_BOOL> ConfigBool;
 
 #define CVAR_STRING(Name_, Default_, EnvName_)	\
 	ConfigStr cv_##Name_ ( #Name_, Default_, EnvName_ )
@@ -138,3 +148,6 @@ typedef Teul::ConfigVar<CVT_SIGNED_INT> ConfigSint;
 
 #define CVAR_SINT(Name_, Default_, EnvName_)	\
 	ConfigSint cv_##Name_ ( #Name_, Default_, EnvName_ )
+
+#define CVAR_BOOL(Name_, Default_, EnvName_)	\
+	ConfigBool cv_##Name_ ( #Name_, Default_, EnvName_ )
