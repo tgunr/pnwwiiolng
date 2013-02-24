@@ -11,3 +11,4 @@ extern ConfigUint	cv_ircPort;
 extern ConfigUint	cv_arenaID;
 extern ConfigStr	cv_teulWebPath;
 extern ConfigStr	cv_authErrorUrl;
+extern ConfigAddr	cv_baseAddress;
