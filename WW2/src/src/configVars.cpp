@@ -104,6 +104,11 @@ static void _readConfigEntriesFromFile(IO::MappedFile& file)
 			cur = eol;
 		else
 			cur = eol = file.endPtr();
+
+		// Trim trailing white space.
+		while ( eol > equals && isspace(*(eol - 1)) )
+			--eol;
+
 		s_configEntries.emplace_back(std::move(ConfigEntry(name, equals, eol)));
 		file.skipline();
 	}
@@ -314,10 +319,16 @@ namespace Teul
 		if ( newValue_ == nullptr || *newValue_ == 0 )
 			return;
 
-		if ( !isdigit(*newValue_) || !teulGetHost(newValue_, &m_union.um_uint32) )
+		if ( !teulGetHost(newValue_, &m_union.um_uint32) )
 		{
-			dbugLog(_FLA, "%s: invalid ip address: %s", GetName(), newValue_);
-			return;
+			UINT32* addresses = teulGetHostByName(newValue_);
+			if ( addresses == nullptr || *addresses == 0 )
+			{
+				dbugLog(_FLA, "%s: invalid ip address: %s", GetName(), newValue_);
+				return;
+			}
+			m_union.um_uint32 = *addresses;
+			memFree(addresses);
 		}
 
 		m_value = strdup(newValue_);
