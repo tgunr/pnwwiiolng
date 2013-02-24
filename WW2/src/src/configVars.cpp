@@ -41,7 +41,7 @@ CVAR_STRING(wwiiDBDefaultSchema, "wwiionline", "WWII_DB_SCHEMA", true
 #include "server/serverConfigVars.h"
 CVAR_STRING(clusterName, nullptr, "WWII_CLUSTER", true
 			, "Short-name for this cluster, e.g. 'dev'");
-CVAR_STRING(ircServer, "", "WWII_IRC_SERVER", false
+CVAR_ADDR(ircServer, "", "WWII_IRC_SERVER", false
 			, "Address of the IRC server. If not defined, disables IRC.");
 CVAR_STRING(ircPassword, "blooGit", "WWII_IRC_PASSWD", true
 			, "Server-password for the IRC server.");

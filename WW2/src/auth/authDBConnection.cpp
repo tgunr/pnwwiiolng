@@ -16,7 +16,7 @@
 
 #include "teul/teulConfigVar.h"
 
-CVAR_STRING(authdbAddress, NULL, "AUTH_DB", true
+CVAR_ADDR(authdbAddress, NULL, "AUTH_DB", true
 			, "Address of the MySQL server hosting the auth database.");
 CVAR_STRING(authdbPort, "", "AUTH_DB_PORT", true
 			, "Port of the Auth MySQL server if not default.");
