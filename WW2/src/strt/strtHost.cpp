@@ -72,8 +72,6 @@ DBCONNECTION dbConnection ;
 
 const char* HostLanguage = "en" ;
 
-static UINT32	_baseHost = 0;
-
 static LOGICAL _exitSignaled = FALSE ;
 static bool _mustSyncChatHost = true ;
 
@@ -133,7 +131,7 @@ static void _mapErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 
 	dbugLog(_FLN, "t:%d map connection closed", teulIndex);
 }
 
-static void _stratGetenv()
+static void _logSettings()
 {
 	dbugLog(_FLI, REPOSITORY_INFO " HOST FLAGS:") ;
 
@@ -166,16 +164,6 @@ static void _stratGetenv()
 #endif
 
 	dbugLog(_FLIB, ".") ;
-
-	SCHAR* s = getenv("BASE_ADDRESS");
-	// pointer sanity check
-	if(s && *s)
-	{
-		dbugLog(_FLN,"BASE_ADDRESS = %s",s);
-		teulGetHost(s, &_baseHost);
-	}
-	else
-		LogAbort("Environment not set yet.  Could not fetch BASE_ADDRESS");
 }
 
 static UINT32
@@ -464,8 +452,8 @@ main(int argc, char* argv[])
 	dbugSetLogLevel((Debug::ERROR_TYPE)(DEF_ERR_LEVEL | DEF_ERR_FLAGS));
 	dbugLog(_FLN, "Strat Host starting. Compiled %s at %s", __DATE__, __TIME__);
 
-	_stratGetenv();
-	serverInitAddresses(_baseHost) ;
+	_logSettings();
+	serverInitAddresses() ;
 
 	threadsReadDBEnvironment() ;
 	threadsSetup() ;

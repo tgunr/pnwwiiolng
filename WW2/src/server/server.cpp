@@ -1563,11 +1563,11 @@ Teul::ConnectionInstruction::receive(SINT32 teulIndex)
 // Populate the Server: ... address fields
 
 void
-serverInitAddresses(const UINT32 baseAddress)
+serverInitAddresses()
 {
 	Server::myServerInfo.stats.arenaID = cv_arenaID.GetUint32();
 
-	Server::broadcastNet = baseAddress ;
+	Server::broadcastNet = cv_baseAddress.GetUint32();
 
 	Server::localHost = Server::myInterface.addr[0].ip ;
 	Server::broadcastHost = Server::broadcastNet | (Server::localHost & 0x000000ff) ;

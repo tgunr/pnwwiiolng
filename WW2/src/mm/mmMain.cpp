@@ -124,7 +124,6 @@ CPStruct* mapCPList ;
 // which needs to set in a shell . file
 
 static UINT32	_authHost = 0;
-static UINT32	_baseHost = 0;
 static UINT32	_stratHost = 0;
 static UINT32 _chatClientHost = 0;
 
@@ -142,6 +141,9 @@ extern SINT32 mapCreatePlayer(SINT32 teulIndex, PlayerStatusNode* psn, const Ser
 extern SINT32 mapReleasePlayer(SINT32 teulIndex, PlayerStatusNode* psn, Server::ReleaseType releaseType) ;
 extern SINT32 mapPlayerExitCluster(PlayerStatusNode& psn);
 extern void teulCloseAllEndpoints(const SINT32 errorCode) ;
+
+CVAR_STRING(appID, NULL, "APP_ID", true
+			, "App ID for this server - 1 being release, 12 being beta.");
 
 void
 mapSendActivate(SINT32 teulIndex, const playerid_t playerID, const char* callsign)
@@ -531,46 +533,6 @@ _errorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEU
 	else
 	{
 		dbugLog(_FLW, "t:%d teul Error %d", teulIndex, error);
-	}
-}
-
-static const char*
-_getEnvVar(const char* const varName)
-{
-	const char* valueStr ;
-
-	if ( varName == NULL )
-	{
-		dbugLog(_FLA, "called getEnvVar with NULL for name") ;
-		exit(0) ;
-	}
-
-	valueStr = getenv(varName) ;
-	if ( valueStr == NULL || *valueStr == 0 )
-	{
-		dbugLog(_FLAS,"Environment not set properly: Could not fetch %s", varName);
-		exit(0) ;
-	}
-
-	return valueStr ;
-}
-
-static void
-_mmGetenv()
-{
-	const char* s;
-
-	s = _getEnvVar("BASE_ADDRESS");
-	dbugLog(_FLI, "BASE ADDRESS = %s", s) ;
-	teulGetHost(s, &_baseHost) ;
-
-	// Optional APP_ID override
-	s = getenv("APP_ID") ;
-	if ( s != NULL && *s != 0 )
-	{
-		g_appID = strtoul(s, NULL, 10) ;
-		if ( g_appID == 0 || g_appID > 255 )
-			LogAbort("Invalid APP_ID environment variable: %s", s) ;
 	}
 }
 
@@ -1134,6 +1096,8 @@ main(int argc, char* argv[])
 	serverEnableDebugWebServer() ;
 	memInit() ;
 
+	ABORT_IF(cv_appID.GetUint32() == 0 || cv_appID.GetUint32() > 255);
+
 	SINT32 retval=0;
 
 //	EF_ALLOW_MALLOC_0 = 1;
@@ -1144,9 +1108,6 @@ main(int argc, char* argv[])
 
 	// Utterly lock the arena.
 	host_config.arena.lock = ~0 ;
-
-	// Get some environment variables, Before teulGetHost
-	_mmGetenv();
 
 	threadsReadDBEnvironment() ;
 	mapThreadsSetup() ;
@@ -1161,7 +1122,7 @@ main(int argc, char* argv[])
 	dbugSetLogLevel((Debug::ERROR_TYPE)(DEF_ERR_LEVEL | DEF_ERR_FLAGS));
 	dbugLog(_FLN, "Map/Mission Host starting. Compiled %s at %s. AppID is %u", __DATE__, __TIME__, g_appID);
 
-	serverInitAddresses(_baseHost);
+	serverInitAddresses();
 
 	_authHost = serverGetAuthIP() ;
 	myMaxUsers = serverGetMaxClusterUsers() ;

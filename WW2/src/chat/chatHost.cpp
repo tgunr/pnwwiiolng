@@ -182,7 +182,6 @@ const char* const chanTypeName[MAX_CHANNEL_TYPES] =
 ,	"OPS"
 } ;
 
-static UINT32	_baseHost = 0;
 static UINT32	_stratHost = 0;
 static UINT16	_stratPort = 0 ;
 //static UINT32	_chatHost = 0;
@@ -2544,22 +2543,6 @@ _dataInit(void)
 
 //////////////////////////////////////////////////////////////////////
 
-static void
-_chatGetenv()
-{
-	SCHAR* s = getenv("BASE_ADDRESS");
-	// pointer sanity check
-	if(s && *s)
-	{
-		dbugLog(_FLN,"BASE_ADDRESS = %s",s);
-		teulGetHost(s, &_baseHost);
-	}
-	else
-		LogAbort("Environment not set yet.  Could not fetch BASE_ADDRESS");
-}
-
-//////////////////////////////////////////////////////////////////////
-
 static SINT32
 _serverEnterCallback(Server::ServerInfo* server, Server::Code scode)
 {
@@ -3579,8 +3562,7 @@ main(int argc, char* argv[])
 		LogAbort("Can't Init transport");
 
 	// Get some environment variables, Before teulGetHost
-	_chatGetenv();
-	serverInitAddresses(_baseHost);
+	serverInitAddresses();
 
 	chatReadHostLocFile() ;
 

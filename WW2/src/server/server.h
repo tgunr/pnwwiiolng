@@ -19,7 +19,7 @@ extern UINT32 serverGetMaxClusterUsers() ;
 
 extern void serverEnableDebugWebServer(unsigned short int port_=0) ;
 
-extern void serverInitAddresses(const UINT32 baseAddress) ;
+extern void serverInitAddresses() ;
 
 extern void serverOpenBroadcastIndexes() ;
 

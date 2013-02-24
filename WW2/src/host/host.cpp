@@ -129,7 +129,6 @@ CVAR_UINT(maxCellPlayers, "1250", "MAX_PLAYERS"
 static SINT32 _userConnections = 0;
 
 char hostname[32] ;
-static UINT32	_baseHost = 0;
 UINT32 _stratHost = 0;
 
 UINT32	_baseUpdtHost = 0;
@@ -2767,12 +2766,7 @@ _getEnv(const char* variable)
 static void
 _getEnvironment()
 {
-	const char* s ;
-
-	s = _getEnv("BASE_ADDRESS") ;
-	teulGetHost(s, &_baseHost);
-
-	s = _getEnv("BASE_UPDT_ADDRESS");
+	const char* s = _getEnv("BASE_UPDT_ADDRESS");
 	teulGetHost(s, &_baseUpdtHost);
 }
 
@@ -2987,7 +2981,7 @@ main(const int argc, const char* const argv[])
 	// Get some environment variables, Before teulGetHost
 	_getEnvironment() ;
 
-	serverInitAddresses(_baseHost);
+	serverInitAddresses();
 
 	wwiiIRCInitialize(Server::localHost, true) ;
 	ircCallbacks.event_channel = _ircChannelMessage ;
