@@ -160,6 +160,9 @@ hostSendVehicleBroadcast(UCHAR* buffer, SINT32 size)
 void
 hostForceFirstTimeUpdates()
 {
+	if ( !g_clustered )
+		return;
+
 	g_synched.clear() ;
 	Teul::Packet outgoing(0, Comm::CallbackX, RESYNC_VEHICLES_Y) ;
 	outgoing.send(updateBcastSend) ;
@@ -172,6 +175,9 @@ hostForceFirstTimeUpdates()
 void
 hostQueueVehicleRemove(UINT32 vehIndex, UCHAR exitCode)
 {
+	if ( !g_clustered )
+		return;
+
 	static Teul::Packet* outgoing = NULL ;
 	static UINT32 vehiclesQueued = 0 ;
 

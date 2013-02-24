@@ -126,14 +126,13 @@ PLAYERS g_players ;
 #include "teul/teulConfigVar.h"
 CVAR_UINT(maxCellPlayers, "1250", "MAX_PLAYERS"
 		  , "Maximum number of players on this cell host.");
+CVAR_ADDR(baseUpdtAddress, "192.168.11.0", "BASE_UPDT_ADDRESS", true
+		  , "Network address to use for private cell network.");
 static SINT32 _userConnections = 0;
 
 char hostname[32] ;
 UINT32 _stratHost = 0;
 
-UINT32	_baseUpdtHost = 0;
-UINT32	_updateBcastHost = 0;
-UINT32	_updateDirectHost = 0;
 SINT32 updateBcastSend = -1, updateBcastRecv = -1 ;
 
 static bool _running = true ;
@@ -2746,30 +2745,6 @@ _releaseVehicleList(Player& player)
 	return 0;
 }
 
-//////////////////////////////////////////////////////////////////////
-// Read an environment variable.
-
-static const char*
-_getEnv(const char* variable)
-{
-	assert(variable != NULL) ;
-	const char* value = getenv(variable) ;
-	if ( !value || !*value )
-		LogAbort("Environment not set, could not fetch %s", variable) ;
-	dbugLog(_FLI, "%s=%s", variable, value) ;
-	return value ;
-}
-
-//////////////////////////////////////////////////////////////////////
-// Read the environment
-
-static void
-_getEnvironment()
-{
-	const char* s = _getEnv("BASE_UPDT_ADDRESS");
-	teulGetHost(s, &_baseUpdtHost);
-}
-
 void
 #ifdef CLOSED_BETA
 Player::processUpdateValues(UINT32 /*updateNo*/, UINT32 /*prime*/)
@@ -2978,9 +2953,6 @@ main(const int argc, const char* const argv[])
 	// Set signal handlers
 	authInitDaemon(_killUpdater);
 
-	// Get some environment variables, Before teulGetHost
-	_getEnvironment() ;
-
 	serverInitAddresses();
 
 	wwiiIRCInitialize(Server::localHost, true) ;
@@ -3022,13 +2994,24 @@ main(const int argc, const char* const argv[])
 
 	sprintf(hostname, "cell%u", Server::localHost & 255) ;
 
-	const UINT32 updateBcastHost = _baseUpdtHost | 0x000000ff;
-	updateBcastRecv = teulOpenSend(updateBcastHost, WWII::Net::Ports::PrivateBcast, NULL, 0, UDB, NULL);
-	dbugLog(_FLN, "t:%d updateBcastRecv:%s", updateBcastRecv, teulGetAddress(_updateBcastHost)) ;
+	const UINT32 updateNet = cv_baseUpdtAddress.GetUint32();
+	if ( updateNet != 0 )
+	{
+		dbugLog(_FLM, "Clustering enabled: Broadcast network %s specified.", cv_baseUpdtAddress.GetString());
 
-	const UINT32 updateDirectHost = _baseUpdtHost | (Server::localHost & 0x000000ff);
-	updateBcastSend = teulOpenSend(updateDirectHost, WWII::Net::Ports::PrivateBcast, NULL, 0, UDB, NULL);
-	dbugLog(_FLN, "t:%d updateBcastSend:%s", updateBcastSend, teulGetAddress(_updateDirectHost)) ;
+		const UINT32 updateBcastHost = cv_baseUpdtAddress.GetUint32() | 0x000000ff;
+		updateBcastRecv = teulOpenSend(updateBcastHost, WWII::Net::Ports::PrivateBcast, NULL, 0, UDB, NULL);
+		dbugLog(_FLN, "t:%d updateBcastRecv:%s", updateBcastRecv, teulGetAddress(updateBcastHost)) ;
+
+		const UINT32 updateDirectHost = cv_baseUpdtAddress.GetUint32() | (Server::localHost & 0x000000ff);
+		updateBcastSend = teulOpenSend(updateDirectHost, WWII::Net::Ports::PrivateBcast, NULL, 0, UDB, NULL);
+		dbugLog(_FLN, "t:%d updateBcastSend:%s", updateBcastSend, teulGetAddress(updateDirectHost)) ;
+	}
+	else
+	{
+		g_clustered = false;
+		dbugLog(_FLM, "Clustering disabled: No broadcast network address provided.");
+	}
 
 	serverOpenBroadcastIndexes() ;
 
