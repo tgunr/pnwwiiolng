@@ -47,7 +47,7 @@ static const SINT32 PLAYER_XFER_TIMEOUT = 30 * 1000 ;	// 30 seconds
 
 CVAR_UINT(maxClusterUsers, "0", "MM_MAX_USERS"
 		  , "Maxmimum number of players on the mmhost/cluster");
-CVAR_STRING(authHost, "auth.playnet.com", "AUTH_ADDRESS", true
+CVAR_ADDR(authHost, "auth.playnet.com", "AUTH_ADDRESS", true
 			, "Host name or IP Address of the authentication server.");
 
 extern void serverInitializePeering() ;
