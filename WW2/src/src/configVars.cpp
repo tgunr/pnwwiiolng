@@ -305,7 +305,7 @@ namespace Teul
 		m_value = strdup(newValue_);
 	}
 
-	void ConfigVar::SetUint32Value(const UINT32 newValue_)
+	void ConfigVar::SetUint32Value(UINT32 newValue_)
 	{
 		if ( newValue_ == GetUint32() )
 			return;
@@ -313,7 +313,7 @@ namespace Teul
 		snprintf(m_value, MaxIntStringSize, "%u", newValue_);
 	}
 
-	void ConfigVar::SetSint32Value(const SINT32 newValue_)
+	void ConfigVar::SetSint32Value(SINT32 newValue_)
 	{
 		if ( newValue_ == GetSint32() )
 			return;
@@ -321,7 +321,12 @@ namespace Teul
 		snprintf(m_value, MaxIntStringSize, "%d", newValue_);
 	}
 
-	void ConfigVar::SetIPAddressValue(const UINT32 newValue_)
+	void ConfigVar::SetBoolValue(bool newValue_)
+	{
+		SetBoolValue(newValue_ ? "1" : "0");
+	}
+
+	void ConfigVar::SetIPAddressValue(UINT32 newValue_)
 	{
 		if ( newValue_ == GetUint32() )
 			return;
