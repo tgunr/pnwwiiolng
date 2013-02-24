@@ -15,10 +15,9 @@
 #include "server/serverConfigVars.h"
 #include "wwii/wwiiNetPorts.h"
 
-CVAR_STRING(dbsePrimaryAddress, NULL, "DBSE_PRIMARY_ADDRESS", true
+CVAR_ADDR(dbsePrimaryAddress, NULL, "DBSE_PRIMARY_ADDRESS", true
 			, "IP address dbd clients will reach the dbd on.");
 
-static UINT32 dbseIP = 0;
 static SINT32 hostIndex = 0;
 static CONNECTION_STATUS connected = CONNECT_NONE;
 static LOGICAL _handshakeSent;
@@ -54,8 +53,7 @@ dbseInit( )
 	if (initialized == false)
 	{
 		initialized = true;
-		teulGetHost(cv_dbsePrimaryAddress.GetString(), &dbseIP);
-		ABORT_IF(dbseIP == 0);
+		ABORT_IF(cv_dbsePrimaryAddress.GetUint32() == 0);
 
 		dbugLog(_FLI,"Installing dbseCallbacks");
 		dbseInstallClientCallbacks();
@@ -144,7 +142,7 @@ dbseOpenConnection()
 	_handshakeSent=FALSE;
 	_dbseError = false;
 
-	const SINT32 tempIndex = teulOpenSend(dbseIP, dbsePort, _connectFn, 2500, TCP, _errorFn);
+	const SINT32 tempIndex = teulOpenSend(cv_dbsePrimaryAddress.GetUint32(), dbsePort, _connectFn, 2500, TCP, _errorFn);
 	if ( tempIndex < 0)
 	{
 		dbugLog(_FLA,"couldnt make dbseDaemon connection, err:%d", hostIndex);

@@ -356,6 +356,8 @@ main(int argc,char** argv)
 					if ( arg == nullptr )
 						usage();
 					cv_wwiiDBAddress.SetString(arg);
+					if ( cv_wwiiDBAddress.GetUint32() == 0 )
+						LogAbort("Invalid database address: %s", arg);
 				break;
 				case 'd':		// Backwards compatability.
 				case 'C':

@@ -8,7 +8,8 @@ enum ConfigVarType
 	CVT_STRING,
 	CVT_UNSIGNED_INT,
 	CVT_SIGNED_INT,
-	CVT_BOOL
+	CVT_BOOL,
+	CVT_IP_ADDRESS,
 };
 
 namespace Teul
@@ -66,7 +67,7 @@ namespace Teul
 		}
 
 	private:
-		enum { MaxIntStringSize = 11 };
+		enum { MaxIntStringSize = 12, MaxIPAddressSize = 65 };
 
 		StrDupPtr		m_name;
 		const char*		m_envVarName;
@@ -94,6 +95,11 @@ namespace Teul
 	// The compiler will specialize this routine as needed.
 	template<>
 	void ConfigVar<CVT_STRING>::Set(const char* const newValue_)
+	{
+		SetString(newValue_);
+	}
+	template<>
+	void ConfigVar<CVT_IP_ADDRESS>::Set(const char* const newValue_)
 	{
 		SetString(newValue_);
 	}
@@ -128,9 +134,13 @@ namespace Teul
 	template<> const UINT32& ConfigVar<CVT_UNSIGNED_INT>::GetUint32() const { return m_union.um_uint32; }
 	template<> const SINT32& ConfigVar<CVT_SIGNED_INT>::GetSint32() const { return m_union.um_sint32; }
 	template<> bool ConfigVar<CVT_BOOL>::GetBool() const { return m_union.um_bool; }
+	template<> const char* ConfigVar<CVT_IP_ADDRESS>::GetString() const { return m_value; }
+	template<> const UINT32& ConfigVar<CVT_IP_ADDRESS>::GetUint32() const { return m_union.um_uint32; }
 
 	template<> void ConfigVar<CVT_STRING>::SetString(const char* const newValue_);
+	template<> void ConfigVar<CVT_IP_ADDRESS>::SetString(const char* const newValue_);
 	template<> void ConfigVar<CVT_UNSIGNED_INT>::SetUint32(const UINT32 newValue_);
+	template<> void ConfigVar<CVT_IP_ADDRESS>::SetUint32(const UINT32 newValue_);
 	template<> void ConfigVar<CVT_SIGNED_INT>::SetSint32(const SINT32 newValue_);
 	template<> void ConfigVar<CVT_BOOL>::SetBool(bool newValue_);
 
@@ -140,6 +150,7 @@ typedef Teul::ConfigVar<CVT_STRING> ConfigStr;
 typedef Teul::ConfigVar<CVT_UNSIGNED_INT> ConfigUint;
 typedef Teul::ConfigVar<CVT_SIGNED_INT> ConfigSint;
 typedef Teul::ConfigVar<CVT_BOOL> ConfigBool;
+typedef Teul::ConfigVar<CVT_IP_ADDRESS> ConfigAddr;
 
 #define CVAR_STRING(Name_, Default_, EnvName_, Required_, Description_)	\
 	ConfigStr cv_##Name_ ( #Name_, Default_, EnvName_, Required_ )
@@ -152,3 +163,6 @@ typedef Teul::ConfigVar<CVT_BOOL> ConfigBool;
 
 #define CVAR_BOOL(Name_, Default_, EnvName_, Description_)	\
 	ConfigBool cv_##Name_ ( #Name_, Default_, EnvName_, false )
+
+#define CVAR_ADDR(Name_, Default_, EnvName_, Required_, Description_)	\
+	ConfigAddr cv_##Name_ ( #Name_, Default_, EnvName_, Required_ )

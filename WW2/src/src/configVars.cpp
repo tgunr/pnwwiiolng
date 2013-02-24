@@ -4,11 +4,14 @@
 #include "str/strdupptr.h"
 #include "teul/teulConfigVar.h"
 
+extern bool teulGetHost(const SCHAR* address, UINT32* host);
+
 // These are here purely to force implementation of the types.
-CVAR_STRING(force_string, NULL, NULL, false, NULL);
-CVAR_UINT(force_uint, NULL, NULL, NULL);
-CVAR_SINT(force_sint, NULL, NULL, NULL);
-CVAR_BOOL(force_bool, NULL, NULL, NULL);
+CVAR_STRING(force_string, nullptr, nullptr, false, nullptr);
+CVAR_UINT(force_uint, nullptr, nullptr, nullptr);
+CVAR_SINT(force_sint, nullptr, nullptr, nullptr);
+CVAR_BOOL(force_bool, nullptr, nullptr, nullptr);
+CVAR_ADDR(force_addr, nullptr, nullptr, false, nullptr);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Variables.
@@ -28,7 +31,7 @@ CVAR_STRING(stratLanguage, "en", "STRAT_LANGUAGE", true
 
 #include "wwii/wwiidbConfigVars.h"
 
-CVAR_STRING(wwiiDBAddress, NULL, "WWII_DB_ADDRESS", true
+CVAR_ADDR(wwiiDBAddress, nullptr, "WWII_DB_ADDRESS", true
 			, "IP address of the MySQL Database.");
 CVAR_STRING(wwiiDBDefaultSchema, "wwiionline", "WWII_DB_SCHEMA", true
 			, "Default schema for game data.");
@@ -36,7 +39,7 @@ CVAR_STRING(wwiiDBDefaultSchema, "wwiionline", "WWII_DB_SCHEMA", true
 #include "wwii/wwiiConfigVars.h"
 
 #include "server/serverConfigVars.h"
-CVAR_STRING(clusterName, NULL, "WWII_CLUSTER", true
+CVAR_STRING(clusterName, nullptr, "WWII_CLUSTER", true
 			, "Short-name for this cluster, e.g. 'dev'");
 CVAR_STRING(ircServer, "", "WWII_IRC_SERVER", false
 			, "Address of the IRC server. If not defined, disables IRC.");
@@ -44,12 +47,14 @@ CVAR_STRING(ircPassword, "blooGit", "WWII_IRC_PASSWD", true
 			, "Server-password for the IRC server.");
 CVAR_UINT(ircPort, "6667", "WWII_IRC_PORT"
 			, "Port to connect to the IRC server on.");
-CVAR_UINT(arenaID, NULL, "ARENA_ID"
+CVAR_UINT(arenaID, nullptr, "ARENA_ID"
 			, "Numeric ID for this arena.");
 CVAR_STRING(teulWebPath, "/playnet/wwiiol/web/debug", "TEUL_UWEB_PATH", true
 			, "Path to the top-level directory for the internal web server.");
 CVAR_STRING(authErrorUrl, "http://www.wwiionline.com/auth/errors/", "AUTH_ERROR_URL", true
 			, "URL to prefix authentication error URLs with.");
+CVAR_ADDR(baseAddress, nullptr, "BASE_ADDRESS", true
+			, "Network address (/24) for the cluster. Server's will map their last octets (x.x.x.N) into this network for inter-host communications.");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Read values from the environment of configuration file.
@@ -58,7 +63,7 @@ CVAR_STRING(authErrorUrl, "http://www.wwiionline.com/auth/errors/", "AUTH_ERROR_
 
 struct ConfigEntry
 {
-	ConfigEntry() : m_name(NULL), m_value(NULL) {}
+	ConfigEntry() : m_name(nullptr), m_value(nullptr) {}
 	ConfigEntry(const char* name_, const char* equals_, const char* end_)
 		: m_name(name_, static_cast<size_t>(equals_ - name_))
 		, m_value(equals_ + 1, static_cast<size_t>(end_ - (equals_ + 1)))
@@ -95,7 +100,7 @@ static void _readConfigEntriesFromFile(IO::MappedFile& file)
 		}
 
 		const char* equals = strchr(cur, '=');
-		if ( equals == NULL )
+		if ( equals == nullptr )
 		{
 			file.skipline();
 			continue;
@@ -103,7 +108,7 @@ static void _readConfigEntriesFromFile(IO::MappedFile& file)
 		const char* name = cur;
 		cur = equals + 1;
 		const char* eol = strstr(cur, "\r\n");
-		if ( eol != NULL )
+		if ( eol != nullptr )
 			cur = eol;
 		else
 			cur = eol = file.endPtr();
@@ -232,4 +237,43 @@ template<> void Teul::ConfigVar<CVT_SIGNED_INT>::SetSint32(const SINT32 newValue
 		return;
 	m_union.um_sint32 = newValue_;
 	snprintf(m_value, MaxIntStringSize, "%d", newValue_);
+}
+
+template<> void Teul::ConfigVar<CVT_IP_ADDRESS>::SetString(const char* const newValue_)
+{
+	if ( newValue_ == m_value )
+		return;
+	if ( m_value )
+	{
+		free(m_value);
+		m_value = nullptr;
+		m_union.um_uint32 = 0;
+	}
+	if ( newValue_ == nullptr || *newValue_ == 0 )
+		return;
+
+	if ( !isdigit(*newValue_) || !teulGetHost(newValue_, &m_union.um_uint32) )
+	{
+		dbugLog(_FLA, "%s: invalid ip address: %s", GetName(), newValue_);
+		return;
+	}
+
+	m_value = strdup(newValue_);
+}
+
+template<> void Teul::ConfigVar<CVT_IP_ADDRESS>::SetUint32(const UINT32 newValue_)
+{
+	if ( newValue_ == GetUint32() )
+		return;
+	if ( m_value )
+	{
+		free(m_value);
+		m_value = nullptr;
+		m_union.um_uint32 = 0;
+	}
+	if ( !newValue_ )
+		return;
+	m_union.um_uint32 = newValue_;
+	m_value = static_cast<char*>(calloc(1, MaxIPAddressSize));
+	teulGetAddress(newValue_, m_value, MaxIPAddressSize);
 }
