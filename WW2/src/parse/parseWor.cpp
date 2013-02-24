@@ -168,7 +168,7 @@ parseWor(const char* levelfile, PARSE_CALLBACK* world)
 
 #ifndef VALIDATOR
  #if platBuild == TEUL_SERVER
-	if ( !weapHasInitialized() && !weapListInit(cv_thblitzPath) )
+	if ( !weapHasInitialized() && !weapListInit(cv_thblitzPath.GetString()) )
  #else
 	if ( !weapListInit("th_blitz/weapon") )
  #endif // TEUL_SERVER

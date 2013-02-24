@@ -294,7 +294,7 @@ ChatHandleTestUnit::Run()
 		} ;
 		const wchar_t* goodWcharSigns[] = { L"aa", L"ab", L"AA", L"12", L"1-", L"12-", L"ZZ", L"A-A", L"A123Z", L"A-1-2-3-4", L"A12345678b", L"\u51f8-", L"\u51f8\u51f8\u51f8\u51f8-", L"\u9fa0", L"\u9fa0\u9fa0", L"\u9fa0aa\u9fa0", L"\u9fa0aa\u9fa0a", L"\u9fa0---a", L"gamemgr-07", L"\u524d\u4e2a\u4f8b\u5b501", NULL } ;
 		const char* badCharSigns[] = { "-", "1", "a", "--", "abcdefghijklmnop", "凸凸凸凸凸", "冖冖冖冖冖冖冖冖", "a冖", NULL } ;
-		const wchar_t* badWcharSigns[] = { L"-", L"1", L"a", L"--", L"abcdefghijklmnop", L"\u51f8\u51f8\u51f8\u51f8\u51f8", L"\u5196\u5196\u5196\u5196\u5196\u5196\u5196\u5196", L"a\u5196", L"\u44b\u441\u434\u444\u43a", NULL } ;
+		const wchar_t* badWcharSigns[] = { L"-", L"1", L"a", L"--", L"abcdefghijklmnop", L"\u51f8\u51f8\u51f8\u51f8\u51f8", L"\u5196\u5196\u5196\u5196\u5196\u5196\u5196\u5196", L"a\u5196", L"\u044b\u0441\u0434\u0444\u043a", NULL } ;
 
 		START_SUB_STAGE( "char* callsigns" )
 

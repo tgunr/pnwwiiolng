@@ -69,7 +69,7 @@ _processfile(const std::string& filename)
 	{
 		char fullpath[MAX_PATH+1];
 		snprintf(fullpath, sizeof(fullpath), SUB_PATH("%s", "%s"), cv_dataDir.GetString(), filepath);
-		fprintf(stderr, "# processing file: %s => %s\n", filename.c_str(), filepath, fullpath);
+		fprintf(stderr, "# processing file: %s => %s (%s)\n", filename.c_str(), filepath, fullpath);
 	}
 
 	retval = sdmOpenFile(filepath, SDMPARSE_ALL);

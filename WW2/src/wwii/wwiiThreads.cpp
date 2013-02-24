@@ -152,7 +152,7 @@ threadsReadDBEnvironment()
 		db = "127.0.0.1";
 #else
 	if ( !db || *db == 0 )
-		LogAbort("Unable to read %s database address from", cv_wwiiDBAddress.GetName(), cv_wwiiDBAddress.GetEnvVar() ? cv_db.GetEnvVar() : "environment");
+		LogAbort("Unable to read %s database address from", cv_wwiiDBAddress.GetName(), cv_wwiiDBAddress.GetEnvVarName() ? cv_wwiiDBAddress.GetEnvVarName() : "environment");
 #endif
 
 	strcpy(dbConnection.host, db);

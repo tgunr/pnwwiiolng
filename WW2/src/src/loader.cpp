@@ -255,11 +255,11 @@ getArgument(int argc, char** argv, int& i)
 static void
 _checkDirectoryStructure()
 {
-	int result = stat(cv_terrainSubdir, &statBuf);
+	int result = stat(cv_terrainSubdir.GetString(), &statBuf);
 	if ( result == 0 )
 		return;
 
-	result = OS_MKDIR(cv_terrainSubdir, 0777);
+	result = OS_MKDIR(cv_terrainSubdir.GetString(), 0777);
 	if ( result == 0 )
 	{
 		printf("# Created terrain directory\n");
@@ -403,7 +403,7 @@ main(int argc,char** argv)
 	if ( cv_dataDir.GetString() == nullptr || *cv_dataDir.GetString() == 0 )
 		cv_dataDir.SetString(".");
 
-	int result = chdir(cv_dataDir);
+	int result = chdir(cv_dataDir.GetString());
 	if ( result < 0 )
 		LogAbort("Unable to access working directory %s: %d", cv_dataDir.GetString(), result);
 

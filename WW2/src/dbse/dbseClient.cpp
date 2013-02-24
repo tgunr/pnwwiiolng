@@ -23,11 +23,7 @@ static CONNECTION_STATUS connected = CONNECT_NONE;
 static LOGICAL _handshakeSent;
 static bool _dbseError = true;
 
-static SCHAR primaryAddress[128];
-
 static SINT32 dbseOpenConnection();
-
-static void _getenv();
 
 extern void dbseSetConnectionStatus(CONNECTION_STATUS status)
 {

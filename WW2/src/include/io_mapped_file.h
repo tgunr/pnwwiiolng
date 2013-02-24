@@ -107,12 +107,12 @@ public:
 	MappedFile(const filename_char_t* const filename_, const filename_char_t* const dirname_=NULL);
 
 	//! Create a viewport onto a portion of a file.
-	MappedFile(const char* start_, const char* end_)
+	MappedFile(const char* start_, size_t size_)
 		: m_basePtr(nullptr)
 		, m_startPtr(start_)
-		, m_endPtr(end_)
+		, m_endPtr(start_ + size_)
 		, m_currentPtr(start_)
-		, m_size(static_cast<size_t>(end_ - start_))
+		, m_size(size_)
 #if IO_MAP_TYPE == _IMT_WINDOWS
 		, m_handle(INVALID_HANDLE_VALUE)
 		, m_mapping(INVALID_HANDLE_VALUE)

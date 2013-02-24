@@ -6,13 +6,6 @@
 
 extern bool teulGetHost(const SCHAR* address, UINT32* host);
 
-// These are here purely to force implementation of the types.
-CVAR_STRING(force_string, nullptr, nullptr, false, nullptr);
-CVAR_UINT(force_uint, nullptr, nullptr, nullptr);
-CVAR_SINT(force_sint, nullptr, nullptr, nullptr);
-CVAR_BOOL(force_bool, nullptr, nullptr, nullptr);
-CVAR_ADDR(force_addr, nullptr, nullptr, false, nullptr);
-
 ////////////////////////////////////////////////////////////////////////////////
 // Variables.
 
@@ -68,7 +61,6 @@ struct ConfigEntry
 		: m_name(name_, static_cast<size_t>(equals_ - name_))
 		, m_value(equals_ + 1, static_cast<size_t>(end_ - (equals_ + 1)))
 	{}
-	ConfigEntry& operator = (ConfigEntry&& rhs_) { m_name = std::move(rhs_.m_name); m_value = std::move(rhs_.m_value); return *this; }
 	StrDupPtr	m_name;
 	StrDupPtr	m_value;
 };
@@ -112,8 +104,7 @@ static void _readConfigEntriesFromFile(IO::MappedFile& file)
 			cur = eol;
 		else
 			cur = eol = file.endPtr();
-		s_configEntries.resize(s_configEntries.size() + 1);
-		s_configEntries.back() = std::move(ConfigEntry(name, equals, eol));
+		s_configEntries.emplace_back(std::move(ConfigEntry(name, equals, eol)));
 		file.skipline();
 	}
 }
@@ -127,10 +118,10 @@ static void _readConfigEntriesFromFile(IO::MappedFile& file)
 #define PARENT_DIR ".."
 #endif
 
-static const char* GetValueFromEnvironmentOrConfig(const char* const name_)
+static const char* GetValueFromEnvironmentOrConfig(const char* name_)
 {
 	// Environment beats config.
-	const char* const envValue = getenv(name_);
+	const char* envValue = getenv(name_);
 	if ( envValue != nullptr )
 		return envValue;
 
@@ -157,123 +148,195 @@ static const char* GetValueFromEnvironmentOrConfig(const char* const name_)
 ////////////////////////////////////////////////////////////////////////////////
 // Implementations.
 
-template<ConfigVarType Type_>
-Teul::ConfigVar<Type_>::ConfigVar(const char* const name_, const char* const default_, const char* const envVarName_, bool required_)
-	: m_name(name_)
-	, m_envVarName(envVarName_)
-	, m_value(nullptr)
-	, m_required(required_)
+namespace Teul
 {
-	ABORT_IF(name_ == nullptr);
-	ABORT_IF(required_ == true && envVarName_ == nullptr);
 
-	m_union.um_ptr = nullptr;
-
-	if ( IsNumber() )
-		m_value = static_cast<char*>(calloc(1, MaxIntStringSize));
-
-	if ( envVarName_ )
+	ConfigVar::ConfigVar(ConfigVarType type_, const char* name_, const char* default_, const char* envVarName_, bool required_)
+		: m_name(name_)
+		, m_type(type_)
+		, m_envVarName(envVarName_)
+		, m_value(nullptr)
+		, m_required(required_)
 	{
-		const char* envValue = GetValueFromEnvironmentOrConfig(envVarName_);
-		if ( envValue != nullptr )
+		ABORT_IF(name_ == nullptr);
+		ABORT_IF(required_ == true && envVarName_ == nullptr);
+
+		m_union.um_ptr = nullptr;
+
+		if ( IsNumber() )
+			m_value = static_cast<char*>(calloc(1, MaxIntStringSize));
+
+		if ( envVarName_ )
 		{
-			if ( m_required == true && *envValue == 0 )
-				LogAbort("Invalid (empty) value for %s ('%s').", envVarName_);
-			Set(envValue);
-			return;
+			const char* envValue = GetValueFromEnvironmentOrConfig(envVarName_);
+			if ( envValue != nullptr )
+			{
+				if ( m_required == true && *envValue == 0 )
+					LogAbort("Invalid (empty) value for %s ('%s').", envVarName_);
+				Set(envValue);
+				return;
+			}
+		}
+
+		if ( default_ != nullptr )
+			Set(default_);
+
+		if ( m_required && (m_value == nullptr || *m_value == 0) )
+			LogAbort("Config variable %s (%s) must be defined with a non-empty value.", name_, envVarName_);
+	}
+
+	ConfigVar::~ConfigVar()
+	{
+		if ( m_type != CVT_BOOL && m_value != nullptr )
+			free(m_value);
+	}
+
+	void ConfigVar::Set(const char* newValue_)
+	{
+		switch ( m_type )
+		{
+		case CVT_STRING: SetStringValue(newValue_); break;
+		case CVT_UNSIGNED_INT: SetUint32Value(newValue_); break;
+		case CVT_SIGNED_INT: SetSint32Value(newValue_); break;
+		case CVT_BOOL: SetBoolValue(newValue_); break;
+		case CVT_IP_ADDRESS: SetStringValue(newValue_); break;
 		}
 	}
 
-	if ( default_ != nullptr )
-		Set(default_);
-
-	if ( m_required && (m_value == nullptr || *m_value == 0) )
-		LogAbort("Config variable %s (%s) must be defined with a non-empty value.", name_, envVarName_);
-}
-
-template<> void Teul::ConfigVar<CVT_BOOL>::Set(const char* const newValue_)
-{
-	if ( newValue_ == nullptr )
+	void ConfigVar::SetString(const char* newValue_)
 	{
-		m_union.um_bool = false;
-		m_value = nullptr;
-		return;
+		if ( m_type == CVT_STRING ) return SetStringValue(newValue_);
+		else if ( m_type == CVT_IP_ADDRESS ) return SetIPAddressValue(newValue_);
+		LogAbort("Incompatible use of %s::SetString", GetName());
 	}
 
-	switch ( *newValue_ )
+	void ConfigVar::SetUint32(UINT32 newValue_)
 	{
-	case 1: case '1': case 'y': case 'Y': case 't': case 'T':
-		m_union.um_bool = true;
-		m_value = "1";
-		break;
-	default:
-		m_union.um_bool = false;
-		m_value = "0";
-		break;
+		if ( m_type == CVT_UNSIGNED_INT ) return SetUint32Value(newValue_);
+		else if ( m_type == CVT_IP_ADDRESS ) return SetIPAddressValue(newValue_);
+		LogAbort("Incompatible use of %s::SetUint32", GetName());
+	}
+
+	void ConfigVar::SetSint32(SINT32 newValue_)
+	{
+		if ( m_type == CVT_SIGNED_INT ) return SetSint32Value(newValue_);
+		LogAbort("Incompatible use of %s::SetSint32", GetName());
+	}
+
+	void ConfigVar::SetBool(bool newValue_)
+	{
+		if ( m_type == CVT_BOOL ) return SetBoolValue(newValue_);
+		LogAbort("Incompatible use of %s::SetBool", GetName());
+	}
+
+	void ConfigVar::SetStringValue(const char* newValue_)
+	{
+		if ( newValue_ == m_value )
+			return;
+		if ( m_value )
+			free(m_value);
+		m_value = newValue_ ? strdup(newValue_) : nullptr;
+		m_union.um_ptr = m_value;
+	}
+
+	void ConfigVar::SetUint32Value(const char* newValue_)
+	{
+		if ( newValue_ != nullptr && *newValue_ )
+			SetUint32Value(strtoul(newValue_, NULL, 10));
+		else
+		{
+			m_union.um_uint32 = 0U;
+			m_value[0] = '\0';
+		}
+	}
+
+	void ConfigVar::SetSint32Value(const char* newValue_)
+	{
+		if ( newValue_ != nullptr && *newValue_ )
+			SetSint32Value(strtol(newValue_, NULL, 10));
+		else
+		{
+			m_union.um_sint32 = 0;
+			m_value[0] = '\0';
+		}
+	}
+
+	void ConfigVar::SetBoolValue(const char* newValue_)
+	{
+		if ( newValue_ == nullptr )
+		{
+			m_union.um_bool = false;
+			m_value = nullptr;
+			return;
+		}
+
+		switch ( *newValue_ )
+		{
+		case 1: case '1': case 'y': case 'Y': case 't': case 'T':
+			m_union.um_bool = true;
+			m_value = const_cast<char*>("1");
+			break;
+		default:
+			m_union.um_bool = false;
+			m_value = const_cast<char*>("0");
+			break;
+		}
+	}
+
+	void ConfigVar::SetIPAddressValue(const char* newValue_)
+	{
+		if ( newValue_ == m_value )
+			return;
+		if ( m_value )
+		{
+			free(m_value);
+			m_value = nullptr;
+			m_union.um_uint32 = 0;
+		}
+		if ( newValue_ == nullptr || *newValue_ == 0 )
+			return;
+
+		if ( !isdigit(*newValue_) || !teulGetHost(newValue_, &m_union.um_uint32) )
+		{
+			dbugLog(_FLA, "%s: invalid ip address: %s", GetName(), newValue_);
+			return;
+		}
+
+		m_value = strdup(newValue_);
+	}
+
+	void ConfigVar::SetUint32Value(const UINT32 newValue_)
+	{
+		if ( newValue_ == GetUint32() )
+			return;
+		m_union.um_uint32 = newValue_;
+		snprintf(m_value, MaxIntStringSize, "%u", newValue_);
+	}
+
+	void ConfigVar::SetSint32Value(const SINT32 newValue_)
+	{
+		if ( newValue_ == GetSint32() )
+			return;
+		m_union.um_sint32 = newValue_;
+		snprintf(m_value, MaxIntStringSize, "%d", newValue_);
+	}
+
+	void ConfigVar::SetIPAddressValue(const UINT32 newValue_)
+	{
+		if ( newValue_ == GetUint32() )
+			return;
+		if ( m_value )
+		{
+			free(m_value);
+			m_value = nullptr;
+			m_union.um_uint32 = 0;
+		}
+		if ( !newValue_ )
+			return;
+		m_union.um_uint32 = newValue_;
+		m_value = static_cast<char*>(calloc(1, MaxIPAddressSize));
+		teulGetAddress(newValue_, m_value, MaxIPAddressSize);
 	}
 }
 
-template<> void Teul::ConfigVar<CVT_STRING>::SetString(const char* const newValue_)
-{
-	if ( newValue_ == m_value )
-		return;
-	if ( m_value )
-		free(m_value);
-	m_value = newValue_ ? strdup(newValue_) : nullptr;
-	m_union.um_ptr = m_value;
-}
 
-template<> void Teul::ConfigVar<CVT_UNSIGNED_INT>::SetUint32(const UINT32 newValue_)
-{
-	if ( newValue_ == GetUint32() )
-		return;
-	m_union.um_uint32 = newValue_;
-	snprintf(m_value, MaxIntStringSize, "%u", newValue_);
-}
-
-template<> void Teul::ConfigVar<CVT_SIGNED_INT>::SetSint32(const SINT32 newValue_)
-{
-	if ( newValue_ == GetSint32() )
-		return;
-	m_union.um_sint32 = newValue_;
-	snprintf(m_value, MaxIntStringSize, "%d", newValue_);
-}
-
-template<> void Teul::ConfigVar<CVT_IP_ADDRESS>::SetString(const char* const newValue_)
-{
-	if ( newValue_ == m_value )
-		return;
-	if ( m_value )
-	{
-		free(m_value);
-		m_value = nullptr;
-		m_union.um_uint32 = 0;
-	}
-	if ( newValue_ == nullptr || *newValue_ == 0 )
-		return;
-
-	if ( !isdigit(*newValue_) || !teulGetHost(newValue_, &m_union.um_uint32) )
-	{
-		dbugLog(_FLA, "%s: invalid ip address: %s", GetName(), newValue_);
-		return;
-	}
-
-	m_value = strdup(newValue_);
-}
-
-template<> void Teul::ConfigVar<CVT_IP_ADDRESS>::SetUint32(const UINT32 newValue_)
-{
-	if ( newValue_ == GetUint32() )
-		return;
-	if ( m_value )
-	{
-		free(m_value);
-		m_value = nullptr;
-		m_union.um_uint32 = 0;
-	}
-	if ( !newValue_ )
-		return;
-	m_union.um_uint32 = newValue_;
-	m_value = static_cast<char*>(calloc(1, MaxIPAddressSize));
-	teulGetAddress(newValue_, m_value, MaxIPAddressSize);
-}

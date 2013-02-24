@@ -1135,7 +1135,7 @@ strtInitializeStratData()
 	atexit(_killStratData) ;
 
 	// Load in the blitzWor modifier data
-	if (!parseWor(cv_blitzworPath, NULL))
+	if (!parseWor(cv_blitzworPath.GetString(), NULL))
 		LogAbort("Unable to load blitzWor file: %s", cv_blitzworPath.GetString());
 
 #ifdef IS_STRAT_HOST

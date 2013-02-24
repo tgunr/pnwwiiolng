@@ -271,9 +271,9 @@ _readSupercells()
 	std::ifstream importList ;
 	std::string filename;
 
-	filename = cv_dataDir;
+	filename = cv_dataDir.GetString();
 	filename += PATH_SEPARATOR;
-	filename += cv_importFile;
+	filename += cv_importFile.GetString();
 	importList.open(filename.c_str(), std::ifstream::in) ;
 	if ( !importList.is_open() )
 		LogAbort("Unable to open sdm import list: %s", filename.c_str());
