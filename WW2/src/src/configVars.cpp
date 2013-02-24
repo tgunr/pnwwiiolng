@@ -99,7 +99,7 @@ static void _readConfigEntriesFromFile(IO::MappedFile& file)
 		}
 		const char* name = cur;
 		cur = equals + 1;
-		const char* eol = strstr(cur, "\r\n");
+		const char* eol = strpbrk(cur, "\r\n");
 		if ( eol != nullptr )
 			cur = eol;
 		else
@@ -110,10 +110,10 @@ static void _readConfigEntriesFromFile(IO::MappedFile& file)
 }
 
 #if defined(WIN32) && defined(UNICODE)
-#define OS_ENVIRONMENT_CFG (L"environment.win.cfg")
+#define OS_ENVIRONMENT_CFG L"environment.win.cfg"
 #define DEF_ENVIRONMENT_CFG L"environment.cfg"
 #else
-#define OS_ENVIRONMENT_CFG ("environment.unix.cfg")
+#define OS_ENVIRONMENT_CFG "environment.unix.cfg"
 #define DEF_ENVIRONMENT_CFG "environment.cfg"
 #define PARENT_DIR ".."
 #endif
@@ -127,13 +127,31 @@ static const char* GetValueFromEnvironmentOrConfig(const char* name_)
 
 	if ( s_configEntriesRead == false )
 	{
-		s_configEntriesRead = true;
 		IO::MappedFile file;
 		// Apply defaults first.
 		if ( file.mapFile(DEF_ENVIRONMENT_CFG) )
 			_readConfigEntriesFromFile(file);
 		if ( file.mapFile(OS_ENVIRONMENT_CFG) )
 			_readConfigEntriesFromFile(file);
+#if platOS != OS_WIN32
+		// If we didn't find those files, try in /etc.
+		if ( !s_configEntriesRead )
+		{
+			if ( file.mapFile(DEF_ENVIRONMENT_CFG, "/playnet/etc") )
+				_readConfigEntriesFromFile(file);
+			if ( file.mapFile(OS_ENVIRONMENT_CFG, "/playnet/etc") )
+				_readConfigEntriesFromFile(file);
+
+			if ( !s_configEntriesRead )
+			{
+				if ( file.mapFile(DEF_ENVIRONMENT_CFG, "/etc") )
+					_readConfigEntriesFromFile(file);
+				if ( file.mapFile(OS_ENVIRONMENT_CFG, "/etc") )
+					_readConfigEntriesFromFile(file);
+			}
+		}
+#endif
+		s_configEntriesRead = true;
 	}
 
 	for ( auto& it : s_configEntries )
