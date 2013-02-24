@@ -18,9 +18,7 @@
 #include "strt/strtCPStruct.h"
 #include "strt/strtFacilityStruct.h"
 #include "strt/strtObjectStruct.h"
-
-TeulTimeMS teulClock64 ;
-UINT32 teulClockTime ;
+#include "teul/teulTime.h"
 
 typedef struct
 {
