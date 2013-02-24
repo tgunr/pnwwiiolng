@@ -363,18 +363,18 @@ teulGetAddress(const UINT32 hostOrderIP)
 
 #if platOS != OS_WIN32
 const char*
-teulGetAddress(const UINT32 host, char* buffer, const size_t bufferLen)
+teulGetAddress(const UINT32 host, char* buffer, const size_t bufferSize)
 {
 	in_addr addr ;
 	addr.s_addr = htonl(host) ;
-	return inet_ntop(AF_INET, &addr, buffer, bufferLen) ;
+	return inet_ntop(AF_INET, &addr, buffer, bufferSize) ;
 }
 #else
 const char*
-teulGetAddress(const UINT32 host, char* buffer, const size_t bufferLen)
+teulGetAddress(const UINT32 host, char* buffer, const size_t bufferSize)
 {
 	const char* p = teulGetAddress(host) ;
-	strncpy(buffer, p, bufferLen) ;
+	strncpy(buffer, p, bufferSize) ;
 	return buffer ;
 }
 #endif

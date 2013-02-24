@@ -68,9 +68,9 @@ extern const SCHAR* teulGetAddress(const UINT32 host);
 //! @ingroup thread-safe
 //! @param[in]	host			Binary IP address.
 //!	@param[out]	buffer			Pointer to output buffer.
-//!	@param[in]	bufferLen		Size of buffer.
+//!	@param[in]	bufferSize		Size of buffer.
 //! @return pointer to buffer (for compatibility with old version)
-extern const char* teulGetAddress(const UINT32 host, char* buffer, const size_t bufferLen) ;
+extern const char* teulGetAddress(const UINT32 host, char* buffer, const size_t bufferSize) ;
 
 //! Resolve the supplied host name into a binary IP address.
 //! @warning This is a long, blocking, call!
