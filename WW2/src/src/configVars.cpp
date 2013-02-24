@@ -59,10 +59,16 @@ struct ConfigEntry
 	ConfigEntry() : m_name(nullptr), m_value(nullptr) {}
 	ConfigEntry(const char* name_, const char* equals_, const char* end_)
 		: m_name(name_, static_cast<size_t>(equals_ - name_))
-		, m_value(equals_ + 1, static_cast<size_t>(end_ - (equals_ + 1)))
-	{}
+		, m_value(nullptr)
+	{
+		setValueFromEquals(equals_, end_);
+	}
 	StrDupPtr	m_name;
 	StrDupPtr	m_value;
+	void setValueFromEquals(const char* equals_, const char* end_)
+	{
+		m_value.copy(equals_ + 1, static_cast<size_t>(end_ - (equals_ + 1)));
+	}
 };
 
 typedef std::vector<ConfigEntry> ConfigEntries;
@@ -109,7 +115,17 @@ static void _readConfigEntriesFromFile(IO::MappedFile& file)
 		while ( eol > equals && isspace(*(eol - 1)) )
 			--eol;
 
-		s_configEntries.emplace_back(std::move(ConfigEntry(name, equals, eol)));
+		auto it = s_configEntries.begin();
+		for ( ; it != s_configEntries.end(); ++it )
+		{
+			if ( strncasecmp(it->m_name, name, static_cast<size_t>(equals - name)) == 0 )
+			{
+				it->setValueFromEquals(equals, eol);
+				break;
+			}
+		}
+		if ( it == s_configEntries.end() )
+			s_configEntries.emplace_back(std::move(ConfigEntry(name, equals, eol)));
 		file.skipline();
 	}
 }
