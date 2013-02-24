@@ -47,6 +47,8 @@ static const SINT32 PLAYER_XFER_TIMEOUT = 30 * 1000 ;	// 30 seconds
 
 CVAR_UINT(maxClusterUsers, "0", "MM_MAX_USERS"
 		  , "Maxmimum number of players on the mmhost/cluster");
+CVAR_STRING(authHost, "auth.playnet.com", "AUTH_ADDRESS", true
+			, "Host name or IP Address of the authentication server.");
 
 extern void serverInitializePeering() ;
 extern void serverConnectPeer(const UINT32 ip, const UINT32 type) ;
@@ -1524,13 +1526,12 @@ ServerInterface::LookupByPlayerID(UINT32 id)
 UINT32
 serverGetAuthIP()
 {
-	const char* authName = getenv("AUTH_ADDRESS") ;
-	if ( authName == NULL || *authName == 0 )
-	{
-		authName = "auth.playnet.com" ;
-		if ( useAuthServer == true )
-			dbugLog(_FLW, "Missing AUTH_ADDRESS environment variable; assuming %s", authName) ;
-	}
+	if ( useAuthServer == false )
+		return 0;
+
+	const char* authName = cv_authHost.GetString();
+	if ( !authName && !*authName )
+		LogAbort("Missing AUTH_ADDRESS");
 
 	UINT32* const addresses = teulGetHostByName(authName) ;	// Returns malloc'd pointer!
 	if ( addresses == NULL )
