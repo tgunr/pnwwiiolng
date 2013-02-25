@@ -837,8 +837,6 @@ _checkEndpointTimeouts(ENDPOINT& endpoint)
 					);
 		teulClose(endpoint, Teul::Closing::Timeout);
 	}
-
-	return;
 }
 
 static void
@@ -915,40 +913,60 @@ _endpointFDConnect(ENDPOINT& endpoint, const WSANETWORKEVENTS& eventData)
 static UINT64 g_idleInstance = 0 ;
 
 static void
-_pollSocketsInner(const TeulTimeMS& /*remainder*/)
+_pollSocketsInner(const TeulTimeMS& remainder)
 {
 	_lastPXferTotal = totalPacketsXfer;
 
 	// Make ourselves re-entrant by aborting if someone else comes along and
 	// processes any endpoints.
 	const UINT64 idleInstance = ++g_idleInstance ;
-	ENDPOINT_LIST::iterator it = idleEndpoints.begin() ;
+	ENDPOINT_LIST::iterator it;
 
+	// Expire endpoints.
+	it = idleEndpoints.begin();
+	while ( it != idleEndpoints.end() )
+	{
+		ENDPOINT& endpoint = *(*it);
+		++it;
+		_idleEndpoint(endpoint);
+		if ( idleInstance != g_idleInstance )
+			return;
+	}
+
+	// Build up a list of endpoints we're still interested in.
+	static std::vector<WSAEVENT> eventHandles;
+	eventHandles.reserve(Teul::MaxConnections);
+	eventHandles.clear();
+
+	for ( auto& ep : idleEndpoints )
+	{
+		if ( ep->m_inUse && ep->socket != INVALID_SOCKET )
+			eventHandles.push_back(ep->eventObject);
+	}
+
+	if ( eventHandles.empty() )
+	{
+#if platBuild == TEUL_SERVER
+		// Server wants us to spend time in the loop.
+		if ( remainder > 0 )
+			OpenThreads::Thread::microSleep(static_cast<unsigned int>(remainder * 1000));
+#endif
+		return;
+	}
+
+	// Wait for some network activity and then check all the endpoints.
+	DWORD waitMessage = WSAWaitForMultipleEvents(eventHandles.size(), &eventHandles[0], FALSE, static_cast<DWORD>(remainder), FALSE);
+	if ( waitMessage == WSA_WAIT_TIMEOUT || waitMessage == WSA_WAIT_FAILED )
+		return;
+
+	WSANETWORKEVENTS eventData;
+	it = idleEndpoints.begin();
 	for ( ; g_idleInstance == idleInstance && it != idleEndpoints.end() ; )
 	{
 		assert( *it != NULL ) ;
 		ENDPOINT& endpoint = *(*it) ;
 		++it ;
 
-		if ( totalPacketsXfer < _lastPXferTotal )
-		{
-			return ;
-		}
-
-//		dbugWrite(_FLD,"running endpoint %d",endpoint ->teulIndex);
-
-		///ISSUE: This could release the endpoint;
-		/// I guess it needs to return a value indicating that.
-		_idleEndpoint(endpoint);
-
-		if ( (! endpoint.m_inUse) || endpoint.socket == INVALID_SOCKET )
-			continue ;
-
-		DWORD waitMessage = WSAWaitForMultipleEvents(1, &(endpoint.eventObject), FALSE, 0, FALSE);
-		if ( waitMessage == WSA_WAIT_TIMEOUT || waitMessage == WSA_WAIT_FAILED )
-			continue ;
-
-		WSANETWORKEVENTS	eventData;
 		const int enumErr = WSAEnumNetworkEvents(endpoint.socket, endpoint.eventObject, &eventData);
 		if ( enumErr != 0 )
 			continue ;
