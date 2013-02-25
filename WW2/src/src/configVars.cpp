@@ -238,7 +238,7 @@ namespace Teul
 		case CVT_UNSIGNED_INT: SetUint32Value(newValue_); break;
 		case CVT_SIGNED_INT: SetSint32Value(newValue_); break;
 		case CVT_BOOL: SetBoolValue(newValue_); break;
-		case CVT_IP_ADDRESS: SetStringValue(newValue_); break;
+		case CVT_IP_ADDRESS: SetIPAddressValue(newValue_); break;
 		}
 	}
 
