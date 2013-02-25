@@ -72,6 +72,14 @@ TeulTimeMS lastUpdateTime;
 extern void teulInitEndpoints(ERROR_FUNCTION* const) ;
 
 //////////////////////////////////////////////////////////////////////
+
+// Check a network-order address.
+static inline CONSTEXPR_FN bool IsMulticastNetworkAddress(const struct sockaddr_in& sockAddress)
+{
+	return (sockAddress.sin_addr.s_addr & 0xE0) == 0xE0;
+}
+
+//////////////////////////////////////////////////////////////////////
 // Retrieve a list of the IP addresses this host has on eth0.
 
 #if platBuild == TEUL_SERVER || platOS == OS_LINUX
@@ -296,7 +304,7 @@ static const size_t UdpRcvBufSize = 64 * 1024 ;
 static const size_t UdpSndBufSize = 64 * 1024 ;
 
 static void
-_configureEndpointSocket(ENDPOINT& endpoint)
+_configureEndpointSocket(ENDPOINT& endpoint, const bool isMulticast)
 {
 	evutil_make_socket_nonblocking(endpoint.socket);
 	evutil_make_socket_closeonexec(endpoint.socket);
@@ -317,9 +325,14 @@ _configureEndpointSocket(ENDPOINT& endpoint)
 	}
 	else if ( endpoint.protocol == UDB )
 	{
-		// UDB sockets need to be broadcast-enabled.
-		int bcast = 1 ;
-		setsockopt(endpoint.socket, SOL_SOCKET, SO_BROADCAST, (char*)&bcast, sizeof(bcast)) ;
+		if ( !isMulticast )
+		{
+			// UDB sockets need to be broadcast-enabled.
+			int bcast = 1 ;
+			setsockopt(endpoint.socket, SOL_SOCKET, SO_BROADCAST, (char*)&bcast, sizeof(bcast)) ;
+		}
+		else
+			evutil_make_listen_socket_reuseable(endpoint.socket);
 	}
 }
 
@@ -408,7 +421,7 @@ _openStream(ENDPOINT& endpoint)
 // Bind a socket for a datagram (UDP) connection.
 
 static void
-_bindDgramSocket(ENDPOINT& endpoint)
+_bindDgramSocket(ENDPOINT& endpoint, const bool isMulticast)
 {
 	sockaddr_in& sockAddr = endpoint.localSockAddress ;
 	socklen_t len = sizeof(sockAddr) ;	// Needed for getsockname.
@@ -425,6 +438,20 @@ _bindDgramSocket(ENDPOINT& endpoint)
 					, teulGetAddress(ntohl(sockAddr.sin_addr.s_addr))
 					, sockAddr.sin_port
 					) ;
+
+	if ( isMulticast )
+	{
+		evutil_make_listen_socket_reuseable(endpoint.socket);
+
+		struct ip_mreq mreq;
+		mreq.imr_multiaddr = endpoint.destSockAddress.sin_addr;
+		mreq.imr_interface.s_addr = htonl(INADDR_ANY);
+		int res = setsockopt(endpoint.socket, IPPROTO_IP, IP_ADD_MEMBERSHIP, (const char*)&mreq, sizeof(mreq));
+		if ( res < 0 )
+			throw Teul::OpenError("multicast membership request failed");
+
+		dbugLog(_FLI, "t:%d sock:%d joined multicast group %s", endpoint.teulIndex(), endpoint.socket, teulGetAddress(ntohl(endpoint.destSockAddress.sin_addr.s_addr)));
+	}
 }
 
 // inActive : true if the TCP socket is to be used to send, false if used to listen/receive
@@ -452,6 +479,8 @@ teulOpenConnection(const SINT32 teulIndex, const bool listening, const SINT32 ti
 	// create the socket
 	newEndpoint->socket = INVALID_SOCKET;
 
+	bool isMulticast = IsMulticastNetworkAddress(sockAddress);
+
 	if (newEndpoint->state() == IS_LISTENING)
 	{
 		newEndpoint->localSockAddress = sockAddress ;
@@ -460,7 +489,8 @@ teulOpenConnection(const SINT32 teulIndex, const bool listening, const SINT32 ti
 	{
 		newEndpoint->fromSockAddress = sockAddress ;
 		newEndpoint->destSockAddress = sockAddress ;
-		if (newEndpoint->protocol == UDB)
+
+		if (newEndpoint->protocol == UDB && !isMulticast )
 		{
 			newEndpoint->localSockAddress = sockAddress ;
 
@@ -473,7 +503,7 @@ teulOpenConnection(const SINT32 teulIndex, const bool listening, const SINT32 ti
 
 			// Listen on all addresses, with an auto-port.
 			newEndpoint->localSockAddress.sin_addr.s_addr = htonl( INADDR_ANY );
-			newEndpoint->localSockAddress.sin_port = htons(0);  // get next available port
+			newEndpoint->localSockAddress.sin_port = !isMulticast ? htons(0) : htons(port);
 		}
 	}
 
@@ -483,7 +513,7 @@ teulOpenConnection(const SINT32 teulIndex, const bool listening, const SINT32 ti
 		if ( newEndpoint->socket == INVALID_SOCKET )
 			throw Teul::OpenError("socket() failed") ;
 
-		_configureEndpointSocket(*newEndpoint) ;
+		_configureEndpointSocket(*newEndpoint, isMulticast) ;
 
 		switch ( newEndpoint->protocol )
 		{
@@ -492,7 +522,7 @@ teulOpenConnection(const SINT32 teulIndex, const bool listening, const SINT32 ti
 		break ;
 		case UDP:
 		case UDB:
-			_bindDgramSocket(*newEndpoint) ;
+			_bindDgramSocket(*newEndpoint, isMulticast) ;
 		break ;
 		default:
 			Teul::OpenError(EINVAL, "unknown protocol") ;
