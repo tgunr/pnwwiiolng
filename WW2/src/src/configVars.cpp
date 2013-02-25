@@ -71,16 +71,29 @@ struct ConfigEntry
 	}
 };
 
-typedef std::vector<ConfigEntry> ConfigEntries;
-static bool s_configEntriesRead = false;
-static ConfigEntries s_configEntries;
+typedef std::vector<ConfigEntry> CONFIG_ENTRIES;
+struct ConfigEntries : public CONFIG_ENTRIES
+{
+	ConfigEntries() : CONFIG_ENTRIES(), m_read(false)
+	{
+		reserve(64);
+	}
+
+	bool m_read;
+};
+
+static ConfigEntries& _getConfigEntries()
+{
+	static ConfigEntries s_configEntries;
+	return s_configEntries;
+}
 
 #include "include/io_mapped_file.h"
 
 static void _readConfigEntriesFromFile(IO::MappedFile& file)
 {
-	s_configEntriesRead = true;
-	s_configEntries.reserve(32);
+	ConfigEntries& configEntries = _getConfigEntries();
+	configEntries.m_read = true;
 	const char*& cur = file.m_currentPtr;
 	while ( cur < file.endPtr() )
 	{
@@ -115,8 +128,8 @@ static void _readConfigEntriesFromFile(IO::MappedFile& file)
 		while ( eol > equals && isspace(*(eol - 1)) )
 			--eol;
 
-		auto it = s_configEntries.begin();
-		for ( ; it != s_configEntries.end(); ++it )
+		auto it = configEntries.begin();
+		for ( ; it != configEntries.end(); ++it )
 		{
 			if ( strncasecmp(it->m_name, name, static_cast<size_t>(equals - name)) == 0 )
 			{
@@ -124,8 +137,8 @@ static void _readConfigEntriesFromFile(IO::MappedFile& file)
 				break;
 			}
 		}
-		if ( it == s_configEntries.end() )
-			s_configEntries.emplace_back(std::move(ConfigEntry(name, equals, eol)));
+		if ( it == configEntries.end() )
+			configEntries.emplace_back(std::move(ConfigEntry(name, equals, eol)));
 		file.skipline();
 	}
 }
@@ -146,7 +159,8 @@ static const char* GetValueFromEnvironmentOrConfig(const char* name_)
 	if ( envValue != nullptr )
 		return envValue;
 
-	if ( s_configEntriesRead == false )
+	ConfigEntries& configEntries = _getConfigEntries();
+	if ( configEntries.m_read == false )
 	{
 		IO::MappedFile file;
 		// Apply defaults first.
@@ -172,10 +186,10 @@ static const char* GetValueFromEnvironmentOrConfig(const char* name_)
 			}
 		}
 #endif
-		s_configEntriesRead = true;
+		configEntries.m_read = true;
 	}
 
-	for ( auto& it : s_configEntries )
+	for ( auto& it : configEntries )
 	{
 		if ( strcmp(it.m_name, name_) == 0 )
 			return it.m_value.str();
