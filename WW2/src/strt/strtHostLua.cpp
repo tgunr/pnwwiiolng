@@ -23,9 +23,17 @@
 #include "include/luaGlue.h"
 #include "strt/strtHostDB.h"
 #include "wwii/wwiiIRC.h"
+#include "teul/teulConfigVar.h"
 
 #include "strt/strtDotCommands.h"
 #include "include/arenaLockEnums.h"
+
+CVAR_STRING(luaPath, "/playnet/wwiiol/lua", "LUA_BASE_PATH", true
+			, "Path to the Lua scripts.");
+CVAR_STRING(luaRCFile, "rc.lua", "LUA_RC_FILE", true
+			, "Name of the startup (rc) Lua script");
+CVAR_STRING(luaStratlibFile, "stratlib.lua", "LUA_STRATLIB_FILE", true
+			, "Name of the Lua strat library.");
 
 // Lua/Tolua API headers
 #ifdef __cplusplus
@@ -272,7 +280,7 @@ _execute(const char* name, bool dbOnly)
 	}
 	else if ( !dbOnly )
 	{
-		code = std::string("/playnet/wwiiol/lua/") + name + ".lua" ;
+		code = std::string(cv_luaPath.GetString()) + name + ".lua" ;
 		success = Lua::RunScript(code.c_str()) ;
 	}
 
@@ -285,7 +293,11 @@ stratStartLua()
 	if ( _luaVM == NULL )
 		return false ;
 
-	if ( !Lua::RunScript("/playnet/wwiiol/lua/stratlib.lua") )
+	std::string stratLib = cv_luaPath.GetString();
+	stratLib += PATH_SEPARATOR;
+	stratLib += cv_luaStratlibFile.GetString();
+
+	if ( !Lua::RunScript(stratLib.c_str()) )
 		LogAbort("Unable to execute stratlib") ;
 
 	return true ;

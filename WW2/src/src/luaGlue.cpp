@@ -26,8 +26,8 @@ std::string _luaSource = "?" ;		// Current source for commands/scripts etc
 std::string _luaSubSystem = "?" ;	// Part of the source
 Lua::SCRIPT_RESULTS _luaOutput ;
 
-CVAR_STRING(luaRCFile, "/playnet/wwiiol/lua/rc.lua", "LUA_RC_FILE", true
-			, "Path/filename of the Lua script to execute on startup");
+extern ConfigStr cv_luaPath;
+extern ConfigStr cv_luaRCFile;
 
 //////////////////////////////////////////////////////////////////////
 // dbugLog wrapper that takes error level and text string
@@ -480,18 +480,22 @@ _startInterpreter()
 	tolua_game_open(_luaVM) ;
 	dbugLog(_FLI, "started Lua interpreter") ;
 
-	static const char* rcFile = cv_luaRCFile.GetString();
-	if ( !_executeScript(rcFile) || _luaVM == NULL )
+	std::string rcFile = cv_luaPath.GetString();
+	rcFile += PATH_SEPARATOR;
+	rcFile += cv_luaRCFile.GetString();
+	if ( !_executeScript(rcFile.c_str()) || _luaVM == NULL )
 	{
 		dbugLog(_FLW, "startup file failed") ;
 		exit(0) ;
 	}
 
-	std::string locRCFile = "/playnet/wwiiol/lua/rc-" ;
-	locRCFile += HostLanguage ;
-	locRCFile += ".lua" ;
+	rcFile = cv_luaPath.GetString();
+	rcFile += PATH_SEPARATOR;
+	rcFile += "rc-";
+	rcFile += HostLanguage;
+	rcFile += ".lua";
 
-	_executeScript(locRCFile.c_str()) ;
+	_executeScript(rcFile.c_str()) ;
 
 	_luaContext() ;
 	_luaOutput.clear() ;
