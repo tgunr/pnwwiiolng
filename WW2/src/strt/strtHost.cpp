@@ -436,7 +436,7 @@ const char* g_serverName = "stratd";
 int
 main(int argc, char* argv[])
 {
-	serverEnableDebugWebServer() ;
+	serverEnableDebugWebServer(STRAT_HOST) ;
 	memInit() ;
 
 	bool runOnce = false ;

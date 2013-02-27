@@ -885,15 +885,14 @@ _killDebugWebServer()
 // Tear up an instance of the debug web server.
 
 void
-serverEnableDebugWebServer(unsigned short int port_)
+serverEnableDebugWebServer(SERVER_TYPE serverType)
 {
 	if ( Teul::uWeb::s_debugServer != NULL )
 		return;
 
-	if ( port_ == 0 )
-		port_ = WWII::Net::Ports::DebugWebServer;
+	UINT16 port = WWII::Net::Ports::DebugWebServer + static_cast<UINT16>(serverType);
 
-	Teul::uWeb::s_debugServer = new Teul::uWeb::Server(cv_teulWebPath.GetString(), port_);
+	Teul::uWeb::s_debugServer = new Teul::uWeb::Server(cv_teulWebPath.GetString(), port);
 	Teul::uWeb::s_debugServer->start();
 
 	atexit(_killDebugWebServer);
@@ -958,8 +957,8 @@ serverInit(UINT32 appVersion
 	dbugLog(_FLI, "serverInit: app:%u arena:%u servType:%u edt:%u server:{enter:%p, leave:%p, status:%p} persona:{cre:%p, rel:%p, act:%p} exit:{pers:%p, cluster:%p} err:%p"
 					, appVersion, Server::myServerInfo.stats.arenaID, serverType, exitDestType, enterCallback, leaveCallback, statusCallback, createPersonaFn, releasePersonaFn, activatePlayerFn, exitPersonaFn, exitClusterFn, errorFunction);
 
-//	Server::myServerInfo.stats.id = Server::myInterface.id;
 	Server::myServerInfo.stats.address = Server::myInterface.addr[0].ip;
+	Server::myServerInfo.stats.id = static_cast<UINT64>(Server::myServerInfo.stats.address) << 32 | Server::myInterface.pid;
 	Server::myServerInfo.stats.type = (SINT16)serverType;
 
 	Server::myServerInfo.stats.status = Server::SERVER_LOGIN;
@@ -1724,7 +1723,7 @@ int main(int argc, const char* argv[])
 	if ( teulInitTransport(LOG_TO_FILE, g_serverName, serverErrorFunction) < 0 )
 		LogAbort("Can't init transport");
 
-	serverEnableDebugWebServer();
+	serverEnableDebugWebServer(g_hostType);
 
 	memInit();
 

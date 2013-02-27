@@ -2912,7 +2912,7 @@ static const char* g_serverName = "hostd";
 int
 main(const int argc, const char* const argv[])
 {
-	serverEnableDebugWebServer() ;
+	serverEnableDebugWebServer(CELL_HOST) ;
 	memInit() ;
 
 	SINT32 retval;

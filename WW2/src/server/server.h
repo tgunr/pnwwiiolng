@@ -17,7 +17,8 @@ extern UINT32 serverGetAuthIP() ;
 // Look up the maximum allowable cluster users.
 extern UINT32 serverGetMaxClusterUsers() ;
 
-extern void serverEnableDebugWebServer(unsigned short int port_=0) ;
+extern enum SERVER_TYPE;
+extern void serverEnableDebugWebServer(SERVER_TYPE offset) ;
 
 extern void serverInitAddresses() ;
 

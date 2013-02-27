@@ -3554,7 +3554,7 @@ const char* const g_serverName = "chatd";
 int
 main(int argc, char* argv[])
 {
-	serverEnableDebugWebServer() ;
+	serverEnableDebugWebServer(CHAT_HOST) ;
 	memInit() ;
 
 	Teul::SetAppName(g_serverName) ;

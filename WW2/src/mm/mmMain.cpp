@@ -1093,7 +1093,7 @@ main(int argc, char* argv[])
 		exit(0) ;
 	}
 
-	serverEnableDebugWebServer() ;
+	serverEnableDebugWebServer(MAP_HOST) ;
 	memInit() ;
 
 	ABORT_IF(cv_appID.GetUint32() == 0 || cv_appID.GetUint32() > 255);

@@ -67,7 +67,7 @@ _recvHeartBeat(ACTION_OBJECT* const a)
 
 	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &heartBeat, sizeof(heartBeat));
 
-	dbugWrite(_FLI,"received heartbeat from %s",teulGetAddress(heartBeat.address));
+	dbugWrite(_FLI,"received heartbeat from %s", teulGetAddress(heartBeat.address));
 	heartBeat.process() ;
 
 	return a->offset;
