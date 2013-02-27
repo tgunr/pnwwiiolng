@@ -8,11 +8,13 @@
 // Originating Programmer: Marty "Vandal" Poulin
 
 #include <queue>
+#include <atomic>
 
 #include "versionNo.h"
 
 #include "server/serverFuncTypes.h"
 #include "server/server.h"
+#include "server/serverBase.h"
 #include "server/serverConfigVars.h"
 #include "server/serverIndexes.h"
 #include "server/serverInterfaceDescription.h"
@@ -123,6 +125,8 @@ static ENDPOINT* s_broadcastEndpoint = NULL;
 UINT32 g_portOffset = 0;
 extern const char* const g_serverName;
 #endif
+
+ServerBase* s_serverBase = nullptr;
 
 //////////////////////////////////////////////////////////////////////
 // Private functions.
@@ -1733,3 +1737,29 @@ int main(int argc, const char* argv[])
 	serverMain();
 }
 #endif
+
+ServerBase::ServerBase(SERVER_TYPE serverType_, const char* serverName_)
+	: m_serverType(serverType_)
+	, m_serverName(serverName_)
+{
+	// Singleton check.
+	static std::atomic<UINT32> s_initializedCount = 0;
+	ABORT_IF( ++s_initializedCount > 1 );
+
+	s_serverBase = this;
+
+	serverEnableDebugWebServer(serverType_);
+	memInit();
+
+	Teul::SetAppName(m_serverName);
+	if ( teulInitTransport(LOG_TO_FILE, m_serverName, s_ErrorDelegate) < 0 )
+		LogAbort("Can't initialize transport.");
+
+	serverInitAddresses();
+}
+
+void ServerBase::s_ErrorDelegate(SINT32 teulIndex_, const UCHAR* const data_, SINT32 size_, const TEUL_CALLBACK* const object_, SINT32 error_)
+{
+	s_serverBase->OnError(teulIndex_, data_, size_, object_, error_);
+}
+
