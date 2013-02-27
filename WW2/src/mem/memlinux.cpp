@@ -10,8 +10,6 @@
 
 extern TeulTimeMS teulClock64 ;
 
-extern Teul::uWeb::Server* serverGetDebugWebServer() ;
-
 struct Header
 {
 	static Header* FromPointer(void* const ptr)
