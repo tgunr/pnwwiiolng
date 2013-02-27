@@ -67,6 +67,8 @@
 #include "wwii/wwiiServerTypeEnums.h"
 #include "wwii/wwiiString.h"
 
+extern ConfigStr cv_luaPath;
+
 #undef DEBUG_SYNC
 
 extern UINT32 strtGetNextSerial() ;
@@ -930,7 +932,7 @@ _recvLua(ACTION_OBJECT* const a)
 
 	if ( bytes > 1 && input[0] == ';' )
 	{
-		std::string object("/playnet/wwiiol/lua/") ;
+		std::string object(cv_luaPath.GetString()) ;
 		object += input + 1 ;
 		object += ".lua" ;
 		Lua::RunScript(object.c_str()) ;

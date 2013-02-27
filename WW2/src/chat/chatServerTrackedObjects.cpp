@@ -30,6 +30,7 @@
 #include "inst/instTypes.h"
 #include "chat/chatHostMessages.h"
 #include "wwii/wwiiThreads.h"
+#include "wwii/wwiiConfigVars.h"
 
 #include <vector>
 
@@ -797,11 +798,13 @@ _getConfig(const TiXmlNode* const parent, const PPOConfig defaultConfig)
 void
 chatLoadPPOXML()
 {
-	static const char* const xmlFile = "/playnet/wwiiol/bin/data/ppo.xml" ;
+	std::string xmlFile = cv_dataDir.GetString();
+	xmlFile += PATH_SEPARATOR;
+	xmlFile += "ppo.xml";
 
 	try
 	{
-		TiXmlDocument doc(xmlFile) ;
+		TiXmlDocument doc(xmlFile.c_str()) ;
 		if ( doc.LoadFile() == false )
 			throw std::runtime_error("Unable to load ppo.xml") ;
 
@@ -809,7 +812,7 @@ chatLoadPPOXML()
 		if ( root == NULL )
 			throw std::runtime_error("Unable to find <ppos> container in ppo.xml") ;
 
-		dbugLog(_FLI, "ppo: reading file %s", xmlFile) ;
+		dbugLog(_FLI, "ppo: reading file %s", xmlFile.c_str()) ;
 
 		// Get the default timeout-minutes value from the <defaults> tag.
 		PPOConfig defaultConfig = _getConfig(root->FirstChild("defaults"), PPOConfig()) ;
@@ -838,7 +841,7 @@ chatLoadPPOXML()
 
 				UINT32 stoType = strtoul(type, NULL, 10) ;
 
-				dbugLog(_FLI, "ppo:%u.%zu %s %s [sto-type:%s]", stoType, ppoConfigs.size() + 1, name, desc, type) ;
+				dbugLog(_FLI, "ppo:%u.%u %s %s [sto-type:%s]", stoType, static_cast<UINT32>(ppoConfigs.size() + 1U), name, desc, type) ;
 
 				if ( stoType == 0 )
 				{

@@ -4,12 +4,14 @@
 #include "str/strdupptr.h"
 #include "teul/teulConfigVar.h"
 
+#if platOS == OS_WIN32
+#include "Shlobj.h"
+#endif
+
 extern bool teulGetHost(const SCHAR* address, UINT32* host);
 
 ////////////////////////////////////////////////////////////////////////////////
 // Variables.
-
-#include "sdm/sdmConfigVars.h"
 
 CVAR_STRING(dataDir, "/playnet/data", "DATA_DIR", true
 			, "Top level directory for game data.");
@@ -22,16 +24,11 @@ CVAR_STRING(originFile, "origin", "ORIGIN_FILE", true
 CVAR_STRING(stratLanguage, "en", "STRAT_LANGUAGE", true
 			, "2-letter language code for server localization.");
 
-#include "wwii/wwiidbConfigVars.h"
-
 CVAR_ADDR(wwiiDBAddress, nullptr, "WWII_DB_ADDRESS", true
 			, "IP address of the MySQL Database.");
 CVAR_STRING(wwiiDBDefaultSchema, "wwiionline", "WWII_DB_SCHEMA", true
 			, "Default schema for game data.");
 
-#include "wwii/wwiiConfigVars.h"
-
-#include "server/serverConfigVars.h"
 CVAR_STRING(clusterName, nullptr, "WWII_CLUSTER", true
 			, "Short-name for this cluster, e.g. 'dev'");
 CVAR_ADDR(ircServer, "", "WWII_IRC_SERVER", false
@@ -48,6 +45,9 @@ CVAR_STRING(authErrorUrl, "http://www.wwiionline.com/auth/errors/", "AUTH_ERROR_
 			, "URL to prefix authentication error URLs with.");
 CVAR_ADDR(baseAddress, nullptr, "BASE_ADDRESS", true
 			, "Network address (/24) for the cluster. Server's will map their last octets (x.x.x.N) into this network for inter-host communications.");
+
+CVAR_STRING(luaPath, "/playnet/wwiiol/lua", "LUA_BASE_PATH", true
+			, "Path to the Lua scripts.");
 
 ////////////////////////////////////////////////////////////////////////////////
 // Read values from the environment of configuration file.
@@ -162,30 +162,23 @@ static const char* GetValueFromEnvironmentOrConfig(const char* name_)
 	ConfigEntries& configEntries = _getConfigEntries();
 	if ( configEntries.m_read == false )
 	{
+#if platOS != OS_WIN32
+		const char* paths[] = { "./", "/playnet/etc/", "/etc/", nullptr };
+#else
+		TCHAR* homepath = nullptr;
+		SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, 0, homepath);
+		const TCHAR* paths[] = { _T(".\\"), _T("..\\"), _T("c:\\playnet\\etc\\"), homepath, nullptr };
+#endif
+
 		IO::MappedFile file;
 		// Apply defaults first.
-		if ( file.mapFile(DEF_ENVIRONMENT_CFG) )
-			_readConfigEntriesFromFile(file);
-		if ( file.mapFile(OS_ENVIRONMENT_CFG) )
-			_readConfigEntriesFromFile(file);
-#if platOS != OS_WIN32
-		// If we didn't find those files, try in /etc.
-		if ( !s_configEntriesRead )
+		for ( size_t i = 0; !configEntries.m_read && paths[i] != nullptr; ++i )
 		{
-			if ( file.mapFile(DEF_ENVIRONMENT_CFG, "/playnet/etc") )
+			if ( file.mapFile(DEF_ENVIRONMENT_CFG, paths[i]) )
 				_readConfigEntriesFromFile(file);
-			if ( file.mapFile(OS_ENVIRONMENT_CFG, "/playnet/etc") )
+			if ( file.mapFile(OS_ENVIRONMENT_CFG, paths[i]) )
 				_readConfigEntriesFromFile(file);
-
-			if ( !s_configEntriesRead )
-			{
-				if ( file.mapFile(DEF_ENVIRONMENT_CFG, "/etc") )
-					_readConfigEntriesFromFile(file);
-				if ( file.mapFile(OS_ENVIRONMENT_CFG, "/etc") )
-					_readConfigEntriesFromFile(file);
-			}
 		}
-#endif
 		configEntries.m_read = true;
 	}
 

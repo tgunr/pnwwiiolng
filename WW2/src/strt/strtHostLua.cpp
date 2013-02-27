@@ -23,13 +23,11 @@
 #include "include/luaGlue.h"
 #include "strt/strtHostDB.h"
 #include "wwii/wwiiIRC.h"
-#include "teul/teulConfigVar.h"
+#include "wwii/wwiiConfigVars.h"
 
 #include "strt/strtDotCommands.h"
 #include "include/arenaLockEnums.h"
 
-CVAR_STRING(luaPath, "/playnet/wwiiol/lua", "LUA_BASE_PATH", true
-			, "Path to the Lua scripts.");
 CVAR_STRING(luaRCFile, "rc.lua", "LUA_RC_FILE", true
 			, "Name of the startup (rc) Lua script");
 CVAR_STRING(luaStratlibFile, "stratlib.lua", "LUA_STRATLIB_FILE", true

@@ -15,17 +15,20 @@
 
 #include "chat/chatLocFile.h"
 #include "chat/chatLocalizedMessage.h"
+#include "sdm/sdmConfigVars.h"
 
 HOSTLOC g_hostMessages ;
 
 bool
 chatReadHostLocFile()
 {
-	static const char* hostLocFile = "/playnet/data/host.loc" ;
-	FILE* fp = fopen(hostLocFile, "rb") ;
+	std::string hostLocFile = cv_dataDir.GetString();
+	hostLocFile += PATH_SEPARATOR;
+	hostLocFile += "host.loc";
+	FILE* fp = fopen(hostLocFile.c_str(), "rb") ;
 	if ( fp == NULL )
 	{
-		fprintf(stderr, "Unable to read %s\n", hostLocFile) ;
+		fprintf(stderr, "Unable to read %s\n", hostLocFile.c_str()) ;
 		return false ;
 	}
 	static const size_t bufSize = 512 ;
