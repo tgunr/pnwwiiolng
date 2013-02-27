@@ -399,9 +399,9 @@ strtdbPopulateVehTypesTable()
 
 	std::string inserts =
 		"INSERT IGNORE into wwii_vehtype"
-			"(countryID,categoryID,classID,typeID,fullName,initial_rank,current_rank,next_cycle_rank,campaign_ready,cvc_value,blitz_name,added) VALUES" ;
+			"(countryID,categoryID,classID,typeID,fullName,initial_rank,current_rank,next_cycle_rank,campaign_ready,cvc_value,blitz_name,added,weapon_spec) VALUES" ;
 	std::string updates =
-		"UPDATE wwii.v_vehtype SET in_service=1 WHERE weapon_spec IN (" ;
+		"UPDATE wwii_vehtype SET in_service=1 WHERE weapon_spec IN (" ;
 	bool needInsert = false ;
 	static const size_t _BUF_SIZE = 512 ;
 	char buf[_BUF_SIZE+1] ;
@@ -426,13 +426,14 @@ strtdbPopulateVehTypesTable()
 			continue ;
 		}
 
-		snprintf(buf, _BUF_SIZE, "%c(%u,%u,%u,%u,\"%s\",%u,%u,%u,1,%u,'%s',now())"
+		snprintf(buf, _BUF_SIZE, "%c(%u,%u,%u,%u,\"%s\",%u,%u,%u,1,%u,'%s',now(),%u)"
 								, (needInsert ? ',' : ' ')
 								, spec.wCountry, spec.wCategory, spec.wClass, spec.wType
 								, weap.name
 								, weap.access(), weap.access(), weap.access()
 								, weap.value
 								, weap.name
+								, spec.asUINT32()
 								) ;
 		dbugLog(_FLIB, "%s", buf) ;
 		inserts += buf ;
