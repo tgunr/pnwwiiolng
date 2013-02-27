@@ -57,5 +57,6 @@ namespace Teul
 #include "wwii/wwiiIRC.h"
 #include "server/serverPeers.h"
 #include "wwii/wwiiServerTypeEnums.h"
+#include "teul/teulConfigVar.h"
 
 #endif // PN_PROJECT_SYSCFG_H
