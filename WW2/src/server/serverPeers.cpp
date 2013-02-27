@@ -156,7 +156,7 @@ void
 ServerConnection::doConnect()
 {
 	m_connected = false ;
-	m_teulIndex = teulOpenSend(m_ip, WWII::Net::Ports::ServerPeering, _onConnect, 20000, TCP, _onError) ;
+	m_teulIndex = teulOpenSend(m_ip, WWII::Net::Ports::ServerPeering + m_type, _onConnect, 20000, TCP, _onError) ;
 	dbugLog(_FLD, "t:%d opening to %s [%u]", m_teulIndex, teulGetAddress(m_ip), m_type) ;
 }
 
@@ -389,10 +389,11 @@ _onPeerError(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*/, con
 void
 serverInitializePeering()
 {
-	s_peeringIndex = teulOpenListen(WWII::Net::Ports::ServerPeering, _onPeerConnect, 10000, TCP, _onPeerError) ;
+	const UINT16 peeringPort = WWII::Net::Ports::ServerPeering + Server::myServerInfo.stats.type;
+	s_peeringIndex = teulOpenListen(peeringPort, _onPeerConnect, 10000, TCP, _onPeerError) ;
 	if ( s_peeringIndex < 0 )
 		LogAbort("Unable to open peering interface") ;
-	dbugLog(_FLN, "t:%d Server peering interface opened on port %u", s_peeringIndex, WWII::Net::Ports::ServerPeering) ;
+	dbugLog(_FLN, "t:%d Server peering interface opened on port %u", s_peeringIndex, peeringPort) ;
 }
 
 //////////////////////////////////////////////////////////////////////

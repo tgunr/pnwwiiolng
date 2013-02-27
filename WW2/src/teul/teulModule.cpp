@@ -288,7 +288,7 @@ _setEndpointPeerState(ENDPOINT& endpoint)
 {
 	if ( endpoint.protocol == UDB || endpoint.state() == IS_LISTENING )
 		endpoint.m_peer = true;
-	else if ( endpoint.protocol == TCP && endpoint.destPort() == WWII::Net::Ports::ServerPeering )
+	else if ( endpoint.protocol == TCP && (static_cast<UINT32>(endpoint.destPort() - WWII::Net::Ports::ServerPeering) < (UINT32)MAX_SERVER_TYPE) )
 		endpoint.m_peer = true;
 }
 

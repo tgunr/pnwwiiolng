@@ -279,7 +279,7 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 		newEndpoint->setConnected() ;
 		newEndpoint->m_parent = &endpoint;
 		newEndpoint->socket = newSock;
-		newEndpoint->m_peer = endpoint.localPort() == WWII::Net::Ports::ServerPeering ;
+		newEndpoint->m_peer = (endpoint.localPort() == WWII::Net::Ports::ServerPeering + Server::myServerInfo.stats.type);
 
 		// Look up the address of our side of the socket.
 		len = SockAddrLen ;
