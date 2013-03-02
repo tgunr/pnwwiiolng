@@ -9,17 +9,18 @@ ENDIF ( )
 # User-settable options for enabling various SSE variants.
 SET   ( PN_CLUSTER "Dev"		CACHE STRING "Target hardware on a specific cluster" )
 
-OPTION( PN_TRACER			"Enable GCC's -ftracer" ON )
-OPTION( PN_STACK_PROTECT	"Enable GCC's stack protector option" OFF )
-
 OPTION( PN_MEM_DEBUG		"Enable debugging of memory usage" ON )
-OPTION( PN_HOST_TIMERS		"Enable host performance timers" OFF )
 
 OPTION( PN_DISABLE_AUTH		"Use auth-bypass only" OFF )
-
-OPTION( PN_HEAVY_OPTS       "Enable additional heavy-hitting optimizations" OFF )
+OPTION( PN_DIFFERENT_PORTS	"Use different public-facing ports for game servers." ON )
 
 OPTION( PN_EXPERIMENTAL		"Enable expirimental files" OFF )
+IF ( !MSVC )
+	OPTION( PN_TRACER			"Enable GCC's -ftracer" ON )
+	OPTION( PN_STACK_PROTECT	"Enable GCC's stack protector option" OFF )
+	OPTION( PN_HEAVY_OPTS       "Enable additional heavy-hitting optimizations" OFF )
+	OPTION( PN_HOST_TIMERS		"Enable host performance timers" OFF )
+ENDIF ( )
 
 # User-settable option for enabling optimizations.
 IF ( PN_BUILD_TYPE MATCHES "Dev" OR CMAKE_BUILD_TYPE MATCHES "Debug" )

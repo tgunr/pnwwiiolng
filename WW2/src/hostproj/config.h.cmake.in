@@ -16,3 +16,6 @@
 #cmakedefine HAVE_SIGACTION 1
 
 #cmakedefine PN_DISABLE_AUTH 1
+
+#cmakedefine PN_DIFFERENT_PORTS 1
+
