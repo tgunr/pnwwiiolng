@@ -9,8 +9,8 @@ SET( PN_BUILD_TYPE "Beta" CACHE STRING "Select Release type: Dev/Beta/RC/Live/Ch
 
 # The default is BETA.
 IF ( NOT PN_BUILD_TYPE )
-	message(STATUS "PN_BUILD_TYPE unspecified, assuming Beta")
-	set(PN_BUILD_TYPE "Beta")
+	message(STATUS "PN_BUILD_TYPE unspecified, assuming Dev")
+	set(PN_BUILD_TYPE "Dev")
 ENDIF ( NOT PN_BUILD_TYPE )
 
 SET(PN_APP_ID ${PN_BETA_APPID})
