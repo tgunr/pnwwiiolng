@@ -18,14 +18,14 @@ static LOGICAL listening = FALSE;
 static SINT32 hostListenTCP;
 static SINT32 arenaID;
 
-extern SINT32 dbseInstallHostCallbacks() ;
+extern SINT32 dbseInstallHostCallbacks();
 
 static void _errorFunction(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 error)
 {
 	if (error == ENOTCONN)
-		dbugLog(_FLA, "connection index %d closed", teulIndex);
+		dbugLog(_FLW, "t:%d connection closed", teulIndex);
 	else
-		dbugLog(_FLA,"recieved error %d on index %d",error,teulIndex);
+		dbugLog(_FLA,"t:%d error %d", error, teulIndex);
 
 }
 
@@ -40,11 +40,10 @@ SINT32 dbseInitHost(UINT16 port)
 {
 	ABORT_IF(dbseInstallHostCallbacks() < 0);
 
-	dbugLog(_FLI, "Opening listensocket for arena:%d on port:%d", arenaID,port);
+	dbugLog(_FLI, "Opening listensocket for arena:%d on port:%d", arenaID, port);
 
-	hostListenTCP = teulOpenListen(port, _acceptFunction, 20000, TCP, _errorFunction) ;
+	hostListenTCP = teulOpenListen(port, _acceptFunction, 20000, TCP, _errorFunction);
 	ABORT_IF(hostListenTCP < 0);
 
 	return hostListenTCP;
 }
-

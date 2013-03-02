@@ -33,16 +33,15 @@
 
 #define DEF_ERR_FLAGS STD_ERR
 
-DBCONNECTION dbConnection ;
-DBHANDLE dbh ;
+DBCONNECTION dbConnection;
+DBHANDLE dbh;
 
 static void _errorFunction(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 error)
 {
 	if (error == ENOTCONN)
-		dbugLog(_FLA, "connection index %d closed", teulIndex);
+		dbugLog(_FLW, "t:%d connection closed", teulIndex);
 	else
-		dbugLog(_FLA,"recieved error %d on index %d",error,teulIndex);
-
+		dbugLog(_FLA, "t:%d recieved error %d", error, teulIndex);
 }
 
 static void
@@ -50,7 +49,7 @@ _initDB()
 {
 	ABORT_IF_EX(dbh.connect(dbConnection) == false, "DBD can't operate without a database connection.");
 
-	dbugLog(_FLI, "Connected to WWII_DB") ;
+	dbugLog(_FLI, "Connected to WWII_DB");
 }
 
 static const char* g_serverName = "dbd";
@@ -59,43 +58,40 @@ int main(int argc, char* argv[])
 {
 	SINT32 listenIndex;
 
-	Teul::SetAppName(g_serverName) ;
+	Teul::SetAppName(g_serverName);
 	if (teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction) < 0)
 	{
-		fprintf(stderr, "Unable to intialize teulTransport\n") ;
-		exit(-ENOTCONN) ;
+		fprintf(stderr, "Unable to intialize teulTransport\n");
+		exit(-ENOTCONN);
 	}
 	dbugSetWriteLevel(Debug::ERR_INFO | DEF_ERR_FLAGS);
 	dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 	dbugLog(_FLI,"Database Proxy Host starting. Compiled %s at %s", __DATE__, __TIME__);
 
-	threadsReadDBEnvironment() ;
+	threadsReadDBEnvironment();
 
 	if ( mmdbInstallHostCallbacks() || chatdbInstallHostCallbacks() )
-	{
 		LogAbort("Error installing callbacks");
-	}
 
-	_initDB() ;
+	_initDB();
 
-	wwiiIRCInitialize(Server::myInterface.addr[0].ip, false) ;
-	wwiiIRCActivate(true) ;
+	wwiiIRCInitialize(Server::myInterface.addr[0].ip, false);
+	wwiiIRCActivate(true);
 
 	listenIndex = dbseInitHost(WWII::Net::Ports::Dbse);
 
-	OpenThreads::Thread::microSleep(50 * 1000) ;
+	OpenThreads::Thread::microSleep(50 * 1000);
 
-	wwiiIRCChannelMessage("-sys,#servers", "++ Running ++") ;
+	wwiiIRCChannelMessage("-sys,#servers", "++ Running ++");
 
 	while (1)
 	{
 		teulUpdateTransport(50);
-		threadsLogging() ;
+		threadsLogging();
 	}
 
-	wwiiIRCTerminate("[[ Shutting Down ]]") ;
+	wwiiIRCTerminate("[[ Shutting Down ]]");
 	teulClose(listenIndex);
 	return(0);
-
 }
 
