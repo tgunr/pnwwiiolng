@@ -279,7 +279,11 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 		newEndpoint->setConnected() ;
 		newEndpoint->m_parent = &endpoint;
 		newEndpoint->socket = newSock;
+#if platBuild == TEUL_SERVER
 		newEndpoint->m_peer = (endpoint.localPort() == WWII::Net::Ports::ServerPeering + Server::myServerInfo.stats.type);
+#else
+		newEndpoint->m_peer = false;
+#endif
 
 		// Look up the address of our side of the socket.
 		len = SockAddrLen ;

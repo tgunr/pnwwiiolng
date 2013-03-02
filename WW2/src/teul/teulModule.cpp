@@ -29,11 +29,13 @@
 #include "teul/teulVersion.h"
 #include "wwii/wwiiNetPorts.h"
 
+
 #if platOS == OS_WIN32
 #include <winsock2.h>
 #include <WinInet.h>
 #include <Winineti.h>
 #include <WinIoCtl.h>
+#include <Ws2tcpip.h>
 #pragma comment(lib, "event.lib")
 #pragma comment(lib, "ws2_32.lib")
 #include <iphlpapi.h>
@@ -286,10 +288,14 @@ teulModShutdown(void)
 static void
 _setEndpointPeerState(ENDPOINT& endpoint)
 {
+#if platBuild == TEUL_SERVER
 	if ( endpoint.protocol == UDB || endpoint.state() == IS_LISTENING )
 		endpoint.m_peer = true;
 	else if ( endpoint.protocol == TCP && (static_cast<UINT32>(endpoint.destPort() - WWII::Net::Ports::ServerPeering) < (UINT32)MAX_SERVER_TYPE) )
 		endpoint.m_peer = true;
+#else
+	endpoint.m_peer = false;
+#endif
 }
 
 //////////////////////////////////////////////////////////////////////
