@@ -432,7 +432,6 @@ _bindDgramSocket(ENDPOINT& endpoint, sockaddr_in& sockAddr)
 {
 	socklen_t len = sizeof(sockAddr);	// Needed for getsockname.
 
-	printf("binding %s:%u\n", inet_ntoa(sockAddr.sin_addr), htons(sockAddr.sin_port));
 	if ( bind(endpoint.socket, (struct sockaddr*)&sockAddr, len) < 0 )
 		throw Teul::OpenError("bind() failed");
 
@@ -446,6 +445,9 @@ _bindDgramSocket(ENDPOINT& endpoint, sockaddr_in& sockAddr)
 					, sockAddr.sin_port
 					);
 }
+
+//////////////////////////////////////////////////////////////////////
+// Bind a socket for a multi-cast UDB port/connection.
 
 static void
 _bindMulticast(ENDPOINT& endpoint)
