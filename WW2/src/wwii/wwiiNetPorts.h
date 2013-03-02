@@ -26,12 +26,15 @@ namespace WWII
 			,	ServerPeering = 6090				// For server<->server mesh.
 
 			// Public ports (customer facing)
-			,	StandardPublicPort = 27015			// Standard game server port
-
 			,	AuthHost = 27015					// Auth Server port
 			,	MapHost = 27015						// Map/Login server
-			,	ChatHost = 27015					// Chat host server
-			,	CellHost = 27015					// Cell host (game world) server
+#if defined(PN_DIFFERENT_PORTS)
+			,	ChatHost = 27016					// Chat host server
+			,	CellHost = 27017					// Cell host (game world) server
+#else
+			,	ChatHost = MapHost
+			,	CellHost = MapHost
+#endif
 
 			,	GameBase	=	27020				// Assign ports here and up.
 			,	PeerBase	=	6100				// Peer listening ports.
