@@ -464,6 +464,7 @@ SINT32 fioQuery()
 
 SINT32 fioDescriptorType(int fd)
 {
+	static_assert(FIOA_FD_START > FIOD_FD_START, "FIOA fds must be bigger than FIOD fds.");
 	if(fd < 0) return -1;
 	if(fd >= FIOA_FD_START)
 		return ISARCHIVE;

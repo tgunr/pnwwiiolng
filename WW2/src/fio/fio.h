@@ -11,6 +11,12 @@
 #define fioSEEK_CUR   SEEK_CUR
 #define fioSEEK_END   SEEK_END
 
+enum
+{
+	FIOD_FD_START = (1 << 16),
+	FIOA_FD_START = (1 << 17),
+};
+
 #if platBuild != TEUL_SERVER
 namespace Fio
 {
@@ -25,8 +31,6 @@ namespace Fio
 #endif
 
 #if ! defined(LIMITED_FIO) || LIMITED_FIO == 0
-	#define FIOA_FD_START 1024
-
 	enum
 	{
 		ISDIRECTORY,

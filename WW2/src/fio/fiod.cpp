@@ -306,6 +306,14 @@ static bool _mapFile(IO::MappedFile& ioMap, const char* name, bool userdir, wcha
 	strcpy(buffer, DataPath) ;
 	strcat(buffer, name) ;
 
+#if platOS == OS_WIN32
+	for ( size_t i = 0; i < sizeof(buffer) && buffer[i]; ++i )
+	{
+		if ( buffer[i] == '/' )
+			buffer[i] = PATH_SEPARATOR;
+	}
+#endif
+
 	if(!WWII::ConvertChars(buffer, widePath, wsize))
 		return false;
 
@@ -324,7 +332,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 	wchar_t widePath[PATH_MAX + 1] = L"";
 	char asciiPath[PATH_MAX + 1] = "";
 
-	const int fd = s_filemap.empty() ? 65537 : (s_filemap.rbegin()->first + 1);
+	const int fd = s_filemap.empty() ? FIOD_FD_START : (s_filemap.rbegin()->first + 1);
 	ABORT_IF( s_filemap.find(fd) != s_filemap.end() );
 	IO::MappedFile* ioMap = new IO::MappedFile();
 	s_filemap[fd] = ioMap;
