@@ -246,26 +246,97 @@ fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
 
-#include "include/io_mapped_file.h"
-typedef std::map<int, IO::MappedFile*> IOMAPPED_FILES;
-static IOMAPPED_FILES s_filemap;
+namespace Fiod
+{
+	struct FileState
+	{
+		FileState() : basePtr(NULL), curPtr(NULL), endPtr(NULL), bytes(0) {}
+		~FileState() { if ( basePtr != NULL ) memFree(basePtr) ; }
+
+		char* basePtr ;
+		char* curPtr ;
+		char* endPtr ;
+		size_t bytes ;
+
+		void Assign(char* base, size_t numBytes)
+		{
+			curPtr = basePtr = base ;
+			endPtr = basePtr + numBytes ;
+			bytes = numBytes ;
+		}
+
+		size_t  BytesRemaining() const { return (size_t)(endPtr - curPtr) ; }
+		bool IsAtEof() const { return curPtr >= endPtr ; }
+
+		size_t Read(void* dest, size_t length)
+		{
+			const size_t readLen = std::min(BytesRemaining(), length) ;
+	  if ( readLen == 4 )
+	  {
+		char* dst = (char*) dest;
+		*dst++ = *curPtr++;
+		*dst++ = *curPtr++;
+		*dst++ = *curPtr++;
+		*dst++ = *curPtr++;
+	  }
+			else if ( readLen > 0 )
+			{
+				memcpy(dest, curPtr, readLen) ;
+				curPtr = curPtr + readLen ;
+			}
+			return readLen ;
+		}
+
+		size_t Seek(size_t offset, int from)
+		{
+			char* newPtr = NULL ;
+			switch ( from )
+			{
+			case fioSEEK_SET:
+				newPtr = basePtr + offset ;
+			break ;
+			case fioSEEK_CUR:
+				newPtr = curPtr + offset ;
+			break ;
+			case fioSEEK_END:
+				newPtr = endPtr + offset ;
+			break ;
+			}
+			if ( newPtr < basePtr || newPtr > endPtr )
+				return (size_t)-1 ;
+			curPtr = newPtr ;
+			return (size_t)(curPtr - basePtr) ;
+		}
+	} ;
+}
+
+// We use a map of file descriptors to track memory allocations
+// for fiod files.
+
+#if platOS == OS_LINUX
+typedef std::unordered_map<SINT32, Fiod::FileState> FILE_MAP ;
+#else
+typedef stdext::hash_map<SINT32, Fiod::FileState> FILE_MAP;
+#endif
+
+static FILE_MAP s_fileMap ;
 
 //////////////////////////////////////////////////////////////////////
 // Lookup a Fiod::FileState from a descriptor
 
 static int lastFd = -1 ;
-static IO::MappedFile* lastResult = NULL ;
+static Fiod::FileState* lastResult = NULL ;
 
-static IO::MappedFile*
+static Fiod::FileState*
 _lookupFileState(int fd)
 {
 	if ( fd != lastFd )
 	{
-		IOMAPPED_FILES::iterator it = s_filemap.find(fd) ;
-		if ( it != s_filemap.end() )
+		FILE_MAP::iterator it = s_fileMap.find(fd) ;
+		if ( it != s_fileMap.end() )
 		{
 			lastFd = fd ;
-			lastResult = it->second ;
+			lastResult = &it->second ;
 		}
 		else
 		{
@@ -278,83 +349,97 @@ _lookupFileState(int fd)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Get me the name and size of a given file.
-
-static bool _mapFile(IO::MappedFile& ioMap, const char* name, bool userdir, wchar_t* widePath, size_t wsize)
-{
-	char buffer[PATH_MAX + 1];
-
-#if platBuild == TEUL_CLIENT && platOS == OS_WIN32
-	if(userdir)
-	{
-		// no bounds checking here, nice
-		strcpy(buffer, UserDataPath);
-		strcat(buffer, (char*)name);
-
-		if(WWII::ConvertChars(buffer, widePath, wsize))
-		{
-			if (ioMap.mapFile(widePath))
-				return true;
-		}
-	// Else fall through normally
-	}
-#else
-	(void)userdir;
-#endif
-
-	// think this works as char* because when we get to here we're talking about relative paths which are all ascii?
-	strcpy(buffer, DataPath) ;
-	strcat(buffer, name) ;
-
-#if platOS == OS_WIN32
-	for ( size_t i = 0; i < sizeof(buffer) && buffer[i]; ++i )
-	{
-		if ( buffer[i] == '/' )
-			buffer[i] = PATH_SEPARATOR;
-	}
-#endif
-
-	if(!WWII::ConvertChars(buffer, widePath, wsize))
-		return false;
-
-#if platOS == OS_WIN32
-	return ioMap.mapFile(widePath);
-#else
-	return ioMap.mapFile(buffer);
-#endif
-}
-
-//////////////////////////////////////////////////////////////////////
 // cross-platform 'open' wrapper.
 
 int fiodOpen(const char* filename, bool userdir, int prereadSize)
 {
-	wchar_t widePath[PATH_MAX + 1] = L"";
-	char asciiPath[PATH_MAX + 1] = "";
+	wchar_t widePath[PATH_MAX + 1];
+  char asciiPath[PATH_MAX + 1];
+  *asciiPath = 0;
 
-	const int fd = s_filemap.empty() ? FIOD_FD_START : (s_filemap.rbegin()->first + 1);
-	ABORT_IF( s_filemap.find(fd) != s_filemap.end() );
-	IO::MappedFile* ioMap = new IO::MappedFile();
-	s_filemap[fd] = ioMap;
-	if ( !_mapFile(*ioMap, filename, userdir, widePath, sizeof(widePath)) )
+  off_t fileSize = _getFilePathAndSize(filename, userdir, widePath, sizeof(widePath));
+
+	if ( fileSize < 0 )
 	{
-		delete ioMap;
-		s_filemap.erase(fd);
-		return -1;
+		return - 1;
 	}
 
-	WWIIConvert(widePath, asciiPath);
-	recordRef(asciiPath);
+  if ( prereadSize > 0 )
+  {
+	fileSize = prereadSize; // if too big will be caught below
+  }
+
+  WWIIConvert(widePath, asciiPath);
+
+	// Add one byte so I can make absolutely sure there
+	// is a null byte at the end :)
+	// Then round the size up to the next page size to
+	// limit memory fragmentation.
+
+	static const size_t _PAGE_SIZE = 4096 ;		// *MUST* be a power of two
+	const size_t allocSize = ((size_t)fileSize + 1 + _PAGE_SIZE) & ~_PAGE_SIZE ;
+
+	char* mem = (char*)memAlloc(allocSize) ;
+	if ( mem == NULL )
+	{
+#if platBuild == TEUL_SERVER
+		LogAbort("out of memory opening %s", asciiPath) ;
+#else
+		Write_Log(LOG_ALL, LOG_FATAL, "out of memory opening %s", asciiPath) ;
+		piExitProgram(__FILE__, __LINE__, "out of memory") ;
+		return -1;
+#endif
+	}
+
+	mem[fileSize] = 0 ;
+
+	int fd = -1 ;
+
+	try
+	{
+#if platOS == OS_WIN32
+		// already been converted and path separators fixed
+		fd = OS_WOPEN(widePath, O_RDONLY | O_BINARY);
+		recordRef(asciiPath);
+#else
+		fd = OS_OPEN(os_file_path(asciiPath), O_RDONLY | O_BINARY);
+		recordRef(os_file_path(asciiPath));
+#endif
+		if ( fd < 0 )
+			throw "open failed" ;
+
+		// Sanity check: we don't already think we have this
+		// descriptor open.
+		assert( s_fileMap.find(fd) == s_fileMap.end() ) ;
+
+	// Try to read the file contents into the allocation
+	off_t bytesRead = OS_READ(fd, mem, fileSize) ;
+	if ( bytesRead < fileSize )
+	  throw "read failed/truncated" ;
+
+	// Index this allocation into the file map
+	s_fileMap[fd].Assign(mem, fileSize) ;
+	}
+	catch ( const char* cause )
+	{
+		// Report
+#if platBuild == TEUL_SERVER
+		dbugLog(_FLD, "fiod:%s:%s", cause, asciiPath) ;
+#else
+		Write_Log(LOG_OLD, LOG_INFO, "fiod:%s:%s", cause, asciiPath) ;
+#endif
+
+		// Relinquish the file descriptor
+		if ( fd >= 0 )
+			OS_CLOSE(fd) ;
+
+		// Free the memory
+		memFree(mem) ;
+
+		return -1 ;
+	}
 
 	return fd ;
-}
-
-//////////////////////////////////////////////////////////////////////
-// Provide access to the IO Mapped File behind an fd.
-
-IO::MappedFile* fiodGetMappedFile(int fd)
-{
-	return fd >= 0 ? _lookupFileState(fd) : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -362,11 +447,12 @@ IO::MappedFile* fiodGetMappedFile(int fd)
 
 size_t fiodRead(int fd, void* dptr, size_t length)
 {
-	IO::MappedFile* state = _lookupFileState(fd) ;
-	if ( state != NULL )
-		return state->read(dptr, length);
-	else
+	Fiod::FileState* state = _lookupFileState(fd) ;
+
+	if ( state == NULL )
 		return (int)OS_READ(fd, dptr, length) ;
+
+	return state->Read(dptr, length) ;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -374,23 +460,12 @@ size_t fiodRead(int fd, void* dptr, size_t length)
 
 size_t fiodSeek(int fd, size_t offset, int from)
 {
-	IO::MappedFile* state = _lookupFileState(fd) ;
-	if ( state != NULL )
-	{
-		switch (from)
-		{
-		case fioSEEK_CUR:
-			return state->seekCur(offset);
-		case fioSEEK_SET:
-			return state->seekSet(offset);
-		case fioSEEK_END:
-			return state->seekEnd(offset);
-		default:
-			return (size_t)-1;
-		}
-	}
-	else
+	Fiod::FileState* state = _lookupFileState(fd) ;
+
+	if ( state == NULL )
 		return OS_LSEEK(fd, offset, from) ;
+
+	return state->Seek(offset, from) ;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -398,11 +473,12 @@ size_t fiodSeek(int fd, size_t offset, int from)
 
 int fiodEOF(int fd)
 {
-	IO::MappedFile* state = _lookupFileState(fd) ;
-	if ( state != NULL )
-		return state->atEof() ? 1 : 0;
-	else
+	Fiod::FileState* state = _lookupFileState(fd) ;
+
+	if ( state == NULL )
 		return -1 ;
+
+	return state->IsAtEof() ? 1 : 0 ;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -410,16 +486,21 @@ int fiodEOF(int fd)
 
 void fiodClose(int fd)
 {
-	IO::MappedFile* state = _lookupFileState(fd);
-	if ( state != NULL )
+	OS_CLOSE(fd) ;
+
+	if ( lastFd == fd )
 	{
-		delete state;
-		s_filemap.erase(fd);
-		lastFd = -1;
-		lastResult = NULL;
+		lastFd = -1 ;
+		lastResult = NULL ;
 	}
-	else
-		OS_CLOSE(fd) ;
+
+	FILE_MAP::iterator it = s_fileMap.find(fd) ;
+
+	if ( it != s_fileMap.end() )
+	{
+		// Destructor will handle cleanup for us.
+		s_fileMap.erase(it) ;
+	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -649,18 +730,29 @@ int fiodOpenWrite(const char* filename, bool /* userdir */)
 #ifdef LIMITED_FIO
 size_t fiodGetString(int fd, char* string, size_t length)
 {
-	IO::MappedFile* state = _lookupFileState(fd) ;
-	if ( state != NULL )
-	{
-		return state->readline(string, length);
-	}
-	else
+	FILE_MAP::iterator it = s_fileMap.find(fd) ;
+	if ( it == s_fileMap.end() )
 	{
 		string[0] = 0 ;
 		///TODO: OGS: Audit callers and make them take
 		/// -1 as a return value.
 		return 0 ;
 	}
+
+	Fiod::FileState& fs = it->second ;
+	const char* const endPtr = fs.curPtr + std::min((size_t)length, fs.BytesRemaining()) ;
+	char* writePtr = string ;
+	while ( fs.curPtr < endPtr && *fs.curPtr && *fs.curPtr != '\n' )
+	{
+		*(writePtr++) = *(fs.curPtr++) ;
+	}
+	*writePtr = 0 ;
+
+	// Treat the \n as consumed.
+	if ( *fs.curPtr == '\n' )
+		++fs.curPtr ;
+
+	return (size_t)(writePtr - string) ;
 }
 #endif
 
