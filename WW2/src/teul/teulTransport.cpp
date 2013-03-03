@@ -49,7 +49,7 @@ void dummyLogFn(const char* const, ...)
 
 void (*Teul::g_logFnPtr) (const char* const, ...) = dummyLogFn ;
 
-static LOGICAL				_transportInited,_transportClosing;
+static bool _transportInited, _transportClosing;
 
 // For client network selection
 UINT32 _hostAddressMask = 0 ;
@@ -443,7 +443,7 @@ teulInitTransport(SINT32 logType
 					, ERROR_FUNCTION* errorFnPtr
 					, Teul::LoggingFn* const logFnPtr)
 {
-	if ( _transportInited == TRUE )
+	if ( _transportInited )
 	{
 		dbugWrite(_FLAS, "can't initialize teul transport twice, must close first");
 		return -EINVAL;
@@ -464,11 +464,11 @@ teulInitTransport(SINT32 logType
 
 	teulSyncClock();
 
-	_transportInited = TRUE;
+	_transportInited = true;
 
 	dbugLog(_FLI, "Initializing TeulKit transport [compiled %s %s]", __DATE__, __TIME__);
 
-	_transportClosing = FALSE;
+	_transportClosing = false;
 
 	if ( logFnPtr )
 		Teul::g_logFnPtr = logFnPtr ;
@@ -498,7 +498,12 @@ teulUpdateTransport(const TeulTimeMS& duration_)
 	if ( _transportClosing )
 		return ;
 
+#if platBuild == TEUL_SERVER
 	ABORT_UNLESS_EX(_transportInited, "transport can't update without being initialized.");
+#else
+	if ( _transportInited == false )
+		return;
+#endif
 
 	teulModIdle(duration_);
 
@@ -529,7 +534,7 @@ void teulCloseTransport(void)
 
 	teulFreeDatagramPool() ;
 
-	_transportInited = FALSE;
+	_transportInited = false;
 }
 
 // after you have opened your connection installed your CALLBACK,
