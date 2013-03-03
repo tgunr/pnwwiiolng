@@ -175,7 +175,7 @@ wwiiReadHCUnits()
 					, newUnit) ;
 		}
 
-		dbugLog(_FLI, "read %zu hcunits", hcUnits.size()) ;
+		dbugLog(_FLI, "read %u hcunits", static_cast<UINT32>(hcUnits.size())) ;
 
 		return true ;
 	}
