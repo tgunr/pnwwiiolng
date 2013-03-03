@@ -776,6 +776,10 @@ _LogAbort(const char* file_, int line_, unsigned int error_, const char* asserti
 	}
 	MessageBoxA(0, message, caption, MB_OK | MB_ICONERROR | MB_APPLMODAL);
 
+#if defined(DEBUG)
+	__debugbreak();
+#endif
+
 	exit(error_ != 0 ? error_ : -1);
 #else
 	if ( _logger.isInitialized() )
