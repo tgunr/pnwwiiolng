@@ -460,7 +460,7 @@ STO_JOULES::receive(SINT32 teulIndex, STO_JOULES& incoming)
 		return -EINVAL ;
 	}
 
-	dbugLog(_FLD, "t:%d p:%u c:%s %zu sto joules messages ", teulIndex, player->playerID(), player->callsign(), incoming.data().size()) ;
+	dbugLog(_FLD, "t:%d p:%u c:%s %" PRSizeT " sto joules messages ", teulIndex, player->playerID(), player->callsign(), incoming.data().size()) ;
 
 	for ( auto it = incoming.data().begin() ; it != incoming.data().end() ; ++it )
 	{

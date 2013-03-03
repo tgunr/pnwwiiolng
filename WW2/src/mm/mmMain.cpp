@@ -1089,7 +1089,7 @@ main(int argc, char* argv[])
 {
 	if ( argc > 1 && strcmp(argv[1], "-teul") == 0 )
 	{
-		printf("sizeof(E) = %zu, sizeof(EI) = %zu, sizeof(wwiiPlayer) = %zu, sizeof(Player) = %zu\n", sizeof(ENDPOINT), sizeof(EndpointImpl), sizeof(wwiiPlayer), sizeof(Player)) ;
+		printf("sizeof(E) = %" PRSizeT ", sizeof(EI) = %" PRSizeT ", sizeof(wwiiPlayer) = %" PRSizeT ", sizeof(Player) = %" PRSizeT "\n", sizeof(ENDPOINT), sizeof(EndpointImpl), sizeof(wwiiPlayer), sizeof(Player)) ;
 		exit(0) ;
 	}
 

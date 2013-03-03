@@ -396,7 +396,7 @@ _pushPlayerToServer(Server::ServerInfo& server, PlayerStatusNode& psn)
 	if ( result.second == true && server.stats.address == Server::myServerInfo.stats.address )
 	{
 		server.stats.addPlayer();
-		dbugLog(_FLWB, " numPlayers now %zu, m_players size %zu", server.stats.numPlayers(), server.m_players.size());
+		dbugLog(_FLWB, " numPlayers now %" PRSizeT ", m_players size %" PRSizeT "", server.stats.numPlayers(), server.m_players.size());
 	}
 
 	return retval;

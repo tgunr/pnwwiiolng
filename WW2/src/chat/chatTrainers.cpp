@@ -27,7 +27,7 @@ _addTrainer(const playerid_t playerID)
 
 	s_trainers.insert(it, playerID) ;
 
-	dbugLog(_FLI, "p:%u added to trainer list (%zu total)", playerID, s_trainers.size()) ;
+	dbugLog(_FLI, "p:%u added to trainer list (%" PRSizeT " total)", playerID, s_trainers.size()) ;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -44,7 +44,7 @@ _removeTrainer(const playerid_t playerID)
 
 	s_trainers.erase(it) ;
 
-	dbugLog(_FLI, "p:%u removed from trainer list (%zu total)", playerID, s_trainers.size()) ;
+	dbugLog(_FLI, "p:%u removed from trainer list (%" PRSizeT " total)", playerID, s_trainers.size()) ;
 }
 
 //////////////////////////////////////////////////////////////////////

@@ -207,7 +207,7 @@ _recvHostConfig(ACTION_OBJECT* const a)
 {
 	if ( a->sizeInBytes() != sizeof(host_config) )
 	{
-		dbugLog(_FLA, "broadcast host configuration size mismatch: rx:%zu, expected:%zu", (size_t)a->sizeInBytes(), sizeof(host_config)) ;
+		dbugLog(_FLA, "broadcast host configuration size mismatch: rx:%" PRSizeT ", expected:%" PRSizeT "", (size_t)a->sizeInBytes(), sizeof(host_config)) ;
 		return -EINVAL ;
 	}
 

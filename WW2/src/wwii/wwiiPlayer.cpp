@@ -159,7 +159,7 @@ wwiiPlayer::operator new(size_t actualSize)
 	}
 	*ptr = allocSize ;
 
-	dbugLog(_FLD, "+player[%zu => pool #%u:%zu] => %p", actualSize, poolNo, allocSize, ptr) ;
+	dbugLog(_FLD, "+player[%" PRSizeT " => pool #%u:%" PRSizeT "] => %p", actualSize, poolNo, allocSize, ptr) ;
 
 	// Return the address of data after StorageHeader
 	return ++ptr ;
@@ -178,7 +178,7 @@ wwiiPlayer::operator delete(void* p)
 	UINT32 poolNo = _getPoolNo((size_t)*ptr) ;
 	Pool& pool = pools[poolNo] ;
 
-	dbugLog(_FLD, "-player[%zu => pool #%u:%zu] => %p", (size_t)*ptr, poolNo, (size_t)*ptr, ptr) ;
+	dbugLog(_FLD, "-player[%" PRSizeT " => pool #%u:%" PRSizeT "] => %p", (size_t)*ptr, poolNo, (size_t)*ptr, ptr) ;
 
 	size_t newSize = 0 ;
 	allocMutex.lock() ;
@@ -205,7 +205,7 @@ wwiiPlayer::operator delete(void* p)
 
 	if ( newSize > 0 )
 	{
-		dbugLog(_FLD, "playerPool#%u grown to %zu spaces", poolNo, newSize) ;
+		dbugLog(_FLD, "playerPool#%u grown to %" PRSizeT " spaces", poolNo, newSize) ;
 	}
 }
 

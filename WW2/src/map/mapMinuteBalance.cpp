@@ -72,7 +72,7 @@ mapChargeMinutes()
 	TeulTimeMS endTime = teulClock64 ;
 	TeulTimeMS takenTime = endTime - startTime ;
 	if ( takenTime > 10 )
-		dbugLog(_FLM, "mmb: %s took %llu milliseconds to charge %zu of %zu customers", __FUNCTION__, takenTime, charged, g_players.size()) ;
+		dbugLog(_FLM, "mmb: %s took %llu milliseconds to charge %" PRSizeT " of %" PRSizeT " customers", __FUNCTION__, takenTime, charged, g_players.size()) ;
 
 	// Schedule the next run for a second from now
 	nextRun = teulClock64 + 1000 ;

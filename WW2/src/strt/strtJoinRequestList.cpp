@@ -215,7 +215,7 @@ JOIN_LIST::Add(WeapJoinRequestNode* node)
 		node->m_joinList = this ;
 
 		if ( g_logDebug )
-			dbugLog(_FLD, "p:%u c:%s ptr:%p list:%p Added Node (%zu)"
+			dbugLog(_FLD, "p:%u c:%s ptr:%p list:%p Added Node (%" PRSizeT ")"
 							, node->m_playerID, chatGetCallsign(node->m_handle), node, this, m_list.size()) ;
 	}
 	catch ( const char* error )
@@ -253,7 +253,7 @@ JOIN_LIST::Extract(WeapJoinRequestNode* node)
 			m_list.resize(m_list.size() - 1) ;
 
 			if ( g_logDebug )
-				dbugLog(_FLD, "p:%u c:%s ptr:%p list:%p Removed Node [%zu]"
+				dbugLog(_FLD, "p:%u c:%s ptr:%p list:%p Removed Node [%" PRSizeT "]"
 								, node->m_playerID, chatGetCallsign(node->m_handle), node, this, m_list.size()) ;
 
 			return ;

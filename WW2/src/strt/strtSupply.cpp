@@ -499,7 +499,7 @@ StratHCUnit::processResupply()
 		}
 	}
 
-	dbugLog(_FLD, "hcu:%u processed %u tickets resupplyQueue has %zu queues left", unitID(), processed, resupply.size()) ;
+	dbugLog(_FLD, "hcu:%u processed %u tickets resupplyQueue has %" PRSizeT " queues left", unitID(), processed, resupply.size()) ;
 
 	if ( resupply.empty() )
 		_resupplyConsumers.erase(this) ;
@@ -558,7 +558,7 @@ const char*
 StratHCUnit::describe() const
 {
 	static char buffer[400] ;
-	sprintf(buffer, "hcu:%u(%s) toe:%s(nv=%zu) %s dkts=%zu, tkts=%u, supplies=%zu, xfers=%zu"
+	sprintf(buffer, "hcu:%u(%s) toe:%s(nv=%" PRSizeT ") %s dkts=%" PRSizeT ", tkts=%u, supplies=%" PRSizeT ", xfers=%" PRSizeT ""
 					, unitID(), callsign()
 					, toeTemplateHeader() ? toeTemplateHeader()->name().c_str() : "none", m_toe.size()
 					, (m_impl.m_inTransit ? "InTransit" : "Stationed")

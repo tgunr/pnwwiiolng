@@ -85,7 +85,7 @@ mmAddMinor(Player* player, UINT32 priorPlayedTime)
 
 	g_minors.insert(player) ;
 
-	dbugLog(_FLD, "t:%d p:%u c:%s added to minor's list now %zu"
+	dbugLog(_FLD, "t:%d p:%u c:%s added to minor's list now %" PRSizeT ""
 					, player->teulIndex(), player->playerID(), player->callsign(), g_minors.size()
 			) ;
 }
@@ -107,7 +107,7 @@ mmRemoveMinor(Player* player)
 
 	g_minors.erase(player) ;
 
-	dbugLog(_FLD, "t:%d p:%u c:%s removed from minor's list now %zu"
+	dbugLog(_FLD, "t:%d p:%u c:%s removed from minor's list now %" PRSizeT ""
 					, player->teulIndex(), player->playerID(), player->callsign(), g_minors.size()
 			) ;
 }

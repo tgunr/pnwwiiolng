@@ -135,7 +135,7 @@ strtAddSyncPeer(UINT32 address)
 
 	synclist.push_back(ServerSync(address)) ;
 
-	dbugLog(_FLN, "Queued %s for synchronization. %zu servers on queue"
+	dbugLog(_FLN, "Queued %s for synchronization. %" PRSizeT " servers on queue"
 					, teulGetAddress(address)
 					, synclist.size()
 					) ;

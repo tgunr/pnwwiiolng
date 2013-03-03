@@ -600,7 +600,7 @@ _checkUnit(StratHCUnit* unit, const CPStruct* cp)
 void
 CPStruct::checkHCUnits()
 {
-	dbugLog(_FLI, "cp:%u name:%s hcus:%zu side:%u ", uOID, name, m_units.size(), side) ;
+	dbugLog(_FLI, "cp:%u name:%s hcus:%" PRSizeT " side:%u ", uOID, name, m_units.size(), side) ;
 
 	HCUNIT_INDEX unitList = m_units ;
 	HCUNIT_INDEX::iterator it ;

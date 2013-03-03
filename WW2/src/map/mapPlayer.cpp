@@ -450,7 +450,7 @@ mapCheckSideCounts()
 	static Teul::BlipRepeater nextReport(60 * 1000) ;
 	if ( nextReport )
 	{
-		dbugLog(_FLI, "personas: %zu; campaign player counts: %u+%u+%u+%u = %u. campaign spawned players: %u+%u = %u"
+		dbugLog(_FLI, "personas: %" PRSizeT "; campaign player counts: %u+%u+%u+%u = %u. campaign spawned players: %u+%u = %u"
 							, g_players.size()
 							, sideCounts[0], sideCounts[1], sideCounts[2], sideCounts[3], playerCount
 							, g_spawnedPlayers[1], g_spawnedPlayers[2], spawnedPlayers) ;
@@ -2294,7 +2294,7 @@ Player::addStratHit(const MissionDamageEvent& mde)
 	break ;
 	}
 
-	dbugLog(_FLD, " dr#:%zu, rr#:%zu, aiHits:%u aiReps:%u brdgHits:%u brdgReps:%u facHits:%u fbHits:%u"
+	dbugLog(_FLD, " dr#:%" PRSizeT ", rr#:%" PRSizeT ", aiHits:%u aiReps:%u brdgHits:%u brdgReps:%u facHits:%u fbHits:%u"
 					, m_damageRecord.size(), m_repairRecord.size()
 					, score.aiKills(), score.aiRepairs(), score.bridgeKills(), score.bridgeRepairs(), score.factoryKills(), score.firebaseKills()) ;
 }

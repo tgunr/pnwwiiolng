@@ -2559,7 +2559,7 @@ chatUpdateAWSSnapshot()
 			newX = awsGrid.begin()->first & 0xff ;
 			newY = awsGrid.begin()->first >> 16 ;
 		}
-		dbugLog(_FLD, "Updating aws grid: Old grid %zu entries starting %hu,%hu; New grid %zu entries starting %hu,%hu"
+		dbugLog(_FLD, "Updating aws grid: Old grid %" PRSizeT " entries starting %hu,%hu; New grid %" PRSizeT " entries starting %hu,%hu"
 						, awsSnapshot.size(), oldX, oldY
 						, awsGrid.size(), newX, newY
 						) ;

@@ -2622,7 +2622,7 @@ _countUserSides(LOGICAL report)
 
 	if (report)
 	{
-		dbugLog(_FLN,"SIDE COUNT: %d:%zu axis, %d:%zu allied, %d:%zu neutral"
+		dbugLog(_FLN,"SIDE COUNT: %d:%" PRSizeT " axis, %d:%" PRSizeT " allied, %d:%" PRSizeT " neutral"
 						, _sideCount[AXIS], sidePlayers[AXIS].size()
 						, _sideCount[ALLIED], sidePlayers[ALLIED].size()
 						, _sideCount[WWII_NO_SIDE], sidePlayers[WWII_NO_SIDE].size()
@@ -3701,7 +3701,7 @@ main(int argc, char* argv[])
 		index.addAlias("m", "t") ;
 		index.addAlias("m", "r") ;
 
-		dbugLog(_FLI, "DotIndex contains %zu commands", index.size()) ;
+		dbugLog(_FLI, "DotIndex contains %" PRSizeT " commands", index.size()) ;
 
 		index.readPermissions() ;
 	}

@@ -105,7 +105,7 @@ public:
 
 		char numLines[32] ;
 		char loops[64] ;
-		snprintf(numLines, 31, "%zu", theSpamCan.size()) ;
+		snprintf(numLines, 31, "%" PRSizeT "", theSpamCan.size()) ;
 		snprintf(loops, 63, "%u (%s)", spamLoops, chatTimeInterval(spamInterval)) ;
 		player.message(LSTR_NOTE, LSTR_SPAM_STATUS, numLines, loops) ;
 

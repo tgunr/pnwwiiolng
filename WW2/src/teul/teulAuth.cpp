@@ -551,7 +551,7 @@ OTP_NODE::OTP_NODE(Auth::Dispatch& dispatch_, bool fromAuth_)
 		char ip[MAX_IP_LEN+1], version[MAX_IP_LEN] ;
 		teulGetAddress(address, ip, MAX_IP_LEN) ;
 		teulGetAddress(appVersion, version, MAX_IP_LEN) ;
-		dbugLog(_FLD, "p:%u c:%s otp:%u ptr:%p ip:%s appVersion:%s +ALLOC {%zu,%zu,%zu}", customerID, handle, OTP, this, ip, version, _otps.size(), _pendingOtps.size(), _custOtps.size()) ;
+		dbugLog(_FLD, "p:%u c:%s otp:%u ptr:%p ip:%s appVersion:%s +ALLOC {%" PRSizeT ",%" PRSizeT ",%" PRSizeT "}", customerID, handle, OTP, this, ip, version, _otps.size(), _pendingOtps.size(), _custOtps.size()) ;
 	}
 }
 
@@ -593,7 +593,7 @@ OTP_NODE::~OTP_NODE()
 	teulGetAddress(address, ip, MAX_IP_LEN) ;
 	teulGetAddress(appVersion, version, MAX_IP_LEN) ;
 
-	dbugLog(_FLN, "p:%u c:%s otp:%u ptr:%p ip:%s appVersion:%s -REL {%zu,%zu,%zu}", customerID, handle, OTP, this, ip, version, _otps.size(), _pendingOtps.size(), _custOtps.size()) ;
+	dbugLog(_FLN, "p:%u c:%s otp:%u ptr:%p ip:%s appVersion:%s -REL {%" PRSizeT ",%" PRSizeT ",%" PRSizeT "}", customerID, handle, OTP, this, ip, version, _otps.size(), _pendingOtps.size(), _custOtps.size()) ;
 }
 
 static bool

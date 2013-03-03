@@ -120,7 +120,7 @@ _validBrigadeOrigin(const HCUnit* unit, const FacilityStruct* facility)
 
 	const CPStruct* bcp = strtGetCP(unit->homeCPID()) ;
 	if ( bcp )
-		dbugLog(_FLI, "XXX posting mission at %s:%s for brigade %s@%s units %zu:%zu"
+		dbugLog(_FLI, "XXX posting mission at %s:%s for brigade %s@%s units %" PRSizeT ":%" PRSizeT ""
 						, facility->name, cp->name
 						, unit->name(), bcp->name
 						, cp->m_units.size(), bcp->m_units.size()) ;
@@ -1026,7 +1026,7 @@ checkForTimedOutMissions()
 	if ( teulClock64 >= nextCheck )
 	{
 #if defined(DEV_BUILD)
-		dbugLog(_FLD, "%s: patrolling %zu missions", __FUNCTION__, g_missions.size()) ;
+		dbugLog(_FLD, "%s: patrolling %" PRSizeT " missions", __FUNCTION__, g_missions.size()) ;
 #endif
 		_sendTimeUpdates(teulTime());
 		nextCheck = teulClock64 + 5000 ;
@@ -1823,7 +1823,7 @@ _postNewInstanceMission(instanceid_t instanceID, WWII_COUNTRY forCountry, BRANCH
 			index.push_back(mission) ;
 			if ( mission->instanceID() != 0 )
 			{
-				dbugLog(_FLD, "in:%llu now has %zu missions", mission->instanceID(), index.size()) ;
+				dbugLog(_FLD, "in:%llu now has %" PRSizeT " missions", mission->instanceID(), index.size()) ;
 			}
 		}
 

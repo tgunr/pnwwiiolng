@@ -415,7 +415,7 @@ chatMissionRemovePlayer(Player* player, UINT32 missionID, UINT32 sponsor)
 
 	_tellSponsor(sponsor, player, LSTR_RECRUIT_LEFT_MISSION, *mission) ;
 
-	dbugLog(_FLI, "m:%u p:%u c:%s left mission [%zu remaining]", missionID, player->playerID(), player->callsign(), mission->m_members.size()) ;
+	dbugLog(_FLI, "m:%u p:%u c:%s left mission [%" PRSizeT " remaining]", missionID, player->playerID(), player->callsign(), mission->m_members.size()) ;
 	if ( mission->m_members.empty() || mission->m_members.size() == 0 )
 	{
 		dbugLog(_FLNB, " *deleting") ;

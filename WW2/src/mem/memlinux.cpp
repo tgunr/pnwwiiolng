@@ -54,7 +54,7 @@ struct Activity
 		const size_t line = (size_t)(fileline) ;
 
 		size_t printed = snprintf(buffer + offset, bufferSize - (1 + offset)
-									, "\"%s:%zu\":{\"allocs\":%llu,\"frees\":%llu,\"unfreed\":%llu,\"max\":%llu,\"cur\":%llu,\"la\":%llu}"
+									, "\"%s:%" PRSizeT "\":{\"allocs\":%llu,\"frees\":%llu,\"unfreed\":%llu,\"max\":%llu,\"cur\":%llu,\"la\":%llu}"
 										, file, line
 										, m_allocs
 										, m_frees

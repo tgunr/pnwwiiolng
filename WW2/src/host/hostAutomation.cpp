@@ -165,7 +165,7 @@ _initializeFakeWeapons()
 		}
 	}
 
-	dbugLog(_FLI, "Created %zu fake vehicles", _fakes.size()) ;
+	dbugLog(_FLI, "Created %" PRSizeT " fake vehicles", _fakes.size()) ;
 }
 
 //////////////////////////////////////////////////////////////////////

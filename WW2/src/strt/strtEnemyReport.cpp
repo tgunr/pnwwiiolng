@@ -90,7 +90,7 @@ strtEvaluateEWSUpdates()
 	if ( _changedCPs.empty() )
 		return ;
 
-	dbugLog(_FLD, "evaluating EWS at %zu CPs", _changedCPs.size()) ;
+	dbugLog(_FLD, "evaluating EWS at %" PRSizeT " CPs", _changedCPs.size()) ;
 
 	// Go through the list and evaluate EWS at each CP, but
 	// do a simple bulk "clear" at the end rather than

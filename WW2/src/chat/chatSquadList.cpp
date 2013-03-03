@@ -124,7 +124,7 @@ public:
 		}
 
 		if ( g_debugSquads )
-			dbugLog(_FLD, "sq:%u '%s' got list of %u members was %zu"
+			dbugLog(_FLD, "sq:%u '%s' got list of %u members was %" PRSizeT ""
 						, m_squadID, list->squad().shortName(), m_results.size(), list->members().size()) ;
 
 		// In order that we can tell who is no-longer in the squad according
@@ -721,7 +721,7 @@ chatCheckSquadLists()
 	bool didNothing = true ;
 
 	if ( g_debugSquads )
-		dbugLog(_FLD, "%zu squads in memory", g_squads.size()) ;
+		dbugLog(_FLD, "%" PRSizeT " squads in memory", g_squads.size()) ;
 
 	TeulTimeMS cutoff = teulClock64 - EMPTY_SQUAD_RETENTION_TIME_MS ;
 

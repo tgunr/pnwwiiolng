@@ -75,7 +75,7 @@ SquadVote::announce(UINT32 squadID, Player* player)
 		results += str ;
 	}
 
-	snprintf(str, 40, "%zu", m_votes->size()) ;
+	snprintf(str, 40, "%" PRSizeT "", m_votes->size()) ;
 
 	if ( player != NULL )
 	{

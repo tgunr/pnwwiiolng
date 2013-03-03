@@ -594,7 +594,7 @@ _announceSTOToGrid(ServerSTO& sto, bool isCreation)
 	}
 
 	if ( g_logDebug )
-		dbugLog(_FLD, "sto:%u %s [%f/%f/%f => %d/%d] %zu cells"
+		dbugLog(_FLD, "sto:%u %s [%f/%f/%f => %d/%d] %" PRSizeT " cells"
 						, sto.uid(), op
 						, sto.position().x()
 						, sto.position().y()
@@ -806,7 +806,7 @@ Player::updateGridPosition()
 	_GRIDS::const_iterator it ;
 	for ( it = newGrid->neighbors().begin() ; it != newGrid->neighbors().end() ; ++it )
 	{
-		off += sprintf(buffer + off, "%d,%d(c:%zu,s:%zu) ", (*it)->gridKey().X(), (*it)->gridKey().Y(), (*it)->players().size(), (*it)->stos().size()) ;
+		off += sprintf(buffer + off, "%d,%d(c:%" PRSizeT ",s:%" PRSizeT ") ", (*it)->gridKey().X(), (*it)->gridKey().Y(), (*it)->players().size(), (*it)->stos().size()) ;
 	}
 	message(LSTR_NOTE, LSTR_GENERIC, buffer) ;
 #endif
@@ -933,7 +933,7 @@ chatGridSnapshot()
 		{
 			query[len++] = ',' ;
 		}
-		len += sprintf(query + len, "(%d,%d,now(),%zu,%zu)"
+		len += sprintf(query + len, "(%d,%d,now(),%" PRSizeT ",%" PRSizeT ")"
 						, node->gridKey().X(), node->gridKey().Y()
 						, node->players().size(), node->stos().size()) ;
 		if ( len > 4000 )

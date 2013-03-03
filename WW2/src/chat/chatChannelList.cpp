@@ -114,7 +114,7 @@ chatDestroyChannel(const ChannelID channelID)
 	_channelIndex.erase(it) ;
 	delete channel ;
 
-	dbugLog(_FLI, "ch:%llu.%u.%u.%llu freed channel, numChannels now %zu"
+	dbugLog(_FLI, "ch:%llu.%u.%u.%llu freed channel, numChannels now %" PRSizeT ""
 						, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID(), _channelIndex.size()) ;
 
 	return true ;
@@ -184,7 +184,7 @@ Chat::Channel::addSubscriber(const Chat::ChannelSubscription& cnode)
 	if ( inserted == true )
 	{
 		if ( g_debugRadios )
-			dbugLog(_FLD, "ch:%llu.%u.%u.%llu added cnode %p to channel %p subscribers now: %zu"
+			dbugLog(_FLD, "ch:%llu.%u.%u.%llu added cnode %p to channel %p subscribers now: %" PRSizeT ""
 							, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID()
 							, &cnode, this
 							, numSubscribers()
@@ -192,7 +192,7 @@ Chat::Channel::addSubscriber(const Chat::ChannelSubscription& cnode)
 	}
 	else
 	{
-		dbugLog(_FLA, "ch:%llu.%u.%u.%llu UNABLE TO ADD CNODE %p to channel %p subscribers now: %zu"
+		dbugLog(_FLA, "ch:%llu.%u.%u.%llu UNABLE TO ADD CNODE %p to channel %p subscribers now: %" PRSizeT ""
 						, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID()
 						, &cnode, this
 						, numSubscribers()
@@ -220,7 +220,7 @@ Chat::Channel::removeSubscriber(Chat::ChannelSubscription& cnode)
 	{
 		if ( numRemoved > 0 )
 		{
-			dbugLog(_FLD, "ch:%llu.%u.%u.%llu removed cnode %p from channel %p subscribers now: %zu"
+			dbugLog(_FLD, "ch:%llu.%u.%u.%llu removed cnode %p from channel %p subscribers now: %" PRSizeT ""
 							, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID()
 							, &cnode, this
 							, numSubscribers()
@@ -228,7 +228,7 @@ Chat::Channel::removeSubscriber(Chat::ChannelSubscription& cnode)
 		}
 		else
 		{
-			dbugLog(_FLW, "ch:%llu.%u.%u.%llu UNABLE TO REMOVE CNODE %p from channel %p subscribers now: %zu"
+			dbugLog(_FLW, "ch:%llu.%u.%u.%llu UNABLE TO REMOVE CNODE %p from channel %p subscribers now: %" PRSizeT ""
 							, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID()
 							, &cnode, this
 							, numSubscribers()

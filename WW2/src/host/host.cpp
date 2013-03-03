@@ -2367,7 +2367,7 @@ _runHost(void)
 			if ( teulClock64 > updateCycleTimeout )
 			{
 				// We overran, we should try sending less updates
-				dbugLog(_FLW, "taking too long to send vehicle updates (%zu): %llums elapsed"
+				dbugLog(_FLW, "taking too long to send vehicle updates (%" PRSizeT "): %llums elapsed"
 								, nextVehicles.size(), teulClock64 - started) ;
 				if ( maxUpdates > _MIN_UPDATES )
 				{

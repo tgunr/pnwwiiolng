@@ -946,7 +946,7 @@ _recvLua(ACTION_OBJECT* const a)
 	}
 
 	Lua::SCRIPT_RESULTS& results = Lua::Results() ;
-	dbugLog(_FLI, "luaSrv: returning %zu lines of results", results.size()) ;
+	dbugLog(_FLI, "luaSrv: returning %" PRSizeT " lines of results", results.size()) ;
 	Lua::SCRIPT_RESULTS::iterator it ;
 	std::string reply = "" ;
 	for ( it = results.begin() ; it != results.end() ; ++it )

@@ -1019,7 +1019,7 @@ chatCheckDecisionQueues()
 			continue ;
 		}
 
-		dbugLog(_FLI, "Decision %s conceeding: Voters:%zu, Vetos:%d, Holds:%d, Falls:%d, Scoring:%d (%s)"
+		dbugLog(_FLI, "Decision %s conceeding: Voters:%" PRSizeT ", Vetos:%d, Holds:%d, Falls:%d, Scoring:%d (%s)"
 						, decision->m_property->Name()
 						, voters.size()
 						, decision->m_vetos

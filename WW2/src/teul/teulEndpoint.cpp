@@ -156,7 +156,7 @@ teulGetEndpoint(const SINT32 teulIndex)
 {
 	if ( (size_t)teulIndex >= _endpoints.size() )	// Coercing to unsigned makes negative indexes very large.
 	{
-		//LogAbort("t:%d endpoint index out of range (0 <= endpoint <= %zu)", teulIndex, _endpoints.size()) ;
+		//LogAbort("t:%d endpoint index out of range (0 <= endpoint <= %" PRSizeT ")", teulIndex, _endpoints.size()) ;
 		return NULL ;
 	}
 

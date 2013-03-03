@@ -316,7 +316,7 @@ LISTHEADER*  part, *nextPart;
 
 	if ( numitems <= 0 || itemsize <= 0)
 	{
-		dbugLog(_FLX, "illegal params num %d size %zu",numitems,itemsize);
+		dbugLog(_FLX, "illegal params num %d size %" PRSizeT "",numitems,itemsize);
 		return(FALSE);
 	}
 
@@ -348,7 +348,7 @@ LISTHEADER*  part, *nextPart, *list;
 
 	if ( numitems <= 0 || itemsize <= 0)
 	{
-		dbugLog(_FLX, "illegal params num %d size %zu",numitems,itemsize);
+		dbugLog(_FLX, "illegal params num %d size %" PRSizeT "",numitems,itemsize);
 		return(FALSE);
 	}
 
