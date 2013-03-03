@@ -109,7 +109,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\teul;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\Libraries;$(SolutionDir)\Libraries\libevent\include;$(SolutionDir)\Libraries\libevent\WIN32-CODE;$(SolutionDir)\Libraries;$(SolutionDir)\Libraries\raknet\Source;$(SolutionDir)\Libraries\raknet</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <SmallerTypeCheck>false</SmallerTypeCheck>
