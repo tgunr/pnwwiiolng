@@ -66,7 +66,7 @@
       <DisableSpecificWarnings>4189</DisableSpecificWarnings>
     </ClCompile>
     <Lib>
-      <OutputFile>../../../WW2/lib/win/Debug/granny2.lib</OutputFile>
+      <OutputFile>../../../WW2/lib/win/3rdParty/granny2.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -92,7 +92,7 @@
       <DisableSpecificWarnings>4189</DisableSpecificWarnings>
     </ClCompile>
     <Lib>
-      <OutputFile>../../../WW2/lib/win/TestRelease/granny2.lib</OutputFile>
+      <OutputFile>../../../WW2/lib/win/3rdParty/granny2.lib</OutputFile>
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
