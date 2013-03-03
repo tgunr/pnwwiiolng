@@ -29,6 +29,10 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 
+#ifndef O_BINARY
+# define O_BINARY 0
+#endif
+
 //////////////////////////////////////////////////////////////////////
 // For throwing errors.
 
@@ -89,7 +93,7 @@ _establishListenSocket(const unsigned short port_)
 		return bindResult ;
 	}
 
-	const int listenResult = listen(sock, 8) ;
+	const int listenResult = listen(sock, 16) ;
 	if ( listenResult < 0 )
 	{
 		printf("uWebServer terminated: unable to set listen socket to listening on port %hu [%d]\n", port_, bindResult) ;
@@ -183,7 +187,7 @@ Teul::uWeb::Server::run()
 {
 	const int listenSock = _establishListenSocket(port()) ;
 
-	char buffer[1024] ;
+	char buffer[4096] ;
 	sockaddr_in addr ;
 
 	for ( ; ; )
@@ -283,12 +287,15 @@ _sendPhysicalFile(const unsigned int sock, const char* const rootPath, const cha
 			throw "Not found" ;
 #else
 		std::string filepath = rootPath;
+		if ( path[0] != '/' && path[0] != '\\' )
+			filepath += PATH_SEPARATOR;
+		filepath += path;
 #if platOS == OS_WIN32
-		filepath += '\\';
-#else
-		filepath += '/';
+		size_t n = 0;
+		while ( (n = filepath.find('/', n)) != filepath.npos )
+			filepath[n] = PATH_SEPARATOR;
 #endif
-		filefd = open(filepath.c_str(), O_RDONLY);
+		filefd = open(filepath.c_str(), O_RDONLY | O_BINARY);
 		if ( filefd < 0 )
 			throw "Not found";
 #endif
@@ -324,10 +331,11 @@ _sendPhysicalFile(const unsigned int sock, const char* const rootPath, const cha
 #endif
 		}
 
-		// To make sure nothing else gets written by accident.
-		close(sock) ;
-
 		success = true ;
+
+		char flushBuffer[] = "\r\n";
+		send(sock, flushBuffer, sizeof(flushBuffer) - 1, 0);
+		shutdown(sock, SD_SEND);
 	}
 	catch ( const char* error )
 	{
