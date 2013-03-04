@@ -105,8 +105,6 @@ TEUL_CALLBACK*	CHAT_XCHG_SERVER_TRACKED_OBJS ;
 
 static TEUL_CALLBACK*	CHAT_SEND_NLA;
 
-static TEUL_CALLBACK*	CHAT_SEND_SMITE_USER;
-
 static TEUL_CALLBACK*	CHAT_SVR_TUNE_CHANNEL;
 
 #ifdef SPAWN_RESTRICT
@@ -120,8 +118,7 @@ static TEUL_CALLBACK*	_XCHG_BANDWIDTH_NOTICE ;
 TEUL_CALLBACK*	CHAT_SEND_TUNE_HANDLE_ACK;
 TEUL_CALLBACK*	CHAT_SQUAD_CONTROL ;
 static TEUL_CALLBACK*	CHAT_MOTD_REPLY;
-static TEUL_CALLBACK*	CHAT_SEND_OOB_MESSAGE ;
-static TEUL_CALLBACK*	_XCHG_SCMD ;
+static TEUL_CALLBACK*	_RECV_SCMD ;
 static TEUL_CALLBACK*	_XCHG_CHAT_MISSION_STATUS ;
 
 ///TEMPORARY
@@ -146,25 +143,6 @@ _sendMOTD_REPLY(ACTION_OBJECT* const a)
 {
 	MOTD_REPLY* object = (MOTD_REPLY*)(a->localRawData) ;
 	return object->packer(TEUL_PACK, a) ;
-}
-
-//////////////////////////////////////////////////////////////////////
-// Out of band messages
-
-static SINT32
-_sendOOBMessage(ACTION_OBJECT* const a)
-{
-	OOBMessage* message = (OOBMessage*)(a->localRawData) ;
-	return message->packer(TEUL_PACK, a) ;
-}
-
-//////////////////////////////////////////////////////////////////////
-//
-
-static SINT32
-_sendSCMDRequest(ACTION_OBJECT* const a)
-{
-	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(StratCommand)) ;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -457,7 +435,9 @@ OOBMessage::send()
 {
 	dbugLog(_FLD, "p:%u c:%s sending oob string message: %s", m_originatorID, originator(), m_text) ;
 
-	teulSendTo(Server::broadcastIndex, chatGetStratAddr(), WWII::Net::Ports::PrivateBcast, CHAT_SEND_OOB_MESSAGE, this) ;
+	Teul::Packet outgoing(sizeof(*this), Chat::CallbackX, Chat::OOB_MESSAGE_Y));
+	outgoing.append(*this);
+	serverSendPacketToType(outgoing, STRAT_HOST);
 }
 
 bool
@@ -478,7 +458,9 @@ chatSendUMSKill(const Player* player, const UINT32 stoUID)
 SINT32
 StratCommand::send()
 {
-	return teulSendTo(Server::broadcastIndex, chatGetStratAddr(), WWII::Net::Ports::PrivateBcast, _XCHG_SCMD, this) ;
+	Teul::Packet outgoing(sizeof(*this), Chat::CallbackX, Chat::EXCHANGE_SCMD_Y);
+	outgoing.append(*this);
+	serverSendPacketToType(outgoing, STRAT_HOST);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -543,6 +525,10 @@ chatSendMissionDeleteRequest(const UINT32& missionID)
 void
 chatSendBrigadeMove(const ChatHandle& byPlayer, bool isGM, UINT32 brigadeID, const FULL_OBJ_ID& fid, bool isActionable)
 {
+	ENDPOINT* stratEndpoint = serverPeerEndpointByType(STRAT_HOST);
+	if ( stratEndpoint == nullptr )
+		return;
+
 	BRIGADE_MOVE_MSG outgoing(byPlayer, isGM, BRIGADE_MOVE_MSG::EXCHANGE) ;
 
 	outgoing.data().m_action = BMR_APPROVED ;
@@ -550,7 +536,7 @@ chatSendBrigadeMove(const ChatHandle& byPlayer, bool isGM, UINT32 brigadeID, con
 	outgoing.data().m_destination = fid ;
 	outgoing.data().m_actionable = isActionable ;
 
-	outgoing.broadcast(Server::broadcastIndex, chatGetStratAddr()) ;
+	outgoing.send(*stratEndpoint, BRIGADE_MOVE_MSG::EXCHANGE);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -731,15 +717,6 @@ _sendNLA(ACTION_OBJECT* const a)
 {
 	Chat::UserNLA* nla = (Chat::UserNLA*)(a->localRawData) ;
 	return nla->packer(TEUL_PACK, a) ;
-}
-
-//////////////////////////////////////////////////////////////////////
-//
-
-static SINT32
-_sendSmiteUser(ACTION_OBJECT* const a)
-{
-	return teulPackVoid(TEUL_PACK, a->packed, a->offset, (CHAT_SMITE_USER*) a->localRawData, sizeof(CHAT_SMITE_USER));
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1243,17 +1220,17 @@ chatMessageChannel(const ChannelID& channelID, LSTRING_ID prefix, LSTRING_ID mes
 //////////////////////////////////////////////////////////////////////
 //Tells an mmhost to smite the user
 SINT32
-chatSendSmiteUser(SINT32 connection, UINT32 customerID, const char* handle)
+chatSendSmiteUser(UINT32 customerID, const char* handle)
 {
-	CHAT_SMITE_USER smiteUser;
-
 	if ( customerID == 0 && handle[0] == 0 )
-		return 0 ;
+		return 0;
 
+	Teul::Packet outgoing(sizeof(CHAT_SMITE_USER), Chat::CallbackX, Chat::SMITE_USER_Y);
+	CHAT_SMITE_USER& smiteUser = outgoing.allocate<CHAT_SMITE_USER>();
 	smiteUser.customerID = customerID;
 	smiteUser.m_handle = chatGetHandle(handle) ;
 
-	return teulSend(connection, CHAT_SEND_SMITE_USER, &smiteUser);
+	return serverSendPacketToPeers(outgoing);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1640,7 +1617,6 @@ chatInstallHostCallbacks()
 		REGISTER_SENDER(Chat::SERVER_MESSAGE_Y, _sendMessage, CHAT_SEND_MESSAGE) ;
 		REGISTER_SENDER(Chat::SVR_TUNE_TO_CHANNEL_Y, _sendTuneToChannel, CHAT_SVR_TUNE_CHANNEL) ;
 		REGISTER_SENDER(Chat::USER_NLA_Y, _sendNLA, CHAT_SEND_NLA) ;
-		REGISTER_SENDER(Chat::SMITE_USER_Y, _sendSmiteUser, CHAT_SEND_SMITE_USER) ;
 		REGISTER_SENDER(Chat::LOCATE_USER_Y, _sendLocateUser, _SEND_LOCATE_USER) ;
 
 #ifdef SPAWN_RESTRICT
@@ -1675,9 +1651,8 @@ chatInstallHostCallbacks()
 		REGISTER_RECEIVER(Chat::CLIENT_LOCALITY_Y, _recvLocality) ;
 		REGISTER_RECEIVER(Chat::SIDE_MESSAGE_Y, _recvSideMessage) ;
 		REGISTER_SENDER(Chat::MOTD_REPLY_Y, _sendMOTD_REPLY, CHAT_MOTD_REPLY) ;
-		REGISTER_SENDER(Chat::OOB_MESSAGE_Y, _sendOOBMessage, CHAT_SEND_OOB_MESSAGE) ;
 		REGISTER_SENDRECV(Chat::SQUAD_CONTROL_Y, _sendSquadControlResult, _recvSquadControl, CHAT_SQUAD_CONTROL) ;
-		REGISTER_SENDRECV(Chat::EXCHANGE_SCMD_Y, _sendSCMDRequest, _recvSCMDResult, _XCHG_SCMD) ;
+		REGISTER_RECEIVER(Chat::EXCHANGE_SCMD_Y, _recvSCMDResult, _RECV_SCMD) ;
 		REGISTER_RECEIVER(Chat::MISSION_DELETION_Y, _recvMissionDeleteNotice) ;
 		REGISTER_MSG(Chat::BRIGADE_MOVE_Y, BRIGADE_MOVE_MSG) ;
 		REGISTER_MSG(Chat::SQUAD_Y, SQUAD_MSG) ;

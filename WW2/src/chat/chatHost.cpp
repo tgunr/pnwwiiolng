@@ -1707,7 +1707,7 @@ chatReleaseGrab(Player& player)
 void
 chatSmitePlayer(const playerid_t playerID)
 {
-	chatSendSmiteUser(Server::broadcastIndex, playerID, "");
+	chatSendSmiteUser(playerID, "");
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1716,7 +1716,7 @@ chatSmitePlayer(const playerid_t playerID)
 void
 chatSmiteHandle(const char* handle)
 {
-	chatSendSmiteUser(Server::broadcastIndex, 0, handle) ;
+	chatSendSmiteUser(0, handle) ;
 }
 
 //////////////////////////////////////////////////////////////////////

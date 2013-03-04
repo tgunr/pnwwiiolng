@@ -25,7 +25,7 @@ extern SINT32 chatInstallHostCallbacks(void);
 extern SINT32 chatSendUserNLA(SINT32 connection, UCHAR radioIndex, const ChatHandle& handleID);
 
 //Sends a message to the mmHost telling it to kill the user referenced
-extern SINT32 chatSendSmiteUser(SINT32 connection, UINT32 customerID, const char* handle);
+extern SINT32 chatSendSmiteUser(UINT32 customerID, const char* handle);
 
 // Send a strat message containing a command request from a specific player regarding a specific cp
 extern bool chatSendStratCommand(SINT32 playerID, int cmd, const struct FULL_OBJ_ID& cp, WWII_SIDE side) ;
