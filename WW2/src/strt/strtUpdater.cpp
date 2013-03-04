@@ -63,7 +63,7 @@ _flushDamageQueue(void)
 	outgoing.setUnencrypted() ;
 	outgoing.append(&damageQueue[0], dataSize) ;
 
-	outgoing.sendTo(Server::broadcastIndex, hostGetStratAddress()) ;
+	serverSendPacketToType(outgoing, STRAT_HOST);
 
 	damageQueue.clear() ;
 }
