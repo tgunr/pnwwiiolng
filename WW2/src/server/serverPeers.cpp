@@ -156,8 +156,9 @@ void
 ServerConnection::doConnect()
 {
 	m_connected = false ;
-	m_teulIndex = teulOpenSend(m_ip, WWII::Net::Ports::ServerPeering + m_type, _onConnect, 20000, TCP, _onError) ;
-	dbugLog(_FLD, "t:%d opening to %s [%u]", m_teulIndex, teulGetAddress(m_ip), m_type) ;
+	UINT16 port = WWII::Net::Ports::ServerPeering + m_type;
+	m_teulIndex = teulOpenSend(m_ip, port, _onConnect, 20000, TCP, _onError) ;
+	dbugLog(_FLD, "t:%d opening to %s:%u [%u]", m_teulIndex, teulGetAddress(m_ip), port, m_type) ;
 }
 
 //////////////////////////////////////////////////////////////////////
