@@ -28,8 +28,6 @@
 TEUL_CALLBACK*	STRT_SEND_DAMAGE;
 TEUL_CALLBACK*	STRT_SEND_HIT_LIST;
 
-static TEUL_CALLBACK*	_SEND_ENEMY_REPORT ;
-
 static SINT32
 _sendHitList(ACTION_OBJECT* const a)
 {
@@ -69,21 +67,22 @@ _recvEnemySpotted(ACTION_OBJECT* const a)
 		return a->offset ;
 	}
 
-	STRAT_ENEMY_REPORT report ;
-
+	Teul::Packet outgoing(sizeof(STRAT_ENEMY_REPORT), Strat::CallbackX, STRT_ENEMY_REPORT_Y);
+	auto& report = outgoing.allocate<STRAT_ENEMY_REPORT>();
 	a->offset = strtPackEnemySpotted(TEUL_UNPACK, a->packed, a->offset, &report, 0) ;
+	if ( a->offset < 0 )
+		return a->offset;
 
 	if ( g_logDebug )
 		dbugLog(_FLD,"t:%d received enemy report for vehicle %s", a->teulIndex, weapPrintSerialC(&report.enemyReported));
 
-	return teulSendTo(Server::broadcastIndex, hostGetStratAddress(), WWII::Net::Ports::PrivateBcast, _SEND_ENEMY_REPORT, &report) ;
+	return serverSendPacketToType(outgoing, STRAT_HOST);
 }
 
 SINT32
 strtInstallUpdaterSupportCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Strat::CallbackX)
-		REGISTER_SENDER(STRT_ENEMY_REPORT_Y, _sendEnemyReport, _SEND_ENEMY_REPORT) ;
 		REGISTER_SENDER(STRT_DAMAGE_Y, _sendHitList, STRT_SEND_HIT_LIST) ;
 		REGISTER_RECEIVER(STRT_ENEMY_SPOTTED_Y, _recvEnemySpotted) ;
 	END_CALLBACK_REGISTRATION
