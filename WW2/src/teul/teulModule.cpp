@@ -343,7 +343,7 @@ _configureEndpointSocket(ENDPOINT& endpoint, const bool isMulticast)
 			int reuseable = 1;
 			setsockopt(endpoint.socket, SOL_SOCKET, SO_REUSEADDR, (char*)&reuseable, sizeof(reuseable));
 
-			int loop = 0;
+			int loop = 1;
 			setsockopt(endpoint.socket, IPPROTO_IP, IP_MULTICAST_LOOP, (const char*)&loop, sizeof(loop));
 		}
 	}
