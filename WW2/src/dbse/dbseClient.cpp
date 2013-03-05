@@ -138,7 +138,7 @@ dbseOpenConnection()
 	_handshakeSent=FALSE;
 	_dbseError = false;
 
-	const SINT32 tempIndex = teulOpenSend(cv_dbsePrimaryAddress.GetUint32(), dbsePort, _connectFn, 2500, TCP, _errorFn);
+	const SINT32 tempIndex = teulOpenSend(cv_dbsePrimaryAddress.GetUint32(), dbsePort, _connectFn, 2500, PROTOCOL_TCP, _errorFn);
 	if ( tempIndex < 0)
 	{
 		dbugLog(_FLA,"couldnt make dbseDaemon connection, err:%d", hostIndex);

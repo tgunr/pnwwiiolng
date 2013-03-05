@@ -34,21 +34,6 @@ _sendHitList(ACTION_OBJECT* const a)
 	return strtPackHitList(TEUL_PACK, a->packed, a->offset, (CP_HIT_HEADER*) a->localRawData, 0);
 }
 
-static SINT32
-_sendEnemyReport(ACTION_OBJECT* const a)
-{
-	a->offset = teulPackVoid(TEUL_PACK, a->packed, a->offset, (STRAT_ENEMY_REPORT*)(a->localRawData), sizeof(STRAT_ENEMY_REPORT)) ;
-
-	if ( a->offset < 0 )
-		dbugLog(_FLW, "t:%d error sending report for vehicle %s, offset:%d"
-					, a->teulIndex
-					, weapPrintSerialC(&((STRAT_ENEMY_REPORT*) a->localRawData)->enemyReported)
-					, a->offset
-					) ;
-
-	return a->offset ;
-}
-
 //////////////////////////////////////////////////////////////////////
 // Receive an EWS message and forward to strat
 

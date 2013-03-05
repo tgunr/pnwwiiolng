@@ -2,6 +2,7 @@
 
 #include "server/serverFlagsEnum.h"
 #include "server/serverHeartBeat.h"
+#include "wwii/wwiiServerTypeEnums.h"
 
 class PlayerStatusNode ;
 
@@ -52,10 +53,10 @@ public:
 	SINT32 sync() ;
 
 	//! Check if there is an open server available for this type.
-	static bool IsAvailable(const UINT32 type_) ;
+	static bool IsAvailable(const UINT16 serverType_) ;
 
 	//! Look up info about a server by its base ip address.
-	static Server::ServerInfo* GetInfo(UINT32 baseIP);
+	static Server::ServerInfo* GetInfo(UINT32 baseIP_, UINT16 serverType_);
 
 	//! Same as ServerInfo::GetInfo except by id
 	static Server::ServerInfo* GetByID(const UINT64& id);
@@ -63,7 +64,7 @@ public:
 	//! Get the best server to send to by type.
 	//! This function culls out all servers that are not
 	//! accepting and returns the one with the most available players.
-	static Server::ServerInfo* GetBest(UINT32 type, bool allowFull=false);
+	static Server::ServerInfo* GetBest(UINT16 serverType_, bool allowFull=false);
 } ;
 
  extern Server::ServerInfo myServerInfo ;

@@ -63,7 +63,7 @@ static SINT32
 _sendAddresses(ACTION_OBJECT* const a)
 {
 	static UINT16 testPort = WWII::Net::Ports::ConnectionTest ;
-	static UINT16 testProtocol = TCP ;
+	static UINT16 testProtocol = PROTOCOL_TCP ;
 	static bool initialized = false ;
 	static UCHAR buf[512] ;
 	static int bufSize = 0 ;

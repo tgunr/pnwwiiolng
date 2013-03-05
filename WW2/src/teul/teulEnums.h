@@ -24,8 +24,9 @@ enum // do not change order!
 // and flexability of the connection.
 enum PROTOCOL
 {
-	UDP,			// User Datagram protocol, unreliable, datagram based, most flexible.
-	TCP,			// Transport Control Protocol, reliable, stream based, extra overhead.
-	UDB				// UDB = UDP bare, no rel, also allows broadcast
+	PROTOCOL_UDP,			// User Datagram protocol, unreliable, datagram based, most flexible.
+	PROTOCOL_TCP,			// Transport Control Protocol, reliable, stream based, extra overhead.
+	PROTOCOL_UDB,			// UDB = UDP bare, no rel, also allows broadcast
+	PROTOCOL_CTRL			// CTRL = Via the controller
 } ;
 

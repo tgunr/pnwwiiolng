@@ -111,14 +111,10 @@ static TEUL_CALLBACK*	CHAT_SVR_TUNE_CHANNEL;
 static TEUL_CALLBACK*	CHAT_SEND_SPAWN_RESTRICTION ;
 #endif //SPAWN_RESTRICT
 
-static TEUL_CALLBACK*	_SEND_LOCATE_USER ;
-static TEUL_CALLBACK*	_XCHG_BANDWIDTH_NOTICE ;
-
 // WWIIOL Specific.
 TEUL_CALLBACK*	CHAT_SEND_TUNE_HANDLE_ACK;
 TEUL_CALLBACK*	CHAT_SQUAD_CONTROL ;
 static TEUL_CALLBACK*	CHAT_MOTD_REPLY;
-static TEUL_CALLBACK*	_RECV_SCMD ;
 static TEUL_CALLBACK*	_XCHG_CHAT_MISSION_STATUS ;
 
 ///TEMPORARY
@@ -435,7 +431,7 @@ OOBMessage::send()
 {
 	dbugLog(_FLD, "p:%u c:%s sending oob string message: %s", m_originatorID, originator(), m_text) ;
 
-	Teul::Packet outgoing(sizeof(*this), Chat::CallbackX, Chat::OOB_MESSAGE_Y));
+	Teul::Packet outgoing(sizeof(*this), Chat::CallbackX, Chat::OOB_MESSAGE_Y);
 	outgoing.append(*this);
 	serverSendPacketToType(outgoing, STRAT_HOST);
 }
@@ -460,7 +456,7 @@ StratCommand::send()
 {
 	Teul::Packet outgoing(sizeof(*this), Chat::CallbackX, Chat::EXCHANGE_SCMD_Y);
 	outgoing.append(*this);
-	serverSendPacketToType(outgoing, STRAT_HOST);
+	return serverSendPacketToType(outgoing, STRAT_HOST);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -717,26 +713,6 @@ _sendNLA(ACTION_OBJECT* const a)
 {
 	Chat::UserNLA* nla = (Chat::UserNLA*)(a->localRawData) ;
 	return nla->packer(TEUL_PACK, a) ;
-}
-
-//////////////////////////////////////////////////////////////////////
-//The actual send function for system messages
-
-static SINT32
-_sendLocateUser(ACTION_OBJECT* const a)
-{
-	a->offset = teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(CHAT_LOC_USER));
-
-	return a->offset ;
-}
-
-//////////////////////////////////////////////////////////////////////
-// Change of bandwidth/update mode
-
-static SINT32
-_sendBandwidthNotice(ACTION_OBJECT* const a)
-{
-	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(BANDWIDTH_CHANGE)) ;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1143,21 +1119,16 @@ chatSendBandwidthNotice(const playerid_t playerID, UINT32 mode)
 	if ( psn == NULL || psn->curServer.type != CELL_HOST )
 		return false ;
 
-	BANDWIDTH_CHANGE change ;
+	Teul::Packet outgoing(0, Chat::CallbackX, Chat::BANDWIDTH_NOTICE_Y);
+	auto& change = outgoing.allocate<BANDWIDTH_CHANGE>();
 	change.playerID = playerID ;
 	change.mode = mode ;
 
 	if ( g_debugPersonas )
 		dbugLog(_FLD, "p:%u c:%s Requesting host %s give mode %u after spawning"
-						, playerID, psn->dispatch().m_callsign, teulGetAddress(psn->curServer.address), mode) ;
+						, playerID, psn->dispatch().m_callsign, teulGetAddress(psn->curServer.address), mode);
 
-	teulSendTo(Server::broadcastIndex
-				, psn->curServer.address & DIRECT_MASK, 0
-				, _XCHG_BANDWIDTH_NOTICE
-				, &change
-				) ;
-
-	return true ;
+	return serverSendPacketToType(outgoing, CELL_HOST);
 }
 
 bool
@@ -1245,7 +1216,7 @@ SendPlayerMove(UINT32 cellHost, Chat::PlayerMove& move)
 	Teul::Packet outgoing(sizeof(PlayerMove), (UCHAR)Host::CallbackX, (UCHAR)Host::Callbacks::MovePlayer_Y) ;
 	dbugLog(_FLD, "sending p:%u moving:%d/%d/%d to cell %u", move.m_playerID, move.m_x, move.m_y, move.m_z, cellHost) ;
 	outgoing.append(move) ;
-	return outgoing.send(serverGetPeerIndex(cellHost)) ;
+	return outgoing.send(serverGetPeerIndex(cellHost, CELL_HOST)) ;
 }
 
 }
@@ -1270,10 +1241,10 @@ chatSendLocateUser(Player& requester, const playerid_t playerID)
 	if (psn && psn->curServer.type == CELL_HOST)
 	{
 		dbugLog(_FLI, "Sending chatSendLocateUser for %d to %s", playerID, teulGetAddress(psn->curServer.address)) ;
-		teulSendTo(Server::broadcastIndex
-					, psn->curServer.address & DIRECT_MASK, 0
-					, _SEND_LOCATE_USER, &locUser
-					);
+		Teul::Packet outgoing(0, Chat::CallbackX, Chat::LOCATE_USER_Y);
+		outgoing.append(locUser);
+		SINT32 cellIndex = serverGetPeerIndex(psn->curServer.address, psn->curServer.type);
+		outgoing.send(cellIndex);
 	}
 	else
 	{
@@ -1306,7 +1277,7 @@ chatSendForcedDespawn(Player* player, LSTRING_ID messageID, const char* reason)
 	const UINT32 cell = player->getCellHost(NULL) ;
 	if ( 0 == cell )
 		return false ;
-	const SINT32 cellIndex = serverGetPeerIndex(cell) ;
+	const SINT32 cellIndex = serverGetPeerIndex(cell, CELL_HOST) ;
 	if ( cellIndex < 0 )
 		return false ;
 
@@ -1617,14 +1588,13 @@ chatInstallHostCallbacks()
 		REGISTER_SENDER(Chat::SERVER_MESSAGE_Y, _sendMessage, CHAT_SEND_MESSAGE) ;
 		REGISTER_SENDER(Chat::SVR_TUNE_TO_CHANNEL_Y, _sendTuneToChannel, CHAT_SVR_TUNE_CHANNEL) ;
 		REGISTER_SENDER(Chat::USER_NLA_Y, _sendNLA, CHAT_SEND_NLA) ;
-		REGISTER_SENDER(Chat::LOCATE_USER_Y, _sendLocateUser, _SEND_LOCATE_USER) ;
 
 #ifdef SPAWN_RESTRICT
 		REGISTER_SENDER(Chat::SPAWN_RESTRICTION_Y, _sendSpawnRestriction, CHAT_SEND_SPAWN_RESTRICTION) ;
 #endif //SPAWN_RESTRICT
 
 		//Send/Recv a strat command response
-		REGISTER_SENDRECV(Chat::BANDWIDTH_NOTICE_Y, _sendBandwidthNotice, _recvBandwidthNotice, _XCHG_BANDWIDTH_NOTICE) ;
+		REGISTER_RECEIVER(Chat::BANDWIDTH_NOTICE_Y, _recvBandwidthNotice) ;
 
 		REGISTER_MSG_SENDER(Chat::WHO_LIST_Y, CHAT_WHO_LIST) ;
 		REGISTER_RECEIVER(Chat::MOD_REPORT_Y, _recvModReport) ;
@@ -1652,7 +1622,7 @@ chatInstallHostCallbacks()
 		REGISTER_RECEIVER(Chat::SIDE_MESSAGE_Y, _recvSideMessage) ;
 		REGISTER_SENDER(Chat::MOTD_REPLY_Y, _sendMOTD_REPLY, CHAT_MOTD_REPLY) ;
 		REGISTER_SENDRECV(Chat::SQUAD_CONTROL_Y, _sendSquadControlResult, _recvSquadControl, CHAT_SQUAD_CONTROL) ;
-		REGISTER_RECEIVER(Chat::EXCHANGE_SCMD_Y, _recvSCMDResult, _RECV_SCMD) ;
+		REGISTER_RECEIVER(Chat::EXCHANGE_SCMD_Y, _recvSCMDResult) ;
 		REGISTER_RECEIVER(Chat::MISSION_DELETION_Y, _recvMissionDeleteNotice) ;
 		REGISTER_MSG(Chat::BRIGADE_MOVE_Y, BRIGADE_MOVE_MSG) ;
 		REGISTER_MSG(Chat::SQUAD_Y, SQUAD_MSG) ;

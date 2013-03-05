@@ -567,15 +567,14 @@ _connectToStrat()
 			const Server::ServerInfo* const server = Server::ServerInfo::GetBest(STRAT_HOST, true) ;
 			if (server != NULL)
 			{
-				_stratHost = Server::broadcastNet & 0xffffff00;
-				_stratHost |= (server->stats.address & 0x000000ff);
+				_stratHost = Server::BroadcastMaskAddress(server->stats.address);
 			}
 		}
 	}
 
 	dbugLog(_FLN,"strat server found at %s",teulGetAddress(_stratHost));
 
-	_stratIndex = teulOpenSend(_stratHost, WWII::Net::Ports::InternalStrat, _stratConnectionOpen, 20000, TCP, _stratErrorFunction);
+	_stratIndex = teulOpenSend(_stratHost, WWII::Net::Ports::InternalStrat, _stratConnectionOpen, 20000, PROTOCOL_TCP, _stratErrorFunction);
 	if ( _stratIndex < 0 )
 		LogAbort("open to strat host failed: %d", _stratIndex) ;
 
@@ -684,13 +683,6 @@ _handleSIGUSR1(SINT32 k)
 	signal(SIGUSR1, _handleSIGUSR1);
 }
 #endif
-
-//////////////////////////////////////////////////////////////////////
-
-UINT32 changeToBroadcast(UINT32 address)
-{
-	return( Server::broadcastNet | (address & 0x000000ff));
-}
 
 UINT32 mmGetAddress()
 {

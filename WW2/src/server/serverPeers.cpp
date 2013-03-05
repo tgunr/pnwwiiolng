@@ -15,10 +15,12 @@
 #include "server/serverPeers.h"
 #include "server/serverServerInfo.h"
 #include "teul/teulCallbackStruct.h"
+#include "teul/teulConstants.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulPacket.h"
 #include "teul/teulPacketHeader.h"
 #include "wwii/wwiiNetPorts.h"
+#include "wwii/wwiiCallbacks.h"
 
 // Describe the mapping.
 struct ServerConnection
@@ -35,24 +37,34 @@ struct ServerConnection
 	SINT16		m_connected ;	// true once connected.
 } ;
 
+#pragma pack(push, 1)
+struct PeerHello
+{
+	SERVER_TYPE	m_type;
+};
+#pragma pack(pop)
+
 // There are going to be very few of these, probably 3-4,
 // so just store them as a vector.
 typedef std::vector<ServerConnection> ServerConnections ;
 static ServerConnections s_connections ;
 static SINT32 s_peeringIndex = -1 ;
 
+// Peers who have connected but not hello'd yet.
+static std::map<SINT16, TeulTimeMS> s_pendingPeers;
+
 //////////////////////////////////////////////////////////////////////
 // Find a connection in the connections list by IP address. Returns
 // pointer or NULL.
 
 static ServerConnection*
-_findConnectionByIP(const UINT32 ip)
+_findConnectionByIP(const UINT32 ip_, const UINT16 type_)
 {
-	const UINT32 localIP = Server::BroadcastMaskAddress(ip) ;
+	const UINT32 localIP = Server::BroadcastMaskAddress(ip_) ;
 	const size_t numConnections = s_connections.size() ;
 	for ( size_t i = 0 ; i < numConnections ; ++i )
 	{
-		if ( s_connections[i].m_ip == localIP )
+		if ( s_connections[i].m_ip == localIP && s_connections[i].m_type == type_ )
 			return &s_connections[i] ;
 	}
 
@@ -86,25 +98,31 @@ static void
 _onConnect(ENDPOINT& endpoint)
 {
 	// Localize the address.
-	ServerConnection* const connection = _findConnectionByIP(endpoint.destAddress()) ;
-	if ( connection != NULL )
+	const SERVER_TYPE peerType = static_cast<SERVER_TYPE>(endpoint.destPort() - WWII::Net::Ports::ServerPeering);
+	ABORT_IF(peerType >= MAX_SERVER_TYPE);
+	ServerConnection* const connection = _findConnectionByIP(endpoint.destAddress(), peerType) ;
+	if ( connection == nullptr )
 	{
-		char addr[65] ;
-		teulGetAddress(connection->m_ip, addr, sizeof(addr)) ;
-		dbugLog(_FLD, "serv:%s t:%d connected on t:%d", addr, connection->m_teulIndex, endpoint.teulIndex()) ;
-
-		// Paranoia: Make sure the teulIndexes match.
-		if ( connection->m_teulIndex != endpoint.teulIndex() )
-		{
-			connection->m_teulIndex = endpoint.teulIndex() ;
-		}
-		
-		connection->m_connected = true ;
-
-		return ;
+		dbugLog(_FLW, "t:%d ip:%u reporting connected, not in s_connections list.", endpoint.teulIndex(), endpoint.fromAddress()) ;
+		return;
 	}
 
-	dbugLog(_FLW, "t:%d ip:%u reporting connected, not in s_connections list.", endpoint.teulIndex(), endpoint.fromAddress()) ;
+	char addr[65] ;
+	teulGetAddress(connection->m_ip, addr, sizeof(addr)) ;
+	dbugLog(_FLD, "serv:%s t:%d connected on t:%d", addr, connection->m_teulIndex, endpoint.teulIndex()) ;
+
+	// Paranoia: Make sure the teulIndexes match.
+	if ( connection->m_teulIndex != endpoint.teulIndex() )
+	{
+		connection->m_teulIndex = endpoint.teulIndex() ;
+	}
+		
+	connection->m_connected = true ;
+
+	Teul::Packet outgoing(sizeof(PeerHello), Teul::Serv::CallbackX, PEER_HELLO_Y);
+	auto& hello = outgoing.allocate<PeerHello>();
+	hello.m_type = Server::myServerInfo.stats.type;
+	outgoing.send(endpoint);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -113,6 +131,9 @@ _onConnect(ENDPOINT& endpoint)
 static void
 _onError(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* /*object*/, SINT32 error)
 {
+	if ( error == ENOTCONN )
+		s_pendingPeers.erase(teulIndex);
+
 	ServerConnection* const connection = _findConnectionByTeulIndex(teulIndex) ;
 	if ( connection == NULL )
 		return ;
@@ -157,7 +178,7 @@ ServerConnection::doConnect()
 {
 	m_connected = false ;
 	UINT16 port = WWII::Net::Ports::ServerPeering + m_type;
-	m_teulIndex = teulOpenSend(m_ip, port, _onConnect, 20000, TCP, _onError) ;
+	m_teulIndex = teulOpenSend(m_ip, port, _onConnect, 20000, PROTOCOL_TCP, _onError) ;
 	dbugLog(_FLD, "t:%d opening to %s:%u [%u]", m_teulIndex, teulGetAddress(m_ip), port, m_type) ;
 }
 
@@ -167,12 +188,12 @@ ServerConnection::doConnect()
 // the new connection instead.
 
 void
-serverConnectPeer(const UINT32 forIP, const UINT32 type)
+serverConnectPeer(const UINT32 forIP_, const SERVER_TYPE type_)
 {
 	char dest[65] ;
-	teulGetAddress(forIP, dest, sizeof(dest)) ;
-	dbugLog(_FLI, "requested connection: type:%u ip:%s", type, dest) ;
-	const SINT32 net = forIP >> 24 ;
+	teulGetAddress(forIP_, dest, sizeof(dest)) ;
+	dbugLog(_FLI, "requested connection: type:%u ip:%s", type_, dest) ;
+	const SINT32 net = forIP_ >> 24 ;
 	if ( (net == 127) | (net == 0) )
 	{
 		// Ignore localhost and exit host.
@@ -182,21 +203,19 @@ serverConnectPeer(const UINT32 forIP, const UINT32 type)
 	// Ignore requests to connect to ourselves or to peers with lower IPs,
 	// we only ever connect upwards. This helps us also avoid trying to
 	// connect to the exit server (ip 0).
-	if ( ((forIP >> 24) == 127) | (forIP <= Server::myServerInfo.stats.address) )
-	{
-		dbugLog(_FLIB, " - skipping this one") ;
-		return ;
-	}
-
-	const UINT32 ip = Server::BroadcastMaskAddress(forIP) ;
-	if ( (ip & 0xff) <= (Server::myServerInfo.stats.address & 0xff) )
+	const UINT32 ip = Server::BroadcastMaskAddress(forIP_) ;
+	if ( (forIP_ < Server::myServerInfo.stats.address)
+		|| (forIP_ == Server::myServerInfo.stats.address && type_ <= Server::myServerInfo.stats.type)
+		|| ((ip & 0xff) <= (Server::myServerInfo.stats.address & 0xff) && type_ <= Server::myServerInfo.stats.type)
+		|| ((forIP_ >> 24) == 127)
+		)
 	{
 		dbugLog(_FLIB, " - leaving this [%u] one to connect to me [%u]", (ip & 0xff), (Server::myServerInfo.stats.address & 0xff)) ;
 		return ;
 	}
 
 	// Only consider the last octet.
-	ServerConnection* const connection = _findConnectionByIP(ip) ;
+	ServerConnection* const connection = _findConnectionByIP(ip, type_) ;
 	if ( connection != NULL )
 	{
 		// The server has probably restarted, so we may already have
@@ -210,7 +229,7 @@ serverConnectPeer(const UINT32 forIP, const UINT32 type)
 	}
 
 	// Being still here indicates the server wasn't found.
-	s_connections.push_back(ServerConnection(ip, type, -1)) ;
+	s_connections.push_back(ServerConnection(ip, type_, -1)) ;
 	s_connections.back().doConnect() ;
 }
 
@@ -218,12 +237,12 @@ serverConnectPeer(const UINT32 forIP, const UINT32 type)
 // Disconnect a peer.
 
 void
-serverDisconnectPeer(const UINT32 ip)
+serverDisconnectPeer(Server::ServerInfo* server)
 {
-	ServerConnection* const connection = _findConnectionByIP(ip) ;
+	ServerConnection* const connection = _findConnectionByIP(server->stats.address, static_cast<SERVER_TYPE>(server->stats.type));
 	if ( connection != NULL )
 	{
-		dbugLog(_FLI, "t:%d serv:%s disconnecting", connection->m_teulIndex, teulGetAddress(ip)) ;
+		dbugLog(_FLI, "t:%d serv:%s disconnecting", connection->m_teulIndex, teulGetAddress(ntohl(server->stats.address))) ;
 		connection->doDisconnect() ;
 	}
 }
@@ -232,9 +251,9 @@ serverDisconnectPeer(const UINT32 ip)
 // Return the teulIndex of a connected peer or -1.
 
 SINT16
-serverGetPeerIndex(const UINT32 ip)
+serverGetPeerIndex(const UINT32 ip_, const SERVER_TYPE serverType_)
 {
-	const ServerConnection* const connection = _findConnectionByIP(ip) ;
+	const ServerConnection* const connection = _findConnectionByIP(ip_, serverType_) ;
 	if ( connection == NULL || connection->m_connected == false )
 		return -1 ;
 	else
@@ -346,21 +365,37 @@ _onPeerConnect(ENDPOINT& endpoint)
 		return ;
 	}
 
-	Server::ServerInfo* info = Server::ServerInfo::GetInfo(endpoint.fromAddress()) ;
+	char addr[65];
+	teulGetAddress(endpoint.fromAddress(), addr, sizeof(addr));
+	dbugLog(_FLI, "t:%d ip:%s:%u peer connection", endpoint.teulIndex(), addr, endpoint.fromPort());
+
+	s_pendingPeers[endpoint.teulIndex()] = teulClock64;
+}
+
+static SINT32
+_onPeerHello(ACTION_OBJECT* a, PeerHello& hello)
+{
+	ABORT_IF(a->endpoint == nullptr);
+
+	ENDPOINT& endpoint = *a->endpoint;
+	///TODO: We should mark this somehow for expiration.
+	Server::ServerInfo* info = Server::ServerInfo::GetInfo(endpoint.fromAddress(), hello.m_type) ;
 	if ( info == NULL )
 	{
-		dbugLog(_FLA, "t:%d ip:%s unknown server attempted connection", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress())) ;
+		dbugLog(_FLA, "t:%d ip:%s type:%u unknown server attempted connection", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), hello.m_type) ;
 		teulClose(endpoint, Teul::Closing::PeerBadSrv) ;
-		return ;
+		return -EINVAL;
 	}
+	ABORT_IF( info->stats.type != hello.m_type );
 
 	UINT32 ip = Server::BroadcastMaskAddress(endpoint.fromAddress()) ;
-	ServerConnection* connection = _findConnectionByIP(ip) ;
+	ServerConnection* connection = _findConnectionByIP(ip, hello.m_type);
 	if ( connection == NULL )
 	{
 		s_connections.push_back(ServerConnection(ip, info->stats.type, endpoint.teulIndex())) ;
 		connection = &s_connections.back() ;
 	}
+	ABORT_IF( connection->m_type != hello.m_type );
 
 	if ( connection->m_teulIndex != endpoint.teulIndex() )
 		connection->doDisconnect() ;
@@ -372,7 +407,11 @@ _onPeerConnect(ENDPOINT& endpoint)
 
 	char addr[65] ;
 	teulGetAddress(connection->m_ip, addr, sizeof(addr)) ;
-	dbugLog(_FLI, "serv:%s t:%d connected as peer", addr, connection->m_teulIndex) ;
+	dbugLog(_FLI, "t:%d serv:%s:%u peer connection complete", connection->m_teulIndex, addr, endpoint.fromPort()) ;
+
+	s_pendingPeers.erase(endpoint.teulIndex());
+
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -385,16 +424,57 @@ _onPeerError(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*/, con
 }
 
 //////////////////////////////////////////////////////////////////////
+// Register peering-specific callbacks.
+
+static SINT32
+_registerPeeringCallbacks()
+{
+	BEGIN_CALLBACK_REGISTRATION(Teul::Serv::CallbackX)
+		REGISTER_RECEIVEOBJ(PEER_HELLO_Y, PeerHello, _onPeerHello);
+	END_CALLBACK_REGISTRATION
+}
+
+//////////////////////////////////////////////////////////////////////
 // Initialize the peering interface.
 
 void
 serverInitializePeering()
 {
+	if ( _registerPeeringCallbacks() < 0 )
+		LogAbort("Unable to register peering callbacks");
 	const UINT16 peeringPort = WWII::Net::Ports::ServerPeering + Server::myServerInfo.stats.type;
-	s_peeringIndex = teulOpenListen(peeringPort, _onPeerConnect, 10000, TCP, _onPeerError) ;
+	s_peeringIndex = teulOpenListen(peeringPort, _onPeerConnect, 10000, PROTOCOL_TCP, _onPeerError) ;
 	if ( s_peeringIndex < 0 )
 		LogAbort("Unable to open peering interface") ;
 	dbugLog(_FLN, "t:%d Server peering interface opened on port %u", s_peeringIndex, peeringPort) ;
+}
+
+//////////////////////////////////////////////////////////////////////
+// Expire any peer connections that haven't hello'd.
+
+void
+serverExpirePeerConnections()
+{
+	if ( s_pendingPeers.empty() )
+		return;
+#if defined(DEBUG)
+	// You have 15 seconds to identify yourself.
+	const TeulTimeMS cutoff = teulClock64 - 5000;
+#else
+	// You get 500ms.
+	const TeulTimeMS cutoff = teulClock64 - 500;
+#endif
+	std::vector<SINT16> discos;
+	for ( auto& it : s_pendingPeers )
+	{
+		if ( it.second < cutoff )
+			discos.push_back(it.first);
+	}
+	for ( auto& teulIndex : discos )
+	{
+		dbugLog(_FLI, "t:%d no hello received - disconnecting.", teulIndex);
+		teulClose(teulIndex);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -402,9 +482,9 @@ serverInitializePeering()
 // server.
 
 bool
-serverPeeringWithIP(const UINT32 ip)
+serverPeeringWithIP(const UINT32 ip, const SERVER_TYPE type_)
 {
-	const ServerConnection* const connection = _findConnectionByIP(ip) ;
+	const ServerConnection* const connection = _findConnectionByIP(ip, type_) ;
 	// We are "peering" if there exists a connection
 	// and it has an IP address. We don't check if
 	// the connection is established to avoid confusion

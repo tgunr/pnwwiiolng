@@ -46,7 +46,7 @@ _runTest(UINT32 address)
 {
 	connected = error = false ;
 
-	SINT32 teulIndex = teulOpenSend(address, WWII::Net::Ports::AuthHost, _connectFn, 60000, TCP, _errorFn) ;
+	SINT32 teulIndex = teulOpenSend(address, WWII::Net::Ports::AuthHost, _connectFn, 60000, PROTOCOL_TCP, _errorFn) ;
 	if ( teulIndex < 0 )
 	{
 		fprintf(stderr, "connection refused\n") ;

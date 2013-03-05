@@ -3665,7 +3665,7 @@ main(int argc, char* argv[])
 
 	dbugLog(_FLN, "Listening for players on port %u", WWII::Net::Ports::ChatHost);
 
-	const SINT32 managementListenInterface = teulOpenListen(WWII::Net::Ports::ChatManagement, _acceptManagementConnection, 20000, TCP, _managementErrorFunction);
+	const SINT32 managementListenInterface = teulOpenListen(WWII::Net::Ports::ChatManagement, _acceptManagementConnection, 20000, PROTOCOL_TCP, _managementErrorFunction);
 	ABORT_IF(managementListenInterface < 0);
 
 	dbugLog(_FLN, "Listening for management players on port %u", WWII::Net::Ports::ChatManagement);

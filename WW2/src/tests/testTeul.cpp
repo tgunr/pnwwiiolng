@@ -64,7 +64,7 @@ namespace Config
 	} ;
 
 	// Which protocol to use.
-	static PROTOCOL protocol = TCP ;
+	static PROTOCOL protocol = PROTOCOL_TCP ;
 
 	// If true (with --debug): enables debugging output.
 	static bool debugOutput = false ;
@@ -623,12 +623,12 @@ _processArguments(const int argc, const char* const argv[])
 			}
 			else if ( strncmp(arg, "udp", 3) == 0 )
 			{
-				Config::protocol = UDP ;
+				Config::protocol = PROTOCOL_UDP ;
 				continue ;
 			}
 			else if ( strncmp(arg, "udb", 3) == 0 )
 			{
-				Config::protocol = UDB ;
+				Config::protocol = PROTOCOL_UDB ;
 				continue ;
 			}
 			else if ( strncmp(arg, "test=", 5) == 0 )

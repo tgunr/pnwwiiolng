@@ -1,6 +1,7 @@
 #pragma once
 
 #include "server/serverStatusEnum.h"
+#include "wwii/wwiiServerTypeEnums.h"
 
 namespace Server
 {
@@ -10,12 +11,12 @@ namespace Server
 // hostd and stratUpdate would only send one.
 struct HeartBeat
 {
-	HeartBeat() : id(0ULL), address(0), port(0), type(0), teulVersion(0), procVersion(0), appVersion(0), m_numPlayers(0), m_maxPlayers(0), status(SERVER_LOGIN), arenaID(0) {}
+	HeartBeat() : id(0ULL), address(0), port(0), type(MAX_SERVER_TYPE), teulVersion(0), procVersion(0), appVersion(0), m_numPlayers(0), m_maxPlayers(0), status(SERVER_LOGIN), arenaID(0) {}
 
 	UINT64			id;				// mac address of eth0 + pid
 	UINT32			address;		// ip address of eth0
 	UINT16			port;			// port to accept players on.
-	UINT16			type;			// server type, servers are grouped by type
+	SERVER_TYPE		type;			// server type, servers are grouped by type
 	UINT32			teulVersion;	// version of teul being run
 	UINT32			procVersion;	// version of process being run
 	UINT32			appVersion;		// version of the client application

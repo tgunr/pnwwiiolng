@@ -10,18 +10,22 @@
 
 #include "weap/weapSpec.h"
 
+#pragma pack(push, 1)
 struct CHAT_SMITE_USER
 {
 	playerid_t	customerID;
 	ChatHandle	m_handle ;
 } ;
+#pragma pack(pop)
 
+#pragma pack(push, 1)
 struct CHAT_LOC_USER
 {
 	playerid_t playerID;
 	UINT32 reqPlayer;
 	SINT32 reqConnection;
 } ;
+#pragma pack(pop)
 
 struct RAW_POSITION
 {

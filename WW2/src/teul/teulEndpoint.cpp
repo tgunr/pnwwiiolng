@@ -462,7 +462,7 @@ ENDPOINT::setTimeout(const UINT32 timeout_)
 {
 	timeout = timeout_ ;
 
-	if ( timeout == 0 || state() == IS_LISTENING || protocol == UDB )
+	if ( timeout == 0 || state() == IS_LISTENING || protocol == PROTOCOL_UDB || protocol == PROTOCOL_CTRL )
 	{
 		m_impl->kliveInterval = Teul::MaxKliveNeeded;
 		m_doTimeoutCheck = false ;
@@ -520,7 +520,7 @@ teulCreateEndpoint(SINT32 wantIndex
 	newEndpoint->m_impl->Reset() ;
 
 	newEndpoint->protocol = (UCHAR)protocol;
-	newEndpoint->m_peer = (protocol == UDB) ;
+	newEndpoint->m_peer = (protocol == PROTOCOL_UDB) | (protocol == PROTOCOL_CTRL) ;
 
 	newEndpoint->m_state = (SCHAR)(isListening ? IS_LISTENING : IS_OPENING) ;
 
@@ -537,9 +537,10 @@ teulCreateEndpoint(SINT32 wantIndex
 
 	switch (protocol)
 	{
-		case TCP:
-		case UDP:
-		case UDB:
+		case PROTOCOL_TCP:
+		case PROTOCOL_UDP:
+		case PROTOCOL_UDB:
+		case PROTOCOL_CTRL:
 			newEndpoint->fromSockAddress.sin_family = AF_INET ;
 			newEndpoint->localSockAddress.sin_family = AF_INET ;
 			newEndpoint->destSockAddress.sin_family = AF_INET ;
@@ -554,18 +555,20 @@ teulCreateEndpoint(SINT32 wantIndex
 	}
 
 	newEndpoint->m_impl->m_version = Teul::VersionNumber ;
-	newEndpoint->m_impl->m_cryptVersion = (protocol != UDB) ? Teul::BaseVersion : 0x0000 ;
+	newEndpoint->m_impl->m_cryptVersion = (!newEndpoint->m_peer) ? Teul::BaseVersion : 0x0000 ;
 	newEndpoint->m_impl->m_txCrypt.newSeed() ;
 	newEndpoint->m_impl->m_rxCrypt.setSeed(0ULL) ;
 //	newEndpoint->m_recvCrypt = newEndpoint->m_sendCrypt ;
 
 	switch (protocol)
 	{
-	case UDP:
-	case UDB:
+	case PROTOCOL_UDP:
+	case PROTOCOL_UDB:
+	case PROTOCOL_CTRL:
 		newEndpoint->m_reliable = false;
 		break;
-	case TCP: default:
+	case PROTOCOL_TCP:
+	default:
 		newEndpoint->m_reliable = true;
 		break;
 	}

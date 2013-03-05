@@ -623,7 +623,7 @@ _setupVersionUpdate(APP_LAUNCH& launch, APP_LAUNCH_REQ& request, UINT32 platform
 	dbugLog(_FLA, "based on appID %d, sending APP_WEB_REDIRECT %s to \"%s\""
 			, request.appID, request.username, url);
 	wwiiIRCMessage("-err", "%s WEBREDIR %s", request.username, url) ;
-	_fillReply(launch, Auth::Apps::WEB_REDIRECT, 1, url, 0, 0, TCP, authGetOTP(), APPDL_INSTALL, request.appID);
+	_fillReply(launch, Auth::Apps::WEB_REDIRECT, 1, url, 0, 0, PROTOCOL_TCP, authGetOTP(), APPDL_INSTALL, request.appID);
 
 	launch.status = -AUTH_GENERAL_ERROR;
 
@@ -913,12 +913,12 @@ main(int argc, char* argv[])
 	signal(SIGHUP, _authSIGHUP);
 #endif
 
-	const SINT32 tcpconnection = teulOpenListen(WWII::Net::Ports::AuthHost, _acceptUserConnection, PLAYER_TIMEOUT, TCP, _errorFunction);
+	const SINT32 tcpconnection = teulOpenListen(WWII::Net::Ports::AuthHost, _acceptUserConnection, PLAYER_TIMEOUT, PROTOCOL_TCP, _errorFunction);
 	dbugLog(_FLN, "listening for clients on TCP port %u", WWII::Net::Ports::AuthHost);
 	if (tcpconnection < 0)
 		LogAbort("Error allocating endpoint!");
 
-	const SINT32 gameConnection = teulOpenListen(WWII::Net::Ports::InternalAuth, _acceptGameConnection, GAME_TIMEOUT, TCP, _gameErrorFunction);
+	const SINT32 gameConnection = teulOpenListen(WWII::Net::Ports::InternalAuth, _acceptGameConnection, GAME_TIMEOUT, PROTOCOL_TCP, _gameErrorFunction);
 	if ( gameConnection < 0 )
 		LogAbort("failed to open game listening socket") ;
 
@@ -1098,7 +1098,7 @@ _noGameEntry(const SINT32 teulIndex, UINT32 platform, const char* ip, const APP_
 				, url 				//data
 				, 0					//serverIP
 				, 0					//serverPort
-				, TCP				//protocol
+				, PROTOCOL_TCP		//protocol
 				, 0					// otp
 				, APPDL_NODL
 				, request.appID
@@ -1126,7 +1126,7 @@ _authValidateFailed(const SINT32 teulIndex, UINT32 platform, const char* ip, con
 
 	char url[MAX_PARAM] ;
 	buildURL(url, (WEB_ERR)error, gameEntry.appID, request.appVersion);  //which is 8
-	_fillReply(reply, Auth::Apps::LOGIN_DENIED, 1, url, 0, 0, TCP, 0, APPDL_NODL, gameEntry.appID);
+	_fillReply(reply, Auth::Apps::LOGIN_DENIED, 1, url, 0, 0, PROTOCOL_TCP, 0, APPDL_NODL, gameEntry.appID);
 
 	reply.status = -AUTH_GENERAL_ERROR;
 }
@@ -1148,7 +1148,7 @@ _gameNotAccepting(const SINT32 teulIndex, UINT32 platform, const char* ip, const
 
 	char deniedUrl[MAX_PARAM] ;
 	buildURL(deniedUrl, WEB_ERR_GAME, gameEntry.appID, request.appVersion);
-	_fillReply(reply, Auth::Apps::WEB_REDIRECT, 1, deniedUrl, 0, 0, TCP, 0, APPDL_NODL, gameEntry.appID);
+	_fillReply(reply, Auth::Apps::WEB_REDIRECT, 1, deniedUrl, 0, 0, PROTOCOL_TCP, 0, APPDL_NODL, gameEntry.appID);
 
 	reply.status = -AUTH_GAME_HOST_DOWN;
 }
@@ -1170,7 +1170,7 @@ _gameFull(const SINT32 teulIndex, UINT32 platform, const char* ip, const APP_LAU
 
 	char deniedUrl[MAX_PARAM] ;
 	buildURL(deniedUrl, WEB_ERR_FULL, gameEntry.appID, request.appVersion);
-	_fillReply(reply, APP_WEB_REDIRECT, 1, deniedUrl, 0, 0, TCP, 0, APPDL_NODL, gameEntry.appID);
+	_fillReply(reply, APP_WEB_REDIRECT, 1, deniedUrl, 0, 0, PROTOCOL_TCP, 0, APPDL_NODL, gameEntry.appID);
 
 	reply.status = -AUTH_GAME_FULL;
 }
@@ -1221,7 +1221,7 @@ _noServerAvailable(const SINT32 teulIndex, const APP_LAUNCH_REQ& request, GAME& 
 
 	char deniedUrl[MAX_PARAM] ;
 	buildURL(deniedUrl, WEB_ERR_FULL, gameEntry.appID, request.appVersion);
-	_fillReply(reply, Auth::Apps::WEB_REDIRECT, 1, deniedUrl, 0, 0, TCP, 0, APPDL_NODL, gameEntry.appID);
+	_fillReply(reply, Auth::Apps::WEB_REDIRECT, 1, deniedUrl, 0, 0, PROTOCOL_TCP, 0, APPDL_NODL, gameEntry.appID);
 
 	reply.status = -AUTH_GAME_FULL;
 }
@@ -1268,7 +1268,7 @@ _okToLaunch(const SINT32 teulIndex, UINT32 platform, const char* ip, const APP_L
 	//Login accepted, setup reply to say so
 	_fillReply(reply, gameEntry.appID, request.appVersion, "Login Accepted"
 				, destAddress, bestServer.port
-				, TCP, otp, APPDL_NODL, gameEntry.appID);
+				, PROTOCOL_TCP, otp, APPDL_NODL, gameEntry.appID);
 
 	reply.status = gameEntry.currentUsers; //pass down the number of users in the game
 
@@ -1511,7 +1511,7 @@ authVerifyChecksum(const SINT32 teulIndex, const UINT32 appID, const UINT32 plat
 					, "/"
 					, "tos.txt") ;
 
-		_fillReply(launcher, Auth::Apps::WEB_DOWNLOAD, 1, url, 0, 21, TCP, 0, APPDL_REPAIR, appID) ;
+		_fillReply(launcher, Auth::Apps::WEB_DOWNLOAD, 1, url, 0, 21, PROTOCOL_TCP, 0, APPDL_REPAIR, appID) ;
 		launcher.status = 0 ;
 
 		teulSend(teulIndex, authAPP_LAUNCH, &launcher) ;

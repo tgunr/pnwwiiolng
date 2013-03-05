@@ -1658,7 +1658,7 @@ missionCatchupServer(Server::ServerInfo* recipientServer)
 
 	while(tempMission)
 	{
-		mmSendExistingMissionTo(tempMission, changeToBroadcast(recipientServer->stats.address) );
+		mmSendExistingMissionTo(tempMission, Server::BroadcastMaskAddress(recipientServer->stats.address) );
 		tempMission=tempMission->next;
 	}
 }

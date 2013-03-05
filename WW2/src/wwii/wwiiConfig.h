@@ -15,6 +15,7 @@ enum
 ,	LIVE_INTERMISSION	=	2		//!< Running intermission
 } ;
 
+#pragma pack(push, 1)
 struct cfARENA
 {
 	UCHAR	banCheats ;				//!< Should we ban cheat detections.
@@ -251,6 +252,8 @@ struct	WWII_CONFIG
 
 	cfWEATHER	weather ;
 } ;
+#pragma pack(pop)
+
 extern WWII_CONFIG host_config ;
 
 extern const char* _countryName[MAX_COUNTRIES] ;

@@ -166,12 +166,6 @@ static void _logSettings()
 	dbugLog(_FLIB, ".") ;
 }
 
-static UINT32
-_getBroadAddr(Server::ServerInfo* server)
-{
-	return (server->stats.address & DIRECT_MASK) | Server::broadcastNet ;
-}
-
 static const char* _serverCode[] =
 {
 	"INVALID-CODE"
@@ -230,9 +224,9 @@ _checkArenalock(Server::ServerInfo* server, Server::Status state)
 static SINT32
 _serverEnterCallback(Server::ServerInfo* server, Server::Code scode)
 {
-	UINT32 broadAddr = _getBroadAddr(server) ;
+	UINT32 broadAddr = Server::BroadcastMaskAddress(server->stats.address) ;
 
- 	dbugLog(_FLN,"server %s added code %s[%d], type %d",teulGetAddress(server->stats.address), _serverCode[scode], scode, server->stats.type);
+ 	dbugLog(_FLN,"server %s added code %s[%d], type %d", teulGetAddress(server->stats.address), _serverCode[scode], scode, server->stats.type);
 
 	//If its a cell host and its already up, we need to sync it, since the
 	//	firebases have changed
@@ -280,7 +274,7 @@ _serverLeaveCallback(Server::ServerInfo* server, Server::Code scode)
 					, teulGetAddress(server->stats.address), _serverCode[scode], scode, server->stats.type);
 
 	_checkArenalock(server, Server::SERVER_INITIALIZING) ;
-	strtRemoveSyncPeer(_getBroadAddr(server)) ;
+	strtRemoveSyncPeer(Server::BroadcastMaskAddress(server->stats.address)) ;
 
 	switch ( server->stats.type )
 	{
@@ -297,7 +291,7 @@ _serverLeaveCallback(Server::ServerInfo* server, Server::Code scode)
 static SINT32
 _serverStatusCallback(Server::ServerInfo* server, Server::Code scode)
 {
-	UINT32 broadAddr = _getBroadAddr(server) ;
+	UINT32 broadAddr = Server::BroadcastMaskAddress(server->stats.address) ;
 
  	dbugLog(_FLN,"server status changed for %s, code is %s[%d] status is %s[%d]"
 				, teulGetAddress(server->stats.address)
@@ -507,7 +501,7 @@ main(int argc, char* argv[])
 	dbugLog(_FLN,"setting up direct broadcast address");
 #endif
 
-	const SINT32 mapConnection = teulOpenListenHost(Server::broadcastHost, WWII::Net::Ports::InternalStrat, _acceptMapConnection, 200000, TCP, _mapErrorFunction);
+	const SINT32 mapConnection = teulOpenListenHost(Server::broadcastHost, WWII::Net::Ports::InternalStrat, _acceptMapConnection, 200000, PROTOCOL_TCP, _mapErrorFunction);
 	dbugLog(_FLN,"Listening for map connections on port %d", WWII::Net::Ports::InternalStrat);
 
 	// Give the chat host 20 seconds to start

@@ -134,7 +134,7 @@ ENDPOINT::doConnect()
 		dbugLog(_FLN, "t:%d connected calling %p", this->teulIndex(), this->connectFn);
 		this->connectFn(*this) ;
 	}
-	else if ( protocol != UDB )	// UDB doesn't connect.
+	else if ( protocol != PROTOCOL_UDB && protocol != PROTOCOL_CTRL )	// UDB doesn't connect.
 	{
 		dbugLog(_FLA, "t:%d sock:%u state:%u prot:%u connected NO CONNECT FN", this->teulIndex(), this->socket, this->state(), this->protocol) ;
 	}
@@ -263,7 +263,7 @@ bool teulOpenListenInterface(const UINT16 portNumber
 						,  portNumber
 						,  acceptFnPtr
 						,  timeout
-						,  TCP
+						,  PROTOCOL_TCP
 						,  errorFnPtr
 						);
 		if (retval < 0)

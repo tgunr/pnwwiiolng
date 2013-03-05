@@ -53,8 +53,8 @@ CVAR_ADDR(authHost, "auth.playnet.com", "AUTH_ADDRESS", true
 			, "Host name or IP Address of the authentication server.");
 
 extern void serverInitializePeering();
-extern void serverConnectPeer(const UINT32 ip, const UINT32 type);
-extern void serverDisconnectPeer(const UINT32 ip);
+extern void serverConnectPeer(const UINT32 ip, const SERVER_TYPE type);
+extern void serverDisconnectPeer(Server::ServerInfo* server);
 
 class ServerManager : public ServerInterface
 {
@@ -76,7 +76,7 @@ namespace Server
 
 	UINT32	broadcastNet;			// Base address of the broadcast network
 
-	SINT32	broadcastIndex = -1;	// TeulIndex for broadcast (UDB) packets.
+	SINT32	broadcastIndex = -1;	// TeulIndex for broadcast packets.
 	SINT32	broadcastRxIndex = - 1;	// Where we receive broadcasts.
 
 	UINT32	localHost;				// IP addr of local host
@@ -97,11 +97,6 @@ static RELEASE_PERSONA_FUNCTION* _releasePersonaFn;
 static ACTIVATE_PLAYER_FUNCTION* _activatePlayerFn;
 static EXIT_PERSONA_FUNCTION* _exitPersonaFn;
 static EXIT_CLUSTER_FUNCTION* _exitClusterFn;
-
-typedef std::map<UINT32, Server::ServerInfo*> SERVERS_BY_IP;
-static SERVERS_BY_IP serversByIP;
-typedef std::map<UINT64, Server::ServerInfo*> SERVERS_BY_ID;
-static SERVERS_BY_ID serversByID;
 
 PLAYERID_HASH ServerInterface::s_byPlayerID;
 PLAYERIDX_MAP ServerInterface::s_byTeulIndex;
@@ -509,7 +504,7 @@ _playerDelete(PlayerStatusNode* const psn, Server::ReleaseType releaseType)
 
 	// With player tracking it is possible to have a player whos server is invalid
 	// here we extract a player from a valid server if abvailabale
-	server = Server::ServerInfo::GetInfo(psn->curServer.address);
+	server = Server::ServerInfo::GetInfo(psn->curServer.address, psn->curServer.type);
 	if ( server != NULL)
 		 _extractPlayerFromServer(server, psn);
 	else
@@ -556,10 +551,7 @@ _releaseServer(Server::ServerInfo* const server, Server::Code scode)
 
 	dbugLog(_FLN, "removing server %s type %d", teulGetAddress(server->stats.address), server->stats.type);
 
-	serverDisconnectPeer(server->stats.address);
-
-	serversByID.erase(server->stats.id);
-	serversByIP.erase(Server::BroadcastMaskAddress(server->stats.address));
+	serverDisconnectPeer(server);
 
 	delete server;
 }
@@ -845,12 +837,9 @@ _addServer(Server::ServerInfo* const server)
 	if (oldServer != NULL)
 		_releaseServer(oldServer, Server::SCODE_REPLACED);
 
-	oldServer = Server::ServerInfo::GetInfo(server->stats.address);
+	oldServer = Server::ServerInfo::GetInfo(server->stats.address, server->stats.type);
 	if(oldServer != NULL)
 		_releaseServer(oldServer, Server::SCODE_REPLACED);
-
-	serversByID[server->stats.id] = server;
-	serversByIP[Server::BroadcastMaskAddress(server->stats.address)] = server;
 
 	// Make sure our server info gets sent ahead of our attempt to connect.
 	_sendHeartBeat();
@@ -933,7 +922,7 @@ _serverReportAlive(unsigned int fd, const char* /*path*/, const char* /*args*/)
 
 SINT32
 serverInit(UINT32 appVersion
-				, SINT32 serverType, UINT32 exitDestType
+				, SERVER_TYPE serverType, UINT32 exitDestType
 				, SERVER_UPDATE* enterCallback
 				, SERVER_UPDATE* leaveCallback
 				, SERVER_UPDATE* statusCallback
@@ -963,7 +952,7 @@ serverInit(UINT32 appVersion
 
 	Server::myServerInfo.stats.address = Server::myInterface.addr[0].ip;
 	Server::myServerInfo.stats.id = static_cast<UINT64>(Server::myServerInfo.stats.address) << 32 | Server::myInterface.pid;
-	Server::myServerInfo.stats.type = (SINT16)serverType;
+	Server::myServerInfo.stats.type = serverType;
 
 	Server::myServerInfo.stats.status = Server::SERVER_LOGIN;
 	Server::myServerInfo.stats.m_numPlayers = 0;
@@ -1012,9 +1001,6 @@ serverFree(void)
 	}
 
 	s_activeServerList.clear();
-
-	serversByID.clear();
-	serversByIP.clear();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1051,21 +1037,30 @@ Server::GetReleaseType(Server::ReleaseType releaseType)
 }
 
 Server::ServerInfo*
-Server::ServerInfo::GetInfo(UINT32 baseIP)
+Server::ServerInfo::GetInfo(UINT32 baseIP_, UINT16 type_)
 {
-	SERVERS_BY_IP::iterator it = serversByIP.find(Server::BroadcastMaskAddress(baseIP));
-	return ( it != serversByIP.end() ) ? it->second : NULL;
+	auto peerIP = Server::BroadcastMaskAddress(baseIP_);
+	for ( auto& it : s_activeServerList )
+	{
+		if ( it->stats.address == peerIP && it->stats.type == type_ )
+			return it;
+	}
+	return nullptr;
 }
 
 Server::ServerInfo*
-Server::ServerInfo::GetByID(const UINT64& id)
+Server::ServerInfo::GetByID(const UINT64& id_)
 {
-	SERVERS_BY_ID::iterator it = serversByID.find(id);
-	return ( it != serversByID.end() ) ? it->second : NULL;
+	for ( auto& it : s_activeServerList )
+	{
+		if ( it->stats.id == id_ )
+			return it;
+	}
+	return nullptr;
 }
 
 Server::ServerInfo*
-Server::ServerInfo::GetBest(UINT32 type, bool allowFull/*=false*/)
+Server::ServerInfo::GetBest(UINT16 type, bool allowFull/*=false*/)
 {
 	Server::ServerInfo* maxServer = NULL;
 
@@ -1085,7 +1080,7 @@ Server::ServerInfo::GetBest(UINT32 type, bool allowFull/*=false*/)
 }
 
 bool
-Server::ServerInfo::IsAvailable(const UINT32 type_)
+Server::ServerInfo::IsAvailable(const UINT16 type_)
 {
 	for ( auto server : s_activeServerList )
 	{
@@ -1203,7 +1198,7 @@ Server::HeartBeat::process()
 		if (server->stats.type != this->type)
 		{
 			dbugLog(_FLI, "server:%s changed type %u->%u", teulGetAddress(server->stats.address), server->stats.type, this->type);
-			serverDisconnectPeer(server->stats.address);
+			serverDisconnectPeer(server);
 			if ( _leaveCallback)
 				(_leaveCallback)(server, Server::SCODE_REPLACED);
 			_sendHeartBeat();
@@ -1225,7 +1220,7 @@ Server::HeartBeat::process()
 				(_statusCallback)(server, Server::SCODE_STATUS);
 
 			// Check if we've lost our connection to this guy.
-			if ( serverPeeringWithIP(this->address) == false )
+			if ( serverPeeringWithIP(this->address, static_cast<SERVER_TYPE>(this->type)) == false )
 			{
 				_sendHeartBeat();
 				serverConnectPeer(this->address, this->type);
@@ -1351,7 +1346,7 @@ Server::Transfer::Transfer(XferReason _reason, Server::ServerInfo* const _destin
 SINT32
 Server::ServerInfo::mirrorPlayer(Server::PersonaMirror* const mirror)
 {
-	SINT32 destIndex = serverGetPeerIndex(stats.address);
+	SINT32 destIndex = serverGetPeerIndex(stats.address, static_cast<SERVER_TYPE>(stats.type));
 	if ( destIndex < 0 )
 	{
 		dbugLog(_FLW, "p:%u unable to mirror to server %s: no peering connection", mirror->dispatch().m_customerID, teulGetAddress(stats.address));
@@ -1572,9 +1567,13 @@ serverInitAddresses()
 	Server::myServerInfo.stats.arenaID = cv_arenaID.GetUint32();
 
 	Server::broadcastNet = cv_baseAddress.GetUint32();
+	if ( Server::IsBroadcastViaController() )
+		dbugLog(_FLI, "Server peering via Controller at %s", cv_baseAddress.GetString());
+	else
+		dbugLog(_FLI, "Server peering via broadcast network %s", cv_baseAddress.GetString());
 
 	Server::localHost = Server::myInterface.addr[0].ip;
-	Server::broadcastHost = Server::broadcastNet | (Server::localHost & 0x000000ff);
+	Server::broadcastHost = Server::BroadcastMaskAddress(Server::localHost);
 }
 
 static bool _broadcastRxConnected = false;
@@ -1584,7 +1583,7 @@ _broadcastConnect(ENDPOINT& endpoint)
 {
 	dbugLog(_FLD, "t:%d ip:%s:%u established broadcast index", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), endpoint.fromPort());
 	Server::broadcastConnected = true;
-	if ( Server::IsMulticast(Server::broadcastNet) )
+	if ( Server::IsBroadcastViaController() )
 		_broadcastRxConnected = true;
 	s_broadcastEndpoint = &endpoint;
 }
@@ -1604,15 +1603,17 @@ serverOpenBroadcastIndexes()
 	assert( Server::broadcastIndex == -1 );
 	assert( Server::broadcastConnected == false );
 
-	Server::broadcastIndex = teulOpenSend(Server::broadcastHost, WWII::Net::Ports::PrivateBcast, _broadcastConnect, 0, UDB, NULL);
+	const bool viaController = Server::IsBroadcastViaController();
+	const PROTOCOL protocol = !viaController ? PROTOCOL_UDB : PROTOCOL_CTRL;
+	Server::broadcastIndex = teulOpenSend(Server::broadcastHost, WWII::Net::Ports::PrivateBcast, _broadcastConnect, 0, protocol, NULL);
 	dbugLog(_FLN, "t:%d Server::broadcastIndex:%s", Server::broadcastIndex, teulGetAddress(Server::broadcastHost));
 	if ( Server::broadcastIndex < 0 )
 		LogAbort("unable to open server-broadcast index");
 
-	if ( !Server::IsMulticast(Server::broadcastNet) )
+	if ( !viaController )
 	{
 		UINT32 rxHost = Server::broadcastNet | 0x000000ff;
-		Server::broadcastRxIndex = teulOpenSend(rxHost, WWII::Net::Ports::PrivateBcast, _broadcastRxConnect, 0, UDB, NULL);
+		Server::broadcastRxIndex = teulOpenSend(rxHost, WWII::Net::Ports::PrivateBcast, _broadcastRxConnect, 0, protocol, NULL);
 		dbugLog(_FLN, "t:%d broadcastRxIndex:%s", Server::broadcastRxIndex, teulGetAddress(rxHost));
 		if ( Server::broadcastRxIndex < 0 )
 			LogAbort("unable to open server-broadcast-rx index");

@@ -88,7 +88,7 @@ public:
 	//! Broadcast this packet to an array of endpoints.
 	void send(const std::vector<ENDPOINT*>& endpoints) ;
 
-	//! Encrypt and send data to specified host over given UDB address.
+	//! Encrypt and send data to specified host via given teulIndex.
 	SINT32 sendTo(const SINT32 teulIndex, const UINT32 destAddress_, const UINT16 destPort_=0) ;
 	//! Encrypt and send data to specified host over given endpoint.
 	SINT32 sendTo(ENDPOINT& endpoint_, const UINT32 destAddress_, const UINT16 destPort_=0) ;

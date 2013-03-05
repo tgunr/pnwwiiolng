@@ -140,6 +140,7 @@ public:
 	UCHAR	restricted ;			// If your account prevents using this
 } ;
 
+#pragma pack(push, 1)				// Wire format capable.
 struct STRAT_ENEMY_REPORT
 {
 	FULL_OBJ_ID		reportingFacility;
@@ -149,5 +150,6 @@ struct STRAT_ENEMY_REPORT
 	UINT32			altitude;
 	UINT32			speed;
 } ;
+#pragma pack(pop)
 
 //tolua_end

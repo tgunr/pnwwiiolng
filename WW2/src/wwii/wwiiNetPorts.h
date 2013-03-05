@@ -36,10 +36,6 @@ namespace WWII
 			,	CellHost = MapHost
 #endif
 
-			,	GameBase	=	27020				// Assign ports here and up.
-			,	PeerBase	=	6100				// Peer listening ports.
-			,	WebBase		=	6200				// Listen for web connections here.
-
 			,	InternalStrat = 6060				// Strat<->server interface
 			,	Dbse = 9000							// } Database proxy primary and
 			,	ConnectionList = 27016				// } Find best connection

@@ -23,7 +23,7 @@ _onError(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*/, const T
 void
 serverOpenLuaClientInterface()
 {
-	const SINT32 result = teulOpenListen(WWII::Net::Ports::LuaInterface, _onAccept, 10000, TCP, _onError);
+	const SINT32 result = teulOpenListen(WWII::Net::Ports::LuaInterface, _onAccept, 10000, PROTOCOL_TCP, _onError);
 	if ( result < 0 )
 	{
 		LogAbort("Unable to initialize lua scripting interface [port %u]: %d", WWII::Net::Ports::LuaInterface, result) ;

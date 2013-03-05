@@ -10,6 +10,7 @@
 
 #include "strt/strtConstants.h"
 
+#pragma pack(push, 1)
 struct CP_SINFO
 {
 	UINT16				uOID ;		// Database ID
@@ -43,7 +44,7 @@ struct STRT_SYNC_BUILDINGS : public STRT_SYNC_DATA
 {
 	UCHAR	vislevel[STRT_BUILDINGS_PER_SYNC];		// list of countries indicating ownership
 } ;
-
+#pragma pack(pop)
 
 extern void strtProcessSyncCPs(const STRT_SYNC_CPS& syncCPs);
 extern void strtProcessSyncFacilities(const STRT_SYNC_FACILITIES& syncFacilities);

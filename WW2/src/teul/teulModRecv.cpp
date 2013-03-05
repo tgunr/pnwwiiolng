@@ -557,7 +557,7 @@ _recvDatagram(ENDPOINT& endpoint)
 		return -EINVAL ;
 
 	SINT32 retval = -1 ;
-	if ( endpoint.protocol == TCP )
+	if ( endpoint.protocol == PROTOCOL_TCP || endpoint.protocol == PROTOCOL_CTRL )
 	{
 		UINT32 packetsReceived = 0 ;
 		UINT32 errorCount = 0 ;
@@ -701,7 +701,7 @@ _runPollEndpoints(struct pollfd* fdArray, SINT32 maxSlots, SINT32 numSlots)
 			continue;
 		}
 
-		if ( endpoint.protocol == TCP )
+		if ( endpoint.protocol == PROTOCOL_TCP )
 		{
 			if (endpoint.state() == IS_LISTENING )
 			{
@@ -891,7 +891,7 @@ _endpointFDConnect(ENDPOINT& endpoint, const WSANETWORKEVENTS& eventData)
 		return false ;
 	break ;
 	case 0:
-		if ( endpoint.protocol != TCP ) // && endpoint->protocol != CMD )
+		if ( endpoint.protocol != PROTOCOL_TCP ) // && endpoint->protocol != CMD )
 		{
 			dbugLog(_FLA, "received connect for endpoint %d ilegal protocol %d"
 						, endpoint.teulIndex(), endpoint.protocol);
@@ -1006,7 +1006,7 @@ _pollSocketsInner(const TeulTimeMS& remainder)
 		}
 		else if( eventData.lNetworkEvents & FD_ACCEPT )
 		{
-			if ( endpoint.protocol != TCP ) // && endpoint->protocol != CMD )
+			if ( endpoint.protocol != PROTOCOL_TCP ) // && endpoint->protocol != CMD )
 			{
 				dbugLog(_FLA, "t:%d received accept for ilegal protocol %d", endpoint.teulIndex(), endpoint.protocol);
 				continue;
@@ -1051,7 +1051,7 @@ ENDPOINT::updateSocketEvents()
 #endif
 	pollData.fd[slot].revents = 0;
 
-	if ( ((protocol == TCP) & (state() == IS_OPENING) & (m_connected == false)) | (m_writesPending == true) )
+	if ( ((protocol == PROTOCOL_TCP) & (state() == IS_OPENING) & (m_connected == false)) | (m_writesPending == true) )
 		pollData.fd[slot].events |= POLLOUT ;
 
 	if (pollData.maxSock == INVALID_SOCKET)

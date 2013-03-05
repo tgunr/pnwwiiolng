@@ -16,12 +16,13 @@ SET(LIBRARIES_DIR "${PROJECT_DIR}/Libraries")
 SET_PROPERTY(GLOBAL PROPERTY USE_FOLDERS ON)
 
 SET(AUTH_HOST_EXE "authHost")
+SET(CONTROLLER_HOST_EXE "controller")
 SET(DBD_HOST_EXE "dbd")
 SET(CHAT_HOST_EXE "chatd")
-SET(STRAT_HOST_EXE "stratd")
-SET(MAP_HOST_EXE "mmhostd")
 SET(CELL_HOST_EXE "hostd")
+SET(MAP_HOST_EXE "mmhostd")
 SET(PING_HOST_EXE "pingHost")
+SET(STRAT_HOST_EXE "stratd")
 
 SET(_LUA_HOST "stratd")
 
@@ -360,6 +361,14 @@ target_link_libraries(${AUTH_HOST_EXE} teulserver libwwii ${MYSQL_LIBRARIES} irc
 SET_PROPERTY(TARGET ${AUTH_HOST_EXE} PROPERTY FOLDER "Hosts")
 
 IF ( NOT PN_CLUSTER STREQUAL "Auth" )
+	add_executable(${CONTROLLER_HOST_EXE}
+		src/controller.cpp
+	)
+	#ADD_PCH(${CONTROLLER_HOST_EXE})
+	set_property(TARGET ${CONTROLLER_HOST_EXE} PROPERTY COMPILE_DEFINITIONS AS_SERVER IS_CONTROLLER_HOST)
+	target_link_libraries(${CONTROLLER_HOST_EXE} libwwii teulserver)
+	SET_PROPERTY(TARGET ${CONTROLLER_HOST_EXE} PROPERTY FOLDER "Hosts")
+
 	# Primarily communications-oriented server, the chat host.
 	# Sadly it does an awful lot of the "map/mission" server's job
 	# because the original design disconnected players from
@@ -785,7 +794,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth")
 			RUNTIME DESTINATION bin
 			COMPONENT tools
 	)
-	INSTALL(TARGETS ${GOVERNOR_HOST_EXE} ${STRAT_HOST_EXE} ${DBD_HOST_EXE} ${PING_HOST_EXE}
+	INSTALL(TARGETS ${CONTROLLER_HOST_EXE} ${STRAT_HOST_EXE} ${DBD_HOST_EXE} ${PING_HOST_EXE}
 					${CHAT_HOST_EXE} ${MAP_HOST_EXE} ${CELL_HOST_EXE}
 			ARCHIVE DESTINATION lib
 			LIBRARY DESTINATION lib

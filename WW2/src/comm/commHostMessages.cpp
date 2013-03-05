@@ -754,7 +754,7 @@ _recvUpdateInfo(ACTION_OBJECT* const a)
 static bool
 _forwardHitsToRemoteServer(const HostVehicle& vehicle, const SINT32 bits, const char* const source)
 {
-	const SINT32 cellIndex = serverGetPeerIndex(vehicle.serverAddress) ;
+	const SINT32 cellIndex = serverGetPeerIndex(vehicle.serverAddress, CELL_HOST) ;
 	if ( cellIndex < 0 )
 		return false ;
 
@@ -1422,7 +1422,7 @@ hostSendResupplyIssue(UINT32 cellIP, const sortieid_t& toSerial, const sortieid_
 	assert( fromSerial != 0 ) ;
 	assert( fromHandle != 0LL ) ;
 
-	const SINT32 cellIndex = serverGetPeerIndex(cellIP) ;
+	const SINT32 cellIndex = serverGetPeerIndex(cellIP, CELL_HOST) ;
 	if ( cellIndex < 0 )
 		return ;
 
@@ -1439,7 +1439,7 @@ hostSendResupplyAccepted(UINT32 cellIP, const sortieid_t& sendTo, const ChatHand
 {
 	assert(cellIP != 0) ;
 
-	const SINT32 cellIndex = serverGetPeerIndex(cellIP) ;
+	const SINT32 cellIndex = serverGetPeerIndex(cellIP, CELL_HOST) ;
 	if ( cellIndex < 0 )
 		return ;
 

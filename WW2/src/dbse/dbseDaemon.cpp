@@ -42,7 +42,7 @@ SINT32 dbseInitHost(UINT16 port)
 
 	dbugLog(_FLI, "Opening listensocket for arena:%d on port:%d", arenaID, port);
 
-	hostListenTCP = teulOpenListen(port, _acceptFunction, 20000, TCP, _errorFunction);
+	hostListenTCP = teulOpenListen(port, _acceptFunction, 20000, PROTOCOL_TCP, _errorFunction);
 	ABORT_IF(hostListenTCP < 0);
 
 	return hostListenTCP;

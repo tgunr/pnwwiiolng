@@ -103,7 +103,7 @@ teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback)
 SINT32
 ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT32 port)
 {
-	if ( protocol == TCP )
+	if ( protocol == PROTOCOL_TCP || protocol == PROTOCOL_CTRL )
 	{
 		return ::send(socket, (const char*)data, sizeInBytes, SOCK_SEND_FLAGS) ;
 	}

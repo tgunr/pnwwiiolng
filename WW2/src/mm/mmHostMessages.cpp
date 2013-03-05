@@ -370,7 +370,7 @@ _recvDoDespawn(struct ACTION_OBJECT* const a)
 		return -Teul::Errors::LoginFail_DespawnNoPlayer ;
 	}
 
-	const UINT32 cellIndex = serverGetPeerIndex(player->m_lastSpawnedTo) ;
+	const UINT32 cellIndex = serverGetPeerIndex(player->m_lastSpawnedTo, CELL_HOST) ;
 	if ( cellIndex >= 0 )
 	{
 		Teul::Packet outgoing(0, Comm::CallbackX, DESPAWNED_Y) ;
@@ -401,7 +401,7 @@ _registerStratCallback(void)
 void
 Host::VehicleRequest::send(const Server::ServerInfo* server)
 {
-	const SINT32 cellIndex = serverGetPeerIndex(server->stats.address) ;
+	const SINT32 cellIndex = serverGetPeerIndex(server->stats.address, CELL_HOST) ;
 	if ( cellIndex < 0 )
 	{
 		dbugLog(_FLD, "unable to send vehicle request: cell %s not peering", teulGetAddress(server->stats.address)) ;
@@ -412,7 +412,7 @@ Host::VehicleRequest::send(const Server::ServerInfo* server)
 	outgoing.setUnencrypted() ;
 	outgoing.append(this, sizeof(*this)) ;
 	const SINT32 result = outgoing.send(cellIndex) ;
-	dbugLog(_FLD, "sending vehicle request to t:%d a:%u returned:%d", Server::broadcastIndex, server->stats.address & DIRECT_MASK, result) ;
+	dbugLog(_FLD, "sending vehicle request to t:%d a:%u returned:%d", cellIndex, server->stats.address & DIRECT_MASK, result) ;
 }
 
 //Installs the host callbacks

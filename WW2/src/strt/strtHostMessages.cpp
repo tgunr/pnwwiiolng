@@ -92,8 +92,6 @@ static	TEUL_CALLBACK* _SEND_SYNC_BUILDINGS;
 
 static	TEUL_CALLBACK* _XCHG_MM_JOIN_LIST;
 
-static	TEUL_CALLBACK* _SEND_CONFIG_UPDATE ;
-
 static LOGICAL _allowSyncing = FALSE ;
 
 template <class Type>
@@ -279,7 +277,7 @@ strtBroadcastTimeUpdate(UINT32 gameTime, UINT32 timeFactor, UINT32 weatherPatter
 {
 	Teul::Packet outgoing(0, Strat::CallbackX, STRT_BROADCAST_TIME_UPDATE_Y) ;
 	CONSTRUCT_IN_PACKET(outgoing, Host::TimeUpdate, gameTime, timeFactor, weatherPattern, fogPattern) ;
-	return outgoing.send(Server::broadcastIndex) ;
+	return serverSendPacketToPeers(outgoing);
 }
 
 SINT32 strtBroadcastConfigUpdate()
@@ -288,7 +286,9 @@ SINT32 strtBroadcastConfigUpdate()
 	{
 		host_config.routDestination[i] = (routDestination[i] ? routDestination[i]->fullObjID.Key() : 0ULL) ;
 	}
-	return teulSend(Server::broadcastIndex, _SEND_CONFIG_UPDATE, &host_config) ;
+	Teul::Packet outgoing(sizeof(host_config), Strat::CallbackX, STRT_BROADCAST_CONFIG_UPDATE_Y);
+	outgoing.append(host_config);
+	return serverSendPacketToPeers(outgoing);
 }
 
 SINT32 strtSendMMCrewBailed(SINT32 hostConnection, UINT32 comanderID,UINT32 crewID)
@@ -789,12 +789,6 @@ static SINT32 _recvWeaponsReturn(ACTION_OBJECT* const a)
 }
 
 static SINT32
-_sendConfigUpdate(ACTION_OBJECT* const a)
-{
-	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(WWII_CONFIG)) ;
-}
-
-static SINT32
 _recvMMSpawnCancel(ACTION_OBJECT* const a)
 {
 	MM_SPAWN_CANCEL spawnCancel;
@@ -1188,7 +1182,6 @@ strtHostInstallCallbacks(void)
 		REGISTER_SENDER(STRT_MM_JOIN_ACCEPT_Y, _sendMMJoinAccept, _SEND_MM_JOIN_ACCEPT) ;
 		REGISTER_SENDER(STRT_MM_JOIN_DENY_Y, _sendMMJoinDeny, _SEND_MM_JOIN_DENY) ;
 		REGISTER_SENDER(STRT_MM_POST_EXPIRED_Y, _sendMMPostExpired, _SEND_MM_POST_EXPIRED) ;
-		REGISTER_SENDER(STRT_BROADCAST_CONFIG_UPDATE_Y, _sendConfigUpdate, _SEND_CONFIG_UPDATE) ;
 		REGISTER_SENDER(STRT_MM_CREW_BAILED_Y, _sendMMCrewBailed, _SEND_MM_CREW_BAILED) ;
 		REGISTER_SENDER(STRT_SYNC_CPS_Y, _sendSyncCPs, _SEND_SYNC_CPS) ;
 		REGISTER_SENDER(STRT_SYNC_FACILITIES_Y, _sendSyncFacilities, _SEND_SYNC_FACILITIES) ;

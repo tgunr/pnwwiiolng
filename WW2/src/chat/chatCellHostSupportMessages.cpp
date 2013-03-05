@@ -38,14 +38,6 @@ extern void hostSmiteCustomer(playerid_t playerID) ;
 
 //The actual send function for system messages
 
-static SINT32
-_sendFoundUser(ACTION_OBJECT* const a)
-{
-	a->offset = teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(CHAT_FOUND_USER));
-
-	return a->offset ;
-}
-
 static HostVehicle*
 _findVehicleByPlayerID(const playerid_t playerID)
 {
@@ -64,20 +56,16 @@ _findVehicleByPlayerID(const playerid_t playerID)
 
 //recvs a smite user from the chat host
 static SINT32
-_recvLocateUser(ACTION_OBJECT* const a)
+_recvLocateUser(ACTION_OBJECT* a, CHAT_LOC_USER& locUser_)
 {
-	CHAT_LOC_USER locUser;
-	CHAT_FOUND_USER found;
-	HostVehicle* vref ;
-
-	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &locUser, sizeof(CHAT_LOC_USER));
-
-	found.locUser = locUser;
+	Teul::Packet outgoing(0, Chat::CallbackX, Chat::FOUND_USER_Y);
+	auto& found = outgoing.allocate<CHAT_FOUND_USER>();
+	found.locUser = locUser_;
 	found.isFound = FALSE;
 	found.serverAddress = Server::myServerInfo.stats.address ;
 	found.serverType = Server::myServerInfo.stats.type ;
 
-	vref = _findVehicleByPlayerID(locUser.playerID) ;
+	HostVehicle* vref = _findVehicleByPlayerID(locUser_.playerID) ;
 	if ( vref != NULL )
 	{
 		found.isFound = TRUE;
@@ -88,7 +76,7 @@ _recvLocateUser(ACTION_OBJECT* const a)
 		found.weapon = vref->spec() ;
 	}
 
-	teulSendTo(Server::broadcastIndex, a->fromAddress & DIRECT_MASK, 0, _SEND_FOUND_USER, &found) ;
+	outgoing.send(*a->endpoint);
 
 	return a->offset;
 }
@@ -188,9 +176,7 @@ chatInstallCellHostSupportCallbacks(void)
 //		REGISTER_SENDER(Chat::GAME_DIRECT_MESSAGE_Y, _sendDirectMessage, _SEND_DIRECT_MESSAGE) ;
 
 		REGISTER_RECEIVER(Chat::SMITE_USER_Y, _recvSmiteUser) ;
-		REGISTER_RECEIVER(Chat::LOCATE_USER_Y, _recvLocateUser) ;
-
-		REGISTER_SENDER(Chat::FOUND_USER_Y, _sendFoundUser, _SEND_FOUND_USER) ;
+		REGISTER_RECEIVEOBJ(Chat::LOCATE_USER_Y, CHAT_LOC_USER, _recvLocateUser);
 
 		// Send/receive bandwidth notices
 		REGISTER_SENDRECV(Chat::BANDWIDTH_NOTICE_Y, _sendBandwidthNotice, _recvBandwidthNotice, _XCHG_BANDWIDTH_NOTICE) ;

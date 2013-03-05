@@ -1529,8 +1529,7 @@ _newStratHost(const Server::HeartBeat& heartbeat, const bool isEntering)
 {
 	if ( heartbeat.status == Server::SERVER_ACCEPTING )
 	{
-		_stratHost = heartbeat.address;
-		_stratHost = (_stratHost & DIRECT_MASK) | Server::broadcastNet ;
+		_stratHost = Server::BroadcastMaskAddress(heartbeat.address);
 		dbugLog(_FLN, "detected strat host at %s", teulGetAddress(_stratHost)) ;
 	}
 }
@@ -3000,11 +2999,11 @@ main(const int argc, const char* const argv[])
 		dbugLog(_FLM, "Clustering enabled: Broadcast network %s specified.", cv_baseUpdtAddress.GetString());
 
 		const UINT32 updateBcastHost = cv_baseUpdtAddress.GetUint32() | 0x000000ff;
-		updateBcastRecv = teulOpenSend(updateBcastHost, WWII::Net::Ports::PrivateBcast, NULL, 0, UDB, NULL);
+		updateBcastRecv = teulOpenSend(updateBcastHost, WWII::Net::Ports::PrivateBcast, NULL, 0, PROTOCOL_UDB, NULL);
 		dbugLog(_FLN, "t:%d updateBcastRecv:%s", updateBcastRecv, teulGetAddress(updateBcastHost)) ;
 
 		const UINT32 updateDirectHost = cv_baseUpdtAddress.GetUint32() | (Server::localHost & 0x000000ff);
-		updateBcastSend = teulOpenSend(updateDirectHost, WWII::Net::Ports::PrivateBcast, NULL, 0, UDB, NULL);
+		updateBcastSend = teulOpenSend(updateDirectHost, WWII::Net::Ports::PrivateBcast, NULL, 0, PROTOCOL_UDB, NULL);
 		dbugLog(_FLN, "t:%d updateBcastSend:%s", updateBcastSend, teulGetAddress(updateDirectHost)) ;
 	}
 	else
@@ -3044,8 +3043,7 @@ main(const int argc, const char* const argv[])
 		Server::ServerInfo* const server = Server::ServerInfo::GetBest(STRAT_HOST, true) ;
 		if (server != NULL)
 		{
-			_stratHost = server->stats.address;
-			_stratHost = (_stratHost & DIRECT_MASK) | Server::broadcastNet;
+			_stratHost = Server::BroadcastMaskAddress(server->stats.address);
 		}
 	}
 

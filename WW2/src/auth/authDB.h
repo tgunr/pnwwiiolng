@@ -15,7 +15,7 @@
 #define URL_STRING_MAX 128
 #define APPLE_ID_MAX 16
 #define DEF_PORT 21
-#define DEF_PROTOCOL TCP
+#define DEF_PROTOCOL PROTOCOL_TCP
 
 struct vers_manifest
 {

@@ -2,6 +2,7 @@
 
 #include "server/serverReleaseTypeEnum.h"
 #include "server/serverCodeEnum.h"
+#include "wwii/wwiiServerTypeEnums.h"
 
 namespace Server
 {
@@ -33,7 +34,7 @@ typedef SINT32 (SERVER_UPDATE) (Server::ServerInfo* server, Server::Code scode);
 // 	xferCompleteFn  : called when the persona transfer is completed by sendPlayerTp or sendGroupTo
 //	errorFunxtion	  : used to relay problems with transfers
 extern SINT32 serverInit(UINT32 appVersion
-					, SINT32 serverType, UINT32 exitDestType
+					, SERVER_TYPE serverType, UINT32 exitDestType
 					// sever managment callbacks
 					, SERVER_UPDATE* enterCallback
 					, SERVER_UPDATE* leaveCallback

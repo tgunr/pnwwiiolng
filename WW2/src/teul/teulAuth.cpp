@@ -423,7 +423,7 @@ SINT32 _openSendParent(UINT32 parentHost, UINT16 parentPort)
 	if (parentHost == 0)
 		return -EINVAL;
 
-	const SINT32 parentConnection = teulOpenSend(parentHost, parentPort, _parentOpened, CONNECT_TIMEOUT, TCP, _authErrorFn);
+	const SINT32 parentConnection = teulOpenSend(parentHost, parentPort, _parentOpened, CONNECT_TIMEOUT, PROTOCOL_TCP, _authErrorFn);
 
 	if (parentConnection < 0)
 	{
@@ -469,7 +469,7 @@ static void _authErrorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size,
 	if ( _timeDown.elapsed() <= MAX_AUTH_DOWN_TIMEOUT )
 	{
 		dbugLog(_FLA,"restarting auth connection error count %d", errorCount);
-		_authConnection = teulOpenSend(_authHost, _authPort, _authOpened, CONNECT_TIMEOUT, TCP, _authErrorFn);
+		_authConnection = teulOpenSend(_authHost, _authPort, _authOpened, CONNECT_TIMEOUT, PROTOCOL_TCP, _authErrorFn);
 	}
 	else
 	{
@@ -505,7 +505,7 @@ SINT32 _openSend(APID appID, UINT32 arenaID, UINT32 hostVersion, UINT32 authHost
 	game.ipAddress = localAddress;
 	strcpy(game.hello,"Hello!");
 
-	_authConnection = teulOpenSend(_authHost, _authPort, _authOpened, CONNECT_TIMEOUT, TCP, _authErrorFn);
+	_authConnection = teulOpenSend(_authHost, _authPort, _authOpened, CONNECT_TIMEOUT, PROTOCOL_TCP, _authErrorFn);
 	_timeOpen.makeCurrent() ;
 
 	if (_authConnection < 0)
