@@ -71,7 +71,7 @@ _recvAddressList(ACTION_OBJECT* const a)
 	if ( _testPort == 0 )
 	{
 		_testPort = WWII::Net::Ports::ConnectionTest ;
-		_testProtocol = TCP ;
+		_testProtocol = PROTOCOL_TCP ;
 	}
 
 	_stop = true ;
@@ -206,7 +206,7 @@ clientFindBestConnection(UINT32 host)
 	// Open connection
 	teulSyncClock() ;	// Mac may need this.
 	_report(true, "starting network selection\n") ;
-	SINT32 connection = teulOpenSend(host, WWII::Net::Ports::ConnectionList, _connectFn, 60000, TCP, _errorFn) ;
+	SINT32 connection = teulOpenSend(host, WWII::Net::Ports::ConnectionList, _connectFn, 60000, PROTOCOL_TCP, _errorFn) ;
 	if ( connection < 0 )
 	{
 		_report(true, "failed creating pingd connection\n") ;
