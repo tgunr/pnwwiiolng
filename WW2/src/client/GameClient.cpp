@@ -82,8 +82,6 @@ using namespace ww2;
 
 static GameClient* _playerclient;
 
-extern void clientFindBestConnection(UINT32 host) ;
-
 /************************************************************************************************
 	GameClientLogin
 	throws ClientNetError
@@ -99,9 +97,6 @@ int GameClientLogin(unsigned int host, int playerID, int otp,
 #endif
 	try
 	{
-#ifndef DONT_FIND_BEST_CONNECTION
-		clientFindBestConnection(host) ;
-#endif
 		if(PlayerClient()->Login(host, port, true) != 0)
 			throw ClientNetError("connect.login.badlogin");
 
