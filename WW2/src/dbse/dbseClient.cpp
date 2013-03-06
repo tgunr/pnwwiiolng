@@ -17,6 +17,8 @@
 
 CVAR_ADDR(dbsePrimaryAddress, NULL, "DBSE_PRIMARY_ADDRESS", true
 			, "IP address dbd clients will reach the dbd on.");
+CVAR_UINT(dbseConnectionTimeout_ms, "3000", "DBSE_CONNECTION_TIMEOUT_MS"
+		    , "Time in miliseconds before database proxy connections timeout.");
 
 static SINT32 hostIndex = 0;
 static CONNECTION_STATUS connected = CONNECT_NONE;
@@ -138,7 +140,7 @@ dbseOpenConnection()
 	_handshakeSent=FALSE;
 	_dbseError = false;
 
-	const SINT32 tempIndex = teulOpenSend(cv_dbsePrimaryAddress.GetUint32(), dbsePort, _connectFn, 2500, PROTOCOL_TCP, _errorFn);
+	const SINT32 tempIndex = teulOpenSend(cv_dbsePrimaryAddress.GetUint32(), dbsePort, _connectFn, cv_dbseConnectionTimeout_ms.GetUint32(), PROTOCOL_TCP, _errorFn);
 	if ( tempIndex < 0)
 	{
 		dbugLog(_FLA,"couldnt make dbseDaemon connection, err:%d", hostIndex);
