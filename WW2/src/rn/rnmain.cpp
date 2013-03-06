@@ -310,7 +310,7 @@ bool rnmainGetOnlineSetting()
 		}
 
 		GamePort = WWII::Net::Ports::MapHost ;
-		CommType = TCP;
+		CommType = PROTOCOL_TCP;
 		GameOTP = strtoul(ServerOTP, NULL, 10);
 
 #if FRES || defined(BETA_RELEASE)
@@ -1467,7 +1467,7 @@ static LOGICAL _ParseCommandArgs(UINT32* host, UINT16* port, UINT16* protocol, U
 	}
 
 	*port = (UINT16)strtoul(ServerPort, NULL, 10);
-	*protocol = TCP;
+	*protocol = PROTOCOL_TCP;
 
 	*otp = strtoul(ServerOTP, NULL, 10) ;
 

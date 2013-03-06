@@ -607,7 +607,7 @@ Teul::Connection::start(class ww2::Client* const client)
 	// Open a new TCP connection to the server; this only
 	// tells us that we were able to perform a TCP open,
 	// it doesn't tell us that we're connected yet.
-	SINT32 newTeulIndex = teulOpenSend(m_serverAddr.m_hostIP, m_serverAddr.m_port, s_onConnect, (SINT32)m_timeoutMS, TCP, s_onError) ;
+	SINT32 newTeulIndex = teulOpenSend(m_serverAddr.m_hostIP, m_serverAddr.m_port, s_onConnect, (SINT32)m_timeoutMS, PROTOCOL_TCP, s_onError) ;
 	if ( newTeulIndex == -1 )
 		return false ;
 
