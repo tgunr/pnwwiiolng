@@ -52,10 +52,12 @@ _onEventBufferRead(struct bufferevent* bev, void* arg)
 	struct evbuffer* input = bufferevent_get_input(bev);
 	ABORT_IF(input == nullptr);
 
+#ifdef CONTROLLER_STATS
 	size_t numReads = 0;
 	size_t bytesRead = 0;
 	size_t numWrites = 0;
 	size_t bytesWritten = 0;
+#endif
 
 	struct evbuffer_iovec ebiov;
 	for ( ;; )
@@ -77,28 +79,27 @@ _onEventBufferRead(struct bufferevent* bev, void* arg)
 			ABORT_IF(output == nullptr);
 			evbuffer_add(output, ebiov.iov_base, ebiov.iov_len);
 
+#ifdef CONTROLLER_STATS
 			++numWrites;
 			bytesWritten += ebiov.iov_len;
+#endif
 		}
 
 		evbuffer_drain(input, ebiov.iov_len);
+
+#ifdef CONTROLLER_STATS
 		++numReads;
 		bytesRead += ebiov.iov_len;
+#endif
 	}
 
-	if ( g_logDebug )
-	{
-		printf("sock:%d read %" PRSizeT " bytes in %" PRSizeT " reads; wrote %" PRSizeT " bytes in %" PRSizeT " writes.\n"
-						, srcSock
-						, bytesRead, numReads
-						, bytesWritten, numWrites
-						);
-		dbugLog(_FLD, "sock:%d read %" PRSizeT " bytes in %" PRSizeT " reads; wrote %" PRSizeT " bytes in %" PRSizeT " writes."
-						, srcSock
-						, bytesRead, numReads
-						, bytesWritten, numWrites
-						);
-	}
+#ifdef CONTROLLER_STATS
+	dbugLog(_FLD, "sock:%d read %" PRSizeT " bytes in %" PRSizeT " reads; wrote %" PRSizeT " bytes in %" PRSizeT " writes."
+					, srcSock
+					, bytesRead, numReads
+					, bytesWritten, numWrites
+					);
+#endif
 }
 
 static void
