@@ -89,10 +89,10 @@ Squad::packer(LOGICAL mode, ACTION_OBJECT* a)
 bool
 Squad::setSquadNight(const char* string)
 {
-	UCHAR night = 0, hour = 0 ;
-	SCHAR tz = 0 ;
+	UINT32 night = 0, hour = 0 ;
+	SINT32 tz = 0 ;
 
-	if ( sscanf(string, "%hhu,%hhu,%hhd", &night, &hour, &tz) != 3 )
+	if ( sscanf(string, "%u,%u,%d", &night, &hour, &tz) != 3 )
 		return false ;
 
 	bool changed = false ;
