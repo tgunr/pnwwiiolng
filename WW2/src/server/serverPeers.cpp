@@ -17,6 +17,7 @@
 #include "teul/teulCallbackStruct.h"
 #include "teul/teulConstants.h"
 #include "teul/teulEndpoint.h"
+#include "teul/teulMicroWebServer.h"
 #include "teul/teulPacket.h"
 #include "teul/teulPacketHeader.h"
 #include "wwii/wwiiNetPorts.h"
@@ -52,6 +53,37 @@ static SINT32 s_peeringIndex = -1 ;
 
 // Peers who have connected but not hello'd yet.
 static std::map<SINT16, TeulTimeMS> s_pendingPeers;
+
+#include <OpenThreads/Mutex>
+#include <OpenThreads/ScopedLock>
+
+static OpenThreads::Mutex s_peerMutex;
+
+//////////////////////////////////////////////////////////////////////
+// JSON description of current peering info.
+
+static void
+_reportJSONPeers(unsigned int fd, const char* path, const char* args)
+{
+	size_t maxSize = 128 + (s_connections.size() * 128) + (s_pendingPeers.size() * 64) + 1;
+	char* report = static_cast<char*>(alloca(maxSize));
+	char* p = report + sprintf(report, "{\"peers\":[");
+	{
+		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(s_peerMutex);
+		for ( auto& it : s_connections )
+		{
+			p += sprintf(p, "{\"ip\":%u,\"type\":%u,\"idx\":%d,\"conn\":%u},", it.m_ip, it.m_type, it.m_teulIndex, it.m_connected);
+		}
+		p += sprintf(p, "],\"pending\":[");
+		for ( auto& it : s_pendingPeers )
+		{
+			p += sprintf(p, "{\"ip\":%u,\"time\":%llu},", it.first, teulClock64 - it.second);
+		}
+	}
+	p += sprintf(p, "]}\n");
+
+	send(fd, report, static_cast<size_t>(p - report), 0);
+}
 
 //////////////////////////////////////////////////////////////////////
 // Find a connection in the connections list by IP address. Returns
@@ -111,13 +143,15 @@ _onConnect(ENDPOINT& endpoint)
 	teulGetAddress(connection->m_ip, addr, sizeof(addr)) ;
 	dbugLog(_FLD, "serv:%s t:%d connected on t:%d", addr, connection->m_teulIndex, endpoint.teulIndex()) ;
 
-	// Paranoia: Make sure the teulIndexes match.
-	if ( connection->m_teulIndex != endpoint.teulIndex() )
 	{
-		connection->m_teulIndex = endpoint.teulIndex() ;
+		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(s_peerMutex);
+
+		// Paranoia: Make sure the teulIndexes match.
+		if ( connection->m_teulIndex != endpoint.teulIndex() )
+			connection->m_teulIndex = endpoint.teulIndex() ;
+
+		connection->m_connected = true ;
 	}
-		
-	connection->m_connected = true ;
 
 	Teul::Packet outgoing(sizeof(PeerHello), Teul::Serv::CallbackX, PEER_HELLO_Y);
 	auto& hello = outgoing.allocate<PeerHello>();
@@ -132,7 +166,10 @@ static void
 _onError(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* /*object*/, SINT32 error)
 {
 	if ( error == ENOTCONN )
+	{
+		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(s_peerMutex);
 		s_pendingPeers.erase(teulIndex);
+	}
 
 	ServerConnection* const connection = _findConnectionByTeulIndex(teulIndex) ;
 	if ( connection == NULL )
@@ -214,6 +251,8 @@ serverConnectPeer(const UINT32 forIP_, const SERVER_TYPE type_)
 		return ;
 	}
 
+	OpenThreads::ScopedLock<OpenThreads::Mutex> lock(s_peerMutex);
+
 	// Only consider the last octet.
 	ServerConnection* const connection = _findConnectionByIP(ip, type_) ;
 	if ( connection != NULL )
@@ -230,6 +269,7 @@ serverConnectPeer(const UINT32 forIP_, const SERVER_TYPE type_)
 
 	// Being still here indicates the server wasn't found.
 	s_connections.push_back(ServerConnection(ip, type_, -1)) ;
+
 	s_connections.back().doConnect() ;
 }
 
@@ -369,7 +409,10 @@ _onPeerConnect(ENDPOINT& endpoint)
 	teulGetAddress(endpoint.fromAddress(), addr, sizeof(addr));
 	dbugLog(_FLI, "t:%d ip:%s:%u peer connection", endpoint.teulIndex(), addr, endpoint.fromPort());
 
-	s_pendingPeers[endpoint.teulIndex()] = teulClock64;
+	{
+		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(s_peerMutex);
+		s_pendingPeers[endpoint.teulIndex()] = teulClock64;
+	}
 }
 
 static SINT32
@@ -387,6 +430,8 @@ _onPeerHello(ACTION_OBJECT* a, PeerHello& hello)
 		return -EINVAL;
 	}
 	ABORT_IF( info->stats.type != hello.m_type );
+
+	OpenThreads::ScopedLock<OpenThreads::Mutex> lock(s_peerMutex);
 
 	UINT32 ip = Server::BroadcastMaskAddress(endpoint.fromAddress()) ;
 	ServerConnection* connection = _findConnectionByIP(ip, hello.m_type);
@@ -409,7 +454,10 @@ _onPeerHello(ACTION_OBJECT* a, PeerHello& hello)
 	teulGetAddress(connection->m_ip, addr, sizeof(addr)) ;
 	dbugLog(_FLI, "t:%d serv:%s:%u peer connection complete", connection->m_teulIndex, addr, endpoint.fromPort()) ;
 
-	s_pendingPeers.erase(endpoint.teulIndex());
+	{
+		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(s_peerMutex);
+		s_pendingPeers.erase(endpoint.teulIndex());
+	}
 
 	return a->offset;
 }
@@ -446,7 +494,11 @@ serverInitializePeering()
 	s_peeringIndex = teulOpenListen(peeringPort, _onPeerConnect, 10000, PROTOCOL_TCP, _onPeerError) ;
 	if ( s_peeringIndex < 0 )
 		LogAbort("Unable to open peering interface") ;
+
 	dbugLog(_FLN, "t:%d Server peering interface opened on port %u", s_peeringIndex, peeringPort) ;
+
+	if ( Teul::uWeb::s_debugServer != NULL )
+		Teul::uWeb::s_debugServer->addVirtualFile("Peering Status", "/peering.json", _reportJSONPeers) ;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -470,6 +522,7 @@ serverExpirePeerConnections()
 		if ( it.second < cutoff )
 			discos.push_back(it.first);
 	}
+
 	for ( auto& teulIndex : discos )
 	{
 		dbugLog(_FLI, "t:%d no hello received - disconnecting.", teulIndex);
