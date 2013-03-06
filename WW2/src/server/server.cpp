@@ -56,6 +56,19 @@ extern void serverInitializePeering();
 extern void serverConnectPeer(const UINT32 ip, const SERVER_TYPE type);
 extern void serverDisconnectPeer(Server::ServerInfo* server);
 
+const char* const g_serverTypes[MAX_SERVER_TYPE] =
+{
+	"controller"
+,	"auth"
+,	"dbd"
+,	"strat"
+,	"chat"
+,	"map"
+,	"ping"
+,	"cell"
+,	"EXIT"
+};
+
 class ServerManager : public ServerInterface
 {
 public:
@@ -175,13 +188,14 @@ _playerExitTo(Server::ServerInfo* server, PlayerStatusNode* psn, Server::Transfe
 
 	if (psn == NULL)
 	{
-		dbugLog(_FLA, "cant send NULL _playerExitTo to server %s"
-					, teulGetAddress(server->stats.address));
+		dbugLog(_FLA, "cant send NULL _playerExitTo to %s server %s"
+					, g_serverTypes[server->stats.type], teulGetAddress(server->stats.address));
 		return -EINVAL;
 	}
 
-	dbugLog(_FLI, "p:%u sending _playerExitTo to server %s exit code %u"
+	dbugLog(_FLI, "p:%u sending _playerExitTo to %s server %s exit code %u"
 				, psn->dispatch().m_customerID
+				, g_serverTypes[server->stats.type]
 				, teulGetAddress(server->stats.address), exitCode);
 
 	Server::PersonaExit xfer(exitCode, psn->data);
@@ -258,10 +272,11 @@ _extractPlayerFromServer(Server::ServerInfo* const server, PlayerStatusNode* con
 		return NULL;
 	}
 
-	dbugLog(_FLD, "p:%d c:%s extracting player %p server %p ip %s id %Ld: "
+	dbugLog(_FLD, "p:%d c:%s extracting player %p %s server %p ip %s id %Ld: "
 				, psn->dispatch().m_customerID
 				, psn->dispatch().m_callsign
 				, psn
+				, g_serverTypes[server->stats.type]
 				, server
 				, teulGetAddress(server->stats.address)
 				, server->stats.id
@@ -362,13 +377,15 @@ _pushPlayerToServer(Server::ServerInfo& server, PlayerStatusNode& psn)
 			break;
 	}
 
-	dbugLog(_FLD, "t:%d p:%d c:%s pushing player %p to server %p ip %s id %llu"
+	dbugLog(_FLD, "t:%d p:%d c:%s pushing player %p to %s server %p ip %s:%u id %llu"
 				, psn.teulIndex, psn.dispatch().m_customerID, psn.dispatch().m_callsign
-				, &psn, &server, teulGetAddress(server.stats.address), server.stats.id);
+				, &psn, g_serverTypes[server.stats.type], &server
+				, teulGetAddress(server.stats.address), server.stats.type, server.stats.id
+				);
 
-	psn.curServer.address = server.stats.address;
-	psn.curServer.type = 	server.stats.type;
-	psn.curServer.id = server.stats.id;
+	psn.curServer.address	= server.stats.address;
+	psn.curServer.type		= server.stats.type;
+	psn.curServer.id		= server.stats.id;
 
 	if (Server::myServerInfo.flags & Server::SVRFLAG_SEND_PSTAT)
 	{
@@ -406,10 +423,12 @@ _playerMove(PlayerStatusNode* const psn, Server::ServerInfo* const server)
 	if ( psn->curServer.address == server->stats.address )
 		return 0;
 
-	dbugLog(_FLD, "p:%d c:%s moving player %p from server ip %s id %Ld to server %p ip %s id %Ld"
+	dbugLog(_FLD, "p:%d c:%s moving player %p"
+					" from %s server ip %s id %Ld "
+					" to %s server ip %s id %Ld"
 				, psn->dispatch().m_customerID, psn->dispatch().m_callsign, psn
-				, teulGetAddress(psn->curServer.address), psn->curServer.id
-				, server, teulGetAddress(server->stats.address), server->stats.id );
+				, g_serverTypes[psn->curServer.type], teulGetAddress(psn->curServer.address), psn->curServer.id
+				, g_serverTypes[server->stats.type], teulGetAddress(server->stats.address), server->stats.id );
 
 	return _pushPlayerToServer(*server, *psn);
 }
@@ -549,7 +568,8 @@ _releaseServer(Server::ServerInfo* const server, Server::Code scode)
 
 	_deleteAllPlayersOnServer(server);
 
-	dbugLog(_FLN, "removing server %s type %d", teulGetAddress(server->stats.address), server->stats.type);
+	dbugLog(_FLN, "removing %s server %s type %d"
+					, g_serverTypes[server->stats.type], teulGetAddress(server->stats.address), server->stats.type);
 
 	serverDisconnectPeer(server);
 
@@ -708,9 +728,10 @@ _playerAdd(Server::PersonaXfer* const persXfer, Server::ServerInfo& server, Serv
 	psn->xferState = persXfer->reason();
 	psn->status = Server::PLAYER_NEW;
 
-	dbugLog(_FLD, "p:%u c:%s adding psn to server %lld"
+	dbugLog(_FLD, "p:%u c:%s adding psn to %s server %llu"
 				, psn->dispatch().m_customerID, psn->dispatch().m_callsign
-				, server.stats.id);
+				, g_serverTypes[server.stats.type], server.stats.id
+				);
 
 	ServerManager::RegisterPlayer(psn);
 
@@ -728,7 +749,8 @@ _playerAdd(Server::PersonaXfer* const persXfer, Server::ServerInfo& server, Serv
 	retval = _pushPlayerToServer(server, *psn);
 
 	if (retval < 0)
-		LogAbort("couldnt add player %d to server %Ld!!", psn->id, server.stats.id);
+		LogAbort("Failed pushing player %u to %s server %llu!"
+					, psn->id, g_serverTypes[server.stats.type], server.stats.id);
 
 	return psn;
 }
@@ -826,12 +848,10 @@ _addServer(Server::ServerInfo* const server)
 {
 	Server::ServerInfo* oldServer = NULL;
 
-	if (	server == NULL
-		|| server->stats.type < 0
-		|| server->stats.type > MAX_SERVER_TYPES)
-		return -EINVAL;
+	if ( server == NULL || server->stats.type < 0 || server->stats.type >= MAX_SERVER_TYPE)
+		LogAbort("Tried to add invalid server.");
 
-	dbugLog(_FLD, "adding server %s", teulGetAddress(server->stats.address));
+	dbugLog(_FLD, "adding %s server on %s", g_serverTypes[server->stats.type], teulGetAddress(server->stats.address));
 
 	oldServer = Server::ServerInfo::GetByID(server->stats.id);
 	if (oldServer != NULL)
@@ -849,12 +869,10 @@ _addServer(Server::ServerInfo* const server)
 
 	s_activeServerList.insert(server);
 
-	dbugLog(_FLN, "added server %s", teulGetAddress(server->stats.address));
+	dbugLog(_FLN, "added %s server on %s", g_serverTypes[server->stats.type], teulGetAddress(server->stats.address));
 
 	if (_enterCallback)
 		(_enterCallback) (server, Server::SCODE_ADDED);
-
-	dbugLog(_FLD, "leaving addServer");
 
 	return 0;
 }
@@ -947,8 +965,9 @@ serverInit(UINT32 appVersion
 
 	_myServerInfo = &Server::myServerInfo;
 
-	dbugLog(_FLI, "serverInit: app:%u arena:%u servType:%u edt:%u server:{enter:%p, leave:%p, status:%p} persona:{cre:%p, rel:%p, act:%p} exit:{pers:%p, cluster:%p} err:%p"
-					, appVersion, Server::myServerInfo.stats.arenaID, serverType, exitDestType, enterCallback, leaveCallback, statusCallback, createPersonaFn, releasePersonaFn, activatePlayerFn, exitPersonaFn, exitClusterFn, errorFunction);
+	dbugLog(_FLI, "serverInit: app:%u arena:%u servType:%u(%s) edt:%u server:{enter:%p, leave:%p, status:%p} persona:{cre:%p, rel:%p, act:%p} exit:{pers:%p, cluster:%p} err:%p"
+					, appVersion, Server::myServerInfo.stats.arenaID, serverType, g_serverTypes[serverType]
+					, exitDestType, enterCallback, leaveCallback, statusCallback, createPersonaFn, releasePersonaFn, activatePlayerFn, exitPersonaFn, exitClusterFn, errorFunction);
 
 	Server::myServerInfo.stats.address = Server::myInterface.addr[0].ip;
 	Server::myServerInfo.stats.id = static_cast<UINT64>(Server::myServerInfo.stats.address) << 32 | Server::myInterface.pid;
@@ -977,6 +996,7 @@ serverInit(UINT32 appVersion
 		return retval;
 
 	_exitServer = new Server::ServerInfo;
+	_exitServer->stats.type = EXIT_SERVER;
 	_addServer(_exitServer);
 	_addServer(&Server::myServerInfo);
 
@@ -1148,8 +1168,9 @@ serverUpdate(void)
 
 			if ( server->m_lastRecv < cutoff )
 			{
-				dbugLog(_FLW, "serv:%s lastRecv too long, assuming server failed"
-								, teulGetAddress(server->stats.address));
+				dbugLog(_FLW, "%s serv:%s lastRecv too long, assuming server failed"
+								, g_serverTypes[server->stats.address], teulGetAddress(server->stats.address)
+								);
 				_releaseServer(server, Server::SCODE_TIMED_OUT);
 			}
 		}
@@ -1197,7 +1218,11 @@ Server::HeartBeat::process()
 
 		if (server->stats.type != this->type)
 		{
-			dbugLog(_FLI, "server:%s changed type %u->%u", teulGetAddress(server->stats.address), server->stats.type, this->type);
+			dbugLog(_FLI, "server:%s changed type %u->%u (%s->%s)"
+							, teulGetAddress(server->stats.address)
+							, server->stats.type, this->type
+							, g_serverTypes[server->stats.type], g_serverTypes[this->type]
+							);
 			serverDisconnectPeer(server);
 			if ( _leaveCallback)
 				(_leaveCallback)(server, Server::SCODE_REPLACED);
@@ -1210,7 +1235,8 @@ Server::HeartBeat::process()
 		
 		if ( statusChange )
 		{
-			dbugLog(_FLN, "status update for server %s status %d numPlayers %d maxPlayers %d"
+			dbugLog(_FLN, "status update for %s server %s status %d numPlayers %d maxPlayers %d"
+						, g_serverTypes[server->stats.type]
 						, teulGetAddress(server->stats.address)
 						, server->stats.status
 						, server->stats.numPlayers()
@@ -1220,7 +1246,7 @@ Server::HeartBeat::process()
 				(_statusCallback)(server, Server::SCODE_STATUS);
 
 			// Check if we've lost our connection to this guy.
-			if ( serverPeeringWithIP(this->address, static_cast<SERVER_TYPE>(this->type)) == false )
+			if ( serverPeeringWithIP(this->address, this->type) == false )
 			{
 				_sendHeartBeat();
 				serverConnectPeer(this->address, this->type);
@@ -1229,7 +1255,8 @@ Server::HeartBeat::process()
 	}
 
 #ifdef HEAVY_DEBUG
-	dbugLog(_FLD, "updateing server %s status %d numPlayers %d maxPlayers %d"
+	dbugLog(_FLD, "updateing %s server %s status %d numPlayers %d maxPlayers %d"
+				, g_serverTypes[server->stats.type]
 				, teulGetAddress(server->stats.address)
 				, server->stats.status
 				, server->stats.numPlayers
@@ -1237,8 +1264,6 @@ Server::HeartBeat::process()
 #endif
 
 	server->m_lastRecv = teulClock64;
-	dbugWrite(_FLD, "heartBeat service for %s", teulGetAddress(server->stats.address));
-
 }
 
 SINT32 serverReleasePlayer(SINT32 teulIndex, UINT32 id, UINT32 otp, UINT32 exitCode, Server::ReleaseType releaseType)
@@ -1263,9 +1288,10 @@ SINT32 serverUpdatePlayer(const Server::PlayerStatusUpdate* const update)
 	Server::PersonaXfer persXfer(Server::Transfer::XferReason::Update, update->dispatch, 0, NULL, update->serverID);
 
 	dbugLog(_FLD, "p:%u c:%s updating player for server id %llu"
-				, update->dispatch.m_customerID
-				, update->dispatch.m_callsign
-				, update->serverID);
+					, update->dispatch.m_customerID
+					, update->dispatch.m_callsign
+					, update->serverID
+					);
 
 	PlayerStatusNode* psn = _releaseNonMatchingPlayer(-1, update->dispatch.m_customerID, update->dispatch.m_OTP, 0, Server::RELEASE_DISCO);
 
@@ -1273,7 +1299,6 @@ SINT32 serverUpdatePlayer(const Server::PlayerStatusUpdate* const update)
 	{
 		if (psn == NULL)
 			return -ENOENT;
-
 		 return _playerRelease(psn->teulIndex, psn, 0, Server::RELEASE_DELETED);
 	}
 
@@ -1346,14 +1371,15 @@ Server::Transfer::Transfer(XferReason _reason, Server::ServerInfo* const _destin
 SINT32
 Server::ServerInfo::mirrorPlayer(Server::PersonaMirror* const mirror)
 {
-	SINT32 destIndex = serverGetPeerIndex(stats.address, static_cast<SERVER_TYPE>(stats.type));
+	SINT32 destIndex = serverGetPeerIndex(stats.address, stats.type);
 	if ( destIndex < 0 )
 	{
-		dbugLog(_FLW, "p:%u unable to mirror to server %s: no peering connection", mirror->dispatch().m_customerID, teulGetAddress(stats.address));
+		dbugLog(_FLW, "p:%u unable to mirror to %s server %s: no peering connection"
+						, mirror->dispatch().m_customerID, g_serverTypes[stats.type], teulGetAddress(stats.address));
 		return -ENOTCONN;
 	}
 
-	dbugLog(_FLI, "p:%u mirroring to server t:%d ip:%s", mirror->dispatch().m_customerID, destIndex, teulGetAddress(stats.address));
+	dbugLog(_FLI, "p:%u mirroring to %s server t:%d ip:%s", mirror->dispatch().m_customerID, g_serverTypes[stats.type], destIndex, teulGetAddress(stats.address));
 
 	return teulSend(destIndex, PLAYER_MIRROR_CB, mirror);
 }
@@ -1568,7 +1594,7 @@ serverInitAddresses()
 
 	Server::broadcastNet = cv_baseAddress.GetUint32();
 	if ( Server::IsBroadcastViaController() )
-		dbugLog(_FLI, "Server peering via Controller at %s", cv_baseAddress.GetString());
+		dbugLog(_FLI, "Server peering via controller at %s", cv_baseAddress.GetString());
 	else
 		dbugLog(_FLI, "Server peering via broadcast network %s", cv_baseAddress.GetString());
 

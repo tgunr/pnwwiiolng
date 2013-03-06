@@ -302,9 +302,10 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 		char localIP[32] ;
 		teulGetAddress(newEndpoint->localAddress(), localIP, sizeof(localIP)) ;
 
-		dbugLog(_FLN, "t:%d accepted %s->%s as t:%d sock:%d (li:%llu)"
+		dbugLog(_FLN, "t:%d accepted %s:%u->%s:%u as t:%d sock:%d (li:%llu)"
 					, endpoint.teulIndex()
-					, remoteIP, localIP
+					, remoteIP, newEndpoint->fromPort()
+					, localIP, newEndpoint->localAddress()
 					, newEndpoint->teulIndex()
 					, newSock
 					, (teulClock64 - _lastIdle)

@@ -141,19 +141,19 @@ ENDPOINT::doConnect()
 }
 
 // any new connections accepted on an ENPOINT owned will
-// use this functiuon to call the user function notifying
+// use this function to call the user function notifying
 // the user app of the new connection.
 void
 ENDPOINT::doAccept(ENDPOINT& newEndpoint)
 {
 	if ( this->connectFn )
 	{
-		dbugLog(_FLD, "t:%d accepting t:%d", this->teulIndex(), newEndpoint.teulIndex());
+		dbugLog(_FLD, "t:%d doing handshaking calling doAccept(t:%d)", this->teulIndex(), newEndpoint.teulIndex());
 		this->connectFn(newEndpoint) ;
 	}
 	else
 	{
-		dbugLog(_FLD, "t:%d accepted t:%d", this->teulIndex(), newEndpoint.teulIndex());
+		dbugLog(_FLD, "t:%d done handshaking t:%d", this->teulIndex(), newEndpoint.teulIndex());
 	}
 }
 

@@ -20,7 +20,10 @@ enum SERVER_TYPE
 	MAP_HOST,
 	PING_HOST,
 	CELL_HOST,
+	EXIT_SERVER,
 	MAX_SERVER_TYPE,
 } ;
+
+extern const char* const g_serverTypes[MAX_SERVER_TYPE];
 
 //tolua_end

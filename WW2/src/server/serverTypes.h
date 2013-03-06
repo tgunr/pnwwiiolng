@@ -8,10 +8,7 @@
 // Originating Programmer:  Marty "Vandal" Poulin
 
 #include "teul/teulServer.h"
-
-#ifndef MAX_SERVER_TYPES
-#define MAX_SERVER_TYPES 64
-#endif
+#include "wwii/wwiiServerTypeEnums.h"
 
 #ifndef SERVER_HASH_SIZE
 #define SERVER_HASH_SIZE 64

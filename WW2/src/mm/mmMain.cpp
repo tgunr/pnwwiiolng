@@ -741,7 +741,7 @@ static SINT32
 _serverEnterCallback(Server::ServerInfo* server, Server::Code scode)
 {
 #ifdef BETA_RELEASE
-	dbugLog(_FLN,"server %s added code %d",teulGetAddress(server->stats.address),scode);
+	dbugLog(_FLN,"%s server %s added code %d", g_serverTypes[server->stats.type], teulGetAddress(server->stats.address),scode);
 #endif
 
 	if ( server->stats.type == STRAT_HOST && server->stats.status == Server::SERVER_ACCEPTING )
@@ -767,7 +767,7 @@ static SINT32
 _serverLeaveCallback(Server::ServerInfo* server, Server::Code scode)
 {
 #ifdef BETA_RELEASE
-	dbugLog(_FLN,"server %s left code %d",teulGetAddress(server->stats.address),scode);
+	dbugLog(_FLN,"%s server %s left code %d", g_serverTypes[server->stats.type], teulGetAddress(server->stats.address), scode);
 #endif
 
 	_sendAuthHostStats() ;

@@ -141,7 +141,10 @@ _onConnect(ENDPOINT& endpoint)
 
 	char addr[65] ;
 	teulGetAddress(connection->m_ip, addr, sizeof(addr)) ;
-	dbugLog(_FLD, "serv:%s t:%d connected on t:%d", addr, connection->m_teulIndex, endpoint.teulIndex()) ;
+	dbugLog(_FLD, "ip:%s:%u t:%d %s connected on t:%d"
+					, addr, endpoint.destPort()
+					, connection->m_teulIndex, g_serverTypes[peerType], endpoint.teulIndex()
+					) ;
 
 	{
 		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(s_peerMutex);
@@ -182,7 +185,7 @@ _onError(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*/, const T
 	{
 		if ( connection->m_connected )
 		{
-			dbugLog(_FLD, "serv:%s t:%d disconnected", addr, teulIndex) ;
+			dbugLog(_FLD, "%s serv:%s t:%d disconnected", g_serverTypes[connection->m_type], addr, teulIndex) ;
 			connection->m_teulIndex = -1 ;
 			connection->m_connected = false ;
 		}
@@ -216,7 +219,7 @@ ServerConnection::doConnect()
 	m_connected = false ;
 	UINT16 port = WWII::Net::Ports::ServerPeering + m_type;
 	m_teulIndex = teulOpenSend(m_ip, port, _onConnect, 20000, PROTOCOL_TCP, _onError) ;
-	dbugLog(_FLD, "t:%d opening to %s:%u [%u]", m_teulIndex, teulGetAddress(m_ip), port, m_type) ;
+	dbugLog(_FLD, "t:%d opening to %s %s:%u [%u]", m_teulIndex, teulGetAddress(m_ip), g_serverTypes[m_type], port, m_type) ;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -229,7 +232,7 @@ serverConnectPeer(const UINT32 forIP_, const SERVER_TYPE type_)
 {
 	char dest[65] ;
 	teulGetAddress(forIP_, dest, sizeof(dest)) ;
-	dbugLog(_FLI, "requested connection: type:%u ip:%s", type_, dest) ;
+	dbugLog(_FLI, "requested %s connection: type:%u ip:%s", g_serverTypes[type_], type_, dest) ;
 	const SINT32 net = forIP_ >> 24 ;
 	if ( (net == 127) | (net == 0) )
 	{
@@ -279,10 +282,10 @@ serverConnectPeer(const UINT32 forIP_, const SERVER_TYPE type_)
 void
 serverDisconnectPeer(Server::ServerInfo* server)
 {
-	ServerConnection* const connection = _findConnectionByIP(server->stats.address, static_cast<SERVER_TYPE>(server->stats.type));
+	ServerConnection* const connection = _findConnectionByIP(server->stats.address, server->stats.type);
 	if ( connection != NULL )
 	{
-		dbugLog(_FLI, "t:%d serv:%s disconnecting", connection->m_teulIndex, teulGetAddress(ntohl(server->stats.address))) ;
+		dbugLog(_FLI, "t:%d %s serv:%s disconnecting", connection->m_teulIndex, g_serverTypes[server->stats.type], teulGetAddress(ntohl(server->stats.address))) ;
 		connection->doDisconnect() ;
 	}
 }
@@ -319,7 +322,7 @@ serverSendPacketToType(Teul::Packet& outgoing, const SERVER_TYPE serverType)
 		const SINT32 err = outgoing.send(server.m_teulIndex) ;
 		if ( err < 0 )
 		{
-			dbugLog(_FLW, "bx cb:%u,%u to t:%d ip:%s failed:%d", outgoing.header().m_callX, outgoing.header().m_callY, server.m_teulIndex, teulGetAddress(server.m_ip), err) ;
+			dbugLog(_FLW, "bx cb:%u,%u to t:%d %s ip:%s failed:%d", outgoing.header().m_callX, outgoing.header().m_callY, server.m_teulIndex, g_serverTypes[server.m_type], teulGetAddress(server.m_ip), err) ;
 			continue ;
 		}
 
@@ -348,7 +351,7 @@ serverSendPacketToPeers(Teul::Packet& outgoing)
 		const SINT32 err = outgoing.send(server.m_teulIndex) ;
 		if ( err < 0 )
 		{
-			dbugLog(_FLW, "bx cb:%u,%u to t:%d ip:%s failed:%d", outgoing.header().m_callX, outgoing.header().m_callY, server.m_teulIndex, teulGetAddress(server.m_ip), err) ;
+			dbugLog(_FLW, "bx cb:%u,%u to t:%d %s ip:%s failed:%d", outgoing.header().m_callX, outgoing.header().m_callY, server.m_teulIndex, g_serverTypes[server.m_type], teulGetAddress(server.m_ip), err) ;
 			continue ;
 		}
 
@@ -381,7 +384,7 @@ serverSendCallbackToType(const SERVER_TYPE serverType, TEUL_CALLBACK* const tcb,
 		const SINT32 err = teulSend(server.m_teulIndex, tcb, data) ;
 		if ( err < 0 )
 		{
-			dbugLog(_FLW, "tbx cb:%u,%u to t:%d ip:%s failed:%d", tcb->callX(), tcb->callY(), server.m_teulIndex, teulGetAddress(server.m_ip), err) ;
+			dbugLog(_FLW, "tbx cb:%u,%u to t:%d %s ip:%s failed:%d", tcb->callX(), tcb->callY(), server.m_teulIndex, g_serverTypes[server.m_type], teulGetAddress(server.m_ip), err) ;
 			continue ;
 		}
 
@@ -452,7 +455,10 @@ _onPeerHello(ACTION_OBJECT* a, PeerHello& hello)
 
 	char addr[65] ;
 	teulGetAddress(connection->m_ip, addr, sizeof(addr)) ;
-	dbugLog(_FLI, "t:%d serv:%s:%u peer connection complete", connection->m_teulIndex, addr, endpoint.fromPort()) ;
+	dbugLog(_FLI, "t:%d ip:%s:%u %s peer connection complete"
+					, connection->m_teulIndex, addr, endpoint.fromPort()
+					, g_serverTypes[hello.m_type]
+					) ;
 
 	{
 		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(s_peerMutex);
@@ -495,7 +501,7 @@ serverInitializePeering()
 	if ( s_peeringIndex < 0 )
 		LogAbort("Unable to open peering interface") ;
 
-	dbugLog(_FLN, "t:%d Server peering interface opened on port %u", s_peeringIndex, peeringPort) ;
+	dbugLog(_FLN, "t:%d server peering interface opened on port %u", s_peeringIndex, peeringPort) ;
 
 	if ( Teul::uWeb::s_debugServer != NULL )
 		Teul::uWeb::s_debugServer->addVirtualFile("Peering Status", "/peering.json", _reportJSONPeers) ;
@@ -584,7 +590,9 @@ serverPeerEndpointByType(const SERVER_TYPE serverType)
 		if ( thisEndpoint == NULL )
 			continue ;
 
-		dbugLog(_FLA, "multiple servers of type %u connected - unable to select for EndpointByType", serverType) ;
+		dbugLog(_FLA, "multiple servers of type %u (%s) connected - unable to select for EndpointByType"
+						, serverType, g_serverTypes[serverType]
+						) ;
 		return NULL ;
 	}
 
