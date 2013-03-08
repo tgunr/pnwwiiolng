@@ -175,6 +175,12 @@ static DB::Revisions revisions =
 	,	"ALTER TABLE `wwiionline`.`wwii_vehtype` MODIFY COLUMN `weapon_spec` INT(11) UNSIGNED NOT NULL"
 	,	"ALTER TABLE `wwiionline`.`wwii_vehtype ADD INDEX `vt_os` (weapon_spec)"
 	}
+,	// Fixes from playnet database
+	{
+		"ALTER TABLE `wwiionline`.`wwii_sortie` MODIFY `successful` TINYINT(1) UNSIGNED DEFAULT 0"
+	,	"ALTER TABLE `wwiionline`.`wwii_sortie` MODIFY `capture_assists` SMALLINT(5) UNSIGNED DEFAULT 0"
+	,	"ALTER TABLE `wwiionline`.`wwii_sortie` MODIFY `resupplies` SMALLINT(5) UNSIGNED DEFAULT 0"
+	}
 } ;
 #else
 static DB::Revisions revisions;
