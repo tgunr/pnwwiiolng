@@ -44,6 +44,7 @@
 #include "teul/teulUtils.h"
 #include "teul/teulVersion.h"
 
+//#define DEBUG_ENCRYPTION
 //#define DEBUG_CONNECTIONS
 
 static size_t _teulConnects;
@@ -97,12 +98,11 @@ teulCloseAllEndpoints(const SINT32 errorCode)
 void
 ENDPOINT::encrypt(UCHAR* const stream, const size_t bytes)
 {
-#ifdef DEBUG_CONNECTIONS
-	printf("Encrypt %p %d [%u] seed %llx\n", stream, bytes, m_impl->m_cryptVersion, m_impl->m_txCrypt.seed()) ;
-#endif
-
 	if ( m_impl->m_cryptVersion >= Teul::TeulV2 )
 	{
+#ifdef DEBUG_ENCRYPTION
+		printf("Encrypt %p %d [%u] seed %llx\n", stream, bytes, m_impl->m_cryptVersion, m_impl->m_txCrypt.seed()) ;
+#endif
 		m_impl->m_txCrypt.translate(stream, bytes) ;
 	}
 }
@@ -113,12 +113,11 @@ ENDPOINT::encrypt(UCHAR* const stream, const size_t bytes)
 void
 ENDPOINT::decrypt(UCHAR* const stream, const size_t bytes)
 {
-#ifdef DEBUG_CONNECTIONS
-	printf("Decrypt %p %d [%u] seed %llx\n", stream, bytes, m_impl->m_cryptVersion, m_impl->m_rxCrypt.seed()) ;
-#endif
-
 	if ( m_impl->m_cryptVersion >= Teul::TeulV2 )
 	{
+#ifdef DEBUG_ENCRYPTION
+		printf("Decrypt %p %d [%u] seed %llx\n", stream, bytes, m_impl->m_cryptVersion, m_impl->m_rxCrypt.seed()) ;
+#endif
 		m_impl->m_rxCrypt.translate(stream, bytes) ;
 	}
 }
@@ -478,6 +477,7 @@ ENDPOINT::setTimeout(const UINT32 timeout_)
 		m_doTimeoutCheck = true ;
 #if defined(DEBUG_CONNECTIONS)
 		dbugLog(_FLD, "t:%d timeout:%u, iv:%u, dtc:true", teulIndex(), timeout_, interval) ;
+		printf("t:%d timeout:%u, iv:%u, dtc:true\n", teulIndex(), timeout_, interval) ;
 #endif
 	}
 
@@ -555,7 +555,7 @@ teulCreateEndpoint(SINT32 wantIndex
 	}
 
 	newEndpoint->m_impl->m_version = Teul::VersionNumber ;
-	newEndpoint->m_impl->m_cryptVersion = (!newEndpoint->m_peer) ? Teul::BaseVersion : 0x0000 ;
+	newEndpoint->m_impl->m_cryptVersion = (newEndpoint->protocol == PROTOCOL_TCP && !newEndpoint->m_peer) ? Teul::BaseVersion : 0x0000 ;
 	newEndpoint->m_impl->m_txCrypt.newSeed() ;
 	newEndpoint->m_impl->m_rxCrypt.setSeed(0ULL) ;
 //	newEndpoint->m_recvCrypt = newEndpoint->m_sendCrypt ;

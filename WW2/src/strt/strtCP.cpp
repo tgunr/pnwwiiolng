@@ -738,7 +738,7 @@ _distributeRPs(CPStruct& cp, SINT32 rpsProduced, WWII_SIDE side)
 		//This is where we do all the requests from the other depots
 		//	we are connected to
 
-		//fprintf(stderr,"Convoy? #%Ld stored: %d request: %d\n\n",currentFacility->id
+		//fprintf(stderr,"Convoy? #%lld stored: %d request: %d\n\n",currentFacility->id
 				//, currentFacility->incomingRPs + currentFacility->storedRPs
 				//, currentFacility->requestThreshold);
 

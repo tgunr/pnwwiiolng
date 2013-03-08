@@ -2055,7 +2055,7 @@ Player::tuneRadioToHandle(UCHAR index, const ChatHandle& handleID)
 	chatGetCallsign(chanHandle, chatGetLowercaseHandle(handleID)) ;
 
 	if ( g_debugRadios )
-		dbugLog(_FLD, "t:%d p:%u c:%s tuning #%d to %s(%Lx)"
+		dbugLog(_FLD, "t:%d p:%u c:%s tuning #%d to %s(%llx)"
 						, teulIndex(), playerID(), callsign()
 						, index
 						, chanHandle, handleID

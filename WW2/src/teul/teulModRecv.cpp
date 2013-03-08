@@ -577,7 +577,7 @@ _recvDatagram(ENDPOINT& endpoint)
 				}
 				errorCount += 1 ;
 			}
-			else
+			else 
 				++packetsReceived ;
 		}
 		while ( errorCount < 16 ) ;
@@ -587,13 +587,14 @@ _recvDatagram(ENDPOINT& endpoint)
 	else if ( endpoint.m_reliable == false )
 	{
 		retval = _recvfromPacketSource(endpoint) ;
-		if ( retval > 0 )
-			endpoint.lastDataRecv.makeCurrent() ;
 	}
 	else
 	{
 		LogAbort("Invalid endpoint type");
 	}
+
+	if ( retval > 0 && (endpoint.protocol != PROTOCOL_TCP || endpoint.m_reliable == false) )
+		endpoint.lastDataRecv.makeCurrent();
 
 	return retval;
 }
@@ -835,6 +836,7 @@ _checkEndpointTimeouts(ENDPOINT& endpoint)
 
 	if (endpoint.state() <= IS_CLOSED)
 	{
+		printf("t:%d timeout\n", endpoint.teulIndex());
 		dbugLog(_FLN, "t:%d endpoint timeout error, closed timeout:%d elapsed:%lldms"
 					, endpoint.teulIndex()
 					, endpoint.timeout
@@ -935,7 +937,10 @@ _pollSocketsInner(const TeulTimeMS& remainder)
 		++it;
 		_idleEndpoint(endpoint);
 		if ( idleInstance != g_idleInstance )
+		{
+			printf("abort early\n");
 			return;
+		}
 	}
 
 	// Build up a list of endpoints we're still interested in.

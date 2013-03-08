@@ -47,7 +47,7 @@ _recvPlayerUpdate(ACTION_OBJECT* const a)
 
 	Server::PlayerStatusUpdate& update = a->read<Server::PlayerStatusUpdate>() ;
 
-	dbugLog(_FLD, "p:%d c:%s received update %d source %s from address %s status %d server %Ld "
+	dbugLog(_FLD, "p:%u c:%s received update %d source %s from address %s status %d server %llu "
 				,update.dispatch.m_customerID
 				,update.dispatch.m_callsign
 				,update.id

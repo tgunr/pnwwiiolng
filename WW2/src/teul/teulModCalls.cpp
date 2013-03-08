@@ -119,9 +119,9 @@ _report(const ACTION_OBJECT* const a, const char* const txt)
 static void
 _status(const char* const doing, const char* const what, UINT32 version, const ENDPOINT* const endpoint)
 {
-	WriteToConsole("[%2s] [%3s] v=%04x ep->ver=%04x ep->crypt=%04x txs=%llx rxs=%16llx", doing, what, version, endpoint->m_impl->m_version, endpoint->m_impl->m_cryptVersion, endpoint->m_impl->m_txCrypt.seed(), endpoint->m_impl->m_rxCrypt.seed()) ;
+	WriteToConsole("t:%d [%2s] [%3s] v=%04x ep->ver=%04x ep->crypt=%04x txs=%llx rxs=%16llx", endpoint->teulIndex(), doing, what, version, endpoint->m_impl->m_version, endpoint->m_impl->m_cryptVersion, endpoint->m_impl->m_txCrypt.seed(), endpoint->m_impl->m_rxCrypt.seed()) ;
 #if platOS == OS_WIN32
-	printf("[%2s] [%3s] v=%04x ep->ver=%04x ep->crypt=%04x txs=%16llx rxs=%16llx\n", doing, what, version, endpoint->m_impl->m_version, endpoint->m_impl->m_cryptVersion, endpoint->m_impl->m_txCrypt.seed(), endpoint->m_impl->m_rxCrypt.seed()) ;
+	printf("t:%d [%2s] [%3s] v=%04x ep->ver=%04x ep->crypt=%04x txs=%16llx rxs=%16llx\n", endpoint->teulIndex(), doing, what, version, endpoint->m_impl->m_version, endpoint->m_impl->m_cryptVersion, endpoint->m_impl->m_txCrypt.seed(), endpoint->m_impl->m_rxCrypt.seed()) ;
 #endif
 }
 #else
@@ -157,9 +157,9 @@ static UINT16
 _negotiateVersionNumber(UINT16 remoteVersion, const ENDPOINT* const endpoint)
 {
 	// Datagram delivery services don't use encryption.
-	if ( endpoint->m_peer )
+	if ( endpoint->protocol != PROTOCOL_TCP || endpoint->m_peer )
 	{
-		dbugLog(_FLM, "t:%d peering connection, disabling encryption", endpoint->teulIndex()) ;
+		dbugLog(_FLM, "t:%d non-client connection, disabling encryption", endpoint->teulIndex()) ;
 		return 0 ;
 	}
 

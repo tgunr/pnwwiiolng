@@ -272,7 +272,7 @@ _extractPlayerFromServer(Server::ServerInfo* const server, PlayerStatusNode* con
 		return NULL;
 	}
 
-	dbugLog(_FLD, "p:%d c:%s extracting player %p %s server %p ip %s id %Ld: "
+	dbugLog(_FLD, "p:%d c:%s extracting player %p %s server %p ip %s id %llu: "
 				, psn->dispatch().m_customerID
 				, psn->dispatch().m_callsign
 				, psn
@@ -332,7 +332,7 @@ _sendPlayerStatusUpdate(const PlayerStatusNode& psn)
 	outgoing.setUnencrypted();
 	Server::PlayerStatusUpdate* const update = CONSTRUCT_IN_PACKET(outgoing, Server::PlayerStatusUpdate, psn);
 
-	dbugLog(_FLD, "p:%d c:%s sending update %d status %d server %Ld"
+	dbugLog(_FLD, "p:%d c:%s sending update %d status %d server %llu"
 					, update->dispatch.m_customerID
 					, update->dispatch.m_callsign
 					, update->id
@@ -423,12 +423,17 @@ _playerMove(PlayerStatusNode* const psn, Server::ServerInfo* const server)
 	if ( psn->curServer.address == server->stats.address )
 		return 0;
 
-	dbugLog(_FLD, "p:%d c:%s moving player %p"
-					" from %s server ip %s id %Ld "
-					" to %s server ip %s id %Ld"
-				, psn->dispatch().m_customerID, psn->dispatch().m_callsign, psn
-				, g_serverTypes[psn->curServer.type], teulGetAddress(psn->curServer.address), psn->curServer.id
-				, g_serverTypes[server->stats.type], teulGetAddress(server->stats.address), server->stats.id );
+	char fromAddr[64], toAddr[64];
+	teulGetAddress(psn->curServer.address, fromAddr, sizeof(fromAddr));
+	teulGetAddress(server->stats.address, toAddr, sizeof(toAddr));
+
+	dbugLog(_FLD, "p:%u c:%s moving player %p"
+					" from %s server ip %s id %llu"
+					" to %s server ip %s id %llu"
+						, psn->dispatch().m_customerID, psn->dispatch().m_callsign, psn
+						, g_serverTypes[psn->curServer.type], fromAddr, psn->curServer.id
+						, g_serverTypes[server->stats.type], toAddr, server->stats.id
+						);
 
 	return _pushPlayerToServer(*server, *psn);
 }
@@ -1621,6 +1626,8 @@ _broadcastRxConnect(ENDPOINT& endpoint)
 	_broadcastRxConnected = true;
 }
 
+#include "teul/teulEndpointImpl.h"
+
 void
 serverOpenBroadcastIndexes()
 {
@@ -1658,6 +1665,9 @@ serverOpenBroadcastIndexes()
 		LogAbort("timed out waiting for server-broadcast index tear up");
 	if ( _broadcastRxConnected == false )
 		LogAbort("timed out waiting for broadcast-rx index tear up");
+
+	if ( s_broadcastEndpoint->m_impl->m_cryptVersion != 0 )
+		LogAbort("broadcast endpoint wants to be encrypted");
 }
 
 void

@@ -15,6 +15,7 @@
 #include "server/serverPeers.h"
 #include "server/serverServerInfo.h"
 #include "teul/teulCallbackStruct.h"
+#include "teul/teulConfigVar.h"
 #include "teul/teulConstants.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulMicroWebServer.h"
@@ -22,6 +23,8 @@
 #include "teul/teulPacketHeader.h"
 #include "wwii/wwiiNetPorts.h"
 #include "wwii/wwiiCallbacks.h"
+
+CVAR_UINT(peerConnectionTimeout_ms, "20000", "PEER_CONNECTION_TIMEOUT_MS", "Number of miliseconds before a server-peer connection times out.");
 
 // Describe the mapping.
 struct ServerConnection
@@ -218,7 +221,7 @@ ServerConnection::doConnect()
 {
 	m_connected = false ;
 	UINT16 port = WWII::Net::Ports::ServerPeering + m_type;
-	m_teulIndex = teulOpenSend(m_ip, port, _onConnect, 20000, PROTOCOL_TCP, _onError) ;
+	m_teulIndex = teulOpenSend(m_ip, port, _onConnect, cv_peerConnectionTimeout_ms.GetUint32(), PROTOCOL_TCP, _onError) ;
 	dbugLog(_FLD, "t:%d opening to %s %s:%u [%u]", m_teulIndex, teulGetAddress(m_ip), g_serverTypes[m_type], port, m_type) ;
 }
 
@@ -497,7 +500,7 @@ serverInitializePeering()
 	if ( _registerPeeringCallbacks() < 0 )
 		LogAbort("Unable to register peering callbacks");
 	const UINT16 peeringPort = WWII::Net::Ports::ServerPeering + Server::myServerInfo.stats.type;
-	s_peeringIndex = teulOpenListen(peeringPort, _onPeerConnect, 10000, PROTOCOL_TCP, _onPeerError) ;
+	s_peeringIndex = teulOpenListen(peeringPort, _onPeerConnect, cv_peerConnectionTimeout_ms.GetUint32(), PROTOCOL_TCP, _onPeerError) ;
 	if ( s_peeringIndex < 0 )
 		LogAbort("Unable to open peering interface") ;
 

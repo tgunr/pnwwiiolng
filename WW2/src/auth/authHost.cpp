@@ -918,7 +918,7 @@ main(int argc, char* argv[])
 	if (tcpconnection < 0)
 		LogAbort("Error allocating endpoint!");
 
-	const SINT32 gameConnection = teulOpenListen(WWII::Net::Ports::InternalAuth, _acceptGameConnection, GAME_TIMEOUT, PROTOCOL_TCP, _gameErrorFunction);
+	const SINT32 gameConnection = teulOpenListen(WWII::Net::Ports::InternalAuth, _acceptGameConnection, GAME_TIMEOUT, PROTOCOL_CTRL, _gameErrorFunction);
 	if ( gameConnection < 0 )
 		LogAbort("failed to open game listening socket") ;
 
