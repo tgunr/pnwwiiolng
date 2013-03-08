@@ -480,7 +480,7 @@ int Client::Login(const char* hostname, short port, bool wantChat)
 SINT32
 Teul::ConnectionInstruction::receive(SINT32 teulIndex)
 {
-	clientErrorLog("tciRx ro:%u ip:%s", (UINT32)role(), teulGetAddress(hostIP())) ;
+	clientErrorLog("tciRx ro:%u ip:%s:%u", (UINT32)role(), teulGetAddress(hostIP()), port()) ;
 
 	// role() will be one of Unknown, Chat() or Cell(),
 	// hostIP() will be the last octet of the IP address,
