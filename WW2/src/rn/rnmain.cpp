@@ -375,6 +375,9 @@ static bool _connectClientToGameNetwork()
 
 		teulGetHost(STRVER, &appversion);
 
+		if ( teulMaskNetworkAddress(0) == 0 )
+			teulSetNetworkMask(GameHost);
+
 		if ( GameClientLogin(GameHost, BypassID, GameOTP, appversion, GamePort) < 0 )
 			throw ClientNetError(-1, "connect.fail") ;
 
