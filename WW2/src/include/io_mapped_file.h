@@ -33,9 +33,6 @@
 ////////////////////////////////////////////////////////////////////// Platform configuration.
 // IO_MAP_TYPE
 //	Whether to use CreateMappedFile (_IMT_WINDOWS) or mmap (_IMT_UNIX)
-// filename_char_t
-//	Character type to use for filenames: Windows supports widechar
-//  filenames, Linux/Mac use ascii-encoding.
 // PATH_SEP_CHAR
 //	Because under DOS '/' was the argument separator
 
@@ -49,31 +46,35 @@
 # define IO_MAP_TYPE _IMT_WINDOWS
 
 # if defined(UNICODE)
-#  define IO_MAP_WCHAR
 #  include <wchar.h>
-#  define filename_char_t wchar_t
-#  define PATH_SEP_CHAR L'\\' 
-# else
-# pragma error
-#  define filename_char_t char
-#  define PATH_SEP_CHAR '\\'
 # endif
+# define PATH_SEP_CHAR '\\' 
+# define PATH_SEP_WCHAR L'\\'
+
+typedef HANDLE imf_handle_t;
+static const imf_handle_t IMF_INVALID_HANDLE = INVALID_HANDLE_VALUE;
 
 #elif defined(__APPLE__)
 
 	// MacOS X
 
 # define IO_MAP_TYPE _IMT_UNIX
-# define filename_char_t char
 # define PATH_SEP_CHAR '/'
+# define PATH_SEP_WCHAR L'/'
+
+typedef int imf_handle_t;
+static const imf_handle_t IMF_INVALID_HANDLE = -1;
 
 #elif defined(__GNUC__)
 
 	// Unix / Linux
 
 # define IO_MAP_TYPE _IMT_UNIX
-# define filename_char_t char
 # define PATH_SEP_CHAR '/'
+# define PATH_SEP_WCHAR L'/'
+
+typedef int imf_handle_t;
+static const imf_handle_t IMF_INVALID_HANDLE = -1;
 
 #endif
 
@@ -92,19 +93,23 @@ public:
 		, m_endPtr(nullptr)
 		, m_currentPtr(nullptr)
 		, m_size(0)
-#if IO_MAP_TYPE == _IMT_WINDOWS
-		, m_handle(INVALID_HANDLE_VALUE)
-		, m_mapping(INVALID_HANDLE_VALUE)
-#else
-		, m_fd(-1)
-#endif
+		, m_handle(IMF_INVALID_HANDLE)
+		, m_mapping(IMF_INVALID_HANDLE)
 		{}
 
 	//! Create an in-memory view of a file from disk,
 	//! while trying to avoid loading it from disk.
 	//! @param[in] filename_ the file/sub-path of the file to open.
 	//! @param[in] dirname_ [optional] prefix path.
-	MappedFile(const filename_char_t* const filename_, const filename_char_t* const dirname_=NULL);
+	MappedFile(const char* const filename_, const char* const dirname_=NULL);
+
+#if IO_MAP_TYPE == _IMT_WINDOWS && defined(UNICODE)
+	//! Create an in-memory view of a file from disk,
+	//! while trying to avoid loading it from disk.
+	//! @param[in] filename_ the file/sub-path of the file to open.
+	//! @param[in] dirname_ [optional] prefix path.
+	MappedFile(const wchar_t* const filename_, const wchar_t* const dirname_=NULL);
+#endif
 
 	//! Create a viewport onto a portion of a file.
 	MappedFile(const char* start_, size_t size_)
@@ -113,12 +118,8 @@ public:
 		, m_endPtr(start_ + size_)
 		, m_currentPtr(start_)
 		, m_size(size_)
-#if IO_MAP_TYPE == _IMT_WINDOWS
-		, m_handle(INVALID_HANDLE_VALUE)
-		, m_mapping(INVALID_HANDLE_VALUE)
-#else
-		, m_fd(-1)
-#endif
+		, m_handle(IMF_INVALID_HANDLE)
+		, m_mapping(IMF_INVALID_HANDLE)
 		{}
 
 	virtual ~MappedFile();					// Destructor.
@@ -135,17 +136,22 @@ public:
 	bool atEof() const { return m_endPtr < m_currentPtr; }
 
 	//! Determine if the file is mapped to something.
-#if IO_MAP_TYPE == _IMT_WINDOWS
-	bool isOpen() const { return m_mapping != INVALID_HANDLE_VALUE; }
-#else
-	bool isOpen() const { return m_fd >= 0; }
-#endif
+	bool isMapped() const { return m_mapping != IMF_INVALID_HANDLE; }
 
 	//! Open a new file (closes any currently open file first).
 	//! @param[in] filename_ the file/sub-path of the file to open.
 	//! @param[in] dirname_ [optional] prefix path.
 	//! @return true if the file was opened, false otherwise.
-	bool mapFile(const filename_char_t* const filename_, const filename_char_t* const dirname_=NULL);
+	bool mapFile(const char* const filename_, const char* const dirname_=NULL);
+
+#if IO_MAP_TYPE == _IMT_WINDOWS && defined(UNICODE)
+	//! Open a new file (closes any currently open file first).
+	//! @param[in] filename_ the file/sub-path of the file to open.
+	//! @param[in] dirname_ [optional] prefix path.
+	//! @return true if the file was opened, false otherwise.
+	bool mapFile(const wchar_t* const filename_, const wchar_t* const dirname_=NULL);
+#endif
+
 	//! Close and unmap the file.
 	//! @return Always returns false.
 	bool unmapFile();
@@ -207,6 +213,9 @@ public:
 		return ptr;
 	}
 
+private:
+	bool mapFileHandleInternal();
+
 public:
 	// Accesors.
 
@@ -237,14 +246,8 @@ public:
 	//! Size (in bytes) of the entire file.k
 	size_t			m_size;
 
-
-#if IO_MAP_TYPE == _IMT_WINDOWS
-	// For windows:
 	HANDLE			m_handle;
 	HANDLE			m_mapping;
-#else
-	int				m_fd;
-#endif
 };
 
 }

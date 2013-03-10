@@ -21,14 +21,62 @@
 # include <windows.h>
 
 #define OsALLOCA _alloca
-#define OsStrlen _tcslen
-#define OsStrcpy _tcscpy
+#define OsStrlen strlen
+#define OsStrcpy strcpy
 #endif
-
-#define ALLOC_STACK_CHARS(x) static_cast<filename_char_t*>(OsALLOCA((x + 1) * sizeof(filename_char_t)))
 
 #include <stdexcept>
 #include <string.h>
+
+// Macros to help with the whole char/wchar crap.
+static inline size_t _getLen(const char* str_) { return OsStrlen(str_); }
+static inline void _copyStr(char* dest_, const char* src_) { OsStrcpy(dest_, src_); }
+
+#if defined(UNICODE)
+static inline size_t _getLen(const wchar_t* str_) { return wcslen(str_); }
+static inline void _copyStr(wchar_t* dest_, const wchar_t* src_) { wcscpy(dest_, src_); }
+#endif
+
+// Cross-platform low-level open file functions.
+static inline imf_handle_t OsOpenFile(const char* filename_)
+{
+#if IO_MAP_TYPE != _IMT_WINDOWS
+	return OS_OPEN(filename_, O_RDONLY);
+#else
+	return CreateFileA(filename_, FILE_GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+#endif
+}
+
+// Handle the same with widecharacters.
+#if IO_MAP_TYPE == _IMT_WINDOWS && defined(UNICODE)
+static inline imf_handle_t OsOpenFile(const wchar_t* filename_)
+{
+	return CreateFileW(filename_, FILE_GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+}
+#endif
+
+template<class CharType>
+imf_handle_t _openFile(const CharType* filename_, const CharType* dirname_)
+{
+	const CharType* filename = nullptr;
+	if (dirname_ && dirname_[0])
+	{
+		// We have to combine both strings and join them with a filename sep.
+		// Figure out how much storage we want and allocate it on the stack.
+		const size_t filenameLen = _getLen(filename_);
+		const size_t dirnameLen = dirname_ ? _getLen(dirname_) : 0;
+		const size_t storageSize = (filenameLen + 1 + dirnameLen + 1) * sizeof(CharType);
+		CharType* filenameAlloc = static_cast<CharType*>(OsALLOCA(storageSize));
+		_copyStr(filenameAlloc, dirname_);
+		filenameAlloc[dirnameLen] = static_cast<CharType>(PATH_SEP_CHAR);
+		_copyStr(filenameAlloc + dirnameLen + 1, filename_);
+		filename = filenameAlloc;
+	}
+	else
+		filename = filename_;
+
+	return OsOpenFile(filename);
+}
 
 namespace IO
 {
@@ -37,18 +85,14 @@ namespace IO
 // Constructor (Posix + Windows versions combined)
 // Note: Posix doesn't support wchar_t filenames.
 
-MappedFile::MappedFile(const filename_char_t* const filename_, const filename_char_t* const dirname_)
+MappedFile::MappedFile(const char* const filename_, const char* const dirname_)
 		: m_basePtr(nullptr)
 		, m_startPtr(nullptr)
 		, m_endPtr(nullptr)
 		, m_currentPtr(nullptr)
 		, m_size(0)
-#if IO_MAP_TYPE == _IMT_WINDOWS
-		, m_handle(INVALID_HANDLE_VALUE)
-		, m_mapping(INVALID_HANDLE_VALUE)
-#else
-		, m_fd(-1)
-#endif
+		, m_handle(IMF_INVALID_HANDLE)
+		, m_mapping(IMF_INVALID_HANDLE)
 {
 	if ( !mapFile(filename_, dirname_) )
 	{
@@ -60,6 +104,27 @@ MappedFile::MappedFile(const filename_char_t* const filename_, const filename_ch
 	}
 }
 
+#if IO_MAP_TYPE == _IMT_WINDOWS && defined(UNICODE)
+MappedFile::MappedFile(const wchar_t* const filename_, const wchar_t* const dirname_)
+		: m_basePtr(nullptr)
+		, m_startPtr(nullptr)
+		, m_endPtr(nullptr)
+		, m_currentPtr(nullptr)
+		, m_size(0)
+		, m_handle(IMF_INVALID_HANDLE)
+		, m_mapping(IMF_INVALID_HANDLE)
+{
+	if ( !mapFile(filename_, dirname_) )
+	{
+#if IO_MAP_TYPE == _IMT_WINDOWS
+		throw std::runtime_error(strerror(GetLastError()));
+#else
+		throw std::runtime_error(strerror(errno));
+#endif
+	}
+}
+#endif
+
 //////////////////////////////////////////////////////////////////////
 // Destructor.
 
@@ -69,43 +134,13 @@ MappedFile::~MappedFile()
 }
 
 //////////////////////////////////////////////////////////////////////
-// Attempt to open a file. Returns false on error.
+// Given an open handle in m_handle, perform the file mapping.
 
-bool
-MappedFile::mapFile(const filename_char_t* const filename_, const filename_char_t* const dirname_)
+bool inline
+MappedFile::mapFileHandleInternal()
 {
-#if IO_MAP_TYPE == _IMT_UNIX
-	// At time of writing, Linux/BSD kernels don't provide widecharacter open()s.
-	static_assert(sizeof(filename_char_t) == 1, "widecharacter filenames not supported on this platform");
-#endif
-
-	// Make sure we close any currently-open/mapped file.
-	unmapFile();
-
-	const filename_char_t* filename = nullptr;
-	if (dirname_ && dirname_[0])
-	{
-		// We have to combine both strings and join them with a filename sep.
-		// Figure out how much storage we want and allocate it on the stack.
-		const size_t filenameLen = OsStrlen(filename_);
-		const size_t dirnameLen = dirname_ ? OsStrlen(dirname_) : 0;
-		const size_t storageSize = (filenameLen + 1 + dirnameLen + 1);
-		filename_char_t* filenameAlloc = ALLOC_STACK_CHARS(storageSize);
-		OsStrcpy(filenameAlloc, dirname_);
-		filenameAlloc[dirnameLen] = PATH_SEP_CHAR;
-		OsStrcpy(filenameAlloc + dirnameLen + 1, filename_);
-		filename = filenameAlloc;
-	}
-	else
-		filename = filename_;
-
-	// Check we can open the file and stat it for size.
+	// stat the file for size.
 #if IO_MAP_TYPE == _IMT_WINDOWS
-	// Windows implementation.
-	m_handle = CreateFile(filename, FILE_GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
-	if ( m_handle == INVALID_HANDLE_VALUE )
-		return false;
-
 	// Determine file size.
 	LARGE_INTEGER size;
 	if ( !GetFileSizeEx(m_handle, &size) )
@@ -113,12 +148,6 @@ MappedFile::mapFile(const filename_char_t* const filename_, const filename_char_
 
 	m_size = (size_t)size.QuadPart;
 #else
-	// Posix implementation.
-	const int fd = OS_OPEN(filename, O_RDONLY);
-	if ( fd < 0 )
-		return unmapFile();
-	m_fd = fd;
-
 	// Use fstat to quickly obtain the file size.
 	struct stat stats;
 	const int sr = fstat(fd, &stats);
@@ -137,7 +166,7 @@ MappedFile::mapFile(const filename_char_t* const filename_, const filename_char_
 #if IO_MAP_TYPE == _IMT_WINDOWS
 	// Windows implementation.
 	m_mapping = CreateFileMapping(m_handle, NULL, PAGE_READONLY, 0, 0, NULL);
-	if ( m_mapping == INVALID_HANDLE_VALUE )
+	if ( m_mapping == IMF_INVALID_HANDLE )
 		return unmapFile();
 
 	LPVOID const ptr = MapViewOfFileEx(m_mapping, FILE_MAP_READ, 0, 0, 0, NULL);
@@ -153,6 +182,8 @@ MappedFile::mapFile(const filename_char_t* const filename_, const filename_char_
 		mmap(NULL, m_size + 1, PROT_READ, flags, m_fd, 0);
 	if ( ptr == MAP_FAILED )
 		return unmapFile();
+
+	std::swap(m_mapping, m_handle);
 #endif
 
 	// Both methods return a pointer to the beginning of the
@@ -173,6 +204,37 @@ MappedFile::mapFile(const filename_char_t* const filename_, const filename_char_
 }
 
 //////////////////////////////////////////////////////////////////////
+// Attempt to open a file. Returns false on error.
+
+bool
+MappedFile::mapFile(const char* const filename_, const char* const dirname_)
+{
+	// Make sure we close any currently-open/mapped file.
+	unmapFile();
+
+	m_handle = _openFile(filename_, dirname_);
+	if ( m_handle == IMF_INVALID_HANDLE )
+		return unmapFile();
+
+	return mapFileHandleInternal();
+}
+
+#if IO_MAP_TYPE == _IMT_WINDOWS && defined(UNICODE)
+bool
+MappedFile::mapFile(const wchar_t* const filename_, const wchar_t* const dirname_)
+{
+	// Make sure we close any currently-open/mapped file.
+	unmapFile();
+
+	m_handle = _openFile(filename_, dirname_);
+	if ( m_handle == IMF_INVALID_HANDLE )
+		return unmapFile();
+
+	return mapFileHandleInternal();
+}
+#endif
+
+//////////////////////////////////////////////////////////////////////
 // Close and unmap the mapping.
 
 bool
@@ -191,24 +253,24 @@ MappedFile::unmapFile()
 		m_size = 0;
 	}
 
+	if ( m_mapping != IMF_INVALID_HANDLE )
+	{
 #if IO_MAP_TYPE == _IMT_WINDOWS
-	if ( m_mapping != INVALID_HANDLE_VALUE )
-	{
 		CloseHandle(m_mapping);
-		m_mapping = INVALID_HANDLE_VALUE;
-	}
-	if ( m_handle != INVALID_HANDLE_VALUE )
-	{
-		CloseHandle(m_handle);
-		m_handle = INVALID_HANDLE_VALUE;
-	}
 #else
-	if ( m_fd >= 0 )
-	{
-		close(m_fd);
-		m_fd = -1;
-	}
+		close(m_mapping);
 #endif
+		m_mapping = IMF_INVALID_HANDLE;
+	}
+	if ( m_handle != IMF_INVALID_HANDLE )
+	{
+#if IO_MAP_TYPE == _IMT_WINDOWS
+		CloseHandle(m_mapping);
+#else
+		close(m_mapping);
+#endif
+		m_handle = IMF_INVALID_HANDLE;
+	}
 
 	return false;
 }
@@ -264,3 +326,4 @@ MappedFile::readline(char* into, size_t maxReadLength)
 }
 
 }
+
