@@ -28,25 +28,35 @@
 #include <sys/socket.h>
 #endif
 
-// We need access to teul transport's event base.
+// List of current clients and the bufferevent associated with each.
+#include <map>
+static std::map<int, bufferevent*> clients;
+
+// TeulKit uses libevent and has an eventBase which it is going to initialize,
+// so we want to expose it to ourselves.
 namespace Teul
 {
 	extern event_base* eventBase;
 }
+extern void teulPrintConfigVars();
+extern void teulGenerateEnvironmentCfgFile(const char* const filename);
 
 // Name of our server.
-const char* const g_serverName = "cluster";
+const char* const g_serverName = "controller";
+
+////////////////////////////////////////////////////////////////////////////////
+// TeulKit error handler.
 
 static void _errorFunction(SINT32 /*teulIndex*/, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 /*error*/)
 {
 	LogAbort("Teul called cluster server error function -- shouldn't happen.");
 }
 
-#include <map>
-static std::map<int, bufferevent*> clients;
+////////////////////////////////////////////////////////////////////////////////
+// Handle a libevent ready-to-read event on the repeater interface, this means
+// someone has sent data, we forward it to all other repeater clients.
 
-static void
-_onEventBufferRead(struct bufferevent* bev, void* arg)
+static void _onEventBufferRead(struct bufferevent* bev, void* arg)
 {
 	int srcSock = (int)arg;
 	struct evbuffer* input = bufferevent_get_input(bev);
@@ -102,8 +112,10 @@ _onEventBufferRead(struct bufferevent* bev, void* arg)
 #endif
 }
 
-static void
-_onEventBufferError(struct bufferevent* bev, short error, void* arg)
+////////////////////////////////////////////////////////////////////////////////
+// Handle an error event on the repeater interface - WITH FIRE (aka disconnection)
+
+static void _onEventBufferError(struct bufferevent* bev, short error, void* arg)
 {
 	int cliSock = (int)(arg);
     if (error & BEV_EVENT_EOF)
@@ -127,8 +139,10 @@ _onEventBufferError(struct bufferevent* bev, short error, void* arg)
 	clients.erase(cliSock);
 }
 
-static void
-_onAccept(evutil_socket_t listener, short event, void* arg)
+////////////////////////////////////////////////////////////////////////////////
+// New connection on the repeater interface, add it to the pool.
+
+static void _onAccept(evutil_socket_t listener, short event, void* arg)
 {
 	auto base = static_cast<event_base*>(arg);
 	struct sockaddr_in cliAddr;
@@ -158,9 +172,94 @@ _onAccept(evutil_socket_t listener, short event, void* arg)
 	dbugLog(_FLN, "sock:%d connected from %s:%u", cliSock, teulGetAddress(ntohl(cliAddr.sin_addr.s_addr)), ntohs(cliAddr.sin_port));
 }
 
-int
-main(int argc, const char* argv[])
+////////////////////////////////////////////////////////////////////////////////
+// Print a list of all the configuration variables.
+
+////////////////////////////////////////////////////////////////////////////////
+// Generate an environment.cfg type file to the specified file name.
+
+////////////////////////////////////////////////////////////////////////////////
+// Describe how to use this application.
+
+static void  _usage(bool detailed_)
 {
+	fprintf(stderr, "Usage: controller [--help] [--configs] [--make-config-only]\n");
+	if ( detailed_ )
+	{
+		fprintf(stderr, "  --help                 Show this information and exit.\n");
+		fprintf(stderr, "  --configs              List configuration variables and exit.\n");
+		fprintf(stderr, "  --make-config-file     Generate an environment.cfg file and exit.\n");
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Describe command line usage and abort.
+
+static NORETURN_FN void _exitWithUsage(const char* const error_, const char* const cause_)
+{
+	fprintf(stderr, "ERROR: %s: %s\n", error_, cause_);
+	_usage(false);
+	exit(1);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Process command line arguments.
+
+static void _processArguments(int argc, const char* argv[])
+{
+	for ( int argn = 1; argn < argc && argv[argn] != nullptr; ++argn )
+	{
+		const char* arg = nullptr;
+		if ( argv[argn][0] == '/' )
+			arg = argv[argn] + 1;
+		else if ( argv[argn][0] == '-' && argv[argn][1] == '-' )
+			arg = argv[argn] + 2;
+
+		if ( arg != nullptr  )
+		{
+			if ( strcasecmp(arg, "help") == 0 || strcasecmp(arg, "?") == 0 )
+			{
+				_usage(true);
+				exit(0);
+			}
+
+			if ( strcasecmp(arg, "configs") == 0 )
+			{
+				teulPrintConfigVars();
+				exit(0);
+			}
+
+			if ( strcasecmp(arg, "make-config-file") == 0 )
+			{
+				if ( argn + 1 >= argc )
+					_exitWithUsage("make-config-file must be followed by a filename.", "missing file name");
+				else if ( argv[argn + 1][0] == '-' )
+					_exitWithUsage("make-config-file must be followed by a filename.", argv[argn+1]);
+
+				teulGenerateEnvironmentCfgFile(argv[argn + 1]);
+
+				exit(0);
+			}
+		}
+
+		_exitWithUsage("Unrecognized command line option", argv[argn]);
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Entry point.
+
+int main(int argc, const char* argv[])
+{
+	// Check arguments.
+	_processArguments(argc, argv);
+
+	if ( Teul::ConfigVar::LoadedConfig() == false )
+	{
+		teulGenerateEnvironmentCfgFile("environment.cfg");
+		LogAbort("environment.cfg could not be found - generated new one, please edit it.");
+	}
+
 	Teul::SetAppName(g_serverName);
 	if (teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction) < 0)
 		LogAbort("Failed to initialize cluster boss");

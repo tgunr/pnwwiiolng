@@ -16,21 +16,11 @@
 
 #include "teul/teulConfigVar.h"
 
-CVAR_ADDR(authdbAddress, NULL, "AUTH_DB", true
-			, "Address of the MySQL server hosting the auth database.");
-CVAR_STRING(authdbPort, "", "AUTH_DB_PORT", true
-			, "Port of the Auth MySQL server if not default.");
-#if defined( HAPPYOO )
-CVAR_STRING(authdbPassword, "m4nd0l1n", "AUTH_DB_PASSWD", true
-			, "Password to use for the auth database.");
-#else
-CVAR_STRING(authdbPassword, "scalar449", "AUTH_DB_PASSWD", true
-			, "Password to use for the auth database.");
-#endif
-CVAR_STRING(authdbSchema, "auth", "AUTH_DB_SCHEMA", true
-			, "Schema to use for auth data.");
-CVAR_STRING(authdbUser, "authuser", "AUTH_DB_USER", true
-			, "Username when connecting to the auth database.");
+extern ConfigAddr cv_authdbAddress;
+extern ConfigStr cv_authdbPort;
+extern ConfigStr cv_authdbPassword;
+extern ConfigStr cv_authdbSchema;
+extern ConfigStr cv_authdbUser;
 
 //////////////////////////////////////////////////////////////////////
 // Populate the supplied DBCONNECTION with details.

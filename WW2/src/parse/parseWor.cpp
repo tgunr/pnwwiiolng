@@ -33,8 +33,7 @@
 	#include "str/stringLib.h"
 	#include "wwii/wwiiConfigVars.h"
 
-	CVAR_STRING(thblitzPath, SUB_PATH("th_blitz", "weapon"), "THBLITZ_PATH", true
-				, "Path from DATA_DIR to the thBlitz csv files.");
+extern ConfigStr cv_thblitzPath;
 #else
 	#include "fio/fio.h"
 #endif

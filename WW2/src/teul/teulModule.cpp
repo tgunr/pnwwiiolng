@@ -55,8 +55,7 @@
 
 #if platOS == OS_LINUX
 #include "teul/teulConfigVar.h"
-CVAR_STRING(defaultInterface, NULL, "DEFAULT_IFACE", false
-			, "Name of the network interface to treat as primary.");
+extern ConfigStr cv_defaultInterface;
 #endif
 
 #if platOS != OS_WIN32

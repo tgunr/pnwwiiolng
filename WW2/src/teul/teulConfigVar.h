@@ -10,6 +10,8 @@ enum ConfigVarType
 	CVT_SIGNED_INT,
 	CVT_BOOL,
 	CVT_IP_ADDRESS,
+	// Insert new entries above NUM_CONFIG_VAR_TYPES
+	NUM_CONFIG_VAR_TYPES
 };
 
 namespace Teul
@@ -23,7 +25,7 @@ namespace Teul
 	class ConfigVar
 	{
 	public:
-		ConfigVar(ConfigVarType type_, const char* name_, const char* default_, const char* envVarName_, bool required_);
+		ConfigVar(ConfigVarType type_, const char* name_, const char* default_, const char* envVarName_, bool required_, const char* description_);
 		~ConfigVar();
 
 		// Assignment operator copies values, not names.
@@ -42,6 +44,9 @@ namespace Teul
 		const char* GetName() const { return m_name; }
 		const char* GetEnvVarName() const { return m_envVarName; }
 		ConfigVarType GetType() const { return m_type; }
+		const char* GetDescription() const { return m_description; }
+		const char* GetDefault() const { return m_default; }
+		bool GetRequired() const { return m_required; }
 
 		bool IsNumber() const { return (m_type == CVT_UNSIGNED_INT || m_type == CVT_SIGNED_INT); }
 		void Set(const char* str_);
@@ -60,6 +65,13 @@ namespace Teul
 		void SetSint32(SINT32 newValue_);
 		void SetBool(bool newValue_);
 
+		//! Will be true if the general purpose defaults file was loaded.
+		static bool LoadedGeneralConfig();
+		//! Will be true if the os-specific defaults file was loaded.
+		static bool LoadedOSConfig();
+		//! Will be true if we loaded either defaults file.
+		static bool LoadedConfig() { return LoadedGeneralConfig() || LoadedOSConfig(); }
+
 	protected:
 		void SetStringValue(const char* str_);
 		void SetUint32Value(const char* str_);
@@ -75,11 +87,13 @@ namespace Teul
 	protected:
 		enum { MaxIntStringSize = 12, MaxIPAddressSize = 65 };
 
-		StrDupPtr		m_name;
-		ConfigVarType	m_type;
-		const char*		m_envVarName;
-		char*			m_value;
-		bool			m_required;
+		StrDupPtr			m_name;
+		ConfigVarType		m_type;
+		const char*			m_envVarName;
+		const char* const	m_description;
+		const char* const	m_default;
+		char*				m_value;
+		bool				m_required;
 
 		union
 		{
@@ -97,19 +111,3 @@ typedef Teul::ConfigVar ConfigUint;
 typedef Teul::ConfigVar ConfigSint;
 typedef Teul::ConfigVar ConfigBool;
 typedef Teul::ConfigVar ConfigAddr;
-
-#define CVAR_STRING(Name_, Default_, EnvName_, Required_, Description_)	\
-	ConfigStr cv_##Name_ ( CVT_STRING, #Name_, Default_, EnvName_, Required_ )
-
-#define CVAR_UINT(Name_, Default_, EnvName_, Description_)	\
-	ConfigUint cv_##Name_ ( CVT_UNSIGNED_INT, #Name_, Default_, EnvName_, false )
-
-#define CVAR_SINT(Name_, Default_, EnvName_, Description_)	\
-	ConfigSint cv_##Name_ ( CVT_SIGNED_INT, #Name_, Default_, EnvName_, false )
-
-#define CVAR_BOOL(Name_, Default_, EnvName_, Description_)	\
-	ConfigBool cv_##Name_ ( CVT_BOOL, #Name_, Default_, EnvName_, false )
-
-#define CVAR_ADDR(Name_, Default_, EnvName_, Required_, Description_)	\
-	ConfigAddr cv_##Name_ ( CVT_IP_ADDRESS, #Name_, Default_, EnvName_, Required_ )
-

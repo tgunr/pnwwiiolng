@@ -124,10 +124,8 @@ namespace Host
 
 PLAYERS g_players ;
 #include "teul/teulConfigVar.h"
-CVAR_UINT(maxCellPlayers, "1250", "MAX_PLAYERS"
-		  , "Maximum number of players on this cell host.");
-CVAR_ADDR(baseUpdtAddress, "192.168.11.0", "BASE_UPDT_ADDRESS", true
-		  , "Network address to use for private cell network.");
+extern ConfigUint cv_maxCellPlayers;
+extern ConfigAddr cv_baseUpdtAddress;
 static SINT32 _userConnections = 0;
 
 char hostname[32] ;

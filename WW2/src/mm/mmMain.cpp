@@ -142,8 +142,7 @@ extern SINT32 mapReleasePlayer(SINT32 teulIndex, PlayerStatusNode* psn, Server::
 extern SINT32 mapPlayerExitCluster(PlayerStatusNode& psn);
 extern void teulCloseAllEndpoints(const SINT32 errorCode) ;
 
-CVAR_UINT(appID, NULL, "APP_ID"
-			, "App ID for this server - 1 being release, 12 being beta.");
+extern ConfigUint cv_appID;
 
 void
 mapSendActivate(SINT32 teulIndex, const playerid_t playerID, const char* callsign)

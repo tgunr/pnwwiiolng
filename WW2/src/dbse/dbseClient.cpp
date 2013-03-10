@@ -15,10 +15,8 @@
 #include "server/serverConfigVars.h"
 #include "wwii/wwiiNetPorts.h"
 
-CVAR_ADDR(dbsePrimaryAddress, NULL, "DBSE_PRIMARY_ADDRESS", true
-			, "IP address dbd clients will reach the dbd on.");
-CVAR_UINT(dbseConnectionTimeout_ms, "3000", "DBSE_CONNECTION_TIMEOUT_MS"
-		    , "Time in miliseconds before database proxy connections timeout.");
+extern ConfigAddr cv_dbsePrimaryAddress;
+extern ConfigUint cv_dbseConnectionTimeout_ms;
 
 static SINT32 hostIndex = 0;
 static CONNECTION_STATUS connected = CONNECT_NONE;

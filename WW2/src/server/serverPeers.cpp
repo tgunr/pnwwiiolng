@@ -24,7 +24,7 @@
 #include "wwii/wwiiNetPorts.h"
 #include "wwii/wwiiCallbacks.h"
 
-CVAR_UINT(peerConnectionTimeout_ms, "20000", "PEER_CONNECTION_TIMEOUT_MS", "Number of miliseconds before a server-peer connection times out.");
+extern ConfigUint cv_peerConnectionTimeout_ms;
 
 // Describe the mapping.
 struct ServerConnection

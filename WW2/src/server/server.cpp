@@ -47,10 +47,8 @@
 static const UINT32 PLAYER_TIMEOUT = 3 * 60 * 1000;	// 4 minutes
 static const SINT32 PLAYER_XFER_TIMEOUT = 30 * 1000;	// 30 seconds
 
-CVAR_UINT(maxClusterUsers, "0", "MM_MAX_USERS"
-		  , "Maxmimum number of players on the mmhost/cluster");
-CVAR_ADDR(authHost, "auth.playnet.com", "AUTH_ADDRESS", true
-			, "Host name or IP Address of the authentication server.");
+extern ConfigUint cv_maxClusterUsers;
+extern ConfigAddr cv_authHost;
 
 extern void serverInitializePeering();
 extern void serverConnectPeer(const UINT32 ip, const SERVER_TYPE type);

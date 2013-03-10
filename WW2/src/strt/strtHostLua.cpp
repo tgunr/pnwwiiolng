@@ -28,10 +28,7 @@
 #include "strt/strtDotCommands.h"
 #include "include/arenaLockEnums.h"
 
-CVAR_STRING(luaRCFile, "rc.lua", "LUA_RC_FILE", true
-			, "Name of the startup (rc) Lua script");
-CVAR_STRING(luaStratlibFile, "stratlib.lua", "LUA_STRATLIB_FILE", true
-			, "Name of the Lua strat library.");
+extern ConfigStr cv_luaRCFile, cv_luaStratlibFile;
 
 // Lua/Tolua API headers
 #ifdef __cplusplus

@@ -39,12 +39,8 @@
 #include "wwii/wwiiConfigVars.h"
 #include "wwii/wwiiString.h"
 
-CVAR_BOOL(stratIgnoreErrors, "0", "STRAT_IGNORE_ERRORS"
-			, "Disables sdm-loading errors from causing termination.");
-
-CVAR_STRING(blitzworPath, "blitzWor.csv", "BLITZWOR_PATH", true
-			, "DATA_DIR-relative path/filename for the blitzWor csv file");
-
+extern ConfigBool cv_stratIgnoreErrors;
+extern ConfigStr cv_blitzworPath;
 
 namespace Strat
 {
@@ -911,7 +907,6 @@ _scPass2_cps(Supercell& sc)
 		cp.m_routeingRun = 0ULL ;
 		cp.flags &= ~CP_STAT_IN_SUPPLY ;
 #endif
-
 	}
 }
 

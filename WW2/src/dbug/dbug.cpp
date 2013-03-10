@@ -35,8 +35,7 @@
 
 #if platBuild == TEUL_SERVER
 #include "teul/teulConfigVar.h"
-CVAR_STRING(defaultLogPath, NULL, "LOG_PATH", false
-				, "Default location for log files.");
+extern ConfigStr cv_defaultLogPath;
 #endif
 
 #if platOS == OS_WIN32

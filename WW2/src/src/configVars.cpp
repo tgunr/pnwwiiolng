@@ -11,46 +11,83 @@
 extern bool teulGetHost(const SCHAR* address, UINT32* host);
 
 ////////////////////////////////////////////////////////////////////////////////
-// Variables.
+// Helper macros.
 
-CVAR_STRING(dataDir, "/playnet/data", "DATA_DIR", true
-			, "Top level directory for game data.");
-CVAR_STRING(importFile, "importlist.txt", "IMPORT_FILE", true
-			, "File which will specify sdm files to be used by the server.");
-CVAR_STRING(terrainSubdir, "terrain", "TERRAIN_SUBDIR", true
-			, "Path from DATA_DIR to the terrain sdm files and origin file.");
-CVAR_STRING(originFile, "origin", "ORIGIN_FILE", true
-			, "Name of the file which identifies where the sdm files came from.");
-CVAR_STRING(stratLanguage, "en", "STRAT_LANGUAGE", true
-			, "2-letter language code for server localization.");
+#define CFG_STRING(Name_, Default_, EnvName_, Required_, Description_)	\
+	ConfigStr cv_##Name_ ( CVT_STRING, #Name_, Default_, EnvName_, Required_, Description_ )
 
-CVAR_ADDR(wwiiDBAddress, nullptr, "WWII_DB_ADDRESS", true
-			, "IP address of the MySQL Database.");
-CVAR_STRING(wwiiDBDefaultSchema, "wwiionline", "WWII_DB_SCHEMA", true
-			, "Default schema for game data.");
+#define CFG_UINT(Name_, Default_, EnvName_, Description_)	\
+	ConfigUint cv_##Name_ ( CVT_UNSIGNED_INT, #Name_, Default_, EnvName_, false, Description_ )
 
-CVAR_STRING(clusterName, nullptr, "WWII_CLUSTER", true
-			, "Short-name for this cluster, e.g. 'dev'");
-CVAR_ADDR(ircServer, "", "WWII_IRC_SERVER", false
-			, "Address of the IRC server. If not defined, disables IRC.");
-CVAR_STRING(ircPassword, "blooGit", "WWII_IRC_PASSWD", true
-			, "Server-password for the IRC server.");
-CVAR_UINT(ircPort, "6667", "WWII_IRC_PORT"
-			, "Port to connect to the IRC server on.");
-CVAR_UINT(arenaID, nullptr, "ARENA_ID"
-			, "Numeric ID for this arena.");
-CVAR_STRING(teulWebPath, "/playnet/wwiiol/web/debug", "TEUL_UWEB_PATH", true
-			, "Path to the top-level directory for the internal web server.");
-CVAR_STRING(authErrorUrl, "http://www.wwiionline.com/auth/errors/", "AUTH_ERROR_URL", true
-			, "URL to prefix authentication error URLs with.");
-CVAR_ADDR(baseAddress, nullptr, "BASE_ADDRESS", true
-			, "Network address (/24) for the cluster. Server's will map their last octets (x.x.x.N) into this network for inter-host communications.");
+#define CFG_SINT(Name_, Default_, EnvName_, Description_)	\
+	ConfigSint cv_##Name_ ( CVT_SIGNED_INT, #Name_, Default_, EnvName_, false, Description_ )
 
-CVAR_STRING(luaPath, "/playnet/wwiiol/lua", "LUA_BASE_PATH", true
-			, "Path to the Lua scripts.");
+#define CFG_BOOL(Name_, Default_, EnvName_, Description_)	\
+	ConfigBool cv_##Name_ ( CVT_BOOL, #Name_, Default_, EnvName_, false, Description_ )
+
+#define CFG_ADDR(Name_, Default_, EnvName_, Required_, Description_)	\
+	ConfigAddr cv_##Name_ ( CVT_IP_ADDRESS, #Name_, Default_, EnvName_, Required_, Description_ )
+
+static const char* const s_configVarTypes[NUM_CONFIG_VAR_TYPES] =
+{
+	"string"
+,	"unsigned int"
+,	"signed int"
+,	"boolean"
+,	"ip address"
+};
 
 ////////////////////////////////////////////////////////////////////////////////
-// Read values from the environment of configuration file.
+// Variables.
+
+CFG_STRING(dataDir, "/playnet/data", "DATA_DIR", true, "Top level directory for game data.");
+CFG_STRING(importFile, "importlist.txt", "IMPORT_FILE", true, "File which will specify sdm files to be used by the server.");
+CFG_STRING(terrainSubdir, "terrain", "TERRAIN_SUBDIR", true, "Path from DATA_DIR to the terrain sdm files and origin file.");
+CFG_STRING(originFile, "origin", "ORIGIN_FILE", true, "Name of the file which identifies where the sdm files came from.");
+CFG_STRING(stratLanguage, "en", "STRAT_LANGUAGE", true, "2-letter language code for server localization.");
+CFG_STRING(thblitzPath, SUB_PATH("th_blitz", "weapon"), "THBLITZ_PATH", true, "Path from DATA_DIR to the thBlitz csv files.");
+CFG_BOOL(stratIgnoreErrors, "0", "STRAT_IGNORE_ERRORS", "Disables sdm-loading errors from causing termination.");
+CFG_STRING(blitzworPath, "blitzWor.csv", "BLITZWOR_PATH", true, "DATA_DIR-relative path/filename for the blitzWor csv file");
+CFG_STRING(luaPath, "/playnet/wwiiol/lua", "LUA_BASE_PATH", true, "Path to the Lua scripts.");
+CFG_STRING(defaultLogPath, NULL, "LOG_PATH", false, "Default location for log files.");
+CFG_STRING(teulWebPath, "/playnet/wwiiol/web/debug", "TEUL_UWEB_PATH", true, "Path to the top-level directory for the internal web server.");
+CFG_STRING(luaRCFile, "rc.lua", "LUA_RC_FILE", true, "Name of the startup (rc) Lua script");
+CFG_STRING(luaStratlibFile, "stratlib.lua", "LUA_STRATLIB_FILE", true, "Name of the Lua strat library.");
+
+CFG_ADDR(wwiiDBAddress, nullptr, "WWII_DB_ADDRESS", true, "IP address of the MySQL Database.");
+CFG_STRING(wwiiDBDefaultSchema, "wwiionline", "WWII_DB_SCHEMA", true, "Default schema for game data.");
+CFG_ADDR(dbsePrimaryAddress, NULL, "DBSE_PRIMARY_ADDRESS", true, "IP address dbd clients will reach the dbd on.");
+CFG_UINT(dbseConnectionTimeout_ms, "3000", "DBSE_CONNECTION_TIMEOUT_MS", "Time in miliseconds before database proxy connections timeout.");
+CFG_BOOL(mysqlCompression, "0", "MYSQL_COMPRESSION", "Enable compression when communicating with the MySQL server");
+
+CFG_STRING(clusterName, nullptr, "WWII_CLUSTER", true, "Short-name for this cluster, e.g. 'dev'");
+CFG_UINT(arenaID, nullptr, "ARENA_ID", "Numeric ID for this arena.");
+CFG_UINT(appID, NULL, "APP_ID", "App ID for this server - 1 being release, 12 being beta.");
+CFG_ADDR(ircServer, "", "WWII_IRC_SERVER", false, "Address of the IRC server. If not defined, disables IRC.");
+CFG_STRING(ircPassword, "blooGit", "WWII_IRC_PASSWD", true, "Server-password for the IRC server.");
+CFG_UINT(ircPort, "6667", "WWII_IRC_PORT", "Port to connect to the IRC server on.");
+CFG_STRING(authErrorUrl, "http://www.wwiionline.com/auth/errors/", "AUTH_ERROR_URL", true, "URL to prefix authentication error URLs with.");
+CFG_ADDR(baseAddress, nullptr, "BASE_ADDRESS", true, "Network address (/24) for the cluster. Server's will map their last octets (x.x.x.N) into this network for inter-host communications.");
+
+CFG_ADDR(authHost, "auth.playnet.com", "AUTH_ADDRESS", true, "Host name or IP Address of the authentication server.");
+CFG_ADDR(authdbAddress, NULL, "AUTH_DB", true, "Address of the MySQL server hosting the auth database.");
+CFG_STRING(authdbPort, "", "AUTH_DB_PORT", true, "Port of the Auth MySQL server if not default.");
+#if defined( HAPPYOO )
+CFG_STRING(authdbPassword, "m4nd0l1n", "AUTH_DB_PASSWD", true, "Password to use for the auth database.");
+#else
+CFG_STRING(authdbPassword, "scalar449", "AUTH_DB_PASSWD", true, "Password to use for the auth database.");
+#endif
+CFG_STRING(authdbSchema, "auth", "AUTH_DB_SCHEMA", true, "Schema to use for auth data.");
+CFG_STRING(authdbUser, "authuser", "AUTH_DB_USER", true, "Username when connecting to the auth database.");
+
+CFG_UINT(maxClusterUsers, "0", "MM_MAX_USERS", "Maxmimum number of players on the mmhost/cluster");
+CFG_UINT(maxCellPlayers, "1250", "MAX_PLAYERS", "Maximum number of players on this cell host.");
+CFG_ADDR(baseUpdtAddress, "192.168.11.0", "BASE_UPDT_ADDRESS", true, "Network address to use for private cell network.");
+CFG_UINT(peerConnectionTimeout_ms, "20000", "PEER_CONNECTION_TIMEOUT_MS", "Number of miliseconds before a server-peer connection times out.");
+CFG_STRING(defaultInterface, NULL, "DEFAULT_IFACE", false, "Name of the network interface to treat as primary.");
+
+////////////////////////////////////////////////////////////////////////////////
+// Read values from the environment or configuration file.
 
 #include <vector>
 
@@ -74,12 +111,14 @@ struct ConfigEntry
 typedef std::vector<ConfigEntry> CONFIG_ENTRIES;
 struct ConfigEntries : public CONFIG_ENTRIES
 {
-	ConfigEntries() : CONFIG_ENTRIES(), m_read(false)
+	ConfigEntries() : CONFIG_ENTRIES(), m_read(false), m_foundGeneralFile(false), m_foundOSFile(false)
 	{
 		reserve(64);
 	}
 
 	bool m_read;
+	bool m_foundGeneralFile;
+	bool m_foundOSFile;
 };
 
 static ConfigEntries& _getConfigEntries()
@@ -171,13 +210,25 @@ static const char* GetValueFromEnvironmentOrConfig(const char* name_)
 #endif
 
 		IO::MappedFile file;
-		// Apply defaults first.
-		for ( size_t i = 0; !configEntries.m_read && paths[i] != nullptr; ++i )
+		// Work thru path list to try and find a general file followed by an OS file,
+		// once we have found an instance of each file, stop looking for that file.
+		for ( size_t i = 0; paths[i] != nullptr; ++i )
 		{
 			if ( file.mapFile(DEF_ENVIRONMENT_CFG, paths[i]) )
+			{
 				_readConfigEntriesFromFile(file);
+				configEntries.m_foundGeneralFile = true;
+				break;
+			}
+		}
+		for ( size_t i = 0; paths[i] != nullptr; ++i )
+		{
 			if ( file.mapFile(OS_ENVIRONMENT_CFG, paths[i]) )
+			{
 				_readConfigEntriesFromFile(file);
+				configEntries.m_foundOSFile = true;
+				break;
+			}
 		}
 		configEntries.m_read = true;
 	}
@@ -192,15 +243,96 @@ static const char* GetValueFromEnvironmentOrConfig(const char* name_)
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Registry of all the known config vars.
+
+#include <set>
+typedef std::set<Teul::ConfigVar*> ConfigVars;
+
+static ConfigVars& _getConfigVars()
+{
+	static ConfigVars s_configVars;
+	return s_configVars;
+}
+
+static void _getSortedConfigVars(std::vector<Teul::ConfigVar*>& myList)
+{
+	myList.reserve(_getConfigVars().size());
+	myList.assign(_getConfigVars().begin(), _getConfigVars().end());
+	std::sort(myList.begin(), myList.end(), [](const Teul::ConfigVar* lhs, const Teul::ConfigVar* rhs) { return strcasecmp(lhs->GetName(), rhs->GetName()) > 0; });
+}
+
+void teulPrintConfigVars()
+{
+	std::vector<Teul::ConfigVar*> myList;
+	_getSortedConfigVars(myList);
+	for ( auto& it : myList )
+	{
+		printf("%-32s (%s)\n", it->GetName(), s_configVarTypes[it->GetType()]);
+		printf("  %s\n", it->GetDescription());
+		printf("  Default: %c%s%c, Current: %c%s%c\n"
+					, it->GetDefault() ? '"' : '<'
+					, it->GetDefault() ? it->GetDefault() : "none"
+					, it->GetDefault() ? '"' : '>'
+					, it->GetString() ? '"' : '<'
+					, it->GetString() ? it->GetString() : "none"
+					, it->GetString() ? '"' : '>'
+					);
+		printf("\n");
+	}
+}
+
+void teulGenerateEnvironmentCfgFile(const char* const filename_)
+{
+	std::vector<Teul::ConfigVar*> myList;
+	_getSortedConfigVars(myList);
+	FILE* fp = fopen(filename_, "w");
+	if ( fp == NULL )
+	{
+		fprintf(stderr, "Unable to create config file: %s\n", filename_);
+		exit(-1);
+	}
+
+	time_t now = time(nullptr);
+	fprintf(fp, "# '%s' WWIIOL environment config defaults\n# Generated %s\n\n", filename_, ctime(&now));
+	for ( auto& it : myList )
+	{
+		fprintf(fp, "# %s (%s %s, default: %c%s%c)\n"
+				, it->GetName()
+				, it->GetRequired() ? "required" : "optional"
+				, s_configVarTypes[it->GetType()]
+				, it->GetDefault() ? '"' : '<'
+				, it->GetDefault() ? it->GetDefault() : "none"
+				, it->GetDefault() ? '"' : '>'
+				);
+		fprintf(fp, "# %s\n", it->GetDescription());
+		fprintf(fp, "#%s=%s\n", it->GetName(), (it->GetDefault() ? it->GetDefault() : (it->GetRequired() ? "???" : "")));
+		fprintf(fp, "\n");
+	}
+	fclose(fp);
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Implementations.
 
 namespace Teul
 {
 
-	ConfigVar::ConfigVar(ConfigVarType type_, const char* name_, const char* default_, const char* envVarName_, bool required_)
+	bool ConfigVar::LoadedGeneralConfig()
+	{
+		return _getConfigEntries().m_foundGeneralFile;
+	}
+
+	bool ConfigVar::LoadedOSConfig()
+	{
+		return _getConfigEntries().m_foundOSFile;
+	}
+
+	ConfigVar::ConfigVar(ConfigVarType type_, const char* name_, const char* default_, const char* envVarName_, bool required_, const char* description_)
 		: m_name(name_)
 		, m_type(type_)
 		, m_envVarName(envVarName_)
+		, m_description(description_)
+		, m_default(default_)
 		, m_value(nullptr)
 		, m_required(required_)
 	{
@@ -224,10 +356,12 @@ namespace Teul
 			}
 		}
 
+		_getConfigVars().insert(this);
+
 		if ( default_ != nullptr )
 			Set(default_);
 
-		if ( m_required && (m_value == nullptr || *m_value == 0) )
+		if ( m_required && (m_value == nullptr || (m_default == nullptr && *m_value == 0)) )
 			LogAbort("Config variable %s (%s) must be defined with a non-empty value.", name_, envVarName_);
 	}
 
@@ -395,5 +529,3 @@ namespace Teul
 		teulGetAddress(newValue_, m_value, MaxIPAddressSize);
 	}
 }
-
-
