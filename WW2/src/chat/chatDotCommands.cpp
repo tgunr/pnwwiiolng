@@ -826,7 +826,7 @@ public:
 
 		if ( arguments[0] != '?' )
 		{
-			sscanf(arguments, "%u", &mode) ;
+			(void)sscanf(arguments, "%u", &mode) ;
 			if ( mode < 0 || mode >= UpdateFraming::_MODES )
 				throw Chat::LStringErr(LSTR_INVALID_UM, arguments) ;
 		}

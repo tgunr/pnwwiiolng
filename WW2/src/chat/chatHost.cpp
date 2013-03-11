@@ -1038,15 +1038,16 @@ _stratCommand(const char* input, Player* player)
 		return false ;
 #endif
 
-	player->sendStratCommand(input+1, NULL, true) ;
+	player->sendStratCommand(input+1, nullptr, true) ;
 	return TRUE ;
 }
 
 static void
 _radioSnoop(Player* player, Chat::ClientMessage* message)
 {
-	if ( (player->m_snoopBy == NULL || player->m_snoopBy == player)
-		&& (player->m_crsSnoopBy == NULL || player->m_crsSnoopBy == player) )
+	ABORT_IF( player == nullptr );
+	if ( (player->m_snoopBy == nullptr || player->m_snoopBy == player)
+		&& (player->m_crsSnoopBy == nullptr || player->m_crsSnoopBy == player) )
 		return ;
 
 	// Caller has determined we are being snooped
@@ -1536,11 +1537,11 @@ chatBuildHostMessage(const ChatHandle& senderID
 	msg.icon = chanIcon ;
 	msg.handle = senderID ;
 
-	if ( text == NULL )
+	if ( text == nullptr )
 		msg.msg = "" ;
 	else
 		msg.msg = text ;
-	msg.length = (UINT32)strnlen(text, MAX_MESSAGE_LENGTH) ;
+	msg.length = (UINT32)strnlen(msg.msg, MAX_MESSAGE_LENGTH) ;
 
 	for ( int i = 0 ; i < MAX_CLIENT_CHANNELS ; i++ )
 		msg.radioType[i] = 0 ;

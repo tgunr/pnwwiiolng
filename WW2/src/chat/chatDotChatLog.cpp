@@ -44,7 +44,7 @@ protected:
 		auto resultIt = m_results.begin() ;
 		while ( Query()->FetchRow() )
 		{
-			const DBRow& row = Query()->Row() ;
+			DBRow& row = Query()->Row() ;
 			std::string& result = *(resultIt++) ;
 			result = row[0] ;
 			result += ": " ;

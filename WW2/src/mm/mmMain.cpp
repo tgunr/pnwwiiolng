@@ -875,7 +875,7 @@ _checkAcceptingStatus()
 		acceptingMessage += g_arenaDescription["host_rev"] ;
 		acceptingMessage += " ++" ;
 		wwiiIRCChannelMessage("-sys,#servers", acceptingMessage.c_str()) ;
-		printf("%s\n", acceptingMessage);
+		printf("%s\n", acceptingMessage.c_str());
 	}
 
 	if ( updateCapacity )

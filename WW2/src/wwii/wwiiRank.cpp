@@ -119,7 +119,7 @@ wwiiReadRanks(DBHANDLE& dbh)
 
 		while (dbq.FetchRow())
 		{
-			const DBRow& row = dbq.Row() ;
+			DBRow& row = dbq.Row() ;
 			UINT32 level = row.NextUInt() ;
 			UINT32 type = row.NextUInt() ;
 			UINT32 points = row.NextUInt() ;

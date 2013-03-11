@@ -14,7 +14,7 @@
 
 struct AuthPlayerDetails
 {
-	AuthPlayerDetails(const DBRow& row)
+	AuthPlayerDetails(DBRow& row)
 		: playerID(row.NextUInt())
 		, permissions(row.NextUINT64())
 		, callsign(row.NextString())

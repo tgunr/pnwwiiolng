@@ -14,6 +14,7 @@ class ObjectStruct ;
 class LinkStruct ;
 struct STRAT_FACILITY_TABLE ;
 struct STRAT_BUILDING_LIST ;
+class HostSupercellVislevelXfer;
 
 //tolua_begin
 
@@ -70,8 +71,10 @@ public:
 	STRAT_FACILITY_TABLE*	facilityTable;
 	STRAT_BUILDING_LIST*	buildingTable;
 
-	class HostSupercellVislevelXfer*	m_xfer ;	// Where to find any xfer data on this we have.
+//tolua_end
+	HostSupercellVislevelXfer*	m_xfer ;	// Where to find any xfer data on this we have.
 	bool			m_modified ;
+//tolua_begin
 } ;
 
 //tolua_end

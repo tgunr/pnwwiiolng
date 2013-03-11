@@ -73,7 +73,7 @@ public:
 		Result result ;
 		while ( Query()->FetchRow() )
 		{
-			const DBRow& row = Query()->Row() ;
+			DBRow& row = Query()->Row() ;
 
 			result.m_squadID = row.NextUInt() ;
 			result.m_playerID = row.NextUInt() ;
@@ -130,7 +130,7 @@ public:
 			}
 
 			// Nobody online, so we have to do this in the background
-			if ( text == NULL )
+			if ( text == nullptr )
 			{
 				text = threadsAllocText() ;
 				tp = text + snprintf(text, TEXT_POOL_SIZE, QRY_REMOVE_RECRUITS, result.m_playerID) ;

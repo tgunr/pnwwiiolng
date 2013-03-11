@@ -805,7 +805,7 @@ protected:
 		char buffer[1024] ;
 		while ( Query()->FetchRow() )
 		{
-			const DBRow& row = Query()->Row() ;
+			DBRow& row = Query()->Row() ;
 			UINT32 ctry = atoi(row[1]) ;
 			snprintf(buffer, sizeof(buffer) - 1, "%19s %s@%s(%s) %s", row[0], row[2], row[3], _countryName[ctry], row[4]) ;
 			m_results.insert(m_results.begin(), buffer) ;
@@ -950,7 +950,7 @@ protected:
 		std::string line ;
 		while ( Query()->FetchRow() )
 		{
-			const DBRow& row = Query()->Row() ;
+			DBRow& row = Query()->Row() ;
 			line = row[0] ;
 			line += '/' ;
 			line += row[2] ;
@@ -1057,7 +1057,7 @@ protected:
 		std::string line ;
 		while ( Query()->FetchRow() )
 		{
-			const DBRow& row = Query()->Row() ;
+			DBRow& row = Query()->Row() ;
 			line = row[0] ;
 			line += '/' ;
 			line += row[1] ;
@@ -2142,7 +2142,7 @@ protected:
 			return false ;
 		}
 
-		const DBRow& row = Query()->Row() ;
+		DBRow& row = Query()->Row() ;
 		if ( atoi(row[0]) == 0 )
 		{
 			m_err = row[1] ;
@@ -2208,7 +2208,7 @@ protected:
 		std::string line ;
 		while ( Query()->FetchRow() )
 		{
-			const DBRow& row = Query()->Row() ;
+			DBRow& row = Query()->Row() ;
 
 			const char* const desc = row[0] ;
 			if ( desc == NULL || *desc == 0 )

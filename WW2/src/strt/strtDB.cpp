@@ -30,7 +30,7 @@
 
 //#define HEAVY_DEBUG
 
-typedef void (_PROCESSOR)(const DBRow&, void*, UINT32 oid) ;
+typedef void (_PROCESSOR)(DBRow&, void*, UINT32 oid) ;
 
 extern DBHANDLE dbh;
 extern DBCONNECTION dbConnection ;
@@ -122,7 +122,7 @@ static const char* _FETCH_LINKS_QUERY =
 ;
 
 static void
-_processCP(const DBRow& row, void* data, UINT32 oid)
+_processCP(DBRow& row, void* data, UINT32 oid)
 {
 	CPStruct* cp = (CPStruct*) data ;
 
@@ -154,7 +154,7 @@ _processCP(const DBRow& row, void* data, UINT32 oid)
 }
 
 static void
-_processFacility(const DBRow& row, void* data, UINT32 oid)
+_processFacility(DBRow& row, void* data, UINT32 oid)
 {
 	FacilityStruct* facility = (FacilityStruct*) data ;
 
@@ -170,7 +170,7 @@ _processFacility(const DBRow& row, void* data, UINT32 oid)
 }
 
 static void
-_processObject(const DBRow& row, void* data, UINT32 oid)
+_processObject(DBRow& row, void* data, UINT32 oid)
 {
 	ObjectStruct* object = (ObjectStruct*) data ;
 
@@ -191,7 +191,7 @@ _processObject(const DBRow& row, void* data, UINT32 oid)
 }
 
 static void
-_processLink(const DBRow& row, void* data, UINT32 oid)
+_processLink(DBRow& row, void* data, UINT32 oid)
 {
 	LinkStruct* link = (LinkStruct*) data ;
 
@@ -217,7 +217,7 @@ _initAllEntries(const char* query, _PROCESSOR* processFn, SINT16& scx, SINT16& s
 
 	while ( q.FetchRow() )
 	{
-		const DBRow& row = q.Row() ;
+		DBRow& row = q.Row() ;
 
 		scx = row.NextSInt() ;
 		scy = row.NextSInt() ;

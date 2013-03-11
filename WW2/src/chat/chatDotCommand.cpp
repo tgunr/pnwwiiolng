@@ -514,7 +514,7 @@ DotCommandIndex::readPermissions()
 		DBQuery dbq(chatdbGetDBH(), "SELECT cc.command, cc.availability FROM chat_commands cc") ;
 		while ( dbq.FetchRow() )
 		{
-			const DBRow& row = dbq.Row() ;
+			DBRow& row = dbq.Row() ;
 
 			// Blank command or "." command
 			if ( row[0] == 0 || row[0][0] == '.' )
@@ -547,7 +547,7 @@ DotCommandIndex::readPermissions()
 							" ORDER BY cc.cmd_oid") ;
 		while ( dbq.FetchRow() )
 		{
-			const DBRow& row = dbq.Row() ;
+			DBRow& row = dbq.Row() ;
 			UINT32 cmdNo = (UINT32)atol(row[0]) ;
 			const char* cmd = row[1] ;
 
@@ -695,7 +695,7 @@ bool
 chatGetTimeInterval(Player& player, const char* timeString, UINT32& interval, const char defaultUnit)
 {
 	char type = defaultUnit ;
-	sscanf(timeString, "%u%c", &interval, &type) ;
+	(void)sscanf(timeString, "%u%c", &interval, &type) ;
 
 	switch ( tolower(type) )
 	{

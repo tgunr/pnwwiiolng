@@ -92,7 +92,7 @@ wwiiReadHCUnits()
 
 		while (q.FetchRow())
 		{
-			const DBRow& row = q.Row() ;
+			DBRow& row = q.Row() ;
 
 			unitID = row.NextUInt() ;
 			parentID = row.NextUInt() ;

@@ -494,7 +494,7 @@ _ensureCPInitialization(CPStruct* cp)
 	cp->ownableFacilities = 0 ;
 	cp->numArmyBases = 0 ;
 	cp->numFirebases = 0 ;
-	memset(cp->facilitiesOwned, 0, sizeof(cp->ownableFacilities)) ;
+	memset(cp->facilitiesOwned, 0, sizeof(cp->facilitiesOwned)) ;
 	memset(cp->armyBasesOwned, 0, sizeof(cp->armyBasesOwned)) ;
 }
 
@@ -840,7 +840,7 @@ _scPass2_linkSetup(Supercell& sc)
 			std::string links = start->m_outgoingLink->name ;
 			links += "/" ;
 			links += newLink->name ;
-			errorList[ERR_LINK_START_MULTIPLE_LINKS][start->name] = links.c_str() ;
+			errorList[ERR_LINK_START_MULTIPLE_LINKS][start->name] = links;
 			continue ;
 		}
 		if ( end->m_incomingLink != NULL )
@@ -1382,7 +1382,7 @@ void strtInitObject(ObjectStruct* object)
 {
 	object->next=NULL;
 	object->facility=NULL;
-	memset(object->name,0,sizeof(UCHAR)*32);
+	memset(object->name, 0, sizeof(object->name));
 	object->m_isCaptureBuilding = object->m_needsSync = false ;
 	object->m_damageJoulesSaved = ~0ULL ;
 	object->m_maxDamageJoulesSaved = ~0ULL ;
@@ -1394,7 +1394,7 @@ void strtInitObject(ObjectStruct* object)
 
 void strtInitLink(LinkStruct* link)
 {
-	memset(link->name,0,sizeof(UCHAR)*32);
+	memset(link->name, 0, sizeof(link->name));
 	link->startDepot=NULL;
 	link->endDepot=NULL;
 }
@@ -2290,12 +2290,13 @@ static void _calcCapacity(ObjectStruct& object)
 
 #ifdef IS_STRAT_HOST
 	object.recalculateCapacity() ;
-	object.Facility().recalculateCapacity() ;
+	auto& fac = object.Facility();
+	fac.recalculateCapacity() ;
 
-	if ( object.Facility().capacity == 0
-		&& object.Facility().type == FACILITY_FIREBASE
-		&& object.Facility().isOpen() )
-		strtProcessFirebase(object.Facility()) ;
+	if ( fac.capacity == 0
+		&& fac.type == FACILITY_FIREBASE
+		&& fac.isOpen() )
+		strtProcessFirebase(fac) ;
 #endif
 }
 

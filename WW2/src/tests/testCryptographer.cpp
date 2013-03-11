@@ -12,9 +12,9 @@ public: CryptographerTest() : TestUnit("Cryptographer") {}
 
 public: virtual bool TestVersion(const UINT32 version, const size_t bufSize, const UINT64 startSeed)
 		{
-			UCHAR* buf1 = static_cast<UCHAR*>(alloca(bufSize + 4)) ;
-			UCHAR* buf2 = static_cast<UCHAR*>(alloca(bufSize + 4)) ;
-			UCHAR* buf3 = static_cast<UCHAR*>(alloca(bufSize + 4)) ;
+			UCHAR* buf1 = static_cast<UCHAR*>(OS_ALLOCA(bufSize + 4)) ;
+			UCHAR* buf2 = static_cast<UCHAR*>(OS_ALLOCA(bufSize + 4)) ;
+			UCHAR* buf3 = static_cast<UCHAR*>(OS_ALLOCA(bufSize + 4)) ;
 
 			ENDPOINT ep ;
 			EndpointImpl impl ;

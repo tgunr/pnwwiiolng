@@ -275,6 +275,7 @@ _drainDecisions(const char* const queueName, DECISION_QUEUE& queue, UINT32 now, 
 	while ( !queue.empty() )
 	{
 		StratDecision* decision = queue.front() ;
+		ABORT_IF( decision == nullptr );
 		if ( decision->m_time > cutoff )
 			break ;
 		queue.erase(queue.begin()) ;
@@ -1061,10 +1062,10 @@ _checkObjectiveTarget(const FULL_OBJ_ID& fid, Player* player)
 
 	const Property* property = chatFindProperty(fid) ;
 
-	if ( property != NULL && property->m_fid.objClass == CLASS_FACILITY )
+	if ( property != nullptr && property->m_fid.objClass == CLASS_FACILITY )
 		property = property->Parent() ;
 
-	if ( property == NULL )
+	if ( property == nullptr )
 	{
 		dbugLog(_FLW, "player %s[%d/%d] requested objective %d.%d.%u is not a valid target?"
 					, player->callsign()
@@ -1072,8 +1073,8 @@ _checkObjectiveTarget(const FULL_OBJ_ID& fid, Player* player)
 					, player->teulIndex()
 					, fid.cell.ox, fid.cell.oy, fid.id
 					) ;
+		return nullptr;
 	}
-
 
 	if ( property->m_fid.objClass != CLASS_CP )
 	{

@@ -241,7 +241,7 @@ authValidateUser(SINT32 teulIndex, const APP_LAUNCH_REQ& request, Auth::Dispatch
 		DBQuery q(dbh, buffer) ;
 		if ( q.HasRows() && q.FetchRow() == true )
 		{
-			const DBRow& row = q.Row() ;
+			DBRow& row = q.Row() ;
 
 			passwordMatch = row.NextUInt() ;
 			isActive = row.NextUInt() ;
@@ -343,7 +343,7 @@ Auth::LoginRequest::validate(SINT32 teulIndex, Auth::ClientData& cdata)
 		DBQuery q(dbh, buffer) ;
 		if ( q.HasRows() && q.FetchRow() == true )
 		{
-			const DBRow& row = q.Row() ;
+			DBRow& row = q.Row() ;
 
 			passwordMatch = row.NextUInt() ;
 			isActive = row.NextUInt() ;
@@ -432,7 +432,7 @@ _getAppTable()
 		UINT32 rown = 0 ;
 		while ( q.FetchRow() )
 		{
-			const DBRow& row = q.Row() ;
+			DBRow& row = q.Row() ;
 			APP_TABLE_ENTRY& entry = appTable[rown++] ;
 
 			entry.appID = row.NextUInt() ;
@@ -541,26 +541,23 @@ static bool
 _getAppManifest()
 {
 	SCHAR statement[512];
-	SINT32 numApps, appNum;
+	SINT32 appNum;
 	static struct vers_manifest* vers_mans;
-	static struct apps_holder* holder;
-
-	holder = config.apps;
 
 	for (size_t i = 0; i < MAX_APPIDS; i++)
 	{
-		if ( holder[i].manifest )
-			memFree(holder[i].manifest);
+		if ( config.apps[i].manifest )
+			memFree(config.apps[i].manifest);
 	}
 
-	memset(holder,MAX_APPIDS,sizeof(struct apps_holder));
+	memset(config.apps, 0, sizeof(config.apps));
 
 	try
 	{
 		DBQuery q(dbh, QRY_SELECT_APPIDS_FROM_MANIFEST) ;
 
-		config.numApps = numApps = q.Rows() ;
-		if ( numApps == 0 )
+		config.numApps = q.Rows() ;
+		if ( config.numApps == 0 )
 		{
 			//We don't have that host version
 			LogAbort("couldnt find any applications!!");
@@ -568,7 +565,7 @@ _getAppManifest()
 
 		for ( size_t i = 0 ; q.FetchRow() ; ++i )
 		{
-			holder[i].appID = (SINT32)atol(q.Row()[0]);
+			config.apps[i].appID = (SINT32)atol(q.Row()[0]);
 		}
 	}
 	catch ( std::exception& e )
@@ -579,7 +576,7 @@ _getAppManifest()
 
 	try
 	{
-		for (appNum = 0; appNum < numApps; appNum++)
+		for (appNum = 0; appNum < config.numApps; appNum++)
 		{
 			sprintf(statement,
 						"SELECT old,new,platform,actionType,webURL,ftpPort,ftpProtocol,ftpURL,ftpDir,ftpFile"
@@ -587,23 +584,23 @@ _getAppManifest()
 							" FROM auth.app_manifest"
 							" WHERE appID = %u"
 							" ORDER BY platform, sorter"
-							, holder[appNum].appID) ;
+							, config.apps[appNum].appID) ;
 			DBQuery q(dbh, statement) ;
 
 			//Build the reply
 			if ( !q.HasRows() )
 			{
 				//We don't have that host version
-				dbugLog(_FLA,"couldnt find any manifests for app %d",holder[appNum].appID );
+				dbugLog(_FLA,"couldnt find any manifests for app %d", config.apps[appNum].appID );
 				continue ;
 			}
 
-			const size_t numRows = holder[appNum].numEntries = q.Rows() ;
-			holder[appNum].manifest = vers_mans = (vers_manifest*)memCalloc(numRows, sizeof(struct vers_manifest));
+			const size_t numRows = config.apps[appNum].numEntries = q.Rows() ;
+			config.apps[appNum].manifest = vers_mans = (vers_manifest*)memCalloc(numRows, sizeof(struct vers_manifest));
 
 			for ( size_t i = 0 ; q.FetchRow() ; ++i )
 			{
-				vers_mans[i].appid = holder[appNum].appID;
+				vers_mans[i].appid = config.apps[appNum].appID;
 				vers_mans[i].port = DEF_PORT;
 				vers_mans[i].protocol = DEF_PROTOCOL;
 
@@ -641,7 +638,7 @@ _getAppManifest()
 		dbugLog(_FLA, "err reading manifests: %s", e.what()) ;
 	}
 
-	dbugLog(_FLN,"appTable Initialized %d apps", numApps);
+	dbugLog(_FLN, "appTable Initialized %d apps", config.numApps);
 
 	return true ;
 }
@@ -699,7 +696,7 @@ authInitGameEntry(GAME& gameEntry)
 			return false ;
 		}
 
-		const DBRow& row = q.Row() ;
+		DBRow& row = q.Row() ;
 		gameEntry.gameID = row.NextUInt() ;
 		gameEntry.groupID = row.NextUInt() ;
 		gameEntry.clusterID = row.NextUInt() ;
@@ -965,7 +962,8 @@ authdbGetFileMD5(const UINT32 appID, const UINT32 platform, const char* filename
 
 	assert(buffer != NULL && bufLen > 1) ;
 
-	strncpy(statement, filename, sizeof(statement)-1) ;
+	strncpy(statement, filename, sizeof(statement)) ;
+	statement[sizeof(statement) - 1] = 0;
 	mysql_escape_string(myFilename, statement, strlen(statement)) ;
 
 	snprintf(statement, sizeof(statement)-1
@@ -1094,7 +1092,7 @@ authdbReadArenaAliases()
 		g_arenaAliases.clear() ;
 		while ( q.FetchRow() )
 		{
-			const DBRow& row = q.Row() ;
+			DBRow& row = q.Row() ;
 			UINT32 arenaID = row.NextUInt() ;
 			g_arenaAliases[arenaID] = row.NextColumn() ;
 		}

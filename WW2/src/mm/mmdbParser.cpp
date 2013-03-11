@@ -80,7 +80,7 @@ mmdbBrigadeDetailsRequest(SINT32 teulIndex, void* object)
 
 		while (q.FetchRow())
 		{
-			const DBRow& row = q.Row() ;
+			DBRow& row = q.Row() ;
 			char ownerHandle[MAX_HANDLE_LEN+1] ;
 
 			bdu.m_brigadeID = row.NextUInt() ;

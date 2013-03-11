@@ -74,7 +74,10 @@ authGetOTP()
 	// batching is to eliminate the number of updates we
 	// make to the database
 	if ( _otpQueueEnd <= 0 )
+	{
 		_fillOTPQueue() ;
+		ABORT_IF(_otpQueueEnd <= 0);
+	}
 
 	// Randomly select an OTP from the queue and then replace it with
 	// the OTP from the end of the queue and shrink the end-of-queue by 1

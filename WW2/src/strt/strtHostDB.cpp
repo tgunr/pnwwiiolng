@@ -880,8 +880,9 @@ strtdbLoadTOETemplates()
 		// our reads may occur in parallel to changes being made
 		// whereas a simple call to read the database time should
 		// occur well before any such overlap.
-		UINT32 numHeaders = q.Row().NextUInt() ;
-		UINT32 thisLoad = q.Row().NextUInt() ;
+		DBRow& hdrRow = q.Row();
+		UINT32 numHeaders = hdrRow.NextUInt() ;
+		UINT32 thisLoad = hdrRow.NextUInt() ;
 
 		// Do we need to bootstrap the TOEs?
 		if ( numHeaders == 0 )
@@ -904,10 +905,11 @@ strtdbLoadTOETemplates()
 
 		while ( q.FetchRow() )
 		{
-			const char* id = q.Row().NextColumn() ;
-			const char* name = q.Row().NextColumn() ;
-			UINT32 country = q.Row().NextUInt() ;
-			UINT32 branch = q.Row().NextUInt() ;
+			DBRow& row = q.Row();
+			const char* id = row.NextColumn() ;
+			const char* name = row.NextColumn() ;
+			UINT32 country = row.NextUInt() ;
+			UINT32 branch = row.NextUInt() ;
 
 			dbugLog(_FLD, "unit:%s toe:%s", id, name) ;
 			strtLoadTOEWeaponTemplateHeader(id, name, country, branch) ;
@@ -932,7 +934,7 @@ strtdbLoadTOETemplates()
 		WEAPON_SPEC spec ;
 		while ( q.FetchRow() )
 		{
-			const DBRow& row = q.Row() ;
+			DBRow& row = q.Row() ;
 			const char* id = row.NextColumn() ;
 			spec.wCountry = row.NextUInt() ;
 			spec.wCategory = row.NextUInt() ;

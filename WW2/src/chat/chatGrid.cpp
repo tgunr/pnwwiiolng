@@ -506,11 +506,14 @@ _checkHulksInArea(ChatGrid* cell)
 
 		if ( hulksInCell <= 0 )
 			continue ;
-		if ( highestPopulatedCell != NULL && hulksInCell < highestPopulation )
-			continue ;
-		if ( hulksInCell == highestPopulation
+		if ( highestPopulatedCell != nullptr )
+		{
+			if ( hulksInCell < highestPopulation )
+				continue ;
+			if ( hulksInCell == highestPopulation
 				&& highestPopulatedCell->players().size() >= (*it)->players().size() )
-			continue ;
+				continue ;
+		}
 
 		///TODO: We should really pick the oldest between matches like this, huh?
 		// Rather than leaving it like this

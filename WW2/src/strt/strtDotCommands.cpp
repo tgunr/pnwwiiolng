@@ -1209,20 +1209,17 @@ _dotForceFacilitys(char* arguments, OOBMessage& message)
 		doAll = TRUE ;
 	}
 	else
-	{
 		cp = _getCPByArguments(arguments, message, false) ;
-		if ( cp == NULL )
-			return FALSE ;
-	}
+
+	if ( cp == nullptr )
+		return FALSE;
+
 
 	if ( tolower(message.m_text[0]) == 'c' )
 		opening = FALSE ;
 
 	for ( ; cp != NULL ; cp = cp->next )
 	{
-		if ( ! cp->name )
-			continue ;
-
 		// Find all matching CPs (or 'all' cps)
 		if ( arguments != NULL && doAll == false && strcasecmp(arguments, cp->name) != 0 )
 			continue ;
@@ -1322,9 +1319,6 @@ _dotForceFBs(char* arguments, OOBMessage& message)
 
 	for ( ; cp != NULL ; cp = cp->next )
 	{
-		if ( ! cp->name )
-			continue ;
-
 		// Find all matching CPs (or 'all' cps)
 		if ( doAll == FALSE && strcasecmp(arguments, cp->name) != 0 )
 			continue ;
@@ -2564,7 +2558,7 @@ void strtProcessOOBMessage(OOBMessage& message)
 					) ;
 
 	// empty string
-	if ( message.m_text == 0 )
+	if ( message.m_text[0] == 0 )
 		return ;
 
 	// Locate the arguments or end of string

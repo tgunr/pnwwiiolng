@@ -97,7 +97,7 @@ DBQuery & DBRow API
 			Advances to the next row in the result set and returns true.
 			Returns false when the last row has been retrieved.
 
-		const DBRow& Row()
+		DBRow& Row()
 			Returns a reference to the last row retrieved by FetchRow().
 
 5. Retrieving values (columns) from DBRow.
@@ -212,7 +212,7 @@ public:
 	} ;
 
 	// Can return null
-	const char* NextColumn() const
+	const char* NextColumn()
 	{
 		if ( m_currentColumn >= m_columns )
 			return NULL ;
@@ -220,58 +220,58 @@ public:
 	}
 
 	// Always returns a valid character array pointer
-	const char* NextString() const
+	const char* NextString()
 	{
 		const char* p = NextColumn() ;
 		return ( p ) ? p : "" ;
 	}
 
 	// NOTE: Does not ensure null-byte placement
-	const char* NextString(char* destination, size_t maxLen) const ;
+	const char* NextString(char* destination, size_t maxLen);
 
-	SINT32 NextSInt() const
+	SINT32 NextSInt()
 	{
 		if ( m_currentColumn >= m_columns ) return 0 ;
 		char* source = m_row[m_currentColumn++] ;			// Null record protection
 		return ( source != NULL ) ? (SINT32)strtol(source, NULL, 10) : 0 ;
 	}
 
-	UINT32 NextUInt() const
+	UINT32 NextUInt()
 	{
 		if ( m_currentColumn >= m_columns ) return 0 ;
 		char* source = m_row[m_currentColumn++] ;			// Null record protection
 		return ( source != NULL ) ? (UINT32)strtoul(source, NULL, 10) : 0 ;
 	}
 
-	UINT64 NextUINT64() const
+	UINT64 NextUINT64()
 	{
 		if ( m_currentColumn >= m_columns ) return 0 ;
 		char* source = m_row[m_currentColumn++] ;
 		return ( source != NULL ) ? strtoull(source, NULL, 10) : 0 ;
 	}
 
-	SINT64 NextSINT64() const
+	SINT64 NextSINT64()
 	{
 		if ( m_currentColumn >= m_columns ) return 0 ;
 		char* source = m_row[m_currentColumn++] ;
 		return ( source != NULL ) ? strtoll(source, NULL, 10) : 0 ;
 	}
 
-	FLOAT32 NextFLOAT32() const
+	FLOAT32 NextFLOAT32()
 	{
 		if ( m_currentColumn >= m_columns ) return 0.0 ;
 		char* source = m_row[m_currentColumn++] ;
 		return ( source != NULL ) ? (FLOAT32)strtof(source, NULL) : 0.0f ;
 	}
 
-	FLOAT64 NextFLOAT64() const
+	FLOAT64 NextFLOAT64()
 	{
 		if ( m_currentColumn >= m_columns ) return 0.0 ;
 		char* source = m_row[m_currentColumn++] ;
 		return ( source != NULL ) ? (FLOAT64)strtod(source, NULL) : 0.0 ;
 	}
 
-	void NextWeaponSpec(struct WEAPON_SPEC& spec) const ;
+	void NextWeaponSpec(struct WEAPON_SPEC& spec);
 
 protected:
 	// Constructor
@@ -281,7 +281,7 @@ protected:
 private:
 	DB::row_t		m_row ;					// The data
 	UINT32			m_columns ;				// Number of columns
-	mutable UINT32	m_currentColumn ;		// Current column
+	UINT32			m_currentColumn ;		// Current column
 } ;
 
 //////////////////////////////////////////////////////////////////////
@@ -317,9 +317,9 @@ public:
 	UINT32			CurrentRow() const	{ return m_currentRow ; }
 	UINT32			LastInsertID() const { return m_lastInsertID ; }
 
-	const DBRow&	Row() const
+	DBRow&	Row() const
 	{
-		if ( m_row != NULL ) return *m_row ;
+		if ( m_row != NULL ) return const_cast<DBRow&>(*m_row);
 		throw std::logic_error("No row to return") ;
 	}
 

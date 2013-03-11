@@ -72,7 +72,7 @@ _loadMotd(MOTD_REPLY& motd)
 		if ( q.FetchRow() == false )
 			throw std::logic_error("fetchrow failed") ;
 
-		const DBRow& row = q.Row() ;
+		DBRow& row = q.Row() ;
 
 		motd.added = row.NextUInt() ;
 		const char* poster = row.NextString() ;
@@ -276,7 +276,7 @@ _readPermissionNames()
 		throw std::runtime_error("No rows returned from auth.wwii_permissions") ;	///Terminal
 	while ( qry.FetchRow() )
 	{
-		const DBRow& row = qry.Row() ;
+		DBRow& row = qry.Row() ;
 		UINT32 mask = row.NextUInt() ;
 		assert( mask < 64 ) ;
 		permissionNames[mask] = row.NextString() ;

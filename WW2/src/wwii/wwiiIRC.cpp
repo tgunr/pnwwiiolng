@@ -823,6 +823,7 @@ namespace Host
 		, input(withInput ? withInput : "")
 		, instID(withInstID)
 {
+	ABORT_IF(withInput == nullptr);
 	const char* src = withInput ;
 	char terminator = ' ' ;
 	const char* arguments = NULL ;
@@ -880,8 +881,8 @@ IRC_Command::Reply(Host::CellCommand::ResponseType, const char* format, ...) con
 	if ( irc.m_running == false )
 		return ;
 
-	if ( format == NULL )
-		dbugLog(_FLW, "called %s with NULL format", __FUNCTION__) ;
+	if ( format == nullptr )
+		LogAbort("called %s with NULL format", __FUNCTION__);
 
 	static char buffer[1202] ;
 	va_list vargs ;

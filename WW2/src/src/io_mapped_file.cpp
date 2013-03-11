@@ -20,7 +20,7 @@
 #else // Now for Windows.
 # include <windows.h>
 
-#define OsALLOCA _alloca
+#define OsALLOCA _malloca
 #define OsStrlen strlen
 #define OsStrcpy strcpy
 #endif
@@ -166,7 +166,7 @@ MappedFile::mapFileHandleInternal()
 #if IO_MAP_TYPE == _IMT_WINDOWS
 	// Windows implementation.
 	m_mapping = CreateFileMapping(m_handle, NULL, PAGE_READONLY, 0, 0, NULL);
-	if ( m_mapping == IMF_INVALID_HANDLE )
+	if ( m_mapping == IMF_INVALID_HANDLE || m_mapping == NULL )
 		return unmapFile();
 
 	LPVOID const ptr = MapViewOfFileEx(m_mapping, FILE_MAP_READ, 0, 0, 0, NULL);

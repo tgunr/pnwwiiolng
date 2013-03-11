@@ -343,10 +343,10 @@ strtInitializeHCUnits()
 	HCUNIT_INDEX::iterator it ;
 	for ( it = hcUnits.begin() ; it != hcUnits.end() ; ++it )
 	{
-		if ( !it->second->isDivision() && !it->second->isBrigade() )
+		HCUnit* hcUnit = it->second;
+		if ( !hcUnit->isDivision() && !hcUnit->isBrigade() )
 			continue ;
-		StratHCUnit* unit = (StratHCUnit*)it->second ;
-		unit->initialize() ;
+		static_cast<StratHCUnit*>(hcUnit)->initialize();
 	}
 
 	strtdbRestoreTOESupplies() ;
@@ -498,7 +498,7 @@ StratHCUnit::setHomeCP(CPStruct* toCP, UINT32 redeployDelay, bool forceDelay)
 		m_nextMove = 0 ;
 
 	// toCP might be null if the brigade is being withdrawn, but otherwise
-	// it now needs adding ot the list of units at that CP
+	// it now needs adding to the list of units at that CP
 	if ( toCP )
 		homeCP()->addUnit(*this) ;
 
@@ -658,8 +658,6 @@ StratHCUnit::deployPermission(const CPStruct* const cp, bool manualMove) const
 void
 StratHCUnit::deploy(CPStruct* cp, UINT32 redeployDelay, const char* byCallsign, bool transferSupply, bool forceDelay)
 {
-	assert( cp != NULL ) ;
-
 	// Training units won't move anywhere.
 	if ( isTrainingUnit() )
 	{
@@ -669,16 +667,12 @@ StratHCUnit::deploy(CPStruct* cp, UINT32 redeployDelay, const char* byCallsign, 
 
 	dbugLog(_FLI, "hcu:%u(%s) delay:%u redeploying to %s from %s"
 					, unitID(), callsign(), redeployDelay
-					, cp->name
+					, cp ? cp->name : "offmap"
 					, (homeCP() != NULL ? homeCP()->name : "<nowhere>")
 					) ;
 
-	UINT32 fromOID = 0 ;
-	if ( homeCP() )
-		fromOID = homeCP()->uOID ;
-	UINT32 toOID = 0 ;
-	if ( cp )
-		toOID = cp->uOID ;
+	const UINT32 fromOID = homeCP() ? homeCP()->uOID : 0;
+	const UINT32 toOID = cp ? cp->uOID : 0;
 
 	m_lastMovedBy = chatGetHandle(byCallsign) ;
 	DBThread::Do(DBThread::Default
@@ -755,7 +749,7 @@ _preferableFallback(const LinkStruct* currentLink, const LinkStruct* previousLin
 }
 
 //////////////////////////////////////////////////////////////////////
-// Find a fallback destination for thsi current CP
+// Find a fallback destination for this current CP
 
 const CPStruct*
 StratHCUnit::findFallback() const
@@ -804,7 +798,8 @@ StratHCUnit::findFallback() const
 			return parentCP ;
 		}
 
-		if ( hadSupply == true && cp->isSupplied() == false )
+		const bool isSupplied = cp->isSupplied();
+		if ( hadSupply == true && isSupplied == false )
 		{
 			dbugLog(_FLIB, "<supply ") ;
 			continue ;
@@ -839,11 +834,12 @@ StratHCUnit::findFallback() const
 		// This destination must meet one or more of the deployment/movement
 		// rules for adjacency, etc, which means its either towards a member
 		// brigade or it is towards a friendly brigade.
-		if ( NULL == candidate || (divisionLink && !hadDivisionLink) || (cp->isSupplied() && !hadSupply) || _preferableFallback(candidate, link) )
+		if ( NULL == candidate || (divisionLink && !hadDivisionLink) || (isSupplied && !hadSupply) || _preferableFallback(candidate, link) )
 		{
 			dbugLog(_FLIB, "candidate ") ;
 			candidate = link ;
 			hadDivisionLink = divisionLink ;
+			hadSupply = isSupplied;
 		}
 	}
 

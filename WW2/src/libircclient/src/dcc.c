@@ -795,6 +795,9 @@ int	irc_dcc_decline (irc_session_t * session, irc_dcc_t dccid)
 
 int	irc_dcc_sendfile (irc_session_t * session, void * ctx, const char * nick, const char * filename, irc_dcc_callback_t callback, irc_dcc_t * dccid)
 {
+	if ( !session )
+		return 1;
+
 	struct sockaddr_in saddr;
 	socklen_t len = sizeof(saddr);
 	char cmdbuf[128], notbuf[128];
@@ -803,7 +806,7 @@ int	irc_dcc_sendfile (irc_session_t * session, void * ctx, const char * nick, co
 	int err;
 	long filesize;
 
-	if ( !session || !dccid || !filename || !callback )
+	if ( !dccid || !filename || !callback )
 	{
 		session->lasterror = LIBIRC_ERR_INVAL;
 		return 1;

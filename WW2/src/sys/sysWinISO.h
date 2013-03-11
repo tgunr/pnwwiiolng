@@ -16,6 +16,7 @@
 
 #include <direct.h>
 
+# define OS_ALLOCA(...) _malloca(__VA_ARGS__)
 # define OS_CLOSE(...) _close(__VA_ARGS__)
 # define OS_OPEN(...) _open(__VA_ARGS__)
 # define OS_WOPEN(...) _wopen(__VA_ARGS__)
@@ -53,24 +54,25 @@
 static inline unsigned long long strtoull(const char* const src_, const char* const, unsigned int)
 {
 	unsigned long long into = 0;
-	sscanf(src_, "%I64u", &into) ;
+	(void)sscanf(src_, "%I64u", &into) ;
 	return into ;
 }
 static inline signed long long strtoll(const char* const src_, const char* const, unsigned int)
 {
 	signed long long into = 0 ;
-	sscanf(src_, "%I64d", &into) ;
+	(void)sscanf(src_, "%I64d", &into) ;
 	return into ;
 }
 static inline float strtof(const char* const src_, const char* const)
 {
 	float into = 0 ;
-	sscanf(src_, "%f", &into) ;
+	(void)sscanf(src_, "%f", &into) ;
 	return into ;
 }
 
 #else
 
+# define OS_ALLOCA(...) ::alloca(__VA_ARGS__)
 # define OS_OPEN(...) ::open(__VA_ARGS__)
 # define OS_CLOSE(...) ::close(__VA_ARGS__)
 # define OS_WOPEN(...) wopen(__VA_ARGS__)

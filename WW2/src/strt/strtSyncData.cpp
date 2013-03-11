@@ -132,11 +132,9 @@ strtProcessSyncBuildings(const STRT_SYNC_BUILDINGS& syncBuildings)
 	Supercell* sc = strtGetSupercell(syncBuildings.sx, syncBuildings.sy);
 	if (sc == NULL)
 	{
-		//Log the fact that we have an error.  But we arent' going to return
-		//	here.  Why?  We need to go ahead and unpack the rest of the
-		//	message, because not unpacking it could screw some stuff up
 		dbugLog(_FLA,"received sync buildings for supercell %d:%d, but it doesn't exist!  Unpacking rest of bogus message"
 			, syncBuildings.sx, syncBuildings.sy);
+		return;
 	}
 
 #ifdef DEBUG_SYNC

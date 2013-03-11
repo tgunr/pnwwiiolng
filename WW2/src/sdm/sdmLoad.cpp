@@ -1070,7 +1070,7 @@ _loadIndex(const char* type
 
 		while (q.FetchRow())
 		{
-			const DBRow& row = q.Row() ;
+			DBRow& row = q.Row() ;
 			oid = row.NextUInt() ;
 			ox = row.NextSInt() ;
 			oy = row.NextSInt() ;

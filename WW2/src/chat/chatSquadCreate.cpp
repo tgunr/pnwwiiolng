@@ -186,9 +186,12 @@ _processCreateComplete(const ChatHandle& /*originator*/, SQUAD_REQUEST& request,
 		chatSaveChannels(*player) ;
 	}
 
-	SquadList* squadList = chatFindSquadList(player->squadID()) ;
-	if ( squadList )
-		squadList->created() ;
+	if ( player )
+	{
+		SquadList* squadList = chatFindSquadList(player->squadID()) ;
+		if ( squadList )
+			squadList->created() ;
+	}
 
 	return SQR_CREATED ;
 }

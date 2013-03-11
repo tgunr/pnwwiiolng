@@ -622,7 +622,7 @@ public:
 		std::string result ;
 		while ( Query()->FetchRow() )
 		{
-			const DBRow& row = Query()->Row() ;
+			DBRow& row = Query()->Row() ;
 			result = row[0] ;
 			result += " " ;
 			result += row[1] ;

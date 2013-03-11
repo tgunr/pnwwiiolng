@@ -401,7 +401,7 @@ Player::selectPersona(UINT32 selectedID, WWII_COUNTRY countryID, BRANCH_ENUM bra
 		if ( q.Rows() == 0 || !q.FetchRow() )
 			return PLS_MISSING ;
 
-		const DBRow &row = q.Row() ;
+		DBRow& row = q.Row() ;
 
 		selectedID = row.NextUInt() ;								// 0
 
@@ -576,7 +576,7 @@ mapFillPersonaData(Player* const player)
 
 		if ( q.Rows() == 0 || !q.FetchRow() )
 			throw std::logic_error("No rows for this player/persona") ;
-		const DBRow& row = q.Row() ;
+		DBRow& row = q.Row() ;
 
 		// Capture the rank they would have incase they
 		// don't have priviliges to actually get that rank.
@@ -920,7 +920,7 @@ protected:
 
 		while ( Query()->FetchRow() && m_results.size() < MAX_PLAYER_PERSONAS )
 		{
-			const DBRow& row = Query()->Row() ;
+			DBRow& row = Query()->Row() ;
 			ps.m_countryID = static_cast<WWII_COUNTRY>(row.NextUInt()) ;
 			if ( !activeCountries[ps.m_countryID] )
 				continue ;

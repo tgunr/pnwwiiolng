@@ -761,7 +761,12 @@ _LogAbort(const char* file_, int line_, unsigned int error_, const char* asserti
 	const size_t roughSize = vsnprintf(_logger.m_text, sizeof(_logger.m_text), fmt_, args);
 	va_end(args);
 	const size_t maxSize = roughSize + 256 + strlen(assertion_);
-	char* message = (char*)alloca(maxSize * sizeof(char));
+	char* message = (char*)OS_ALLOCA(maxSize * sizeof(char));
+	if ( message == nullptr )
+	{
+		MessageBoxA(0, "OUT OF MEMORY", "OUT OF MEMORY", MB_ICONERROR | MB_OK | MB_APPLMODAL);
+		abort();
+	}
 	const char* caption;
 	if ( assertion_[0] )
 	{

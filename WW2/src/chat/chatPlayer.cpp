@@ -2305,8 +2305,9 @@ Player::whereabouts(char* into, const FLOAT64& x, const FLOAT64& y) const
 
 	if ( isSpawned() && m_impl->m_lastPing > 0 )
 	{
-		char ping[20] ;
-		snprintf(ping, 19, " ping:%ums", m_impl->m_lastPing) ;
+		char ping[20];
+		snprintf(ping, sizeof(ping), " ping:%ums", m_impl->m_lastPing) ;
+		ping[sizeof(ping)-1] = 0;
 		strcat(into, ping) ;
 	}
 

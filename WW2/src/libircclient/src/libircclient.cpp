@@ -849,6 +849,7 @@ int irc_send_raw (irc_session_t * session, const char * format, ...)
 	va_start (va_alist, format);
 	vsnprintf (buf, sizeof(buf), format, va_alist);
 	va_end (va_alist);
+	buf[sizeof(buf)-1] = 0;
 
 	libirc_mutex_lock (&session->mutex_session);
 

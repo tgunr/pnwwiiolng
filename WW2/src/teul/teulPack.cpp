@@ -133,7 +133,7 @@ _packBits(UCHAR* const buffer, SINT32 bitOffset, UINT32* const idata, SINT32 sig
 	if (bitOffset != 0)
 	{
 		UCHAR buf[4] ;
-		_packBytes(0, buf, (UCHAR*) &data, numBytes, sigBytes);
+		(void)_packBytes(0, buf, (UCHAR*) &data, numBytes, sigBytes);
 
 		for (SINT32 i = 0; i < sigBytes; ++i)
 		{
@@ -151,7 +151,7 @@ _packBits(UCHAR* const buffer, SINT32 bitOffset, UINT32* const idata, SINT32 sig
 	}
 	else
 		// don't compensate for numBytes - sigBytes
-		_packBytes(byteOffset, buffer, (UCHAR*) &data, numBytes, sigBytes);
+		(void)_packBytes(byteOffset, buffer, (UCHAR*) &data, numBytes, sigBytes);
 
 	return (totalBits);
 }

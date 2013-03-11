@@ -70,7 +70,7 @@ weapLoadIndexes(DB::handle_t* conn)
 
 	while ( query.FetchRow() )
 	{
-		const DBRow& row = query.Row() ;
+		DBRow& row = query.Row() ;
 
 		wCountry = row.NextUInt() ;
 		wCategory = row.NextUInt() ;

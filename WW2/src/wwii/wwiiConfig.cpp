@@ -313,7 +313,7 @@ wwiiConfigSetFLOAT(FLOAT32* data, const char* const source, UINT64 /*max*/)
 	if ( !isdigit(*source) )
 		return false ;
 
-	sscanf(source, "%f", data) ;
+	(void)sscanf(source, "%f", data) ;
 
 	return true ;
 }

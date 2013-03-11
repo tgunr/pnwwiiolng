@@ -54,7 +54,7 @@ extern void serverInitializePeering();
 extern void serverConnectPeer(const UINT32 ip, const SERVER_TYPE type);
 extern void serverDisconnectPeer(Server::ServerInfo* server);
 
-const char* const g_serverTypes[MAX_SERVER_TYPE] =
+const char* g_serverTypes[MAX_SERVER_TYPE] =
 {
 	"controller"
 ,	"auth"
@@ -101,7 +101,7 @@ ERROR_FUNCTION* 	extErrorFn;
 typedef std::deque<Server::Transfer*> TransferQueue;
 static TransferQueue s_transferQueue;
 
-static Server::ServerInfo* _exitServer = NULL;
+static Server::ServerInfo* _exitServer = nullptr;
 
 static CREATE_PERSONA_FUNCTION* _createPersonaFn;
 static RELEASE_PERSONA_FUNCTION* _releasePersonaFn;
@@ -112,12 +112,12 @@ static EXIT_CLUSTER_FUNCTION* _exitClusterFn;
 PLAYERID_HASH ServerInterface::s_byPlayerID;
 PLAYERIDX_MAP ServerInterface::s_byTeulIndex;
 
-static Server::ServerInfo* _myServerInfo = NULL;
+static Server::ServerInfo* _myServerInfo = nullptr;
 static TeulTimeMS _nextHeartbeat = 0ULL, _nextUpdate;
 
-static SERVER_UPDATE* _enterCallback= NULL;
-static SERVER_UPDATE* _leaveCallback = NULL;
-static SERVER_UPDATE* _statusCallback= NULL;
+static SERVER_UPDATE* _enterCallback= nullptr;
+static SERVER_UPDATE* _leaveCallback = nullptr;
+static SERVER_UPDATE* _statusCallback= nullptr;
 
 static std::set<Server::ServerInfo*> s_activeServerList;
 
@@ -125,7 +125,7 @@ static SINT32 _playerDelete(PlayerStatusNode* const psn, Server::ReleaseType rel
 
 // move players from one server list to another and update state
 extern ERROR_FUNCTION* 	extErrorFn;
-static ENDPOINT* s_broadcastEndpoint = NULL;
+static ENDPOINT* s_broadcastEndpoint = nullptr;
 
 #if defined(SERVER_AS_ENTRY_POINT)
 UINT32 g_portOffset = 0;
@@ -160,12 +160,12 @@ _getPlayerWith(SINT32 teulIndex, UINT32 id)
 	if (id != 0)
 	{
 		PlayerStatusNode* psn = ServerInterface::PlayerStatusNodeByPlayerID(id);
-		if ( psn != NULL )
+		if ( psn != nullptr )
 			return psn;
 	}
 
 	if ( teulIndex < 0 )
-		return NULL;
+		return nullptr;
 
 	return ServerInterface::PlayerStatusNodeByTeulIndex(teulIndex);
 }
@@ -173,20 +173,20 @@ _getPlayerWith(SINT32 teulIndex, UINT32 id)
 SINT32
 _playerExitTo(Server::ServerInfo* server, PlayerStatusNode* psn, Server::Transfer::XferReason /* reason */, UINT32 exitCode)
 {
-	if (server == NULL)
+	if (server == nullptr)
 	{
-		if(psn != NULL)
-			dbugLog(_FLA, "p:%u cant send _playerExitTo, NULL server"
+		if(psn != nullptr)
+			dbugLog(_FLA, "p:%u cant send _playerExitTo, null server"
 						, psn->dispatch().m_customerID);
 		else
-			dbugLog(_FLA, "cant send _playerExitTo for NULL everything!!");
+			dbugLog(_FLA, "cant send _playerExitTo for null everything!!");
 
 		return -EINVAL;
 	}
 
-	if (psn == NULL)
+	if (psn == nullptr)
 	{
-		dbugLog(_FLA, "cant send NULL _playerExitTo to %s server %s"
+		dbugLog(_FLA, "cant send null _playerExitTo to %s server %s"
 					, g_serverTypes[server->stats.type], teulGetAddress(server->stats.address));
 		return -EINVAL;
 	}
@@ -207,9 +207,9 @@ _playerExitTo(Server::ServerInfo* server, PlayerStatusNode* psn, Server::Transfe
 static void
 _playerReleasePersona(SINT32 teulIndex, PlayerStatusNode* psn, UINT32 exitCode, Server::ReleaseType releaseType)
 {
-	Server::ServerInfo* destination = NULL;
+	Server::ServerInfo* destination = nullptr;
 
-	if ( psn->localInfo != NULL && _releasePersonaFn )
+	if ( psn->localInfo != nullptr && _releasePersonaFn )
 	{
 
 		if ((Server::myServerInfo.flags & Server::SVRFLAG_SEND_PSTAT)
@@ -222,7 +222,7 @@ _playerReleasePersona(SINT32 teulIndex, PlayerStatusNode* psn, UINT32 exitCode, 
 
 		(_releasePersonaFn)(teulIndex, psn, releaseType);
 
-		psn->localInfo = NULL;
+		psn->localInfo = nullptr;
 	}
 
 	if ( psn->teulIndex >= 0 )
@@ -248,7 +248,7 @@ _playerDeleteAuth(PlayerStatusNode* psn)
 static void
 _sendHeartBeat(void)
 {
-	if ( _myServerInfo == NULL || Server::broadcastIndex < 0 )
+	if ( _myServerInfo == nullptr || Server::broadcastIndex < 0 )
 		return;
 
 	Server::myServerInfo.availPlayers = Server::myServerInfo.stats.availPlayers();
@@ -264,10 +264,10 @@ _sendHeartBeat(void)
 static PlayerStatusNode*
 _extractPlayerFromServer(Server::ServerInfo* const server, PlayerStatusNode* const psn)
 {
-	if (server == NULL || psn == NULL)
+	if (server == nullptr || psn == nullptr)
 	{
 		dbugLog(_FLA, "cant extract player %p from server %p", psn, server);
-		return NULL;
+		return nullptr;
 	}
 
 	dbugLog(_FLD, "p:%d c:%s extracting player %p %s server %p ip %s id %llu: "
@@ -307,10 +307,10 @@ Server::ServerInfo::~ServerInfo()
 {
 	this->stats.status = Server::SERVER_LOGIN;
 
-	if ( this->localInfo != NULL )
+	if ( this->localInfo != nullptr )
 	{
 		memFree(this->localInfo);
-		this->localInfo = NULL;
+		this->localInfo = nullptr;
 	}
 
 	if ( !s_activeServerList.empty() )
@@ -323,7 +323,7 @@ Server::ServerInfo::~ServerInfo()
 static void
 _sendPlayerStatusUpdate(const PlayerStatusNode& psn)
 {
-	if ( s_broadcastEndpoint == NULL )
+	if ( s_broadcastEndpoint == nullptr )
 		return;
 
 	Teul::Packet outgoing(sizeof(PlayerStatusNode), Teul::Serv::CallbackX, PLAYER_UPDATE_Y);

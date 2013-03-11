@@ -1960,7 +1960,7 @@ _sendHCUnitList(Player* player)
 	if ( player->m_loginSub >= MAX_COUNTRIES )
 		return true ;
 	WWII_COUNTRY country = (WWII_COUNTRY)(player->m_loginSub++) ;
-	while ( !activeCountries[player->m_loginSub] && player->m_loginSub < MAX_COUNTRIES )
+	while ( player->m_loginSub < MAX_COUNTRIES && !activeCountries[player->m_loginSub] )
 		player->m_loginSub++ ;
 	if ( player->m_loginSub >= MAX_COUNTRIES )
 		finished = true ;

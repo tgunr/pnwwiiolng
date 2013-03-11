@@ -101,7 +101,7 @@ public:
 		Result result ;
 		while ( Query()->FetchRow() )
 		{
-			const DBRow& row = Query()->Row() ;
+			DBRow& row = Query()->Row() ;
 
 			result.m_handle = chatGetHandle(row.NextString()) ;
 			result.m_playerID = row.NextUInt() ;

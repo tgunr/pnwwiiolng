@@ -204,7 +204,7 @@ static const char* GetValueFromEnvironmentOrConfig(const char* name_)
 #if platOS != OS_WIN32
 		const char* paths[] = { "./", "/playnet/etc/", "/etc/", nullptr };
 #else
-		TCHAR* homepath = nullptr;
+		TCHAR homepath[MAX_PATH];
 		SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, 0, homepath);
 		const TCHAR* paths[] = { _T(".\\"), _T("..\\"), _T("c:\\playnet\\etc\\"), homepath, nullptr };
 #endif
@@ -267,7 +267,7 @@ void teulPrintConfigVars()
 	_getSortedConfigVars(myList);
 	for ( auto& it : myList )
 	{
-		printf("%-32s (%s)\n", it->GetName(), s_configVarTypes[it->GetType()]);
+		printf("%-32s (%s %s)\n", it->GetEnvVarName(), s_configVarTypes[it->GetType()], it->GetName());
 		printf("  %s\n", it->GetDescription());
 		printf("  Default: %c%s%c, Current: %c%s%c\n"
 					, it->GetDefault() ? '"' : '<'
@@ -293,7 +293,7 @@ void teulGenerateEnvironmentCfgFile(const char* const filename_)
 	}
 
 	time_t now = time(nullptr);
-	fprintf(fp, "# '%s' WWIIOL environment config defaults\n# Generated %s\n\n", filename_, ctime(&now));
+	fprintf(fp, "# '%s' WWIIOL environment config defaults\n# Generated %s\n", filename_, ctime(&now));
 	for ( auto& it : myList )
 	{
 		fprintf(fp, "# %s (%s %s, default: %c%s%c)\n"
@@ -305,7 +305,7 @@ void teulGenerateEnvironmentCfgFile(const char* const filename_)
 				, it->GetDefault() ? '"' : '>'
 				);
 		fprintf(fp, "# %s\n", it->GetDescription());
-		fprintf(fp, "#%s=%s\n", it->GetName(), (it->GetDefault() ? it->GetDefault() : (it->GetRequired() ? "???" : "")));
+		fprintf(fp, "#%s=%s\n", it->GetEnvVarName(), (it->GetDefault() ? it->GetDefault() : (it->GetRequired() ? "???" : "")));
 		fprintf(fp, "\n");
 	}
 	fclose(fp);
@@ -336,6 +336,7 @@ namespace Teul
 		, m_value(nullptr)
 		, m_required(required_)
 	{
+		ABORT_IF(envVarName_ == nullptr);
 		ABORT_IF(name_ == nullptr);
 		ABORT_IF(required_ == true && envVarName_ == nullptr);
 
@@ -344,16 +345,13 @@ namespace Teul
 		if ( IsNumber() )
 			m_value = static_cast<char*>(calloc(1, MaxIntStringSize));
 
-		if ( envVarName_ )
+		const char* envValue = GetValueFromEnvironmentOrConfig(envVarName_);
+		if ( envValue != nullptr )
 		{
-			const char* envValue = GetValueFromEnvironmentOrConfig(envVarName_);
-			if ( envValue != nullptr )
-			{
-				if ( m_required == true && *envValue == 0 )
-					LogAbort("Invalid (empty) value for %s ('%s').", envVarName_);
-				Set(envValue);
-				return;
-			}
+			if ( m_required == true && *envValue == 0 )
+				LogAbort("Invalid (empty) value for %s ('%s').", envVarName_);
+			Set(envValue);
+			return;
 		}
 
 		_getConfigVars().insert(this);

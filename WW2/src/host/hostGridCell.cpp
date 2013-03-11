@@ -180,7 +180,7 @@ _checkRowForExpiry(Grid::CellXHash& hash)
 		Grid::Cell* cell = it->second ;
 		++it ;
 
-		if ( cell->expired() )
+		if ( !cell || cell->expired() )
 		{
 			delete cell ;
 		}

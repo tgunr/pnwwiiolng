@@ -47,7 +47,7 @@ DBRow::DBRow(UINT32 columns, DB::result_t* result) :
 //////////////////////////////////////////////////////////////////////
 // Little helper function
 const char*
-DBRow::NextString(char* destination, size_t size) const
+DBRow::NextString(char* destination, size_t size)
 {
 	if ( destination == NULL )
 		throw std::invalid_argument("null destination for nextString") ;
@@ -368,7 +368,7 @@ DBQuery::NextResultSet()
 //////////////////////////////////////////////////////////////////////
 
 void
-DBRow::NextWeaponSpec(WEAPON_SPEC& spec) const
+DBRow::NextWeaponSpec(WEAPON_SPEC& spec)
 {
 	spec.wCountry = (UCHAR)NextUInt() ;
 	spec.wCategory = (UCHAR)NextUInt() ;

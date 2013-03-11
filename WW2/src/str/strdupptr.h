@@ -62,6 +62,7 @@ private:
 		if ( str_ != nullptr && length_ > 0 )
 		{
 			char* newStr = static_cast<char*>(malloc(length_ + 1));
+			ABORT_IF(newStr == nullptr);
 			memcpy(newStr, str_, length_);
 			newStr[length_] = 0;
 			m_ptr = newStr;

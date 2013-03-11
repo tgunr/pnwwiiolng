@@ -140,9 +140,7 @@ struct ACTION_OBJECT
 	template<class Typename_>
 	bool canRead() const
 	{
-		const bool validOffset = offset >= 0 ;
-		const bool validSize = (SINT32)(offset + sizeof(Typename_) * 8) <= (SINT32)sizeInBits() ;
-		return validOffset & validSize ;
+		return (offset >= 0) ? ((SINT32)(static_cast<size_t>(offset) + sizeof(Typename_) * 8) <= (SINT32)sizeInBits()) : false;
 	}
 
 	//! @brief Consume an object, in-place, from the packed data section.
@@ -150,8 +148,9 @@ struct ACTION_OBJECT
 	template<class Typename_>
 	Typename_& read()
 	{
-		void* ptr = ((char*)(packed)) + (offset / 8) ;
-		offset += sizeof(Typename_) * 8 ;
+		ABORT_IF(offset < 0);
+		void* ptr = ((char*)(packed)) + (static_cast<size_t>(offset) / 8) ;
+		offset += static_cast<SINT32>(sizeof(Typename_) * 8);
 		return *(Typename_*)(ptr) ;
 	}
 
@@ -172,7 +171,7 @@ struct ACTION_OBJECT
 		// Align to byte boundary so we don't mess about with bits.
 		this->offset = (this->offset + 7) & (~7) ;
 		// Take a pointer to this position in the byte stream.
-		char* streamPtr = (char*)(this->packed) + Teul::BitsToBytes(this->offset) ;
+		char* streamPtr = (char*)(this->packed) + static_cast<size_t>(Teul::BitsToBytes(this->offset));
 		// Increment offset.
 		this->offset += Teul::BytesToBits(bytes) ;
 
@@ -322,7 +321,7 @@ bool FitSignedBitValue(const _Type& value, size_t bits)
 	const UINT64 sign = ((SINT64)value >> 63);
 	// Create a mask for examining all the upper bits, from
 	// 63 to the sign bit within the size of "bits".
-	const UINT64 signMask = ~0LL << (bits - 1);
+	const UINT64 signMask = (~0ULL) << (bits - 1);
 	// All of the bits in "value" and "sign" should be the
 	// same; i.e. 1s for a negative value, 0s for a positive.
 	// If not, then the value is too big.

@@ -45,10 +45,10 @@ public:
 	TYPE type() const { return (TYPE)m_type ; }
 
 public:
-	RANK_NO			m_level ;					// My level
-	UINT8			m_type ;
 	PermissionMask	m_perm ;					// 64 bit permission mask
 	UINT32			m_points ;					// Points to complete this rank
+	RANK_NO			m_level ;					// My level
+	UINT8			m_type ;
 } ;
 
 extern void wwiiReadRanks(class DBHANDLE& dbh) ;
