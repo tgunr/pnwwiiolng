@@ -46,6 +46,8 @@
 #include "chat/chatHandle.h"
 #include "dbug/dbug.h"
 #include "wwii/wwiiOwnershipEnums.h"
+#include "wwii/wwiiTypes.h"
+#include "wwii/wwiiBranchEnums.h"
 #if defined(AS_SERVER)
 #include "wwii/wwiiConfig.h"
 #include "server/serverServerInfo.h"
@@ -63,4 +65,5 @@
 #include "teul/teulPacket.h"
 #include "weap/weapWeapon.h"
 #include "teul/teulEndpoint.h"
+#include "chat/chatLStringIDs.h"
 
