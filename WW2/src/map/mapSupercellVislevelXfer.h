@@ -29,7 +29,7 @@ class SupercellVislevelXfer
 				vis_t visValue = (*ptr & maskValue) >> shift ;
 				// Handle sign.
 				if ( visValue & (1 << (BitsPerObject - 1)) )
-					visValue |= (~0 << BitsPerObject) ;
+					visValue |= (~0U << BitsPerObject) ;
 				return visValue ;
 			}
 

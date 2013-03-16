@@ -9,41 +9,42 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
+class Player;
 
 //Takes a post request, attaches the correct customerID to it, then
 //	forwards it along to the strat system for processing
-extern bool mmProcessFEPostRequest(SINT32 teulIndex, const struct FE_POST_REQUEST& postRequest);
+extern bool mmProcessFEPostRequest(Player& player, const struct FE_POST_REQUEST& postRequest);
 
-//Handles the cancelling of a post.
-extern bool mmProcessFEPostCancel(SINT32 teulIndex, const struct FE_POST_CANCEL& cancelPost);
+//Handles the canceling of a post.
+extern bool mmProcessFEPostCancel(Player& player, const struct FE_POST_CANCEL& cancelPost);
 
 //Handles a postListRequest from the client
-extern bool mmProcessFEPostListRequest(SINT32 connection, const struct FE_POST_LIST_REQUEST& postListRequest);
+extern bool mmProcessFEPostListRequest(Player& player, const struct FE_POST_LIST_REQUEST& postListRequest);
 
 //Handles someone making a join request.  This is more complicated, b/c
 //	we have to ask the front end the player is wanting to join up with
 //	whether its ok or not
-extern bool mmProcessFEJoinRequest(SINT32 connection, const struct FE_JOIN_REQUEST& joinRequest);
+extern bool mmProcessFEJoinRequest(Player& player, const struct FE_JOIN_REQUEST& joinRequest);
 
-extern bool mmProcessFECrewRequest(SINT32 connection, const struct FE_CREW_REQUEST& crewRequest);
+extern bool mmProcessFECrewRequest(Player& player, const struct FE_CREW_REQUEST& crewRequest);
 
 //Handles a joinPermResponse.  Asks the strat server to see if its ok for the
 //	person to join the vehicle
-extern bool mmProcessFECrewAccept(SINT32 connection, const struct FE_CREW_ACCEPT& joinPermResponse);
+extern bool mmProcessFECrewAccept(Player& player, const struct FE_CREW_ACCEPT& joinPermResponse);
 
 //Handles someone killing a join request on thieir posted vehicle
-extern bool mmProcessFEJoinPermKill(SINT32 connection, const struct FE_JOIN_PERM_KILL& joinPermKill);
+extern bool mmProcessFEJoinPermKill(Player& player, const struct FE_JOIN_PERM_KILL& joinPermKill);
 
 //Handles a client spawn.  Asks the strat server to spawn the people
-extern bool mmProcessFEClientSpawn(SINT32 connection, const struct FE_CLIENT_SPAWN& clientSpawn);
+extern bool mmProcessFEClientSpawn(Player& player, const struct FE_CLIENT_SPAWN& clientSpawn);
 
-extern void mmSpawnDeleteVehicle(class Player* player);
+extern void mmSpawnDeleteVehicle(Player& player);
 
 //-> from strat
 
 //Handles the post accept handed it by the strat server.  Looks up the
 //	appropriate client and forwards the message to them
-extern bool mmProcessPostAccept(class Player* mapPersona, const struct MM_POST_ACCEPT& postAccept, UINT32 acceptType);
+extern bool mmProcessPostAccept(class Player& mapPersona, const struct MM_POST_ACCEPT& postAccept, UINT32 acceptType);
 
 //Handles the post accept handed it by the strat server.  Looks up the
 //	appropriate client and forwards the message to them
@@ -58,7 +59,7 @@ extern bool mmProcessPostInfoResponse(const struct MM_POST_INFO_RESPONSE& postIn
 
 //Handles the join Accept coming from the strat system.  Tell the accepted
 //	person everything is good to go, then tells the other unlucky people that
-//	they were not chosen to accompany the person on thier trip into the magic
+//	they were not chosen to accompany the person on their trip into the magic
 //	wwiionline kingdom
 extern bool mmProcessJoinAccept(const struct MM_JOIN_ACCEPT& joinAccept);
 
@@ -73,5 +74,5 @@ extern bool mmProcessJoinListResponse(const struct MM_JOIN_LIST_RESPONSE& respon
 
 extern bool mmProcessLeaveListResponse(const struct MM_POST_INFO_RESPONSE& postInfoResponse);
 
-extern bool mmDirectSpawn(class Player* player, const struct WEAPON_SPEC& weapon, bool setIdentity, bool useCustomLocation, const FLOAT64VECTOR& customLocation) ;
+extern bool mmDirectSpawn(Player& player, const struct WEAPON_SPEC& weapon, bool setIdentity, bool useCustomLocation, const FLOAT64VECTOR& customLocation) ;
 

@@ -293,7 +293,7 @@ DotCommand::_featureLockedM(Player& player, UINT32 duration_m) const
 		return false ;
 
 	char mins[10+1] ;
-	snprintf(mins, sizeof(mins)-1, "%d", duration_m) ;
+	snprintf(mins, sizeof(mins)-1, "%u", duration_m) ;
 	player.message(LSTR_CAUTION, LSTR_FEATURE_LOCKED, command(), mins) ;
 	return true ;
 }
@@ -500,7 +500,7 @@ DotCommandIndex::readPermissions()
 	// Reset all commands to Playnet availability and no groups
 	// since deletions from the permissions data are not explicit
 	dbugLog(_FLI, "Flushing old permissions [setting all chat commands to CRS only]") ;
-	for ( auto it = begin() ; it != end() ; it++ )
+	for ( auto it = begin() ; it != end() ; ++it )
 	{
 		DotCommand* dc = *it ;
 		dc->setAvailability('C') ;

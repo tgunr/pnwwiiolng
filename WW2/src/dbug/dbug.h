@@ -133,11 +133,11 @@ static inline void	noWrite(char* /*filename*/, int /*lineno*/, unsigned int /*er
 }
 
 // dbugLog: if the current filename, lineno or string is NULL then it sets these members. The
-// paremters are output as a string to the debug file depending on the debug level selected and
+// parameters are output as a string to the debug file depending on the debug level selected and
 // the current error type.  calls handlers.
 extern int	_dbugLog(const char* filename, int lineno, unsigned int errType, const char* fmt, ...) __attribute__ ((format (printf,4,5))) ;
 
-extern NORETURN_FN void _LogAbort(const char* filename, int lineno, unsigned int errType, const char* assertion, const char* fmt, ...);
+extern NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, unsigned int errType, const char* assertion, const char* fmt, ...);
 #define LogAbort(...) _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, NULL, __VA_ARGS__)
 
 // These macros assume that the condition is unlikely and try to provide the compiler an optimization hint by

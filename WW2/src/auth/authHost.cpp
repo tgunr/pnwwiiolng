@@ -606,7 +606,7 @@ _setupVersionUpdate(APP_LAUNCH& launch, APP_LAUNCH_REQ& request, UINT32 platform
 		if(vmatch->protocol != DEF_PROTOCOL)
 		{
 			static SCHAR homeDir[128];
-			snprintf(homeDir,128,"appID%d/plat%d/",vmatch->appid,((vmatch->newNo)>>24));
+			snprintf(homeDir,128,"appID%u/plat%u/", vmatch->appid, ((vmatch->newNo)>>24));
 			authDBInsertOTP(launch, request, homeDir);
 		}
 //		launch->status = -AUTH_GENERAL_ERROR;
@@ -1564,7 +1564,7 @@ authDeleteDispatch(Auth::Dispatch* /*dispatch*/)
 
 void AppGameList::process()
 {
-	static const UINT32 arenaIDs[] = { 1, 22, 222, 0 } ;
+	static const UINT32 arenaIDs[_MAX_GAMES] = { 1, 22, 222, 0, 0, 0, 0, 0 } ;
 	for ( numGames = 0 ; numGames < _MAX_GAMES && arenaIDs[numGames] != 0 ; ++numGames )
 	{
 		GAME* game =_findGame(arenaIDs[numGames]) ;

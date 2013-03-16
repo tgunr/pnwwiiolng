@@ -453,11 +453,13 @@ BrigadeController::voteFor(Vote::Mode mode, UINT32 action, const ChatHandle& nom
 
 	_voting(sponsor, action, "nominating", duration, nominee, unit().callsign(), mode) ;
 	m_vote = new Vote(mode, action, nominee, sponsor, duration, origin) ;
+	if ( m_vote == nullptr )
+		throw BCERR_NO_VOTE_TO_VETO;
 
 	elections.insert(unit().unitID()) ;
 
 	// Send notification to HC officers
-	_noticeToOfficers(BrigadeControl::_PROPOSAL, vote()->m_forAction, 0, votePermitRequirement(), unit(), nominee, sponsor, duration, origin) ;
+	_noticeToOfficers(BrigadeControl::_PROPOSAL, m_vote->m_forAction, 0, votePermitRequirement(), unit(), nominee, sponsor, duration, origin) ;
 }
 
 //////////////////////////////////////////////////////////////////////

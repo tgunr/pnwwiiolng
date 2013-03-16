@@ -687,13 +687,13 @@ _exitPlayer(Player& player)
 static SINT32
 _personaExit(const SINT32 teulIndex, PlayerStatusNode* const psn, Server::PersonaExit& persXfer)
 {
-	dbugLog(_FLI, "t:%d p:%u c:%s personaExit", teulIndex, psn->dispatch().m_customerID, psn->dispatch().m_callsign) ;
-
 	if ( psn == NULL )
 	{
 		dbugLog(_FLW, "t:%d exiting with NULL player", teulIndex) ;
 		return 0 ;
 	}
+
+	dbugLog(_FLI, "t:%d p:%u c:%s personaExit", teulIndex, psn->dispatch().m_customerID, psn->dispatch().m_callsign) ;
 
 	Player* const player = (Player*)(psn->localInfo) ;
 	if ( player == NULL )

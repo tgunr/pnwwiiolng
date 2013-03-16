@@ -54,8 +54,8 @@ namespace Teul
 		//! 4-bit markers marker used to indicate start of a teul frame.
 		enum
 		{
-			Encrypted			=	((1 << 3) | (0 << 2) | (0 << 1) | (1 << 0))
-		,	Unencrypted			=	((0 << 3) | (1 << 2) | (1 << 1) | (0 << 0))
+			Encrypted			=	9		// 1001
+		,	Unencrypted			=	6		// 0110
 		} ;
 	}
 }

@@ -84,7 +84,7 @@ static SINT32 _recvMMPostAccept(ACTION_OBJECT* const a)
 	Player* player = PlayerInterface::Lookup(postAccept.customerID) ;
 	if ( player != NULL )
 	{
-		mmProcessPostAccept(player, postAccept, MM_ACCEPT_NEW);
+		mmProcessPostAccept(*player, postAccept, MM_ACCEPT_NEW);
 		return a->offset ;
 	}
 
@@ -442,56 +442,50 @@ SINT32 strtSendMMPostInfoUpdate(SINT32 connection, UINT32 customerID, const WEAP
 }
 
 SINT32
-strtSendMMSpawnGrantRequest(SINT32 connection, const WEAPON_SERIAL& weaponSerial, Player* player)
+strtSendMMSpawnGrantRequest(SINT32 connection, const WEAPON_SERIAL& weaponSerial, Player& player)
 {
-	if ( player == NULL )
-	{
-		dbugLog(_FLA, "NULL player") ;
-		return -EINVAL ;
-	}
-
 	SINT32 retval;
 	MM_SPAWN_GRANT_REQUEST spawnGrantRequest;
 
 	spawnGrantRequest.weaponSerial = weaponSerial;
-	spawnGrantRequest.playerID = player->playerID() ;
+	spawnGrantRequest.playerID = player.playerID() ;
 	spawnGrantRequest.missionID = 0 ;
 
-	if ( player->validMissionPacket() )
+	if ( player.validMissionPacket() )
 	{
 		dbugLog(_FLI, "t:%d p:%d c:%s spawnGrantRequest m:%u br:%u v:%u %s at %d.%d.%u"
-						, player->teulIndex()
-						, player->playerID()
-						, player->callsign()
-						, player->missionID()
-						, player->brigadeID()
+						, player.teulIndex()
+						, player.playerID()
+						, player.callsign()
+						, player.missionID()
+						, player.brigadeID()
 						, spawnGrantRequest.weaponSerial.serial
 						, weapPrintName(&spawnGrantRequest.weaponSerial.spec)
 						, spawnGrantRequest.weaponSerial.source.cell.ox, spawnGrantRequest.weaponSerial.source.cell.oy, spawnGrantRequest.weaponSerial.source.id
 						) ;
 
-		spawnGrantRequest.missionID = player->missionID() ;
+		spawnGrantRequest.missionID = player.missionID() ;
 
-		if(player->missionPacket().m_missionType == POINT_ATTACK ||
-			player->missionPacket().m_missionType == AREA_ATTACK ||
-			player->missionPacket().m_missionType == RESUPPLY)
+		if(player.missionPacket().m_missionType == POINT_ATTACK ||
+			player.missionPacket().m_missionType == AREA_ATTACK ||
+			player.missionPacket().m_missionType == RESUPPLY)
 		{
 			//get capacity of target
-			spawnGrantRequest.facility = player->missionPacket().sortie().target() ;
+			spawnGrantRequest.facility = player.missionPacket().sortie().target() ;
 		}
-		else if(player->missionPacket().m_missionType == POINT_DEFENSE ||
-			player->missionPacket().m_missionType == AREA_DEFENSE)
+		else if(player.missionPacket().m_missionType == POINT_DEFENSE ||
+			player.missionPacket().m_missionType == AREA_DEFENSE)
 		{
 			//get capacity of origin
-			spawnGrantRequest.facility = player->missionPacket().sortie().originFac() ;
+			spawnGrantRequest.facility = player.missionPacket().sortie().originFac() ;
 		}
 		else
 		{
 			dbugLog(_FLA, "t:%d p:%d c:%s illegal missionType %d"
-							, player->teulIndex()
-							, player->playerID()
-							, player->callsign()
-							, player->missionPacket().m_missionType
+							, player.teulIndex()
+							, player.playerID()
+							, player.callsign()
+							, player.missionPacket().m_missionType
 							);
 		}
 	}
@@ -500,7 +494,7 @@ strtSendMMSpawnGrantRequest(SINT32 connection, const WEAPON_SERIAL& weaponSerial
 
 	if (retval < 0)
 	{
-		dbugLog(_FLI, "t:%d p:%d c:%s failed to send spawn grant request", player->teulIndex(), player->playerID(), player->callsign()) ;
+		dbugLog(_FLI, "t:%d p:%d c:%s failed to send spawn grant request", player.teulIndex(), player.playerID(), player.callsign()) ;
 		return retval;
 	}
 

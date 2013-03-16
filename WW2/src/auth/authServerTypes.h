@@ -46,8 +46,8 @@ struct SERVER
 	~SERVER() ;
 
 	UINT32	ipAddress;			//The IP address of the server
-	UINT16	port;				//The port the server is running on
 	SINT32	teulIndex;			//The teulIndex of the server
+	UINT16	port;				//The port the server is running on
 	UINT16	sourcePort;
 	SINT32	currentUsers;		//current useres on this server
 	UINT32	maxUsers;			//maximum users allowed on this server

@@ -222,6 +222,7 @@ static SINT32 _sendFECrewBailed(ACTION_OBJECT* const a)
 
 static SINT32 _recvFEPostRequest(ACTION_OBJECT* const a)
 {
+	REQUIRE_CLIENT_DATA_AS(Player, player);
 	BETAInfo(a->teulIndex) ;
 	FE_POST_REQUEST postRequest;
 
@@ -231,7 +232,7 @@ static SINT32 _recvFEPostRequest(ACTION_OBJECT* const a)
 	dbugLog(_FLD,"postRequest: %d:%d:%d:%d:%d %d:%d:%d:%d", postRequest.facility.cell.ox, postRequest.facility.cell.oy, postRequest.facility.id, postRequest.facility.objClass, postRequest.facility.objType, postRequest.weapon.wCountry, postRequest.weapon.wCategory, postRequest.weapon.wClass, postRequest.weapon.wType);
 #endif
 
-	mmProcessFEPostRequest(a->teulIndex, postRequest);
+	mmProcessFEPostRequest(player, postRequest);
 
 	return a->offset;
 }
@@ -239,6 +240,7 @@ static SINT32 _recvFEPostRequest(ACTION_OBJECT* const a)
 static SINT32
 _recvFEPostListRequest(ACTION_OBJECT* const a)
 {
+	REQUIRE_CLIENT_DATA_AS(Player, player);
 	BETAInfo(a->teulIndex) ;
 	FE_POST_LIST_REQUEST postListRequest;
 
@@ -248,43 +250,46 @@ _recvFEPostListRequest(ACTION_OBJECT* const a)
 	dbugLog(_FLD,"postListRequest: %d:%d:%d:%d:%d", postListRequest.facility.cell.ox, postListRequest.facility.cell.oy, postListRequest.facility.id, postListRequest.facility.objClass, postListRequest.facility.objType);
 #endif
 
-	mmProcessFEPostListRequest(a->teulIndex, postListRequest);
+	mmProcessFEPostListRequest(player, postListRequest);
 
 	return a->offset;
 }
 
 static SINT32 _recvFEJoinRequest(ACTION_OBJECT* const a)
 {
+	REQUIRE_CLIENT_DATA_AS(Player, player);
 	BETAInfo(a->teulIndex) ;
 	FE_JOIN_REQUEST joinRequest;
 
 	a->offset = mmPackFEJoinRequest(TEUL_UNPACK, a->packed, a->offset, &joinRequest, 0);
 
-	mmProcessFEJoinRequest(a->teulIndex, joinRequest);
+	mmProcessFEJoinRequest(player, joinRequest);
 
 	return a->offset;
 }
 
 static SINT32 _recvFECrewAccept(ACTION_OBJECT* const a)
 {
+	REQUIRE_CLIENT_DATA_AS(Player, player);
 	BETAInfo(a->teulIndex) ;
 	FE_CREW_ACCEPT joinPermResponse;
 
 	a->offset = mmPackFECrewAccept(TEUL_UNPACK, a->packed, a->offset, &joinPermResponse, 0);
 
-	mmProcessFECrewAccept(a->teulIndex, joinPermResponse);
+	mmProcessFECrewAccept(player, joinPermResponse);
 
 	return a->offset;
 }
 
 static SINT32 _recvFECrewRequest(ACTION_OBJECT* const a)
 {
+	REQUIRE_CLIENT_DATA_AS(Player, player);
 	BETAInfo(a->teulIndex) ;
 	FE_CREW_REQUEST crewRequest;
 
 	a->offset = mmPackFECrewRequest(TEUL_UNPACK, a->packed, a->offset, &crewRequest, 0);
 
-	mmProcessFECrewRequest(a->teulIndex, crewRequest);
+	mmProcessFECrewRequest(player, crewRequest);
 
 	return a->offset;
 }
@@ -292,24 +297,26 @@ static SINT32 _recvFECrewRequest(ACTION_OBJECT* const a)
 
 static SINT32 _recvFEJoinPermKill(ACTION_OBJECT* const a)
 {
+	REQUIRE_CLIENT_DATA_AS(Player, player);
 	BETAInfo(a->teulIndex) ;
 	FE_JOIN_PERM_KILL joinPermKill;
 
 	a->offset = mmPackFEJoinPermKill(TEUL_UNPACK, a->packed, a->offset, &joinPermKill, 0);
 
-	mmProcessFEJoinPermKill(a->teulIndex, joinPermKill);
+	mmProcessFEJoinPermKill(player, joinPermKill);
 
 	return a->offset;
 }
 
 static SINT32 _recvFEPostCancel(ACTION_OBJECT* const a)
 {
+	REQUIRE_CLIENT_DATA_AS(Player, player);
 	BETAInfo(a->teulIndex) ;
 	FE_POST_CANCEL postCancel;
 
 	a->offset = mmPackFEPostCancel(TEUL_UNPACK, a->packed, a->offset, &postCancel, 0);
 
-	mmProcessFEPostCancel(a->teulIndex, postCancel);
+	mmProcessFEPostCancel(player, postCancel);
 
 	return a->offset;
 }
@@ -317,13 +324,14 @@ static SINT32 _recvFEPostCancel(ACTION_OBJECT* const a)
 static SINT32
 _recvFEClientSpawn(ACTION_OBJECT* const a)
 {
+	REQUIRE_CLIENT_DATA_AS(Player, player);
 	FE_CLIENT_SPAWN clientSpawn;
 
 	a->offset = mmPackFEClientSpawn(TEUL_UNPACK, a->packed, a->offset, &clientSpawn, 0);
 
 	BETAInfo(a->teulIndex) ;
 
-	mmProcessFEClientSpawn(a->teulIndex, clientSpawn);
+	mmProcessFEClientSpawn(player, clientSpawn);
 
 	return a->offset;
 }
@@ -352,7 +360,7 @@ _recvDirectSpawn(ACTION_OBJECT* const a)
 	}
 #endif
 
-	mmDirectSpawn(&player, request.m_weapon, true, request.m_useLocation, request.m_location) ;
+	mmDirectSpawn(player, request.m_weapon, true, request.m_useLocation, request.m_location) ;
 
 	return a->offset ;
 }

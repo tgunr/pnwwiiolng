@@ -74,11 +74,11 @@ _getInteractionCount(const std::map<UINT32, UINT32>& counters, const UINT32 spec
 }
 
 static bool
-_createMissionResults(const Player* player, MISSION_RESULTS& results)
+_createMissionResults(const Player& player, MISSION_RESULTS& results)
 {
 	WWII_SIDE side = MAX_SIDES;
 
-	const MissionPacket& packet = player->missionPacket() ;
+	const MissionPacket& packet = player.missionPacket() ;
 
 	results.sortieID = packet.sortie().sortieID() ;
 
@@ -92,7 +92,7 @@ _createMissionResults(const Player* player, MISSION_RESULTS& results)
 		if (cp == NULL)
 		{
 			dbugLog(_FLW, "t:%d p:%d c:%s Mission packet has invalid origin: %d.%d.%u"
-							, player->teulIndex(), player->playerID(), player->callsign()
+							, player.teulIndex(), player.playerID(), player.callsign()
 							, origin.cell.ox, origin.cell.oy, origin.id
 							) ;
 			return false ;
@@ -103,19 +103,19 @@ _createMissionResults(const Player* player, MISSION_RESULTS& results)
 
 	const auto& scoring = packet.scoring() ;
 
-	results.handleID = player->chatHandle() ;
-	results.missionID = player->missionID() ;
+	results.handleID = player.chatHandle() ;
+	results.missionID = player.missionID() ;
 	results.missionSuccess = packet.wasSuccessful ;
-	results.promoted = player->promoted() ;
+	results.promoted = player.promoted() ;
 	results.elapsedTime = packet.duration_s() ;
 	results.kills = scoring.kills() ;
 	results.numHits = scoring.hits() ;
 	results.captureEvents = scoring.captures() ;
 	results.captureAssists = 0 ;
 	results.m_side = side;
-	results.rank = player->effectiveRank() ;
-	results.m_realRank = player->realRank() ;
-	results.m_maxRank = player->maxRank() ;
+	results.rank = player.effectiveRank() ;
+	results.m_realRank = player.realRank() ;
+	results.m_maxRank = player.maxRank() ;
 	results.rtb = (CODE_RTB)packet.vehicle().rtbState() ;
 	results.rtbFacility = packet.vehicle().rtbFacility() ;
 	if ( packet.rtbReservedWeapon.serial > 0 )
@@ -137,22 +137,22 @@ _createMissionResults(const Player* player, MISSION_RESULTS& results)
 	results.m_assists = scoring.assists() ;
 
 	results.pointsScored = scoring.points() ;
-	results.pointsAccumulated = player->points() ;
-	results.rankIsKOTH = player->useRank().kingOfTheHill() ;
-	bool maxedRank = player->effectiveRank() >= player->maxRank() ;
+	results.pointsAccumulated = player.points() ;
+	results.rankIsKOTH = player.useRank().kingOfTheHill() ;
+	bool maxedRank = player.effectiveRank() >= player.maxRank() ;
 	if ( !maxedRank && !results.rankIsKOTH )
-		results.pointsNextRank = player->useRank().points() ;
+		results.pointsNextRank = player.useRank().points() ;
 	else
 		results.pointsNextRank = 0 ;
 
-	const Rank* nextRank = player->useRank().next() ;
+	const Rank* nextRank = player.useRank().next() ;
 	if ( nextRank != NULL )
-		results.nextRank = std::min(nextRank->level(), player->maxRank()) ;
+		results.nextRank = std::min(nextRank->level(), player.maxRank()) ;
 	else
 		results.nextRank = 0 ;
 
-	const UINT32 sortieID = player->missionPacket().sortieID() ;
-	const Scoring::Sortie* sortie = player->sortie() ;
+	const UINT32 sortieID = player.missionPacket().sortieID() ;
+	const Scoring::Sortie* sortie = player.sortie() ;
 	if ( sortie == NULL || sortie->sortieID() == sortieID )
 	{
 		sortie = Scoring::Sortie::Lookup(sortieID) ;
@@ -173,8 +173,8 @@ _createMissionResults(const Player* player, MISSION_RESULTS& results)
 		}
 	}
 
-	results.chatPermissions = *player->chatPermissions() ;
-	results.accountGoodUntil = player->accountGoodUntil() ;
+	results.chatPermissions = *player.chatPermissions() ;
+	results.accountGoodUntil = player.accountGoodUntil() ;
 	results.m_hitArraySize = results.numHits ;
 
 	return true ;
@@ -390,61 +390,59 @@ _recvMISSION_RESULTS_REQ(ACTION_OBJECT* const a)
 }
 
 SINT32
-mmSendMissionResults(Player* player)
+mmSendMissionResults(Player& player)
 {
 	FacilityStruct* facility;
 	MM_POST_ACCEPT fakeAccept ;
 
-	if ( player->m_missionResults == NULL )
-	{
-		player->m_missionResults = new MISSION_RESULTS ;
-	}
+	if ( player.m_missionResults != nullptr )
+		delete player.m_missionResults;
 
-	MISSION_RESULTS& results = *player->m_missionResults ;
-	memset(&results, 0, sizeof(MISSION_RESULTS));
+	player.m_missionResults = new MISSION_RESULTS();
+	MISSION_RESULTS& results = *player.m_missionResults ;
 
-	dbugLog(_FLD, "t:%d p:%d c:%s m:%d mp:%p amp:%p", player->teulIndex(), player->playerID(), player->callsign(), player->missionID(), player->mission(), mapFindMission(player->missionID()));
+	dbugLog(_FLD, "t:%d p:%d c:%s m:%d mp:%p amp:%p", player.teulIndex(), player.playerID(), player.callsign(), player.missionID(), player.mission(), mapFindMission(player.missionID()));
 
 	if ( !_createMissionResults(player, results) )
 	{
 		dbugLog(_FLA,"%s() Unable to create mission results for %s"
 				, __FUNCTION__
-				, player->callsign()
+				, player.callsign()
 				);
 		return -EINVAL;
 	}
 
 	//by now missionCalcResults should have been called, and we got the info
 	//we needed just now take them off the mission
-	facility = strtGetFacility(player->missionPacket().sortie().originFac());
+	facility = strtGetFacility(player.missionPacket().sortie().originFac());
 	if ( facility == NULL && results.rtbFacility.id != 0 )
 	{
 		facility = strtGetFacility(results.rtbFacility) ;
 	}
 
 	// Cleanup/reset their mission packet
-	player->clearSortieResults(false) ;
+	player.clearSortieResults(false) ;
 
-	results.missionInvalid = (bool)(player->mission() == NULL) ;
-	dbugLog(_FLD, "t:%d p:%d c:%s m:%d mission is %s", player->teulIndex(), player->playerID(), player->callsign(), player->missionID(), (results.missionInvalid ? "invalid" : "valid"));
+	results.missionInvalid = (bool)(player.mission() == NULL) ;
+	dbugLog(_FLD, "t:%d p:%d c:%s m:%d mission is %s", player.teulIndex(), player.playerID(), player.callsign(), player.missionID(), (results.missionInvalid ? "invalid" : "valid"));
 
 	// If they've got a reserved vehicle, we need to register it to them
 	if (
 		facility != NULL
-		&& facility->side == player->side()
+		&& facility->side == player.side()
 		&& activeCountries[facility->country]
 		&& results.rtbReservedWeapon.serial > 0
 		&& memcmp(&results.rtbFacility, &nullObjID, sizeof(nullObjID)) != 0
 		)
 	{
 		dbugLog(_FLD, "t:%d p:%d c:%s processing post accept for pre-reserved %s"
-						, player->teulIndex(), player->playerID(), player->callsign(), weapPrintName(&results.rtbReservedWeapon.spec));
+						, player.teulIndex(), player.playerID(), player.callsign(), weapPrintName(&results.rtbReservedWeapon.spec));
 		memset(&fakeAccept, 0, sizeof(fakeAccept)) ;
 
 		fakeAccept.facility = results.rtbFacility ;
 		fakeAccept.weaponSerial = results.rtbReservedWeapon ;
-		fakeAccept.customerID = player->playerID();
-		fakeAccept.portal = player->m_portal ;
+		fakeAccept.customerID = player.playerID();
+		fakeAccept.portal = player.m_portal ;
 		fakeAccept.multicrew = FALSE ;
 		fakeAccept.immediateSpawn = FALSE ;
 
@@ -455,28 +453,28 @@ mmSendMissionResults(Player* player)
 		const char* msg ;
 		if ( facility == NULL )
 			msg = "no facility" ;
-		else if ( facility->side != player->side() || activeCountries[facility->country] == false )
+		else if ( facility->side != player.side() || activeCountries[facility->country] == false )
 			msg = "wrong side" ;
 		else if ( results.rtbReservedWeapon.serial == 0 )
 			msg = "no reserved weapon" ;
 		else if ( results.rtbFacility.id == 0 )
 			msg = "no rtb facility" ;
 		else msg = "UNKNOWN" ;
-		dbugLog(_FLD, "t:%d p:%d c:%s NO RESERVED VEHICLE: %s", player->teulIndex(), player->playerID(), player->callsign(), msg);
+		dbugLog(_FLD, "t:%d p:%d c:%s NO RESERVED VEHICLE: %s", player.teulIndex(), player.playerID(), player.callsign(), msg);
 	}
 
-	player->SetState(PERS_AT_MISSION) ;
-	player->updateMissionTaker(false) ;
+	player.SetState(PERS_AT_MISSION) ;
+	player.updateMissionTaker(false) ;
 
-	player->updateNextLaunchTime() ;
+	player.updateNextLaunchTime() ;
 
-	const Mission* mission = player->mission() ;
+	const Mission* mission = player.mission() ;
 	if ( mission )
 	{
 		sendToClientMissTimeUpdate(
-			player->teulIndex()
+			player.teulIndex()
 			, mission->missionID()
-			, player->nextLaunchTime()
+			, player.nextLaunchTime()
 			, mission->isMobileSpawnAvailable()
 			, mission->isMobileSpawnAllowed()
 			, mission->active()
@@ -485,15 +483,15 @@ mmSendMissionResults(Player* player)
 	}
 
 	dbugLog(_FLI, "t:%d p:%d c:%s sending mission results reply m:%u el:%u k:%u h:%u succ:%u rtb:%u rank:%u p:%u pa:%u"
-					, player->teulIndex(), player->playerID(), player->callsign()
+					, player.teulIndex(), player.playerID(), player.callsign()
 					, results.missionID, results.elapsedTime, results.kills, results.numHits, results.missionSuccess, results.rtb, results.rank, results.pointsScored, results.pointsAccumulated
 					);
-	const SINT32 retval = teulSend(player->teulIndex(), missSEND_RESULTS_REPLY, &results);
+	const SINT32 retval = teulSend(player.teulIndex(), missSEND_RESULTS_REPLY, &results);
 #ifdef BETA_RELEASE
 	if ( retval >= 0 )
 	{
 #include "chat/chatLStringIDs.h"
-		player->message(LSTR_NOTE, LSTR_GENERIC, "MISSION RESULTS SENT") ;
+		player.message(LSTR_NOTE, LSTR_GENERIC, "MISSION RESULTS SENT") ;
 	}
 #endif
 

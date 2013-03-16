@@ -60,7 +60,7 @@ public:
 			return ;
 		}
 
-		if ( target->lastX() == INVALID_GRID_COORD )
+		if ( static_cast<UINT64>(target->lastX()) == static_cast<UINT64>(INVALID_GRID_COORD) )
 		{
 			player.message(LSTR_CAUTION, LSTR_PLAYER_NOT_SPAWNED_YET, target->callsign()) ;
 			return ;

@@ -119,11 +119,11 @@ namespace WWII
       at(size_type __n)
       {
 #if defined(__GNUC__)
-	if (__builtin_expect(__n >= size(), false))
-	  std::__throw_out_of_range(__N("inplace_vector::at"));
+		if (__builtin_expect(__n >= size(), false))
+			std::__throw_out_of_range(__N("inplace_vector::at"));
 #else
-	if(__n >= size())
-	  throw std::range_error("inplace_vector::at") ;
+		if(__n >= size())
+			throw std::range_error("inplace_vector::at") ;
 #endif
 	return _M_instance[__n];
       }
@@ -131,11 +131,12 @@ namespace WWII
       const_reference
       at(size_type __n) const
       {
-	if (__builtin_expect(__n >= size(), false))
 #if defined(__GNUC__)
-	  std::__throw_out_of_range(__N("inplace_vector::at"));
+		  if (__builtin_expect(__n >= size(), false))
+			  std::__throw_out_of_range(__N("inplace_vector::at"));
 #else
-	  throw std::range_error("inplace_vector::at") ;
+		  if(__n >= size())
+			  throw std::range_error("inplace_vector::at") ;
 #endif
 	return _M_instance[__n];
       }

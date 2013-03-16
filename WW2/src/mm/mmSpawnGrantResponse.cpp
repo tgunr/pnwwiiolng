@@ -307,12 +307,13 @@ _processSpawnGrantResponse(const MM_SPAWN_GRANT_RESPONSE& grant
 
 	if ( g_logDebug )
 	{
+		auto& instance = commander->instance();
 		dbugLog(_FLD, "Notifying cell:%s spawning t:%d,p:%u,c:%s sq:%u(%s) ct:%d,cp:%u,cc:%s in:%u.%u.%llu.%llu %s#%d [%f/%f/%f]"
 						, teulGetAddress(grant.serverIP)
 						, commander->teulIndex(), grant.commander, commander->callsign()
 						, commander->squadID(), chatGetCallsign(commander->squadHandle())
 						, ((crew) ? crew->teulIndex() : 0), grant.crew, ((crew) ? crew->callsign() : "n/a")
-						, commander->instance().category(), commander->instance().type(), commander->instance().handle(), commander->instance().id()
+						, instance.category(), instance.type(), instance.handle(), instance.id()
 						, weapPrintName(&spec), commander->weapon().serial
 						, x, y, z
 						) ;
@@ -326,8 +327,8 @@ _processSpawnGrantResponse(const MM_SPAWN_GRANT_RESPONSE& grant
 			",%u,%u"
 			",%u"
 			",%u"
-			",%hu,%hu,%hu,%hu"
-			",%hu,%u"
+			",%u,%u,%u,%u"
+			",%u,%u"
 			",%u"
 			")"
 			, grant.weaponSerial.serial
@@ -335,7 +336,7 @@ _processSpawnGrantResponse(const MM_SPAWN_GRANT_RESPONSE& grant
 			, (crew ? crew->playerID() : 0), (crew ? crew->personaID() : 0)
 			, commander->brigadeID()
 			, (mission ? mission->originFac()->uOID : 0)
-			, spec.wCountry, spec.wCategory, spec.wClass, spec.wType
+			, static_cast<UINT32>(spec.wCountry), static_cast<UINT32>(spec.wCategory), static_cast<UINT32>(spec.wClass), static_cast<UINT32>(spec.wType)
 			, (mission ? mission->missionType() : 0), (mission ? mission->missionID() : 0)
 			, (grant.serverIP & 255)
 	) ;

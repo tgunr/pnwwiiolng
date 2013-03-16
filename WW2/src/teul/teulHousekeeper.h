@@ -31,8 +31,8 @@ class housekeeper
 {
 public:
 	housekeeper(void (*fn)(void), UINT32 stockInterval_ms)
-		: m_fn(fn)
-		, m_lastClock(teulClock64)
+		: m_lastClock(teulClock64)
+		, m_fn(fn)
 		, m_stockInterval_ms(stockInterval_ms)
 		{}
 
@@ -48,8 +48,8 @@ public:
 	bool poll() { return poll(m_stockInterval_ms) ; }
 
 private:
-	void			(*m_fn)(void) ;
 	TeulTimeMS		m_lastClock ;
+	void			(*m_fn)(void) ;
 	UINT32			m_stockInterval_ms ;
 } ; // class
 } // namespace

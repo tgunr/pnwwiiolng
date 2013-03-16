@@ -45,22 +45,23 @@ static SINT32
 _recvEvent(ACTION_OBJECT* const a)
 {
 	Scoring::EventBase* evt = (Scoring::EventBase*)(a->packed) ;
+	auto& lhs = evt->lhs();
 	dbugLog(_FLI, "p:%u c:%s v:%u in:%llu Scoring::Event::recvEvent:: type %u. Processing: "
-					, evt->lhs().playerID()
-					, chatGetCallsign(evt->lhs().handle())
-					, evt->lhs().sortieID()
-					, evt->lhs().instID()
+					, lhs.playerID()
+					, chatGetCallsign(lhs.handle())
+					, lhs.sortieID()
+					, lhs.instID()
 					, evt->type()
 					) ;
 
-	Player* const lhsPlayer = PlayerInterface::Lookup(evt->lhs().playerID()) ;
+	Player* const lhsPlayer = PlayerInterface::Lookup(lhs.playerID()) ;
 	if ( lhsPlayer == NULL )
 	{
 		dbugLog(_FLM, "p:%u c:%s v:%u in:%llu Player not online for scoring event"
-					, evt->lhs().playerID()
+					, lhs.playerID()
 					, chatGetCallsign(evt->lhs().handle())
-					, evt->lhs().sortieID()
-					, evt->lhs().instID()
+					, lhs.sortieID()
+					, lhs.instID()
 					) ;
 		return 0 ;
 	}
@@ -136,7 +137,7 @@ bool Scoring::Capture::process(Player* const lhsPlayer)
 	/// player->missionPacket.
 	++lhsPlayer->missionPacket().scoring().captures ;
 
-	dbugLog(_FLD, "t:%d p:%u c:%s captures = %u", lhsPlayer->teulIndex(), lhsPlayer->playerID(), lhsPlayer->callsign(), lhsPlayer->missionPacket().scoring().captures()) ;
+	dbugLog(_FLD, "t:%d p:%u c:%s captures = %u", lhsPlayer->teulIndex(), lhsPlayer->playerID(), lhsPlayer->callsign(), lhsPlayer->missionPacket().scoring().captures.get()) ;
 
 	return true ;
 }
@@ -208,7 +209,7 @@ bool Scoring::Guard::process(Player* const lhsPlayer)
 	///TODO:SCORING+: Move to sortie stuff.
 	lhsPlayer->missionPacket().scoring().guardingPoints += guardPoints ;
 
-	dbugLog(_FLIB, " guardpoints = %u", lhsPlayer->missionPacket().scoring().guardingPoints()) ;
+	dbugLog(_FLIB, " guardpoints = %u", lhsPlayer->missionPacket().scoring().guardingPoints.get()) ;
 
 	return true ;
 }

@@ -203,10 +203,10 @@ _processLink(DBRow& row, void* data, UINT32 oid)
 }
 
 static void
-_initAllEntries(const char* query, _PROCESSOR* processFn, SINT16& scx, SINT16& scy, UINT32 id)
+_initAllEntries(const char* query, _PROCESSOR* processFn)
 {
-	scx = scy = 0 ;
-	id = 0 ;
+	SINT32 scx = 0, scy = 0;
+	UINT32 id = 0;
 
 	DBQuery q(dbh, query) ;
 
@@ -252,22 +252,19 @@ strtdbInitSupercells()
 {
 	const char* resource = NULL ;
 
-	SINT16 scx = 0, scy = 0 ;
-	UINT32 id = 0 ;
-
 	try
 	{
 		resource = "cp" ;
-		_initAllEntries(_FETCH_CPS_QUERY, _processCP, scx, scy, id) ;
+		_initAllEntries(_FETCH_CPS_QUERY, _processCP) ;
 
 		resource = "fac" ;
-		_initAllEntries(_FETCH_FACS_QUERY, _processFacility, scx, scy, id) ;
+		_initAllEntries(_FETCH_FACS_QUERY, _processFacility) ;
 
 		resource = "obj" ;
-		_initAllEntries(_FETCH_OBJS_QUERY, _processObject, scx, scy, id) ;
+		_initAllEntries(_FETCH_OBJS_QUERY, _processObject) ;
 
 		resource = "link" ;
-		_initAllEntries(_FETCH_LINKS_QUERY, _processLink, scx, scy, id) ;
+		_initAllEntries(_FETCH_LINKS_QUERY, _processLink) ;
 	}
 	catch ( std::exception& e )
 	{

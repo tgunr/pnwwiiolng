@@ -732,7 +732,6 @@ authdbStoreComputerInfo(const Auth::ClientData& cdata, const PLAY_COMPUTER_INFO&
 	SCHAR	descs[MAX_COMPRESSED_TEXTURE*5 + 1] ; // %4x + " "
 	std::string cpuManufacturer ;
 	std::string cpuBrandName ;
-	std::string username ;
 	SCHAR	soundCard[MAX_MIX_NAME*2 + 1] ;
 	SCHAR	exts[1024+1] ;
 	SCHAR*	p ;

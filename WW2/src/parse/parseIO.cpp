@@ -368,8 +368,6 @@ static bool _setIgnore(int numargs, FUNCARGS* args)
 	if ( numargs < 2 )
 		return true ;
 
-	std::string objectName = args[0].svalue ;
-
 	for ( int i = 1 ; i < numargs ; ++i )
 	{
 		_ignoreList.insert( std::make_pair<std::string,std::string>(args[0].svalue, args[i].svalue) ) ;

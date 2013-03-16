@@ -1065,7 +1065,7 @@ _radioSnoop(Player* player, Chat::ClientMessage* message)
 		if ( channels.size() > 1 )
 			channels += "," ;
 		if ( cnode.type() == PRIVATE_CHANNEL && cnode.channel() )
-			channels += cnode.channel()->m_name.c_str() ;
+			channels += cnode.channel()->m_name;
 		else
 			channels += chanTypeName[cnode.type()] ;
 	}
@@ -1468,7 +1468,7 @@ chatRouteMessage(Player* player, Chat::ClientMessage* inMessage, UINT32 messageI
 			if ( cnode.type() == NUMBERED_CHANNEL )
 			{
 				prefix = "[" ;
-				prefix += channel->m_name.c_str() ;
+				prefix += channel->m_name;
 				prefix += "] " ;
 			}
 			else if ( cnode.type() == SIDE_OPS_CHANNEL && player->isActiveCommander() )

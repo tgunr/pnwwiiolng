@@ -134,10 +134,10 @@ _roll(const char* const filename, const int baseNum)
 {
 	char oldName[DBUG_MAX_PATH + 1], newName[DBUG_MAX_PATH + 1] ;
 
-	snprintf(oldName, DBUG_MAX_PATH, "%s.%u.log", filename, baseNum) ;
+	snprintf(oldName, DBUG_MAX_PATH, "%s.%d.log", filename, baseNum) ;
 	oldName[DBUG_MAX_PATH] = 0 ;
 
-	snprintf(newName, DBUG_MAX_PATH, "%s.%u.log", filename, baseNum + 1) ;
+	snprintf(newName, DBUG_MAX_PATH, "%s.%d.log", filename, baseNum + 1) ;
 	newName[DBUG_MAX_PATH] = 0 ;
 
 	rename(oldName, newName) ;
@@ -749,7 +749,7 @@ void _levelHandler(UINT32 errType, const char* const text)
 // "Pretty" logging routine.
 
 void NORETURN_FN
-_LogAbort(const char* file_, int line_, unsigned int error_, const char* assertion_, const char* fmt_, ...)
+_LogAbort(const char* file_, unsigned int line_, unsigned int error_, const char* assertion_, const char* fmt_, ...)
 {
 	va_list args;
 	va_start(args, fmt_);

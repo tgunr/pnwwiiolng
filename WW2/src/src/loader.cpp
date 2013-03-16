@@ -96,7 +96,10 @@ SINT32 len;
 			continue;
 
 		len = strlen(s);
-		s[len-1] = '\0';
+		if ( len > 0 )
+			s[len-1] = '\0';
+		else
+			s[0] = '\0';
 
 		return s;
 	}

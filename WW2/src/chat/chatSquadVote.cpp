@@ -214,15 +214,15 @@ SquadVote::winner(SquadList* list)
 		return 0LL ;
 
 	// Check if the leader has left the squad
-	while ( !list->find(m_leader) )
+	if ( !list->find(m_leader) )
 	{
 		list->sendMessage(LSTR_SQUAD, LSTR_SQUAD_VOTE_FAIL_LEAVER) ;
 		close(HOUR_S) ;
-		return 0LL ;
+		return 0ULL ;
 	}
 
 	if ( m_leader == 0LL || m_colead )
-		return 0LL ;
+		return 0ULL ;
 
 	// Does someone have more half or more of the votes?
 	size_t members = list->members().size() ;
@@ -230,14 +230,14 @@ SquadVote::winner(SquadList* list)
 		return m_leader ;
 
 	if ( m_lead < 5 )
-		return 0LL ;
+		return 0ULL ;
 
 	if ( expires() == 0 )
 	{
 		return m_leader ;
 	}
 
-	return 0LL ;
+	return 0ULL ;
 }
 
 //////////////////////////////////////////////////////////////////////

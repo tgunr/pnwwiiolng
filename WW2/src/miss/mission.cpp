@@ -1240,8 +1240,6 @@ missionSendMissionPostReply(MISSION_POST_REQ& request, Player* player, SINT32 co
 
 	memcpy(summary.callsign, player->callsign(), sizeof(summary.callsign));
 
-	reply.posted = FALSE ;
-
 	postingFacility = strtGetFacility(request.origin) ;
 
 	if ( player->hasActiveMission() )

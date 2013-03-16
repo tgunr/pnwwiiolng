@@ -108,18 +108,18 @@ Player::cancelWeapon(bool notifyStrat)
 }
 
 static bool
-_spawnDisabledByGM(Player* player)
+_spawnDisabledByGM(const Player& player)
 {
 	if ( !host_config.isArenaLocked(AL_SPAWN) )
 		return false ;
 
-	if ( player->isPlaynet() || isupper(player->callsign()[0]) )
+	if ( player.isPlaynet() || isupper(player.callsign()[0]) )
 		return false ;
 
-	if ( player->permissions(ALL_SPAWN) )
+	if ( player.permissions(ALL_SPAWN) )
 		return false ;
 
-	dbugLog(_FLW, "t:%d p:%d c:%s spawn denied - arena locked", player->teulIndex(), player->playerID(), player->callsign()) ;
+	dbugLog(_FLW, "t:%d p:%d c:%s spawn denied - arena locked", player.teulIndex(), player.playerID(), player.callsign()) ;
 
 	return true ;
 }
@@ -129,70 +129,62 @@ _spawnDisabledByGM(Player* player)
 //
 
 void
-mmSpawnDeleteVehicle(Player* player)
+mmSpawnDeleteVehicle(Player& player)
 {
-	BETAInfo(player->teulIndex()) ;
+	BETAInfo(player.teulIndex()) ;
 
 	// If the player has a vehicle pre-reserved, bye bye.
-	if ( player->hasVehicle() && player->isConnected() )
-		mmSendPostDeny(player->teulIndex(), player->weapon().spec, SPAWN_RESERVATION_CANCELLED, true) ;
+	if ( player.hasVehicle() && player.isConnected() )
+		mmSendPostDeny(player.teulIndex(), player.weapon().spec, SPAWN_RESERVATION_CANCELLED, true) ;
 
-	if ( player->isSpawned() == false )
-		player->cancelWeapon(true) ;
+	if ( player.isSpawned() == false )
+		player.cancelWeapon(true) ;
 }
 
 bool
-mmProcessFEPostRequest(SINT32 connection, const FE_POST_REQUEST& request)
+mmProcessFEPostRequest(Player& player, const FE_POST_REQUEST& request)
 {
-	//Get the persona associated with this index
-	Player* const player = PlayerInterface::Lookup(connection) ;
-	if ( player == NULL )
-	{
-		dbugLog(_FLA, "t:%d couldn't find persona on teulIndex, ignoring", connection) ;
-		return false;
-	}
-
-	BETAInfo(player->teulIndex()) ;
+	BETAInfo(player.teulIndex()) ;
 
 	if ( _spawnDisabledByGM(player) )
 	{
-		player->postDenied(player->weapon().spec, SPAWN_DISABLED_BY_GM, false) ;
+		player.postDenied(player.weapon().spec, SPAWN_DISABLED_BY_GM, false) ;
 		return false ;
 	}
 
 	if ( Server::ServerInfo::GetBest(CELL_HOST) == NULL )
 	{
-		player->postDenied(player->weapon().spec, SPAWN_DISABLED_BY_SERVER, false) ;
+		player.postDenied(player.weapon().spec, SPAWN_DISABLED_BY_SERVER, false) ;
 		return false ;
 	}
 
-	player->clearSortieResults(false) ;
+	player.clearSortieResults(false) ;
 
-	player->SetSideLock() ;
-	player->m_wantMobileSpawn = false ;
+	player.SetSideLock() ;
+	player.m_wantMobileSpawn = false ;
 
 	SINT32 stratIndex = mapGetStratIndex();
 
-	switch(player->vehicleState())
+	switch(player.vehicleState())
 	{
 		case MM_VEH_HAS_CREW:
 		case MM_VEH_WAITING_CREW:
 		case MM_VEH_RESERVED:
 		case MM_VEH_PRERESERVED:
 			// see if we are requesting the same vehicle at the same facility, if so we keep the vehicle
-			if (memcmp(&player->weapon().spec,&request.weapon,sizeof(WEAPON_SPEC)) == 0 && player->m_weapOrigin == request.facility)
+			if (memcmp(&player.weapon().spec,&request.weapon,sizeof(WEAPON_SPEC)) == 0 && player.m_weapOrigin == request.facility)
 			{
-				if ( player->hasVehicle() && request.immediateSpawn )
-					return strtSendMMSpawnGrantRequest(stratIndex, player->weapon(), player) ;
+				if ( player.hasVehicle() && request.immediateSpawn )
+					return strtSendMMSpawnGrantRequest(stratIndex, player.weapon(), player) ;
 
 				MM_POST_ACCEPT postAccept;
 
 				postAccept.multicrew = FALSE;
 				postAccept.immediateSpawn = FALSE;
-				postAccept.portal = player->m_portal;
-				postAccept.customerID = player->playerID();
-				postAccept.weaponSerial = player->weapon();
-				postAccept.facility = player->m_weapOrigin;
+				postAccept.portal = player.m_portal;
+				postAccept.customerID = player.playerID();
+				postAccept.weaponSerial = player.weapon();
+				postAccept.facility = player.m_weapOrigin;
 
 				return mmProcessPostAccept(player, postAccept, MM_ACCEPT_UPDATE);
 
@@ -202,29 +194,29 @@ mmProcessFEPostRequest(SINT32 connection, const FE_POST_REQUEST& request)
 		default:
 		{
 			// Cancel any existing request
-			player->cancelWeapon(true) ;
+			player.cancelWeapon(true) ;
 
-			if ( player->CheckWeaponMask(request.weapon.asUINT16()) == false )
+			if ( player.CheckWeaponMask(request.weapon.asUINT16()) == false )
 			{
-				mmSendPostDeny(player->teulIndex(), player->weapon().spec, SPAWN_ACCOUNT_MASK, true) ;
+				mmSendPostDeny(player.teulIndex(), player.weapon().spec, SPAWN_ACCOUNT_MASK, true) ;
 				return false ;
 			}
 
 			// Flag player as in the process of requesting a weapon
-			player->SetVehicleState(MM_VEH_POST_REQ) ;
+			player.SetVehicleState(MM_VEH_POST_REQ) ;
 
-			const UINT32 missionID = player->missionID() ;
+			const UINT32 missionID = player.missionID() ;
 
-			player->m_weapOrigin = player->missionPacket().sortie().originFac() ;
+			player.m_weapOrigin = player.missionPacket().sortie().originFac() ;
 
 			//Ask the strat system about the message
 			strtSendMMPostRequest(stratIndex
-							, player->playerID()
-							, player->callsign()
+							, player.playerID()
+							, player.callsign()
 							, missionID
-							, player->brigadeID()
-							, player->permissionMask()
-							, player->m_weapOrigin
+							, player.brigadeID()
+							, player.permissionMask()
+							, player.m_weapOrigin
 							, request.weapon
 							, FALSE
 							, request.immediateSpawn
@@ -256,65 +248,63 @@ _findOrigin(const FacilityStruct* facility, UINT8 weaponCategory)
 // NOTE: Caller is responsible for ensuring player is not null
 
 bool
-mmDirectSpawn(Player* player, const WEAPON_SPEC& weapon, bool setIdentity, bool useCustomLocation, const FLOAT64VECTOR& customLocation)
+mmDirectSpawn(Player& player, const WEAPON_SPEC& weapon, bool setIdentity, bool useCustomLocation, const FLOAT64VECTOR& customLocation)
 {
-	assert( player != NULL ) ;
-
-	BETAInfo(player->teulIndex()) ;
+	BETAInfo(player.teulIndex()) ;
 
 	try
 	{
 		// Yank my association with any existing sortie/selection
-		player->cancelWeapon(true) ;
-		player->clearSortieResults(false) ;
+		player.cancelWeapon(true) ;
+		player.clearSortieResults(false) ;
 
 		// We may need to establish this player's identity
 		// or assert one over their current setup.
 		if ( setIdentity )
 		{
 			WWII_COUNTRY country = (WWII_COUNTRY)weapon.wCountry ;
-			BRANCH_ENUM branch = (player->branch() != BRANCH_NOT_USED) ? player->branch() : BRANCH_LAND ;
-			Mission* const mission = missionGetInstanceMission(player->instance().id(), country, branch) ;
+			BRANCH_ENUM branch = (player.branch() != BRANCH_NOT_USED) ? player.branch() : BRANCH_LAND ;
+			Mission* const mission = missionGetInstanceMission(player.instance().id(), country, branch) ;
 			if ( !mission )
 				throw "unable to find system mission" ;
 			if ( !mission->brigade() )
 				throw "mission does not have a brigade" ;
 
-			if ( player->country() != country || player->branch() != mission->branch() )
+			if ( player.country() != country || player.branch() != mission->branch() )
 			{
 				///TODO: Combine select and create with one database query and have
 				///TODO: done in the background, please.
 				// People are usually going to have a persona
-				if ( player->selectPersona(0, country, mission->branch()) != PLS_LOADED )
+				if ( player.selectPersona(0, country, mission->branch()) != PLS_LOADED )
 				{
 					// But they might not. This is not the best way to do this.
-					player->createPersonaRecord(country, mission->branch()) ;
-					if ( player->selectPersona(0, country, mission->branch()) != PLS_LOADED )
+					player.createPersonaRecord(country, mission->branch()) ;
+					if ( player.selectPersona(0, country, mission->branch()) != PLS_LOADED )
 						throw "unable to select necessary persona" ;
 				}
 			}
-			if ( player->brigade() != mission->brigade() )
+			if ( player.brigade() != mission->brigade() )
 			{
-				player->ExitBrigade(PERS_SELECTING_BRIGADE) ;
-				player->SetBrigade(mission->brigade()) ;
+				player.ExitBrigade(PERS_SELECTING_BRIGADE) ;
+				player.SetBrigade(mission->brigade()) ;
 			}
-			if ( player->mission() != mission && player->selectMission(mission, true) != MC_JOIN )
+			if ( player.mission() != mission && player.selectMission(mission, true) != MC_JOIN )
 				throw "unable to join mission" ;
 		}
 
-		if ( player->country() != weapon.wCountry )
+		if ( player.country() != weapon.wCountry )
 			throw "Country mismatch" ;
-		if ( !player->brigade() )
+		if ( !player.brigade() )
 			throw "No brigade selected" ;
-		if ( !player->mission() )
+		if ( !player.mission() )
 			throw "No mission selected" ;
 
 		// Figure out the origin spawner
-		ObjectStruct* origin = _findOrigin(player->mission()->originFac(), weapon.wCategory) ;
+		ObjectStruct* origin = _findOrigin(player.mission()->originFac(), weapon.wCategory) ;
 		if ( origin == NULL )
 		{
 			// Check other facilities.
-			FacilityStruct* fac = player->mission()->originCP()->facilityList ;
+			FacilityStruct* fac = player.mission()->originCP()->facilityList ;
 			for ( ; origin == NULL && fac != NULL ; fac = fac->next )
 			{
 				origin = _findOrigin(fac, weapon.wCategory) ;
@@ -325,14 +315,14 @@ mmDirectSpawn(Player* player, const WEAPON_SPEC& weapon, bool setIdentity, bool 
 				throw "no spawner for this weapon category" ;
 		}
 
-		SINT32 errType = (player->instance().isCampaign() ? Debug::ERR_MINOR : Debug::ERR_INFO) ;
-		player->log(_FL, errType, "m:%u weap:%s loc:%s(%g,%g,%g) direct spawn"
+		SINT32 errType = (player.instance().isCampaign() ? Debug::ERR_MINOR : Debug::ERR_INFO) ;
+		player.log(_FL, errType, "m:%u weap:%s loc:%s(%g,%g,%g) direct spawn"
 							, weapon.wCountry, weapPrintName(&weapon)
 							, (useCustomLocation) ? "yes":"no"
 							, customLocation.x, customLocation.y, customLocation.z) ;
 
 		SERIAL_NUMBER_REQUEST snr ;
-		snr.data().playerID = player->playerID() ;
+		snr.data().playerID = player.playerID() ;
 		snr.data().weapon = weapon ;
 		snr.data().serial = 0 ;
 		snr.send(mapGetStratIndex(), SERIAL_NUMBER_REQUEST::EXCHANGE) ;
@@ -342,31 +332,31 @@ mmDirectSpawn(Player* player, const WEAPON_SPEC& weapon, bool setIdentity, bool 
 		fakeSerial.serial = 0 ;
 		fakeSerial.spec = weapon ;
 
-		_setWeapSerial(*player, fakeSerial, MM_VEH_NONE);
+		_setWeapSerial(player, fakeSerial, MM_VEH_NONE);
 
 		if ( useCustomLocation )
 		{
-			player->m_useCustomSpawnLocation = true ;
-			player->m_customSpawnLocation = customLocation ;
+			player.m_useCustomSpawnLocation = true ;
+			player.m_customSpawnLocation = customLocation ;
 		}
 
 		return true ;
 	}
 	catch ( const char* message )
 	{
-		player->log(_FLA, "m:%u weap:%s %s"
+		player.log(_FLA, "m:%u weap:%s %s"
 							, weapon.wCountry, weapPrintName(&weapon)
 							, message) ;
 	}
 	catch ( std::exception &e )
 	{
-		player->log(_FLA, "m:%u weap:%s exception: %s"
-							, player->teulIndex(), player->playerID(), player->callsign()
+		player.log(_FLA, "m:%u weap:%s exception: %s"
+							, player.teulIndex(), player.playerID(), player.callsign()
 							, weapon.wCountry, weapPrintName(&weapon)
 							, e.what()) ;
 	}
 
-	player->postDenied(weapon, SPAWN_COMPLEX_DISABLED, true) ;
+	player.postDenied(weapon, SPAWN_COMPLEX_DISABLED, true) ;
 
 	return false ;
 }
@@ -401,28 +391,25 @@ SERIAL_NUMBER_REQUEST::receive(SINT32 teulIndex, SERIAL_NUMBER_REQUEST& incoming
 //	appropriate client and forwards the message to them
 
 bool
-mmProcessPostAccept(Player* player, const MM_POST_ACCEPT& post, UINT32 acceptType)
+mmProcessPostAccept(Player& player, const MM_POST_ACCEPT& post, UINT32 acceptType)
 {
 	MM_VEH_STATE reservationType ;
 	bool mobileSpawnAvailable = false ;
 
-	if ( player == NULL )
-		return false ;
-
-	BETAInfo(player->teulIndex()) ;
+	BETAInfo(player.teulIndex()) ;
 
 	//Initialize the numbers of postRequests
-	player->SetWeapon(post.weaponSerial) ;
-	player->m_portal = post.portal;
-	player->m_weapOrigin = post.facility;
-	player->m_wantMobileSpawn = false ;
+	player.SetWeapon(post.weaponSerial) ;
+	player.m_portal = post.portal;
+	player.m_weapOrigin = post.facility;
+	player.m_wantMobileSpawn = false ;
 
 	if ( g_logDebug )
 	{
 		FacilityStruct* facility = strtGetFacility(post.facility) ;
 		dbugLog(_FLD, "t:%d p:%d c:%s reserved %s#%d [%s] at %s [%d.%d.%u]"
-						, player->teulIndex(), player->playerID(), player->callsign()
-						, weapPrintName(&player->weapon().spec), post.weaponSerial.serial, weapPrintSpecC(&player->weapon().spec)
+						, player.teulIndex(), player.playerID(), player.callsign()
+						, weapPrintName(&player.weapon().spec), post.weaponSerial.serial, weapPrintSpecC(&player.weapon().spec)
 						, facility->name
 						, post.facility.cell.ox, post.facility.cell.oy, post.facility.id
 						);
@@ -433,23 +420,23 @@ mmProcessPostAccept(Player* player, const MM_POST_ACCEPT& post, UINT32 acceptTyp
 	else
 		reservationType = MM_VEH_RESERVED ;
 
-	if ( player->mission() )
+	if ( player.mission() )
 	{
 		// Dorothy allows any vehicle to spawn through a mobile spawn
 #if !defined(DOROTHY)
-		if ( player->weapon().spec.wCategory == _INFANTRY )
+		if ( player.weapon().spec.wCategory == _INFANTRY )
 #endif
-			mobileSpawnAvailable = player->mission()->isMobileSpawnAvailable() ;
+			mobileSpawnAvailable = player.mission()->isMobileSpawnAvailable() ;
 	}
 
 	switch ( acceptType )
 	{
 	  case MM_ACCEPT_NEW:
-		mmSendPostAccept(player->teulIndex(), post.weaponSerial, TRUE, post.portal, mobileSpawnAvailable) ;
+		mmSendPostAccept(player.teulIndex(), post.weaponSerial, TRUE, post.portal, mobileSpawnAvailable) ;
 		break ;
 
 	  case MM_ACCEPT_UPDATE:
-		mmSendPostAccept(player->teulIndex(), post.weaponSerial, FALSE, post.portal, mobileSpawnAvailable) ;
+		mmSendPostAccept(player.teulIndex(), post.weaponSerial, FALSE, post.portal, mobileSpawnAvailable) ;
 		break ;
 
 	  case MM_ACCEPT_RTB_RESERVED:
@@ -458,23 +445,23 @@ mmProcessPostAccept(Player* player, const MM_POST_ACCEPT& post, UINT32 acceptTyp
 	  	break ;
 
 	  default:
-		dbugLog(_FLW, "t:%d p:%d c:%s Unrecognized POST_ACCEPT_TYPE %d", player->teulIndex(), player->playerID(), player->callsign(), acceptType);
+		dbugLog(_FLW, "t:%d p:%d c:%s Unrecognized POST_ACCEPT_TYPE %d", player.teulIndex(), player.playerID(), player.callsign(), acceptType);
 	  	break ;
 	}
 
-	_setWeapSerial(*player, post.weaponSerial, reservationType);
+	_setWeapSerial(player, post.weaponSerial, reservationType);
 
 	if (post.immediateSpawn)
 	{
 #ifdef DEBUG
-		player->debug("Immediate spawn request", "sending grantRequest") ;
+		player.debug("Immediate spawn request", "sending grantRequest") ;
 #endif
 
 		//Go ahead and ask for permission to spawn
 		strtSendMMSpawnGrantRequest(mapGetStratIndex(), post.weaponSerial, player);
 	}
 	else
-		player->updateChat() ;
+		player.updateChat() ;
 
 	return true;
 }
@@ -528,26 +515,18 @@ mmProcessPostExpired(const MM_POST_EXPIRED& expiry)
 
 //Handles a postListRequest from the client
 bool
-mmProcessFEPostListRequest(SINT32 connection, const FE_POST_LIST_REQUEST& request)
+mmProcessFEPostListRequest(Player& player, const FE_POST_LIST_REQUEST& request)
 {
-	//Get the persona associated with this index
-	Player* player = PlayerInterface::Lookup(connection) ;
-	if (player == NULL)
-	{
-		dbugLog(_FLA, "t:%d no persona on this connection, ignoring postListRequest", connection) ;
-		return false;
-	}
-
-	BETAInfo(player->teulIndex()) ;
+	BETAInfo(player.teulIndex()) ;
 
 	///FIXME: Just say "OK" if the vehicle is what I already have reserved
-	player->cancelWeapon(true) ;
-	player->SetVehicleState(MM_VEH_POST_LIST_REQ) ;
-	UINT32 missionID = player->missionID() ;
-	player->m_weapOrigin = player->missionPacket().sortie().originFac() ;
+	player.cancelWeapon(true) ;
+	player.SetVehicleState(MM_VEH_POST_LIST_REQ) ;
+	UINT32 missionID = player.missionID() ;
+	player.m_weapOrigin = player.missionPacket().sortie().originFac() ;
 
 	//Ask the strat system about the message
-	strtSendMMPostListRequest(mapGetStratIndex(), player->playerID(), player->callsign(), missionID, player->brigadeID(), player->m_weapOrigin);
+	strtSendMMPostListRequest(mapGetStratIndex(), player.playerID(), player.callsign(), missionID, player.brigadeID(), player.m_weapOrigin);
 
 	return true;
 }
@@ -614,31 +593,23 @@ PostListReply::Process(ACTION_OBJECT* const a)
 
 //Handles someone making a crew request.
 bool
-mmProcessFECrewRequest(SINT32 connection, const FE_CREW_REQUEST& request)
+mmProcessFECrewRequest(Player& player, const FE_CREW_REQUEST& request)
 {
-	//Get the player associated with this index
-	Player* player = PlayerInterface::Lookup(connection) ;
-	if (player == NULL)
-	{
-		dbugLog(_FLA, "t:%d unknown player sending request, ignoring", connection) ;
-		return false;
-	}
+	BETAInfo(player.teulIndex()) ;
 
-	BETAInfo(player->teulIndex()) ;
-
-	switch(player->vehicleState())
+	switch(player.vehicleState())
 	{
 		case MM_VEH_HAS_CREW:
 		case MM_VEH_WAITING_CREW:
 		case MM_VEH_PRERESERVED:
 		case MM_VEH_RESERVED:
-			player->SetVehicleState(MM_VEH_WAITING_CREW) ;
-			player->updateMissionTaker(false) ;
-			strtSendMMPostInfoUpdate(mapGetStratIndex(),player->playerID(), request.weaponSerial, TRUE);
+			player.SetVehicleState(MM_VEH_WAITING_CREW) ;
+			player.updateMissionTaker(false) ;
+			strtSendMMPostInfoUpdate(mapGetStratIndex(),player.playerID(), request.weaponSerial, TRUE);
 		return true ;
 
 		default:
-			player->cancelWeapon(true) ;
+			player.cancelWeapon(true) ;
 		return false ;
 	}
 }
@@ -647,20 +618,12 @@ mmProcessFECrewRequest(SINT32 connection, const FE_CREW_REQUEST& request)
 //	we have to ask the front end the player is wanting to join up with
 //	whether its ok or not
 bool
-mmProcessFEJoinRequest(SINT32 connection, const FE_JOIN_REQUEST& request)
+mmProcessFEJoinRequest(Player& player, const FE_JOIN_REQUEST& request)
 {
-	//Get the player associated with this index
-	Player* player = PlayerInterface::Lookup(connection) ;
-	if (player == NULL)
-	{
-		dbugLog(_FLA, "t:%d unknown player sending join request, ignoring", connection) ;
-		return false;
-	}
-
-	dbugLog(_FLD, "t:%d p:%d c:%s requesting to join v:%d", player->teulIndex(), player->playerID(), player->callsign(), request.weaponSerial.serial) ;
+	dbugLog(_FLD, "t:%d p:%d c:%s requesting to join v:%d", player.teulIndex(), player.playerID(), player.callsign(), request.weaponSerial.serial) ;
 
 	//Ask the strat system about the message
-	strtSendMMJoinListRequest(mapGetStratIndex(), player->playerID(), request.weaponSerial, player->chatHandle(), TRUE);
+	strtSendMMJoinListRequest(mapGetStratIndex(), player.playerID(), request.weaponSerial, player.chatHandle(), TRUE);
 
 	return true;
 }
@@ -687,28 +650,20 @@ mmProcessJoinListResponse(const MM_JOIN_LIST_RESPONSE& response)
 
 //Handles a JoinPermResponse
 bool
-mmProcessFECrewAccept(SINT32 connection, const FE_CREW_ACCEPT& response)
+mmProcessFECrewAccept(Player& player, const FE_CREW_ACCEPT& response)
 {
-	BETAInfo(connection) ;
-
-	//Get the sender associated with this index
-	Player* player = PlayerInterface::Lookup(connection) ;
-	if (player == NULL)
-	{
-		dbugLog(_FLA, "t:%d no player on this connection for joinPermResponse, ignoring", connection) ;
-		return false;
-	}
+	BETAInfo(player.teulIndex()) ;
 
 	//Send the join message to the strat system apprising it of the join,
 	//	asking it as to whether its okay
-	strtSendMMJoinRequest(mapGetStratIndex(), response.joinRequestID, player->weapon());
+	strtSendMMJoinRequest(mapGetStratIndex(), response.joinRequestID, player.weapon());
 
 	return true;
 }
 
 //Handles the join Accept coming from the strat system.  Tell the accepted
 //	person everything is good to go, then tells the other unlucky people that
-//	they were not chosen to accompany the person on thier trip into the magic
+//	they were not chosen to accompany the person on their trip into the magic
 //	wwiionline kingdom
 bool
 mmProcessJoinAccept(const MM_JOIN_ACCEPT& accept)
@@ -757,116 +712,94 @@ mmProcessJoinDeny(const MM_JOIN_DENY& denial)
 
 //Handles someone killing a join request on their posted vehicle
 bool
-mmProcessFEJoinPermKill(SINT32 connection, const FE_JOIN_PERM_KILL& kill)
+mmProcessFEJoinPermKill(Player& player, const FE_JOIN_PERM_KILL& kill)
 {
-	BETAInfo(connection) ;
+	BETAInfo(player.teulIndex()) ;
 
-	Player* player = PlayerInterface::Lookup(connection) ;
-	if (player == NULL)
-	{
-		dbugLog(_FLA, "t:%d no player on this connection, ignoring joinPermKill", connection) ;
-		return false;
-	}
-
+	///TODO: Verify the kill vehicle matches the current vehicle.
 	// tell strat to ditch all crew
-	strtSendMMPostInfoUpdate(mapGetStratIndex(), player->playerID(), player->weapon(), FALSE);
+	strtSendMMPostInfoUpdate(mapGetStratIndex(), player.playerID(), player.weapon(), FALSE);
 
 	return true;
 }
 
-//Handles the cancelling of a post.
+//Handles the canceling of a post.
 bool
-mmProcessFEPostCancel(SINT32 teulIndex, const FE_POST_CANCEL& request)
+mmProcessFEPostCancel(Player& player, const FE_POST_CANCEL& request)
 {
 	SINT32 stratIndex = mapGetStratIndex() ;
 
-	//Find the customer that the message is destined for
-	Player* player = PlayerInterface::Lookup(teulIndex) ;
-	if ( player == NULL )
-	{
-		dbugLog(_FLD, "t:%d no player on this teulIndex, ignoring post cancel", teulIndex) ;
-		return false ;
-	}
+	BETAInfo(player.teulIndex()) ;
 
-	BETAInfo(player->teulIndex()) ;
-
-	strtSendMMSpawnCancel(stratIndex, player->playerID(), player->m_weapOrigin, player->weapon());
-	player->SetVehicleState(MM_VEH_NONE) ;
-	player->cancelWeapon(false) ;
+	strtSendMMSpawnCancel(stratIndex, player.playerID(), player.m_weapOrigin, player.weapon());
+	player.SetVehicleState(MM_VEH_NONE) ;
+	player.cancelWeapon(false) ;
 
 	return true;
 }
 
 //Handles a client spawn.  Asks the strat server to spawn the people
 bool
-mmProcessFEClientSpawn(SINT32 connection, const FE_CLIENT_SPAWN& request)
+mmProcessFEClientSpawn(Player& player, const FE_CLIENT_SPAWN& request)
 {
-	//Get the player associated with this index
-	Player* player = PlayerInterface::Lookup(connection) ;
-	if (player == NULL)
-	{
-		dbugLog(_FLA, "t:%d no player on this connection, ignoring fe_client_spawn", connection);
-		return false;
-	}
+	BETAInfo(player.teulIndex()) ;
 
-	BETAInfo(player->teulIndex()) ;
-
-	Mission* mission = player->mission() ;
+	Mission* mission = player.mission() ;
 	if ( mission == NULL )
 	{
-		dbugLog(_FLA, "t:%d p:%d c:%s player attempting to spawn without mission", player->teulIndex(), player->playerID(), player->callsign());
-		player->postDenied(request.weaponSerial.spec, SPAWN_COMPLEX_DISABLED, true) ;
+		dbugLog(_FLA, "t:%d p:%d c:%s player attempting to spawn without mission", player.teulIndex(), player.playerID(), player.callsign());
+		player.postDenied(request.weaponSerial.spec, SPAWN_COMPLEX_DISABLED, true) ;
 		return false ;
 	}
 
-	if ( !player->mission()->ongoing() )
+	if ( !player.mission()->ongoing() )
 	{
-		dbugLog(_FLA, "t:%d p:%d c:%s player attempting to spawn closed mission", player->teulIndex(), player->playerID(), player->callsign());
-		player->postDenied(request.weaponSerial.spec, SPAWN_COMPLEX_DISABLED, true) ;
+		dbugLog(_FLA, "t:%d p:%d c:%s player attempting to spawn closed mission", player.teulIndex(), player.playerID(), player.callsign());
+		player.postDenied(request.weaponSerial.spec, SPAWN_COMPLEX_DISABLED, true) ;
 		return false ;
 	}
 
-	if ( !player->validMissionPacket() )
+	if ( !player.validMissionPacket() )
 	{
-		dbugLog(_FLA, "t:%d p:%d c:%s mission packet not ready for spawning", player->teulIndex(), player->playerID(), player->callsign());
-		player->postDenied(request.weaponSerial.spec, SPAWN_COMPLEX_DISABLED, true) ;
+		dbugLog(_FLA, "t:%d p:%d c:%s mission packet not ready for spawning", player.teulIndex(), player.playerID(), player.callsign());
+		player.postDenied(request.weaponSerial.spec, SPAWN_COMPLEX_DISABLED, true) ;
 		return false ;
 	}
 
 	if ( _spawnDisabledByGM(player) )
 	{
-		BETALog(connection, "denied: arena locked") ;
-		player->postDenied(request.weaponSerial.spec, SPAWN_DISABLED_BY_GM, false) ;
+		BETALog(player.teulIndex(), "denied: arena locked") ;
+		player.postDenied(request.weaponSerial.spec, SPAWN_DISABLED_BY_GM, false) ;
 		return false ;
 	}
 
 	if ( request.wantMobileSpawn && !mission->isMobileSpawnAvailable() )
 	{
-		BETALog(connection, "msp: denied: mobile spawn unavailable") ;
-		player->postDenied(request.weaponSerial.spec, SPAWN_MOBILE_UNAVAILABLE, false) ;
+		BETALog(player.teulIndex(), "msp: denied: mobile spawn unavailable") ;
+		player.postDenied(request.weaponSerial.spec, SPAWN_MOBILE_UNAVAILABLE, false) ;
 		return false ;
 	}
 
-	if ( !player->hasAvailableVehicle()
-		|| memcmp(&request.weaponSerial.spec, &player->weapon().spec, sizeof(WEAPON_SPEC)) != 0)
+	if ( !player.hasAvailableVehicle()
+		|| memcmp(&request.weaponSerial.spec, &player.weapon().spec, sizeof(WEAPON_SPEC)) != 0)
 	{
-		BETALog(connection, "denied: no vehicle reserved here") ;
-		player->postDenied(request.weaponSerial.spec, SPAWN_WEAPON_NOT_AT_FACILITY, true) ;
+		BETALog(player.teulIndex(), "denied: no vehicle reserved here") ;
+		player.postDenied(request.weaponSerial.spec, SPAWN_WEAPON_NOT_AT_FACILITY, true) ;
 		return false ;
 	}
 
-	if ( !player->allowLaunch() )
+	if ( !player.allowLaunch() )
 	{
-		BETALog(connection, "denied: launch timer") ;
-		player->postDenied(request.weaponSerial.spec, SPAWN_DELAYED, false) ;
+		BETALog(player.teulIndex(), "denied: launch timer") ;
+		player.postDenied(request.weaponSerial.spec, SPAWN_DELAYED, false) ;
 		return false ;
 	}
 
-	player->SetSideLock() ;
-	player->m_wantMobileSpawn = request.wantMobileSpawn ;
+	player.SetSideLock() ;
+	player.m_wantMobileSpawn = request.wantMobileSpawn ;
 #ifdef BETA_RELEASE
-	dbugLog(_FLD, "t:%d p:%d c:%s requested %s spawn", player->teulIndex(), player->playerID(), player->callsign()
-					, ((player->m_wantMobileSpawn)?"mobile":"normal")
+	dbugLog(_FLD, "t:%d p:%d c:%s requested %s spawn", player.teulIndex(), player.playerID(), player.callsign()
+					, ((player.m_wantMobileSpawn)?"mobile":"normal")
 					);
 #endif
 
@@ -916,7 +849,7 @@ mmProcessBuzzardSpawn(SINT32 teulIndex, const BuzzardSpawn& request)
 			throw "Failed to aquire buzzard (internal error)" ;
 		myBuzzard.wCountry = player->country() ;
 
-		mmDirectSpawn(player, myBuzzard, false, request.m_useLocation, request.m_location) ;
+		mmDirectSpawn(*player, myBuzzard, false, request.m_useLocation, request.m_location) ;
 	}
 	catch (const char* reason)
 	{

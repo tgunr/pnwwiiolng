@@ -843,7 +843,7 @@ _processVehicleHit(Vehicle::Hit& hit, Player* const shooter, const SINT32 fromTe
 	}
 
 	HostVehicle* const vShooter = hostFindVehicleLocal(hit.m_shooter);
-	if ( vShooter == NULL )
+	if ( vShooter == nullptr )
 	{
 		dbugLog(_FLW, "v:%u cant apply hit, unknown m_shooter %u, may have already despawned", hit.m_target, hit.m_shooter) ;
 		return false ;
@@ -903,26 +903,18 @@ _processVehicleHit(Vehicle::Hit& hit, Player* const shooter, const SINT32 fromTe
 		if ( host_config.kills.reportDamage )
 		{
 			static char buffer[512] ;
-			if ( vShooter )
-				sprintf(buffer, "INCOMING: %lld joules of damage %s %s"
-								, totalDamageJ
-								, (vShooter->isRemote()) ? "from [alt-cell]" : "from [same cell]"
-								, vShooter->callsign()
-								) ;
-			else
-				sprintf(buffer, "INCOMING: %lld joules of damage from v#%u (unknown)"
-								, totalDamageJ
-								, hit.m_shooter
-								) ;
+			sprintf(buffer, "INCOMING: %lld joules of damage %s %s"
+							, totalDamageJ
+							, (vShooter->isRemote()) ? "from [alt-cell]" : "from [same cell]"
+							, vShooter->callsign()
+							) ;
 			thePlayer->message(LSTR_BETA, LSTR_GENERIC, buffer) ;
 		}
 
 		Teul::Packet forward(hitBytes, Comm::CallbackX, HOST_HIT_Y) ;
 		forward.append(source, hitBytes) ;
 		if ( forward.send(thePlayer->teulIndex()) < 0)
-		{
-			threadLog(_FLA, "v:%u couldnt send hit %u(%d)", hit.m_shooter, hit.m_target, thePlayer->teulIndex());
-		}
+			threadLog(_FLA, "v:%u couldn't send hit %u(%d)", hit.m_shooter, hit.m_target, thePlayer->teulIndex());
 	}
 
 	return true ;

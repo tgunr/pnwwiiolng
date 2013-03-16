@@ -97,7 +97,7 @@ _readActiveCountries()
 //////////////////////////////////////////////////////////////////////
 // Insert a description of this host build into the arenavars.
 
-static void _removePrefix(std::string& from, const std::string prefix)
+static void _removePrefix(std::string& from, const std::string& prefix)
 {
 	const size_t matchLen = prefix.length() ;
 	if ( from.compare(0, matchLen, prefix) == 0 )
@@ -477,10 +477,11 @@ Player::selectPersona(UINT32 selectedID, WWII_COUNTRY countryID, BRANCH_ENUM bra
 
 		while ( q.FetchRow() )
 		{
-			q.Row().NextUInt() ;	// Skip personaID
-			const WWII_COUNTRY altPersCountry = (WWII_COUNTRY) q.Row().NextUInt() ;
-			const RANK_NO altPersRankNo = (RANK_NO) q.Row().NextUInt() ;
-			const UINT32 altPersPoints = q.Row().NextUInt() ;
+			DBRow& row = q.Row();
+			row.NextUInt() ;	// Skip personaID
+			const WWII_COUNTRY altPersCountry = (WWII_COUNTRY) row.NextUInt() ;
+			const RANK_NO altPersRankNo = (RANK_NO) row.NextUInt() ;
+			const UINT32 altPersPoints = row.NextUInt() ;
 
 			const bool sameSide = (wwiiSide(altPersCountry) == wwiiSide(thisCountry)) ;
 			const RANK_NO sharedRank = std::min(altPersRankNo, sameSide ? sideShareCeiling : globalShareCeiling) ;

@@ -105,6 +105,10 @@ private:
 	void _addMember(const ChatHandle& handle, RANK_NO squadRank, Player* player, UINT32 joined) ;
 	void _updateOnline(int by) ;
 
+private:
+	TeulTimeMS		m_msstamp ;				// Modified timestamp
+	TeulTimeMS		m_lastMemberMod ;		// Last member modification
+
 public:
 	Squad			m_squad ;
 //	UINT64			m_lastListedRecruiters ;// Timestamp of when we were last listed for recruiting
@@ -114,8 +118,6 @@ private:
 	UINT32			m_pulled ;				// When the squad was last fetched
 	SQUAD_MEMBERS	m_members ;
 	UINT32			m_online ;
-	TeulTimeMS		m_msstamp ;				// Modified timestamp
-	TeulTimeMS		m_lastMemberMod ;		// Last member modification
 	bool			m_newSquad ;			// Squad in the process of creation
 
 	friend class SquadMemberQuery ;

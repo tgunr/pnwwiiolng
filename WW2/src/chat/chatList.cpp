@@ -144,13 +144,16 @@ Player::activate(SINT32 newIndex, PlayerStatusNode* psn)
 LOGICAL
 chatPlayerDeactivate(Player* player)
 {
+	if ( player == nullptr )
+		return FALSE;
+
 	if ( isValidSide(player->side()) )
 	{
 		betaLog(_FLI, "removing %p from %d side lists", player, player->side()) ;
 		sidePlayers[player->side()].erase(player) ;
 	}
 
-	if (player == NULL || !player->active() )
+	if ( !player->active() )
 		return FALSE;
 
 	player->deactivate() ;

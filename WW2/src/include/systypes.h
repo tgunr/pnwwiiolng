@@ -31,16 +31,15 @@
 
 	// Signed types
 	typedef		char				SINT8;			//!< 8 bit signed value.
-	typedef		short				SINT16;			//!< 16 bit signed value.
-	typedef		int					SINT32;			//!< 32 bit signed value.
-	typedef		__int64				SINT64;			//!< 64 bit signed value.
+	typedef		signed __int16		SINT16;			//!< 16 bit signed value.
+	typedef		signed __int32		SINT32;			//!< 32 bit signed value.
+	typedef		signed __int64		SINT64;			//!< 64 bit signed value.
 
 	// Unsigned types
 	typedef		unsigned char		UINT8;			//!< 8 bit unsigned value.
-	typedef		unsigned short		UINT16;			//!< 16 bit unsigned value.
-
-	typedef		unsigned __int32	UINT32;
-	typedef		unsigned __int64	UINT64;
+	typedef		unsigned __int16	UINT16;			//!< 16 bit unsigned value.
+	typedef		unsigned __int32	UINT32;			//!< 32 bit unsigned value.
+	typedef		unsigned __int64	UINT64;			//!< 64 bit unsigned value.
 
 	// Float types; single (32 bits) and double (64 bits)
 	typedef		float				FLOAT32;		//!< 32 bit single-precision float.

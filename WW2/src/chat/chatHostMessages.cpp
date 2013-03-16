@@ -837,7 +837,7 @@ _recvPersonaUpdate(ACTION_OBJECT* const a)
 static void
 __describePlayer(const Player* player, char* msg, int size)
 {
-	snprintf(msg, size-1, "[%s->%s M#%d %d/%d]"
+	snprintf(msg, size, "[%s->%s M#%d %d/%d]"
 							, chatPropertyName(player->originCpID())
 							, "?"
 							, player->missionID()
@@ -882,7 +882,7 @@ _recvKickNotice(ACTION_OBJECT* const a)
 						, callsign
 						, incoming.m_playerID
 						) ;
-		snprintf(message, sizeof(message), message, "[id: %u, not connected]", incoming.m_playerID) ;
+		snprintf(message, sizeof(message), "[id: %u, not connected]", incoming.m_playerID) ;
 	}
 
 	chatdbRecordEvent("KICK", callsign, "kicked", incoming.m_problem, message) ;

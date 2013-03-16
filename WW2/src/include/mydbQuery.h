@@ -169,7 +169,7 @@ DBQuery & DBRow API
 		query.Query(strlen(statement), statement);
 
 		if ( Query.HasRows() == false )
-			throw std::logic_error("Nothing in t_foo") ;
+			throw std::logic_error("Nothing in t_foo");
 
 		while ( query.FetchRow() == true )
 		{
@@ -193,7 +193,7 @@ DBQuery & DBRow API
 // If you want to execute a really simple query and you don't
 // want the result set, don't care how long it takes, and
 // don't care whether it works or not, use DBSimpleQuery
-#define DBSimpleQuery(dbh, ...)	{ try { DBQuery __dbsq(dbh, __VA_ARGS__) ; } catch (std::exception& e) { dbugLog(_FLA, "%s: %s", __FUNCTION__, e.what()) ; } }
+#define DBSimpleQuery(dbh, ...)	{ try { DBQuery __dbsq(dbh, __VA_ARGS__); } catch (std::exception& e) { dbugLog(_FLA, "%s: %s", __FUNCTION__, e.what()); } }
 
 //////////////////////////////////////////////////////////////////////
 // Definition of the 'row' type, which is basically a wrapper for
@@ -206,24 +206,24 @@ public:
 	const char*	operator[](UINT32 index) const
 	{
 		if ( index >= m_columns )
-			throw std::invalid_argument("index out of bounds") ;
+			throw std::invalid_argument("index out of bounds");
 
-		return m_row[index] ;
-	} ;
+		return m_row[index];
+	};
 
 	// Can return null
 	const char* NextColumn()
 	{
 		if ( m_currentColumn >= m_columns )
-			return NULL ;
-		return m_row[m_currentColumn++] ;
+			return NULL;
+		return m_row[m_currentColumn++];
 	}
 
 	// Always returns a valid character array pointer
 	const char* NextString()
 	{
-		const char* p = NextColumn() ;
-		return ( p ) ? p : "" ;
+		const char* p = NextColumn();
+		return ( p ) ? p : "";
 	}
 
 	// NOTE: Does not ensure null-byte placement
@@ -231,58 +231,58 @@ public:
 
 	SINT32 NextSInt()
 	{
-		if ( m_currentColumn >= m_columns ) return 0 ;
-		char* source = m_row[m_currentColumn++] ;			// Null record protection
-		return ( source != NULL ) ? (SINT32)strtol(source, NULL, 10) : 0 ;
+		if ( m_currentColumn >= m_columns ) return 0;
+		const char* source = m_row[m_currentColumn++];			// Null record protection
+		return ( source != NULL ) ? (SINT32)strtol(source, NULL, 10) : 0;
 	}
 
 	UINT32 NextUInt()
 	{
-		if ( m_currentColumn >= m_columns ) return 0 ;
-		char* source = m_row[m_currentColumn++] ;			// Null record protection
-		return ( source != NULL ) ? (UINT32)strtoul(source, NULL, 10) : 0 ;
+		if ( m_currentColumn >= m_columns ) return 0;
+		const char* source = m_row[m_currentColumn++];			// Null record protection
+		return ( source != NULL ) ? (UINT32)strtoul(source, NULL, 10) : 0;
 	}
 
 	UINT64 NextUINT64()
 	{
-		if ( m_currentColumn >= m_columns ) return 0 ;
-		char* source = m_row[m_currentColumn++] ;
-		return ( source != NULL ) ? strtoull(source, NULL, 10) : 0 ;
+		if ( m_currentColumn >= m_columns ) return 0;
+		const char* source = m_row[m_currentColumn++];
+		return ( source != NULL ) ? strtoull(source, NULL, 10) : 0;
 	}
 
 	SINT64 NextSINT64()
 	{
-		if ( m_currentColumn >= m_columns ) return 0 ;
-		char* source = m_row[m_currentColumn++] ;
-		return ( source != NULL ) ? strtoll(source, NULL, 10) : 0 ;
+		if ( m_currentColumn >= m_columns ) return 0;
+		const char* source = m_row[m_currentColumn++];
+		return ( source != NULL ) ? strtoll(source, NULL, 10) : 0;
 	}
 
 	FLOAT32 NextFLOAT32()
 	{
-		if ( m_currentColumn >= m_columns ) return 0.0 ;
-		char* source = m_row[m_currentColumn++] ;
-		return ( source != NULL ) ? (FLOAT32)strtof(source, NULL) : 0.0f ;
+		if ( m_currentColumn >= m_columns ) return 0.0;
+		const char* source = m_row[m_currentColumn++];
+		return ( source != NULL ) ? (FLOAT32)strtof(source, NULL) : 0.0f;
 	}
 
 	FLOAT64 NextFLOAT64()
 	{
-		if ( m_currentColumn >= m_columns ) return 0.0 ;
-		char* source = m_row[m_currentColumn++] ;
-		return ( source != NULL ) ? (FLOAT64)strtod(source, NULL) : 0.0 ;
+		if ( m_currentColumn >= m_columns ) return 0.0;
+		const char* source = m_row[m_currentColumn++];
+		return ( source != NULL ) ? (FLOAT64)strtod(source, NULL) : 0.0;
 	}
 
 	void NextWeaponSpec(struct WEAPON_SPEC& spec);
 
 protected:
 	// Constructor
-	DBRow(UINT32 columns, DB::result_t* result) ;
-	friend class DBQuery ;					// But DBQuery can access our constructor.
+	DBRow(UINT32 columns, DB::result_t* result);
+	friend class DBQuery;					// But DBQuery can access our constructor.
 
 private:
-	DB::row_t		m_row ;					// The data
-	UINT32			m_columns ;				// Number of columns
-	UINT32			m_currentColumn ;		// Current column
-} ;
+	DB::row_t		m_row;					// The data
+	UINT32			m_columns;				// Number of columns
+	UINT32			m_currentColumn;		// Current column
+};
 
 //////////////////////////////////////////////////////////////////////
 // Definition of a query, which is basically a wrapper for performing
@@ -293,61 +293,61 @@ class DBQuery
 {
 public:
 	// Constructor (with query)
-	DBQuery(DBHANDLE&, const char* query, ...) ;
+	DBQuery(DBHANDLE&, const char* query, ...);
 	// Constructor with prepared query
-	DBQuery(DB::handle_t*, const char* query) ;
+	DBQuery(DB::handle_t*, const char* query);
 	// Constructor (without query)
-	DBQuery(DB::handle_t*) ;
+	DBQuery(DB::handle_t*);
 	// Destructor
-	~DBQuery() ;
+	~DBQuery();
 
 	// Perform another query
-	void Query(size_t stlen, const char* statement) ;
-	void Query(const std::string& qry) { Query(qry.length(), qry.c_str()) ; }
+	void Query(size_t stlen, const char* statement);
+	void Query(const std::string& qry) { Query(qry.length(), qry.c_str()); }
 
 	// Access to result fields
-	int				Error() const		{ return m_error ; }
+	int				Error() const		{ return m_error; }
 
-	public: bool HasRows() const { return m_rows > 0 && m_nextRow < m_rows ; }
+	public: bool HasRows() const { return m_rows > 0 && m_nextRow < m_rows; }
 
-	bool			FetchRow() ;
+	bool			FetchRow();
 
-	UINT32			AffectedRows() const { return m_affectedRows ; }
-	UINT32			Cols() const		{ return m_cols ; }
-	UINT32			CurrentRow() const	{ return m_currentRow ; }
-	UINT32			LastInsertID() const { return m_lastInsertID ; }
+	UINT32			AffectedRows() const { return m_affectedRows; }
+	UINT32			Cols() const		{ return m_cols; }
+	UINT32			CurrentRow() const	{ return m_currentRow; }
+	UINT32			LastInsertID() const { return m_lastInsertID; }
 
 	DBRow&	Row() const
 	{
 		if ( m_row != NULL ) return const_cast<DBRow&>(*m_row);
-		throw std::logic_error("No row to return") ;
+		throw std::logic_error("No row to return");
 	}
 
-	bool NextResultSet() ;
-	UINT32			Rows() const		{ return m_rows ; }
+	bool NextResultSet();
+	UINT32			Rows() const		{ return m_rows; }
 
 private:
-	DB::handle_t*	m_conn ;				// Database connection handle
-	DB::result_t*	m_result ;				// The query result or statement
+	DB::handle_t*	m_conn;				// Database connection handle
+	DB::result_t*	m_result;				// The query result or statement
 
-	bool			m_executed : 1 ;		// FALSE until we try the command
-	int				m_error ;				// Error No of any error
+	bool			m_executed : 1;		// FALSE until we try the command
+	int				m_error;				// Error No of any error
 
-	UINT32			m_affectedRows ;		// NUmber of rows modified
-	UINT32			m_cols ;				// Number of columns
-	UINT32			m_lastInsertID ;		// Last insert ID if we inserted
+	UINT32			m_affectedRows;		// NUmber of rows modified
+	UINT32			m_cols;				// Number of columns
+	UINT32			m_lastInsertID;		// Last insert ID if we inserted
 
-	UINT32			m_currentRow ;			// 0-based cursor
-	UINT32			m_nextRow ;				// 1-based cursor
+	UINT32			m_currentRow;			// 0-based cursor
+	UINT32			m_nextRow;				// 1-based cursor
 
-	UINT32			m_rows ;				// Number of rows returned
+	UINT32			m_rows;				// Number of rows returned
 
 private:
-	DBRow*			m_row ;
+	DBRow*			m_row;
 
 	// Private member functions
-	void			_finish(bool thorough) ;
-	void			_processResultSet() ;
-	void			_query(const char* statement, size_t stlen) ;
+	void			_finish(bool thorough);
+	void			_processResultSet();
+	void			_query(const char* statement, size_t stlen);
 
-} ;
+};

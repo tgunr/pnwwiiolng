@@ -2504,10 +2504,11 @@ Player::removeFromAWS()
 		AWS_GRID::iterator it = grid.find(index) ;
 		if ( it != grid.end() )
 		{
-			UINT16& reading = (m_impl->m_awsSide == ALLIED) ? it->second.allied : it->second.axis ;
+			auto& awsReading = it->second;
+			UINT16& reading = (m_impl->m_awsSide == ALLIED) ? awsReading.allied : awsReading.axis ;
 			if ( reading > 0 )
 				--reading ;
-			if ( it->second.allied == 0 && it->second.axis == 0 )
+			if ( awsReading.allied <= 0U && awsReading.axis <= 0U )
 				grid.erase(it) ;
 		}
 

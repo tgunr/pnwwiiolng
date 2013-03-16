@@ -200,7 +200,7 @@ public:
 
 	SINT32 delta(const FLOAT64& from, const FLOAT64& to, const FLOAT64& max) const
 	{
-		if ( from == to )
+		if ( fabs(from - to) < DBL_EPSILON )
 			return (SINT32) (to) ;
 		else if ( to > from + max )
 			return (SINT32)(from + max) ;
@@ -1187,27 +1187,28 @@ public:
 			return ;
 		}
 
-		ChatHandle oldCO = list->squad().coHandle() ;
+		auto& squad = list->squad();
+		ChatHandle oldCO = squad.coHandle() ;
 		if ( oldCO != 0LL && oldCO != handle )
 		{
 			Player* co = PlayerInterface::Lookup(oldCO) ;
 			if ( co )
 			{
-				player.message(LSTR_CAUTION, LSTR_SQUAD_CO_ONLINE, list->squad().shortName(), co->callsign()) ;
+				player.message(LSTR_CAUTION, LSTR_SQUAD_CO_ONLINE, squad.shortName(), co->callsign()) ;
 				return ;
 			}
 			else if ( !force )
 			{
-				player.message(LSTR_CAUTION, LSTR_MAKECO_USE_FORCE, list->squad().shortName(), chatGetCallsign(oldCO)) ;
+				player.message(LSTR_CAUTION, LSTR_MAKECO_USE_FORCE, squad.shortName(), chatGetCallsign(oldCO)) ;
 				return ;
 			}
 		}
 
 		list->appointNewCO(subject->matchHandle(), subject) ;
 
-		player.gmNote("GM", command(), arguments, list->squad().shortName()) ;
-		list->sendMessage(LSTR_SQUAD, LSTR_SQUAD_MAKECO_APPOINTED, subject->callsign(), list->squad().shortName()) ;
-		player.message(LSTR_NOTE, LSTR_MAKECO_APPOINTED, subject->callsign(), list->squad().shortName()) ;
+		player.gmNote("GM", command(), arguments, squad.shortName()) ;
+		list->sendMessage(LSTR_SQUAD, LSTR_SQUAD_MAKECO_APPOINTED, subject->callsign(), squad.shortName()) ;
+		player.message(LSTR_NOTE, LSTR_MAKECO_APPOINTED, subject->callsign(), squad.shortName()) ;
 	}
 } dotMakeCO ;
 
@@ -1392,7 +1393,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 
 	if ( player.isPlaynet() )
 	{
-		snprintf(buf, sizeof(buf)-1, "Pid#%d", playerID()) ;
+		snprintf(buf, sizeof(buf)-1, "Pid#%u", playerID()) ;
 		_addStr(response, buf) ;
 	}
 
@@ -1449,7 +1450,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		}
 		else if ( player.isPlaynet() )
 		{
-			snprintf(buf, sizeof(buf)-1, "B#%d:UNK", brigadeID()) ;
+			snprintf(buf, sizeof(buf)-1, "B#%u:UNK", brigadeID()) ;
 			_addStr(response, buf) ;
 		}
 	}
@@ -1460,13 +1461,13 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		const Rank* myRank = Rank::lookup(erank) ;
 		if ( myRank != NULL )
 			snprintf(buf, sizeof(buf)-1
-						, "R#%d(%s/%s)"
+						, "R#%u(%s/%s)"
 							, erank
 							, _rankType(myRank->type())
 							, rankNames[erank]
 							) ;
 		else if ( player.isPlaynet() )
-			snprintf(buf, sizeof(buf)-1, "R#%d(INVALID)", erank) ;
+			snprintf(buf, sizeof(buf)-1, "R#%u(INVALID)", erank) ;
 		_addStr(response, buf) ;
 	}
 

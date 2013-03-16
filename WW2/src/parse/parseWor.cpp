@@ -357,7 +357,7 @@ WEAPON_SPEC spec;
 
 	spec = NULL_WEAP_SPEC;
 
-	if ( strncmp(args[MAX_LM_ARG+7].svalue,"NONE",MAX_OBJNAME_LENGTH))
+	if ( strcmp(args[MAX_LM_ARG+7].svalue, "NONE") != 0)
 	{
 		spec = weapCreateSpec(args[MAX_LM_ARG+7].svalue);
 		if (spec.wCategory == 0)

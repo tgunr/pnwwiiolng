@@ -284,7 +284,7 @@ threadsLogging()
 	for ( auto it : logQueue )
 	{
 		const THREAD_LOG* entry = it;
-		if ( entry->m_entry && *entry->m_entry )
+		if ( *entry->m_entry )
 			_dbugLog(entry->m_file, entry->m_line, entry->m_level, "%s", entry->m_entry);
 		delete entry;
 	}

@@ -551,8 +551,9 @@ static void AddPlayersToIndex(const ChatGrid* grid)
 static bool
 _announceSTOToGrid(ServerSTO& sto, bool isCreation)
 {
-	SINT32 gx = (SINT32)sto.position().x() >> ChatGrid::_KEY_SHIFT ;
-	SINT32 gy = (SINT32)sto.position().y() >> ChatGrid::_KEY_SHIFT ;
+	auto& position = sto.position();
+	SINT32 gx = (SINT32)position.x() >> ChatGrid::_KEY_SHIFT ;
+	SINT32 gy = (SINT32)position.y() >> ChatGrid::_KEY_SHIFT ;
 	GridKey key(sto.m_instanceID, gx, gy) ;
 
 	static bool inUse = false ;
@@ -566,7 +567,7 @@ _announceSTOToGrid(ServerSTO& sto, bool isCreation)
 	data.insert(&sto) ;
 
 	_stoBatch.clear() ;
-	_stoBatch.setCoords(sto.position().x(), sto.position().y()) ;
+	_stoBatch.setCoords(position.x(), position.y()) ;
 
 	ChatGrid* cell ;
 	const char* op ;
@@ -599,9 +600,9 @@ _announceSTOToGrid(ServerSTO& sto, bool isCreation)
 	if ( g_logDebug )
 		dbugLog(_FLD, "sto:%u %s [%f/%f/%f => %d/%d] %" PRSizeT " cells"
 						, sto.uid(), op
-						, sto.position().x()
-						, sto.position().y()
-						, sto.position().z()
+						, position.x()
+						, position.y()
+						, position.z()
 						, key.X(), key.Y(), cell->neighbors().size()) ;
 
 	// Are we forcibly removing an STO rather than expiring one due to old age?

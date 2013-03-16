@@ -24,5 +24,5 @@ extern SINT32 sendToClientRoomList(SINT32 connection, RoomList& roomList) ;
 extern SINT32 mmBroadcastMission(Mission* mission);
 //send a mission to a specific server
 extern SINT32 mmSendExistingMissionTo(Mission* mission, UINT32 server);
-extern SINT32 mmSendMissionResults(Player* player);
+extern SINT32 mmSendMissionResults(Player& player);
 

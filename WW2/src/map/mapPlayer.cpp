@@ -892,14 +892,6 @@ Player::deflateMissionPacket()
 bool
 Player::evaluateMissionPacket()
 {
-#ifdef BETA_RELEASE
-	///TEMPORARY
-	if ( playerID() <= DEFAULT_PLAYER_ID )
-	{
-		dbugLog(_FLW, "t:%d Evaluating player ID: %d", teulIndex(), playerID()) ;
-	}
-#endif
-
 	m_promoted = false ;
 
 	if ( !validMissionPacket() )
@@ -1221,7 +1213,7 @@ Player::processCapacityResponse(const FULL_OBJ_ID& rtbFacility_, const WEAPON_SE
 
 	SetSideLock() ;
 
-	mmSendMissionResults(this);
+	mmSendMissionResults(*this);
 
 	if ( mission() )
 		sendFullMissionTakerList() ;
@@ -1437,7 +1429,7 @@ Player::sendUpdateToChat()
 
 	// Since this is going to the chat host, we don't want to include
 	// the chat permissions mask in the mask we send
-	PermissionMask mask = m_playerMask | m_playerMask | useRank().permissions() ;
+	PermissionMask mask = m_playerMask | useRank().permissions() ;
 
 	Chat::PersonaUpdate cpu(matchHandle(), country(), branch(), realRank(), instance(), sortieID(), brigadeID(), missionID(), leader, origin, target, mask, weapon().spec, isSpawned(), isChecksumDirty()) ;
 	if ( cpu.send() < 0 )
@@ -1848,7 +1840,7 @@ mapReleasePlayer(SINT32 teulIndex, PlayerStatusNode* psn, Server::ReleaseType re
 		player->SetState(PERS_EXITING) ;
 
 		// Delete any vehicle reserved to this player
-		mmSpawnDeleteVehicle(player);
+		mmSpawnDeleteVehicle(*player);
 
 		player->SetInstance(Instance::g_invalid) ;
 

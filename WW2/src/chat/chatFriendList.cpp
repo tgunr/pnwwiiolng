@@ -330,7 +330,7 @@ chatModifySocialList(Player& player, ARGV& args, bool isIgnore)
 	HANDLES& list = (isIgnore) ? player.ignores() : player.friends() ;
 	HANDLES done ;
 	HANDLES::iterator it ;
-	for ( UINT32 i = 0 ; i < args.size() ; ++i )
+	for ( size_t i = 0 ; i < args.size() ; ++i )
 	{
 		ChatHandle handle = chatGetLowercaseHandle(args[i]) ;
 		if ( done.find(handle) != done.end() )

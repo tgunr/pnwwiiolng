@@ -63,7 +63,7 @@ SINT32
 Chat::Who::packer(LOGICAL mode, ACTION_OBJECT* a)
 {
 	if ( mode == TEUL_UNPACK )
-		memset(this, 0, sizeof(*this)) ;
+		new (this) Chat::Who();
 
 	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_handle, 0) ;
 	a->packer(mode, m_online) ;

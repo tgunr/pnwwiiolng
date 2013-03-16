@@ -603,19 +603,20 @@ _releaseNonMatchingPlayer(SINT32 teulIndex, const playerid_t playerID, UINT32 OT
 	if ( psn == NULL )
 		return NULL;
 
-	if ( psn->dispatch().m_OTP == OTP )
+	auto& dispatch = psn->dispatch();
+	if ( dispatch.m_OTP == OTP )
 		return psn;
 
 	// Sanity check
 	if ( psn->id != playerID && psn->id != 0 )
-		dbugLog(_FLA, "t:%d p:%u otp:%u old psn has id:%u", teulIndex, playerID, psn->dispatch().m_OTP, psn->id);
+		dbugLog(_FLA, "t:%d p:%u otp:%u old psn has id:%u", teulIndex, playerID, dispatch.m_OTP, psn->id);
 	if ( psn->dispatch().m_customerID != playerID )
-		dbugLog(_FLA, "t:%d p:%u otp:%u old psn has disp.p:%u", teulIndex, playerID, psn->dispatch().m_OTP, psn->dispatch().m_customerID);
+		dbugLog(_FLA, "t:%d p:%u otp:%u old psn has disp.p:%u", teulIndex, playerID, dispatch.m_OTP, dispatch.m_customerID);
 
 	const char* const foundPlayer = (ServerInterface::PlayerStatusNodeByPlayerID(playerID) == NULL) ? "no" : "yes";
 	const char* const foundTeul = (ServerInterface::PlayerStatusNodeByTeulIndex(teulIndex) == NULL) ? "no" : "yes";
 
-	dbugLog(_FLI, "t:%d p:%u otp mismatch, was:%u is:%u ot:%d. found by player:%s, found by teul:%s", teulIndex, playerID, psn->dispatch().m_OTP, OTP, psn->teulIndex, foundPlayer, foundTeul);
+	dbugLog(_FLI, "t:%d p:%u otp mismatch, was:%u is:%u ot:%d. found by player:%s, found by teul:%s", teulIndex, playerID, dispatch.m_OTP, OTP, psn->teulIndex, foundPlayer, foundTeul);
 	_playerRelease(psn->teulIndex, psn,  exitCode,  releaseType);
 
 	return NULL;
@@ -1172,7 +1173,7 @@ serverUpdate(void)
 			if ( server->m_lastRecv < cutoff )
 			{
 				dbugLog(_FLW, "%s serv:%s lastRecv too long, assuming server failed"
-								, g_serverTypes[server->stats.address], teulGetAddress(server->stats.address)
+								, g_serverTypes[server->stats.type], teulGetAddress(server->stats.address)
 								);
 				_releaseServer(server, Server::SCODE_TIMED_OUT);
 			}
