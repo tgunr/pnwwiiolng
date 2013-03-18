@@ -86,6 +86,8 @@ CFG_ADDR(baseUpdtAddress, "192.168.11.0", "BASE_UPDT_ADDRESS", true, "Network ad
 CFG_UINT(peerConnectionTimeout_ms, "20000", "PEER_CONNECTION_TIMEOUT_MS", "Number of miliseconds before a server-peer connection times out.");
 CFG_STRING(defaultInterface, NULL, "DEFAULT_IFACE", false, "Name of the network interface to treat as primary.");
 
+CFG_STRING(manageProcesses, NULL, "MANAGE_PROCESSES", false, "Semi-colon separated list of processes this host should run.");
+
 ////////////////////////////////////////////////////////////////////////////////
 // Read values from the environment or configuration file.
 
@@ -258,7 +260,7 @@ static void _getSortedConfigVars(std::vector<Teul::ConfigVar*>& myList)
 {
 	myList.reserve(_getConfigVars().size());
 	myList.assign(_getConfigVars().begin(), _getConfigVars().end());
-	std::sort(myList.begin(), myList.end(), [](const Teul::ConfigVar* lhs, const Teul::ConfigVar* rhs) { return strcasecmp(lhs->GetName(), rhs->GetName()) > 0; });
+	std::sort(myList.begin(), myList.end(), [](const Teul::ConfigVar* lhs, const Teul::ConfigVar* rhs) { return strcasecmp(rhs->GetEnvVarName(), lhs->GetEnvVarName()) > 0; });
 }
 
 void teulPrintConfigVars()
@@ -340,6 +342,8 @@ namespace Teul
 		ABORT_IF(name_ == nullptr);
 		ABORT_IF(required_ == true && envVarName_ == nullptr);
 
+		_getConfigVars().insert(this);
+
 		m_union.um_ptr = nullptr;
 
 		if ( IsNumber() )
@@ -353,8 +357,6 @@ namespace Teul
 			Set(envValue);
 			return;
 		}
-
-		_getConfigVars().insert(this);
 
 		if ( default_ != nullptr )
 			Set(default_);
