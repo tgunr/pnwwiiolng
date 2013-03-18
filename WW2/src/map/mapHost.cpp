@@ -54,7 +54,7 @@ PersonaSummaries::receive(SINT32 teulIndex)
 		return -EINVAL ;
 	}
 
-	dbugLog(_FLD, "t:%d p:%d c:%s persona summary request", teulIndex, player->playerID(), player->callsign()) ;
+	dbugLog(_FLD, "t:%d p:%u c:%s persona summary request", teulIndex, player->playerID(), player->callsign()) ;
 
 	// Persona must be at persona selection, so clobber everything
 	player->selectNullPersona() ;
@@ -93,7 +93,7 @@ PersonaSelection::_create(Player* const player)
 SINT32
 PersonaSelection::_delete(Player* const player)
 {
-	dbugLog(_FLW, "t:%d p:%d c:%s DELETE not implemented", player->teulIndex(), player->playerID(), player->callsign()) ;
+	dbugLog(_FLW, "t:%d p:%u c:%s DELETE not implemented", player->teulIndex(), player->playerID(), player->callsign()) ;
 	return _sendResult(player->teulIndex(), PSS_ERROR) ;
 }
 
@@ -116,7 +116,7 @@ PersonaSelection::_select(Player* const player)
 			return _create(player) ;
 
 		player->debug("Persona select failed", "no personaID specified") ;
-		dbugLog(_FLW, "t:%d p:%d c:%s attempt to select pid 0", player->teulIndex(), player->playerID(), player->callsign()) ;
+		dbugLog(_FLW, "t:%d p:%u c:%s attempt to select pid 0", player->teulIndex(), player->playerID(), player->callsign()) ;
 		return _sendResult(player->teulIndex(), PSS_ERROR) ;
 	}
 
@@ -142,7 +142,7 @@ PersonaSelection::_select(Player* const player)
 		break;
 		default:
 			player->debug("Persona select refused", "internal error") ;
-			dbugLog(_FLW, "t:%d p:%d c:%s unknown error %d loading persona", player->teulIndex(), player->playerID(), player->callsign(), pls) ;
+			dbugLog(_FLW, "t:%d p:%u c:%s unknown error %d loading persona", player->teulIndex(), player->playerID(), player->callsign(), pls) ;
 			return _sendResult(player->teulIndex(), PSS_ERROR) ;
 	}
 }
@@ -163,7 +163,7 @@ PersonaSelection::receive(SINT32 teulIndex)
 	if ( m_countryID <= WWII_NO_COUNTRY || m_countryID >= MAX_COUNTRIES )
 	{
 		player->debug("persona selection refused", "invalid country") ;
-		dbugLog(_FLW, "t:%d p:%d c:%s invalid country [%d]", player->teulIndex(), player->playerID(), player->callsign(), m_countryID) ;
+		dbugLog(_FLW, "t:%d p:%u c:%s invalid country [%d]", player->teulIndex(), player->playerID(), player->callsign(), m_countryID) ;
 		return _sendResult(player->teulIndex(), PSS_ERROR) ;
 	}
 	if ( !activeCountries[m_countryID] )
@@ -174,35 +174,35 @@ PersonaSelection::receive(SINT32 teulIndex)
 	if ( m_branchID < BRANCH_LAND || m_branchID > BRANCH_SEA )
 	{
 		player->debug("persona selection refused", "invalid branch") ;
-		dbugLog(_FLW, "t:%d p:%d c:%s invalid branch [%d]", player->teulIndex(), player->playerID(), player->callsign(), m_branchID) ;
+		dbugLog(_FLW, "t:%d p:%u c:%s invalid branch [%d]", player->teulIndex(), player->playerID(), player->callsign(), m_branchID) ;
 		return _sendResult(player->teulIndex(), PSS_ERROR) ;
 	}
 
 	switch ( m_status )
 	{
 		case PSS_NEW:
-			dbugLog(_FLI, "t:%d p:%d c:%s persona create request: st:%d, pid:%d, c:%d, b:%d"
+			dbugLog(_FLI, "t:%d p:%u c:%s persona create request: st:%d, pid:%d, c:%d, b:%d"
 							, teulIndex, player->playerID(), player->callsign()
 							, m_status, m_personaID, m_countryID, m_branchID
 							) ;
 			return _create(player) ;
 		break ;
 		case PSS_SELECT:
-			dbugLog(_FLI, "t:%d p:%d c:%s persona selection request: st:%d, pid:%d, c:%d, b:%d"
+			dbugLog(_FLI, "t:%d p:%u c:%s persona selection request: st:%d, pid:%d, c:%d, b:%d"
 							, teulIndex, player->playerID(), player->callsign()
 							, m_status, m_personaID, m_countryID, m_branchID
 							) ;
 			return _select(player) ;
 		break ;
 		case PSS_DELETE:
-			dbugLog(_FLI, "t:%d p:%d c:%s persona delete request: st:%d, pid:%d, c:%d, b:%d"
+			dbugLog(_FLI, "t:%d p:%u c:%s persona delete request: st:%d, pid:%d, c:%d, b:%d"
 							, teulIndex, player->playerID(), player->callsign()
 							, m_status, m_personaID, m_countryID, m_branchID
 							) ;
 			return _delete(player) ;
 		break ;
 		default:
-			dbugLog(_FLW, "t:%d p:%d c:%s invalid request type: %d", teulIndex, player->playerID(), player->callsign(), m_status) ;
+			dbugLog(_FLW, "t:%d p:%u c:%s invalid request type: %d", teulIndex, player->playerID(), player->callsign(), m_status) ;
 			return _sendResult(teulIndex, PSS_ERROR) ;
 	}
 
@@ -288,7 +288,7 @@ BrigadeSummaries::receive(SINT32 teulIndex)
 	}
 	catch (std::exception& e)
 	{
-		dbugLog(_FLA, "t:%d p:%d c:%s %s", teulIndex, player->playerID(), player->callsign(), e.what()) ;
+		dbugLog(_FLA, "t:%d p:%u c:%s %s", teulIndex, player->playerID(), player->callsign(), e.what()) ;
 
 		m_error = true ;
 		m_count = 0 ;
@@ -334,7 +334,7 @@ BrigadeSelection::receive(SINT32 teulIndex)
 	if ( m_detail.brigadeID() == 0 )
 	{
 		chatSendLocalizedMessage(player->playerID(), LSTR_CAUTION, LSTR_BDESEL_REFUSED_ID0) ;
-		dbugLog(_FLW, "t:%d p:%d c:%s brigade select request with brigade id 0"
+		dbugLog(_FLW, "t:%d p:%u c:%s brigade select request with brigade id 0"
 						, teulIndex, player->playerID(), player->callsign()) ;
 		return _sendResult(teulIndex, BRIG_MISSING) ;
 	}
@@ -342,7 +342,7 @@ BrigadeSelection::receive(SINT32 teulIndex)
 	if ( player->personaID() == 0 )
 	{
 		chatSendLocalizedMessage(player->playerID(), LSTR_CAUTION, LSTR_BDESEL_REFUSED_PERSONA) ;
-		dbugLog(_FLW, "t:%d p:%d c:%s brigade select request with no persona selected", teulIndex, player->playerID(), player->callsign()) ;
+		dbugLog(_FLW, "t:%d p:%u c:%s brigade select request with no persona selected", teulIndex, player->playerID(), player->callsign()) ;
 		return _sendResult(teulIndex, BRIG_ERROR) ;
 	}
 
@@ -350,7 +350,7 @@ BrigadeSelection::receive(SINT32 teulIndex)
 	if ( brigade == NULL )
 	{
 		chatSendLocalizedMessage(player->playerID(), LSTR_NONE, LSTR_BDESEL_REFUSED_BDE) ;
-		dbugLog(_FLW, "t:%d p:%d c:%s brigade select request for non-existant brigade %d"
+		dbugLog(_FLW, "t:%d p:%u c:%s brigade select request for non-existant brigade %d"
 						, teulIndex, player->playerID(), player->callsign(), m_detail.brigadeID()) ;
 		return _sendResult(teulIndex, BRIG_MISSING) ;
 	}
@@ -366,7 +366,7 @@ BrigadeSelection::receive(SINT32 teulIndex)
 		break ;
 
 		default:
-			dbugLog(_FLW, "t:%d p:%d c:%s invalid selection.m_status: %d"
+			dbugLog(_FLW, "t:%d p:%u c:%s invalid selection.m_status: %d"
 							, teulIndex, player->playerID(), player->callsign(), m_status) ;
 		return _sendResult(teulIndex, BRIG_ERROR) ;
 	}
@@ -417,14 +417,14 @@ MissionList::receive(SINT32 teulIndex)
 
 	if ( player->personaID() == 0 )
 	{
-		dbugLog(_FLW, "t:%d p:%d c:%s mission list without persona selected", player->teulIndex(), player->playerID(), player->callsign());
+		dbugLog(_FLW, "t:%d p:%u c:%s mission list without persona selected", player->teulIndex(), player->playerID(), player->callsign());
 		return _sendResult(teulIndex, MLR_NO_PERSONA) ;
 	}
 
 	Brigade* const brigade = player->brigade() ;
 	if ( brigade == NULL )
 	{
-		dbugLog(_FLW, "t:%d p:%d c:%s mission list without brigade selected", player->teulIndex(), player->playerID(), player->callsign());
+		dbugLog(_FLW, "t:%d p:%u c:%s mission list without brigade selected", player->teulIndex(), player->playerID(), player->callsign());
 		return _sendResult(teulIndex, MLR_NO_BRIGADE) ;
 	}
 
@@ -436,7 +436,7 @@ MissionList::receive(SINT32 teulIndex)
 	if ( brigade->actualMissions() == 0 )
 	{
 		player->message(LSTR_NOTE, LSTR_NO_ACTIVE_MISSIONS) ;
-		dbugLog(_FLD, "t:%d p:%d c:%s no missions for brigade", player->teulIndex(), player->playerID(), player->callsign());
+		dbugLog(_FLD, "t:%d p:%u c:%s no missions for brigade", player->teulIndex(), player->playerID(), player->callsign());
 		return _sendResult(teulIndex, MLR_OK) ;
 	}
 
@@ -487,7 +487,7 @@ MissionList::receive(SINT32 teulIndex)
 	if ( missionCount == 0 )
 	{
 		player->message(LSTR_NOTE, LSTR_NO_ACTIVE_MISSIONS) ;
-		dbugLog(_FLD, "t:%d p:%d c:%s no missions for brigade", player->teulIndex(), player->playerID(), player->callsign());
+		dbugLog(_FLD, "t:%d p:%u c:%s no missions for brigade", player->teulIndex(), player->playerID(), player->callsign());
 	}
 
 	_sendResult(teulIndex, MLR_OK) ;

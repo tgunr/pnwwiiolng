@@ -496,6 +496,8 @@ SET_PROPERTY(TARGET ${AUTH_HOST_EXE} PROPERTY FOLDER "Hosts")
 IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 	add_executable(${CONTROLLER_HOST_EXE}
 		src/controller.cpp
+		src/controllerGameProcess.cpp
+			src/controllerGameProcess.h
 	)
 	#ADD_PCH(${CONTROLLER_HOST_EXE})
 	set_property(TARGET ${CONTROLLER_HOST_EXE} PROPERTY COMPILE_DEFINITIONS AS_SERVER IS_CONTROLLER_HOST)

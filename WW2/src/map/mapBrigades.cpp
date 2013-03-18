@@ -152,7 +152,7 @@ Brigade::addPlayer(Player* const player)
 	{
 		if ( it->second != player )
 		{
-			dbugLog(_FLD, "t:%d p:%d c:%s stray player lingering in brigade list", player->teulIndex(), player->playerID(), player->callsign());
+			dbugLog(_FLD, "t:%d p:%u c:%s stray player lingering in brigade list", player->teulIndex(), player->playerID(), player->callsign());
 			it->second = player ;
 		}
 		return ;

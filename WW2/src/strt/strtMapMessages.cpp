@@ -317,7 +317,7 @@ static SINT32 _recvMMFacilityCapacityResponse(ACTION_OBJECT* const a)
 	}
 
 #ifdef STICK_DEBUG
-	dbugLog(_FLD, "t:%d p:%d c:%s tag %d fac.cap: %d rps: %d"
+	dbugLog(_FLD, "t:%d p:%u c:%s tag %d fac.cap: %d rps: %d"
 					, player->teulIndex(), player->playerID(), player->callsign()
 					, response.tag, response.capacity, response.totalRPs
 					) ;
@@ -453,7 +453,7 @@ strtSendMMSpawnGrantRequest(SINT32 connection, const WEAPON_SERIAL& weaponSerial
 
 	if ( player.validMissionPacket() )
 	{
-		dbugLog(_FLI, "t:%d p:%d c:%s spawnGrantRequest m:%u br:%u v:%u %s at %d.%d.%u"
+		dbugLog(_FLI, "t:%d p:%u c:%s spawnGrantRequest m:%u br:%u v:%u %s at %d.%d.%u"
 						, player.teulIndex()
 						, player.playerID()
 						, player.callsign()
@@ -481,7 +481,7 @@ strtSendMMSpawnGrantRequest(SINT32 connection, const WEAPON_SERIAL& weaponSerial
 		}
 		else
 		{
-			dbugLog(_FLA, "t:%d p:%d c:%s illegal missionType %d"
+			dbugLog(_FLA, "t:%d p:%u c:%s illegal missionType %d"
 							, player.teulIndex()
 							, player.playerID()
 							, player.callsign()
@@ -494,7 +494,7 @@ strtSendMMSpawnGrantRequest(SINT32 connection, const WEAPON_SERIAL& weaponSerial
 
 	if (retval < 0)
 	{
-		dbugLog(_FLI, "t:%d p:%d c:%s failed to send spawn grant request", player.teulIndex(), player.playerID(), player.callsign()) ;
+		dbugLog(_FLI, "t:%d p:%u c:%s failed to send spawn grant request", player.teulIndex(), player.playerID(), player.callsign()) ;
 		return retval;
 	}
 
@@ -612,14 +612,14 @@ _recvMissionDamageEvent(ACTION_OBJECT* const a)
 	Player* player = PlayerInterface::Lookup(incoming.m_playerID) ;
 	if ( player == NULL )
 	{
-		dbugLog(_FLI, "t:%d p:%d received mde for non-existant (logged out?) player", a->teulIndex, incoming.m_playerID) ;
+		dbugLog(_FLI, "t:%d p:%u received mde for non-existant (logged out?) player", a->teulIndex, incoming.m_playerID) ;
 		return -EINVAL ;
 	}
 
 	// Can we find their sortie?
 	if ( player->weapon().serial != incoming.m_sortieID )
 	{
-		dbugLog(_FLI, "t:%d p:%d c:%s mde has arrived too late", a->teulIndex, player->playerID(), player->callsign()) ;
+		dbugLog(_FLI, "t:%d p:%u c:%s mde has arrived too late", a->teulIndex, player->playerID(), player->callsign()) ;
 		return -EINVAL ;
 	}
 

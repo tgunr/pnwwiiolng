@@ -208,7 +208,7 @@ static const char* GetValueFromEnvironmentOrConfig(const char* name_)
 #else
 		TCHAR homepath[MAX_PATH];
 		SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, 0, homepath);
-		const TCHAR* paths[] = { _T(".\\"), _T("..\\"), _T("c:\\playnet\\etc\\"), homepath, nullptr };
+		const TCHAR* paths[] = { _T(".\\"), _T("c:\\playnet\\etc\\"), homepath, nullptr };
 #endif
 
 		IO::MappedFile file;

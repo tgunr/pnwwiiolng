@@ -91,7 +91,7 @@ _createMissionResults(const Player& player, MISSION_RESULTS& results)
 		const CPStruct* const cp = strtGetCP(origin) ;
 		if (cp == NULL)
 		{
-			dbugLog(_FLW, "t:%d p:%d c:%s Mission packet has invalid origin: %d.%d.%u"
+			dbugLog(_FLW, "t:%d p:%u c:%s Mission packet has invalid origin: %d.%d.%u"
 							, player.teulIndex(), player.playerID(), player.callsign()
 							, origin.cell.ox, origin.cell.oy, origin.id
 							) ;
@@ -248,7 +248,7 @@ _recvWEP_LIST_REQ(ACTION_OBJECT* const a)
 	// Check ownership before bothering the strat host.
 	if ( player.side() != facility->side )
 	{
-		dbugLog(_FLD, "t:%d p:%d c:%s side mismatch persona %d, facility %d", a->teulIndex, player.playerID(), player.callsign(), player.side(), facility->side) ;
+		dbugLog(_FLD, "t:%d p:%u c:%s side mismatch persona %d, facility %d", a->teulIndex, player.playerID(), player.callsign(), player.side(), facility->side) ;
 
 		// Notify the player why the weapon list can't be sent.
 		FacilityWeaponList reply(player.playerID(), request.facility) ;
@@ -260,7 +260,7 @@ _recvWEP_LIST_REQ(ACTION_OBJECT* const a)
 		return a->offset;
 	}
 
-	dbugLog(_FLD, "t:%d p:%d c:%s weapons request at %s, all: %d, refresh: %d, perm: %llx"
+	dbugLog(_FLD, "t:%d p:%u c:%s weapons request at %s, all: %d, refresh: %d, perm: %llx"
 					, a->teulIndex, player.playerID(), player.callsign()
 					, facility->name, request.allWeapons, request.isRefresh, player.permissionMask()
 					);
@@ -401,7 +401,7 @@ mmSendMissionResults(Player& player)
 	player.m_missionResults = new MISSION_RESULTS();
 	MISSION_RESULTS& results = *player.m_missionResults ;
 
-	dbugLog(_FLD, "t:%d p:%d c:%s m:%d mp:%p amp:%p", player.teulIndex(), player.playerID(), player.callsign(), player.missionID(), player.mission(), mapFindMission(player.missionID()));
+	dbugLog(_FLD, "t:%d p:%u c:%s m:%d mp:%p amp:%p", player.teulIndex(), player.playerID(), player.callsign(), player.missionID(), player.mission(), mapFindMission(player.missionID()));
 
 	if ( !_createMissionResults(player, results) )
 	{
@@ -424,7 +424,7 @@ mmSendMissionResults(Player& player)
 	player.clearSortieResults(false) ;
 
 	results.missionInvalid = (bool)(player.mission() == NULL) ;
-	dbugLog(_FLD, "t:%d p:%d c:%s m:%d mission is %s", player.teulIndex(), player.playerID(), player.callsign(), player.missionID(), (results.missionInvalid ? "invalid" : "valid"));
+	dbugLog(_FLD, "t:%d p:%u c:%s m:%d mission is %s", player.teulIndex(), player.playerID(), player.callsign(), player.missionID(), (results.missionInvalid ? "invalid" : "valid"));
 
 	// If they've got a reserved vehicle, we need to register it to them
 	if (
@@ -435,7 +435,7 @@ mmSendMissionResults(Player& player)
 		&& memcmp(&results.rtbFacility, &nullObjID, sizeof(nullObjID)) != 0
 		)
 	{
-		dbugLog(_FLD, "t:%d p:%d c:%s processing post accept for pre-reserved %s"
+		dbugLog(_FLD, "t:%d p:%u c:%s processing post accept for pre-reserved %s"
 						, player.teulIndex(), player.playerID(), player.callsign(), weapPrintName(&results.rtbReservedWeapon.spec));
 		memset(&fakeAccept, 0, sizeof(fakeAccept)) ;
 
@@ -460,7 +460,7 @@ mmSendMissionResults(Player& player)
 		else if ( results.rtbFacility.id == 0 )
 			msg = "no rtb facility" ;
 		else msg = "UNKNOWN" ;
-		dbugLog(_FLD, "t:%d p:%d c:%s NO RESERVED VEHICLE: %s", player.teulIndex(), player.playerID(), player.callsign(), msg);
+		dbugLog(_FLD, "t:%d p:%u c:%s NO RESERVED VEHICLE: %s", player.teulIndex(), player.playerID(), player.callsign(), msg);
 	}
 
 	player.SetState(PERS_AT_MISSION) ;
@@ -482,7 +482,7 @@ mmSendMissionResults(Player& player)
 			) ;
 	}
 
-	dbugLog(_FLI, "t:%d p:%d c:%s sending mission results reply m:%u el:%u k:%u h:%u succ:%u rtb:%u rank:%u p:%u pa:%u"
+	dbugLog(_FLI, "t:%d p:%u c:%s sending mission results reply m:%u el:%u k:%u h:%u succ:%u rtb:%u rank:%u p:%u pa:%u"
 					, player.teulIndex(), player.playerID(), player.callsign()
 					, results.missionID, results.elapsedTime, results.kills, results.numHits, results.missionSuccess, results.rtb, results.rank, results.pointsScored, results.pointsAccumulated
 					);

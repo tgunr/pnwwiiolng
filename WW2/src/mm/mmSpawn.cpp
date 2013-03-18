@@ -73,7 +73,7 @@ Player::cancelWeapon(bool notifyStrat)
 		case MM_VEH_POST_LIST_REQ:
 			if ( notifyStrat )
 			{
-				dbugLog(_FLD, "t:%d p:%d c:%s cancelling vehicle %d", teulIndex(), playerID(), callsign(), weapon().serial);
+				dbugLog(_FLD, "t:%d p:%u c:%s cancelling vehicle %d", teulIndex(), playerID(), callsign(), weapon().serial);
 				strtSendMMSpawnCancel(mapGetStratIndex(), playerID(), m_weapOrigin, weapon());
 			}
 			break;
@@ -85,7 +85,7 @@ Player::cancelWeapon(bool notifyStrat)
 			return;
 		break ;
 		default:
-			dbugLog(_FLA, "t:%d p:%d c:%s illegal vehicle state %d"
+			dbugLog(_FLA, "t:%d p:%u c:%s illegal vehicle state %d"
 							, teulIndex(), playerID(), callsign()
 							, vehicleState()
 							);
@@ -119,7 +119,7 @@ _spawnDisabledByGM(const Player& player)
 	if ( player.permissions(ALL_SPAWN) )
 		return false ;
 
-	dbugLog(_FLW, "t:%d p:%d c:%s spawn denied - arena locked", player.teulIndex(), player.playerID(), player.callsign()) ;
+	dbugLog(_FLW, "t:%d p:%u c:%s spawn denied - arena locked", player.teulIndex(), player.playerID(), player.callsign()) ;
 
 	return true ;
 }
@@ -407,7 +407,7 @@ mmProcessPostAccept(Player& player, const MM_POST_ACCEPT& post, UINT32 acceptTyp
 	if ( g_logDebug )
 	{
 		FacilityStruct* facility = strtGetFacility(post.facility) ;
-		dbugLog(_FLD, "t:%d p:%d c:%s reserved %s#%d [%s] at %s [%d.%d.%u]"
+		dbugLog(_FLD, "t:%d p:%u c:%s reserved %s#%d [%s] at %s [%d.%d.%u]"
 						, player.teulIndex(), player.playerID(), player.callsign()
 						, weapPrintName(&player.weapon().spec), post.weaponSerial.serial, weapPrintSpecC(&player.weapon().spec)
 						, facility->name
@@ -445,7 +445,7 @@ mmProcessPostAccept(Player& player, const MM_POST_ACCEPT& post, UINT32 acceptTyp
 	  	break ;
 
 	  default:
-		dbugLog(_FLW, "t:%d p:%d c:%s Unrecognized POST_ACCEPT_TYPE %d", player.teulIndex(), player.playerID(), player.callsign(), acceptType);
+		dbugLog(_FLW, "t:%d p:%u c:%s Unrecognized POST_ACCEPT_TYPE %d", player.teulIndex(), player.playerID(), player.callsign(), acceptType);
 	  	break ;
 	}
 
@@ -506,7 +506,7 @@ mmProcessPostExpired(const MM_POST_EXPIRED& expiry)
 	//	be redundant now, wouldn't it? :)
 	if ( player->isSpawned() == false &&  expiry.cancelled == false )
 	{
-		dbugLog(_FLD, "t:%d p:%d c:%s sending post expired for %s", player->teulIndex(), player->playerID(), player->callsign(), weapPrintName(&expiry.weaponSerial.spec));
+		dbugLog(_FLD, "t:%d p:%u c:%s sending post expired for %s", player->teulIndex(), player->playerID(), player->callsign(), weapPrintName(&expiry.weaponSerial.spec));
 		mmSendPostExpired(player->teulIndex(), expiry.weaponSerial);
 	}
 
@@ -620,7 +620,7 @@ mmProcessFECrewRequest(Player& player, const FE_CREW_REQUEST& request)
 bool
 mmProcessFEJoinRequest(Player& player, const FE_JOIN_REQUEST& request)
 {
-	dbugLog(_FLD, "t:%d p:%d c:%s requesting to join v:%d", player.teulIndex(), player.playerID(), player.callsign(), request.weaponSerial.serial) ;
+	dbugLog(_FLD, "t:%d p:%u c:%s requesting to join v:%d", player.teulIndex(), player.playerID(), player.callsign(), request.weaponSerial.serial) ;
 
 	//Ask the strat system about the message
 	strtSendMMJoinListRequest(mapGetStratIndex(), player.playerID(), request.weaponSerial, player.chatHandle(), TRUE);
@@ -698,7 +698,7 @@ mmProcessJoinDeny(const MM_JOIN_DENY& denial)
 	Player* const player = PlayerInterface::Lookup(denial.customerID);
 	if ( player == NULL || player->isAtLobby() == false )
 	{
-		dbugLog(_FLA, "p:%d no player for this customerID, ignoring joinDeny", denial.customerID) ;
+		dbugLog(_FLA, "p:%u no player for this customerID, ignoring joinDeny", denial.customerID) ;
 		return false;
 	}
 
@@ -747,21 +747,21 @@ mmProcessFEClientSpawn(Player& player, const FE_CLIENT_SPAWN& request)
 	Mission* mission = player.mission() ;
 	if ( mission == NULL )
 	{
-		dbugLog(_FLA, "t:%d p:%d c:%s player attempting to spawn without mission", player.teulIndex(), player.playerID(), player.callsign());
+		dbugLog(_FLA, "t:%d p:%u c:%s player attempting to spawn without mission", player.teulIndex(), player.playerID(), player.callsign());
 		player.postDenied(request.weaponSerial.spec, SPAWN_COMPLEX_DISABLED, true) ;
 		return false ;
 	}
 
 	if ( !player.mission()->ongoing() )
 	{
-		dbugLog(_FLA, "t:%d p:%d c:%s player attempting to spawn closed mission", player.teulIndex(), player.playerID(), player.callsign());
+		dbugLog(_FLA, "t:%d p:%u c:%s player attempting to spawn closed mission", player.teulIndex(), player.playerID(), player.callsign());
 		player.postDenied(request.weaponSerial.spec, SPAWN_COMPLEX_DISABLED, true) ;
 		return false ;
 	}
 
 	if ( !player.validMissionPacket() )
 	{
-		dbugLog(_FLA, "t:%d p:%d c:%s mission packet not ready for spawning", player.teulIndex(), player.playerID(), player.callsign());
+		dbugLog(_FLA, "t:%d p:%u c:%s mission packet not ready for spawning", player.teulIndex(), player.playerID(), player.callsign());
 		player.postDenied(request.weaponSerial.spec, SPAWN_COMPLEX_DISABLED, true) ;
 		return false ;
 	}
@@ -798,7 +798,7 @@ mmProcessFEClientSpawn(Player& player, const FE_CLIENT_SPAWN& request)
 	player.SetSideLock() ;
 	player.m_wantMobileSpawn = request.wantMobileSpawn ;
 #ifdef BETA_RELEASE
-	dbugLog(_FLD, "t:%d p:%d c:%s requested %s spawn", player.teulIndex(), player.playerID(), player.callsign()
+	dbugLog(_FLD, "t:%d p:%u c:%s requested %s spawn", player.teulIndex(), player.playerID(), player.callsign()
 					, ((player.m_wantMobileSpawn)?"mobile":"normal")
 					);
 #endif
@@ -816,7 +816,7 @@ mmProcessCrewBailed(const MM_CREW_BAILED& crewBailed)
 	Player* const player = PlayerInterface::Lookup(crewBailed.comanderID);
 	if ( player == NULL || player->isAtLobby() == false )
 	{
-		dbugLog(_FLW, "p:%d no player for this customerID, ignoring bail message", crewBailed.comanderID);
+		dbugLog(_FLW, "p:%u no player for this customerID, ignoring bail message", crewBailed.comanderID);
 		return false ;
 	}
 

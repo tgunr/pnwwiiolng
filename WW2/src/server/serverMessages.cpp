@@ -80,7 +80,7 @@ _recvPersonaExit(ACTION_OBJECT* const a)
 	Server::PersonaExit persExit ;
 	persExit.packer(TEUL_UNPACK, a) ;
 
-	dbugLog(_FLI, "t:%d p:%d c:%s otp:%u received personaExit ip:%s from %s"
+	dbugLog(_FLI, "t:%d p:%u c:%s otp:%u received personaExit ip:%s from %s"
 				, a->teulIndex
 				, persExit.dispatch().m_customerID
 				, persExit.dispatch().m_callsign

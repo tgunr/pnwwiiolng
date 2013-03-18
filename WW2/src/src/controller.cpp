@@ -8,10 +8,12 @@
 #include <event2/bufferevent.h>
 #include <event2/buffer.h>
 #include <event2/util.h>
+#include <set>
 
 #include "dbug/dbug.h"
 #include "teul/teulKit.h"
 #include "wwii/wwiiNetPorts.h"
+#include "src/controllerGameProcess.h"
 
 #if platOS == OS_WIN32
 #include <winsock2.h>
@@ -30,7 +32,7 @@
 
 // List of current clients and the bufferevent associated with each.
 #include <map>
-static std::map<int, bufferevent*> clients;
+static std::map<int, bufferevent*> s_clients;
 
 // TeulKit uses libevent and has an eventBase which it is going to initialize,
 // so we want to expose it to ourselves.
@@ -43,6 +45,14 @@ extern void teulGenerateEnvironmentCfgFile(const char* const filename);
 
 // Name of our server.
 const char* const g_serverName = "controller";
+
+// The once-per-second heartbeat event.
+static event* s_heartbeatEvent;
+static event* s_listenEvent;
+
+bool g_shuttingDown = false;
+
+extern ConfigStr cv_manageProcesses;
 
 ////////////////////////////////////////////////////////////////////////////////
 // TeulKit error handler.
@@ -80,7 +90,7 @@ static void _onEventBufferRead(struct bufferevent* bev, void* arg)
 		if ( n <= 0 || ebiov.iov_base == nullptr || ebiov.iov_len == 0 )
 			break;
 
-		for ( auto it = clients.begin(); it != clients.end(); ++it )
+		for ( auto it = s_clients.begin(); it != s_clients.end(); ++it )
 		{
 			auto destSock = it->first;
 			if ( destSock == srcSock )
@@ -136,7 +146,7 @@ static void _onEventBufferError(struct bufferevent* bev, short error, void* arg)
 	}
 
     bufferevent_free(bev);
-	clients.erase(cliSock);
+	s_clients.erase(cliSock);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -164,10 +174,10 @@ static void _onAccept(evutil_socket_t listener, short event, void* arg)
 	bufferevent_setcb(bev, _onEventBufferRead, nullptr, _onEventBufferError, (void*)cliSock);
 	bufferevent_enable(bev, EV_READ|EV_WRITE|EV_PERSIST);
 
-	const bool socketAlreadyRegistered = (clients.find(cliSock) != clients.end());
+	const bool socketAlreadyRegistered = (s_clients.find(cliSock) != s_clients.end());
 	ABORT_IF( socketAlreadyRegistered );
 
-	clients[cliSock] = bev;
+	s_clients[cliSock] = bev;
 
 	dbugLog(_FLN, "sock:%d connected from %s:%u", cliSock, teulGetAddress(ntohl(cliAddr.sin_addr.s_addr)), ntohs(cliAddr.sin_port));
 }
@@ -241,6 +251,84 @@ static void _processArguments(int argc, const char* argv[])
 }
 
 ////////////////////////////////////////////////////////////////////////////////
+// Check to see if we need to manage any processes.
+
+static void _addInitialProcesses()
+{
+	const char* p = cv_manageProcesses.GetString();
+	while ( p && *p )
+	{
+		const char* end = strchr(p, ';');
+		for ( UINT32 i = 0 ; i < MAX_SERVER_TYPE ; ++i )
+		{
+			if ( strncmp(g_serverTypes[i], p, strlen(g_serverTypes[i])) == 0 )
+			{
+				GameProcessManager::AddServer(static_cast<SERVER_TYPE>(i));
+				break;
+			}
+		}
+		p = end;
+		if ( p )	// it points to a semicolon
+			++p;	// which we want to skip.
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Schedule the heartbeat.
+
+static void _scheduleHeartbeatEvent()
+{
+	timeval one_sec = { 1, 0 };
+	event_add(s_heartbeatEvent, &one_sec);
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// Once-per-second event handling/checking.
+
+static void heartbeatFunction(evutil_socket_t /*-1*/, short /*eventBits*/, void* /*arg*/)
+{
+	GameProcessManager::Heartbeat();
+	_scheduleHeartbeatEvent();
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Clean shutdown
+
+static void _shutdownNetwork()
+{
+	for ( auto& it : s_clients )
+	{
+		evutil_closesocket(it.first);
+	}
+	s_clients.clear();
+
+	// If we reach this point, we are shutting down.
+	if ( s_heartbeatEvent )
+	{
+		event_free(s_heartbeatEvent);
+		s_heartbeatEvent = nullptr;
+	}
+	if ( s_listenEvent )
+	{
+		event_free(s_listenEvent);
+		s_listenEvent = nullptr;
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////
+// CTRL-C handler: Initiate shutdown.
+
+void _startShutdown(int /*signal*/)
+{
+	if ( !g_shuttingDown )
+	{
+		g_shuttingDown = true;
+		event_base_loopbreak(Teul::eventBase);
+		dbugLog(_FLA, "abort signal received: shutting down.");
+	}
+}
+
+////////////////////////////////////////////////////////////////////////////////
 // Entry point.
 
 int main(int argc, const char* argv[])
@@ -273,10 +361,32 @@ int main(int argc, const char* argv[])
 	if ( listen(listener, 16) < 0 )
 		LogAbort("Unable to listen on listen socket.");
 
+	// Prepare any libevent::events.
+
 	// Create an event to listen for new connections on this socket.
-	auto listenEvent = event_new(Teul::eventBase, listener, EV_READ|EV_PERSIST, _onAccept, (void*)Teul::eventBase);
+	s_listenEvent = event_new(Teul::eventBase, listener, EV_READ|EV_PERSIST, _onAccept, (void*)Teul::eventBase);
+	event_add(s_listenEvent, nullptr);
 
-	event_add(listenEvent, nullptr);
+	// Look for processes we're supposed to manage.
+	_addInitialProcesses();
 
+	// Once-a-second heartbeat tick.
+	s_heartbeatEvent = evtimer_new(Teul::eventBase, heartbeatFunction, nullptr);
+	_scheduleHeartbeatEvent();
+
+	signal(SIGINT, _startShutdown);
+
+	// Our mainloop is handled by libevent rather than teulkit.
 	event_base_dispatch(Teul::eventBase);
+
+	if ( g_shuttingDown == false )
+	{
+		dbugLog(_FLAS, "exited event_base_dispatch without being flagged as shutting down.");
+		g_shuttingDown = true;
+	}
+
+	// Kill all the child processes.
+	GameProcessManager::Shutdown();
+
+	_shutdownNetwork();
 }

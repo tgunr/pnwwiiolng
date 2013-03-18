@@ -1087,7 +1087,7 @@ Player::saveMissionPacket()
 		}
 		else
 		{
-			dbugLog(_FLW, "p:%d m:%u v:%u facility lookup failed: %d,%d.%u"
+			dbugLog(_FLW, "p:%u m:%u v:%u facility lookup failed: %d,%d.%u"
 							, playerID(), missionID(), sortieID()
 							, rtbFacility.cell.ox, rtbFacility.cell.oy, rtbFacility.id
 							) ;

@@ -293,17 +293,6 @@ commRecvVehicleUpdate(UINT32 serverAddress, const UCHAR* const buffer)
 //
 
 static SINT32
-_sendVoid(ACTION_OBJECT* const a)
-{
-	VOID_STRUCT* const v = (VOID_STRUCT*)a->localRawData;
-
-	return teulPackVoid(TEUL_PACK, a->packed, a->offset, v->data, v->size);
-}
-
-//////////////////////////////////////////////////////////////////////
-//
-
-static SINT32
 _sendPlayerExit(ACTION_OBJECT* const a)
 {
 	PLAYER_EXIT* const pe = (PLAYER_EXIT*) a->localRawData;
@@ -1348,7 +1337,6 @@ _registerClientCallbacks()
 	BEGIN_CALLBACK_REGISTRATION(Comm::CallbackX)
 
 		REGISTER_SENDER(GRANT_VEHICLE_JOIN_Y, _sendGrantVehicleJoin, _GRANT_VEHICLE_JOIN) ;
-		REGISTER_SENDER(HOST_HIT_Y, _sendVoid, _HOST_HIT) ;
 		REGISTER_SENDER(ACTIVATE_CLIENT_Y, _sendClientActivate, _ACTIVATE_CLIENT) ;
 		REGISTER_SENDER(RESUPPLY_ISSUE_Y, _sendResupplyIssue, _XFER_RESUPPLY_ISSUE) ;
 

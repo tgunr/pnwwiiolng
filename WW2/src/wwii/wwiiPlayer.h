@@ -168,3 +168,7 @@ public:
 
 extern SINT32 wwiiRegisterPlayerMessageCallback() ;
 
+#define PF_PLAYER "t:%d p:%u c:%s "
+#define VAPF_PLAYER(player) (player)->teulIndex(), (player)->playerID(), (player)->callsign()
+#define VAPF_PLAYER_INFO(teulIndex, playerID, callsign) (SINT32)(teulIndex), (UINT32)(playerID), (callsign)
+

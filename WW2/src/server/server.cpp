@@ -270,7 +270,7 @@ _extractPlayerFromServer(Server::ServerInfo* const server, PlayerStatusNode* con
 		return nullptr;
 	}
 
-	dbugLog(_FLD, "p:%d c:%s extracting player %p %s server %p ip %s id %llu: "
+	dbugLog(_FLD, "p:%u c:%s extracting player %p %s server %p ip %s id %llu: "
 				, psn->dispatch().m_customerID
 				, psn->dispatch().m_callsign
 				, psn
@@ -330,7 +330,7 @@ _sendPlayerStatusUpdate(const PlayerStatusNode& psn)
 	outgoing.setUnencrypted();
 	Server::PlayerStatusUpdate* const update = CONSTRUCT_IN_PACKET(outgoing, Server::PlayerStatusUpdate, psn);
 
-	dbugLog(_FLD, "p:%d c:%s sending update %d status %d server %llu"
+	dbugLog(_FLD, "p:%u c:%s sending update %d status %d server %llu"
 					, update->dispatch.m_customerID
 					, update->dispatch.m_callsign
 					, update->id
@@ -375,7 +375,7 @@ _pushPlayerToServer(Server::ServerInfo& server, PlayerStatusNode& psn)
 			break;
 	}
 
-	dbugLog(_FLD, "t:%d p:%d c:%s pushing player %p to %s server %p ip %s:%u id %llu"
+	dbugLog(_FLD, "t:%d p:%u c:%s pushing player %p to %s server %p ip %s:%u id %llu"
 				, psn.teulIndex, psn.dispatch().m_customerID, psn.dispatch().m_callsign
 				, &psn, g_serverTypes[server.stats.type], &server
 				, teulGetAddress(server.stats.address), server.stats.type, server.stats.id
@@ -815,7 +815,7 @@ _timeOutPlayers(void)
 		if ( elapsed < PLAYER_TIMEOUT )
 			continue;
 
-		dbugLog(_FLD, "t:%d p:%d c:%s timing out player after %lldms"
+		dbugLog(_FLD, "t:%d p:%u c:%s timing out player after %lldms"
 						, psn->teulIndex
 						, psn->id
 						, psn->dispatch().m_callsign

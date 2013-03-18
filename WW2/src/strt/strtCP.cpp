@@ -1492,7 +1492,7 @@ _recordJoulesApplied(const ObjectStruct& object
 		Teul::Packet outgoing(0, Strat::CallbackX, STRT_MM_DAMAGE_EVENT_Y) ;
 		auto* mde = CONSTRUCT_IN_PACKET(outgoing, MissionDamageEvent, playerID, weapon.serial, object.fullObjID.Key(), _getDamageTargetType(object, effectLevel), effectLevel, appliedJoules) ;
 
-		dbugLog(_FLI, "mapt:%d sending p:%d v:%d tt:%d ef:%d j:%lld mission damage event"
+		dbugLog(_FLI, "mapt:%d sending p:%u v:%u tt:%d ef:%d j:%lld mission damage event"
 						, mapEndpoint->teulIndex(), playerID, weapon.serial
 						, mde->m_targetType
 						, mde->m_effectType

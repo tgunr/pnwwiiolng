@@ -284,7 +284,7 @@ _processSpawnGrantResponse(const MM_SPAWN_GRANT_RESPONSE& grant
 		SINT32 crewResult = _sendSpawnNotify(*crew, grant, *commander, mobileSpawnID, x, y, z) ;
 		if ( crewResult < 0 )
 		{
-			dbugLog(_FLW, "t:%d p:%d c:%s error sending spawn notify to crew: %d"
+			dbugLog(_FLW, "t:%d p:%u c:%s error sending spawn notify to crew: %d"
 							, crew->teulIndex(), crew->playerID(), crew->callsign(), crewResult) ;
 			crew->SetWeapon(NULL_WEAP_SERIAL) ;
 			crew->updateMissionTaker(false) ;
@@ -382,14 +382,14 @@ mmProcessSpawnGrantResponse(const MM_SPAWN_GRANT_RESPONSE& grant)
 	PlayerStatusNode* const commandPlayer = ServerInterface::PlayerStatusNodeByPlayerID(grant.commander) ;
 	if ( commandPlayer == NULL )
 	{
-		dbugLog(_FLA, "p:%d v:%d No commandPlayer for vehicle to spawn", grant.commander, grant.weaponSerial.serial) ;
+		dbugLog(_FLA, "p:%u v:%u No commandPlayer for vehicle to spawn", grant.commander, grant.weaponSerial.serial) ;
 		return FALSE ;
 	}
 
 	Player* const commander = (Player*)commandPlayer->localInfo ;
 	if ( commander == NULL )
 	{
-		dbugLog(_FLA, "p:%d v:%d commander is NULL", grant.commander, grant.weaponSerial.serial) ;
+		dbugLog(_FLA, "p:%u v:%u commander is NULL", grant.commander, grant.weaponSerial.serial) ;
 		return FALSE ;
 	}
 
@@ -409,7 +409,7 @@ mmProcessSpawnGrantResponse(const MM_SPAWN_GRANT_RESPONSE& grant)
 	}
 	catch (SpawnGrantFailure& e)
 	{
-		dbugLog(_FLA, "t:%d p:%d c:%s v:%d crew:%d %s [FAIL: %d, lv:%s]"
+		dbugLog(_FLA, "t:%d p:%u c:%s v:%d crew:%d %s [FAIL: %d, lv:%s]"
 						, commander->teulIndex()
 						, commander->playerID()
 						, commander->callsign()
