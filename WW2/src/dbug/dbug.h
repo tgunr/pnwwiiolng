@@ -128,14 +128,11 @@ extern void		dbugSetErrno( int err);
 // with compatibility.
 extern int		dbugGetErrno(void);
 
-static inline void	noWrite(char* /*filename*/, int /*lineno*/, unsigned int /*errType*/, char* /*fmt*/, ...)
-{
-}
-
 // dbugLog: if the current filename, lineno or string is NULL then it sets these members. The
 // parameters are output as a string to the debug file depending on the debug level selected and
 // the current error type.  calls handlers.
-extern int	_dbugLog(const char* filename, int lineno, unsigned int errType, const char* fmt, ...) __attribute__ ((format (printf,4,5))) ;
+extern int _dbugLog(const char* filename, int lineno, unsigned int errType, const char* fmt, ...) __attribute__ ((format (printf,4,5))) ;
+extern int _dbugLogV(const char* filename, int lineno, unsigned int errType, const char* fmt, va_list& args);
 
 extern NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, unsigned int errType, const char* assertion, const char* fmt, ...);
 #define LogAbort(...) _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, NULL, __VA_ARGS__)
@@ -153,13 +150,17 @@ extern NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, uns
 	#ifdef NO_DEBUG_LOG
 		#if platOS == OS_LINUX
 			#define dbugLog(...)
+			#define dbugLogV(...)
 		#elif platOS == OS_WIN32
-			#define dbugLog _dbugLog
+			#define dbugLog(...) _dbugLog(__VA_ARGS__)		//} Seems like this should be
+			#define dbugLogV(...) _dbugLogV(__VA_ARGS__)	//} the same as the others???
 		#elif platOS == OS_MACOS
 			#define dbugLog(...)
+			#define dbugLogV(...)
 		#endif
 	#else
 		#define dbugLog _dbugLog
+		#define dbugLogV _dbugLogV
 	#endif
 #endif
 
