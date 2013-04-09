@@ -53,10 +53,8 @@ public:
 	int vformatText(const char* fmt, va_list args)
 	{
 		const int result = std::min(vsnprintf(m_text, DBUG_MAX_STRING, fmt, args), (int)DBUG_MAX_STRING - 1) ;
-		if ( result >= 0 )
-		{
+		if ( static_cast<UINT64>(result) < DBUG_MAX_STRING )
 			m_text[result] = 0 ;
-		}
 		return result ;
 	}
 
