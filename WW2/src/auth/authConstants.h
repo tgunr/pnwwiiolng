@@ -11,7 +11,6 @@
 
 //Setup the callback x and y values
 
-//We want this to be a low priority callback
 namespace Auth
 {
 	enum { CallbackX = 250 } ;
