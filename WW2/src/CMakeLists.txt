@@ -4,10 +4,6 @@ PROJECT (GameHosts)
 ################################################################################
 ## Configuration.
 
-IF ( UNIX AND NOT IS_DIRECTORY "/playnet/" )
-	message(SEND_ERROR "No /playnet folder")
-ENDIF ( )
-
 ENABLE_TESTING()
 SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmakeincludes")
 SET(PROJECT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../..")
@@ -36,6 +32,9 @@ IF ( PN_BUILD_TYPE MATCHES "Auth" OR PN_CLUSTER MATCHES "Auth" )
 ENDIF ( )
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/hostproj ${CMAKE_CURRENT_BINARY_DIR})
+
+# Define and validate the default top-level for this build.
+include ( cmakeincludes/PlaynetPath.cmake )
 
 # Define and validate user-specifiable options.
 include ( cmakeincludes/UserOptions.cmake )
@@ -330,9 +329,6 @@ add_library (libwwii
 	dbse/dbseClientMessages.cpp
 		dbse/dbseClientMessages.h
 	dbse/dbsePackers.cpp
-	wwii/wwiiClusterConfig.cpp
-		wwii/wwiiClusterConfig.h
-			str/strdupptr.h
 	src/configVars.cpp
 
 	sdm/sdmConfigVars.h
@@ -342,7 +338,6 @@ add_library (libwwii
 	${PCH_INCLUDE_HEADERS}
 	include/io_mapped_file.h
 	str/strdupptr.h
-	wwii/wwiiClusterConfig.h
 	wwii/wwiiNetPorts.h
 	wwii/wwiiCallbacks.h
 	wwii/wwiiThreads.h
@@ -1280,15 +1275,15 @@ ENDIF ( )
 SET(CPACK_COMPONENTS_ALL game lua web auth)
 
 SET(CPACK_GENERATOR "DEB")
-SET(CPACK_INSTALL_PREFIX "/playnet/wwiiol")
+SET(CPACK_INSTALL_PREFIX "${_PLAYNET}/wwiiol")
 SET(CPACK_SET_DESTDIR ON)
-SET(CPACK_PACKAGING_INSTALL_PREFIX "/playnet/wwiiol")
+SET(CPACK_PACKAGING_INSTALL_PREFIX "${_PLAYNET}/wwiiol")
 SET(OptLevel "NoOptimization")
 IF ( PN_ENABLE_OPTS AND OPTIMIZATION GREATER 0 )
  SET(OptLevel "OptLevel${OPTIMIZATION}")
 ENDIF ( )
 SET(CPACK_PACKAGE_VERSION "${REPO_WC_REVISION}.${CMAKE_BUILD_TYPE}.${BUILDNAME}.${OptLevel}")
-SET(CPACK_OUTPUT_FILE_PREFIX "/playnet/packages")
+SET(CPACK_OUTPUT_FILE_PREFIX "${_PLAYNET}/packages")
 SET(CPACK_PACKAGE_VENDOR "Cornered Rat Software")
 SET(CPACK_PACKAGE_NAME "wwiiol")
 SET(CPACK_PACKAGE_DESCRIPTION_SUMMARY "WWII Online game servers")
