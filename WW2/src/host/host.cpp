@@ -2909,6 +2909,7 @@ static const char* g_serverName = "hostd";
 int
 main(const int argc, const char* const argv[])
 {
+	Teul::ConfigVar::InitializeConfigVars();
 	serverEnableDebugWebServer(CELL_HOST) ;
 	memInit() ;
 

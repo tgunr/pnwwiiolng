@@ -28,6 +28,9 @@ extern bool teulGetHost(const SCHAR* address, UINT32* host);
 #define CFG_ADDR(Name_, Default_, EnvName_, Required_, Description_)	\
 	ConfigAddr cv_##Name_ ( CVT_IP_ADDRESS, #Name_, Default_, EnvName_, Required_, Description_ )
 
+#define CFG_PATH(Name_, Default_, EnvName_, Required_, Description_)	\
+	ConfigStr cv_##Name_ ( CVT_PATH, #Name_, Default_, EnvName_, Required_, Description_ )
+
 static const char* const s_configVarTypes[NUM_CONFIG_VAR_TYPES] =
 {
 	"string"
@@ -40,19 +43,19 @@ static const char* const s_configVarTypes[NUM_CONFIG_VAR_TYPES] =
 ////////////////////////////////////////////////////////////////////////////////
 // Variables.
 
-CFG_STRING(dataDir, "/playnet/data", "DATA_DIR", true, "Top level directory for game data.");
-CFG_STRING(importFile, "importlist.txt", "IMPORT_FILE", true, "File which will specify sdm files to be used by the server.");
-CFG_STRING(terrainSubdir, "terrain", "TERRAIN_SUBDIR", true, "Path from DATA_DIR to the terrain sdm files and origin file.");
-CFG_STRING(originFile, "origin", "ORIGIN_FILE", true, "Name of the file which identifies where the sdm files came from.");
+CFG_PATH(dataDir, PN_PLAYNET_PATH PATH_SEPSTR "wwiiol" PATH_SEPSTR "data", "DATA_DIR", true, "Top level directory for game data.");
+CFG_PATH(importFile, "importlist.txt", "IMPORT_FILE", true, "File which will specify sdm files to be used by the server.");
+CFG_PATH(terrainSubdir, "terrain", "TERRAIN_SUBDIR", true, "Path from DATA_DIR to the terrain sdm files and origin file.");
+CFG_PATH(originFile, "origin", "ORIGIN_FILE", true, "Name of the file which identifies where the sdm files came from.");
 CFG_STRING(stratLanguage, "en", "STRAT_LANGUAGE", true, "2-letter language code for server localization.");
-CFG_STRING(thblitzPath, SUB_PATH("th_blitz", "weapon"), "THBLITZ_PATH", true, "Path from DATA_DIR to the thBlitz csv files.");
+CFG_PATH(thblitzPath, "th_blitz" PATH_SEPSTR "weapon", "THBLITZ_PATH", true, "Path from DATA_DIR to the thBlitz csv files.");
 CFG_BOOL(stratIgnoreErrors, "0", "STRAT_IGNORE_ERRORS", "Disables sdm-loading errors from causing termination.");
-CFG_STRING(blitzworPath, "blitzWor.csv", "BLITZWOR_PATH", true, "DATA_DIR-relative path/filename for the blitzWor csv file");
-CFG_STRING(luaPath, "/playnet/wwiiol/lua", "LUA_BASE_PATH", true, "Path to the Lua scripts.");
-CFG_STRING(defaultLogPath, NULL, "LOG_PATH", false, "Default location for log files.");
-CFG_STRING(teulWebPath, "/playnet/wwiiol/web/debug", "TEUL_UWEB_PATH", true, "Path to the top-level directory for the internal web server.");
-CFG_STRING(luaRCFile, "rc.lua", "LUA_RC_FILE", true, "Name of the startup (rc) Lua script");
-CFG_STRING(luaStratlibFile, "stratlib.lua", "LUA_STRATLIB_FILE", true, "Name of the Lua strat library.");
+CFG_PATH(blitzworPath, "blitzWor.csv", "BLITZWOR_PATH", true, "DATA_DIR-relative path/filename for the blitzWor csv file");
+CFG_PATH(luaPath, PN_PLAYNET_PATH PATH_SEPSTR "wwiiol" PATH_SEPSTR "lua", "LUA_BASE_PATH", true, "Path to the Lua scripts.");
+CFG_PATH(defaultLogPath, NULL, "LOG_PATH", false, "Default location for log files.");
+CFG_PATH(teulWebPath, PN_PLAYNET_PATH PATH_SEPSTR "wwiiol" PATH_SEPSTR "web" PATH_SEPSTR "debug", "TEUL_UWEB_PATH", true, "Path to the top-level directory for the internal web server.");
+CFG_PATH(luaRCFile, "rc.lua", "LUA_RC_FILE", true, "Name of the startup (rc) Lua script");
+CFG_PATH(luaStratlibFile, "stratlib.lua", "LUA_STRATLIB_FILE", true, "Name of the Lua strat library.");
 
 CFG_ADDR(wwiiDBAddress, nullptr, "WWII_DB_ADDRESS", true, "IP address of the MySQL Database.");
 CFG_STRING(wwiiDBDefaultSchema, "wwiionline", "WWII_DB_SCHEMA", true, "Default schema for game data.");
@@ -86,7 +89,33 @@ CFG_ADDR(baseUpdtAddress, "192.168.11.0", "BASE_UPDT_ADDRESS", true, "Network ad
 CFG_UINT(peerConnectionTimeout_ms, "20000", "PEER_CONNECTION_TIMEOUT_MS", "Number of miliseconds before a server-peer connection times out.");
 CFG_STRING(defaultInterface, NULL, "DEFAULT_IFACE", false, "Name of the network interface to treat as primary.");
 
-CFG_STRING(manageProcesses, NULL, "MANAGE_PROCESSES", false, "Semi-colon separated list of processes this host should run.");
+CFG_STRING(manageProcesses, NULL, "MANAGE_PROCESSES", false, "Semi-colon separated list of processes this machine should run.");
+
+//////////////////////////////////////////////////////////////////////////
+// Helper for creating ensuring a string is in native path style and
+// doesn't have trailing slashes.
+
+static char* _makeNativePath(const char* const path_)
+{
+	ABORT_IF( path_ == nullptr );
+	if ( *path_ == 0 )
+		return nullptr;
+
+	// Trim trailing slashes off of path names.
+	char nativePath[1024];
+	size_t len = snprintf(nativePath, sizeof(nativePath), "%s", path_);	// Get length in first pass.
+	if ( len >= sizeof(nativePath) )
+		LogAbort("Invalid path: %s", path_);
+	while ( len > 0 && (nativePath[len-1] == '/' || nativePath[len-1] == '\\') )
+		nativePath[--len] = 0;
+#if defined(WIN32)
+	// Perform path naturalization for Windows.
+	char* p;
+	while ( (p = strchr(nativePath, '/')) != nullptr )
+		*p = '\\';
+#endif
+	return strdup(nativePath);
+}
 
 ////////////////////////////////////////////////////////////////////////////////
 // Read values from the environment or configuration file.
@@ -204,11 +233,11 @@ static const char* GetValueFromEnvironmentOrConfig(const char* name_)
 	if ( configEntries.m_read == false )
 	{
 #if platOS != OS_WIN32
-		const char* paths[] = { "./", "/playnet/etc/", "/etc/", nullptr };
+		const char* paths[] = { "./", PN_PLAYNET_PATH "/etc/", "/etc/", nullptr };
 #else
 		TCHAR homepath[MAX_PATH];
 		SHGetFolderPath(NULL, CSIDL_PROFILE, NULL, 0, homepath);
-		const TCHAR* paths[] = { _T(".\\"), _T("c:\\playnet\\etc\\"), homepath, nullptr };
+		const TCHAR* paths[] = { _T(".\\"), _T(PN_PLAYNET_PATH) _T("\\etc"), homepath, nullptr };
 #endif
 
 		IO::MappedFile file;
@@ -318,6 +347,13 @@ void teulGenerateEnvironmentCfgFile(const char* const filename_)
 
 namespace Teul
 {
+	void ConfigVar::InitializeConfigVars()
+	{
+		for ( auto it : _getConfigVars() )
+		{
+			it->Initialize();
+		}
+	}
 
 	bool ConfigVar::LoadedGeneralConfig()
 	{
@@ -337,6 +373,7 @@ namespace Teul
 		, m_default(default_)
 		, m_value(nullptr)
 		, m_required(required_)
+		, m_initialized(false)
 	{
 		ABORT_IF(envVarName_ == nullptr);
 		ABORT_IF(name_ == nullptr);
@@ -345,24 +382,31 @@ namespace Teul
 		_getConfigVars().insert(this);
 
 		m_union.um_ptr = nullptr;
+	}
+
+	void ConfigVar::Initialize()
+	{
+		if ( m_initialized )
+			return;
+		m_initialized = true;
 
 		if ( IsNumber() )
 			m_value = static_cast<char*>(calloc(1, MaxIntStringSize));
 
-		const char* envValue = GetValueFromEnvironmentOrConfig(envVarName_);
+		const char* envValue = GetValueFromEnvironmentOrConfig(m_envVarName);
 		if ( envValue != nullptr )
 		{
 			if ( m_required == true && *envValue == 0 )
-				LogAbort("Invalid (empty) value for %s ('%s').", envVarName_);
+				LogAbort("Invalid (empty) value for %s ('%s').", m_envVarName);
 			Set(envValue);
 			return;
 		}
 
-		if ( default_ != nullptr )
-			Set(default_);
+		if ( m_default != nullptr )
+			Set(m_default);
 
 		if ( m_required && (m_value == nullptr || (m_default == nullptr && *m_value == 0)) )
-			LogAbort("Config variable %s (%s) must be defined with a non-empty value.", name_, envVarName_);
+			LogAbort("Config variable %s (%s) must be defined with a non-empty value.", m_name, m_envVarName);
 	}
 
 	ConfigVar::~ConfigVar()
@@ -380,6 +424,7 @@ namespace Teul
 		case CVT_SIGNED_INT: SetSint32Value(newValue_); break;
 		case CVT_BOOL: SetBoolValue(newValue_); break;
 		case CVT_IP_ADDRESS: SetIPAddressValue(newValue_); break;
+		case CVT_PATH: SetPathValue(newValue_); break;
 		}
 	}
 
@@ -387,6 +432,7 @@ namespace Teul
 	{
 		if ( m_type == CVT_STRING ) return SetStringValue(newValue_);
 		else if ( m_type == CVT_IP_ADDRESS ) return SetIPAddressValue(newValue_);
+		else if ( m_type == CVT_PATH ) return SetPathValue(newValue_);
 		LogAbort("Incompatible use of %s::SetString", GetName());
 	}
 
@@ -411,8 +457,9 @@ namespace Teul
 
 	void ConfigVar::SetStringValue(const char* newValue_)
 	{
-		if ( newValue_ == m_value )
+		if ( m_initialized && newValue_ == m_value )
 			return;
+		m_initialized = true;
 		if ( m_value )
 			free(m_value);
 		m_value = newValue_ ? strdup(newValue_) : nullptr;
@@ -425,6 +472,7 @@ namespace Teul
 			SetUint32Value(strtoul(newValue_, NULL, 10));
 		else
 		{
+			m_initialized = true;
 			m_union.um_uint32 = 0U;
 			m_value[0] = '\0';
 		}
@@ -436,6 +484,7 @@ namespace Teul
 			SetSint32Value(strtol(newValue_, NULL, 10));
 		else
 		{
+			m_initialized = true;
 			m_union.um_sint32 = 0;
 			m_value[0] = '\0';
 		}
@@ -443,6 +492,7 @@ namespace Teul
 
 	void ConfigVar::SetBoolValue(const char* newValue_)
 	{
+		m_initialized = true;
 		if ( newValue_ == nullptr )
 		{
 			m_union.um_bool = false;
@@ -465,8 +515,9 @@ namespace Teul
 
 	void ConfigVar::SetIPAddressValue(const char* newValue_)
 	{
-		if ( newValue_ == m_value )
+		if ( m_initialized && newValue_ == m_value )
 			return;
+		m_initialized = true;
 		if ( m_value )
 		{
 			free(m_value);
@@ -491,18 +542,31 @@ namespace Teul
 		m_value = strdup(newValue_);
 	}
 
+	void ConfigVar::SetPathValue(const char* newValue_)
+	{
+		if ( m_initialized && newValue_ == m_value )
+			return;
+		m_initialized = true;
+		if ( m_value )
+			free(m_value);
+		m_value = newValue_ ? _makeNativePath(newValue_) : nullptr;
+		m_union.um_ptr = m_value;
+	}
+
 	void ConfigVar::SetUint32Value(UINT32 newValue_)
 	{
-		if ( newValue_ == GetUint32() )
+		if ( m_initialized && newValue_ == m_union.um_uint32 )
 			return;
+		m_initialized = true;
 		m_union.um_uint32 = newValue_;
 		snprintf(m_value, MaxIntStringSize, "%u", newValue_);
 	}
 
 	void ConfigVar::SetSint32Value(SINT32 newValue_)
 	{
-		if ( newValue_ == GetSint32() )
+		if ( m_initialized && newValue_ == m_union.um_sint32 )
 			return;
+		m_initialized = true;
 		m_union.um_sint32 = newValue_;
 		snprintf(m_value, MaxIntStringSize, "%d", newValue_);
 	}
@@ -514,8 +578,9 @@ namespace Teul
 
 	void ConfigVar::SetIPAddressValue(UINT32 newValue_)
 	{
-		if ( newValue_ == GetUint32() )
+		if ( m_initialized && newValue_ == m_union.um_uint32 )
 			return;
+		m_initialized = true;
 		if ( m_value )
 		{
 			free(m_value);

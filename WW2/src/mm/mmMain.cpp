@@ -1085,6 +1085,7 @@ main(int argc, char* argv[])
 		exit(0) ;
 	}
 
+	Teul::ConfigVar::InitializeConfigVars();
 	serverEnableDebugWebServer(MAP_HOST) ;
 	memInit() ;
 

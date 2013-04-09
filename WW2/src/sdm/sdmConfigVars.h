@@ -3,8 +3,8 @@
 
 #include "teul/teulConfigVar.h"
 
-extern ConfigStr	cv_dataDir;
-extern ConfigStr	cv_importFile;
-extern ConfigStr	cv_terrainSubdir;
-extern ConfigStr	cv_originFile;
+extern ConfigPath	cv_dataDir;
+extern ConfigPath	cv_importFile;
+extern ConfigPath	cv_terrainSubdir;
+extern ConfigPath	cv_originFile;
 extern ConfigStr	cv_stratLanguage;

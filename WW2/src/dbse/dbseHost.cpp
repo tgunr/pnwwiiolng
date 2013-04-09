@@ -58,6 +58,7 @@ int main(int argc, char* argv[])
 {
 	SINT32 listenIndex;
 
+	Teul::ConfigVar::InitializeConfigVars();
 	Teul::SetAppName(g_serverName);
 	if (teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction) < 0)
 	{

@@ -83,6 +83,8 @@ _runTest(UINT32 address)
 int
 main(int argc, char* argv[])
 {
+	Teul::ConfigVar::InitializeConfigVars();
+
 	teulInitTransport(LOG_TO_FILE, "./testAuthConnect", NULL) ;
 
 	teulSyncClock() ;

@@ -26,8 +26,8 @@ std::string _luaSource = "?" ;		// Current source for commands/scripts etc
 std::string _luaSubSystem = "?" ;	// Part of the source
 Lua::SCRIPT_RESULTS _luaOutput ;
 
-extern ConfigStr cv_luaPath;
-extern ConfigStr cv_luaRCFile;
+extern ConfigPath cv_luaPath;
+extern ConfigPath cv_luaRCFile;
 
 //////////////////////////////////////////////////////////////////////
 // dbugLog wrapper that takes error level and text string

@@ -98,7 +98,9 @@ static SINT32
 _recvClusterDown(ACTION_OBJECT* const a)
 {
 	dbugLog(_FLW, "t:%d received Cluster Down command", a->teulIndex) ;
-	system("/playnet/bin/stophost") ;
+	///TODO: Move this to the controller or signal myself to shutdown, anything
+	///but invoking an external command!
+	system(PN_PLAYNET_PATH PATH_SEPSTR "bin" PATH_SEPSTR "stophost") ;
 	return -EINVAL ;
 }
 

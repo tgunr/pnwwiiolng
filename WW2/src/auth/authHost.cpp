@@ -866,6 +866,7 @@ const char* const g_serverName = "authHost";
 int
 main(int argc, char* argv[])
 {
+	Teul::ConfigVar::InitializeConfigVars();
 #ifdef BLOCK_AN_ADDRESS
 	teulGetHost(BLOCK_ADDRESS, &blockedIP);
 #endif
@@ -923,7 +924,6 @@ main(int argc, char* argv[])
 		LogAbort("failed to open game listening socket") ;
 
 	dbugLog(_FLN, "listening for games on port %u", WWII::Net::Ports::InternalAuth);
-	dbugLog(_FLN, "waiting for connections");
 
 	threadsEnable() ;
 

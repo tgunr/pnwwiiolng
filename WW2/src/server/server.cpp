@@ -1750,6 +1750,8 @@ serverGetClusterCapacity()
 
 int main(int argc, const char* argv[])
 {
+	Teul::ConfigVar::InitializeConfigVars();
+
 	if ( argc > 1 )
 	{
 		extern bool serverProcessCommandLine(int, const char**);

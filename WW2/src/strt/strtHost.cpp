@@ -56,10 +56,10 @@
 #include "include/luaGlue.h"
 #include "strt/strtHostLua.h"
 
-extern ObjectiveStats g_objectiveStats ;
+extern ObjectiveStats g_objectiveStats;
 
-DBHANDLE dbh ;
-DBCONNECTION dbConnection ;
+DBHANDLE dbh;
+DBCONNECTION dbConnection;
 
 #ifdef BETA_RELEASE
 	#define DEF_ERR_LEVEL Debug::ERR_DBUG
@@ -74,6 +74,12 @@ const char* HostLanguage = "en" ;
 
 static LOGICAL _exitSignaled = FALSE ;
 static bool _mustSyncChatHost = true ;
+extern int tolua_stratd_open(struct lua_State*) ;
+extern ConfigPath cv_luaPath;
+
+//////////////////////////////////////////////////////////////////////////
+// Users never directly connect to strat, so while we are aware of them
+// thru teul-server, we don't actually need to process them.
 
 static SINT32	_personaCreate(const Server::PersonaLogin& login, PlayerStatusNode& psn)
 {
@@ -99,11 +105,17 @@ static void	_personaErrorFunction (SINT32 teulIndex, const UCHAR* const data, SI
 {
 }
 
+//////////////////////////////////////////////////////////////////////////
 //This is my error function for bailing out of teulkit
+
 static void _cnvyErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error)
 {
 	dbugLog(_FLA,"cnvyErrorFunction: index %d code %d\n\n",teulIndex, error);
 }
+
+//////////////////////////////////////////////////////////////////////////
+// Theoretically invoked by teulKit shutting down - so what this actually
+// does is probably not a really good idea.
 
 static void _killConvoy(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error)
 {
@@ -119,6 +131,11 @@ static void _killConvoy(SINT32 teulIndex, const UCHAR* const data, SINT32 size, 
 	exit(0) ;
 }
 
+//////////////////////////////////////////////////////////////////////////
+// Handle a direct, explicit map connection.
+///TODO: Remove: Use serverPeer API instead now that it provides us a
+/// direct, TCP based connection to all peers.
+
 static void
 _acceptMapConnection(ENDPOINT& endpoint)
 {
@@ -131,7 +148,11 @@ static void _mapErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 
 	dbugLog(_FLN, "t:%d map connection closed", teulIndex);
 }
 
-static void _logSettings()
+//////////////////////////////////////////////////////////////////////////
+// Describe our configuration to the log file so we can tell at a glance
+// what is actually running when looking at log files.
+
+static void _describeBuildConfigurationToLogFile()
 {
 	dbugLog(_FLI, REPOSITORY_INFO " HOST FLAGS:") ;
 
@@ -165,6 +186,11 @@ static void _logSettings()
 
 	dbugLog(_FLIB, ".") ;
 }
+
+//////////////////////////////////////////////////////////////////////////
+// If the cluster has gone into a strange state, e.g. the map server is
+// restarting, put it into a "locked" state which disables things like
+// capture or kills, and also alert the players.
 
 static const char* _serverCode[] =
 {
@@ -221,6 +247,10 @@ _checkArenalock(Server::ServerInfo* server, Server::Status state)
 	}
 }
 
+//////////////////////////////////////////////////////////////////////////
+// teulServer API notifying us of a first time sighting of a process,
+// either it just started or we did.
+
 static SINT32
 _serverEnterCallback(Server::ServerInfo* server, Server::Code scode)
 {
@@ -267,6 +297,9 @@ _serverEnterCallback(Server::ServerInfo* server, Server::Code scode)
  	return 0;
 }
 
+//////////////////////////////////////////////////////////////////////////
+// teulServer API notifying us that a server process went away.
+
 static SINT32
 _serverLeaveCallback(Server::ServerInfo* server, Server::Code scode)
 {
@@ -287,6 +320,9 @@ _serverLeaveCallback(Server::ServerInfo* server, Server::Code scode)
 
  	return 0;
 }
+
+//////////////////////////////////////////////////////////////////////////
+// teulServer API providing us a heartbeat status for a server.
 
 static SINT32
 _serverStatusCallback(Server::ServerInfo* server, Server::Code scode)
@@ -335,12 +371,32 @@ _serverStatusCallback(Server::ServerInfo* server, Server::Code scode)
  	return 0;
 }
 
+//////////////////////////////////////////////////////////////////////////
+// Handle sig-int.
+
 static void
 _strtSIGINT(int signo)
 {
 	dbugLog(_FLI, "Received exit signal") ;
 	_exitSignaled = TRUE ;
 }
+
+//////////////////////////////////////////////////////////////////////////
+///HACK: Work around for firebases getting clobbered during startup by
+// deployments etc. We periodically save the current map state out as a
+// set of lua commands that we can replay to put things back as they
+// were.
+
+static void
+_restoreMapState()
+{
+	char mapStateScript[1024];
+	snprintf(mapStateScript, sizeof(mapStateScript), SUB_PATH("%s", "map-state.lua"), cv_luaPath.GetString());
+	Lua::RunScript(mapStateScript);
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Run various hearbeat events.
 
 static TeulTimeMS
 _housekeeping()
@@ -423,13 +479,15 @@ _housekeeping()
 	return (((teulClock64 + 5) / 100) + 1) * 100 ;
 }
 
-extern int tolua_stratd_open(struct lua_State*) ;
+//////////////////////////////////////////////////////////////////////////
+// Main entry point.
 
 const char* g_serverName = "stratd";
 
 int
 main(int argc, char* argv[])
 {
+	Teul::ConfigVar::InitializeConfigVars();
 	serverEnableDebugWebServer(STRAT_HOST) ;
 	memInit() ;
 
@@ -439,14 +497,13 @@ main(int argc, char* argv[])
 
 	Teul::SetAppName(g_serverName) ;
 	if (teulInitTransport(LOG_TO_FILE, g_serverName, _cnvyErrorFunction) < 0)
-	{
 		LogAbort("Cannot initialize teulTransport");
-	}
+
 	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | DEF_ERR_FLAGS));
 	dbugSetLogLevel((Debug::ERROR_TYPE)(DEF_ERR_LEVEL | DEF_ERR_FLAGS));
 	dbugLog(_FLN, "Strat Host starting. Compiled %s at %s", __DATE__, __TIME__);
 
-	_logSettings();
+	_describeBuildConfigurationToLogFile();
 	serverInitAddresses() ;
 
 	threadsReadDBEnvironment() ;
@@ -544,7 +601,8 @@ main(int argc, char* argv[])
 
 	signal(SIGINT, _strtSIGINT) ;
 
-	Lua::RunScript("/playnet/wwiiol/lua/map-state.lua") ;
+	// Run the map-restoration hack for restarts.
+	_restoreMapState();
 
 	if ( stratStartIntermission() == false )
 	{

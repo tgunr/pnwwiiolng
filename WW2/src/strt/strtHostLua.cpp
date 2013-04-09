@@ -28,7 +28,7 @@
 #include "strt/strtDotCommands.h"
 #include "include/arenaLockEnums.h"
 
-extern ConfigStr cv_luaRCFile, cv_luaStratlibFile;
+extern ConfigPath cv_luaRCFile, cv_luaStratlibFile;
 
 // Lua/Tolua API headers
 #ifdef __cplusplus
@@ -275,7 +275,7 @@ _execute(const char* name, bool dbOnly)
 	}
 	else if ( !dbOnly )
 	{
-		code = std::string(cv_luaPath.GetString()) + name + ".lua" ;
+		code = std::string(cv_luaPath.GetString()) + PATH_SEPARATOR + name + ".lua" ;
 		success = Lua::RunScript(code.c_str()) ;
 	}
 
@@ -315,7 +315,11 @@ stratStartIntermission()
 	if ( host_config.isIntermission() == false )
 		return true ;
 
-	if ( Lua::RunScript("/playnet/wwiiol/lua/becdwrapper.lua") == false )
+	// BECD is a tool written by xiper for creating map configurations,
+	// becdwrapper defines glue functions for reading/loading these.
+	char becdScript[1024];
+	snprintf(becdScript, sizeof(becdScript), SUB_PATH("%s", "becdwrapper.lua"), cv_luaPath.GetString());
+	if ( Lua::RunScript(becdScript) == false )
 	{
 		dbugLog(_FLA, "Unable to load intermission functions") ;
 		return false ;

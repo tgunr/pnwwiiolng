@@ -230,7 +230,7 @@ static NORETURN_FN void
 usage()
 {
 	fprintf(stderr, "Usage: %s [-x tarfile] [-C directory] [-h dbHost] [-I] [-O] [filename]\n", g_appName);
-	fprintf(stderr, " -x tarfile      Extract data from tarfile into /playnet/ to populate terrain\n");
+	fprintf(stderr, " -x tarfile      Extract data from tarfile into data directory (default %s) to populate terrain\n", cv_dataDir.GetString());
 	fprintf(stderr, " -C directory    Working directory [default: %s]\n", cv_dataDir.GetString());
 	fprintf(stderr, " -h dbHost       Specify IP of database [default: specified in %s]\n", cv_wwiiDBAddress.GetString());
 	fprintf(stderr, " -I              Disable irc\n");
@@ -328,6 +328,7 @@ int
 main(int argc,char** argv)
 {
 	g_appName = argv[0];
+	Teul::ConfigVar::InitializeConfigVars();
 
 	SCHAR* filename;
 	//LOGICAL moreFiles = TRUE;

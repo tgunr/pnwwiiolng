@@ -237,6 +237,7 @@ main(int argc, char* argv[])
         enableTestDebug = true ;
     }
 
+	Teul::ConfigVar::InitializeConfigVars();
     TestUnit::RunTests() ;
 
     exit(0) ;

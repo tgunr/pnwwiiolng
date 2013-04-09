@@ -130,6 +130,7 @@ static const char* g_serverName = "pingHost";
 int
 main(int /*argc*/, char** /*argv*/)
 {
+	Teul::ConfigVar::InitializeConfigVars();
 	teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction);
 
 	dbugSetWriteLevel(Debug::ERR_INFO | DEF_ERR_FLAGS);

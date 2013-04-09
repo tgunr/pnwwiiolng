@@ -2845,8 +2845,8 @@ _startShutdown()
 
 	serverBroadcastClusterShutdown() ;
 
-	if ( system("/playnet/bin/stophost &") < 0 )
-		LogAbort("system /playnet/bin/stophost & failed") ;
+	if ( system(PN_PLAYNET_PATH "/bin/stophost &") < 0 )
+		LogAbort("system " PN_PLAYNET_PATH "/bin/stophost & failed") ;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -3555,6 +3555,8 @@ const char* const g_serverName = "chatd";
 int
 main(int argc, char* argv[])
 {
+	Teul::ConfigVar::InitializeConfigVars();
+
 	serverEnableDebugWebServer(CHAT_HOST) ;
 	memInit() ;
 

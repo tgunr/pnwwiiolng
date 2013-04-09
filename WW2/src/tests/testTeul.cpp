@@ -793,6 +793,8 @@ _doCryptTests()
 int
 main(int argc, const char* const argv[])
 {
+	Teul::ConfigVar::InitializeConfigVars();
+
 	// Handle the command line.
 	_processArguments(argc, argv) ;
 

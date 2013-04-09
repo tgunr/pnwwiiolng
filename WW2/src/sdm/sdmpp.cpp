@@ -205,6 +205,8 @@ main(int argc, char** argv)
 {
 	program = argv[0] ;
 
+	Teul::ConfigVar::InitializeConfigVars();
+
 	for (int argn = 1; argn < argc; ++argn)
 	{
 		if(argv[argn][0] != '-')

@@ -35,7 +35,7 @@
 
 #if platBuild == TEUL_SERVER
 #include "teul/teulConfigVar.h"
-extern ConfigStr cv_defaultLogPath;
+extern ConfigPath cv_defaultLogPath;
 #endif
 
 #if platOS == OS_WIN32
@@ -166,11 +166,7 @@ _qualifyFilename(const char* filename, char* const output, const size_t outputSi
 		if ( defaultPath && defaultPath[0] != 0 )
 		{
 			OS_MKDIR(defaultPath, 0770);
-#if platOS == OS_WIN32
-			snprintf(output, outputSize, "%s\\%s", defaultPath, filename);
-#else
-			snprintf(output, outputSize, "%s/%s", defaultPath, filename);
-#endif
+			snprintf(output, outputSize, SUB_PATH("%s", "%s"), defaultPath, filename);
 			return;
 		}
 
@@ -782,7 +778,7 @@ _LogAbort(const char* file_, unsigned int line_, unsigned int error_, const char
 	}
 	MessageBoxA(0, message, caption, MB_OK | MB_ICONERROR | MB_APPLMODAL);
 
-#if defined(DEBUG)
+#if defined(_DEBUG)
 	__debugbreak();
 #endif
 

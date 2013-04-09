@@ -3,5 +3,5 @@
 
 #include "teul/teulConfigVar.h"
 
-extern ConfigStr cv_luaPath;
-extern ConfigStr cv_dataDir;
+extern ConfigPath cv_luaPath;
+extern ConfigPath cv_dataDir;

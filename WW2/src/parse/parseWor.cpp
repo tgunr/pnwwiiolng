@@ -33,7 +33,7 @@
 	#include "str/stringLib.h"
 	#include "wwii/wwiiConfigVars.h"
 
-extern ConfigStr cv_thblitzPath;
+extern ConfigPath cv_thblitzPath;
 #else
 	#include "fio/fio.h"
 #endif

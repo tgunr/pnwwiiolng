@@ -229,6 +229,7 @@ static void _processArguments(int argc, const char* argv[])
 
 			if ( strcasecmp(arg, "configs") == 0 )
 			{
+				Teul::ConfigVar::InitializeConfigVars();
 				teulPrintConfigVars();
 				exit(0);
 			}
@@ -336,6 +337,7 @@ int main(int argc, const char* argv[])
 	// Check arguments.
 	_processArguments(argc, argv);
 
+	Teul::ConfigVar::InitializeConfigVars();
 	if ( Teul::ConfigVar::LoadedConfig() == false )
 	{
 		teulGenerateEnvironmentCfgFile("environment.cfg");

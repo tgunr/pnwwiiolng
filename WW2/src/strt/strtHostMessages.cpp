@@ -67,7 +67,7 @@
 #include "wwii/wwiiServerTypeEnums.h"
 #include "wwii/wwiiString.h"
 
-extern ConfigStr cv_luaPath;
+extern ConfigPath cv_luaPath;
 
 #undef DEBUG_SYNC
 

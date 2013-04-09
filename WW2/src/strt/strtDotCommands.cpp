@@ -49,6 +49,7 @@
 #include "strt/strtWeaponUpdate.h"
 #include "teul/teulTime.h"
 #include "wwii/wwiiConfig.h"
+#include "wwii/wwiiConfigVars.h"
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiString.h"
 
@@ -1659,7 +1660,7 @@ static LOGICAL
 _dotRestart(char* arguments, OOBMessage& message)
 {
 	dbugLog(_FLA, "restarting the strat host") ;
-	if ( system("(sleep 1 ; /playnet/bin/stophost ; sleep 1 ; /playnet/bin/starthost) &") < 0 )
+	if ( system("(sleep 1 ; " PN_PLAYNET_PATH PATH_SEPSTR "bin" PATH_SEPSTR "stophost ; sleep 1 ; " PN_PLAYNET_PATH PATH_SEPSTR "bin" PATH_SEPSTR "starthost) &") < 0 )
 	{
 	    dbugLog(_FLA, "dotRetsart system call failed") ;
 	    RESPOND("System call failed") ;
@@ -1682,7 +1683,7 @@ _dotShutdownStrat(char* arguments, OOBMessage& message)
 	strtSaveTOESupplies() ;
 	OpenThreads::Thread::microSleep(1 * 1000 * 1000) ;
 
-    if ( system("/playnet/bin/stophost &") < 0 )
+    if ( system(PN_PLAYNET_PATH PATH_SEPSTR "bin" PATH_SEPSTR "stophost &") < 0 )
     {
         RESPOND("System call failed") ;
         LogAbort("dotShutdownStrat system call failed") ;
@@ -2214,8 +2215,8 @@ _dotRunLua(char* arguments, OOBMessage& message)
 	{
 		static const UINT32 FILENAME_SIZE = 160 ;
 		char filename[FILENAME_SIZE+1] ;
-		if ( publicMode ) snprintf(filename, FILENAME_SIZE, "/playnet/wwiiol/lua/public/%s.lua", script) ;
-		else snprintf(filename, FILENAME_SIZE, "/playnet/wwiiol/lua/%s.lua", script) ;
+		if ( publicMode ) snprintf(filename, FILENAME_SIZE, "%s" PATH_SEPSTR "public" PATH_SEPSTR "%s.lua", cv_luaPath.GetString(), script) ;
+		else snprintf(filename, FILENAME_SIZE, "%s" PATH_SEPSTR "%s.lua", cv_luaPath.GetString(), script) ;
 		success = Lua::RunScript(filename) ;
 	}
 

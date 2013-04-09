@@ -40,7 +40,7 @@
 #include "wwii/wwiiString.h"
 
 extern ConfigBool cv_stratIgnoreErrors;
-extern ConfigStr cv_blitzworPath;
+extern ConfigPath cv_blitzworPath;
 
 namespace Strat
 {

@@ -110,6 +110,8 @@ main(int argc, char** argv)
 		return 1 ;
 	}
 
+	Teul::ConfigVar::InitializeConfigVars();
+
 	for ( int i = 1 ; i < argc ; ++i )
 	{
 		_processFile(argv[i]) ;
