@@ -59,7 +59,7 @@ chatdbSquadInfo(SINT32 teulIndex, UINT32 squadID, bool /*sendMembers*/)
 		if ( q.HasRows() == false || q.FetchRow() == false )
 			throw std::logic_error("no rows for squad") ;
 
-		DBRow& row = q.Row() ;
+		auto& row = q.Row() ;
 		CHATDB_SQUAD_XCHG squadXchg ;
 		Squad& squad = squadXchg.data() ;
 
@@ -71,8 +71,8 @@ chatdbSquadInfo(SINT32 teulIndex, UINT32 squadID, bool /*sendMembers*/)
 		squad.m_created = row.NextUInt() ;
 
 		squad.m_flags = row.NextUInt() ;
-		squad.m_votingEnabled = row.NextUInt() != 0 ;
-		squad.m_recruiting = row.NextUInt() != 0 ;
+		squad.m_votingEnabled = (row.NextUInt() != 0);
+		squad.m_recruiting = (row.NextUInt() != 0);
 
 		squad.m_rookieDays = row.NextUInt() ;
 		squad.m_lastJoined = row.NextUInt() ;
