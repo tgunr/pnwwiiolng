@@ -316,7 +316,7 @@ serverSendPacketToType(Teul::Packet& outgoing, const SERVER_TYPE serverType)
 
 	outgoing.setUnencrypted() ;
 
-	for ( auto server : s_connections )
+	for ( auto& server : s_connections )
 	{
 		// Find servers matching the given type.
 		if ( (server.m_type != serverType) | (!server.m_connected) )
@@ -345,7 +345,7 @@ serverSendPacketToPeers(Teul::Packet& outgoing)
 
 	outgoing.setUnencrypted() ;
 
-	for ( auto server : s_connections )
+	for ( auto& server : s_connections )
 	{
 		// Find servers matching the given type.
 		if ( !server.m_connected )
@@ -378,7 +378,7 @@ serverSendCallbackToType(const SERVER_TYPE serverType, TEUL_CALLBACK* const tcb,
 
 	bool sent = false ;
 
-	for ( auto server : s_connections )
+	for ( auto& server : s_connections )
 	{
 		// Find servers matching the given type.
 		if ( (server.m_type != serverType) | (!server.m_connected) )
@@ -561,7 +561,7 @@ serverPeeringWithIP(const UINT32 ip, const SERVER_TYPE type_)
 bool
 serverPeeringWithType(const SERVER_TYPE serverType)
 {
-	for ( auto server : s_connections )
+	for ( auto& server : s_connections )
 	{
 		// Find servers matching the given type.
 		if ( (server.m_type == serverType) & (server.m_connected) )
@@ -577,7 +577,7 @@ ENDPOINT*
 serverPeerEndpointByType(const SERVER_TYPE serverType)
 {
 	ENDPOINT* endpoint = NULL ;
-	for ( auto server : s_connections )
+	for ( auto& server : s_connections )
 	{
 		// Find servers matching the given type.
 		if ( (server.m_type != serverType) | (!server.m_connected) )

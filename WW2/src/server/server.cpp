@@ -557,8 +557,9 @@ _playerDelete(PlayerStatusNode* const psn, Server::ReleaseType releaseType)
 static void
 _deleteAllPlayersOnServer(Server::ServerInfo* const server)
 {
-	for ( auto psn : server->m_players )
+	while ( !server->m_players.empty() )
 	{
+		auto psn = *(server->m_players.begin());
 		_playerDelete(psn, Server::RELEASE_ERROR);
 	}
 }
@@ -809,7 +810,8 @@ _releaseFn(SINT32 teulIndex, UINT32 customerID, UINT32 otp, Server::ReleaseType 
 static void
 _timeOutPlayers(void)
 {
-	for ( auto psn : _exitServer->m_players )
+	std::set<PlayerStatusNode*> timeouts = _exitServer->m_players;
+	for ( auto& psn : timeouts )
 	{
 		const TeulDeltaMS elapsed = psn->timeStamp.elapsed();
 		if ( elapsed < PLAYER_TIMEOUT )
@@ -823,6 +825,8 @@ _timeOutPlayers(void)
 						);
 
 		_playerRelease(psn->teulIndex, psn, 0, Server::RELEASE_DISCO);
+
+		_exitServer->m_players.erase(psn);
 	}
 }
 
@@ -1017,7 +1021,8 @@ serverFree(void)
 {
 	_leaveCallback = NULL;
 
-	for ( auto server : s_activeServerList )
+	auto servers = s_activeServerList;
+	for ( auto server : servers )
 	{
 		_deleteAllPlayersOnServer(server);
 		if ( server != &Server::myServerInfo )
@@ -1088,7 +1093,7 @@ Server::ServerInfo::GetBest(UINT16 type, bool allowFull/*=false*/)
 {
 	Server::ServerInfo* maxServer = NULL;
 
-	for ( auto server : s_activeServerList )
+	for ( auto& server : s_activeServerList )
 	{
 		if ( server->stats.type != type )
 			continue;
@@ -1106,7 +1111,7 @@ Server::ServerInfo::GetBest(UINT16 type, bool allowFull/*=false*/)
 bool
 Server::ServerInfo::IsAvailable(const UINT16 type_)
 {
-	for ( auto server : s_activeServerList )
+	for ( auto& server : s_activeServerList )
 	{
 		if ( server->stats.type == type_ && server->stats.status == SERVER_ACCEPTING )
 			return true;
@@ -1165,8 +1170,9 @@ serverUpdate(void)
 
 	if ( s_activeServerList.empty() == false && teulClock64 >= _nextUpdate )
 	{
-		for( auto server : s_activeServerList )
+		for( auto it = s_activeServerList.begin() ; it != s_activeServerList.end() ; )
 		{
+			auto& server = *(it++);
 			if (server == &Server::myServerInfo || server == _exitServer)
 				continue;
 
@@ -1687,7 +1693,7 @@ size_t
 serverGetPlayerCount(const UINT32 serverType)
 {
 	size_t total = 0;
-	for ( auto server : s_activeServerList )
+	for ( auto& server : s_activeServerList )
 	{
 		if ( server->stats.type == serverType )
 			total += server->stats.numPlayers();
@@ -1715,7 +1721,7 @@ serverGetClusterCapacity()
 	// Get a peak capacity for each server type.
 	size_t clusterCapacity = 0;
 	size_t typeCapacity[MAX_SERVER_TYPE] = { 0, 0, 0, 0, 0 };
-	for ( auto server : s_activeServerList )
+	for ( auto& server : s_activeServerList )
 	{
 		if ( server->stats.status < Server::SERVER_ACCEPTING )
 			continue;

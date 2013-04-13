@@ -449,9 +449,10 @@ static void heartbeatFunction(evutil_socket_t /*-1*/, short /*eventBits*/, void*
 
 static void _shutdownNetwork()
 {
-	for ( auto& it : s_clients )
+	for ( auto it = s_clients.begin(); it != s_clients.end(); )
 	{
-		evutil_closesocket(it.first);
+		evutil_socket_t sock = (it++)->first;
+		evutil_closesocket(sock);
 	}
 	s_clients.clear();
 

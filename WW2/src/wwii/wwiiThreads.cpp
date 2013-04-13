@@ -281,7 +281,7 @@ threadsLogging()
 	if ( logQueue.size() > logQueueMax )
 		logQueueMax = logQueue.size();
 
-	for ( auto it : logQueue )
+	for ( auto& it : logQueue )
 	{
 		const THREAD_LOG* entry = it;
 		if ( *entry->m_entry )
@@ -313,7 +313,7 @@ threadsCallNextCallback()
 	if ( callbackQueue.size() > cbQueueMax )
 		cbQueueMax = callbackQueue.size();
 
-	for ( auto it : callbackQueue )
+	for ( auto& it : callbackQueue )
 	{
 		try
 		{
