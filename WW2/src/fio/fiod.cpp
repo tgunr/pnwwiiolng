@@ -22,21 +22,12 @@
 # include <io.h>
 # include <Windows.h>	// WIN32_FIND_DATA, FindFirstFile, FindNextFile
 # include <direct.h>
-# if defined(lstrcat)
-#  undef lstrcat
-#  undef lstrcpy
-# endif
 #else
 # include <dirent.h>
 # include <unistd.h>
 # ifndef O_BINARY
 #  define O_BINARY 0
 # endif
-#endif
-
-#if platOS == OS_WIN32 || platOS == OS_LINUX // Does Mac need these?
-# define lstrcpy strcpy
-# define lstrcat strcat
 #endif
 
 #ifndef LIMITED_FIO
@@ -113,8 +104,7 @@ static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* wi
 	if(userdir)
 	{
 		// no bounds checking here, nice
-		strcpy(buffer, UserDataPath);
-		strcat(buffer, (char*)name);
+		pathprintf(buffer, UserDataPath, name);
 
 		if(WWII::ConvertChars(buffer, widePath, wsize))
 		{
@@ -132,8 +122,7 @@ static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* wi
 #endif
 
 	// think this works as char* because when we get to here we're talking about relative paths which are all ascii?
-	strcpy(buffer, DataPath) ;
-	strcat(buffer, name) ;
+	pathprintf(buffer, DataPath, name);
 
 	struct stat statBuffer ;
 	retval = stat(os_file_path(buffer), &statBuffer);
@@ -521,8 +510,13 @@ const char* fiodGetPrepath(void)
 #ifndef LIMITED_FIO
 void fiodSetPrepath(char* newpath)
 {
-	if(newpath != NULL)
-		lstrcpy(DataPath, newpath);
+	if(newpath == NULL)
+		return;
+#if platBuild == TEUL_SERVER
+		cv_dataDir.SetString(newPath);
+#else
+		strncpy(DataPath, newpath));
+#endif
 }
 #endif
 
@@ -539,8 +533,7 @@ void fiodmkdir(const char* path)
 	OS_MKDIR(os_file_path(fullPath), S_IRWXU);
 #elif platOS == OS_WIN32
 
-	lstrcpy(fullPath, DataPath);
-	lstrcat(fullPath, path);
+	pathprintf(fullPath, DataPath, path);
 
 	wchar_t widePath[PATH_MAX+1];
 
@@ -563,8 +556,7 @@ LOGICAL fiodAccess(const char* filename, bool userdir)
 #if platBuild == TEUL_CLIENT && platOS == OS_WIN32
 	if(userdir)
 	{
-		lstrcpy(fullpath, UserDataPath);
-		lstrcat(fullpath, filename);
+		pathprintf(fullpath, UserDataPath, filename);
 
 		bool success = false;
 
@@ -582,8 +574,7 @@ LOGICAL fiodAccess(const char* filename, bool userdir)
 	}
 #endif
 
-	lstrcpy(fullpath, DataPath);
-	lstrcat(fullpath, filename);
+	pathprintf(fullpath, DataPath, filename);
 
 	return (OS_ACCESS(os_file_path(fullpath), 0) == 0);
 }
@@ -597,8 +588,7 @@ LOGICAL fiodModified(SINT32* modified, const char* filename, bool userdir)
 #if platOS == OS_WIN32 && platBuild != TEUL_SERVER
 	if(userdir)
 	{
-		lstrcpy(fullpath, UserDataPath);
-		lstrcat(fullpath, filename);
+		pathprintf(fullpath, UserDataPath, filename);
 
 		wchar_t widePath[PATH_MAX+1];
 
@@ -616,8 +606,7 @@ LOGICAL fiodModified(SINT32* modified, const char* filename, bool userdir)
 	}
 #endif
 
-	lstrcpy(fullpath, DataPath);
-	lstrcat(fullpath, filename);
+	pathprintf(fullpath, DataPath, filename);
 	retval = stat(os_file_path(fullpath), &buffer);
 
 	if (retval == 0)
@@ -635,8 +624,7 @@ LOGICAL fiodModified(SINT32* modified, const char* filename, bool userdir)
 LOGICAL fiodAccess(const char* filename, bool /* userdir */)
 {
   char fullpath[1024];
-  strcpy(fullpath, DataPath);
-  strcat(fullpath, filename);
+  pathprintf(fullpath, DataPath, filename);
   return(OS_ACCESS(os_file_path(fullpath), 0) == 0);
 }
 
@@ -645,8 +633,7 @@ LOGICAL fiodModified(SINT32* modified, const char* filename, bool /* userdir */)
   char fullpath[1024];
   SINT32 retval;
   struct stat buffer;
-  strcpy(fullpath, DataPath);
-  strcat(fullpath, filename);
+  pathprintf(fullpath, DataPath, filename);
   retval = stat(os_file_path(fullpath), &buffer);
 
   if (retval == 0)
@@ -676,8 +663,7 @@ int fiodOpenWrite(const char* filename, bool /* userdir */)
   if(userdir)
   {
 		// Make sure directorys are created since some filenames contain directory paths.
-		lstrcpy(fullpath, UserDataPath);
-		lstrcat(fullpath, filename);
+		pathprintf(fullpath, UserDataPath, filename);
 
 		wchar_t widePath[PATH_MAX+1];
 
@@ -709,13 +695,8 @@ int fiodOpenWrite(const char* filename, bool /* userdir */)
 		return OS_WOPEN(wpath.c_str(), O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IREAD | S_IWRITE);
   }
   else
-  {
-	lstrcpy(fullpath, DataPath);
-	lstrcat(fullpath, filename);
-  }
 #else
-  lstrcpy(fullpath, DataPath);
-  lstrcat(fullpath, filename);
+	  pathprintf(fullpath, DataPath, filename);
 #endif
 
 	return OS_OPEN(os_file_path(fullpath), O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IREAD | S_IWRITE);

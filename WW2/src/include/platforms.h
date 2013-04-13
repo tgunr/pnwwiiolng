@@ -115,3 +115,28 @@ static inline float strtof(const char* const src_, const char* const);
 #include "include/precompile_includes.h"
 
 #include "sys/sysWinISO.h"
+
+// Cross-platform path builder.
+template<size_t bufSize>
+size_t pathprintf(char (& buf)[bufSize], const char* lhs, const char* rhs)
+{
+	int printed = snprintf(buf, bufSize, "%s" PATH_SEPSTR "%s", lhs, rhs);
+	if ( printed != -1 && printed < bufSize )
+		return static_cast<size_t>(printed);
+	buf[bufSize - 1] = 0;
+	return (bufSize - 1);
+}
+
+// snprintf wrapper
+template<size_t bufSize>
+size_t strprintf(char (& buf)[bufSize], const char* fmt, ...)
+{
+	va_arg list;
+	va_start(fmt, list);
+	int printed = vsnprintf(buf, bufSize, fmt, list);
+	va_end(list);
+	if ( printed != -1 && printed < bufSize )
+		return static_cast<size_t>(printed);
+	buf[bufSize - 1] = 0;
+	return (bufSize - 1);
+}
