@@ -515,7 +515,7 @@ void fiodSetPrepath(char* newpath)
 #if platBuild == TEUL_SERVER
 		cv_dataDir.SetString(newPath);
 #else
-		strncpy(DataPath, newpath));
+		strncpy(DataPath, newpath, sizeof(DataPath));
 #endif
 }
 #endif

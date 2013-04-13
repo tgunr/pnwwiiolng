@@ -793,7 +793,9 @@ _doCryptTests()
 int
 main(int argc, const char* const argv[])
 {
+#if platBuild == TEUL_SERVER
 	Teul::ConfigVar::InitializeConfigVars();
+#endif
 
 	// Handle the command line.
 	_processArguments(argc, argv) ;
