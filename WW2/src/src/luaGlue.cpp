@@ -477,6 +477,17 @@ _startInterpreter()
 
 	_luaOpenLibs(_luaVM) ;
 
+	lua_getglobal(_luaVM, "package");
+	lua_getfield(_luaVM, -1, "path");
+	std::string luaPath = lua_tostring(_luaVM, -1);
+	luaPath.append(";");
+	luaPath.append(cv_luaPath.GetString());
+	luaPath.append(PATH_SEPSTR "?.lua");
+	lua_pop(_luaVM, 1);
+	lua_pushstring(_luaVM, luaPath.c_str());
+	lua_setfield(_luaVM, -2, "path");
+	lua_pop(_luaVM, 1);
+	
 	tolua_game_open(_luaVM) ;
 	dbugLog(_FLI, "started Lua interpreter") ;
 
