@@ -294,6 +294,8 @@ namespace GameProcessManager
 			// Someone wants to start. Only start one at a time.
 			if ( GameProcess::s_processStarting == nullptr )
 			{
+				///TODO: Make the host names match their app names,
+				/// e.g. right now cell host logs to wwii_host.X.log but the executable is hostd.
 				static const char* processNames[MAX_SERVER_TYPE] = { nullptr, "authHost" EXE_SUFFIX, "dbd" EXE_SUFFIX, "stratd" EXE_SUFFIX, "chatd" EXE_SUFFIX, "mmhostd" EXE_SUFFIX, "pingHost" EXE_SUFFIX, "hostd" EXE_SUFFIX, nullptr };
 
 				const char* processName = processNames[starter->ServerType()];
