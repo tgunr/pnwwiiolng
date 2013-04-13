@@ -39,12 +39,6 @@
 # define lstrcat strcat
 #endif
 
-#if platOS == OS_WIN32
-# if platBuild == TEUL_SERVER
-char DataPath[MAX_PATH] = "c:\\playnet\\data\\" ;
-# endif
-#endif
-
 #ifndef LIMITED_FIO
  static char* os_file_path(char* path);
  static wchar_t* os_file_path(wchar_t* path);
@@ -52,8 +46,9 @@ char DataPath[MAX_PATH] = "c:\\playnet\\data\\" ;
 # define os_file_path(x) (x)
 #endif
 
-#if platOS == OS_LINUX
-static const char* DataPath = "./data";
+#if platBuild == TEUL_SERVER
+#include "wwii/wwiiConfigVars.h"
+# define DataPath cv_dataDir.GetString()
 #endif
 
 #ifndef _POSIX_
