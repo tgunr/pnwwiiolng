@@ -42,7 +42,7 @@ namespace Teul
 		}
 
 		const char* Get() const { ABORT_IF(!m_initialized); return m_value; }
-		const char* GetName() const { return m_name; }
+		const char* GetName() const { return m_name.str(); }
 		const char* GetEnvVarName() const { return m_envVarName; }
 		ConfigVarType GetType() const { return m_type; }
 		const char* GetDescription() const { return m_description; }

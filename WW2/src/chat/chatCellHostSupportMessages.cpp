@@ -31,7 +31,6 @@
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiString.h"
 
-static TEUL_CALLBACK* _SEND_FOUND_USER ;
 static TEUL_CALLBACK* _XCHG_BANDWIDTH_NOTICE ;
 
 extern void hostSmiteCustomer(playerid_t playerID) ;

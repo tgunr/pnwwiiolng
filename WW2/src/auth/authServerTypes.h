@@ -41,7 +41,7 @@ struct GAME ;
 
 struct SERVER
 {
-	SERVER() : ipAddress(0), port(0), teulIndex(-1), sourcePort(0), currentUsers(0), maxUsers(0), game(NULL)
+	SERVER() : ipAddress(0), teulIndex(-1), port(0), sourcePort(0), currentUsers(0), maxUsers(0), game(NULL)
 		{}
 	~SERVER() ;
 

@@ -463,10 +463,7 @@ _onPeerHello(ACTION_OBJECT* a, PeerHello& hello)
 					, g_serverTypes[hello.m_type]
 					) ;
 
-	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(s_peerMutex);
-		s_pendingPeers.erase(endpoint.teulIndex());
-	}
+	s_pendingPeers.erase(endpoint.teulIndex());
 
 	return a->offset;
 }

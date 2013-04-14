@@ -261,7 +261,8 @@ Player::updateSquadEntry(bool squadAnnounce)
 // Constructor for a squad list with a supplied squad object
 
 SquadList::SquadList(const Squad& withSquad)
-	: m_squad(withSquad), m_pulled(0), m_members(), m_online(0), m_msstamp(teulClock64), m_lastMemberMod(0LL)
+	: m_msstamp(teulClock64), m_lastMemberMod(0ULL)
+	, m_squad(withSquad), m_pulled(0), m_members(), m_online(0)
 	, m_newSquad(_requestPending(withSquad.squadID()))
 {
 }

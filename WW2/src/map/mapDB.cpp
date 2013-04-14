@@ -401,7 +401,7 @@ Player::selectPersona(UINT32 selectedID, WWII_COUNTRY countryID, BRANCH_ENUM bra
 		if ( q.Rows() == 0 || !q.FetchRow() )
 			return PLS_MISSING ;
 
-		DBRow& row = q.Row() ;
+		auto& row = q.Row() ;
 
 		selectedID = row.NextUInt() ;								// 0
 
@@ -477,11 +477,11 @@ Player::selectPersona(UINT32 selectedID, WWII_COUNTRY countryID, BRANCH_ENUM bra
 
 		while ( q.FetchRow() )
 		{
-			DBRow& row = q.Row();
-			row.NextUInt() ;	// Skip personaID
-			const WWII_COUNTRY altPersCountry = (WWII_COUNTRY) row.NextUInt() ;
-			const RANK_NO altPersRankNo = (RANK_NO) row.NextUInt() ;
-			const UINT32 altPersPoints = row.NextUInt() ;
+			auto& altRow = q.Row();
+			altRow.NextUInt() ;	// Skip personaID
+			const WWII_COUNTRY altPersCountry = (WWII_COUNTRY) altRow.NextUInt() ;
+			const RANK_NO altPersRankNo = (RANK_NO) altRow.NextUInt() ;
+			const UINT32 altPersPoints = altRow.NextUInt() ;
 
 			const bool sameSide = (wwiiSide(altPersCountry) == wwiiSide(thisCountry)) ;
 			const RANK_NO sharedRank = std::min(altPersRankNo, sameSide ? sideShareCeiling : globalShareCeiling) ;
@@ -577,7 +577,7 @@ mapFillPersonaData(Player* const player)
 
 		if ( q.Rows() == 0 || !q.FetchRow() )
 			throw std::logic_error("No rows for this player/persona") ;
-		DBRow& row = q.Row() ;
+		auto& row = q.Row() ;
 
 		// Capture the rank they would have incase they
 		// don't have priviliges to actually get that rank.

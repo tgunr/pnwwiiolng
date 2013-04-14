@@ -359,11 +359,8 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth")
 			chat/chatManagementClientMessages.cpp
 				chat/chatManagementClientMessages.h
 			chat/chatManagementPack.cpp
-				chat/chatManagementPack.h
 			chat/chatRoster.cpp
-				chat/chatRoster.h
 			chat/chatRosterClient.cpp
-				chat/chatRosterClient.h
 		)
 		ADD_PCH(chatClient)
 		target_link_libraries(chatClient libwwii teulserver)
@@ -372,7 +369,6 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth")
 		# Provide access to the LuaVMs.
 		add_executable(luaClient
 			src/luaClient.cpp
-				src/luaClient.h
 		)
 		target_link_libraries(luaClient libwwii teulserver readline ncurses)
 		SET_PROPERTY(TARGET luaClient PROPERTY FOLDER "Tools")

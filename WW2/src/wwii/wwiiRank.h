@@ -31,7 +31,7 @@ public:
 	static bool valid(RANK_NO level) { return (level <= s_max) ; }
 
 public:
-	Rank() : m_level(0), m_type(NO_TYPE), m_perm(0L), m_points(0) {}
+	Rank() :m_perm(0L), m_points(0), m_level(0), m_type(NO_TYPE) {}
 
 public:
 	bool commissioned() const { return (type() == OFFICER || type() == COMMAND) ; }

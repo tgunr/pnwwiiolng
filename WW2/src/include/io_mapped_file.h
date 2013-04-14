@@ -246,8 +246,8 @@ public:
 	//! Size (in bytes) of the entire file.k
 	size_t			m_size;
 
-	HANDLE			m_handle;
-	HANDLE			m_mapping;
+	imf_handle_t	m_handle;
+	imf_handle_t	m_mapping;
 };
 
 }

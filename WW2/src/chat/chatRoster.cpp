@@ -201,7 +201,7 @@ static int
 _openConnection(UINT32 host, UINT32 port, const char* const gameName)
 {
 	_connectionError = false ;
-	SINT32 conn = teulOpenSend(host, (UINT16)port, _connectionOpen, 2000, TCP, _errorFunction);
+	SINT32 conn = teulOpenSend(host, (UINT16)port, _connectionOpen, 2000, PROTOCOL_TCP, _errorFunction);
 	if ( conn < 0 )
 	{
 		dbugLog(_FLA, "Error allocating endpoint!");

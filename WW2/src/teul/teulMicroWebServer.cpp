@@ -335,7 +335,7 @@ _sendPhysicalFile(const unsigned int sock, const char* const rootPath, const cha
 
 		char flushBuffer[] = "\r\n";
 		send(sock, flushBuffer, sizeof(flushBuffer) - 1, 0);
-		shutdown(sock, SD_SEND);
+		shutdown(sock, 1);
 	}
 	catch ( const char* error )
 	{

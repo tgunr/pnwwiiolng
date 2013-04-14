@@ -521,7 +521,7 @@ _recvfromPacketSource(ENDPOINT& endpoint)
 
 #if platOS == OS_LINUX
 		// ignore packets we broadcast..
-		if ( endpoint.protocol == UDB && (dgram->sockAddress.sin_addr.s_addr & 0xff000000) == (Server::myInterface.addr[0].naddr & 0xff000000) )
+		if ( endpoint.protocol == PROTOCOL_UDB && (dgram->sockAddress.sin_addr.s_addr & 0xff000000) == (Server::myInterface.addr[0].naddr & 0xff000000) )
 		{
 			dbugWrite(_FLI, "ignoring packet from %s!", teulGetAddress(ntohl(dgram->sockAddress.sin_addr.s_addr)) );
 			continue;

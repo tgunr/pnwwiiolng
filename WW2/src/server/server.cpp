@@ -1787,7 +1787,7 @@ ServerBase::ServerBase(SERVER_TYPE serverType_, const char* serverName_)
 	, m_serverName(serverName_)
 {
 	// Singleton check.
-	static std::atomic<UINT32> s_initializedCount = 0;
+	static std::atomic<UINT32> s_initializedCount(0);
 	ABORT_IF( ++s_initializedCount > 1 );
 
 	s_serverBase = this;

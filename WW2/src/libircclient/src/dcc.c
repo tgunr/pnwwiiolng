@@ -376,7 +376,7 @@ static void libirc_dcc_process_descriptors (irc_session_t * ircsession, fd_set *
 
 						libirc_mutex_lock (&ircsession->mutex_dcc);
 
-						if ( dcc->incoming_offset > offset )
+						if ( dcc->incoming_offset > static_cast<decltype(dcc->incoming_offset)>(offset) )
 							memmove (dcc->incoming_buf, dcc->incoming_buf + offset, dcc->incoming_offset - offset);
 
 						dcc->incoming_offset -= offset;
@@ -448,7 +448,7 @@ static void libirc_dcc_process_descriptors (irc_session_t * ircsession, fd_set *
 							libirc_mutex_lock (&dcc->mutex_outbuf);
 						}
 
-						if ( dcc->outgoing_offset > length )
+						if ( dcc->outgoing_offset > static_cast<decltype(dcc->outgoing_offset)>(length) )
 							memmove (dcc->outgoing_buf, dcc->outgoing_buf + length, dcc->outgoing_offset - length);
 
 						dcc->outgoing_offset -= length;

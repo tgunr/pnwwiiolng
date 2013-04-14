@@ -150,7 +150,7 @@ MappedFile::mapFileHandleInternal()
 #else
 	// Use fstat to quickly obtain the file size.
 	struct stat stats;
-	const int sr = fstat(fd, &stats);
+	const int sr = fstat(m_handle, &stats);
 	if ( sr < 0 )
 		return unmapFile();
 	m_size = stats.st_size;
@@ -179,7 +179,7 @@ MappedFile::mapFileHandleInternal()
 			| MAP_SHARED	// Share buffers with any other mmappers of this file.
 			;
 	void* const ptr =
-		mmap(NULL, m_size + 1, PROT_READ, flags, m_fd, 0);
+		mmap(NULL, m_size + 1, PROT_READ, flags, m_handle, 0);
 	if ( ptr == MAP_FAILED )
 		return unmapFile();
 

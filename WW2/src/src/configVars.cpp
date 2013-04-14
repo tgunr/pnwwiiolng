@@ -406,7 +406,7 @@ namespace Teul
 			Set(m_default);
 
 		if ( m_required && (m_value == nullptr || (m_default == nullptr && *m_value == 0)) )
-			LogAbort("Config variable %s (%s) must be defined with a non-empty value.", m_name, m_envVarName);
+			LogAbort("Config variable %s (%s) must be defined with a non-empty value.", GetName(), GetEnvVarName());
 	}
 
 	ConfigVar::~ConfigVar()
@@ -425,6 +425,7 @@ namespace Teul
 		case CVT_BOOL: SetBoolValue(newValue_); break;
 		case CVT_IP_ADDRESS: SetIPAddressValue(newValue_); break;
 		case CVT_PATH: SetPathValue(newValue_); break;
+		default: LogAbort("Invalid config var type"); break;
 		}
 	}
 

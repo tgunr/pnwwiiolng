@@ -290,6 +290,8 @@ _serverEnterCallback(Server::ServerInfo* server, Server::Code scode)
 		case CHAT_HOST:
 			_mustSyncChatHost = true ;
 		break ;
+
+		default: break;
 	}
 
 	strtBroadcastConfigUpdate() ;
@@ -314,8 +316,7 @@ _serverLeaveCallback(Server::ServerInfo* server, Server::Code scode)
 	case CHAT_HOST:
 		_mustSyncChatHost = false ;
 	break ;
-	case MAP_HOST:
-	break ;
+	default: break;
 	}
 
  	return 0;
@@ -357,6 +358,8 @@ _serverStatusCallback(Server::ServerInfo* server, Server::Code scode)
 				case CHAT_HOST:
 					_mustSyncChatHost = false ;
 				break ;
+
+				default: break;
 			}
 		}
 		else

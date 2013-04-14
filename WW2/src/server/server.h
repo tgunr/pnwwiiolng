@@ -17,7 +17,7 @@ extern UINT32 serverGetAuthIP() ;
 // Look up the maximum allowable cluster users.
 extern UINT32 serverGetMaxClusterUsers() ;
 
-extern enum SERVER_TYPE;
+#include "wwii/wwiiServerTypeEnums.h"
 extern void serverEnableDebugWebServer(SERVER_TYPE offset) ;
 
 extern void serverInitAddresses() ;

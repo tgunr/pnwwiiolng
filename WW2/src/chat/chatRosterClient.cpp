@@ -125,7 +125,7 @@ _connectToChatHost(void)
 								  (UINT16)_chatPort,
 								  _chatClientConnectFunction,
 								  300000,
-								  TCP,
+								  PROTOCOL_TCP,
 								  _chatClientErrorFunction);
 }
 

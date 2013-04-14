@@ -587,7 +587,7 @@ main(int argc, char* argv[])
 
 	if ( g_debugMode )
 		_printf("Connecting to host\n") ;
-	serverTeulIndex = teulOpenSend(ip, WWII::Net::Ports::LuaInterface, _teulConnectFn, 30000, TCP, _teulErrorFn) ;
+	serverTeulIndex = teulOpenSend(ip, WWII::Net::Ports::LuaInterface, _teulConnectFn, 30000, PROTOCOL_TCP, _teulErrorFn) ;
 	if ( serverTeulIndex < 0 )
 	{
 		_printf("Unable to connect: %d\n", serverTeulIndex) ;
