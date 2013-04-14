@@ -12,7 +12,7 @@ struct GameProcess
 	//! We're ready to start this process.
 	void RequestStart();
 	//! The OS has been asked to launch this process.
-	void OnStarting(UINT64 processID_, void* process_);
+	void OnStarting(UINT64 process_);
 	//! We have received contact from the process, it's running.
 	void OnStarted(UINT64 processID_);
 	//! We have decided this process should be terminated.
@@ -41,10 +41,12 @@ struct GameProcess
 	//! Determine if the process no-longer needs to be managed.
 	bool ReadyForRemoval() const { return !Running() && !StartSent() && !Desired(); }
 
-	UINT64 ProcessID() const { return m_pid; }
 #if platOS == OS_WIN32
-	HANDLE ProcessHandle() const { return static_cast<HANDLE>(m_process); }
+	HANDLE Process() const { return static_cast<HANDLE>(m_process); }
+#else
+	pid_t Process() const { return static_cast<pid_t>(m_process); }
 #endif
+	UINT64 ProcessID() const { return static_cast<UINT64>(m_process); }
 
 	TeulTimeMS TimeRunning() const { return Running() ? (teulClock64 - m_started) : ~0ULL; }
 	TeulTimeMS TimeSinceStartSent() const { return StartSent() ? (teulClock64 - m_startSent) : ~0ULL; }
@@ -62,10 +64,13 @@ private:
 	TeulTimeMS		m_startSent;
 	//! When we got confirmation the process was running.
 	TeulTimeMS		m_started;
-	//! ProcessID of the process.
-	UINT64			m_pid;
+#if platOS == OS_WIN32
 	//! For Windows - equivalent of a HANDLE.
 	void*			m_process;
+#else
+	//! For Linux - a process ID
+	UINT64			m_process;
+#endif
 	//! When we asked the process to stop.
 	TeulTimeMS		m_stopSent;
 	//! When we got confirmation the process had stopped.

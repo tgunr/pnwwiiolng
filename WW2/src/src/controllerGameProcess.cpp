@@ -20,18 +20,38 @@ GameProcess* GameProcess::s_processStarting = nullptr;
 
 static std::list<GameProcess> s_processes;
 
+//////////////////////////////////////////////////////////////////////
+// Helper to determine if a process is currently running.
+
+static bool _processStillRunning(UINT64 process_)
+{
+#if platOS == OS_WIN32
+	// Check if the process is still running.
+	auto result = WaitForSingleObject(process_, 0);
+	return ( result != WAIT_OBJECT_0 && result != WAIT_FAILED );
+#else
+	auto result = kill(process_, 0);
+	return ( result == 0 );
+#endif
+}
+
+//////////////////////////////////////////////////////////////////////
+// GameProcess object ctor.
+
 GameProcess::GameProcess(SERVER_TYPE type_)
 	: m_type(type_)
 	, m_desired(true)
 	, m_wantRunning(false)
 	, m_startSent(0ULL)
 	, m_started(0ULL)
-	, m_pid(0ULL)
 	, m_process(0ULL)
 	, m_stopSent(0ULL)
 	, m_stopped(0ULL)
 {
 }
+
+//////////////////////////////////////////////////////////////////////
+// Schedule a start next time we can find a launch spot.
 
 void GameProcess::RequestStart()
 {
@@ -42,7 +62,12 @@ void GameProcess::RequestStart()
 	Log("requestStart");
 }
 
-void GameProcess::OnStarting(UINT64 processID_, void* process_)
+//////////////////////////////////////////////////////////////////////
+// Handle the process being successfully started - does not mean that
+// it will succeed in startup, just that we've done everything that
+// we needed to do to get the OS to run the executable.
+
+void GameProcess::OnStarting(UINT64 process_)
 {
 	ABORT_IF( StartSent() );
 	ABORT_IF( Running() );
@@ -52,13 +77,15 @@ void GameProcess::OnStarting(UINT64 processID_, void* process_)
 	teulSyncClock();
 	m_startSent = teulClock64;
 	m_stopped = 0ULL;
-	m_pid = processID_;
 	m_process = process_;
 	s_processStarting = this;
 	++m_launchAttempts;
 
 	Log("onStarting");
 }
+
+//////////////////////////////////////////////////////////////////////
+// Handle the process having launched and registered itself with us.
 
 void GameProcess::OnStarted(UINT64 processID_)
 {
@@ -76,6 +103,9 @@ void GameProcess::OnStarted(UINT64 processID_)
 	m_launchAttempts = 0;
 }
 
+//////////////////////////////////////////////////////////////////////
+// Handle a request to begin stopping the process.
+
 void GameProcess::RequestStop()
 {
 	if ( m_wantRunning == false )
@@ -83,6 +113,9 @@ void GameProcess::RequestStop()
 	m_wantRunning = false;
 	Log("requestStop");
 }
+
+//////////////////////////////////////////////////////////////////////
+// We want to stop running this process and not launch any more of it.
 
 void GameProcess::RequestDiscontinue()
 {
@@ -93,6 +126,9 @@ void GameProcess::RequestDiscontinue()
 	Log("requestDisc");
 	RequestStop();
 }
+
+//////////////////////////////////////////////////////////////////////
+// Handle a process that is no-longer running.
 
 void GameProcess::OnStopped()
 {
@@ -115,7 +151,6 @@ void GameProcess::OnStopped()
 	m_startSent = 0ULL;
 	m_stopSent = 0ULL;
 	m_started = 0ULL;
-	m_pid = 0ULL;
 #if platOS == OS_WIN32
 	if ( m_process != 0ULL )
 		CloseHandle(m_process);
@@ -123,20 +158,27 @@ void GameProcess::OnStopped()
 	m_process = 0ULL;
 }
 
+//////////////////////////////////////////////////////////////////////
+// Forcefully terminate a process and assume that'll work.
+
 void GameProcess::Kill()
 {
 	if ( !StartSent() )
 		return;
 	Log(Debug::ERR_NOTE, "kill");
 #if platOS == OS_WIN32
-	TerminateProcess(m_process, 1);
-	CloseHandle(m_process);
+	TerminateProcess(Process(), 1);
+	CloseHandle(Process());
 	m_process = 0ULL;
 #else
-	kill(m_process, SIGKILL);
+	kill(Process(), SIGKILL);
+	m_process = 0ULL;
 #endif
 	OnStopped();
 }
+
+//////////////////////////////////////////////////////////////////////
+// Work the state machine for a process.
 
 bool GameProcess::CheckStatus()
 {
@@ -160,16 +202,12 @@ bool GameProcess::CheckStatus()
 
 	if ( StartSent() )
 	{
-#if platOS == OS_WIN32
-		// Check if the process is still running.
-		auto result = WaitForSingleObject(m_process, 0);
-		if ( result == WAIT_OBJECT_0 || result == WAIT_FAILED )
+		if ( ! _processStillRunning(ProcessID()) )
 		{
 			Log("process stopped");
 			OnStopped();
 			return false;
 		}
-#endif
 	}
 
 	if ( Running() )
@@ -233,6 +271,70 @@ bool GameProcess::CheckStatus()
 	}
 
 	return false;
+}
+
+static bool _spawnProcess(GameProcess* const starter_, const char* const processName_, UINT64& process_, UINT64& pid_, int errno_)
+{
+	char processPath[MAX_PATH];
+
+#if platOS == OS_WIN32
+	char cmdLine[] = "";
+	STARTUPINFOA sinf;
+	PROCESS_INFORMATION pinf;
+	memset(&sinf, 0, sizeof(sinf));
+	memset(&pinf, 0, sizeof(pinf));
+
+	// Get the current executable path + name, remove the name and add the target executable path.
+	GetModuleFileNameA(NULL, processPath, sizeof(processPath));
+	char* endCharacter = strrchr(processPath, '\\');
+	if ( endCharacter != NULL )
+		*(endCharacter + 1) = 0;
+	else
+		strcpy_s(processPath, ".\\");
+	if ( strcat_s(processPath, processName_) == 0 )
+	{
+		char pwd[MAX_PATH];
+		GetCurrentDirectoryA(sizeof(pwd), pwd);
+		sinf.lpTitle = const_cast<LPSTR>(starter_->ServerTypeName());
+		dbugLog(_FLD, "starting %s server %s", sinf.lpTitle, processPath);
+		if ( CreateProcessA(processPath, cmdLine, nullptr, nullptr, FALSE, CREATE_NEW_CONSOLE, nullptr, pwd, &sinf, &pinf) == TRUE )
+		{
+			CloseHandle(pinf.hThread);
+			process_ = static_cast<UINT64>(pinf.hProcess);
+			pid_ = pinf.dwProcessId;
+			return true;
+		}
+		errno_ = GetLastError();
+	}
+	else
+		errno_ = -1;
+	return false;
+#else
+	extern const char* g_argv0;
+	pathprintf(processPath, g_argv0, processName_);
+	const pid_t childPid = vfork();
+	switch ( childPid )
+	{
+	case -1:	// Error
+		errno_ = errno;
+		return false;
+	break;
+	case 0:		// Child
+		{
+			char* execArgs[2] = { processPath, nullptr };
+			int execResult = execv(processPath, execArgs);
+			dbugLog(_FLA, "failed to start %s, exec returned %d (%u)", processPath, execResult, errno);
+			// we're in a child process...
+			exit(0);
+		}
+	break;
+	default:	// Parent getting PID
+		process_ = childPid;
+		pid_ = childPid;
+		return true;
+	break;
+	}
+#endif
 }
 
 #if platOS == OS_WIN32
@@ -300,49 +402,18 @@ namespace GameProcessManager
 				static const char* processNames[MAX_SERVER_TYPE] = { nullptr, "authHost" EXE_SUFFIX, "dbd" EXE_SUFFIX, "stratd" EXE_SUFFIX, "chatd" EXE_SUFFIX, "mmhostd" EXE_SUFFIX, "pingHost" EXE_SUFFIX, "hostd" EXE_SUFFIX, nullptr };
 
 				const char* processName = processNames[starter->ServerType()];
-				char cmdLine[] = "";
-
-#if platOS == OS_WIN32
-				STARTUPINFOA sinf;
-				PROCESS_INFORMATION pinf;
-				memset(&sinf, 0, sizeof(sinf));
-				memset(&pinf, 0, sizeof(pinf));
-
-				bool success = false;
-				char processPath[MAX_PATH];
-				// Get the current executable path + name, remove the name and add the target executable path.
-				GetModuleFileNameA(NULL, processPath, sizeof(processPath));
-				char* endCharacter = strrchr(processPath, '\\');
-				if ( endCharacter != NULL )
-					*(endCharacter + 1) = 0;
-				else
-					strcpy_s(processPath, ".\\");
-				if ( strcat_s(processPath, processName) == 0 )
+				UINT64 child = 0ULL, childPid = 0ULL;
+				int spawnErrno = 0;
+				bool success = _spawnProcess(starter, processName, child, childPid, spawnErrno);
+				if ( success )
 				{
-					char pwd[MAX_PATH];
-					GetCurrentDirectoryA(sizeof(pwd), pwd);
-					sinf.lpTitle = const_cast<LPSTR>(starter->ServerTypeName());
-					dbugLog(_FLD, "starting %s server %s", sinf.lpTitle, processPath);
-					if ( CreateProcessA(processPath, cmdLine, nullptr, nullptr, FALSE, CREATE_NEW_CONSOLE, nullptr, pwd, &sinf, &pinf) == TRUE )
-					{
-						dbugLog(_FLI, "%s server started %s pid %u", starter->ServerTypeName(), processPath, pinf.dwProcessId);
-						CloseHandle(pinf.hThread);
-						starter->OnStarting(static_cast<UINT64>(pinf.dwProcessId), pinf.hProcess);
-					}
-					else
-					{
-						dbugLog(_FLA, "failed to start %s: %u", processNames[starter->ServerType()], GetLastError());
-						starter->RequestStop();
-					}
+					dbugLog(_FLI, "%s server started %s child %llu (pid %llu)", starter->ServerTypeName(), processName, child, childPid);
+					starter->OnStarting(child);
+					return true;
 				}
-				else
-				{
-					dbugLog(_FLA, "unable to start %s: can't populate pathname", processNames[starter->ServerType()]);
-					starter->RequestStop();
-				}
-#else
-# error "Not implemented yet."
-#endif
+				dbugLog(_FLA, "failed to start %s: %u", processName, spawnErrno);
+				starter->RequestStop();
+				return false;
 			}
 			else
 			{

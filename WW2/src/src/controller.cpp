@@ -57,6 +57,8 @@ bool g_shuttingDown = false;
 
 extern ConfigStr cv_manageProcesses;
 
+const char* g_argv0 = nullptr;
+
 ////////////////////////////////////////////////////////////////////////////////
 // TeulKit error handler.
 
@@ -101,7 +103,7 @@ static void _prepareLibEventListenSocket(evutil_socket_t* socket_, event** event
 
 static evutil_socket_t _libEventAcceptHandler(evutil_socket_t listener, short event, void* arg, sockaddr_in& cliAddr_)
 {
-	auto base = static_cast<event_base*>(arg);
+	//auto base = static_cast<event_base*>(arg);
 	socklen_t caLen = sizeof(cliAddr_);
 	evutil_socket_t cliSock = EAGAIN;
 	while ( (cliSock == EAGAIN) | (cliSock == EINTR) )
@@ -485,6 +487,8 @@ void _startShutdown(int /*signal*/)
 
 int main(int argc, const char* argv[])
 {
+	g_argv0 = argv[0];
+
 	// Check arguments.
 	_processArguments(argc, argv);
 
