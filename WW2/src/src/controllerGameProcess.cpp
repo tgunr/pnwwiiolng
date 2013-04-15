@@ -273,9 +273,28 @@ bool GameProcess::CheckStatus()
 	return false;
 }
 
+static void _getCurrentProcessPath(char (& processPath)[MAX_PATH])
+{
+#if platOS == OS_WIN32
+	GetModuleFileNameA(NULL, processPath, sizeof(processPath) - 1);
+#else
+	extern const char* g_argv0;
+	strncpy(processPath, g_argv0, sizeof(processPath) - 1);
+#endif
+	char* endCharacter = strrchr(processPath, PATH_SEPARATOR);
+	if ( endCharacter != NULL )
+		*(endCharacter) = 0;
+	else
+		strncpy(processPath, ".", sizeof(processPath) - 1);
+}
+
 static bool _spawnProcess(GameProcess* const starter_, const char* const processName_, UINT64& process_, UINT64& pid_, int errno_)
 {
 	char processPath[MAX_PATH];
+	processPath[sizeof(processPath) - 1] = 0;
+	_getCurrentProcessPath(processPath);
+	strncat(processPath, PATH_SEPSTR, sizeof(processPath) - 1);
+	strncat(processPath, processName_, sizeof(processPath) - 1);
 
 #if platOS == OS_WIN32
 	char cmdLine[] = "";
@@ -284,48 +303,34 @@ static bool _spawnProcess(GameProcess* const starter_, const char* const process
 	memset(&sinf, 0, sizeof(sinf));
 	memset(&pinf, 0, sizeof(pinf));
 
-	// Get the current executable path + name, remove the name and add the target executable path.
-	GetModuleFileNameA(NULL, processPath, sizeof(processPath));
-	char* endCharacter = strrchr(processPath, '\\');
-	if ( endCharacter != NULL )
-		*(endCharacter + 1) = 0;
-	else
-		strcpy_s(processPath, ".\\");
-	if ( strcat_s(processPath, processName_) == 0 )
+	char pwd[MAX_PATH];
+	GetCurrentDirectoryA(sizeof(pwd), pwd);
+	sinf.lpTitle = const_cast<LPSTR>(starter_->ServerTypeName());
+	dbugLog(_FLD, "starting %s server %s", sinf.lpTitle, processPath);
+	if ( CreateProcessA(processPath, cmdLine, nullptr, nullptr, FALSE, CREATE_NEW_CONSOLE, nullptr, pwd, &sinf, &pinf) == TRUE )
 	{
-		char pwd[MAX_PATH];
-		GetCurrentDirectoryA(sizeof(pwd), pwd);
-		sinf.lpTitle = const_cast<LPSTR>(starter_->ServerTypeName());
-		dbugLog(_FLD, "starting %s server %s", sinf.lpTitle, processPath);
-		if ( CreateProcessA(processPath, cmdLine, nullptr, nullptr, FALSE, CREATE_NEW_CONSOLE, nullptr, pwd, &sinf, &pinf) == TRUE )
-		{
-			CloseHandle(pinf.hThread);
-			process_ = static_cast<UINT64>(pinf.hProcess);
-			pid_ = pinf.dwProcessId;
-			return true;
-		}
-		errno_ = GetLastError();
+		CloseHandle(pinf.hThread);
+		process_ = static_cast<UINT64>(pinf.hProcess);
+		pid_ = pinf.dwProcessId;
+		return true;
 	}
-	else
-		errno_ = -1;
-	return false;
+	errno_ = GetLastError();
 #else
-	extern const char* g_argv0;
-	pathprintf(processPath, g_argv0, processName_);
 	const pid_t childPid = vfork();
 	switch ( childPid )
 	{
 	case -1:	// Error
-		errno_ = errno;
-		return false;
 	break;
 	case 0:		// Child
 		{
+			fclose(stdin);
+			fclose(stdout);
+			fclose(stderr);
 			char* execArgs[2] = { processPath, nullptr };
 			int execResult = execv(processPath, execArgs);
 			dbugLog(_FLA, "failed to start %s, exec returned %d (%u)", processPath, execResult, errno);
 			// we're in a child process...
-			exit(0);
+			pthread_exit(nullptr);
 		}
 	break;
 	default:	// Parent getting PID
@@ -334,7 +339,9 @@ static bool _spawnProcess(GameProcess* const starter_, const char* const process
 		return true;
 	break;
 	}
+	errno_ = errno;
 #endif
+	return false;
 }
 
 #if platOS == OS_WIN32

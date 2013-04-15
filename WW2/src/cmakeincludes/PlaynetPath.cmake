@@ -2,7 +2,7 @@
 # the specified top-level path.
 
 IF ( UNIX OR APPLE )
-	SET( PN_PLAYNET_PATH "/playnet/"	CACHE STRING "Default top-level runtime path for this build to use." )
+	SET( PN_PLAYNET_PATH "/playnet/"   CACHE STRING "Default top-level runtime path for this build to use." )
 ELSEIF ( WIN32 )
 	SET( PN_PLAYNET_PATH "C:/playnet/" CACHE STRING "Default top-level runtime path for this build to use." )
 ELSE ( )
@@ -15,6 +15,8 @@ FILE(TO_NATIVE_PATH "${PN_PLAYNET_PATH}" _PLAYNET)
 IF ( WIN32 )
 	# Make an escaped version for the config file.
 	STRING(REGEX REPLACE "\\\\" "\\\\\\\\" _PLAYNET_PATH_VAR "${_PLAYNET}") 
+ELSE ( )
+	SET(_PLAYNET_PATH_VAR "${_PLAYNET}")
 ENDIF ( )
 
 # The top level path must exist before we'll continue.

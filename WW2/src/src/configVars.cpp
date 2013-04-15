@@ -10,6 +10,10 @@
 
 extern bool teulGetHost(const SCHAR* address, UINT32* host);
 
+#ifndef PN_PLAYNET_PATH
+#error "PN_PLAYNET_PATH not defined."
+#endif
+
 ////////////////////////////////////////////////////////////////////////////////
 // Helper macros.
 
@@ -87,7 +91,11 @@ CFG_UINT(maxClusterUsers, "0", "MM_MAX_USERS", "Maxmimum number of players on th
 CFG_UINT(maxCellPlayers, "1250", "MAX_PLAYERS", "Maximum number of players on this cell host.");
 CFG_ADDR(baseUpdtAddress, "192.168.11.0", "BASE_UPDT_ADDRESS", true, "Network address to use for private cell network.");
 CFG_UINT(peerConnectionTimeout_ms, "20000", "PEER_CONNECTION_TIMEOUT_MS", "Number of miliseconds before a server-peer connection times out.");
+#if defined(WIN32)
 CFG_STRING(defaultInterface, NULL, "DEFAULT_IFACE", false, "Name of the network interface to treat as primary.");
+#else
+CFG_STRING(defaultInterface, "eth0", "DEFAULT_IFACE", true, "Name of the network interface to treat as primary.");
+#endif
 
 CFG_STRING(manageProcesses, NULL, "MANAGE_PROCESSES", false, "Semi-colon separated list of processes this machine should run.");
 
