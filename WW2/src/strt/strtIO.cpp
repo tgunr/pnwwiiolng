@@ -255,7 +255,9 @@ strtReleaseSupercells()
 static bool
 _getFilenameXY(const std::string& filename, SINT16* scx, SINT16* scy)
 {
-	UINT32 n = filename.rfind(PATH_SEPARATOR) + 1 ;
+	UINT32 n = filename.rfind('/') + 1 ;
+	if ( n == std::string::npos )
+		n = filename.rfind('\\') + 1 ;
 	if ( n >= filename.length() )
 		n = 0 ;
 	const UINT32 assigned = sscanf(filename.c_str() + n, "%hx_%hx", scx, scy) ;

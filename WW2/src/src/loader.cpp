@@ -74,12 +74,12 @@ static IrcThread* ircThread = nullptr;
 
 SCHAR* _getValidLine(FILE* f,SINT32* line)
 {
-static char s[1024];
-SINT32 len;
+	static char s[1024];
+	SINT32 len;
 
 	while(!feof(f))
 	{
-		if ( fgets(s,512,f) == nullptr )
+		if ( fgets(s, sizeof(s) ,f) == nullptr )
             return nullptr;
 
 		(*line)++;
@@ -96,10 +96,10 @@ SINT32 len;
 			continue;
 
 		len = strlen(s);
-		if ( len > 0 )
-			s[len-1] = '\0';
-		else
-			s[0] = '\0';
+		while ( len > 0 && isspace(s[len-1]) )
+			s[--len] = 0;
+		if ( len == 0 )
+			s[0] = 0;
 
 		return s;
 	}
@@ -441,7 +441,7 @@ main(int argc,char** argv)
 	bool errors = false;
 	while( (filename = _getValidLine(importFile,&line)) != nullptr)
 	{
-		if ( dbseLoadFile(filename) != 0 )
+		if ( filename[0] != 0 && dbseLoadFile(filename) != 0 )
 			errors = true;
 	}
 

@@ -122,7 +122,12 @@ static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* wi
 #endif
 
 	// think this works as char* because when we get to here we're talking about relative paths which are all ascii?
-	pathprintf(buffer, DataPath, name);
+	size_t pathLen = pathprintf(buffer, DataPath, name);
+	for ( size_t i = 0 ; i < pathLen ; ++i )
+	{
+		if ( buffer[i] == CHANGE_SEP )
+			buffer[i] = PATH_SEPARATOR;
+	}
 
 	struct stat statBuffer ;
 	retval = stat(os_file_path(buffer), &statBuffer);
@@ -337,11 +342,10 @@ _lookupFileState(int fd)
 
 int fiodOpen(const char* filename, bool userdir, int prereadSize)
 {
-	wchar_t widePath[PATH_MAX + 1];
-  char asciiPath[PATH_MAX + 1];
-  *asciiPath = 0;
+	wchar_t widePath[PATH_MAX + 1] = L"";
+	char asciiPath[PATH_MAX + 1] = "";
 
-  off_t fileSize = _getFilePathAndSize(filename, userdir, widePath, sizeof(widePath));
+	off_t fileSize = _getFilePathAndSize(filename, userdir, widePath, sizeof(widePath));
 
 	if ( fileSize < 0 )
 	{

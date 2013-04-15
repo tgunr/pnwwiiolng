@@ -518,6 +518,8 @@ int main(int argc, const char* argv[])
 
 	signal(SIGINT, _startShutdown);
 
+	GameProcessManager::Initialize();
+
 	// Our mainloop is handled by libevent rather than teulkit.
 	event_base_dispatch(Teul::eventBase);
 

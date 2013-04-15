@@ -96,6 +96,9 @@ public:
 //! Game server manager API.
 namespace GameProcessManager
 {
+	//! Tear up.
+	void Initialize();
+
 	//! Ask the server manager to include a new server type.
 	//! @note Only one instance of each server per manager.
 	void AddServer(SERVER_TYPE type_);

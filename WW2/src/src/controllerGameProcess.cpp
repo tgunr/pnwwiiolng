@@ -4,6 +4,8 @@
 #if platOS == OS_WIN32
 #include "WinBase.h"
 #include "processthreadsapi.h"
+#else
+#include <sys/wait.h>
 #endif
 
 #include "dbug/dbug.h"
@@ -30,7 +32,8 @@ static bool _processStillRunning(UINT64 process_)
 	auto result = WaitForSingleObject((HANDLE)process_, 0);
 	return ( result != WAIT_OBJECT_0 && result != WAIT_FAILED );
 #else
-	auto result = kill(process_, 0);
+	int status = 0;
+	auto result = waitpid(process_, &status, WEXITED | WNOHANG);
 	return ( result == 0 );
 #endif
 }
@@ -352,6 +355,11 @@ static bool _spawnProcess(GameProcess* const starter_, const char* const process
 
 namespace GameProcessManager
 {
+	void Initialize()
+	{
+		signal(SIGCHLD, SIG_IGN);
+	}
+
 	// Include this server in the launch list.
 	void AddServer(SERVER_TYPE type_)
 	{
