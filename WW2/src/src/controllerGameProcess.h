@@ -42,11 +42,11 @@ struct GameProcess
 	bool ReadyForRemoval() const { return !Running() && !StartSent() && !Desired(); }
 
 #if platOS == OS_WIN32
-	HANDLE Process() const { return static_cast<HANDLE>(m_process); }
+	HANDLE Process() const { return (HANDLE)m_process; }
 #else
-	pid_t Process() const { return static_cast<pid_t>(m_process); }
+	pid_t Process() const { return (pid_t)m_process; }
 #endif
-	UINT64 ProcessID() const { return static_cast<UINT64>(m_process); }
+	UINT64 ProcessID() const { return m_process; }
 
 	TeulTimeMS TimeRunning() const { return Running() ? (teulClock64 - m_started) : ~0ULL; }
 	TeulTimeMS TimeSinceStartSent() const { return StartSent() ? (teulClock64 - m_startSent) : ~0ULL; }
@@ -64,13 +64,8 @@ private:
 	TeulTimeMS		m_startSent;
 	//! When we got confirmation the process was running.
 	TeulTimeMS		m_started;
-#if platOS == OS_WIN32
-	//! For Windows - equivalent of a HANDLE.
-	void*			m_process;
-#else
-	//! For Linux - a process ID
+	//! Process ID (linux) or Process Handle (Windows)
 	UINT64			m_process;
-#endif
 	//! When we asked the process to stop.
 	TeulTimeMS		m_stopSent;
 	//! When we got confirmation the process had stopped.

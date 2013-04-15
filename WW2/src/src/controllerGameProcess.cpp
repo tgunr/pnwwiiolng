@@ -27,7 +27,7 @@ static bool _processStillRunning(UINT64 process_)
 {
 #if platOS == OS_WIN32
 	// Check if the process is still running.
-	auto result = WaitForSingleObject(process_, 0);
+	auto result = WaitForSingleObject((HANDLE)process_, 0);
 	return ( result != WAIT_OBJECT_0 && result != WAIT_FAILED );
 #else
 	auto result = kill(process_, 0);
@@ -153,7 +153,7 @@ void GameProcess::OnStopped()
 	m_started = 0ULL;
 #if platOS == OS_WIN32
 	if ( m_process != 0ULL )
-		CloseHandle(m_process);
+		CloseHandle(Process());
 #endif
 	m_process = 0ULL;
 }
@@ -310,7 +310,7 @@ static bool _spawnProcess(GameProcess* const starter_, const char* const process
 	if ( CreateProcessA(processPath, cmdLine, nullptr, nullptr, FALSE, CREATE_NEW_CONSOLE, nullptr, pwd, &sinf, &pinf) == TRUE )
 	{
 		CloseHandle(pinf.hThread);
-		process_ = static_cast<UINT64>(pinf.hProcess);
+		process_ = (UINT64)pinf.hProcess;
 		pid_ = pinf.dwProcessId;
 		return true;
 	}
