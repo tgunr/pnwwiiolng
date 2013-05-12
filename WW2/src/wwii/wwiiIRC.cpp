@@ -5,22 +5,22 @@
 // Basic usage:
 //
 //  // Initialize the IRC context with defaults
-//  wwiiIRCInitialize(ip, plural) ;
+//  wwiiIRCInitialize(ip, plural);
 //
 //  /* your IRC setup stuff here, any callbacks etc */
 //
 //  // Start the IRC thread/connection.
-//  wwiiIRCActivate() ;
+//  wwiiIRCActivate();
 //
 //  /* your code here */
 //
 //  // Notify our cluster's -info channel we are ready
-//  wwiiIRCChannelMessage("-info", "Server ready") ;
+//  wwiiIRCChannelMessage("-info", "Server ready");
 //
 //  /* your server code */
 //
 //  // Shutdown cleanly
-//  wwiiIRCTerminate("End of application") ;
+//  wwiiIRCTerminate("End of application");
 //
 // Copyright (C) PlayNet, Inc 1999-2007 - All rights reserved.
 // Not for redistribution.
@@ -39,7 +39,7 @@
 #include "wwii/wwiiIRC.h"
 #include "server/serverConfigVars.h"
 
-void wwiiIRCDefaultChannelMsg(irc_session_t* session, const char* event, const char* origin, const char** params, unsigned int count) ;
+void wwiiIRCDefaultChannelMsg(irc_session_t* session, const char* event, const char* origin, const char** params, unsigned int count);
 
 //////////////////////////////////////////////////////////////////////
 // Description of a channel a server wishes to belong to, provides
@@ -52,14 +52,14 @@ struct IRCChannel
 		: m_channel(channel), m_mode(mode), m_topic(topic)
 		, m_newChannel(false)
 		{}
-	std::string m_channel, m_mode, m_topic ;
-	bool m_newChannel ;
-} ;
+	std::string m_channel, m_mode, m_topic;
+	bool m_newChannel;
+};
 
-typedef std::vector<std::string> _MODES ;
-typedef std::map<std::string, IRCChannel> _CHANNELS ;
+typedef std::vector<std::string> _MODES;
+typedef std::map<std::string, IRCChannel> _CHANNELS;
 
-namespace Teul { extern const char* GetAppName() ; }
+namespace Teul { extern const char* GetAppName(); }
 
 //////////////////////////////////////////////////////////////////////
 // Our context/IRC description. Describes an IRC session. This is
@@ -67,7 +67,7 @@ namespace Teul { extern const char* GetAppName() ; }
 // Includes all the information necessary to re-establish the
 // connection if the server barfs.
 
-static const char* _getChannelName(const char* channel, char* into, size_t intoSize) ;
+static const char* _getChannelName(const char* channel, char* into, size_t intoSize);
 
 struct IRCImpl : public IRC, public OpenThreads::Thread
 {
@@ -79,34 +79,34 @@ struct IRCImpl : public IRC, public OpenThreads::Thread
 		{}
 	virtual ~IRCImpl() {}
 
-	bool			m_initialized ;
-	bool			m_active ;
-	volatile bool	m_running ;
-	bool			m_joined ;			// Finished joining
-	irc_session_t*	m_session ;
-	std::string		m_app ;
-	std::string		m_nick ;
-	_MODES			m_modes ;
-	_CHANNELS		m_channels ;
+	bool			m_initialized;
+	bool			m_active;
+	volatile bool	m_running;
+	bool			m_joined;			// Finished joining
+	irc_session_t*	m_session;
+	std::string		m_app;
+	std::string		m_nick;
+	_MODES			m_modes;
+	_CHANNELS		m_channels;
 
 	// Dot command index
-	typedef std::map<std::string, irc_dotcmd_t> DOTS ;
-	DOTS			m_dots ;
+	typedef std::map<std::string, irc_dotcmd_t> DOTS;
+	DOTS			m_dots;
 
-	std::set<std::string>	m_ignores ;
+	std::set<std::string>	m_ignores;
 
 	virtual bool ignoring(const char* channel) const
 	{
-		char realName[128] ;
-		return ( m_ignores.find(_getChannelName(channel, realName, sizeof(realName))) != m_ignores.end() ) ;
+		char realName[128];
+		return ( m_ignores.find(_getChannelName(channel, realName, sizeof(realName))) != m_ignores.end() );
 	}
-	virtual const std::string& nick() const { return m_nick ; }
+	virtual const std::string& nick() const { return m_nick; }
 
-	virtual void run() ;
-} ;
+	virtual void run();
+};
 
-irc_callbacks_t ircCallbacks ;
-static IRCImpl irc ;
+irc_callbacks_t ircCallbacks;
+static IRCImpl irc;
 
 //////////////////////////////////////////////////////////////////////
 // The central loop of the IRC thread.
@@ -114,52 +114,52 @@ static IRCImpl irc ;
 void
 IRCImpl::run()
 {
-	threadLog(_FLI, "IRC: started [thread #%u]", getThreadId()) ;
+	threadLog(_FLI, "IRC: started [thread #%u]", getThreadId());
 
 	const char* ircPass = cv_ircPassword.GetString();
 
-	UINT32 backOff = 30 ;
+	UINT32 backOff = 30;
 	// Running indicates we have not yet made a pass thru the loop.
-	m_running = false ;
+	m_running = false;
 	do
 	{
 		// If running didn't just get set to false, then we have been
 		// disconnected.
 		if ( m_running )
 		{
-			threadLog(_FLN, "IRC: Reconnecting") ;
+			threadLog(_FLN, "IRC: Reconnecting");
 			if ( backOff < 90 )
-				++backOff ;
+				++backOff;
 		}
 		else
-			m_running = true ;
+			m_running = true;
 
-		irc.m_joined = false ;
-			threadLog(_FLI, "IRC: Connecting %s:%u %s", cv_ircServer.GetString(), cv_ircPort.GetUint32(), m_nick.c_str()) ;
+		irc.m_joined = false;
+			threadLog(_FLI, "IRC: Connecting %s:%u %s", cv_ircServer.GetString(), cv_ircPort.GetUint32(), m_nick.c_str());
 		if ( irc_connect(m_session, cv_ircServer.GetString(), cv_ircPort.GetUint32(), ircPass, m_nick.c_str(), m_nick.c_str(), m_nick.c_str()) )
 		{
-			threadLog(_FLM, "IRC: Unable to connect: %s", irc_strerror(irc_errno(m_session))) ;
-			irc_disconnect(m_session) ;
-			irc.m_joined = true ;
+			threadLog(_FLM, "IRC: Unable to connect: %s", irc_strerror(irc_errno(m_session)));
+			irc_disconnect(m_session);
+			irc.m_joined = true;
 		}
 		else
 		{
-			OpenThreads::Thread::YieldCurrentThread() ;
+			OpenThreads::Thread::YieldCurrentThread();
 			// Reset the backoff
-			backOff = 0 ;
+			backOff = 0;
 
 			// Enter the central irc loop
-			irc_run(m_session) ;
+			irc_run(m_session);
 
 			// If the loop exits, cleanly disconnect.
-			irc_disconnect(m_session) ;
+			irc_disconnect(m_session);
 		}
 
-		OpenThreads::Thread::YieldCurrentThread() ;
-		const TeulTimeMS backoff_us = (TeulTimeMS)(backOff + 10) * 1000ULL * 1000ULL ;
-		OpenThreads::Thread::microSleep(static_cast<unsigned int>(backoff_us)) ;
+		OpenThreads::Thread::YieldCurrentThread();
+		const TeulTimeMS backoff_us = (TeulTimeMS)(backOff + 10) * 1000ULL * 1000ULL;
+		OpenThreads::Thread::microSleep(static_cast<unsigned int>(backoff_us));
 	}
-	while ( m_running ) ;
+	while ( m_running );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -169,19 +169,19 @@ static void
 _terminate(const char* reason)
 {
 	if ( irc.m_session == NULL || irc.m_active == false || irc.m_running == false )
-		return ;
+		return;
 
-	irc.m_running = false ;
+	irc.m_running = false;
 
-	irc_cmd_quit(irc.m_session, reason) ;
+	irc_cmd_quit(irc.m_session, reason);
 
-	OpenThreads::Thread::microSleep(250 * 1000) ;
+	OpenThreads::Thread::microSleep(250 * 1000);
 
-	irc.cancel() ;
+	irc.cancel();
 
-	OpenThreads::Thread::microSleep(250 * 1000) ;
+	OpenThreads::Thread::microSleep(250 * 1000);
 
-	threadsLogging() ;
+	threadsLogging();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -191,42 +191,42 @@ typedef void (*SignalHandler)(int);
 #if !defined(HAVE_SIGACTION)
 struct sigaction { SignalHandler sa_handler; };
 #endif
-static const int MaxSignals = 32 ;
-static struct sigaction oldActions[MaxSignals] ;
+static const int MaxSignals = 32;
+static struct sigaction oldActions[MaxSignals];
 
 static void
 _ircSigHandler(int signo)
 {
-	char buffer[100] ;
-	const char* format = "*** PROCESS CRASHED: %s ***" ;
-	const char* sigName = NULL ;
+	char buffer[100];
+	const char* format = "*** PROCESS CRASHED: %s ***";
+	const char* sigName = NULL;
 	switch ( signo )
 	{
-	case SIGINT:	format = "Shutdown [%s]" ; sigName = "sigint" ; break ;
-	case SIGABRT:	sigName = "abort()" ; break ;
-	case SIGILL:	sigName = "Illegal Instruction" ; break ;
-	case SIGFPE:	sigName = "Float.Pt Error" ; break ;
-	case SIGSEGV:	sigName = "Segment Fault" ; break ;
-	case SIGTERM:	sigName = "Terminated" ; break ;
+	case SIGINT:	format = "Shutdown [%s]"; sigName = "sigint"; break;
+	case SIGABRT:	sigName = "abort()"; break;
+	case SIGILL:	sigName = "Illegal Instruction"; break;
+	case SIGFPE:	sigName = "Float.Pt Error"; break;
+	case SIGSEGV:	sigName = "Segment Fault"; break;
+	case SIGTERM:	sigName = "Terminated"; break;
 #if defined(SIGHUP)
-	case SIGHUP:	format = "Shutdown [%s]" ; sigName = "hangup" ; break ;
-	case SIGBUS:	sigName = "Bus Error" ; break ;
+	case SIGHUP:	format = "Shutdown [%s]"; sigName = "hangup"; break;
+	case SIGBUS:	sigName = "Bus Error"; break;
 #endif
-	default: break ;
+	default: break;
 	}
 
 	if ( sigName != NULL )
-		sprintf(buffer, format, sigName) ;
+		sprintf(buffer, format, sigName);
 	else
-		sprintf(buffer, "*** PROCESS CRASHED with signal %d ***", signo) ;
+		sprintf(buffer, "*** PROCESS CRASHED with signal %d ***", signo);
 
-	_terminate(buffer) ;
+	_terminate(buffer);
 
 	if ( signo >= 0 && signo < MaxSignals )
 	{
-		SignalHandler handler = oldActions[signo].sa_handler ;
+		SignalHandler handler = oldActions[signo].sa_handler;
 		if ( handler != NULL && handler != SIG_IGN && handler != SIG_DFL )
-			handler(signo) ;
+			handler(signo);
 	}
 }
 
@@ -237,13 +237,13 @@ static void
 _setSig(int signum)
 {
 #if defined(HAVE_SIGACTION)
-	struct sigaction sa ;
-	sa.sa_handler = _ircSigHandler ;
-	sigfillset(&sa.sa_mask) ;
-	sa.sa_flags = SA_RESETHAND ;
+	struct sigaction sa;
+	sa.sa_handler = _ircSigHandler;
+	sigfillset(&sa.sa_mask);
+	sa.sa_flags = SA_RESETHAND;
 
-	struct sigaction* oldact = (signum >= 0 and signum < MaxSignals) ? &oldActions[signum] : NULL ;
-	sigaction(signum, &sa, oldact) ;
+	struct sigaction* oldact = (signum >= 0 and signum < MaxSignals) ? &oldActions[signum] : NULL;
+	sigaction(signum, &sa, oldact);
 #else
 	oldActions[signum].sa_handler = signal(signum, _ircSigHandler);
 #endif
@@ -255,7 +255,7 @@ _setSig(int signum)
 static void
 _shutdown()
 {
-	_terminate("Shutdown [cleanly]") ;
+	_terminate("Shutdown [cleanly]");
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -265,28 +265,28 @@ _shutdown()
 static const char*
 _getChannelName(const char* const channel, char* const into, size_t intoSize)
 {
-	assert( channel != NULL ) ;
+	assert( channel != NULL );
 
-	const char* src = channel ;
-	char* dst = into ;
-	char* const end = into + intoSize - 1 ;
+	const char* src = channel;
+	char* dst = into;
+	char* const end = into + intoSize - 1;
 	while ( *src && dst < end )
 	{
 		if ( *src == '-' )
-			dst += snprintf(dst, (size_t)(end - dst), "#%s", cv_clusterName.GetString()) ;
+			dst += snprintf(dst, (size_t)(end - dst), "#%s", cv_clusterName.GetString());
 		else if ( *src != '#' )
-			*(dst++) = '#' ;
-		char copied ;
+			*(dst++) = '#';
+		char copied;
 		do
 		{
-			copied = *(dst++) = *(src++) ;
+			copied = *(dst++) = *(src++);
 			if ( copied == 0 )
-				return into ;
-		} while ( copied != ',' && dst < end ) ;
+				return into;
+		} while ( copied != ',' && dst < end );
 	}
-	*end = 0 ;
+	*end = 0;
 
-	return into ;
+	return into;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -296,80 +296,80 @@ bool
 wwiiIRCInitialize(UINT32 ip, bool plural)
 {
 	if ( irc.m_initialized )
-		LogAbort("Tried to reinitialize IRC") ;
+		LogAbort("Tried to reinitialize IRC");
 
 	if ( cv_clusterName.GetString() == NULL )
 	{
-		dbugLog(_FLA, "WWII_CLUSTER not defined") ;
-		return false ;
+		dbugLog(_FLA, "WWII_CLUSTER not defined");
+		return false;
 	}
 
 	if ( cv_ircServer.GetString() == NULL || cv_ircServer.GetString() == 0 )
 	{
-		dbugLog(_FLA, "WWII_IRC_SERVER not defined") ;
-		return false ;
+		dbugLog(_FLW, "WWII_IRC_SERVER not defined");
+		return false;
 	}
 
-	const char* const appName = Teul::GetAppName() ;
-	irc.m_app = appName ;
+	const char* const appName = Teul::GetAppName();
+	irc.m_app = appName;
 
-	char buf[128] ;
+	char buf[128];
 
 	// Plural indicates there is more than one of this type of host
 	if ( plural )
-		sprintf(buf, "%c%c%s%c%s%u", IRC::_SERVER_PREFIX, toupper(cv_clusterName.GetString()[0]), cv_clusterName.GetString()+1, toupper(appName[0]), appName+1, ip & 255) ;
+		sprintf(buf, "%c%c%s%c%s%u", IRC::_SERVER_PREFIX, toupper(cv_clusterName.GetString()[0]), cv_clusterName.GetString()+1, toupper(appName[0]), appName+1, ip & 255);
 	else
-		sprintf(buf, "%c%c%s%c%s", IRC::_SERVER_PREFIX, toupper(cv_clusterName.GetString()[0]), cv_clusterName.GetString()+1, toupper(appName[0]), appName+1) ;
+		sprintf(buf, "%c%c%s%c%s", IRC::_SERVER_PREFIX, toupper(cv_clusterName.GetString()[0]), cv_clusterName.GetString()+1, toupper(appName[0]), appName+1);
 
-	irc.m_nick = buf ;
+	irc.m_nick = buf;
 
-	ircCallbacks.event_nick = wwiiIRCDumpEvent ;
-	ircCallbacks.event_quit = wwiiIRCDumpEvent ;
-	ircCallbacks.event_part = wwiiIRCDumpEvent ;
-	ircCallbacks.event_mode = wwiiIRCDumpEvent ;
-	ircCallbacks.event_topic = wwiiIRCDumpEvent ;
-	ircCallbacks.event_kick = wwiiIRCDumpEvent ;
-	ircCallbacks.event_notice = wwiiIRCDumpEvent ;
-	ircCallbacks.event_invite = wwiiIRCDumpEvent ;
-	ircCallbacks.event_umode = wwiiIRCDumpEvent ;
-	ircCallbacks.event_ctcp_rep = wwiiIRCDumpEvent ;
-	ircCallbacks.event_ctcp_action = wwiiIRCDumpEvent ;
-	ircCallbacks.event_unknown = wwiiIRCDumpEvent ;
-	ircCallbacks.event_channel = wwiiIRCDefaultChannelMsg ;
+	ircCallbacks.event_nick = wwiiIRCDumpEvent;
+	ircCallbacks.event_quit = wwiiIRCDumpEvent;
+	ircCallbacks.event_part = wwiiIRCDumpEvent;
+	ircCallbacks.event_mode = wwiiIRCDumpEvent;
+	ircCallbacks.event_topic = wwiiIRCDumpEvent;
+	ircCallbacks.event_kick = wwiiIRCDumpEvent;
+	ircCallbacks.event_notice = wwiiIRCDumpEvent;
+	ircCallbacks.event_invite = wwiiIRCDumpEvent;
+	ircCallbacks.event_umode = wwiiIRCDumpEvent;
+	ircCallbacks.event_ctcp_rep = wwiiIRCDumpEvent;
+	ircCallbacks.event_ctcp_action = wwiiIRCDumpEvent;
+	ircCallbacks.event_unknown = wwiiIRCDumpEvent;
+	ircCallbacks.event_channel = wwiiIRCDefaultChannelMsg;
 
-	ircCallbacks.event_join = wwiiIRCDefaultJoin ;
-	ircCallbacks.event_connect = wwiiIRCDefaultConnect ;
-	ircCallbacks.event_numeric = wwiiIRCDefaultNumeric ;
-	ircCallbacks.event_privmsg = wwiiIRCDefaultPrivMsg ;
+	ircCallbacks.event_join = wwiiIRCDefaultJoin;
+	ircCallbacks.event_connect = wwiiIRCDefaultConnect;
+	ircCallbacks.event_numeric = wwiiIRCDefaultNumeric;
+	ircCallbacks.event_privmsg = wwiiIRCDefaultPrivMsg;
 
-	irc.m_initialized = true ;
+	irc.m_initialized = true;
 
 	// All server notices
-	wwiiIRCAddInitialChannel("#servers", "-nt", "Crticial notices from all clusters") ;
-	wwiiIRCAddChannelIgnore("#servers") ;
+	wwiiIRCAddInitialChannel("#servers", "-nt", "Crticial notices from all clusters");
+	wwiiIRCAddChannelIgnore("#servers");
 
 	// Cluster server notices
-	sprintf(buf, "#%s-sys", cv_clusterName.GetString()) ;
-	char title[256] ;
-	snprintf(title, 255, "CRS, GM and System messages from %s servers", cv_clusterName.GetString()) ;
-	wwiiIRCAddInitialChannel(buf, "-nt", title) ;
+	sprintf(buf, "#%s-sys", cv_clusterName.GetString());
+	char title[256];
+	snprintf(title, 255, "CRS, GM and System messages from %s servers", cv_clusterName.GetString());
+	wwiiIRCAddInitialChannel(buf, "-nt", title);
 
 	// Initial modes
-	wwiiIRCAddInitialMode("-b") ;
-	wwiiIRCAddInitialMode("-c") ;
-	wwiiIRCAddInitialMode("-d") ;
-	wwiiIRCAddInitialMode("-k") ;
-	wwiiIRCAddInitialMode("-l") ;
-	wwiiIRCAddInitialMode("-n") ;
-	wwiiIRCAddInitialMode("-r") ;
-	wwiiIRCAddInitialMode("-s") ;
-	wwiiIRCAddInitialMode("-u") ;
-	wwiiIRCAddInitialMode("-y") ;
-	wwiiIRCAddInitialMode("-z") ;
+	wwiiIRCAddInitialMode("-b");
+	wwiiIRCAddInitialMode("-c");
+	wwiiIRCAddInitialMode("-d");
+	wwiiIRCAddInitialMode("-k");
+	wwiiIRCAddInitialMode("-l");
+	wwiiIRCAddInitialMode("-n");
+	wwiiIRCAddInitialMode("-r");
+	wwiiIRCAddInitialMode("-s");
+	wwiiIRCAddInitialMode("-u");
+	wwiiIRCAddInitialMode("-y");
+	wwiiIRCAddInitialMode("-z");
 
-	dbugLog(_FLI, "IRC: Initialized") ;
+	dbugLog(_FLI, "IRC: Initialized");
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -381,9 +381,9 @@ wwiiIRCInitialize(UINT32 ip, bool plural)
 void
 wwiiIRCAddChannelIgnore(const char* name)
 {
-	char realName[128] ;
-	_getChannelName(name, realName, sizeof(realName)) ;
-	irc.m_ignores.insert(realName) ;
+	char realName[128];
+	_getChannelName(name, realName, sizeof(realName));
+	irc.m_ignores.insert(realName);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -395,21 +395,21 @@ void
 wwiiIRCAddInitialChannel(std::string name, const char* mode, const char* topic)
 {
 	if ( irc.m_initialized == false )
-		return ;
+		return;
 
 	if ( irc.m_active )
-		LogAbort("Tried to add channel after initialization") ;
+		LogAbort("Tried to add channel after initialization");
 
 	if ( name[0] == '-' )
 	{
-		name.insert(0, cv_clusterName.GetString()) ;
-		name.insert(0, "#") ;
+		name.insert(0, cv_clusterName.GetString());
+		name.insert(0, "#");
 	}
 
-	IRCChannel addition(name.c_str(), mode, topic) ;
-	irc.m_channels[name] = addition ;
+	IRCChannel addition(name.c_str(), mode, topic);
+	irc.m_channels[name] = addition;
 
-	dbugLog(_FLI, "IRC: +chan(%s, %s, %s)", name.c_str(), mode, topic) ;
+	dbugLog(_FLI, "IRC: +chan(%s, %s, %s)", name.c_str(), mode, topic);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -420,12 +420,12 @@ void
 wwiiIRCAddInitialMode(const char* mode)
 {
 	if ( irc.m_initialized == false )
-		return ;
+		return;
 
 	if ( irc.m_active )
-		LogAbort("Tried to add mode after initialization") ;
-	dbugLog(_FLI, "IRC: added mode %s", mode) ;
-	irc.m_modes.push_back(mode) ;
+		LogAbort("Tried to add mode after initialization");
+	dbugLog(_FLI, "IRC: added mode %s", mode);
+	irc.m_modes.push_back(mode);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -434,20 +434,20 @@ wwiiIRCAddInitialMode(const char* mode)
 void
 wwiiIRCDumpEvent(irc_session_t* /*session*/, const char* event, const char* origin, const char** params, unsigned int count)
 {
-	static std::string text ;
-	text = "" ;
+	static std::string text;
+	text = "";
 
-	for ( UINT32 i = 0 ; i < count && text.length() < 1000 ; ++i )
+	for ( UINT32 i = 0; i < count && text.length() < 1000; ++i )
 	{
 		if ( i )
-			text += "|" ;
-		text += params[i] ;
+			text += "|";
+		text += params[i];
 	}
 
 	if ( text.length() > 1000 )
-		text.replace(997, 3, "...") ;
+		text.replace(997, 3, "...");
 
-	threadLog(_FLI, "IRC e:%s o:%s p:%u[%s]", event, origin ? origin : "NULL", count, text.c_str()) ;
+	threadLog(_FLI, "IRC e:%s o:%s p:%u[%s]", event, origin ? origin : "NULL", count, text.c_str());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -460,47 +460,47 @@ _joinChannel(irc_session_t* session, _CHANNELS::iterator it)
 {
 	if ( it == irc.m_channels.end() )
 	{
-		wwiiIRCChannelMessage("-sys", "== Process Online ==") ;
-		irc.m_joined = true ;
-		return ;
+		wwiiIRCChannelMessage("-sys", "== Process Online ==");
+		irc.m_joined = true;
+		return;
 	}
 
-	IRCChannel& chan = it->second ;
+	IRCChannel& chan = it->second;
 
-	threadLog(_FLI, "IRC: Attempting to join %s", chan.m_channel.c_str()) ;
+	threadLog(_FLI, "IRC: Attempting to join %s", chan.m_channel.c_str());
 
-	chan.m_newChannel = true ;
-	irc_cmd_join(session, chan.m_channel.c_str(), 0) ;
+	chan.m_newChannel = true;
+	irc_cmd_join(session, chan.m_channel.c_str(), 0);
 }
 
 void
 wwiiIRCDefaultConnect(irc_session_t* session, const char* event, const char* origin, const char** params, unsigned int count)
 {
 	// Record
-	wwiiIRCDumpEvent(session, event, origin, params, count) ;
+	wwiiIRCDumpEvent(session, event, origin, params, count);
 
 	// First, request operator mode.
-	irc_send_raw(session, "oper god crummy") ;
+	irc_send_raw(session, "oper god crummy");
 
-	irc.m_joined = false ;
+	irc.m_joined = false;
 
 	// Set user modes
-	for ( _MODES::iterator it = irc.m_modes.begin() ; it != irc.m_modes.end() ; ++it )
+	for ( _MODES::iterator it = irc.m_modes.begin(); it != irc.m_modes.end(); ++it )
 	{
-		irc_cmd_user_mode(session, it->c_str()) ;
+		irc_cmd_user_mode(session, it->c_str());
 	}
 
-	_joinChannel(session, irc.m_channels.begin()) ;
+	_joinChannel(session, irc.m_channels.begin());
 }
 
 void
 wwiiIRCDefaultChannelMsg(irc_session_t* session, const char* event, const char* origin, const char** params, unsigned int count)
 {
 	if ( origin[0] == IRC::_SERVER_PREFIX )
-		return ;
+		return;
 
 	// Record
-	wwiiIRCDumpEvent(session, event, origin, params, count) ;
+	wwiiIRCDumpEvent(session, event, origin, params, count);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -513,52 +513,52 @@ void
 wwiiIRCDefaultPrivMsg(irc_session_t* session, const char* event, const char* origin, const char** params, unsigned int count)
 {
 	if ( origin[0] == IRC::_SERVER_PREFIX )
-		return ;
+		return;
 
 	// Record
-	wwiiIRCDumpEvent(session, event, origin, params, count) ;
+	wwiiIRCDumpEvent(session, event, origin, params, count);
 
 	if ( count < 2 || params[1][0] != '.' )
-		return ;
+		return;
 	if ( params[1][1] == '.' )
-		return ;
+		return;
 
-	const char* input = params[1] + 1 ;
+	const char* input = params[1] + 1;
 	if ( irc.m_ignores.find(input) != irc.m_ignores.end() )
-		return ;
+		return;
 
-	char nick[129] ;
-	irc_target_get_nick(origin, nick, 128) ;
-	const char* recipient = (params[0][0] == '#') ? params[0] : nick ;
+	char nick[129];
+	irc_target_get_nick(origin, nick, 128);
+	const char* recipient = (params[0][0] == '#') ? params[0] : nick;
 
-	IRC_Command iCmd(nick, recipient, input) ;
+	IRC_Command iCmd(nick, recipient, input);
 
-	IRCImpl::DOTS::iterator it ;
+	IRCImpl::DOTS::iterator it;
 
 	// ".help" produces a list of commands.
 	if ( iCmd.cmd == "help" )
 	{
-		std::string reply = "Commands: help" ;
-		for ( it = irc.m_dots.begin() ; it != irc.m_dots.end() ; ++it )
+		std::string reply = "Commands: help";
+		for ( it = irc.m_dots.begin(); it != irc.m_dots.end(); ++it )
 		{
-			reply += ", " ;
-			reply += it->first ;
+			reply += ", ";
+			reply += it->first;
 		}
-		reply += "." ;
-		irc_cmd_msg(session, recipient, reply.c_str()) ;
-		return ;
+		reply += ".";
+		irc_cmd_msg(session, recipient, reply.c_str());
+		return;
 	}
 
-	it = irc.m_dots.find(iCmd.cmd) ;
+	it = irc.m_dots.find(iCmd.cmd);
 	if ( it == irc.m_dots.end() )
 	{
-		char retort[64] ;
-		sprintf(retort, "I don't understand '%s'", iCmd.Command()) ;
-		irc_cmd_msg(session, recipient, retort) ;
-		return ;
+		char retort[64];
+		sprintf(retort, "I don't understand '%s'", iCmd.Command());
+		irc_cmd_msg(session, recipient, retort);
+		return;
 	}
 
-	it->second(iCmd) ;
+	it->second(iCmd);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -567,32 +567,32 @@ wwiiIRCDefaultPrivMsg(irc_session_t* session, const char* event, const char* ori
 bool
 wwiiIRCHandleJoinMessage(irc_session_t* session, const char* event, const char* origin, const char** params, unsigned int count)
 {
-	wwiiIRCDumpEvent(session, event, origin, params, count) ;
+	wwiiIRCDumpEvent(session, event, origin, params, count);
 
-	char nick[65] ;
-	irc_target_get_nick(origin, nick, 64) ;
+	char nick[65];
+	irc_target_get_nick(origin, nick, 64);
 
 	// Is this a message about me?
 	if ( irc.m_nick.compare(nick) == 0 )
 	{
 		// So I've joined a channel.
-		_CHANNELS::iterator it = irc.m_channels.find(params[0]) ;
+		_CHANNELS::iterator it = irc.m_channels.find(params[0]);
 		if ( it != irc.m_channels.end() )
 		{
-			const IRCChannel& chan = it->second ;
-			std::string modeCmd = "+o " ;
-			modeCmd += irc.m_nick ;
-			irc_cmd_channel_mode(session, chan.m_channel.c_str(), modeCmd.c_str()) ;
+			const IRCChannel& chan = it->second;
+			std::string modeCmd = "+o ";
+			modeCmd += irc.m_nick;
+			irc_cmd_channel_mode(session, chan.m_channel.c_str(), modeCmd.c_str());
 
-			irc_cmd_user_mode(session, "+i") ;
+			irc_cmd_user_mode(session, "+i");
 		}
 
 		// We've done the work.
-		return true ;
+		return true;
 	}
 
 	// We did no work, up to you if you want to handle it.
-	return false ;
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -602,7 +602,7 @@ wwiiIRCHandleJoinMessage(irc_session_t* session, const char* event, const char* 
 void
 wwiiIRCDefaultJoin(irc_session_t* session, const char* event, const char* origin, const char** params, unsigned int count)
 {
-	wwiiIRCHandleJoinMessage(session, event, origin, params, count) ;
+	wwiiIRCHandleJoinMessage(session, event, origin, params, count);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -611,47 +611,47 @@ wwiiIRCDefaultJoin(irc_session_t* session, const char* event, const char* origin
 void
 wwiiIRCDefaultNumeric(irc_session_t * session, unsigned int event, const char* origin, const char** params, unsigned int count)
 {
-	char buf[32] ;
-	sprintf(buf, "num#%u", event) ;
-	wwiiIRCDumpEvent(session, buf, origin, params, count) ;
+	char buf[32];
+	sprintf(buf, "num#%u", event);
+	wwiiIRCDumpEvent(session, buf, origin, params, count);
 
 	if ( count < 2 )
-		return ;
+		return;
 
-	const char* nick = params[0] ;
-	const char* channel = params[1] ;
+	const char* nick = params[0];
+	const char* channel = params[1];
 
 	if ( channel == NULL || channel[0] != '#' || irc.m_nick.compare(nick) != 0 )
-		return ;
+		return;
 
-	_CHANNELS::iterator it = irc.m_channels.find(channel) ;
+	_CHANNELS::iterator it = irc.m_channels.find(channel);
 	if ( it == irc.m_channels.end() )
-		return ;
-	IRCChannel& chan = it->second ;
+		return;
+	IRCChannel& chan = it->second;
 
 	switch ( event )
 	{
 	case 333:	// Channel creation info, means channel existed
 	case LIBIRC_RFC_RPL_TOPIC:	// Topic notification for a channel
-		chan.m_newChannel = false ;
-	break ;
+		chan.m_newChannel = false;
+	break;
 
 	case LIBIRC_RFC_RPL_ENDOFNAMES:	// End of user list
 		if ( chan.m_newChannel == true )
 		{
-			threadLog(_FLI, "IRC: Created %s", channel) ;
+			threadLog(_FLI, "IRC: Created %s", channel);
 			if ( chan.m_mode.empty() == false )
-				irc_cmd_channel_mode(session, chan.m_channel.c_str(), chan.m_mode.c_str()) ;
+				irc_cmd_channel_mode(session, chan.m_channel.c_str(), chan.m_mode.c_str());
 			if ( chan.m_topic.empty() == false )
-				irc_cmd_topic(session, chan.m_channel.c_str(), chan.m_topic.c_str()) ;
+				irc_cmd_topic(session, chan.m_channel.c_str(), chan.m_topic.c_str());
 		}
 		else
 		{
-			threadLog(_FLI, "IRC: Joined %s", channel) ;
+			threadLog(_FLI, "IRC: Joined %s", channel);
 		}
-		++it ;
-		_joinChannel(session, it) ;
-	break ;
+		++it;
+		_joinChannel(session, it);
+	break;
 	}
 }
 
@@ -666,57 +666,57 @@ wwiiIRCActivate(bool includeSigHup)
 {
 	if ( cv_ircServer.GetString() == NULL || *cv_ircServer.GetString() == 0 )
 	{
-		dbugLog(_FLA, "IRC: disabled") ;
-		return true ;
+		dbugLog(_FLA, "IRC: disabled");
+		return true;
 	}
 
 	if ( irc.m_initialized == false )
 	{
-		dbugLog(_FLA, "IRC: Tried to activate but initialization failed") ;
-		return false ;
+		dbugLog(_FLA, "IRC: Tried to activate but initialization failed");
+		return false;
 	}
 
-	irc.m_session = irc_create_session(&ircCallbacks) ;
+	irc.m_session = irc_create_session(&ircCallbacks);
 	if ( irc.m_session == NULL )
 	{
-		dbugLog(_FLA, "IRC: Unable to create session") ;
-		return false ;
+		dbugLog(_FLA, "IRC: Unable to create session");
+		return false;
 	}
 
-	irc_set_ctx(irc.m_session, &irc) ;
+	irc_set_ctx(irc.m_session, &irc);
 
-	irc.m_active = true ;
+	irc.m_active = true;
 
-	atexit(_shutdown) ;
+	atexit(_shutdown);
 
 	irc.start();
 
-	_setSig(SIGINT) ;
-	_setSig(SIGABRT) ;
-	_setSig(SIGILL) ;
-	_setSig(SIGFPE) ;
-	_setSig(SIGSEGV) ;
-	_setSig(SIGTERM) ;
+	_setSig(SIGINT);
+	_setSig(SIGABRT);
+	_setSig(SIGILL);
+	_setSig(SIGFPE);
+	_setSig(SIGSEGV);
+	_setSig(SIGTERM);
 
 #if defined(SIGHUP)
-	_setSig(SIGBUS) ;
+	_setSig(SIGBUS);
 
 	if ( includeSigHup == true )
-		_setSig(SIGHUP) ;
+		_setSig(SIGHUP);
 #endif
 
-	dbugLog(_FLN, "IRC: Activated as %s", irc.m_nick.c_str()) ;
+	dbugLog(_FLN, "IRC: Activated as %s", irc.m_nick.c_str());
 
 	// Allow IRC 5 seconds to initialize
-	for ( UINT32 i = 0 ; i < 5 * 100 ; ++i )
+	for ( UINT32 i = 0; i < 5 * 100; ++i )
 	{
-		OpenThreads::Thread::microSleep(10 * 100) ;
-		threadsLogging() ;
+		OpenThreads::Thread::microSleep(10 * 100);
+		threadsLogging();
 		if ( irc.m_joined == true )
-			break ;
+			break;
 	}
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -726,8 +726,8 @@ void
 wwiiIRCTerminate(const char* reason)
 {
 	if ( reason == NULL )
-		reason = "Terminated" ;
-	_terminate(reason) ;
+		reason = "Terminated";
+	_terminate(reason);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -736,13 +736,13 @@ wwiiIRCTerminate(const char* reason)
 void
 wwiiIRCChannelMessage(const char* channel, const char* message)
 {
-	assert( channel != NULL ) ;
-	assert( message != NULL ) ;
+	assert( channel != NULL );
+	assert( message != NULL );
 
 	if ( irc.m_running )
 	{
-		char name[128] ;
-		irc_cmd_msg(irc.m_session, _getChannelName(channel, name, sizeof(name)), message) ;
+		char name[128];
+		irc_cmd_msg(irc.m_session, _getChannelName(channel, name, sizeof(name)), message);
 	}
 }
 
@@ -753,24 +753,24 @@ void
 wwiiIRCMessage(const char* channel, const char* fmt, ...)
 {
 	if ( irc.m_running == false )
-		return ;
+		return;
 
-	assert( channel != NULL ) ;
+	assert( channel != NULL );
 
 	if ( fmt == NULL )
-		dbugLog(_FLW, "called wwiiIRCMessage(%s, NULL)...", channel) ;
+		dbugLog(_FLW, "called wwiiIRCMessage(%s, NULL)...", channel);
 
-	static char buffer[1202] ;
-	va_list args ;
-	va_start(args, fmt) ;
+	static char buffer[1202];
+	va_list args;
+	va_start(args, fmt);
 
-	vsnprintf(buffer, 1200, fmt, args) ;
-	va_end(args) ;
+	vsnprintf(buffer, 1200, fmt, args);
+	va_end(args);
 
-	buffer[1200] = 0 ;
+	buffer[1200] = 0;
 
-	char name[128] ;
-	irc_cmd_msg(irc.m_session, _getChannelName(channel, name, sizeof(name)), buffer) ;
+	char name[128];
+	irc_cmd_msg(irc.m_session, _getChannelName(channel, name, sizeof(name)), buffer);
 }
 
 
@@ -780,13 +780,13 @@ wwiiIRCMessage(const char* channel, const char* fmt, ...)
 void
 wwiiIRCChannelNotice(const char* channel, const char* message)
 {
-	assert( channel != NULL ) ;
-	assert( message != NULL ) ;
+	assert( channel != NULL );
+	assert( message != NULL );
 
 	if ( irc.m_running )
 	{
-		char name[128] ;
-		irc_cmd_notice(irc.m_session, _getChannelName(channel, name, sizeof(name)), message) ;
+		char name[128];
+		irc_cmd_notice(irc.m_session, _getChannelName(channel, name, sizeof(name)), message);
 	}
 }
 
@@ -796,17 +796,17 @@ wwiiIRCChannelNotice(const char* channel, const char* message)
 void
 wwiiIRCRegisterCommand(const char* name, irc_dotcmd_t function)
 {
-	assert( name != NULL ) ;
+	assert( name != NULL );
 
 	if ( function != NULL )
 	{
-		dbugLog(_FLI, "IRC: Registering .%s", name) ;
-		irc.m_dots[name] = function ;
+		dbugLog(_FLI, "IRC: Registering .%s", name);
+		irc.m_dots[name] = function;
 	}
 	else
 	{
-		dbugLog(_FLI, "IRC: Disabling .%s", name) ;
-		irc.m_dots.erase(name) ;
+		dbugLog(_FLI, "IRC: Disabling .%s", name);
+		irc.m_dots.erase(name);
 	}
 }
 
@@ -824,53 +824,53 @@ namespace Host
 		, instID(withInstID)
 {
 	ABORT_IF(withInput == nullptr);
-	const char* src = withInput ;
-	char terminator = ' ' ;
-	const char* arguments = NULL ;
+	const char* src = withInput;
+	char terminator = ' ';
+	const char* arguments = NULL;
 	do
 	{
 		if ( src[0] == '"' || src[0] == '\'' )
 		{
-			terminator = src[0] ;
-			++src ;
+			terminator = src[0];
+			++src;
 		}
 
-		const char* space = strchr(src, terminator) ;
+		const char* space = strchr(src, terminator);
 		if ( space == NULL )
 		{
-			args.push_back(src) ;
-			break ;
+			args.push_back(src);
+			break;
 		}
 
-		args.push_back(std::string(src, (size_t)(space - src))) ;
+		args.push_back(std::string(src, (size_t)(space - src)));
 
-		src = space + 1 ;
-		terminator = ' ' ;
+		src = space + 1;
+		terminator = ' ';
 
 		while ( *src && isspace(*src) )
 		{
-			++src ;
+			++src;
 		}
 
 		if ( arguments == NULL )
-			arguments = src ;
+			arguments = src;
 	}
-	while ( *src ) ;
+	while ( *src );
 
-	cmd = args[0] ;
-	args.erase(args.begin()) ;
+	cmd = args[0];
+	args.erase(args.begin());
 
 	if ( cmd.size() > 32 )
 	{
-		cmd.resize(32) ;
+		cmd.resize(32);
 	}
 
-	for ( UINT32 i = 0 ; i < cmd.size() ; ++i )
+	for ( UINT32 i = 0; i < cmd.size(); ++i )
 	{
-		cmd[i] = tolower(cmd[i]) ;
+		cmd[i] = tolower(cmd[i]);
 	}
 
-	input = arguments ? arguments : "" ;
+	input = arguments ? arguments : "";
 }
 
 }
@@ -879,21 +879,21 @@ void
 IRC_Command::Reply(Host::CellCommand::ResponseType, const char* format, ...) const
 {
 	if ( irc.m_running == false )
-		return ;
+		return;
 
 	if ( format == nullptr )
 		LogAbort("called %s with NULL format", __FUNCTION__);
 
-	static char buffer[1202] ;
-	va_list vargs ;
-	va_start(vargs, format) ;
+	static char buffer[1202];
+	va_list vargs;
+	va_start(vargs, format);
 
-	vsnprintf(buffer, 1200, format, vargs) ;
-	va_end(vargs) ;
+	vsnprintf(buffer, 1200, format, vargs);
+	va_end(vargs);
 
-	buffer[1200] = 0 ;
+	buffer[1200] = 0;
 
-	char name[128] ;
-	irc_cmd_msg(irc.m_session, _getChannelName(Tell(), name, sizeof(name)), buffer) ;
+	char name[128];
+	irc_cmd_msg(irc.m_session, _getChannelName(Tell(), name, sizeof(name)), buffer);
 }
 
