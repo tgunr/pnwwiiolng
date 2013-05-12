@@ -366,10 +366,17 @@ _bindAndListen(ENDPOINT& endpoint)
 static void
 _connectSocket(ENDPOINT& endpoint)
 {
-	// Start the connection process.
-	if ( connect(endpoint.socket, (struct sockaddr*)&endpoint.destSockAddress, sizeof(endpoint.destSockAddress)) < 0 )
+	// Start the connection process. Give the OS a few chances to allocate an address for us.
+	for (size_t attempt = 0; attempt < 64; ++attempt)
 	{
+		int connectResult = connect(endpoint.socket, (struct sockaddr*)&endpoint.destSockAddress, sizeof(endpoint.destSockAddress));
+		if ( connectResult >= 0 )
+			break;
+
 		const SINT32 error = dbugGetErrno();
+
+		if ( error == EADDRNOTAVAIL )
+			continue;
 
 		// Since our sockets are configured as non-blocking,
 		// it's VERY unlikely the connection will happen this
@@ -390,6 +397,8 @@ _connectSocket(ENDPOINT& endpoint)
 #endif
 
 		dbugLog(_FLD, "t:%d sock:%d connecting", endpoint.teulIndex(), endpoint.socket);
+
+		break;
 	}
 }
 
