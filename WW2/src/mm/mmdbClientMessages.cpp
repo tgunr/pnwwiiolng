@@ -7,59 +7,56 @@
 //
 // Originating Programmer: Eric "Meat" Hall
 
-#include "map/mapPlayer.h"
-#include "mm/mmdbPack.h"
-#include "mm/mmPack.h"
 #include "mm/mmdbClientMessages.h"
-#include "dbse/dbseClient.h"
-#include "dbse/dbseConstants.h"
-#include "teul/teulKit.h"
 #include "miss/mission.h"
-#include "mm/mmdbTypes.h"
-#include "miss/missionExtMission.h"
-#include "wwii/wwiiCallbacks.h"
 #include "map/mapBrigades.h"
-#include "map/mapDB.h"
 #include "strt/strtData.h"
 #include "strt/strtCPStruct.h"
 #include "wwii/wwiiString.h"
+#include "include/mydbQuery.h"
+#include "wwii/wwiiDBThreads.h"
 
-static	TEUL_CALLBACK*	_XCHG_BRIGADE_DETAILS ;
+// By default, check once every 3 seconds.
+static const SINT32 _STANDARD_BDU_INTERVAL_MS = 1 * 3 * 1000;
 
-static UINT32 _lastbduModified ;
-static UINT32 _lastbduUnit ;
-static TeulTimeMS _lastbduMark ;
-static UINT32 _lastbduInterval ;
+static const char* QRY_SELECT_BRIGADE_DETAILS =
+	"SELECT shu.unit_id"
+	", UNIX_TIMESTAMP(shu.modified)"
+	", shu.title"
+	", shu.motd"
+	", shu.motto"
+	", shu.nick"
+	", home.cp_ox"
+	", home.cp_oy"
+	", home.cp_id"
+	", owner.playerid"
+	", IF(owner.isplaynet,UPPER(owner.callsign),owner.callsign)"
+	", ownerp.rankid"
+	" FROM strat_hc_units shu"
+	" LEFT JOIN strat_cp home ON (shu.home_cp_oid = home.cp_oid)"
+	" LEFT OUTER JOIN wwii_player owner ON (shu.owner_id = owner.playerid)"
+	" LEFT OUTER JOIN wwii_persona ownerp ON (shu.owner_id = ownerp.playerid"
+	" and shu.country_id = ownerp.countryid"
+	" and shu.branch_id = ownerp.branchid)"
+	" WHERE (UNIX_TIMESTAMP(shu.modified) > %u)"
+	" ORDER BY 2, 1"
+	;
 
-// By default, check once every minute
-static const SINT32 _STANDARD_BDU_INTERVAL_MS = 1 * 3 * 1000 ;
-
-// Whenever we receive data, park another request 200ms from now
-static const SINT32 _RAPID_BDU_INTERVAL_MS = 20 ;
-
-static SINT32
-_sendBrigadeDetailsRequest(ACTION_OBJECT* const a)
-{
-	UINT32* data = (UINT32*)(a->localRawData) ;
-	// We're passed two UINT32s
-	a->offset = teulPackUINT32(TEUL_PACK, a->packed, a->offset, &data[0], 0) ;
-	a->offset = teulPackUINT32(TEUL_PACK, a->packed, a->offset, &data[1], 0) ;
-
-	return a->offset ;
-}
+static UINT32		s_lastUnitModifiedStamp = 0;
+static TeulTimeMS	s_nextBrigadeDetailsQuery = 0;
 
 void
 mmdbInitializeBrigadeLocations()
 {
-	HCUNIT_INDEX::iterator it ;
-	for ( it = hcUnits.begin() ; it != hcUnits.end() ; ++it )
+	HCUNIT_INDEX::iterator it;
+	for ( it = hcUnits.begin(); it != hcUnits.end(); ++it )
 	{
-		HCUnit* unit = it->second ;
+		HCUnit* unit = it->second;
 		if ( !unit->isBrigade() && !unit->isDivision() )
-			continue ;
+			continue;
 		if ( unit->homeCPID().id == 0 )
-			continue ;
-		unit->setHomeCPID(unit->homeCPID()) ;
+			continue;
+		unit->setHomeCPID(unit->homeCPID());
 	}
 }
 
@@ -72,110 +69,165 @@ mmdbInitializeBrigadeLocations()
 void
 HCUnit::setHomeCPID(const FULL_OBJ_ID& cpID)
 {
-	CPStruct* oldCP ;
-	oldCP = strtGetCP(m_homeCPID) ;
+	CPStruct* oldCP;
+	oldCP = strtGetCP(m_homeCPID);
 	if ( oldCP != NULL )
-		oldCP->m_units.erase(unitID()) ;
+		oldCP->m_units.erase(unitID());
 
-	CPStruct* cp = strtGetCP(cpID) ;
+	CPStruct* cp = strtGetCP(cpID);
 	if ( cp )
 	{
-		m_homeCPID = cpID ;
-		cp->m_units[unitID()] = this ;
+		m_homeCPID = cpID;
+		cp->m_units[unitID()] = this;
 	}
 	else
-		m_homeCPID = nullObjID ;
+		m_homeCPID = nullObjID;
 
 	// Have we moved?
 	if ( cp != oldCP && NULL != oldCP )
 	{
-		Brigade* brigade = mapFindBrigade(unitID()) ;
+		Brigade* brigade = mapFindBrigade(unitID());
 		if ( brigade != NULL )
-			brigade->checkOrigins() ;
-		missionCheckOrigins(oldCP) ;
+			brigade->checkOrigins();
+		missionCheckOrigins(oldCP);
 		if ( brigade != NULL )
-			brigade->updateDestinations() ;
+			brigade->updateDestinations();
 	}
 
-	brigadeMovements[unitID()] = ++lastBrigadeMovement ;
+	brigadeMovements[unitID()] = ++lastBrigadeMovement;
 
-//	dbugLog(_FLI, "XXX hcu:%u name:%s home:%s units:%u", unitID(), name(), (cp ? cp->name : "offmap"), (cp ? cp->m_units.size() : 0)) ;
+//	dbugLog(_FLI, "XXX hcu:%u name:%s home:%s units:%u", unitID(), name(), (cp ? cp->name : "offmap"), (cp ? cp->m_units.size() : 0));
 }
 
-static SINT32
-_recvBrigadeDetailsResponse(ACTION_OBJECT* const a)
+//////////////////////////////////////////////////////////////////////
+// Query brigades that have had a database change we don't know about.
+
+struct BrigadeDetailsUpdate
 {
-	BrigadeDetailsUpdate bdu(a) ;
+	BrigadeDetailsUpdate() {}
 
-	if ( bdu.m_lastModified >= _lastbduModified )
+	UINT32			m_brigadeID;
+	UINT32			m_lastModified;
+	ChatHandle		m_owner;
+	RANK_NO			m_ownerRank;
+	UINT32			m_ownerID;
+	char			m_title[MAX_HCUNIT_NAME_LENGTH+1];
+	char			m_motd[MAX_BRIGADE_NOTES_LENGTH+1];
+	char			m_motto[MAX_BRIGADE_MOTTO_LENGTH+1];
+	char			m_shortName[MAX_BRIGADE_SHORT_LENGTH+1];
+	FULL_OBJ_ID		m_homeCPID;
+};
+
+class BrigadeDetailsQuery : public DBThreadQuery
+{
+public:	BrigadeDetailsQuery()
+			: DBThreadQuery(DBThread::Default, "BrigadeDetailsUpdate", DBThreadQuery::_CALLBACK
+							, QRY_SELECT_BRIGADE_DETAILS
+								, s_lastUnitModifiedStamp
+							)
+		{
+		}
+
+private:
+	std::vector<BrigadeDetailsUpdate> m_results;
+
+protected:
+	virtual bool Process(const size_t numRows)
 	{
-		_lastbduModified = bdu.m_lastModified ;
-		_lastbduUnit = bdu.m_brigadeID ;
+		if ( numRows <= 0 )
+			return true;
+
+		m_results.resize(numRows);
+		char ownerHandle[MAX_HANDLE_SIZE];
+		for ( size_t i = 0; i < numRows && Query()->FetchRow(); ++i )
+		{
+			auto& row = Query()->Row();
+			auto& bdu = m_results[i];
+
+			bdu.m_brigadeID = row.NextUInt();
+			bdu.m_lastModified = row.NextUInt();
+			row.NextString(bdu.m_title, sizeof(bdu.m_title));
+			row.NextString(bdu.m_motd, sizeof(bdu.m_motd));
+			row.NextString(bdu.m_motto, sizeof(bdu.m_motto));
+			row.NextString(bdu.m_shortName, sizeof(bdu.m_shortName));
+			bdu.m_homeCPID.cell.ox = (SINT16)row.NextSInt();
+			bdu.m_homeCPID.cell.oy = (SINT16)row.NextSInt();
+			bdu.m_homeCPID.id = (UINT16)row.NextUInt();
+			bdu.m_ownerID = row.NextUInt();
+			row.NextString(ownerHandle, sizeof(ownerHandle));
+			bdu.m_ownerRank = (UINT8)row.NextUInt();
+
+			bdu.m_owner = chatGetHandle(ownerHandle);
+		}
+
+		threadLog(_FLD, "received %u brigade detail updates", numRows);
+
+		return true;
 	}
 
-//	dbugLog(_FLD, "XXX hcUnit(%u) %s update", bdu.m_brigadeID, bdu.m_title) ;
-
-	HCUnit* unit = HCUnit::Lookup(bdu.m_brigadeID) ;
-	if ( unit == NULL )
+public:
+	virtual void Success()
 	{
-		dbugLog(_FLW, "Apparent new brigade(%hu): %s", bdu.m_brigadeID, bdu.m_title) ;
-		return a->offset ;
+		for ( size_t i = 0; i < m_results.size(); ++i )
+		{
+			auto& bdu = m_results[i];
+			if ( bdu.m_lastModified >= s_lastUnitModifiedStamp )
+				s_lastUnitModifiedStamp = bdu.m_lastModified;
+
+			//	dbugLog(_FLD, "XXX hcUnit(%u) %s update", bdu.m_brigadeID, bdu.m_title);
+
+			HCUnit* unit = HCUnit::Lookup(bdu.m_brigadeID);
+			if ( unit == NULL )
+			{
+				dbugLog(_FLW, "Apparent new brigade(%hu): %s", bdu.m_brigadeID, bdu.m_title);
+				continue;
+			}
+
+			strncpy(unit->m_name, bdu.m_title, MAX_HCUNIT_NAME_LENGTH);
+			unit->m_name[MAX_HCUNIT_NAME_LENGTH] = 0;
+			unit->m_owner = bdu.m_owner;
+			unit->m_ownerRank = bdu.m_ownerRank;
+
+			if ( bdu.m_homeCPID != unit->homeCPID() )
+			{
+				dbugLog(_FLD, "hcu:%u %s moved", bdu.m_brigadeID, bdu.m_title);
+				unit->setHomeCPID(bdu.m_homeCPID);
+			}
+
+			Brigade* brigade = mapFindBrigade(bdu.m_brigadeID);
+			if ( brigade != NULL )
+			{
+				strlcpy(brigade->m_motd, bdu.m_motd, sizeof(brigade->m_motd));
+				strlcpy(brigade->m_shortName, bdu.m_shortName, sizeof(brigade->m_shortName));
+				strlcpy(brigade->m_motto, bdu.m_motto, sizeof(brigade->m_motto));
+				brigade->m_ownerID = bdu.m_ownerID;
+			}
+		}
+		s_nextBrigadeDetailsQuery = teulClock64 + _STANDARD_BDU_INTERVAL_MS;
 	}
 
-	strncpy(unit->m_name, bdu.m_title, MAX_HCUNIT_NAME_LENGTH) ;
-	unit->m_name[MAX_HCUNIT_NAME_LENGTH] = 0 ;
-	unit->m_owner = bdu.m_owner ;
-	unit->m_ownerRank = bdu.m_ownerRank ;
-
-	if ( bdu.m_homeCPID != unit->homeCPID() )
+	virtual void Failure()
 	{
-		dbugLog(_FLD, "hcu:%u %s moved", bdu.m_brigadeID, bdu.m_title) ;
-		unit->setHomeCPID(bdu.m_homeCPID) ;
+		dbugLog(_FLW, "brigade details query failed");
+		s_nextBrigadeDetailsQuery = teulClock64 + 5000;
 	}
+};
 
-	Brigade* brigade = mapFindBrigade(bdu.m_brigadeID) ;
-	if ( brigade != NULL )
-	{
-		strlcpy(brigade->m_motd, bdu.m_motd, sizeof(brigade->m_motd)) ;
-		strlcpy(brigade->m_shortName, bdu.m_shortName, sizeof(brigade->m_shortName)) ;
-		strlcpy(brigade->m_motto, bdu.m_motto, sizeof(brigade->m_motto)) ;
-		brigade->m_ownerID = bdu.m_ownerID ;
-	}
+void
+mmdbRequestBrigadeDetailsUpdate()
+{
+	if ( teulClock64 < s_nextBrigadeDetailsQuery )
+		return;
 
-	_lastbduMark = teulClock64 ;
-	_lastbduInterval = _RAPID_BDU_INTERVAL_MS ;
+	// don't do any queries until this fails or succeeds.
+	s_nextBrigadeDetailsQuery = ~0ULL;
 
-	return a->offset ;
+	(new BrigadeDetailsQuery())->Queue();
 }
 
 void
 mmdbForceBrigadeDetailsUpdate()
 {
-	_lastbduMark = 0 ;
-	mmdbRequestBrigadeDetailsUpdate() ;
-}
-
-void
-mmdbRequestBrigadeDetailsUpdate()
-{
-	if ( _lastbduMark != 0 && teulClock64 - _lastbduMark < _lastbduInterval )
-		return ;
-
-	_lastbduMark = teulClock64 ;
-	_lastbduInterval = _STANDARD_BDU_INTERVAL_MS ;
-
-	UINT32 prior[2] ;
-	prior[0] = _lastbduModified ;
-	prior[1] = _lastbduUnit ;
-	dbseSend(_XCHG_BRIGADE_DETAILS, prior) ;
-}
-
-SINT32
-mmdbInstallClientCallbacks()
-{
-	BEGIN_CALLBACK_REGISTRATION(MM_DBSE_X)
-
-		REGISTER_SENDRECV(MMDB_XCHG_BRIGADE_DETAILS_Y, _sendBrigadeDetailsRequest, _recvBrigadeDetailsResponse, _XCHG_BRIGADE_DETAILS) ;
-
-	END_CALLBACK_REGISTRATION
+	s_nextBrigadeDetailsQuery = 0ULL;
+	mmdbRequestBrigadeDetailsUpdate();
 }

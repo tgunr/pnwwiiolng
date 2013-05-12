@@ -899,8 +899,6 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 			miss/missionUtils.h
 		mm/mmdbClientMessages.cpp
 			mm/mmdbClientMessages.h
-		mm/mmdbPack.cpp
-			mm/mmdbPack.h
 		mm/mmdbPersonaSelections.cpp
 			mm/mmdbPersonaSelections.h
 		parse/parseWor.cpp
@@ -971,24 +969,6 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 		dbse/dbseDaemon.cpp
 			dbse/dbseDaemon.h
 		dbse/dbseHostMessages.cpp
-		miss/missionPacket.cpp
-			miss/missionPacket.h
-				mm/mmEnums.h
-				wwii/wwiiRank.h
-				weap/weapSerial.h
-				omg/omgMissionSortieData.h
-				miss/missFlags.h
-					wwii/wwiiSyncVar.h
-					teul/teulNetTimeMS.h
-					weap/weapSpecPacker.h
-					wwii/wwiiFullObjIDPacker.h
-						teul/teulNetTimeMSPacker.h
-		mm/mmdbHostMessages.cpp
-			mm/mmdbHostMessages.h
-		mm/mmdbPack.cpp
-			mm/mmdbPack.h
-		mm/mmdbParser.cpp
-			mm/mmdbParser.h
 		wwii/wwiiSquads.cpp
 			wwii/wwiiSquads.h
 

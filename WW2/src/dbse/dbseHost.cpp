@@ -15,8 +15,6 @@
 #include "dbse/dbseHandle.h"
 #include "dbse/dbseDaemon.h"
 #include "dbse/dbseConnection.h"
-#include "mm/mmdbHostMessages.h"
-#include "mm/mmdbParser.h"
 #include "server/serverInterfaceDescription.h"			// For myInterface
 #include "teul/teulKit.h"
 #include "wwii/wwiiIRC.h"
@@ -62,7 +60,7 @@ int main(int argc, char* argv[])
 	Teul::SetAppName(g_serverName);
 	if (teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction) < 0)
 	{
-		fprintf(stderr, "Unable to intialize teulTransport\n");
+		fprintf(stderr, "Unable to initialize teulTransport\n");
 		exit(-ENOTCONN);
 	}
 	dbugSetWriteLevel(Debug::ERR_INFO | DEF_ERR_FLAGS);
@@ -71,7 +69,7 @@ int main(int argc, char* argv[])
 
 	threadsReadDBEnvironment();
 
-	if ( mmdbInstallHostCallbacks() || chatdbInstallHostCallbacks() )
+	if ( chatdbInstallHostCallbacks() )
 		LogAbort("Error installing callbacks");
 
 	_initDB();

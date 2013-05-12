@@ -12,7 +12,6 @@
 
 #include "auth/authPlayerDetails.h"
 #include "chat/chatGroupPermissionTypes.h"
-#include "dbse/dbseClient.h"
 #include "dbse/dbseConnection.h"
 #include "dbse/dbseWrapper.h"
 #include "include/arenaLockEnums.h"
@@ -210,10 +209,6 @@ mapInitDB()
 	}
 
 	wwiiReadRanks(dbh);
-
-	mmdbInstallClientCallbacks();
-	if (dbseInit() != SUCCESS)
-		retval = false ;
 
 #if !defined(DEV_BUILD) && !defined(FRES)
 	mapPollChecksums(true) ;

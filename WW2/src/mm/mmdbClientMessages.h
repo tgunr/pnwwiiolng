@@ -7,12 +7,6 @@
 //
 // Originating Programmer: Eric "Meat" Hall
 
-#include "wwii/wwiiOwnershipEnums.h"		// For WWII_SIDE
-
-extern SINT32 mmdbInstallClientCallbacks();
-extern LOGICAL mmdbRequestMissionList(void) ;
-extern void mmdbSendPlayerSideLock(UINT32 pid, WWII_SIDE side, UINT32 locktime) ;
 extern void mmdbRequestBrigadeDetailsUpdate() ;
 extern void mmdbForceBrigadeDetailsUpdate() ;
 extern void mmdbInitializeBrigadeLocations() ;
-

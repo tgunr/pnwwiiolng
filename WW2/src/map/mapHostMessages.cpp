@@ -27,7 +27,6 @@
 #include "map/mapSwingMeter.h"
 #include "miss/mission.h"
 #include "miss/missionHostMessages.h"
-#include "mm/mmdbClientMessages.h"
 #include "mm/mmMain.h"
 #include "mm/mmSpawn.h"
 #include "mm/mmSpawnTypes.h"

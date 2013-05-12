@@ -17,32 +17,33 @@ struct PersonaSlectionThread : public OpenThreads::Thread
 {
 	virtual void run() { mmdbPersonaSelectionsThread(NULL); }
 };
-static PersonaSlectionThread _personaThread ;
-static StatsThread _statsThread ;
+static PersonaSlectionThread _personaThread;
+static StatsThread _statsThread;
 
 
 void
 mapThreadsSetup()
 {
-	threadsSetup() ;
+	threadsSetup();
 
-	_statsThread.start() ;
-	_personaThread.cancel() ;
+	_statsThread.start();
+	_personaThread.cancel();
 }
 
 void
 mapThreadsEnable()
 {
-	threadsEnable() ;
+	threadsEnable();
 }
 
 void
 mapThreadsShutdown()
 {
-	_personaThread.cancel() ;
-	_personaThread.join() ;
+	_personaThread.cancel();
+	_personaThread.join();
 
-	_statsThread.cancel() ;
+	_statsThread.cancel();
+	_statsThread.join();
 
-	threadsShutdown() ;
+	threadsShutdown();
 }

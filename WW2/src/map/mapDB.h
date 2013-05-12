@@ -28,4 +28,3 @@ extern void mapCloseOpenSorties(UINT32 ip) ;
 extern void mapRequestTutProgress(const playerid_t playerID, SINT32 teulIndex) ;
 
 extern void mapLoadWeaponIndexes() ;
-

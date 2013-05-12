@@ -12,7 +12,6 @@
 
 enum {
 	DBSE_GENERAL_X = 19,
-	MM_DBSE_X,
 	CHAT_DBSE_X
 };
 
@@ -21,11 +20,6 @@ enum {
 	DBSE_CLIENT_HANDSHAKE_Y=0,
 	DBSE_SERVER_HANDSHAKE_Y
 };
-
-enum {
-	//map database stuff here
-	MMDB_XCHG_BRIGADE_DETAILS_Y
-} ;
 
 enum
 {

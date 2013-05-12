@@ -221,27 +221,3 @@ private:
 	SINT32 _select(Player* player, Brigade* brigade) ;
 	SINT32 _sendResult(SINT32 teulIndex, BRIGADE_SELECT_STATUS result) { m_status = result ; return send(teulIndex) ; }
 } ;
-
-class BrigadeDetailsUpdate
-{
-public:
-	BrigadeDetailsUpdate() : m_brigadeID(0), m_owner(0), m_ownerRank(0), m_ownerID(0) {} ;
-	BrigadeDetailsUpdate(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a) ; }
-	~BrigadeDetailsUpdate() {} ;
-
-public:
-	UINT32			m_brigadeID ;
-	UINT32			m_lastModified ;
-	ChatHandle		m_owner ;
-	RANK_NO			m_ownerRank ;
-	UINT32			m_ownerID ;
-	char			m_title[MAX_HCUNIT_NAME_LENGTH+1] ;
-	char			m_motd[MAX_BRIGADE_NOTES_LENGTH+1] ;
-	char			m_motto[MAX_BRIGADE_MOTTO_LENGTH+1] ;
-	char			m_shortName[MAX_BRIGADE_SHORT_LENGTH+1] ;
-	FULL_OBJ_ID		m_homeCPID ;
-
-public:
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) ;
-} ;
-
