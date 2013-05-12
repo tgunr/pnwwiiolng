@@ -42,6 +42,7 @@ static const char* const s_configVarTypes[NUM_CONFIG_VAR_TYPES] =
 ,	"signed int"
 ,	"boolean"
 ,	"ip address"
+,	"path"
 };
 
 ////////////////////////////////////////////////////////////////////////////////

@@ -27,6 +27,25 @@ public:
 	//! @param[in] history_ Ordered list of revisions to the database.
 	void Update(const DB::Revisions& history_) ;
 
+	template<size_t size>
+	void Update(const char* (&revisionArray)[size])
+	{
+		DB::Revisions revs;
+		std::vector<const char*> curRevision;
+		for ( size_t i = 0 ; i < size ; ++i ) {
+			if ( revisionArray[i] == NULL ) {
+				if ( !curRevision.empty() )
+					revs.push_back(curRevision);
+				curRevision.clear();
+			} else {
+				curRevision.push_back(revisionArray[i]);
+			}
+		}
+		if ( !curRevision.empty() )
+			revs.push_back(curRevision);
+		Update(revs);
+	}
+
 private:
 	Schema& operator = ( const Schema& rhs ) ;	// Do not use!
 

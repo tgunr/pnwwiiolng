@@ -5,27 +5,28 @@
 
 #include "dbse/dbseDatabaseSchema.h"
 
-#if platOS == OS_LINUX
-static DB::Revisions revisions =
+static const char* revisions[] =
 {
 	// Revision 0: Add the schema table
-	{
+	//{
 		"CREATE TABLE IF NOT EXISTS `auth`.`schema_info`"
 		"("
 		" `version_no` INT(11) UNSIGNED NOT NULL DEFAULT 0"
 		",`implemented` TIMESTAMP NOT NULL"
 		")"
 		" COMMENT 'Track current database schema revision to allow automatic updates'"
-	}
+	,	NULL
+	//}
 ,	// Revision 1: Add the CAN_USE_PPO_TOOL permission.
-	{
+	//{
 		"REPLACE INTO `auth`.`wwii_permissions` "
 			"(permissionID, maskvalue, description, modified, internal, details)"
 		"VALUES"
 			"(36, POW(2,35), 'CAN_USE_PPO_TOOL', NOW(), 0, 'Allows access to the PPO building tool')"
-	}
+	,	NULL
+	//}
 ,	// Revision 2: Lets tidy up the auth_customers table.
-	{
+	//{
 		"ALTER TABLE `auth`.`auth_customer`"
 			"	MODIFY	`username`		CHAR(16)	CHARACTER SET latin1		NOT NULL"
 			",	MODIFY	`password`		CHAR(32)	CHARACTER SET latin1		NOT NULL"
@@ -34,9 +35,10 @@ static DB::Revisions revisions =
 			",	DROP	`email`"
 	,	"ALTER TABLE `auth`.`auth_subscription`"
 			"	MODIFY `description`	CHAR(128)	NOT NULL					COMMENT 'Internal description of subscription.'"
-	}
+	,	NULL
+	//}
 ,	// Revision 3: Clean up on several views to reduce locking times.
-	{
+	//{
 		"CREATE OR REPLACE"
 		"	ALGORITHM = TEMPTABLE"
 		"	DEFINER = CURRENT_USER"
@@ -83,9 +85,10 @@ static DB::Revisions revisions =
 		"	GROUP	BY 1, 2"
 	,
 		"DROP VIEW IF EXISTS `auth`.`v_player_active_group_grants`"
-	}
+	,	NULL
+	//}
 ,	// Revision 4: 1.34 product permissions
-	{
+	//{
 		"REPLACE INTO `auth`.`wwii_permissions` "
 			"(permissionID, maskvalue, description, modified, internal, details)"
 		"VALUES"
@@ -109,8 +112,6 @@ static DB::Revisions revisions =
 			",(57, POW(2,56), 'PRODUCT18', NOW(), 0, 'Product Permission 18')"
 			",(58, POW(2,57), 'PRODUCT19', NOW(), 0, 'Product Permission 19')"
 			",(59, POW(2,58), 'PRODUCT20', NOW(), 0, 'Product Permission 20')"
-	}
+	,	NULL
+	//}
 } ;
-#else
-static DB::Revisions revisions;
-#endif
