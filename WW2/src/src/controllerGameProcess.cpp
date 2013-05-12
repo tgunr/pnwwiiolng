@@ -357,7 +357,9 @@ namespace GameProcessManager
 {
 	void Initialize()
 	{
+#if platOS != OS_WIN32
 		signal(SIGCHLD, SIG_IGN);
+#endif
 	}
 
 	// Include this server in the launch list.
