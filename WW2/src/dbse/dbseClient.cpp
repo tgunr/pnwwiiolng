@@ -75,7 +75,6 @@ dbseInit( )
 					_handshakeSent = TRUE;
 				}
 				continue;
-			case CONNECT_REDIRECTED:
 			case CONNECT_REFUSE:
 				returnVal = FAIL_VERSION;
 				break;

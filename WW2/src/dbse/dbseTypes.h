@@ -14,17 +14,17 @@ enum CONNECTION_STATUS
 	CONNECT_OPEN,
 	CONNECT_REFUSE,
 	CONNECT_ACCEPT,
-	CONNECT_REDIRECTED,
 	CONNECT_DROPPED
-} ;
+};
 
-struct HANDSHAKE
+struct DBSE_HANDSHAKE
 {
-	UINT32 				host;
-	CONNECTION_STATUS 	status;
-	UINT32				version;
-} ;
-extern SINT32 dbsePackHandshake(LOGICAL mode, UCHAR* data, SINT32 offset, HANDSHAKE* object, SINT32 size);
+	enum { CurrentVersion = 1 };
+	DBSE_HANDSHAKE(UINT32 arenaID_) : m_version(CurrentVersion), m_arenaID(arenaID_), m_status(CONNECT_NONE) {}
+	UINT32				m_version;
+	UINT32				m_arenaID;
+	CONNECTION_STATUS 	m_status;
+};
 
 enum DBSE_RANK
 {
@@ -33,7 +33,7 @@ enum DBSE_RANK
 	DBSE_SLAVE,
 	DBSE_REDIRECT,
 	DBSE_MAX_RANK
-} ;
+};
 
 enum
 {

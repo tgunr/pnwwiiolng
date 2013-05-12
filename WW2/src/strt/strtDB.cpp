@@ -13,7 +13,6 @@
 #include "strt/strtProtos.h"
 
 #include "wwii/wwiiDBConfig.h"
-#include "dbse/dbseClient.h"
 #include "dbse/dbseWrapper.h"
 #include "dbse/dbseConnection.h"
 #include "include/mydbQuery.h"
@@ -82,7 +81,6 @@ strtInitDB()
 LOGICAL
 strtCloseDB()
 {
-	dbseClose();
 	dbh.disconnect() ;
 	return TRUE;
 }

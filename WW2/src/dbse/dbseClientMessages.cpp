@@ -7,9 +7,6 @@
 //
 // Originating Programmer: Eric Hall
 
-#include <stdlib.h>
-#include <ctype.h>
-
 #include "dbse/dbseConstants.h"
 #include "dbse/dbseTypes.h"
 #include "teul/teulKit.h"
@@ -17,41 +14,30 @@
 #include "dbse/dbseClientMessages.h"
 #include "dbse/dbseClient.h"
 
-TEUL_CALLBACK* DBSE_SEND_CLIENT_HANDSHAKE;
+extern void dbseSetConnectionStatus(CONNECTION_STATUS);
 
-extern void dbseSetConnectionStatus(CONNECTION_STATUS) ;
-
-static SINT32
-_sendHandshake(ACTION_OBJECT* const a)
+static SINT32 _recvHandshake(ACTION_OBJECT* const a, DBSE_HANDSHAKE& handshake)
 {
-	return dbsePackHandshake(TEUL_PACK, a->packed, a->offset,(HANDSHAKE*) a->localRawData,  sizeof(HANDSHAKE));
-}
-
-static SINT32 _recvHandshake(ACTION_OBJECT* const a)
-{
-	HANDSHAKE handshake;
-	const SCHAR* address;
-
-	a->offset = dbsePackHandshake(TEUL_UNPACK, a->packed, a->offset, &handshake, sizeof(HANDSHAKE));
-
-	switch (handshake.status)
+	switch (handshake.m_status)
 	{
+	case CONNECT_BAD:
+		dbugLog(_FLA, "dbse host version mismatch, rejected version %u", handshake.m_version);
+		break;
+
 	case CONNECT_REFUSE:
-		dbugLog(_FLA,"DBHost arena does not match! Host version: %u",handshake.version);
+		dbugLog(_FLA, "dbse hose arena mismatch, rejected arena request for arena %u", handshake.m_arenaID);
 		break;
+
 	case CONNECT_ACCEPT:
-	//case CONNECT_OPEN:
-		dbugLog(_FLI,"DB Connection complete!");
+		dbugLog(_FLI,"db connection accepted!");
 		break;
-	case CONNECT_REDIRECTED:
-		//theHost = handshake.host;
-		address = teulGetAddress(handshake.host);
-		dbugLog(_FLW,"DB Connection redirected to %s",address);
-		break;
+
 	default:
 		LogAbort("ERROR: Unable to determine db connection status\n Abort!\n");
 	}
-	dbseSetConnectionStatus(handshake.status);
+
+	dbseSetConnectionStatus(handshake.m_status);
+
 	return(a->offset);
 }
 
@@ -62,17 +48,14 @@ SINT32 dbseInstallClientCallbacks(void)
 {
 	BEGIN_CALLBACK_REGISTRATION(DBSE_GENERAL_X)
 
-		REGISTER_SENDER(DBSE_CLIENT_HANDSHAKE_Y, _sendHandshake, DBSE_SEND_CLIENT_HANDSHAKE) ;
-		REGISTER_RECEIVER(DBSE_SERVER_HANDSHAKE_Y, _recvHandshake) ;
+		REGISTER_RECEIVEOBJ(DBSE_SERVER_HANDSHAKE_Y, DBSE_HANDSHAKE, _recvHandshake);
 
 	END_CALLBACK_REGISTRATION
 }
 
-SINT32
-dbseSendHandshake(SINT32 teulIndex, UINT32 arena)
+SINT32 dbseSendHandshake(SINT32 teulIndex, UINT32 arena)
 {
-	static HANDSHAKE handshake;
-	handshake.version = arena;
-	return teulSend(teulIndex,DBSE_SEND_CLIENT_HANDSHAKE,&handshake);
+	Teul::Packet outgoing(sizeof(DBSE_HANDSHAKE), DBSE_GENERAL_X, DBSE_CLIENT_HANDSHAKE_Y);
+	(void)CONSTRUCT_IN_PACKET(outgoing, DBSE_HANDSHAKE, arena);
+	return outgoing.send(teulIndex);
 }
-

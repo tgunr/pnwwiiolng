@@ -323,12 +323,6 @@ add_library (libwwii
 			teul/teulCallback.h
 			teul/teulCallbackInit.h
 	wwii/wwiiHCUnitsCommon.cpp
-	dbse/dbseClient.cpp
-		dbse/dbseClient.h
-			dbse/dbseTypes.h
-	dbse/dbseClientMessages.cpp
-		dbse/dbseClientMessages.h
-	dbse/dbsePackers.cpp
 	src/configVars.cpp
 
 	sdm/sdmConfigVars.h
@@ -655,6 +649,12 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 			wwii/wwiiHCUnits.h
 		wwii/wwiiSquads.cpp
 			wwii/wwiiSquads.h
+
+		dbse/dbseClient.cpp
+			dbse/dbseClient.h
+				dbse/dbseTypes.h
+		dbse/dbseClientMessages.cpp
+			dbse/dbseClientMessages.h
 
 		${PCH_INCLUDE_HEADERS}
 	)

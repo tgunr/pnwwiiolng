@@ -15,49 +15,43 @@
 #include "teul/teulBasic.h"
 #include "server/serverConfigVars.h"
 
-TEUL_CALLBACK*	DBSE_SEND_HANDSHAKE;
-
-static SINT32 _recvHandshake(ACTION_OBJECT* const a);
-static SINT32 _sendHandshake(ACTION_OBJECT* const a);
-
-SINT32
-dbseInstallHostCallbacks()
+static SINT32 _recvHandshake(ACTION_OBJECT* const a, DBSE_HANDSHAKE& handshake)
 {
-	BEGIN_CALLBACK_REGISTRATION(DBSE_GENERAL_X)
-
-		REGISTER_RECEIVER(DBSE_CLIENT_HANDSHAKE_Y, _recvHandshake) ;
-		REGISTER_SENDER(DBSE_SERVER_HANDSHAKE_Y, _sendHandshake, DBSE_SEND_HANDSHAKE) ;
-
-	END_CALLBACK_REGISTRATION
-}
-
-static SINT32 _sendHandshake(ACTION_OBJECT* const a)
-{
-	return dbsePackHandshake(TEUL_PACK, a->packed, a->offset, (HANDSHAKE*) a->localRawData, sizeof(HANDSHAKE));
-}
-
-static SINT32 _recvHandshake(ACTION_OBJECT* const a)
-{
-	dbugLog(_FLI,"Recieving Handshake for Client");
-
-	HANDSHAKE handshake;
-	a->offset = dbsePackHandshake(TEUL_UNPACK, a->packed, a->offset, &handshake, sizeof(HANDSHAKE));
-
-	if (a->offset >= 0)
+	const UINT32 destAddress = teulGetEndpointRemoteAddress(a->teulIndex);
+	const UINT32 myArenaID = cv_arenaID.GetUint32();
+	if ( handshake.m_version != DBSE_HANDSHAKE::CurrentVersion )
 	{
-		if (handshake.version != cv_arenaID.GetUint32())
-		{
-			handshake.status = CONNECT_REFUSE;
-			handshake.version = cv_arenaID.GetUint32();
-		}else
-		{
-			handshake.status = CONNECT_ACCEPT;
-			const UINT32 destAddress = teulGetEndpointRemoteAddress(a->teulIndex) ;
-			dbugLog(_FLI,"Connection opened from %s",teulGetAddress(destAddress));
-		}
-
-		teulSend(a->teulIndex,DBSE_SEND_HANDSHAKE, &handshake);
+		handshake.m_status = CONNECT_BAD;
+		dbugLog(_FLW, "t:%d %s dbse request has wrong version %u, expected %u"
+					, a->teulIndex, teulGetAddress(destAddress)
+					, handshake.m_version, DBSE_HANDSHAKE::CurrentVersion
+					);
 	}
+	else if ( handshake.m_arenaID != myArenaID )
+	{
+		handshake.m_status = CONNECT_REFUSE;
+		dbugLog(_FLM, "t:%d %s requested arenaID %u"
+					, a->teulIndex, teulGetAddress(destAddress), myArenaID);
+	}
+	else
+	{
+		handshake.m_status = CONNECT_ACCEPT;
+		dbugLog(_FLI, "t:%d ar:%u connection opened from %s"
+					, a->teulIndex, myArenaID, teulGetAddress(destAddress));
+	}
+
+	Teul::Packet outgoing(sizeof(handshake), DBSE_GENERAL_X, DBSE_SERVER_HANDSHAKE_Y);
+	outgoing.append(handshake);
+	outgoing.send(*a->endpoint);
+
 	return a->offset;
 }
 
+SINT32 dbseInstallHostCallbacks()
+{
+	BEGIN_CALLBACK_REGISTRATION(DBSE_GENERAL_X)
+
+		REGISTER_RECEIVEOBJ(DBSE_CLIENT_HANDSHAKE_Y, DBSE_HANDSHAKE, _recvHandshake);
+
+	END_CALLBACK_REGISTRATION
+}
