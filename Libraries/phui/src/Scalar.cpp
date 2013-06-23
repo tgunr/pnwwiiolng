@@ -590,7 +590,7 @@ Scalar& Scalar::Set(char c)
 		break;
 		
 		case BoolT:
-			_value.b = (bool)c;
+			_value.b = c ? true : false;
 		break;
 
 		case CharT:
@@ -641,7 +641,7 @@ Scalar& Scalar::Set(short s)
 		break;
 		
 		case BoolT:
-			_value.b = (bool)s;
+			_value.b = s ? true : false;
 		break;
 
 		case CharT:
@@ -692,7 +692,7 @@ Scalar& Scalar::Set(long l)
 		break;
 		
 		case BoolT:
-			_value.b = (bool)l;
+			_value.b = l ? true : false;
 		break;
 
 		case CharT:
@@ -748,7 +748,7 @@ Scalar& Scalar::Set(float f)
 		break;
 		
 		case BoolT:
-			_value.b = (bool)f;
+			_value.b = f ? true : false;
 		break;
 
 		case CharT:
@@ -799,7 +799,7 @@ Scalar& Scalar::Set(double d)
 		break;
 		
 		case BoolT:
-			_value.b = (bool)d;
+			_value.b = d ? true : false;
 		break;
 
 		case CharT:
@@ -850,7 +850,7 @@ Scalar& Scalar::Set(const void* p)
 		break;
 		
 		case BoolT:
-			_value.b = (bool)p;
+			_value.b = p ? true : false;
 		break;
 
 		case CharT:

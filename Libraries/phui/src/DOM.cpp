@@ -717,7 +717,7 @@ JSBool ElementDOM::SetProperty(JSContext* ctx, int propid, jsval* val)
 		break;
 		case ENABLED_PROP:
 			JS_ValueToInt32(ctx, *val, &ival);
-			_view->SetEnable(ival);
+			_view->SetEnable(ival ? true : false);
 		break;
 		
 		case VALUE_PROP:
@@ -846,14 +846,14 @@ JSBool ElementDOM::SetProperty(JSContext* ctx, int propid, jsval* val)
 		{
 			JSBool focus = JS_FALSE;
 			JS_ValueToBoolean(ctx, *val, &focus);
-			_view->MakeFocus(focus);
+			_view->MakeFocus(focus ? true : false);
 		}
 		break;
 		case ACCEPTSFOCUS_PROP:
 		{
 			JSBool acceptsfocus = JS_FALSE;
 			JS_ValueToBoolean(ctx, *val, &acceptsfocus);
-			_view->SetAcceptsFocus(acceptsfocus);
+			_view->SetAcceptsFocus(acceptsfocus ? true : false);
 		}
 		break;
 		case MAXWIDTH_PROP:
@@ -898,14 +898,14 @@ JSBool ElementDOM::SetProperty(JSContext* ctx, int propid, jsval* val)
 		{
 			JSBool acceptsmouse = JS_FALSE;
 			JS_ValueToBoolean(ctx, *val, &acceptsmouse);
-			_view->SetAcceptsMouseClick(acceptsmouse);
+			_view->SetAcceptsMouseClick(acceptsmouse ? true : false);
 		}
 		break;
 		case MODAL_PROP:
 		{
 			JSBool modal = JS_FALSE;
 			JS_ValueToBoolean(ctx, *val, &modal);
-			_view->SetIsModal(modal);
+			_view->SetIsModal(modal ? true : false);
 		}
 		break;
 		default:
