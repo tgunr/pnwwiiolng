@@ -27,30 +27,30 @@
 //////////////////////////////////////////////////////////////////////
 // Global variables
 
-HINSTANCE	hMainInstance ;
-CBDialog*	hMainWnd ;
+HINSTANCE	hMainInstance;
+CBDialog*	hMainWnd;
 
-HANDLE		hStatusMutex ;
-HANDLE		hExitMutex ;
-HANDLE		hApplicationMutex ;
-HANDLE		hLogonAttemptMutex ;
-bool		g_tryLogonAttempt = false ;
+HANDLE		hStatusMutex;
+HANDLE		hExitMutex;
+HANDLE		hApplicationMutex;
+HANDLE		hLogonAttemptMutex;
+bool		g_tryLogonAttempt = false;
 
-std::wstring g_dataPath, g_exePath ;
+std::wstring g_dataPath, g_exePath;
 
 UINT32 g_gameAppID;
-char g_registryKey[256] ; // Where the registry values are located.
-wchar_t g_registryKeyW[256] ;
+char g_registryKey[256]; // Where the registry values are located.
+wchar_t g_registryKeyW[256];
 UINT32 g_playgateVersion;
 SINT32 g_arenaID, g_sessionID;
 
-char g_authHostName[256] = "" ;
+char g_authHostName[256] = "";
 
-char szVersion[] = PG_VER_STRING ;
-char szVersionString[] = PG_COPYRIGHT ;
+char szVersion[] = PG_VER_STRING;
+char szVersionString[] = PG_COPYRIGHT;
 
-IP_LIST	g_authHosts ;
-UINT16	g_authPort ;
+IP_LIST	g_authHosts;
+UINT16	g_authPort;
 SINT32 webID; //used for web downloads
 UINT32 webURL;
 
@@ -64,9 +64,9 @@ enum PlaygateState
 ,	PgAuthentication
 ,	PgServerSelect
 ,	PgFinished
-} ;
+};
 
-static PlaygateState pgState ;
+static PlaygateState pgState;
 
 //////////////////////////////////////////////////////////////////////
 // Local variables
@@ -99,67 +99,67 @@ CPlaygateApp::CPlaygateApp()
 static bool
 _DoDialog(CBDialog& dlg)
 {
-	hMainWnd = &dlg ;
-	INT_PTR nResponse = dlg.DoModal() ;
-	hMainWnd = NULL ;
-	return(nResponse == IDOK) ;
+	hMainWnd = &dlg;
+	INT_PTR nResponse = dlg.DoModal();
+	hMainWnd = NULL;
+	return(nResponse == IDOK);
 }
 
 static bool
 _TosDialog()
 {
-	CTermsOfServiceDlg dlg ;
-	return _DoDialog(dlg) ;
+	CTermsOfServiceDlg dlg;
+	return _DoDialog(dlg);
 }
 
 static bool
 _Login()
 {
-	CPlayerLogon dlg ;
-	return _DoDialog(dlg) ;
+	CPlayerLogon dlg;
+	return _DoDialog(dlg);
 }
 
 static bool
 _ServerSelect()
 {
-	CPlaygateDlg dlg ;
-	return _DoDialog(dlg) ;
+	CPlaygateDlg dlg;
+	return _DoDialog(dlg);
 }
 
 static void
 _setInput(bool enable)
 {
-	CPlayerLogon* logon = (CPlayerLogon*)hMainWnd ;
-	logon->ToggleInput(enable, enable) ;
+	CPlayerLogon* logon = (CPlayerLogon*)hMainWnd;
+	logon->ToggleInput(enable, enable);
 }
 
 static void
 _attemptConnection()
 {
-	_setInput(false) ;
+	_setInput(false);
 
-	bool connected = false ;
-	bool firstTime = true ;
-	static bool firstAttempt = true ;
-	static UINT32 attempt = 0 ;
+	bool connected = false;
+	bool firstTime = true;
+	static bool firstAttempt = true;
+	static UINT32 attempt = 0;
 
 	while ( connected == false )
 	{
 		if ( firstAttempt == true )
-			firstAttempt = false ;
+			firstAttempt = false;
 		else
 		{
 			// Report and retry in 6 seconds.
-			playgate.SetStatus(GetLoc(ERROR_CONNECT), AppCaution) ;
-			Sleep(6 * 1000) ;
+			playgate.SetStatus(GetLoc(ERROR_CONNECT), AppCaution);
+			Sleep(6 * 1000);
 		}
 
 		// The first connection attempt often fails, so use logic-shortcircuit
 		// to slip a second try in if the first fails.
 		if ( launchOpenConnection() || launchOpenConnection() )
 		{
-			connected = true ;
-			break ;
+			connected = true;
+			break;
 		}
 
 		// We were unable to open a connection.
@@ -173,31 +173,31 @@ _attemptConnection()
 			{
 				// They said "no" to our "do you want to continue trying" question,
 				// shutdown.
-				playgate.StartBrowser(ERR_AUTH_CONNECT) ;
-				playgate.Quit() ;
-				ExitThread(0) ;
-				return ;
+				playgate.StartBrowser(ERR_AUTH_CONNECT);
+				playgate.Quit();
+				ExitThread(0);
+				return;
 			}
 
-			firstTime = false ;
+			firstTime = false;
 		}
 	}
 
 	// Ok, now you can start typing stuff.
-	_setInput(true) ;
+	_setInput(true);
 }
 
 static DWORD WINAPI threadFunc(LPVOID dummyParam)
 {
 	if ( WaitForSingleObject(hApplicationMutex, INFINITE) == WAIT_ABANDONED )
-		return 0 ;
+		return 0;
 	// Yield processing
-	Sleep(0) ;
-	ReleaseMutex(hApplicationMutex) ;
+	Sleep(0);
+	ReleaseMutex(hApplicationMutex);
 	// Yield processing
-	Sleep(0) ;
+	Sleep(0);
 
-	bool connected = false ; 
+	bool connected = false; 
 
 	while ( WaitForSingleObject(hExitMutex, (connected ? 25 : 1)) == WAIT_TIMEOUT )
 	{
@@ -208,25 +208,25 @@ static DWORD WINAPI threadFunc(LPVOID dummyParam)
 			// bail out.
 			if ( connected == true && pgState != PgAuthentication )
 			{
-				playgate.AlertOK(GetLoc(AUTH_LOST)) ;
-				playgate.Quit() ;
-				ExitThread(0) ;
+				playgate.AlertOK(GetLoc(AUTH_LOST));
+				playgate.Quit();
+				ExitThread(0);
 			}
 
-			_attemptConnection() ;
+			_attemptConnection();
 
-			connected = true ;
+			connected = true;
 
-			continue ;
+			continue;
 		}
 
 		// Check to see if the main thread has tasked us with
 		// performing a login attempt.
 		if ( WaitForSingleObject(hLogonAttemptMutex, 0) != WAIT_TIMEOUT )
 		{
-			bool tryAttempt = g_tryLogonAttempt ;
-			g_tryLogonAttempt = false ;
-			ReleaseMutex(hLogonAttemptMutex) ;
+			bool tryAttempt = g_tryLogonAttempt;
+			g_tryLogonAttempt = false;
+			ReleaseMutex(hLogonAttemptMutex);
 			if ( tryAttempt == true )
 			{
 				if ( pgState == PgAuthentication )
@@ -238,16 +238,16 @@ static DWORD WINAPI threadFunc(LPVOID dummyParam)
 
 		if ( 0 != playgate.m_nextGameListRequest && teulTime() >= playgate.m_nextGameListRequest )
 		{
-			playgate.m_nextGameListRequest = teulTime() + 30 ;
-			launchRequestGameList() ;
+			playgate.m_nextGameListRequest = teulTime() + 30;
+			launchRequestGameList();
 		}
 
 		std::this_thread::yield();
 	}
 
-	ReleaseMutex(hExitMutex) ;
+	ReleaseMutex(hExitMutex);
 
-	ExitThread(0) ;
+	ExitThread(0);
 }
 
 // CPlaygateApp initialization
@@ -256,17 +256,17 @@ BOOL CPlaygateApp::InitInstance()
 {
 	// OGS: First things first, determine what kind of client we are.
 	// If the version number ends in .255 we are appID 1, otherwise we're beta.
-	g_gameAppID = Auth::Apps::LIVE_APP_ID ;
+	g_gameAppID = Auth::Apps::LIVE_APP_ID;
 	if (strstr(STRVER, ".255") == NULL)
-		g_gameAppID = Auth::Apps::BETA_APP_ID ;
+		g_gameAppID = Auth::Apps::BETA_APP_ID;
 	_snprintf(g_registryKey, 255, "Software\\Playnet\\apps\\appid%u\\instance1", g_gameAppID);
-	WWII::ConvertChars(g_registryKey, g_registryKeyW, sizeof(g_registryKeyW)) ;
+	WWII::ConvertChars(g_registryKey, g_registryKeyW, sizeof(g_registryKeyW));
 
 	LocInit();
 	
 	if (g_SingleInstanceObj.IsAnotherInstanceRunning())
 	{
-		MessageBox(NULL, GetLoc(ERROR_PLAYGATE), GetLoc(APP_TITLE), MB_ICONEXCLAMATION|MB_OK) ;
+		MessageBox(NULL, GetLoc(ERROR_PLAYGATE), GetLoc(APP_TITLE), MB_ICONEXCLAMATION|MB_OK);
 		return FALSE;
 	}
 
@@ -282,7 +282,7 @@ BOOL CPlaygateApp::InitInstance()
 
 	CWinApp::InitInstance();
 
-	hMainInstance = AfxGetInstanceHandle() ;
+	hMainInstance = AfxGetInstanceHandle();
 
 	if (!AfxSocketInit())
 	{
@@ -308,98 +308,98 @@ BOOL CPlaygateApp::InitInstance()
 	// Move ourselves to the playgate home
 	if ( registryGetPaths(g_exePath, g_dataPath) == false )
 	{
-		dbugLog(_FLA, "Unable to retrieve paths from registry.") ;
-		MessageBox(NULL, GetLoc(ERROR_INSTALL), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK) ;
-		exit(0) ;
+		dbugLog(_FLA, "Unable to retrieve paths from registry.");
+		MessageBox(NULL, GetLoc(ERROR_INSTALL), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
+		exit(0);
 	}
 
-	_tchdir(g_dataPath.c_str()) ;
+	_tchdir(g_dataPath.c_str());
 
 	commInit();
 
-	registryGetPaths(g_exePath, g_dataPath) ;
-	dbugLog(_FLM, "Playgate version %s. Command Line: %s. ExePath: %ls. DataPath: %ls.", PG_COPYRIGHT, m_lpCmdLine, g_exePath.c_str(), g_dataPath.c_str()) ;
+	registryGetPaths(g_exePath, g_dataPath);
+	dbugLog(_FLM, "Playgate version %s. Command Line: %s. ExePath: %ls. DataPath: %ls.", PG_COPYRIGHT, m_lpCmdLine, g_exePath.c_str(), g_dataPath.c_str());
 
 	if ( _tchdir(g_exePath.c_str()) != 0 )
 	{
-		MessageBox(NULL, GetLoc(ERROR_APP_FOLDER, g_exePath.c_str()), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK) ;
-		exit(0) ;
+		MessageBox(NULL, GetLoc(ERROR_APP_FOLDER, g_exePath.c_str()), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
+		exit(0);
 	}
 
 	// If they've logged in before, recover the data.
-	loginData.Read() ;
+	loginData.Read();
 	// Make sure it's not just or something.
-	loginData.Validate() ;
+	loginData.Validate();
 
-	pgState = PgTOS ;
+	pgState = PgTOS;
 
 	// Load the "region"s data.
-	dbugLog(_FLI, "Regions") ;
+	dbugLog(_FLI, "Regions");
 	if ( !CRegionSelect::ReadRegionsFile() )
-		return FALSE ;
+		return FALSE;
 
 	// Show the Terms of Service file
 	// (%exepath%\\data\\playgate\\tos.rtf)
-	dbugLog(_FLI, "TOS") ;
+	dbugLog(_FLI, "TOS");
 	if ( !_TosDialog() )
-		return FALSE ;
+		return FALSE;
 
-	pgState = PgRegionSelection ;
+	pgState = PgRegionSelection;
 
 	// Prompt the user to select their region.
-	dbugLog(_FLI, "Regions follow-up") ;
+	dbugLog(_FLI, "Regions follow-up");
 	if ( !RegionSelect() )
-		return FALSE ;
+		return FALSE;
 
 	// Update the region
-	const wchar_t* regionName = g_region.name().c_str() ;
+	const wchar_t* regionName = g_region.name().c_str();
 	if ( wcscmp(regionName, loginData.m_region) != 0 )
 	{
 		// Arena will change
-		loginData.m_arenaID = 0 ;
-		wcsncpy_s(loginData.m_region, regionName, sizeof(loginData.m_region)) ;
-		loginData.MarkForWrite() ;
+		loginData.m_arenaID = 0;
+		wcsncpy_s(loginData.m_region, regionName, sizeof(loginData.m_region));
+		loginData.MarkForWrite();
 	}
 
 	// Verify access to the data directory.
 	if ( _tchdir(g_dataPath.c_str()) != 0 )
 	{
-		dbugLog(_FLA, "Unable to access datapath [%ls]", g_dataPath.c_str()) ;
-		MessageBox(NULL, GetLoc(ERROR_DATA_FOLDER, g_dataPath.c_str()), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK) ;
-		return FALSE ;
+		dbugLog(_FLA, "Unable to access datapath [%ls]", g_dataPath.c_str());
+		MessageBox(NULL, GetLoc(ERROR_DATA_FOLDER, g_dataPath.c_str()), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
+		return FALSE;
 	}
 
-	hStatusMutex = CreateMutex(NULL, FALSE, NULL) ;
-	hExitMutex = CreateMutex(NULL, TRUE, NULL) ;
-	hApplicationMutex = CreateMutex(NULL, TRUE, NULL) ;
+	hStatusMutex = CreateMutex(NULL, FALSE, NULL);
+	hExitMutex = CreateMutex(NULL, TRUE, NULL);
+	hApplicationMutex = CreateMutex(NULL, TRUE, NULL);
 
-	pgState = PgAuthentication ;
+	pgState = PgAuthentication;
 
-	DWORD threadId ;
-	::CreateThread(NULL, 0, threadFunc, NULL,0, &threadId) ;
+	DWORD threadId;
+	::CreateThread(NULL, 0, threadFunc, NULL,0, &threadId);
 	if ( _Login() )
 	{
-		loginData.MarkForWrite() ;
+		loginData.MarkForWrite();
 
-		pgState = PgServerSelect ;
+		pgState = PgServerSelect;
 
 		if ( _ServerSelect() )
-			loginData.MarkForWrite() ;
+			loginData.MarkForWrite();
 	}
 
-	pgState = PgFinished ;
+	pgState = PgFinished;
 
 	ReleaseMutex(hExitMutex);
 
-	Sleep(100) ;
+	Sleep(100);
 
-	CloseHandle(hStatusMutex) ;
-	CloseHandle(hLogonAttemptMutex) ;
-	CloseHandle(hExitMutex) ;
+	CloseHandle(hStatusMutex);
+	CloseHandle(hLogonAttemptMutex);
+	CloseHandle(hExitMutex);
 
-	teulCloseTransport() ;
+	teulCloseTransport();
 
-	commKill() ;
+	commKill();
 
 	return FALSE;
 }
@@ -407,27 +407,27 @@ BOOL CPlaygateApp::InitInstance()
 void
 CPlaygateApp::SetStatus(const TCHAR* message, StatusType status) const
 {
-	if ( !hMainWnd ) return ;
+	if ( !hMainWnd ) return;
 	// Lock the mutex so that we don't have multiple threads
 	// trying to write to the same status object.
-	WaitForSingleObject(hStatusMutex, INFINITE) ;
+	WaitForSingleObject(hStatusMutex, INFINITE);
 	if ( hMainWnd )
 	{
-		hMainWnd->m_hint.SetWindowText(message) ;
-		hMainWnd->m_hint.SetTextColor((int)status) ;
+		hMainWnd->m_hint.SetWindowText(message);
+		hMainWnd->m_hint.SetTextColor((int)status);
 	}
-	ReleaseMutex(hStatusMutex) ;
-	Sleep(250) ;
+	ReleaseMutex(hStatusMutex);
+	Sleep(250);
 }
 
 void CPlaygateApp::Quit()
 {
 	// Stop anything the FTP connection is doing
-	ftpQuit() ;
+	ftpQuit();
 
 	// Post a message to the main window to tell it to shut down
 	if ( hMainWnd )
-		hMainWnd->SetTimer('QUIT', 100, NULL) ;
+		hMainWnd->SetTimer('QUIT', 100, NULL);
 }
 
 static bool
@@ -435,61 +435,61 @@ _getDefaultBrowser(TCHAR* browserName, LONG nameSize)
 {
 	int res = RegQueryValue(HKEY_CLASSES_ROOT, _T("http\\shell\\open\\command")
 							, browserName
-							, &nameSize) ;
+							, &nameSize);
 	if ( res != ERROR_SUCCESS )
-		return false ;
+		return false;
 
-	TCHAR* p = browserName ;
+	TCHAR* p = browserName;
 	// Normally the command is quoted
 	if ( *p == '"' )
 	{
 		// Its quoted, find the end quote and snip.
-		p = _tcschr(p + 1, '"') ;
+		p = _tcschr(p + 1, '"');
 		if ( p != NULL )
-			*(p + 1) = 0 ;
+			*(p + 1) = 0;
 	}
 	else
 	{
 		// Otherwise, snip at the first space
-		p = _tcschr(browserName, ' ') ;
+		p = _tcschr(browserName, ' ');
 		if ( p != NULL )
-			*p = 0 ;
+			*p = 0;
 	}
 
-	return true ;
+	return true;
 }
 
 void
 CPlaygateApp::StartBrowser(std::string WebPage)
 {
-	TCHAR browserName[256] ;
+	TCHAR browserName[256];
 	if ( !_getDefaultBrowser(browserName, sizeof(browserName)) )
-		return ;
+		return;
 
-	TCHAR parameters[512] ;
+	TCHAR parameters[512];
 	if ( WebPage[0] == '@' )
 	{
 		_stprintf(parameters
 					, L"http://www%hs/%hs"
 						, g_region.webSuffix().c_str()
-						, WebPage.c_str() + 1) ;
+						, WebPage.c_str() + 1);
 	}
 	else
 	{
-		_stprintf(parameters, L"%hs", WebPage.c_str()) ;
+		_stprintf(parameters, L"%hs", WebPage.c_str());
 	}
 
-	ShellExecute(NULL, _T("open"), parameters, NULL, NULL, SW_SHOWNORMAL) ;
+	ShellExecute(NULL, _T("open"), parameters, NULL, NULL, SW_SHOWNORMAL);
 
-	return ;
+	return;
 }
 
 void
 CPlaygateApp::QueueLogonAttempt()
 {
-	WaitForSingleObject(hLogonAttemptMutex, INFINITE) ;
-	g_tryLogonAttempt = true ;
-	ReleaseMutex(hLogonAttemptMutex) ;
+	WaitForSingleObject(hLogonAttemptMutex, INFINITE);
+	g_tryLogonAttempt = true;
+	ReleaseMutex(hLogonAttemptMutex);
 }
 
 void
@@ -497,33 +497,33 @@ CPlaygateApp::ftping(bool actively)
 {
 	if ( playgate.m_progress )
 	{
-		playgate.m_progress->ShowWindow(actively) ;
-//		playgate.m_progress->EnableWindow(actively) ;
+		playgate.m_progress->ShowWindow(actively);
+//		playgate.m_progress->EnableWindow(actively);
 	}
 
 	if ( actively )
 	{
-		playgate.m_progress->SetRange(0, 100) ;
-		m_inputAllowed = false ;
-		hMainWnd->SetTimer('FTP', 50, NULL) ;
+		playgate.m_progress->SetRange(0, 100);
+		m_inputAllowed = false;
+		hMainWnd->SetTimer('FTP', 50, NULL);
 	}
 	else
 	{
-		m_inputAllowed = true ;
-		hMainWnd->KillTimer('FTP') ;
+		m_inputAllowed = true;
+		hMainWnd->KillTimer('FTP');
 	}
 
-	hMainWnd->GetDlgItem(IDC_SERVER_LIST)->EnableWindow(!actively) ;
-	hMainWnd->GetDlgItem(IDOK)->EnableWindow(!actively) ;
+	hMainWnd->GetDlgItem(IDC_SERVER_LIST)->EnableWindow(!actively);
+	hMainWnd->GetDlgItem(IDOK)->EnableWindow(!actively);
 }
 
 void CPlaygateApp::SetWindowText(CWnd* wnd, const char* text)
 {
 	if ( wnd != NULL )
 	{
-		wchar_t buffer[512] ;
-		WWII::ConvertChars(text, buffer, sizeof(buffer)) ;
-		wnd->SetWindowTextW(buffer) ;
+		wchar_t buffer[512];
+		WWII::ConvertChars(text, buffer, sizeof(buffer));
+		wnd->SetWindowTextW(buffer);
 	}
 }
 
@@ -532,8 +532,8 @@ void CPlaygateApp::SetWindowText(CWnd* wnd, const char* text)
 
 HBITMAP pgLoadImage(const std::wstring& filename)
 {
-	std::wstring fullName(g_exePath.begin(), g_exePath.end()) ;
-	fullName += L"\\data\\playgate\\" ;
-	fullName += filename ;
+	std::wstring fullName(g_exePath.begin(), g_exePath.end());
+	fullName += L"\\data\\playgate\\";
+	fullName += filename;
 	return (HBITMAP)::LoadImage(hMainInstance, fullName.c_str(), IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
 }
