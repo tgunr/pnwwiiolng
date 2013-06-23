@@ -148,7 +148,7 @@ commOpenConnection(UINT32 HostNumber, UINT16 Port)
 	// Open a socket; it's not yet a connection though,
 	// because teulKit has stuff to do before it is ready
 	// to hand off to us.
-	const SINT32 ConnectionNumber = teulOpenSend(HostNumber, Port, _connectionOpened, 3000, TCP, _networkError);
+	const SINT32 ConnectionNumber = teulOpenSend(HostNumber, Port, _connectionOpened, 3000, PROTOCOL_TCP, _networkError);
 	if (ConnectionNumber < 0)
 		return false ;
 

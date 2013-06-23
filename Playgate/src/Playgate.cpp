@@ -242,7 +242,7 @@ static DWORD WINAPI threadFunc(LPVOID dummyParam)
 			launchRequestGameList() ;
 		}
 
-		Yield() ;
+		std::this_thread::yield();
 	}
 
 	ReleaseMutex(hExitMutex) ;
