@@ -21,7 +21,6 @@
 #include "ime/imeMain.h"
 #include "fio/fio.h"
 #include "ogl/oglGlobalStates.h"
-#include "OpenThreads/Thread"
 #include "resource.h"
 
 #include "ddp.h"

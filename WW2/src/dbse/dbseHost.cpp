@@ -20,7 +20,6 @@
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiNetPorts.h"
 #include "wwii/wwiiThreads.h"
-#include <OpenThreads/Thread>
 
 #ifdef BETA_RELEASE
 	#define DEF_ERR_LEVEL Debug::ERR_DBUG

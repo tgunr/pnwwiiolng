@@ -55,8 +55,7 @@
 #include "wwii/wwiiThreadText.h"
 #include "wwii/wwiiThreadTextQuery.h"
 
-#include <OpenThreads/Mutex>
-#include <OpenThreads/ScopedLock>
+#include <mutex>
 
 // Temporary
 #include "map/mapAWS.h"
@@ -1057,14 +1056,14 @@ Player::objectiveCP() const
 
 #include <unordered_map>
 static std::unordered_map<playerid_t, std::vector<UINT32>> playerGroups ;
-static OpenThreads::Mutex playerGroupsMutex ;
+static std::mutex playerGroupsMutex ;
 
 bool
 chatProcessPlayerGroups()
 {
 	size_t numGroupEntries = 0 ;
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> hashLock(playerGroupsMutex) ;
+		std::lock_guard<std::mutex> hashLock(playerGroupsMutex) ;
 		numGroupEntries = playerGroups.size() ;
 		for ( auto it = playerGroups.begin() ; it != playerGroups.end() ; ++it )
 		{
@@ -1111,7 +1110,7 @@ protected:
 			groupIDs.push_back(Query()->Row().NextUInt()) ;
 		}
 
-		OpenThreads::ScopedLock<OpenThreads::Mutex> hashLock(playerGroupsMutex) ;
+		std::lock_guard<std::mutex> hashLock(playerGroupsMutex) ;
 		playerGroups[m_playerID] = groupIDs ;
 	}
 

@@ -367,7 +367,7 @@ Teul::uWeb::Server::processHTTPRequest(const int sock, char* const request)
 	// Is there a function registered to handle this request?
 	VirtualFileHandler handler = NULL ;
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(m_config_mutex) ;
+		std::lock_guard<std::mutex> lock(m_config_mutex) ;
 		auto it = m_virtualFileHandlers.find(path) ;
 		if ( it != m_virtualFileHandlers.end() )
 			handler = it->second.first ;
@@ -402,7 +402,7 @@ Teul::uWeb::Server::addVirtualFile(std::string desc_, std::string path_, Virtual
 	char* buffer = new char[bufLen] ;
 	snprintf(buffer, bufLen - 1, "{\"url\":\"%s\",\"desc\":\"%s\"}]", path_.c_str(), desc_.c_str()) ;
 
-	OpenThreads::ScopedLock<OpenThreads::Mutex> lock(m_config_mutex) ;
+	std::lock_guard<std::mutex> lock(m_config_mutex) ;
 	m_virtualFileHandlers[path_] = std::make_pair(handler_, desc_) ;
 
 	// Replace the ']' at the end of the list with a comma.

@@ -15,9 +15,7 @@
 #include <string>
 #include <mysql.h>
 #include <signal.h>
-#include <OpenThreads/Thread>
-#include <OpenThreads/Mutex>
-#include <OpenThreads/ScopedLock>
+#include <mutex>
 
 #include "dbse/dbseConnection.h"
 #include "dbse/dbseWrapper.h"
@@ -42,29 +40,22 @@ struct THREAD_LOG
 };
 
 // Storing information about a DB helper thread
-class DBQueueThread : public OpenThreads::Thread
+class DBQueueThread : public PNThread
 {
 private:
 	DB::handle_t*		m_conn;
+	uint32_t			m_id;
 
 public:
-	DBQueueThread() : Thread(), m_conn(nullptr) {}
+	DBQueueThread() : PNThread(), m_conn(nullptr), m_id(0) {}
 	~DBQueueThread();
 
-	virtual void run();
-};
+	void start(uint32_t id_) {
+		m_id = id_ + 1;
+		PNThread::start();
+	}
 
-class ScopedLockTry
-{
-private:
-	OpenThreads::Mutex&	m_mutex;
-	bool m_gotLock;
-	ScopedLockTry(const ScopedLockTry&);	// prevent copy
-	ScopedLockTry& operator=(const ScopedLockTry&);	// prevent assign
-public:
-	explicit ScopedLockTry(OpenThreads::Mutex& mutex_) : m_mutex(mutex_), m_gotLock(mutex_.trylock() == 0) {}
-	~ScopedLockTry() { if ( m_gotLock ) m_mutex.unlock(); }
-	bool gotLock() const { return m_gotLock; }
+	virtual void run();
 };
 
 static const UINT32 NUM_HELPER_THREADS = 2;
@@ -72,7 +63,7 @@ static const UINT32 NUM_HELPER_THREADS = 2;
 typedef std::vector<THREAD_LOG*> LOG_QUEUE;
 static LOG_QUEUE logQueue;
 static size_t logQueueMax, logQueuePushes;
-static OpenThreads::Mutex logQueueMutex;
+static std::mutex logQueueMutex;
 
 static ConditionQueue<DBThreadQuery*> dbQueue;
 DBQueueThread dbThread[NUM_HELPER_THREADS];
@@ -81,14 +72,14 @@ typedef std::pair<THREAD_CALLBACK*, void*> CALLBACK_INFO;
 typedef std::vector<CALLBACK_INFO*> CALLBACK_QUEUE;
 static CALLBACK_QUEUE callbackQueue;
 static size_t cbQueueMax, cbQueuePushes;
-static OpenThreads::Mutex callbackQueueMutex;
+static std::mutex callbackQueueMutex;
 
 extern DBCONNECTION dbConnection;
 
 void
 DBQueueThread::run()
 {
-	unsigned int threadId = getThreadId();
+	unsigned int threadId = m_id;
 
 	m_conn = threadsOpenDBConnection(true);
 	if ( m_conn == nullptr )
@@ -225,7 +216,7 @@ threadsSetup()
 	// database thread contesting for work
 	for ( UINT32 i = 0; i < NUM_HELPER_THREADS; ++i )
 	{
-		dbThread[i].start();
+		dbThread[i].start(i);
 	}
 }
 
@@ -274,8 +265,8 @@ threadsLogging()
 	if ( logQueue.empty() )
 		return false;
 
-	ScopedLockTry lock(logQueueMutex);
-	if ( lock.gotLock() == false )
+	std::unique_lock<std::mutex> lock(logQueueMutex, std::try_to_lock);
+	if ( lock.owns_lock() == false )
 		return false;
 
 	if ( logQueue.size() > logQueueMax )
@@ -306,8 +297,8 @@ threadsCallNextCallback()
 	if ( callbackQueue.empty() )
 		return;
 
-	ScopedLockTry lock(callbackQueueMutex);
-	if ( lock.gotLock() == false )
+	std::unique_lock<std::mutex> lock(callbackQueueMutex, std::try_to_lock);
+	if ( lock.owns_lock() == false )
 		return;
 
 	if ( callbackQueue.size() > cbQueueMax )
@@ -346,7 +337,7 @@ threadLog(const char* file, UINT32 line, UINT32 level, const char* fmt, ...)
 	vsnprintf(entry->m_entry, LOG_LENGTH, fmt, args);
 	va_end(args);
 
-	OpenThreads::ScopedLock<OpenThreads::Mutex> lock(logQueueMutex);
+	std::lock_guard<std::mutex> lock(logQueueMutex);
 	logQueue.push_back(entry);
 	++logQueuePushes;
 }
@@ -388,7 +379,7 @@ DBThread::Do(const DBThread::DBNo db_, const char* queryFormat, ...)
 void
 threadCallback(THREAD_CALLBACK* fn, void* param)
 {
-	OpenThreads::ScopedLock<OpenThreads::Mutex> lock(callbackQueueMutex);
+	std::lock_guard<std::mutex> lock(callbackQueueMutex);
 	callbackQueue.push_back(new CALLBACK_INFO(fn, param));
 	++cbQueuePushes;
 }
@@ -406,12 +397,17 @@ StatsThread::run()
 	UINT64 cbCurSize, cbMaxSize, cbUsed;
 	UINT64 cbLastUsed = 0L;
 
-	threadLog(_FLI, "Stats thread active [thread #%u]", getThreadId());
+	threadLog(_FLI, "Stats thread active [thread #%u]", std::this_thread::get_id());
 
 	UINT32 count = 0;
-	for (;; )
+	for ( ; ; )
 	{
-		std::this_thread::sleep_for(std::chrono::seconds(15));
+		// sleep for 15,000 milliseconds (15 seconds).
+		for (uint32_t i = 0; i < 15 * 10; ++i) {
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			if(isCancelled())
+				return;
+		}
 
 		if ( ++count < 4 )
 			continue;
@@ -419,15 +415,15 @@ StatsThread::run()
 
 		try
 		{
-			dbQueue.lock();
-			dbCurSize = dbQueue.m_queue.size();
-			dbMaxSize = dbQueue.m_maxSize;
-			dbUsed = dbQueue.m_hits - dbLastUsed;
-			dbLastUsed += dbUsed;
-			dbQueue.unlock();
+			dbQueue.doLocked([&] {
+				dbCurSize = dbQueue.m_queue.size();
+				dbMaxSize = dbQueue.m_maxSize;
+				dbUsed = dbQueue.m_hits - dbLastUsed;
+				dbLastUsed += dbUsed;
+			});
 
 			{
-				OpenThreads::ScopedLock<OpenThreads::Mutex> lock(callbackQueueMutex);
+				std::lock_guard<std::mutex> lock(callbackQueueMutex);
 				cbCurSize = callbackQueue.size();
 				cbMaxSize = cbQueueMax;
 				cbUsed = cbQueuePushes - cbLastUsed;

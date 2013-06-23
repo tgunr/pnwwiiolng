@@ -15,7 +15,7 @@
 // Threads
 //////////////////////////////////////////////////////////////////////
 
-struct BanThread : public OpenThreads::Thread
+struct BanThread : public PNThread
 {
 	virtual void run() { chatBanQueueThread(NULL);	}
 };

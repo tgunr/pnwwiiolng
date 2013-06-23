@@ -12,7 +12,6 @@
 #include "hostproj/revision.h"
 
 #include <signal.h>  //to catch SIGHUPS with
-#include <OpenThreads/Thread>
 
 #include "auth/authDaemon.h"
 #include "chat/chatStratSupportMessages.h"

@@ -3,9 +3,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 // Copyright (C) PlayNet Inc, 2011 -- All rights reserved.
 
-#include <OpenThreads/Mutex>
-#include <OpenThreads/ScopedLock>
-#include <OpenThreads/Thread>
 #include "teul/teulMicroWebServer.h"
 
 extern TeulTimeMS teulClock64 ;
@@ -101,12 +98,12 @@ struct HISTORY : HISTORY_BASE
 	HISTORY() : HISTORY_BASE(), m_inUse(true), m_mutex() {}
 	~HISTORY()
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(m_mutex);
+		std::lock_guard<std::mutex> lock(m_mutex);
 		m_inUse = false;
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 	volatile bool m_inUse;
-	OpenThreads::Mutex m_mutex ;
+	std::mutex m_mutex ;
 } history;
 
 void*
@@ -120,7 +117,7 @@ memCallocDebug(const size_t units_, const size_t size_, const char* const file_,
 
 	if ( history.m_inUse )
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(history.m_mutex) ;
+		std::lock_guard<std::mutex> lock(history.m_mutex) ;
 		Activity& act = history[ flLong ] ;
 		act.alloc(ptr, size_) ;
 	}
@@ -143,7 +140,7 @@ memReallocDebug(void* const oldPtr_, const size_t newSize_, const char* const fi
 
 	if ( history.m_inUse )
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(history.m_mutex) ;
+		std::lock_guard<std::mutex> lock(history.m_mutex) ;
 		Activity& newAct = history[ flLong ] ;
 		oldAct->free(newPtr) ;
 		newAct.alloc(newPtr, newSize_) ;
@@ -164,7 +161,7 @@ memFreeDebug(void* const oldPtr_, const char* const file_, const size_t line_)
 	Header* header = Header::FromPointer(oldPtr_) ;
 	if ( history.m_inUse )
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(history.m_mutex) ;
+		std::lock_guard<std::mutex> lock(history.m_mutex) ;
 		header->m_activity->free(header) ;
 	}
 
@@ -186,7 +183,7 @@ memReportJSON(unsigned int fd, const char* const /*path*/, const char* const /*a
 
 	if ( history.m_inUse )
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(history.m_mutex) ;
+		std::lock_guard<std::mutex> lock(history.m_mutex) ;
 		const auto end = history.end() ;
 		for ( auto it = history.begin() ; it != end ; ++it )
 		{

@@ -12,9 +12,6 @@
 #include "dbug/dbug.h"
 
 #include <mysql.h>
-#include <OpenThreads/Thread>
-#include <OpenThreads/Mutex>
-#include <OpenThreads/ScopedLock>
 
 #include "map/mapPlayer.h"
 #include "include/mydbQuery.h"
@@ -23,6 +20,7 @@
 #include "wwii/wwiiThreads.h"
 #include "wwii/wwiiThreadText.h"
 #include "wwii/wwiiThreadTypes.h"
+#include "mmdbPersonaSelections.h"
 
 //////////////////////////////////////////////////////////////////////
 
@@ -33,7 +31,7 @@ typedef std::unordered_map<UINT32,_PERSONAS> _BRIGADE_PERSONAS;
 
 static _PERSONA_SELECTIONS _selections;
 
-static OpenThreads::Mutex _mutex;
+static std::mutex _mutex;
 static volatile UINT32 _selectionRequests = 0;
 
 //////////////////////////////////////////////////////////////////////
@@ -42,7 +40,7 @@ static volatile UINT32 _selectionRequests = 0;
 void
 mmdbSavePersonaSelection(const Player* player)
 {
-	OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	_selections[player->personaID()] = player->brigadeID();
 	++_selectionRequests;
 }
@@ -54,7 +52,7 @@ _grabPersonas(_BRIGADE_PERSONAS& personas)
 {
 	// Do this early to allow the main thread the chance to skip
 	// some locking
-	OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_mutex);
+	std::lock_guard<std::mutex> lock(_mutex);
 	
 	for ( auto it = _selections.begin(); it != _selections.end(); ++it )
 	{
@@ -140,8 +138,8 @@ _saveSelections(DB::handle_t* conn)
 //////////////////////////////////////////////////////////////////////
 // Thread that periodically saves personas
 
-void*
-mmdbPersonaSelectionsThread(void*)
+void
+PersonaSelectionThread::run()
 {
 	DB::handle_t* conn = threadsOpenDBConnection(true);
 	if ( conn == NULL )
@@ -151,9 +149,14 @@ mmdbPersonaSelectionsThread(void*)
 
 	threadLog(_FLM, "Persona-selections thread active");
 
-	while ( 1 )
+	while ( !isCancelled() )
 	{
-		std::this_thread::sleep_for(std::chrono::seconds(5));
+		for (uint32_t i = 0; i < 50; ++i)
+		{
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
+			if(isCancelled())
+				return;
+		}
 
 		if ( !_selectionRequests )
 			continue;

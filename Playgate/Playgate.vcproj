@@ -72,7 +72,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				LinkLibraryDependencies="true"
-				AdditionalDependencies="lib\fce32.obj teulKit.lib Winmm.lib Version.lib Iphlpapi.lib opengl32.lib glu32.lib glew32s.lib OpenThreads.lib"
+				AdditionalDependencies="lib\fce32.obj teulKit.lib Winmm.lib Version.lib Iphlpapi.lib opengl32.lib glu32.lib glew32s.lib"
 				LinkIncremental="2"
 				AdditionalLibraryDirectories="lib;..\WW2\lib\win\TestRelease"
 				IgnoreDefaultLibraryNames="libc.lib"
@@ -163,7 +163,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				UseUnicodeResponseFiles="true"
-				AdditionalDependencies="lib\fce32.obj teulKit.lib Winmm.lib Version.lib Iphlpapi.lib opengl32.lib glu32.lib glew32s.lib OpenThreads.lib"
+				AdditionalDependencies="lib\fce32.obj teulKit.lib Winmm.lib Version.lib Iphlpapi.lib opengl32.lib glu32.lib glew32s.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="lib;..\WW2\lib\win\TestRelease"
 				IgnoreDefaultLibraryNames="LIBC.lib;LIBCMTD"
@@ -257,7 +257,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				UseUnicodeResponseFiles="true"
-				AdditionalDependencies="lib\fce32.obj teulKit.lib Winmm.lib Version.lib Iphlpapi.lib opengl32.lib glu32.lib glew32s.lib OpenThreads.lib"
+				AdditionalDependencies="lib\fce32.obj teulKit.lib Winmm.lib Version.lib Iphlpapi.lib opengl32.lib glu32.lib glew32s.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="lib;..\WW2\lib\win\TestRelease"
 				IgnoreDefaultLibraryNames="LIBC.lib;LIBCMTD"
@@ -351,7 +351,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				UseUnicodeResponseFiles="true"
-				AdditionalDependencies="lib\fce32.obj teulKit.lib Winmm.lib Version.lib Iphlpapi.lib opengl32.lib glu32.lib glew32s.lib OpenThreads.lib"
+				AdditionalDependencies="lib\fce32.obj teulKit.lib Winmm.lib Version.lib Iphlpapi.lib opengl32.lib glu32.lib glew32s.lib"
 				LinkIncremental="1"
 				AdditionalLibraryDirectories="lib;..\WW2\lib\win\TestRelease"
 				IgnoreDefaultLibraryNames="LIBC.lib;LIBCMTD"

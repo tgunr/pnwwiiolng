@@ -2,9 +2,6 @@
 // Created: Tue Nov 22 13:41:59 CST 2011
 // Author: Oliver "kfsone" Smith <osmith@playnet.com>
 
-#include <OpenThreads/Thread>
-#include <OpenThreads/Mutex>
-#include <OpenThreads/ScopedLock>
 #include "wwii/wwiiHash.h"
 
 namespace Teul
@@ -13,11 +10,11 @@ namespace Teul
 	{
 		//! @class Teul::uWeb::Server
 		//! @brief Micro Web-server for providing
-		class Server : public OpenThreads::Thread
+		class Server : public PNThread
 		{
 		public:
 			Server(const char* const rootPath_, const unsigned short port_)
-				: Thread()
+				: PNThread()
 				, m_rootPath(rootPath_)
 				, m_port(port_)
 				, m_config_mutex()
@@ -30,7 +27,7 @@ namespace Teul
 		private:
 			const unsigned short m_port ;
 		private:
-			OpenThreads::Mutex m_config_mutex ;
+			std::mutex m_config_mutex ;
 
 		public:
 			const std::string& rootPath() const { return m_rootPath ; }

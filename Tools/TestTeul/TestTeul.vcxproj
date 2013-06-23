@@ -90,9 +90,6 @@
     <ProjectReference Include="..\..\Libraries\libevent\libevent.vcxproj">
       <Project>{fe3e7329-9561-4bfc-9e1d-f4bddba2cbb0}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\Libraries\OpenThreads\OpenThreads.vcxproj">
-      <Project>{e5a6b20b-c552-4c73-b6f4-a7b43b023ad8}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\WW2\proj\win\teulKit\teulKit.vcxproj">
       <Project>{4f492374-dc5c-47d0-ae9f-7df7a50fdecb}</Project>
     </ProjectReference>

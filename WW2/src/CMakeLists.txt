@@ -65,8 +65,6 @@ SET(PCH_INCLUDE_HEADERS
 	wwii/wwiiIRC.h
 	server/serverPeers.h
 	wwii/wwiiServerTypeEnums.h
-	../../Libraries/OpenThreads/Thread
-	../../Libraries/OpenThreads/Mutex
 	wwii/wwiiHash.h
 	wwii/wwiiOwnershipEnums.h
 	wwii/wwiiConfig.h
@@ -102,41 +100,6 @@ set_property(TARGET ircclient PROPERTY COMPILE_DEFINITIONS IN_BUILDING_LIBIRC=1)
 set_property(TARGET  ircclient PROPERTY FOLDER "Libs")
 IF (WIN32 OR WIN64)
 	SET_TARGET_PROPERTIES(ircclient PROPERTIES COMPILE_FLAGS "${CXX_COMPILE_FLAGS} /W1")
-ENDIF ( )
-
-IF ( WIN32 )
-	add_library(OpenThreads
-		${LIBRARIES_DIR}/OpenThreads/Atomic.cpp
-		${LIBRARIES_DIR}/OpenThreads/Version.cpp
-		${LIBRARIES_DIR}/OpenThreads/WIN32Condition.cpp
-		${LIBRARIES_DIR}/OpenThreads/Win32Mutex.cpp
-		${LIBRARIES_DIR}/OpenThreads/Win32Thread.cpp
-		${LIBRARIES_DIR}/OpenThreads/Win32ThreadBarrier.cpp
-
-		${LIBRARIES_DIR}/OpenThreads/HandleHolder.h
-		${LIBRARIES_DIR}/OpenThreads/Win32BarrierPrivateData.h
-		${LIBRARIES_DIR}/OpenThreads/Win32Condition.h
-		${LIBRARIES_DIR}/OpenThreads/WIn32ConditionPrivateData.h
-		${LIBRARIES_DIR}/OpenThreads/Win32MutexPrivateData.h
-		${LIBRARIES_DIR}/OpenThreads/Win32ThreadPrivateData.h
-
-		${LIBRARIES_DIR}/OpenThreads/Atomic
-		${LIBRARIES_DIR}/OpenThreads/Barrier
-		${LIBRARIES_DIR}/OpenThreads/Block
-		${LIBRARIES_DIR}/OpenThreads/Condition
-		${LIBRARIES_DIR}/OpenThreads/Mutex
-		${LIBRARIES_DIR}/OpenThreads/ReadWriteMutex
-		${LIBRARIES_DIR}/OpenThreads/ReentrantMutex
-		${LIBRARIES_DIR}/OpenThreads/ScopedLock
-		${LIBRARIES_DIR}/OpenThreads/Thread
-	)
-	set_property(TARGET OpenThreads PROPERTY COMPILE_DEFINITIONS OT_LIBRARY_STATIC)
-	set_property(TARGET OpenThreads PROPERTY COMPILE_DEFINITIONS OpenThreads_EXPORTS)
-	set_property(TARGET OpenThreads PROPERTY COMPILE_DEFINITIONS OPENTHREADS_EXPORTS)
-	SET(_PCH "openthreads-precompile-pch.h")
-	SET_TARGET_PROPERTIES(OpenThreads PROPERTIES COMPILE_FLAGS "/Yu\"${_PCH}\" /FI\"${_PCH}\" /Fp\"\$(IntDir)\$(TargetName).pch\"")
-	SET_TARGET_PROPERTIES(OpenThreads PROPERTIES FOLDER "Libs")
-	SET_SOURCE_FILES_PROPERTIES(${LIBRARIES_DIR}/OpenThreads/Atomic.cpp PROPERTIES COMPILE_FLAGS "/Yc\"${_PCH}\"")
 ENDIF ( )
 
 # TeulServer library - this is a baseline library that provides
@@ -337,7 +300,7 @@ add_library (libwwii
 	wwii/wwiiThreads.h
 )
 ADD_PCH(libwwii)
-target_link_libraries(libwwii OpenThreads)
+target_link_libraries(libwwii)
 SET_PROPERTY(TARGET libwwii PROPERTY FOLDER "Libs")
 
 ######################################################################

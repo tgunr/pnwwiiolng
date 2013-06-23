@@ -10,8 +10,7 @@
 
 #include "versionNo.h"
 
-#include <OpenThreads/Mutex>
-#include <OpenThreads/ScopedLock>
+#include <mutex>
 
 #include "wwii/wwiiHash.h"
 #include "wwii/wwiiSquads.h"
@@ -53,7 +52,7 @@ static RECRUITERS g_recruiters ;
 static SQUAD_LISTS g_squads ;
 
 static SQUAD_NAMES g_squadNames ;
-static OpenThreads::Mutex _namesMutex ;
+static std::mutex _namesMutex ;
 
 extern const char* chatMakeTempString(const char* fmt, ...) ;
 extern void chatSendCOAppointment(UINT32 squadID, const ChatHandle& handle) ;
@@ -1256,7 +1255,7 @@ protected:
 void
 SquadNamesQuery::Success()
 {
-	OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_namesMutex) ;
+	std::lock_guard<std::mutex> lock(_namesMutex) ;
 	g_squadNames.clear() ;
 
 	if ( Query()->HasRows() )
@@ -1302,7 +1301,7 @@ chatAddSquadName(const char* name)
 void
 chatAddSquadName(const ChatHandle& handle)
 {
-	OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_namesMutex) ;
+	std::lock_guard<std::mutex> lock(_namesMutex) ;
 	g_squadNames[chatGetLowercaseHandle(handle)] = handle ;
 }
 
@@ -1318,7 +1317,7 @@ chatCheckForSquadName(const char* name)
 bool
 chatCheckForSquadName(const ChatHandle& handle)
 {
-	OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_namesMutex) ;
+	std::lock_guard<std::mutex> lock(_namesMutex) ;
 	const bool exists = (g_squadNames.find(chatGetLowercaseHandle(handle)) != g_squadNames.end()) ;
 	return exists ;
 }
@@ -1335,7 +1334,7 @@ chatRemoveSquadName(const char* name)
 void
 chatRemoveSquadName(const ChatHandle& handle)
 {
-	OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_namesMutex) ;
+	std::lock_guard<std::mutex> lock(_namesMutex) ;
 	SQUAD_NAMES::iterator it = g_squadNames.find(chatGetLowercaseHandle(handle)) ;
 	if ( it != g_squadNames.end() )
 		g_squadNames.erase(it) ;

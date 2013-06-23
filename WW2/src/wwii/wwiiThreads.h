@@ -62,10 +62,9 @@ extern void wwiiEscapeString(std::string& text);
 extern void threadIgnoreSIGPIPE();
 
 // Thread for monitoring database and worker queue performance.
-class StatsThread : public OpenThreads::Thread
+class StatsThread : public PNThread
 {
 public:
-	StatsThread() {}
 	virtual void run();
 };
 

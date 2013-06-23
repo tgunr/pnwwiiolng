@@ -12,15 +12,13 @@
 
 #include <deque>
 #include <stdexcept>
+#include <mutex>
 
 #include "teul/teulTime.h"					// For teulClock64
 #include "wwii/wwiiString.h"
 #include "wwii/wwiiThreadTextQuery.h"
 
-#include <OpenThreads/Mutex>
-#include <OpenThreads/ScopedLock>
-
-static OpenThreads::Mutex textMutex ;
+static std::mutex textMutex ;
 
 typedef std::deque<char*> TEXT_POOL ;
 static TEXT_POOL _pool ;
@@ -38,7 +36,7 @@ threadsAllocText()
 
 #if !defined(XMEMORY_DEBUG)
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> mutexLock(textMutex) ;
+		std::lock_guard<std::mutex> mutexLock(textMutex) ;
 
 		if ( !_pool.empty() )
 		{
@@ -96,7 +94,7 @@ void
 threadsFreeText(char* text)
 {
 #if !defined(XMEMORY_DEBUG)
-	OpenThreads::ScopedLock<OpenThreads::Mutex> mutexLock(textMutex) ;
+	std::lock_guard<std::mutex> mutexLock(textMutex) ;
 	_pool.push_back(text) ;
 #else
 	memFree(text) ;

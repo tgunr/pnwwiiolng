@@ -1,9 +1,5 @@
 # Server project dependencies.
 
-IF ( NOT WIN32 )
-	FIND_PACKAGE(OpenThreads REQUIRED)
-ENDIF ( )
-
 FIND_LIBRARY(CNL NAMES ncurses)
 IF ( UNIX AND NOT CNL )
  MESSAGE(SEND_ERROR "ncurses library not found")

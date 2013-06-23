@@ -31,11 +31,7 @@
 #include "sdm/StratDB.h"
 #include "scen/ScenarioManager.h"
 #include "sys/sysmain.h"
-
-#include <OpenThreads/Thread>
-#include <OpenThreads/ReentrantMutex>
-#include <OpenThreads/Condition>
-#include <OpenThreads/ScopedLock>
+#include <condition_variable>
 
 #define SQUARE(x) ((x)*(x))
 #define PAN_SCALE_MAX 5.0f				// max scale when panning
@@ -45,7 +41,7 @@
 
 static SINT32 _mapinstances = 0;
 
-class  SuperCellMapView::Renderer::LoadThread : public OpenThreads::Thread, public phui::Referenced
+class  SuperCellMapView::Renderer::LoadThread : public PNThread, public phui::Referenced
 {
 public:
 	LoadThread(SuperCellMapView::Renderer* r);
@@ -56,14 +52,14 @@ public:
 
 	virtual void run();
 
-	OpenThreads::Mutex _queueMutex, _loadMutex;
+	std::mutex _queueMutex;
+	std::condition_variable _doLoad;
 
 	SuperCellMapView::Renderer* _renderer;
 	bool _done;
 
 	typedef std::vector<SuperCell*> SuperCellList;
 	SuperCellList _cells;
-	OpenThreads::Condition _doload;
 };
 
 phui::ref_ptr<SuperCellMapView::Renderer::LoadThread> SuperCellMapView::Renderer::_loadthread;
@@ -818,7 +814,6 @@ SuperCellMapView::Renderer::Renderer() : enabled(true), minscale(.1f), maxscale(
 	if(!_loadthread.valid())
 	{
 		_loadthread = new LoadThread(this);
-    _loadthread->setStackSize(1024*1024);
 		_loadthread->start();
 		while(!_loadthread->isRunning()){}
 	}
@@ -881,7 +876,7 @@ SuperCellMapView::Renderer::SuperCell::SuperCell(Renderer* r, int x, int y)
 *************************************************************************************************/
 
 SuperCellMapView::Renderer::LoadThread::LoadThread(Renderer* r)
-	: OpenThreads::Thread()
+	: PNThread()
 	, _renderer(r)
 	, _done(false)
 	, _cells()
@@ -892,85 +887,57 @@ SuperCellMapView::Renderer::LoadThread::LoadThread(Renderer* r)
 SuperCellMapView::Renderer::LoadThread::~LoadThread()
 {
 	_done = true;
-	_doload.signal();
+	{
+		std::unique_lock<std::mutex> lock(_queueMutex, std::try_to_lock);
+		_doLoad.notify_all();
+	}
 	while(GameInProgress && isRunning()) {}
 }
 
 void SuperCellMapView::Renderer::LoadThread::LoadSuperCell(SuperCell* sc)
 {
-	_queueMutex.lock() ;
+	std::lock_guard<std::mutex> lock(_queueMutex);
 
 	sc->loading = true;
 	_cells.push_back(sc);
-	_doload.signal();
-
-	_queueMutex.unlock() ;
+	_doLoad.notify_one();
 }
 
 void SuperCellMapView::Renderer::LoadThread::RemoveRendererSuperCells(SuperCellMapView::Renderer* r)
 {
-	_queueMutex.lock() ;
-	if ( _cells.empty() == false )
+	std::lock_guard<std::mutex> lock(_queueMutex);
+	if ( _cells.empty() == true )
+		return;
+	SuperCellList::iterator it = _cells.begin();
+	while ( it != _cells.end() )
 	{
-		_loadMutex.lock() ;
-
-		SuperCellList::iterator it = _cells.begin();
-		while ( it != _cells.end() )
+		if( (*it)->renderer == r)
 		{
-			if( (*it)->renderer == r)
-			{
-				*it = _cells.back() ;
-				_cells.pop_back() ;
-			}
-			else
-				++it ;
+			*it = _cells.back() ;
+			_cells.pop_back() ;
 		}
-
-		_loadMutex.unlock() ;
+		else
+			++it ;
 	}
-
-	_queueMutex.unlock() ;
 }
 
 void SuperCellMapView::Renderer::LoadThread::run()
 {
-	SuperCell* sc = NULL;
-
-	_queueMutex.lock() ;
 	for(;;)
 	{
-		while(false == _done && true == _cells.empty())
-		{
-			_doload.wait(&_queueMutex);
-		}
-		if(_done) { _queueMutex.unlock() ; break ; }
-		if(_cells.empty()) continue ;
+		std::unique_lock<std::mutex> lock(_queueMutex);
+		_doLoad.wait(lock, [&] { return _done || !_cells.empty(); });
+		if(_done)
+			break;
+		if(_cells.empty())
+			continue;
 
-		bool lockedLoad = (_loadMutex.trylock() == 0) ;
-		if ( lockedLoad == false )
-			continue ;
+		SuperCell* sc = _cells.front();
+		_cells.erase(_cells.begin());
+		lock.unlock();
 
-		if ( lockedLoad )
-		{
-			sc = _cells[0] ;
-			_cells[0] = _cells.back() ;
-			_cells.pop_back() ;
-		}
-		else
-		{
-			sc = NULL ;
-		}
-
-		_queueMutex.unlock() ;
-
-		if ( lockedLoad )
-		{
-			if ( NULL != sc )
-				sc->Load();
-			_loadMutex.unlock() ;
-		}
-
-		_queueMutex.lock() ;
+		if ( NULL != sc && sc->loading == true )
+			sc->Load();
 	}
 }
 

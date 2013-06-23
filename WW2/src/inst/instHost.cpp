@@ -8,8 +8,7 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include <OpenThreads/Mutex>
-#include <OpenThreads/ScopedLock>
+#include <mutex>
 
 #include "inst/instHost.h"
 #include "inst/instHostInstance.h"
@@ -30,7 +29,7 @@ namespace Lua { extern void ProcessEventQueue() ; }
 HOST_INSTANCES g_hostInstances ;
 INSTANCE_UIDS g_hostInstanceUIDs ;
 
-static OpenThreads::Mutex s_instanceMutex ;
+static std::mutex s_instanceMutex ;
 
 //////////////////////////////////////////////////////////////////////
 // The HostInstanceImpl generator.
@@ -273,7 +272,7 @@ HostInstance::swapPlayerSide(wwiiPlayer* const player, UINT8 fromSide)
 	assert( m_count[fromSide] > 0 ) ;
 #endif
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(s_instanceMutex) ;
+		std::lock_guard<std::mutex> lock(s_instanceMutex) ;
 		--m_count[fromSide] ;
 		++m_count[player->side()] ;
 	}
@@ -297,7 +296,7 @@ HostInstance::addPlayer(wwiiPlayer* const player)
 
 	// Add me and bump the counters
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(s_instanceMutex) ;
+		std::lock_guard<std::mutex> lock(s_instanceMutex) ;
 		m_players.insert(it, player) ;
 		incrementCount(player->side()) ;
 	}
@@ -318,7 +317,7 @@ HostInstance::removePlayer(wwiiPlayer* const player)
 		return false ;
 
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(s_instanceMutex) ;
+		std::lock_guard<std::mutex> lock(s_instanceMutex) ;
 		m_players.erase(it) ;
 		decrementCount(player->side()) ;
 	}

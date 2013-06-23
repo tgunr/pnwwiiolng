@@ -57,10 +57,7 @@ static SINT32 s_peeringIndex = -1 ;
 // Peers who have connected but not hello'd yet.
 static std::map<SINT16, TeulTimeMS> s_pendingPeers;
 
-#include <OpenThreads/Mutex>
-#include <OpenThreads/ScopedLock>
-
-static OpenThreads::Mutex s_peerMutex;
+static std::mutex s_peerMutex;
 
 //////////////////////////////////////////////////////////////////////
 // JSON description of current peering info.
@@ -72,7 +69,7 @@ _reportJSONPeers(unsigned int fd, const char* path, const char* args)
 	char* report = static_cast<char*>(alloca(maxSize));
 	char* p = report + sprintf(report, "{\"peers\":[");
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(s_peerMutex);
+		std::lock_guard<std::mutex> lock(s_peerMutex);
 		for ( auto& it : s_connections )
 		{
 			p += sprintf(p, "{\"ip\":%u,\"type\":%u,\"idx\":%d,\"conn\":%u},", it.m_ip, it.m_type, it.m_teulIndex, it.m_connected);
@@ -150,7 +147,7 @@ _onConnect(ENDPOINT& endpoint)
 					) ;
 
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(s_peerMutex);
+		std::lock_guard<std::mutex> lock(s_peerMutex);
 
 		// Paranoia: Make sure the teulIndexes match.
 		if ( connection->m_teulIndex != endpoint.teulIndex() )
@@ -173,7 +170,7 @@ _onError(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*/, const T
 {
 	if ( error == ENOTCONN )
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(s_peerMutex);
+		std::lock_guard<std::mutex> lock(s_peerMutex);
 		s_pendingPeers.erase(teulIndex);
 	}
 
@@ -257,7 +254,7 @@ serverConnectPeer(const UINT32 forIP_, const SERVER_TYPE type_)
 		return ;
 	}
 
-	OpenThreads::ScopedLock<OpenThreads::Mutex> lock(s_peerMutex);
+	std::lock_guard<std::mutex> lock(s_peerMutex);
 
 	// Only consider the last octet.
 	ServerConnection* const connection = _findConnectionByIP(ip, type_) ;
@@ -416,7 +413,7 @@ _onPeerConnect(ENDPOINT& endpoint)
 	dbugLog(_FLI, "t:%d ip:%s:%u peer connection", endpoint.teulIndex(), addr, endpoint.fromPort());
 
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(s_peerMutex);
+		std::lock_guard<std::mutex> lock(s_peerMutex);
 		s_pendingPeers[endpoint.teulIndex()] = teulClock64;
 	}
 }
@@ -437,7 +434,7 @@ _onPeerHello(ACTION_OBJECT* a, PeerHello& hello)
 	}
 	ABORT_IF( info->stats.type != hello.m_type );
 
-	OpenThreads::ScopedLock<OpenThreads::Mutex> lock(s_peerMutex);
+	std::lock_guard<std::mutex> lock(s_peerMutex);
 
 	UINT32 ip = Server::BroadcastMaskAddress(endpoint.fromAddress()) ;
 	ServerConnection* connection = _findConnectionByIP(ip, hello.m_type);

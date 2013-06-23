@@ -62,9 +62,6 @@
 
 #include "libxml/tree.h"
 
-#include <OpenThreads/Mutex>
-#include <OpenThreads/ScopedLock>
-
 #if platOS == OS_WIN32
 #include <unordered_map>
 #define UNORDERED_MAP std::unordered_map

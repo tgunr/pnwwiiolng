@@ -14,10 +14,8 @@
 #include "dbse/dbseWrapper.h"
 #include "dbug/dbug.h"
 #include "mem/mem.h"
+#include <mutex>
 #include <mysql.h>
-#include <OpenThreads/Mutex>
-#include <OpenThreads/ScopedLock>
-#include <OpenThreads/Thread>
 #include "wwii/wwiidbConfigVars.h"
 #include "wwii/wwiiThreads.h"
 
@@ -74,7 +72,7 @@ _doMyConnect(const DBCONNECTION& connection, bool autoReconnect)
 
 // ------ Public Functions
 
-static OpenThreads::Mutex dbconnMutex ;
+static std::mutex dbconnMutex ;
 
 DB::handle_t*
 dbseGetConnection(const DBCONNECTION& connection, bool report, bool autoReconnect)
@@ -87,7 +85,7 @@ dbseGetConnection(const DBCONNECTION& connection, bool report, bool autoReconnec
 	DB::handle_t* newConn = NULL ;
 	std::this_thread::sleep_for(std::chrono::microseconds(250));
 	{
-		OpenThreads::ScopedLock<OpenThreads::Mutex> dbconnLock(dbconnMutex) ;
+		std::lock_guard<std::mutex> dbconnLock(dbconnMutex) ;
 		newConn = _doMyConnect(connection, autoReconnect) ;
 	}
 

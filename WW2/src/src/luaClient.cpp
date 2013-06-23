@@ -14,7 +14,6 @@
 #include <fstream>
 #include <ios>
 #include <iostream>
-#include <OpenThreads/Thread>
 #include <sys/poll.h>
 
 #if defined(HAVE_ARPA_INET_H)

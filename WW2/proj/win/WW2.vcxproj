@@ -1866,9 +1866,6 @@
     <ProjectReference Include="..\..\..\Libraries\opende\build\vs2008\ode.vcxproj">
       <Project>{8ab66b51-5e2c-544a-aa89-117cce62c46a}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\..\Libraries\OpenThreads\OpenThreads.vcxproj">
-      <Project>{e5a6b20b-c552-4c73-b6f4-a7b43b023ad8}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\..\..\Libraries\phui\proj.win32\phui-vs8.vcxproj">
       <Project>{c1b372c3-12a9-45aa-9d23-4d5024926fab}</Project>
     </ProjectReference>

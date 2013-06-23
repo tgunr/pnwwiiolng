@@ -8,8 +8,6 @@
 
 #include "include/mydbQuery.h"
 #include "map/mapPlayer.h"
-#include <OpenThreads/Mutex>
-#include <OpenThreads/ScopedLock>
 #include "teul/teulTime.h"
 #include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiOpinionPoll.h"
@@ -20,7 +18,7 @@
 typedef std::map<UINT32,OpinionPoll> _POLLS ;
 static _POLLS polls ;
 static UINT32 g_maxPoll = 0 ;
-static OpenThreads::Mutex _pollsLock ;
+static std::mutex _pollsLock ;
 
 //////////////////////////////////////////////////////////////////////
 
@@ -64,7 +62,7 @@ _parseQuery(DBQuery& query)
 	}
 
 	// Now copy them over with a lock.
-	OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_pollsLock) ;
+	std::lock_guard<std::mutex> lock(_pollsLock) ;
 	polls = newPolls ;
 	g_maxPoll = maxPoll ;
 }
@@ -135,7 +133,7 @@ mmCheckOpinionPolls(Player* player)
 	if ( player->teulIndex() < 0 )
 		return false ;
 
-	OpenThreads::ScopedLock<OpenThreads::Mutex> lock(_pollsLock) ;
+	std::lock_guard<std::mutex> lock(_pollsLock) ;
 	try
 	{
 		const OpinionPoll* const sendPoll = _checkPolls(player) ;

@@ -13,11 +13,7 @@
 #include "wwii/wwiiThreads.h"
 #include "mm/mmdbPersonaSelections.h"
 
-struct PersonaSlectionThread : public OpenThreads::Thread
-{
-	virtual void run() { mmdbPersonaSelectionsThread(NULL); }
-};
-static PersonaSlectionThread _personaThread;
+static PersonaSelectionThread _personaThread;
 static StatsThread _statsThread;
 
 
@@ -27,7 +23,7 @@ mapThreadsSetup()
 	threadsSetup();
 
 	_statsThread.start();
-	_personaThread.cancel();
+	_personaThread.start();
 }
 
 void

@@ -402,7 +402,7 @@ void CtxMenu::GetBranchDimensions(float& w, float& h)
 		{
 			CtxMenu* menu = (*_submenus)[i];
 
-			w = std::max(w, ctx->FontAdvance(_font, menu->GetValue().WideString())) + 37.0;
+			w = std::max(w, ctx->FontAdvance(_font, menu->GetValue().WideString())) + 37.0f;
 			h += menu->Height();
 		}
 		

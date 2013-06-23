@@ -33,7 +33,7 @@ static const size_t _ROUNDING = 1023 ;
 // Maximum number of pools to have (max size of a player)
 static const UINT32 _MAX_POOLS = 3 ;
 
-static Mutex allocMutex ;
+static std::mutex allocMutex ;
 typedef UINT64 StorageHeader ;
 typedef	std::vector<UINT64*> Pool ;
 static UINT32 _callocs = 0 ;
@@ -111,7 +111,7 @@ wwiiPlayer::operator new(size_t actualSize)
 	StorageHeader* ptr = NULL ;
 
 	// We'll need a lock.
-	if ( allocMutex.lock() != 0 ) throw std::bad_alloc() ;
+	auto* lock = new std::lock_guard<std::mutex>(allocMutex);
 
 	// When the pool is empty, allocate a batch of objects.
 	if ( pool.empty() )
@@ -124,8 +124,8 @@ wwiiPlayer::operator new(size_t actualSize)
 		_callocs++ ;
 		if ( block == NULL )
 		{
-			allocMutex.unlock() ;
-			throw std::bad_alloc() ;
+			delete lock;
+			throw std::bad_alloc();
 		}
 
 		_reserved += _CALLOC_RATE ;
@@ -148,7 +148,7 @@ wwiiPlayer::operator new(size_t actualSize)
 	_inUse++ ;
 	_news++ ;
 
-	allocMutex.unlock() ;
+	delete lock;
 
 	assert( ptr != NULL ) ;
 
@@ -181,27 +181,28 @@ wwiiPlayer::operator delete(void* p)
 	dbugLog(_FLD, "-player[%" PRSizeT " => pool #%u:%" PRSizeT "] => %p", (size_t)*ptr, poolNo, (size_t)*ptr, ptr) ;
 
 	size_t newSize = 0 ;
-	allocMutex.lock() ;
 
-	// We're going to push this onto the top of the
-	// pool, so check if this would push the pool
-	// over it's capacity and grow it by a suitable
-	// increment in advance.
-	if ( pool.size() + 1 >= pool.capacity() )
 	{
-		newSize = pool.capacity() + _POOL_GROWTH_RATE ;
-		pool.reserve(newSize) ;
+		std::lock_guard<std::mutex> lock(allocMutex);
+
+		// We're going to push this onto the top of the
+		// pool, so check if this would push the pool
+		// over it's capacity and grow it by a suitable
+		// increment in advance.
+		if ( pool.size() + 1 >= pool.capacity() )
+		{
+			newSize = pool.capacity() + _POOL_GROWTH_RATE ;
+			pool.reserve(newSize) ;
+		}
+
+		// Push it onto the back of the pool
+		pool.push_back(ptr) ;
+
+		// Adjust counters
+		_reserved++ ;
+		_inUse-- ;
+		_frees++ ;
 	}
-
-	// Push it onto the back of the pool
-	pool.push_back(ptr) ;
-
-	// Adjust counters
-	_reserved++ ;
-	_inUse-- ;
-	_frees++ ;
-
-	allocMutex.unlock() ;
 
 	if ( newSize > 0 )
 	{
@@ -215,13 +216,12 @@ wwiiPlayer::operator delete(void* p)
 void
 wwiiPlayer::logStats()
 {
-	allocMutex.lock() ;
+	std::lock_guard<std::mutex> lock(allocMutex);
 	dbugLog(_FLN, "callocs:%u news:%u frees:%u reserved:%u inUse:%u"
 					, _callocs
 					, _news, _frees
 					, _reserved, _inUse
 					) ;
-	allocMutex.unlock() ;
 }
 
 //////////////////////////////////////////////////////////////////////

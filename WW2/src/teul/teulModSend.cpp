@@ -9,8 +9,6 @@
 //
 // Originating Programmer: Martin Poulin
 
-#include <OpenThreads/Thread>
-
 #include "teul/teulCallbackStruct.h"
 #include "teul/teulClosingEnums.h"
 #include "teul/teulEndpoint.h"

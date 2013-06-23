@@ -32,7 +32,6 @@
 #include <libircclient.h>
 #include <libirc_rfcnumeric.h>
 #include <signal.h>
-#include <OpenThreads/Thread>
 #include <set>
 
 #include "wwii/wwiiThreads.h"
@@ -69,10 +68,11 @@ namespace Teul { extern const char* GetAppName(); }
 
 static const char* _getChannelName(const char* channel, char* into, size_t intoSize);
 
-struct IRCImpl : public IRC, public OpenThreads::Thread
+struct IRCImpl : public IRC, public PNThread
 {
 	IRCImpl()
-		:  m_initialized(false), m_active(false), m_running(false), m_joined(false)
+		:  PNThread()
+		, m_initialized(false), m_active(false), m_running(false), m_joined(false)
 		, m_session(NULL)
 		, m_app(""), m_nick("")
 		, m_modes(), m_channels()
@@ -114,7 +114,7 @@ static IRCImpl irc;
 void
 IRCImpl::run()
 {
-	threadLog(_FLI, "IRC: started [thread #%u]", getThreadId());
+	threadLog(_FLI, "IRC: started");
 
 	const char* ircPass = cv_ircPassword.GetString();
 

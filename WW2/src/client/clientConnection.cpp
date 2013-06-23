@@ -34,7 +34,6 @@
 #include "wwii/wwiiNetPorts.h"
 #include "fio/fio.h"
 #include "rn/rnlogo.h"
-#include <OpenThreads/Thread>
 
 static TeulTimeMS _pingSent = 0LL, _pingRxed = 0LL ;
 //static TeulTimeMS _connectTime = 0LL ;

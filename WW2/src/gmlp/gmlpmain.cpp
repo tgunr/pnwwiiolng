@@ -2,7 +2,6 @@
 
 #include <math.h>
 
-#include <OpenThreads/Thread>
 #include "pi/pi.h"
 #include "include/vars.h"
 

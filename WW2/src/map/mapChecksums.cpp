@@ -10,15 +10,13 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 #include "include/mydbQuery.h"
-#include <OpenThreads/Mutex>
-#include <OpenThreads/ScopedLock>
 #include "wwii/wwiiDBThreads.h"
 
 //////////////////////////////////////////////////////////////////////
 
 typedef std::vector< std::pair<UINT32, UINT64> > CHECKSUMS ;
 
-static OpenThreads::Mutex chMutex ;
+static std::mutex chMutex;
 static CHECKSUMS _checksums ;
 static bool _inProgress = false ;
 
@@ -53,7 +51,7 @@ public:
 		threadLog(_FLD, "%u checksums", newChecksums.size()) ;
 
 		{
-			OpenThreads::ScopedLock<OpenThreads::Mutex> lock(chMutex) ;
+			std::lock_guard<std::mutex> lock(chMutex) ;
 			_checksums = newChecksums ;
 		}
 		_inProgress = false ;
@@ -104,7 +102,7 @@ mapCheckChecksum(UINT32 appVersion, const UINT64& checksum, bool isProducer)
 	if ( (checksum == 8173587580LL) | (isProducer) )
 		return true ;
 
-	OpenThreads::ScopedLock<OpenThreads::Mutex> lock(chMutex) ;
+	std::lock_guard<std::mutex> lock(chMutex) ;
 
 	CHECKSUMS::iterator it ;
 	for ( it = _checksums.begin() ; it != _checksums.end() ; ++it )

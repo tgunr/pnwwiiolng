@@ -88,7 +88,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="imm32.lib ode.lib teulkit.lib d3d9.lib dxguid.lib dinput.lib winmm.lib vfw32.lib odbc32.lib odbccp32.lib version.lib imap.lib xmlparse.lib opengl32.lib glu32.lib dsound.lib SpeedTree.lib cg.lib cgGL.lib js.lib freetype.lib ftgl.lib phui.lib libxml2_a.lib OpenThreads.lib Ws2_32.lib granny2.lib WMVCORE.lib strmiids.lib glew32s.lib RakNetLibStatic.lib Psapi.lib lua51.lib tolua++.lib libboost_regex-1_38.lib"
+				AdditionalDependencies="imm32.lib ode.lib teulkit.lib d3d9.lib dxguid.lib dinput.lib winmm.lib vfw32.lib odbc32.lib odbccp32.lib version.lib imap.lib xmlparse.lib opengl32.lib glu32.lib dsound.lib SpeedTree.lib cg.lib cgGL.lib js.lib freetype.lib ftgl.lib phui.lib libxml2_a.lib Ws2_32.lib granny2.lib WMVCORE.lib strmiids.lib glew32s.lib RakNetLibStatic.lib Psapi.lib lua51.lib tolua++.lib libboost_regex-1_38.lib"
 				OutputFile="$(OutDir)/dorothy.exe"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
@@ -197,7 +197,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="imm32.lib teulkit.lib d3d9.lib dxguid.lib dinput.lib winmm.lib vfw32.lib odbc32.lib odbccp32.lib version.lib imap.lib xmlparse.lib d3dx8.lib opengl32.lib glu32.lib dsound.lib SpeedTreeRT_SSE2.lib cg.lib cgGL.lib phui.lib js.lib ftgl_static_MTD.lib freetype214MT.lib libxml2_a.lib OpenThreads.lib Ws2_32.lib granny2.lib WMVCORE.lib strmiids.lib glew32s.lib RakNetLibStatic.lib"
+				AdditionalDependencies="imm32.lib teulkit.lib d3d9.lib dxguid.lib dinput.lib winmm.lib vfw32.lib odbc32.lib odbccp32.lib version.lib imap.lib xmlparse.lib d3dx8.lib opengl32.lib glu32.lib dsound.lib SpeedTreeRT_SSE2.lib cg.lib cgGL.lib phui.lib js.lib ftgl_static_MTD.lib freetype214MT.lib libxml2_a.lib Ws2_32.lib granny2.lib WMVCORE.lib strmiids.lib glew32s.lib RakNetLibStatic.lib"
 				OutputFile="$(OutDir)/$(ProjectName)_sse2.exe"
 				Version="0.1"
 				LinkIncremental="1"
@@ -305,7 +305,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="imm32.lib teulkit.lib d3d9.lib dxguid.lib dinput.lib winmm.lib vfw32.lib odbc32.lib odbccp32.lib version.lib imap.lib xmlparse.lib d3dx8.lib opengl32.lib glu32.lib dsound.lib SpeedTreeRT_SSE2.lib cg.lib cgGL.lib phui.lib js.lib ftgl_static_MTD.lib freetype214MT.lib libxml2_a.lib OpenThreads.lib Ws2_32.lib granny2.lib WMVCORE.lib strmiids.lib glew32s.lib RakNetLibStatic.lib"
+				AdditionalDependencies="imm32.lib teulkit.lib d3d9.lib dxguid.lib dinput.lib winmm.lib vfw32.lib odbc32.lib odbccp32.lib version.lib imap.lib xmlparse.lib d3dx8.lib opengl32.lib glu32.lib dsound.lib SpeedTreeRT_SSE2.lib cg.lib cgGL.lib phui.lib js.lib ftgl_static_MTD.lib freetype214MT.lib libxml2_a.lib Ws2_32.lib granny2.lib WMVCORE.lib strmiids.lib glew32s.lib RakNetLibStatic.lib"
 				OutputFile="$(OutDir)/$(ProjectName)_sse2.exe"
 				Version="0.1"
 				LinkIncremental="1"
@@ -416,7 +416,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="imm32.lib shlW32Mt.lib ode.lib teulkit.lib d3d9.lib dxguid.lib dinput.lib winmm.lib vfw32.lib odbc32.lib odbccp32.lib version.lib imap.lib xmlparse.lib opengl32.lib glu32.lib dsound.lib SpeedTree.lib cg.lib cgGL.lib phui.lib js.lib ftgl.lib freetype.lib libxml2_a.lib OpenThreads.lib Ws2_32.lib granny2.lib WMVCORE.lib strmiids.lib glew32s.lib RakNetLibStatic.lib Psapi.lib lua51.lib tolua++.lib libboost_regex-1_38.lib"
+				AdditionalDependencies="imm32.lib shlW32Mt.lib ode.lib teulkit.lib d3d9.lib dxguid.lib dinput.lib winmm.lib vfw32.lib odbc32.lib odbccp32.lib version.lib imap.lib xmlparse.lib opengl32.lib glu32.lib dsound.lib SpeedTree.lib cg.lib cgGL.lib phui.lib js.lib ftgl.lib freetype.lib libxml2_a.lib Ws2_32.lib granny2.lib WMVCORE.lib strmiids.lib glew32s.lib RakNetLibStatic.lib Psapi.lib lua51.lib tolua++.lib libboost_regex-1_38.lib"
 				OutputFile="$(OutDir)/$(ProjectName)_sse2.exe"
 				Version="0.1"
 				LinkIncremental="1"
@@ -527,7 +527,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="imm32.lib shlW32Mt.lib ode.lib teulkit.lib d3d9.lib dxguid.lib dinput.lib winmm.lib vfw32.lib odbc32.lib odbccp32.lib version.lib imap.lib xmlparse.lib opengl32.lib glu32.lib dsound.lib SpeedTree.lib cg.lib cgGL.lib phui.lib js.lib ftgl.lib freetype.lib libxml2_a.lib OpenThreads.lib Ws2_32.lib granny2.lib WMVCORE.lib strmiids.lib glew32s.lib RakNetLibStatic.lib Psapi.lib lua51.lib tolua++.lib libboost_regex-1_38.lib"
+				AdditionalDependencies="imm32.lib shlW32Mt.lib ode.lib teulkit.lib d3d9.lib dxguid.lib dinput.lib winmm.lib vfw32.lib odbc32.lib odbccp32.lib version.lib imap.lib xmlparse.lib opengl32.lib glu32.lib dsound.lib SpeedTree.lib cg.lib cgGL.lib phui.lib js.lib ftgl.lib freetype.lib libxml2_a.lib Ws2_32.lib granny2.lib WMVCORE.lib strmiids.lib glew32s.lib RakNetLibStatic.lib Psapi.lib lua51.lib tolua++.lib libboost_regex-1_38.lib"
 				OutputFile="$(OutDir)/$(ProjectName)_sse2.exe"
 				Version="0.1"
 				LinkIncremental="1"
@@ -638,7 +638,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="imm32.lib ode.lib teulkit.lib d3d9.lib dxguid.lib dinput.lib winmm.lib vfw32.lib odbc32.lib odbccp32.lib version.lib imap.lib xmlparse.lib opengl32.lib glu32.lib dsound.lib SpeedTree.lib cg.lib cgGL.lib phui.lib js.lib ftgl.lib freetype.lib libxml2_a.lib OpenThreads.lib Ws2_32.lib granny2.lib WMVCORE.lib strmiids.lib glew32s.lib RakNetLibStatic.lib Psapi.lib lua51.lib tolua++.lib libboost_regex-1_38.lib"
+				AdditionalDependencies="imm32.lib ode.lib teulkit.lib d3d9.lib dxguid.lib dinput.lib winmm.lib vfw32.lib odbc32.lib odbccp32.lib version.lib imap.lib xmlparse.lib opengl32.lib glu32.lib dsound.lib SpeedTree.lib cg.lib cgGL.lib phui.lib js.lib ftgl.lib freetype.lib libxml2_a.lib Ws2_32.lib granny2.lib WMVCORE.lib strmiids.lib glew32s.lib RakNetLibStatic.lib Psapi.lib lua51.lib tolua++.lib libboost_regex-1_38.lib"
 				ShowProgress="0"
 				OutputFile="$(OutDir)/$(ProjectName)_x86.exe"
 				LinkIncremental="2"
@@ -752,7 +752,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386"
-				AdditionalDependencies="imm32.lib ode.lib teulkit.lib d3d9.lib dxguid.lib dinput.lib winmm.lib vfw32.lib odbc32.lib odbccp32.lib version.lib imap.lib xmlparse.lib opengl32.lib glu32.lib dsound.lib SpeedTree.lib cg.lib cgGL.lib phui.lib js.lib ftgl.lib freetype.lib libxml2_a.lib OpenThreads.lib Ws2_32.lib granny2.lib WMVCORE.lib strmiids.lib glew32s.lib RakNetLibStatic.lib Psapi.lib lua51.lib tolua++.lib libboost_regex-1_38.lib"
+				AdditionalDependencies="imm32.lib ode.lib teulkit.lib d3d9.lib dxguid.lib dinput.lib winmm.lib vfw32.lib odbc32.lib odbccp32.lib version.lib imap.lib xmlparse.lib opengl32.lib glu32.lib dsound.lib SpeedTree.lib cg.lib cgGL.lib phui.lib js.lib ftgl.lib freetype.lib libxml2_a.lib Ws2_32.lib granny2.lib WMVCORE.lib strmiids.lib glew32s.lib RakNetLibStatic.lib Psapi.lib lua51.lib tolua++.lib libboost_regex-1_38.lib"
 				OutputFile="$(OutDir)/$(ProjectName)_sse2.exe"
 				Version="0.1"
 				LinkIncremental="2"

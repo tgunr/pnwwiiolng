@@ -19,3 +19,7 @@ extern void* mmdbPersonaSelectionsThread(void*) ;
 // the save is committed to disk
 extern void mmdbSavePersonaSelection(const Player* player) ;
 
+struct PersonaSelectionThread : public PNThread
+{
+	virtual void run();
+};

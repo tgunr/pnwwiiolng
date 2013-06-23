@@ -9,136 +9,70 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 #include <queue>
-#include <OpenThreads/Condition>
-
-// Wrapper around the simple mutex object class; lock/unlock
-// is the responsibility of the caller. See Lock class.
-class Mutex
-{
-public:
-	OpenThreads::Mutex m_mutex ;
-
-	Mutex() : m_mutex() {}
-
-	int lock() { return m_mutex.lock() ; }
-	int tryLock() { return m_mutex.trylock() ; }
-	int unlock() { return m_mutex.unlock() ; }
-
-	virtual ~Mutex() {}
-} ;
-
-// Class which encapsulates the relationship between
-// a condition variable and its mutex.
-// Usage:
-//  std::vector<int> threadSharedQueue ;
-//  ...
-//  consumer()
-//  {
-//    condition.lock() ;
-//    while ( threadSharedQueue.empty() )
-//    {
-//      condition.wait() ;
-//    }
-//  }
-//
-//  producer(int value)
-//  {
-//    condition.lock() ;
-//    threadSharedQueue.push_back(value) ;
-//    condition.unlock() ;
-//    condition.signal() ;
-//  }
-
-class Condition : public Mutex
-{
-public:
-	OpenThreads::Condition m_cond ;
-
-	Condition() : Mutex(), m_cond() {}
-
-	int wait() { return m_cond.wait(&m_mutex) ; }
-	int signal() { return m_cond.signal() ; }
-
-	~Condition() {}
-} ;
-
-// Provides the Lock concept for the Condition class.
-class ConditionLock
-{
-public:
-	ConditionLock(Condition& cond, bool signal=false) : m_cond(cond), m_signal(signal) { m_cond.lock() ; }
-	~ConditionLock()
-	{
-		m_cond.unlock() ;
-		if ( m_signal ) m_cond.signal() ;
-	}
-
-	Condition& m_cond ;
-	bool m_signal ;
-} ;
+#include <condition_variable>
 
 // Implements a shared queue around an STL container class.
 // For a non-blocking fetch, use tryGetNext().
 // For a condition-variable based, blocking fetch, use getNext()
 template<typename _DataType>
-class ConditionQueue : public Condition
+class ConditionQueue
 {
+	std::mutex				m_mutex;
+	std::condition_variable	m_condition;
+
 public:
 	typedef std::queue<_DataType> QUEUE ;
 
 public:
-	ConditionQueue() : Condition(), m_hits(0LL), m_maxSize(0) {}
+	ConditionQueue() : m_mutex(), m_condition(), m_queue(), m_hits(0LL), m_maxSize(0) {}
 
 	QUEUE m_queue ;
 	unsigned long long m_hits ;
 	size_t m_maxSize ;
 
+	void doLocked(std::function<void(void)> lambda)
+	{
+		std::unique_lock<std::mutex> lock(m_mutex);
+		lambda();
+	}
+
 	// Non-blocking lock attempt.
 	bool tryGetNext(_DataType& data)
 	{
-		if ( tryLock() != 0 )
-			return false ;
+		std::unique_lock<std::mutex> lock(m_mutex, std::try_to_lock);
+		if ( lock.owns_lock() == false )
+			return false;
 
 		if ( m_queue.empty() )
-		{
-			unlock() ;
-			return false ;
-		}
+			return false;
 
-		data = m_queue.front() ;
-		m_queue.pop() ;
-		unlock() ;
+		data = m_queue.front();
+		m_queue.pop();
 
-		return true ;
+		return true;
 	}
 
 	// Blocking lock attempt
 	_DataType getNext()
 	{
 		// Wait until empty is false
-		lock() ;
-		while ( m_queue.empty() )
-		{
-			wait() ;
-		}
+		std::unique_lock<std::mutex> lock(m_mutex);
+		m_condition.wait(lock, [=] () { return m_queue.empty(); });
 
 		_DataType data = m_queue.front() ;
 		m_queue.pop() ;
-
-		unlock() ;
 
 		return data ;
 	}
 
 	void push_back(const _DataType& data)
 	{
-		lock() ;
-		m_queue.push(data) ;
-		++m_hits ;
+		std::lock_guard<std::mutex> lock(m_mutex);
+		m_queue.push(data);
+		++m_hits;
 		if ( m_queue.size() > m_maxSize )
-			m_maxSize = m_queue.size() ;
-		unlock() ;
-		signal() ;
+			m_maxSize = m_queue.size();
+		m_condition.notify_one();
 	}
 } ;
 

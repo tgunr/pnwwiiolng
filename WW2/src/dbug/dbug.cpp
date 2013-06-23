@@ -107,9 +107,8 @@ static const char _CLOSE_MSG[] = CARRIAGE_RETURN "Debug Message System Closed." 
 // message constructions.
 bool g_logDebug = true ;
 
-#include <OpenThreads/Mutex>
-#include <OpenThreads/ScopedLock>
-static OpenThreads::Mutex s_dbugInitMutex;
+#include <mutex>
+static std::mutex s_dbugInitMutex;
 static bool s_dbugInitialized = false;
 
 //////////////////////////////////////////////////////////////////////
@@ -390,7 +389,7 @@ _setSignal(int signum, void (*handler)(int))
 
 void dbugInit(SINT32 logType, const char* const filename)
 {
-	OpenThreads::ScopedLock<OpenThreads::Mutex> mutexLock(s_dbugInitMutex);
+	std::lock_guard<std::mutex> mutexLock(s_dbugInitMutex);
 	if ( s_dbugInitialized )
 		return;
 	s_dbugInitialized = true;

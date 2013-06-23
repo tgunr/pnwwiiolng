@@ -13,7 +13,6 @@
 
 #include "include/mydbQuery.h"
 #include <mysql.h>
-#include <OpenThreads/Thread>
 #include "teul/teulTime.h"
 #include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiThreadTextQuery.h"

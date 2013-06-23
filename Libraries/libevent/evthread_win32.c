@@ -272,7 +272,7 @@ evthread_win32_cond_wait(void *_cond, void *_lock, const struct timeval *tv)
 				waiting = 0;
 				goto out;
 			} else {
-				ms = startTime + ms_orig - endTime;
+				ms = (DWORD)(startTime + ms_orig - endTime);
 			}
 		}
 		/* If we make it here, we are still waiting. */

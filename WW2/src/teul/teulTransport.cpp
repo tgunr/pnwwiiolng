@@ -23,7 +23,6 @@
 #include "teul/teulVersion.h"
 
 #include "host/hostTiming.h"
-#include <OpenThreads/Thread>
 
 #if platOS != OS_WIN32
 #include <netdb.h>

@@ -37,11 +37,12 @@ struct stat statBuf;
 DBCONNECTION dbConnection;
 extern DBHANDLE dbHandle;
 
-class IrcThread : public OpenThreads::Thread
+class IrcThread : public PNThread
 {
 public:
 	IrcThread(void* s)
-		: m_session(static_cast<irc_session_t*>(s))
+		: PNThread()
+		, m_session(static_cast<irc_session_t*>(s))
 	{}
 
 	virtual void run()
@@ -57,7 +58,7 @@ public:
 		irc_disconnect(session);
 		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
-		return OpenThreads::Thread::cancel();
+		return PNThread::cancel();
 	}
 
 	~IrcThread()

@@ -18,7 +18,6 @@
 #include "ogl/oglGlobalStates.h"
 #include "phui/Message.h"
 #include "teul/teulBasic.h"
-#include <OpenThreads/Thread>
 
 #if defined(USE_OSG)
 #include "osg/osgGame.h"

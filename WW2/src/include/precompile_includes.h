@@ -16,8 +16,10 @@
 #include <float.h>
 #include <ctype.h>
 
-#include <OpenThreads/Thread>
-#include <OpenThreads/Mutex>
+#include <thread>
+#include <mutex>
+#include <chrono>
+#include <cstdint>
 
 #if defined(HAVE_SYS_CDEFS_H)
 # include <sys/cdefs.h>
