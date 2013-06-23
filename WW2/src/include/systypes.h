@@ -10,6 +10,9 @@
 // Originating Programmer: Martin Poulin
 
 #include <stddef.h>
+#include <cstdint>
+#include <thread>
+#include <chrono>
 
 // True and False
 #ifndef TRUE

@@ -97,7 +97,7 @@ static bool			_needSetFs = true;
 // Linux uses "poll()" for checking sockets for events.
 struct POLL_STRUCT
 {
-	enum { CAPACITY = Teul::MaxConnections } ;
+	static const size_t CAPACITY = Teul::MaxConnections;
 	struct pollfd	fd[CAPACITY];
 	SINT32		maxSock;
 	SINT32		size;
@@ -959,7 +959,7 @@ _pollSocketsInner(const TeulTimeMS& remainder)
 #if platBuild == TEUL_SERVER
 		// Server wants us to spend time in the loop.
 		if ( remainder > 0 )
-			OpenThreads::Thread::microSleep(static_cast<unsigned int>(remainder * 1000));
+			std::this_thread::sleep_for(std::chrono::milliseconds(remainder));
 #endif
 		return;
 	}
@@ -1298,7 +1298,7 @@ _pollSockets(const TeulTimeMS& duration_)
 	{
 		// Yield CPU for a short period of time.
 		if ( duration_ > 0 )
-			OpenThreads::Thread::microSleep(static_cast<unsigned int>(duration_) * 1000) ;
+			std::this_thread::sleep_for(std::chrono::milliseconds(duration_));
 		return ;
 	}
 
@@ -1321,7 +1321,7 @@ _pollSockets(const TeulTimeMS& duration_)
 	{
 		// Yield CPU for a short period of time.
 		if ( duration_ > 0 )
-			OpenThreads::Thread::microSleep(static_cast<unsigned int>(duration_) * 1000) ;
+			std::this_thread::sleep_for(std::chrono::milliseconds(duration_));
 		return ;
 	}
 
@@ -1572,7 +1572,7 @@ SINT32
 teulModIdle(const TeulTimeMS& duration_)
 {
 	if ( duration_ == 0 )
-		OpenThreads::Thread::YieldCurrentThread() ;
+		std::this_thread::yield();
 
 	TIMER_RESET
 	teulSyncClock() ;

@@ -1681,7 +1681,7 @@ _dotShutdownStrat(char* arguments, OOBMessage& message)
 
 	strtProcessDBQueue() ;
 	strtSaveTOESupplies() ;
-	OpenThreads::Thread::microSleep(1 * 1000 * 1000) ;
+	std::this_thread::sleep_for(std::chrono::seconds(1));
 
     if ( system(PN_PLAYNET_PATH PATH_SEPSTR "bin" PATH_SEPSTR "stophost &") < 0 )
     {

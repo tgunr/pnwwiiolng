@@ -609,7 +609,7 @@ main(int argc, char* argv[])
 
 	if ( stratStartIntermission() == false )
 	{
-		OpenThreads::Thread::microSleep(1 * 1000 * 1000) ;
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 		LogAbort("bailing because intermission script failed.") ;
 	}
 	threadsLogging() ;
@@ -667,7 +667,7 @@ main(int argc, char* argv[])
 
 	strtProcessDBQueue() ;
 	strtSaveTOESupplies() ;
-	OpenThreads::Thread::microSleep(1 * 1000 * 1000) ;
+	std::this_thread::sleep_for(std::chrono::seconds(1));
 
 	teulCloseTransport();
 

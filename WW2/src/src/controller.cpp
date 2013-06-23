@@ -137,7 +137,7 @@ static void _shutdownLibEventSocket(evutil_socket_t& socket_, event*& event_)
 
 static void _onRepeaterRead(struct bufferevent* bev_, void* arg_)
 {
-	int srcSock = (int)arg_;
+	int srcSock = *(int*)arg_;
 	struct evbuffer* input = bufferevent_get_input(bev_);
 	ABORT_IF(input == nullptr);
 
@@ -196,7 +196,7 @@ static void _onRepeaterRead(struct bufferevent* bev_, void* arg_)
 
 static void _onRepeaterError(struct bufferevent* bev_, short error_, void* arg_)
 {
-	int cliSock = (int)(arg_);
+	int cliSock = *(int*)arg_;
     if (error_ & BEV_EVENT_EOF)
 	{
 		dbugLog(_FLM, "sock:%d disconnected.", cliSock);
@@ -216,6 +216,7 @@ static void _onRepeaterError(struct bufferevent* bev_, short error_, void* arg_)
 
     bufferevent_free(bev_);
 	s_clients.erase(cliSock);
+	delete (int*)(arg_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -233,7 +234,7 @@ static void _onRepeaterAccept(evutil_socket_t listener_, short event_, void* arg
 
 	evutil_make_socket_nonblocking(cliSock);
 	struct bufferevent* bev = bufferevent_socket_new(static_cast<event_base*>(arg_), cliSock, BEV_OPT_CLOSE_ON_FREE);
-	bufferevent_setcb(bev, _onRepeaterRead, nullptr, _onRepeaterError, (void*)cliSock);
+	bufferevent_setcb(bev, _onRepeaterRead, nullptr, _onRepeaterError, new int(cliSock));
 	bufferevent_enable(bev, EV_READ|EV_WRITE|EV_PERSIST);
 
 	const bool socketAlreadyRegistered = (s_clients.find(cliSock) != s_clients.end());
@@ -254,7 +255,7 @@ static std::map<evutil_socket_t /*socket*/, UINT64 /*processID*/> s_processSocke
 
 static void _onManagedProcessError(struct bufferevent* bev_, short error_, void* arg_)
 {
-	int cliSock = (int)(arg_);
+	int cliSock = *(int*)(arg_);
 	if (error_ & BEV_EVENT_EOF)
 	{
 		dbugLog(_FLM, "sock:%d disconnected.", cliSock);
@@ -278,6 +279,7 @@ static void _onManagedProcessError(struct bufferevent* bev_, short error_, void*
 	if ( it != s_processSockets.end() && it->second != 0ULL )
 	{
 		dbugLog(_FLI, "sock:%d process:%llu disconnecting", cliSock, it->second);
+		delete (int*)arg_;
 		///TODO: Tell GameProcessManager that the process went away.
 	}
 }
@@ -287,7 +289,7 @@ static void _onManagedProcessError(struct bufferevent* bev_, short error_, void*
 
 static void _onManagedProcessRead(struct bufferevent* bev_, void* arg_)
 {
-	int srcSock = (int)arg_;
+	int srcSock = *(int*)arg_;
 	if ( s_processSockets.find(srcSock) != s_processSockets.end() )
 	{
 		dbugLog(_FLW, "unexpected data from managed process socket %d", srcSock);
@@ -325,7 +327,7 @@ static void _onManagedProcessAccept(evutil_socket_t listener_, short event_, voi
 
 	evutil_make_socket_nonblocking(cliSock);
 	struct bufferevent* bev = bufferevent_socket_new(static_cast<event_base*>(arg_), cliSock, BEV_OPT_CLOSE_ON_FREE);
-	bufferevent_setcb(bev, _onManagedProcessRead, nullptr, _onManagedProcessError, (void*)cliSock);
+	bufferevent_setcb(bev, _onManagedProcessRead, nullptr, _onManagedProcessError, new int(cliSock));
 	bufferevent_enable(bev, EV_READ|EV_PERSIST);
 
 	const bool socketAlreadyRegistered = (s_processSockets.find(cliSock) != s_processSockets.end());

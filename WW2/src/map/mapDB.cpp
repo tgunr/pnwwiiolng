@@ -544,7 +544,7 @@ Player::loadChatMask()
 LOGICAL
 mapFillPersonaData(Player* const player)
 {
-	OpenThreads::Thread::YieldCurrentThread() ;
+	std::this_thread::yield();
 
 	player->SetRank(0) ;
 

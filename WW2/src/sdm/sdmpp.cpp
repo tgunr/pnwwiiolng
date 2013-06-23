@@ -185,7 +185,7 @@ _processDirectory()
 
 	const size_t numFiles = filenames.size();
 	if ( s_verbose > 1 )
-		fprintf(stderr, "# Found %u files.\n", numFiles);
+		fprintf(stderr, "# Found %" PRSizeT " files.\n", numFiles);
 
 	size_t filesParsed = 0;
 	for ( size_t i = 0 ; i < numFiles ; ++i )
@@ -195,7 +195,7 @@ _processDirectory()
 	}
 
 	if ( s_verbose )
-		fprintf(stderr, "# Parsed %u files.\n", filesParsed);
+		fprintf(stderr, "# Parsed %" PRSizeT " files.\n", filesParsed);
 
 	return filesParsed;
 }

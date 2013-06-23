@@ -935,7 +935,7 @@ LOGICAL ddpUpdate(void)
 #else
 	if (!focus)
 	{
-		OpenThreads::Thread::YieldCurrentThread();
+		std::this_thread::yield();
 	}
 #endif
 

@@ -125,7 +125,7 @@ _reportPlayerDetails(unsigned int fd, const char* /*path*/, const char* /*args*/
 		OpenThreads::ScopedLock<OpenThreads::Mutex> mutexLock(s_sidecountMutex) ;
 
 		len = snprintf(buffer, sizeof(buffer)
-							, "{\"stamp\":%llu,\"players\":%u,\"balance\":{\"above\":%u,\"delays_max\":%u,\"delays_pctg\":%u,\"margin_pctg\":%u,\"pers_delay\":%u},\"camp\":{\"allies_spawned\":%u,\"axis_spawned\":%u,\"hvyside\":%u,\"overdog\":%u,\"underdog\":%u,\"imb\":%u,\"dev\":%u},\"swing_meter\":{\"in_effect\":%d,\"meter\":%d,\"delays\":%d}}"
+							, "{\"stamp\":%llu,\"players\":%" PRSizeT ",\"balance\":{\"above\":%u,\"delays_max\":%u,\"delays_pctg\":%u,\"margin_pctg\":%u,\"pers_delay\":%u},\"camp\":{\"allies_spawned\":%u,\"axis_spawned\":%u,\"hvyside\":%u,\"overdog\":%u,\"underdog\":%u,\"imb\":%u,\"dev\":%u},\"swing_meter\":{\"in_effect\":%d,\"meter\":%d,\"delays\":%d}}"
 								, teulClock64
 								, g_players.size()
 								, host_config.balance.above
@@ -976,7 +976,7 @@ Player::evaluateMissionPacket()
 		mapSaveRank(this, true) ;
 
 	// Give the database threads chance to eat the queue
-	OpenThreads::Thread::YieldCurrentThread() ;
+	std::this_thread::yield();
 
 	return true ;
 }

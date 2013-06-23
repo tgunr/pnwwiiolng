@@ -79,7 +79,7 @@ int main(int argc, char* argv[])
 
 	listenIndex = dbseInitHost(WWII::Net::Ports::Dbse);
 
-	OpenThreads::Thread::microSleep(50 * 1000);
+	std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
 	wwiiIRCChannelMessage("-sys,#servers", "++ Running ++");
 

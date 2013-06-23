@@ -122,7 +122,7 @@ _reportLuaError(const char* stage, const char* scriptName)
 
 	results.clear() ;
 
-	OpenThreads::Thread::microSleep(2 * 1000 * 1000) ;
+	std::this_thread::sleep_for(std::chrono::seconds(2));
 
 	// Log it and shut down.
 	LogAbort("luaErr: %s", error) ;

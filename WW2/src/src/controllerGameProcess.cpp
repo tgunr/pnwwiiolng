@@ -454,7 +454,7 @@ namespace GameProcessManager
 		while ( teulClock64 < cutoff  && Heartbeat() == true )
 		{
 			// Free up the CPU for a while.
-			OpenThreads::Thread::microSleep(100 * 1000);
+			std::this_thread::sleep_for(std::chrono::milliseconds(100));
 			teulSyncClock();
 		}
 

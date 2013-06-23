@@ -85,7 +85,7 @@ dbseGetConnection(const DBCONNECTION& connection, bool report, bool autoReconnec
 	if ( connection.password == NULL ) return NULL ;
 
 	DB::handle_t* newConn = NULL ;
-	OpenThreads::Thread::microSleep(250) ;
+	std::this_thread::sleep_for(std::chrono::microseconds(250));
 	{
 		OpenThreads::ScopedLock<OpenThreads::Mutex> dbconnLock(dbconnMutex) ;
 		newConn = _doMyConnect(connection, autoReconnect) ;
@@ -101,7 +101,7 @@ dbseGetConnection(const DBCONNECTION& connection, bool report, bool autoReconnec
 						);
 	}
 
-	OpenThreads::Thread::YieldCurrentThread() ;
+	std::this_thread::yield();
 
 	return newConn ;
 }

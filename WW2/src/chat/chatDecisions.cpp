@@ -270,7 +270,7 @@ _drainDecisions(const char* const queueName, DECISION_QUEUE& queue, UINT32 now, 
 	// Translate into seconds from minutes
 	const UINT32 cutoff = now - (cutoff_min * 60) ;
 
-	dbugLog(_FLD, "%s decision queue. items:%u, life:%um, next:%ds", queueName, queue.size(), cutoff_min, queue.front()->m_time - cutoff) ;
+	dbugLog(_FLD, "%s decision queue. items:%" PRSizeT ", life:%um, next:%ds", queueName, queue.size(), cutoff_min, queue.front()->m_time - cutoff) ;
 
 	while ( !queue.empty() )
 	{

@@ -119,7 +119,7 @@ DBQueueThread::run()
 
 		do
 		{
-			OpenThreads::Thread::microSleep(5 * 1000);
+			std::this_thread::sleep_for(std::chrono::milliseconds(5));
 			m_conn = threadsOpenDBConnection(true);
 			if ( m_conn == nullptr )
 				threadLog(_FLA, "dbc:%u unable to reconnect to database", threadId);
@@ -250,8 +250,8 @@ threadsShutdown()
 		dbThread[i].cancel();
 	}
 
-	OpenThreads::Thread::YieldCurrentThread();
-	OpenThreads::Thread::microSleep(100 * 1000);
+	std::this_thread::yield();
+	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 
 	// Clear out any pending threadLogs, but don't take too long at it
 	threadsLogging();
@@ -411,8 +411,7 @@ StatsThread::run()
 	UINT32 count = 0;
 	for (;; )
 	{
-		static const unsigned int SleepInterval_us = (15 * 1000) * 1000;	// 15 seconds.
-		OpenThreads::Thread::microSleep(SleepInterval_us);
+		std::this_thread::sleep_for(std::chrono::seconds(15));
 
 		if ( ++count < 4 )
 			continue;

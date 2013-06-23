@@ -236,7 +236,7 @@ struct ClientRole : public Role
 						sendEchoRequest(0, type) ;
 					}
 
-					OpenThreads::Thread::microSleep((50 + (rand() % 50))) ;
+					std::this_thread::sleep_for(std::chrono::microseconds(50 + rand() % 50));
 					teulUpdateTransport(0) ;
 				}
 			}
@@ -592,7 +592,7 @@ struct ClientRole : public Role
 		if ( tStallConnect.isExplicitlyEnabled() )
 		{
 			Iprintf("Stalling connection for %u seconds\n", Config::stallTime_s) ;
-			OpenThreads::Thread::microSleep(Config::stallTime_s * 1000 * 1000) ;
+			std::this_thread::sleep_for(std::chrono::seconds(Config::stallTime_s));
 		}
 
 		WaitForConnectionToComplete(m_teulIndex) ;

@@ -406,7 +406,7 @@ _pushPlayerToServer(Server::ServerInfo& server, PlayerStatusNode& psn)
 	if ( result.second == true && server.stats.address == Server::myServerInfo.stats.address )
 	{
 		server.stats.addPlayer();
-		dbugLog(_FLWB, " numPlayers now %" PRSizeT ", m_players size %" PRSizeT "", server.stats.numPlayers(), server.m_players.size());
+		dbugLog(_FLWB, " numPlayers now %d, m_players size %" PRSizeT "", server.stats.numPlayers(), server.m_players.size());
 	}
 
 	return retval;
@@ -894,7 +894,7 @@ _killDebugWebServer()
 	if ( Teul::uWeb::s_debugServer != NULL )
 	{
 		Teul::uWeb::s_debugServer->cancel();
-		OpenThreads::Thread::microSleep(100 * 1000);
+		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		delete Teul::uWeb::s_debugServer;
 		Teul::uWeb::s_debugServer = NULL;
 	}
@@ -1659,7 +1659,7 @@ serverOpenBroadcastIndexes()
 	else
 		Server::broadcastRxIndex = Server::broadcastIndex;
 
-	OpenThreads::Thread::YieldCurrentThread();
+	std::this_thread::yield();
 
 	for ( UINT32 i = 0; (Server::broadcastConnected == false || _broadcastRxConnected == false) && i < 10; ++i )
 	{

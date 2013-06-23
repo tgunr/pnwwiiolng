@@ -105,7 +105,7 @@ _aggregatePermissions(ChatPermissions& lhs, const CHAT_GROUPS& groups)
 			groupNos += num ;
 		}
 		char buffer[2048] ;
-		snprintf(buffer, 2047, "For groups {%s} maxRanks{army:%u,air:%u,navy:%u,sqd:%u} perms=%llx vehGrants=%u"
+		snprintf(buffer, 2047, "For groups {%s} maxRanks{army:%u,air:%u,navy:%u,sqd:%u} perms=%llx vehGrants=%" PRSizeT ""
 								, groupNos.c_str()
 								, lhs.m_limitRank[BRANCH_LAND]
 								, lhs.m_limitRank[BRANCH_AIR]

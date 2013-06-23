@@ -381,7 +381,7 @@ chatMissionAddPlayer(Player* player, UINT32 missionID, UINT32 sponsor)
 
 	_tellSponsor(sponsor, player, LSTR_RECRUIT_JOINED_MISSION, mission) ;
 
-	betaLog(_FLI, "m:%u p:%u c:%s joining mission [%u members]", missionID, player->playerID(), player->callsign(), mission.m_members.size()) ;
+	betaLog(_FLI, "m:%u p:%u c:%s joining mission [%" PRSizeT " members]", missionID, player->playerID(), player->callsign(), mission.m_members.size()) ;
 
 	// And you generate a membership update by joining
 	mission.addMemberUpdate(player) ;
@@ -1006,7 +1006,7 @@ ChatMission::sendUpdates()
 		return 0 ;
 
 #ifdef CLOSED_BETA
-	dbugLog(_FLD, "m:%u members:%u updates:%u "
+	dbugLog(_FLD, "m:%u members:%" PRSizeT " updates:%" PRSizeT " "
 					, missionID()
 					, m_members.size()
 					, m_updates.size()

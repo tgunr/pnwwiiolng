@@ -153,7 +153,7 @@ mmdbPersonaSelectionsThread(void*)
 
 	while ( 1 )
 	{
-		OpenThreads::Thread::microSleep(5 * 1000 * 1000);	// Every 5 seconds.
+		std::this_thread::sleep_for(std::chrono::seconds(5));
 
 		if ( !_selectionRequests )
 			continue;

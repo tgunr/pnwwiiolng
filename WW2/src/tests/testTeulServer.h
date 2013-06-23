@@ -186,9 +186,7 @@ struct ServerRole : public Role
 	void ServerLoop()
 	{
 		if ( tTimeouts.isExplicitlyEnabled() )
-		{
-			OpenThreads::Thread::microSleep(Config::ConnectTimeoutMS * 1000 * 2) ;
-		}
+			std::this_thread::sleep_for(std::chrono::milliseconds(Config::ConnectTimeoutMS * 2));
 
 		Iprintf("Listening...\n") ;
 		while ( m_running )

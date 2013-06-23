@@ -1861,7 +1861,7 @@ missDeleteInstanceMissions(instanceid_t instanceID)
 
 	InstanceMissions& index = it->second ;
 
-	betaLog(_FLD, "in:%llu deleting instance mission list (%u missions)", instanceID, index.size()) ;
+	betaLog(_FLD, "in:%llu deleting instance mission list (%" PRSizeT " missions)", instanceID, index.size()) ;
 
 	const UINT32 numMissions = index.size() ;
 	for ( UINT32 i = 0 ; i < numMissions ; ++i )

@@ -900,7 +900,7 @@ chatGridGetPlayersVector(const Player* player, const SINT64& range, PLAYERS_ARRA
 #ifdef CLOSED_BETA
 	if ( g_logDebug )
 	{
-		betaLog(_FLDB, " total: %u cells", cells.size()) ;
+		betaLog(_FLDB, " total: %" PRSizeT " cells", cells.size()) ;
 	}
 #endif
 }

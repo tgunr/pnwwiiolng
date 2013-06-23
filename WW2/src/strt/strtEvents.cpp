@@ -61,7 +61,7 @@ class BroadcastPacket : public UpdatePacket
 
 	public: virtual void Send()
 	{
-		dbugLog(_FLD, "transmitting EventPacket with %u events to %u players"
+		dbugLog(_FLD, "transmitting EventPacket with %" PRSizeT " events to %" PRSizeT " players"
 						, size(), m_playerList.size()) ;
 
 		TeulTransmission broadcast(Strat::Events::Callback) ;
@@ -176,7 +176,7 @@ Strat::Events::Publish()
 	{
 		BroadcastPacket packet(g_players) ;
 
-		dbugLog(_FLD, "Strat::Events::Publish %u cps, %u facs, %u total events"
+		dbugLog(_FLD, "Strat::Events::Publish %" PRSizeT " cps, %" PRSizeT " facs, %" PRSizeT " total events"
 						, numCPs, numFacs, numUpdates
 						) ;
 

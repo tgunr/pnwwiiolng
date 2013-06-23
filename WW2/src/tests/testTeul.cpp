@@ -437,7 +437,7 @@ struct Role
 		static const size_t expectSize = textSize + Teul::Packet::DefaultLocalDataSize + sizeof(UINT32) + textSize ;
 		if ( size != expectSize )
 		{
-			Iprintf("Expected packet to be %u bytes\n", expectSize) ;
+			Iprintf("Expected packet to be %" PRSizeT " bytes\n", expectSize) ;
 			throw Teul::Error("First Teul::Packet size is wrong.", size) ;
 		}
 		if ( memcmp(data, Config::teulPacketString, textSize) != 0 )

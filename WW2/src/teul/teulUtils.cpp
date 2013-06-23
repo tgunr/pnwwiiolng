@@ -206,7 +206,7 @@ struct ClockSpeedCounter
 		{
 			gettimeofday(&before, 0) ;
 			rdtsc(startTicks) ;
-			OpenThreads::Thread::microSleep(msWait * 995) ;	// usleep is imprecise so aim short
+			std::this_thread::sleep_for(std::chrono::microseconds(msWait * 995));	// sleep is imprecise so aim short.
 			rdtsc(endTicks) ;
 			gettimeofday(&after, 0) ;
 			const TeulTimeMS startMs = ((TeulTimeMS)before.tv_sec * 1000LL) + (before.tv_usec / 1000) ;

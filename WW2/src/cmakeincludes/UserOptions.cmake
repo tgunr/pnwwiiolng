@@ -22,6 +22,8 @@ IF ( !MSVC )
 	OPTION( PN_HOST_TIMERS		"Enable host performance timers" OFF )
 ENDIF ( )
 
+OPTION( PN_BUILD_32BIT		"Enable 32-bit build" ON )
+
 # User-settable option for enabling optimizations.
 IF ( PN_BUILD_TYPE MATCHES "Dev" OR CMAKE_BUILD_TYPE MATCHES "Debug" )
 	SET ( PN_ENABLE_OPTS	0 CACHE STRING "Enable optimizations" )

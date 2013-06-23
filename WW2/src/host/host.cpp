@@ -190,7 +190,7 @@ _closeAllOpenSortiesOnThisCell()
 			" WHERE return_time IS NULL and cell_host_ip = %u"
 			, (Server::localHost & 255)
 	) ;
-	OpenThreads::Thread::microSleep(1 * 1000 * 1000) ;
+	std::this_thread::sleep_for(std::chrono::seconds(1));
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -208,12 +208,12 @@ void exitHandler()
 		_closeAllOpenSortiesOnThisCell() ;
 	}
 
-	OpenThreads::Thread::YieldCurrentThread() ;
+	std::this_thread::yield();
 
 	Server::myServerInfo.stats.status = Server::SERVER_INITIALIZING;
 	Server::myServerInfo.sync() ;
 
-	OpenThreads::Thread::microSleep(250 * 1000) ;
+	std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
 	teulCloseTransport();
 
@@ -234,7 +234,7 @@ _extractPlayerFromVehiclesList(Player& player, HostVehicle& vehicle)
 	if ( it != vehicle.players().end() )
 	{
 		vehicle.players().erase(it) ;
-		betaLog(_FLI, "t:%d p:%u c:%s v:%u extracting player from vehicle crew:%d, players:%u"
+		betaLog(_FLI, "t:%d p:%u c:%s v:%u extracting player from vehicle crew:%d, players:%" PRSizeT ""
 						, player.teulIndex(), player.playerID(), player.callsign(), vehicle.index
 						, vehicle.crew, vehicle.players().size()
 						) ;
@@ -1863,7 +1863,7 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 	if ( vehicles.size() > maxVehicles )
 	{
 		TIMER_START
-		dbugLog(_FLA, "%u vehicles want updates, limit is %u", vehicles.size(), maxVehicles) ;
+		dbugLog(_FLA, "%" PRSizeT " vehicles want updates, limit is %u", vehicles.size(), maxVehicles) ;
 		sort(vehicles.begin(), vehicles.end(), SortVehiclesByUpdateAge) ;
 		vehicles.resize(maxVehicles) ;
 		TIMER_STOP("gvwfu_shrink") ;

@@ -446,7 +446,7 @@ _processCreate(SquadControl& request, Player* player, SquadList* /*squadList*/)
 	}
 	if ( request.m_players.size() < SquadControl::CREATE_PLAYERS_REQUIRED )
 	{
-		betaLog(_FLA, "m_players contains %u instead of %u members", request.m_players.size(), SquadControl::CREATE_PLAYERS_REQUIRED) ;
+		betaLog(_FLA, "m_players contains %" PRSizeT " instead of %" PRSizeT " members", request.m_players.size(), SquadControl::CREATE_PLAYERS_REQUIRED) ;
 		throw SQR_CREATE_TOO_FEW_MEMBERS ;
 	}
 

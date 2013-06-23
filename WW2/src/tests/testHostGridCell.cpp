@@ -196,7 +196,7 @@ public: virtual ~HostGridCellTest() {}
 		for ( size_t i = 0 ; i < numKeys ; ++i )
 		{
 			char comparison[32] ;
-			sprintf(comparison, "cell[%d]", i) ;
+			sprintf(comparison, "cell[%" PRSizeT "]", i) ;
 			START_SUB_STAGE( comparison )
 				// Test if inRange returns the expected (true/false) result.
 				ExpectTrue( cells[0]->inRange(cells[i]->key()) == keys[i].inRangeOfCenter ) ;

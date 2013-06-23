@@ -311,7 +311,7 @@ static void _displayLogo()
 
 		for(_startloadtime = frametime; _keyEntered() == false && frametime < _startloadtime + 5000; UpdateGameClocks())
 		{
-			OpenThreads::Thread::YieldCurrentThread();
+			std::this_thread::yield();
 			if (!running)
 				piExitProgram(__FILE__, __LINE__, "Exit requested during startup");
 		}

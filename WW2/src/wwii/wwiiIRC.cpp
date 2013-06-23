@@ -144,7 +144,7 @@ IRCImpl::run()
 		}
 		else
 		{
-			OpenThreads::Thread::YieldCurrentThread();
+			std::this_thread::yield();
 			// Reset the backoff
 			backOff = 0;
 
@@ -155,9 +155,8 @@ IRCImpl::run()
 			irc_disconnect(m_session);
 		}
 
-		OpenThreads::Thread::YieldCurrentThread();
-		const TeulTimeMS backoff_us = (TeulTimeMS)(backOff + 10) * 1000ULL * 1000ULL;
-		OpenThreads::Thread::microSleep(static_cast<unsigned int>(backoff_us));
+		std::this_thread::yield();
+		std::this_thread::sleep_for(std::chrono::seconds(backOff + 10));
 	}
 	while ( m_running );
 }
@@ -175,11 +174,11 @@ _terminate(const char* reason)
 
 	irc_cmd_quit(irc.m_session, reason);
 
-	OpenThreads::Thread::microSleep(250 * 1000);
+	std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
 	irc.cancel();
 
-	OpenThreads::Thread::microSleep(250 * 1000);
+	std::this_thread::sleep_for(std::chrono::milliseconds(250));
 
 	threadsLogging();
 }
@@ -710,7 +709,7 @@ wwiiIRCActivate(bool includeSigHup)
 	// Allow IRC 5 seconds to initialize
 	for ( UINT32 i = 0; i < 5 * 100; ++i )
 	{
-		OpenThreads::Thread::microSleep(10 * 100);
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 		threadsLogging();
 		if ( irc.m_joined == true )
 			break;

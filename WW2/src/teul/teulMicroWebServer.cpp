@@ -53,7 +53,7 @@ struct WebError
 void
 _sendString200(const int fd, const std::string& content)
 {
-	static const char ok200[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: text/application-json\r\nContent-Language: en\r\nContent-Encoding: UTF-8\r\nContent-Length: %u\r\n\r\n%s\n" ;
+	static const char ok200[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: text/application-json\r\nContent-Language: en\r\nContent-Encoding: UTF-8\r\nContent-Length: %" PRSizeT "\r\n\r\n%s\n" ;
 	char* buf = new char[sizeof(ok200) + content.length() + 1] ;
 	int bytes = sprintf(buf, ok200, content.length() + 1, content.c_str()) ;
 	send(fd, buf, bytes, 0) ;
@@ -193,7 +193,7 @@ Teul::uWeb::Server::run()
 	for ( ; ; )
 	{
 		// Make sure we're not providing a denial of service to the host by using all the CPU.
-		OpenThreads::Thread::YieldCurrentThread() ;
+		std::this_thread::yield();
 
 		socklen_t sockLen = sizeof(addr) ;
 		const int newSock = accept(listenSock, (struct sockaddr*)&addr, &sockLen) ;

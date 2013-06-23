@@ -62,7 +62,7 @@ _unitLocationsKeyframe(HC_UNIT_LOCATIONS& hculUpdate)
 
 	if ( hculUpdate.empty() == false )
 	{
-		betaLog(_FLD, "%u updates in hcul keyframe", hculUpdate.size()) ;
+		betaLog(_FLD, "%" PRSizeT " updates in hcul keyframe", hculUpdate.size()) ;
 	}
 }
 

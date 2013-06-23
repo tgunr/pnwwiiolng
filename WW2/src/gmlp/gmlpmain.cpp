@@ -556,7 +556,7 @@ LOGICAL gmlpMainUpdate(void)
 
     GLCounter::instance().endFrame();
 
-	OpenThreads::Thread::YieldCurrentThread();
+	std::this_thread::yield();
 
 	return TRUE;
 }

@@ -55,7 +55,7 @@ public:
 		m_session = nullptr;
 
 		irc_disconnect(session);
-		OpenThreads::Thread::microSleep(50 * 1000);
+		std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
 		return OpenThreads::Thread::cancel();
 	}
@@ -160,7 +160,7 @@ _ircConnect()
 	UINT32 cutoff = teulTime() + 30;
 	while ( ircConnected == false && teulTime() < cutoff )
 	{
-		OpenThreads::Thread::microSleep(500 * 1000);
+		std::this_thread::sleep_for(std::chrono::milliseconds(500));
 		teulSyncClock();
 	}
 
@@ -217,7 +217,7 @@ _ircFinish(const TeulTimeMS& timeTaken)
 
 	_ircSendMessage("-sys,#servers", message);
 
-	OpenThreads::Thread::microSleep(500 * 1000);
+	std::this_thread::sleep_for(std::chrono::milliseconds(500));
 	delete ircThread;
 
 	ircThread = nullptr;
@@ -448,7 +448,7 @@ main(int argc,char** argv)
 	if ( true == errors )
 	{
 		_ircSendMessage("-sys,#servers", "Load failed");
-		OpenThreads::Thread::microSleep(1 * 1000 * 1000);
+		std::this_thread::sleep_for(std::chrono::seconds(1));
 		fprintf(stderr, "Unable to load terrain because of errors\n");
 		dbseLoadFile(nullptr);
 		exit(1);

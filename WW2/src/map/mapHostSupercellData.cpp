@@ -45,7 +45,8 @@ public:
 		m_allocation = result.first ;
 		m_size = result.second ;
 
-		dbugLog(_FLI, "Created HostSupercellData: %u supercells, max %u buildings in a supercell, total %u buildings requiring %u bytes", g_supercells.size(), maxBuildings, numBuildings, m_size) ;
+		dbugLog(_FLI, "Created HostSupercellData: %" PRSizeT " supercells, max %u buildings in a supercell, total %u buildings requiring %" PRSizeT " bytes"
+					, g_supercells.size(), maxBuildings, numBuildings, m_size) ;
 	}
 
 	// Destructor.
@@ -105,7 +106,7 @@ mapSendHostSupercellData(SINT32 teulIndex)
 	Teul::Packet outgoing(size, Map::CallbackX, Map::BUILDING_VISLEVELS_Y) ;
 	outgoing.setPayloadSizeBytes(size) ;
 	memcpy(outgoing.payload(), hsd.data(), size) ;
-	dbugLog(_FLD, "t:%d sending %ubyte building damage level packet", teulIndex, size) ;
+	dbugLog(_FLD, "t:%d sending %" PRSizeT " byte building damage level packet", teulIndex, size) ;
 
 	return outgoing.send(teulIndex) ;
 }
@@ -169,7 +170,7 @@ mapSendDirtySupercellData()
 		return ;
 	}
 
-	dbugLog(_FLI, "Sending %u supercells to %u players in %u bytes", _dirtyCells.size(), indexes.size(), _dirtyData) ;
+	dbugLog(_FLI, "Sending %" PRSizeT " supercells to %" PRSizeT " players in %" PRSizeT " bytes", _dirtyCells.size(), indexes.size(), _dirtyData) ;
 
 	// Create a packet with all of the data.
 	Teul::Packet outgoing(_dirtyData, Map::CallbackX, Map::BUILDING_VISLEVELS_Y) ;

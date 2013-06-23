@@ -46,7 +46,7 @@
 #	error("GCC version 4.0 or higher is required to compile this code.")
 # endif
 # ifdef __LP64__
-#  define PRSizeT "llu"
+#  define PRSizeT "zu"
 # else
 #  define PRSizeT "u"
 # endif

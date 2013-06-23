@@ -925,7 +925,7 @@ _distributeChannelMessage(Chat::HostMessage& message, Chat::Channel& channel, Pl
 		return ;
 	}
 
-	dbugLog(_FLD, "t:%d p:%u c:%s channel:{type:%u,name:'%s',subs:%u} distributing: %s"
+	dbugLog(_FLD, "t:%d p:%u c:%s channel:{type:%u,name:'%s',subs:%" PRSizeT "} distributing: %s"
 					, sender.teulIndex(), sender.playerID(), sender.callsign()
 					, channel.type(), channel.m_name.c_str(), channel.numSubscribers()
 					, message.msg
@@ -949,7 +949,7 @@ _distributeChannelMessage(Chat::HostMessage& message, Chat::Channel& channel, Pl
 	}
 
 	if ( g_logDebug )
-		dbugLog(_FLDB, " [%u recipients]", indexes.size()) ;
+		dbugLog(_FLDB, " [%" PRSizeT " recipients]", indexes.size()) ;
 
 	chatBroadcastHostMessage(indexes.begin(), indexes.end(), message) ;
 }
@@ -2829,7 +2829,7 @@ _startShutdown()
 
 	wwiiIRCChannelMessage("-sys,#servers", "*Automated shutdown") ;
 
-	OpenThreads::Thread::microSleep(500) ;
+	std::this_thread::sleep_for(std::chrono::microseconds(500));
 
 	PLAYER_INDEX::iterator it = playerIndex.begin() ;
 	while ( it != playerIndex.end() )

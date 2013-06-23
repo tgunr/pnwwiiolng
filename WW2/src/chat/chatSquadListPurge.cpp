@@ -93,7 +93,7 @@ public:
 			return ;
 
 		const size_t numRows = m_results.size() ;
-		dbugLog(_FLD, "Got list of %u expired recruits", numRows) ;
+		dbugLog(_FLD, "Got list of %" PRSizeT " expired recruits", numRows) ;
 
 		// See who was listed.
 		UINT32 prevSquadID = 0 ;

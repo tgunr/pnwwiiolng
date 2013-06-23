@@ -124,7 +124,7 @@ public:
 		}
 
 		if ( g_debugSquads )
-			dbugLog(_FLD, "sq:%u '%s' got list of %u members was %" PRSizeT ""
+			dbugLog(_FLD, "sq:%u '%s' got list of %" PRSizeT " members was %" PRSizeT ""
 						, m_squadID, list->squad().shortName(), m_results.size(), list->members().size()) ;
 
 		// In order that we can tell who is no-longer in the squad according

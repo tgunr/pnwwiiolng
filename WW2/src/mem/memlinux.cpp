@@ -103,7 +103,7 @@ struct HISTORY : HISTORY_BASE
 	{
 		OpenThreads::ScopedLock<OpenThreads::Mutex> lock(m_mutex);
 		m_inUse = false;
-		OpenThreads::Thread::microSleep(10 * 1000);
+		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 	volatile bool m_inUse;
 	OpenThreads::Mutex m_mutex ;

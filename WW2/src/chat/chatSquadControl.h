@@ -81,7 +81,7 @@ public:
 
 public:
 	// Number of players required to create a squad
-	static const UINT32 CREATE_PLAYERS_REQUIRED = 4 ;
+	static const size_t CREATE_PLAYERS_REQUIRED = 4 ;
 	static const UINT32 MAX_TEXT_LEN = 400 ;
 
 public:
