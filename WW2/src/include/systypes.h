@@ -178,6 +178,7 @@ class PNThread
 
 public:
 	PNThread() : m_thread(), m_started(false), m_cancelled(false) {}
+	virtual ~PNThread() {}
 
 	void start() { if(m_started) return; m_thread = std::thread([=] { run(); }); m_started = true; }
 	virtual int cancel() { m_cancelled = true; return 0; }
