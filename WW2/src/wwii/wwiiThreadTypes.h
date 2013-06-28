@@ -57,7 +57,7 @@ public:
 	{
 		// Wait until empty is false
 		std::unique_lock<std::mutex> lock(m_mutex);
-		m_condition.wait(lock, [=] () { return m_queue.empty(); });
+		m_condition.wait(lock, [=] () { return !m_queue.empty(); });
 
 		_DataType data = m_queue.front() ;
 		m_queue.pop() ;
