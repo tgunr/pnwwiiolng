@@ -51,6 +51,7 @@
 #define   swprintf   _snwprintf
 #define	  vswprintf	 _vsnwprintf
 
+#if _MSC_VER < 1800 // visual studio 2013 defines this in stdlib.h
 static inline unsigned long long strtoull(const char* const src_, const char* const, unsigned int)
 {
 	unsigned long long into = 0;
@@ -69,6 +70,7 @@ static inline float strtof(const char* const src_, const char* const)
 	(void)sscanf(src_, "%f", &into) ;
 	return into ;
 }
+#endif
 
 #else
 

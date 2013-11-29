@@ -97,9 +97,11 @@
 
 #if defined(WIN32) || defined(WIN64)
 
+#if _MSC_VER < 1800	// VS2013 has this in stdlib.h
 static inline unsigned long long strtoull(const char* const src_, const char* const, unsigned int);
 static inline signed long long strtoll(const char* const src_, const char* const, unsigned int);
 static inline float strtof(const char* const src_, const char* const);
+#endif
 
 #include <io.h>
 #endif
