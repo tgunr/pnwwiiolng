@@ -1,3 +1,5 @@
-/win32_2k8_static.sdf
-/*.suo
-/*.user
+*.suo
+*.user
+*.sdf
+Debug
+Release
