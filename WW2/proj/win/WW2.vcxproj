@@ -242,7 +242,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>shlW32Mt.lib;imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;granny2.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SolutionDir)\WW2\lib\win\3rdParty;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
@@ -292,7 +292,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\include;$(SolutionDir)\WW2\proj;$(SolutionDir)\WW2\proj\win;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\dd;$(SolutionDir)\WW2\src\di;$(SolutionDir)\WW2\src\mem;$(SolutionDir)\Libraries\;$(SolutionDir)\Libraries\phui\include;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\opende\include;$(SolutionDir)\Libraries\zlib-1.2.5;$(SolutionDir)\Libraries\lpng144;$(SolutionDir)\Libraries\ftgl\src;$(SolutionDir)\Libraries\freetype\include;$(SolutionDir)\Libraries\phui\include\js;$(SolutionDir)\WW2\include\lua;$(SolutionDir)\WW2\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>VEHICLES_GAME_INFO;ENABLE_FLOATERS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_CRT_SECURE_NO_WARNINGS;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;SMARTHEAP_USED;CRASH_HANDLER;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>VEHICLES_GAME_INFO;ENABLE_FLOATERS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_CRT_SECURE_NO_WARNINGS;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;SMARTHEAP_USED;CRASH_HANDLER;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
@@ -322,7 +322,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;granny2.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <Version>0.1</Version>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -368,7 +368,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\include;$(SolutionDir)\WW2\proj;$(SolutionDir)\WW2\proj\win;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\dd;$(SolutionDir)\WW2\src\di;$(SolutionDir)\WW2\src\mem;$(SolutionDir)\Libraries\;$(SolutionDir)\Libraries\phui\include;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\opende\include;$(SolutionDir)\Libraries\zlib-1.2.5;$(SolutionDir)\Libraries\lpng144;$(SolutionDir)\Libraries\ftgl\src;$(SolutionDir)\Libraries\freetype\include;$(SolutionDir)\Libraries\phui\include\js;$(SolutionDir)\WW2\include\lua;$(SolutionDir)\WW2\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>MULTI_CLIENT=1;ENABLE_FLOATERS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_CRT_SECURE_NO_WARNINGS;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;SMARTHEAP_USED;CRASH_HANDLER;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>MULTI_CLIENT=1;ENABLE_FLOATERS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;RELEASE_CLIENT=1;BETA_RELEASE;GLEW_STATIC;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_CRT_SECURE_NO_WARNINGS;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;SMARTHEAP_USED;CRASH_HANDLER;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
@@ -400,7 +400,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;granny2.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(Configuration).exe</OutputFile>
       <Version>0.1</Version>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -447,7 +447,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\include;$(SolutionDir)\WW2\proj;$(SolutionDir)\WW2\proj\win;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\dd;$(SolutionDir)\WW2\src\di;$(SolutionDir)\WW2\src\mem;$(SolutionDir)\Libraries\;$(SolutionDir)\Libraries\phui\include;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\opende\include;$(SolutionDir)\Libraries\zlib-1.2.5;$(SolutionDir)\Libraries\lpng144;$(SolutionDir)\Libraries\ftgl\src;$(SolutionDir)\Libraries\freetype\include;$(SolutionDir)\Libraries\phui\include\js;$(SolutionDir)\WW2\include\lua;$(SolutionDir)\WW2\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;GLEW_STATIC;RELEASE_CLIENT=1;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;CRASH_HANDLER;SMARTHEAP_USED;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;ANTIHACK;DIDDLE_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;GLEW_STATIC;RELEASE_CLIENT=1;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;CRASH_HANDLER;SMARTHEAP_USED;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;ANTIHACK;DIDDLE_ENABLED;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
@@ -476,7 +476,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;granny2.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <Version>0.1</Version>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -547,7 +547,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>shlW32Mt.lib;imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;granny2.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <OutputFile>$(OutDir)$(ProjectName)_x86.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -620,7 +620,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;granny2.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <Version>0.1</Version>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -662,7 +662,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\include;$(SolutionDir)\WW2\proj;$(SolutionDir)\WW2\proj\win;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\dd;$(SolutionDir)\WW2\src\di;$(SolutionDir)\WW2\src\mem;$(SolutionDir)\Libraries\;$(SolutionDir)\Libraries\phui\include;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\opende\include;$(SolutionDir)\Libraries\zlib-1.2.5;$(SolutionDir)\Libraries\lpng144;$(SolutionDir)\Libraries\ftgl\src;$(SolutionDir)\Libraries\freetype\include;$(SolutionDir)\Libraries\phui\include\js;$(SolutionDir)\WW2\include\lua;$(SolutionDir)\WW2\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;GLEW_STATIC;RELEASE_CLIENT=1;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;CRASH_HANDLER;SMARTHEAP_USED;GREEN_INSTALL=1;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=0;DIDDLE_ENABLED;IS_CHINA=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;GLEW_STATIC;RELEASE_CLIENT=1;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;CRASH_HANDLER;SMARTHEAP_USED;GREEN_INSTALL=1;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=0;DIDDLE_ENABLED;IS_CHINA=1;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
@@ -691,7 +691,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;granny2.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <Version>0.1</Version>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -733,7 +733,7 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src\include;$(SolutionDir)\WW2\proj;$(SolutionDir)\WW2\proj\win;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\dd;$(SolutionDir)\WW2\src\di;$(SolutionDir)\WW2\src\mem;$(SolutionDir)\Libraries\;$(SolutionDir)\Libraries\phui\include;$(SolutionDir)\Libraries\glew\include;$(SolutionDir)\Libraries\opende\include;$(SolutionDir)\Libraries\zlib-1.2.5;$(SolutionDir)\Libraries\lpng144;$(SolutionDir)\Libraries\ftgl\src;$(SolutionDir)\Libraries\freetype\include;$(SolutionDir)\Libraries\phui\include\js;$(SolutionDir)\WW2\include\lua;$(SolutionDir)\WW2\include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>ENABLE_FLOATERS;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;GLEW_STATIC;RELEASE_CLIENT=1;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;CRASH_HANDLER;SMARTHEAP_USED;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;ANTIHACK;DIDDLE_ENABLED;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>ENABLE_FLOATERS;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;XP_WIN;NDEBUG;WIN32;_WINDOWS;INC_STRAT;GLEW_STATIC;RELEASE_CLIENT=1;OT_LIBRARY_STATIC;platOS=OS_WIN32;BOOST_REGEX_NO_LIB;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;dDOUBLE;CRASH_HANDLER;SMARTHEAP_USED;FTGL_LIBRARY_STATIC;USE_SCENARIOS=0;USE_SCENARIO_MAP=0;XAUDIO=1;ANTIHACK;DIDDLE_ENABLED;BUILDING_GRANNY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
@@ -762,7 +762,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;granny2.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <Version>0.1</Version>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -1855,6 +1855,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\Libraries\glew\build\vc6\glew_static.vcxproj">
       <Project>{c5e233a4-ee47-427d-96e7-a3b784914109}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\..\Libraries\granny2\projects\win32_2k13_static.vcxproj">
+      <Project>{88f5e6ba-bd13-4b8a-a19e-232fe3bf5c73}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Libraries\imap\proj.win32\imap.vcxproj">
       <Project>{cccfce71-8ee8-439a-a9e3-109558287b8d}</Project>
