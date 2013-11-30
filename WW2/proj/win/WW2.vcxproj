@@ -1315,7 +1315,6 @@
     <ClCompile Include="..\..\src\chat\chatWho.cpp" />
     <ClCompile Include="..\..\src\client\client.cpp" />
     <ClCompile Include="..\..\src\client\clientBrigadeControl.cpp" />
-    <ClCompile Include="..\..\src\client\clientConnection.cpp" />
     <ClCompile Include="..\..\src\client\clientGlobals.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">
       </PrecompiledHeader>

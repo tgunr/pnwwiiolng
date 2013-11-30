@@ -1685,9 +1685,6 @@
     <ClCompile Include="..\..\src\client\clientBrigadeControl.cpp">
       <Filter>client</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\client\clientConnection.cpp">
-      <Filter>client</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\client\clientGlobals.cpp">
       <Filter>client</Filter>
     </ClCompile>

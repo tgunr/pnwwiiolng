@@ -17,7 +17,6 @@ SET(DBD_HOST_EXE "dbd")
 SET(CHAT_HOST_EXE "chatd")
 SET(CELL_HOST_EXE "hostd")
 SET(MAP_HOST_EXE "mmhostd")
-SET(PING_HOST_EXE "pingHost")
 SET(STRAT_HOST_EXE "stratd")
 
 SET(_LUA_HOST "stratd")
@@ -906,19 +905,6 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 	SET_PROPERTY(TARGET ${MAP_HOST_EXE} PROPERTY FOLDER "Hosts")
 
 	######################################################################
-	# Playnet's solution to an Autonomous System Number: Have multiple
-	# network routes and make the client figure out which one to use.
-	# Pinghostd listens on all available interfaces and clients connect
-	# to it during startup and see which interface they liked the best.
-	# Selection is based on speed, which means that in many cases they
-	# pick the one with the highest speed and most variability/least
-	# reliability :(
-	add_executable(${PING_HOST_EXE} src/pinghost.cpp)
-	set_property(TARGET ${PING_HOST_EXE} PROPERTY COMPILE_DEFINITIONS AS_SERVER IS_PING_HOST)
-	target_link_libraries(${PING_HOST_EXE} libwwii teulserver)
-	SET_PROPERTY(TARGET ${PING_HOST_EXE} PROPERTY FOLDER "Hosts")
-
-	######################################################################
 	# Database Proxy Daemon [deprecated].
 	# Because the original host implementation was
 	# entirely single-threaded, this host process was created to offload
@@ -1182,7 +1168,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth")
 			RUNTIME DESTINATION bin
 			COMPONENT tools
 	)
-	INSTALL(TARGETS ${CONTROLLER_HOST_EXE} ${STRAT_HOST_EXE} ${DBD_HOST_EXE} ${PING_HOST_EXE}
+	INSTALL(TARGETS ${CONTROLLER_HOST_EXE} ${STRAT_HOST_EXE} ${DBD_HOST_EXE}
 					${CHAT_HOST_EXE} ${MAP_HOST_EXE} ${CELL_HOST_EXE}
 			ARCHIVE DESTINATION lib
 			LIBRARY DESTINATION lib

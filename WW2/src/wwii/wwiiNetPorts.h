@@ -1,9 +1,6 @@
 #pragma once
 // Created: Tue Apr  4 17:10:59 CDT 2006
 //
-// Defines the parameters for best connection test to the
-// map/ping host
-//
 // Copyright (C) PlayNet, Inc 1999-2006 - All rights reserved.
 // Not for redistribution.
 //
@@ -38,8 +35,6 @@ namespace WWII
 
 			,	InternalStrat = 6060				// Strat<->server interface
 			,	Dbse = 9000							// } Database proxy primary and
-			,	ConnectionList = 27016				// } Find best connection
-			,	ConnectionTest = 27017				// } algorithm ports
 			} ;
 		}
 	}

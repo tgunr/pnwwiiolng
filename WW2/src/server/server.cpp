@@ -62,7 +62,6 @@ const char* g_serverTypes[MAX_SERVER_TYPE] =
 ,	"strat"
 ,	"chat"
 ,	"map"
-,	"ping"
 ,	"cell"
 ,	"EXIT"
 };
