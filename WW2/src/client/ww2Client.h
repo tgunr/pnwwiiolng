@@ -159,7 +159,7 @@ public:
 	bool CellClientActive() const;
 	bool MapClientActive() const;
 
-	void OnDespawn();
+	virtual void OnDespawn();
 	void OnExit();
 
 	void ResetMissionData();
