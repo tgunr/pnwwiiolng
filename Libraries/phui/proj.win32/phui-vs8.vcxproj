@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project DefaultTargets="Build" ToolsVersion="12.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Buzzard|Win32">
       <Configuration>Buzzard</Configuration>
@@ -34,32 +34,32 @@
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='China|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='SSE2SmartHeap|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseOfMfc>false</UseOfMfc>
     <CharacterSet>Unicode</CharacterSet>
     <WholeProgramOptimization>true</WholeProgramOptimization>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <CharacterSet>Unicode</CharacterSet>
     <CLRSupport>false</CLRSupport>
-    <PlatformToolset>v110</PlatformToolset>
+    <PlatformToolset>v120</PlatformToolset>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
@@ -101,7 +101,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <Optimization>Disabled</Optimization>
-      <AdditionalIncludeDirectories>..\include\js;..\..\ftgl\include;..\..\freetype\include;..\include;..\..\ftgl\src\FTGL;..\..\ftgl\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\include\js;..\..\ftgl\include;..\..\freetype\include;..\include;..\..\ftgl\src\FTGL;..\..\ftgl\src;..\..\..\ww2\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>XP_WIN;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;FTGL_LIBRARY_STATIC;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <ExceptionHandling>Sync</ExceptionHandling>
@@ -124,8 +124,6 @@
       <OpenMPSupport>false</OpenMPSupport>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
       <PrecompiledHeaderFile>phui-precompiled-header.h</PrecompiledHeaderFile>
-      <ForcedIncludeFiles>
-      </ForcedIncludeFiles>
     </ClCompile>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
@@ -151,7 +149,7 @@
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <AdditionalIncludeDirectories>..\include\js;..\..\ftgl\include;..\..\freetype\include;..\include;..\..\ftgl\src\FTGL;..\..\ftgl\src;..\..\..\ww2\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;XP_WIN;FTGL_LIBRARY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>XP_WIN;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;FTGL_LIBRARY_STATIC;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -167,8 +165,7 @@
       </DebugInformationFormat>
       <OpenMPSupport>false</OpenMPSupport>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
-      <PrecompiledHeaderFile>include/phui-precompiled-header.h</PrecompiledHeaderFile>
-      <ForcedIncludeFiles>include/phui-precompiled-header.h</ForcedIncludeFiles>
+      <PrecompiledHeaderFile>phui-precompiled-header.h</PrecompiledHeaderFile>
     </ClCompile>
     <Lib>
       <AdditionalDependencies>
@@ -190,8 +187,8 @@
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
       <OmitFramePointers>true</OmitFramePointers>
       <WholeProgramOptimization>false</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\include\js;..\..\ftgl\include;..\..\freetype\include;..\include;..\..\ftgl\src\FTGL;..\..\ftgl\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;XP_WIN;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;FTGL_LIBRARY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\include\js;..\..\ftgl\include;..\..\freetype\include;..\include;..\..\ftgl\src\FTGL;..\..\ftgl\src;..\..\..\ww2\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>XP_WIN;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;FTGL_LIBRARY_STATIC;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
@@ -208,8 +205,7 @@
       <OpenMPSupport>false</OpenMPSupport>
       <ExceptionHandling>Sync</ExceptionHandling>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
-      <PrecompiledHeaderFile>include/phui-precompiled-header.h</PrecompiledHeaderFile>
-      <ForcedIncludeFiles>include/phui-precompiled-header.h</ForcedIncludeFiles>
+      <PrecompiledHeaderFile>phui-precompiled-header.h</PrecompiledHeaderFile>
     </ClCompile>
     <Lib>
       <OutputFile>$(OutDir)$(TargetName)$(TargetExt)</OutputFile>
@@ -231,8 +227,8 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\include\js;..\..\ftgl\include;..\..\freetype\include;..\include;..\..\ftgl\src\FTGL;..\..\ftgl\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;XP_WIN;FTGL_LIBRARY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\include\js;..\..\ftgl\include;..\..\freetype\include;..\include;..\..\ftgl\src\FTGL;..\..\ftgl\src;..\..\..\ww2\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>XP_WIN;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;FTGL_LIBRARY_STATIC;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -248,8 +244,7 @@
       </DebugInformationFormat>
       <OpenMPSupport>false</OpenMPSupport>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
-      <PrecompiledHeaderFile>include/phui-precompiled-header.h</PrecompiledHeaderFile>
-      <ForcedIncludeFiles>include/phui-precompiled-header.h</ForcedIncludeFiles>
+      <PrecompiledHeaderFile>phui-precompiled-header.h</PrecompiledHeaderFile>
     </ClCompile>
     <Lib>
       <AdditionalDependencies>
@@ -272,8 +267,8 @@
       <OmitFramePointers>true</OmitFramePointers>
       <EnableFiberSafeOptimizations>true</EnableFiberSafeOptimizations>
       <WholeProgramOptimization>true</WholeProgramOptimization>
-      <AdditionalIncludeDirectories>..\include\js;..\..\ftgl\include;..\..\freetype\include;..\include;..\..\ftgl\src\FTGL;..\..\ftgl\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;_CRT_SECURE_NO_WARNINGS;_SCL_SECURE_NO_WARNINGS;XP_WIN;FTGL_LIBRARY_STATIC;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\include\js;..\..\ftgl\include;..\..\freetype\include;..\include;..\..\ftgl\src\FTGL;..\..\ftgl\src;..\..\..\ww2\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>XP_WIN;_SCL_SECURE_NO_WARNINGS;_CRT_SECURE_NO_DEPRECATE;FTGL_LIBRARY_STATIC;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <StringPooling>true</StringPooling>
       <ExceptionHandling>Sync</ExceptionHandling>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
@@ -289,8 +284,7 @@
       </DebugInformationFormat>
       <OpenMPSupport>false</OpenMPSupport>
       <DisableSpecificWarnings>4996</DisableSpecificWarnings>
-      <PrecompiledHeaderFile>include/phui-precompiled-header.h</PrecompiledHeaderFile>
-      <ForcedIncludeFiles>include/phui-precompiled-header.h</ForcedIncludeFiles>
+      <PrecompiledHeaderFile>phui-precompiled-header.h</PrecompiledHeaderFile>
     </ClCompile>
     <Lib>
       <AdditionalDependencies>
@@ -307,6 +301,14 @@
   <ItemGroup>
     <ClCompile Include="..\src\Button.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='China|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='SSE2SmartHeap|Win32'">Create</PrecompiledHeader>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='China|Win32'">..\include\js;..\..\ftgl\include;..\..\freetype\include;..\include;..\..\ftgl\src\FTGL;..\..\ftgl\src;..\..\..\ww2\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\include\js;..\..\ftgl\include;..\..\freetype\include;..\include;..\..\ftgl\src\FTGL;..\..\ftgl\src;..\..\..\ww2\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">..\include\js;..\..\ftgl\include;..\..\freetype\include;..\include;..\..\ftgl\src\FTGL;..\..\ftgl\src;..\..\..\ww2\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PrecompiledHeaderFile Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">phui-precompiled-header.h</PrecompiledHeaderFile>
     </ClCompile>
     <ClCompile Include="..\src\Caption.cpp" />
     <ClCompile Include="..\src\Checkbox.cpp" />
@@ -316,6 +318,10 @@
     <ClCompile Include="..\src\ControlValueMessage.cpp" />
     <ClCompile Include="..\src\ConvertUTF.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='China|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='SSE2SmartHeap|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="..\src\CSSViewDrawer.cpp" />
     <ClCompile Include="..\src\CtxMenu.cpp" />
