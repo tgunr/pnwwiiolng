@@ -443,7 +443,7 @@ _sendAuthHostStats()
 	// Don't send packets like a crazy mofo
 	if ( teulClock64 >= nextLoadUpdate || (teulClock64 + 5000 >= nextLoadUpdate && totalPlayers != lastTotalPlayers) )
 	{
-		authUpdateServerLoad(totalPlayers, mmGetAddress(), Server::myServerInfo.stats.arenaID);
+		authUpdateServerLoad(totalPlayers, Server::myServerInfo.stats.address, Server::myServerInfo.stats.arenaID);
 		lastTotalPlayers = totalPlayers;
 		nextLoadUpdate = teulClock64 + 60*1000;
 	}
@@ -682,11 +682,6 @@ _handleSIGUSR1(SINT32 k)
 	signal(SIGUSR1, _handleSIGUSR1);
 }
 #endif
-
-UINT32 mmGetAddress()
-{
-	return Server::myServerInfo.stats.address;
-}
 
 //////////////////////////////////////////////////////////////////////
 
