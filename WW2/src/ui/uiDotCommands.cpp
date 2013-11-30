@@ -13,6 +13,7 @@
 #include "client/clientSquad.h"
 #include "client/clientSTO.h"
 #include "client/GameClient.h"
+#include "client/ww2HostState.h"
 #include "draw/draw3d.h"
 #include "fp/fpFPSdata.h"
 #include "fp/fpFPS.h"

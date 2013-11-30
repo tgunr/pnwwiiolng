@@ -121,8 +121,8 @@ protected:
 	FLOAT64 mobilespawnyaw;
 
 private:
-	GameClient(const GameClient&) ;		// Prevent copy ctor.
-	GameClient& operator=(const GameClient&) ;	// prevent copy operator
+	GameClient(const GameClient&);				// Prevent copy ctor.
+	GameClient& operator=(const GameClient&);	// prevent copy operator
 };
 
 extern int GameClientLogin(unsigned int hostAddress, int playerID, int otp,

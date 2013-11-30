@@ -3,6 +3,7 @@
 #include "phui/Message.h"
 
 #include "client/GameClient.h"
+#include "client/ww2HostState.h"
 #include "comm/commClientMessages.h"
 #include "ml/mltypes.h"
 #include "mm/mmSpawnTypes.h"

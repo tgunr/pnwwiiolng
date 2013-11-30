@@ -15,6 +15,7 @@
 #include "client/clientSquad.h"
 #include "client/GameClient.h"
 #include "client/ww2Client.h"
+#include "client/ww2HostState.h"
 #include "comm/commClientMessages.h"
 #include "inst/instClient.h"
 #include "inst/instDescriptor.h"
