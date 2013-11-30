@@ -214,13 +214,6 @@ void clientProcessCrewBailed(SINT32 teulIndex, struct FE_CREW_BAILED* crewBailed
 		client->ProcessCrewBailed(*crewBailed);
 }
 
-void clientProcessDialog(SINT32 teulIndex, int dialog)
-{
-	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
-	if(client)
-		client->ProcessDialog(dialog);
-}
-
 void clientChatProcessMotdReply(SINT32 teulIndex, const MOTD_REPLY& reply)
 {
 	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);

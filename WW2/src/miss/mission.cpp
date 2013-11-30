@@ -244,13 +244,6 @@ missionRevokeMissionsFrom(const FacilityStruct& facility)
 		if ( current->numTakers() > 0 && facility.type != FACILITY_FIREBASE )
 		{
 			chatSendBroadcast(Chat::_ORDERS, current->instanceID(), current->missionID(), LSTR_ORDERS, LSTR_BASE_CAPTURED, facility.name) ;
-
-			for ( auto it = current->m_takers.begin() ; it != current->m_takers.end() ; ++it )
-			{
-				Player* const player = it->second ;
-				if ( player != NULL && !player->isSpawned() )
-					wwiiSendDialog(player->teulIndex(), DLG_BASE_CAPTURED) ;
-			}
 		}
 
 		current->cancel() ;

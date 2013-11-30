@@ -24,7 +24,6 @@
 #endif
 
 static TEUL_CALLBACK*	_SEND_ACTIVATE;
-static TEUL_CALLBACK*	_SEND_DIALOG ;
 
 extern void mapUserAbortedApp(Player* player) ;
 extern void hostUserAbortedApp(Player* player) ;
@@ -34,12 +33,6 @@ _sendWWII_ACTIVATE(ACTION_OBJECT* const a)
 {
 	WWII_ACTIVATE* activate = (WWII_ACTIVATE*)(a->localRawData) ;
 	return activate->packer(TEUL_PACK, a) ;
-}
-
-static SINT32
-_sendWWII_DIALOG(ACTION_OBJECT* const a)
-{
-	return teulPackUINT32(TEUL_PACK, a->packed, a->offset, (UINT32*)(a->localRawData), 8) ;
 }
 
 static SINT32 _recvWWII_ERROR_INFO(ACTION_OBJECT* const a)
@@ -83,18 +76,10 @@ SINT32
 wwiiHostInstallCallbacks(void)
 {
 	BEGIN_CALLBACK_REGISTRATION(WWII_X)
-		REGISTER_SENDER(WWII_ACTIVATE_Y, _sendWWII_ACTIVATE, _SEND_ACTIVATE) ;
-		REGISTER_SENDER(WWII_DIALOG_Y, _sendWWII_DIALOG, _SEND_DIALOG) ;
-
-		REGISTER_RECEIVER(WWII_ERROR_INFO_Y, _recvWWII_ERROR_INFO) ;
-		REGISTER_RECEIVER(WWII_USER_ABORTED_APP_Y, _recvAbortedApp) ;
+		REGISTER_SENDER(WWII_ACTIVATE_Y, _sendWWII_ACTIVATE, _SEND_ACTIVATE);
+		REGISTER_RECEIVER(WWII_ERROR_INFO_Y, _recvWWII_ERROR_INFO);
+		REGISTER_RECEIVER(WWII_USER_ABORTED_APP_Y, _recvAbortedApp);
 	END_CALLBACK_REGISTRATION
-}
-
-SINT32
-wwiiSendDialog(SINT32 connection, /*WWII_DIALOG*/ UINT32 dialog)
-{
-	return teulSend(connection, _SEND_DIALOG, &dialog) ;
 }
 
 SINT32 wwiiSendActivate(SINT32 connection, WWII_ACTIVATE* const activate)

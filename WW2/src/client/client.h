@@ -55,9 +55,6 @@ extern void clientProcessJoinAccept(int teulIndex, struct FE_JOIN_ACCEPT*);
 extern void clientProcessSpawnNotify(int teulIndex, const FESpawnNotify&);
 extern void clientProcessCrewBailed(int teulIndex, struct FE_CREW_BAILED*);
 
-// ww2
-extern void clientProcessDialog(int teulIndex, int);
-
 // chat
 #include "chat/chatPrototypes.h"		// Common chat forward protos
 struct MOTD_REPLY;

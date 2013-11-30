@@ -446,6 +446,7 @@ void GameClient::ProcessChatLocalizedMessage(Chat::LocalizedMessage const& msg)
 				wchar_t orders[255+1];
 				swprintf(orders, 255, format.c_str(), strings[0]);
 				SetCurrentOrders(orders);
+				jsclient->RunScript("onbasecaptured()");
 			}
 			break;
 			case LSTR_GENERIC:
@@ -672,20 +673,6 @@ void GameClient::ProcessMissionList(MissionList const& missionList)
 		jsclient->RunScript("onmissionlistchange()");
 }
 
-/************************************************************************************************
-	ProcessDialog
-*************************************************************************************************/
-
-void GameClient::ProcessDialog(int dialog)
-{
-	Client::ProcessDialog(dialog);
-	switch (dialog)
-	{
-		case DLG_BASE_CAPTURED:
-			jsclient->RunScript("onbasecaptured()");
-		break ;
-	}
-}
 /************************************************************************************************
 	ProcessWeapList
 *************************************************************************************************/

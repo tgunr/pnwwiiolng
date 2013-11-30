@@ -51,7 +51,6 @@ public:
 	virtual void ProcessCrewJoinPerm(FE_JOIN_PERM_REQUEST const& joinperm);
 	virtual void ProcessPersonaSummaries(PersonaSummaries const& summaries);
 	virtual void ProcessMissionList(MissionList const& missionList);
-	virtual void ProcessDialog(int dialog);
 	virtual void ProcessWeapList(struct ACTION_OBJECT* a);
 	virtual void ProcessMissionLaunchUpdate(MISS_LAUNCH_UPDATE const&);
 	virtual void ProcessEmptyChatWhoList(int type) ;

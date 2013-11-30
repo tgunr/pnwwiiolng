@@ -17,14 +17,9 @@
 
 enum
 {
-	WWII_DIALOG_Y = 1,
-	WWII_BUTTON_REPLY_Y,
+	WWII_ERROR_INFO_Y = 1,
+	WWII_USER_ABORTED_APP_Y,
 	WWII_ACTIVATE_Y,
-	WWII_ERROR_INFO_Y,
-	_WWII_UNUSED_1_Y,
-	WWII_ADDRESS_LIST_Y,
-	WWII_PING_Y,
-	WWII_USER_ABORTED_APP_Y
 };
 
 // Determination of the different infantry types
@@ -71,12 +66,5 @@ struct REL_OBJ_ID
 	SINT8		objType;
 
 };
-
-enum WWII_DIALOG
-{
-	DLG_INVALID = 0,
-	DLG_BASE_CAPTURED,
-	MAX_DIALOGS
-} ;
 
 struct FULL_OBJ_ID;

@@ -183,19 +183,6 @@ _recvWWII_ACTIVATE(ACTION_OBJECT* const a)
 	return a->offset;
 }
 
-static SINT32
-_recvWWII_DIALOG(ACTION_OBJECT* const a)
-{
-	// Dialog is a simple enumeration
-	WWII_DIALOG dialog ;
-
-	a->offset = teulPackUINT32(TEUL_UNPACK, a->packed, a->offset, (UINT32*)&dialog, 8) ;
-
-	clientProcessDialog(a->teulIndex, dialog);
-
-	return a->offset;
-}
-
 #if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
 
 #include "versionNo.h"
@@ -792,7 +779,6 @@ wwiiClientInstallCallbacks()
 	BEGIN_CALLBACK_REGISTRATION(WWII_X)
 
 		REGISTER_RECEIVER(WWII_ACTIVATE_Y, _recvWWII_ACTIVATE) ;
-		REGISTER_RECEIVER(WWII_DIALOG_Y, _recvWWII_DIALOG) ;
 
 		REGISTER_SENDER(WWII_ERROR_INFO_Y, _sendWWII_ERROR_INFO, _SEND_ERROR_INFO) ;
 		REGISTER_SENDER_NODATA(WWII_USER_ABORTED_APP_Y, _SEND_USER_ABORTED_APP) ;

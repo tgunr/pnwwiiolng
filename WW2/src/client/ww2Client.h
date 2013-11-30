@@ -243,7 +243,6 @@ public:
 	virtual void ProcessWorldUpdate(WORLD_UPDATE const&);
 	virtual void ProcessMissionLaunchUpdate(MISS_LAUNCH_UPDATE const&);
 	virtual void ProcessMissionResults(MISSION_RESULTS const&);
-	virtual void ProcessDialog(int dialog){}
 	virtual void ProcessChatMotdReply(struct MOTD_REPLY const&);
 	virtual void ProcessChatHostMessage(Chat::HostMessage const&){}
 	virtual void ProcessChatTuneToChannel(Chat::TuneToChannel const&) {}
