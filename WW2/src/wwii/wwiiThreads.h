@@ -7,6 +7,8 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
+#include "include/pnThread.h"
+
 typedef struct st_mysql MYSQL;
 class DBQuery;
 

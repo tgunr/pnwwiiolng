@@ -43,14 +43,14 @@ enum WWII_INF_TYPE
 ,	_INF_SNIPER	= 12
 ,	_INF_MORTAR	= 13
 ,	MAX_WWII_INF_TYPES
-} ;
+};
 
 //Used for a number of FRONT_END requests, probably needs to move to a more central location
 struct SUPER_CELL
 {
 	SINT16 sx;
 	SINT16 sy;
-} ;
+};
 
 //tolua_end
 
@@ -58,10 +58,10 @@ struct SUPER_CELL
 struct FULL_ID
 {
 	SINT16	sx;			// supercell coordinates start at the center of the map
-	SINT16	sy;			// and therfore must be signed.
+	SINT16	sy;			// and therefore must be signed.
 	UINT16	id;
 	UINT16	type;
-} ;
+};
 
 // supercell relative id
 struct REL_OBJ_ID
@@ -70,7 +70,7 @@ struct REL_OBJ_ID
 	SINT8		objClass;
 	SINT8		objType;
 
-} ;
+};
 
 enum WWII_DIALOG
 {
@@ -79,5 +79,4 @@ enum WWII_DIALOG
 	MAX_DIALOGS
 } ;
 
-struct FULL_OBJ_ID ;
-
+struct FULL_OBJ_ID;

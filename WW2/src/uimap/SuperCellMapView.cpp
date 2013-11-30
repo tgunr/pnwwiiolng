@@ -32,6 +32,7 @@
 #include "scen/ScenarioManager.h"
 #include "sys/sysmain.h"
 #include <condition_variable>
+#include "include/pnThread.h"
 
 #define SQUARE(x) ((x)*(x))
 #define PAN_SCALE_MAX 5.0f				// max scale when panning

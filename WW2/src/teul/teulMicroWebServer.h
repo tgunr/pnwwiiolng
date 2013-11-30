@@ -3,6 +3,7 @@
 // Author: Oliver "kfsone" Smith <osmith@playnet.com>
 
 #include "wwii/wwiiHash.h"
+#include "include/pnThread.h"
 
 namespace Teul
 {
