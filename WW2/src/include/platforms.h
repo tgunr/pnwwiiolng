@@ -93,8 +93,6 @@
 
 #undef DBA_ENABLE_SQLITE
 
-#undef DBA_ENABLE_SQLITE
-
 #if defined(WIN32) || defined(WIN64)
 
 #if _MSC_VER < 1800	// VS2013 has this in stdlib.h
