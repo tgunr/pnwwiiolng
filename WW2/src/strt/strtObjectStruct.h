@@ -11,7 +11,7 @@
 #include "strt/strtProtos.h"
 #include "strt/strtWOR.h"
 
-struct SPAWN_ABILITY ;
+struct SPAWN_ABILITY;
 
 //tolua_begin
 
@@ -19,67 +19,67 @@ struct SPAWN_ABILITY ;
 class ObjectStruct
 {
 public:
-	ObjectStruct() { memset(this, 0, sizeof(*this)) ; }
+	ObjectStruct() { memset(this, 0, sizeof(*this)); }
 	//// ---- Accessors
 	//-- Read
-	bool isValid() const { return NULL != facility ; }
-	const FacilityStruct& Facility() const { return *facility ; }
-	FacilityStruct& Facility() { return *facility ; }
+	bool isValid() const { return NULL != facility; }
+	const FacilityStruct& Facility() const { return *facility; }
+	FacilityStruct& Facility() { return *facility; }
 
-	UCHAR effectiveVisLevel() const { return (visLevel() == 0 || visLevel() == 255) ? visLevel() : visLevel() + smokeLevel() ; }
-	UCHAR smokeLevel() const { return m_smokeLevel ; }
-	UCHAR visLevel() const { return m_visLevel ; }
+	UCHAR effectiveVisLevel() const { return (visLevel() == 0 || visLevel() == 255) ? visLevel() : visLevel() + smokeLevel(); }
+	UCHAR smokeLevel() const { return m_smokeLevel; }
+	UCHAR visLevel() const { return m_visLevel; }
 
 	//-- Write
 
 	// Change the vis level - note: also clears the damagedBy field.
-	void setVisLevel(UCHAR newlevel) ;
+	void setVisLevel(UCHAR newlevel);
 
 	// Change what smoke level the building is showing.
-	void setSmokeLevel(UCHAR newLevel) ;
+	void setSmokeLevel(UCHAR newLevel);
 
 	//// ---- Queries
-	bool isProductionCenter() const ;
-	bool isCapturable() const { return m_isCaptureBuilding ; }
+	bool isProductionCenter() const;
+	bool isCapturable() const { return m_isCaptureBuilding; }
 
 	//// ---- Operations
 
-	void applyDamage(const SINT64& joules, UINT32 originatingSortieID) ;
+	void applyDamage(const SINT64& joules, UINT32 originatingSortieID);
 
 	// Calculate and cache the percentage damage
 	UINT32 calcPercentDamage()
 	{
-		return percentDamage = (UINT32)((FLOAT64)100 * (FLOAT64)m_damageJoules / (FLOAT64)m_maxDamageJoules) ;
+		return percentDamage = (UINT32)((FLOAT64)100 * (FLOAT64)m_damageJoules / (FLOAT64)m_maxDamageJoules);
 	}
 
 	// Determine and switch to the appropriate damaged level
 	// for this building along with various related state
 	// settings
-	void damagedVisLevel(UINT32 damagedBy) ;
+	void damagedVisLevel(UINT32 damagedBy);
 
 	// Calculate the RDP damage factor
-	FLOAT64 factoryDamageFactor() const ;
+	FLOAT64 factoryDamageFactor() const;
 
 	// Recalculate our "capacity"
-	void recalculateCapacity() ;
+	void recalculateCapacity();
 
 	// Determine and switch to the appropriate repaired vis
 	// level for this building in its current state.
-	void repairVisLevel() ;
+	void repairVisLevel();
 
 	// If we aren't already queued for saving, put us on the queue
-	bool save() ;
+	bool save();
 
-	void setCapacity(UINT32 newCapacity) ;
-	void setCountry(WWII_COUNTRY newCountry, WWII_SIDE newSide) ;
-	bool setDamageJoules(SINT64 newDamageJoules) ;
-	void setMaxCapacity(UINT32 newMax) ;
-	void setRepairRPs(UINT32 newRepairRPs) ;
-	void addRepairTime(UINT32 time) ;
+	void setCapacity(UINT32 newCapacity);
+	void setCountry(WWII_COUNTRY newCountry, WWII_SIDE newSide);
+	bool setDamageJoules(SINT64 newDamageJoules);
+	void setMaxCapacity(UINT32 newMax);
+	void setRepairRPs(UINT32 newRepairRPs);
+	void addRepairTime(UINT32 time);
 
 	// Set the table timer and vis-level related values
 	// for a table;
-	void setTableTimer(UCHAR withVisLevel, bool allowRebuild, bool shortRebuild=false) ;
+	void setTableTimer(UCHAR withVisLevel, bool allowRebuild, bool shortRebuild=false);
 
 public:
 //FULL_OBJ_ID must be the first field in the structure.
@@ -92,7 +92,7 @@ public:
 	SINT8			subType;
 	FULL_OBJ_ID		facilityID;
 	char			name[MAX_STRT_NAME_LENGTH];
-	const char*		filename ;
+	const char*		filename;
 	WWII_SIDE		m_side;		//the side that owns the object
 	WWII_COUNTRY	m_country;		//the country that owns the object
 	WWII_SIDE		originalSide;
@@ -123,7 +123,7 @@ public:
 	UINT32			m_repairRPsSaved;
 	UINT32			m_repairTime;		//Time of the next repair
 	UCHAR 			m_visLevel;			//Visual level of the building
-	UCHAR 			m_smokeLevel ;		// What level of smoke the building is producing
+	UCHAR 			m_smokeLevel;		// What level of smoke the building is producing
 	UCHAR 			maxVislevel;		//Max Visual level of the building
 
 	//For spawnpoints
@@ -132,15 +132,15 @@ public:
 	struct BRIDGE_ENTRY*	linkList;
 	SINT32			objectValue;		//The objectValue of a building
 	SINT32			posX, posY;			// X/Y Position [in supercell?] (in meters)
-	Supercell*		supercell ;
+	Supercell*		supercell;
 
-	bool			m_needsSync ;		// True when queued for broadcasting
-	bool			m_isCaptureBuilding ;
+	bool			m_needsSync;		// True when queued for broadcasting
+	bool			m_isCaptureBuilding;
 
-	UINT32			m_lastSmokeTime ;	// Last time smoke changed state
-	UINT32			m_uid ;				// Unique ID from the database
-	UINT32			m_damagedBy ;		// SortieID of vehicle that put bldg into damaged vislevel
-	UINT32			m_bid ;				// Building ID within supercell.
-} ;
+	UINT32			m_lastSmokeTime;	// Last time smoke changed state
+	UINT32			m_uid;				// Unique ID from the database
+	UINT32			m_damagedBy;		// SortieID of vehicle that put bldg into damaged vislevel
+	UINT32			m_bid;				// Building ID within supercell.
+};
 
 //tolua_end
