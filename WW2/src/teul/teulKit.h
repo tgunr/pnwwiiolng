@@ -32,7 +32,6 @@ namespace Teul { }
 extern SINT32 teulInitTransport(SINT32 logType
 							, const char* name
 							, ERROR_FUNCTION* errorFnPtr
-							, Teul::LoggingFn* const logFnPtr = NULL
 							);
 
 //	there are 48 local connections "built in" to the teul system, and each
