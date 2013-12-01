@@ -37,6 +37,19 @@
 # define CONSTEXPR_FN
 #endif
 
+// borrowed from libevent.
+#if defined(__GNUC__) && __GNUC__ >= 3         /* gcc 3.0 or later */
+#define PN_UNLIKELY(p) __builtin_expect(!!(p), 0)
+#else
+#define PN_UNLIKELY(p) (p)
+#endif
+
+#if defined(__GNUC__) && __GNUC__ >= 3         /* gcc 3.0 or later */
+#define PN_LIKELY(p) __builtin_expect(!!(p), 1)
+#else
+#define PN_LIKELY(p) (p)
+#endif
+
 // Determine which version of GCC, if any, is being used,
 // and for GCC/MSVC, determine what C++0X support is
 // available.
