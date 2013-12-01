@@ -3555,12 +3555,12 @@ const char* const g_serverName = "chatd";
 int
 main(int argc, char* argv[])
 {
+	Teul::SetAppName(g_serverName);
 	Teul::ConfigVar::InitializeConfigVars();
 
 	serverEnableDebugWebServer(CHAT_HOST) ;
 	memInit() ;
 
-	Teul::SetAppName(g_serverName) ;
 	if (teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction) < 0)//_killFunction
 		LogAbort("Can't Init transport");
 

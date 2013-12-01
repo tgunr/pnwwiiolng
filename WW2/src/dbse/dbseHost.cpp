@@ -53,10 +53,11 @@ static const char* g_serverName = "dbd";
 
 int main(int argc, char* argv[])
 {
+	Teul::SetAppName(g_serverName);
+	Teul::ConfigVar::InitializeConfigVars();
+
 	SINT32 listenIndex;
 
-	Teul::ConfigVar::InitializeConfigVars();
-	Teul::SetAppName(g_serverName);
 	if (teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction) < 0)
 	{
 		fprintf(stderr, "Unable to initialize teulTransport\n");

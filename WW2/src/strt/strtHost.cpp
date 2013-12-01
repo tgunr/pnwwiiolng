@@ -489,6 +489,8 @@ const char* g_serverName = "stratd";
 int
 main(int argc, char* argv[])
 {
+	Teul::SetAppName(g_serverName);
+
 	Teul::ConfigVar::InitializeConfigVars();
 	serverEnableDebugWebServer(STRAT_HOST) ;
 	memInit() ;
@@ -497,7 +499,6 @@ main(int argc, char* argv[])
 
 	HostLanguage = cv_stratLanguage.GetString();
 
-	Teul::SetAppName(g_serverName) ;
 	if (teulInitTransport(LOG_TO_FILE, g_serverName, _cnvyErrorFunction) < 0)
 		LogAbort("Cannot initialize teulTransport");
 

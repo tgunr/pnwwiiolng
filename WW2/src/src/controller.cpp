@@ -491,6 +491,8 @@ int main(int argc, const char* argv[])
 {
 	g_argv0 = argv[0];
 
+	Teul::SetAppName(g_serverName);
+
 	// Check arguments.
 	_processArguments(argc, argv);
 
@@ -501,7 +503,6 @@ int main(int argc, const char* argv[])
 		LogAbort("environment.cfg could not be found - generated new one, please edit it.");
 	}
 
-	Teul::SetAppName(g_serverName);
 	if (teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction) < 0)
 		LogAbort("Failed to initialize cluster boss");
 

@@ -107,27 +107,21 @@ UINT32 myMaxUsers;
 
 UINT32 hostAddress = 0;
 
-static SINT32 _userConnections = 0;
+static SINT32 s_userConnections = 0;
 
-UINT32 mmStratInternalAddress = 0;
-static SINT32 _stratIndex = -1;
-static LOGICAL _stratOpen = FALSE;
-static LOGICAL _stratError = FALSE;
-
-static SINT32 _chatClientPort = 0;
-
-static bool _chatReady = false;
+static SINT32 s_chatClientPort = 0;
+static bool s_chatReady = false;
 
 CPStruct* mapCPList;
 
-// These are fetched from the enviroment
+// These are fetched from the environment
 // which needs to set in a shell . file
 
-static UINT32	_authHost = 0;
-static UINT32	_stratHost = 0;
-static UINT32 _chatClientHost = 0;
+static UINT32 s_authHost = 0;
+static UINT32 s_stratHost = 0;
+static UINT32 s_chatClientHost = 0;
 
-static bool _stratReady = false;
+static bool s_stratReady = false;
 bool g_initialized = false;
 
 SortieManager g_sortieReturns("`spawn_time` = IF(`spawn_time` IS NULL,added,NOW()),`return_time` = NOW()", "`return_time` IS NULL");
@@ -280,7 +274,7 @@ Player::mirrorToChat()
 	server->mirrorPlayer(mirror);
 
 	///TODO:PERSIST: This should use Teul::ConnectionInstruction instead :/
-	chatSendServerInfo(teulIndex(), OTP(), _chatClientHost, _chatClientPort);
+	chatSendServerInfo(teulIndex(), OTP(), s_chatClientHost, s_chatClientPort);
 
 	return true;
 }
@@ -356,11 +350,11 @@ _playerActivate(SINT32 teulIndex, PlayerStatusNode* psn)
 static void
 _acceptUserConnection(ENDPOINT& endpoint)
 {
-	_userConnections++;
+	s_userConnections++;
 
 	dbugLog(_FLN,"t:%d connection opened from %s on local port %d; connections: %d"
 				, endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), endpoint.fromPort()
-				, _userConnections
+				, s_userConnections
 				);
 }
 
@@ -400,14 +394,14 @@ _stratErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 size, cons
 	{
 		//oh crap, the strat system dropped.  free the CGM list
 		dbugLog(_FLW, "t:%d strat system went away", teulIndex);
-		_stratIndex = -1;
+		s_stratIndex = -1;
 	}
 	else
 	{
 		dbugLog(_FLA,"t:%d strat error: %d", teulIndex, error );
 	}
 
-	_stratError = TRUE;
+	s_stratError = true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -461,7 +455,7 @@ _sendAuthHostStats()
 		lastCapReported = myMaxUsers;
 	}
 
-	if ( _stratReady == false || Server::ServerInfo::IsAvailable(STRAT_HOST) == false )
+	if ( s_stratReady == false || Server::ServerInfo::IsAvailable(STRAT_HOST) == false )
 	{
 		_zeroUserCapacity("No strat host available");
 		host_config.arena.lock = ~0;
@@ -506,15 +500,15 @@ _errorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEU
 		Player* player = PlayerInterface::Lookup(teulIndex);
 		if ( player != NULL)
 		{
-			--_userConnections;
+			--s_userConnections;
 			dbugLog(_FLI, "t:%d p:%u c:%s connection closed %d connections remaining"
-							, teulIndex, player->playerID(), player->callsign(), _userConnections);
+							, teulIndex, player->playerID(), player->callsign(), s_userConnections);
 			player->Release(teulIndex, Server::RELEASE_ECONN);
 			player->setDisconnected();
 		}
 		else
 		{
-			dbugLog(_FLD, "t:%d non-player connection closed %d connections remaining", teulIndex, _userConnections);
+			dbugLog(_FLD, "t:%d non-player connection closed %d connections remaining", teulIndex, s_userConnections);
 		}
 	}
 	else if ( error == ETEUL_ILLEGAL_TICKS )
@@ -539,53 +533,47 @@ static void
 _stratConnectionOpen(ENDPOINT& endpoint)
 {
 	dbugLog(_FLN,"t:%d strat connection opened %s", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()));
-	_stratOpen = TRUE;
+	s_stratOpen = true;
 }
 
 static void
 _connectToStrat()
 {
-	//Initialize
-	if ( _stratIndex >= 0 )
-	{
-		teulClose(_stratIndex, Teul::Closing::StratSrvRcn);
-	}
-
-	_stratIndex = -1;
-	_stratHost = 0;
-	_stratError = FALSE;
+	s_stratIndex = -1;
+	s_stratHost = 0;
+	s_stratError = false;
 
 	dbugLog(_FLN,"waiting for strat server");
 
 	//Get the address
-	while ( !_stratReady || _stratHost == 0 )
+	while ( !s_stratReady || s_stratHost == 0 )
 	{
 		teulUpdateTransport(25);
-		if ( _stratReady )
+		if ( s_stratReady )
 		{
 			const Server::ServerInfo* const server = Server::ServerInfo::GetBest(STRAT_HOST, true);
 			if (server != NULL)
 			{
-				_stratHost = Server::BroadcastMaskAddress(server->stats.address);
+				s_stratHost = Server::BroadcastMaskAddress(server->stats.address);
 			}
 		}
 	}
 
-	dbugLog(_FLN,"strat server found at %s",teulGetAddress(_stratHost));
+	dbugLog(_FLN,"strat server found at %s", teulGetAddress(s_stratHost));
 
-	_stratIndex = teulOpenSend(_stratHost, WWII::Net::Ports::InternalStrat, _stratConnectionOpen, 20000, PROTOCOL_TCP, _stratErrorFunction);
-	if ( _stratIndex < 0 )
-		LogAbort("open to strat host failed: %d", _stratIndex);
+	s_stratIndex = teulOpenSend(s_stratHost, WWII::Net::Ports::InternalStrat, _stratConnectionOpen, 20000, PROTOCOL_TCP, _stratErrorFunction);
+	if ( s_stratIndex < 0 )
+		LogAbort("open to strat host failed: %d", s_stratIndex);
 
-	while ( !_stratOpen && !_stratError )
+	while ( !s_stratOpen && !s_stratError )
 	{
 		teulUpdateTransport(10);
 	}
 
-	if ( _stratError )
-		LogAbort("unable to open strat connection, got error %d", _stratError);
+	if ( s_stratError )
+		LogAbort("unable to open strat connection, got error %d", s_stratError);
 
-	dbugLog(_FLN, "t:%d opened strat connection", _stratIndex);
+	dbugLog(_FLN, "t:%d opened strat connection", s_stratIndex);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -595,23 +583,23 @@ static bool
 _checkChatMaster()
 {
 	Server::ServerInfo* server = Server::ServerInfo::GetBest(CHAT_HOST, true);
-	if ( server == NULL )
+	if ( server == nullptr )
 	{
-		_chatReady = false;
+		s_chatReady = false;
 		return false;
 	}
 
-	if ( _chatClientHost != server->stats.address )
+	if ( s_chatClientHost != server->stats.address )
 	{
-		_chatClientHost = server->stats.address;
-		_chatClientPort = server->stats.port;
+		s_chatClientHost = server->stats.address;
+		s_chatClientPort = server->stats.port;
 
-		dbugLog(_FLN,"Chat host master at %s", teulGetAddress(_chatClientHost));
+		dbugLog(_FLN,"Chat host master at %s", teulGetAddress(s_chatClientHost));
 	}
 
-	if ( !_chatReady )
+	if ( !s_chatReady )
 	{
-		_chatReady = true;
+		s_chatReady = true;
 		missAnnounceMissionsToChat();
 	}
 
@@ -688,7 +676,7 @@ _handleSIGUSR1(SINT32 k)
 SINT32
 mapGetStratIndex(void)
 {
-	return _stratIndex;
+	return s_stratIndex;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -715,7 +703,7 @@ _checkStratMaster()
 	Server::ServerInfo* server = Server::ServerInfo::GetBest(STRAT_HOST, true);
 	if (server != NULL)
 	{
-		_stratHost = server->stats.address;
+		s_stratHost = server->stats.address;
 	}
 }
 
@@ -741,7 +729,7 @@ _serverEnterCallback(Server::ServerInfo* server, Server::Code scode)
 	if ( server->stats.type == STRAT_HOST && server->stats.status == Server::SERVER_ACCEPTING )
 	{
 		dbugLog(_FLI, "strat server is accepting");
-		_stratReady = true;
+		s_stratReady = true;
 	}
 
 	_sendAuthHostStats();
@@ -773,7 +761,7 @@ _serverLeaveCallback(Server::ServerInfo* server, Server::Code scode)
 		//Kill all the computer generated missions
 		//	missionBlowAwayComputerMissions();
 
-		_stratReady = false;
+		s_stratReady = false;
 		host_config.arena.lock = ~0;
 
 		chatSendBroadcastAll(LSTR_WARNING, LSTR_GENERIC, "[X] Server Locked: Strat system unavailable. [X]");
@@ -802,12 +790,12 @@ _serverStatusCallback(Server::ServerInfo* server, Server::Code scode)
 	{
 		if ( server->stats.status == Server::SERVER_ACCEPTING )
 		{
-			if ( _stratReady == false )
+			if ( s_stratReady == false )
 				dbugLog(_FLI, "strat server is now accepting");
-			_stratReady = true;
+			s_stratReady = true;
 		}
 		else
-			_stratReady = false;
+			s_stratReady = false;
 	}
 
 	_sendAuthHostStats();
@@ -1080,13 +1068,12 @@ main(int argc, char* argv[])
 		exit(0);
 	}
 
+	Teul::SetAppName("mmhostd");
 	Teul::ConfigVar::InitializeConfigVars();
 	serverEnableDebugWebServer(MAP_HOST);
 	memInit();
 
 	ABORT_IF(cv_appID.GetUint32() == 0 || cv_appID.GetUint32() > 255);
-
-	SINT32 retval=0;
 
 //	EF_ALLOW_MALLOC_0 = 1;
 //	EF_PROTECT_FREE = 1;
@@ -1102,7 +1089,6 @@ main(int argc, char* argv[])
 
 	HostLanguage = cv_stratLanguage.GetString();
 	//Open transport for logging
-	Teul::SetAppName("mmhostd");
 	if ( teulInitTransport(LOG_TO_FILE, "mmhostd", _errorFunction) < 0 )
 		LogAbort("Cannot initialize teulTransport");
 
@@ -1112,7 +1098,7 @@ main(int argc, char* argv[])
 
 	serverInitAddresses();
 
-	_authHost = serverGetAuthIP();
+	s_authHost = serverGetAuthIP();
 	myMaxUsers = serverGetMaxClusterUsers();
 
 	wwiiIRCInitialize(Server::localHost, false);
@@ -1134,10 +1120,10 @@ main(int argc, char* argv[])
 	mapPlayerInit();
 
 	dbugLog(_FLI, "Initializing auth");
-	retval = authGameInit(
+	SINT32 retval = authGameInit(
 					Server::localHost
 					, WWII::Net::Ports::MapHost
-					, _authHost
+					, s_authHost
 					, WWII::Net::Ports::InternalAuth
 					, g_appID
 					, HOST_VERSION
@@ -1156,7 +1142,7 @@ main(int argc, char* argv[])
 	//set things up
 	missInit();
 
-	//initalize time system
+	//initialize time system
 	wthrInitTime();
 
 	if (!(mapInitDB() && strtInitDB()))
@@ -1194,7 +1180,7 @@ main(int argc, char* argv[])
 	_connectToChat();
 	_connectToStrat();
 
-	dbugLog(_FLN,"listening for clients on TCP port %d",WWII::Net::Ports::MapHost);
+	dbugLog(_FLN,"listening for clients on TCP port %d", WWII::Net::Ports::MapHost);
 
 	mapInitMapData();
 
@@ -1207,7 +1193,7 @@ main(int argc, char* argv[])
 
 	mapThreadsEnable();
 
-	dbugLog(_FLI, "connecting to authhost @ %s", teulGetAddress(_authHost));
+	dbugLog(_FLI, "connecting to authhost @ %s", teulGetAddress(s_authHost));
 	//register our ip and the port we're listening on
 
 	teulUpdateTransport(50);
@@ -1232,18 +1218,18 @@ main(int argc, char* argv[])
 	TeulTimeMS nextHousekeeping = teulClock64 + 1000;
 	Teul::housekeeper cpEventsHousekeeper(Strat::Events::Publish, 100);
 
-	while(TRUE)
+	while (true)
 	{
 		teulUpdateTransport(50);
 
 		// Make sure we're talking to the strat host
-		if ( _stratIndex == -1 )
+		if ( s_stratIndex == -1 )
 		{
 			_connectToStrat();
 			continue;
 		}
 
-		// Return to "accepting" status if neccessary
+		// Return to "accepting" status if necessary
 		_checkAcceptingStatus();
 
 		threadsLogging();
