@@ -522,17 +522,16 @@ void
 chatSendBrigadeMove(const ChatHandle& byPlayer, bool isGM, UINT32 brigadeID, const FULL_OBJ_ID& fid, bool isActionable)
 {
 	ENDPOINT* stratEndpoint = serverPeerEndpointByType(STRAT_HOST);
-	if ( stratEndpoint == nullptr )
-		return;
+	if (PN_LIKELY(stratEndpoint != nullptr)) {
+		BRIGADE_MOVE_MSG outgoing(byPlayer, isGM, BRIGADE_MOVE_MSG::EXCHANGE);
 
-	BRIGADE_MOVE_MSG outgoing(byPlayer, isGM, BRIGADE_MOVE_MSG::EXCHANGE) ;
+		outgoing.data().m_action = BMR_APPROVED;
+		outgoing.data().m_brigadeID = brigadeID;
+		outgoing.data().m_destination = fid;
+		outgoing.data().m_actionable = isActionable;
 
-	outgoing.data().m_action = BMR_APPROVED ;
-	outgoing.data().m_brigadeID = brigadeID ;
-	outgoing.data().m_destination = fid ;
-	outgoing.data().m_actionable = isActionable ;
-
-	outgoing.send(*stratEndpoint, BRIGADE_MOVE_MSG::EXCHANGE);
+		outgoing.send(*stratEndpoint, BRIGADE_MOVE_MSG::EXCHANGE);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////
