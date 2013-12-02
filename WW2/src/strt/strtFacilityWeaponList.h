@@ -35,7 +35,6 @@ FacilityWeaponList::_WRONG_OWNER		Owned by an ally, but not your country
 FacilityWeaponList::_WRONG_SUPPLY		Nobody can spawn here, same-side diff-country owner of supply source
 FacilityWeaponList::_SUPPLY_CLOSED		"Supplying armybase is closed"
 FacilityWeaponList::_NOT_LINKED			Supplying armybase does not match your country [shouldn't happen]
-FacilityWeaponList::_DEP_UNLINKED		"This depot isn't linked to anything"
 FacilityWeaponList::_EMPTY				Nothing here
 FacilityWeaponList::_ENEMY_CONTROLS_CP	"Enemy controls this CP"
 FacilityWeaponList::_BDE_DISABLED		Supplying HC Unit is disabled.
