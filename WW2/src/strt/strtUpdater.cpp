@@ -45,7 +45,7 @@
 
 #define DEF_ERR_FLAGS 0
 
-std::vector<DAMAGE_QUEUE_ENTRY> damageQueue ;
+std::vector<DAMAGE_QUEUE_ENTRY> damageQueue;
 CPStruct* _cpList;
 
 UINT32 _stratUpdateWait = 1000 / STRAT_SYNC_FREQUENCY;
@@ -56,45 +56,45 @@ static void
 _flushDamageQueue(void)
 {
 	if ( damageQueue.empty() )
-		return ;
+		return;
 
-	const size_t dataSize = damageQueue.size() * sizeof(decltype(damageQueue[0])) ;
-	Teul::Packet outgoing(dataSize, Strat::CallbackX, STRT_SYNC_DAMAGE_LIST_Y) ;
-	outgoing.setUnencrypted() ;
-	outgoing.append(&damageQueue[0], dataSize) ;
+	const size_t dataSize = damageQueue.size() * sizeof(decltype(damageQueue[0]));
+	Teul::Packet outgoing(dataSize, Strat::CallbackX, STRT_SYNC_DAMAGE_LIST_Y);
+	outgoing.setUnencrypted();
+	outgoing.append(&damageQueue[0], dataSize);
 
 	serverSendPacketToType(outgoing, STRAT_HOST);
 
-	damageQueue.clear() ;
+	damageQueue.clear();
 }
 
 void
 strtUpdaterInit()
 {
-	damageQueue.reserve(256) ;
+	damageQueue.reserve(256);
 
 	//Initialize the strat system
-	_cpList = strtImportStratData() ;
+	_cpList = strtImportStratData();
 
 	strtFakeBridges(_cpList);
 
-	strtReportDataErrors() ;
+	strtReportDataErrors();
 }
 
 DAMAGE_QUEUE_ENTRY&
 _getDamageQueueEntry(const UINT64& objectKey, const WEAPON_SERIAL& weapon, const UINT32 playerID)
 {
-	const size_t entries = damageQueue.size() ;
-	for ( size_t i = 0 ; i < entries ; ++i )
+	const size_t entries = damageQueue.size();
+	for ( size_t i = 0; i < entries; ++i )
 	{
-		DAMAGE_QUEUE_ENTRY& entry = damageQueue[i] ;
+		DAMAGE_QUEUE_ENTRY& entry = damageQueue[i];
 		if ( (entry.objectKey == objectKey) & (entry.weapon.serial == weapon.serial) & (entry.playerID == playerID) )
-			return entry ;
+			return entry;
 	}
 
-	damageQueue.push_back(DAMAGE_QUEUE_ENTRY(objectKey, weapon, playerID)) ;
+	damageQueue.push_back(DAMAGE_QUEUE_ENTRY(objectKey, weapon, playerID));
 
-	return damageQueue.back() ;
+	return damageQueue.back();
 }
 
 void
@@ -110,43 +110,43 @@ strtAccumulateDamageMessage(const FULL_OBJ_ID& object, const SINT64& damageJoule
 	}
 
 	//Generate its object ID
-	const UINT64 objectKey = object.Key() ;
+	const UINT64 objectKey = object.Key();
 
 	//Since we've found it, we need to add it to our outgoing queue
-	DAMAGE_QUEUE_ENTRY& damageEntry = _getDamageQueueEntry(objectKey, serial, playerID) ;
+	DAMAGE_QUEUE_ENTRY& damageEntry = _getDamageQueueEntry(objectKey, serial, playerID);
 
 	// Do the signs differ?
-	const SINT64 newDamage = damageEntry.damageJoules + damageJoules ;
+	const SINT64 newDamage = damageEntry.damageJoules + damageJoules;
 	if ( damageEntry.damageJoules > 0 )
 	{
 		if (damageJoules < 0 )
 		{
-			dbugLog(_FLD, "p:%u v:%u obj:%d,%d.%u ignoring repairs over damage", playerID, serial.serial, object.cell.ox, object.cell.oy, object.id) ;
-			return ;
+			dbugLog(_FLD, "p:%u v:%u obj:%d,%d.%u ignoring repairs over damage", playerID, serial.serial, object.cell.ox, object.cell.oy, object.id);
+			return;
 		}
 		if ( newDamage < damageJoules )
 		{
-			dbugLog(_FLD, "p:%u v:%u obj:%d,%d.%u ignoring %lld joules damage - would wrap", playerID, serial.serial, object.cell.ox, object.cell.oy, object.id, damageJoules) ;
-			return ;
+			dbugLog(_FLD, "p:%u v:%u obj:%d,%d.%u ignoring %lld joules damage - would wrap", playerID, serial.serial, object.cell.ox, object.cell.oy, object.id, damageJoules);
+			return;
 		}
-		damageEntry.damageJoules = newDamage ;
+		damageEntry.damageJoules = newDamage;
 	}
 	else if ( damageEntry.damageJoules < 0 )
 	{
 		if ( damageJoules > 0 )
 		{
-			dbugLog(_FLD, "p:%u v:%u obj:%d,%d.%u overriding repairs with damage", playerID ,serial.serial, object.cell.ox, object.cell.oy, object.id) ;
-			damageEntry.damageJoules = damageJoules ;
+			dbugLog(_FLD, "p:%u v:%u obj:%d,%d.%u overriding repairs with damage", playerID ,serial.serial, object.cell.ox, object.cell.oy, object.id);
+			damageEntry.damageJoules = damageJoules;
 		}
 		else
 		{
-			dbugLog(_FLD, "p:%u v:%u obj:%d,%d.%u discarding overlapping repairs", playerID ,serial.serial, object.cell.ox, object.cell.oy, object.id) ;
-			return ;
+			dbugLog(_FLD, "p:%u v:%u obj:%d,%d.%u discarding overlapping repairs", playerID ,serial.serial, object.cell.ox, object.cell.oy, object.id);
+			return;
 		}
 	}
 	else
 	{
-		damageEntry.damageJoules = newDamage ;
+		damageEntry.damageJoules = newDamage;
 	}
 
 	if ( damageQueue.size() >= MAX_DAMAGE_ENTRIES_PER_MESSAGE )
@@ -159,10 +159,10 @@ strtAccumulateDamageMessage(const FULL_OBJ_ID& object, const SINT64& damageJoule
 void
 strtUpdaterProcessEvents()
 {
-	static TeulTimeMS nextDamageFlush = 0ULL ;
+	static TeulTimeMS nextDamageFlush = 0ULL;
 	if ( teulClock64 < nextDamageFlush )
-		return ;
-	nextDamageFlush = teulClock64 + 100 ;
+		return;
+	nextDamageFlush = teulClock64 + 100;
 
 	_flushDamageQueue();
 }

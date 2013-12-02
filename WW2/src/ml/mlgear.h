@@ -134,7 +134,7 @@ struct mlGearComponentData
 
 	FLOAT64VECTOR LastNormalVel;
 
-} ;
+};
 
 
 extern UINT32 mlgearSetComponentSubtype(void*  SpecialData, char * SubType);

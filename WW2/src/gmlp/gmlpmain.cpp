@@ -620,7 +620,7 @@ UINT32	cUsed, cUnused;
 	return 0;
 }
 
-//extern void mapProcessSuperCellVislevels() ;
+//extern void mapProcessSuperCellVislevels();
 
 // initializes stuff for the main update loop
 void _UpdateInit(void)

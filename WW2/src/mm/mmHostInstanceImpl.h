@@ -17,7 +17,7 @@ namespace Instance
 		//! @brief Allocate mmhost-specific impl instance.
 	public: static HostInstanceImpl* Factory(Instance::HostInstance& _inst)
 			{
-				return new MMHostInstanceImpl(_inst) ;
+				return new MMHostInstanceImpl(_inst);
 			}
 
 		//! @brief Constructor.
@@ -26,11 +26,11 @@ namespace Instance
 	public:	virtual ~MMHostInstanceImpl() {}
 
 		//! @brief Handle construction: create missions.
-	public: virtual void PostConstructionHandler() ;
+	public: virtual void PostConstructionHandler();
 
 		//! @brief Handle destruction:
-	public: virtual void PreDestructionHandler() ;
-	} ;
+	public: virtual void PreDestructionHandler();
+	};
 
 } // namespace
 

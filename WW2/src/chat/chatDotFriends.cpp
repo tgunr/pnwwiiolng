@@ -24,22 +24,22 @@ public:
 								) { }
 
 public:
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const { chatFriendsList(player) ; }
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const { chatFriendsList(player); }
 
 	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
 	{
-		static ARGV args ;
+		static ARGV args;
 
-		vectorize(arguments, args, 11) ;
+		vectorize(arguments, args, 11);
 
 		// Request for assistance
 		if ( args.size() < 1 || strcasecmp(args[0], "help") == 0 )
 		{
-			help(player) ;
-			return ;
+			help(player);
+			return;
 		}
 
-		chatModifySocialList(player, args, false) ;
+		chatModifySocialList(player, args, false);
 	}
-} dotFriends ;
+} dotFriends;
 

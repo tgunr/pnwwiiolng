@@ -203,11 +203,11 @@ const BASE_ARG_TYPES* specAllow;
 SINT32 i;
 
 	if ( spec == T_STRING )
-		return TRUE ;
+		return TRUE;
 
 	specAllow = baseAllow[spec];
 
-	for ( i = 0; specAllow[i] != 0 ; i++)
+	for ( i = 0; specAllow[i] != 0; i++)
 	{
 		if (specAllow[i] == arg)
 			return (TRUE);
@@ -261,7 +261,7 @@ ARG_KEY* argKey, *fargs, *defs;
 	nargs = argList->numArgs - offset;
 
 	// fill out the fargs array
-	for (i=0 ; i < nargs ; i++)
+	for (i=0; i < nargs; i++)
 	{
 		argKey = parseGetArgKey((UCHAR*)argList->arg[i+offset]);
 
@@ -278,13 +278,13 @@ ARG_KEY* argKey, *fargs, *defs;
 
 	if (defaultList->numKeys > 0 && nargs < defaultList->numKeys)
 	{
-		for ( i=nargs ; i < defaultList->numKeys ; i++ )
+		for ( i=nargs; i < defaultList->numKeys; i++ )
 			fargs[i] = defs[i];
 	}
 
 	nargs = (nargs > defaultList->numKeys) ? nargs : defaultList->numKeys;
 
-	for (i=nargs ; i < MAX_ARGS ; i++)
+	for (i=nargs; i < MAX_ARGS; i++)
 	{
 		fargs[i].svalue = "\0";
 		fargs[i].dvalue = 0;
@@ -352,7 +352,7 @@ SINT32	len, retval;
 			if (len > 1)
 				return (et);
 			*((UCHAR * )target) = *arg;
-			target = (UCHAR*)target + 1 ;
+			target = (UCHAR*)target + 1;
 		default:
 			if (argKey->baseType == T_INT)
 			{
@@ -364,7 +364,7 @@ SINT32	len, retval;
 
 				// I know it doesn't look as efficient as target += blah,
 				// but the compiler will make it that way.
-				target = (UCHAR*)target + retval ;
+				target = (UCHAR*)target + retval;
 			}
 			else if (argKey->baseType == T_FLOAT)
 			{

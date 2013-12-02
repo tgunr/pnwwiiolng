@@ -22,31 +22,31 @@ struct WWII_ACTIVATE
 		, playerID(0)
 		, otp(0)
 	{
-		pkey[0] = 0 ;
+		pkey[0] = 0;
 	}
 
 	SERVER_TYPE	serverType;
 	UINT16		port;
 	UINT32		hostIP;
-	UINT32		hostTime ;
-	UINT16		teulIndex ;
-	playerid_t	playerID ;
-	UINT32		otp ;
+	UINT32		hostTime;
+	UINT16		teulIndex;
+	playerid_t	playerID;
+	UINT32		otp;
 	UCHAR		pkey[80];
 
 	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a)
 	{
-		a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)(&serverType), 8) ;
-		a->packer(mode, port) ;
-		a->packer(mode, hostIP) ;
-		a->packer(mode, hostTime) ;
-		a->packer(mode, teulIndex) ;
-		a->packer(mode, playerID) ;
-		a->packer(mode, otp) ;
+		a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)(&serverType), 8);
+		a->packer(mode, port);
+		a->packer(mode, hostIP);
+		a->packer(mode, hostTime);
+		a->packer(mode, teulIndex);
+		a->packer(mode, playerID);
+		a->packer(mode, otp);
 
 		if ( teulIndex != 0 && playerID != 0 )
-			a->offset = teulPackVoid(mode, a->packed, a->offset, pkey, sizeof(pkey)) ;
+			a->offset = teulPackVoid(mode, a->packed, a->offset, pkey, sizeof(pkey));
 
 		return a->offset;
 	}
-} ;
+};

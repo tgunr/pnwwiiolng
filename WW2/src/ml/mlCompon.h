@@ -95,20 +95,20 @@ struct mlComponent
 
 	LOGICAL isPak38_6lb_57mm;
 
-} ;
+};
 
 struct mlComponentList
 {
 	UINT32 NumComponents;
 	mlComponent* Components;
-} ;
+};
 
 struct mlComponentListIterator
 {
 	mlComponentList const* List;
 	int idx;
 	mlComponent* comp;
-} ;
+};
 
 typedef std::vector<mlComponent*> mlComponentVector;
 

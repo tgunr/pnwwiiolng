@@ -13,7 +13,7 @@
 
 namespace Auth
 {
-	enum { CallbackX = 250 } ;
+	enum { CallbackX = 250 };
 }
 
 //Once again, we pick a high number that hopefully isn't taken by someone

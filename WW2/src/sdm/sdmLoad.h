@@ -5,8 +5,8 @@
 //
 // Originating Programmer: Eric "Meat" Hall
 
-extern void dbseLoadIndexes(void) ;
-extern void dbseSaveIndexChanges(void) ;
+extern void dbseLoadIndexes(void);
+extern void dbseSaveIndexChanges(void);
 
 extern SINT32 dbseInitStratLoader();
 

@@ -1869,7 +1869,7 @@ piVECTOR const*		pv1, *pv2, *pv3;
 	td = trndtl;
 
 
-	for (l=0 ; l < NUM_TERRAIN_RECTANGLES && *NumCollisionSlotsLeft > 0 ; l++, td++)
+	for (l=0; l < NUM_TERRAIN_RECTANGLES && *NumCollisionSlotsLeft > 0; l++, td++)
 	{
 		lpobj = td->terrain;
 		if (lpobj == NULL)
@@ -1877,7 +1877,7 @@ piVECTOR const*		pv1, *pv2, *pv3;
 			continue;
 		}
 
-		for (m=0 ; m < MAX_TERRAIN_TEXTURES && *NumCollisionSlotsLeft > 0 ; lpobj=td->nonreplacementtiles[m++])
+		for (m=0; m < MAX_TERRAIN_TEXTURES && *NumCollisionSlotsLeft > 0; lpobj=td->nonreplacementtiles[m++])
 		{
 			if (lpobj == NULL)
 			{
@@ -1951,7 +1951,7 @@ piVECTOR const*		pv1, *pv2, *pv3;
 
 			numoctets = numtris / NUM_TRIANGLES_PER_OCTET;
 
-			for (i=0 ; i < numoctets && *NumCollisionSlotsLeft > 0; i++)
+			for (i=0; i < numoctets && *NumCollisionSlotsLeft > 0; i++)
 			{
 				pv1 = &objPos[i*NUM_VERTICES_PER_OCTET+1];
 				pv2 = &objPos[i*NUM_VERTICES_PER_OCTET+5];
@@ -1989,7 +1989,7 @@ piVECTOR const*		pv1, *pv2, *pv3;
 				}
 
 
-				for (j=0 ; j < NUM_TRIANGLES_PER_OCTET && *NumCollisionSlotsLeft > 0 ; j++, pt++, /*pn++, pcn+=3,*/ tripos++)
+				for (j=0; j < NUM_TRIANGLES_PER_OCTET && *NumCollisionSlotsLeft > 0; j++, pt++, /*pn++, pcn+=3,*/ tripos++)
 				{
 					if (pt->v1 == pt->v2 && pt->v2 == pt->v3)
 					{
@@ -2165,7 +2165,7 @@ piMATRIX		InvMat;
 
 	eps = 10.0f;
 	numoctets = numtris / NUM_TRIANGLES_PER_OCTET;
-	for (i=0 ; i < numoctets && !retval ; i++)
+	for (i=0; i < numoctets && !retval; i++)
 	{
 		pv1 = &objPos[i*NUM_VERTICES_PER_OCTET+1];
 		pv2 = &objPos[i*NUM_VERTICES_PER_OCTET+5];
@@ -2206,7 +2206,7 @@ piMATRIX		InvMat;
 			continue;
 		}
 
-		for (j=0 ; j < NUM_TRIANGLES_PER_OCTET ; j++, pt++, pn++, pcn+=3)
+		for (j=0; j < NUM_TRIANGLES_PER_OCTET; j++, pt++, pn++, pcn+=3)
 		{
 			// if the polygon normal is facing away, skip the tests
 			d = math3dDotProduct(&dir, pn);
@@ -2377,7 +2377,7 @@ UINT32 TriNum;
 	dir.y = 0.0f;
 	eps = 10.0f;
 
-	for (i=0 ; i < NUM_TERRAIN_RECTANGLES ; i++)
+	for (i=0; i < NUM_TERRAIN_RECTANGLES; i++)
 	{
 		td = &(trndtl[i]);
 
@@ -2797,7 +2797,7 @@ SINT32			texid;
 
 //	texid = piGetNamedTexture("null1.bmp");
 	texid = _NullTexId;
-	for (l=0 ; l < NUM_TERRAIN_RECTANGLES && !retval ; l++, td++)
+	for (l=0; l < NUM_TERRAIN_RECTANGLES && !retval; l++, td++)
 	{
 		lpobj = td->terrain;
 		if (lpobj == NULL)
@@ -2805,7 +2805,7 @@ SINT32			texid;
 			continue;
 		}
 
-		for (m=0 ; m < MAX_TERRAIN_TEXTURES && !retval ; lpobj=td->nonreplacementtiles[m++])
+		for (m=0; m < MAX_TERRAIN_TEXTURES && !retval; lpobj=td->nonreplacementtiles[m++])
 		{
 			if (lpobj == NULL)
 			{
@@ -2873,7 +2873,7 @@ SINT32			texid;
 			{
 				piVectorConstPtr objPos = lpobj->RenderPositions();
 				numverts  = lpobj->numverts;
-				for (i=0 ; i < numverts ; i++, ++objPos)
+				for (i=0; i < numverts; i++, ++objPos)
 				{
 					math3dSubtractVectors(&vt, objPos.ptr, &op1);
 					dp = math3dDotProduct(&dir, &vt);
@@ -2887,13 +2887,13 @@ SINT32			texid;
 			else
 			{
 				lpcrnr = lpobj->bbox;
-				for (i=0 ; i < 2 && !indirection ; i++)
+				for (i=0; i < 2 && !indirection; i++)
 				{
 					vt.x = xc + lpcrnr[i].x;
-					for (j=0 ; j < 2 && !indirection ; j++)
+					for (j=0; j < 2 && !indirection; j++)
 					{
 						vt.y = yc + lpcrnr[j].y;
-						for (k=0 ; k < 2 ; k++)
+						for (k=0; k < 2; k++)
 						{
 							vt.z = zc + lpcrnr[k].z;
 							math3dSubtractVectors(&pv, &vt, &op1);
@@ -3052,7 +3052,7 @@ TERRAIN_DETAIL*	td;
 	yn1 = np->y;
 	zn1 = np->z;
 
-	for (l=0 ; l < NUM_TERRAIN_RECTANGLES ; l++, td++)
+	for (l=0; l < NUM_TERRAIN_RECTANGLES; l++, td++)
 	{
 		lpobj = td->terrainorig;
 		if (lpobj == NULL)
@@ -3110,7 +3110,7 @@ TERRAIN_DETAIL*	td;
 		{
 			piVectorConstPtr objPos = lpobj->RenderPositions();
 			numverts  = lpobj->numverts;
-			for (i=0 ; i < numverts ; i++, ++objPos)
+			for (i=0; i < numverts; i++, ++objPos)
 			{
 				math3dSubtractVectors(&vt, objPos.ptr, &op1);
 				dp = math3dDotProduct(&dir, &vt);
@@ -3124,13 +3124,13 @@ TERRAIN_DETAIL*	td;
 		else
 		{
 			lpcrnr = lpobj->bbox;
-			for (i=0 ; i < 2 && !indirection ; i++)
+			for (i=0; i < 2 && !indirection; i++)
 			{
 				vt.x = xc + lpcrnr[i].x;
-				for (j=0 ; j < 2 && !indirection ; j++)
+				for (j=0; j < 2 && !indirection; j++)
 				{
 					vt.y = yc + lpcrnr[j].y;
-					for (k=0 ; k < 2 ; k++)
+					for (k=0; k < 2; k++)
 					{
 						vt.z = zc + lpcrnr[k].z;
 						math3dSubtractVectors(&pv, &vt, &op1);
@@ -3406,7 +3406,7 @@ static int		  npolys=0;
 	lpcrnr  = lpobj->bbox;
 
 	eps = FLT_EPSILON * 16.0f;
-	for (i=0 ; i < numtris ; i++, pt++, pn++, pcn+=3)
+	for (i=0; i < numtris; i++, pt++, pn++, pcn+=3)
 	{
 		d = math3dDotProduct(&dir, pn);
 		if (d >= 0.0f)
@@ -3601,7 +3601,7 @@ piVECTOR		dir, vt, pv;
 		{
 			piVectorConstPtr objPos = lpobj->RenderPositions();
 			numverts  = lpobj->numverts;
-			for (i=0 ; i < numverts ; i++, ++objPos)
+			for (i=0; i < numverts; i++, ++objPos)
 			{
 				math3dAddVectors(&mvd, objPos.ptr, &pos);
 				math3dSubtractVectors(&vt, &mvd, op);
@@ -3616,13 +3616,13 @@ piVECTOR		dir, vt, pv;
 		else
 		{
 			lpcrnr = lpobj->bbox;
-			for (i=0 ; i < 2 && !indirection ; i++)
+			for (i=0; i < 2 && !indirection; i++)
 			{
 				vt.x = xc + lpcrnr[i].x;
-				for (j=0 ; j < 2 && !indirection ; j++)
+				for (j=0; j < 2 && !indirection; j++)
 				{
 					vt.y = yc + lpcrnr[j].y;
-					for (k=0 ; k < 2 ; k++)
+					for (k=0; k < 2; k++)
 					{
 						vt.z = zc + lpcrnr[k].z;
 						math3dSubtractVectors(&pv, &vt, op);
@@ -3799,9 +3799,9 @@ TERRAIN_DETAIL*	td = trndtl;
 		return(FALSE);
 	}
 
-	for (l=0 ; l < NUM_TERRAIN_RECTANGLES ; l++, td++)
+	for (l=0; l < NUM_TERRAIN_RECTANGLES; l++, td++)
 	{
-		for (obnum=0 ; obnum < td->tobndx ; obnum++)
+		for (obnum=0; obnum < td->tobndx; obnum++)
 		{
 			// could optimize this via some array or list of object names bypassing the
 			// iterate-through-each-object-in-database scan
@@ -5042,7 +5042,7 @@ FASTCOLLIDE* CollideList;
 
 	HasAlpha = piTextureHasAlpha(CurrentObject->texid);
 	CollideList = *CollisionList;
-	for (i=0 ; i < CurrentObject->numtris ; i++, CurrentTri++, pcn+=3, psn++)
+	for (i=0; i < CurrentObject->numtris; i++, CurrentTri++, pcn+=3, psn++)
 	{
 #ifdef TERRAIN_EDITOR
 		_CollisionTriCnt++;
@@ -5312,7 +5312,7 @@ piMATRIX	Mat1;
 					//math3dMatrixMultiplyOptimized(&Mat1,&ObjectAtt->mat,InvMat);
 					math3dMatrixMultiply(&Mat1,&ObjectAtt->mat,InvMat);
 					piVectorConstPtr objPos = ObjectAtt->RenderPositions();
-					for (i=0 ; i < ObjectAtt->numtris ; i++)
+					for (i=0; i < ObjectAtt->numtris; i++)
 					{
 
 						OldPnt = objPos[ObjectAtt->ptris[i].v2];
@@ -5422,7 +5422,7 @@ UINT32 trncdAdjustTerrainObjects(piVECTOR* CameraAdjustment)
 	// next line should be called from the function that calls this function
 	persAdjustExternalFixedCamera(CameraAdjustment);
 
-		for (TO = _TerrainObjectsHead.Next ; TO != NULL ; TO = TO->Next)
+		for (TO = _TerrainObjectsHead.Next; TO != NULL; TO = TO->Next)
 		{
 			if (TO->TerrainObject != NULL)
 			{
@@ -5464,7 +5464,7 @@ FLOAT32		Time;
 piVECTOR const*	pcn;
 piVECTOR const*	psn;
 
-	for (i=0 ; i < NumPolys ; i++)
+	for (i=0; i < NumPolys; i++)
 	{
 		CurrentObject = CollideObjectList[i];
 		CurrentPoly = PolyNumList[i];
@@ -5617,7 +5617,7 @@ static UINT32	_Count;
 
 	while (TO != NULL && (LODLimitPerFrame == FALSE || Count < 1000))
 	{
-		for (i=0 ; i < TRN_MAX_LOD ; i++)
+		for (i=0; i < TRN_MAX_LOD; i++)
 		{
 			if (TO->LOD[i] == NULL)
 			{
@@ -5865,7 +5865,7 @@ UINT32 trnUpdateObjectStatus(SINT32 x, SINT32 y, UINT32 id, SINT32 country, SINT
 
 	Found = 0;
 
-	for (TO = _TerrainObjectsHead.Next ; TO != NULL ; TO = TO->Next)
+	for (TO = _TerrainObjectsHead.Next; TO != NULL; TO = TO->Next)
 	{
 		if (TO->StratSupercellX == x && TO->StratSupercellY == y &&
 			TO->StratId == id)
@@ -6487,7 +6487,7 @@ void trncdResetFXDamageFlags()
 
     while(TO != NULL && (LODLimitPerFrame == FALSE || Count < 1000))
 	{
-		for(i=0 ; i < TRN_MAX_LOD ; i++)
+		for(i=0; i < TRN_MAX_LOD; i++)
 		{
 			if(TO->LOD[i] == NULL)
 			{

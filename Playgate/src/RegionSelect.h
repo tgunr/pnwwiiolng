@@ -13,10 +13,10 @@ class CRegionSelect : public CBDialog
 public:
 	CRegionSelect(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CRegionSelect();
-	virtual UINT TitleLocID() const { return REGION_TITLE ; }
-	virtual UINT HintLocID() const { return REGION_HINT ; }
+	virtual UINT TitleLocID() const { return REGION_TITLE; }
+	virtual UINT HintLocID() const { return REGION_HINT; }
 
-	static bool ReadRegionsFile() ;
+	static bool ReadRegionsFile();
 
 // Dialog Data
 	enum { IDD = IDD_REGION_SELECT };
@@ -35,11 +35,11 @@ protected:
 	protected:
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CRegionSelect)
-	virtual BOOL OnInitDialog() ;
-	virtual void OnOK() ;
+	virtual BOOL OnInitDialog();
+	virtual void OnOK();
 	//}}AFX_VIRTUAL
 public:
 	afx_msg void OnBnClickedOk();
 };
 
-extern bool RegionSelect() ;
+extern bool RegionSelect();

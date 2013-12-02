@@ -30,16 +30,16 @@ struct BAN
 		{}
 	~BAN() {}
 
-	ChatHandle	m_handle ;
-	UINT32		m_duration ;
-	std::string	m_message ;
-	UINT32		m_issuer ;
-	ChatHandle	m_issuerHandle ;
-	UINT32		m_banNo ;
-	playerid_t	m_playerID ;
-} ;
-typedef ConditionQueue<BAN*> BAN_QUEUE ;
-BAN_QUEUE banQueue ;
+	ChatHandle	m_handle;
+	UINT32		m_duration;
+	std::string	m_message;
+	UINT32		m_issuer;
+	ChatHandle	m_issuerHandle;
+	UINT32		m_banNo;
+	playerid_t	m_playerID;
+};
+typedef ConditionQueue<BAN*> BAN_QUEUE;
+BAN_QUEUE banQueue;
 
 //////////////////////////////////////////////////////////////////////
 // Ban a player -- if player is not null then the player is notified
@@ -48,13 +48,13 @@ BAN_QUEUE banQueue ;
 void
 chatBanPlayer(const ChatHandle& handle, UINT32 duration, const char* message, UINT32 issuer, const ChatHandle& issuerHandle)
 {
-	banQueue.push_back(new BAN(handle, duration, message, issuer, issuerHandle)) ;
+	banQueue.push_back(new BAN(handle, duration, message, issuer, issuerHandle));
 }
 
 void
 chatForceKickPlayer(const ChatHandle& handle, const char* message, UINT32 issuer, const ChatHandle& issuerHandle)
 {
-	banQueue.push_back(new BAN(handle, 0, message, issuer, issuerHandle)) ;
+	banQueue.push_back(new BAN(handle, 0, message, issuer, issuerHandle));
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -62,17 +62,17 @@ chatForceKickPlayer(const ChatHandle& handle, const char* message, UINT32 issuer
 void
 _banFail(void* data)
 {
-	BAN* ban = (BAN*)data ;
+	BAN* ban = (BAN*)data;
 
 	// Tell the banner it failed
-	Player* player = PlayerInterface::Lookup(ban->m_issuerHandle) ;
+	Player* player = PlayerInterface::Lookup(ban->m_issuerHandle);
 	if ( player != NULL )
 	{
-		player->message(LSTR_CAUTION, LSTR_ERROR_VERB_SUBJECT, (ban->m_duration > 0) ? "ban" : "kick", chatGetCallsign(ban->m_handle)) ;
-		player->message(LSTR_CAUTION, LSTR_GENERIC, ban->m_message.c_str()) ;
+		player->message(LSTR_CAUTION, LSTR_ERROR_VERB_SUBJECT, (ban->m_duration > 0) ? "ban" : "kick", chatGetCallsign(ban->m_handle));
+		player->message(LSTR_CAUTION, LSTR_GENERIC, ban->m_message.c_str());
 	}
 
-	delete ban ;
+	delete ban;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -80,14 +80,14 @@ _banFail(void* data)
 void
 _banSuccess(void* data)
 {
-	BAN* const ban = (BAN*)data ;
-	Player* const issuer = PlayerInterface::Lookup(ban->m_issuerHandle) ;
+	BAN* const ban = (BAN*)data;
+	Player* const issuer = PlayerInterface::Lookup(ban->m_issuerHandle);
 	if ( issuer != NULL )
 	{
 		// Tell the issuer they were successful
-		const char* p ;
+		const char* p;
 		if ( ban->m_duration == 0 )
-			p = chatMakeTempString("%s has force-kicked %s: %s", issuer->callsign(), chatGetCallsign(ban->m_handle), ban->m_message.c_str()) ;
+			p = chatMakeTempString("%s has force-kicked %s: %s", issuer->callsign(), chatGetCallsign(ban->m_handle), ban->m_message.c_str());
 		else
 			p = chatMakeTempString("%s has issued a %s ban(#%u) on %s: %s"
 						, issuer->callsign()
@@ -95,24 +95,24 @@ _banSuccess(void* data)
 						, ban->m_banNo
 						, chatGetCallsign(ban->m_handle)
 						, ban->m_message.c_str()
-			) ;
-		chatDispatchGMMessage("INFO", p) ;
+			);
+		chatDispatchGMMessage("INFO", p);
 	}
 
 	if ( ban->m_duration == 0 )
 	{
-		betaLog(_FLI, "p:%u issuing smite on playerID", ban->m_playerID) ;
-		chatSmitePlayer(ban->m_playerID) ;
+		betaLog(_FLI, "p:%u issuing smite on playerID", ban->m_playerID);
+		chatSmitePlayer(ban->m_playerID);
 	}
 	else
 	{
 		// Tell the banee he's banned
-		Player* const player = PlayerInterface::Lookup(ban->m_handle) ;
+		Player* const player = PlayerInterface::Lookup(ban->m_handle);
 		if ( player != NULL )
-			player->message(LSTR_WARNING, LSTR_ACCOUNT_SUSPENDED_NOTICE, chatTimeInterval(ban->m_duration), ban->m_message.c_str()) ;
+			player->message(LSTR_WARNING, LSTR_ACCOUNT_SUSPENDED_NOTICE, chatTimeInterval(ban->m_duration), ban->m_message.c_str());
 	}
 
-	delete ban ;
+	delete ban;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -121,51 +121,51 @@ _banSuccess(void* data)
 static void
 _processBan(DB::handle_t* conn, BAN& ban)
 {
-	char* p = NULL ;
-	char callsign[MAX_HANDLE_SIZE] ;
-	chatGetCallsign(callsign, ban.m_handle) ;
+	char* p = NULL;
+	char callsign[MAX_HANDLE_SIZE];
+	chatGetCallsign(callsign, ban.m_handle);
 
 	try
 	{
-		mysql_ping(conn) ;
+		mysql_ping(conn);
 
-		threadLog(_FLN, "p:%u c:%s %s(%u) %s", ban.m_issuer, chatGetCallsign(ban.m_issuerHandle), (ban.m_duration > 0) ? "ban":"kick", ban.m_duration, callsign) ;
+		threadLog(_FLN, "p:%u c:%s %s(%u) %s", ban.m_issuer, chatGetCallsign(ban.m_issuerHandle), (ban.m_duration > 0) ? "ban":"kick", ban.m_duration, callsign);
 
-		std::string message(ban.m_message) ;
-		wwiiEscapeString(message) ;
+		std::string message(ban.m_message);
+		wwiiEscapeString(message);
 
 		// p_ban_player ( playerID, banFor, banBy, reason ) returns either
 		// 0, <reason>
 		// 1, <#bans>
-		static const char QRY_CALL_BAN_PLAYER[] = "CALL wwii.p_ban_player ('%s', %u, %u, '%s')" ;
+		static const char QRY_CALL_BAN_PLAYER[] = "CALL wwii.p_ban_player ('%s', %u, %u, '%s')";
 
-		p = threadsPrintf(QRY_CALL_BAN_PLAYER, callsign, ban.m_duration, ban.m_issuer, message.c_str()) ;
-		DBQuery q(conn, p) ;
+		p = threadsPrintf(QRY_CALL_BAN_PLAYER, callsign, ban.m_duration, ban.m_issuer, message.c_str());
+		DBQuery q(conn, p);
 
-		playerid_t playerID = 0 ;
+		playerid_t playerID = 0;
 		if ( q.HasRows() && q.FetchRow() )
-			playerID = q.Row().NextUInt() ;
+			playerID = q.Row().NextUInt();
 
 		if ( playerID == 0 )
-			throw std::domain_error(q.Row().NextString()) ;
+			throw std::domain_error(q.Row().NextString());
 
 		// If its positive, we have playerid, notes, warnings, bans
-		ban.m_playerID = playerID ;
-		ban.m_banNo = q.Row().NextUInt() ;
+		ban.m_playerID = playerID;
+		ban.m_banNo = q.Row().NextUInt();
 
-		threadCallback(_banSuccess, &ban) ;
+		threadCallback(_banSuccess, &ban);
 
-		threadLog(_FLN, "p:%u subj:%s %llu vs %llu issued %us ban", ban.m_issuer, callsign, ban.m_issuerHandle, ban.m_handle, ban.m_duration) ;
+		threadLog(_FLN, "p:%u subj:%s %llu vs %llu issued %us ban", ban.m_issuer, callsign, ban.m_issuerHandle, ban.m_handle, ban.m_duration);
 	}
 	catch (std::exception& e)
 	{
-		ban.m_message = e.what() ;
-		threadCallback(_banFail, &ban) ;
-		threadLog(_FLW, "p:%u subj:%s failed: %s", ban.m_issuer, callsign, e.what()) ;
+		ban.m_message = e.what();
+		threadCallback(_banFail, &ban);
+		threadLog(_FLW, "p:%u subj:%s failed: %s", ban.m_issuer, callsign, e.what());
 	}
 
 	if ( p )
-		threadsFreeText(p) ;
+		threadsFreeText(p);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -174,19 +174,19 @@ _processBan(DB::handle_t* conn, BAN& ban)
 void*
 chatBanQueueThread(void*)
 {
-	static DB::handle_t* conn = threadsOpenDBConnection(false) ;
+	static DB::handle_t* conn = threadsOpenDBConnection(false);
 	if ( conn == NULL )
 	{
-		threadLog(_FLA, "bqt: Unable to open database connection") ;
-		return NULL ;
+		threadLog(_FLA, "bqt: Unable to open database connection");
+		return NULL;
 	}
 
-	threadLog(_FLI, "Ban Queue Thread active") ;
+	threadLog(_FLI, "Ban Queue Thread active");
 
-	threadIgnoreSIGPIPE() ;
+	threadIgnoreSIGPIPE();
 
 	while ( 1 )
 	{
-		_processBan(conn, *banQueue.getNext()) ;
+		_processBan(conn, *banQueue.getNext());
 	}
 }

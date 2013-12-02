@@ -15,7 +15,7 @@ struct iacEntry
 	unsigned int iac;
 	const char* name;
 	int locID;
-} ;
+};
 
 static const iacEntry USKeyboardTable[] =
 {

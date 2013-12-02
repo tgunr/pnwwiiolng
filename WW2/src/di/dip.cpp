@@ -42,7 +42,7 @@ static LOGICAL FindDeviceType(UINT16 devtype, LPGUID* lpguid)
 {
 SINT32		i;
 
-	for (i=0 ; i < numdidi ; i++)
+	for (i=0; i < numdidi; i++)
 	{
 		if ((UINT16)didi[i].dwDevType == devtype)
 		{
@@ -175,7 +175,7 @@ void dipKillJoystick(void)
 {
 SINT32		i;
 
-	for (i=0 ; i < numjsd ; i++)
+	for (i=0; i < numjsd; i++)
 	{
 		KillJoystick(i);
 	}
@@ -237,7 +237,7 @@ void dipUnacquireJoystick(void)
 HRESULT	result;
 SINT32		i;
 
-	for (i=0 ; i < numjsd ; i++)
+	for (i=0; i < numjsd; i++)
 	{
 		if (lpjsd[i] != NULL)
 		{
@@ -310,7 +310,7 @@ LOGICAL	retval=TRUE;
 HRESULT	result;
 SINT32		i;
 
-	for (i=0 ; i < numjsd ; i++)
+	for (i=0; i < numjsd; i++)
 	{
 		if (lpjsd[i] != NULL)
 		{
@@ -813,7 +813,7 @@ SINT32				number;
 SINT32				i;
 
 	number = 0;
-	for (i=0 ; i < numdidi ; i++)
+	for (i=0; i < numdidi; i++)
 	{
 		if ((UINT8)didi[i].dwDevType == DI8DEVTYPE_JOYSTICK)
 		{
@@ -1048,7 +1048,7 @@ UINT32		numelements, numused, num, count;
 
 	numelements = *dwElements;
 	numused = 0;
-	for (i=0 ; i < numjsd ; i++)
+	for (i=0; i < numjsd; i++)
 	{
 		num = numelements - numused;
 		if (!GetJoystickData(i, &od[numused], &num))
@@ -1056,7 +1056,7 @@ UINT32		numelements, numused, num, count;
 			return(FALSE);
 		}
 
-		for (count=0 ; count < num ; count++, numused++)
+		for (count=0; count < num; count++, numused++)
 		{
 			od[numused].dwData = MAKELONG((UINT16)od[numused].dwData, i);
 		}

@@ -13,7 +13,7 @@
 // x column general category
 namespace Comm
 {
-	enum { CallbackX = 140 } ;
+	enum { CallbackX = 140 };
 }
 
 enum

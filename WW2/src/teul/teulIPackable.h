@@ -8,7 +8,7 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-struct ACTION_OBJECT ;
+struct ACTION_OBJECT;
 
 namespace Teul
 {
@@ -20,14 +20,14 @@ namespace Teul
 		{
 			Receive			// Equivalent to TEUL_UNPACK
 		,	Send			// Equivalent to TEUL_PACK
-		} ;
+		};
 
 		// Abstract class, so the compiler knows we don't need a vtable.
-		virtual ~IPackable() = 0 ;
+		virtual ~IPackable() = 0;
 
 		// Packer routine.
-		virtual void packer(Direction, ACTION_OBJECT* a) = 0 ;
-	} ;
+		virtual void packer(Direction, ACTION_OBJECT* a) = 0;
+	};
 
 } // namespace Teul
 

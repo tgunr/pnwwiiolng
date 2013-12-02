@@ -35,7 +35,7 @@ namespace WWII
 
 			,	InternalStrat = 6060				// Strat<->server interface
 			,	Dbse = 9000							// } Database proxy primary and
-			} ;
+			};
 		}
 	}
 }

@@ -27,16 +27,16 @@ TEUL_CALLBACK*	authAPP_VERIFY;
 TEUL_CALLBACK*	authDISPATCH;
 TEUL_CALLBACK*	authGAME_ACK;
 
-static TEUL_CALLBACK*	_APP_PLAYGATE_OK ;
-static TEUL_CALLBACK*	_XCHG_GAME_LIST ;
-static TEUL_CALLBACK*	_XCHG_GAME_LIST2 ;
-static TEUL_CALLBACK*	_XCHG_AUTH_LOGIN ;
-static TEUL_CALLBACK*	_SEND_QUEUE_POSITION ;
+static TEUL_CALLBACK*	_APP_PLAYGATE_OK;
+static TEUL_CALLBACK*	_XCHG_GAME_LIST;
+static TEUL_CALLBACK*	_XCHG_GAME_LIST2;
+static TEUL_CALLBACK*	_XCHG_AUTH_LOGIN;
+static TEUL_CALLBACK*	_SEND_QUEUE_POSITION;
 
 //Send Login Reply function
 static SINT32 _sendAPP_PLAYGATE_OK(ACTION_OBJECT* const a)
 {
-	return a->offset ;
+	return a->offset;
 }
 
 //Send Login Reply function
@@ -77,15 +77,15 @@ static SINT32 _recvARENA_REQ2(ACTION_OBJECT* const a)
 
 static SINT32 _recvAuthLoginRequest(ACTION_OBJECT* const a)
 {
-	Auth::LoginRequest request(a) ;
-	request.process(a->teulIndex) ;
-	return a->offset ;
+	Auth::LoginRequest request(a);
+	request.process(a->teulIndex);
+	return a->offset;
 }
 
 static SINT32 _sendAuthLoginReply(ACTION_OBJECT* const a)
 {
-	Auth::LoginReply* reply = (Auth::LoginReply*)(a->localRawData) ;
-	return reply->packer(TEUL_PACK, a) ;
+	Auth::LoginReply* reply = (Auth::LoginReply*)(a->localRawData);
+	return reply->packer(TEUL_PACK, a);
 }
 
 //Receive Login Request function
@@ -115,8 +115,8 @@ static SINT32 _recvGAME_INIT(ACTION_OBJECT* const a)
 //Send Game Cookie function
 static SINT32 _sendAUTH_DISPATCH(ACTION_OBJECT* const a)
 {
-	((Auth::Dispatch*)(a->localRawData))->packer(TEUL_PACK, a) ;
-	return a->offset ;
+	((Auth::Dispatch*)(a->localRawData))->packer(TEUL_PACK, a);
+	return a->offset;
 }
 
 //Send an ack of the hello
@@ -127,21 +127,21 @@ static SINT32 _sendGAME_ACK(ACTION_OBJECT* const a)
 
 MANAGEMENT_MSG::MANAGEMENT_MSG(ACTION_OBJECT* const a)
 {
-	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, this, sizeof(*this)) ;
+	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, this, sizeof(*this));
 }
 
 //Receive a managementMsg
 static SINT32
 _recvManagementMsg(ACTION_OBJECT* const a)
 {
-	SERVER* serverEntry = (SERVER*)teulGetPersonaData(a->teulIndex) ;
+	SERVER* serverEntry = (SERVER*)teulGetPersonaData(a->teulIndex);
 	if ( serverEntry == NULL )
 	{
 		dbugLog(_FLA,"no server info avalable on %d:",a->teulIndex);
 		return 0;
 	}
 
-	MANAGEMENT_MSG message(a) ;
+	MANAGEMENT_MSG message(a);
 	switch (message.m_action)
 	{
 		// Login
@@ -157,13 +157,13 @@ _recvManagementMsg(ACTION_OBJECT* const a)
 				serverEntry->currentUsers--;
 			if (serverEntry->game->currentUsers > 0)
 				serverEntry->game->currentUsers--;
-			serverEntry->game->CheckLoginQueue() ;
+			serverEntry->game->CheckLoginQueue();
 		break;
 
 		// Compiler will complain if we do not cover all enumerations.
 	}
 
-	message.process() ;
+	message.process();
 
 	dbugLog(_FLN, "p:%u a:%u ip:%s status:%s server:%s server-users:%u game-users:%u"
 					, message.m_customerID
@@ -173,7 +173,7 @@ _recvManagementMsg(ACTION_OBJECT* const a)
 					, teulGetAddress(serverEntry->ipAddress)
 					, serverEntry->currentUsers
 					, serverEntry->game->currentUsers
-					) ;
+					);
 
 	return a->offset;
 }
@@ -197,23 +197,23 @@ _recvClearLoginTable(ACTION_OBJECT* const a)
 static SINT32
 _recvAPP_FILE_CHECK(ACTION_OBJECT* const a)
 {
-	APP_FILE_CHECK afc ;
-	UINT32 platform ;
+	APP_FILE_CHECK afc;
+	UINT32 platform;
 
-	a->offset = authPackAPP_FILE_CHECK(TEUL_UNPACK, a->packed, a->offset, &afc, sizeof(afc)) ;
+	a->offset = authPackAPP_FILE_CHECK(TEUL_UNPACK, a->packed, a->offset, &afc, sizeof(afc));
 
-	platform = afc.presenterVersion >> 24 ;
+	platform = afc.presenterVersion >> 24;
 
 	dbugLog(_FLD, "t:%d Received AFC for %d.%d:=%s"
 					, a->teulIndex
 					, afc.appID
 					, platform
 					, afc.fileKey
-					) ;
+					);
 
-	authVerifyChecksum(a->teulIndex, afc.appID, platform, (char*)afc.fileKey) ;
+	authVerifyChecksum(a->teulIndex, afc.appID, platform, (char*)afc.fileKey);
 
-	return a->offset ;
+	return a->offset;
 }
 
 static SINT32
@@ -230,8 +230,8 @@ static SINT32
 _recvGAME_CAPACITY(ACTION_OBJECT* const a)
 {
 	AUTH_GAME_CAPACITY message;
-	memset(&message, 0, sizeof(message)) ;
-	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &message, sizeof(AUTH_GAME_CAPACITY)) ;
+	memset(&message, 0, sizeof(message));
+	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &message, sizeof(AUTH_GAME_CAPACITY));
 	handleGameCapacityUpdate(message);
 
 	return a->offset;
@@ -241,61 +241,61 @@ _recvGAME_CAPACITY(ACTION_OBJECT* const a)
 static SINT32
 _recvAppGameListRequest(ACTION_OBJECT* const a)
 {
-	AppGameList list ;
-	list.process() ;
-	teulSend(a->teulIndex, _XCHG_GAME_LIST, &list) ;
-	return a->offset ;
+	AppGameList list;
+	list.process();
+	teulSend(a->teulIndex, _XCHG_GAME_LIST, &list);
+	return a->offset;
 }
 
 static SINT32
 _sendAppGameList(ACTION_OBJECT* const a)
 {
-	AppGameList* list = (AppGameList*)(a->localRawData) ;
-	return list->packer(TEUL_PACK, a) ;
+	AppGameList* list = (AppGameList*)(a->localRawData);
+	return list->packer(TEUL_PACK, a);
 }
 
 // New Game List
 static SINT32
 _recvGameListRequest(ACTION_OBJECT* const a)
 {
-	Auth::GameList* list = authGetGameList(a->teulIndex) ;
+	Auth::GameList* list = authGetGameList(a->teulIndex);
 	if ( list == NULL )
-		return -EINVAL ;
+		return -EINVAL;
 	if ( teulSend(a->teulIndex, _XCHG_GAME_LIST2, list) < 0 )
-		return -EINVAL ;
-	return a->offset ;
+		return -EINVAL;
+	return a->offset;
 }
 
 static SINT32
 _sendGameList(ACTION_OBJECT* const a)
 {
-	Auth::GameList* list = (Auth::GameList*)(a->localRawData) ;
-	return list->packer(TEUL_PACK, a) ;
+	Auth::GameList* list = (Auth::GameList*)(a->localRawData);
+	return list->packer(TEUL_PACK, a);
 }
 
 static SINT32
 _sendAuthQueuePosition(ACTION_OBJECT* const a)
 {
-	return ((Auth::QueuePosition*)(a->localRawData))->packer(TEUL_PACK, a) ;
+	return ((Auth::QueuePosition*)(a->localRawData))->packer(TEUL_PACK, a);
 }
 
 SINT32
 authSendAppPlaygateOk(SINT32 teulIndex)
 {
-	return teulSend(teulIndex, _APP_PLAYGATE_OK, NULL) ;
+	return teulSend(teulIndex, _APP_PLAYGATE_OK, NULL);
 }
 
 void
 Auth::LoginReply::send(SINT32 teulIndex)
 {
-	teulSend(teulIndex, _XCHG_AUTH_LOGIN, this) ;
+	teulSend(teulIndex, _XCHG_AUTH_LOGIN, this);
 }
 
 void
 authSendPlayerInQueue(Auth::ClientData* cdata, UINT32 position, UINT32 waitTime)
 {
-	Auth::QueuePosition update(position, waitTime) ;
-	teulSend(cdata->teulIndex, _SEND_QUEUE_POSITION, &update) ;
+	Auth::QueuePosition update(position, waitTime);
+	teulSend(cdata->teulIndex, _SEND_QUEUE_POSITION, &update);
 }
 
 //This function installs our two callbacks
@@ -303,29 +303,29 @@ SINT32 authHostInstallCallbacks(void)
 {
 	BEGIN_CALLBACK_REGISTRATION(Auth::CallbackX)
 
-		REGISTER_RECEIVER(ARENA_REQ_Y, _recvARENA_REQ) ;
-		REGISTER_RECEIVER(APP_LAUNCH_REQ_Y, _recvAPP_LAUNCH_REQ) ;
-		REGISTER_RECEIVER(AUTH_GAME_INIT_Y, _recvGAME_INIT) ; //	ci->error =		_hostRecvAuthHelloError;
+		REGISTER_RECEIVER(ARENA_REQ_Y, _recvARENA_REQ);
+		REGISTER_RECEIVER(APP_LAUNCH_REQ_Y, _recvAPP_LAUNCH_REQ);
+		REGISTER_RECEIVER(AUTH_GAME_INIT_Y, _recvGAME_INIT); //	ci->error =		_hostRecvAuthHelloError;
 
-		REGISTER_RECEIVER(ARENA_REQ2_Y, _recvARENA_REQ2) ;
+		REGISTER_RECEIVER(ARENA_REQ2_Y, _recvARENA_REQ2);
 
-		REGISTER_SENDER(APP_VERIFY_Y, _sendAPP_VERIFY, authAPP_VERIFY) ;
-		REGISTER_SENDER(APP_LAUNCH_Y, _sendAPP_LAUNCH, authAPP_LAUNCH) ;
-		REGISTER_SENDER(AUTH_DISPATCH_Y, _sendAUTH_DISPATCH, authDISPATCH) ; //	ci->error =		_hostSendGameCookieError;
-		REGISTER_SENDER(AUTH_GAME_ACK_Y, _sendGAME_ACK, authGAME_ACK) ; // 	ci->error =		_hostSendHelloAckError;
+		REGISTER_SENDER(APP_VERIFY_Y, _sendAPP_VERIFY, authAPP_VERIFY);
+		REGISTER_SENDER(APP_LAUNCH_Y, _sendAPP_LAUNCH, authAPP_LAUNCH);
+		REGISTER_SENDER(AUTH_DISPATCH_Y, _sendAUTH_DISPATCH, authDISPATCH); //	ci->error =		_hostSendGameCookieError;
+		REGISTER_SENDER(AUTH_GAME_ACK_Y, _sendGAME_ACK, authGAME_ACK); // 	ci->error =		_hostSendHelloAckError;
 
-		REGISTER_RECEIVER(GAME_MANAGEMENT_Y, _recvManagementMsg) ; //	ci->error =		_hostRecvManagementMsgError;
-		REGISTER_RECEIVER(GAME_CLEAR_LOGIN_TABLE_Y, _recvClearLoginTable) ; // _hostRecvManagementMsgError
-		REGISTER_RECEIVER(SERVER_LOAD_Y, _recvSERVER_LOAD) ;
-		REGISTER_RECEIVER(GAME_CAPACITY_Y, _recvGAME_CAPACITY) ;
+		REGISTER_RECEIVER(GAME_MANAGEMENT_Y, _recvManagementMsg); //	ci->error =		_hostRecvManagementMsgError;
+		REGISTER_RECEIVER(GAME_CLEAR_LOGIN_TABLE_Y, _recvClearLoginTable); // _hostRecvManagementMsgError
+		REGISTER_RECEIVER(SERVER_LOAD_Y, _recvSERVER_LOAD);
+		REGISTER_RECEIVER(GAME_CAPACITY_Y, _recvGAME_CAPACITY);
 
-		REGISTER_RECEIVER(APP_FILE_CHECK_Y, _recvAPP_FILE_CHECK) ;
+		REGISTER_RECEIVER(APP_FILE_CHECK_Y, _recvAPP_FILE_CHECK);
 
-		REGISTER_SENDER(APP_PLAYGATE_OK_Y, _sendAPP_PLAYGATE_OK, _APP_PLAYGATE_OK) ;
-		REGISTER_SENDRECV(APP_GET_GAME_LIST_Y, _sendAppGameList, _recvAppGameListRequest, _XCHG_GAME_LIST) ;
-		REGISTER_SENDRECV(APP_XCHG_GAME_LIST_Y, _sendGameList, _recvGameListRequest, _XCHG_GAME_LIST2) ;
-		REGISTER_SENDRECV(AUTH_XCHG_LOGIN_Y, _sendAuthLoginReply, _recvAuthLoginRequest, _XCHG_AUTH_LOGIN) ;
-		REGISTER_SENDER(AUTH_QUEUE_POSITION_Y, _sendAuthQueuePosition, _SEND_QUEUE_POSITION) ;
+		REGISTER_SENDER(APP_PLAYGATE_OK_Y, _sendAPP_PLAYGATE_OK, _APP_PLAYGATE_OK);
+		REGISTER_SENDRECV(APP_GET_GAME_LIST_Y, _sendAppGameList, _recvAppGameListRequest, _XCHG_GAME_LIST);
+		REGISTER_SENDRECV(APP_XCHG_GAME_LIST_Y, _sendGameList, _recvGameListRequest, _XCHG_GAME_LIST2);
+		REGISTER_SENDRECV(AUTH_XCHG_LOGIN_Y, _sendAuthLoginReply, _recvAuthLoginRequest, _XCHG_AUTH_LOGIN);
+		REGISTER_SENDER(AUTH_QUEUE_POSITION_Y, _sendAuthQueuePosition, _SEND_QUEUE_POSITION);
 
 	END_CALLBACK_REGISTRATION
 }

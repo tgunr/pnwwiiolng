@@ -54,7 +54,7 @@ struct ReflectorSight
 	piVECTOR up, right,front;
 	piVECTOR center;
 	OBJECT* gviewObj;
-} ;
+};
 
 ReflectorSight _ReflectorSights[ML_MAX_CREW_POSITIONS];
 

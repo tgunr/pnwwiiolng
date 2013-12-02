@@ -116,7 +116,7 @@ LISTHEADER*  part;
 
   part = free->next;
   free->next = NULL;
-  for (i=0 ; i < numitems ; i++)
+  for (i=0; i < numitems; i++)
   {
     memset(part, 0, itemsize);
     listAddItem(free, part);

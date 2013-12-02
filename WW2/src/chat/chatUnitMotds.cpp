@@ -13,8 +13,8 @@
 #include "wwii/wwiiHash.h"
 #include <string>
 
-typedef std::unordered_map<UINT32,std::string> MOTD_INDEX ;
-static MOTD_INDEX motds ;
+typedef std::unordered_map<UINT32,std::string> MOTD_INDEX;
+static MOTD_INDEX motds;
 
 //////////////////////////////////////////////////////////////////////
 // Set a particular unit's MOTD
@@ -22,7 +22,7 @@ static MOTD_INDEX motds ;
 void
 chatSetUnitMotd(UINT32 unit, const std::string& motd)
 {
-	motds[unit] = motd ;
+	motds[unit] = motd;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -31,9 +31,9 @@ chatSetUnitMotd(UINT32 unit, const std::string& motd)
 const char*
 chatGetUnitMotd(UINT32 unit)
 {
-	MOTD_INDEX::iterator it = motds.find(unit) ;
+	MOTD_INDEX::iterator it = motds.find(unit);
 	if ( it == motds.end() || it->second.empty() )
-		return NULL ;
-	return it->second.c_str() ;
+		return NULL;
+	return it->second.c_str();
 }
 

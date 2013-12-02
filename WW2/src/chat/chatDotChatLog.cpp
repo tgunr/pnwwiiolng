@@ -9,7 +9,7 @@
 #include "include/mydbQuery.h"
 #include "wwii/wwiiDBThreads.h"
 
-extern void chatDispatchGMMessage(const SCHAR* source, const SCHAR* text, const ChatHandle& excludeID=0LL) ;
+extern void chatDispatchGMMessage(const SCHAR* source, const SCHAR* text, const ChatHandle& excludeID=0LL);
 
 //////////////////////////////////////////////////////////////////////
 // List the last N chat messages of a given player.
@@ -31,61 +31,61 @@ public:	ChatHistory(const playerid_t& playerID_, const ChatHandle& requester_)
 			{}
 
 protected:
-	ChatHandle					m_requester ;
-	std::vector<std::string>	m_results ;
+	ChatHandle					m_requester;
+	std::vector<std::string>	m_results;
 
 protected:
 	virtual bool Process(const size_t numRows)
 	{
 		if ( numRows <= 0 )
-			return true ;
+			return true;
 
-		m_results.resize(numRows) ;
-		auto resultIt = m_results.begin() ;
+		m_results.resize(numRows);
+		auto resultIt = m_results.begin();
 		while ( Query()->FetchRow() )
 		{
-			DBRow& row = Query()->Row() ;
-			std::string& result = *(resultIt++) ;
-			result = row[0] ;
-			result += ": " ;
-			result += row[1] ;
+			DBRow& row = Query()->Row();
+			std::string& result = *(resultIt++);
+			result = row[0];
+			result += ": ";
+			result += row[1];
 		}
 
-		return true ;
+		return true;
 	}
 
 public:
 	virtual void Success()
 	{
-		Player* const player = PlayerInterface::Lookup(m_requester) ;
+		Player* const player = PlayerInterface::Lookup(m_requester);
 		if ( player == NULL )
-			return ;
+			return;
 
-		const size_t numRows = m_results.size() ;
+		const size_t numRows = m_results.size();
 		if ( numRows <= 0 )
 		{
-			player->message(LSTR_NOTE, LSTR_NO_MATCHES) ;
-			return ;
+			player->message(LSTR_NOTE, LSTR_NO_MATCHES);
+			return;
 		}
 
-		for ( auto it = m_results.rbegin() ; it != m_results.rend() ; ++it )
+		for ( auto it = m_results.rbegin(); it != m_results.rend(); ++it )
 		{
-			player->message(LSTR_NONE, LSTR_GENERIC, it->c_str()) ;
+			player->message(LSTR_NONE, LSTR_GENERIC, it->c_str());
 		}
 	}
 
 	virtual void Failure()
 	{
-		Player* const player = PlayerInterface::Lookup(m_requester) ;
+		Player* const player = PlayerInterface::Lookup(m_requester);
 		if ( player != NULL )
-			player->message(LSTR_CAUTION, LSTR_DB_QUERY_FAILED, "chatlog", "Database Error") ;
+			player->message(LSTR_CAUTION, LSTR_DB_QUERY_FAILED, "chatlog", "Database Error");
 	}
-} ;
+};
 
 void
 chatSendChatLog(const playerid_t& subjectID, const ChatHandle& requester)
 {
-	(new ChatHistory(subjectID, requester))->Queue() ;
+	(new ChatHistory(subjectID, requester))->Queue();
 }
 
 //! @internal
@@ -98,45 +98,45 @@ public:
 
 	virtual bool help(Player& player) const OVERRIDE_FN
 	{
-		if ( !allow(player) ) return false ;
-		player.message(LSTR_USAGE, LSTR_GENERIC, "/chatlog <player> <reason>") ;
-		player.message(LSTR_DETAIL, LSTR_GENERIC, "Shows the last 10 lines of chat messages received from <player>.") ;
-		return true ;
+		if ( !allow(player) ) return false;
+		player.message(LSTR_USAGE, LSTR_GENERIC, "/chatlog <player> <reason>");
+		player.message(LSTR_DETAIL, LSTR_GENERIC, "Shows the last 10 lines of chat messages received from <player>.");
+		return true;
 	}
 
 	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
 	{
-		ARGV args ;
+		ARGV args;
 		if ( vectorize(arguments, args, 2) < 2 )
 		{
-			help(player) ;
-			return ;
+			help(player);
+			return;
 		}
 
-		const ChatHandle handle = chatGetHandle(args[0]) ;
-		const Player* const subject = PlayerInterface::Lookup(handle) ;
+		const ChatHandle handle = chatGetHandle(args[0]);
+		const Player* const subject = PlayerInterface::Lookup(handle);
 		if ( subject == NULL )
 		{
-			player.messagef(LSTR_CAUTION, LSTR_GENERIC, "Player '%s' not online or does not exist. /chatlog only works for online players.", args[0]) ;
-			help(player) ;
-			return ;
+			player.messagef(LSTR_CAUTION, LSTR_GENERIC, "Player '%s' not online or does not exist. /chatlog only works for online players.", args[0]);
+			help(player);
+			return;
 		}
 
 		if ( subject->matchHandle() != player.matchHandle() )
 		{
 			// No point logging self-reviews.
-			chatDispatchGMMessage("INFO", chatMakeTempString("%s /chatlog'ing %s: %s", player.callsign(), subject->callsign(), args[1])) ;
-			player.gmNote("GM", command(), arguments, NULL) ;
+			chatDispatchGMMessage("INFO", chatMakeTempString("%s /chatlog'ing %s: %s", player.callsign(), subject->callsign(), args[1]));
+			player.gmNote("GM", command(), arguments, NULL);
 		}
 
-		player.gmNote("GM", command(), arguments, NULL) ;
+		player.gmNote("GM", command(), arguments, NULL);
 		if ( player.isPlaynet() == false && subject->isPlaynet() == true )
 		{
-			player.message(LSTR_CAUTION, LSTR_GENERIC, "Permission denied.") ;
-			return ;
+			player.message(LSTR_CAUTION, LSTR_GENERIC, "Permission denied.");
+			return;
 		}
 
-		chatSendChatLog(subject->playerID(), player.matchHandle()) ;
+		chatSendChatLog(subject->playerID(), player.matchHandle());
 	}
-} dotChatLog ;
+} dotChatLog;
 

@@ -46,7 +46,7 @@ const char* _sideName[MAX_SIDES] =
 	"Allies",
 	"Axis",
 	"Neutral"
-} ;
+};
 
 // Side names, adjective form
 const char* _sideNameAdj[MAX_SIDES] =
@@ -55,7 +55,7 @@ const char* _sideNameAdj[MAX_SIDES] =
 	"Allied",
 	"Axis",
 	"Neutral"
-} ;
+};
 
 const char* _countryCode[MAX_COUNTRIES] =
 {
@@ -67,12 +67,12 @@ const char* _countryCode[MAX_COUNTRIES] =
 ,	"IT"
 ,	"CN"
 ,	"RU"
-} ;
+};
 
-bool g_activeCountries[MAX_COUNTRIES] ;
+bool g_activeCountries[MAX_COUNTRIES];
 
 // Structures
-WWII_CONFIG host_config ;
+WWII_CONFIG host_config;
 
 WWII_CONFIG_MAP configMap[] =
 {
@@ -225,20 +225,20 @@ WWII_CONFIG_MAP configMap[] =
 
 // -- End of list
 ,	{ NULL, MAX_WWII_CONFIG_TYPES, NULL, 0, NULL, NULL }
-} ;
+};
 
 static bool
 _isAffirmative(const char* const string)
 {
 	if ( tolower(*string) == 'y' )
-		return true ;
+		return true;
 	if ( strcasecmp(string, "on") == 0 )
-		return true ;
+		return true;
 
 	if ( atol(string) == 1 )
-		return true ;
+		return true;
 
-	return false ;
+	return false;
 }
 
 bool
@@ -246,54 +246,54 @@ wwiiConfigSetINT(UINT32* data, const char* const source, UINT64 max)
 {
 	if ( data == NULL || source == NULL )
 	{
-		dbugLog(_FLAS, "called with NULL data or source") ;
-		return false ;
+		dbugLog(_FLAS, "called with NULL data or source");
+		return false;
 	}
 
-	*data = 0 ;
+	*data = 0;
 
 	if ( *source == 0 )
-		return false ;
+		return false;
 
 	if ( !isdigit(*source) )
-		return false ;
+		return false;
 
-	*data = static_cast<UINT32>(atol(source)) ;
+	*data = static_cast<UINT32>(atol(source));
 	if ( max > 0 && *data > static_cast<UINT32>(max) )
-		*data = static_cast<UINT32>(max) ;
+		*data = static_cast<UINT32>(max);
 
-	return true ;
+	return true;
 }
 
 bool
 wwiiConfigSetSINT(UINT16* data, const char* const source, UINT64 max)
 {
-	UINT32 value ;
+	UINT32 value;
 	if ( data == NULL || source == NULL )
 	{
-		dbugLog(_FLAS, "called with NULL data or source") ;
-		return false ;
+		dbugLog(_FLAS, "called with NULL data or source");
+		return false;
 	}
 
-	*data = 0 ;
+	*data = 0;
 
 	if ( *source == 0 )
-		return false ;
+		return false;
 
 	if ( !isdigit(*source) )
-		return false ;
+		return false;
 
 	// Constrain to UINT64
 	if ( max <= 0 || max > USHRT_MAX )
-		max = USHRT_MAX ;
+		max = USHRT_MAX;
 
-	value = (UINT32)atol(source) ;
+	value = (UINT32)atol(source);
 	if ( value > max )
-		*data = (UINT16)max ;
+		*data = (UINT16)max;
 	else if ( value > 0 )
-		*data = (UINT16)value ;
+		*data = (UINT16)value;
 
-	return true ;
+	return true;
 }
 
 bool
@@ -301,21 +301,21 @@ wwiiConfigSetFLOAT(FLOAT32* data, const char* const source, UINT64 /*max*/)
 {
 	if ( data == NULL || source == NULL )
 	{
-		dbugLog(_FLAS, "called with NULL data or source") ;
-		return false ;
+		dbugLog(_FLAS, "called with NULL data or source");
+		return false;
 	}
 
-	*data = 0.0f ;
+	*data = 0.0f;
 
 	if ( *source == 0 )
-		return false ;
+		return false;
 
 	if ( !isdigit(*source) )
-		return false ;
+		return false;
 
-	(void)sscanf(source, "%f", data) ;
+	(void)sscanf(source, "%f", data);
 
-	return true ;
+	return true;
 }
 
 bool
@@ -323,24 +323,24 @@ wwiiConfigSetSTRING(char* data, const char* const source, UINT64 max)
 {
 	if ( data == NULL || source == NULL )
 	{
-		dbugLog(_FLAS, "called with NULL data or source") ;
-		return false ;
+		dbugLog(_FLAS, "called with NULL data or source");
+		return false;
 	}
 
 	if ( max == 0 )
 	{
-		dbugLog(_FLAS, "supplied 0 as string maxlength") ;
-		return false ;
+		dbugLog(_FLAS, "supplied 0 as string maxlength");
+		return false;
 	}
 
-	*data = 0 ;
+	*data = 0;
 
 	if ( *source == 0 )
-		return false ;
+		return false;
 
-	strncpy(data, source, static_cast<size_t>(max)) ;
+	strncpy(data, source, static_cast<size_t>(max));
 
-	return true ;
+	return true;
 }
 
 bool
@@ -348,18 +348,18 @@ wwiiConfigSetBOOL(UCHAR* data, const char* const source, UINT64 /*max*/)
 {
 	if ( data == NULL || source == NULL )
 	{
-		dbugLog(_FLAS, "called with NULL data or source") ;
-		return false ;
+		dbugLog(_FLAS, "called with NULL data or source");
+		return false;
 	}
 
-	*data = (UCHAR)false ;
+	*data = (UCHAR)false;
 	if ( *source == 0 )
-		return false ;
+		return false;
 
 	if ( _isAffirmative(source) )
-		*data = (UCHAR)true ;
+		*data = (UCHAR)true;
 
-	return true ;
+	return true;
 }
 
 bool
@@ -367,28 +367,28 @@ wwiiConfigSetBYTE(UCHAR* data, const char* const source, UINT64 max)
 {
 	if ( data == NULL || source == NULL )
 	{
-		dbugLog(_FLAS, "called with NULL data or source") ;
-		return false ;
+		dbugLog(_FLAS, "called with NULL data or source");
+		return false;
 	}
 
-	*data = 0 ;
+	*data = 0;
 	if ( *source == 0 )
-		return false ;
+		return false;
 
 	if ( !isdigit(*source) )
-		return false ;
+		return false;
 
 	// Constrain "max" to within a UCHAR
 	if ( max <= 0 || max > UCHAR_MAX )
-		max = UCHAR_MAX ;
+		max = UCHAR_MAX;
 
-	UINT32 value = (UINT32)atol(source) ;
+	UINT32 value = (UINT32)atol(source);
 	if ( value > max )
-		*data = (UCHAR)max ;
+		*data = (UCHAR)max;
 	else if ( value > 0 )
-		*data = (UCHAR)value ;
+		*data = (UCHAR)value;
 
-	return true ;
+	return true;
 }
 
 // That's all we provide for now
@@ -396,49 +396,49 @@ wwiiConfigSetBYTE(UCHAR* data, const char* const source, UINT64 max)
 WWII_COUNTRY
 isCountryCode(const char* source)
 {
-	UINT32 i ;
-	for ( i = 1 ; i < MAX_COUNTRIES ; i++ )
+	UINT32 i;
+	for ( i = 1; i < MAX_COUNTRIES; i++ )
 	{
 		if ( strcasecmp(_countryCode[i], source) == 0 )
-			return (WWII_COUNTRY) i ;
+			return (WWII_COUNTRY) i;
 	}
-	return WWII_NO_COUNTRY ;
+	return WWII_NO_COUNTRY;
 }
 
 WWII_COUNTRY
 isCountryName(const char* source)
 {
-	UINT32 i ;
-	for ( i = 1 ; i < MAX_COUNTRIES ; i++ )
+	UINT32 i;
+	for ( i = 1; i < MAX_COUNTRIES; i++ )
 	{
 		if ( strcasecmp(_countryName[i], source) == 0 )
-			return (WWII_COUNTRY) i ;
+			return (WWII_COUNTRY) i;
 	}
-	return WWII_NO_COUNTRY ;
+	return WWII_NO_COUNTRY;
 }
 
 WWII_COUNTRY
 isCountry(const char* source)
 {
-	if ( strlen(source) == 2 ) return isCountryCode(source) ;
-	UINT32 i ;
-	i = isCountryName(source) ;
-	if ( i != WWII_NO_COUNTRY ) return (WWII_COUNTRY) i ;
-	for ( i = 1 ; i < MAX_COUNTRIES ; ++i )
+	if ( strlen(source) == 2 ) return isCountryCode(source);
+	UINT32 i;
+	i = isCountryName(source);
+	if ( i != WWII_NO_COUNTRY ) return (WWII_COUNTRY) i;
+	for ( i = 1; i < MAX_COUNTRIES; ++i )
 	{
 		if ( strcasecmp(_countryNameAdj[i], source) == 0 )
-			return (WWII_COUNTRY) i ;
+			return (WWII_COUNTRY) i;
 	}
 	if ( strncasecmp("brit", source, 4) == 0 )
-		return WWII_ENGLAND ;
-	return WWII_NO_COUNTRY ;
+		return WWII_ENGLAND;
+	return WWII_NO_COUNTRY;
 }
 
 WWII_SIDE
 isSideName(const char* source)
 {
-	if ( strcasecmp(source, "allied") == 0 ) return ALLIED ;
-	if ( strcasecmp(source, "axis") == 0 ) return AXIS ;
-	return WWII_NO_SIDE ;
+	if ( strcasecmp(source, "allied") == 0 ) return ALLIED;
+	if ( strcasecmp(source, "axis") == 0 ) return AXIS;
+	return WWII_NO_SIDE;
 }
 

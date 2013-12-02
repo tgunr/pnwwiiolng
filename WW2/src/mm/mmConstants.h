@@ -11,7 +11,7 @@
 
 namespace MMHost
 {
-	enum { CallbackX = 227 } ;
+	enum { CallbackX = 227 };
 
 	enum
 	{

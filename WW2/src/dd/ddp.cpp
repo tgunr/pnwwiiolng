@@ -125,7 +125,7 @@ char*		pStr;
 DWORD		i;
 SYSTEMTIME	SystemTime;
 
-	FILE* ExceptionLog = Fio::OpenLogFile() ;
+	FILE* ExceptionLog = Fio::OpenLogFile();
 	if ( ExceptionLog )
 	{
 		Write_Debug("Exception handler information...");
@@ -277,7 +277,7 @@ SYSTEMTIME	SystemTime;
 		fprintf(ExceptionLog, "Exception address: 0x%08x\n", ep->ExceptionRecord->ExceptionAddress);
 		Write_Debug("Exception address: 0x%08x", ep->ExceptionRecord->ExceptionAddress);
 
-		for (i=0 ; i < ep->ExceptionRecord->NumberParameters ; i+=2)
+		for (i=0; i < ep->ExceptionRecord->NumberParameters; i+=2)
 		{
 			fprintf(ExceptionLog, "Exception tried to: %s at address 0x%08x\n", ep->ExceptionRecord->ExceptionInformation[i] ? "write" : "read", ep->ExceptionRecord->ExceptionInformation[i+1]);
 			Write_Debug("Exception tried to: %s at address 0x%08x", ep->ExceptionRecord->ExceptionInformation[i] ? "write" : "read", ep->ExceptionRecord->ExceptionInformation[i+1]);
@@ -1966,7 +1966,7 @@ SINT32					i, pixelformat, depth, accum, stencil;
 	depth = 24;
 	accum = 0;
 	stencil = 8;
-	for (i=1 ; ; i++)
+	for (i=1;; i++)
 	{
 		if (!DescribePixelFormat(hdc, i, sizeof(PIXELFORMATDESCRIPTOR), pfd))
 		{
@@ -2338,10 +2338,10 @@ static void capSave(UCHAR* const bptr, UINT32 width, UINT32 height, const char* 
 
 		ptrin 	= bptr;
 		ptrout 	= bits;
-		for (i=0 ; i < height ; i++)
+		for (i=0; i < height; i++)
 		{
 			// copy a row
-			for (j=0 ; j < bwidth ; j += 3, ptrin += 3)
+			for (j=0; j < bwidth; j += 3, ptrin += 3)
 			{
 				*ptrout++ = *(ptrin+2);
 				*ptrout++ = *(ptrin+1);
@@ -2349,7 +2349,7 @@ static void capSave(UCHAR* const bptr, UINT32 width, UINT32 height, const char* 
 			}
 
 			// pad rest of DWORD with zeros
-			for ( ; j < twidth ; j++)
+			for (; j < twidth; j++)
 			{
 				*ptrout++ = 0;
 			}

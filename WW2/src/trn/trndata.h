@@ -22,7 +22,7 @@ struct TERRAINSKY
     {
         scale = 1.0f;
     }
-} ;
+};
 
 
 struct FOGOPTION
@@ -33,7 +33,7 @@ struct FOGOPTION
     std::vector<FLOAT32> start;
     std::vector<FLOAT32> end;
 
-} ;
+};
 
 // Each terrain setting may have several fog options
 struct TERRAINFOG
@@ -41,7 +41,7 @@ struct TERRAINFOG
     SINT32 setting;
 
     std::vector<FOGOPTION *> options;
-} ;
+};
 
 extern void trndataInit();
 extern void trndataKill();

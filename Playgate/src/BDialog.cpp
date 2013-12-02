@@ -29,38 +29,38 @@ CBDialog::CBDialog(UINT nIDTemplate, CWnd* pParent /*=NULL*/)
 
 void CBDialog::Localize(UINT itemId, UINT locID) const
 {
-	CWnd* item = GetDlgItem(itemId) ;
+	CWnd* item = GetDlgItem(itemId);
 	if ( item != NULL )
 	{
 		if ( locID )
-			item->SetWindowTextW(GetLoc(locID)) ;
+			item->SetWindowTextW(GetLoc(locID));
 		else
 		{
-			wchar_t versionNo[81] ;
-			swprintf(versionNo, 80, L"%s", STRVER) ;
-			item->SetWindowText(versionNo) ;
+			wchar_t versionNo[81];
+			swprintf(versionNo, 80, L"%s", STRVER);
+			item->SetWindowText(versionNo);
 		}
 	}
 }
 
 BOOL CBDialog::OnInitDialog()
 {
-	CDialog::OnInitDialog() ;
+	CDialog::OnInitDialog();
 
 	// Set the icon for this dialog.  The framework does this automatically
 	//  when the application's main window is not a dialog
 	SetIcon(m_hIcon, TRUE);			// Set big icon
 	SetIcon(m_hIcon, FALSE);		// Set small icon
 
-	SetWindowText(GetLoc(TitleLocID())) ;
+	SetWindowText(GetLoc(TitleLocID()));
 #ifdef SHOW_VERSIONS
-	Localize(IDC_VERSION_NO, 0) ;
+	Localize(IDC_VERSION_NO, 0);
 #endif
-	Localize(IDOK, OkLocID()) ;
-	Localize(IDCANCEL, CancelLocID()) ;
-	Localize(IDC_HINT, HintLocID()) ;
+	Localize(IDOK, OkLocID());
+	Localize(IDCANCEL, CancelLocID());
+	Localize(IDC_HINT, HintLocID());
 
-	return TRUE ;
+	return TRUE;
 }
 
 BEGIN_MESSAGE_MAP(CBDialog, CDialog)
@@ -76,10 +76,10 @@ END_MESSAGE_MAP()
 /////////////////////////////////////////////////////////////////////////////
 // Default LocIDs for buttons
 
-UINT CBDialog::TitleLocID() const { return APP_TITLE ; }
-UINT CBDialog::OkLocID() const { return DIALOG_OK ; }
-UINT CBDialog::CancelLocID() const { return DIALOG_CANCEL ; }
-UINT CBDialog::HintLocID() const { return DIALOG_HINT ; }
+UINT CBDialog::TitleLocID() const { return APP_TITLE; }
+UINT CBDialog::OkLocID() const { return DIALOG_OK; }
+UINT CBDialog::CancelLocID() const { return DIALOG_CANCEL; }
+UINT CBDialog::HintLocID() const { return DIALOG_HINT; }
 
 /////////////////////////////////////////////////////////////////////////////
 // CBDialog message handlers
@@ -95,7 +95,7 @@ BOOL CBDialog::OnEraseBkgnd(CDC* pDC)
 	CDC dc;
 	dc.CreateCompatibleDC(pDC);
 	CBitmap* pOldBitmap = dc.SelectObject(&m_bitmap);
-	int bmw, bmh ;
+	int bmw, bmh;
 	BITMAP bmap;
 	m_bitmap.GetBitmap(&bmap);
 	bmw = bmap.bmWidth;
@@ -183,7 +183,7 @@ HBRUSH CBDialog::OnCtlColor(CDC* pDC, CWnd* pWnd, UINT nCtlColor)
 		pDC->SetBkMode(TRANSPARENT);
 		hbr = (HBRUSH)GetStockObject( NULL_BRUSH );
 	}
-	return hbr ;
+	return hbr;
 }
 
 void CBDialog::SetBitmapStyle(int style)
@@ -207,7 +207,7 @@ int CBDialog::SetBitmap(UINT nIDResource)
 
 int CBDialog::SetBitmap(LPCTSTR name)
 {
-	int res = m_bitmap.LoadBitmap(name) ;
+	int res = m_bitmap.LoadBitmap(name);
 	if(res)
 		return 0;	
 	else
@@ -216,8 +216,8 @@ int CBDialog::SetBitmap(LPCTSTR name)
 
 int CBDialog::SetBitmap(HBITMAP bitmap)
 {
-	int res = m_bitmap.Attach(bitmap) ;
-	return ( res ) ? 0 : 1 ;
+	int res = m_bitmap.Attach(bitmap);
+	return ( res ) ? 0 : 1;
 }
 
 // The system calls this function to obtain the cursor to display while the user drags
@@ -230,9 +230,9 @@ HCURSOR CBDialog::OnQueryDragIcon()
 void CBDialog::OnTimer(UINT_PTR nIDEvent)
 {
 	if ( nIDEvent == 'QUIT' )
-		OnCancel() ;
+		OnCancel();
 	else
-		CDialog::OnTimer(nIDEvent) ;
+		CDialog::OnTimer(nIDEvent);
 }
 void CBDialog::WinHelp(DWORD dwData, UINT nCmd)
 {

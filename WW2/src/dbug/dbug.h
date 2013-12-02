@@ -36,8 +36,8 @@ namespace Debug
 		ERR_INFO,					// informational message
 		ERR_DBUG					// debug level message
 	,	ERROR_TYPE_SIZE
-	} ;
-	typedef unsigned int ERROR_TYPE ;
+	};
+	typedef unsigned int ERROR_TYPE;
 }
 
 #define STD_ERR				0x0010	// mirror significant output to stderr
@@ -131,7 +131,7 @@ extern int		dbugGetErrno(void);
 // dbugLog: if the current filename, lineno or string is NULL then it sets these members. The
 // parameters are output as a string to the debug file depending on the debug level selected and
 // the current error type.  calls handlers.
-extern int _dbugLog(const char* filename, int lineno, unsigned int errType, const char* fmt, ...) __attribute__ ((format (printf,4,5))) ;
+extern int _dbugLog(const char* filename, int lineno, unsigned int errType, const char* fmt, ...) __attribute__ ((format (printf,4,5)));
 extern int _dbugLogV(const char* filename, int lineno, unsigned int errType, const char* fmt, va_list& args);
 
 extern NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, unsigned int errType, const char* assertion, const char* fmt, ...);
@@ -139,10 +139,10 @@ extern NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, uns
 
 // These macros assume that the condition is unlikely and try to provide the compiler an optimization hint by
 // ordering the abort as the second choice.
-#define ABORT_UNLESS(assertion_) (assertion_) ? (void)0 : (void)_LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, NULL, "Assertion: !(%s)", #assertion_)
-#define ABORT_UNLESS_EX(assertion_, ...) (assertion_) ? (void)0 : (void)_LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, #assertion_, __VA_ARGS__)
-#define ABORT_IF(assertion_) (!(assertion_)) ? (void)0 : (void)_LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, NULL, "Assertion: %s", #assertion_)
-#define ABORT_IF_EX(assertion_, ...) (!(assertion_)) ? (void)0 : (void)_LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, #assertion_, __VA_ARGS__)
+#define ABORT_UNLESS(assertion_) PN_LIKELY(assertion_) ? (void)0 : (void)_LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, NULL, "Assertion: !(%s)", #assertion_)
+#define ABORT_UNLESS_EX(assertion_, ...) PN_LIKELY(assertion_) ? (void)0 : (void)_LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, #assertion_, __VA_ARGS__)
+#define ABORT_IF(assertion_) PN_LIKELY(!(assertion_)) ? (void)0 : (void)_LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, NULL, "Assertion: %s", #assertion_)
+#define ABORT_IF_EX(assertion_, ...) PN_LIKELY(!(assertion_)) ? (void)0 : (void)_LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, #assertion_, __VA_ARGS__)
 
 #ifdef DBUG_TEST
 	#define dbugLog(x,args...) printf(args)
@@ -185,7 +185,7 @@ extern NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, uns
 #endif
 
 // This is set to true when the dbug library is logging _FLD messages
-extern bool g_logDebug ;
+extern bool g_logDebug;
 
 #ifndef FRONT_END
 # define DEBUG_ERR(...) dbugLog(_FLA, __VA_ARGS__)
@@ -198,17 +198,17 @@ extern bool g_logDebug ;
 #if platOS== OS_WIN32
 #define WriteToConsole(...)	\
 	{	\
-		char output[4096] ;	\
-		sprintf(output, __VA_ARGS__) ;	\
-		OutputDebugStringA(output) ;	\
-		OutputDebugStringA("\n") ;		\
+		char output[4096];	\
+		sprintf(output, __VA_ARGS__);	\
+		OutputDebugStringA(output);	\
+		OutputDebugStringA("\n");		\
 	}
 #elif platOS == OS_MACOS
 #define WriteToConsole(...)	\
 	{	\
-		printf(__VA_ARGS__) ;	\
-		printf("\n") ;	\
+		printf(__VA_ARGS__);	\
+		printf("\n");	\
 	}
 #else
-#define WriteToConsole(...) dbugLog(_FLD, __VA_ARGS__) ;
+#define WriteToConsole(...) dbugLog(_FLD, __VA_ARGS__);
 #endif

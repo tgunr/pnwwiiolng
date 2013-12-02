@@ -297,7 +297,7 @@ static void _displayLogo()
 	//_playStartupMovie("start");
 
 #ifndef DOROTHY
-	phui::View* splashscreen ;
+	phui::View* splashscreen;
 	if(_isWidescreen())	{splashscreen = uiLoadView("splashscreen69");}
 	else {splashscreen = uiLoadView("splashscreen43");}
 

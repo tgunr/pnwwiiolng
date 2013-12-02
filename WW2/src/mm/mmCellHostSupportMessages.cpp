@@ -12,11 +12,11 @@
 #include "mm/mmConstants.h"
 #include "wwii/wwiiCallbacks.h"
 
-TEUL_CALLBACK*	Host::VehicleRequest::s_callback ;
+TEUL_CALLBACK*	Host::VehicleRequest::s_callback;
 
 namespace Scoring
 {
-	TEUL_CALLBACK* xchgEventCallback = NULL ;
+	TEUL_CALLBACK* xchgEventCallback = NULL;
 }
 
 SINT32
@@ -24,7 +24,7 @@ mmCellHostSupportCallbacks(void)
 {
 	BEGIN_CALLBACK_REGISTRATION(MMHost::CallbackX)
 
-		REGISTER_RECEIVER(MMHost::WEAPONS_HANDOFF_Y, Host::VehicleRequest::_recvCallback) ;
+		REGISTER_RECEIVER(MMHost::WEAPONS_HANDOFF_Y, Host::VehicleRequest::_recvCallback);
 
 	END_CALLBACK_REGISTRATION
 }

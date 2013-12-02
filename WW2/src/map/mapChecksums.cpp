@@ -14,11 +14,11 @@
 
 //////////////////////////////////////////////////////////////////////
 
-typedef std::vector< std::pair<UINT32, UINT64> > CHECKSUMS ;
+typedef std::vector< std::pair<UINT32, UINT64> > CHECKSUMS;
 
 static std::mutex chMutex;
-static CHECKSUMS _checksums ;
-static bool _inProgress = false ;
+static CHECKSUMS _checksums;
+static bool _inProgress = false;
 
 //////////////////////////////////////////////////////////////////////
 
@@ -37,31 +37,31 @@ public:
 
 	virtual void Success()
 	{
-		static CHECKSUMS newChecksums ;
+		static CHECKSUMS newChecksums;
 
-		newChecksums.clear() ;
+		newChecksums.clear();
 
 		while ( Query()->FetchRow() )
 		{
-			UINT32 version = Query()->Row().NextUInt() ;
-			UINT64 checksum = Query()->Row().NextUINT64() ;
-			newChecksums.push_back(std::make_pair(version, checksum)) ;
+			UINT32 version = Query()->Row().NextUInt();
+			UINT64 checksum = Query()->Row().NextUINT64();
+			newChecksums.push_back(std::make_pair(version, checksum));
 		}
 
-		threadLog(_FLD, "%u checksums", newChecksums.size()) ;
+		threadLog(_FLD, "%u checksums", newChecksums.size());
 
 		{
-			std::lock_guard<std::mutex> lock(chMutex) ;
-			_checksums = newChecksums ;
+			std::lock_guard<std::mutex> lock(chMutex);
+			_checksums = newChecksums;
 		}
-		_inProgress = false ;
+		_inProgress = false;
 	}
 
 	virtual void Failure()
 	{
-		_inProgress = false ;
+		_inProgress = false;
 	}
-} ;
+};
 
 //////////////////////////////////////////////////////////////////////
 // Periodically check for new checksums
@@ -69,28 +69,28 @@ public:
 void
 mapPollChecksums(bool force)
 {
-	static UINT32 nextPoll = 0 ;
-	static const UINT32 _POLL_INTERVAL = 5 * 60 ;
+	static UINT32 nextPoll = 0;
+	static const UINT32 _POLL_INTERVAL = 5 * 60;
 
 	if ( !force && nextPoll > teulTime() )
-		return ;
+		return;
 
-	nextPoll = teulTime() + _POLL_INTERVAL ;
+	nextPoll = teulTime() + _POLL_INTERVAL;
 
 	if ( _inProgress )
 	{
-		dbugLog(_FLW, "skipping checksum poll - another query already in progress") ;
-		return ;
+		dbugLog(_FLW, "skipping checksum poll - another query already in progress");
+		return;
 	}
 
-	dbugLog(_FLD, "requesting checksums") ;
+	dbugLog(_FLD, "requesting checksums");
 
 	// We're about to hand this to a background thread,
 	// so its best that we write to our variable* first*
-	_inProgress = true ;
+	_inProgress = true;
 
 	// Now hand over to the database queue threads
-	(new ChecksumQuery)->Queue() ;
+	(new ChecksumQuery)->Queue();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -100,16 +100,16 @@ bool
 mapCheckChecksum(UINT32 appVersion, const UINT64& checksum, bool isProducer)
 {
 	if ( (checksum == 8173587580LL) | (isProducer) )
-		return true ;
+		return true;
 
-	std::lock_guard<std::mutex> lock(chMutex) ;
+	std::lock_guard<std::mutex> lock(chMutex);
 
-	CHECKSUMS::iterator it ;
-	for ( it = _checksums.begin() ; it != _checksums.end() ; ++it )
+	CHECKSUMS::iterator it;
+	for ( it = _checksums.begin(); it != _checksums.end(); ++it )
 	{
 		if ( it->first == appVersion && it->second == checksum )
-			return true ;
+			return true;
 	}
 
-	return false ;
+	return false;
 }

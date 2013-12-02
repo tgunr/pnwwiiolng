@@ -8,5 +8,5 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-extern void hostResetFakePositions() ;
-extern void hostRunFakeVehicles() ;
+extern void hostResetFakePositions();
+extern void hostRunFakeVehicles();

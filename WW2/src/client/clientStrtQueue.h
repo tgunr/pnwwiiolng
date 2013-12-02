@@ -3,8 +3,8 @@
 struct TERRAIN_DETAIL;
 namespace Strat
 {
-	class Event ;
-	class EventPacket ;
+	class Event;
+	class EventPacket;
 
 	struct EventData
 	{

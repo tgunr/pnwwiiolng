@@ -455,7 +455,7 @@ public:
 
 private:
 
-	CHATWHO_TIMEFRAME getJoinedSquad(UINT32 joined, UINT32& numUnits) const ;
+	CHATWHO_TIMEFRAME getJoinedSquad(UINT32 joined, UINT32& numUnits) const;
 };
 
 class jsPoll : public phui::js::Object

@@ -104,7 +104,7 @@ enum cfgPARAM_TYPES
 	cfgPARAM_FLOAT,
 	cfgPARAM_DOUBLE,
 	cfgPARAM_STRING
-} ;
+};
 
 #define CONFIG_NAME_SIZE 32
 

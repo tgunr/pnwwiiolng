@@ -9,7 +9,7 @@
 
 namespace Teul
 {
-	struct PacketHeader ;
+	struct PacketHeader;
 }
 
 struct DATA_GRAM
@@ -17,4 +17,4 @@ struct DATA_GRAM
 	struct sockaddr_in	sockAddress;
 	Teul::PacketHeader*	contents ;	//!< Points to the beginning of the packet data.
 	UINT32				m_size ;	//!< Size of the entire object.
-} ;
+};

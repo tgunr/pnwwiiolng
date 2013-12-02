@@ -126,7 +126,7 @@ typedef std::vector<UINT32> UnitList;
 
 	bool IsSpawnable() const;
 	bool IsDeepWaterPort() const;
-	bool IsRelated(const FULL_OBJ_ID& id) const ;
+	bool IsRelated(const FULL_OBJ_ID& id) const;
 	bool IsRelated(const StratDB::StratObject* strat) const;
 
 	StratDB::StratObject* GetLinkedDepot() const;

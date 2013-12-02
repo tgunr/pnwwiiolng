@@ -62,7 +62,7 @@ private:
 #ifdef __GNUC__
 #include <ext/hash_map>
 #include <ext/hash_set>
-namespace stdext = ::__gnu_cxx ;
+namespace stdext = ::__gnu_cxx;
 #elif defined(WIN32) || defined(WIN64)
 #include <hash_map>
 #include <hash_set>

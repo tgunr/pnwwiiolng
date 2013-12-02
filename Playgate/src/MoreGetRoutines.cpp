@@ -102,7 +102,7 @@ GetCPUFeatures(CPUFeatures& features)
 {
     int info[4] = {-1};
 
-	memset(&features, 0, sizeof(features)) ;
+	memset(&features, 0, sizeof(features));
 
 	// __cpuid with an InfoType argument of 0 returns the number of
 	// valid Ids in info[0] and the CPU identification string in
@@ -120,8 +120,8 @@ GetCPUFeatures(CPUFeatures& features)
 	// Get the information associated with each valid Id
 	if ( nIds < 1 )
 	{
-		Write_Debug("Invalid CPU Features nIDs %u", nIds) ;
-		return ;
+		Write_Debug("Invalid CPU Features nIDs %u", nIds);
+		return;
 	}
 
 	// Interpret CPU feature information.
@@ -133,9 +133,9 @@ GetCPUFeatures(CPUFeatures& features)
 	features.extendedModel = (info[0] >> 16) & 0xf;
 	features.extendedFamily = (info[0] >> 20) & 0xff;
 	features.brandIndex = info[1] & 0xff;
-	features.clflushCLS = ((info[1] >> 8) & 0xff) ;
+	features.clflushCLS = ((info[1] >> 8) & 0xff);
 	features.apicPhysicalID = (info[1] >> 24) & 0xff;
-	features.extFeatureInfo = info[2] ;
+	features.extFeatureInfo = info[2];
 	features.featureInfo = info[3];
 
 	// Calling __cpuid with 0x80000000 as the InfoType argument
@@ -144,7 +144,7 @@ GetCPUFeatures(CPUFeatures& features)
 	unsigned int nExIds = info[0];
 
 	// Get the information associated with each extended ID.
-	for ( unsigned int i = 0x80000002 ; i <= nExIds ; ++i )
+	for ( unsigned int i = 0x80000002; i <= nExIds; ++i )
 	{
 		// Interpret CPU brand string and cache information.
 		switch ( i )
@@ -152,27 +152,27 @@ GetCPUFeatures(CPUFeatures& features)
 		case 0x80000002:
 			__cpuid(info, i);
 			memcpy(features.brandName, info, sizeof(info));
-			break ;
+			break;
 		case 0x80000003:
 			__cpuid(info, i);
 			memcpy(features.brandName + 16, info, sizeof(info));
-			break ;
+			break;
 		case 0x80000004:
 			__cpuid(info, i);
 			memcpy(features.brandName + 32, info, sizeof(info));
-			break ;
+			break;
 		case 0x80000006:
 			__cpuid(info, i);
 			features.cacheLineSize = info[2] & 0xff;
 			features.l2Associativity = (info[2] >> 12) & 0xf;
 			features.cacheSizeK = (info[2] >> 16) & 0xffff;
-			break ;
+			break;
 		default:
-			break ;
+			break;
 		}
 	}
 
-	features.speed = GetCPUSpeed() ;
+	features.speed = GetCPUSpeed();
 }
 
 // Static functions
@@ -278,7 +278,7 @@ BOOL VerifyDirectXFileVersion(PLAY_DX_VERS *vers, DWORD MinProductVersionMS, DWO
 		// DirectX not correct version
 		if (Messages)
 		{
-			TCHAR txt[512] ;
+			TCHAR txt[512];
 			wsprintf(txt, _T("The version of DirectX installed on your system\n")
 										_T("is DirectX %d. %s requires you to\n")
 										_T("upgrade to DirectX %d."),
@@ -355,8 +355,8 @@ void GetSoundDevice(PLAY_SOUND *sound)
 	sound->mixer.wMid			= mxcaps.wMid;
 	sound->mixer.wPid			= mxcaps.wPid;
 
-	for ( UINT32 i = 0 ; i < MAX_MIX_NAME && i < sizeof(sound->mixer.szPname) ; ++i )
-		sound->mixer.szPname[i] = (char)mxcaps.szPname[i] ;
+	for ( UINT32 i = 0; i < MAX_MIX_NAME && i < sizeof(sound->mixer.szPname); ++i )
+		sound->mixer.szPname[i] = (char)mxcaps.szPname[i];
 	sound->mixer.szPname[MAX_MIX_NAME] = 0;
 
 //	Write_Debug("Audio device: %s", mxcaps.szPname);
@@ -369,7 +369,7 @@ void GetComputerInfo(HINSTANCE hInstance, PLAY_COMPUTER_INFO* const info, BOOL M
 {
 	info->version = info->CurrentVersion();
 	GetMemory(&info->memory);
-	GetCPUFeatures(info->cpu) ;
+	GetCPUFeatures(info->cpu);
 	GetSoundDevice(&info->sound);
 
 	GetDxInfo(&info->video.dx, Messages);

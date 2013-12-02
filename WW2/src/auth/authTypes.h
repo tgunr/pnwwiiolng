@@ -36,7 +36,7 @@ struct ARENA_REQ
 	UINT8	oVersion;			// used by packer for expansion of fields.
 	SCHAR	username[MAX_OLD_USERNAME+1];
 	UCHAR	password[MAX_PASSWORD+1]; // UCHAR expected for MD5
-} ;
+};
 
 enum AUTH_STATUS
 {
@@ -46,7 +46,7 @@ enum AUTH_STATUS
 	AUTH_AUTH_DOWN,
 	AUTH_GAME_FULL,
 	AUTH_MAX
-} ;
+};
 
 struct APP_VERIFY
 {
@@ -57,7 +57,7 @@ struct APP_VERIFY
 	SCHAR	appleID[4];
 	SINT32	appVersionMax;	// Max Version of the app required
 	LOGICAL	requireCD;		// require CD to be in drive
-} ;
+};
 
 struct APP_LAUNCH_REQ
 {
@@ -78,7 +78,7 @@ struct APP_LAUNCH_REQ
 	UCHAR	fileKey[MAX_PASSWORD+1];	//	UCHAR expected for MD5
 	UCHAR	manifestKey[MAX_PASSWORD+1]; //	UCHAR expected for MD5
 
-} ;
+};
 
 struct APP_FILE_CHECK
 {
@@ -86,7 +86,7 @@ struct APP_FILE_CHECK
 	SINT32	appID;						//	Application ID
 	UCHAR	fileKey[MAX_PASSWORD+1];	//	UCHAR expected for MD5
 	UCHAR	manifestKey[MAX_PASSWORD+1]; //	UCHAR expected for MD5
-} ;
+};
 
 
 enum APPDL_ACTION
@@ -94,29 +94,29 @@ enum APPDL_ACTION
 	APPDL_NODL,
 	APPDL_INSTALL,
 	APPDL_REPAIR
-} ;
+};
 
 struct APP_LAUNCH
 {
 	SINT32	arenaID;
-	UINT32	sessionID;	//The sessionID is used by the chat server, as
-						//	well as any game service that wants sessions
-	SINT32	appID;		//Application ID
-	SINT32	appVersion;	//Version of the app required
+	UINT32	sessionID;		//The sessionID is used by the chat server, as
+							//	well as any game service that wants sessions
+	SINT32	appID;			//Application ID
+	SINT32	appVersion;		//Version of the app required
 	UINT32	otp;			//One time password, provided authentication was
-						//	successful
+							//	successful
 	UINT32	serverIP;		//IP address of the server to connect to
-	UINT32	serverPort;	//port of the game server
+	UINT32	serverPort;		//port of the game server
 	PROTOCOL protocol;		//Protocol ID
-	SINT32	status;		// server status < 0 is an error, > 0 is # of players
+	SINT32	status;			// server status < 0 is an error, > 0 is # of players
 	SINT32	dataSize;
 	SCHAR	appleID[4];
 	SCHAR	data[MAX_PARAM];		//Application data.  Like parameters and such.
 
-	APPDL_ACTION action;	// what to do with a file that we dowload
+	APPDL_ACTION action;	// what to do with a file that we download
 	SINT32	dlAppID;		//Application ID
 
-} ;
+};
 
 #if platBuild == TEUL_SERVER
 	#include "auth/authServerTypes.h"

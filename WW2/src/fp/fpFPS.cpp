@@ -558,14 +558,14 @@ void fpFPSInit(vehVehicle*vehicle)
 
 	if (isParatroop)
 	{
-		fpsTrooper.isParatroop = TRUE ;
+		fpsTrooper.isParatroop = TRUE;
 		fpsTrooper.parachuteWorn = TRUE;
 		fpsTrooper.parachuteOpen = FALSE;
 		fpsTrooper.parachuteOKToOpen = FALSE;
 	}
 	else
 	{
-		fpsTrooper.isParatroop = FALSE ;
+		fpsTrooper.isParatroop = FALSE;
 		fpsTrooper.parachuteWorn = FALSE;
 		fpsTrooper.parachuteOpen = FALSE;
 		fpsTrooper.parachuteOKToOpen = FALSE;
@@ -1332,7 +1332,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 	// no sprinting while doing the stuff specified in the nosprint mask
 	if ((stateFlags & STATE_NOSPRINT_MASK) && (stateFlags & STATE_MOVE_FAST))
 	{
-		stateFlags &= ~(STATE_MOVE_FAST | STATE_NO_ARM_SWAY) ;
+		stateFlags &= ~(STATE_MOVE_FAST | STATE_NO_ARM_SWAY);
 		stateFlags |= STATE_MOVE_SLOW;
 	}
 
@@ -1340,8 +1340,8 @@ fpsWeaponStates fpFPSDetermineNextState ()
 	if ((stateFlags & STATE_SWIMMING) && !(stateFlags & STATE_SIT))
 	{
 		// Flags we need to remove
-		static const UINT32 _FLAGS_TO_REMOVE = STATE_EYE_STAND | STATE_EYE_CROUCH | STATE_AIM ;
-		static const UINT32 _FLAGS_TO_ADD = STATE_EYE_PRONE | STATE_RELAXED ;
+		static const UINT32 _FLAGS_TO_REMOVE = STATE_EYE_STAND | STATE_EYE_CROUCH | STATE_AIM;
+		static const UINT32 _FLAGS_TO_ADD = STATE_EYE_PRONE | STATE_RELAXED;
 
 		if (stateFlags & STATE_MOVE_FAST)
 		{
@@ -5746,7 +5746,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 	// convert to the physical world
 	pos = physicsGameToPhysical(pos);
 
-	colliderQuery::dGeomList& geoms = collider.geoms() ;
+	colliderQuery::dGeomList& geoms = collider.geoms();
 
 	dMatrix3 dAttitude;
 	MatrixTodMatrix(attitude, dAttitude);
@@ -5780,7 +5780,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 	bool recentRider = (fpsTrooper.lastUnrideTime && ((frametime - fpsTrooper.lastUnrideTime) <= 3000));
 	bool considerVehicles = !recentRider;
 
-	UINT32 ceilingFlags = (considerVehicles) ? COLLIDER_MANMADE_MASK|COLLIDER_DRIVABLE_MASK : COLLIDER_MANMADE_MASK ;
+	UINT32 ceilingFlags = (considerVehicles) ? COLLIDER_MANMADE_MASK|COLLIDER_DRIVABLE_MASK : COLLIDER_MANMADE_MASK;
 
 	Vec3d up = Vec3d(0, 0, 1.0f);
 	float ceiling = (float)collideRay(ceilingFlags, .75f, pos, up, true);
@@ -8193,7 +8193,7 @@ UINT32 fpFPSCheckNewPose(fpFPSPoses poseToCheck)
 	{
 		//	Write_Log (LOG_FPS, LOG_INFO, "Checking pose %d", poseToCheck);
 		mlVehicleData*	vehicleData = persGetPersonaModelDataPtr();
-		FLOAT64VECTOR	zeroVel = { 0, 0, 0 } ;
+		FLOAT64VECTOR	zeroVel = { 0, 0, 0 };
 		return (mlDetermineInfantryCollisions(vehicleData, &zeroVel, (UINT32)poseToCheck, FALSE));
 	}
 #endif
@@ -9004,22 +9004,22 @@ void fpFPSFireResupply (mlVehicleData* pVehicleData, FLOAT64VECTOR* pFirePos, pi
 static bool _isValidRepairTarget(const trnCDTerrainObject* TO)
 {
 	if ( NULL == TO )
-		return false ;
+		return false;
 
 	// Bridges are valid, but we ought to check for a defend objective.
 	// FIXME - check for objective here
 	// need the new strat db to be loaded for this
 	if ( TO->ObjId.objClass == CLASS_CP && TO->ObjId.objType == CP_BRIDGE )
-		return true ;
+		return true;
 
 	// You can also repair auto-gunners
 	if ( TO->ObjId.objClass == CLASS_BUILDING && TO->ObjId.objType == BUILDING_AUTOGUNNER )
 	{
 		// It must be destroyed
 		if ( TO->DamageLevel < 1 )
-			return false ;
+			return false;
 
-		vehVehicle*playerVehicle = persGetPersonaVehiclePtr() ;
+		vehVehicle*playerVehicle = persGetPersonaVehiclePtr();
 		// And it oughta be friendly
 #if defined(USE_OSG)
 		if(NULL == playerVehicle || wwiiSide(TO->Country) != (WWII_SIDE)playerVehicle->Side)
@@ -9028,12 +9028,12 @@ static bool _isValidRepairTarget(const trnCDTerrainObject* TO)
         }
 #else
 		if ( NULL == playerVehicle || wwiiSide(TO->Country) != (WWII_SIDE)playerVehicle->GetSide() )
-			return false ;
+			return false;
 #endif
-		return true ;
+		return true;
 	}
 
-	return false ;
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -10243,7 +10243,7 @@ static void _standFlags(UINT32& pFlags, fpFPSWeaponData& weapon, UINT32 poseFlag
 	}
 
 	//////// point
-	UINT32 pointFlag = (poseFlag == TPS_POSETYPE_STAND) ? TPS_POINTTYPE_RELAXED : TPS_POINTTYPE_READY ;
+	UINT32 pointFlag = (poseFlag == TPS_POSETYPE_STAND) ? TPS_POINTTYPE_RELAXED : TPS_POINTTYPE_READY;
 
 	if(poseFlag == TPS_POSETYPE_STAND && weapon.weaponType == FPS_WEAPONTYPE_ROCKET && moveFlag > TPS_MOVETYPE_STILL)
 	{
@@ -12349,10 +12349,10 @@ void fpFPSStartEmote (SCHAR* emote, SCHAR* handle, LOGICAL force)
 				Write_Log(LOG_FPS, LOG_INFO, "Invalid handle passed to dressdown!");
 				return;
 			}
-			ChatHandle target = chatGetHandle(handle) ;
+			ChatHandle target = chatGetHandle(handle);
 			if(!target)
 			{
-				Write_Log(LOG_FPS, LOG_INFO, "Handle is not a real handle") ;
+				Write_Log(LOG_FPS, LOG_INFO, "Handle is not a real handle");
 				return;
 			}
 
@@ -14563,7 +14563,7 @@ void FPSCollider::Update(double deltaTime)
 	// convert to the physical world
 	pos = physicsGameToPhysical(pos);
 
-	colliderQuery::dGeomList& colliders = geoms() ;
+	colliderQuery::dGeomList& colliders = geoms();
 
 	dMatrix3 dAttitude;
 	MatrixTodMatrix(attitude, dAttitude);

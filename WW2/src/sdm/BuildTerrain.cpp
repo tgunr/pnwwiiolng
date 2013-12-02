@@ -304,7 +304,7 @@ static void MergeCPFdata()
 		facSDM->originalSide	= facCPF->side;
 		facSDM->originalCountry	= facCPF->country;
 		facSDM->stratFlags		= (UINT8)facCPF->flags;
-		facSDM->cpid.Populate(cpCPF->second, cpCPF->second->cpid.id, CLASS_CP, cpCPF->second->ctype) ;
+		facSDM->cpid.Populate(cpCPF->second, cpCPF->second->cpid.id, CLASS_CP, cpCPF->second->ctype);
 
 		CellStratData*	cellStratData = &cellStratMap[pair<int, int>(facCPF->fid.scx, facCPF->fid.scy)];
 		if(cellStratData->facilities.insert(pair<ObjectId, FACILITY*>(ObjectId(facSDM->posx, facSDM->posy, facSDM->fileName), facSDM)).second == false)
@@ -370,7 +370,7 @@ static void MergeCPFdata()
 		FacilityCPFmap::iterator	facMapIt = facilityCPFmap.find(StratObjId(linkCPF->fbid.scx, linkCPF->fbid.scy, linkCPF->fbid.id));
 		if(facMapIt != facilityCPFmap.end())
 		{
-			linkSDM->firebaseId.Populate(facMapIt->second, facMapIt->second->fid.id, CLASS_FACILITY, facMapIt->second->ftype) ;
+			linkSDM->firebaseId.Populate(facMapIt->second, facMapIt->second->fid.id, CLASS_FACILITY, facMapIt->second->ftype);
 		}
 		else
 		{
@@ -385,7 +385,7 @@ static void MergeCPFdata()
 			piExitProgram (__FILE__, __LINE__, "As described in terrainBuildLog.txt.");
 		}
 
-		linkSDM->startDepotId.Populate(startBldCPF->second, linkCPF->lbid.id, CLASS_BUILDING, startBldCPF->second->btype) ;
+		linkSDM->startDepotId.Populate(startBldCPF->second, linkCPF->lbid.id, CLASS_BUILDING, startBldCPF->second->btype);
 
 		BuildingCPFmap::iterator	endBldCPF	= buildingCPFmap.find(StratObjId(linkCPF->bid.scx, linkCPF->bid.scy, linkCPF->bid.id));
 		if(endBldCPF == buildingCPFmap.end())
@@ -393,7 +393,7 @@ static void MergeCPFdata()
 			logFile << endl << "fatal error: link(" << linkCPF->lid.scx << "," << linkCPF->lid.scy << "," << linkCPF->lid.id << ") refers to inexistent end depot!" << endl;
 			piExitProgram (__FILE__, __LINE__, "As described in terrainBuildLog.txt.");
 		}
-		linkSDM->endDepotId.Populate(endBldCPF->second, endBldCPF->second->bid.id, CLASS_BUILDING, endBldCPF->second->btype) ;
+		linkSDM->endDepotId.Populate(endBldCPF->second, endBldCPF->second->bid.id, CLASS_BUILDING, endBldCPF->second->btype);
 
 		if(linkCPF->waypoint)
 		{
@@ -449,7 +449,7 @@ static void MergeCPFdata()
 		wptSDM->posy				= wptCPF->posy;
 		if(wptCPF->next != NULL)
 		{
-			wptSDM->nextpt.Populate(wptCPF->next, wptCPF->next->wpid.id, CLASS_WAYPOINT, 0) ;
+			wptSDM->nextpt.Populate(wptCPF->next, wptCPF->next->wpid.id, CLASS_WAYPOINT, 0);
 			FLOAT64	dx = (FLOAT64)wptCPF->next->posx - (FLOAT64)wptSDM->posx;
 			FLOAT64	dy = (FLOAT64)wptCPF->next->posy - (FLOAT64)wptSDM->posy;
 			wptSDM->distance = (SINT32)sqrt(dx * dx + dy * dy);
@@ -470,13 +470,13 @@ static void MergeCPFdata()
 				piExitProgram (__FILE__, __LINE__, "As described in terrainBuildLog.txt.");
 			}
 
-			wptSDM->nextpt.Populate(bldIt->second, linkIt->second.first->lid.id, CLASS_LINK, 0) ;
+			wptSDM->nextpt.Populate(bldIt->second, linkIt->second.first->lid.id, CLASS_LINK, 0);
 			FLOAT64 dx = (FLOAT64)bldIt->second->posx - (FLOAT64)wptCPF->posx;
 			FLOAT64 dy = (FLOAT64)bldIt->second->posy - (FLOAT64)wptCPF->posy;
 			wptSDM->distance = (SINT32)sqrt(dx * dx + dy * dy);
 		}
 
-		wptSDM->lid.Populate(it->second.second, wptCPF->lid.id, CLASS_LINK, 0) ;
+		wptSDM->lid.Populate(it->second.second, wptCPF->lid.id, CLASS_LINK, 0);
 		wptSDM->serial			= wptCPF->serial;
 		wptSDM->stratFlags		= (UINT8)wptCPF->flags;
 
@@ -2361,9 +2361,9 @@ void SuperCellTerrainData::Preprocess()
 		assert(editListCnt == 0);
 
 #if !WANT_NON_REPLACEMENT_TILES
-		for(int octetX=0; octetX < SUPERCELL_OCTETS_Y ; octetX++)
+		for(int octetX=0; octetX < SUPERCELL_OCTETS_Y; octetX++)
 		{
-			for(int octetY=0; octetY < SUPERCELL_OCTETS_X ; octetY++)
+			for(int octetY=0; octetY < SUPERCELL_OCTETS_X; octetY++)
 			{
 				Octet*	octet			= &octets[octetX][octetY];
 				Matrixf	worldTransform	= Matrixf::translate(worldOrigin + Vec3f((octetX+0.5f)*800.0f, (octetY+0.5f)*800.0f, 0.0f));
@@ -2642,9 +2642,9 @@ SuperCellTerrainData::SuperCellTerrainData(int cellX, int cellY, const Vec3f& of
 #endif
 
     // Initialize the octet physics spaces
-	for(int octetX=0; octetX < SUPERCELL_OCTETS_Y ; octetX++)
+	for(int octetX=0; octetX < SUPERCELL_OCTETS_Y; octetX++)
 	{
-		for(int octetY=0; octetY < SUPERCELL_OCTETS_X ; octetY++)
+		for(int octetY=0; octetY < SUPERCELL_OCTETS_X; octetY++)
 		{
 			octets[octetX][octetY].replacementTile = 0;
 			octets[octetX][octetY].octetPhysicsSpace = dHashSpaceCreate(cellPhysicsSpace);

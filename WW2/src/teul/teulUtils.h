@@ -14,7 +14,7 @@ namespace Teul
 	//! @param[in] signum	Signal to specify handler for.
 	//! @param[in] handler	New signal-handler function receiving signum as argument.
 	//! @returns 0 on success, otherwise error code.
-	int SetSignalHandler(int signum, void (*handler)(int)) ;
+	int SetSignalHandler(int signum, void (*handler)(int));
 #endif
 
 #if platBuild == TEUL_SERVER
@@ -32,7 +32,7 @@ namespace Teul
 	//! @param[out] outReason 0 on a successful lookup, otherwise an error code describing the failure.
 	//! @param[out] lastRx_ms time in milliseconds since the last packet was received.
 	//! @returns true on a successful query, false if there is a problem with the teulIndex.
-	bool GetEndpointStatus(const SINT32 teulIndex, SINT32* const outReason, TeulDeltaMS* const outLastRx_ms) ;
+	bool GetEndpointStatus(const SINT32 teulIndex, SINT32* const outReason, TeulDeltaMS* const outLastRx_ms);
 
 	//! Convert a host address and port number into host name (dotted decimal notation) and port number strings.
 	//! Primary purpose is to simplify future transitions to IPv6. bufLen must be large enough
@@ -43,7 +43,7 @@ namespace Teul
 	//! @param[in] hostBufLen_ size of the host name buffer (including trailing zero).
 	//! @param[in] portBuf_ destination for the port number or NULL if not required.
 	//! @param[in] portBufLen_ size of the port buffer (including trailing zero).
-	int HostToAddr(const UINT32 host_, const UINT16 port_, char* const hostBuf_, const size_t hostBufLen_, char* const portBuf_, const size_t portBufLen_) ;
+	int HostToAddr(const UINT32 host_, const UINT16 port_, char* const hostBuf_, const size_t hostBufLen_, char* const portBuf_, const size_t portBufLen_);
 
 	//! Convert an internet address into host name (dotted decimal notation) and port number strings.
 	//! Primary purpose is to simplify future transitions to IPv6. bufLen must be large enough
@@ -54,5 +54,5 @@ namespace Teul
 	//! @param[in] hostBufLen_ size of the host name buffer (including trailing zero).
 	//! @param[in] portBuf_ destination for the port number or NULL if not required.
 	//! @param[in] portBufLen_ size of the port buffer (including trailing zero).
-	int	HostToAddr(const struct sockaddr_in* const sa, char* const hostBuf_, size_t hostBufLen_, char* const portBuf_, size_t portBufLen_) ;
+	int	HostToAddr(const struct sockaddr_in* const sa, char* const hostBuf_, size_t hostBufLen_, char* const portBuf_, size_t portBufLen_);
 }

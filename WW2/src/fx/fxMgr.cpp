@@ -49,7 +49,7 @@ struct FXDRAWFUNC
 {
     LOGICAL (*pFn)(SINT32 iIndex);
 
-} ;
+};
 
 static FXDRAWFUNC g_pfnDrawFunc[NUMBER_OF_FXTYPES];
 

@@ -97,7 +97,7 @@ void nonExceptionErrorReport(const SINT8* file, SINT32 line, const SINT8* messag
 
 	errInfo.data.piExitInfo.srcLine=line;
 
-	FILE* fp = Fio::OpenLogFile() ;
+	FILE* fp = Fio::OpenLogFile();
 	if ( fp )
 	{
 		fprintf( fp, sstr.str().c_str() );
@@ -347,7 +347,7 @@ static int starter(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 	__except(reportException(GetExceptionInformation(),buffer,exceptionInfo,sw,errInfo))
 	{
-		FILE* fp = Fio::OpenLogFile() ;
+		FILE* fp = Fio::OpenLogFile();
 		if ( fp )
 		{
 			fprintf( fp, buffer.c_str() );

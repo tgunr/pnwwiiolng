@@ -36,15 +36,15 @@ extern SINT32 missionSendMMCapacityRequest(Player* player, CAPACITY_REQUEST_STAT
 #define PROCESS(_Type)	\
 	case Scoring :: Events :: _Type : \
 	{	\
-		Scoring :: _Type& typedEvt = *static_cast<Scoring :: _Type *>(evt) ; \
-		success = typedEvt.process(lhsPlayer) ; \
+		Scoring :: _Type& typedEvt = *static_cast<Scoring :: _Type *>(evt); \
+		success = typedEvt.process(lhsPlayer); \
 	}	\
-	break ;
+	break;
 
 static SINT32
 _recvEvent(ACTION_OBJECT* const a)
 {
-	Scoring::EventBase* evt = (Scoring::EventBase*)(a->packed) ;
+	Scoring::EventBase* evt = (Scoring::EventBase*)(a->packed);
 	auto& lhs = evt->lhs();
 	dbugLog(_FLI, "p:%u c:%s v:%u in:%llu Scoring::Event::recvEvent:: type %u. Processing: "
 					, lhs.playerID()
@@ -52,9 +52,9 @@ _recvEvent(ACTION_OBJECT* const a)
 					, lhs.sortieID()
 					, lhs.instID()
 					, evt->type()
-					) ;
+					);
 
-	Player* const lhsPlayer = PlayerInterface::Lookup(lhs.playerID()) ;
+	Player* const lhsPlayer = PlayerInterface::Lookup(lhs.playerID());
 	if ( lhsPlayer == NULL )
 	{
 		dbugLog(_FLM, "p:%u c:%s v:%u in:%llu Player not online for scoring event"
@@ -62,16 +62,16 @@ _recvEvent(ACTION_OBJECT* const a)
 					, chatGetCallsign(evt->lhs().handle())
 					, lhs.sortieID()
 					, lhs.instID()
-					) ;
-		return 0 ;
+					);
+		return 0;
 	}
 
-	bool success = false ;
+	bool success = false;
 	switch ( evt->type() )
 	{
 	case Scoring::Events::Invalid:
-		dbugLog(_FLA, " That's an INVALID event!") ;
-	break ;
+		dbugLog(_FLA, " That's an INVALID event!");
+	break;
 		PROCESS( Assist )
 		PROCESS( Capture )
 		PROCESS( Death )
@@ -84,17 +84,17 @@ _recvEvent(ACTION_OBJECT* const a)
 		PROCESS( UMSKill )
 		PROCESS( WeaponReturn )
 	default:
-		dbugLog(_FLA, "Unhandled event type") ;
-	break ;
+		dbugLog(_FLA, "Unhandled event type");
+	break;
 //	default:
-//		dbugLog(_FLA, "Unknown scoring event: %u in inst %llu", evt->type(), evt->instanceID()) ;
-//	break ;
+//		dbugLog(_FLA, "Unknown scoring event: %u in inst %llu", evt->type(), evt->instanceID());
+//	break;
 	}
 
 	if ( success == false )
-		return -EINVAL ;
+		return -EINVAL;
 
-	return a->offset ;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -105,8 +105,8 @@ Scoring::FindSortieForPlayer(const Player* const player, const sortieid_t sortie
 {
 	// Avoid a lookup if the sortie is current.
 	if ( player->sortie() && player->sortie()->sortieID() == sortieID )
-		return const_cast<Scoring::Sortie*>(player->sortie()) ;
-	return Scoring::Sortie::Lookup(sortieID) ;
+		return const_cast<Scoring::Sortie*>(player->sortie());
+	return Scoring::Sortie::Lookup(sortieID);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -114,12 +114,12 @@ Scoring::FindSortieForPlayer(const Player* const player, const sortieid_t sortie
 
 bool Scoring::Assist::process(Player* const /*lhsPlayer*/)
 {
-	dbugLog(_FLIB, " assist") ;		///TODO:134:REMOVE
+	dbugLog(_FLIB, " assist");		///TODO:134:REMOVE
 
 	///TODO:SCORING+: Similar to handling a kill, except we give
 	/// points to other people too.
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -127,64 +127,64 @@ bool Scoring::Assist::process(Player* const /*lhsPlayer*/)
 
 bool Scoring::Capture::process(Player* const lhsPlayer)
 {
-	dbugLog(_FLIB, " capture") ;	///TODO:134:REMOVE
+	dbugLog(_FLIB, " capture");	///TODO:134:REMOVE
 
-	Scoring::Sortie* const sortie = FindSortieForPlayer(lhsPlayer, lhs().sortieID()) ;
+	Scoring::Sortie* const sortie = FindSortieForPlayer(lhsPlayer, lhs().sortieID());
 	if ( sortie == NULL )
-		return true ;
+		return true;
 
 	///TODO:SCORING+: We need to move the fancy stuff to Scoring::Sortie rather than
 	/// player->missionPacket.
-	++lhsPlayer->missionPacket().scoring().captures ;
+	++lhsPlayer->missionPacket().scoring().captures;
 
-	dbugLog(_FLD, "t:%d p:%u c:%s captures = %u", lhsPlayer->teulIndex(), lhsPlayer->playerID(), lhsPlayer->callsign(), lhsPlayer->missionPacket().scoring().captures.get()) ;
+	dbugLog(_FLD, "t:%d p:%u c:%s captures = %u", lhsPlayer->teulIndex(), lhsPlayer->playerID(), lhsPlayer->callsign(), lhsPlayer->missionPacket().scoring().captures.get());
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Process a vehicle despawn event.
 
-static const CODE_RTB rtbCodes[] = { RTB_BAIL_ENEMY, RTB_SUCCESS, RTB_DIED, RTB_BAIL_ENEMY, RTB_BAIL_FRIENDLY } ;
-extern const char* const rtbNames[] = { "rtb", "res", "mia", "kia" } ;
+static const CODE_RTB rtbCodes[] = { RTB_BAIL_ENEMY, RTB_SUCCESS, RTB_DIED, RTB_BAIL_ENEMY, RTB_BAIL_FRIENDLY };
+extern const char* const rtbNames[] = { "rtb", "res", "mia", "kia" };
 
 bool Scoring::Despawn::process(Player* const lhsPlayer)
 {
-	const CODE_RTB rtbCode = (exitCode() <= PEXIT_OVER_FRIENDLY_TERRITORY) ? rtbCodes[exitCode()] : rtbCodes[0] ;
+	const CODE_RTB rtbCode = (exitCode() <= PEXIT_OVER_FRIENDLY_TERRITORY) ? rtbCodes[exitCode()] : rtbCodes[0];
 
-	dbugLog(_FLIB, " despawn, ec:%u rtb:%u", exitCode(), rtbCode) ;
+	dbugLog(_FLIB, " despawn, ec:%u rtb:%u", exitCode(), rtbCode);
 
-	Scoring::Sortie* const sortie = FindSortieForPlayer(lhsPlayer, lhs().sortieID()) ;
+	Scoring::Sortie* const sortie = FindSortieForPlayer(lhsPlayer, lhs().sortieID());
 	if ( sortie == NULL )
 	{
-		dbugLog(_FLIB, " no sortie") ; ///TODO:134:REMOVE
-		return true ;
+		dbugLog(_FLIB, " no sortie"); ///TODO:134:REMOVE
+		return true;
 	}
 
-	sortie->setRTB(rtbCode, rhs()) ;
-	sortie->despawned() ;
+	sortie->setRTB(rtbCode, rhs());
+	sortie->despawned();
 
 	if ( (lhsPlayer->requestedCapacity() == false) & (lhsPlayer->receivedCapacity() == false) )
 	{
-		missionSendMMCapacityRequest(lhsPlayer, CAPACITY_AFTER_MISSION) ;
+		missionSendMMCapacityRequest(lhsPlayer, CAPACITY_AFTER_MISSION);
 	}
 
 	// Did we take a hit within the last 1 minute 15 seconds?
-	const bool wasRecentlyHit = (sortie->lastHitTime() >=  teulClock64 - (75 * 1000)) ;
+	const bool wasRecentlyHit = (sortie->lastHitTime() >=  teulClock64 - (75 * 1000));
 
-	WeaponsReturn weaponsReturn(sortie->sortieID(), sortie->despawnedTo(), (UINT32)exitCode(), isVehicleDead(), wasRecentlyHit, false, isResupply()) ;
-	weaponsReturn.m_position = position() ;
+	WeaponsReturn weaponsReturn(sortie->sortieID(), sortie->despawnedTo(), (UINT32)exitCode(), isVehicleDead(), wasRecentlyHit, false, isResupply());
+	weaponsReturn.m_position = position();
 
-	Teul::Packet outgoing(sizeof(WeaponsReturn), Strat::CallbackX, STRT_SYNC_WEAPONS_RETURN_Y) ;
-	outgoing.append(weaponsReturn) ;
+	Teul::Packet outgoing(sizeof(WeaponsReturn), Strat::CallbackX, STRT_SYNC_WEAPONS_RETURN_Y);
+	outgoing.append(weaponsReturn);
 
-	const SINT32 retval = outgoing.send(mapGetStratIndex()) ;
+	const SINT32 retval = outgoing.send(mapGetStratIndex());
 	if ( retval < 0 )
 	{
-		dbugLog(_FLA, "v:%u couldn't send weaponsreturn retval:%d", sortie->sortieID(), retval) ;
+		dbugLog(_FLA, "v:%u couldn't send weaponsreturn retval:%d", sortie->sortieID(), retval);
 	}
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -192,26 +192,26 @@ bool Scoring::Despawn::process(Player* const lhsPlayer)
 
 bool Scoring::Guard::process(Player* const lhsPlayer)
 {
-	dbugLog(_FLIB, " guard") ; ///TODO:134:REMOVE
+	dbugLog(_FLIB, " guard"); ///TODO:134:REMOVE
 
-	const UINT32 pointsPer_s = (UINT32)host_config.score.guardPointPer_m * 60 ;
+	const UINT32 pointsPer_s = (UINT32)host_config.score.guardPointPer_m * 60;
 	if ( pointsPer_s == 0 )
-		return true ;
+		return true;
 
-	Scoring::Sortie* const sortie = FindSortieForPlayer(lhsPlayer, lhs().sortieID()) ;
+	Scoring::Sortie* const sortie = FindSortieForPlayer(lhsPlayer, lhs().sortieID());
 	if ( sortie == NULL )
-		return true ;
+		return true;
 
-	const UINT32 guardPoints = seconds() / pointsPer_s ;
+	const UINT32 guardPoints = seconds() / pointsPer_s;
 	if ( guardPoints <= 0 )
-		return true ;
+		return true;
 
 	///TODO:SCORING+: Move to sortie stuff.
-	lhsPlayer->missionPacket().scoring().guardingPoints += guardPoints ;
+	lhsPlayer->missionPacket().scoring().guardingPoints += guardPoints;
 
-	dbugLog(_FLIB, " guardpoints = %u", lhsPlayer->missionPacket().scoring().guardingPoints.get()) ;
+	dbugLog(_FLIB, " guardpoints = %u", lhsPlayer->missionPacket().scoring().guardingPoints.get());
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -219,30 +219,30 @@ bool Scoring::Guard::process(Player* const lhsPlayer)
 
 bool Scoring::Hit::process(Player* const lhsPlayer)
 {
-	dbugLog(_FLIB, " hit") ; ///TODO:134:REMOVE
+	dbugLog(_FLIB, " hit"); ///TODO:134:REMOVE
 
-	Scoring::Sortie* const sortie = FindSortieForPlayer(lhsPlayer, lhs().sortieID()) ;
+	Scoring::Sortie* const sortie = FindSortieForPlayer(lhsPlayer, lhs().sortieID());
 	if ( sortie == NULL )
-		return true ;
+		return true;
 
-	Player* const rhsPlayer = PlayerInterface::Lookup(rhs().playerID()) ;
+	Player* const rhsPlayer = PlayerInterface::Lookup(rhs().playerID());
 	if ( rhsPlayer != NULL )
 	{
-		++rhsPlayer->missionPacket().scoring().hits ;
+		++rhsPlayer->missionPacket().scoring().hits;
 
-		Scoring::Sortie* const shooterSortie = FindSortieForPlayer(rhsPlayer, rhs().sortieID()) ;
+		Scoring::Sortie* const shooterSortie = FindSortieForPlayer(rhsPlayer, rhs().sortieID());
 		if ( shooterSortie != NULL )
 		{
-			shooterSortie->addHitTo(lhs(), joules()) ;
+			shooterSortie->addHitTo(lhs(), joules());
 		}
 	}
 
 	///TODO:SCORING+: Track friendly hits.
 
 	if ( sortie )
-		sortie->addHitBy(rhs(), joules()) ;
+		sortie->addHitBy(rhs(), joules());
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -250,20 +250,20 @@ bool Scoring::Hit::process(Player* const lhsPlayer)
 
 bool Scoring::Kill::process(Player* const lhsPlayer)
 {
-	dbugLog(_FLIB, " kill") ; ///TODO:134:REMOVE
+	dbugLog(_FLIB, " kill"); ///TODO:134:REMOVE
 
-	Scoring::Sortie* const killerSortie = FindSortieForPlayer(lhsPlayer, lhs().sortieID()) ;
-	Scoring::Sortie* const deadSortie = Sortie::Lookup(rhs().sortieID()) ;
+	Scoring::Sortie* const killerSortie = FindSortieForPlayer(lhsPlayer, lhs().sortieID());
+	Scoring::Sortie* const deadSortie = Sortie::Lookup(rhs().sortieID());
 	if ( killerSortie == NULL )
-		dbugLog(_FLA, "p:%u c:%s v:%u unable to find this killer sortie", lhsPlayer->playerID(), lhsPlayer->callsign(), lhs().sortieID()) ;
+		dbugLog(_FLA, "p:%u c:%s v:%u unable to find this killer sortie", lhsPlayer->playerID(), lhsPlayer->callsign(), lhs().sortieID());
 	if ( deadSortie == NULL )
-		dbugLog(_FLA, "p:%u c:%s v:%u unable to find this victim sortie", rhs().playerID(), chatGetCallsign(rhs().handle()), rhs().sortieID()) ;
+		dbugLog(_FLA, "p:%u c:%s v:%u unable to find this victim sortie", rhs().playerID(), chatGetCallsign(rhs().handle()), rhs().sortieID());
 	if ( killerSortie == NULL || deadSortie == NULL )
-		return false ;
+		return false;
 
 	///TODO:SCORING: Process the kill.
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -271,11 +271,11 @@ bool Scoring::Kill::process(Player* const lhsPlayer)
 
 bool Scoring::PPO::process(Player* const /*lhsPlayer*/)
 {
-	dbugLog(_FLIB, " ppokill") ; ///TODO:134:REMOVE
+	dbugLog(_FLIB, " ppokill"); ///TODO:134:REMOVE
 
 	///TODO:SCORING+: Score for ppo kills?
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -283,12 +283,12 @@ bool Scoring::PPO::process(Player* const /*lhsPlayer*/)
 
 bool Scoring::Resupply::process(Player* const lhsPlayer)
 {
-	dbugLog(_FLIB, " resupply") ; ///TODO:134:REMOVE
+	dbugLog(_FLIB, " resupply"); ///TODO:134:REMOVE
 
-	++ lhsPlayer->missionPacket().scoring().resupplies ;
-	++ lhsPlayer->missionPacket().scoring().resuppliesScored ;
+	++ lhsPlayer->missionPacket().scoring().resupplies;
+	++ lhsPlayer->missionPacket().scoring().resuppliesScored;
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -296,11 +296,11 @@ bool Scoring::Resupply::process(Player* const lhsPlayer)
 
 bool Scoring::UMSKill::process(Player* const lhsPlayer)
 {
-	dbugLog(_FLIB, " umskill") ; ///TODO:134:REMOVE
+	dbugLog(_FLIB, " umskill"); ///TODO:134:REMOVE
 
-	++ lhsPlayer->missionPacket().scoring().umsKills ;
+	++ lhsPlayer->missionPacket().scoring().umsKills;
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -309,11 +309,11 @@ bool Scoring::UMSKill::process(Player* const lhsPlayer)
 
 bool Scoring::WeaponReturn::process(Player* const /*lhsPlayer*/)
 {
-	dbugLog(_FLIB, " weaponreturn") ; ///TODO:134:REMOVE
+	dbugLog(_FLIB, " weaponreturn"); ///TODO:134:REMOVE
 
 	///TODO:SCORING: Handle weapon's return (augment player's score)
 
-	return true ;
+	return true;
 }
 
 namespace Scoring
@@ -322,7 +322,7 @@ SINT32
 InstallCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Scoring::CallbackX)
-		REGISTER_RECEIVER(Scoring::EVENT_Y, _recvEvent) ;
+		REGISTER_RECEIVER(Scoring::EVENT_Y, _recvEvent);
 	END_CALLBACK_REGISTRATION
 }
 }

@@ -14,7 +14,7 @@
 #define memRealloc(Ptr_, NewSize_) realloc(Ptr_, NewSize_)
 void* memAllocRelease(SINT32 allocSize);
 void memFreeRelease(void* pointer);
-static void* memCalloc(size_t members, size_t sz) { return calloc(members, sz) ; }
+static void* memCalloc(size_t members, size_t sz) { return calloc(members, sz); }
 extern LOGICAL memInit(void);
 extern void memKill(void);
 #else
@@ -29,14 +29,14 @@ extern void memKill(void);
 		#define memFree(Ptr_) free(Ptr_)
 		#define memReportJSON(...)
 	#else
-		extern void* memCallocDebug(const size_t, const size_t, const char* const file_, const size_t line) ;
+		extern void* memCallocDebug(const size_t, const size_t, const char* const file_, const size_t line);
 		#define memAlloc(Size_) memCallocDebug(1, Size_, __FILE__, __LINE__)
 		#define memCalloc(Units_, UnitSize_) memCallocDebug(Units_, UnitSize_, __FILE__, __LINE__)
-		extern void* memReallocDebug(void* const, const size_t, const char* const file_, const size_t line) ;
+		extern void* memReallocDebug(void* const, const size_t, const char* const file_, const size_t line);
 		#define memRealloc(Ptr_, NewSize_) memReallocDebug(Ptr_, NewSize_, __FILE__, __LINE__)
-		extern void memFreeDebug(void* const, const char* const file_, const size_t line) ;
+		extern void memFreeDebug(void* const, const char* const file_, const size_t line);
 		#define memFree(Ptr_) memFreeDebug(Ptr_, __FILE__, __LINE__)
-		extern void memReportJSON(unsigned int fd, const char* const /*path*/, const char* const /*args*/) ;
+		extern void memReportJSON(unsigned int fd, const char* const /*path*/, const char* const /*args*/);
 	#endif
 #else
 	#include <malloc.h>
@@ -64,9 +64,9 @@ extern void memKill(void);
 		void memFreeDebug(void* Pointer, SINT8* file, SINT32 line);
 		#define memCalloc(a,b) memAlloc((a)*(b))
 	#else
-		static inline void* memAllocRelease(size_t allocSize) { return calloc(1, allocSize) ; }
-		static inline void memFreeRelease(void* pointer) { free(pointer) ; }
-//		static inline void* memCalloc(size_t members, size_t size) { return calloc(members, size) ; }
+		static inline void* memAllocRelease(size_t allocSize) { return calloc(1, allocSize); }
+		static inline void memFreeRelease(void* pointer) { free(pointer); }
+//		static inline void* memCalloc(size_t members, size_t size) { return calloc(members, size); }
 	#endif
 #endif
 
@@ -79,6 +79,6 @@ extern void memKill(void);
 #endif
 #endif
 #ifdef __cplusplus
-#define memRelease(ptr) { if(ptr != NULL) { memFree(ptr) ; ptr = NULL ; } }
+#define memRelease(ptr) { if(ptr != NULL) { memFree(ptr); ptr = NULL; } }
 #endif
 

@@ -8,4 +8,4 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-extern const char* chatTimeInterval(UINT32 interval) ;
+extern const char* chatTimeInterval(UINT32 interval);

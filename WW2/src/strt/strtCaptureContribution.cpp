@@ -22,11 +22,11 @@
 #include <set>
 #include <queue>
 
-typedef std::set<FacilityStruct*> ACTIVE_FACILITIES ;
-typedef std::queue<Strat::CaptureContribution> CONTRIBUTIONS ;
+typedef std::set<FacilityStruct*> ACTIVE_FACILITIES;
+typedef std::queue<Strat::CaptureContribution> CONTRIBUTIONS;
 
-static ACTIVE_FACILITIES	activeFacilities ;
-static CONTRIBUTIONS		contributions ;
+static ACTIVE_FACILITIES	activeFacilities;
+static CONTRIBUTIONS		contributions;
 
 //	------------------------------	Declarations
 
@@ -44,56 +44,56 @@ void
 FacilityStruct::_setCaptureState(CaptureStage toStage, UINT16 toCounter)
 {
 	if ( toStage == m_captureStage && toCounter == m_captureCounter )
-		return ;
+		return;
 
 	switch ( toStage )
 	{
 	case _CAP_DISABLED:
-		assert( toCounter == 0 ) ;
-		dbugLog(_FLI, "fac:%s:cap setting disabled", this->name) ;
-		m_captureProgress = 0 ;
-		m_captureRate = 0 ;
-	break ;
+		assert( toCounter == 0 );
+		dbugLog(_FLI, "fac:%s:cap setting disabled", this->name);
+		m_captureProgress = 0;
+		m_captureRate = 0;
+	break;
 	case _CAP_PENDING:
-		assert( toCounter > 0 ) ;
-		dbugLog(_FLI, "fac:%s:cap setting pending in %us", this->name, toCounter) ;
-		m_captureProgress = 0 ;
-		m_captureRate = 0 ;
-	break ;
+		assert( toCounter > 0 );
+		dbugLog(_FLI, "fac:%s:cap setting pending in %us", this->name, toCounter);
+		m_captureProgress = 0;
+		m_captureRate = 0;
+	break;
 	case _CAP_ENABLED:
-		assert( toCounter < 100 ) ;
-		dbugLog(_FLI, "fac:%s:cap setting enabled with %u%% initial progress", this->name, toCounter) ;
-		m_captureProgress = (FLOAT32)toCounter ;
-		m_captureRate = 0 ;
-	break ;
+		assert( toCounter < 100 );
+		dbugLog(_FLI, "fac:%s:cap setting enabled with %u%% initial progress", this->name, toCounter);
+		m_captureProgress = (FLOAT32)toCounter;
+		m_captureRate = 0;
+	break;
 	default:
-		dbugLog(_FLA, "unknown capture state") ;
-	break ;
+		dbugLog(_FLA, "unknown capture state");
+	break;
 	}
 
-	UINT32 oldStage = m_captureStage ;
+	UINT32 oldStage = m_captureStage;
 
-	m_captureStage = toStage ;
-	m_captureCounter = toCounter ;
-	m_captureStateChanged = teulTime() ;
+	m_captureStage = toStage;
+	m_captureCounter = toCounter;
+	m_captureStateChanged = teulTime();
 
-	strtSendCaptureState(this, this->side, (oldStage == _CAP_ENABLED ? 100 : 0), false) ;
+	strtSendCaptureState(this, this->side, (oldStage == _CAP_ENABLED ? 100 : 0), false);
 
-	strtQueueFacilityStatus(this) ;
+	strtQueueFacilityStatus(this);
 
 	// End of processing for disabled captures.
 	if ( _CAP_DISABLED == m_captureStage )
 	{
-		activeFacilities.erase(this) ;
+		activeFacilities.erase(this);
 	}
 	else
 	{
 		// Make sure we're in the active captures list.
-		activeFacilities.insert(this) ;
+		activeFacilities.insert(this);
 
 		// Captured depots open once
 		if ( this->type == FACILITY_DEPOT && !this->isOpen() )
-			strtOpenBase(*this) ;
+			strtOpenBase(*this);
 	}
 
 }
@@ -107,62 +107,62 @@ FacilityStruct::setCaptureProgress(FLOAT32 newValue, const Strat::CaptureContrib
 {
 	if ( false == this->isCapturable() )
 	{
-		dbugLog(_FLW, "f:%s:cap not capturable", name) ;
-		return this->setCaptureDisabled() ;
+		dbugLog(_FLW, "f:%s:cap not capturable", name);
+		return this->setCaptureDisabled();
 	}
 
 	if ( this->isCaptureEnabled() == false )
 	{
-		dbugLog(_FLW, "f:%s:cap not enabled", name) ;
-		return ;
+		dbugLog(_FLW, "f:%s:cap not enabled", name);
+		return;
 	}
 
 	if ( newValue < 0.0 )
-		newValue = 0.0 ;
+		newValue = 0.0;
 	else if ( newValue > 100.0 )
-		newValue = 100.0 ;
+		newValue = 100.0;
 
-	const WWII_SIDE forSide = claimant.unit().side() ;
-	const FLOAT32 delta = newValue - this->m_captureProgress ;
+	const WWII_SIDE forSide = claimant.unit().side();
+	const FLOAT32 delta = newValue - this->m_captureProgress;
 
 	if ( delta != 0 )
 	{
 		// It went up or down.
-		this->m_captureCounter = (UINT16)newValue ;
-		this->m_captureProgress = newValue ;
-		this->m_captureRate = delta ;
+		this->m_captureCounter = (UINT16)newValue;
+		this->m_captureProgress = newValue;
+		this->m_captureRate = delta;
 
-		strtQueueFacilityStatus(this) ;
+		strtQueueFacilityStatus(this);
 
 		if ( newValue <= 0.0 || newValue >= 100.0 )
 		{
-			dbugLog(_FLD, "f:%s:cap capping", name) ;
+			dbugLog(_FLD, "f:%s:cap capping", name);
 			strtCaptureAndLog(this
 								, claimant.handle()
 								, claimant.playerID()
 								, claimant.missionID()
 								, &claimant.unit()
 								, teulTime() - this->m_captureStateChanged
-								) ;
+								);
 
 			if ( this->m_captureBuilding )
-				strtSendCaptureScoreNotice(this->m_captureBuilding->fullObjID, claimant.unit().side()) ;
+				strtSendCaptureScoreNotice(this->m_captureBuilding->fullObjID, claimant.unit().side());
 		}
 		else
 		{
-			SINT32 rate = 1 ;
-			FLOAT32 absDelta = abs(delta) ;
+			SINT32 rate = 1;
+			FLOAT32 absDelta = abs(delta);
 			if ( absDelta > 5 )
-				rate = 3 ;
+				rate = 3;
 			else if ( absDelta >= 0.5 )
-				rate = 2 ;
-			strtSendCaptureState(this, forSide, rate, false) ;
+				rate = 2;
+			strtSendCaptureState(this, forSide, rate, false);
 		}
 	}
 	else
 	{
-		dbugLog(_FLD, "f:%s:cap old value [%f]", name, newValue) ;
-		strtSendCaptureState(this, forSide, 0, false) ;
+		dbugLog(_FLD, "f:%s:cap old value [%f]", name, newValue);
+		strtSendCaptureState(this, forSide, 0, false);
 	}
 }
 
@@ -175,12 +175,12 @@ Strat::CaptureContribution::Queue(Status withStatus, FacilityStruct& forFacility
 	if ( forFacility.isCaptureEnabled() == false )
 	{
 		dbugLog(_FLD, "p:%u c:%s fac:%s:cap ignoring contribution for uncappable facility"
-						, forPlayerID, chatGetCallsign(forHandle), forFacility.name) ;
-		return ;
+						, forPlayerID, chatGetCallsign(forHandle), forFacility.name);
+		return;
 	}
 
-	Strat::CaptureContribution contrib(withStatus, forFacility, forHandle, forPlayerID, forSortieID, forMissionID, forUnit) ;
-	contributions.push(contrib) ;
+	Strat::CaptureContribution contrib(withStatus, forFacility, forHandle, forPlayerID, forSortieID, forMissionID, forUnit);
+	contributions.push(contrib);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -189,19 +189,19 @@ Strat::CaptureContribution::Queue(Status withStatus, FacilityStruct& forFacility
 Strat::CaptureContribution
 Strat::CaptureContribution::GetQueueFront()
 {
-	return contributions.front() ;
+	return contributions.front();
 }
 
 void
 Strat::CaptureContribution::QueuePop()
 {
-	contributions.pop() ;
+	contributions.pop();
 }
 
 bool
 Strat::CaptureContribution::IsQueueEmpty()
 {
-	return contributions.empty() ;
+	return contributions.empty();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -210,12 +210,12 @@ Strat::CaptureContribution::IsQueueEmpty()
 FacilityStruct*
 Strat::CaptureContribution::GetNextActiveFacility(FacilityStruct* current)
 {
-	ACTIVE_FACILITIES::iterator it = activeFacilities.upper_bound(current) ;
+	ACTIVE_FACILITIES::iterator it = activeFacilities.upper_bound(current);
 	if ( it == activeFacilities.end() || *it == current)
 	{
-		return NULL ;
+		return NULL;
 	}
 
-	return *it ;
+	return *it;
 }
 

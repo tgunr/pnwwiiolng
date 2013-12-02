@@ -24,38 +24,38 @@
 WeaponCounter*
 WeaponEntry::getCounter(WeaponCounter* into, const TOE_::WeaponInstance* toeEntry) const
 {
-	static WeaponCounter tempCounter ;
-	WeaponCounter* counter = (into) ? into : &tempCounter ;
+	static WeaponCounter tempCounter;
+	WeaponCounter* counter = (into) ? into : &tempCounter;
 
 	if ( host_config.supply.enabled == false || weapon().isSystemWeapon() )
 	{
-		counter->current = counter->capacity = 1 ;
-		return counter ;
+		counter->current = counter->capacity = 1;
+		return counter;
 	}
 
 	if ( toeEntry == NULL || toeEntry->capacity() == 0 )
 	{
-		counter->clear() ;
-		return counter ;
+		counter->clear();
+		return counter;
 	}
 
 	// If the spawn isn't throttled, just give them what they want
 	if ( !isThrottled() )
 	{
-		counter->current = toeEntry->present() ;
-		counter->capacity = toeEntry->capacity() ;
-		return counter ;
+		counter->current = toeEntry->present();
+		counter->capacity = toeEntry->capacity();
+		return counter;
 	}
 
 	// It's throttled, apply the window
-	counter->capacity = toeEntry->throttleCapacity() ;
-	SINT32 newCurrent = (SINT32)counter->capacity - (SINT32)toeEntry->unit().checkThrottleWindow(facility(), toeEntry->spec()) ;
+	counter->capacity = toeEntry->throttleCapacity();
+	SINT32 newCurrent = (SINT32)counter->capacity - (SINT32)toeEntry->unit().checkThrottleWindow(facility(), toeEntry->spec());
 	if ( newCurrent <= 0 )
-		counter->current = 0 ;
+		counter->current = 0;
 	else if ( toeEntry->present() < newCurrent )
-		counter->current = toeEntry->present() ;
+		counter->current = toeEntry->present();
 	else
-		counter->current = newCurrent ;
+		counter->current = newCurrent;
 
-	return counter ;
+	return counter;
 }

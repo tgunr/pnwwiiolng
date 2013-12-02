@@ -11,9 +11,9 @@
 // These values are arbitrary, and designed to create an initially high
 // "covert check" frequency which decreases over time but also
 // has a minimum that tries to reduce overhead.
-static const unsigned int INIT_UPDATE_PRIME = 127979 ;
-static const unsigned int UPDATE_PRIME_DEC = 311 ;
-static const unsigned int MIN_UPDATE_PRIME = 32801 ;
+static const unsigned int INIT_UPDATE_PRIME = 127979;
+static const unsigned int UPDATE_PRIME_DEC = 311;
+static const unsigned int MIN_UPDATE_PRIME = 32801;
 
 enum
 {
@@ -33,8 +33,8 @@ enum
 	UPDT_LONE =0,
 	UPDT_CONTROL,
 	UPDT_OTHER
-} ;
-typedef UCHAR UPDT_STATION ;
+};
+typedef UCHAR UPDT_STATION;
 
 enum ONETIME_BITS
 {
@@ -47,14 +47,14 @@ enum ONETIME_BITS
 ,	OTB_IN_MISSION		= 0x040		///< Player/Vehicle is on viewer's mission.
 ,	OTB_TRAINER			= 0x080		///< Player/Vehicle is a trainer.
 ,	OTB_MAX				= 0x100
-} ;
+};
 
 enum VEH_GLOBAL_FLAGS
 {
 	VEHG_DEAD	=	0x0001			// Vehicle dead
 ,	VEHG_KILLED	=	0x0002			// Has been killed
 ,	VEHG_HC		=	0x0004			// Is High Commander
-} ;
+};
 
 enum VEHICLE_STATE
 {
@@ -64,7 +64,7 @@ enum VEHICLE_STATE
 	VEH_DEAD,
 	VEH_EXIT,
 	VEH_DELETED
-} ;
+};
 
 //! "PResent" flags. Intended to indicate which sections of the world
 //! update are being included, they also now include state fields such
@@ -89,20 +89,20 @@ enum
 
 	PR_RELPOS	= 0x1000,		//!< Relative position-to-ride being sent.
 	PR_FROM_CONTROLLER	= 0x2000	//!< Indicates message is from controlling player.
-} ;
+};
 
 enum
 {
 	PRX_DESPAWN_TIMER	= 0x010000		//!< Client->Host: Requesting despawn timer.
 ,	PRX_FIRST_TIME		= 0x020000		//!< Host->Host: Includes first time.
 ,	PRX_REALLY_ACTIVE	= 0x040000		//!< Host->Host: Player is now really active.
-} ;
+};
 
-enum { PR_NUM_BITS = 16, PRX_NUM_BITS = 24 } ;
+enum { PR_NUM_BITS = 16, PRX_NUM_BITS = 24 };
 
-static const UINT32 PR_FIRE_FLAGS = PR_FIRE1 | PR_FIRE2 ;
-static const UINT32 FIRSTTIME_PR_FLAGS = PR_STATE0|PR_STATE1|PR_FIRE_FLAGS|PR_POSITION|PR_TURRET|PR_VEH_VIS|PR_ONE_TIME|PR_RIDING|PR_RELPOS ;
-typedef UINT32 PRESENT_FLAGS ;
+static const UINT32 PR_FIRE_FLAGS = PR_FIRE1 | PR_FIRE2;
+static const UINT32 FIRSTTIME_PR_FLAGS = PR_STATE0|PR_STATE1|PR_FIRE_FLAGS|PR_POSITION|PR_TURRET|PR_VEH_VIS|PR_ONE_TIME|PR_RIDING|PR_RELPOS;
+typedef UINT32 PRESENT_FLAGS;
 
 #define PR_SET_ALL ( PR_STATE0 | PR_STATE1 | PR_POSITION | PR_TURRET | PR_VEH_VIS | PR_ONE_TIME | PR_DEAD | PR_KILLED | PR_RIDING | PR_RELPOS | PR_FROM_CONTROLLER | PRX_REALLY_ACTIVE | PRX_FIRST_TIME | PR_FIRE_FLAGS )
 

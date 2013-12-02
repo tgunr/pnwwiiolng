@@ -9,8 +9,8 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-extern struct DATA_GRAM* teulGetDatagram(const UINT32 dataSize) ;
-extern void teulReleaseDatagram(struct DATA_GRAM* const gram) ;
+extern struct DATA_GRAM* teulGetDatagram(const UINT32 dataSize);
+extern void teulReleaseDatagram(struct DATA_GRAM* const gram);
 
 // Call on shutdown
-extern void teulFreeDatagramPool() ;
+extern void teulFreeDatagramPool();

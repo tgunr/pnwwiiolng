@@ -10,5 +10,5 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-extern const char* chatMakeTempString(const char* fmt, ...) ;
+extern const char* chatMakeTempString(const char* fmt, ...);
 

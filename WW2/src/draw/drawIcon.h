@@ -5,7 +5,7 @@ struct DrawIcons
 	int texid;
 	int numIcons;
 	piUV* uv;
-} ;
+};
 
 typedef struct DrawIcons* drawIconRef;
 

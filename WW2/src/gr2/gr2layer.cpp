@@ -223,7 +223,7 @@ struct TextureReplacement
 {
     std::map<std::string, std::vector<std::string> > fromto;
 
-} ;
+};
 
 static std::map<std::string, TextureReplacement *> _replacements;
 
@@ -758,7 +758,7 @@ gr2Model* gr2LoadModel(const char* modelFile, gr2Model* wornOnModel, SINT32* bon
 	if(file)
 	{
 		// cache all models and textures in this gr2 file
-		for(int mo = 0 ; mo < fileInfo->ModelCount; mo++)
+		for(int mo = 0; mo < fileInfo->ModelCount; mo++)
 		{
 			granny_model* m = fileInfo->Models[mo];
 

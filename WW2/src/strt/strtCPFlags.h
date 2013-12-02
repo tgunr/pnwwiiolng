@@ -39,8 +39,8 @@ enum
 	CP_STAT_MAKES_RDP			= 0x04000000,	// RDP Production Center
 
 	CP_STAT_RESERVED			= 0x80000000	// Reserved for packers that use 31 bits.
-} ;
-typedef UINT32 CP_STATUS_FLAGS ;
+};
+typedef UINT32 CP_STATUS_FLAGS;
 
 // Mask for excluding EWS when promoting flags from facility to town
 #define CP_NORM_EWS_FLAG_MASK (CP_STAT_ENEMY_ARMOR | CP_STAT_ENEMY_INFANTRY | CP_STAT_ENEMY_SEACRAFT | CP_STAT_ENEMY_AIRCRAFT)

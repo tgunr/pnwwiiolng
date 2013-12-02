@@ -14,13 +14,13 @@ class CPlayerLogon : public CBDialog
 public:
 	CPlayerLogon(CWnd* pParent = NULL);   // standard constructor
 	virtual ~CPlayerLogon();
-	virtual UINT TitleLocID() const { return LOGIN_TITLE ; }
-	virtual UINT OkLocID() const { return LOGIN_OK ; }
-	virtual UINT HintID() const { return LOGIN_HINT ; }
+	virtual UINT TitleLocID() const { return LOGIN_TITLE; }
+	virtual UINT OkLocID() const { return LOGIN_OK; }
+	virtual UINT HintID() const { return LOGIN_HINT; }
 
-	void ToggleInput(bool enable, bool changeFocus=false) ;
+	void ToggleInput(bool enable, bool changeFocus=false);
 
-	static void Browse() ;
+	static void Browse();
 
 // Dialog Data
 	enum { IDD = IDD_PLAYER_LOGON };
@@ -38,7 +38,7 @@ protected:
 protected:
 	// ClassWizard generated virtual function overrides
 	//{{AFX_VIRTUAL(CPlayerLogon)
-	virtual BOOL OnInitDialog() ;
+	virtual BOOL OnInitDialog();
 	//}}AFX_VIRTUAL
 public:
 	CExplorer2 m_browser;
@@ -48,11 +48,11 @@ public:
 	CButton m_ok;
 	afx_msg void OnEnChangeInputs();
 	afx_msg void OnTimer(UINT_PTR nIDEvent);
-	std::wstring m_startUrl ;
+	std::wstring m_startUrl;
 	virtual void WinHelp(DWORD dwData, UINT nCmd = HELP_CONTEXT);
 	afx_msg void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
 	afx_msg void OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 };
 
-extern void logonAttempt() ;
+extern void logonAttempt();
 

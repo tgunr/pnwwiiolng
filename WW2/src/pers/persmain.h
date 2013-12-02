@@ -29,13 +29,13 @@ typedef bool (*ExternalCameraPivot)(piVECTOR*, piMATRIX*);
 struct persPositionDataElement {
 	UINT32	ordnanceNum;
 	UINT32	gunsightNum;
-} ;
+};
 
 struct persCommandListElement
 {
 	UCHAR CommandName[32];
 	UINT32 CommandId;
-} ;
+};
 
 struct persPersona
 {
@@ -93,7 +93,7 @@ struct persPersona
 
 	persPositionDataElement	PositionData[ML_MAX_CREW_POSITIONS];
 
-} ;
+};
 
 class persPersonaHealth
 {
@@ -105,7 +105,7 @@ public:
 		, PayAttentionToPersona(FALSE) {}
 	~persPersonaHealth() {}
 
-	void clear() ;
+	void clear();
 
 public:
 	// these are 0.0 = normal, 1.0 = dead
@@ -124,7 +124,7 @@ public:
 	Covert<FLOAT32> BloodCurrentLevel; // current blood level
 
 	Covert<UINT32> PayAttentionToPersona; // used for vehicle kill stuff
-} ;
+};
 
 #if !defined(USE_OSG)
 

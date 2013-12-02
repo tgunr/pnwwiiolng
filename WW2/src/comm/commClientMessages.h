@@ -14,7 +14,7 @@ extern SINT32	GameId;
 
 extern SINT32	frametime;
 
-struct TEUL_CALLBACK ;
+struct TEUL_CALLBACK;
 
 // All teul callback modules use a mixture of global functions and
 // global callback refs.
@@ -37,7 +37,7 @@ struct TEUL_CALLBACK ;
 //
 // refer to typedef of SHARED_VEHICLE_INFO in netTypes.h for parameters
 extern TEUL_CALLBACK*		commUPDATE;
-struct COMM_UPDATE_BUFFER { UCHAR data[1400] ; SINT32 size ; } ;
+struct COMM_UPDATE_BUFFER { UCHAR data[1400]; SINT32 size; };
 
 // sends a strat damage message to the strat updater
 // i.e. cp or building hit.. go bombs!
@@ -76,7 +76,7 @@ extern SINT32 commSendPlayerExit(SINT32 teulIndex, PLAYER_DESTINATION destinatio
 extern SINT32 commSendVehicleJoin(SINT32 teulIndex, VEHICLE_REQUEST* lvr);
 
 // Function that unpacks and processes an incoming world update
-extern SINT32 commRecvWorldUpdateData(const SINT32 teulIndex, UCHAR* const data, SINT32 offset, const SINT32 size_bytes) ;
+extern SINT32 commRecvWorldUpdateData(const SINT32 teulIndex, UCHAR* const data, SINT32 offset, const SINT32 size_bytes);
 
 // Notify the host that a vehicle has caused us to die
-extern void commSendKillNotice(SINT32 hostIndex, UINT32 myVehicleID, UINT32 hostVehicleID) ;
+extern void commSendKillNotice(SINT32 hostIndex, UINT32 myVehicleID, UINT32 hostVehicleID);

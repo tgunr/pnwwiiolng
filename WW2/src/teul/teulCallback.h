@@ -11,9 +11,9 @@
 
 namespace Teul
 {
-	struct CallbackInit ;
+	struct CallbackInit;
 
-	enum { RestrictedCallbackRange_X = 15 } ;
+	enum { RestrictedCallbackRange_X = 15 };
 }
 
 extern void teulFreeAllCallbacks(void);

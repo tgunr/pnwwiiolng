@@ -23,30 +23,30 @@ public:
 
 	// If you're not leaving your mission but just cleaning
 	// up the per-sortie fields...
-	void discardSortieData() ;
+	void discardSortieData();
 
 	// Clear out all non-persistant values
-	void flushVolatiles() ;
+	void flushVolatiles();
 
 	// Clear out all the hit-array fields
-	void resetHitArray() ;
+	void resetHitArray();
 
 	// Was the mission successful?
-	bool successful(const WEAPON_SPEC&) const ;
-	bool successfulDuration() const ;
+	bool successful(const WEAPON_SPEC&) const;
+	bool successfulDuration() const;
 
 public:
-	MISSION_TYPE	m_missionType;	// so we can score the silly thing ;-)
+	MISSION_TYPE	m_missionType;	// so we can score the silly thing;-)
 
 public:
-	FLOAT32			m_killScore ;		// Points accrued from scoring kills.
-	bool			wasSuccessful : 1 ;
-	bool			rtbPromotion : 1 ;
+	FLOAT32			m_killScore;		// Points accrued from scoring kills.
+	bool			wasSuccessful : 1;
+	bool			rtbPromotion : 1;
 	bool			m_altF4ed : 1;
-	bool			m_saved : 1 ;
-	bool			m_vehicleResupplied : 1 ;	// Was the vehicle resupplied?
+	bool			m_saved : 1;
+	bool			m_vehicleResupplied : 1;	// Was the vehicle resupplied?
 
 public:
-	WEAPON_SERIAL	rtbReservedWeapon ;	// Weapon reserved for them at rtbFacility
-} ;
+	WEAPON_SERIAL	rtbReservedWeapon;	// Weapon reserved for them at rtbFacility
+};
 

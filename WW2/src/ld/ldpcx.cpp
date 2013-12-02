@@ -17,12 +17,12 @@ int		i, j, k, l, cb;
 
 	l = 0;
 	// reverse the rows; like a bitmap
-	for (i=height-1 ; i >= 0 ; i--)
+	for (i=height-1; i >= 0; i--)
 	{
 		// reverse colors; like a DIB
-		for (j=2 ; j >= 0 ; j--)
+		for (j=2; j >= 0; j--)
 		{
-			for (k=0 ; k < width ; k++)
+			for (k=0; k < width; k++)
 			{
 				if (l == 0)
 				{

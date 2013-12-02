@@ -87,7 +87,7 @@ _reportJSONPeers(unsigned int fd, const char* path, const char* args)
 
 //////////////////////////////////////////////////////////////////////
 // Find a connection in the connections list by IP address. Returns
-// pointer or NULL.
+// pointer or nullptr.
 
 static ServerConnection*
 _findConnectionByIP(const UINT32 ip_, const UINT16 type_)
@@ -100,19 +100,19 @@ _findConnectionByIP(const UINT32 ip_, const UINT16 type_)
 			return &s_connections[i];
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Find a connection in the connections list by teulIndex. Returns
-// pointer or NULL.
+// pointer or nullptr.
 
 static ServerConnection*
 _findConnectionByTeulIndex(const SINT32 teulIndex)
 {
 	// Not valid to search by negative index.
-	if ( teulIndex < 0 )
-		return NULL;
+	if ( PN_UNLIKELY(teulIndex < 0) )
+		return nullptr;
 	const size_t numConnections = s_connections.size();
 	for ( size_t i = 0; i < numConnections; ++i )
 	{
@@ -120,7 +120,7 @@ _findConnectionByTeulIndex(const SINT32 teulIndex)
 			return &s_connections[i];
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -175,7 +175,7 @@ _onError(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*/, const T
 	}
 
 	ServerConnection* const connection = _findConnectionByTeulIndex(teulIndex);
-	if ( connection == NULL )
+	if ( connection == nullptr )
 		return;
 
 	char addr[65];
@@ -258,7 +258,7 @@ serverConnectPeer(const UINT32 forIP_, const SERVER_TYPE type_)
 
 	// Only consider the last octet.
 	ServerConnection* const connection = _findConnectionByIP(ip, type_);
-	if ( connection != NULL )
+	if ( connection != nullptr )
 	{
 		// The server has probably restarted, so we may already have
 		// a connection open, which is no-longer valid.
@@ -283,7 +283,7 @@ void
 serverDisconnectPeer(Server::ServerInfo* server)
 {
 	ServerConnection* const connection = _findConnectionByIP(server->stats.address, server->stats.type);
-	if ( connection != NULL )
+	if ( connection != nullptr )
 	{
 		dbugLog(_FLI, "t:%d %s serv:%s disconnecting", connection->m_teulIndex, g_serverTypes[server->stats.type], teulGetAddress(ntohl(server->stats.address)));
 		connection->doDisconnect();
@@ -297,7 +297,7 @@ SINT16
 serverGetPeerIndex(const UINT32 ip_, const SERVER_TYPE serverType_)
 {
 	const ServerConnection* const connection = _findConnectionByIP(ip_, serverType_);
-	if ( connection == NULL || connection->m_connected == false )
+	if ( connection == nullptr || connection->m_connected == false )
 		return -1;
 	else
 		return connection->m_teulIndex;
@@ -367,7 +367,7 @@ serverSendPacketToPeers(Teul::Packet& outgoing)
 bool
 serverSendCallbackToType(const SERVER_TYPE serverType, TEUL_CALLBACK* const tcb, void* data)
 {
-	if ( tcb == NULL )
+	if ( PN_UNLIKELY(tcb == nullptr) )
 	{
 		dbugLog(_FLW, "tried to send NULL callback");
 		return false;
@@ -382,7 +382,7 @@ serverSendCallbackToType(const SERVER_TYPE serverType, TEUL_CALLBACK* const tcb,
 			continue;
 
 		const SINT32 err = teulSend(server.m_teulIndex, tcb, data);
-		if ( err < 0 )
+		if ( PN_UNLIKELY(err < 0) )
 		{
 			dbugLog(_FLW, "tbx cb:%u,%u to t:%d %s ip:%s failed:%d", tcb->callX(), tcb->callY(), server.m_teulIndex, g_serverTypes[server.m_type], teulGetAddress(server.m_ip), err);
 			continue;
@@ -426,7 +426,7 @@ _onPeerHello(ACTION_OBJECT* a, PeerHello& hello)
 	ENDPOINT& endpoint = *a->endpoint;
 	///TODO: We should mark this somehow for expiration.
 	Server::ServerInfo* info = Server::ServerInfo::GetInfo(endpoint.fromAddress(), hello.m_type);
-	if ( info == NULL )
+	if ( PN_UNLIKELY(info == nullptr) )
 	{
 		dbugLog(_FLA, "t:%d ip:%s type:%u unknown server attempted connection", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), hello.m_type);
 		teulClose(endpoint, Teul::Closing::PeerBadSrv);
@@ -438,7 +438,7 @@ _onPeerHello(ACTION_OBJECT* a, PeerHello& hello)
 
 	UINT32 ip = Server::BroadcastMaskAddress(endpoint.fromAddress());
 	ServerConnection* connection = _findConnectionByIP(ip, hello.m_type);
-	if ( connection == NULL )
+	if ( connection == nullptr )
 	{
 		s_connections.push_back(ServerConnection(ip, info->stats.type, endpoint.teulIndex()));
 		connection = &s_connections.back();
@@ -500,7 +500,7 @@ serverInitializePeering()
 
 	dbugLog(_FLN, "t:%d server peering interface opened on port %u", s_peeringIndex, peeringPort);
 
-	if ( Teul::uWeb::s_debugServer != NULL )
+	if ( Teul::uWeb::s_debugServer != nullptr )
 		Teul::uWeb::s_debugServer->addVirtualFile("Peering Status", "/peering.json", _reportJSONPeers);
 }
 
@@ -541,11 +541,10 @@ bool
 serverPeeringWithIP(const UINT32 ip, const SERVER_TYPE type_)
 {
 	const ServerConnection* const connection = _findConnectionByIP(ip, type_);
-	// We are "peering" if there exists a connection
-	// and it has an IP address. We don't check if
-	// the connection is established to avoid confusion
+	// We are "peering" if there exists a connection and it has an IP address.
+	// We don't check if the connection is established to avoid confusion
 	// while a connection is opening.
-	return ( connection != NULL && connection->m_teulIndex >= 0 );
+	return ( connection != nullptr && connection->m_teulIndex >= 0 );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -570,13 +569,13 @@ serverPeeringWithType(const SERVER_TYPE serverType)
 ENDPOINT*
 serverPeerEndpointByType(const SERVER_TYPE serverType)
 {
-	ENDPOINT* endpoint = NULL;
+	ENDPOINT* endpoint = nullptr;
 	for ( auto& server : s_connections )
 	{
 		// Find servers matching the given type.
 		if ( (server.m_type != serverType) | (!server.m_connected) )
 			continue;
-		if ( endpoint == NULL )
+		if ( endpoint == nullptr )
 		{
 			endpoint = teulGetEndpoint(server.m_teulIndex);
 			continue;
@@ -584,13 +583,13 @@ serverPeerEndpointByType(const SERVER_TYPE serverType)
 
 		// We already have an endpoint.
 		ENDPOINT* thisEndpoint = teulGetEndpoint(server.m_teulIndex);
-		if ( thisEndpoint == NULL )
+		if ( thisEndpoint == nullptr )
 			continue;
 
 		dbugLog(_FLA, "multiple servers of type %u (%s) connected - unable to select for EndpointByType"
 						, serverType, g_serverTypes[serverType]
 						);
-		return NULL;
+		return nullptr;
 	}
 
 	return endpoint;

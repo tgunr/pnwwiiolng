@@ -1218,7 +1218,7 @@ void multiClientKill(bool exit)
 
 		ww2::Client::NetUpdate(100);
 #if defined(WIN32)
-		Sleep(0) ;
+		Sleep(0);
 #else
 		usleep(50);
 #endif
@@ -1855,7 +1855,7 @@ static int interp_parse_args(char* line, char* argv[], int maxargs)
 static interp_cmd lookup_interp_cmd(const char* cmdName)
 {
 	int i;
-	for(i = 0; INTERP_CMDS[i].name ; i++)
+	for(i = 0; INTERP_CMDS[i].name; i++)
 	{
 		if (!strcmp(cmdName, INTERP_CMDS[i].name))
 		{
@@ -1872,7 +1872,7 @@ static interp_cmd lookup_interp_cmd(const char* cmdName)
 
 static interp_cmd_lookup& lookup_interp_cmd_lookup(const char* cmdName)
 {
-	for(int i = 0; INTERP_CMDS[i].name ; i++)
+	for(int i = 0; INTERP_CMDS[i].name; i++)
 	{
 		if (!strcmp(cmdName, INTERP_CMDS[i].name))
 			return INTERP_CMDS[i];

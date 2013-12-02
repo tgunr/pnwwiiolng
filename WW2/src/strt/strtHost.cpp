@@ -69,11 +69,11 @@ DBCONNECTION dbConnection;
 
 #define DEF_ERR_FLAGS 0
 
-const char* HostLanguage = "en" ;
+const char* HostLanguage = "en";
 
-static LOGICAL _exitSignaled = FALSE ;
-static bool _mustSyncChatHost = true ;
-extern int tolua_stratd_open(struct lua_State*) ;
+static LOGICAL _exitSignaled = FALSE;
+static bool _mustSyncChatHost = true;
+extern int tolua_stratd_open(struct lua_State*);
 extern ConfigPath cv_luaPath;
 
 //////////////////////////////////////////////////////////////////////////
@@ -127,7 +127,7 @@ static void _killConvoy(SINT32 teulIndex, const UCHAR* const data, SINT32 size, 
 
 	dbugLog(_FLN,"server exiting normally");
 
-	exit(0) ;
+	exit(0);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -138,8 +138,8 @@ static void _killConvoy(SINT32 teulIndex, const UCHAR* const data, SINT32 size, 
 static void
 _acceptMapConnection(ENDPOINT& endpoint)
 {
-	dbugLog(_FLN, "t:%d map connection opened %s", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress())) ;
-	cnvySetMapConnection(endpoint.teulIndex()) ;
+	dbugLog(_FLN, "t:%d map connection opened %s", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()));
+	cnvySetMapConnection(endpoint.teulIndex());
 }
 
 static void _mapErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error)
@@ -153,37 +153,37 @@ static void _mapErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 
 
 static void _describeBuildConfigurationToLogFile()
 {
-	dbugLog(_FLI, REPOSITORY_INFO " HOST FLAGS:") ;
+	dbugLog(_FLI, REPOSITORY_INFO " HOST FLAGS:");
 
 #if defined(DEV_BUILD)
-	dbugLog(_FLIB, "DEV_BUILD") ;
+	dbugLog(_FLIB, "DEV_BUILD");
 #endif
 #if defined(BETA_RELEASE)
-	dbugLog(_FLIB, " BETA_RELEASE") ;
+	dbugLog(_FLIB, " BETA_RELEASE");
 #endif
 #if defined(TEST_RELEASE)
-	dbugLog(_FLIB, " TEST_RELEASE") ;
+	dbugLog(_FLIB, " TEST_RELEASE");
 #endif
 #if defined(OPEN_BETA)
-	dbugLog(_FLIB, " OPEN_BETA") ;
+	dbugLog(_FLIB, " OPEN_BETA");
 #endif
 #if defined(CLOSED_BETA)
-	dbugLog(_FLIB, " CLOSED_BETA") ;
+	dbugLog(_FLIB, " CLOSED_BETA");
 #endif
 #if defined(FRES)
-	dbugLog(_FLIB, " FRES") ;
+	dbugLog(_FLIB, " FRES");
 #endif
 #if defined(HAPPYOO)
-	dbugLog(_FLIB, " HAPPYOO") ;
+	dbugLog(_FLIB, " HAPPYOO");
 #endif
 #if defined(TRAINING_SERVER)
-	dbugLog(_FLIB, " TRAINING_SERVER") ;
+	dbugLog(_FLIB, " TRAINING_SERVER");
 #endif
 #if defined(PUBLIC_RELEASE)
-	dbugLog(_FLIB, " PUBLIC_RELEASE") ;
+	dbugLog(_FLIB, " PUBLIC_RELEASE");
 #endif
 
-	dbugLog(_FLIB, ".") ;
+	dbugLog(_FLIB, ".");
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -203,7 +203,7 @@ static const char* _serverCode[] =
 ,	"deleted"
 ,	"timedOut"
 ,	"insertError"
-} ;
+};
 
 static const char* _serverStatus[] =
 {
@@ -211,38 +211,38 @@ static const char* _serverStatus[] =
 ,	"initializing"
 ,	"accepting"
 ,	"full"
-} ;
+};
 
 void
 _checkArenalock(Server::ServerInfo* server, Server::Status state)
 {
-	static bool _autolock = false ;
-	static UCHAR _previousLockState = 0 ;
-	static const UINT32 MMHOST_LOCK = AL_SPAWN | AL_CAPTURE | AL_KILL ;
+	static bool _autolock = false;
+	static UCHAR _previousLockState = 0;
+	static const UINT32 MMHOST_LOCK = AL_SPAWN | AL_CAPTURE | AL_KILL;
 
 	if ( server->stats.type != MAP_HOST )
-		return ;
+		return;
 
 	// If the map mission host goes into accepting mode while we are autolocked,
 	// then turn the autolock back off.
 	if ( state >= Server::SERVER_ACCEPTING && _autolock )
 	{
-		dbugLog(_FLW, "AUTOLOCK OFF: mmhost has come back") ;
-		_autolock = false ;
+		dbugLog(_FLW, "AUTOLOCK OFF: mmhost has come back");
+		_autolock = false;
 		if ( host_config.arena.lock == MMHOST_LOCK )
 		{
-			host_config.arena.lock = _previousLockState ;
-			dotApplyConfig() ;
+			host_config.arena.lock = _previousLockState;
+			dotApplyConfig();
 		}
 	}
 	// If the map mission host goes away, turn on the autolock.
 	else if ( state < Server::SERVER_ACCEPTING && host_config.isArenaOpen() )
 	{
-		dbugLog(_FLW, "AUTOLOCK ON: mmhost gone away!") ;
-		_autolock = true ;
-		_previousLockState = host_config.arena.lock ;
-		host_config.arena.lock = MMHOST_LOCK ;
-		dotApplyConfig() ;
+		dbugLog(_FLW, "AUTOLOCK ON: mmhost gone away!");
+		_autolock = true;
+		_previousLockState = host_config.arena.lock;
+		host_config.arena.lock = MMHOST_LOCK;
+		dotApplyConfig();
 	}
 }
 
@@ -253,7 +253,7 @@ _checkArenalock(Server::ServerInfo* server, Server::Status state)
 static SINT32
 _serverEnterCallback(Server::ServerInfo* server, Server::Code scode)
 {
-	UINT32 broadAddr = Server::BroadcastMaskAddress(server->stats.address) ;
+	UINT32 broadAddr = Server::BroadcastMaskAddress(server->stats.address);
 
  	dbugLog(_FLN,"server %s added code %s[%d], type %d", teulGetAddress(server->stats.address), _serverCode[scode], scode, server->stats.type);
 
@@ -262,7 +262,7 @@ _serverEnterCallback(Server::ServerInfo* server, Server::Code scode)
 	switch ( server->stats.type )
 	{
 		case MAP_HOST:
-			_checkArenalock(server, server->stats.status) ;
+			_checkArenalock(server, server->stats.status);
 			// FALL THRU
 
 		case CELL_HOST:
@@ -271,8 +271,8 @@ _serverEnterCallback(Server::ServerInfo* server, Server::Code scode)
 				dbugLog(_FLN, "syncing already initialized %s server at %s"
 								, ((server->stats.type == CELL_HOST) ? "cell" : "map")
 								, teulGetAddress(broadAddr)
-								) ;
-				strtAddSyncPeer(broadAddr) ;
+								);
+				strtAddSyncPeer(broadAddr);
 			}
 			else
 			{
@@ -281,19 +281,19 @@ _serverEnterCallback(Server::ServerInfo* server, Server::Code scode)
 				dbugLog(_FLN, "removing %s at %s from sync peer queue due to state change"
 								, ((server->stats.type == CELL_HOST) ? "cell" : "map")
 								, teulGetAddress(broadAddr)
-								) ;
-				strtRemoveSyncPeer(broadAddr) ;
+								);
+				strtRemoveSyncPeer(broadAddr);
 			}
-		break ;
+		break;
 
 		case CHAT_HOST:
-			_mustSyncChatHost = true ;
-		break ;
+			_mustSyncChatHost = true;
+		break;
 
 		default: break;
 	}
 
-	strtBroadcastConfigUpdate() ;
+	strtBroadcastConfigUpdate();
 
  	return 0;
 }
@@ -307,14 +307,14 @@ _serverLeaveCallback(Server::ServerInfo* server, Server::Code scode)
  	dbugLog(_FLN,"server %s left code %s[%d], type %d"
 					, teulGetAddress(server->stats.address), _serverCode[scode], scode, server->stats.type);
 
-	_checkArenalock(server, Server::SERVER_INITIALIZING) ;
-	strtRemoveSyncPeer(Server::BroadcastMaskAddress(server->stats.address)) ;
+	_checkArenalock(server, Server::SERVER_INITIALIZING);
+	strtRemoveSyncPeer(Server::BroadcastMaskAddress(server->stats.address));
 
 	switch ( server->stats.type )
 	{
 	case CHAT_HOST:
-		_mustSyncChatHost = false ;
-	break ;
+		_mustSyncChatHost = false;
+	break;
 	default: break;
 	}
 
@@ -327,7 +327,7 @@ _serverLeaveCallback(Server::ServerInfo* server, Server::Code scode)
 static SINT32
 _serverStatusCallback(Server::ServerInfo* server, Server::Code scode)
 {
-	UINT32 broadAddr = Server::BroadcastMaskAddress(server->stats.address) ;
+	UINT32 broadAddr = Server::BroadcastMaskAddress(server->stats.address);
 
  	dbugLog(_FLN,"server status changed for %s, code is %s[%d] status is %s[%d]"
 				, teulGetAddress(server->stats.address)
@@ -350,13 +350,13 @@ _serverStatusCallback(Server::ServerInfo* server, Server::Code scode)
 				case CELL_HOST:
 				dbugLog(_FLN, "syncing %s server at %s"
 									, ((server->stats.type == CELL_HOST) ? "cell" : "map")
-									, teulGetAddress(broadAddr)) ;
-					strtAddSyncPeer(broadAddr) ;
-				break ;
+									, teulGetAddress(broadAddr));
+					strtAddSyncPeer(broadAddr);
+				break;
 
 				case CHAT_HOST:
-					_mustSyncChatHost = false ;
-				break ;
+					_mustSyncChatHost = false;
+				break;
 
 				default: break;
 			}
@@ -364,10 +364,10 @@ _serverStatusCallback(Server::ServerInfo* server, Server::Code scode)
 		else
 		{
 			if ( server->stats.status != Server::SERVER_ACCEPTING )
-				strtRemoveSyncPeer(broadAddr) ;
+				strtRemoveSyncPeer(broadAddr);
 		}
 
-		_checkArenalock(server, server->stats.status) ;
+		_checkArenalock(server, server->stats.status);
 	}
 
  	return 0;
@@ -379,8 +379,8 @@ _serverStatusCallback(Server::ServerInfo* server, Server::Code scode)
 static void
 _strtSIGINT(int signo)
 {
-	dbugLog(_FLI, "Received exit signal") ;
-	_exitSignaled = TRUE ;
+	dbugLog(_FLI, "Received exit signal");
+	_exitSignaled = TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -403,82 +403,82 @@ _restoreMapState()
 static TeulTimeMS
 _housekeeping()
 {
-	TeulTimeMS nextHouseKeep = teulClock64 + 25 ;
+	TeulTimeMS nextHouseKeep = teulClock64 + 25;
 
-	threadsLogging() ;
+	threadsLogging();
 
 	if ( !strtIsStratInitialized() )
-		return nextHouseKeep ;
+		return nextHouseKeep;
 
 	if ( _mustSyncChatHost && serverPeeringWithType(CHAT_HOST) == true )
 	{
-		strtSendChatInitialUpdates() ;
-		_mustSyncChatHost = false ;
+		strtSendChatInitialUpdates();
+		_mustSyncChatHost = false;
 	}
 
-	static UINT32 nextFBRepairCycle = 0 ;
+	static UINT32 nextFBRepairCycle = 0;
 	if ( teulTime() >= nextFBRepairCycle )
 	{
-		strtProcessFBRepairQueue() ;
-		nextFBRepairCycle = teulTime() + 5 ;
+		strtProcessFBRepairQueue();
+		nextFBRepairCycle = teulTime() + 5;
 	}
 
-	static TeulTimeMS nextHalfSecond = teulClock64 + 500 ;
+	static TeulTimeMS nextHalfSecond = teulClock64 + 500;
 	if ( teulClock64 >= nextHalfSecond )
 	{
-		strtProcessDBQueue() ;
-		strtEvaluateEWSUpdates() ;
-		nextHalfSecond = teulClock64 + 500 ;
-		return nextHouseKeep ;
+		strtProcessDBQueue();
+		strtEvaluateEWSUpdates();
+		nextHalfSecond = teulClock64 + 500;
+		return nextHouseKeep;
 	}
 
-	static TeulTimeMS nextSecond = 0 ;
+	static TeulTimeMS nextSecond = 0;
 	if ( teulClock64 >= nextSecond )
 	{
-		strtProcessResupply() ;
-		stratProcessLuaEventQueue() ;
-		nextSecond = teulClock64 + 1000 ;
-		return nextHouseKeep ;
+		strtProcessResupply();
+		stratProcessLuaEventQueue();
+		nextSecond = teulClock64 + 1000;
+		return nextHouseKeep;
 	}
 
-	static UINT32 nextObjectiveUpdate = teulTime() + 5 ;
+	static UINT32 nextObjectiveUpdate = teulTime() + 5;
 	if ( teulTime() >= nextObjectiveUpdate )
 	{
-		g_objectiveStats.calculate() ;
+		g_objectiveStats.calculate();
 		if ( g_objectiveStats.m_cityAvailable[ALLIED] >= 1 )
-			strtGameEventTrigger("gameSpareAOCapacity", ALLIED) ;
+			strtGameEventTrigger("gameSpareAOCapacity", ALLIED);
 		if ( g_objectiveStats.m_cityAvailable[AXIS] >= 1 )
-			strtGameEventTrigger("gameSpareAOCapacity", AXIS) ;
-		nextObjectiveUpdate = teulTime() + 5 ;
-		return nextHouseKeep ;
+			strtGameEventTrigger("gameSpareAOCapacity", AXIS);
+		nextObjectiveUpdate = teulTime() + 5;
+		return nextHouseKeep;
 	}
 
-	static UINT32 nextSupplyRouteCheck = teulTime() + 1 ;
-	static UINT32 nextForcedSupplyRouteCheck = 0 ;
+	static UINT32 nextSupplyRouteCheck = teulTime() + 1;
+	static UINT32 nextForcedSupplyRouteCheck = 0;
 	if ( teulTime() >= nextSupplyRouteCheck )
 	{
-		bool force = false ;
+		bool force = false;
 		if ( teulTime() >= nextForcedSupplyRouteCheck )
 		{
-			force = true ;
-			nextForcedSupplyRouteCheck = teulTime() + 60 ;
+			force = true;
+			nextForcedSupplyRouteCheck = teulTime() + 60;
 		}
-		strtBuildSupplyChains(force) ;
-		nextSupplyRouteCheck = teulTime() + 2 ;
-		return nextHouseKeep ;
+		strtBuildSupplyChains(force);
+		nextSupplyRouteCheck = teulTime() + 2;
+		return nextHouseKeep;
 	}
 
 	// Wait 2 minutes before starting to save the lists
-	static UINT32 nextTOESave = teulTime() + 120 ;
+	static UINT32 nextTOESave = teulTime() + 120;
 	if ( teulTime() >= nextTOESave )
 	{
-		strtSaveTOESupplies() ;
+		strtSaveTOESupplies();
 		// But then save every minute
-		nextTOESave = teulTime() + 60 ;
-		return nextHouseKeep ;
+		nextTOESave = teulTime() + 60;
+		return nextHouseKeep;
 	}
 
-	return (((teulClock64 + 5) / 100) + 1) * 100 ;
+	return (((teulClock64 + 5) / 100) + 1) * 100;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -492,10 +492,10 @@ main(int argc, char* argv[])
 	Teul::SetAppName(g_serverName);
 
 	Teul::ConfigVar::InitializeConfigVars();
-	serverEnableDebugWebServer(STRAT_HOST) ;
-	memInit() ;
+	serverEnableDebugWebServer(STRAT_HOST);
+	memInit();
 
-	bool runOnce = false ;
+	bool runOnce = false;
 
 	HostLanguage = cv_stratLanguage.GetString();
 
@@ -507,23 +507,23 @@ main(int argc, char* argv[])
 	dbugLog(_FLN, "Strat Host starting. Compiled %s at %s", __DATE__, __TIME__);
 
 	_describeBuildConfigurationToLogFile();
-	serverInitAddresses() ;
+	serverInitAddresses();
 
-	threadsReadDBEnvironment() ;
-	threadsSetup() ;
+	threadsReadDBEnvironment();
+	threadsSetup();
 
 	//set up the signal handler
 	authInitDaemon(_killConvoy);
 
-	teulSyncClock() ;
+	teulSyncClock();
 
-	wwiiIRCInitialize(Server::localHost) ;
-	wwiiIRCActivate(true) ;
+	wwiiIRCInitialize(Server::localHost);
+	wwiiIRCActivate(true);
 
-	Lua::Start("stratd") ;
+	Lua::Start("stratd");
 
 	if ( !stratStartLua() )
-		exit(0) ;
+		exit(0);
 
 #ifdef IS_STRAT_HOST
 	if (!strtInitDB())
@@ -534,13 +534,13 @@ main(int argc, char* argv[])
 
 	StatsThread statsThread;
 	statsThread.start();
-	threadsEnable() ;
+	threadsEnable();
 
 	//Initializes the convoy system
 	cnvyInit();
 
 	dbugLog(_FLN,"opening broadcast ports");
-	serverOpenBroadcastIndexes() ;
+	serverOpenBroadcastIndexes();
 
 	serverInit(HOST_VERSION
 				, STRAT_HOST, STRAT_HOST
@@ -565,13 +565,13 @@ main(int argc, char* argv[])
 	dbugLog(_FLN,"Listening for map connections on port %d", WWII::Net::Ports::InternalStrat);
 
 	// Give the chat host 20 seconds to start
-	teulSyncClock() ;
-	TeulTimeMS cutoff = teulClock64 + 30000 ;
-	dbugLog(_FLI, "Waiting for chat server") ;
-	for ( ; teulClock64 < cutoff && serverPeeringWithType(CHAT_HOST) == false ; )
+	teulSyncClock();
+	TeulTimeMS cutoff = teulClock64 + 30000;
+	dbugLog(_FLI, "Waiting for chat server");
+	for (; teulClock64 < cutoff && serverPeeringWithType(CHAT_HOST) == false; )
 	{
-		teulUpdateTransport(50) ;
-		threadsLogging() ;
+		teulUpdateTransport(50);
+		threadsLogging();
 	}
 
 #ifdef DEBUG
@@ -586,23 +586,23 @@ main(int argc, char* argv[])
 
 	ABORT_IF(chatInstallStratSupportCallbacks() < 0);
 
-	chatSendBroadcastAll(LSTR_SYSTEM, LSTR_STRAT_STARTING) ;
-	for ( UINT32 i = 0 ; i < 10 ; ++i )
+	chatSendBroadcastAll(LSTR_SYSTEM, LSTR_STRAT_STARTING);
+	for ( UINT32 i = 0; i < 10; ++i )
 	{
-		teulUpdateTransport(20) ;
-		threadsLogging() ;
+		teulUpdateTransport(20);
+		threadsLogging();
 	}
 
 	// Initialize the strat objective limits
-	g_objectiveStats.calculate() ;
+	g_objectiveStats.calculate();
 
-	teulSyncClock() ;
+	teulSyncClock();
 
-	strtInitializeStratSystem() ;
+	strtInitializeStratSystem();
 
-	threadsLogging() ;
+	threadsLogging();
 
-	signal(SIGINT, _strtSIGINT) ;
+	signal(SIGINT, _strtSIGINT);
 
 	// Run the map-restoration hack for restarts.
 	_restoreMapState();
@@ -610,77 +610,77 @@ main(int argc, char* argv[])
 	if ( stratStartIntermission() == false )
 	{
 		std::this_thread::sleep_for(std::chrono::seconds(1));
-		LogAbort("bailing because intermission script failed.") ;
+		LogAbort("bailing because intermission script failed.");
 	}
-	threadsLogging() ;
+	threadsLogging();
 
-	strtBroadcastConfigUpdate() ;
-	threadsLogging() ;
+	strtBroadcastConfigUpdate();
+	threadsLogging();
 
 	Server::myServerInfo.stats.status = Server::SERVER_ACCEPTING;
-	Server::myServerInfo.sync() ;
+	Server::myServerInfo.sync();
 
-	extern void serverOpenLuaClientInterface(void) ;
-	serverOpenLuaClientInterface() ;
+	extern void serverOpenLuaClientInterface(void);
+	serverOpenLuaClientInterface();
 
-	wwiiIRCChannelMessage("-sys", "[[ Syncing ]]") ;
+	wwiiIRCChannelMessage("-sys", "[[ Syncing ]]");
 
-	threadsLogging() ;
+	threadsLogging();
 
-	TeulTimeMS tick100ms = 0 ;
+	TeulTimeMS tick100ms = 0;
 	while ( !_exitSignaled )
 	{
 		// Process the strat update queue
-		cnvyProcessStratUpdates(teulTime()) ;
+		cnvyProcessStratUpdates(teulTime());
 
-		threadsCallNextCallback() ;
+		threadsCallNextCallback();
 
 		// Things to do every 100ms
 		if ( teulClock64 >= tick100ms )
-			tick100ms = _housekeeping() ;
+			tick100ms = _housekeeping();
 
 		// Be a strat server for 10ms
 		teulUpdateTransport(25);
 
 		// Send the next pending sync updates
-		UINT32 peers = strtSyncPeers() ;
+		UINT32 peers = strtSyncPeers();
 
 		// Have we run thru once, yet?
 		if ( runOnce == false )
 		{
 			// Don't announce anything until we've done all the syncs
 			if ( peers > 0 )
-				continue ;
+				continue;
 
-			wwiiIRCChannelMessage("-sys,#servers", "++ Running ++") ;
-			chatSendBroadcastAll(LSTR_SYSTEM, LSTR_STRAT_READY) ;
-			strtAllowSyncing() ;
+			wwiiIRCChannelMessage("-sys,#servers", "++ Running ++");
+			chatSendBroadcastAll(LSTR_SYSTEM, LSTR_STRAT_READY);
+			strtAllowSyncing();
 
-			runOnce = true ;
+			runOnce = true;
 		}
 	}
 
-	teulClose(mapConnection, Teul::Closing::MapSrvClose) ;
+	teulClose(mapConnection, Teul::Closing::MapSrvClose);
 
-	wwiiIRCChannelMessage("-sys", "[[ Shutting down normally ]]") ;
-	chatSendBroadcastAll(LSTR_SYSTEM, LSTR_STRAT_EXITED) ;
+	wwiiIRCChannelMessage("-sys", "[[ Shutting down normally ]]");
+	chatSendBroadcastAll(LSTR_SYSTEM, LSTR_STRAT_EXITED);
 
-	strtProcessDBQueue() ;
-	strtSaveTOESupplies() ;
+	strtProcessDBQueue();
+	strtSaveTOESupplies();
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 
 	teulCloseTransport();
 
-	threadsLogging() ;
+	threadsLogging();
 
 #ifdef IS_STRAT_HOST
 	strtCloseDB();
 #endif
 	dbugLog(_FLN,"strat system shutting down");
 
-	Lua::Stop() ;
+	Lua::Stop();
 
-	strtShutdownStratSystem() ;
+	strtShutdownStratSystem();
 
 	statsThread.cancel();
 

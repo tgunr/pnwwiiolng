@@ -159,7 +159,7 @@ static UINT32 FindConstant(const char* string)
 {
 int		i;
 
-	for (i=0 ; constants[i].flagval ; i++)
+	for (i=0; constants[i].flagval; i++)
 	{
 		if (lstrcmp(string, constants[i].flagname) == 0)
 		{
@@ -786,7 +786,7 @@ static int TrimSpace(char* string)
 {
 int   i;
 
-	for (i=0 ; string[i] ; i++)
+	for (i=0; string[i]; i++)
 	{
 		if (!isspace(string[i]))
 		{
@@ -799,7 +799,7 @@ int   i;
 		strcpy(string, &string[i]);
 	}
 
-	for (i=lstrlen(string)-1 ; i >= 0 && isspace(string[i]) ; i--)
+	for (i=lstrlen(string)-1; i >= 0 && isspace(string[i]); i--)
 	{
 		string[i] = 0;
 	}
@@ -813,7 +813,7 @@ static int GetArg(char* string, char* arg)
 {
 int   i;
 
-	for (i=0 ; string[i] ; i++)
+	for (i=0; string[i]; i++)
 	{
 		if (isspace(string[i]))
 		{

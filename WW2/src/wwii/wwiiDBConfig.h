@@ -9,5 +9,5 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 //tolua_begin
-extern bool dbGetWWIIConfig(class DBHANDLE& dbh) ;
+extern bool dbGetWWIIConfig(class DBHANDLE& dbh);
 //tolua_end

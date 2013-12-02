@@ -219,102 +219,102 @@ void ReadoutView::DisplayGroundReadout()
 
 	phui::GraphicsContext* ctx = GetGraphicsContext();
 
-	bool enginesStarting = ((_VehicleData->MasterStarterOn || _VehicleData->StartersOn) && _VehicleData->ShutdownEngines == 0) ;
-	bool enginesCaught = true ;
-	bool liveEngine = false ;
-	UINT32 numEngines = 0 ;
+	bool enginesStarting = ((_VehicleData->MasterStarterOn || _VehicleData->StartersOn) && _VehicleData->ShutdownEngines == 0);
+	bool enginesCaught = true;
+	bool liveEngine = false;
+	UINT32 numEngines = 0;
 
 	FLOAT32 TempNum;
 	mlGetGaugeData(&TempNum,ML_DOF_ELEMENT_GEARSHIFT,0);
-	bool enginesReversed = (_VehicleData->ReverseToggle || TempNum < 0) ;
+	bool enginesReversed = (_VehicleData->ReverseToggle || TempNum < 0);
 
 	FLOAT32 LGS;
-	mlGetGaugeData(&LGS, ML_DOF_CONTROL_LINEARGEARSHIFT, 0) ;
+	mlGetGaugeData(&LGS, ML_DOF_CONTROL_LINEARGEARSHIFT, 0);
 
 	mlComponentListIterator it;
 	mlComponentListBegin(_VehicleData->ComponentList, &it);
 	for(; it.comp; mlComponentListNext(&it))
 	{
-		if ( it.comp->Type != ML_COMPONENT_ENGINE ) continue ;
-		const mlEngineComponentData* Engine = (const mlEngineComponentData*)(it.comp->SpecialData) ;
+		if ( it.comp->Type != ML_COMPONENT_ENGINE ) continue;
+		const mlEngineComponentData* Engine = (const mlEngineComponentData*)(it.comp->SpecialData);
 		if ( Engine->SubType == ML_ENGINE_SUBTYPE_GEARBOX )
 		{
             // Compile warning
 			//if ( Engine->InReverse == true )
             if(Engine->InReverse)
-				enginesReversed = true ;
-			continue ;
+				enginesReversed = true;
+			continue;
 		}
-		if ( Engine->SubType != ML_ENGINE_SUBTYPE_ENGINE ) continue ;
-		++numEngines ;
-		const mlEngineComponentData* TorqueReceiver = (const mlEngineComponentData*)Engine->PropellorComponent->SpecialData ;
+		if ( Engine->SubType != ML_ENGINE_SUBTYPE_ENGINE ) continue;
+		++numEngines;
+		const mlEngineComponentData* TorqueReceiver = (const mlEngineComponentData*)Engine->PropellorComponent->SpecialData;
 		if ( it.comp->CurrentDamage < it.comp->DamageLevels[2] )
 		{
-			liveEngine = true ;
+			liveEngine = true;
 			if ( Engine->EngineCaught != 1 || TorqueReceiver->CurrentRpm <= Engine->EngineData->CriticalRpm )
-				enginesCaught = false ;
+				enginesCaught = false;
 			if ( Engine->InReverse )
-				enginesReversed = true ;
+				enginesReversed = true;
 		}
 	}
 
-	if ( 0 == numEngines ) return ;
+	if ( 0 == numEngines ) return;
 
 	if ( false == liveEngine )
 	{
 		// Case 1: Engines are dead
-		ctx->SetColor(1, 0, 0) ;				// Red
-		const char* labelStr = (1 == numEngines) ? "hud.readout.gear.engine" : "hud.readout.gear.engines" ;
-		DrawString(L"%ls: %ls\n", strings[labelStr].c_str(), strings["hud.readout.gear.kaput"].c_str()) ;
-		return ;
+		ctx->SetColor(1, 0, 0);				// Red
+		const char* labelStr = (1 == numEngines) ? "hud.readout.gear.engine" : "hud.readout.gear.engines";
+		DrawString(L"%ls: %ls\n", strings[labelStr].c_str(), strings["hud.readout.gear.kaput"].c_str());
+		return;
 	}
 
-	wchar_t gearNum[16] ;
-	const wchar_t* gear ;
+	wchar_t gearNum[16];
+	const wchar_t* gear;
 
-	bool inNeutral = false ;
+	bool inNeutral = false;
 
 	if ( TempNum < 0.0f )
-		gear = strings["hud.readout.gear.reverse"].c_str() ;
+		gear = strings["hud.readout.gear.reverse"].c_str();
 	else if ( TempNum < 0.05f )
 	{
-		inNeutral = true ;
-		gear = strings["hud.readout.gear.neutral"].c_str() ;
+		inNeutral = true;
+		gear = strings["hud.readout.gear.neutral"].c_str();
 	}
 	else
 	{
-		swprintf(gearNum, sizeof(gearNum) - 1, L"%d", (SINT32)(TempNum + 0.5f)) ;
-		gear = gearNum ;
+		swprintf(gearNum, sizeof(gearNum) - 1, L"%d", (SINT32)(TempNum + 0.5f));
+		gear = gearNum;
 	}
 
 	if ( enginesStarting == false && enginesCaught == false )
 	{
 		// Case 2: Engines are off
 		if ( enginesReversed )
-			ctx->SetColor(0.7f, 0.5f, 0.3f) ;		// Orangey
+			ctx->SetColor(0.7f, 0.5f, 0.3f);		// Orangey
 		else
-			ctx->SetColor(0.6f, 0.6f, 0.6f) ;
+			ctx->SetColor(0.6f, 0.6f, 0.6f);
 	}
 	else if ( (enginesCaught == false || inNeutral) && (frametime & 512) < 256 )
 	{
 		if ( enginesReversed )
-			ctx->SetColor(0.9f, 0.6f, 0) ;
+			ctx->SetColor(0.9f, 0.6f, 0);
 		else
-			ctx->SetColor(0.6f, 0.6f, 0.6f) ;
+			ctx->SetColor(0.6f, 0.6f, 0.6f);
 	}
 	else if ( inNeutral )
 	{
-		ctx->SetColor(1.0f, 1.0f, 0) ;
+		ctx->SetColor(1.0f, 1.0f, 0);
 	}
 	else
 	{
 		if ( enginesReversed )
-			ctx->SetColor(1.0f, 0.8f, 0) ;
+			ctx->SetColor(1.0f, 0.8f, 0);
 		else
-			ctx->SetColor(0.3f, 1.0f, 0.3f) ;
+			ctx->SetColor(0.3f, 1.0f, 0.3f);
 	}
 
-	DrawString(L"%ls: %ls\n", strings["hud.readout.gear"].c_str(), gear) ;
+	DrawString(L"%ls: %ls\n", strings["hud.readout.gear"].c_str(), gear);
 }
 
 /************************************************************************************************

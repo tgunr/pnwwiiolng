@@ -25,14 +25,14 @@
 
 static TEUL_CALLBACK*	_SEND_ACTIVATE;
 
-extern void mapUserAbortedApp(Player* player) ;
-extern void hostUserAbortedApp(Player* player) ;
+extern void mapUserAbortedApp(Player* player);
+extern void hostUserAbortedApp(Player* player);
 
 static SINT32
 _sendWWII_ACTIVATE(ACTION_OBJECT* const a)
 {
-	WWII_ACTIVATE* activate = (WWII_ACTIVATE*)(a->localRawData) ;
-	return activate->packer(TEUL_PACK, a) ;
+	WWII_ACTIVATE* activate = (WWII_ACTIVATE*)(a->localRawData);
+	return activate->packer(TEUL_PACK, a);
 }
 
 static SINT32 _recvWWII_ERROR_INFO(ACTION_OBJECT* const a)
@@ -43,7 +43,7 @@ static SINT32 _recvWWII_ERROR_INFO(ACTION_OBJECT* const a)
 
 #if defined(IS_MAP_HOST)
 	{
-		Player* player = (Player*)ServerInterface::LookupByTeulIndex(a->teulIndex) ;
+		Player* player = (Player*)ServerInterface::LookupByTeulIndex(a->teulIndex);
 		if ( player )
 			mapSaveErrorInfo(*player, info);
 	}
@@ -53,23 +53,23 @@ static SINT32 _recvWWII_ERROR_INFO(ACTION_OBJECT* const a)
 
 static SINT32 _recvAbortedApp(ACTION_OBJECT* const a)
 {
-	Player* player = (Player*)ServerInterface::LookupByTeulIndex(a->teulIndex) ;
+	Player* player = (Player*)ServerInterface::LookupByTeulIndex(a->teulIndex);
 	if ( player == NULL )
 	{
-		dbugLog(_FLW, "t:%d got abortedApp message from unregistered teulIndex", a->teulIndex) ;
-		teulClose(a->teulIndex, Teul::Closing::AbortedApp) ;
-		return -EINVAL ;
+		dbugLog(_FLW, "t:%d got abortedApp message from unregistered teulIndex", a->teulIndex);
+		teulClose(a->teulIndex, Teul::Closing::AbortedApp);
+		return -EINVAL;
 	}
 
 #if defined(IS_MAP_HOST)
-	mapUserAbortedApp(player) ;
+	mapUserAbortedApp(player);
 #elif defined(IS_CELL_HOST)
-	hostUserAbortedApp(player) ;
+	hostUserAbortedApp(player);
 #else
-	dbugLog(_FLW, "t:%d sent us a USER_ABORTED_APP that we weren't expecting") ;
+	dbugLog(_FLW, "t:%d sent us a USER_ABORTED_APP that we weren't expecting");
 #endif
 
-	return a->offset ;
+	return a->offset;
 }
 
 SINT32

@@ -15,10 +15,10 @@ namespace Teul
 	class Connection;
 };
 
-struct FULL_OBJ_ID ;
-struct WEAPON_SPEC ;
-struct WEAPON_SERIAL ;
-struct FLOAT64VECTOR ;
+struct FULL_OBJ_ID;
+struct WEAPON_SPEC;
+struct WEAPON_SERIAL;
+struct FLOAT64VECTOR;
 
 //Callback installer
 extern SINT32 mmClientInstallCallbacks(void);

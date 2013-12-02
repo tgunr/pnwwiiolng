@@ -104,9 +104,9 @@ void TextControl::DrawSelf()
 		
 		if(ax < cx)
 		{
-			float placeHolder = cx ;
-			cx = ax ;
-			ax = placeHolder ;
+			float placeHolder = cx;
+			cx = ax;
+			ax = placeHolder;
 		}
 		
 		BoxVerts box;

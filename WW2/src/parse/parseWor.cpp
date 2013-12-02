@@ -46,7 +46,7 @@ enum SECTION_ENUM
 	WOR_FACILITY,
 	WOR_BUILDING,
 	WOR_DEPOT_LINK
-} ;
+};
 static bool _fillCp(SINT32 numArgs, FUNCARGS* args);
 static bool _fillFacility(SINT32 numArgs, FUNCARGS* args);
 static bool _fillDepotLink(SINT32 numArgs, FUNCARGS* args);
@@ -74,7 +74,7 @@ static PARSE_CALLBACK	_stratCallbacks[] = {{"cp",			_fillCp}
 											,{"",			NULL}};
 
 #if platBuild == TEUL_SERVER
-static bool doNothing(SINT32 numArgss, FUNCARGS* args) { return true ; }
+static bool doNothing(SINT32 numArgss, FUNCARGS* args) { return true; }
 
 static PARSE_CALLBACK  blank[]={{"backdrop",				doNothing},
                                {"sphere",					doNothing},
@@ -110,7 +110,7 @@ static PARSE_CALLBACK  blank[]={{"backdrop",				doNothing},
                               };
 #endif
 
-static UINT32 worFileLineNum ;
+static UINT32 worFileLineNum;
 static char _fileName[PN_MAX_PATH];
 
 #if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
@@ -125,9 +125,9 @@ void parseWorKill(void)
 				; it != _stratSections[i].objects.end()
 				; ++it )
 		{
-			memFree(it->second) ;
+			memFree(it->second);
 		}
-		_stratSections[i].objects.clear() ;
+		_stratSections[i].objects.clear();
 	}
 }
 
@@ -135,35 +135,35 @@ template<typename _Type>
 static _Type* _getValue(SECTION_ENUM sec, const char* const name)
 {
 	ObjMap& objects = _stratSections[sec].objects;
-	ObjMap::iterator it = objects.find(name) ;
-	return (_Type*)( it != objects.end() ? it->second : NULL ) ;
+	ObjMap::iterator it = objects.find(name);
+	return (_Type*)( it != objects.end() ? it->second : NULL );
 }
 
 
 CP_PARAMS* parseGetCPValues(const char* const objName)
 {
-	return _getValue<CP_PARAMS>(WOR_CP, objName) ;
+	return _getValue<CP_PARAMS>(WOR_CP, objName);
 }
 
 FACILITY_PARAMS* parseGetFacilityValues(const char* objName)
 {
-	return _getValue<FACILITY_PARAMS>(WOR_FACILITY, objName) ;
+	return _getValue<FACILITY_PARAMS>(WOR_FACILITY, objName);
 }
 
 BUILDING_PARAMS* parseGetBuildingValues(const char* objName)
 {
-	return _getValue<BUILDING_PARAMS>(WOR_BUILDING, objName) ;
+	return _getValue<BUILDING_PARAMS>(WOR_BUILDING, objName);
 }
 
 DEPOT_LINK_PARAMS* parseGetDepotLinkValues(const char* objName)
 {
-	return _getValue<DEPOT_LINK_PARAMS>(WOR_DEPOT_LINK, objName) ;
+	return _getValue<DEPOT_LINK_PARAMS>(WOR_DEPOT_LINK, objName);
 }
 
 bool
 parseWor(const char* levelfile, PARSE_CALLBACK* world)
 {
-	atexit(parseWorKill) ;
+	atexit(parseWorKill);
 
 #ifndef VALIDATOR
  #if platBuild == TEUL_SERVER
@@ -198,13 +198,13 @@ static void _copyObjName(const char* sourceName, char* destName)
 	// If there is a directory separator, advance past it.
 	const char* p = strrchr(sourceName, '\\');
 	if ( p != NULL )
-		sourceName = ++p ;
+		sourceName = ++p;
 
 	// Trim off any trailing extension
 	p = strrchr(sourceName, '.');
-	size_t copyLen = (p) ? (p - sourceName) : MAX_OBJNAME_LENGTH ;
-	strncpy(destName, sourceName, copyLen) ;
-	destName[copyLen] = 0 ;
+	size_t copyLen = (p) ? (p - sourceName) : MAX_OBJNAME_LENGTH;
+	strncpy(destName, sourceName, copyLen);
+	destName[copyLen] = 0;
 }
 
 template<typename _Type>
@@ -212,24 +212,24 @@ static _Type*
 _grow(SECTION_HEADER* header, FUNCARGS* args)
 {
 #ifdef OLD
-	static const UINT32 _GROWTH_RATE = 0x40 ;		// Must be a power-of-2
+	static const UINT32 _GROWTH_RATE = 0x40;		// Must be a power-of-2
 	if ( ((UINT32)header->numObjects & (_GROWTH_RATE - 1)) == 0 )
 	{
-		void* newData = memAlloc((header->numObjects + _GROWTH_RATE) * sizeof(_Type)) ;
+		void* newData = memAlloc((header->numObjects + _GROWTH_RATE) * sizeof(_Type));
 		if ( header->objArray != NULL )
 		{
-			memcpy(newData, header->objArray, header->numObjects * sizeof(_Type)) ;
-			memFree(header->objArray) ;
+			memcpy(newData, header->objArray, header->numObjects * sizeof(_Type));
+			memFree(header->objArray);
 		}
-		header->objArray = newData ;
+		header->objArray = newData;
 	}
-	return &((_Type*)header->objArray)[header->numObjects] ;
+	return &((_Type*)header->objArray)[header->numObjects];
 #else
-	_Type* thisParam = (_Type*)memAlloc(sizeof(_Type)) ;
+	_Type* thisParam = (_Type*)memAlloc(sizeof(_Type));
 	_copyObjName(args[0].svalue, thisParam->filename);
-	assert( header->objects.find(thisParam->filename) == header->objects.end() ) ;
-	header->objects[thisParam->filename] = thisParam ;
-	return thisParam ;
+	assert( header->objects.find(thisParam->filename) == header->objects.end() );
+	header->objects[thisParam->filename] = thisParam;
+	return thisParam;
 #endif
 }
 
@@ -249,16 +249,16 @@ SECTION_HEADER* dest;
 	dest = &_stratSections[WOR_DEPOT_LINK];
 
 	if ( ! parseValidArgs(argSpec, args, numSpecs, "DEPOT_LINK", worFileLineNum) )
-		return false ;
+		return false;
 
-	DEPOT_LINK_PARAMS* thisParam = _grow<DEPOT_LINK_PARAMS>(dest, args) ;
+	DEPOT_LINK_PARAMS* thisParam = _grow<DEPOT_LINK_PARAMS>(dest, args);
 
 	thisParam->haulSpeed		= args[3].dvalue;
 	thisParam->haulCapacity		= args[4].dvalue;
 	thisParam->minCapacity		= args[5].dvalue;
 	thisParam->maxCapacity		= args[6].dvalue;
 
-	return true ;
+	return true;
 
 }
 
@@ -271,13 +271,13 @@ static SINT32 numSpecs = sizeof(argSpec)/sizeof(ARG_SPEC);
 SECTION_HEADER* dest = &_stratSections[WOR_CP];
 
 	if ( ! parseValidArgs(argSpec, args, numSpecs, "cp", worFileLineNum))
-		return false ;
+		return false;
 
-	CP_PARAMS* thisParam = _grow<CP_PARAMS>(dest, args) ;
+	CP_PARAMS* thisParam = _grow<CP_PARAMS>(dest, args);
 
 	thisParam->ttp		= args[MAX_LM_ARG+0].dvalue;
 
-	return true ;
+	return true;
 }
 
 /*
@@ -314,9 +314,9 @@ SECTION_HEADER* dest;
 	dest = &_stratSections[WOR_FACILITY];
 
 	if ( ! parseValidArgs(argSpec, args, numSpecs,"FACILITY", worFileLineNum))
-		return false ;
+		return false;
 
-	FACILITY_PARAMS* thisParam = _grow<FACILITY_PARAMS>(dest, args) ;
+	FACILITY_PARAMS* thisParam = _grow<FACILITY_PARAMS>(dest, args);
 
 	thisParam->shippingThreshold= args[MAX_LM_ARG+0].dvalue;
 	thisParam->requestThreshold	= args[MAX_LM_ARG+1].dvalue;
@@ -324,7 +324,7 @@ SECTION_HEADER* dest;
 	thisParam->rput				= args[MAX_LM_ARG+3].dvalue;
 	thisParam->multiplier		= args[MAX_LM_ARG+4].dvalue;
 
-	return true ;
+	return true;
 }
 
 static bool _fillCpObject(SINT32 /*numArgs*/, FUNCARGS* args)
@@ -353,7 +353,7 @@ WEAPON_SPEC spec;
 	dest = &_stratSections[WOR_BUILDING];
 
 	if ( ! parseValidArgs(argSpec, args, numSpecs, "BUILDING", worFileLineNum))
-		return false ;
+		return false;
 
 	spec = NULL_WEAP_SPEC;
 
@@ -362,12 +362,12 @@ WEAPON_SPEC spec;
 		spec = weapCreateSpec(args[MAX_LM_ARG+7].svalue);
 		if (spec.wCategory == 0)
 		{
-			DEBUG_ERR("Invalid weapon spec %s", args[MAX_LM_ARG+7].svalue) ;
-			return false ;
+			DEBUG_ERR("Invalid weapon spec %s", args[MAX_LM_ARG+7].svalue);
+			return false;
 		}
 	}
 
-	BUILDING_PARAMS* thisParam = _grow<BUILDING_PARAMS>(dest, args) ;
+	BUILDING_PARAMS* thisParam = _grow<BUILDING_PARAMS>(dest, args);
 
 	// Some mechanism may need to be used for the 64 bit ASCII to 64 bit integer conversion.
 	// The atoll function is not supported on the PC; however, _atoi64 is supported.
@@ -379,12 +379,12 @@ WEAPON_SPEC spec;
 	thisParam->rpslevel			= args[MAX_LM_ARG+3].dvalue;
 	thisParam->damageThreshold	= args[MAX_LM_ARG+4].dvalue;
 	thisParam->pRebuildlevel	= args[MAX_LM_ARG+5].dvalue;
-	thisParam->stratFlags		= (strncmp(args[MAX_LM_ARG+6].svalue, "cap", 3) != 0) ? 0 : 1 ;
+	thisParam->stratFlags		= (strncmp(args[MAX_LM_ARG+6].svalue, "cap", 3) != 0) ? 0 : 1;
 	thisParam->spawn.weap		= spec;
 	thisParam->spawn.slots		= args[MAX_LM_ARG+8].dvalue;
 	thisParam->spawn.points		= args[MAX_LM_ARG+9].dvalue;
 	thisParam->objectValue		= args[MAX_LM_ARG+10].dvalue;
 
-	return true ;
+	return true;
 }
 

@@ -120,9 +120,9 @@ int		lowX, lowY, highX, highY;
 	if (lpdest->PixelFormat.dwRGBBitCount <= 8)
 	{
 		cdptr = (char*)lpdest->Surface + lowY * lpdest->Width;
-		for (i=lowY ; i < highY ; i++)
+		for (i=lowY; i < highY; i++)
 		{
-			for (j=lowX ; j < highX ; j++)
+			for (j=lowX; j < highX; j++)
 			{
 				cdptr[j] = (char)Color;
 			}
@@ -134,9 +134,9 @@ int		lowX, lowY, highX, highY;
 	if (lpdest->PixelFormat.dwRGBBitCount <= 16)
 	{
 		sdptr = (short*)lpdest->Surface + lowY * lpdest->Width;
-		for (i=lowY ; i < highY ; i++)
+		for (i=lowY; i < highY; i++)
 		{
-			for (j=lowX ; j < highX ; j++)
+			for (j=lowX; j < highX; j++)
 			{
 				sdptr[j] = (short)Color;
 			}
@@ -148,9 +148,9 @@ int		lowX, lowY, highX, highY;
 	if (lpdest->PixelFormat.dwRGBBitCount <= 32)
 	{
 		ldptr = (long*)lpdest->Surface + lowY * lpdest->Width;
-		for (i=lowY ; i < highY ; i++)
+		for (i=lowY; i < highY; i++)
 		{
-			for (j=lowX ; j < highX ; j++)
+			for (j=lowX; j < highX; j++)
 			{
 				ldptr[j] = (long)Color;
 			}
@@ -245,9 +245,9 @@ int     SearchColor, Color;
 	{
 		csptr = (char*)lpsrc->Surface + srcoff;
 		cdptr = (char*)lpdest->Surface + destoff;
-		for (i=0 ; i < height ; i++)
+		for (i=0; i < height; i++)
 		{
-			for (j=0 ; j < width ; j++)
+			for (j=0; j < width; j++)
 			{
 				Color = csptr[j];
 				if (Color == SearchColor)
@@ -270,9 +270,9 @@ int     SearchColor, Color;
 	{
 		ssptr = (short*)lpsrc->Surface + srcoff;
 		sdptr = (short*)lpdest->Surface + destoff;
-		for (i=0 ; i < height ; i++)
+		for (i=0; i < height; i++)
 		{
-			for (j=0 ; j < width ; j++)
+			for (j=0; j < width; j++)
 			{
 				Color = ssptr[j];
 				if (Color == SearchColor)
@@ -295,9 +295,9 @@ int     SearchColor, Color;
 	{
 		lsptr = (long*)lpsrc->Surface + srcoff;
 		ldptr = (long*)lpdest->Surface + destoff;
-		for (i=0 ; i < height ; i++)
+		for (i=0; i < height; i++)
 		{
-			for (j=0 ; j < width ; j++)
+			for (j=0; j < width; j++)
 			{
 			Color = lsptr[j];
 				if (Color == SearchColor)

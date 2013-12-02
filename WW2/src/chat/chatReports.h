@@ -15,12 +15,12 @@ class ChatReport
 {
 public:
 	// How long the text strings can be
-	static const UINT32 MAX_TEXT_LENGTH = 400 ;
+	static const UINT32 MAX_TEXT_LENGTH = 400;
 
 	// Categories
-	enum { INVALID = 0 } ;
-	enum { BUG = 1, GAMEPLAY, TERRAIN, IDEA, PLAYER, SPEED_HACK, CAPTURE_HACK, CLIENT_HACK } ;
-	static const UINT32 MAX_CLIENT_CATEGORY = PLAYER ;
+	enum { INVALID = 0 };
+	enum { BUG = 1, GAMEPLAY, TERRAIN, IDEA, PLAYER, SPEED_HACK, CAPTURE_HACK, CLIENT_HACK };
+	static const UINT32 MAX_CLIENT_CATEGORY = PLAYER;
 
 	// Satuses ...
 	// Submission = this is a new entry for the host, client should ignore
@@ -30,55 +30,55 @@ public:
 	// Escalating: GM has viewed it and needs a senior GM/staff to view it
 	// Escalated: Opened -> Escalating -> Snr GM/Staff has taken it up
 	// Attention_CRS: GMs have forwarded it for staff review
-	enum { SUBMISSION = 0, NEW, OPENED, CLOSED, ESCALATING, ESCALATED, ATTENTION_CRS } ;
+	enum { SUBMISSION = 0, NEW, OPENED, CLOSED, ESCALATING, ESCALATED, ATTENTION_CRS };
 
 public:
 	// Con-/de-structors
-	ChatReport(UINT16 category=0, const std::string& report="", const ChatHandle& offender=0LL) ;
-	ChatReport(ACTION_OBJECT* const a) { packer(TEUL_UNPACK, a) ; }
+	ChatReport(UINT16 category=0, const std::string& report="", const ChatHandle& offender=0LL);
+	ChatReport(ACTION_OBJECT* const a) { packer(TEUL_UNPACK, a); }
 	~ChatReport() {}
 
 public:
 	// Transport methods
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) ;
+	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
 
 public:
 	// Unique ID assigned by the host
-	UINT32			m_hostID ;
+	UINT32			m_hostID;
 	// Time stamp of report
-	UINT32			m_time ;
+	UINT32			m_time;
 	// Category of the report
-	UINT16			m_category ;
+	UINT16			m_category;
 	// Current status of the report
-	UINT16			m_status ;
+	UINT16			m_status;
 	// Name of the poster and the report subject (if its a player)
-	ChatHandle		m_poster ;
+	ChatHandle		m_poster;
 	// If this is a vs-player complaint, who are they complaining about
-	ChatHandle		m_offender ;
+	ChatHandle		m_offender;
 	// 0 or the packed ID of the GM handling this
-	ChatHandle		m_assigned ;
+	ChatHandle		m_assigned;
 	// What country they were
-	UINT16			m_country ;
+	UINT16			m_country;
 	// What branch they were in
-	UINT16			m_branch ;
+	UINT16			m_branch;
 	// The HCUnit they were in
-	UINT32			m_brigade ;
+	UINT32			m_brigade;
 	// ID of their mission, if any
-	UINT32			m_mission ;
+	UINT32			m_mission;
 	// If they were leading the mission
-	bool			m_leader ;
+	bool			m_leader;
 	// Vehicle they are or were in
-	WEAPON_SPEC		m_weapon ;
+	WEAPON_SPEC		m_weapon;
 	// Sortie ID if any
-	UINT32			m_sortie ;
+	UINT32			m_sortie;
 	// If they were spawned
-	bool			m_spawned ;
+	bool			m_spawned;
 	// Current or last x/y/z co-ords
-	SINT32			m_x, m_y, m_z ;
+	SINT32			m_x, m_y, m_z;
 	// Most importantly
-	std::string		m_report ;	// Upto 400 characters of report
+	std::string		m_report;	// Upto 400 characters of report
 	// Space for GMs to comment
-	std::string		m_notes ;
-} ;
+	std::string		m_notes;
+};
 
-typedef teul_network_object<ChatReport> CHAT_REPORT ;
+typedef teul_network_object<ChatReport> CHAT_REPORT;

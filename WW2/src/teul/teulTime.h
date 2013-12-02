@@ -11,18 +11,18 @@
 
 //tolua_begin
 
-extern TeulTimeMS teulClock64 ;						//!< Miliseconds since epoch as of last teulSyncClock().
-extern UINT32 teulClockTime ;						//!< Seconds since epoch as of last teulSyncClock().
+extern TeulTimeMS teulClock64;						//!< Miliseconds since epoch as of last teulSyncClock().
+extern UINT32 teulClockTime;						//!< Seconds since epoch as of last teulSyncClock().
 
 //tolua_end
 
-static const UINT32	SECOND_MS	=	1000 ;			//!< Number of seconds in a milliseconds.
-static const UINT32 MINUTE_S	=	60 ;			//!< Number of seconds in a minute.
-static const UINT32	HOUR_M		=	60 ;			//!< Number of minutes in an hour.
-static const UINT32 HOUR_S		=	60 * 60 ;		//!< Number of seconds in an hour.
-static const UINT32	DAY_S		=	24 * 60 * 60 ;	//!< Number of seconds in a day.
+static const UINT32	SECOND_MS	=	1000;			//!< Number of seconds in a milliseconds.
+static const UINT32 MINUTE_S	=	60;				//!< Number of seconds in a minute.
+static const UINT32	HOUR_M		=	60;				//!< Number of minutes in an hour.
+static const UINT32 HOUR_S		=	60 * 60;		//!< Number of seconds in an hour.
+static const UINT32	DAY_S		=	24 * 60 * 60;	//!< Number of seconds in a day.
 
-static inline UINT32 teulTime() { return teulClockTime ; }	//!< Seconds since epoch as of last teulSyncClock().
+static inline UINT32 teulTime() { return teulClockTime; }	//!< Seconds since epoch as of last teulSyncClock().
 
 extern SINT32 teulSyncClock(void);					//!< Updates the teulClock64 and teulClockTime values.
 
@@ -44,7 +44,7 @@ extern SINT32 teulElapsedClock(UINT32 oldTime);
 
 // teulClockBits functions are the same as above excepting that
 // the number of bits are specified and may be between 2 and 31.
-// allways assumes same number of bits for all parameters.
+// always assumes same number of bits for all parameters.
 
 extern SINT32 teulClockBits(UINT32 bits);
 extern SINT32 teulDeltaClockBits( UINT32 bits, UINT32 newTime, UINT32 oldTime );

@@ -34,7 +34,7 @@ extern SINT32	LoadingScreen;
 
 static bool _setSection(int numargs, FUNCARGS* args);
 static bool _setDefault(int numargs, FUNCARGS* args);
-static bool _setIgnore(int numargs, FUNCARGS* args) ;
+static bool _setIgnore(int numargs, FUNCARGS* args);
 static bool _executeFunc(char* func, FUNCARGS* fargs, SINT32 nargs
 						, SINT32 argOffset, PARSE_CALLBACK* callback, bool* funcFound, UINT32* lineCounter);
 
@@ -50,7 +50,7 @@ struct SECTION_HEAD
 	SINT32	numargs;
 	UCHAR	name[MAX_SECT_NAME_SIZE];
 	UCHAR	header[MAX_ARGS][MAX_SECT_NAME_SIZE];
-} ;
+};
 
 static SECTION_HEAD* _section;
 
@@ -59,42 +59,42 @@ static ARG_KEY_HEAD _defaultKeys;
 
 #include <string>
 #include <set>
-typedef std::set< std::pair<std::string, std::string> > IGNORE_LIST ;
-static IGNORE_LIST _ignoreList ;
+typedef std::set< std::pair<std::string, std::string> > IGNORE_LIST;
+static IGNORE_LIST _ignoreList;
 
 static ARG_LIST* paramGetArgList(char* src)
 {
 	static ARG_LIST list;
 
 	list.numArgs = 0;
-	list.line = src ;
+	list.line = src;
 
 	do
 	{
-		list.arg[list.numArgs] = src ;
-		src = strchr(src, ',') ;
+		list.arg[list.numArgs] = src;
+		src = strchr(src, ',');
 
 		if ( src != NULL )
 		{
 			// Remove trailing white space and any quotes.
-			for ( char* p = src - 1 ; p > list.arg[list.numArgs] && (isspace(*p) || *p == '\"') ; --p )
+			for ( char* p = src - 1; p > list.arg[list.numArgs] && (isspace(*p) || *p == '\"'); --p )
 			{
-				*p = 0 ;
+				*p = 0;
 			}
 
 			// Trim the comma
-			*(src++) = 0 ;
+			*(src++) = 0;
 
 			// Skip leading whitespace or any quotes on the next argument
 			while ( *src && (isspace(*src) || *src == '\"') )
 			{
-				++src ;
+				++src;
 			}
 		}
 
-		++list.numArgs ;
+		++list.numArgs;
 	}
-	while ( src && *src && list.numArgs < MAX_ARGS ) ;
+	while ( src && *src && list.numArgs < MAX_ARGS );
 
 	// if the last arg's last char is a quote, kill it here; above code doesn't catch it for some reason
 	int lastArg = list.numArgs - 1;
@@ -104,10 +104,10 @@ static ARG_LIST* paramGetArgList(char* src)
 		*lastArgChar = 0;
 
 	// Trim empty arguments from the end.
-	for ( int i = list.numArgs - 1 ; i >= 0 && list.arg[i] && list.arg[i][0] == 0 ; --i )
+	for ( int i = list.numArgs - 1; i >= 0 && list.arg[i] && list.arg[i][0] == 0; --i )
 	{
-		list.arg[i] = NULL ;
-		--list.numArgs ;
+		list.arg[i] = NULL;
+		--list.numArgs;
 	}
 
 	if ( list.numArgs == 0)
@@ -125,21 +125,21 @@ _getEndOfLine(char* src)
 	// Find the end of this line.
 	while ( *src )
 	{
-		char c = *src ;
+		char c = *src;
 		if ( c == '\n' || c == '\r' )
 		{
-			*(src++) = 0 ;
+			*(src++) = 0;
 			if ( src[0] != c && (src[0] == '\n' || src[0] == '\r' ) )
 			{
 				// Handle OSes that have \r\n and \n\r
-				++src ;
+				++src;
 			}
-			return src ;
+			return src;
 		}
-		++src ;
+		++src;
 	}
 
-	return src ;
+	return src;
 }
 
 // Returns a pointer to the end of the current line,
@@ -147,28 +147,28 @@ _getEndOfLine(char* src)
 static char*
 _getNextValidLine(char*& eol, UINT32& lineCounter)
 {
-	char* src = NULL ;
-	bool inComment = false ;
+	char* src = NULL;
+	bool inComment = false;
 	while ( eol && *eol )
 	{
-		++lineCounter ;		// We have a line.
+		++lineCounter;		// We have a line.
 
-		src = eol ;
-		eol = _getEndOfLine(src) ;
+		src = eol;
+		eol = _getEndOfLine(src);
 
 		while ( *src && isspace(*src) )
-			++src ;
+			++src;
 
 		// Line contained nothing but spaces.
 		if ( !*src )
-			continue ;
+			continue;
 
 		if ( inComment )
 		{
 			if ( src[0] != '*' || src[1] != '/' )
-				continue ;
-			inComment = false ;
-			continue ;
+				continue;
+			inComment = false;
+			continue;
 		}
 
 		if ( src[0] == '/' && src[1] == '*' )
@@ -176,19 +176,19 @@ _getNextValidLine(char*& eol, UINT32& lineCounter)
 			if ( strstr(src + 2, "*/") == NULL )
 			{
 				/* Not a comment like this */
-				inComment = true ;
+				inComment = true;
 			}
-			continue ;
+			continue;
 		}
 
 		// Comment line, skip.
 		if ( *src == '#' || *src == ';' || *src == '/' || *src == '"' )
-			continue ;
+			continue;
 
-		return src ;
+		return src;
 	}
 
-	return NULL ;
+	return NULL;
 }
 
 bool parseFile(char* pathName, PARSE_CALLBACK* sectionCallbacks
@@ -208,10 +208,10 @@ bool parseFile(char* pathName, PARSE_CALLBACK* sectionCallbacks
 
 	strncpy(_fileName, pathName, PN_MAX_PATH);
 
-	char* data = NULL ;
-	bool loaded = fioLoad(_fileName, data) ;
+	char* data = NULL;
+	bool loaded = fioLoad(_fileName, data);
 	if ( data == NULL )
-		return loaded ;
+		return loaded;
 
 	_section = (SECTION_HEAD*)memAlloc(sizeof(SECTION_HEAD));
 	memset(_section, 0x0, sizeof(SECTION_HEAD));
@@ -220,9 +220,9 @@ bool parseFile(char* pathName, PARSE_CALLBACK* sectionCallbacks
 	memset(_defaultKeys.keys, 0x0, sizeof(ARG_KEY)*(MAX_ARGS+1));
 
 	// should no lines return false?
-	retval = true ;
+	retval = true;
 
-	*lineCounter = 0 ;
+	*lineCounter = 0;
 
 #if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
 	if ( LoadingScreen )
@@ -231,12 +231,12 @@ bool parseFile(char* pathName, PARSE_CALLBACK* sectionCallbacks
 	}
 #endif
 
-	char* eol = data ;
+	char* eol = data;
 	while ( eol && *eol )
 	{
-		char* p = _getNextValidLine(eol, *lineCounter) ;
+		char* p = _getNextValidLine(eol, *lineCounter);
 		if ( p == NULL || *p == 0 )
-			continue ;
+			continue;
 
 		argList = paramGetArgList(p);
 
@@ -244,7 +244,7 @@ bool parseFile(char* pathName, PARSE_CALLBACK* sectionCallbacks
 			continue;
 
 		// if we get an error and break retval its false
-		retval = false ;
+		retval = false;
 
 		strncpy(func, argList->arg[0], MAX_SECT_NAME_SIZE);
 		_strlwr(func);
@@ -307,13 +307,13 @@ bool parseFile(char* pathName, PARSE_CALLBACK* sectionCallbacks
 		}
 
 		// the only way to be true is to run out of lines
-		retval = true ;
+		retval = true;
 	}
 
 	memFree(_section);
 	memFree(_defaultKeys.keys);
 
-	memFree(data) ;
+	memFree(data);
 
 	return (retval);
 }
@@ -328,7 +328,7 @@ SINT32 i,sendNum;
 
 	sendNum = nargs-argOffset;
 
-	for (i=0 ; callback[i].function ; i++)
+	for (i=0; callback[i].function; i++)
 	{
 		if (strcmp(func, callback[i].type) == 0)
 		{
@@ -336,14 +336,14 @@ SINT32 i,sendNum;
 			if (!callback[i].function(sendNum, &fargs[argOffset]))
 			{
 				DEBUG_ERR("%s:%u: Function failure, funct %s", _fileName, *lineCounter, callback[i].type);
-				return false ;
+				return false;
 			}
 
 			break;
 		}
 	}
 
-	return true ;
+	return true;
 }
 
 static bool _setSection(int numargs, FUNCARGS* args)
@@ -360,20 +360,20 @@ SINT32 i;
 
 	_defaultKeys.numKeys= 0;
 
-	return true ;
+	return true;
 }
 
 static bool _setIgnore(int numargs, FUNCARGS* args)
 {
 	if ( numargs < 2 )
-		return true ;
+		return true;
 
-	for ( int i = 1 ; i < numargs ; ++i )
+	for ( int i = 1; i < numargs; ++i )
 	{
-		_ignoreList.insert( std::make_pair<std::string,std::string>(args[0].svalue, args[i].svalue) ) ;
+		_ignoreList.insert( std::make_pair<std::string,std::string>(args[0].svalue, args[i].svalue) );
 	}
 
-	return true ;
+	return true;
 }
 
 static bool _setDefault(int numargs, FUNCARGS* args)
@@ -385,14 +385,14 @@ SINT32 i;
 
 	_defaultKeys.numKeys = numargs+1;
 
-	return true ;
+	return true;
 
 }
 
 bool
 parseIsObjectIgnoringError(const char* objectName, const char* error)
 {
-	IGNORE_LIST::iterator it = _ignoreList.find( std::make_pair<std::string, std::string>(objectName, error) ) ;
-	return ( it != _ignoreList.end() ) ;
+	IGNORE_LIST::iterator it = _ignoreList.find( std::make_pair<std::string, std::string>(objectName, error) );
+	return ( it != _ignoreList.end() );
 }
 

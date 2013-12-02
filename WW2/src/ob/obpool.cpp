@@ -80,7 +80,7 @@ struct POOL_OBJECT_TO_DIRECTORY
 	SINT8	LocalName[32];
 	SINT8	Directory[128];
 
-} ;
+};
 
 // Callback definitions for scanning object types.
 typedef LOGICAL (*SCANOBJECT)(OBJECT* lpobj, POOLOBJHDR** lphdr);
@@ -167,7 +167,7 @@ void obpoolKill(void)
 
 	if (PoolObjectDirectoryHead.next != NULL)
 	{
-		for (TransTablePtr = PoolObjectDirectoryHead.next ;
+		for (TransTablePtr = PoolObjectDirectoryHead.next;
 			TransTablePtr != NULL;
 			TransTablePtr = nextPtr)
 		{
@@ -288,7 +288,7 @@ static LOGICAL ProcessObjectTree(OBJECT* lpobj, UINT32 setflags, UINT32 setflag2
 		}
 
 		OBJECT* lpatt = lpobj->attached;
-		OBJECT* lptmp ;
+		OBJECT* lptmp;
 		while (lpatt != NULL)
 		{
 			lptmp = lpatt->attached;

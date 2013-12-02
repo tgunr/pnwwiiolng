@@ -26,7 +26,7 @@
 											  //			2 = grayscale
 	  UCHAR	filler[58];		//	70	Filler  	58	blank to fill out 128 byte header
 
-  } ;
+  };
 
   #pragma pack()
 

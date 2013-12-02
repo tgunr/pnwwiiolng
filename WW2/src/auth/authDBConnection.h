@@ -8,4 +8,4 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-extern void authGetDBConnectionInfo(struct DBCONNECTION* into) ;
+extern void authGetDBConnectionInfo(struct DBCONNECTION* into);

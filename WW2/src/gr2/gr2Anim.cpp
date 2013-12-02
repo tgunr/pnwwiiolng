@@ -6979,13 +6979,13 @@ void gr2AnimTrooperTwists(OBJECT* object,
 				{
 					if(model->currentMove == TPS_MOVETYPE_IDLE_AIM)
 					{
-						torsoThreshold = 20 ;
-						legsThreshold = (left) ? 55 : 70 ;
+						torsoThreshold = 20;
+						legsThreshold = (left) ? 55 : 70;
 					}
 					else
 					{
-						torsoThreshold = (left) ? 50 : 65 ;
-						legsThreshold = (left) ? 50 : 65 ;
+						torsoThreshold = (left) ? 50 : 65;
+						legsThreshold = (left) ? 50 : 65;
 					}
 				}
 
@@ -6993,7 +6993,7 @@ void gr2AnimTrooperTwists(OBJECT* object,
 
 				if(model->currentMove == TPS_MOVETYPE_IDLE_AIM || model->currentMove == TPS_MOVETYPE_TURN_AIM)
 				{
-					torsoThreshold = 5 ;
+					torsoThreshold = 5;
 					legsThreshold = 70.0f;
 				}
 
@@ -7008,7 +7008,7 @@ void gr2AnimTrooperTwists(OBJECT* object,
 				if(fabs(torsoDiff) > torsoThreshold)
 				{
 					if(left)
-						model->torsoYaw += (torsoDiff > 0) ? torsoDiff - torsoThreshold : torsoThreshold - torsoDiff ;
+						model->torsoYaw += (torsoDiff > 0) ? torsoDiff - torsoThreshold : torsoThreshold - torsoDiff;
 					else
 						model->torsoYaw += (torsoDiff > 0) ? torsoThreshold - torsoDiff : torsoDiff + torsoThreshold;
 
@@ -7521,7 +7521,7 @@ void gr2AnimUpdate()
 
 			for(int p = 0; p < 2; ++p)
 			{
-				int footBone = (p == 0) ? 12 : 8 ; // left, right
+				int footBone = (p == 0) ? 12 : 8; // left, right
 
 				if(gr2GetBonePositionByIndex(model->skeleton, footBone, &tempMat))
 				{
@@ -7925,8 +7925,8 @@ void gr2AnimUpdate()
 			{
 				hits.clear();
 
-				int footBone		= (r == 0) ? 12 : 8 ; // left, right
-				FLOAT32& foot	= (r == 0) ? left : right ; // left, right
+				int footBone		= (r == 0) ? 12 : 8; // left, right
+				FLOAT32& foot	= (r == 0) ? left : right; // left, right
 
 				if(gr2GetBonePositionByIndex(model->skeleton, footBone, &tempMat))
 				{
@@ -8327,7 +8327,7 @@ bool gr2AnimTerrainize(gr2AnimTrooper* model)
 			static FLOAT64 idleDisplace = 1.4f;
 			static FLOAT64 moveDisplace = .6f;
 
-			FLOAT64 adjust = (model->currentMove == TPS_MOVETYPE_IDLE) ? idleDisplace : moveDisplace ;
+			FLOAT64 adjust = (model->currentMove == TPS_MOVETYPE_IDLE) ? idleDisplace : moveDisplace;
 			FLOAT64 zAdjust = -(worldPos.z() - (worldPos.z() - adjust));
 
 			// do pitch smoothing
@@ -8674,13 +8674,13 @@ void gr2AnimTwist::CalculateTurn(gr2AnimTrooper* model, FLOAT64& yaw, FLOAT64VEC
 			{
 				if(model->currentPoint == TPS_POINTTYPE_AIM)
 				{
-					torsoThreshold = 20 ;
-					legsThreshold = (left) ? 55 : 70 ;
+					torsoThreshold = 20;
+					legsThreshold = (left) ? 55 : 70;
 				}
 				else
 				{
-					torsoThreshold = (left) ? 50 : 65 ;
-					legsThreshold = (left) ? 50 : 65 ;
+					torsoThreshold = (left) ? 50 : 65;
+					legsThreshold = (left) ? 50 : 65;
 				}
 			}
 
@@ -8691,7 +8691,7 @@ void gr2AnimTwist::CalculateTurn(gr2AnimTrooper* model, FLOAT64& yaw, FLOAT64VEC
 
 			if(model->currentPoint == TPS_POINTTYPE_AIM || model->currentMove == TPS_MOVETYPE_DEPLOYED)
 			{
-				torsoThreshold = 5 ;
+				torsoThreshold = 5;
 				legsThreshold = 70.0f;
 			}
 
@@ -8706,7 +8706,7 @@ void gr2AnimTwist::CalculateTurn(gr2AnimTrooper* model, FLOAT64& yaw, FLOAT64VEC
 			if(fabs(torsoDiff) > torsoThreshold)
 			{
 				if(left)
-					torsoYaw += (torsoDiff > 0) ? torsoDiff - torsoThreshold : torsoThreshold - torsoDiff ;
+					torsoYaw += (torsoDiff > 0) ? torsoDiff - torsoThreshold : torsoThreshold - torsoDiff;
 				else
 					torsoYaw += (torsoDiff > 0) ? torsoThreshold - torsoDiff : torsoDiff + torsoThreshold;
 
@@ -9824,13 +9824,13 @@ void gr2AnimTwist::Calculate2(FLOAT64 delta, gr2AnimTrooper* model)
 				{
 					if(model->currentPoint == TPS_POINTTYPE_AIM)
 					{
-						torsoThreshold = 20 ;
-						legsThreshold = (left) ? 55 : 70 ;
+						torsoThreshold = 20;
+						legsThreshold = (left) ? 55 : 70;
 					}
 					else
 					{
-						torsoThreshold = (left) ? 50 : 65 ;
-						legsThreshold = (left) ? 50 : 65 ;
+						torsoThreshold = (left) ? 50 : 65;
+						legsThreshold = (left) ? 50 : 65;
 					}
 				}
 
@@ -9838,7 +9838,7 @@ void gr2AnimTwist::Calculate2(FLOAT64 delta, gr2AnimTrooper* model)
 
 				if(model->currentPoint == TPS_POINTTYPE_AIM || model->currentMove == TPS_MOVETYPE_DEPLOYED)
 				{
-					torsoThreshold = 5 ;
+					torsoThreshold = 5;
 					legsThreshold = 70.0f;
 				}
 
@@ -9853,7 +9853,7 @@ void gr2AnimTwist::Calculate2(FLOAT64 delta, gr2AnimTrooper* model)
 				if(fabs(torsoDiff) > torsoThreshold)
 				{
 					if(left)
-						torsoYaw += (torsoDiff > 0) ? torsoDiff - torsoThreshold : torsoThreshold - torsoDiff ;
+						torsoYaw += (torsoDiff > 0) ? torsoDiff - torsoThreshold : torsoThreshold - torsoDiff;
 					else
 						torsoYaw += (torsoDiff > 0) ? torsoThreshold - torsoDiff : torsoDiff + torsoThreshold;
 

@@ -36,7 +36,7 @@ extern void uiMapAddWaypoint(const char* name, int type, int subtype, int x, int
 extern void uiMapRemoveWaypoint(const char* name);
 extern void uiMapClearWaypoints();
 extern void uiMapAddLayer(SuperCellMapView* mapview, _xmlNode* node);
-namespace StratDB { class StratObject ; } ;
+namespace StratDB { class StratObject ; };
 extern void uiMapStratUpdate(StratDB::StratObject* strat, int country = -1, int vislevel = -1);
 
 extern SuperCellMapView* uiMapFind(const char* name);

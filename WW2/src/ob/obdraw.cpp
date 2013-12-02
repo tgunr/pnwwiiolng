@@ -100,17 +100,17 @@ static UINT32					MultiTextureTransparentColor;
 static MULTITEXTURE*			MultiTextureInfo;
 static SINT32					NumMultiTextures;
 
-static Covert<LOGICAL> g_drawObjectTriangles(FALSE) ;
-static Covert<LOGICAL> g_drawObjectNormals(FALSE) ;
-static Covert<LOGICAL> _drawCollisionNormals(FALSE) ;
-static Covert<LOGICAL> _drawboundingbox(FALSE) ;
-static Covert<LOGICAL> _drawTObox(FALSE) ;
+static Covert<LOGICAL> g_drawObjectTriangles(FALSE);
+static Covert<LOGICAL> g_drawObjectNormals(FALSE);
+static Covert<LOGICAL> _drawCollisionNormals(FALSE);
+static Covert<LOGICAL> _drawboundingbox(FALSE);
+static Covert<LOGICAL> _drawTObox(FALSE);
 static Covert<bool> _drawHeightMap(false);
 static Covert<LOGICAL> _drawCollisionObjects(FALSE);
 
-static Covert<bool> _unsorteddraw(true) ;
-static Covert<bool> _sorteddraw(true) ;
-static Covert<bool> _cockpitsorteddraw(true) ;
+static Covert<bool> _unsorteddraw(true);
+static Covert<bool> _sorteddraw(true);
+static Covert<bool> _cockpitsorteddraw(true);
 static Covert<bool> _cockpitunsorteddraw = true;
 static Covert<bool> _multitexturedraw = true;
 
@@ -246,7 +246,7 @@ piINDICES*	pt;
 
 	if (rpos.ptr == NULL || pt == NULL) return;
 
-	for (i=0 ; i < numtris ; i++)
+	for (i=0; i < numtris; i++)
 	{
 		draw3dLine(&rpos[pt[i].v1], &rpos[pt[i].v2], color);
 		draw3dLine(&rpos[pt[i].v2], &rpos[pt[i].v3], color);
@@ -750,7 +750,7 @@ SINT32		i;
 		return(FALSE);
 	}
 
-	for (i=0 ; i < MAX_MULTITEXTURES ; i++)
+	for (i=0; i < MAX_MULTITEXTURES; i++)
 	{
 		MultiTextureInfo[i].MultiTextureId = -1;
 		MultiTextureInfo[i].MultiMaterialId = -1;
@@ -773,7 +773,7 @@ SINT32		i;
 		return;
 	}
 
-	for (i=0 ; i < MAX_MULTITEXTURES ; i++)
+	for (i=0; i < MAX_MULTITEXTURES; i++)
 	{
 		piFreeMipTextures(MultiTextureInfo[i].MultiTextureId);
 		piFreeMaterial(MultiTextureInfo[i].MultiMaterialId);
@@ -875,7 +875,7 @@ SINT32		i, j, btid, mtid;
 		btid = mtid = -1;
 	}
 
-	for (i=0 ; i < NumMultiTextures ; i++)
+	for (i=0; i < NumMultiTextures; i++)
 	{
 		if (btid == MultiTextureInfo[i].BaseTextureId &&
 			mtid == MultiTextureInfo[i].MultiTextureId)
@@ -884,7 +884,7 @@ SINT32		i, j, btid, mtid;
 		}
 	}
 
-	for (i=0 ; i < NumMultiTextures ; i++)
+	for (i=0; i < NumMultiTextures; i++)
 	{
 		if (btid < MultiTextureInfo[i].BaseTextureId)
 		{
@@ -919,7 +919,7 @@ SINT32		i, j, btid, mtid;
 	{
         TEXTURE* lpTex = NULL;
 
-		for (j=NumMultiTextures ; j > i ; j--)
+		for (j=NumMultiTextures; j > i; j--)
 		{
 			MultiTextureInfo[j] = MultiTextureInfo[j-1];
 
@@ -965,7 +965,7 @@ SINT32		i;
 		return(FALSE);
 	}
 
-	for (i=0 ; i < NumMultiTextures ; i++)
+	for (i=0; i < NumMultiTextures; i++)
 	{
 		if (BaseTexture[0] == MultiTextureInfo[i].MultiTextureName[0])
 		{
@@ -1402,7 +1402,7 @@ LOGICAL obdrawUpdateDOT3ColorPoint(OBJECT* lpobj)
 	// convert from eye space to object space
 	math3dMultiplyRotation(&lpOS, &lpES, &modelViewMatrixInverse);
 
-	for (i=0 ; i < lpobj->numverts ; i++)
+	for (i=0; i < lpobj->numverts; i++)
 	{
 		lv.x = lpOS.x - pverts[i].x;
 		lv.y = lpOS.y - pverts[i].y;
@@ -1461,7 +1461,7 @@ LOGICAL obdrawUpdateDOT3ColorDirectional(OBJECT* lpobj)
 
 	pcolors = lpobj->MutableColors();
 
-	for (i=0 ; i < lpobj->numverts ; i++)
+	for (i=0; i < lpobj->numverts; i++)
 	{
 		pcolors[i].color = color;
 	}
@@ -5853,7 +5853,7 @@ static UINT32	lasttod;
 	}
 
 	lpobj = (OBJECT*)lplist->next;
-	for ( ; lpobj ; lpobj=lpobj->next)
+	for (; lpobj; lpobj=lpobj->next)
 	{
 		// only operate on selected objects
 		if (!(lpobj->flag2 & OBJECT_TERRAIN_OBJECT))

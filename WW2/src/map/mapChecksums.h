@@ -10,9 +10,9 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 // Request the most recent checksums [background thread task]
-extern void mapPollChecksums(bool force=false) ;
+extern void mapPollChecksums(bool force=false);
 
 // Tell me if a particular app/checksum pair are valid.
 // If the player is a producer, the checksum will be added to the db
-extern bool mapCheckChecksum(UINT32 appVersion, const UINT64& checksum, bool isProducer) ;
+extern bool mapCheckChecksum(UINT32 appVersion, const UINT64& checksum, bool isProducer);
 

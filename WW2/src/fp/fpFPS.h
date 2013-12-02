@@ -16,7 +16,7 @@ enum fpFPSPoses
 	POSE_TRANSITION,
 	POSE_SIT,
 	POSE_NUM_POSES
-} ;
+};
 
 // control block flags; used by tutorials to block certain inputs
 enum fpFPSControlBlocks
@@ -29,7 +29,7 @@ enum fpFPSControlBlocks
 	CB_SELECT			= 1<<4,
 	CB_DEPLOY			= 1<<5,
 	CB_NUM_BLOCKS		= 6
-} ;
+};
 // tolua_end
 
 #define MAX_FPS_STEP .5f

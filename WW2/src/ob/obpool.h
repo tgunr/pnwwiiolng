@@ -46,7 +46,7 @@ struct OBJECTFILE
 	SINT16	filetype;		// File type (object, etc.)
 	SINT16	version;		// Major/Minor version information
 	UINT32	length;			// Length of data; including this header
-} ;
+};
 
 
 struct POOLOBJ
@@ -64,7 +64,7 @@ struct POOLOBJ
 	SINT32				comment;		// Offset text comment
 	SINT32				spare;			// Offset Spare data
 
-} ;
+};
 
 struct POOLOBJDATA
 {
@@ -91,7 +91,7 @@ struct POOLOBJDATA
 	SINT32				ptris;			// Offset to object indices
 	SINT32				psnorms;		// Offset to surface normals
 	SINT32				pscdn;			// Offset to surface collision detection normals
-} ;
+};
 
 struct DOF
 {
@@ -121,7 +121,7 @@ struct DOF
 	piMATRIX			dofposmatrix;	// DOF position matrix
 	UINT32				dofflags;		// DOF Flags
 
-} ;
+};
 
 
 

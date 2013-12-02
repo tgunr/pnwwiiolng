@@ -25,14 +25,14 @@
 
 //	------------------------------	Declarations
 
-static TEUL_CALLBACK* _XCHG_LISTING ;
-static TEUL_CALLBACK* _XCHG_SELECT ;
-static TEUL_CALLBACK* _XCHG_CREATE ;
+static TEUL_CALLBACK* _XCHG_LISTING;
+static TEUL_CALLBACK* _XCHG_SELECT;
+static TEUL_CALLBACK* _XCHG_CREATE;
 
 // Track instance IDs through wwiionline.wwii_serial.
-static SerialNumber instanceSerialNumber("instance", Instance::_TUTORIAL, 10, 0) ;
+static SerialNumber instanceSerialNumber("instance", Instance::_TUTORIAL, 10, 0);
 
-using namespace Instance ;
+using namespace Instance;
 
 //////////////////////////////////////////////////////////////////////
 // Process a request for a list of instances from a client.
@@ -40,24 +40,24 @@ using namespace Instance ;
 static SINT32
 _recvInstanceRequest(ACTION_OBJECT* const a)
 {
-	wwiiPlayer* const player = ServerInterface::LookupByTeulIndex(a->teulIndex) ;
+	wwiiPlayer* const player = ServerInterface::LookupByTeulIndex(a->teulIndex);
 	if ( player == NULL )
 	{
-		dbugLog(_FLD, "t:%d Instance::Listing request with no player", a->teulIndex) ;
-		return -EINVAL ;
+		dbugLog(_FLD, "t:%d Instance::Listing request with no player", a->teulIndex);
+		return -EINVAL;
 	}
 
 	// The client actually sends a descriptor describing the
 	// listing they want.
-	Instance::ListingRequest query(a) ;
+	Instance::ListingRequest query(a);
 
-	Instance::Listing result ;					// Container for reply
+	Instance::Listing result;					// Container for reply
 	if ( !result.populate(player, query) )
 	{
-		return -EINVAL ;
+		return -EINVAL;
 	}
 
-	return teulSend(a->teulIndex, _XCHG_LISTING, &result) ;
+	return teulSend(a->teulIndex, _XCHG_LISTING, &result);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -66,7 +66,7 @@ _recvInstanceRequest(ACTION_OBJECT* const a)
 static SINT32
 _sendInstanceListing(ACTION_OBJECT* const a)
 {
-	return ((Instance::Listing*)(a->localRawData))->packer(TEUL_PACK, a) ;
+	return ((Instance::Listing*)(a->localRawData))->packer(TEUL_PACK, a);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -75,7 +75,7 @@ _sendInstanceListing(ACTION_OBJECT* const a)
 static
 SINT32 _sendInstanceCreated(ACTION_OBJECT* const a)
 {
-	return ((Instance::Result*)(a->localRawData))->packer(TEUL_PACK, a) ;
+	return ((Instance::Result*)(a->localRawData))->packer(TEUL_PACK, a);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -84,7 +84,7 @@ SINT32 _sendInstanceCreated(ACTION_OBJECT* const a)
 static
 SINT32 _sendInstanceSelect(ACTION_OBJECT* const a)
 {
-	return ((Instance::Result*)(a->localRawData))->packer(TEUL_PACK, a) ;
+	return ((Instance::Result*)(a->localRawData))->packer(TEUL_PACK, a);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -93,7 +93,7 @@ SINT32 _sendInstanceSelect(ACTION_OBJECT* const a)
 static Descriptor
 _getNewInstanceDescriptor(const Descriptor& request)
 {
-	return Descriptor(request.category(), request.type(), request.handle(), instanceSerialNumber.getNext()) ;
+	return Descriptor(request.category(), request.type(), request.handle(), instanceSerialNumber.getNext());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -102,32 +102,32 @@ _getNewInstanceDescriptor(const Descriptor& request)
 static Descriptor
 _pickTutorialInstance(wwiiPlayer* const player, const Descriptor& request, HOST_INSTANCES::iterator& it)
 {
-	UINT32 bestScore = 0 ;
-	Descriptor best ;
-	for ( ; it != g_hostInstances.end() && it->first.isInstanceOf(request) ; ++it )
+	UINT32 bestScore = 0;
+	Descriptor best;
+	for (; it != g_hostInstances.end() && it->first.isInstanceOf(request); ++it )
 	{
-		UINT32 score = 0 ;
-		HostInstance& instance = *it->second ;
+		UINT32 score = 0;
+		HostInstance& instance = *it->second;
 
 		// Ignore full instances
 		if ( instance.population() >= instance.capacity() )
-			continue ;
+			continue;
 
 		// But otherwise look for empty slots.
-		score += instance.capacity() - instance.population() ;
+		score += instance.capacity() - instance.population();
 
 		if ( score > bestScore )
 		{
-			best = instance.descriptor() ;
-			bestScore = score ;
+			best = instance.descriptor();
+			bestScore = score;
 		}
 	}
 
 	// No winner, create a new instance.
 	if ( bestScore == 0 )
-		best = _getNewInstanceDescriptor(request) ;
+		best = _getNewInstanceDescriptor(request);
 
-	return best ;
+	return best;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -136,59 +136,59 @@ _pickTutorialInstance(wwiiPlayer* const player, const Descriptor& request, HOST_
 static Descriptor
 _pickTrainingInstance(wwiiPlayer* const player, const Descriptor& request, HOST_INSTANCES::iterator& it)
 {
-	UINT32 bestScore = 0 ;
-	bool matched = false ;
-	Descriptor best ;
-	for ( ; it != g_hostInstances.end() && it->first.isInstanceOf(request) ; ++it )
+	UINT32 bestScore = 0;
+	bool matched = false;
+	Descriptor best;
+	for (; it != g_hostInstances.end() && it->first.isInstanceOf(request); ++it )
 	{
-		UINT32 score = 0 ;
-		HostInstance& instance = *it->second ;
+		UINT32 score = 0;
+		HostInstance& instance = *it->second;
 
 		// Ignore full instances
 		if ( instance.capacity() != 0 && instance.population() >= instance.capacity() )
-			continue ;
+			continue;
 
 		if ( instance.capacity() == 0 ) // Just find population
-			score += instance.population() ;
+			score += instance.population();
 		else
 		{
 			// Balance
-			const UINT32 sideCap = (instance.capacity() / 2) ;
+			const UINT32 sideCap = (instance.capacity() / 2);
 
 			// Don't allow > half on one side.
-			const UINT32 ourPop = instance.count(player->side()) ;
+			const UINT32 ourPop = instance.count(player->side());
 			if ( ourPop >= sideCap )
-				continue ;
+				continue;
 
-			const UINT32 theirPop = instance.count(wwiiOtherSide(player->side())) ;
+			const UINT32 theirPop = instance.count(wwiiOtherSide(player->side()));
 			if ( ourPop + 1 <= theirPop )
 			{
 				// We are underpop
-				score += (sideCap - ourPop) * 2 + (theirPop - ourPop) ;
+				score += (sideCap - ourPop) * 2 + (theirPop - ourPop);
 			}
 			else
 			{
 				// We are overpop
-				score += (sideCap - ourPop) ;
+				score += (sideCap - ourPop);
 			}
 		}
 
 		// Look for squad mates.
-		score += (SINT32) instance.getSquadMemberCount(player->squadID()) * 2 ;
+		score += (SINT32) instance.getSquadMemberCount(player->squadID()) * 2;
 
 		if ( matched == false || score > bestScore )
 		{
-			matched = true ;
-			best = instance.descriptor() ;
-			bestScore = score ;
+			matched = true;
+			best = instance.descriptor();
+			bestScore = score;
 		}
 	}
 
 	// No winner, create a new instance.
 	if ( matched == false )
-		best = _getNewInstanceDescriptor(request) ;
+		best = _getNewInstanceDescriptor(request);
 
-	return best ;
+	return best;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -198,8 +198,8 @@ static Descriptor
 _pickOtherInstance(const wwiiPlayer* const player, const Descriptor& request, HOST_INSTANCES::iterator& it)
 {
 	if ( it == g_hostInstances.end() || it->first != request )
-		return _getNewInstanceDescriptor(request) ;
-	return it->first ;
+		return _getNewInstanceDescriptor(request);
+	return it->first;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -212,42 +212,42 @@ _pickInstance(wwiiPlayer* const player, Instance::Descriptor& request)
 	switch ( request.category() )
 	{
 	case Instance::_INVALID:
-		return Instance::g_invalid ;
-	break ;
+		return Instance::g_invalid;
+	break;
 	case Instance::_CAMPAIGN:
-		return Instance::g_campaign ;
-	break ;
+		return Instance::g_campaign;
+	break;
 	case Instance::_TUTORIAL:
-		request.m_type = player->side() ;
-	break ;
+		request.m_type = player->side();
+	break;
 	case Instance::_SCENARIO:
-		request = Descriptor(request.category(), request.type(), 0, 0) ;
-	break ;
+		request = Descriptor(request.category(), request.type(), 0, 0);
+	break;
 	default:
 	break;
 	}
 
 	// Check to see if any instances of this descriptor are available
-	HOST_INSTANCES::iterator it = g_hostInstances.lower_bound(request) ;
+	HOST_INSTANCES::iterator it = g_hostInstances.lower_bound(request);
 	if ( it == g_hostInstances.end() || it->first.isInstanceOf(request) == false )
-		return _getNewInstanceDescriptor(request) ;
+		return _getNewInstanceDescriptor(request);
 
 	switch ( request.category() )
 	{
 	case Instance::_TUTORIAL:
-		return _pickTutorialInstance(player, request, it) ;
-	break ;
+		return _pickTutorialInstance(player, request, it);
+	break;
 	case Instance::_TRAINING:
-		return _pickTrainingInstance(player, request, it) ;
-	break ;
+		return _pickTrainingInstance(player, request, it);
+	break;
 	case Instance::_SCENARIO:
-		return it->first ;
-	break ;
+		return it->first;
+	break;
 	default:
-	break ;
+	break;
 	}
 
-	return _pickOtherInstance(player, request, it) ;
+	return _pickOtherInstance(player, request, it);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -256,26 +256,26 @@ _pickInstance(wwiiPlayer* const player, Instance::Descriptor& request)
 static
 SINT32 _recvInstanceSelect(ACTION_OBJECT* const a)
 {
-	Instance::Descriptor request(a) ;
+	Instance::Descriptor request(a);
 
 	if ( a->offset < 0 )
 	{
-		dbugLog(_FLA, "t:%d bad data during instance request (%d)", a->teulIndex, a->offset) ;
-		Instance::Result result(g_invalid) ;
-		result.m_status = Instance::_BAD_DATA ;
-		teulSend(a->teulIndex, _XCHG_SELECT, &result) ;
-		return a->offset ;
+		dbugLog(_FLA, "t:%d bad data during instance request (%d)", a->teulIndex, a->offset);
+		Instance::Result result(g_invalid);
+		result.m_status = Instance::_BAD_DATA;
+		teulSend(a->teulIndex, _XCHG_SELECT, &result);
+		return a->offset;
 	}
 
-	bool success = false ;
-	wwiiPlayer* const player = ServerInterface::LookupByTeulIndex(a->teulIndex) ;
+	bool success = false;
+	wwiiPlayer* const player = ServerInterface::LookupByTeulIndex(a->teulIndex);
 	if ( player != NULL )
 	{
 		player->log(_FLD, "received instance request %u.%u.%llu.%llu"
-					, request.category(), request.type(), request.handle(), request.id()) ;
+					, request.category(), request.type(), request.handle(), request.id());
 		if ( request.category() == Instance::_INVALID )
 		{
-			player->log(_FLW, "request for instance 0 ignored") ;
+			player->log(_FLW, "request for instance 0 ignored");
 		}
 		else if ( player->instance() == request )
 		{
@@ -283,8 +283,8 @@ SINT32 _recvInstanceSelect(ACTION_OBJECT* const a)
 			// on whether any change was successfully made; if
 			// the player is already in this instance it would
 			// return false, which is not what we want.
-			player->log(_FLD, "redundant instance request") ;
-			success = true ;
+			player->log(_FLD, "redundant instance request");
+			success = true;
 		}
 		else
 		{
@@ -293,22 +293,22 @@ SINT32 _recvInstanceSelect(ACTION_OBJECT* const a)
 			// select one for them.
 			if ( request.id() == 0 )
 			{
-				request = _pickInstance(player, request) ;
+				request = _pickInstance(player, request);
 			}
 
-			success = player->SetInstance(request) ;
+			success = player->SetInstance(request);
 		}
 	}
 	else
 	{
-		dbugLog(_FLW, "t:%d instance request from unregistered connection", a->teulIndex) ;
+		dbugLog(_FLW, "t:%d instance request from unregistered connection", a->teulIndex);
 	}
 
-	Instance::Result result(request) ;
+	Instance::Result result(request);
 	if ( success == true )
-		result.m_status = Instance::_SUCCESS ;
+		result.m_status = Instance::_SUCCESS;
 
-	return teulSend(a->teulIndex, _XCHG_SELECT, &result) ;
+	return teulSend(a->teulIndex, _XCHG_SELECT, &result);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -317,36 +317,36 @@ SINT32 _recvInstanceSelect(ACTION_OBJECT* const a)
 static
 SINT32 _recvInstanceCreate(ACTION_OBJECT* const a)
 {
-	Instance::Descriptor request(a) ;
+	Instance::Descriptor request(a);
 
-	bool success = false ;
-	wwiiPlayer* const player = ServerInterface::LookupByTeulIndex(a->teulIndex) ;
+	bool success = false;
+	wwiiPlayer* const player = ServerInterface::LookupByTeulIndex(a->teulIndex);
 	if ( player != NULL )
 	{
 		if ( request.id() != 0 )
 		{
 			player->log(_FLA, "received instance create request with non-zero id: %u.%u.%llu.>%llu<"
-					, request.category(), request.type(), request.handle(), request.id()) ;
+					, request.category(), request.type(), request.handle(), request.id());
 		}
 		else
 		{
 			player->log(_FLD, "received instance create request %u.%u.%llu.%llu"
-						, request.category(), request.type(), request.handle(), request.id()) ;
-			request = _pickInstance(player, request) ;
+						, request.category(), request.type(), request.handle(), request.id());
+			request = _pickInstance(player, request);
 		}
 
-		success = player->SetInstance(request) ;
+		success = player->SetInstance(request);
 	}
 	else
 	{
-		dbugLog(_FLW, "t:%d instance request from unregistered connection", a->teulIndex) ;
+		dbugLog(_FLW, "t:%d instance request from unregistered connection", a->teulIndex);
 	}
 
-	Instance::Result result(request) ;
+	Instance::Result result(request);
 	if ( success == true )
-		result.m_status = Instance::_SUCCESS ;
+		result.m_status = Instance::_SUCCESS;
 
-	return teulSend(a->teulIndex, _XCHG_SELECT, &result) ;
+	return teulSend(a->teulIndex, _XCHG_SELECT, &result);
 }
 
 namespace Instance
@@ -361,69 +361,69 @@ Listing::populate(wwiiPlayer* const player, const ListingRequest& request)
 {
 	// Clients track individual requests so that they can time them out
 	// incase they send multiple requests in a lag spike, etc.
-	m_requestID = request.m_requestID ;
+	m_requestID = request.m_requestID;
 
-	const Descriptor& query = request.m_descriptor ;
+	const Descriptor& query = request.m_descriptor;
 	// Some really obvious gruft:
 	if ( query == Instance::g_campaign )
 	{
-		m_result = _SPECIAL_REQUESTED ;
+		m_result = _SPECIAL_REQUESTED;
 		dbugLog(_FLM, "t:%d p:%u c:%s requesting instance category %u listing"
 						, player->teulIndex(), player->playerID(), player->callsign()
 						, query.category()
 						);
-		return true ;
+		return true;
 	}
 
 	if ( query.id() != 0LL )
 	{
-		m_result = _BAD_DESCRIPTOR ;
+		m_result = _BAD_DESCRIPTOR;
 		dbugLog(_FLM, "t:%d p:%u c:%s invalid descriptor [%u.%u.%llu.>%llu<]"
 						, player->teulIndex(), player->playerID(), player->callsign()
-						, query.category(), query.type(), query.handle(), query.id()) ;
-		return true ;
+						, query.category(), query.type(), query.handle(), query.id());
+		return true;
 	}
 
 	if ( query.category() >= 500 && (query.category() % 100) == 0 && query.type() == 0 )
 	{
-		HOST_INSTANCES::const_iterator top = g_hostInstances.lower_bound(Instance::Descriptor(query.category(), 0)) ;
-		HOST_INSTANCES::const_iterator bottom   = g_hostInstances.lower_bound(Instance::Descriptor(query.category() + 100, 0)) ;
+		HOST_INSTANCES::const_iterator top = g_hostInstances.lower_bound(Instance::Descriptor(query.category(), 0));
+		HOST_INSTANCES::const_iterator bottom   = g_hostInstances.lower_bound(Instance::Descriptor(query.category() + 100, 0));
 
-		for ( auto it = top ; it != bottom ; ++it )
+		for ( auto it = top; it != bottom; ++it )
 		{
-			const UINT32 squadMates = it->second->getSquadMemberCount(player->squadID()) ;
-			ClientStatus status(*it->second, squadMates) ;
-			m_results.push_back(status) ;
+			const UINT32 squadMates = it->second->getSquadMemberCount(player->squadID());
+			ClientStatus status(*it->second, squadMates);
+			m_results.push_back(status);
 		}
 	}
 	else if ( query.category() != 0 )
 	{
-		Instance::Descriptor base(query.category(), query.type()) ;
+		Instance::Descriptor base(query.category(), query.type());
 
 		for ( auto it = g_hostInstances.lower_bound(base)
 			;	it != g_hostInstances.end() && it->first.isInstanceOf(query)
 			;	++it
 			)
 		{
-			const UINT32 squadMates = it->second->getSquadMemberCount(player->squadID()) ;
-			ClientStatus status(*it->second, squadMates) ;
-			m_results.push_back(status) ;
+			const UINT32 squadMates = it->second->getSquadMemberCount(player->squadID());
+			ClientStatus status(*it->second, squadMates);
+			m_results.push_back(status);
 		}
 	}
 	else
 	{
-		for ( auto it = g_hostInstances.begin() ; it != g_hostInstances.end() ; ++it )
+		for ( auto it = g_hostInstances.begin(); it != g_hostInstances.end(); ++it )
 		{
-			const UINT32 squadMates = it->second->getSquadMemberCount(player->squadID()) ;
-			ClientStatus status(*it->second, squadMates) ;
-			m_results.push_back(status) ;
+			const UINT32 squadMates = it->second->getSquadMemberCount(player->squadID());
+			ClientStatus status(*it->second, squadMates);
+			m_results.push_back(status);
 		}
 	}
 
-	m_result = _SUCCESS ;
-	m_complete = true ;
+	m_result = _SUCCESS;
+	m_complete = true;
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -433,9 +433,9 @@ SINT32
 InstallHostCallbacks(void)
 {
 	BEGIN_CALLBACK_REGISTRATION(Instance::INST_X)
-		REGISTER_RECVSEND(Instance::INST_XCHG_LISTING_Y, _recvInstanceRequest, _sendInstanceListing, _XCHG_LISTING) ;
-		REGISTER_RECVSEND(Instance::INST_XCHG_SELECT_Y, _recvInstanceSelect, _sendInstanceSelect, _XCHG_SELECT) ;
-		REGISTER_RECVSEND(Instance::INST_XCHG_CREATE_Y, _recvInstanceCreate, _sendInstanceCreated, _XCHG_CREATE) ;
+		REGISTER_RECVSEND(Instance::INST_XCHG_LISTING_Y, _recvInstanceRequest, _sendInstanceListing, _XCHG_LISTING);
+		REGISTER_RECVSEND(Instance::INST_XCHG_SELECT_Y, _recvInstanceSelect, _sendInstanceSelect, _XCHG_SELECT);
+		REGISTER_RECVSEND(Instance::INST_XCHG_CREATE_Y, _recvInstanceCreate, _sendInstanceCreated, _XCHG_CREATE);
 	END_CALLBACK_REGISTRATION
 }
 
@@ -450,29 +450,29 @@ RecordPopulations()
 	/// campaign.
 	// Record once a minute for fidelity, we'll need something to
 	// automatically compress the table at a later point.
-	static const UINT32 _RUN_TIME_INTERVAL_S = 1 * 60 ;
-	static UINT32 nextRunTime_s = 0 ;
+	static const UINT32 _RUN_TIME_INTERVAL_S = 1 * 60;
+	static UINT32 nextRunTime_s = 0;
 	if ( teulTime() < nextRunTime_s )
-		return ;
-	nextRunTime_s = teulTime() + _RUN_TIME_INTERVAL_S ;
+		return;
+	nextRunTime_s = teulTime() + _RUN_TIME_INTERVAL_S;
 
 	// Use a ThreadTextQuery to batch up the inserts and then commit them
 	// in the background through a worker thread.
-	ThreadTextQuery query(DBThread::Audit, "INSERT INTO instance_populations VALUES","") ;
-	char entry[128] ;
-	for ( auto it = g_hostInstanceUIDs.begin() ; it != g_hostInstanceUIDs.end() ; ++it )
+	ThreadTextQuery query(DBThread::Audit, "INSERT INTO instance_populations VALUES","");
+	char entry[128];
+	for ( auto it = g_hostInstanceUIDs.begin(); it != g_hostInstanceUIDs.end(); ++it )
 	{
-		Instance::HostInstance* instance = it->second ;
+		Instance::HostInstance* instance = it->second;
 		dbugLog(_FLD, "rp:inst:%u.%u.%llu.%llu"
 								, instance->descriptor().category()
 								, instance->descriptor().type()
 								, instance->descriptor().handle()
 								, instance->descriptor().id()
-								) ;
+								);
 
-		for ( UINT32 side = 0 ; side < MAX_SIDES ; ++side )
+		for ( UINT32 side = 0; side < MAX_SIDES; ++side )
 		{
-			const UINT32 count = instance->count(side) ;
+			const UINT32 count = instance->count(side);
 			if ( count != 0 || count != instance->m_lastRecorded[side] )
 			{
 				sprintf(entry, "(%u,%u,%llu,%llu,NOW(),%u,%u)"
@@ -482,15 +482,15 @@ RecordPopulations()
 								, instance->descriptor().id()
 								, side
 								, instance->count(side)
-								) ;
-				query.addEntry(entry) ;
-				instance->m_lastRecorded[side] = count ;
+								);
+				query.addEntry(entry);
+				instance->m_lastRecorded[side] = count;
 			}
 		}
 	}
 
 	// Ok - whatever is left, if anything, needs saving.
-	query.commit(0) ;
+	query.commit(0);
 }
 
 }

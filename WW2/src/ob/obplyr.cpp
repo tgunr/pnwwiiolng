@@ -211,7 +211,7 @@ piVECTOR		n, cn;
 			pn	= lpatt->psnorms;
 			pcn	= lpatt->pscdn;
 
-			for (i=lpatt->numtris ; i ; i--, pn++, ++mnorm)
+			for (i=lpatt->numtris; i; i--, pn++, ++mnorm)
 			{
 				// rotate surface normals
 				n.x = mnorm->x * mat->_11 + mnorm->y * mat->_21 + mnorm->z * mat->_31;
@@ -301,7 +301,7 @@ piVECTOR		obox[2];
 			piVectorPtr snorm = lpobj->StaticNormals();
 			if(spos.ptr == NULL) return FALSE;
 
-			for (i=lpobj->numverts ; i ; i--, ++spos, ++snorm)
+			for (i=lpobj->numverts; i; i--, ++spos, ++snorm)
 			{
 				piVECTOR v;
 				// rotate and translate all vertices
@@ -325,7 +325,7 @@ piVECTOR		obox[2];
 			pcon  = lpobj->pscdon;
 			pcn   = lpobj->pscdn;
 
-			for (i=lpobj->numtris ; i ; i--, pno++, pn++)
+			for (i=lpobj->numtris; i; i--, pno++, pn++)
 			{
 				// rotate surface normal
 				pn->x = pno->x * mat._11 + pno->y * mat._21 + pno->z * mat._31;
@@ -431,7 +431,7 @@ static int        number=0;
 		psl = lpobj->pslverts;
 		pdl = lpobj->pdlverts;
 
-		for (i=lpobj->numverts ; i ; i--, pvo++, pv++, psl++, pdl++)
+		for (i=lpobj->numverts; i; i--, pvo++, pv++, psl++, pdl++)
 		{
 			// rotate and translate all vertices
 			vec.x = (pvo->x - x) * mat._11 + (pvo->y - y) * mat._21 + (pvo->z - z) * mat._31 + x;
@@ -457,7 +457,7 @@ static int        number=0;
 		pcon  = lpobj->pscdon;
 		pcn   = lpobj->pscdn;
 
-		for (i=lpobj->numtris ; i ; i--, pno++, pn++)
+		for (i=lpobj->numtris; i; i--, pno++, pn++)
 		{
 			// rotate surface normal
 			normal.x = pno->x * mat._11 + pno->y * mat._21 + pno->z * mat._31;
@@ -545,7 +545,7 @@ piMATRIX	mat;
 		psl = lpobj->pslverts;
 		pdl = lpobj->pdlverts;
 
-		for (i=lpobj->numverts ; i ; i--, pvo++, pv++, psl++, pdl++)
+		for (i=lpobj->numverts; i; i--, pvo++, pv++, psl++, pdl++)
 		{
 			// rotate and translate all vertices
 			vec.x = pvo->x * mat._11 + pvo->y * mat._21 + pvo->z * mat._31 + mat._41;
@@ -571,7 +571,7 @@ piMATRIX	mat;
 		pcon  = lpobj->pscdon;
 		pcn   = lpobj->pscdn;
 
-		for (i=lpobj->numtris ; i ; i--, pno++, pn++)
+		for (i=lpobj->numtris; i; i--, pno++, pn++)
 		{
 			// rotate surface normal
 			normal.x = pno->x * mat._11 + pno->y * mat._21 + pno->z * mat._31;
@@ -661,7 +661,7 @@ OBJECT*	lpobj;
 		pv = lpobj->pverts;
 		psl = lpobj->pslverts;
 		pdl = lpobj->pdlverts;
-		for (i=0 ; i < lpobj->numverts ; i++)
+		for (i=0; i < lpobj->numverts; i++)
 		{
 			pvo[i].x -= ax;
 			pvo[i].y -= ay;

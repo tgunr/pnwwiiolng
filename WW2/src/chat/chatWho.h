@@ -23,7 +23,7 @@ enum
 ,	CWT_FRIENDS
 ,	CWT_IGNORE
 ,	CWT_HC
-} ;
+};
 
 namespace Chat
 {
@@ -41,101 +41,101 @@ public:
 		, m_missionID(0)
 		, m_joinedSquad(0)
 		{}
-	Who(ACTION_OBJECT* const a) ;
+	Who(ACTION_OBJECT* const a);
 	virtual ~Who() {}
 
 public:
 	// Number of seconds in a delta
-	static const UINT32 _SECONDS_PER_DAY = 24 * 60 * 60 ;
+	static const UINT32 _SECONDS_PER_DAY = 24 * 60 * 60;
 	// How many days before we switch to a lower granularity
-	static const UINT32 _MAX_DELTA_DAYS = 90 ;
+	static const UINT32 _MAX_DELTA_DAYS = 90;
 	// How many days in a month
-	static const UINT32 _DAYS_PER_MONTH = 30 ;
+	static const UINT32 _DAYS_PER_MONTH = 30;
 
 public:
 	void setBasics(const ChatHandle& withHandle, bool isOnline, bool isInMySquad, RANK_NO withSquadRank, const ChatHandle& withSquadHandle=0LL, UINT32 withJoinedSquad=0)
 	{
-		m_handle = withHandle ;
-		m_online = isOnline ;
-		m_inSameSquad = isInMySquad ;
-		m_squadRank = withSquadRank ;
-		m_squadHandle = withSquadHandle ;
-		m_extendedInfo = false ;
-		m_joinedSquad = withJoinedSquad ;
+		m_handle = withHandle;
+		m_online = isOnline;
+		m_inSameSquad = isInMySquad;
+		m_squadRank = withSquadRank;
+		m_squadHandle = withSquadHandle;
+		m_extendedInfo = false;
+		m_joinedSquad = withJoinedSquad;
 	}
 
 	void setPrimaryDetails(bool withAfk, bool hc, WWII_COUNTRY withCountry, BRANCH_ENUM withBranch, RANK_NO withRank, UINT32 withHcUnitID, UINT32 withMissionID, bool isLeadingMission, bool isRecruiting)
 	{
-		m_extendedInfo = false ;
-		m_hc = hc ;
-		m_afk = withAfk ;
-		m_country = withCountry ;
-		m_branch = withBranch ;
-		m_rank = withRank ;
-		m_hcUnitID = withHcUnitID ;
-		m_missionID = withMissionID ;
-		m_leadingMission = isLeadingMission ;
-		m_recruiting = isRecruiting ;
+		m_extendedInfo = false;
+		m_hc = hc;
+		m_afk = withAfk;
+		m_country = withCountry;
+		m_branch = withBranch;
+		m_rank = withRank;
+		m_hcUnitID = withHcUnitID;
+		m_missionID = withMissionID;
+		m_leadingMission = isLeadingMission;
+		m_recruiting = isRecruiting;
 	}
 
 	void setExtendedDetails(bool withSpawned, const FULL_OBJ_ID& withNearCP)
 	{
-		m_extendedInfo = true ;
-		m_spawned = withSpawned ;
-		m_nearCP = withNearCP ;
+		m_extendedInfo = true;
+		m_spawned = withSpawned;
+		m_nearCP = withNearCP;
 	}
 
 public:
 	// No network handling (send/receive) - those are done by teulNetworkArray
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) ;
+	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
 
 public:
 	// Accessors
-	bool afk() const { return m_afk ; }
-	BRANCH_ENUM branch() const { return m_branch ; }
-	WWII_COUNTRY country() const { return m_country ; }
-	bool extendedInfo() const { return m_extendedInfo ; }
-	const ChatHandle& handle() const { return m_handle ; }
-	UINT32 hcUnitID() const { return m_hcUnitID ; }
-	bool highCommander() const { return m_hc ; }
-	bool inSameSquad() const { return m_inSameSquad ; }
-	bool leadingMission() const { return m_leadingMission ; }
-	UINT32 missionID() const { return m_missionID ; }
-	const FULL_OBJ_ID& nearCP() const { return m_nearCP ; }
-	bool online() const { return m_online ; }
-	RANK_NO rank() const { return m_rank ; }
-	bool recruiting() const { return m_recruiting ; }
-	bool spawned() const { return m_spawned ; }
-	const ChatHandle& squadHandle() const { return m_squadHandle ; }
-	RANK_NO squadRank() const { return m_squadRank ; }
-	UINT32 joinedSquad() const { return m_joinedSquad ; }
+	bool afk() const { return m_afk; }
+	BRANCH_ENUM branch() const { return m_branch; }
+	WWII_COUNTRY country() const { return m_country; }
+	bool extendedInfo() const { return m_extendedInfo; }
+	const ChatHandle& handle() const { return m_handle; }
+	UINT32 hcUnitID() const { return m_hcUnitID; }
+	bool highCommander() const { return m_hc; }
+	bool inSameSquad() const { return m_inSameSquad; }
+	bool leadingMission() const { return m_leadingMission; }
+	UINT32 missionID() const { return m_missionID; }
+	const FULL_OBJ_ID& nearCP() const { return m_nearCP; }
+	bool online() const { return m_online; }
+	RANK_NO rank() const { return m_rank; }
+	bool recruiting() const { return m_recruiting; }
+	bool spawned() const { return m_spawned; }
+	const ChatHandle& squadHandle() const { return m_squadHandle; }
+	RANK_NO squadRank() const { return m_squadRank; }
+	UINT32 joinedSquad() const { return m_joinedSquad; }
 
 private:
-	ChatHandle		m_handle ;
+	ChatHandle		m_handle;
 
-	bool			m_online ;					// If false, nothing else will be initialized
-	bool			m_inSameSquad ;				// Whether player is in your squad
-	bool			m_afk ;						// Whether player is afk
-	bool			m_hc ;						// Whether player is acting as a high commander
-	bool			m_extendedInfo ;			// Whether we have extended info
-	bool			m_spawned ;					// Whether player is spawned
-	bool			m_leadingMission ;			// Whether player is leading a mission
-	bool			m_recruiting ;				// Whether player is acting as a recruit or not
+	bool			m_online;					// If false, nothing else will be initialized
+	bool			m_inSameSquad;				// Whether player is in your squad
+	bool			m_afk;						// Whether player is afk
+	bool			m_hc;						// Whether player is acting as a high commander
+	bool			m_extendedInfo;				// Whether we have extended info
+	bool			m_spawned;					// Whether player is spawned
+	bool			m_leadingMission;			// Whether player is leading a mission
+	bool			m_recruiting;				// Whether player is acting as a recruit or not
 												// (ONLY sent if they are a squad mate)
 
-	WWII_COUNTRY	m_country ;
-	BRANCH_ENUM		m_branch ;
-	RANK_NO			m_rank ;
-	UINT32			m_hcUnitID ;
-	FULL_OBJ_ID		m_nearCP ;					// Only populated if m_inSquad
-	RANK_NO			m_squadRank ;				// Player's rank within their squad
-	UINT32			m_missionID ;				// Mission they are on
-	ChatHandle		m_squadHandle ;				// Name of player's squad (not supplied by host if inSameSquad)
+	WWII_COUNTRY	m_country;
+	BRANCH_ENUM		m_branch;
+	RANK_NO			m_rank;
+	UINT32			m_hcUnitID;
+	FULL_OBJ_ID		m_nearCP;					// Only populated if m_inSquad
+	RANK_NO			m_squadRank;				// Player's rank within their squad
+	UINT32			m_missionID;				// Mission they are on
+	ChatHandle		m_squadHandle;				// Name of player's squad (not supplied by host if inSameSquad)
 
-	// If this player is a squad mate, this is an aproximation of when they joined
+	// If this player is a squad mate, this is an approximation of when they joined
 	// 0-89 days has day-to-day granularity
 	// 3 months to 10 years has monthly granularity
 	// Anything longer is listed as 11 years ago
-	UINT32			m_joinedSquad ;
-} ;
+	UINT32			m_joinedSquad;
+};
 } // namespace Chat

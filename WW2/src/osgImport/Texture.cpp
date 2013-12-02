@@ -871,7 +871,7 @@ void Texture::computeRequiredTextureDimensions(const Image& image,GLsizei& inwid
     else
     {
         numMipmapLevels = 0;
-        for( ; (width || height) ;++numMipmapLevels)
+        for(; (width || height);++numMipmapLevels)
         {
 
             if(width == 0)
@@ -1073,7 +1073,7 @@ void Texture::applyTexImage2D_load(GLenum target, const Image* image, GLsizei in
 
             if(!compressed_image )
             {
-                for( GLsizei k = 0 ; k < numMipmapLevels  && (width || height) ;k++)
+                for( GLsizei k = 0; k < numMipmapLevels  && (width || height);k++)
                 {
 
                     if(width == 0)
@@ -1095,7 +1095,7 @@ void Texture::applyTexImage2D_load(GLenum target, const Image* image, GLsizei in
             {
                 GLint blockSize, size;
 
-                for( GLsizei k = 0 ; k < numMipmapLevels  && (width || height) ;k++)
+                for( GLsizei k = 0; k < numMipmapLevels  && (width || height);k++)
                 {
                     if(width == 0)
                         width = 1;
@@ -1127,7 +1127,7 @@ void Texture::applyTexImage2D_load(GLenum target, const Image* image, GLsizei in
 
                 int width  = image->s();
                 int height = image->t();
-                for( numMipmapLevels = 0 ; (width || height) ; ++numMipmapLevels)
+                for( numMipmapLevels = 0; (width || height); ++numMipmapLevels)
                 {
                     width >>= 1;
                     height >>= 1;
@@ -1323,7 +1323,7 @@ void Texture::applyTexImage2D_subload(GLenum target, const Image* image, GLsizei
 
             if(!compressed_image )
             {
-                for( GLsizei k = 0 ; k < numMipmapLevels  && (width || height) ;k++)
+                for( GLsizei k = 0; k < numMipmapLevels  && (width || height);k++)
                 {
 
                     if(width == 0)
@@ -1345,7 +1345,7 @@ void Texture::applyTexImage2D_subload(GLenum target, const Image* image, GLsizei
             else if(extensions->isCompressedTexImage2DSupported())
             {
                 GLint blockSize,size;
-                for( GLsizei k = 0 ; k < numMipmapLevels  && (width || height) ;k++)
+                for( GLsizei k = 0; k < numMipmapLevels  && (width || height);k++)
                 {
                     if(width == 0)
                         width = 1;

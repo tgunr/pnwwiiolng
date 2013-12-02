@@ -20,7 +20,7 @@ enum BASE_ARG_TYPES
 	T_EMPTY,
 	T_MAX_BASE_TYPE
 
-} ;
+};
 
 enum EXT_ARG_TYPES
 {
@@ -36,20 +36,20 @@ enum EXT_ARG_TYPES
 	T_FLOAT32,
 	T_SCHAR,
 	T_UCHAR
-} ;
+};
 
 struct ARG_LIST
 {
 	SINT32 numArgs;
 	SCHAR* line;
 	SCHAR* arg[MAX_ARGS +1];
-} ;
+};
 
 struct ERROR_TOKEN
 {
 	SINT16	location;
 	SINT16	error;
-} ;
+};
 
 struct ARG_KEY
 {
@@ -61,7 +61,7 @@ struct ARG_KEY
 	SINT8	isNegative;
 	UCHAR	character;
 
-} ;
+};
 
 #define FUNCARGS ARG_KEY
 
@@ -69,13 +69,13 @@ struct ARG_KEY_HEAD
 {
 	SINT32 numKeys;
 	ARG_KEY*	keys;
-} ;
+};
 
 struct ARG_SPEC
 {
 	BASE_ARG_TYPES	baseType;
 	SINT32		maxArgBytes;
-} ;
+};
 
 extern LOGICAL parseValidArgs(ARG_SPEC* argSpec, FUNCARGS* args, SINT32 numArgs, const char* section, SINT32 lineNum);
 
@@ -84,5 +84,5 @@ extern SINT32 parseFillKeys(ARG_KEY_HEAD* keyList, ARG_KEY_HEAD* defaultList, AR
 extern ERROR_TOKEN getParams(ARG_LIST* list, UCHAR* paramString
 							, void* destination, SINT32 minParams);
 
-extern bool parseIsObjectIgnoringError(const char* objectName, const char* error) ;
+extern bool parseIsObjectIgnoringError(const char* objectName, const char* error);
 

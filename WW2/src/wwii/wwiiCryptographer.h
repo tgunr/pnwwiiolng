@@ -16,15 +16,15 @@ template<bool Encrypting>
 class Cryptographer
 {
 public:
-	typedef unsigned long long SeedType ;
-	typedef unsigned char ByteType ;
+	typedef unsigned long long SeedType;
+	typedef unsigned char ByteType;
 
 public:
 	//! Default constructor.
 	Cryptographer()
 		: m_seed((SeedType)0)
 		{
-			newSeed() ;
+			newSeed();
 		}
 
 	//! Constructor: Requires a seed.
@@ -34,23 +34,23 @@ public:
 		}
 
 	//! Get current seed value.
-	const SeedType& seed() const { return m_seed ; }
+	const SeedType& seed() const { return m_seed; }
 
 	//! Set the seed.
-	void setSeed(const SeedType& rhs_) { m_seed = rhs_ ; }
+	void setSeed(const SeedType& rhs_) { m_seed = rhs_; }
 
 	//! Generate a new seed.
 	void newSeed()
 	{
-		m_seed = teulClock64 + (((TeulTimeMS)rand()) << 32) + ((TeulTimeMS)rand()) ;
+		m_seed = teulClock64 + (((TeulTimeMS)rand()) << 32) + ((TeulTimeMS)rand());
 	}
 
 private:
 	//! Copy-operations disabled.
-	Cryptographer& operator = (const Cryptographer&) ;
+	Cryptographer& operator = (const Cryptographer&);
 
 private:
-	SeedType	m_seed ;
+	SeedType	m_seed;
 
 private:
 	//! Rotate the seed some number of bits leftwards with
@@ -66,10 +66,10 @@ private:
 	void
 	_addValueToSeed(SeedType value)
 	{
-		const size_t bitsToMoveLeft = ((m_seed & 3) ^ (value & 3)) + 1 ;
-		const size_t bitsToMoveRight = (sizeof(value) * 8) - bitsToMoveLeft ;
-		value ^= 1ULL << (m_seed & 7) ;
-		m_seed = ((m_seed << bitsToMoveLeft) | (m_seed >> bitsToMoveRight)) ^ (~value) ;
+		const size_t bitsToMoveLeft = ((m_seed & 3) ^ (value & 3)) + 1;
+		const size_t bitsToMoveRight = (sizeof(value) * 8) - bitsToMoveLeft;
+		value ^= 1ULL << (m_seed & 7);
+		m_seed = ((m_seed << bitsToMoveLeft) | (m_seed >> bitsToMoveRight)) ^ (~value);
 	}
 
 	//! Xor the given value with some bits taken from seed,
@@ -77,7 +77,7 @@ private:
 	ByteType
 	_translateValue(ByteType source)
 	{
-		return source ^= (ByteType)(m_seed >> (m_seed & 7)) ;
+		return source ^= (ByteType)(m_seed >> (m_seed & 7));
 	}
 
 	//! Non-destructive processing of data to generate checksum.
@@ -87,12 +87,12 @@ private:
 	void
 	checksum(const ByteType* source, const size_t bytes)
 	{
-		_addValueToSeed((SeedType)bytes) ;
+		_addValueToSeed((SeedType)bytes);
 
-		for ( size_t i = 0 ; i < bytes ; ++i )
+		for ( size_t i = 0; i < bytes; ++i )
 		{
-			const ByteType sourceValue = *(source++) ;
-			_addValueToSeed(Encrypting ? sourceValue : (_translateValue(sourceValue) ^ (ByteType)i)) ;
+			const ByteType sourceValue = *(source++);
+			_addValueToSeed(Encrypting ? sourceValue : (_translateValue(sourceValue) ^ (ByteType)i));
 		}
 	}
 
@@ -102,47 +102,47 @@ public:
 	{
 		// Find the remainder of bytes modulo sizeof(SeedType)
 		// and process those bytes individually.
-		const size_t boundaryOffset = (bytes & (sizeof(SeedType) - 1)) ;
+		const size_t boundaryOffset = (bytes & (sizeof(SeedType) - 1));
 		if ( boundaryOffset > 0 )
 		{
-			ByteType* const tail = stream + bytes - boundaryOffset ;
-			for ( size_t i = 0 ; i < boundaryOffset ; ++i )
+			ByteType* const tail = stream + bytes - boundaryOffset;
+			for ( size_t i = 0; i < boundaryOffset; ++i )
 			{
-				const ByteType sourceValue = tail[i] ;
-				const ByteType resultValue = sourceValue ^ ((ByteType)m_seed) ;
-				tail[i] = resultValue ;
-				_addValueToSeed(Encrypting ? sourceValue : resultValue) ;
+				const ByteType sourceValue = tail[i];
+				const ByteType resultValue = sourceValue ^ ((ByteType)m_seed);
+				tail[i] = resultValue;
+				_addValueToSeed(Encrypting ? sourceValue : resultValue);
 			}
 		}
 
 		// Now encrypt the remainder of the message in big units
 		// (units of SeedType bytes at a time).
-		const size_t numUINT32s = (bytes - boundaryOffset) / sizeof(UINT32) ;
+		const size_t numUINT32s = (bytes - boundaryOffset) / sizeof(UINT32);
 		if ( numUINT32s <= 0 )
-			return ;
+			return;
 
 		// Incorporate the byte count into the seed.
-		_addValueToSeed((SeedType)bytes) ;
-		UINT32* const base = (UINT32*)stream ;
-		UINT32 base0, base1 ;
+		_addValueToSeed((SeedType)bytes);
+		UINT32* const base = (UINT32*)stream;
+		UINT32 base0, base1;
 		if ( Encrypting )
-			base0 = ((SeedType)(base[0])) ;
+			base0 = ((SeedType)(base[0]));
 		else
-			base1 = ((SeedType)(base[numUINT32s - 1])) ;
-		for ( size_t i = 0 ; i < numUINT32s ; i += sizeof(UINT32) )
+			base1 = ((SeedType)(base[numUINT32s - 1]));
+		for ( size_t i = 0; i < numUINT32s; i += sizeof(UINT32) )
 		{
-			base[i] ^= ((m_seed + i) >> (i & 31)) ;
+			base[i] ^= ((m_seed + i) >> (i & 31));
 		}
 		if ( !Encrypting )
-			base0 = ((SeedType)(base[0])) ;
+			base0 = ((SeedType)(base[0]));
 		else
-			base1 = ((SeedType)(base[numUINT32s - 1])) ;
-		_addValueToSeed(base0) ;
+			base1 = ((SeedType)(base[numUINT32s - 1]));
+		_addValueToSeed(base0);
 		if ( base1 != base0 )
-			_addValueToSeed(base1) ;
+			_addValueToSeed(base1);
 	}
 
-} ;
+};
 
 }
 

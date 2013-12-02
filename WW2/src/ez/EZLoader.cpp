@@ -135,7 +135,7 @@ bool EZLoader::DoEZ(xmlNode* node, bool first, void* userData)
 		if(rootLoader->currentLevel > rootLoader->maxLevelLoaded)
 			rootLoader->maxLevelLoaded = rootLoader->currentLevel;
 
-		// init this level ; could overwrite this level if a previous
+		// init this level; could overwrite this level if a previous
 		// include had populated this ez level but thats ok and expected
 		// functionality
 		rootLoader->levels[rootLoader->currentLevel] = EZLoader::EZLevel();

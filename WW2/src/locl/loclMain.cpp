@@ -95,7 +95,7 @@ char	FileNameBuffer[MAX_PATH],
 
 		fioSeek(FileID, 0, fioSEEK_SET);
 
-		for(i = 0; ; )
+		for(i = 0;; )
 		{
 			if (i >= CountLanguageStrings)
 			{

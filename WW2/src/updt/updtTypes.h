@@ -23,7 +23,7 @@
 #include "strt/strtTypes.h"
 
 #include "updt/updtFraming.h"
-extern UpdateFraming framings[UpdateFraming::_MODES] ;
+extern UpdateFraming framings[UpdateFraming::_MODES];
 
 #include "updt/updtVehiclePosition.h"
 
@@ -46,14 +46,14 @@ struct VEHICLE_HIT
 	UCHAR	compID[VEH_MAX_OBJ_HIT];
 	UINT16	Damage[VEH_MAX_OBJ_HIT];
 	UCHAR	NumHits[VEH_MAX_OBJ_HIT];
-} ;
+};
 
 #pragma pack(push, 1)
 struct TURRET_POS
 {
 	turret_t x;
 	turret_t y;
-} ;
+};
 
 struct RELATIVE_POSITION
 {
@@ -61,7 +61,7 @@ struct RELATIVE_POSITION
 	SINT16	relY;
 	SINT16	relZ;
 	SCHAR	yaw;
-} ;
+};
 
 struct VEHICLE_VEL_HIGH // Velocity vector
 {
@@ -75,21 +75,21 @@ struct VEHICLE_ACCEL_HIGH	// Acceleration vector
 	SINT16	accelX;
 	SINT16	accelY;
 	SINT16	accelZ;
-} ;
+};
 
 struct VEHICLE_ATTVEL_HIGH	// Velocity vector
 {
 	SINT16	velX;
 	SINT16	velY;
 	SINT16	velZ;
-} ;
+};
 
 struct VEHICLE_ATT_HIGH
 {
 	SINT16	attX;
 	SINT16	attY;
 	SINT16	attZ;
-} ;
+};
 #pragma pack(pop)
 
 struct TURRET_STRUCT
@@ -97,7 +97,7 @@ struct TURRET_STRUCT
 	// when valid data is received from a turret the mask is set to 1
 	// when an individual turrest timestamp expires (rolls over) the mask is
 	// set to 0
-	TeulTimeMS		clock64[MAX_TURRETS] ;
+	TeulTimeMS		clock64[MAX_TURRETS];
 	TURRET_POS	pos[MAX_TURRETS];
 	UINT16		valid;
 };
@@ -107,11 +107,11 @@ struct FIRE_STRUCT
 	// when valid data is received from a turret the mask is set to 1
 	// when an individual turrest timestamp expires (rolls over) the mask is
 	// set to 0
-	TeulTimeMS	masterClock64 ;
-	TeulTimeMS	clock64[MAX_GUNS] ;
+	TeulTimeMS	masterClock64;
+	TeulTimeMS	clock64[MAX_GUNS];
 	UINT16	valid;
 	UINT16	state;		// indicates if the gun has fired this frame?
-} ;
+};
 
 //////////////////////////////////////////////////////////////////////
 //! Vehicle Info structure defines elements of vehicles that are
@@ -121,8 +121,8 @@ struct FIRE_STRUCT
 
 struct SHARED_VEHICLE_INFO
 {
-	const WEAPON_SPEC& spec() const { return wSerial.spec ; }
-	WEAPON_SPEC& spec() { return wSerial.spec ; }
+	const WEAPON_SPEC& spec() const { return wSerial.spec; }
+	WEAPON_SPEC& spec() { return wSerial.spec; }
 
 	TeulTimeMS			hostPosTimeStamp;
 
@@ -148,12 +148,12 @@ struct SHARED_VEHICLE_INFO
 //	UCHAR				loadOut;
 	UCHAR				country;
 	UCHAR				side;
-	UCHAR				decal ;
-	UINT32				brigadeID ;		// ID of the HCUnit this came from
+	UCHAR				decal;
+	UINT32				brigadeID;		// ID of the HCUnit this came from
 
 	char				callsign[MAX_HANDLE_SIZE]; // SIZE includes null byte
 
-	VEHICLE_POSITION	position ;
+	VEHICLE_POSITION	position;
 	RANK_NO				rank;
 
 	RELATIVE_POSITION	relPos;
@@ -179,32 +179,32 @@ struct SHARED_VEHICLE_INFO
 //	DAMAGE_HEAD			damage;
 
 #if platBuild == TEUL_SERVER
-	ChatHandle			squadHandle ;
+	ChatHandle			squadHandle;
 #else
-	char				squadName[MAX_HANDLE_SIZE] ; // SIZE includes null byte
+	char				squadName[MAX_HANDLE_SIZE]; // SIZE includes null byte
 #endif
 
 	// one time structures...
-	WEAPON_SERIAL		wSerial ;	// Partially populated weapon serial for spec
+	WEAPON_SERIAL		wSerial;	// Partially populated weapon serial for spec
 
 #if platBuild == TEUL_SERVER
-	bool				m_hideCallsign ;
-	ChatHandle			packedCallsign ;
-	class HostVehicle*	m_vehicle ;
+	bool				m_hideCallsign;
+	ChatHandle			packedCallsign;
+	class HostVehicle*	m_vehicle;
 #endif
-} ;
+};
 
 struct VEHICLE_TURRETS
 {
 	UINT16			numTurrets;
 	UINT16			turretMask;
-} ;
+};
 
 struct TURRET_HEADER
 {
 	SHARED_VEHICLE_INFO*		vehInfo;
 	VEHICLE_TURRETS 	vt;
-} ;
+};
 
 //////////////////////////////////////////////////////////////////////
 // The vehicle transport header
@@ -215,7 +215,7 @@ struct VEHICLE_UPDATE_HEADER
 {
 #if platBuild == TEUL_SERVER
 	SHARED_VEHICLE_INFO* vehInfo;
-	class Player*		player ;
+	class Player*		player;
 #else
 	SHARED_VEHICLE_INFO	vehInfo;
 #endif
@@ -230,10 +230,10 @@ struct VEHICLE_UPDATE_HEADER
 	UINT32				updateNo;
 	UINT32				updatePrime;
 
-	sortieid_t			killedBy ;
-} ;
+	sortieid_t			killedBy;
+};
 
-namespace Teul { class Packet ; }
+namespace Teul { class Packet; }
 
 struct WORLD_UPDATE
 {
@@ -242,10 +242,10 @@ struct WORLD_UPDATE
 	{
 		/// @brief X, Y, Z in cm of the center of the update.
 		/// @detail All vehicle positions will be relative to this.
-		VEHICLE_POSITION center ;
+		VEHICLE_POSITION center;
 
 		/// @brief 8 bits of randomness to ensure encryption of some kind.
-		UINT8			random1 ;
+		UINT8			random1;
 		/// @brief Despawn Timer: -1 = can't, 0 = immediate, +ve = number of seconds
 		SINT8			timerInfo;
 		/// @brief Framing mode used for this update.
@@ -255,19 +255,19 @@ struct WORLD_UPDATE
 
 		/// @brief Regardless of what's in this update, this is how many vehicles you are supposed to be seeing.
 		UINT16			actualVehiclesInRange;
-	} header ;
+	} header;
 #pragma pack(pop)
 
 	/// @brief List of vehicles being removed.
 	UINT32			numRemove;
-	UINT32			removeList[MAX_VEH_REMOVE] ;
+	UINT32			removeList[MAX_VEH_REMOVE];
 
 #if platBuild == TEUL_SERVER
-	char			m_state[64] ;
+	char			m_state[64];
 	// Host version.
 	class	HostVehicle*	myVehicle;
-	class	Viewing*	viewings[MAX_VEH_PER_UPDATE] ;
-	Teul::Packet*		packet ;
+	class	Viewing*	viewings[MAX_VEH_PER_UPDATE];
+	Teul::Packet*		packet;
 #else
 
 	// Client version.
@@ -275,8 +275,8 @@ struct WORLD_UPDATE
 
 #endif
 
-	SINT32	packRemoveList(LOGICAL mode, ACTION_OBJECT* const a) ;
-} ;
+	SINT32	packRemoveList(LOGICAL mode, ACTION_OBJECT* const a);
+};
 
 // if a fireTimeStamp is valid and hapened btween updateSent and now
 // it must be sent now, otherwise the current state is sent.

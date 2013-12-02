@@ -22,9 +22,9 @@
 #include "wwii/wwiiConfig.h"
 #include "chat/chatMakeTempString.h"
 
-typedef std::unordered_map<UINT32,SquadVote> SQUAD_VOTES ;
+typedef std::unordered_map<UINT32,SquadVote> SQUAD_VOTES;
 
-static SQUAD_VOTES g_squadVotes ;
+static SQUAD_VOTES g_squadVotes;
 
 //////////////////////////////////////////////////////////////////////
 // Register a vote
@@ -33,20 +33,20 @@ void
 SquadVote::addVote(UINT32 squadID, const ChatHandle& voteBy, const ChatHandle& voteFor)
 {
 	if ( m_started == 0 )
-		startVote() ;
-	(*m_votes)[voteBy] = voteFor ;
-	UINT32 votes = ++(*m_counts)[voteFor] ;
+		startVote();
+	(*m_votes)[voteBy] = voteFor;
+	UINT32 votes = ++(*m_counts)[voteFor];
 	if ( votes > m_lead )
 	{
-		m_colead = false ;
-		m_leader = voteFor ;
-		m_lead = votes ;
+		m_colead = false;
+		m_leader = voteFor;
+		m_lead = votes;
 	}
 	else if ( votes == m_lead )
-		m_colead = true ;
+		m_colead = true;
 
 	if ( m_votes->size() == 1 )
-		announce(squadID, NULL) ;
+		announce(squadID, NULL);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -57,41 +57,41 @@ void
 SquadVote::announce(UINT32 squadID, Player* player)
 {
 	if ( !m_votes )
-		return ;
+		return;
 
-	SquadList* list = NULL ;
+	SquadList* list = NULL;
 	if ( player == NULL )
-		list = chatFindSquadList(squadID) ;
+		list = chatFindSquadList(squadID);
 	if ( player == NULL && list == NULL )
-		return ;
+		return;
 
-	char str[40+1] ;
-	std::string results = "" ;
+	char str[40+1];
+	std::string results = "";
 
-	for ( COUNTS::iterator it = m_counts->begin() ; it != m_counts->end() ; ++it )
+	for ( COUNTS::iterator it = m_counts->begin(); it != m_counts->end(); ++it )
 	{
-		if ( results.size() > 0 ) results += ", " ;
-		snprintf(str, 40, "%s (%u)", chatGetCallsign(it->first), it->second) ;
-		results += str ;
+		if ( results.size() > 0 ) results += ", ";
+		snprintf(str, 40, "%s (%u)", chatGetCallsign(it->first), it->second);
+		results += str;
 	}
 
-	snprintf(str, 40, "%" PRSizeT "", m_votes->size()) ;
+	snprintf(str, 40, "%" PRSizeT "", m_votes->size());
 
 	if ( player != NULL )
 	{
-		player->message(LSTR_SQUAD, LSTR_SQUAD_ELECTION, str, results.c_str()) ;
+		player->message(LSTR_SQUAD, LSTR_SQUAD_ELECTION, str, results.c_str());
 		if ( m_votes->find(player->matchHandle()) == m_votes->end() )
-			player->message(LSTR_SQUAD, LSTR_SQUAD_NOT_VOTED, chatTimeInterval(expires())) ;
+			player->message(LSTR_SQUAD, LSTR_SQUAD_NOT_VOTED, chatTimeInterval(expires()));
 	}
 	else
 	{
-		list->sendMessage(LSTR_SQUAD, LSTR_SQUAD_ELECTION, str, results.c_str()) ;
-		for ( SQUAD_MEMBERS::iterator it = list->begin() ; it != list->end() ; ++it )
+		list->sendMessage(LSTR_SQUAD, LSTR_SQUAD_ELECTION, str, results.c_str());
+		for ( SQUAD_MEMBERS::iterator it = list->begin(); it != list->end(); ++it )
 		{
-			SquadMemberEntry& member = it->second ;
-			if ( member.teulIndex() < 0 ) continue ;
-			if ( m_votes->find(member.player()->matchHandle()) != m_votes->end() ) continue ;
-			member.player()->message(LSTR_SQUAD, LSTR_SQUAD_NOT_VOTED, chatTimeInterval(expires())) ;
+			SquadMemberEntry& member = it->second;
+			if ( member.teulIndex() < 0 ) continue;
+			if ( m_votes->find(member.player()->matchHandle()) != m_votes->end() ) continue;
+			member.player()->message(LSTR_SQUAD, LSTR_SQUAD_NOT_VOTED, chatTimeInterval(expires()));
 		}
 	}
 }
@@ -104,35 +104,35 @@ void
 SquadVote::close(UINT32 duration)
 {
 	if ( m_closedUntil != 0 )
-		return ;
+		return;
 
 	if ( duration == 0 )
 	{
-		duration = host_config.squad.electionInterval * DAY_S ;
+		duration = host_config.squad.electionInterval * DAY_S;
 		if ( duration == 0 )
-			duration = 7 * DAY_S ;
+			duration = 7 * DAY_S;
 	}
 
-	m_started = 0 ;
-	m_closedUntil = teulTime() + duration ;
+	m_started = 0;
+	m_closedUntil = teulTime() + duration;
 	if ( m_counts )
 	{
-		delete m_counts ;
-		m_counts = NULL ;
+		delete m_counts;
+		m_counts = NULL;
 	}
 	if ( m_votes )
 	{
-		delete m_votes ;
-		m_votes = NULL ;
+		delete m_votes;
+		m_votes = NULL;
 	}
-	recount() ;
+	recount();
 }
 
 void
 SquadVote::erase(UINT32 squadID)
 {
-	close() ;
-	g_squadVotes.erase(squadID) ;
+	close();
+	g_squadVotes.erase(squadID);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -142,11 +142,11 @@ UINT32
 SquadVote::expires() const
 {
 	if ( m_started == 0 )
-		return 0 ;
-	const UINT32 cutoff = m_started + host_config.squad.electionDuration * DAY_S ;
+		return 0;
+	const UINT32 cutoff = m_started + host_config.squad.electionDuration * DAY_S;
 	if ( teulTime() > cutoff )
-		return 0 ;
-	return (UINT32)(cutoff - teulTime()) ;
+		return 0;
+	return (UINT32)(cutoff - teulTime());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -155,7 +155,7 @@ SquadVote::expires() const
 UINT32
 SquadVote::nextStart() const
 {
-	return m_closedUntil ;
+	return m_closedUntil;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -164,24 +164,24 @@ SquadVote::nextStart() const
 void
 SquadVote::recount()
 {
-	m_leader = 0LL ;
-	m_lead = 0 ;
-	m_colead = false ;
+	m_leader = 0LL;
+	m_lead = 0;
+	m_colead = false;
 
 	if ( m_counts == NULL || m_counts->empty() )
-		return ;
+		return;
 
-	COUNTS::iterator it ;
-	for ( it = m_counts->begin() ; it != m_counts->end() ; ++it )
+	COUNTS::iterator it;
+	for ( it = m_counts->begin(); it != m_counts->end(); ++it )
 	{
 		if ( it->second > m_lead )
 		{
-			m_leader = it->first ;
-			m_lead = it->second ;
-			m_colead = false ;
+			m_leader = it->first;
+			m_lead = it->second;
+			m_colead = false;
 		}
 		else if ( it->second == m_lead )
-			m_colead = true ;
+			m_colead = true;
 	}
 }
 
@@ -191,17 +191,17 @@ SquadVote::recount()
 void
 SquadVote::startVote()
 {
-	m_closedUntil = 0 ;
-	m_started = teulTime() ;
+	m_closedUntil = 0;
+	m_started = teulTime();
 	if ( m_counts )
-		delete m_counts ;
-	m_counts = new COUNTS ;
+		delete m_counts;
+	m_counts = new COUNTS;
 	if ( m_votes )
-		delete m_votes ;
-	m_votes = new VOTES ;
-	m_leader = 0LL ;
-	m_lead = 0 ;
-	m_colead = false ;
+		delete m_votes;
+	m_votes = new VOTES;
+	m_leader = 0LL;
+	m_lead = 0;
+	m_colead = false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -211,33 +211,33 @@ ChatHandle
 SquadVote::winner(SquadList* list)
 {
 	if ( m_started == 0 || m_votes == NULL || m_counts == NULL || m_votes->empty() || m_votes->size() <= 1 )
-		return 0LL ;
+		return 0LL;
 
 	// Check if the leader has left the squad
 	if ( !list->find(m_leader) )
 	{
-		list->sendMessage(LSTR_SQUAD, LSTR_SQUAD_VOTE_FAIL_LEAVER) ;
-		close(HOUR_S) ;
-		return 0ULL ;
+		list->sendMessage(LSTR_SQUAD, LSTR_SQUAD_VOTE_FAIL_LEAVER);
+		close(HOUR_S);
+		return 0ULL;
 	}
 
 	if ( m_leader == 0LL || m_colead )
-		return 0ULL ;
+		return 0ULL;
 
 	// Does someone have more half or more of the votes?
-	size_t members = list->members().size() ;
+	size_t members = list->members().size();
 	if ( m_lead > members / 2 )
-		return m_leader ;
+		return m_leader;
 
 	if ( m_lead < 5 )
-		return 0ULL ;
+		return 0ULL;
 
 	if ( expires() == 0 )
 	{
-		return m_leader ;
+		return m_leader;
 	}
 
-	return 0ULL ;
+	return 0ULL;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -248,57 +248,57 @@ SquadVote::withdraw(UINT32 squadID, const ChatHandle& handle, SquadList* list)
 {
 	// Is the vote active?
 	if ( !m_started || m_closedUntil || !m_votes || !m_counts )
-		return ;
+		return;
 
 	// Has this individual vote
-	VOTES::iterator vit ;
-	COUNTS::iterator cit ;
-	bool candidateRemoved = false ;
+	VOTES::iterator vit;
+	COUNTS::iterator cit;
+	bool candidateRemoved = false;
 
-	vit = m_votes->find(handle) ;
+	vit = m_votes->find(handle);
 	if ( vit != m_votes->end() )
 	{
 		// Candidate iterator
-		cit = m_counts->find(vit->second) ;
+		cit = m_counts->find(vit->second);
 		if ( cit != m_counts->end() )
 		{
 			// If this is the candidates last vote, withdraw them
 			if ( cit->second <= 1 )
-				m_counts->erase(cit) ;
+				m_counts->erase(cit);
 			else
-				--(cit->second) ;
+				--(cit->second);
 		}
 
 		// Remove the vote
-		m_votes->erase(vit) ;
+		m_votes->erase(vit);
 	}
 
 	// Have people voted for you?
-	cit = m_counts->find(handle) ;
+	cit = m_counts->find(handle);
 	if ( cit != m_counts->end() )
 	{
-		for ( vit = m_votes->begin() ; vit != m_votes->end() ; ++vit )
+		for ( vit = m_votes->begin(); vit != m_votes->end(); ++vit )
 		{
-			if ( vit->second != handle ) continue ;
-				m_votes->erase(vit) ;
+			if ( vit->second != handle ) continue;
+				m_votes->erase(vit);
 		}
-		m_counts->erase(cit) ;
-		candidateRemoved = true ;
+		m_counts->erase(cit);
+		candidateRemoved = true;
 	}
 
 	// Retally the vote scores
-	recount() ;
+	recount();
 
 	// Check to see if we still have a vote
 	if ( m_lead == 0 )
 	{
-		list->sendMessage(LSTR_SQUAD, LSTR_SQUAD_VOTES_WITHDRAWN, "*") ;
-		g_squadVotes.erase(squadID) ;
+		list->sendMessage(LSTR_SQUAD, LSTR_SQUAD_VOTES_WITHDRAWN, "*");
+		g_squadVotes.erase(squadID);
 		// DO NOT PASS HERE
-		return ;
+		return;
 	}
 	else if ( candidateRemoved )
-		list->sendMessage(LSTR_SQUAD, LSTR_SQUAD_ALL_VOTES_WITHDRAWN, chatGetCallsign(handle)) ;
+		list->sendMessage(LSTR_SQUAD, LSTR_SQUAD_ALL_VOTES_WITHDRAWN, chatGetCallsign(handle));
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -308,7 +308,7 @@ SquadVote::withdraw(UINT32 squadID, const ChatHandle& handle, SquadList* list)
 SquadVote&
 chatGetSquadVote(UINT32 squadID)
 {
-	return g_squadVotes[squadID] ;
+	return g_squadVotes[squadID];
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -317,6 +317,6 @@ chatGetSquadVote(UINT32 squadID)
 SquadVote*
 chatFindSquadVote(UINT32 squadID)
 {
-	SQUAD_VOTES::iterator it = g_squadVotes.find(squadID) ;
-	return ( it == g_squadVotes.end() ) ? NULL : &(it->second) ;
+	SQUAD_VOTES::iterator it = g_squadVotes.find(squadID);
+	return ( it == g_squadVotes.end() ) ? NULL : &(it->second);
 }

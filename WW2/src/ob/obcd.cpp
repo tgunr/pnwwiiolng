@@ -114,7 +114,7 @@ static int		  npolys=0;
 	lpcrnr  = lpobj->bbox;
 
 	eps = FLT_EPSILON * 16.0f;
-	for (i=0 ; i < numtris ; i++, pt++, pn++, pcn+=3)
+	for (i=0; i < numtris; i++, pt++, pn++, pcn+=3)
 	{
 		d = math3dDotProduct(&dir, pn);
 		if (d >= 0.0f)
@@ -294,7 +294,7 @@ static int        number=0;
 	}
 
 	objects = (OBJECT*)lplist->next;
-	for (lpobj=objects ; lpobj != NULL ; lpobj=(OBJECT*)lpobj->next)
+	for (lpobj=objects; lpobj != NULL; lpobj=(OBJECT*)lpobj->next)
 	{
 		if (object != NULL && lpobj != object)
 		{
@@ -322,7 +322,7 @@ static int        number=0;
 		{
 			piVectorConstPtr    pos = lpobj->RenderPositions();
 			numverts  = lpobj->numverts;
-			for (i=0 ; i < numverts ; i++, ++pos)
+			for (i=0; i < numverts; i++, ++pos)
 			{
 				math3dSubtractVectors(&vt, pos.ptr, op);
 				dp = math3dDotProduct(&dir, &vt);
@@ -336,13 +336,13 @@ static int        number=0;
 		else
 		{
 			lpcrnr = lpobj->bbox;
-			for (i=0 ; i < 2 && !indirection ; i++)
+			for (i=0; i < 2 && !indirection; i++)
 			{
 				vt.x = xc + lpcrnr[i].x;
-				for (j=0 ; j < 2 && !indirection ; j++)
+				for (j=0; j < 2 && !indirection; j++)
 				{
 					vt.y = yc + lpcrnr[j].y;
-					for (k=0 ; k < 2 ; k++)
+					for (k=0; k < 2; k++)
 					{
 						vt.z = zc + lpcrnr[k].z;
 						math3dSubtractVectors(&pv, &vt, op);

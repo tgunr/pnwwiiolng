@@ -34,7 +34,7 @@ static bool operator < (const sdm_lookup_id& a, const sdm_lookup_id& b)
 
 typedef std::pair<int,int> supercell_id;
 typedef std::map<sdm_lookup_id, StratObject*> StratObjectMap;
-typedef std::vector<StratObject*> BuildingList ;
+typedef std::vector<StratObject*> BuildingList;
 
 struct supercell
 {
@@ -60,7 +60,7 @@ public:
 	StratObjectMap _stratobjs;
 
 protected:
-	std::vector<StratObject*> _buildings ;
+	std::vector<StratObject*> _buildings;
 };
 
 typedef std::map<supercell_id, supercell> SuperCellMap;
@@ -245,12 +245,12 @@ StratObjList& StratDB::BuildingsInOctet(const int scx, const int scy, const int 
 void strtApplySuperCellVisLevels(const SupercellVislevelXfer& xfer)
 {
 	// Look up which supercell this xfer is for.
-	const SINT16 scx = xfer.scx() ;
-	const SINT16 scy = xfer.scy() ;
+	const SINT16 scx = xfer.scx();
+	const SINT16 scy = xfer.scy();
 
-	supercell& sc = _scmap[supercell_id(scx, scy)] ;
+	supercell& sc = _scmap[supercell_id(scx, scy)];
 
-	if(!sc._loaded) sc.load(scx, scy) ;
+	if(!sc._loaded) sc.load(scx, scy);
 
 	// temp object to pass the data down
 	Strat::EventData ed;
@@ -663,13 +663,13 @@ static bool SortUnitsByDivision(const UINT32& lhs, const UINT32& rhs)
 		return true;
 
 	if(lu->parent() == ru->parent())
-		return (strcoll(lu->name(), ru->name()) < 0) ;
+		return (strcoll(lu->name(), ru->name()) < 0);
 
 	if(lu->isDivision() && ru->isBrigade())
-		return (strcoll(lu->name(), ru->parent()->name()) < 0) ;
+		return (strcoll(lu->name(), ru->parent()->name()) < 0);
 	if(ru->isDivision() && lu->isBrigade())
-		return strcoll(lu->parent()->name(), ru->name()) < 0 ;
-	return strcoll(lu->name(), ru->name()) < 0 ;
+		return strcoll(lu->parent()->name(), ru->name()) < 0;
+	return strcoll(lu->name(), ru->name()) < 0;
 }
 
 void StratObject::AddUnit(unsigned int id)
@@ -864,7 +864,7 @@ bool StratObject::GetAreaXY(int& ax, int& ay)
 	ay = strat->PosY();
 	int count = 1;
 
-	StratDB::StratObject::ChildList const& children = strat->ChildStratObjects() ;
+	StratDB::StratObject::ChildList const& children = strat->ChildStratObjects();
 	StratDB::StratObject::ChildList::const_iterator it;
 
 	for(it = children.begin() ; it != children.end() ; ++it)
@@ -906,7 +906,7 @@ const wchar_t* StratObject::DisplayName() const
 
 unsigned int StratObject::StratFlags(bool filter) const
 {
-	return (filter) ? clientStrtFilterFlags((WWII_SIDE)Side(), _stratflags) : _stratflags ;
+	return (filter) ? clientStrtFilterFlags((WWII_SIDE)Side(), _stratflags) : _stratflags;
 }
 
 /************************************************************************************************
@@ -1054,7 +1054,7 @@ void supercell::AddStratData(sdm_strat_data* strat)
 		stratobj->SetIndex(i);
 	}
 
-	_buildings.resize(strat->numblds) ;
+	_buildings.resize(strat->numblds);
 	for(int i = 0; i < strat->numblds; i++)
 	{
 		id.id = strat->building[i].oid.id;

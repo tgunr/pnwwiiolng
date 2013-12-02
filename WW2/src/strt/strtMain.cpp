@@ -51,73 +51,73 @@ static void _weapTest(UCHAR * tag);
 static CPStruct* _cpList;	//The list of free CPs
 static Supercell* _supercellList = NULL;
 static CPStruct* _currentCP = NULL;
-static bool _initialized = false ;
+static bool _initialized = false;
 static UINT32 _starttime=0;
 
 #ifdef BETA_RELEASE
 // Variables for debugger assistance purposes only
 
- CPStruct*			dbgCP ;
- FacilityStruct*	dbgFacil ;
- ObjectStruct*		dbgObj ;
- void*				dbgPtr ;
- FILE*				dbgFP ;
- UINT32				uint32 ;
+ CPStruct*			dbgCP;
+ FacilityStruct*	dbgFacil;
+ ObjectStruct*		dbgObj;
+ void*				dbgPtr;
+ FILE*				dbgFP;
+ UINT32				uint32;
 
 #endif // BETA_RELEASE
 
-FULL_OBJ_ID		g_fullObjID ;
+FULL_OBJ_ID		g_fullObjID;
 
 //////////////////////////////////////////////////////////////////////
 // Build a map of all the pockets
 
 #ifdef POCKET_MAPS
-extern UINT32 g_maxCPOID ;
+extern UINT32 g_maxCPOID;
 
 static void
 _buildPocketMap()
 {
-	CPStruct** visitMap = (CPStruct**)alloca(sizeof(CPStruct*) * g_maxCPOID) ;
-	CPStruct** newLinks = (CPStruct**)alloca(sizeof(CPStruct*) * g_maxCPOID) ;
+	CPStruct** visitMap = (CPStruct**)alloca(sizeof(CPStruct*) * g_maxCPOID);
+	CPStruct** newLinks = (CPStruct**)alloca(sizeof(CPStruct*) * g_maxCPOID);
 
-	memset(visitMap, 0, sizeof(visitMap)) ;
+	memset(visitMap, 0, sizeof(visitMap));
 
-	std::vector<CPStruct*> pockets ;
+	std::vector<CPStruct*> pockets;
 
-	CPStruct* cp = _cpList ;
-	CPStruct* linked ;
-	CPStruct* neighbor ;
-	CPStruct::LINKS::iterator it ;
-	WWII_SIDE forSide ;
-	UINT32 linkNo ;
+	CPStruct* cp = _cpList;
+	CPStruct* linked;
+	CPStruct* neighbor;
+	CPStruct::LINKS::iterator it;
+	WWII_SIDE forSide;
+	UINT32 linkNo;
 
 	while ( cp != NULL )
 	{
 		if ( visitMap[cp->uOID] != NULL || cp->numLinks == 0 || isValidSide(cp->side) == false )
-			continue ;
-		pockets.push_back(cp) ;
+			continue;
+		pockets.push_back(cp);
 
-		linked = cp ;
-		forSide = cp->side ;
+		linked = cp;
+		forSide = cp->side;
 
 		do
 		{
-			for ( it = linked->m_links.begin() ; it != linked->m_links.end() ; ++it )
+			for ( it = linked->m_links.begin(); it != linked->m_links.end(); ++it )
 			{
-				neighbor = (*it)->endDepot->cp ;
+				neighbor = (*it)->endDepot->cp;
 				if ( visitMap[neighbor->uOID] == NULL && neighbor->side == forSide )
 				{
-					visitMap[neighbor->uOID] = cp ;
-					newLinks[linkNo++] = neighbor ;
+					visitMap[neighbor->uOID] = cp;
+					newLinks[linkNo++] = neighbor;
 				}
 			}
 
 			if ( linkNo > 0 )
 			{
-				linked = newLinks[--linkNo] ;
+				linked = newLinks[--linkNo];
 			}
 		}
-		while ( linked != NULL ) ;
+		while ( linked != NULL );
 	}
 }
 #endif
@@ -127,7 +127,7 @@ _buildPocketMap()
 // outstanding and we then apply the group of adjustments to each CP as we
 // process them through the strat cycle.
 
-extern int inUse, allocations ;
+extern int inUse, allocations;
 
 LOGICAL
 strtMain(UINT32 currentTime)
@@ -136,25 +136,25 @@ strtMain(UINT32 currentTime)
 	static UINT32 CPsRan = 0;
 
 	if (!_initialized)
-		strtInitializeStratSystem() ;
+		strtInitializeStratSystem();
 
-	FacilityStruct* fac = NULL ;
+	FacilityStruct* fac = NULL;
 	while ( (fac = Strat::CaptureContribution::GetNextActiveFacility(fac)) )
 	{
 		if ( fac->isCapturePending() && fac->getCaptureRemaining() <= 0 )
-			fac->setCaptureEnabled() ;
+			fac->setCaptureEnabled();
 	}
 
 	leftToRun = (strtNumCPs() - CPsRan);
-	toRun = (CPSPERCALL < leftToRun) ? CPSPERCALL : leftToRun ;
+	toRun = (CPSPERCALL < leftToRun) ? CPSPERCALL : leftToRun;
 
 	//Run the iteration on it
-	for ( i = 0 ; i < toRun && _currentCP != NULL ; ++i, _currentCP = _currentCP->next )
+	for ( i = 0; i < toRun && _currentCP != NULL; ++i, _currentCP = _currentCP->next )
 	{
 		// Run the normal CP processes
 		strtRunCP(*_currentCP);
 
-		++CPsRan ;
+		++CPsRan;
 	}
 
 #ifdef HEAVY_DEBUG
@@ -169,13 +169,13 @@ strtMain(UINT32 currentTime)
 		dbugLog(_FLI,"starting a new strat cycle.");
 
 #ifdef POCKET_MAPS
-		TeulTimeMS start, end ;
-		teulSyncClock() ;
-		start = teulClock64 ;
-		_buildPocketMap() ;
-		teulSyncClock() ;
-		end = teulClock64 ;
-		LogAbort("build pocket map too %llums", end - start) ;
+		TeulTimeMS start, end;
+		teulSyncClock();
+		start = teulClock64;
+		_buildPocketMap();
+		teulSyncClock();
+		end = teulClock64;
+		LogAbort("build pocket map too %llums", end - start);
 #endif
 
 		return FALSE;
@@ -187,12 +187,12 @@ strtMain(UINT32 currentTime)
 LOGICAL
 strtBroadcastCPs(void)
 {
-	CPStruct* cp ;
+	CPStruct* cp;
 
 	if ( _cpList == NULL )
 		return FALSE;
 
-	for ( cp = _cpList ; cp != NULL ; cp = cp->next )
+	for ( cp = _cpList; cp != NULL; cp = cp->next )
 	{
 		//Send the CP status
 		strtQueueCPStatus(cp);
@@ -210,7 +210,7 @@ strtGetCPList(void)
 Supercell*
 strtGetCellList(void)
 {
-	return _supercellList ;
+	return _supercellList;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -247,13 +247,13 @@ strtInitializeStratSystem()
 	dbugLog(_FLN,"Initializing Strat System");
 
 	//Get the starting time
-	_starttime = teulTime() ;
+	_starttime = teulTime();
 
 	// Parse the Wor Files and load terrain data.
-	_cpList = strtImportStratData() ;
+	_cpList = strtImportStratData();
 	if (_cpList == NULL)
 	{
-		strtReportDataErrors() ;
+		strtReportDataErrors();
 		fprintf(stderr,"Strat system failed to initialize, /tmp/strt*.log\n");
 		LogAbort("Strat System failed to initialize");
 		exit(1);
@@ -269,50 +269,50 @@ strtInitializeStratSystem()
 		exit(1);
 	}
 
-	stratInitializeLua() ;
+	stratInitializeLua();
 
 	dbugLog(_FLN,"Strat System verified");
-	threadsLogging() ;
+	threadsLogging();
 
 	// Make sure all the global spawn data is ready;
 	// this doesn't actually initialize spawn lists tho.
 	strtInitSpawn();
-	threadsLogging() ;
+	threadsLogging();
 
 	//Turn on all the bases
 	// (which includes creating all the spawn lists)
 	strtInitBases(_cpList);
-	threadsLogging() ;
+	threadsLogging();
 
 	//Init all the firebases
 	strtInitStratSystemFirebases(_cpList);
-	threadsLogging() ;
+	threadsLogging();
 
 #if defined(IS_STRAT_HOST)
-	strtdbSaveGameWorld(_cpList) ;
-	threadsLogging() ;
+	strtdbSaveGameWorld(_cpList);
+	threadsLogging();
 #endif // IS_STRAT_HOST
 
 	// Put brigades onto the map
-	strtInitializeHCUnits() ;
-	threadsLogging() ;
+	strtInitializeHCUnits();
+	threadsLogging();
 
 	//Tell everyone the status of the CPs
 	strtBroadcastCPs();
 
 	_currentCP = _cpList;
 
-	_initialized = true ;
+	_initialized = true;
 }
 
 void
 strtShutdownStratSystem()
 {
-	strtReleaseSupercells() ;
+	strtReleaseSupercells();
 }
 
 bool
 strtIsStratInitialized()
 {
-	return _initialized ;
+	return _initialized;
 }

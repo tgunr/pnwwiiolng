@@ -41,18 +41,18 @@
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiHCUnits.h"
 
-static CPSET g_objectives[MAX_SIDES] ;
-ObjectiveStats g_objectiveStats ;
+static CPSET g_objectives[MAX_SIDES];
+ObjectiveStats g_objectiveStats;
 
-bool g_budgetHadGrace[MAX_SIDES] ;
-UINT32 g_budgetGoodUntil[MAX_SIDES] ;
+bool g_budgetHadGrace[MAX_SIDES];
+UINT32 g_budgetGoodUntil[MAX_SIDES];
 
-extern CPSET sideCPs[MAX_SIDES] ;
+extern CPSET sideCPs[MAX_SIDES];
 
 // Supply routing
-static CPSET suppliers ;
+static CPSET suppliers;
 
-static bool supplyStabilized = false ;
+static bool supplyStabilized = false;
 
 //////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////
@@ -67,43 +67,43 @@ void
 ObjectiveStats::update(WWII_SIDE forSide)
 {
 	// Only do this once every 5 seconds
-	static const UINT32 STAT_UPDATE_INTERVAL_S = 5 ;
+	static const UINT32 STAT_UPDATE_INTERVAL_S = 5;
 	if ( m_updated[forSide] > 0 && teulTime() - m_updated[forSide] < STAT_UPDATE_INTERVAL_S )
-		return ;
+		return;
 
-	m_cityAttacks[forSide] = m_cityDefends[forSide] = m_battles[forSide] = 0 ;
-	m_bridgeAttacks[forSide] = m_bridgeDefends[forSide] = 0 ;
+	m_cityAttacks[forSide] = m_cityDefends[forSide] = m_battles[forSide] = 0;
+	m_bridgeAttacks[forSide] = m_bridgeDefends[forSide] = 0;
 
 	// No players, no AOs
-	const CPSET& objectives = g_objectives[forSide] ;
-	CPSET::iterator it ;
+	const CPSET& objectives = g_objectives[forSide];
+	CPSET::iterator it;
 
-	for ( it = objectives.begin() ; it != objectives.end() ; ++it )
+	for ( it = objectives.begin(); it != objectives.end(); ++it )
 	{
-		CPStruct* cp = (CPStruct*)(*it) ;
+		CPStruct* cp = (CPStruct*)(*it);
 		if ( cp->isAttackObjective(forSide) )
 		{
-			if ( cp->isBridge() ) ++m_bridgeAttacks[forSide] ;
+			if ( cp->isBridge() ) ++m_bridgeAttacks[forSide];
 			else
 			{
-				++m_cityAttacks[forSide] ;
+				++m_cityAttacks[forSide];
 				if ( cp->numUnits() > 0 || cp->isSupplyCenter() )
-					++m_battles[forSide] ;
+					++m_battles[forSide];
 			}
 		}
 		else if ( cp->isDefendObjective(forSide) )
 		{
-			if ( cp->isBridge() ) ++m_bridgeDefends[forSide] ;
-			else ++m_cityDefends[forSide] ;
+			if ( cp->isBridge() ) ++m_bridgeDefends[forSide];
+			else ++m_cityDefends[forSide];
 		}
 	}
 
-	m_cityAvailable[forSide] = m_cityLimit - std::min(m_cityAttacks[forSide], m_cityLimit) ;
+	m_cityAvailable[forSide] = m_cityLimit - std::min(m_cityAttacks[forSide], m_cityLimit);
 
-	UINT32 bridgeObjectives = m_bridgeAttacks[forSide] + m_bridgeDefends[forSide] ;
-	m_bridgeAvailable[forSide] = m_bridgeLimit - std::min(bridgeObjectives, m_bridgeLimit) ;
+	UINT32 bridgeObjectives = m_bridgeAttacks[forSide] + m_bridgeDefends[forSide];
+	m_bridgeAvailable[forSide] = m_bridgeLimit - std::min(bridgeObjectives, m_bridgeLimit);
 
-	m_updated[forSide] = teulTime() ;
+	m_updated[forSide] = teulTime();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -113,17 +113,17 @@ void
 ObjectiveStats::calculate()
 {
 	if ( chatGetPopulation(WWII_NO_SIDE) > 0 )
-		m_cityLimit = stratCaptureObjectiveLimit() ;
+		m_cityLimit = stratCaptureObjectiveLimit();
 	else
-		m_cityLimit = 0 ;
+		m_cityLimit = 0;
 
-	m_bridgeLimit = stratBridgeObjectiveLimit() ;
+	m_bridgeLimit = stratBridgeObjectiveLimit();
 
-	voidStats(ALLIED) ;
-	voidStats(AXIS) ;
+	voidStats(ALLIED);
+	voidStats(AXIS);
 
-	update(ALLIED) ;
-	update(AXIS) ;
+	update(ALLIED);
+	update(AXIS);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -132,33 +132,33 @@ static CPStruct*
 _leastCaptured(CPStruct* prev, CPStruct* cur, WWII_SIDE forSide)
 {
 	if ( prev == NULL )
-		return cur ;
+		return cur;
 
 	// If we control one but not the other, volunteer the uncontrolled one
 	if ( prev->controllingSide != forSide && cur->controllingSide == forSide )
-		return prev ;
+		return prev;
 	if ( cur->controllingSide != forSide && prev->controllingSide == forSide )
-		return cur ;
+		return cur;
 
 	// If we own more armybases at either, volunteer the lesser
 	if ( prev->armyBasesOwned[forSide] > cur->armyBasesOwned[forSide] )
-		return cur ;
+		return cur;
 	if ( prev->armyBasesOwned[forSide] < cur->armyBasesOwned[forSide] )
-		return prev ;
+		return prev;
 
 	// If we own less facilities at either, volunteer it
 	if ( prev->facilitiesOwned[forSide] > cur->facilitiesOwned[forSide] )
-		return cur ;
+		return cur;
 	if ( cur->facilitiesOwned[forSide] > prev->facilitiesOwned[forSide] )
-		return prev ;
+		return prev;
 
 	// Does the new candidate have less EWS flags going off?
 	if ( prev->flags & CP_HEAVY_EWS_FLAG_MASK && !(cur->flags & CP_HEAVY_EWS_FLAG_MASK) )
-		return cur ;
+		return cur;
 	if ( prev->flags & CP_NORM_EWS_FLAG_MASK && !(cur->flags & CP_NORM_EWS_FLAG_MASK) )
-		return cur ;
+		return cur;
 
-	return prev ;
+	return prev;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -166,52 +166,52 @@ _leastCaptured(CPStruct* prev, CPStruct* cur, WWII_SIDE forSide)
 static CPStruct*
 _findSacrificialObjective(WWII_SIDE forSide, UINT32 currentTime)
 {
-	CPSET::iterator it ;
-	CPStruct* lastFit = NULL ;
-	CPStruct* desperateFit = NULL ;
+	CPSET::iterator it;
+	CPStruct* lastFit = NULL;
+	CPStruct* desperateFit = NULL;
 
 	// Look through all the iterators
-	for ( it = g_objectives[forSide].begin() ; it != g_objectives[forSide].end() ; ++it )
+	for ( it = g_objectives[forSide].begin(); it != g_objectives[forSide].end(); ++it )
 	{
-		CPStruct* current = (*it) ;
+		CPStruct* current = (*it);
 
 		// Only look at attack objectives on cities
 		if ( !current->isCaptureObjective(forSide) )
-			continue ;
+			continue;
 
 		// If there is an objective being cleared, there's nothing to do
 		if ( current->m_clearing[forSide] )
-			return current ;
+			return current;
 
 		if ( current->minimumObjectiveLifetime(currentTime) > 0 )
 		{
-			desperateFit = _leastCaptured(desperateFit, current, forSide) ;
-			continue ;
+			desperateFit = _leastCaptured(desperateFit, current, forSide);
+			continue;
 		}
 
-		lastFit = _leastCaptured(lastFit, current, forSide) ;
+		lastFit = _leastCaptured(lastFit, current, forSide);
 	}
 
 	// Did we find a fit?
 	if ( lastFit != NULL )
-		return lastFit ;
+		return lastFit;
 
 	// Ok - are we desperate enough to use a desperate fit?
 	// i.e. two or more objectives out of whack
 	if ( desperateFit == NULL )
-		return NULL ;
+		return NULL;
 
-	SINT32 overBudget = (SINT32)(g_objectiveStats.m_cityLimit - g_objectiveStats.m_cityAttacks[forSide]) ;
+	SINT32 overBudget = (SINT32)(g_objectiveStats.m_cityLimit - g_objectiveStats.m_cityAttacks[forSide]);
 	if ( overBudget <= 1 )
-		return NULL ;
+		return NULL;
 
 	dbugLog(_FLI, "ao: %s sacrificing %s objective out of desperation (%d over budget)"
 					, _sideName[forSide]
 					, desperateFit->name
 					, overBudget
-					) ;
+					);
 
-	return desperateFit ;
+	return desperateFit;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -222,15 +222,15 @@ void
 ObjectiveStats::checkLimits(UINT32 currentTime)
 {
 	// Lets make sure the figures are fresh
-	calculate() ;
+	calculate();
 
 	// Step #1 - save the damn things :)
 #if !defined(TRAINING_SERVER) && !defined(FRES)
-	save() ;
+	save();
 
 	// Now check the stats of both sides to see if they're valid
-	checkSideLimits(ALLIED, currentTime) ;
-	checkSideLimits(AXIS, currentTime) ;
+	checkSideLimits(ALLIED, currentTime);
+	checkSideLimits(AXIS, currentTime);
 #endif
 }
 
@@ -240,15 +240,15 @@ ObjectiveStats::checkLimits(UINT32 currentTime)
 static void
 _setBudgetStatus(WWII_SIDE forSide, bool hadGrace, UINT32 atTime)
 {
-	g_budgetHadGrace[forSide] = hadGrace ;
-	g_budgetGoodUntil[forSide] = atTime ;
+	g_budgetHadGrace[forSide] = hadGrace;
+	g_budgetGoodUntil[forSide] = atTime;
 }
 
 static void
 _startGracePeriod(WWII_SIDE forSide, UINT32 currentTime)
 {
-	const UINT32 gracePeriod = host_config.objective.gracePeriod_m * 60 ;
-	_setBudgetStatus(forSide, false, currentTime + gracePeriod) ;
+	const UINT32 gracePeriod = host_config.objective.gracePeriod_m * 60;
+	_setBudgetStatus(forSide, false, currentTime + gracePeriod);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -259,8 +259,8 @@ ObjectiveStats::checkSideLimits(WWII_SIDE forSide, UINT32 currentTime)
 {
 	if ( m_cityAttacks[forSide] <= m_cityLimit )
 	{
-		_setBudgetStatus(forSide, false, 0) ;
-		return ;
+		_setBudgetStatus(forSide, false, 0);
+		return;
 	}
 
 	// See if they are in their grace interval
@@ -268,14 +268,14 @@ ObjectiveStats::checkSideLimits(WWII_SIDE forSide, UINT32 currentTime)
 	{
 		if ( g_budgetGoodUntil[forSide] == 0 )
 		{
-			_startGracePeriod(forSide, currentTime) ;
+			_startGracePeriod(forSide, currentTime);
 #ifdef BETA_RELEASE
 			if ( currentTime < g_budgetGoodUntil[forSide] )
 			{
 				///LOCALIZE
-				char buf[128] ;
-				sprintf(buf, "[beta] Too many objectives (%u/%u): grace period", m_cityAttacks[forSide], m_cityLimit) ;
-				chatSendHCMessage(forSide, LSTR_GENERIC, buf) ;
+				char buf[128];
+				sprintf(buf, "[beta] Too many objectives (%u/%u): grace period", m_cityAttacks[forSide], m_cityLimit);
+				chatSendHCMessage(forSide, LSTR_GENERIC, buf);
 			}
 #endif
 		}
@@ -283,25 +283,25 @@ ObjectiveStats::checkSideLimits(WWII_SIDE forSide, UINT32 currentTime)
 
 	// We've given them grace or a warning
 	if ( currentTime < g_budgetGoodUntil[forSide] )
-		return ;
+		return;
 
-	CPStruct* cp = _findSacrificialObjective((WWII_SIDE)forSide, currentTime) ;
+	CPStruct* cp = _findSacrificialObjective((WWII_SIDE)forSide, currentTime);
 
 	if ( cp == NULL )
 	{
 #ifdef BETA_RELEASE
-		chatSendHCMessage(forSide, LSTR_GENERIC, "[beta] Too many objectives, no fit for removal") ;
+		chatSendHCMessage(forSide, LSTR_GENERIC, "[beta] Too many objectives, no fit for removal");
 #endif
-		_startGracePeriod(forSide, currentTime) ;
-		return ;
+		_startGracePeriod(forSide, currentTime);
+		return;
 	}
 
 	if ( cp->m_clearing[forSide] )
 	{
 		// Since they're doing something re-start the grace period
 		// if they're still overbudget once its gone
-		_setBudgetStatus(forSide, false, 0) ;
-		return ;
+		_setBudgetStatus(forSide, false, 0);
+		return;
 	}
 
 	dbugLog(_FLI, "ao: %s over budget on capture objectives %d/%d sacrificial cp is %s"
@@ -309,33 +309,33 @@ ObjectiveStats::checkSideLimits(WWII_SIDE forSide, UINT32 currentTime)
 					, m_cityAttacks[forSide]
 					, m_cityLimit
 					, ((cp) ? cp->name : "<null>")
-					) ;
+					);
 
 	if ( !g_budgetHadGrace[forSide] )
 	{
-		dbugLog(_FLN, "ao: serving %s over-budget notice", _sideName[forSide]) ;
+		dbugLog(_FLN, "ao: serving %s over-budget notice", _sideName[forSide]);
 
 		// Give them a warning
-		const UINT32 expiry = host_config.objective.warningPeriod_m ;
-		char buf[16] ;
-		snprintf(buf, 15, "%u", expiry) ;
-		chatSendHCMessage((WWII_SIDE)forSide, LSTR_TOO_MANY_AOS, buf) ;
+		const UINT32 expiry = host_config.objective.warningPeriod_m;
+		char buf[16];
+		snprintf(buf, 15, "%u", expiry);
+		chatSendHCMessage((WWII_SIDE)forSide, LSTR_TOO_MANY_AOS, buf);
 
-		_setBudgetStatus(forSide, true, currentTime + (expiry * 60)) ;
+		_setBudgetStatus(forSide, true, currentTime + (expiry * 60));
 
-		return ;
+		return;
 	}
 
 
 #ifdef BETA_RELEASE
-	chatSendHCMessage(forSide, LSTR_LABELLED_GENERIC, "[beta] Too many objectives - auto-culling", cp->name) ;
+	chatSendHCMessage(forSide, LSTR_LABELLED_GENERIC, "[beta] Too many objectives - auto-culling", cp->name);
 #endif
-	dbugLog(_FLI, "ao: Sacrificing %s objective on %s", _sideNameAdj[forSide], cp->name) ;
+	dbugLog(_FLI, "ao: Sacrificing %s objective on %s", _sideNameAdj[forSide], cp->name);
 
-	cp->startObjectiveExpiry((WWII_SIDE)forSide, host_config.objective.clearTime_m * 60) ;
+	cp->startObjectiveExpiry((WWII_SIDE)forSide, host_config.objective.clearTime_m * 60);
 
 	// Give them a fresh grace period
-	_startGracePeriod(forSide, currentTime) ;
+	_startGracePeriod(forSide, currentTime);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -346,63 +346,63 @@ const std::string&
 strtListObjectives(WWII_SIDE forSide, bool citysOnly)
 {
 	///LOCALIZE or transfer to client.
-	static std::string text ;
-	text.clear() ;
+	static std::string text;
+	text.clear();
 
-	const CPSET& objectives = g_objectives[forSide] ;
+	const CPSET& objectives = g_objectives[forSide];
 
-	std::string attack = "", defend = "", soft = ""  ;
+	std::string attack = "", defend = "", soft = "";
 
-	CPSET::iterator it ;
-	for ( it = objectives.begin() ; it != objectives.end() ; ++it )
+	CPSET::iterator it;
+	for ( it = objectives.begin(); it != objectives.end(); ++it )
 	{
-		CPStruct* cp = *it ;
-		std::string* list ;
-		bool isSoftcap = (cp->isCity() && cp->numUnits() == 0) ;
+		CPStruct* cp = *it;
+		std::string* list;
+		bool isSoftcap = (cp->isCity() && cp->numUnits() == 0);
 
 		if ( citysOnly && (cp->isCity() == false || isSoftcap) )
-			continue ;
+			continue;
 
 		if ( cp->isDefendObjective(forSide) )
-			list = &defend ;
+			list = &defend;
 		else if ( isSoftcap )
-			list = &soft ;
+			list = &soft;
 		else if ( cp->isAttackObjective(forSide) )
-			list = &attack ;
+			list = &attack;
 		else
-			continue ;
+			continue;
 
 		if ( list->size() > 0 )
-			*list += ", " ;
+			*list += ", ";
 
 		if ( cp->m_clearing[forSide] )
-			*list += "[" ;
+			*list += "[";
 		else if ( isSoftcap )
-			*list += "(" ;
-		*list += cp->name ;
+			*list += "(";
+		*list += cp->name;
 		if ( cp->isCity() && cp->isContested() )
-			*list += "/con" ;
+			*list += "/con";
 		if ( cp->m_clearing[forSide] )
-			*list += "]" ;
+			*list += "]";
 		else if ( isSoftcap )
-			*list += "/no bde)" ;
+			*list += "/no bde)";
 	}
 
 	if ( attack.size() > 0 )
-		text += "Attack: " + attack + ". " ;
+		text += "Attack: " + attack + ". ";
 	if ( defend.size() > 0 )
 		text += "Defend: " + defend + ". ";
 	if ( citysOnly == false && soft.size() > 0 )
-		text += "Maneuver: " + soft + ". " ;
+		text += "Maneuver: " + soft + ". ";
 
 	if ( text.size() == 0 )
-		text = "No current objectives." ;
+		text = "No current objectives.";
 	else if ( citysOnly == true && soft.size() > 0 )
-		text += "See '/ob l' for full list." ;
+		text += "See '/ob l' for full list.";
 	else if ( citysOnly == false )
-		text += "See '/ob c' for city battles only." ;
+		text += "See '/ob c' for city battles only.";
 
-	return text ;
+	return text;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -416,9 +416,9 @@ CPStruct::_changeFlags(UINT32 newFlags)
 {
 	if ( flags != (CP_STATUS_FLAGS)newFlags )
 	{
-		flags = (CP_STATUS_FLAGS)newFlags ;
+		flags = (CP_STATUS_FLAGS)newFlags;
 #ifdef IS_STRAT_HOST
-		strtQueueCPStatus(this) ;
+		strtQueueCPStatus(this);
 #endif // IS_STRAT_HOST
 	}
 }
@@ -453,66 +453,66 @@ const char* scmds[] = {
 ,	"SCMD_NO_BDE_LINK"				// No direct link for ground bde
 ,	"SCMD_NO_DIV_LINK"				// No members with direct link for ground div
 ,	"SCMD_ERROR"						// Must always be the last
-} ;
+};
 
 SCMD_RESULT
 CPStruct::_fallback(WWII_SIDE issuer, FALLBACK_MODE mode, UINT32 playerID)
 {
 	// Don't try to execute before having issued
 	if ( mode == FALLBACK_EXECUTE && (!isFallingBack() || m_fallback == WWII_NO_SIDE || m_fallbackTime == 0) )
-		return SCMD_ERROR ;
+		return SCMD_ERROR;
 
-	const char* fallbackType ;
+	const char* fallbackType;
 	switch ( mode )
 	{
-	case FALLBACK_TEST: fallbackType = "test" ; break ;
-	case FALLBACK_START: fallbackType = "start" ; break ;
-	case FALLBACK_EXECUTE: fallbackType = "execute" ; break ;
-	default: fallbackType = "!UNKNOWN!" ; break ;
+	case FALLBACK_TEST: fallbackType = "test"; break;
+	case FALLBACK_START: fallbackType = "start"; break;
+	case FALLBACK_EXECUTE: fallbackType = "execute"; break;
+	default: fallbackType = "!UNKNOWN!"; break;
 	}
 
-	dbugLog(_FLI, "%s fallback order on %s for %s", fallbackType, name, _sideName[issuer]) ;
+	dbugLog(_FLI, "%s fallback order on %s for %s", fallbackType, name, _sideName[issuer]);
 
 	// Dummy-run the fallback operation
-	SCMD_RESULT testResult = strtFallback(this, issuer, mode, playerID) ;
+	SCMD_RESULT testResult = strtFallback(this, issuer, mode, playerID);
 	dbugLog(_FLI, "strtFallback(%s, %s, %s, %u) = %s(%u)"
 					, name, _sideName[issuer], fallbackType, (UINT32)playerID, scmds[testResult], (UINT32)testResult
-					) ;
+					);
 
 	// How to interpret the result when we're not in execution mode
 	if ( mode == FALLBACK_TEST )
-		return testResult ;
+		return testResult;
 
 	if ( mode == FALLBACK_START )
 	{
 		if ( testResult != SCMD_ALLOWED )
-			return testResult ;
+			return testResult;
 
 		if ( !setAlert(CP_STAT_FALLBACK)->isFallingBack() )
 		{
-			dbugLog(_FLW, "Somehow failed to set fallback flag") ;
-			return SCMD_ERROR ;
+			dbugLog(_FLW, "Somehow failed to set fallback flag");
+			return SCMD_ERROR;
 		}
 
-		m_fallback = issuer ;
-		m_fallbackTime = teulTime() + (UINT32)(host_config.objective.fallbackNotice_m * 60) ;
-		m_fallbackBy = playerID ;
+		m_fallback = issuer;
+		m_fallbackTime = teulTime() + (UINT32)(host_config.objective.fallbackNotice_m * 60);
+		m_fallbackBy = playerID;
 
-		return SCMD_SUCCESS ;
+		return SCMD_SUCCESS;
 	}
 
 	// We're executing, SCMD_ALLOWED isn't what we're expecting
 	if ( testResult == SCMD_ALLOWED )
 	{
-		dbugLog(_FLW, "Got SCMD_ALLOWED on a fallback on execution") ;
-		return SCMD_ERROR ;
+		dbugLog(_FLW, "Got SCMD_ALLOWED on a fallback on execution");
+		return SCMD_ERROR;
 	}
 
 	// If this didn't uncontest the town, we still need to clear the fallback flag
 	if ( isContested() )
-		clearFlag(CP_STAT_FALLBACK) ;
+		clearFlag(CP_STAT_FALLBACK);
 
-	return testResult ;
+	return testResult;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -522,10 +522,10 @@ void
 CPStruct::announceObjectiveWithdrawl() const
 {
 	// Tell the attacker their objective has been withdrawn
-	chatSendSideMessage(attacker(), nullObjID, LSTR_NONE, LSTR_OBJECTIVE_WITHDRAWN, name) ;
+	chatSendSideMessage(attacker(), nullObjID, LSTR_NONE, LSTR_OBJECTIVE_WITHDRAWN, name);
 
 	// Tell the defender
-	chatSendGCIMessage(GCI_CP_OBJECTIVE_WITHDRAWN, side, *this, nullObjID) ;
+	chatSendGCIMessage(GCI_CP_OBJECTIVE_WITHDRAWN, side, *this, nullObjID);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -540,8 +540,8 @@ CPStruct::changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly)
 						, name
 						, toCountry
 						, MAX_COUNTRIES
-						) ;
-		return false ;
+						);
+		return false;
 	}
 
 	// If the ownership already matches, we fail unless force is true
@@ -550,8 +550,8 @@ CPStruct::changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly)
 		dbugLog(_FLI, "%s.changeOwnership(%s) uneccessary - skipping"
 						, name
 						, _countryName[toCountry]
-						) ;
-		return false ;
+						);
+		return false;
 	}
 
 	dbugLog(_FLI, "%s %s %s change of ownership to %s"
@@ -559,22 +559,22 @@ CPStruct::changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly)
 					, ((force) ? "forcing" : "setting")
 					, name
 					, _countryName[toCountry]
-					) ;
+					);
 
 	// Firstly change standard facilities
-	FacilityStruct* facility ;
-	for ( facility = facilityList ; facility != NULL ; facility = facility->next )
+	FacilityStruct* facility;
+	for ( facility = facilityList; facility != NULL; facility = facility->next )
 	{
 		if ( facility->type == FACILITY_FIREBASE )
-			continue ;
+			continue;
 		if ( force || facility->country != toCountry )
-			strtConvertFacility(*facility, toCountry, force, quietly) ;
+			strtConvertFacility(*facility, toCountry, force, quietly);
 	}
 
 	// Clear out the routeing
-	resetRouteing() ;
+	resetRouteing();
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -584,31 +584,31 @@ static void
 _checkUnit(StratHCUnit* unit, const CPStruct* cp)
 {
 	if ( NULL == unit || NULL == cp || cp != unit->homeCP() )
-		return ;
+		return;
 	// Ensure we rout parents first.
 	if ( NULL != unit->parent() && cp == unit->parent()->homeCP() )
-		_checkUnit(unit->parent(), cp) ;
-	dbugLog(_FLIB, "(hcu:%d name:%s side:%u) ", unit->unitID(), unit->callsign(), unit->side()) ;
+		_checkUnit(unit->parent(), cp);
+	dbugLog(_FLIB, "(hcu:%d name:%s side:%u) ", unit->unitID(), unit->callsign(), unit->side());
 	if ( unit->canDeployTo(cp) )
-		dbugLog(_FLIB, "ok ") ;
+		dbugLog(_FLIB, "ok ");
 	else if ( !unit->rout() )
-		dbugLog(_FLIB, "FAILED ") ;
+		dbugLog(_FLIB, "FAILED ");
 	else
-		dbugLog(_FLIB, "routed ") ;
+		dbugLog(_FLIB, "routed ");
 }
 
 void
 CPStruct::checkHCUnits()
 {
-	dbugLog(_FLI, "cp:%u name:%s hcus:%" PRSizeT " side:%u ", uOID, name, m_units.size(), side) ;
+	dbugLog(_FLI, "cp:%u name:%s hcus:%" PRSizeT " side:%u ", uOID, name, m_units.size(), side);
 
-	HCUNIT_INDEX unitList = m_units ;
-	HCUNIT_INDEX::iterator it ;
-	for ( it = unitList.begin() ; it != unitList.end() ; ++it )
+	HCUNIT_INDEX unitList = m_units;
+	HCUNIT_INDEX::iterator it;
+	for ( it = unitList.begin(); it != unitList.end(); ++it )
 	{
-		_checkUnit((StratHCUnit*)it->second, this) ;
+		_checkUnit((StratHCUnit*)it->second, this);
 	}
-	dbugLog(_FLIB, "End") ;
+	dbugLog(_FLIB, "End");
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -622,22 +622,22 @@ CPStruct::checkForUnderAttack(void)
 	{
 		if ( !isUnderAttack )
 		{
-			betaLog(_FLI, "ews: marking %s as under attack", name) ;
+			betaLog(_FLI, "ews: marking %s as under attack", name);
 		}
-		isUnderAttack = true ;
+		isUnderAttack = true;
 	}
 	else
 	{
 		if ( isUnderAttack )
 		{
-			betaLog(_FLI, "ews: removing %s under attack flag", name) ;
+			betaLog(_FLI, "ews: removing %s under attack flag", name);
 		}
-		isUnderAttack = false ;
+		isUnderAttack = false;
 	}
 
 	///TODO: Distinguish between "enemy here" and "fight here"
 
-	return this ;
+	return this;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -646,27 +646,27 @@ CPStruct::checkForUnderAttack(void)
 void
 CPStruct::_removeObjective(WWII_SIDE forSide)
 {
-	clearFlag(objectiveFlags[forSide]) ;
+	clearFlag(objectiveFlags[forSide]);
 
 	// Remove the "work in progress" flag and remove the objective
-	m_clearing[forSide] = false ;
+	m_clearing[forSide] = false;
 
-	g_objectives[forSide].erase(this) ;
+	g_objectives[forSide].erase(this);
 
 #ifdef IS_STRAT_HOST
-	strtQueueCPStatus(this) ;
-	strtSaveCP(this) ;
+	strtQueueCPStatus(this);
+	strtSaveCP(this);
 #endif
 }
 
 CPStruct*
 CPStruct::clearObjective(WWII_SIDE forSide)
 {
-	bool wasAttack = isAttackObjective(forSide) ;
+	bool wasAttack = isAttackObjective(forSide);
 
-	_removeObjective(forSide) ;
+	_removeObjective(forSide);
 	if ( isCity() && isValidSide(forSide) )
-		_removeObjective(wwiiOtherSide(forSide)) ;
+		_removeObjective(wwiiOtherSide(forSide));
 
 	// If you remove an AO from a town which is contested,
 	// then the town has to uncontest itself.
@@ -675,27 +675,27 @@ CPStruct::clearObjective(WWII_SIDE forSide)
 		dbugLog(_FLI, "Aborted attack during contention: restoring %d ownership of %s"
 						, country
 						, name
-						) ;
-		changeOwnership(country, false, true) ;
+						);
+		changeOwnership(country, false, true);
 	}
 
 	if ( wasAttack )
 	{
 		if ( isCity () )
 		{
-			setTableStates() ;
-			m_attackStarted = 0 ;
-			m_attackingUnit = NULL ;
+			setTableStates();
+			m_attackStarted = 0;
+			m_attackingUnit = NULL;
 		}
-		m_attacker = WWII_NO_SIDE ;
+		m_attacker = WWII_NO_SIDE;
 	}
 
 	if ( isCity() )
-		strtCPEventTrigger(*this, "cpClearedAO") ;
+		strtCPEventTrigger(*this, "cpClearedAO");
 
-	strtSaveCP(this) ;
+	strtSaveCP(this);
 
-	return this ;
+	return this;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -705,30 +705,30 @@ void
 CPStruct::drainHistories()
 {
 	if ( m_overruns == NULL )
-		return ;
+		return;
 
 	// Drain the overruns
-	const UINT32 runTime = teulTime() ;
-	const UINT32 lifeTime = (host_config.objective.overrunWindow_m * 60) ;
-	UINT32 limit = runTime - lifeTime ;
+	const UINT32 runTime = teulTime();
+	const UINT32 lifeTime = (host_config.objective.overrunWindow_m * 60);
+	UINT32 limit = runTime - lifeTime;
 
 	// If we're overrun, overrun requests last a while longer
 	if ( !isOverrun() )
-		limit = runTime - lifeTime ;
+		limit = runTime - lifeTime;
 	else
-		limit = runTime - 2 * lifeTime ;
+		limit = runTime - 2 * lifeTime;
 
 	while ( m_overruns->size() > 0 && m_overruns->front() <= limit )
 	{
-		m_overruns->erase(m_overruns->begin()) ;
+		m_overruns->erase(m_overruns->begin());
 	}
 
 	// If we've emptied the queue and we're in overrun state, exit the state
 	if ( m_overruns->size() < 2 && isOverrun() )
-		clearOverrun() ;
+		clearOverrun();
 
 	if ( m_overruns->size() < 1 )
-		clearOverrunHistory() ;
+		clearOverrunHistory();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -737,56 +737,56 @@ CPStruct::drainHistories()
 CPStruct*
 CPStruct::endContention()
 {
-	setContention(false) ;
+	setContention(false);
 
 #ifdef IS_STRAT_HOST
-	clearAlerts() ;
-	clearFallback() ;
-	clearOverrunHistory() ;
+	clearAlerts();
+	clearFallback();
+	clearOverrunHistory();
 
 	if ( isCity() && isValidSide(side) )
 	{
 		if ( isAttackObjective(side) )
 		{
-			dbugLog(_FLN, "cp:%s removing AO on endContention", name) ;
+			dbugLog(_FLN, "cp:%s removing AO on endContention", name);
 			// Victory: City captured, objective complete
-			clearObjective(side) ;
+			clearObjective(side);
 		}
 		else if ( isDefendObjective(side) && !isAttackObjective(wwiiOtherSide(side)) )
 		{
-			dbugLog(_FLA, "cp:%s lopsided capture objective", name) ;
+			dbugLog(_FLA, "cp:%s lopsided capture objective", name);
 			// WTF: This shouldn't happen
-			clearObjective(side) ;
+			clearObjective(side);
 		}
 		else if ( !isEnemyLinked() && isObjective() )
 		{
 			// Can only hold an AO on a frontline town
 			if ( isAttackObjective(ALLIED) )
 			{
-				dbugLog(_FLI, "cp:%s removing ALLIED AO due to lack of link", name) ;
-				announceObjectiveWithdrawl() ;
-				clearObjective(ALLIED) ;
+				dbugLog(_FLI, "cp:%s removing ALLIED AO due to lack of link", name);
+				announceObjectiveWithdrawl();
+				clearObjective(ALLIED);
 			}
 			else if ( isAttackObjective(AXIS) )
 			{
-				dbugLog(_FLI, "cp:%s removing AXIS AO due to lack of link", name) ;
-				announceObjectiveWithdrawl() ;
-				clearObjective(AXIS) ;
+				dbugLog(_FLI, "cp:%s removing AXIS AO due to lack of link", name);
+				announceObjectiveWithdrawl();
+				clearObjective(AXIS);
 			}
 		}
 	}
 
 	// Make sure all the tables get re-processed
-	setTableStates() ;
+	setTableStates();
 
-	resetRouteing() ;
+	resetRouteing();
 
-	strtQueueCPStatus(this) ;
+	strtQueueCPStatus(this);
 #endif
 
-	strtCPEventTrigger(*this, "cpLeftContention") ;
+	strtCPEventTrigger(*this, "cpLeftContention");
 
-	return this ;
+	return this;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -796,42 +796,42 @@ CPStruct::endContention()
 SCMD_RESULT
 CPStruct::executeFallback()
 {
-	const UINT32 runTime = teulTime() ;
+	const UINT32 runTime = teulTime();
 
 	// If the flag isn't set, obviously nothing to do
 	if ( !isFallingBack() || m_fallbackTime > runTime )
-		return SCMD_NO_EFFECT ;
+		return SCMD_NO_EFFECT;
 
 	if ( m_fallback == WWII_NO_SIDE  )
 	{
-		clearFallback() ;
-		return SCMD_NO_EFFECT ;
+		clearFallback();
+		return SCMD_NO_EFFECT;
 	}
 
-	WWII_SIDE forSide = m_fallback ;
-	WWII_SIDE otherSide = ((forSide == ALLIED) ? AXIS : ALLIED) ;
+	WWII_SIDE forSide = m_fallback;
+	WWII_SIDE otherSide = ((forSide == ALLIED) ? AXIS : ALLIED);
 
-	SCMD_RESULT result = _fallback(m_fallback, FALLBACK_EXECUTE, m_fallbackBy) ;
+	SCMD_RESULT result = _fallback(m_fallback, FALLBACK_EXECUTE, m_fallbackBy);
 
 	if ( result != SCMD_SUCCESS )
 	{
 		// If we were not successful, we still need to clear the fallback flag.
-		clearFlag(CP_STAT_FALLBACK) ;
+		clearFlag(CP_STAT_FALLBACK);
 
 #ifdef BETA_RELEASE
-		chatSendBroadcast(Chat::_HC, Instance::_CAMPAIGN, forSide, LSTR_BETA, LSTR_FALLBACK_FAILED, name) ;
+		chatSendBroadcast(Chat::_HC, Instance::_CAMPAIGN, forSide, LSTR_BETA, LSTR_FALLBACK_FAILED, name);
 #endif
-		return result ;
+		return result;
 	}
 
 	// Success, tell the world
-	chatSendBroadcast(Chat::_SIDE, Instance::_CAMPAIGN, forSide, LSTR_NONE, LSTR_FALLING_BACK, name) ;
-	chatSendBroadcast(Chat::_SIDE, Instance::_CAMPAIGN, otherSide, LSTR_NONE, LSTR_ENEMY_FALLING_BACK, name) ;
+	chatSendBroadcast(Chat::_SIDE, Instance::_CAMPAIGN, forSide, LSTR_NONE, LSTR_FALLING_BACK, name);
+	chatSendBroadcast(Chat::_SIDE, Instance::_CAMPAIGN, otherSide, LSTR_NONE, LSTR_ENEMY_FALLING_BACK, name);
 
 	// Leave the flag there for one CP run cycle
-	m_fallback = WWII_NO_SIDE ;
+	m_fallback = WWII_NO_SIDE;
 
-	return SCMD_SUCCESS ;
+	return SCMD_SUCCESS;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -841,30 +841,30 @@ SCMD_RESULT
 CPStruct::holdAtAllCosts(WWII_SIDE issuer, bool execute)
 {
 	if ( side != issuer )
-		return SCMD_WRONG_SIDE ;
+		return SCMD_WRONG_SIDE;
 
 	if ( isFallingBack() )
-		return SCMD_OTHER_ORDERS ;
+		return SCMD_OTHER_ORDERS;
 
 	if ( isHolding() )
-		return SCMD_REPEAT ;
+		return SCMD_REPEAT;
 
 	if ( !isDefendObjective(issuer) )
-		return SCMD_NO_OBJECTIVE ;
+		return SCMD_NO_OBJECTIVE;
 
 	if ( !isContested() )
-		return SCMD_NO_CONTENTION ;
+		return SCMD_NO_CONTENTION;
 
 	if ( controllingSide != issuer )
-		return SCMD_MUST_OAC ;
+		return SCMD_MUST_OAC;
 
 	if ( !execute )
-		return SCMD_ALLOWED ;
+		return SCMD_ALLOWED;
 
 	if ( setAlert(CP_STAT_OWN_HAAC)->isHolding() )
-		return SCMD_SUCCESS ;
+		return SCMD_SUCCESS;
 
-	return SCMD_ERROR ;
+	return SCMD_ERROR;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -875,14 +875,14 @@ CPStruct::issueFallback(WWII_SIDE issuer, bool testOnly, UINT32 playerID)
 {
 	if ( issuer == WWII_NO_SIDE )
 	{
-		dbugLog(_FLW, "p:%u Tried to fallback %s for invalid side", playerID, name) ;
-		return SCMD_ERROR ;
+		dbugLog(_FLW, "p:%u Tried to fallback %s for invalid side", playerID, name);
+		return SCMD_ERROR;
 	}
 
 	if ( testOnly )
-		return _fallback(issuer, FALLBACK_TEST, playerID) ;
+		return _fallback(issuer, FALLBACK_TEST, playerID);
 	else
-		return _fallback(issuer, FALLBACK_START, playerID) ;
+		return _fallback(issuer, FALLBACK_START, playerID);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -891,20 +891,20 @@ CPStruct::issueFallback(WWII_SIDE issuer, bool testOnly, UINT32 playerID)
 void
 CPStruct::markOverrunReported()
 {
-	UINT32 now = teulTime() ;
+	UINT32 now = teulTime();
 
 	if ( m_overruns == NULL )
-		m_overruns = new OVERRUNS ;
+		m_overruns = new OVERRUNS;
 
 	// Record the timestamp of this event
-	m_overruns->push_back(now) ;
+	m_overruns->push_back(now);
 
 	// Expire any leading wastage
-	drainHistories() ;
+	drainHistories();
 
 	// Don't let the list get stupidly large
 	if ( m_overruns->size() > 20 )
-		m_overruns->erase(m_overruns->begin()) ;
+		m_overruns->erase(m_overruns->begin());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -914,32 +914,32 @@ CPStruct::markOverrunReported()
 UINT32
 CPStruct::minimumObjectiveLifetime(UINT32 currentTime) const
 {
-	UINT32 expires = m_attackStarted + (host_config.objective.minLifetime_m * 60) ;
+	UINT32 expires = m_attackStarted + (host_config.objective.minLifetime_m * 60);
 
 	if ( expires <= currentTime )
-		return 0 ;
+		return 0;
 
-	return expires - currentTime ;
+	return expires - currentTime;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Calculate how many overruns required for a trigger
 
 #ifdef BETA_RELEASE
-static const UINT32 MIN_OVERRUNS = 1 ;
+static const UINT32 MIN_OVERRUNS = 1;
 #else
-static const UINT32 MIN_OVERRUNS = 3 ;
+static const UINT32 MIN_OVERRUNS = 3;
 #endif
 
 static UINT32
 _overrunReportsRequired(WWII_SIDE forSide)
 {
-	UINT32 players = chatGetPopulation(forSide) ;
+	UINT32 players = chatGetPopulation(forSide);
 
 	if ( players <= 200 )
-		return MIN_OVERRUNS ;
+		return MIN_OVERRUNS;
 
-	return MIN_OVERRUNS + (players / 200) ;
+	return MIN_OVERRUNS + (players / 200);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -949,42 +949,42 @@ SCMD_RESULT
 CPStruct::overrun(WWII_SIDE issuer)
 {
 	if ( side != issuer )
-		return SCMD_WRONG_SIDE ;
+		return SCMD_WRONG_SIDE;
 
 	if ( isHolding() || isFallingBack() )
-		return SCMD_OTHER_ORDERS ;
+		return SCMD_OTHER_ORDERS;
 
 #ifndef BETA_RELEASE
 	if ( !isUnderAttack )
-		return SCMD_NO_ENEMY ;
+		return SCMD_NO_ENEMY;
 #endif
 
 	if ( !isContested() )
-		return SCMD_NO_CONTENTION ;
+		return SCMD_NO_CONTENTION;
 
 	if ( controllingSide != issuer )
-		return SCMD_MUST_OAC ;
+		return SCMD_MUST_OAC;
 
 	if ( armyBasesOwned[issuer] == 0 )
-		return SCMD_NO_ABS ;
+		return SCMD_NO_ABS;
 
-	markOverrunReported() ;
+	markOverrunReported();
 
 	// If it's already flagged as overrun, the report is uneccessary
 	if ( isOverrun() )
-		return SCMD_REPEAT ;
+		return SCMD_REPEAT;
 
 	//// You meet the criteria, did you raise the bar?
 
 	if ( m_overruns->size() < _overrunReportsRequired(side) )
 	{
-		return SCMD_ALLOWED ;
+		return SCMD_ALLOWED;
 	}
 
 	if ( setAlert(CP_STAT_OVERRUN)->isOverrun() )
-		return SCMD_SUCCESS ;
+		return SCMD_SUCCESS;
 
-	return SCMD_ERROR ;
+	return SCMD_ERROR;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -993,12 +993,12 @@ CPStruct::overrun(WWII_SIDE issuer)
 static bool
 _sideObjectivesAvailable(WWII_SIDE forSide, bool isCity)
 {
-	g_objectiveStats.update(forSide) ;
+	g_objectiveStats.update(forSide);
 
 	if ( isCity )
-		return (g_objectiveStats.m_cityAvailable[forSide] > 0) ;
+		return (g_objectiveStats.m_cityAvailable[forSide] > 0);
 	else
-		return (g_objectiveStats.m_bridgeAvailable[forSide] > 0) ;
+		return (g_objectiveStats.m_bridgeAvailable[forSide] > 0);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1011,25 +1011,25 @@ _checkEngagementOrSoftcap(WWII_SIDE forSide, const CPStruct* cp)
 {
 	// A soft cap is a city with no brigade to defend
 	if ( cp->isCity() == false || cp->numUnits() > 0 )
-		return true ;
+		return true;
 	// The one exception is factory towns which have a high
 	// strategic value and therefore may be subject to abuse
 	// of the rules to deprive the enemy the opportunity to
 	// attack.
 	if ( cp->isSupplyCenter() )
-		return true ;
+		return true;
 
 	// Find out how many - if any - engagements are required before a
 	// softcap can be placed.
-	UINT32 engagementQuota = stratEngagementObjectivesQuota(g_objectiveStats.attackCapacity()) ;
+	UINT32 engagementQuota = stratEngagementObjectivesQuota(g_objectiveStats.attackCapacity());
 	// Per Doc's request, when it's zero, allow softcaps for low pop.
 	if ( engagementQuota == 0 )
-		return true ;
+		return true;
 
 	// Get the latest figures
-	g_objectiveStats.update(forSide) ;
+	g_objectiveStats.update(forSide);
 
-	return ( g_objectiveStats.battles(forSide) >= engagementQuota ) ;
+	return ( g_objectiveStats.battles(forSide) >= engagementQuota );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1038,59 +1038,59 @@ _checkEngagementOrSoftcap(WWII_SIDE forSide, const CPStruct* cp)
 SCMD_RESULT
 CPStruct::requestAttack(bool execute, UINT32 brigadeID)
 {
-	StratHCUnit* unit = StratHCUnit::Lookup(brigadeID) ;
+	StratHCUnit* unit = StratHCUnit::Lookup(brigadeID);
 	if ( unit == NULL )
 	{
-		dbugLog(_FLA, "Attempted to issue attack request with brigadeID %u", brigadeID) ;
-		return SCMD_ERROR ;
+		dbugLog(_FLA, "Attempted to issue attack request with brigadeID %u", brigadeID);
+		return SCMD_ERROR;
 	}
 
 	if ( isCity() )
 	{
 		if ( side == unit->side() || country == WWII_CHINA )
-			return SCMD_FRIENDLY_TOWN ;
+			return SCMD_FRIENDLY_TOWN;
 		if ( !isEnemyLinked() )
-			return SCMD_OBJECTIVE_FRONTLINE ;
+			return SCMD_OBJECTIVE_FRONTLINE;
 	}
 
 	if ( unit->offMap() )
-		return SCMD_OTHER_ORDERS ;
+		return SCMD_OTHER_ORDERS;
 
 	if ( isObjective(unit->side()) )
-		return SCMD_OTHER_ORDERS ;
+		return SCMD_OTHER_ORDERS;
 
 	if ( _sideObjectivesAvailable(unit->side(), isCity()) == false )
-		return SCMD_ORDER_LIMIT ;
+		return SCMD_ORDER_LIMIT;
 
 	if ( _checkEngagementOrSoftcap(unit->side(), this) == false )
-		return SCMD_SOFTCAP_DENIED ;
+		return SCMD_SOFTCAP_DENIED;
 
 #ifdef REQUIRE_BRIGADE_LINK_TO_TARGET
 	if ( BRANCH_LAND == unit->movementType() && this->linkTo(unit->homeCP()) == false )
 	{
 		// Brigades require a direct link.
 		if ( unit->isBrigade() )
-			return SCMD_NO_BDE_LINK ;
+			return SCMD_NO_BDE_LINK;
 
 		// Divisions just require a member link.
 		if ( this->hasContactWithDivision(unit) == false )
-			return SCMD_NO_DIV_LINK ;
+			return SCMD_NO_DIV_LINK;
 	}
 #endif
 
 	if ( !execute )
-		return SCMD_ALLOWED ;
+		return SCMD_ALLOWED;
 
 #ifdef STRAT_ANNOUNCE_OBJECTIVES
 	if ( isCity() )
-		chatSendSideMessage(unit->side(), nullObjID, LSTR_NONE, LSTR_CAPTURE_ORDERS, name) ;
+		chatSendSideMessage(unit->side(), nullObjID, LSTR_NONE, LSTR_CAPTURE_ORDERS, name);
 	else
-		chatSendSideMessage(unit->side(), nullObjID, LSTR_NONE, LSTR_ATTACK_ORDERS, name) ;
+		chatSendSideMessage(unit->side(), nullObjID, LSTR_NONE, LSTR_ATTACK_ORDERS, name);
 #endif
 
-	setAttackObjective(true, unit) ;
+	setAttackObjective(true, unit);
 
-	return SCMD_SUCCESS ;
+	return SCMD_SUCCESS;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1102,27 +1102,27 @@ CPStruct::requestClear(WWII_SIDE forSide, UINT32& data, bool execute)
 {
 	// Can't place a defend where an attack already sits
 	if ( !isObjective(forSide) )
-		return SCMD_NO_OBJECTIVE ;
+		return SCMD_NO_OBJECTIVE;
 
 	if ( isCity() && isDefendObjective(forSide) )
-		return SCMD_CITY_AUTODEFENSE ;
+		return SCMD_CITY_AUTODEFENSE;
 
 	if ( m_clearing[forSide] )
-		return SCMD_OTHER_ORDERS ;
+		return SCMD_OTHER_ORDERS;
 
 	if ( isCaptureObjective(forSide) )
 	{
-		data = minimumObjectiveLifetime(teulTime()) ;
+		data = minimumObjectiveLifetime(teulTime());
 		if ( data > 0 )
-			return SCMD_YOUNG_OBJECTIVE ;
+			return SCMD_YOUNG_OBJECTIVE;
 	}
 
 	if ( !execute )
-		return SCMD_ALLOWED ;
+		return SCMD_ALLOWED;
 
-	startObjectiveExpiry(forSide, host_config.objective.clearTime_m * 60) ;
+	startObjectiveExpiry(forSide, host_config.objective.clearTime_m * 60);
 
-	return SCMD_SUCCESS ;
+	return SCMD_SUCCESS;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1133,23 +1133,23 @@ CPStruct::requestDefend(WWII_SIDE forSide, bool execute)
 {
 	// Can't place a defend where an attack already sits etc
 	if ( isObjective(forSide) )
-		return SCMD_OTHER_ORDERS ;
+		return SCMD_OTHER_ORDERS;
 
 	if ( !isBridge() && side != forSide )
-		return SCMD_WRONG_SIDE ;
+		return SCMD_WRONG_SIDE;
 
 	if ( isCity() )
-		return SCMD_CITY_AUTODEFENSE ;
+		return SCMD_CITY_AUTODEFENSE;
 
 	if ( !_sideObjectivesAvailable(forSide, isCity()) )
-		return SCMD_ORDER_LIMIT ;
+		return SCMD_ORDER_LIMIT;
 
 	if ( !execute )
-		return SCMD_ALLOWED ;
+		return SCMD_ALLOWED;
 
-	setDefendObjective(forSide, true) ;
+	setDefendObjective(forSide, true);
 
-	return SCMD_SUCCESS ;
+	return SCMD_SUCCESS;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1159,24 +1159,24 @@ CPStruct*
 CPStruct::runCycleEvents(UINT32 runtime)
 {
 	// Expire EWS reports
-	expireEnemyReports(runtime) ;
+	expireEnemyReports(runtime);
 
 	// Reconsider the EWS state
-	evaluateEWS() ;
+	evaluateEWS();
 
 	// Execute fullback if there is one
-	executeFallback() ;
+	executeFallback();
 
 	// Drain the various fallback/etc histories
-	drainHistories() ;
+	drainHistories();
 
 	// Is this an attack objective being withdrawn?
 	if ( isObjective() && m_attacker != WWII_NO_SIDE && m_clearing[m_attacker] )
 	{
-		chatSendSideMessage(m_attacker, fullObjID, LSTR_CAUTION, LSTR_WITHDRAW_REMINDER, name) ;
+		chatSendSideMessage(m_attacker, fullObjID, LSTR_CAUTION, LSTR_WITHDRAW_REMINDER, name);
 	}
 
-	return this ;
+	return this;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1185,49 +1185,49 @@ CPStruct::runCycleEvents(UINT32 runtime)
 CPStruct*
 CPStruct::setAttackObjective(bool modifyObjectiveList, HCUnit* unit)
 {
-	WWII_SIDE forSide = unit->side() ;
+	WWII_SIDE forSide = unit->side();
 
 	if ( !isAttackObjective(forSide) )
 	{
-		setFlag(attackFlags[forSide]) ;
+		setFlag(attackFlags[forSide]);
 
 		if ( isCity() && isValidSide(side) && !isDefendObjective(side) )
 		{
 # ifdef STRAT_ANNOUNCE_OBJECTIVES
-			chatSendSideMessage(side, nullObjID, LSTR_NONE, LSTR_AUTODEFENSE_ORDERS, name) ;
+			chatSendSideMessage(side, nullObjID, LSTR_NONE, LSTR_AUTODEFENSE_ORDERS, name);
 # endif // STRAT_ANNOUNCE_OBJECTIVES
-			setDefendObjective(side, true) ;
+			setDefendObjective(side, true);
 		}
 
 		if ( isCity() )
-			setTableStates(true) ;
+			setTableStates(true);
 	}
 
-	m_attacker = forSide ;
+	m_attacker = forSide;
 
 	if ( isCity() )
 	{
-		m_attackStarted = teulTime() ;
-		m_attackingUnit = unit ;
+		m_attackStarted = teulTime();
+		m_attackingUnit = unit;
 	}
 
 	// Abandon any clear attempt we were making
-	m_clearing[forSide] = false ;
-	g_objectiveStats.voidStats(forSide) ;
+	m_clearing[forSide] = false;
+	g_objectiveStats.voidStats(forSide);
 
 	if ( modifyObjectiveList )
 	{
-		g_objectives[forSide].insert(this) ;
+		g_objectives[forSide].insert(this);
 	}
 
 #ifdef IS_STRAT_HOST
-	strtQueueCPStatus(this) ;
-	strtSaveCP(this) ;
+	strtQueueCPStatus(this);
+	strtSaveCP(this);
 #endif
 
-	dbugLog(_FLN, "cp:%s hcu:%s placing attack objective", name, unit->callsign()) ;
+	dbugLog(_FLN, "cp:%s hcu:%s placing attack objective", name, unit->callsign());
 
-	return this ;
+	return this;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1236,31 +1236,31 @@ CPStruct::setAttackObjective(bool modifyObjectiveList, HCUnit* unit)
 CPStruct*
 CPStruct::setDefendObjective(WWII_SIDE forSide, bool modifyObjectiveList)
 {
-	WWII_SIDE otherSide = wwiiOtherSide(forSide) ;
-	assert( isBridge() || !isValidSide(otherSide) || isAttackObjective(otherSide) ) ;
+	WWII_SIDE otherSide = wwiiOtherSide(forSide);
+	assert( isBridge() || !isValidSide(otherSide) || isAttackObjective(otherSide) );
 	if ( isCity() && !isAttackObjective(otherSide) )
-		dbugLog(_FLA, "cp:%s setting city defend objective without attack???", name) ;
+		dbugLog(_FLA, "cp:%s setting city defend objective without attack???", name);
 
-	setFlag(defendFlags[forSide]) ;
+	setFlag(defendFlags[forSide]);
 
 	// Abandon any clear attempt we were making
-	m_clearing[forSide] = false ;
+	m_clearing[forSide] = false;
 
-	g_objectiveStats.voidStats(forSide) ;
+	g_objectiveStats.voidStats(forSide);
 
 	if ( modifyObjectiveList )
 	{
-		g_objectives[forSide].insert(this) ;
+		g_objectives[forSide].insert(this);
 	}
 
 #ifdef IS_STRAT_HOST
-	strtQueueCPStatus(this) ;
-	strtSaveCP(this) ;
+	strtQueueCPStatus(this);
+	strtSaveCP(this);
 #endif
 
-	dbugLog(_FLN, "cp:%s placing defense objective", name) ;
+	dbugLog(_FLN, "cp:%s placing defense objective", name);
 
-	return this ;
+	return this;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1270,10 +1270,10 @@ void
 CPStruct::setSupplyCenter()
 {
 	if ( m_isSupplyCenter )
-		return ;
+		return;
 
-	m_isSupplyCenter = true ;
-	suppliers.insert(this) ;
+	m_isSupplyCenter = true;
+	suppliers.insert(this);
 }
 
 
@@ -1283,28 +1283,28 @@ CPStruct::setSupplyCenter()
 void
 CPStruct::setTableStates(bool isNewObjective)
 {
-	FacilityStruct* fac ;
+	FacilityStruct* fac;
 
-	dbugLog(_FLI, "contentionTables(%s) : %s", name, ((isContested())?"con":"uncon")) ;
+	dbugLog(_FLI, "contentionTables(%s) : %s", name, ((isContested())?"con":"uncon"));
 
-	for ( fac = facilityList ; fac != NULL ; fac = fac->next )
+	for ( fac = facilityList; fac != NULL; fac = fac->next )
 	{
 		if ( fac->canBeCaptured() == false )
-			continue ;
+			continue;
 
 		if ( !isObjective() )
 		{
 			// No objective, no tables
-			betaLog(_FLD, "NORB hiding %s non-obj table", fac->name) ;
-			fac->setCaptureDisabled() ;
+			betaLog(_FLD, "NORB hiding %s non-obj table", fac->name);
+			fac->setCaptureDisabled();
 
 			// If the facility is spawnable and closed, time to wake it up
 			if ( fac->m_spawnable && !fac->isOpen() )
 			{
-				betaLog(_FLI, "opening %s since no objective", fac->name) ;
-				strtOpenBase(*fac) ;
+				betaLog(_FLI, "opening %s since no objective", fac->name);
+				strtOpenBase(*fac);
 			}
-			continue ;
+			continue;
 		}
 
 		if ( fac->isMilitaryFacility() )
@@ -1313,19 +1313,19 @@ CPStruct::setTableStates(bool isNewObjective)
 			// entered contention, they should redraw soon
 			if ( isContested() )
 			{
-				betaLog(_FLD, "RB-MF table %s", fac->name) ;
-				fac->setCapturePending() ;
+				betaLog(_FLD, "RB-MF table %s", fac->name);
+				fac->setCapturePending();
 			}
 			else
 			{
-				betaLog(_FLD, "NORB-MF hiding %s", fac->name) ;
-				fac->setCaptureDisabled() ;
+				betaLog(_FLD, "NORB-MF hiding %s", fac->name);
+				fac->setCaptureDisabled();
 			}
 		}
 		else if ( isNewObjective )
 		{
-			betaLog(_FLD, "RB show %s table no radio", fac->name) ;
-			fac->setCapturePending() ;
+			betaLog(_FLD, "RB show %s table no radio", fac->name);
+			fac->setCapturePending();
 		}
 	}
 }
@@ -1337,13 +1337,13 @@ CPStruct::setTableStates(bool isNewObjective)
 void
 CPStruct::startObjectiveExpiry(WWII_SIDE forSide, UINT32 delay)
 {
-	cnvyScheduleObjectiveExpiry(this, forSide, delay) ;
+	cnvyScheduleObjectiveExpiry(this, forSide, delay);
 
 #ifdef STRAT_ANNOUNCE_OBJECTIVES
-	chatSendSideMessage(forSide, nullObjID, LSTR_NONE, LSTR_OBJECTIVE_WITHDRAWING, name) ;
+	chatSendSideMessage(forSide, nullObjID, LSTR_NONE, LSTR_OBJECTIVE_WITHDRAWING, name);
 #endif
 
-	m_clearing[forSide] = true ;
+	m_clearing[forSide] = true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1354,71 +1354,71 @@ bool
 strtBuildSupplyChains(bool force)
 {
 	if ( supplyStabilized && force == false )
-		return false ;
+		return false;
 
-	supplyStabilized = true ;
+	supplyStabilized = true;
 
-	RoutingPropagator propagator ;
+	RoutingPropagator propagator;
 
-	teulSyncClock() ;
-	const TeulTimeMS started = teulClock64 ;
+	teulSyncClock();
+	const TeulTimeMS started = teulClock64;
 
-	propagator.Run(suppliers) ;
-	teulSyncClock() ;
-	const TeulTimeMS runEnded = teulClock64 ;
+	propagator.Run(suppliers);
+	teulSyncClock();
+	const TeulTimeMS runEnded = teulClock64;
 
-	propagator.Apply(strtGetCPList()) ;
+	propagator.Apply(strtGetCPList());
 
-	teulSyncClock() ;
-	const TeulTimeMS applyEnded = teulClock64 ;
-	dbugLog(_FLI, "sup: supply routeing took %llums [%llu run, %llu apply]", teulClock64 - started, runEnded - started, applyEnded - runEnded) ;
+	teulSyncClock();
+	const TeulTimeMS applyEnded = teulClock64;
+	dbugLog(_FLI, "sup: supply routeing took %llums [%llu run, %llu apply]", teulClock64 - started, runEnded - started, applyEnded - runEnded);
 
-	return true ;
+	return true;
 }
 
 bool
 CPStruct::hasContactWithDivision(const StratHCUnit* unit) const
 {
-	const StratHCUnit* candidate ;
+	const StratHCUnit* candidate;
 
 	if ( unit->type() == HCU_BRIGADE )
-		candidate = unit->parent() ;
+		candidate = unit->parent();
 	else if ( unit->type() == HCU_DIVISION )
-		candidate = unit ;
+		candidate = unit;
 	else
-		return false ;
+		return false;
 
-	for ( ; candidate != NULL ; candidate = candidate->next() )
+	for (; candidate != NULL; candidate = candidate->next() )
 	{
 		if ( candidate->unitID() == unit->unitID() || candidate->homeCP() == NULL )
-			continue ;
+			continue;
 
 		if ( candidate->homeCP() == this )
 		{
-			return true ;
+			return true;
 		}
 
 		if ( linkTo(candidate->homeCP()) != NULL )
 		{
-			return true ;
+			return true;
 		}
 	}
 
-	return false ;
+	return false;
 }
 
 static UINT32 _getValue(const HCUnit& unit)
 {
-	UINT32 base = (unit.isBrigade() ? 1 : 3) ;
+	UINT32 base = (unit.isBrigade() ? 1 : 3);
 	switch ( unit.movementType() )
 	{
 	case BRANCH_AIR:
-		return base + 1 ;
+		return base + 1;
 	case BRANCH_SEA:
-		return base + 2 ;
+		return base + 2;
 	default:
 	case BRANCH_LAND:
-		return base ;
+		return base;
 	}
 }
 
@@ -1429,12 +1429,12 @@ static inline bool
 _updateFirebases(const HCUnit& unit, CPStruct* cp)
 {
 	if ( cp == NULL )
-		return false ;
+		return false;
 	if ( unit.movementType() == BRANCH_LAND && unit.branch() == BRANCH_LAND && unit.isBrigade() == true )
-		return true ;
+		return true;
 	if ( cp->isEnemyLinked() && cp->m_units.empty() == true )
-		return true ;
-	return false ;
+		return true;
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1443,11 +1443,11 @@ _updateFirebases(const HCUnit& unit, CPStruct* cp)
 void
 CPStruct::addUnit(HCUnit& unit)
 {
-	m_units[unit.unitID()] = &unit ;
-	m_value += _getValue(unit) ;
+	m_units[unit.unitID()] = &unit;
+	m_value += _getValue(unit);
 
 	if ( _updateFirebases(unit, this) )
-		processFirebases(false) ;
+		processFirebases(false);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1457,11 +1457,11 @@ void
 CPStruct::removeUnit(const HCUnit& unit)
 {
 	if ( m_units.find(unit.unitID()) != m_units.end() )
-		m_value -= _getValue(unit) ;
-	m_units.erase(unit.unitID()) ;
+		m_value -= _getValue(unit);
+	m_units.erase(unit.unitID());
 
 	if ( _updateFirebases(unit, this) == true )
-		processFirebases(true) ;
+		processFirebases(true);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1471,16 +1471,16 @@ bool
 CPStruct::hasHCUnit(UINT32 unitID) const
 {
 	if ( m_units.empty() )
-		return false ;
+		return false;
 
-	HCUNIT_INDEX::const_iterator it ;
-	for ( it = m_units.begin() ; it != m_units.end() ; ++it )
+	HCUNIT_INDEX::const_iterator it;
+	for ( it = m_units.begin(); it != m_units.end(); ++it )
 	{
 		if ( it->first == unitID )
-			return true ;
+			return true;
 	}
 
-	return false ;
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1491,33 +1491,33 @@ CPStruct::resetRouteing()
 {
 	if ( (isCity() == false) | (numLinks == 0) | (country == WWII_CHINA) )
 	{
-		m_isRouteingConnected = true ;
-		return ;
+		m_isRouteingConnected = true;
+		return;
 	}
 
-	setRouteing(false) ;
+	setRouteing(false);
 }
 
 void
 CPStruct::setRouteing(bool isConnected)
 {
 	if ( isConnected == m_isRouteingConnected )
-		return ;
+		return;
 
 	// We need to rebuild the links again
-	supplyStabilized = false ;
+	supplyStabilized = false;
 
-	m_isRouteingConnected = isConnected ;
+	m_isRouteingConnected = isConnected;
 
 	if ( m_isRouteingConnected )
 	{
-		flags |= CP_STAT_IN_SUPPLY ;
-		restartSupplies() ;
+		flags |= CP_STAT_IN_SUPPLY;
+		restartSupplies();
 	}
 	else
-		flags &= ~CP_STAT_IN_SUPPLY ;
+		flags &= ~CP_STAT_IN_SUPPLY;
 
 #ifdef IS_STRAT_HOST
-	strtQueueCPStatus(this) ;
+	strtQueueCPStatus(this);
 #endif
 }

@@ -554,7 +554,7 @@ void GameInfoView::DrawSelf()
 	DisplayInfo
 *************************************************************************************************/
 #if platOS == OS_WIN32 && (!defined(RELEASE_CLIENT) || RELEASE_CLIENT == 0)
-	extern std::vector<std::wstring> updtGetNvHistory() ;
+	extern std::vector<std::wstring> updtGetNvHistory();
 #endif
 
 void GameInfoView::DisplayInfo()
@@ -584,11 +584,11 @@ void GameInfoView::DisplayInfo()
 	DrawString(L"%ls: %ls\n", strings["hud.gameinfo.icon"].c_str(), strings[modeKey].c_str());
 
 #if defined(BETA_RELEASE)
-	DrawString(L"%ls\n", clientGetNetworkState().c_str()) ;
+	DrawString(L"%ls\n", clientGetNetworkState().c_str());
 #endif
 
 #ifdef VEHICLES_GAME_INFO
-	DrawString("%s\n", vehVehiclesGameInfo().c_str()) ;
+	DrawString("%s\n", vehVehiclesGameInfo().c_str());
 #endif
 
 #if RELEASE_CLIENT == 0
@@ -618,9 +618,9 @@ void GameInfoView::DisplayInfo()
 
 #if platOS == OS_WIN32 && (!defined(RELEASE_CLIENT) || RELEASE_CLIENT == 0)
 	std::vector<std::wstring> nvHistory = updtGetNvHistory();
-	for ( auto it = nvHistory.begin() ; it != nvHistory.end() ; ++it )
+	for ( auto it = nvHistory.begin(); it != nvHistory.end(); ++it )
 	{
-		DrawString(L"%ls\n", it->c_str()) ;
+		DrawString(L"%ls\n", it->c_str());
 	}
 #endif
 }

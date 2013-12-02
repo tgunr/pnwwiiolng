@@ -15,12 +15,12 @@
 #include "teul/teulPacket.h"
 #include "teul/teulTransmission.h"
 
-static char s_buffer[Teul::MaxPacket*2] ;
+static char s_buffer[Teul::MaxPacket*2];
 
 void*
 TeulTransmission::_staticBuffer()
 {
-	return s_buffer ;
+	return s_buffer;
 }
 
 bool
@@ -28,35 +28,35 @@ TeulTransmission::_checkData() const
 {
 	if ( m_callback == NULL )
 	{
-		dbugLog(_FLA, "%s: tried to send TeulTransmission with NULL callback", __FUNCTION__) ;
-		return false ;
+		dbugLog(_FLA, "%s: tried to send TeulTransmission with NULL callback", __FUNCTION__);
+		return false;
 	}
 	if ( m_buffer == NULL )
 	{
-		dbugLog(_FLA, "%s tried to send TeulTransmission with NULL buffer", __FUNCTION__) ;
-		return false ;
+		dbugLog(_FLA, "%s tried to send TeulTransmission with NULL buffer", __FUNCTION__);
+		return false;
 	}
 	if ( m_size < 0 )
 	{
-		dbugLog(_FLA, "%s tried to send TeulTransmission with invalid packed buffer [%d bytes]", __FUNCTION__, m_size) ;
-		return false ;
+		dbugLog(_FLA, "%s tried to send TeulTransmission with invalid packed buffer [%d bytes]", __FUNCTION__, m_size);
+		return false;
 	}
-	return true ;
+	return true;
 }
 
 SINT32
 TeulTransmission::send(SINT32 teulIndex) const
 {
-	ENDPOINT* const endpoint = teulGetEndpoint(teulIndex) ;
+	ENDPOINT* const endpoint = teulGetEndpoint(teulIndex);
 	if ( endpoint == NULL )
-		return -EINVAL ;
+		return -EINVAL;
 
 	if ( endpoint->state() != IS_OPEN )
-		return -EINVAL ;
+		return -EINVAL;
 
-	Teul::Packet outgoing(m_size, m_callback->callX(), m_callback->callY()) ;
-	outgoing.append((UCHAR*)m_buffer, m_size) ;
-	return outgoing.send(*endpoint) ;
+	Teul::Packet outgoing(m_size, m_callback->callX(), m_callback->callY());
+	outgoing.append((UCHAR*)m_buffer, m_size);
+	return outgoing.send(*endpoint);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -68,16 +68,16 @@ TeulTransmission::populate(void* data, SINT32 teulIndex)
 {
 	if ( m_callback == NULL )
 	{
-		dbugLog(_FLA, "%s: no callback to populate transmission from", __FUNCTION__) ;
-		return -ENOENT ;
+		dbugLog(_FLA, "%s: no callback to populate transmission from", __FUNCTION__);
+		return -ENOENT;
 	}
 	if ( m_buffer == NULL )
 	{
-		dbugLog(_FLA, "%s: no buffer to populate transmission into", __FUNCTION__) ;
-		return -EINVAL ;
+		dbugLog(_FLA, "%s: no buffer to populate transmission into", __FUNCTION__);
+		return -EINVAL;
 	}
 
-	m_callback->outData = data ;
+	m_callback->outData = data;
 
 	// All packers need an ACTION_OBJECT, and we
 	ACTION_OBJECT actionObj;
@@ -87,13 +87,13 @@ TeulTransmission::populate(void* data, SINT32 teulIndex)
 	actionObj.localRawData = data;
 	actionObj.packed = (UCHAR*)m_buffer;
 	actionObj.offset = 0;
-	actionObj.m_size_bytes = -1 ;
+	actionObj.m_size_bytes = -1;
 
-	m_size = (m_callback->m_sendAction)(&actionObj) ;
+	m_size = (m_callback->m_sendAction)(&actionObj);
 	if ( m_size < 0 )
 	{
-		dbugLog(_FLA, "t:%d cb:%u,%u pack failed:%d probable data corruption", teulIndex, m_callback->callX(), m_callback->callY(), m_size) ;
+		dbugLog(_FLA, "t:%d cb:%u,%u pack failed:%d probable data corruption", teulIndex, m_callback->callX(), m_callback->callY(), m_size);
 	}
 
-	return m_size ;
+	return m_size;
 }

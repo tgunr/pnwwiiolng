@@ -146,7 +146,7 @@ piVECTOR	v1, v2, v3;
 	v2 = pscrn[1];
 	v3 = pscrn[2];
 
-	for (i=0 ; i < shadow_texture_size ; i++)
+	for (i=0; i < shadow_texture_size; i++)
 	{
 		bounds[i][0] = shadow_texture_size;
 		bounds[i][1] = -1;
@@ -180,7 +180,7 @@ piVECTOR	v1, v2, v3;
 	dx = v2.x - bx;
 	dy = v2.y - by;
 	GetStep(dx, dy, &sx, &sy, &count);
-	for (i=0 ; i < count ; i++)
+	for (i=0; i < count; i++)
 	{
 #ifdef SHADOW_BOUNDS_DEBUG
 		if (bx < shadow_start_x)
@@ -246,7 +246,7 @@ piVECTOR	v1, v2, v3;
 	dx = v3.x - bx;
 	dy = v3.y - by;
 	GetStep(dx, dy, &sx, &sy, &count);
-	for (i=0 ; i < count ; i++)
+	for (i=0; i < count; i++)
 	{
 #ifdef SHADOW_BOUNDS_DEBUG
 		if (bx < shadow_start_x)
@@ -312,7 +312,7 @@ piVECTOR	v1, v2, v3;
 	dx = v1.x - bx;
 	dy = v1.y - by;
 	GetStep(dx, dy, &sx, &sy, &count);
-	for (i=0 ; i < count ; i++)
+	for (i=0; i < count; i++)
 	{
 #ifdef SHADOW_BOUNDS_DEBUG
 		if (bx < shadow_start_x)
@@ -351,7 +351,7 @@ piVECTOR	v1, v2, v3;
 	}
 
 #ifndef SHADOW_BOUNDS_DEBUG
-	for (i=shadow_start_y ; i <= shadow_finish_y ; i++)
+	for (i=shadow_start_y; i <= shadow_finish_y; i++)
 	{
 		if (bounds[i][0] < shadow_start_x)
 		{
@@ -378,9 +378,9 @@ piVECTOR	v1, v2, v3;
 	if (lppisd->PixelFormat.dwRGBBitCount <= 8)
 	{
 		cptr = (char*)lppisd->Surface;
-		for (i=shadow_start_y ; i <= shadow_finish_y ; i++)
+		for (i=shadow_start_y; i <= shadow_finish_y; i++)
 		{
-			for (j=bounds[i][0] ; j <= bounds[i][1] ; j++)
+			for (j=bounds[i][0]; j <= bounds[i][1]; j++)
 			{
 				cptr[j] = (char)color;
 			}
@@ -392,9 +392,9 @@ piVECTOR	v1, v2, v3;
 	if (lppisd->PixelFormat.dwRGBBitCount <= 16)
 	{
 		sptr = (short*)lppisd->Surface;
-		for (i=shadow_start_y ; i <= shadow_finish_y ; i++)
+		for (i=shadow_start_y; i <= shadow_finish_y; i++)
 		{
-			for (j=bounds[i][0] ; j <= bounds[i][1] ; j++)
+			for (j=bounds[i][0]; j <= bounds[i][1]; j++)
 			{
 				sptr[j] = (short)color;
 			}
@@ -406,9 +406,9 @@ piVECTOR	v1, v2, v3;
 	if (lppisd->PixelFormat.dwRGBBitCount <= 32)
 	{
 		lptr = (long*)lppisd->Surface;
-		for (i=shadow_start_y ; i < shadow_finish_y ; i++)
+		for (i=shadow_start_y; i < shadow_finish_y; i++)
 		{
-			for (j=bounds[i][0] ; j <= bounds[i][1] ; j++)
+			for (j=bounds[i][0]; j <= bounds[i][1]; j++)
 			{
 				lptr[j] = (long)color;
 			}
@@ -450,7 +450,7 @@ piVECTOR*	obox;
 		{
 			piVectorConstPtr ipos = lpatt->ImmutablePositions();
 
-			for (i=0 ; i < lpatt->numverts ; i++, ++ipos)
+			for (i=0; i < lpatt->numverts; i++, ++ipos)
 			{
 				math3dMultiplyRotation(&pos, ipos.ptr, &lpatt->mat);
 
@@ -718,7 +718,7 @@ piMATRIX*		lpmat;
 				usemat = FALSE;
 			}
 
-			for (i=0 ; i < numtris ; i++, psnorms++)
+			for (i=0; i < numtris; i++, psnorms++)
 			{
 				v1 = ptris[i].v1;
 				v2 = ptris[i].v2;
@@ -968,7 +968,7 @@ piMATRIX		mat;
 	lpshad->pos.z = (pos[0].z + pos[1].z + pos[2].z + pos[3].z) / 4.0f;
 
 	color = colorBLACK;
-	for (i=0 ; i < 4 ; i++, ++stex, ++spos, ++sc)
+	for (i=0; i < 4; i++, ++stex, ++spos, ++sc)
 	{
 		switch (i)
 		{

@@ -593,7 +593,7 @@ bool GenerateIcons::wantModel(UINT32 mt)
   (
     mt == ModelTypes::TERRAIN_TILE
    )
-  ;
+ ;
 }
 
 /*---------------------------------------------------------------------------

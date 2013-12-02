@@ -36,15 +36,15 @@ class CPCollider
 {
 public:
 	CPCollider() : x1(0x7fffffff), y1(0x7fffffff), x2(0x80000000), y2(0x80000000), cx(0), cy(0), cp(NULL) {}
-	SINT32	x1, y1 ;	// bottom left
-	SINT32	x2, y2 ;	// top right
-	SINT32	cx, cy ;	// Center x/y
-	CPStruct*	cp ;
-} ;
+	SINT32	x1, y1;	// bottom left
+	SINT32	x2, y2;	// top right
+	SINT32	cx, cy;	// Center x/y
+	CPStruct*	cp;
+};
 
-typedef std::pair<SINT32, SINT32> ColliderKey ;
-static const UINT32 COLLISION_GRID_SHIFT = 11 ;	// Each grid space is 2048^2m granularity
-static const SINT32 COLLISION_MARGIN = 2000 ;	// Extend each bounding box out this far from town
+typedef std::pair<SINT32, SINT32> ColliderKey;
+static const UINT32 COLLISION_GRID_SHIFT = 11;	// Each grid space is 2048^2m granularity
+static const SINT32 COLLISION_MARGIN = 2000;	// Extend each bounding box out this far from town
 
 namespace std
 {
@@ -58,10 +58,10 @@ namespace std
 	};
 }
 
-typedef std::vector<CPCollider*> COLLIDERS ;
-typedef std::unordered_map<ColliderKey, COLLIDERS> CP_MAP ;
-static CP_MAP _cpMap ;
-extern CPStruct* _cpList ;
+typedef std::vector<CPCollider*> COLLIDERS;
+typedef std::unordered_map<ColliderKey, COLLIDERS> CP_MAP;
+static CP_MAP _cpMap;
+extern CPStruct* _cpList;
 
 //////////////////////////////////////////////////////////////////////
 // Find the distance between meter-coordinates position and the center
@@ -70,9 +70,9 @@ extern CPStruct* _cpList ;
 static UINT64
 _distance(const CPCollider& collider, SINT32 x, SINT32 y)
 {
-	const SINT64 xd = (x - collider.cx) ;
-	const SINT64 yd = (y - collider.cy) ;
-	return (UINT64)((xd * xd) + (yd * yd)) ;
+	const SINT64 xd = (x - collider.cx);
+	const SINT64 yd = (y - collider.cy);
+	return (UINT64)((xd * xd) + (yd * yd));
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -81,7 +81,7 @@ _distance(const CPCollider& collider, SINT32 x, SINT32 y)
 static inline bool
 _collide(const CPCollider& collider, SINT32 x, SINT32 y)
 {
-	return ( x >= collider.x1 && x <= collider.x2 && y >= collider.y1 && y <= collider.y2 ) ;
+	return ( x >= collider.x1 && x <= collider.x2 && y >= collider.y1 && y <= collider.y2 );
 }
 
 #ifdef PICKY
@@ -97,16 +97,16 @@ _singleAxisDistance(SINT32 negativeEdge, SINT32 positiveEdge, SINT32 pointOnAxis
 	if ( negativeEdge > pointOnAxis )
 	{
 		// Point is below/left of the lower/left edge.
-		return negativeEdge - pointOnAxis ;
+		return negativeEdge - pointOnAxis;
 	}
 	if ( pointOnAxis > positiveEdge )
 	{
 		// Point is above/right of the upper/right edge.
-		return pointOnAxis - positiveEdge ;
+		return pointOnAxis - positiveEdge;
 	}
 
 	// Otherwise it is between the two edges
-	return 0 ;
+	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -117,9 +117,9 @@ static UINT64
 _boxDistance2(const CPCollider& collider, SINT32 x, SINT32 y)
 {
 	// X1/Y1 are bottom left, X2/Y2 are top right
-	SINT64 xd = _singleAxisDistance(collider.x1, collider.x2, x) ;
-	SINT64 yd = _singleAxisDistance(collider.y1, collider.y2, y) ;
-	return (UINT64)((xd * xd) + (yd * yd)) ;
+	SINT64 xd = _singleAxisDistance(collider.x1, collider.x2, x);
+	SINT64 yd = _singleAxisDistance(collider.y1, collider.y2, y);
+	return (UINT64)((xd * xd) + (yd * yd));
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -129,9 +129,9 @@ static UINT64
 _facilityDistance(const FacilityStruct* facility, SINT32 x, SINT32 y)
 {
 	// X1/Y1 are bottom left, X2/Y2 are top right
-	SINT64 xd = (x - facility->m_posX) ;
-	SINT64 yd = (y - facility->m_posY) ;
-	return (UINT64)((xd * xd) + (yd * yd)) ;
+	SINT64 xd = (x - facility->m_posX);
+	SINT64 yd = (y - facility->m_posY);
+	return (UINT64)((xd * xd) + (yd * yd));
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -140,112 +140,112 @@ _facilityDistance(const FacilityStruct* facility, SINT32 x, SINT32 y)
 static const FacilityStruct*
 _checkFacilities(const CPStruct* cp, SINT32 x, SINT32 y, UINT64& closestDist, const FacilityStruct* closest)
 {
-	UINT64 dist ;
-	const FacilityStruct* fac ;
-	for ( fac = cp->facilityList ; fac != NULL ; fac = fac->next )
+	UINT64 dist;
+	const FacilityStruct* fac;
+	for ( fac = cp->facilityList; fac != NULL; fac = fac->next )
 	{
 		if ( fac->type == FACILITY_FIREBASE )
 		{
 			// Firebases are supposed to be far away from the home town,
 			// so being near an FB doesn't count. EWS is about towns.
-			continue ;
+			continue;
 		}
-		dist = _facilityDistance(fac, x, y) ;
+		dist = _facilityDistance(fac, x, y);
 		if ( dist < closestDist )
 		{
-			closest = fac ;
-			closestDist = dist ;
+			closest = fac;
+			closestDist = dist;
 		}
 	}
 
-	return closest ;
+	return closest;
 }
 #endif
 
 void
 strtBuildCPColliders()
 {
-	teulSyncClock() ;
-	TeulTimeMS startMs = teulClock64 ;
+	teulSyncClock();
+	TeulTimeMS startMs = teulClock64;
 
-	CPStruct* cp ;
-	FacilityStruct* fac ;
-	for ( cp = _cpList ; cp != NULL ; cp = cp->next )
+	CPStruct* cp;
+	FacilityStruct* fac;
+	for ( cp = _cpList; cp != NULL; cp = cp->next )
 	{
 		if ( !cp->isCity() )
-			continue ;						// Bridges don't count.
+			continue;						// Bridges don't count.
 
-		CPCollider* collider = new CPCollider ;
-		for ( fac = cp->facilityList ; fac != NULL ; fac = fac->next )
+		CPCollider* collider = new CPCollider;
+		for ( fac = cp->facilityList; fac != NULL; fac = fac->next )
 		{
 			if ( fac->type == FACILITY_FIREBASE )
 			{
 				// Again: Firebases are designed to be a long way away
 				// from the CP they belong to, so they don't count.
-				continue ;
+				continue;
 			}
 
 			// Stretch the bounding box to encompass the position
 			// of this facility.
 			if ( fac->m_posX < collider->x1 )
-				collider->x1 = fac->m_posX ;
+				collider->x1 = fac->m_posX;
 			if ( fac->m_posX > collider->x2 )
-				collider->x2 = fac->m_posX ;
+				collider->x2 = fac->m_posX;
 			if ( fac->m_posY < collider->y1 )
-				collider->y1 = fac->m_posY ;
+				collider->y1 = fac->m_posY;
 			if ( fac->m_posY > collider->y2 )
-				collider->y2 = fac->m_posY ;
+				collider->y2 = fac->m_posY;
 		}
 
-		collider->cp = cp ;
+		collider->cp = cp;
 
 		// Calculate the center of the bounding box.
-		collider->cx = collider->x1 + (collider->x2 - collider->x1) / 2 ;
-		collider->cy = collider->y1 + (collider->y2 - collider->y1) / 2 ;
+		collider->cx = collider->x1 + (collider->x2 - collider->x1) / 2;
+		collider->cy = collider->y1 + (collider->y2 - collider->y1) / 2;
 
 		// The box we have has corners centered on individual facilities;
 		// we add "COLLISION_MARGIN" to transform it into a larger
 		// footprint.
-		collider->x1 -= COLLISION_MARGIN ;
-		collider->x2 += COLLISION_MARGIN ;
-		collider->y1 -= COLLISION_MARGIN ;
-		collider->y2 += COLLISION_MARGIN ;
+		collider->x1 -= COLLISION_MARGIN;
+		collider->x2 += COLLISION_MARGIN;
+		collider->y1 -= COLLISION_MARGIN;
+		collider->y2 += COLLISION_MARGIN;
 
 		// Now point to this collider in every cell of the grid that
 		// it overlaps with.
-		SINT32 gx, gy ;
-		for ( gx = collider->x1 >> COLLISION_GRID_SHIFT ;
-			  gx <= collider->x2 >> COLLISION_GRID_SHIFT ;
+		SINT32 gx, gy;
+		for ( gx = collider->x1 >> COLLISION_GRID_SHIFT;
+			  gx <= collider->x2 >> COLLISION_GRID_SHIFT;
 			  ++gx )
 		{
-			for ( gy = collider->y1 >> COLLISION_GRID_SHIFT ;
-				  gy <= collider->y2 >> COLLISION_GRID_SHIFT ;
+			for ( gy = collider->y1 >> COLLISION_GRID_SHIFT;
+				  gy <= collider->y2 >> COLLISION_GRID_SHIFT;
 				  ++gy )
 			{
-				_cpMap[std::make_pair(gx,gy)].push_back(collider) ;
+				_cpMap[std::make_pair(gx,gy)].push_back(collider);
 			}
 		}
 	}
 
-	CP_MAP::const_iterator it ;
-	UINT32 cells = 0, entries = 0, overlaps = 0 ;
-	for ( it = _cpMap.begin() ; it != _cpMap.end() ; ++it )
+	CP_MAP::const_iterator it;
+	UINT32 cells = 0, entries = 0, overlaps = 0;
+	for ( it = _cpMap.begin(); it != _cpMap.end(); ++it )
 	{
-		++cells ;
-		entries += it->second.size() ;
+		++cells;
+		entries += it->second.size();
 		if ( it->second.size() > 1 )
 		{
-			++overlaps ;
+			++overlaps;
 		}
 	}
 
-	teulSyncClock() ;
-	const TeulTimeMS endMs = teulClock64 ;
+	teulSyncClock();
+	const TeulTimeMS endMs = teulClock64;
 
 	dbugLog(_FLI, "colliders: %u cells, %u entries, %u overlaps, %f average/cell. Took %llums"
 					, cells, entries, overlaps, ((FLOAT32)entries / (FLOAT32)cells)
 					, endMs - startMs
-					) ;
+					);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -254,57 +254,57 @@ strtBuildCPColliders()
 CPStruct*
 strtFindClosestCP(SINT32 x, SINT32 y)
 {
-	CP_MAP::iterator it ;
-	it = _cpMap.find(std::make_pair(x>>COLLISION_GRID_SHIFT, y>>COLLISION_GRID_SHIFT)) ;
+	CP_MAP::iterator it;
+	it = _cpMap.find(std::make_pair(x>>COLLISION_GRID_SHIFT, y>>COLLISION_GRID_SHIFT));
 	if ( it == _cpMap.end() )
-		return NULL ;
+		return NULL;
 
-	COLLIDERS& colliders = it->second ;
+	COLLIDERS& colliders = it->second;
 	if ( colliders.size() == 1 && _collide(*colliders[0], x, y) )
-		return colliders[0]->cp ;
+		return colliders[0]->cp;
 
 	// More than one CP, may be overlap
-	bool gotCandidate = false ;
-	UINT32 candidate = 0 ;
+	bool gotCandidate = false;
+	UINT32 candidate = 0;
 #ifdef PICKY
-	UINT32 candidate2 = 0 ;
+	UINT32 candidate2 = 0;
 #endif
-	for ( UINT32 i = 0 ; i < colliders.size() ; ++i )
+	for ( UINT32 i = 0; i < colliders.size(); ++i )
 	{
 		if ( !_collide(*colliders[i], x, y) )
-			continue ;
+			continue;
 		if ( gotCandidate )
 		{
-			UINT64 oldDist = _distance(*colliders[candidate], x, y) ;
-			UINT64 newDist = _distance(*colliders[i], x, y) ;
+			UINT64 oldDist = _distance(*colliders[candidate], x, y);
+			UINT64 newDist = _distance(*colliders[i], x, y);
 			if ( oldDist <= newDist )
-				continue ;
+				continue;
 #ifdef PICKY
-			candidate2 = candidate ;
+			candidate2 = candidate;
 #endif
 		}
 
-		gotCandidate = true ;
-		candidate = i ;
+		gotCandidate = true;
+		candidate = i;
 	}
 
 	if ( !gotCandidate )
-		return NULL ;
+		return NULL;
 
 #ifdef PICKY
 	if ( candidate2 == 0 )
-		return colliders[candidate]->cp ;
+		return colliders[candidate]->cp;
 
 	// Check facilities in candidate2 for something close to us
-	UINT64 closestDist = (UINT64)-1LL ;
-	const FacilityStruct* closest ;
-	closest = _checkFacilities(colliders[candidate2]->cp, x, y, closestDist, closest) ;
-	closest = _checkFacilities(colliders[candidate]->cp, x, y, closestDist, closest) ;
+	UINT64 closestDist = (UINT64)-1LL;
+	const FacilityStruct* closest;
+	closest = _checkFacilities(colliders[candidate2]->cp, x, y, closestDist, closest);
+	closest = _checkFacilities(colliders[candidate]->cp, x, y, closestDist, closest);
 
 	if ( closest != NULL )
-		return closest->cp ;
+		return closest->cp;
 #endif // PICKY
 
-	return colliders[candidate]->cp ;
+	return colliders[candidate]->cp;
 }
 

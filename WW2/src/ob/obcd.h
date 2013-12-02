@@ -14,7 +14,7 @@ struct COLLISION
 	piVECTOR	colnormal;
 	FLOAT32		colangle;
 
-} ;
+};
 
 struct FASTCOLLIDE
 {
@@ -27,7 +27,7 @@ struct FASTCOLLIDE
 	FLOAT32 CollideTime;
 	FLOAT32 Alpha;
 	UINT32 Flags;
-} ;
+};
 
 
 extern LOGICAL obcdCheckObjectCollision(OBJECT* lpobj, COLLISION* collision);

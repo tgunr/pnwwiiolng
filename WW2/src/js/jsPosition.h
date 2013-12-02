@@ -2,7 +2,7 @@
 
 #include "phui/Javascript.h"
 
-namespace StratDB { class StratObject ; }
+namespace StratDB { class StratObject; }
 
 /************************************************************************************************
 	jsPosition

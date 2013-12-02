@@ -11,13 +11,13 @@
 
 #include "miss/missionTypes.h"
 
-class Mission ;
-class Player ;
-class MissionPacket ;
-class FacilityStruct ;
+class Mission;
+class Player;
+class MissionPacket;
+class FacilityStruct;
 
 extern void missInit();
-extern Mission* mapFindMission(UINT32 id) ;
+extern Mission* mapFindMission(UINT32 id);
 
 extern void checkForTimedOutMissions();
 
@@ -38,18 +38,18 @@ extern LOGICAL missionSetPersonaAllegiance(Player* player, FacilityStruct* facil
 
 extern void missionUpdateMissionTaker(Player* player, RMLIST_ACTION action);
 
-extern void missionRevokeMissionsFrom(const FacilityStruct& facility) ;
-extern void missionFirebaseDestroyed(const FacilityStruct& facility) ;
+extern void missionRevokeMissionsFrom(const FacilityStruct& facility);
+extern void missionFirebaseDestroyed(const FacilityStruct& facility);
 
-extern SINT32 missionCancel(UINT32 missionID) ;
+extern SINT32 missionCancel(UINT32 missionID);
 
-extern void missionCheckOrigins(class CPStruct* cp) ;
+extern void missionCheckOrigins(class CPStruct* cp);
 
-extern Mission* missionGetInstanceMission(instanceid_t instanceID, WWII_COUNTRY forCountry, BRANCH_ENUM forBranch) ;
+extern Mission* missionGetInstanceMission(instanceid_t instanceID, WWII_COUNTRY forCountry, BRANCH_ENUM forBranch);
 
-extern void missDeleteInstanceMissions(instanceid_t instanceID) ;
+extern void missDeleteInstanceMissions(instanceid_t instanceID);
 
-extern void missAnnounceMissionsToChat() ;
+extern void missAnnounceMissionsToChat();
 
-extern void missCancelAllMobileSpawns() ;
+extern void missCancelAllMobileSpawns();
 

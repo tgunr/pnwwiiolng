@@ -195,7 +195,7 @@ PIXELFORMATDESCRIPTOR	pfds;
 	depth = 0;
 	accum = 0;
 	stencil = 0;
-	for (i=1 ; ; i++)
+	for (i=1;; i++)
 	{
 		if (!DescribePixelFormat(hdc, i, sizeof(PIXELFORMATDESCRIPTOR), pfd))
 		{

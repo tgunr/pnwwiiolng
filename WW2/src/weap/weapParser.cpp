@@ -154,7 +154,7 @@ static bool _setSection(int /*numargs*/, FUNCARGS* args)
 		_section.spec = weapFindCategory(_section.name);
 
 		if (*((UINT32*)&_section.spec) == *((UINT32*)&NULL_WEAP_SPEC))
-			return false ;
+			return false;
 		break;
 
 	case PARSE_WEAPON:
@@ -172,7 +172,7 @@ static bool _setSection(int /*numargs*/, FUNCARGS* args)
 #ifdef FRONT_END
 			Write_Debug("invlid class name %s",_section.name);
 #endif // FRONT_END
-			return false ;
+			return false;
 		}
 
 		_section.spec.wCountry	= _curCountry;	// set country
@@ -191,26 +191,26 @@ static bool _setSection(int /*numargs*/, FUNCARGS* args)
 		{
 			_section.spec = weapFindClass(_section.name);
 			if ( _section.spec.wClass == 0 )
-				return false ;
+				return false;
 		}
 		else
-			_section.spec.wClass = 0 ;
+			_section.spec.wClass = 0;
 
 		_section.spec.wCountry	= _curCountry;	// set country
 		_section.spec.wCategory = _curCategory;	// set category
 		// wClass populated from section name
-		_section.spec.wType = 0 ;
+		_section.spec.wType = 0;
 
-		_section.spawnList = &g_weaponSpawns[weapClassIndex(_section.spec)] ;
+		_section.spawnList = &g_weaponSpawns[weapClassIndex(_section.spec)];
 
 		break;
 	default:
-		return false ;
+		return false;
 	};
 
 	strupr(_section.name);
 
-	return true ;
+	return true;
 }
 
 static bool _fillCountry(SINT32 /*numArgs*/, FUNCARGS* args)
@@ -228,12 +228,12 @@ static bool _fillCountry(SINT32 /*numArgs*/, FUNCARGS* args)
 	thisCountry = NULL;
 
 	if ( ! parseValidArgs(argSpec, args, _NUM_SPECS, _section.name, weapFileLineNum) )
-		return false ;
+		return false;
 
 	spec = weapFindCountry(args[2].svalue);
 
 	if (spec.wCountry == 0)
-		return false ;
+		return false;
 
 	thisCountry = &weaponCountry[spec.wCountry];
 	strcpy((SCHAR*)thisCountry->name, args[2].svalue);
@@ -245,9 +245,9 @@ static bool _fillCountry(SINT32 /*numArgs*/, FUNCARGS* args)
 	thisCountry->active = (args[4].dvalue == 0) ? false : true;
 
 	if (thisCountry->code == 0 || thisCountry->side == 0)
-		thisCountry->active = false ;
+		thisCountry->active = false;
 
-	return true ;
+	return true;
 
 }
 
@@ -255,9 +255,9 @@ void
 weapAddClass(UINT32 classIndex, const char* name)
 {
 	strncpy((SCHAR*)weaponClass[classIndex].name, name, MAX_CLASS_NAME_LEN);
-	weaponClass[classIndex].active = true ;
+	weaponClass[classIndex].active = true;
 	weaponClass[classIndex].spec = NULL_WEAP_SPEC;
-	weaponClass[classIndex].spec.wClass = classIndex ;
+	weaponClass[classIndex].spec.wClass = classIndex;
 }
 
 static bool _fillClass(SINT32 /*numArgs*/, FUNCARGS* args)
@@ -269,24 +269,24 @@ static bool _fillClass(SINT32 /*numArgs*/, FUNCARGS* args)
 	static const SINT32 _NUM_SPECS = sizeof(argSpec)/sizeof(ARG_SPEC);
 
 	if ( ! parseValidArgs(argSpec, args, _NUM_SPECS, _section.name, weapFileLineNum) )
-		return false ;
+		return false;
 
-	UINT32 classIndex = (UINT32)args[0].dvalue ;
+	UINT32 classIndex = (UINT32)args[0].dvalue;
 	if ( classIndex >= MAX_WEAP_CLASSES )
 	{
-		dbugLog(_FLA, "invalid weapClass '%s' (%s)", args[0].svalue, args[1].svalue) ;
-		return false ;
+		dbugLog(_FLA, "invalid weapClass '%s' (%s)", args[0].svalue, args[1].svalue);
+		return false;
 	}
 
 	if ( weaponClass[classIndex].active )
 	{
-		dbugLog(_FLA, "duplicate weapClass %u (%s and %s)", classIndex, weaponClass[classIndex].name, args[1].svalue) ;
-		return false ;
+		dbugLog(_FLA, "duplicate weapClass %u (%s and %s)", classIndex, weaponClass[classIndex].name, args[1].svalue);
+		return false;
 	}
 
-	weapAddClass((UINT32)classIndex, args[1].svalue) ;
+	weapAddClass((UINT32)classIndex, args[1].svalue);
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -315,7 +315,7 @@ _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 									,{T_INT,4}		// SPEED
 									,{T_INT,4}};	// VALUE
 	static const SINT32 _NUM_SPECS = sizeof(argSpec)/sizeof(ARG_SPEC);
-	WEAPON_SPEC thisSpec = NULL_WEAP_SPEC ;
+	WEAPON_SPEC thisSpec = NULL_WEAP_SPEC;
 
 #ifndef FRONT_END
 	bool fNext = false, eNext = false;
@@ -325,17 +325,17 @@ _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 	{
 
 		if ( ! parseValidArgs(argSpec, args, _NUM_SPECS, _section.name, weapFileLineNum) )
-				throw "invalid entry" ;
+				throw "invalid entry";
 
 		thisSpec = _section.spec;			// set class
 		thisSpec.wType = args[0].dvalue;	// set type
 
 		if ( weapLookup(thisSpec) != NULL )
-			throw "multiple definitions of vehicle" ;
+			throw "multiple definitions of vehicle";
 
 		WEAPON* weapon = new WEAPON(thisSpec, args[1].svalue, args[2].svalue
 									, args[4].dvalue, args[7].dvalue * 100, args[8].dvalue, args[9].dvalue, args[10].dvalue
-									) ;
+									);
 
 #ifndef FRONT_END
 		SINT32 i, bIndex;
@@ -357,7 +357,7 @@ _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 					biasSpec.wCountry = findCountryCode(args[i].svalue);
 
 					if ( SPEC_IS_NULL(biasSpec) )
-						throw "invalid bias data" ;
+						throw "invalid bias data";
 					else
 					{
 						if (biasSpec.wCountry == Parse::FY_)
@@ -400,7 +400,7 @@ _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 				bIndex--;
 
 				if ( SPEC_IS_NULL(weapon->bias[bIndex].spec) )
-					throw "illegal weapon bias slot" ;
+					throw "illegal weapon bias slot";
 
 				weapon->bias[bIndex].slots = args[i].dvalue;
 
@@ -413,36 +413,36 @@ _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 				bIndex++;
 			}
 			else
-				throw "illegal value in bias data" ;
+				throw "illegal value in bias data";
 
 		}
 #endif //!FRONT_END
 
 #ifdef EXTREME_DEBUG
-		dbugLog(_FLD, "adding %s => %p", weapPrintSpecC(&thisSpec), weapon) ;
+		dbugLog(_FLD, "adding %s => %p", weapPrintSpecC(&thisSpec), weapon);
 #endif
-		g_weaponList[thisSpec] = weapon ;
+		g_weaponList[thisSpec] = weapon;
 
-		return true ;
+		return true;
 	}
 	catch ( std::exception& e )
 	{
 #ifdef FRONT_END
-		Write_Log(LOG_WEAP, LOG_FATAL, "%s:%u %s/%s %s", _fileName, weapFileLineNum, _section.name, args[1].svalue, e.what()) ;
+		Write_Log(LOG_WEAP, LOG_FATAL, "%s:%u %s/%s %s", _fileName, weapFileLineNum, _section.name, args[1].svalue, e.what());
 #else
-		dbugLog(_FLA, "%s:%u %s/%s %s", _fileName, weapFileLineNum, _section.name, args[1].svalue, e.what()) ;
+		dbugLog(_FLA, "%s:%u %s/%s %s", _fileName, weapFileLineNum, _section.name, args[1].svalue, e.what());
 #endif
 	}
 	catch ( const char* reason )
 	{
 #ifdef FRONT_END
-		Write_Log(LOG_WEAP, LOG_FATAL, "%s:%u %s/%s %s", _fileName, weapFileLineNum, _section.name, args[1].svalue, reason) ;
+		Write_Log(LOG_WEAP, LOG_FATAL, "%s:%u %s/%s %s", _fileName, weapFileLineNum, _section.name, args[1].svalue, reason);
 #else
-		dbugLog(_FLA, "%s:%u %s/%s %s", _fileName, weapFileLineNum, _section.name, args[1].svalue, reason) ;
+		dbugLog(_FLA, "%s:%u %s/%s %s", _fileName, weapFileLineNum, _section.name, args[1].svalue, reason);
 #endif
 	}
 
-	return false ;
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -454,46 +454,46 @@ static bool _fillSpawn(SINT32 /*numArgs*/, FUNCARGS* args)
 {
 	static ARG_SPEC argSpec[] = {	{T_STRING,MAX_CNAME_SIZE} };
 	static const SINT32 _NUM_SPECS = sizeof(argSpec)/sizeof(ARG_SPEC);
-	char weapName[MAX_SVALUE_SIZE+1] ;
+	char weapName[MAX_SVALUE_SIZE+1];
 
 	try
 	{
 		if ( ! parseValidArgs(argSpec, args, _NUM_SPECS, _section.name, weapFileLineNum) )
-			throw "invalid entry" ;
+			throw "invalid entry";
 
-		UINT32 len ;
-		for ( len = 0 ; len < MAX_SVALUE_SIZE && args[0].svalue[len] != 0 ; ++len )
-			weapName[len] = tolower(args[0].svalue[len]) ;
-		weapName[len] = 0 ;
+		UINT32 len;
+		for ( len = 0; len < MAX_SVALUE_SIZE && args[0].svalue[len] != 0; ++len )
+			weapName[len] = tolower(args[0].svalue[len]);
+		weapName[len] = 0;
 
-		const WEAPON_SPEC& mySpec = _section.spec ;
-		WEAPON* weap = weapLookupWeaponByName(weapName) ;
+		const WEAPON_SPEC& mySpec = _section.spec;
+		WEAPON* weap = weapLookupWeaponByName(weapName);
 		if ( weap == NULL || weap->spec().wType == 0 )
-			throw "weapon not found" ;
-		const WEAPON_SPEC& spec = weap->spec() ;
+			throw "weapon not found";
+		const WEAPON_SPEC& spec = weap->spec();
 		if ( mySpec.wCountry != spec.wCountry )
-			throw "country mismatch" ;
+			throw "country mismatch";
 		// Allow infantry to spawn at GV_ and AC_ spawners
 		if ( mySpec.wCategory != spec.wCategory && (mySpec.wCategory != IN_ && spec.wCategory != GV_) && (spec.wCategory != IN_ || mySpec.wCategory == SV_) )
-			throw "category mismatch" ;
+			throw "category mismatch";
 
-		WEAPON_LIST& spawnList = *_section.spawnList ;
+		WEAPON_LIST& spawnList = *_section.spawnList;
 
 		if ( spawnList.find(spec) != spawnList.end() )
-			throw "multiple spawn list entries" ;
+			throw "multiple spawn list entries";
 
-		spawnList[spec] = weap ;
+		spawnList[spec] = weap;
 	}
 	catch ( const char* reason )
 	{
 #ifdef FRONT_END
-		Write_Log(LOG_WEAP, LOG_FATAL, "%s:%u %s/%s: %s", _fileName, weapFileLineNum, _section.name, weapName, reason) ;
-		return false ;
+		Write_Log(LOG_WEAP, LOG_FATAL, "%s:%u %s/%s: %s", _fileName, weapFileLineNum, _section.name, weapName, reason);
+		return false;
 #else
-		LogAbort("%s:%u %s/%s: %s", _fileName, weapFileLineNum, _section.name, weapName, reason) ;
+		LogAbort("%s:%u %s/%s: %s", _fileName, weapFileLineNum, _section.name, weapName, reason);
 #endif
 	}
 
-	return true ;
+	return true;
 }
 

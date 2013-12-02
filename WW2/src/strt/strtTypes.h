@@ -18,7 +18,7 @@
 
 //------------------------------DEFINE SECTION-------------------------------
 
-enum { FB_CLOSED_VISLEVEL = 255 } ;
+enum { FB_CLOSED_VISLEVEL = 255 };
 
 // Bridges use their country to declare damaged state
 enum
@@ -47,7 +47,7 @@ enum SPAWN_DENY_REASONCODE
 	SPAWN_ACCOUNT_MINUTES,					// Not enough minutes on your account
 	SPAWN_ACCOUNT_MASK,						// Your account doesn't have access to this vehicle.
 	SPAWN_ERROR								// Unknown error.
-} ;
+};
 
 // Object visibility flags
 
@@ -55,14 +55,14 @@ enum {
 	RADIO_CAPPABLE = 0
 ,	RADIO_TABLE = 1
 ,	RADIO_HIDDEN = 255
-} ;
+};
 
 // visLevels
 enum {
 	VISLEVEL_NORMAL = 0
 ,	VISLEVEL_DAMAGED = 1
 ,	VISLEVEL_HIDDEN = 255
-} ;
+};
 
 // smokeLevels
 // visLevel + smokeLevels are combined to produce effective visLevel
@@ -72,7 +72,7 @@ enum {
 ,	SMOKELEVEL_LIGHT = 1
 ,	SMOKELEVEL_HEAVY = 2
 ,	SMOKELEVEL_FIRE = 3
-} ;
+};
 
 //------------------------------STRUCT SECTION-------------------------------
 
@@ -82,13 +82,13 @@ struct CP_OBJ_HIT
 {
 	FULL_OBJ_ID		object;
 	SINT64			damage;
-} ;
+};
 
 struct CP_HIT_HEADER
 {
 	SINT32			numHits;
 	CP_OBJ_HIT*		list;
-} ;
+};
 
 //This message goes to the game host to apprise it of an ownership change
 //	for an object.
@@ -96,8 +96,8 @@ struct OWNERSHIP_UPDATE
 {
 	FULL_OBJ_ID		objectID;
 	WWII_COUNTRY	country;
-	UINT32			flags ;
-} ;
+	UINT32			flags;
+};
 
 //this message goes to the game host to tell the front ends to update their
 //	visualization of a certain object
@@ -105,7 +105,7 @@ struct VISLEVEL_UPDATE
 {
 	FULL_OBJ_ID		objectID;
 	UCHAR			vislevel;
-} ;
+};
 
 // Structure for defining allocations of vehicles
 class WeaponCounter
@@ -115,30 +115,30 @@ public:
 
 public:
 	// add LOCKED value to this enum for client state notification of subscription content locking
-	enum { SPAWNABLE, NOT_DEPLOYED, NOT_PRESENT, NOT_PERMITTED } ; //LOCKED
-	void clear() { capacity = current = reinforcements = 0 ; spawnable = NOT_PERMITTED ; }
-	void setCapacity(UINT16 newCapacity) { capacity = newCapacity ; }
-	void setCurrent(UINT16 newCurrent) { current = newCurrent ; }
+	enum { SPAWNABLE, NOT_DEPLOYED, NOT_PRESENT, NOT_PERMITTED }; //LOCKED
+	void clear() { capacity = current = reinforcements = 0; spawnable = NOT_PERMITTED; }
+	void setCapacity(UINT16 newCapacity) { capacity = newCapacity; }
+	void setCurrent(UINT16 newCurrent) { current = newCurrent; }
 
 //tolua_end
 	WeaponCounter& operator = (const WeaponCounter& rhs)
 	{
-		capacity = rhs.capacity ;
-		current = rhs.current ;
-		reinforcements = rhs.reinforcements ;
-		spawnable = rhs.spawnable ;
-		restricted = rhs.restricted ;
-		return *this ;
+		capacity = rhs.capacity;
+		current = rhs.current;
+		reinforcements = rhs.reinforcements;
+		spawnable = rhs.spawnable;
+		restricted = rhs.restricted;
+		return *this;
 	}
 //tolua_begin
 
 public:
-	UINT16	capacity ;				// Automatic resupply level
-	UINT16	current ;				// Current actual level
-	UINT16	reinforcements ;		// Number of pending reinforcements
-	UCHAR	spawnable ;				// Used by the client
-	UCHAR	restricted ;			// If your account prevents using this
-} ;
+	UINT16	capacity;				// Automatic resupply level
+	UINT16	current;				// Current actual level
+	UINT16	reinforcements;		// Number of pending reinforcements
+	UCHAR	spawnable;				// Used by the client
+	UCHAR	restricted;			// If your account prevents using this
+};
 
 #pragma pack(push, 1)				// Wire format capable.
 struct STRAT_ENEMY_REPORT
@@ -149,7 +149,7 @@ struct STRAT_ENEMY_REPORT
 	UINT32			heading;
 	UINT32			altitude;
 	UINT32			speed;
-} ;
+};
 #pragma pack(pop)
 
 //tolua_end

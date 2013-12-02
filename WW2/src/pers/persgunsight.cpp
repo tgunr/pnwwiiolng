@@ -1187,13 +1187,13 @@ static LOGICAL _SetTilt(GSCommandList * GSCL,SINT8 * Params)
 static LOGICAL _DisplayMagLine(void*  Data)
 {
 	vehVehicle* vehicle = persGetPersonaVehiclePtr();
-	if ( vehicle == NULL || vehicle->VehicleType == NULL ) return TRUE ;
+	if ( vehicle == NULL || vehicle->VehicleType == NULL ) return TRUE;
 
 	FLOAT32 horizon = piLongLikeFloat(FogEnd);
     // HACK!
     // Z value is 1000 meters. horizon less than 1000 will make the
     // gunsight disappear on near fog (user adjusted fog distance)
-	if ( horizon < 1000.0f ) horizon = 1000.0f ;
+	if ( horizon < 1000.0f ) horizon = 1000.0f;
 
 	FLOAT32* Mag = (FLOAT32*)&Data;
 	FLOAT32 FieldOfView = _BaseFOV / (*Mag);

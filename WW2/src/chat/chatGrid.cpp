@@ -58,28 +58,28 @@ struct GridKey
 		{}
 	GridKey(UINT64 _key) : m_key(_key) {}
 
-	const instanceid_t& instanceID() const { return m_instanceID ; }
-	SINT32 X() const { return m_x ; }
-	SINT32 Y() const { return m_y ; }
-	const UINT64& key() const { return m_key ; }
+	const instanceid_t& instanceID() const { return m_instanceID; }
+	SINT32 X() const { return m_x; }
+	SINT32 Y() const { return m_y; }
+	const UINT64& key() const { return m_key; }
 
-	bool operator==(const GridKey& rhs) const { return instanceID() == rhs.instanceID() && key() == rhs.key() ; }
+	bool operator==(const GridKey& rhs) const { return instanceID() == rhs.instanceID() && key() == rhs.key(); }
 
-	instanceid_t m_instanceID ;
+	instanceid_t m_instanceID;
 	union
 	{
-		struct { SINT32 m_x, m_y ; } ;
-		UINT64 m_key ;
-	} ;
-} ;
+		struct { SINT32 m_x, m_y; };
+		UINT64 m_key;
+	};
+};
 
 // STL hash functor for the GridKey class.
-namespace std { template<> struct hash<GridKey> { UINT64 operator()(const GridKey& key) const { return (key.instanceID() << 5) ^ key.key() ; } } ; }
+namespace std { template<> struct hash<GridKey> { UINT64 operator()(const GridKey& key) const { return (key.instanceID() << 5) ^ key.key(); } }; }
 
-typedef std::unordered_map<GridKey, class ChatGrid*> _CHAT_GRID ;
-typedef std::set<class ChatGrid*> _GRIDS ;
+typedef std::unordered_map<GridKey, class ChatGrid*> _CHAT_GRID;
+typedef std::set<class ChatGrid*> _GRIDS;
 
-static ChatGrid* _getGrid(const GridKey& key) ;
+static ChatGrid* _getGrid(const GridKey& key);
 
 //////////////////////////////////////////////////////////////////////
 //! Private ChatGrid class
@@ -87,8 +87,8 @@ static ChatGrid* _getGrid(const GridKey& key) ;
 class ChatGrid
 {
 public:
-	ChatGrid(const GridKey& key) ;
-	~ChatGrid() ;
+	ChatGrid(const GridKey& key);
+	~ChatGrid();
 
 public:
 	enum
@@ -104,50 +104,50 @@ public:
 	,	_STO_RING_RADIUS = 6			//!< Aprox. 3km range
 	,	_STO_RING_DIAMETER = 2 * _STO_RING_RADIUS + 1
 	,	_GRID_SIZE = _STO_RING_DIAMETER * _STO_RING_DIAMETER
-	} ;
+	};
 
 private:
-	void _checkForExpiry() ;
-	void _removeFromNeighborhood() ;
+	void _checkForExpiry();
+	void _removeFromNeighborhood();
 
 public:
-	void activate() ;
-	void deactivate() ;
+	void activate();
+	void deactivate();
 
 	//! Add or transfer a player
-	void addPlayer(Player* player, ChatGrid* oldGrid) ;
+	void addPlayer(Player* player, ChatGrid* oldGrid);
 	//! Remove a player without any fuss
-	void extractPlayer(Player* player) ;
+	void extractPlayer(Player* player);
 
-	void addSTO(ServerSTO& sto) { m_stos.insert(&sto) ; _checkForExpiry() ; }
-	void removeSTO(ServerSTO& sto) { m_stos.erase(&sto) ; _checkForExpiry() ; }
+	void addSTO(ServerSTO& sto) { m_stos.insert(&sto); _checkForExpiry(); }
+	void removeSTO(ServerSTO& sto) { m_stos.erase(&sto); _checkForExpiry(); }
 
-	bool expired() const ;
+	bool expired() const;
 
 	bool inRange(const GridKey& botleft, const GridKey& topright) const
 	{
-		if ( gridKey().X() < botleft.X() || gridKey().Y() < botleft.Y() ) return false ;
-		if ( gridKey().X() > topright.X() || gridKey().Y() > topright.Y() ) return false ;
-		return true ;
+		if ( gridKey().X() < botleft.X() || gridKey().Y() < botleft.Y() ) return false;
+		if ( gridKey().X() > topright.X() || gridKey().Y() > topright.Y() ) return false;
+		return true;
 	}
 
-	const PLAYERS& players() const { return m_players ; }
-	const GridKey& gridKey() const { return m_gridKey ; }
-	const _GRIDS& neighbors() const { return m_neighbors ; }
-	const STOS& stos() const { return m_stos ; }
-	STOS& stos() { return m_stos ; }
+	const PLAYERS& players() const { return m_players; }
+	const GridKey& gridKey() const { return m_gridKey; }
+	const _GRIDS& neighbors() const { return m_neighbors; }
+	const STOS& stos() const { return m_stos; }
+	STOS& stos() { return m_stos; }
 
 private:
-	GridKey			m_gridKey ;
-	_GRIDS			m_neighbors ;
-	PLAYERS			m_players ;
-	STOS			m_stos ;
-	TeulTimeMS		m_expiry ;
-	bool			m_active ;
+	GridKey			m_gridKey;
+	_GRIDS			m_neighbors;
+	PLAYERS			m_players;
+	STOS			m_stos;
+	TeulTimeMS		m_expiry;
+	bool			m_active;
 
-	friend struct NeighborExtractionFunctor ;
-	friend ChatGrid* _getGrid(const GridKey& key) ;
-} ;
+	friend struct NeighborExtractionFunctor;
+	friend ChatGrid* _getGrid(const GridKey& key);
+};
 
 #if defined(CLOSED_BETA)
 # define GRID_INFO(mask, ...) dbugLog(_FLD, "g:%llu:%d,%d " mask, gridKey().instanceID(), gridKey().X(), gridKey().Y(), __VA_ARGS__)
@@ -158,12 +158,12 @@ private:
 
 //////////////////////////////////////////////////////////////////////
 
-static _CHAT_GRID _gridIndex ;
+static _CHAT_GRID _gridIndex;
 
-typedef std::stack<ChatGrid*> _FREE_GRIDS ;
-static _FREE_GRIDS _freeGrids ;
+typedef std::stack<ChatGrid*> _FREE_GRIDS;
+static _FREE_GRIDS _freeGrids;
 
-static STOBatch _stoBatch ;
+static STOBatch _stoBatch;
 
 //////////////////////////////////////////////////////////////////////
 // Constructor for a grid object
@@ -175,7 +175,7 @@ ChatGrid::ChatGrid(const GridKey& key)
 	, m_expiry(0LL)
 	, m_active(false)
 {
-	activate() ;
+	activate();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -184,24 +184,24 @@ ChatGrid::ChatGrid(const GridKey& key)
 struct NeighborExtractionFunctor : public std::unary_function<ChatGrid*, void>
 {
 	NeighborExtractionFunctor(ChatGrid* leaver) : m_leaver(leaver) {}
-	ChatGrid* m_leaver ;
-	void operator()(ChatGrid* neighbor) const { neighbor->m_neighbors.erase(m_leaver) ; }
-} ;
+	ChatGrid* m_leaver;
+	void operator()(ChatGrid* neighbor) const { neighbor->m_neighbors.erase(m_leaver); }
+};
 
 void
 ChatGrid::_removeFromNeighborhood()
 {
-	m_neighbors.erase(this) ;
+	m_neighbors.erase(this);
 
-	for_each(m_neighbors.begin(), m_neighbors.end(), NeighborExtractionFunctor(this)) ;
+	for_each(m_neighbors.begin(), m_neighbors.end(), NeighborExtractionFunctor(this));
 }
 
 ChatGrid::~ChatGrid()
 {
-	assert(m_players.empty()) ;
-	assert(m_stos.empty()) ;
+	assert(m_players.empty());
+	assert(m_stos.empty());
 
-	_removeFromNeighborhood() ;
+	_removeFromNeighborhood();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -210,10 +210,10 @@ ChatGrid::~ChatGrid()
 static ChatGrid*
 _findGrid(const GridKey& key)
 {
-	_CHAT_GRID::iterator it = _gridIndex.find(key) ;
+	_CHAT_GRID::iterator it = _gridIndex.find(key);
 	if ( it == _gridIndex.end() )
-		return NULL ;
-	return it->second ;
+		return NULL;
+	return it->second;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -222,20 +222,20 @@ _findGrid(const GridKey& key)
 static ChatGrid*
 _getGrid(const GridKey& key)
 {
-	ChatGrid* grid = _findGrid(key) ;
+	ChatGrid* grid = _findGrid(key);
 	if ( grid != NULL )
-		return grid ;
+		return grid;
 
 	if ( !_freeGrids.empty() )
 	{
-		grid = _freeGrids.top() ;
-		_freeGrids.pop() ;
-		grid->m_gridKey = key ;
-		grid->activate() ;
-		return grid ;
+		grid = _freeGrids.top();
+		_freeGrids.pop();
+		grid->m_gridKey = key;
+		grid->activate();
+		return grid;
 	}
 
-	return new ChatGrid(key) ;
+	return new ChatGrid(key);
 }
 //////////////////////////////////////////////////////////////////////
 // Check to see if a grid element should be marked for expiry
@@ -247,23 +247,23 @@ ChatGrid::_checkForExpiry()
 	{
 		if ( m_expiry )
 		{
-//			GRID_INFO("cancelling expiration", 0) ;
+//			GRID_INFO("cancelling expiration", 0);
 
 			// We have data, so we can't expire
-			m_expiry = 0LL ;
+			m_expiry = 0LL;
 
 			if ( !m_active )
-				activate() ;
+				activate();
 		}
-		return ;
+		return;
 	}
 
 	// We don't have data, are we penned for expiry?
 	if ( m_expiry > 0LL )
-		return ;
+		return;
 
 	// Flag us for expiry
-	m_expiry = teulClock64 + _EXPIRY_MS ;
+	m_expiry = teulClock64 + _EXPIRY_MS;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -272,31 +272,31 @@ ChatGrid::_checkForExpiry()
 void
 ChatGrid::activate()
 {
-//	GRID_INFO("activating", 0) ;
-	m_expiry = 0LL ;
+//	GRID_INFO("activating", 0);
+	m_expiry = 0LL;
 
-	assert( _gridIndex.find(gridKey()) == _gridIndex.end() ) ;
-	_gridIndex[gridKey()] = this ;
+	assert( _gridIndex.find(gridKey()) == _gridIndex.end() );
+	_gridIndex[gridKey()] = this;
 
-	m_active = true ;
+	m_active = true;
 
-	_CHAT_GRID::iterator it ;
-	SINT32 x, y ;
-	for ( y = -_STO_RING_RADIUS ; y <= _STO_RING_RADIUS ; ++y )
+	_CHAT_GRID::iterator it;
+	SINT32 x, y;
+	for ( y = -_STO_RING_RADIUS; y <= _STO_RING_RADIUS; ++y )
 	{
-		for ( x = -_STO_RING_RADIUS ; x <= _STO_RING_RADIUS ; ++x )
+		for ( x = -_STO_RING_RADIUS; x <= _STO_RING_RADIUS; ++x )
 		{
-			GridKey neighbor(gridKey().instanceID(), gridKey().X() + x, gridKey().Y() + y) ;
-			it = _gridIndex.find(neighbor) ;
+			GridKey neighbor(gridKey().instanceID(), gridKey().X() + x, gridKey().Y() + y);
+			it = _gridIndex.find(neighbor);
 			if ( it == _gridIndex.end() )
 			{
-				assert( !(neighbor.X() == gridKey().X() && neighbor.Y() == gridKey().Y()) ) ;
-				continue ;
+				assert( !(neighbor.X() == gridKey().X() && neighbor.Y() == gridKey().Y()) );
+				continue;
 			}
 
 			// Mutual visibility
-			m_neighbors.insert(it->second) ;
-			it->second->m_neighbors.insert(this) ;
+			m_neighbors.insert(it->second);
+			it->second->m_neighbors.insert(this);
 		}
 	}
 }
@@ -307,15 +307,15 @@ ChatGrid::activate()
 void
 ChatGrid::addPlayer(Player* player, ChatGrid* oldGrid)
 {
-	_GRIDS::iterator it ;
+	_GRIDS::iterator it;
 
 	if ( oldGrid )
 	{
-		GRID_INFO("transfering c:%s from %d,%d", player->callsign(), oldGrid->gridKey().X(), oldGrid->gridKey().Y()) ;
+		GRID_INFO("transfering c:%s from %d,%d", player->callsign(), oldGrid->gridKey().X(), oldGrid->gridKey().Y());
 	}
 	else
 	{
-		GRID_INFO("adding c:%s", player->callsign()) ;
+		GRID_INFO("adding c:%s", player->callsign());
 	}
 
 	if ( player->teulIndex() >= 0 )
@@ -323,13 +323,13 @@ ChatGrid::addPlayer(Player* player, ChatGrid* oldGrid)
 		// Grids that have moved out of range
 		if ( oldGrid != NULL )
 		{
-			for ( it = oldGrid->m_neighbors.begin() ; it != oldGrid->m_neighbors.end() ; ++it )
+			for ( it = oldGrid->m_neighbors.begin(); it != oldGrid->m_neighbors.end(); ++it )
 			{
 				if ( (*it)->stos().empty() )
-					continue ;
+					continue;
 				if ( std::find(m_neighbors.begin(), m_neighbors.end(), *it) == m_neighbors.end() )
 				{
-					_stoBatch.add((*it)->stos(), true) ;
+					_stoBatch.add((*it)->stos(), true);
 				}
 			}
 
@@ -338,27 +338,27 @@ ChatGrid::addPlayer(Player* player, ChatGrid* oldGrid)
 				SINT64 xCoord = static_cast<SINT64>(oldGrid->gridKey().X()) << _KEY_SHIFT;
 				SINT64 yCoord = static_cast<SINT64>(oldGrid->gridKey().Y()) << _KEY_SHIFT;
 				_stoBatch.setCoords(static_cast<FLOAT64>(xCoord), static_cast<FLOAT64>(yCoord));
-				_stoBatch.send(player->teulIndex()) ;
+				_stoBatch.send(player->teulIndex());
 			}
 
 			// Grids that have entered into range
-			for ( it = m_neighbors.begin() ; it != m_neighbors.end() ; ++it )
+			for ( it = m_neighbors.begin(); it != m_neighbors.end(); ++it )
 			{
 				if ( (*it)->stos().empty() )
-					continue ;
+					continue;
 				if ( std::find(oldGrid->m_neighbors.begin(), oldGrid->m_neighbors.end(), *it) == oldGrid->m_neighbors.end() )
 				{
-					_stoBatch.add((*it)->stos(), false) ;
+					_stoBatch.add((*it)->stos(), false);
 				}
 			}
 		}
 		else
 		{
-			for ( it = m_neighbors.begin() ; it != m_neighbors.end() ; ++it )
+			for ( it = m_neighbors.begin(); it != m_neighbors.end(); ++it )
 			{
 				if ( !(*it)->stos().empty() )
 				{
-					_stoBatch.add((*it)->stos(), false) ;
+					_stoBatch.add((*it)->stos(), false);
 				}
 			}
 		}
@@ -368,19 +368,19 @@ ChatGrid::addPlayer(Player* player, ChatGrid* oldGrid)
 			SINT64 xCoord = static_cast<SINT64>(gridKey().X()) << _KEY_SHIFT;
 			SINT64 yCoord = static_cast<SINT64>(gridKey().Y()) << _KEY_SHIFT;
 			_stoBatch.setCoords(static_cast<FLOAT64>(xCoord), static_cast<FLOAT64>(yCoord));
-			_stoBatch.send(player->teulIndex()) ;
+			_stoBatch.send(player->teulIndex());
 		}
 	}
 
 	if ( oldGrid )
 	{
-		GRID_INFO("extracting %s after transfer", player->callsign()) ;
-		oldGrid->extractPlayer(player) ;
+		GRID_INFO("extracting %s after transfer", player->callsign());
+		oldGrid->extractPlayer(player);
 	}
 
-	m_players.insert(player) ;
+	m_players.insert(player);
 
-	_checkForExpiry() ;
+	_checkForExpiry();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -389,15 +389,15 @@ ChatGrid::addPlayer(Player* player, ChatGrid* oldGrid)
 void
 ChatGrid::deactivate()
 {
-//	GRID_INFO("deactivating", 0) ;
+//	GRID_INFO("deactivating", 0);
 
-	m_active = false ;
+	m_active = false;
 
-	_removeFromNeighborhood() ;
+	_removeFromNeighborhood();
 
-	m_neighbors.clear() ;
-	m_stos.clear() ;
-	m_players.clear() ;
+	m_neighbors.clear();
+	m_stos.clear();
+	m_players.clear();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -406,7 +406,7 @@ ChatGrid::deactivate()
 bool
 ChatGrid::expired() const
 {
-	return ( m_expiry > 0LL && m_expiry < teulClock64 ) ;
+	return ( m_expiry > 0LL && m_expiry < teulClock64 );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -415,17 +415,17 @@ ChatGrid::expired() const
 void
 ChatGrid::extractPlayer(Player* const player)
 {
-	GRID_INFO("removing c:%s", player->callsign()) ;
+	GRID_INFO("removing c:%s", player->callsign());
 
 	// Remove the player from all of our STOs.
-	for ( auto it = stos().begin() ; it != stos().end() ; ++it )
+	for ( auto it = stos().begin(); it != stos().end(); ++it )
 	{
-		ServerSTO* const sto = (ServerSTO*)*it ;
-		sto->extractPlayer(player) ;
+		ServerSTO* const sto = (ServerSTO*)*it;
+		sto->extractPlayer(player);
 	}
 
-	m_players.erase(player) ;
-	_checkForExpiry() ;
+	m_players.erase(player);
+	_checkForExpiry();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -437,9 +437,9 @@ ChatGrid::extractPlayer(Player* const player)
 static UINT32
 _checkHulksInCell(ChatGrid* cell, UINT32 limit)
 {
-	STOS::iterator it ;
-	UINT32 hulks = 0  ;
-	ServerSTO* oldest = NULL ;
+	STOS::iterator it;
+	UINT32 hulks = 0;
+	ServerSTO* oldest = NULL;
 
 	// Count the hulks and track which is oldest incase
 	// we need to remove it
@@ -448,29 +448,29 @@ _checkHulksInCell(ChatGrid* cell, UINT32 limit)
 			; ++it )
 	{
 		if ( (*it)->type() != ServerTrackedObject::_HULK )
-			continue ;
-		++hulks ;
+			continue;
+		++hulks;
 
 		if ( oldest == NULL || (*it)->age() > oldest->age() )
-			oldest = (*it) ;
+			oldest = (*it);
 	}
 
 	// Under either of these conditions, we don't need to proceed
 	if ( hulks <= 0 )
-		return 0 ;
+		return 0;
 	if ( hulks <= limit )
-		return hulks ;
+		return hulks;
 
 	// Simple sanity check
-	assert( oldest != NULL ) ;
+	assert( oldest != NULL );
 
 	// We've now determined that there is one or more hulk here,
 	// and that we need to remove at least one hulk
 	// NOTE: countHulksInArea depends on only one hulk being removed
-	dbugLog(_FLI, "Removing oldest hulk: %u", oldest->uid()) ;
-	oldest->deactivate() ;
+	dbugLog(_FLI, "Removing oldest hulk: %u", oldest->uid());
+	oldest->deactivate();
 
-	return hulks - 1 ;
+	return hulks - 1;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -487,114 +487,114 @@ _checkHulksInArea(ChatGrid* cell)
 		// Enforce per-cell if they exist
 		if ( host_config.sto.hulkLimitPerCell > 0 )
 		{
-			_checkHulksInCell(cell, host_config.sto.hulkLimitPerCell - 1) ;
+			_checkHulksInCell(cell, host_config.sto.hulkLimitPerCell - 1);
 		}
-		return ;
+		return;
 	}
 
-	ChatGrid* highestPopulatedCell = NULL ;
-	_GRIDS::iterator it ;
-	UINT32 hulksInArea = 0 ;
-	UINT32 highestPopulation = 0 ;
+	ChatGrid* highestPopulatedCell = NULL;
+	_GRIDS::iterator it;
+	UINT32 hulksInArea = 0;
+	UINT32 highestPopulation = 0;
 
 	// Find the most overpopulated cell
 	for ( it = cell->neighbors().begin()
 			; it != cell->neighbors().end()
 			; ++it )
 	{
-		UINT32 hulksInCell = _checkHulksInCell(*it, host_config.sto.hulkLimitPerCell) ;
+		UINT32 hulksInCell = _checkHulksInCell(*it, host_config.sto.hulkLimitPerCell);
 
 		if ( hulksInCell <= 0 )
-			continue ;
+			continue;
 		if ( highestPopulatedCell != nullptr )
 		{
 			if ( hulksInCell < highestPopulation )
-				continue ;
+				continue;
 			if ( hulksInCell == highestPopulation
 				&& highestPopulatedCell->players().size() >= (*it)->players().size() )
-				continue ;
+				continue;
 		}
 
 		///TODO: We should really pick the oldest between matches like this, huh?
 		// Rather than leaving it like this
 
-		highestPopulatedCell = *it ;
-		highestPopulation = hulksInCell ;
+		highestPopulatedCell = *it;
+		highestPopulation = hulksInCell;
 
-		hulksInArea += hulksInCell ;
+		hulksInArea += hulksInCell;
 	}
 
 	// Are there too many hulks in this area?
 	if ( hulksInArea >= host_config.sto.hulkLimitPerArea )
 	{
 		// Simple sanity check
-		assert( highestPopulatedCell != NULL ) ;
-		_checkHulksInCell(highestPopulatedCell, 0) ;
+		assert( highestPopulatedCell != NULL );
+		_checkHulksInCell(highestPopulatedCell, 0);
 	}
 }
 
 //////////////////////////////////////////////////////////////////////
 // Add/remove a server tracked object to the grid
 
-std::vector<SINT32> b_teulBroadcastIndexes ;
+std::vector<SINT32> b_teulBroadcastIndexes;
 
 static void IndexPlayer(const wwiiPlayer* player)
 {
-	if ( player->teulIndex() >= 0 ) b_teulBroadcastIndexes.push_back(player->teulIndex()) ;
+	if ( player->teulIndex() >= 0 ) b_teulBroadcastIndexes.push_back(player->teulIndex());
 }
 
 static void AddPlayersToIndex(const ChatGrid* grid)
 {
-	for_each(grid->players().begin(), grid->players().end(), IndexPlayer) ;
+	for_each(grid->players().begin(), grid->players().end(), IndexPlayer);
 }
 
 static bool
 _announceSTOToGrid(ServerSTO& sto, bool isCreation)
 {
 	auto& position = sto.position();
-	SINT32 gx = (SINT32)position.x() >> ChatGrid::_KEY_SHIFT ;
-	SINT32 gy = (SINT32)position.y() >> ChatGrid::_KEY_SHIFT ;
-	GridKey key(sto.m_instanceID, gx, gy) ;
+	SINT32 gx = (SINT32)position.x() >> ChatGrid::_KEY_SHIFT;
+	SINT32 gy = (SINT32)position.y() >> ChatGrid::_KEY_SHIFT;
+	GridKey key(sto.m_instanceID, gx, gy);
 
-	static bool inUse = false ;
+	static bool inUse = false;
 
 	if ( inUse )
-		LogAbort("recursive use of announceSTOToGrid") ;
+		LogAbort("recursive use of announceSTOToGrid");
 
-	inUse = true ;
+	inUse = true;
 
-	STOS data ;
-	data.insert(&sto) ;
+	STOS data;
+	data.insert(&sto);
 
-	_stoBatch.clear() ;
-	_stoBatch.setCoords(position.x(), position.y()) ;
+	_stoBatch.clear();
+	_stoBatch.setCoords(position.x(), position.y());
 
-	ChatGrid* cell ;
-	const char* op ;
+	ChatGrid* cell;
+	const char* op;
 	if ( isCreation )
 	{
-		op = "add" ;
-		cell = _getGrid(key) ;
+		op = "add";
+		cell = _getGrid(key);
 
 		// DEBUG: Make sure we're not adding the same guy
-		assert( cell != NULL ) ;
-		assert( cell->stos().find(&sto) == cell->stos().end() ) ;
+		assert( cell != NULL );
+		assert( cell->stos().find(&sto) == cell->stos().end() );
 
-		cell->addSTO(sto) ;
+		cell->addSTO(sto);
 
-		_stoBatch.add(data, false) ;
+		_stoBatch.add(data, false);
 	}
 	else
 	{
-		op = "remove" ;
-		cell = _findGrid(key) ;
+		op = "remove";
+		cell = _findGrid(key);
 
-		assert( cell != NULL ) ;
-		assert( cell->stos().find(&sto) != cell->stos().end() ) ;
+		assert( cell != NULL );
+		assert( cell->stos().find(&sto) != cell->stos().end() );
 
-		cell->removeSTO(sto) ;
+		cell->removeSTO(sto);
 
-		_stoBatch.add(data, true) ;
+		_stoBatch.add(data, true);
 	}
 
 	if ( g_logDebug )
@@ -603,43 +603,43 @@ _announceSTOToGrid(ServerSTO& sto, bool isCreation)
 						, position.x()
 						, position.y()
 						, position.z()
-						, key.X(), key.Y(), cell->neighbors().size()) ;
+						, key.X(), key.Y(), cell->neighbors().size());
 
 	// Are we forcibly removing an STO rather than expiring one due to old age?
 	if ( isCreation == false && sto.needsBroadcastRemoval() == true )
 	{
-		chatBroadcastObject(playerIndex.begin(), playerIndex.end(), CHAT_XCHG_SERVER_TRACKED_OBJS, _stoBatch) ;
+		chatBroadcastObject(playerIndex.begin(), playerIndex.end(), CHAT_XCHG_SERVER_TRACKED_OBJS, _stoBatch);
 	}
 	else
 	{
-		b_teulBroadcastIndexes.clear() ;
+		b_teulBroadcastIndexes.clear();
 
-		for_each(cell->neighbors().begin(), cell->neighbors().end(), AddPlayersToIndex) ;
+		for_each(cell->neighbors().begin(), cell->neighbors().end(), AddPlayersToIndex);
 
 		// Don't send STO notices for a ordnance to the originating player
 		if ( isCreation && sto.type() == ServerTrackedObject::_ORDNANCE )
 		{
-			SINT32 fromIndex = ((OrdnanceSTO&)sto).fromTeulIndex() ;
+			SINT32 fromIndex = ((OrdnanceSTO&)sto).fromTeulIndex();
 			if ( fromIndex != -1 )
 			{
-				std::vector<SINT32>::iterator it = std::find(b_teulBroadcastIndexes.begin(), b_teulBroadcastIndexes.end(), fromIndex) ;
+				std::vector<SINT32>::iterator it = std::find(b_teulBroadcastIndexes.begin(), b_teulBroadcastIndexes.end(), fromIndex);
 				if ( it != b_teulBroadcastIndexes.end() )
-					b_teulBroadcastIndexes.erase(it) ;
+					b_teulBroadcastIndexes.erase(it);
 			}
 		}
 
 		if ( !b_teulBroadcastIndexes.empty() )
 		{
-			chatBroadcastObject(b_teulBroadcastIndexes.begin(), b_teulBroadcastIndexes.end(), CHAT_XCHG_SERVER_TRACKED_OBJS, _stoBatch) ;
-			b_teulBroadcastIndexes.clear() ;
+			chatBroadcastObject(b_teulBroadcastIndexes.begin(), b_teulBroadcastIndexes.end(), CHAT_XCHG_SERVER_TRACKED_OBJS, _stoBatch);
+			b_teulBroadcastIndexes.clear();
 		}
 	}
 
-	_stoBatch.clear() ;
+	_stoBatch.clear();
 
-	inUse = false ;
+	inUse = false;
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -648,21 +648,21 @@ _announceSTOToGrid(ServerSTO& sto, bool isCreation)
 bool
 ServerSTO::activate()
 {
-	dbugLog(_FLD, "%s:%u activating", typeName(), uid()) ;
+	dbugLog(_FLD, "%s:%u activating", typeName(), uid());
 	if ( activated() )
-		return false ;
+		return false;
 
 	if ( !_announceSTOToGrid(*this, true) )
 	{
-		dbugLog(_FLA, "%s announce failed", typeName()) ;
-		return false ;
+		dbugLog(_FLA, "%s announce failed", typeName());
+		return false;
 	}
 
-	bool result = ServerTrackedObject::activate() ;
+	bool result = ServerTrackedObject::activate();
 	if ( result == true )
-		_audit(Creation) ;
+		_audit(Creation);
 
-	return result ;
+	return result;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -671,13 +671,13 @@ ServerSTO::activate()
 void
 ServerSTO::deactivate()
 {
-	dbugLog(_FLD, "%s:%u deactivating", typeName(), uid()) ;
+	dbugLog(_FLD, "%s:%u deactivating", typeName(), uid());
 
-	_announceSTOToGrid(*this, false) ;
+	_announceSTOToGrid(*this, false);
 
-	_audit(Destruction) ;
+	_audit(Destruction);
 
-	ServerTrackedObject::deactivate() ;
+	ServerTrackedObject::deactivate();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -687,46 +687,46 @@ bool
 UMSSTO::activate()
 {
 	if ( activated() )
-		return false ;
+		return false;
 
 	// Make sure we can look this dude up
-	Player* const player = PlayerInterface::Lookup(creatorID()) ;
+	Player* const player = PlayerInterface::Lookup(creatorID());
 	if ( player == NULL || player->missionID() == 0 )
-		return false ;
+		return false;
 
 	try
 	{
-		ChatMission* mission = chatFindMission(player->missionID()) ;
+		ChatMission* mission = chatFindMission(player->missionID());
 		if ( mission == NULL )
-			throw MSDR_MISSION_EXPIRED ;
+			throw MSDR_MISSION_EXPIRED;
 
 		if ( player->isMissionLeader() == false && mission->m_stoUID != 0 )
-			throw MSDR_1PER ;
+			throw MSDR_1PER;
 
 //		// Allow 10 seconds for a response from the mmhost
-//		m_lifespan = 1 * 1000 ;
-		mission->sendMobileSpawn(player->playerID(), player->matchHandle(), position().x(), position().y(), position().z(), true, uid()) ;
+//		m_lifespan = 1 * 1000;
+		mission->sendMobileSpawn(player->playerID(), player->matchHandle(), position().x(), position().y(), position().z(), true, uid());
 	}
 	catch (MSPAWN_RESULT error)
 	{
-		char errorMsg[256] ;
+		char errorMsg[256];
 		snprintf(errorMsg, 255, "t:%d p:%u c:%s m:%u %s activate failed: MSDR %u"
-						, player->teulIndex(), player->playerID(), player->callsign(), player->missionID(), typeName(), error) ;
-		dbugLog(_FLA, "%s", errorMsg) ;
-		wwiiIRCChannelMessage("-sys", errorMsg) ;
+						, player->teulIndex(), player->playerID(), player->callsign(), player->missionID(), typeName(), error);
+		dbugLog(_FLA, "%s", errorMsg);
+		wwiiIRCChannelMessage("-sys", errorMsg);
 		///TODO: What was I going to do here?
-		return false ;
+		return false;
 	}
 
 	if ( !_announceSTOToGrid(*this, true) )
 	{
 		///TODO: Delete the msp waypoint too
-		return false ;
+		return false;
 	}
 
-	_audit(Creation) ;
+	_audit(Creation);
 
-	return ServerTrackedObject::activate() ;
+	return ServerTrackedObject::activate();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -735,45 +735,45 @@ UMSSTO::activate()
 bool
 chatPatrolGridExpirations()
 {
-	_CHAT_GRID::iterator it ;
+	_CHAT_GRID::iterator it;
 #ifdef HEAVY_DEBUG
 	if ( !_gridIndex.empty() )
 	{
-		dbugLog(_FLD, "cell:%u entries. ", _gridIndex.size()) ;
-		for ( it = _gridIndex.begin() ; it != _gridIndex.end() ; ++it )
+		dbugLog(_FLD, "cell:%u entries. ", _gridIndex.size());
+		for ( it = _gridIndex.begin(); it != _gridIndex.end(); ++it )
 		{
-			ChatGrid* node = it->second ;
+			ChatGrid* node = it->second;
 			if ( g_logDebug )
 				dbugLog(_FLDB, "[g:%llu:%d,%d %p players:%u, stos:%u] "
 								, node->gridKey().instanceID(), node->gridKey().X(), node->gridKey().Y(), node
-								, node->players().size(), node->stos().size()) ;
+								, node->players().size(), node->stos().size());
 		}
 	}
 #endif
 
-	for ( it = _gridIndex.begin() ; it != _gridIndex.end() ;  )
+	for ( it = _gridIndex.begin(); it != _gridIndex.end();  )
 	{
-		ChatGrid* cell = it->second ;
-		++it ;
+		ChatGrid* cell = it->second;
+		++it;
 		if ( cell->expired() )
 		{
 			if ( g_logDebug )
 				dbugLog(_FLD, "g:%llu:%d,%d expiry time elapsed"
-								, cell->gridKey().instanceID(), cell->gridKey().X(), cell->gridKey().Y()) ;
-			_gridIndex.erase(cell->gridKey()) ;
-			cell->deactivate() ;
-			_freeGrids.push(cell) ;
+								, cell->gridKey().instanceID(), cell->gridKey().X(), cell->gridKey().Y());
+			_gridIndex.erase(cell->gridKey());
+			cell->deactivate();
+			_freeGrids.push(cell);
 		}
 		else if ( !cell->stos().empty() )
 		{
 			if ( host_config.sto.hulkLimitPerArea > 0 )
-				_checkHulksInArea(cell) ;
+				_checkHulksInArea(cell);
 			else if ( host_config.sto.hulkLimitPerCell > 0 )
-				_checkHulksInCell(cell, host_config.sto.hulkLimitPerCell) ;
+				_checkHulksInCell(cell, host_config.sto.hulkLimitPerCell);
 		}
 	}
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -782,43 +782,43 @@ chatPatrolGridExpirations()
 void
 Player::updateGridPosition()
 {
-	SINT32 newGX = ((SINT32)m_lastX) >> ChatGrid::_KEY_SHIFT ;
-	SINT32 newGY = ((SINT32)m_lastY) >> ChatGrid::_KEY_SHIFT ;
+	SINT32 newGX = ((SINT32)m_lastX) >> ChatGrid::_KEY_SHIFT;
+	SINT32 newGY = ((SINT32)m_lastY) >> ChatGrid::_KEY_SHIFT;
 
 	if ( newGX == m_gridX && newGY == m_gridY )
-		return ;
+		return;
 
-	ChatGrid* oldGrid = _findGrid(GridKey(instance().id(), m_gridX, m_gridY)) ;
-	ChatGrid* newGrid = _getGrid(GridKey(instance().id(), newGX, newGY)) ;
+	ChatGrid* oldGrid = _findGrid(GridKey(instance().id(), m_gridX, m_gridY));
+	ChatGrid* newGrid = _getGrid(GridKey(instance().id(), newGX, newGY));
 
 	if ( g_logDebug )
 	{
 		dbugLog(_FLD, "t:%d p:%u c:%s moved into [%d,%d] -> [%d,%d]"
 						, teulIndex(), playerID(), callsign()
 						, m_gridX, m_gridY
-						, newGX, newGY) ;
+						, newGX, newGY);
 	}
 
 #ifdef HEAVY_DEBUG
-	char buffer[4096] ;
-	int off ;
+	char buffer[4096];
+	int off;
 	off = sprintf(buffer, "Grid:%d,%d off:%d,%d. Neighborhood:"
 							, newGX, newGY
 							, lastX - (newGX << ChatGrid::_KEY_SHIFT)
 							, lastY - (newGY << ChatGrid::_KEY_SHIFT)
-							) ;
-	_GRIDS::const_iterator it ;
-	for ( it = newGrid->neighbors().begin() ; it != newGrid->neighbors().end() ; ++it )
+							);
+	_GRIDS::const_iterator it;
+	for ( it = newGrid->neighbors().begin(); it != newGrid->neighbors().end(); ++it )
 	{
-		off += sprintf(buffer + off, "%d,%d(c:%" PRSizeT ",s:%" PRSizeT ") ", (*it)->gridKey().X(), (*it)->gridKey().Y(), (*it)->players().size(), (*it)->stos().size()) ;
+		off += sprintf(buffer + off, "%d,%d(c:%" PRSizeT ",s:%" PRSizeT ") ", (*it)->gridKey().X(), (*it)->gridKey().Y(), (*it)->players().size(), (*it)->stos().size());
 	}
-	message(LSTR_NOTE, LSTR_GENERIC, buffer) ;
+	message(LSTR_NOTE, LSTR_GENERIC, buffer);
 #endif
 
-	newGrid->addPlayer(this, oldGrid) ;
+	newGrid->addPlayer(this, oldGrid);
 
-	m_gridX = newGX ;
-	m_gridY = newGY ;
+	m_gridX = newGX;
+	m_gridY = newGY;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -828,71 +828,71 @@ void
 Player::removeFromGrid()
 {
 	if ( m_gridX == INVALID_GRID_COORD && m_gridY == m_gridX )
-		return ;
+		return;
 
 	if ( g_logDebug )
-		log(_FLD, "removing from grid [%d,%d]", m_gridX, m_gridY) ;
+		log(_FLD, "removing from grid [%d,%d]", m_gridX, m_gridY);
 
-	ChatGrid* grid = _findGrid(GridKey(instance().id(), m_gridX, m_gridY)) ;
+	ChatGrid* grid = _findGrid(GridKey(instance().id(), m_gridX, m_gridY));
 	if ( grid != NULL )
-		grid->extractPlayer(this) ;
+		grid->extractPlayer(this);
 
-	m_gridX = m_gridY = INVALID_GRID_COORD ;
+	m_gridX = m_gridY = INVALID_GRID_COORD;
 }
 
 void
 chatGridGetPlayersVector(const Player* player, const SINT64& range, PLAYERS_ARRAY& cells)
 {
-	cells.clear() ;
+	cells.clear();
 
-	GridKey origin(player->instance().id(), player->gridX(), player->gridY()) ;
-	ChatGrid* grid = _findGrid(origin) ;
+	GridKey origin(player->instance().id(), player->gridX(), player->gridY());
+	ChatGrid* grid = _findGrid(origin);
 	if ( grid == NULL )
 	{
-		player->log(_FLW, "g:%d,%d no grid?", player->gridX(), player->gridY()) ;
-		return ;
+		player->log(_FLW, "g:%d,%d no grid?", player->gridX(), player->gridY());
+		return;
 	}
 
-	GridKey botleft(player->instance().id(), (SINT32)(player->lastX() - range) >> ChatGrid::_KEY_SHIFT, (SINT32)(player->lastY() - range) >> ChatGrid::_KEY_SHIFT) ;
-	GridKey topright(player->instance().id(), (SINT32)(player->lastX() + range) >> ChatGrid::_KEY_SHIFT, (SINT32)(player->lastY() + range) >> ChatGrid::_KEY_SHIFT) ;
+	GridKey botleft(player->instance().id(), (SINT32)(player->lastX() - range) >> ChatGrid::_KEY_SHIFT, (SINT32)(player->lastY() - range) >> ChatGrid::_KEY_SHIFT);
+	GridKey topright(player->instance().id(), (SINT32)(player->lastX() + range) >> ChatGrid::_KEY_SHIFT, (SINT32)(player->lastY() + range) >> ChatGrid::_KEY_SHIFT);
 
-	_GRIDS::const_iterator it ;
-	PLAYERS::iterator cit ;
+	_GRIDS::const_iterator it;
+	PLAYERS::iterator cit;
 
 	betaLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%llu.%llu getting cells within [%d,%d],[%d,%d] %lld range: "
 					, player->teulIndex(), player->playerID(), player->callsign()
 					, player->instance().category(), player->instance().type(), player->instance().handle(), player->instance().id()
 					, botleft.X(), botleft.Y(), topright.X(), topright.Y()
-					, range) ;
+					, range);
 
-	for ( it = grid->neighbors().begin() ; it != grid->neighbors().end() ; ++it )
+	for ( it = grid->neighbors().begin(); it != grid->neighbors().end(); ++it )
 	{
-		const ChatGrid* node = (*it) ;
+		const ChatGrid* node = (*it);
 		if ( node->players().empty() )
 		{
 #ifdef CLOSED_BETA
 			if ( g_logDebug )
 			{
-				betaLog(_FLDB, "[%d,%d:empty] ", node->gridKey().X(), node->gridKey().Y()) ;
+				betaLog(_FLDB, "[%d,%d:empty] ", node->gridKey().X(), node->gridKey().Y());
 			}
 #endif
-			continue ;
+			continue;
 		}
 		if ( !node->inRange(botleft, topright) )
 		{
 #ifdef CLOSED_BETA
 			if ( g_logDebug )
 			{
-				betaLog(_FLDB, "[%d,%d:too far] ", node->gridKey().X(), node->gridKey().Y()) ;
+				betaLog(_FLDB, "[%d,%d:too far] ", node->gridKey().X(), node->gridKey().Y());
 			}
 #endif
-			continue ;
+			continue;
 		}
-		cells.push_back(&node->players()) ;
+		cells.push_back(&node->players());
 #ifdef CLOSED_BETA
 		if ( g_logDebug )
 		{
-			betaLog(_FLDB, "%d,%d ", node->gridKey().X(), node->gridKey().Y()) ;
+			betaLog(_FLDB, "%d,%d ", node->gridKey().X(), node->gridKey().Y());
 		}
 #endif
 	}
@@ -900,57 +900,57 @@ chatGridGetPlayersVector(const Player* player, const SINT64& range, PLAYERS_ARRA
 #ifdef CLOSED_BETA
 	if ( g_logDebug )
 	{
-		betaLog(_FLDB, " total: %" PRSizeT " cells", cells.size()) ;
+		betaLog(_FLDB, " total: %" PRSizeT " cells", cells.size());
 	}
 #endif
 }
 
-static bool g_enableSnapshot = false ;
-static bool g_enableFullSnapshot = false ;
+static bool g_enableSnapshot = false;
+static bool g_enableFullSnapshot = false;
 
 bool
 chatGridSnapshot()
 {
 	if ( ! g_enableSnapshot )
-		return true ;
+		return true;
 
-	static TeulTimeMS nextSnap = teulClock64 ;
+	static TeulTimeMS nextSnap = teulClock64;
 	if ( teulClock64 < nextSnap )
-		return true ;
+		return true;
 
-	nextSnap = teulClock64 + 1 * 60 * 1000 ;	// Once a minute
+	nextSnap = teulClock64 + 1 * 60 * 1000;	// Once a minute
 
-	char query[4096] ;
-	int len = 0 ;
+	char query[4096];
+	int len = 0;
 
-	_CHAT_GRID::const_iterator it ;
-	for ( it = _gridIndex.begin() ; it != _gridIndex.end() ; ++it )
+	_CHAT_GRID::const_iterator it;
+	for ( it = _gridIndex.begin(); it != _gridIndex.end(); ++it )
 	{
-		const ChatGrid* node = it->second ;
+		const ChatGrid* node = it->second;
 		if ( !g_enableFullSnapshot && !node->players().size() && !node->stos().size() )
-			continue ;
+			continue;
 		if ( len == 0 )
 		{
-			len = sprintf(query, "INSERT INTO grid_snapshot (gx,gy,recorded,players,stos) VALUES ") ;
+			len = sprintf(query, "INSERT INTO grid_snapshot (gx,gy,recorded,players,stos) VALUES ");
 		}
 		else
 		{
-			query[len++] = ',' ;
+			query[len++] = ',';
 		}
 		len += sprintf(query + len, "(%d,%d,now(),%" PRSizeT ",%" PRSizeT ")"
 						, node->gridKey().X(), node->gridKey().Y()
-						, node->players().size(), node->stos().size()) ;
+						, node->players().size(), node->stos().size());
 		if ( len > 4000 )
 		{
-			(new DBThreadQuery(DBThread::Default, "GridSnapshot1", query, DBThreadQuery::_IMMEDIATE))->Queue() ;
-			len = 0 ;
+			(new DBThreadQuery(DBThread::Default, "GridSnapshot1", query, DBThreadQuery::_IMMEDIATE))->Queue();
+			len = 0;
 		}
 	}
 
 	if ( len > 0 )
-		(new DBThreadQuery(DBThread::Default, "GridSnapshot2", query, DBThreadQuery::_IMMEDIATE))->Queue() ;
+		(new DBThreadQuery(DBThread::Default, "GridSnapshot2", query, DBThreadQuery::_IMMEDIATE))->Queue();
 
-	return true ;
+	return true;
 }
 
 class DotGridSnapshot : public DotCommand
@@ -962,22 +962,22 @@ public:
 	{
 		if ( strcmp(arguments, "on") == 0 )
 		{
-			g_enableSnapshot = true ;
-			g_enableFullSnapshot = false ;
-			player.message(LSTR_NOTE, LSTR_GRIDSNAPSHOT_ENABLED) ;
+			g_enableSnapshot = true;
+			g_enableFullSnapshot = false;
+			player.message(LSTR_NOTE, LSTR_GRIDSNAPSHOT_ENABLED);
 		}
 		if ( strcmp(arguments, "full") == 0 )
 		{
-			g_enableSnapshot = g_enableFullSnapshot = false ;
-			player.message(LSTR_NOTE, LSTR_GRIDSNAPSHOT_FULL) ;
+			g_enableSnapshot = g_enableFullSnapshot = false;
+			player.message(LSTR_NOTE, LSTR_GRIDSNAPSHOT_FULL);
 		}
 		else if ( strcmp(arguments, "off") == 0 )
 		{
-			g_enableSnapshot = false ;
-			player.message(LSTR_NOTE, LSTR_GRIDSNAPSHOT_DISABLED) ;
+			g_enableSnapshot = false;
+			player.message(LSTR_NOTE, LSTR_GRIDSNAPSHOT_DISABLED);
 		}
 		else
-			help(player) ;
+			help(player);
 	}
-} dotGridSnapshot ;
+} dotGridSnapshot;
 

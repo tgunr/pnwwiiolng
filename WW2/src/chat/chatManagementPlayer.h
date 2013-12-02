@@ -13,15 +13,15 @@
 class ManagementPlayer : public Player
 {
 public:
-	static void Initialize() ;
+	static void Initialize();
 
 public:
-	ManagementPlayer(SINT32 teulIndex, const char* withGameName) ;
-	virtual ~ManagementPlayer() ;
+	ManagementPlayer(SINT32 teulIndex, const char* withGameName);
+	virtual ~ManagementPlayer();
 
-	virtual bool isManager() const { return true ; }
-	virtual bool isConnected() const { return true ; }
+	virtual bool isManager() const { return true; }
+	virtual bool isConnected() const { return true; }
 
 	// Describe to another GM
-	virtual void describeTo(const Player* player, const FLOAT64& x, const FLOAT64& y, bool includePermissions) const ;
-} ;
+	virtual void describeTo(const Player* player, const FLOAT64& x, const FLOAT64& y, bool includePermissions) const;
+};

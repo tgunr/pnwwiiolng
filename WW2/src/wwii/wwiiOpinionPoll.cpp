@@ -19,9 +19,9 @@ const char*
 OpinionPoll::title() const
 {
 	if ( empty() )
-		return NULL ;
+		return NULL;
 	else
-		return m_title.c_str() ;
+		return m_title.c_str();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -31,8 +31,8 @@ const char*
 OpinionPoll::entry(UINT32 i) const
 {
 	if ( i >= m_size )
-		return NULL ;
-	return m_strings[i] ;
+		return NULL;
+	return m_strings[i];
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -42,9 +42,9 @@ UINT32
 OpinionPoll::size() const
 {
 	if ( empty() )
-		return 0 ;
+		return 0;
 	else
-		return m_size ;
+		return m_size;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -54,16 +54,16 @@ void
 OpinionPoll::addEntry(const char* newEntry)
 {
 	if ( size() > _MAX_STRINGS )
-		return ;
+		return;
 
-	char* dest = m_strings[m_size++] ;
+	char* dest = m_strings[m_size++];
 
 	if ( newEntry == NULL )
-		*dest = 0 ;
+		*dest = 0;
 	else
 	{
-		strncpy(dest, newEntry, _MAX_STRING_LEN) ;
-		dest[_MAX_STRING_LEN] = 0 ;
+		strncpy(dest, newEntry, _MAX_STRING_LEN);
+		dest[_MAX_STRING_LEN] = 0;
 	}
 }
 
@@ -73,17 +73,17 @@ OpinionPoll::addEntry(const char* newEntry)
 SINT32
 OpinionPoll::packer(LOGICAL mode, ACTION_OBJECT* a)
 {
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_pollID, 0) ;
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_size, 8) ;
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_pollID, 0);
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_size, 8);
 
-	a->offset = wwiiPackString(mode, a->packed, a->offset, m_title, _MAX_TITLE_LEN) ;
+	a->offset = wwiiPackString(mode, a->packed, a->offset, m_title, _MAX_TITLE_LEN);
 
-	for ( UINT32 i = 0 ; i < m_size && i < _MAX_STRINGS ; ++i )
+	for ( UINT32 i = 0; i < m_size && i < _MAX_STRINGS; ++i )
 	{
-		a->offset = wwiiPackText(mode, a->packed, a->offset, m_strings[i], _MAX_STRING_LEN) ;
+		a->offset = wwiiPackText(mode, a->packed, a->offset, m_strings[i], _MAX_STRING_LEN);
 	}
 
-	return a->offset ;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -92,7 +92,7 @@ OpinionPoll::packer(LOGICAL mode, ACTION_OBJECT* a)
 SINT32
 OpinionChoice::packer(LOGICAL mode, ACTION_OBJECT* a)
 {
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_pollID, 0) ;
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_choice, 8) ;
-	return a->offset ;
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_pollID, 0);
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_choice, 8);
+	return a->offset;
 }

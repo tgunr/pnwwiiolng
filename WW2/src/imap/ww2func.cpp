@@ -21,7 +21,7 @@ struct functionEntry
 	unsigned int flags;
 	int headerLocID;
 	int ezLevel;
-} ;
+};
 
 enum
 {

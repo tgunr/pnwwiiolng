@@ -9,9 +9,9 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-struct SquadMemberUpdate ;
+struct SquadMemberUpdate;
 
 extern SINT32 chatdbInstallClientCallbacks();
-extern SINT32 chatdbRequestSquad(UINT32 squadID) ;
-extern SINT32 chatdbSendSquadMemberUpdate(SquadMemberUpdate& smu) ;
+extern SINT32 chatdbRequestSquad(UINT32 squadID);
+extern SINT32 chatdbSendSquadMemberUpdate(SquadMemberUpdate& smu);
 

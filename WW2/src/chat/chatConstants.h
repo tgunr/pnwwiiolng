@@ -14,7 +14,7 @@ enum { CHAT_X = 205 };
 
 namespace Chat
 {
-	enum { CallbackX = 205 } ;
+	enum { CallbackX = 205 };
 
 	//Once again, we pick a high number that hopefully isn't taken by someone
 	//	else

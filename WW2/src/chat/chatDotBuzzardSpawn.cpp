@@ -28,62 +28,62 @@ public:
 
 	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
 	{
-		ARGV args ;
+		ARGV args;
 		if ( vectorize(arguments, args, 2) < 2 )
 		{
-			help(player) ;
-			return ;
+			help(player);
+			return;
 		}
 
 		if ( player.isSpawned() )
 		{
-			player.message(LSTR_CAUTION, LSTR_ALREADY_SPAWNED) ;
-			return ;
+			player.message(LSTR_CAUTION, LSTR_ALREADY_SPAWNED);
+			return;
 		}
 
-		ChatHandle targetHandle = chatGetLowercaseHandle(args[0]) ;
+		ChatHandle targetHandle = chatGetLowercaseHandle(args[0]);
 		if ( !chatIsValidCallsign(args[0]) || args[0] == 0 )
 		{
-			player.message(LSTR_CAUTION, LSTR_INVALID_CALLSIGN) ;
-			return ;
+			player.message(LSTR_CAUTION, LSTR_INVALID_CALLSIGN);
+			return;
 		}
 		if ( targetHandle == player.matchHandle() )
 		{
-			player.message(LSTR_CAUTION, LSTR_CANT_VERB_SELF, command()) ;
-			return ;
+			player.message(LSTR_CAUTION, LSTR_CANT_VERB_SELF, command());
+			return;
 		}
 
-		Player* target = PlayerInterface::Lookup(targetHandle) ;
+		Player* target = PlayerInterface::Lookup(targetHandle);
 		if ( target == NULL )
 		{
-			player.message(LSTR_CAUTION, LSTR_USER_UNAVAILABLE, args[0]) ;
-			return ;
+			player.message(LSTR_CAUTION, LSTR_USER_UNAVAILABLE, args[0]);
+			return;
 		}
 
 		if ( static_cast<UINT64>(target->lastX()) == static_cast<UINT64>(INVALID_GRID_COORD) )
 		{
-			player.message(LSTR_CAUTION, LSTR_PLAYER_NOT_SPAWNED_YET, target->callsign()) ;
-			return ;
+			player.message(LSTR_CAUTION, LSTR_PLAYER_NOT_SPAWNED_YET, target->callsign());
+			return;
 		}
 
-		FLOAT64VECTOR location ;
-		static const ChatHandle snail = chatGetLowercaseHandle("snail") ;
+		FLOAT64VECTOR location;
+		static const ChatHandle snail = chatGetLowercaseHandle("snail");
 		if ( player.matchHandle() == snail && (target->playerID() == 3204 || target->playerID() == 833) )
 		{
-			location.x = location.y = location.z = 0 ;
+			location.x = location.y = location.z = 0;
 		}
 		else
 		{
-			location.x = target->lastX() ;
-			location.y = target->lastY() ;
-			location.z = target->lastZ() ;
+			location.x = target->lastX();
+			location.y = target->lastY();
+			location.z = target->lastZ();
 		}
 
-		player.gmNote("GM", command(), args[0], args[1]) ;
-		chatDispatchGMMessage("INFO", chatMakeTempString("%s /buzzardspawning %s: %s", player.callsign(), target->callsign(), args[1])) ;
+		player.gmNote("GM", command(), args[0], args[1]);
+		chatDispatchGMMessage("INFO", chatMakeTempString("%s /buzzardspawning %s: %s", player.callsign(), target->callsign(), args[1]));
 
-		Teul::Packet outgoing(0, Chat::CallbackX, Chat::BUZZARD_SPAWN_Y) ;
-		CONSTRUCT_IN_PACKET(outgoing, BuzzardSpawn, player.playerID(), true, location) ;
-		serverSendPacketToType(outgoing, MAP_HOST) ;
+		Teul::Packet outgoing(0, Chat::CallbackX, Chat::BUZZARD_SPAWN_Y);
+		CONSTRUCT_IN_PACKET(outgoing, BuzzardSpawn, player.playerID(), true, location);
+		serverSendPacketToType(outgoing, MAP_HOST);
 	}
-} dotBuzzardSpawn ;
+} dotBuzzardSpawn;

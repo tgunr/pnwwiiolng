@@ -186,7 +186,7 @@ void cfgPrefsSendSharedPrefs()
 	if(PlayerClient()->ChatConnection() < 0)
 		return;
 
-	Teul::Packet outgoing(0, Chat::CallbackX, Chat::PREFERENCE_Y) ;
+	Teul::Packet outgoing(0, Chat::CallbackX, Chat::PREFERENCE_Y);
 
 	const char* name;
 	name = cfgPrefsGetGlobalName(cfgVISIBLE_PLAYER_LIMIT);
@@ -214,7 +214,7 @@ void cfgPrefsSendSharedPref(CHAT_PREFERENCE key)
 	if(PlayerClient()->ChatConnection() < 0)
 		return;
 
-	Teul::Packet outgoing(0, Chat::CallbackX, Chat::PREFERENCE_Y) ;
+	Teul::Packet outgoing(0, Chat::CallbackX, Chat::PREFERENCE_Y);
 	switch(key)
 	{
 		case CPR_UPDATE_MODE:

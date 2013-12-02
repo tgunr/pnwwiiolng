@@ -149,7 +149,7 @@ static void _onRepeaterRead(struct bufferevent* bev_, void* arg_)
 #endif
 
 	struct evbuffer_iovec ebiov;
-	for ( ;; )
+	for (;; )
 	{
 		size_t contigBytes = evbuffer_get_contiguous_space(input);
 		if ( contigBytes == 0 )
@@ -416,7 +416,7 @@ static void _addInitialProcesses()
 	while ( p && *p )
 	{
 		const char* end = strchr(p, ';');
-		for ( UINT32 i = 0 ; i < MAX_SERVER_TYPE ; ++i )
+		for ( UINT32 i = 0; i < MAX_SERVER_TYPE; ++i )
 		{
 			if ( strncmp(g_serverTypes[i], p, strlen(g_serverTypes[i])) == 0 )
 			{

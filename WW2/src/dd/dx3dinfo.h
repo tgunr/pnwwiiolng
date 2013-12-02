@@ -15,7 +15,7 @@ struct DSOUNDDRIVERS
 	std::string description;
 	std::string driverName;
 
-} ;
+};
 
 struct ADAPTERMODES
 {

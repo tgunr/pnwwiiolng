@@ -30,14 +30,14 @@ struct BrigadeControlDescriptor
 
 	void getBrigadeDescriptor(UINT32 brigadeID, std::wstring& into) const
 	{
-		static std::string brigadeName ;
-		brigadeName = "" ;
+		static std::string brigadeName;
+		brigadeName = "";
 
-		const HCUnit* brigade = HCUnit::Lookup(brigadeID) ;
+		const HCUnit* brigade = HCUnit::Lookup(brigadeID);
 		if ( brigade )
-			brigade->getDescriptor(brigadeName) ;
+			brigade->getDescriptor(brigadeName);
 
-		into = uiUTF8toUTF16(brigadeName.c_str()) ;
+		into = uiUTF8toUTF16(brigadeName.c_str());
 	}
 
 	std::string label;
@@ -53,12 +53,12 @@ struct BCD_OfficerBrigade : public BrigadeControlDescriptor
 	{
 		if(me)
 		{
-			getBrigadeDescriptor(bcn->m_brigadeID, arg1) ;
+			getBrigadeDescriptor(bcn->m_brigadeID, arg1);
 		}
 		else
 		{
 			arg1 = chatGetWideCallsign(bcn->m_officer);
-			getBrigadeDescriptor(bcn->m_brigadeID, arg2) ;
+			getBrigadeDescriptor(bcn->m_brigadeID, arg2);
 		}
 	}
 };
@@ -70,14 +70,14 @@ struct BCD_OfficerSponsorBrigade : public BrigadeControlDescriptor
 		if(me)
 		{
 			arg1 = chatGetWideCallsign(bcn->m_sponsor);
-			getBrigadeDescriptor(bcn->m_brigadeID, arg2) ;
+			getBrigadeDescriptor(bcn->m_brigadeID, arg2);
 
 		}
 		else
 		{
 			arg1 = chatGetWideCallsign(bcn->m_officer);
 			arg2 = chatGetWideCallsign(bcn->m_sponsor);
-			getBrigadeDescriptor(bcn->m_brigadeID, arg3) ;
+			getBrigadeDescriptor(bcn->m_brigadeID, arg3);
 
 		}
 	}
@@ -90,13 +90,13 @@ struct BCD_SponsorOfficerBrigade : public BrigadeControlDescriptor
 		if(me)
 		{
 			arg1 = chatGetWideCallsign(bcn->m_sponsor);
-			getBrigadeDescriptor(bcn->m_brigadeID, arg2) ;
+			getBrigadeDescriptor(bcn->m_brigadeID, arg2);
 		}
 		else
 		{
 			arg1 = chatGetWideCallsign(bcn->m_sponsor);
 			arg2 = chatGetWideCallsign(bcn->m_officer);
-			getBrigadeDescriptor(bcn->m_brigadeID, arg3) ;
+			getBrigadeDescriptor(bcn->m_brigadeID, arg3);
 		}
 	}
 };
@@ -110,7 +110,7 @@ struct BCD_SponsorBrigadeOriginTarget : public BrigadeControlDescriptor
 
 		arg1 = chatGetWideCallsign(bcn->m_sponsor);
 
-		getBrigadeDescriptor(bcn->m_brigadeID, arg2) ;
+		getBrigadeDescriptor(bcn->m_brigadeID, arg2);
 		if(origin) arg3		= origin->DisplayName();
 		if(target) arg4		= target->DisplayName();
 	}
@@ -123,7 +123,7 @@ struct BCD_BrigadeOriginTarget : public BrigadeControlDescriptor
 		StratDB::StratObject* origin = StratDB::FindStratObject(bcn->m_origin);
 		StratDB::StratObject* target = StratDB::FindStratObject(bcn->m_target);
 
-		getBrigadeDescriptor(bcn->m_brigadeID, arg1) ;
+		getBrigadeDescriptor(bcn->m_brigadeID, arg1);
 		if(origin) arg2		= origin->DisplayName();
 		if(target) arg3		= target->DisplayName();
 	}
@@ -157,7 +157,7 @@ struct BCD_Objective : public BrigadeControlDescriptor
 		}
 
 		if(target) arg2 = target->DisplayName();
-		getBrigadeDescriptor(bcn->m_brigadeID, arg3) ;
+		getBrigadeDescriptor(bcn->m_brigadeID, arg3);
 		if(bcn->m_sponsor) arg4 = chatGetWideCallsign(bcn->m_sponsor);
 		else if(oic && oic->m_officer) arg4 = chatGetWideCallsign(oic->m_officer);
 	}
@@ -170,19 +170,19 @@ struct BCD_ControlError : public BrigadeControlDescriptor
 	{
 		if ( bcn->isTargettedAction() )
 		{
-			StratDB::StratObject* object ;
+			StratDB::StratObject* object;
 			object = StratDB::FindStratObject(bcn->m_target);
 			if ( object )
-				arg1 = object->DisplayName() ;
+				arg1 = object->DisplayName();
 			object = StratDB::FindStratObject(bcn->m_origin);
 			if ( object )
-				arg3 = object->DisplayName() ;
+				arg3 = object->DisplayName();
 		}
 		else
 		{
-			arg1 = (bcn->m_officer) ? chatGetWideCallsign(bcn->m_officer) : L"<null>" ;
+			arg1 = (bcn->m_officer) ? chatGetWideCallsign(bcn->m_officer) : L"<null>";
 		}
-		getBrigadeDescriptor(bcn->m_brigadeID, arg2) ;
+		getBrigadeDescriptor(bcn->m_brigadeID, arg2);
 
 	}
-} ;
+};

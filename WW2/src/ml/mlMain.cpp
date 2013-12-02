@@ -5429,7 +5429,7 @@ static UINT32 _UpdateTerrainCollideLists(mlVehicleData* VehicleData, UINT32 Forc
 		TERRAIN_DETAIL* td = &trndtl[i];
 		//FLOAT64VECTOR pos = {(td->scx+.5)*SUPERCELL_SIZE_M,(td->scy+.5)*SUPERCELL_SIZE_M,0};
 
-		for(int j=0 ; j < MAX_TERRAIN_TEXTURES; j++)
+		for(int j=0; j < MAX_TERRAIN_TEXTURES; j++)
 		{
 			OBJECT* lpobj=td->nonreplacementtiles[j];
 

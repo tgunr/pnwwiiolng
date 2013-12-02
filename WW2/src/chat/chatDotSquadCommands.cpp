@@ -32,31 +32,31 @@
 static SquadList*
 _findClientSquadList(const Player& player)
 {
-	SquadList* list = chatFindSquadList(player.squadID()) ;
+	SquadList* list = chatFindSquadList(player.squadID());
 
-	if ( list != NULL ) return list ;
+	if ( list != NULL ) return list;
 
-	SquadControlResult error(SQR_SQUAD_UNAVAILABLE, SquadControl::_INVALID, 0LL) ;
-	error.send(player.teulIndex()) ;
+	SquadControlResult error(SQR_SQUAD_UNAVAILABLE, SquadControl::_INVALID, 0LL);
+	error.send(player.teulIndex());
 
-	return NULL ;
+	return NULL;
 }
 
 static inline ChatHandle
 	_validateSquadName(const char* name)
 {
-	ChatHandle handle = chatGetLowercaseHandle(name) ;
+	ChatHandle handle = chatGetLowercaseHandle(name);
 	if ( handle == 0LL )
-		return handle ;
-	char unpacked[MAX_HANDLE_SIZE] ;
-	chatGetCallsign(unpacked, handle) ;
+		return handle;
+	char unpacked[MAX_HANDLE_SIZE];
+	chatGetCallsign(unpacked, handle);
 	if ( strcasecmp(name, unpacked) != 0 )
-		return 0LL ;
-	int len = strlen(unpacked) ;
+		return 0LL;
+	int len = strlen(unpacked);
 	if ( len < 2 || len > Squad::SHORT_NAME_LEN )
-		return 0LL ;
+		return 0LL;
 
-	return handle ;
+	return handle;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -70,27 +70,27 @@ public:
 										) {}
 	virtual bool help(Player& player) const OVERRIDE_FN
 	{
-		genericHelp(player, "/changesquadname <newname>", "Request a name change for your squad.") ;
-		return true ;
+		genericHelp(player, "/changesquadname <newname>", "Request a name change for your squad.");
+		return true;
 	}
 
 	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
 	{
 		if ( !player.squadID() || player.squadRank() != Squad::CO )
 		{
-			help(player) ;
-			return ;
+			help(player);
+			return;
 		}
 
-		SquadList* list = _findClientSquadList(player) ;
+		SquadList* list = _findClientSquadList(player);
 		if ( !list )
-			return ;
+			return;
 
-		ChatHandle squadHandle = _validateSquadName(arguments) ;
+		ChatHandle squadHandle = _validateSquadName(arguments);
 		if ( squadHandle == 0LL )
 		{
-			player.message(LSTR_CAUTION, LSTR_INVALID_CALLSIGN, arguments) ;
-			return ;
+			player.message(LSTR_CAUTION, LSTR_INVALID_CALLSIGN, arguments);
+			return;
 		}
 
 		///TODO: Check if squad already exists in memory
@@ -100,9 +100,9 @@ public:
 	virtual void action(Player& player, Chat::ClientMessage* message) const OVERRIDE_FN
 	{
 		// Confirmation
-		help(player) ;
+		help(player);
 	}
-} dotChangeSquadName ;
+} dotChangeSquadName;
 
 //////////////////////////////////////////////////////////////////////
 // Vote for a CO
@@ -113,11 +113,11 @@ _checkVoteStart(const SquadVote& vote, Player& player)
 {
 	if ( vote.nextStart() > teulTime() )
 	{
-		player.message(LSTR_CAUTION, LSTR_SQUAD_VOTE_CLOSED, chatTimeInterval(vote.nextStart() - teulTime())) ;
-		return false ;
+		player.message(LSTR_CAUTION, LSTR_SQUAD_VOTE_CLOSED, chatTimeInterval(vote.nextStart() - teulTime()));
+		return false;
 	}
 
-	return true ;
+	return true;
 }
 
 class DotVoteCO : public DotCommand
@@ -131,82 +131,82 @@ public:
 	{
 		if ( !player.squadID() )
 		{
-			player.message(LSTR_CAUTION, LSTR_NO_SQUAD) ;
-			return ;
+			player.message(LSTR_CAUTION, LSTR_NO_SQUAD);
+			return;
 		}
 
-		SquadList* list = _findClientSquadList(player) ;
+		SquadList* list = _findClientSquadList(player);
 		if ( list == NULL )
-			return ;
+			return;
 
 		if ( !list->squad().votingEnabled() )
 		{
-			player.message(LSTR_CAUTION, LSTR_VOTING_DISABLED) ;
-			return ;
+			player.message(LSTR_CAUTION, LSTR_VOTING_DISABLED);
+			return;
 		}
 
 		if ( player.squadRank() == Squad::RECRUIT && chatFindSquadVote(player.squadID()) == NULL )
 		{
-			player.message(LSTR_CAUTION, LSTR_SQUAD_NOT_VOTING) ;
-			return ;
+			player.message(LSTR_CAUTION, LSTR_SQUAD_NOT_VOTING);
+			return;
 		}
-		SquadVote& vote = chatGetSquadVote(player.squadID()) ;
+		SquadVote& vote = chatGetSquadVote(player.squadID());
 		if ( _checkVoteStart(vote, player) == false )
 		{
-			return ;
+			return;
 		}
 
 		if ( vote.hasVoted(player.matchHandle())  )
 		{
-			player.message(LSTR_CAUTION, LSTR_SQUAD_ALREADY_VOTED) ;
-			return ;
+			player.message(LSTR_CAUTION, LSTR_SQUAD_ALREADY_VOTED);
+			return;
 		}
 
-		ChatHandle handle = chatGetLowercaseHandle(arguments) ;
+		ChatHandle handle = chatGetLowercaseHandle(arguments);
 		if ( list->find(handle) == NULL )
 		{
-			player.message(LSTR_CAUTION, LSTR_PLAYER_NOT_IN_SQUAD, chatGetCallsign(handle)) ;
-			return ;
+			player.message(LSTR_CAUTION, LSTR_PLAYER_NOT_IN_SQUAD, chatGetCallsign(handle));
+			return;
 		}
 
-		vote.addVote(player.squadID(), player.matchHandle(), handle) ;
+		vote.addVote(player.squadID(), player.matchHandle(), handle);
 
-		player.message(LSTR_NOTE, LSTR_SQUAD_VOTE_REGISTERED) ;
+		player.message(LSTR_NOTE, LSTR_SQUAD_VOTE_REGISTERED);
 	}
 
 	virtual void action(Player& player, Chat::ClientMessage* message) const OVERRIDE_FN
 	{
 		if ( !player.squadID() )
 		{
-			player.message(LSTR_CAUTION, LSTR_NO_SQUAD) ;
-			return ;
+			player.message(LSTR_CAUTION, LSTR_NO_SQUAD);
+			return;
 		}
 
-		SquadList* list = _findClientSquadList(player) ;
-		if ( list == NULL ) return ;
+		SquadList* list = _findClientSquadList(player);
+		if ( list == NULL ) return;
 
 		if ( !list->squad().votingEnabled() )
 		{
-			player.message(LSTR_NOTE, LSTR_VOTING_DISABLED) ;
-			return ;
+			player.message(LSTR_NOTE, LSTR_VOTING_DISABLED);
+			return;
 		}
 
-		SquadVote* vote = chatFindSquadVote(player.squadID()) ;
+		SquadVote* vote = chatFindSquadVote(player.squadID());
 
 		if ( vote == NULL || vote->m_started == false )
 		{
-			player.message(LSTR_CAUTION, LSTR_SQUAD_NOT_VOTING) ;
-			return ;
+			player.message(LSTR_CAUTION, LSTR_SQUAD_NOT_VOTING);
+			return;
 		}
 
 		// This would be a good time to tell them that they are
 		// between votes right now.
 		if ( _checkVoteStart(*vote, player) == false )
-			return ;
+			return;
 
-		vote->announce(player.squadID(), &player) ;
+		vote->announce(player.squadID(), &player);
 	}
-} dotVoteCO ;
+} dotVoteCO;
 
 //////////////////////////////////////////////////////////////////////
 // Enable or disable voting
@@ -223,61 +223,61 @@ public:
 	{
 		if ( !player.squadID() || player.squadRank() != Squad::CO )
 		{
-			player.updatePermMask() ;
-			help(player) ;
-			return ;
+			player.updatePermMask();
+			help(player);
+			return;
 		}
 
 		// Make sure the squad is in memory
-		SquadList* list = _findClientSquadList(player) ;
-		if ( list == NULL ) return ;
+		SquadList* list = _findClientSquadList(player);
+		if ( list == NULL ) return;
 
 		if ( strcasecmp(arguments, "on") == 0 )			 // Turn voting on
 		{
 			// Check if it is already on
 			if ( list->squad().votingEnabled() )
 			{
-				player.message(LSTR_CAUTION, LSTR_VOTING_ALREADY_ENABLED) ;
-				return ;
+				player.message(LSTR_CAUTION, LSTR_VOTING_ALREADY_ENABLED);
+				return;
 			}
 
 			// Update the database, but make it low-priority
-			DBThread::Do(DBThread::Default, "UPDATE LOW_PRIORITY wwii_squads SET voting = 1 WHERE squadid = %u", player.squadID()) ;
+			DBThread::Do(DBThread::Default, "UPDATE LOW_PRIORITY wwii_squads SET voting = 1 WHERE squadid = %u", player.squadID());
 
 			// Update the in-memory image, it's called "active" for now
-			list->squad().setVotingEnabled(true) ;
-			list->setUpdated() ;
+			list->squad().setVotingEnabled(true);
+			list->setUpdated();
 
 			// Notify the squad
-			list->sendMessage(LSTR_SQUAD, LSTR_CO_ENABLED_ELECTIONS, player.callsign(), list->squad().shortName()) ;
+			list->sendMessage(LSTR_SQUAD, LSTR_CO_ENABLED_ELECTIONS, player.callsign(), list->squad().shortName());
 		}
 		else if ( strcasecmp(arguments, "off") == 0 )	// Turn voting off
 		{
 			// Check if it's already off
 			if ( !list->squad().votingEnabled() )
 			{
-				player.message(LSTR_CAUTION, LSTR_VOTING_ALREADY_DISABLED) ;
-				return ;
+				player.message(LSTR_CAUTION, LSTR_VOTING_ALREADY_DISABLED);
+				return;
 			}
 
 			// Low-pri update of the table
-			DBThread::Do(DBThread::Default, "UPDATE LOW_PRIORITY wwii_squads SET voting = 0 WHERE squadid = %u", player.squadID()) ;
+			DBThread::Do(DBThread::Default, "UPDATE LOW_PRIORITY wwii_squads SET voting = 0 WHERE squadid = %u", player.squadID());
 
 			// Update in-memory
-			list->squad().setVotingEnabled(false) ;
-			list->setUpdated() ;
+			list->squad().setVotingEnabled(false);
+			list->setUpdated();
 
-			list->sendMessage(LSTR_SQUAD, LSTR_CO_DISABLED_ELECTIONS, player.callsign(), list->squad().shortName()) ;
+			list->sendMessage(LSTR_SQUAD, LSTR_CO_DISABLED_ELECTIONS, player.callsign(), list->squad().shortName());
 
 			// Cancel any pending vote
-			SquadVote* vote = chatFindSquadVote(player.squadID()) ;
+			SquadVote* vote = chatFindSquadVote(player.squadID());
 			if ( vote != NULL )
-				vote->erase(player.squadID()) ;
+				vote->erase(player.squadID());
 		}
 		else
-			help(player) ;
+			help(player);
 	}
-} dotVoting ;
+} dotVoting;
 
 
 //////////////////////////////////////////////////////////////////////
@@ -292,55 +292,55 @@ public:
 							) { }
 	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN;
 	virtual void action(Player& player, Chat::ClientMessage* message) const OVERRIDE_FN;
-} dotWho ;
+} dotWho;
 
 // Provide info on the listed players
 void
 DotWho::actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const
 {
-	static const UINT32 _MAX_NAMES = 8 ;
+	static const UINT32 _MAX_NAMES = 8;
 
 	if ( DotCommand::lockedFeature(player, "who", 5, teulTime()) )
-		return ;
+		return;
 
-	ARGV args ;
+	ARGV args;
 	if ( vectorize(arguments, args, _MAX_NAMES + 1) < 1 )
 	{
-		help(player) ;
-		return ;
+		help(player);
+		return;
 	}
 
-	CHAT_WHO_LIST whoList(CWT_HC, 0, Teul::TCPStdPayload) ;
-	Chat::Who who ;
-	SquadList* list = chatFindSquadList(player.squadID()) ;
-	SquadMemberEntry* entry = NULL ;
+	CHAT_WHO_LIST whoList(CWT_HC, 0, Teul::TCPStdPayload);
+	Chat::Who who;
+	SquadList* list = chatFindSquadList(player.squadID());
+	SquadMemberEntry* entry = NULL;
 
-	whoList.clear() ;
+	whoList.clear();
 
-	for ( UINT32 i = 0 ; i < args.size() && i < _MAX_NAMES ; ++i )
+	for ( UINT32 i = 0; i < args.size() && i < _MAX_NAMES; ++i )
 	{
-		ChatHandle handleID = chatGetLowercaseHandle(args[i]) ;
-		Player* target = PlayerInterface::Lookup(handleID) ;
+		ChatHandle handleID = chatGetLowercaseHandle(args[i]);
+		Player* target = PlayerInterface::Lookup(handleID);
 
 		if ( target != NULL
 			&& target->isVisibleTo(player)
 			&& (!target->noWho() || player.isEffectiveGM())
 			)
 		{
-			chatWhoPopulate(who, &player, target, false) ;
+			chatWhoPopulate(who, &player, target, false);
 		}
 		else
 		{
-			entry = (list) ? list->find(handleID) : NULL ;
+			entry = (list) ? list->find(handleID) : NULL;
 			if ( entry )
-				who.setBasics(handleID, false, true, entry->squadRank(), list->squad().shortHandle()) ;
+				who.setBasics(handleID, false, true, entry->squadRank(), list->squad().shortHandle());
 			else
-				who.setBasics(handleID, false, false, 0, 0) ;
+				who.setBasics(handleID, false, false, 0, 0);
 		}
-		whoList.add(who) ;
+		whoList.add(who);
 	}
 
-	whoList.send(player.teulIndex()) ;
+	whoList.send(player.teulIndex());
 }
 
 void
@@ -349,54 +349,54 @@ DotWho::action(Player& player, Chat::ClientMessage* /*message*/) const
 #if !defined(BETA_RELEASE) && !defined(TEST_RELEASE) && !defined(TRAINING_SERVER) && !defined(FRES)
 	if ( player.squadID() == false )
 	{
-		player.message(LSTR_CAUTION, LSTR_NO_SQUAD, NULL, NULL) ;
-		return ;
+		player.message(LSTR_CAUTION, LSTR_NO_SQUAD, NULL, NULL);
+		return;
 	}
 #endif // BETA_RELEASE
 
-	std::string reply = "" ;
-	PLAYER_INDEX::const_iterator it ;
-	UINT32 count = 0 ;
+	std::string reply = "";
+	PLAYER_INDEX::const_iterator it;
+	UINT32 count = 0;
 
-	static const UINT32 listLimit = 300 ;
+	static const UINT32 listLimit = 300;
 
 	// Produce a list of upto N people who meet the criteria that are online.
 	// Caveat: If there are N+ then truncate the list and add "..." instead
 	// of the (N+1)th person.
-	LSTRING_ID lstringID = LSTR_TEXT_START ;
+	LSTRING_ID lstringID = LSTR_TEXT_START;
 
-	for ( it = playerIndex.begin() ; count < listLimit && it != playerIndex.end() ; ++it )
+	for ( it = playerIndex.begin(); count < listLimit && it != playerIndex.end(); ++it )
 	{
-		const Player* subject = it->second ;
+		const Player* subject = it->second;
 #if !defined(BETA_RELEASE) && !defined(TEST_RELEASE) && !defined(TRAINING_SERVER) && !defined(FRES)
 		if ( subject->inSquad(player) == false )
-			continue ;
+			continue;
 #endif // !BETA_RELEASE
 
 		if ( subject->isVisibleTo(player) && (subject->noWho() == false || player.isEffectiveGM()) )
 		{
 			if ( reply.length() + 10 > MAX_MESSAGE_LENGTH )
 			{
-				player.message(LSTR_NONE, lstringID, reply.c_str(), NULL) ;
-				lstringID = LSTR_TEXT ;
-				reply.clear() ;
+				player.message(LSTR_NONE, lstringID, reply.c_str(), NULL);
+				lstringID = LSTR_TEXT;
+				reply.clear();
 			}
 
 			// Reached our limit, truncate the list
 			if ( count >= listLimit )
 			{
-				reply += "..." ;
-				break ;
+				reply += "...";
+				break;
 			}
 
-			subject->addName(reply) ;
+			subject->addName(reply);
 
-			count++ ;
+			count++;
 		}
 	}
 	if ( count == 0 )
-		player.message(LSTR_NONE, LSTR_NO_MATCHES, NULL, NULL) ;
+		player.message(LSTR_NONE, LSTR_NO_MATCHES, NULL, NULL);
 	else if ( reply.length() > 0 )
-		player.message(LSTR_NONE, LSTR_TEXT_END, reply.c_str(), NULL) ;
+		player.message(LSTR_NONE, LSTR_TEXT_END, reply.c_str(), NULL);
 }
 

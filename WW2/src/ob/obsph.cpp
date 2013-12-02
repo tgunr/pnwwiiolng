@@ -78,11 +78,11 @@ LOGICAL obsphCreate(const char* name, int MeshSize, piVECTOR* Location, float Sc
 	Color = piRGBA_MAKE(piRGBA_GETBLUE(Color), piRGBA_GETGREEN(Color), piRGBA_GETRED(Color), piRGBA_GETALPHA(Color));
 #endif
 
-	for (i=0 ; i <= MeshSize ; i++)
+	for (i=0; i <= MeshSize; i++)
 	{
 		vo = (MeshSize * 2 + 1) * i;
 
-		for (j=0 ; j <= MeshSize * 2 ; j++)
+		for (j=0; j <= MeshSize * 2; j++)
 		{
 			vec.x = (float)cos(PI / 2 + j * dj) * (float)sin(i * di);
 			vec.y = (float)sin(PI / 2 + j * dj) * (float)sin(i * di);
@@ -116,11 +116,11 @@ LOGICAL obsphCreate(const char* name, int MeshSize, piVECTOR* Location, float Sc
 	}
 
 	TotalIndices = 0;
-	for (i=0 ; i < MeshSize ; i++)
+	for (i=0; i < MeshSize; i++)
 	{
 		vo = (MeshSize * 2 + 1) * i;
 		io = (MeshSize * 2) * i * 6;
-		for (j=0 ; j < MeshSize * 2 ; j++)
+		for (j=0; j < MeshSize * 2; j++)
 		{
 			ptris[6 * j + io]      = vo + j;
 			ptris[6 * j + 2 + io]  = vo + j + 1;
@@ -223,10 +223,10 @@ piVECTOR	loc;
 #endif
 
 	TotalVertices = 0;
-	for (i=0 ; i <= MeshSize ; i++)
+	for (i=0; i <= MeshSize; i++)
 	{
 		vo = (MeshSize * 2 + 1) * i;
-		for (j=0 ; j <= MeshSize * 2 ; j++)
+		for (j=0; j <= MeshSize * 2; j++)
 		{
 			vec.x = (float)cos(PI / 2 + j * dj) * (float)sin(i * di);
 			vec.y = (float)sin(PI / 2 + j * dj) * (float)sin(i * di);
@@ -257,11 +257,11 @@ piVECTOR	loc;
 	}
 
 	TotalIndices = 0;
-	for (i=0 ; i < MeshSize ; i++)
+	for (i=0; i < MeshSize; i++)
 	{
 		vo = (MeshSize * 2 + 1) * i;
 		io = (MeshSize * 2) * i * 6;
-		for (j=0 ; j < MeshSize * 2 ; j++)
+		for (j=0; j < MeshSize * 2; j++)
 		{
 			ptris[6 * j + io]      = vo + j;
 			ptris[6 * j + 1 + io]  = vo + j + 1;
@@ -364,10 +364,10 @@ piVECTOR loc;
 #endif
 
 	TotalVertices = 0;
-	for (i=0 ; i <= MeshSize ; i++)
+	for (i=0; i <= MeshSize; i++)
 	{
 		vo = (MeshSize * 2 + 1) * i;
-		for (j=0 ; j <= MeshSize * 2 ; j++)
+		for (j=0; j <= MeshSize * 2; j++)
 		{
 			vec.x = (float)cos(PI / 2 + j * dj);// * (float)sin(i * di);
 			vec.y = (float)sin(PI / 2 + j * dj);// * (float)sin(i * di);
@@ -398,11 +398,11 @@ piVECTOR loc;
 	}
 
   	TotalIndices = 0;
-	for (i=0 ; i < MeshSize ; i++)
+	for (i=0; i < MeshSize; i++)
 	{
 		vo = (MeshSize * 2 + 1) * i;
 		io = (MeshSize * 2) * i * 6;
-		for (j=0 ; j < MeshSize * 2 ; j++)
+		for (j=0; j < MeshSize * 2; j++)
 		{
 			ptris[6 * j + io]      = vo + j;
 			ptris[6 * j + 2 + io]  = vo + j + 1;
@@ -524,10 +524,10 @@ UINT16*		ptris;
 #endif
 
 	TotalVertices = 0;
-	for (i=0 ; i <= (MeshSize / 2) ; i++)
+	for (i=0; i <= (MeshSize / 2); i++)
 	{
 		vo = (MeshSize + 1) * i;
-		for (j=0 ; j <= MeshSize ; j++)
+		for (j=0; j <= MeshSize; j++)
 		{
 			vec.x = (float)cos(PI / 2 + j * dj) * (float)sin(i * di + qi);
 			vec.y = (float)sin(PI / 2 + j * dj) * (float)sin(i * di + qi);
@@ -579,11 +579,11 @@ UINT16*		ptris;
 	}
 
   TotalIndices = 0;
-	for (i=0 ; i < (MeshSize / 2) ; i++)
+	for (i=0; i < (MeshSize / 2); i++)
   {
     vo = (MeshSize + 1) * i;
 		io = MeshSize * i * 6;
-		for (j=0 ; j < MeshSize ; j++)
+		for (j=0; j < MeshSize; j++)
     {
 			ptris[6 * j + io]      = vo + j;
 			ptris[6 * j + ib + io]  = vo + j + 1;
@@ -723,12 +723,12 @@ piLVERTEX*	pslverts, pdlverts;
 
   // Average the points around the top
   avg = 0;
-  for (i=0 ; i < width ; i++)
+  for (i=0; i < width; i++)
   {
     avg += bits[i];
   }
   avg /= width;
-  for (i=0 ; i < width ; i++)
+  for (i=0; i < width; i++)
   {
     bits[i] = avg;
   }
@@ -736,19 +736,19 @@ piLVERTEX*	pslverts, pdlverts;
   // Average the points around the bottom
   avg = 0;
   index = (height - 1) * width;
-  for (i=0 ; i < width ; i++)
+  for (i=0; i < width; i++)
   {
     avg += bits[index + i];
   }
   avg /= width;
-  for (i=0 ; i < width ; i++)
+  for (i=0; i < width; i++)
   {
     bits[index + i] = avg;
   }
 
   // Average the points at the seam
   index = width;
-  for (i=0 ; i < height - 1 ; i++)
+  for (i=0; i < height - 1; i++)
   {
     avg = bits[index] + bits[index + width - 1];
     bits[index] = bits[index + width - 1] = avg / 2;
@@ -773,9 +773,9 @@ piLVERTEX*	pslverts, pdlverts;
   pverts = lpobj->pverts;
   pslverts = lpobj->pslverts;
   pdlverts = lpobj->pdlverts;
-  for (i=0 ; i < rows ; i++)
+  for (i=0; i < rows; i++)
   {
-    for (j=0 ; j < cols ; j++)
+    for (j=0; j < cols; j++)
     {
       index = (int)((float)((int)((float)i * hdelta) * width) + (float)j * wdelta);
       hmulti = (float)bits[index] * maxheight;

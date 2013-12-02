@@ -21,7 +21,7 @@
 struct WEAPON_SPEC
 {
 	WEAPON_SPEC() : wType(0), wClass(0), wCategory(0), wCountry(0) {}
-	WEAPON_SPEC(const UINT16& rhs) { *(UINT16*)this = rhs ; }
+	WEAPON_SPEC(const UINT16& rhs) { *(UINT16*)this = rhs; }
 	WEAPON_SPEC(const WEAPON_SPEC& rhs) : wType(rhs.wType), wClass(rhs.wClass), wCategory(rhs.wCategory), wCountry(rhs.wCountry) {}
 	WEAPON_SPEC(UINT32 country_, UINT32 category_, UINT32 class_, UINT32 type_)
 		: wType((UINT8)type_), wClass((UINT8)class_), wCategory((UINT8)category_), wCountry((UINT8)country_)
@@ -49,47 +49,47 @@ struct WEAPON_SPEC
 //tolua_begin
 
 	//! But I don't want a complicated structure. Just gimme a number.
-	UINT32 asUINT32() const { return ((UINT32)wCountry << 24) | ((UINT32)wCategory << 16) | ((UINT32)wClass << 8) | (UINT32)wType ; }
-	UINT16 asUINT16() const { return *(UINT16*)this ; }
+	UINT32 asUINT32() const { return ((UINT32)wCountry << 24) | ((UINT32)wCategory << 16) | ((UINT32)wClass << 8) | (UINT32)wType; }
+	UINT16 asUINT16() const { return *(UINT16*)this; }
 	//! Compare two weapon specs, but do it real cheap, because we do it frequently.
-	bool operator==(const WEAPON_SPEC& rhs) const { return this->asUINT16() == rhs.asUINT16() ; }
+	bool operator==(const WEAPON_SPEC& rhs) const { return this->asUINT16() == rhs.asUINT16(); }
 
 //tolua_end
 	//! Make network fly.
-	void packer(LOGICAL mode, ACTION_OBJECT* a) ;
+	void packer(LOGICAL mode, ACTION_OBJECT* a);
 
 private:
-	operator UINT32() const ;	//<! Use asUINT32() instead.
-	operator SINT32() const ;	//<! Use asUINT32() instead.
-	operator UINT64() const ;	//<! Use asUINT32() instead.
-	operator SINT64() const ;	//<! Use asUINT32() instead.
-	operator UINT8() const ;	//<! Use asUINT32() instead.
-	operator SINT8() const ;	//<! Use asUINT32() instead.
+	operator UINT32() const;	//<! Use asUINT32() instead.
+	operator SINT32() const;	//<! Use asUINT32() instead.
+	operator UINT64() const;	//<! Use asUINT32() instead.
+	operator SINT64() const;	//<! Use asUINT32() instead.
+	operator UINT8() const;	//<! Use asUINT32() instead.
+	operator SINT8() const;	//<! Use asUINT32() instead.
 public:
-	operator UINT16() const { return asUINT16() ; }
+	operator UINT16() const { return asUINT16(); }
 
 	//! When 16-bits just aren't enough.
 	void fromShort(const UINT16 key)
 	{
-		*(UINT16*)this = key ;
+		*(UINT16*)this = key;
 	}
 
 	//! Because != != !(=). For some reason.
 	//! (not-equals is not-equal-to not(equals))
-	bool operator!=(const WEAPON_SPEC& rhs) const { return this->asUINT16() != rhs.asUINT16() ; }
+	bool operator!=(const WEAPON_SPEC& rhs) const { return this->asUINT16() != rhs.asUINT16(); }
 
 	//! Does this weapon spec make my ass look thin?
-	bool operator<(const WEAPON_SPEC& rhs) const { return this->asUINT16() < rhs.asUINT16() ; }
+	bool operator<(const WEAPON_SPEC& rhs) const { return this->asUINT16() < rhs.asUINT16(); }
 	//! Does this weapon spec make my ass look fat?
-	bool operator>(const WEAPON_SPEC& rhs) const { return this->asUINT16() > rhs.asUINT16() ; }
+	bool operator>(const WEAPON_SPEC& rhs) const { return this->asUINT16() > rhs.asUINT16(); }
 //tolua_begin
 
 	//! Check for a null spec.
-	bool isNull() const { return asUINT16() == 0 ; }
+	bool isNull() const { return asUINT16() == 0; }
 
-	WWII_COUNTRY country() const { return (WWII_COUNTRY)wCountry ; }
-	int side() const { return wwiiSide((WWII_COUNTRY)wCountry) ; }
-} ;
+	WWII_COUNTRY country() const { return (WWII_COUNTRY)wCountry; }
+	int side() const { return wwiiSide((WWII_COUNTRY)wCountry); }
+};
 
 extern WEAPON_SPEC NULL_WEAP_SPEC; // removed const to work with broken MW Linker
 //tolua_end
@@ -101,12 +101,12 @@ extern WEAPON_SPEC NULL_WEAP_SPEC; // removed const to work with broken MW Linke
 //tolua_begin
 
 // find a weapon spec based on the weapon's name
-extern const WEAPON_SPEC& weapFindWeaponByName(const char* weaponName) ;
+extern const WEAPON_SPEC& weapFindWeaponByName(const char* weaponName);
 
 static inline const char* weapPrintSpecC(const WEAPON_SPEC* spec)
 {
 	if (spec == NULL)
-		return "<null>" ;
+		return "<null>";
 
 	static char buffer[24];
 	sprintf(buffer, "%u:%u:%u:%u", (UINT8)spec->wCountry, (UINT8)spec->wCategory, (UINT8)spec->wClass, (UINT8)spec->wType);

@@ -253,7 +253,7 @@ void ScenarioPlayer::Receive(const char* name, const char* value)
 // get our current weapon
 WEAPON_SPEC ScenarioPlayer::GetWeaponSpec()
 {
-	WEAPON_SPEC spec(0, 0, 0, 0) ;
+	WEAPON_SPEC spec(0, 0, 0, 0);
 
 	std::string key = GetAttribute("weapon");
 

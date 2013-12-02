@@ -69,7 +69,7 @@ struct MISCTEXTURE
         TextureState::Disable();
     }
 
-} ;
+};
 
 struct CONCUSSION
 {
@@ -95,7 +95,7 @@ struct CONCUSSION
 	, rotate(0.0f)
     {
     }
-} ;
+};
 
 static CONCUSSION _expconcussion[ML_MAX_CREW_POSITIONS];
 static CONCUSSION _woundconcussion[ML_MAX_CREW_POSITIONS];
@@ -314,8 +314,8 @@ static void _grabScene()
 //////////////////////////////////////////////////////////////////////
 static void _drawConcussionIfNecessary(CONCUSSION* c)
 {
-    persPersona* p = persGetPersonaDataPtr() ;
-	if ( p == NULL ) return ;
+    persPersona* p = persGetPersonaDataPtr();
+	if ( p == NULL ) return;
 
     if(!c->on)
     {
@@ -502,8 +502,8 @@ static void _drawDeathFade(SINT32 reset, UINT32 position, UINT32 playposition)
 //////////////////////////////////////////////////////////////////////
 static void _drawBlackoutIfNecessary()
 {
-    persPersona* p = persGetPersonaDataPtr() ;
-	if ( p == NULL ) return ;
+    persPersona* p = persGetPersonaDataPtr();
+	if ( p == NULL ) return;
 
     static UINT32 insidecolor = colorBLACK;
     static UINT32 outsidecolor = colorBLACK;

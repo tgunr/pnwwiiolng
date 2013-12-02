@@ -49,16 +49,16 @@ strtProcessSyncCPs(const STRT_SYNC_CPS& syncCPs)
 		LogAbort("Bad strat data");
 
 	UINT32 i, cpID;
-	const CP_SINFO* sync ;
+	const CP_SINFO* sync;
 
 	//Unpack the data
-	for ( i = 0, cpID = syncCPs.startID, sync = &syncCPs.info[0] ; i < syncCPs.numEntries ; ++i, ++cpID, ++sync )
+	for ( i = 0, cpID = syncCPs.startID, sync = &syncCPs.info[0]; i < syncCPs.numEntries; ++i, ++cpID, ++sync )
 	{
-		CPStruct& cp = sc->cps[cpID] ;
-		cp.uOID = sync->uOID ;
+		CPStruct& cp = sc->cps[cpID];
+		cp.uOID = sync->uOID;
 
 #if defined(IS_MAP_HOST)
-		mapUpdateCP(&cp, (WWII_COUNTRY)sync->owner, (WWII_COUNTRY)sync->control, sync->flags, __FUNCTION__) ;
+		mapUpdateCP(&cp, (WWII_COUNTRY)sync->owner, (WWII_COUNTRY)sync->control, sync->flags, __FUNCTION__);
 #endif
 
 		cp.country = (WWII_COUNTRY)sync->owner;
@@ -67,9 +67,9 @@ strtProcessSyncCPs(const STRT_SYNC_CPS& syncCPs)
 		cp.controllingCountry = (WWII_COUNTRY)sync->control;
 		cp.controllingSide = wwiiSide(sync->control);
 
-		cp.flags = sync->flags ;
-		cp.m_contention = (sync->flags & CP_STAT_CONTENTION) ? TRUE : FALSE ;
-		cp.m_enemyLinked = (sync->flags & CP_STAT_ENEMY_LINKED) ? TRUE : FALSE ;
+		cp.flags = sync->flags;
+		cp.m_contention = (sync->flags & CP_STAT_CONTENTION) ? TRUE : FALSE;
+		cp.m_enemyLinked = (sync->flags & CP_STAT_ENEMY_LINKED) ? TRUE : FALSE;
 	}
 }
 
@@ -85,7 +85,7 @@ strtProcessSyncFacilities(const STRT_SYNC_FACILITIES& syncFacilities)
 		//	here.  Why?  We need to go ahead and unpack the rest of the
 		//	message, because not unpacking it could screw some stuff up
 		dbugLog(_FLA,"received sync facilities for supercell %d:%d, but it doesn't exist!", syncFacilities.sx, syncFacilities.sy);
-		return ;
+		return;
 	}
 
 #ifdef DEBUG_SYNC
@@ -95,23 +95,23 @@ strtProcessSyncFacilities(const STRT_SYNC_FACILITIES& syncFacilities)
 #endif
 
 	if ((syncFacilities.startID + syncFacilities.numEntries) > sc->numFacilities)
-		LogAbort("wrong number of facilities in supercell") ;
+		LogAbort("wrong number of facilities in supercell");
 
 	UINT32 i, facID;
 
 	//Unpack the data
-	for ( i=0, facID = syncFacilities.startID ; i<syncFacilities.numEntries; ++i, ++facID )
+	for ( i=0, facID = syncFacilities.startID; i<syncFacilities.numEntries; ++i, ++facID )
 	{
-		FacilityStruct* fac = &sc->facilities[facID] ;
-		UINT8 country = syncFacilities.country[i] ;
-		fac->uOID = syncFacilities.uOID[i] ;
-		fac->setOpen((country & FAC_OPEN_FLAG) == FAC_OPEN_FLAG) ;
-		fac->setCountry((WWII_COUNTRY)(country & ~FAC_OPEN_FLAG)) ;
-		fac->m_captureStage = (FacilityStruct::CaptureStage)syncFacilities.captureStage[i] ;
-		fac->m_captureCounter = syncFacilities.captureCounter[i] ;
+		FacilityStruct* fac = &sc->facilities[facID];
+		UINT8 country = syncFacilities.country[i];
+		fac->uOID = syncFacilities.uOID[i];
+		fac->setOpen((country & FAC_OPEN_FLAG) == FAC_OPEN_FLAG);
+		fac->setCountry((WWII_COUNTRY)(country & ~FAC_OPEN_FLAG));
+		fac->m_captureStage = (FacilityStruct::CaptureStage)syncFacilities.captureStage[i];
+		fac->m_captureCounter = syncFacilities.captureCounter[i];
 		if ( fac->m_captureStage == FacilityStruct::_CAP_ENABLED )
 			fac->m_captureProgress = (float)fac->m_captureCounter;
-		fac->m_captureStateChanged = teulTime() + syncFacilities.captureStateChanged[i] ;
+		fac->m_captureStateChanged = teulTime() + syncFacilities.captureStateChanged[i];
 
 #ifdef DEBUG_SYNC
 		dbugLog(_FLN,"syncing facility %d => %u to country %d open %d"
@@ -123,7 +123,7 @@ strtProcessSyncFacilities(const STRT_SYNC_FACILITIES& syncFacilities)
 	}
 }
 
-extern void mapUpdateBuildingVisLevel(const ObjectStruct* const obj) ;
+extern void mapUpdateBuildingVisLevel(const ObjectStruct* const obj);
 
 void
 strtProcessSyncBuildings(const STRT_SYNC_BUILDINGS& syncBuildings)
@@ -153,9 +153,9 @@ strtProcessSyncBuildings(const STRT_SYNC_BUILDINGS& syncBuildings)
 		//Here's the NULL check repeated from above.
 		if (sc != NULL)
 		{
-			sc->objects[b].setVisLevel(syncBuildings.vislevel[i]) ;
+			sc->objects[b].setVisLevel(syncBuildings.vislevel[i]);
 #if defined(IS_MAP_HOST)
-			mapUpdateBuildingVisLevel(&sc->objects[b]) ;
+			mapUpdateBuildingVisLevel(&sc->objects[b]);
 #endif
 		}
 	}

@@ -41,8 +41,8 @@
 // Maximum number of active local connections allowed
 namespace Teul
 {
-	static const size_t MaxConnections = 6000 ;
-	static const size_t MaxClusterUsers = 5000 ;
+	static const size_t MaxConnections = 6000;
+	static const size_t MaxClusterUsers = 5000;
 }
 
 #include "include/precompile_includes.h"

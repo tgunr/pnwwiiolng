@@ -99,7 +99,7 @@ static void AddArchives();
 #define USE_REFERENCE_RASTERIZER
 #undef	USE_REFERENCE_RASTERIZER
 
-extern char RegionSuffix[] ;
+extern char RegionSuffix[];
 
 void decompressStatus (SINT32 archive_index)
 {
@@ -278,7 +278,7 @@ int sysmainExceptionHandler(int code, EXCEPTION_POINTERS* ep)
 		return(EXCEPTION_EXECUTE_HANDLER);
 	}
 
-	FILE* ExceptionLog = Fio::OpenLogFile() ;
+	FILE* ExceptionLog = Fio::OpenLogFile();
 
 	if ( ExceptionLog )
 	{
@@ -447,7 +447,7 @@ int sysmainExceptionHandler(int code, EXCEPTION_POINTERS* ep)
 	fprintf(ExceptionLog, "Exception address: 0x%08x\n", ep->ExceptionRecord->ExceptionAddress);
 	Write_Debug("Exception address: 0x%08x", ep->ExceptionRecord->ExceptionAddress);
 
-	for (i=0 ; i < ep->ExceptionRecord->NumberParameters ; i+=2)
+	for (i=0; i < ep->ExceptionRecord->NumberParameters; i+=2)
 	{
 		fprintf(ExceptionLog, "Exception tried to: %s at address 0x%08x\n", ep->ExceptionRecord->ExceptionInformation[i] ? "write" : "read", ep->ExceptionRecord->ExceptionInformation[i+1]);
 		Write_Debug("Exception tried to: %s at address 0x%08x", ep->ExceptionRecord->ExceptionInformation[i] ? "write" : "read", ep->ExceptionRecord->ExceptionInformation[i+1]);
@@ -505,7 +505,7 @@ int sysmainExceptionHandler(int code, EXCEPTION_POINTERS* ep)
 	// Has subsequent exception records (if present)
 	ep->ExceptionRecord->ExceptionRecord;
 
-	fprintf(ExceptionLog, Detect::strings[1]) ;
+	fprintf(ExceptionLog, Detect::strings[1]);
 
 	fflush(ExceptionLog);
 	fclose(ExceptionLog);
@@ -849,7 +849,7 @@ SYSTEMTIME	SystemTime;
 		return;
 	}
 
-	//FILE* ValidExitLog = Fio::OpenLogFile() ;
+	//FILE* ValidExitLog = Fio::OpenLogFile();
 
 	Write_Debug("Abort handler information...");
     ClipCursor(NULL);
@@ -995,10 +995,10 @@ MEM_BOOL MEM_CALLBACK MyErrorHandler( MEM_ERROR_INFO* errorInfo)
 	delete emergencybuffer;
 
     Write_Debug("Smartheap Reports Out Of Memory\n");
-	//MessageBox(NULL, _T("Application is out of memory and will exit."), _T("Out Of Memory"), MB_ICONERROR|MB_OK|MB_SYSTEMMODAL) ;
+	//MessageBox(NULL, _T("Application is out of memory and will exit."), _T("Out Of Memory"), MB_ICONERROR|MB_OK|MB_SYSTEMMODAL);
 
 	/*
-	FILE* fp = Fio::OpenLogFile() ;
+	FILE* fp = Fio::OpenLogFile();
     SYSTEMTIME SystemTime;
     GetLocalTime(&SystemTime);
 
@@ -1101,7 +1101,7 @@ static void HandleHackID()
 		{
 			unsigned long otp  = strtoul(ServerOTP, NULL, 10);
 			srand(otp);
-			wchar_t text[12] ;
+			wchar_t text[12];
 			int j=0;
 			for ( int i=0; i< 44; i+=4,j++ )
 			{
@@ -1303,7 +1303,7 @@ int		screenmode;
 #endif	// DIRECT3D
 
 	// look up the product region (us/china)
-	_lookupProductRegion() ;
+	_lookupProductRegion();
 
 	// we then try to load wwiiol.xml variables
 	// eventually this call will replace the above call
@@ -1385,7 +1385,7 @@ int		screenmode;
 	// key file check
 #ifndef DEBUG_WW2
 	{
-		//__codeMangle(92783423471, 0xdf) ;	// See wwiiCovert.h wtf does this do?
+		//__codeMangle(92783423471, 0xdf);	// See wwiiCovert.h wtf does this do?
 		// OGS: It injects a double-negative branch operation across
 		// a garbage byte (0xdf) which makes the following 1kb of
 		// instructions look like a data segment to disassemblers

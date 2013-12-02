@@ -262,7 +262,7 @@ class TiXmlString
 	Rep * rep_;
 	static Rep nullrep_;
 
-} ;
+};
 
 
 inline bool operator == (const TiXmlString & a, const TiXmlString & b)
@@ -312,7 +312,7 @@ public :
 		return *this;
 	}
 
-} ;
+};
 
 #endif	// TIXML_STRING_INCLUDED
 #endif	// TIXML_USE_STL

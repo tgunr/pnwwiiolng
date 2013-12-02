@@ -44,20 +44,20 @@
 #endif
 
 #ifdef BETA_RELEASE
-static const bool isBETA_RELEASE = true ;
+static const bool isBETA_RELEASE = true;
 #else
-static const bool isBETA_RELEASE = false ;
+static const bool isBETA_RELEASE = false;
 #endif
 
 #ifdef PUBLIC_RELEASE
-static const bool isPUBLIC_RELEASE = true ;
+static const bool isPUBLIC_RELEASE = true;
 #else
-static const bool isPUBLIC_RELEASE = false ;
+static const bool isPUBLIC_RELEASE = false;
 #endif
 
 #if defined(PN_DISABLE_AUTH)
-static const bool useAuthServer = false ;
+static const bool useAuthServer = false;
 #else
-static const bool useAuthServer = true ;
+static const bool useAuthServer = true;
 #endif
 

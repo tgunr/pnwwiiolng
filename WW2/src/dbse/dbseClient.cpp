@@ -57,7 +57,7 @@ dbseInit( )
 
 //	connected = CONNECT_NONE;
 	hostIndex = dbseOpenConnection();
-	for ( ; ; )
+	for (;; )
 	{
 		teulUpdateTransport(30);
 		switch (connected)

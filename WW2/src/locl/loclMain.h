@@ -10,7 +10,7 @@ enum loclLocalizationLanguage
 {
 	loclEnglish = 0,
 	loclLastLanguage
-} ;
+};
 
 enum loclLocalizationStringID
 {
@@ -106,7 +106,7 @@ enum loclLocalizationStringID
 	loclLAUNCHING_ROUND_MSG,
 	loclLastStringSPHERE_COLLISION_OCCURENCE_MSG,
 	loclAMMODEPLETED,
-} ;
+};
 
 // This opens a file (using fio subsystem) to load in a group of message strings.
 // The message strings are placed in a global/ array with size dynamically

@@ -10,14 +10,14 @@ struct mlObjectTrackSection
 	UINT32 LinkToVertex[ML_MAX_TRACK_VERTICES][2];
 	UINT32 NumVertices;
 
-} ;
+};
 
 struct mlObjectTrackAnimation
 {
 	struct OBJECT * TrackAnimationObject;
 	UINT32 TrackNum;
 	FLOAT32 TrackMoveRate;
-} ;
+};
 
 
 #if defined(USE_OSG)
@@ -46,7 +46,7 @@ struct mlObjectCollidePnt
 	LOGICAL IsSpike;
 	struct dxGeom* lineColliderGeom;
     char name[32];
-} ;
+};
 
 struct mlObjectData
 {
@@ -88,7 +88,7 @@ struct mlObjectCollidePnt
 	FLOAT64 Length;
 	char VisDamage[32];
 	LOGICAL IsSpike;
-} ;
+};
 
 
 struct mlObjectData

@@ -31,32 +31,32 @@ STRAT_FACILITY_TABLE*
 sdmCreateFacilityTable(FACILITY* const fac, const size_t numFacilities, const size_t numCPs)
 {
 	// Bridges get fake facilities, so we have to look at CPs.
-	const size_t potentialFacs = numFacilities + numCPs ;
+	const size_t potentialFacs = numFacilities + numCPs;
 	if ( (fac == NULL) | (potentialFacs <= 0) )
 		return NULL;
 
-	const size_t HeaderNodeSize = sizeof(STRAT_FACILITY_TABLE) ;
-	const size_t FacilityNodeListSize = sizeof(STRAT_FACILITY_NODE) * potentialFacs ;
-	const size_t BuildingTableSize = sizeof(SINT16) * MAX_BUILD_PER_FAC ;
-	const size_t BuildingTableListSize = BuildingTableSize * potentialFacs ;
+	const size_t HeaderNodeSize = sizeof(STRAT_FACILITY_TABLE);
+	const size_t FacilityNodeListSize = sizeof(STRAT_FACILITY_NODE) * potentialFacs;
+	const size_t BuildingTableSize = sizeof(SINT16) * MAX_BUILD_PER_FAC;
+	const size_t BuildingTableListSize = BuildingTableSize * potentialFacs;
 
-	const size_t AllocationSize = HeaderNodeSize + FacilityNodeListSize + BuildingTableListSize ;
+	const size_t AllocationSize = HeaderNodeSize + FacilityNodeListSize + BuildingTableListSize;
 
-	UCHAR* base = (UCHAR*)memCalloc(1, AllocationSize) ;
-	STRAT_FACILITY_TABLE* table = (STRAT_FACILITY_TABLE*)(base) ;
-	STRAT_FACILITY_NODE* facility = (STRAT_FACILITY_NODE*)(base + HeaderNodeSize) ;
-	UCHAR* bidList = (base + HeaderNodeSize + FacilityNodeListSize) ;
+	UCHAR* base = (UCHAR*)memCalloc(1, AllocationSize);
+	STRAT_FACILITY_TABLE* table = (STRAT_FACILITY_TABLE*)(base);
+	STRAT_FACILITY_NODE* facility = (STRAT_FACILITY_NODE*)(base + HeaderNodeSize);
+	UCHAR* bidList = (base + HeaderNodeSize + FacilityNodeListSize);
 
 	table->facility = facility;
 	table->numFacilities = numFacilities;
 
-	for ( size_t i = 0 ; i < numFacilities ; ++i )
+	for ( size_t i = 0; i < numFacilities; ++i )
 	{
 		facility[i].id = fac[i].oid.id;
-		facility[i].bidList.bid = (SINT16*)bidList ;
+		facility[i].bidList.bid = (SINT16*)bidList;
 		facility[i].bidList.numBuildings = 0;
 
-		bidList += BuildingTableSize ;
+		bidList += BuildingTableSize;
 	}
 
 	return table;
@@ -75,8 +75,8 @@ STRAT_BUILDING_LIST * sdmGetFaciltyBidList(STRAT_FACILITY_TABLE* facTable, SINT1
 
 static LOGICAL _addBuildingToFacTable(STRAT_FACILITY_TABLE* facTable, const BUILDING& building)
 {
-	const SINT16 facID = building.pid.id ;
-	const SINT32 bid = building.oid.id ;
+	const SINT16 facID = building.pid.id;
+	const SINT32 bid = building.oid.id;
 	STRAT_FACILITY_NODE* fac;
 	SINT32 i;
 
@@ -90,7 +90,7 @@ static LOGICAL _addBuildingToFacTable(STRAT_FACILITY_TABLE* facTable, const BUIL
 		}
 	}
 
-	return FALSE ;
+	return FALSE;
 }
 
 // Creates a cell basesd table with each cell contatining a list of buildings in
@@ -113,15 +113,15 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd,SINT32 numBu
 	dbugLog(_FLW,"adding buildings to sc %d:%d",sx,sy);
 #endif
 
-	std::map<SINT16, STRAT_BUILDING> bldgMap ;
+	std::map<SINT16, STRAT_BUILDING> bldgMap;
 
 	for (i = 0; i< facTable->numFacilities; i++)
 	{
-		const SINT16 bid = facTable->facility[i].id ;
-		STRAT_BUILDING& bldg = bldgMap[bid] ;
-		bldg.bid = bid ;
-		bldg.isFacility = TRUE ;
-		bldg.pobj = (void*) 1 ;	// Really?
+		const SINT16 bid = facTable->facility[i].id;
+		STRAT_BUILDING& bldg = bldgMap[bid];
+		bldg.bid = bid;
+		bldg.isFacility = TRUE;
+		bldg.pobj = (void*) 1;	// Really?
 	}
 
 	for(i=0;i<numBuildings;i++)
@@ -129,8 +129,8 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd,SINT32 numBu
 		if (! _addBuildingToFacTable(facTable, bd[i]))
 		{
 #if platBuild == TEUL_SERVER
-			const BUILDING& building = bd[i] ;
-			strtDataErrorParentFacility(building.name, building.fileName, sx, sy, building.oid.id, static_cast<UINT16>(i), building.pid.id) ;
+			const BUILDING& building = bd[i];
+			strtDataErrorParentFacility(building.name, building.fileName, sx, sy, building.oid.id, static_cast<UINT16>(i), building.pid.id);
 #else
 			dbugLog(_FLA,"sc:%d,%d can't find facility:%d for building:%d (%s [%s])"
 						, sx, sy
@@ -138,18 +138,18 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd,SINT32 numBu
 						, bd[i].oid.id
 						, bd[i].name
 						, bd[i].fileName
-						) ;
+						);
 #endif
-			if(errors) (*errors)++ ;
-			continue ;
+			if(errors) (*errors)++;
+			continue;
 		}
 
         // HACK! for builder statues.
 		const SINT16 bid = bd[i].oid.id;
 		STRAT_BUILDING& bldg = bldgMap[bid];
 
-		bldg.bid = bid ;
-		bldg.pobj = (void*) 2 ;	// Really?
+		bldg.bid = bid;
+		bldg.pobj = (void*) 2;	// Really?
         if(!strncmp(bd[i].name, builder, 7))
         {
             bldg.isBuilder = TRUE;
@@ -187,15 +187,15 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd,SINT32 numBu
 
 	if (bldHash)
 	{
-		const size_t maxBldgId = (size_t)(bldgMap.rbegin()->first) + 1 ;
+		const size_t maxBldgId = (size_t)(bldgMap.rbegin()->first) + 1;
 
-		bldHash->maxBldID = maxBldgId ;
+		bldHash->maxBldID = maxBldgId;
 
 		bldHash->building = (STRAT_BUILDING*)memAlloc(maxBldgId * sizeof(STRAT_BUILDING));
 
-		for ( std::map<SINT16, STRAT_BUILDING>::iterator it = bldgMap.begin() ; it != bldgMap.end() ; ++it )
+		for ( std::map<SINT16, STRAT_BUILDING>::iterator it = bldgMap.begin(); it != bldgMap.end(); ++it )
 		{
-			bldHash->building[it->first] = it->second ;
+			bldHash->building[it->first] = it->second;
 		}
 	}
 

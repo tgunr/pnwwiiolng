@@ -40,9 +40,9 @@ _doMyConnect(const DBCONNECTION& connection, bool autoReconnect)
 	}
 
 	// Attempt to establish the connection
-	auto flags = CLIENT_MULTI_STATEMENTS | CLIENT_MULTI_RESULTS ;
+	auto flags = CLIENT_MULTI_STATEMENTS | CLIENT_MULTI_RESULTS;
 	if ( cv_mysqlCompression.GetBool() )
-		flags |= CLIENT_COMPRESS ;
+		flags |= CLIENT_COMPRESS;
 
 	if ( mysql_real_connect(tempConn, connection.host, connection.username, connection.password, connection.dbName, 0, NULL, flags) == NULL )
 	{
@@ -54,39 +54,39 @@ _doMyConnect(const DBCONNECTION& connection, bool autoReconnect)
 
 #if MYSQL_VERSION_ID >= 50003
 	// Enable automatic reconnection
-	my_bool reconnect = (autoReconnect) ? 1 : 0 ;
-	mysql_options(tempConn, MYSQL_OPT_RECONNECT, &reconnect) ;
+	my_bool reconnect = (autoReconnect) ? 1 : 0;
+	mysql_options(tempConn, MYSQL_OPT_RECONNECT, &reconnect);
 #endif
 
 	if ( mysql_set_character_set(tempConn, "utf8") != 0 )
 	{
-		threadLog(_FLA, "set names failed") ;
-		mysql_close(tempConn) ;
-		return NULL ;
+		threadLog(_FLA, "set names failed");
+		mysql_close(tempConn);
+		return NULL;
 	}
 
-//	mysql_set_character_set(tempConn, "utf8") ;
+//	mysql_set_character_set(tempConn, "utf8");
 
 	return(tempConn);
 }
 
 // ------ Public Functions
 
-static std::mutex dbconnMutex ;
+static std::mutex dbconnMutex;
 
 DB::handle_t*
 dbseGetConnection(const DBCONNECTION& connection, bool report, bool autoReconnect)
 {
-	if ( connection.host == NULL ) return NULL ;
-	if ( connection.dbName == NULL ) return NULL ;
-	if ( connection.username == NULL ) return NULL ;
-	if ( connection.password == NULL ) return NULL ;
+	if ( connection.host == NULL ) return NULL;
+	if ( connection.dbName == NULL ) return NULL;
+	if ( connection.username == NULL ) return NULL;
+	if ( connection.password == NULL ) return NULL;
 
-	DB::handle_t* newConn = NULL ;
+	DB::handle_t* newConn = NULL;
 	std::this_thread::sleep_for(std::chrono::microseconds(250));
 	{
-		std::lock_guard<std::mutex> dbconnLock(dbconnMutex) ;
-		newConn = _doMyConnect(connection, autoReconnect) ;
+		std::lock_guard<std::mutex> dbconnLock(dbconnMutex);
+		newConn = _doMyConnect(connection, autoReconnect);
 	}
 
 	if ( report )
@@ -101,45 +101,45 @@ dbseGetConnection(const DBCONNECTION& connection, bool report, bool autoReconnec
 
 	std::this_thread::yield();
 
-	return newConn ;
+	return newConn;
 }
 
 bool
 DBHANDLE::connect(const DBCONNECTION& connection)
 {
-	assert( m_initialized == false ) ;
+	assert( m_initialized == false );
 
 	//Initialization stuff;
-	m_conn = dbseGetConnection(connection, true) ;
+	m_conn = dbseGetConnection(connection, true);
 	if ( NULL == m_conn )
-		return false ;
+		return false;
 
-	m_initialized = true ;
+	m_initialized = true;
 
-	return true ;
+	return true;
 }
 
 void
 DBHANDLE::disconnect()
 {
-	DB::handle_t* const oldConn = m_conn ;
-	m_conn = NULL ;
+	DB::handle_t* const oldConn = m_conn;
+	m_conn = NULL;
 
 	if ( m_initialized == false )
-		return ;
+		return;
 
-	mysql_close(oldConn) ;
+	mysql_close(oldConn);
 }
 
 const char*
 escapeString(const char* src, char* dest, size_t destSize)
 {
-	size_t len = strlen(src) ;
+	size_t len = strlen(src);
 	if ( len > destSize / 2 )
-		len = destSize / 2 ;
+		len = destSize / 2;
 
-	mysql_escape_string(dest, src, len) ;
+	mysql_escape_string(dest, src, len);
 
-	return dest ;
+	return dest;
 }
 

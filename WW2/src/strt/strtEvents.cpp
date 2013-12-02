@@ -17,10 +17,10 @@
 #include "strt/strtFacilityStruct.h"
 #include "strt/strtObjectStruct.h"
 
-TEUL_CALLBACK* Strat::Events::Callback ;
+TEUL_CALLBACK* Strat::Events::Callback;
 
-std::vector<CPStruct*> cps ;
-std::vector<FacilityStruct*> facs ;
+std::vector<CPStruct*> cps;
+std::vector<FacilityStruct*> facs;
 
 //////////////////////////////////////////////////////////////////////
 // EventPacket-derived class that provides Send and Add functionality.
@@ -31,18 +31,18 @@ public:
 	UpdatePacket() : EventPacket() {}
 
 	// Function for sending.
-	virtual void Send() = 0 ;
+	virtual void Send() = 0;
 
 	// Function for adding a packet with overflow handling.
 	void Add(const Strat::Event& newEvent)
 	{
-		events().push_back(newEvent) ;
+		events().push_back(newEvent);
 		if ( size() >= Strat::Event::MaxPerPacket )
 		{
-			Send() ;
+			Send();
 		}
 	}
-} ;
+};
 
 //////////////////////////////////////////////////////////////////////
 // Derived class that sends broadcasts of packets.
@@ -55,25 +55,25 @@ class BroadcastPacket : public UpdatePacket
 	{
 		bool operator () (wwiiPlayer* const player) const
 		{
-			return player->instance().isCampaign() ;
+			return player->instance().isCampaign();
 		}
 	};
 
 	public: virtual void Send()
 	{
 		dbugLog(_FLD, "transmitting EventPacket with %" PRSizeT " events to %" PRSizeT " players"
-						, size(), m_playerList.size()) ;
+						, size(), m_playerList.size());
 
-		TeulTransmission broadcast(Strat::Events::Callback) ;
+		TeulTransmission broadcast(Strat::Events::Callback);
 
-		broadcast.populate(this) ;
-		broadcast.send(m_playerList.begin(), m_playerList.end(), InstanceFilterFn()) ;
+		broadcast.populate(this);
+		broadcast.send(m_playerList.begin(), m_playerList.end(), InstanceFilterFn());
 
-		events().clear() ;
+		events().clear();
 	}
 
-	public: PLAYERS& m_playerList ;
-} ;
+	public: PLAYERS& m_playerList;
+};
 
 //////////////////////////////////////////////////////////////////////
 // Derived class that sends packets to individual players.
@@ -85,21 +85,21 @@ class DirectPacket : public UpdatePacket
 	public: virtual void Send()
 	{
 #ifdef HEAVY_DEBUG
-		dbugLog(_FLD, "t:%d transmitting EventPacket with %u events", m_teulIndex, events().size()) ;
+		dbugLog(_FLD, "t:%d transmitting EventPacket with %u events", m_teulIndex, events().size());
 #endif
-		const SINT32 result = teulSend(m_teulIndex, Strat::Events::Callback, this) ;
+		const SINT32 result = teulSend(m_teulIndex, Strat::Events::Callback, this);
 #ifdef HEAVY_DEBUG
 		if ( g_logDebug )
-			dbugLog(_FLDB, " result = %d", result) ;
+			dbugLog(_FLDB, " result = %d", result);
 #endif
 		if ( result < 0 )
-			dbugLog(_FLW, "t:%d err:%d while sending strat event packet", m_teulIndex, result) ;
+			dbugLog(_FLW, "t:%d err:%d while sending strat event packet", m_teulIndex, result);
 
-		events().clear() ;
+		events().clear();
 	}
 
-	private:	SINT32	m_teulIndex ;
-} ;
+	private:	SINT32	m_teulIndex;
+};
 
 //////////////////////////////////////////////////////////////////////
 // Functions for add a CP/Facility/Object to the event queue.
@@ -113,30 +113,30 @@ static void
 _addEvent(std::vector<_Type*>& events, _Type* const source)
 {
 	if ( source->modified )
-		return ;
-	events.push_back(source) ;
-	source->modified = true ;
+		return;
+	events.push_back(source);
+	source->modified = true;
 }
 
 void
 Strat::Events::Add(CPStruct* const cp)
 {
-	_addEvent(cps, cp) ;
+	_addEvent(cps, cp);
 }
 
 void
 Strat::Events::Add(FacilityStruct* const fac)
 {
-	_addEvent(facs, fac) ;
+	_addEvent(facs, fac);
 }
 
-extern void mapUpdateBuildingVisLevel(const ObjectStruct* const obj) ;
+extern void mapUpdateBuildingVisLevel(const ObjectStruct* const obj);
 
 void
 Strat::Events::Add(ObjectStruct* const obj)
 {
-//	_addEvent(objs, obj) ;
-	mapUpdateBuildingVisLevel(obj) ;
+//	_addEvent(objs, obj);
+	mapUpdateBuildingVisLevel(obj);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -148,59 +148,59 @@ template<typename _Type>
 static void
 _addUpdatesToPacket(BroadcastPacket& packet, std::vector<_Type*>& events)
 {
-	const size_t numEvents = events.size() ;
-	for ( size_t i = 0 ; i < numEvents ; ++i )
+	const size_t numEvents = events.size();
+	for ( size_t i = 0; i < numEvents; ++i )
 	{
-		_Type* const source = events[i] ;
-		packet.Add(Strat::Event(source->fullObjID, source->country, source->flags)) ;
+		_Type* const source = events[i];
+		packet.Add(Strat::Event(source->fullObjID, source->country, source->flags));
 
-		source->modified = false ;
+		source->modified = false;
 	}
 
-	events.clear() ;
+	events.clear();
 }
 
 //////////////////////////////////////////////////////////////////////
 // Broadcast top-level strat events to all players.
 
-extern void mapSendDirtySupercellData() ;
+extern void mapSendDirtySupercellData();
 
 void
 Strat::Events::Publish()
 {
-	const size_t numCPs = cps.size() ;
-	const size_t numFacs = facs.size() ;
-	const size_t numUpdates = numCPs + numFacs ;
+	const size_t numCPs = cps.size();
+	const size_t numFacs = facs.size();
+	const size_t numUpdates = numCPs + numFacs;
 
 	if ( numUpdates > 0 )
 	{
-		BroadcastPacket packet(g_players) ;
+		BroadcastPacket packet(g_players);
 
 		dbugLog(_FLD, "Strat::Events::Publish %" PRSizeT " cps, %" PRSizeT " facs, %" PRSizeT " total events"
 						, numCPs, numFacs, numUpdates
-						) ;
+						);
 
 		if ( g_players.empty() == false )
 		{
-			_addUpdatesToPacket(packet, cps) ;
-			_addUpdatesToPacket(packet, facs) ;
+			_addUpdatesToPacket(packet, cps);
+			_addUpdatesToPacket(packet, facs);
 
 			if ( packet.size() > 0 )
-				packet.Send() ;
+				packet.Send();
 		}
 		else
 		{
-			for ( auto it = cps.begin() ; it != cps.end() ; ++it )
-				(*it)->modified = false ;
-			for ( auto it = facs.begin() ; it != facs.end() ; ++it )
-				(*it)->modified = false ;
+			for ( auto it = cps.begin(); it != cps.end(); ++it )
+				(*it)->modified = false;
+			for ( auto it = facs.begin(); it != facs.end(); ++it )
+				(*it)->modified = false;
 
-			cps.clear() ;
-			facs.clear() ;
+			cps.clear();
+			facs.clear();
 		}
 	}
 
-	mapSendDirtySupercellData() ;
+	mapSendDirtySupercellData();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -211,24 +211,24 @@ Strat::Events::SendMapState(SINT32 teulIndex, bool isCampaign, const CPStruct* c
 {
 	///TODO:INST: Batch these up and send one per second so we don't have to spend
 	///TODO:INST: lots of time recreating them when 100 people log in together.
-	dbugLog(_FLD, "t:%d SendMapState", teulIndex) ;
-	DirectPacket packet(teulIndex) ;
-	for ( const CPStruct* cp = cpList ; cp != NULL ; cp = cp->next )
+	dbugLog(_FLD, "t:%d SendMapState", teulIndex);
+	DirectPacket packet(teulIndex);
+	for ( const CPStruct* cp = cpList; cp != NULL; cp = cp->next )
 	{
-		const WWII_COUNTRY country = isCampaign ? cp->country : cp->originalCountry ;
-		const UINT32 flags = isCampaign ? cp->flags : ((cp->flags & (CP_STAT_HAS_NAVYBASE|CP_STAT_HAS_AIRBASE|CP_STAT_MAKES_RDP)) | CP_STAT_OPEN | CP_STAT_IN_SUPPLY) ;
+		const WWII_COUNTRY country = isCampaign ? cp->country : cp->originalCountry;
+		const UINT32 flags = isCampaign ? cp->flags : ((cp->flags & (CP_STAT_HAS_NAVYBASE|CP_STAT_HAS_AIRBASE|CP_STAT_MAKES_RDP)) | CP_STAT_OPEN | CP_STAT_IN_SUPPLY);
 
-		packet.Add(Strat::Event(cp->fullObjID, country, flags)) ;
+		packet.Add(Strat::Event(cp->fullObjID, country, flags));
 
-		for ( FacilityStruct* fac = cp->facilityList ; fac != NULL ; fac = fac->next )
+		for ( FacilityStruct* fac = cp->facilityList; fac != NULL; fac = fac->next )
 		{
 			if ( fac->country != cp->country || fac->flags != 0 )
-				packet.Add(Strat::Event(fac->fullObjID, fac->country, fac->flags)) ;
+				packet.Add(Strat::Event(fac->fullObjID, fac->country, fac->flags));
 		}
 	}
 
 	if ( packet.size() > 0 )
-		packet.Send() ;
+		packet.Send();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -237,8 +237,8 @@ Strat::Events::SendMapState(SINT32 teulIndex, bool isCampaign, const CPStruct* c
 SINT32
 Strat::Events::SendFunction(ACTION_OBJECT* const a)
 {
-	EventPacket* const packet = (EventPacket*)(a->localRawData) ;
-	packet->packer(TEUL_PACK, a) ;
-	return a->offset ;
+	EventPacket* const packet = (EventPacket*)(a->localRawData);
+	packet->packer(TEUL_PACK, a);
+	return a->offset;
 }
 

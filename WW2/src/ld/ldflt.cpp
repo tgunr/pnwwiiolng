@@ -51,7 +51,7 @@ struct FLTLoadFailure
 		: m_problem(problem), m_doing(doing)
 	{}
 
-	std::string m_problem, m_doing ;
+	std::string m_problem, m_doing;
 };
 
 struct FLTChunkFailure : public FLTLoadFailure
@@ -162,8 +162,8 @@ void ldfltKill()
 
 static int localBufferRead(void* const dest, const int requestBytes)
 {
-	const int remainingBytes = streamBuffer.size() - streamOffset - 1 ;
-	const int readBytes = std::min(requestBytes, remainingBytes) ;
+	const int remainingBytes = streamBuffer.size() - streamOffset - 1;
+	const int readBytes = std::min(requestBytes, remainingBytes);
 	if ( readBytes <= 0 )
 	{
 		return 0;
@@ -310,7 +310,7 @@ static UINT16 FindTexPatIndex(UINT16 patindex)
 {
   int		i;
 
-	for (i=0 ; i < numtexrefs ; i++)
+	for (i=0; i < numtexrefs; i++)
 	{
 		if (patindex == texref[i].patindex)
 		{
@@ -420,7 +420,7 @@ static LOGICAL CreateLevel(OBJECT** lpnewobj)
 
 	groups[groupindex] = lpobj;
 
-	for (i=groupindex+1 ; i < MAX_GROUP_SIZE ; i++)
+	for (i=groupindex+1; i < MAX_GROUP_SIZE; i++)
 	{
 		grouplevels[i] = -1;
 		groups[i] = NULL;
@@ -1024,7 +1024,7 @@ static LOGICAL ReadVertexList(void)
 	std::set<size_t> duplicate;
 #endif
 
-	for (i=0 ; i < num ; i++)
+	for (i=0; i < num; i++)
 	{
 		vertlist[i].vertoff = LongEndian(vertlist[i].vertoff) - 8;
 		if (vertlist[i].vertoff >= totsizeverts)
@@ -1365,7 +1365,7 @@ static LOGICAL ReadMaterial(const char* name)
 	matlevel = level;
 	nummaterials /= sizeof(fltMATERIAL);
 
-	for (i=0 ; i < nummaterials ; i++)
+	for (i=0; i < nummaterials; i++)
 	{
 		Write_Debug("Material loaded: %s", material[i].name);
 
@@ -1558,9 +1558,9 @@ static LOGICAL ReadColorPalette(void)
 	return(FALSE);
   }
 
-  for (h=0, i=0 ; i < length ; i++)
+  for (h=0, i=0; i < length; i++)
   {
-	for (j=0 ; j < 128 ; h++, j++)
+	for (j=0; j < 128; h++, j++)
 	{
 	  color.full = colorpal->briteRGB[i];
 	  color.rgb.red = color.rgb.red * j / 127;
@@ -1619,7 +1619,7 @@ static LOGICAL ReadTextureReference(void)
 	texid[numtexrefs] = ldpixLoadImageFileToSurface(filename, colorBLACK, LDPIX_MIPMAP);
 
 	if(!piIsTexture(texid[numtexrefs], 0))
-		throw FLTUnknownTexture(filename) ;
+		throw FLTUnknownTexture(filename);
 
 	//numuses[numtexrefs] = 0;
 	texalpha[numtexrefs] = piTextureHasAlpha(texid[numtexrefs]);
@@ -1793,7 +1793,7 @@ static LOGICAL ReadObject(void)
 
 	strcpy(objname[level], object.id);
 	strlwr(objname[level]);
-	for (i=level+1 ; i < MAX_LEVELS ; i++)
+	for (i=level+1; i < MAX_LEVELS; i++)
 	{
 		strcpy(objname[i], objname[level]);
 	}
@@ -2119,7 +2119,7 @@ static LOGICAL ReadLongID(void)
 	if (facelevel == -1)
 	{
 		strcpy(objname[level], tempname);
-		for (i=level+1 ; i < MAX_LEVELS ; i++)
+		for (i=level+1; i < MAX_LEVELS; i++)
 		{
 			strcpy(objname[i], tempname);
 		}
@@ -2235,7 +2235,7 @@ static LOGICAL ReadPopLevel(void)
 
 			//Write_Debug("Up a group level: %d (%d)", groupindex, level);
 
-			for (i=groupindex+1 ; i < MAX_GROUP_SIZE ; i++)
+			for (i=groupindex+1; i < MAX_GROUP_SIZE; i++)
 			{
 				grouplevels[i] = -1;
 				groups[i] = NULL;
@@ -2264,7 +2264,7 @@ static LOGICAL ReadPopLevel(void)
 		{
 			memFree(texref);
 			texref = NULL;
-			for (SINT32 i=0 ; i < numtexrefs ; i++)
+			for (SINT32 i=0; i < numtexrefs; i++)
 			{
 				piFreeMipTextures(texid[i]);
 			}
@@ -2500,7 +2500,7 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 	meshpool_idx = 0;
 	memset( meshpools, 0, sizeof(meshpools) );
 
-	for (i=0 ; i < MAX_GROUP_SIZE; i++)
+	for (i=0; i < MAX_GROUP_SIZE; i++)
 	{
 		grouplevels[i] = -1;
 		groups[i] = NULL;
@@ -2519,7 +2519,7 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 		strcat(filename, name);
 		stream = fioOpen(filename);
 		if (-1 == stream)
-			throw FLTLoadFailure("Unable to read flt file", "open") ;
+			throw FLTLoadFailure("Unable to read flt file", "open");
 	}
 
 	// new code to buffer data locally
@@ -2567,7 +2567,7 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 
 		if ( chunk.next == 0 )
 		{
-			throw FLTLoadFailure("Bad chunk in flt file", "read") ;
+			throw FLTLoadFailure("Bad chunk in flt file", "read");
 		}
 
 
@@ -2584,72 +2584,72 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 		case HEADER_RECORD:
 			LDWrite_Debug("HEADER_RECORD");
 			if(!ReadHeader())
-				throw FLTChunkFailure("HEADER_RECORD") ;
+				throw FLTChunkFailure("HEADER_RECORD");
 		break;
 		case GROUP_RECORD:
 			LDWrite_Debug("GROUP_RECORD");
 			if(!ReadGroup())
-				throw FLTChunkFailure("GROUP_RECORD") ;
+				throw FLTChunkFailure("GROUP_RECORD");
 		break;
 		case OBJECT_RECORD:
 			LDWrite_Debug("OBJECT_RECORD");
 			if(!ReadObject())
-				throw FLTChunkFailure("OBJECT_RECORD") ;
+				throw FLTChunkFailure("OBJECT_RECORD");
 		break;
 		case FACE_RECORD:
 			LDWrite_Debug("FACE_RECORD");
 			if(!ReadFace())
-				throw FLTChunkFailure("FACE_RECORD") ;
+				throw FLTChunkFailure("FACE_RECORD");
 		break;
 		case PUSH_LEVEL:
 			if(!ReadPushLevel())
-				throw FLTChunkFailure("PUSH_LEVEL") ;
+				throw FLTChunkFailure("PUSH_LEVEL");
 			LDWrite_Debug("PUSH_LEVEL: %d", level);
 		break;
 		case POP_LEVEL:
 			LDWrite_Debug("POP_LEVEL: %d", level);
 			if(!ReadPopLevel())
-				throw FLTChunkFailure("POP_LEVEL") ;
+				throw FLTChunkFailure("POP_LEVEL");
 		break;
 		case DOF_RECORD:
 			LDWrite_Debug("DOF");
 			if(!ReadDOF())
-				throw FLTChunkFailure("DOF_RECORD") ;
+				throw FLTChunkFailure("DOF_RECORD");
 		break;
 		case PUSH_SUBFACE:
 			LDWrite_Debug("PUSH_SUBFACE");
 			if(!ReadPushSubface())
-				throw FLTChunkFailure("PUSH_SUBFACE") ;
+				throw FLTChunkFailure("PUSH_SUBFACE");
 		break;
 		case POP_SUBFACE:
 			LDWrite_Debug("POP_SUBFACE");
 			if(!ReadPopSubface())
-				throw FLTChunkFailure("POP_SUBFACE") ;
+				throw FLTChunkFailure("POP_SUBFACE");
 		break;
 		case PUSH_EXTENSION:
 			LDWrite_Debug("PUSH_EXTENSION");
 			if(!ReadPushExtension())
-				throw FLTChunkFailure("PUSH_EXTENSION") ;
+				throw FLTChunkFailure("PUSH_EXTENSION");
 		break;
 		case POP_EXTENSION:
 			LDWrite_Debug("POP_EXTENSION");
 			if(!ReadPopExtension())
-				throw FLTChunkFailure("POP_EXTENSION") ;
+				throw FLTChunkFailure("POP_EXTENSION");
 		break;
 		case TEXT_COMMENT:
 			LDWrite_Debug("TEXT_COMMENT");
 			if(!ReadTextComment())
-				throw FLTChunkFailure("TEXT_COMMENT") ;
+				throw FLTChunkFailure("TEXT_COMMENT");
 		break;
 		case COLOR_PALETTE:
 			LDWrite_Debug("COLOR_PALETTE");
 			if(!ReadColorPalette())
-				throw FLTChunkFailure("COLOR_PALETTE") ;
+				throw FLTChunkFailure("COLOR_PALETTE");
 		break;
 		case LONG_ID:
 			LDWrite_Debug("LONG_ID");
 			if(!ReadLongID())
-				throw FLTChunkFailure("LONG_ID") ;
+				throw FLTChunkFailure("LONG_ID");
 		break;
 		case MATRIX:
 			ReadMatrix();
@@ -2681,22 +2681,22 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 		case TEXTURE_REFERENCE:
 			LDWrite_Debug("TEXTURE_REFERENCE");
 			if(!ReadTextureReference())
-				throw FLTChunkFailure("TEXTURE_REFERENCE") ;
+				throw FLTChunkFailure("TEXTURE_REFERENCE");
 		break;
 		case VERTEX_PALETTE:
 			LDWrite_Debug("VERTEX_PALETTE");
 			if(!ReadVertexPalette())
-				throw FLTChunkFailure("VERTEX_PALETTE") ;
+				throw FLTChunkFailure("VERTEX_PALETTE");
 		break;
 		case VERTEX_LIST:
 			LDWrite_Debug("VERTEX_LIST");
 			if(!ReadVertexList())
-				throw FLTChunkFailure("VERTEX_LIST") ;
+				throw FLTChunkFailure("VERTEX_LIST");
 		break;
 		case FLT_LOD:
 			LDWrite_Debug("LOD");
 			if(!ReadLOD())
-				throw FLTChunkFailure("LOD") ;
+				throw FLTChunkFailure("LOD");
 		break;
 		case BOUNDING_BOX:
 			Write_Debug("BOUNDING_BOX");
@@ -2768,7 +2768,7 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 		case EXTENSION:
 			LDWrite_Debug("EXTENSION");
 			if(!ReadExtension())
-				throw FLTChunkFailure("EXTENSION") ;
+				throw FLTChunkFailure("EXTENSION");
 		break;
 		case LIGHT_SOURCE:
 			Write_Debug("LIGHT_SOURCE");
@@ -2801,7 +2801,7 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 		case MATERIAL_TABLE:
 			LDWrite_Debug("MATERIAL_TABLE");
 			if(!ReadMaterial(name))
-				throw FLTChunkFailure("MATERIAL_TABLE") ;
+				throw FLTChunkFailure("MATERIAL_TABLE");
 		break;
 		case TEXTURE_MAPPING_PALETTE:
 			Write_Debug("TEXTURE_MAPPING_PALETTE");
@@ -2810,7 +2810,7 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 		case MATERIAL_PALETTE:
 			LDWrite_Debug("MATERIAL_PALETTE");
 			if(!ReadMaterialPalette(name))
-				throw FLTChunkFailure("MATERIAL_PALETTE") ;
+				throw FLTChunkFailure("MATERIAL_PALETTE");
 		break;
 		case COLOR_NAME_PALETTE:
 			Write_Debug("COLOR_NAME_PALETTE");
@@ -2910,11 +2910,11 @@ OBJECT* ldfltLoad(const char* name, float scale, int reduce)
 	}
 	catch (FLTLoadFailure& e)
 	{
-		char error[1024] ;
-		sprintf(error, "Flt:%s\nError: %s (%s)", name, e.m_problem.c_str(), e.m_doing.c_str()) ;
-		Write_Debug("%s", error) ;
-		piExitProgram(__FILE__, __LINE__, error) ;
-		return NULL ;
+		char error[1024];
+		sprintf(error, "Flt:%s\nError: %s (%s)", name, e.m_problem.c_str(), e.m_doing.c_str());
+		Write_Debug("%s", error);
+		piExitProgram(__FILE__, __LINE__, error);
+		return NULL;
 	}
 }
 

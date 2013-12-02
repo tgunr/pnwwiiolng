@@ -13,11 +13,11 @@ namespace Teul
 template<>
 struct Packer<WEAPON_SPEC>
 {
-	WEAPON_SPEC m_value ;
+	WEAPON_SPEC m_value;
 	void packer(LOGICAL mode, ACTION_OBJECT* const a, SINT32 /*bits*/=0)
 	{
-		m_value.packer(mode, a) ;
+		m_value.packer(mode, a);
 	}
-} ;
+};
 
 } // namespace Teul

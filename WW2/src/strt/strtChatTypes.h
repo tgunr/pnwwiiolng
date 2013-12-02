@@ -15,9 +15,9 @@
 #include "wwii/wwiiFullObjID.h"
 #include "wwii/wwiiOwnershipEnums.h"
 
-static const int OOB_STRING_LEN	= 160 ;
-static const int OOB_STRING_SIZE = OOB_STRING_LEN + 1 ;
-static const int OOB_CALLSIGN_SIZE = MAX_HANDLE_LEN + 1 ;
+static const int OOB_STRING_LEN	= 160;
+static const int OOB_STRING_SIZE = OOB_STRING_LEN + 1;
+static const int OOB_CALLSIGN_SIZE = MAX_HANDLE_LEN + 1;
 
 // Out of band messages for sending config/command packets between hosts
 // basically, a reduction in the number of callbacks required.
@@ -27,28 +27,28 @@ class OOBMessage
 {
 public:
 	OOBMessage(UINT32 playerID, UINT32 brigadeID, const ChatHandle& handleID, const char* command, const char* arguments
-				, const FULL_OBJ_ID& cpID, WWII_SIDE side, WWII_COUNTRY country) ;
-	OOBMessage() ;
-	OOBMessage(ACTION_OBJECT* const a) ;
+				, const FULL_OBJ_ID& cpID, WWII_SIDE side, WWII_COUNTRY country);
+	OOBMessage();
+	OOBMessage(ACTION_OBJECT* const a);
 
 public:
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) ;
-	void send() ;
+	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	void send();
 
-	const char* originator() const { return chatGetCallsign(m_handleID) ; }
+	const char* originator() const { return chatGetCallsign(m_handleID); }
 
 	// Used by the host
-	void Reply(int prefix, int msg, const char* text1=NULL, const char* text2=NULL) ;
+	void Reply(int prefix, int msg, const char* text1=NULL, const char* text2=NULL);
 
 public:
-	UINT32			m_originatorID ;	// Player ID of originator (or 0 for system)
-	UINT32			m_brigadeID ;		// ID of the brigade player is in or requesting
-	ChatHandle		m_handleID ;		// Packed handle of originator
-	FULL_OBJ_ID		m_cpID ;			// Origin facility of the GM
-	WWII_COUNTRY	m_country ;			// Country of the sender
-	WWII_SIDE		m_side ;			// Side - since they might not have a country selected
-	char			m_text[OOB_STRING_SIZE] ;
-} ;
+	UINT32			m_originatorID;		// Player ID of originator (or 0 for system)
+	UINT32			m_brigadeID;		// ID of the brigade player is in or requesting
+	ChatHandle		m_handleID;			// Packed handle of originator
+	FULL_OBJ_ID		m_cpID;				// Origin facility of the GM
+	WWII_COUNTRY	m_country;			// Country of the sender
+	WWII_SIDE		m_side;				// Side - since they might not have a country selected
+	char			m_text[OOB_STRING_SIZE];
+};
 //tolua_end
 
 // List of known SCMDs
@@ -63,8 +63,8 @@ enum
 ,	SC_CLEAR						// Clear objective
 // And so we can tell how big the list is :)
 ,	SC_NUM_COMMANDS
-} ;
-typedef UINT32 SCMD_ENUM ;
+};
+typedef UINT32 SCMD_ENUM;
 
 // Result codes for strat commands
 enum
@@ -95,47 +95,47 @@ enum
 ,	SCMD_NO_DIV_LINK				// No link between division and target
 // And finally:
 ,	SCMD_ERROR						// Must always be the last
-}  ;
-typedef UINT32 SCMD_RESULT ;
+};
+typedef UINT32 SCMD_RESULT;
 
 enum
 {
 	FALLBACK_TEST
 ,	FALLBACK_START
 ,	FALLBACK_EXECUTE
-} ;
+};
 
 // Maximum length of a strat command
-static const int		_MAX_SCMD_LEN = 10 ;
+static const int		_MAX_SCMD_LEN = 10;
 
 // These are commands issued to strat by the chat host, processed
 // and then fired back to the chat host with the result variable set.
 class StratCommand
 {
 public:
-	UINT32			m_issuer ;				// Issuer's playerID
-	SCMD_ENUM		m_command ;				// List of strat commands
-	FULL_OBJ_ID		m_cp ;					// Full ObjID of the CP they issued at
-	WWII_SIDE		m_side ;				// Which country they belong to
-	SCMD_RESULT		m_result ;				// The result they produced
-	UINT32			m_data ;				// For argument passing
-	UINT32			m_brigadeID ;
+	UINT32			m_issuer;				// Issuer's playerID
+	SCMD_ENUM		m_command;				// List of strat commands
+	FULL_OBJ_ID		m_cp;					// Full ObjID of the CP they issued at
+	WWII_SIDE		m_side;					// Which country they belong to
+	SCMD_RESULT		m_result;				// The result they produced
+	UINT32			m_data;					// For argument passing
+	UINT32			m_brigadeID;
 
-	StratCommand(UINT32 issuer, SCMD_ENUM command, FULL_OBJ_ID cp, WWII_SIDE side, SCMD_RESULT result=SCMD_NO_EFFECT) ;
-	StratCommand(ACTION_OBJECT* const a) ;
+	StratCommand(UINT32 issuer, SCMD_ENUM command, FULL_OBJ_ID cp, WWII_SIDE side, SCMD_RESULT result=SCMD_NO_EFFECT);
+	StratCommand(ACTION_OBJECT* const a);
 
 	// Code that actually handles the SCMD result;
 	// eventually this should exist on both sides of the connection
-	void process(void) ;
+	void process(void);
 
 	~StratCommand() { }
 
-	SINT32 send() ;
+	SINT32 send();
 
-	SINT32 pack(LOGICAL mode, ACTION_OBJECT* a) ;
+	SINT32 pack(LOGICAL mode, ACTION_OBJECT* a);
 
-	bool describe() const ;
-} ;
+	bool describe() const;
+};
 
-typedef std::pair<UINT32,UINT32> POPULATION ;
+typedef std::pair<UINT32,UINT32> POPULATION;
 

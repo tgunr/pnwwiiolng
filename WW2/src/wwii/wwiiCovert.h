@@ -86,10 +86,10 @@ public:
 	const Tp operator!() { return !Get(); }
 };
 #else
-extern UINT32 wwiiGetUpdateNo(bool increment) ;
-extern bool wwiiIncrementHits() ;
+extern UINT32 wwiiGetUpdateNo(bool increment);
+extern bool wwiiIncrementHits();
 #include "wwii/wwiiOhYeahCodes.h"
-extern void wwiiOhYeah(const UCHAR) ;
+extern void wwiiOhYeah(const UCHAR);
 
 // Covert type class:
 //  - Obscure values of static data
@@ -124,8 +124,8 @@ private:
 
 
 public:
-	typedef Tp valuetype ;
-	typedef Covert<valuetype> selftype ;
+	typedef Tp valuetype;
+	typedef Covert<valuetype> selftype;
 
 #ifdef RELOCATING_COVERT
 	UINT64& Deref() { return *m_data; }
@@ -156,12 +156,12 @@ public:
 		if ( wwiiIncrementHits() )
 		{
 			// Increment mangler must be prime and 1 lower than a power of 2
-			static const unsigned short int INCREMENT_MANGLING_PRIME = 127 ;	// So increments aren't predictable
+			static const unsigned short int INCREMENT_MANGLING_PRIME = 127;	// So increments aren't predictable
 			static const unsigned short int UNSIGN_MASK = (unsigned short int)~0x8000;
 			m_hits = ((m_hits + (rand() & INCREMENT_MANGLING_PRIME)) & UNSIGN_MASK);
 		}
 
-		m_exposed = _exposeValue(t) ;
+		m_exposed = _exposeValue(t);
 #endif
 
 		// Return the naked value
@@ -177,8 +177,8 @@ public:
 #ifdef COMPLEX_COVERT
 		if ( m_exposed != _exposeValue(t) && (rand() & 15) == 0 )
 		{
-			wwiiGetUpdateNo() ;		// Bump the increment number for inconvenience to them
-			wwiiOhYeah(OH_YEAH_COVERT) ;
+			wwiiGetUpdateNo();		// Bump the increment number for inconvenience to them
+			wwiiOhYeah(OH_YEAH_COVERT);
 		}
 #endif
 		return *(valuetype*)&t;
@@ -188,8 +188,8 @@ private:
 	bool Equals(const valuetype& rhs) const
 	{
 		const UINT64 lhsValue = (Deref() ^ ~m_mask);
-		const UINT64 rhsValue = (rhs->Deref() ^ ~ rhs->m_mask) ;
-		return (*(valuetype*)&lhsValue) == (*(valuetype*)&rhsValue) ;
+		const UINT64 rhsValue = (rhs->Deref() ^ ~ rhs->m_mask);
+		return (*(valuetype*)&lhsValue) == (*(valuetype*)&rhsValue);
 	}
 
 public:
@@ -256,7 +256,7 @@ private:
 #ifdef COMPLEX_COVERT
 	UINT64 inline _exposeValue(UINT64& t) const
 	{
-		return (UINT64)((SINT64)t + (SINT64)m_hits) ;
+		return (UINT64)((SINT64)t + (SINT64)m_hits);
 	}
 #endif
 
@@ -272,8 +272,8 @@ private:
 	void _generateMask()
 	{
 		// The casting is neccessary to stop truncation to 32 bits during all this
-		static const int BIT_SIZE = (int)sizeof(UINT64) << 3 ;
-		for ( int i = 0 ; i < BIT_SIZE ; i += 32 )
+		static const int BIT_SIZE = (int)sizeof(UINT64) << 3;
+		for ( int i = 0; i < BIT_SIZE; i += 32 )
 		{
 			m_mask ^= ((UINT64)_randomNumber()) << i;
 		}
@@ -290,9 +290,9 @@ private:
 		// aren't stored in the same order each time.
 #ifdef RELOCATING_COVERT
  #ifdef COVERT_USE_CHAOTIC_NUMBERS
-		bool allocateFeint = (mathGetChaoticNumber() & 1) ;
+		bool allocateFeint = (mathGetChaoticNumber() & 1);
  #else
-		bool allocateFeint = (rand() & 1) ;
+		bool allocateFeint = (rand() & 1);
  #endif
 
 		UINT64* feint = NULL;
@@ -307,7 +307,7 @@ private:
 		{
 			if ( allocateFeint == true )
 				delete feint;
-			throw ;
+			throw;
 		}
 
 		if ( allocateFeint == true )

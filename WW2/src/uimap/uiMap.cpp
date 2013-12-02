@@ -986,7 +986,7 @@ bool MapMessageFilter::Filter(phui::Message* msg, phui::MessageHandler** target,
 
 //			strtRequestCPFacilitiesUpdate(PlayerClient()->MapConnection(), fullid);
 			///TODO: strtRequestCPFacilitiesUpdate is no-longer required.
-//			assert( "TROY: Fix Me" == NULL ) ;
+//			assert( "TROY: Fix Me" == NULL );
 		}
 		break;
 		*/

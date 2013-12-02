@@ -27,8 +27,8 @@
 
 // "XCHG" indicates a callback which has send/recv
 
-static TEUL_CALLBACK*	_SEND_SQUAD_REQUEST ;
-static TEUL_CALLBACK*	_XCHG_SQUAD_MEMBER_UPDATE ;
+static TEUL_CALLBACK*	_SEND_SQUAD_REQUEST;
+static TEUL_CALLBACK*	_XCHG_SQUAD_MEMBER_UPDATE;
 
 //////////////////////////////////////////////////////////////////////
 // Private functions
@@ -45,12 +45,12 @@ static TEUL_CALLBACK*	_XCHG_SQUAD_MEMBER_UPDATE ;
 static SINT32
 _recvSquadMemberUpdate(ACTION_OBJECT* const a)
 {
-	SquadMemberUpdate result(a) ;
+	SquadMemberUpdate result(a);
 	if ( a->offset < 0 )
-		return a->offset ;
+		return a->offset;
 	if ( result.receive(a->teulIndex) < 0 )
-		return -EINVAL ;
-	return a->offset ;
+		return -EINVAL;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -58,14 +58,14 @@ _recvSquadMemberUpdate(ACTION_OBJECT* const a)
 static SINT32
 _sendSquadRequest(ACTION_OBJECT* const a)
 {
-	a->offset = teulPackUINT32(TEUL_PACK, a->packed, a->offset, (UINT32*)(a->localRawData), 0) ;
-	return a->offset ;
+	a->offset = teulPackUINT32(TEUL_PACK, a->packed, a->offset, (UINT32*)(a->localRawData), 0);
+	return a->offset;
 }
 
 static SINT32
 _sendSquadMemberUpdate(ACTION_OBJECT* const a)
 {
-	return ((SquadMemberUpdate*)(a->localRawData))->packer(TEUL_PACK, a) ;
+	return ((SquadMemberUpdate*)(a->localRawData))->packer(TEUL_PACK, a);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -77,7 +77,7 @@ _sendSquadMemberUpdate(ACTION_OBJECT* const a)
 SINT32
 chatdbRequestSquad(UINT32 squadID)
 {
-	return dbseSend(_SEND_SQUAD_REQUEST, &squadID) ;
+	return dbseSend(_SEND_SQUAD_REQUEST, &squadID);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -86,7 +86,7 @@ chatdbRequestSquad(UINT32 squadID)
 SINT32
 chatdbSendSquadMemberUpdate(SquadMemberUpdate& smu)
 {
-	return dbseSend(_XCHG_SQUAD_MEMBER_UPDATE, &smu) ;
+	return dbseSend(_XCHG_SQUAD_MEMBER_UPDATE, &smu);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -97,11 +97,11 @@ chatdbInstallClientCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(CHAT_DBSE_X)
 
-		REGISTER_SENDER(CHATDB_SQUAD_REQUEST_Y, _sendSquadRequest, _SEND_SQUAD_REQUEST) ;
+		REGISTER_SENDER(CHATDB_SQUAD_REQUEST_Y, _sendSquadRequest, _SEND_SQUAD_REQUEST);
 
-		REGISTER_MSG_RECEIVER(CHATDB_SQUAD_INFO_Y, CHATDB_SQUAD_XCHG) ;
+		REGISTER_MSG_RECEIVER(CHATDB_SQUAD_INFO_Y, CHATDB_SQUAD_XCHG);
 
-		REGISTER_SENDRECV(CHATDB_SQUAD_MEMBER_UPDATE_Y, _sendSquadMemberUpdate, _recvSquadMemberUpdate, _XCHG_SQUAD_MEMBER_UPDATE) ;
+		REGISTER_SENDRECV(CHATDB_SQUAD_MEMBER_UPDATE_Y, _sendSquadMemberUpdate, _recvSquadMemberUpdate, _XCHG_SQUAD_MEMBER_UPDATE);
 
 	END_CALLBACK_REGISTRATION
 }

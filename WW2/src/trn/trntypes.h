@@ -143,7 +143,7 @@
 		FLOAT64		ulymap;			//	= 39.99583333333333;
 		FLOAT64		xdim;			//	= 0.00833333333333;
 		FLOAT64		ydim;			//	= 0.00833333333333;
-	} ;
+	};
 
 	struct TERRAINFILE
 	{
@@ -179,7 +179,7 @@
 		TRN_STATE_UNLOAD_OTHERS,	// Unload remainder of super cell and release
 		// Add all new states here
 		MAX_TRN_STATES				// Maximum number of states in this enum block
-	} ;
+	};
 
 	enum OBJVALS
 	{
@@ -199,7 +199,7 @@
 		OBJVAL_PLACE_STRAIGHT_DOWN,
         OBJVAL_PLACE_DOWN_ROTATE, // Place down and rotate to terrain
 		OBJVAL_NO_PLACEMODE
-	} ;
+	};
 
 	struct TERRAIN_INFO
 	{

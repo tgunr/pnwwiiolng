@@ -27,15 +27,15 @@ WeaponEntry::WeaponEntry(const WEAPON& withWeapon, const ObjectStruct& withSpawn
 	: m_weapon(withWeapon)
 	, m_portals()
 {
-	addSpawner(withSpawner) ;
+	addSpawner(withSpawner);
 }
 
 void
 WeaponEntry::addSpawner(const ObjectStruct& spawner)
 {
-	PORTALS::iterator it = std::find(m_portals.begin(), m_portals.end(), &spawner) ;
+	PORTALS::iterator it = std::find(m_portals.begin(), m_portals.end(), &spawner);
 	if ( it == m_portals.end() )
-		m_portals.push_back(&spawner) ;
+		m_portals.push_back(&spawner);
 }
 
 // Determine if a vehicle is available at a specific facility; usually
@@ -43,7 +43,7 @@ WeaponEntry::addSpawner(const ObjectStruct& spawner)
 bool
 WeaponEntry::isAccessible(const FacilityStruct& spawnFac) const
 {
-	return ( spawnFac.isOpen() == true && spawnFac.side == spec().side() ) ;
+	return ( spawnFac.isOpen() == true && spawnFac.side == spec().side() );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -53,20 +53,20 @@ bool
 WeaponEntry::isThrottled() const
 {
 	if ( facility() == NULL || facility()->type != FACILITY_DEPOT )
-		return false ;
+		return false;
 
 	if ( host_config.supply.enabled == false || host_config.throttle.enabled == false )
-		return false ;
+		return false;
 
-	WWII_SIDE wSide = (WWII_SIDE)spec().side() ;
+	WWII_SIDE wSide = (WWII_SIDE)spec().side();
 
-	assert( !m_portals.empty() ) ;
+	assert( !m_portals.empty() );
 
-	const CPStruct& cp = *facility()->cp ;
+	const CPStruct& cp = *facility()->cp;
 
 	// If we are in charge of this CP and we have HAAC in effect, no throttling.
 	if ( cp.spawningEnabledFor(wSide) && cp.isHolding(wSide) )
-		return false ;
+		return false;
 
-	return true ;
+	return true;
 }

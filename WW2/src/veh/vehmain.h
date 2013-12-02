@@ -210,7 +210,7 @@ struct vehanimVehicleStateAnimations
 	FLOAT32 LastMainGunSmokeLevel;
 	FLOAT32 MainGunSmokeLevel;
 	FLOAT32 CockpitSmokeLevel;
-} ;
+};
 
 struct vehVehiclePositionData
 {
@@ -272,7 +272,7 @@ struct vehVehiclePositionData
 	UINT32 animationFlags;
 
 	FLOAT64VECTOR Pos;
-} ;
+};
 
 
 /************************************************************************************************
@@ -299,7 +299,7 @@ struct vehDamageQue
 
 	FLOAT64	DamageAccrued	[VEH_MAX_DAMAGE_OBJECTS+1];	// Vehicle Damage
 	FLOAT64	Damage		[VEH_MAX_BUILDINGS_HIT];		// Building Damage
-} ;
+};
 
 /************************************************************************************************
 	vehVehicle
@@ -542,8 +542,8 @@ struct vehVehicle
 
 private:
 	// Prevent copy ctor/operator
-	vehVehicle(const vehVehicle&) ;
-	vehVehicle& operator=(const vehVehicle&) ;
+	vehVehicle(const vehVehicle&);
+	vehVehicle& operator=(const vehVehicle&);
 #endif
 };
 

@@ -23,8 +23,8 @@ typedef std::vector<Recruiter> RecruiterList;
 class ClientSquad : public Squad
 {
 public:
-	ClientSquad() ;
-	ClientSquad(const Squad&) ;
+	ClientSquad();
+	ClientSquad(const Squad&);
 	virtual ~ClientSquad() {}
 
 	UINT32 size() { return m_members.size(); }
@@ -35,17 +35,17 @@ public:
 	bool isSquadBrigade(const UINT32 brigadeID, bool excludeMe = true) const; // is the squad represented here?
 	bool isSquadMission(const UINT32 missionID, bool excludeMe = true) const; // is the squad represented here?
 	const SquadMembers& members(bool reset = false) const;
-	bool modified() const { return m_modified ; }
+	bool modified() const { return m_modified; }
 
 protected:
 
 	// has member been added or removed
-	mutable bool m_modified ;
+	mutable bool m_modified;
 
 	// list of squad members
 	SquadMembers m_members;
 
-} ;
+};
 
 class SquadInvite
 {
@@ -57,19 +57,19 @@ public:
 	SquadMsg const& msg() const { return m_invitation; }
 	const wchar_t* inviter(){ return chatGetWideCallsign(m_invitation.inviter()); }
 	RANK_NO inviteRank() const { return m_invitation.inviteRank(); }
-	UINT32 invited() const { return m_invited ; }
-	bool valid() const { return ((UINT32)teulTime() < (m_invited + SQUAD_INVITATION_TIMEOUT)) ; }
+	UINT32 invited() const { return m_invited; }
+	bool valid() const { return ((UINT32)teulTime() < (m_invited + SQUAD_INVITATION_TIMEOUT)); }
 	void Invalidate() { m_invited = 0; }
 
 protected:
 
 	// creation invite
 	// when the invitation came in
-	UINT32 m_invited ;
+	UINT32 m_invited;
 
 	// invite message
-	SquadMsg m_invitation ;
-} ;
+	SquadMsg m_invitation;
+};
 
 // Is the host supposed to do something with this?
 struct SquadRecruitment

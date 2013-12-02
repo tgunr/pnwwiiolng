@@ -13,5 +13,5 @@
 extern SINT32 mapInitMapData();
 extern class CPStruct* mapGetStratSystem(void);
 
-extern void mapUpdateCP(class CPStruct* cp, WWII_COUNTRY owner, WWII_COUNTRY controller, UINT32 flags, const char* from) ;
+extern void mapUpdateCP(class CPStruct* cp, WWII_COUNTRY owner, WWII_COUNTRY controller, UINT32 flags, const char* from);
 

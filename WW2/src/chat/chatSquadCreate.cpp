@@ -25,128 +25,128 @@
 #include "chat/chatSquadList.h"
 #include "chat/chatSquadListTypes.h"
 
-static const UINT32 CREATE_REQUEST_EXPIRY_S = 6 * 30 ;	// 3 minutes
+static const UINT32 CREATE_REQUEST_EXPIRY_S = 6 * 30;	// 3 minutes
 
 struct SQUAD_REQUEST
 {
-	UINT32					expires ;
-	SquadControl			control ;
-	bool					approved ;	// Did we get a CREATE_CHECK approval back?
-	std::set<ChatHandle>	agreed ;	// Which players have agreed
-} ;
+	UINT32					expires;
+	SquadControl			control;
+	bool					approved;	// Did we get a CREATE_CHECK approval back?
+	std::set<ChatHandle>	agreed;	// Which players have agreed
+};
 
-typedef std::unordered_map<ChatHandle,SQUAD_REQUEST> SQUAD_REQUESTS ;
+typedef std::unordered_map<ChatHandle,SQUAD_REQUEST> SQUAD_REQUESTS;
 
-extern UINT32 chatSendSquadCreateRequest(SquadControl& control, Player* player) ;
+extern UINT32 chatSendSquadCreateRequest(SquadControl& control, Player* player);
 
-SQUAD_REQUESTS requestIndex ;
+SQUAD_REQUESTS requestIndex;
 
 static void
 _expired(Player* player)
 {
-	if ( player == NULL || player->teulIndex() < 0 || player->squadID() ) return ;
+	if ( player == NULL || player->teulIndex() < 0 || player->squadID() ) return;
 
-	static SquadControlResult reply(SQR_CREATE_EXPIRED, SquadControl::_CREATE, 0) ;
-	reply.send(player->teulIndex()) ;
+	static SquadControlResult reply(SQR_CREATE_EXPIRED, SquadControl::_CREATE, 0);
+	reply.send(player->teulIndex());
 }
 
 static void
 _sendInvites(const ChatHandle& squadHandle, const std::string& squadName, const ChatHandle& co, const ChatHandle& xo, const PLAYER_INDEX& invites)
 {
-	dbugLog(_FLI, "sending %s squad invites", squadName.c_str()) ;
-	for ( PLAYER_INDEX::const_iterator it = invites.begin() ; it != invites.end() ; ++it )
+	dbugLog(_FLI, "sending %s squad invites", squadName.c_str());
+	for ( PLAYER_INDEX::const_iterator it = invites.begin(); it != invites.end(); ++it )
 	{
-		RANK_NO rank = (it->first == xo) ? Squad::XO : Squad::MEMBER ;
-		Player* invitee = it->second ;
-		betaLog(_FLI, "c:%s sending invite to %s", invitee->callsign(), squadName.c_str()) ;
-		invitee->sendSquadCreateInvite(squadHandle, squadName, co, rank) ;
+		RANK_NO rank = (it->first == xo) ? Squad::XO : Squad::MEMBER;
+		Player* invitee = it->second;
+		betaLog(_FLI, "c:%s sending invite to %s", invitee->callsign(), squadName.c_str());
+		invitee->sendSquadCreateInvite(squadHandle, squadName, co, rank);
 	}
 }
 
 static void
 _checkMembers(Player* player, SquadControl& control, bool sendInvites)
 {
-	std::vector<ChatHandle>& players = control.m_players ;
-	char callsign[MAX_HANDLE_SIZE] ;
-	PLAYER_INDEX approved ;
+	std::vector<ChatHandle>& players = control.m_players;
+	char callsign[MAX_HANDLE_SIZE];
+	PLAYER_INDEX approved;
 
-	approved.clear() ;
-	control.m_playerIDs.clear() ;
+	approved.clear();
+	control.m_playerIDs.clear();
 
-	SquadControlResult result(SquadControl::_INVALID, SquadControl::_CREATE, 0LL) ;
+	SquadControlResult result(SquadControl::_INVALID, SquadControl::_CREATE, 0LL);
 
-	for ( UINT32 i = 0 ; i < players.size() ; ++i )
+	for ( UINT32 i = 0; i < players.size(); ++i )
 	{
-		result.m_handle = players[i] ;
+		result.m_handle = players[i];
 		try
 		{
-			ChatHandle handleID = chatGetLowercaseHandle(players[i]) ;
-			chatGetCallsign(callsign, handleID) ;
+			ChatHandle handleID = chatGetLowercaseHandle(players[i]);
+			chatGetCallsign(callsign, handleID);
 			if ( handleID == player->matchHandle() )
-				throw SQR_CANT_DO_TO_SELF ;
+				throw SQR_CANT_DO_TO_SELF;
 			// Skip duplicates
 			if ( approved.find(handleID) != approved.end() )
-				continue ;
-			Player* invitee = PlayerInterface::Lookup(handleID) ;
-			approved[handleID] = invitee ;
+				continue;
+			Player* invitee = PlayerInterface::Lookup(handleID);
+			approved[handleID] = invitee;
 			if ( invitee == NULL
 				|| !invitee->isVisibleTo(player)
 				|| invitee->ignoring(player)
 				)
-				throw SQR_PLAYER_NOT_ONLINE ;
+				throw SQR_PLAYER_NOT_ONLINE;
 			if ( invitee->squadID() )
-				throw SQR_PLAYER_IN_OTHER_SQUAD ;
+				throw SQR_PLAYER_IN_OTHER_SQUAD;
 			if ( invitee->squadInvite() && invitee->squadInvite()->m_from != player->matchHandle() )
-				throw SQR_PLAYER_CONSIDERING_OTHER ;
+				throw SQR_PLAYER_CONSIDERING_OTHER;
 
-			control.m_playerIDs.push_back(invitee->playerID()) ;
+			control.m_playerIDs.push_back(invitee->playerID());
 		}
 		catch (SQUAD_CONTROL_RESULT& e)
 		{
-			result.m_result = e ;
-			result.send(player->teulIndex()) ;
+			result.m_result = e;
+			result.send(player->teulIndex());
 		}
 	}
 
 	if ( approved.size() < SquadControl::CREATE_PLAYERS_REQUIRED )
-		throw SQR_CREATE_TOO_FEW_MEMBERS ;
+		throw SQR_CREATE_TOO_FEW_MEMBERS;
 
 	if ( control.m_playerIDs.size() < SquadControl::CREATE_PLAYERS_REQUIRED )
-		throw SQR_CREATE_MEMBER_ERROR ;
+		throw SQR_CREATE_MEMBER_ERROR;
 
 	// Can't proceed without the XO
-	ChatHandle& xo = players[0] ;
+	ChatHandle& xo = players[0];
 	if ( approved[xo] == NULL )
-		throw SQR_CREATE_MEMBER_ERROR ;
+		throw SQR_CREATE_MEMBER_ERROR;
 
 	if ( sendInvites )
-		_sendInvites(control.m_handle, control.m_text, player->matchHandle(), xo, approved) ;
+		_sendInvites(control.m_handle, control.m_text, player->matchHandle(), xo, approved);
 }
 
 void
 chatProcessSquadCreateRequest(SquadControl& control, Player* player)
 {
 	if ( !player || player->teulIndex() < 0 )
-		throw SQR_OPERATION_FAILED ;
+		throw SQR_OPERATION_FAILED;
 
 	if ( requestIndex.find(player->matchHandle()) != requestIndex.end() )
-		throw SQR_CREATE_IN_PROGRESS ;
+		throw SQR_CREATE_IN_PROGRESS;
 
 	// Check the name isn't already being applied for
-	ChatHandle lowerHandle = chatGetLowercaseHandle(control.m_handle) ;
-	SQUAD_REQUESTS::iterator it ;
-	for ( it = requestIndex.begin() ; it != requestIndex.end() ; ++it )
+	ChatHandle lowerHandle = chatGetLowercaseHandle(control.m_handle);
+	SQUAD_REQUESTS::iterator it;
+	for ( it = requestIndex.begin(); it != requestIndex.end(); ++it )
 	{
 		if ( chatGetLowercaseHandle(it->second.control.m_handle) == lowerHandle )
-			throw SQR_SQUAD_EXISTS ;
+			throw SQR_SQUAD_EXISTS;
 	}
 
-	_checkMembers(player, control, false) ;
+	_checkMembers(player, control, false);
 
-	SQUAD_REQUEST& request = requestIndex[player->matchHandle()] ;
-	request.expires = teulTime() + CREATE_REQUEST_EXPIRY_S ;
-	request.control = control ;
-	request.approved = false ;
+	SQUAD_REQUEST& request = requestIndex[player->matchHandle()];
+	request.expires = teulTime() + CREATE_REQUEST_EXPIRY_S;
+	request.control = control;
+	request.approved = false;
 
 	dbugLog(_FLD, "t:%d p:%u c:%s ok to proceed with squad creation", player->teulIndex(), player->playerID(), player->callsign());
 }
@@ -154,71 +154,71 @@ chatProcessSquadCreateRequest(SquadControl& control, Player* player)
 static SQUAD_CONTROL_RESULT
 _processCreateCheck(const ChatHandle& /*originator*/, SQUAD_REQUEST& request, Player* player)
 {
-	_checkMembers(player, request.control, true) ;
+	_checkMembers(player, request.control, true);
 
-	request.expires = teulTime() + CREATE_REQUEST_EXPIRY_S + 1 ;
-	request.approved = true ;
+	request.expires = teulTime() + CREATE_REQUEST_EXPIRY_S + 1;
+	request.approved = true;
 
-	return SQR_DONE ;
+	return SQR_DONE;
 }
 
 static SQUAD_CONTROL_RESULT
 _processCreateComplete(const ChatHandle& /*originator*/, SQUAD_REQUEST& request, Player* player)
 {
-	bool updatedPlayer = false ;
-	Player* member ;
-	for ( UINT32 i = 0 ; i < request.control.m_players.size() ; ++i )
+	bool updatedPlayer = false;
+	Player* member;
+	for ( UINT32 i = 0; i < request.control.m_players.size(); ++i )
 	{
-		member = PlayerInterface::Lookup(request.control.m_players[i]) ;
+		member = PlayerInterface::Lookup(request.control.m_players[i]);
 		if ( member != NULL )
 		{
 			if ( member == player )
-				updatedPlayer = true ;
-			member->SetSquadInvite(NULL) ;
-			member->tuneChannelType(SQUAD_CHANNEL) ;
-			chatSaveChannels(*member) ;
+				updatedPlayer = true;
+			member->SetSquadInvite(NULL);
+			member->tuneChannelType(SQUAD_CHANNEL);
+			chatSaveChannels(*member);
 		}
 	}
 	if ( !updatedPlayer && player && player->teulIndex() >= 0 && player->initialized() )
 	{
-		player->SetSquadInvite(NULL) ;
-		player->tuneChannelType(SQUAD_CHANNEL) ;
-		chatSaveChannels(*player) ;
+		player->SetSquadInvite(NULL);
+		player->tuneChannelType(SQUAD_CHANNEL);
+		chatSaveChannels(*player);
 	}
 
 	if ( player )
 	{
-		SquadList* squadList = chatFindSquadList(player->squadID()) ;
+		SquadList* squadList = chatFindSquadList(player->squadID());
 		if ( squadList )
-			squadList->created() ;
+			squadList->created();
 	}
 
-	return SQR_CREATED ;
+	return SQR_CREATED;
 }
 
 SQUAD_CONTROL_RESULT
 chatProcessSquadCreateReply(bool created, const ChatHandle& originator, Player* player)
 {
 	// Find the original request for the member's list
-	SQUAD_REQUESTS::iterator it = requestIndex.find(originator) ;
+	SQUAD_REQUESTS::iterator it = requestIndex.find(originator);
 	if ( !created && it == requestIndex.end() )
-		throw SQR_CREATE_EXPIRED ;
+		throw SQR_CREATE_EXPIRED;
 
 	try
 	{
 		if ( !created )
-			return _processCreateCheck(originator, it->second, player) ;
+			return _processCreateCheck(originator, it->second, player);
 		else
 		{
-			_processCreateComplete(originator, it->second, player) ;
-			requestIndex.erase(it) ;
-			throw SQR_CREATED ;
+			_processCreateComplete(originator, it->second, player);
+			requestIndex.erase(it);
+			throw SQR_CREATED;
 		}
 	}
 	catch (SQUAD_CONTROL_RESULT /*result*/)
 	{
-		requestIndex.erase(originator) ;
-		throw ;
+		requestIndex.erase(originator);
+		throw;
 	}
 }
 
@@ -230,33 +230,33 @@ chatSquadDeclineCreateInvite(Player* decliner, Player* creator)
 {
 	if ( decliner == NULL || creator == NULL )
 	{
-		dbugLog(_FLA, "%s: NULL pointers", __FUNCTION__) ;
-		return ;
+		dbugLog(_FLA, "%s: NULL pointers", __FUNCTION__);
+		return;
 	}
 
 	if ( creator->teulIndex() >= 0 )
 	{
-		SquadControlResult notice(SQR_DECLINED, SquadControl::_CREATE, decliner->chatHandle()) ;
-		notice.send(creator->teulIndex()) ;
+		SquadControlResult notice(SQR_DECLINED, SquadControl::_CREATE, decliner->chatHandle());
+		notice.send(creator->teulIndex());
 	}
 
 	// Look up the request
-	SQUAD_REQUESTS::iterator it = requestIndex.find(creator->matchHandle()) ;
+	SQUAD_REQUESTS::iterator it = requestIndex.find(creator->matchHandle());
 	if ( it != requestIndex.end() )
 	{
-		SQUAD_REQUEST& request = it->second ;
-		Player* member ;
-		for ( UINT32 i = 0 ; i < request.control.m_players.size() ; ++i )
+		SQUAD_REQUEST& request = it->second;
+		Player* member;
+		for ( UINT32 i = 0; i < request.control.m_players.size(); ++i )
 		{
-			member = PlayerInterface::Lookup(request.control.m_players[i]) ;
+			member = PlayerInterface::Lookup(request.control.m_players[i]);
 			if ( member != NULL )
-				member->SetSquadInvite(NULL) ;
+				member->SetSquadInvite(NULL);
 		}
 	}
 
 	// We could remove the request, but then you could spam,
 	// so we won't
-	//requestIndex.erase(creator->matchHandle()) ;
+	//requestIndex.erase(creator->matchHandle());
 }
 
 SQUAD_CONTROL_RESULT
@@ -270,79 +270,79 @@ chatSquadAcceptCreateInvite(Player* acceptor, Player* creator)
 	// Pointer check
 	if ( acceptor == NULL || creator == NULL )
 	{
-		betaLog(_FLA, "NULL pointers") ;
-		throw SQR_NO_INVITE ;
+		betaLog(_FLA, "NULL pointers");
+		throw SQR_NO_INVITE;
 	}
 
 	// Does the create request still exist?
-	SQUAD_REQUESTS::iterator it = requestIndex.find(creator->matchHandle()) ;
+	SQUAD_REQUESTS::iterator it = requestIndex.find(creator->matchHandle());
 	if ( it == requestIndex.end() )
 	{
-		betaLog(_FLA, "creator has no request pending") ;
-		throw SQR_NO_INVITE ;
+		betaLog(_FLA, "creator has no request pending");
+		throw SQR_NO_INVITE;
 	}
 
-	SQUAD_REQUEST& request = it->second ;
-	SquadControl& control = request.control ;
+	SQUAD_REQUEST& request = it->second;
+	SquadControl& control = request.control;
 
 	// Am I in the list of people being requested?
 	// or has the guy started a new request to which I'm not an invitee
 	// in which case letting me vote would be bad.
 	if ( find(control.m_players.begin(), control.m_players.end(), acceptor->matchHandle()) == control.m_players.end() )
 	{
-		betaLog(_FLA, "acceptor is not in the players list") ;
-		throw SQR_NO_INVITE ;
+		betaLog(_FLA, "acceptor is not in the players list");
+		throw SQR_NO_INVITE;
 	}
 
 	// Have I already agreed?
 	if ( find(request.agreed.begin(), request.agreed.end(), acceptor->matchHandle()) != request.agreed.end() )
 	{
-		betaLog(_FLA, "%s has already accepted invite to %s's squad", acceptor->callsign(), creator->callsign()) ;
-		throw SQR_NO_INVITE ;
+		betaLog(_FLA, "%s has already accepted invite to %s's squad", acceptor->callsign(), creator->callsign());
+		throw SQR_NO_INVITE;
 	}
 
 	if ( request.agreed.size() >= SquadControl::CREATE_PLAYERS_REQUIRED )
 	{
-		betaLog(_FLA, "squad already met member requirements") ;
-		throw SQR_NO_INVITE ;
+		betaLog(_FLA, "squad already met member requirements");
+		throw SQR_NO_INVITE;
 	}
 
 	// So add me
-	request.agreed.insert(acceptor->matchHandle()) ;
+	request.agreed.insert(acceptor->matchHandle());
 
 	// The CO needs to know which user just accepted
 	if ( creator->teulIndex() >= 0 )
 	{
-		SquadControlResult notice(SQR_ACCEPTED, SquadControl::_CREATE, acceptor->chatHandle()) ;
-		notice.send(creator->teulIndex()) ;
+		SquadControlResult notice(SQR_ACCEPTED, SquadControl::_CREATE, acceptor->chatHandle());
+		notice.send(creator->teulIndex());
 	}
 
 	if ( request.agreed.size() >= SquadControl::CREATE_PLAYERS_REQUIRED )
-		chatSendSquadCreateRequest(control, creator) ;
+		chatSendSquadCreateRequest(control, creator);
 
-	return SQR_CREATE_WAITING_OTHERS ;
+	return SQR_CREATE_WAITING_OTHERS;
 }
 
 bool
 chatExpireSquadCreates()
 {
-	SQUAD_REQUESTS::iterator it, expired ;
+	SQUAD_REQUESTS::iterator it, expired;
 
-	for ( it = requestIndex.begin() ; it != requestIndex.end() ; )
+	for ( it = requestIndex.begin(); it != requestIndex.end(); )
 	{
-		Player* creator = PlayerInterface::Lookup(it->first) ;
+		Player* creator = PlayerInterface::Lookup(it->first);
 		if ( it->second.expires > teulTime() && creator != NULL && creator->teulIndex() >= 0 )
-			++it ;
+			++it;
 		else
 		{
-			dbugLog(_FLD, "c:%s expiring squad request (%u:%u)", chatGetCallsign(it->first), it->second.expires, teulTime()) ;
+			dbugLog(_FLD, "c:%s expiring squad request (%u:%u)", chatGetCallsign(it->first), it->second.expires, teulTime());
 			if ( it->second.approved )
-				_expired(creator) ;
-			expired = it++ ;
-			requestIndex.erase(expired) ;
+				_expired(creator);
+			expired = it++;
+			requestIndex.erase(expired);
 		}
 	}
 
-	return true ;
+	return true;
 }
 

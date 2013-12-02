@@ -8,7 +8,7 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-struct ACTION_OBJECT ;
+struct ACTION_OBJECT;
 
 namespace Chat
 {
@@ -17,11 +17,11 @@ namespace Chat
 		UINT32			playerID;
 		UINT32			otp;
 		UINT32			squadID;
-		ChatHandle		m_handle ;
-		PermissionMask	m_permissionMask ;
+		ChatHandle		m_handle;
+		PermissionMask	m_permissionMask;
 
-		SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) ;
-	} ;
+		SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	};
 
 } // namespace Chat
 

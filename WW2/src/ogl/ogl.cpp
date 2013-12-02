@@ -854,7 +854,7 @@ SINT32		retval, i, miplevels;
 		textures[texid].hdevtex[miplevel] = 1;
 
 		// Create the remaining miplevels
-		for (i=1 ; i < miplevels ; i++)
+		for (i=1; i < miplevels; i++)
 		{
 			if (textures[texid].hdevtex[i] == 0)
 			{
@@ -1028,10 +1028,10 @@ SINT32	i, j, texid;
 		texture3Ds[tex3d].genlist = 0;
 	}
 
-	for (i=0 ; i < texture3Ds[tex3d].imagedepth ; i++)
+	for (i=0; i < texture3Ds[tex3d].imagedepth; i++)
 	{
 		texid = texture3Ds[tex3d].texid[i];
-		for (j=textures[texid].miplevels-1 ; j >= 0 ; j--)
+		for (j=textures[texid].miplevels-1; j >= 0; j--)
 		{
 			if (textures[texid].lpsurf[j] != NULL)
 			{
@@ -1095,7 +1095,7 @@ SINT32   i;
 		return;
 	}
 
-	for (i=textures[texid].miplevels-1 ; i >= 0 ; i--)
+	for (i=textures[texid].miplevels-1; i >= 0; i--)
 	{
 		oglFreeTexture(texid, i);
 	}
@@ -1246,7 +1246,7 @@ SINT32 oglFindBitShift(UINT32 Mask)
 {
 SINT32	i;
 
-	for (i=0, Mask=~Mask ; Mask & 1 ; Mask>>=1, i++) /* Empty */ ;
+	for (i=0, Mask=~Mask; Mask & 1; Mask>>=1, i++) /* Empty */;
 
 	return(i);
 }
@@ -1255,7 +1255,7 @@ SINT32 oglFindBitCount(UINT32 Mask)
 {
 SINT32	i;
 
-	for (i=0 ; Mask ; Mask>>=1)
+	for (i=0; Mask; Mask>>=1)
 	{
 		if (Mask & 1)
 		{
@@ -1321,7 +1321,7 @@ SINT32		pdepth;
 		}
 	}
 
-	for (pdepth=texminwidth ; pdepth < depth && pdepth < gMaxTextureWidth ; pdepth *= 2) /* Empty */ ;
+	for (pdepth=texminwidth; pdepth < depth && pdepth < gMaxTextureWidth; pdepth *= 2) /* Empty */;
 
 	texture3Ds[texid].name[0] = 0;
 	texture3Ds[texid].hasalpha = alphabits;
@@ -1378,8 +1378,8 @@ SINT32		pwidth, pheight;
 		newtex = TRUE;
 	}
 
-	for (pwidth=texminwidth ; pwidth < width && pwidth < gMaxTextureWidth ; pwidth *= 2) /* Empty */ ;
-	for (pheight=texminheight ; pheight < height && pheight < gMaxTextureHeight ; pheight *= 2) /* Empty */ ;
+	for (pwidth=texminwidth; pwidth < width && pwidth < gMaxTextureWidth; pwidth *= 2) /* Empty */;
+	for (pheight=texminheight; pheight < height && pheight < gMaxTextureHeight; pheight *= 2) /* Empty */;
 
 	if (alphabits != 0)
 	{
@@ -2379,7 +2379,7 @@ SINT32		numcomps, *comps;
 #if platOS == OS_MACOS
 	//g_postRenderFilter = FALSE;
 #endif
-	for(i = 0; i < MAXRENDERSTATES ; i++)
+	for(i = 0; i < MAXRENDERSTATES; i++)
     {
        _GetOpenGLState((oglRENDERSTATETYPES)i);
     }
@@ -2423,8 +2423,8 @@ SINT32		numcomps, *comps;
 	}
 
 	tp = (SINT8*)glGetString(GL_VERSION);
-	static char OGL_Requirements[128] ;
-	sprintf(OGL_Requirements, "OpenGL drivers %u.%u or higher are required", OPENGL_MAJOR_VERSION, OPENGL_MINOR_VERSION) ;
+	static char OGL_Requirements[128];
+	sprintf(OGL_Requirements, "OpenGL drivers %u.%u or higher are required", OPENGL_MAJOR_VERSION, OPENGL_MINOR_VERSION);
 	if (tp != NULL)
 	{
 		Write_Debug("Version:   %s", tp);
@@ -2441,12 +2441,12 @@ SINT32		numcomps, *comps;
 
 		if (!(gOpenGLMajorVersion > OPENGL_MAJOR_VERSION || (gOpenGLMajorVersion == OPENGL_MAJOR_VERSION && gOpenGLMinorVersion >= OPENGL_MINOR_VERSION)))
 		{
-			throw OGL_Requirements ;
+			throw OGL_Requirements;
 		}
 	}
 	else
 	{
-		throw OGL_Requirements ;
+		throw OGL_Requirements;
 	}
 
 	tp = (SINT8*)glGetString(GL_RENDERER);
@@ -2471,7 +2471,7 @@ SINT32		numcomps, *comps;
 	{
 		if (!ParseExtensions(tp))
 		{
-			throw "OpenGL drivers are incompatible" ;
+			throw "OpenGL drivers are incompatible";
 		}
 	}
 
@@ -2506,7 +2506,7 @@ SINT32		numcomps, *comps;
 	// Some generic setup
 	if (!oglSetupRC())
 	{
-		throw "Unable to prepare render context" ;
+		throw "Unable to prepare render context";
 	}
 
 	gSupportedSrcBlendModes = oglSRCBLENDCAPS_ALL;
@@ -2562,7 +2562,7 @@ SINT32		numcomps, *comps;
 			if (comps == NULL)
 				throw "Out of memory for compressed textures";
 			glGetIntegerv(GL_COMPRESSED_TEXTURE_FORMATS_ARB, (GLint*)comps);
-			for (i=0 ; i < numcomps ; i++)
+			for (i=0; i < numcomps; i++)
 			{
 				switch (comps[i])
 				{
@@ -2659,7 +2659,7 @@ static inline void _initializationError(const char* problem)
 	message += _ERR_STR_2;
 	MessageBox(NULL, message.c_str(), _ERR_TITLE, MB_ICONEXCLAMATION|MB_OK);
 #elif platOS == OS_MACOS
-	MacVideoInitializationFailed(problem) ;
+	MacVideoInitializationFailed(problem);
 #endif
 }
 
@@ -2687,7 +2687,7 @@ SINT32		total, free;
 	glLightModeli(GL_LIGHT_MODEL_COLOR_CONTROL, GL_SINGLE_COLOR);
 
 	// Lights
-	for (i=0 ; i < numlights ; i++)
+	for (i=0; i < numlights; i++)
 	{
 		oglReleaseLight(i);
 	}
@@ -2701,7 +2701,7 @@ SINT32		total, free;
 	}
 
 	// Materials
-	for (i=0 ; i < nummaterials ; i++)
+	for (i=0; i < nummaterials; i++)
 	{
 		oglFreeMaterial(i);
 	}
@@ -2720,7 +2720,7 @@ SINT32		total, free;
 		Write_Debug("Texture memory (before free): total = %d, free = %d, in use = %d", total, free, total - free);
 	}
 
-	for (i=0 ; i < numtexture3Ds ; i++)
+	for (i=0; i < numtexture3Ds; i++)
 	{
 		texture3Ds[i].numuses = 1;  // force to one use
 		oglFreeMipTexture3Ds(i);
@@ -2728,7 +2728,7 @@ SINT32		total, free;
 
     ldTextureKill();
 
-	for (i=0 ; i < numtextures ; i++)
+	for (i=0; i < numtextures; i++)
 	{
         if(textures[i].numuses != 0)
         {
@@ -3643,7 +3643,7 @@ LOGICAL oglDisplayRenderStates(void)
 {
 SINT32		i;
 
-	for (i=0 ; i < MAXRENDERSTATES ; i++)
+	for (i=0; i < MAXRENDERSTATES; i++)
 	{
 		if (renderstates[i] != 0xffffffff)
 		{
@@ -3722,7 +3722,7 @@ void oglDisplayRenderBuckets(void)
 SINT32		i, num, tottriangles, totrunning, totpaints, halfpaints;
 
 	tottriangles = 0;
-	for (i=0 ; i < MAX_RENDER_BUCKETS ; i++)
+	for (i=0; i < MAX_RENDER_BUCKETS; i++)
 	{
 		tottriangles += renderbuckets[i];
 	}
@@ -3735,7 +3735,7 @@ SINT32		i, num, tottriangles, totrunning, totpaints, halfpaints;
 			halfpaints = totpaints / 2;
 			totrunning = 0;
 			Write_Debug("Triangle render bucket breakdown:");
-			for (i=0 ; i < MAX_RENDER_BUCKETS ; i++)
+			for (i=0; i < MAX_RENDER_BUCKETS; i++)
 			{
 				num = renderbuckets[i];
 				totrunning += num;
@@ -3752,7 +3752,7 @@ void oglDisplayRenderIndexBuckets(void)
 SINT32		i, num, tottriangles, totrunning, totpaints, halfpaints;
 
 	tottriangles = 0;
-	for (i=0 ; i < MAX_RENDER_BUCKETS ; i++)
+	for (i=0; i < MAX_RENDER_BUCKETS; i++)
 	{
 		tottriangles += renderindexbuckets[i];
 	}
@@ -3765,7 +3765,7 @@ SINT32		i, num, tottriangles, totrunning, totpaints, halfpaints;
 			halfpaints = totpaints / 2;
 			totrunning = 0;
 			Write_Debug("Triangle render index bucket breakdown:");
-			for (i=0 ; i < MAX_RENDER_BUCKETS ; i++)
+			for (i=0; i < MAX_RENDER_BUCKETS; i++)
 			{
 				num = renderindexbuckets[i];
 				totrunning += num;
@@ -4042,10 +4042,10 @@ UINT32		r, g, b, a, result;
 	}
 
 	// Create the indices for later reference
-	for (i=0 ; i < 4 ; i++)
+	for (i=0; i < 4; i++)
 	{
 		tc = *pblock++;
-		for (j=0 ; j < 4 ; j++)
+		for (j=0; j < 4; j++)
 		{
 			index[i][j] = tc & 0x03;
 			tc >>= 2;
@@ -4076,11 +4076,11 @@ UINT16		ta, color[4];
 UINT32		r, g, b, a, result;
 
 	// Create the alphas for later reference
-	for (i=0 ; i < 4 ; i++)
+	for (i=0; i < 4; i++)
 	{
 		ta = *((UINT16*)pblock);
 		pblock += 2;
-		for (j=0 ; j < 4 ; j++)
+		for (j=0; j < 4; j++)
 		{
 			alpha[i][j] = ta & 0x000f;
 			ta >>= 4;
@@ -4100,10 +4100,10 @@ UINT32		r, g, b, a, result;
 	color[3] = (color[0] + 2 * color[1] + 1) / 3;
 
 	// Create the indices for later reference
-	for (i=0 ; i < 4 ; i++)
+	for (i=0; i < 4; i++)
 	{
 		tc = *pblock++;
-		for (j=0 ; j < 4 ; j++)
+		for (j=0; j < 4; j++)
 		{
 			index[i][j] = tc & 0x03;
 			tc >>= 2;
@@ -5857,7 +5857,7 @@ static SINT32 _GetNewTexture3DId(void)
 SINT32			i, num;
 TEXTURE3D*		ptex;
 
-	for (i = 1 ; i < numtexture3Ds ; i++)
+	for (i = 1; i < numtexture3Ds; i++)
 	{
 		if (texture3Ds[i].numuses == 0)
 		{
@@ -5894,7 +5894,7 @@ MATERIAL*	pmat;
 
 	systhreadMutexLock(materialMutex);
 
-	for (i=0 ; i < nummaterials ; i++)
+	for (i=0; i < nummaterials; i++)
 	{
 		if (materials[i].numuses == 0)
 		{

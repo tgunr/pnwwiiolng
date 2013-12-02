@@ -15,11 +15,11 @@
 #include "strt/strtObjectStruct.h"
 #include "weap/weapWeapon.h"
 
-class FacilityStruct ;
-class ObjectStruct ;
+class FacilityStruct;
+class ObjectStruct;
 namespace TOE_
 {
- class WeaponInstance ;
+ class WeaponInstance;
 }
 
 //tolua_begin
@@ -27,43 +27,43 @@ namespace TOE_
 class WeaponEntry
 {
 public:
-	WeaponCounter* getCounter(WeaponCounter* into, const TOE_::WeaponInstance* toeEntry) const ;
+	WeaponCounter* getCounter(WeaponCounter* into, const TOE_::WeaponInstance* toeEntry) const;
 
 	// Determine if a weapon is currently spawnable at a facility
 	// for a given mission ID
-	bool isAccessible(const FacilityStruct& fac) const ;
+	bool isAccessible(const FacilityStruct& fac) const;
 
-	bool isPlayerWeapon() const { return (access() < SYSTEM_START_GRADE) ; }
+	bool isPlayerWeapon() const { return (access() < SYSTEM_START_GRADE); }
 
 	// Buzzard/skull/etc type vehicles
-	bool isSystemWeapon() const { return (access() >= SYSTEM_START_GRADE) ; }
+	bool isSystemWeapon() const { return (access() >= SYSTEM_START_GRADE); }
 
 public:
 	// Accessors
-	SINT16 access() const { return m_weapon.access() ; }
-	void addSpawner(const ObjectStruct& spawner) ;
-	const char* fullname() const { return m_weapon.fullName ; }
-	UINT32 localIndex() const { return m_weapon.localIndex() ; }
-	bool isThrottled() const ;			 // If we are throttled and the CP isn't in hold at all costs
-	const char* name() const { return m_weapon.name ; }
-	const ObjectStruct& portals(UINT32 index) const { return *m_portals[index] ; }
-	const FacilityStruct* facility() const { return m_portals[0]->facility ; }
-	FacilityStruct* facility() { return m_portals[0]->facility ; }
-	const WEAPON_SPEC& spec() const { return m_weapon.spec() ; }
-	const WEAPON& weapon() const { return m_weapon ; }
+	SINT16 access() const { return m_weapon.access(); }
+	void addSpawner(const ObjectStruct& spawner);
+	const char* fullname() const { return m_weapon.fullName; }
+	UINT32 localIndex() const { return m_weapon.localIndex(); }
+	bool isThrottled() const;			 // If we are throttled and the CP isn't in hold at all costs
+	const char* name() const { return m_weapon.name; }
+	const ObjectStruct& portals(UINT32 index) const { return *m_portals[index]; }
+	const FacilityStruct* facility() const { return m_portals[0]->facility; }
+	FacilityStruct* facility() { return m_portals[0]->facility; }
+	const WEAPON_SPEC& spec() const { return m_weapon.spec(); }
+	const WEAPON& weapon() const { return m_weapon; }
 
 public:
-	WeaponEntry(const WEAPON& weapon, const ObjectStruct& spawner) ;
+	WeaponEntry(const WEAPON& weapon, const ObjectStruct& spawner);
 
 //tolua_end
 public:
-	typedef std::vector<const ObjectStruct*> PORTALS ;
-	const PORTALS& portals() const { return m_portals ; }
+	typedef std::vector<const ObjectStruct*> PORTALS;
+	const PORTALS& portals() const { return m_portals; }
 
 protected:
-	const WEAPON&	m_weapon ;			// Pointed to the weapon we represent
-	PORTALS			m_portals ;			// List of spawn locations
+	const WEAPON&	m_weapon;			// Pointed to the weapon we represent
+	PORTALS			m_portals;			// List of spawn locations
 //tolua_begin
-} ;
+};
 
 //tolua_end

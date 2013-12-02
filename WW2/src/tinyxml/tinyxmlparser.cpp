@@ -365,7 +365,7 @@ const char* TiXmlBase::SkipWhiteSpace( const char* p, TiXmlEncoding encoding )
 #ifdef TIXML_USE_STL
 /*static*/ bool TiXmlBase::StreamWhiteSpace( std::istream * in, TIXML_STRING * tag )
 {
-	for( ;; )
+	for(;; )
 	{
 		if ( !in->good() ) return false;
 
@@ -921,7 +921,7 @@ void TiXmlElement::StreamIn (std::istream * in, TIXML_STRING * tag)
 				document->SetError( TIXML_ERROR_EMBEDDED_NULL, 0, 0, TIXML_ENCODING_UNKNOWN );
 			return;
 		}
-		(*tag) += (char) c ;
+		(*tag) += (char) c;
 
 		if ( c == '>' )
 			break;
@@ -945,7 +945,7 @@ void TiXmlElement::StreamIn (std::istream * in, TIXML_STRING * tag)
 		//		cdata text (which looks like another node)
 		//		closing tag
 		//		another node.
-		for ( ;; )
+		for (;; )
 		{
 			StreamWhiteSpace( in, tag );
 
@@ -970,7 +970,7 @@ void TiXmlElement::StreamIn (std::istream * in, TIXML_STRING * tag)
 			bool closingTag = false;
 			bool firstCharFound = false;
 
-			for( ;; )
+			for(;; )
 			{
 				if ( !in->good() )
 					return;

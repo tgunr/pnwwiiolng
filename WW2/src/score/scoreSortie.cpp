@@ -10,11 +10,11 @@
 #include "map/mapPlayer.h"
 #include "weap/weapWeapon.h"
 
-typedef std::unordered_map<UINT32 /*sortieID*/, Scoring::Sortie*> SortieTable ;
-static SortieTable sorties ;
+typedef std::unordered_map<UINT32 /*sortieID*/, Scoring::Sortie*> SortieTable;
+static SortieTable sorties;
 
-typedef std::queue<Scoring::Sortie*> ExpiryList ;
-static ExpiryList expiringSorties ;
+typedef std::queue<Scoring::Sortie*> ExpiryList;
+static ExpiryList expiringSorties;
 
 //////////////////////////////////////////////////////////////////////
 // Lookup the RDP value of a particular vehicle
@@ -23,14 +23,14 @@ static ExpiryList expiringSorties ;
 static FLOAT32
 _getVehicleValue(const WEAPON_SPEC& vehicleType)
 {
-	WEAPON* weapon = weapLookup(vehicleType) ;
+	WEAPON* weapon = weapLookup(vehicleType);
 	if ( weapon == NULL )
-		return 0.0f ;
+		return 0.0f;
 
 	if ( weapon->value <= 0 )
-		return 0.0f ;
+		return 0.0f;
 
-	return (FLOAT32)weapon->value ;
+	return (FLOAT32)weapon->value;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -59,7 +59,7 @@ Scoring::Sortie::Sortie(Player& pilot_)
 	, m_typesKilled()
 	, m_typesInteractedWith()
 {
-	sorties[sortieID()] = this ;
+	sorties[sortieID()] = this;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -68,8 +68,8 @@ Scoring::Sortie::Sortie(Player& pilot_)
 Scoring::Sortie::~Sortie()
 {
 	// Ensure they've actually left the sortie.
-	assert( m_pilot == NULL ) ;
-	assert( m_crew == NULL ) ;
+	assert( m_pilot == NULL );
+	assert( m_crew == NULL );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -78,12 +78,12 @@ Scoring::Sortie::~Sortie()
 bool
 Scoring::Sortie::addHitBy(const Scoring::Actor& actor_, const UINT64& joules_)
 {
-	m_lastHitBySortieID = actor_.sortieID() ;
-	m_lastHitTime = teulClock64 ;
+	m_lastHitBySortieID = actor_.sortieID();
+	m_lastHitTime = teulClock64;
 
-	m_hitsTaken.push_back(Scoring::Sortie::HitEntry(actor_, joules_)) ;
+	m_hitsTaken.push_back(Scoring::Sortie::HitEntry(actor_, joules_));
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -92,15 +92,15 @@ Scoring::Sortie::addHitBy(const Scoring::Actor& actor_, const UINT64& joules_)
 void
 Scoring::Sortie::addHitTo(const Scoring::Actor& actor_, const UINT64& joules_)
 {
-	auto addition = m_sortiesHit.insert(actor_.sortieID()) ;
+	auto addition = m_sortiesHit.insert(actor_.sortieID());
 	if ( addition.second == false )
 	{
-		return ;
+		return;
 	}
 
-	addInteraction(actor_.weapon()) ;
+	addInteraction(actor_.weapon());
 
-	++ m_typesHit[actor_.weapon().asUINT32()] ;
+	++ m_typesHit[actor_.weapon().asUINT32()];
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -109,7 +109,7 @@ Scoring::Sortie::addHitTo(const Scoring::Actor& actor_, const UINT64& joules_)
 void
 Scoring::Sortie::addInteraction(const WEAPON_SPEC& spec_)
 {
-	m_typesInteractedWith.insert(spec_.asUINT32()) ;
+	m_typesInteractedWith.insert(spec_.asUINT32());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -118,16 +118,16 @@ Scoring::Sortie::addInteraction(const WEAPON_SPEC& spec_)
 void
 Scoring::Sortie::addKill(const UINT32 sortieID_, const WEAPON_SPEC& spec_)
 {
-	assert( sortieID_ != 0 ) ;
-	assert( spec_.asUINT32() != 0 ) ;
+	assert( sortieID_ != 0 );
+	assert( spec_.asUINT32() != 0 );
 
-	auto addition = m_sortiesKilled.insert(sortieID_) ;
+	auto addition = m_sortiesKilled.insert(sortieID_);
 	if ( addition.second == false )
-		return ;
+		return;
 
-	addInteraction(spec_) ;
+	addInteraction(spec_);
 
-	++ m_typesKilled[spec_.asUINT32()] ;
+	++ m_typesKilled[spec_.asUINT32()];
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -136,9 +136,9 @@ Scoring::Sortie::addKill(const UINT32 sortieID_, const WEAPON_SPEC& spec_)
 void
 Scoring::Sortie::attachCrew(Player& crew_)
 {
-	assert( m_crew == NULL ) ;
-	m_crew = &crew_ ;
-	m_crewID = crew_.playerID() ;
+	assert( m_crew == NULL );
+	m_crew = &crew_;
+	m_crewID = crew_.playerID();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -147,26 +147,26 @@ Scoring::Sortie::attachCrew(Player& crew_)
 void
 Scoring::Sortie::setRTB(const CODE_RTB rtbCode_, const FULL_OBJ_ID& rtbDest_)
 {
-	dbugLog(_FLD, "v:%u setting rtb to %u", m_sortieID, rtbCode_) ;
+	dbugLog(_FLD, "v:%u setting rtb to %u", m_sortieID, rtbCode_);
 
-	m_rtbCode = rtbCode_ ;
+	m_rtbCode = rtbCode_;
 	if ( rtbCode_ == RTB_SUCCESS )
 	{
 		if ( rtbDest_.id != 0 )
-			m_despawnedTo = rtbDest_ ;
+			m_despawnedTo = rtbDest_;
 	}
 	else
-		m_despawnedTo = nullObjID ;
+		m_despawnedTo = nullObjID;
 
 	if ( m_pilot )
 	{
-		m_pilot->missionPacket().vehicle().rtbState = rtbCode_ ;
-		m_pilot->missionPacket().vehicle().rtbFacility = rtbDest_ ;
+		m_pilot->missionPacket().vehicle().rtbState = rtbCode_;
+		m_pilot->missionPacket().vehicle().rtbFacility = rtbDest_;
 	}
 	if ( m_crew )
 	{
-		m_crew->missionPacket().vehicle().rtbState = rtbCode_ ;
-		m_crew->missionPacket().vehicle().rtbFacility = rtbDest_ ;
+		m_crew->missionPacket().vehicle().rtbState = rtbCode_;
+		m_crew->missionPacket().vehicle().rtbFacility = rtbDest_;
 	}
 }
 
@@ -182,21 +182,21 @@ Scoring::Sortie::despawned()
 {
 	if ( m_despawnTime != 0 )
 	{
-		dbugLog(_FLD, "duplicate attempt to despawn sortie.") ;	///TODO:134:REMOVE
-		return ;
+		dbugLog(_FLD, "duplicate attempt to despawn sortie.");	///TODO:134:REMOVE
+		return;
 	}
 
-	m_despawnTime = teulTime() ;
+	m_despawnTime = teulTime();
 	if ( m_pilot && m_pilot->sortie() == this )
-		m_pilot->missionPacket().sortie().despawned_ms = teulClock64 ;
+		m_pilot->missionPacket().sortie().despawned_ms = teulClock64;
 	if ( m_crew && m_crew->sortie() == this )
-		m_crew->missionPacket().sortie().despawned_ms = teulClock64 ;
+		m_crew->missionPacket().sortie().despawned_ms = teulClock64;
 
-	dbugLog(_FLD, "v:%u despawned, pushing to expiration queue", sortieID()) ;
+	dbugLog(_FLD, "v:%u despawned, pushing to expiration queue", sortieID());
 
 	// Push it onto the queue of sorties waiting to time out so we can
 	// actually purge it at a later time.
-	expiringSorties.push(this) ;
+	expiringSorties.push(this);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -209,15 +209,15 @@ void
 mapExpireSorties()
 {
 	// Keep sorties in memory for 10 minutes
-	static const UINT32 cutoff = teulTime() - (10 * 60) ;
+	static const UINT32 cutoff = teulTime() - (10 * 60);
 	// If they despawned more than 10 minutes ago, we can expire them.
 	while ( !expiringSorties.empty() && expiringSorties.front()->despawnTime() < cutoff )
 	{
-		Scoring::Sortie* const sortie = expiringSorties.front() ;
-		expiringSorties.pop() ;
-		dbugLog(_FLD, "v:%u expired", sortie->sortieID()) ;
-		sorties.erase(sortie->sortieID()) ;
-		delete sortie ;
+		Scoring::Sortie* const sortie = expiringSorties.front();
+		expiringSorties.pop();
+		dbugLog(_FLD, "v:%u expired", sortie->sortieID());
+		sorties.erase(sortie->sortieID());
+		delete sortie;
 	}
 }
 
@@ -227,8 +227,8 @@ mapExpireSorties()
 Scoring::Sortie*
 Scoring::Sortie::Lookup(UINT32 sortieID_)
 {
-	auto it = sorties.find(sortieID_) ;
-	return (it != sorties.end()) ? (it->second) : NULL ;
+	auto it = sorties.find(sortieID_);
+	return (it != sorties.end()) ? (it->second) : NULL;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -239,21 +239,21 @@ Player::closeCurrentSortie()
 {
 	if ( m_sortie != NULL )
 	{
-		dbugLog(_FLD, "p:%u c:%s v:%u detaching from sortie %p", playerID(), callsign(), m_sortie->sortieID(), m_sortie) ;
+		dbugLog(_FLD, "p:%u c:%s v:%u detaching from sortie %p", playerID(), callsign(), m_sortie->sortieID(), m_sortie);
 
 		if ( m_sortie->despawnTime() == 0 )
 		{
-			const CODE_RTB code = (CODE_RTB)missionPacket().vehicle().rtbState() ;
-			const FULL_OBJ_ID& dest = missionPacket().vehicle().rtbFacility() ;
-			m_sortie->setRTB(code, dest) ;
-			m_sortie->despawned() ;
+			const CODE_RTB code = (CODE_RTB)missionPacket().vehicle().rtbState();
+			const FULL_OBJ_ID& dest = missionPacket().vehicle().rtbFacility();
+			m_sortie->setRTB(code, dest);
+			m_sortie->despawned();
 		}
 
-		evaluateMissionPacket() ;
+		evaluateMissionPacket();
 
-		saveMissionPacket() ;
+		saveMissionPacket();
 
-		m_sortie = NULL ;
+		m_sortie = NULL;
 		m_sortieID = 0;
 	}
 }
@@ -266,32 +266,32 @@ Player::newSortie(UINT32 newSortieID, bool isPilot)
 {
 	if ( m_sortie != NULL && m_sortie->sortieID() == newSortieID )
 	{
-		dbugLog(_FLA, "tried to re-allocate same sortie!") ;
-		return ;
+		dbugLog(_FLA, "tried to re-allocate same sortie!");
+		return;
 	}
 
-	closeCurrentSortie() ;
+	closeCurrentSortie();
 
-	m_sortieID = newSortieID ;
+	m_sortieID = newSortieID;
 
-	Scoring::Sortie* const existingSortie = Scoring::Sortie::Lookup(sortieID()) ;
+	Scoring::Sortie* const existingSortie = Scoring::Sortie::Lookup(sortieID());
 	if ( isPilot )
 	{
 		if ( existingSortie != NULL )
-			LogAbort("p:%u v:%u duplicate sortie assigned to a pilot", playerID(), sortieID()) ;
-		m_sortie = new Scoring::Sortie(*this) ;
-		dbugLog(_FLD, "p:%u c:%s v:%u pilot assigned new sortie %p", playerID(), callsign(), sortieID(), m_sortie) ;
+			LogAbort("p:%u v:%u duplicate sortie assigned to a pilot", playerID(), sortieID());
+		m_sortie = new Scoring::Sortie(*this);
+		dbugLog(_FLD, "p:%u c:%s v:%u pilot assigned new sortie %p", playerID(), callsign(), sortieID(), m_sortie);
 	}
 	else
 	{
 		if ( existingSortie == NULL )
-			LogAbort("p:%u v:%u absent sortie for crew", playerID(), sortieID()) ;
-		m_sortie = existingSortie ;
-		existingSortie->attachCrew(*this) ;
-		dbugLog(_FLD, "p:%u c:%s v:%u crew attached to sortie %p", playerID(), callsign(), sortieID(), m_sortie) ;
+			LogAbort("p:%u v:%u absent sortie for crew", playerID(), sortieID());
+		m_sortie = existingSortie;
+		existingSortie->attachCrew(*this);
+		dbugLog(_FLD, "p:%u c:%s v:%u crew attached to sortie %p", playerID(), callsign(), sortieID(), m_sortie);
 	}
 
-	missionPacket().sortie().spawned_ms.set(teulClock64) ;
-	missionPacket().sortie().despawned_ms.set(0ULL) ;
+	missionPacket().sortie().spawned_ms.set(teulClock64);
+	missionPacket().sortie().despawned_ms.set(0ULL);
 }
 

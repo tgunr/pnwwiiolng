@@ -21,17 +21,17 @@
 
 struct BANDWIDTH_CHANGE
 {
-	playerid_t	playerID ;
-	UINT32		mode ;
-} ;
+	playerid_t	playerID;
+	UINT32		mode;
+};
 
 struct BANDWIDTH_NOTICE
 {
-	playerid_t	playerID ;
-	UINT32		mode ;
-	char		response[80+1] ;
-	bool		display ;
-} ;
+	playerid_t	playerID;
+	UINT32		mode;
+	char		response[80+1];
+	bool		display;
+};
 
 #ifndef FRONT_END
 #include "chat/chatServerTypes.h"

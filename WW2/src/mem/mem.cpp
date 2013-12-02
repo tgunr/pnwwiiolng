@@ -37,7 +37,7 @@ struct MEMORYDEBUG
 	SINT32		Line;
 	UINT32		guardend;
 	UINT32		retaddress;
-} ;
+};
 #pragma pack(pop)
 #endif
 
@@ -65,7 +65,7 @@ void* memAllocReleaseX(size_t allocSize, const char* f, int n )
 		}
 #endif
 	}
-	return calloc(1, allocSize) ;
+	return calloc(1, allocSize);
 }
 #endif
 

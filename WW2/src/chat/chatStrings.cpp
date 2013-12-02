@@ -25,54 +25,54 @@ static UINT32
 _editSideMotd(Player* player, UINT64 id, std::string& text)
 {
 	if ( text.length() > MOTD_REPLY::_MAX_LENGTH )
-		return EditString::_TOO_LONG ;
+		return EditString::_TOO_LONG;
 	if ( id == MOTD::_CRS )
 	{
 		if ( !player->isPlaynet() )
-			return EditString::_PERMISSION_DENIED ;
+			return EditString::_PERMISSION_DENIED;
 	}
 	else
 	{
 		if ( player->effectiveCommandSide() != (WWII_SIDE)id )
-			return EditString::_PERMISSION_DENIED ;
+			return EditString::_PERMISSION_DENIED;
 		if ( !player->isGM() )
 		{
 			if ( player->side() == ALLIED )
 			{
 				if ( !player->permissions(ALLIED_MOTD) )
-					return EditString::_PERMISSION_DENIED ;
+					return EditString::_PERMISSION_DENIED;
 			}
 			else if ( player->side() == AXIS )
 			{
 				if ( !player->permissions(AXIS_MOTD) )
-					return EditString::_PERMISSION_DENIED ;
+					return EditString::_PERMISSION_DENIED;
 			}
 		}
 	}
 
 	if ( !chatSetMotd((UINT32)id, player->chatHandle(), text) )
-		return EditString::_INVALID ;
+		return EditString::_INVALID;
 
-	wwiiEscapeString(text) ;
+	wwiiEscapeString(text);
 	static const char QRY_UPDATE_MOTD[] =
-		"INSERT INTO wwii_motd (type, added, added_by, motd) VALUES (%u,now(),%u,'%s')" ;
-	DBThread::Do(DBThread::Default, QRY_UPDATE_MOTD, (UINT32)id, player->playerID(), text.c_str()) ;
+		"INSERT INTO wwii_motd (type, added, added_by, motd) VALUES (%u,now(),%u,'%s')";
+	DBThread::Do(DBThread::Default, QRY_UPDATE_MOTD, (UINT32)id, player->playerID(), text.c_str());
 
-	chatSendMotd(player->teulIndex(), chatGetMotd((UINT32)id)) ;
+	chatSendMotd(player->teulIndex(), chatGetMotd((UINT32)id));
 
-	return EditString::_ACCEPTED ;
+	return EditString::_ACCEPTED;
 }
 
 static UINT32
 _editHCUnitMotd(Player* player, UINT32 id, std::string& text)
 {
-	HCUnit* unit = HCUnit::Lookup(id) ;
+	HCUnit* unit = HCUnit::Lookup(id);
 	if ( unit == NULL )
 	{
 		dbugLog(_FLA, "t:%d p:%u c:%s tried to edit MOTD for invalid hcUnit %hu"
 						, player->teulIndex(), player->playerID(), player->callsign()
-						, id) ;
-		return EditString::_INVALID ;
+						, id);
+		return EditString::_INVALID;
 	}
 
 	if ( player->effectiveCommandSide() != unit->side() )
@@ -81,22 +81,22 @@ _editHCUnitMotd(Player* player, UINT32 id, std::string& text)
 						, player->teulIndex(), player->playerID(), player->callsign()
 						, unit->name()
 						, unit->country()
-						, player->activeCommandSide()) ;
-		return EditString::_PERMISSION_DENIED ;
+						, player->activeCommandSide());
+		return EditString::_PERMISSION_DENIED;
 	}
 
-	wwiiEscapeString(text) ;
+	wwiiEscapeString(text);
 
 	// Trim "crap: " off the beginning of the existing MOTD
-	size_t n = text.find(": ") ;
+	size_t n = text.find(": ");
 	if ( n < text.length() && n < 12 )
-		text = text.substr(n + 2) ;
+		text = text.substr(n + 2);
 
 	static const char QRY_UPDATE_HCUNIT_MOTD[] =
-		"UPDATE strat_hc_units SET motd = '%s: %s', modified = now() WHERE unit_id = %hu" ;
-	DBThread::Do(DBThread::Default, QRY_UPDATE_HCUNIT_MOTD, player->callsign(), text.c_str(), id) ;
+		"UPDATE strat_hc_units SET motd = '%s: %s', modified = now() WHERE unit_id = %hu";
+	DBThread::Do(DBThread::Default, QRY_UPDATE_HCUNIT_MOTD, player->callsign(), text.c_str(), id);
 
-	return EditString::_ACCEPTED ;
+	return EditString::_ACCEPTED;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -105,45 +105,45 @@ _editHCUnitMotd(Player* player, UINT32 id, std::string& text)
 SINT32
 EditString::receive(SINT32 teulIndex)
 {
-	Player* player = PlayerInterface::Lookup(teulIndex) ;
+	Player* player = PlayerInterface::Lookup(teulIndex);
 	if ( player == NULL )
 	{
-		dbugLog(_FLA, "t:%d f:%s no player registered on this index", teulIndex, __FUNCTION__) ;
-		return -EINVAL ;
+		dbugLog(_FLA, "t:%d f:%s no player registered on this index", teulIndex, __FUNCTION__);
+		return -EINVAL;
 	}
 
 	dbugLog(_FLD, "t:%d p:%u c:%s received edit string %u:%llu:%s"
 					, teulIndex, player->playerID(), player->callsign()
-					, category(), id(), text().c_str()) ;
+					, category(), id(), text().c_str());
 
-	UINT32 result ;
+	UINT32 result;
 	switch ( category() )
 	{
 	case _SIDE_MOTD:
-		result = _editSideMotd(player, (UINT16)id(), text()) ;
-	break ;
+		result = _editSideMotd(player, (UINT16)id(), text());
+	break;
 	case _HCUNIT_MOTD:
-		result = _editHCUnitMotd(player, (UINT16)id(), text()) ;
-	break ;
+		result = _editHCUnitMotd(player, (UINT16)id(), text());
+	break;
 	case _UNDEFINED:
 	default:
-		dbugLog(_FLA, "t:%d p:%u c:%s invalid edit string category %d", teulIndex, player->playerID(), player->callsign(), category()) ;
-		return -EINVAL ;
+		dbugLog(_FLA, "t:%d p:%u c:%s invalid edit string category %d", teulIndex, player->playerID(), player->callsign(), category());
+		return -EINVAL;
 	}
 
-	return result ;
+	return result;
 }
 
 SINT32
 GenericString::receive(SINT32 teulIndex)
 {
-	Player* player = PlayerInterface::Lookup(teulIndex) ;
+	Player* player = PlayerInterface::Lookup(teulIndex);
 	if ( player == NULL )
 	{
-		dbugLog(_FLA, "t:%d f:%s no player registered on this index", teulIndex, __FUNCTION__) ;
-		return -EINVAL ;
+		dbugLog(_FLA, "t:%d f:%s no player registered on this index", teulIndex, __FUNCTION__);
+		return -EINVAL;
 	}
 
-	return 0 ;
+	return 0;
 }
 

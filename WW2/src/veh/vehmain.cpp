@@ -136,7 +136,7 @@ typedef std::map<SINT32, FLOAT32> ENEMY_REPORTS;
 // used offline and ignored online
 static std::queue<vehVehicle*> g_freeVeh;
 
-typedef std::set<VehicleSTO*> HULK_SET ;
+typedef std::set<VehicleSTO*> HULK_SET;
 static HULK_SET _hulkqueue;
 
 // used offline and ignored online
@@ -156,8 +156,8 @@ static FLOAT32 _bailoutLife = 0;
 
 static void vehmainSpawn();
 
-typedef std::list<Vehicle::Hit> VEHICLE_HITS ;
-typedef std::vector<Vehicle::Hit> VEHICLE_HIT_LIST ;
+typedef std::list<Vehicle::Hit> VEHICLE_HITS;
+typedef std::vector<Vehicle::Hit> VEHICLE_HIT_LIST;
 
 static VEHICLE_HITS _DeferredHitMessages;
 
@@ -246,8 +246,8 @@ static void _setVehicleState(vehVehicle* v, bool start);
 
 /*----------------------------------------------------------*/
 /* MOBILE SPAWN STUFF                                       */
-static const FLOAT64 TFR_RANGE_2 = (FLOAT64)(1350*1350) ;
-static const FLOAT64 EFR_RANGE_2 = (FLOAT64)(400*400) ;
+static const FLOAT64 TFR_RANGE_2 = (FLOAT64)(1350*1350);
+static const FLOAT64 EFR_RANGE_2 = (FLOAT64)(400*400);
 
 static SINT32 g_mobileUpdateTimer = 0;
 
@@ -315,7 +315,7 @@ static void _ReadComponentFiles(void)
 	logTimerBeginMacro();
 
 
-	for(i = 0; ; i++)
+	for(i = 0;; i++)
 	{
 		veh = (vehType*)vehtypeGetByIndex(i);
 		if(!veh) break;
@@ -1324,7 +1324,7 @@ static void _HitMessageUpdate()
 	{
 		Vehicle::Hit& hit = *it;
 		VEHICLE_HITS::iterator curIt = it;
-		++it ;
+		++it;
 		vehVehicle* ShooterVehicle = vehFindVehicle(hit.m_shooter);
 
 		if(!ShooterVehicle)
@@ -1557,7 +1557,7 @@ UINT32 vehUpdate(void)
 			for(rit = reports.begin(); rit != reports.end(); ++rit)
 			{
 				// -1 is near me
-				currentScore = rit->second ;
+				currentScore = rit->second;
 
 				if(currentScore > bestScore)
 				{
@@ -2516,7 +2516,7 @@ vehVehicle*vehFindVehicle(UINT32 HostIndex)
 vehVehicle*cur;
 
 	for (cur = getVehicleHead().getNext()
-		; cur != NULL ; cur = cur->getNext())
+		; cur != NULL; cur = cur->getNext())
 	{
 		if (HostIndex == cur->VehicleHostIndex)
 			return cur;
@@ -2530,7 +2530,7 @@ LOGICAL vehValid(vehVehicle* Vehicle)
 vehVehicle*cur;
 
 	for (cur = getVehicleHead().getNext()
-		; cur != NULL ; cur = cur->getNext())
+		; cur != NULL; cur = cur->getNext())
 	{
 		if (Vehicle == cur)
 			return TRUE;
@@ -2541,7 +2541,7 @@ vehVehicle*cur;
 
 vehVehicle*vehFindVehicleByChatHandle(const ChatHandle& chathandle)
 {
-	for ( vehVehicle* cur = getVehicleHead().getNext(); cur != NULL ; cur = cur->getNext())
+	for ( vehVehicle* cur = getVehicleHead().getNext(); cur != NULL; cur = cur->getNext())
 	{
 		if(chatGetLowercaseHandle(cur->Chat_Handle) == chatGetLowercaseHandle(chathandle))
 			return cur;
@@ -2782,16 +2782,16 @@ static void _sendSTODamage(vehVehicle*veh, vehDamageQue* que)
 
 static UINT32 _SendDamageUpdate(vehVehicle* CurrentVehicle, vehDamageQue * DQ)
 {
-	Vehicle::Hit hit(CurrentVehicle->VehicleHostIndex) ;
+	Vehicle::Hit hit(CurrentVehicle->VehicleHostIndex);
 	vehVehicle* PlayerVehicle = persGetPersonaVehiclePtr();
 
-	UINT32& Count = (UINT32&)hit.m_components._M_size ;
+	UINT32& Count = (UINT32&)hit.m_components._M_size;
 	Count = 0;
 
-	for (UINT32 i = 1 ; Count < VEH_MAX_OBJ_HIT - 1 && i < VEH_MAX_DAMAGE_OBJECTS ; ++i)
+	for (UINT32 i = 1; Count < VEH_MAX_OBJ_HIT - 1 && i < VEH_MAX_DAMAGE_OBJECTS; ++i)
 	{
 		if (DQ->NumRoundsHit[i] <= 0)
-			continue ;
+			continue;
 
 		Write_Debug("WEAP HIT component %s, num individual hits: %d, damage: %f",
 							CurrentVehicle->VehicleType->DamageObjects[i-1],
@@ -2850,7 +2850,7 @@ static void vehApplyVehicleHit(const Vehicle::Hit& hit)
 
 	const size_t numComponents = hit.m_components.size();
 
-	for (UINT32 i=0; i < numComponents ;i++)
+	for (UINT32 i=0; i < numComponents;i++)
 	{
 		const Vehicle::Hit::Component& comp = hit.m_components[i];
 		const UINT16& compID = comp.compID;
@@ -2874,13 +2874,13 @@ static void vehApplyVehicleHit(const Vehicle::Hit& hit)
 			// got multiple hit messages at once
 			if (ModelData->NewDamage == 1)
 			{
-				ModelData->DamageAccrued[compID] += comp.m_damage ;
+				ModelData->DamageAccrued[compID] += comp.m_damage;
 				ModelData->NumRoundsHit[compID] += comp.NumHits;
 			}
 			else
 			{
                 //printf( "applying damage to compID %d\n",compID );
-				ModelData->DamageAccrued[compID] = (float)comp.m_damage ;
+				ModelData->DamageAccrued[compID] = (float)comp.m_damage;
 				ModelData->NumRoundsHit[compID] = comp.NumHits;
 			}
 		}
@@ -3875,7 +3875,7 @@ void VehicleSTO::load()
 #ifdef BETA_RELEASE
     const UCHAR* name = vehtypeGetByIndex(getVehicleTypeNum())->Shape;
 
-	char buf[150] ;
+	char buf[150];
     sprintf(buf, "[activate] %s id:%d, veh:%s", type() == _HULK ? "HULK" : "STO", (int)uid(), name);
 	uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_BETA, LSTR_GENERIC, uiUTF8toUTF16(buf));
 #endif
@@ -3888,7 +3888,7 @@ void VehicleSTO::deactivate()
 #ifdef BETA_RELEASE
     const UCHAR* name = vehtypeGetByIndex(getVehicleTypeNum())->Shape;
 
-	char buf[150] ;
+	char buf[150];
     sprintf(buf, "[deactivate] %s id:%d, veh:%s", type() == _HULK ? "HULK" : "STO", (int)uid(), name);
 	uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_BETA, LSTR_GENERIC, uiUTF8toUTF16(buf));
 #endif
@@ -4552,7 +4552,7 @@ static void _FindNearbyFacilities(vehVehicle* Vehicle)
 
 	Vehicle->ModelData->closestCapTO = *(capBld->FullObjID());
 
-	static UINT32 lastSerial = 0 ;
+	static UINT32 lastSerial = 0;
 	static WEAPON* weapon = NULL;
 	static STRAT_ENEMY_REPORT report;
 
@@ -4563,7 +4563,7 @@ static void _FindNearbyFacilities(vehVehicle* Vehicle)
 	if(weapon == NULL || Vehicle->WeaponSerial.serial != lastSerial)
 	{
 		weapon = weapLookup(Vehicle->WeaponSerial.spec);
-		lastSerial = Vehicle->WeaponSerial.serial ;
+		lastSerial = Vehicle->WeaponSerial.serial;
 	}
 
 	// don't do ews check if the weapon doesn't require it
@@ -4638,14 +4638,14 @@ static void _FindNearbyFacilities2(vehVehicle* Vehicle)
 	SINT32 dir;
 	static STRAT_ENEMY_REPORT report;
 
-	static UINT32 lastSerial = 0 ;
+	static UINT32 lastSerial = 0;
 	static WEAPON* weapon;
 	if(weapon == NULL || Vehicle->WeaponSerial.serial != lastSerial)
 	{
 		// Lookup the WEAPON* when the weapon changes, and only then
 		// because the lookup is relatively expensive
 		weapon = weapLookup(Vehicle->WeaponSerial.spec);
-		lastSerial = Vehicle->WeaponSerial.serial ;
+		lastSerial = Vehicle->WeaponSerial.serial;
 	}
 
 	if(!weapon || !weapon->alertDist) skipEWScheck = TRUE;
@@ -5085,7 +5085,7 @@ SINT32 vehAttachToRidePoint(vehVehicle* RiderVehicle)
 			{
 				RiderModelData->VehicleAtt.Pitch = att.x;
 				RiderModelData->VehicleAtt.Roll = -att.y + PI; // usual insane sign flips
-				RiderModelData->VehicleAtt.Yaw = -att.z ;
+				RiderModelData->VehicleAtt.Yaw = -att.z;
 			}
 			else
 			{
@@ -5366,7 +5366,7 @@ static MSPAWN_RESULT _nearEnemyFacility(FULL_OBJ_ID& foi, int side)
 
 PlayerPlacedObject* vehmainFRUBuild()
 {
-	vehVehicle* veh = persGetPersonaVehiclePtr() ;
+	vehVehicle* veh = persGetPersonaVehiclePtr();
 	if(veh == NULL) return false;
 
 	// do we already have an msp on this misison?
@@ -5467,7 +5467,7 @@ bool vehmainFRUExecute()
 
 void vehHandleMobileSpawnUpdate(MSPAWN_RESULT enumResult)
 {
-	vehVehicle* veh = persGetPersonaPilotedOnlineVehicle() ;
+	vehVehicle* veh = persGetPersonaPilotedOnlineVehicle();
 
 	bool isError;
 
@@ -5527,7 +5527,7 @@ void vehHandleMobileSpawnUpdate(MSPAWN_RESULT enumResult)
 *************************************************************************************************/
 static MSPAWN_RESULT _canWeDeploy(vehVehicle* veh, bool ignoreMovement)
 {
-	g_canDeployMobileSpawn = false ;
+	g_canDeployMobileSpawn = false;
 
     if(!veh || !veh->ModelData)
 		return MSDR_FAILED;
@@ -5582,7 +5582,7 @@ static MSPAWN_RESULT _canWeDeploy(vehVehicle* veh, bool ignoreMovement)
 	if(attempt != MSDR_GRANTED)
 		return attempt;
 
-	g_canDeployMobileSpawn = true ;
+	g_canDeployMobileSpawn = true;
 
     return MSDR_GRANTED;
 }
@@ -5627,7 +5627,7 @@ static void _checkMobileSpawnAbility()
 
 SINT32 vehmainDeployVehicleForMobileSpawn()
 {
-	vehVehicle* veh = persGetPersonaPilotedOnlineVehicle() ;
+	vehVehicle* veh = persGetPersonaPilotedOnlineVehicle();
 	if(veh == NULL)
 		return -1;
 
@@ -5965,7 +5965,7 @@ void _updateMobileSpawn()
     }
 
 	/* new mobile spawn functionality
-	vehVehicle* veh = persGetPersonaPilotedOnlineVehicle() ;
+	vehVehicle* veh = persGetPersonaPilotedOnlineVehicle();
 
 	if(veh && veh->StateAnimation.enumDeployedState == IDE_VEHICLE_DEPLOYED && vehmainIsMobileSpawn())
 	{
@@ -5985,7 +5985,7 @@ void _updateMobileSpawn()
         return;
     }
 
-	vehVehicle* veh = persGetPersonaPilotedOnlineVehicle() ;
+	vehVehicle* veh = persGetPersonaPilotedOnlineVehicle();
 
     g_mobileUpdateTimer = frametime;
 
@@ -6403,9 +6403,9 @@ UINT32 vehmainDetermineComponentKiller(mlComponent* killedComponent)
 	{
 		Vehicle::Hit& hit = *vehHitIt;
 
-		for (Vehicle::Hit::Components::iterator it = hit.m_components.begin() ; it != hit.m_components.end() ; ++it)
+		for (Vehicle::Hit::Components::iterator it = hit.m_components.begin(); it != hit.m_components.end(); ++it)
 		{
-			Vehicle::Hit::Component& comp = *it ;
+			Vehicle::Hit::Component& comp = *it;
 
 			if (comp.compID >= VEH_MAX_DAMAGE_OBJECTS)
 				continue;
@@ -6606,7 +6606,7 @@ static void vehmainSpawn()
 #ifdef ANTIHACK
 	if ( Online && yeahCode == 0 && !checksumOK )
 	{
-		yeahCode = OH_YEAH_CHECKS ;
+		yeahCode = OH_YEAH_CHECKS;
 	}
 #endif
 
@@ -6738,7 +6738,7 @@ bool vehVehicle::InRange(double x, double y, double z, double distance)
 
 gr2AnimTrooper* vehVehicle::GetAnim()
 {
-	return (VehicleObjectData && VehicleObjectData->PlaneObject) ? VehicleObjectData->PlaneObject->animModel : NULL ;
+	return (VehicleObjectData && VehicleObjectData->PlaneObject) ? VehicleObjectData->PlaneObject->animModel : NULL;
 }
 
 bool vehVehicle::IsFiring(SINT32 index) const
@@ -7060,11 +7060,11 @@ const char* vehGetHistoryStringFor(const UINT32 vehicleIndex, char* const into, 
     const size_t maxEntries = intoSize_bytes - 1;    // < Tells the compiler nothing will change this.
     into[maxEntries] = 0; // Terminating byte.
 
-    for(size_t i = 0 ; i < maxEntries; ++i)
+    for(size_t i = 0; i < maxEntries; ++i)
     {
         const UINT32 updatesReceived = s_updateHistory[teulTime() - i][vehicleIndex];    // Will set itself to 0 if none received.
         // Populate them backwards.
-        char* const entry = &into[i] ;
+        char* const entry = &into[i];
 
         // Display a number 0-9 for updates or '*' for 10+.
         if(updatesReceived <= 0)
@@ -7091,7 +7091,7 @@ std::string& vehVehiclesGameInfo()
 
 	if(_lastWorldUpdate.header.timerInfo)
 	{
-		const UpdateFraming& currentMode = framings[_lastWorldUpdate.header.framingMode] ;
+		const UpdateFraming& currentMode = framings[_lastWorldUpdate.header.framingMode];
 
 		UINT32 numVehiclesDisplayed		= 0;
 		const UINT32 maxVehiclesDisplayed		= currentMode.maxVehicles;
@@ -7100,7 +7100,7 @@ std::string& vehVehiclesGameInfo()
 
 		vehVehicle* cur;
 
-		for (cur = getVehicleHead().getNext(); cur != NULL ; cur = cur->getNext())
+		for (cur = getVehicleHead().getNext(); cur != NULL; cur = cur->getNext())
 		{
 			if(cur->ModelData || !cur->InUse || cur->isSTO())
 				continue;

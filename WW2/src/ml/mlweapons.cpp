@@ -804,7 +804,7 @@ static void _HandleAmmoCycle(mlWeaponMount* Mount, mlVehicleData* VehicleData, m
 			{
 				NewAmmo = Mount->Weapons[i].AmmoTypeInUse;
 			}
-			CurAmmo = NewAmmo ;
+			CurAmmo = NewAmmo;
 
 			do
 			{

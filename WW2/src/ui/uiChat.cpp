@@ -65,7 +65,7 @@
 typedef RENS::wregex OBSCENITY_RULE;
 
 // Vector of rules forms a filter.
-typedef std::vector<OBSCENITY_RULE> OBSCENITY_FILTER ;
+typedef std::vector<OBSCENITY_RULE> OBSCENITY_FILTER;
 
 // word filter loader
 class BadWordLoader : public XMLLoader2<BadWordLoader>
@@ -123,7 +123,7 @@ std::wstring lastplayerhandle;
 static int uiChatPrintLinev(int* icons, unsigned int color, const wchar_t* format, va_list& marker);
 static drawIconRef _commicons;
 static phui::TextHistory* _chatHistorySave = NULL; // used to save history of chat window resets
-static OBSCENITY_FILTER _wordFilter ;
+static OBSCENITY_FILTER _wordFilter;
 
 struct ChatLine
 {
@@ -343,38 +343,38 @@ static inline const wchar_t* _lstringToText(ENUM_CATEGORIES loc, int message
 
 	if ( loc != IDE_LANG_HOST || message < LSTR_TEXT_START || message > LSTR_TEXT_END )
 	{
-		static std::wstring output ;
-		output = uiLocString(lockey).c_str() ;
+		static std::wstring output;
+		output = uiLocString(lockey).c_str();
 
-		const wchar_t* const args[Chat::LocalizedMessage::_NUM_ARGUMENTS] = { arg1, arg2, arg3, arg4, arg5, arg6 } ;
-		wchar_t format[5] ;
-		UINT32 pos ;
+		const wchar_t* const args[Chat::LocalizedMessage::_NUM_ARGUMENTS] = { arg1, arg2, arg3, arg4, arg5, arg6 };
+		wchar_t format[5];
+		UINT32 pos;
 
-		for ( UINT32 i = 0 ; i < Chat::LocalizedMessage::_NUM_ARGUMENTS ; ++i )
+		for ( UINT32 i = 0; i < Chat::LocalizedMessage::_NUM_ARGUMENTS; ++i )
 		{
 			// Other parts of the DTD still use %s.
 			if ( loc != IDE_LANG_HOST )
 			{
-				pos = output.find(L"%ls") ;
+				pos = output.find(L"%ls");
 				if ( pos != output.npos )
-					output.replace(pos, 3, (args[i][0] ? args[i] : L"?null?")) ;
+					output.replace(pos, 3, (args[i][0] ? args[i] : L"?null?"));
 			}
 
-			swprintf(format, 5, L"{%1u}", i + 1) ;
+			swprintf(format, 5, L"{%1u}", i + 1);
 
 			while ( (pos = output.find(format)) != output.npos )
 			{
-				output.replace(pos, 3, (args[i][0] ? args[i] : L"?null?")) ;
+				output.replace(pos, 3, (args[i][0] ? args[i] : L"?null?"));
 			}
 		}
 
-		return output.c_str() ;
+		return output.c_str();
 	}
 
-	static std::wstring stringBuf ;
+	static std::wstring stringBuf;
 
 	// We'll need to track when stringBuf has been finished and needs erasing
-	static bool clearStringBuf = false ;
+	static bool clearStringBuf = false;
 
 	if(clearStringBuf)
 	{
@@ -385,8 +385,8 @@ static inline const wchar_t* _lstringToText(ENUM_CATEGORIES loc, int message
 	if ( message == LSTR_TEXT_START )
 	{
 		// Start a new long-string message
-		stringBuf = arg1 ;
-		return NULL ;
+		stringBuf = arg1;
+		return NULL;
 	}
 	else if ( message == LSTR_TEXT_LINE )
 	{
@@ -409,15 +409,15 @@ static inline const wchar_t* _lstringToText(ENUM_CATEGORIES loc, int message
 
 static void _buzzer()
 {
-	static int nextPlayWindow = 0 ;
+	static int nextPlayWindow = 0;
 	if ( ft1000mscount >= nextPlayWindow )
 	{
 #ifdef ORIGINALLY
-		uiPlaySound("sounds/buzzer.wav", true, 0.50, NULL) ;
+		uiPlaySound("sounds/buzzer.wav", true, 0.50, NULL);
 #else
-		uiPlaySound("sounds/Drum1.wav", true, 0.48, NULL) ;
+		uiPlaySound("sounds/Drum1.wav", true, 0.48, NULL);
 #endif
-		nextPlayWindow = ft1000mscount + 6 ;
+		nextPlayWindow = ft1000mscount + 6;
 	}
 }
 
@@ -448,26 +448,26 @@ void uiChatPrintLineMessageLoc(int loc, int prefix, int message
 
 		case LSTR_AXIS_HC:
 		case LSTR_ALLIED_HC:
-			side = (prefix == LSTR_AXIS_HC) ? AXIS : ALLIED ;
+			side = (prefix == LSTR_AXIS_HC) ? AXIS : ALLIED;
 			icons[2] = IDE_ICON_HC;
-			prefix = LSTR_NONE ;
+			prefix = LSTR_NONE;
 			color = colorCYANALPHA;
-		break ;
+		break;
 
 		case LSTR_HQ:
-			prefix = LSTR_NONE ;
+			prefix = LSTR_NONE;
 			icons[0] = IDE_ICON_GCI;
 			color = colorCYANALPHA;
 		break;
 
 		case LSTR_WARNING:
-			_buzzer() ;
+			_buzzer();
 		case LSTR_REPORT:
 			color = colorREDALPHA;
 		break;
 
 		case LSTR_NOTE:
-			prefix = LSTR_NONE ;
+			prefix = LSTR_NONE;
 			if(message == LSTR_AFK)
 				uiSetAFK(frametime);
 			else if(message == LSTR_NOT_AFK)
@@ -482,42 +482,42 @@ void uiChatPrintLineMessageLoc(int loc, int prefix, int message
 		case LSTR_ERROR:
 		// PASSTHRU
 		case LSTR_CAUTION:
-			prefix = LSTR_NONE ;
+			prefix = LSTR_NONE;
 			icons[2] = IDE_ICON_CAUTION;
 			color = colorORANGEALPHA;
 		break;
 
 		case LSTR_ALLIED:
 		case LSTR_AXIS:
-			side = (prefix == LSTR_AXIS) ? AXIS : ALLIED ;
+			side = (prefix == LSTR_AXIS) ? AXIS : ALLIED;
 			icons[0] = IDE_ICON_GCI;
 			icons[2] = IDE_ICON_HC;
-			color = MSG_COLOR ;
+			color = MSG_COLOR;
 		break;
 
 		case LSTR_SQUAD:
-			prefix = LSTR_NONE ;
-			icons[2] = IDE_ICON_SQUAD ;
-			color = colorTEXTSQUAD ;
-		break ;
+			prefix = LSTR_NONE;
+			icons[2] = IDE_ICON_SQUAD;
+			color = colorTEXTSQUAD;
+		break;
 
 		case LSTR_MISSION:
-			prefix = LSTR_NONE ;
-			icons[2] = IDE_ICON_MISSION ;
-			color = colorTEXTNOTE ;
+			prefix = LSTR_NONE;
+			icons[2] = IDE_ICON_MISSION;
+			color = colorTEXTNOTE;
 			//if(message == LSTR_ORDERS)
-		break ;
+		break;
 
 		default:
 		break;
 	}
 
 	if ( side > 0 )
-		icons[1] = (side == ALLIED) ? IDE_ICON_ALLIED : IDE_ICON_AXIS ;
+		icons[1] = (side == ALLIED) ? IDE_ICON_ALLIED : IDE_ICON_AXIS;
 
-	const wchar_t* textPtr = _lstringToText((ENUM_CATEGORIES)loc, message, arg1, arg2, arg3, arg4, arg5, arg6) ;
+	const wchar_t* textPtr = _lstringToText((ENUM_CATEGORIES)loc, message, arg1, arg2, arg3, arg4, arg5, arg6);
 	if ( textPtr == NULL )
-		return ;
+		return;
 
 	// we don't handle generic orders because thats handled in GameClient
 	if(prefix == LSTR_ORDERS && message != LSTR_GENERIC)
@@ -866,13 +866,13 @@ void uiChatTuneToChannel(Chat::TuneToChannel const& tunechannel)
 			break;
 			case SIDE_HELP_CHANNEL:
 				channel.name = L"help";
-			break ;
+			break;
 			case SIDE_OPS_CHANNEL:
 				channel.name = L"ops";
-			break ;
+			break;
 			default:
 				// do nothing
-			break ;
+			break;
 		}
 	}
 }
@@ -918,7 +918,7 @@ UINT32 uiChatGetRadio(UINT32 radioIndex)
 
 void uiChatGCIMessage(Chat::GCIMessage const& pgciMsg, bool alertOnly)
 {
-	int uiMsgNo = 0 ;
+	int uiMsgNo = 0;
 	int gameEvent = GAMEEVENT_INVALID;
 	const char* specifics = NULL;
 	bool facilityEvent = false;
@@ -1055,7 +1055,7 @@ void uiChatGCIMessage(Chat::GCIMessage const& pgciMsg, bool alertOnly)
 	}
 
 	if(!alertOnly)
-		uiChatPrintLineMessageLoc(IDE_LANG_UI, LSTR_HQ, uiMsgNo, UTF16(pgciMsg.name), NULL) ;
+		uiChatPrintLineMessageLoc(IDE_LANG_UI, LSTR_HQ, uiMsgNo, UTF16(pgciMsg.name), NULL);
 }
 
 bool uiChatInitWordFilter()
@@ -1086,7 +1086,7 @@ static const wchar_t* _filterText(const wchar_t* source)
 
 	// If the user has disabled the language filter, then just return the input.
 	if (_wordFilter.empty() || cfgPrefsGetBool("app.languagefilter", true) == false)
-		return source ;
+		return source;
 
 	/////////// STATIC VARS
 
@@ -1103,7 +1103,7 @@ static const wchar_t* _filterText(const wchar_t* source)
 	OBSCENITY_FILTER::const_iterator it;
 
 	// It could be in the cuss pool, so compare.
-	for (it = _wordFilter.begin() ; it != _wordFilter.end() ; ++it )
+	for (it = _wordFilter.begin(); it != _wordFilter.end(); ++it )
 	{
 		bool found = false;
 
@@ -1161,18 +1161,18 @@ static const wchar_t* _filterTextOld(const wchar_t* source)
 {
 	// If the user has disabled the language filter, then just return the input.
 	if (_wordFilter.empty() || cfgPrefsGetBool("app.languagefilter", true) == false)
-		return source ;
+		return source;
 
 	/////////// STATIC VARS
 
 	// filtered wide character buffer
-	static wchar_t filterBuffer[MAX_MESSAGE_LENGTH + 8] ;
+	static wchar_t filterBuffer[MAX_MESSAGE_LENGTH + 8];
 
 	// size of replacements string
-	static const UINT32 NUM_REPLACEMENTS = 8 ;
+	static const UINT32 NUM_REPLACEMENTS = 8;
 
 	// used to rotate characters used
-	static UINT32 replacement = NUM_REPLACEMENTS ;
+	static UINT32 replacement = NUM_REPLACEMENTS;
 
 	// replacements string
 	static const wchar_t replacements[NUM_REPLACEMENTS + 1] = L"%*$&^!@#";
@@ -1180,10 +1180,10 @@ static const wchar_t* _filterTextOld(const wchar_t* source)
 	/////////// TEMP VARS
 
 	// filter iterator
-	OBSCENITY_FILTER::const_iterator it ;
+	OBSCENITY_FILTER::const_iterator it;
 
 	// pointer to the wide character filtered buffer
-	wchar_t* filteredPtr = filterBuffer ; // init dest to beginning of wide filtered buffer
+	wchar_t* filteredPtr = filterBuffer; // init dest to beginning of wide filtered buffer
 
 	// used to find word breaks
 	const wchar_t* wordEnd = NULL;
@@ -1197,28 +1197,28 @@ static const wchar_t* _filterTextOld(const wchar_t* source)
 	{
 		// Skip any kind of noise between words
 		while ( isspace(*sourcePtr) )
-			*(filteredPtr++) = *(sourcePtr++) ;
+			*(filteredPtr++) = *(sourcePtr++);
 
 		// Allow for end of string
 		if ( *sourcePtr == 0 )
-			break ;
+			break;
 
 		// Lets find the first non-alphabetical crap
-		wordEnd = sourcePtr ;
+		wordEnd = sourcePtr;
 
 		// move forward until the end of the string or the next space
 		while (*wordEnd && !isspace(*wordEnd) )
-			++wordEnd ;
+			++wordEnd;
 
 		// Find the size of the "word"/token, and see if it matches the cuss pool
-		UINT32  size = wordEnd - sourcePtr ;
+		UINT32  size = wordEnd - sourcePtr;
 		if ( size >= _minFilterWord )
 		{
 			// It could be in the cuss pool, so compare.
-			for ( it = _wordFilter.begin() ; it != _wordFilter.end() ; ++it )
+			for ( it = _wordFilter.begin(); it != _wordFilter.end(); ++it )
 			{
-				const OBSCENITY_RULE& rule = *it ;
-				const UINT32 ruleSize = rule.text.size() ;
+				const OBSCENITY_RULE& rule = *it;
+				const UINT32 ruleSize = rule.text.size();
 
 				// nothing to do if the rule is empty
 				if(!ruleSize) continue;
@@ -1230,12 +1230,12 @@ static const wchar_t* _filterTextOld(const wchar_t* source)
 					if ( wstrncasecmp(sourcePtr, rule.text.c_str(), ruleSize) == 0 )
 					{
 						// Found a cuss, replace it with characters from "replacements".
-						for ( UINT32 i = 0 ; i < ruleSize ; ++i )
-							*(filteredPtr++) = replacements[replacement++ % NUM_REPLACEMENTS] ;
+						for ( UINT32 i = 0; i < ruleSize; ++i )
+							*(filteredPtr++) = replacements[replacement++ % NUM_REPLACEMENTS];
 
 						// Now check here for the start of another cuss-word
-						sourcePtr += ruleSize ;
-						break ;
+						sourcePtr += ruleSize;
+						break;
 					}
 				}
 			}
@@ -1243,11 +1243,11 @@ static const wchar_t* _filterTextOld(const wchar_t* source)
 
 		// In any other case, source will be short of wordEnd, so copy the remaining characters.
 		while ( sourcePtr < wordEnd )
-			*(filteredPtr++) = *(sourcePtr++) ;
+			*(filteredPtr++) = *(sourcePtr++);
 	}
 
 	// terminate the string
-	*filteredPtr = 0 ;
+	*filteredPtr = 0;
 
 	// return the filtered string
 	return filterBuffer;
@@ -1269,10 +1269,10 @@ void uiChatHostMessage(Chat::HostMessage const& message)
 	}
 
 	// The icons on the host are 1 indexed.
-	icons[2] = message.icon - 1 ;
+	icons[2] = message.icon - 1;
 
 	// Eliminate obscenities
-	const wchar_t* msg = _filterText(uiUTF8toUTF16(message.msg)) ;
+	const wchar_t* msg = _filterText(uiUTF8toUTF16(message.msg));
 
 	if (message.handle > 0)
 	{
@@ -1302,7 +1302,7 @@ void uiChatHostMessage(Chat::HostMessage const& message)
 		{
 			lastplayerhandle = callsign;
 			char script[80];
-			sprintf(script, "game.onprivatemessage('%s', %u)", chatGetCallsign(message.handle), teulTime()) ;
+			sprintf(script, "game.onprivatemessage('%s', %u)", chatGetCallsign(message.handle), teulTime());
 			c->jsclient->RunScript(script);
 		}
 	}else
@@ -1567,7 +1567,7 @@ LOGICAL rnmainListEmoteText(SINT32 category, SINT32 locID, UINT32 uColor, const 
 LOGICAL rnmainListText(const char* text, ...)
 {
 	if ( NULL == text )
-		return FALSE ;
+		return FALSE;
 
  	va_list marker;
 	char buf[256];
@@ -1584,7 +1584,7 @@ LOGICAL rnmainListText(const char* text, ...)
 LOGICAL rnmainListText(const wchar_t* text, ...)
 {
 	if ( NULL == text )
-		return FALSE ;
+		return FALSE;
 
  	va_list marker;
 	wchar_t buf[256];

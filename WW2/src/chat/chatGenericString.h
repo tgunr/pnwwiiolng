@@ -20,24 +20,24 @@ public:
 					: EditString(withCategory, withID, withText)
 					, m_modified(withModified), m_author(withAuthor), m_editable(withEditable)
 					{}
-	GenericString(ACTION_OBJECT* const a) ;
+	GenericString(ACTION_OBJECT* const a);
 	virtual ~GenericString() {}
 
 	// Member functions
 public:
-	SINT32 packer(UINT32 mode, ACTION_OBJECT* a) ;
-	SINT32 receive(SINT32 teulIndex) ;
+	SINT32 packer(UINT32 mode, ACTION_OBJECT* a);
+	SINT32 receive(SINT32 teulIndex);
 
 	// Accessors
 public:
-	UINT32 modified() const { return m_modified ; }
-	ChatHandle author() const { return m_author ; }
-	bool editable() const { return m_editable ; }
+	UINT32 modified() const { return m_modified; }
+	ChatHandle author() const { return m_author; }
+	bool editable() const { return m_editable; }
 
 	// Member variables
 protected:
-	UINT32		m_modified ;				// Unix-timestamp of last mod
-	ChatHandle	m_author ;					// Packed callsign of author
-	bool		m_editable ;				// Whether or not you can edit it
-} ;
+	UINT32		m_modified;				// Unix-timestamp of last mod
+	ChatHandle	m_author;					// Packed callsign of author
+	bool		m_editable;				// Whether or not you can edit it
+};
 

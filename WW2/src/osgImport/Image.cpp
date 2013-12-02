@@ -927,7 +927,7 @@ void Image::flipHorizontal()
             for (int t=0; t<_t; ++t)
             {
                 unsigned char* rowData = _data+t*getRowSizeInBytes()+r*getImageSizeInBytes();
-                unsigned char* left  = rowData ;
+                unsigned char* left  = rowData;
                 unsigned char* right = rowData + ((_s-1)*getPixelSizeInBits())/8;
 
                 while (left < right)

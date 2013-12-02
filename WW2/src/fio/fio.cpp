@@ -92,61 +92,61 @@ bool fioLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 {
 	// fiod has its own custom fiodLoad definition.
 	if ( fio_switch == ISDIRECTORY )
-		return fiodLoad(filename, outPtr, outSize) ;
+		return fiodLoad(filename, outPtr, outSize);
 
-	outPtr = NULL ;
+	outPtr = NULL;
 
 	// Assess the file size, assume fioFileSize will
 	// report any errors locating the file etc.
-	SINT32 fileSize = fioFileSize(filename) ;
+	SINT32 fileSize = fioFileSize(filename);
 	if ( fileSize < 0 )
 	{
-		return false ;
+		return false;
 	}
 	if ( fileSize == 0 )
 	{
-		return true ;
+		return true;
 	}
 
 	// Open the file, again assume fioOpen will err for us.
-	int fd = fioOpen(filename) ;
+	int fd = fioOpen(filename);
 	if ( fd < 0 )
 	{
-		return false ;
+		return false;
 	}
 
 	// Allocate the memory.
-	char* data = (char*)memAlloc(fileSize + 1) ;
+	char* data = (char*)memAlloc(fileSize + 1);
 	if ( data == NULL )
 	{
-		DEBUG_ERR("Unable to allocate %u bytes of memory for loading %s.", fileSize + 1) ;
-		fiodClose(fd) ;
-		return false ;
+		DEBUG_ERR("Unable to allocate %u bytes of memory for loading %s.", fileSize + 1);
+		fiodClose(fd);
+		return false;
 	}
 
-	size_t bytesRead = fioRead(fd, data, fileSize) ;
-	fioClose(fd) ;
+	size_t bytesRead = fioRead(fd, data, fileSize);
+	fioClose(fd);
 
 	if ( bytesRead < 0 )
 	{
-		DEBUG_ERR("Read error reading %u bytes from %s.", bytesRead, filename) ;
-		memFree(data) ;
-		return false ;
+		DEBUG_ERR("Read error reading %u bytes from %s.", bytesRead, filename);
+		memFree(data);
+		return false;
 	}
 
 	if ( bytesRead != fileSize )
 	{
-		DEBUG_ERR("Read error reading %s, got %u bytes instead of %u.", filename, bytesRead, fileSize) ;
+		DEBUG_ERR("Read error reading %s, got %u bytes instead of %u.", filename, bytesRead, fileSize);
 	}
 
-	data[bytesRead] = 0 ;
+	data[bytesRead] = 0;
 
 	if ( outSize != NULL )
-		*outSize = (unsigned int)fileSize ;
+		*outSize = (unsigned int)fileSize;
 
-	outPtr = data ;
+	outPtr = data;
 
-	return true ;
+	return true;
 }
 
 /************************************************************************************************
@@ -219,7 +219,7 @@ FILE* fioUserFile(const char* filename, const char* mode)
 #if platOS == OS_WIN32 && defined(_UNICODE)
     return _wfopen(UTF16(path.c_str()), UTF16(mode));
 #else
-	return fopen(path.c_str(), mode) ;
+	return fopen(path.c_str(), mode);
 #endif
 }
 
@@ -561,7 +561,7 @@ size_t fioGetLine(int fd, char* string, size_t length)
 
 	if(fd < 0) return -1;
 
-  for (i=0 ; i < length - 1 ; i++)
+  for (i=0; i < length - 1; i++)
   {
     if (fioRead(fd, &string[i], 1) != 1)
 	{
@@ -803,7 +803,7 @@ namespace Fio
 	//////////////////////////////////////////////////////////////////////
 	// Return the name of the standard log file.
 
-   const char* LogFileName() { return "WW2_Log.txt" ; }
+   const char* LogFileName() { return "WW2_Log.txt"; }
 
 	//////////////////////////////////////////////////////////////////////
 	// Return a FILE* to either the unified log file or, if unable to
@@ -812,11 +812,11 @@ namespace Fio
 
 	FILE* OpenLogFile(void)
 	{
-		FILE* fp = fioUserFile(Fio::LogFileName(), "a") ;
+		FILE* fp = fioUserFile(Fio::LogFileName(), "a");
 		// If that fails, return stderr
 		if ( fp == NULL )
-			return OS_FDOPEN(OS_DUP(OS_FILENO(stderr)), "a") ;
-		return fp ;
+			return OS_FDOPEN(OS_DUP(OS_FILENO(stderr)), "a");
+		return fp;
 	}
 
 	void DeleteLogFile()
@@ -826,8 +826,8 @@ namespace Fio
 #if platOS == OS_WIN32
 		_unlink(path.c_str());
 #else
-		unlink(path.c_str()) ;
+		unlink(path.c_str());
 #endif
 	}
 
-} ;	// end namespace Fio
+};	// end namespace Fio

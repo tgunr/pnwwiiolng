@@ -1698,7 +1698,7 @@ static UINT32 _DrawStarsDeprecated(void)
 }
 #endif
 
-extern void LensFlareKill() ;
+extern void LensFlareKill();
 
 void trnskyKill(void)
 {

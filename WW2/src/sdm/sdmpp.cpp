@@ -28,14 +28,14 @@
 #include "sdm/sdmConfigVars.h"
 
 static FILE* man;
-const char* program = "sdmpp" ;
+const char* program = "sdmpp";
 
 static bool s_unlinksEnabled = true;
 static bool s_renamesEnabled = false;
 static unsigned int s_verbose;
 
-//typedef std::map<int,std::string> XPATHS ;
-//static XPATHS xpaths ;
+//typedef std::map<int,std::string> XPATHS;
+//static XPATHS xpaths;
 
 static NORETURN_FN void
 usage(int exitCode)
@@ -57,8 +57,8 @@ usage(int exitCode)
 static bool
 _processfile(const std::string& filename)
 {
-	bool success = false ;
-	bool doUnlink = false ;
+	bool success = false;
+	bool doUnlink = false;
 
 	SINT32  retval;
 
@@ -87,14 +87,14 @@ _processfile(const std::string& filename)
 			if ( s_verbose )
 				fprintf(stderr, "# SDMFILE_TRANS_ERR: %s\n", filename.c_str());
 			fprintf(man, "%s\n", filepath);
-			success = true ;
+			success = true;
 		break;
 		case SDMNO_STRAT_DATA:
 			if ( s_verbose > 2 )
 				fprintf(stderr, "# SDMNO_STRAT_DATA: %s\n", filename.c_str());
 			//fprintf(stderr,"No Strat data found in file %s \n",filename);
 			doUnlink = true;
-			success = true ;
+			success = true;
 		break;
 
 		default:
@@ -117,7 +117,7 @@ _processfile(const std::string& filename)
 			unlink(filepath);
 	}
 
-	return success ;
+	return success;
 }
 
 #if platOS != OS_WIN32
@@ -131,13 +131,13 @@ _getListOfSDMFiles(std::vector<std::string>& into)
 {
 	struct dirent** namelist = NULL;
 	SINT32 n = scandir(cv_terrainSubdir.GetString(), &namelist, select_fn, alphasort);
-	for ( SINT32 i = 0 ; i < n ; ++i )
+	for ( SINT32 i = 0; i < n; ++i )
 	{
 		into.push_back(namelist[i]->d_name);
 		free(namelist[i]);
 	}
 	if ( namelist != NULL )
-		free(namelist) ;
+		free(namelist);
 	return (n >= 0);
 }
 #else
@@ -188,7 +188,7 @@ _processDirectory()
 		fprintf(stderr, "# Found %" PRSizeT " files.\n", numFiles);
 
 	size_t filesParsed = 0;
-	for ( size_t i = 0 ; i < numFiles ; ++i )
+	for ( size_t i = 0; i < numFiles; ++i )
 	{
 		if ( _processfile(filenames[i]) )
 			++filesParsed;
@@ -203,7 +203,7 @@ _processDirectory()
 int
 main(int argc, char** argv)
 {
-	program = argv[0] ;
+	program = argv[0];
 
 	Teul::ConfigVar::InitializeConfigVars();
 
@@ -235,7 +235,7 @@ main(int argc, char** argv)
 				break;
 			case 'C':
 				cv_dataDir.Set(argValue);
-				break ;
+				break;
 			default:
 				usage(0);
 				break;
@@ -279,10 +279,10 @@ main(int argc, char** argv)
 		fprintf(stderr, "%s: no files processed? No .sdm files in " SUB_PATH("%s", "%s") "?\n"
 							, program, cv_dataDir.GetString(), cv_terrainSubdir.GetString()
 							);
-		exit(-22) ;
+		exit(-22);
 	}
 
-	fclose(man) ;
+	fclose(man);
 
 	return 0;
 }

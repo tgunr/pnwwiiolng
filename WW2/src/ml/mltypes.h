@@ -97,7 +97,7 @@ struct mlAnimation
 
 	UINT32 LastAnimationTime;
 
-} ;
+};
 
 struct mlPositionData
 {
@@ -125,7 +125,7 @@ struct mlPositionData
 	LOGICAL SetBombbayDoor[ML_MAX_CREW_POSITIONS];
 	LOGICAL BombbayDoorState[ML_MAX_CREW_POSITIONS];
 
-} ;
+};
 
 struct ptkBody;
 
@@ -135,7 +135,7 @@ struct mlBuoyancyData
 	FLOAT64 x,y;
 	FLOAT64 top, bottom;
 	FLOAT64 width, len;
-} ;
+};
 
 struct fpPersonData;
 

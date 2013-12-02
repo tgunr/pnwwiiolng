@@ -40,8 +40,8 @@
 SINT32
 Chat::PlayerInfo::packer(LOGICAL mode, ACTION_OBJECT* const a)
 {
-	a->packBytes(mode, a->localRawData, sizeof(*this)) ;
-	return a->offset ;
+	a->packBytes(mode, a->localRawData, sizeof(*this));
+	return a->offset;
 }
 #endif
 
@@ -51,16 +51,16 @@ Chat::ClientMessage::packer(LOGICAL mode, ACTION_OBJECT* a)
 	//Make sure our length isn't greater than it should be
 	if ( mode == TEUL_PACK && m_length > (MAX_MESSAGE_LENGTH - 1))
 		m_length = MAX_MESSAGE_LENGTH - 1;
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_length, MAX_MESSAGE_LENGTH_BITS) ;
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_length, MAX_MESSAGE_LENGTH_BITS);
 	if ( mode == TEUL_UNPACK && m_length > (MAX_MESSAGE_LENGTH - 1))
 		m_length = MAX_MESSAGE_LENGTH - 1;
 
-	a->offset = teulPackUINT16(mode, a->packed, a->offset, &m_radios, 8) ;
+	a->offset = teulPackUINT16(mode, a->packed, a->offset, &m_radios, 8);
 
-	a->offset = teulPackVoid(mode, a->packed, a->offset, &m_message, m_length) ;
-	m_message[m_length] = 0 ;
+	a->offset = teulPackVoid(mode, a->packed, a->offset, &m_message, m_length);
+	m_message[m_length] = 0;
 
-	a->offset = wwiiPackFullObjID(mode, a->packed, a->offset, &m_uiTarget, 0) ;
+	a->offset = wwiiPackFullObjID(mode, a->packed, a->offset, &m_uiTarget, 0);
 
 	return a->offset;
 }
@@ -69,24 +69,24 @@ SINT32
 Chat::HostMessage::packer(LOGICAL mode, ACTION_OBJECT* a)
 {
 	// User must initialize the "msg" pointer before calling.
-	if ( msg == NULL )
-		return -EINVAL ;
+	if ( PN_UNLIKELY(msg == nullptr) )
+		return -EINVAL;
 
 	// Pack these two together to align to an 8 bit boundary
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, &length, MAX_MESSAGE_LENGTH_BITS) ;
-	a->offset = teulPackUCHAR(mode, a->packed, a->offset, &icon, 6) ;
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, &length, MAX_MESSAGE_LENGTH_BITS);
+	a->offset = teulPackUCHAR(mode, a->packed, a->offset, &icon, 6);
 
 	//Packing the radioTypes it was sent on.
 	for ( UINT32 i = 0; i<MAX_CLIENT_CHANNELS; i++ )
-		a->offset = teulPackUCHAR(mode, a->packed, a->offset, &radioType[i], 6) ;
+		a->offset = teulPackUCHAR(mode, a->packed, a->offset, &radioType[i], 6);
 
-	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &handle, 0) ;
+	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &handle, 0);
 
 	//Make sure our length isn't greater than it should be
 	if ( mode == TEUL_UNPACK && length > MAX_MESSAGE_LENGTH - 1 )
 		length = MAX_MESSAGE_LENGTH - 1;
 
-	a->offset = teulPackVoid(mode, a->packed, a->offset, (void*)msg, length+1) ;
+	a->offset = teulPackVoid(mode, a->packed, a->offset, (void*)msg, length+1);
 
 	return a->offset;
 }
@@ -94,11 +94,11 @@ Chat::HostMessage::packer(LOGICAL mode, ACTION_OBJECT* a)
 SINT32
 Chat::TuneToChannel::packer(LOGICAL mode, ACTION_OBJECT* a)
 {
-	a->offset = teulPackUCHAR(mode, a->packed, a->offset, &m_radioIndex, 4) ;
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_type, 12) ;
-	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_handle, 0) ;
-	a->packer(mode, m_rx) ;
-	a->packer(mode, m_tx) ;
+	a->offset = teulPackUCHAR(mode, a->packed, a->offset, &m_radioIndex, 4);
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_type, 12);
+	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_handle, 0);
+	a->packer(mode, m_rx);
+	a->packer(mode, m_tx);
 
 	return a->offset;
 }
@@ -106,8 +106,8 @@ Chat::TuneToChannel::packer(LOGICAL mode, ACTION_OBJECT* a)
 SINT32
 Chat::UpdateChannel::packer(LOGICAL mode, ACTION_OBJECT* a)
 {
-	a->offset = teulPackUCHAR(mode, a->packed, a->offset, &radioIndex, 7) ;
-	a->packer(mode, receiveStatus) ;
+	a->offset = teulPackUCHAR(mode, a->packed, a->offset, &radioIndex, 7);
+	a->packer(mode, receiveStatus);
 
 	return a->offset;
 }
@@ -115,7 +115,7 @@ Chat::UpdateChannel::packer(LOGICAL mode, ACTION_OBJECT* a)
 SINT32
 Chat::UserNLA::packer(LOGICAL mode, ACTION_OBJECT* a)
 {
-	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &handle, 0) ;
+	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &handle, 0);
 	a->offset = teulPackUCHAR(mode, a->packed, a->offset, &radioIndex, 0);
 	return a->offset;
 }
@@ -123,9 +123,9 @@ Chat::UserNLA::packer(LOGICAL mode, ACTION_OBJECT* a)
 SINT32
 ChatServerInfo::packer(LOGICAL mode, ACTION_OBJECT* a)
 {
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_otp, 0) ;
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_ipAddress, 0) ;
-	a->offset = teulPackUINT16(mode, a->packed, a->offset, &m_port, 0) ;
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_otp, 0);
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_ipAddress, 0);
+	a->offset = teulPackUINT16(mode, a->packed, a->offset, &m_port, 0);
 
 	return a->offset;
 }
@@ -133,14 +133,14 @@ ChatServerInfo::packer(LOGICAL mode, ACTION_OBJECT* a)
 SINT32
 Chat::LocalizedMessage::packer(LOGICAL mode, ACTION_OBJECT* const a)
 {
-	a->packer(mode, (SINT32*)&m_prefix, 12) ;
-	a->packer(mode, (SINT32*)&m_message, 12) ;
-	a->packer(mode, &m_size, 16) ;
-	a->packBytes(mode, m_data, m_size) ;
+	a->packer(mode, (SINT32*)&m_prefix, 12);
+	a->packer(mode, (SINT32*)&m_message, 12);
+	a->packer(mode, &m_size, 16);
+	a->packBytes(mode, m_data, m_size);
 	if ( mode == TEUL_UNPACK )
-		SetPointers() ;
+		SetPointers();
 
-	return a->offset ;
+	return a->offset;
 }
 
 void
@@ -151,34 +151,34 @@ Chat::LocalizedMessage::_copy(const char* const p0, const char* const p1, const 
 		m_size = snprintf(m_data, MAX_MESSAGE_LENGTH
 							, "%s%c%s%c%s%c%s%c%s%c%s"
 							, p0,0 , p1,0 , p2,0 , p3,0 , p4,0 , p5
-							) ;
+							);
 		if ( m_size > MAX_MESSAGE_LENGTH )
-			m_size = MAX_MESSAGE_LENGTH - 1 ;
+			m_size = MAX_MESSAGE_LENGTH - 1;
 	}
 	else
 	{
-		m_size = 0 ;
+		m_size = 0;
 	}
-	m_data[m_size++] = 0 ;
-	m_data[m_size] = 0 ;
+	m_data[m_size++] = 0;
+	m_data[m_size] = 0;
 
-	SetPointers() ;
+	SetPointers();
 }
 
 void
 Chat::LocalizedMessage::SetPointers()
 {
-	m_ptr[0] = m_data ;
-	char* ptr = m_data ;
-	char* const end = (m_size <= 0 ? m_data : m_data + m_size - 1) ;
-	size_t position = 1 ;
+	m_ptr[0] = m_data;
+	char* ptr = m_data;
+	char* const end = (m_size <= 0 ? m_data : m_data + m_size - 1);
+	size_t position = 1;
 	do
 	{
 		while ( ptr < end && *(ptr++) != 0 )
 			;
-		m_ptr[position++] = ptr ;
+		m_ptr[position++] = ptr;
 	}
-	while ( position < _NUM_ARGUMENTS ) ;
+	while ( position < _NUM_ARGUMENTS );
 }
 
 
@@ -191,7 +191,7 @@ Chat::Locality::Locality(ACTION_OBJECT* const a)
 	, m_z(0)
 	, m_nearCP(nullObjID)
 {
-	a->offset = packer(TEUL_UNPACK, a) ;
+	a->offset = packer(TEUL_UNPACK, a);
 }
 
 // Packer for the locality class.
@@ -218,54 +218,54 @@ Chat::SideMessage::SideMessage(ACTION_OBJECT* const a)
 	, m_arg1()
 	, m_arg2()
 {
-	a->offset = packer(TEUL_UNPACK, a) ;
+	a->offset = packer(TEUL_UNPACK, a);
 }
 
 SINT32
 Chat::SideMessage::packer(LOGICAL mode, ACTION_OBJECT* a)
 {
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_type, 4) ;
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_side, 4) ;
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_type, 4);
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_side, 4);
 
-	a->offset = wwiiPackFullObjID(mode, a->packed, a->offset, &m_objectiveID, 0) ;
+	a->offset = wwiiPackFullObjID(mode, a->packed, a->offset, &m_objectiveID, 0);
 
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_prefix, 12) ;
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_message, 12) ;
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_prefix, 12);
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_message, 12);
 
-	a->offset = wwiiPackString(mode, a->packed, a->offset, m_arg1, MAX_MESSAGE_LENGTH) ;
+	a->offset = wwiiPackString(mode, a->packed, a->offset, m_arg1, MAX_MESSAGE_LENGTH);
 	if ( m_arg1.length() > 0 )
-		a->offset = wwiiPackString(mode, a->packed, a->offset, m_arg2, MAX_MESSAGE_LENGTH) ;
+		a->offset = wwiiPackString(mode, a->packed, a->offset, m_arg2, MAX_MESSAGE_LENGTH);
 	else if ( mode == TEUL_UNPACK )
-		m_arg2 = "" ;
+		m_arg2 = "";
 
-	return a->offset ;
+	return a->offset;
 }
 #endif
 
 SINT32
 Waypoint::packer(LOGICAL mode, ACTION_OBJECT* a)
 {
-	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_handle, MAX_WP_HANDLE_BITS) ;
-	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_playerHandle, 0) ;
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_type, 8) ;
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_subType, 8) ;
-	a->offset = teulPackSINT32(mode, a->packed, a->offset, &m_x, 24) ;
-	a->offset = teulPackSINT32(mode, a->packed, a->offset, &m_y, 24) ;
+	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_handle, MAX_WP_HANDLE_BITS);
+	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_playerHandle, 0);
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_type, 8);
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_subType, 8);
+	a->offset = teulPackSINT32(mode, a->packed, a->offset, &m_x, 24);
+	a->offset = teulPackSINT32(mode, a->packed, a->offset, &m_y, 24);
 
 	if ( mode == TEUL_PACK )
 	{
-		UINT32 delta = teulTime() - m_posted ;
-		a->offset = teulPackUINT32(mode, a->packed, a->offset, &delta, 16) ;
+		UINT32 delta = teulTime() - m_posted;
+		a->offset = teulPackUINT32(mode, a->packed, a->offset, &delta, 16);
 	}
 	else
 	{
-		a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_posted, 16) ;
-		m_posted = teulTime() - m_posted ;
+		a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_posted, 16);
+		m_posted = teulTime() - m_posted;
 	}
 
-	a->offset = wwiiPackText(mode, a->packed, a->offset, m_notes, MAX_WP_NOTE_LENGTH) ;
+	a->offset = wwiiPackText(mode, a->packed, a->offset, m_notes, MAX_WP_NOTE_LENGTH);
 
-	return a->offset ;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -274,7 +274,7 @@ Waypoint::packer(LOGICAL mode, ACTION_OBJECT* a)
 SINT32
 STOJoules::packer(LOGICAL mode, ACTION_OBJECT* a)
 {
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_uid, 0) ;
-	a->offset = teulPackUINT64(mode, a->packed, a->offset, (UINT64*)&m_joules, 0) ;
-	return a->offset ;
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_uid, 0);
+	a->offset = teulPackUINT64(mode, a->packed, a->offset, (UINT64*)&m_joules, 0);
+	return a->offset;
 }

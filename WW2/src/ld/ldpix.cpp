@@ -211,7 +211,7 @@ SINT32		t1, t2, t3, t4;
 
     Write_Log(LOG_TEXTURE, LOG_INFO, "[TEXTURE] loading %s", localname);
 
-	for (i=0 ; GfxFormats[i].Routine ; i++)
+	for (i=0; GfxFormats[i].Routine; i++)
 	{
 		strcpy(tmpname, localname);
 		strcat(tmpname, ".");
@@ -472,7 +472,7 @@ SINT32		t1, t2, t3, t4;
 		newwidth = width;
 		newheight = height;
 
-		for (j=1 ; ; j++)
+		for (j=1;; j++)
 		{
 			// Create a mipmap for this texture
 			if (newwidth == MinTextureDim &&
@@ -690,12 +690,12 @@ int     SearchColor, Color;
   if (lppisd->PixelFormat.dwRGBBitCount <= 8)
   {
 
-    for (i=0 ; i < height ; i++)
+    for (i=0; i < height; i++)
     {
 	    cptr = ((char*)lppisd->Surface + i*lppisd->Pitch);
 		rgbptr = (piRGBTRIPLE*)(bits + i*bitsPitch);
 
-      for (j=0 ; j < width ; j++, rgbptr++)
+      for (j=0; j < width; j++, rgbptr++)
       {
         Color = ((rgbptr->rgbtRed >> RedBits) << RedShift) |
                 ((rgbptr->rgbtGreen >> GreenBits) << GreenShift) |
@@ -714,12 +714,12 @@ int     SearchColor, Color;
   else
   if (lppisd->PixelFormat.dwRGBBitCount <= 16)
   {
-    for (i=0 ; i < height ; i++)
+    for (i=0; i < height; i++)
     {
 	    sptr = (short*)((char*)lppisd->Surface + i*lppisd->Pitch);
 		rgbptr = (piRGBTRIPLE*)(bits + i*bitsPitch);
 
-      for (j=0 ; j < width ; j++, rgbptr++)
+      for (j=0; j < width; j++, rgbptr++)
       {
         Color = ((rgbptr->rgbtRed >> RedBits) << RedShift) |
                 ((rgbptr->rgbtGreen >> GreenBits) << GreenShift) |
@@ -738,11 +738,11 @@ int     SearchColor, Color;
   else
   if (lppisd->PixelFormat.dwRGBBitCount <= 24)
   {
-    for (i=0 ; i < height ; i++)
+    for (i=0; i < height; i++)
     {
     	cptr = ((char*)lppisd->Surface + i*lppisd->Pitch);
 		rgbptr = (piRGBTRIPLE*)(bits + i*bitsPitch);
-      for (j=0 ; j < width ; j++, rgbptr++)
+      for (j=0; j < width; j++, rgbptr++)
       {
         Color = ((rgbptr->rgbtRed >> RedBits) << RedShift) |
                 ((rgbptr->rgbtGreen >> GreenBits) << GreenShift) |
@@ -766,11 +766,11 @@ int     SearchColor, Color;
   else
   if (lppisd->PixelFormat.dwRGBBitCount <= 32)
   {
-    for (i=0 ; i < height ; i++)
+    for (i=0; i < height; i++)
     {
    		lptr = (long*)((char*)lppisd->Surface + i*lppisd->Pitch);
 		rgbptr = (piRGBTRIPLE*)(bits + i*bitsPitch);
-      for (j=0 ; j < width; j++, rgbptr++)
+      for (j=0; j < width; j++, rgbptr++)
       {
         Color = ((rgbptr->rgbtRed >> RedBits) << RedShift) |
                 ((rgbptr->rgbtGreen >> GreenBits) << GreenShift) |
@@ -824,9 +824,9 @@ int     AlphaBits, AlphaShift, AlphaMask;
 	if (lppisd->PixelFormat.dwRGBBitCount <= 8)
 	{
 		cptr = (char*)lppisd->Surface;
-		for (i=0 ; i < height ; i++)
+		for (i=0; i < height; i++)
 		{
-			for (j=0 ; j < width ; j++, rgbptr++)
+			for (j=0; j < width; j++, rgbptr++)
 			{
 				Color = ((rgbptr->rgbtRed >> RedBits) << RedShift) |
 						((rgbptr->rgbtGreen >> GreenBits) << GreenShift) |
@@ -853,9 +853,9 @@ int     AlphaBits, AlphaShift, AlphaMask;
 		sptr = (short*)lppisd->Surface;
 		GreenShift -= GreenBits;
 		RedShift -= RedBits;
-		for (i=0 ; i < height ; i++)
+		for (i=0; i < height; i++)
 		{
-			for (j=0 ; j < width ; j++)
+			for (j=0; j < width; j++)
 			{
 				s = *sptr++;
 				*cptr++ = ((s & BlueMask)) << BlueBits;
@@ -870,9 +870,9 @@ int     AlphaBits, AlphaShift, AlphaMask;
 	if (lppisd->PixelFormat.dwRGBBitCount <= 24)
 	{
 		cptr = (char*)lppisd->Surface;
-		for (i=0 ; i < height ; i++)
+		for (i=0; i < height; i++)
 		{
-			for (j=0 ; j < width ; j++, rgbptr++)
+			for (j=0; j < width; j++, rgbptr++)
 			{
 				rgbptr->rgbtBlue = *cptr++;
 				rgbptr->rgbtGreen = *cptr++;
@@ -886,9 +886,9 @@ int     AlphaBits, AlphaShift, AlphaMask;
 	if (lppisd->PixelFormat.dwRGBBitCount <= 32)
 	{
 		cptr = (char*)lppisd->Surface;
-		for (i=0 ; i < height ; i++)
+		for (i=0; i < height; i++)
 		{
-			for (j=0 ; j < width ; j++, rgbptr++)
+			for (j=0; j < width; j++, rgbptr++)
 			{
 				rgbptr->rgbtBlue = *cptr++;
 				rgbptr->rgbtGreen = *cptr++;
@@ -937,12 +937,12 @@ UCHAR* bitp;
 
   if (lppisd->PixelFormat.dwRGBBitCount <= 8)
   {
-    for (i=0 ; i < height ; i++)
+    for (i=0; i < height; i++)
     {
 	    cptr = ((char*)lppisd->Surface + i*lppisd->Pitch);
 		bitp = bits + i*bitsPitch;
 
-      for (j=0 ; j < width ; j++, bitp++)
+      for (j=0; j < width; j++, bitp++)
       {
         Color = *cptr & ColorMask;
         *cptr++ = Color | (AlphaMask & ((*bitp >> (8 - AlphaBits)) << AlphaShift));
@@ -952,11 +952,11 @@ UCHAR* bitp;
   else
   if (lppisd->PixelFormat.dwRGBBitCount <= 16)
   {
-   for (i=0 ; i < height ; i++)
+   for (i=0; i < height; i++)
     {
 	    sptr = (short*)((char*)lppisd->Surface + i*lppisd->Pitch);
  		bitp = bits + i*bitsPitch;
-      for (j=0 ; j < width ; j++, sptr++,bitp++)
+      for (j=0; j < width; j++, sptr++,bitp++)
       {
         Color = *sptr & ColorMask;
         *sptr = Color | (AlphaMask & ((*bitp >> (8 - AlphaBits)) << AlphaShift));
@@ -966,11 +966,11 @@ UCHAR* bitp;
   else
   if (lppisd->PixelFormat.dwRGBBitCount <= 32)
   {
-   for (i=0 ; i < height ; i++)
+   for (i=0; i < height; i++)
     {
   		lptr = (long*)((char*)lppisd->Surface + i*lppisd->Pitch);
   		bitp = bits + i*bitsPitch;
-      for (j=0 ; j < width ; j++, bitp++)
+      for (j=0; j < width; j++, bitp++)
       {
         Color = *lptr & ColorMask;
         *lptr++ = Color | (AlphaMask & ((*bitp >> (8 - AlphaBits)) << AlphaShift));
@@ -1010,9 +1010,9 @@ int     Color, ColorMask;
   if (lppisd->PixelFormat.dwRGBBitCount <= 8)
   {
     cptr = (char*)lppisd->Surface;
-    for (i=0 ; i < height ; i++)
+    for (i=0; i < height; i++)
     {
-      for (j=0 ; j < width ; j++)
+      for (j=0; j < width; j++)
       {
         Color = *cptr & ColorMask;
         *cptr++ = Color | AlphaValue;
@@ -1025,9 +1025,9 @@ int     Color, ColorMask;
   if (lppisd->PixelFormat.dwRGBBitCount <= 16)
   {
     sptr = (short*)lppisd->Surface;
-    for (i=0 ; i < height ; i++)
+    for (i=0; i < height; i++)
     {
-      for (j=0 ; j < width ; j++, sptr++)
+      for (j=0; j < width; j++, sptr++)
       {
         Color = *sptr & ColorMask;
         *sptr = Color | AlphaValue;
@@ -1040,9 +1040,9 @@ int     Color, ColorMask;
   if (lppisd->PixelFormat.dwRGBBitCount <= 32)
   {
     lptr = (long*)lppisd->Surface;
-    for (i=0 ; i < height ; i++)
+    for (i=0; i < height; i++)
     {
-      for (j=0 ; j < width ; j++)
+      for (j=0; j < width; j++)
       {
         Color = *lptr & ColorMask;
         *lptr++ = Color | AlphaValue;
@@ -1113,9 +1113,9 @@ piRGBQUAD PalColor;
     cptr = (char*)lppisd->Surface + offset;
     if (pal == NULL)
     {
-      for (i=0 ; i < height ; i++)
+      for (i=0; i < height; i++)
       {
-        for (j=0 ; j < width ; j++, rgbptr++)
+        for (j=0; j < width; j++, rgbptr++)
         {
           Color = ((rgbptr->rgbtRed >> RedBits) << RedShift) |
                   ((rgbptr->rgbtGreen >> GreenBits) << GreenShift) |
@@ -1136,9 +1136,9 @@ piRGBQUAD PalColor;
     }
     else
     {
-      for (i=0 ; i < height ; i++)
+      for (i=0; i < height; i++)
       {
-        for (j=0 ; j < width ; j++, bits++)
+        for (j=0; j < width; j++, bits++)
         {
           PalColor = pal[*bits];
           Color = ((PalColor.rgbRed >> RedBits) << RedShift) |
@@ -1165,9 +1165,9 @@ piRGBQUAD PalColor;
     sptr = (short*)lppisd->Surface + offset;
     if (pal == NULL)
     {
-      for (i=0 ; i < height ; i++)
+      for (i=0; i < height; i++)
       {
-        for (j=0 ; j < width ; j++)
+        for (j=0; j < width; j++)
         {
           RgbColor = rgbptr[j];
           Color = ((RgbColor.rgbtRed >> RedBits) << RedShift) |
@@ -1190,9 +1190,9 @@ piRGBQUAD PalColor;
     }
     else
     {
-      for (i=0 ; i < height ; i++)
+      for (i=0; i < height; i++)
       {
-        for (j=0 ; j < width ; j++, bits++)
+        for (j=0; j < width; j++, bits++)
         {
           PalColor = pal[*bits];
           Color = ((PalColor.rgbRed >> RedBits) << RedShift) |
@@ -1219,9 +1219,9 @@ piRGBQUAD PalColor;
     lptr = (long*)lppisd->Surface + offset;
     if (pal == NULL)
     {
-      for (i=0 ; i < height ; i++)
+      for (i=0; i < height; i++)
       {
-        for (j=0 ; j < width ; j++, rgbptr++)
+        for (j=0; j < width; j++, rgbptr++)
         {
           Color = ((rgbptr->rgbtRed >> RedBits) << RedShift) |
                   ((rgbptr->rgbtGreen >> GreenBits) << GreenShift) |
@@ -1242,9 +1242,9 @@ piRGBQUAD PalColor;
     }
     else
     {
-      for (i=0 ; i < height ; i++)
+      for (i=0; i < height; i++)
       {
-        for (j=0 ; j < width ; j++, bits++)
+        for (j=0; j < width; j++, bits++)
         {
           PalColor = pal[*bits];
           Color = ((PalColor.rgbRed >> RedBits) << RedShift) |
@@ -1283,9 +1283,9 @@ int		i, j;
 	}
 
 	tmpbits = outbits;
-	for (i=0 ; i < height ; i++)
+	for (i=0; i < height; i++)
 	{
-		for (j=0 ; j < width ; j++)
+		for (j=0; j < width; j++)
 		{
 			*tmpbits++ = pal[*inbits].rgbRed;
 			*tmpbits++ = pal[*inbits].rgbGreen;
@@ -1306,7 +1306,7 @@ int		i, up, dn;
 	up = 0;
 	dn = (height - 1) * width;
 	height /= 2;
-	for (i=0 ; i < height ; i++, up += width, dn -= width)
+	for (i=0; i < height; i++, up += width, dn -= width)
 	{
 		memcpy(ptr, &inbits[up], width);
 		memcpy(&inbits[up], &inbits[dn], width);
@@ -1390,7 +1390,7 @@ int		red, blue, green, alpha;
 			// FIXME - if needed
 			if (bits != 16)
 			{
-				for (k=0 ; k < size ; k++)
+				for (k=0; k < size; k++)
 				{
 					outptr[heightoutoffset + widthoutoffset + k] =
 						inptr[heightinoffset + widthinoffset + k];
@@ -1488,9 +1488,9 @@ int			i, j, width, height;
   {
     cptr1 = (char*)lppisd1->Surface;
     cptr2 = (char*)lppisd2->Surface;
-    for (i=0 ; i < height ; i++)
+    for (i=0; i < height; i++)
     {
-      for (j=0 ; j < width ; j++)
+      for (j=0; j < width; j++)
       {
         *cptr2++ = *cptr1++;
       }
@@ -1504,9 +1504,9 @@ int			i, j, width, height;
   {
     sptr1 = (short*)lppisd1->Surface;
     sptr2 = (short*)lppisd2->Surface;
-    for (i=0 ; i < height ; i++)
+    for (i=0; i < height; i++)
     {
-      for (j=0 ; j < width ; j++)
+      for (j=0; j < width; j++)
       {
         *sptr2++ = *sptr1++;
       }
@@ -1520,9 +1520,9 @@ int			i, j, width, height;
   {
     lptr1 = (long*)lppisd1->Surface;
     lptr2 = (long*)lppisd2->Surface;
-    for (i=0 ; i < height ; i++)
+    for (i=0; i < height; i++)
     {
-      for (j=0 ; j < width ; j++)
+      for (j=0; j < width; j++)
       {
         *lptr2++ = *lptr1++;
       }
@@ -1557,7 +1557,7 @@ struct tex_def
 	UINT32	height[MAXMIPLEVELS];
 	// this isn't used in ldpix
 	UCHAR*  bits[MAXMIPLEVELS];
-} ;
+};
 
 struct texcRGBA
 {
@@ -1566,7 +1566,7 @@ struct texcRGBA
 	UCHAR	rgbRed;
 	UCHAR	rgbAlpha;
 
-} ;
+};
 
 LOGICAL ldpixCopyAllBitsToSurface(UCHAR* bits, int width, int height, piSURFACEDESC* lppisd)
 {
@@ -1610,9 +1610,9 @@ UINT32  uTemp = 0;
   if (lppisd->PixelFormat.dwRGBBitCount <= 8)
   {
     cptr = (char*)lppisd->Surface;
-    for (i=0 ; i < height ; i++)
+    for (i=0; i < height; i++)
     {
-      for (j=0 ; j < width ; j++, rgbptr++)
+      for (j=0; j < width; j++, rgbptr++)
       {
         Color = ((rgbptr->rgbRed >> RedBits) << RedShift) |
                 ((rgbptr->rgbGreen >> GreenBits) << GreenShift) |
@@ -1628,9 +1628,9 @@ UINT32  uTemp = 0;
   if (lppisd->PixelFormat.dwRGBBitCount <= 16)
   {
     sptr = (short*)lppisd->Surface;
-    for (i=0 ; i < height ; i++)
+    for (i=0; i < height; i++)
     {
-      for (j=0 ; j < width ; j++, rgbptr++)
+      for (j=0; j < width; j++, rgbptr++)
       {
 
 //		  unsigned short	subr, subg, subb, suba;
@@ -1655,9 +1655,9 @@ UINT32  uTemp = 0;
   if (lppisd->PixelFormat.dwRGBBitCount <= 24)
   {
     cptr = (char*)lppisd->Surface;
-    for (i=0 ; i < height ; i++)
+    for (i=0; i < height; i++)
     {
-      for (j=0 ; j < width ; j++, rgbptr++)
+      for (j=0; j < width; j++, rgbptr++)
       {
         Color = ((rgbptr->rgbRed >> RedBits) << RedShift) |
                 ((rgbptr->rgbGreen >> GreenBits) << GreenShift) |
@@ -1676,9 +1676,9 @@ UINT32  uTemp = 0;
   if (lppisd->PixelFormat.dwRGBBitCount <= 32)
   {
     lptr = (long*)lppisd->Surface;
-    for (i=0 ; i < height ; i++)
+    for (i=0; i < height; i++)
     {
-      for (j=0 ; j < width ; j++, rgbptr++)
+      for (j=0; j < width; j++, rgbptr++)
       {
         Color = ((rgbptr->rgbRed >> RedBits) << RedShift) |
                 ((rgbptr->rgbGreen >> GreenBits) << GreenShift) |

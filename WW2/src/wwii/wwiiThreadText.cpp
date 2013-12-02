@@ -18,13 +18,13 @@
 #include "wwii/wwiiString.h"
 #include "wwii/wwiiThreadTextQuery.h"
 
-static std::mutex textMutex ;
+static std::mutex textMutex;
 
-typedef std::deque<char*> TEXT_POOL ;
-static TEXT_POOL _pool ;
+typedef std::deque<char*> TEXT_POOL;
+static TEXT_POOL _pool;
 
-static int inUse = 0 ;
-static int allocations = 0 ;
+static int inUse = 0;
+static int allocations = 0;
 
 //////////////////////////////////////////////////////////////////////
 // Allocate me a thread-safe buffer
@@ -32,35 +32,35 @@ static int allocations = 0 ;
 char*
 threadsAllocText()
 {
-	char* p = NULL ;
+	char* p = NULL;
 
 #if !defined(XMEMORY_DEBUG)
 	{
-		std::lock_guard<std::mutex> mutexLock(textMutex) ;
+		std::lock_guard<std::mutex> mutexLock(textMutex);
 
 		if ( !_pool.empty() )
 		{
-			p = _pool.back() ;
-			_pool.pop_back() ;
+			p = _pool.back();
+			_pool.pop_back();
 		}
 
-		++inUse ;
+		++inUse;
 		if ( p == NULL )
-			++allocations ;
+			++allocations;
 	}
 
 	if ( p == NULL )
 	{
-		p = new char[TEXT_POOL_SIZE+1] ; // (char*)memCalloc(1, TEXT_POOL_SIZE + 1) ;
-		p[TEXT_POOL_SIZE] = 0 ;
+		p = new char[TEXT_POOL_SIZE+1]; // (char*)memCalloc(1, TEXT_POOL_SIZE + 1);
+		p[TEXT_POOL_SIZE] = 0;
 	}
 #else
-	p = (char*)memCalloc(1, TEXT_POOL_SIZE + 1) ;
-	++inUse ;
-	++allocations ;
+	p = (char*)memCalloc(1, TEXT_POOL_SIZE + 1);
+	++inUse;
+	++allocations;
 #endif
 
-	return p ;
+	return p;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -70,21 +70,21 @@ char*
 threadsPrintf(const char* fmt, ...)
 {
 	if ( fmt == NULL )
-		LogAbort("%s called with NULL fmt", __FUNCTION__) ;
+		LogAbort("%s called with NULL fmt", __FUNCTION__);
 
-	char* p = threadsAllocText() ;
+	char* p = threadsAllocText();
 	if ( p == NULL )
-		LogAbort("%s out of memory", __FUNCTION__) ;
+		LogAbort("%s out of memory", __FUNCTION__);
 	else
 	{
-		va_list args ;
-		va_start(args, fmt) ;
-		int bytes = vsnprintf(p, TEXT_POOL_SIZE - 1, fmt, args) ;
-		p[bytes] = 0 ;
-		va_end(args) ;
+		va_list args;
+		va_start(args, fmt);
+		int bytes = vsnprintf(p, TEXT_POOL_SIZE - 1, fmt, args);
+		p[bytes] = 0;
+		va_end(args);
 	}
 
-	return p ;
+	return p;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -94,48 +94,48 @@ void
 threadsFreeText(char* text)
 {
 #if !defined(XMEMORY_DEBUG)
-	std::lock_guard<std::mutex> mutexLock(textMutex) ;
-	_pool.push_back(text) ;
+	std::lock_guard<std::mutex> mutexLock(textMutex);
+	_pool.push_back(text);
 #else
-	memFree(text) ;
+	memFree(text);
 #endif
 
-	--inUse ;
+	--inUse;
 }
 
 void
 ThreadTextQuery::addEntry(const char* const entry)
 {
-	assert( entry != NULL ) ;
+	assert( entry != NULL );
 
 	// Are we about to fill the buffer?
-	size_t len = strlen(entry) ;
+	size_t len = strlen(entry);
 	if ( noRoomFor(len) )
 	{
 		// No space in the buffer for this many bytes,
 		// so commit immediately.
-		commit(0LL) ;
+		commit(0LL);
 	}
 
 	if ( m_length == 0 )
 	{
 		// No current buffer, allocate one and copy the prefix into it.
-		m_length = strlcpy(m_statement, m_prefix, TEXT_POOL_SIZE - 1) ;
-		m_commitFrom = teulClock64 ;
+		m_length = strlcpy(m_statement, m_prefix, TEXT_POOL_SIZE - 1);
+		m_commitFrom = teulClock64;
 	}
 	else
 	{
 		// We have a buffer, add a separator.
-		m_statement[m_length++] = separator() ;
+		m_statement[m_length++] = separator();
 	}
 
 	if ( noRoomFor(len) )
-		throw std::domain_error("Data too long for ThreadTextQuery") ;
+		throw std::domain_error("Data too long for ThreadTextQuery");
 
 	// Copy the data over, no need to worry about buffer size because
 	// we've already validated that it fits.
-	strcpy(m_statement + m_length, entry) ;
+	strcpy(m_statement + m_length, entry);
 
-	m_length += len ;
+	m_length += len;
 }
 

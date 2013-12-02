@@ -126,7 +126,7 @@ struct FLOAT64VECTOR
 	FLOAT64 x;
 	FLOAT64 y;
 	FLOAT64 z;
-} ;
+};
 
 struct FLOAT32VECTOR
 {
@@ -138,32 +138,32 @@ struct FLOAT64ATT
 	FLOAT64 Roll;
 	FLOAT64 Pitch;
 	FLOAT64 Yaw;
-} ;
+};
 
 struct FLOAT64QUAT
 {
 	FLOAT64 x,y,z,w;
 };
 
-typedef UINT8 RANK_NO ;
+typedef UINT8 RANK_NO;
 
 typedef SINT32 teulindex_t;
 
-struct ACTION_OBJECT ;
-namespace Teul { struct PacketHeader ; class Packet ; }
+struct ACTION_OBJECT;
+namespace Teul { struct PacketHeader; class Packet; }
 
 //! Compressed player gamename/callsign.
-typedef UINT64 ChatHandle ;
+typedef UINT64 ChatHandle;
 //! Player permission mask.
-typedef UINT64 PermissionMask ;
+typedef UINT64 PermissionMask;
 //! Teul type for millisecond time.
-typedef	UINT64 TeulTimeMS ;
+typedef	UINT64 TeulTimeMS;
 //! Teul type for a millisecond delta (signed).
 typedef SINT64 TeulDeltaMS	;
 
 //! Index for a player ID
-typedef unsigned int playerid_t ;
+typedef unsigned int playerid_t;
 //! Index for a sortie ID
-typedef unsigned int sortieid_t ;
+typedef unsigned int sortieid_t;
 //! Index for an instance's unique ID
-typedef unsigned long long instanceid_t ;
+typedef unsigned long long instanceid_t;

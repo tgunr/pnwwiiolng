@@ -8,9 +8,9 @@
 
 #include "updt/loginTypes.h"
 
-typedef int APID ;
+typedef int APID;
 
-namespace Auth { struct Dispatch ; }
+namespace Auth { struct Dispatch; }
 typedef SINT32 (PLAYER_ACCEPT_FUNCTION) ( SINT32 teulIndex, Auth::Dispatch* authPersona );
 
 // This function initializes the game servers communications to the auth

@@ -16,7 +16,7 @@
 
 SINT32 authPackAPP_FILE_CHECK(LOGICAL mode, UCHAR* data, SINT32 offset, APP_FILE_CHECK* request, SINT32 /*size*/)
 {
-	if (request == NULL)
+	if (PN_UNLIKELY(request == nullptr))
 		return 0;
 
 	offset = teulPackSINT32(mode,data,offset,&request->appID,0);
@@ -34,7 +34,7 @@ SINT32 authPackAPP_FILE_CHECK(LOGICAL mode, UCHAR* data, SINT32 offset, APP_FILE
 SINT32
 authPackARENA_REQ(LOGICAL mode, UCHAR* data, SINT32 offset, ARENA_REQ* request, SINT32 /*size*/)
 {
-	if (request == NULL)
+	if (PN_UNLIKELY(request == nullptr))
 		return 0;
 
 	offset = teulPackSINT32(mode,data,offset,&request->arenaID,0);
@@ -52,7 +52,7 @@ authPackARENA_REQ(LOGICAL mode, UCHAR* data, SINT32 offset, ARENA_REQ* request, 
 
 SINT32 authPackARENA_REQ2(LOGICAL mode, UCHAR* data, SINT32 offset, ARENA_REQ* request, SINT32 /*size*/)
 {
-	if (request == NULL)
+	if (PN_UNLIKELY(request == nullptr))
 		return 0;
 
 	offset = teulPackSINT32(mode,data,offset,&request->arenaID,0);
@@ -73,7 +73,7 @@ SINT32 authPackARENA_REQ2(LOGICAL mode, UCHAR* data, SINT32 offset, ARENA_REQ* r
 
 SINT32 authPackAPP_VERIFY(LOGICAL mode, UCHAR* data, SINT32 offset, APP_VERIFY* object, SINT32 /*size*/)
 {
-	if (object == NULL)
+	if (PN_UNLIKELY(object == nullptr))
 		return 0;
 
 	offset = teulPackSINT32(mode,data,offset,&object->arenaID,0);
@@ -88,9 +88,7 @@ SINT32 authPackAPP_VERIFY(LOGICAL mode, UCHAR* data, SINT32 offset, APP_VERIFY* 
 
 SINT32 authPackAPP_LAUNCH_REQ(LOGICAL mode, UCHAR* data, SINT32 offset, APP_LAUNCH_REQ* request, SINT32 /*size*/)
 {
-	UINT32 ignore;
-
-	if (request == NULL)
+	if (PN_UNLIKELY(request == nullptr))
 		return -EINVAL;
 
 	offset = teulPackVoid(mode,data,offset,&request->username,MAX_OLD_USERNAME);
@@ -109,7 +107,7 @@ SINT32 authPackAPP_LAUNCH_REQ(LOGICAL mode, UCHAR* data, SINT32 offset, APP_LAUN
 	offset = teulPackVoid(mode,data,offset,&(request->cdKey),request->cdKeySize);
 	request->cdKey[request->cdKeySize] = '\0';
 
-	ignore = (UINT32) request->ignoreMinorUpdates;
+	UINT32 ignore = (UINT32)request->ignoreMinorUpdates;
 	offset = teulPackUINT32(mode,data,offset,&ignore,0);
 	request->ignoreMinorUpdates = (LOGICAL) ignore;
 
@@ -118,9 +116,7 @@ SINT32 authPackAPP_LAUNCH_REQ(LOGICAL mode, UCHAR* data, SINT32 offset, APP_LAUN
 
 SINT32 authPackAPP_LAUNCH_REQ2(LOGICAL mode, UCHAR* data, SINT32 offset, APP_LAUNCH_REQ* request, SINT32 /*size*/)
 {
-	UINT32 ignore;
-
-	if (request == NULL)
+	if (PN_UNLIKELY(request == nullptr))
 		return -EINVAL;
 
 	offset = teulPackVoid(mode,data,offset,&request->username,MAX_OLD_USERNAME);
@@ -149,7 +145,7 @@ SINT32 authPackAPP_LAUNCH_REQ2(LOGICAL mode, UCHAR* data, SINT32 offset, APP_LAU
 
 	request->cdKey[request->cdKeySize] = '\0';
 
-	ignore = (UINT32) request->ignoreMinorUpdates;
+	UINT32 ignore = (UINT32) request->ignoreMinorUpdates;
 	offset = teulPackUINT32(mode,data,offset,&ignore,0);
 	request->ignoreMinorUpdates = (LOGICAL) ignore;
 
@@ -158,7 +154,7 @@ SINT32 authPackAPP_LAUNCH_REQ2(LOGICAL mode, UCHAR* data, SINT32 offset, APP_LAU
 
 SINT32 authPackAPP_LAUNCH(LOGICAL mode, UCHAR* data, SINT32 offset, APP_LAUNCH* object, SINT32 /*size*/)
 {
-	if (object == NULL)
+	if (PN_UNLIKELY(object == nullptr))
 		return -EINVAL;
 
 	offset = teulPackSINT32(mode,data,offset,&object->appID,0);
@@ -184,7 +180,7 @@ SINT32 authPackAPP_LAUNCH(LOGICAL mode, UCHAR* data, SINT32 offset, APP_LAUNCH* 
 
 SINT32 authPackSERVER_LOAD(LOGICAL mode, UCHAR* data, SINT32 offset, AUTH_SERVER_LOAD* object, SINT32 /*size*/)
 {
-	if (object == NULL)
+	if (PN_UNLIKELY(object == nullptr))
 		return -EINVAL;
 
 	offset = teulPackSINT32(mode,data,offset,&object->numPlayers,0);
@@ -197,17 +193,17 @@ SINT32 authPackSERVER_LOAD(LOGICAL mode, UCHAR* data, SINT32 offset, AUTH_SERVER
 void
 Auth::Dispatch::packer(unsigned int mode, ACTION_OBJECT* a)
 {
-	a->packer(mode, &m_customerID, 0) ;
-	a->packBytes(mode, m_callsign, sizeof(m_callsign)) ;
-	a->packer(mode, &m_clientIP, 0) ;
-	a->packer(mode, &m_OTP, 0) ;
-	a->packer(mode, &m_appVersion, 0) ;
-	a->packer(mode, &m_platform, 0) ;
+	a->packer(mode, &m_customerID, 0);
+	a->packBytes(mode, m_callsign, sizeof(m_callsign));
+	a->packer(mode, &m_clientIP, 0);
+	a->packer(mode, &m_OTP, 0);
+	a->packer(mode, &m_appVersion, 0);
+	a->packer(mode, &m_platform, 0);
 }
 
 SINT32 authPackGAME_INIT(LOGICAL mode, UCHAR* data, SINT32 offset, AUTH_GAME_INIT*init, SINT32 /*size*/)
 {
-	if (init==NULL)
+	if (PN_UNLIKELY(init == nullptr))
 		return 0;
 
 	offset = teulPackUINT32(mode,data,offset,&(init->arenaID),0);
@@ -218,12 +214,12 @@ SINT32 authPackGAME_INIT(LOGICAL mode, UCHAR* data, SINT32 offset, AUTH_GAME_INI
 	offset = teulPackUINT32(mode,data,offset,&(init->port),0);
 	offset = teulPackUINT32(mode,data,offset,&(init->ipAddress),0);
 
-	offset = teulPackVoid(mode, data, offset, init->hello, 16) ;
+	offset = teulPackVoid(mode, data, offset, init->hello, 16);
 
 	return offset;
 }
 
-//This function packs/unpacks the hello acknowledgement
+//This function packs/unpacks the hello acknowledgment
 SINT32 authPackGAME_ACK(LOGICAL mode, UCHAR* data, SINT32 offset, AUTH_GAME_ACK* object, SINT32 /*size*/)
 {
 	return teulPackUINT32(mode,data,offset,&(object->gotcha),0);

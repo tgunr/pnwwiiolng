@@ -13,7 +13,7 @@
 
 #include "chat/chatDefines.h"
 
-static char buffer[4][MAX_MESSAGE_LENGTH+1] ;
+static char buffer[4][MAX_MESSAGE_LENGTH+1];
 
 //////////////////////////////////////////////////////////////////////
 // Build a temporary string, basically a wrapper for sprintf that
@@ -22,20 +22,20 @@ static char buffer[4][MAX_MESSAGE_LENGTH+1] ;
 const char*
 chatMakeTempString(const char* fmt, ...)
 {
-	va_list args ;
+	va_list args;
 
-	static int bufNo = 0 ;
+	static int bufNo = 0;
 	if ( bufNo > 3 )
-		bufNo = 0 ;
+		bufNo = 0;
 
-	buffer[bufNo][0] = 0 ;
+	buffer[bufNo][0] = 0;
 
 	if ( fmt != NULL )
 	{
-		va_start(args, fmt) ;
-		vsnprintf(buffer[bufNo], MAX_MESSAGE_LENGTH, fmt, args) ;
-		va_end(args) ;
+		va_start(args, fmt);
+		vsnprintf(buffer[bufNo], MAX_MESSAGE_LENGTH, fmt, args);
+		va_end(args);
 	}
 
-	return buffer[bufNo++] ;
+	return buffer[bufNo++];
 }

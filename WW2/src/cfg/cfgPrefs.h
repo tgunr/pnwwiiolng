@@ -88,7 +88,7 @@ extern const char* cfgPrefsGetString(const char* key, const char* defaultValue);
 
 // save/restore view properties; what determines what property(s) to save/restore
 // see SAVE_VIEW_* defines above
-namespace phui { class View ; class Message ; }
+namespace phui { class View; class Message; }
 
 extern void cfgPrefsRestoreToView(phui::View* v, int what = SAVE_VIEW_VALUE);
 extern void cfgPrefsSaveFromView(phui::View* v, int what = SAVE_VIEW_VALUE);

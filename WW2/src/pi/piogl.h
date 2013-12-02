@@ -415,7 +415,7 @@ struct VERTEXSOURCE
 struct INDEXSOURCE
 {
 	UINT32 fvf;
-} ;
+};
 
 enum TEXTURETYPE
 {
@@ -429,7 +429,7 @@ enum TEXTURETYPE
 	TEXTURE_TGA,
 	TEXTURE_PNG,
 	MAX_TEXTURE_TYPES
-} ;
+};
 
 struct TEXTURE
 {
@@ -472,7 +472,7 @@ struct TEXTURE
 	bool istga() {return type == TEXTURE_TGA;}
 #endif
 
-} ;
+};
 
 struct TEXTURE3D
 {
@@ -487,7 +487,7 @@ struct TEXTURE3D
 	UINT32                  timeaccessed;
 	SINT32                  numuses;
 
-} ;
+};
 
 struct FLOATINT
 {
@@ -497,7 +497,7 @@ struct FLOATINT
 		SINT32	i;
 	};
 
-} ;
+};
 
 static inline SINT32 FloatToInt(FLOAT32 f)
 {
@@ -546,7 +546,7 @@ enum piTSS_COMBINE_TEXTURE
 	piTSS_DOT3_RGB		= GL_DOT3_RGB_ARB,		// Use for RGB only
 	piTSS_DOT3_RGBA		= GL_DOT3_RGBA_ARB		// Use for RGB only
 
-} ;
+};
 
 // Source 'n' RGB/ALPHA
 enum piTSS_SOURCE_RGB
@@ -556,7 +556,7 @@ enum piTSS_SOURCE_RGB
 	piTSS_PRIMARY_COLOR		= GL_PRIMARY_COLOR_ARB,
 	piTSS_PREVIOUS			= GL_PREVIOUS_ARB
 
-} ;
+};
 
 // Operand 'n' RGB/ALPHA
 enum piTSS_OPERAND_RGB
@@ -566,7 +566,7 @@ enum piTSS_OPERAND_RGB
 	piTSS_SRC_ALPHA					= GL_SRC_ALPHA,				// Use for RGB and ALPHA
 	piTSS_SRC_ONE_MINUS_SRC_ALPHA	= GL_ONE_MINUS_SRC_ALPHA	// Use for RGB and ALPHA
 
-} ;
+};
 
 // Texture stage states combine modes
 enum piTEXTURESTAGESTATETYPE
@@ -594,7 +594,7 @@ enum piTEXTURESTAGESTATETYPE
 	piTSS_MIPFILTER,
 	piTSS_ENABLE_TEXTURE2D
 
-} ;
+};
 
 #define piTA_SELECTMASK        0x0000000f  // mask for arg selector
 #define piTA_DIFFUSE           0x00000000  // select diffuse color
@@ -614,7 +614,7 @@ enum piTEXTUREMAGFILTER
 	piTFG_POINT						= GL_NEAREST,	// nearest
 	piTFG_LINEAR					= GL_LINEAR		// linear interpolation
 
-} ;
+};
 
 enum piTEXTUREMINFILTER
 {
@@ -626,7 +626,7 @@ enum piTEXTUREMINFILTER
 	piTFN_NEAREST_MIPMAP_LINEAR		= GL_NEAREST_MIPMAP_LINEAR,		// MIN: nearest, MIP: linear
 	piTFN_LINEAR_MIPMAP_LINEAR		= GL_LINEAR_MIPMAP_LINEAR		// MIN: linear, MIP: linear
 
-} ;
+};
 
 // MIP filtering is not available directly; it is combined with the MIN filter (see above)
 // We maintain these values to keep the changes in code minimal
@@ -636,7 +636,7 @@ enum piTEXTUREMIPFILTER
 	piTFP_POINT						= GL_NEAREST,	// nearest
 	piTFP_LINEAR					= GL_LINEAR		// linear interpolation
 
-} ;
+};
 
 enum piPRIMITIVETYPE
 {
@@ -647,7 +647,7 @@ enum piPRIMITIVETYPE
 	piPT_TRIANGLESTRIP	= GL_TRIANGLE_STRIP,
 	piPT_TRIANGLEFAN	= GL_TRIANGLE_FAN
 
-} ;
+};
 
 // Vertex types
 enum piVERTEXTYPE
@@ -660,7 +660,7 @@ enum piVERTEXTYPE
 	piVT_3DVERTEX		= 4,
 	piVT_TVERTEX        = 5 // Tangent vertex
 
-} ;
+};
 
 struct piVECTOR
 {
@@ -755,7 +755,7 @@ struct piUNIFIED_VERTEX
 	FLOAT32		nx, ny, nz;
 	UINT32		color;
 	FLOAT32		tu, tv;
-} ;
+};
 typedef struct piUNIFIED_VERTEX piCVERTEX;
 
 struct piGVERTEX
@@ -792,7 +792,7 @@ struct piVERTEX_COLOR
 	UINT32 color;
 	UINT32 specular;
 
-} ;
+};
 
 #if platOS == OS_MACOS
 #pragma cpp_extensions on // for nameless union
@@ -874,7 +874,7 @@ public:
 		w = W;
 	}
 
-} ;
+};
 
 // Loading 3ds file information
 
@@ -894,7 +894,7 @@ public:
 		a = A;
 	}
 
-} ;
+};
 
 // piPIXELFORMAT
 class piPIXELFORMAT
@@ -934,7 +934,7 @@ public:
 		UINT32	dwRGBAlphaBitMask;	// mask for alpha channel
 	};
 
-} ;
+};
 
 // piSURFACEDESC
 struct piSURFACEDESC
@@ -988,14 +988,14 @@ struct piRGBQUAD
 	UCHAR	rgbGreen;
 	UCHAR	rgbBlue;
 	UCHAR	rgbReserved;
-} ;
+};
 
 struct piRGBTRIPLE
 {
 	UCHAR rgbtRed;
 	UCHAR rgbtGreen;
 	UCHAR rgbtBlue;
-} ;
+};
 
 struct piBITMAPINFOHEADER
 {

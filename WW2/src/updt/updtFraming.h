@@ -10,15 +10,15 @@
 
 struct UpdateFraming
 {
-	enum { _SMALL, _MED, _LARGE, _MAX } ;
-	enum { _MODES = 5 } ;
+	enum { _SMALL, _MED, _LARGE, _MAX };
+	enum { _MODES = 5 };
 
-	UINT32	maxVehicles ;				//!< Maximum vehicles player can see: total.
-	UINT32	packetSize ;				//!< Which packet size to use.
-	UINT32	updateInterval ;			//!< MS between updates for this rate
-	UINT32	vehiclesPerFrame ;			//!< Maximum vehicles per update.
-	const	char* description ;
+	UINT32	maxVehicles;				//!< Maximum vehicles player can see: total.
+	UINT32	packetSize;				//!< Which packet size to use.
+	UINT32	updateInterval;			//!< MS between updates for this rate
+	UINT32	vehiclesPerFrame;			//!< Maximum vehicles per update.
+	const	char* description;
 
-	size_t maxVehiclesPerFrame() const { return vehiclesPerFrame ; }
-} ;
+	size_t maxVehiclesPerFrame() const { return vehiclesPerFrame; }
+};
 

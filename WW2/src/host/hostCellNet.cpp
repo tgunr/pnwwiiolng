@@ -28,14 +28,14 @@
 #include "wwii/wwiiThreads.h"
 
 #include <unordered_map>
-typedef std::unordered_map<UINT32, bool> SYNCHED_VEHICLES ;
-static SYNCHED_VEHICLES g_synched ;
+typedef std::unordered_map<UINT32, bool> SYNCHED_VEHICLES;
+static SYNCHED_VEHICLES g_synched;
 
-static Teul::Packet vehicleBroadcasts(0, Comm::CallbackX, BCAST_VEH_UPDATE_Y) ;
-static UINT32 numberOfVehiclesPending = 0 ;
-static UINT32 maxSize = 0 ;
+static Teul::Packet vehicleBroadcasts(0, Comm::CallbackX, BCAST_VEH_UPDATE_Y);
+static UINT32 numberOfVehiclesPending = 0;
+static UINT32 maxSize = 0;
 
-bool g_clustered = false ;
+bool g_clustered = false;
 
 //////////////////////////////////////////////////////////////////////
 // Receive a remove list from a remote cell host
@@ -43,20 +43,20 @@ bool g_clustered = false ;
 extern SINT32
 cellVehicleRemoval(ACTION_OBJECT* const a)
 {
-	const UINT32 numUpdates = a->sizeInBytes() / sizeof(UINT32) ;
-	UINT32* data = (UINT32*)a->localRawData ;
+	const UINT32 numUpdates = a->sizeInBytes() / sizeof(UINT32);
+	UINT32* data = (UINT32*)a->localRawData;
 
-	for ( UINT32 i = 0 ; i < numUpdates ; ++i )
+	for ( UINT32 i = 0; i < numUpdates; ++i )
 	{
-		const UINT32 vehIndex = *(data++) ;
-		const UINT32 exitCode = *(data++) ;
-		hostRemoveRemoteVehicle(vehIndex, (PLAYER_EXIT_CODE)exitCode) ;
+		const UINT32 vehIndex = *(data++);
+		const UINT32 exitCode = *(data++);
+		hostRemoveRemoteVehicle(vehIndex, (PLAYER_EXIT_CODE)exitCode);
 	}
 
 	dbugLog(_FLD, "cell:%s removed %u remote vehicles"
-					, teulGetAddress(a->fromAddress), numUpdates) ;
+					, teulGetAddress(a->fromAddress), numUpdates);
 
-	return a->offset ;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -65,19 +65,19 @@ cellVehicleRemoval(ACTION_OBJECT* const a)
 UINT32
 hostReceiveVehicleUpdates(const unsigned char* const input, const UINT32 bytes, const UINT32 source)
 {
-	const unsigned char* cur = input ;
-	const unsigned char* const end = cur + bytes ;
-	UINT32 count = 0 ;
+	const unsigned char* cur = input;
+	const unsigned char* const end = cur + bytes;
+	UINT32 count = 0;
 	while ( cur < end )
 	{
-		SINT32 size = *((SINT32*)cur) ;
-		cur = cur + sizeof(SINT32) ;
-		commRecvVehicleUpdate(source, cur) ;
-		cur += size ;
-		++count ;
+		SINT32 size = *((SINT32*)cur);
+		cur = cur + sizeof(SINT32);
+		commRecvVehicleUpdate(source, cur);
+		cur += size;
+		++count;
 	}
 
-	return count ;
+	return count;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -86,39 +86,39 @@ hostReceiveVehicleUpdates(const unsigned char* const input, const UINT32 bytes, 
 bool
 hostNeedVehicleFirstTime(UINT32 vehicleID)
 {
-	bool& current = g_synched[vehicleID] ;
-	const bool result = !current ;
-	current = true ;
-	return result ;
+	bool& current = g_synched[vehicleID];
+	const bool result = !current;
+	current = true;
+	return result;
 }
 
 void
 hostPushVehicleBroadcasts()
 {
 	if ( vehicleBroadcasts.empty() == true )
-		return ;
+		return;
 
 	if ( !g_clustered )
 	{
 		if ( vehicleBroadcasts.empty() == false )
-			vehicleBroadcasts.reset() ;
-		numberOfVehiclesPending = 0 ;
-		return ;
+			vehicleBroadcasts.reset();
+		numberOfVehiclesPending = 0;
+		return;
 	}
 
-	const bool sent = vehicleBroadcasts.send(updateBcastSend) > 0 ;
+	const bool sent = vehicleBroadcasts.send(updateBcastSend) > 0;
 	if ( sent == false )
 	{
-		threadLog(_FLA, "Unable to broadcast update of size %d to cellnet", vehicleBroadcasts.packetSizeBytes()) ;
+		threadLog(_FLA, "Unable to broadcast update of size %d to cellnet", vehicleBroadcasts.packetSizeBytes());
 	}
 	else
 	{
 #ifdef DEV_BUILD
-		threadLog(_FLD, "pushed %u vbs in %u bytes. maxBits=%u, avgBits=%u", numberOfVehiclesPending, vehicleBroadcasts.packetSizeBytes(), maxSize * 8, vehicleBroadcasts.packetSizeBits() / numberOfVehiclesPending) ;
+		threadLog(_FLD, "pushed %u vbs in %u bytes. maxBits=%u, avgBits=%u", numberOfVehiclesPending, vehicleBroadcasts.packetSizeBytes(), maxSize * 8, vehicleBroadcasts.packetSizeBits() / numberOfVehiclesPending);
 #endif
 	}
-	vehicleBroadcasts.reset() ;
-	numberOfVehiclesPending = 0 ;
+	vehicleBroadcasts.reset();
+	numberOfVehiclesPending = 0;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -129,29 +129,29 @@ hostSendVehicleBroadcast(UCHAR* buffer, SINT32 size)
 {
 	if ( buffer == NULL )
 	{
-		LogAbort("called hostSendVehicleBroadcast with NULL") ;
+		LogAbort("called hostSendVehicleBroadcast with NULL");
 	}
 	if ( size == 0 )
 	{
-		LogAbort("called hostSendVehicleBroadcast with 0 size") ;
+		LogAbort("called hostSendVehicleBroadcast with 0 size");
 	}
 
 	if ( !g_clustered )
-		return false ;
+		return false;
 
 	// Round size up to a multiple of 32.
-	size = ((size & ~((sizeof(size)*8)-1)) + sizeof(size)) / 8 ;
+	size = ((size & ~((sizeof(size)*8)-1)) + sizeof(size)) / 8;
 
 	if ( (UINT32)size > maxSize )
-		maxSize = size ;
+		maxSize = size;
 
 	if ( vehicleBroadcasts.packetSizeBytes() + size >= 4000 )
-		hostPushVehicleBroadcasts() ;
+		hostPushVehicleBroadcasts();
 
-	vehicleBroadcasts.append(buffer, size) ;
-	++numberOfVehiclesPending ;
+	vehicleBroadcasts.append(buffer, size);
+	++numberOfVehiclesPending;
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -163,9 +163,9 @@ hostForceFirstTimeUpdates()
 	if ( !g_clustered )
 		return;
 
-	g_synched.clear() ;
-	Teul::Packet outgoing(0, Comm::CallbackX, RESYNC_VEHICLES_Y) ;
-	outgoing.send(updateBcastSend) ;
+	g_synched.clear();
+	Teul::Packet outgoing(0, Comm::CallbackX, RESYNC_VEHICLES_Y);
+	outgoing.send(updateBcastSend);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -178,36 +178,36 @@ hostQueueVehicleRemove(UINT32 vehIndex, UCHAR exitCode)
 	if ( !g_clustered )
 		return;
 
-	static Teul::Packet* outgoing = NULL ;
-	static UINT32 vehiclesQueued = 0 ;
+	static Teul::Packet* outgoing = NULL;
+	static UINT32 vehiclesQueued = 0;
 
 	if ( vehIndex == 0 && vehiclesQueued == 0 )
-		return ;
+		return;
 
 	if ( vehIndex != 0 )
 	{
 		if ( outgoing == NULL )
 		{
-			outgoing = new Teul::Packet(0, Comm::CallbackX, BCAST_VEH_REMOVE_Y) ;
-			outgoing->setUnencrypted() ;
+			outgoing = new Teul::Packet(0, Comm::CallbackX, BCAST_VEH_REMOVE_Y);
+			outgoing->setUnencrypted();
 		}
 
-		outgoing->append(vehIndex) ;
-		outgoing->append(exitCode) ;
+		outgoing->append(vehIndex);
+		outgoing->append(exitCode);
 
-		g_synched.erase(vehIndex) ;
-		++vehiclesQueued ;
+		g_synched.erase(vehIndex);
+		++vehiclesQueued;
 
-		return ;
+		return;
 	}
 
-	dbugLog(_FLD, "cell sending %u vehicle removals", vehiclesQueued) ;
+	dbugLog(_FLD, "cell sending %u vehicle removals", vehiclesQueued);
 
-	outgoing->send(updateBcastSend) ;
+	outgoing->send(updateBcastSend);
 
-	delete outgoing ;
-	outgoing = NULL ;
+	delete outgoing;
+	outgoing = NULL;
 
-	vehiclesQueued = 0 ;
+	vehiclesQueued = 0;
 }
 

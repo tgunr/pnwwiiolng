@@ -658,7 +658,7 @@ void SuperCellMapView::SetScale(float numsc)
 			pany = strat->PosY();
 			count = 1;
 
-			StratDB::StratObject::ChildList const& children = strat->ChildStratObjects() ;
+			StratDB::StratObject::ChildList const& children = strat->ChildStratObjects();
 			StratDB::StratObject::ChildList::const_iterator it;
 			for(it = children.begin() ; it != children.end() ; ++it)
 			{
@@ -681,7 +681,7 @@ void SuperCellMapView::SetScale(float numsc)
 			leftx = rightx = strat->PosX();
 			topy = bottomy = strat->PosY();
 
-			StratDB::StratObject::ChildList const& children = strat->ChildStratObjects() ;
+			StratDB::StratObject::ChildList const& children = strat->ChildStratObjects();
 			StratDB::StratObject::ChildList::const_iterator it;
 			for(it = children.begin() ; it != children.end() ; ++it)
 			{
@@ -882,7 +882,7 @@ SuperCellMapView::Renderer::LoadThread::LoadThread(Renderer* r)
 	, _done(false)
 	, _cells()
 {
-	_cells.reserve(64) ;
+	_cells.reserve(64);
 }
 
 SuperCellMapView::Renderer::LoadThread::~LoadThread()
@@ -914,11 +914,11 @@ void SuperCellMapView::Renderer::LoadThread::RemoveRendererSuperCells(SuperCellM
 	{
 		if( (*it)->renderer == r)
 		{
-			*it = _cells.back() ;
-			_cells.pop_back() ;
+			*it = _cells.back();
+			_cells.pop_back();
 		}
 		else
-			++it ;
+			++it;
 	}
 }
 

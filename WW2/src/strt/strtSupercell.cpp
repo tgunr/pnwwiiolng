@@ -10,38 +10,38 @@ Supercell::~Supercell()
 {
 	if ( cps )
 	{
-		delete [] cps ;
-		cps = NULL ;
+		delete [] cps;
+		cps = NULL;
 	}
 	if ( facilities )
 	{
-		delete [] facilities ;
-		facilities = NULL ;
+		delete [] facilities;
+		facilities = NULL;
 	}
 	if ( objects )
 	{
-		memFree(objects) ;
-		objects = NULL ;
+		memFree(objects);
+		objects = NULL;
 	}
 	if ( links )
 	{
-		memFree(links) ;
-		links = NULL ;
+		memFree(links);
+		links = NULL;
 	}
 	if ( index )
 	{
-		memFree(index) ;
-		links = NULL ;
+		memFree(index);
+		links = NULL;
 	}
 	if ( facilityTable )
 	{
-		memFree(facilityTable) ;
-		facilityTable = NULL ;
+		memFree(facilityTable);
+		facilityTable = NULL;
 	}
 	if ( buildingTable )
 	{
-		buildingTable->destroy(buildingTable) ;
-		buildingTable = NULL ;
+		buildingTable->destroy(buildingTable);
+		buildingTable = NULL;
 	}
 }
 

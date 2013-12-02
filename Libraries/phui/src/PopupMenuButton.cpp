@@ -66,7 +66,7 @@ void PopupMenuButton::DrawSelf()
 		
 		float fontheight = ctx->FontHeight(_font);
 		float x = XMARGIN;
-		float y = (_height - fontheight) / 2.0f ;
+		float y = (_height - fontheight) / 2.0f;
 		
 		ctx->SetColor(_textcolor[0],_textcolor[1],_textcolor[2],_textcolor[3]);
 		ctx->EnableTexture();

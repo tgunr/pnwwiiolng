@@ -32,10 +32,10 @@ public:
 
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
 	{
-		DBThread::Do(DBThread::Default, "DELETE FROM wwii_persona WHERE playerid = %u", player.playerID()) ;
-		player.message(LSTR_SYSTEM, LSTR_PERSONAS_NUKED) ;
+		DBThread::Do(DBThread::Default, "DELETE FROM wwii_persona WHERE playerid = %u", player.playerID());
+		player.message(LSTR_SYSTEM, LSTR_PERSONAS_NUKED);
 	}
-} dotNukePersonas ;
+} dotNukePersonas;
 
 //////////////////////////////////////////////////////////////////////
 
@@ -47,43 +47,43 @@ public:
 
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
 	{
-		static UINT32 lastRequest = 0 ;
-		static UINT32 lastRequester = 0 ;
-		static UINT32 lastIssued = 0 ;
+		static UINT32 lastRequest = 0;
+		static UINT32 lastRequester = 0;
+		static UINT32 lastIssued = 0;
 
-		static const UINT32 REQUEST_INTERVAL = 30 ;
+		static const UINT32 REQUEST_INTERVAL = 30;
 
 		if ( teulTime() - lastIssued < 300 )
 		{
-			player.message(LSTR_CAUTION, LSTR_RESETSTRAT_5MINUTE_LIMIT) ;
-			return ;
+			player.message(LSTR_CAUTION, LSTR_RESETSTRAT_5MINUTE_LIMIT);
+			return;
 		}
 
 		if ( !player.isPlaynet() && playerIndex.size() > 1 )
 		{
 			if ( teulTime() - lastRequest > REQUEST_INTERVAL )
 			{
-				lastRequest = teulTime() ;
-				lastRequester = player.playerID() ;
+				lastRequest = teulTime();
+				lastRequester = player.playerID();
 
-				player.message(LSTR_NONE, LSTR_RESETSTRAT_ACK, command()) ;
-				chatSystemMessage(LSTR_RESETSTRAT_SYS, player.callsign()) ;
+				player.message(LSTR_NONE, LSTR_RESETSTRAT_ACK, command());
+				chatSystemMessage(LSTR_RESETSTRAT_SYS, player.callsign());
 
-				return ;
+				return;
 			}
 			else if ( player.playerID() == lastRequester )
 			{
-				player.message(LSTR_CAUTION, LSTR_RESETSTRAT_SELF_APPROVAL) ;
-				return ;
+				player.message(LSTR_CAUTION, LSTR_RESETSTRAT_SELF_APPROVAL);
+				return;
 			}
 
-			chatSystemMessage(LSTR_RESETSTRAT_APPROVED, player.callsign()) ;
+			chatSystemMessage(LSTR_RESETSTRAT_APPROVED, player.callsign());
 		}
 
-		player.sendStratCommand("restart", "", false) ;
-		lastIssued = teulTime() ;
+		player.sendStratCommand("restart", "", false);
+		lastIssued = teulTime();
 	}
-} dotResetStrat ;
+} dotResetStrat;
 
 #endif //BETA_RELEASE
 

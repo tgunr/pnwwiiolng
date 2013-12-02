@@ -11,7 +11,7 @@
 
 #include "chat/chatManagementTypes.h"
 
-using namespace Chat ;
+using namespace Chat;
 
 //////////////////////////////////////////////////////////////////////
 // Pack the version 2 management structure
@@ -19,7 +19,7 @@ using namespace Chat ;
 SINT32
 ManagementLogin2::packer(LOGICAL mode, ACTION_OBJECT* a)
 {
-	a->packer(mode, &m_version) ;
-	a->packer(mode, &m_wantHandle) ;
-	return a->offset ;
+	a->packer(mode, &m_version);
+	a->packer(mode, &m_wantHandle);
+	return a->offset;
 }

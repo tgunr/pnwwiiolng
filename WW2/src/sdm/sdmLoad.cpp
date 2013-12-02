@@ -152,7 +152,7 @@ _findCP(SINT32 ox, SINT32 oy, SINT32 id)
 {
 	CPWITHID* cpw;
 
-	for ( cpw = cps ; cpw != NULL ; cpw = cpw->next )
+	for ( cpw = cps; cpw != NULL; cpw = cpw->next )
 	{
 		if ( cpw->ox == ox && cpw->oy == oy && cpw->id == id && cpw->bIsCurrent )
 			return cpw->cp_oid;
@@ -207,7 +207,7 @@ dbseLoadCP(CP* cp)
 	ox = cp->posx / 800;
 	oy = cp->posy / 800;
 
-	for ( newCP = cps ; newCP != NULL ; newCP = newCP->next )
+	for ( newCP = cps; newCP != NULL; newCP = newCP->next )
 	{
 		if ( newCP->bIsCurrent )
 			continue;
@@ -225,7 +225,7 @@ dbseLoadCP(CP* cp)
 	}
 	else
 	{
-		newCP->bIsInDB = TRUE ;	// Innocent until proven guilty
+		newCP->bIsInDB = TRUE;	// Innocent until proven guilty
 		if ( newCP->owner != cp->country )
 		{
 			newCP->owner = (WWII_COUNTRY)cp->country;
@@ -339,7 +339,7 @@ _findFacility(SINT32 ox, SINT32 oy, SINT32 id)
 {
 FACWITHID* facw;
 
-	for ( facw = facs ; facw != NULL ; facw = facw->next )
+	for ( facw = facs; facw != NULL; facw = facw->next )
 	{
 		if ( facw->ox == ox && facw->oy == oy && facw->id == id )
 			return facw->fac_oid;
@@ -353,7 +353,7 @@ _findFacilityBySC(SINT32 sx, SINT32 sy, SINT32 id)
 {
 FACWITHID* facw;
 
-	for ( facw = facs ; facw != NULL ; facw = facw->next )
+	for ( facw = facs; facw != NULL; facw = facw->next )
 	{
 		if ( facw->sx == sx && facw->sy == sy && facw->id == id )
 			return facw->fac_oid;
@@ -411,7 +411,7 @@ dbseLoadFacility(FACILITY* fac)
 	ox = fac->posx / 800;
 	oy = fac->posy / 800;
 
-	for ( newFac = facs ; newFac != NULL ; newFac = newFac->next )
+	for ( newFac = facs; newFac != NULL; newFac = newFac->next )
 	{
 		if ( newFac->bIsCurrent )
 			continue;
@@ -551,7 +551,7 @@ _findBuilding(SINT32 ox, SINT32 oy, SINT32 id)
 {
 	BUILDWITHID* buildw;
 
-	for ( buildw = builds ; buildw != NULL ; buildw = buildw->next )
+	for ( buildw = builds; buildw != NULL; buildw = buildw->next )
 	{
 		if ( buildw->ox == ox && buildw->oy == oy && buildw->object.oid.id == id )
 			return buildw;
@@ -660,7 +660,7 @@ dbseSaveBUILDING(BUILDWITHID* buildw)
 static bool
 _addLink(SINT32 ox, SINT32 oy, SINT32 id)
 {
-	for ( BUILDWITHID* b = builds ; b != NULL ; b = b->next )
+	for ( BUILDWITHID* b = builds; b != NULL; b = b->next )
 	{
 		SINT32 box = b->object.posx / 800;
 		SINT32 boy = b->object.posy / 800;
@@ -668,11 +668,11 @@ _addLink(SINT32 ox, SINT32 oy, SINT32 id)
 		{
 			SINT32 sx = box >> 4;
 			SINT32 sy = boy >> 4;
-			for ( FACWITHID* f = facs ; f != NULL ; f = f->next )
+			for ( FACWITHID* f = facs; f != NULL; f = f->next )
 			{
 				if ( f->sx == sx && f->sy == sy && f->id == b->object.pid.id )
 				{
-					for ( CPWITHID* c = cps ; c != NULL ; c = c->next )
+					for ( CPWITHID* c = cps; c != NULL; c = c->next )
 					{
 						if ( c->ox == f->fac.cpid.cell.ox && c->oy == f->fac.cpid.cell.oy && c->id == f->fac.cpid.id )
 						{
@@ -680,10 +680,10 @@ _addLink(SINT32 ox, SINT32 oy, SINT32 id)
 							return true;
 						}
 					}
-					printf("No cp\n") ; return false;
+					printf("No cp\n"); return false;
 				}
 			}
-			printf("No fac\n") ; return false;
+			printf("No fac\n"); return false;
 		}
 	}
 	printf("No building\n");
@@ -861,7 +861,7 @@ dbseSaveIndexChanges()
 	start = _statement + sprintf(_statement, "REPLACE INTO ids_cp(cp_oid,cp_ox,cp_oy,cp_id,name)VALUES");
 	p = start;
 
-	for ( cpw = cps ; cpw != NULL ; cpw = cpw->next )
+	for ( cpw = cps; cpw != NULL; cpw = cpw->next )
 	{
 		if ( !cpw->bIsInDB && cpw->bIsCurrent )
 		{
@@ -877,7 +877,7 @@ dbseSaveIndexChanges()
 	start = _statement + sprintf(_statement, "REPLACE INTO ids_facility(facility_oid,facility_ox,facility_oy,facility_id,name)VALUES");
 	p = start;
 
-	for ( facw = facs ; facw != NULL ; facw = facw->next )
+	for ( facw = facs; facw != NULL; facw = facw->next )
 	{
 		if ( !facw->bIsInDB && facw->bIsCurrent )
 		{
@@ -926,7 +926,7 @@ dbseResolveReferences()
 	title("~~~ Loaded data ~~~");
 
 	title("~~~ resolving links ~~~");
-	for ( dlinkw = dlinks ; dlinkw != NULL ; dlinkw = dlinkw->next )
+	for ( dlinkw = dlinks; dlinkw != NULL; dlinkw = dlinkw->next )
 	{
 		if ( !_addLink(dlinkw->object.startDepotId.cell.ox, dlinkw->object.startDepotId.cell.oy, dlinkw->object.startDepotId.id) )
 			printf("no cp for %d.%d.%d %s\n", dlinkw->object.startDepotId.cell.ox, dlinkw->object.startDepotId.cell.oy, dlinkw->object.startDepotId.id, dlinkw->object.name);
@@ -934,7 +934,7 @@ dbseResolveReferences()
 
 	title("~~~ saving cps ~~~");
 	_begin("cp");
-	for ( cpw = cps ; cpw != NULL ; cpw = cpw->next )
+	for ( cpw = cps; cpw != NULL; cpw = cpw->next )
 	{
 		dbseSaveCP(cpw);
 	}
@@ -943,7 +943,7 @@ dbseResolveReferences()
 
 	title("~~~ saving facilities ~~~");
 	_begin("facility");
-	for ( facw = facs ; facw != NULL ; facw = facw->next )
+	for ( facw = facs; facw != NULL; facw = facw->next )
 	{
 		dbseSaveFACILITY(facw);
 	}
@@ -952,7 +952,7 @@ dbseResolveReferences()
 
 	title("~~~ saving buildings ~~~");
 	_begin("object");
-	for ( buildw = builds ; buildw != NULL ; buildw = buildw->next )
+	for ( buildw = builds; buildw != NULL; buildw = buildw->next )
 	{
 		dbseSaveBUILDING(buildw);
 	}
@@ -961,7 +961,7 @@ dbseResolveReferences()
 
 	title("~~~ saving depot links ~~~");
 	_begin("link");
-	for ( dlinkw = dlinks ; dlinkw != NULL ; dlinkw = dlinkw->next )
+	for ( dlinkw = dlinks; dlinkw != NULL; dlinkw = dlinkw->next )
 	{
 		dbseSaveDEPOT_LINK(dlinkw);
 	}
@@ -1084,7 +1084,7 @@ _loadIndex(const char* type
 
 		printf("OK\r\n");
 	}
-	catch (std::exception& e) { fprintf(stderr, "%s: %s\n", __FUNCTION__, e.what()) ; }
+	catch (std::exception& e) { fprintf(stderr, "%s: %s\n", __FUNCTION__, e.what()); }
 }
 
 void

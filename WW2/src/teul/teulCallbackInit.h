@@ -26,6 +26,6 @@ namespace Teul
 
 		UCHAR		callX;			//! X position in the callback matrix.
 		UCHAR		callY;			//! Y position in the callback matrix.
-	} ;
+	};
 
 } // namespace Teul

@@ -9,15 +9,15 @@
 
 namespace Auth
 {
-struct ClientData ;
+struct ClientData;
 
 	namespace Queue
 	{
-		extern bool AddPlayer(UINT32 arenaID, ClientData* cdata, bool premium) ;
-		extern bool RemovePlayer(UINT32 arenaID, ClientData* cdata, bool premium, bool enteredGame) ;
+		extern bool AddPlayer(UINT32 arenaID, ClientData* cdata, bool premium);
+		extern bool RemovePlayer(UINT32 arenaID, ClientData* cdata, bool premium, bool enteredGame);
 
-		extern ClientData* GetNextPlayer(UINT32 arenaID) ;
+		extern ClientData* GetNextPlayer(UINT32 arenaID);
 
-		extern void ProcessQueues() ;
+		extern void ProcessQueues();
 	}
 }

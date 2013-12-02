@@ -331,7 +331,7 @@ enum WW2_FUNC_CATEGORIES
 	WW2_FUNC_CATEGORY_EZ,
 
 	WW2_FUNC_NUM_CATEGORIES
-} ;
+};
 // tolua_end
 
 // Function flags

@@ -14,7 +14,7 @@ namespace Parse
 		FY_, // friendly country
 		EY_, // enemy country
 		MAX_COUNTRY_CODES
-	} ;
+	};
 
 }
 

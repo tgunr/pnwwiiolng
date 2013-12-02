@@ -7,7 +7,7 @@
 #include "mn/mngopt.h"
 
 // Used to build fully-qualified domain names, primarily auth.
-char RegionSuffix[512] = ".playnet.com" ;
+char RegionSuffix[512] = ".playnet.com";
 
 enum key_TYPE
 {
@@ -21,14 +21,14 @@ enum key_TYPE
 	EDOUBLE,
 	ESTRING
 
-} ;
+};
 
 struct KEY
 {
 	char*		key;
 	key_TYPE	ktype;
 
-} ;
+};
 
 //  lowercase ONLY!
 static KEY	vars[]={{"help", ENULL},
@@ -106,21 +106,21 @@ static char* _skipFilename(const char* ptr)
 	if ( *ptr == '"' )
 	{
 		while ( *ptr == '"' )
-			++ptr ;
-		ptr = strchr(ptr, '"') ;
+			++ptr;
+		ptr = strchr(ptr, '"');
 		while ( ptr && *ptr == '"' )
-			++ptr ;
+			++ptr;
 	}
 	else
-		ptr = strchr(ptr, ' ') ;
+		ptr = strchr(ptr, ' ');
 
 	if ( ptr == NULL )
-		return NULL ;
+		return NULL;
 
 	while ( *ptr == ' ' )
-		++ptr ;
+		++ptr;
 
-	return (char*)ptr ;
+	return (char*)ptr;
 }
 
 LOGICAL mngoptParse(char* InputLine)
@@ -130,19 +130,19 @@ LOGICAL mngoptParse(char* InputLine)
 	int		i;
 
 #if platOS == OS_WIN32
-	ptr = _skipFilename(GetCommandLineA()) ;
+	ptr = _skipFilename(GetCommandLineA());
 #else
-	ptr = _skipFilename(GetCommandLine()) ;
+	ptr = _skipFilename(GetCommandLine());
 #endif
 
 	if ( ptr == NULL )
-		return TRUE ;
+		return TRUE;
 	if ( *ptr != '-' && *ptr != '/' )
-		return TRUE ;
+		return TRUE;
 
-	strncpy(CommandLine, ptr, 511) ;
+	strncpy(CommandLine, ptr, 511);
 
-	ptr = CommandLine ;
+	ptr = CommandLine;
     sep[0] = *ptr;
 
     ptr = strtok(ptr, sep);
@@ -150,7 +150,7 @@ LOGICAL mngoptParse(char* InputLine)
 	while ( ptr != NULL )
 	{
 		// find end of command
-		for (i=0 ; ptr[i] ; i++)
+		for (i=0; ptr[i]; i++)
 		{
 			if (isspace(ptr[i]) ||
 				ptr[i] == ':' ||
@@ -166,7 +166,7 @@ LOGICAL mngoptParse(char* InputLine)
 
 		// trim tail of command
 		while ( isspace(ptr[i]) )
-			++i ;
+			++i;
 
 		// move to head of line
 		ptr = &ptr[i];
@@ -175,7 +175,7 @@ LOGICAL mngoptParse(char* InputLine)
 		if (ptr[0] == '"')
 		{
 			ptr += 1;
-			for (i=0 ; ptr[i] ; i++)
+			for (i=0; ptr[i]; i++)
 			{
 				if (ptr[i] == '"')
 				{
@@ -187,7 +187,7 @@ LOGICAL mngoptParse(char* InputLine)
 		}
 		else
 		{
-			for (i=0 ; ptr[i] ; i++)
+			for (i=0; ptr[i]; i++)
 			{
 				if (isspace(ptr[i]))
 				{
@@ -201,7 +201,7 @@ LOGICAL mngoptParse(char* InputLine)
 		value[i] = 0;
 
 		// search for cmd in known commands
-		for (i=0 ; vars[i].key ; i++)
+		for (i=0; vars[i].key; i++)
 		{
 			if (0 == lstrcmp(vars[i].key, cmd))
 			{

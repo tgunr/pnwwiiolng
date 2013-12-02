@@ -9,11 +9,11 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 // Initialize threads to a ready state
-extern void chatThreadsSetup() ;
+extern void chatThreadsSetup();
 
 // Any threads that want main server setup to be completed
 // before they start their things need to be enabled here
-extern void chatThreadsEnable() ;
+extern void chatThreadsEnable();
 
 // Bring the threads into sync and shut them down
-extern void chatThreadsShutdown() ;
+extern void chatThreadsShutdown();

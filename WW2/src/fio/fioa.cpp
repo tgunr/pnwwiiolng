@@ -18,13 +18,13 @@ struct fioaFD
 	int marker;
 	int datalen;
 	unsigned char* data;
-} ;
+};
 
 struct fioaObj
 {
 	fioaFD file[FIOA_MAX_FILDES];
 	paFILE* pf;
-} ;
+};
 
 static fioaObj fioa;
 static systhread_mutex fioaMutex;

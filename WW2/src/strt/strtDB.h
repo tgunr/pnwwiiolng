@@ -18,4 +18,4 @@ extern LOGICAL strtCloseDB();
 
 extern void strtdbInitSupercells();
 
-extern void strtLoadTOEsAndHCUnits() ;
+extern void strtLoadTOEsAndHCUnits();

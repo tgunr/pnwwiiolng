@@ -25,7 +25,7 @@
 #include "wwii/wwiiConfig.h"
 
 // Definition of all the little word sounds we have for
-// each country. Note: Pirate is MAX_COUNTRIES ;)
+// each country. Note: Pirate is MAX_COUNTRIES;)
 
 static const char* g_fsNoCountry[] =
 {	// NO_COUNTRY
@@ -34,7 +34,7 @@ static const char* g_fsNoCountry[] =
 	"thpo", "mak", "na", "kik", "chak", "zik",
 	"mipt", "niha", "mah", "buh", "rahka",
 	NULL
-} ;
+};
 
 static const char* g_fsEnglish[] =
 {	// English
@@ -52,12 +52,12 @@ static const char* g_fsEnglish[] =
 	"vick", "bof", "tuf", "nar", "wor", "ers",
 	"mar", "ek", "un", "ole", "oke", "ad",
 	NULL
-} ;
+};
 
 static const char* g_fsAmerican[] =
 {	// American
 	NULL
-} ;
+};
 
 static const char* g_fsFrench[] =
 {	// French
@@ -73,7 +73,7 @@ static const char* g_fsFrench[] =
 	"donner", "mon", "tir", "clope", "pinard",
 	"jamais", "dans", "plus", "mama",
 	NULL
-} ;
+};
 
 static const char* g_fsGerman[] =
 {	// German
@@ -93,25 +93,25 @@ static const char* g_fsGerman[] =
 	"hilf", "gevare", "rauch", "tsum", "maus",
 	"luger", "mess", "sch", "viss", "haff", "ink",
 	NULL
-} ;
+};
 
 static const char* g_fsItalian[] =
 {	// Italian
 	NULL
-} ;
+};
 
 static const char* g_fsChina[] =
 {	// China
 	NULL
-} ;
+};
 
 static const char* g_fsRussia[] =
 {	// Russia
 	NULL
-} ;
+};
 
 static const char* g_fsPirate[] =
-{	// MAX_COUNTRIES -- PIRATE! -- AKA -- PiRAT ;)
+{	// MAX_COUNTRIES -- PIRATE! -- AKA -- PiRAT;)
 	"aye", "arrh", "matey", "grog", "ahoy", "oi",
 	"land", "lubber", "argh", "avast", "piecesofeight",
 	"ye", "der", "shiver", "timbers", "me",
@@ -119,31 +119,31 @@ static const char* g_fsPirate[] =
 	"doubloons", "mighty", "yo", "ho", "hoho",
 	"baytah", "teh", "doh", "twowiks", "gold", "thar",
 	NULL
-} ;
+};
 
-static int g_foreignCounts[MAX_COUNTRIES+1] ;
+static int g_foreignCounts[MAX_COUNTRIES+1];
 static const char** g_foreignParts[MAX_COUNTRIES+1] = {
  g_fsNoCountry, g_fsEnglish, g_fsAmerican, g_fsFrench,
  g_fsGerman, g_fsItalian, g_fsChina, g_fsRussia,
  g_fsPirate
-} ;
+};
 
 // say function stuff
-bool _enablePirate = false ;
+bool _enablePirate = false;
 
 // Make sure that the foreign sound list is populated
 static inline void
 _setupForeignSounds()
 {
-	static bool initialized = false ;
+	static bool initialized = false;
 	if ( initialized )
-		return ;
-	for ( int country = 0 ; country <= MAX_COUNTRIES ; ++country )
+		return;
+	for ( int country = 0; country <= MAX_COUNTRIES; ++country )
 	{
-		int sound = 0 ;
+		int sound = 0;
 		while ( g_foreignParts[country][sound] )
-			++sound ;
-		g_foreignCounts[country] = sound ;
+			++sound;
+		g_foreignCounts[country] = sound;
 	}
 }
 
@@ -153,14 +153,14 @@ _setupForeignSounds()
 static inline void
 _populateEnemyMessage(Chat::HostMessage& enemyMsg, const Chat::HostMessage& friendlyMsg, WWII_COUNTRY country, char* phrase)
 {
-	memcpy(&enemyMsg, &friendlyMsg, sizeof(friendlyMsg)) ;
-	enemyMsg.icon = Chat::ENEMY_SAY_ICON ;
+	memcpy(&enemyMsg, &friendlyMsg, sizeof(friendlyMsg));
+	enemyMsg.icon = Chat::ENEMY_SAY_ICON;
 
 #if !defined(TRAINING_SERVER) && !defined(FRES)
-	static const size_t MAX_FOREIGN_STRING_LEN = 80 ;		// Lets not over-do them or allow spamming
-	enemyMsg.msg = chatForeignizeMessage(country, strnlen(phrase, MAX_FOREIGN_STRING_LEN)) ;
-	enemyMsg.length = (UINT32)strnlen(enemyMsg.msg, MAX_MESSAGE_LENGTH) ;
-	enemyMsg.handle = chatGetHandle("Enemy") ;
+	static const size_t MAX_FOREIGN_STRING_LEN = 80;		// Lets not over-do them or allow spamming
+	enemyMsg.msg = chatForeignizeMessage(country, strnlen(phrase, MAX_FOREIGN_STRING_LEN));
+	enemyMsg.length = (UINT32)strnlen(enemyMsg.msg, MAX_MESSAGE_LENGTH);
+	enemyMsg.handle = chatGetHandle("Enemy");
 #endif
 }
 
@@ -170,13 +170,13 @@ _populateEnemyMessage(Chat::HostMessage& enemyMsg, const Chat::HostMessage& frie
 static inline bool
 _inRange(const Player* observer, const Player* speaker, SINT64 range2)
 {
-	FLOAT64 dX = observer->currentX() - speaker->lastX() ;
-	FLOAT64 dY = observer->currentY() - speaker->lastY() ;
-	FLOAT64 dZ = (observer->currentZ() - speaker->lastZ()) * 2 ;
+	FLOAT64 dX = observer->currentX() - speaker->lastX();
+	FLOAT64 dY = observer->currentY() - speaker->lastY();
+	FLOAT64 dZ = (observer->currentZ() - speaker->lastZ()) * 2;
 
-	SINT64 dist2 = (SINT64)(dX*dX + dY*dY + dZ*dZ) ;
+	SINT64 dist2 = (SINT64)(dX*dX + dY*dY + dZ*dZ);
 
-	return (dist2 <= range2) ;
+	return (dist2 <= range2);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -189,70 +189,70 @@ _populateSayMessage(Chat::HostMessage& outMsg
 					, UINT32 icon
 					)
 {
-	outMsg.handle = player->chatHandle() ;
-	outMsg.id = message->m_id ;
-	outMsg.isDotMessage = false ;
-	outMsg.auxChanType = 0 ;
-	outMsg.radioType[0] = 0 ;
-	outMsg.radioType[1] = 0 ;
-	outMsg.radioType[2] = 0 ;
-	outMsg.radioType[3] = 0 ;
-	outMsg.icon = icon ;
+	outMsg.handle = player->chatHandle();
+	outMsg.id = message->m_id;
+	outMsg.isDotMessage = false;
+	outMsg.auxChanType = 0;
+	outMsg.radioType[0] = 0;
+	outMsg.radioType[1] = 0;
+	outMsg.radioType[2] = 0;
+	outMsg.radioType[3] = 0;
+	outMsg.icon = icon;
 
-	outMsg.msg = phrase ;
-	outMsg.length = (UINT32)strnlen(phrase, MAX_MESSAGE_LENGTH) ;
+	outMsg.msg = phrase;
+	outMsg.length = (UINT32)strnlen(phrase, MAX_MESSAGE_LENGTH);
 }
 
 //////////////////////////////////////////////////////////////////////
-// Convert an incoming string into outgoing jibberish ;)
+// Convert an incoming string into outgoing jibberish;)
 const char*
 chatForeignizeMessage(WWII_COUNTRY country, size_t maxLen)
 {
-	static char text[MAX_MESSAGE_LENGTH+1] ;
-	const char** parts = NULL ;
-	int selection = 0 ;
-	size_t destOff = 0 ;
-	const char* selected ;
+	static char text[MAX_MESSAGE_LENGTH+1];
+	const char** parts = NULL;
+	int selection = 0;
+	size_t destOff = 0;
+	const char* selected;
 
-	_setupForeignSounds() ;
+	_setupForeignSounds();
 
 	// If pirate mode is enabled, use MAX_COUNTRIES
 	if ( _enablePirate )
-		country = MAX_COUNTRIES ;
+		country = MAX_COUNTRIES;
 
-	text[0] = 0 ;
+	text[0] = 0;
 	// If we have no words for your country, use NO_COUNTRY
 	if ( g_foreignCounts[country] == 0 )
-		country = WWII_NO_COUNTRY ;
+		country = WWII_NO_COUNTRY;
 
-	parts = g_foreignParts[country] ;
+	parts = g_foreignParts[country];
 	if ( parts == NULL )
 	{
-		dbugLog(_FLI, "NULL POINTER for g_foreignParts[%d]", country) ;
-		return text ;
+		dbugLog(_FLI, "NULL POINTER for g_foreignParts[%d]", country);
+		return text;
 	}
 
 	if ( maxLen > 4 && maxLen < 40 )
-		maxLen += rand() % 8 ;
+		maxLen += rand() % 8;
 
-	text[destOff] = 0 ;
-	char prev = 0 ;
+	text[destOff] = 0;
+	char prev = 0;
 
 	do
 	{
 		// Choose a random sylable to use
-		selection = rand() % g_foreignCounts[country] ;
-		selected = parts[selection] ;
+		selection = rand() % g_foreignCounts[country];
+		selected = parts[selection];
 		while ( *selected )
-			prev = text[destOff++] = *(selected++) ;
+			prev = text[destOff++] = *(selected++);
 
-		int symRate, spaceChance ;
+		int symRate, spaceChance;
 		switch (country)
 		{
-			case WWII_GERMANY: symRate = 6, spaceChance = 5 ; break ;
-			case WWII_FRANCE: symRate = 4, spaceChance = 6 ; break ;
-			case MAX_COUNTRIES: symRate = 1, spaceChance = 9; break ;
-			default: symRate = 3, spaceChance = 9 ; break ;
+			case WWII_GERMANY: symRate = 6, spaceChance = 5; break;
+			case WWII_FRANCE: symRate = 4, spaceChance = 6; break;
+			case MAX_COUNTRIES: symRate = 1, spaceChance = 9; break;
+			default: symRate = 3, spaceChance = 9; break;
 		}
 
 		// And maybe some dressing
@@ -260,22 +260,22 @@ chatForeignizeMessage(WWII_COUNTRY country, size_t maxLen)
 		{
 			switch (rand() % (10+spaceChance))	// 10 being number of cased symbols below
 			{
-				case 0: case 1: text[destOff++] = '?' ; break ;
-				case 2: text[destOff++] = ',' ; break ;
-				case 4: case 5: text[destOff++] = '.' ; ; break ;
-				case 6: text[destOff++] = '.' ; text[destOff++] = '.' ; text[destOff++] = '.' ; prev = ' ' ; break ;
-				case 7: text[destOff++] = '-' ; prev = ' ' ; break ;
-				case 3: case 9: case 10: text[destOff++] = '!' ; break ;
-				default: break ;
+				case 0: case 1: text[destOff++] = '?'; break;
+				case 2: text[destOff++] = ','; break;
+				case 4: case 5: text[destOff++] = '.';; break;
+				case 6: text[destOff++] = '.'; text[destOff++] = '.'; text[destOff++] = '.'; prev = ' '; break;
+				case 7: text[destOff++] = '-'; prev = ' '; break;
+				case 3: case 9: case 10: text[destOff++] = '!'; break;
+				default: break;
 			}
 			if ( prev != ' ' )
-				prev = text[destOff++] = ' ' ;
+				prev = text[destOff++] = ' ';
 		}
 	}
-	while ( destOff < maxLen ) ;
+	while ( destOff < maxLen );
 
-	text[destOff] = 0 ;
-	return text ;
+	text[destOff] = 0;
+	return text;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -285,103 +285,103 @@ chatSay(Player* player, Chat::ClientMessage* message, char* phrase, AREA_CHAT_MO
 {
 	if ( !player->isSpawned() || player->currentX() == INVALID_GRID_COORD )
 	{
-		player->message(LSTR_CAUTION, LSTR_AREA_ONLY_WHILE_SPAWNED) ;
-		return ;
+		player->message(LSTR_CAUTION, LSTR_AREA_ONLY_WHILE_SPAWNED);
+		return;
 	}
 
-	UINT32 icon ;
-	SINT64 friendlyRange2, hostileRange2 ;
-	bool isGMMessage = false ;
+	UINT32 icon;
+	SINT64 friendlyRange2, hostileRange2;
+	bool isGMMessage = false;
 
 	// Start by getting the unsquared value, which we'll need in a moment
 	switch (mode)
 	{
 	case AREA_GM:
-		isGMMessage = true ;
+		isGMMessage = true;
 		/* FALLTHROUGH */
 	case AREA_YELL:
-		friendlyRange2 = host_config.yellFriendlyRange ;
-		hostileRange2 = host_config.yellEnemyRange ;
-		icon = Chat::YELL_ICON ;
-	break ;
+		friendlyRange2 = host_config.yellFriendlyRange;
+		hostileRange2 = host_config.yellEnemyRange;
+		icon = Chat::YELL_ICON;
+	break;
 	case AREA_WHISPER:
-		friendlyRange2 = host_config.whisperFriendlyRange ;
-		hostileRange2 = host_config.whisperEnemyRange ;
-		icon = Chat::WHISPER_ICON ;
-	break ;
+		friendlyRange2 = host_config.whisperFriendlyRange;
+		hostileRange2 = host_config.whisperEnemyRange;
+		icon = Chat::WHISPER_ICON;
+	break;
 	default:
-		friendlyRange2 = host_config.sayFriendlyRange ;
-		hostileRange2 = host_config.sayEnemyRange ;
-		icon = Chat::SAY_ICON ;
-	break ;
+		friendlyRange2 = host_config.sayFriendlyRange;
+		hostileRange2 = host_config.sayEnemyRange;
+		icon = Chat::SAY_ICON;
+	break;
 	}
 
 	// Find which cells we need to transmit to for this guy
-	static PLAYERS_ARRAY array ;
-	chatGridGetPlayersVector(player, std::max(friendlyRange2, hostileRange2), array) ;
+	static PLAYERS_ARRAY array;
+	chatGridGetPlayersVector(player, std::max(friendlyRange2, hostileRange2), array);
 	if ( array.empty() )
-		return ;
+		return;
 
 	// Square the values so we don't have to perform sqrt
 	// every time we want to test distances
-	friendlyRange2 *= friendlyRange2 ;
-	hostileRange2 *= hostileRange2 ;
+	friendlyRange2 *= friendlyRange2;
+	hostileRange2 *= hostileRange2;
 
-	static Chat::HostMessage outMsg ;
-	static Chat::HostMessage enemyMsg ;
+	static Chat::HostMessage outMsg;
+	static Chat::HostMessage enemyMsg;
 
-	_populateSayMessage(outMsg, player, message, phrase, icon) ;
-	enemyMsg.msg = NULL ;
+	_populateSayMessage(outMsg, player, message, phrase, icon);
+	enemyMsg.msg = NULL;
 
-	PLAYERS_ARRAY::iterator it ;
-	Player* cur ;
+	PLAYERS_ARRAY::iterator it;
+	Player* cur;
 
-	for ( it = array.begin() ; it != array.end() ; ++it )
+	for ( it = array.begin(); it != array.end(); ++it )
 	{
-		PLAYERS::iterator cit = (*it)->begin() ;
+		PLAYERS::iterator cit = (*it)->begin();
 		while ( cit != (*it)->end() )
 		{
-			cur = static_cast<Player*>(*cit) ;
-			++cit ;
+			cur = static_cast<Player*>(*cit);
+			++cit;
 
 			if ( cur->playerID() <= 0 )
-				continue ;
+				continue;
 
 			// Don't echo to myself unless the caller wants this behavior
 			if ( allowEchoToClient == false && cur == player )
-				continue ;
+				continue;
 
 			// In a grab conversation
 			if ( cur->inGrab() == true )
-				continue ;
+				continue;
 
 			// Not finished spawning (or maybe despawned)
 			// or already seen this message (e.g. via another channel)
 			if ( cur->currentX() == INVALID_GRID_COORD )
-				continue ;
+				continue;
 
 			if ( cur->side() != player->side() && isGMMessage == false && cur->isBuzzard() == false )
 			{
 				// Target has turned off enemy chat receipt
 				if ( cur->noEnemyChat() )
-					continue ;
+					continue;
 
 				if ( _inRange(cur, player, hostileRange2) == false )
-					continue ;
+					continue;
 
 				// If this is our first enemy, the message isn't populated yet.
 				if ( enemyMsg.msg == NULL )
-					_populateEnemyMessage(enemyMsg, outMsg, player->country(), phrase) ;
+					_populateEnemyMessage(enemyMsg, outMsg, player->country(), phrase);
 
-				cur->send(enemyMsg) ;
+				cur->send(enemyMsg);
 
-				continue ;
+				continue;
 			}
 
 			if ( _inRange(cur, player, friendlyRange2) == false )
-				continue ;
+				continue;
 
-			cur->trySend(outMsg) ;
+			cur->trySend(outMsg);
 		}
 	}
 }
@@ -390,42 +390,42 @@ void
 Player::Emit(const Chat::LocalizedMessage& lmsg)
 {
 	if ( !isSpawned() || currentX() == INVALID_GRID_COORD )
-		return ;
+		return;
 
-	SINT64 friendlyRange2 = host_config.sayFriendlyRange ;
-	friendlyRange2 = friendlyRange2 * friendlyRange2 ;
+	SINT64 friendlyRange2 = host_config.sayFriendlyRange;
+	friendlyRange2 = friendlyRange2 * friendlyRange2;
 
-	static PLAYERS_ARRAY array ;
-	chatGridGetPlayersVector(this, friendlyRange2, array) ;
+	static PLAYERS_ARRAY array;
+	chatGridGetPlayersVector(this, friendlyRange2, array);
 
-	Player* cur ;
-	for ( auto it = array.begin() ; it != array.end() ; ++it )
+	Player* cur;
+	for ( auto it = array.begin(); it != array.end(); ++it )
 	{
-		auto cit = (*it)->begin() ;
+		auto cit = (*it)->begin();
 		while ( cit != (*it)->end() )
 		{
-			cur = static_cast<Player*>(*cit) ;
-			++cit ;
+			cur = static_cast<Player*>(*cit);
+			++cit;
 
 			if ( cur->playerID() <= 0 )
-				continue ;
+				continue;
 
 			// In a grab conversation
 			if ( cur->inGrab() == true )
-				continue ;
+				continue;
 
 			// Not finished spawning (or maybe despawned)
 			// or already seen this message (e.g. via another channel)
 			if ( cur->currentX() == INVALID_GRID_COORD )
-				continue ;
+				continue;
 
 			if ( cur->side() != side() )
-				continue ;
+				continue;
 
 			if ( _inRange(cur, this, friendlyRange2) == false )
-				continue ;
+				continue;
 
-			cur->message(lmsg) ;
+			cur->message(lmsg);
 		}
 	}
 }

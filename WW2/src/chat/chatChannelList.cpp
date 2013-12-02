@@ -29,10 +29,10 @@ struct ChannelHash
 	UINT64 operator()(const ChannelID& channelID) const { return channelID.HashValue(); }
 };
 
-typedef std::unordered_map<ChannelID, Chat::Channel*, ChannelHash> CHANNEL_INDEX ;
-CHANNEL_INDEX _channelIndex ;
+typedef std::unordered_map<ChannelID, Chat::Channel*, ChannelHash> CHANNEL_INDEX;
+CHANNEL_INDEX _channelIndex;
 
-static CHANNEL_INDEX _tentativeChannels ;
+static CHANNEL_INDEX _tentativeChannels;
 
 // Register a new chat channel
 Chat::Channel*
@@ -40,21 +40,21 @@ chatCreateChannel(const ChannelID& channelID, const char* const name, ChatHandle
 {
 	if ( channelID.IsPlaceHolder() )
 	{
-		dbugLog(_FLA, "attempting to create placeholder channel - id not properly populated") ;
-		return NULL ;
+		dbugLog(_FLA, "attempting to create placeholder channel - id not properly populated");
+		return NULL;
 	}
 
 	// Check to see if channel already exists.
 	if ( _channelIndex.find(channelID) != _channelIndex.end() )
 	{
 		LogAbort("ch:%llu.%u.%u.%llu attempting to re-create existing channel"
-					, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID()) ;
+					, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID());
 	}
 
 	dbugLog(_FLD, "Creating ch:%llu.%u.%u.%llu %s: %s [%s]", channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID(), chanTypeName[channelID.Type()], name, chatGetCallsign(chHandle));
-	Chat::Channel* const channel = new Chat::Channel(channelID, name, chHandle) ;
+	Chat::Channel* const channel = new Chat::Channel(channelID, name, chHandle);
 
-	_channelIndex[channelID] = channel ;
+	_channelIndex[channelID] = channel;
 
 	switch ( channel->type() )
 	{
@@ -65,15 +65,15 @@ chatCreateChannel(const ChannelID& channelID, const char* const name, ChatHandle
 	case SIDE_GENERAL_CHANNEL:
 	case SIDE_HELP_CHANNEL:
 	case SIDE_OPS_CHANNEL:
-	break ;
+	break;
 	default:
-		_tentativeChannels[channelID] = channel ;
-	break ;
+		_tentativeChannels[channelID] = channel;
+	break;
 	}
 
 	dbugLog(_FLD, "ch:%llu.%u.%u.%llu channel created, numChannels now %" PRSizeT ""
 						, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID()
-						, _channelIndex.size()) ;
+						, _channelIndex.size());
 
 	return channel;
 }
@@ -89,42 +89,42 @@ chatDestroyChannel(const ChannelID channelID)
 		// Transient channels
 	case MISSION_CHANNEL:
 		// Notify the mission tracking system that we have no takers here
-		chatMissionChannelEmpty((UINT32)channelID.SubID()) ;
+		chatMissionChannelEmpty((UINT32)channelID.SubID());
 		/* PASSTHRU */
 	case SQUAD_CHANNEL:
 	case CP_CHANNEL:
 	case PRIVATE_CHANNEL:
-		break ;
+		break;
 	default:
 		// Permanent channels
-		return true ;
+		return true;
 	}
 
-	CHANNEL_INDEX::iterator it = _channelIndex.find(channelID) ;
+	CHANNEL_INDEX::iterator it = _channelIndex.find(channelID);
 	if ( it == _channelIndex.end() )
 	{
 		dbugLog(_FLI, "ch:%llu.%u.%u.%llu attempting to delete unlisted channel"
-						, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID()) ;
-		return false ;
+						, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID());
+		return false;
 	}
 
-	_tentativeChannels.erase(channelID) ;
+	_tentativeChannels.erase(channelID);
 
-	Chat::Channel* const channel = it->second ;
-	_channelIndex.erase(it) ;
-	delete channel ;
+	Chat::Channel* const channel = it->second;
+	_channelIndex.erase(it);
+	delete channel;
 
 	dbugLog(_FLI, "ch:%llu.%u.%u.%llu freed channel, numChannels now %" PRSizeT ""
-						, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID(), _channelIndex.size()) ;
+						, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID(), _channelIndex.size());
 
-	return true ;
+	return true;
 }
 
 Chat::Channel*
 chatFindChannel(const ChannelID& id)
 {
-	CHANNEL_INDEX::iterator it = _channelIndex.find(id) ;
-	return ( it != _channelIndex.end() ) ? it->second : NULL ;
+	CHANNEL_INDEX::iterator it = _channelIndex.find(id);
+	return ( it != _channelIndex.end() ) ? it->second : NULL;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -133,42 +133,42 @@ chatFindChannel(const ChannelID& id)
 void
 chatDeleteUnusedChannels()
 {
-	for ( auto it = _tentativeChannels.begin() ; it != _tentativeChannels.end() ; ++it )
+	for ( auto it = _tentativeChannels.begin(); it != _tentativeChannels.end(); ++it )
 	{
-		Chat::Channel* const channel = it->second ;
+		Chat::Channel* const channel = it->second;
 		if ( channel == NULL )
-			LogAbort("dead channel in list") ;
+			LogAbort("dead channel in list");
 
 		if ( channel->numSubscribers() > 0 )
 		{
 			if ( channel->m_expireAt > 0 )
-				channel->m_expireAt = 0 ;
-			continue ;
+				channel->m_expireAt = 0;
+			continue;
 		}
 
-		const ChannelID channelID = it->first ;
+		const ChannelID channelID = it->first;
 
 		if ( channel->m_expireAt == 0 )
 		{
-			static const TeulTimeMS FiveMinutes_ms = (5 * 60) * 1000 ;
-			channel->m_expireAt = teulClock64 + FiveMinutes_ms ;
+			static const TeulTimeMS FiveMinutes_ms = (5 * 60) * 1000;
+			channel->m_expireAt = teulClock64 + FiveMinutes_ms;
 			dbugLog(_FLD, "ch:%llu.%u.%u.%llu marking for expiration"
 							, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID()
-							) ;
-			continue ;
+							);
+			continue;
 		}
 
 		if ( channel->m_expireAt > teulClock64 )
 		{
-			continue ;
+			continue;
 		}
 
 		dbugLog(_FLM, "ch:%llu.%u.%u.%llu expired and empty, deleting"
 						, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID()
-						) ;
-		chatDestroyChannel(channelID) ;
+						);
+		chatDestroyChannel(channelID);
 
-		break ;
+		break;
 	}
 }
 
@@ -179,7 +179,7 @@ void
 Chat::Channel::addSubscriber(const Chat::ChannelSubscription& cnode)
 {
 	// insert returns pair<interator, bool>.
-	const bool inserted = m_subscribers.insert(const_cast<Chat::ChannelSubscription*>(&cnode)).second ;
+	const bool inserted = m_subscribers.insert(const_cast<Chat::ChannelSubscription*>(&cnode)).second;
 	// The bool tells us whether the insert occurred or not.
 	if ( inserted == true )
 	{
@@ -188,7 +188,7 @@ Chat::Channel::addSubscriber(const Chat::ChannelSubscription& cnode)
 							, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID()
 							, &cnode, this
 							, numSubscribers()
-							) ;
+							);
 	}
 	else
 	{
@@ -196,7 +196,7 @@ Chat::Channel::addSubscriber(const Chat::ChannelSubscription& cnode)
 						, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID()
 						, &cnode, this
 						, numSubscribers()
-						) ;
+						);
 	}
 }
 
@@ -212,10 +212,10 @@ Chat::Channel::removeSubscriber(Chat::ChannelSubscription& cnode)
 {
 	if ( cnode.m_channel != this )
 	{
-		LogAbort("cnode %p attempting remove from non-subscribed channel %p!", &cnode, this) ;
+		LogAbort("cnode %p attempting remove from non-subscribed channel %p!", &cnode, this);
 	}
 
-	const size_t numRemoved = m_subscribers.erase(&cnode) ;
+	const size_t numRemoved = m_subscribers.erase(&cnode);
 	if ( g_debugRadios )
 	{
 		if ( numRemoved > 0 )
@@ -224,7 +224,7 @@ Chat::Channel::removeSubscriber(Chat::ChannelSubscription& cnode)
 							, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID()
 							, &cnode, this
 							, numSubscribers()
-							) ;
+							);
 		}
 		else
 		{
@@ -232,7 +232,7 @@ Chat::Channel::removeSubscriber(Chat::ChannelSubscription& cnode)
 							, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID()
 							, &cnode, this
 							, numSubscribers()
-							) ;
+							);
 		}
 	}
 }
@@ -246,11 +246,11 @@ Chat::ChannelSubscription::unsubscribe()
 {
 	if ( m_channel )
 	{
-		m_channel->removeSubscriber(*this) ;
+		m_channel->removeSubscriber(*this);
 	}
 
-	m_type = NO_CHANNEL ;
-	m_channel = NULL ;
+	m_type = NO_CHANNEL;
+	m_channel = NULL;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -261,14 +261,14 @@ void
 Chat::ChannelSubscription::subscribe(CHANNEL_TYPE type_, Chat::Channel* channel_)
 {
 	if ( m_channel != NULL )
-		unsubscribe() ;
+		unsubscribe();
 
-	this->m_channel = channel_ ;
-	this->m_type = type_ ;
+	this->m_channel = channel_;
+	this->m_type = type_;
 
 	// Channel will be null if this is a placeholder tune.
 	if ( m_channel != NULL )
-		m_channel->addSubscriber(*this) ;
+		m_channel->addSubscriber(*this);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -277,5 +277,5 @@ Chat::ChannelSubscription::subscribe(CHANNEL_TYPE type_, Chat::Channel* channel_
 SINT32
 Chat::ChannelSubscription::teulIndex() const
 {
-	return m_subscriber->teulIndex() ;
+	return m_subscriber->teulIndex();
 }

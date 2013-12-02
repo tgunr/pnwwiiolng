@@ -255,7 +255,7 @@ public:
 	PPOSpec defaults;
 };
 
-namespace phui { class View ; }
+namespace phui { class View; }
 
 struct PlayerPlacedObject
 {

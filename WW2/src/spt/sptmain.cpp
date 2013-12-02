@@ -86,11 +86,11 @@ class FakeVector
 {
 private:
 	enum { GrowthRate = 128 } ;	// Grow in units of 128. MUST BE POWER OF 2.
-	enum { GrowthMask = GrowthRate - 1 } ;
+	enum { GrowthMask = GrowthRate - 1 };
 public:
     FakeVector() : _size(0), _data(0), _capacity(0)
 	{
-		reserve(1024) ;
+		reserve(1024);
 	}
     ~FakeVector()
     {

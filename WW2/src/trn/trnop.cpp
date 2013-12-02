@@ -423,7 +423,7 @@ int			i;
 	Write_Debug("Place on ground: %s", lpobj->name);
 #endif
 
-	for (i=1 ; i < 10 ; i++)
+	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, OnGroundLOD))
 		{
@@ -448,7 +448,7 @@ int		i;
 #ifdef TERRAIN_EDITOR
 	Write_Debug("Place relative to ground: %s", lpobj->name);
 #endif
-	for (i=1 ; i < 10 ; i++)
+	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, HeightPlaceLOD))
 		{
@@ -582,7 +582,7 @@ OBJECT*	lpbase;
 	piVectorPtr objPos = lpbase->MutablePositions();
 	lpbase->flag2 &= ~OBJECT_USEBUFFERS; // should just put this in MutablePositions()
 
-	for (i=0 ; i < num ; i++, ++objPos)
+	for (i=0; i < num; i++, ++objPos)
 	{
 		if (bz1 > objPos->z &&
 			bz2 < objPos->z)
@@ -694,7 +694,7 @@ OBJECT*	lpbase, *lpnext;
 		num = lpnext->numverts;
 		piVectorConstPtr objPos = lpnext->RenderPositions();
 
-		for (i=0 ; i < num ; i++, ++objPos)
+		for (i=0; i < num; i++, ++objPos)
 		{
             if(lpnext->flag2 & OBJECT_IS_ROTATED)
             {
@@ -749,7 +749,7 @@ OBJECT*	lpbase, *lpnext;
 		piVectorPtr objPos = lpbase->MutablePositions();
 		lpbase->flag2 &= ~OBJECT_USEBUFFERS;
 
-		for (i=0 ; i < num ; i++, ++objPos)
+		for (i=0; i < num; i++, ++objPos)
 		{
 			if (bz1 > objPos->z &&
 				bz2 < objPos->z)
@@ -802,7 +802,7 @@ int			i;
 	Write_Debug("Place height conform: %s", lpobj->name);
 #endif
 
-	for (i=1 ; i < 10 ; i++)
+	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, HeightConformLOD))
 		{
@@ -848,7 +848,7 @@ SINT32		i, poly;
 		poly = poly / 8 * 8; // get 1st triangle of octet
 
 		// ok place objects o1-o7
-		for (i=1 ; i < 8 ; i++)
+		for (i=1; i < 8; i++)
 		{
 			sprintf(s, "o%d", i);
 			ogrpFindSubObjectByName(&TempObjPtr, lpobj, s);
@@ -1065,7 +1065,7 @@ OBJECT*	lpbase, *lpnext;
 		lpnext->flag2 &= ~OBJECT_USEBUFFERS;
 		num = lpnext->numverts;
 		piVectorConstPtr objPos = lpnext->RenderPositions();
-		for (i=0 ; i < num ; i++, ++objPos)
+		for (i=0; i < num; i++, ++objPos)
 		{
 			// Rotate/Translate position to object space
 			math3dVectorMultiply(&pos, objPos.ptr, &lpnext->mat);
@@ -1099,7 +1099,7 @@ OBJECT*	lpbase, *lpnext;
 		piVectorPtr objPos = lpnext->MutablePositions();
 		lpnext->flag2 &= ~OBJECT_USEBUFFERS;
 
-		for (i=0 ; i < num ; i++, ++objPos)
+		for (i=0; i < num; i++, ++objPos)
 		{
 			if (bz1 > objPos->z &&
 				bz2 < objPos->z)
@@ -1144,7 +1144,7 @@ SINT32		i;
 	Write_Debug("Place bottom conform: %s", lpobj->name);
 #endif
 
-	for (i=1 ; i < 10 ; i++)
+	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, BottomConformLOD))
 		{
@@ -1415,7 +1415,7 @@ static LOGICAL DownLODImplement(OBJECT* lpobj)
     piVECTOR retpos = {0, 0, 0};
     SINT32 poly = 0;
 
-	for (i=0 ; i < num ; i++, ++objPos)
+	for (i=0; i < num; i++, ++objPos)
 	{
 		pos = *objPos;
 
@@ -1492,7 +1492,7 @@ SINT32		i;
 	Write_Debug("Place down: %s", lpobj->name);
 #endif
 
-	for (i=1 ; i < 10 ; i++)
+	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, DownLOD))
 		{
@@ -1514,7 +1514,7 @@ SINT32		i;
 	Write_Debug("Place conform radial: %s", lpobj->name);
 #endif
 
-	for (i=1 ; i < 10 ; i++)
+	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, ConformRadialLOD))
 		{
@@ -1536,7 +1536,7 @@ piVECTOR	pos, cpos;
 	piVectorPtr objPos = lpobj->MutablePositions();
 	lpobj->flag2 &= ~OBJECT_USEBUFFERS;
 
-	for (i=0 ; i < num ; i++, ++objPos)
+	for (i=0; i < num; i++, ++objPos)
 	{
 		pos = *objPos;
 
@@ -1614,7 +1614,7 @@ SINT32		i;
 	Write_Debug("Place and rotate: %s", lpobj->name);
 #endif
 
-	for (i=1 ; i < 10 ; i++)
+	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, RotateLOD))
 		{
@@ -2014,7 +2014,7 @@ OBJECT*			TempObj;
 			case OBJVAL_PLACE_ROTATE:
 			case OBJVAL_OCTET_REPLACE:
 			case OBJVAL_OCTET_CONFORMRADIAL:
-				for (i=1 ; i < 10 ; i++)
+				for (i=1; i < 10; i++)
 				{
 					if (!obmainFindObjectLOD(lpsub, i, (PROCESSCALLBACK)_UpdateGroupNormals))
 					{
@@ -2261,7 +2261,7 @@ SINT32		i;
 
 	if (Object != NULL)
 	{
-		for (i=1 ; i < 10 ; i++)
+		for (i=1; i < 10; i++)
 		{
 			if (!obmainFindObjectLOD(Object, i, (PROCESSCALLBACK)_UpdateBaseNormals))
 			{

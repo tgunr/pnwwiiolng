@@ -28,14 +28,14 @@ namespace Instance
 			, m_squadMates(squadMates_)
 			{}
 		ClientStatus() : BasicStatus(), m_squadMates(0) {}
-		ClientStatus(struct ACTION_OBJECT*) ;
+		ClientStatus(struct ACTION_OBJECT*);
 		virtual ~ClientStatus() {}
 
-		UINT16 squadMates() const { return m_squadMates ; }
+		UINT16 squadMates() const { return m_squadMates; }
 
-		virtual SINT32 packer(const unsigned int mode, ACTION_OBJECT* const a) ;
+		virtual SINT32 packer(const unsigned int mode, ACTION_OBJECT* const a);
 
 	private:
-		UINT16		m_squadMates ;
-	} ;
+		UINT16		m_squadMates;
+	};
 }

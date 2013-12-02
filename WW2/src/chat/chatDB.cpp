@@ -23,11 +23,11 @@
 #include "chat/chatMotds.h"
 #include "chat/chatHostMotds.h"
 
-DBCONNECTION dbConnection ;
+DBCONNECTION dbConnection;
 DBHANDLE dbh;
-extern DBHANDLE& chatdbGetDBH() { return dbh ; }
+extern DBHANDLE& chatdbGetDBH() { return dbh; }
 
-PROPERTY_INDEX _properties ;
+PROPERTY_INDEX _properties;
 
 static const char QRY_SELECT_MOTD_BY_TYPE[] =
 	"SELECT unix_timestamp(m.added), IF(p.isplaynet,UPPER(p.callsign),p.callsign), m.motd"
@@ -53,7 +53,7 @@ static const char QRY_INSERT_CHAT_EVENT[] =
 		 " (now(), \"%s\", \"%s\", \"%s\", \"%s\", \"%s\")"
 ;
 
-static std::string permissionNames[64] ;
+static std::string permissionNames[64];
 
 void
 _loadMotd(MOTD_REPLY& motd)
@@ -67,33 +67,33 @@ _loadMotd(MOTD_REPLY& motd)
 		DBQuery q(dbh, QRY_SELECT_MOTD_BY_TYPE, motd.type);
 
 		if ( q.HasRows() == false )
-			return ;
+			return;
 
 		if ( q.FetchRow() == false )
-			throw std::logic_error("fetchrow failed") ;
+			throw std::logic_error("fetchrow failed");
 
-		auto& row = q.Row() ;
+		auto& row = q.Row();
 
-		motd.added = row.NextUInt() ;
-		const char* poster = row.NextString() ;
-		motd.poster = chatGetHandle(poster) ;
-		motd.message = row.NextString() ;
+		motd.added = row.NextUInt();
+		const char* poster = row.NextString();
+		motd.poster = chatGetHandle(poster);
+		motd.message = row.NextString();
 
-		return ;
+		return;
 	}
-	catch (std::exception& e) { dbugLog(_FLA, "%s: %s", __FUNCTION__, e.what()) ; }
+	catch (std::exception& e) { dbugLog(_FLA, "%s: %s", __FUNCTION__, e.what()); }
 
-	return ;
+	return;
 }
 
 void
 chatLoadMotds()
 {
-	for ( UINT32 i = 0 ; i < MOTD::_MAX_TYPES ; ++i )
+	for ( UINT32 i = 0; i < MOTD::_MAX_TYPES; ++i )
 	{
-		MOTD_REPLY& motd = chatGetMotd(i) ;
-		motd.type = i ;
-		_loadMotd(motd) ;
+		MOTD_REPLY& motd = chatGetMotd(i);
+		motd.type = i;
+		_loadMotd(motd);
 	}
 }
 
@@ -103,13 +103,13 @@ chatLoadMotds()
 Property*
 chatFindProperty(const FULL_OBJ_ID& id)
 {
-	PROPERTY_INDEX::iterator it ;
+	PROPERTY_INDEX::iterator it;
 
-	it = _properties.find(id.Key()) ;
+	it = _properties.find(id.Key());
 	if ( it == _properties.end() )
-		return NULL ;
+		return NULL;
 
-	return it->second ;
+	return it->second;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -120,21 +120,21 @@ PropFacility::PropFacility(const FULL_OBJ_ID& id, WWII_COUNTRY owner, const char
 	: Property(id, owner, name, oid)
 	, m_cp(NULL)
 {
-	Property* cp = chatFindProperty(cpID) ;
+	Property* cp = chatFindProperty(cpID);
 	if ( cp == NULL )
 	{
-		dbugLog(_FLA, "%s has invalid CP data %d.%d.%u", name, cpID.cell.ox, cpID.cell.oy, cpID.id) ;
-		return ;
+		dbugLog(_FLA, "%s has invalid CP data %d.%d.%u", name, cpID.cell.ox, cpID.cell.oy, cpID.id);
+		return;
 	}
 
 	if ( !cp->IsCP() )
 	{
-		dbugLog(_FLA, "%s has CP data that references a non-CP object", name) ;
-		return ;
+		dbugLog(_FLA, "%s has CP data that references a non-CP object", name);
+		return;
 	}
 
 	// Add me to my parent CP's list
-	m_cp = reinterpret_cast<PropCP*>(cp) ;
+	m_cp = reinterpret_cast<PropCP*>(cp);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -144,89 +144,89 @@ PropFacility::PropFacility(const FULL_OBJ_ID& id, WWII_COUNTRY owner, const char
 static bool
 chatdbLoadStratData()
 {
-	UINT32 loadedCPs = 0 ;
-	UINT32 loadedFacs = 0 ;
-	UINT32 owner ;
+	UINT32 loadedCPs = 0;
+	UINT32 loadedFacs = 0;
+	UINT32 owner;
 
-	assert(sizeof(FULL_OBJ_ID) == sizeof(UINT64)) ;
+	assert(sizeof(FULL_OBJ_ID) == sizeof(UINT64));
 
-	FULL_OBJ_ID fid ;
-	FULL_OBJ_ID cpid ;
-	UINT32 oid ;
-	char name[128] ;
+	FULL_OBJ_ID fid;
+	FULL_OBJ_ID cpid;
+	UINT32 oid;
+	char name[128];
 
 	try
 	{
-		UINT32 controller ;
+		UINT32 controller;
 
 		DBQuery q(dbh, "SELECT cp_ox, cp_oy, cp_class, cp_type, cp_id"
 									", country, concountry"
-									", cp_oid, name FROM strat_cp") ;
+									", cp_oid, name FROM strat_cp");
 		while ( q.FetchRow() )
 		{
-			auto& row = q.Row() ;
-			fid.cell.ox = row.NextSInt() ;
-			fid.cell.oy = row.NextSInt() ;
-			fid.objClass = row.NextUInt() ;
-			fid.objType = row.NextUInt() ;
-			fid.id = row.NextUInt() ;
-			owner = row.NextUInt() ;
-			controller = row.NextUInt() ;
-			oid = row.NextUInt() ;
-			row.NextString(name, sizeof(name)) ;
+			auto& row = q.Row();
+			fid.cell.ox = row.NextSInt();
+			fid.cell.oy = row.NextSInt();
+			fid.objClass = row.NextUInt();
+			fid.objType = row.NextUInt();
+			fid.id = row.NextUInt();
+			owner = row.NextUInt();
+			controller = row.NextUInt();
+			oid = row.NextUInt();
+			row.NextString(name, sizeof(name));
 
-			new PropCP(fid, (WWII_COUNTRY)owner, name, (WWII_COUNTRY)controller, oid) ;
-			loadedCPs++ ;
+			new PropCP(fid, (WWII_COUNTRY)owner, name, (WWII_COUNTRY)controller, oid);
+			loadedCPs++;
 		}
 	}
 	catch (std::exception& e)
 	{
-		dbugLog(_FLW, "chatdbLoadStratData failed: %s", e.what()) ;
-		return false ;
+		dbugLog(_FLW, "chatdbLoadStratData failed: %s", e.what());
+		return false;
 	}
 
 	try
 	{
-		memset(&cpid, 0, sizeof(cpid)) ;
+		memset(&cpid, 0, sizeof(cpid));
 
 		DBQuery q(dbh, "SELECT facility_ox, facility_oy, facility_class, facility_type, facility_id"
 							", cp_ox, cp_oy, cp_id"
-							", country, facility_oid, name FROM strat_facility") ;
+							", country, facility_oid, name FROM strat_facility");
 
 		while ( q.FetchRow() )
 		{
-			auto& row = q.Row() ;
-			fid.cell.ox = row.NextSInt() ;
-			fid.cell.oy = row.NextSInt() ;
-			fid.objClass = row.NextUInt() ;
-			fid.objType = row.NextUInt() ;
-			fid.id = row.NextUInt() ;
-			cpid.cell.ox = row.NextSInt() ;
-			cpid.cell.oy = row.NextSInt() ;
-			cpid.id = row.NextUInt() ;
-			owner = row.NextUInt() ;
-			oid = row.NextUInt() ;
-			row.NextString(name, sizeof(name)) ;
+			auto& row = q.Row();
+			fid.cell.ox = row.NextSInt();
+			fid.cell.oy = row.NextSInt();
+			fid.objClass = row.NextUInt();
+			fid.objType = row.NextUInt();
+			fid.id = row.NextUInt();
+			cpid.cell.ox = row.NextSInt();
+			cpid.cell.oy = row.NextSInt();
+			cpid.id = row.NextUInt();
+			owner = row.NextUInt();
+			oid = row.NextUInt();
+			row.NextString(name, sizeof(name));
 
-			new PropFacility(fid, (WWII_COUNTRY)owner, name, cpid, oid) ;
+			new PropFacility(fid, (WWII_COUNTRY)owner, name, cpid, oid);
 
-			loadedFacs++ ;
+			loadedFacs++;
 		}
 	}
 	catch (std::exception& e)
 	{
-		dbugLog(_FLW, "chatdbLoadStratData failed: %s", e.what()) ;
-		return false ;
+		dbugLog(_FLW, "chatdbLoadStratData failed: %s", e.what());
+		return false;
 	}
 
 	if ( loadedCPs == 0 || loadedFacs == 0 )
 	{
-		dbugLog(_FLW, "CPs:%d, Facs: %d", loadedCPs, loadedFacs) ;
-		return false ;
+		dbugLog(_FLW, "CPs:%d, Facs: %d", loadedCPs, loadedFacs);
+		return false;
 	}
 
-	dbugLog(_FLI, "CPs:%d, Facs: %d", loadedCPs, loadedFacs) ;
-	return true ;
+	dbugLog(_FLI, "CPs:%d, Facs: %d", loadedCPs, loadedFacs);
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -234,8 +234,8 @@ chatdbLoadStratData()
 bool
 chatGetWWIIConfig(void)
 {
-	dbGetWWIIConfig(dbh) ;
-	return true ;
+	dbGetWWIIConfig(dbh);
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -248,11 +248,11 @@ chatdbRecordEvent(const SCHAR* category
 					, const SCHAR* data
 					)
 {
-	static char escCategory[64] ;
-	static char escCallsign[64] ;
-	static char escEvent[128] ;
-	static char escParam[1024] ;
-	static char escData[1024] ;
+	static char escCategory[64];
+	static char escCallsign[64];
+	static char escEvent[128];
+	static char escParam[1024];
+	static char escData[1024];
 
 	DBThread::Do(DBThread::Default
 					, QRY_INSERT_CHAT_EVENT
@@ -261,8 +261,8 @@ chatdbRecordEvent(const SCHAR* category
 						, escapeString(event, escEvent, sizeof(escEvent))
 						, escapeString(parameter, escParam, sizeof(escParam))
 						, escapeString(data, escData, sizeof(escData))
-				) ;
-	return true ;
+				);
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -271,23 +271,23 @@ chatdbRecordEvent(const SCHAR* category
 static inline void
 _readPermissionNames()
 {
-	DBQuery qry(dbh, "SELECT `permissionid` - 1, `description` FROM `auth`.`wwii_permissions`") ;
+	DBQuery qry(dbh, "SELECT `permissionid` - 1, `description` FROM `auth`.`wwii_permissions`");
 	if ( qry.HasRows() == false )
-		throw std::runtime_error("No rows returned from auth.wwii_permissions") ;	///Terminal
+		throw std::runtime_error("No rows returned from auth.wwii_permissions");	///Terminal
 	while ( qry.FetchRow() )
 	{
-		auto& row = qry.Row() ;
-		UINT32 mask = row.NextUInt() ;
-		assert( mask < 64 ) ;
-		permissionNames[mask] = row.NextString() ;
+		auto& row = qry.Row();
+		UINT32 mask = row.NextUInt();
+		assert( mask < 64 );
+		permissionNames[mask] = row.NextString();
 	}
-	char name[64] ;
-	for ( UINT32 i = 0 ; i < 64 ; ++i )
+	char name[64];
+	for ( UINT32 i = 0; i < 64; ++i )
 	{
 		if ( permissionNames[i].empty() )
 		{
-			sprintf(name, "UNK_PERM_%u", i+1) ;
-			permissionNames[i] = name ;
+			sprintf(name, "UNK_PERM_%u", i+1);
+			permissionNames[i] = name;
 		}
 	}
 }
@@ -298,29 +298,29 @@ _readPermissionNames()
 LOGICAL
 chatInitDB()
 {
-	dbugLog(_FLD, "Initializing database") ;
+	dbugLog(_FLD, "Initializing database");
 
 	try
 	{
 		if ( dbh.connect(dbConnection) == false )
-			throw std::runtime_error("database connection failed") ;
+			throw std::runtime_error("database connection failed");
 
-		wwiiReadHCUnits() ;
-		wwiiReadRanks(dbh) ;
+		wwiiReadHCUnits();
+		wwiiReadRanks(dbh);
 
-		_readPermissionNames() ;
-		return chatdbLoadStratData() ;
+		_readPermissionNames();
+		return chatdbLoadStratData();
 	}
 	catch ( std::exception& e )
 	{
-		LogAbort("Unable to initialize Chat Database: %s", e.what()) ;
+		LogAbort("Unable to initialize Chat Database: %s", e.what());
 	}
 }
 
 LOGICAL
 chatCloseDB(void)
 {
-	dbh.disconnect() ;
+	dbh.disconnect();
 	return TRUE;
 }
 
@@ -337,7 +337,7 @@ chatdbListTasks()
 	{
 //		DBQuery q(dbh,
 	}
-	catch (std::exception& e) { dbugLog(_FLW, "%s: %s", __FUNCTION__, e.what()) ; }
+	catch (std::exception& e) { dbugLog(_FLW, "%s: %s", __FUNCTION__, e.what()); }
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -346,29 +346,29 @@ chatdbListTasks()
 UINT32
 chatGetPermissionNames(const PermissionMask& mask, char* into, UINT32 from)
 {
-	bool matched = (from != 0) ;
-	char* cutoff = into + MAX_MESSAGE_LENGTH - 4 ;
-	PermissionMask bit = 1ULL << from ;
-	for ( UINT32 i = from ; i < 64 ; ++i, bit <<= 1 )
+	bool matched = (from != 0);
+	char* cutoff = into + MAX_MESSAGE_LENGTH - 4;
+	PermissionMask bit = 1ULL << from;
+	for ( UINT32 i = from; i < 64; ++i, bit <<= 1 )
 	{
 		if ( (mask & bit) == 0ULL )
-			continue ;
+			continue;
 		if ( into + permissionNames[i].size() > cutoff )
 		{
-			*into = 0 ;
-			return i ;
+			*into = 0;
+			return i;
 		}
 		if ( matched == true )
 		{
-			*(into++) = ',' ;
-			*(into++) = ' ' ;
+			*(into++) = ',';
+			*(into++) = ' ';
 		}
 		else
-			matched = true ;
-		for ( const char* p = permissionNames[i].c_str() ; *p != 0 ; ++p, ++into )
-			*into = tolower(*p) ;
+			matched = true;
+		for ( const char* p = permissionNames[i].c_str(); *p != 0; ++p, ++into )
+			*into = tolower(*p);
 	}
-	*into = 0 ;
-	return 0 ;
+	*into = 0;
+	return 0;
 }
 

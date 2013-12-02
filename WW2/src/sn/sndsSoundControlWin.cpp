@@ -66,16 +66,16 @@ static LOGICAL sndsPlatformInitListener();
 // Function that throws up an error when the sound card fails to initialize.
 static inline void _soundError(const char* description)
 {
-	static const TCHAR* _SND_TITLE = _T("Error initializing sound") ;
-	static const TCHAR* _SND_ERR_1 = _T("Failed to initialize the sound device: ") ;
-	static const TCHAR* _SND_ERR_2 = _T("\nPlease check your sound card configuration and try again.") ;
+	static const TCHAR* _SND_TITLE = _T("Error initializing sound");
+	static const TCHAR* _SND_ERR_1 = _T("Failed to initialize the sound device: ");
+	static const TCHAR* _SND_ERR_2 = _T("\nPlease check your sound card configuration and try again.");
 
-	Write_Log(LOG_SOUND, LOG_WARN, description) ;
+	Write_Log(LOG_SOUND, LOG_WARN, description);
 	std::wstring message = _SND_ERR_1;
-	message += UTF16(description) ;
-	message += _SND_ERR_2 ;
+	message += UTF16(description);
+	message += _SND_ERR_2;
 
-	MessageBox(NULL, message.c_str(), _SND_TITLE, MB_ICONEXCLAMATION|MB_OK) ;
+	MessageBox(NULL, message.c_str(), _SND_TITLE, MB_ICONEXCLAMATION|MB_OK);
 }
 
 ////////////////////////////////////////////////
@@ -100,7 +100,7 @@ LOGICAL sndsPlatformInit(void)
 	    if(hr != DS_OK)
 	    {
 			DDError(hr);
-			throw "Could not create the DirectSound object" ;
+			throw "Could not create the DirectSound object";
 		}
 
 	    ///////////////////////
@@ -111,7 +111,7 @@ LOGICAL sndsPlatformInit(void)
 	    if(hr != DS_OK)
 	    {
 			DDError(hr);
-			throw "Could not set the cooperative level" ;
+			throw "Could not set the cooperative level";
 		}
 
 		///////////////////////////////
@@ -129,7 +129,7 @@ LOGICAL sndsPlatformInit(void)
 	    if(hr != DS_OK)
 	    {
 			DDError(hr);
-			throw "Could not create the primary sound buffer" ;
+			throw "Could not create the primary sound buffer";
 		}
 
 	    /////////////////////////////
@@ -149,7 +149,7 @@ LOGICAL sndsPlatformInit(void)
 	    if(hr != DS_OK)
 	    {
 			sndsPlatformKill();
-			throw "Could not set the format for the primary DirectSound buffer" ;
+			throw "Could not set the format for the primary DirectSound buffer";
 		}
 
 		// Don't need this anymore
@@ -159,7 +159,7 @@ LOGICAL sndsPlatformInit(void)
 	    if(b3DSoundEnable && !sndsPlatformInitListener())
 	    {
 			sndsPlatformKill();
-			throw "Unable to initialize hardware sound driver" ;
+			throw "Unable to initialize hardware sound driver";
 		}
 
 	    if(VolumeMultiplier < 0.01f)
@@ -202,7 +202,7 @@ LOGICAL sndsPlatformInit(void)
 		{
 	        DDError(hr);
 			sndsPlatformKill();
-			throw "Could not play the primary sound buffer" ;
+			throw "Could not play the primary sound buffer";
 		}
 #endif
 
@@ -210,18 +210,18 @@ LOGICAL sndsPlatformInit(void)
 	}
 	catch ( const char* error )
 	{
-		_soundError(error) ;
+		_soundError(error);
 	}
 	catch ( std::exception& e )
 	{
-		_soundError(e.what()) ;
+		_soundError(e.what());
 	}
 	catch ( ... )
 	{
-		_soundError("[unknown error]") ;
+		_soundError("[unknown error]");
 	}
 
-	return FALSE ;
+	return FALSE;
 #endif // XAUDIO
 }
 

@@ -19,7 +19,7 @@
 #include "teul/teulTime.h"					// teulTime()
 #include "wwii/wwiiConfig.h"
 
-extern void strtQueueVisLevelUpdate(ObjectStruct* object) ;
+extern void strtQueueVisLevelUpdate(ObjectStruct* object);
 
 //////////////////////////////////////////////////////////////////////
 // Extend how long this building is going to take to repair
@@ -27,7 +27,7 @@ extern void strtQueueVisLevelUpdate(ObjectStruct* object) ;
 void
 ObjectStruct::addRepairTime(UINT32 time)
 {
-	m_repairTime = teulTime() + (time * host_config.rpTime) ;
+	m_repairTime = teulTime() + (time * host_config.rpTime);
 	// Does not get saved
 }
 
@@ -38,8 +38,8 @@ FLOAT64
 ObjectStruct::factoryDamageFactor() const
 {
 	if ( !facility || facility->side != facility->originalSide || m_maxDamageJoules == 0 )
-		return 1.0 ;
-	return (FLOAT64) m_damageJoules / (FLOAT64) m_maxDamageJoules ;
+		return 1.0;
+	return (FLOAT64) m_damageJoules / (FLOAT64) m_maxDamageJoules;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -48,27 +48,27 @@ ObjectStruct::factoryDamageFactor() const
 void
 ObjectStruct::recalculateCapacity()
 {
-	SINT32 newCapacity = 0 ;
+	SINT32 newCapacity = 0;
 	if ( m_maxCapacity > 0 )
 	{
 		if ( percentDamage == 0 )
-			newCapacity = m_maxCapacity ;
+			newCapacity = m_maxCapacity;
 		else if ( percentDamage < 100 )
 		{
-			newCapacity = m_maxCapacity - (UINT32)((FLOAT32)m_maxCapacity * (FLOAT32)percentDamage / 100.0f) ;
+			newCapacity = m_maxCapacity - (UINT32)((FLOAT32)m_maxCapacity * (FLOAT32)percentDamage / 100.0f);
 			if ( newCapacity < 0 )
-				newCapacity = 0 ;
+				newCapacity = 0;
 		}
 	}
 
-	setCapacity((UINT32)newCapacity) ;
+	setCapacity((UINT32)newCapacity);
 }
 
 //////////////////////////////////////////////////////////////////////
 // Strat definition is in strtHostDB.cpp
 
 #ifndef IS_STRAT_HOST
-bool ObjectStruct::save() { return true ; }
+bool ObjectStruct::save() { return true; }
 #endif
 
 //////////////////////////////////////////////////////////////////////
@@ -78,15 +78,15 @@ void
 ObjectStruct::setCapacity(UINT32 newCapacity)
 {
 	if ( newCapacity > m_maxCapacity )
-		newCapacity = m_maxCapacity ;
+		newCapacity = m_maxCapacity;
 
 	if ( m_capacity == newCapacity && m_lastCapacity == m_capacity )
-		return ;
+		return;
 
-	m_lastCapacity = m_capacity ;
-	m_capacity = newCapacity ;
+	m_lastCapacity = m_capacity;
+	m_capacity = newCapacity;
 
-	save() ;
+	save();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -96,12 +96,12 @@ void
 ObjectStruct::setCountry(WWII_COUNTRY newCountry, WWII_SIDE newSide)
 {
 	if ( newCountry == m_country && newSide == m_side )
-		return ;
+		return;
 
-	m_country = newCountry ;
-	m_side = newSide ;
+	m_country = newCountry;
+	m_side = newSide;
 
-	save() ;
+	save();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -112,18 +112,18 @@ ObjectStruct::setDamageJoules(SINT64 newDamageJoules)
 {
 	// Validate the value
 	if ( newDamageJoules > m_maxDamageJoules )
-		newDamageJoules = m_maxDamageJoules ;
+		newDamageJoules = m_maxDamageJoules;
 	else if ( newDamageJoules < 0 )
-		newDamageJoules = 0 ;
+		newDamageJoules = 0;
 
 	if ( m_damageJoules == newDamageJoules )
-		return false ;
+		return false;
 
-	m_damageJoules = newDamageJoules ;
+	m_damageJoules = newDamageJoules;
 
-	save() ;
+	save();
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -134,14 +134,14 @@ ObjectStruct::setMaxCapacity(UINT32 newMax)
 {
 	if ( newMax != m_maxCapacity )
 	{
-		m_maxCapacity = newMax ;
-		save() ;
+		m_maxCapacity = newMax;
+		save();
 	}
 
 	if ( m_capacity != newMax || m_lastCapacity != newMax )
 	{
-		m_capacity = m_lastCapacity = newMax ;
-		save() ;
+		m_capacity = m_lastCapacity = newMax;
+		save();
 	}
 }
 
@@ -152,9 +152,9 @@ void
 ObjectStruct::setRepairRPs(UINT32 newRepairRPs)
 {
 	if ( m_repairRPs == newRepairRPs )
-		return ;
-	m_repairRPs = newRepairRPs ;
-	save() ;
+		return;
+	m_repairRPs = newRepairRPs;
+	save();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -170,29 +170,29 @@ ObjectStruct::setTableTimer(UCHAR inVisLevel, bool allowRebuild, bool shortRebui
 			, inVisLevel
 			, ((allowRebuild)?"RB":"NORB")
 			, ((shortRebuild)?"short":"long")
-			) ;
+			);
 
 	if ( inVisLevel != visLevel() )
 	{
-		setVisLevel(inVisLevel) ;
-		strtQueueVisLevelUpdate(this) ;
+		setVisLevel(inVisLevel);
+		strtQueueVisLevelUpdate(this);
 	}
 
 	if ( allowRebuild )
 	{
 		// Set values that will cause the table to be rebuilt
-		m_damageJoules = m_maxDamageJoules ;
+		m_damageJoules = m_maxDamageJoules;
 		// Choose between the tables innate rebuild and the
 		// host_config "short" one used after a capture, e.g.
 		if ( !shortRebuild )
-			addRepairTime(rebuildPeriod) ;
+			addRepairTime(rebuildPeriod);
 		else
 			addRepairTime((host_config.capture.rebuildTime_s + 59) / 60);
 	}
 	else
 	{
-		m_repairTime = 0 ;
-		m_damageJoules = 0 ;
+		m_repairTime = 0;
+		m_damageJoules = 0;
 	}
 }
 
@@ -204,17 +204,17 @@ ObjectStruct::setSmokeLevel(UCHAR newLevel)
 {
 	// Nothing to do
 	if ( m_smokeLevel == newLevel )
-		return ;
+		return;
 
 	// Only applies to some buildings
 	if ( type != BUILDING_GENERIC && type != BUILDING_RESEARCH && type != BUILDING_SPAWN )
-		return ;
+		return;
 
-	m_smokeLevel = newLevel ;
+	m_smokeLevel = newLevel;
 
-	m_lastSmokeTime = teulTime() ;
+	m_lastSmokeTime = teulTime();
 
-	strtQueueVisLevelUpdate(this) ;
+	strtQueueVisLevelUpdate(this);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -225,12 +225,12 @@ ObjectStruct::setVisLevel(UCHAR newLevel)
 {
 	// No change to make
 	if ( newLevel == m_visLevel )
-		return ;
+		return;
 
-	m_visLevel = newLevel ;
-	m_damagedBy = 0 ;
+	m_visLevel = newLevel;
+	m_damagedBy = 0;
 
-	strtQueueVisLevelUpdate(this) ;
+	strtQueueVisLevelUpdate(this);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -238,7 +238,7 @@ ObjectStruct::setVisLevel(UCHAR newLevel)
 
 #ifndef IS_STRAT_HOST
 
-SINT32 runtime = 0 ;
+SINT32 runtime = 0;
 
 void strtQueueVisLevelUpdate(ObjectStruct* /*obj*/)
 {

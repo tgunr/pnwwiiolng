@@ -237,12 +237,12 @@ static void SetTodaysRainTimes(const int seedidx)
 			if(start > 0 || start < (int)daySeconds)
 				thundertimes.push_back((unsigned int)start / divisor);
 
-			unsigned int hour = raintimes[i] / 3600 ;
+			unsigned int hour = raintimes[i] / 3600;
 			unsigned int thunders = (hour >= 6 && hour <= 18) ? 16 : 3;
 			for(unsigned int t = 1; t < thunders; ++t)
 			{
 				if ( rainlength[i] < 120 )
-					continue ;
+					continue;
 				// Chance of an additional rumbles the rain; increasingly less likely.
 				if(WeatherRandom(0, t) == 0)
 				{
@@ -394,7 +394,7 @@ static void PrintTimeLine()
 	{
 		output += "Rain Times: ";
 
-		for ( unsigned int i = 0 ; i < raintimes.size() ; ++i )
+		for ( unsigned int i = 0; i < raintimes.size(); ++i )
 		{
 			if(i > 0)
 				output += ", ";

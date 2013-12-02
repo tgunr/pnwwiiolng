@@ -9,7 +9,7 @@ PLAY_COMPUTER_INFO compInfo;
 
 static TEUL_CALLBACK* infoSend;
 
-extern HINSTANCE hMainInstance ;
+extern HINSTANCE hMainInstance;
 
 static SINT32 _SendInfo(ACTION_OBJECT* const a)
 {
@@ -19,7 +19,7 @@ static SINT32 _SendInfo(ACTION_OBJECT* const a)
 static void _sendInfo(SINT32 teulIndex,PLAY_COMPUTER_INFO* const info)
 {
 	// Ensure the version stamp is current.
-	info->version = info->CurrentVersion() ;
+	info->version = info->CurrentVersion();
 	teulSend(teulIndex,infoSend,info);
 }
 
@@ -44,7 +44,7 @@ static SINT32 _recvInfoReq(ACTION_OBJECT* const a)
 SINT32 infoInstallCallbacks(void)
 {
 	BEGIN_CALLBACK_REGISTRATION(PgInfo::CallbackX)
-		REGISTER_SENDER(PLAY_INFO_SEND_Y, _SendInfo, infoSend) ;
-		REGISTER_RECEIVER(PLAY_INFO_REQ_RECV_Y, _recvInfoReq) ;
+		REGISTER_SENDER(PLAY_INFO_SEND_Y, _SendInfo, infoSend);
+		REGISTER_RECEIVER(PLAY_INFO_REQ_RECV_Y, _recvInfoReq);
 	END_CALLBACK_REGISTRATION
 }

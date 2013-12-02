@@ -30,14 +30,14 @@ namespace Scoring
 		,	Resupply
 		,	UMSKill
 		,	WeaponReturn
-		} ;
+		};
 	}
 
 	//! @class Scoring::EventBase
 	//! @brief Un-attributed Event comprising event type and instance.
 	class EventBase
 	{
-	public:	typedef Scoring::Actor LhsType ;
+	public:	typedef Scoring::Actor LhsType;
 	public:	EventBase() : m_type(Events::Invalid), m_lhs() {}
 	public: EventBase(const Events::Type type_, const LhsType& lhs_)
 				: m_type(type_), m_lhs(lhs_)
@@ -45,13 +45,13 @@ namespace Scoring
 
 			//! Event type.
 			//! @see Scoring::Events::Type
-	public: const Events::Type& type() const { return m_type ; }
+	public: const Events::Type& type() const { return m_type; }
 			//! Player this event is being attributed to.
-	public: const LhsType& lhs() const { return m_lhs ; }
+	public: const LhsType& lhs() const { return m_lhs; }
 
-	private:	Events::Type		m_type ;		//!< What type of event.
-	private:	LhsType				m_lhs ;			//!< Player this is being attributed to.
-	} ;
+	private:	Events::Type		m_type;		//!< What type of event.
+	private:	LhsType				m_lhs;			//!< Player this is being attributed to.
+	};
 
 	//! @class Scoring::Event
 	//! @brief Base class for describing scoring events.
@@ -60,8 +60,8 @@ namespace Scoring
 	template<typename RhsType_>
 	class Event : public EventBase
 	{
-	public: typedef RhsType_ RhsType ;
-	public: typedef Event<RhsType> SelfType ;
+	public: typedef RhsType_ RhsType;
+	public: typedef Event<RhsType> SelfType;
 
 	public:
 		//! Default constructor.
@@ -79,11 +79,11 @@ namespace Scoring
 
 	public:
 		//! Retrieve the right-hand-side entity.
-		const RhsType& rhs() const { return m_rhs ; }
+		const RhsType& rhs() const { return m_rhs; }
 
 	private:
-		RhsType			m_rhs ;			//!< Right-hand-side entity.
-	} ;
+		RhsType			m_rhs;			//!< Right-hand-side entity.
+	};
 }
 #pragma pack(pop)
 
@@ -92,12 +92,12 @@ namespace Scoring
 #define BEGIN_SCORING_EVENT( name_, RhsType_ )	\
 	class name_ : public Scoring::Event<RhsType_> \
 	{ \
-	public:	static const Scoring::Events::Type Type = Events :: name_ ; \
-	public: typedef Scoring::Actor LhsType ; \
-	public: typedef RhsType_ RhsType ; \
-	public: typedef Scoring::Event<RhsType> EventType ; \
-	public: bool process(Player* const player) ;
+	public:	static const Scoring::Events::Type Type = Events :: name_; \
+	public: typedef Scoring::Actor LhsType; \
+	public: typedef RhsType_ RhsType; \
+	public: typedef Scoring::Event<RhsType> EventType; \
+	public: bool process(Player* const player);
 
-#define END_SCORING_EVENT( )	} ;
+#define END_SCORING_EVENT( )	};
 
 

@@ -71,6 +71,6 @@ namespace Teul
 
 		,	ChatSrvErr		=	30300
 		,	MapSrvClose		=	30303
-		} ;
+		};
 	}
 }

@@ -5,34 +5,34 @@
 
 #include "teul/teulMicroWebServer.h"
 
-extern TeulTimeMS teulClock64 ;
+extern TeulTimeMS teulClock64;
 
 struct Header
 {
 	static Header* FromPointer(void* const ptr)
 	{
-		return ((Header*)ptr) - 1 ;
+		return ((Header*)ptr) - 1;
 	}
 
-	size_t				m_allocSize ;
-	struct Activity*	m_activity ;
-} ;
+	size_t				m_allocSize;
+	struct Activity*	m_activity;
+};
 
 struct Activity
 {
 	Activity() : m_allocs(0), m_frees(0), m_unfreed(0), m_maxAllocated(0), m_curAllocated(0), m_lastAccess(0) {}
 
-	unsigned long long	m_allocs ;
-	unsigned long long	m_frees ;
-	unsigned long long	m_unfreed ;
-	unsigned long long	m_maxAllocated ;
-	unsigned long long	m_curAllocated ;
-	TeulTimeMS			m_lastAccess ;
+	unsigned long long	m_allocs;
+	unsigned long long	m_frees;
+	unsigned long long	m_unfreed;
+	unsigned long long	m_maxAllocated;
+	unsigned long long	m_curAllocated;
+	TeulTimeMS			m_lastAccess;
 
 	void describe(unsigned long long fileline, char* const buffer, const size_t bufferSize)
 	{
-		const char* const file = ((const char*)(fileline >> 32)) ;
-		const size_t line = (size_t)(fileline) ;
+		const char* const file = ((const char*)(fileline >> 32));
+		const size_t line = (size_t)(fileline);
 		snprintf(buffer, bufferSize - 1
 				, "%s:%" PRSizeT " allocs:%llu frees:%llu unfreed:%llu maxAllocated:%llu curAllocated:%llu la:%llu"
 					, file, line
@@ -42,13 +42,13 @@ struct Activity
 					, m_maxAllocated
 					, m_curAllocated
 					, teulClock64 - m_lastAccess
-				) ;
+				);
 	}
 
 	size_t describeJSON(unsigned long long fileline, char* const buffer, const size_t bufferSize, const size_t offset)
 	{
-		const char* const file = ((const char*)(fileline >> 32)) ;
-		const size_t line = (size_t)(fileline) ;
+		const char* const file = ((const char*)(fileline >> 32));
+		const size_t line = (size_t)(fileline);
 
 		size_t printed = snprintf(buffer + offset, bufferSize - (1 + offset)
 									, "\"%s:%" PRSizeT "\":{\"allocs\":%llu,\"frees\":%llu,\"unfreed\":%llu,\"max\":%llu,\"cur\":%llu,\"la\":%llu}"
@@ -59,39 +59,39 @@ struct Activity
 										, m_maxAllocated
 										, m_curAllocated
 										, teulClock64 - m_lastAccess
-										) ;
+										);
 
-		return offset + printed ;
+		return offset + printed;
 	}
 
 	void alloc(Header* const ptr_, const size_t amount_)
 	{
-		m_allocs++ ;
-		m_unfreed++ ;
-		m_curAllocated += amount_ ;
+		m_allocs++;
+		m_unfreed++;
+		m_curAllocated += amount_;
 		if ( m_curAllocated > m_maxAllocated )
-			m_maxAllocated = m_curAllocated ;
-		m_lastAccess = teulClock64 ;
+			m_maxAllocated = m_curAllocated;
+		m_lastAccess = teulClock64;
 
-		ptr_->m_allocSize = amount_ ;
-		ptr_->m_activity = this ;
+		ptr_->m_allocSize = amount_;
+		ptr_->m_activity = this;
 	}
 
 	void free(Header* const ptr_)
 	{
-		m_frees++ ;
-		m_unfreed-- ;
-		m_curAllocated -= ptr_->m_allocSize ;
-		m_lastAccess = teulClock64 ;
+		m_frees++;
+		m_unfreed--;
+		m_curAllocated -= ptr_->m_allocSize;
+		m_lastAccess = teulClock64;
 	}
-} ;
+};
 
 static unsigned long long _fileLineToLong(const char* const file_, const size_t line_)
 {
-	return ((unsigned long long)file_) << 32 | (unsigned long long)line_ ;
+	return ((unsigned long long)file_) << 32 | (unsigned long long)line_;
 }
 
-typedef UNORDERED_MAP<unsigned long long, Activity> HISTORY_BASE ;
+typedef UNORDERED_MAP<unsigned long long, Activity> HISTORY_BASE;
 
 struct HISTORY : HISTORY_BASE
 {
@@ -103,114 +103,114 @@ struct HISTORY : HISTORY_BASE
 		std::this_thread::sleep_for(std::chrono::milliseconds(10));
 	}
 	volatile bool m_inUse;
-	std::mutex m_mutex ;
+	std::mutex m_mutex;
 } history;
 
 void*
 memCallocDebug(const size_t units_, const size_t size_, const char* const file_, const size_t line_)
 {
-	unsigned long long flLong = _fileLineToLong(file_, line_) ;
+	unsigned long long flLong = _fileLineToLong(file_, line_);
 
-	Header* ptr = (Header*)calloc(1, (units_ * size_) + sizeof(Header)) ;
-	if ( ptr == NULL )
-		return ptr ;
+	Header* ptr = (Header*)calloc(1, (units_ * size_) + sizeof(Header));
+	if ( PN_UNLIKELY(ptr == nullptr) )
+		return ptr;
 
-	if ( history.m_inUse )
+	if ( PN_LIKELY(history.m_inUse) )
 	{
-		std::lock_guard<std::mutex> lock(history.m_mutex) ;
-		Activity& act = history[ flLong ] ;
-		act.alloc(ptr, size_) ;
+		std::lock_guard<std::mutex> lock(history.m_mutex);
+		Activity& act = history[ flLong ];
+		act.alloc(ptr, size_);
 	}
 
-	return ptr + 1 ;
+	return ptr + 1;
 }
 
 void*
 memReallocDebug(void* const oldPtr_, const size_t newSize_, const char* const file_, const size_t line_)
 {
-	unsigned long long flLong = _fileLineToLong(file_, line_) ;
+	unsigned long long flLong = _fileLineToLong(file_, line_);
 
-	Header* const oldHeader = Header::FromPointer(oldPtr_) ;
+	Header* const oldHeader = Header::FromPointer(oldPtr_);
 
-	const size_t oldSize = oldHeader->m_allocSize ;
+	const size_t oldSize = oldHeader->m_allocSize;
 
-	Header* newPtr = (Header*)malloc(newSize_ + sizeof(Header)) ;
-	memcpy(newPtr, oldHeader, sizeof(Header) + std::min(newSize_, oldSize)) ;
-	Activity* const oldAct = newPtr->m_activity ;
+	Header* newPtr = (Header*)malloc(newSize_ + sizeof(Header));
+	memcpy(newPtr, oldHeader, sizeof(Header) + std::min(newSize_, oldSize));
+	Activity* const oldAct = newPtr->m_activity;
 
-	if ( history.m_inUse )
+	if ( PN_LIKELY(history.m_inUse) )
 	{
-		std::lock_guard<std::mutex> lock(history.m_mutex) ;
-		Activity& newAct = history[ flLong ] ;
-		oldAct->free(newPtr) ;
-		newAct.alloc(newPtr, newSize_) ;
+		std::lock_guard<std::mutex> lock(history.m_mutex);
+		Activity& newAct = history[ flLong ];
+		oldAct->free(newPtr);
+		newAct.alloc(newPtr, newSize_);
 	}
 
 #ifdef DEV_BUILD
-	memset(oldHeader, 0xe3, oldSize) ;
+	memset(oldHeader, 0xe3, oldSize);
 #endif
 
-	free(oldHeader) ;
+	free(oldHeader);
 
-	return newPtr + 1 ;
+	return newPtr + 1;
 }
 
 void
 memFreeDebug(void* const oldPtr_, const char* const file_, const size_t line_)
 {
-	Header* header = Header::FromPointer(oldPtr_) ;
-	if ( history.m_inUse )
+	Header* header = Header::FromPointer(oldPtr_);
+	if ( PN_LIKELY(history.m_inUse) )
 	{
-		std::lock_guard<std::mutex> lock(history.m_mutex) ;
-		header->m_activity->free(header) ;
+		std::lock_guard<std::mutex> lock(history.m_mutex);
+		header->m_activity->free(header);
 	}
 
 #ifdef DEV_BUILD
-	const size_t size = header->m_allocSize ;
-	memset(header, 0xe5, size) ;
+	const size_t size = header->m_allocSize;
+	memset(header, 0xe5, size);
 #endif
-	free(header) ;
+	free(header);
 }
 
 #if defined(MEMORY_DEBUG)
 void
 memReportJSON(unsigned int fd, const char* const /*path*/, const char* const /*args*/)
 {
-	char buffer[132 * 200] ;
-	size_t offset = 0 ;
+	char buffer[132 * 200];
+	size_t offset = 0;
 
-	const TeulTimeMS cutoff = teulClock64 - (5 * 60 * 1000) ;
+	const TeulTimeMS cutoff = teulClock64 - (5 * 60 * 1000);
 
-	if ( history.m_inUse )
+	if ( PN_LIKELY(history.m_inUse) )
 	{
-		std::lock_guard<std::mutex> lock(history.m_mutex) ;
-		const auto end = history.end() ;
-		for ( auto it = history.begin() ; it != end ; ++it )
+		std::lock_guard<std::mutex> lock(history.m_mutex);
+		const auto end = history.end();
+		for ( auto it = history.begin(); it != end; ++it )
 		{
 			if ( it->second.m_lastAccess < cutoff && it->second.m_unfreed == 0 )
-				continue ;
-			offset += sprintf(buffer + offset, "%s", offset ? "," : "{") ;
-			offset = it->second.describeJSON(it->first, buffer, sizeof(buffer), offset) ;
+				continue;
+			offset += sprintf(buffer + offset, "%s", offset ? "," : "{");
+			offset = it->second.describeJSON(it->first, buffer, sizeof(buffer), offset);
 		}
 	}
 	else
 		return;
 
-	offset += sprintf(buffer + offset, "\r\n}\r\n") ;
+	offset += sprintf(buffer + offset, "\r\n}\r\n");
 
-	send(fd, buffer, offset, 0) ;
+	send(fd, buffer, offset, 0);
 }
 #endif
 
 void
 memReport()
 {
-	fprintf(stderr, "Memory Report:\n") ;
-	char buffer[128] ;
-	for ( auto it = history.begin() ; it != history.end() ; ++it )
+	fprintf(stderr, "Memory Report:\n");
+	char buffer[128];
+	for ( auto it = history.begin(); it != history.end(); ++it )
 	{
-		it->second.describe(it->first, buffer, sizeof(buffer)) ;
-		fprintf(stderr, "%s\n", buffer) ;
+		it->second.describe(it->first, buffer, sizeof(buffer));
+		fprintf(stderr, "%s\n", buffer);
 	}
 }
 
@@ -218,11 +218,11 @@ LOGICAL
 memInit()
 {
 #if defined(MEMORY_DEBUG)
-	atexit(memReport) ;
+	atexit(memReport);
 
-	if ( Teul::uWeb::s_debugServer != NULL )
-		Teul::uWeb::s_debugServer->addVirtualFile("Debug Memory Usage Statistics", "/mem.json", memReportJSON) ;
+	if ( Teul::uWeb::s_debugServer != nullptr )
+		Teul::uWeb::s_debugServer->addVirtualFile("Debug Memory Usage Statistics", "/mem.json", memReportJSON);
 #endif
 
-	return TRUE ;
+	return TRUE;
 }

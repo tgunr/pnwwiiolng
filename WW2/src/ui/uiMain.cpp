@@ -1977,7 +1977,7 @@ static int openLocDTD(const char* name)
 
 void locInitStrings(bool force)
 {
-	static unsigned int lang = 0xffffffff ;
+	static unsigned int lang = 0xffffffff;
 
 	if(!force && gLanguage == lang)
 		return;
@@ -2459,7 +2459,7 @@ int uiConsoleprintf(const char* text, ...)
 		if(out[out.size()  - 1] != '\n')
 			out += "\n";
 
-		Write_Log(LOG_CONSOLE, LOG_INFO, out.c_str()) ;
+		Write_Log(LOG_CONSOLE, LOG_INFO, out.c_str());
 
 		if(display) display->AddText(out.c_str());
 

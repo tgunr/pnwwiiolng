@@ -96,7 +96,7 @@ static off_t _getFilePathAndSize(const char* name, bool userdir, wchar_t* widePa
 static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* widePath, size_t wsize)
 #endif
 {
-	SINT32 retval = 0 ;
+	SINT32 retval = 0;
 
 	char buffer[PATH_MAX + 1];
 
@@ -114,7 +114,7 @@ static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* wi
 
 			if (retval == 0)
 			{
-				return wStatBuffer.st_size ; // Return what the OS thinks it is
+				return wStatBuffer.st_size; // Return what the OS thinks it is
 			}
 		}
 	// Else fall through normally
@@ -123,26 +123,26 @@ static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* wi
 
 	// think this works as char* because when we get to here we're talking about relative paths which are all ascii?
 	size_t pathLen = pathprintf(buffer, DataPath, name);
-	for ( size_t i = 0 ; i < pathLen ; ++i )
+	for ( size_t i = 0; i < pathLen; ++i )
 	{
 		if ( buffer[i] == CHANGE_SEP )
 			buffer[i] = PATH_SEPARATOR;
 	}
 
-	struct stat statBuffer ;
+	struct stat statBuffer;
 	retval = stat(os_file_path(buffer), &statBuffer);
 
 #if platOS != OS_WIN32
 	///TODO: OGS: I think this works under Windows too...
 	if ( retval < 0 || !S_ISREG(statBuffer.st_mode) )
 	{
-		return -1 ;
+		return -1;
 	}
 #else
 	///TODO: OGS: See above: This allows Windows to [try to] open directories like files.
 	if ( retval < 0 )
 	{
-		return -1 ;
+		return -1;
 	}
 #endif
 
@@ -150,7 +150,7 @@ static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* wi
 	if(!WWII::ConvertChars(buffer, widePath, wsize))
 		return -1;
 
-	return statBuffer.st_size ; // Return what the OS thinks it is
+	return statBuffer.st_size; // Return what the OS thinks it is
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -159,20 +159,20 @@ static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* wi
 bool
 fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 {
-	wchar_t	widePath[PATH_MAX + 1] = L"" ;
-	char	asciiPath[PATH_MAX + 1] = "" ;
+	wchar_t	widePath[PATH_MAX + 1] = L"";
+	char	asciiPath[PATH_MAX + 1] = "";
 
-	outPtr = NULL ;
+	outPtr = NULL;
 
-	off_t fileSize = _getFilePathAndSize(filename, false, widePath, sizeof(widePath)) ;
+	off_t fileSize = _getFilePathAndSize(filename, false, widePath, sizeof(widePath));
 	if ( fileSize < 0 )
 	{
-		DEBUG_ERR("Error performing stat on '%s'.", filename) ;
-		return false ;
+		DEBUG_ERR("Error performing stat on '%s'.", filename);
+		return false;
 	}
 
 	if ( fileSize == 0 )
-		return true ;
+		return true;
 
 	WWIIConvert(widePath, asciiPath);
 
@@ -186,44 +186,44 @@ fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 #endif
 	if ( fd < 0 )
 	{
-		DEBUG_ERR("Unable to open '%s'.", asciiPath) ;
-		return false ;
+		DEBUG_ERR("Unable to open '%s'.", asciiPath);
+		return false;
 	}
 
-	static const size_t _PAGE_SIZE = 4096 ;		// *MUST* be a power of two
-	const size_t allocSize = ((size_t)fileSize + 1 + _PAGE_SIZE) & ~_PAGE_SIZE ;
+	static const size_t _PAGE_SIZE = 4096;		// *MUST* be a power of two
+	const size_t allocSize = ((size_t)fileSize + 1 + _PAGE_SIZE) & ~_PAGE_SIZE;
 
-	char* mem = (char*)memAlloc(allocSize) ;
+	char* mem = (char*)memAlloc(allocSize);
 	if ( mem == NULL )
 	{
-		OS_CLOSE(fd) ;
-		DEBUG_FATAL("Out of memory loading '%s' (%" PRSizeT " bytes).", filename, allocSize) ;
-		return false ;
+		OS_CLOSE(fd);
+		DEBUG_FATAL("Out of memory loading '%s' (%" PRSizeT " bytes).", filename, allocSize);
+		return false;
 	}
 
-	int bytesRead = OS_READ(fd, mem, fileSize) ;
-	OS_CLOSE(fd) ;
+	int bytesRead = OS_READ(fd, mem, fileSize);
+	OS_CLOSE(fd);
 
 	if ( bytesRead < 0 )
 	{
-		DEBUG_ERR("Error reading data from %s (fd:%d, size:%u)", asciiPath, fd, (unsigned int)fileSize) ;
-		memFree(mem) ;
-		return false ;
+		DEBUG_ERR("Error reading data from %s (fd:%d, size:%u)", asciiPath, fd, (unsigned int)fileSize);
+		memFree(mem);
+		return false;
 	}
 
 	if ( bytesRead != fileSize )
 	{
-		DEBUG_ERR("Read error reading %s, got %d bytes instead of %u.", filename, bytesRead, (unsigned int)fileSize) ;
+		DEBUG_ERR("Read error reading %s, got %d bytes instead of %u.", filename, bytesRead, (unsigned int)fileSize);
 	}
 
-	mem[bytesRead] = 0 ;
+	mem[bytesRead] = 0;
 
 	if ( outSize != NULL )
-		*outSize = (unsigned int)fileSize ;
+		*outSize = (unsigned int)fileSize;
 
-	outPtr = mem ;
+	outPtr = mem;
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -240,26 +240,26 @@ namespace Fiod
 	struct FileState
 	{
 		FileState() : basePtr(NULL), curPtr(NULL), endPtr(NULL), bytes(0) {}
-		~FileState() { if ( basePtr != NULL ) memFree(basePtr) ; }
+		~FileState() { if ( basePtr != NULL ) memFree(basePtr); }
 
-		char* basePtr ;
-		char* curPtr ;
-		char* endPtr ;
-		size_t bytes ;
+		char* basePtr;
+		char* curPtr;
+		char* endPtr;
+		size_t bytes;
 
 		void Assign(char* base, size_t numBytes)
 		{
-			curPtr = basePtr = base ;
-			endPtr = basePtr + numBytes ;
-			bytes = numBytes ;
+			curPtr = basePtr = base;
+			endPtr = basePtr + numBytes;
+			bytes = numBytes;
 		}
 
-		size_t  BytesRemaining() const { return (size_t)(endPtr - curPtr) ; }
-		bool IsAtEof() const { return curPtr >= endPtr ; }
+		size_t  BytesRemaining() const { return (size_t)(endPtr - curPtr); }
+		bool IsAtEof() const { return curPtr >= endPtr; }
 
 		size_t Read(void* dest, size_t length)
 		{
-			const size_t readLen = std::min(BytesRemaining(), length) ;
+			const size_t readLen = std::min(BytesRemaining(), length);
 	  if ( readLen == 4 )
 	  {
 		char* dst = (char*) dest;
@@ -270,71 +270,71 @@ namespace Fiod
 	  }
 			else if ( readLen > 0 )
 			{
-				memcpy(dest, curPtr, readLen) ;
-				curPtr = curPtr + readLen ;
+				memcpy(dest, curPtr, readLen);
+				curPtr = curPtr + readLen;
 			}
-			return readLen ;
+			return readLen;
 		}
 
 		size_t Seek(size_t offset, int from)
 		{
-			char* newPtr = NULL ;
+			char* newPtr = NULL;
 			switch ( from )
 			{
 			case fioSEEK_SET:
-				newPtr = basePtr + offset ;
-			break ;
+				newPtr = basePtr + offset;
+			break;
 			case fioSEEK_CUR:
-				newPtr = curPtr + offset ;
-			break ;
+				newPtr = curPtr + offset;
+			break;
 			case fioSEEK_END:
-				newPtr = endPtr + offset ;
-			break ;
+				newPtr = endPtr + offset;
+			break;
 			}
 			if ( newPtr < basePtr || newPtr > endPtr )
-				return (size_t)-1 ;
-			curPtr = newPtr ;
-			return (size_t)(curPtr - basePtr) ;
+				return (size_t)-1;
+			curPtr = newPtr;
+			return (size_t)(curPtr - basePtr);
 		}
-	} ;
+	};
 }
 
 // We use a map of file descriptors to track memory allocations
 // for fiod files.
 
 #if platOS == OS_LINUX
-typedef std::unordered_map<SINT32, Fiod::FileState> FILE_MAP ;
+typedef std::unordered_map<SINT32, Fiod::FileState> FILE_MAP;
 #else
 typedef stdext::hash_map<SINT32, Fiod::FileState> FILE_MAP;
 #endif
 
-static FILE_MAP s_fileMap ;
+static FILE_MAP s_fileMap;
 
 //////////////////////////////////////////////////////////////////////
 // Lookup a Fiod::FileState from a descriptor
 
-static int lastFd = -1 ;
-static Fiod::FileState* lastResult = NULL ;
+static int lastFd = -1;
+static Fiod::FileState* lastResult = NULL;
 
 static Fiod::FileState*
 _lookupFileState(int fd)
 {
 	if ( fd != lastFd )
 	{
-		FILE_MAP::iterator it = s_fileMap.find(fd) ;
+		FILE_MAP::iterator it = s_fileMap.find(fd);
 		if ( it != s_fileMap.end() )
 		{
-			lastFd = fd ;
-			lastResult = &it->second ;
+			lastFd = fd;
+			lastResult = &it->second;
 		}
 		else
 		{
-			lastFd = -1 ;
-			lastResult = NULL ;
+			lastFd = -1;
+			lastResult = NULL;
 		}
 	}
 
-	return lastResult ;
+	return lastResult;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -364,24 +364,24 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 	// Then round the size up to the next page size to
 	// limit memory fragmentation.
 
-	static const size_t _PAGE_SIZE = 4096 ;		// *MUST* be a power of two
-	const size_t allocSize = ((size_t)fileSize + 1 + _PAGE_SIZE) & ~_PAGE_SIZE ;
+	static const size_t _PAGE_SIZE = 4096;		// *MUST* be a power of two
+	const size_t allocSize = ((size_t)fileSize + 1 + _PAGE_SIZE) & ~_PAGE_SIZE;
 
-	char* mem = (char*)memAlloc(allocSize) ;
+	char* mem = (char*)memAlloc(allocSize);
 	if ( mem == NULL )
 	{
 #if platBuild == TEUL_SERVER
-		LogAbort("out of memory opening %s", asciiPath) ;
+		LogAbort("out of memory opening %s", asciiPath);
 #else
-		Write_Log(LOG_ALL, LOG_FATAL, "out of memory opening %s", asciiPath) ;
-		piExitProgram(__FILE__, __LINE__, "out of memory") ;
+		Write_Log(LOG_ALL, LOG_FATAL, "out of memory opening %s", asciiPath);
+		piExitProgram(__FILE__, __LINE__, "out of memory");
 		return -1;
 #endif
 	}
 
-	mem[fileSize] = 0 ;
+	mem[fileSize] = 0;
 
-	int fd = -1 ;
+	int fd = -1;
 
 	try
 	{
@@ -394,40 +394,40 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 		recordRef(os_file_path(asciiPath));
 #endif
 		if ( fd < 0 )
-			throw "open failed" ;
+			throw "open failed";
 
 		// Sanity check: we don't already think we have this
 		// descriptor open.
-		assert( s_fileMap.find(fd) == s_fileMap.end() ) ;
+		assert( s_fileMap.find(fd) == s_fileMap.end() );
 
 	// Try to read the file contents into the allocation
-	off_t bytesRead = OS_READ(fd, mem, fileSize) ;
+	off_t bytesRead = OS_READ(fd, mem, fileSize);
 	if ( bytesRead < fileSize )
-	  throw "read failed/truncated" ;
+	  throw "read failed/truncated";
 
 	// Index this allocation into the file map
-	s_fileMap[fd].Assign(mem, fileSize) ;
+	s_fileMap[fd].Assign(mem, fileSize);
 	}
 	catch ( const char* cause )
 	{
 		// Report
 #if platBuild == TEUL_SERVER
-		dbugLog(_FLD, "fiod:%s:%s", cause, asciiPath) ;
+		dbugLog(_FLD, "fiod:%s:%s", cause, asciiPath);
 #else
-		Write_Log(LOG_OLD, LOG_INFO, "fiod:%s:%s", cause, asciiPath) ;
+		Write_Log(LOG_OLD, LOG_INFO, "fiod:%s:%s", cause, asciiPath);
 #endif
 
 		// Relinquish the file descriptor
 		if ( fd >= 0 )
-			OS_CLOSE(fd) ;
+			OS_CLOSE(fd);
 
 		// Free the memory
-		memFree(mem) ;
+		memFree(mem);
 
-		return -1 ;
+		return -1;
 	}
 
-	return fd ;
+	return fd;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -435,12 +435,12 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 
 size_t fiodRead(int fd, void* dptr, size_t length)
 {
-	Fiod::FileState* state = _lookupFileState(fd) ;
+	Fiod::FileState* state = _lookupFileState(fd);
 
 	if ( state == NULL )
-		return (int)OS_READ(fd, dptr, length) ;
+		return (int)OS_READ(fd, dptr, length);
 
-	return state->Read(dptr, length) ;
+	return state->Read(dptr, length);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -448,12 +448,12 @@ size_t fiodRead(int fd, void* dptr, size_t length)
 
 size_t fiodSeek(int fd, size_t offset, int from)
 {
-	Fiod::FileState* state = _lookupFileState(fd) ;
+	Fiod::FileState* state = _lookupFileState(fd);
 
 	if ( state == NULL )
-		return OS_LSEEK(fd, offset, from) ;
+		return OS_LSEEK(fd, offset, from);
 
-	return state->Seek(offset, from) ;
+	return state->Seek(offset, from);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -461,12 +461,12 @@ size_t fiodSeek(int fd, size_t offset, int from)
 
 int fiodEOF(int fd)
 {
-	Fiod::FileState* state = _lookupFileState(fd) ;
+	Fiod::FileState* state = _lookupFileState(fd);
 
 	if ( state == NULL )
-		return -1 ;
+		return -1;
 
-	return state->IsAtEof() ? 1 : 0 ;
+	return state->IsAtEof() ? 1 : 0;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -474,20 +474,20 @@ int fiodEOF(int fd)
 
 void fiodClose(int fd)
 {
-	OS_CLOSE(fd) ;
+	OS_CLOSE(fd);
 
 	if ( lastFd == fd )
 	{
-		lastFd = -1 ;
-		lastResult = NULL ;
+		lastFd = -1;
+		lastResult = NULL;
 	}
 
-	FILE_MAP::iterator it = s_fileMap.find(fd) ;
+	FILE_MAP::iterator it = s_fileMap.find(fd);
 
 	if ( it != s_fileMap.end() )
 	{
 		// Destructor will handle cleanup for us.
-		s_fileMap.erase(it) ;
+		s_fileMap.erase(it);
 	}
 }
 
@@ -496,8 +496,8 @@ void fiodClose(int fd)
 
 size_t fiodFileSize(const char* name, bool userdir)
 {
-	wchar_t widePath[PATH_MAX + 1] ;
-	return _getFilePathAndSize(name, userdir, widePath, sizeof(widePath)) ;
+	wchar_t widePath[PATH_MAX + 1];
+	return _getFilePathAndSize(name, userdir, widePath, sizeof(widePath));
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -710,29 +710,29 @@ int fiodOpenWrite(const char* filename, bool /* userdir */)
 #ifdef LIMITED_FIO
 size_t fiodGetString(int fd, char* string, size_t length)
 {
-	FILE_MAP::iterator it = s_fileMap.find(fd) ;
+	FILE_MAP::iterator it = s_fileMap.find(fd);
 	if ( it == s_fileMap.end() )
 	{
-		string[0] = 0 ;
+		string[0] = 0;
 		///TODO: OGS: Audit callers and make them take
 		/// -1 as a return value.
-		return 0 ;
+		return 0;
 	}
 
-	Fiod::FileState& fs = it->second ;
-	const char* const endPtr = fs.curPtr + std::min((size_t)length, fs.BytesRemaining()) ;
-	char* writePtr = string ;
+	Fiod::FileState& fs = it->second;
+	const char* const endPtr = fs.curPtr + std::min((size_t)length, fs.BytesRemaining());
+	char* writePtr = string;
 	while ( fs.curPtr < endPtr && *fs.curPtr && *fs.curPtr != '\n' )
 	{
-		*(writePtr++) = *(fs.curPtr++) ;
+		*(writePtr++) = *(fs.curPtr++);
 	}
-	*writePtr = 0 ;
+	*writePtr = 0;
 
 	// Treat the \n as consumed.
 	if ( *fs.curPtr == '\n' )
-		++fs.curPtr ;
+		++fs.curPtr;
 
-	return (size_t)(writePtr - string) ;
+	return (size_t)(writePtr - string);
 }
 #endif
 

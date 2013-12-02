@@ -40,7 +40,7 @@ get_ifi_info(int family, bool doAliases)
 
 	lastlen = 0;
 	len = 100 * sizeof(struct ifreq);	// initial buffer size guess
-	for ( ; ; )
+	for (;; )
 	{
 		buf = (char*)memAlloc(len);
 		ifc.ifc_len = len;
@@ -60,7 +60,7 @@ get_ifi_info(int family, bool doAliases)
 		memFree(buf);
 	}
 
-	ifihead = NULL;
+	ifihead = nullptr;
 	ifipnext = &ifihead;
 	lastname[0] = 0;
 
@@ -90,7 +90,7 @@ get_ifi_info(int family, bool doAliases)
 			continue;		// ignore if not desired address family
 
 		myflags = 0;
-		if ( (cptr = strchr(ifr->ifr_name, ':')) != NULL)
+		if ( (cptr = strchr(ifr->ifr_name, ':')) != nullptr)
 			*cptr = 0;		// replace colon will null
 		if (strncmp(lastname, ifr->ifr_name, IFNAMSIZ) == 0)
 		{
@@ -128,7 +128,7 @@ get_ifi_info(int family, bool doAliases)
 		{
 		case AF_INET:
 			sinptr = (struct sockaddr_in*) &ifr->ifr_addr;
-			if (ifi->ifi_addr == NULL)
+			if (ifi->ifi_addr == nullptr)
 			{
 				ifi->ifi_addr = (struct sockaddr*)memCalloc(1, sizeof(struct sockaddr_in));
 				memcpy(ifi->ifi_addr, sinptr, sizeof(struct sockaddr_in));
@@ -171,13 +171,13 @@ free_ifi_info(struct ifi_info* ifihead)
 {
 	struct ifi_info*	ifi, *ifinext;
 
-	for (ifi = ifihead; ifi != NULL; ifi = ifinext)
+	for (ifi = ifihead; ifi != nullptr; ifi = ifinext)
 	{
-		if (ifi->ifi_addr != NULL)
+		if (ifi->ifi_addr != nullptr)
 			memFree(ifi->ifi_addr);
-		if (ifi->ifi_brdaddr != NULL)
+		if (ifi->ifi_brdaddr != nullptr)
 			memFree(ifi->ifi_brdaddr);
-		if (ifi->ifi_dstaddr != NULL)
+		if (ifi->ifi_dstaddr != nullptr)
 			memFree(ifi->ifi_dstaddr);
 		ifinext = ifi->ifi_next;			// can't fetch ifi_next after free()
 		memFree(ifi);					// the ifi_info{} itself

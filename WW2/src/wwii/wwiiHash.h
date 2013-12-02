@@ -47,14 +47,14 @@
 
 	// In GCC 3.3.4 the bastards not only relocated the
 	// hash files, they also frickin' re-namespaced 'em
-	namespace stdext = ::__gnu_cxx ;
+	namespace stdext = ::__gnu_cxx;
 
-	struct OBJECT ;
+	struct OBJECT;
 
 	// Define any common hash fns here
 	namespace __gnu_cxx
 	{
-		template<> struct hash<UINT64> { UINT64 operator()(UINT64 __x) const { return __x ; } } ;
+		template<> struct hash<UINT64> { UINT64 operator()(UINT64 __x) const { return __x; } };
 		template<> struct hash<std::string>  { size_t operator()(std::string const& __s) const  { return __stl_hash_string(__s.c_str()); } };
 		template<> struct hash<OBJECT*>  { size_t operator()(OBJECT const* o) const  { return *(size_t*)(&o); } };
 		template<> struct hash<void*>  { size_t operator()(void const* o) const  { return *(size_t*)(&o); } };

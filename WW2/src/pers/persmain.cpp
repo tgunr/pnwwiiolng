@@ -727,7 +727,7 @@ UINT32 persAttachPlayerToVehicle(vehVehicle* Vehicle,UINT32 Position)
 	LastVehicle = _Persona.VehicleAttached;
 
 	if (Vehicle != _Persona.VehicleAttached)
-		persResetHealths() ;
+		persResetHealths();
 
 	_Persona.VehicleAttached = Vehicle;
 
@@ -1632,7 +1632,7 @@ static piVECTOR _LastVec;
 
 #ifdef _EXTERN_VIEW_SLEW_RATE
 	FLOAT32 slewRate = _EXTERN_VIEW_SLEW_RATE * Delta;
-	FLOAT32 zoomMod = (dipKEYDOWN(buffer,DIK_LSHIFT) || dipKEYDOWN(buffer,DIK_RSHIFT)) ? 20.0f : 8.0f ;
+	FLOAT32 zoomMod = (dipKEYDOWN(buffer,DIK_LSHIFT) || dipKEYDOWN(buffer,DIK_RSHIFT)) ? 20.0f : 8.0f;
 
 	Att1.z += _SlewViewLRHeldDown * slewRate;
 	Att1.x += _SlewViewUDHeldDown * slewRate;
@@ -2753,22 +2753,22 @@ static UINT32 _SlewView(SINT32 Param,UINT32 Id,UINT32 Detach)
 		switch(Id)
 		{
 			case IMAP_HOLD_SLEWVIEWLEFT:
-				_SlewViewLRHeldDown = (Param) ? 1 : 0 ;
+				_SlewViewLRHeldDown = (Param) ? 1 : 0;
 			break;
 			case IMAP_HOLD_SLEWVIEWRIGHT:
-				_SlewViewLRHeldDown = (Param) ? -1 : 0 ;
+				_SlewViewLRHeldDown = (Param) ? -1 : 0;
 			break;
 			case IMAP_HOLD_SLEWVIEWUP:
-				_SlewViewUDHeldDown = (Param) ? -1 : 0 ;
+				_SlewViewUDHeldDown = (Param) ? -1 : 0;
 			break;
 			case IMAP_HOLD_SLEWVIEWDOWN:
-				_SlewViewUDHeldDown = (Param) ? 1 : 0 ;
+				_SlewViewUDHeldDown = (Param) ? 1 : 0;
 			break;
 			case IMAP_HOLD_SLEWVIEWIN:
-				_SlewViewIOHeldDown = (Param) ? -1 : 0 ;
+				_SlewViewIOHeldDown = (Param) ? -1 : 0;
 			break;
 			case IMAP_HOLD_SLEWVIEWOUT:
-				_SlewViewIOHeldDown = (Param) ? 1 : 0 ;
+				_SlewViewIOHeldDown = (Param) ? 1 : 0;
 			break;
 		}
 	}
@@ -5890,7 +5890,7 @@ LOGICAL persIsTired()
 UINT32 persResetHealths(void)
 {
 	for (int i = 0 ; i < ML_MAX_CREW_POSITIONS ; ++i )
-		_PersonaHealth[i].clear() ;
+		_PersonaHealth[i].clear();
 	return 0;
 }
 

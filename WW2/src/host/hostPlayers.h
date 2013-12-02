@@ -9,6 +9,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 #include <set>
-typedef std::set<class wwiiPlayer*> PLAYERS ;
-extern PLAYERS g_players ;
+typedef std::set<class wwiiPlayer*> PLAYERS;
+extern PLAYERS g_players;
 

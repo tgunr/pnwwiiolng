@@ -623,7 +623,7 @@ struct  DebugDrawObject
 	LOGICAL flipZ;
 	FLOAT64VECTOR viewRange;
 
-} ;
+};
 
 
 static DebugDrawObject debugObjects[MAX_WORLD_DEBUG_OBJECTS];
@@ -854,7 +854,7 @@ struct DebugLine
 	piVECTOR p1;
 	piVECTOR p2;
 	UINT32 color;
-} ;
+};
 
 std::vector<DebugLine>	debugLines;
 

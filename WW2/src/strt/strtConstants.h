@@ -11,7 +11,7 @@
 
 namespace Strat
 {
-	enum { CallbackX = 206 } ;
+	enum { CallbackX = 206 };
 }
 
 enum {

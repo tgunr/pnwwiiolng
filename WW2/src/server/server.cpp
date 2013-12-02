@@ -347,7 +347,7 @@ _sendPlayerStatusUpdate(const PlayerStatusNode& psn)
 static SINT32
 _pushPlayerToServer(Server::ServerInfo& server, PlayerStatusNode& psn)
 {
-	Server::ServerInfo* oldServer = NULL;
+	Server::ServerInfo* oldServer = nullptr;
 	SINT32 retval = 0;
 
 	switch (psn.status)
@@ -364,7 +364,7 @@ _pushPlayerToServer(Server::ServerInfo& server, PlayerStatusNode& psn)
 					return 0;
 				else if (oldServer)
 				{
-					if (_extractPlayerFromServer(oldServer, &psn) == NULL)
+					if (_extractPlayerFromServer(oldServer, &psn) == nullptr)
 					{
 						LogAbort("t:%d p:%u couldn't extract player from server %p!!"
 								, psn.teulIndex, psn.dispatch().m_customerID, &server);
@@ -414,7 +414,7 @@ _pushPlayerToServer(Server::ServerInfo& server, PlayerStatusNode& psn)
 static SINT32
 _playerMove(PlayerStatusNode* const psn, Server::ServerInfo* const server)
 {
-	if ( server == NULL || psn == NULL)
+	if (PN_UNLIKELY(server == nullptr || psn == nullptr))
 		return -EINVAL;
 
 	if ( psn->curServer.address == server->stats.address )
@@ -438,7 +438,7 @@ _playerMove(PlayerStatusNode* const psn, Server::ServerInfo* const server)
 static SINT32
 _playerRelease(SINT32 teulIndex, PlayerStatusNode* psn, UINT32 exitCode, Server::ReleaseType releaseType)
 {
-	if (psn == NULL)
+	if (PN_UNLIKELY(psn == nullptr))
 	{
 		dbugLog(_FLD, "t:%d attempt to release null player", teulIndex);
 
@@ -502,14 +502,14 @@ _playerRelease(SINT32 teulIndex, PlayerStatusNode* psn, UINT32 exitCode, Server:
 static SINT32
 _playerDelete(PlayerStatusNode* const psn, Server::ReleaseType releaseType)
 {
-	if ( psn == NULL)
+	if (PN_UNLIKELY(psn == nullptr))
 		return -ENOENT;
 
-	Server::ServerInfo* server = NULL;
+	Server::ServerInfo* server = nullptr;
 
 	if ( Server::myServerInfo.exitDestType == AUTH_HOST )
 	{
-		if ( psn->localInfo == NULL && _exitClusterFn )
+		if ( psn->localInfo == nullptr && _exitClusterFn )
 		{
 			dbugLog(_FLN, "t:%d p:%u exit cluster", psn->teulIndex, psn->dispatch().m_customerID);
 			_exitClusterFn(*psn);
@@ -524,9 +524,9 @@ _playerDelete(PlayerStatusNode* const psn, Server::ReleaseType releaseType)
 	ServerManager::UnregisterPlayer(psn);
 
 	// With player tracking it is possible to have a player whos server is invalid
-	// here we extract a player from a valid server if abvailabale
+	// here we extract a player from a valid server if available
 	server = Server::ServerInfo::GetInfo(psn->curServer.address, psn->curServer.type);
-	if ( server != NULL)
+	if ( server != nullptr)
 		 _extractPlayerFromServer(server, psn);
 	else
 		 _extractPlayerFromServer(_exitServer, psn);
@@ -584,7 +584,7 @@ _playerActivate(SINT32 teulIndex, PlayerStatusNode* const psn)
 {
 	dbugLog(_FLD, "t:%d p:%u entered activate fn", teulIndex, psn->dispatch().m_customerID);
 
-	if (_activatePlayerFn != NULL)
+	if (_activatePlayerFn != nullptr)
 		(_activatePlayerFn)(teulIndex, psn);
 
 	if (Server::myServerInfo.flags & Server::SVRFLAG_SEND_PSTAT)
@@ -600,8 +600,8 @@ static PlayerStatusNode*
 _releaseNonMatchingPlayer(SINT32 teulIndex, const playerid_t playerID, UINT32 OTP, UINT32 exitCode, Server::ReleaseType releaseType)
 {
 	PlayerStatusNode* psn = _getPlayerWith(teulIndex, playerID);
-	if ( psn == NULL )
-		return NULL;
+	if (psn == nullptr)
+		return nullptr;
 
 	auto& dispatch = psn->dispatch();
 	if ( dispatch.m_OTP == OTP )
@@ -613,13 +613,13 @@ _releaseNonMatchingPlayer(SINT32 teulIndex, const playerid_t playerID, UINT32 OT
 	if ( psn->dispatch().m_customerID != playerID )
 		dbugLog(_FLA, "t:%d p:%u otp:%u old psn has disp.p:%u", teulIndex, playerID, dispatch.m_OTP, dispatch.m_customerID);
 
-	const char* const foundPlayer = (ServerInterface::PlayerStatusNodeByPlayerID(playerID) == NULL) ? "no" : "yes";
-	const char* const foundTeul = (ServerInterface::PlayerStatusNodeByTeulIndex(teulIndex) == NULL) ? "no" : "yes";
+	const char* const foundPlayer = (ServerInterface::PlayerStatusNodeByPlayerID(playerID) == nullptr) ? "no" : "yes";
+	const char* const foundTeul = (ServerInterface::PlayerStatusNodeByTeulIndex(teulIndex) == nullptr) ? "no" : "yes";
 
 	dbugLog(_FLI, "t:%d p:%u otp mismatch, was:%u is:%u ot:%d. found by player:%s, found by teul:%s", teulIndex, playerID, dispatch.m_OTP, OTP, psn->teulIndex, foundPlayer, foundTeul);
 	_playerRelease(psn->teulIndex, psn,  exitCode,  releaseType);
 
-	return NULL;
+	return nullptr;
 }
 
 static bool
@@ -664,7 +664,7 @@ _playerProc(Server::PersonaXfer* const persXfer, PlayerStatusNode* const psn, bo
 				psn->logins++;
 			}
 
-			if (psn->localInfo == NULL && ((_createPersonaFn)(*static_cast<Server::PersonaLogin*>(persXfer), *psn)) < 0)
+			if (psn->localInfo == nullptr && ((_createPersonaFn)(*static_cast<Server::PersonaLogin*>(persXfer), *psn)) < 0)
 				return _playerDestroy(psn, createComplete);
 
 			break;
@@ -690,11 +690,10 @@ _playerProc(Server::PersonaXfer* const persXfer, PlayerStatusNode* const psn, bo
 static PlayerStatusNode*
 _playerAdd(Server::PersonaXfer* const persXfer, Server::ServerInfo& server, Server::PlayerStatus status, void* const localInfo)
 {
-	PlayerStatusNode* psn = NULL;
 	SINT32 retval;
 
-	psn = _releaseNonMatchingPlayer(-1, persXfer->dispatch().m_customerID, persXfer->dispatch().m_OTP, 0, Server::RELEASE_DISCO);
-	if (psn != NULL)
+	PlayerStatusNode* psn = _releaseNonMatchingPlayer(-1, persXfer->dispatch().m_customerID, persXfer->dispatch().m_OTP, 0, Server::RELEASE_DISCO);
+	if (psn != nullptr)
 	{
 		psn->xferState = persXfer->reason();
 
@@ -705,20 +704,20 @@ _playerAdd(Server::PersonaXfer* const persXfer, Server::ServerInfo& server, Serv
 			{
 				_playerRelease(psn->teulIndex, psn, 0, Server::RELEASE_ERROR);
 	//			_playerDelete(psn);
-				return NULL;
+				return nullptr;
 			}
 		}
 
 		if ( ! _playerProc(persXfer, psn, true))
-			return NULL;
+			return nullptr;
 
 		return psn;
 	}
 
-	if (_createPersonaFn == NULL)
+	if (PN_UNLIKELY(_createPersonaFn == nullptr))
 	{
 		dbugLog(_FLAS, "some brain surgeon didn't install the _create persona handler");
-		return NULL;
+		return nullptr;
 	}
 
 	psn = (PlayerStatusNode*)memCalloc(1, sizeof(PlayerStatusNode));
@@ -740,7 +739,7 @@ _playerAdd(Server::PersonaXfer* const persXfer, Server::ServerInfo& server, Serv
 	ServerManager::RegisterPlayer(psn);
 
 	if ( ! _playerProc(persXfer, psn, true))
-		return NULL;
+		return nullptr;
 
 	if (	&server == &Server::myServerInfo
 		&& server.stats.status == Server::SERVER_ACCEPTING
@@ -782,8 +781,8 @@ _acceptLoginFn(SINT32 teulIndex, Auth::Dispatch* const dispatch)
 
 	Server::PersonaLogin login(*dispatch);
 
-	PlayerStatusNode* psn = _playerAdd(&login, Server::myServerInfo, Server::PLAYER_INIT, NULL);
-	if ( psn == NULL )
+	PlayerStatusNode* psn = _playerAdd(&login, Server::myServerInfo, Server::PLAYER_INIT, nullptr);
+	if (PN_UNLIKELY(psn == nullptr))
 	{
 		dbugLog(_FLA, "t:%d p:%u c:%s couldnt create persona, login denied!", teulIndex, dispatch->m_customerID, dispatch->m_callsign);
 		return -Teul::Errors::LoginFail_AddPlayer;
@@ -853,19 +852,17 @@ _timeOutXfers(void)
 static SINT32
 _addServer(Server::ServerInfo* const server)
 {
-	Server::ServerInfo* oldServer = NULL;
-
-	if ( server == NULL || server->stats.type < 0 || server->stats.type >= MAX_SERVER_TYPE)
+	if ( PN_UNLIKELY(server == nullptr|| server->stats.type < 0 || server->stats.type >= MAX_SERVER_TYPE) )
 		LogAbort("Tried to add invalid server.");
 
 	dbugLog(_FLD, "adding %s server on %s", g_serverTypes[server->stats.type], teulGetAddress(server->stats.address));
 
-	oldServer = Server::ServerInfo::GetByID(server->stats.id);
-	if (oldServer != NULL)
+	Server::ServerInfo* oldServer = Server::ServerInfo::GetByID(server->stats.id);
+	if (oldServer != nullptr)
 		_releaseServer(oldServer, Server::SCODE_REPLACED);
 
 	oldServer = Server::ServerInfo::GetInfo(server->stats.address, server->stats.type);
-	if(oldServer != NULL)
+	if (oldServer != nullptr)
 		_releaseServer(oldServer, Server::SCODE_REPLACED);
 
 	// Make sure our server info gets sent ahead of our attempt to connect.
@@ -890,12 +887,12 @@ _addServer(Server::ServerInfo* const server)
 static void
 _killDebugWebServer()
 {
-	if ( Teul::uWeb::s_debugServer != NULL )
+	if ( Teul::uWeb::s_debugServer != nullptr )
 	{
 		Teul::uWeb::s_debugServer->cancel();
 		std::this_thread::sleep_for(std::chrono::milliseconds(100));
 		delete Teul::uWeb::s_debugServer;
-		Teul::uWeb::s_debugServer = NULL;
+		Teul::uWeb::s_debugServer = nullptr;
 	}
 }
 
@@ -905,7 +902,7 @@ _killDebugWebServer()
 void
 serverEnableDebugWebServer(SERVER_TYPE serverType)
 {
-	if ( Teul::uWeb::s_debugServer != NULL )
+	if ( Teul::uWeb::s_debugServer != nullptr )
 		return;
 
 	UINT16 port = WWII::Net::Ports::DebugWebServer + static_cast<UINT16>(serverType);
@@ -1007,7 +1004,7 @@ serverInit(UINT32 appVersion
 	_addServer(_exitServer);
 	_addServer(&Server::myServerInfo);
 
-	if ( Teul::uWeb::s_debugServer != NULL )
+	if ( Teul::uWeb::s_debugServer != nullptr )
 	{
 		Teul::uWeb::s_debugServer->addVirtualFile("Server Status", "/server-alive.json", _serverReportAlive);
 	}
@@ -1018,7 +1015,7 @@ serverInit(UINT32 appVersion
 void
 serverFree(void)
 {
-	_leaveCallback = NULL;
+	_leaveCallback = nullptr;
 
 	auto servers = s_activeServerList;
 	for ( auto server : servers )
@@ -1090,7 +1087,7 @@ Server::ServerInfo::GetByID(const UINT64& id_)
 Server::ServerInfo*
 Server::ServerInfo::GetBest(UINT16 type, bool allowFull/*=false*/)
 {
-	Server::ServerInfo* maxServer = NULL;
+	Server::ServerInfo* maxServer = nullptr;
 
 	for ( auto& server : s_activeServerList )
 	{
@@ -1100,7 +1097,7 @@ Server::ServerInfo::GetBest(UINT16 type, bool allowFull/*=false*/)
 			continue;
 		if ( server->stats.status != SERVER_ACCEPTING )
 			continue;
-		if ( maxServer == NULL || server->availPlayers > maxServer->availPlayers )
+		if ( maxServer == nullptr || server->availPlayers > maxServer->availPlayers )
 			maxServer = server;
 	}
 
@@ -1125,7 +1122,7 @@ Server::ServerInfo::sync()
 
 //	dbugLog(_FLI, "syncing server mode %d", Server::myServerInfo.stats.status);
 
-	if ( _myServerInfo != NULL && Server::broadcastIndex > 0 )
+	if ( _myServerInfo != nullptr && Server::broadcastIndex > 0 )
 	{
 		Server::myServerInfo.availPlayers = Server::myServerInfo.stats.availPlayers();
 
@@ -1151,14 +1148,14 @@ serverBroadcastClusterShutdown()
 	}
 
 	dbugLog(_FLW, "Sending cluster shutdown message");
-	return teulSend(Server::broadcastIndex, CLUSTER_SHUTDOWN_CB, NULL);
+	return teulSend(Server::broadcastIndex, CLUSTER_SHUTDOWN_CB, nullptr);
 }
 
 void
 serverUpdate(void)
 {
 	static bool inUpdate = false;
-	if ((_myServerInfo == NULL) | (inUpdate))
+	if ( (_myServerInfo == nullptr) | (inUpdate) )
 		return;
 
 	inUpdate = true;
@@ -1169,7 +1166,7 @@ serverUpdate(void)
 
 	if ( s_activeServerList.empty() == false && teulClock64 >= _nextUpdate )
 	{
-		for( auto it = s_activeServerList.begin() ; it != s_activeServerList.end() ; )
+		for( auto it = s_activeServerList.begin(); it != s_activeServerList.end(); )
 		{
 			auto& server = *(it++);
 			if (server == &Server::myServerInfo || server == _exitServer)
@@ -1208,13 +1205,13 @@ _updateServerStats(Server::ServerInfo* const server)
 void
 Server::HeartBeat::process()
 {
-	if ( _myServerInfo == NULL ) return;
-	// Don't process heartbeat messages until we've sent out first hearbeat.
+	if ( _myServerInfo == nullptr )
+		return;
+	// Don't process heartbeat messages until we've sent out first heartbeat.
 	// This ensures the server peering system doesn't get borked.
-	
 
 	Server::ServerInfo* server = Server::ServerInfo::GetByID(this->id);
-	if ( server == NULL )
+	if ( server == nullptr )
 	{
 		dbugWrite(_FLI, "adding new server %s", teulGetAddress(this->address));
 		server = new Server::ServerInfo;
@@ -1278,10 +1275,10 @@ Server::HeartBeat::process()
 SINT32 serverReleasePlayer(SINT32 teulIndex, UINT32 id, UINT32 otp, UINT32 exitCode, Server::ReleaseType releaseType)
 {
 	PlayerStatusNode* psn = _getPlayerWith(teulIndex,  id);
-	if ( psn == NULL )
+	if ( psn == nullptr )
 		return -ENOENT;
 
-	if ( otp != 0 && psn->dispatch().m_OTP != otp )
+	if ( PN_UNLIKELY(otp != 0 && psn->dispatch().m_OTP != otp) )
 	{
 		dbugLog(_FLM, "t:%d p:%u not releasing, otp mismatch: %u v %u", teulIndex, id, otp, psn->dispatch().m_OTP);
 		return 0;
@@ -1294,7 +1291,7 @@ SINT32 serverReleasePlayer(SINT32 teulIndex, UINT32 id, UINT32 otp, UINT32 exitC
 // does not create a localinfo persona
 SINT32 serverUpdatePlayer(const Server::PlayerStatusUpdate* const update)
 {
-	Server::PersonaXfer persXfer(Server::Transfer::XferReason::Update, update->dispatch, 0, NULL, update->serverID);
+	Server::PersonaXfer persXfer(Server::Transfer::XferReason::Update, update->dispatch, 0, nullptr, update->serverID);
 
 	dbugLog(_FLD, "p:%u c:%s updating player for server id %llu"
 					, update->dispatch.m_customerID
@@ -1306,17 +1303,17 @@ SINT32 serverUpdatePlayer(const Server::PlayerStatusUpdate* const update)
 
 	if ( update->status == Server::PLAYER_DELETED )
 	{
-		if (psn == NULL)
+		if (psn == nullptr)
 			return -ENOENT;
 		 return _playerRelease(psn->teulIndex, psn, 0, Server::RELEASE_DELETED);
 	}
 
 	Server::ServerInfo* const server = Server::ServerInfo::GetByID(update->serverID);
-	if ( server == NULL )
-		psn = _playerAdd(&persXfer, *_exitServer, update->status, NULL);
+	if ( server == nullptr )
+		psn = _playerAdd(&persXfer, *_exitServer, update->status, nullptr);
 	else
-		psn = _playerAdd(&persXfer, *server, update->status, NULL);
-	if (psn == NULL)
+		psn = _playerAdd(&persXfer, *server, update->status, nullptr);
+	if (psn == nullptr)
 		return -ENOENT;
 
 	psn->dispatch() = update->dispatch;
@@ -1332,11 +1329,11 @@ Server::PersonaExit::onReceive(SINT32 teulIndex)
 	const playerid_t playerID = dispatch().m_customerID;
 	PlayerStatusNode* const psn = ServerInterface::PlayerStatusNodeByPlayerID(playerID);
 
-	if ( psn == NULL )
+	if ( psn == nullptr )
 	{
 		// Not local
 		if (_exitPersonaFn)
-			(_exitPersonaFn)(teulIndex, NULL, *this);
+			(_exitPersonaFn)(teulIndex, nullptr, *this);
 	}
 	else
 	{
@@ -1397,7 +1394,7 @@ SINT32
 Server::PersonaMirror::onReceive(SINT32 teulIndex)
 {
 	dbugLog(_FLD, "t:%d p:%u c:%s processing player mirror request", teulIndex, dispatch().m_customerID, dispatch().m_callsign);
-	if ( _playerAdd(this, Server::myServerInfo, PLAYER_INIT, NULL) == NULL )
+	if ( _playerAdd(this, Server::myServerInfo, PLAYER_INIT, nullptr) == nullptr )
 		return -EINVAL;
 	return 0;
 }
@@ -1440,10 +1437,9 @@ Server::PersonaMirrorReply::onReceive(SINT32 teulIndex)
 	auto* const mirrorRequest = (Server::PersonaMirror*)(*it);
 	SINT32 retval = -ENOENT;
 	PlayerStatusNode* const psn = ServerInterface::PlayerStatusNodeByPlayerID(mirrorRequest->dispatch().m_customerID);
-	if ( psn == NULL )
+	if ( psn == nullptr )
 	{
 		mirrorRequest->onComplete(-ENOENT);
-		retval = -ENOENT;
 	}
 	else
 	{
@@ -1480,7 +1476,7 @@ ServerManager::SetPlayerTeulIndex(PlayerStatusNode* const psn, SINT32 teulIndex)
 							);
 
 		s_byTeulIndex.erase(psn->teulIndex);
-		teulSetPersonaData(psn->teulIndex, NULL);
+		teulSetPersonaData(psn->teulIndex, nullptr);
 	}
 
 	psn->teulIndex = teulIndex;
@@ -1524,7 +1520,7 @@ ServerManager::UnregisterPlayer(PlayerStatusNode* const psn)
 	if ( psn->teulIndex >= 0 )
 	{
 		///TODO: Has it been freed?
-		teulSetPersonaData(psn->teulIndex, NULL);
+		teulSetPersonaData(psn->teulIndex, nullptr);
 		s_byTeulIndex.erase(psn->teulIndex);
 		psn->teulIndex = -1;
 	}
@@ -1550,7 +1546,7 @@ wwiiPlayer*
 ServerInterface::LookupByPlayerID(UINT32 id)
 {
 	PLAYERID_HASH::iterator it = s_byPlayerID.find(id);
-	return ( it != s_byPlayerID.end() ) ? (wwiiPlayer*)it->second->localInfo : NULL;
+	return ( it != s_byPlayerID.end() ) ? (wwiiPlayer*)it->second->localInfo : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1567,7 +1563,7 @@ serverGetAuthIP()
 		LogAbort("Missing AUTH_ADDRESS");
 
 	UINT32* const addresses = teulGetHostByName(authName);	// Returns malloc'd pointer!
-	if ( addresses == NULL )
+	if ( addresses == nullptr )
 	{
 		if ( useAuthServer == true )
 		{
@@ -1642,7 +1638,7 @@ serverOpenBroadcastIndexes()
 
 	const bool viaController = Server::IsBroadcastViaController();
 	const PROTOCOL protocol = !viaController ? PROTOCOL_UDB : PROTOCOL_CTRL;
-	Server::broadcastIndex = teulOpenSend(Server::broadcastHost, WWII::Net::Ports::PrivateBcast, _broadcastConnect, 0, protocol, NULL);
+	Server::broadcastIndex = teulOpenSend(Server::broadcastHost, WWII::Net::Ports::PrivateBcast, _broadcastConnect, 0, protocol, nullptr);
 	dbugLog(_FLN, "t:%d Server::broadcastIndex:%s", Server::broadcastIndex, teulGetAddress(Server::broadcastHost));
 	if ( Server::broadcastIndex < 0 )
 		LogAbort("unable to open server-broadcast index");
@@ -1650,7 +1646,7 @@ serverOpenBroadcastIndexes()
 	if ( !viaController )
 	{
 		UINT32 rxHost = Server::broadcastNet | 0x000000ff;
-		Server::broadcastRxIndex = teulOpenSend(rxHost, WWII::Net::Ports::PrivateBcast, _broadcastRxConnect, 0, protocol, NULL);
+		Server::broadcastRxIndex = teulOpenSend(rxHost, WWII::Net::Ports::PrivateBcast, _broadcastRxConnect, 0, protocol, nullptr);
 		dbugLog(_FLN, "t:%d broadcastRxIndex:%s", Server::broadcastRxIndex, teulGetAddress(rxHost));
 		if ( Server::broadcastRxIndex < 0 )
 			LogAbort("unable to open server-broadcast-rx index");

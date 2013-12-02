@@ -13,7 +13,7 @@
 #include "server/serverPersonaMirror.h"
 #include "server/serverPersonaMirrorReply.h"
 
-Server::Transfer::xferid_t Server::Transfer::g_xferID = 0 ;
+Server::Transfer::xferid_t Server::Transfer::g_xferID = 0;
 
 //////////////////////////////////////////////////////////////////////
 // Transfer (base class) doesn't allow onReceive events that
@@ -23,12 +23,12 @@ Server::Transfer::xferid_t Server::Transfer::g_xferID = 0 ;
 SINT32
 Server::Transfer::onReceive(SINT32 teulIndex)
 {
-	LogAbort("t:%d raised Transfer::onReceive in an object that doesn't anticpate receiving an onReceive.", teulIndex) ;
+	LogAbort("t:%d raised Transfer::onReceive in an object that doesn't anticpate receiving an onReceive.", teulIndex);
 }
 
 
 SINT32
 Server::PersonaMirror::onComplete(SINT32 /*resultCode*/) const
 {
-	LogAbort("xfer:%llu unhandled PersonaMirror::onComplete", xferID()) ;
+	LogAbort("xfer:%llu unhandled PersonaMirror::onComplete", xferID());
 }

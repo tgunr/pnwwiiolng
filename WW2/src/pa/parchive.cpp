@@ -519,7 +519,7 @@ static void fix_path_name(char* name)
             if((name[i] == '/') &&  (name[i-1] == '/'))
             {
                 // nuking slash by doing nothing
-                ;
+               ;
             }
             else
             {

@@ -12,15 +12,15 @@
 
 #include "weap/weapDefs.h"			// For MAX_WEAP_CATEGORY
 
-struct STRAT_ENEMY_REPORT ;
+struct STRAT_ENEMY_REPORT;
 
 //tolua_begin
 
-extern bool strtAddEnemyReport(const STRAT_ENEMY_REPORT& report) ;
+extern bool strtAddEnemyReport(const STRAT_ENEMY_REPORT& report);
 
-extern UINT32 ewsHighThreshold[MAX_WEAP_CATEGORY] ;
+extern UINT32 ewsHighThreshold[MAX_WEAP_CATEGORY];
 
-extern void strtEvaluateEWSUpdates() ;
+extern void strtEvaluateEWSUpdates();
 
 //tolua_end
 

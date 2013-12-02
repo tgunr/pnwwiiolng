@@ -42,7 +42,7 @@ UINT32 wthrTimeFactors[HOURS_PER_DAY] =
 ,   20                  // 21:00
 ,   20                  // 22:00
 ,   20                  // 23:00
-} ;
+};
 
 //This function initializes all the time components
 void
@@ -51,7 +51,7 @@ wthrInitTime(void)
 	//Set lastGameTime to midnight
 	_lastGameTime = 0;
 	//Sets current time to the clock
-	_lastRealTime = (UINT32) teulTime() ;
+	_lastRealTime = (UINT32) teulTime();
 }
 
 //This function returns the current time in the world
@@ -59,57 +59,57 @@ UINT32
 wthrGetGameTime(void)
 {
 	//Get the realTime
-	UINT32 currentRealTime = (UINT32) teulTime() ;
+	UINT32 currentRealTime = (UINT32) teulTime();
 	if ( currentRealTime == _lastRealTime )
-		return _lastGameTime ;
+		return _lastGameTime;
 
 	if ( host_config.arena.freezeClock )
 	{
-		UINT32 hours = host_config.arena.freezeClock / 100 ;
-		UINT32 minutes = (host_config.arena.freezeClock % 100) % 60 ;
-		_lastRealTime = teulTime() ;
-		_lastGameTime = ((hours * 60) + minutes) * 60 ;
-		return _lastGameTime ;
+		UINT32 hours = host_config.arena.freezeClock / 100;
+		UINT32 minutes = (host_config.arena.freezeClock % 100) % 60;
+		_lastRealTime = teulTime();
+		_lastGameTime = ((hours * 60) + minutes) * 60;
+		return _lastGameTime;
 	}
 
 	//Calculate the game time off of the current real time
-	UINT32 newTime = _lastGameTime + (currentRealTime - _lastRealTime) * wthrGetTimeFactor() ;
+	UINT32 newTime = _lastGameTime + (currentRealTime - _lastRealTime) * wthrGetTimeFactor();
 
-	newTime %= SECONDS_PER_DAY ;
+	newTime %= SECONDS_PER_DAY;
 
 	//Save these values for the next time around
 	_lastRealTime = currentRealTime;
-	_lastGameTime = newTime ;
+	_lastGameTime = newTime;
 
-	return newTime ;
+	return newTime;
 }
 
 void
 wthrSetGameTime(UINT32 gameTime)
 {
-	_lastRealTime = (UINT32) teulTime() ;
-	_lastGameTime = (gameTime % SECONDS_PER_DAY) ;
+	_lastRealTime = (UINT32) teulTime();
+	_lastGameTime = (gameTime % SECONDS_PER_DAY);
 }
 
 class WeatherForecast
 {
-	public: WeatherForecast(const char* name, const UINT32 numOptions, const UINT32& lockTo) ;
-	public: ~WeatherForecast() ;
+	public: WeatherForecast(const char* name, const UINT32 numOptions, const UINT32& lockTo);
+	public: ~WeatherForecast();
 
-	public: void GenerateNextForecast() ;
+	public: void GenerateNextForecast();
 
 	// We return 1-based valued but store 0-based internally
-	public: UINT32 GetCurrent() const { return m_today + 1 ; }
-	public: UINT32 GetForecast() const { return m_tomorrow + 1 ; }
-	public: void SetForecast(const UINT32 selection) ;
+	public: UINT32 GetCurrent() const { return m_today + 1; }
+	public: UINT32 GetForecast() const { return m_tomorrow + 1; }
+	public: void SetForecast(const UINT32 selection);
 
-	private: const char* m_name ;					// What we are describing
-	private: const UINT32 m_numOptions ;			// Range of options (fixed)
-	private: const UINT32& m_lockTo ;				// Dynamic value to lock to
-	private: UINT32 m_yesterday, m_today, m_tomorrow ;	// Histogram
+	private: const char* m_name;					// What we are describing
+	private: const UINT32 m_numOptions;			// Range of options (fixed)
+	private: const UINT32& m_lockTo;				// Dynamic value to lock to
+	private: UINT32 m_yesterday, m_today, m_tomorrow;	// Histogram
 
 	private: WeatherForecast(const WeatherForecast&);
-} ;
+};
 
 WeatherForecast::WeatherForecast(const char* name, const UINT32 numOptions, const UINT32& lockTo)
 	: m_name(name)
@@ -126,87 +126,87 @@ static UINT32
 _random(UINT32 numOptions)
 {
 	if ( numOptions > 3 )
-		return rand() % numOptions ;
+		return rand() % numOptions;
 
-	static const UINT32 modulo = 1024 ;	// Must be a power of 2 to provide even rand() distribution.
+	static const UINT32 modulo = 1024;	// Must be a power of 2 to provide even rand() distribution.
 	// Transform the chance into a factor of the modulo.
-	const UINT32 chance = std::min((UINT32)host_config.weather.chanceOf, (UINT32)100) * modulo / 100 ;
+	const UINT32 chance = std::min((UINT32)host_config.weather.chanceOf, (UINT32)100) * modulo / 100;
 
-	UINT32 roll = rand() % modulo ;		// Roll of the dice.
+	UINT32 roll = rand() % modulo;		// Roll of the dice.
 	if ( roll < chance )
-		return 2 ;
+		return 2;
 
-	return 0 ;
+	return 0;
 }
 
 void
 WeatherForecast::GenerateNextForecast()
 {
 	if ( m_tomorrow == 9999 )
-		m_tomorrow = _random(m_numOptions) ;
+		m_tomorrow = _random(m_numOptions);
 
-	const char* method ;
-	UINT32 prediction ;
+	const char* method;
+	UINT32 prediction;
 	if ( m_numOptions <= 1 )
 	{
-		m_tomorrow = prediction = 0 ;
-		method = "defaulting to" ;
+		m_tomorrow = prediction = 0;
+		method = "defaulting to";
 	}
 	else if ( m_lockTo > 0 && m_lockTo < m_numOptions )
 	{
-		m_tomorrow = prediction = m_lockTo - 1 ;
-		method = "locking to" ;
+		m_tomorrow = prediction = m_lockTo - 1;
+		method = "locking to";
 	}
 	else
 	{
-		prediction = _random(m_numOptions) ;
+		prediction = _random(m_numOptions);
 		if ( prediction > 0 && prediction == m_tomorrow )
 		{
-			prediction = (m_numOptions <= 3 ? 2 - prediction : (prediction+1) % m_numOptions) ;
-			method = "adjusting" ;
+			prediction = (m_numOptions <= 3 ? 2 - prediction : (prediction+1) % m_numOptions);
+			method = "adjusting";
 		}
 		else
-			method = "predicting" ;
+			method = "predicting";
 	}
 
-	dbugLog(_FLI, "%s %s %u, setting today to %u", method, m_name, prediction + 1, m_tomorrow + 1) ;
+	dbugLog(_FLI, "%s %s %u, setting today to %u", method, m_name, prediction + 1, m_tomorrow + 1);
 
-	m_yesterday = m_today ;
-	m_today = m_tomorrow ;
-	m_tomorrow = prediction ;
+	m_yesterday = m_today;
+	m_today = m_tomorrow;
+	m_tomorrow = prediction;
 }
 
 void
 WeatherForecast::SetForecast(const UINT32 selection)
 {
-	wthrGetGameTime() ;
+	wthrGetGameTime();
 
 	if ( selection > 0 )
 	{
 		if ( selection > 1 && selection > m_numOptions )
 		{
-			dbugLog(_FLW, "Attempted to set %s to %u (max %u), ignoring", m_name, selection, m_numOptions) ;
-			return ;
+			dbugLog(_FLW, "Attempted to set %s to %u (max %u), ignoring", m_name, selection, m_numOptions);
+			return;
 		}
-		m_today = (selection - 1) ;
+		m_today = (selection - 1);
 	}
 	else
-		GenerateNextForecast() ;
+		GenerateNextForecast();
 }
 
-static WeatherForecast weatherForecast("weather forecast", 3, host_config.weather.lockToPattern) ;
-static WeatherForecast fogForecast("fog forecast", 16, host_config.weather.lockToFog) ;
+static WeatherForecast weatherForecast("weather forecast", 3, host_config.weather.lockToPattern);
+static WeatherForecast fogForecast("fog forecast", 16, host_config.weather.lockToFog);
 
 void
 wthrSetWeatherPattern(UINT32 pattern)
 {
-	weatherForecast.SetForecast(pattern) ;
+	weatherForecast.SetForecast(pattern);
 }
 
 void
 wthrSetFogPattern(UINT32 pattern)
 {
-	fogForecast.SetForecast(pattern) ;
+	fogForecast.SetForecast(pattern);
 }
 
 //Gets the current time factor
@@ -214,17 +214,17 @@ UINT32
 wthrGetTimeFactor(void)
 {
 	if ( host_config.arena.fixedTimeFactor > 0 )
-		return host_config.arena.fixedTimeFactor ;
+		return host_config.arena.fixedTimeFactor;
 
-	return wthrTimeFactors[(_lastGameTime % SECONDS_PER_DAY) / SECONDS_PER_HOUR] ;
+	return wthrTimeFactors[(_lastGameTime % SECONDS_PER_DAY) / SECONDS_PER_HOUR];
 }
 
 // Determine the number of real seconds left until the end of the current hour
 UINT32
 wthrRealSecondsToHour(void)
 {
-	UINT32 gameSecondsLeft = (SECONDS_PER_HOUR - (_lastGameTime % SECONDS_PER_HOUR)) ;
-	return gameSecondsLeft / wthrTimeFactors[(_lastGameTime % SECONDS_PER_DAY) / SECONDS_PER_HOUR] ;
+	UINT32 gameSecondsLeft = (SECONDS_PER_HOUR - (_lastGameTime % SECONDS_PER_HOUR));
+	return gameSecondsLeft / wthrTimeFactors[(_lastGameTime % SECONDS_PER_DAY) / SECONDS_PER_HOUR];
 }
 
 // wthrConvertTimeToString()
@@ -237,20 +237,20 @@ wthrConvertTimeToString(UINT32 _time)
 	if(_time >= SECONDS_PER_DAY) //no such time
 		return NULL;
 
-	UINT32 hours =_time/(SECONDS_PER_HOUR) ;
+	UINT32 hours =_time/(SECONDS_PER_HOUR);
 	if ( hours > 23 )
 		return NULL;
-	UINT32 mins =(_time - (hours*SECONDS_PER_HOUR))/60 ;
+	UINT32 mins =(_time - (hours*SECONDS_PER_HOUR))/60;
 	if ( mins > 59 )
-		return NULL ;
+		return NULL;
 
 	static char timeStr[5+1] = "00:00";
 	// Very simple placement of corresponding time characters
-	timeStr[0] = static_cast<char>(hours / 10 + '0') ;
-	timeStr[1] = static_cast<char>(hours % 10 + '0') ;
+	timeStr[0] = static_cast<char>(hours / 10 + '0');
+	timeStr[1] = static_cast<char>(hours % 10 + '0');
 	// timeStr[2] never changes from ':'
-	timeStr[3] = static_cast<char>(mins / 10 + '0') ;
-	timeStr[4] = static_cast<char>(mins % 10 + '0') ;
+	timeStr[3] = static_cast<char>(mins / 10 + '0');
+	timeStr[4] = static_cast<char>(mins % 10 + '0');
 
 	return timeStr;
 }
@@ -261,7 +261,7 @@ wthrConvertTimeToString(UINT32 _time)
 UINT32
 wthrGetWeatherPattern()
 {
-	return weatherForecast.GetCurrent() ;
+	return weatherForecast.GetCurrent();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -270,7 +270,7 @@ wthrGetWeatherPattern()
 UINT32
 wthrGetFogPattern()
 {
-	return fogForecast.GetCurrent() ;
+	return fogForecast.GetCurrent();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -279,7 +279,7 @@ wthrGetFogPattern()
 UINT32
 wthrGetWeatherForecast()
 {
-	return weatherForecast.GetForecast() ;
+	return weatherForecast.GetForecast();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -288,7 +288,7 @@ wthrGetWeatherForecast()
 UINT32
 wthrGetFogForecast()
 {
-	return fogForecast.GetForecast() ;
+	return fogForecast.GetForecast();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -297,16 +297,16 @@ wthrGetFogForecast()
 FLOAT64
 wthrGetGameDayDuration()
 {
-	static FLOAT64 dayDuration = 0.0f ;
+	static FLOAT64 dayDuration = 0.0f;
 	if ( !dayDuration )
 	{
-		for ( UINT32 i = 0 ; i < HOURS_PER_DAY ; ++i )
+		for ( UINT32 i = 0; i < HOURS_PER_DAY; ++i )
 		{
-			dayDuration += (3600.0 / wthrTimeFactors[i]) ;
+			dayDuration += (3600.0 / wthrTimeFactors[i]);
 		}
 	}
 
-	return dayDuration ;
+	return dayDuration;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -315,10 +315,10 @@ wthrGetGameDayDuration()
 void
 wthrStartNewDay()
 {
-	wthrGetGameTime() ;
+	wthrGetGameTime();
 
-	weatherForecast.GenerateNextForecast() ;
-	fogForecast.GenerateNextForecast() ;
+	weatherForecast.GenerateNextForecast();
+	fogForecast.GenerateNextForecast();
 }
 
 

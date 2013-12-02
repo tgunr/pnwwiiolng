@@ -52,7 +52,7 @@ enum SQUAD_CONTROL_RESULT
 ,	SQR_LEFT								// You've left the squad
 ,	SQR_KICKED								// You've left the squad
 ,	SQR_RECRUITER_GONE						// Recruiter is no-longer recruiting, pick another
-} ;
+};
 
 // Used by the host to indicate no response as yet
-static const UINT32 SQR_IN_PROGRESS = 9999 ;
+static const UINT32 SQR_IN_PROGRESS = 9999;

@@ -25,37 +25,37 @@ public:
 
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
 	{
-		PLAYER_INDEX::iterator it ;
-		std::string result = "" ;
-		for ( it = playerIndex.begin() ; it != playerIndex.end() ; ++it )
+		PLAYER_INDEX::iterator it;
+		std::string result = "";
+		for ( it = playerIndex.begin(); it != playerIndex.end(); ++it )
 		{
-			Player* subject = it->second ;
+			Player* subject = it->second;
 
 			if ( !subject->squadID() || subject->squadRank() != Squad::CO )
-				continue ;
+				continue;
 
 			if ( !subject->isVisibleTo(player) )
-				continue ;
+				continue;
 
-			const char* squadName = chatGetSquadCallsign(subject->squadID()) ;
+			const char* squadName = chatGetSquadCallsign(subject->squadID());
 			if ( !squadName )
-				continue ;
+				continue;
 
 			if ( result.length() + 20 >= MAX_MESSAGE_LENGTH )
 			{
-				player.message(LSTR_NOTE, LSTR_GENERIC, result.c_str()) ;
-				result = "" ;
+				player.message(LSTR_NOTE, LSTR_GENERIC, result.c_str());
+				result = "";
 			}
 
-			subject->addName(result, ", ") ;
-			result += ":" ;
-			result += squadName ;
+			subject->addName(result, ", ");
+			result += ":";
+			result += squadName;
 		}
 
 		if ( result.empty() )
-			player.message(LSTR_CAUTION, LSTR_NO_MATCHES) ;
+			player.message(LSTR_CAUTION, LSTR_NO_MATCHES);
 		else
-			player.message(LSTR_NOTE, LSTR_GENERIC, result.c_str()) ;
+			player.message(LSTR_NOTE, LSTR_GENERIC, result.c_str());
 	}
-} listCOs ;
+} listCOs;
 

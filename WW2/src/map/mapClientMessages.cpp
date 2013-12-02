@@ -29,12 +29,12 @@
 #include "map/mapSupercellVislevelXfer.h"
 
 static	TEUL_CALLBACK*	MAP_SEND_EXIT_WWIIOL;
-static	TEUL_CALLBACK*	_XCHG_PERSONA_LIST ;
-static	TEUL_CALLBACK*	_XCHG_PERSONA_SELECT ;
-static	TEUL_CALLBACK*	_XCHG_BRIGADE_LIST ;
-static	TEUL_CALLBACK*	_XCHG_BRIGADE_SELECT ;
-static	TEUL_CALLBACK*	_XCHG_MISSION_LIST ;
-static	TEUL_CALLBACK*	_XCHG_TUT_PROGRESS ;
+static	TEUL_CALLBACK*	_XCHG_PERSONA_LIST;
+static	TEUL_CALLBACK*	_XCHG_PERSONA_SELECT;
+static	TEUL_CALLBACK*	_XCHG_BRIGADE_LIST;
+static	TEUL_CALLBACK*	_XCHG_BRIGADE_SELECT;
+static	TEUL_CALLBACK*	_XCHG_MISSION_LIST;
+static	TEUL_CALLBACK*	_XCHG_TUT_PROGRESS;
 
 #if platOS == OS_WIN32
 #include <io.h>
@@ -52,53 +52,53 @@ static	TEUL_CALLBACK*	_XCHG_TUT_PROGRESS ;
 static UINT64
 _check64(const char* filename)
 {
-	int		fd = -1 ;				// Level 2 file descriptor
-	int		bytes = 0 ;				// Number of bytes successfully read
-	int		i ;
-	UINT64	checksum = 0 ;
+	int		fd = -1;				// Level 2 file descriptor
+	int		bytes = 0;				// Number of bytes successfully read
+	int		i;
+	UINT64	checksum = 0;
 
-	char* memory = (char*)alloca(READ_BUF_SIZE) ;
+	char* memory = (char*)alloca(READ_BUF_SIZE);
 	if ( memory == NULL )
 	{
-		dbugWrite("No memory") ;
-		return 0 ;
+		dbugWrite("No memory");
+		return 0;
 	}
 
 	// Get a descriptor for reading the file in binary mode
-	fd = _open(filename, _O_RDONLY | _O_BINARY, 0) ;
+	fd = _open(filename, _O_RDONLY | _O_BINARY, 0);
 	if ( fd == -1 )
 	{
-		dbugWrite("File missing") ;
-		return 0 ;
+		dbugWrite("File missing");
+		return 0;
 	}
 
 	do
 	{
-		bytes = _read(fd, memory, READ_BUF_SIZE) ;
+		bytes = _read(fd, memory, READ_BUF_SIZE);
 		if ( bytes < 0 )
 		{
-			dbugWrite("Read failure") ;
-			checksum = 0 ;
-			break ;
+			dbugWrite("Read failure");
+			checksum = 0;
+			break;
 		}
 
 		// Its possible we might read 0 bytes
 		if ( bytes == 0 )
-			break ;
+			break;
 
 		// Rotate 5 bits right and add the new value, this gives some weight to positional value
 		// of each value.
-		for ( i = 0 ; i < bytes ; i++ )
+		for ( i = 0; i < bytes; i++ )
 		{
-			checksum = ((checksum & 0x1f) << (CHECKSUM_BIT_LEN-5)) | (checksum >> 5) ;
-			checksum += memory[i] ;
+			checksum = ((checksum & 0x1f) << (CHECKSUM_BIT_LEN-5)) | (checksum >> 5);
+			checksum += memory[i];
 		}
 	}
-	while ( bytes > 0 ) ;
+	while ( bytes > 0 );
 
-	_close(fd) ;
+	_close(fd);
 
-	return checksum ;
+	return checksum;
 }
 #endif
 
@@ -110,58 +110,58 @@ static SINT32 _sendExitWWIIOL(ACTION_OBJECT* const a)
 static SINT32
 _sendPersonaListRequest(ACTION_OBJECT* const a)
 {
-	PersonaSummaries* request = (PersonaSummaries*)(a->localRawData) ;
-	return request->packer(TEUL_PACK, a) ;
+	PersonaSummaries* request = (PersonaSummaries*)(a->localRawData);
+	return request->packer(TEUL_PACK, a);
 }
 
 static SINT32
 _sendPersonaSelectRequest(ACTION_OBJECT* const a)
 {
-	PersonaSelection* request = (PersonaSelection*)(a->localRawData) ;
-	return request->packer(TEUL_PACK, a) ;
+	PersonaSelection* request = (PersonaSelection*)(a->localRawData);
+	return request->packer(TEUL_PACK, a);
 }
 
 static SINT32
 _sendBrigadeListRequest(ACTION_OBJECT* const a)
 {
-	BrigadeSummaries* request = (BrigadeSummaries*)(a->localRawData) ;
-	return request->packer(TEUL_PACK, a) ;
+	BrigadeSummaries* request = (BrigadeSummaries*)(a->localRawData);
+	return request->packer(TEUL_PACK, a);
 }
 
 static SINT32
 _sendBrigadeSelectRequest(ACTION_OBJECT* const a)
 {
-	BrigadeSelection* request = (BrigadeSelection*)(a->localRawData) ;
-	return request->packer(TEUL_PACK, a) ;
+	BrigadeSelection* request = (BrigadeSelection*)(a->localRawData);
+	return request->packer(TEUL_PACK, a);
 }
 
 static SINT32
 _sendMissionListRequest(ACTION_OBJECT* const a)
 {
-	MissionList* request = (MissionList*)(a->localRawData) ;
-	return request->packer(TEUL_PACK, a) ;
+	MissionList* request = (MissionList*)(a->localRawData);
+	return request->packer(TEUL_PACK, a);
 }
 
 static SINT32 _sendTutProgress(ACTION_OBJECT* const a)
 {
-	((Tutorial::GroupProgress*)(a->localRawData))->packer(TEUL_PACK, a) ;
-	return a->offset ;
+	((Tutorial::GroupProgress*)(a->localRawData))->packer(TEUL_PACK, a);
+	return a->offset;
 }
 
 static SINT32
 _recvPersonaListResponse(ACTION_OBJECT* const a)
 {
-	PersonaSummaries ps(a) ;
-	ps.receive(a->teulIndex) ;
-	return a->offset ;
+	PersonaSummaries ps(a);
+	ps.receive(a->teulIndex);
+	return a->offset;
 }
 
 static SINT32
 _recvPersonaSelectResponse(ACTION_OBJECT* const a)
 {
-	PersonaSelection ps(a) ;
-	ps.receive(a->teulIndex) ;
-	return a->offset ;
+	PersonaSelection ps(a);
+	ps.receive(a->teulIndex);
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -177,29 +177,29 @@ _recvPersonaSelectResponse(ACTION_OBJECT* const a)
 SINT32
 HCUnitList::receive(SINT32 teulIndex)
 {
-	static UINT32 _packets = 0 ;
+	static UINT32 _packets = 0;
 
 	if ( m_listStart )
 	{
 		// m_listStart indicates the first packet in a sequence
-		Write_Debug("Receiving new HCUnit List") ;
-		_packets = 0 ;
+		Write_Debug("Receiving new HCUnit List");
+		_packets = 0;
 	}
 	else
 	{
 		// If m_listStart is false, this packet is a continuation
-		Write_Debug("Receiving HCUnit list packet #%d", _packets) ;
+		Write_Debug("Receiving HCUnit list packet #%d", _packets);
 	}
 
 	// We contain several HCUnit objects in our m_units field.
-	for ( UINT32 i = 0 ; i < m_count && i < MAX_HCUNITS_PER_LIST ; ++i )
+	for ( UINT32 i = 0; i < m_count && i < MAX_HCUNITS_PER_LIST; ++i )
 	{
-		HCUnit& unit = m_units[i] ;
+		HCUnit& unit = m_units[i];
 
-		Write_Debug("p#%d e#%d unit#%d type#%d rank#%d:: %s", _packets, i, unit.unitID(), unit.type(), unit.rank(), unit.name()) ;
+		Write_Debug("p#%d e#%d unit#%d type#%d rank#%d:: %s", _packets, i, unit.unitID(), unit.type(), unit.rank(), unit.name());
 
 		// Constructed this way, the HCUnit will self-register itself into hcUnits.
-		HCUnit* hcUnit = new HCUnit(unit.unitID(), unit.type(), unit.parentID(), unit.country(), unit.branch(), unit.movementType(), unit.unitClass(), unit.handle(), unit.name(), unit.shortName(), unit.rank(), unit.homeCPID(), unit.owner(), unit.ownerRank()) ;
+		HCUnit* hcUnit = new HCUnit(unit.unitID(), unit.type(), unit.parentID(), unit.country(), unit.branch(), unit.movementType(), unit.unitClass(), unit.handle(), unit.name(), unit.shortName(), unit.rank(), unit.homeCPID(), unit.owner(), unit.ownerRank());
 
 		// The client assigns decals to brigades, so we need to look the unit up and pass it to the decal
 		// code /once/ per HC Unit
@@ -209,23 +209,23 @@ HCUnitList::receive(SINT32 teulIndex)
 		}
 	}
 
-	++_packets ;
+	++_packets;
 
 	if ( m_listEnd )
 	{
 		// When m_listEnd is set, this is the last packet in a sequence
-		Write_Debug("HCUnit list completed: %d units in %d packets", hcUnits.size(), _packets) ;
+		Write_Debug("HCUnit list completed: %d units in %d packets", hcUnits.size(), _packets);
 	}
 
-	return 0 ;
+	return 0;
 }
 
 static SINT32
 _recvHCUnitList(ACTION_OBJECT* const a)
 {
-	HCUnitList hcul(a) ;
-	hcul.receive(a->teulIndex) ;
-	return a->offset ;
+	HCUnitList hcul(a);
+	hcul.receive(a->teulIndex);
+	return a->offset;
 }
 
 static SINT32
@@ -233,31 +233,31 @@ _recvBrigadeListResponse(ACTION_OBJECT* const a)
 {
 	try
 	{
-		BrigadeSummaries* bs = new BrigadeSummaries(a) ;
-		bs->receive(a->teulIndex) ;
-		delete bs ;
+		BrigadeSummaries* bs = new BrigadeSummaries(a);
+		bs->receive(a->teulIndex);
+		delete bs;
 	}
 	catch (std::exception& e)
 	{
 		Write_Debug("BrigadeSummaries failed: %s", e.what());
 	}
-	return a->offset ;
+	return a->offset;
 }
 
 static SINT32
 _recvBrigadeSelectResponse(ACTION_OBJECT* const a)
 {
-	BrigadeSelection bs(a) ;
-	bs.receive(a->teulIndex) ;
-	return a->offset ;
+	BrigadeSelection bs(a);
+	bs.receive(a->teulIndex);
+	return a->offset;
 }
 
 static SINT32
 _recvMissionListResponse(ACTION_OBJECT* const a)
 {
-	MissionList ml(a) ;
-	ml.receive(a->teulIndex) ;
-	return a->offset ;
+	MissionList ml(a);
+	ml.receive(a->teulIndex);
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -311,7 +311,7 @@ ArenaDescription::receive(SINT32 teulIndex)
 {
 #ifdef FANCY_ARENA_DESC_HANDLING
 	ARENA_VARS::iterator it;
-	for(it = begin(); it != end() ; ++it)
+	for(it = begin(); it != end(); ++it)
 	{
 		// it->first = key, it->second = value
 		// expose me to javascript
@@ -338,39 +338,39 @@ _recvTutProgressBatch(ACTION_OBJECT* const a)
 	// the end of the package.
 	while ( a->atEndOfBuffer() == false )
 	{
-		Tutorial::GroupProgress incoming(a) ;
-		incoming.receive(NULL) ;
+		Tutorial::GroupProgress incoming(a);
+		incoming.receive(NULL);
 	}
-	return a->offset ;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Process the "big list of vislevels".
 
-extern void strtApplySuperCellVisLevels(const SupercellVislevelXfer& xfer) ;
+extern void strtApplySuperCellVisLevels(const SupercellVislevelXfer& xfer);
 
 static SINT32
 _recvBuildingVisLevels(ACTION_OBJECT* const a)
 {
-	UCHAR* const src = a->packed ;
-	UCHAR* const endPtr = src + a->sizeInBytes() ;
+	UCHAR* const src = a->packed;
+	UCHAR* const endPtr = src + a->sizeInBytes();
 
-	for ( UCHAR* ptr = src ; src < endPtr ; )
+	for ( UCHAR* ptr = src; src < endPtr; )
 	{
-		SupercellVislevelXfer& xfer = *(SupercellVislevelXfer*)ptr ;
-		const size_t size = xfer.size_bytes() ;
+		SupercellVislevelXfer& xfer = *(SupercellVislevelXfer*)ptr;
+		const size_t size = xfer.size_bytes();
 		if ( size == 0 )
 		{
-			ptr = endPtr ;
-			break ;
+			ptr = endPtr;
+			break;
 		}
 
-		ptr += size ;
+		ptr += size;
 
-		strtApplySuperCellVisLevels(xfer) ;
+		strtApplySuperCellVisLevels(xfer);
 	}
 
-	return a->offset + a->sizeInBits() ;
+	return a->offset + a->sizeInBits();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -388,8 +388,8 @@ SINT32
 PersonaSummaries::send(SINT32 teulIndex)
 {
 	// Client never sends persona summaries up to the host
-	m_count = 0 ;
-	return teulSend(teulIndex, _XCHG_PERSONA_LIST, this) ;
+	m_count = 0;
+	return teulSend(teulIndex, _XCHG_PERSONA_LIST, this);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -405,13 +405,13 @@ PersonaSelection::send(SINT32 teulIndex)
 	// Checksum the current executable
 	if ( GetModuleFileNameA(NULL, filename, sizeof(filename)-1) )
 	{
-		m_checksum = _check64(filename) ;	// See function for description; its cryptic on purpose.
+		m_checksum = _check64(filename);	// See function for description; its cryptic on purpose.
 	}
 #else
-	m_checksum = 8173587580LL ;
+	m_checksum = 8173587580LL;
 #endif
 
-	return teulSend(teulIndex, _XCHG_PERSONA_SELECT, this) ;
+	return teulSend(teulIndex, _XCHG_PERSONA_SELECT, this);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -419,7 +419,7 @@ PersonaSelection::send(SINT32 teulIndex)
 SINT32
 BrigadeSummaries::send(SINT32 teulIndex)
 {
-	return teulSend(teulIndex, _XCHG_BRIGADE_LIST, this) ;
+	return teulSend(teulIndex, _XCHG_BRIGADE_LIST, this);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -428,19 +428,19 @@ SINT32
 BrigadeSelection::send(SINT32 teulIndex)
 {
 	if ( m_status == BRIG_SELECT )
-		Write_Debug("SELECTing brigade %d", m_detail.brigadeID()) ;
+		Write_Debug("SELECTing brigade %d", m_detail.brigadeID());
 	else if ( m_status == BRIG_DETAIL )
-		Write_Debug("QUERYing brigade %d", m_detail.brigadeID()) ;
+		Write_Debug("QUERYing brigade %d", m_detail.brigadeID());
 	else
 	{
-		Write_Debug("Unknown selection request type.") ;
-		return -EINVAL ;
+		Write_Debug("Unknown selection request type.");
+		return -EINVAL;
 	}
 
 	///TODO: Prevent player from spamming the host with selection requests,
 	/// since this could be confusing in terms of the responses we get back.
 
-	return teulSend(teulIndex, _XCHG_BRIGADE_SELECT, this) ;
+	return teulSend(teulIndex, _XCHG_BRIGADE_SELECT, this);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -450,8 +450,8 @@ SINT32
 MissionList::send(SINT32 teulIndex)
 {
 	// For now we just send a status
-	m_status = MLR_OK ;
-	return teulSend(teulIndex, _XCHG_MISSION_LIST, this) ;
+	m_status = MLR_OK;
+	return teulSend(teulIndex, _XCHG_MISSION_LIST, this);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -460,9 +460,9 @@ MissionList::send(SINT32 teulIndex)
 void
 mapSendOpinionPollResult(SINT32 teulIndex, UINT32 pollID, UINT32 entryID)
 {
-	OpinionChoice choice(pollID, entryID) ;
-	OPINION_CHOICE_MSG outgoing(choice) ;
-	outgoing.send(teulIndex) ;
+	OpinionChoice choice(pollID, entryID);
+	OPINION_CHOICE_MSG outgoing(choice);
+	outgoing.send(teulIndex);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -473,7 +473,7 @@ mapSendOpinionPollResult(SINT32 teulIndex, UINT32 pollID, UINT32 entryID)
 void
 Tutorial::GroupProgress::send(SINT32 chatIndex)
 {
-	teulSend(chatIndex, _XCHG_TUT_PROGRESS, this) ;
+	teulSend(chatIndex, _XCHG_TUT_PROGRESS, this);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -482,30 +482,30 @@ SINT32 mapInstallClientCallbacks(void)
 {
 	BEGIN_CALLBACK_REGISTRATION(Map::CallbackX)
 
-		REGISTER_SENDER(Map::EXIT_WWIIOL_Y, _sendExitWWIIOL, MAP_SEND_EXIT_WWIIOL) ;
+		REGISTER_SENDER(Map::EXIT_WWIIOL_Y, _sendExitWWIIOL, MAP_SEND_EXIT_WWIIOL);
 
-		REGISTER_RECEIVER(Map::XCHG_HCUNIT_LIST_Y, _recvHCUnitList) ;
-		REGISTER_RECEIVER(Map::ARENA_DESCRIPTION_Y, _recvArenaDescription) ;
+		REGISTER_RECEIVER(Map::XCHG_HCUNIT_LIST_Y, _recvHCUnitList);
+		REGISTER_RECEIVER(Map::ARENA_DESCRIPTION_Y, _recvArenaDescription);
 
-		REGISTER_SENDRECV(Map::XCHG_PERSONA_LIST_Y, _sendPersonaListRequest,_recvPersonaListResponse, _XCHG_PERSONA_LIST) ;
-		REGISTER_SENDRECV(Map::XCHG_PERSONA_SELECT_Y, _sendPersonaSelectRequest, _recvPersonaSelectResponse, _XCHG_PERSONA_SELECT) ;
-		REGISTER_SENDRECV(Map::XCHG_BRIGADE_LIST_Y, _sendBrigadeListRequest, _recvBrigadeListResponse, _XCHG_BRIGADE_LIST) ;
-		REGISTER_SENDRECV(Map::XCHG_BRIGADE_SELECT_Y, _sendBrigadeSelectRequest, _recvBrigadeSelectResponse, _XCHG_BRIGADE_SELECT) ;
-		REGISTER_SENDRECV(Map::XCHG_MISSION_LIST_Y, _sendMissionListRequest, _recvMissionListResponse, _XCHG_MISSION_LIST) ;
+		REGISTER_SENDRECV(Map::XCHG_PERSONA_LIST_Y, _sendPersonaListRequest,_recvPersonaListResponse, _XCHG_PERSONA_LIST);
+		REGISTER_SENDRECV(Map::XCHG_PERSONA_SELECT_Y, _sendPersonaSelectRequest, _recvPersonaSelectResponse, _XCHG_PERSONA_SELECT);
+		REGISTER_SENDRECV(Map::XCHG_BRIGADE_LIST_Y, _sendBrigadeListRequest, _recvBrigadeListResponse, _XCHG_BRIGADE_LIST);
+		REGISTER_SENDRECV(Map::XCHG_BRIGADE_SELECT_Y, _sendBrigadeSelectRequest, _recvBrigadeSelectResponse, _XCHG_BRIGADE_SELECT);
+		REGISTER_SENDRECV(Map::XCHG_MISSION_LIST_Y, _sendMissionListRequest, _recvMissionListResponse, _XCHG_MISSION_LIST);
 
-		REGISTER_MSG_RECEIVER(Map::HC_UNIT_LOCATIONS_Y, HC_UNIT_LOCATIONS) ;
-		REGISTER_MSG_RECEIVER(Map::SWING_METER_Y, SWING_METER_MSG) ;
+		REGISTER_MSG_RECEIVER(Map::HC_UNIT_LOCATIONS_Y, HC_UNIT_LOCATIONS);
+		REGISTER_MSG_RECEIVER(Map::SWING_METER_Y, SWING_METER_MSG);
 
 		// Incoming description of an opinion poll
-		REGISTER_MSG_RECEIVER(Map::OPINION_POLL_Y, OPINION_POLL_MSG) ;
+		REGISTER_MSG_RECEIVER(Map::OPINION_POLL_Y, OPINION_POLL_MSG);
 
 		// Our response (if any) to a poll
-		REGISTER_MSG_SENDER(Map::POLL_RESULT_Y, OPINION_CHOICE_MSG) ;
+		REGISTER_MSG_SENDER(Map::POLL_RESULT_Y, OPINION_CHOICE_MSG);
 
-		REGISTER_RECVSEND(Map::TUT_PROGRESS_Y, _recvTutProgressBatch, _sendTutProgress, _XCHG_TUT_PROGRESS) ;
+		REGISTER_RECVSEND(Map::TUT_PROGRESS_Y, _recvTutProgressBatch, _sendTutProgress, _XCHG_TUT_PROGRESS);
 
 		// The big packet of strat data we get when we spawn.
-		REGISTER_RECEIVER(Map::BUILDING_VISLEVELS_Y, _recvBuildingVisLevels) ;
+		REGISTER_RECEIVER(Map::BUILDING_VISLEVELS_Y, _recvBuildingVisLevels);
 
 	END_CALLBACK_REGISTRATION
 }

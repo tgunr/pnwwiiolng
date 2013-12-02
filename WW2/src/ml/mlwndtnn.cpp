@@ -994,13 +994,13 @@ mlComponentListIterator it;
 	// roll rates
 	// general theory is this:
 	// we set the plane to a particular speed and attitude, then deflect the ailerons
-	// the flight model runs for the equivelant of 10 seconds, holding everything
+	// the flight model runs for the equivalent of 10 seconds, holding everything
 	// constant except for rollvel
 	// then we record the angular velocity to determine sustained roll rate
 	_NoHorizStab = 0;
 	fprintf(TunnelFile,"\nRoll Rates: (Engine off, left hand roll)\n");
 	fprintf(TunnelFile,"   m/s     kph     mph      rate (deg/s)\n");
-	for (Speed = 50 / 2.237;Speed <= 501.0 / 2.237 ; Speed += 10.0 / 2.237)
+	for (Speed = 50 / 2.237;Speed <= 501.0 / 2.237; Speed += 10.0 / 2.237)
 	{
 		fprintf(TunnelFile,"%7.1lf %7.1lf %7.1lf",Speed, Speed * 3.6, Speed * 2.237);
 		_TunnelTurnEnginesOff(VehicleData);

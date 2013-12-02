@@ -99,7 +99,7 @@ _saveSelections(DB::handle_t* conn)
 
 			// Iterate across the personas registered to this brigade,
 
-			for ( pit = it->second.begin(); ; ++pit )
+			for ( pit = it->second.begin();; ++pit )
 			{
 				bool isLast = (pit == it->second.end());
 				// If we fill up buf execute the query and proceed.

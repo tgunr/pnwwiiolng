@@ -31,9 +31,9 @@
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiString.h"
 
-static TEUL_CALLBACK* _XCHG_BANDWIDTH_NOTICE ;
+static TEUL_CALLBACK* _XCHG_BANDWIDTH_NOTICE;
 
-extern void hostSmiteCustomer(playerid_t playerID) ;
+extern void hostSmiteCustomer(playerid_t playerID);
 
 //The actual send function for system messages
 
@@ -42,15 +42,15 @@ _findVehicleByPlayerID(const playerid_t playerID)
 {
 	// Since they* might* be on another cell host, we have to look them up this way
 	///TODO: Don't do it this way :)
-	PlayerStatusNode* psn = ServerInterface::PlayerStatusNodeByPlayerID(playerID) ;
+	PlayerStatusNode* psn = ServerInterface::PlayerStatusNodeByPlayerID(playerID);
 	if ( psn == NULL || psn->curServer.id != Server::myServerInfo.stats.id )
-		return NULL ;
+		return NULL;
 
-	const Player* player = (Player*)(psn->localInfo) ;
+	const Player* player = (Player*)(psn->localInfo);
 	if ( player == NULL )
-		return NULL ;
+		return NULL;
 
-	return player->vehicle ;
+	return player->vehicle;
 }
 
 //recvs a smite user from the chat host
@@ -61,18 +61,18 @@ _recvLocateUser(ACTION_OBJECT* a, CHAT_LOC_USER& locUser_)
 	auto& found = outgoing.allocate<CHAT_FOUND_USER>();
 	found.locUser = locUser_;
 	found.isFound = FALSE;
-	found.serverAddress = Server::myServerInfo.stats.address ;
-	found.serverType = Server::myServerInfo.stats.type ;
+	found.serverAddress = Server::myServerInfo.stats.address;
+	found.serverType = Server::myServerInfo.stats.type;
 
-	HostVehicle* vref = _findVehicleByPlayerID(locUser_.playerID) ;
+	HostVehicle* vref = _findVehicleByPlayerID(locUser_.playerID);
 	if ( vref != NULL )
 	{
 		found.isFound = TRUE;
 		found.vehicleID = vref->index;
-		found.position.rawX = vref->x_cm() ;
-		found.position.rawY = vref->y_cm() ;
-		found.position.rawZ = vref->z_cm() ;
-		found.weapon = vref->spec() ;
+		found.position.rawX = vref->x_cm();
+		found.position.rawY = vref->y_cm();
+		found.position.rawZ = vref->z_cm();
+		found.weapon = vref->spec();
 	}
 
 	outgoing.send(*a->endpoint);
@@ -86,11 +86,11 @@ _recvSmiteUser(ACTION_OBJECT* const a)
 {
 	CHAT_SMITE_USER smiteUser;
 
-	smiteUser.m_handle = 0LL ;
+	smiteUser.m_handle = 0LL;
 	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &smiteUser, sizeof(CHAT_SMITE_USER));
 
-	char callsign[MAX_HANDLE_SIZE] ;
-	chatGetCallsign(callsign, smiteUser.m_handle) ;
+	char callsign[MAX_HANDLE_SIZE];
+	chatGetCallsign(callsign, smiteUser.m_handle);
 
 	dbugLog(_FLN, "received a smite user for customerID %u [%s]", smiteUser.customerID, callsign);
 
@@ -103,7 +103,7 @@ _recvSmiteUser(ACTION_OBJECT* const a)
 static SINT32
 _sendBandwidthNotice(ACTION_OBJECT* const a)
 {
-	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(BANDWIDTH_NOTICE)) ;
+	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(BANDWIDTH_NOTICE));
 }
 
 // Receive a bandwidth change request from the chat host
@@ -111,30 +111,30 @@ _sendBandwidthNotice(ACTION_OBJECT* const a)
 static SINT32
 _recvBandwidthNotice(ACTION_OBJECT* const a)
 {
-	BANDWIDTH_CHANGE request ;
+	BANDWIDTH_CHANGE request;
 
-	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &request, sizeof(request)) ;
+	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &request, sizeof(request));
 
 	if ( a->offset < 0 )
 	{
-		dbugLog(_FLW, "invalid bandwidth notice") ;
-		return a->offset ;
+		dbugLog(_FLW, "invalid bandwidth notice");
+		return a->offset;
 	}
 
-	Player* player = (Player*)ServerInterface::LookupByPlayerID(request.playerID) ;
+	Player* player = (Player*)ServerInterface::LookupByPlayerID(request.playerID);
 	if ( player == NULL )
 	{
-		dbugLog(_FLA, "p:%u invalid player holder", request.playerID) ;
-		return -EINVAL ;
+		dbugLog(_FLA, "p:%u invalid player holder", request.playerID);
+		return -EINVAL;
 	}
 
 	// The request is valid and the player is local to this server
 	// Execute any non-255 mode request and then either way
 	// send back a description of the current mode
-	BANDWIDTH_NOTICE reply ;
-	memset(&reply, 0, sizeof(reply)) ;
+	BANDWIDTH_NOTICE reply;
+	memset(&reply, 0, sizeof(reply));
 
-	reply.playerID = request.playerID ;
+	reply.playerID = request.playerID;
 
 	if ( request.mode != 255 )
 	{
@@ -144,8 +144,8 @@ _recvBandwidthNotice(ACTION_OBJECT* const a)
 						, player->callsign()
 						, (player->vehicle ? player->vehicle->index : 0)
 						, request.mode
-						) ;
-		player->setFramingMode(request.mode) ;
+						);
+		player->setFramingMode(request.mode);
 	}
 	else
 	{
@@ -154,16 +154,16 @@ _recvBandwidthNotice(ACTION_OBJECT* const a)
 						, player->playerID()
 						, player->callsign()
 						, (player->vehicle ? player->vehicle->index : 0)
-						) ;
+						);
 	}
 
-	reply.mode = player->getCurrentFramingMode() ;
-	reply.display = (request.mode == 255) ;
-	strlcpy(reply.response, framings[reply.mode].description, sizeof(reply.response)) ;
+	reply.mode = player->getCurrentFramingMode();
+	reply.display = (request.mode == 255);
+	strlcpy(reply.response, framings[reply.mode].description, sizeof(reply.response));
 
-	teulSendTo(a->teulIndex, a->fromAddress & DIRECT_MASK, a->fromPort, _XCHG_BANDWIDTH_NOTICE, &reply) ;
+	teulSendTo(a->teulIndex, a->fromAddress & DIRECT_MASK, a->fromPort, _XCHG_BANDWIDTH_NOTICE, &reply);
 
-	return a->offset ;
+	return a->offset;
 }
 
 //This function installs all the host callbacks
@@ -172,13 +172,13 @@ chatInstallCellHostSupportCallbacks(void)
 {
 	BEGIN_CALLBACK_REGISTRATION(Chat::CallbackX)
 
-//		REGISTER_SENDER(Chat::GAME_DIRECT_MESSAGE_Y, _sendDirectMessage, _SEND_DIRECT_MESSAGE) ;
+//		REGISTER_SENDER(Chat::GAME_DIRECT_MESSAGE_Y, _sendDirectMessage, _SEND_DIRECT_MESSAGE);
 
-		REGISTER_RECEIVER(Chat::SMITE_USER_Y, _recvSmiteUser) ;
+		REGISTER_RECEIVER(Chat::SMITE_USER_Y, _recvSmiteUser);
 		REGISTER_RECEIVEOBJ(Chat::LOCATE_USER_Y, CHAT_LOC_USER, _recvLocateUser);
 
 		// Send/receive bandwidth notices
-		REGISTER_SENDRECV(Chat::BANDWIDTH_NOTICE_Y, _sendBandwidthNotice, _recvBandwidthNotice, _XCHG_BANDWIDTH_NOTICE) ;
+		REGISTER_SENDRECV(Chat::BANDWIDTH_NOTICE_Y, _sendBandwidthNotice, _recvBandwidthNotice, _XCHG_BANDWIDTH_NOTICE);
 
 	END_CALLBACK_REGISTRATION
 }
@@ -190,20 +190,20 @@ chatSendKickNotice(const playerid_t playerID, const SCHAR* callsign, const SCHAR
 					, callsign
 					, playerID
 					, problem
-					) ;
+					);
 
-	Teul::Packet outgoing(0, Chat::CallbackX, Chat::KICK_NOTICE_Y) ;
-	CONSTRUCT_IN_PACKET(outgoing, Chat::KickNotice, playerID, chatGetHandle(callsign), problem) ;
+	Teul::Packet outgoing(0, Chat::CallbackX, Chat::KICK_NOTICE_Y);
+	CONSTRUCT_IN_PACKET(outgoing, Chat::KickNotice, playerID, chatGetHandle(callsign), problem);
 
-	return serverSendPacketToType(outgoing, CHAT_HOST) ;
+	return serverSendPacketToType(outgoing, CHAT_HOST);
 }
 
 void
 Chat::SendModReport(const ChatHandle& handle, const Chat::ModReport report)
 {
-	Teul::Packet outgoing(sizeof(handle) + sizeof(report), Chat::CallbackX, Chat::MOD_REPORT_Y) ;
-	outgoing.append(report) ;
-	outgoing.append(handle) ;
-	serverSendPacketToType(outgoing, CHAT_HOST) ;
+	Teul::Packet outgoing(sizeof(handle) + sizeof(report), Chat::CallbackX, Chat::MOD_REPORT_Y);
+	outgoing.append(report);
+	outgoing.append(handle);
+	serverSendPacketToType(outgoing, CHAT_HOST);
 }
 

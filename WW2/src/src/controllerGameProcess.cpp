@@ -399,7 +399,7 @@ namespace GameProcessManager
 		// Remember if we thought a process was starting before we checked statuses.
 		bool wasStarting = (GameProcess::s_processStarting != nullptr);
 		GameProcess* starter = nullptr;
-		for ( auto it = s_processes.begin() ; it != s_processes.end() ; )
+		for ( auto it = s_processes.begin(); it != s_processes.end(); )
 		{
 			auto& proc = (*(it++));
 			if ( proc.CheckStatus() )
@@ -443,7 +443,7 @@ namespace GameProcessManager
 	void Shutdown()
 	{
 		// Ask all processes to stop.
-		for ( auto it = s_processes.begin() ; it != s_processes.end() ; ++it )
+		for ( auto it = s_processes.begin(); it != s_processes.end(); ++it )
 		{
 			auto& proc = *(it++);
 			proc.RequestDiscontinue();
@@ -462,7 +462,7 @@ namespace GameProcessManager
 		if ( s_processes.empty() == false )
 		{
 			fprintf(stderr, "killing lingering processes.\n");
-			for ( auto it = s_processes.begin() ; it != s_processes.end() ; )
+			for ( auto it = s_processes.begin(); it != s_processes.end(); )
 			{
 				auto& proc = *(it++);
 				proc.Log(Debug::ERR_ABORT, "still running at shutdown, terminating.");

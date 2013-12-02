@@ -802,12 +802,12 @@ dJointID gr2PhysicsBone::SetJointParams(int axis, double fudge, double stiffness
 		if(axis != 0 && a != axis)
 			continue;
 
-		int paramFmax		= (a == 3 ) ? dParamFMax3 :				(a == 2) ? dParamFMax2 :		dParamFMax ;
-		int paramVel		= (a == 3 ) ? dParamVel3 :				(a == 2) ? dParamVel2 :			dParamVel ;
-		int paramFudge		= (a == 3 ) ? dParamFudgeFactor3 :		(a == 2) ? dParamFudgeFactor2 :	dParamFudgeFactor ;
-		int paramCFM		= (a == 3 ) ? dParamCFM3 :				(a == 2) ? dParamCFM2 :			dParamCFM ;
-		int paramSERP		= (a == 3 ) ? dParamStopERP3 :			(a == 2) ? dParamStopERP2 :		dParamStopERP ;
-		int paramSCFM		= (a == 3 ) ? dParamStopCFM3 :			(a == 2) ? dParamStopCFM2 :		dParamStopCFM ;
+		int paramFmax		= (a == 3 ) ? dParamFMax3 :				(a == 2) ? dParamFMax2 :		dParamFMax;
+		int paramVel		= (a == 3 ) ? dParamVel3 :				(a == 2) ? dParamVel2 :			dParamVel;
+		int paramFudge		= (a == 3 ) ? dParamFudgeFactor3 :		(a == 2) ? dParamFudgeFactor2 :	dParamFudgeFactor;
+		int paramCFM		= (a == 3 ) ? dParamCFM3 :				(a == 2) ? dParamCFM2 :			dParamCFM;
+		int paramSERP		= (a == 3 ) ? dParamStopERP3 :			(a == 2) ? dParamStopERP2 :		dParamStopERP;
+		int paramSCFM		= (a == 3 ) ? dParamStopCFM3 :			(a == 2) ? dParamStopCFM2 :		dParamStopCFM;
 
 		// setter
 		jointParam param = NULL;
@@ -2125,8 +2125,8 @@ void gr2PhysicsModel::UpdateBoneTransform(float* boneMat, Vec3d& pos, Matrixf& r
 /*
 dJointID gr2PhysicsBone::setJointStiffness(dJointID joint, double stiffness)
 {
-	int fmax	= (axis == 3 ) ? dParamFMax3 : (axis == 2) ? dParamFMax2 : dParamFMax ;
-	int vel	= (axis == 3 ) ? dParamVel3 : (axis == 2) ? dParamVel2 : dParamVel ;
+	int fmax	= (axis == 3 ) ? dParamFMax3 : (axis == 2) ? dParamFMax2 : dParamFMax;
+	int vel	= (axis == 3 ) ? dParamVel3 : (axis == 2) ? dParamVel2 : dParamVel;
 
 	switch(dJointGetType(joint))
 	{
@@ -3049,8 +3049,8 @@ bool gr2PhysicsModel::ProcessFlag(unsigned int f, physicsObject* o)
 
 				bool isWater = colliderIsType(f, COLLIDER_TRN_WATER);
 
-				const char* effect = (isWater) ? "waterhit" : "shockdust" ;
-				const char* sound = (isWater) ? "sounds/grenadesplash.wav" : "sounds/troop/body/impact.wav" ;
+				const char* effect = (isWater) ? "waterhit" : "shockdust";
+				const char* sound = (isWater) ? "sounds/grenadesplash.wav" : "sounds/troop/body/impact.wav";
 
 				fxSndAddFiniteWorldSound(sound, 10, 100, IDE_TP_PRIORITY_LOW, bone->getPosition());
 

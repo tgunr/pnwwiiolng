@@ -193,7 +193,7 @@ jsClient::jsClient(ww2::Client* c) :
 	state = new jsClientState;
 	capturestate = new jsCaptureState;
 
-	for(UINT32 i = 0 ; i < MAX_CLIENT_CHANNELS ; ++i )
+	for(UINT32 i = 0; i < MAX_CLIENT_CHANNELS; ++i )
 		chatchannels->SetElement(new jsChatChannel(i), i);
 
 	lastmissionresults = 0;
@@ -779,8 +779,8 @@ JS_FUNCTION_DEF(jsClient, createmission)
 	if(!jstarget || !jstarget->stratobj) return JS_FALSE;
 
 	int32 type = 0, subtype = 0;
-	JS_ValueToInt32(ctx, argv[2], &type) ;
-	JS_ValueToInt32(ctx, argv[3], &subtype) ;
+	JS_ValueToInt32(ctx, argv[2], &type);
+	JS_ValueToInt32(ctx, argv[3], &subtype);
 
 	const wchar_t* wmissiondesc = phui::js::ValueToWideString(argv[4]);
 	std::string missiondesc = UTF8(wmissiondesc);
@@ -1102,7 +1102,7 @@ JS_FUNCTION_DEF(jsClient, requestmotd)
 	if(!jsclient) return JS_FALSE;
 
 	int32 mid = 0;
-	JS_ValueToInt32(ctx, argv[0], &mid) ;
+	JS_ValueToInt32(ctx, argv[0], &mid);
 
 	jsMotd* motd = NULL;
 
@@ -1146,10 +1146,10 @@ JS_FUNCTION_DEF(jsClient, setmotd)
 	if(!jsclient) return JS_FALSE;
 
 	int32 type = 0;
-	JS_ValueToInt32(ctx, argv[0], &type) ;
+	JS_ValueToInt32(ctx, argv[0], &type);
 
 	int32 subtype = 0;
-	JS_ValueToInt32(ctx, argv[1], &subtype) ;
+	JS_ValueToInt32(ctx, argv[1], &subtype);
 
 	const wchar_t* wmotd = phui::js::ValueToWideString(argv[2]);
 	const char* motd = UTF8(wmotd);
@@ -1321,7 +1321,7 @@ JS_FUNCTION_DEF(jsClient, requestmissiondetail)
 	if(!jsclient) return JS_FALSE;
 
 	int32 missionID = 0;
-	JS_ValueToInt32(ctx, argv[0], &missionID) ;
+	JS_ValueToInt32(ctx, argv[0], &missionID);
 
 	jsclient->client->RequestMissionLookup(missionID);
 
@@ -1346,7 +1346,7 @@ JS_FUNCTION_DEF(jsClient, requestrecruiters)
 
 	int32 language	= -1;
 
-	JS_ValueToInt32(ctx, argv[0], &language) ;
+	JS_ValueToInt32(ctx, argv[0], &language);
 
 	if(language > -1)
 	{
@@ -1519,7 +1519,7 @@ JSBool jsClient::GetProperty(JSContext* ctx, int propid, jsval* val)
 		}
 		break;
 		case SIDELOCKED_PROP:
-			*val = INT_TO_JSVAL(client->Personas().m_sidelocked) ;
+			*val = INT_TO_JSVAL(client->Personas().m_sidelocked);
 		break;
 		case CURRENTMISSION_PROP:
 			if(mission.valid() && mission->Detail().m_isCurrent)
@@ -1581,7 +1581,7 @@ JSBool jsClient::GetProperty(JSContext* ctx, int propid, jsval* val)
 		break;
 		case LASTSPAWNLISTSTATUS_PROP:
 		{
-			const char* state = "invalid" ;
+			const char* state = "invalid";
 			switch(lastspawnliststatus)
 			{
 				// Spawnable but not supplied states
@@ -1839,7 +1839,7 @@ void jsClient::ProcessWeapList()
 	}
 
 	lastspawnliststatus = (int)weaplist.m_status;
-	lastspawnlistsource = weaplist.m_fullObjID ;
+	lastspawnlistsource = weaplist.m_fullObjID;
 	nextsupply = weaplist.m_nextSupplyM;
 
 	RunScript("onweaponlist()");
@@ -2028,10 +2028,10 @@ JSBool jsMission::GetProperty(JSContext* ctx, int propid, jsval* val)
 			*val = INT_TO_JSVAL(std::max(detail.launchDelay(), 0U));
 		break;
 		case ISSQUADMISSION_PROP:
-			*val = BOOLEAN_TO_JSVAL(PlayerClient()->PlayerSquad().isSquadMission(detail.m_missionID)) ;
+			*val = BOOLEAN_TO_JSVAL(PlayerClient()->PlayerSquad().isSquadMission(detail.m_missionID));
 		break;
 		case POPULATION_PROP: // will eventually be updated during the launchupdate
-			*val = INT_TO_JSVAL(detail.m_population) ;
+			*val = INT_TO_JSVAL(detail.m_population);
 		break;
 		case CANMOBILESPAWN_PROP:
 			*val = BOOLEAN_TO_JSVAL(detail.m_canMobileSpawn);
@@ -2049,7 +2049,7 @@ void jsMission::LaunchUpdate(MISS_LAUNCH_UPDATE const& lu)
 	detail.m_timeLaunch = lu.timeLaunch;
 	detail.m_hasMobileSpawn = lu.mobileSpawnAvailable;
 	detail.m_canMobileSpawn = lu.m_canMobileSpawn;
-	detail.m_isOpen = (lu.state == MISS_LAUNCH_UPDATE::ACTIVE) ;
+	detail.m_isOpen = (lu.state == MISS_LAUNCH_UPDATE::ACTIVE);
 	state = lu.state;
 	starttime = frametime;
 }
@@ -2133,8 +2133,8 @@ JSBool jsPersonaSummary::GetProperty(JSContext* ctx, int propid, jsval* val)
 			*val = INT_TO_JSVAL(summary.m_rankPctg);
 		break;
 		case AVAILABILITY_PROP:
-			*val = phui::js::NewString(summary.availability()) ;
-		break ;
+			*val = phui::js::NewString(summary.availability());
+		break;
 	}
 
 	return JS_TRUE;
@@ -2517,7 +2517,7 @@ JSBool jsBrigade::GetProperty(JSContext* ctx, int propid, jsval* val)
 			*val = phui::js::NewString(UTF16(detail.callsign()));
 		break;
 		case OFFICERS_PROP:
-			*val = INT_TO_JSVAL(detail.officers()) ;
+			*val = INT_TO_JSVAL(detail.officers());
 		break;
 		case HOME_PROP:
             {
@@ -2558,13 +2558,13 @@ JSBool jsBrigade::GetProperty(JSContext* ctx, int propid, jsval* val)
         }
 		break;
 		case MOBILESPAWNS_PROP:
-			*val = INT_TO_JSVAL(detail.m_mobileSpawns) ;
+			*val = INT_TO_JSVAL(detail.m_mobileSpawns);
 		break;
 		case ISBRIGADE_PROP:
-			*val = BOOLEAN_TO_JSVAL(detail.isBrigade()) ;
+			*val = BOOLEAN_TO_JSVAL(detail.isBrigade());
 		break;
 		case ISSQUADBRIGADE_PROP:
-			*val = BOOLEAN_TO_JSVAL(PlayerClient()->PlayerSquad().isSquadBrigade(detail.brigadeID())) ;
+			*val = BOOLEAN_TO_JSVAL(PlayerClient()->PlayerSquad().isSquadBrigade(detail.brigadeID()));
 		break;
 		case OWNER_PROP: // permanent owner of the brigade
 			*val = phui::js::NewString(chatGetWideCallsign(detail.owner()));
@@ -2612,27 +2612,27 @@ JSBool jsBrigade::GetProperty(JSContext* ctx, int propid, jsval* val)
 		{
 			BrigadeControlList* oic = PlayerClient()->LookupBrigadeOIC(detail.brigadeID());
 			if(oic)
-				*val = BOOLEAN_TO_JSVAL(oic->m_canVote) ;
+				*val = BOOLEAN_TO_JSVAL(oic->m_canVote);
 			else
-				*val = BOOLEAN_TO_JSVAL(false) ;
+				*val = BOOLEAN_TO_JSVAL(false);
 		}
 		break;
 		case CANTAKECHARGE_PROP:
 		{
 			BrigadeControlList* oic = PlayerClient()->LookupBrigadeOIC(detail.brigadeID());
 			if(oic)
-				*val = BOOLEAN_TO_JSVAL(oic->m_canTakeCharge) ;
+				*val = BOOLEAN_TO_JSVAL(oic->m_canTakeCharge);
 			else
-				*val = BOOLEAN_TO_JSVAL(false) ;
+				*val = BOOLEAN_TO_JSVAL(false);
 		}
 		break;
 		case ACTIVEOIC_PROP:
 		{
 			BrigadeControlList* oic = PlayerClient()->LookupBrigadeOIC(detail.brigadeID());
 			if(oic && oic->m_officer > 0)
-				*val = BOOLEAN_TO_JSVAL(true) ;
+				*val = BOOLEAN_TO_JSVAL(true);
 			else
-				*val = BOOLEAN_TO_JSVAL(false) ;
+				*val = BOOLEAN_TO_JSVAL(false);
 		}
 		break;
 	}
@@ -2927,7 +2927,7 @@ jsWeaponCounter::jsWeaponCounter(WeaponCounter const& counter, int _index, char 
 	DefineProperty("minimumrank", INT_TO_JSVAL(minimumRank));
 	DefineProperty("index", INT_TO_JSVAL(_index));
 
-	const char* spawnable = "invalid" ;
+	const char* spawnable = "invalid";
 	switch(counter.spawnable)
 	{
 		case WeaponCounter::SPAWNABLE:			spawnable = "spawnable"; break;
@@ -2953,7 +2953,7 @@ jsWeaponCounter::jsWeaponCounter(int capacity, int current, int weapIndex, char 
 	DefineProperty("minimumrank", INT_TO_JSVAL(minRank));
 	DefineProperty("index", INT_TO_JSVAL(weapIndex));
 
-	const char* spawnable = "invalid" ;
+	const char* spawnable = "invalid";
 
 	switch(availability)
 	{
@@ -3280,9 +3280,9 @@ jsMissionResults::jsMissionResults(MISSION_RESULTS const& results)
 
 	// latest latest latest additions
 	// Number of kills scored near a table (as a guard)
-	DefineProperty("guardingkills", INT_TO_JSVAL(results.m_guardingKills)) ;
+	DefineProperty("guardingkills", INT_TO_JSVAL(results.m_guardingKills));
 	// Number of kills on an enemy who was near a table (a capper)
-	DefineProperty("capperkills", INT_TO_JSVAL(results.m_capperKills)) ;
+	DefineProperty("capperkills", INT_TO_JSVAL(results.m_capperKills));
 	// Callsign of the person who killed me
 	if(results.m_killedBy) // Killed by another player?
 		DefineProperty("killedby", phui::js::NewString(chatGetWideCallsign(results.m_killedBy)));
@@ -3291,10 +3291,10 @@ jsMissionResults::jsMissionResults(MISSION_RESULTS const& results)
 	else // Killed self, or MIA, RTB, etc...
 		DefineProperty("killedby", phui::js::NewString("-"));
 	// Bonus points for time spent defending a table
-	DefineProperty("guardingpoints", INT_TO_JSVAL(results.m_guardingPoints)) ;
+	DefineProperty("guardingpoints", INT_TO_JSVAL(results.m_guardingPoints));
 
 	// Number of Unmanned Mobile Spawns they killed
-	DefineProperty("umskills", INT_TO_JSVAL(results.m_umsKills)) ;
+	DefineProperty("umskills", INT_TO_JSVAL(results.m_umsKills));
 }
 
 /************************************************************************************************
@@ -3535,12 +3535,12 @@ JSBool jsSquad::GetProperty(JSContext* ctx, int propid, jsval* val)
 		{
 			time_t stamp(squad.created());
 
-			char created[31] ;
+			char created[31];
 #if platOS == OS_WIN32
-			strftime(created, 30, "%a %b %d %X %Y", localtime_r(&stamp, NULL)) ;
+			strftime(created, 30, "%a %b %d %X %Y", localtime_r(&stamp, NULL));
 #else
-      struct tm tmStruct ;
-			strftime(created, 30, "%a %b %d %X %Y", localtime_r(&stamp, &tmStruct)) ;
+      struct tm tmStruct;
+			strftime(created, 30, "%a %b %d %X %Y", localtime_r(&stamp, &tmStruct));
 #endif
 			*val = phui::js::NewString(created);
 		}

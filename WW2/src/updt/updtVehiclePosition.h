@@ -10,5 +10,5 @@
 
 #include "include/xyz_tuple.h"
 
-typedef XYZTuple<SINT32> VEHICLE_POSITION ;
+typedef XYZTuple<SINT32> VEHICLE_POSITION;
 

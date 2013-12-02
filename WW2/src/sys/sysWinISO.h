@@ -55,20 +55,20 @@
 static inline unsigned long long strtoull(const char* const src_, const char* const, unsigned int)
 {
 	unsigned long long into = 0;
-	(void)sscanf(src_, "%I64u", &into) ;
-	return into ;
+	(void)sscanf(src_, "%I64u", &into);
+	return into;
 }
 static inline signed long long strtoll(const char* const src_, const char* const, unsigned int)
 {
-	signed long long into = 0 ;
-	(void)sscanf(src_, "%I64d", &into) ;
-	return into ;
+	signed long long into = 0;
+	(void)sscanf(src_, "%I64d", &into);
+	return into;
 }
 static inline float strtof(const char* const src_, const char* const)
 {
-	float into = 0 ;
-	(void)sscanf(src_, "%f", &into) ;
-	return into ;
+	float into = 0;
+	(void)sscanf(src_, "%f", &into);
+	return into;
 }
 #endif
 

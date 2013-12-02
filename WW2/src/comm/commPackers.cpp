@@ -36,9 +36,9 @@ SINT32 commPackVEHICLE_REQUEST(LOGICAL mode, UCHAR* const data, SINT32 offset, V
 SINT32 commPackVEHICLE_REPLY(LOGICAL mode, UCHAR* const data, SINT32 offset, VEHICLE_REPLY* reply, SINT32 /*size*/)
 {
 //	offset = teulPackUINT32(mode, data, offset, &reply->timeStamp, 0);
-	offset = teulPackUINT32(mode, data, offset, &reply->hostIndex, 0) ;
-	offset = wwiiPackWeaponSpec(mode, data, offset, &reply->spec, 0) ;
-	offset = wwiiPackFullObjID(mode, data, offset, &reply->source, 0) ;
+	offset = teulPackUINT32(mode, data, offset, &reply->hostIndex, 0);
+	offset = wwiiPackWeaponSpec(mode, data, offset, &reply->spec, 0);
+	offset = wwiiPackFullObjID(mode, data, offset, &reply->source, 0);
 
 	// 3 + 3 + 4 + 6 = 16 bits
 	offset = teulPackUCHAR(mode, data, offset, &reply->persVehicleIndex, 0);
@@ -55,42 +55,42 @@ SINT32 commPackPlayerExit(LOGICAL mode, UCHAR* const data, SINT32 offset, PLAYER
 {
 	offset = teulPackUINT32(mode, data, offset, (UINT32*)&pe->destination, 0);
 	offset = teulPackUINT32(mode, data, offset, (UINT32*)&pe->exitCode, 0);
-	offset = wwiiPackFullObjID(mode, data, offset, (FULL_OBJ_ID*)&pe->facility, 0) ;
+	offset = wwiiPackFullObjID(mode, data, offset, (FULL_OBJ_ID*)&pe->facility, 0);
 
 	return offset;
 }
 
 SINT32 Vehicle::Hit::packer(LOGICAL mode, ACTION_OBJECT* const a)
 {
-	a->packer(mode, m_shooter) ;
-	a->packer(mode, m_target) ;
+	a->packer(mode, m_shooter);
+	a->packer(mode, m_target);
 
 	// Pack components.
-	UINT32 numComponents = m_components.size() ;
-	a->packer(mode, numComponents, 8) ;
-	numComponents = std::min(numComponents, (UINT32)m_components.capacity()) ;
+	UINT32 numComponents = m_components.size();
+	a->packer(mode, numComponents, 8);
+	numComponents = std::min(numComponents, (UINT32)m_components.capacity());
 	if ( mode == TEUL_UNPACK )
-		m_components.resize(numComponents) ;
+		m_components.resize(numComponents);
 
-	for ( UINT32 i = 0 ; i < numComponents ; ++i )
+	for ( UINT32 i = 0; i < numComponents; ++i )
 	{
-		Vehicle::Hit::Component& comp = m_components[i] ;
-		a->packer(mode, comp.compID, 7) ;
-		a->packer(mode, comp.isImportant) ;
-		a->packer(mode, comp.NumHits, 6) ;
-		UCHAR damageWords = 0 ;
+		Vehicle::Hit::Component& comp = m_components[i];
+		a->packer(mode, comp.compID, 7);
+		a->packer(mode, comp.isImportant);
+		a->packer(mode, comp.NumHits, 6);
+		UCHAR damageWords = 0;
 		if (mode == TEUL_PACK)
 		{
-			for ( damageWords = 0 ; damageWords < 3 ; ++damageWords )
+			for ( damageWords = 0; damageWords < 3; ++damageWords )
 			{
 				if ( comp.m_damage < (1ULL << ((damageWords + 1) * 16)) )
-					break ;
+					break;
 			}
 		}
-		a->packer(mode, damageWords, 2) ;
-		a->packer(mode, comp.m_damage, (damageWords + 1) * 16) ;
+		a->packer(mode, damageWords, 2);
+		a->packer(mode, comp.m_damage, (damageWords + 1) * 16);
 	}
 
-	return a->offset ;
+	return a->offset;
 }
 

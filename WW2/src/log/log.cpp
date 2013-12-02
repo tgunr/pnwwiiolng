@@ -191,11 +191,11 @@ LOGICAL Open_Debug(const char* filename)
 	ofp = fioUserFile(ofn, "w");
 
 	if ( ofp == NULL )
-		return FALSE ;
+		return FALSE;
 
-	Write_Debug("\r\nDebug Message System Open.\r\n") ;
+	Write_Debug("\r\nDebug Message System Open.\r\n");
 
-	return TRUE ;
+	return TRUE;
 }
 
 /************************************************************************************************
@@ -205,8 +205,8 @@ LOGICAL Open_Debug(const char* filename)
 void Close_Debug(void)
 {
 	if ( ofp != NULL )
-		fclose(ofp) ;
-	ofp = NULL ;
+		fclose(ofp);
+	ofp = NULL;
 }
 
 /************************************************************************************************
@@ -235,12 +235,12 @@ static void logv(UINT32 system, SINT32 level, const char* str, va_list marker)
 		OutputDebugStringA(buf);
 		OutputDebugStringA("\r\n");
 
-		fprintf(ofp, "%s\r\n", buf) ;
+		fprintf(ofp, "%s\r\n", buf);
 		fflush(ofp);
 
 #else
-		vfprintf(ofp, str, marker) ;
-		fprintf(ofp, "\r\n") ;
+		vfprintf(ofp, str, marker);
+		fprintf(ofp, "\r\n");
 		fflush(ofp);
 #endif
 	}
@@ -267,13 +267,13 @@ struct logTimer
 	int callcount; // to handle recursion
 	SINT32 starttime;
 	SINT32 tottime[10]; // last 10 totaltimes
-} ;
+};
 
 struct logTimerStat
 {
 	const char* funcname;
 	SINT32 tottime;
-} ;
+};
 
 static logTimer logTimers[MAX_TIMERS];
 static logTimerStat sortedTimes[MAX_TIMERS];
@@ -532,7 +532,7 @@ static void _getSystemDetails(char* into, size_t sizeofInto)
 #endif
 
 	// snprintf/strncpy don't guarantee a null terminator
-	into[sizeofInto - 1] = 0 ;
+	into[sizeofInto - 1] = 0;
 }
 
 
@@ -645,7 +645,7 @@ void logUpdateProfiling()
 								, CurrentProfileName.c_str()
 								);
 			if ( written > MAX_MESSAGE_LENGTH )
-				written = MAX_MESSAGE_LENGTH ;
+				written = MAX_MESSAGE_LENGTH;
 			// snprintf doesn't guarantee it will write a trailing zero...
 			result[MAX_MESSAGE_LENGTH] = 0;
 

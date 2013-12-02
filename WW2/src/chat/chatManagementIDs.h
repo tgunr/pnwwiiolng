@@ -8,23 +8,23 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-class Player ;
+class Player;
 
 namespace Chat
 {
 	class ManagementIDAllocator
 	{
 	public:
-		static void Initialize() ;			// Initializes data.
+		static void Initialize();			// Initializes data.
 
 		// Request an ID. Throws std::runtime_error if none available.
-		static playerid_t AllocateID(Player*) ;
+		static playerid_t AllocateID(Player*);
 
 		// Returns an ID to the free pool.
-		static void ReleaseID(const playerid_t playerID) ;
+		static void ReleaseID(const playerid_t playerID);
 
 		// Lookup an ID
-		static Player* Lookup(const playerid_t playerID) ;
-	} ;
+		static Player* Lookup(const playerid_t playerID);
+	};
 }
 

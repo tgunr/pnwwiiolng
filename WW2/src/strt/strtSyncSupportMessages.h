@@ -10,4 +10,4 @@
 //Installs the callbacks
 extern SINT32 strtSyncSupportInstallCallbacks(void);
 
-extern bool strtCheckSyncFinished() ;
+extern bool strtCheckSyncFinished();

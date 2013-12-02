@@ -17,14 +17,14 @@
 SINT32
 ActiveMission::packer(LOGICAL mode, ACTION_OBJECT* a)
 {
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_missionID, 0) ;
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_missionID, 0);
 	if ( m_missionID > 0 )
 	{
-		a->offset = wwiiPackCountry(mode, a->packed, a->offset, &m_countryID, 0) ;
-		a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_branchID, 3) ;
-		a->offset = wwiiPackBrigadeID(mode, a->packed, a->offset, m_brigadeID) ;
+		a->offset = wwiiPackCountry(mode, a->packed, a->offset, &m_countryID, 0);
+		a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_branchID, 3);
+		a->offset = wwiiPackBrigadeID(mode, a->packed, a->offset, m_brigadeID);
 	}
 
-	return a->offset ;
+	return a->offset;
 }
 

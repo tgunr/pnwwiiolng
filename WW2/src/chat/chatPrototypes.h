@@ -10,14 +10,14 @@
 
 namespace Chat
 {
-	struct	ClientMessage ;
-	struct	GCIMessage ;
-	struct	HostMessage ;
-	struct	LocalizedMessage ;
-	struct	TuneToChannel ;
-	struct	SideMessage ;
-	class	Broadcast ;
-	struct	UpdateChannel ;
-	struct	UserNLA ;
-	class	MissionStatus ;
+	struct	ClientMessage;
+	struct	GCIMessage;
+	struct	HostMessage;
+	struct	LocalizedMessage;
+	struct	TuneToChannel;
+	struct	SideMessage;
+	class	Broadcast;
+	struct	UpdateChannel;
+	struct	UserNLA;
+	class	MissionStatus;
 }

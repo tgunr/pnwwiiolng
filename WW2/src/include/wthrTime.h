@@ -30,20 +30,20 @@ extern UINT32 wthrGetTimeFactor(void);
 //convert time to a string HH:MM
 extern const char* wthrConvertTimeToString(UINT32 _time);
 
-extern UINT32 wthrRealSecondsToHour(void) ;
+extern UINT32 wthrRealSecondsToHour(void);
 
-extern UINT32 wthrGetWeatherPattern() ;
-extern void wthrSetWeatherPattern(UINT32 pattern) ;
+extern UINT32 wthrGetWeatherPattern();
+extern void wthrSetWeatherPattern(UINT32 pattern);
 
-extern UINT32 wthrGetFogPattern() ;
-extern void wthrSetFogPattern(UINT32 pattern) ;
+extern UINT32 wthrGetFogPattern();
+extern void wthrSetFogPattern(UINT32 pattern);
 
-extern UINT32 wthrGetWeatherForecast() ;
-extern UINT32 wthrGetFogForecast() ;
+extern UINT32 wthrGetWeatherForecast();
+extern UINT32 wthrGetFogForecast();
 
-extern void wthrStartNewDay() ;
+extern void wthrStartNewDay();
 
 // Return the number of seconds that a game-day lasts.
-extern FLOAT64 wthrGetGameDayDuration() ;
+extern FLOAT64 wthrGetGameDayDuration();
 //tolua_end
 

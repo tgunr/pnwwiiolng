@@ -27,7 +27,7 @@ enum
 ,	ETEUL_CB_CONN_DEAD			=	20034	//! Connection not accepting callbacks.
 ,	ETEUL_CB_SEND_NULL			=	20035	//! Tried to send NULL data.
 ,	ETEUL_CB_REQ_DATA			=	20036	//! Callback requires data.
-} ;
+};
 
 namespace Teul
 {
@@ -59,12 +59,12 @@ namespace Teul
 		,	PackCallbackCategory = 5
 		,	SendFailCategory = 6
 		,	PushPacketCategory = 7
-		} ;
+		};
 
 		static inline SINT32 combineCodes(const UINT32 category_, const SINT32 error_)
 		{
-			const UINT32 unsignedError = (UINT32)((error_ < 0) ? -error_ : error_) ;
-			return (unsignedError >= CategoryMultiplier) ? unsignedError : (category_ * CategoryMultiplier) + unsignedError ;
+			const UINT32 unsignedError = (UINT32)((error_ < 0) ? -error_ : error_);
+			return (unsignedError >= CategoryMultiplier) ? unsignedError : (category_ * CategoryMultiplier) + unsignedError;
 		}
 	}
 }

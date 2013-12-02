@@ -20,13 +20,13 @@ namespace Chat
 			: m_x(x), m_y(y), m_z(z), m_nearCP(nearCP)
 			{}
 
-		Locality(ACTION_OBJECT* const a) ;
+		Locality(ACTION_OBJECT* const a);
 
-		SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) ;
+		SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
 
-		FLOAT64		m_x, m_y, m_z ;		// World co-ordinates
-		FULL_OBJ_ID	m_nearCP ;			// Which CP you are near
-	} ;
+		FLOAT64		m_x, m_y, m_z;		// World co-ordinates
+		FULL_OBJ_ID	m_nearCP;			// Which CP you are near
+	};
 }
 #pragma pack(pop)
 

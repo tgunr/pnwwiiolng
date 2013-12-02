@@ -216,7 +216,7 @@ public:
 	// override these to do things in response to requests
 	// if you override you must call the base function first
 	// as it sets the request state
-	virtual void SetActiveHost(unsigned int hostIP, unsigned int port) ;
+	virtual void SetActiveHost(unsigned int hostIP, unsigned int port);
 	virtual void ActivateMap();
 	virtual void ActivateCell();
 	virtual void ProcessWeapList(struct ACTION_OBJECT* a);
@@ -251,12 +251,12 @@ public:
 	virtual void ProcessChatGCIMessage(Chat::GCIMessage const&) {}
 	virtual void ProcessMissionListUpdate(unsigned int brigadeID);
 	virtual void ProcessEmptyChatWhoList(int type) {}
-	virtual void ProcessChatWho(int type, const Chat::Who&) ;
-	virtual void ProcessSquad(const SquadMsg&) ;
-	virtual void ProcessRecruiter(const Recruiter& rec, bool reset=false) ;
-	virtual void ProcessRecruiter(bool reset=true) ;
+	virtual void ProcessChatWho(int type, const Chat::Who&);
+	virtual void ProcessSquad(const SquadMsg&);
+	virtual void ProcessRecruiter(const Recruiter& rec, bool reset=false);
+	virtual void ProcessRecruiter(bool reset=true);
 	virtual void ProcessSquadControl(const SquadControlResult&) {}
-	virtual void ProcessSquadInvite(const SquadMsg&) ;
+	virtual void ProcessSquadInvite(const SquadMsg&);
 	virtual void ProcessWaypoint(Waypoint const&, int type);
 	virtual void ProcessWaypointControl(WaypointControlMsg const&, int type, unsigned long long handle);
 	virtual void ProcessMissionMemberUpdate(MissionMember const&);
@@ -443,5 +443,5 @@ enum MSG_TIME
 
 }
 
-extern std::wstring clientGetNetworkState() ;
+extern std::wstring clientGetNetworkState();
 

@@ -2079,7 +2079,7 @@ void PoolModel::RebuildMDL()
 	if(!topmostObj)
 	{
 		Write_Debug("Error loading FLT file for %s", fltPath.c_str());
-		piExitProgram(__FILE__, __LINE__, "MDLreb failed") ;
+		piExitProgram(__FILE__, __LINE__, "MDLreb failed");
 	}
 
 	SetModelType();

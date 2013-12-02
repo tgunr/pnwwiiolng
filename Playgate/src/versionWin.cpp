@@ -40,7 +40,7 @@ static UINT32 _GetInstanceVersion(const char* VersionKey, const char* SubKey, ch
 	if (! registryGetSubKey( NewKey, &RegKey) )
 		return 0;
 
-	DWORD Bytes = sizeof(Location) - 1 ;
+	DWORD Bytes = sizeof(Location) - 1;
 	if (RegQueryValueExW(RegKey, L"Path", NULL, &Type, (LPBYTE)Location, &Bytes) !=
 		ERROR_SUCCESS)
 	{
@@ -50,14 +50,14 @@ static UINT32 _GetInstanceVersion(const char* VersionKey, const char* SubKey, ch
 	
 	RegCloseKey(RegKey);
 
-	wcscat(Location, L"\\WW2.exe") ;
+	wcscat(Location, L"\\WW2.exe");
 
 	// Access Window's version information for the executable.
 	TCHAR buffer[256+1];
 	if (!GetFileVersion(buffer, sizeof(buffer), Location))
 		return 0;
 
-	char verStr[25 + 1] ;
+	char verStr[25 + 1];
 	WWII::ConvertChars(buffer, verStr, sizeof(verStr));
 	teulGetHost(verStr, &Version);
 
@@ -144,7 +144,7 @@ bool GetFileVersion(TCHAR* const dest, const size_t destSize, TCHAR* const filen
 	const DWORD VSize = GetFileVersionInfoSize(filename, NULL);
 	if (VSize == 0)
 	{
-		DWORD n = GetLastError() ;
+		DWORD n = GetLastError();
 		// file not found
 		//Write_Debug("No file version info available for %s", filename);
 		return false;
@@ -180,8 +180,8 @@ bool GetFileVersion(TCHAR* const dest, const size_t destSize, TCHAR* const filen
 	}
 
 	// Copy everything but the revision number.
-	static const TCHAR chColon = _T(':') ;
-	static const TCHAR chNull = _T('\0') ;
+	static const TCHAR chColon = _T(':');
+	static const TCHAR chNull = _T('\0');
 
 	TCHAR* src = ptrFVI;
 	TCHAR* dst = dest;

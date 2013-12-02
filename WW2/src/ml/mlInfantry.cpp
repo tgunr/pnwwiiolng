@@ -211,7 +211,7 @@ UINT32 mlDetermineInfantryCollisions(mlVehicleData*	VehicleData,
 									 UINT32			Flags,
 									vehVehicle**	collideVehicle)
 {
-	static const UINT32 _MAX_COLLISIONS = 32 ;
+	static const UINT32 _MAX_COLLISIONS = 32;
 	static trnCDTerrainObject* _lastCollision = NULL;
 
 	UINT32				i,j;
@@ -326,7 +326,7 @@ UINT32 mlDetermineInfantryCollisions(mlVehicleData*	VehicleData,
 		return 0;
 	}
 
-	static FASTCOLLIDE collisionsSaveList[_FPS_MAX_COLLIDE_LINES] ;
+	static FASTCOLLIDE collisionsSaveList[_FPS_MAX_COLLIDE_LINES];
 
 	memset (collisionsSaveList, 0, sizeof(FASTCOLLIDE) * NumLines);
 
@@ -391,7 +391,7 @@ UINT32 mlDetermineInfantryCollisions(mlVehicleData*	VehicleData,
 		draw3dLineDebug(&NewPos, &OldPos, colorBLUEALPHA);
 #endif
 
-		TempNum = _MAX_COLLISIONS ;
+		TempNum = _MAX_COLLISIONS;
 
 		CollideListPtr = CollisionList;
 

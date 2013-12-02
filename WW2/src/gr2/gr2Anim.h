@@ -41,7 +41,7 @@ public:
 
 	int walking;
 	int parade;
-	int useAltTrooperMesh ;
+	int useAltTrooperMesh;
 	int chuteOpen;
 	int freeFall;
 	int altWeaponModel;
@@ -385,7 +385,7 @@ struct gr2AnimTrooper : public gr2AnimModel
         if(myVehicle && myVehicle->VehicleObjectData && myVehicle->VehicleObjectData->PlaneObject)
         {
 		    FLOAT32 dist = myVehicle->VehicleObjectData->PlaneObject->distsqr * ((applyMod) ? (gTrooperLOD * gTrooperMOD) : 1.0f);
-		    return (dist <= distance) ? true : false ;
+		    return (dist <= distance) ? true : false;
         }
 
         return false;
@@ -416,7 +416,7 @@ struct gr2AnimTrooper : public gr2AnimModel
 #ifdef GR2_MEMORY_PAD
 	//char pad[0];
 #endif
-} ;
+};
 
 struct Corpse
 {
@@ -462,9 +462,9 @@ struct Corpse
 		if(model && model != skeleton)
 			gr2FreeModel(model);
 
-		memset(&world, 0, sizeof(world)) ;
-		memset(&pos, 0, sizeof(pos)) ;
-		memset(&gr2Offset, 0, sizeof(gr2Offset)) ;
+		memset(&world, 0, sizeof(world));
+		memset(&pos, 0, sizeof(pos));
+		memset(&gr2Offset, 0, sizeof(gr2Offset));
 
 		skeleton = NULL;
 		model	= NULL;
@@ -477,7 +477,7 @@ struct Corpse
 		update = true;
 	}
 
-} ;
+};
 
 struct vehVehicle;
 

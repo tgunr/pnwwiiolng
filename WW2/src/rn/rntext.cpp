@@ -153,7 +153,7 @@ static SINT32 westernGetStringWidth(const WCHAR*s, SINT32 f)
 static LOGICAL western3DString(const WCHAR* pszText, UINT32 uColor, SINT32 f, piLVERTEX* plVertices, SINT32 iNumVertices)
 {
     FontAdaptor* fa = (f == 1) ? gunsightfontAdaptor : iconfontAdaptor;
-    return fa->get3DString(pszText, uColor, plVertices, iNumVertices) ;
+    return fa->get3DString(pszText, uColor, plVertices, iNumVertices);
 }
 
 static SINT32 westernGetTexId(SINT32 f)

@@ -29,12 +29,12 @@
 
 //#define HEAVY_DEBUG
 
-typedef void (_PROCESSOR)(DBRow&, void*, UINT32 oid) ;
+typedef void (_PROCESSOR)(DBRow&, void*, UINT32 oid);
 
 extern DBHANDLE dbh;
-extern DBCONNECTION dbConnection ;
+extern DBCONNECTION dbConnection;
 
-extern void strtInitializeVehicleAccessLevels() ;
+extern void strtInitializeVehicleAccessLevels();
 
 //////////////////////////////////////////////////////////////////////
 
@@ -42,8 +42,8 @@ extern void strtInitializeVehicleAccessLevels() ;
 # include "strt/strtDatabaseSchemas.h"
 static void _updateDatabaseSchema()
 {
-	DB::Schema schema(dbh, "wwii") ;
-	schema.Update(revisions) ;
+	DB::Schema schema(dbh, "wwii");
+	schema.Update(revisions);
 }
 #endif
 
@@ -55,24 +55,24 @@ strtInitDB()
 	bool retval = true;
 
 	if ( !dbh.connected() )
-		dbh.connect(dbConnection) ;
+		dbh.connect(dbConnection);
 
 #ifdef IS_STRAT_HOST
-	_updateDatabaseSchema() ;
+	_updateDatabaseSchema();
 
 	if ( !strtInitHostDB() )
-		retval = false ;
+		retval = false;
 #endif // IS_STRAT_HOST
 
-	srand((UINT32)teulClock64) ;
+	srand((UINT32)teulClock64);
 
 	if ( ! dbGetWWIIConfig(dbh) )
-		dbugLog(_FLA, "No configuration from database") ;
+		dbugLog(_FLA, "No configuration from database");
 
 #ifdef IS_STRAT_HOST
-	wwiiReadRanks(dbh) ;
+	wwiiReadRanks(dbh);
 
-	strtInitializeVehicleAccessLevels() ;
+	strtInitializeVehicleAccessLevels();
 #endif
 
 	return retval;
@@ -81,7 +81,7 @@ strtInitDB()
 LOGICAL
 strtCloseDB()
 {
-	dbh.disconnect() ;
+	dbh.disconnect();
 	return TRUE;
 }
 
@@ -90,12 +90,12 @@ strtLoadTOEsAndHCUnits()
 {
 #ifdef IS_STRAT_HOST
 	// Read in the complete list of TOE templates so that we're ready for HCUnits.
-	strtdbLoadTOETemplates() ;
+	strtdbLoadTOETemplates();
 	// Read in the list of HCUnits
 #endif
 
 	if ( !wwiiReadHCUnits() )
-		dbugLog(_FLA, "Unable to read HC Units") ;
+		dbugLog(_FLA, "Unable to read HC Units");
 }
 
 static const char* _FETCH_CPS_QUERY =
@@ -122,82 +122,82 @@ static const char* _FETCH_LINKS_QUERY =
 static void
 _processCP(DBRow& row, void* data, UINT32 oid)
 {
-	CPStruct* cp = (CPStruct*) data ;
+	CPStruct* cp = (CPStruct*) data;
 
-	cp->uOID = oid ;
+	cp->uOID = oid;
 
-	cp->setContention((bool)row.NextUInt()) ;
-	cp->controllingCountry = (WWII_COUNTRY)row.NextUInt() ;
-	cp->controllingSide = wwiiSide(cp->controllingCountry) ;
-	cp->country = (WWII_COUNTRY)row.NextUInt() ;
-	cp->setSide(wwiiSide(cp->country)) ;
+	cp->setContention((bool)row.NextUInt());
+	cp->controllingCountry = (WWII_COUNTRY)row.NextUInt();
+	cp->controllingSide = wwiiSide(cp->controllingCountry);
+	cp->country = (WWII_COUNTRY)row.NextUInt();
+	cp->setSide(wwiiSide(cp->country));
 
 #if defined(IS_STRAT_HOST)
 	if ( cp->isCity() )
 	{
-		UINT32 attackingBrigade = row.NextUInt() ;
+		UINT32 attackingBrigade = row.NextUInt();
 		if ( attackingBrigade != 0 )
 		{
-			HCUnit* unit = HCUnit::Lookup(attackingBrigade) ;
+			HCUnit* unit = HCUnit::Lookup(attackingBrigade);
 			if ( unit && unit->side() != cp->side )
 			{
-				cp->setAttackObjective(true, unit) ;
-				cp->m_attackStarted = teulTime() - (host_config.objective.minLifetime_m * 60) ;
+				cp->setAttackObjective(true, unit);
+				cp->m_attackStarted = teulTime() - (host_config.objective.minLifetime_m * 60);
 			}
 		}
 	}
 #endif
 
-	strtAddCPoid(cp, cp->uOID) ;
+	strtAddCPoid(cp, cp->uOID);
 }
 
 static void
 _processFacility(DBRow& row, void* data, UINT32 oid)
 {
-	FacilityStruct* facility = (FacilityStruct*) data ;
+	FacilityStruct* facility = (FacilityStruct*) data;
 
-	facility->uOID = oid ;
+	facility->uOID = oid;
 
-	facility->setCountry((WWII_COUNTRY)row.NextUInt()) ;
-	facility->setOpen(row.NextUInt()) ;
-	facility->m_building = row.NextUInt() ;
-	facility->storedRPs = row.NextUInt() ;
-	facility->capacity = row.NextUInt() ;
+	facility->setCountry((WWII_COUNTRY)row.NextUInt());
+	facility->setOpen(row.NextUInt());
+	facility->m_building = row.NextUInt();
+	facility->storedRPs = row.NextUInt();
+	facility->capacity = row.NextUInt();
 
-	strtAddFacilityoid(facility, facility->uOID) ;
+	strtAddFacilityoid(facility, facility->uOID);
 }
 
 static void
 _processObject(DBRow& row, void* data, UINT32 oid)
 {
-	ObjectStruct* object = (ObjectStruct*) data ;
+	ObjectStruct* object = (ObjectStruct*) data;
 
-	object->m_uid = oid ;
+	object->m_uid = oid;
 
-	object->m_repairRPs = row.NextUInt() ;
-	object->m_lastCapacity = row.NextUInt() ;
-	object->m_capacity = row.NextUInt() ;
-	object->m_damageJoules = row.NextUINT64() ;
-	object->m_country = (WWII_COUNTRY)row.NextUInt() ;
-	object->m_side = wwiiSide(object->m_country) ;
+	object->m_repairRPs = row.NextUInt();
+	object->m_lastCapacity = row.NextUInt();
+	object->m_capacity = row.NextUInt();
+	object->m_damageJoules = row.NextUINT64();
+	object->m_country = (WWII_COUNTRY)row.NextUInt();
+	object->m_side = wwiiSide(object->m_country);
 
-	object->calcPercentDamage() ;
+	object->calcPercentDamage();
 
 #ifdef IS_STRAT_HOST
-	object->recalculateCapacity() ;
+	object->recalculateCapacity();
 #endif
 }
 
 static void
 _processLink(DBRow& row, void* data, UINT32 oid)
 {
-	LinkStruct* link = (LinkStruct*) data ;
+	LinkStruct* link = (LinkStruct*) data;
 
-	link->m_uid = oid ;
+	link->m_uid = oid;
 
-	UINT32 disabled = row.NextUInt() ;
-	link->setEnabled(!disabled) ;
-	link->convoy = row.NextUInt() ;
+	UINT32 disabled = row.NextUInt();
+	link->setEnabled(!disabled);
+	link->convoy = row.NextUInt();
 }
 
 static void
@@ -206,66 +206,66 @@ _initAllEntries(const char* query, _PROCESSOR* processFn)
 	SINT32 scx = 0, scy = 0;
 	UINT32 id = 0;
 
-	DBQuery q(dbh, query) ;
+	DBQuery q(dbh, query);
 
 	if ( q.Rows() <= 0 )
-		return ;
+		return;
 
-	Supercell* sc = NULL ;
+	Supercell* sc = NULL;
 
 	while ( q.FetchRow() )
 	{
-		DBRow& row = q.Row() ;
+		DBRow& row = q.Row();
 
-		scx = row.NextSInt() ;
-		scy = row.NextSInt() ;
-		id = row.NextUInt() ;
+		scx = row.NextSInt();
+		scy = row.NextSInt();
+		id = row.NextUInt();
 
 		if ( !sc || sc->x != scx || sc->y != scy )
-			sc = strtGetSupercell(scx, scy) ;
+			sc = strtGetSupercell(scx, scy);
 
 		if ( !sc )
 		{
-			dbugLog(_FLI, "Database supercell %d,%d not found", scx, scy) ;
-			throw std::domain_error("Unable to find supercell") ;
+			dbugLog(_FLI, "Database supercell %d,%d not found", scx, scy);
+			throw std::domain_error("Unable to find supercell");
 		}
 
 		if ( id > sc->indexSize )
-			throw std::domain_error("id outside range for supercell") ;
+			throw std::domain_error("id outside range for supercell");
 
-		void* data = sc->index[id] ;
+		void* data = sc->index[id];
 		if ( data == NULL )
-			throw std::domain_error("no matching sdm data") ;
+			throw std::domain_error("no matching sdm data");
 
-		UINT32 oid = row.NextUInt() ;
+		UINT32 oid = row.NextUInt();
 		if ( oid == 0 )
-			throw std::domain_error("zero oid") ;
+			throw std::domain_error("zero oid");
 
-		processFn(row, data, oid) ;
+		processFn(row, data, oid);
 	}
 }
 
 void
 strtdbInitSupercells()
 {
-	const char* resource = NULL ;
+	const char* resource = NULL;
 
 	try
 	{
-		resource = "cp" ;
-		_initAllEntries(_FETCH_CPS_QUERY, _processCP) ;
+		resource = "cp";
+		_initAllEntries(_FETCH_CPS_QUERY, _processCP);
 
-		resource = "fac" ;
-		_initAllEntries(_FETCH_FACS_QUERY, _processFacility) ;
+		resource = "fac";
+		_initAllEntries(_FETCH_FACS_QUERY, _processFacility);
 
-		resource = "obj" ;
-		_initAllEntries(_FETCH_OBJS_QUERY, _processObject) ;
+		resource = "obj";
+		_initAllEntries(_FETCH_OBJS_QUERY, _processObject);
 
-		resource = "link" ;
-		_initAllEntries(_FETCH_LINKS_QUERY, _processLink) ;
+		resource = "link";
+		_initAllEntries(_FETCH_LINKS_QUERY, _processLink);
 	}
 	catch ( std::exception& e )
 	{
-		LogAbort("failed initializing %ss from database: %s", resource, e.what()) ;
+		LogAbort("failed initializing %ss from database: %s", resource, e.what());
 	}
 }

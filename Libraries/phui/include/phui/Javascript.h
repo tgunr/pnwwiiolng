@@ -28,7 +28,7 @@ int SetGlobalObject(Object* obj);
 Object* GlobalObject();
 void SetErrorReporter(JSErrorReporter);
 
-typedef void(*AbortHandler)(const char*) ;
+typedef void(*AbortHandler)(const char*);
 void SetAbortHandler(AbortHandler);
 
 /************************************************************************************************

@@ -8,8 +8,8 @@
 
 #include <map>
 
-class Player ;
-class SquadList ;
+class Player;
+class SquadList;
 
 class SquadVote
 {
@@ -17,36 +17,36 @@ public:
 	SquadVote() : m_started(0), m_closedUntil(0), m_counts(NULL), m_votes(NULL), m_colead(false) {}
 	~SquadVote()
 	{
-		if ( m_votes ) delete m_votes ;
-		if ( m_counts ) delete m_counts ;
+		if ( m_votes ) delete m_votes;
+		if ( m_counts ) delete m_counts;
 	}
 
 public:
-	typedef std::map<ChatHandle,UINT32> COUNTS ;
-	typedef std::map<ChatHandle,ChatHandle> VOTES ;
+	typedef std::map<ChatHandle,UINT32> COUNTS;
+	typedef std::map<ChatHandle,ChatHandle> VOTES;
 
 private:
-	void startVote() ;
+	void startVote();
 
 public:
-	UINT32		m_started, m_closedUntil ;
-	COUNTS*		m_counts ;
-	VOTES*		m_votes ;
-	ChatHandle	m_leader ;
-	UINT32		m_lead ;
-	bool		m_colead ;
+	UINT32		m_started, m_closedUntil;
+	COUNTS*		m_counts;
+	VOTES*		m_votes;
+	ChatHandle	m_leader;
+	UINT32		m_lead;
+	bool		m_colead;
 
-	void addVote(UINT32 squadID, const ChatHandle& voteBy, const ChatHandle& voteFor) ;
-	void announce(UINT32 squadID, Player* player=NULL) ;
-	void close(UINT32 duration=0) ;				// 0 = use default
-	void erase(UINT32 squadID) ;				// Close it and erase it
-	UINT32 expires() const ;
-	bool hasVoted(const ChatHandle& voter) { return (m_votes && m_votes->find(voter) != m_votes->end()) ; }
-	UINT32 nextStart() const ;
-	void recount() ;
-	UINT64 winner(SquadList* list) ;
-	void withdraw(UINT32 squadID, const ChatHandle& voterHandle, SquadList* list) ;
-} ;
+	void addVote(UINT32 squadID, const ChatHandle& voteBy, const ChatHandle& voteFor);
+	void announce(UINT32 squadID, Player* player=NULL);
+	void close(UINT32 duration=0);				// 0 = use default
+	void erase(UINT32 squadID);				// Close it and erase it
+	UINT32 expires() const;
+	bool hasVoted(const ChatHandle& voter) { return (m_votes && m_votes->find(voter) != m_votes->end()); }
+	UINT32 nextStart() const;
+	void recount();
+	UINT64 winner(SquadList* list);
+	void withdraw(UINT32 squadID, const ChatHandle& voterHandle, SquadList* list);
+};
 
-extern SquadVote& chatGetSquadVote(UINT32 squadID) ;
-extern SquadVote* chatFindSquadVote(UINT32 squadID) ;
+extern SquadVote& chatGetSquadVote(UINT32 squadID);
+extern SquadVote* chatFindSquadVote(UINT32 squadID);

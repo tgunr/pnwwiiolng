@@ -18,7 +18,7 @@ class ChatHandleTestUnit : public TestUnit
 public: ChatHandleTestUnit() : TestUnit("ChatHandle") {}
 public: virtual ~ChatHandleTestUnit() {}
 
-public: virtual bool Run() ;
+public: virtual bool Run();
 
 	// Test chatIsValidCallsign and chatIsValidHandle
 	// with a series of valid callsigns.
@@ -28,16 +28,16 @@ public:	// Templated to accept char* and wchar_t*
 	TestGoodCallsigns(const _Type** goodSigns)
 	{
 		START_SUB_STAGE( "Good Callsigns" )
-			for ( UINT32 i = 0 ; goodSigns[i] != NULL ; ++i )
+			for ( UINT32 i = 0; goodSigns[i] != NULL; ++i )
 			{
-				TestFocus(goodSigns[i]) ;
+				TestFocus(goodSigns[i]);
 
-				ExpectTrue( chatIsValidCallsign(goodSigns[i]) ) ;
+				ExpectTrue( chatIsValidCallsign(goodSigns[i]) );
 
-				ExpectTrue( chatIsValidHandle(chatGetHandle(goodSigns[i])) ) ;
+				ExpectTrue( chatIsValidHandle(chatGetHandle(goodSigns[i])) );
 			}
 		END_SUB_STAGE( "Good Callsigns" )
-		return true ;
+		return true;
 	}
 
 	// Test chatIsValidCallsign with a series of invalid callsigns.
@@ -49,14 +49,14 @@ public: // Templated to accept char* and wchar_t*
 	TestBadCallsigns(const _Type** badSigns)
 	{
 		START_SUB_STAGE( "Bad Callsigns" )
-			for ( UINT32 i = 0 ; badSigns[i] != NULL ; ++i )
+			for ( UINT32 i = 0; badSigns[i] != NULL; ++i )
 			{
-				TestFocus(badSigns[i]) ;
+				TestFocus(badSigns[i]);
 				// Test char* overload of chatIsValidCallsign
-				ExpectFalse( chatIsValidCallsign(badSigns[i]) ) ;
+				ExpectFalse( chatIsValidCallsign(badSigns[i]) );
 			}
 		END_SUB_STAGE( "Bad Callsigns" )
-		return true ;
+		return true;
 	}
 
 	// Test that a known-good callsign packs the correct number
@@ -67,22 +67,22 @@ public:	// Templated so it can accept char* or wchar_t*
 	bool
 	TestPackHandle(const _Type* callsign)
 	{
-		char packBuffer[128] ;
-		ChatHandle source = chatGetHandle(callsign) ;
-		CRITICAL( ExpectFalse(source == 0ULL) ) ;
+		char packBuffer[128];
+		ChatHandle source = chatGetHandle(callsign);
+		CRITICAL( ExpectFalse(source == 0ULL) );
 
-		bool result = true ;
+		bool result = true;
 
 		// Test wwiiPackHandle on a whole series of offsets.
-		for ( UINT32 baseOffset = 0 ; baseOffset <= GAME_HANDLE_BITS * 2 ; ++baseOffset )
+		for ( UINT32 baseOffset = 0; baseOffset <= GAME_HANDLE_BITS * 2; ++baseOffset )
 		{
-			sprintf(packBuffer, "%u bits offset", baseOffset) ;
-			TestFocus(packBuffer) ;
+			sprintf(packBuffer, "%u bits offset", baseOffset);
+			TestFocus(packBuffer);
 
-			ChatHandle dest = 0 ;
+			ChatHandle dest = 0;
 
-			SINT32 srcOffset = wwiiPackHandle(TEUL_PACK, (UCHAR*)packBuffer, baseOffset, &source, 0) ;
-			SINT32 dstOffset = wwiiPackHandle(TEUL_UNPACK, (UCHAR*)packBuffer, baseOffset, &dest, 0) ;
+			SINT32 srcOffset = wwiiPackHandle(TEUL_PACK, (UCHAR*)packBuffer, baseOffset, &source, 0);
+			SINT32 dstOffset = wwiiPackHandle(TEUL_UNPACK, (UCHAR*)packBuffer, baseOffset, &dest, 0);
 
 			// We should have packed 'GAME_HANDLE_BITS' of data
 			if (
@@ -90,13 +90,13 @@ public:	// Templated so it can accept char* or wchar_t*
 				!ExpectEqual( dstOffset, GAME_HANDLE_BITS + baseOffset ) ||
 				!ExpectEqual( source, dest ) )
 			{
-				result = false ;
+				result = false;
 			}
 		}
 
-		return result ;
+		return result;
 	}
-} ;
+};
 
 bool
 ChatHandleTestUnit::Run()
@@ -109,10 +109,10 @@ ChatHandleTestUnit::Run()
 	# define WCharacter L"七"
 	#endif
 
-	ChatHandle test ;
-	char plainCallsign[MAX_HANDLE_SIZE] ;
-	wchar_t wideCallsign[MAX_HANDLE_SIZE] ;
-	const ChatHandle characterHandle = 9223372036854775874ULL ;
+	ChatHandle test;
+	char plainCallsign[MAX_HANDLE_SIZE];
+	wchar_t wideCallsign[MAX_HANDLE_SIZE];
+	const ChatHandle characterHandle = 9223372036854775874ULL;
 
 	//////////////////////////////////////////////////////////////////////
 	// First of all, make sure that the UTF8 conversion functions work
@@ -124,20 +124,20 @@ ChatHandleTestUnit::Run()
 
 		START_SUB_STAGE( "char->wide->char" )
 
-			strcpy(plainCallsign, FIRST_TEST) ;
-			WWII::ConvertChars(plainCallsign, wideCallsign, sizeof(wideCallsign)) ;
+			strcpy(plainCallsign, FIRST_TEST);
+			WWII::ConvertChars(plainCallsign, wideCallsign, sizeof(wideCallsign));
 			plainCallsign[0] = 0;
-			WWII::ConvertChars(wideCallsign, plainCallsign, sizeof(plainCallsign)) ;
+			WWII::ConvertChars(wideCallsign, plainCallsign, sizeof(plainCallsign));
 
-			CRITICAL( ExpectEqual( strcmp(plainCallsign, FIRST_TEST), 0 ) ) ;
+			CRITICAL( ExpectEqual( strcmp(plainCallsign, FIRST_TEST), 0 ) );
 
 		END_SUB_STAGE( "char->wchar->char" )
 
 		START_SUB_STAGE( "wchar->char" )
 
-			WWII::ConvertChars(WCharacter, plainCallsign, sizeof(plainCallsign)) ;
+			WWII::ConvertChars(WCharacter, plainCallsign, sizeof(plainCallsign));
 
-			CRITICAL( ExpectEqual( strcmp(plainCallsign, Character), 0 ) ) ;
+			CRITICAL( ExpectEqual( strcmp(plainCallsign, Character), 0 ) );
 
 		END_SUB_STAGE( "wchar->char" )
 
@@ -165,7 +165,7 @@ ChatHandleTestUnit::Run()
 				ExpectEqual( chatGetHandle("AAAAAAAAAA"), 494109216260077275ULL ) &&
 				ExpectEqual( chatGetHandle("ZZZZZZZZZZ"), 951617749834222900ULL ) &&
 				ExpectEqual( chatGetHandle("AbCd123450"), 971343266556530843ULL )
-			) ;
+			);
 
 		END_SUB_STAGE( "chars" )
 
@@ -183,7 +183,7 @@ ChatHandleTestUnit::Run()
 				ExpectEqual( chatGetHandle(L"AAAAAAAAAA"), 494109216260077275ULL ) &&
 				ExpectEqual( chatGetHandle(L"ZZZZZZZZZZ"), 951617749834222900ULL ) &&
 				ExpectEqual( chatGetHandle(L"AbCd123450"), 971343266556530843ULL )
-			) ;
+			);
 
 		END_SUB_STAGE( "wide chars" )
 
@@ -194,7 +194,7 @@ ChatHandleTestUnit::Run()
 				ExpectEqual( chatGetHandle(WCharacter), characterHandle ) &&
 				ExpectEqual( chatGetHandle(WCharacter WCharacter WCharacter WCharacter), 9223662325642330178ULL ) &&
 				ExpectEqual( chatGetHandle(WCharacter L"abcd"), 9511615607682908226ULL )
-			) ;
+			);
 
 		END_SUB_STAGE( "Chinese wchars" )
 
@@ -205,21 +205,21 @@ ChatHandleTestUnit::Run()
 
 	START_TEST_STAGE( "chatGetCallsign" )
 
-		test = chatGetHandle(Character) ;
+		test = chatGetHandle(Character);
 
-		CRITICAL( ExpectEqual(test, characterHandle) ) ;
+		CRITICAL( ExpectEqual(test, characterHandle) );
 
 		CRITICAL(
 			ExpectTrue(chatGetCallsign(plainCallsign, test)) &&
 			ExpectEqual(strcmp(plainCallsign, Character), 0)
-		) ;
+		);
 
 		CRITICAL(
 			ExpectTrue(chatGetCallsign(wideCallsign, test)) &&
 			ExpectEqual(wcscmp(wideCallsign, WCharacter), 0)
-		) ;
+		);
 
-		CRITICAL( ExpectTrue( WWII::ConvertChars(wideCallsign, plainCallsign, sizeof(plainCallsign)) ) ) ;
+		CRITICAL( ExpectTrue( WWII::ConvertChars(wideCallsign, plainCallsign, sizeof(plainCallsign)) ) );
 
 	END_TEST_STAGE( "chatGetCallsign" )
 
@@ -231,13 +231,13 @@ ChatHandleTestUnit::Run()
 		// Operations with char* plain ascii callsigns
 		START_SUB_STAGE( "ASCII char* callsigns" )
 
-			ExpectFalse( chatGetHandle("kfs1") == chatGetHandle("KFS1") ) ;
+			ExpectFalse( chatGetHandle("kfs1") == chatGetHandle("KFS1") );
 
 			START_SUB_STAGE( "From char*" )
-				ExpectEqual( chatGetHandle("kfs1"), chatGetLowercaseHandle("KFS1") ) ;
+				ExpectEqual( chatGetHandle("kfs1"), chatGetLowercaseHandle("KFS1") );
 			END_SUB_STAGE( "From char*" )
 			START_SUB_STAGE( "From ChatHandle" )
-				ExpectEqual( chatGetHandle("kfs1"), chatGetLowercaseHandle(chatGetHandle("KFS1")) ) ;
+				ExpectEqual( chatGetHandle("kfs1"), chatGetLowercaseHandle(chatGetHandle("KFS1")) );
 			END_SUB_STAGE( "From ChatHandle" )
 
 		END_SUB_STAGE( "ASCII char* callsigns" )
@@ -246,21 +246,21 @@ ChatHandleTestUnit::Run()
 		START_SUB_STAGE( "ASCII wchar_t* callsigns" )
 
 			// Verify case is being interpreted correctly.
-			ExpectFalse( chatGetHandle(L"kfs1") == chatGetHandle(L"KFS1") ) ;
+			ExpectFalse( chatGetHandle(L"kfs1") == chatGetHandle(L"KFS1") );
 
 			START_SUB_STAGE( "Basic Equality With ASCII char* callsigns" )
 
-				ExpectEqual( chatGetHandle("kfs1"), chatGetHandle(L"kfs1") ) ;
-				ExpectEqual( chatGetLowercaseHandle("AbCdEfGhIj"), chatGetLowercaseHandle(L"AbCdEfGhIj") ) ;
-				ExpectEqual( chatGetLowercaseHandle("aBcDeFgHiJ"), chatGetLowercaseHandle(L"aBcDeFgHiJ") ) ;
+				ExpectEqual( chatGetHandle("kfs1"), chatGetHandle(L"kfs1") );
+				ExpectEqual( chatGetLowercaseHandle("AbCdEfGhIj"), chatGetLowercaseHandle(L"AbCdEfGhIj") );
+				ExpectEqual( chatGetLowercaseHandle("aBcDeFgHiJ"), chatGetLowercaseHandle(L"aBcDeFgHiJ") );
 
 			END_SUB_STAGE( "Basic Equality With ASCII char* callsigns" )
 
 			START_SUB_STAGE( "From wchar_t*" )
-				ExpectEqual( chatGetHandle(L"kfs1"), chatGetLowercaseHandle(L"KFS1") ) ;
+				ExpectEqual( chatGetHandle(L"kfs1"), chatGetLowercaseHandle(L"KFS1") );
 			END_SUB_STAGE( "From wchar_t*" )
 			START_SUB_STAGE( "From ChatHandle" )
-				ExpectEqual( chatGetHandle(L"kfs1"), chatGetLowercaseHandle(chatGetHandle(L"KFS1")) ) ;
+				ExpectEqual( chatGetHandle(L"kfs1"), chatGetLowercaseHandle(chatGetHandle(L"KFS1")) );
 			END_SUB_STAGE( "From ChatHandle" )
 
 		END_SUB_STAGE( "ASCII wchar_t* callsigns" )
@@ -268,8 +268,8 @@ ChatHandleTestUnit::Run()
 		// Operations with wchar_t* callsigns including chinese characters.
 		START_SUB_STAGE( "Chinese wchar_t* callsigns" )
 
-			ExpectEqual( chatGetHandle(L"\u4e03a\u4e0cc"), chatGetLowercaseHandle(L"\u4e03A\u4e0cC") ) ;
-			ExpectEqual( chatGetHandle(L"\u4e03kfs1"), chatGetLowercaseHandle(L"\u4e03KFS1") ) ;
+			ExpectEqual( chatGetHandle(L"\u4e03a\u4e0cc"), chatGetLowercaseHandle(L"\u4e03A\u4e0cC") );
+			ExpectEqual( chatGetHandle(L"\u4e03kfs1"), chatGetLowercaseHandle(L"\u4e03KFS1") );
 
 		END_SUB_STAGE( "Chinese wchar_t* callsigns" )
 
@@ -291,31 +291,31 @@ ChatHandleTestUnit::Run()
 		,	"aaa", "AAA", "aaaa", "AAAA", "aaaaa", "AAAAA", "aaaaaa", "AAAAAA", "aaaaaaa", "AAAAAAA", "aaaaaaaa", "AAAAAAAA", "aaaaaaaaaa", "AAAAAAAAAA"
 		,	"AaAaAaAaAa", "aAaAaAaAaA"
 		, NULL
-		} ;
-		const wchar_t* goodWcharSigns[] = { L"aa", L"ab", L"AA", L"12", L"1-", L"12-", L"ZZ", L"A-A", L"A123Z", L"A-1-2-3-4", L"A12345678b", L"\u51f8-", L"\u51f8\u51f8\u51f8\u51f8-", L"\u9fa0", L"\u9fa0\u9fa0", L"\u9fa0aa\u9fa0", L"\u9fa0aa\u9fa0a", L"\u9fa0---a", L"gamemgr-07", L"\u524d\u4e2a\u4f8b\u5b501", NULL } ;
-		const char* badCharSigns[] = { "-", "1", "a", "--", "abcdefghijklmnop", "凸凸凸凸凸", "冖冖冖冖冖冖冖冖", "a冖", NULL } ;
-		const wchar_t* badWcharSigns[] = { L"-", L"1", L"a", L"--", L"abcdefghijklmnop", L"\u51f8\u51f8\u51f8\u51f8\u51f8", L"\u5196\u5196\u5196\u5196\u5196\u5196\u5196\u5196", L"a\u5196", L"\u044b\u0441\u0434\u0444\u043a", NULL } ;
+		};
+		const wchar_t* goodWcharSigns[] = { L"aa", L"ab", L"AA", L"12", L"1-", L"12-", L"ZZ", L"A-A", L"A123Z", L"A-1-2-3-4", L"A12345678b", L"\u51f8-", L"\u51f8\u51f8\u51f8\u51f8-", L"\u9fa0", L"\u9fa0\u9fa0", L"\u9fa0aa\u9fa0", L"\u9fa0aa\u9fa0a", L"\u9fa0---a", L"gamemgr-07", L"\u524d\u4e2a\u4f8b\u5b501", NULL };
+		const char* badCharSigns[] = { "-", "1", "a", "--", "abcdefghijklmnop", "凸凸凸凸凸", "冖冖冖冖冖冖冖冖", "a冖", NULL };
+		const wchar_t* badWcharSigns[] = { L"-", L"1", L"a", L"--", L"abcdefghijklmnop", L"\u51f8\u51f8\u51f8\u51f8\u51f8", L"\u5196\u5196\u5196\u5196\u5196\u5196\u5196\u5196", L"a\u5196", L"\u044b\u0441\u0434\u0444\u043a", NULL };
 
 		START_SUB_STAGE( "char* callsigns" )
 
-			TestGoodCallsigns(goodCharSigns) ;
-			TestBadCallsigns(badCharSigns) ;
+			TestGoodCallsigns(goodCharSigns);
+			TestBadCallsigns(badCharSigns);
 
 		END_SUB_STAGE( "char* callsigns" )
 
 		START_SUB_STAGE( "wchar_t* callsigns" )
 
-			TestGoodCallsigns(goodWcharSigns) ;
-			TestBadCallsigns(badWcharSigns) ;
+			TestGoodCallsigns(goodWcharSigns);
+			TestBadCallsigns(badWcharSigns);
 
 		END_SUB_STAGE( "wchar_t* callsigns" )
 
 		// Simple chatIsValidHandle tests.
-		ExpectFalse( chatIsValidHandle(0ULL) ) ;
-		ExpectFalse( chatIsValidHandle(1ULL) ) ;
-		ExpectFalse( chatIsValidHandle(0ULL + WIDE_HANDLE_BIT) ) ;
-		ExpectFalse( chatIsValidHandle(1ULL + WIDE_HANDLE_BIT) ) ;
-		ExpectFalse( chatIsValidHandle(~0ULL) ) ;
+		ExpectFalse( chatIsValidHandle(0ULL) );
+		ExpectFalse( chatIsValidHandle(1ULL) );
+		ExpectFalse( chatIsValidHandle(0ULL + WIDE_HANDLE_BIT) );
+		ExpectFalse( chatIsValidHandle(1ULL + WIDE_HANDLE_BIT) );
+		ExpectFalse( chatIsValidHandle(~0ULL) );
 
 	END_TEST_STAGE( "isValidCallsign" )
 
@@ -327,27 +327,27 @@ ChatHandleTestUnit::Run()
 		START_SUB_STAGE( "char* plain callsign" )
 
 			// We validated this handle earlier.
-			TestPackHandle("AbCd123450") ;
+			TestPackHandle("AbCd123450");
 
 		END_SUB_STAGE( "char* plain callsign" )
 
 		START_SUB_STAGE( "wchar_t* plain callsign" )
 
 			// We validated this handle earlier.
-			TestPackHandle(L"AbCd123450") ;
+			TestPackHandle(L"AbCd123450");
 
 		END_SUB_STAGE( "char* plain callsign" )
 
 		START_SUB_STAGE( "wchar_t* chinese callsign" )
 
 			// We validated this handle earlier.
-			TestPackHandle(WCharacter L"abcd") ;
+			TestPackHandle(WCharacter L"abcd");
 
 		END_SUB_STAGE( "wchar_t* chinese callsign" )
 
 	END_TEST_STAGE( "wwiiPackHandle" )
 
-	return true ;
+	return true;
 }
 
-static ChatHandleTestUnit test ;
+static ChatHandleTestUnit test;

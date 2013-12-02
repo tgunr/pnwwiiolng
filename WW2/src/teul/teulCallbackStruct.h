@@ -71,7 +71,7 @@ public:
 	const UINT8&	callY() const { return m_callY ; }
 
 public:
-	static TEUL_CALLBACK*	s_callbackArray[256][256] ;
+	static TEUL_CALLBACK*	s_callbackArray[256][256];
 
 public:
 	//! @brief Lookup a callback by it's X/Y values packed as bytes in a stream.
@@ -84,8 +84,8 @@ public:
 	//! @brief Lookup a callback by it's X and Y values.
 	static TEUL_CALLBACK* Lookup(const UINT8 x_, const UINT8 y_) { return s_callbackArray[x_][y_] ; }
 
-	void Release() ;
+	void Release();
 
-	SINT32 processCallback(struct ENDPOINT& endpoint_, UCHAR* const data_, const SINT32 dataSize_bytes_) ;
-} ;
+	SINT32 processCallback(struct ENDPOINT& endpoint_, UCHAR* const data_, const SINT32 dataSize_bytes_);
+};
 

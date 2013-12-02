@@ -30,19 +30,19 @@ authGetDBConnectionInfo(DBCONNECTION* connectionInfo)
 {
 	// Look up the cannonical name/address of the auth database
 	// and resolve it to an IP
-	UINT32* dbIp = teulGetHostByName(cv_authdbAddress.GetString()) ;
+	UINT32* dbIp = teulGetHostByName(cv_authdbAddress.GetString());
 	if ( dbIp == NULL )
 		LogAbort("Invalid %s: %s (unable to resolve)"
-					, cv_authdbAddress.GetEnvVarName(), cv_authdbAddress.GetString()) ;
+					, cv_authdbAddress.GetEnvVarName(), cv_authdbAddress.GetString());
 
 	// Populate the connection info structure.
-	strcpy(connectionInfo->host, teulGetAddress(*dbIp)) ;
-	strcpy(connectionInfo->dbName, cv_authdbSchema.GetString()) ;
-	strcpy(connectionInfo->username, cv_authdbUser.GetString()) ;
-	strcpy(connectionInfo->password, cv_authdbPassword.GetString()) ;
-	strcpy(connectionInfo->port, cv_authdbPort.GetString()) ;
+	strcpy(connectionInfo->host, teulGetAddress(*dbIp));
+	strcpy(connectionInfo->dbName, cv_authdbSchema.GetString());
+	strcpy(connectionInfo->username, cv_authdbUser.GetString());
+	strcpy(connectionInfo->password, cv_authdbPassword.GetString());
+	strcpy(connectionInfo->port, cv_authdbPort.GetString());
 
 	// Release the list of addresses we were given
-	memFree(dbIp) ;
+	memFree(dbIp);
 }
 

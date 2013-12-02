@@ -19,8 +19,8 @@
 #define DEF_MODE_HEADRELATIVE   0x00000001
 #define DEF_MODE_DISABLE        0x00000002
 
-typedef struct snSound* snSoundPtr ;
-typedef struct SNDSCREATE* LPSNDSCREATE ;
+typedef struct snSound* snSoundPtr;
+typedef struct SNDSCREATE* LPSNDSCREATE;
 
 // Return maximum number of sounds allowed by the sound card
 extern UINT32 sndsGetMaxNumberOfSounds();

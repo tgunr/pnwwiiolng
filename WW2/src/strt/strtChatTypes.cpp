@@ -30,48 +30,48 @@ OOBMessage
 	, m_side(side)
 {
 	if ( arguments == NULL || !*arguments )
-		strlcpy(m_text, command, sizeof(m_text)) ;
+		strlcpy(m_text, command, sizeof(m_text));
 	else
 	{
-		snprintf(m_text, OOB_STRING_LEN, "%s %s", command, arguments) ;
-		m_text[sizeof(m_text)-1] = 0 ;
+		snprintf(m_text, OOB_STRING_LEN, "%s %s", command, arguments);
+		m_text[sizeof(m_text)-1] = 0;
 	}
 }
 
 OOBMessage::OOBMessage()
 {
-	memset(this, 0, sizeof(*this)) ;
+	memset(this, 0, sizeof(*this));
 }
 
 OOBMessage::OOBMessage(ACTION_OBJECT* const a)
 {
-	a->offset = packer(TEUL_UNPACK, a) ;
+	a->offset = packer(TEUL_UNPACK, a);
 }
 
 SINT32
 OOBMessage::packer(LOGICAL mode, ACTION_OBJECT* a)
 {
-	a->offset = teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this)) ;
-	return a->offset ;
+	a->offset = teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this));
+	return a->offset;
 }
 
 StratCommand::StratCommand(UINT32 issuer, SCMD_ENUM command, FULL_OBJ_ID cp, WWII_SIDE side, SCMD_RESULT result)
 	: m_issuer(issuer), m_command(command), m_cp(cp), m_side(side), m_result(result), m_data(0)
 {
 	if ( command <= SC_NO_COMMAND || command >= SC_NUM_COMMANDS )
-		throw std::domain_error("command number out of bounds") ;
+		throw std::domain_error("command number out of bounds");
 }
 
 StratCommand::StratCommand(ACTION_OBJECT* const a)
 {
-	a->offset = pack(TEUL_UNPACK, a) ;
+	a->offset = pack(TEUL_UNPACK, a);
 }
 
 SINT32
 StratCommand::pack(LOGICAL mode, ACTION_OBJECT* a)
 {
-	a->offset = teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this)) ;
-	return a->offset ;
+	a->offset = teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this));
+	return a->offset;
 }
 
 bool
@@ -80,15 +80,15 @@ StratCommand::describe() const
 	if ( m_command <= SC_NO_COMMAND || m_command >= SC_NUM_COMMANDS )
 	{
 		dbugLog(_FLW, "p:%u Invalid scmd number (%d)"
-						, m_issuer, m_command) ;
-		return false ;
+						, m_issuer, m_command);
+		return false;
 	}
 
 	// Report what we're receiving
 	dbugLog(_FLI, "p:%u Strat command %d: target %d.%d.%u for side %u"
 					, m_issuer, m_command
 					, m_cp.cell.ox, m_cp.cell.oy, m_cp.id
-					, m_side) ;
-	return true ;
+					, m_side);
+	return true;
 }
 

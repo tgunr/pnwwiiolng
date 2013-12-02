@@ -17,9 +17,9 @@
 #include "teul/teulCallbackInit.h"
 #include "teul/teulEndpoint.h"
 
-static bool		_isConnected = false ;
-static SINT32	_connectionError = 0 ;
-static SINT32	_teulIndex = -1 ;
+static bool		_isConnected = false;
+static SINT32	_connectionError = 0;
+static SINT32	_teulIndex = -1;
 
 //////////////////////////////////////////////////////////////////////
 // Test if we have a valid connection open
@@ -27,7 +27,7 @@ static SINT32	_teulIndex = -1 ;
 static bool
 _haveOpenConnection()
 {
-	return ( _teulIndex >= 0 && _isConnected == true && _connectionError != ENOTCONN ) ;
+	return ( _teulIndex >= 0 && _isConnected == true && _connectionError != ENOTCONN );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -36,9 +36,9 @@ _haveOpenConnection()
 static void
 _connectionOpened(ENDPOINT& endpoint)
 {
-	_teulIndex = endpoint.teulIndex() ;
-	_isConnected = true ;
-	_connectionError = 0 ;
+	_teulIndex = endpoint.teulIndex();
+	_isConnected = true;
+	_connectionError = 0;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -57,10 +57,10 @@ _networkError(
 {
 	if ( _haveOpenConnection() )
 	{
-		_isConnected = false ;
-		_teulIndex = -1 ;
+		_isConnected = false;
+		_teulIndex = -1;
 	}
-	_connectionError = error ;
+	_connectionError = error;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -91,7 +91,7 @@ _callbackError(
 	, const SINT32 error
 	)
 {
-	const std::pair<UINT32, UINT16>& dest = Teul::GetRemote(teulIndex) ;
+	const std::pair<UINT32, UINT16>& dest = Teul::GetRemote(teulIndex);
 	playgate.AlertOK(GetLoc(ERROR_DEBUG
 								, teulIndex
 								, teulGetAddress(dest.first)
@@ -106,7 +106,7 @@ bool
 commInit(void)
 {
 	if ( teulInitTransport(LOG_TO_FILE, "PlayGATE", _teulKitError))
-		return false ;
+		return false;
 
 #ifdef DEBUG
 	dbugSetLogLevel(Debug::ERR_DBUG);
@@ -119,7 +119,7 @@ commInit(void)
 	launchInstallCallbacks();
 	infoInstallCallbacks();
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -129,7 +129,7 @@ void
 commKill(void)
 {
 	// If we have an active connection, shut it down.
-	commCloseConnection() ;
+	commCloseConnection();
 	// Close out all the teulKit transport stuff.
 	teulCloseTransport();
 }
@@ -141,7 +141,7 @@ bool
 commOpenConnection(UINT32 HostNumber, UINT16 Port)
 {
 	// If we already have a connection open, shut it down.
-	commCloseConnection() ;
+	commCloseConnection();
 
 	teulUpdateTransport(25);
 
@@ -150,11 +150,11 @@ commOpenConnection(UINT32 HostNumber, UINT16 Port)
 	// to hand off to us.
 	const SINT32 ConnectionNumber = teulOpenSend(HostNumber, Port, _connectionOpened, 3000, PROTOCOL_TCP, _networkError);
 	if (ConnectionNumber < 0)
-		return false ;
+		return false;
 
 	// Allow teulKit 45 seconds to connect to the remote
 	// host, do its handshakes and hand over to us.
-	const TeulTimeMS cutoff = teulClock64 + 45000 ;
+	const TeulTimeMS cutoff = teulClock64 + 45000;
 	while ( teulClock64 < cutoff && !_isConnected && _connectionError == 0 )
 	{
 		teulUpdateTransport(25);
@@ -163,22 +163,22 @@ commOpenConnection(UINT32 HostNumber, UINT16 Port)
 	if ( _connectionError != 0 )
 	{
 		if ( _connectionError != ENOTCONN )
-			teulClose(ConnectionNumber) ;
+			teulClose(ConnectionNumber);
 
 		dbugSetErrno(_connectionError);
 
-		return false ;
+		return false;
 	}
 
 	if ( _isConnected == false )
 	{
-		teulClose(ConnectionNumber) ;
-		return false ;
+		teulClose(ConnectionNumber);
+		return false;
 	}
 
-	_teulIndex = ConnectionNumber ;
+	_teulIndex = ConnectionNumber;
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -192,17 +192,17 @@ commCloseConnection()
 	{
 		// Flag ourselves as disconnected so that we don't
 		// see the ENOTCONN as a genuine error.
-		_isConnected = false ;
+		_isConnected = false;
 		// NOW close the connection.
-		teulClose(_teulIndex) ;
+		teulClose(_teulIndex);
 		// Give teulKit a moment to consume that.
-		teulUpdateTransport(5) ;
+		teulUpdateTransport(5);
 	}
 
-	_teulIndex = -1 ;
-	_isConnected = false ;
-	_connectionError = 0 ;
-	dbugSetErrno(0) ;
+	_teulIndex = -1;
+	_isConnected = false;
+	_connectionError = 0;
+	dbugSetErrno(0);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -211,9 +211,9 @@ commCloseConnection()
 bool
 commUpdate(void)
 {
-	teulUpdateTransport(5) ;
+	teulUpdateTransport(5);
 
-	return ( _haveOpenConnection() ) ;
+	return ( _haveOpenConnection() );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -227,13 +227,13 @@ commInstallMessage(
 	, ACTION_REF ReceiveFunc
 	)
 {
-	Teul::CallbackInit ci ;
+	Teul::CallbackInit ci;
 
 	ci.callX         = MessageGroup;
 	ci.callY         = MessageNumber;
 	ci.sendAction    = SendFunc;
 	ci.recvAction    = ReceiveFunc;
-	ci.error         = _callbackError ;
+	ci.error         = _callbackError;
 
 	return (teulAllocCallback(&ci));
 }
@@ -244,8 +244,8 @@ SINT32
 commSend(TEUL_CALLBACK* object, void*  data)
 {
 	if ( !_haveOpenConnection() )
-		return -ENOTCONN ;
-	return teulSend(_teulIndex, object, data) ;
+		return -ENOTCONN;
+	return teulSend(_teulIndex, object, data);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -255,5 +255,5 @@ commSend(TEUL_CALLBACK* object, void*  data)
 int
 Teul::ConnectionInstruction::receive(SINT32 teulIndex)
 {
-	return -EINVAL ;
+	return -EINVAL;
 }

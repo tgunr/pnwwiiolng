@@ -11,5 +11,5 @@
 extern SINT32 strtUpdateHostInstallCallbacks(void);
 
 //Sends a status packet to the FE
-struct STRAT_STATUS_PACKET ;
+struct STRAT_STATUS_PACKET;
 extern SINT32 strtSendStatusPacket(SINT32 teulIndex, STRAT_STATUS_PACKET* packet);

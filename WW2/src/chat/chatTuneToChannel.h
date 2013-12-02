@@ -24,16 +24,16 @@ namespace Chat
 			, m_tx(tx)
 			{}
 
-		UCHAR			m_radioIndex ;		// Which radio is being tuned
-		CHANNEL_TYPE	m_type ;			// Type of channel being tuned
-		ChatHandle		m_handle ;			// Packed handle of the channel's name
-		bool			m_rx ;				// Is receive enabled?
-		bool			m_tx ;				// Is transmit enabled?
+		UCHAR			m_radioIndex;		// Which radio is being tuned
+		CHANNEL_TYPE	m_type;				// Type of channel being tuned
+		ChatHandle		m_handle;			// Packed handle of the channel's name
+		bool			m_rx;				// Is receive enabled?
+		bool			m_tx;				// Is transmit enabled?
 
 		// Common members
-		SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) ;
+		SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
 
 		// Host functions
-		bool send(SINT32 connection) ;
-	} ;
+		bool send(SINT32 connection);
+	};
 }

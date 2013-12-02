@@ -27,30 +27,30 @@ _getMode(HostVehicle* vehicle)
 {
 	if ( vehicle->players().empty() )
 	{
-		return host_config.update.defaultUM ;
+		return host_config.update.defaultUM;
 	}
 
 	// Determine if all expected players have attached to the vehicle
-	PLAYER_LIST::iterator it = vehicle->players().begin() ;
-	UINT16 minMode = (*it)->getPreferredFramingMode() ;
+	PLAYER_LIST::iterator it = vehicle->players().begin();
+	UINT16 minMode = (*it)->getPreferredFramingMode();
 	while ( it != vehicle->players().end() )
 	{
-		Player* player = (*it) ;
-		++it ;
+		Player* player = (*it);
+		++it;
 
-		assert(player != NULL) ;
+		assert(player != NULL);
 		if ( player == NULL )
-			continue ;
+			continue;
 
 		if ( player->teulIndex() < 0 || !player->active )
-			continue ;
+			continue;
 
-		UINT16 mode = player->getPreferredFramingMode() ;
+		UINT16 mode = player->getPreferredFramingMode();
 		if ( mode < minMode )
-			minMode = mode ;
+			minMode = mode;
 	}
 
-	return minMode ;
+	return minMode;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -62,14 +62,14 @@ _getFramingMTU(UINT16 mode)
 	switch ( framings[mode].packetSize )
 	{
 	case UpdateFraming::_MAX:
-		return Teul::TCPMaxPayload ;
-	break ;
+		return Teul::TCPMaxPayload;
+	break;
 	case UpdateFraming::_LARGE:
-		return Teul::TCPMaxPayload ;
-	break ;
-	default: break ;
+		return Teul::TCPMaxPayload;
+	break;
+	default: break;
 	}
-	return Teul::TCPStdPayload ;
+	return Teul::TCPStdPayload;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -79,16 +79,16 @@ _getFramingMTU(UINT16 mode)
 void
 HostVehicle::selectBestFramingMode()
 {
-	framingMode = _getMode(this) ;
+	framingMode = _getMode(this);
 
-	mtu = _getFramingMTU(framingMode) ;
+	mtu = _getFramingMTU(framingMode);
 
-	UINT32 interval = framings[framingMode].updateInterval ;
+	UINT32 interval = framings[framingMode].updateInterval;
 
-	betaLog(_FLI, "c:%s v:%u selecting framing mode %u [%u] dU:%u", vehicleData.callsign, index, framingMode, mtu, interval) ;
+	betaLog(_FLI, "c:%s v:%u selecting framing mode %u [%u] dU:%u", vehicleData.callsign, index, framingMode, mtu, interval);
 
 	if ( isActive() )
-		updateScheduleVehicle(this, interval) ;
+		updateScheduleVehicle(this, interval);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -99,15 +99,15 @@ void
 Player::setFramingMode(UINT16 newMode)
 {
 	if ( newMode > UpdateFraming::_MODES )
-		newMode = UpdateFraming::_MODES ;
+		newMode = UpdateFraming::_MODES;
 
-	m_framingMode = newMode ;
+	m_framingMode = newMode;
 
 	if ( vehicle != NULL )
 	{
-		vehicle->selectBestFramingMode() ;
+		vehicle->selectBestFramingMode();
 		if ( g_logDebug )
-			dbugLog(_FLD, "t:%d p:%u c:%s v:%u best framing mode %u", teulIndex(), playerID(), callsign(), vehicle->index, vehicle->framingMode) ;
+			dbugLog(_FLD, "t:%d p:%u c:%s v:%u best framing mode %u", teulIndex(), playerID(), callsign(), vehicle->index, vehicle->framingMode);
 	}
 }
 
@@ -118,7 +118,7 @@ UINT16
 Player::getCurrentFramingMode()
 {
 	if ( vehicle )
-		return vehicle->framingMode ;
-	return m_framingMode ;
+		return vehicle->framingMode;
+	return m_framingMode;
 }
 

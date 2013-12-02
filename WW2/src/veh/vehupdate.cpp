@@ -350,7 +350,7 @@ static SINT32 _LastUpdateTime = 0; // added specific initialization 5/28/01 hoss
 		{
 			// find the player's vehicle, if it exists
 			if (Vehicle->ModelData == NULL)
-				continue ;
+				continue;
 
 			// if player is in the process of exitting the vehicle, stop
 			// sending updates
@@ -581,7 +581,7 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 
 	if(Data.MultiCrewPos < 2)
 	{
-		VehicleHdr.present |= PR_POSITION ;
+		VehicleHdr.present |= PR_POSITION;
 		if(Vehicle.VehicleType->NumStates > 0)
 			VehicleHdr.present |= PR_STATE0;
 		if(Vehicle.VehicleType->NumStates > 15)
@@ -591,7 +591,7 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 	}
 	else
 	{
-		VehicleHdr.present &= ~(PR_STATE0 | PR_STATE1 | PR_VEH_VIS | PR_POSITION) ;
+		VehicleHdr.present &= ~(PR_STATE0 | PR_STATE1 | PR_VEH_VIS | PR_POSITION);
 	}
 
 	// mount firing
@@ -607,7 +607,7 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 	}
 
 	VehicleHdr.fireMask = VehicleInfo.fire.state;
-	VehicleHdr.present |= PR_FIRE_FLAGS ;
+	VehicleHdr.present |= PR_FIRE_FLAGS;
 
 	// turret traverse
 	TurretMask = 0;
@@ -811,13 +811,13 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 	{
 		VehicleHdr.updateNo = wwiiGetUpdateNo(true);
 		VehicleHdr.updatePrime = wwiiHitsPrime();
-		COMM_UPDATE_BUFFER cub ;
-		cub.size = updtPackSHARED_VEHICLE_INFO(TEUL_PACK, cub.data, 0, &VehicleHdr, sizeof(cub.data)) ;
+		COMM_UPDATE_BUFFER cub;
+		cub.size = updtPackSHARED_VEHICLE_INFO(TEUL_PACK, cub.data, 0, &VehicleHdr, sizeof(cub.data));
 		if ( cub.size >= 0 )
 		{
 			// Send them our teulClock64
 			teulSyncClock();
-			cub.size = teulPackUINT64(TEUL_PACK, cub.data, cub.size, &teulClock64, 0) ;
+			cub.size = teulPackUINT64(TEUL_PACK, cub.data, cub.size, &teulClock64, 0);
 			teulSend(PlayerClient()->CellConnection(),commUPDATE,&cub);
 		}
 	}
@@ -2804,13 +2804,13 @@ void _processBuildingDamage (vehVehicle& Vehicle)
 		damagePacket.list[i].object.objType = 0;
 
 		// used to be 4000000000.0, now 2147483647 due to change from UINT to SINT
-		SINT64 damage = (SINT64)Vehicle.DamageQue.Damage[i] ;
-		static const SINT64 cutoffJoules = 2100000000LL ;
+		SINT64 damage = (SINT64)Vehicle.DamageQue.Damage[i];
+		static const SINT64 cutoffJoules = 2100000000LL;
 		if ( damage > 0 && damage > cutoffJoules )
-			damage = cutoffJoules ;
+			damage = cutoffJoules;
 		else if ( damage < 0 && damage < -cutoffJoules )
-			damage = -cutoffJoules ;
-		damagePacket.list[i].damage = damage ;
+			damage = -cutoffJoules;
+		damagePacket.list[i].damage = damage;
 
 		Write_Debug("WEAP Sending building hit message, scx = %d, scy = %d, id = %d, damage = %lf",
 							Vehicle.DamageQue.SuperCellX[i],

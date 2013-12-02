@@ -18,5 +18,5 @@ extern	struct TEUL_CALLBACK*	authGAME_ACK;
 //Initialization function declaration
 extern SINT32 authHostInstallCallbacks(void);
 
-extern SINT32 authSendAppPlaygateOk(SINT32 teulIndex) ;
+extern SINT32 authSendAppPlaygateOk(SINT32 teulIndex);
 

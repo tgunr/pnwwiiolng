@@ -2,7 +2,7 @@
 
 #include "pi/pi.h"
 #include "mem/mem.h"
-struct LISTHEADER ;
+struct LISTHEADER;
 
 #define MINOBJECTS				96000
 
@@ -200,7 +200,7 @@ struct OBJECTSTATICDOF
 	piVECTOR			dofcurscale;	// DOF Current Scale
 	piVECTOR			dofincscale;	// DOF Scale Increment
 
-} ;
+};
 
 struct OBJECTDOF
 {
@@ -216,7 +216,7 @@ struct OBJECTDOF
 	piMATRIX			dofposmatrix;	// DOF position matrix
 	UINT32				dofflags;		// DOF Flags
 
-} ;
+};
 
 #if defined(USE_OSG)
 
@@ -239,7 +239,7 @@ struct OBJECT
 	}
 #endif
 
-} ;
+};
 
 #else
 
@@ -442,7 +442,7 @@ struct OBJECT
 #ifdef SPATIAL_DB
     void*           sdbInfo;
 #endif
-} ;
+};
 
 #endif
 typedef OBJECT DOFOBJECT;

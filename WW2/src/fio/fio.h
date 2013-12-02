@@ -21,12 +21,12 @@ enum
 namespace Fio
 {
 	// Name of our log file
-	extern const char* LogFileName() ;
+	extern const char* LogFileName();
 
 	// Open the standard logging file or return stderr.
 	// (guaranteed not to return NULL)
-	extern FILE* OpenLogFile( void ) ;
-	extern void DeleteLogFile() ;
+	extern FILE* OpenLogFile( void );
+	extern void DeleteLogFile();
 }
 #endif
 
@@ -47,7 +47,7 @@ namespace Fio
 	// sets up the user data directory on Windows
 	extern void fioInit();
 
-	extern bool fioLoad(const char* filename, char*& outPtr, unsigned int* outSize=NULL) ;
+	extern bool fioLoad(const char* filename, char*& outPtr, unsigned int* outSize=NULL);
 	extern int  fioOpen(const char* const filename);
 	extern int  fioOpenWrite(const char*filename);
 

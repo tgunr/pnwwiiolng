@@ -20,7 +20,7 @@ struct UiSounds
 
     SINT32 ID;
 	SCHAR callback[32];
-} ;
+};
 
 static UiSounds sounds[MAX_UI_SOUNDS];
 static UiSounds freeH;

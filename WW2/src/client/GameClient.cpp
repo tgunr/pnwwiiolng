@@ -107,10 +107,10 @@ int GameClientLogin(unsigned int host, int playerID, int otp,
 	catch(ClientNetError& e)
 	{
 		Write_Log(LOG_COMM, LOG_WARN, "Client::Login generated an error: %d, %s", e.Error(), e.What());
-		throw ;
+		throw;
 	}
 
-	Write_Log(LOG_COMM, LOG_INFO, "Connected to host") ;
+	Write_Log(LOG_COMM, LOG_INFO, "Connected to host");
 
 	return _playerclient->MapConnection();
 }
@@ -155,12 +155,12 @@ void GameClient::ProcessSpawnNotify(FESpawnNotify const& notify)
 
 	if(gCellClientActive)
 	{
-		clientErrorLog("rvj") ;
+		clientErrorLog("rvj");
 		spawnStatus = SPAWN_VEHICLE;
 	}
 	else
 	{
-		clientErrorLog("! no cell for rvj") ;
+		clientErrorLog("! no cell for rvj");
 	}
 }
 
@@ -197,7 +197,7 @@ void GameClient::DoVehicleJoin()
 	vehType const* vehtype = vehTypeGetBySpec(weaponSerial.spec);
 	if(!vehtype)
 	{
-		clientErrorLog("! dvj->vtgbs") ;
+		clientErrorLog("! dvj->vtgbs");
 		return;
 	}
 
@@ -379,10 +379,10 @@ void GameClient::ProcessChatLocalizedMessage(Chat::LocalizedMessage const& msg)
 
 	// Allocate room on the stack for the UTF16 conversion of all the strings.
 	// NOTE: Using 'alloca' allocates on the stack, so no free is required.
-	wchar_t strings[Chat::LocalizedMessage::_NUM_ARGUMENTS][MAX_MESSAGE_LENGTH + 1] ;
-	for ( size_t i = 0 ; i < Chat::LocalizedMessage::_NUM_ARGUMENTS ; ++i )
+	wchar_t strings[Chat::LocalizedMessage::_NUM_ARGUMENTS][MAX_MESSAGE_LENGTH + 1];
+	for ( size_t i = 0; i < Chat::LocalizedMessage::_NUM_ARGUMENTS; ++i )
 	{
-		WWII::ConvertChars(msg.m_ptr[i], strings[i], (MAX_MESSAGE_LENGTH + 1) * sizeof(wchar_t)) ;
+		WWII::ConvertChars(msg.m_ptr[i], strings[i], (MAX_MESSAGE_LENGTH + 1) * sizeof(wchar_t));
 	}
 
 	if(msg.m_prefix == LSTR_ORDERS)
@@ -415,7 +415,7 @@ void GameClient::ProcessChatLocalizedMessage(Chat::LocalizedMessage const& msg)
 					}
 				}
 
-				SelectedMission().m_poster = newLeader ;
+				SelectedMission().m_poster = newLeader;
 
 				if(Personas().m_callsign == newLeader)
 				{
@@ -573,7 +573,7 @@ void GameClient::ProcessChatGCIMessage(Chat::GCIMessage const& pgciMsg)
 void GameClient::ProcessMissionResults(MISSION_RESULTS const& results)
 {
 	//uiChatPrintLine("Prcoessing Mission Results!");
-	clientErrorLog("pmr") ;
+	clientErrorLog("pmr");
 	Client::ProcessMissionResults(results);
 }
 
@@ -724,7 +724,7 @@ void GameClient::ActivateCell()
 	}
 	else
 	{
-		clientErrorLog("! cell active") ;
+		clientErrorLog("! cell active");
 	}
 }
 
@@ -856,7 +856,7 @@ static void _setBuildingOwnershipsToMatchFacility(const StratDB::StratObject* co
 {
 	const StratDB::StratObject::ChildList& children = facility->ChildStratObjects();
 	StratDB::StratObject::ChildList::const_iterator it = children.begin();
-	StratDB::StratObject::ChildList::const_iterator last = children.end() ;
+	StratDB::StratObject::ChildList::const_iterator last = children.end();
 
 	// create a new strat event for each building's ownership
 	for(; it != last; ++it)
@@ -876,7 +876,7 @@ static void _setFacilityOwnershipsToMatchCP(const StratDB::StratObject* const cp
 {
 	const StratDB::StratObject::ChildList& children = cp->ChildStratObjects();
 	StratDB::StratObject::ChildList::const_iterator it = children.begin();
-	StratDB::StratObject::ChildList::const_iterator last = children.end() ;
+	StratDB::StratObject::ChildList::const_iterator last = children.end();
 
 	for(; it != last; ++it)
 	{
@@ -891,7 +891,7 @@ static void _setFacilityOwnershipsToMatchCP(const StratDB::StratObject* const cp
 			data.level	= -1;
 			clientApplyStratEventData(data);
 
-			_setBuildingOwnershipsToMatchFacility(facility, data) ;
+			_setBuildingOwnershipsToMatchFacility(facility, data);
 		}
 	}
 }
@@ -907,7 +907,7 @@ void GameClient::ProcessStratEventPacket(const Strat::EventPacket& packet)
 
 	const size_t numEvents = packet.size();
 
-	for(size_t i = 0 ; i < numEvents ; ++i)
+	for(size_t i = 0; i < numEvents; ++i)
 	{
 		const Strat::Event& entry = packet[i];
 
@@ -932,20 +932,20 @@ void GameClient::ProcessStratEventPacket(const Strat::EventPacket& packet)
 				}
 				else if (stratobj->StratClass() == SDM_CLASS_CP && (entry.flags() & CP_STAT_CONTENTION) == 0)
 				{
-					_setFacilityOwnershipsToMatchCP(stratobj, data) ;
+					_setFacilityOwnershipsToMatchCP(stratobj, data);
 				}
 			}
 			break;
 			case SDM_CLASS_FACILITY:
 			{
-				_applyEventToStratDB(entry, stratobj) ;
+				_applyEventToStratDB(entry, stratobj);
 
 				if(activeMaps > 0)
 					AddStratObjectToCPUpdate(msg, stratobj);
 
-				_setBuildingOwnershipsToMatchFacility(stratobj, data) ;
+				_setBuildingOwnershipsToMatchFacility(stratobj, data);
 			}
-			break ;
+			break;
 			case SDM_CLASS_BUILDING:
 			{
 				// building events always have vis levels in them
@@ -1102,7 +1102,7 @@ void GameClient::ProcessBrigadeControlNotice(const BrigadeControlNotice* const n
 	}
 	else
 	{
-		color = colorWHITEALPHA ;
+		color = colorWHITEALPHA;
 		icons[0] = (notice->isTargettedAction()) ? IDE_ICON_GCI : IDE_ICON_BRIGADE;
 		HCUnit* brigade = HCUnit::Lookup(notice->m_brigadeID);
 		icons[1] = (brigade && brigade->side() == ALLIED) ? IDE_ICON_ALLIED: IDE_ICON_AXIS;
@@ -1128,13 +1128,13 @@ void GameClient::ProcessBrigadeControlNotice(const BrigadeControlNotice* const n
 
 void GameClient::ProcessHCUnitLocation(const HCUnitLocation& unitloc)
 {
-	HCUnit* unit = HCUnit::Lookup(unitloc.m_unitID) ;
+	HCUnit* unit = HCUnit::Lookup(unitloc.m_unitID);
 
 	if(unit)
 	{
 		// we send out update messages so the map updates itself
 		FULL_OBJ_ID oldHome = unit->homeCPID();
-		unit->setHomeCPID(unitloc.m_homeCPID) ;
+		unit->setHomeCPID(unitloc.m_homeCPID);
 
 		// create some update messages
 		phui::Message oldHomeMsg(CPUPDATE_MSG);
@@ -1232,7 +1232,7 @@ void GameClient::Update()
 
 void GameClient::SpawnComplete()
 {
-	clientErrorLog("redired") ;
+	clientErrorLog("redired");
 	Client::SpawnComplete();
 	spawnStatus = SPAWN_SPAWNED;
 }
@@ -1240,7 +1240,7 @@ void GameClient::SpawnComplete()
 void GameClient::SendPlayerExit(int exitcode, FULL_OBJ_ID const& fac)
 {
 	//uiChatPrintLineColor(colorORANGEALPHA, L"Sending client player exit!");
-	clientErrorLog("spe") ;
+	clientErrorLog("spe");
 	spawnStatus = SPAWN_DESPAWNED;
 	Client::SendPlayerExit(exitcode, fac);
 }
@@ -1251,7 +1251,7 @@ void GameClient::SendPlayerExit(int exitcode, FULL_OBJ_ID const& fac)
 
 void GameClient::RedirectFailed()
 {
-	clientErrorLog("!redir") ;
+	clientErrorLog("!redir");
 	spawnStatus = SPAWN_DESPAWNED;
 	//uiChatPrintLine("Despawn Failed");
 }
@@ -1352,7 +1352,7 @@ void GameClient::ConnectionLost(const char* description, int errorNo)
 
 	// Convert negative numbers into high-looking numbers
 	if ( errorNo < 0 )
-		errorNo = -errorNo ;
+		errorNo = -errorNo;
 
 	if(MapConnection() < 0)
 	{
@@ -1436,21 +1436,21 @@ void GameClient::KickBanPopup(ww2::HostState* state, UINT32 actions)
 
 void GameClient::ProcessEmptyChatWhoList(int type)
 {
-	Client::ProcessEmptyChatWhoList(type) ;
+	Client::ProcessEmptyChatWhoList(type);
 
 	// Handle receiving a chat who list that is entirely empty
 	switch ( type )
 	{
 	case CWT_SQUAD:
 		// We're being told squad has disbanded or something?
-	break ;
+	break;
 	case CWT_TRAINERS:
-		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_CAUTION, LSTR_NO_TRAINERS) ;
-	break ;
+		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_CAUTION, LSTR_NO_TRAINERS);
+	break;
 	case CWT_WHO:
 	default:
 		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_NONE, LSTR_NO_MATCHES);
-	break ;
+	break;
 	}
 }
 
@@ -1460,7 +1460,7 @@ void GameClient::ProcessEmptyChatWhoList(int type)
 
 void GameClient::ProcessChatWho(int type, const Chat::Who& who)
 {
-	Client::ProcessChatWho(type, who) ;
+	Client::ProcessChatWho(type, who);
 
 	// Not a displayable list
 	if(type == CWT_SQUAD)
@@ -1471,9 +1471,9 @@ void GameClient::ProcessChatWho(int type, const Chat::Who& who)
 		return;
 
 	// Offline?
-	persRank const* rank = NULL ;
+	persRank const* rank = NULL;
 	if ( who.online() && who.rank() > 0 )
-		rank = persrankFind(who.rank()) ;
+		rank = persrankFind(who.rank());
 
 	const wchar_t* callsign = chatGetWideCallsign(who.handle());
 
@@ -1504,21 +1504,21 @@ void GameClient::ProcessChatWho(int type, const Chat::Who& who)
 		name += L")";
 	}
 
-	std::wstring description = L"" ;
+	std::wstring description = L"";
 
 	///FIXME
-	static const int UI_BASE_COUNTRY_ADJECTIVE = 535 ;
-	static const int UI_BASE_BRANCH_NAME = 544 ;
+	static const int UI_BASE_COUNTRY_ADJECTIVE = 535;
+	static const int UI_BASE_BRANCH_NAME = 544;
 
 	// The country is 1 based, the strings are 0 based.
-	description += rank->WideName(who.country(), who.branch()) ;
-	description += L" (" ;
+	description += rank->WideName(who.country(), who.branch());
+	description += L" (";
 	description += uiLocString(IDE_LANG_UI, UI_BASE_COUNTRY_ADJECTIVE + who.country() - 1);
-	description += L" " ;
+	description += L" ";
 	description += uiLocString(IDE_LANG_UI, UI_BASE_BRANCH_NAME + who.branch() - 1);
-	description += L")" ;
+	description += L")";
 
-	HCUnit* brigade = HCUnit::Lookup(who.hcUnitID()) ;
+	HCUnit* brigade = HCUnit::Lookup(who.hcUnitID());
 	if ( !brigade )
 	{
 		description += L" ";
@@ -1545,12 +1545,12 @@ void GameClient::ProcessChatWho(int type, const Chat::Who& who)
 			{
 				description += L" (";
 				description += uiLocString("chat.ingame");
-				description += L")" ;
+				description += L")";
 			}
 		}
 	}
 
-	uiChatPrintLine("%ls: %ls", name.c_str(), description.c_str()) ;
+	uiChatPrintLine("%ls: %ls", name.c_str(), description.c_str());
 }
 
 /************************************************************************************************
@@ -1559,7 +1559,7 @@ void GameClient::ProcessChatWho(int type, const Chat::Who& who)
 
 void GameClient::ProcessSquad(const SquadMsg& msg)
 {
-	Client::ProcessSquad(msg) ;
+	Client::ProcessSquad(msg);
 }
 
 /************************************************************************************************
@@ -1575,7 +1575,7 @@ void GameClient::ProcessSquadControl(const SquadControlResult& result)
 	char keyBuffer[SquadControl::MAX_TEXT_LEN+1];
 
 	snprintf(keyBuffer, SquadControl::MAX_TEXT_LEN, "squad.control.%s", result.printResult());
-	const std::wstring& locmsg = uiLocString(keyBuffer) ;
+	const std::wstring& locmsg = uiLocString(keyBuffer);
 
 	if(result.m_action == SquadControl::_CREATE && result.m_result == SQR_ACCEPTED)
 	{
@@ -1588,9 +1588,9 @@ void GameClient::ProcessSquadControl(const SquadControlResult& result)
 			wchar_t buffer[SquadControl::MAX_TEXT_LEN+1];
 			buffer[0] = 0;
 
-			swprintf(buffer, SquadControl::MAX_TEXT_LEN, locmsg.c_str(), chatGetWideCallsign(result.m_handle)) ;
+			swprintf(buffer, SquadControl::MAX_TEXT_LEN, locmsg.c_str(), chatGetWideCallsign(result.m_handle));
 
-			uiChatPrintLine(buffer) ;
+			uiChatPrintLine(buffer);
 		}
 		else
 		{
@@ -1642,7 +1642,7 @@ void GameClient::ProcessSquadControl(const SquadControlResult& result)
 
 	uiClearSquadCommandTimeout();
 
-	Client::ProcessSquadControl(result) ;
+	Client::ProcessSquadControl(result);
 }
 
 /************************************************************************************************
@@ -1658,35 +1658,35 @@ void GameClient::ProcessSquadInvite(const SquadMsg& msg)
 			// The messages are fairly long so they're split into two entities
 			{
 				// First message
-				const std::wstring& locmsg = uiLocString("squad.control.createinvite1") ;
+				const std::wstring& locmsg = uiLocString("squad.control.createinvite1");
 
 				uiChatPrintLine(locmsg.c_str()
 							, chatGetWideCallsign(msg.inviter())
 							, uiUTF8toUTF16(msg.squad().shortName())
 							, uiUTF8toUTF16(msg.squad().name().c_str())
 							, SquadControl::CREATE_PLAYERS_REQUIRED+1
-					) ;
+					);
 			}
 
 			{
-				const std::wstring& locmsg = uiLocString("squad.control.createinvite2") ;
-				const char* positionRank = (msg.inviteRank() == Squad::XO) ? "common.squads.ranks.rank4" : "common.squads.ranks.rank2" ;
-				const std::wstring& position = uiLocString(positionRank) ;
+				const std::wstring& locmsg = uiLocString("squad.control.createinvite2");
+				const char* positionRank = (msg.inviteRank() == Squad::XO) ? "common.squads.ranks.rank4" : "common.squads.ranks.rank2";
+				const std::wstring& position = uiLocString(positionRank);
 
-				uiChatPrintLine(locmsg.c_str(), position.c_str()) ;
+				uiChatPrintLine(locmsg.c_str(), position.c_str());
 			}
 		}
 		else
 		{
-			const std::wstring& locmsg = uiLocString("squad.control.joininvite") ;
+			const std::wstring& locmsg = uiLocString("squad.control.joininvite");
 			uiChatPrintLine(locmsg.c_str()
 				, chatGetWideCallsign(msg.inviter())
 				, uiUTF8toUTF16(msg.squad().shortName())
-				, uiUTF8toUTF16(msg.squad().name().c_str())) ;
+				, uiUTF8toUTF16(msg.squad().name().c_str()));
 		}
 
 		// lets save it
-		Client::ProcessSquadInvite(msg) ;
+		Client::ProcessSquadInvite(msg);
 	}
 	else
 	{
@@ -1702,7 +1702,7 @@ void GameClient::ProcessSquadInvite(const SquadMsg& msg)
 
 void GameClient::ProcessSwingMeter(SwingMeter const& meter)
 {
-	Client::ProcessSwingMeter(meter) ;
+	Client::ProcessSwingMeter(meter);
 }
 
 /************************************************************************************************
@@ -1711,12 +1711,12 @@ void GameClient::ProcessSwingMeter(SwingMeter const& meter)
 
 void GameClient::ProcessOpinionPoll(OpinionPoll const& p)
 {
-	Client::ProcessOpinionPoll(p) ;
+	Client::ProcessOpinionPoll(p);
 }
 
 void GameClient::Reconnected()
 {
-	uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_SYSTEM, LSTR_RECONNECTED) ;
+	uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_SYSTEM, LSTR_RECONNECTED);
 }
 
 /************************************************************************************************
@@ -1761,7 +1761,7 @@ void GameClient::ProcessMissionDetail(MissionDetail const& reply)
 		{
 			if(!target || (target->PosX() != origin->PosX() && target->PosY() != origin->PosY()))
 			{
-				static const ChatHandle handle = chatGetHandle("ORIGIN") ;
+				static const ChatHandle handle = chatGetHandle("ORIGIN");
 				Waypoint waypoint(true, handle, reply.m_poster, WPT_ORIGIN, 0, origin->PosX(), origin->PosY(), teulTime(),
 									uiLocString2("waypoints.origin.tip").c_str());
 				waypoint.setShared(false);
@@ -1886,7 +1886,7 @@ void HCUnit::setHomeCPID(const FULL_OBJ_ID& newHomeID)
 {
 	// Is this actually a change?
 	if ( m_homeCPID == newHomeID)
-		return ;
+		return;
 
 	// let the old cp know we've moved
 	StratDB::StratObject* from = StratDB::FindStratObject(m_homeCPID);

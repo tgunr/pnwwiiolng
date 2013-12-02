@@ -27,18 +27,18 @@ public:
 		, m_squadHandle(squadHandle)
 		, m_isDirective(isDirective)
 			{}
-	MissionInvite(ACTION_OBJECT* const a) ;
+	MissionInvite(ACTION_OBJECT* const a);
 	~MissionInvite() {}
 
 public:
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) ;
+	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
 
 public:
-	UINT32			m_missionID ;		// 0 or ID of active mission
-	WWII_COUNTRY	m_countryID ;		// Country of mission
-	BRANCH_ENUM		m_branchID ;		// What branch
-	UINT32			m_brigadeID ;		// The brigade it's in
-	ChatHandle		m_fromHandle ;		// Handle of the requesting player
-	ChatHandle		m_squadHandle ;		// Handle of requester's squad (or 0)
-	bool			m_isDirective ;
-} ;
+	UINT32			m_missionID;		// 0 or ID of active mission
+	WWII_COUNTRY	m_countryID;		// Country of mission
+	BRANCH_ENUM		m_branchID;			// What branch
+	UINT32			m_brigadeID;		// The brigade it's in
+	ChatHandle		m_fromHandle;		// Handle of the requesting player
+	ChatHandle		m_squadHandle;		// Handle of requester's squad (or 0)
+	bool			m_isDirective;
+};

@@ -12,7 +12,7 @@
 
 // force clients out after 35 seconds
 //#define FORCE_CLIENT_TIMEOUT 30000
-static const TeulTimeMS FORCE_CLIENT_TIMEOUT = 35 * 1000 ;
+static const TeulTimeMS FORCE_CLIENT_TIMEOUT = 35 * 1000;
 
 #define MAX_HOST_VEHICLES 6000
 
@@ -21,17 +21,17 @@ static const TeulTimeMS FORCE_CLIENT_TIMEOUT = 35 * 1000 ;
 
 #define ACTIVE_TO_REALLY_ACTIVE_TIME_S 21
 
-extern bool g_serverReserved ;
-extern bool g_clustered ;
+extern bool g_serverReserved;
+extern bool g_clustered;
 
-class HostVehicle ;
-class Player ;
-struct VEHICLE_HOLDER ;
-struct HIT_VEHICLE_NODE ;
-struct WEAP_BIAS ;
-struct UPDATE_LIST ;
+class HostVehicle;
+class Player;
+struct VEHICLE_HOLDER;
+struct HIT_VEHICLE_NODE;
+struct WEAP_BIAS;
+struct UPDATE_LIST;
 
-typedef std::list<Player*> PLAYER_LIST ;
+typedef std::list<Player*> PLAYER_LIST;
 
 struct VEHICLE_HOLDER
 {
@@ -45,7 +45,7 @@ struct VEHICLE_HOLDER
 	UINT16	fireMask;
 	SINT8	numTurrets;
 	UINT32	present;	// present flags from update
-} ;
+};
 
 #ifdef NEW_SERVER_INFO
 struct NEW_SERVER_INFO
@@ -57,7 +57,7 @@ struct NEW_SERVER_INFO
 	SINT32	offset;
 	SINT32	syncCount;
 	HASH_D1*	syncSent;
-} ;
+};
 #endif
 
 struct MY_SERVER_INFO
@@ -65,7 +65,7 @@ struct MY_SERVER_INFO
 	UINT32 recvVehBcastErrors;
 	UINT32 initStartTime;
 	UINT32 packetTag;
-} ;
+};
 
 extern SINT32			authConnection;
 extern SINT32 updateBcastRecv, updateBcastSend;
@@ -81,7 +81,7 @@ extern HostVehicle* hostFindVehicleLocal( UINT32 indexValue );
 extern SINT32 hostJoinVehicle(Player& persona, const struct VEHICLE_REQUEST& vRequest);
 extern HostVehicle* hostCreateRemoteVehicle(const instanceid_t& instanceID, sortieid_t index, WEAPON_SPEC spec);
 extern void hostRemoveRemoteVehicle(UINT32 serial, PLAYER_EXIT_CODE exitCode);
-struct VEHICLE_UPDATE_HEADER ;
+struct VEHICLE_UPDATE_HEADER;
 extern bool hostAddVehicleToBroadcast(HostVehicle* vehicle, VEHICLE_UPDATE_HEADER* vh);
 
 extern void	hostActivatePlayer(Player* persona);
@@ -94,13 +94,13 @@ extern void hostForceVehExit(HostVehicle* vehicle);
 
 extern void hostDeleteToastVehicle(HostVehicle* vehicle);
 
-extern void hostBuildingVisLevelChange(class ObjectStruct* object, const instanceid_t& inInstance) ;
-extern void hostChangeFPSBuilding(Player* persona, const FULL_OBJ_ID& newBuildingID) ;
+extern void hostBuildingVisLevelChange(class ObjectStruct* object, const instanceid_t& inInstance);
+extern void hostChangeFPSBuilding(Player* persona, const FULL_OBJ_ID& newBuildingID);
 
-extern void* teulGetPersonaData(SINT32 teulIndex) ;
-static inline Player* hostGetPlayer(SINT32 teulIndex) { return (Player*)teulGetPersonaData(teulIndex) ; }
-extern void hostGiveCaptureScoreToPlayers(const FULL_OBJ_ID& buildingID, WWII_SIDE forSide) ;
-extern void hostSendCaptureStatesToOccupants(const class CaptureState& incoming) ;
+extern void* teulGetPersonaData(SINT32 teulIndex);
+static inline Player* hostGetPlayer(SINT32 teulIndex) { return (Player*)teulGetPersonaData(teulIndex); }
+extern void hostGiveCaptureScoreToPlayers(const FULL_OBJ_ID& buildingID, WWII_SIDE forSide);
+extern void hostSendCaptureStatesToOccupants(const class CaptureState& incoming);
 
 #include "host/hostPlayers.h"
 

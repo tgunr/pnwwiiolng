@@ -16,7 +16,7 @@ enum PLAYER_DESTINATION
 {
 	PDEST_MAP,
 	PDEST_EXIT
-} ;
+};
 
 #include "wwii/wwiiFullObjID.h"			// For FULL_OBJ_ID
 
@@ -24,8 +24,8 @@ struct PLAYER_EXIT
 {
 	PLAYER_DESTINATION destination;
 	PLAYER_EXIT_CODE exitCode;
-	FULL_OBJ_ID facility ;		// Override facility
-} ;
+	FULL_OBJ_ID facility;		// Override facility
+};
 
 #include "weap/weapSerial.h"	// For WEAPON_SERIAL
 
@@ -36,7 +36,7 @@ struct VEHICLE_REQUEST
 	UPDT_STATION	station; 	// station in the vehicle.
 	UCHAR			side;		// Axis or Allied
 	UCHAR			country;	// what country the persona belongs to
-} ;
+};
 
 struct VEHICLE_REPLY
 {
@@ -51,10 +51,10 @@ struct VEHICLE_REPLY
 							// used to refereence this vehicle by persona
 	UPDT_STATION	station;	// station in the vehicle.
 //	LOAD_OUT_FLAGS	loadOutFlags;
-} ;
+};
 
 struct VOID_STRUCT
 {
 	SINT32 size;
 	void* data;
-} ;
+};

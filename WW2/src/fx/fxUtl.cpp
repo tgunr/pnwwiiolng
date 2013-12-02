@@ -54,7 +54,7 @@ struct MATERIALPROP
 	hitsoundwave[0] = hitsoundwave[1] = hitsoundwave[2] = "";
     }
 
-} ;
+};
 
 typedef std::map<std::string, MATERIALPROP *> MaterialPropertiesMap;
 static MaterialPropertiesMap g_materialProperties;

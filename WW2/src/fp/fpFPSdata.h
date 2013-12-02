@@ -33,7 +33,7 @@ enum fpsInfantryTypes
 	FRENCH_ML,
 	AMERICAN_INFANTRY,
 	NUM_INFANTRY_TYPES
-} ;
+};
 
 enum fpsSpeedTypes
 {
@@ -48,7 +48,7 @@ enum fpsSpeedTypes
 	FPS_SPEED_BACKWARDS,
 	FPS_SPEED_BACKWARDS_CROUCH,
 	FPS_NUM_SPEEDS
-} ;
+};
 
 enum fpsWeaponTypes
 {
@@ -105,7 +105,7 @@ enum fpsWeaponTypes
 	USSMOKE,
 	PIAT,
 	NUM_WEAPONS
-} ;
+};
 // tolua_end
 
 extern SCHAR* fpFPSWeaponKeyStrings[NUM_WEAPONS];
@@ -141,7 +141,7 @@ enum fpsWeaponStates
 	DEPLOYED_KNEEL,
 	AIM_SMG,
 	NUM_WEAP_STATES
-} ;
+};
 
 // if ever adding a weapon type, make sure to add a corresponding string in fpsData.cpp:fpFPSWeaponTypeStrings
 enum fpFPSWeaponType
@@ -162,7 +162,7 @@ enum fpFPSWeaponType
 	FPS_WEAPONTYPE_AUTO_RIFLE, // semiauto
 	FPS_WEAPONTYPE_ROCKET, // bazooka/panzershrek/piat
 	FPS_WEAPONTYPE_NUM_TYPES
-} ;
+};
 // tolua_end
 
 extern SCHAR* fpFPSWeaponTypeStrings[FPS_WEAPONTYPE_NUM_TYPES];
@@ -189,7 +189,7 @@ enum fpFPSIconType
 	FPS_ICON_AUTO_RIFLE,
 	FPS_ICON_ROCKET,
 	NUM_ICONS
-} ;
+};
 
 // tolua_begin
 enum fpFPSPositions
@@ -199,7 +199,7 @@ enum fpFPSPositions
 	FPS_POSITION_PRONE,
 	FPS_POSITION_SITTING,
 	FPS_NUM_POSITIONS
-} ;
+};
 // tolua_end
 
 enum fpFPSSoundType
@@ -219,7 +219,7 @@ enum fpFPSSoundType
 	FPS_SOUND_FREEFALL,
 	FPS_SOUND_PARACHUTE_FALL,
 	FPS_MAX_SOUNDS
-} ;
+};
 
 enum fpFPSFallType
 {
@@ -228,14 +228,14 @@ enum fpFPSFallType
 	FPS_FALL_WATER,
 	FPS_FALL_WATER_HURT,
 	FPS_MAX_FALL_TYPES
-} ;
+};
 
 enum fpFPSAuxModelType
 {
 	FPS_AUX_RGCUP,
 	FPS_AUX_RGGRENADE,
 	FPS_NUM_AUX_MODELS
-} ;
+};
 
 enum fpFPSEyeHeights
 {
@@ -253,7 +253,7 @@ enum fpFPSEyeHeights
 	FPS_EYE_STANDAIM,
 	FPS_EYE_STANDDEPLOY,
 	FPS_NUM_EYEHEIGHTS
-} ;
+};
 
 enum HUD_AMMO_DATA
 {
@@ -272,14 +272,14 @@ class CSAFE_fpFPSWeaponData
 public:
 	CSAFE_fpFPSWeaponData()
 	{
-		clear() ;
+		clear();
 	}
 
 	~CSAFE_fpFPSWeaponData(){}
 
 	void clear()
 	{
-		memset(this, 0, sizeof(CSAFE_fpFPSWeaponData)) ;
+		memset(this, 0, sizeof(CSAFE_fpFPSWeaponData));
 	}
 
 	int getSightDist(int position)
@@ -409,9 +409,9 @@ public:
 	LOGICAL				placedObject;				// is this weapon type the build tool
 
 private:
-	CSAFE_fpFPSWeaponData(const CSAFE_fpFPSWeaponData&) ;			// Prevent copy ctor
+	CSAFE_fpFPSWeaponData(const CSAFE_fpFPSWeaponData&);			// Prevent copy ctor
 	CSAFE_fpFPSWeaponData& operator=(const CSAFE_fpFPSWeaponData&);	// Prevent copy operator
-} ;
+};
 
 class fpFPSWeaponData : public CSAFE_fpFPSWeaponData
 {
@@ -423,7 +423,7 @@ public:
 
 	~fpFPSWeaponData(){}
 
-	void clear() ;
+	void clear();
 
 public:
 	Covert<SINT32>		clipBullets;			// number of bullets in current clip
@@ -431,18 +431,18 @@ public:
 	Covert<LOGICAL>		suppressAim;
 	Covert<FLOAT32>		perBulletATP;			// ATP drain per bullet
 	Covert<FLOAT32>		delayAfterFire;			// how long after the weapon is fired to delay reload & recycle animations
-} ;
+};
 
 // "C" safe trooper data
 class CSAFE_fpFPSTrooperData {
 public:
 	CSAFE_fpFPSTrooperData() {
-		clear() ;
+		clear();
 	}
 	~CSAFE_fpFPSTrooperData() {}
 
 	void clear() {
-		memset(this, 0, sizeof(CSAFE_fpFPSTrooperData)) ;
+		memset(this, 0, sizeof(CSAFE_fpFPSTrooperData));
 	}
 
 public:
@@ -602,7 +602,7 @@ public:
 	// are exiting a river?
 	// used to determine which cage collider to use
 	LOGICAL				riverExit;
-} ;
+};
 
 class fpFPSTrooperData : public CSAFE_fpFPSTrooperData {
 public:
@@ -611,7 +611,7 @@ public:
 	}
 	~fpFPSTrooperData() {}
 
-	void clear() ;
+	void clear();
 
 public:
 	Covert<LOGICAL>		initialized;
@@ -660,7 +660,7 @@ public:
 
 	Covert<FLOAT32>		defaultFOV;
 	Covert<FLOAT32>		desiredFOV;
-} ;
+};
 
 struct fpFPSLoadoutWeapon
 {

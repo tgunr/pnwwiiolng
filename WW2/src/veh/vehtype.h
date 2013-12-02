@@ -57,7 +57,7 @@ struct vehInertiaComponent
 	FLOAT64 vol;
 	FLOAT64VECTOR cm;
 	FLOAT64 I[3][3]; // per unit mass moment of inertia, multiply times mass to get moment
-} ;
+};
 
 struct vehanimVehicleStateType
 {

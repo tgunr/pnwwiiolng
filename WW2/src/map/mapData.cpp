@@ -33,36 +33,36 @@ void
 mapUpdateCP(CPStruct* cp, WWII_COUNTRY owner, WWII_COUNTRY controller, CP_STATUS_FLAGS flags, const char* from)
 {
 	if ( cp->country == owner && cp->controllingCountry == controller && cp->flags == flags )
-		return ;
+		return;
 
 	// Did it's objective status change
 	if ( (cp->flags & CP_OBJECTIVES) != (flags & CP_OBJECTIVES) )
 	{
-		cp->flags = flags ;
-		missionCheckOrigins(cp) ;
-		mapUpdateBrigadesWithMissionsAt(cp) ;
+		cp->flags = flags;
+		missionCheckOrigins(cp);
+		mapUpdateBrigadesWithMissionsAt(cp);
 	}
 	else
-		cp->flags = flags ;
+		cp->flags = flags;
 }
 
 SINT32
 mapInitMapData()
 {
-	SUPERCELLS::iterator it ;
-	for ( it = g_supercells.begin() ; it != g_supercells.end() ; ++it )
+	SUPERCELLS::iterator it;
+	for ( it = g_supercells.begin(); it != g_supercells.end(); ++it )
 	{
-		Supercell& sc = it->second ;
+		Supercell& sc = it->second;
 		for ( UINT32 n = 0; n < sc.numCPs; ++n )
 		{
-			CPStruct& cp = sc.cps[n] ;
+			CPStruct& cp = sc.cps[n];
 
 			if ( cp.isContested() )
-				cp.flags |= CP_STAT_CONTENTION ;
+				cp.flags |= CP_STAT_CONTENTION;
 			else
-				cp.flags &= ~CP_STAT_CONTENTION ;
+				cp.flags &= ~CP_STAT_CONTENTION;
 
-			mapUpdateCP(&cp, cp.originalCountry, cp.controllingCountry, cp.flags & ~(CP_STAT_CONTENTION|CP_OBJECTIVES), __FUNCTION__) ;
+			mapUpdateCP(&cp, cp.originalCountry, cp.controllingCountry, cp.flags & ~(CP_STAT_CONTENTION|CP_OBJECTIVES), __FUNCTION__);
 		}
 	}
 

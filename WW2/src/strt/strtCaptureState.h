@@ -52,8 +52,8 @@ private:
 
 	,	CapCaptured			// Indicates end of CapEnabled, no other
 							// data is supplied.
-	} ;
-	enum { StageBits = 2 } ;
+	};
+	enum { StageBits = 2 };
 
 private:
 	UINT32	m_stage ;		// Current stage (Disabled/Pending/Enabled)
@@ -63,7 +63,7 @@ private:
 							// CapEnabled :- percentage towards capture
 	bool	m_spawnable ;	// Is it/will it be spawnable by us?
 
-	enum { RateBits = 7 } ;
+	enum { RateBits = 7 };
 	SINT16	m_rate ;	// +ve = our capture, -ve = decapture
 						// Always zero on first update.
 
@@ -89,10 +89,10 @@ public:	~CaptureState() {}
 	// Network packer
 public:	void packer(LOGICAL mode, struct ACTION_OBJECT* a)
 	{
-		a->packer(mode, &m_stage, StageBits) ;
-		a->packer(mode, &m_counter, 16) ;
-		a->packer(mode, &m_rate, RateBits) ;
-		a->packer(mode, m_spawnable, 1) ;
+		a->packer(mode, &m_stage, StageBits);
+		a->packer(mode, &m_counter, 16);
+		a->packer(mode, &m_rate, RateBits);
+		a->packer(mode, m_spawnable, 1);
 	}
 
 	// True/False: Can this building be captured?
@@ -120,21 +120,21 @@ public: UINT32 GetProgress() const { return (IsCapturable() ? m_counter : 0) ; }
 	// -ve = Owner pulse
 public:	SINT32 GetLastContribution() const
 	{
-		if ( IsCapturable() == false || IsComplete() ) return 0 ;
-		return (SINT32) m_rate ;
+		if ( IsCapturable() == false || IsComplete() ) return 0;
+		return (SINT32) m_rate;
 	}
 
 #ifdef AS_SERVER
 	// Host function to populate
-public:	void populate(const class FacilityStruct* facility, UINT32 forSide, SINT32 rate, bool spawnable) ;
+public:	void populate(const class FacilityStruct* facility, UINT32 forSide, SINT32 rate, bool spawnable);
 	// Only used by the host
-public:	UINT64	m_fidKey ;
-public:	UINT32	m_forSide ;
-public: void invert(const CaptureState& rhs) ;
+public:	UINT64	m_fidKey;
+public:	UINT32	m_forSide;
+public: void invert(const CaptureState& rhs);
 #else
 public: bool m_valid;
 public: UINT32 GetStage() const { return m_stage; }
 #endif
-} ;
+};
 #pragma pack(pop)
 

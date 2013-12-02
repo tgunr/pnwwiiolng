@@ -25,14 +25,14 @@ MMHostInstanceImpl::PreDestructionHandler()
 {
 	// Don't try to do anything if we haven't been initialized.
 	if ( inst().descriptor().id() == 0 )
-		return ;
+		return;
 
 	betaLog(_FLD, "in:%u.%u.%llu.%llu host instance destructor"
-				, inst().descriptor().category(), inst().descriptor().type(), inst().descriptor().handle(), inst().descriptor().id()) ;
+				, inst().descriptor().category(), inst().descriptor().type(), inst().descriptor().handle(), inst().descriptor().id());
 
 	// Tell the mission system to delete all missions associated with
 	// this instance.
-	missDeleteInstanceMissions(inst().descriptor().id()) ;
+	missDeleteInstanceMissions(inst().descriptor().id());
 }
 
 } // namespace Instance

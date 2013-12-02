@@ -8,5 +8,5 @@
 
 #include "weap/weapSpec.h"
 
-WEAPON_SPEC NULL_WEAP_SPEC((UINT16)0) ;
+WEAPON_SPEC NULL_WEAP_SPEC((UINT16)0);
 

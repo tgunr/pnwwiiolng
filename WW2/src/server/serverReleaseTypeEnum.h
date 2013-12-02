@@ -14,8 +14,8 @@ enum ReleaseType
 ,	RELEASE_ECONN			//! the players connection is fubar, put on exit server
 
 ,	MAX_RELEASE_TYPES
-} ;
+};
 
-extern const char* GetReleaseType(ReleaseType releaseType) ;
+extern const char* GetReleaseType(ReleaseType releaseType);
 }
 

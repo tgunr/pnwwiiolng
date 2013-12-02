@@ -15,7 +15,7 @@ enum MSPAWN_STATE	// (Mobile Spawn STate)
 	MSST_UNDEPLOYED = 0			// Vehicle not deployed
 ,	MSST_DEPLOYED				// Vehicle deployed
 ,	MSST_DEPLOYING				// Vehicle requesting deployment
-} ;
+};
 
 // Mobile spawn deployment responses
 enum MSPAWN_RESULT	// (Mobile Spawn Deployment Results)
@@ -48,5 +48,5 @@ enum MSPAWN_RESULT	// (Mobile Spawn Deployment Results)
 ,	MSDR_INVALID_STATE		// Can't do that in this state
 
 ,	MSPAWN_RESULT_MAX
-} ;
+};
 

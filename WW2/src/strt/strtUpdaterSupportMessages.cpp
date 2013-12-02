@@ -40,21 +40,21 @@ _sendHitList(ACTION_OBJECT* const a)
 static SINT32
 _recvEnemySpotted(ACTION_OBJECT* const a)
 {
-	wwiiPlayer* player = ServerInterface::LookupByTeulIndex(a->teulIndex) ;
+	wwiiPlayer* player = ServerInterface::LookupByTeulIndex(a->teulIndex);
 	if ( player == NULL )
 	{
-		dbugLog(_FLW, "t:%d ignoring EWS from unregistered player", a->teulIndex) ;
-		return -EINVAL ;
+		dbugLog(_FLW, "t:%d ignoring EWS from unregistered player", a->teulIndex);
+		return -EINVAL;
 	}
 	if ( player->instance().isCampaign() == false )
 	{
-		player->log(_FLD, "t:%d ignoring EWS from non-campaign player", a->teulIndex) ;
-		return a->offset ;
+		player->log(_FLD, "t:%d ignoring EWS from non-campaign player", a->teulIndex);
+		return a->offset;
 	}
 
 	Teul::Packet outgoing(sizeof(STRAT_ENEMY_REPORT), Strat::CallbackX, STRT_ENEMY_REPORT_Y);
 	auto& report = outgoing.allocate<STRAT_ENEMY_REPORT>();
-	a->offset = strtPackEnemySpotted(TEUL_UNPACK, a->packed, a->offset, &report, 0) ;
+	a->offset = strtPackEnemySpotted(TEUL_UNPACK, a->packed, a->offset, &report, 0);
 	if ( a->offset < 0 )
 		return a->offset;
 
@@ -68,7 +68,7 @@ SINT32
 strtInstallUpdaterSupportCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Strat::CallbackX)
-		REGISTER_SENDER(STRT_DAMAGE_Y, _sendHitList, STRT_SEND_HIT_LIST) ;
-		REGISTER_RECEIVER(STRT_ENEMY_SPOTTED_Y, _recvEnemySpotted) ;
+		REGISTER_SENDER(STRT_DAMAGE_Y, _sendHitList, STRT_SEND_HIT_LIST);
+		REGISTER_RECEIVER(STRT_ENEMY_SPOTTED_Y, _recvEnemySpotted);
 	END_CALLBACK_REGISTRATION
 }

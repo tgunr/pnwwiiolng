@@ -55,12 +55,12 @@ SINT32 missionSendExit(SINT32 hostIndex, UINT32 cancelMissionID)
 void
 missionSendDetailRequest(SINT32 hostIndex, UINT32 missionID, bool joinRequest)
 {
-	MISSION_DETAIL packet ;
+	MISSION_DETAIL packet;
 
 	// Tell the host whether we want to join or view this mission
-	packet.m_flags = joinRequest ;
+	packet.m_flags = joinRequest;
 
-	packet.request(hostIndex, missionID) ;
+	packet.request(hostIndex, missionID);
 }
 
 // missionSendWeaponListRequest()
@@ -68,9 +68,9 @@ SINT32 missionSendWeaponListRequest(SINT32 hostIndex, FULL_OBJ_ID facility, LOGI
 {
 WEP_LIST_REQ request;
 
-	request.facility = facility ;
-	request.allWeapons = allWeapons ;
-	request.isRefresh = isRefresh ;
+	request.facility = facility;
+	request.allWeapons = allWeapons;
+	request.isRefresh = isRefresh;
 	return teulSend(hostIndex, missSEND_WEP_LIST_REQ, &request);
 }
 
@@ -90,7 +90,7 @@ static SINT32 _sendMISSION_EXIT(ACTION_OBJECT* const a)
 #endif
 
 	// Send the UINT32 we were called with
-	return teulPackUINT32(TEUL_PACK, a->packed, a->offset, (UINT32*)a->localRawData, 0) ;
+	return teulPackUINT32(TEUL_PACK, a->packed, a->offset, (UINT32*)a->localRawData, 0);
 }
 
 static SINT32 _sendWEP_LIST_REQ(ACTION_OBJECT* const a)
@@ -127,12 +127,12 @@ _recvMISSION_POST_REPLY(ACTION_OBJECT* const a)
 }
 
 // Incoming room list - optimization to avoid reallocations
-static RoomList _inRoomList ;
+static RoomList _inRoomList;
 
 static SINT32
 _recvRoomList(ACTION_OBJECT* const a)
 {
-	a->offset = _inRoomList.packer(TEUL_UNPACK, a) ;
+	a->offset = _inRoomList.packer(TEUL_UNPACK, a);
 
 	clientMissionRoomListReply(a->teulIndex, &_inRoomList);
 
@@ -185,12 +185,12 @@ MISSION_DETAIL::receive(SINT32 teulIndex, MISSION_DETAIL& incoming)
 		///TODO: Handle me!
 		// clientMissionDetailFailed(); -> so the request knows it failed?
 		// Say "barf" to the host
-		return -EINVAL ;
+		return -EINVAL;
 	}
 
 	// Otherwise...
 	// MissionDetail is derived from mission summary, see missionDetail.h
-	clientMissionDetailReply(teulIndex, incoming.data()) ;	// Replaces MissionCheckReply()
+	clientMissionDetailReply(teulIndex, incoming.data());	// Replaces MissionCheckReply()
 
 	return 0;
 }
@@ -202,18 +202,18 @@ SINT32
 missRequestMissionResults(const SINT32 teulIndex, const UINT32 sortieID)
 {
 	// Prevent the client from spamming the host.
-	static TeulTimeMS nextReq = 0ULL ;
+	static TeulTimeMS nextReq = 0ULL;
 	if ( teulClock64 < nextReq )
-		return 0 ;
+		return 0;
 
-	Teul::Packet outgoing(sizeof(sortieID), MISSION_X, FE_MISSION_RESULT_REPLY_Y) ;
-	outgoing.append(sortieID) ;
-	const SINT32 retval = outgoing.send(teulIndex) ;
+	Teul::Packet outgoing(sizeof(sortieID), MISSION_X, FE_MISSION_RESULT_REPLY_Y);
+	outgoing.append(sortieID);
+	const SINT32 retval = outgoing.send(teulIndex);
 
 	// No more than once every 2.5 seconds.
-	nextReq = teulClock64 + 2500 ;
+	nextReq = teulClock64 + 2500;
 
-	return retval ;
+	return retval;
 }
 
 SINT32
@@ -221,19 +221,19 @@ missionInstallCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(MISSION_X)
 
-		REGISTER_SENDER(FE_MISSION_POST_REQ_Y, _sendMISSION_POST_REQ, missSEND_POST_REQ) ;
-		REGISTER_SENDER(FE_MISSION_EXIT_Y, _sendMISSION_EXIT, missSEND_EXIT) ;
-		REGISTER_SENDER(FE_MISSION_WEP_LIST_REQ_Y, _sendWEP_LIST_REQ, missSEND_WEP_LIST_REQ) ;
+		REGISTER_SENDER(FE_MISSION_POST_REQ_Y, _sendMISSION_POST_REQ, missSEND_POST_REQ);
+		REGISTER_SENDER(FE_MISSION_EXIT_Y, _sendMISSION_EXIT, missSEND_EXIT);
+		REGISTER_SENDER(FE_MISSION_WEP_LIST_REQ_Y, _sendWEP_LIST_REQ, missSEND_WEP_LIST_REQ);
 
-		REGISTER_RECEIVER(FE_MISSION_POST_REPLY_Y, _recvMISSION_POST_REPLY) ;
-		REGISTER_RECEIVER(FE_MISSION_CLIENT_WEP_LIST_Y, _recvCLIENT_WEP_LIST) ;
-		REGISTER_RECEIVER(FE_MISSION_RESULT_REPLY_Y, _recvMISSION_RESULT_REPLY) ;
+		REGISTER_RECEIVER(FE_MISSION_POST_REPLY_Y, _recvMISSION_POST_REPLY);
+		REGISTER_RECEIVER(FE_MISSION_CLIENT_WEP_LIST_Y, _recvCLIENT_WEP_LIST);
+		REGISTER_RECEIVER(FE_MISSION_RESULT_REPLY_Y, _recvMISSION_RESULT_REPLY);
 		REGISTER_RECEIVER(FE_MISSION_ROOM_LIST_Y, _recvRoomList);
-		REGISTER_RECEIVER(FE_MISSION_LAUNCH_UPDATE_Y, _recvMISS_LAUNCH_UPDATE) ;
+		REGISTER_RECEIVER(FE_MISSION_LAUNCH_UPDATE_Y, _recvMISS_LAUNCH_UPDATE);
 
 		// Register this callback (_Y) to that teul_network_msg
-		REGISTER_MSG(FE_MISSION_DETAIL_Y, MISSION_DETAIL) ;
-		REGISTER_MSG_RECEIVER(FE_MISSION_LIST_UPDATE_Y, MISSION_LIST_UPDATE) ;
+		REGISTER_MSG(FE_MISSION_DETAIL_Y, MISSION_DETAIL);
+		REGISTER_MSG_RECEIVER(FE_MISSION_LIST_UPDATE_Y, MISSION_LIST_UPDATE);
 
 	END_CALLBACK_REGISTRATION
 }

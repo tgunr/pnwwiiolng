@@ -26,36 +26,36 @@ namespace Teul
 			virtual ~Server() {}
 
 		private:
-			const std::string m_rootPath ;
+			const std::string m_rootPath;
 		private:
-			const unsigned short m_port ;
+			const unsigned short m_port;
 		private:
-			std::mutex m_config_mutex ;
+			std::mutex m_config_mutex;
 
 		public:
-			const std::string& rootPath() const { return m_rootPath ; }
+			const std::string& rootPath() const { return m_rootPath; }
 		public:
-			unsigned short port() const { return m_port ; }
+			unsigned short port() const { return m_port; }
 
 		public:
-			virtual void run() ;
+			virtual void run();
 
 		public:
-			typedef void (*VirtualFileHandler)(unsigned int /*fd*/, const char* /*path*/, const char* /*args*/) ;
+			typedef void (*VirtualFileHandler)(unsigned int /*fd*/, const char* /*path*/, const char* /*args*/);
 		private:
-			typedef UNORDERED_MAP< std::string, std::pair<VirtualFileHandler /*handler*/, std::string /*description*/> > VirtualFileHandlers ;
-			VirtualFileHandlers m_virtualFileHandlers ;
+			typedef UNORDERED_MAP< std::string, std::pair<VirtualFileHandler /*handler*/, std::string /*description*/> > VirtualFileHandlers;
+			VirtualFileHandlers m_virtualFileHandlers;
 		private:
-			std::string m_resourceList ;
+			std::string m_resourceList;
 
 		public:
-			void addVirtualFile(std::string desc_, std::string path_, VirtualFileHandler handler_) ;
+			void addVirtualFile(std::string desc_, std::string path_, VirtualFileHandler handler_);
 
 		private:
-			void processHTTPRequest(const int fd, char* const request) ;
-		} ;
+			void processHTTPRequest(const int fd, char* const request);
+		};
 
-		extern Server* s_debugServer ;
+		extern Server* s_debugServer;
 	}
 }
 

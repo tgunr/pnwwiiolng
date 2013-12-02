@@ -54,7 +54,7 @@ struct mlHeadAttitude
 	SINT32 leftRight;
 	SINT32 upDown;
 	SINT32 enabled;
-} ;
+};
 
 static SINT32 _curView = 0;
 static LOGICAL _mouseLook;

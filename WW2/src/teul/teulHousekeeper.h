@@ -39,17 +39,17 @@ public:
 	bool poll(UINT32 interval_ms)
 	{
 		if ( interval_ms > 0 && teulClock64 - m_lastClock < (TeulTimeMS)interval_ms )
-			return false ;
-		m_fn() ;
-		m_lastClock = teulClock64 ;
-		return true ;
+			return false;
+		m_fn();
+		m_lastClock = teulClock64;
+		return true;
 	}
 
-	bool poll() { return poll(m_stockInterval_ms) ; }
+	bool poll() { return poll(m_stockInterval_ms); }
 
 private:
-	TeulTimeMS		m_lastClock ;
-	void			(*m_fn)(void) ;
-	UINT32			m_stockInterval_ms ;
-} ; // class
+	TeulTimeMS		m_lastClock;
+	void			(*m_fn)(void);
+	UINT32			m_stockInterval_ms;
+}; // class
 } // namespace

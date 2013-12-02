@@ -18,9 +18,9 @@ struct WEAPON_SERIAL
 	FULL_OBJ_ID		source;		// source spawn location
 	UINT32			serial;		// serial number
 	WEAPON_SPEC		spec;		// specific type of weapon
-} ;
+};
 
-extern const WEAPON_SERIAL NULL_WEAP_SERIAL ;
+extern const WEAPON_SERIAL NULL_WEAP_SERIAL;
 
 static inline const char* weapPrintSerialC(const WEAPON_SERIAL* weap)
 {

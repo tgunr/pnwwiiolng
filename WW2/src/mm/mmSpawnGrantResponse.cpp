@@ -30,7 +30,7 @@
 #include "host/hostVehicleRequest.h"
 #include "wwii/wwiiServerTypeEnums.h"
 
-extern SINT32 mapSendHostSupercellData(SINT32 teulIndex) ;	// From mapHostSupercellData.cpp
+extern SINT32 mapSendHostSupercellData(SINT32 teulIndex);	// From mapHostSupercellData.cpp
 
 //////////////////////////////////////////////////////////////////////
 // Exception classes for failing during spawn grant
@@ -41,17 +41,17 @@ public:
 	explicit SpawnGrantFailure(int code, const char* const reason, bool loseVehicle) : m_code(code), m_reason(reason), m_loseVehicle(loseVehicle) {}
 	virtual ~SpawnGrantFailure() {}
 
-	int m_code ;
-	const char* const m_reason ;
-	bool m_loseVehicle ;
-} ;
+	int m_code;
+	const char* const m_reason;
+	bool m_loseVehicle;
+};
 
 class SGFLostCrew : public SpawnGrantFailure
 {
 public:
 	explicit SGFLostCrew(const char* const reason) : SpawnGrantFailure(SPAWN_LOST_CREW, reason, true) {}
 	virtual ~SGFLostCrew() {}
-} ;
+};
 
 class SGFSpawningDisabled : public SpawnGrantFailure
 {
@@ -59,7 +59,7 @@ public:
 	explicit SGFSpawningDisabled(const char* const reason, bool loseVehicle)
 		: SpawnGrantFailure(SPAWN_DISABLED_BY_SERVER, reason, loseVehicle) {}
 	virtual ~SGFSpawningDisabled() {}
-} ;
+};
 
 //////////////////////////////////////////////////////////////////////
 // Constructor for a VehicleRequest
@@ -75,9 +75,9 @@ Host::VehicleRequest::VehicleRequest(const instanceid_t& instanceID_, const MM_S
 	, m_rank(commander.effectiveRank())
 	, m_flags(0)
 {
-	m_players.push_back(commander.playerID()) ;
+	m_players.push_back(commander.playerID());
 	if ( crew )
-		m_players.push_back(crew->playerID()) ;
+		m_players.push_back(crew->playerID());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -87,7 +87,7 @@ Host::VehicleRequest::VehicleRequest(const instanceid_t& instanceID_, const MM_S
 static void
 _sendVehicleToCell(const MM_SPAWN_GRANT_RESPONSE& grant, const Player& commander, const Player* const crew, Server::ServerInfo* const server)
 {
-	Host::VehicleRequest vr(commander.instance().id(), grant, commander, crew) ;
+	Host::VehicleRequest vr(commander.instance().id(), grant, commander, crew);
 
 	if ( g_logDebug )
 		dbugLog(_FLD, "v:%u sending vehicle to cell %s with players %u,%u"
@@ -95,9 +95,9 @@ _sendVehicleToCell(const MM_SPAWN_GRANT_RESPONSE& grant, const Player& commander
 						, teulGetAddress(server->stats.address)
 						, vr.playerNo(0)
 						, vr.playerNo(1)
-						) ;
+						);
 
-	vr.send(server) ;
+	vr.send(server);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -107,20 +107,20 @@ static void
 _checkCrew(const UINT32 playerID, const Player* const crew, const Player* const commander)
 {
 	if ( playerID == 0 )
-		return ;
+		return;
 
 	if ( crew == NULL )
-		throw SGFLostCrew("crew absconded") ;
+		throw SGFLostCrew("crew absconded");
 	if ( crew->teulIndex() < 0 )
-		throw SGFLostCrew("crew not connected") ;
+		throw SGFLostCrew("crew not connected");
 	if ( !crew->validMissionPacket() )
-		throw SGFLostCrew("invalid crew mission packet") ;
+		throw SGFLostCrew("invalid crew mission packet");
 	if ( crew->country() != commander->country() )
-		throw SGFLostCrew("country mismatch with crew") ;
+		throw SGFLostCrew("country mismatch with crew");
 	if ( crew->brigadeID() != commander->brigadeID() )
-		throw SGFLostCrew("brigade mismatch with crew") ;
+		throw SGFLostCrew("brigade mismatch with crew");
 	if ( crew->missionID() != commander->missionID() )
-		throw SGFLostCrew("mission mismatch with crew") ;
+		throw SGFLostCrew("mission mismatch with crew");
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -130,26 +130,26 @@ _checkCrew(const UINT32 playerID, const Player* const crew, const Player* const 
 static inline UINT32
 _getMobileSpawn(const Player* const commander, FLOAT64* const x, FLOAT64* const y, FLOAT64* const z)
 {
-	Mission* const mission = commander->mission() ;
+	Mission* const mission = commander->mission();
 	if ( !mission || mission->isMobileSpawnAvailable() == false )
-		return 0 ;
+		return 0;
 
 #if !defined(DOROTHY)
 	///TODO: Determine if the mobile spawn is suitable for the vehicle
 	if ( commander->weapon().spec.wCategory != _INFANTRY )
-		return 0 ;
+		return 0;
 #endif
 
-	MobileSpawn& spawner = mission->spawner() ;
+	MobileSpawn& spawner = mission->spawner();
 
-	*x = spawner.m_x ;
-	*y = spawner.m_y ;
-	*z = spawner.m_z ;
+	*x = spawner.m_x;
+	*y = spawner.m_y;
+	*z = spawner.m_z;
 
 	// Add one to the player's counter
-	spawner.incrementSpawnees(commander->playerID()) ;
+	spawner.incrementSpawnees(commander->playerID());
 
-	return 1 ; // spawner.m_vehicleID ;
+	return 1; // spawner.m_vehicleID;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -160,8 +160,8 @@ _getBestCell(const MM_SPAWN_GRANT_RESPONSE& grant, const Player* const commander
 {
 	Server::ServerInfo* const server = Server::ServerInfo::GetBest(CELL_HOST);
 	if ( server == NULL )
-		throw SGFSpawningDisabled("no cell hosts available for spawning", true) ;
-	return server ;
+		throw SGFSpawningDisabled("no cell hosts available for spawning", true);
+	return server;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -171,11 +171,11 @@ static void
 _sendMapData(Player* const player)
 {
 	if ( player->instance().hasStrat() == false )
-		return ;
+		return;
 
-	const SINT32 cmdrResult = mapSendHostSupercellData(player->teulIndex()) ;
+	const SINT32 cmdrResult = mapSendHostSupercellData(player->teulIndex());
 	if ( cmdrResult < 0 )
-		throw SpawnGrantFailure(SPAWN_ERROR, "Unable to send strat to player", false) ;
+		throw SpawnGrantFailure(SPAWN_ERROR, "Unable to send strat to player", false);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -187,13 +187,13 @@ _determineSpawnCoordinates(const MM_SPAWN_GRANT_RESPONSE& grant, const Player* c
 {
 	if ( commander->m_useCustomSpawnLocation )
 	{
-		*mobileSpawnID = grant.weaponSerial.serial ;
-		*x = commander->m_customSpawnLocation.x ;
-		*y = commander->m_customSpawnLocation.y ;
-		*z = commander->m_customSpawnLocation.z ;
+		*mobileSpawnID = grant.weaponSerial.serial;
+		*x = commander->m_customSpawnLocation.x;
+		*y = commander->m_customSpawnLocation.y;
+		*z = commander->m_customSpawnLocation.z;
 	}
 	else if ( commander->m_wantMobileSpawn )
-		*mobileSpawnID = _getMobileSpawn(commander, x, y, z) ;
+		*mobileSpawnID = _getMobileSpawn(commander, x, y, z);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -203,12 +203,12 @@ static void
 _sendPlayerInfoToCell(Player& player, Server::ServerInfo& server, const MM_SPAWN_GRANT_RESPONSE& grant, const Player& commander, const bool ejectable)
 {
 	// Add the final touches needed to the mission packet.
-	player.missionPacket().sortie().sortieID = grant.weaponSerial.serial ;
-	player.m_flags.canEject = ejectable ;
-	player.missionPacket().player().decal = commander.decal() ;
+	player.missionPacket().sortie().sortieID = grant.weaponSerial.serial;
+	player.m_flags.canEject = ejectable;
+	player.missionPacket().player().decal = commander.decal();
 
 	// Notify the cell host and tell the client's teulkit to connect to it.
-	player.mirrorToCellHost(&server) ;
+	player.mirrorToCellHost(&server);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -217,14 +217,14 @@ _sendPlayerInfoToCell(Player& player, Server::ServerInfo& server, const MM_SPAWN
 static SINT32
 _sendSpawnNotify(Player& player, const MM_SPAWN_GRANT_RESPONSE& grant, const Player& commander, const UINT32& mobileSpawnID, const FLOAT64& x, const FLOAT64& y, const FLOAT64& z)
 {
-	player.setRequestedCapacity(false) ;
-	player.setReceivedCapacity(false) ;
+	player.setRequestedCapacity(false);
+	player.setReceivedCapacity(false);
 
 	return mmSendSpawnNotify(player.teulIndex()
 							, grant.weaponSerial
 							, mobileSpawnID, x, y, z
 							, commander.decal(), commander.isOfficer(), commander.isBuilder(), commander.isMissionLeader()
-							) ;
+							);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -240,70 +240,70 @@ _processSpawnGrantResponse(const MM_SPAWN_GRANT_RESPONSE& grant
 {
 	if ( grant.code != SPAWN_GRANTED )
 	{
-		throw SpawnGrantFailure(grant.code, "strat host denied spawn", true) ;
+		throw SpawnGrantFailure(grant.code, "strat host denied spawn", true);
 	}
 
 	if ( !commander->validMissionPacket() )
-		throw SpawnGrantFailure(SPAWN_DISABLED_BY_SERVER, "commander missing mission packet", true) ;
+		throw SpawnGrantFailure(SPAWN_DISABLED_BY_SERVER, "commander missing mission packet", true);
 
 	// See if there is a server available for them.
-	Server::ServerInfo* const server = _getBestCell(grant, commander) ;
+	Server::ServerInfo* const server = _getBestCell(grant, commander);
 
-	_sendMapData(commander) ;
+	_sendMapData(commander);
 
 	// Check if the crew component is valid.
-	_checkCrew(grant.crew, crew, commander) ;
+	_checkCrew(grant.crew, crew, commander);
 
 	// Tell the cell host about the vehicle.
-	_sendVehicleToCell(grant, *commander, crew, server) ;
+	_sendVehicleToCell(grant, *commander, crew, server);
 
 	// Obtain any pertinent mobile spawn information.
-	FLOAT64 x = 0.0f, y = 0.0f, z = 0.0f ;
-	UINT32 mobileSpawnID = 0 ;
+	FLOAT64 x = 0.0f, y = 0.0f, z = 0.0f;
+	UINT32 mobileSpawnID = 0;
 
-	_determineSpawnCoordinates(grant, commander, &x, &y, &z, &mobileSpawnID) ;
+	_determineSpawnCoordinates(grant, commander, &x, &y, &z, &mobileSpawnID);
 
-	const bool ejectable = (commander->permissions(CAN_BE_EJECTED) || (crew && crew->permissions(CAN_BE_EJECTED))) ;
+	const bool ejectable = (commander->permissions(CAN_BE_EJECTED) || (crew && crew->permissions(CAN_BE_EJECTED)));
 
 	// Add the final touches to the mission packet and
-	_sendPlayerInfoToCell(*commander, *server, grant, *commander, ejectable) ;
+	_sendPlayerInfoToCell(*commander, *server, grant, *commander, ejectable);
 	// Tell the commander's front end to spawn.
-	const SINT32 cmdrResult = _sendSpawnNotify(*commander, grant, *commander, mobileSpawnID, x, y, z) ;
+	const SINT32 cmdrResult = _sendSpawnNotify(*commander, grant, *commander, mobileSpawnID, x, y, z);
 	if ( cmdrResult < 0 )
-		throw SGFSpawningDisabled("error sending spawn notify to player", true) ;
+		throw SGFSpawningDisabled("error sending spawn notify to player", true);
 
-	commander->newSortie(grant.weaponSerial.serial, true) ;
-	commander->SetState(PERS_SPAWNING) ;
-	commander->updateMissionTaker(false) ;
-	commander->updateChat() ;
+	commander->newSortie(grant.weaponSerial.serial, true);
+	commander->SetState(PERS_SPAWNING);
+	commander->updateMissionTaker(false);
+	commander->updateChat();
 
 	if ( crew != NULL )
 	{
-		_sendPlayerInfoToCell(*crew, *server, grant, *commander, ejectable) ;
+		_sendPlayerInfoToCell(*crew, *server, grant, *commander, ejectable);
 		//Tell the crew front end to spawn
-		SINT32 crewResult = _sendSpawnNotify(*crew, grant, *commander, mobileSpawnID, x, y, z) ;
+		SINT32 crewResult = _sendSpawnNotify(*crew, grant, *commander, mobileSpawnID, x, y, z);
 		if ( crewResult < 0 )
 		{
 			dbugLog(_FLW, "t:%d p:%u c:%s error sending spawn notify to crew: %d"
-							, crew->teulIndex(), crew->playerID(), crew->callsign(), crewResult) ;
-			crew->SetWeapon(NULL_WEAP_SERIAL) ;
-			crew->updateMissionTaker(false) ;
-			crew->updateChat() ;
-			crew = NULL ;
+							, crew->teulIndex(), crew->playerID(), crew->callsign(), crewResult);
+			crew->SetWeapon(NULL_WEAP_SERIAL);
+			crew->updateMissionTaker(false);
+			crew->updateChat();
+			crew = NULL;
 		}
 		else
 		{
-			crew->newSortie(grant.weaponSerial.serial, false) ;
-			crew->SetState(PERS_SPAWNING) ;
-			crew->updateMissionTaker(false) ;
-			crew->updateChat() ;
+			crew->newSortie(grant.weaponSerial.serial, false);
+			crew->SetState(PERS_SPAWNING);
+			crew->updateMissionTaker(false);
+			crew->updateChat();
 		}
 	}
 
 	///TODO: Add the "mount" parameter somehow (which vehicle you're riding)
 
-	const Mission* mission = commander->mission() ;
-	const WEAPON_SPEC& spec = commander->weapon().spec ;
+	const Mission* mission = commander->mission();
+	const WEAPON_SPEC& spec = commander->weapon().spec;
 
 	if ( g_logDebug )
 	{
@@ -316,7 +316,7 @@ _processSpawnGrantResponse(const MM_SPAWN_GRANT_RESPONSE& grant
 						, instance.category(), instance.type(), instance.handle(), instance.id()
 						, weapPrintName(&spec), commander->weapon().serial
 						, x, y, z
-						) ;
+						);
 	}
 
 	// Create the sortie record
@@ -339,7 +339,7 @@ _processSpawnGrantResponse(const MM_SPAWN_GRANT_RESPONSE& grant
 			, static_cast<UINT32>(spec.wCountry), static_cast<UINT32>(spec.wCategory), static_cast<UINT32>(spec.wClass), static_cast<UINT32>(spec.wType)
 			, (mission ? mission->missionType() : 0), (mission ? mission->missionID() : 0)
 			, (grant.serverIP & 255)
-	) ;
+	);
 
 	return TRUE;
 }
@@ -347,65 +347,65 @@ _processSpawnGrantResponse(const MM_SPAWN_GRANT_RESPONSE& grant
 void
 mmFakeSpawnGrantResponse(Player* const player, const UINT32 serialNumber)
 {
-	MM_SPAWN_GRANT_RESPONSE grant ;
+	MM_SPAWN_GRANT_RESPONSE grant;
 
-	grant.code = SPAWN_GRANTED ;
-	grant.weaponSerial = player->weapon() ;
-	grant.weaponSerial.serial = serialNumber ;
-	player->SetWeapon(grant.weaponSerial) ;
+	grant.code = SPAWN_GRANTED;
+	grant.weaponSerial = player->weapon();
+	grant.weaponSerial.serial = serialNumber;
+	player->SetWeapon(grant.weaponSerial);
 
-	Server::ServerInfo* const server = Server::ServerInfo::GetBest(CELL_HOST) ;
+	Server::ServerInfo* const server = Server::ServerInfo::GetBest(CELL_HOST);
 	if ( server == NULL )
 	{
 		dbugLog(_FLA, "t:%d p:%u c:%s v:%u No cells available"
 						, player->teulIndex(), player->playerID(), player->callsign()
-						, serialNumber) ;
-		return ;
+						, serialNumber);
+		return;
 	}
 
-	grant.serverIP = server->stats.address ;
+	grant.serverIP = server->stats.address;
 
-	grant.commander = player->playerID() ;
-	grant.crew = 0 ;
+	grant.commander = player->playerID();
+	grant.crew = 0;
 	grant.capacity = 0;
 
-	player->m_wantMobileSpawn = true ;
+	player->m_wantMobileSpawn = true;
 
-	mmProcessSpawnGrantResponse(grant) ;
+	mmProcessSpawnGrantResponse(grant);
 
-	player->m_wantMobileSpawn = false ;
+	player->m_wantMobileSpawn = false;
 }
 
 LOGICAL
 mmProcessSpawnGrantResponse(const MM_SPAWN_GRANT_RESPONSE& grant)
 {
-	PlayerStatusNode* const commandPlayer = ServerInterface::PlayerStatusNodeByPlayerID(grant.commander) ;
+	PlayerStatusNode* const commandPlayer = ServerInterface::PlayerStatusNodeByPlayerID(grant.commander);
 	if ( commandPlayer == NULL )
 	{
-		dbugLog(_FLA, "p:%u v:%u No commandPlayer for vehicle to spawn", grant.commander, grant.weaponSerial.serial) ;
-		return FALSE ;
+		dbugLog(_FLA, "p:%u v:%u No commandPlayer for vehicle to spawn", grant.commander, grant.weaponSerial.serial);
+		return FALSE;
 	}
 
-	Player* const commander = (Player*)commandPlayer->localInfo ;
+	Player* const commander = (Player*)commandPlayer->localInfo;
 	if ( commander == NULL )
 	{
-		dbugLog(_FLA, "p:%u v:%u commander is NULL", grant.commander, grant.weaponSerial.serial) ;
-		return FALSE ;
+		dbugLog(_FLA, "p:%u v:%u commander is NULL", grant.commander, grant.weaponSerial.serial);
+		return FALSE;
 	}
 
-	PlayerStatusNode* crewPlayer = NULL ;
-	Player* crew = NULL ;
+	PlayerStatusNode* crewPlayer = NULL;
+	Player* crew = NULL;
 	if ( grant.crew > 0 )
 	{
-		crewPlayer = ServerInterface::PlayerStatusNodeByPlayerID(grant.crew) ;
+		crewPlayer = ServerInterface::PlayerStatusNodeByPlayerID(grant.crew);
 		if ( crewPlayer != NULL )
-			crew = (Player*)crewPlayer->localInfo ;
+			crew = (Player*)crewPlayer->localInfo;
 	}
 
 	try
 	{
 		// We are basically an evaluation/wrapper shell for _process...
-		return _processSpawnGrantResponse(grant, commander, commandPlayer, crew, crewPlayer) ;
+		return _processSpawnGrantResponse(grant, commander, commandPlayer, crew, crewPlayer);
 	}
 	catch (SpawnGrantFailure& e)
 	{
@@ -418,11 +418,11 @@ mmProcessSpawnGrantResponse(const MM_SPAWN_GRANT_RESPONSE& grant)
 						, e.m_reason
 						, e.m_code
 						, (e.m_loseVehicle ? "yes" : "no")
-						) ;
+						);
 
-		commander->postDenied(grant.weaponSerial.spec, e.m_code, e.m_loseVehicle) ;
+		commander->postDenied(grant.weaponSerial.spec, e.m_code, e.m_loseVehicle);
 	}
 
-	return FALSE ;
+	return FALSE;
 }
 

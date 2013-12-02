@@ -94,7 +94,7 @@ DBQueueThread::run()
 
 	DBThread::DBNo dbNo = DBThread::Default;
 
-	for ( ; ; )
+	for (;; )
 	{
 		DBThreadQuery* query = dbQueue.getNext();
 		if ( query == nullptr )
@@ -400,7 +400,7 @@ StatsThread::run()
 	threadLog(_FLI, "Stats thread active [thread #%u]", std::this_thread::get_id());
 
 	UINT32 count = 0;
-	for ( ; ; )
+	for (;; )
 	{
 		// sleep for 15,000 milliseconds (15 seconds).
 		for (uint32_t i = 0; i < 15 * 10; ++i) {

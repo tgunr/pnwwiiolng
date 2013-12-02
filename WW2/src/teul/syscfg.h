@@ -40,16 +40,16 @@ namespace Teul
 {
 #if !defined(MULTI_CLIENT)
 	// Number of users to support per client (cluster is the host term)
-	static const size_t MaxClusterUsers = 8 ;
+	static const size_t MaxClusterUsers = 8;
 	// How many endpoints teulKit reserve, also limits the
 	// number of concurrent connections.
-	static const size_t	MaxConnections = MaxClusterUsers * 3 + 4 ;
+	static const size_t	MaxConnections = MaxClusterUsers * 3 + 4;
 #else
 	// Number of users to support per client instance (cluster is the host term)
-	static const size_t MaxClusterUsers = 2000 ;
+	static const size_t MaxClusterUsers = 2000;
 	// How many endpoints teulKit reserve, also limits the
 	// number of concurrent connections.
-	static const size_t	MaxConnections = MaxClusterUsers * 3 + (MaxClusterUsers / 4) ;
+	static const size_t	MaxConnections = MaxClusterUsers * 3 + (MaxClusterUsers / 4);
 #endif
 }
 

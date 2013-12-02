@@ -78,7 +78,7 @@ struct imap_joy_calib
 
 	unsigned int iac;
 	float deadband, x, y, fullband;
-} ;
+};
 
 struct imap_axis_calib
 {
@@ -86,7 +86,7 @@ struct imap_axis_calib
 	float mouseY;
 	float aimMouseX, aimMouseY;
 	imap_joy_calib* joystick;
-} ;
+};
 
 static const char* categoryName[WW2_FUNC_NUM_CATEGORIES] =
 {

@@ -110,7 +110,7 @@ struct trnAutoGunType
 	SINT8 FireSound[MAX_COUNTRIES][64]; // sound file used for firing
 	SINT8 ReloadSound[MAX_COUNTRIES][64]; // sound file used for reloads
 
-} ;
+};
 
 typedef struct SpawnData
 {
@@ -235,7 +235,7 @@ struct trnCDTerrainObject
 
 	bool IsCollidable(UINT32 cflags);
 
-} ;
+};
 
 struct trnAutoGun
 {
@@ -306,7 +306,7 @@ struct trnAutoGun
 
 	SINT32 LastLeadCalcTime;
 
-} ;
+};
 
 	extern LOGICAL trncdCheckTerrainCollision(OBJECT* lpobj, COLLISION* collision);
 	extern LOGICAL trncdCheckTerrainDown(COLLISION* collision);

@@ -13,11 +13,11 @@
 const char*
 chatTimeString(time_t timestamp)
 {
-	static const UINT32 bufSize = 30 ;
-	static char timeStr[bufSize+1] ;
+	static const UINT32 bufSize = 30;
+	static char timeStr[bufSize+1];
 
-	struct tm tm ; (void)tm;
-	strftime(timeStr, bufSize, "%a %b %d %T %Z", localtime_r(&timestamp, &tm)) ;
+	struct tm tm; (void)tm;
+	strftime(timeStr, bufSize, "%a %b %d %T %Z", localtime_r(&timestamp, &tm));
 
-	return timeStr ;
+	return timeStr;
 }

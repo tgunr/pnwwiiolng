@@ -84,7 +84,7 @@ static int _luaOS(lua_State* L);
 static int _luaDead(lua_State* L);
 
 // types and locals
-std::vector<const char*> script_args ;
+std::vector<const char*> script_args;
 
 // game lib names
 static char* _gameLibs[GPT_NUM_TYPES] =
@@ -116,23 +116,23 @@ SCRIPT_RESULTS _luaOutput;
 
 static inline void _report(UINT32 level, const char* message)
 {
-	std::string output ;
+	std::string output;
 
 	if ( message == NULL )
-		return ;
+		return;
 
 	// Save the output
 	switch (level)
 	{
-		case Debug::ERR_WARN:	output += "!: " ; break ;
-		case Debug::ERR_FATAL:	output += "<!>: " ; break ;
-		break ;
+		case Debug::ERR_WARN:	output += "!: "; break;
+		case Debug::ERR_FATAL:	output += "<!>: "; break;
+		break;
 	}
 
-	output += message ;
-	output += "\n" ;
+	output += message;
+	output += "\n";
 
-	_luaOutput.push_back(output) ;
+	_luaOutput.push_back(output);
 
 	uiChatPrintLine("LUA(%s): %s", _luaSubSystem.c_str(), output.c_str());
 	//uiConsoleprintf("LUA(%s): %s", _luaSubSystem.c_str(), output.c_str());
@@ -148,7 +148,7 @@ static inline void _report(UINT32 level, const char* message)
 
 char* luaARGS(int i)
 {
-	return ( i >= (int)script_args.size() ) ? NULL : (char*)script_args[i] ;
+	return ( i >= (int)script_args.size() ) ? NULL : (char*)script_args[i];
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -156,9 +156,9 @@ char* luaARGS(int i)
 
 static inline bool _luaError(lua_State* L)
 {
-	error(lua_tostring(L, -1)) ;
-	lua_pop(L, 1) ;
-	return false ;
+	error(lua_tostring(L, -1));
+	lua_pop(L, 1);
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -166,26 +166,26 @@ static inline bool _luaError(lua_State* L)
 
 void _luaContext(const char* source = "?", const char* func = "?")
 {
-	_luaSource = source ;
-	_luaSubSystem = func ;
+	_luaSource = source;
+	_luaSubSystem = func;
 }
 
-static std::string _prevSource = "" ;
-static std::string _prevSub = "" ;
+static std::string _prevSource = "";
+static std::string _prevSub = "";
 
 void luaSetContext(const char* func)
 {
-	_prevSource = _luaSource ;
-	_prevSub = _luaSubSystem ;
+	_prevSource = _luaSource;
+	_prevSub = _luaSubSystem;
 
-	_luaSource = "code" ;
-	_luaSubSystem = func ;
+	_luaSource = "code";
+	_luaSubSystem = func;
 }
 
 void luaEndContext()
 {
-	_luaSource = _prevSource ;
-	_luaSubSystem = _prevSub ;
+	_luaSource = _prevSource;
+	_luaSubSystem = _prevSub;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -303,7 +303,7 @@ lua_State* luaGetVM(bool defaultVM)
 {
 	if(defaultVM && _luaVM != NULL)
 	{
-		uiConsoleprintf("Attempted to restart active default vm") ;
+		uiConsoleprintf("Attempted to restart active default vm");
 		return _luaVM;
 	}
 
@@ -314,7 +314,7 @@ lua_State* luaGetVM(bool defaultVM)
 
 	if (vm == NULL)
 	{
-		uiConsoleprintf("Unable to start lua interpreter") ;
+		uiConsoleprintf("Unable to start lua interpreter");
 		return NULL;
 	}
 
@@ -346,8 +346,8 @@ lua_State* luaGetVM(bool defaultVM)
 
 bool luaStopVM(lua_State* L)
 {
-	_luaContext() ;
-	_luaOutput.clear() ;
+	_luaContext();
+	_luaOutput.clear();
 
 	uiConsoleprintf("Stopping Lua VM");
 
@@ -355,14 +355,14 @@ bool luaStopVM(lua_State* L)
 	{
 		if(_luaVM)
 		{
-			lua_close(_luaVM) ;
-			_luaVM = NULL ;
+			lua_close(_luaVM);
+			_luaVM = NULL;
 			return true;
 		}
 	}
 	else
 	{
-		lua_close(L) ;
+		lua_close(L);
 		return true;
 	}
 
@@ -374,7 +374,7 @@ bool luaStopVM(lua_State* L)
 
 SCRIPT_RESULTS& luaResults()
 {
-	return _luaOutput ;
+	return _luaOutput;
 }
 
 int luaLoadLib(GAME_PKG_TYPE type, lua_State* L)

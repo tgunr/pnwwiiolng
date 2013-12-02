@@ -25,7 +25,7 @@
 
 static inline bool _invalidTeulIndex(SINT32 teulIndex)
 {
-	return ( teulIndex < 0 ) ;
+	return ( teulIndex < 0 );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -34,7 +34,7 @@ static inline bool _invalidTeulIndex(SINT32 teulIndex)
 
 static inline bool _invalidBrigade(UINT32 brigadeID)
 {
-	return ( brigadeID <= 0 || brigadeID >= 0x8000 ) ;
+	return ( brigadeID <= 0 || brigadeID >= 0x8000 );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -43,9 +43,9 @@ static inline bool _invalidBrigade(UINT32 brigadeID)
 static inline bool _invalidCountryBranch(UCHAR country, UCHAR branch)
 {
 	if ( country >= MAX_COUNTRIES || branch >= MAX_BRANCHES )
-		return true ;
+		return true;
 	// If branch is zero, country must be too.
-	return ( branch == 0 && country != 0 ) ;
+	return ( branch == 0 && country != 0 );
 }
 
 //	------------------------------	BrigadeControl (base class)
@@ -65,13 +65,13 @@ static inline bool _invalidCountryBranch(UCHAR country, UCHAR branch)
 bool BrigadeControlRequest::requestList(SINT32 teulIndex, UCHAR country, UCHAR branch)
 {
 	if ( _invalidTeulIndex(teulIndex) || _invalidCountryBranch(country, branch) )
-		return false ;
+		return false;
 
-	m_action = REQ_LIST ;
-	m_country = country ;
-	m_branch = branch ;
+	m_action = REQ_LIST;
+	m_country = country;
+	m_branch = branch;
 
-	return send(teulIndex) ;
+	return send(teulIndex);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -80,12 +80,12 @@ bool BrigadeControlRequest::requestList(SINT32 teulIndex, UCHAR country, UCHAR b
 bool BrigadeControlRequest::volunteerOIC(SINT32 teulIndex, UINT32 brigade)
 {
 	if ( _invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) )
-		return false ;
+		return false;
 
-	m_action = REQ_VOLUNTEER ;
-	m_brigadeID = brigade ;
+	m_action = REQ_VOLUNTEER;
+	m_brigadeID = brigade;
 
-	return send(teulIndex) ;
+	return send(teulIndex);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -95,13 +95,13 @@ bool BrigadeControlRequest::volunteerOIC(SINT32 teulIndex, UINT32 brigade)
 bool BrigadeControlRequest::nominateOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle& nomineeHandle)
 {
 	if ( _invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) || !chatIsValidHandle(nomineeHandle) )
-		return false ;
+		return false;
 
-	m_action = REQ_NOMINATE ;
-	m_brigadeID = brigade ;
-	m_officer = nomineeHandle ;
+	m_action = REQ_NOMINATE;
+	m_brigadeID = brigade;
+	m_officer = nomineeHandle;
 
-	return send(teulIndex) ;
+	return send(teulIndex);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -110,13 +110,13 @@ bool BrigadeControlRequest::nominateOIC(SINT32 teulIndex, UINT32 brigade, const 
 bool BrigadeControlRequest::vetoOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle& onHandle)
 {
 	if ( _invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) || !chatIsValidHandle(onHandle) )
-		return false ;
+		return false;
 
-	m_action = REQ_VETO ;
-	m_brigadeID = brigade ;
-	m_officer = onHandle ;
+	m_action = REQ_VETO;
+	m_brigadeID = brigade;
+	m_officer = onHandle;
 
-	return send(teulIndex) ;
+	return send(teulIndex);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -126,12 +126,12 @@ bool BrigadeControlRequest::vetoOIC(SINT32 teulIndex, UINT32 brigade, const Chat
 bool BrigadeControlRequest::resignOIC(SINT32 teulIndex, UINT32 brigade)
 {
 	if ( _invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) )
-		return false ;
+		return false;
 
-	m_action = REQ_RESIGN ;
-	m_brigadeID = brigade ;
+	m_action = REQ_RESIGN;
+	m_brigadeID = brigade;
 
-	return send(teulIndex) ;
+	return send(teulIndex);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -141,13 +141,13 @@ bool BrigadeControlRequest::resignOIC(SINT32 teulIndex, UINT32 brigade)
 bool BrigadeControlRequest::replaceOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle& oldHandle)
 {
 	if ( _invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) || !chatIsValidHandle(oldHandle) )
-		return false ;
+		return false;
 
-	m_action = REQ_REPLACE ;
-	m_brigadeID = brigade ;
-	m_officer = oldHandle ;
+	m_action = REQ_REPLACE;
+	m_brigadeID = brigade;
+	m_officer = oldHandle;
 
-	return send(teulIndex) ;
+	return send(teulIndex);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -157,13 +157,13 @@ bool BrigadeControlRequest::replaceOIC(SINT32 teulIndex, UINT32 brigade, const C
 bool BrigadeControlRequest::removeOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle& oicHandle)
 {
 	if ( _invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) || !chatIsValidHandle(oicHandle) )
-		return false ;
+		return false;
 
-	m_action = REQ_REMOVE ;
-	m_brigadeID = brigade ;
-	m_officer = oicHandle ;
+	m_action = REQ_REMOVE;
+	m_brigadeID = brigade;
+	m_officer = oicHandle;
 
-	return send(teulIndex) ;
+	return send(teulIndex);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -173,19 +173,19 @@ bool BrigadeControlRequest::removeOIC(SINT32 teulIndex, UINT32 brigade, const Ch
 bool BrigadeControlRequest::requestBrigadeMove(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID& destination, const FULL_OBJ_ID& origin)
 {
 	if ( _invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) )
-		return false ;
+		return false;
 
 	// You must specify where you want to move it to and where you want to move it from
 	if ( !destination.id || !origin.id )
-		return false ;
+		return false;
 
-	m_action = REQ_MOVE ;
-	m_brigadeID = brigade ;
-	m_officer = destination.Key() ;
-	m_target = destination ;
-	m_origin = origin ;
+	m_action = REQ_MOVE;
+	m_brigadeID = brigade;
+	m_officer = destination.Key();
+	m_target = destination;
+	m_origin = origin;
 
-	return send(teulIndex) ;
+	return send(teulIndex);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -195,19 +195,19 @@ bool BrigadeControlRequest::requestBrigadeMove(SINT32 teulIndex, UINT32 brigade,
 bool BrigadeControlRequest::vetoBrigadeMove(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID& destination, const FULL_OBJ_ID& origin)
 {
 	if ( _invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) )
-		return false ;
+		return false;
 
 	// You must specify where you want to move it to and where you want to move it from
 	if ( !destination.id || !origin.id )
-		return false ;
+		return false;
 
-	m_action = REQ_VETO ;
-	m_brigadeID = brigade ;
-	m_officer = destination.Key() ;
-	m_target = destination ;
-	m_origin = origin ;
+	m_action = REQ_VETO;
+	m_brigadeID = brigade;
+	m_officer = destination.Key();
+	m_target = destination;
+	m_origin = origin;
 
-	return send(teulIndex) ;
+	return send(teulIndex);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -216,70 +216,70 @@ bool BrigadeControlRequest::vetoBrigadeMove(SINT32 teulIndex, UINT32 brigade, co
 bool BrigadeControlRequest::vetoObjective(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID& target)
 {
 	if ( _invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) )
-		return false ;
+		return false;
 
 	// You must specify where you want to move it to and where you want to move it from
 	if ( !target.id )
-		return false ;
+		return false;
 
-	m_action = REQ_VETO ;
-	m_brigadeID = brigade ;
-	m_officer = target.Key() ;
-	m_target = target ;
-	m_origin = nullObjID ;
+	m_action = REQ_VETO;
+	m_brigadeID = brigade;
+	m_officer = target.Key();
+	m_target = target;
+	m_origin = nullObjID;
 
-	return send(teulIndex) ;
+	return send(teulIndex);
 }
 
 bool BrigadeControlRequest::requestAttack(SINT32 teulIndex, const FULL_OBJ_ID& destination)
 {
 	if ( _invalidTeulIndex(teulIndex) )
-		return false ;
+		return false;
 
 	// You must specify where you want to move it to and where you want to move it from
 	if ( !destination.id )
-		return false ;
+		return false;
 
-	m_action = REQ_ATTACK ;
-	m_brigadeID = 0 ;
-	m_officer = destination.Key() ;
-	m_target = destination ;
+	m_action = REQ_ATTACK;
+	m_brigadeID = 0;
+	m_officer = destination.Key();
+	m_target = destination;
 
-	return send(teulIndex) ;
+	return send(teulIndex);
 }
 
 bool BrigadeControlRequest::requestDefend(SINT32 teulIndex, const FULL_OBJ_ID& destination)
 {
-	if ( _invalidTeulIndex(teulIndex) )
-		return false ;
+	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex)) )
+		return false;
 
 	// You must specify where you want to move it to and where you want to move it from
-	if ( !destination.id )
-		return false ;
+	if ( PN_UNLIKELY(!destination.id) )
+		return false;
 
-	m_action = REQ_DEFEND ;
-	m_brigadeID = 0 ;
-	m_officer = destination.Key() ;
-	m_target = destination ;
+	m_action = REQ_DEFEND;
+	m_brigadeID = 0;
+	m_officer = destination.Key();
+	m_target = destination;
 
-	return send(teulIndex) ;
+	return send(teulIndex);
 }
 
 bool BrigadeControlRequest::requestClear(SINT32 teulIndex, const FULL_OBJ_ID& destination)
 {
-	if ( _invalidTeulIndex(teulIndex) )
-		return false ;
+	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex)) )
+		return false;
 
 	// You must specify where you want to move it to and where you want to move it from
-	if ( !destination.id )
-		return false ;
+	if ( PN_UNLIKELY(!destination.id) )
+		return false;
 
-	m_action = REQ_CLEAR ;
-	m_brigadeID = 0 ;
-	m_officer = destination.Key() ;
-	m_target = destination ;
+	m_action = REQ_CLEAR;
+	m_brigadeID = 0;
+	m_officer = destination.Key();
+	m_target = destination;
 
-	return send(teulIndex) ;
+	return send(teulIndex);
 }
 
 //	------------------------------	BrigadeControlNotice
@@ -296,7 +296,7 @@ void BrigadeControlNotice::processNotice()
 	// that gophur was removed from another brigade before you get
 	// your response to your request...
 
-	PlayerClient()->ProcessBrigadeControlNotice(this) ;
+	PlayerClient()->ProcessBrigadeControlNotice(this);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -356,7 +356,7 @@ BrigadeControlDescriptor BrigadeControlNotice::getDescription() const
 				case REQ_ATTACK:
 				case REQ_DEFEND:
 				case REQ_CLEAR:
-					return BCD_Objective(this, "proposal.objective", false) ;
+					return BCD_Objective(this, "proposal.objective", false);
 			}
 		}
 		break;
@@ -371,7 +371,7 @@ BrigadeControlDescriptor BrigadeControlNotice::getDescription() const
 				case REQ_ATTACK:
 				case REQ_DEFEND:
 				case REQ_CLEAR:
-					return BCD_Objective(this, "vetoed.objective", false) ;
+					return BCD_Objective(this, "vetoed.objective", false);
 			}
 		}
 		break;

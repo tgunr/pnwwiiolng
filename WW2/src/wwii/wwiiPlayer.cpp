@@ -25,30 +25,30 @@
 #include "mem/mem.h"
 
 // Allocate in blocks of 64 at a time.
-static const UINT32 _CALLOC_RATE = 64 ;
+static const UINT32 _CALLOC_RATE = 64;
 // How fast to grow the pool indexes (to avoid allocations)
-static const UINT32 _POOL_GROWTH_RATE = 1024 ;
+static const UINT32 _POOL_GROWTH_RATE = 1024;
 // Rounding size (how big each allocation is rounded up to)
-static const size_t _ROUNDING = 1023 ;
+static const size_t _ROUNDING = 1023;
 // Maximum number of pools to have (max size of a player)
-static const UINT32 _MAX_POOLS = 3 ;
+static const UINT32 _MAX_POOLS = 3;
 
-static std::mutex allocMutex ;
-typedef UINT64 StorageHeader ;
-typedef	std::vector<UINT64*> Pool ;
-static UINT32 _callocs = 0 ;
-static UINT32 _reserved = 0 ;
-static UINT32 _inUse = 0 ;
-static UINT32 _news = 0 ;
-static UINT32 _frees = 0 ;
+static std::mutex allocMutex;
+typedef UINT64 StorageHeader;
+typedef	std::vector<UINT64*> Pool;
+static UINT32 _callocs = 0;
+static UINT32 _reserved = 0;
+static UINT32 _inUse = 0;
+static UINT32 _news = 0;
+static UINT32 _frees = 0;
 // Pools are ONE BASED, i.e. pools[0] is actually the
 // pool for objects with a non-zero size.
-static Pool pools[_MAX_POOLS] ;
+static Pool pools[_MAX_POOLS];
 
 // Callback registration for sending localized messages.
 namespace Chat
 {
-	TEUL_CALLBACK*	_SEND_LOCALIZED_MESSAGE ;
+	TEUL_CALLBACK*	_SEND_LOCALIZED_MESSAGE;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -58,8 +58,8 @@ namespace Chat
 static inline size_t
 _normalizeObjectSize(size_t actualSize)
 {
-	assert( actualSize > 0 ) ;
-	return (actualSize + sizeof(StorageHeader) + _ROUNDING) & ~_ROUNDING ;
+	assert( actualSize > 0 );
+	return (actualSize + sizeof(StorageHeader) + _ROUNDING) & ~_ROUNDING;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -68,16 +68,16 @@ _normalizeObjectSize(size_t actualSize)
 static inline UINT32
 _getPoolNo(size_t allocSize)
 {
-	assert( (allocSize & _ROUNDING) == 0 ) ;
+	assert( (allocSize & _ROUNDING) == 0 );
 
-	UINT32 poolNo = (UINT32)(allocSize / (_ROUNDING + 1)) ;
+	UINT32 poolNo = (UINT32)(allocSize / (_ROUNDING + 1));
 	// This will always be > 1. "pools" is 1 based so we
 	// must subtract one to get the poolNo
-	poolNo = poolNo - 1 ;
+	poolNo = poolNo - 1;
 
-	assert( poolNo < _MAX_POOLS ) ;
+	assert( poolNo < _MAX_POOLS );
 
-	return poolNo ;
+	return poolNo;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -103,12 +103,12 @@ wwiiPlayer::operator new(size_t actualSize)
 	// boundaries we can avoid pool fragmentation by sharing
 	// the same blocks for different sized structs. So I use
 	// multiple pools indexed by (normalized size / boundary)
-	size_t allocSize = _normalizeObjectSize(actualSize) ;
-	UINT32 poolNo = _getPoolNo(allocSize) ;
+	size_t allocSize = _normalizeObjectSize(actualSize);
+	UINT32 poolNo = _getPoolNo(allocSize);
 
-	Pool& pool = pools[poolNo] ;
+	Pool& pool = pools[poolNo];
 
-	StorageHeader* ptr = NULL ;
+	StorageHeader* ptr = NULL;
 
 	// We'll need a lock.
 	auto* lock = new std::lock_guard<std::mutex>(allocMutex);
@@ -117,52 +117,52 @@ wwiiPlayer::operator new(size_t actualSize)
 	if ( pool.empty() )
 	{
 		if ( pool.capacity() < _POOL_GROWTH_RATE )
-			pool.reserve(_POOL_GROWTH_RATE) ;
+			pool.reserve(_POOL_GROWTH_RATE);
 
 		// calloc: so that we have pre-zero'd memory.
-		void* block = memCalloc(_CALLOC_RATE, allocSize) ;
-		_callocs++ ;
+		void* block = memCalloc(_CALLOC_RATE, allocSize);
+		_callocs++;
 		if ( block == NULL )
 		{
 			delete lock;
 			throw std::bad_alloc();
 		}
 
-		_reserved += _CALLOC_RATE ;
+		_reserved += _CALLOC_RATE;
 
 		// Now we need to split this block up into units
 		// and feed them backwards onto the pool
-		for ( UINT32 i = 1 ; i <= _CALLOC_RATE ; ++i )
+		for ( UINT32 i = 1; i <= _CALLOC_RATE; ++i )
 		{
-			StorageHeader* alloc = (StorageHeader*)((char*)block + (_CALLOC_RATE - i) * allocSize) ;
-			pool.push_back(alloc) ;
+			StorageHeader* alloc = (StorageHeader*)((char*)block + (_CALLOC_RATE - i) * allocSize);
+			pool.push_back(alloc);
 		}
 	}
 
 	// Grab the last entry off the vector
-	ptr = pool.back() ;
-	pool.pop_back() ;
+	ptr = pool.back();
+	pool.pop_back();
 
 	// Adjust counters
-	_reserved-- ;
-	_inUse++ ;
-	_news++ ;
+	_reserved--;
+	_inUse++;
+	_news++;
 
 	delete lock;
 
-	assert( ptr != NULL ) ;
+	assert( ptr != NULL );
 
 	if ( *ptr != 0 )
 	{
 		// Initialized, so it needs to be cleaned
-		memset(ptr, 0, allocSize) ;
+		memset(ptr, 0, allocSize);
 	}
-	*ptr = allocSize ;
+	*ptr = allocSize;
 
-	dbugLog(_FLD, "+player[%" PRSizeT " => pool #%u:%" PRSizeT "] => %p", actualSize, poolNo, allocSize, ptr) ;
+	dbugLog(_FLD, "+player[%" PRSizeT " => pool #%u:%" PRSizeT "] => %p", actualSize, poolNo, allocSize, ptr);
 
 	// Return the address of data after StorageHeader
-	return ++ptr ;
+	return ++ptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -172,15 +172,15 @@ void
 wwiiPlayer::operator delete(void* p)
 {
 	// Each player allocation actually carries a secret "size" value.
-	StorageHeader* ptr = static_cast<StorageHeader*>(p) - 1 ;
+	StorageHeader* ptr = static_cast<StorageHeader*>(p) - 1;
 
 	// Make sure storage header is good data
-	UINT32 poolNo = _getPoolNo((size_t)*ptr) ;
-	Pool& pool = pools[poolNo] ;
+	UINT32 poolNo = _getPoolNo((size_t)*ptr);
+	Pool& pool = pools[poolNo];
 
-	dbugLog(_FLD, "-player[%" PRSizeT " => pool #%u:%" PRSizeT "] => %p", (size_t)*ptr, poolNo, (size_t)*ptr, ptr) ;
+	dbugLog(_FLD, "-player[%" PRSizeT " => pool #%u:%" PRSizeT "] => %p", (size_t)*ptr, poolNo, (size_t)*ptr, ptr);
 
-	size_t newSize = 0 ;
+	size_t newSize = 0;
 
 	{
 		std::lock_guard<std::mutex> lock(allocMutex);
@@ -191,22 +191,22 @@ wwiiPlayer::operator delete(void* p)
 		// increment in advance.
 		if ( pool.size() + 1 >= pool.capacity() )
 		{
-			newSize = pool.capacity() + _POOL_GROWTH_RATE ;
-			pool.reserve(newSize) ;
+			newSize = pool.capacity() + _POOL_GROWTH_RATE;
+			pool.reserve(newSize);
 		}
 
 		// Push it onto the back of the pool
-		pool.push_back(ptr) ;
+		pool.push_back(ptr);
 
 		// Adjust counters
-		_reserved++ ;
-		_inUse-- ;
-		_frees++ ;
+		_reserved++;
+		_inUse--;
+		_frees++;
 	}
 
 	if ( newSize > 0 )
 	{
-		dbugLog(_FLD, "playerPool#%u grown to %" PRSizeT " spaces", poolNo, newSize) ;
+		dbugLog(_FLD, "playerPool#%u grown to %" PRSizeT " spaces", poolNo, newSize);
 	}
 }
 
@@ -221,7 +221,7 @@ wwiiPlayer::logStats()
 					, _callocs
 					, _news, _frees
 					, _reserved, _inUse
-					) ;
+					);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -230,37 +230,37 @@ wwiiPlayer::logStats()
 wwiiPlayer&
 wwiiPlayer::operator=(const wwiiPlayer* const rhs)
 {
-	m_hostInstance = NULL ;
-	m_instance = Instance::g_invalid ;
+	m_hostInstance = NULL;
+	m_instance = Instance::g_invalid;
 
-	m_teulIndex = -EINVAL ;
-	m_playerID = rhs->m_playerID ;
-	m_personaID = rhs->m_personaID ;
-	m_squadID = rhs->m_squadID ;
-	m_brigadeID = rhs->m_brigadeID ;
-	m_missionID = rhs->m_missionID ;
-	m_sortieID = rhs->m_sortieID ;
-	m_side = WWII_NO_SIDE ;
-	m_country = WWII_NO_COUNTRY ;
-	m_branch = rhs->m_branch ;
-	m_maxRank = rhs->m_maxRank ;
-	m_maxSquadRank = rhs->m_maxSquadRank ;
-	m_realRank = rhs->m_realRank ;
-	m_realSquadRank = rhs->m_realSquadRank ;
-	m_weaponSpecNo = rhs->m_weaponSpecNo ;
-	m_chatHandle = rhs->m_chatHandle ;
-	m_matchHandle = rhs->m_matchHandle ;
-	m_squadHandle = rhs->m_squadHandle ;
-	m_permissionMask = rhs->m_permissionMask ;
+	m_teulIndex = -EINVAL;
+	m_playerID = rhs->m_playerID;
+	m_personaID = rhs->m_personaID;
+	m_squadID = rhs->m_squadID;
+	m_brigadeID = rhs->m_brigadeID;
+	m_missionID = rhs->m_missionID;
+	m_sortieID = rhs->m_sortieID;
+	m_side = WWII_NO_SIDE;
+	m_country = WWII_NO_COUNTRY;
+	m_branch = rhs->m_branch;
+	m_maxRank = rhs->m_maxRank;
+	m_maxSquadRank = rhs->m_maxSquadRank;
+	m_realRank = rhs->m_realRank;
+	m_realSquadRank = rhs->m_realSquadRank;
+	m_weaponSpecNo = rhs->m_weaponSpecNo;
+	m_chatHandle = rhs->m_chatHandle;
+	m_matchHandle = rhs->m_matchHandle;
+	m_squadHandle = rhs->m_squadHandle;
+	m_permissionMask = rhs->m_permissionMask;
 	// Do not copy m_instance
 	// Do not copy m_hostInstance
-	m_flags = rhs->m_flags ;
-	m_dispatch = rhs->m_dispatch ;
+	m_flags = rhs->m_flags;
+	m_dispatch = rhs->m_dispatch;
 
-	SetCountry(rhs->m_country, rhs->m_side) ;
-	SetInstance(rhs->m_instance) ;
+	SetCountry(rhs->m_country, rhs->m_side);
+	SetInstance(rhs->m_instance);
 
-	return *this ;
+	return *this;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -269,12 +269,12 @@ wwiiPlayer::operator=(const wwiiPlayer* const rhs)
 void
 wwiiPlayer::SetDispatch(const Auth::Dispatch& rhs, UINT32 overridingCustomerID)
 {
-	m_dispatch.m_customerID = (overridingCustomerID) ? overridingCustomerID : rhs.m_customerID ;
-	m_dispatch.m_OTP = rhs.m_OTP ;
-	strncpy(m_dispatch.m_callsign, rhs.m_callsign, sizeof(m_dispatch.m_callsign)) ;
-	m_dispatch.m_callsign[sizeof(m_dispatch.m_callsign) - 1] = 0 ;
-	m_dispatch.m_clientIP = rhs.m_clientIP ;
-	m_dispatch.m_appVersion = rhs.m_appVersion ;
+	m_dispatch.m_customerID = (overridingCustomerID) ? overridingCustomerID : rhs.m_customerID;
+	m_dispatch.m_OTP = rhs.m_OTP;
+	strncpy(m_dispatch.m_callsign, rhs.m_callsign, sizeof(m_dispatch.m_callsign));
+	m_dispatch.m_callsign[sizeof(m_dispatch.m_callsign) - 1] = 0;
+	m_dispatch.m_clientIP = rhs.m_clientIP;
+	m_dispatch.m_appVersion = rhs.m_appVersion;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -292,14 +292,14 @@ wwiiPlayer::log(const char* msg) const
 void
 wwiiPlayer::log(const char* file, int lineno, unsigned int errType, const char* mask, ...) const
 {
-	if ( errType == Debug::ERR_DBUG && !g_logDebug ) return ;
+	if ( errType == Debug::ERR_DBUG && !g_logDebug ) return;
 
-	static char buf[512] ;
+	static char buf[512];
 
-	va_list args ;
-	va_start(args, mask) ;
-	vsnprintf(buf, 511, mask, args) ;
-	va_end(args) ;
+	va_list args;
+	va_start(args, mask);
+	vsnprintf(buf, 511, mask, args);
+	va_end(args);
 
 	dbugLog(file, lineno, errType
 				, "t:%d p:%u c:%s in:%u.%u.%llu.%llu %s"
@@ -315,9 +315,9 @@ bool
 wwiiPlayer::isEffectiveGM() const
 {
 #if defined(TRAINING_SERVER) || defined(BETA_RELEASE) || defined(FRES)
-	return permissions(IS_PLAYNET | GAME_MANAGER | GAME_TRAINER) ;
+	return permissions(IS_PLAYNET | GAME_MANAGER | GAME_TRAINER);
 #else
-	return permissions(IS_PLAYNET | GAME_MANAGER) ;
+	return permissions(IS_PLAYNET | GAME_MANAGER);
 #endif
 }
 
@@ -327,7 +327,7 @@ wwiiPlayer::isEffectiveGM() const
 bool
 wwiiPlayer::noSide() const
 {
-	return false == isValidSide(side()) ;
+	return false == isValidSide(side());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -336,14 +336,14 @@ wwiiPlayer::noSide() const
 void
 wwiiPlayer::_setCallsign(const char* to, bool isPlayerPlaynet)
 {
-	m_matchHandle = chatGetLowercaseHandle(to) ;
-	memset(m_dispatch.m_callsign, 0, sizeof(m_dispatch.m_callsign)) ;
-	chatGetCallsign(m_dispatch.m_callsign, m_matchHandle) ;
+	m_matchHandle = chatGetLowercaseHandle(to);
+	memset(m_dispatch.m_callsign, 0, sizeof(m_dispatch.m_callsign));
+	chatGetCallsign(m_dispatch.m_callsign, m_matchHandle);
 	if ( isPlayerPlaynet )
-		strupr(m_dispatch.m_callsign) ;
+		strupr(m_dispatch.m_callsign);
 	else
-		strlwr(m_dispatch.m_callsign) ;
-	m_chatHandle = chatGetHandle(m_dispatch.m_callsign) ;
+		strlwr(m_dispatch.m_callsign);
+	m_chatHandle = chatGetHandle(m_dispatch.m_callsign);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -352,12 +352,12 @@ wwiiPlayer::_setCallsign(const char* to, bool isPlayerPlaynet)
 void
 wwiiPlayer::Release(SINT32 onTeulIndex, int releaseType)
 {
-	bool closeRequired = (onTeulIndex >= 0 && onTeulIndex == m_teulIndex) ;
-	this->m_teulIndex = -1 ;
-	serverReleasePlayer(onTeulIndex, this->playerID(), this->OTP(), PEXIT_DEAD, (Server::ReleaseType)releaseType) ;
+	bool closeRequired = (onTeulIndex >= 0 && onTeulIndex == m_teulIndex);
+	this->m_teulIndex = -1;
+	serverReleasePlayer(onTeulIndex, this->playerID(), this->OTP(), PEXIT_DEAD, (Server::ReleaseType)releaseType);
 
 	if ( closeRequired )
-		teulClose(onTeulIndex, Teul::Closing::PlayerDtor) ;
+		teulClose(onTeulIndex, Teul::Closing::PlayerDtor);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -367,9 +367,9 @@ bool
 wwiiPlayer::isOfficer() const
 {
 	if ( side() == ALLIED )
-		return permissions(ALLIED_COMMAND_STAFF) ;
+		return permissions(ALLIED_COMMAND_STAFF);
 	else if ( side() == AXIS )
-		return permissions(AXIS_COMMAND_STAFF) ;
-	return false ;
+		return permissions(AXIS_COMMAND_STAFF);
+	return false;
 }
 

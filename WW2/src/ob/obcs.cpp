@@ -38,7 +38,7 @@
 #include "ogl/oglShadow.h"
 #endif
 
-static Covert<LOGICAL> _doCull(TRUE) ;
+static Covert<LOGICAL> _doCull(TRUE);
 
 typedef std::vector<SORTHEADER*> SortVector;
 
@@ -1699,7 +1699,7 @@ OBJECT* nxtprev;
 
 	dir = *lpdir;
 
-	for (lpobj=lpobjorig ; lpobj ; lpobj=lpobj->next)
+	for (lpobj=lpobjorig; lpobj; lpobj=lpobj->next)
 	{
 		if (lpobj->flags & OBJECT_NOTOBJECT)
 		{
@@ -1747,7 +1747,7 @@ OBJECT* nxtprev;
 			}
 		}
 
-		for ( ; lpobj && lpnxt ; )
+		for (; lpobj && lpnxt; )
 		{
 			if (lpobj->distsqr > lpnxt->distsqr)
 			{
@@ -1810,7 +1810,7 @@ OBJECT* nxtprev;
 			}
 		}
 
-		for ( ; lpobj && lpnxt ; )
+		for (; lpobj && lpnxt; )
 		{
 			if (lpobj->texid > lpnxt->texid)
 			{
@@ -1899,7 +1899,7 @@ piINDICES*		pt;
 	piVectorConstPtr pos = lpobj->RenderPositions();
 	num = lpobj->numtris;
 	pt = lpobj->ptris;
-	for (i=0 ; i < num-1 ; i++)
+	for (i=0; i < num-1; i++)
 	{
 		math3dSubtractVectors(&pv1, &pos[pt[i].v1], &pp);
 		math3dSubtractVectors(&pv2, &pos[pt[i].v2], &pp);
@@ -1908,7 +1908,7 @@ piINDICES*		pt;
 		math3dAddVectors(&pv1, &pv1, &pv3);
 		d1 = math3dDotProduct(&pv1, &pv1);
 
-		for (j=i+1 ; j < num ; j++)
+		for (j=i+1; j < num; j++)
 		{
 			math3dSubtractVectors(&pv1, &pos[pt[j].v1], &pp);
 			math3dSubtractVectors(&pv2, &pos[pt[j].v2], &pp);

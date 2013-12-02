@@ -202,7 +202,7 @@ bool TerrainSTO::activate()
 #ifdef BETA_RELEASE
 	if(0)
 	{
-		char buf[150] ;
+		char buf[150];
 		sprintf(buf, "[activate] Terrain model: %s id:%d", model(), (int)uid());
 		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_BETA, LSTR_GENERIC, UTF16(buf));
 	}
@@ -365,7 +365,7 @@ bool TerrainSTO::load()
 #ifdef BETA_RELEASE
 	if(0)
 	{
-		char buf[150] ;
+		char buf[150];
 		sprintf(buf, "Added MSP terrain object %s at %.2f,%.2f,%.2f", _to->name, _to->mat._41, _to->mat._42, _to->mat._43);
 		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_BETA, LSTR_GENERIC, UTF16(buf));
 	}
@@ -403,7 +403,7 @@ void TerrainSTO::deactivate()
 #ifdef BETA_RELEASE
 	if(0)
 	{
-		char buf[150] ;
+		char buf[150];
 		sprintf(buf, "[deactivate] Terrain model: %s id:%d", model(), (int)uid());
 		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_BETA, LSTR_GENERIC, UTF16(buf));
 	}

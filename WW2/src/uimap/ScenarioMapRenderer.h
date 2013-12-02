@@ -11,7 +11,7 @@
 class ScenarioMapRenderer : public SuperCellMapView::Renderer
 {
 public:
-	ScenarioMapRenderer() {} ;
+	ScenarioMapRenderer() {};
 	~ScenarioMapRenderer() {};
 
 	virtual SuperCell* NewSuperCell(Renderer*, int scx, int scy);

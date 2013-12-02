@@ -309,7 +309,7 @@ bool rnmainGetOnlineSetting()
 			return false;
 		}
 
-		GamePort = WWII::Net::Ports::MapHost ;
+		GamePort = WWII::Net::Ports::MapHost;
 		CommType = PROTOCOL_TCP;
 		GameOTP = strtoul(ServerOTP, NULL, 10);
 
@@ -317,7 +317,7 @@ bool rnmainGetOnlineSetting()
 		if(GameOTP == 0)
 		{
 			GameOTP = AUTH_BYPASS_OTP;
-			snprintf(ServerOTP, sizeof(ServerOTP)-1, "%u", GameOTP) ;
+			snprintf(ServerOTP, sizeof(ServerOTP)-1, "%u", GameOTP);
 		}
 #endif
 	}
@@ -333,7 +333,7 @@ bool rnmainGetOnlineSetting()
 			return false;
 		}
 
-		GamePort = WWII::Net::Ports::MapHost ;
+		GamePort = WWII::Net::Ports::MapHost;
 		CommType = TCP;
 		GameOTP = AUTH_BYPASS_OTP;
 #else
@@ -369,7 +369,7 @@ static bool _connectClientToGameNetwork()
 {
 	try
 	{
-		UINT32 appversion = 0 ;
+		UINT32 appversion = 0;
 
 		rnlogoUpdateStatus("loading.network");
 
@@ -379,10 +379,10 @@ static bool _connectClientToGameNetwork()
 			teulSetNetworkMask(GameHost);
 
 		if ( GameClientLogin(GameHost, BypassID, GameOTP, appversion, GamePort) < 0 )
-			throw ClientNetError(-1, "connect.fail") ;
+			throw ClientNetError(-1, "connect.fail");
 
 		if ( PlayerClient()->ChatConnection() < 0 )
-			throw ClientNetError(-1, "connect.chat.fail") ;
+			throw ClientNetError(-1, "connect.chat.fail");
 	}
 	catch (ClientNetError& e)
 	{
@@ -570,13 +570,13 @@ LOGICAL rnmainInit(void)
 		try
 		{
 			StratDB::StratObject* strat = StratDB::FindStratObject("Antwerp");
-			HCUnit* hcUnit = new HCUnit(WWII_ENGLAND, HCU_BRIGADE, 0, WWII_ENGLAND, BRANCH_LAND, BRANCH_LAND, 9, 0, "English Training Brigade", "1.uk", 1, (strat) ? *strat->FullObjID(): nullObjID, 0, 0) ;
+			HCUnit* hcUnit = new HCUnit(WWII_ENGLAND, HCU_BRIGADE, 0, WWII_ENGLAND, BRANCH_LAND, BRANCH_LAND, 9, 0, "English Training Brigade", "1.uk", 1, (strat) ? *strat->FullObjID(): nullObjID, 0, 0);
 
 			strat = StratDB::FindStratObject("Lier");
-			hcUnit = new HCUnit(WWII_FRANCE, HCU_BRIGADE, 0, WWII_FRANCE, BRANCH_LAND, BRANCH_LAND, 9, 0, "French Training Brigade", "1.fr", 1, (strat) ? *strat->FullObjID(): nullObjID, 0, 0) ;
+			hcUnit = new HCUnit(WWII_FRANCE, HCU_BRIGADE, 0, WWII_FRANCE, BRANCH_LAND, BRANCH_LAND, 9, 0, "French Training Brigade", "1.fr", 1, (strat) ? *strat->FullObjID(): nullObjID, 0, 0);
 
 			strat = StratDB::FindStratObject("Schilde");
-			hcUnit = new HCUnit(WWII_GERMANY, HCU_BRIGADE, 0, WWII_GERMANY, BRANCH_LAND, BRANCH_LAND, 9, 0, "German Training Brigade", "1.de", 1, (strat) ? *strat->FullObjID(): nullObjID, 0, 0) ;
+			hcUnit = new HCUnit(WWII_GERMANY, HCU_BRIGADE, 0, WWII_GERMANY, BRANCH_LAND, BRANCH_LAND, 9, 0, "German Training Brigade", "1.de", 1, (strat) ? *strat->FullObjID(): nullObjID, 0, 0);
 		}
 		catch(std::runtime_error)
 		{
@@ -1259,7 +1259,7 @@ UINT32 rnmainGetZBufferNearVal(FLOAT32* ZBufferNearVal)
 #if(0)
 static void OutputStatusMessageToFile(SINT8* File, SINT32 Line, SINT8* MessageString)
 {
-	FILE* ExitLog = Fio::OpenLogFile() ;
+	FILE* ExitLog = Fio::OpenLogFile();
 
 	Write_Debug("Status handler information...");
 
@@ -1472,7 +1472,7 @@ static LOGICAL _ParseCommandArgs(UINT32* host, UINT16* port, UINT16* protocol, U
 	*port = (UINT16)strtoul(ServerPort, NULL, 10);
 	*protocol = PROTOCOL_TCP;
 
-	*otp = strtoul(ServerOTP, NULL, 10) ;
+	*otp = strtoul(ServerOTP, NULL, 10);
 
 	return TRUE;
 

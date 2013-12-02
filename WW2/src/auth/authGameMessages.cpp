@@ -58,7 +58,7 @@ SINT32 authInstallGameCallbacks(ERROR_FUNCTION* externErrorFn)
 
 	//Global values
 	ci.error		= _errorFn;
-	ci.callX		= Auth::CallbackX ;
+	ci.callX		= Auth::CallbackX;
 
 	//The recv function setup
 	ci.callY		= AUTH_DISPATCH_Y;
@@ -72,7 +72,7 @@ SINT32 authInstallGameCallbacks(ERROR_FUNCTION* externErrorFn)
 	ci.sendAction	= _sendGAME_INIT;
 	ci.recvAction	= nullptr;
 
-	if ( (authGAME_INIT = teulAllocCallback(&ci)) == NULL)
+	if ( PN_UNLIKELY((authGAME_INIT = teulAllocCallback(&ci)) == nullptr) )
 		return (0-dbugGetErrno());
 
 	//The send function setup
@@ -80,7 +80,7 @@ SINT32 authInstallGameCallbacks(ERROR_FUNCTION* externErrorFn)
 	ci.sendAction	= nullptr;
 	ci.recvAction	= _recvPlayerLogin;
 
-	if ( (_PLAYER_LOGIN = teulAllocCallback(&ci)) == NULL)
+	if ( PN_UNLIKELY((_PLAYER_LOGIN = teulAllocCallback(&ci)) == nullptr) )
 		return (0-dbugGetErrno());
 
 	//The send function setup
@@ -88,7 +88,7 @@ SINT32 authInstallGameCallbacks(ERROR_FUNCTION* externErrorFn)
 	ci.sendAction	= _sendPlayerLoginReply;
 	ci.recvAction	= nullptr;
 
-	if ( (_PLAYER_LOGIN_REPLY = teulAllocCallback(&ci)) == NULL)
+	if ( PN_UNLIKELY((_PLAYER_LOGIN_REPLY = teulAllocCallback(&ci)) == nullptr) )
 		return (0-dbugGetErrno());
 
 	//The game ack recv callback
@@ -96,7 +96,7 @@ SINT32 authInstallGameCallbacks(ERROR_FUNCTION* externErrorFn)
 	ci.sendAction	= nullptr;
 	ci.recvAction	= _recvGAME_ACK;
 
-	if ( (_AUTH_GAME_ACK = teulAllocCallback(&ci)) == NULL)
+	if ( PN_UNLIKELY((_AUTH_GAME_ACK = teulAllocCallback(&ci)) == nullptr) )
 		return (0-dbugGetErrno());
 
 	//The managementMsg send function setup
@@ -104,7 +104,7 @@ SINT32 authInstallGameCallbacks(ERROR_FUNCTION* externErrorFn)
 	ci.sendAction	= _sendManagementMsg;
 	ci.recvAction	= nullptr;
 
-	if ( (_MANAGEMENT_MSG = teulAllocCallback(&ci)) == NULL)
+	if ( PN_UNLIKELY((_MANAGEMENT_MSG = teulAllocCallback(&ci)) == nullptr) )
 		return (0-dbugGetErrno());
 
 	//server load send msg
@@ -112,7 +112,7 @@ SINT32 authInstallGameCallbacks(ERROR_FUNCTION* externErrorFn)
 	ci.sendAction	= _sendServerLoad;
 	ci.recvAction	= nullptr;
 
-	if ( (authSERVER_LOAD = teulAllocCallback(&ci)) == NULL)
+	if ( PN_UNLIKELY((authSERVER_LOAD = teulAllocCallback(&ci)) == nullptr) )
 		return (0-dbugGetErrno());
 
 	//game capacity send msg
@@ -120,7 +120,7 @@ SINT32 authInstallGameCallbacks(ERROR_FUNCTION* externErrorFn)
 	ci.sendAction	= _sendGameCapacity;
 	ci.recvAction	= nullptr;
 
-	if ( (authGAME_CAPACITY = teulAllocCallback(&ci)) == NULL)
+	if ( PN_UNLIKELY((authGAME_CAPACITY = teulAllocCallback(&ci)) == nullptr) )
 		return (0-dbugGetErrno());
 
 	//The setup for the login init message
@@ -128,7 +128,7 @@ SINT32 authInstallGameCallbacks(ERROR_FUNCTION* externErrorFn)
 	ci.sendAction	= _sendClearLoginTable;
 	ci.recvAction	= nullptr;
 
-	if ( (_INIT_LOGIN = teulAllocCallback(&ci)) == NULL)
+	if ( PN_UNLIKELY((_INIT_LOGIN = teulAllocCallback(&ci)) == nullptr) )
 		return (0-dbugGetErrno());
 
 #ifdef DEBUG
@@ -141,7 +141,7 @@ SINT32 authInstallGameCallbacks(ERROR_FUNCTION* externErrorFn)
 //Send game capacity function
 static SINT32 _sendGameCapacity(ACTION_OBJECT* const a)
 {
-	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(AUTH_GAME_CAPACITY)) ;
+	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(AUTH_GAME_CAPACITY));
 }
 
 //Send function
@@ -158,11 +158,11 @@ static void _errorFn(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*siz
 //Send function
 static SINT32 _sendPlayerLoginReply(ACTION_OBJECT* const a)
 {
-	PLAYER_LOGIN_REPLY* reply = (PLAYER_LOGIN_REPLY*)(a->localRawData) ;
-	a->packer(TEUL_PACK, reply->attemptID) ;
-	a->packer(TEUL_PACK, reply->resultCode) ;
+	PLAYER_LOGIN_REPLY* reply = (PLAYER_LOGIN_REPLY*)(a->localRawData);
+	a->packer(TEUL_PACK, reply->attemptID);
+	a->packer(TEUL_PACK, reply->resultCode);
 
-	return a->offset ;
+	return a->offset;
 }
 
 static SINT32 _sendGAME_INIT(ACTION_OBJECT* const a)
@@ -189,53 +189,53 @@ _recvPlayerLogin(ACTION_OBJECT* const a)
 {
 	PLAYER_LOGIN login;
 
-    SINT32 acceptResult = 0 ;
-    SINT32 sendResult = 0 ;
+    SINT32 acceptResult = 0;
+    SINT32 sendResult = 0;
 
 	try
 	{
-		a->offset = login.packer(TEUL_UNPACK, a->packed, a->offset) ;
-		if ( a->offset < 0 )
-			throw std::logic_error("unable to unpack player login") ;
+		a->offset = login.packer(TEUL_UNPACK, a->packed, a->offset);
+		if ( PN_UNLIKELY(a->offset < 0) )
+			throw std::logic_error("unable to unpack player login");
 
-		char versionNo[4 * 6 + 1] ;
-		teulGetAddress(login.appVersion, versionNo, sizeof(versionNo) - 1) ;
-		dbugLog(_FLI, "t:%d otp:%u app:%s crs:%s", a->teulIndex, login.OTP, versionNo, login.CopyRightString) ;
+		char versionNo[4 * 6 + 1];
+		teulGetAddress(login.appVersion, versionNo, sizeof(versionNo) - 1);
+		dbugLog(_FLI, "t:%d otp:%u app:%s crs:%s", a->teulIndex, login.OTP, versionNo, login.CopyRightString);
 
-		UINT32 destAddress = a->endpoint->destAddress() ;
+		UINT32 destAddress = a->endpoint->destAddress();
 
-		PLAYER_LOGIN_REPLY reply ;
-		reply.attemptID = login.attemptID ;
+		PLAYER_LOGIN_REPLY reply;
+		reply.attemptID = login.attemptID;
 		reply.resultCode = authAcceptPlayer(a->teulIndex, destAddress, login);
-		sendResult = teulSend(a->teulIndex, _PLAYER_LOGIN_REPLY, &reply) ;
+		sendResult = teulSend(a->teulIndex, _PLAYER_LOGIN_REPLY, &reply);
 
-		if ( sendResult < 0 )
-			throw std::logic_error("send of acceptResult failed") ;
+		if ( PN_UNLIKELY(sendResult < 0) )
+			throw std::logic_error("send of acceptResult failed");
 
-		if ( acceptResult < 0 )
-			throw std::logic_error("acceptResult failed closing conn") ;
+		if ( PN_UNLIKELY(acceptResult < 0) )
+			throw std::logic_error("acceptResult failed closing conn");
 
-		return a->offset ;
+		return a->offset;
 	}
 	catch (std::exception& e)
 	{
-		dbugLog(_FLA, "t:%d %s. off:%d, sr:%d, ar:%d", a->teulIndex, e.what(), a->offset, sendResult, acceptResult) ;
-		teulClose(a->teulIndex, Teul::Closing::AuthLoginExcept) ;
-		return -EINVAL ;
+		dbugLog(_FLA, "t:%d %s. off:%d, sr:%d, ar:%d", a->teulIndex, e.what(), a->offset, sendResult, acceptResult);
+		teulClose(a->teulIndex, Teul::Closing::AuthLoginExcept);
+		return -EINVAL;
 	}
 	catch ( ... )
 	{
-		dbugLog(_FLA, "t:%d !!!Unhandled exception!!! off:%d, sr:%d, ar:%d", a->teulIndex, a->offset, sendResult, acceptResult) ;
-		teulClose(a->teulIndex, Teul::Closing::AuthLoginErr) ;
-		return -EINVAL ;
+		dbugLog(_FLA, "t:%d !!!Unhandled exception!!! off:%d, sr:%d, ar:%d", a->teulIndex, a->offset, sendResult, acceptResult);
+		teulClose(a->teulIndex, Teul::Closing::AuthLoginErr);
+		return -EINVAL;
 	}
 }
 
 static SINT32 _recvDISPATCH(ACTION_OBJECT* const a)
 {
-	Auth::Dispatch dispatch ;
+	Auth::Dispatch dispatch;
 
-	dispatch.packer(TEUL_UNPACK, a) ;
+	dispatch.packer(TEUL_UNPACK, a);
 
 	authRecordDispatch(&dispatch, true);
 
@@ -249,7 +249,7 @@ static SINT32 _recvGAME_ACK(ACTION_OBJECT* const a)
 
 	a->offset = authPackGAME_ACK(TEUL_UNPACK, a->packed, a->offset, &ack, 0);
 
-	if (ack.gotcha != AUTH_HELLO_VALID)
+	if ( PN_UNLIKELY(ack.gotcha != AUTH_HELLO_VALID) )
 		return -EINVAL;
 
 	return a->offset;
@@ -260,14 +260,14 @@ static SINT32 _recvGAME_ACK(ACTION_OBJECT* const a)
 // <costomerID> the customer ID of the client.
 // <gameID> the game that is being played.
 // <actionType> action (login, logout, etc..)
-// <timestamp> when the action occured.
+// <timestamp> when the action occurred.
 SINT32
 authSendClientAction(SINT32 connection, UINT32 arenaID, UINT32 customerID, CLIENT_ACTIONS action, UINT32 ip)
 {
-	dbugLog(_FLD, "p:%u a:%u ca:%u ip:%u sending client action to auth", customerID, arenaID, action, ip) ;
-	MANAGEMENT_MSG managementMsg(customerID, arenaID, action, ip) ;
-	SINT32 retval = teulSend(connection, _MANAGEMENT_MSG, &managementMsg) ;
-	if ( retval < 0 )
+	dbugLog(_FLD, "p:%u a:%u ca:%u ip:%u sending client action to auth", customerID, arenaID, action, ip);
+	MANAGEMENT_MSG managementMsg(customerID, arenaID, action, ip);
+	SINT32 retval = teulSend(connection, _MANAGEMENT_MSG, &managementMsg);
+	if ( PN_UNLIKELY(retval < 0) )
 		dbugLog(_FLA, "sending management message returned %d", retval);
 
 	return retval;

@@ -18,13 +18,13 @@ extern bool mapInitPersonaDataForCustomer(Player* player, UINT32 playerID);
 extern LOGICAL mapSaveMissionResults(class MissionPacket* packet);
 extern void mapSaveErrorInfo(class Player& player, struct WWII_ERROR_INFO& info);
 
-extern void mapSaveRank(const class Player* player, bool immediate) ;
+extern void mapSaveRank(const class Player* player, bool immediate);
 
 // Request a persona list for a particular player
-extern void mapRequestPersonaSummaryList(const class Player* player) ;
+extern void mapRequestPersonaSummaryList(const class Player* player);
 
-extern void mapCloseOpenSorties(UINT32 ip) ;
+extern void mapCloseOpenSorties(UINT32 ip);
 
-extern void mapRequestTutProgress(const playerid_t playerID, SINT32 teulIndex) ;
+extern void mapRequestTutProgress(const playerid_t playerID, SINT32 teulIndex);
 
-extern void mapLoadWeaponIndexes() ;
+extern void mapLoadWeaponIndexes();

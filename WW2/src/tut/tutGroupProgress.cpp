@@ -23,7 +23,7 @@ namespace Tutorial
 GroupProgress::GroupProgress(ACTION_OBJECT* const a)
 	: m_groupHandle(0LL), m_flags(0L)
 {
-	this->packer(TEUL_UNPACK, a) ;
+	this->packer(TEUL_UNPACK, a);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -32,8 +32,8 @@ GroupProgress::GroupProgress(ACTION_OBJECT* const a)
 void
 GroupProgress::packer(LOGICAL mode, ACTION_OBJECT* a)
 {
-	a->packChatHandle(mode, &m_groupHandle) ;
-	a->packer(mode, &m_flags) ;
+	a->packChatHandle(mode, &m_groupHandle);
+	a->packer(mode, &m_flags);
 }
 
 }

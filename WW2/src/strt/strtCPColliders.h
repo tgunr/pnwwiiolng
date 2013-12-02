@@ -11,9 +11,9 @@
 //
 
 // Build the collider set - run once
-extern void strtBuildCPColliders() ;
+extern void strtBuildCPColliders();
 
 // Given specific meter coordinates, find the closest CP
-class CPStruct ;
-extern CPStruct* strtFindClosestCP(SINT32 x, SINT32 y) ;
+class CPStruct;
+extern CPStruct* strtFindClosestCP(SINT32 x, SINT32 y);
 

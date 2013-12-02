@@ -27,102 +27,102 @@ public:
 
 	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
 	{
-		bool listAll = false ;
+		bool listAll = false;
 
-		ARGV argv ;
-		int argc = vectorize(arguments, argv, 2) ;
+		ARGV argv;
+		int argc = vectorize(arguments, argv, 2);
 
 		if ( argc > 0 && strcasecmp(argv[0], "-all") == 0 )
 		{
-			listAll = true ;
-			argv.erase(argv.begin()) ;
-			argc-- ;
+			listAll = true;
+			argv.erase(argv.begin());
+			argc--;
 		}
 
 		if ( argc != 1 )
 		{
-			help(player) ;
-			return ;
+			help(player);
+			return;
 		}
 
-		SquadList* list = chatFindSquadListByName(argv[0]) ;
+		SquadList* list = chatFindSquadListByName(argv[0]);
 		if ( list == NULL )
 		{
 			if ( chatCheckForSquadName(argv[0]) )
 			{
-				player.message(LSTR_CAUTION, LSTR_NO_SUCH_SQUAD, argv[0]) ;
-				return ;
+				player.message(LSTR_CAUTION, LSTR_NO_SUCH_SQUAD, argv[0]);
+				return;
 			}
 
-			player.message(LSTR_NOTE, LSTR_SQUAD_NOT_ONLINE, argv[0]) ;
-			return ;
+			player.message(LSTR_NOTE, LSTR_SQUAD_NOT_ONLINE, argv[0]);
+			return;
 		}
 
 		// No more than once per minute
 		if ( _featureLockedM(player, 1) )
-			return ;
+			return;
 
-		const Squad& squad = list->squad() ;
-		std::string response = "" ;
+		const Squad& squad = list->squad();
+		std::string response = "";
 		response += chatMakeTempString("Sq#%u %s: %s. Online: %u/%u.\n"
 									, squad.squadID()
 									, squad.callsign().c_str()
 									, squad.name().c_str()
 									, list->online()
-									, list->members().size()) ;
-		response += chatMakeTempString("Created: %s by %s. ", chatTimeString(squad.created()), chatGetCallsign(squad.creatorHandle())) ;
-		response += chatMakeTempString("CO: %s. ", chatGetCallsign(squad.coHandle())) ;
-		response += chatMakeTempString("R: %s. ", squad.recruiting() ? "Yes" : "No") ;
-		response += chatMakeTempString("V: %s. ", squad.recruiting() ? "Yes" : "No") ;
-		response += chatMakeTempString("URL: %s", squad.homepage().c_str()) ;
-		player.message(LSTR_NOTE, LSTR_GENERIC, response.c_str()) ;
+									, list->members().size());
+		response += chatMakeTempString("Created: %s by %s. ", chatTimeString(squad.created()), chatGetCallsign(squad.creatorHandle()));
+		response += chatMakeTempString("CO: %s. ", chatGetCallsign(squad.coHandle()));
+		response += chatMakeTempString("R: %s. ", squad.recruiting() ? "Yes" : "No");
+		response += chatMakeTempString("V: %s. ", squad.recruiting() ? "Yes" : "No");
+		response += chatMakeTempString("URL: %s", squad.homepage().c_str());
+		player.message(LSTR_NOTE, LSTR_GENERIC, response.c_str());
 
 		if ( !listAll && list->online() == 0 )
-			return ;
+			return;
 
-		response = "" ;
-		SQUAD_MEMBERS::iterator it ;
-		LSTRING_ID lstrID = LSTR_TEXT_START ;
-		std::string entry = "" ;
+		response = "";
+		SQUAD_MEMBERS::iterator it;
+		LSTRING_ID lstrID = LSTR_TEXT_START;
+		std::string entry = "";
 
-		for ( it = list->begin() ; it != list->end() ; ++it )
+		for ( it = list->begin(); it != list->end(); ++it )
 		{
-			SquadMemberEntry& member = it->second ;
+			SquadMemberEntry& member = it->second;
 
 			if ( !listAll && !member.player() )
-				continue ;
+				continue;
 
 
 			if ( listAll )
 			{
 				if ( !response.empty() )
-					response += " " ;
-				entry = chatGetCallsign(it->first) ;
+					response += " ";
+				entry = chatGetCallsign(it->first);
 			}
 			else
 			{
 				if ( !response.empty() )
-					response += ", " ;
-				const Player* subject = member.player() ;
-				entry = "" ;
-				subject->addName(entry) ;
+					response += ", ";
+				const Player* subject = member.player();
+				entry = "";
+				subject->addName(entry);
 			}
 
 			if ( response.length() + entry.length() + 2 >= MAX_MESSAGE_LENGTH )
 			{
-				player.message(LSTR_NONE, lstrID, response.c_str()) ;
-				lstrID = LSTR_TEXT ;
-				response = "" ;
+				player.message(LSTR_NONE, lstrID, response.c_str());
+				lstrID = LSTR_TEXT;
+				response = "";
 			}
 
-			response += entry ;
+			response += entry;
 		}
 
 		if ( response.length() )
 		{
-			lstrID = (lstrID == LSTR_TEXT_START) ? LSTR_GENERIC : LSTR_TEXT_END ;
-			player.message(LSTR_NONE, lstrID, response.c_str()) ;
+			lstrID = (lstrID == LSTR_TEXT_START) ? LSTR_GENERIC : LSTR_TEXT_END;
+			player.message(LSTR_NONE, lstrID, response.c_str());
 		}
 	}
-} dotListSquad ;
+} dotListSquad;
 

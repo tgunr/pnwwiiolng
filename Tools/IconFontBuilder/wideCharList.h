@@ -5,7 +5,7 @@
 // I didn't move the structure into a header for the WW2 project because of it's size
 /////////////////////////////////////
 
-const unsigned int WIDE_CHARACTERS = 6827 ;
+const unsigned int WIDE_CHARACTERS = 6827;
 const wchar_t s_wideCharacters[WIDE_CHARACTERS] = 
 {	// The latin characters we support followed by
 	// table of Chinse characters based on GB2312

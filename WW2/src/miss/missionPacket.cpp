@@ -18,43 +18,43 @@
 void
 MissionPacket::discardSortieData()
 {
-	resetHitArray() ;
+	resetHitArray();
 
-	scoring().hits = 0 ;
-	scoring().kills = 0 ;
-	scoring().captures = 0 ;
-	scoring().defends = 0 ;
-	scoring().aiKills = 0 ;
-	scoring().aiRepairs = 0 ;
-	scoring().bridgeKills = 0 ;
-	scoring().bridgeRepairs = 0 ;
-	scoring().factoryKills = 0 ;
-	scoring().firebaseKills = 0 ;
-	scoring().resupplies = 0 ;
-	scoring().resuppliesScored = 0 ;
-	scoring().guardingKills = 0 ;
-	scoring().cappingKills = 0 ;
-	scoring().umsKills = 0 ;
-	scoring().guardingPoints = 0 ;
-	scoring().spawnees = 0 ;
-	scoring().uniqueHits = 0 ;
-	scoring().vehtypesHit = 0 ;
-	scoring().points = 0 ;
+	scoring().hits = 0;
+	scoring().kills = 0;
+	scoring().captures = 0;
+	scoring().defends = 0;
+	scoring().aiKills = 0;
+	scoring().aiRepairs = 0;
+	scoring().bridgeKills = 0;
+	scoring().bridgeRepairs = 0;
+	scoring().factoryKills = 0;
+	scoring().firebaseKills = 0;
+	scoring().resupplies = 0;
+	scoring().resuppliesScored = 0;
+	scoring().guardingKills = 0;
+	scoring().cappingKills = 0;
+	scoring().umsKills = 0;
+	scoring().guardingPoints = 0;
+	scoring().spawnees = 0;
+	scoring().uniqueHits = 0;
+	scoring().vehtypesHit = 0;
+	scoring().points = 0;
 
-	vehicle().killedBy = 0ULL ;
+	vehicle().killedBy = 0ULL;
 
-	m_killScore = 0.0f ;
-	wasSuccessful = false ;
-	m_altF4ed = false ;
-	m_vehicleResupplied = false ;
-	m_saved = false ;
+	m_killScore = 0.0f;
+	wasSuccessful = false;
+	m_altF4ed = false;
+	m_vehicleResupplied = false;
+	m_saved = false;
 /*
-	m_killedBy = 0ULL ;
+	m_killedBy = 0ULL;
 	///TODO:SCORING: Replace
-	rtbPromotion = false ;
-	spawnTime = returnTime = 0 ;
-	spawnCapacity = despawnCapacity = 0 ;
-	missionScore = 0 ;
+	rtbPromotion = false;
+	spawnTime = returnTime = 0;
+	spawnCapacity = despawnCapacity = 0;
+	missionScore = 0;
 */
 }
 

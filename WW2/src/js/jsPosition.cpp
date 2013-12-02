@@ -226,9 +226,9 @@ jsBoundingBox::jsBoundingBox(StratDB::StratObject const* strat)
 		leftx = rightx = strat->PosX();
 		topy = bottomy = strat->PosY();
 
-		StratDB::StratObject::ChildList const& children = strat->ChildStratObjects() ;
+		StratDB::StratObject::ChildList const& children = strat->ChildStratObjects();
 		StratDB::StratObject::ChildList::const_iterator it;
-		for(it = children.begin() ; it != children.end() ; ++it)
+		for(it = children.begin(); it != children.end(); ++it)
 		{
 			if((*it)->StratType() != SDM_FACILITY_FIREBASE)
 			{

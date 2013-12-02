@@ -59,7 +59,7 @@ SINT32 piFindBitShift(UINT32 Mask)
 {
 SINT32 i;
 
-	for (i=0, Mask=~Mask ; Mask & 1 ; Mask>>=1, i++) /* Empty */ ;
+	for (i=0, Mask=~Mask; Mask & 1; Mask>>=1, i++) /* Empty */;
 
 	return(i);
 }
@@ -774,7 +774,7 @@ void piSetTextureMatrix(const piMATRIX* newtexmat)
 
 void piExitProgram(const SINT8* file, SINT32 line, const SINT8* MessageString)
 {
-	FILE* fp = Fio::OpenLogFile() ;
+	FILE* fp = Fio::OpenLogFile();
 
 #if platOS == OS_WIN32
 #ifdef CRASH_HANDLER
@@ -786,12 +786,12 @@ void piExitProgram(const SINT8* file, SINT32 line, const SINT8* MessageString)
 #if defined(DEBUG_WW2) || defined(BETA_RELEASE)
 	if(MessageString)
 	{
-		char msgFmt[] = "Application crashed and will now exit.\n\nFile: %s\nLine: %u\nMessage: %s\n" ;
-		const size_t fileNameLen = strlen(file) ;
-		const size_t msgLen = strlen(MessageString) ;
-		char* msg   = (char*)alloca(sizeof(msgFmt) + fileNameLen + msgLen + 16) ;
-		sprintf(msg, msgFmt, file, line, MessageString) ;
-		MessageBoxA(NULL, msg, "Application crash/exit", MB_ICONERROR | MB_OK) ;
+		char msgFmt[] = "Application crashed and will now exit.\n\nFile: %s\nLine: %u\nMessage: %s\n";
+		const size_t fileNameLen = strlen(file);
+		const size_t msgLen = strlen(MessageString);
+		char* msg   = (char*)alloca(sizeof(msgFmt) + fileNameLen + msgLen + 16);
+		sprintf(msg, msgFmt, file, line, MessageString);
+		MessageBoxA(NULL, msg, "Application crash/exit", MB_ICONERROR | MB_OK);
 	}
 #endif
 	PostMessageA(myhwnd, WM_CLOSE, 0, 0);
@@ -808,7 +808,7 @@ void piExitProgram(const SINT8* file, SINT32 line, const SINT8* MessageString)
 		printf("Message string: %s\n", MessageString);
 	}
 	if ( fp != NULL )
-		fclose(fp) ;
+		fclose(fp);
 
 #endif
 

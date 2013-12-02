@@ -8,8 +8,8 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-class CPStruct ;
-class DBQuery ;
+class CPStruct;
+class DBQuery;
 
 // Pass the base of the CP list to this function and it will save the world to the database quickly
-extern void strtdbSaveWorld(CPStruct* cp, DBQuery& query) ;
+extern void strtdbSaveWorld(CPStruct* cp, DBQuery& query);

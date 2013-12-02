@@ -47,47 +47,47 @@ public:
 	virtual ~SquadRename() {}
 
 protected:
-	ChatHandle	m_requester ;
-	std::string	m_from ;
-	std::string	m_to ;
-	size_t		m_affectedRows ;
+	ChatHandle	m_requester;
+	std::string	m_from;
+	std::string	m_to;
+	size_t		m_affectedRows;
 
 	virtual bool Process(const size_t numRows)
 	{
-		m_affectedRows = Query()->AffectedRows() ;
+		m_affectedRows = Query()->AffectedRows();
 
-		return true ;
+		return true;
 	}
 
 	virtual void Success()
 	{
 		if ( m_affectedRows == 0 )
-			return Failure() ;
+			return Failure();
 
 		if ( m_affectedRows > 1 )
-			threadLog(_FLA, "Updated multiple squads during rename!") ;
+			threadLog(_FLA, "Updated multiple squads during rename!");
 
-		Player* player = PlayerInterface::Lookup(m_requester) ;
+		Player* player = PlayerInterface::Lookup(m_requester);
 		if ( player == NULL )
-			return ;
+			return;
 
-		chatRenameSquad(m_from.c_str(), m_to.c_str()) ;
+		chatRenameSquad(m_from.c_str(), m_to.c_str());
 
 		///LOCALIZE
 		const char* message =
-			chatMakeTempString("%s has renamed squad '%s' to '%s'.", player->callsign(), m_from.c_str(), m_to.c_str()) ;
-		chatDispatchGMMessage("INFO", message) ;
+			chatMakeTempString("%s has renamed squad '%s' to '%s'.", player->callsign(), m_from.c_str(), m_to.c_str());
+		chatDispatchGMMessage("INFO", message);
 	}
 
 	virtual void Failure()
 	{
-		Player* player = PlayerInterface::Lookup(m_requester) ;
+		Player* player = PlayerInterface::Lookup(m_requester);
 		if ( player == NULL )
-			return ;
+			return;
 
-		player->message(LSTR_CAUTION, LSTR_DB_QUERY_FAILED, "rename squad", "Database error") ;
+		player->message(LSTR_CAUTION, LSTR_DB_QUERY_FAILED, "rename squad", "Database error");
 	}
-} ;
+};
 
 //////////////////////////////////////////////////////////////////////
 // Check the validity of a name
@@ -95,33 +95,33 @@ protected:
 static bool
 _checkName(char* name, bool isCurrent, Player& player)
 {
-	size_t len = strlen(name) ;
+	size_t len = strlen(name);
 	if ( len < 2 || len > MAX_HANDLE_LEN )
 	{
-		player.message(LSTR_CAUTION, LSTR_INVALID_SQUAD_NAME, name) ;
-		return false ;
+		player.message(LSTR_CAUTION, LSTR_INVALID_SQUAD_NAME, name);
+		return false;
 	}
 
-	ChatHandle id = chatGetHandle(name) ;
+	ChatHandle id = chatGetHandle(name);
 	if ( !chatIsValidCallsign(name) || id == 0 || strcmp(name, chatGetCallsign(id)) != 0 )
 	{
-		player.message(LSTR_CAUTION, LSTR_INVALID_SQUAD_NAME, name) ;
-		return false ;
+		player.message(LSTR_CAUTION, LSTR_INVALID_SQUAD_NAME, name);
+		return false;
 	}
 
 	if ( chatCheckForSquadName(id) != isCurrent )
 	{
 		if ( isCurrent )
-			player.message(LSTR_CAUTION, LSTR_NO_SUCH_SQUAD, name) ;
+			player.message(LSTR_CAUTION, LSTR_NO_SUCH_SQUAD, name);
 		else
-			player.message(LSTR_CAUTION, LSTR_SQUAD_ALREADY_EXISTS, name) ;
-		return false ;
+			player.message(LSTR_CAUTION, LSTR_SQUAD_ALREADY_EXISTS, name);
+		return false;
 	}
 
 	// Just to make absolutely sure the string is sanitized, reverse engineer it
-	chatGetCallsign(name, id) ;
+	chatGetCallsign(name, id);
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -135,36 +135,36 @@ public:
 
 	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
 	{
-		ARGV argv ;
+		ARGV argv;
 
 		// Usage: renamesquad <from> <to>
 		if ( vectorize(arguments, argv, 3) != 2 )
 		{
-			help(player) ;
-			return ;
+			help(player);
+			return;
 		}
 
-		char from[MAX_HANDLE_SIZE] ;
-		char to[MAX_HANDLE_SIZE] ;
-		strcpy(from, argv[0]) ;
-		strcpy(to, argv[1]) ;
+		char from[MAX_HANDLE_SIZE];
+		char to[MAX_HANDLE_SIZE];
+		strcpy(from, argv[0]);
+		strcpy(to, argv[1]);
 
 		if ( !_checkName(from, true, player) )
-			return ;
+			return;
 
 		if ( strcmp(from, to) == 0 )
 		{
-			player.message(LSTR_CAUTION, LSTR_SQUAD_OLD_AND_NEW_SAME) ;
-			return ;
+			player.message(LSTR_CAUTION, LSTR_SQUAD_OLD_AND_NEW_SAME);
+			return;
 		}
 
-		bool isCaseChange = (strcasecmp(from, to) == 0) ;
+		bool isCaseChange = (strcasecmp(from, to) == 0);
 		if ( !isCaseChange && !_checkName(to, false, player) )
-			return ;
+			return;
 
-		player.gmNote("GM", command(), arguments, NULL) ;
+		player.gmNote("GM", command(), arguments, NULL);
 
-		(new SquadRename(player.matchHandle(), from, to))->Queue() ;
+		(new SquadRename(player.matchHandle(), from, to))->Queue();
 	}
 
-} dotRenameSquad ;
+} dotRenameSquad;

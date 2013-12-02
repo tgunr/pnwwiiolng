@@ -25,4 +25,4 @@ extern SINT32 missionSendExit(SINT32 hostIndex, UINT32 cancelMissionID=0);
 //! @param[in] teulIndex The teulindex to send the request on (map connection).
 //! @param[in] sortieID The sortie ID we want details for (should be last sortie).
 //! @returns Negative error code on error, otherwise 0 or greater.
-extern SINT32 missRequestMissionResults(const SINT32 teulIndex, const UINT32 sortieID) ;
+extern SINT32 missRequestMissionResults(const SINT32 teulIndex, const UINT32 sortieID);

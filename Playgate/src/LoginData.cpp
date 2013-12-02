@@ -12,14 +12,14 @@
 
 // ------------------------------ Public Variables
 
-LoginData loginData ;
+LoginData loginData;
 
 // ------------------------------ Local Variables
 
-static const wchar_t*	HistoryFilename = L"lg.dat" ;
-static		 wchar_t	HistoryFilePath[512] ;
-static const UINT32		Guard1Value = 0xf1aca8c3 ;
-static const UINT32		Guard2Value = 0xa1c349ab ;
+static const wchar_t*	HistoryFilename = L"lg.dat";
+static		 wchar_t	HistoryFilePath[512];
+static const UINT32		Guard1Value = 0xf1aca8c3;
+static const UINT32		Guard2Value = 0xa1c349ab;
 
 // ------------------------------ Member Functions
 
@@ -34,10 +34,10 @@ LoginData::LoginData()
 	, m_guard2(Guard2Value)
 	, m_needsWrite(true)
 {
-	memset(m_username, 0, sizeof(m_username)) ;
-	memset(m_passMD5, 0, sizeof(m_passMD5)) ;
-	memset(m_spare, 0, sizeof(m_spare)) ;
-	memset(m_region, 0, sizeof(m_region)) ;
+	memset(m_username, 0, sizeof(m_username));
+	memset(m_passMD5, 0, sizeof(m_passMD5));
+	memset(m_spare, 0, sizeof(m_spare));
+	memset(m_region, 0, sizeof(m_region));
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -46,7 +46,7 @@ LoginData::LoginData()
 LoginData::~LoginData()
 {
 	if ( m_needsWrite == true && HistoryFilePath[0] != 0 )
-		Write() ;
+		Write();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -55,27 +55,27 @@ LoginData::~LoginData()
 bool
 LoginData::Read()
 {
-	_stprintf_s(HistoryFilePath, _T("%s\\%s"), g_dataPath.c_str(), HistoryFilename) ; 
+	_stprintf_s(HistoryFilePath, _T("%s\\%s"), g_dataPath.c_str(), HistoryFilename); 
 
-	int file = -1 ;
-	errno_t err = _tsopen_s(&file, HistoryFilePath, _O_RDONLY | _O_BINARY, _SH_DENYRW, 0) ;
+	int file = -1;
+	errno_t err = _tsopen_s(&file, HistoryFilePath, _O_RDONLY | _O_BINARY, _SH_DENYRW, 0);
 	if ( err != 0 )
 	{
-		dbugLog(_FLI, "Unable to read history file: %d [%s]", err, _sys_errlist[err]) ;
-		return false ;
+		dbugLog(_FLI, "Unable to read history file: %d [%s]", err, _sys_errlist[err]);
+		return false;
 	}
 	if ( file < 0 )
 	{
-		dbugLog(_FLI, "Failed to open history file") ;
-		return false ;
+		dbugLog(_FLI, "Failed to open history file");
+		return false;
 	}
 
-	int bytesRead = _read(file, this, sizeof(*this)) ;
-	_close(file) ;
+	int bytesRead = _read(file, this, sizeof(*this));
+	_close(file);
 
-	m_needsWrite = false ;
+	m_needsWrite = false;
 
-	return bytesRead >= 8 ;
+	return bytesRead >= 8;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -86,7 +86,7 @@ bool
 LoginData::Validate()
 {
 	if ( m_nullByte != 0 || m_version != 255 || m_revision == 0 )
-		return false ;
+		return false;
 
 	////
 	// Data Validation.
@@ -94,21 +94,21 @@ LoginData::Validate()
 	{
 	case 1:
 		if ( m_arenaID <= 0 || m_arenaID > 255 )
-			return false ;
+			return false;
 		if ( m_guard1 != Guard1Value )
-			return false ;
+			return false;
 		if ( m_guard2 != Guard2Value )
-			return false ;
-	break ;
+			return false;
+	break;
 	default:
-		return false ;
-	break ;
+		return false;
+	break;
 	}
 
 	////
 	// Do data conversion here
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -118,15 +118,15 @@ void
 LoginData::GetPasswordMask(wchar_t* mask) const
 {
 	if ( m_passlen <= 0 )
-		mask[0] = 0 ;
+		mask[0] = 0;
 	else
 	{
-		int i ;
-		for ( i = 0 ; i < m_passlen ; ++i )
+		int i;
+		for ( i = 0; i < m_passlen; ++i )
 		{
-			mask[i] = L'*' ;
+			mask[i] = L'*';
 		}
-		mask[i] = 0 ;
+		mask[i] = 0;
 	}
 }
 
@@ -138,10 +138,10 @@ LoginData::GetPasswordMD5(UCHAR* md5, const size_t md5Size) const
 {
 	// Password is not stored.
 	if ( m_passlen <= 0 )
-		md5[0] = 0 ;
+		md5[0] = 0;
 	else
 	{
-		sprintf((char*)md5, "%016llx%016llx", m_passMD5[0], m_passMD5[1]) ;
+		sprintf((char*)md5, "%016llx%016llx", m_passMD5[0], m_passMD5[1]);
 	}
 }
 
@@ -151,7 +151,7 @@ LoginData::GetPasswordMD5(UCHAR* md5, const size_t md5Size) const
 bool
 LoginData::GetUsernameAsUTF8(char* usernameDest, const size_t destSize) const
 {
-	return WWII::ConvertChars(m_username, usernameDest, destSize) ;
+	return WWII::ConvertChars(m_username, usernameDest, destSize);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -160,9 +160,9 @@ LoginData::GetUsernameAsUTF8(char* usernameDest, const size_t destSize) const
 void
 LoginData::SetPassword(bool /*savePassword*/, UINT32 passlen, const UCHAR* passMD5)
 {
-	m_savePassword = false ; //savePassword ;
-	m_passlen = passlen ;
-	sscanf_s((const char*)passMD5, "%016llx%016llx", &m_passMD5[0], &m_passMD5[1]) ;
+	m_savePassword = false; //savePassword;
+	m_passlen = passlen;
+	sscanf_s((const char*)passMD5, "%016llx%016llx", &m_passMD5[0], &m_passMD5[1]);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -171,29 +171,29 @@ LoginData::SetPassword(bool /*savePassword*/, UINT32 passlen, const UCHAR* passM
 bool
 LoginData::Write()
 {
-	assert( m_guard1 == Guard1Value ) ;
-	assert( m_guard2 == Guard2Value ) ;
+	assert( m_guard1 == Guard1Value );
+	assert( m_guard2 == Guard2Value );
 
-	m_needsWrite = false ;
+	m_needsWrite = false;
 
 	if ( !m_savePassword )
 	{
-		m_passlen = -1 ;
-		m_passMD5[0] = m_passMD5[1] = 0ULL ;
+		m_passlen = -1;
+		m_passMD5[0] = m_passMD5[1] = 0ULL;
 	}
 
-	std::wstring filename = g_dataPath + L"\\" ;
-	filename += HistoryFilename ;
+	std::wstring filename = g_dataPath + L"\\";
+	filename += HistoryFilename;
 
-	int file = -1 ;
-	_wunlink(filename.c_str()) ;
-	int err = _wsopen_s(&file, HistoryFilePath, _O_CREAT | _O_TRUNC | _O_BINARY | _O_WRONLY, _SH_SECURE, _S_IREAD | _S_IWRITE) ;
+	int file = -1;
+	_wunlink(filename.c_str());
+	int err = _wsopen_s(&file, HistoryFilePath, _O_CREAT | _O_TRUNC | _O_BINARY | _O_WRONLY, _SH_SECURE, _S_IREAD | _S_IWRITE);
 	if ( err != 0 )
-		return false ;
+		return false;
 	if ( file < 0 )
-		return false ;
-	int bytesWritten = _write(file, this, sizeof(*this)) ;
-	_close(file) ;
+		return false;
+	int bytesWritten = _write(file, this, sizeof(*this));
+	_close(file);
 
-	return (bytesWritten == sizeof(*this)) ;
+	return (bytesWritten == sizeof(*this));
 }

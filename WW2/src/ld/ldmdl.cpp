@@ -238,7 +238,7 @@ __int64		rdcount, rdcount1, rdcount2;
 			if (num > 0)
 			{
 				piVectorConstPtr rpos = lpobj->RenderPositions();
-				for (i=0 ; i < num ; i++, ++rpos)
+				for (i=0; i < num; i++, ++rpos)
 				{
 					if (xmn > rpos->x)
 					{
@@ -374,7 +374,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	pscdn  = lpobj->pscdn;
 
 	num = lpobj->numtris;
-	for (i=0 ; i < num ; i++, pt++)
+	for (i=0; i < num; i++, pt++)
 	{
 		// retrieve all three vectors numbers
 		fst = pt->v1;
@@ -472,7 +472,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	pscdn  = lpobj->pscdn;
 
 	num = lpobj->numtris;
-	for (i=0 ; i < num ; i++, pt++)
+	for (i=0; i < num; i++, pt++)
 	{
 		// retrieve all three vectors numbers
 		fst = pt->v1;
@@ -544,7 +544,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	piVectorPtr mnorm = lpobj->MutableNormals();
 
 	num = lpobj->numverts;
-	for (i=0 ; i < num ; i++, ++mnorm)
+	for (i=0; i < num; i++, ++mnorm)
 	{
 		mnorm->x = 0.0f;
 		mnorm->y = 0.0f;
@@ -554,7 +554,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	pt = lpobj->ptris;
 
 	num = lpobj->numtris;
-	for (i=0 ; i < num ; i++, pt++)
+	for (i=0; i < num; i++, pt++)
 	{
 		// retrieve all three vectors numbers
 		fst = pt->v1;
@@ -579,7 +579,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	}
 
 	num = lpobj->numverts;
-	for (i=0 ; i < num ; i++, ++mnorm)
+	for (i=0; i < num; i++, ++mnorm)
 	{
 		Normalize(mnorm.ptr);
 	}
@@ -1037,7 +1037,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	}
 
 	numv = lpobj->numverts;
-	for (i=0 ; i < numv ; i++, ++rpos, ++mnorm)
+	for (i=0; i < numv; i++, ++rpos, ++mnorm)
 	{
 		mnorm->x = 0.0f;
 		mnorm->y = 0.0f;
@@ -1053,7 +1053,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	pscdn  = lpobj->pscdn;
 
 	num = lpobj->numtris;
-	for (i=0 ; i < num ; i++, pt++)
+	for (i=0; i < num; i++, pt++)
 	{
 		// retrieve all three vectors numbers
 		fst = pt->v1;
@@ -1128,7 +1128,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	}
 
 	num = lpobj->numverts;
-	for (i=0 ; i < num ; i++, ++mnorm)
+	for (i=0; i < num; i++, ++mnorm)
 	{
 		Normalize(mnorm.ptr);
 	}
@@ -1171,7 +1171,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	}
 
 	numv = lpobj->numverts;
-	for (i=0 ; i < numv ; i++, ++mnorm)
+	for (i=0; i < numv; i++, ++mnorm)
 	{
 		mnorm->x = 0.0f;
 		mnorm->y = 0.0f;
@@ -1189,7 +1189,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	pscdn  = lpobj->pscdn;
 
 	num = lpobj->numtris;
-	for (i=0 ; i < num ; i++, pt++)
+	for (i=0; i < num; i++, pt++)
 	{
 		// retrieve all three vectors numbers
 		fst = pt->v1;
@@ -1263,7 +1263,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	}
 
 	numv = lpobj->numverts;
-	for (i=0 ; i < numv ; i++, ++mnorm)
+	for (i=0; i < numv; i++, ++mnorm)
 	{
 		Normalize(mnorm.ptr);
 	}
@@ -1305,7 +1305,7 @@ __int64		rdcount, rdcount1, rdcount2;
 
 	numv = lpobj->numverts;
 	num = lpobj->numtris;
-	for (i=0 ; i < num ; i++, pt++)
+	for (i=0; i < num; i++, pt++)
 	{
 		// retrieve all three vectors numbers
 		fst = pt->v1;
@@ -1396,7 +1396,7 @@ piINDICES*		pt;
 	}
 
 	num = lpobj->numverts;
-	for (i=0 ; i < num ; i++, ++snorm)
+	for (i=0; i < num; i++, ++snorm)
 	{
 		snorm->x = -snorm->x;
 		snorm->y = -snorm->y;
@@ -1411,7 +1411,7 @@ piINDICES*		pt;
 	psn = lpobj->psnorms;
 
 	num = lpobj->numtris;
-	for (i=0 ; i < num ; i++, pt++, pso++, psn++)
+	for (i=0; i < num; i++, pt++, pso++, psn++)
 	{
 		v = pt->v2;
 		pt->v2 = pt->v3;
@@ -1784,7 +1784,7 @@ piINDICES*	pt;
 		piVectorConstPtr rpos = lpobj->RenderPositions();
 		num = lpobj->numtris;
 		pt = lpobj->ptris;
-		for (i=0 ; i < num-1 ; i++)
+		for (i=0; i < num-1; i++)
 		{
 			math3dSubtractVectors(&pv1, &rpos[pt[i].v1], &pp);
 			math3dSubtractVectors(&pv2, &rpos[pt[i].v2], &pp);
@@ -1793,7 +1793,7 @@ piINDICES*	pt;
 			math3dAddVectors(&pv1, &pv1, &pv3);
 			d1 = math3dDotProduct(&pv1, &pv1);
 
-			for (j=i+1 ; j < num ; j++)
+			for (j=i+1; j < num; j++)
 			{
 				math3dSubtractVectors(&pv1, &rpos[pt[j].v1], &pp);
 				math3dSubtractVectors(&pv2, &rpos[pt[j].v2], &pp);
@@ -2059,7 +2059,7 @@ LOGICAL MergeObjectsIfPossible(OBJECT* main, OBJECT* o)
 
 		piINDICES*	ptris = main->ptris;
 
-		for(int i=0 ; i < main->numtris ; i++)
+		for(int i=0; i < main->numtris; i++)
 		{	// Funky useless indices
 			ptris[i].v1 = (i*3);
 			ptris[i].v2 = (i*3) + 1;

@@ -10,15 +10,15 @@
 #include <vector>
 #include <wchar.h>
 
-bool enableTestDebug = false ;
+bool enableTestDebug = false;
 
-typedef std::vector<TestUnit*> TestIndex ;
+typedef std::vector<TestUnit*> TestIndex;
 // We have to make sure this gets instantiated before we try to use it,
 // otherwise it may get instantiated after we've populated it and cleared.
 static TestIndex& tests()
 {
-    static TestIndex s_tests ;
-    return s_tests ;
+    static TestIndex s_tests;
+    return s_tests;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -29,8 +29,8 @@ TestUnit::TestUnit(const char* unitName)
         , m_stagePasses(0), m_unitPasses(0)
         , m_stageErrors(0), m_unitErrors(0)
 {
-	teulClock64 = 0ULL ;
-    tests().push_back(this) ;
+	teulClock64 = 0ULL;
+    tests().push_back(this);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -41,44 +41,44 @@ void
 TestUnit::_failedTest(const char* file, unsigned int lineNo, const char* operation, const char* obtained, const char* expected, bool withOperands)
 {
     // prefix, e.g.: file.cpp:25: testing explosions
-    char str[256] ;
-    snprintf(str, sizeof(str) - 1, "\n%s:%u", file, lineNo) ;
-    std::string text = str ;
-	text += ": error: " ;
+    char str[256];
+    snprintf(str, sizeof(str) - 1, "\n%s:%u", file, lineNo);
+    std::string text = str;
+	text += ": error: ";
 
 	// Indent with substage
-    for ( size_t i = 0 ; i < m_subStage.size() ; ++i )
+    for ( size_t i = 0; i < m_subStage.size(); ++i )
     {
-        text += m_subStage[i] ;
-        text += " >> " ;
+        text += m_subStage[i];
+        text += " >> ";
     }
 
 	// What operation was being attempted
-    text += operation ;
+    text += operation;
 
 	// Add focus label if there was one
 	if ( m_testFocus.empty() == false )
 	{
-		text += " [" ;
-		text += m_testFocus ;
-		text += "]" ;
+		text += " [";
+		text += m_testFocus;
+		text += "]";
 	}
 
 	// Describe the result we got
-    text += " was " ;
-    text += obtained ;
-    text += " instead of " ;
-    text += expected ;
+    text += " was ";
+    text += obtained;
+    text += " instead of ";
+    text += expected;
 
     if ( withOperands )
     {
-        snprintf(str, sizeof(str) - 1, " (%s vs %s)", m_lhsVal, m_rhsVal) ;
-        text += str ;
+        snprintf(str, sizeof(str) - 1, " (%s vs %s)", m_lhsVal, m_rhsVal);
+        text += str;
     }
 
-    text += ".\n" ;
+    text += ".\n";
 
-    Error(text.c_str()) ;
+    Error(text.c_str());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -87,23 +87,23 @@ TestUnit::_failedTest(const char* file, unsigned int lineNo, const char* operati
 void
 TestUnit::Error(const char* error, bool /*critical*/)
 {
-    std::string text = ""  ;
+    std::string text = "";
 
     // First error in a stage, annotate the stage.
     if ( m_stageErrors == 0 )
     {
-        text += "- " ;
-        text += m_stage ;
-        text += ":\n" ;
+        text += "- ";
+        text += m_stage;
+        text += ":\n";
     }
 
-    ++m_stageErrors ;
-    ++m_unitErrors ;
+    ++m_stageErrors;
+    ++m_unitErrors;
 
-    text += error ;
-    text += "\n" ;
+    text += error;
+    text += "\n";
 
-    m_fails += text ;
+    m_fails += text;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -112,10 +112,10 @@ TestUnit::Error(const char* error, bool /*critical*/)
 void
 TestUnit::TestFocus(const wchar_t* label)
 {
-	char buffer[1024] ;
-	assert( wcslen(label) * sizeof(wchar_t) < sizeof(buffer) ) ;
-	WWII::ConvertChars(label, buffer, sizeof(buffer)) ;
-	m_testFocus = buffer ;
+	char buffer[1024];
+	assert( wcslen(label) * sizeof(wchar_t) < sizeof(buffer) );
+	WWII::ConvertChars(label, buffer, sizeof(buffer));
+	m_testFocus = buffer;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -124,15 +124,15 @@ TestUnit::TestFocus(const wchar_t* label)
 void
 TestUnit::TestFocus(const char* fmt, ...)
 {
-	char buffer[256] ;
-	buffer[254] = 0 ;
-	buffer[255] = 0 ;
-	va_list args ;
-	va_start(args, fmt) ;
-	vsnprintf(buffer, 254, fmt, args) ;
-	va_end(args) ;
+	char buffer[256];
+	buffer[254] = 0;
+	buffer[255] = 0;
+	va_list args;
+	va_start(args, fmt);
+	vsnprintf(buffer, 254, fmt, args);
+	va_end(args);
 
-	m_testFocus = buffer ;
+	m_testFocus = buffer;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -141,10 +141,10 @@ TestUnit::TestFocus(const char* fmt, ...)
 static const char*
 _testResults(UINT32 passes, UINT32 fails)
 {
-    UINT32 total = passes + fails ;
-    static char status[128] ;
-    snprintf(status, 127, "%u/%u %s passed", passes, total, (total == 1 ? "test" : "tests")) ;
-    return status ;
+    UINT32 total = passes + fails;
+    static char status[128];
+    snprintf(status, 127, "%u/%u %s passed", passes, total, (total == 1 ? "test" : "tests"));
+    return status;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -154,75 +154,75 @@ void
 TestUnit::RunTests()
 {
     if ( tests().empty() )
-        std::cout << "FAIL: No tests defined." << std::endl ;
+        std::cout << "FAIL: No tests defined." << std::endl;
 
     if ( enableTestDebug )
-        std::cout << "#" << tests().size() << " test(s) defined." << std::endl ;
+        std::cout << "#" << tests().size() << " test(s) defined." << std::endl;
 
-    UINT32 testsPassed = 0 ;
-    UINT32 testsFailed = 0 ;
-    for ( TestIndex::iterator it = tests().begin() ; it != tests().end() ; ++it )
+    UINT32 testsPassed = 0;
+    UINT32 testsFailed = 0;
+    for ( TestIndex::iterator it = tests().begin(); it != tests().end(); ++it )
     {
-        TestUnit* unit = (*it) ;
+        TestUnit* unit = (*it);
         try
         {
             if ( enableTestDebug )
-                std::cerr << "#Running " << unit->Name() << std::endl ;
+                std::cerr << "#Running " << unit->Name() << std::endl;
 
 			// Make sure they start with a consistent, non-zero, teulClock.
-			ResetClock() ;
+			ResetClock();
 
 			// Run the test.
-            bool succeeded = unit->Run() ;
+            bool succeeded = unit->Run();
 
-            UINT32 unitPasses = unit->UnitPasses() ;
-            UINT32 unitFails = unit->UnitErrors() ;
+            UINT32 unitPasses = unit->UnitPasses();
+            UINT32 unitFails = unit->UnitErrors();
 
-            testsPassed += unitPasses ;
-            testsFailed += unitFails ;
+            testsPassed += unitPasses;
+            testsFailed += unitFails;
 
             if ( succeeded && unit->m_fails.empty() )
             {
-                std::cout << "OK: " << unit->Name() << " " << _testResults(unitPasses, unitFails) << std::endl ;
-                continue ;
+                std::cout << "OK: " << unit->Name() << " " << _testResults(unitPasses, unitFails) << std::endl;
+                continue;
             }
 
             if ( unit->m_fails.empty() )
             {
-                ++unitFails ;
-                ++testsFailed ;
+                ++unitFails;
+                ++testsFailed;
             }
 
             // Unit test failed.
-            std::cerr << "FAIL: " << unit->Name() << " (" << _testResults(unitPasses, unitFails) << ")" ;
+            std::cerr << "FAIL: " << unit->Name() << " (" << _testResults(unitPasses, unitFails) << ")";
             if ( !succeeded )
-                std::cerr << " [Run() returned 'false']" ;
-            std::cerr << std::endl << unit->Fails() ;
+                std::cerr << " [Run() returned 'false']";
+            std::cerr << std::endl << unit->Fails();
 
-            continue ;
+            continue;
         }
         catch ( std::exception& e )
         {
-            std::cerr << "FAIL: " << unit->Name() << ": " << e.what() << std::endl ;
-            ++testsFailed ;
+            std::cerr << "FAIL: " << unit->Name() << ": " << e.what() << std::endl;
+            ++testsFailed;
         }
         catch ( ... )
         {
 
-            std::cerr << "FAIL: " << unit->Name() << ": Unhandled exception!" << std::endl ;
-            ++testsFailed ;
+            std::cerr << "FAIL: " << unit->Name() << ": Unhandled exception!" << std::endl;
+            ++testsFailed;
         }
 
-        testsFailed += unit->UnitErrors() ;
+        testsFailed += unit->UnitErrors();
     }
 
     if ( testsFailed > 0 )
     {
-        std::cerr << "FAILED: " << _testResults(testsPassed, testsFailed) << std::endl ;
-        exit(-1) ;
+        std::cerr << "FAILED: " << _testResults(testsPassed, testsFailed) << std::endl;
+        exit(-1);
     }
 
-    std::cout << "SUCCESS: " << _testResults(testsPassed, testsFailed) << std::endl ;
+    std::cout << "SUCCESS: " << _testResults(testsPassed, testsFailed) << std::endl;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -233,12 +233,12 @@ main(int argc, char* argv[])
 {
     if ( argc > 1 && strcmp(argv[1], "-d") == 0 )
     {
-        std::cout << "#TestDebuggingEnabled" << std::endl ;
-        enableTestDebug = true ;
+        std::cout << "#TestDebuggingEnabled" << std::endl;
+        enableTestDebug = true;
     }
 
 	Teul::ConfigVar::InitializeConfigVars();
-    TestUnit::RunTests() ;
+    TestUnit::RunTests();
 
-    exit(0) ;
+    exit(0);
 }

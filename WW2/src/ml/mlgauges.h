@@ -200,7 +200,7 @@ enum mlGaugeDOFList
 					ML_DOF_VEH_SEAT,
 
 					ML_DOF_MAXNUM
-} ;
+};
 
 struct mlGaugeTranslationTable
 {
@@ -210,7 +210,7 @@ struct mlGaugeTranslationTable
 	void*  Variable;
 	UINT32 VarCycles;
 	UINT32 IgnoreCurrent;
-} ;
+};
 
 // all gauges are SINT32s so that the gauges can be referred to by number later
 // no floats used because many gauges require state1/state2/etc settings that
@@ -354,7 +354,7 @@ struct mlVehicleVarData
 	FLOAT32 TurretTraverseConv[ML_MAX_CREW_POSITIONS][VEH_MAX_MOUNTS];
 	FLOAT32 TurretElevateConv[ML_MAX_CREW_POSITIONS][VEH_MAX_MOUNTS];
 
-} ;
+};
 
 extern mlVehicleVarData _VarData;
 

@@ -7,6 +7,6 @@
 //
 // Originating Programmer: Eric "Meat" Hall
 
-extern void mmdbRequestBrigadeDetailsUpdate() ;
-extern void mmdbForceBrigadeDetailsUpdate() ;
-extern void mmdbInitializeBrigadeLocations() ;
+extern void mmdbRequestBrigadeDetailsUpdate();
+extern void mmdbForceBrigadeDetailsUpdate();
+extern void mmdbInitializeBrigadeLocations();

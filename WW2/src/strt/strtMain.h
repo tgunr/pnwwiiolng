@@ -9,8 +9,8 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-class CPStruct ;
-class Supercell ;
+class CPStruct;
+class Supercell;
 
 // Number of CPs per pass that the main loop will process, effectively
 // spreading out the processing load of CPs over a longer time
@@ -23,20 +23,20 @@ extern LOGICAL strtMain(UINT32 currentTime);
 
 //tolua_begin
 
-extern const char* HostLanguage ;
+extern const char* HostLanguage;
 
 //Broadcasts the CP_STATUS messages for every cp to everybody
 extern LOGICAL strtBroadcastCPs(void);
 
 extern CPStruct* strtGetCPList(void);
-extern Supercell* strtGetCellList(void) ;
+extern Supercell* strtGetCellList(void);
 
-extern FULL_OBJ_ID g_fullObjID ;
+extern FULL_OBJ_ID g_fullObjID;
 
-extern bool strtIsStratInitialized() ;
+extern bool strtIsStratInitialized();
 
 //tolua_end
 
-extern void strtInitializeStratSystem() ;
-extern void strtShutdownStratSystem() ;
+extern void strtInitializeStratSystem();
+extern void strtShutdownStratSystem();
 

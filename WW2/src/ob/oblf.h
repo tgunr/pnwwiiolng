@@ -10,7 +10,7 @@ struct FLARE
 	float		  loc;              // postion along axis
 	float     red, green, blue; // amount of natural color in each flare
 
-} ;
+};
 
 
 extern LOGICAL oblfInit(void);

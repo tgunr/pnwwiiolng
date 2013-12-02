@@ -29,5 +29,5 @@ enum BRIGADE_MOVE_RESULT
 	, BMR_FAILED_PREM_SURDR			// Tried to surrender prematurely
 	, BMR_FAILED_ENEMY_DEPOT		// Don't control both depots on link
 	, BMR_FAILED_ENEMY_FB			// Don't control FB on link
-} ;
+};
 

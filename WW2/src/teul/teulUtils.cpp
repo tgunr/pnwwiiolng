@@ -44,7 +44,7 @@
 
 static UINT32	tclock;
 TeulTimeMS teulClock64;
-UINT32 teulClockTime ;
+UINT32 teulClockTime;
 
 // returns the current clock value truncated to x bits
 static inline SINT32 _clockBits(UINT32 bits)
@@ -53,10 +53,10 @@ static inline SINT32 _clockBits(UINT32 bits)
 		return -EINVAL;
 
 	// Maximum of 31 bits
-	return (tclock & (0xffffffff >> (32-bits))) ;
+	return (tclock & (0xffffffff >> (32-bits)));
 }
 
-// Adds  an unsigned x bit timevalues with a signed 20bit delta .
+// Adds  an unsigned x bit time values with a signed 20bit delta .
 // Returns an unsigned 20 bit timeval, - val indicates error.
 // Truncates overflows (e.g. 0x0fffff + 1 = 0).
 static inline SINT32 _addClockBits( UINT32 bits, UINT32 time, SINT32 delta )
@@ -85,9 +85,9 @@ static inline SINT32 _addClockBits( UINT32 bits, UINT32 time, SINT32 delta )
 	return result;
 }
 
-// Subtracts unsigned 31 bit timevalues only.
+// Subtracts unsigned 31 bit time values only.
 // Returns an unsigned 31 bit timeval, - val indicates error.
-// Truncates overlows (e.g.  0 - 1 = 0x0fffff0).
+// Truncates overflows (e.g.  0 - 1 = 0x0fffff0).
 static inline SINT32 _subClockBits( UINT32 bits, UINT32 newTime, UINT32 oldTime )
 {
 	SINT32 result;
@@ -184,7 +184,7 @@ _teulClock(void)
 // ALSO REQUIRES A SYSTEM THAT DOES NOT PERFORM POWER SAVING FUNCTIONS
 // THAT ALTER THE CLOCK FREQUENCY.
 
-static UINT64 _ticks = 0LL ;
+static UINT64 _ticks = 0LL;
 
 static inline void
 rdtsc(UINT64& x)
@@ -196,33 +196,33 @@ struct ClockSpeedCounter
 {
 	ClockSpeedCounter() : m_ticks(0LL)
 	{
-		UINT64 startTicks, endTicks ;
-		TeulTimeMS msAvg = 0 ;
+		UINT64 startTicks, endTicks;
+		TeulTimeMS msAvg = 0;
 		// Work out how many ticks there are per 10ms
-		static const UINT32 iterations = 16 ;
-		static const UINT32 msWait = 16 ;
-		struct timeval before, after ;
-		for ( UINT32 i = 0 ; i < iterations ; ++i )
+		static const UINT32 iterations = 16;
+		static const UINT32 msWait = 16;
+		struct timeval before, after;
+		for ( UINT32 i = 0; i < iterations; ++i )
 		{
-			gettimeofday(&before, 0) ;
-			rdtsc(startTicks) ;
+			gettimeofday(&before, 0);
+			rdtsc(startTicks);
 			std::this_thread::sleep_for(std::chrono::microseconds(msWait * 995));	// sleep is imprecise so aim short.
-			rdtsc(endTicks) ;
-			gettimeofday(&after, 0) ;
-			const TeulTimeMS startMs = ((TeulTimeMS)before.tv_sec * 1000LL) + (before.tv_usec / 1000) ;
-			const TeulTimeMS endMs = ((TeulTimeMS)after.tv_sec * 1000LL) + (after.tv_usec / 1000) ;
-			const TeulTimeMS msElapsed = endMs - startMs ;
-			msAvg += (endTicks - startTicks) / msElapsed ;
+			rdtsc(endTicks);
+			gettimeofday(&after, 0);
+			const TeulTimeMS startMs = ((TeulTimeMS)before.tv_sec * 1000LL) + (before.tv_usec / 1000);
+			const TeulTimeMS endMs = ((TeulTimeMS)after.tv_sec * 1000LL) + (after.tv_usec / 1000);
+			const TeulTimeMS msElapsed = endMs - startMs;
+			msAvg += (endTicks - startTicks) / msElapsed;
 		}
 		// Take the average and divide by 4 so that we
 		// only allow a re-read of the time once every
 		// 0.25ms
-		m_ticks = msAvg / (4*iterations) ;
+		m_ticks = msAvg / (4*iterations);
 
-		_ticks = 0LL ;
+		_ticks = 0LL;
 	}
-	UINT64 m_ticks ;
-} clockSpeedCounter ;
+	UINT64 m_ticks;
+} clockSpeedCounter;
 
 //////////////////////////////////////////////////////////////////////
 // Update the tick counter and see if enough ticks have elapsed to
@@ -232,10 +232,10 @@ struct ClockSpeedCounter
 static inline bool
 _checkRdtsc()
 {
-	UINT64 oldTicks = _ticks ;
-	rdtsc(_ticks) ;
+	UINT64 oldTicks = _ticks;
+	rdtsc(_ticks);
 	// Has more than 1/4ms elapsed?
-	return ( (UINT64)(_ticks - oldTicks) >= clockSpeedCounter.m_ticks ) ;
+	return ( (UINT64)(_ticks - oldTicks) >= clockSpeedCounter.m_ticks );
 }
 #endif
 #endif
@@ -254,46 +254,46 @@ teulSyncClock(void)
 	{
 		struct timeval tv;
 		gettimeofday(&tv,0);
-		const TeulTimeMS newTimeMS = ((TeulTimeMS)tv.tv_sec * 1000ULL) + (tv.tv_usec / 1000ULL) ;
+		const TeulTimeMS newTimeMS = ((TeulTimeMS)tv.tv_sec * 1000ULL) + (tv.tv_usec / 1000ULL);
 		if ( newTimeMS < teulClock64 )
 		{
-			teulClock64++ ;
-			teulClockTime = teulClock64 / 1000ULL ;
+			teulClock64++;
+			teulClockTime = teulClock64 / 1000ULL;
 		}
 		else
 		{
-			teulClock64 = newTimeMS ;
-			teulClockTime = (UINT32)tv.tv_sec ;
+			teulClock64 = newTimeMS;
+			teulClockTime = (UINT32)tv.tv_sec;
 		}
-		tclock = (UINT32)teulClock64 ;
+		tclock = (UINT32)teulClock64;
 	}
 #elif platOS == OS_WIN32
-	static const DWORD  BaseClockTime = timeGetTime() ;
-	static const TeulTimeMS BaseClock64 = time(NULL) * 1000ULL + BaseClockTime % 1000ULL ;
+	static const DWORD  BaseClockTime = timeGetTime();
+	static const TeulTimeMS BaseClock64 = time(NULL) * 1000ULL + BaseClockTime % 1000ULL;
 
-	teulClock64 = BaseClock64 + (timeGetTime() - BaseClockTime) ;
-	teulClockTime = (UINT32)(teulClock64 / 1000LL) ;
-	tclock = (UINT32)(teulClock64) ;
+	teulClock64 = BaseClock64 + (timeGetTime() - BaseClockTime);
+	teulClockTime = (UINT32)(teulClock64 / 1000LL);
+	tclock = (UINT32)(teulClock64);
 #elif platOS == OS_MACOS
 	UnsignedWide microTickCount;
 	Microseconds(&microTickCount);
-	teulClock64 = UnsignedWideToUInt64(microTickCount) / 1000 ;
-	teulClockTime = (UINT32)(teulClock64 / 1000LL) ;
-	tclock = (UINT32)(teulClock64) ;
+	teulClock64 = UnsignedWideToUInt64(microTickCount) / 1000;
+	teulClockTime = (UINT32)(teulClock64 / 1000LL);
+	tclock = (UINT32)(teulClock64);
 #else
 #pragma error("No teulSyncClock implementation for this platform")
 #endif
-	return _teulClock() ;
+	return _teulClock();
 }
 
 // returns the current clock value truncated to 20 bits
 UINT32 teulClock(void)
 {
 //	teulSyncClock();
-	return _teulClock() ;
+	return _teulClock();
 }
 
-// Adds  an unsigned 20 bit timevalues with a signed 20bit delta .
+// Adds  an unsigned 20 bit time values with a signed 20bit delta .
 // Returns an unsigned 20 bit timeval, - val indicates error.
 // Truncates overflows (e.g. 0x0fffff + 1 = 0).
 SINT32 teulAddClock(UINT32 time, SINT32 delta)
@@ -340,20 +340,20 @@ SINT32 teulElapsedClock(UINT32 oldTime)
 // converts UINT32. to doted quad string.
 // stores in a static array of char
 // that is in turn returned.
-// this allows up to 16 addreses to be returned
-// before we get an overwite.
+// this allows up to 16 addresses to be returned
+// before we get an overwrite.
 const SCHAR*
 teulGetAddress(const UINT32 hostOrderIP)
 {
 	const UINT32 netOrderIP = htonl(hostOrderIP);
 	in_addr thost;
 	thost.s_addr = netOrderIP;
-	char* addr = inet_ntoa(thost) ;
+	char* addr = inet_ntoa(thost);
 	if  ( addr == NULL)
 		return NULL;
 
 	static SCHAR ntoa[16][16];
-	static SINT32 count = 0 ; 	// NO THREAD SAFE
+	static SINT32 count = 0; 	// NO THREAD SAFE
 	SINT32 slot = (count++) & 0x0f;
 
 	strncpy(ntoa[slot], addr ,16);
@@ -365,17 +365,17 @@ teulGetAddress(const UINT32 hostOrderIP)
 const char*
 teulGetAddress(const UINT32 host, char* buffer, const size_t bufferSize)
 {
-	in_addr addr ;
-	addr.s_addr = htonl(host) ;
-	return inet_ntop(AF_INET, &addr, buffer, bufferSize) ;
+	in_addr addr;
+	addr.s_addr = htonl(host);
+	return inet_ntop(AF_INET, &addr, buffer, bufferSize);
 }
 #else
 const char*
 teulGetAddress(const UINT32 host, char* buffer, const size_t bufferSize)
 {
-	const char* p = teulGetAddress(host) ;
-	strncpy(buffer, p, bufferSize) ;
-	return buffer ;
+	const char* p = teulGetAddress(host);
+	strncpy(buffer, p, bufferSize);
+	return buffer;
 }
 #endif
 
@@ -388,11 +388,11 @@ namespace Teul
 int
 HostToAddr(const UINT32 host_, const UINT16 port_, char* const hostBuf_, const size_t hostBufLen_, char* const portBuf_, const size_t portBufLen_)
 {
-	sockaddr_in sa ;
-	sa.sin_addr.s_addr = host_ ;
-	sa.sin_family = AF_INET ;
-	sa.sin_port = port_ ;
-	return getnameinfo((sockaddr*)&sa, sizeof(sa), hostBuf_, hostBufLen_, portBuf_, portBufLen_, NI_NUMERICHOST | NI_NUMERICSERV) ;
+	sockaddr_in sa;
+	sa.sin_addr.s_addr = host_;
+	sa.sin_family = AF_INET;
+	sa.sin_port = port_;
+	return getnameinfo((sockaddr*)&sa, sizeof(sa), hostBuf_, hostBufLen_, portBuf_, portBufLen_, NI_NUMERICHOST | NI_NUMERICSERV);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -401,7 +401,7 @@ HostToAddr(const UINT32 host_, const UINT16 port_, char* const hostBuf_, const s
 int
 HostToAddr(const struct sockaddr_in* const sa, char* const hostBuf_, const size_t hostBufLen_, char* const portBuf_, const size_t portBufLen_)
 {
-	return getnameinfo((sockaddr*)&sa, sizeof(sa), hostBuf_, hostBufLen_, portBuf_, portBufLen_, NI_NUMERICHOST | NI_NUMERICSERV) ;
+	return getnameinfo((sockaddr*)&sa, sizeof(sa), hostBuf_, hostBufLen_, portBuf_, portBufLen_, NI_NUMERICHOST | NI_NUMERICSERV);
 }
 
 #if platOS != OS_WIN32
@@ -412,17 +412,17 @@ HostToAddr(const struct sockaddr_in* const sa, char* const hostBuf_, const size_
 int
 SetSignalHandler(int signum, void (*handler)(int))
 {
-	struct sigaction action ;
+	struct sigaction action;
 	// Get the pre-existing setup.
-	const int err = sigaction(signum, NULL, &action) ;
+	const int err = sigaction(signum, NULL, &action);
 	if ( err < 0 )
-		return err ;
+		return err;
 
-	action.sa_handler = handler ;
-	sigfillset(&action.sa_mask) ;
-	action.sa_flags = SA_RESETHAND ;
+	action.sa_handler = handler;
+	sigfillset(&action.sa_mask);
+	action.sa_flags = SA_RESETHAND;
 
-	return sigaction(signum, &action, NULL) ;
+	return sigaction(signum, &action, NULL);
 }
 #endif
 }

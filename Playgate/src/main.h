@@ -29,19 +29,19 @@
 #define ERR_UNKNOWN			ERROR_REDIRECT "unknown"
 #define ERR_LOCKED			ERROR_REDIRECT "locked"
 
-extern HINSTANCE hMainInstance ;
+extern HINSTANCE hMainInstance;
 
 extern char szVersion[];
 extern char szVersionString[];
 
-typedef std::vector<UINT32> IP_LIST ;
-extern IP_LIST	g_authHosts ;
-extern UINT16	g_authPort ;
+typedef std::vector<UINT32> IP_LIST;
+extern IP_LIST	g_authHosts;
+extern UINT16	g_authPort;
 extern SINT32 webID; //used for web downloads
 extern UINT32 webURL;
 extern UINT32 g_playgateVersion;
-extern std::wstring g_exePath, g_dataPath ;
+extern std::wstring g_exePath, g_dataPath;
 extern SINT32 g_sessionID;
 extern UINT32 g_gameAppID;
-extern char g_registryKey[] ;
-extern wchar_t g_registryKeyW[] ;
+extern char g_registryKey[];
+extern wchar_t g_registryKeyW[];

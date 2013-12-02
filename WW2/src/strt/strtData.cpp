@@ -44,12 +44,12 @@ extern ConfigPath cv_blitzworPath;
 
 namespace Strat
 {
-	CPStruct*	cpList ;
+	CPStruct*	cpList;
 }
 
-static UINT32 totalCPs ;
+static UINT32 totalCPs;
 
-static UINT16 uMaxFacilityOID = 0 ;
+static UINT16 uMaxFacilityOID = 0;
 
 //local function to verify capture and spawn objects
 static LOGICAL _verifySubtypes(FacilityStruct* facility);
@@ -59,16 +59,16 @@ static void _calcCapacity(ObjectStruct& object);
 static LOGICAL _checkCPStatus(CPStruct* cpList);
 
 // Bitmask flags for capture objectives
-const UINT32 attackFlags[MAX_SIDES] = { 0, CP_STAT_ALLIED_ATTACK_OBJ, CP_STAT_AXIS_ATTACK_OBJ, 0 } ;
-const UINT32 defendFlags[MAX_SIDES] = { 0, CP_STAT_ALLIED_DEFEND_OBJ, CP_STAT_AXIS_DEFEND_OBJ, 0 } ;
+const UINT32 attackFlags[MAX_SIDES] = { 0, CP_STAT_ALLIED_ATTACK_OBJ, CP_STAT_AXIS_ATTACK_OBJ, 0 };
+const UINT32 defendFlags[MAX_SIDES] = { 0, CP_STAT_ALLIED_DEFEND_OBJ, CP_STAT_AXIS_DEFEND_OBJ, 0 };
 const UINT32 objectiveFlags[MAX_SIDES] = {
 	CP_OBJECTIVES
 ,	CP_ALLIED_OBJECTIVES
 ,	CP_AXIS_OBJECTIVES
 ,	0
-} ;
+};
 
-static UINT32 curTestLevel = 0 ;
+static UINT32 curTestLevel = 0;
 
 enum
 {
@@ -100,15 +100,15 @@ enum
 ,	ERR_MULT_CAP_OBJECTS
 
 ,	MAX_ERR_CODES
-} ;
+};
 
 struct ErrorInfo
 {
-	const char*	name ;				// Name for blitzWor
-	const char* text ;				// Descriptive text.
-	UINT32		level ;				// Error level
-	bool		canIgnore ;			// Can ignore minor ones
-} ;
+	const char*	name;				// Name for blitzWor
+	const char* text;				// Descriptive text.
+	UINT32		level;				// Error level
+	bool		canIgnore;			// Can ignore minor ones
+};
 
 ErrorInfo errorInfo[MAX_ERR_CODES] =
 {
@@ -268,15 +268,15 @@ ErrorInfo errorInfo[MAX_ERR_CODES] =
 		, 1
 		, true
 	}
-} ;
+};
 
-static std::map<std::string, std::string> errorList[MAX_ERR_CODES] ;
+static std::map<std::string, std::string> errorList[MAX_ERR_CODES];
 
 static WWII_COUNTRY _adjustCountryFor135(UINT32 country)
 {
 	if ( country >= MAX_COUNTRIES )
-		country -= 2 ;
-	return (WWII_COUNTRY) country ;
+		country -= 2;
+	return (WWII_COUNTRY) country;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -286,9 +286,9 @@ static WWII_COUNTRY _adjustCountryFor135(UINT32 country)
 void strtAddErrorListEntry(int errorNo, const char* objectName, const char* entryName, const char* entryData)
 {
 	if ( errorInfo[errorNo].canIgnore && parseIsObjectIgnoringError(objectName, errorInfo[errorNo].name) )
-		return ;
+		return;
 
-	errorList[errorNo][entryName] = entryData ;
+	errorList[errorNo][entryName] = entryData;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -298,12 +298,12 @@ struct filenameComparitor
 {
 	bool operator()(const char* s1, const char* s2) const
 	{
-		return strncmp(s1, s2, 128) < 0 ;
+		return strncmp(s1, s2, 128) < 0;
 	}
-} ;
+};
 
-typedef std::set<const char*, filenameComparitor> FilenamePool ;
-FilenamePool g_filenamePool ;
+typedef std::set<const char*, filenameComparitor> FilenamePool;
+FilenamePool g_filenamePool;
 
 //////////////////////////////////////////////////////////////////////
 // Code that provides a shared memory of filename spaces, rather than using
@@ -313,38 +313,38 @@ static const char*
 _filenamePool(const char* string)
 {
 	// Step 1: Look for the string in the existing set
-	FilenamePool::iterator p = g_filenamePool.find(string) ;
+	FilenamePool::iterator p = g_filenamePool.find(string);
 	if ( p != g_filenamePool.end() )
-		return *p ;
+		return *p;
 
 	// In order to add the string, we'll need to clone it
-	const char* copy = strdup(string) ;
+	const char* copy = strdup(string);
 	if ( copy == NULL )
 	{
-		dbugLog(_FLAS, "out of memory duplicating string %p", copy) ;
-		exit(0) ;
+		dbugLog(_FLAS, "out of memory duplicating string %p", copy);
+		exit(0);
 	}
 
-	p = g_filenamePool.insert(g_filenamePool.begin(), copy) ;
+	p = g_filenamePool.insert(g_filenamePool.begin(), copy);
 	if ( p == g_filenamePool.end() || *p == NULL )
 	{
-		dbugLog(_FLAS, "failed to insert string pool entry %p of %s", copy, string) ;
-		exit(0) ;
+		dbugLog(_FLAS, "failed to insert string pool entry %p of %s", copy, string);
+		exit(0);
 	}
 
-	return *p ;
+	return *p;
 }
 
 UINT32
 strtNumCPs(void)
 {
-	return totalCPs ;
+	return totalCPs;
 }
 
 void*
 g_malloc0(size_t size, int units=1)
 {
-	return calloc(size, units) ;
+	return calloc(size, units);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -354,13 +354,13 @@ bool
 LinkStruct::hasEnemyFirebase(WWII_SIDE forSide) const
 {
 	if ( firebase == NULL )
-		return false ;
+		return false;
 	if ( firebase->isOpen() && firebase->side != forSide )
-		return true ;
-	LinkStruct* other = endDepot->m_outgoingLink ;
+		return true;
+	LinkStruct* other = endDepot->m_outgoingLink;
 	if ( other == NULL || other->firebase == NULL || !other->firebase->isOpen() )
-		return false ;
-	return other->firebase->side != forSide ;
+		return false;
+	return other->firebase->side != forSide;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -369,20 +369,20 @@ LinkStruct::hasEnemyFirebase(WWII_SIDE forSide) const
 void
 strtEnemyLink(CPStruct& cp, bool state)
 {
-	cp.m_enemyLinked = state ;
+	cp.m_enemyLinked = state;
 	if ( state )
-		cp.flags |= CP_STAT_ENEMY_LINKED ;
+		cp.flags |= CP_STAT_ENEMY_LINKED;
 	else
 	{
 #ifdef IS_STRAT_HOST
-		WWII_SIDE attacker = cp.attacker() ;
+		WWII_SIDE attacker = cp.attacker();
 		if ( cp.isCity() && attacker != WWII_NO_SIDE && !cp.isContested() )
 		{
-			cp.clearObjective(attacker) ;
+			cp.clearObjective(attacker);
 		}
 #endif
 
-		cp.flags &= ~CP_STAT_ENEMY_LINKED ;
+		cp.flags &= ~CP_STAT_ENEMY_LINKED;
 	}
 }
 
@@ -392,59 +392,59 @@ strtEnemyLink(CPStruct& cp, bool state)
 void
 strtDataCantFindBuilding(const char* linkName, const char* role, const FULL_OBJ_ID& fid)
 {
-	char description[256] ;
-	snprintf(description, 255, "%s (%d,%d:%u)", role, fid.cell.ox, fid.cell.oy, fid.id) ;
-	errorList[ERR_CANT_FIND_LINK_BUILDING][linkName] = description ;
+	char description[256];
+	snprintf(description, 255, "%s (%d,%d:%u)", role, fid.cell.ox, fid.cell.oy, fid.id);
+	errorList[ERR_CANT_FIND_LINK_BUILDING][linkName] = description;
 }
 
 static inline void
 _checkSupplyLinksIn(const Supercell& sc)
 {
-	const LinkStruct* newLink ;
-	const ObjectStruct* bldg ;
+	const LinkStruct* newLink;
+	const ObjectStruct* bldg;
 
-	for ( UINT32 counter = 0 ; counter < sc.numLinks ; ++counter )
+	for ( UINT32 counter = 0; counter < sc.numLinks; ++counter )
 	{
 		newLink = &sc.links[counter];
 
-		bldg = strtGetObject(newLink->startDepotID) ;
+		bldg = strtGetObject(newLink->startDepotID);
 		if ( bldg != NULL )
 		{
-			const FacilityStruct& facility = bldg->Facility() ;
+			const FacilityStruct& facility = bldg->Facility();
 			if ( facility.m_outgoingLink == NULL)
 			{
-				char buffer[256] ;
+				char buffer[256];
 				sprintf(buffer, "%d,%d:%d -> %s"
 								, newLink->fullObjID.cell.ox
 								, newLink->fullObjID.cell.oy
 								, newLink->fullObjID.id
-								, facility.name) ;
-				errorList[ERR_LINK_START_DEPOT_LINK][newLink->name] = buffer ;
+								, facility.name);
+				errorList[ERR_LINK_START_DEPOT_LINK][newLink->name] = buffer;
 			}
 		}
 		else
 		{
-			strtDataCantFindBuilding(newLink->name, "start", newLink->startDepotID) ;
+			strtDataCantFindBuilding(newLink->name, "start", newLink->startDepotID);
 		}
 
 		bldg = strtGetObject(newLink->endDepotID);
 		if ( bldg != NULL )
 		{
-			const FacilityStruct& facility = bldg->Facility() ;
+			const FacilityStruct& facility = bldg->Facility();
 			if ( facility.m_incomingLink == NULL)
 			{
-				char buffer[256] ;
+				char buffer[256];
 				sprintf(buffer, "(%d,%d:%d -> %s)"
 								, newLink->fullObjID.cell.ox
 								, newLink->fullObjID.cell.oy
 								, newLink->fullObjID.id
-								, facility.name) ;
-				errorList[ERR_LINK_END_DEPOT_LINK][newLink->name] = buffer ;
+								, facility.name);
+				errorList[ERR_LINK_END_DEPOT_LINK][newLink->name] = buffer;
 			}
 		}
 		else
 		{
-			strtDataCantFindBuilding(newLink->name, "end", newLink->endDepotID) ;
+			strtDataCantFindBuilding(newLink->name, "end", newLink->endDepotID);
 		}
 
 	}
@@ -456,10 +456,10 @@ _checkSupplyLinksIn(const Supercell& sc)
 static void
 _checkSupplyLinks()
 {
-	SUPERCELLS::iterator it ;
-	for ( it = g_supercells.begin() ; it != g_supercells.end() ; ++it )
+	SUPERCELLS::iterator it;
+	for ( it = g_supercells.begin(); it != g_supercells.end(); ++it )
 	{
-		_checkSupplyLinksIn(it->second) ;
+		_checkSupplyLinksIn(it->second);
 	}
 }
 
@@ -469,12 +469,12 @@ _checkSupplyLinks()
 bool
 ObjectStruct::isProductionCenter() const
 {
-	if ( type != BUILDING_RESEARCH ) return false ;
-	if ( facility->type != FACILITY_FACTORY ) return false ;
-	if ( facility->subType != FACTORY_VEHICLE ) return false ;
-	if ( strncmp(filename, "fac", 3) != 0 ) return false ;
+	if ( type != BUILDING_RESEARCH ) return false;
+	if ( facility->type != FACILITY_FACTORY ) return false;
+	if ( facility->subType != FACTORY_VEHICLE ) return false;
+	if ( strncmp(filename, "fac", 3) != 0 ) return false;
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -489,13 +489,13 @@ static void
 _ensureCPInitialization(CPStruct* cp)
 {
 	if ( !(cp->facilityList == NULL && cp->supercell == NULL) )
-		return ;
+		return;
 
-	cp->ownableFacilities = 0 ;
-	cp->numArmyBases = 0 ;
-	cp->numFirebases = 0 ;
-	memset(cp->facilitiesOwned, 0, sizeof(cp->facilitiesOwned)) ;
-	memset(cp->armyBasesOwned, 0, sizeof(cp->armyBasesOwned)) ;
+	cp->ownableFacilities = 0;
+	cp->numArmyBases = 0;
+	cp->numFirebases = 0;
+	memset(cp->facilitiesOwned, 0, sizeof(cp->facilitiesOwned));
+	memset(cp->armyBasesOwned, 0, sizeof(cp->armyBasesOwned));
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -506,17 +506,17 @@ _facilityDistance(const FacilityStruct* facil1, const FacilityStruct* facil2)
 {
 	if ( facil1 == NULL || facil2 == NULL )
 	{
-		dbugLog(_FLA, "NULL facility pointer!") ;
-		return 0xffffffff ;				// A very long distance
+		dbugLog(_FLA, "NULL facility pointer!");
+		return 0xffffffff;				// A very long distance
 	}
 
 	// m_posX and m_posY should be the full X/Y of the facility;
 	// previous versions of the code thought they were
 	// supercell relative.
-	SINT64 xDist = facil1->m_posX - facil2->m_posX ;
-	SINT64 yDist = facil1->m_posY - facil2->m_posY ;
+	SINT64 xDist = facil1->m_posX - facil2->m_posX;
+	SINT64 yDist = facil1->m_posY - facil2->m_posY;
 
-	return (UINT32)sqrtl((double)(xDist * xDist) + (double)(yDist * yDist)) ;
+	return (UINT32)sqrtl((double)(xDist * xDist) + (double)(yDist * yDist));
 }
 
 
@@ -527,13 +527,13 @@ _facilityDistance(const FacilityStruct* facil1, const FacilityStruct* facil2)
 void
 _resetAllObjects()
 {
-	SUPERCELLS::iterator it ;
-	for ( it = g_supercells.begin() ; it != g_supercells.end() ; ++it )
+	SUPERCELLS::iterator it;
+	for ( it = g_supercells.begin(); it != g_supercells.end(); ++it )
 	{
-		Supercell& sc = it->second ;
-		for ( int counter = 0 ; counter < sc.numObjects ; ++counter )
+		Supercell& sc = it->second;
+		for ( int counter = 0; counter < sc.numObjects; ++counter )
 		{
-			strtResetObject(sc.objects[counter]) ;
+			strtResetObject(sc.objects[counter]);
 		}
 	}
 }
@@ -544,19 +544,19 @@ _resetAllObjects()
 static bool
 _supercellCheck(const char* typeName, const char* name, const Supercell& sc, int posX, int posY)
 {
-	int actualScx = posX / SUPERCELL_SIZE_M ;
-	int actualScy = posY / SUPERCELL_SIZE_M ;
+	int actualScx = posX / SUPERCELL_SIZE_M;
+	int actualScy = posY / SUPERCELL_SIZE_M;
 
 	if ( actualScx == sc.x && actualScy == sc.y )
-		return true ;
+		return true;
 
-	char entity[256], expected[256] ;
-	snprintf(entity, 255, "%s '%s' from %d.%d", typeName, name, sc.x, sc.y) ;
-	snprintf(expected, 255, "sdm puts it in %d.%d", actualScx, actualScy) ;
+	char entity[256], expected[256];
+	snprintf(entity, 255, "%s '%s' from %d.%d", typeName, name, sc.x, sc.y);
+	snprintf(expected, 255, "sdm puts it in %d.%d", actualScx, actualScy);
 
-	errorList[ERR_WRONG_SUPERCELL][entity] = expected ;
+	errorList[ERR_WRONG_SUPERCELL][entity] = expected;
 
-	return false ;
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -568,17 +568,17 @@ _supercellCheck(const char* typeName, const char* name, const Supercell& sc, int
 static void
 _scPass1_cps(Supercell& sc)
 {
-	for ( UINT32 counter = 0 ; counter < sc.numCPs ; ++counter )
+	for ( UINT32 counter = 0; counter < sc.numCPs; ++counter )
 	{
 		CPStruct* newCP = &sc.cps[counter];
 
-		_supercellCheck("CP", newCP->name, sc, newCP->m_posX, newCP->m_posY) ;
+		_supercellCheck("CP", newCP->name, sc, newCP->m_posX, newCP->m_posY);
 
 		if ( Strat::cpList )
-			Strat::cpList->prev = newCP ;
-		newCP->next = Strat::cpList ;
-		Strat::cpList = newCP ;
-		newCP->prev = NULL ;
+			Strat::cpList->prev = newCP;
+		newCP->next = Strat::cpList;
+		Strat::cpList = newCP;
+		newCP->prev = NULL;
 
 		if (!strtInitCPfromWOR(*newCP))
 		{
@@ -588,8 +588,8 @@ _scPass1_cps(Supercell& sc)
 
 		// Make sure the CP is initialized correctly if it hasn't
 		// already been visited by a facility forward reference
-		_ensureCPInitialization(newCP) ;
-		newCP->supercell = &sc ;
+		_ensureCPInitialization(newCP);
+		newCP->supercell = &sc;
 	}
 }
 
@@ -607,11 +607,11 @@ _scPass1_cps(Supercell& sc)
 static void
 _scPass1_facs(Supercell& sc)
 {
-	for ( UINT32 counter = 0 ; counter < sc.numFacilities ; ++counter )
+	for ( UINT32 counter = 0; counter < sc.numFacilities; ++counter )
 	{
 		FacilityStruct* newFacility = &sc.facilities[counter];
 
-		_supercellCheck("FAC", newFacility->name, sc, newFacility->m_posX, newFacility->m_posY) ;
+		_supercellCheck("FAC", newFacility->name, sc, newFacility->m_posX, newFacility->m_posY);
 
 		CPStruct* parentCP = strtGetCP(newFacility->cpID);
 		if (parentCP == NULL)
@@ -621,20 +621,20 @@ _scPass1_facs(Supercell& sc)
 						, newFacility->cpID.id
 						, newFacility->fullObjID.id
 						, newFacility->name);
-			continue ;
+			continue;
 		}
 
-		_ensureCPInitialization(parentCP) ;
+		_ensureCPInitialization(parentCP);
 
 		if ( newFacility->supercell != NULL )
 			dbugLog(_FLW, "reinitialization of facility %s in supercell %04hx/%04hx"
-							, newFacility->name, sc.x, sc.y) ;
+							, newFacility->name, sc.x, sc.y);
 
-		newFacility->supercell = &sc ;
+		newFacility->supercell = &sc;
 
 		if ( !strtInitFacilityfromWOR(*newFacility) )
 		{
-			dbugLog(_FLA,"couldn't initialize facility %s from WOR file", newFacility->name) ;
+			dbugLog(_FLA,"couldn't initialize facility %s from WOR file", newFacility->name);
 			continue;
 		}
 
@@ -642,8 +642,8 @@ _scPass1_facs(Supercell& sc)
 		newFacility->next = parentCP->facilityList;
 
 		// Add to the CPs by-type facility indexes
-		newFacility->typeNext = parentCP->facilityTypeIndex[newFacility->type] ;
-		parentCP->facilityTypeIndex[newFacility->type] = newFacility ;
+		newFacility->typeNext = parentCP->facilityTypeIndex[newFacility->type];
+		parentCP->facilityTypeIndex[newFacility->type] = newFacility;
 
 		if (newFacility->type == FACILITY_ARMYBASE)
 		{
@@ -660,20 +660,20 @@ _scPass1_facs(Supercell& sc)
 		}
 		else
 		{
-			parentCP->ownableFacilities++ ;
+			parentCP->ownableFacilities++;
 			if (newFacility->type == FACILITY_NAVALBASE)
-				parentCP->flags |= CP_STAT_HAS_NAVYBASE ;
+				parentCP->flags |= CP_STAT_HAS_NAVYBASE;
 			if (newFacility->type == FACILITY_AIRBASE)
-				parentCP->flags |= CP_STAT_HAS_AIRBASE ;
+				parentCP->flags |= CP_STAT_HAS_AIRBASE;
 
 			parentCP->facilitiesOwned[newFacility->side] ++;
 		}
 		parentCP->facilityList = newFacility;
 
 		//Initialize the capacity for the facility
-		newFacility->capacity = newFacility->maxCapacity() ;
+		newFacility->capacity = newFacility->maxCapacity();
 
-		newFacility->m_captureBuilding = NULL ;
+		newFacility->m_captureBuilding = NULL;
 	}
 }
 
@@ -683,10 +683,10 @@ _scPass1_facs(Supercell& sc)
 void
 strtDataErrorParentFacility(const char* buildingName, const char* filename, SINT32 scx, SINT32 scy, UINT16 bid, UINT16 bno, UINT16 fid)
 {
-	char description[256] ;
+	char description[256];
 	snprintf(description, 255, "%s sc:%d,%d bid:%d bldg:%d fid:%d"
-				, filename, scx, scy, bid, bno, fid) ;
-	errorList[ERR_CANT_FIND_PARENT_FACILITY][buildingName] = description ;
+				, filename, scx, scy, bid, bno, fid);
+	errorList[ERR_CANT_FIND_PARENT_FACILITY][buildingName] = description;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -699,45 +699,45 @@ strtDataErrorParentFacility(const char* buildingName, const char* filename, SINT
 static void
 _scPass1_objs(Supercell& sc)
 {
-	for ( UINT32 counter = 0 ; counter < sc.numObjects ; ++counter )
+	for ( UINT32 counter = 0; counter < sc.numObjects; ++counter )
 	{
 		ObjectStruct* newObject = &sc.objects[counter];
 
-		_supercellCheck("BLDG", newObject->name, sc, newObject->posX, newObject->posY) ;
+		_supercellCheck("BLDG", newObject->name, sc, newObject->posX, newObject->posY);
 
 		FacilityStruct* parentFacility = strtGetFacility(newObject->facilityID);
 
 		if (parentFacility == NULL)
 		{
-			strtDataErrorParentFacility(newObject->name, newObject->filename, sc.x, sc.y, newObject->fullObjID.id, counter, newObject->facilityID.id) ;
-			continue ;
+			strtDataErrorParentFacility(newObject->name, newObject->filename, sc.x, sc.y, newObject->fullObjID.id, counter, newObject->facilityID.id);
+			continue;
 		}
 
 		if ( !strtInitObjectfromWOR(*newObject) )
 		{
-			strtAddErrorListEntry(ERR_OBJ_NOT_IN_BLITZWOR, newObject->filename, newObject->name, newObject->filename) ;
-			continue ;
+			strtAddErrorListEntry(ERR_OBJ_NOT_IN_BLITZWOR, newObject->filename, newObject->name, newObject->filename);
+			continue;
 		}
 
 		if ( newObject->m_isCaptureBuilding != 0 )
 		{
 			if ( parentFacility->m_captureBuilding && parentFacility->m_captureBuilding != newObject )
 			{
-				char error[512] ;
+				char error[512];
 				sprintf(error, "type:%s vs %s type:%s"
 								, newObject->filename
 								, parentFacility->m_captureBuilding->name
 								, parentFacility->m_captureBuilding->filename
-								) ;
-				errorList[ERR_MULT_CAP_OBJECTS][newObject->name] = error ;
+								);
+				errorList[ERR_MULT_CAP_OBJECTS][newObject->name] = error;
 			}
 			else
 			{
-				parentFacility->m_captureBuilding = newObject ;
+				parentFacility->m_captureBuilding = newObject;
 			}
 		}
 
-		newObject->supercell = &sc ;
+		newObject->supercell = &sc;
 		newObject->facility = parentFacility;
 		newObject->next = parentFacility->objectList;
 		// try to not increment the number of objects a firebase has
@@ -752,12 +752,12 @@ _scPass1_objs(Supercell& sc)
 
 		parentFacility->objectList = newObject;
 
-		newObject->setCountry(parentFacility->country, parentFacility->side) ;
+		newObject->setCountry(parentFacility->country, parentFacility->side);
 
 #ifdef IS_STRAT_HOST
 		// Is it a production center?
 		if ( newObject->isProductionCenter() )
-			strtAddFactory(newObject) ;
+			strtAddFactory(newObject);
 #endif // IS_STRAT_HOST
 	}
 }
@@ -770,20 +770,20 @@ _scPass1_objs(Supercell& sc)
 static void
 _supercellsPass1()
 {
-	SUPERCELLS::iterator it ;
+	SUPERCELLS::iterator it;
 
 #if defined(IS_STRAT_HOST) || defined(IS_MAP_HOST)
-	dbugLog(_FLI, "Loading data from database") ;
-	strtdbInitSupercells() ;
+	dbugLog(_FLI, "Loading data from database");
+	strtdbInitSupercells();
 #endif
 
-	for ( it = g_supercells.begin() ; it != g_supercells.end() ; ++it )
+	for ( it = g_supercells.begin(); it != g_supercells.end(); ++it )
 	{
 		totalCPs += it->second.numCPs;
 
-		_scPass1_cps(it->second) ;
-		_scPass1_facs(it->second) ;
-		_scPass1_objs(it->second) ;
+		_scPass1_cps(it->second);
+		_scPass1_facs(it->second);
+		_scPass1_objs(it->second);
 	}
 }
 
@@ -793,60 +793,60 @@ _supercellsPass1()
 static void
 _scPass2_linkSetup(Supercell& sc)
 {
-	for ( UINT32 counter = 0 ; counter < sc.numLinks ; ++counter )
+	for ( UINT32 counter = 0; counter < sc.numLinks; ++counter )
 	{
 		LinkStruct* newLink = &sc.links[counter];
 
 		ObjectStruct* startBldg = strtGetObject(newLink->startDepotID);
 		if ( startBldg == NULL )
 		{
-			strtDataCantFindBuilding(newLink->name, "start", newLink->startDepotID) ;
-			continue ;
+			strtDataCantFindBuilding(newLink->name, "start", newLink->startDepotID);
+			continue;
 		}
 
 		FacilityStruct* start = startBldg->facility;
 		if ( start == NULL )
 		{
 			dbugLog(_FLA,"Supercell %d:%d: couldn't find start facility %d for Link %d %s", sc.x, sc.y, newLink->startDepotID.id, counter, newLink->name);
-			continue ;
+			continue;
 		}
 		if ( start->cp == NULL )
 		{
 			dbugLog(_FLA,"Supercell %d:%d: couldn't find start cp %d for Link %d %s", sc.x, sc.y, newLink->startDepotID.id, counter, newLink->name);
-			continue ;
+			continue;
 		}
 
 		ObjectStruct* endBldg = strtGetObject(newLink->endDepotID);
 		if ( endBldg == NULL )
 		{
-			strtDataCantFindBuilding(newLink->name, "end", newLink->endDepotID) ;
-			continue ;
+			strtDataCantFindBuilding(newLink->name, "end", newLink->endDepotID);
+			continue;
 		}
 
 		FacilityStruct* end = endBldg->facility;
 		if ( end == NULL )
 		{
 			dbugLog(_FLA,"Supercell %d:%d: couldn't find end facility %d for Link %d %s", sc.x, sc.y, newLink->endDepotID.id, counter, newLink->name);
-			continue ;
+			continue;
 		}
 		if ( end->cp == NULL )
 		{
 			dbugLog(_FLA,"Supercell %d:%d: couldn't find end cp %d for Link %d %s", sc.x, sc.y, newLink->endDepotID.id, counter, newLink->name);
-			continue ;
+			continue;
 		}
 
 		if ( start->m_outgoingLink != NULL )
 		{
-			std::string links = start->m_outgoingLink->name ;
-			links += "/" ;
-			links += newLink->name ;
+			std::string links = start->m_outgoingLink->name;
+			links += "/";
+			links += newLink->name;
 			errorList[ERR_LINK_START_MULTIPLE_LINKS][start->name] = links;
-			continue ;
+			continue;
 		}
 		if ( end->m_incomingLink != NULL )
 		{
-			dbugLog(_FLA, "link-end %s is associated with multiple links", end->name) ;
-			continue ;
+			dbugLog(_FLA, "link-end %s is associated with multiple links", end->name);
+			continue;
 		}
 
 		newLink->startDepot = start;
@@ -855,18 +855,18 @@ _scPass2_linkSetup(Supercell& sc)
 		newLink->endDepot = end;
 		end->m_incomingLink = newLink;
 
-		start->cp->m_links.insert(newLink) ;
+		start->cp->m_links.insert(newLink);
 
 		//Link up the firebase if we have one
 		FacilityStruct* firebase = strtGetFacility(newLink->firebaseID);
 		if ( firebase == NULL )
 		{
 			if ( newLink->firebaseID == nullObjID )
-				continue ;
-			char buffer[256] ;
-			sprintf(buffer, "%d,%d:%u", newLink->firebaseID.cell.ox, newLink->firebaseID.cell.oy, newLink->firebaseID.id) ;
-			errorList[ERR_LINK_FIREBASE][newLink->name] = buffer ;
-			continue ;
+				continue;
+			char buffer[256];
+			sprintf(buffer, "%d,%d:%u", newLink->firebaseID.cell.ox, newLink->firebaseID.cell.oy, newLink->firebaseID.id);
+			errorList[ERR_LINK_FIREBASE][newLink->name] = buffer;
+			continue;
 		}
 
 		firebase->link = newLink;
@@ -884,7 +884,7 @@ _scPass2_linkSetup(Supercell& sc)
 		if (!strtInitLinkfromWOR(*newLink))
 		{
 			dbugLog(_FLA,"couldn't initialize link %s from WOR file", newLink->name);
-			return ;
+			return;
 		}
 	}
 }
@@ -897,15 +897,15 @@ static void
 _scPass2_cps(Supercell& sc)
 {
 	//Cp initialization stuff
-	for ( UINT32 counter = 0 ; counter < sc.numCPs ; ++counter )
+	for ( UINT32 counter = 0; counter < sc.numCPs; ++counter )
 	{
-		CPStruct& cp = sc.cps[counter] ;
+		CPStruct& cp = sc.cps[counter];
 
-		cp.m_isSupplyCenter = false ;
+		cp.m_isSupplyCenter = false;
 #ifdef IS_STRAT_HOST
-		cp.m_isRouteingConnected = false ;
-		cp.m_routeingRun = 0ULL ;
-		cp.flags &= ~CP_STAT_IN_SUPPLY ;
+		cp.m_isRouteingConnected = false;
+		cp.m_routeingRun = 0ULL;
+		cp.flags &= ~CP_STAT_IN_SUPPLY;
 #endif
 	}
 }
@@ -917,9 +917,9 @@ static void
 _scPass2_facs(Supercell& sc)
 {
 	//Facility initialization
-	for ( UINT32 counter = 0 ; counter < sc.numFacilities ; ++counter )
+	for ( UINT32 counter = 0; counter < sc.numFacilities; ++counter )
 	{
-		FacilityStruct& fac = sc.facilities[counter] ;
+		FacilityStruct& fac = sc.facilities[counter];
 
 		if ( fac.type != FACILITY_FIREBASE && fac.m_captureBuilding == NULL
 			&& strncmp(fac.name, "Camp ", 5) != 0
@@ -939,44 +939,44 @@ _scPass2_facs(Supercell& sc)
 static void
 _scPass2_objs(Supercell& sc)
 {
-	for ( UINT32 counter = 0 ; counter < sc.numObjects ; ++counter )
+	for ( UINT32 counter = 0; counter < sc.numObjects; ++counter )
 	{
 		//initialize each Object
-		ObjectStruct& obj = sc.objects[counter] ;
+		ObjectStruct& obj = sc.objects[counter];
 
 		///CAVEAT: If we couldn't look the facility up in the
 		/// first pass, we shouldn't assume it's there now
 		if ( obj.isValid() == false )
-			continue ;
+			continue;
 
-		WEAPON_SPEC spec = weapFindClass(obj.filename) ;
+		WEAPON_SPEC spec = weapFindClass(obj.filename);
 		if ( spec.wClass != 0 )
-			obj.spawnAbility.weap = spec ;
+			obj.spawnAbility.weap = spec;
 
 		if ( obj.spawnAbility.weap.wCategory > 0 || obj.spawnAbility.weap.wClass > 0 )
 		{
 			if ( obj.type != BUILDING_SPAWN )
 			{
-				obj.type = BUILDING_SPAWN ;
-				obj.Facility().m_spawnable = true ;
+				obj.type = BUILDING_SPAWN;
+				obj.Facility().m_spawnable = true;
 			}
 
 			// Flag which types of spawn this facility has
 			switch (obj.spawnAbility.weap.wCategory)
 			{
 				case _INFANTRY:
-					obj.Facility().m_spawnsInf = true ;
-				break ;
+					obj.Facility().m_spawnsInf = true;
+				break;
 				case _GROUND_VEHICLE:
-					obj.Facility().m_spawnsVehicles = true ;
-				break ;
+					obj.Facility().m_spawnsVehicles = true;
+				break;
 				default:
-				break ;
+				break;
 			}
 		}
 		if ( obj.isProductionCenter() )
 		{
-			obj.Facility().CP().setSupplyCenter() ;
+			obj.Facility().CP().setSupplyCenter();
 		}
 	}
 }
@@ -988,15 +988,15 @@ _scPass2_objs(Supercell& sc)
 static void
 _scPass2_links(Supercell& sc)
 {
-	for ( UINT32 counter = 0 ; counter < sc.numLinks ; ++counter )
+	for ( UINT32 counter = 0; counter < sc.numLinks; ++counter )
 	{
-		LinkStruct& link = sc.links[counter] ;
+		LinkStruct& link = sc.links[counter];
 		if ( link.startDepot == NULL )
 		{
 			// We couldn't initialize this link, so ignore it.
-			continue ;
+			continue;
 		}
-		link.distance = _facilityDistance(link.startDepot, link.endDepot) ;
+		link.distance = _facilityDistance(link.startDepot, link.endDepot);
 	}
 }
 
@@ -1010,17 +1010,17 @@ _scPass2_links(Supercell& sc)
 static void
 _supercellsPass2()
 {
-	SUPERCELLS::iterator it ;
+	SUPERCELLS::iterator it;
 
 	//Now that all ither pointers have been resolved
 	// we can do the links and do other initialization
-	for ( it = g_supercells.begin() ; it != g_supercells.end() ; ++it )
+	for ( it = g_supercells.begin(); it != g_supercells.end(); ++it )
 	{
-		_scPass2_linkSetup(it->second) ;
-		_scPass2_cps(it->second) ;
-		_scPass2_facs(it->second) ;
-		_scPass2_objs(it->second) ;
-		_scPass2_links(it->second) ;
+		_scPass2_linkSetup(it->second);
+		_scPass2_cps(it->second);
+		_scPass2_facs(it->second);
+		_scPass2_objs(it->second);
+		_scPass2_links(it->second);
 	}
 }
 
@@ -1036,20 +1036,20 @@ _supercellsPass2()
 static void
 _mate()
 {
-	for ( auto cp = Strat::cpList ; cp != NULL ; cp = cp->next )
+	for ( auto cp = Strat::cpList; cp != NULL; cp = cp->next )
 	{
 		for ( auto facility = cp->facilityTypeIndex[FACILITY_DEPOT]
 			; facility != NULL
 			; facility = facility->next
 			)
 		{
-			LinkStruct* const link = facility->m_outgoingLink ;
+			LinkStruct* const link = facility->m_outgoingLink;
 			if ( link )
 			{
-				facility->mate = link->endDepot ;
-				FacilityStruct* const mate = facility->m_incomingLink->firebase ;
+				facility->mate = link->endDepot;
+				FacilityStruct* const mate = facility->m_incomingLink->firebase;
 				if ( mate && link->firebase )
-					link->firebase->mate = mate ;
+					link->firebase->mate = mate;
 			}
 		}
 	}
@@ -1059,14 +1059,14 @@ static void
 _checkCPLinks()
 {
 #ifdef CHECK_SUPPLY
-	CPStruct* cp ;
+	CPStruct* cp;
 	FacilityStruct* facility;
 
-	for ( cp = Strat::cpList ; cp != NULL ; cp = cp->next )
+	for ( cp = Strat::cpList; cp != NULL; cp = cp->next )
 	{
-		cp->numLinks = 0 ;
-		cp->numOpenLinks = 0 ;
-		strtEnemyLink(*cp, false) ;
+		cp->numLinks = 0;
+		cp->numOpenLinks = 0;
+		strtEnemyLink(*cp, false);
 
 		for ( facility = cp->facilityTypeIndex[FACILITY_DEPOT]
 			; facility != NULL
@@ -1074,16 +1074,16 @@ _checkCPLinks()
 			)
 		{
 			if ( facility->m_outgoingLink == NULL || facility->m_incomingLink == NULL )
-				continue ;
+				continue;
 
 			if ( facility->subType != DEPOT_TRAIN)
 				cp->numLinks++;
 
-			const CPStruct* const otherCP = facility->m_outgoingLink->endDepot->cp ;
+			const CPStruct* const otherCP = facility->m_outgoingLink->endDepot->cp;
 			if( otherCP->ControllingSide() == cp->ControllingSide() )
 			{
-				facility->m_outgoingLink->setEnabled(true) ;
-				facility->m_incomingLink->setEnabled(true) ;
+				facility->m_outgoingLink->setEnabled(true);
+				facility->m_incomingLink->setEnabled(true);
 
 				if ( facility->subType != DEPOT_TRAIN)
 					cp->numOpenLinks++;
@@ -1091,20 +1091,20 @@ _checkCPLinks()
 			else
 			{
 				if ( isValidSide(otherCP->side) && otherCP->country != WWII_CHINA )	// Russia is neutral-hostile
-					strtEnemyLink(*cp, true) ;
+					strtEnemyLink(*cp, true);
 
-				facility->m_outgoingLink->setEnabled(false) ;
-				facility->m_incomingLink->setEnabled(false) ;
+				facility->m_outgoingLink->setEnabled(false);
+				facility->m_incomingLink->setEnabled(false);
 			}
 		}
 
 		// If the facility has no open links, but IS linked to an enemy CP, then it must be out of supply
-		cp->updateFriendlyLinkStatus() ;
-		cp->processFirebases(cp->isContested()) ;
+		cp->updateFriendlyLinkStatus();
+		cp->processFirebases(cp->isContested());
 
-		for ( facility=cp->facilityList ; facility != NULL ; facility=facility->next)
+		for ( facility=cp->facilityList; facility != NULL; facility=facility->next)
 		{
-			facility->setCaptureDisabled() ;
+			facility->setCaptureDisabled();
 		}
 	}
 
@@ -1115,9 +1115,9 @@ _checkCPLinks()
 static void
 _killStratData()
 {
-	for ( auto it = g_filenamePool.begin() ; it != g_filenamePool.end() ; ++it )
+	for ( auto it = g_filenamePool.begin(); it != g_filenamePool.end(); ++it )
 	{
-		free((void*)*it) ;
+		free((void*)*it);
 	}
 }
 
@@ -1127,7 +1127,7 @@ _killStratData()
 CPStruct*
 strtInitializeStratData()
 {
-	atexit(_killStratData) ;
+	atexit(_killStratData);
 
 	// Load in the blitzWor modifier data
 	if (!parseWor(cv_blitzworPath.GetString(), NULL))
@@ -1135,28 +1135,28 @@ strtInitializeStratData()
 
 #ifdef IS_STRAT_HOST
 	// Load the virtual spawn classes.
-	weapLoadSpawnXML() ;
+	weapLoadSpawnXML();
 #endif
 
-	totalCPs = 0 ;
+	totalCPs = 0;
 
 	// Go through all the basic strat objects and ensure they are base-
 	// initialized and establish all the basic object indexes. Also pull
 	// baseline data from the strat database
-	_supercellsPass1() ;
+	_supercellsPass1();
 
 	// Now that all the base values are in place, we can go through and
 	// tie everything up
-	_supercellsPass2() ;
+	_supercellsPass2();
 
 	// Now set up all the reciprocations between FBs/depots
-	_mate() ;
+	_mate();
 
 	_checkSupplyLinks();
 	_checkCPStatus(Strat::cpList);
-	_resetAllObjects() ;
+	_resetAllObjects();
 
-	_checkCPLinks() ;
+	_checkCPLinks();
 
 	_checkSupplyLinks();
 
@@ -1176,7 +1176,7 @@ _getStratObject(const FULL_ID& index)
 	}else
 	{
 		if (index.id < sc->indexSize)
-			return (FULL_OBJ_ID*)sc->index[index.id] ;
+			return (FULL_OBJ_ID*)sc->index[index.id];
 		else
 			return NULL;
 	}
@@ -1193,28 +1193,28 @@ strtGetSupercellFULL_OBJ_ID(const FULL_OBJ_ID& fullObjID)
 Supercell*
 strtGetSupercell(const SINT16 x, const SINT16 y)
 {
-	SUPERCELLS::iterator it = g_supercells.find(std::make_pair(x,y)) ;
-	return ( it != g_supercells.end() ) ? &it->second : NULL ;
+	SUPERCELLS::iterator it = g_supercells.find(std::make_pair(x,y));
+	return ( it != g_supercells.end() ) ? &it->second : NULL;
 }
 
 Supercell*
 strtGetSupercellFromPosition_cm(const SINT32 x_cm, const SINT32 y_cm)
 {
-	const SINT32 x_m = x_cm / 100 ;
-	const SINT32 y_m = y_cm / 100 ;
-	return strtGetSupercellFromPosition_m(x_m, y_m) ;
+	const SINT32 x_m = x_cm / 100;
+	const SINT32 y_m = y_cm / 100;
+	return strtGetSupercellFromPosition_m(x_m, y_m);
 }
 
 Supercell*
 strtGetSupercellFromPosition_m(const SINT32 x_m, const SINT32 y_m)
 {
-	return strtGetSupercell(x_m / SUPERCELL_SIZE_M, y_m / SUPERCELL_SIZE_M) ;
+	return strtGetSupercell(x_m / SUPERCELL_SIZE_M, y_m / SUPERCELL_SIZE_M);
 }
 
 FULL_OBJ_ID*
 strtGetFullObjID(const FULL_OBJ_ID& index)
 {
-	return _getStratObject(strtFullObjIDToFullID(index)) ;
+	return _getStratObject(strtFullObjIDToFullID(index));
 }
 
 CPStruct*
@@ -1226,38 +1226,38 @@ strtGetCP(const FULL_OBJ_ID& index)
 CPStruct*
 strtGetCPorBridge(const FULL_OBJ_ID& index)
 {
-	FULL_OBJ_ID* cp = _getStratObject(strtFullObjIDToFullID(index)) ;
+	FULL_OBJ_ID* cp = _getStratObject(strtFullObjIDToFullID(index));
 	if ( cp == NULL )
-		return NULL ;
+		return NULL;
 	if ( cp->objClass == CLASS_CP )
-		return (CPStruct*)cp ;
+		return (CPStruct*)cp;
 	if ( cp->objClass == CLASS_BUILDING )
 	{
-		ObjectStruct* building = (ObjectStruct*)cp ;
+		ObjectStruct* building = (ObjectStruct*)cp;
 		if ( building->type == BUILDING_BRIDGE && building->facility )
-			return building->facility->cp ;
+			return building->facility->cp;
 	}
 
-	return NULL ;
+	return NULL;
 }
 
 CPStruct*
 strtGetCPFromTarget(const FULL_OBJ_ID& index)
 {
-	FULL_OBJ_ID* target = _getStratObject(strtFullObjIDToFullID(index)) ;
+	FULL_OBJ_ID* target = _getStratObject(strtFullObjIDToFullID(index));
 	while ( target != NULL )
 	{
 		if ( target->objClass == CLASS_CP )
-			return (CPStruct*) target ;
+			return (CPStruct*) target;
 		if ( target->objClass == CLASS_FACILITY )
-			target = (FULL_OBJ_ID*)((FacilityStruct*)target)->cp ;
+			target = (FULL_OBJ_ID*)((FacilityStruct*)target)->cp;
 		else if ( target->objClass == CLASS_BUILDING )
-			target = (FULL_OBJ_ID*)((ObjectStruct*)target)->facility ;
+			target = (FULL_OBJ_ID*)((ObjectStruct*)target)->facility;
 		else
-			target = NULL ;
+			target = NULL;
 	}
 
-	return NULL ;
+	return NULL;
 }
 
 FacilityStruct*
@@ -1321,18 +1321,18 @@ void
 strtResetObject(ObjectStruct& object)
 {
 	if ( object.isValid() == false )
-		return ;
+		return;
 
-	UINT32 newMax ;
+	UINT32 newMax;
 	if ( object.Facility().type != FACILITY_FIREBASE || object.m_maxDamageJoules > 0 )
-		newMax = 1000 ;
+		newMax = 1000;
 	else
-		newMax = 0 ;
+		newMax = 0;
 
-	object.setMaxCapacity(newMax) ;
+	object.setMaxCapacity(newMax);
 
-	object.setVisLevel(VISLEVEL_NORMAL) ;
-	object.m_smokeLevel = 0 ;
+	object.setVisLevel(VISLEVEL_NORMAL);
+	object.m_smokeLevel = 0;
 
 #ifdef OLDSTYLE_FBS
 	//OGS Mon 2004-11-15 17:xx:xx
@@ -1345,11 +1345,11 @@ strtResetObject(ObjectStruct& object)
 	if ( object.type == BUILDING_SPAWN && object.facility().type == FACILITY_FIREBASE )
 	{
 		//dbugLog(_FLN,"Setting invisible spawn portal %s capacity to zero",object.name);
-		object.setMaxCapacity(0) ;
-		object.setCapacity(0) ;
+		object.setMaxCapacity(0);
+		object.setCapacity(0);
 	}
 	else
-		object.setMaxCapacity(object.capacity) ;
+		object.setMaxCapacity(object.capacity);
 #endif
 
 	_calcCapacity(object);
@@ -1358,7 +1358,7 @@ strtResetObject(ObjectStruct& object)
 	//for the Facility
 	object.Facility().objectRPTotal += object.totalRPs;
 
-	object.save() ;
+	object.save();
 }
 
 void strtInitCP(CPStruct* cp)
@@ -1374,8 +1374,8 @@ void strtInitFacility(FacilityStruct* facility)
 	facility->next = NULL;
 	facility->cp = NULL;
 	facility->objectList = NULL;
-	facility->m_outgoingLink = facility->m_incomingLink = NULL ;
-	facility->m_captureBuilding = NULL ;
+	facility->m_outgoingLink = facility->m_incomingLink = NULL;
+	facility->m_captureBuilding = NULL;
 }
 
 void strtInitObject(ObjectStruct* object)
@@ -1383,13 +1383,13 @@ void strtInitObject(ObjectStruct* object)
 	object->next=NULL;
 	object->facility=NULL;
 	memset(object->name, 0, sizeof(object->name));
-	object->m_isCaptureBuilding = object->m_needsSync = false ;
-	object->m_damageJoulesSaved = ~0ULL ;
-	object->m_maxDamageJoulesSaved = ~0ULL ;
-	object->m_capacitySaved = ~0 ;
-	object->m_lastCapacitySaved = ~0 ;
-	object->m_maxCapacitySaved = ~0 ;
-	object->m_repairRPsSaved = ~0 ;
+	object->m_isCaptureBuilding = object->m_needsSync = false;
+	object->m_damageJoulesSaved = ~0ULL;
+	object->m_maxDamageJoulesSaved = ~0ULL;
+	object->m_capacitySaved = ~0;
+	object->m_lastCapacitySaved = ~0;
+	object->m_maxCapacitySaved = ~0;
+	object->m_repairRPsSaved = ~0;
 }
 
 void strtInitLink(LinkStruct* link)
@@ -1448,37 +1448,37 @@ static LOGICAL _checkFirebasePair(FacilityStruct& firebase)
 FacilityStruct*
 FacilityStruct::findLocalAB(WWII_SIDE favorSide) const
 {
-	UINT32	currentDistance = 0 ;			// How far current ab is
-	UINT32	nearestDistance = 0xffffffff ;	// How far closest was
-	const FacilityStruct* currentAB ;		// AB being considered
-	const FacilityStruct* chosenAB ;		// The AB we are choosing
-	const FacilityStruct* lastResort ;
+	UINT32	currentDistance = 0;			// How far current ab is
+	UINT32	nearestDistance = 0xffffffff;	// How far closest was
+	const FacilityStruct* currentAB;		// AB being considered
+	const FacilityStruct* chosenAB;		// The AB we are choosing
+	const FacilityStruct* lastResort;
 
 	// If the facility is an armybase itself, then it is its own spawn source
 	if ( isSpawnSource() )
-		return const_cast<FacilityStruct*>(this) ;
+		return const_cast<FacilityStruct*>(this);
 
 	if ( type == FACILITY_FIREBASE )
 	{
 		// If you're looking for an ownership matchup, check sides first.
 		if ( (favorSide > 0 && side != favorSide) || link == NULL || link->startDepot == NULL )
-			return NULL ;
+			return NULL;
 
-		return link->startDepot->findLocalAB(favorSide) ;
+		return link->startDepot->findLocalAB(favorSide);
 	}
 
 	// If we aren't the owners, none of the armybases are supplying
 	if ( favorSide > 0 && (cp->side != favorSide || cp->ControllingSide() != favorSide) )
-		return NULL ;
+		return NULL;
 
 	// No ABs means that the facilities have to rely on themselves.
 	if ( cp->numArmyBases <= 0 )
 	{
-		return const_cast<FacilityStruct*>(this) ;
+		return const_cast<FacilityStruct*>(this);
 	}
 
-	chosenAB = NULL ;
-	lastResort = NULL ;
+	chosenAB = NULL;
+	lastResort = NULL;
 
 	// Otherwise we need to do a radial search
 	for ( currentAB = cp->facilityTypeIndex[FACILITY_ARMYBASE]
@@ -1489,26 +1489,26 @@ FacilityStruct::findLocalAB(WWII_SIDE favorSide) const
 		// If a country has been supplied ignore any non-country ABs
 		// or armybases which are currently closed
 		if ( favorSide && (!currentAB->isOpen() || currentAB->side != favorSide) )
-			continue ;
+			continue;
 
 		// Otherwise we need to know how far apart they are
-		currentDistance = _facilityDistance(this, currentAB) ;
+		currentDistance = _facilityDistance(this, currentAB);
 		if ( currentDistance < nearestDistance )
 		{
 			if ( currentAB->m_spawnsInf && currentAB->m_spawnsVehicles )
 			{
-				chosenAB = currentAB ;
-				nearestDistance = currentDistance ;
+				chosenAB = currentAB;
+				nearestDistance = currentDistance;
 			}
 			else
-				lastResort = currentAB ;
+				lastResort = currentAB;
 		}
 	}
 
 	if ( chosenAB == NULL )
-		chosenAB = lastResort ;
+		chosenAB = lastResort;
 
-	return const_cast<FacilityStruct*>(chosenAB) ;
+	return const_cast<FacilityStruct*>(chosenAB);
 }
 
 //returns TRUE if the facility can spawn ground vehicles
@@ -1519,7 +1519,7 @@ _spawnsGroundVehicles(FacilityStruct* facility)
 		return FALSE;
 
 	if ( facility->m_spawnsVehicles )
-		return TRUE ;
+		return TRUE;
 
 	ObjectStruct* currentObject;
 
@@ -1567,7 +1567,7 @@ static LOGICAL _spawnsInfantry(FacilityStruct* facility)
 		return FALSE;
 
 	if ( facility->m_spawnsInf )
-		return TRUE ;
+		return TRUE;
 
 	ObjectStruct* currentObject;
 
@@ -1617,19 +1617,19 @@ strtVerifyStratSystem(CPStruct* cpList, UINT32 testLevel)
 		return false;
 	}
 
-	curTestLevel = testLevel ;
+	curTestLevel = testLevel;
 
 	CPStruct* currentCP;
 	FacilityStruct* fac;
-	bool retval = true ;
+	bool retval = true;
 	ObjectStruct* building;
 
-	for ( currentCP = cpList ; currentCP != NULL ; currentCP = currentCP->next )
+	for ( currentCP = cpList; currentCP != NULL; currentCP = currentCP->next )
 	{
 		if (wwiiSide(currentCP->country) != currentCP->side)
 		{
 			dbugLog(_FLA,"CP %s has side %d and country %d", currentCP->name, currentCP->side, currentCP->country);
-			retval = false ;
+			retval = false;
 		}
 
 		if (curTestLevel == 3)
@@ -1646,7 +1646,7 @@ strtVerifyStratSystem(CPStruct* cpList, UINT32 testLevel)
 		fac = currentCP->facilityList;
 		while (fac != NULL)
 		{
-			WWII_SIDE expectSide = wwiiSide(fac->country) ;
+			WWII_SIDE expectSide = wwiiSide(fac->country);
 			if ( fac->side != expectSide )
 			{
 				dbugLog(_FLA,"%s Side and country do not match: country %s(%u), side %s(%u) should be %s(%u)"
@@ -1654,8 +1654,8 @@ strtVerifyStratSystem(CPStruct* cpList, UINT32 testLevel)
 								, _countryCode[fac->country], fac->country
 								, _sideName[fac->side], fac->side
 								, _sideName[expectSide], expectSide
-								) ;
-				retval = false ;
+								);
+				retval = false;
 			}
 
 			if (curTestLevel == 2)
@@ -1698,20 +1698,20 @@ strtVerifyStratSystem(CPStruct* cpList, UINT32 testLevel)
 					{
 						if ( curTestLevel >= 1 )
 						{
-							strtAddErrorListEntry(ERR_ZERO_LINKS, fac->name, fac->name, "") ;
-							retval = false ;
+							strtAddErrorListEntry(ERR_ZERO_LINKS, fac->name, fac->name, "");
+							retval = false;
 						}
 						// Otherwise its a warning
 					}
 					else if ( fac->m_incomingLink == NULL )
 					{
-						errorList[ERR_ZERO_ILINKS][fac->name] = "" ;
-						retval = false ;
+						errorList[ERR_ZERO_ILINKS][fac->name] = "";
+						retval = false;
 					}
 					else if ( fac->m_outgoingLink == NULL )
 					{
-						errorList[ERR_ZERO_OLINKS][fac->name] = "" ;
-						retval = false ;
+						errorList[ERR_ZERO_OLINKS][fac->name] = "";
+						retval = false;
 					}
 				break;
 				case FACILITY_FIREBASE:
@@ -1722,53 +1722,53 @@ strtVerifyStratSystem(CPStruct* cpList, UINT32 testLevel)
 						if (!(_spawnsGroundVehicles(fac) && _spawnsInfantry(fac)))
 						//Print the log message if they can't
 						{
-							strtAddErrorListEntry(ERR_FB_BOTH_CHECK, fac->name, fac->name, "") ;
-							retval = false ;
+							strtAddErrorListEntry(ERR_FB_BOTH_CHECK, fac->name, fac->name, "");
+							retval = false;
 						}
 					}
 					if ( fac->numObjects == 0 )
 					{
-						errorList[ERR_FB_ZERO_OBJECTS][fac->name] = "" ;
-						retval = false ;
-						break ;
+						errorList[ERR_FB_ZERO_OBJECTS][fac->name] = "";
+						retval = false;
+						break;
 					}
 					{
-						UINT64 capacity = 0LL ;
-						UINT32 damageables = 0 ;
-						bool tainted = false ;
-						for ( ObjectStruct* it = fac->objectList ; it != NULL ; it = it->next )
+						UINT64 capacity = 0LL;
+						UINT32 damageables = 0;
+						bool tainted = false;
+						for ( ObjectStruct* it = fac->objectList; it != NULL; it = it->next )
 						{
 							if ( strstr(it->filename, "spawn") != NULL && it->m_maxDamageJoules > 0 )
 							{
-								errorList[ERR_FB_DAMAGEABLE_SPAWN][fac->name] = "" ;
-								tainted = true ;
-								retval = false ;
+								errorList[ERR_FB_DAMAGEABLE_SPAWN][fac->name] = "";
+								tainted = true;
+								retval = false;
 							}
 							if ( it->m_maxDamageJoules > 0 )
 							{
-								capacity += it->m_maxCapacity ;
-								++damageables ;
+								capacity += it->m_maxCapacity;
+								++damageables;
 							}
 						}
-						capacity /= fac->numObjects ;
+						capacity /= fac->numObjects;
 						if ( capacity != (UINT64)fac->maxCapacity() && (!tainted || curTestLevel > 0) )
 						{
-							errorList[ERR_FB_DIVISOR][fac->name] = "" ;
-							retval = false ;
+							errorList[ERR_FB_DIVISOR][fac->name] = "";
+							retval = false;
 						}
 					}
 					if (fac->link == NULL)
 					{
-						errorList[ERR_FB_NO_LINK][fac->name] = "" ;
-						retval = false ;
+						errorList[ERR_FB_NO_LINK][fac->name] = "";
+						retval = false;
 					}
 					else
 					{
 						// Check for matching firebase
 						if (!_checkFirebasePair(*fac))
 						{
-							errorList[ERR_FB_NO_MATE][fac->name] = "" ;
-							retval = false ;
+							errorList[ERR_FB_NO_MATE][fac->name] = "";
+							retval = false;
 						}
 					}
 				break;
@@ -1779,8 +1779,8 @@ strtVerifyStratSystem(CPStruct* cpList, UINT32 testLevel)
 						if (!(_spawnsGroundVehicles(fac) && _spawnsInfantry(fac)))
 						//Print the log message if they can't
 						{
-							strtAddErrorListEntry(ERR_AB_BOTH_CHECK, fac->name, fac->name, "") ;
-							retval = false ;
+							strtAddErrorListEntry(ERR_AB_BOTH_CHECK, fac->name, fac->name, "");
+							retval = false;
 						}
 					}
 				break;
@@ -1790,8 +1790,8 @@ strtVerifyStratSystem(CPStruct* cpList, UINT32 testLevel)
 					//Print the log message if they can't
 					if (!_spawnsAircraft(fac))
 					{
-						strtAddErrorListEntry(ERR_AF_NO_SPAWN, fac->name, fac->name, "") ;
-						retval = false ;
+						strtAddErrorListEntry(ERR_AF_NO_SPAWN, fac->name, fac->name, "");
+						retval = false;
 					}
 				break;
 #endif
@@ -1803,7 +1803,7 @@ strtVerifyStratSystem(CPStruct* cpList, UINT32 testLevel)
 						if (!_spawnsSeaVehicles(fac))
 						{
 							dbugLog(_FLA,"%s: Navalbase cannot spawn sea vehicles",fac->name);
-							retval = false ;
+							retval = false;
 						}
 					}
 				break;
@@ -1813,17 +1813,17 @@ strtVerifyStratSystem(CPStruct* cpList, UINT32 testLevel)
 			if (curTestLevel >= 1)
 			{
 				//Verify the existence of a capture object
-				bool doCaptureTest = (curTestLevel > 1 && strcmp(fac->name, "UK") != 0 && strcmp(fac->name, "FR") != 0 && strcmp(fac->name, "DE") != 0) ;
+				bool doCaptureTest = (curTestLevel > 1 && strcmp(fac->name, "UK") != 0 && strcmp(fac->name, "FR") != 0 && strcmp(fac->name, "DE") != 0);
 				if ( doCaptureTest && fac->type != FACILITY_FIREBASE && fac->m_captureBuilding == NULL )
 				{
 					dbugLog(_FLA,"%s: non-firebase with no capture object",fac->name);
-					retval = false ;
+					retval = false;
 				}
 				//Also verify subtypes where appropiate for all buildings
 				if (!_verifySubtypes(fac))
 				{
 					dbugLog(_FLA,"subtype is not apropriate for all buildings for facility %s",fac->name);
-					retval = false ;
+					retval = false;
 				}
 
 			}
@@ -1834,24 +1834,24 @@ strtVerifyStratSystem(CPStruct* cpList, UINT32 testLevel)
 	}
 
 	if ( strtReportDataErrors() > 0 )
-		retval = false ;
+		retval = false;
 
 	if ( cv_stratIgnoreErrors.GetBool() )
-		return true ;
+		return true;
 
-	curTestLevel = 0 ;
-	return retval ;
+	curTestLevel = 0;
+	return retval;
 }
 
 UINT32
 strtReportDataErrors()
 {
-	UINT32 errors = 0 ;
+	UINT32 errors = 0;
 
-	dbugLog(_FLIB, "\n") ;
+	dbugLog(_FLIB, "\n");
 
 //	const UINT32 errorLimit = cv_stratErrorLimit().GetUint32();
-	for ( UINT32 i = 0 ; i < MAX_ERR_CODES ; ++i )
+	for ( UINT32 i = 0; i < MAX_ERR_CODES; ++i )
 	{
 		if ( curTestLevel >= errorInfo[i].level && errorList[i].empty() == false )
 		{
@@ -1860,52 +1860,52 @@ strtReportDataErrors()
 							"%s"
 							"\n============================================================================\n"
 							, (errorInfo[i].canIgnore ? errorInfo[i].name : "CRITICAL")
-							, errorInfo[i].text) ;
+							, errorInfo[i].text);
 
-			std::string list = "" ;
-			std::string detail = "" ;
-			std::map<std::string, std::string>::iterator it ;
-			UINT32 reportNo = 0 ;
-			for ( it = errorList[i].begin() ; it != errorList[i].end() ; ++it, ++reportNo )
+			std::string list = "";
+			std::string detail = "";
+			std::map<std::string, std::string>::iterator it;
+			UINT32 reportNo = 0;
+			for ( it = errorList[i].begin(); it != errorList[i].end(); ++it, ++reportNo )
 			{
 				if ( list.empty() == false )
-					list += ", " ;
+					list += ", ";
 
 //				if ( errorLimit > 0 && curTestLevel > 0 && errorList[i].size() > errorLimit + 10 && reportNo >= errorLimit )
 //				{
-//					char conclusion[80] ;
-//					sprintf(conclusion, "{ %u more occurances skipped }", (UINT32)(errorList[i].size() - reportNo)) ;
-//					list += conclusion ;
-//					break ;
+//					char conclusion[80];
+//					sprintf(conclusion, "{ %u more occurances skipped }", (UINT32)(errorList[i].size() - reportNo));
+//					list += conclusion;
+//					break;
 //				}
 
-				detail = it->first ;
+				detail = it->first;
 				if ( it->second.empty() == false )
 				{
-					detail += " [" ;
-					detail += it->second.c_str() ;
-					detail += "]" ;
+					detail += " [";
+					detail += it->second.c_str();
+					detail += "]";
 				}
 
 				if ( list.size() + detail.size() > 77 )
 				{
-					dbugLog(_FLAB, "  %s\n", list.c_str()) ;
-					list = "" ;
+					dbugLog(_FLAB, "  %s\n", list.c_str());
+					list = "";
 				}
 
-				list += detail ;
+				list += detail;
 
 				if ( errorInfo[i].canIgnore == false )
-					++errors ;
+					++errors;
 			}
 
 			if ( list.empty() == false )
-				dbugLog(_FLAB, "  %s\n", list.c_str()) ;
-			dbugLog(_FLIB, "\n") ;
+				dbugLog(_FLAB, "  %s\n", list.c_str());
+			dbugLog(_FLIB, "\n");
 		}
 	}
 
-	return errors ;
+	return errors;
 }
 
 static bool _isSpawnObject(ObjectStruct* object)
@@ -1916,14 +1916,14 @@ static bool _isSpawnObject(ObjectStruct* object)
 		"gv_spawnfb2c", "sv_spawng1c", "ac_spawn1c", "acrare_spawn1c",
 		"acspit_spawn1c", "mshack1c",
 		NULL
-	} ;
+	};
 
-	for ( int i = 0 ; spawners[i] != NULL ; ++i )
+	for ( int i = 0; spawners[i] != NULL; ++i )
 	{
 		if ( !strncmp(object->filename, spawners[i], MAX_OBJNAME_LENGTH) )
-			return true ;
+			return true;
 	}
-	return false ;
+	return false;
 }
 
 //Returns true if all buildings that are capture objects have the capture subtype
@@ -1956,7 +1956,7 @@ ObjectStruct* currentObject;
 				retval = FALSE;
 			}
 		}
-		currentObject = currentObject->next ;
+		currentObject = currentObject->next;
 	}
 
 	return retval;
@@ -1973,8 +1973,8 @@ strtInitCPStructwithCP(CPStruct* newCP,CP* cp)
 	//Calculate octet x and y from POSITIONAL x and y
 	newCP->fullObjID.cell.ox = cp->posx / 800;
 	newCP->fullObjID.cell.oy = cp->posy / 800;
-	newCP->m_posX = cp->posx ;
-	newCP->m_posY = cp->posy ;
+	newCP->m_posX = cp->posx;
+	newCP->m_posY = cp->posy;
 
 	//Get the class and type from oid
 	newCP->fullObjID.id = cp->oid.id;
@@ -1983,14 +1983,14 @@ strtInitCPStructwithCP(CPStruct* newCP,CP* cp)
 
 	newCP->subType = cp->subType;
 
-	newCP->setSide((WWII_SIDE)cp->side) ;
-	newCP->originalSide = newCP->controllingSide = (WWII_SIDE) cp->side ;
+	newCP->setSide((WWII_SIDE)cp->side);
+	newCP->originalSide = newCP->controllingSide = (WWII_SIDE) cp->side;
 
-	cp->country = _adjustCountryFor135(cp->country) ;
-	newCP->country = newCP->originalCountry = newCP->controllingCountry = (WWII_COUNTRY) cp->country ;
+	cp->country = _adjustCountryFor135(cp->country);
+	newCP->country = newCP->originalCountry = newCP->controllingCountry = (WWII_COUNTRY) cp->country;
 
 	strlcpy(newCP->name, cp->name, sizeof(newCP->name));
-	newCP->filename = _filenamePool(cp->fileName) ;
+	newCP->filename = _filenamePool(cp->fileName);
 
 	return TRUE;
 }
@@ -2002,8 +2002,8 @@ strtInitFacilityStructwithFACILITY(FacilityStruct* newFacility, FACILITY* facili
 		return FALSE;
 
 	// Remember the location
-	newFacility->m_posX = facility->posx ;
-	newFacility->m_posY = facility->posy ;
+	newFacility->m_posX = facility->posx;
+	newFacility->m_posY = facility->posy;
 
 	//Fill in the fullObjID
 	//Calculate octet x and y from x and y location in meters
@@ -2021,11 +2021,11 @@ strtInitFacilityStructwithFACILITY(FacilityStruct* newFacility, FACILITY* facili
 
 	newFacility->side = newFacility->originalSide = (WWII_SIDE) facility->originalSide;
 
-	facility->originalCountry = _adjustCountryFor135(facility->originalCountry) ;
-	newFacility->country = newFacility->originalCountry = (WWII_COUNTRY) facility->originalCountry ;
+	facility->originalCountry = _adjustCountryFor135(facility->originalCountry);
+	newFacility->country = newFacility->originalCountry = (WWII_COUNTRY) facility->originalCountry;
 
 	strlcpy(newFacility->name, facility->name, sizeof(newFacility->name));
-	newFacility->filename = _filenamePool(facility->fileName) ;
+	newFacility->filename = _filenamePool(facility->fileName);
 
 	return TRUE;
 }
@@ -2036,8 +2036,8 @@ LOGICAL strtInitObjectStructwithBUILDING(ObjectStruct* newObject, BUILDING* buil
 		return FALSE;
 
 	//Remember the location
-	newObject->posX = building->posx ;
-	newObject->posY = building->posy ;
+	newObject->posX = building->posx;
+	newObject->posY = building->posy;
 
 	//Fill in the fullObjID
 	//Calculate octet x and y from supercell x and y
@@ -2062,7 +2062,7 @@ LOGICAL strtInitObjectStructwithBUILDING(ObjectStruct* newObject, BUILDING* buil
 	newObject->facilityID.objType = building->pid.objType;
 
 	strlcpy(newObject->name, building->name, sizeof(newObject->name));
-	newObject->filename = _filenamePool(building->fileName) ;
+	newObject->filename = _filenamePool(building->fileName);
 
 	return TRUE;
 }
@@ -2088,7 +2088,7 @@ strtInitLinkStructwithDEPOT_LINK(LinkStruct* newLink, DEPOT_LINK* depotlink)
 	newLink->firebaseID = depotlink->firebaseId;
 
 	newLink->distance = depotlink->distance;
-	strlcpy(newLink->name, depotlink->name, sizeof(newLink->name)) ;
+	strlcpy(newLink->name, depotlink->name, sizeof(newLink->name));
 
 	return TRUE;
 }
@@ -2215,7 +2215,7 @@ LOGICAL strtInitObjectfromWOR(ObjectStruct& object)
 	//Get spawn ability
 	object.spawnAbility = objectParams->spawn;
 
-	object.m_isCaptureBuilding = (objectParams->stratFlags != 0) ;
+	object.m_isCaptureBuilding = (objectParams->stratFlags != 0);
 
 	return TRUE;
 }
@@ -2283,20 +2283,20 @@ static void _calcCapacity(ObjectStruct& object)
 	SINT32 lastPercentDamage;
 
 	lastPercentDamage = object.percentDamage;
-	object.calcPercentDamage() ;
+	object.calcPercentDamage();
 
 	if (lastPercentDamage < 50 && object.percentDamage >= 50)
-		object.setVisLevel(1) ;
+		object.setVisLevel(1);
 
 #ifdef IS_STRAT_HOST
-	object.recalculateCapacity() ;
+	object.recalculateCapacity();
 	auto& fac = object.Facility();
-	fac.recalculateCapacity() ;
+	fac.recalculateCapacity();
 
 	if ( fac.capacity == 0
 		&& fac.type == FACILITY_FIREBASE
 		&& fac.isOpen() )
-		strtProcessFirebase(fac) ;
+		strtProcessFirebase(fac);
 #endif
 }
 
@@ -2307,18 +2307,18 @@ static void _setObjectsOwner(ObjectStruct* objectList, WWII_SIDE side, WWII_COUN
 {
 	///FIXME: We should probably put an assert here
 	if ( objectList == NULL )
-		return ;
+		return;
 	if ( country == WWII_NO_COUNTRY || country >= MAX_COUNTRIES )
-		return ;
+		return;
 	if ( side == WWII_NO_SIDE || side >= MAX_SIDES )
-		return ;
+		return;
 
 	ObjectStruct* current;
 
 	//Rip through the object list, changing ownership along the way
-	for ( current = objectList ; current != NULL ; current = current->next )
+	for ( current = objectList; current != NULL; current = current->next )
 	{
-		current->setCountry(country, side) ;
+		current->setCountry(country, side);
 	}
 }
 
@@ -2329,10 +2329,10 @@ static inline
 bool _validOwnership(WWII_COUNTRY country, WWII_SIDE side)
 {
 	if ( country == WWII_NO_COUNTRY || country >= MAX_COUNTRIES )
-		return false ;
+		return false;
 	if ( side == WWII_NO_SIDE || side >= MAX_SIDES )
-		return false ;
-	return true ;
+		return false;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2341,12 +2341,12 @@ bool _validOwnership(WWII_COUNTRY country, WWII_SIDE side)
 static void
 _ownFacility(FacilityStruct& facility)
 {
-	CPStruct& cp = facility.CP() ;
+	CPStruct& cp = facility.CP();
 
 	if ( facility.type == FACILITY_ARMYBASE && cp.armyBasesOwned[facility.side] < cp.numArmyBases )
-		cp.armyBasesOwned[facility.side]++ ;
+		cp.armyBasesOwned[facility.side]++;
 	if ( facility.type != FACILITY_FIREBASE && cp.facilitiesOwned[facility.side] < cp.ownableFacilities )
-		cp.facilitiesOwned[facility.side]++ ;
+		cp.facilitiesOwned[facility.side]++;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2355,12 +2355,12 @@ _ownFacility(FacilityStruct& facility)
 static void
 _disownFacility(FacilityStruct& facility)
 {
-	CPStruct& cp = facility.CP() ;
+	CPStruct& cp = facility.CP();
 
 	if ( facility.type == FACILITY_ARMYBASE && cp.armyBasesOwned[facility.side] > 0 )
-		cp.armyBasesOwned[facility.side]-- ;
+		cp.armyBasesOwned[facility.side]--;
 	if ( facility.type != FACILITY_FIREBASE  && cp.facilitiesOwned[facility.side] > 0 )
-		cp.facilitiesOwned[facility.side]-- ;
+		cp.facilitiesOwned[facility.side]--;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2371,29 +2371,29 @@ static void
 _forceFacility(FacilityStruct& facility, const WWII_SIDE side, WWII_COUNTRY country)
 {
 	// Decrement the counters for the side that currently holds it
-	_disownFacility(facility) ;
+	_disownFacility(facility);
 
 	if ( facility.isRDPFactory() && side == facility.originalSide )
-		country = facility.originalCountry ;
+		country = facility.originalCountry;
 
 	if ( facility.side != side || facility.country != country )
 	{
-		facility.side = side ;
+		facility.side = side;
 		if ( facility.armyBase != NULL && facility.armyBase != &facility && facility.armyBase->side == side )
-			facility.setCountry(facility.armyBase->country) ;
+			facility.setCountry(facility.armyBase->country);
 		else
-			facility.setCountry(country) ;
+			facility.setCountry(country);
 
 #ifdef IS_STRAT_HOST
-		strtSaveFacility(&facility) ;
+		strtSaveFacility(&facility);
 #endif
 	}
 
 	// Increment the counters for the side that just gained it
-	_ownFacility(facility) ;
+	_ownFacility(facility);
 
 	// Make sure all sub-objects are correctly assigned
-	_setObjectsOwner(facility.objectList, side, facility.country) ;
+	_setObjectsOwner(facility.objectList, side, facility.country);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2402,9 +2402,9 @@ static void
 _forceFacilitySide(FacilityStruct& fac, WWII_SIDE side, WWII_COUNTRY country)
 {
 	if ( fac.side != side )
-		_forceFacility(fac, side, country) ;
+		_forceFacility(fac, side, country);
 	else
-		_setObjectsOwner(fac.objectList, side, fac.country) ;
+		_setObjectsOwner(fac.objectList, side, fac.country);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2413,27 +2413,27 @@ _forceFacilitySide(FacilityStruct& fac, WWII_SIDE side, WWII_COUNTRY country)
 static void
 _cpOwnership(CPStruct& cp, WWII_COUNTRY country)
 {
-	FacilityStruct* facility ;
-	WWII_SIDE side ;
+	FacilityStruct* facility;
+	WWII_SIDE side;
 
 	if ( country == WWII_NO_COUNTRY || country >= MAX_COUNTRIES )
-		country = cp.originalCountry ;
+		country = cp.originalCountry;
 
-	side = wwiiSide(country) ;
+	side = wwiiSide(country);
 
 #if defined(DEV_BUILD)
 	dbugLog(_FLI, "forcing %d:%d ownership on %s from %d:%d"
 					, country, side
 					, cp.name
 					, cp.country, cp.side
-					) ;
+					);
 #endif
 
-	cp.setSide(side) ;
-	cp.country = country ;
-	cp.setContention(false) ;
-	cp.controllingSide = side ;
-	cp.controllingCountry = country ;
+	cp.setSide(side);
+	cp.country = country;
+	cp.setContention(false);
+	cp.controllingSide = side;
+	cp.controllingCountry = country;
 
 	// Remove any entries that belong to the wrong side, but be lenient on
 	// country differences; this allows CPs to have mixed ownership, e.g.
@@ -2441,15 +2441,15 @@ _cpOwnership(CPStruct& cp, WWII_COUNTRY country)
 
 	// Start with Armybases, since depots etc will take their country from
 	// the AB that they belong to to make them spawnable
-	for ( facility = cp.facilityTypeIndex[FACILITY_ARMYBASE] ; facility != NULL ; facility = facility->typeNext )
-		_forceFacilitySide(*facility, side, country) ;
+	for ( facility = cp.facilityTypeIndex[FACILITY_ARMYBASE]; facility != NULL; facility = facility->typeNext )
+		_forceFacilitySide(*facility, side, country);
 
-	for ( facility = cp.facilityList ; facility != NULL ; facility = facility->next )
+	for ( facility = cp.facilityList; facility != NULL; facility = facility->next )
 	{
-		_forceFacilitySide(*facility, side, country) ;
+		_forceFacilitySide(*facility, side, country);
 
 		if ( facility->type != FACILITY_FIREBASE && facility->m_spawnable )
-			facility->setOpen(true) ;
+			facility->setOpen(true);
 	}
 }
 
@@ -2462,49 +2462,49 @@ _cpOwnership(CPStruct& cp, WWII_COUNTRY country)
 static void
 _cpControl(CPStruct& cp, WWII_COUNTRY country)
 {
-	FacilityStruct* facility ;
-	WWII_SIDE side ;
+	FacilityStruct* facility;
+	WWII_SIDE side;
 
 	if ( country == WWII_NO_COUNTRY || country >= MAX_COUNTRIES )
-		country = cp.originalCountry ;
+		country = cp.originalCountry;
 
-	side = wwiiSide(country) ;
+	side = wwiiSide(country);
 
 #if defined(DEV_BUILD)
 	dbugLog(_FLI, "forcing %d:%d control on %s from %d:%d"
 					, country, side
 					, cp.name
 					, cp.country, cp.side
-					) ;
+					);
 #endif
 
-	cp.controllingSide = side ;
-	cp.controllingCountry = country ;
+	cp.controllingSide = side;
+	cp.controllingCountry = country;
 
 	// Make sure the counters are correct
-	memset(cp.armyBasesOwned, 0 , sizeof(cp.armyBasesOwned)) ;
-	cp.armyBasesOwned[side] = cp.numArmyBases ;
+	memset(cp.armyBasesOwned, 0 , sizeof(cp.armyBasesOwned));
+	cp.armyBasesOwned[side] = cp.numArmyBases;
 
 	// Check the armybases first
-	for ( facility = cp.facilityTypeIndex[FACILITY_ARMYBASE] ; facility != NULL ; facility = facility->typeNext )
+	for ( facility = cp.facilityTypeIndex[FACILITY_ARMYBASE]; facility != NULL; facility = facility->typeNext )
 	{
-		_forceFacilitySide(*facility, side, country) ;
-		facility->setOpen(true) ;
+		_forceFacilitySide(*facility, side, country);
+		facility->setOpen(true);
 	}
 
 	// Link depots
-	for ( facility = cp.facilityTypeIndex[FACILITY_DEPOT] ; facility != NULL ; facility = facility->typeNext )
+	for ( facility = cp.facilityTypeIndex[FACILITY_DEPOT]; facility != NULL; facility = facility->typeNext )
 	{
 		// If the side matches, make sure the country does too so its spawnable
-		_setObjectsOwner(facility->objectList, facility->side, facility->country) ;
-		facility->setOpen(true) ;
+		_setObjectsOwner(facility->objectList, facility->side, facility->country);
+		facility->setOpen(true);
 	}
 
 	// Associate FBs too
-	for ( facility = cp.facilityTypeIndex[FACILITY_FIREBASE] ; facility != NULL ; facility = facility->typeNext )
+	for ( facility = cp.facilityTypeIndex[FACILITY_FIREBASE]; facility != NULL; facility = facility->typeNext )
 	{
 		if ( facility->armyBase )
-			_forceFacility(*facility, side, facility->armyBase->country) ;
+			_forceFacility(*facility, side, facility->armyBase->country);
 	}
 }
 
@@ -2516,35 +2516,35 @@ _findFirebaseArmybase(FacilityStruct* fb)
 {
 	if ( fb->link == NULL )
 	{
-		errorList[ERR_FB_NO_LINK][fb->name] = "" ;
-		return false ;
+		errorList[ERR_FB_NO_LINK][fb->name] = "";
+		return false;
 	}
 
-	FacilityStruct* depot = fb->link->startDepot ;
+	FacilityStruct* depot = fb->link->startDepot;
 
 	if ( !depot )
 	{
 		dbugLog(_FLA, "link from FireBase %s doesnt have an start depot", fb->name);
-		return false ;
+		return false;
 	}
 
 	if ( depot->armyBase == NULL )
-		depot->armyBase = depot->findLocalAB(WWII_NO_SIDE) ;
+		depot->armyBase = depot->findLocalAB(WWII_NO_SIDE);
 	if ( depot->armyBase == NULL )
 	{
 		dbugLog(_FLW, "FB '%s' depot '%s' has NULL armybase!"
 					, fb->name
 					, depot->name
-					) ;
-		return false ;
+					);
+		return false;
 	}
 #ifdef HEAVY_DEBUG
 	else
-		dbugLog(_FLI, "FB %s has AB %s", fb->name, depot->armyBase->name) ;
+		dbugLog(_FLI, "FB %s has AB %s", fb->name, depot->armyBase->name);
 #endif
-	fb->armyBase = depot->armyBase ;
+	fb->armyBase = depot->armyBase;
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2558,52 +2558,52 @@ static LOGICAL
 _checkCPStatus(CPStruct* cpList)
 {
 	if ( cpList == NULL )
-		return FALSE ;
+		return FALSE;
 
 	CPStruct* current;
 	FacilityStruct* facility;
 	CPStruct saveCP;
 	FacilityStruct saveFac;
 	WWII_COUNTRY maxSideCountry[MAX_SIDES];
-	SINT32 ownerCount[MAX_COUNTRIES] ;
-	WWII_SIDE otherSide ;
+	SINT32 ownerCount[MAX_COUNTRIES];
+	WWII_SIDE otherSide;
 
-	for ( current = cpList ; current != NULL ; current = current->next )
+	for ( current = cpList; current != NULL; current = current->next )
 	{
-		CPStruct& cp = *current ;
+		CPStruct& cp = *current;
 
 #if defined(STRAT_DB)
 		// The validator doesn't use the database, so doesn't load these values
 		if ( cp.uOID == 0 )
-			dbugLog(_FLW, "CP %s has no unique id", cp.name) ;
+			dbugLog(_FLW, "CP %s has no unique id", cp.name);
 #endif // VALIDATOR
 
 		if ( cp.fullObjID.objType == CP_BRIDGE )
 		{
-			cp.country = (WWII_COUNTRY)BRIDGE_BUILT_COUNTRY ;
-			cp.setSide((WWII_SIDE)BRIDGE_SIDE) ;
-			cp.originalCountry = cp.country ;
-			cp.originalSide = cp.side ;
-			cp.controllingCountry = cp.country ;
-			cp.controllingSide = cp.side ;
-			cp.setContention(false) ;
+			cp.country = (WWII_COUNTRY)BRIDGE_BUILT_COUNTRY;
+			cp.setSide((WWII_SIDE)BRIDGE_SIDE);
+			cp.originalCountry = cp.country;
+			cp.originalSide = cp.side;
+			cp.controllingCountry = cp.country;
+			cp.controllingSide = cp.side;
+			cp.setContention(false);
 #ifdef IS_STRAT_HOST
 			strtSaveCP(&cp);
 #endif
-			continue ;
+			continue;
 		}
 
 		if ( cp.supercell == NULL )
-			dbugLog(_FLW, "%s: CP has no supercell data", cp.name) ;
+			dbugLog(_FLW, "%s: CP has no supercell data", cp.name);
 		else if ( cp.ownableFacilities == 0 )
-			strtAddErrorListEntry(ERR_CP_NO_OWNABLES, cp.name, cp.name, "") ;
+			strtAddErrorListEntry(ERR_CP_NO_OWNABLES, cp.name, cp.name, "");
 
-		saveCP = cp ;
+		saveCP = cp;
 		//Set our default values
 		memset(ownerCount, 0, sizeof(ownerCount));
 		memset(maxSideCountry, 0, sizeof(maxSideCountry));
-		memset(cp.armyBasesOwned, 0, sizeof(cp.armyBasesOwned)) ;
-		memset(cp.facilitiesOwned, 0, sizeof(cp.facilitiesOwned)) ;
+		memset(cp.armyBasesOwned, 0, sizeof(cp.armyBasesOwned));
+		memset(cp.facilitiesOwned, 0, sizeof(cp.facilitiesOwned));
 
 		// This would be the right place to count the number of
 		// firebases that a CP has rather than during the sdm
@@ -2611,8 +2611,8 @@ _checkCPStatus(CPStruct* cpList)
 		// - as long as this function is called on the other hosts
 		// OGS
 
-		cp.setContention(false) ;
-		cp.m_attackStarted = 0 ;
+		cp.setContention(false);
+		cp.m_attackStarted = 0;
 
 		for ( facility = cp.facilityList
 			; facility != NULL
@@ -2622,21 +2622,21 @@ _checkCPStatus(CPStruct* cpList)
 			facility->side = wwiiSide(facility->country);
 
 			if ( !_validOwnership(facility->country, facility->side) )
-				_forceFacility(*facility, facility->originalSide, facility->originalCountry) ;
+				_forceFacility(*facility, facility->originalSide, facility->originalCountry);
 
 			if ( facility->armyBase == NULL )
 			{
 				if ( facility->type == FACILITY_FIREBASE )
-					_findFirebaseArmybase(facility) ;
+					_findFirebaseArmybase(facility);
 				else
-					facility->armyBase = facility->findLocalAB(WWII_NO_SIDE) ;
+					facility->armyBase = facility->findLocalAB(WWII_NO_SIDE);
 
 				// A change of armybase doesn't require a save
-				saveFac.armyBase = facility->armyBase ;
+				saveFac.armyBase = facility->armyBase;
 			}
 
 			// Add this facility to it's owner's counts
-			_ownFacility(*facility) ;
+			_ownFacility(*facility);
 
 			if ( facility->type == FACILITY_ARMYBASE )
 			{
@@ -2661,50 +2661,50 @@ _checkCPStatus(CPStruct* cpList)
 // Declare complete ownership
 		if ( !_validOwnership(cp.country, cp.side) )
 			dbugLog(_FLA, "Invalid ownership[%u:%u] at %s"
-							, cp.country, cp.side, cp.name) ;
+							, cp.country, cp.side, cp.name);
 
 		if ( !_validOwnership(cp.controllingCountry, cp.controllingSide) )
-			dbugLog(_FLA, "Invalid control states at %s", cp.name) ;
+			dbugLog(_FLA, "Invalid control states at %s", cp.name);
 
 		// Conditions that we can easily assert
 		if ( cp.facilitiesOwned[ALLIED] >= cp.ownableFacilities )
-			_cpOwnership(cp, maxSideCountry[ALLIED]) ;
+			_cpOwnership(cp, maxSideCountry[ALLIED]);
 		else if ( cp.facilitiesOwned[AXIS] >= cp.ownableFacilities )
-			_cpOwnership(cp, maxSideCountry[AXIS]) ;
+			_cpOwnership(cp, maxSideCountry[AXIS]);
 
 		if ( cp.armyBasesOwned[ALLIED] >= cp.numArmyBases )
-			_cpControl(cp, maxSideCountry[ALLIED]) ;
+			_cpControl(cp, maxSideCountry[ALLIED]);
 		else if ( cp.armyBasesOwned[AXIS] >= cp.numArmyBases )
-			_cpControl(cp, maxSideCountry[AXIS]) ;
+			_cpControl(cp, maxSideCountry[AXIS]);
 
 		otherSide = (cp.controllingSide == ALLIED) ? AXIS : ALLIED;
 
 		if ( cp.facilitiesOwned[otherSide] == 0 )
-			cp.setContention(false) ;
+			cp.setContention(false);
 		else
 		{
-			FacilityStruct* fac = cp.facilityList ;
+			FacilityStruct* fac = cp.facilityList;
 			while ( fac != NULL )
 			{
 				if ( fac->side != cp.side )
 				{
-					std::string cpDetail = cp.name ;
-					cpDetail += "/" ;
-					cpDetail += _sideNameAdj[cp.side] ;
-					std::string facDetail = fac->name ;
-					facDetail += "/" ;
-					facDetail += _sideNameAdj[fac->side] ;
-					strtAddErrorListEntry(ERR_DEFINED_CONTESTED, cp.name, cpDetail.c_str(), facDetail.c_str()) ;
-					break ;
+					std::string cpDetail = cp.name;
+					cpDetail += "/";
+					cpDetail += _sideNameAdj[cp.side];
+					std::string facDetail = fac->name;
+					facDetail += "/";
+					facDetail += _sideNameAdj[fac->side];
+					strtAddErrorListEntry(ERR_DEFINED_CONTESTED, cp.name, cpDetail.c_str(), facDetail.c_str());
+					break;
 				}
-				fac = fac->next ;
+				fac = fac->next;
 			}
-			cp.setContention(true) ;
+			cp.setContention(true);
 		}
 
 #ifdef IS_STRAT_HOST
 		if ( cp.isContested() )
-			cp.changeOwnership(cp.country, false, true) ;
+			cp.changeOwnership(cp.country, false, true);
 
 		if (memcmp(&saveCP, &cp, sizeof(saveCP)) != 0)
 		{
@@ -2726,19 +2726,19 @@ _checkCPStatus(CPStruct* cpList)
 FacilityStruct*
 strtGetFacilityByName(const char* name)
 {
-	CPStruct* cp ;
-	FacilityStruct* fac ;
+	CPStruct* cp;
+	FacilityStruct* fac;
 
-	for ( cp = Strat::cpList ; cp != NULL ; cp = cp->next )
+	for ( cp = Strat::cpList; cp != NULL; cp = cp->next )
 	{
-		for ( fac = cp->facilityList ; fac != NULL ; fac = fac->next )
+		for ( fac = cp->facilityList; fac != NULL; fac = fac->next )
 		{
 			if ( strcasecmp(fac->name, name) == 0 )
-				return fac ;
+				return fac;
 		}
 	}
 
-	return NULL ;
+	return NULL;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2748,23 +2748,23 @@ strtGetCPByName(const char* name)
 {
 	if ( name == NULL || *name == 0 )
 	{
-		dbugLog(_FLA, "null or empty name") ;
-		return NULL ;
+		dbugLog(_FLA, "null or empty name");
+		return NULL;
 	}
 
 	if ( Strat::cpList == NULL )
 	{
-		dbugLog(_FLA, "called before Strat::cpList initialized") ;
-		return NULL ;
+		dbugLog(_FLA, "called before Strat::cpList initialized");
+		return NULL;
 	}
 
-	for ( CPStruct* cp = Strat::cpList ; cp != NULL ; cp = cp->next )
+	for ( CPStruct* cp = Strat::cpList; cp != NULL; cp = cp->next )
 	{
 		if ( strcasecmp(name, cp->name) == 0 )
-			return cp ;
+			return cp;
 	}
 
-	return NULL ;
+	return NULL;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2772,9 +2772,9 @@ strtGetCPByName(const char* name)
 #define MAX_CP_LIST_OIDS		1000
 #define	MAX_FACILITY_LIST_OIDS	(MAX_CP_LIST_OIDS*7)
 
-CPStruct* cpOIDList[MAX_CP_LIST_OIDS] ;
-FacilityStruct* facilityOIDList[MAX_FACILITY_LIST_OIDS] ;
-UINT32 g_maxCPOID = 0 ;
+CPStruct* cpOIDList[MAX_CP_LIST_OIDS];
+FacilityStruct* facilityOIDList[MAX_FACILITY_LIST_OIDS];
+UINT32 g_maxCPOID = 0;
 
 void
 strtAddCPoid(CPStruct* newEntry, UINT16 entryNum)
@@ -2784,13 +2784,13 @@ strtAddCPoid(CPStruct* newEntry, UINT16 entryNum)
 		dbugLog(_FLA, "Exceeded maximum CP ID number (%d vs %d)"
 						, entryNum
 						, MAX_CP_LIST_OIDS
-						) ;
-		return ;
+						);
+		return;
 	}
 
-	cpOIDList[entryNum] = newEntry ;
+	cpOIDList[entryNum] = newEntry;
 	if ( entryNum > g_maxCPOID )
-		g_maxCPOID = entryNum ;
+		g_maxCPOID = entryNum;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2802,12 +2802,12 @@ strtGetCPByOID(UINT16 uOID)
 #ifdef DEBUG
 	if ( uOID > MAX_CP_LIST_OIDS )
 	{
-		dbugLog(_FLA, "out-of-bounds cp OID request: #%u", uOID) ;
-		return NULL ;
+		dbugLog(_FLA, "out-of-bounds cp OID request: #%u", uOID);
+		return NULL;
 	}
 #endif // DEBUG
 
-	return cpOIDList[uOID] ;
+	return cpOIDList[uOID];
 }
 
 
@@ -2819,33 +2819,33 @@ strtAddFacilityoid(FacilityStruct* newEntry, UINT16 uEntryNum)
 		dbugLog(_FLA, "Exceeded maximum Facility ID number (%d vs %d)"
 						, uEntryNum
 						, MAX_FACILITY_LIST_OIDS
-						) ;
-		return ;
+						);
+		return;
 	}
 
 	if ( uEntryNum > uMaxFacilityOID )
-		uMaxFacilityOID = uEntryNum ;
+		uMaxFacilityOID = uEntryNum;
 
-	facilityOIDList[uEntryNum] = newEntry ;
+	facilityOIDList[uEntryNum] = newEntry;
 }
 
 FacilityStruct*
 strtNextMatchingFacility(const char* string, UINT16 uStartOID)
 {
-	UINT32 uStringLen = strlen(string) ;
-	FacilityStruct* cur ;
-	UINT16 uOID ;
+	UINT32 uStringLen = strlen(string);
+	FacilityStruct* cur;
+	UINT16 uOID;
 
-	for ( uOID = uStartOID ; uOID <= uMaxFacilityOID ; uOID++ )
+	for ( uOID = uStartOID; uOID <= uMaxFacilityOID; uOID++ )
 	{
-		cur = facilityOIDList[uOID] ;
+		cur = facilityOIDList[uOID];
 		if ( cur == NULL )
-			continue ;
+			continue;
 		if ( strncasecmp(cur->name, string, uStringLen) == 0 )
-			return cur ;
+			return cur;
 	}
 
-	return NULL ;
+	return NULL;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2857,12 +2857,12 @@ strtGetFacilityByOID(UINT16 uOID)
 #ifdef DEBUG
 	if ( uOID > MAX_FACILITY_LIST_OIDS )
 	{
-		dbugLog(_FLA, "out-of-bounds facility OID request: #%u", uOID) ;
-		return NULL ;
+		dbugLog(_FLA, "out-of-bounds facility OID request: #%u", uOID);
+		return NULL;
 	}
 #endif // DEBUG
 
-	return facilityOIDList[uOID] ;
+	return facilityOIDList[uOID];
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2872,7 +2872,7 @@ strtGetFacilityByOID(UINT16 uOID)
 void
 CPStruct::setSupplyCenter()
 {
-	m_isSupplyCenter = true ;
+	m_isSupplyCenter = true;
 }
 #else
 // It's defined in strtCPClass.cpp

@@ -271,18 +271,18 @@ static BOOL ParseExtensions(const char *tp, PLAY_OGL_EXTENSIONS *ext)
 {
 	int i = 0;
 	char* token;
-	char* tpCopy ;
+	char* tpCopy;
 
 	memset(ext,0,sizeof(PLAY_OGL_EXTENSIONS));
 	ext->numExtensions = 0;
 
 	// We don't know for a fact that 'tp' is writable. So lets assume it
 	// isn't, and take a copy of it
-	tpCopy = _strdup(tp) ;
+	tpCopy = _strdup(tp);
 	if ( tpCopy == NULL )
 	{
-		Write_Debug("Unable to allocate copy of the token string") ;
-		return FALSE ;
+		Write_Debug("Unable to allocate copy of the token string");
+		return FALSE;
 	}
 
 	char* context = NULL;
@@ -290,7 +290,7 @@ static BOOL ParseExtensions(const char *tp, PLAY_OGL_EXTENSIONS *ext)
 		token != NULL;
 		token = strtok_s( NULL, " ", &context ))
 	{
-		for (i=0 ; ogl_extension[i].pflag != NULL ; i++)
+		for (i=0; ogl_extension[i].pflag != NULL; i++)
 		{
 			if (strcmp(ogl_extension[i].name, token) == 0)
 			{
@@ -299,7 +299,7 @@ static BOOL ParseExtensions(const char *tp, PLAY_OGL_EXTENSIONS *ext)
 
 					ext->numExtensions += 1;
 					if ( i >= MAX_OGL_EXTENSIONS )
-						Write_Debug("  Extensions > %d not supported (%d)", MAX_OGL_EXTENSIONS, i) ;
+						Write_Debug("  Extensions > %d not supported (%d)", MAX_OGL_EXTENSIONS, i);
 					else
 						setOglBit(ext->bitmap,i);
 					break;
@@ -307,9 +307,9 @@ static BOOL ParseExtensions(const char *tp, PLAY_OGL_EXTENSIONS *ext)
 		}
 	}
 
-	Write_Debug(" upto %d extensions available", ext->numExtensions) ;
+	Write_Debug(" upto %d extensions available", ext->numExtensions);
 
-	free(tpCopy) ;
+	free(tpCopy);
 
 	return(TRUE);
 }
@@ -318,28 +318,28 @@ static BOOL ParseExtensions(const char *tp, PLAY_OGL_EXTENSIONS *ext)
 UINT32 ConvertVersion(char* verstring)
 {
 	UINT32 lvernum = 0;
-	UINT32 numbers[4] = { 0, 0, 0 } ;
-	int dots ;
-	char* p ;
+	UINT32 numbers[4] = { 0, 0, 0 };
+	int dots;
+	char* p;
 
 	// No version string or its null, then give up
 	if ( !verstring || *verstring == 0 )
-		return lvernum ;
+		return lvernum;
 
-	p = verstring ;
+	p = verstring;
 	// Iterate across the version subs
 	// and extract each of the numeric digits into a 'quad'
-	for ( dots = 0 ; dots < 4 ; dots++ )
+	for ( dots = 0; dots < 4; dots++ )
 	{
 		while ( isdigit((unsigned char)*p) )
 		{
-			numbers[dots] *= 10 ;
-			numbers[dots] += *p - '0' ;
-			p++ ;
+			numbers[dots] *= 10;
+			numbers[dots] += *p - '0';
+			p++;
 		}
 		if ( *p != '.' )
-			break ;
-		p++ ;
+			break;
+		p++;
 	}
 
 	// How many dots did we get?
@@ -347,27 +347,27 @@ UINT32 ConvertVersion(char* verstring)
 	{
 		case 0:
 			// Split a large number into 4 quads
-			return numbers[0] ;
-		break ;
+			return numbers[0];
+		break;
 		case 1:
-			return (UINT32)(((numbers[0] & 0xffff) << 16) | (numbers[1] & 0x0ffff)) ;
-		break ;
+			return (UINT32)(((numbers[0] & 0xffff) << 16) | (numbers[1] & 0x0ffff));
+		break;
 		case 2:
 			return (UINT32)(
 							((numbers[0] & 0xff) << 24)
 							|((numbers[1] & 0xff) << 16)
 							|(((numbers[2]>>8) & 0xff) << 8)
 							|(numbers[2] & 0xff)
-							) ;
-		break ;
+							);
+		break;
 		default:
 			return (UINT32)(
 							((numbers[0] & 0xff) << 24)
 							|((numbers[1] & 0xff) << 16)
 							|((numbers[2] & 0xff) << 8)
 							|(numbers[3] & 0xff)
-							) ;
-		break ;
+							);
+		break;
 	}
 }
 
@@ -412,10 +412,10 @@ int			numcomps, *comps;
 	{
 		strncpy(info->vendor, tp, MAX_OGL_VENDOR_NAME);
 		Write_Debug("Vendor:    %s", tp);
-//		strncpy(info->vendor,"*BETA*",MAX_OGL_VENDOR_NAME) ;		// Uncomment when testing
+//		strncpy(info->vendor,"*BETA*",MAX_OGL_VENDOR_NAME);		// Uncomment when testing
 	}
 	else
-		Write_Debug("No OGL Vendor available") ;
+		Write_Debug("No OGL Vendor available");
 
 	info->oglVersion = 0;
 
@@ -450,7 +450,7 @@ int			numcomps, *comps;
 		}
 	}
 	else
-		Write_Debug("No GL_EXTENSIONS data to parse") ;
+		Write_Debug("No GL_EXTENSIONS data to parse");
 
 	glGetIntegerv(GL_MAX_LIGHTS, (GLint*)&gMaxLights);
 
@@ -489,7 +489,7 @@ int			numcomps, *comps;
 		{
 			comps = (int*)malloc(numcomps * sizeof(int));
 			glGetIntegerv(GL_COMPRESSED_TEXTURE_FORMATS_ARB, (GLint*)comps);
-			for (i=0 ; i < numcomps ; i++)
+			for (i=0; i < numcomps; i++)
 			{
 				if (i<MAX_COMPRESSED_TEXTURE)
 				{
@@ -530,13 +530,13 @@ int			numcomps, *comps;
 			{
 				info->compTextures.num = MAX_COMPRESSED_TEXTURE;
 			}
-			Write_Debug("Compressed Textures: %d", info->compTextures.num) ;
+			Write_Debug("Compressed Textures: %d", info->compTextures.num);
 
 			free(comps);
 		}
 	}
 	else
-		Write_Debug("Compressed textures not supported") ;
+		Write_Debug("Compressed textures not supported");
 
 #ifdef NOT_USED
 

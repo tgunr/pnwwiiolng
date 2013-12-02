@@ -15,7 +15,7 @@ enum ENUM_CATEGORIES
     IDE_LANG_MOBILE,
 	IDE_LANG_CLIENT, // old loclMain crap
     NUMBER_OF_CATEGORIES
-} ;
+};
 
 enum ENUM_LANGUAGES
 {
@@ -27,7 +27,7 @@ enum ENUM_LANGUAGES
 	IDE_LANGUAGE_CHINESE,
     IDE_LANGUAGE_PIGLATIN,
     NUMBER_OF_LANGUAGES
-} ;
+};
 
 struct LANGTABLE
 {
@@ -38,7 +38,7 @@ struct LANGTABLE
 
     UCHAR szStr[256];
 
-} ;
+};
 
 
 extern LANGTABLE g_LangTable[NUMBER_OF_CATEGORIES];

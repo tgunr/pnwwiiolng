@@ -10,7 +10,7 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-struct MobileSpawnWaypoint ;
+struct MobileSpawnWaypoint;
 
 //This function installs all the host callbacks
 extern SINT32 chatInstallSupportCallbacks(void);
@@ -24,6 +24,6 @@ extern SINT32 chatInstallSupportCallbacks(void);
 //	<port> is the port of the chat server
 extern LOGICAL chatSendServerInfo(SINT32 teulIndex, UINT32 otp, UINT32 ipAddress, UINT16 port);
 
-extern SINT32 chatSendMissionDeletionNotice(const UINT32& missionID) ;
+extern SINT32 chatSendMissionDeletionNotice(const UINT32& missionID);
 
-extern SINT32 chatSendMissionMobileSpawnWaypoint(const MobileSpawnWaypoint& wp) ;
+extern SINT32 chatSendMissionMobileSpawnWaypoint(const MobileSpawnWaypoint& wp);

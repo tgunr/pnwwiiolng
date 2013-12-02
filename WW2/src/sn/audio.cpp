@@ -512,7 +512,7 @@ Description:
 bool AudioCreateEmitter(snSound& sound)
 {
 	if ( xaudio2 == NULL )
-		return false ;
+		return false;
 
     AudioLoadSound(sound.name);
 

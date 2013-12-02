@@ -143,7 +143,7 @@ void Menu::DrawSelf()
 
 int Menu::AddItem(MenuItem* item)
 {
-	assert( item != NULL ) ;
+	assert( item != NULL );
 
 	if(item->ParentMenu() != NULL) return -1;
 	

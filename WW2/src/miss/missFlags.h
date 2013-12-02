@@ -8,5 +8,5 @@ struct MISS_FLAGS
 		{}
 	bool	canEject:1;				//!< Player can be ejected.
 	bool	checksumsDirty:1;		//!< Player has invalid checksums.
-} ;
+};
 

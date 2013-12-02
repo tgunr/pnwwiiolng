@@ -23,26 +23,26 @@
 bool
 Chat::Broadcast::send()
 {
-	Teul::Packet outgoing(sizeof(*this), Chat::CallbackX, Chat::BROADCAST_MESSAGE_Y) ;
-	outgoing.append(*this) ;
-	return serverSendPacketToType(outgoing, CHAT_HOST) ;
+	Teul::Packet outgoing(sizeof(*this), Chat::CallbackX, Chat::BROADCAST_MESSAGE_Y);
+	outgoing.append(*this);
+	return serverSendPacketToType(outgoing, CHAT_HOST);
 }
 
 bool
 chatSendBroadcast(Chat::BCAST_TYPE type, const instanceid_t& instanceID, UINT64 targetID, LSTRING_ID prefix, LSTRING_ID message
 						, const char* ptr0, const char* ptr1, const char* ptr2, const char* ptr3, const char* ptr4, const char* ptr5)
 {
-	Teul::Packet outgoing(sizeof(Chat::Broadcast), Chat::CallbackX, Chat::BROADCAST_MESSAGE_Y) ;
-	CONSTRUCT_IN_PACKET(outgoing, Chat::Broadcast, Chat::_EVERYONE, instanceID, targetID, prefix, message, ptr0, ptr1, ptr2, ptr3, ptr4, ptr5) ;
-	return serverSendPacketToType(outgoing, CHAT_HOST) ;
+	Teul::Packet outgoing(sizeof(Chat::Broadcast), Chat::CallbackX, Chat::BROADCAST_MESSAGE_Y);
+	CONSTRUCT_IN_PACKET(outgoing, Chat::Broadcast, Chat::_EVERYONE, instanceID, targetID, prefix, message, ptr0, ptr1, ptr2, ptr3, ptr4, ptr5);
+	return serverSendPacketToType(outgoing, CHAT_HOST);
 }
 
 bool
 chatSendBroadcastAll(LSTRING_ID prefix, LSTRING_ID messageID
 					, const char* const ptr0, const char* const ptr1, const char* const ptr2, const char* const ptr3, const char* const ptr4, const char* const ptr5)
 {
-	Chat::Broadcast broadcast(Chat::_EVERYONE, 0, 0, prefix, messageID, ptr0, ptr1, ptr2, ptr3, ptr4, ptr5) ;
-	return broadcast.send() ;
+	Chat::Broadcast broadcast(Chat::_EVERYONE, 0, 0, prefix, messageID, ptr0, ptr1, ptr2, ptr3, ptr4, ptr5);
+	return broadcast.send();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -52,16 +52,16 @@ bool
 chatSendAdminMessage(const char* fmt, ...)
 {
 	if ( fmt == NULL )
-		return false ;
+		return false;
 
-	va_list args ;
-	char message[MAX_MESSAGE_LENGTH+2] ;
-	va_start(args, fmt) ;
-	vsnprintf(message, MAX_MESSAGE_LENGTH, fmt, args) ;
-	va_end(args) ;
+	va_list args;
+	char message[MAX_MESSAGE_LENGTH+2];
+	va_start(args, fmt);
+	vsnprintf(message, MAX_MESSAGE_LENGTH, fmt, args);
+	va_end(args);
 
-	Chat::Broadcast outgoing(Chat::_ADMINISTRATIVE, 0, 0, LSTR_NONE, LSTR_GM_MSG, "HOST", message) ;
-	return outgoing.send() ;
+	Chat::Broadcast outgoing(Chat::_ADMINISTRATIVE, 0, 0, LSTR_NONE, LSTR_GM_MSG, "HOST", message);
+	return outgoing.send();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -73,11 +73,11 @@ chatSendLocalizedMessage(const playerid_t playerID, LSTRING_ID prefix, LSTRING_I
 {
 	// PlayerIDs of 0 or 1 are invalid ...
 	if ( playerID <= 1 )
-		return FALSE ;
+		return FALSE;
 
-	Teul::Packet outgoing(sizeof(Chat::DirectMessage), Chat::CallbackX, Chat::LOCALIZED_MESSAGE_Y) ;
-	CONSTRUCT_IN_PACKET(outgoing, Chat::DirectMessage, playerID, prefix, message, ptr0, ptr1, ptr2, ptr3, ptr4, ptr5) ;
-	return serverSendPacketToType(outgoing, CHAT_HOST) ;
+	Teul::Packet outgoing(sizeof(Chat::DirectMessage), Chat::CallbackX, Chat::LOCALIZED_MESSAGE_Y);
+	CONSTRUCT_IN_PACKET(outgoing, Chat::DirectMessage, playerID, prefix, message, ptr0, ptr1, ptr2, ptr3, ptr4, ptr5);
+	return serverSendPacketToType(outgoing, CHAT_HOST);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -89,30 +89,30 @@ chatSendDirectMessage(const playerid_t playerID, LSTRING_ID prefix, LSTRING_ID m
 	// PlayerIDs of 0 or 1 are invalid ...
 	if ( playerID <= 1 )
 	{
-		dbugLog(_FLA, "%s called with playerID of %u!", __FUNCTION__, playerID) ;
-		return false ;
+		dbugLog(_FLA, "%s called with playerID of %u!", __FUNCTION__, playerID);
+		return false;
 	}
 
 	if ( fmt == NULL )
-		return false ;
+		return false;
 
-	va_list args ;
-	char text[MAX_MESSAGE_LENGTH+1] ;
-	va_start(args, fmt) ;
-	vsnprintf(text, MAX_MESSAGE_LENGTH, fmt, args) ;
-	va_end(args) ;
+	va_list args;
+	char text[MAX_MESSAGE_LENGTH+1];
+	va_start(args, fmt);
+	vsnprintf(text, MAX_MESSAGE_LENGTH, fmt, args);
+	va_end(args);
 
-	return chatSendLocalizedMessage(playerID, prefix, message, text) ;
+	return chatSendLocalizedMessage(playerID, prefix, message, text);
 }
 
 void
 chatSendTickSample(const UINT32 source, const playerid_t playerID, const void* data)
 {
-	Teul::TickSample* srcSample = (Teul::TickSample*)data ;
-	Teul::Packet outgoing(0, Chat::CallbackX, Chat::TICK_SAMPLE_Y) ;
-	auto* sample = CONSTRUCT_IN_PACKET(outgoing, Teul::TickSample, srcSample->host_ms, srcSample->client_ms) ;
-	sample->source = source ;
-	sample->playerID = playerID ;
-	serverSendPacketToType(outgoing, CHAT_HOST) ;
+	Teul::TickSample* srcSample = (Teul::TickSample*)data;
+	Teul::Packet outgoing(0, Chat::CallbackX, Chat::TICK_SAMPLE_Y);
+	auto* sample = CONSTRUCT_IN_PACKET(outgoing, Teul::TickSample, srcSample->host_ms, srcSample->client_ms);
+	sample->source = source;
+	sample->playerID = playerID;
+	serverSendPacketToType(outgoing, CHAT_HOST);
 }
 

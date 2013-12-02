@@ -225,7 +225,7 @@ void MessageLoop::SetPreferredHandler(MessageHandler* handler)
 
 int MessageLoop::AddCommonFilter(MessageFilter* filter)
 {
-	assert( filter != NULL ) ;
+	assert( filter != NULL );
 
     if(!_commonfilters) _commonfilters = new FilterList;
 	_commonfilters->push_back(filter);

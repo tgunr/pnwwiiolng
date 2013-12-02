@@ -10,9 +10,9 @@ extern void clientActivateMap(int teulIndex, unsigned int on, unsigned int hostI
 // strat
 namespace Strat
 {
-	class Event ;
-	class EventPacket ;
-	struct EventData ;
+	class Event;
+	class EventPacket;
+	struct EventData;
 }
 
 extern void clientWorldUpdate(int teulIndex, struct WORLD_UPDATE*);
@@ -70,7 +70,7 @@ extern void clientProcessChatMissionStatus(int teulIndex, const Chat::MissionSta
 
 struct VEHICLE_UPDATE_HEADER;
 struct VEHICLE_REPLY;
-namespace Vehicle { struct Hit ; }
+namespace Vehicle { struct Hit; }
 
 extern void clientRemoveVehicle(int teulIndex, unsigned int index);
 extern void clientProcessPositionUpdateMsg(int teulIndex, VEHICLE_UPDATE_HEADER* VehicleHeader);
@@ -79,4 +79,4 @@ extern void clientProcessVehicleHit(int teulIndex, Vehicle::Hit&);
 
 extern bool clientReceiveServerTrackedObject(int teulIndex, int type, ACTION_OBJECT* a);
 
-extern void clientErrorLog(const char* const format, ...) ;
+extern void clientErrorLog(const char* const format, ...);

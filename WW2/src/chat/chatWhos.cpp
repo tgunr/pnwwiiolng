@@ -26,11 +26,11 @@ chatWhoPopulate(
 		, bool forceExtendedInfo
 		)
 {
-	bool isInMySquad = target->inSquad(player) ;
-	bool isOnMyMission = (player->missionID() && player->missionID() == target->missionID()) ;
-	bool isRecruiting = (isInMySquad) ? target->getPreference(CPR_IS_RECRUITING) : false ;
+	bool isInMySquad = target->inSquad(player);
+	bool isOnMyMission = (player->missionID() && player->missionID() == target->missionID());
+	bool isRecruiting = (isInMySquad) ? target->getPreference(CPR_IS_RECRUITING) : false;
 
-	who.setBasics(target->chatHandle(), true, isInMySquad, target->squadRank(), target->squadHandle(), target->joinedSquad()) ;
+	who.setBasics(target->chatHandle(), true, isInMySquad, target->squadRank(), target->squadHandle(), target->joinedSquad());
 
 	who.setPrimaryDetails(target->isAFK()
 							, target->isActiveCommander()
@@ -41,15 +41,15 @@ chatWhoPopulate(
 							, target->missionID()
 							, target->isMissionLeader()
 							, isRecruiting
-							) ;
+							);
 
 	if ( forceExtendedInfo || isInMySquad || isOnMyMission )
 	{
-		FULL_OBJ_ID location = nullObjID ;
+		FULL_OBJ_ID location = nullObjID;
 		if ( target->lastCP() )
-			location = target->lastCP()->Fid() ;
+			location = target->lastCP()->Fid();
 
-		who.setExtendedDetails(target->isSpawned(), location) ;
+		who.setExtendedDetails(target->isSpawned(), location);
 	}
 }
 

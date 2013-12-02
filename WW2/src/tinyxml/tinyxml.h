@@ -1745,7 +1745,7 @@ public:
 	/** Set the indent characters for printing. By default 4 spaces
 		but tab is also useful, or null/empty string for no indentation.
 	*/
-	void SetIndent( const char* _indent )			{ indent = _indent ? _indent : "" ; }
+	void SetIndent( const char* _indent )			{ indent = _indent ? _indent : ""; }
 	/// Query the indention string.
 	const char* Indent()							{ return indent.c_str(); }
 	/** Set the line breaking string. By default set to newline (\n).

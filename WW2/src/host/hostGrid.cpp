@@ -43,16 +43,16 @@
 static void
 _dumpVisListEntry(const Viewing& entry)
 {
-	char buffer[64] ;
-	const char* lastSent ;
+	char buffer[64];
+	const char* lastSent;
 	if ( entry.m_lastSent > 0 )
 	{
-		sprintf(buffer, "%llu", teulClock64 - entry.m_lastSent) ;
-		lastSent = buffer ;
+		sprintf(buffer, "%llu", teulClock64 - entry.m_lastSent);
+		lastSent = buffer;
 	}
 	else
-		lastSent = "never" ;
-	dbugLog(_FLIB, "%s:%s:%lld,", entry.m_vehicle.callsign(), lastSent, entry.m_priority) ;
+		lastSent = "never";
+	dbugLog(_FLIB, "%s:%s:%lld,", entry.m_vehicle.callsign(), lastSent, entry.m_priority);
 }
 #else
 #define VIS_DEBUG(...)
@@ -63,16 +63,16 @@ static void
 _dumpVisList(const char* const label, const _Container& list)
 {
 #if defined(ENABLE_VIS_DEBUG)
-	const size_t size = list.size() ;
-	dbugLog(_FLIB, "%s: (%u entries) ", label, size) ;
+	const size_t size = list.size();
+	dbugLog(_FLIB, "%s: (%u entries) ", label, size);
 	if ( size > 0 )
 	{
-		dbugLog(_FLIB, "[") ;
-		for ( auto it = list.begin() ; it != list.end() ; ++it )
+		dbugLog(_FLIB, "[");
+		for ( auto it = list.begin(); it != list.end(); ++it )
 		{
-			_dumpVisListEntry(*it) ;
+			_dumpVisListEntry(*it);
 		}
-		dbugLog(_FLIB, "]") ;
+		dbugLog(_FLIB, "]");
 	}
 #endif
 }
@@ -86,13 +86,13 @@ HostVehicle::removeFromVisList(Viewings::iterator& it)
 {
 	if ( it->m_lastSent > 0ULL )
 	{
-		m_worldUpdate->removeList[m_worldUpdate->numRemove++] = it->m_index ;
+		m_worldUpdate->removeList[m_worldUpdate->numRemove++] = it->m_index;
 	}
 	if ( &(*it) != &(m_visList.back()) )
 	{
-		memcpy(&(*it), &(m_visList.back()), sizeof(Viewing)) ;
+		memcpy(&(*it), &(m_visList.back()), sizeof(Viewing));
 	}
-	m_visList.pop_back() ;
+	m_visList.pop_back();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -103,21 +103,21 @@ void
 HostVehicle::SendRemoveList()
 {
 	if ( m_worldUpdate->numRemove == 0 )
-		return ;
+		return;
 
-	const UCHAR count = m_worldUpdate->numRemove ;
-	const size_t entrySize = sizeof(*m_worldUpdate->removeList) ;
-	const size_t dataSize  = entrySize * count ;
-	const size_t packetSize = sizeof(count) + dataSize ;
+	const UCHAR count = m_worldUpdate->numRemove;
+	const size_t entrySize = sizeof(*m_worldUpdate->removeList);
+	const size_t dataSize  = entrySize * count;
+	const size_t packetSize = sizeof(count) + dataSize;
 
-	Teul::Packet outgoing(packetSize, Comm::CallbackX, REMOVE_LIST_Y) ;
-	outgoing.setUnencrypted() ;
-	outgoing.append(count) ;
-	outgoing.append(m_worldUpdate->removeList, packetSize) ;
+	Teul::Packet outgoing(packetSize, Comm::CallbackX, REMOVE_LIST_Y);
+	outgoing.setUnencrypted();
+	outgoing.append(count);
+	outgoing.append(m_worldUpdate->removeList, packetSize);
 
-	sendPacket(outgoing) ;
+	sendPacket(outgoing);
 
-	m_worldUpdate->numRemove = 0 ;
+	m_worldUpdate->numRemove = 0;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -126,11 +126,11 @@ HostVehicle::SendRemoveList()
 static bool
 _isMandatoryVehicle(const HostVehicle& myVehicle, const HostVehicle& newVehicle)
 {
-	const bool isMyVehicle = (newVehicle.index == myVehicle.index) ;
-	const bool isMulticrew = (newVehicle.isMultiCrewed()) ;
-	const bool isMyRide    = (myVehicle.vehicleData.rideIndex == newVehicle.index) ;
+	const bool isMyVehicle = (newVehicle.index == myVehicle.index);
+	const bool isMulticrew = (newVehicle.isMultiCrewed());
+	const bool isMyRide    = (myVehicle.vehicleData.rideIndex == newVehicle.index);
 
-	return ( (isMyVehicle & isMulticrew) | isMyRide ) ;
+	return ( (isMyVehicle & isMulticrew) | isMyRide );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -139,15 +139,15 @@ _isMandatoryVehicle(const HostVehicle& myVehicle, const HostVehicle& newVehicle)
 static UINT64
 _getVehicleDistance_cm2(const HostVehicle& lhs, const HostVehicle& rhs)
 {
-	SINT64 sqXcm 	= 	(SINT64)(lhs.x_cm() - (SINT64)rhs.x_cm()) ;
-	SINT64 sqYcm 	= 	(SINT64)(lhs.y_cm() - (SINT64)rhs.y_cm()) ;
-	SINT64 sqZcm 	= 	(SINT64)(lhs.z_cm() - (SINT64)rhs.z_cm()) ;
+	SINT64 sqXcm 	= 	(SINT64)(lhs.x_cm() - (SINT64)rhs.x_cm());
+	SINT64 sqYcm 	= 	(SINT64)(lhs.y_cm() - (SINT64)rhs.y_cm());
+	SINT64 sqZcm 	= 	(SINT64)(lhs.z_cm() - (SINT64)rhs.z_cm());
 
-	sqXcm *= sqXcm ;
-	sqYcm *= sqYcm ;
-	sqZcm *= sqZcm ;
+	sqXcm *= sqXcm;
+	sqYcm *= sqYcm;
+	sqZcm *= sqZcm;
 
-	return (UINT64)(sqXcm + sqYcm + sqZcm) ;
+	return (UINT64)(sqXcm + sqYcm + sqZcm);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -158,22 +158,22 @@ _isVehicleVisible(const HostVehicle& vehicle, const UINT64& dist_cm2, const bool
 {
 	if ( dist_cm2 > (UINT64)Grid::MAX_RANGE_CM_SQ )
 	{
-		EXTREME(_FLDB, "!wayfar") ;
-		return false ;
+		EXTREME(_FLDB, "!wayfar");
+		return false;
 	}
 
-	UINT64 maxViewingDistance_cm2 = vehicle.m_maxLod_cm2 ;
+	UINT64 maxViewingDistance_cm2 = vehicle.m_maxLod_cm2;
 	if ( forFighter && (vehicle.spec().wCategory == IN_ || vehicle.spec().wCategory == GV_) )
 	{
-		EXTREME(_FLDB, ":forFighter") ;
+		EXTREME(_FLDB, ":forFighter");
 		maxViewingDistance_cm2 >>= 2;
 	}
 
-	EXTREME(_FLDB, ":dist=%llu,maxV=%llu,inrange=%s", (UINT64)dist_cm2, (UINT64)maxViewingDistance_cm2, dist_cm2 <= maxViewingDistance_cm2 ? "yes" : "no") ;
+	EXTREME(_FLDB, ":dist=%llu,maxV=%llu,inrange=%s", (UINT64)dist_cm2, (UINT64)maxViewingDistance_cm2, dist_cm2 <= maxViewingDistance_cm2 ? "yes" : "no");
 
 	if ( dist_cm2 <= maxViewingDistance_cm2 )
-		return true ;
-	return false ;
+		return true;
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -183,11 +183,11 @@ _isVehicleVisible(const HostVehicle& vehicle, const UINT64& dist_cm2, const bool
 static void
 _weightCurrentVisList(HostVehicle& myVehicle)
 {
-	auto it = myVehicle.m_visList.begin() ;
+	auto it = myVehicle.m_visList.begin();
 
 	while ( it != myVehicle.m_visList.end() )
 	{
-		const HostVehicle& subject = it->m_vehicle ;
+		const HostVehicle& subject = it->m_vehicle;
 
 		// Setting inUpdate to true, even if we decide they
 		// will not be getting sent prevents them from
@@ -195,36 +195,36 @@ _weightCurrentVisList(HostVehicle& myVehicle)
 		// See if the vehicle has exited
 		if ( subject.index != it->m_index )
 		{
-			EXTREME(_FLDB, " vv:%u looks like it went away", it->m_index) ;
-			myVehicle.removeFromVisList(it) ;
-			continue ;
+			EXTREME(_FLDB, " vv:%u looks like it went away", it->m_index);
+			myVehicle.removeFromVisList(it);
+			continue;
 		}
 
 		if ( _isMandatoryVehicle(myVehicle, subject) )
 		{
-			EXTREME(_FLDB, " vv:%u mandatory", it->m_index) ;
-			it->m_priority = -1 ;
+			EXTREME(_FLDB, " vv:%u mandatory", it->m_index);
+			it->m_priority = -1;
 		}
 		else
 		{
 			if ( ((subject.isHiddenBuzzard() == true) & (myVehicle.canSeeHiddenBuzzards() == false)) == true )
 			{
-				EXTREME(_FLDB, " vv:%u hidden", it->m_index) ;
-				myVehicle.removeFromVisList(it) ;
-				continue ;
+				EXTREME(_FLDB, " vv:%u hidden", it->m_index);
+				myVehicle.removeFromVisList(it);
+				continue;
 			}
-			it->m_priority = _getVehicleDistance_cm2(subject, myVehicle) ;
+			it->m_priority = _getVehicleDistance_cm2(subject, myVehicle);
 			if ( _isVehicleVisible(subject, it->m_priority, myVehicle.m_isFighter) == false )
 			{
-				EXTREME(_FLDB, " vv:%u out of range", it->m_index) ;
+				EXTREME(_FLDB, " vv:%u out of range", it->m_index);
 				// Gone out of range
-				myVehicle.removeFromVisList(it) ;
-				continue ;
+				myVehicle.removeFromVisList(it);
+				continue;
 			}
 		}
 
-		EXTREME(_FLDB, " vv:%u visible", it->m_index) ;
-		++it ;
+		EXTREME(_FLDB, " vv:%u visible", it->m_index);
+		++it;
 	}
 }
 
@@ -234,100 +234,100 @@ _weightCurrentVisList(HostVehicle& myVehicle)
 static bool
 _hasVehicleHadUpdate(UINT32 index, HostVehicle& myVehicle, const TeulTimeMS since)
 {
-	auto it = myVehicle.m_visList.begin() ;
+	auto it = myVehicle.m_visList.begin();
 	while ( it != myVehicle.m_visList.end() )
 	{
 		if ( index == it->m_vehicle.index )
-			return (it->m_lastSent >= since) ;
-		++it ;
+			return (it->m_lastSent >= since);
+		++it;
 	}
 
-	return false ;
+	return false;
 }
 
 static bool
 _vehicleIsCurrentlyInList(UINT32 index, HostVehicle& myVehicle)
 {
-	return _hasVehicleHadUpdate(index, myVehicle, 0ULL) ;
+	return _hasVehicleHadUpdate(index, myVehicle, 0ULL);
 }
 
 //////////////////////////////////////////////////////////////////////
 // Add the vehicles from a given grid node into our vis list.
 
 // Vehicles we know to have riders.
-typedef std::unordered_map< UINT32 /*carrierIndex*/, SINT32 /*riderCount or -1*/ > CARRIERS ;
+typedef std::unordered_map< UINT32 /*carrierIndex*/, SINT32 /*riderCount or -1*/ > CARRIERS;
 
 static bool
 _addCellNodesToVisList(HostVehicle& myVehicle, const Grid::VehicleSet& vehicles, CARRIERS& carriers)
 {
-	bool additions = false ;
+	bool additions = false;
 
-	auto it = vehicles.begin() ;
+	auto it = vehicles.begin();
 	while ( it != vehicles.end() )
 	{
-		const HostVehicle& subject = *(*it) ;
-		++it ;
+		const HostVehicle& subject = *(*it);
+		++it;
 
-		EXTREME(_FLDB, " cand:%u:%s", subject.index, subject.callsign()) ;
+		EXTREME(_FLDB, " cand:%u:%s", subject.index, subject.callsign());
 
 		if ( _vehicleIsCurrentlyInList(subject.index, myVehicle) == true )
 		{
-			EXTREME(_FLDB, "!in") ;
-			continue ;
+			EXTREME(_FLDB, "!in");
+			continue;
 		}
 
-		SINT64 vehicleDist_cm2 = -1LL ;
+		SINT64 vehicleDist_cm2 = -1LL;
 		if ( _isMandatoryVehicle(myVehicle, subject) == false )
 		{
-			EXTREME(_FLDB, "=norm") ;
-			const bool isHidden = (subject.isHiddenBuzzard() == true) & (myVehicle.canSeeHiddenBuzzards() == false) ;
+			EXTREME(_FLDB, "=norm");
+			const bool isHidden = (subject.isHiddenBuzzard() == true) & (myVehicle.canSeeHiddenBuzzards() == false);
 			if ( (subject.index == myVehicle.index) | (subject.isActive() == false) | (isHidden) )
 			{
-				EXTREME(_FLDB, "!vis") ;
-				continue ;
+				EXTREME(_FLDB, "!vis");
+				continue;
 			}
-			vehicleDist_cm2 = _getVehicleDistance_cm2(subject, myVehicle) ;
+			vehicleDist_cm2 = _getVehicleDistance_cm2(subject, myVehicle);
 			if ( _isVehicleVisible(subject, vehicleDist_cm2, myVehicle.m_isFighter) == false )
 			{
-				EXTREME(_FLDB, "!range") ;
-				continue ;
+				EXTREME(_FLDB, "!range");
+				continue;
 			}
 
 			if ( vehicleDist_cm2 == 0 )
-				vehicleDist_cm2 = 1 ;
+				vehicleDist_cm2 = 1;
 
 			// Count the number of riders on each vehicle so that we can make
 			// each subsequent rider less important to our vis list. This way
 			// we will see less riders as our vis list becomes more crowded,
 			// except as the carrying vehicle becomes closer to us.
-			const UINT32 rideIndex = subject.vehicleData.rideIndex ;
+			const UINT32 rideIndex = subject.vehicleData.rideIndex;
 			if ( rideIndex != 0 )
 			{
-				SINT32& riderCount = carriers[rideIndex] ;
+				SINT32& riderCount = carriers[rideIndex];
 				// Never show me a rider for a vehicle I haven't seen yet.
 				if ( riderCount == -1 )
 				{
-					EXTREME(_FLDB, "!rider") ;
-					continue ;
+					EXTREME(_FLDB, "!rider");
+					continue;
 				}
 				// If this is the first update in which we are seeing the
 				// ride, then don't send me the riders just yet.
 				if ( riderCount == 0 && rideIndex != myVehicle.index && _hasVehicleHadUpdate(rideIndex, myVehicle, 1) == false )
 				{
-					EXTREME(_FLDB, "!ride") ;
-					riderCount = -1 ;
-					continue ;
+					EXTREME(_FLDB, "!ride");
+					riderCount = -1;
+					continue;
 				}
-				vehicleDist_cm2 += (vehicleDist_cm2 / (host_config.update.riderBiasing + 1) * riderCount++) ;
+				vehicleDist_cm2 += (vehicleDist_cm2 / (host_config.update.riderBiasing + 1) * riderCount++);
 			}
 		}
 
-		EXTREME(_FLDB, "+add") ;
-		myVehicle.m_visList.push_back(Viewing(subject, vehicleDist_cm2)) ;
-		additions = true ;
+		EXTREME(_FLDB, "+add");
+		myVehicle.m_visList.push_back(Viewing(subject, vehicleDist_cm2));
+		additions = true;
 	}
 
-	return additions ;
+	return additions;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -336,10 +336,10 @@ _addCellNodesToVisList(HostVehicle& myVehicle, const Grid::VehicleSet& vehicles,
 static void
 _cullAdditions(HostVehicle& myVehicle)
 {
-	UINT32 newVehiclesRemaining = host_config.update.limitNewVehicles ;
+	UINT32 newVehiclesRemaining = host_config.update.limitNewVehicles;
 	if ( newVehiclesRemaining == 0 )
-		return ;
-	auto it = myVehicle.m_visList.begin() ;
+		return;
+	auto it = myVehicle.m_visList.begin();
 	while ( it != myVehicle.m_visList.end() )
 	{
 		// Already in the update.
@@ -347,14 +347,14 @@ _cullAdditions(HostVehicle& myVehicle)
 		{
 			if ( newVehiclesRemaining == 0 )
 			{
-				EXTREME(_FLDB, " vc:%u no room for new updates", it->m_index) ;
-				myVehicle.removeFromVisList(it) ;
-				continue ;
+				EXTREME(_FLDB, " vc:%u no room for new updates", it->m_index);
+				myVehicle.removeFromVisList(it);
+				continue;
 			}
-			--newVehiclesRemaining ;
+			--newVehiclesRemaining;
 		}
 
-		++it ;
+		++it;
 	}
 }
 
@@ -366,7 +366,7 @@ _limitVisListSize(HostVehicle& myVehicle, const UINT32 numVehicles)
 {
 	while ( myVehicle.m_visList.size() > numVehicles )
 	{
-		myVehicle.removeFromVisList(--(myVehicle.m_visList.end())) ;
+		myVehicle.removeFromVisList(--(myVehicle.m_visList.end()));
 	}
 }
 
@@ -386,35 +386,35 @@ struct ViewingWeightOrder
 		, newVehiclesLeft(host_config.update.limitNewVehicles ? host_config.update.limitNewVehicles : 255)
 		, size(forVehicle.m_visList.size())
 	{
-		indexes.resize(size) ;
-		for ( UINT32 i = 0 ; i < size ; ++i )
+		indexes.resize(size);
+		for ( UINT32 i = 0; i < size; ++i )
 		{
-			indexes[i] = i ;
+			indexes[i] = i;
 		}
 		// Sort the indexes by the bias weighting of
 		// the vehicle they reference.
-		std::sort(indexes.begin(), indexes.end(), *this) ;
+		std::sort(indexes.begin(), indexes.end(), *this);
 	}
 
 	// Sort the indexes by the weight of the corresponding
 	// vis list viewing.
 	bool operator()(UINT32 lhs, UINT32 rhs) const
 	{
-		SINT64 myWeight = myVehicle.m_visList[lhs].m_priority ;
+		SINT64 myWeight = myVehicle.m_visList[lhs].m_priority;
 		// Existing vehicles are always more important than new vehicles.
 		if ( myVehicle.m_visList[lhs].m_lastSent == 0 && myVehicle.m_visList[rhs].m_lastSent != 0 )
-			myWeight *= 3 ;
-		return myWeight < myVehicle.m_visList[rhs].m_priority ;
+			myWeight *= 3;
+		return myWeight < myVehicle.m_visList[rhs].m_priority;
 	}
 
-	void adjustWeightsForBias(const WEAP_BIAS& bias) ;
+	void adjustWeightsForBias(const WEAP_BIAS& bias);
 
-	HostVehicle& myVehicle ;
-	std::vector<UINT32> indexes ;
-	UINT32 biasedVehicles ;
-	UINT32 newVehiclesLeft ;
-	const size_t size ;
-} ;
+	HostVehicle& myVehicle;
+	std::vector<UINT32> indexes;
+	UINT32 biasedVehicles;
+	UINT32 newVehiclesLeft;
+	const size_t size;
+};
 
 //////////////////////////////////////////////////////////////////////
 // Determine which, if any, side a bias spec requires of a vehicle.
@@ -423,10 +423,10 @@ static WWII_SIDE
 _getBiasSpecSide(const WEAP_BIAS& bias, const HostVehicle& myVehicle)
 {
 	if ( bias.spec.wCountry == Parse::FY_ )
-		return myVehicle.side() ;
+		return myVehicle.side();
 	if ( bias.spec.wCountry == Parse::EY_ )
-		return wwiiOtherSide(myVehicle.side()) ;
-	return WWII_NO_SIDE ;
+		return wwiiOtherSide(myVehicle.side());
+	return WWII_NO_SIDE;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -436,28 +436,28 @@ void
 ViewingWeightOrder::adjustWeightsForBias(const WEAP_BIAS& bias)
 {
 	// Create a mask based on the weapon spec minus the country.
-	const WWII_SIDE specSide = _getBiasSpecSide(bias, myVehicle) ;
-	const UINT32 specMask = bias.spec.asUINT32() & 0x00ffffff ;
+	const WWII_SIDE specSide = _getBiasSpecSide(bias, myVehicle);
+	const UINT32 specMask = bias.spec.asUINT32() & 0x00ffffff;
 
-	UINT32 slotsUsed = 0 ;
-	auto& list = myVehicle.m_visList ;
+	UINT32 slotsUsed = 0;
+	auto& list = myVehicle.m_visList;
 
 	// Start from the highest slot to contain a vehicle that
 	// was positioned as a result of biasing.
 	// Vehicles that match the bias pattern should be moved
 	// down to the lower part of the list.
-	for ( size_t current = biasedVehicles ; current < size ; ++current )
+	for ( size_t current = biasedVehicles; current < size; ++current )
 	{
-		assert( current < indexes.size() ) ;
-		const UINT32 viewingIndex = indexes[current] ;
-		assert( viewingIndex < list.size() ) ;
-		const Viewing& viewing = list[viewingIndex] ;
-		assert( (UINT32)(&viewing.m_vehicle) > 1000 ) ;
-		const HostVehicle& subject = viewing.m_vehicle ;
+		assert( current < indexes.size() );
+		const UINT32 viewingIndex = indexes[current];
+		assert( viewingIndex < list.size() );
+		const Viewing& viewing = list[viewingIndex];
+		assert( (UINT32)(&viewing.m_vehicle) > 1000 );
+		const HostVehicle& subject = viewing.m_vehicle;
 
 		// Find vehicles matching our bias pattern.
 		if ( (specSide && subject.side() != specSide) | ((specMask & subject.spec().asUINT32()) != specMask) )
-			continue ;
+			continue;
 
 		if ( current > biasedVehicles )
 		{
@@ -465,16 +465,16 @@ ViewingWeightOrder::adjustWeightsForBias(const WEAP_BIAS& bias)
 			// is also the index of the first unbiased entry. Move this
 			// vehicle down to that slot so that the biased vehicles
 			// form a contiguous block.
-			std::swap(indexes[current], indexes[biasedVehicles]) ;
+			std::swap(indexes[current], indexes[biasedVehicles]);
 		}
 
 		// Add one to the biased count; all of the biased vehicles
 		// will be at the bottom of the list.
-		++biasedVehicles ;
+		++biasedVehicles;
 
-		++slotsUsed ;
+		++slotsUsed;
 		if ( slotsUsed >= bias.slots )
-			break ;
+			break;
 	}
 }
 
@@ -484,32 +484,32 @@ ViewingWeightOrder::adjustWeightsForBias(const WEAP_BIAS& bias)
 static void
 _biasWeightVisList(HostVehicle& myVehicle)
 {
-	ViewingWeightOrder ordering(myVehicle) ;
+	ViewingWeightOrder ordering(myVehicle);
 
 	// For each bias we have, adjust the vehicle list weights.
-	for ( UINT32 i = 0 ; i < MAX_BIAS_INDEX ; ++i )
+	for ( UINT32 i = 0; i < MAX_BIAS_INDEX; ++i )
 	{
-		const WEAP_BIAS& bias = myVehicle.m_bias[i] ;
+		const WEAP_BIAS& bias = myVehicle.m_bias[i];
 		if ( SPEC_IS_NULL(bias.spec) )
-			break ;
+			break;
 
-		ordering.adjustWeightsForBias(bias) ;
+		ordering.adjustWeightsForBias(bias);
 	}
 
 	// Now assign the biasedVehicles weights based on their ordering position.
-	for ( UINT32 i = 0 ; i < ordering.biasedVehicles ; ++i )
+	for ( UINT32 i = 0; i < ordering.biasedVehicles; ++i )
 	{
-		SINT64& priority = myVehicle.m_visList[ordering.indexes[i]].m_priority ;
+		SINT64& priority = myVehicle.m_visList[ordering.indexes[i]].m_priority;
 		if ( priority >= 0 )
-			priority = i ;
+			priority = i;
 	}
 
 	// Now ensure that the remaining vehicles have weights higher than the highest bias value.
-	for ( UINT32 i = ordering.biasedVehicles ; i < myVehicle.m_visList.size() ; ++i )
+	for ( UINT32 i = ordering.biasedVehicles; i < myVehicle.m_visList.size(); ++i )
 	{
-		SINT64& priority = myVehicle.m_visList[ordering.indexes[i]].m_priority ;
+		SINT64& priority = myVehicle.m_visList[ordering.indexes[i]].m_priority;
 		if ( priority >= 0 )
-			priority += i ;
+			priority += i;
 	}
 }
 
@@ -524,58 +524,58 @@ _checkForNewVisListCandidates(HostVehicle& myVehicle)
 {
 	TIMER_USE_HERE
 
-	CARRIERS carriers ;
-	auto neighborhood = myVehicle.m_cell->neighbors() ;
-	bool additions = false ;
+	CARRIERS carriers;
+	auto neighborhood = myVehicle.m_cell->neighbors();
+	bool additions = false;
 	TIMER_START
-	for ( auto it = neighborhood.begin() ; it != neighborhood.end() ; ++it )
+	for ( auto it = neighborhood.begin(); it != neighborhood.end(); ++it )
 	{
-		const bool additionsThisCell = _addCellNodesToVisList(myVehicle, (*it)->vehicles(), carriers) ;
-		additions |= additionsThisCell ;
+		const bool additionsThisCell = _addCellNodesToVisList(myVehicle, (*it)->vehicles(), carriers);
+		additions |= additionsThisCell;
 	}
-	TIMER_STOP("cfnv:add") ;
+	TIMER_STOP("cfnv:add");
 
-	const UINT32 maxVisVehicles = framings[myVehicle.framingMode].maxVehicles ;
+	const UINT32 maxVisVehicles = framings[myVehicle.framingMode].maxVehicles;
 	if ( additions == false && myVehicle.m_visList.size() <= maxVisVehicles )
 	{
 		// Incase vis-list size changed.
-		EXTREME(_FLDB, " no additions") ;
-		return ;
+		EXTREME(_FLDB, " no additions");
+		return;
 	}
 
 	if ( additions )
 	{
-		EXTREME(_FLDB, " additions") ;
+		EXTREME(_FLDB, " additions");
 		// Ensure that we don't try to add too many new vehicles.
 		TIMER_START
-		_cullAdditions(myVehicle) ;
-		TIMER_STOP("cfnv:cull") ;
+		_cullAdditions(myVehicle);
+		TIMER_STOP("cfnv:cull");
 	}
 
 	// If we don't have a full vis list, we don't need to muck about
 	// with what's in the list.
-	myVehicle.m_visListPressure = myVehicle.m_visList.size() ;
+	myVehicle.m_visListPressure = myVehicle.m_visList.size();
 	if ( myVehicle.m_visList.size() <= maxVisVehicles )
 	{
-		EXTREME(_FLDB, " vl:%u, mvl:%u, plenty of room.", myVehicle.m_visList.size(), maxVisVehicles) ;
+		EXTREME(_FLDB, " vl:%u, mvl:%u, plenty of room.", myVehicle.m_visList.size(), maxVisVehicles);
 		if ( myVehicle.m_visList.size() > framings[myVehicle.framingMode].vehiclesPerFrame )
 		{
 			TIMER_START
-			std::sort(myVehicle.m_visList.begin(), myVehicle.m_visList.end()) ;
-			TIMER_STOP("cfnv:sort") ;
+			std::sort(myVehicle.m_visList.begin(), myVehicle.m_visList.end());
+			TIMER_STOP("cfnv:sort");
 		}
-		return ;
+		return;
 	}
 
 #if defined(ENABLE_BIASING)
-	_biasWeightVisList(myVehicle) ;
+	_biasWeightVisList(myVehicle);
 #endif
 
 	// Now sort the resulting visList and trim it down to size.
 	TIMER_START
-	std::sort(myVehicle.m_visList.begin(), myVehicle.m_visList.end()) ;
-	_limitVisListSize(myVehicle, maxVisVehicles) ;
-	TIMER_STOP("cfnv:limit") ;
+	std::sort(myVehicle.m_visList.begin(), myVehicle.m_visList.end());
+	_limitVisListSize(myVehicle, maxVisVehicles);
+	TIMER_STOP("cfnv:limit");
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -586,45 +586,45 @@ HostVehicle::UpdateVehicleList()
 {
 	TIMER_USE_HERE
 
-	EXTREME(_FLD, "UPDT v:%u updating list", index) ;
+	EXTREME(_FLD, "UPDT v:%u updating list", index);
 
 	// Find where I am on the grid.
 	if ( m_cell == NULL )
 	{
-		EXTREME(_FLDB, " cell=NULL") ;
+		EXTREME(_FLDB, " cell=NULL");
 		TIMER_START
 		if ( m_visList.empty() == false )
 		{
-			EXTREME(_FLDB, " purge") ;
-			_limitVisListSize(*this, 0) ;
+			EXTREME(_FLDB, " purge");
+			_limitVisListSize(*this, 0);
 		}
-		TIMER_STOP("uvl:purge") ;
+		TIMER_STOP("uvl:purge");
 
 		return -EINVAL;
 	}
 
 	// sort current update list, sets inUpdate to TRUE
 	TIMER_START
-	_weightCurrentVisList(*this) ;
-	TIMER_STOP("uvl:weight") ;
+	_weightCurrentVisList(*this);
+	TIMER_STOP("uvl:weight");
 
-	_dumpVisList("weighted", this->m_visList) ;
+	_dumpVisList("weighted", this->m_visList);
 
 	// Only rebuild vis list once a second.
 	if ( m_lastVisListUpdate <= teulClock64 - 400 )
 	{
-		m_lastVisListUpdate = teulClock64 ;
-		_checkForNewVisListCandidates(*this) ;
+		m_lastVisListUpdate = teulClock64;
+		_checkForNewVisListCandidates(*this);
 	}
 
-	_dumpVisList("with additions", this->m_visList) ;
+	_dumpVisList("with additions", this->m_visList);
 
 	return 0;
 }
 
 bool SortViewingsByPriority(const Viewing* const lhs, const Viewing* const rhs)
 {
-	return lhs->m_priority < rhs->m_priority ;
+	return lhs->m_priority < rhs->m_priority;
 }
 
 SINT32
@@ -633,72 +633,72 @@ HostVehicle::CreateWorldUpdate()
 	TIMER_USE_HERE
 
 	TIMER_START
-	WORLD_UPDATE& wu = *(this->m_worldUpdate) ;
+	WORLD_UPDATE& wu = *(this->m_worldUpdate);
 
-	wu.header.random1 = static_cast<UINT8>(teulClock64 % 0x9e3779b9) ;
+	wu.header.random1 = static_cast<UINT8>(teulClock64 % 0x9e3779b9);
 
 	if ( m_despawnTimerActive )
-		wu.header.timerInfo = despawnTime().m_despawn ;
+		wu.header.timerInfo = despawnTime().m_despawn;
 	else
-		wu.header.timerInfo = -1 ;
-	wu.header.center = vehicleData.position ;
+		wu.header.timerInfo = -1;
+	wu.header.center = vehicleData.position;
 
-	wu.header.framingMode = framingMode ;
+	wu.header.framingMode = framingMode;
 	wu.header.numVehicles = 0;
 	wu.myVehicle = this;
-	wu.header.actualVehiclesInRange = m_visListPressure ;
+	wu.header.actualVehiclesInRange = m_visListPressure;
 
 	// A distant time guaranteed to be older than the oldest update
 	// we might have sent.
-	const TeulTimeMS epoch = (teulClock64 - (TeulTimeMS)(HOUR_S) * 1000ULL) ;
+	const TeulTimeMS epoch = (teulClock64 - (TeulTimeMS)(HOUR_S) * 1000ULL);
 
-	const size_t visListSize = m_visList.size() ;
-	const size_t maxVehiclesPerFrame = framings[framingMode].maxVehiclesPerFrame() ;
-	VIS_DEBUG(_FLI, "framing:%u mv:%u mvpf:%u vls:%u", framingMode, framings[framingMode].maxVehicles, maxVehiclesPerFrame, visListSize) ;
+	const size_t visListSize = m_visList.size();
+	const size_t maxVehiclesPerFrame = framings[framingMode].maxVehiclesPerFrame();
+	VIS_DEBUG(_FLI, "framing:%u mv:%u mvpf:%u vls:%u", framingMode, framings[framingMode].maxVehicles, maxVehiclesPerFrame, visListSize);
 
-	TIMER_STOP("cwu:pre") ;
+	TIMER_STOP("cwu:pre");
 
-	const bool avoidRepeats = host_config.update.avoidRepeats ;
+	const bool avoidRepeats = host_config.update.avoidRepeats;
 
 	if ( visListSize <= maxVehiclesPerFrame )
 	{
 		if ( avoidRepeats )
 		{
-			VIS_DEBUG(_FLIB, " small, counting those with updates.") ;
+			VIS_DEBUG(_FLIB, " small, counting those with updates.");
 
 			TIMER_START
-			for ( size_t i = 0 ; i < visListSize ; ++i )
+			for ( size_t i = 0; i < visListSize; ++i )
 			{
-				Viewing& viewing = m_visList[i] ;
+				Viewing& viewing = m_visList[i];
 				if ( viewing.m_lastSent > 1 && viewing.m_vehicle.lastRX < viewing.m_lastSent )
-					continue ;
-				wu.viewings[wu.header.numVehicles++] = &viewing ;
+					continue;
+				wu.viewings[wu.header.numVehicles++] = &viewing;
 			}
 		}
 		else
 		{
-			for ( size_t i = 0 ; i < visListSize ; ++i )
+			for ( size_t i = 0; i < visListSize; ++i )
 			{
-				wu.viewings[wu.header.numVehicles++] = &m_visList[i] ;
+				wu.viewings[wu.header.numVehicles++] = &m_visList[i];
 			}
 		}
 
-		VIS_DEBUG(_FLIB, " going with %u", wu.header.numVehicles) ;
+		VIS_DEBUG(_FLIB, " going with %u", wu.header.numVehicles);
 
 #if defined(ENABLE_VIS_DEBUG)
 		if ( wu.header.numVehicles > 0 )
 		{
-			VIS_DEBUG(_FLI, "final list: ") ;
-			for ( UINT32 i = 0 ; i < wu.header.numVehicles ; ++i )
+			VIS_DEBUG(_FLI, "final list: ");
+			for ( UINT32 i = 0; i < wu.header.numVehicles; ++i )
 			{
-				_dumpVisListEntry(*wu.viewings[i]) ;
+				_dumpVisListEntry(*wu.viewings[i]);
 			}
 		}
 #endif
 
-		TIMER_STOP("cwu:gowith") ;
+		TIMER_STOP("cwu:gowith");
 
-		return wu.header.numVehicles ;
+		return wu.header.numVehicles;
 	}
 
 	/////
@@ -716,55 +716,55 @@ HostVehicle::CreateWorldUpdate()
 	///				enemies within 250m need major prioritisation
 	///			}
 
-	std::vector<Viewing*> updateViewings ;
-	updateViewings.reserve(std::min(m_visList.size(), (size_t)framings[framingMode].maxVehicles)) ;
+	std::vector<Viewing*> updateViewings;
+	updateViewings.reserve(std::min(m_visList.size(), (size_t)framings[framingMode].maxVehicles));
 
 	TIMER_START
-	wu.header.numVehicles = 0 ;
-	for ( UINT32 i = 0 ; i < m_visList.size() ; ++i )
+	wu.header.numVehicles = 0;
+	for ( UINT32 i = 0; i < m_visList.size(); ++i )
 	{
-		Viewing& viewing = m_visList[i] ;
+		Viewing& viewing = m_visList[i];
 		if ( (avoidRepeats) & (viewing.m_vehicle.lastRX < viewing.m_lastSent) )
-			continue ;
+			continue;
 
-		//viewing.m_oneTimeBits = viewing.m_vehicle.getOneTimeBitsFor(this) ;
+		//viewing.m_oneTimeBits = viewing.m_vehicle.getOneTimeBitsFor(this);
 
 		// Top-priority stuff
 		if ( viewing.m_priority < 0 || viewing.m_lastSent == 0 )
 		{
-			viewing.m_priority = -1 ;
+			viewing.m_priority = -1;
 		}
 		else
 		{
 			// Otherwise the weight is the age of the last sent time.
 			// subtract epoch so that more recent values are larger and thus lower priority.
-			viewing.m_priority = (SINT64)(viewing.m_lastSent - epoch) ;
+			viewing.m_priority = (SINT64)(viewing.m_lastSent - epoch);
 
 			// Try to prioritize vehicles that are firing.
 			if ( viewing.m_vehicle.vehicleData.fire.masterClock64 > viewing.m_lastSent )
-				viewing.m_priority /= 4 ;
+				viewing.m_priority /= 4;
 		}
 
-		updateViewings.push_back(&viewing) ;
+		updateViewings.push_back(&viewing);
 	}
-	TIMER_STOP("cwl:pri") ;
+	TIMER_STOP("cwl:pri");
 
 	// Size-up the final list.
-	const size_t numVehicles = std::min(updateViewings.size(), maxVehiclesPerFrame) ;
+	const size_t numVehicles = std::min(updateViewings.size(), maxVehiclesPerFrame);
 
 #if defined(ENABLE_VIS_DEBUG)
-	dbugLog(_FLIB, " final list: nv=min(%u, %u) = %u", updateViewings.size(), maxVehiclesPerFrame, numVehicles) ;
+	dbugLog(_FLIB, " final list: nv=min(%u, %u) = %u", updateViewings.size(), maxVehiclesPerFrame, numVehicles);
 #endif
 
 	// Sort the list into priority order and then whatever is at the preferred end of the list gets sent.
 	TIMER_START
-	std::sort(updateViewings.begin(), updateViewings.end(), SortViewingsByPriority) ;
-	memcpy(wu.viewings, &updateViewings[0], sizeof(Viewing*) * numVehicles) ;
-	TIMER_STOP("cwl:sortcopy") ;
+	std::sort(updateViewings.begin(), updateViewings.end(), SortViewingsByPriority);
+	memcpy(wu.viewings, &updateViewings[0], sizeof(Viewing*) * numVehicles);
+	TIMER_STOP("cwl:sortcopy");
 
-	wu.header.numVehicles = numVehicles ;
+	wu.header.numVehicles = numVehicles;
 
-	_dumpVisList("vis list", this->m_visList) ;
+	_dumpVisList("vis list", this->m_visList);
 
 	return numVehicles;
 }

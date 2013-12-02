@@ -23,93 +23,93 @@ public:
 		   , wx(0), wy(0), wz(0)
 			{}
 
-	void reset() ;
-	void move() ;
-	void moveAircraft() ;
-	void moveOther() ;
-	void update() ;
+	void reset();
+	void move();
+	void moveAircraft();
+	void moveOther();
+	void update();
 
 public:
-	HostVehicle*	hv ;
-	FLOAT64			sx, sy ;		// Deltas (speeds)
-	FLOAT64			dist ;			// Distance controller
+	HostVehicle*	hv;
+	FLOAT64			sx, sy;		// Deltas (speeds)
+	FLOAT64			dist;			// Distance controller
 
-	FLOAT64			cx, cy, cz ;
-	FLOAT64 radius ;
-	FLOAT64 speed ;
-	TeulTimeMS started ;	// teulClock64 walltime in ms
+	FLOAT64			cx, cy, cz;
+	FLOAT64 radius;
+	FLOAT64 speed;
+	TeulTimeMS started;	// teulClock64 walltime in ms
 
-	FLOAT64	x, y, z ;
-	FLOAT64	pitch, roll, yaw ;
-	FLOAT64	vx, vy, vz ;
-	FLOAT64 ax, ay, az ;
-	FLOAT64	wx, wy, wz ;
-} ;
+	FLOAT64	x, y, z;
+	FLOAT64	pitch, roll, yaw;
+	FLOAT64	vx, vy, vz;
+	FLOAT64 ax, ay, az;
+	FLOAT64	wx, wy, wz;
+};
 
-typedef std::vector<Fake> FAKES ;
-static FAKES _fakes ;
+typedef std::vector<Fake> FAKES;
+static FAKES _fakes;
 
 // Eersel
-FLOAT64 g_fakeBaseX = 254900.94717361819 ;
-FLOAT64 g_fakeBaseY = 3081051.2831075168 ;
-FLOAT64 g_fakeBaseZ = 29.0 ;
+FLOAT64 g_fakeBaseX = 254900.94717361819;
+FLOAT64 g_fakeBaseY = 3081051.2831075168;
+FLOAT64 g_fakeBaseZ = 29.0;
 
-UINT32 g_fakeRange = 500 ;
-UINT32 g_fakeSpeed = 50 ;
-FLOAT64 g_fakeDensity = 12.0 ;
-FLOAT64 g_fakeAirZ = 600.0 ;
-bool g_fakeMovement = true ;
-bool g_enableFunnyFarm = false ;
-static const UINT32 g_waves = 2 ;
-UINT32 g_modify = 0 ;
+UINT32 g_fakeRange = 500;
+UINT32 g_fakeSpeed = 50;
+FLOAT64 g_fakeDensity = 12.0;
+FLOAT64 g_fakeAirZ = 600.0;
+bool g_fakeMovement = true;
+bool g_enableFunnyFarm = false;
+static const UINT32 g_waves = 2;
+UINT32 g_modify = 0;
 
 void
 Fake::reset()
 {
-	UINT32 unitNo = hv->vehicleData.squad ;
+	UINT32 unitNo = hv->vehicleData.squad;
 
-	cx = g_fakeBaseX + (g_fakeDensity * (FLOAT64)(unitNo%16)) - 8 * g_fakeDensity ;
-	cy = g_fakeBaseY + (g_fakeDensity * (FLOAT64)(unitNo/16)) - 8 * g_fakeDensity ;
+	cx = g_fakeBaseX + (g_fakeDensity * (FLOAT64)(unitNo%16)) - 8 * g_fakeDensity;
+	cy = g_fakeBaseY + (g_fakeDensity * (FLOAT64)(unitNo/16)) - 8 * g_fakeDensity;
 
-	cz = g_fakeBaseZ ;
+	cz = g_fakeBaseZ;
 
-	radius = 5 + (rand() % (g_fakeRange*100))/100 ;
-	speed = 1 + (rand() % (g_fakeSpeed * 10)) / 10 ;
+	radius = 5 + (rand() % (g_fakeRange*100))/100;
+	speed = 1 + (rand() % (g_fakeSpeed * 10)) / 10;
 
 	// Bump aircraft altitude a little
 	if ( hv->spec().wCategory == _AIRCRAFT )
 	{
-		cz += (g_fakeAirZ / 2) + (rand() % (UINT32)g_fakeAirZ*3) ;
-		radius = g_fakeRange + (rand() % (g_fakeRange*1000))/100 ;
-		speed = 75 + speed + (rand() % g_fakeSpeed) ;
+		cz += (g_fakeAirZ / 2) + (rand() % (UINT32)g_fakeAirZ*3);
+		radius = g_fakeRange + (rand() % (g_fakeRange*1000))/100;
+		speed = 75 + speed + (rand() % g_fakeSpeed);
 	}
 	else if ( hv->spec().wCategory == _INFANTRY )
-		speed /= 4 ;
+		speed /= 4;
 	else if ( hv->spec().wCategory == _SEA_VEHICLE )
-		radius = 250 + 2*radius + (rand() % g_fakeRange) ;
+		radius = 250 + 2*radius + (rand() % g_fakeRange);
 	else
 	{
-		radius = (radius + 10) * 2 ;
-		speed = speed + (rand() % g_fakeSpeed) ;
+		radius = (radius + 10) * 2;
+		speed = speed + (rand() % g_fakeSpeed);
 	}
 
-	speed /= 1000 ;
+	speed /= 1000;
 
-	x = cx ;
-	y = cy ;
-	z = cz ;
+	x = cx;
+	y = cy;
+	z = cz;
 
-	dist = 0 ;
+	dist = 0;
 
 	sx = cx + radius * cos(0);
 	sy = cy + radius * sin(0);
 
-	hv->setReallyActive(true) ;
-	hv->m_spawnTime = 0 ;
+	hv->setReallyActive(true);
+	hv->m_spawnTime = 0;
 
-	started = (TeulTimeMS) rand() ;
+	started = (TeulTimeMS) rand();
 
-	hv->updateGrid() ;
+	hv->updateGrid();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -118,13 +118,13 @@ Fake::reset()
 void
 hostResetFakePositions()
 {
-	UINT32 i ;
-	FAKES::iterator it ;
-	for ( i = 0, it = _fakes.begin() ; it != _fakes.end() ; ++it, ++i )
+	UINT32 i;
+	FAKES::iterator it;
+	for ( i = 0, it = _fakes.begin(); it != _fakes.end(); ++it, ++i )
 	{
-		it->reset() ;
+		it->reset();
 	}
-	dbugLog(_FLI, "reset %u vehicle positions to base %f.%f.%f", i, g_fakeBaseX, g_fakeBaseY, g_fakeBaseZ) ;
+	dbugLog(_FLI, "reset %u vehicle positions to base %f.%f.%f", i, g_fakeBaseX, g_fakeBaseY, g_fakeBaseZ);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -134,38 +134,38 @@ static void
 _initializeFakeWeapons()
 {
 	if ( g_enableFunnyFarm == false )
-		return ;
+		return;
 
-	static const UINT32 _WEAPONS = g_weaponList.size() ;
-	UINT32 serial = 0x3fffffff ;
-	Fake entry ;
+	static const UINT32 _WEAPONS = g_weaponList.size();
+	UINT32 serial = 0x3fffffff;
+	Fake entry;
 
-	WEAPON_LIST::iterator it = g_weaponList.begin() ;
-	for ( UINT32 wave = 0 ; wave < g_waves ; ++wave )
+	WEAPON_LIST::iterator it = g_weaponList.begin();
+	for ( UINT32 wave = 0; wave < g_waves; ++wave )
 	{
-		for ( UINT32 i = 0 ; i < _WEAPONS ; ++i )
+		for ( UINT32 i = 0; i < _WEAPONS; ++i )
 		{
 			if ( it == g_weaponList.end() )
-				it = g_weaponList.begin() ;
-			WEAPON* weap = it->second ;
-			++it ;
-			HostVehicle* fake = hostCreateRemoteVehicle(Instance::_CAMPAIGN, serial, weap->spec()) ;
-			assert(fake) ;
-			SHARED_VEHICLE_INFO& vi = fake->vehicleData ;
-			sprintf(vi.callsign, "FAKE%04zu", _fakes.size()) ;
-			vi.packedCallsign = chatGetHandle(vi.callsign) ;
-			vi.squad = i ;
-			vi.rank = (rand() % 22) + 1 ;
-			hostActivateVehicle(fake, false) ;
-			entry.hv = fake ;
-			entry.reset() ;
-			_fakes.push_back(entry) ;
+				it = g_weaponList.begin();
+			WEAPON* weap = it->second;
+			++it;
+			HostVehicle* fake = hostCreateRemoteVehicle(Instance::_CAMPAIGN, serial, weap->spec());
+			assert(fake);
+			SHARED_VEHICLE_INFO& vi = fake->vehicleData;
+			sprintf(vi.callsign, "FAKE%04zu", _fakes.size());
+			vi.packedCallsign = chatGetHandle(vi.callsign);
+			vi.squad = i;
+			vi.rank = (rand() % 22) + 1;
+			hostActivateVehicle(fake, false);
+			entry.hv = fake;
+			entry.reset();
+			_fakes.push_back(entry);
 
-			--serial ;
+			--serial;
 		}
 	}
 
-	dbugLog(_FLI, "Created %" PRSizeT " fake vehicles", _fakes.size()) ;
+	dbugLog(_FLI, "Created %" PRSizeT " fake vehicles", _fakes.size());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -174,22 +174,22 @@ _initializeFakeWeapons()
 void
 hostRunFakeVehicles()
 {
-	static TeulTimeMS nextRun = teulClock64 ;
+	static TeulTimeMS nextRun = teulClock64;
 	if ( teulClock64 < nextRun )
-		return ;
+		return;
 
 	// Only do this once every 150ms
 	if ( nextRun + 200 < teulClock64 )
-		nextRun = teulClock64 ;
-	nextRun = nextRun + 125 + (rand() & 63) ;
+		nextRun = teulClock64;
+	nextRun = nextRun + 125 + (rand() & 63);
 
 	if ( _fakes.empty() )
-		_initializeFakeWeapons() ;
+		_initializeFakeWeapons();
 
-	FAKES::iterator it ;
-	for ( it = _fakes.begin() ; it != _fakes.end() ; ++it )
+	FAKES::iterator it;
+	for ( it = _fakes.begin(); it != _fakes.end(); ++it )
 	{
-		(*it).update() ;
+		(*it).update();
 	}
 }
 
@@ -203,29 +203,29 @@ Fake::moveAircraft()
 	TeulTimeMS t = teulClock64 - started;
 	FLOAT64 w = speed / radius;
 
-	yaw = (w * t) ;
+	yaw = (w * t);
 
 	x = cx + radius * cos(yaw);
 	y = cy + radius * sin(yaw);
 
 	if ( cx == sx && cy == sy )
 	{
-		started = teulClock64 ;
-		yaw = 0 ;
+		started = teulClock64;
+		yaw = 0;
 	}
 
 	vx = -speed * 100 * sin(yaw);
 	vy = speed * 100 * cos(yaw);
 
-	SHARED_VEHICLE_INFO& vi = hv->vehicleData ;
+	SHARED_VEHICLE_INFO& vi = hv->vehicleData;
 
 //	if ( vi.squad == 1 )
 //	{
-//		dbugLog(_FLI, "t=%llu, w=%g, yaw=%g, x=%g, y=%g, vx=%g, vy=%g", t, w, yaw, x, y, vx, vy) ;
+//		dbugLog(_FLI, "t=%llu, w=%g, yaw=%g, x=%g, y=%g, vx=%g, vy=%g", t, w, yaw, x, y, vx, vy);
 //	}
 
 	// Convert to radians
-//	FLOAT64 yawR = yaw * PI / 180 ;
+//	FLOAT64 yawR = yaw * PI / 180;
 
 	vi.attitude.attZ = (SINT16)(cos(yaw) * 10000.0 + 0.5);
 
@@ -237,32 +237,32 @@ void
 Fake::move()
 {
 	if ( !g_fakeMovement )
-		return ;
+		return;
 
-	moveAircraft() ;
+	moveAircraft();
 
 //	switch ( hv->spec().wCategory )
 //	{
 //	case _AIRCRAFT:
-//		moveAircraft() ;
-//	break ;
+//		moveAircraft();
+//	break;
 //	default:
-//		moveOther() ;
+//		moveOther();
 //	}
 }
 
 void
 Fake::update()
 {
-	move() ;
+	move();
 
-	SHARED_VEHICLE_INFO& vi = hv->vehicleData ;
-	hv->lastRX = teulClock64 ;
-	vi.hostPosTimeStamp = teulClock64 + 1 ;
-	vi.timeStamp = teulClock() ;
-	vi.posTimeStamp = teulClock() ;
-	hv->m_holder->timeStamp = teulClock() ;
-	hv->m_holder->posTimeStamp = teulClock() ;
+	SHARED_VEHICLE_INFO& vi = hv->vehicleData;
+	hv->lastRX = teulClock64;
+	vi.hostPosTimeStamp = teulClock64 + 1;
+	vi.timeStamp = teulClock();
+	vi.posTimeStamp = teulClock();
+	hv->m_holder->timeStamp = teulClock();
+	hv->m_holder->posTimeStamp = teulClock();
 
 	vi.position.m_x = (int)(x * 100.0);
 	vi.position.m_y = (int)(y * 100.0);
@@ -310,5 +310,5 @@ Fake::update()
 	if (wz < 0.0)	vi.low.rotational.velZ = -vi.low.rotational.velZ;
 */
 
-	hv->updateGrid() ;
+	hv->updateGrid();
 }

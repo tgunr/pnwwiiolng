@@ -219,21 +219,12 @@ _recvWEP_LIST_REQ(ACTION_OBJECT* const a)
 {
 	REQUIRE_CLIENT_DATA_AS(Player, player);
 	WEP_LIST_REQ request;
-	FacilityStruct* facility;
-
 	a->offset = missPackWEP_LIST_REQ(TEUL_UNPACK, a->packed, a->offset, &request, 0);
-
-	const SINT32 stratIndex = mapGetStratIndex();
-	if ( stratIndex < 0 )
-	{
-		///TODO: Notify client.
-		return -EINVAL;
-	}
 
 	BETAInfo(a->teulIndex);
 
-	facility = strtGetFacility(request.facility);
-	if (facility == NULL)
+	FacilityStruct* facility = strtGetFacility(request.facility);
+	if (PN_UNLIKELY(facility == nullptr))
 	{
 		dbugLog(_FLA,"couldnt find facility x:%d y:%d id:%d for index %d"
 					, request.facility.cell.ox
@@ -241,34 +232,40 @@ _recvWEP_LIST_REQ(ACTION_OBJECT* const a)
 					, request.facility.id
 					, a->teulIndex);
 
-		///TODO: Notify client.
+		FacilityWeaponList reply(player.playerID(), request.facility);
+		reply.send(a->teulIndex);
 		return -EINVAL;
 	}
 
 	// Check ownership before bothering the strat host.
-	if ( player.side() != facility->side )
+	if (PN_UNLIKELY(player.side() != facility->side))
 	{
 		dbugLog(_FLD, "t:%d p:%u c:%s side mismatch persona %d, facility %d", a->teulIndex, player.playerID(), player.callsign(), player.side(), facility->side);
 
 		// Notify the player why the weapon list can't be sent.
-		FacilityWeaponList reply(player.playerID(), request.facility);
-		reply.m_status = FacilityWeaponList::_ENEMY_OWNS;
-		reply.m_numWeapons = 0;
-		reply.m_refreshSeconds = 30;
-		reply.send(player.teulIndex());
-
+		FacilityWeaponList reply(player.playerID(), request.facility, FacilityWeaponList::_ENEMY_OWNS);
+		reply.send(a->teulIndex);
 		return a->offset;
 	}
 
+	ENDPOINT* stratHost = serverPeerEndpointByType(STRAT_HOST);
+	if (PN_UNLIKELY(!stratHost))
+	{
+		dbugLog(_FLI, "t:%d p:%u c:%s can't fulfill weapons request: no strat host", a->teulIndex, player.playerID(), player.callsign());
+		FacilityWeaponList reply(player.playerID(), request.facility);
+		reply.send(a->teulIndex);
+		return 0;
+	}
+
 	dbugLog(_FLD, "t:%d p:%u c:%s weapons request at %s, all: %d, refresh: %d, perm: %llx"
-					, a->teulIndex, player.playerID(), player.callsign()
-					, facility->name, request.allWeapons, request.isRefresh, player.permissionMask()
-					);
+			, a->teulIndex, player.playerID(), player.callsign()
+			, facility->name, request.allWeapons, request.isRefresh, player.permissionMask()
+			);
 
 	Teul::Packet outgoing(0, Strat::CallbackX, STRT_FACILITY_WEAP_LIST_Y);
 	CONSTRUCT_IN_PACKET(outgoing, WeaponListRequest, player.playerID(), player.brigadeID(), request.facility
-													, player.permissionMask()
-													, false, request.isRefresh != FALSE);
+						, player.permissionMask()
+						, false, request.isRefresh != FALSE);
 	outgoing.send(mapGetStratIndex());
 
 	return a->offset;
@@ -336,7 +333,7 @@ _recvMISSION_EXIT(ACTION_OBJECT* const a)
 {
 	REQUIRE_CLIENT_DATA_AS(Player, player);
 
-	const UINT32 missionID = player.missionID() ;
+	const UINT32 missionID = player.missionID();
 	player.ExitMission();
 
 	// Last one out turn off the lights

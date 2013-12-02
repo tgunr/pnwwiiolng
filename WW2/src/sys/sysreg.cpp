@@ -167,15 +167,15 @@ HKEY	hkey;
 const TCHAR* sysregGetInstallValue(const TCHAR* Key)
 {
 #ifdef BETA_RELEASE
-    int appid = Auth::Apps::BETA_APP_ID ;
+    int appid = Auth::Apps::BETA_APP_ID;
 #elif PN_WW2_BUILD_NO != 255
-    int appid = Auth::Apps::BETA_APP_ID ;
+    int appid = Auth::Apps::BETA_APP_ID;
 #else
-    int appid = Auth::Apps::LIVE_APP_ID ;
+    int appid = Auth::Apps::LIVE_APP_ID;
 #endif
 
-	static TCHAR value[256+1] ;
-	value[0] = 0 ;
+	static TCHAR value[256+1];
+	value[0] = 0;
 
 	TCHAR path[256+1];
 

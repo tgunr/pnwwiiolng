@@ -13,5 +13,5 @@
 extern SINT32 chatInstallCellHostSupportCallbacks(void);
 
 // Notify chat we have kicked someone
-extern bool chatSendKickNotice(const playerid_t playerID, const SCHAR* callsign, const SCHAR* problem) ;
+extern bool chatSendKickNotice(const playerid_t playerID, const SCHAR* callsign, const SCHAR* problem);
 

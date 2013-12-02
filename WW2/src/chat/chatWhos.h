@@ -8,6 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-namespace Chat { class Who ; }
+namespace Chat { class Who; }
 
-extern void chatWhoPopulate(Chat::Who& who, const Player* player, const Player* target, bool forceExtendedInfo) ;
+extern void chatWhoPopulate(Chat::Who& who, const Player* player, const Player* target, bool forceExtendedInfo);

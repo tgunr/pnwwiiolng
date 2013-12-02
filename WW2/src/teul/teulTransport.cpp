@@ -37,7 +37,7 @@
 #endif
 
 extern SINT32 teulModStartup(ERROR_FUNCTION*);
-extern SINT32 teulOpenConnection(const SINT32 teulIndex, const bool listening, const SINT32 timeout, const PROTOCOL protocol, const UINT32 host, const UINT16 port, CONNECT_FUNCTION* connectFn, ERROR_FUNCTION* errorFn) ;
+extern SINT32 teulOpenConnection(const SINT32 teulIndex, const bool listening, const SINT32 timeout, const PROTOCOL protocol, const UINT32 host, const UINT16 port, CONNECT_FUNCTION* connectFn, ERROR_FUNCTION* errorFn);
 
 SCHAR* teulModuleName;
 SCHAR* teulAppName;
@@ -45,7 +45,7 @@ SCHAR* teulAppName;
 static bool _transportInited, _transportClosing;
 
 // For client network selection
-UINT32 _hostAddressMask = 0 ;
+UINT32 _hostAddressMask = 0;
 
 UINT32*
 teulGetHostByName(const SCHAR* const name)
@@ -59,7 +59,7 @@ teulGetHostByName(const SCHAR* const name)
 	struct hostent hostEnt;
 	char buf[512];
 	struct hostent* entry = NULL;
-	int herrnop = 0 ;	// gethostbyname wants an errono parameter.
+	int herrnop = 0;	// gethostbyname wants an errono parameter.
 	gethostbyname_r(name, &hostEnt, buf, sizeof(buf), &entry, &herrnop);
 #endif
 
@@ -125,11 +125,11 @@ ENDPOINT::doConnect()
 	if ( this->connectFn != NULL )
 	{
 		dbugLog(_FLN, "t:%d connected calling %p", this->teulIndex(), this->connectFn);
-		this->connectFn(*this) ;
+		this->connectFn(*this);
 	}
 	else if ( protocol != PROTOCOL_UDB && protocol != PROTOCOL_CTRL )	// UDB doesn't connect.
 	{
-		dbugLog(_FLA, "t:%d sock:%u state:%u prot:%u connected NO CONNECT FN", this->teulIndex(), this->socket, this->state(), this->protocol) ;
+		dbugLog(_FLA, "t:%d sock:%u state:%u prot:%u connected NO CONNECT FN", this->teulIndex(), this->socket, this->state(), this->protocol);
 	}
 }
 
@@ -142,7 +142,7 @@ ENDPOINT::doAccept(ENDPOINT& newEndpoint)
 	if ( this->connectFn )
 	{
 		dbugLog(_FLD, "t:%d doing handshaking calling doAccept(t:%d)", this->teulIndex(), newEndpoint.teulIndex());
-		this->connectFn(newEndpoint) ;
+		this->connectFn(newEndpoint);
 	}
 	else
 	{
@@ -153,19 +153,19 @@ ENDPOINT::doAccept(ENDPOINT& newEndpoint)
 void
 teulSetPersonaData(const SINT32 teulIndex, void* personaData)
 {
-	ENDPOINT* const endpoint = teulGetEndpoint(teulIndex) ;
+	ENDPOINT* const endpoint = teulGetEndpoint(teulIndex);
 	if ( endpoint != NULL )
-		endpoint->appConnectionData = personaData ;
+		endpoint->appConnectionData = personaData;
 }
 
 void*
 teulGetPersonaData(const SINT32 teulIndex)
 {
-	ENDPOINT* const endpoint = teulGetEndpoint(teulIndex) ;
+	ENDPOINT* const endpoint = teulGetEndpoint(teulIndex);
 	if ( endpoint != NULL )
-		return endpoint->appConnectionData ;
+		return endpoint->appConnectionData;
 
-	return NULL ;
+	return NULL;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -182,9 +182,9 @@ _openListen(const UINT32 ipAddress
 {
 	SINT32 retval;
 
-	teulSyncClock() ;
+	teulSyncClock();
 
-	const SINT32 teulIndex = teulQueryNextFreeIndex() ;
+	const SINT32 teulIndex = teulQueryNextFreeIndex();
 	if ( teulIndex < 0 )
 	{
 		dbugSetErrno(ENOSPC);
@@ -195,11 +195,11 @@ _openListen(const UINT32 ipAddress
 				teulIndex, true, timeout
 				, protocol, ipAddress, portNumber
 				, acceptFnPtr, errorFnPtr
-				) ;
+				);
 	if ( retval < 0 )
 	{
-		dbugLog(_FLA, "t:%d teulOpenConn failed %d", teulIndex, retval) ;
-		return retval ;
+		dbugLog(_FLA, "t:%d teulOpenConn failed %d", teulIndex, retval);
+		return retval;
 	}
 
 	return teulIndex;
@@ -219,7 +219,7 @@ SINT32 teulOpenListen(const UINT16 portNumber
 					)
 {
 	if ( _transportClosing )
-		return -EDEADLK ;
+		return -EDEADLK;
 
 	dbugLog(_FLD,"opening listen port on address ? port %d",portNumber);
 
@@ -245,7 +245,7 @@ bool teulOpenListenInterface(const UINT16 portNumber
 					)
 {
 	if ( _transportClosing )
-		return false ;
+		return false;
 
 	SINT32 retval;
 	for (UINT32 i = 0; i < Server::myInterface.numIP; ++i)
@@ -281,7 +281,7 @@ SINT32 teulOpenListenHost(const UINT32 ipAddress
 					)
 {
 	if ( _transportClosing )
-		return -EDEADLK ;
+		return -EDEADLK;
 
 	dbugLog(_FLD,"opening listen port on  address %s port %d", teulGetAddress(ipAddress), portNumber);
 
@@ -305,15 +305,15 @@ void
 teulSetNetworkMask(UINT32 address)
 {
 	// Only keep the low 8 bits
-	_hostAddressMask = address & ~0xff ;
+	_hostAddressMask = address & ~0xff;
 }
 
 UINT32
 teulMaskNetworkAddress(UINT32 address)
 {
 	if ( !_hostAddressMask )
-		return address ;
-	return _hostAddressMask | (address & 0xff) ;
+		return address;
+	return _hostAddressMask | (address & 0xff);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -333,14 +333,14 @@ teulOpenSend(UINT32 host
 			, ERROR_FUNCTION* errorFnPtr)
 {
 	if ( _transportClosing )
-		return -EDEADLK ;
+		return -EDEADLK;
 
 	// Have we selected a particular network?
-	host = teulMaskNetworkAddress(host) ;
+	host = teulMaskNetworkAddress(host);
 
-	teulSyncClock() ;
+	teulSyncClock();
 
-	const SINT32 teulIndex = teulQueryNextFreeIndex() ;
+	const SINT32 teulIndex = teulQueryNextFreeIndex();
 	if ( teulIndex < 0 )
 	{
 		dbugLog(_FLA, "no more connections available");
@@ -348,11 +348,11 @@ teulOpenSend(UINT32 host
 		return -ENOSPC;
 	}
 
-	const SINT32 retval = teulOpenConnection(teulIndex, false, timeout, protocol, host, portNumber, connectFnPtr, errorFnPtr) ;
+	const SINT32 retval = teulOpenConnection(teulIndex, false, timeout, protocol, host, portNumber, connectFnPtr, errorFnPtr);
 	if (retval < 0)
 	{
-		dbugLog(_FLA, "t:%d teulOpenConn failed %d", teulIndex, retval) ;
-		return retval ;
+		dbugLog(_FLA, "t:%d teulOpenConn failed %d", teulIndex, retval);
+		return retval;
 	}
 
 	return teulIndex;
@@ -373,22 +373,22 @@ UINT32 teulGetVersion()
 
 namespace Teul
 {
-	event_base* eventBase ;
+	event_base* eventBase;
 }
 
 // For libevent logging.
 static void
 _logLibEvent(int eventLevel, const char* msg)
 {
-	int dbugLevel ;
+	int dbugLevel;
 	switch ( eventLevel )
 	{
-	case _EVENT_LOG_ERR: dbugLevel = Debug::ERR_ABORT ; break ;
-	case _EVENT_LOG_WARN: dbugLevel = Debug::ERR_WARN ; break ;
-	case _EVENT_LOG_MSG: dbugLevel = Debug::ERR_INFO ; break ;
-	default: dbugLevel = Debug::ERR_DBUG ; break ;
+	case _EVENT_LOG_ERR: dbugLevel = Debug::ERR_ABORT; break;
+	case _EVENT_LOG_WARN: dbugLevel = Debug::ERR_WARN; break;
+	case _EVENT_LOG_MSG: dbugLevel = Debug::ERR_INFO; break;
+	default: dbugLevel = Debug::ERR_DBUG; break;
 	}
-	dbugLog("libevent", 0, dbugLevel, "%s", msg) ;
+	dbugLog("libevent", 0, dbugLevel, "%s", msg);
 }
 
 static void
@@ -415,13 +415,13 @@ _initializePlatform()
 	// The WinSock DLL is acceptable. Proceed.
 #endif
 
-	event_set_log_callback(_logLibEvent) ;
+	event_set_log_callback(_logLibEvent);
 
 	// Set up the configuration.
-	event_config* const cfg = event_config_new() ;
-	event_config_set_flag(cfg, EVENT_BASE_FLAG_NOLOCK | EVENT_BASE_FLAG_EPOLL_USE_CHANGELIST) ;
-	Teul::eventBase = event_base_new_with_config(cfg) ;
-	event_config_free(cfg) ;
+	event_config* const cfg = event_config_new();
+	event_config_set_flag(cfg, EVENT_BASE_FLAG_NOLOCK | EVENT_BASE_FLAG_EPOLL_USE_CHANGELIST);
+	Teul::eventBase = event_base_new_with_config(cfg);
+	event_config_free(cfg);
 
 	ABORT_IF( Teul::eventBase == NULL );
 }
@@ -443,8 +443,8 @@ teulInitTransport(SINT32 logType
 
 	if ( _transportClosing )
 	{
-		dbugWrite(_FLAS, "can't initialize teul transport during shutdown") ;
-		return -EDEADLK ;
+		dbugWrite(_FLAS, "can't initialize teul transport during shutdown");
+		return -EDEADLK;
 	}
 
 	dbugInit(logType, name);
@@ -466,7 +466,7 @@ teulInitTransport(SINT32 logType
 
 	teulFreeAllCallbacks();
 
-	const SINT32 retval = teulModStartup(errorFnPtr) ;
+	const SINT32 retval = teulModStartup(errorFnPtr);
 	if ( retval < 0 )
 	{
 		dbugLog(_FLA,"module wont Init");
@@ -475,7 +475,7 @@ teulInitTransport(SINT32 logType
 
 	teulGetVersion();
 
-	return 0 ;
+	return 0;
 }
 
 // Since we have to ensure that callbacks happen in step with whatever
@@ -485,7 +485,7 @@ void
 teulUpdateTransport(const TeulTimeMS& duration_)
 {
 	if ( _transportClosing )
-		return ;
+		return;
 
 #if platBuild == TEUL_SERVER
 	ABORT_UNLESS_EX(_transportInited, "transport can't update without being initialized.");
@@ -497,12 +497,12 @@ teulUpdateTransport(const TeulTimeMS& duration_)
 	teulModIdle(duration_);
 
 #if platOS == OS_LINUX || platBuild == TEUL_SERVER
-	extern void serverUpdate(void) ;
+	extern void serverUpdate(void);
 	serverUpdate();
 #endif
 }
 
-// close all connections and the dugger. (teul go bye bye)
+// close all connections and the debugger. (teul go bye bye)
 void teulCloseTransport(void)
 {
 	if(! _transportInited || _transportClosing)
@@ -511,17 +511,17 @@ void teulCloseTransport(void)
 	_transportClosing = TRUE;
 
 #if platOS == OS_LINUX
-	extern void serverFree(void) ;
-	serverFree() ;
+	extern void serverFree(void);
+	serverFree();
 #endif
 
 	teulModShutdown();
 
 	dbugClose();
 
-	teulFreeAllCallbacks() ;
+	teulFreeAllCallbacks();
 
-	teulFreeDatagramPool() ;
+	teulFreeDatagramPool();
 
 	_transportInited = false;
 }
@@ -530,21 +530,21 @@ void teulCloseTransport(void)
 // point the CALLBACK->outData to your data structure and call this
 // function to send it.
 
-extern SINT32 teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback) ;
-extern SINT32 teulModSendCALLBACK(SINT32 teulIndex, TEUL_CALLBACK& callback) ;
+extern SINT32 teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback);
+extern SINT32 teulModSendCALLBACK(SINT32 teulIndex, TEUL_CALLBACK& callback);
 
 SINT32
 teulSend(ENDPOINT& endpoint, TEUL_CALLBACK* const object, void* const data)
 {
 	if (object == NULL)
 	{
-		dbugLog(_FLA, "teulSend called with NULL callback") ;
+		dbugLog(_FLA, "teulSend called with NULL callback");
 		return -EINVAL;
 	}
 
 	object->outData = data;
 
-	return teulModSendCALLBACKe(endpoint, *object) ;
+	return teulModSendCALLBACKe(endpoint, *object);
 }
 
 SINT32
@@ -552,14 +552,14 @@ teulSend(SINT32 teulIndex, TEUL_CALLBACK* const object, void* const data)
 {
 	if (object == NULL)
 	{
-		dbugLog(_FLA, "teulSend called with NULL callback") ;
+		dbugLog(_FLA, "teulSend called with NULL callback");
 		return -EINVAL;
 	}
 
 	if ( teulIndex < 0 )
 	{
 		dbugLog(_FLW, "t:%d illegal", teulIndex);
-		return teulIndex ;
+		return teulIndex;
 	}
 
 	object->outData = data;
@@ -588,21 +588,21 @@ teulSendTo(SINT32 teulIndex, UINT32 address, UINT16 port, TEUL_CALLBACK* callbac
 }
 
 
-static char _appName[64] = "undefined" ;
+static char _appName[64] = "undefined";
 
 namespace Teul
 {
 
 void SetAppName(const char* const name)
 {
-	memset(_appName, 0, sizeof(_appName)) ;
-	strncpy(_appName, name, sizeof(_appName) - 1) ;
+	memset(_appName, 0, sizeof(_appName));
+	strncpy(_appName, name, sizeof(_appName) - 1);
 }
 
 const char*
 GetAppName()
 {
-	return _appName ;
+	return _appName;
 }
 
 bool IsTransportInited() { return _transportInited; }
