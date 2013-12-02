@@ -512,7 +512,7 @@ chatSendMissionDeleteRequest(const UINT32& missionID)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Send a localised message packet to this player
+// Send a localized message packet to this player
 
 //////////////////////////////////////////////////////////////////////
 // Asks the host to validate a brigade move; if you want it to execute

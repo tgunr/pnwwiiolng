@@ -1236,7 +1236,7 @@ main(int argc, char* argv[])
 			continue;
 		}
 
-		// Return to "accepting" status if neccessary
+		// Return to "accepting" status if necessary
 		_checkAcceptingStatus();
 
 		threadsLogging();
