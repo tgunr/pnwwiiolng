@@ -623,7 +623,7 @@ gr2AnimTrooper* gr2AnimCreateModel (vehVehicle*vehicle, UINT32 vehicleTypeNum, O
 	newModel = _gr2TrooperPool.Pop();
 
 	// Try to avoid malloc when possible.
-	if(newModel == NULL)
+	if(PN_UNLIKELY(newModel == NULL))
 		piExitProgram (__FILE__, __LINE__, "gr2AnimCreateModel: Failed to allocate memory for animModel");
 
 	// get everything to a default state
@@ -1940,7 +1940,7 @@ LOGICAL gr2AnimDoWeaponCollision (OBJECT* pObject, piVECTOR* startPnt, piVECTOR*
 
 LOGICAL gr2AnimGetCurrentWeapon (OBJECT* pObject, SINT32* weapon)
 {
-	if (pObject == NULL)
+	if (PN_UNLIKELY(pObject == NULL))
 	{
 		return (FALSE);
 	}

@@ -105,7 +105,7 @@ extern const WEAPON_SPEC& weapFindWeaponByName(const char* weaponName);
 
 static inline const char* weapPrintSpecC(const WEAPON_SPEC* spec)
 {
-	if (spec == NULL)
+	if (PN_UNLIKELY(spec == nullptr))
 		return "<null>";
 
 	static char buffer[24];

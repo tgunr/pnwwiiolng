@@ -196,13 +196,10 @@ LOGICAL fxBltKill()
 //////////////////////////////////////////////
 LOGICAL fxBltCreate(FXBULLETCREATE* create)
 {
-    if(create == NULL)
+    if(PN_UNLIKELY(create == NULL))
         return FALSE;
 
-    if(!fxBltCreateBulletDecal(create))
-        return FALSE;
-
-    return TRUE;
+	return fxBltCreateBulletDecal(create);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -211,9 +208,10 @@ LOGICAL fxBltCreate(FXBULLETCREATE* create)
 //////////////////////////////////////////////////////////////////////
 LOGICAL fxBltCreateBulletDecal(FXBULLETCREATE* create)
 {
-    FXBULLET* blt = NULL;
+	if (PN_UNLIKELY(create == NULL))
+		return FALSE;
 
-    bool blood = create->flags & (blt_decal_is_blood_splat | blt_decal_is_ground_blood);
+	bool blood = create->flags & (blt_decal_is_blood_splat | blt_decal_is_ground_blood);
 
     if(blood)
     {
@@ -221,9 +219,7 @@ LOGICAL fxBltCreateBulletDecal(FXBULLETCREATE* create)
             return FALSE;
     }
 
-    if(create == NULL)
-        return FALSE;
-
+    FXBULLET* blt = NULL;
     if(!fxBltGetBullet(&blt))
         return FALSE;
 

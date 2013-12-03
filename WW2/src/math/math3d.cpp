@@ -1142,7 +1142,7 @@ SINT32 nxt[3] = {1, 2, 0};
 piMATRIX TempMat;
 piMATRIX * Mat;
 
-	if (InMat == NULL)
+	if (PN_UNLIKELY(InMat == NULL))
 	{
 		quat->x = quat->y = quat->z = quat->w = 0;
 		return quat;

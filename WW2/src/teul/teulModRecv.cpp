@@ -257,7 +257,7 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 
 		// set socket to non-blocking.
 		const SINT32 retval = ioctlsocket(newSock, FIONBIO, &argp);
-		if ( retval < 0 )
+		if ( PN_UNLIKELY(retval < 0) )
 		{
 			dbugLog(_FLA, "t:%d could not accept connection", endpoint.teulIndex());
 			closesocket(newSock);
@@ -268,7 +268,7 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 			dbugLog(_FLN, "sock:%d t:%d accepting connection", endpoint.teulIndex(), newSock);
 
 		newEndpoint = teulCreateEndpoint(Teul::AnyIndex, false, endpoint.timeout, (PROTOCOL)endpoint.protocol);
-		if ( newEndpoint == nullptr )
+		if ( PN_UNLIKELY(newEndpoint == nullptr) )
 		{
 			dbugLog(_FLA,"couldnt allocate new endpoint for accept!");
 			shutdown(newSock, 0x02);

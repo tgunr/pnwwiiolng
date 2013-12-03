@@ -86,13 +86,13 @@ bool VehicleSTO::applyJoules(const SINT64& joules, class Player* player)
 void TerrainSTO::enter()
 {
 	const SINT64 joules = -1;
-	applyJoules(joules, NULL);
+	applyJoules(joules, nullptr);
 }
 
 void TerrainSTO::leave()
 {
 	const SINT64 joules = 0;
-	applyJoules(joules, NULL);
+	applyJoules(joules, nullptr);
 }
 
 bool TerrainSTO::applyJoules(const SINT64& joules, class Player* player)
@@ -163,7 +163,7 @@ static void _removeSTO(ACTION_OBJECT* const a)
 
 bool clientReceiveServerTrackedObject(UINT16 type, ACTION_OBJECT* a)
 {
-	ServerTrackedObject* sto = NULL;
+	ServerTrackedObject* sto = nullptr;
 
 	// The type tells us which class to expand to
 	switch ( type )
@@ -196,7 +196,7 @@ bool clientReceiveServerTrackedObject(UINT16 type, ACTION_OBJECT* a)
 			if(sto->owner() == pv->Chat_Handle) // don't use this sto if we created it
 			{
 				delete sto;
-				sto = NULL;
+				sto = nullptr;
 			}
 			else if(pv->ModelData->MultiCrewPos > 1) // if we're a crew
 			{
@@ -238,7 +238,7 @@ bool clientReceiveServerTrackedObject(UINT16 type, ACTION_OBJECT* a)
 	break;
 	}
 
-	if ( sto == NULL )
+	if ( PN_UNLIKELY(sto == nullptr) )
 		return false;
 
 	switch ( ServerTrackedObject::addToIndex(sto) )

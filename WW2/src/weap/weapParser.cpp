@@ -458,7 +458,7 @@ static bool _fillSpawn(SINT32 /*numArgs*/, FUNCARGS* args)
 
 	try
 	{
-		if ( ! parseValidArgs(argSpec, args, _NUM_SPECS, _section.name, weapFileLineNum) )
+		if ( PN_UNLIKELY(! parseValidArgs(argSpec, args, _NUM_SPECS, _section.name, weapFileLineNum)) )
 			throw "invalid entry";
 
 		UINT32 len;

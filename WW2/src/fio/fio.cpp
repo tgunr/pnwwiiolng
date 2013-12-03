@@ -99,25 +99,25 @@ bool fioLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 	// Assess the file size, assume fioFileSize will
 	// report any errors locating the file etc.
 	SINT32 fileSize = fioFileSize(filename);
-	if ( fileSize < 0 )
+	if ( PN_UNLIKELY(fileSize < 0) )
 	{
 		return false;
 	}
-	if ( fileSize == 0 )
+	if ( PN_UNLIKELY(fileSize == 0) )
 	{
 		return true;
 	}
 
 	// Open the file, again assume fioOpen will err for us.
 	int fd = fioOpen(filename);
-	if ( fd < 0 )
+	if ( PN_UNLIKELY(fd < 0) )
 	{
 		return false;
 	}
 
 	// Allocate the memory.
 	char* data = (char*)memAlloc(fileSize + 1);
-	if ( data == NULL )
+	if ( PN_UNLIKELY(data == NULL) )
 	{
 		DEBUG_ERR("Unable to allocate %u bytes of memory for loading %s.", fileSize + 1);
 		fiodClose(fd);
@@ -127,14 +127,14 @@ bool fioLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 	size_t bytesRead = fioRead(fd, data, fileSize);
 	fioClose(fd);
 
-	if ( bytesRead < 0 )
+	if ( PN_UNLIKELY(bytesRead < 0) )
 	{
 		DEBUG_ERR("Read error reading %u bytes from %s.", bytesRead, filename);
 		memFree(data);
 		return false;
 	}
 
-	if ( bytesRead != fileSize )
+	if ( PN_UNLIKELY(bytesRead != fileSize) )
 	{
 		DEBUG_ERR("Read error reading %s, got %u bytes instead of %u.", filename, bytesRead, fileSize);
 	}
@@ -814,7 +814,7 @@ namespace Fio
 	{
 		FILE* fp = fioUserFile(Fio::LogFileName(), "a");
 		// If that fails, return stderr
-		if ( fp == NULL )
+		if ( PN_UNLIKELY(fp == NULL) )
 			return OS_FDOPEN(OS_DUP(OS_FILENO(stderr)), "a");
 		return fp;
 	}

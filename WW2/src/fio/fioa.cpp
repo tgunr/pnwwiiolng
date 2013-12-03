@@ -35,13 +35,14 @@ static systhread_mutex fioaMutex;
 
 int fioaAddArchive(const char* archive)
 {
-	if(fioaMutex == NULL)
+	if(PN_UNLIKELY(fioaMutex == NULL))
 		fioaMutex = systhreadMutexCreate();
 
-	if(fioa.pf == NULL)
+	if (PN_UNLIKELY(fioa.pf == NULL)) {
 		fioa.pf = paAlloc();
-
-	if(fioa.pf == NULL) return -1;
+		if (PN_UNLIKELY(fioa.pf == NULL))
+			return -1;
+	}
 
 	return paOpen(fioa.pf, archive, "rb");
 }
@@ -80,7 +81,7 @@ int fioaOpen(const char* filename)
 {
 	int fd;
 
-	if(fioa.pf == NULL) return -1;
+	if(PN_UNLIKELY(fioa.pf == NULL)) return -1;
 
 // use mutex here since we call it from thread completion routine
 	systhreadMutexLock(fioaMutex);

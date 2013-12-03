@@ -1288,7 +1288,7 @@ UINT32 weapAmmoSetRoundPos(piVECTOR* Pos)
 	Mat1._42 = -(FLOAT32)(Pos->y - playdir.y * 1.1);
 	Mat1._43 = -(FLOAT32)(Pos->z - playdir.z * 1.1);
 
-	ogrpMoveAndRotateSubObject(_WeapRoundObject,&Mat1,&Mat1,0);
+	ogrpMoveAndRotateSubObject(_WeapRoundObject,&Mat1,&Mat1);
 
 	return 0;
 }
@@ -2928,14 +2928,14 @@ static UINT32 _UpdateProjectileDisplay(weapAmmo * Ammo)
 
 	if(AmmoDisplayObject)
 	{
-		ogrpMoveAndRotateSubObject(AmmoDisplayObject, &Mat, &Mat,0);
+		ogrpMoveAndRotateSubObject(AmmoDisplayObject, &Mat, &Mat);
 		piSetRenderStageState(0, piTSS_MIPFILTER, piTFP_NONE);
 
 		_DisplayObject(AmmoDisplayObject);
 		piSetRenderStageState(0, piTSS_MIPFILTER, TextureMipFilter);
 
 		Mat = IdentityMatrix;
-		ogrpMoveAndRotateSubObject(AmmoDisplayObject,&Mat,&Mat,0);
+		ogrpMoveAndRotateSubObject(AmmoDisplayObject,&Mat,&Mat);
 	}
 
 	return 0;

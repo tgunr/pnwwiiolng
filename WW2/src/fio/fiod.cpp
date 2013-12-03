@@ -162,7 +162,7 @@ fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 	wchar_t	widePath[PATH_MAX + 1] = L"";
 	char	asciiPath[PATH_MAX + 1] = "";
 
-	outPtr = NULL;
+	outPtr = nullptr;
 
 	off_t fileSize = _getFilePathAndSize(filename, false, widePath, sizeof(widePath));
 	if ( fileSize < 0 )
@@ -194,7 +194,7 @@ fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 	const size_t allocSize = ((size_t)fileSize + 1 + _PAGE_SIZE) & ~_PAGE_SIZE;
 
 	char* mem = (char*)memAlloc(allocSize);
-	if ( mem == NULL )
+	if ( PN_UNLIKELY(mem == nullptr) )
 	{
 		OS_CLOSE(fd);
 		DEBUG_FATAL("Out of memory loading '%s' (%" PRSizeT " bytes).", filename, allocSize);
@@ -218,7 +218,7 @@ fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 
 	mem[bytesRead] = 0;
 
-	if ( outSize != NULL )
+	if ( outSize != nullptr )
 		*outSize = (unsigned int)fileSize;
 
 	outPtr = mem;
@@ -239,8 +239,8 @@ namespace Fiod
 {
 	struct FileState
 	{
-		FileState() : basePtr(NULL), curPtr(NULL), endPtr(NULL), bytes(0) {}
-		~FileState() { if ( basePtr != NULL ) memFree(basePtr); }
+		FileState() : basePtr(nullptr), curPtr(nullptr), endPtr(nullptr), bytes(0) {}
+		~FileState() { if ( basePtr != nullptr ) memFree(basePtr); }
 
 		char* basePtr;
 		char* curPtr;
@@ -278,7 +278,7 @@ namespace Fiod
 
 		size_t Seek(size_t offset, int from)
 		{
-			char* newPtr = NULL;
+			char* newPtr = nullptr;
 			switch ( from )
 			{
 			case fioSEEK_SET:
@@ -314,7 +314,7 @@ static FILE_MAP s_fileMap;
 // Lookup a Fiod::FileState from a descriptor
 
 static int lastFd = -1;
-static Fiod::FileState* lastResult = NULL;
+static Fiod::FileState* lastResult = nullptr;
 
 static Fiod::FileState*
 _lookupFileState(int fd)
@@ -330,7 +330,7 @@ _lookupFileState(int fd)
 		else
 		{
 			lastFd = -1;
-			lastResult = NULL;
+			lastResult = nullptr;
 		}
 	}
 
@@ -368,7 +368,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 	const size_t allocSize = ((size_t)fileSize + 1 + _PAGE_SIZE) & ~_PAGE_SIZE;
 
 	char* mem = (char*)memAlloc(allocSize);
-	if ( mem == NULL )
+	if ( PN_UNLIKELY(mem == nullptr) )
 	{
 #if platBuild == TEUL_SERVER
 		LogAbort("out of memory opening %s", asciiPath);
@@ -437,7 +437,7 @@ size_t fiodRead(int fd, void* dptr, size_t length)
 {
 	Fiod::FileState* state = _lookupFileState(fd);
 
-	if ( state == NULL )
+	if ( state == nullptr )
 		return (int)OS_READ(fd, dptr, length);
 
 	return state->Read(dptr, length);
@@ -450,7 +450,7 @@ size_t fiodSeek(int fd, size_t offset, int from)
 {
 	Fiod::FileState* state = _lookupFileState(fd);
 
-	if ( state == NULL )
+	if ( state == nullptr )
 		return OS_LSEEK(fd, offset, from);
 
 	return state->Seek(offset, from);
@@ -463,7 +463,7 @@ int fiodEOF(int fd)
 {
 	Fiod::FileState* state = _lookupFileState(fd);
 
-	if ( state == NULL )
+	if ( state == nullptr )
 		return -1;
 
 	return state->IsAtEof() ? 1 : 0;
@@ -479,7 +479,7 @@ void fiodClose(int fd)
 	if ( lastFd == fd )
 	{
 		lastFd = -1;
-		lastResult = NULL;
+		lastResult = nullptr;
 	}
 
 	FILE_MAP::iterator it = s_fileMap.find(fd);
@@ -514,7 +514,7 @@ const char* fiodGetPrepath(void)
 #ifndef LIMITED_FIO
 void fiodSetPrepath(char* newpath)
 {
-	if(newpath == NULL)
+	if (newpath == nullptr)
 		return;
 #if platBuild == TEUL_SERVER
 		cv_dataDir.SetString(newPath);
@@ -752,14 +752,14 @@ void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFilesI
 
 	fileHandle = INVALID_HANDLE_VALUE;
 
-	if(numFilesInDir == NULL || fileList == NULL || fileList == NULL)
+	if (numFilesInDir == nullptr || fileList == nullptr || fileList == nullptr)
 	{
 		return;
 	}
 
 	GetCurrentDirectoryA(MAX_PATH, curWorkingDir);
 
-	if(dirToSearch == NULL)	// searching within the root of the DataPath
+	if (dirToSearch == nullptr)	// searching within the root of the DataPath
 	{
 		sprintf(newWorkingDir, ".\\");
 	}
@@ -801,7 +801,7 @@ void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFilesI
 
 	list = (SCHAR **)memAlloc(sizeof(SCHAR*) * numFiles);
 
-	if(list == NULL)
+	if (PN_UNLIKELY(list == nullptr))
 	{
 		SetCurrentDirectoryA(curWorkingDir);
 		return;
@@ -809,9 +809,9 @@ void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFilesI
 
 	for(count = 0; count < numFiles; count++)
 	{
-		list[count] = (SCHAR*)memAlloc(sizeof(SCHAR) * longestFileName + 1); // dont forget the NULL terminator, duh
+		list[count] = (SCHAR*)memAlloc(sizeof(SCHAR) * longestFileName + 1); // dont forget the nullptr terminator, duh
 
-		if(list[count] == NULL)
+		if (PN_UNLIKELY(list[count] == nullptr))
 		{
 			SetCurrentDirectoryA(curWorkingDir);
 			return;
@@ -857,17 +857,19 @@ void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFilesI
 	SCHAR filePath[MAX_PATH];
 	struct stat st;
 
-	if(numFilesInDir == NULL || fileList == NULL) return;
+	if (numFilesInDir == nullptr || fileList == nullptr)
+		return;
 
-	if(dirToSearch == NULL)
+	if (dirToSearch == nullptr)
 		sprintf(newWorkingDir, "%s", ".\\");
 	else
 		sprintf(newWorkingDir, "%s", dirToSearch);
 	dir = opendir(os_file_path(newWorkingDir));
-	if(dir == NULL) return;
+	if (dir == nullptr)
+		return;
 
 // Get number of files in directory
-	while((ent = readdir(dir)) != NULL)
+	while ((ent = readdir(dir)) != nullptr)
 	{
 		sprintf(filePath, "%s%s%s",newWorkingDir, macFileSeparator(), ent->d_name);
 		if(!stat(os_file_path(filePath), &st) && S_ISREG(st.st_mode))
@@ -875,13 +877,14 @@ void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFilesI
 	}
 	rewinddir(dir);
 
-	if(numFiles == 0) return;
+	if (numFiles == 0)
+		return;
 
 	list = (SCHAR **)memAlloc(sizeof(SCHAR*) * numFiles);
 
 	// If no memory then stop and return
 	//  Rick, Do you want to do more?
-	if(list == NULL)
+	if (PN_UNLIKELY(list == nullptr))
 	{
 		return;
 	}
@@ -890,7 +893,7 @@ void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFilesI
 	for(i = 0; i < numFiles;)
 	{
 		ent = readdir(dir);
-		if(ent == NULL) break;
+		if (ent == nullptr) break;
 
 		sprintf(filePath, "%s%s%s",newWorkingDir, macFileSeparator(), ent->d_name);
 		if(!stat(os_file_path(filePath), &st) && S_ISREG(st.st_mode))
@@ -898,7 +901,7 @@ void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFilesI
 			fileName = (SCHAR*)memAlloc(strlen(ent->d_name) + 1);
 			// If no memory then stop and return
 			//  Rick, Do you want to do more?
-			if(fileName == NULL)
+			if (PN_UNLIKELY(fileName == nullptr))
 			{
 				return;
 			}

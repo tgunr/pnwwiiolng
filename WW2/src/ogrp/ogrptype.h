@@ -9,8 +9,7 @@
 extern UINT32 ogrpMoveAndRotateObjectGroup(OBJECT * ObjectPtr,piVECTOR * Pos,piVECTOR * Att);
 extern UINT32 ogrpMoveAndRotateSubObject(OBJECT * ObjectPtr,
 									 piMATRIX * CurrentMatrix,
-									 piMATRIX * OriginalMatrix,
-									 UINT32 IncludeSiblings);
+									 piMATRIX * OriginalMatrix);
 extern UINT32 ogrpFreeObjectGroup(OBJECT * ObjectPtr);
 extern UINT32 ogrpSetDOFVariable(OBJECT * ObjectPtr, FLOAT32 VarContents, UINT32 CycleVarContents, UINT32 IgnoreCurrent);
 extern UINT32 ogrpParseDOFParameters(OBJECT * InObjectPtr,UCHAR* VarList, UINT32 NumVars, UINT32 MaxVarnameLength);

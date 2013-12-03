@@ -799,7 +799,7 @@ LOGICAL trnUpdateAutoGuns(void)
 
 		AG->Object->matint = IdentityMatrix;
         // I guess we do this every frame in case the world origin offset moves???
-		ogrpMoveAndRotateSubObject(AG->Object,&TempMat,&TempMat,0);
+		ogrpMoveAndRotateSubObject(AG->Object,&TempMat,&TempMat);
 
 		_UpdateWeapon(AG);
 

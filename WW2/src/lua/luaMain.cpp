@@ -318,7 +318,7 @@ lua_State* luaGetVM(bool defaultVM)
 		return NULL;
 	}
 
-	// open default lubs
+	// open default libs
 	luaL_openlibs(vm);
 
 	// init tolua

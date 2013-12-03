@@ -622,10 +622,7 @@ static UINT32 _HandleCastor(mlGearComponentData * GearData,
 	Matrix1 = GearData->CastorDOF->mat;
 	math3dMatrixMultiply(&Matrix2,&Matrix2,&Matrix1);
 	ogrpSetDOFVariable(GearData->CastorDOF, (FLOAT32)GearData->LastCastorYaw / PI, 0, 1);
-	ogrpMoveAndRotateSubObject(GearData->CastorDOF,
-								 &Matrix1,
-								 &Matrix2,
-								 0);
+	ogrpMoveAndRotateSubObject(GearData->CastorDOF, &Matrix1, &Matrix2);
 #endif
 	return 0;
 }
@@ -789,10 +786,7 @@ static UINT32 _HandleGearStrut(mlGearComponentData * GearData,
 		Matrix1 = GearData->ShockDOF->mat;
 		math3dMatrixMultiply(&Matrix2,&Matrix2,&Matrix1);
 		ogrpSetDOFVariable(GearData->ShockDOF, (FLOAT32)Compression, 0, 1);
-		ogrpMoveAndRotateSubObject(GearData->ShockDOF,
-									 &Matrix1,
-									 &Matrix2,
-									 0);
+		ogrpMoveAndRotateSubObject(GearData->ShockDOF, &Matrix1, &Matrix2);
 
 #endif
 		}

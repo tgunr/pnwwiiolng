@@ -24,11 +24,10 @@ extern const WEAPON_SERIAL NULL_WEAP_SERIAL;
 
 static inline const char* weapPrintSerialC(const WEAPON_SERIAL* weap)
 {
-	static char buffer[128];
-
-	if (weap == NULL)
+	if (PN_UNLIKELY(weap == nullptr))
 		return "<nullSER>";
 
+	static char buffer[128];
 	sprintf(buffer, "Serial: %u Source: %hd.%hd.%hu Spec: %s"
 				, weap->serial
 				, weap->source.cell.ox, weap->source.cell.oy, weap->source.id

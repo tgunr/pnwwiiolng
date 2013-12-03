@@ -65,7 +65,7 @@ public:
 	typedef std::vector<Tp> array_type;
 
 	//! Returns a singleton reference to a callback for the template instance.
-	static TEUL_CALLBACK*& callback() { static TEUL_CALLBACK* s_callback = NULL; return s_callback; }
+	static TEUL_CALLBACK*& callback() { static TEUL_CALLBACK* s_callback = nullptr; return s_callback; }
 
 	//! Required if you will be receiving arrays of this type.
 	static SINT32 receive(SINT32 teulIndex, __self&);
@@ -144,7 +144,7 @@ public:
 	SINT32 send(SINT32 teulIndex, UINT32 packetLimit=0)
 	{
 		ENDPOINT* const endpoint = teulGetEndpoint(teulIndex);
-		if ( endpoint == NULL )
+		if ( PN_UNLIKELY(endpoint == nullptr) )
 			return -ENOTCONN;
 		return send(*endpoint, packetLimit);
 	}

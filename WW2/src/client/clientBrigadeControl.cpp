@@ -64,7 +64,7 @@ static inline bool _invalidCountryBranch(UCHAR country, UCHAR branch)
 
 bool BrigadeControlRequest::requestList(SINT32 teulIndex, UCHAR country, UCHAR branch)
 {
-	if ( _invalidTeulIndex(teulIndex) || _invalidCountryBranch(country, branch) )
+	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidCountryBranch(country, branch)) )
 		return false;
 
 	m_action = REQ_LIST;
@@ -79,7 +79,7 @@ bool BrigadeControlRequest::requestList(SINT32 teulIndex, UCHAR country, UCHAR b
 
 bool BrigadeControlRequest::volunteerOIC(SINT32 teulIndex, UINT32 brigade)
 {
-	if ( _invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) )
+	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade)) )
 		return false;
 
 	m_action = REQ_VOLUNTEER;
@@ -94,7 +94,7 @@ bool BrigadeControlRequest::volunteerOIC(SINT32 teulIndex, UINT32 brigade)
 
 bool BrigadeControlRequest::nominateOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle& nomineeHandle)
 {
-	if ( _invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) || !chatIsValidHandle(nomineeHandle) )
+	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) || !chatIsValidHandle(nomineeHandle)) )
 		return false;
 
 	m_action = REQ_NOMINATE;
@@ -109,7 +109,7 @@ bool BrigadeControlRequest::nominateOIC(SINT32 teulIndex, UINT32 brigade, const 
 
 bool BrigadeControlRequest::vetoOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle& onHandle)
 {
-	if ( _invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) || !chatIsValidHandle(onHandle) )
+	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) || !chatIsValidHandle(onHandle)) )
 		return false;
 
 	m_action = REQ_VETO;
@@ -125,7 +125,7 @@ bool BrigadeControlRequest::vetoOIC(SINT32 teulIndex, UINT32 brigade, const Chat
 
 bool BrigadeControlRequest::resignOIC(SINT32 teulIndex, UINT32 brigade)
 {
-	if ( _invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) )
+	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade)) )
 		return false;
 
 	m_action = REQ_RESIGN;
@@ -140,7 +140,7 @@ bool BrigadeControlRequest::resignOIC(SINT32 teulIndex, UINT32 brigade)
 
 bool BrigadeControlRequest::replaceOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle& oldHandle)
 {
-	if ( _invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) || !chatIsValidHandle(oldHandle) )
+	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) || !chatIsValidHandle(oldHandle)) )
 		return false;
 
 	m_action = REQ_REPLACE;
@@ -156,7 +156,7 @@ bool BrigadeControlRequest::replaceOIC(SINT32 teulIndex, UINT32 brigade, const C
 
 bool BrigadeControlRequest::removeOIC(SINT32 teulIndex, UINT32 brigade, const ChatHandle& oicHandle)
 {
-	if ( _invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) || !chatIsValidHandle(oicHandle) )
+	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) || !chatIsValidHandle(oicHandle)) )
 		return false;
 
 	m_action = REQ_REMOVE;
@@ -172,11 +172,11 @@ bool BrigadeControlRequest::removeOIC(SINT32 teulIndex, UINT32 brigade, const Ch
 
 bool BrigadeControlRequest::requestBrigadeMove(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID& destination, const FULL_OBJ_ID& origin)
 {
-	if ( _invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) )
+	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade)) )
 		return false;
 
 	// You must specify where you want to move it to and where you want to move it from
-	if ( !destination.id || !origin.id )
+	if ( PN_UNLIKELY(!destination.id || !origin.id) )
 		return false;
 
 	m_action = REQ_MOVE;
@@ -194,11 +194,11 @@ bool BrigadeControlRequest::requestBrigadeMove(SINT32 teulIndex, UINT32 brigade,
 
 bool BrigadeControlRequest::vetoBrigadeMove(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID& destination, const FULL_OBJ_ID& origin)
 {
-	if ( _invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) )
+	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade)) )
 		return false;
 
 	// You must specify where you want to move it to and where you want to move it from
-	if ( !destination.id || !origin.id )
+	if ( PN_UNLIKELY(!destination.id || !origin.id) )
 		return false;
 
 	m_action = REQ_VETO;
@@ -215,11 +215,11 @@ bool BrigadeControlRequest::vetoBrigadeMove(SINT32 teulIndex, UINT32 brigade, co
 
 bool BrigadeControlRequest::vetoObjective(SINT32 teulIndex, UINT32 brigade, const FULL_OBJ_ID& target)
 {
-	if ( _invalidTeulIndex(teulIndex) || _invalidBrigade(brigade) )
+	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex) || _invalidBrigade(brigade)) )
 		return false;
 
 	// You must specify where you want to move it to and where you want to move it from
-	if ( !target.id )
+	if ( PN_UNLIKELY(!target.id) )
 		return false;
 
 	m_action = REQ_VETO;
@@ -233,11 +233,11 @@ bool BrigadeControlRequest::vetoObjective(SINT32 teulIndex, UINT32 brigade, cons
 
 bool BrigadeControlRequest::requestAttack(SINT32 teulIndex, const FULL_OBJ_ID& destination)
 {
-	if ( _invalidTeulIndex(teulIndex) )
+	if ( PN_UNLIKELY(_invalidTeulIndex(teulIndex)) )
 		return false;
 
 	// You must specify where you want to move it to and where you want to move it from
-	if ( !destination.id )
+	if ( PN_UNLIKELY(!destination.id) )
 		return false;
 
 	m_action = REQ_ATTACK;
