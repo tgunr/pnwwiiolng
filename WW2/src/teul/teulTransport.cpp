@@ -42,6 +42,12 @@ extern SINT32 teulOpenConnection(const SINT32 teulIndex, const bool listening, c
 SCHAR* teulModuleName;
 SCHAR* teulAppName;
 
+void dummyLogFn(const char* const, ...)
+{
+}
+
+void (*Teul::g_logFnPtr) (const char* const, ...) = dummyLogFn;
+
 static bool _transportInited, _transportClosing;
 
 // For client network selection
@@ -433,7 +439,8 @@ _initializePlatform()
 SINT32
 teulInitTransport(SINT32 logType
 					, const char* name
-					, ERROR_FUNCTION* errorFnPtr)
+					, ERROR_FUNCTION* errorFnPtr
+					, Teul::LoggingFn* const logFnPtr)
 {
 	if ( _transportInited )
 	{
@@ -462,6 +469,9 @@ teulInitTransport(SINT32 logType
 
 	_transportClosing = false;
 
+	if ( logFnPtr )
+		Teul::g_logFnPtr = logFnPtr ;
+
 	_initializePlatform();
 
 	teulFreeAllCallbacks();
@@ -478,7 +488,7 @@ teulInitTransport(SINT32 logType
 	return 0;
 }
 
-// Since we have to ensure that callbacks happen in step with whatever
+// Since we hae to ensure that callbacks happen in step with whatever
 // application is using teul, we have to make a call for that all to happen.
 // should be called once per game loop
 void

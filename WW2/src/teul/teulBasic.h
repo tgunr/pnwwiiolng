@@ -13,6 +13,9 @@ struct ENDPOINT;
 
 namespace Teul
 {
+	typedef void (LoggingFn)(const char* const, ...);
+	extern LoggingFn* g_logFnPtr;
+
 	static const UINT32 INVALID_INDEX = ~0U	;		//!< Value used for "Invalid Index".
 
 	// Get a textual id for an error (default is "error").

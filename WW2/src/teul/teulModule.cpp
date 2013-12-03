@@ -607,6 +607,9 @@ teulClose(ENDPOINT& inEndpoint, const UINT32 code)
 		return;
 	}
 
+#if platOS == OS_WIN32
+	Teul::g_logFnPtr("t:%d closing code:%u", inEndpoint.teulIndex(), code);
+#endif
 #if platOS == OS_LINUX
 	if ( g_logDebug )
 		dbugLog(_FLN, "t:%d closing [%u] st:%u cl:%s", inEndpoint.teulIndex(), code, inEndpoint.state(), inEndpoint.m_closed ? "yes" : "no");
