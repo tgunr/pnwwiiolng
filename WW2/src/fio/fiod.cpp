@@ -699,9 +699,8 @@ int fiodOpenWrite(const char* filename, bool /* userdir */)
 		return OS_WOPEN(wpath.c_str(), O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IREAD | S_IWRITE);
   }
   else
-#else
-	  pathprintf(fullpath, DataPath, filename);
 #endif
+	  pathprintf(fullpath, DataPath, filename);
 
 	return OS_OPEN(os_file_path(fullpath), O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IREAD | S_IWRITE);
 }
