@@ -193,7 +193,7 @@ _openDbugFile(const char* const srcFile_)
 
 	_qualifyFilename(srcFile_, filename, sizeof(filename));
 
-	if (filename != NULL)
+	if (PN_UNLIKELY(filename != NULL))
 	{
 		int oflags = _O_CREAT|_O_WRONLY|_O_TRUNC;
 
@@ -252,7 +252,7 @@ _dbugOut(const SINT32		file
 		return;
 
 	_fileSize += retval;
-	if ( rollover && _fileSize >= MAX_FILE_SIZE )
+	if ( PN_UNLIKELY(rollover && _fileSize >= MAX_FILE_SIZE) )
 	{
 		OS_CLOSE(file);
 		_logger.dbugfile = _openDbugFile(_logger.program());
@@ -588,7 +588,7 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 	const char* myName;
 	UINT32 minLevel;
 
-	if ( _logger.isInitialized() == false )
+	if ( PN_UNLIKELY(_logger.isInitialized() == false) )
 		_logger.initialize(LOG_TO_FILE,  Debug::ERR_INFO, _stdErrFileNo, "not_initialized");
 
 	_logger.isLog = isLog;
@@ -605,14 +605,14 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 	flags |= (errType & DBUG_FLAG_MASK);
 	_logger.flags = flags;
 
-	if (errType != Debug::ERR_FATAL)
+	if (PN_LIKELY(errType != Debug::ERR_FATAL))
 		_logger.errType = errType & ~DBUG_FLAG_MASK;
 	else
 		_logger.errType = errType;
 
 	_logger.err = dbugGetErrno();
 
-	if ( (_logger.errType != Debug::ERR_FATAL) && (_logger.errType > minLevel) )
+	if ( PN_LIKELY((_logger.errType != Debug::ERR_FATAL) && (_logger.errType > minLevel)) )
 		return 0;
 
 	if ( (myName = strrchr(filename,'/')) != NULL)
@@ -646,7 +646,7 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 	}
 
 	const char* text = NULL;
-	if ( fmt == NULL )
+	if ( PN_UNLIKELY(fmt == NULL) )
 		len = 0;
 	else
 	{
@@ -660,7 +660,7 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 			text = _logger.text();
 	}
 
-	if ( len == 0 )
+	if ( PN_UNLIKELY(len == 0) )
 	{
 		text = "[NULL]";
 		len = strlen(text);
@@ -688,9 +688,9 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 SINT32 _dbugLogV(const char* const filename, const SINT32 lineno, const UINT32 errType, const char* const fmt, va_list& args)
 {
 	SINT32 result = 0;
-	if ( _logger.isInitialized() == false )
+	if ( PN_UNLIKELY(_logger.isInitialized() == false) )
 	{
-		if ( errType == Debug::ERR_FATAL)
+		if ( PN_UNLIKELY(errType == Debug::ERR_FATAL) )
 		{
 			char text[DBUG_MAX_STRING + 1];
 			vsnprintf(text, sizeof(text), fmt, args);
@@ -734,7 +734,7 @@ SINT32 _dbugWrite(char* filename, SINT32 lineno, UINT32 errType, char* fmt, ...)
 
 void _levelHandler(UINT32 errType, const char* const text)
 {
-	if ( errType != Debug::ERR_FATAL )
+	if ( PN_LIKELY(errType != Debug::ERR_FATAL) )
 		return;
 
 	fprintf(stderr, "%s\n", text);
@@ -783,7 +783,7 @@ _LogAbort(const char* file_, unsigned int line_, unsigned int error_, const char
 
 	exit(error_ != 0 ? error_ : -1);
 #else
-	if ( _logger.isInitialized() )
+	if ( PN_LIKELY(_logger.isInitialized()) )
 	{
 		if ( assertion_ != NULL && *assertion_ != 0 )
 			_dbugLog(file_, line_, error_, "ASSERTION: %s", assertion_);
