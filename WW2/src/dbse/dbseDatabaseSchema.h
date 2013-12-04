@@ -27,6 +27,9 @@ public:
 	//! @param[in] history_ Ordered list of revisions to the database.
 	void Update(const DB::Revisions& history_);
 
+	// Since visual studio doesn't yet support vector initializers,
+	// I had to flatten the schema list into a null-seperated list of
+	// revisions.
 	template<size_t size>
 	void Update(const char* (&revisionArray)[size])
 	{

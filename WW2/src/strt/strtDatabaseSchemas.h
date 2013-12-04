@@ -197,4 +197,30 @@ static const char* revisions[] =
 	,	"ALTER TABLE `wwiionline`.`wwii_sortie` MODIFY `resupplies` SMALLINT(5) UNSIGNED DEFAULT 0"
 	,	NULL
 	//}
+,	// Revision 17: Fix wwii.v_vehicle_vs_vehicle view.
+	//{
+		"DROP VIEW `wwii`.`v_vehicle_vs_vehicle`"
+	,	"CREATE "
+			"ALGORITHM = UNDEFINED "
+			"DEFINER = `osmith`@`66.28.224.245` "
+			"SQL SECURITY INVOKER "
+			"VIEW `wwii`.`v_vehicle_vs_vehicle` AS\n"
+		"select "
+			"`kv`.`vehtype_oid` AS `killer`, "
+			"`vv`.`vehtype_oid` AS `victim`, "
+			"`k`.`killer_country` AS `killer_country`, "
+			"`k`.`victim_country` AS `victim_country`, "
+			"`kv`.`fullName` AS `killer_name`, "
+			"`vv`.`fullName` AS `victim_name`, "
+			"count(0) AS `kills` "
+			"from "
+				"`wwii`.`kills` `k`, "
+					"`wwiionline`.`wwii_vehtype` `vv`, "
+					"`wwiionline`.`wwii_vehtype` `kv` "
+			"where "
+				"((`k`.`victim_vehtype_oid` = `vv`.`vehtype_oid`) "
+				"and (`k`.`killer_vehtype_oid` = `kv`.`vehtype_oid`)) "
+				"group by 1, 2"
+	,	NULL
+	//}
 } ;
