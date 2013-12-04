@@ -91,20 +91,29 @@ static unsigned long long _fileLineToLong(const char* const file_, const size_t 
 	return ((unsigned long long)file_) << 32 | (unsigned long long)line_;
 }
 
-typedef UNORDERED_MAP<unsigned long long, Activity> HISTORY_BASE;
-
-struct HISTORY : HISTORY_BASE
+#include <memory>
+struct HISTORY
 {
-	HISTORY() : HISTORY_BASE(), m_inUse(true), m_mutex() {}
+	HISTORY()
+#ifdef PN_MEM_DEBUG
+		: m_inUse(true), m_mutex(), m_data() {}
+#else
+		: m_inUse(false) {}
+#endif
 	~HISTORY()
 	{
-		std::lock_guard<std::mutex> lock(m_mutex);
-		m_inUse = false;
-		std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		if (PN_LIKELY(m_inUse)) {
+			m_inUse = false;
+			std::lock_guard<std::mutex> lock(m_mutex);
+			std::this_thread::sleep_for(std::chrono::milliseconds(10));
+		}
 	}
+
 	volatile bool m_inUse;
 	std::mutex m_mutex;
-} history;
+
+	UNORDERED_MAP<unsigned long long, Activity> m_data;
+} s_history;
 
 void*
 memCallocDebug(const size_t units_, const size_t size_, const char* const file_, const size_t line_)
@@ -115,10 +124,10 @@ memCallocDebug(const size_t units_, const size_t size_, const char* const file_,
 	if ( PN_UNLIKELY(ptr == nullptr) )
 		return ptr;
 
-	if ( PN_LIKELY(history.m_inUse) )
+	if ( PN_LIKELY(s_history.m_inUse) )
 	{
-		std::lock_guard<std::mutex> lock(history.m_mutex);
-		Activity& act = history[ flLong ];
+		std::lock_guard<std::mutex> lock(s_history.m_mutex);
+		Activity& act = s_history.m_data[ flLong ];
 		act.alloc(ptr, size_);
 	}
 
@@ -138,10 +147,10 @@ memReallocDebug(void* const oldPtr_, const size_t newSize_, const char* const fi
 	memcpy(newPtr, oldHeader, sizeof(Header) + std::min(newSize_, oldSize));
 	Activity* const oldAct = newPtr->m_activity;
 
-	if ( PN_LIKELY(history.m_inUse) )
+	if ( PN_LIKELY(s_history.m_inUse) )
 	{
-		std::lock_guard<std::mutex> lock(history.m_mutex);
-		Activity& newAct = history[ flLong ];
+		std::lock_guard<std::mutex> lock(s_history.m_mutex);
+		Activity& newAct = s_history.m_data[ flLong ];
 		oldAct->free(newPtr);
 		newAct.alloc(newPtr, newSize_);
 	}
@@ -159,9 +168,9 @@ void
 memFreeDebug(void* const oldPtr_, const char* const file_, const size_t line_)
 {
 	Header* header = Header::FromPointer(oldPtr_);
-	if ( PN_LIKELY(history.m_inUse) )
+	if ( PN_LIKELY(s_history.m_inUse) )
 	{
-		std::lock_guard<std::mutex> lock(history.m_mutex);
+		std::lock_guard<std::mutex> lock(s_history.m_mutex);
 		header->m_activity->free(header);
 	}
 
@@ -181,11 +190,11 @@ memReportJSON(unsigned int fd, const char* const /*path*/, const char* const /*a
 
 	const TeulTimeMS cutoff = teulClock64 - (5 * 60 * 1000);
 
-	if ( PN_LIKELY(history.m_inUse) )
+	if ( PN_LIKELY(s_history.m_inUse) )
 	{
-		std::lock_guard<std::mutex> lock(history.m_mutex);
-		const auto end = history.end();
-		for ( auto it = history.begin(); it != end; ++it )
+		std::lock_guard<std::mutex> lock(s_history.m_mutex);
+		const auto end = s_history.m_data.end();
+		for ( auto it = s_history.m_data.begin(); it != end; ++it )
 		{
 			if ( it->second.m_lastAccess < cutoff && it->second.m_unfreed == 0 )
 				continue;
@@ -207,7 +216,7 @@ memReport()
 {
 	fprintf(stderr, "Memory Report:\n");
 	char buffer[128];
-	for ( auto it = history.begin(); it != history.end(); ++it )
+	for ( auto it = s_history.m_data.begin(); it != s_history.m_data.end(); ++it )
 	{
 		it->second.describe(it->first, buffer, sizeof(buffer));
 		fprintf(stderr, "%s\n", buffer);
