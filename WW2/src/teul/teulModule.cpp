@@ -136,7 +136,7 @@ _getHostIPAddresses()
 	for ( auto curAddr = pAddresses; curAddr != NULL; curAddr = curAddr->Next )
 	{
 		// Only look for ethernet networks with IfOperStatusUp and a unicast address.
-		if ( curAddr->OperStatus != IfOperStatusUp || curAddr->FirstUnicastAddress == NULL )
+		if ( curAddr->OperStatus != IfOperStatusUp || curAddr->FirstUnicastAddress == nullptr )
 			continue;
 
 		switch (curAddr->IfType)
@@ -152,13 +152,18 @@ _getHostIPAddresses()
 		}
 
 		// Try to improve on any previous interface address.
-		if ( preferredIf != NULL && curAddr->FirstDnsServerAddress == NULL )
-			continue;
+		if (preferredIf)
+		{
+			if (curAddr->FirstDnsServerAddress == nullptr)
+				continue;
+			if (curAddr->FirstGatewayAddress == nullptr)
+				continue;
+		}
 
 		preferredIf = curAddr;
 	}
 
-	ABORT_IF_EX(preferredIf == NULL || preferredIf->FirstUnicastAddress == NULL
+	ABORT_IF_EX(preferredIf == NULL
 				, "Unable to find eth0. If you need to specify an interface, set the environment variable 'ETH0' to the friendly name of the adapter.");
 
 	assert( preferredIf->PhysicalAddressLength < sizeof(Server::myInterface.mac) );
