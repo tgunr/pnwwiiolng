@@ -247,7 +247,7 @@ _playerDeleteAuth(PlayerStatusNode* psn)
 static void
 _sendHeartBeat(void)
 {
-	if ( _myServerInfo == nullptr || Server::broadcastIndex < 0 )
+	if ( PN_UNLIKELY(_myServerInfo == nullptr || Server::broadcastIndex < 0) )
 		return;
 
 	Server::myServerInfo.availPlayers = Server::myServerInfo.stats.availPlayers();
@@ -263,7 +263,7 @@ _sendHeartBeat(void)
 static PlayerStatusNode*
 _extractPlayerFromServer(Server::ServerInfo* const server, PlayerStatusNode* const psn)
 {
-	if (server == nullptr || psn == nullptr)
+	if (PN_UNLIKELY(server == nullptr || psn == nullptr))
 	{
 		dbugLog(_FLA, "cant extract player %p from server %p", psn, server);
 		return nullptr;

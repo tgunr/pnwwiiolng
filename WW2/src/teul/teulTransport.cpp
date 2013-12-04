@@ -99,7 +99,7 @@ teulGetHostByName(const SCHAR* const name)
 bool
 teulGetHost(const SCHAR* address_, UINT32* host_)
 {
-	if (strcmp(address_, "localhost") == 0 )
+	if (strcmp(address_, "localhost") == 0)
 	{
 		*host_ = INADDR_LOOPBACK;
 		return true;
@@ -128,7 +128,7 @@ teulGetHost(const SCHAR* address_, UINT32* host_)
 void
 ENDPOINT::doConnect()
 {
-	if ( this->connectFn != NULL )
+	if (PN_LIKELY(this->connectFn != NULL))
 	{
 		dbugLog(_FLN, "t:%d connected calling %p", this->teulIndex(), this->connectFn);
 		this->connectFn(*this);
@@ -145,7 +145,7 @@ ENDPOINT::doConnect()
 void
 ENDPOINT::doAccept(ENDPOINT& newEndpoint)
 {
-	if ( this->connectFn )
+	if (PN_LIKELY(this->connectFn))
 	{
 		dbugLog(_FLD, "t:%d doing handshaking calling doAccept(t:%d)", this->teulIndex(), newEndpoint.teulIndex());
 		this->connectFn(newEndpoint);
@@ -160,7 +160,7 @@ void
 teulSetPersonaData(const SINT32 teulIndex, void* personaData)
 {
 	ENDPOINT* const endpoint = teulGetEndpoint(teulIndex);
-	if ( endpoint != NULL )
+	if (PN_LIKELY(endpoint != nullptr))
 		endpoint->appConnectionData = personaData;
 }
 
@@ -168,7 +168,7 @@ void*
 teulGetPersonaData(const SINT32 teulIndex)
 {
 	ENDPOINT* const endpoint = teulGetEndpoint(teulIndex);
-	if ( endpoint != NULL )
+	if (PN_LIKELY(endpoint != nullptr))
 		return endpoint->appConnectionData;
 
 	return NULL;
@@ -191,7 +191,7 @@ _openListen(const UINT32 ipAddress
 	teulSyncClock();
 
 	const SINT32 teulIndex = teulQueryNextFreeIndex();
-	if ( teulIndex < 0 )
+	if (PN_UNLIKELY(teulIndex < 0))
 	{
 		dbugSetErrno(ENOSPC);
 		return -ENOSPC;
@@ -202,7 +202,7 @@ _openListen(const UINT32 ipAddress
 				, protocol, ipAddress, portNumber
 				, acceptFnPtr, errorFnPtr
 				);
-	if ( retval < 0 )
+	if (PN_UNLIKELY(retval < 0))
 	{
 		dbugLog(_FLA, "t:%d teulOpenConn failed %d", teulIndex, retval);
 		return retval;
@@ -224,7 +224,7 @@ SINT32 teulOpenListen(const UINT16 portNumber
 					, ERROR_FUNCTION* errorFnPtr
 					)
 {
-	if ( _transportClosing )
+	if (PN_UNLIKELY(_transportClosing))
 		return -EDEADLK;
 
 	dbugLog(_FLD,"opening listen port on address ? port %d",portNumber);
@@ -250,7 +250,7 @@ bool teulOpenListenInterface(const UINT16 portNumber
 					, ERROR_FUNCTION* errorFnPtr
 					)
 {
-	if ( _transportClosing )
+	if (PN_UNLIKELY(_transportClosing))
 		return false;
 
 	SINT32 retval;
@@ -286,7 +286,7 @@ SINT32 teulOpenListenHost(const UINT32 ipAddress
 					, ERROR_FUNCTION* errorFnPtr
 					)
 {
-	if ( _transportClosing )
+	if (PN_UNLIKELY(_transportClosing))
 		return -EDEADLK;
 
 	dbugLog(_FLD,"opening listen port on  address %s port %d", teulGetAddress(ipAddress), portNumber);
@@ -338,7 +338,7 @@ teulOpenSend(UINT32 host
 			, const PROTOCOL protocol
 			, ERROR_FUNCTION* errorFnPtr)
 {
-	if ( _transportClosing )
+	if (PN_UNLIKELY(_transportClosing))
 		return -EDEADLK;
 
 	// Have we selected a particular network?
@@ -347,7 +347,7 @@ teulOpenSend(UINT32 host
 	teulSyncClock();
 
 	const SINT32 teulIndex = teulQueryNextFreeIndex();
-	if ( teulIndex < 0 )
+	if (PN_UNLIKELY(teulIndex < 0))
 	{
 		dbugLog(_FLA, "no more connections available");
 		dbugSetErrno(ENOSPC);
@@ -355,7 +355,7 @@ teulOpenSend(UINT32 host
 	}
 
 	const SINT32 retval = teulOpenConnection(teulIndex, false, timeout, protocol, host, portNumber, connectFnPtr, errorFnPtr);
-	if (retval < 0)
+	if (PN_UNLIKELY(retval < 0))
 	{
 		dbugLog(_FLA, "t:%d teulOpenConn failed %d", teulIndex, retval);
 		return retval;
@@ -494,13 +494,13 @@ teulInitTransport(SINT32 logType
 void
 teulUpdateTransport(const TeulTimeMS& duration_)
 {
-	if ( _transportClosing )
+	if (PN_UNLIKELY(_transportClosing))
 		return;
 
 #if platBuild == TEUL_SERVER
 	ABORT_UNLESS_EX(_transportInited, "transport can't update without being initialized.");
 #else
-	if ( _transportInited == false )
+	if (PN_UNLIKELY(_transportInited == false))
 		return;
 #endif
 
@@ -546,7 +546,7 @@ extern SINT32 teulModSendCALLBACK(SINT32 teulIndex, TEUL_CALLBACK& callback);
 SINT32
 teulSend(ENDPOINT& endpoint, TEUL_CALLBACK* const object, void* const data)
 {
-	if (object == NULL)
+	if (PN_UNLIKELY(object == nullptr))
 	{
 		dbugLog(_FLA, "teulSend called with NULL callback");
 		return -EINVAL;
@@ -560,13 +560,13 @@ teulSend(ENDPOINT& endpoint, TEUL_CALLBACK* const object, void* const data)
 SINT32
 teulSend(SINT32 teulIndex, TEUL_CALLBACK* const object, void* const data)
 {
-	if (object == NULL)
+	if (PN_UNLIKELY(object == nullptr))
 	{
 		dbugLog(_FLA, "teulSend called with NULL callback");
 		return -EINVAL;
 	}
 
-	if ( teulIndex < 0 )
+	if (PN_UNLIKELY(teulIndex < 0))
 	{
 		dbugLog(_FLW, "t:%d illegal", teulIndex);
 		return teulIndex;
@@ -580,13 +580,13 @@ teulSend(SINT32 teulIndex, TEUL_CALLBACK* const object, void* const data)
 SINT32
 teulSendTo(SINT32 teulIndex, UINT32 address, UINT16 port, TEUL_CALLBACK* callback, void* data)
 {
-	if (callback == NULL)
+	if (PN_UNLIKELY(callback == NULL))
 	{
 		dbugLog(_FLA,"illegal callback");
 		return -EINVAL;
 	}
 
-	if ( teulIndex < 0 )
+	if (PN_UNLIKELY(teulIndex < 0))
 	{
 		dbugLog(_FLA,"illegal index %d", teulIndex);
 		return teulIndex;

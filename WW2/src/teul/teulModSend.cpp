@@ -52,12 +52,12 @@ teulInitSend(void)
 SINT32
 teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback)
 {
-	if( endpoint.state() == IS_DEAD )
+	if( PN_UNLIKELY(endpoint.state() == IS_DEAD) )
 	{
 		dbugLog(_FLA,"endpoint not open state = %d, index %d callback %d:%d ", endpoint.state(), endpoint.teulIndex(), callback.callX(), callback.callY());
 		return -ETEUL_CB_CONN_DEAD;
 	}
-	if ( callback.m_sendAction == nullptr)
+	if ( PN_UNLIKELY(callback.m_sendAction == nullptr) )
 	{
 		dbugLog(_FLA, "cant execute NULL callback x:%d y:%d", callback.callX(), callback.callY());
 		return -ETEUL_CB_SEND_NULL;
@@ -77,7 +77,7 @@ teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback)
 	actionObj.m_size_bytes = -1;
 
 	const SINT32 packedSizeBits = (callback.m_sendAction)(&actionObj);
-	if ( packedSizeBits < 0 )
+	if ( PN_UNLIKELY(packedSizeBits < 0) )
 	{
 		dbugLog(_FLA, "t:%d cb:%u,%u pack failed:%d probable data corruption", endpoint.teulIndex(), callback.callX(), callback.callY(), packedSizeBits);
 		return packedSizeBits;
@@ -86,7 +86,7 @@ teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback)
 	outgoing.setPayloadSizeBytes(Teul::BitsToBytes(packedSizeBits));
 
 	const SINT32 sendResult = outgoing.send(endpoint);
-	if ( sendResult < 0 )
+	if ( PN_UNLIKELY(sendResult < 0) )
 	{
 		dbugLog(_FLW, "t:%d cb:%u,%u send failed:%d", endpoint.teulIndex(), callback.callX(), callback.callY(), sendResult);
 		return sendResult;
@@ -158,7 +158,7 @@ ENDPOINT::sendPacket(Teul::Packet& packet)
 	{
 		const SINT32 result = writeData(packet.packet(), packetBytes, packet.address(), packet.port());
 		// Anything but a partial send, the sender handles.
-		if ( result < 0 )
+		if ( PN_UNLIKELY(result < 0) )
 		{
 			// If the error was the result of an interruption, then lets just queue the packet
 			// and give it a retry later on.
@@ -229,7 +229,7 @@ ENDPOINT::pushSendQueue()
 SINT32
 Teul::Packet::send(ENDPOINT& endpoint)
 {
-	if ( endpoint.state() == IS_LISTENING || endpoint.state() >= IS_CLOSING )
+	if ( PN_UNLIKELY(endpoint.state() == IS_LISTENING || endpoint.state() >= IS_CLOSING) )
 	{
 		dbugLog(_FLA, "t:%d tried to send to non-open endpoint [st:%d]", endpoint.teulIndex(), endpoint.state());
 		return -ENOTCONN;
@@ -267,7 +267,7 @@ Teul::Packet::send(ENDPOINT& endpoint)
 	}
 
 	const SINT32 result = endpoint.sendPacket(*this);
-	if ( result <= 0 )
+	if ( PN_UNLIKELY(result <= 0) )
 	{
 		int err = 0;
 		// Connection closed.
@@ -294,7 +294,7 @@ SINT32
 teulModSendCALLBACK(SINT32 teulIndex, TEUL_CALLBACK& object)
 {
 	ENDPOINT* const theEndpoint = teulGetEndpoint(teulIndex);
-	if ( theEndpoint == NULL)
+	if (PN_UNLIKELY(theEndpoint == nullptr))
 	{
 		dbugLog(_FLA, "t:%d x:%d y:%d invalid endpoint in send callback", teulIndex, object.callX(), object.callY());
 		return -EINVAL;
@@ -309,7 +309,7 @@ SINT32
 teulModSendCallbackTo(SINT32 teulIndex, UINT32 address, UINT16 port, TEUL_CALLBACK& object)
 {
 	ENDPOINT* const theEndpoint = teulGetEndpoint(teulIndex);
-	if ( theEndpoint == NULL )
+	if ( PN_UNLIKELY(theEndpoint == nullptr) )
 	{
 		dbugLog(_FLA, "t:%d null endpoint", teulIndex);
 		return -EINVAL;
