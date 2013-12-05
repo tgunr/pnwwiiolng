@@ -204,7 +204,7 @@ FLOAT32 _avgMessageLength=0;
 #endif
 
 // Commonly used channels so we don't have to keep finding them
-Chat::Channel* adminChannel = NULL;
+Chat::Channel* adminChannel = nullptr;
 
 UINT32 g_shutdownLockAt = 0;
 UINT32 g_shutdownDowntime = 0;
@@ -261,12 +261,12 @@ IRCPlayer::message(int prefix, int messageID
 	do
 	{
 		char* eol = strchr(p, '\n');
-		if ( eol != NULL )
+		if ( eol != nullptr )
 			*(eol++) = 0;
 		wwiiIRCMessage(m_lastChannel.empty() ? callsign() : m_lastChannel.c_str(), "%s", p);
 		p = eol;
 	}
-	while ( p != NULL );
+	while ( p != nullptr );
 
 	return true;
 }
@@ -353,7 +353,7 @@ chatPropertyName(const FULL_OBJ_ID& id)
 	static char name[20+1];
 
 	Property* property = chatFindProperty(id);
-	if ( property != NULL )
+	if ( property != nullptr )
 		return property->Name();
 
 	snprintf(name, 20, "[%d.%d.%d]", id.cell.ox, id.cell.oy, id.id);
@@ -367,7 +367,7 @@ chatPropertyName(const Property* property, const FULL_OBJ_ID& id)
 {
 	static char name[20+1];
 
-	if ( property != NULL )
+	if ( property != nullptr )
 		return property->Name();
 
 	snprintf(name, 20, "[%d.%d.%d]", id.cell.ox, id.cell.oy, id.id);
@@ -595,7 +595,7 @@ _processDelayedBan()
 			dbugLog(_FLN, "!GM:%s:banned:auto:%s", callsign, days);
 			chatdbRecordEvent("GM", callsign, "banned", "auto", days);
 
-			if ( ban.m_kickTime == 0 || PlayerInterface::Lookup(ban.m_handle) == NULL )
+			if ( ban.m_kickTime == 0 || PlayerInterface::Lookup(ban.m_handle) == nullptr )
 				remove = true;
 			else
 			{
@@ -611,12 +611,12 @@ _processDelayedBan()
 			remove = true;
 
 			Player* const player = PlayerInterface::Lookup(ban.m_handle);
-			if ( player != NULL )
+			if ( player != nullptr )
 			{
 				chatSmitePlayer(player->playerID());
 
 				PlayerStatusNode* const psn = ServerInterface::PlayerStatusNodeByPlayerID(player->playerID());
-				if ( psn != NULL )
+				if ( psn != nullptr )
 					player->Release(psn->teulIndex, Server::RELEASE_ECONN);
 			}
 		}
@@ -689,7 +689,7 @@ void
 Chat::SendModReport(const ChatHandle& handle, const Chat::ModReport modType)
 {
 	const char* callsign = chatGetCallsign(handle);
-	const char* type = NULL;
+	const char* type = nullptr;
 	UINT32 days = 0;
 
 	switch ( modType )
@@ -743,7 +743,7 @@ Chat::SendModReport(const ChatHandle& handle, const Chat::ModReport modType)
 void
 chatRouteGCIMessage(Chat::GCIMessage& message, UINT32 messageID)
 {
-	if ( playerIndex.empty() )
+	if ( PN_UNLIKELY(playerIndex.empty()) )		// And when it's true, we can afford the hit.
 		return;
 
 	std::vector<ENDPOINT*> endpoints;
@@ -755,7 +755,7 @@ chatRouteGCIMessage(Chat::GCIMessage& message, UINT32 messageID)
 		if ( player->approveGCIMessage(messageID, message, true) )
 		{
 			ENDPOINT* ep = teulGetEndpoint(player->teulIndex());
-			if ( ep != NULL )
+			if ( ep != nullptr )
 				endpoints.push_back(ep);
 		}
 	}
@@ -821,7 +821,7 @@ _getChanIconFromType(UINT32 type, WWII_COUNTRY country=WWII_NO_COUNTRY)
 SINT32
 Player::send(const Chat::HostMessage& outgoing)
 {
-	if ( teulIndex() < 0 )
+	if ( PN_UNLIKELY(teulIndex() < 0) )
 		return 0;
 
 	if ( g_debugChat )
@@ -837,7 +837,7 @@ Player::send(const Chat::HostMessage& outgoing)
 static void
 _snoop(const char* type, Player* player, Player* snooper, const char* to, const char* text)
 {
-	if ( snooper == NULL || player == NULL || snooper == player )
+	if ( snooper == nullptr || player == nullptr || snooper == player )
 		return;
 
 	snooper->message(LSTR_GM, LSTR_LABELLED_GENERIC, chatMakeTempString("%s->%s", player->callsign(), to), text);
@@ -849,7 +849,7 @@ _snoop(const char* type, Player* player, Player* snooper, const char* to, const 
 bool
 chatSendToRecipient(Player* player, Player* recipient, const Chat::HostMessage& message)
 {
-	if ( recipient == NULL || recipient->teulIndex() < 0 || recipient->active() == false )
+	if ( recipient == nullptr || recipient->teulIndex() < 0 || recipient->active() == false )
 		return false;
 
 	if ( recipient->inGrab() || recipient->lastMessageID() == message.id )
@@ -879,7 +879,7 @@ chatSendToRecipient(Player* player, Player* recipient, const Chat::HostMessage& 
 static void
 _distributeSquelched(Player& player, Chat::HostMessage* hostMessage)
 {
-	Player*	recipient = NULL;
+	Player*	recipient = nullptr;
 
 	//If we are the game manager, then the recipient is who we squelched
 	if ( player.grabbing() )
@@ -890,7 +890,7 @@ _distributeSquelched(Player& player, Chat::HostMessage* hostMessage)
 	else
 		return;
 
-	if ( recipient == NULL )
+	if ( recipient == nullptr )
 	{
 		player.message(LSTR_CAUTION, LSTR_PARTY_UNAVAILABLE);
 		chatReleaseGrab(player);
@@ -961,7 +961,7 @@ void
 chatReportPlaceHolder(Player* player, CHANNEL_TYPE type)
 {
 	LSTRING_ID message = LSTR_NONE;
-	const char* arg = NULL;
+	const char* arg = nullptr;
 
 	switch ( type )
 	{
@@ -1112,7 +1112,7 @@ _injectUnitAndLeader(std::string& buffer, const size_t pos, UINT32 brigadeID, UI
 	if ( brigadeID )
 	{
 		const HCUnit* const unit = HCUnit::Lookup(brigadeID);
-		if ( unit != NULL )
+		if ( unit != nullptr )
 		{
 			if ( unit->parent() )
 			{
@@ -1126,7 +1126,7 @@ _injectUnitAndLeader(std::string& buffer, const size_t pos, UINT32 brigadeID, UI
 	if ( missionID )
 	{
 		ChatMission* mission = chatFindMission(missionID);
-		if ( mission != NULL )
+		if ( mission != nullptr )
 		{
 			const UINT64 leader = mission->leader();
 			if ( leader )
@@ -1241,7 +1241,7 @@ _processDollars(const Player* player, const char* base, char* start)
 		else if ( buffer.compare(pos + 1, _NAME_LEN, "hcid") == 0 )
 		{
 			HCUnit* unit = HCUnit::Lookup(player->brigadeID());
-			if ( unit != NULL )
+			if ( unit != nullptr )
 			{
 				buffer.replace(pos, _TAG_LEN, unit->callsign());
 				translations = true;
@@ -1362,7 +1362,7 @@ _prefixMessageBody(std::string& prefix, Chat::HostMessage& message)
 void
 chatRouteMessage(Player* player, Chat::ClientMessage* inMessage, UINT32 messageID, bool allowDotCommands)
 {
-	if ( player == NULL || inMessage == NULL)
+	if ( player == nullptr || inMessage == nullptr )
 	{
 		dbugLog(_FLA,"illegal message data player %p iMess %p"
 				, player, inMessage);
@@ -1372,7 +1372,7 @@ chatRouteMessage(Player* player, Chat::ClientMessage* inMessage, UINT32 messageI
 	if ( allowDotCommands )
 	{
 		char* p = strpbrk(inMessage->m_message, "$%");
-		if ( p != NULL )
+		if ( p != nullptr )
 		{
 			if ( _processDollars(player, inMessage->m_message, p) )
 				inMessage->m_length = (UINT32)strlen(inMessage->m_message);
@@ -1431,7 +1431,7 @@ chatRouteMessage(Player* player, Chat::ClientMessage* inMessage, UINT32 messageI
 	}
 
 	std::string prefix = "";
-	Chat::Channel* channel = NULL;
+	Chat::Channel* channel = nullptr;
 	bool foundChannel = false;
 
 	for ( UINT32 i = 0; i < MAX_CLIENT_CHANNELS; ++i )
@@ -1660,8 +1660,8 @@ HoldFallVote::~HoldFallVote()
 void
 chatReleaseGrab(Player& player)
 {
-	Player* grabber = NULL;
-	Player* grabbed = NULL;
+	Player* grabber = nullptr;
+	Player* grabbed = nullptr;
 	const char* subject;
 
 	// Resolve which way around this is
@@ -1676,7 +1676,7 @@ chatReleaseGrab(Player& player)
 		grabber = PlayerInterface::Lookup(player.takenBy());
 	}
 
-	Player* logAs = NULL;
+	Player* logAs = nullptr;
 
 	if ( grabber )
 	{
@@ -1685,21 +1685,21 @@ chatReleaseGrab(Player& player)
 		grabber->ungrabbed();
 
 		subject = (grabbed) ? grabbed->callsign() : "subject";
-		grabber->message(LSTR_NOTE, LSTR_HAVE_UNGRABBED, subject, NULL);
+		grabber->message(LSTR_NOTE, LSTR_HAVE_UNGRABBED, subject, nullptr);
 	}
 
 	if ( grabbed )
 	{
-		if ( logAs == NULL ) logAs = grabbed;
+		if ( logAs == nullptr ) logAs = grabbed;
 
 		grabbed->ungrabbed();
 
 		subject = (grabber && (grabbed->isGM() || grabbed->isPlaynet())) ? grabber->callsign() : "(GM)";
-		grabbed->message(LSTR_NOTE, LSTR_BEEN_UNGRABBED, subject, NULL);
+		grabbed->message(LSTR_NOTE, LSTR_BEEN_UNGRABBED, subject, nullptr);
 	}
 
-	if ( logAs != NULL )
-		logAs->gmNote("GM", "ungrab", NULL, NULL);
+	if (logAs != nullptr)
+		logAs->gmNote("GM", "ungrab", nullptr, nullptr);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1726,7 +1726,7 @@ chatSmiteHandle(const char* handle)
 bool
 Player::tuneRadioToChannel(UCHAR index, Chat::Channel* toChannel, CHANNEL_TYPE type)
 {
-	if ( index >= MAX_CLIENT_CHANNELS || toChannel == NULL )
+	if ( index >= MAX_CLIENT_CHANNELS || toChannel == nullptr )
 		return false;
 
 	ABORT_IF_EX(type == NO_CHANNEL, "t:%d p:%u c:%s attempting to tune radio %d to NO_CHANNEL", teulIndex(), playerID(), callsign(), index);
@@ -1746,7 +1746,7 @@ Player::announceToSquadChannel()
 		return;
 
 	SquadList* squadList = chatFindSquadList(squadID());
-	if ( squadList == NULL || squadList->isNewSquad() )
+	if ( squadList == nullptr || squadList->isNewSquad() )
 		return;
 
 	if ( g_debugSquads )
@@ -1759,12 +1759,12 @@ Player::announceToSquadChannel()
 	chatMessageChannel(channelID, LSTR_SQUAD, LSTR_SIGNED_ON, callsign());
 
 	const char* motd = chatFindSquadMotd(squadID());
-	if ( motd != NULL && *motd != 0 )
+	if ( motd != nullptr && *motd != 0 )
 		message(LSTR_SQUAD, LSTR_MOTD_STRING, motd);
 
 	// Find out if the squad is running a vote
 	SquadVote* vote = chatFindSquadVote(squadID());
-	if ( vote != NULL )
+	if ( vote != nullptr )
 		vote->announce(squadID(), this);
 
 	squelchSquadAnnounce();
@@ -1803,7 +1803,7 @@ bool
 Player::tuneRadio(UCHAR index, CHANNEL_TYPE type, const ChatHandle& handleID)
 {
 	ChannelID channelID((CHANNEL_TYPE)0);
-	Chat::Channel* tuneChannel = NULL;
+	Chat::Channel* tuneChannel = nullptr;
 
 	if ( g_debugRadios )
 		dbugLog(_FLD, "t:%d p:%u c:%s rid:%d tune request to type %s [%d]", teulIndex(), playerID(), callsign(), index, chanTypeName[type], type);
@@ -1889,12 +1889,12 @@ Player::tuneRadio(UCHAR index, CHANNEL_TYPE type, const ChatHandle& handleID)
 		return true;
 	}
 
-	if ( channelID.IsSet() && tuneChannel == NULL )
+	if ( channelID.IsSet() && tuneChannel == nullptr )
 	{
 		tuneChannel = _getChannel(channelID);
 	}
 
-	if ( tuneChannel == NULL )
+	if ( tuneChannel == nullptr )
 	{
 		message(LSTR_CAUTION, LSTR_CHANNEL_UNAVAILABLE);
 		detuneRadio(index);
@@ -1946,9 +1946,9 @@ _tuneGM(Player* player, UCHAR index, const SCHAR* /*handle*/, UINT32 /*commandIn
 
 	dbugLog(_FLI, "tuning %s to GM channel", player->callsign());
 
-	if ( adminChannel == NULL )
+	if ( adminChannel == nullptr )
 	{
-		dbugLog(_FLW, "adminChannel is NULL");
+		dbugLog(_FLW, "adminChannel is null");
 		return FALSE;
 	}
 
@@ -1956,7 +1956,7 @@ _tuneGM(Player* player, UCHAR index, const SCHAR* /*handle*/, UINT32 /*commandIn
 }
 
 //////////////////////////////////////////////////////////////////////
-// Send a tune acknowldgement to the player
+// Send a tune acknowledgment to the player
 
 bool
 Player::ackTuneHandle(UCHAR index, const ChatHandle& handleID)
@@ -1983,7 +1983,7 @@ _getTuneByName(const char* name)
 		if ( _tuneCommand[i].matchHandle == handle )
 			return &_tuneCommand[i];
 	}
-	return NULL;
+	return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1993,7 +1993,7 @@ _getTuneByName(const char* name)
 bool
 Player::tuneRadioToNamedChannel(UCHAR index, const char* const channelName)
 {
-	if ( channelName == NULL )
+	if ( channelName == nullptr )
 		return false;
 
 	TUNE_COMMAND* const tuneCommand = _getTuneByName(channelName);
@@ -2101,7 +2101,7 @@ Player::tuneRadioToNumberedChannel(UCHAR index, UINT32 channelNo)
 	const ChannelID& channelID = chatGetNumberedChannelID(0ULL, channelNo, side());
 
 	Chat::Channel* const tuneChannel = _getChannel(channelID);
-	if ( tuneChannel == NULL )
+	if ( tuneChannel == nullptr )
 	{
 		dbugLog(_FLA, "t:%d p:%u c:%s tuning #%d to ch#%d side %d CREATE FAILED"
 						, teulIndex(), playerID(), callsign()
@@ -2129,7 +2129,7 @@ static void
 _distributeHCUnitMessage(Chat::Broadcast& broadcast)
 {
 	HCUnit* unit = HCUnit::Lookup(broadcast.m_targetID);
-	if ( unit == NULL || unit->country() <= WWII_NO_COUNTRY || unit->country() >= MAX_COUNTRIES )
+	if ( unit == nullptr || unit->country() <= WWII_NO_COUNTRY || unit->country() >= MAX_COUNTRIES )
 		return;
 
 	PLAYERS& side = sidePlayers[unit->side()];
@@ -2158,7 +2158,7 @@ static void
 _distributeInstanceMessage(Chat::Broadcast& broadcast)
 {
 	Instance::HostInstance* inst = Instance::HostInstance::LookupByUID(broadcast.m_targetID);
-	if ( inst != NULL )
+	if ( inst != nullptr )
 	{
 		chatBroadcastLocMessage(inst->players().begin(), inst->players().end(), broadcast);
 	}
@@ -2307,7 +2307,7 @@ _errorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/, const
 	{
 		auto* sample = (Teul::TickSample*)(data);
 		Player* player = PlayerInterface::Lookup(teulIndex);
-		if ( player != NULL )
+		if ( player != nullptr )
 		{
 			chatHandleTickSample(CHAT_HOST, *player, *sample);
 		}
@@ -2325,7 +2325,7 @@ _errorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/, const
 
 	dbugLog(_FLD, "t:%d connection closed", teulIndex);
 	Player* const player = PlayerInterface::Lookup(teulIndex);
-	if ( player != NULL )
+	if ( player != nullptr )
 	{
 		// Player has lost their connection.
 		player->setDisconnected();
@@ -2376,7 +2376,7 @@ _listenErrorFunction(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*siz
 //		chatLogoutPlayer(teulIndex);
 
 		Player* player = PlayerInterface::Lookup(teulIndex);
-		if ( player != NULL )
+		if ( player != nullptr )
 		{
 			dbugLog(_FLN, "t:%d p:%u c:%s closed", teulIndex, player->playerID(), player->callsign());
 			chatPlayerDeactivate(player);
@@ -2415,7 +2415,7 @@ _managementErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*siz
 	{
 		auto* sample = (Teul::TickSample*)(data);
 		Player* player = PlayerInterface::Lookup(teulIndex);
-		if ( player != NULL )
+		if ( player != nullptr )
 		{
 			dbugLog(_FLW, "t:%d p:%u c:%s clock drift host:%llu, client:%llu, delta:%lld, ratio:%.6g", player->teulIndex(), player->playerID(), player->callsign(), sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
 			chatHandleTickSample(CHAT_HOST, *player, *sample);
@@ -2430,9 +2430,9 @@ _managementErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*siz
 static SINT32
 _personaCreate(const Server::PersonaLogin& login, PlayerStatusNode& psn)
 {
-	if ( login.data.auxData == NULL )
+	if ( login.data.auxData == nullptr )
 	{
-		dbugLog(_FLA, "t:%d p:%u c:%s personaCreate with NULL persXfer->data"
+		dbugLog(_FLA, "t:%d p:%u c:%s personaCreate with null persXfer->data"
 					, psn.teulIndex, psn.dispatch().m_customerID, psn.dispatch().m_callsign);
 		return -EINVAL;
 	}
@@ -2469,7 +2469,7 @@ _personaRelease(SINT32 teulIndex, PlayerStatusNode* psn, Server::ReleaseType rel
 					, relaseType
 					);
 
-	if ( psn->localInfo != NULL )
+	if ( psn->localInfo != nullptr )
 	{
 		dbugLog(_FLNB, " *freeing");
 		chatFreePlayer((Player*)psn->localInfo);
@@ -2487,9 +2487,9 @@ static SINT32
 _personaActivate(SINT32 teulIndex, PlayerStatusNode* psn)
 {
 	Player* player = (Player*)psn->localInfo;
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
-		dbugLog(_FLA, "t:%d received NULL Player in PSN", teulIndex);
+		dbugLog(_FLA, "t:%d received null Player in PSN", teulIndex);
 		return -Teul::Errors::LoginFail_ActivateNoLocalInfo;
 	}
 
@@ -2614,7 +2614,7 @@ _countUserSides(LOGICAL report)
 		{
 			if ( g_debugSquads )
 				dbugLog(_FLD, "t:%d p:%u c:%s squad invite expired", player->teulIndex(), player->playerID(), player->callsign());
-			player->SetSquadInvite(NULL);
+			player->SetSquadInvite(nullptr);
 		}
 	}
 
@@ -2711,7 +2711,7 @@ _refreshDefaultSquad()
 	dbugLog(_FLD, "requesting %s squad list", host_config.squad.defaultSquad);
 
 	SquadList* recruitSquad = chatFindSquadListByName(host_config.squad.defaultSquad);
-	if ( recruitSquad != NULL )
+	if ( recruitSquad != nullptr )
 	{
 		chatRequestSquadMemberList(recruitSquad->squad().squadID());
 	}
@@ -2781,7 +2781,7 @@ _houseKeeping()
 	if ( teulClock64 < nextHouseKeep )
 		return false;
 
-	// NULL TERMINATED List of functions to call
+	// nullptr TERMINATED List of functions to call
 	typedef bool (HOUSEKEEPING)(void);
 	HOUSEKEEPING* housekeeping[] =
 	{
@@ -2799,10 +2799,10 @@ _houseKeeping()
 	// Insert new entries here
 
 	,	_lowFrequencyHouseKeeping
-	,	NULL
+	,	nullptr
 	};
 
-	if ( housekeeping[step] == NULL )
+	if ( housekeeping[step] == nullptr )
 	{
 		step = 0;
 		nextHouseKeep = teulClock64 + (30 * 1000);		// Every 30s.
@@ -3032,7 +3032,7 @@ _handleIRCChannelMessage(irc_session_t* session, const char* /*event*/, const ch
 		return true;
 
 	const char* p = strchr(params[0], '-');
-	if ( p == NULL )
+	if ( p == nullptr )
 		return false;
 	++p;
 	if ( *p == 0 )
@@ -3105,7 +3105,7 @@ _lookupIRCPlayer(const char* gamename)
 {
 	ChatHandle matchHandle = chatGetLowercaseHandle(gamename);
 	IRC_PLAYERS::iterator it = ircPlayers.find(matchHandle);
-	return ( it == ircPlayers.end() ) ? NULL : it->second;
+	return ( it == ircPlayers.end() ) ? nullptr : it->second;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -3180,17 +3180,17 @@ IRCRegistration::Add(IRCPlayer* ircPlayer)
 {
 	dbugLog(_FLI, "irc:%s:joined %s", m_username.c_str(), m_channel.c_str());
 
-	if ( ircPlayer == NULL )
+	if ( ircPlayer == nullptr )
 	{
 		Player* player = PlayerInterface::Lookup(m_username.c_str());
-		if ( player != NULL )
+		if ( player != nullptr )
 		{
 			dbugLog(_FLA, "irc:cannot register irc user %s, user is logged in", m_username.c_str());
 			return;
 		}
 
 		ircPlayer = new IRCPlayer(m_username.c_str());
-		if ( ircPlayer == NULL )
+		if ( ircPlayer == nullptr )
 		{
 			dbugLog(_FLA, "irc:failed to create irc user '%s'", m_username.c_str());
 			return;
@@ -3205,7 +3205,7 @@ IRCRegistration::Add(IRCPlayer* ircPlayer)
 void
 IRCRegistration::Remove(IRCPlayer* ircPlayer)
 {
-	if ( ircPlayer == NULL )
+	if ( ircPlayer == nullptr )
 		return;
 
 	dbugLog(_FLI, "irc:%s:left %s", m_username.c_str(), m_channel.c_str());
@@ -3221,7 +3221,7 @@ IRCRegistration::Remove(IRCPlayer* ircPlayer)
 void
 IRCRegistration::Nick(IRCPlayer* ircPlayer)
 {
-	if ( ircPlayer == NULL )
+	if ( ircPlayer == nullptr )
 		return;
 
 	const char* newUsername = m_channel.c_str();
@@ -3244,14 +3244,14 @@ IRCRegistration::Nick(IRCPlayer* ircPlayer)
 	}
 
 	Player* player = PlayerInterface::Lookup(newUsername);
-	if ( player != NULL )
+	if ( player != nullptr )
 	{
 		dbugLog(_FLA, "irc:cannot register new nick %s, user is logged in", newUsername);
 		return;
 	}
 
 	ircPlayer = _lookupIRCPlayer(newUsername);
-	if ( ircPlayer != NULL )
+	if ( ircPlayer != nullptr )
 	{
 		dbugLog(_FLA, "irc:cannot register new nick %s, irc user exists", newUsername);
 		return;
@@ -3260,7 +3260,7 @@ IRCRegistration::Nick(IRCPlayer* ircPlayer)
 	try
 	{
 		ircPlayer = new IRCPlayer(newUsername);
-		if ( ircPlayer == NULL )
+		if ( ircPlayer == nullptr )
 		{
 			dbugLog(_FLA, "irc:failed registering new nick %s, internal error", newUsername);
 			return;
@@ -3367,7 +3367,7 @@ _registerUsers(const char* channel, const char* names)
 	while ( names && *names )
 	{
 		const char* p = strchr(names, ' ');
-		if ( p == NULL )
+		if ( p == nullptr )
 		{
 			// Last name in the list
 			_registerIrcUser(names, channel);
@@ -3456,7 +3456,7 @@ _processIRCDotPassthru(void* v)
 	const char* tell = data->m_tell.c_str();
 
 	IRCPlayer* ircPlayer = _lookupIRCPlayer(from);
-	if ( ircPlayer == NULL )
+	if ( ircPlayer == nullptr )
 	{
 		wwiiIRCMessage(tell, "Sorry, %s, you cannot use '.' commands unless you are on at least one channel with me.", from);
 		return;
@@ -3529,7 +3529,7 @@ _runHost()
 
 		// Check to see if the spam can should run now
 		// (it has finer than 30s/tick granularity)
-		if ( teulClock64 > nextSpamTime )
+		if ( PN_UNLIKELY(teulClock64 > nextSpamTime) )
 		{
 			nextSpamTime = teulClock64 + _manTheSpamCan();
 		}
@@ -3561,7 +3561,7 @@ main(int argc, char* argv[])
 	serverEnableDebugWebServer(CHAT_HOST);
 	memInit();
 
-	if (teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction) < 0)//_killFunction
+	if (teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction) < 0)
 		LogAbort("Can't Init transport");
 
 	// Get some environment variables, Before teulGetHost
@@ -3646,12 +3646,12 @@ main(int argc, char* argv[])
 				, _serverEnterCallback
 				, _serverLeaveCallback
 				, _serverStatusCallback
-				,_personaCreate
-				,_personaRelease
-				,_personaActivate
-				,_personaExit
-				,NULL					// Don't care about cluster exits
-				,_personaErrorFunction);
+				, _personaCreate
+				, _personaRelease
+				, _personaActivate
+				, _personaExit
+				, nullptr					// Don't care about cluster exits
+				, _personaErrorFunction);
 
 	Server::myServerInfo.flags = Server::SVRFLAG_RELOGIN;//SVRFLAG_SEND_PSTAT;
 	Server::myServerInfo.stats.m_maxPlayers = Teul::MaxClusterUsers;
