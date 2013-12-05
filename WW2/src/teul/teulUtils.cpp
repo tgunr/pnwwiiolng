@@ -175,71 +175,6 @@ _teulClock(void)
 
 // 	----- teulClock
 
-#if platOS == OS_LINUX
-#if defined(USE_RDTSC_FOR_TIME)
-//////////////////////////////////////////////////////////////////////
-// ReaD Tick System Counter (number of clock ticks)
-// This stuff depends on adherence to UINT64 values to ensure
-// wrap-around occurs cleanly.
-// ALSO REQUIRES A SYSTEM THAT DOES NOT PERFORM POWER SAVING FUNCTIONS
-// THAT ALTER THE CLOCK FREQUENCY.
-
-static UINT64 _ticks = 0LL;
-
-static inline void
-rdtsc(UINT64& x)
-{
-  __asm__ volatile (".byte 0x0f, 0x31" : "=A" (x));
-}
-
-struct ClockSpeedCounter
-{
-	ClockSpeedCounter() : m_ticks(0LL)
-	{
-		UINT64 startTicks, endTicks;
-		TeulTimeMS msAvg = 0;
-		// Work out how many ticks there are per 10ms
-		static const UINT32 iterations = 16;
-		static const UINT32 msWait = 16;
-		struct timeval before, after;
-		for ( UINT32 i = 0; i < iterations; ++i )
-		{
-			gettimeofday(&before, 0);
-			rdtsc(startTicks);
-			std::this_thread::sleep_for(std::chrono::microseconds(msWait * 995));	// sleep is imprecise so aim short.
-			rdtsc(endTicks);
-			gettimeofday(&after, 0);
-			const TeulTimeMS startMs = ((TeulTimeMS)before.tv_sec * 1000LL) + (before.tv_usec / 1000);
-			const TeulTimeMS endMs = ((TeulTimeMS)after.tv_sec * 1000LL) + (after.tv_usec / 1000);
-			const TeulTimeMS msElapsed = endMs - startMs;
-			msAvg += (endTicks - startTicks) / msElapsed;
-		}
-		// Take the average and divide by 4 so that we
-		// only allow a re-read of the time once every
-		// 0.25ms
-		m_ticks = msAvg / (4*iterations);
-
-		_ticks = 0LL;
-	}
-	UINT64 m_ticks;
-} clockSpeedCounter;
-
-//////////////////////////////////////////////////////////////////////
-// Update the tick counter and see if enough ticks have elapsed to
-// merit another fetch of the time. This means that the time is
-// accurate to within +/-250.
-
-static inline bool
-_checkRdtsc()
-{
-	UINT64 oldTicks = _ticks;
-	rdtsc(_ticks);
-	// Has more than 1/4ms elapsed?
-	return ( (UINT64)(_ticks - oldTicks) >= clockSpeedCounter.m_ticks );
-}
-#endif
-#endif
-
 //////////////////////////////////////////////////////////////////////
 // Flush the time cache and update teulClock64 and teulTime (since
 // teulTime is just teulClock64 / 1000)
@@ -248,9 +183,6 @@ SINT32
 teulSyncClock(void)
 {
 #if platOS == OS_LINUX
-# if defined(USE_RDTSC_FOR_TIME)
-	if ( _checkRdtsc() )
-#endif
 	{
 		struct timeval tv;
 		gettimeofday(&tv,0);
