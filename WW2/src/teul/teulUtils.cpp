@@ -82,6 +82,7 @@ teulSyncClock(void)
 #endif
 }
 
+#if platOS == OS_LINUX
 void testMonotonicClock()
 {
 	struct timespec ts;
@@ -97,6 +98,7 @@ void testMonotonicClock()
 	teulClockTime = uint32_t(ts.tv_sec) + clockBase;
 	teulClock64 = clockBase64 + uint64_t(ts.tv_sec) * 1000ULL + uint64_t(ts.tv_nsec / 1000000ULL);
 }
+#endif
 
 // wrapper for inet_ntoa.
 // converts UINT32. to doted quad string.
