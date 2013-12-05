@@ -11,7 +11,7 @@
 
 //tolua_begin
 
-extern TeulTimeMS teulClock64;						//!< Miliseconds since epoch as of last teulSyncClock().
+extern TeulTimeMS teulClock64;						//!< Milliseconds since epoch as of last teulSyncClock().
 extern UINT32 teulClockTime;						//!< Seconds since epoch as of last teulSyncClock().
 
 //tolua_end
