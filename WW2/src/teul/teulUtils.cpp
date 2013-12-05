@@ -49,24 +49,22 @@ UINT32 teulClockTime;
 // Flush the time cache and update teulClock64 and teulTime (since
 // teulTime is just teulClock64 / 1000)
 
-SINT32
+void
 teulSyncClock(void)
 {
 #if platOS == OS_LINUX
+	struct timeval tv;
+	gettimeofday(&tv, nullptr);
+	const TeulTimeMS newTimeMS = ((TeulTimeMS)tv.tv_sec * 1000ULL) + (tv.tv_usec / 1000ULL);
+	if ( PN_LIKELY(newTimeMS > teulClock64) )
 	{
-		struct timeval tv;
-		gettimeofday(&tv,0);
-		const TeulTimeMS newTimeMS = ((TeulTimeMS)tv.tv_sec * 1000ULL) + (tv.tv_usec / 1000ULL);
-		if ( newTimeMS < teulClock64 )
-		{
-			teulClock64++;
-			teulClockTime = teulClock64 / 1000ULL;
-		}
-		else
-		{
-			teulClock64 = newTimeMS;
-			teulClockTime = (UINT32)tv.tv_sec;
-		}
+		teulClock64 = newTimeMS;
+		teulClockTime = (UINT32)tv.tv_sec;
+	}
+	else if (PN_UNLIKELY(newTimeMS < teulClock64))
+	{
+		teulClock64++;
+		teulClockTime = teulClock64 / 1000ULL;
 	}
 #elif platOS == OS_WIN32
 	static const DWORD  BaseClockTime = timeGetTime();
