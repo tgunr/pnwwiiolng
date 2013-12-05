@@ -231,7 +231,7 @@ _expireTurretBits(struct TURRET_STRUCT* turret)
 		{
 #ifdef NEVER
 			dbugLog(_FLDB,"turret invalid: %x mask %x",turret->valid, tmpMask);
-			dbugLog(_FLDB,"turret invalid: %d, stamp %x now %x",i, turret->timeStamp[i], teulClockBits(16));
+			dbugLog(_FLDB,"turret invalid: %d, stamp %llu now %llu",i, turret->timeStamp[i], teulClock64);
 #endif
 			turret->valid &= ~mask;
 			turret->clock64[i] = teulClock64;

@@ -40,138 +40,8 @@
 #include <sys/timeb.h>
 #endif
 
-#define CLOCK_MULTIPLIER 1000/CLOCKS_PER_SEC
-
-static UINT32	tclock;
 TeulTimeMS teulClock64;
 UINT32 teulClockTime;
-
-// returns the current clock value truncated to x bits
-static inline SINT32 _clockBits(UINT32 bits)
-{
-	if (bits > 31)
-		return -EINVAL;
-
-	// Maximum of 31 bits
-	return (tclock & (0xffffffff >> (32-bits)));
-}
-
-// Adds  an unsigned x bit time values with a signed 20bit delta .
-// Returns an unsigned 20 bit timeval, - val indicates error.
-// Truncates overflows (e.g. 0x0fffff + 1 = 0).
-static inline SINT32 _addClockBits( UINT32 bits, UINT32 time, SINT32 delta )
-{
-	SINT32 result;
-	UINT32 tMask, cMask, vMask;
-
-	if (bits > 31 || bits < 2)
-		return -EINVAL;
-
-	tMask = (0xffffffff << bits);
-	cMask = (0xffffffff >> (33 - bits));
-	vMask = (0xffffffff >> (32 - bits));
-
-	time &= vMask;
-	delta &= vMask;
-
-	if ((time & tMask) != 0  || (delta > (SINT32)cMask) || (delta < (0- (SINT32)cMask)) )
-		return -EINVAL;
-
-	result = time + delta;
-
-	// fix overflows
-	result &= ~tMask;
-
-	return result;
-}
-
-// Subtracts unsigned 31 bit time values only.
-// Returns an unsigned 31 bit timeval, - val indicates error.
-// Truncates overflows (e.g.  0 - 1 = 0x0fffff0).
-static inline SINT32 _subClockBits( UINT32 bits, UINT32 newTime, UINT32 oldTime )
-{
-	SINT32 result;
-	UINT32 tMask, cMask, vMask;
-
-	if (bits > 31 || bits < 2)
-		return -EINVAL;
-	else
-	{
-		tMask =  (0xffffffff << bits);
-		cMask = (0xffffffff >> (33 - bits));
-		vMask = (0xffffffff >> (32 - bits));
-	}
-
-	newTime &= vMask;
-	oldTime &= vMask;
-
-	if ((newTime & tMask) != 0 || (oldTime &  cMask) != 0)
-		return -EINVAL;
-
-	result = newTime - oldTime;
-
-	// fix overflows
-	result &=  ~tMask;
-
-	return result;
-}
-
-// Returns a signed x bit delta taking into account clock rollover.
-// Assumes no real negative time diff larger than 1/2 of the max time of 0xfffff.
-// Adjusts for clock overflow (e.g. 0 - 0x0fffff = 1 or 0x0fffff - 0 = -1)
-static inline SINT32 _deltaClockBits( UINT32 bits, UINT32 newTime, UINT32 oldTime )
-{
-	SINT32 result;
-	UINT32 tMask, sMask, vMask;
-
-	if (bits > 31  || bits < 2)
-		return -EINVAL;
-	else
-	{
-		tMask =  (0xffffffff >> (32-bits+1));
-		vMask =  (0xffffffff >> (32-bits));
-		sMask = (0x00000001 << (bits));
-	}
-
-	newTime &= vMask;
-	oldTime &= vMask;
-
-	result = newTime - oldTime;
-
-	// fix overflows
-	if (result < (0 - (SINT32)tMask))
-	{
-//		fprintf(stderr,"Up:%x:%x:%x\n",tMask,0-tMask,result);
-		result = newTime - (oldTime - sMask);
-//		fprintf(stderr,"U:%x:%x:%x\n",oldTime,newTime,result);
-	}
-
-	else if (result > (SINT32)tMask)
-	{
-//		fprintf(stderr,"Op:%x:%x:%x\n",newTime,oldTime,result);
-		result = newTime - (oldTime + sMask);
-//		fprintf(stderr,"O:%x:%x:%x\n",newTime,oldTime,result);
-	}
-
-
-	return result;
-}
-
-SINT32 teulClockBits(UINT32 bits)
-{
-	return _clockBits(bits);
-}
-
-SINT32 teulDeltaClockBits(UINT32 bits, UINT32 newTime, UINT32 oldTime )
-{
-	return _deltaClockBits(bits,newTime,oldTime);
-}
-
-static inline UINT32
-_teulClock(void)
-{
-	return (tclock & 0x000fffff);				// 20 bit limit
-}
 
 // 	----- teulClock
 
@@ -197,7 +67,6 @@ teulSyncClock(void)
 			teulClock64 = newTimeMS;
 			teulClockTime = (UINT32)tv.tv_sec;
 		}
-		tclock = (UINT32)teulClock64;
 	}
 #elif platOS == OS_WIN32
 	static const DWORD  BaseClockTime = timeGetTime();
@@ -205,67 +74,30 @@ teulSyncClock(void)
 
 	teulClock64 = BaseClock64 + (timeGetTime() - BaseClockTime);
 	teulClockTime = (UINT32)(teulClock64 / 1000LL);
-	tclock = (UINT32)(teulClock64);
 #elif platOS == OS_MACOS
 	UnsignedWide microTickCount;
 	Microseconds(&microTickCount);
 	teulClock64 = UnsignedWideToUInt64(microTickCount) / 1000;
 	teulClockTime = (UINT32)(teulClock64 / 1000LL);
-	tclock = (UINT32)(teulClock64);
 #else
 #pragma error("No teulSyncClock implementation for this platform")
 #endif
-	return _teulClock();
 }
 
-// returns the current clock value truncated to 20 bits
-UINT32 teulClock(void)
+void testMonotonicClock()
 {
-//	teulSyncClock();
-	return _teulClock();
-}
-
-// Adds  an unsigned 20 bit time values with a signed 20bit delta .
-// Returns an unsigned 20 bit timeval, - val indicates error.
-// Truncates overflows (e.g. 0x0fffff + 1 = 0).
-SINT32 teulAddClock(UINT32 time, SINT32 delta)
-{
-	SINT32 result;
-
-	if ((time & 0xfff00000) != 0  || (delta > 0x7ffff) || (delta < (0-0x7ffff)) )
-		return -EINVAL;
-
-	result = time + delta;
-
-	// fix overflows
-	result &=  0x000fffff;
-
-	return result;
-}
-
-// Returns a signed 20 bit delta taking into account clock rollover.
-// Assumes no real negative time diff larger than 1/2 of the max time of 0xfffff.
-// Adjusts for clock overflow (e.g. 0 - 0x0fffff = 1 or 0x0fffff - 0 = -1)
-SINT32 teulDeltaClock( UINT32 newTime, UINT32 oldTime )
-{
-	SINT32 result;
-
-	result = newTime - oldTime;
-
-	//. fix overflows
-	if (result < (0 - 0x7ffff))
-		result = newTime - (oldTime - 0x0100000);
-
-	else if (result > 0x7ffff)
-		result = newTime - (oldTime + 0x0100000);
-
-	return result;
-}
-
-// same as teulDeltaClock but newTime = teulClock()
-SINT32 teulElapsedClock(UINT32 oldTime)
-{
-	return teulDeltaClock(teulClock(),oldTime);
+	struct timespec ts;
+	clock_gettime(CLOCK_MONOTONIC, &ts);
+	static uint32_t clockBase = 0;
+	static uint64_t clockBase64 = 0;
+	if (PN_UNLIKELY(clockBase == 0)) {
+		struct timeval tv;
+		gettimeofday(&tv, nullptr);
+		clockBase = tv.tv_sec - ts.tv_sec;
+		clockBase64 = uint64_t(clockBase) * 1000ULL;
+	}
+	teulClockTime = uint32_t(ts.tv_sec) + clockBase;
+	teulClock64 = clockBase64 + uint64_t(ts.tv_sec) * 1000ULL + uint64_t(ts.tv_nsec / 1000000ULL);
 }
 
 // wrapper for inet_ntoa.
