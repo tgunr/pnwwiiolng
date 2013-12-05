@@ -1609,7 +1609,7 @@ teulModIdle(const TeulTimeMS& duration_)
 #else
 	static const TeulTimeMS AlertInterval_ms = 75;
 #endif
-	if ( interval > duration_ + AlertInterval_ms )
+	if ( PN_UNLIKELY(interval > duration_ + AlertInterval_ms) )
 		dbugLog(_FLA, "STALL. teulModIdle interval=%llu", interval);
 
 	_lastIdle = teulClock64;
