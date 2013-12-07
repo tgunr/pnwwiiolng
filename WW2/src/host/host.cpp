@@ -2860,7 +2860,8 @@ hostStatusCommand(Host::CommandMsg& cmd)
 void
 hostWhoCommand(Host::CommandMsg& cmd)
 {
-	char buffer[1024] = "";
+	char buffer[1024];
+	buffer[0] = '\0';
 
 	char* ptr = buffer + sprintf(buffer, "Cell #%u has %" PRSizeT " player(s).", (Server::localHost & 255), g_players.size());
 

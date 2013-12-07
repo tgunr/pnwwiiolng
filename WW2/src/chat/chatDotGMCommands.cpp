@@ -1388,8 +1388,10 @@ DotPInfo::actionWith(Player& player, Chat::ClientMessage* message, char* argumen
 void
 Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, bool includePermissions) const
 {
-	char response[MAX_MESSAGE_LENGTH + 1] = "";
-	char buf[128+1] = "";
+	char response[MAX_MESSAGE_LENGTH + 1];
+	char buf[128+1];
+	response[0] = '\0';
+	buf[0] = '\0';
 
 	if ( player.isPlaynet() )
 	{

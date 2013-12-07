@@ -3048,7 +3048,8 @@ _handleIRCChannelMessage(irc_session_t* session, const char* /*event*/, const ch
 	else
 		return false;
 
-	char nick[32] = "";
+	char nick[32];
+	nick[0] = '\0';
 	irc_target_get_nick(origin, nick, 31);
 
 	strupr(nick);

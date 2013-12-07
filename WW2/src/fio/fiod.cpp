@@ -159,19 +159,21 @@ static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* wi
 bool
 fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 {
-	wchar_t	widePath[PATH_MAX + 1] = L"";
-	char	asciiPath[PATH_MAX + 1] = "";
+	wchar_t	widePath[PATH_MAX + 1];
+	char	asciiPath[PATH_MAX + 1];
+	widePath[0] = '\0';
+	asciiPath[0] = '\0';
 
 	outPtr = nullptr;
 
 	off_t fileSize = _getFilePathAndSize(filename, false, widePath, sizeof(widePath));
-	if ( fileSize < 0 )
+	if ( PN_UNLIKELY(fileSize < 0) )
 	{
 		DEBUG_ERR("Error performing stat on '%s'.", filename);
 		return false;
 	}
 
-	if ( fileSize == 0 )
+	if ( PN_UNLIKELY(fileSize == 0) )
 		return true;
 
 	WWIIConvert(widePath, asciiPath);
@@ -184,7 +186,7 @@ fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 	int fd = OS_OPEN(os_file_path(asciiPath), O_RDONLY | O_BINARY);
 	recordRef(os_file_path(asciiPath));
 #endif
-	if ( fd < 0 )
+	if ( PN_UNLIKELY(fd < 0) )
 	{
 		DEBUG_ERR("Unable to open '%s'.", asciiPath);
 		return false;

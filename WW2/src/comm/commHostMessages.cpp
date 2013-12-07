@@ -512,7 +512,8 @@ Player::awsCheck()
 	}
 
 #ifdef BETA_RELEASE
-	char vOver[80] = "";
+	char vOver[80];
+	vOver[0] = '\0';
 	if ( vel >= VEL_SQUARE_TRIP )
 		snprintf(vOver, 79, "AWS Candidate (vel=%3.2fms/%3.2fMph)", sqrt(vel), sqrt(vel) / MPH_TO_MS);
 	else
