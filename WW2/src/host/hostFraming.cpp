@@ -25,29 +25,27 @@
 static UINT16
 _getMode(HostVehicle* vehicle)
 {
-	if ( vehicle->players().empty() )
+	if ( PN_UNLIKELY(vehicle->players().empty()) )
 	{
 		return host_config.update.defaultUM;
 	}
 
 	// Determine if all expected players have attached to the vehicle
 	PLAYER_LIST::iterator it = vehicle->players().begin();
+	const PLAYER_LIST::const_iterator end = vehicle->players().end();
 	UINT16 minMode = (*it)->getPreferredFramingMode();
-	while ( it != vehicle->players().end() )
+	while ( it != end )
 	{
 		Player* player = (*it);
 		++it;
 
-		assert(player != NULL);
-		if ( player == NULL )
+		if ( PN_UNLIKELY(player == NULL) )
 			continue;
 
 		if ( player->teulIndex() < 0 || !player->active )
 			continue;
 
-		UINT16 mode = player->getPreferredFramingMode();
-		if ( mode < minMode )
-			minMode = mode;
+		minMode = std::min(minMode, player->getPreferredFramingMode());
 	}
 
 	return minMode;
@@ -98,8 +96,7 @@ HostVehicle::selectBestFramingMode()
 void
 Player::setFramingMode(UINT16 newMode)
 {
-	if ( newMode > UpdateFraming::_MODES )
-		newMode = UpdateFraming::_MODES;
+	newMode = std::min(newMode, UINT16(UpdateFraming::_MODES));
 
 	m_framingMode = newMode;
 
