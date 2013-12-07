@@ -153,7 +153,7 @@ typedef std::vector<HostVehicle*> VEHICLES;
 typedef std::set<HostVehicle*> OCCUPANTS;
 struct Occupancy
 {
-	Occupancy() : object(NULL), occupants() {}
+	Occupancy() : object(nullptr), occupants() {}
 	ObjectStruct*	object;
 	OCCUPANTS		occupants;
 };
@@ -258,7 +258,7 @@ HostVehicle*
 hostFindVehicleLocal(UINT32 vehicleIndex)
 {
 	VEHICLE_HASH::iterator it = _vehicleHash.find(vehicleIndex);
-	return ( it != _vehicleHash.end() ? it->second : NULL);
+	return ( it != _vehicleHash.end() ? it->second : nullptr );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -276,10 +276,10 @@ hostCreateRemoteVehicle(const instanceid_t& instanceID, sortieid_t index, WEAPON
 #endif
 
 	HostVehicle* vehicle = hostFindVehicleLocal(index);
-	if (vehicle != NULL)
+	if (vehicle != nullptr)
 	{
 		dbugLog(_FLA,"vehicle %d already exists",index);
-		return NULL;
+		return nullptr;
 	}
 
 	vr.m_weaponSerial.source = nullObjID;
@@ -290,15 +290,15 @@ hostCreateRemoteVehicle(const instanceid_t& instanceID, sortieid_t index, WEAPON
 	if ( success == false )
 	{
 		dbugLog(_FLA, "v:%u could not create remote vehicle", index);
-		return NULL;
+		return nullptr;
 	}
 
 	vehicle = hostFindVehicleLocal(index);
 
-	if ( vehicle == NULL )
+	if ( PN_UNLIKELY(vehicle == nullptr) )
 	{
-		dbugLog(_FLA,"v:%u could not create remote vehicle is NULL", index);
-		return NULL;
+		dbugLog(_FLA,"v:%u could not create remote vehicle is null", index);
+		return nullptr;
 	}
 
 	vehicle->setRemote();
@@ -340,21 +340,21 @@ Host::VehicleRequest::execute()
 
 	// Verify the weapon data before trying to use other values
 	const WEAPON* const weapon = weapLookup(ws.spec);
-	if (weapon == NULL)
+	if (weapon == nullptr)
 	{
 		dbugLog(_FLA,"could not find weapon definition for vehicle %u spec %u.%u.%u.%u"
 					, ws.serial, ws.spec.wCountry, ws.spec.wCategory, ws.spec.wClass, ws.spec.wType);
 		return false;
 	}
 
-	if ( hostFindVehicleLocal(ws.serial) != NULL )
+	if ( hostFindVehicleLocal(ws.serial) != nullptr )
 	{
 		dbugLog(_FLA,"vehicle %u already in use!!", ws.serial);
 		return false;
 	}
 
 	VEHICLE_HOLDER* const vehHolder = Host::Vehicles::GetHolder(ws.serial, ws, weapon);
-	if ( vehHolder == NULL )
+	if ( vehHolder == nullptr )
 	{
 		return false;
 	}
@@ -436,7 +436,7 @@ static SINT32
 _joinVehicle(Player& player, const VEHICLE_REQUEST& vRequest)
 {
 	PlayerStatusNode* const psn = ServerInterface::PlayerStatusNodeByPlayerID(player.playerID());
-	if ( psn == NULL )
+	if ( psn == nullptr )
 	{
 		dbugLog(_FLA, "t:%d p:%u attempt to join vehicle without a player status node", player.teulIndex(), player.playerID());
 		return -EINVAL;
@@ -451,7 +451,7 @@ _joinVehicle(Player& player, const VEHICLE_REQUEST& vRequest)
 #endif
 
 	HostVehicle* const vehicle = hostFindVehicleLocal(vRequest.weapon.serial);
-	if (vehicle == NULL)
+	if (vehicle == nullptr)
 	{
 		dbugLog(_FLAS,"couldnt find or allocate vehicle %d for player id:%d"
 					, vRequest.weapon.serial, player.playerID());
@@ -465,7 +465,7 @@ _joinVehicle(Player& player, const VEHICLE_REQUEST& vRequest)
 		return -EINVAL;
 	}
 
-	if ( player.vehicle != NULL )
+	if ( player.vehicle != nullptr )
 	{
 		if ( player.vehicle != vehicle )
 		{
@@ -474,7 +474,7 @@ _joinVehicle(Player& player, const VEHICLE_REQUEST& vRequest)
 		}
 
 		_extractPlayerFromVehiclesList(player, *vehicle);
-		player.vehicle = NULL;
+		player.vehicle = nullptr;
 	}
 
 	if ( ! _determineStation(*vehicle, player) )
@@ -492,7 +492,7 @@ _joinVehicle(Player& player, const VEHICLE_REQUEST& vRequest)
 	player.active = false;
 
 	// point to that vehicle from our list
-	if ( player.vehicle != NULL )
+	if ( player.vehicle != nullptr )
 	{
 		LogAbort("player has non-null vehicle pointer");
 	}
@@ -531,8 +531,8 @@ Player::Player(const Server::PersonaXfer& personaXfer)
 	: wwiiPlayer()
 	, m_lastTimeRx(0ULL)
 	, m_lastTimeRxed(0ULL)
-	, vehicle(NULL)
-	, m_antiHack(NULL)
+	, vehicle(nullptr)
+	, m_antiHack(nullptr)
 	, state(Player::_RESERVED)
 	, stationID(0)
 	, exitState(PEXIT_UNINITIALIZED)
@@ -566,7 +566,7 @@ Player::Player(const Server::PersonaXfer& personaXfer)
 
 	try
 	{
-		if ( personaXfer.data.auxData == NULL )
+		if ( personaXfer.data.auxData == nullptr )
 		{
 			dbugLog(_FLA, "p:%u c:%s Received persXfer without mission packet [pc#%d]"
 							, personaXfer.dispatch().m_customerID, personaXfer.dispatch().m_callsign, _personaCounter + 1);
@@ -663,7 +663,7 @@ _exitPlayer(Player& player)
 	SINT32 teulIndex = player.teulIndex();
 
 	PlayerStatusNode* const psn = ServerInterface::PlayerStatusNodeByPlayerID(player.playerID());
-	if ( psn == NULL )
+	if ( psn == nullptr )
 	{
 		dbugLog(_FLA, "t:%d p:%u no player data", teulIndex, player.playerID());
 		if ( teulIndex >= 0 )
@@ -687,16 +687,16 @@ _exitPlayer(Player& player)
 static SINT32
 _personaExit(const SINT32 teulIndex, PlayerStatusNode* const psn, Server::PersonaExit& persXfer)
 {
-	if ( psn == NULL )
+	if ( psn == nullptr )
 	{
-		dbugLog(_FLW, "t:%d exiting with NULL player", teulIndex);
+		dbugLog(_FLW, "t:%d exiting with null player", teulIndex);
 		return 0;
 	}
 
 	dbugLog(_FLI, "t:%d p:%u c:%s personaExit", teulIndex, psn->dispatch().m_customerID, psn->dispatch().m_callsign);
 
 	Player* const player = (Player*)(psn->localInfo);
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		dbugLog(_FLA,"t:%d p:%u c:%s exiting, no persona information found"
 					, teulIndex
@@ -719,7 +719,7 @@ static SINT32
 _personaRelease(SINT32 teulIndex, PlayerStatusNode* const psn, Server::ReleaseType releaseType)
 {
 	Player* const player = (Player*)psn->localInfo;
-	if ( player == NULL )
+	if ( player == nullptr )
 		return -EINVAL;
 
 	// Make sure they're no-longer in an instance.
@@ -747,12 +747,12 @@ _personaRelease(SINT32 teulIndex, PlayerStatusNode* const psn, Server::ReleaseTy
 		player->exitFacility = nullObjID;
 
 	_releaseVehicleList(*player);
-	player->vehicle = NULL;
+	player->vehicle = nullptr;
 
 	player->state = Player::_FREE;
 
 	if ( player->teulIndex() >= 0 )
-		teulSetPersonaData(player->teulIndex(), NULL);
+		teulSetPersonaData(player->teulIndex(), nullptr);
 
 	if ( _personaCounter <= 0)
 	{
@@ -762,7 +762,7 @@ _personaRelease(SINT32 teulIndex, PlayerStatusNode* const psn, Server::ReleaseTy
 	else
 		_personaCounter--;
 
-	psn->localInfo = NULL;
+	psn->localInfo = nullptr;
 
 	delete player;
 
@@ -981,7 +981,7 @@ hostGiveCaptureScoreToPlayers(const FULL_OBJ_ID& buildingID, WWII_SIDE forSide)
 		for ( auto pit = veh->players().begin(); pit != veh->players().end(); ++pit )
 		{
 			Player* const player = *pit;
-			if ( player->active == false || player->exitState == PEXIT_DEAD || player->teulIndex() < 0 || player->vehicle == NULL )
+			if ( player->active == false || player->exitState == PEXIT_DEAD || player->teulIndex() < 0 || player->vehicle == nullptr )
 			{
 				continue;
 			}
@@ -1007,7 +1007,7 @@ _scoreGuarding(Player* const player)
 	if ( player->vehicle->m_guardingSince <= 0 )
 		return;
 
-	if ( player->vehicle->m_inBuildingObject != NULL )
+	if ( player->vehicle->m_inBuildingObject != nullptr )
 	{
 		const SINT32 seconds = (UINT32)((teulClock64 - player->vehicle->m_guardingSince) / 1000ULL);
 		if ( seconds > (host_config.score.guardPointPer_m * 60) )
@@ -1034,7 +1034,7 @@ _isGuarding(Player* const player)
 		return false;
 
 	HostVehicle* const vehicle = player->vehicle;
-	assert( vehicle != NULL );
+	assert( vehicle != nullptr );
 
 	const WWII_SIDE& playerSide = player->side();
 
@@ -1043,7 +1043,7 @@ _isGuarding(Player* const player)
 		return false;
 
 	const ObjectStruct* building = vehicle->m_inBuildingObject;
-	if ( building == NULL || building->facility == NULL || building->facility->canBeCaptured() == false )
+	if ( building == nullptr || building->facility == nullptr || building->facility->canBeCaptured() == false )
 		return false;
 
 	// Not in an enemy spawnable building.
@@ -1112,7 +1112,7 @@ HostVehicle::setInBuilding(const FULL_OBJ_ID& newBuildingID)
 		if ( isRemote() == false )
 		{
 			static TeulTimeMS nextBlip = 0ULL;
-			if ( m_inBuildingObject == NULL )
+			if ( m_inBuildingObject == nullptr )
 			{
 				if ( nextBlip <= teulClock64 )
 				{
@@ -1127,7 +1127,7 @@ HostVehicle::setInBuilding(const FULL_OBJ_ID& newBuildingID)
 
 			// Update the relevant occupancy map for where they arrived
 			Occupancy& occupancy = occupancyMap[m_inBuilding];
-			if ( occupancy.object == NULL && m_inBuildingObject != NULL )
+			if ( occupancy.object == nullptr && m_inBuildingObject != nullptr )
 				occupancy.object = m_inBuildingObject;
 			occupancy.occupants.insert(this);
 		}
@@ -1135,7 +1135,7 @@ HostVehicle::setInBuilding(const FULL_OBJ_ID& newBuildingID)
 	else
 	{
 		m_inBuilding = 0;
-		m_inBuildingObject = NULL;
+		m_inBuildingObject = nullptr;
 		m_enteredBuilding = teulClock64;
 	}
 }
@@ -1146,7 +1146,7 @@ HostVehicle::setInBuilding(const FULL_OBJ_ID& newBuildingID)
 void
 Player::changeFPSBuilding(const FULL_OBJ_ID& newBuildingID, bool inCaptureBuilding)
 {
-	if ( vehicle == NULL )
+	if ( vehicle == nullptr )
 	{
 		m_fpsBuildingID = nullObjID;
 		return;
@@ -1209,7 +1209,7 @@ _personaXfer(Player& player, PLAYER_EXIT& pe)
 	try
 	{
 		PlayerStatusNode* psn = ServerInterface::PlayerStatusNodeByPlayerID(player.playerID());
-		if ( psn == NULL )
+		if ( psn == nullptr )
 			throw std::domain_error("No data for this player");
 
 		serverReleasePlayer(player.teulIndex(), player.playerID(), player.OTP(), pe.exitCode, Server::RELEASE_REDIRECTED);
@@ -1236,7 +1236,7 @@ static void
 _badTicks(const SINT32 teulIndex, wwiiPlayer* const player_, const UCHAR* const data)
 {
 	auto* const sample = (Teul::TickSample*)(data);
-	if ( player_ == NULL )
+	if ( player_ == nullptr )
 	{
 		dbugLog(_FLW, "t:%d clock drift host:%llu, client:%llu, delta:%lld, ratio:%.6g", teulIndex, sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
 		return;
@@ -1244,7 +1244,7 @@ _badTicks(const SINT32 teulIndex, wwiiPlayer* const player_, const UCHAR* const 
 
 	Player& player = *static_cast<Player*>(player_);
 
-	if ( player.m_antiHack == NULL )
+	if ( player.m_antiHack == nullptr )
 		player.m_antiHack = new AntiHack;
 
 	auto& ah = *player.m_antiHack;
@@ -1280,7 +1280,7 @@ _personaErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 	// A clean log out by a player should finish with the
 	// door closing: it's actually healthy for a connection
 	// to close with no player connection.
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		if ( error == ENOTCONN )
 		{
@@ -1351,7 +1351,7 @@ _illegalPacketSequence(SINT32 teulIndex)
 		return;
 
 	Player* persona = (Player*)ServerInterface::LookupByTeulIndex(teulIndex);
-	if ( persona == NULL )
+	if ( persona == nullptr )
 		return;
 
 	// Give them a grace period after reconnecting
@@ -1410,7 +1410,7 @@ _updaterErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 
 		wwiiPlayer* player = ServerInterface::LookupByTeulIndex(teulIndex);
 
-		if ( player != NULL )
+		if ( player != nullptr )
 		{
 			dbugLog(_FLI, "t:%d p:%u c:%s connection closed, %d connections remaining"
 						, teulIndex
@@ -1586,17 +1586,17 @@ _expireVehicles()
 	size_t removals = 64;
 
 	// Get a list of vehicles to remove.
-	for ( auto it = _vehicleHash.begin(); it != _vehicleHash.end(); )
+	for ( auto it = _vehicleHash.begin(), end = _vehicleHash.end(); it != end;)
 	{
 		HostVehicle* const vehicle = it->second;
 		++it;
 
-		if ( !vehicle->isReallyActive() )
+		if ( PN_UNLIKELY(!vehicle->isReallyActive()) )
 			continue;
 
-		if ( vehicle->lastRX > remoteCutoff )
+		if ( PN_LIKELY(vehicle->lastRX > remoteCutoff) )
 			continue;
-		if ( vehicle->isRemote() == false && vehicle->lastRX > localCutoff )
+		if ( PN_LIKELY(vehicle->isRemote() == false && vehicle->lastRX > localCutoff) )
 			continue;
 
 		dbugLog(_FLD, "v:%u c:%s forcing exit due to lack of updates", vehicle->index, vehicle->callsign());
@@ -1622,7 +1622,7 @@ HostVehicle::forceExit()
 		for ( auto it = myPlayers.begin(); it != myPlayers.end(); ++it )
 		{
 			Player* const player = *(it);
-			if ( player != NULL )
+			if ( player != nullptr )
 				_exitPlayer(*player);
 		}
 
@@ -1672,7 +1672,7 @@ static SINT32
 _personaActivate(SINT32 teulIndex , PlayerStatusNode* psn)
 {
 	Player* player = (Player*)psn->localInfo;
-	if ( player == NULL)
+	if ( PN_UNLIKELY(player == nullptr) )
 	{
 		dbugLog(_FLA, "t:%d p:%u c:%s couldnt find persona to activate"
 						, teulIndex
@@ -1682,8 +1682,8 @@ _personaActivate(SINT32 teulIndex , PlayerStatusNode* psn)
 		return -EINVAL;
 	}
 
-	if ( player->teulIndex() >= 0)
-		teulSetPersonaData(player->teulIndex(), NULL);
+	if ( player->teulIndex() >= 0 )
+		teulSetPersonaData(player->teulIndex(), nullptr);
 
 	dbugLog(_FLN,"t:%d p:%u c:%s login#%u [formerly %d]"
 					, teulIndex, psn->dispatch().m_customerID, psn->dispatch().m_callsign
@@ -1713,7 +1713,7 @@ _personaActivate(SINT32 teulIndex , PlayerStatusNode* psn)
 	activate.port = WWII::Net::Ports::CellHost;
 
 	const SINT32 retval = wwiiSendActivate(teulIndex, &activate);
-	if ( retval < 0 )
+	if ( PN_UNLIKELY(retval < 0) )
 	{
 		dbugLog(_FLW, "t:%d p:%u c:%s wwiiSendActivate failed: %d"
 						, teulIndex
@@ -1723,7 +1723,7 @@ _personaActivate(SINT32 teulIndex , PlayerStatusNode* psn)
 						);
 	}
 
-	if ( player->vehicle && player->vehicle->isRemote() )
+	if ( PN_UNLIKELY(player->vehicle && player->vehicle->isRemote()) )
 	{
 		dbugLog(_FLA, "t:%d p:%u c:%s seems to have REMOTE vehicle %u"
 						, teulIndex
@@ -1732,7 +1732,7 @@ _personaActivate(SINT32 teulIndex , PlayerStatusNode* psn)
 						, player->vehicle->index);
 	}
 
-	if ( player->vehicle != NULL )
+	if ( player->vehicle != nullptr )
 		player->vehicle->updateGrid();
 
 	return 0;
@@ -1780,12 +1780,12 @@ _writeEventCounters()
 bool
 HostVehicle::hasConnectedPlayers() const
 {
-	if ( players().empty() || crew <= 0 )
+	if ( PN_UNLIKELY(players().empty() || crew <= 0) )
 		return false;
 
 	for ( auto it = players().begin(); it != players().end(); ++it )
 	{
-		if ( (*it)->teulIndex() >= 0 )
+		if ( PN_LIKELY((*it)->teulIndex() >= 0) )
 			return true;
 	}
 
@@ -1820,25 +1820,25 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 	bool reportedLagging = false;
 #endif
 	TIMER_START
-	for ( auto it = _vehicleHash.begin(); it != _vehicleHash.end(); )
+	for (auto it = _vehicleHash.begin(), end = _vehicleHash.end(); it != end;)
 	{
 		HostVehicle* const vehicle = it->second;
 		++it;
 
 #ifdef DEV_BUILD
-		assert( vehicle != NULL );
+		assert( vehicle != nullptr );
 #endif
 
 		if ( (vehicle->isRemote() == true) | (vehicle->m_nextUpdateClock > teulClock64) )
 			continue;
 
 		unsigned int fail = 0;
-		if ( (vehicle->index == 0) | (vehicle->isActive() == false) | (vehicle->m_holder == NULL) )
+		if ( PN_UNLIKELY((vehicle->index == 0) | (vehicle->isActive() == false) | (vehicle->m_holder == nullptr)) )
 			++fail;
-		else if ( vehicle->hasConnectedPlayers() == false )
+		else if ( PN_UNLIKELY(vehicle->hasConnectedPlayers() == false) )
 			++fail;
 
-		if ( fail == 0 )
+		if ( PN_LIKELY(fail == 0) )
 		{
 #ifdef BETA_RELEASE
 			if ( (!reportedLagging) & (vehicle->m_nextUpdateClock < lowend) )
@@ -1857,7 +1857,7 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 	}
 	TIMER_STOP("gvwfu_sel");
 
-	if ( vehicles.empty() )
+	if ( PN_UNLIKELY(vehicles.empty()) )
 		return;
 
 	if ( vehicles.size() > maxVehicles )
@@ -1875,7 +1875,7 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 
 	TIMER_START
 	Teul::Packet outgoing(0, Chat::CallbackX, Chat::HOST_LOCALITY_UPDATES_Y);
-	for ( auto it = vehicles.begin(); it != vehicles.end(); ++it )
+	for ( auto it = vehicles.begin(), end = vehicles.end(); it != end; ++it )
 	{
 		HostVehicle* const vehicle = (*it);
 		vehicle->setNextUpdate(vehicle->m_updateInterval);
@@ -1897,7 +1897,7 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 static inline bool
 _checkPlayerEjectionCountdown(Player* persona)
 {
-	if ( persona->m_ejectionCountdown <= 0 )
+	if ( PN_LIKELY(persona->m_ejectionCountdown <= 0) )
 		return false;
 
 	if ( --persona->m_ejectionCountdown > 0 )
@@ -1922,7 +1922,7 @@ _checkPlayerEjectionCountdown(Player* persona)
 static inline bool
 _checkPlayerTimeToLive(Player* player)
 {
-	if ( player->m_timeToLive <= 0 )
+	if ( PN_LIKELY(player->m_timeToLive <= 0) )
 		return false;
 	player->m_timeToLive--;
 	if ( player->m_timeToLive > 0 )
@@ -1949,9 +1949,9 @@ _starvedUpdates(Player* player, HostVehicle* vehicle, bool despawnTimerActive)
 #endif
 	if ( vehicle->isReallyActive() == false )
 		return false;
-	if ( player->isPlaynet() )
+	if ( PN_UNLIKELY(player->isPlaynet()) )
 		return false;
-	if ( despawnTimerActive )
+	if ( PN_UNLIKELY(despawnTimerActive) )
 		return false;
 
 	++player->m_updatesSinceRX;
@@ -1961,7 +1961,7 @@ _starvedUpdates(Player* player, HostVehicle* vehicle, bool despawnTimerActive)
 #endif
 
 	const UINT32 maxUpdatesBetweenRxs = (FE_UPDATES_PER_SECOND * host_config.update.starvationLimit_s);
-	if ( player->m_updatesSinceRX > maxUpdatesBetweenRxs )
+	if ( PN_UNLIKELY(player->m_updatesSinceRX > maxUpdatesBetweenRxs) )
 	{
 		commForcePlayerExit(*player, "*too few updates from client", true);
 		return true;
@@ -2029,9 +2029,9 @@ _sendNextUpdate(HostVehicle* const vehicle)
 
 	VEHICLE_HOLDER* vehHolder = vehicle->m_holder;
 #ifdef DEV_BUILD
-	if ( vehHolder == NULL )
+	if ( PN_UNLIKELY(vehHolder == nullptr) )
 	{
-		dbugLog(_FLA, "v:%u vehicle has NULL holder", vehicle->index);
+		dbugLog(_FLA, "v:%u vehicle has null holder", vehicle->index);
 		return false;
 	}
 #endif
@@ -2084,9 +2084,9 @@ _sendNextUpdate(HostVehicle* const vehicle)
 	// Pack the world update into "out.message"; if this is a multi-crew
 	// vehicle, this will save us having to pack it for each player.
 	//TIMER_START
-	SINT32 packResult = updtPackWORLD_UPDATE(TEUL_PACK, NULL, 0, &wu, 0);
+	const SINT32 packResult = updtPackWORLD_UPDATE(TEUL_PACK, nullptr, 0, &wu, 0);
 //	TIMER_STOP("pack");
-	if ( packResult < 0)
+	if ( PN_UNLIKELY(packResult < 0) )
 	{
 		dbugLog(_FLA, "v:%u c:%s pack world update failed: %d"
 						, vehicle->index, vehicle->callsign()
@@ -2114,31 +2114,30 @@ _sendNextUpdate(HostVehicle* const vehicle)
 
 	//send to all players on this vehicle
 	bool result = false;
-	PLAYER_LIST::iterator it = vehicle->players().begin();
-	while ( it != vehicle->players().end() )
+	for (auto it = vehicle->players().begin(), end = vehicle->players().end(); it != end; )
 	{
 		Player* const player = *it;
 		++it;
 
-		if ( !player->active || player->teulIndex() < 0)
+		if ( PN_UNLIKELY(!player->active || player->teulIndex() < 0) )
 			continue;
 
 //		TIMER_START
-		if ( _checkPlayerTimeToLive(player) )
+		if ( PN_UNLIKELY(_checkPlayerTimeToLive(player)) )
 			continue;
 //		TIMER_STOP("plyr:chkttl");
 
 //		TIMER_START
-		if ( _checkPlayerEjectionCountdown(player) )
+		if ( PN_UNLIKELY(_checkPlayerEjectionCountdown(player)) )
 			continue;
 //		TIMER_STOP("plyr:ejectctr");
 
 //		TIMER_START
-		if ( _starvedUpdates(player, vehicle, vehHolder->vehicle->m_despawnTimerActive) )
+		if ( PN_UNLIKELY(_starvedUpdates(player, vehicle, vehHolder->vehicle->m_despawnTimerActive)) )
 			continue;
 //		TIMER_STOP("plyr:starved");
 
-		if ( player->m_updatesSinceRX > updatesBehind )
+		if ( PN_UNLIKELY(player->m_updatesSinceRX > updatesBehind) )
 			updatesBehind = player->m_updatesSinceRX;
 
 #ifdef HEAVY_DEBUG
@@ -2251,7 +2250,7 @@ _runHost(void)
 
 		// Make sure that the cell host is in accepting mode.
 		///TODO: Kinda retarded to keep doing this.
-		if ( !g_accepting && !g_serverReserved )
+		if ( PN_UNLIKELY(!g_accepting && !g_serverReserved) )
 		{
 			g_accepting = true;
 			Server::myServerInfo.stats.m_maxPlayers = cv_maxCellPlayers.GetUint32();
@@ -2344,7 +2343,7 @@ _runHost(void)
 
 		// Now generate world updates for all of the vehicles we selected.
 		TIMER_START
-		for ( auto it = nextVehicles.begin(); it != nextVehicles.end(); ++it )
+		for ( auto it = nextVehicles.begin(), end = nextVehicles.end(); it != end; ++it )
 		{
 			HostVehicle* const vehicle = *it;
 
@@ -2359,7 +2358,7 @@ _runHost(void)
 		TIMER_STOP("updts");
 		TIMER_REPORT(250)
 
-		if ( nextVehicles.size() >= _MIN_UPDATES )
+		if ( PN_UNLIKELY(nextVehicles.size() >= _MIN_UPDATES) )
 		{
 			if ( teulClock64 > updateCycleTimeout )
 			{
@@ -2468,7 +2467,7 @@ hostRemoveRemoteVehicle(UINT32 serial, PLAYER_EXIT_CODE exitCode)
 {
 	dbugLog(_FLD, "v:%u attempting release of remote vehicle", serial);
 	HostVehicle* const vehicle = hostFindVehicleLocal(serial);
-	if ( vehicle == NULL )
+	if ( vehicle == nullptr )
 	{
 		dbugLog(_FLA, "v:%u no such remote vehicle to remove???", serial);
 		return;
@@ -2490,7 +2489,7 @@ void
 hostSmiteCustomer(const playerid_t playerID)
 {
 	Player* const player = (Player*)ServerInterface::LookupByPlayerID(playerID);
-	if ( player == NULL )
+	if ( player == nullptr )
 		return;
 
 	dbugLog(_FLN, "t:%d p:%u c:%s Smiting customer"
@@ -2513,9 +2512,9 @@ hostSmiteCustomer(const playerid_t playerID)
 static void
 _releaseVehicle(VEHICLE_HOLDER* const vehicleHold, FULL_OBJ_ID toFacility)
 {
-	if (vehicleHold == NULL)
+	if (PN_UNLIKELY(vehicleHold == nullptr))
 	{
-		dbugLog(_FLAS,"_releaseVehicle: ERROR vehicleHold = NULL!!");
+		dbugLog(_FLAS,"_releaseVehicle: ERROR vehicleHold = null!!");
 		return;
 	}
 
@@ -2598,7 +2597,7 @@ static void
 _exitLimboVehicle(HostVehicle* vehicle)
 {
 	dbugLog(_FLN, "exitLimboVehicle(%d)", vehicle->index);
-	if (vehicle == NULL)
+	if (vehicle == nullptr)
 	{
 		dbugLog(_FLA,"_exitLimboVehicle: vehicle is null");
 		return;
@@ -2630,7 +2629,7 @@ static void
 _exitVehicle(Player& player)
 {
 	HostVehicle* const vehicle = player.vehicle;
-	if ( vehicle == NULL )
+	if ( vehicle == nullptr )
 		return;
 
 	_extractPlayerFromVehiclesList(player, *vehicle);
@@ -2714,7 +2713,7 @@ hostForceVehExit(HostVehicle* vehicle)
 static SINT32
 _releaseVehicleList(Player& player)
 {
-	if ( player.vehicle == NULL )
+	if ( player.vehicle == nullptr )
 		return 0;
 
 	player.changeFPSBuilding(nullObjID, false);
@@ -2728,16 +2727,16 @@ _releaseVehicleList(Player& player)
 	else
 	{
 		HostVehicle* const vehicle = hostFindVehicleLocal(index);
-		if ( vehicle != NULL && vehicle != player.vehicle )
+		if ( vehicle != nullptr && vehicle != player.vehicle )
 		{
 			dbugLog(_FLA, "t:%d p:%u c:%s player.vehicle and hostFindVehicleLocal disagree"
 							, player.teulIndex(), player.playerID(), player.callsign());
 		}
-		else if ( vehicle != NULL )
+		else if ( vehicle != nullptr )
 			_exitVehicle(player);
 	}
 
-	player.vehicle = NULL;
+	player.vehicle = nullptr;
 
 	return 0;
 }
@@ -2773,7 +2772,7 @@ Player::processUpdateValues(UINT32 updateNo, UINT32 prime)
 	{
 		if ( m_hasSentUpdate )
 		{
-			const char* issue = NULL;
+			const char* issue = nullptr;
 			if ( prime > m_updatePrime )
 				issue = "tampered";
 			else if ( prime <= MIN_UPDATE_PRIME - UPDATE_PRIME_DEC )
@@ -2999,11 +2998,11 @@ main(const int argc, const char* const argv[])
 		dbugLog(_FLM, "Clustering enabled: Broadcast network %s specified.", cv_baseUpdtAddress.GetString());
 
 		const UINT32 updateBcastHost = cv_baseUpdtAddress.GetUint32() | 0x000000ff;
-		updateBcastRecv = teulOpenSend(updateBcastHost, WWII::Net::Ports::PrivateBcast, NULL, 0, PROTOCOL_UDB, NULL);
+		updateBcastRecv = teulOpenSend(updateBcastHost, WWII::Net::Ports::PrivateBcast, nullptr, 0, PROTOCOL_UDB, nullptr);
 		dbugLog(_FLN, "t:%d updateBcastRecv:%s", updateBcastRecv, teulGetAddress(updateBcastHost));
 
 		const UINT32 updateDirectHost = cv_baseUpdtAddress.GetUint32() | (Server::localHost & 0x000000ff);
-		updateBcastSend = teulOpenSend(updateDirectHost, WWII::Net::Ports::PrivateBcast, NULL, 0, PROTOCOL_UDB, NULL);
+		updateBcastSend = teulOpenSend(updateDirectHost, WWII::Net::Ports::PrivateBcast, nullptr, 0, PROTOCOL_UDB, nullptr);
 		dbugLog(_FLN, "t:%d updateBcastSend:%s", updateBcastSend, teulGetAddress(updateDirectHost));
 	}
 	else
@@ -3026,7 +3025,7 @@ main(const int argc, const char* const argv[])
 				, _personaRelease
 				, _personaActivate
 				, _personaExit
-				, NULL
+				, nullptr
 				, _personaErrorFunction);
 	ABORT_IF(initResult == -EINVAL);
 
@@ -3041,7 +3040,7 @@ main(const int argc, const char* const argv[])
 		teulUpdateTransport(25);
 
 		Server::ServerInfo* const server = Server::ServerInfo::GetBest(STRAT_HOST, true);
-		if (server != NULL)
+		if (server != nullptr)
 		{
 			_stratHost = Server::BroadcastMaskAddress(server->stats.address);
 		}
