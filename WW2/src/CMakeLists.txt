@@ -662,6 +662,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 						weap/weapSpecPacker.h
 						wwii/wwiiFullObjIDPacker.h
 							teul/teulNetTimeMSPacker.h
+			host/hostPlayer.h
 		host/hostFraming.cpp
 			host/hostFraming.h
 		host/hostGrid.cpp
