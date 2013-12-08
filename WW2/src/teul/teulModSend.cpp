@@ -33,6 +33,10 @@ UINT32 totalPacketsXfer;
 // Maximum send buffer of 256Kb.
 static const SINT32 MaxSendBufferSize = 256 * 1024;	// 256kb
 
+#include "mem/memPool.h"
+
+static Mem::Pool<Teul::Packet, 16 * 4096 / sizeof(Teul::Packet)> s_delayedPackets;
+
 //////////////////////////////////////////////////////////////////////
 
 void teulInitSend()
@@ -44,6 +48,7 @@ void teulInitSend()
 
 void teulCleanupSend()
 {
+	s_delayedPackets.Cleanup();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -179,7 +184,7 @@ ENDPOINT::sendPacket(Teul::Packet& packet)
 		// Partial or blocked send falls thru and queues the remainder.
 	}
 
-	Teul::Packet* const copy = new Teul::Packet(std::move(packet));
+	Teul::Packet* const copy = s_delayedPackets.New(std::move(packet));
 
 	m_impl->m_sendQueue.push_back(copy);
 
@@ -215,8 +220,8 @@ ENDPOINT::pushSendQueue()
 		if ( packet->sentBytes() >= packet->packetSizeBytes() )
 		{
 			// We appear to have sent the data.
-			delete packet;
 			m_impl->m_sendQueue.erase(m_impl->m_sendQueue.begin());
+			s_delayedPackets.Delete(packet);
 		}
 	}
 
