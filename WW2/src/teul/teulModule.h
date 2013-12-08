@@ -30,5 +30,3 @@ extern void teulMRecvUpdatePoll(ENDPOINT* endpoint);
 extern void teulMRecvRemoveFromPoll(ENDPOINT* endpoint);
 
 extern UINT32 teulElapsedTotal(UINT32 newTotal, UINT32 oldTotal);
-
-extern void teulModRecvInit(void);

@@ -338,9 +338,6 @@
     <ClCompile Include="..\..\..\src\teul\teulCallback.cpp">
       <OpenMPSupport Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">false</OpenMPSupport>
     </ClCompile>
-    <ClCompile Include="..\..\..\src\teul\teulDatagramPool.cpp">
-      <OpenMPSupport Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">false</OpenMPSupport>
-    </ClCompile>
     <ClCompile Include="..\..\..\src\teul\teulEndpoint.cpp">
       <OpenMPSupport Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">false</OpenMPSupport>
     </ClCompile>
@@ -380,9 +377,9 @@
     <ClInclude Include="..\..\..\src\dbug\dbugWErrno.h" />
     <ClInclude Include="..\..\..\src\include\emem.h" />
     <ClInclude Include="..\..\..\src\include\precompile_includes.h" />
+    <ClInclude Include="..\..\..\src\mem\memPool.h" />
     <ClInclude Include="..\..\..\src\teul\teulCallbackStruct.h" />
     <ClInclude Include="..\..\..\src\teul\teulClosingEnums.h" />
-    <ClInclude Include="..\..\..\src\teul\teulDatagram.h" />
     <ClInclude Include="..\..\..\src\teul\teulEndpointIdleList.h" />
     <ClInclude Include="..\..\..\src\teul\teulEndpointImpl.h" />
     <ClInclude Include="..\..\..\src\teul\teulExceptions.h" />
@@ -407,11 +404,9 @@
     <ClInclude Include="..\..\..\src\teul\teulConnection.h" />
     <ClInclude Include="..\..\..\src\teul\teulConnectionInstruction.h" />
     <ClInclude Include="..\..\..\src\teul\teulConstants.h" />
-    <ClInclude Include="..\..\..\src\teul\teulDatagramPool.h" />
     <ClInclude Include="..\..\..\src\teul\teulEndpoint.h" />
     <ClInclude Include="..\..\..\src\teul\teulEndpointDefs.h" />
     <ClInclude Include="..\..\..\src\teul\teulEnums.h" />
-    <ClInclude Include="..\..\..\src\teul\teulFresConstants.h" />
     <ClInclude Include="..\..\..\src\teul\teulHousekeeper.h" />
     <ClInclude Include="..\..\..\src\teul\teulKit.h" />
     <ClInclude Include="..\..\..\src\teul\teulModCalls.h" />

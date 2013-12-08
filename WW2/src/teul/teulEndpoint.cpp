@@ -33,7 +33,6 @@
 #include "include/inplace_vector.h"
 #include <queue>
 #include "teul/teulBasic.h"
-#include "teul/teulDatagramPool.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulEndpointIdleList.h"
 #include "teul/teulEndpointImpl.h"
@@ -66,6 +65,8 @@ namespace Teul
 static ENDPOINT_LIST _freeEndpoints;
 
 static ERROR_FUNCTION* _endpointErrorFn;
+
+extern void teulReleaseDatagram(struct DATA_GRAM*);
 
 void
 teulCloseAllEndpoints(const SINT32 errorCode)
@@ -344,20 +345,6 @@ teulKillDeadEndpoints(void)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Delete any datagrams waiting on a given endpoint's queue.
-
-static void
-_freeDatagramQueue(std::vector<DATA_GRAM*>& queue)
-{
-	while ( queue.empty() == false )
-	{
-		DATA_GRAM* gram = queue.front();
-		teulReleaseDatagram(gram);
-		queue.erase(queue.begin());
-	}
-}
-
-//////////////////////////////////////////////////////////////////////
 // Release the current datagram.
 
 void
@@ -387,7 +374,6 @@ teulFreeEndpoint(ENDPOINT* inEndpoint)
 
 	inEndpoint->releaseDatagram();
 
-	_freeDatagramQueue(inEndpoint->m_impl->recvQueue);
 	inEndpoint->m_impl->Reset();
 
 //	dbugLog(_FLD, "pushing endpoint %p to freelist", inEndpoint);
@@ -442,7 +428,6 @@ teulCleanupEndpoints(void)
 		{
 			ENDPOINT& endpoint = _endpoints[i];
 
-			_freeDatagramQueue(endpoint.m_impl->recvQueue);
 			endpoint.m_impl->Reset();
 
 			endpoint.releaseDatagram();
@@ -780,7 +765,9 @@ EndpointImpl::Reset()
 	recvTag = 0;
 	sentTag = 0;
 	assert( m_curDatagram == nullptr );
-	assert( recvQueue.empty() );
+	for (auto it = recvQueue.begin(), end = recvQueue.end(); it != end; ++it)
+		teulReleaseDatagram(*it);
+	recvQueue.clear();
 	while ( m_sendQueue.empty() == false )
 	{
 		FreeFirstPacketInSendQueue();

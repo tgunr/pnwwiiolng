@@ -12,8 +12,6 @@
 #include "server/serverInterfaceDescription.h"
 #include "teul/teulBasic.h"
 #include "teul/teulCallbackStruct.h"
-#include "teul/teulDatagram.h"
-#include "teul/teulDatagramPool.h"
 #include "teul/teulEndpointIdleList.h"
 #include "teul/teulModule.h"
 #include "teul/teulPackers.h"
@@ -126,7 +124,84 @@ static void _pollSet(void);
 
 static const socklen_t SockAddrLen = sizeof(struct sockaddr_in);
 
-void teulModRecvInit(void)
+struct DATA_GRAM
+{
+	struct sockaddr_in	sockAddress;
+	Teul::PacketHeader*	contents;	//!< Points to the beginning of the packet data.
+	UINT32				m_size;		//!< Size of the entire object.
+};
+
+#include <stack>
+#include <array>
+
+static const size_t NUM_DATAGRAM_SIZES = 16;
+static const size_t DATAGRAM_ROUNDING = 1024;	// round datagram sizes up to this.
+static std::array<std::stack<DATA_GRAM*>, NUM_DATAGRAM_SIZES> s_freeDatagrams;
+
+//////////////////////////////////////////////////////////////////////
+// Given a requested data size, work out the best buffer size for it
+
+template<size_t roundingValue>
+static inline size_t _roundDatagramSize(UINT32 size)
+{
+	static_assert(roundingValue && (roundingValue & (roundingValue - 1)) == 0, "roundingValue must be a power of 2");
+	return ((size + sizeof(DATA_GRAM)) + (roundingValue - 1)) & ~(roundingValue - 1);
+}
+
+static DATA_GRAM* _getNextDatagram(size_t size)
+{
+	size_t allocSize;
+	// For sizes we are going to pool, use regular 1k rounding.
+	if (PN_LIKELY(size <= s_freeDatagrams.size() * DATAGRAM_ROUNDING))
+	{
+		allocSize = _roundDatagramSize<DATAGRAM_ROUNDING>(size);
+		const size_t bucketNo = (allocSize / DATAGRAM_ROUNDING) - 1;
+		auto& bucket = s_freeDatagrams[bucketNo];
+		if (bucket.empty() == false)
+		{
+			DATA_GRAM* gram = bucket.top();
+			bucket.pop();
+			return gram;
+		}
+	}
+	else
+	{
+		// use more aggressive, 4k (page size) rounding for big packets.
+		allocSize = _roundDatagramSize<DATAGRAM_ROUNDING * 4>(size);
+	}
+	return static_cast<DATA_GRAM*>(memCalloc(1, allocSize));
+}
+
+DATA_GRAM *
+teulGetDatagram(const UINT32 size)
+{
+	DATA_GRAM* gram = _getNextDatagram(size);
+	// Point contents to memory immediately AFTER the gram header.
+	gram->contents = (Teul::PacketHeader*)(gram + 1);
+	gram->m_size = size;		// The actual requested size.
+
+	return gram;
+}
+
+//////////////////////////////////////////////////////////////////////
+// Release a datagram - if it fits into the cache buckets, put it there.
+
+void
+teulReleaseDatagram(DATA_GRAM* gram)
+{
+	size_t allocSize = _roundDatagramSize<DATAGRAM_ROUNDING>(gram->m_size);
+	if (PN_LIKELY(allocSize) <= s_freeDatagrams.size() * DATAGRAM_ROUNDING)
+		s_freeDatagrams[(allocSize / DATAGRAM_ROUNDING) - 1].push(gram);
+	else
+	{
+		memFree(gram);
+	}
+}
+
+//////////////////////////////////////////////////////////////////////
+// Initialize module
+
+void teulInitModRecv(void)
 {
 #if defined(NIX_VERSION)
 	dbugLog(_FLI, "FD_SETSIZE = %u, sizeof(fd_set) = %" PRSizeT ", MAX_POLL_FD = %" PRSizeT, FD_SETSIZE, sizeof(fd_set), POLL_STRUCT::CAPACITY);
@@ -143,6 +218,20 @@ void teulModRecvInit(void)
 
 	_lastIdle = teulClock64;
 	lastTeulUpdate = teulClock64;
+}
+
+void teulCleanupModRecv()
+{
+	for (size_t i = 0; i < s_freeDatagrams.size(); ++i)
+	{
+		auto& bucket = s_freeDatagrams[i];
+		dbugLog(_FLN, "Freeing %" PRSizeT "Kb DATA_GRAMs: %" PRSizeT "", (i * DATAGRAM_ROUNDING) / 1024, bucket.size());
+		while (bucket.empty() == false)
+		{
+			memFree(bucket.top());
+			bucket.pop();
+		}
+	}
 }
 
 static void

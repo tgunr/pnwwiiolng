@@ -16,7 +16,6 @@
 #include "teul/teulBasic.h"
 #include "teul/teulCallback.h"
 #include "teul/teulCallbackStruct.h"
-#include "teul/teulDatagramPool.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulModule.h"
 #include "teul/teulTime.h"
@@ -530,8 +529,6 @@ void teulCloseTransport(void)
 	dbugClose();
 
 	teulFreeAllCallbacks();
-
-	teulFreeDatagramPool();
 
 	_transportInited = false;
 }

@@ -126,10 +126,9 @@ add_library (teulserver
 		str/stringLib.h
 	teul/teulCallback.cpp
 		teul/teulCallback.h
-	teul/teulDatagramPool.cpp
-		teul/teulDatagramPool.h
 	teul/teulEndpoint.cpp
 		teul/teulEndpoint.h
+		teul/teulEndpointImpl.h
 	teul/teulMicroWebServer.cpp
 		teul/teulMicroWebServer.h
 	teul/teulModCalls.cpp

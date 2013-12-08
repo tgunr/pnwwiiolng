@@ -206,7 +206,10 @@ SINT32 teulModStartup(ERROR_FUNCTION* errFnPtr)
 	dbugWrite(_FLN,"intitializing teul module verion: %x",Teul::VersionString);
 
 	extern void teulInitSend();
+	extern void teulInitModRecv();
+
 	teulInitSend();
+	teulInitModRecv();
 
 	teulInitEndpoints(errFnPtr);
 
@@ -218,8 +221,6 @@ SINT32 teulModStartup(ERROR_FUNCTION* errFnPtr)
 #if platOS == OS_LINUX || platBuild == TEUL_SERVER
 	_getHostIPAddresses();
 #endif
-
-	teulModRecvInit();
 
 	return 0;
 }
@@ -271,9 +272,11 @@ teulModShutdown(void)
 	// Free up the memory the endpoints are using
 	teulCleanupEndpoints();
 
-	// Shutdown the send subystem
+	// Shutdown the Mod subsystems
 	extern void teulCleanupSend();
 	teulCleanupSend();
+	extern void teulCleanupModRecv();
+	teulCleanupModRecv();
 
 #if platOS == OS_WIN32
 	WSACleanup( );
