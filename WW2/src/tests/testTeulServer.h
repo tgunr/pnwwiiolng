@@ -139,6 +139,8 @@ struct ServerRole : public Role
 			REGISTER_SENDRECV(Role::Echo_Y, EchoPacketHeader::_send, EchoPacketHeader::_recv, s_cbEcho);
 
 			REGISTER_RECEIVEOBJ(Role::ObjTest_Y, TestObject, recvTestObject);
+
+			REGISTER_RECEIVER(Role::Spam_Y, [](ACTION_OBJECT* a) { return a->offset; });
 		END_CALLBACK_REGISTRATION
 	}
 

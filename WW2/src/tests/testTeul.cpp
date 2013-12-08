@@ -312,6 +312,7 @@ struct Role
 			teulClose(teulIndex);
 			Dprintf("Closed index %d.\n", teulIndex);
 		}
+		teulCloseTransport();
 	}
 
 	//////////////////////////////////////////////////////////////
@@ -426,6 +427,7 @@ struct Role
 	,	Unencrypted_Y
 	,	Echo_Y
 	,	ObjTest_Y
+	,	Spam_Y
 		// Callbacks we don't specifically register.
 	,	Unregistered_Y = 100	// Neither send nor receive.
 	};

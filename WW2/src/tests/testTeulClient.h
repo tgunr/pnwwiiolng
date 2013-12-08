@@ -583,6 +583,27 @@ struct ClientRole : public Role
 		teulSend(teulIndex, s_cbUnregistered, NULL);
 	}
 
+	public:
+	void TestSpam(const SINT32 teulIndex, const UINT32 numUnits)
+	{
+		if (tSendSpam.isEnabled() == false)
+			return;
+
+		Iprintf("sending %u spam messages\n", numUnits);
+
+		Teul::Packet outgoing(1024, Role::Test_X, Role::Spam_Y);
+		outgoing.setUnencrypted();
+		for (size_t i = 0; i < 1024; ++i)
+		{
+			outgoing.append(UCHAR(rand() % 255));
+		}
+
+		for (size_t i = 0; i < numUnits; ++i)
+		{
+			outgoing.send(teulIndex);
+		}
+	}
+
 	public: virtual void Run()
 	{
 		OpenConnection();
@@ -652,6 +673,9 @@ struct ClientRole : public Role
 		TestObjectMethod(secondIndex);
 
 		Delay();
+
+		TestSpam(m_teulIndex, 512);
+		TestSpam(secondIndex, 256);
 
 		Iprintf("Closing second connection.\n");
 		teulClose(secondIndex);
