@@ -40,6 +40,8 @@ class Packet
 	public: Packet(const size_t payloadCapacityBytes_, const unsigned char callX_, const unsigned char callY_);
 	//! Default/receive constructor.
 	public: Packet();
+	//! Move constructor
+	public: Packet(Packet&& moveRef);
 	//! Destructor.
 	public: ~Packet();
 
@@ -48,9 +50,6 @@ class Packet
 
 	//! Copy operator.
 	public: Packet& operator = (const Packet& rhs);
-
-	//! Transfer data from one packet to another (copy-avoiding).
-	public: void stealContentsFrom(Packet& rhs_);
 
 public:
 	enum { DefaultLocalDataSize = 256 };

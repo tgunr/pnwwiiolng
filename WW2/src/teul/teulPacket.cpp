@@ -2,7 +2,7 @@
 
 #include "teul/teulCallbackStruct.h"	// For TEUL_CALLBACK details.
 #include "teul/teulEndpoint.h"			// For struct ENDPOINT.
-#include "teul/teulPacket.h"		// Main header.
+#include "teul/teulPacket.h"			// Main header.
 #include "teul/teulPacketHeader.h"		// For Teul::PacketHeader.
 
 //////////////////////////////////////////////////////////////////////
@@ -117,7 +117,7 @@ Teul::Packet::setPacketSizeBytes(const size_t sizeBytes_)
 void
 Teul::Packet::setPacketCapacityBytes(const size_t newCapacityBytes_)
 {
-	if ( newCapacityBytes_ > Teul::MaxAllowedPacketSize_bytes )
+	if ( PN_UNLIKELY(newCapacityBytes_ > Teul::MaxAllowedPacketSize_bytes) )
 		throw std::invalid_argument("Illegal packet size");
 
 	// No growth required.
@@ -142,9 +142,9 @@ Teul::Packet::setPacketCapacityBytes(const size_t newCapacityBytes_)
 	else
 	{
 		// changing the size of an alloc()d
-		// area of memory, sue realloc to get a larger space.
+		// area of memory, use realloc to get a larger space.
 		UCHAR* newData = (UCHAR*)memRealloc(m_data, m_capacity);
-		if ( newData != NULL )
+		if ( PN_LIKELY(newData != nullptr) )
 			m_data = newData;
 	}
 }
@@ -156,7 +156,7 @@ SINT32
 Teul::Packet::send(const SINT32 teulIndex_)
 {
 	ENDPOINT* endpoint = teulGetEndpoint(teulIndex_);
-	if ( endpoint == NULL )
+	if ( PN_UNLIKELY(endpoint == nullptr) )
 		return -EINVAL;
 
 	return send(*endpoint);
@@ -170,7 +170,7 @@ SINT32
 Teul::Packet::sendTo(const SINT32 teulIndex_, const UINT32 destAddress_, const UINT16 destPort_)
 {
 	ENDPOINT* const endpoint = teulGetEndpoint(teulIndex_);
-	if ( endpoint == NULL )
+	if ( PN_UNLIKELY(endpoint == nullptr) )
 		return -EINVAL;
 
 	return sendTo(*endpoint, destAddress_, destPort_);
@@ -203,7 +203,7 @@ Teul::Packet::sendTo(ENDPOINT& endpoint_, const UINT32 destAddress_, const UINT1
 SINT32
 Teul::Packet::receive(ENDPOINT& endpoint_)
 {
-	if ( header().packetType() != Teul::Tokens::Encrypted && header().packetType() != Teul::Tokens::Unencrypted )
+	if ( PN_UNLIKELY(header().packetType() != Teul::Tokens::Encrypted && header().packetType() != Teul::Tokens::Unencrypted) )
 	{
 		dbugLog(_FLW, "t:%d invalid packet header [%u]", endpoint_.teulIndex(), header().packetType());
 		return -EINVAL;
@@ -211,14 +211,14 @@ Teul::Packet::receive(ENDPOINT& endpoint_)
 
 	m_packetSizeBytes = header().packetSizeBytes();
 
-	if ( packetSizeBytes() < headerSizeBytes() )
+	if ( PN_UNLIKELY(packetSizeBytes() < headerSizeBytes()) )
 	{
 		dbugLog(_FLW, "t:%d malformed packet header", endpoint_.teulIndex());
 		return -EINVAL;
 	}
 
 	TEUL_CALLBACK* const callback = TEUL_CALLBACK::Lookup(header().m_callX, header().m_callY);
-	if ( callback == NULL )
+	if ( PN_UNLIKELY(callback == nullptr) )
 	{
 		dbugLog(_FLM, "t:%d cbx:%u cby:%u no such callback", endpoint_.teulIndex(), header().m_callX, header().m_callY);
 		return -EINVAL;
@@ -263,33 +263,30 @@ Teul::Packet::wantsEncryption()
 }
 
 //////////////////////////////////////////////////////////////////////
-// Steal the contents of a teul packet.
+// Move constructor
 
-void
-Teul::Packet::stealContentsFrom(Teul::Packet& rhs)
+Teul::Packet::Packet(Teul::Packet&& rhs)
 {
-	Teul::Packet& lhs = *this;	// Convenience.
+	if (PN_UNLIKELY(&rhs == this))
+		return;
 
-	// If the source is using it's local data buffer,
-	// just copy the data over
-	if ( rhs.m_data == rhs.m_localData )
+	this->m_data = rhs.m_data;		// Take posession of the data,
+	rhs.m_data = rhs.m_localData;	// point rhs back at its local data.
+
+	// If the source is using it's local data buffer, just copy the data over
+	if ( this->m_data == rhs.m_localData )
 	{
 		// Data fits within the local data, so just copy that.
-		lhs.m_data = lhs.m_localData;
-		memcpy(lhs.m_data, rhs.m_localData, rhs.m_packetSizeBytes);
-	}
-	else
-	{
-		lhs.m_data = rhs.m_data;		// Take posession of the data,
-		rhs.m_data = rhs.m_localData;	// point rhs back at its local data.
+		this->m_data = this->m_localData;
+		memcpy(this->m_localData, rhs.m_localData, rhs.m_packetSizeBytes);
 	}
 
 	// Steal the size counts.
-	lhs.m_packetSizeBytes = rhs.m_packetSizeBytes;
-	lhs.m_capacity = rhs.m_capacity;
-	lhs.m_sent = rhs.m_sent;
-	lhs.m_address = rhs.m_address;
-	lhs.m_port = rhs.m_port;
+	this->m_packetSizeBytes = rhs.m_packetSizeBytes;
+	this->m_capacity = rhs.m_capacity;
+	this->m_sent = rhs.m_sent;
+	this->m_address = rhs.m_address;
+	this->m_port = rhs.m_port;
 
 	rhs.m_packetSizeBytes = 0;
 	rhs.m_capacity = 0;
@@ -307,25 +304,12 @@ Teul::Packet::send(const ENDPOINTS& endpoints)
 	if ( wantsEncryption() )
 	{
 		// Need to send copies.
-		for ( ENDPOINTS::const_iterator it = endpoints.begin(); it != endpoints.end(); ++it )
-		{
-			ENDPOINT* const endpoint = *it;
-			if ( endpoint != NULL )
-			{
-				Teul::Packet copy(*this);
-				copy.send(*endpoint);
-			}
-		}
+		std::for_each(endpoints.begin(), endpoints.end(), [=](ENDPOINT* endpoint) { Teul::Packet copy(*this); copy.send(*endpoint); });
 	}
 	else
 	{
 		// Not encrypted, we can just broadcast.
-		for ( ENDPOINTS::const_iterator it = endpoints.begin(); it != endpoints.end(); ++it )
-		{
-			ENDPOINT* const endpoint = *it;
-			if ( endpoint != NULL )
-				send(*endpoint);
-		}
+		std::for_each(endpoints.begin(), endpoints.end(), [=](ENDPOINT* endpoint) { send(*endpoint); });
 	}
 }
 

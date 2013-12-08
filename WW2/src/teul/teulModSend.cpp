@@ -179,8 +179,7 @@ ENDPOINT::sendPacket(Teul::Packet& packet)
 		// Partial or blocked send falls thru and queues the remainder.
 	}
 
-	Teul::Packet* const copy = new Teul::Packet(0, 0, 0);
-	copy->stealContentsFrom(packet);
+	Teul::Packet* const copy = new Teul::Packet(std::move(packet));
 
 	m_impl->m_sendQueue.push_back(copy);
 
