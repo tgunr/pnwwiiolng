@@ -783,9 +783,7 @@ EndpointImpl::Reset()
 	assert( recvQueue.empty() );
 	while ( m_sendQueue.empty() == false )
 	{
-		Teul::Packet* const pkt = m_sendQueue.front();
-		m_sendQueue.erase(m_sendQueue.begin());
-		delete pkt;
+		FreeFirstPacketInSendQueue();
 	}
 	m_version = 0;
 	m_cryptVersion = 0;

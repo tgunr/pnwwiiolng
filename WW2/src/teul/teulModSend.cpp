@@ -194,6 +194,17 @@ ENDPOINT::sendPacket(Teul::Packet& packet)
 }
 
 //////////////////////////////////////////////////////////////////////
+// Free the first packet in an endpoint's send queue.
+
+void
+EndpointImpl::FreeFirstPacketInSendQueue()
+{
+	Teul::Packet* packet = m_sendQueue.front();
+	m_sendQueue.erase(m_sendQueue.begin());
+	s_delayedPackets.Delete(packet);
+}
+
+//////////////////////////////////////////////////////////////////////
 // Try to drain the send queue of a socket.
 
 SINT32
@@ -220,8 +231,7 @@ ENDPOINT::pushSendQueue()
 		if ( packet->sentBytes() >= packet->packetSizeBytes() )
 		{
 			// We appear to have sent the data.
-			m_impl->m_sendQueue.erase(m_impl->m_sendQueue.begin());
-			s_delayedPackets.Delete(packet);
+			m_impl->FreeFirstPacketInSendQueue();
 		}
 	}
 

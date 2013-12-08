@@ -23,6 +23,9 @@ struct EndpointImpl
 	//! Retrieve the current poll slot.
 	SINT16 pollSlot() const { return m_pollSlot; }
 
+	//! Return the first packet in the send queue to the free list.
+	void FreeFirstPacketInSendQueue();
+
 	// Encryption properties.
 	WWII::Cryptographer<true>	m_txCrypt;		//!< Sending encryptor.
 	WWII::Cryptographer<false>	m_rxCrypt;		//!< Receiving decryptor.
