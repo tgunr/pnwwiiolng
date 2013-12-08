@@ -47,7 +47,7 @@ namespace Teul
 
 	//! Convert an internet address into host name (dotted decimal notation) and port number strings.
 	//! Primary purpose is to simplify future transitions to IPv6. bufLen must be large enough
-	//! to accomodate the trailing null.
+	//! to accommodate the trailing null.
 	//! @param[in] host_ value of the address to query.
 	//! @param[in] port_ value of the port number to query.
 	//! @param[in] hostBuf_ destination for the host name (dotted numeric) or NULL if not required.
