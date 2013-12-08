@@ -43,7 +43,7 @@ namespace Mem
 		void Cleanup()
 		{
 			m_freeList.clear();
-			std::for_each(m_blocks.begin(), m_blocks.end(), memFree[](Type* block) { memFree(block); })
+			std::for_each(m_blocks.begin(), m_blocks.end(), [](Type* block) { memFree(block); });
 			m_blocks.clear();
 		}
 
