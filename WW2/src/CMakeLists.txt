@@ -167,6 +167,7 @@ add_library (teulserver
 
 	${PCH_INCLUDE_HEADERS}
 	dbug/dbugInternal.h
+	mem/memPool.h
 )
 ADD_PCH(teulserver)
 target_link_libraries(teulserver event)
