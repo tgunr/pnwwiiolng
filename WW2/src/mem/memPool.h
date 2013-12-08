@@ -52,6 +52,7 @@ namespace Mem
 			ABORT_IF(m_blocks.empty() == false);
 		}
 
+		//! Ensure at least minAvailable free entries are available.
 		void Reserve(size_t minAvailable)
 		{
 			while (m_freeList.size() < minAvailable)
@@ -68,12 +69,15 @@ namespace Mem
 			return node;
 		}
 
+		//! Return an Alloc()d node to the pool.
+		//! @warn Does not verify the node came from the pool.
 		void Free(Type* node)
 		{
 			ABORT_IF(node == nullptr);
 			m_freeList.push_back(node);
 		}
 
+		//! Obtain the next free node and in-place default new it.
 		Type* New()
 		{
 			Type* newNode = Alloc();
@@ -81,6 +85,7 @@ namespace Mem
 			return newNode;
 		}
 
+		//! Obtain the next free node and in-place copy construct it.
 		Type* New(const Type& copy)
 		{
 			Type* newNode = Alloc();
@@ -88,6 +93,7 @@ namespace Mem
 			return newNode;
 		}
 
+		//! Obtain the next free node and in-place move construct it.
 		Type* New(Type&& rvalue)
 		{
 			Type* newNode = Alloc();
@@ -95,11 +101,11 @@ namespace Mem
 			return newNode;
 		}
 
+		//! Return a New()'d node to the pool.
 		void Delete(Type* ptr)
 		{
 			Free(ptr);
 			ptr->~Type();
 		}
-
 	};
 }
