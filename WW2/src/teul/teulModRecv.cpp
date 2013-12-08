@@ -190,7 +190,7 @@ void
 teulReleaseDatagram(DATA_GRAM* gram)
 {
 	size_t allocSize = _roundDatagramSize<DATAGRAM_ROUNDING>(gram->m_size);
-	if (PN_LIKELY(allocSize) <= s_freeDatagrams.size() * DATAGRAM_ROUNDING)
+	if (PN_LIKELY(allocSize <= s_freeDatagrams.size() * DATAGRAM_ROUNDING))
 		s_freeDatagrams[(allocSize / DATAGRAM_ROUNDING) - 1].push(gram);
 	else
 	{
