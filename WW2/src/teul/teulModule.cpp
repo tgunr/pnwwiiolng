@@ -205,6 +205,7 @@ SINT32 teulModStartup(ERROR_FUNCTION* errFnPtr)
 
 	dbugWrite(_FLN,"intitializing teul module verion: %x",Teul::VersionString);
 
+	extern void teulInitSend();
 	teulInitSend();
 
 	teulInitEndpoints(errFnPtr);
@@ -255,13 +256,11 @@ namespace Teul
 SINT32
 teulModShutdown(void)
 {
-	Teul::ENDPOINT_LIST::iterator it = Teul::idleEndpoints.begin();
-	while ( it != Teul::idleEndpoints.end() )
+	using namespace Teul;
+	for ( auto it = idleEndpoints.begin(), end = idleEndpoints.end(); it != end; )
 	{
-		ENDPOINT* const endpoint = *it;
-		++it;
-
-		if ( endpoint != NULL )
+		ENDPOINT* const endpoint = *(it++);
+		if ( PN_LIKELY(endpoint != nullptr) )
 			teulClose(*endpoint, Teul::Closing::Shutdown);
 	}
 
@@ -271,6 +270,10 @@ teulModShutdown(void)
 
 	// Free up the memory the endpoints are using
 	teulCleanupEndpoints();
+
+	// Shutdown the send subystem
+	extern void teulCleanupSend();
+	teulCleanupSend();
 
 #if platOS == OS_WIN32
 	WSACleanup( );
@@ -454,7 +457,7 @@ teulOpenConnection(const SINT32 teulIndex, const bool listening, const SINT32 ti
 	sockAddress.sin_port = htons(port);
 
 	ENDPOINT* newEndpoint = teulCreateEndpoint(teulIndex, listening, timeout, protocol);
-	if ( newEndpoint == NULL )
+	if ( PN_UNLIKELY(newEndpoint == nullptr) )
 	{
 		dbugLog(_FLA, "Couldn't Allocate endpoint!!");
 		return -ENOSPC;	// could not allocate buffer for endpoint
@@ -560,9 +563,7 @@ teulOpenConnection(const SINT32 teulIndex, const bool listening, const SINT32 ti
 SINT32
 teulConnectENDPOINT(ENDPOINT* const inEndpoint)
 {
-	SINT32	retval = 0;
-
-	if (inEndpoint->state() != IS_OPENING)
+	if (PN_UNLIKELY(inEndpoint->state() != IS_OPENING))
 	{
 		dbugLog(_FLA,"can't connect an endpoint in state %d", inEndpoint->state());
 		return -EINVAL;
@@ -570,7 +571,7 @@ teulConnectENDPOINT(ENDPOINT* const inEndpoint)
 
 	if ( inEndpoint->m_reliable == false )
 	{
-		retval = connect(inEndpoint->socket, (struct sockaddr*)&inEndpoint->destSockAddress, sizeof(inEndpoint->destSockAddress));
+		SINT32 retval = connect(inEndpoint->socket, (struct sockaddr*)&inEndpoint->destSockAddress, sizeof(inEndpoint->destSockAddress));
 		if ( retval < 0 )
 		{
 			dbugWrite(_FLA, "t:%d couldn't connect socket",inEndpoint->teulIndex());

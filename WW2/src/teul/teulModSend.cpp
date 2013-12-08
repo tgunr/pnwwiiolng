@@ -35,14 +35,15 @@ static const SINT32 MaxSendBufferSize = 256 * 1024;	// 256kb
 
 //////////////////////////////////////////////////////////////////////
 
-SINT32
-teulInitSend(void)
+void teulInitSend()
 {
 	totalPacketsSent = 0;
 	totalPacketsRecv = 0;
 	totalPacketsXfer = 0;
+}
 
-	return 0;
+void teulCleanupSend()
+{
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -118,7 +119,7 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 	}
 
 	const SINT32 result = ::sendto(socket, (const char*)data, sizeInBytes, 0, (struct sockaddr*)&inetAddress, sizeof(inetAddress));
-	if ( result <= 0 )
+	if ( PN_UNLIKELY(result <= 0) )
 	{
 		// Socket closed.
 		if ( result == 0 )
@@ -345,4 +346,3 @@ teulModResendPACKET(ENDPOINT* const /* inEndpoint */, PACKET_HEAD* const /* pack
 {
 	LogAbort("retransmit does not work.");
 }
-
