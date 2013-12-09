@@ -44,6 +44,7 @@ static const char* s_translationLanguage = "en";
 #define _TFSIZE 4*sizeof(UINT16) + 2*sizeof(UINT32)
 //#undef CANTPACKSTRUCT
 static STRT_DTL_HEADER header;
+static void*			currentData = nullptr;
 static CP*				cpList = NULL;
 static FACILITY*		facilityList = NULL;
 static BUILDING*		buildingList = NULL;
@@ -244,20 +245,20 @@ SINT32 sdmOpenFile(const SCHAR* path, UINT16 /* mode */)
 {
 	maxId = 0;
 
-	if ( path == NULL || *path == '\0' )
+	if ( PN_UNLIKELY(path == NULL || *path == '\0') )
 		return SDMFILE_READ_ERR;
 
 	sdmLoadTranslationList();
 
 	int fd = fiodOpen(path);
-	if (fd <= -1)
+	if ( PN_UNLIKELY(fd <= -1) )
 		return SDMFILE_READ_ERR;
 
 	//get the starting position of cpf data
 	SINT32 sdmLength = _getTerrainFileLength(fd);
 	fiodSeek(fd, sdmLength + (SINT32)sizeof(TERRAINFILE), fioSEEK_SET);
 
-	if ( fiodRead(fd,&header,sizeof(STRT_DTL_HEADER)) != (int)sizeof(STRT_DTL_HEADER) )
+	if ( PN_UNLIKELY(fiodRead(fd,&header,sizeof(STRT_DTL_HEADER)) != (int)sizeof(STRT_DTL_HEADER)) )
 	{
 		fioClose(fd);
 		return SDMFILE_READ_ERR;
@@ -277,27 +278,43 @@ SINT32 sdmOpenFile(const SCHAR* path, UINT16 /* mode */)
 
 	if ( s_translationsRequired == true )
 	{
-		if ( s_cpTranslationFails == NULL )
+		if ( PN_UNLIKELY(s_cpTranslationFails == nullptr) )
 			s_cpTranslationFails = new TRANSLATION_FAILS;
-		if ( s_facilityTranslationFails == NULL )
+		if ( PN_UNLIKELY(s_facilityTranslationFails == NULL) )
 			s_facilityTranslationFails = new TRANSLATION_FAILS;
+	}
+
+	const size_t cpSize = header.numCPs * sizeof(CP);
+	const size_t facilitySize = header.numFacilities * sizeof(FACILITY);
+	const size_t buildingSize = header.numBuildings * sizeof(BUILDING);
+	const size_t depotSize = header.numLinks * sizeof(DEPOT_LINK);
+	const size_t waypointSize = header.numWaypoints * sizeof(WAYPOINT);
+	const size_t dataSize = cpSize + facilitySize + buildingSize + depotSize + waypointSize;
+	if ( PN_UNLIKELY(dataSize == 0) )
+	{
+		fioClose(fd);
+		return 0;
+	}
+	void* data = currentData = memAlloc(dataSize);
+
+	size_t dataRead = fioRead(fd, data, dataSize);
+	fioClose(fd);
+	if (dataRead != dataSize)
+	{
+		sdmCloseFile();
+		return SDMFILE_READ_ERR;
 	}
 
 	if (header.numCPs)
 	{
-		const size_t dataSize = header.numCPs * sizeof(CP);
-		cpList = (CP*)memAlloc(dataSize);
-		if ( dataSize != fioRead(fd, cpList, dataSize) )
-		{
-			fioClose(fd);
-			return SDMFILE_READ_ERR;
-		}
+		cpList = static_cast<CP*>(data);
+		data = cpList + header.numCPs;
 
 		for(SINT32 _CPindex=0; _CPindex < header.numCPs; ++_CPindex)
 		{
 			CP& cp = cpList[_CPindex];
 
-			///OGS:06/22/07: Allow code to supercede SDM files as to
+			///OGS:06/22/07: Allow code to supersede SDM files as to
 			///which side a country indicates.
 			cp.side = wwiiSide(static_cast<WWII_COUNTRY>(cp.country));
 
@@ -309,19 +326,14 @@ SINT32 sdmOpenFile(const SCHAR* path, UINT16 /* mode */)
 
 	if (header.numFacilities)
 	{
-		const size_t dataSize = header.numFacilities * sizeof(FACILITY);
-		facilityList = (FACILITY*)memAlloc(dataSize);
-		if ( dataSize != fioRead(fd, facilityList, dataSize) )
-		{
-			fioClose(fd);
-			return SDMFILE_READ_ERR;
-		}
+		facilityList = static_cast<FACILITY*>(data);
+		data = facilityList + header.numFacilities;
 
 		for(SINT32 _FACindex = 0; _FACindex < header.numFacilities; ++_FACindex)
 		{
 			FACILITY& fac = facilityList[_FACindex];
 
-			///OGS:06/22/07: Allow code to supercede SDM files as to
+			///OGS:06/22/07: Allow code to supersede SDM files as to
 			///which side a country indicates.
 			fac.originalSide = wwiiSide(static_cast<WWII_COUNTRY>(fac.originalCountry));
 
@@ -333,13 +345,8 @@ SINT32 sdmOpenFile(const SCHAR* path, UINT16 /* mode */)
 
 	if (header.numBuildings)
 	{
-		const size_t dataSize = header.numBuildings * sizeof(BUILDING);
-		buildingList = (BUILDING*)memAlloc(dataSize);
-		if ( dataSize != fioRead(fd, buildingList, dataSize) )
-		{
-			fioClose(fd);
-			return SDMFILE_READ_ERR;
-		}
+		buildingList = static_cast<BUILDING*>(data);
+		data = buildingList + header.numBuildings;
 
 		for(SINT32 _BUILDindex=0; _BUILDindex < header.numBuildings; ++_BUILDindex)
 		{
@@ -353,13 +360,8 @@ SINT32 sdmOpenFile(const SCHAR* path, UINT16 /* mode */)
 
 	if (header.numLinks)
 	{
-		const size_t dataSize = header.numLinks * sizeof(DEPOT_LINK);
-		linkList = (DEPOT_LINK*)memAlloc(dataSize);
-		if ( dataSize != fioRead(fd, linkList, dataSize) )
-		{
-			fioClose(fd);
-			return SDMFILE_READ_ERR;
-		}
+		linkList = static_cast<DEPOT_LINK*>(data);
+		data = linkList + header.numLinks;
 
 		for(SINT32 _DEPOTindex=0; _DEPOTindex < header.numLinks; ++_DEPOTindex)
 		{
@@ -373,13 +375,8 @@ SINT32 sdmOpenFile(const SCHAR* path, UINT16 /* mode */)
 
 	if (header.numWaypoints)
 	{
-		const size_t dataSize = header.numWaypoints * sizeof(WAYPOINT);
-		waypointList = (WAYPOINT*)memAlloc(dataSize);
-		if ( dataSize != fioRead(fd, waypointList, dataSize) )
-		{
-			fioClose(fd);
-			return SDMFILE_READ_ERR;
-		}
+		waypointList = static_cast<WAYPOINT*>(data);
+		data = waypointList + header.numWaypoints;
 
 		for(SINT32 _WAYPOINTindex=0; _WAYPOINTindex < header.numWaypoints; ++_WAYPOINTindex)
 		{
@@ -389,8 +386,6 @@ SINT32 sdmOpenFile(const SCHAR* path, UINT16 /* mode */)
 		}
 
 	}
-
-	fioClose(fd);
 
 	return 0;
 }
@@ -403,34 +398,16 @@ SINT32 sdmCloseFile(void)
 	header.numLinks = currentLink = 0;
 	header.numWaypoints = currentWaypoint = 0;
 
-	if (cpList)
-	{
-		memFree(cpList);
-		cpList = NULL;
-	}
+	cpList = nullptr;
+	facilityList = nullptr;
+	buildingList = nullptr;
+	linkList = nullptr;
+	waypointList = nullptr;
 
-	if (facilityList)
+	if (currentData)
 	{
-		memFree(facilityList);
-		facilityList = NULL;
-	}
-
-	if (buildingList)
-	{
-		memFree(buildingList);
-		buildingList = NULL;
-	}
-
-	if (linkList)
-	{
-		memFree(linkList);
-		linkList = NULL;
-	}
-
-	if (waypointList)
-	{
-		memFree(waypointList);
-		waypointList = NULL;
+		memFree(currentData);
+		currentData = nullptr;
 	}
 
 	return 0;
