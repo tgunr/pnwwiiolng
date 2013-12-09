@@ -934,7 +934,7 @@ _scPass2_facs(Supercell& sc)
 
 //////////////////////////////////////////////////////////////////////
 // - Load WOR info into buildings
-// - Propogate attributes up to facilities/cps
+// - Propagate attributes up to facilities/cps
 
 static void
 _scPass2_objs(Supercell& sc)

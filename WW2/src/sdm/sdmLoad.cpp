@@ -7,6 +7,49 @@
 //
 // Originating Programmer: Eric "Meat" Hall
 
+// WWIIOL's terrain editor treats it's data set as discrete
+// blocks of data - each cell is it's own pristine little
+// world. This allowed the embedding of much smaller IDs and
+// during many cell-relative operations you can specify
+// a specific strat object with a UINT16 value. 
+// In a world-scope context, such as on the server, you have
+// to combine that ID with the X and Y of the cell to produce
+// a 64 bit value (24 bits of X plus 24 bits of Y plus 16 id)
+//
+// On the host, we combat this by assigning every cp and facility
+// a unique, persistent id (uid or uoid).
+//
+// A second problem is that the terrain editor doesn't do
+// persistence well. Whenever stuff gets edited, the editor
+// gives it a new cell-local unique id. So { 30, 5, 1 }
+// might become { 30, 5, 7 }.
+//
+// Usually when this happens, the name stays the same, so I
+// added a couple of tables to let me map names/stratids to
+// unique ids.
+//
+// Lastly: This tool used to load the sdm data and forcefully
+// overwrite what was in the database, which would force a
+// campaign reset, clobber scoring, and all kinds of other
+// undesirable side-effects.
+//
+// This program loads in the ids_ tables along with the current
+// strat data for cps/facilities that existed in the current
+// live data.
+//
+// Then it reads in the sdm files and tries to overlay the
+// incoming data and align IDs or names with uoids.
+//
+// The "isCurrent" value will be false in any old, legacy data
+// we read from the database. It will be true for any data that
+// we read from the sdm files.
+//
+// "isInDB" is used as a guard to help reduce the amount of
+// churn when you are applying stratLoader to a populated
+// database; it gets set to false when columns have changed
+// in the sdm file. It's supposed to be limited to values
+// that don't affect the live game.
+
 #include "dbug/dbug.h"
 
 #include "str/stringLib.h"

@@ -2,7 +2,7 @@
 // Created: Tue Jan 28 20:00:08 2001
 //
 // All the routines for reading in the weap files
-// to create and access the weapon heirarchies.
+// to create and access the weapon hierarchies.
 //
 // Copyright (c) 2000 Playnet, Inc., All Rights Reserved.
 // Not to be distributed in API form except as part of a
