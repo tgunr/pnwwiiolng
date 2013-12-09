@@ -33,10 +33,12 @@ extern WEAPON_LIST g_weaponList;
 extern WEAPON_SPAWNS g_weaponSpawns;
 
 //tolua_end
-//tolua_begin
 
 // If you ever have to look up a class name.
+extern size_t g_maxWeaponClass;
 extern WEAPON_CLASS weaponClass[MAX_WEAP_CLASSES];
+
+//tolua_begin
 
 // returns true once weapListInit() has been called once
 extern LOGICAL weapHasInitialized();
@@ -63,7 +65,7 @@ extern WEAPON_SPEC	weapFindCountry(const char* country);
 // turn country code string into weap spec
 extern WEAPON_SPEC	weapFindCountryFromCode(const char* cCode);
 
-// turn category aberviation string into a weap spec
+// turn category abbreviation string into a weap spec
 extern WEAPON_SPEC	weapFindCategory(const char* category);
 
 // find a weapon spec by its name (used to match weapon specs to names

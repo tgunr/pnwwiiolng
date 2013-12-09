@@ -258,6 +258,9 @@ weapAddClass(UINT32 classIndex, const char* name)
 	weaponClass[classIndex].active = true;
 	weaponClass[classIndex].spec = NULL_WEAP_SPEC;
 	weaponClass[classIndex].spec.wClass = classIndex;
+
+	if ( classIndex > g_maxWeaponClass )
+		g_maxWeaponClass = classIndex;
 }
 
 static bool _fillClass(SINT32 /*numArgs*/, FUNCARGS* args)
@@ -272,7 +275,7 @@ static bool _fillClass(SINT32 /*numArgs*/, FUNCARGS* args)
 		return false;
 
 	UINT32 classIndex = (UINT32)args[0].dvalue;
-	if ( classIndex >= MAX_WEAP_CLASSES )
+	if ( classIndex <= 0 || classIndex >= MAX_WEAP_CLASSES )
 	{
 		dbugLog(_FLA, "invalid weapClass '%s' (%s)", args[0].svalue, args[1].svalue);
 		return false;

@@ -100,6 +100,7 @@ SINT16	weapCountryIndex[Parse::MAX_COUNTRY_CODES];
 
 // If you ever have to look up a class name.
 WEAPON_CLASS weaponClass[MAX_WEAP_CLASSES];
+size_t g_maxWeaponClass = 0;
 
 // All known weapons
 WEAPON_LIST g_weaponList;
@@ -127,7 +128,7 @@ SINT32 i;
 
 	for( i = 1; i < MAX_SIDES; i++ )
 	{
-		if ( !strcasecmp(wwii_side[i],side) )
+		if ( !strcasecmp(wwii_side[i], side) )
 			return (WWII_SIDE)i;
 	}
 
@@ -193,9 +194,9 @@ WEAPON_SPEC
 weapFindClass(const char* weapClass)
 {
 	WEAPON_SPEC weap = NULL_WEAP_SPEC;
-	for ( UINT32 i = 1; i < MAX_WEAP_CLASSES; i++ )
+	for ( UINT32 i = 1; i <= g_maxWeaponClass; i++ )
 	{
-		if ( strcasecmp((char*)weaponClass[i].name,weapClass) == 0 )
+		if ( weaponClass[i].active && strcasecmp((char*)weaponClass[i].name,weapClass) == 0 )
 		{
 			weap.wClass = i;
 			break;

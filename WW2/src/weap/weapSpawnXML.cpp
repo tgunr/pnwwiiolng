@@ -32,7 +32,7 @@ static UINT8
 _getFirstFreeWeaponClass()
 {
 	UINT8 lastUsedClass = 0;
-	for ( UINT8 i = 1; i < MAX_WEAP_CLASSES; ++i )
+	for ( UINT8 i = 1; i <= g_maxWeaponClass; ++i )
 	{
 		if ( weaponClass[i].active == true )
 			lastUsedClass = i;
