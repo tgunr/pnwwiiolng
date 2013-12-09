@@ -294,15 +294,7 @@ void strtAddErrorListEntry(int errorNo, const char* objectName, const char* entr
 //////////////////////////////////////////////////////////////////////
 // Filename string pool definitions
 
-struct filenameComparitor
-{
-	bool operator()(const char* s1, const char* s2) const
-	{
-		return strncmp(s1, s2, 128) < 0;
-	}
-};
-
-typedef std::set<const char*, filenameComparitor> FilenamePool;
+typedef std::unordered_set<std::string> FilenamePool;
 FilenamePool g_filenamePool;
 
 //////////////////////////////////////////////////////////////////////
@@ -313,26 +305,16 @@ static const char*
 _filenamePool(const char* string)
 {
 	// Step 1: Look for the string in the existing set
-	FilenamePool::iterator p = g_filenamePool.find(string);
-	if ( p != g_filenamePool.end() )
-		return *p;
-
-	// In order to add the string, we'll need to clone it
-	const char* copy = strdup(string);
-	if ( copy == NULL )
+	FilenamePool::iterator it = g_filenamePool.find(string);
+	if ( it != g_filenamePool.end() )
+		return it->c_str();
+	auto insertion = g_filenamePool.insert(string);
+	if ( PN_UNLIKELY(!insertion.second) )
 	{
-		dbugLog(_FLAS, "out of memory duplicating string %p", copy);
+		dbugLog(_FLAS, "failed to add %s to string pool", string);
 		exit(0);
 	}
-
-	p = g_filenamePool.insert(g_filenamePool.begin(), copy);
-	if ( p == g_filenamePool.end() || *p == NULL )
-	{
-		dbugLog(_FLAS, "failed to insert string pool entry %p of %s", copy, string);
-		exit(0);
-	}
-
-	return *p;
+	return insertion.first->c_str();
 }
 
 UINT32
@@ -1115,10 +1097,7 @@ _checkCPLinks()
 static void
 _killStratData()
 {
-	for ( auto it = g_filenamePool.begin(); it != g_filenamePool.end(); ++it )
-	{
-		free((void*)*it);
-	}
+	g_filenamePool.clear();
 }
 
 //////////////////////////////////////////////////////////////////////
