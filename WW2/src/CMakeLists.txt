@@ -368,6 +368,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth")
 		src/loader.cpp
 		sdm/sdmLoad.cpp
 			sdm/sdmLoad.h
+			sdm/sdmParse.h
 		${PCH_INCLUDE_HEADERS}
 	)
 	target_link_libraries(stratLoader libwwii teulserver ircclient ${MYSQL_LIBRARIES})
