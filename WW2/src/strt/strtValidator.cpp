@@ -136,6 +136,9 @@ _calcStratSystem(const SCHAR* filename, CPStruct* cpList)
 int
 main (int argc, char** argv)
 {
+	Teul::SetAppName(argv[0]);
+	Teul::ConfigVar::InitializeConfigVars();
+
 	static CPStruct* cpList;	//The list of free CPs
 	int level = 1;
 
