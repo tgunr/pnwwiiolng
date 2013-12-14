@@ -278,7 +278,7 @@ struct ClientRole : public Role
 
 		g_inBulkTest = true;
 
-		const bool echoTest = tEchoTest.isExplicitlyEnabled();
+		const bool echoTest = tEchoTest.isEnabled();
 
 		for ( size_t iter = 0; iter < Config::iterFactor; ++iter )
 		{
@@ -437,7 +437,7 @@ struct ClientRole : public Role
 		{
 			for ( size_t i = 0; i < 16; ++i )
 			{
-				if ( firstConnIsOpen && tEchoTest.isExplicitlyEnabled() )
+				if ( firstConnIsOpen && tEchoTest.isEnabled() )
 					sendEchoRequest(0);
 
 				teulUpdateTransport(1);
@@ -449,10 +449,14 @@ struct ClientRole : public Role
 				endpoint = Teul::GetConnectedEndpoint(0);
 				if ( (endpoint != NULL) != firstConnIsOpen )
 					throw Teul::IterationError(i, "First connection in wrong state", 0);
+				if (!firstConnIsOpen)
+					dbugLog(_FLI, "[ignore 'endpoint %d is not in use']", 0);
 
 				endpoint = Teul::GetConnectedEndpoint(1);
 				if ( (endpoint != NULL) != secondConnIsOpen )
 					throw Teul::IterationError(i, "Second connection in wrong state", 0);
+				if (!secondConnIsOpen)
+					dbugLog(_FLI, "[ignore 'endpoint %d is not in use']", 1);
 			}
 		}
 	}
@@ -608,7 +612,7 @@ struct ClientRole : public Role
 	{
 		OpenConnection();
 
-		if ( tStallConnect.isExplicitlyEnabled() )
+		if ( tStallConnect.isEnabled() )
 		{
 			Iprintf("Stalling connection for %u seconds\n", Config::stallTime_s);
 			std::this_thread::sleep_for(std::chrono::seconds(Config::stallTime_s));
@@ -694,7 +698,7 @@ struct ClientRole : public Role
 			throw Teul::Error("We lost the primary endpoint", 0);
 
 		// If the "killserver" test is enabled, we send the "shutdown" callback.
-		if ( tKillServer.isExplicitlyEnabled() )
+		if ( tKillServer.isEnabled() )
 		{
 			Iprintf("Sending KILLSERVER.\n");
 			teulSend(m_teulIndex, s_cbShutdown, NULL);

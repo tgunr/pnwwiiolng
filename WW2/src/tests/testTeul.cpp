@@ -578,7 +578,7 @@ TEUL_CALLBACK* Role::s_cbUnregistered;
 static void
 _usage(const char* const argv[], const bool listTests)
 {
-	printf("FAIL: Usage: %s [options] [--test=<testname>] {client | server}\n", argv[0]);
+	printf("FAIL: Usage: %s [options] [--test=<testname>] [--skip=<testname>] {client | server}\n", argv[0]);
 	printf("Options:\n");
 	printf("  --debug\n\tEnable debug output.\n");
 	printf("  --host=ad.dr.e.ss\n\tSpecifies the IP address for client mode to connect to.\n");
@@ -647,9 +647,25 @@ _processArguments(const int argc, const char* const argv[])
 					_usage(argv, true);
 				}
 
-				test->setEnabled(true);
-
+				test->setEnabled();
 				explicitTests = true;
+
+				continue;
+			}
+			else if ( strncmp(arg, "skip=", 5) == 0 )
+			{
+				const char* testName = (arg + 5);
+				if ( *testName == 0 )
+					_usage(argv, true);
+
+				TestItem* test = TestItem::Lookup(testName);
+				if ( test == nullptr )
+				{
+					printf("ERROR: Unknown test: %s\n", testName);
+					_usage(argv, true);
+				}
+
+				test->setDisabled();
 
 				continue;
 			}
@@ -700,12 +716,13 @@ _processArguments(const int argc, const char* const argv[])
 		_usage(argv, false);
 	}
 
-	if ( explicitTests == false )
+	if ( explicitTests )
 	{
 		TestItem::Index::iterator it;
 		for ( it = TestItem::s_index.begin(); it != TestItem::s_index.end(); ++it )
 		{
-			it->second->setEnabled(false);
+			if ( !it->second->isExplicitlySet() )
+				it->second->setDisabled();
 		}
 	}
 
@@ -718,7 +735,7 @@ _processArguments(const int argc, const char* const argv[])
 			Dprintf("%20s Enabled: %3s Explicit: %3s\n"
 						, it->second->name()
 						, (it->second->isEnabled() ? "yes" : "no")
-						, (it->second->isExplicitlyEnabled() ? "yes" : "no")
+						, (it->second->isExplicitlySet() ? "yes" : "no")
 						);
 		}
 	}
@@ -842,7 +859,7 @@ main(int argc, const char* const argv[])
 	// This is so you don't have to set a breakpoint in visual studio to see what
 	// was said in the output window on a clean & successful debug run :)
 	// run with --test=anykey
-	if ( tAnyKey.isExplicitlyEnabled() )
+	if ( tAnyKey.isEnabled() )
 	{
 		printf("\nPress enter to continue: ");
 		getchar();
