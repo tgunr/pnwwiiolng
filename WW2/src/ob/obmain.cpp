@@ -496,16 +496,7 @@ void obmainFreeObjectMemory(OBJECT*  lpobj)
 
 	if (!(lpobj->flag2 & OBJECT_POOL))
 	{
-#if(0) // Uses strpool
-		if (lpobj->comment != NULL)
-		{
-            // this* IS* allocated with new!!!!
-			delete lpobj->comment; //memFree(lpobj->comment);
-			lpobj->comment = NULL;
-		}
-#else
         lpobj->comment = NULL;
-#endif
 	}
 
 	if ((!(lpobj->flags & OBJECT_NOTOBJECT) || ((lpobj->flags & OBJECT_NOTOBJECT) == OBJECT_GROUP)) && lpobj->shadow != NULL)
@@ -521,8 +512,8 @@ void obmainFreeObjectMemory(OBJECT*  lpobj)
 	{
 		if (lpobj->flag2 & OBJECT_ANIMATION)
 		{
-			memFree (lpobj->lpspare);
-			Write_Debug ("%%%%%%%%%%%%%%%%%Freeing allocated lpspare!");
+			Write_Debug("%%%%%%%%%%%%%%%%%Freeing allocated lpspare!");
+			memFree(lpobj->lpspare);
 
 			lpobj->lpspare = NULL;
 		}
@@ -1683,12 +1674,10 @@ LOGICAL obmainCreateObject(OBJECT** newobj, char* name, int numverts, int numtri
 
 OBJECT* obmainCopyObjectFull(OBJECT* lpcopy)
 {
-int       nv, nt;
-OBJECT*  lpobj;
+	int		nv, nt;
+	OBJECT*	lpobj;
 
-	if (lpcopy->flags & OBJECT_NOTOBJECT ||
-		lpcopy->flags & OBJECT_USERDRAW ||
-		lpcopy->flag2 & OBJECT_TOPMOST)
+	if ((lpcopy->flags & (OBJECT_NOTOBJECT | OBJECT_USERDRAW)) || (lpcopy->flag2 & OBJECT_TOPMOST))
 	{
 		lpobj = obmainGetNewNotObject(lpcopy->flags);
 	}
@@ -1727,7 +1716,6 @@ OBJECT*  lpobj;
 			memcpy(lpobj->puverts, lpcopy->puverts, nv * sizeof(piUNIFIED_VERTEX));
 		}
 
-
 		if(lpcopy->pverts)
 		{
 			lpobj->pverts = (piUNIFIED_VERTEX*)memAlloc(nv * sizeof(piUNIFIED_VERTEX));
@@ -1755,19 +1743,20 @@ OBJECT*  lpobj;
 			if(lpcopy->psnorig)
 			{
 				memcpy(lpobj->psnorig, lpcopy->psnorig, nt * sizeof(piVECTOR));
-				if(lpobj->psnorig != lpobj->psnorms)	memcpy(lpobj->psnorms, lpcopy->psnorms, nt * sizeof(piVECTOR));
+				if(lpobj->psnorig != lpobj->psnorms)
+					memcpy(lpobj->psnorms, lpcopy->psnorms, nt * sizeof(piVECTOR));
 			}
 			if(lpcopy->pscdon)
 			{
 				memcpy(lpobj->pscdon, lpcopy->pscdon, nt * 3 * sizeof(piVECTOR));
-				if(lpobj->pscdon != lpobj->pscdn)	memcpy(lpobj->pscdn, lpcopy->pscdn, nt * 3 * sizeof(piVECTOR));
+				if(lpobj->pscdon != lpobj->pscdn)
+					memcpy(lpobj->pscdn, lpcopy->pscdn, nt * 3 * sizeof(piVECTOR));
 			}
 		}
 
 		//if (lpcopy->flags & OBJECT_TESSELATION)
 		{
 			nt = lpcopy->numtris;
-
 			nt *= 3;
 			lpobj->ptverts = (piCVERTEX*)memAlloc(nt * sizeof(piCVERTEX));
 			if (lpobj->ptverts == NULL)
@@ -1776,9 +1765,7 @@ OBJECT*  lpobj;
 			}
 
 			if (lpcopy->ptverts != NULL)
-			{
 				memcpy(lpobj->ptverts, lpcopy->ptverts, nt * sizeof(piLVERTEX));
-			}
     	}
 
 		piAddTexRef(lpobj->texid);
@@ -1799,9 +1786,7 @@ OBJECT* obmainCopyObject(OBJECT* lpcopy)
 
 OBJECT* obmainCopyNamedObject(const char* name)
 {
-OBJECT*    lpobj;
-
-	lpobj = obmainFindNamedObject(name);
+	OBJECT* lpobj = obmainFindNamedObject(name);
 	if (lpobj == NULL)
 	{
 		return(NULL);
@@ -2708,8 +2693,8 @@ piVectorPtr OBJECT::MutablePositions()
 		memcpy(pverts, puverts, numverts * sizeof(piUNIFIED_VERTEX));
 
 #ifdef ANDREWTEST
-    MutablePositions_size += numverts * sizeof(piUNIFIED_VERTEX);
-    MutablePositions_count ++;
+		MutablePositions_size += numverts * sizeof(piUNIFIED_VERTEX);
+		MutablePositions_count ++;
 #endif
 	}
 
@@ -2730,8 +2715,8 @@ piVectorPtr OBJECT::MutableNormals()
         pverts = (piUNIFIED_VERTEX*)memAlloc(numverts * sizeof(piUNIFIED_VERTEX));
 		memcpy(pverts, puverts, numverts * sizeof(piUNIFIED_VERTEX));
 #ifdef ANDREWTEST
-    MutableNormals_size += numverts * sizeof(piUNIFIED_VERTEX);
-    MutableNormals_count ++;
+		MutableNormals_size += numverts * sizeof(piUNIFIED_VERTEX);
+		MutableNormals_count ++;
 #endif
 	}
 
@@ -2752,8 +2737,8 @@ piVertexColorPtr OBJECT::MutableColors()
 		pverts = (piUNIFIED_VERTEX*)memAlloc(numverts * sizeof(piUNIFIED_VERTEX));
 		memcpy(pverts, puverts, numverts * sizeof(piUNIFIED_VERTEX));
 #ifdef ANDREWTEST
-    MutableColors_size += numverts * sizeof(piUNIFIED_VERTEX);
-    MutableColors_count ++;
+		MutableColors_size += numverts * sizeof(piUNIFIED_VERTEX);
+		MutableColors_count ++;
 #endif
 	}
 
@@ -2774,8 +2759,8 @@ piTexCoordPtr OBJECT::MutableTexCoords()
         pverts = (piUNIFIED_VERTEX*)memAlloc(numverts * sizeof(piUNIFIED_VERTEX));
 		memcpy(pverts, puverts, numverts * sizeof(piUNIFIED_VERTEX));
 #ifdef ANDREWTEST
-    MutableTexCoords_size += numverts * sizeof(piUNIFIED_VERTEX);
-    MutableTexCoords_count ++;
+		MutableTexCoords_size += numverts * sizeof(piUNIFIED_VERTEX);
+		MutableTexCoords_count ++;
 #endif
 	}
 
@@ -2886,8 +2871,8 @@ void obmainCreateMutableSurfaceNormals(OBJECT* lpobj)
     if(!lpobj->freepsnorms && lpobj->psnorms == lpobj->psnorig)
 	{
 #ifdef ANDREWTEST
-    MutableSurfaceNormals_size += lpobj->numtris * 3 * sizeof(piVECTOR);
-    MutableSurfaceNormals_count ++;
+		MutableSurfaceNormals_size += lpobj->numtris * 3 * sizeof(piVECTOR);
+		MutableSurfaceNormals_count ++;
 #endif
 
 		lpobj->psnorms = (piVECTOR*)memAlloc(lpobj->numtris * sizeof(piVECTOR));
@@ -2906,7 +2891,7 @@ void obmainCreateMutableCollisionNormals(OBJECT* lpobj)
 {
     if(!lpobj->freepscdn && lpobj->pscdn == lpobj->pscdon)
 	{
-		lpobj->pscdn =(piVECTOR*)memAlloc(lpobj->numtris * 3 * sizeof(piVECTOR));
+		lpobj->pscdn = (piVECTOR*)memAlloc(lpobj->numtris * 3 * sizeof(piVECTOR));
 		if( !lpobj->pscdon )
         {
             lpobj->pscdon = lpobj->pscdn;
