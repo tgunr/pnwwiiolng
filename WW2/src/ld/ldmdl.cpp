@@ -2000,7 +2000,6 @@ LOGICAL MergeObjectsIfPossible(OBJECT* main, OBJECT* o)
 	if(!main || !o) return FALSE;
 
 	UINT16				old_numverts	= main->numverts;
-	piUNIFIED_VERTEX*	old_puverts		= main->puverts;
 
     // For sorting issues, make sure both are either blended or not blended when merging
     bool mainHasAlpha = main->flag2 & OBJECT_HASALPHA;
@@ -2034,7 +2033,6 @@ LOGICAL MergeObjectsIfPossible(OBJECT* main, OBJECT* o)
 		main->flags |= OBJECT_TRIANGLELIST;
 		main->flags |= OBJECT_INDEXED;
 
-
 		if(main->ptris)		memFree(main->ptris);
 		if(main->psnorig)	memFree(main->psnorig);
 		if(main->psnorms && main->psnorms != main->psnorig)	memFree(main->psnorms);
@@ -2042,7 +2040,6 @@ LOGICAL MergeObjectsIfPossible(OBJECT* main, OBJECT* o)
 		if(main->pscdn && main->pscdn != main->pscdon)		memFree(main->pscdn);
 		if(main->ptverts)	memFree(main->ptverts);
 
-		main->puverts		= NULL;
 		main->ptris			= NULL;
 		main->psnorig		= NULL;
 		main->psnorms		= NULL;
@@ -2050,12 +2047,10 @@ LOGICAL MergeObjectsIfPossible(OBJECT* main, OBJECT* o)
 		main->pscdn			= NULL;
 		main->ptverts		= NULL;
 
-		main->puverts		= (piUNIFIED_VERTEX*)memAlloc(main->numverts * sizeof(piUNIFIED_VERTEX));
+		main->puverts		= (piUNIFIED_VERTEX*)memRealloc(main->puverts, main->numverts * sizeof(piUNIFIED_VERTEX));
 		main->ptris			= (piINDICES*)memAlloc(main->numtris * sizeof(piINDICES));
 
-		memcpy(main->puverts, old_puverts, old_numverts*sizeof(piUNIFIED_VERTEX));
 		memcpy(main->puverts + old_numverts, o->puverts, o->numverts*sizeof(piUNIFIED_VERTEX));
-		if(old_puverts) memFree(old_puverts);
 
 		piINDICES*	ptris = main->ptris;
 
