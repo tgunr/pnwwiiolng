@@ -925,10 +925,7 @@ void TransformEffect::Apply(struct gr2AnimTrooper* trooper, struct OBJECT* o)
         return;
     }
 
-    TransformEffect* te = NULL;
-
-    te = TransformEffect::AddEffect("trooperwatertrail", Vec3f(0, 0, 0), 0, o);
-
+    TransformEffect* te = TransformEffect::AddEffect("trooperwatertrail", Vec3f(0, 0, 0), 0, o);
     if(te)
     {
         te->setstate((unsigned int*)&trooper->currentPose);
@@ -997,13 +994,8 @@ void TransformEffect::Apply(struct trnCDTerrainObject* to)
                     if(p)
                     {
                         p += 7;
-                    }
 
-                    if(p)
-                    {
-                        TransformEffect* te = NULL;
-                        te = TransformEffect::AddEffect(p, Vec3f(0, 0, -1), 0, o);
-
+						TransformEffect* te = TransformEffect::AddEffect(p, Vec3f(0, 0, -1), 0, o);
                         if(te)
                         {
                             te->settoobj(to);
@@ -1149,11 +1141,8 @@ Description:
 -----------------------------------------------------------------------*/
 TransformEffect* TransformEffect::AddTracer(const weapAmmo* ammo, const char* effect)
 {
-    TransformEffect* te = NULL;
-
-    te = TransformEffect::AddEffect(effect, Vec3f(float(ammo->Velocity.x), float(ammo->Velocity.y), float(-ammo->Velocity.z)), 0, NULL);
-
-    if(te)
+    TransformEffect* te = TransformEffect::AddEffect(effect, Vec3f(float(ammo->Velocity.x), float(ammo->Velocity.y), float(-ammo->Velocity.z)), 0, NULL);
+	if(te)
     {
         te->setweapammo(ammo);
         te->enableemitters(true);;
@@ -1169,7 +1158,6 @@ Description:
 TransformEffect* TransformEffect::AddTargetAim(const char* effect)
 {
     TransformEffect* te = GetFreeTransform();
-
     if(!te)
     {
         return NULL;
