@@ -2075,7 +2075,7 @@ void PoolModel::RebuildMDL()
 	MODELMATERIALS				modelMaterials;
 
 
-	topmostObj = ldfltLoad(fltPath.c_str(), 1, 1);
+	topmostObj = ldfltLoad(fltPath, 1, 1);
 	if(!topmostObj)
 	{
 		Write_Debug("Error loading FLT file for %s", fltPath.c_str());

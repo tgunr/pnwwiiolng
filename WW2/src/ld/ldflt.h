@@ -530,4 +530,4 @@ struct fltEXTENSION
 #define fltWIRE_CLOSED        3
 #define fltALTERNATE_COLOR    4
 
-struct OBJECT* ldfltLoad(const char* name, float scale, int reduce);
+struct OBJECT* ldfltLoad(const std::string& name, float scale, int reduce);
