@@ -1983,6 +1983,7 @@ static bool ReadTextComment(void)
 	if (len < 0)
 	{
 		// comment has no data
+		memFree(textcomment);
 		textcomment = nullptr;
 	}
 	else
@@ -2206,6 +2207,7 @@ static bool ReadPopLevel(void)
 		textlevel = -1;
 		if (textcomment)
 		{
+			memFree(textcomment);
 			textcomment = nullptr;
 		}
 	}
