@@ -544,8 +544,7 @@ static bool ReadVertexPalette(void)
 	sizeverts = 0;
 	numvertices = 0;
 
-	rawverts = memAlloc(totsizeverts);
-	localBufferCopyBytes( rawverts, totsizeverts);
+	localBufferUseBytes( rawverts, totsizeverts);
 
 	offset += LongEndian(vp->length);
 
@@ -2765,10 +2764,7 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 	fioClose(stream);
 
 	if (rawverts != NULL)
-	{
-		memFree(rawverts);
 		rawverts = NULL;
-	}
 
 	// If this flag is still true, then something went wrong, because
 	// it should have been reset to false. Check for topmost group name
