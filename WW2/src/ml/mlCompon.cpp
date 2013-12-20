@@ -143,61 +143,61 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
 								   UINT32 VehicleTypeNum,
 								   void* VehicleMasterPtr)
 {
-	SINT32 ComponentListFile = -1;
-	UCHAR Buffer[256];
-	UCHAR * BufferPos;
-	UCHAR UseFileName[128];
-	SINT32 NumComponents;
-	UINT32 VarNum;
-	UCHAR * VarName;
-	UCHAR * VarContents;
-	SINT32 ComponentListPos;
-	mlComponent * CurrentComponent;
-
-	if(ComponentListFilename == NULL || *ComponentListFilename == '\0') return 1;
+	*ComponentList = NULL;
+	if (ComponentListFilename == NULL || *ComponentListFilename == '\0')
+		return 1;
 
 #ifdef PRINT_COMPONENTS
 	printf("%s\n", ComponentListFilename);
 #endif
 
-	strcpy((char*)UseFileName,(char*)DirName);
+	UCHAR UseFileName[128];
+	strcpy((char*)UseFileName, (char*)DirName);
 	strcat((char*)UseFileName,"\\");
 	strcat((char*)UseFileName,(char*)ComponentListFilename);
 
-	if(fioAccess((char*)UseFileName))
-		ComponentListFile = fioOpen((char*)UseFileName);
-
+	SINT32 ComponentListFile = fioOpen((char*)UseFileName);
 	if (ComponentListFile < 0)
 	{
-		*ComponentList = NULL;
 		return 1;
 	}
 
-	NumComponents = 0;
-	while (fioGetLine(ComponentListFile,(char*)Buffer,255) != 0)
+	const void *fileData;
+	size_t fileSize = fioMap(ComponentListFile, fileData);
+	if (fileSize <= 0)
 	{
-		if (Buffer[0] == '[')
-		{
-			NumComponents++;
-		}
+		fioClose(ComponentListFile);
+		return 1;
 	}
 
-	fioClose(ComponentListFile);
-
-	ComponentListFile = fioOpen((char*)UseFileName);
-
-	if (ComponentListFile == -1)
+	size_t NumComponents = 0;
+	for (const char* cur = static_cast<const char*>(fileData);;)
 	{
-		*ComponentList = NULL;
+		if (*cur == '[')
+			++NumComponents;
+		cur = strchr(cur, '\n');
+		if (!cur)
+			break;
+		++cur;
+	}
+	if (NumComponents == 0)
+	{
+		fioClose(ComponentListFile);
 		return 1;
 	}
 
 	*ComponentList = (mlComponentList*)memCalloc(sizeof(mlComponentList) + NumComponents * sizeof(mlComponent), 1);
 	(*ComponentList)->NumComponents = NumComponents;
 
-	ComponentListPos = -1;
+	SINT32 ComponentListPos = -1;
+	UCHAR Buffer[256];
+	UCHAR * BufferPos;
+	UINT32 VarNum;
+	UCHAR * VarName;
+	UCHAR * VarContents;
+	mlComponent * CurrentComponent;
 
-	while (fioGetLine(ComponentListFile,(char*)Buffer,255) != 0)
+	while (fioGetLine(ComponentListFile, (char*)Buffer, 255) != 0)
 	{
 		if (Buffer[0] == '#')
 			continue;
@@ -682,48 +682,50 @@ UINT32 mlcomponReadDamageComponents(mlComponentList** ComponentList,
 								   UINT32 VehicleTypeNum,
 								   void* VehicleMasterPtr)
 {
-	SINT32 ComponentListFile = -1;
 	UCHAR Buffer[256];
 	UCHAR * BufferPos;
 	UCHAR UseFileName[128];
-	SINT32 NumComponents;
 	UINT32 VarNum;
 	UCHAR * VarName;
 	UCHAR * VarContents;
 	SINT32 ComponentListPos;
 	mlComponent * CurrentComponent;
 
-	if(ComponentListFilename == NULL || *ComponentListFilename == '\0') return 1;
+	*ComponentList = nullptr;
+	if(ComponentListFilename == NULL || *ComponentListFilename == '\0')
+		return 1;
 
 	strcpy((char*)UseFileName,(char*)DirName);
 	strcat((char*)UseFileName,"\\");
 	strcat((char*)UseFileName,(char*)ComponentListFilename);
 
-	if(fioAccess((char*)UseFileName))
-		ComponentListFile = fioOpen((char*)UseFileName);
-
+	SINT32 ComponentListFile = fioOpen((char*)UseFileName);
 	if (ComponentListFile < 0)
 	{
-		*ComponentList = NULL;
 		return 1;
 	}
 
-	NumComponents = 0;
-	while (fioGetLine(ComponentListFile,(char*)Buffer,255) != 0)
+	const void *fileData;
+	size_t fileSize = fioMap(ComponentListFile, fileData);
+	if (fileSize <= 0)
 	{
-		if (Buffer[0] == '[')
-			NumComponents++;
+		fioClose(ComponentListFile);
+		return 1;
 	}
 
-	fioClose(ComponentListFile);
-
-	ComponentListFile = fioOpen((char*)UseFileName);
-
-    //printf("cmp file:%s\n",UseFileName);
-
-	if (ComponentListFile == -1)
+	size_t NumComponents = 0;
+	for (const char* cur = static_cast<const char*>(fileData);;)
 	{
-		*ComponentList = NULL;
+		if (*cur == '[')
+			++NumComponents;
+		cur = strchr(cur, '\n');
+		if (!cur)
+			break;
+		++cur;
+	}
+	if (NumComponents == 0)
+	{
+		fioClose(ComponentListFile);
 		return 1;
 	}
 
