@@ -22,21 +22,55 @@
 #include "systhread.h"
 #endif
 
+typedef UINT64 guard_t;
+static const guard_t GUARD_VALUE = 0xaafebbdccc12dd34ULL;
+//typedef UINT32 guard_t;
+//static const guard_t GUARD_VALUE = 0xfedc1234;
+
 #ifdef MEMORY_DEBUG
 #pragma pack(push, 4)
 // Size must be evenly divisible by 16
-struct MEMORYDEBUG
+struct MemAllocation
 {
-	UINT32		guardstart;
-	MEMORYDEBUG*	prev;
-	MEMORYDEBUG*	next;
-	UINT32		allocsize;
-	void*		trueptr;
-	UINT32*		lastdword;
-	SINT8		File[32];
-	SINT32		Line;
-	UINT32		guardend;
-	UINT32		retaddress;
+	guard_t			m_startGuard;
+	MemAllocation*	m_prev;
+	MemAllocation*	m_next;
+	size_t			m_allocSize;
+	const char*		m_file;	// points to __FILE__ values which are static constants.
+	SINT32			m_line;
+	guard_t			m_headerGuard;
+	union
+	{
+		guard_t		m_dataStart;
+		char		m_data[1];	// overlay pattern
+	};
+
+	MemAllocation();
+
+	MemAllocation(size_t allocSize, const char* file, UINT32 line)
+	{
+		m_startGuard = GUARD_VALUE;
+		m_allocSize = allocSize;
+		m_prev = m_next = nullptr;
+		m_file = file;
+		m_line = line;
+		m_headerGuard = *(guard_t*)(m_data + m_allocSize) = GUARD_VALUE;
+		Clear(0);
+	}
+
+	guard_t StartGuard() const { return m_startGuard; }
+	guard_t HeaderGuard() const { return m_headerGuard; }
+	guard_t EndGuard() const { return *(guard_t*)(m_data + m_allocSize); }
+
+	void Clear(unsigned int value)
+	{
+		memset(m_data, value, m_allocSize);
+	}
+
+	bool CheckGuards() const
+	{
+		return (StartGuard() == GUARD_VALUE && HeaderGuard() == GUARD_VALUE && EndGuard() == GUARD_VALUE);
+	}
 };
 #pragma pack(pop)
 #endif
@@ -71,273 +105,195 @@ void* memAllocReleaseX(size_t allocSize, const char* f, int n )
 
 // Statics
 #ifdef MEMORY_DEBUG
-static UINT32		numallocations;
+static UINT64		s_totalAllocations;
+static UINT64		s_totalFrees;
+static UINT64		s_peakAllocated;
+static UINT64		s_totalBytesAllocated;
+static UINT64		s_totalBytesFreed;
 
-static UINT32		peakallocated;
-static UINT32		amountallocated;
-systhread_mutex memlistMutex;
-#pragma pack(push, 4)
+systhread_mutex		s_memoryListMutex;
+MemAllocation		memoryList;
 
-// Size must be evenly divisible by 16
+void*				s_ballast;
 
-#pragma pack(pop)
+static void s_memInitialization()
+{
+	static std::once_flag s_onceFlag;
+	std::call_once(s_onceFlag, []() {
+		s_totalAllocations = 0;
+		s_totalBytesAllocated = 0;
 
-MEMORYDEBUG		memorylist;
+		memset(&memoryList, 0, sizeof(MemAllocation));
 
+		s_memoryListMutex = systhreadMutexCreate();
+
+		// allocate a block of memory we can throw away if we do
+		// run out of memory, so there'll be memory available for
+		// whatever we need to do as the application terminates.
+		s_ballast = malloc(1 * 1024 * 1024);
+	});
+}
+
+MemAllocation::MemAllocation()
+{
+	s_memInitialization();
+}
 
 // Add memory to list
-static LOGICAL AddToList(MEMORYDEBUG* lplist, MEMORYDEBUG* lpmem)
+static bool AddToList(MemAllocation* lpmem)
 {
-	MEMORYDEBUG*	lplast;
+	ABORT_IF(lpmem == nullptr);
 
-	if (lplist == NULL || lpmem == NULL)
+	s_memInitialization();
+	lpmem->m_prev = &memoryList;
+	systhreadMutexLock(s_memoryListMutex);
 	{
-		return(FALSE);
+		lpmem->m_next = memoryList.m_next;
+		if (lpmem->m_next)
+			lpmem->m_next->m_prev = lpmem;
+		memoryList.m_next = lpmem;
 	}
+	systhreadMutexUnlock(s_memoryListMutex);
 
-	systhreadMutexLock(memlistMutex);
-
-	lplast = lplist->next;
-	lpmem->next = lplast;
-	lpmem->prev = lplist;
-	lplist->next = lpmem;
-	if (lplast != NULL)
-	{
-		lplast->prev = lpmem;
-	}
-
-	systhreadMutexUnlock(memlistMutex);
-
-	return(TRUE);
+	return true;
 }
 
 // Remove memory from list
-static LOGICAL RemoveFromList(MEMORYDEBUG* lpmem)
+static void RemoveFromList(MemAllocation* mem)
 {
-	if (lpmem == NULL)
+	systhreadMutexLock(s_memoryListMutex);
 	{
-		return(FALSE);
+		if (mem->m_prev)
+			mem->m_prev->m_next = mem->m_next;
+
+		if (mem->m_next)
+			mem->m_next->m_prev = mem->m_prev;
 	}
+	systhreadMutexUnlock(s_memoryListMutex);
 
-	systhreadMutexLock(memlistMutex);
-
-	if (lpmem->prev != NULL)
-	{
-		lpmem->prev->next = lpmem->next;
-	}
-
-	if (lpmem->next != NULL)
-	{
-		lpmem->next->prev = lpmem->prev;
-	}
-
-	systhreadMutexUnlock(memlistMutex);
-
-	return(TRUE);
+	mem->m_prev = mem->m_next = nullptr;
 }
 
 // Check memory list
-static LOGICAL CheckList(MEMORYDEBUG* lpmem)
+static bool CheckList()
 {
-	if (lpmem == NULL)
+	s_memInitialization();
+	systhreadMutexLock(s_memoryListMutex);
 	{
-		return(FALSE);
-	}
-
-	systhreadMutexLock(memlistMutex);
-
-	if (lpmem->lastdword == NULL)
-	{
-		lpmem = lpmem->next;
-	}
-
-	while (lpmem != NULL)
-	{
-		if (*(lpmem->lastdword) != 0xfedc1234)
+		for (MemAllocation* mem = memoryList.m_next; mem != nullptr; mem = mem->m_next)
 		{
-			char buf[256];
-			snprintf(buf, 255, "Memory overwrite detected: 0x%08x in %s at line %d", lpmem, lpmem->File, lpmem->Line);
-			piExitProgram(__FILE__,__LINE__,buf);
+			if (PN_UNLIKELY(!mem->CheckGuards()))
+			{
+				char buf[256];
+				strprintf(buf, "Memory overwrite detected: 0x%08x in %s at line %d", mem, mem->m_file, mem->m_line);
+				piExitProgram(__FILE__, __LINE__, buf);
+			}
 		}
-
-		lpmem = lpmem->next;
 	}
+	systhreadMutexUnlock(s_memoryListMutex);
 
-	systhreadMutexUnlock(memlistMutex);
-
-	return(TRUE);
+	return true;
 }
-
 
 LOGICAL memInit(void)
 {
-	numallocations = 0;
-	amountallocated = 0;
+	s_memInitialization();
 
-	memset(&memorylist, 0, sizeof(MEMORYDEBUG));
-
-	memlistMutex = systhreadMutexCreate();
-
-	return(TRUE);
+	return TRUE;
 }
+
+#if platOS != OS_WIN32
+#define OutputDebugStringA printf
+#endif
 
 void memKill(void)
 {
-#if platOS == OS_WIN32
-    MEMORYDEBUG* mem;
+	if (s_ballast)
+		free(s_ballast);
 
-	Write_Debug("Peak memory allocation: %d", peakallocated);
+	Write_Debug("Peak memory allocation: %llu", s_peakAllocated);
+	UINT64 count = 0;
+	UINT64 size = 0;
+	MemAllocation* mem = memoryList.m_next;
+	char buf[256];
 
-    int count = 0;
-    int size = 0;
-
-    mem = memorylist.next;
-
-    char buff[256];
-
-	while(mem)
+	while (mem)
 	{
-        count++;
-        size += mem->allocsize;
+		count++;
+		size += mem->m_allocSize;
 
-		sprintf(buff, "Memory leak: size = %d, file = %s, line = %d\n", mem->allocsize, mem->File, mem->Line);
-        OutputDebugStringA(buff);
+		strprintf(buf, "Memory leak: size = %" PRSizeT ", file = %s, line = %d\n", mem->m_allocSize, mem->m_file, mem->m_line);
+		OutputDebugStringA(buf);
 
-		if (*(mem->lastdword) != 0xfedc1234 || mem->guardstart != 0xfedc1234 || mem->guardend != 0xfedc1234)
+		if (!mem->CheckGuards())
 		{
-			char buf[256];
-			snprintf(buf, 255, "Memory overwrite detected: 0x%08x in %s at line %d", mem, mem->File, mem->Line);
+			strprintf(buf, "Memory overwrite detected: 0x%08x in %s at line %d", mem, mem->m_file, mem->m_line);
 			piExitProgram(__FILE__, __LINE__, buf);
 		}
 
-		mem = mem->next;
+		mem = mem->m_next;
 	}
-
-    sprintf(buff, "[memKill] %d (%d bytes) objects not freed\n", count, size);
-    OutputDebugStringA(buff);
-
-	if(memlistMutex)
-		systhreadMutexKill(memlistMutex);
-
-	return;
-#else
-    MEMORYDEBUG* mem;
-
-	Write_Debug("Peak memory allocation: %d", peakallocated);
-
-    int count = 0;
-    int size = 0;
-
-    mem = memorylist.next;
-
-    char buff[256];
-
-	while(mem)
-	{
-        count++;
-        size += mem->allocsize;
-
-		sprintf(buff, "Memory leak: size = %d, file = %s, line = %d\n", mem->allocsize, mem->File, mem->Line);
-        OutputDebugStringA(buff);
-            
-		if (*(mem->lastdword) != 0xfedc1234 || mem->guardstart != 0xfedc1234 || mem->guardend != 0xfedc1234)
-		{
-			char buf[256];
-			snprintf(buf, 255, "Memory overwrite detected: 0x%08x in %s at line %d", mem, mem->File, mem->Line);
-			piExitProgram(__FILE__, __LINE__, buf);			
-		}
-
-		mem = mem->next;
-	}
-
-    sprintf(buff, "[memKill] %d (%d bytes) objects not freed\n", count, size);
-    OutputDebugStringA(buff);
-
-	if(memlistMutex)
-		systhreadMutexKill(memlistMutex);
-
-	return;
-#endif
 }
 
 void memVerifyMemory(void)
 {
-	CheckList(&memorylist);
+	CheckList();
 }
 
-void* memAllocDebug(SINT32 allocsize, SINT8* File, SINT32 Line)
+void* memAllocDebug(SINT32 allocSize, SINT8* File, SINT32 Line)
 {
-SINT8*	pfile;
-MEMORYDEBUG*	ptr;
-
 #ifdef MEMORY_DEBUG_EXTREME
-	CheckList(&memorylist);
+	CheckList();
 #endif
 
-	ptr = (MEMORYDEBUG*)calloc(1, allocsize + sizeof(MEMORYDEBUG));
-	if (ptr == NULL)
+	MemAllocation* ptr = (MemAllocation*)malloc(allocSize + sizeof(MemAllocation));
+	if (ptr == nullptr)
 	{
-		Write_Debug("No memory available for allocation; %d", allocsize);
-		return(NULL);
-	}
-	ptr->guardstart = ptr->guardend = 0xfedc1234;
-	ptr->allocsize = allocsize;
-	ptr->trueptr = ptr;
-	ptr->lastdword = (UINT32*)((BYTE*)ptr + allocsize + sizeof(MEMORYDEBUG) - sizeof(UINT32));
-	*(ptr->lastdword) = 0xfedc1234;
-	pfile = strrchr(File, '\\');
-	if (pfile == NULL)
-	{
-		pfile = File;
-	}
-	else
-	{
-		pfile += 1;
+		free(s_ballast);
+		LogAbort("Out of memory");
 	}
 
-	strncpy(ptr->File, pfile,31);
-	ptr->Line = Line;
-	AddToList(&memorylist, ptr);
+	// initialize
+	new (ptr) MemAllocation(allocSize, File, Line);
 
-	numallocations += 1;
-	amountallocated += allocsize;
-	if (amountallocated > peakallocated)
-	{
-		peakallocated = amountallocated;
-	}
+	AddToList(ptr);
 
-	return(&ptr->retaddress);
+	++s_totalAllocations;
+	s_totalBytesAllocated += allocSize;
+	if (s_totalBytesAllocated > s_peakAllocated)
+		s_peakAllocated = s_totalBytesAllocated;
+
+	return &(ptr->m_dataStart);
 }
 
 void memFreeDebug(void* allocptr, SINT8* File, SINT32 Line)
 {
-MEMORYDEBUG*	ptr;
-
-#ifdef MEMORY_DEBUG_EXTREME
-	CheckList(&memorylist);
-#endif
-
-	ptr = (MEMORYDEBUG*)allocptr;
-	if (allocptr == NULL)
+	if (allocptr == nullptr)
 	{
-		Write_Debug("Attempting to free a null memory pointer");
+		Write_Debug("Attempting to free a nullptr memory pointer");
 		return;
 	}
 
-	ptr = (MEMORYDEBUG*)((BYTE*)ptr - sizeof(MEMORYDEBUG) + sizeof(UINT32));
+#ifdef MEMORY_DEBUG_EXTREME
+	CheckList();
+#endif
 
-	if (*(ptr->lastdword) != 0xfedc1234 || ptr->guardstart != 0xfedc1234 || ptr->guardend != 0xfedc1234)
+	MemAllocation* ptr = (MemAllocation*)((char*)allocptr - offsetof(struct MemAllocation, m_data));
+
+	if (!ptr->CheckGuards())
 	{
 			char buf[256];
-			snprintf(buf, 255, "Memory overwrite detected: 0x%08x in %s at line %d", ptr, ptr->File, ptr->Line);
-			piExitProgram(__FILE__,__LINE__,buf);
-	}else
-	{
-		RemoveFromList(ptr);
-		numallocations -= 1;
-		amountallocated -= ptr->allocsize;
-		free(ptr->trueptr);
+			strprintf(buf, "Memory overwrite detected: 0x%08x in %s at line %d", ptr, ptr->m_file, ptr->m_line);
+			piExitProgram(__FILE__, __LINE__, buf);
 	}
+
+	RemoveFromList(ptr);
+	s_totalFrees++;
+	s_totalBytesFreed += ptr->m_allocSize;
+#ifdef MEMORY_DEBUG_EXTREME
+	ptr->Clear(0xbb);
+#endif
+	free(ptr);
 }
 
 #else	//	MEMORY_DEBUG
