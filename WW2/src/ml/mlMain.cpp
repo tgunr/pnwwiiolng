@@ -640,8 +640,7 @@ UINT32 _ClearVehicleData(mlVehicleData * VehicleData)
 	}
 	if (VehicleData->ComponentList != NULL)
 	{
-		mlcomponFreeComponentData(VehicleData->ComponentList);
-		memFree(VehicleData->ComponentList);
+		mlcomponFreeComponentList(VehicleData->ComponentList);
 		VehicleData->ComponentList = NULL;
 	}
 

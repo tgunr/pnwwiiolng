@@ -420,8 +420,7 @@ static void _ReadComponentFiles(void)
 			}
 		}
 
-		mlcomponFreeComponentData(compList);
-		memFree(compList);
+		mlcomponFreeComponentList(compList);
 	}
 logTimerEndMacro();
 }

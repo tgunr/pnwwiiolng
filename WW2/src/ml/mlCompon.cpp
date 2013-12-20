@@ -192,10 +192,7 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
 		return 1;
 	}
 
-	*ComponentList = (mlComponentList*)memAlloc(sizeof(mlComponentList));
-	memset(*ComponentList,0,sizeof(mlComponentList));
-	(*ComponentList)->Components =  (mlComponent*)memAlloc(NumComponents * sizeof(mlComponent));
-	memset((*ComponentList)->Components,0,NumComponents * sizeof(mlComponent));
+	*ComponentList = (mlComponentList*)memCalloc(sizeof(mlComponentList) + NumComponents * sizeof(mlComponent), 1);
 	(*ComponentList)->NumComponents = NumComponents;
 
 	ComponentListPos = -1;
@@ -203,9 +200,7 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
 	while (fioGetLine(ComponentListFile,(char*)Buffer,255) != 0)
 	{
 		if (Buffer[0] == '#')
-		{
 			continue;
-		}
 
 		if (Buffer[0] == '[')
 		{
@@ -642,16 +637,14 @@ UINT32 mlFindComponent(mlComponent** ComponentPtr,
 }
 
 /************************************************************************************************
-	mlcomponFreeComponentData
+	mlcomponFreeComponentList
 *************************************************************************************************/
 
-UINT32 mlcomponFreeComponentData(mlComponentList* ComponentList)
+UINT32 mlcomponFreeComponentList(mlComponentList* ComponentList)
 {
-	UINT32 i;
-
 	if (ComponentList->Components != NULL)
 	{
-		for (i=0;i<ComponentList->NumComponents;i++)
+		for (size_t i=0;i<ComponentList->NumComponents;i++)
 		{
 			if (ComponentList->Components[i].SpecialData != NULL)
 			{
@@ -671,12 +664,10 @@ UINT32 mlcomponFreeComponentData(mlComponentList* ComponentList)
 					memFree(ComponentList->Components[i].SpecialData);
 				}
 			}
-			ComponentList->Components[i].SpecialData = NULL;
 		}
 
-		memFree(ComponentList->Components);
 	}
-	ComponentList->NumComponents = 0;
+	memFree(ComponentList);
 
 	return 0;
 }
@@ -736,10 +727,7 @@ UINT32 mlcomponReadDamageComponents(mlComponentList** ComponentList,
 		return 1;
 	}
 
-	*ComponentList =  (mlComponentList*)memAlloc(sizeof(mlComponentList));
-	memset(*ComponentList,0,sizeof(mlComponentList));
-	(*ComponentList)->Components =  (mlComponent*)memAlloc(NumComponents * sizeof(mlComponent));
-	memset((*ComponentList)->Components,0,NumComponents * sizeof(mlComponent));
+	*ComponentList =  (mlComponentList*)memCalloc(sizeof(mlComponentList) + NumComponents * sizeof(mlComponent), 1);
 	(*ComponentList)->NumComponents = NumComponents;
 
 	ComponentListPos = -1;
@@ -848,7 +836,7 @@ UINT32 mlcomponReadDamageComponents(mlComponentList** ComponentList,
 	mlComponentListBegin
 *************************************************************************************************/
 
-void mlComponentListBegin(mlComponentList const* List, mlComponentListIterator* it)
+void mlComponentListBegin(mlComponentList* List, mlComponentListIterator* it)
 {
 	it->List = List;
 	it->idx = 0;
