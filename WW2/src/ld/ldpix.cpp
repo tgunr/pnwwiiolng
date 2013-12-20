@@ -158,20 +158,14 @@ static void _checkTexture(int texid)
 
 int _loadImageFileToSurface(const char* Filename, UINT32 TransparentColor, UINT32 Flags)
 {
-LOGICAL		loadalpha, WantDXT, WantMipmap;
-UINT32		WantFlags;
-char*		ptr;
-char		basename[256], localname[256], tmpname[256], alphaname[256];
-int			i, j, texid, width, height;
-int			newwidth, newheight;
-TEXTURE*	lptex;
-int			mip_texid;
-//static int	count;
-LOGICAL 	isUITexture   = !strncasecmp("ui\\", Filename, 3);
-LOGICAL     isSplashScreen = !strncasecmp("splashscreen", Filename, 12);
-LOGICAL     isFont = !strncasecmp("\\fonts\\", Filename, 7);
-
-LOGICAL		actuallyReduce = FALSE;
+	UINT32		WantFlags;
+	char*		ptr;
+	char		basename[256], localname[256], tmpname[256], alphaname[256];
+	int			i, j, texid, width, height;
+	int			newwidth, newheight;
+	TEXTURE*	lptex;
+	int			mip_texid;
+	//static int	count;
 
 #ifdef LOAD_TIMER
 SINT32		t1, t2, t3, t4;
@@ -181,10 +175,13 @@ SINT32		t1, t2, t3, t4;
 	t1 = piReadTimeStamp32();
 #endif
 
-	WantMipmap = (Flags & LDPIX_MIPMAP) != 0;
-	WantDXT = (Flags & LDPIX_NO_DXT) == 0;
+	bool WantMipmap = (Flags & LDPIX_MIPMAP) != 0;
+	bool WantDXT = (Flags & LDPIX_NO_DXT) == 0;
 
-	if (isUITexture || isSplashScreen || isFont)
+	if (WantMipmap
+		&& (strncasecmp("ui\\", Filename, 3) == 0
+			|| strncasecmp("\\fonts\\", Filename, 7) == 0
+			|| strncasecmp("splashscreen", Filename, 12) == 0))
 	{
 		WantMipmap = FALSE;
 	}
@@ -211,11 +208,10 @@ SINT32		t1, t2, t3, t4;
 
     Write_Log(LOG_TEXTURE, LOG_INFO, "[TEXTURE] loading %s", localname);
 
+	size_t suffixOffset = strprintf(tmpname, "%s.", localname);
 	for (i=0; GfxFormats[i].Routine; i++)
 	{
-		strcpy(tmpname, localname);
-		strcat(tmpname, ".");
-		strcat(tmpname, GfxFormats[i].Extension);
+		strncpy(tmpname + suffixOffset, GfxFormats[i].Extension, sizeof(tmpname) - suffixOffset);
 
 		if (fioAccess(tmpname))
 		{
@@ -264,7 +260,7 @@ SINT32		t1, t2, t3, t4;
 	}
 #endif
 
-	loadalpha = FALSE;
+	bool loadalpha = false;
 
 #if defined (EVENT_LOG_EXTREME) || defined (DEBUG_REDUCTION)
 	Write_Debug("Texture loading: %s", localname);
@@ -275,7 +271,7 @@ SINT32		t1, t2, t3, t4;
 	if (fioAccess(alphaname))
 	{
 		TransparentColor = piRGBA_SETALPHA(TransparentColor,8);
-		loadalpha = TRUE;
+		loadalpha = true;
 
 #ifdef CONVERSION_PROGRAM
 		nErrorCode = ALPHA_FILE_FOUND;
@@ -328,6 +324,7 @@ SINT32		t1, t2, t3, t4;
 		reduceTextures = FALSE;
 	}
 
+	bool actuallyReduce = false;
 	// let's determine if we want to reduce
 	if (reduceTextures)
 	{
@@ -335,14 +332,13 @@ SINT32		t1, t2, t3, t4;
 		{
 			if ((width > 256) || (height > 256))
 			{
-				actuallyReduce = TRUE;
+				actuallyReduce = true;
 #ifdef DEBUG_REDUCTION
 				Write_Debug ("DEBUG_REDUCTION: Reducing large texture %s .. (%d, %d)", localname, width, height);
 #endif
 			}
 			else
 			{
-				actuallyReduce = FALSE;
 #ifdef DEBUG_REDUCTION
 				Write_Debug ("DEBUG_REDUCTION:  Not reducing %s due to alpha", localname);
 #endif
@@ -352,14 +348,13 @@ SINT32		t1, t2, t3, t4;
 		{
 			if ((width <= 32) || (height <= 32))
 			{
-				actuallyReduce = FALSE;
 #ifdef DEBUG_REDUCTION
 				Write_Debug ("DEBUG_REDUCTION: Not reducing small texture %s .. (%d, %d)", localname, width, height);
 #endif
 			}
 			else
 			{
-				actuallyReduce = TRUE;
+				actuallyReduce = true;
 			}
 		}
 	}
@@ -374,8 +369,7 @@ SINT32		t1, t2, t3, t4;
 		newwidth = width / 2;
 		newheight = height / 2;
 
-		if (newwidth <= MinTextureDim ||
-			newheight <= MinTextureDim)
+		if (newwidth <= MinTextureDim || newheight <= MinTextureDim)
 		{
 #ifdef DEBUG_REDUCTION
 			Write_Debug ("DEBUG_REDUCTION:  Not reducing %s due to size .. (%d, %d) < %d", localname, newwidth, newheight, MinTextureDim);
@@ -394,11 +388,11 @@ SINT32		t1, t2, t3, t4;
 		{
 			lstrcpy(alphaname, localname);
 			lstrcat(alphaname, "_alpha.bmp");
-			loadalpha = FALSE;
+			loadalpha = false;
 			if (fioAccess(alphaname))
 			{
 				TransparentColor = piRGBA_SETALPHA(TransparentColor, 8);
-				loadalpha = TRUE;
+				loadalpha = true;
 			}
 
 			new_texid = GfxFormats[i].Routine(tmpname, TransparentColor, WantFlags);
@@ -499,11 +493,11 @@ SINT32		t1, t2, t3, t4;
 			{
 				lstrcpy(alphaname, localname);
 				lstrcat(alphaname, "_alpha.bmp");
-				loadalpha = FALSE;
+				loadalpha = false;
 				if (fioAccess(alphaname))
 				{
 					TransparentColor = piRGBA_SETALPHA(TransparentColor, 8);
-					loadalpha = TRUE;
+					loadalpha = true;
 				}
 
 				mip_texid = GfxFormats[i].Routine(tmpname, TransparentColor, WantFlags);
