@@ -69,6 +69,8 @@ namespace Fio
 	extern size_t fioRead(int fd, void* dptr, size_t length);
 	extern size_t fioWrite(int fd, const void* dptr, size_t length);
 
+	extern size_t fioMap(int fd, const void*& data);
+
 	extern size_t    fioGetLine(int fd, char* string, size_t length);
 	extern char   fioGetc(int fd);
 	extern short  fioGets(int fd);

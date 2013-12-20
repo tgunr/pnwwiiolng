@@ -14,6 +14,7 @@
 #define fioGetString fiodGetString
 #define fioSeek fiodSeek
 #define fioRead fiodRead
+#define fioMap  fiodMap
 #define fioGets fiodGets
 #define fioGetc fiodGetc
 #define fioGetl fiodGetl

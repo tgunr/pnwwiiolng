@@ -15,3 +15,5 @@ extern int fioaEOF(int fd);
 
 extern size_t fioaFileSize(const char* name);
 extern int fioaAccess(const char* filename);
+
+extern size_t fioaMap(int fd, const void*& data);

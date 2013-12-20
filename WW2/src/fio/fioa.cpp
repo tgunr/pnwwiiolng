@@ -15,8 +15,8 @@
 
 struct fioaFD
 {
-	int marker;
-	int datalen;
+	size_t marker;
+	size_t datalen;
 	unsigned char* data;
 };
 
@@ -35,12 +35,13 @@ static systhread_mutex fioaMutex;
 
 int fioaAddArchive(const char* archive)
 {
-	if(PN_UNLIKELY(fioaMutex == NULL))
+	if(PN_UNLIKELY(fioaMutex == nullptr))
 		fioaMutex = systhreadMutexCreate();
 
-	if (PN_UNLIKELY(fioa.pf == NULL)) {
+	if (PN_UNLIKELY(fioa.pf == nullptr))
+	{
 		fioa.pf = paAlloc();
-		if (PN_UNLIKELY(fioa.pf == NULL))
+		if (PN_UNLIKELY(fioa.pf == nullptr))
 			return -1;
 	}
 
@@ -53,12 +54,10 @@ int fioaAddArchive(const char* archive)
 
 void fioaKill()
 {
-	int i;
-
 	if(fioaMutex)
 		systhreadMutexKill(fioaMutex);
 
-	for(i = 0; i < FIOA_MAX_FILDES; i++)
+	for(size_t i = 0; i < FIOA_MAX_FILDES; i++)
 	{
 		if(fioa.file[i].data)
 		{
@@ -81,14 +80,14 @@ int fioaOpen(const char* filename)
 {
 	int fd;
 
-	if(PN_UNLIKELY(fioa.pf == NULL)) return -1;
+	if(PN_UNLIKELY(fioa.pf == nullptr)) return -1;
 
 // use mutex here since we call it from thread completion routine
 	systhreadMutexLock(fioaMutex);
 
 	for(fd = 0; fd < FIOA_MAX_FILDES; fd++)
 	{
-		if(fioa.file[fd].data == NULL)
+		if(fioa.file[fd].data == nullptr)
 		{
 			if(paFetchMember(fioa.pf, filename, &fioa.file[fd].data, &fioa.file[fd].datalen) == 0)
 				fd += FIOA_FD_START;
@@ -131,6 +130,26 @@ void fioaClose(int fd)
 }
 
 /************************************************************************************************
+	fioaMap
+*************************************************************************************************/
+
+size_t fioaMap(int fd, const void*& data)
+{
+	fd -= FIOA_FD_START;
+	if (fd > -1 && fd < FIOA_MAX_FILDES)
+	{
+		auto& file = fioa.file[fd];
+		if (file.marker < file.datalen)
+		{
+			data = file.data + file.marker;
+			return file.datalen - file.marker;
+		}
+	}
+	data = nullptr;
+	return 0;
+}
+
+/************************************************************************************************
 	fioaRead
 *************************************************************************************************/
 
@@ -141,12 +160,12 @@ size_t fioaRead(int fd, void* data, size_t len)
 
 	if(fd > -1 && fd < FIOA_MAX_FILDES)
 	{
-		int offset = fioa.file[fd].marker;
+		size_t offset = fioa.file[fd].marker;
 
 		if(offset < fioa.file[fd].datalen)
 		{
 			nb = len;
-			if(offset + (int)nb > fioa.file[fd].datalen)
+			if(offset + nb > fioa.file[fd].datalen)
 			{
 				nb = fioa.file[fd].datalen - offset;
 			}
@@ -227,11 +246,11 @@ int fioaEOF(int fd)
 
 size_t fioaFileSize(const char* filename)
 {
-	int len = -1;
+	size_t len = -1;
 
-	paFetchMember(fioa.pf, filename, NULL, &len);
+	paFetchMember(fioa.pf, filename, nullptr, &len);
 
-	return (size_t)len;
+	return len;
 }
 
 /************************************************************************************************
@@ -240,5 +259,5 @@ size_t fioaFileSize(const char* filename)
 
 int fioaAccess(const char* filename)
 {
-	return paFetchMember(fioa.pf, filename, NULL, NULL) == 0;
+	return paFetchMember(fioa.pf, filename, nullptr, nullptr) == 0;
 }

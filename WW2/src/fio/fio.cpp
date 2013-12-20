@@ -525,6 +525,29 @@ size_t fioRead(int fd, void* dptr, size_t length)
     }
 }
 
+size_t fioMap(int fd, const void*& data)
+{
+	SINT32 fdtype = fioDescriptorType(fd);
+
+	switch (fdtype)
+	{
+		case - 1:
+			data = nullptr;
+			return 0;
+		break;
+		case ISUSERDIRECTORY:
+		case ISDIRECTORY:
+		default:
+			return fiodMap(fd, data);
+		break;
+#ifndef FIO_NO_ARCHIVE
+		case ISARCHIVE:
+			return fioaMap(fd, data);
+		break;
+#endif
+	}
+}
+
 /************************************************************************************************
 	fioWrite
 *************************************************************************************************/

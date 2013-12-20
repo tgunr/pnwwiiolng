@@ -262,15 +262,7 @@ namespace Fiod
 		size_t Read(void* dest, size_t length)
 		{
 			const size_t readLen = std::min(BytesRemaining(), length);
-	  if ( readLen == 4 )
-	  {
-		char* dst = (char*) dest;
-		*dst++ = *curPtr++;
-		*dst++ = *curPtr++;
-		*dst++ = *curPtr++;
-		*dst++ = *curPtr++;
-	  }
-			else if ( readLen > 0 )
+			if ( readLen > 0 )
 			{
 				memcpy(dest, curPtr, readLen);
 				curPtr = curPtr + readLen;
@@ -404,13 +396,16 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 		// descriptor open.
 		assert( s_fileMap.find(fd) == s_fileMap.end() );
 
-	// Try to read the file contents into the allocation
-	off_t bytesRead = OS_READ(fd, mem, fileSize);
-	if ( bytesRead < fileSize )
-	  throw "read failed/truncated";
+		// Try to read the file contents into the allocation
+		off_t bytesRead = OS_READ(fd, mem, fileSize);
+		if ( bytesRead < fileSize )
+			throw "read failed/truncated";
 
-	// Index this allocation into the file map
-	s_fileMap[fd].Assign(mem, fileSize);
+		// Index this allocation into the file map
+		auto& fileMap = s_fileMap[fd];
+		fileMap.Assign(mem, fileSize);
+		lastFd = fd;
+		lastResult = &fileMap;
 	}
 	catch ( const char* cause )
 	{
@@ -458,6 +453,21 @@ size_t fiodSeek(int fd, size_t offset, int from)
 		return OS_LSEEK(fd, offset, from);
 
 	return state->Seek(offset, from);
+}
+
+//////////////////////////////////////////////////////////////////////
+// allow the caller to see the internal data buffer, like mmap.
+
+size_t fiodMap(int fd, const void*& data)
+{
+	Fiod::FileState* state = _lookupFileState(fd);
+	if (state != nullptr && state->curPtr < state->endPtr)
+	{
+		data = state->curPtr;
+		return static_cast<size_t>(state->endPtr - state->curPtr);
+	}
+	data = nullptr;
+	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////

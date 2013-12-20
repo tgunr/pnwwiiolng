@@ -195,7 +195,7 @@ void paClose(paFILE* pf, int archiveIdx)
 	paFetchMember
 *************************************************************************************************/
 
-int paFetchMember(paFILE* pf, const char* membername, unsigned char** data, int* len)
+int paFetchMember(paFILE* pf, const char* membername, unsigned char** data, size_t* len)
 {
 	char name[PA_MAX_NAME+1];
 	paTOC* member;
@@ -232,8 +232,7 @@ int paFetchMember(paFILE* pf, const char* membername, unsigned char** data, int*
 
 				fread(srcMD5, 1, 16, member->pa->f);
 
-				*data = (unsigned char*)calloc(member->filelen, 1);
-
+				*data = (unsigned char*)calloc(member->filelen + 1, 1);
 				if(*data == NULL)
 				{
 					return -1;

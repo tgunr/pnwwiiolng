@@ -15,6 +15,7 @@ extern void fiodClose(int hfile);
 extern size_t fiodRead(int hfile, void* dptr, size_t length);
 extern size_t fiodWrite(int hfile, const void* dptr, size_t length);
 extern size_t fiodSeek(int hfile, size_t offset, int from);
+extern size_t fiodMap(int hfile, const void*& data);
 extern int fiodEOF(int hfile);
 
 extern LOGICAL fiodAccess(const char* filename, bool userdir = false);
