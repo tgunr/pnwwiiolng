@@ -94,23 +94,19 @@ UINT32 mlUtilityFindComponentByName(mlComponent** ComponentPtr,
 	UINT32 Found = 0;
 	mlComponentListIterator it;
 
+	const size_t compNameLen = strlen((const char*)ComponentName);
 	mlComponentListBegin(ComponentList, &it);
 	for(; it.comp; mlComponentListNext(&it))
 	{
-		if(strncmp((char*)ComponentName,(char*)it.comp->ComponentName, strlen((char*)ComponentName)) == 0)
+		if(strncmp((char*)ComponentName, (char*)it.comp->ComponentName, compNameLen) == 0)
 		{
 			*ComponentPtr = it.comp;
-
-			Found = 1;
-			break;
+			return 0;
 		}
 	}
 
-	if (Found == 0)
-	{
-		*ComponentPtr = NULL;
-		Write_Debug("Unable to find component called %s stated in component %s\n",ComponentName,Component->ComponentName);
-	}
+	*ComponentPtr = NULL;
+	Write_Debug("Unable to find component called %s stated in component %s\n",ComponentName,Component->ComponentName);
 
 	return 0;
 }
