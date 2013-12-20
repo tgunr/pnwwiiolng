@@ -322,13 +322,11 @@ static void ReadUnknown()
 
 static UINT16 FindTexPatIndex(UINT16 patindex)
 {
-  int		i;
-
-	for (i=0; i < numtexrefs; i++)
+	for (auto i=0; i < numtexrefs; i++)
 	{
 		if (patindex == texref[i].patindex)
 		{
-			return(i);
+			return i;
 		}
 	}
 

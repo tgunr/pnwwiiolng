@@ -339,14 +339,16 @@ UINT32 _ReadAmmoTypes(void)
 {
 	int AmmoListFile = 0;
 	int CurrentAmmoFile = 0;
-    UCHAR FileName[300] = "";
-    UCHAR Buffer[256] = "";
+    UCHAR FileName[300];
+    UCHAR Buffer[256];
 	UCHAR* VarName = NULL;
 	UCHAR* VarContents = NULL;
 	UINT32 VarNum = 0;
 	UINT32 CurrentPos = 0;
 	weapAmmoType* AmmoType = NULL;
 	UINT32 i = 0;
+
+	FileName[0] = Buffer[0] = 0;
 
 #if defined(USE_OSG)
 #else

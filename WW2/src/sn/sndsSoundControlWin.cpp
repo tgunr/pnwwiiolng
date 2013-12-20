@@ -395,7 +395,7 @@ HRESULT         hr;
 
     if(hr != DS_OK)
     {
-        SCHAR szBuff[256] = "";
+        SCHAR szBuff[256];
 
         DDError(hr);
 

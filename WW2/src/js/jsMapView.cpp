@@ -972,7 +972,7 @@ JS_FUNCTION_DEF(jsMapView, getnexthandle)
 	const char* type = JS_GetStringBytes(JS_ValueToString(ctx, argv[0]));
 
 	ChatHandle id = 0;
-	char callsign[MAX_HANDLE_SIZE] = "";
+	char callsign[MAX_HANDLE_SIZE];
 
 	if(!strcmp(type, "rally"))
 		id = GetUniqueHandle('R');
@@ -981,8 +981,7 @@ JS_FUNCTION_DEF(jsMapView, getnexthandle)
 	else if(!strcmp(type, "mortar"))
 		id = GetUniqueHandle('M');
 
-	if(id)
-		chatGetCallsign(callsign, id);
+	chatGetCallsign(callsign, id);
 
 	*rval = phui::js::NewString(callsign);
 

@@ -786,7 +786,7 @@ void piExitProgram(const SINT8* file, SINT32 line, const SINT8* MessageString)
 #if defined(DEBUG_WW2) || defined(BETA_RELEASE)
 	if(MessageString)
 	{
-		char msgFmt[] = "Application crashed and will now exit.\n\nFile: %s\nLine: %u\nMessage: %s\n";
+		static const char msgFmt[] = "Application crashed and will now exit.\n\nFile: %s\nLine: %u\nMessage: %s\n";
 		const size_t fileNameLen = strlen(file);
 		const size_t msgLen = strlen(MessageString);
 		char* msg   = (char*)alloca(sizeof(msgFmt) + fileNameLen + msgLen + 16);

@@ -1467,8 +1467,7 @@ void fxPclPlayDirtSound(void* posAddress)
     if(id == -1)
         return;
 
-    SCHAR szName[] = "sounds\\troop\\satchel-place.wav";
-
+    static const char* const szName = "sounds\\troop\\satchel-place.wav";
     fxSndSetSoundName(id, szName);
     fxSndSetPosition(id, pPos->x, pPos->y, pPos->z);
     fxSndSetPriority(id, IDE_TP_PRIORITY_LOW);
@@ -1492,9 +1491,8 @@ void fxPclPlayShellSound(FXPARTICLE* lpPcl)
     if(id == -1)
         return;
 
-    SCHAR szName[] = "sounds\\casing.wav";
-
-    fxSndSetSoundName(id, szName);
+    static const char* const szName = "sounds\\casing.wav";
+	fxSndSetSoundName(id, szName);
     fxSndSetPosition(id, lpPcl->vecPos.x, lpPcl->vecPos.y, lpPcl->vecPos.z);
     fxSndSetPriority(id, IDE_TP_PRIORITY_LOW);
     fxSndSetSoundType(id, TYPE_FINITE_EXTERNAL_SOUND);

@@ -1836,15 +1836,14 @@ void fxSndSetCreateTime(SINT32 id, SINT32 iTime)
 // Function: fxSndSetSoundName
 // Description:
 //////////////////////////////////////////////////////////
-void fxSndSetSoundName(SINT32 id, SCHAR* soundName)
+void fxSndSetSoundName(SINT32 id, const char* soundName)
 {
-    if(!soundName) return;
-
-	FXSOUND* sound = _findSound(id);
-
-	if(!sound) return;
-
-    strncpy(sound->szName, soundName, MAX_SND_NAME_LENGTH - 1);
+	if (soundName)
+	{
+		FXSOUND* sound = _findSound(id);
+		if (sound)
+			strncpy(sound->szName, soundName, MAX_SND_NAME_LENGTH - 1);
+	}
 }
 
 //////////////////////////////////////////////////////////

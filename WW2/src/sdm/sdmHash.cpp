@@ -102,7 +102,7 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd,SINT32 numBu
 	STRAT_BUILDING_LIST* table, *tcell;
 	SINT32 i,x,y,sx,sy;
 
-    static SCHAR builder[] = "builder";
+    static const char builder[] = "builder";
 
 	memset(_tempTable,0,sizeof(_tempTable));
 

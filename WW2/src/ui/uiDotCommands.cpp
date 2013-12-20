@@ -295,7 +295,8 @@ ARGV::ARGV(const char* utf8Source, UINT32 maxArguments, bool fillLastArgument)
 
 static SINT32 dot_help(const wchar_t* line)
 {
-	wchar_t cmd[DOT_COMMAND_SIZE+1] = L"";
+	wchar_t cmd[DOT_COMMAND_SIZE+1];
+	cmd[0] = 0;
 
 	int argc = swscanf(line, L"%*ls %255ls", cmd);
 	SINT32 result = DC_PASS_TO_HOST;
@@ -527,8 +528,9 @@ static SINT32 dot_conv(const wchar_t* line)
 
 static SINT32 dot_emote(const char* line)
 {
-	char emote[256] = "";
-	char handle[256] = "";
+	char emote[256];
+	char handle[256];
+	emote[0] = handle[0] = 0;
 
 	int argc = sscanf(line, "%*s %255s %255s", emote, handle);
 

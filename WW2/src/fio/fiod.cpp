@@ -344,8 +344,10 @@ _lookupFileState(int fd)
 
 int fiodOpen(const char* filename, bool userdir, int prereadSize)
 {
-	wchar_t widePath[PATH_MAX + 1] = L"";
-	char asciiPath[PATH_MAX + 1] = "";
+	wchar_t widePath[PATH_MAX + 1];
+	char asciiPath[PATH_MAX + 1];
+	widePath[0] = 0;
+	asciiPath[0] = 0;
 
 	off_t fileSize = _getFilePathAndSize(filename, userdir, widePath, sizeof(widePath));
 
@@ -354,12 +356,12 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 		return - 1;
 	}
 
-  if ( prereadSize > 0 )
-  {
+	if ( prereadSize > 0 )
+	{
 	fileSize = prereadSize; // if too big will be caught below
-  }
+	}
 
-  WWIIConvert(widePath, asciiPath);
+	WWIIConvert(widePath, asciiPath);
 
 	// Add one byte so I can make absolutely sure there
 	// is a null byte at the end :)

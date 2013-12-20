@@ -189,7 +189,8 @@ END_MESSAGE_MAP()
 
 static bool _lookupAuthHost()
 {
-	char hostPortString[257] = "";
+	char hostPortString[257];
+	hostPortString[0] = 0;
 
 	g_authPort = WWII::Net::Ports::AuthHost;
 

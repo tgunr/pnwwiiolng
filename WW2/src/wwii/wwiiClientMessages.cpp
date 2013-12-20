@@ -109,7 +109,8 @@ _recordPeers()
 
 		HMODULE module;			// For the module information.
 		DWORD filled = 0;			// For the module information.
-		wchar_t buffer[MAX_PATH] = L"";	// For the executable name.
+		wchar_t buffer[MAX_PATH];	// For the executable name.
+		buffer[0] = 0;
 		DWORD len = sizeof(buffer) - 1;
 
 		// Look for the first "module" within the process,
@@ -124,7 +125,8 @@ _recordPeers()
 		if ( buffer[0] == 0 )
 			continue;
 
-		char utfBuffer[MAX_PATH * 3] = "";
+		char utfBuffer[MAX_PATH * 3];
+		utfBuffer[0] = 0;
 		WWIIConvert(buffer, utfBuffer);
 
 		if ( peerNames.empty() == false )

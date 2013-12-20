@@ -66,7 +66,8 @@ void LocInit()
 			language = LANGUAGE_CHINESE;
 	}
 	
-	char	buffer[MAX_PARAM+1] = "";
+	char buffer[MAX_PARAM+1];
+	buffer[0] = 0;
 	if(!registryGetVal(g_registryKey, "Region", (LPBYTE)buffer) || buffer[0] == 0)
 		return;
 

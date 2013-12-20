@@ -569,7 +569,8 @@ static unsigned int iac_mouse_code(const char* name)
 static unsigned int iac_joystick_code(const char* name)
 {
 	unsigned joynum = 0, idx = 0;
-	char str[16] = "";
+	char str[16];
+	str[0] = 0;
 	int i;
 
 	if(!strcmpiws(name, "trackirx"))

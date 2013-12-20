@@ -63,7 +63,8 @@ static inline void _copyPathToString(const char* name, std::wstring& to, wchar_t
 	else if ( *to.rbegin() != L'\\' )
 		to += L'\\';
 
-	char buffer[MAX_PATH + 3] = "";
+	char buffer[MAX_PATH + 3];
+	buffer[0] = 0;
 	WWII::ConvertChars(to.c_str(), buffer, sizeof(buffer));
 	dbugLog(_FLI, "%s = %s", name, buffer);
 }
@@ -73,7 +74,8 @@ registryGetPaths(std::wstring& exePath, std::wstring& dataPath)
 {
 	exePath = dataPath = L"";
 
-	wchar_t wBuffer[MAX_PATH+1] = L"";
+	wchar_t wBuffer[MAX_PATH+1];
+	wBuffer[0] = 0;
 	const wchar_t* PATH_KEY = L"Path";
 	if ( !_readWideKey(g_registryKeyW, PATH_KEY, wBuffer) || wBuffer[0] == 0 )
 	{

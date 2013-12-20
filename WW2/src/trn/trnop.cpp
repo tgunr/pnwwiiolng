@@ -2199,7 +2199,7 @@ SINT32 _ParseSpeedTreeComment(SCHAR* comment, SINT32 treevalues[])
 
     if(!p1) return -1;
 
-    SCHAR szTokens[] = "=,n\0";
+    static const char* szTokens = "=,n\0";
     SCHAR begin[128];
     SCHAR* pToken = NULL;
     SINT32 i = 1;
