@@ -76,9 +76,18 @@ static void FLTGeneralError(const char* error)
 	s_loadError += '\n';
 }
 
+static void FLTItemFileError(const char* error, const char* item, const char* file)
+{
+	s_loadError += error;
+	s_loadError += ": id=";
+	s_loadError += item;
+	s_loadError += ": file=";
+	s_loadError += file;
+	s_loadError += '\n';
+}
+
 // persistent variables
 static SINT8				pathname[MAX_PATH];
-static char					szErrorString[512]; // Set to any user specified error string
 static char					filename[MAX_PATH];
 static char					grpname[MAX_GROUP_SIZE][32];
 static struct OBJECT*		groups[MAX_GROUP_SIZE];
@@ -379,16 +388,16 @@ static bool CreateLevel(OBJECT** lpnewobj)
 
 	g_bSpeedTrees = false;
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return false;
 	}
 
 	if (groupindex >= 0)
 	{
-		if (groups[groupindex] != NULL)
+		if (groups[groupindex] != nullptr)
 		{
-			if (groups[groupindex]->child == NULL)
+			if (groups[groupindex]->child == nullptr)
 			{
 				if(groups[groupindex]->flag2 & OBJECT_SPEEDTREE)
 				{
@@ -407,7 +416,7 @@ static bool CreateLevel(OBJECT** lpnewobj)
 		return FLTGeneralError("Group index overflow"), false;
 
 	grouplevels[groupindex] = level;
-	if (groups[groupindex] != NULL)
+	if (groups[groupindex] != nullptr)
 	{
 		if(groups[groupindex - 1]->flag2 & OBJECT_SPEEDTREE)
 		{
@@ -423,7 +432,7 @@ static bool CreateLevel(OBJECT** lpnewobj)
 	for (i=groupindex+1; i < MAX_GROUP_SIZE; i++)
 	{
 		grouplevels[i] = -1;
-		groups[i] = NULL;
+		groups[i] = nullptr;
 	}
 
 	if (topmost)
@@ -462,10 +471,7 @@ static bool ReadGroup(void)
 				Write_Debug("[ReadGroup] FAILURE: Topmost group.id = %s Filename = %s\n",
 							group->id, s_conversionFile.c_str());
 
-#ifdef CONVERSION_PROGRAM
-				sprintf(szErrorString, "Topmost group.id = %s Filename = %s",
-						group.id, s_conversionFile.c_str());
-#endif
+				FLTItemFileError("Topmost group", group->id, s_conversionFile.c_str());
 
 				return false;
 			}
@@ -481,23 +487,13 @@ static bool ReadGroup(void)
 
 	if (strcmp(group->id, "Default") == 0)
 	{
-
-		Write_Debug("[ReadGroup] FAILURE: Group.id is 'Default'.\n");
-
-#ifdef CONVERSION_PROGRAM
-	sprintf(szErrorString, "Group.id is %s", group.id);
-#endif
-
+		FLTGeneralError("[ReadGroup] FAILURE: Group.id is 'Default'");
 		return false;
 	}
 
 	if (!CreateLevel(&lpobj))
 	{
-
-#ifdef CONVERSION_PROGRAM
-		sprintf(szErrorString, "CreateLevel Failed");
-#endif
-
+		FLTGeneralError("[ReadGroup] CreateLevel failed");
 		return false;
 	}
 
@@ -520,8 +516,8 @@ static bool ReadGroup(void)
 
 	if (objectlevel != -1)
 	{
-		attached = NULL;
-		lastobject	= NULL;
+		attached = nullptr;
+		lastobject	= nullptr;
 		//objectlevel = level;		// WTF!?!
 		numvertices = 0;
 		strcpy(objname[level], grpname[groupindex]);
@@ -561,12 +557,12 @@ static bool ReadVertexCoordinate(void* pvc, piUNIFIED_VERTEX* vertices)
 #ifdef DEBUG_FPU
 	SetupFPU(false);
 #endif
-  vc.colorname    = ShortEndian(vertcoord->colorname);
-  vc.flags        = ShortEndian(vertcoord->flags);
-  vc.x            = DoubleEndian(vertcoord->x);
-  vc.y            = DoubleEndian(vertcoord->y);
-  vc.z            = DoubleEndian(vertcoord->z);
-  vc.color        = LongEndian(vertcoord->color);
+	vc.colorname    = ShortEndian(vertcoord->colorname);
+	vc.flags        = ShortEndian(vertcoord->flags);
+	vc.x            = DoubleEndian(vertcoord->x);
+	vc.y            = DoubleEndian(vertcoord->y);
+	vc.z            = DoubleEndian(vertcoord->z);
+	vc.color        = LongEndian(vertcoord->color);
 #ifdef DEBUG_FPU
 	SetupFPU(true);
 #endif
@@ -771,7 +767,7 @@ struct eqstr
 
 #if platOS == OS_MACOS
 typedef stdext::hash_set<const char*, stdext::hash<const char*>, eqstr> CharPSet;
-static CharPSet* RoadTextureNames = NULL;
+static CharPSet* RoadTextureNames = nullptr;
 
 static void initRoadTextureNames()
 {
@@ -804,7 +800,7 @@ static bool isRoadTexture( int texid )
 {
 #if platOS == OS_MACOS
 	TEXTURE* tp = oglGetTextureData(texid);
-	bool res = tp!=NULL && RoadTextureNames->find( tp->name ) != RoadTextureNames->end();
+	bool res = tp!=nullptr && RoadTextureNames->find( tp->name ) != RoadTextureNames->end();
 	if ( res )
 	{
 		//printf("%s\n",tp->name);
@@ -823,14 +819,14 @@ static bool isRoadTexture( int texid )
 
 static bool ReadVertexList(void)
 {
-	void*				pdata					= NULL;
-	fltCHUNK*			pchunk					= NULL;
+	void*				pdata					= nullptr;
+	fltCHUNK*			pchunk					= nullptr;
 	int					i, num, length, index;
-	OBJECT*				lpobj					= NULL;
-	piUNIFIED_VERTEX*	vertices				= NULL;
+	OBJECT*				lpobj					= nullptr;
+	piUNIFIED_VERTEX*	vertices				= nullptr;
 
 #if platOS == OS_MACOS
-	if ( RoadTextureNames == NULL )
+	if ( RoadTextureNames == nullptr )
 	{
 		initRoadTextureNames();
 	}
@@ -1065,7 +1061,7 @@ static bool ReadVertexList(void)
 		{
 			//if (numuses[index] > 0)
 			{
-			piAddTexRef(tv.texid);
+				piAddTexRef(tv.texid);
 			}
 
 			//numuses[index] += 1;
@@ -1179,7 +1175,7 @@ static bool ReadVertexList(void)
 	ldmdlGetBounds(&tv);
 	lpobj = obcObject(attached, &tv);
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return false;
 	}
@@ -1197,18 +1193,18 @@ static bool ReadVertexList(void)
 		}
 
 	//		Write_Debug("Object face '%s' (%s) was created (%d)", tv.name, s_face->id, level);
-		if (attached == NULL)
+		if (attached == nullptr)
 		{
-			if (groups[groupindex] != NULL)
+			if (groups[groupindex] != nullptr)
 			{
-				if (groups[groupindex]->child == NULL)
+				if (groups[groupindex]->child == nullptr)
 				{
 					groups[groupindex]->child = lpobj;
 				}
 			}
 
 			groupindex += 1;
-			if (groups[groupindex] != NULL)
+			if (groups[groupindex] != nullptr)
 			{
 				groups[groupindex]->sibling = lpobj;
 			}
@@ -1219,7 +1215,7 @@ static bool ReadVertexList(void)
 			headObject = lpobj;
 			attached = lpobj;
 
-			if(textcomment != NULL)
+			if(textcomment != nullptr)
 			{
 				SCHAR* p = textcomment;
 
@@ -1260,7 +1256,7 @@ static bool ReadVertexList(void)
 				}
 
 				lpobj->comment = textcomment;
-				textcomment = NULL;
+				textcomment = nullptr;
 			}
 		}
 		else
@@ -1325,7 +1321,7 @@ static bool ReadVertexList(void)
 	offset += s_chunk->next;
 
 	memFree(vertices);
-	vertices = NULL;
+	vertices = nullptr;
 
 	return true;
 }
@@ -1564,7 +1560,8 @@ static bool ReadTextureReference(void)
 	texref[numtexrefs].y        = LongEndian(texref[numtexrefs].y);
 
 	// HACK to work around MAX flt plugin texture paths
-	std::string str = texref[numtexrefs].name;
+	static std::string str;
+	str = texref[numtexrefs].name;
 	UINT32 pos = str.rfind('\\');
 
 	if(pos == std::string::npos)
@@ -1645,7 +1642,7 @@ static bool ReadFace(void)
 		return false;
 	}
 
-	OBJECT*		o = NULL;
+	OBJECT*		o = nullptr;
 
 	facelevel = level;
 
@@ -1743,7 +1740,7 @@ static bool ReadLOD(void)
 	lpobj->minlod = (float)(s_currentLod.switchout * s_currentLod.switchout) * localscale * localscale;
 	lpobj->maxlod = (float)(s_currentLod.switchin * s_currentLod.switchin) * localscale * localscale;
 
-	attached = NULL;
+	attached = nullptr;
 	lastobject = lpobj;
 
 //	Write_Debug("Processing LOD: %s; in=%g, out=%g (%d)", lod->name, (float)s_currentLod.switchin, (float)s_currentLod.switchout, s_currentLod.level);
@@ -1955,24 +1952,22 @@ static bool ReadDOF(void)
 static bool ReadTextComment(void)
 {
 	size_t len = s_chunk->next - 4;
-	char* thisTextComment = (char*)memAlloc(len+1);
-	if (!localBufferCopyBytes(thisTextComment, len))
+	char* thisTextComment;
+	if (!localBufferUseBytes(thisTextComment, len))
 		return false;
 	len -= 1;
 
 	textlevel = level;
 	if(textlevel != facelevel || facelevel < 0)
 	{
-		if(textcomment != NULL)
+		if(textcomment != nullptr)
 		{
 			Write_Debug("Old text comment was unused");
-			memFree(textcomment);
 		}
 		textcomment = thisTextComment;
 	}
 	else
 	{	// Don't take comments from face attributes!
-		memFree(thisTextComment);
 		thisTextComment = 0;
 		offset += s_chunk->next;
 		return true;
@@ -1982,51 +1977,50 @@ static bool ReadTextComment(void)
 	while (len >= 0 && iscntrl(textcomment[len]))
 	{
 		textcomment[len] = 0;
-		len -= 1;
+		--len;
 	}
 
 	if (len < 0)
 	{
 		// comment has no data
-		memFree(textcomment);
-		textcomment = NULL;
+		textcomment = nullptr;
 	}
 	else
 	{
 		SCHAR* p = textcomment;
 
-		if(lastobject != NULL)
+		if(lastobject != nullptr)
 		{
-	  if(strstr(p, "flag"))
-	  {
-		lastobject->flag2 |= OBJECT_FLAG;
-	  }
+			if(strstr(p, "flag"))
+			{
+				lastobject->flag2 |= OBJECT_FLAG;
+			}
 
-	  if(strstr(p, "popup="))
-	  {
-		lastobject->flag3 |= OBJECT_HAS_POPUP;
-	  }
+			if(strstr(p, "popup="))
+			{
+				lastobject->flag3 |= OBJECT_HAS_POPUP;
+			}
 
-	  if(strstr(p, "grass"))
-	  {
-		lastobject->flag2 |= OBJECT_IS_GRASS;
+			if(strstr(p, "grass"))
+			{
+				lastobject->flag2 |= OBJECT_IS_GRASS;
 
-		SCHAR* typestr = strchr(p, '=');
-		if(typestr) typestr++;
+				SCHAR* typestr = strchr(p, '=');
+				if(typestr) typestr++;
 
-		if(typestr)
-		{
-		  g_grassType = atol(typestr);
-		}
+				if(typestr)
+				{
+					g_grassType = atol(typestr);
+				}
 
-		lastobject->layer = g_grassType;
-		g_isGrass = true;
-	  }
+				lastobject->layer = g_grassType;
+				g_isGrass = true;
+			}
 
-	  if(strstr(p, "spawnobject"))
-	  {
-		lastobject->flag3 |= OBJECT_SPAWN;
-	  }
+			if(strstr(p, "spawnobject"))
+			{
+				lastobject->flag3 |= OBJECT_SPAWN;
+			}
 
 			if(strstr(p, "capture"))
 			{
@@ -2039,8 +2033,8 @@ static bool ReadTextComment(void)
 			}
 
 			lastobject->comment = textcomment;
-			textcomment = NULL;
-			textlevel = -1;
+			textcomment = nullptr;
+			--textlevel;
 		}
 	}
 
@@ -2108,14 +2102,7 @@ static bool ReadLongID(void)
 			{
 				if (stricmp(lastobject->name, s_conversionFile.c_str()))
 				{
-					Write_Debug("[ReadLongID] FAILURE: Topmost = %s Filename = %s\n",
-								lastobject->name, s_conversionFile.c_str());
-
-#ifdef CONVERSION_PROGRAM
-					sprintf(szErrorString, "Topmost = %s Filename = %s",
-							lastobject->name, s_conversionFile.c_str());
-#endif
-
+					FLTItemFileError("TopMost", lastobject->name, s_conversionFile.c_str());
 					return false;
 				}
 			}
@@ -2181,7 +2168,7 @@ static bool ReadPopLevel(void)
 			for (size_t i=groupindex+1; i < MAX_GROUP_SIZE; i++)
 			{
 				grouplevels[i] = -1;
-				groups[i] = NULL;
+				groups[i] = nullptr;
 			}
 
 			groupindex -= 1;
@@ -2219,8 +2206,7 @@ static bool ReadPopLevel(void)
 		textlevel = -1;
 		if (textcomment)
 		{
-			memFree(textcomment);
-			textcomment = NULL;
+			textcomment = nullptr;
 		}
 	}
 
@@ -2243,7 +2229,7 @@ static bool ReadPopLevel(void)
 		if( objreduce == 1 )
 		{
 			ldmdlReduceAttachments(headObject);
-			lastobject = NULL;
+			lastobject = nullptr;
 		}
 
 		if ( objreduce == 2 )
@@ -2455,7 +2441,7 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 
 	strcpy(pathname, filename);
 	char* ptr = strrchr(pathname, '\\');
-	if (ptr != NULL)
+	if (ptr != nullptr)
 	{
 		ptr += 1;	// Leave the '\'
 		*ptr = 0;
@@ -2469,11 +2455,11 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 
 	strcpy(filename, name);
 	ptr = (char*)strrchr(filename, '.');
-	if (ptr != NULL)
+	if (ptr != nullptr)
 		*ptr = 0;
 
 	ptr = (char*)strrchr(filename, '\\');
-	if (ptr != NULL)
+	if (ptr != nullptr)
 	{
 		ptr += 1;
 		strcpy(filename, ptr);
@@ -2763,18 +2749,15 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 	// close file
 	fioClose(stream);
 
-	if (rawverts != NULL)
-		rawverts = NULL;
+	if (rawverts != nullptr)
+		rawverts = nullptr;
 
 	// If this flag is still true, then something went wrong, because
 	// it should have been reset to false. Check for topmost group name
 	// not being equal to the file name.
 	if(bTopmostObject)
 	{
-	//		Write_Debug("[ldfltLoad] Topmost group.id = %s Filename = %s.",
-	//			        groups[0]->name, szConversionFile);
-		sprintf(szErrorString, "Topmost group.id = %s Filename = %s.",
-				groups[0]->name, s_conversionFile.c_str());
+		FLTItemFileError("Topmost", groups[0]->name, s_conversionFile.c_str());
 
 		bTopmostObject = false;
 
@@ -2803,7 +2786,7 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 
 	ldmdlProcessBounds(topmostObject);
 
-	if (groups[0] != NULL)
+	if (groups[0] != nullptr)
 	{
 		ldmdlUpdateGroupFilteringAndBlendStatus(groups[0]);
 	}
@@ -2825,7 +2808,7 @@ OBJECT* ldfltLoad(const std::string& name, float scale, int reduce)
 		return obj;
 
 	char error[1024];
-	sprintf(error, "Flt: %s\nError: %s", name.c_str(), s_loadError.c_str());
+	strprintf(error, "Flt: %s\nError: %s", name.c_str(), s_loadError.c_str());
 	Write_Debug("%s", error);
 	piExitProgram(__FILE__, __LINE__, error);
 	return nullptr;
