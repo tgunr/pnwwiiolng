@@ -360,14 +360,14 @@ static UINT32 CreateColor(int colorindex)
 
 static bool ReadHeader(void)
 {
-	fltHEADER header;
+	fltHEADER* header;
+	if ( !localBufferUseObject(header) )
+		return false;
 
-	localBufferRead( &header, sizeof(header));
+	//header->format = LongEndian(header->format);
+	//header->edit   = LongEndian(header->edit);
 
-	header.format = LongEndian(header.format);
-	header.edit	= LongEndian(header.edit);
-
-	fltrevision = header.format;
+	fltrevision = LongEndian(header->format);
 
 	//Write_Debug("Header for id: %s", header.id);
 	//Write_Debug("Openflight version: %d", header.format);
