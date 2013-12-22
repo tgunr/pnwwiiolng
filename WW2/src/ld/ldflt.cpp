@@ -107,8 +107,7 @@ static OBJECT*				topmostObject;
 static MATERIAL				mat;
 //static LIGHT				light;
 
-
-static SINT8				szConversionFile[MAX_PATH];
+static std::string			s_conversionFile;
 
 // To convert to DirectX Handedness
 static piMATRIX				translate;
@@ -473,15 +472,15 @@ static bool ReadGroup(void)
 	// with the group id here. Else, we will need to compare in ReadLongID.
 	if(topmost)
 	{
-		if(strlen(szConversionFile) <= 7)
+		if(s_conversionFile.length() <= 7)
 		{
 			bTopmostObject = false;
-			if(stricmp(group.id, szConversionFile))
+			if (stricmp(group.id, s_conversionFile.c_str()))
 			{
 				Write_Debug("[ReadGroup] FAILURE: Topmost group.id = %s Filename = %s\n",
-							group.id, szConversionFile);
+							group.id, s_conversionFile.c_str());
 
-				FLTItemFileError("Topmost group", group.id, szConversionFile);
+				FLTItemFileError("Topmost group", group.id, s_conversionFile.c_str());
 
 				return false;
 			}
@@ -2084,7 +2083,7 @@ static bool ReadLongID(void)
 	char*	completeString = (char*)alloca(len + 1);
 	if (PN_UNLIKELY(!localBufferCopyBytes(completeString, len)))
 	{
-		Write_Debug("[ReadLongID] FAILURE: bad read\n", lastobject->name, szConversionFile);
+		Write_Debug("[ReadLongID] FAILURE: bad read\n", lastobject->name, s_conversionFile.c_str());
 		return false;
 	}
 
@@ -2131,9 +2130,9 @@ static bool ReadLongID(void)
 			// Make sure we are staring at the same address for topmost
 			if (lastobject == groups[0])
 			{
-				if (stricmp(lastobject->name, szConversionFile))
+				if (stricmp(lastobject->name, s_conversionFile.c_str()))
 				{
-					FLTItemFileError("ReadLongID", lastobject->name, szConversionFile);
+					FLTItemFileError("ReadLongID", lastobject->name, s_conversionFile.c_str());
 					return false;
 				}
 			}
@@ -2516,8 +2515,8 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 		strcpy(filename, ptr);
 	}
 
-	// Need szConversionFile to compare group.id and filename in ReadGroup
-	strcpy(szConversionFile, filename);
+	// Need s_conversionFile to compare group.id and filename in ReadGroup
+	s_conversionFile = filename;
 
 	for (;;)
 	{
@@ -2814,7 +2813,7 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 	// not being equal to the file name.
 	if(bTopmostObject)
 	{
-		FLTItemFileError("Topmost", groups[0]->name, szConversionFile);
+		FLTItemFileError("Topmost", groups[0]->name, s_conversionFile.c_str());
 		bTopmostObject = false;
 		return false;
 	}
