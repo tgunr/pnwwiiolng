@@ -86,7 +86,7 @@ static SINT32				groupindex;
 static char					objname[MAX_LEVELS][32];
 static long					offset;
 static float				localscale;
-static fltCHUNK				s_chunk;
+static fltCHUNK*			s_chunk;
 static OBJECT				tv;
 static OBJECT*				attached;
 static OBJECT*				lastobject;
@@ -316,7 +316,7 @@ static void ConvertVector(piVECTOR* vector)
 // for unknown or irrelevant chunks of data
 static void ReadUnknown()
 {
-	offset += s_chunk.next;
+	offset += s_chunk->next;
 }
 
 static UINT16 FindTexPatIndex(UINT16 patindex)
@@ -372,7 +372,7 @@ static bool ReadHeader(void)
 	//Write_Debug("Header for id: %s", header.id);
 	//Write_Debug("Openflight version: %d", header.format);
 
-	offset += s_chunk.next;
+	offset += s_chunk->next;
 
 	return true;
 }
@@ -459,7 +459,7 @@ static bool ReadGroup(void)
 
 	localBufferRead( &group, sizeof(group));
 
-	offset += s_chunk.next;
+	offset += s_chunk->next;
 
 	// If group.id is <= 7, then we can compare the conversion filename
 	// with the group id here. Else, we will need to compare in ReadLongID.
@@ -849,7 +849,7 @@ static bool ReadVertexList(void)
 	}
 #endif
 
-	length = (int)s_chunk.next - 4;
+	length = (int)s_chunk->next - 4;
 
 	if (vertlist != nullptr)
 	{
@@ -869,7 +869,7 @@ static bool ReadVertexList(void)
 #ifdef EVENT_LOG_EXTREME
 		Write_Debug("Degenerated face found in .flt! Skipped in .mdl.");
 #endif
-		offset += s_chunk.next;
+		offset += s_chunk->next;
 
 	Write_Debug("Degenerate face found in .flt! This face %s is not a polygon", face.id);
 		return false;
@@ -1339,7 +1339,7 @@ static bool ReadVertexList(void)
 		}
 	}
 
-	offset += s_chunk.next;
+	offset += s_chunk->next;
 
 	memFree(vertices);
 	vertices = nullptr;
@@ -1357,24 +1357,34 @@ static bool ReadMatrix(void)
 		*((float*)&s_matrixRecord + i) = FloatEndian(*((float*)&s_matrixRecord + i));
 	}
 
-	offset += s_chunk.next;
+	offset += s_chunk->next;
 
 	return true;
 }
 
 static bool ReadMaterialTable(const char* name)
 {
-	s_nummaterials = s_chunk.next - 4;
-	material = (fltMATERIAL*)memAlloc(s_nummaterials);
+	const size_t materialsLen = s_chunk->next - 4;
+	s_nummaterials = materialsLen / sizeof(fltMATERIAL);
+	if (s_nummaterials > MAX_FLT_MATERIALS)
+	{
+		Write_Debug("fltLoad failed at %s:%u", __FILE__, __LINE__);
+		return false;
+	}
+	if (s_nummaterials * sizeof(fltMATERIAL) != materialsLen)
+	{
+		Write_Debug("Bad materials data");
+		return false;
+	}
 
+	material = (fltMATERIAL*)memAlloc(materialsLen);
 	localBufferRead( material, s_nummaterials);
 
 	matlevel = level;
-	s_nummaterials /= sizeof(fltMATERIAL);
 
 	for (size_t i = 0; i < s_nummaterials; ++i)
 	{
-		Write_Debug("Material loaded: %s", material[i].name);
+		Write_Debug("Material %u loaded: %s", i, material[i].name);
 
 		material[i].ambRed	= FloatEndian(material[i].ambRed);
 		material[i].ambGreen	= FloatEndian(material[i].ambGreen);
@@ -1429,7 +1439,7 @@ static bool ReadMaterialTable(const char* name)
 		}
 	}
 
-	offset += s_chunk.next;
+	offset += s_chunk->next;
 
 	return true;
 }
@@ -1521,7 +1531,7 @@ static bool ReadMaterialPalette(const char* name)
 		}
 	}
 
-	offset += s_chunk.next;
+	offset += s_chunk->next;
 
 	return true;
 }
@@ -1537,7 +1547,7 @@ static bool ReadColorPalette(void)
 	memFree(colorpal);
 	}
 
-	length = s_chunk.next - 4;
+	length = s_chunk->next - 4;
 	colorpal = (fltCOLORPALETTE*)memAlloc(length);
 	localBufferRead( colorpal, length);
 
@@ -1567,7 +1577,7 @@ static bool ReadColorPalette(void)
 
 	colorlevel = level;
 
-	offset += s_chunk.next;
+	offset += s_chunk->next;
 
 	return true;
 }
@@ -1608,7 +1618,7 @@ static bool ReadTextureReference(void)
 	lstrcpy(filename, pathname);
 	lstrcat(filename, texref[numtexrefs].name);
 
-	offset += s_chunk.next;
+	offset += s_chunk->next;
 
 	// If the name is not a filename (for a textured surface),
 	// then the surface will be untextured...
@@ -1722,7 +1732,7 @@ static bool ReadFace(void)
 
 	hasalpha = false;
 
-	offset += s_chunk.next;
+	offset += s_chunk->next;
 
 	return true;
 }
@@ -1770,7 +1780,7 @@ static bool ReadLOD(void)
 
 	//	Write_Debug("Processing LOD: %s; in=%g, out=%g (%d)", lod.name, (float)lod.switchin, (float)lod.switchout, level);
 
-	offset += s_chunk.next;
+	offset += s_chunk->next;
 
 	return true;
 }
@@ -1802,7 +1812,7 @@ static bool ReadObject(void)
 	objectlevel = level;
 	numvertices = 0;
 
-	offset += s_chunk.next;
+	offset += s_chunk->next;
 
 	return true;
 }
@@ -1819,7 +1829,7 @@ static bool ReadExtension(void)
 	ext.reserved1 = 0;	// terminate the site id
 	//Write_Debug(" extension: '%s', '%s', code=0x%x, level=%d", ext.id, ext.siteid, ext.code, extlevel);
 
-	offset += s_chunk.next;
+	offset += s_chunk->next;
 
 	return true;
 }
@@ -1964,7 +1974,7 @@ static bool ReadDOF(void)
 
 	doflevel = level;
 
-	offset += s_chunk.next;
+	offset += s_chunk->next;
 
 	return true;
 }
@@ -1975,7 +1985,7 @@ static bool ReadTextComment(void)
 	SINT32	len;
 
 
-	len = s_chunk.next - 4;
+	len = s_chunk->next - 4;
 
 	thisTextComment = (char*)memAlloc(len+1);
 	localBufferRead( thisTextComment, len);
@@ -1995,7 +2005,7 @@ static bool ReadTextComment(void)
 	{	// Don't take comments from face attributes!
 		memFree(thisTextComment);
 		thisTextComment = 0;
-		offset += s_chunk.next;
+		offset += s_chunk->next;
 		return true;
 	}
 
@@ -2065,14 +2075,14 @@ static bool ReadTextComment(void)
 		}
 	}
 
-	offset += s_chunk.next;
+	offset += s_chunk->next;
 
 	return true;
 }
 
 static bool ReadLongID(void)
 {
-	size_t len = size_t(s_chunk.next - 4);
+	size_t len = size_t(s_chunk->next - 4);
 	SCHAR	oldname[32];
 	SCHAR	tempname[32];
 	SINT32	i;
@@ -2154,7 +2164,7 @@ static bool ReadLongID(void)
 		}
 	}
 
-	offset += s_chunk.next;
+	offset += s_chunk->next;
 
 	return true;
 }
@@ -2170,7 +2180,7 @@ static bool ReadPushLevel(void)
 
 	//Write_Debug("Down to level %d", level);
 
-	offset += s_chunk.next;
+	offset += s_chunk->next;
 
 	return true;
 }
@@ -2310,7 +2320,7 @@ static bool ReadPopLevel(void)
 		}
 	}
 
-	offset += s_chunk.next;
+	offset += s_chunk->next;
 
 	return true;
 }
@@ -2320,7 +2330,7 @@ static bool ReadPushSubface(void)
 {
 	facelayer += 1;
 
-	offset += s_chunk.next;
+	offset += s_chunk->next;
 
 	return true;
 }
@@ -2330,7 +2340,7 @@ static bool ReadPopSubface(void)
 {
 	facelayer -= 1;
 
-	offset += s_chunk.next;
+	offset += s_chunk->next;
 
 	return true;
 }
@@ -2340,7 +2350,7 @@ static bool ReadPushExtension(void)
 {
 	extlevel += 1;
 
-	offset += s_chunk.next;
+	offset += s_chunk->next;
 
 	return true;
 }
@@ -2350,7 +2360,7 @@ static bool ReadPopExtension(void)
 {
 	extlevel -= 1;
 
-	offset += s_chunk.next;
+	offset += s_chunk->next;
 
 	return true;
 }
@@ -2538,12 +2548,10 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 
 	for (;;)
 	{
-		if (sizeof(s_chunk) != localBufferRead(&s_chunk, sizeof(s_chunk)))
-		{
+		if (localBufferUseObject(s_chunk) != sizeof(*s_chunk))
 			break;
-		}
 
-		if (s_chunk.next == 0)
+		if ( s_chunk->next == 0 )
 		{
 			throw flt::LoadFailure("Bad chunk in flt file", "read");
 		}
@@ -2551,13 +2559,13 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 
 		//	There is a bug in the later versions of the .FLT file format.
 		//	The POP_LEVEL commands at the end of a file are not endian converted.
-		if (s_chunk.cid != POP_LEVEL)
+		if (s_chunk->cid != POP_LEVEL)
 		{
-			s_chunk.cid = ShortEndian(s_chunk.cid);
-			s_chunk.next = ShortEndian(s_chunk.next);
+			s_chunk->cid = ShortEndian(s_chunk->cid);
+			s_chunk->next = ShortEndian(s_chunk->next);
 		}
 
-		switch (s_chunk.cid)
+		switch (s_chunk->cid)
 		{
 		case HEADER_RECORD:
 			LDWrite_Debug("HEADER_RECORD");
@@ -2807,7 +2815,7 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 			ReadUnknown();
 		break;
 		default:
-			Write_Debug("UNKNOWN: %d", s_chunk.cid);
+			Write_Debug("UNKNOWN: %d", s_chunk->cid);
 			ReadUnknown();
 		break;
 		}
