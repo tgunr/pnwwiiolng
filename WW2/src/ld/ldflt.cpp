@@ -542,18 +542,19 @@ static bool ReadGroup(void)
 
 static bool ReadVertexPalette(void)
 {
-	fltVERTEXPALETTE	vp;
+	fltVERTEXPALETTE* vp;
 
-	localBufferCopyObject(&vp);
+	if ( !localBufferUseObject(vp) )
+		return false;
 
-	totsizeverts = LongEndian(vp.length) - 8;
+	totsizeverts = LongEndian(vp->length) - 8;
 	sizeverts = 0;
 	numvertices = 0;
 
 	rawverts = memAlloc(totsizeverts);
-	localBufferRead( rawverts, totsizeverts);
+	localBufferCopyBytes(rawverts, totsizeverts);
 
-	offset += LongEndian(vp.length);
+	offset += LongEndian(vp->length);
 
 	return true;
 }
