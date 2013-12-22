@@ -88,7 +88,6 @@ static void FLTItemFileError(const char* error, const char* item, const char* fi
 
 // persistent variables
 static SINT8				pathname[MAX_PATH];
-static char					szErrorString[512]; // Set to any user specified error string
 static char					filename[MAX_PATH];
 static char					grpname[MAX_GROUP_SIZE][32];
 static struct OBJECT*		groups[MAX_GROUP_SIZE];
