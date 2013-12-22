@@ -34,60 +34,45 @@
 
 struct fltColor
 {
-	UCHAR  alpha;
-	UCHAR  blue;
-	UCHAR  green;
-	UCHAR  red;
+	UCHAR	alpha;
+	UCHAR	blue;
+	UCHAR	green;
+	UCHAR	red;
 };
 
 union colorstruct
 {
 	fltColor rgb;
-	UINT32  full;
+	UINT32	full;
 };
 
-static std::string s_loadError;
-
-static void FLTLoadFailure(const char* problem, const char* doing)
+struct FLTLoadFailure
 {
-	s_loadError += problem;
-	s_loadError += " on ";
-	s_loadError += doing;
-	s_loadError += '\n';
-}
+	FLTLoadFailure(const char* const problem, const char* const doing)
+		: m_problem(problem), m_doing(doing)
+	{}
 
-static void FLTChunkFailure(const char* chunkType)
-{
-	s_loadError += "Unable to load FLT chunk ";
-	s_loadError += chunkType;
-	s_loadError += '\n';
-}
+	std::string m_problem, m_doing;
+};
 
-static void FLTUnknownTexture(const char* textureName)
+struct FLTChunkFailure : public FLTLoadFailure
 {
-	s_loadError += "Reference to missing texture ";
-	s_loadError += textureName;
-	s_loadError += '\n';
-}
+	FLTChunkFailure(const char* const chunkType)
+		: FLTLoadFailure("Unable to load FLT chunk", chunkType)
+	{}
 
-static void FLTGeneralError(const char* error)
-{
-	s_loadError += error;
-	s_loadError += '\n';
-}
+};
 
-static void FLTItemFileError(const char* error, const char* item, const char* file)
+struct FLTUnknownTexture : public FLTLoadFailure
 {
-	s_loadError += error;
-	s_loadError += ": id=";
-	s_loadError += item;
-	s_loadError += ": file=";
-	s_loadError += file;
-	s_loadError += '\n';
-}
+	FLTUnknownTexture(const char* const textureName)
+		: FLTLoadFailure("Reference to missing texture", textureName)
+	{}
+};
 
 // persistent variables
 static SINT8				pathname[MAX_PATH];
+static char					szErrorString[512]; // Set to any user specified error string
 static char					filename[MAX_PATH];
 static char					grpname[MAX_GROUP_SIZE][32];
 static struct OBJECT*		groups[MAX_GROUP_SIZE];
@@ -98,15 +83,17 @@ static SINT32				groupindex;
 static char					objname[MAX_LEVELS][32];
 static long					offset;
 static float				localscale;
-static fltCHUNK*			s_chunk;
+static fltCHUNK				s_chunk;
 static OBJECT				tv;
 static OBJECT*				attached;
 static OBJECT*				lastobject;
 static OBJECT*				headObject;
 static OBJECT*				topmostObject;
+static MATERIAL				mat;
 //static LIGHT				light;
 
-static std::string			s_conversionFile;
+
+static SINT8				szConversionFile[MAX_PATH];
 
 // To convert to DirectX Handedness
 static piMATRIX				translate;
@@ -116,19 +103,21 @@ static const size_t MAX_FLT_MATERIALS = 64;
 
 static long					fltrevision;
 static void*				rawverts;
-static fltFACE*				s_face;
+static fltFACE				face;
 static int					facelevel;
 static int					facelayer;
 static UINT32				facecolor;
 static fltVERTEX*			vertlist;
-static std::array<fltMATERIAL*, MAX_FLT_MATERIALS> s_material;
-static std::array<fltMATERIAL, MAX_FLT_MATERIALS> s_materialPalette;
+static fltMATERIAL*			material;
 static fltTEXTUREREFERENCE*	texref;
+static fltCOLORPALETTE*		colorpal;
+static fltLOD				lod;
 static fltOBJECT			object;
 static int					objreduce;
+static fltDOF				dof;
 static SINT8*				textcomment;
 static SINT32				textlevel;
-static std::vector<colorstruct>	s_colortable;
+static colorstruct*			colortable;
 static int					matlevel;
 static int					texlevel;
 static size_t				s_nummaterials;
@@ -144,6 +133,8 @@ static int					objectlevel;
 static int					doflevel;
 static piMATRIX				s_matrixRecord;
 static int					vlistlevel;
+static int					lodlevel;
+static char					lodname[8];
 static int					texid[64];
 //static int				numuses[64];
 static bool					texalpha[64];
@@ -159,14 +150,6 @@ static bool g_isGrass;
 static bool _hasspeedtree;
 static SINT32 g_grassType;
 
-static struct CurrentLod
-{
-	int				level;
-	const char*		name;
-	double			switchin;
-	double			switchout;
-} s_currentLod;
-
 // ----------------- faster loading
 
 static std::vector<char>& streamBuffer = * new std::vector<char>(); // reference to vector in ldfltLoad
@@ -174,11 +157,28 @@ static size_t streamOffset;
 
 void ldfltKill()
 {
-    delete &streamBuffer;
+	delete &streamBuffer;
+}
+
+static int localBufferRead(void* const dest, const int requestBytes)
+{
+	const int remainingBytes = streamBuffer.size() - streamOffset - 1;
+	const int readBytes = std::min(requestBytes, remainingBytes);
+	if ( readBytes <= 0 )
+	{
+		return 0;
+	}
+
+	// Copy the data from the buffer to the destination.
+	const char* const src = &streamBuffer[streamOffset];
+	streamOffset += readBytes;
+	memcpy(dest, src, readBytes);
+
+	return readBytes;
 }
 
 template<typename PtrType>
-static size_t localBufferUseBytes(PtrType*& ptr, const size_t requestBytes)
+size_t localBufferUseBytes(PtrType*& ptr, const size_t requestBytes)
 {
 	const size_t bytesInBuffer = streamBuffer.size();
 	if (streamOffset >= bytesInBuffer)
@@ -193,12 +193,12 @@ static size_t localBufferUseBytes(PtrType*& ptr, const size_t requestBytes)
 }
 
 template<typename ObjectType, size_t Count=1>
-static size_t localBufferUseObject(ObjectType*& ptr)
+size_t localBufferUseObject(ObjectType*& ptr)
 {
 	return localBufferUseBytes(ptr, sizeof(ObjectType) * Count);
 }
 
-static size_t localBufferCopyBytes(void* const dest, const int requestBytes)
+size_t localBufferCopyBytes(void* const dest, const int requestBytes)
 {
 	void* src;
 	const size_t result = localBufferUseBytes(src, requestBytes);
@@ -209,7 +209,7 @@ static size_t localBufferCopyBytes(void* const dest, const int requestBytes)
 }
 
 template<typename ObjectType>
-static size_t localBufferCopyObject(ObjectType* const dest)
+size_t localBufferCopyObject(ObjectType* const dest)
 {
 	ObjectType* src;
 	size_t result = localBufferUseObject(src);
@@ -239,7 +239,9 @@ static int localSeek(int offset)
 
 inline bool isAlphaBlend()
 {
-  return (s_face->billboard == FIXED_ALPHA_BLENDING) || (s_face->billboard == AXIAL_ROTATE_WITH_ALPHA_BLENDING) || (s_face->billboard == POINT_ROTATE_WITH_ALPHA_BLENDING);
+	return (face.billboard == FIXED_ALPHA_BLENDING) ||
+	(face.billboard == AXIAL_ROTATE_WITH_ALPHA_BLENDING) ||
+	(face.billboard == POINT_ROTATE_WITH_ALPHA_BLENDING);
 }
 
 // these four functions apply to little-endian systems only. Big-endian
@@ -248,63 +250,57 @@ inline bool isAlphaBlend()
 
 static UINT16 ShortEndian(UINT16 word)
 {
-  return((word >> 8) | ((word & 0xff) << 8));
+	return((word >> 8) | ((word & 0xff) << 8));
 }
 
 
 static UINT32 LongEndian(UINT32 dword)
 {
-  return((UINT32)ShortEndian((UINT16)(dword >> 16)) | ((UINT32)ShortEndian((UINT16)(dword & 0xffff)) << 16));
+	return((UINT32)ShortEndian((UINT16)(dword >> 16)) | ((UINT32)ShortEndian((UINT16)(dword & 0xffff)) << 16));
 }
 
 
 static float FloatEndian(float f)
 {
-  struct
-  {
-	union
+	struct
 	{
-	  float f;
-	  UINT32 dw;
-	};
+	    union
+		{
+			float f;
+			UINT32 dw;
+		};
+	} fdw;
 
-  } fdw;
+	fdw.f = f;
+	fdw.dw = LongEndian(fdw.dw);
 
-  fdw.f = f;
-  fdw.dw = LongEndian(fdw.dw);
-
-  return(fdw.f);
+	return fdw.f;
 }
 
 
 static double DoubleEndian(double dbl)
 {
-  struct
-  {
-	union
+	struct
 	{
-	  double  dbl;
-	  struct
-	  {
-		UINT32   dw1;
-		UINT32   dw2;
-	  } dw;
-	};
+	    union
+	    {
+		    double	dbl;
+		    struct
+		    {
+		    UINT32	dw1;
+		    UINT32	dw2;
+		    } dw;
+	    };
+	} ddw;
 
-  } ddw;
+	ddw.dbl = dbl;
 
-  UINT32   t;
+	ddw.dw.dw1 = LongEndian(ddw.dw.dw1);
+	ddw.dw.dw2 = LongEndian(ddw.dw.dw2);
 
-  ddw.dbl = dbl;
+	std::swap(ddw.dw.dw1, ddw.dw.dw2);
 
-  ddw.dw.dw1 = LongEndian(ddw.dw.dw1);
-  ddw.dw.dw2 = LongEndian(ddw.dw.dw2);
-
-  t = ddw.dw.dw1;
-  ddw.dw.dw1 = ddw.dw.dw2;
-  ddw.dw.dw2 = t;
-
-  return(ddw.dbl);
+	return ddw.dbl;
 }
 
 // read a vertex
@@ -317,7 +313,7 @@ static void ConvertVector(piVECTOR* vector)
 // for unknown or irrelevant chunks of data
 static void ReadUnknown()
 {
-	offset += s_chunk->next;
+	offset += s_chunk.next;
 }
 
 static UINT16 FindTexPatIndex(UINT16 patindex)
@@ -335,22 +331,23 @@ static UINT16 FindTexPatIndex(UINT16 patindex)
 
 static UINT32 CreateColor(int colorindex)
 {
-	if (PN_UNLIKELY(s_colortable.empty()))
+	UINT32		rgba, alpha;
+	colorstruct	color;
+
+	if (colortable == nullptr)
 	{
 		Write_Debug("Tried to get a color but the color table has not been created");
 		return(0xffffffff);
 	}
 
-	UINT32		rgba, alpha;
-	colorstruct	color;
-	color.full = s_colortable[colorindex].full;
-	if (s_face->matindex >= 0)
+	color.full = colortable[colorindex].full;
+	if (face.matindex >= 0)
 	{
-		alpha = (UCHAR)(s_material[s_face->matindex]->alpha * 255.0f);
+		alpha = (UCHAR)(material[face.matindex].alpha * 255.0f);
 	}
 	else
 	{
-		alpha = (UINT32)((float)(65535 - s_face->transparency) / 65535.0f * 255.0f);
+		alpha = (UINT32)((float)(65535 - face.transparency) / 65535.0f * 255.0f);
 	}
 
 	rgba = piRGBA_MAKE(color.rgb.red, color.rgb.green, color.rgb.blue, alpha);
@@ -360,27 +357,27 @@ static UINT32 CreateColor(int colorindex)
 
 static bool ReadHeader(void)
 {
-	fltHEADER* header;
-	if ( !localBufferUseObject(header) )
-		return false;
+	fltHEADER header;
 
-	//header->format = LongEndian(header->format);
-	//header->edit   = LongEndian(header->edit);
+	localBufferRead( &header, sizeof(header));
 
-	fltrevision = LongEndian(header->format);
+	header.format = LongEndian(header.format);
+	header.edit	= LongEndian(header.edit);
+
+	fltrevision = header.format;
 
 	//Write_Debug("Header for id: %s", header.id);
 	//Write_Debug("Openflight version: %d", header.format);
 
-	offset += s_chunk->next;
+	offset += s_chunk.next;
 
 	return true;
 }
 
 static bool CreateLevel(OBJECT** lpnewobj)
 {
-  SINT32		i;
-  OBJECT*	lpobj;
+	SINT32		i;
+	OBJECT*	lpobj;
 
 	lpobj = obmainGetNewObject();
 
@@ -397,11 +394,11 @@ static bool CreateLevel(OBJECT** lpnewobj)
 		{
 			if (groups[groupindex]->child == nullptr)
 			{
-				if(groups[groupindex]->flag2 & OBJECT_SPEEDTREE)
-				{
-					lpobj->flag2 |= OBJECT_SPEEDTREE;
-					g_bSpeedTrees = true;
-				}
+		if(groups[groupindex]->flag2 & OBJECT_SPEEDTREE)
+		{
+			lpobj->flag2 |= OBJECT_SPEEDTREE;
+			g_bSpeedTrees = true;
+		}
 
 				groups[groupindex]->child = lpobj;
 			}
@@ -411,7 +408,11 @@ static bool CreateLevel(OBJECT** lpnewobj)
 	groupindex += 1;
 
 	if (groupindex >= MAX_GROUP_SIZE)
-		return FLTGeneralError("Group index overflow"), false;
+	{
+		// Array size is 64
+		strcpy(szErrorString, "Group index has exceeded array size");
+		return false;
+	}
 
 	grouplevels[groupindex] = level;
 	if (groups[groupindex] != nullptr)
@@ -449,30 +450,35 @@ static bool CreateLevel(OBJECT** lpnewobj)
 
 static bool ReadGroup(void)
 {
-	fltGROUP*	group;
+	fltGROUP	group;
 	OBJECT*		lpobj;
 
-	if ( !localBufferUseObject(group) )
-		return false;
 
-	offset += s_chunk->next;
+	localBufferRead( &group, sizeof(group));
+
+	offset += s_chunk.next;
 
 	// If group.id is <= 7, then we can compare the conversion filename
 	// with the group id here. Else, we will need to compare in ReadLongID.
 	if(topmost)
 	{
-		if(s_conversionFile.length() <= 7)
+		if(strlen(szConversionFile) <= 7)
 		{
-			bTopmostObject = false;
-			if (stricmp(group->id, s_conversionFile.c_str()))
+			if(stricmp(group.id, szConversionFile))
 			{
 				Write_Debug("[ReadGroup] FAILURE: Topmost group.id = %s Filename = %s\n",
-							group->id, s_conversionFile.c_str());
+					group.id, szConversionFile);
 
-				FLTItemFileError("Topmost group", group->id, s_conversionFile.c_str());
+#ifdef CONVERSION_PROGRAM
+				sprintf(szErrorString, "Topmost group.id = %s Filename = %s",
+				group.id, szConversionFile);
+#endif
+				bTopmostObject = false;
 
 				return false;
 			}
+
+			bTopmostObject = false;
 		}
 		else
 		{
@@ -483,21 +489,31 @@ static bool ReadGroup(void)
 		}
 	}
 
-	if (strcmp(group->id, "Default") == 0)
+	if (strcmp(group.id, "Default") == 0)
 	{
-		FLTGeneralError("[ReadGroup] FAILURE: Group.id is 'Default'");
+
+		Write_Debug("[ReadGroup] FAILURE: Group.id is 'Default'.\n");
+
+#ifdef CONVERSION_PROGRAM
+	sprintf(szErrorString, "Group.id is %s", group.id);
+#endif
+
 		return false;
 	}
 
 	if (!CreateLevel(&lpobj))
 	{
-		FLTGeneralError("[ReadGroup] CreateLevel failed");
+
+#ifdef CONVERSION_PROGRAM
+		sprintf(szErrorString, "CreateLevel Failed");
+#endif
+
 		return false;
 	}
 
 	lpobj->flags = OBJECT_GROUP;
 
-	if(!strncmp(group->id, "speedtr", 7))
+	if(!strncmp(group.id, "speedtr", 7))
 	{
 		lpobj->flag2 |= OBJECT_SPEEDTREE;
 		g_bSpeedTrees = true;
@@ -507,8 +523,8 @@ static bool ReadGroup(void)
 	g_isGrass = false;
 	g_grassType = 0;
 
-	strcpy(grpname[groupindex], group->id);
-	strcpy(lpobj->name, group->id);
+	strcpy(grpname[groupindex], group.id);
+	strcpy(lpobj->name, group.id);
 
 	lastobject = lpobj;
 
@@ -521,7 +537,7 @@ static bool ReadGroup(void)
 		strcpy(objname[level], grpname[groupindex]);
 	}
 
-  //	Write_Debug("Processing group: %s (%d)", grpname[groupindex], level);
+	//	Write_Debug("Processing group: %s (%d)", grpname[groupindex], level);
 
 	return true;
 }
@@ -529,18 +545,18 @@ static bool ReadGroup(void)
 
 static bool ReadVertexPalette(void)
 {
-	fltVERTEXPALETTE* vp;
+	fltVERTEXPALETTE	vp;
 
-	if ( !localBufferUseObject(vp) )
-		return false;
+	localBufferRead( &vp, sizeof(vp));
 
-	totsizeverts = LongEndian(vp->length) - 8;
+	totsizeverts = LongEndian(vp.length) - 8;
 	sizeverts = 0;
 	numvertices = 0;
 
-	localBufferUseBytes( rawverts, totsizeverts);
+	rawverts = memAlloc(totsizeverts);
+	localBufferRead( rawverts, totsizeverts);
 
-	offset += LongEndian(vp->length);
+	offset += LongEndian(vp.length);
 
 	return true;
 }
@@ -555,12 +571,12 @@ static bool ReadVertexCoordinate(void* pvc, piUNIFIED_VERTEX* vertices)
 #ifdef DEBUG_FPU
 	SetupFPU(false);
 #endif
-	vc.colorname    = ShortEndian(vertcoord->colorname);
-	vc.flags        = ShortEndian(vertcoord->flags);
-	vc.x            = DoubleEndian(vertcoord->x);
-	vc.y            = DoubleEndian(vertcoord->y);
-	vc.z            = DoubleEndian(vertcoord->z);
-	vc.color        = LongEndian(vertcoord->color);
+	vc.colorname	= ShortEndian(vertcoord->colorname);
+	vc.flags		= ShortEndian(vertcoord->flags);
+	vc.x			= DoubleEndian(vertcoord->x);
+	vc.y			= DoubleEndian(vertcoord->y);
+	vc.z			= DoubleEndian(vertcoord->z);
+	vc.color		= LongEndian(vertcoord->color);
 #ifdef DEBUG_FPU
 	SetupFPU(true);
 #endif
@@ -594,15 +610,15 @@ static bool ReadVertexNormal(void* pvn, piUNIFIED_VERTEX* vertices)
 #ifdef DEBUG_FPU
 	SetupFPU(false);
 #endif
-	vn.colorname    = ShortEndian(vertnorm->colorname);
-	vn.flags        = ShortEndian(vertnorm->flags);
-	vn.x            = DoubleEndian(vertnorm->x);
-	vn.y            = DoubleEndian(vertnorm->y);
-	vn.z            = DoubleEndian(vertnorm->z);
-	vn.i            = FloatEndian(vertnorm->i);
-	vn.j            = FloatEndian(vertnorm->j);
-	vn.k            = FloatEndian(vertnorm->k);
-	vn.color        = LongEndian(vertnorm->color);
+	vn.colorname	= ShortEndian(vertnorm->colorname);
+	vn.flags		= ShortEndian(vertnorm->flags);
+	vn.x			= DoubleEndian(vertnorm->x);
+	vn.y			= DoubleEndian(vertnorm->y);
+	vn.z			= DoubleEndian(vertnorm->z);
+	vn.i			= FloatEndian(vertnorm->i);
+	vn.j			= FloatEndian(vertnorm->j);
+	vn.k			= FloatEndian(vertnorm->k);
+	vn.color		= LongEndian(vertnorm->color);
 #ifdef DEBUG_FPU
 	SetupFPU(true);
 #endif
@@ -642,14 +658,14 @@ static bool ReadVertexUV(void* pvuv, piUNIFIED_VERTEX* vertices)
 #ifdef DEBUG_FPU
 	SetupFPU(false);
 #endif
-	vuv.colorname    = ShortEndian(vertuv->colorname);
-	vuv.flags        = ShortEndian(vertuv->flags);
-	vuv.x            = DoubleEndian(vertuv->x);
-	vuv.y            = DoubleEndian(vertuv->y);
-	vuv.z            = DoubleEndian(vertuv->z);
-	vuv.u            = FloatEndian(vertuv->u);
-	vuv.v            = FloatEndian(vertuv->v);
-	vuv.color        = LongEndian(vertuv->color);
+	vuv.colorname	= ShortEndian(vertuv->colorname);
+	vuv.flags		= ShortEndian(vertuv->flags);
+	vuv.x			= DoubleEndian(vertuv->x);
+	vuv.y			= DoubleEndian(vertuv->y);
+	vuv.z			= DoubleEndian(vertuv->z);
+	vuv.u			= FloatEndian(vertuv->u);
+	vuv.v			= FloatEndian(vertuv->v);
+	vuv.color		= LongEndian(vertuv->color);
 #ifdef DEBUG_FPU
 	SetupFPU(true);
 #endif
@@ -673,7 +689,7 @@ static bool ReadVertexUV(void* pvuv, piUNIFIED_VERTEX* vertices)
 
 	numvertices += 1;
 
-	index = FindTexPatIndex(s_face->texpatindex);
+	index = FindTexPatIndex(face.texpatindex);
 
 	if (index != 0xffff)
 	{
@@ -701,17 +717,17 @@ static bool ReadVertexNormalUV(void* pvnuv, piUNIFIED_VERTEX* vertices)
 	SetupFPU(false);
 #endif
 
-	vnuv.colorname    = ShortEndian(vertnormuv->colorname);
-	vnuv.flags        = ShortEndian(vertnormuv->flags);
-	vnuv.x            = DoubleEndian(vertnormuv->x);
-	vnuv.y            = DoubleEndian(vertnormuv->y);
-	vnuv.z            = DoubleEndian(vertnormuv->z);
-	vnuv.i            = FloatEndian(vertnormuv->i);
-	vnuv.j            = FloatEndian(vertnormuv->j);
-	vnuv.k            = FloatEndian(vertnormuv->k);
-	vnuv.u            = FloatEndian(vertnormuv->u);
-	vnuv.v            = FloatEndian(vertnormuv->v);
-	vnuv.color        = LongEndian(vertnormuv->color);
+	vnuv.colorname	= ShortEndian(vertnormuv->colorname);
+	vnuv.flags		= ShortEndian(vertnormuv->flags);
+	vnuv.x			= DoubleEndian(vertnormuv->x);
+	vnuv.y			= DoubleEndian(vertnormuv->y);
+	vnuv.z			= DoubleEndian(vertnormuv->z);
+	vnuv.i			= FloatEndian(vertnormuv->i);
+	vnuv.j			= FloatEndian(vertnormuv->j);
+	vnuv.k			= FloatEndian(vertnormuv->k);
+	vnuv.u			= FloatEndian(vertnormuv->u);
+	vnuv.v			= FloatEndian(vertnormuv->v);
+	vnuv.color		= LongEndian(vertnormuv->color);
 
 #ifdef DEBUG_FPU
 	SetupFPU(true);
@@ -741,7 +757,7 @@ static bool ReadVertexNormalUV(void* pvnuv, piUNIFIED_VERTEX* vertices)
 
 	numvertices += 1;
 
-	index = FindTexPatIndex(s_face->texpatindex);
+	index = FindTexPatIndex(face.texpatindex);
 	if (index != 0xffff)
 	{
 		tv.texname = strpool(texref[index].name);
@@ -830,32 +846,36 @@ static bool ReadVertexList(void)
 	}
 #endif
 
-	length = (int)s_chunk->next - 4;
+	length = (int)s_chunk.next - 4;
+
+	if (vertlist != nullptr)
+	{
+		memFree(vertlist);
+	}
 
 	vlistlevel = level;
 
-	if (objectlevel == -1)
-		return FLTGeneralError("no object"), false;
-
-	if (!localBufferUseBytes(vertlist, length))
-		return false;
+	vertlist = (fltVERTEX*)memAlloc(length);
+	localBufferRead( vertlist, length);
 	num = length /= 4;
 
-	if( s_face->drawtype != fltWIRE_OPEN && s_face->drawtype != fltWIRE_CLOSED && num < 3 )
+	if( face.drawtype != fltWIRE_OPEN	&&
+		face.drawtype != fltWIRE_CLOSED &&
+		num < 3 )
 	{
 #ifdef EVENT_LOG_EXTREME
 		Write_Debug("Degenerated face found in .flt! Skipped in .mdl.");
 #endif
-		offset += s_chunk->next;
+		offset += s_chunk.next;
 
-		Write_Debug("Degenerate face found in .flt! This face %s is not a polygon", s_face->id);
+	Write_Debug("Degenerate face found in .flt! This face %s is not a polygon", face.id);
 		return false;
 	}
 
 	//memset(&tv, 0, sizeof(tv));
-	if (s_face->texpatindex >= 0 ||
-		s_face->matindex >= 0 ||
-		s_face->transparency != 0 ||
+	if (face.texpatindex >= 0 ||
+		face.matindex >= 0 ||
+		face.transparency != 0 ||
 		object.transparency != 0)
 	{
 		tv.flags |= OBJECT_VISIBLE;
@@ -890,45 +910,45 @@ static bool ReadVertexList(void)
 	}
 
 	tv.flags |= OBJECT_CLIPPED;
-	if (s_currentLod.level != -1)
+	if (lodlevel != -1)
 	{
 		tv.flags |= OBJECT_USELOD;
-		tv.minlod = (float)(s_currentLod.switchout * s_currentLod.switchout) * localscale * localscale;
-		tv.maxlod = (float)(s_currentLod.switchin * s_currentLod.switchin) * localscale * localscale;
+		tv.minlod = (float)lod.switchout * (float)lod.switchout * localscale * localscale;
+		tv.maxlod = (float)lod.switchin * (float)lod.switchin * localscale * localscale;
 	}
 
-	if (s_face->drawtype == fltWIRE_OPEN)
+	if (face.drawtype == fltWIRE_OPEN)
 	{
 		tv.flags |= OBJECT_LINESTRIP
-				 |  OBJECT_LITE
-				 |  OBJECT_DYNALITE
-				 |  OBJECT_NOSPECULAR; // just to be sure
+				|	OBJECT_LITE
+				|	OBJECT_DYNALITE
+				|	OBJECT_NOSPECULAR; // just to be sure
 	}
 	else
-	if (s_face->drawtype == fltWIRE_CLOSED)
+	if (face.drawtype == fltWIRE_CLOSED)
 	{
 		tv.flags |= OBJECT_LINECLOSED
-				|  OBJECT_LITE
-				|  OBJECT_DYNALITE
-				|  OBJECT_NOSPECULAR; // just to be sure
+				|	OBJECT_LITE
+				|	OBJECT_DYNALITE
+				|	OBJECT_NOSPECULAR; // just to be sure
 		length += 1;
 	}
 	else
 	{
-	  if (s_face->drawtype == fltSOLID_NOBACKFACE)
-	  {
+		if (face.drawtype == fltSOLID_NOBACKFACE)
+		{
 		//tv.flags |= OBJECT_NOBACKFACE;
 		//length *= 2;
-	  }
+		}
 
-	  //tv.flags |= OBJECT_TRIANGLELIST;
-	  tv.flags |= OBJECT_TRIANGLEFAN
-			   |  OBJECT_INDEXED
-			   |  OBJECT_LITE
-			   |  OBJECT_DYNALITE;
+		//tv.flags |= OBJECT_TRIANGLELIST;
+		tv.flags |= OBJECT_TRIANGLEFAN
+				|	OBJECT_INDEXED
+				|	OBJECT_LITE
+				|	OBJECT_DYNALITE;
 	}
 
-	if (s_face->drawtype == fltWIRE_OPEN || s_face->drawtype == fltWIRE_CLOSED)
+	if (face.drawtype == fltWIRE_OPEN || face.drawtype == fltWIRE_CLOSED)
 	{
 		// For lines, no indices are allowed
 		tv.flags &= ~OBJECT_INDEXED;
@@ -941,9 +961,9 @@ static bool ReadVertexList(void)
 
 	if (matlevel != -1)
 	{
-		if (s_face->matindex >= 0)
+		if (face.matindex >= 0)
 		{
-			tv.matname = strpool(s_material[s_face->matindex]->name);
+			tv.matname = strpool(material[face.matindex].name);
 			if (tv.matname[0] == 0)
 			{
 				Write_Debug("Material has no name!");
@@ -964,8 +984,8 @@ static bool ReadVertexList(void)
 	tv.matid = -1;
 	tv.texname = "";
 	tv.texid = -1;
-	tv.feature = s_face->fid;
-	tv.level = s_face->surfmatcode;
+	tv.feature = face.fid;
+	tv.level = face.surfmatcode;
 	tv.layer = object.priority + facelayer;
 
 	////Write_Debug(" vertices: %d", length);////
@@ -984,7 +1004,7 @@ static bool ReadVertexList(void)
 		tv.flag2 |= OBJECT_AIRRAIDSIREN;
 	}
 
-	if (s_face->drawtype == fltWIRE_OPEN || s_face->drawtype == fltWIRE_CLOSED)
+	if (face.drawtype == fltWIRE_OPEN || face.drawtype == fltWIRE_CLOSED)
 	{
 		tv.numtris	= 0;
 		tv.numverts	= length;
@@ -1023,19 +1043,19 @@ static bool ReadVertexList(void)
 		switch (ShortEndian(pchunk->cid))
 		{
 		case VERTEX_COORDINATE:
-			////Write_Debug("  VERTEX_COORDINATE");
+			////Write_Debug(" VERTEX_COORDINATE");
 			ReadVertexCoordinate(pdata, vertices);
 		break;
 		case VERTEX_NORMAL:
-			////Write_Debug("  VERTEX_NORMAL");
+			////Write_Debug(" VERTEX_NORMAL");
 			ReadVertexNormal(pdata, vertices);
 		break;
 		case VERTEX_NORMAL_UV:
-			////Write_Debug("  VERTEX_NORMAL_UV");
+			////Write_Debug(" VERTEX_NORMAL_UV");
 			ReadVertexNormalUV(pdata, vertices);
 		break;
 		case VERTEX_UV:
-			////Write_Debug("  VERTEX_UV");
+			////Write_Debug(" VERTEX_UV");
 			ReadVertexUV(pdata, vertices);
 		break;
 		}
@@ -1052,7 +1072,7 @@ static bool ReadVertexList(void)
 #endif
 	}
 
-	index = FindTexPatIndex(s_face->texpatindex);
+	index = FindTexPatIndex(face.texpatindex);
 	if (index != 0xffff)
 	{
 		if (piIsTexture(tv.texid, 0))
@@ -1108,7 +1128,7 @@ static bool ReadVertexList(void)
 		tv.layer = 16;
 	}
 
-	if (s_face->drawtype != fltWIRE_OPEN && s_face->drawtype != fltWIRE_CLOSED)
+	if (face.drawtype != fltWIRE_OPEN && face.drawtype != fltWIRE_CLOSED)
 	{
 		// Triangulate the face and reverse vertex order to CCW
 		for (int tri=0; tri < tv.numtris; tri++)
@@ -1125,19 +1145,19 @@ static bool ReadVertexList(void)
 
 
 #ifdef FORCE_DDS_NO_FLIP
-  // Flip for dds textures
-  TEXTURE* t = piGetTextureData(tv.texid);
+	// Flip for dds textures
+	TEXTURE* t = piGetTextureData(tv.texid);
 
-  if(t)
-  {
-	if(t->isdds())
+	if(t)
 	{
-	  for(int vert=0; vert < tv.numverts; vert++)
-	  {	// Flip the v texture coordinate
-		(tv.puverts + vert)->tv = 1 - (tv.puverts + vert)->tv;
-	  }
+		if(t->isdds())
+		{
+			for(int vert=0; vert < tv.numverts; vert++)
+			{	// Flip the v texture coordinate
+				(tv.puverts + vert)->tv = 1 - (tv.puverts + vert)->tv;
+			}
+		}
 	}
-  }
 #endif
 
 	// convert to DirectX handedness
@@ -1147,15 +1167,15 @@ static bool ReadVertexList(void)
 	piTexCoordPtr stex = tv.StaticTexCoords();
 
 	// close the line
-	if (s_face->drawtype == fltWIRE_CLOSED)
+	if (face.drawtype == fltWIRE_CLOSED)
 	{
-		spos[presvert]  = spos[0];
+		spos[presvert]	= spos[0];
 		snorm[presvert]	= snorm[0];
 		sc[presvert] 	= sc[0];
-		stex[presvert] = stex[0];
+		stex[presvert]	= stex[0];
 	}
 
-	if (s_face->drawtype != fltWIRE_OPEN && s_face->drawtype != fltWIRE_CLOSED)
+	if (face.drawtype != fltWIRE_OPEN && face.drawtype != fltWIRE_CLOSED)
 	{
 		for (i=0; i < tv.numtris; i++)
 		{
@@ -1165,7 +1185,7 @@ static bool ReadVertexList(void)
 		}
 	}
 
-	if (s_face->flags & fltFACE_HIDDEN)
+	if (face.flags & fltFACE_HIDDEN)
 	{
 		tv.flag2 |= OBJECT_HIDDEN;
 	}
@@ -1181,7 +1201,7 @@ static bool ReadVertexList(void)
 	{
 		if(g_bSpeedTrees)
 		{
-		  lpobj->flag2 |= OBJECT_SPEEDTREE;
+			lpobj->flag2 |= OBJECT_SPEEDTREE;
 		}
 
 		if(g_isGrass)
@@ -1190,7 +1210,7 @@ static bool ReadVertexList(void)
 			lpobj->layer = g_grassType;
 		}
 
-	//		Write_Debug("Object face '%s' (%s) was created (%d)", tv.name, s_face->id, level);
+	//		Write_Debug("Object face '%s' (%s) was created (%d)", tv.name, face.id, level);
 		if (attached == nullptr)
 		{
 			if (groups[groupindex] != nullptr)
@@ -1265,7 +1285,7 @@ static bool ReadVertexList(void)
 
 		lastobject = lpobj;
 
-		if (s_face->drawtype == fltSOLID_NOBACKFACE)
+		if (face.drawtype == fltSOLID_NOBACKFACE)
 		{
 			// Create a inverted face copy if the face is two sided
 			// This increases the triangle count, but reduces the amount of batches
@@ -1275,7 +1295,7 @@ static bool ReadVertexList(void)
 			obmainAttachObject(attached, backfaceObj);
 			attached = backfaceObj;
 
-			if (s_face->drawtype != fltWIRE_OPEN && s_face->drawtype != fltWIRE_CLOSED)
+			if (face.drawtype != fltWIRE_OPEN && face.drawtype != fltWIRE_CLOSED)
 			{
 				for(i=0; i < num; i++)
 				{
@@ -1316,7 +1336,7 @@ static bool ReadVertexList(void)
 		}
 	}
 
-	offset += s_chunk->next;
+	offset += s_chunk.next;
 
 	memFree(vertices);
 	vertices = nullptr;
@@ -1327,81 +1347,78 @@ static bool ReadVertexList(void)
 
 static bool ReadMatrix(void)
 {
-	if (!localBufferCopyObject(&s_matrixRecord))
-		return false;
+	localBufferRead( &s_matrixRecord, sizeof(s_matrixRecord));
 
 	for(size_t i=0; i<16; i++)
 	{
 		*((float*)&s_matrixRecord + i) = FloatEndian(*((float*)&s_matrixRecord + i));
 	}
 
-	offset += s_chunk->next;
+	offset += s_chunk.next;
 
 	return true;
 }
 
 static bool ReadMaterialTable(const char* name)
 {
-	const size_t materialsLen = s_chunk->next - 4;
-	s_nummaterials = materialsLen / sizeof(fltMATERIAL);
-	if (s_nummaterials > s_material.max_size())
-	{
-		Write_Debug("fltLoad failed at %s:%u", __FILE__, __LINE__);
-		return false;
-	}
-	if (s_nummaterials * sizeof(fltMATERIAL) != materialsLen)
-	{
-		Write_Debug("Bad materials data");
-		return false;
-	}
+	s_nummaterials = s_chunk.next - 4;
+	material = (fltMATERIAL*)memAlloc(s_nummaterials);
+
+	localBufferRead( material, s_nummaterials);
 
 	matlevel = level;
+	s_nummaterials /= sizeof(fltMATERIAL);
 
 	for (size_t i = 0; i < s_nummaterials; ++i)
 	{
-		ABORT_IF(s_material[i] != &s_materialPalette[i]);
-		if (!localBufferUseBytes(s_material[i], sizeof(*s_material[i])))
-		{
-			Write_Debug("fltLoad failed at %s:%u", __FILE__, __LINE__);
-			return false;
-		}
+		Write_Debug("Material loaded: %s", material[i].name);
 
-		fltMATERIAL& material = *s_material[i];
-		Write_Debug("Material %u loaded: %s", i, material.name);
+		material[i].ambRed	= FloatEndian(material[i].ambRed);
+		material[i].ambGreen	= FloatEndian(material[i].ambGreen);
+		material[i].ambBlue	= FloatEndian(material[i].ambBlue);
+		material[i].diffRed	= FloatEndian(material[i].diffRed);
+		material[i].diffGreen	= FloatEndian(material[i].diffGreen);
+		material[i].diffBlue	= FloatEndian(material[i].diffBlue);
+		material[i].specRed	= FloatEndian(material[i].specRed);
+		material[i].specGreen	= FloatEndian(material[i].specGreen);
+		material[i].specBlue	= FloatEndian(material[i].specBlue);
+		material[i].emissRed	= FloatEndian(material[i].emissRed);
+		material[i].emissGreen = FloatEndian(material[i].emissGreen);
+		material[i].emissBlue	= FloatEndian(material[i].emissBlue);
+		material[i].shininess	= FloatEndian(material[i].shininess);
+		material[i].alpha		= FloatEndian(material[i].alpha);
+		material[i].flags		= LongEndian(material[i].flags);
 
 		// No name, no material (we key off name!)
-		if (material.name[0] != 0)
+		if (material[i].name[0] != 0)
 		{
-			MATERIAL mat {};
+			memset(&mat, 0, sizeof(mat));
 			mat.material.power = 1.0f;
-			strcpy(mat.name, material.name);
+			strcpy(mat.name, material[i].name);
 
-			auto alpha = FloatEndian(material.alpha);
-			mat.material.ambient.r = FloatEndian(material.ambRed);
-			mat.material.ambient.g = FloatEndian(material.ambGreen);
-			mat.material.ambient.b = FloatEndian(material.ambBlue);
-			mat.material.ambient.a = alpha;
+			mat.material.ambient.r = material[i].ambRed;
+			mat.material.ambient.g = material[i].ambGreen;
+			mat.material.ambient.b = material[i].ambBlue;
+			mat.material.ambient.a = material[i].alpha;
 
-			mat.material.diffuse.r = FloatEndian(material.diffRed);
-			mat.material.diffuse.g = FloatEndian(material.diffGreen);
-			mat.material.diffuse.b = FloatEndian(material.diffBlue);
-			mat.material.diffuse.a = alpha;
+			mat.material.diffuse.r = material[i].diffRed;
+			mat.material.diffuse.g = material[i].diffGreen;
+			mat.material.diffuse.b = material[i].diffBlue;
+			mat.material.diffuse.a = material[i].alpha;
 
-			mat.material.specular.r = FloatEndian(material.specRed);
-			mat.material.specular.g = FloatEndian(material.specGreen);
-			mat.material.specular.b = FloatEndian(material.specBlue);
-			mat.material.specular.a = alpha;
+			mat.material.specular.r = material[i].specRed;
+			mat.material.specular.g = material[i].specGreen;
+			mat.material.specular.b = material[i].specBlue;
+			mat.material.specular.a = material[i].alpha;
 
-			mat.material.emissive.r = FloatEndian(material.emissRed);
-			mat.material.emissive.g = FloatEndian(material.emissGreen);
-			mat.material.emissive.b = FloatEndian(material.emissBlue);
-			mat.material.emissive.a = alpha;
+			mat.material.emissive.r = material[i].emissRed;
+			mat.material.emissive.g = material[i].emissGreen;
+			mat.material.emissive.b = material[i].emissBlue;
+			mat.material.emissive.a = material[i].alpha;
 
-			mat.material.power = FloatEndian(material.shininess);
+			mat.material.power = material[i].shininess;
 
-			//material.flags      = LongEndian(material.flags);
-
-//            Write_Debug("Material name: %s", mat.matname);
+//			Write_Debug("Material name: %s", mat.matname);
 			if (!obcMaterial(&mat))
 			{
 				return false;
@@ -1409,89 +1426,85 @@ static bool ReadMaterialTable(const char* name)
 		}
 	}
 
-	offset += s_chunk->next;
+	offset += s_chunk.next;
 
 	return true;
 }
 
 static bool ReadMaterialPalette(const char* name)
 {
-	matlevel = level;
+	fltMATERIAL_PALETTE matpal;
 
-	fltMATERIAL_PALETTE* matpal;
-	if (!localBufferUseObject(matpal))
+	if (material == nullptr)
 	{
-		Write_Debug("fltLoad failed at %s:%u", __FILE__, __LINE__);
-		return false;
+		material = (fltMATERIAL*)memAlloc(64 * sizeof(fltMATERIAL));
+		matlevel = level;
 	}
 
-	size_t i = LongEndian(matpal->index);
-	if(i >= s_materialPalette.max_size())
+	localBufferRead( &matpal, sizeof(fltMATERIAL_PALETTE));
+
+	size_t i = LongEndian(matpal.index);
+	if(i >= 64)
 	{
-		Write_Log(LOG_OLD, LOG_WARN, "[ReadMaterialPalette] material index is %d. It should be 0<=x<=63.", i);
-		return false;
+	Write_Log(LOG_OLD, LOG_WARN, "[ReadMaterialPalette] material index is %d. It should be 0<=x<=63.", i);
+	return false;
 	}
 
-	ABORT_IF(s_material[i] != &s_materialPalette[i]);
-
-	fltMATERIAL& material = s_materialPalette[i];
-	material.ambRed			= FloatEndian(matpal->ambRed);
-	material.ambGreen		= FloatEndian(matpal->ambGreen);
-	material.ambBlue		= FloatEndian(matpal->ambBlue);
-	material.diffRed		= FloatEndian(matpal->diffRed);
-	material.diffGreen		= FloatEndian(matpal->diffGreen);
-	material.diffBlue		= FloatEndian(matpal->diffBlue);
-	material.specRed		= FloatEndian(matpal->specRed);
-	material.specGreen		= FloatEndian(matpal->specGreen);
-	material.specBlue		= FloatEndian(matpal->specBlue);
-	material.emissRed		= FloatEndian(matpal->emissRed);
-	material.emissGreen		= FloatEndian(matpal->emissGreen);
-	material.emissBlue		= FloatEndian(matpal->emissBlue);
-	material.shininess		= FloatEndian(matpal->shininess);
-	material.alpha			= FloatEndian(matpal->alpha);
-	material.flags			= LongEndian(matpal->flags);
-	s_material[i] = &material;
+	material[i].ambRed		= FloatEndian(matpal.ambRed);
+	material[i].ambGreen	= FloatEndian(matpal.ambGreen);
+	material[i].ambBlue		= FloatEndian(matpal.ambBlue);
+	material[i].diffRed		= FloatEndian(matpal.diffRed);
+	material[i].diffGreen	= FloatEndian(matpal.diffGreen);
+	material[i].diffBlue	= FloatEndian(matpal.diffBlue);
+	material[i].specRed		= FloatEndian(matpal.specRed);
+	material[i].specGreen	= FloatEndian(matpal.specGreen);
+	material[i].specBlue	= FloatEndian(matpal.specBlue);
+	material[i].emissRed	= FloatEndian(matpal.emissRed);
+	material[i].emissGreen	= FloatEndian(matpal.emissGreen);
+	material[i].emissBlue	= FloatEndian(matpal.emissBlue);
+	material[i].shininess	= FloatEndian(matpal.shininess);
+	material[i].alpha		= FloatEndian(matpal.alpha);
+	material[i].flags		= LongEndian(matpal.flags);
+	strcpy(material[i].name, matpal.name);
 
 	// HACK! for max to flt plugging anomalies
 	// If there is a '*' in the name, then use the name previous to the '*'
 	// MAX requires unique names, and FLT limit of 12 chars for material names makes this work.
-	char* star = strchr(matpal->name, '*');
+	char* star = strchr(matpal.name, '*');
 	if (star)
 		*star = '\0';
-	strcpy(material.name, matpal->name);
-
-	Write_Debug("Material %u loaded: %s", i, material.name);
+	strcpy(material[i].name, matpal.name);
 
 	// No name, no material (we key off name!)
-	if (material.name[0] != 0)
+	if (material[i].name[0] != 0)
 	{
-		MATERIAL mat {};
+		memset(&mat, 0, sizeof(mat));
 		mat.material.power = 1.0f;
-		strcpy(mat.name, material.name);
+		strcpy(mat.name, material[i].name);
 
-		mat.material.ambient.r = material.ambRed;
-		mat.material.ambient.g = material.ambGreen;
-		mat.material.ambient.b = material.ambBlue;
-		mat.material.ambient.a = material.alpha;
+		mat.material.ambient.r = material[i].ambRed;
+		mat.material.ambient.g = material[i].ambGreen;
+		mat.material.ambient.b = material[i].ambBlue;
+		mat.material.ambient.a = material[i].alpha;
 
-		mat.material.diffuse.r = material.diffRed;
-		mat.material.diffuse.g = material.diffGreen;
-		mat.material.diffuse.b = material.diffBlue;
-		mat.material.diffuse.a = material.alpha;
+		mat.material.diffuse.r = material[i].diffRed;
+		mat.material.diffuse.g = material[i].diffGreen;
+		mat.material.diffuse.b = material[i].diffBlue;
+		mat.material.diffuse.a = material[i].alpha;
 
-		mat.material.specular.r = material.specRed;
-		mat.material.specular.g = material.specGreen;
-		mat.material.specular.b = material.specBlue;
-		mat.material.specular.a = material.alpha;
+		mat.material.specular.r = material[i].specRed;
+		mat.material.specular.g = material[i].specGreen;
+		mat.material.specular.b = material[i].specBlue;
+		mat.material.specular.a = material[i].alpha;
 
-		mat.material.emissive.r = material.emissRed;
-		mat.material.emissive.g = material.emissGreen;
-		mat.material.emissive.b = material.emissBlue;
-		mat.material.emissive.a = material.alpha;
+		mat.material.emissive.r = material[i].emissRed;
+		mat.material.emissive.g = material[i].emissGreen;
+		mat.material.emissive.b = material[i].emissBlue;
+		mat.material.emissive.a = material[i].alpha;
 
-		mat.material.power = material.shininess;
+		mat.material.power = material[i].shininess;
 
-//        Write_Debug("Material name: %s", mat.matname);
+//		Write_Debug("Material name: %s", mat.matname);
 		if (!obcMaterial(&mat))
 		{
 			return false;
@@ -1505,7 +1518,7 @@ static bool ReadMaterialPalette(const char* name)
 		}
 	}
 
-	offset += s_chunk->next;
+	offset += s_chunk.next;
 
 	return true;
 }
@@ -1513,28 +1526,45 @@ static bool ReadMaterialPalette(const char* name)
 
 static bool ReadColorPalette(void)
 {
-	size_t length = s_chunk->next - 4;
-	fltCOLORPALETTE* colorpal;
-	localBufferUseBytes(colorpal, length);
+	int	h, i, j, length;
+	colorstruct color;
+
+	if (colortable != nullptr)
+	{
+	memFree(colorpal);
+	}
+
+	length = s_chunk.next - 4;
+	colorpal = (fltCOLORPALETTE*)memAlloc(length);
+	localBufferRead( colorpal, length);
+
+	if (colortable != nullptr)
+	{
+	memFree(colortable);
+	}
 
 	length = (length - 128) / sizeof(UINT32);
-	s_colortable.resize(length * 128);
-
-	colorstruct* color = &s_colortable.front();
-	for (size_t i=0; i < length; ++i)
+	colortable = (colorstruct*)memAlloc(length * 128 * sizeof(UINT32));
+	if (colortable == nullptr)
 	{
-		for (size_t j=0; j < 128; ++color, ++j)
-		{
-			color->full			=	colorpal->briteRGB[i];
-			color->rgb.red		=	color->rgb.red * j / 127;
-			color->rgb.green	=	color->rgb.green * j / 127;
-			color->rgb.blue		=	color->rgb.blue * j / 127;
-		}
+	return false;
+	}
+
+	for (h=0, i=0; i < length; i++)
+	{
+	for (j=0; j < 128; h++, j++)
+	{
+		color.full = colorpal->briteRGB[i];
+		color.rgb.red = color.rgb.red * j / 127;
+		color.rgb.green = color.rgb.green * j / 127;
+		color.rgb.blue = color.rgb.blue * j / 127;
+		colortable[h] = color;
+	}
 	}
 
 	colorlevel = level;
 
-	offset += s_chunk->next;
+	offset += s_chunk.next;
 
 	return true;
 }
@@ -1545,21 +1575,20 @@ static bool ReadTextureReference(void)
 	char filename[256];
 	filename[0] = '\0';
 
-	if(texref == NULL)
+	if(texref == nullptr)
 	{
 		texref = (fltTEXTUREREFERENCE*)memAlloc(MAX_TEXTURE_REFS * sizeof(fltTEXTUREREFERENCE));
 		texlevel = level;
 	}
 
-	localBufferCopyBytes( &texref[numtexrefs], sizeof(fltTEXTUREREFERENCE));
+	localBufferRead( &texref[numtexrefs], sizeof(fltTEXTUREREFERENCE));
 
 	texref[numtexrefs].patindex = LongEndian(texref[numtexrefs].patindex);
-	texref[numtexrefs].x        = LongEndian(texref[numtexrefs].x);
-	texref[numtexrefs].y        = LongEndian(texref[numtexrefs].y);
+	texref[numtexrefs].x		= LongEndian(texref[numtexrefs].x);
+	texref[numtexrefs].y		= LongEndian(texref[numtexrefs].y);
 
 	// HACK to work around MAX flt plugin texture paths
-	static std::string str;
-	str = texref[numtexrefs].name;
+	std::string str = texref[numtexrefs].name;
 	UINT32 pos = str.rfind('\\');
 
 	if(pos == std::string::npos)
@@ -1576,14 +1605,14 @@ static bool ReadTextureReference(void)
 	lstrcpy(filename, pathname);
 	lstrcat(filename, texref[numtexrefs].name);
 
-	offset += s_chunk->next;
+	offset += s_chunk.next;
 
 	// If the name is not a filename (for a textured surface),
 	// then the surface will be untextured...
 	texid[numtexrefs] = ldpixLoadImageFileToSurface(filename, colorBLACK, LDPIX_MIPMAP);
 
 	if(!piIsTexture(texid[numtexrefs], 0))
-		return FLTUnknownTexture(filename), false;
+		throw FLTUnknownTexture(filename);
 
 	//numuses[numtexrefs] = 0;
 	texalpha[numtexrefs] = piTextureHasAlpha(texid[numtexrefs]);
@@ -1634,36 +1663,32 @@ static bool ReadTextureReference(void)
 
 static bool ReadFace(void)
 {
-	if (!localBufferUseObject(s_face))
-	{
-		Write_Debug("fltLoad failed at %s:%u", __FILE__, __LINE__);
-		return false;
-	}
+	localBufferRead( &face, sizeof(face));
 
-	OBJECT*		o = nullptr;
+	OBJECT*		o	= nullptr;
 
 	facelevel = level;
 
-	s_face->ircolor        = LongEndian(s_face->ircolor);
-	s_face->priority       = ShortEndian(s_face->priority);
-	s_face->colorname      = ShortEndian(s_face->colorname);
-	s_face->altcolorname   = ShortEndian(s_face->altcolorname);
-	s_face->dettexpat      = ShortEndian(s_face->dettexpat);
-	s_face->texpatindex    = ShortEndian(s_face->texpatindex);
-	s_face->matindex       = ShortEndian(s_face->matindex);
-	s_face->surfmatcode    = ShortEndian(s_face->surfmatcode);
-	s_face->fid            = ShortEndian(s_face->fid);
-	s_face->irmat          = LongEndian(s_face->irmat);
-	s_face->transparency   = ShortEndian(s_face->transparency);
-	s_face->flags          = LongEndian(s_face->flags);
-	s_face->color          = LongEndian(s_face->color);
-	s_face->altcolor       = LongEndian(s_face->altcolor);
-	s_face->texmapindex    = ShortEndian(s_face->texmapindex);
-	s_face->colorindex     = LongEndian(s_face->colorindex);
-	s_face->altcolorindex  = LongEndian(s_face->altcolorindex);
+	face.ircolor		= LongEndian(face.ircolor);
+	face.priority		= ShortEndian(face.priority);
+	face.colorname		= ShortEndian(face.colorname);
+	face.altcolorname	= ShortEndian(face.altcolorname);
+	face.dettexpat		= ShortEndian(face.dettexpat);
+	face.texpatindex	= ShortEndian(face.texpatindex);
+	face.matindex		= ShortEndian(face.matindex);
+	face.surfmatcode	= ShortEndian(face.surfmatcode);
+	face.fid			= ShortEndian(face.fid);
+	face.irmat			= LongEndian(face.irmat);
+	face.transparency	= ShortEndian(face.transparency);
+	face.flags			= LongEndian(face.flags);
+	face.color			= LongEndian(face.color);
+	face.altcolor		= LongEndian(face.altcolor);
+	face.texmapindex	= ShortEndian(face.texmapindex);
+	face.colorindex	= LongEndian(face.colorindex);
+	face.altcolorindex	= LongEndian(face.altcolorindex);
 
 
-  //	Write_Debug("Processing face: %s (%d)", s_face->id, level);
+	//	Write_Debug("Processing face: %s (%d)", face.id, level);
 
 	if (objectlevel == -1)
 	{
@@ -1685,16 +1710,16 @@ static bool ReadFace(void)
 
 	if (fltrevision < 1510)
 	{
-		facecolor = CreateColor(s_face->colorname);
+		facecolor = CreateColor(face.colorname);
 	}
 	else
 	{
-		facecolor = CreateColor(s_face->colorindex);
+		facecolor = CreateColor(face.colorindex);
 	}
 
 	hasalpha = false;
 
-	offset += s_chunk->next;
+	offset += s_chunk.next;
 
 	return true;
 }
@@ -1702,26 +1727,25 @@ static bool ReadFace(void)
 
 static bool ReadLOD(void)
 {
-	fltLOD* lod;
-	if (!localBufferUseObject(lod))
-		return false;
+	localBufferRead( &lod, sizeof(lod));
 
-	const bool hasFx = (strncmp(lod->name, "fx", 2) == 0);
+	lodlevel = level;
+	strcpy(lodname, lod.name);
 
-	s_currentLod.level = level;
-	s_currentLod.name = lod->name;
-	s_currentLod.switchin = DoubleEndian(lod->switchin);
-	s_currentLod.switchout = DoubleEndian(lod->switchout);
-	// these all appear to be unused, so no point translating them.
-	//lod->spfxid1     = ShortEndian(lod->spfxid1);
-	//lod->spfxid2     = ShortEndian(lod->spfxid2);
-	//lod->flags       = LongEndian(lod->flags);
-	//lod->centerx     = DoubleEndian(lod->centerx);
-	//lod->centery     = DoubleEndian(lod->centery);
-	//lod->centerz     = DoubleEndian(lod->centerz);
-	//lod->transition  = DoubleEndian(lod->transition);
+	const bool hasFx = (strncmp(lod.name, "fx", 2) == 0);
+
+	lod.switchin	= DoubleEndian(lod.switchin);
+	lod.switchout	= DoubleEndian(lod.switchout);
+	lod.spfxid1	= ShortEndian(lod.spfxid1);
+	lod.spfxid2	= ShortEndian(lod.spfxid2);
+	lod.flags		= LongEndian(lod.flags);
+	lod.centerx	= DoubleEndian(lod.centerx);
+	lod.centery	= DoubleEndian(lod.centery);
+	lod.centerz	= DoubleEndian(lod.centerz);
+	lod.transition	= DoubleEndian(lod.transition);
 
 	OBJECT*	lpobj;
+
 	if (!CreateLevel(&lpobj))
 	{
 		return false;
@@ -1734,16 +1758,16 @@ static bool ReadLOD(void)
 		lpobj->flag2 |= OBJECT_HAS_FX;
 	}
 
-	strcpy(lpobj->name, s_currentLod.name);
-	lpobj->minlod = (float)(s_currentLod.switchout * s_currentLod.switchout) * localscale * localscale;
-	lpobj->maxlod = (float)(s_currentLod.switchin * s_currentLod.switchin) * localscale * localscale;
+	strcpy(lpobj->name, lod.name);
+	lpobj->minlod = (float)lod.switchout * (float)lod.switchout * localscale * localscale;
+	lpobj->maxlod = (float)lod.switchin * (float)lod.switchin * localscale * localscale;
 
 	attached = nullptr;
 	lastobject = lpobj;
 
-//	Write_Debug("Processing LOD: %s; in=%g, out=%g (%d)", lod->name, (float)s_currentLod.switchin, (float)s_currentLod.switchout, s_currentLod.level);
+	//	Write_Debug("Processing LOD: %s; in=%g, out=%g (%d)", lod.name, (float)lod.switchin, (float)lod.switchout, level);
 
-	offset += s_chunk->next;
+	offset += s_chunk.next;
 
 	return true;
 }
@@ -1751,8 +1775,7 @@ static bool ReadLOD(void)
 
 static bool ReadObject(void)
 {
-	if (!localBufferCopyBytes( &object, sizeof(object)))
-		return false;
+	localBufferRead( &object, sizeof(object));
 
 	strcpy(objname[level], object.id);
 	strlwr(objname[level]);
@@ -1761,14 +1784,14 @@ static bool ReadObject(void)
 		strcpy(objname[i], objname[level]);
 	}
 
-	object.flags         = LongEndian(object.flags);
-	object.priority      = ShortEndian(object.priority);
-	object.transparency  = ShortEndian(object.transparency);
-	object.spfxid1       = ShortEndian(object.spfxid1);
-	object.spfxid2       = ShortEndian(object.spfxid2);
-	object.significance  = ShortEndian(object.significance);
+	object.flags		= LongEndian(object.flags);
+	object.priority		= ShortEndian(object.priority);
+	object.transparency	= ShortEndian(object.transparency);
+	object.spfxid1		= ShortEndian(object.spfxid1);
+	object.spfxid2		= ShortEndian(object.spfxid2);
+	object.significance	= ShortEndian(object.significance);
 
-  //	Write_Debug("Processing object: %s (%d)", objname[level], level);
+	//	Write_Debug("Processing object: %s (%d)", objname[level], level);
 
 	attached = nullptr;
 	headObject	= nullptr;
@@ -1776,7 +1799,7 @@ static bool ReadObject(void)
 	objectlevel = level;
 	numvertices = 0;
 
-	offset += s_chunk->next;
+	offset += s_chunk.next;
 
 	return true;
 }
@@ -1784,17 +1807,16 @@ static bool ReadObject(void)
 
 static bool ReadExtension(void)
 {
-	fltEXTENSION*  ext;
-	if (!localBufferUseObject(ext))
-		return false;
+	fltEXTENSION ext;
 
-#if (0)
-	ext->code = ShortEndian(ext->code);
-	ext->reserved1 = 0;  // terminate the site id
-	//Write_Debug(" extension: '%s', '%s', code=0x%x, level=%d", ext->id, ext->siteid, ext->code, extlevel);
-#endif
+	localBufferRead( &ext, sizeof(ext));
 
-	offset += s_chunk->next;
+	ext.code = ShortEndian(ext.code);
+
+	ext.reserved1 = 0;	// terminate the site id
+	//Write_Debug(" extension: '%s', '%s', code=0x%x, level=%d", ext.id, ext.siteid, ext.code, extlevel);
+
+	offset += s_chunk.next;
 
 	return true;
 }
@@ -1803,10 +1825,7 @@ static bool ReadDOF(void)
 {
 	OBJECT*	lpobj;
 
-	fltDOF* dofPtr;
-	if (!localBufferUseObject(dofPtr))
-		return false;
-	fltDOF& dof = *dofPtr;
+	localBufferRead( &dof, sizeof(dof));
 
 #ifdef DEBUG_FPU
 	SetupFPU(false);
@@ -1938,21 +1957,25 @@ static bool ReadDOF(void)
 	lpobj->dof->dofstatic->dofcurscale.z = (float)dof.curzscale;
 	lpobj->dof->dofstatic->dofincscale.z = (float)dof.inczscale;
 
-  //	Write_Debug("Processing DOF: %s (%d)", dof.name, level);
+	//	Write_Debug("Processing DOF: %s (%d)", dof.name, level);
 
 	doflevel = level;
 
-	offset += s_chunk->next;
+	offset += s_chunk.next;
 
 	return true;
 }
 
 static bool ReadTextComment(void)
 {
-	size_t len = s_chunk->next - 4;
-	char* thisTextComment;
-	if (!localBufferUseBytes(thisTextComment, len))
-		return false;
+	char*	thisTextComment = 0;
+	SINT32	len;
+
+
+	len = s_chunk.next - 4;
+
+	thisTextComment = (char*)memAlloc(len+1);
+	localBufferRead( thisTextComment, len);
 	len -= 1;
 
 	textlevel = level;
@@ -1961,13 +1984,15 @@ static bool ReadTextComment(void)
 		if(textcomment != nullptr)
 		{
 			Write_Debug("Old text comment was unused");
+			memFree(textcomment);
 		}
 		textcomment = thisTextComment;
 	}
 	else
 	{	// Don't take comments from face attributes!
+		memFree(thisTextComment);
 		thisTextComment = 0;
-		offset += s_chunk->next;
+		offset += s_chunk.next;
 		return true;
 	}
 
@@ -1975,7 +2000,7 @@ static bool ReadTextComment(void)
 	while (len >= 0 && iscntrl(textcomment[len]))
 	{
 		textcomment[len] = 0;
-		--len;
+		len -= 1;
 	}
 
 	if (len < 0)
@@ -2033,18 +2058,18 @@ static bool ReadTextComment(void)
 
 			lastobject->comment = textcomment;
 			textcomment = nullptr;
-			--textlevel;
+			textlevel = -1;
 		}
 	}
 
-	offset += s_chunk->next;
+	offset += s_chunk.next;
 
 	return true;
 }
 
 static bool ReadLongID(void)
 {
-	size_t len = size_t(s_chunk->next - 4);
+	size_t len = size_t(s_chunk.next - 4);
 	SCHAR	oldname[32];
 	SCHAR	tempname[32];
 	SINT32	i;
@@ -2052,7 +2077,7 @@ static bool ReadLongID(void)
 	char*	completeString = (char*)alloca(len + 1);
 	if (PN_UNLIKELY(!localBufferCopyBytes(completeString, len)))
 	{
-		Write_Debug("[ReadLongID] FAILURE: bad read\n", lastobject->name, s_conversionFile.c_str());
+		Write_Debug("[ReadLongID] FAILURE: bad read\n", lastobject->name, szConversionFile);
 		return false;
 	}
 
@@ -2084,11 +2109,11 @@ static bool ReadLongID(void)
 		{
 			strcpy(lastobject->name, tempname);
 			strcpy(objname[level], tempname);
-	  //			Write_Debug("Existing object name changed from '%s' to '%s' (%d)", oldname, tempname, level);
+		//			Write_Debug("Existing object name changed from '%s' to '%s' (%d)", oldname, tempname, level);
 		}
 		else
 		{
-	  //			Write_Debug("Existing object name '%s' was not changed to '%s' (%d)", oldname, tempname, level);
+		//			Write_Debug("Existing object name '%s' was not changed to '%s' (%d)", oldname, tempname, level);
 		}
 
 		// Check if topmost name is the file name...required.
@@ -2099,9 +2124,16 @@ static bool ReadLongID(void)
 			// Make sure we are staring at the same address for topmost
 			if (lastobject == groups[0])
 			{
-				if (stricmp(lastobject->name, s_conversionFile.c_str()))
+				if (stricmp(lastobject->name, szConversionFile))
 				{
-					FLTItemFileError("TopMost", lastobject->name, s_conversionFile.c_str());
+					Write_Debug("[ReadLongID] FAILURE: Topmost = %s Filename = %s\n",
+					lastobject->name, szConversionFile);
+
+#ifdef CONVERSION_PROGRAM
+					sprintf(szErrorString, "Topmost = %s Filename = %s",
+					lastobject->name, szConversionFile);
+#endif
+
 					return false;
 				}
 			}
@@ -2111,15 +2143,15 @@ static bool ReadLongID(void)
 	{
 		if (facelevel == -1)
 		{
-	  //			Write_Debug("Uncreated object name set to '%s' (%d)", objname[level], level);
+		//			Write_Debug("Uncreated object name set to '%s' (%d)", objname[level], level);
 		}
 		else
 		{
-	  //			Write_Debug("Uncreated object '%s', name unchanged: '%s' (%d)", objname[level], tempname, level);
+		//			Write_Debug("Uncreated object '%s', name unchanged: '%s' (%d)", objname[level], tempname, level);
 		}
 	}
 
-	offset += s_chunk->next;
+	offset += s_chunk.next;
 
 	return true;
 }
@@ -2135,7 +2167,7 @@ static bool ReadPushLevel(void)
 
 	//Write_Debug("Down to level %d", level);
 
-	offset += s_chunk->next;
+	offset += s_chunk.next;
 
 	return true;
 }
@@ -2144,17 +2176,30 @@ static bool ReadPushLevel(void)
 static bool ReadPopLevel(void)
 {
 	if (vlistlevel == level)
+	{
 		vlistlevel = -1;
+		if (vertlist != nullptr)
+		{
+			memFree(vertlist);
+			vertlist = nullptr;
+		}
+	}
 
-	if (s_currentLod.level == level)
-		s_currentLod.level = -1;
+	if (lodlevel == level)
+	{
+		lodlevel = -1;
+	}
 
 	if (facelevel == level)
+	{
 		facelevel = -1;
+	}
 
-	--level;
+	level -= 1;
 	if (level == 0)
+	{
 		topmost = true;
+	}
 
 	//Write_Debug("Up to level %d", level);
 
@@ -2162,9 +2207,12 @@ static bool ReadPopLevel(void)
 	{
 		if (grouplevels[groupindex] >= level)
 		{
+		int		i;
+
+
 			//Write_Debug("Up a group level: %d (%d)", groupindex, level);
 
-			for (size_t i=groupindex+1; i < MAX_GROUP_SIZE; i++)
+			for (i=groupindex+1; i < MAX_GROUP_SIZE; i++)
 			{
 				grouplevels[i] = -1;
 				groups[i] = nullptr;
@@ -2179,6 +2227,11 @@ static bool ReadPopLevel(void)
 	{
 		matlevel = -1;
 		s_nummaterials = 0;
+		if (material != nullptr)
+		{
+			memFree(material);
+			material = nullptr;
+		}
 	}
 
 	if (texlevel == level)
@@ -2187,7 +2240,7 @@ static bool ReadPopLevel(void)
 		if (texref != nullptr)
 		{
 			memFree(texref);
-			texref = NULL;
+			texref = nullptr;
 			for (SINT32 i=0; i < numtexrefs; i++)
 			{
 				piFreeMipTextures(texid[i]);
@@ -2213,7 +2266,17 @@ static bool ReadPopLevel(void)
 	if (colorlevel == level)
 	{
 		colorlevel = -1;
-		s_colortable.clear();
+		if (colorpal != nullptr)
+		{
+			memFree(colorpal);
+			colorpal = nullptr;
+		}
+
+		if (colortable != nullptr)
+		{
+			memFree(colortable);
+			colortable = nullptr;
+		}
 	}
 
 	if (doflevel == level)
@@ -2244,7 +2307,7 @@ static bool ReadPopLevel(void)
 		}
 	}
 
-	offset += s_chunk->next;
+	offset += s_chunk.next;
 
 	return true;
 }
@@ -2254,7 +2317,7 @@ static bool ReadPushSubface(void)
 {
 	facelayer += 1;
 
-	offset += s_chunk->next;
+	offset += s_chunk.next;
 
 	return true;
 }
@@ -2264,7 +2327,7 @@ static bool ReadPopSubface(void)
 {
 	facelayer -= 1;
 
-	offset += s_chunk->next;
+	offset += s_chunk.next;
 
 	return true;
 }
@@ -2274,7 +2337,7 @@ static bool ReadPushExtension(void)
 {
 	extlevel += 1;
 
-	offset += s_chunk->next;
+	offset += s_chunk.next;
 
 	return true;
 }
@@ -2284,7 +2347,7 @@ static bool ReadPopExtension(void)
 {
 	extlevel -= 1;
 
-	offset += s_chunk->next;
+	offset += s_chunk.next;
 
 	return true;
 }
@@ -2366,21 +2429,23 @@ void DoOutputX(const char* str, ...)
 #endif
 
 #ifdef SHOWLDMSGS
-# define LDWrite_Debug(...) WriteToConsole(__VA_ARGS__); Write_Debug(__VA_ARGS__)
+# define LDWrite_Debug(...) Write_Debug(_VA_ARGS_)
 #else
 # define LDWrite_Debug(...)
 #endif
 
 static OBJECT* _fltLoad(const char* const name, const float scale, const int reduce)
 {
-	SINT32 tstart = timeGetTime();
+	SINT8*	ptr;
+	SINT32	i;
+	SINT32	tstart;
+	int stream;
 
-	s_loadError = "";
 	memset(_textureflags2, 0, sizeof(unsigned int) * MAX_TEXTURE_REFS);
 	memset(_textureflags3, 0, sizeof(unsigned int) * MAX_TEXTURE_REFS);
-	memset(s_materialPalette.data(), 0, sizeof(fltMATERIAL) * s_materialPalette.max_size());
-	for (size_t i = 0; i < s_material.max_size(); ++i)
-		s_material[i] = &s_materialPalette[i];
+
+	//	tstart = GetTickCount();
+	tstart = timeGetTime();
 
 	localscale = scale;
 	objreduce = reduce;
@@ -2392,7 +2457,7 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 	translate._33 = -localscale;
 
 	level		= 0;
-	s_currentLod.level = -1;
+	lodlevel	= -1;
 	objectlevel	= -1;
 	doflevel	= -1;
 	textlevel	= -1;
@@ -2400,36 +2465,36 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 	facelayer	= 0;
 	vlistlevel	= -1;
 	extlevel	= -1;
-	numtexrefs  = 0;
-	attached = nullptr;
-	lastobject = nullptr;
-	headObject = nullptr;
-	topmostObject = nullptr;
+	numtexrefs	= 0;
+	attached		= nullptr;
+	lastobject		= nullptr;
+	headObject		= nullptr;
+	topmostObject	= nullptr;
 	s_matrixRecord	= IdentityMatrix;
 
 	meshpool_idx = 0;
 	memset( meshpools, 0, sizeof(meshpools) );
 
-	for (size_t i=0; i < MAX_GROUP_SIZE; i++)
+	for (i=0; i < MAX_GROUP_SIZE; i++)
 	{
 		grouplevels[i] = -1;
 		groups[i] = nullptr;
 	}
 
-	groupindex = -1;
+	groupindex	= -1;
 
-	topmost = true;
+	topmost		= true;
 
 	// open flt file
 	strcpy(filename, name);
-	int stream = fioOpen(filename);
+	stream = fioOpen(filename);
 	if (-1 == stream)
 	{
 		strcpy(filename, TERRAIN_PREPATH);
 		strcat(filename, name);
 		stream = fioOpen(filename);
 		if (-1 == stream)
-			return FLTLoadFailure("Unable to read flt file", "open"), nullptr;
+			throw FLTLoadFailure("Unable to read flt file", "open");
 	}
 
 	// new code to buffer data locally
@@ -2440,7 +2505,7 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 	fioRead(stream,&streamBuffer[0],fsize);
 
 	strcpy(pathname, filename);
-	char* ptr = strrchr(pathname, '\\');
+	ptr = strrchr(pathname, '\\');
 	if (ptr != nullptr)
 	{
 		ptr += 1;	// Leave the '\'
@@ -2466,276 +2531,280 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 	}
 
 	// Need szConversionFile to compare group.id and filename in ReadGroup
-	s_conversionFile = filename;
+	strcpy(szConversionFile, filename);
 
-	for (size_t iter = 0;; ++iter)
+	for (;;)
 	{
-		if (localBufferUseObject(s_chunk) != sizeof(*s_chunk))
+		if (sizeof(s_chunk) != localBufferRead(&s_chunk, sizeof(s_chunk)))
+		{
 			break;
+		}
 
-		if ( s_chunk->next == 0 )
-			return FLTLoadFailure("Bad chunk in flt file", "read"), false;
+		if (s_chunk.next == 0)
+		{
+			throw FLTLoadFailure("Bad chunk in flt file", "read");
+		}
+
 
 		//	There is a bug in the later versions of the .FLT file format.
 		//	The POP_LEVEL commands at the end of a file are not endian converted.
-		if ( s_chunk->cid != POP_LEVEL)
+		if (s_chunk.cid != POP_LEVEL)
 		{
-			s_chunk->cid = ShortEndian(s_chunk->cid);
-			s_chunk->next = ShortEndian(s_chunk->next);
+			s_chunk.cid = ShortEndian(s_chunk.cid);
+			s_chunk.next = ShortEndian(s_chunk.next);
 		}
 
-		switch (s_chunk->cid)
+		switch (s_chunk.cid)
 		{
 		case HEADER_RECORD:
 			LDWrite_Debug("HEADER_RECORD");
 			if(!ReadHeader())
-				return FLTChunkFailure("HEADER_RECORD"), nullptr;
+				throw FLTChunkFailure("HEADER_RECORD");
 		break;
 		case GROUP_RECORD:
 			LDWrite_Debug("GROUP_RECORD");
 			if(!ReadGroup())
-				return FLTChunkFailure("GROUP_RECORD"), nullptr;
+				throw FLTChunkFailure("GROUP_RECORD");
 		break;
 		case OBJECT_RECORD:
 			LDWrite_Debug("OBJECT_RECORD");
 			if(!ReadObject())
-				return FLTChunkFailure("OBJECT_RECORD"), nullptr;
+				throw FLTChunkFailure("OBJECT_RECORD");
 		break;
 		case FACE_RECORD:
 			LDWrite_Debug("FACE_RECORD");
 			if(!ReadFace())
-				return FLTChunkFailure("FACE_RECORD"), nullptr;
+				throw FLTChunkFailure("FACE_RECORD");
 		break;
 		case PUSH_LEVEL:
 			if(!ReadPushLevel())
-				return FLTChunkFailure("PUSH_LEVEL"), nullptr;
+				throw FLTChunkFailure("PUSH_LEVEL");
 			LDWrite_Debug("PUSH_LEVEL: %d", level);
 		break;
 		case POP_LEVEL:
 			LDWrite_Debug("POP_LEVEL: %d", level);
 			if(!ReadPopLevel())
-				return FLTChunkFailure("POP_LEVEL"), nullptr;
+				throw FLTChunkFailure("POP_LEVEL");
 		break;
 		case DOF_RECORD:
 			LDWrite_Debug("DOF");
-			if (!ReadDOF())
-				return FLTChunkFailure("DOF_RECORD"), nullptr;
+			if(!ReadDOF())
+				throw FLTChunkFailure("DOF_RECORD");
 		break;
 		case PUSH_SUBFACE:
 			LDWrite_Debug("PUSH_SUBFACE");
 			if(!ReadPushSubface())
-				return FLTChunkFailure("PUSH_SUBFACE"), nullptr;
+				throw FLTChunkFailure("PUSH_SUBFACE");
 		break;
 		case POP_SUBFACE:
 			LDWrite_Debug("POP_SUBFACE");
 			if(!ReadPopSubface())
-				return FLTChunkFailure("POP_SUBFACE"), nullptr;
+				throw FLTChunkFailure("POP_SUBFACE");
 		break;
 		case PUSH_EXTENSION:
 			LDWrite_Debug("PUSH_EXTENSION");
 			if(!ReadPushExtension())
-				return FLTChunkFailure("PUSH_EXTENSION"), nullptr;
+				throw FLTChunkFailure("PUSH_EXTENSION");
 		break;
 		case POP_EXTENSION:
 			LDWrite_Debug("POP_EXTENSION");
 			if(!ReadPopExtension())
-				return FLTChunkFailure("POP_EXTENSION"), nullptr;
+				throw FLTChunkFailure("POP_EXTENSION");
 		break;
 		case TEXT_COMMENT:
 			LDWrite_Debug("TEXT_COMMENT");
 			if(!ReadTextComment())
-				return FLTChunkFailure("TEXT_COMMENT"), nullptr;
+				throw FLTChunkFailure("TEXT_COMMENT");
 		break;
 		case COLOR_PALETTE:
 			LDWrite_Debug("COLOR_PALETTE");
 			if(!ReadColorPalette())
-				return FLTChunkFailure("COLOR_PALETTE"), nullptr;
+				throw FLTChunkFailure("COLOR_PALETTE");
 		break;
 		case LONG_ID:
 			LDWrite_Debug("LONG_ID");
 			if(!ReadLongID())
-				return FLTChunkFailure("LONG_ID"), nullptr;
+				throw FLTChunkFailure("LONG_ID");
 		break;
 		case MATRIX:
-			if (!ReadMatrix())
-				return FLTChunkFailure("MATRIX"), nullptr;
+			ReadMatrix();
 		break;
 		case VECTOR:
-			LDWrite_Debug("VECTOR");
+			Write_Debug("VECTOR");
 			ReadUnknown();
 		break;
 		case BSP:
-			LDWrite_Debug("BSP");
+			Write_Debug("BSP");
 			ReadUnknown();
 		break;
 		case REPLICATE:
-			LDWrite_Debug("REPLICATE");
+			Write_Debug("REPLICATE");
 			ReadUnknown();
 		break;
 		case INSTANCE_REFERENCE:
-			LDWrite_Debug("INSTANCE_REFERENCE");
+			Write_Debug("INSTANCE_REFERENCE");
 			ReadUnknown();
 		break;
 		case INSTANCE_DEFINITION:
-			LDWrite_Debug("INSTANCE_DEFINITION");
+			Write_Debug("INSTANCE_DEFINITION");
 			ReadUnknown();
 		break;
 		case EXTERNAL:
-			LDWrite_Debug("EXTERNAL");
+			Write_Debug("EXTERNAL");
 			ReadUnknown();
 		break;
 		case TEXTURE_REFERENCE:
 			LDWrite_Debug("TEXTURE_REFERENCE");
 			if(!ReadTextureReference())
-				return FLTChunkFailure("TEXTURE_REFERENCE"), nullptr;
+				throw FLTChunkFailure("TEXTURE_REFERENCE");
 		break;
 		case VERTEX_PALETTE:
 			LDWrite_Debug("VERTEX_PALETTE");
 			if(!ReadVertexPalette())
-				return FLTChunkFailure("VERTEX_PALETTE"), nullptr;
+				throw FLTChunkFailure("VERTEX_PALETTE");
 		break;
 		case VERTEX_LIST:
 			LDWrite_Debug("VERTEX_LIST");
 			if(!ReadVertexList())
-				return FLTChunkFailure("VERTEX_LIST"), nullptr;
+				throw FLTChunkFailure("VERTEX_LIST");
 		break;
 		case FLT_LOD:
 			LDWrite_Debug("LOD");
 			if(!ReadLOD())
-				return FLTChunkFailure("LOD"), nullptr;
+				throw FLTChunkFailure("LOD");
 		break;
 		case BOUNDING_BOX:
-			LDWrite_Debug("BOUNDING_BOX");
+			Write_Debug("BOUNDING_BOX");
 			ReadUnknown();
 		break;
 		case ROTATE_EDGE:
-			LDWrite_Debug("ROTATE_EDGE");
+			Write_Debug("ROTATE_EDGE");
 			ReadUnknown();
 		break;
 		case TRANSLATE:
-			LDWrite_Debug("TRANSLATE");
+			Write_Debug("TRANSLATE");
 			ReadUnknown();
 		break;
 		case SCALE_INDEPENDENT_XYZ:
-			LDWrite_Debug("SCALE_INDEPENDENT_XYZ");
+			Write_Debug("SCALE_INDEPENDENT_XYZ");
 			ReadUnknown();
 		break;
 		case ROTATE_POINT:
-			LDWrite_Debug("ROTATE_POINT");
+			Write_Debug("ROTATE_POINT");
 			ReadUnknown();
 		break;
 		case ROTATE_SCALE:
-			LDWrite_Debug("ROTATE_SCALE");
+			Write_Debug("ROTATE_SCALE");
 			ReadUnknown();
 		break;
 		case PUT:
-			LDWrite_Debug("PUT");
+			Write_Debug("PUT");
 			ReadUnknown();
 		break;
 		case EYEPOINT_TRACKPLANE:
-			LDWrite_Debug("EYEPOINT_TRACKPLANE");
+			Write_Debug("EYEPOINT_TRACKPLANE");
 			ReadUnknown();
 		break;
 		case ROAD_SEGMENT:
-			LDWrite_Debug("ROAD_SEGMENT");
+			Write_Debug("ROAD_SEGMENT");
 			ReadUnknown();
 		break;
 		case ROAD_ZONE:
-			LDWrite_Debug("ROAD_ZONE");
+			Write_Debug("ROAD_ZONE");
 			ReadUnknown();
 		break;
 		case MORPH_VERTEX_LIST:
-			LDWrite_Debug("MORPH_VERTEX_LIST");
+			Write_Debug("MORPH_VERTEX_LIST");
 			ReadUnknown();
 		break;
 		case SOUND:
-			LDWrite_Debug("SOUND");
+			Write_Debug("SOUND");
 			ReadUnknown();
 		break;
 		case ROAD_PATH:
-			LDWrite_Debug("ROAD_PATH");
+			Write_Debug("ROAD_PATH");
 			ReadUnknown();
 		break;
 		case SOUND_PALETTE:
-			LDWrite_Debug("SOUND_PALETTE");
+			Write_Debug("SOUND_PALETTE");
 			ReadUnknown();
 		case TEXT_RECORD:
-			LDWrite_Debug("TEXT_RECORD");
+			Write_Debug("TEXT_RECORD");
 			ReadUnknown();
 		break;
 		case SWITCH:
-			LDWrite_Debug("SWITCH");
+			Write_Debug("SWITCH");
 			ReadUnknown();
 		break;
 		case CLIP_REGION:
-			LDWrite_Debug("CLIP_REGION");
+			Write_Debug("CLIP_REGION");
 			ReadUnknown();
 		break;
 		case EXTENSION:
 			LDWrite_Debug("EXTENSION");
 			if(!ReadExtension())
-				return FLTChunkFailure("EXTENSION"), nullptr;
+				throw FLTChunkFailure("EXTENSION");
 		break;
 		case LIGHT_SOURCE:
-			LDWrite_Debug("LIGHT_SOURCE");
+			Write_Debug("LIGHT_SOURCE");
 			ReadUnknown();
 		break;
 		case LIGHT_SOURCE_PALETTE:
-			LDWrite_Debug("LIGHT_SOURCE_PALETTE");
+			Write_Debug("LIGHT_SOURCE_PALETTE");
 			ReadUnknown();
 		break;
 		case BOUNDING_SPHERE:
-			LDWrite_Debug("BOUNDING_SPHERE");
+			Write_Debug("BOUNDING_SPHERE");
 			ReadUnknown();
 		break;
 		case BOUNDING_CYLINDER:
-			LDWrite_Debug("BOUNDING_CYLINDER");
+			Write_Debug("BOUNDING_CYLINDER");
 			ReadUnknown();
 		break;
 		case BOUNDING_VOLUME_CENTER:
-			LDWrite_Debug("BOUNDING_VOLUME_CENTER");
+			Write_Debug("BOUNDING_VOLUME_CENTER");
 			ReadUnknown();
 		break;
 		case BOUNDING_VOLUME_ORIENT:
-			LDWrite_Debug("BOUNDING_VOLUME_ORIENT");
+			Write_Debug("BOUNDING_VOLUME_ORIENT");
 			ReadUnknown();
 		break;
 		case LIGHT_POINT:
-			LDWrite_Debug("LIGHT_POINT");
+			Write_Debug("LIGHT_POINT");
 			ReadUnknown();
 		break;
 		case MATERIAL_TABLE:
 			LDWrite_Debug("MATERIAL_TABLE");
 			if(!ReadMaterialTable(name))
-				return FLTChunkFailure("MATERIAL_TABLE"), nullptr;
+				throw FLTChunkFailure("MATERIAL_TABLE");
 		break;
 		case TEXTURE_MAPPING_PALETTE:
-			LDWrite_Debug("TEXTURE_MAPPING_PALETTE");
+			Write_Debug("TEXTURE_MAPPING_PALETTE");
 			ReadUnknown();
 		break;
 		case MATERIAL_PALETTE:
 			LDWrite_Debug("MATERIAL_PALETTE");
 			if(!ReadMaterialPalette(name))
-				return FLTChunkFailure("MATERIAL_PALETTE"), nullptr;
+				throw FLTChunkFailure("MATERIAL_PALETTE");
 		break;
 		case COLOR_NAME_PALETTE:
-			LDWrite_Debug("COLOR_NAME_PALETTE");
+			Write_Debug("COLOR_NAME_PALETTE");
 			ReadUnknown();
 		break;
 		case CAT:
-			LDWrite_Debug("CAT");
+			Write_Debug("CAT");
 			ReadUnknown();
 		break;
 		case CAT_DATA:
-			LDWrite_Debug("CAT_DATA");
+			Write_Debug("CAT_DATA");
 			ReadUnknown();
 		break;
 		case CURVE:
-			LDWrite_Debug("CURVE");
+			Write_Debug("CURVE");
 			ReadUnknown();
 		break;
 		default:
-			Write_Debug("UNKNOWN: %d", s_chunk->cid);
+			Write_Debug("UNKNOWN: %d", s_chunk.cid);
 			ReadUnknown();
 		break;
 		}
@@ -2749,15 +2818,24 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 	// close file
 	fioClose(stream);
 
+	while (level > 0)
+		ReadPopLevel();
+
 	if (rawverts != nullptr)
+	{
+		memFree(rawverts);
 		rawverts = nullptr;
+	}
 
 	// If this flag is still true, then something went wrong, because
 	// it should have been reset to false. Check for topmost group name
 	// not being equal to the file name.
 	if(bTopmostObject)
 	{
-		FLTItemFileError("Topmost", groups[0]->name, s_conversionFile.c_str());
+	//		Write_Debug("[ldfltLoad] Topmost group.id = %s Filename = %s.",
+	//					groups[0]->name, szConversionFile);
+		sprintf(szErrorString, "Topmost group.id = %s Filename = %s.",
+			groups[0]->name, szConversionFile);
 
 		bTopmostObject = false;
 
@@ -2791,7 +2869,7 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 		ldmdlUpdateGroupFilteringAndBlendStatus(groups[0]);
 	}
 
-  //	tstart = GetTickCount() - tstart;
+	//	tstart = GetTickCount() - tstart;
 	tstart = timeGetTime() - tstart;
 	Write_Debug("Finished ldfltLoad in %d ms", tstart);
 
@@ -2803,15 +2881,17 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 
 OBJECT* ldfltLoad(const std::string& name, float scale, int reduce)
 {
-	auto obj = _fltLoad(name.c_str(), scale, reduce);
-	if (PN_LIKELY(obj != nullptr))
-		return obj;
-
-	char error[1024];
-	strprintf(error, "Flt: %s\nError: %s", name.c_str(), s_loadError.c_str());
-	Write_Debug("%s", error);
-	piExitProgram(__FILE__, __LINE__, error);
-	return nullptr;
+	try
+	{
+		return _fltLoad(name.c_str(), scale, reduce);
+	}
+	catch (FLTLoadFailure& e)
+	{
+		char error[1024];
+		sprintf(error, "Flt:%s\nError: %s (%s)", name, e.m_problem.c_str(), e.m_doing.c_str());
+		Write_Debug("%s", error);
+		piExitProgram(__FILE__, __LINE__, error);
+		return nullptr;
+	}
 }
-
 
