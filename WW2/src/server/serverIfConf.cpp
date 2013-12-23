@@ -26,6 +26,8 @@
 #include "server/serverIfConf.h"
 
 #if platOS != OS_WIN32
+#include "mem/mem.h"
+
 struct ifi_info *
 get_ifi_info(int family, bool doAliases)
 {
