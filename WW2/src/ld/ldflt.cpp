@@ -124,14 +124,13 @@ static UINT32				facecolor;
 static fltVERTEX*			vertlist;
 static fltMATERIAL*			material;
 static fltTEXTUREREFERENCE*	texref;
-static fltCOLORPALETTE*		colorpal;
 static fltLOD				lod;
 static fltOBJECT			object;
 static int					objreduce;
 static fltDOF				dof;
 static SINT8*				textcomment;
 static SINT32				textlevel;
-static colorstruct*			colortable;
+static std::vector<colorstruct>	s_colortable;
 static int					matlevel;
 static int					texlevel;
 static size_t				s_nummaterials;
@@ -345,16 +344,15 @@ static UINT16 FindTexPatIndex(UINT16 patindex)
 
 static UINT32 CreateColor(int colorindex)
 {
-	UINT32		rgba, alpha;
-	colorstruct	color;
-
-	if (colortable == nullptr)
+	if (PN_UNLIKELY(s_colortable.empty()))
 	{
 		Write_Debug("Tried to get a color but the color table has not been created");
 		return(0xffffffff);
 	}
 
-	color.full = colortable[colorindex].full;
+	UINT32		rgba, alpha;
+	colorstruct	color;
+	color.full = s_colortable[colorindex].full;
 	if (face.matindex >= 0)
 	{
 		alpha = (UCHAR)(material[face.matindex].alpha * 255.0f);
@@ -1532,40 +1530,23 @@ static bool ReadMaterialPalette(const char* name)
 
 static bool ReadColorPalette(void)
 {
-	int	h, i, j, length;
-	colorstruct color;
-
-	if (colortable != nullptr)
-	{
-	memFree(colorpal);
-	}
-
-	length = s_chunk->next - 4;
-	colorpal = (fltCOLORPALETTE*)memAlloc(length);
-	localBufferRead( colorpal, length);
-
-	if (colortable != nullptr)
-	{
-	memFree(colortable);
-	}
+	size_t length = s_chunk->next - 4;
+	fltCOLORPALETTE* colorpal;
+	localBufferUseBytes(colorpal, length);
 
 	length = (length - 128) / sizeof(UINT32);
-	colortable = (colorstruct*)memAlloc(length * 128 * sizeof(UINT32));
-	if (colortable == nullptr)
-	{
-	return false;
-	}
+	s_colortable.resize(length * 128);
 
-	for (h=0, i=0; i < length; i++)
+	colorstruct* color = &s_colortable.front();
+	for (size_t i=0; i < length; ++i)
 	{
-	for (j=0; j < 128; h++, j++)
-	{
-		color.full = colorpal->briteRGB[i];
-		color.rgb.red = color.rgb.red * j / 127;
-		color.rgb.green = color.rgb.green * j / 127;
-		color.rgb.blue = color.rgb.blue * j / 127;
-		colortable[h] = color;
-	}
+		for (size_t j=0; j < 128; ++color, ++j)
+		{
+			color->full			=	colorpal->briteRGB[i];
+			color->rgb.red		=	color->rgb.red * j / 127;
+			color->rgb.green	=	color->rgb.green * j / 127;
+			color->rgb.blue		=	color->rgb.blue * j / 127;
+		}
 	}
 
 	colorlevel = level;
@@ -2256,17 +2237,7 @@ static bool ReadPopLevel(void)
 	if (colorlevel == level)
 	{
 		colorlevel = -1;
-		if (colorpal != nullptr)
-		{
-			memFree(colorpal);
-			colorpal = nullptr;
-		}
-
-		if (colortable != nullptr)
-		{
-			memFree(colortable);
-			colortable = nullptr;
-		}
+		s_colortable.clear();
 	}
 
 	if (doflevel == level)
