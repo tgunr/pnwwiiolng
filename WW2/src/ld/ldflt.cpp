@@ -117,7 +117,7 @@ static const size_t MAX_FLT_MATERIALS = 64;
 
 static long					fltrevision;
 static void*				rawverts;
-static fltFACE				face;
+static fltFACE*				s_face;
 static int					facelevel;
 static int					facelayer;
 static UINT32				facecolor;
@@ -234,9 +234,7 @@ static int localSeek(int offset)
 
 inline bool isAlphaBlend()
 {
-	return (face.billboard == FIXED_ALPHA_BLENDING) ||
-	(face.billboard == AXIAL_ROTATE_WITH_ALPHA_BLENDING) ||
-	(face.billboard == POINT_ROTATE_WITH_ALPHA_BLENDING);
+	return (s_face->billboard == FIXED_ALPHA_BLENDING) || (s_face->billboard == AXIAL_ROTATE_WITH_ALPHA_BLENDING) || (s_face->billboard == POINT_ROTATE_WITH_ALPHA_BLENDING);
 }
 
 // these four functions apply to little-endian systems only. Big-endian
@@ -335,13 +333,13 @@ static UINT32 CreateColor(int colorindex)
 	UINT32		rgba, alpha;
 	colorstruct	color;
 	color.full = s_colortable[colorindex].full;
-	if (face.matindex >= 0)
+	if (s_face->matindex >= 0)
 	{
-		alpha = (UCHAR)(material[face.matindex].alpha * 255.0f);
+		alpha = (UCHAR)(material[s_face->matindex].alpha * 255.0f);
 	}
 	else
 	{
-		alpha = (UINT32)((float)(65535 - face.transparency) / 65535.0f * 255.0f);
+		alpha = (UINT32)((float)(65535 - s_face->transparency) / 65535.0f * 255.0f);
 	}
 
 	rgba = piRGBA_MAKE(color.rgb.red, color.rgb.green, color.rgb.blue, alpha);
@@ -664,7 +662,7 @@ static bool ReadVertexUV(void* pvuv, piUNIFIED_VERTEX* vertices)
 
 	numvertices += 1;
 
-	index = FindTexPatIndex(face.texpatindex);
+	index = FindTexPatIndex(s_face->texpatindex);
 
 	if (index != 0xffff)
 	{
@@ -732,7 +730,7 @@ static bool ReadVertexNormalUV(void* pvnuv, piUNIFIED_VERTEX* vertices)
 
 	numvertices += 1;
 
-	index = FindTexPatIndex(face.texpatindex);
+	index = FindTexPatIndex(s_face->texpatindex);
 	if (index != 0xffff)
 	{
 		tv.texname = strpool(texref[index].name);
@@ -835,23 +833,21 @@ static bool ReadVertexList(void)
 		return false;
 	num = length /= 4;
 
-	if( face.drawtype != fltWIRE_OPEN	&&
-		face.drawtype != fltWIRE_CLOSED &&
-		num < 3 )
+	if( s_face->drawtype != fltWIRE_OPEN && s_face->drawtype != fltWIRE_CLOSED && num < 3 )
 	{
 #ifdef EVENT_LOG_EXTREME
 		Write_Debug("Degenerated face found in .flt! Skipped in .mdl.");
 #endif
 		offset += s_chunk->next;
 
-	Write_Debug("Degenerate face found in .flt! This face %s is not a polygon", face.id);
+		Write_Debug("Degenerate face found in .flt! This face %s is not a polygon", s_face->id);
 		return false;
 	}
 
 	//memset(&tv, 0, sizeof(tv));
-	if (face.texpatindex >= 0 ||
-		face.matindex >= 0 ||
-		face.transparency != 0 ||
+	if (s_face->texpatindex >= 0 ||
+		s_face->matindex >= 0 ||
+		s_face->transparency != 0 ||
 		object.transparency != 0)
 	{
 		tv.flags |= OBJECT_VISIBLE;
@@ -893,7 +889,7 @@ static bool ReadVertexList(void)
 		tv.maxlod = (float)lod.switchin * (float)lod.switchin * localscale * localscale;
 	}
 
-	if (face.drawtype == fltWIRE_OPEN)
+	if (s_face->drawtype == fltWIRE_OPEN)
 	{
 		tv.flags |= OBJECT_LINESTRIP
 				|	OBJECT_LITE
@@ -901,7 +897,7 @@ static bool ReadVertexList(void)
 				|	OBJECT_NOSPECULAR; // just to be sure
 	}
 	else
-	if (face.drawtype == fltWIRE_CLOSED)
+	if (s_face->drawtype == fltWIRE_CLOSED)
 	{
 		tv.flags |= OBJECT_LINECLOSED
 				|	OBJECT_LITE
@@ -911,7 +907,7 @@ static bool ReadVertexList(void)
 	}
 	else
 	{
-		if (face.drawtype == fltSOLID_NOBACKFACE)
+		if (s_face->drawtype == fltSOLID_NOBACKFACE)
 		{
 		//tv.flags |= OBJECT_NOBACKFACE;
 		//length *= 2;
@@ -924,7 +920,7 @@ static bool ReadVertexList(void)
 				|	OBJECT_DYNALITE;
 	}
 
-	if (face.drawtype == fltWIRE_OPEN || face.drawtype == fltWIRE_CLOSED)
+	if (s_face->drawtype == fltWIRE_OPEN || s_face->drawtype == fltWIRE_CLOSED)
 	{
 		// For lines, no indices are allowed
 		tv.flags &= ~OBJECT_INDEXED;
@@ -937,9 +933,9 @@ static bool ReadVertexList(void)
 
 	if (matlevel != -1)
 	{
-		if (face.matindex >= 0)
+		if (s_face->matindex >= 0)
 		{
-			tv.matname = strpool(material[face.matindex].name);
+			tv.matname = strpool(material[s_face->matindex].name);
 			if (tv.matname[0] == 0)
 			{
 				Write_Debug("Material has no name!");
@@ -960,8 +956,8 @@ static bool ReadVertexList(void)
 	tv.matid = -1;
 	tv.texname = "";
 	tv.texid = -1;
-	tv.feature = face.fid;
-	tv.level = face.surfmatcode;
+	tv.feature = s_face->fid;
+	tv.level = s_face->surfmatcode;
 	tv.layer = object.priority + facelayer;
 
 	////Write_Debug(" vertices: %d", length);////
@@ -980,7 +976,7 @@ static bool ReadVertexList(void)
 		tv.flag2 |= OBJECT_AIRRAIDSIREN;
 	}
 
-	if (face.drawtype == fltWIRE_OPEN || face.drawtype == fltWIRE_CLOSED)
+	if (s_face->drawtype == fltWIRE_OPEN || s_face->drawtype == fltWIRE_CLOSED)
 	{
 		tv.numtris	= 0;
 		tv.numverts	= length;
@@ -1048,7 +1044,7 @@ static bool ReadVertexList(void)
 #endif
 	}
 
-	index = FindTexPatIndex(face.texpatindex);
+	index = FindTexPatIndex(s_face->texpatindex);
 	if (index != 0xffff)
 	{
 		if (piIsTexture(tv.texid, 0))
@@ -1104,7 +1100,7 @@ static bool ReadVertexList(void)
 		tv.layer = 16;
 	}
 
-	if (face.drawtype != fltWIRE_OPEN && face.drawtype != fltWIRE_CLOSED)
+	if (s_face->drawtype != fltWIRE_OPEN && s_face->drawtype != fltWIRE_CLOSED)
 	{
 		// Triangulate the face and reverse vertex order to CCW
 		for (int tri=0; tri < tv.numtris; tri++)
@@ -1143,7 +1139,7 @@ static bool ReadVertexList(void)
 	piTexCoordPtr stex = tv.StaticTexCoords();
 
 	// close the line
-	if (face.drawtype == fltWIRE_CLOSED)
+	if (s_face->drawtype == fltWIRE_CLOSED)
 	{
 		spos[presvert]	= spos[0];
 		snorm[presvert]	= snorm[0];
@@ -1151,7 +1147,7 @@ static bool ReadVertexList(void)
 		stex[presvert]	= stex[0];
 	}
 
-	if (face.drawtype != fltWIRE_OPEN && face.drawtype != fltWIRE_CLOSED)
+	if (s_face->drawtype != fltWIRE_OPEN && s_face->drawtype != fltWIRE_CLOSED)
 	{
 		for (i=0; i < tv.numtris; i++)
 		{
@@ -1161,7 +1157,7 @@ static bool ReadVertexList(void)
 		}
 	}
 
-	if (face.flags & fltFACE_HIDDEN)
+	if (s_face->flags & fltFACE_HIDDEN)
 	{
 		tv.flag2 |= OBJECT_HIDDEN;
 	}
@@ -1186,7 +1182,7 @@ static bool ReadVertexList(void)
 			lpobj->layer = g_grassType;
 		}
 
-	//		Write_Debug("Object face '%s' (%s) was created (%d)", tv.name, face.id, level);
+	//		Write_Debug("Object face '%s' (%s) was created (%d)", tv.name, s_face->id, level);
 		if (attached == nullptr)
 		{
 			if (groups[groupindex] != nullptr)
@@ -1261,7 +1257,7 @@ static bool ReadVertexList(void)
 
 		lastobject = lpobj;
 
-		if (face.drawtype == fltSOLID_NOBACKFACE)
+		if (s_face->drawtype == fltSOLID_NOBACKFACE)
 		{
 			// Create a inverted face copy if the face is two sided
 			// This increases the triangle count, but reduces the amount of batches
@@ -1271,7 +1267,7 @@ static bool ReadVertexList(void)
 			obmainAttachObject(attached, backfaceObj);
 			attached = backfaceObj;
 
-			if (face.drawtype != fltWIRE_OPEN && face.drawtype != fltWIRE_CLOSED)
+			if (s_face->drawtype != fltWIRE_OPEN && s_face->drawtype != fltWIRE_CLOSED)
 			{
 				for(i=0; i < num; i++)
 				{
@@ -1381,7 +1377,6 @@ static bool ReadMaterialTable(const char* name)
 		if (material[i].name[0] != 0)
 		{
 			memset(&mat, 0, sizeof(mat));
-			mat.material.power = 1.0f;
 			strcpy(mat.name, material[i].name);
 
 			mat.material.ambient.r = material[i].ambRed;
@@ -1636,33 +1631,31 @@ static bool ReadTextureReference(void)
 
 static bool ReadFace(void)
 {
-	if (!localBufferCopyObject(&face))
+	if (!localBufferUseObject(s_face))
 		return false;
-
-	OBJECT*		o	= nullptr;
 
 	facelevel = level;
 
-	face.ircolor		= LongEndian(face.ircolor);
-	face.priority		= ShortEndian(face.priority);
-	face.colorname		= ShortEndian(face.colorname);
-	face.altcolorname	= ShortEndian(face.altcolorname);
-	face.dettexpat		= ShortEndian(face.dettexpat);
-	face.texpatindex	= ShortEndian(face.texpatindex);
-	face.matindex		= ShortEndian(face.matindex);
-	face.surfmatcode	= ShortEndian(face.surfmatcode);
-	face.fid			= ShortEndian(face.fid);
-	face.irmat			= LongEndian(face.irmat);
-	face.transparency	= ShortEndian(face.transparency);
-	face.flags			= LongEndian(face.flags);
-	face.color			= LongEndian(face.color);
-	face.altcolor		= LongEndian(face.altcolor);
-	face.texmapindex	= ShortEndian(face.texmapindex);
-	face.colorindex	= LongEndian(face.colorindex);
-	face.altcolorindex	= LongEndian(face.altcolorindex);
+	s_face->ircolor        = LongEndian(s_face->ircolor);
+	s_face->priority       = ShortEndian(s_face->priority);
+	s_face->colorname      = ShortEndian(s_face->colorname);
+	s_face->altcolorname   = ShortEndian(s_face->altcolorname);
+	s_face->dettexpat      = ShortEndian(s_face->dettexpat);
+	s_face->texpatindex    = ShortEndian(s_face->texpatindex);
+	s_face->matindex       = ShortEndian(s_face->matindex);
+	s_face->surfmatcode    = ShortEndian(s_face->surfmatcode);
+	s_face->fid            = ShortEndian(s_face->fid);
+	s_face->irmat          = LongEndian(s_face->irmat);
+	s_face->transparency   = ShortEndian(s_face->transparency);
+	s_face->flags          = LongEndian(s_face->flags);
+	s_face->color          = LongEndian(s_face->color);
+	s_face->altcolor       = LongEndian(s_face->altcolor);
+	s_face->texmapindex    = ShortEndian(s_face->texmapindex);
+	s_face->colorindex     = LongEndian(s_face->colorindex);
+	s_face->altcolorindex  = LongEndian(s_face->altcolorindex);
 
 
-	//	Write_Debug("Processing face: %s (%d)", face.id, level);
+	//	Write_Debug("Processing face: %s (%d)", s_face->id, level);
 
 	if (objectlevel == -1)
 	{
@@ -1674,7 +1667,7 @@ static bool ReadFace(void)
 
 	if (topmost)
 	{
-		o = obcObject(attached, &tv);
+		OBJECT* o = obcObject(attached, &tv);
 		o->flag2 = OBJECT_TOPMOST;
 		obmainMoveToNotObjectTree(o);
 		topmostObject = o;
@@ -1684,11 +1677,11 @@ static bool ReadFace(void)
 
 	if (fltrevision < 1510)
 	{
-		facecolor = CreateColor(face.colorname);
+		facecolor = CreateColor(s_face->colorname);
 	}
 	else
 	{
-		facecolor = CreateColor(face.colorindex);
+		facecolor = CreateColor(s_face->colorindex);
 	}
 
 	hasalpha = false;
@@ -1720,7 +1713,6 @@ static bool ReadLOD(void)
 	lod.transition	= DoubleEndian(lod.transition);
 
 	OBJECT*	lpobj;
-
 	if (!CreateLevel(&lpobj))
 	{
 		return false;
@@ -2421,6 +2413,7 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 	headObject		= nullptr;
 	topmostObject	= nullptr;
 	s_matrixRecord	= IdentityMatrix;
+	s_face = nullptr;
 
 	meshpool_idx = 0;
 	memset( meshpools, 0, sizeof(meshpools) );
