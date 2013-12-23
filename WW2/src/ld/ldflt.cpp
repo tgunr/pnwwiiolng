@@ -457,9 +457,9 @@ static bool CreateLevel(OBJECT** lpnewobj)
 
 static bool ReadGroup(void)
 {
-	fltGROUP	group;
-
-	localBufferRead( &group, sizeof(group));
+	fltGROUP* group;
+	if ( !localBufferUseObject(group) )
+		return false;
 
 	offset += s_chunk->next;
 
@@ -470,12 +470,12 @@ static bool ReadGroup(void)
 		if(s_conversionFile.length() <= 7)
 		{
 			bTopmostObject = false;
-			if (stricmp(group.id, s_conversionFile.c_str()))
+			if (stricmp(group->id, s_conversionFile.c_str()))
 			{
 				Write_Debug("[ReadGroup] FAILURE: Topmost group.id = %s Filename = %s\n",
-							group.id, s_conversionFile.c_str());
+							group->id, s_conversionFile.c_str());
 
-				FLTItemFileError("Topmost group", group.id, s_conversionFile.c_str());
+				FLTItemFileError("Topmost group", group->id, s_conversionFile.c_str());
 
 				return false;
 			}
@@ -489,13 +489,13 @@ static bool ReadGroup(void)
 		}
 	}
 
-	if (strcmp(group.id, "Default") == 0)
+	if (strcmp(group->id, "Default") == 0)
 	{
 		FLTGeneralError("[ReadGroup] FAILURE: Group.id is 'Default'");
 		return false;
 	}
 
-	OBJECT*		lpobj;
+	OBJECT* lpobj;
 	if (!CreateLevel(&lpobj))
 	{
 		FLTGeneralError("[ReadGroup] CreateLevel failed");
@@ -504,7 +504,7 @@ static bool ReadGroup(void)
 
 	lpobj->flags = OBJECT_GROUP;
 
-	if(!strncmp(group.id, "speedtr", 7))
+	if(!strncmp(group->id, "speedtr", 7))
 	{
 		lpobj->flag2 |= OBJECT_SPEEDTREE;
 		g_bSpeedTrees = true;
@@ -514,8 +514,8 @@ static bool ReadGroup(void)
 	g_isGrass = false;
 	g_grassType = 0;
 
-	strcpy(grpname[groupindex], group.id);
-	strcpy(lpobj->name, group.id);
+	strcpy(grpname[groupindex], group->id);
+	strcpy(lpobj->name, group->id);
 
 	lastobject = lpobj;
 
@@ -1792,14 +1792,15 @@ static bool ReadObject(void)
 
 static bool ReadExtension(void)
 {
-	fltEXTENSION ext;
+	fltEXTENSION*  ext;
+	if (!localBufferUseObject(ext))
+		return false;
 
-	localBufferRead( &ext, sizeof(ext));
-
-	ext.code = ShortEndian(ext.code);
-
-	ext.reserved1 = 0;	// terminate the site id
-	//Write_Debug(" extension: '%s', '%s', code=0x%x, level=%d", ext.id, ext.siteid, ext.code, extlevel);
+#if (0)
+	ext->code = ShortEndian(ext->code);
+	ext->reserved1 = 0;  // terminate the site id
+	//Write_Debug(" extension: '%s', '%s', code=0x%x, level=%d", ext->id, ext->siteid, ext->code, extlevel);
+#endif
 
 	offset += s_chunk->next;
 
