@@ -10,6 +10,7 @@
 
 #include <sys/stat.h>
 
+#include "mem/mem.h"
 #include "sdm/sdmParse.h"
 #include "fio/fio.h"
 #if defined(LIMITED_FIO) && LIMITED_FIO != 0

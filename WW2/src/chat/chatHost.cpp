@@ -11,6 +11,7 @@
 
 #include "hostproj/hostversion.h"
 
+#include "mem/mem.h"
 #include "chat/chatBanPlayer.h"
 #include "chat/chatBroadcast.h"
 #include "chat/chatBroadcastHCPacket.h"

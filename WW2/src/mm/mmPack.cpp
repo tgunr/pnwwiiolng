@@ -11,6 +11,7 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
+#include "mem/mem.h"
 #include "miss/missionTypes.h"
 #include "mm/mmDirectSpawn.h"
 #include "mm/mmPack.h"

@@ -13,6 +13,7 @@
 
 #include <signal.h>  //to catch SIGHUPS with
 
+#include "mem/mem.h"
 #include "auth/authDaemon.h"
 #include "chat/chatStratSupportMessages.h"
 #include "chat/chatSupportRPCMessages.h"

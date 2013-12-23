@@ -10,6 +10,7 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
+#include "mem/mem.h"
 #include "mm/mmConstants.h"
 #include "mm/mmSpawnTypes.h"
 #include "mm/mmPack.h"

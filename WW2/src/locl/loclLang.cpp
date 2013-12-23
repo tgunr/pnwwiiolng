@@ -3,7 +3,9 @@
 // Module: loclLang.cpp
 // Description: TODO: ***REDO with STL***
 //////////////////////////////////////////////////////////////////////
+
 #include "locl/loclLang.h"
+#include "mem/mem.h"
 
 #ifdef FRONT_END
 #include "fio/fiod.h"

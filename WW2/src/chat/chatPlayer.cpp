@@ -11,6 +11,7 @@
 
 #include "versionNo.h"
 
+#include "mem/mem.h"
 #include "chat/chatBroadcastObject.h"
 #include "chat/chatData.h"
 #include "chat/chatDB.h"

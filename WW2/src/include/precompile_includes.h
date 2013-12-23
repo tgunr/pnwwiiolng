@@ -40,7 +40,6 @@
 ////////// PLAYNET INCLUDES GO AFTER HERE
 
 #include "include/defs.h"
-#include "mem/mem.h"
 
 #include "wwii/wwiiHash.h"
 #include "chat/chatHandle.h"

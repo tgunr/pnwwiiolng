@@ -1,5 +1,6 @@
 #include <syscfg.h>	// Path is project dependent.
 
+#include "mem/mem.h"
 #include "teul/teulCallbackStruct.h"	// For TEUL_CALLBACK details.
 #include "teul/teulEndpoint.h"			// For struct ENDPOINT.
 #include "teul/teulPacket.h"			// Main header.

@@ -18,6 +18,7 @@
 #endif
 #include <signal.h>
 
+#include "mem/mem.h"
 #include "chat/chatConstants.h"
 #include "chat/chatGroupPermissions.h"
 #include "chat/chatSupportMessages.h"

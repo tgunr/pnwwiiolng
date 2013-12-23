@@ -1,6 +1,7 @@
 #include <syscfg.h> // Path is project specific.
 // Implement all the various config values.
 
+#include "mem/mem.h"
 #include "str/strdupptr.h"
 #include "teul/teulConfigVar.h"
 

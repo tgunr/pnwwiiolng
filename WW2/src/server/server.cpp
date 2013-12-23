@@ -12,6 +12,7 @@
 
 #include "versionNo.h"
 
+#include "mem/mem.h"
 #include "server/serverFuncTypes.h"
 #include "server/server.h"
 #include "server/serverBase.h"

@@ -1,6 +1,8 @@
 #pragma once
 // Memory Pooling of objects.
 
+#include "mem/mem.h"
+
 namespace Mem
 {
 	// Creates a managed pool of instances of Type. The free list

@@ -5,6 +5,7 @@ Description: Wrapper for creating vertex/frag shaders
 -------------------------------------------------------------------*/
 #include "gl/glew.h"
 #include "ogl/ogl.h"
+#include "mem/mem.h"
 
 #include "shader/glslProgram.h"
 #include "shader/glslShader.h"

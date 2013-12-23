@@ -1,5 +1,6 @@
 #include <syscfg.h> // Path is project specific.
 
+#include "mem/mem.h"
 #include "include/vars.h"
 #include "ob/obmain.h"
 #include "ob/obpool.h"

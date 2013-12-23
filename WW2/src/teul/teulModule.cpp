@@ -13,6 +13,7 @@
 #include <signal.h>
 #include <event2/event.h>
 
+#include "mem/mem.h"
 #include "teul/teulBasic.h"
 #include "teul/teulCallback.h"
 #include "teul/teulCallbackStruct.h"
