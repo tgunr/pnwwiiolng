@@ -11,14 +11,12 @@
 #include <time.h>
 #include <assert.h>
 #include <string.h>
-#include <stdexcept>
 #include <wchar.h>
 #include <float.h>
 #include <ctype.h>
 
 #include <thread>
 #include <mutex>
-#include <chrono>
 #include <cstdint>
 
 #if defined(HAVE_SYS_CDEFS_H)
