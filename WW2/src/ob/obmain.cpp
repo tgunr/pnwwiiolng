@@ -120,49 +120,26 @@ static LOGICAL listAddTopMostOBJECTAfter(OBJECT* objectlist, OBJECT* after);
 OBJECT* obmainGetNewObjectA()
 {
 	OBJECT* lpobj = _newObject(0);
-
-	if (lpobj != NULL)
-	{
-		listAddItemAfter((LISTHEADER*)&objused, (LISTHEADER*)lpobj);
-	}else
-	{
-		Write_Debug("[obmainGetNewObject] No more storage available for objects!");
-		piExitProgram(__FILE__, __LINE__, "No more storage available for objects");
-	}
+	listAddItemAfter((LISTHEADER*)&objused, (LISTHEADER*)lpobj);
 	return lpobj;
 }
 
 OBJECT* obmainGetNewNotObjectA(UINT32 obtype)
 {
 	OBJECT* lpobj = _newObject(obtype);
-
-	if (lpobj != NULL)
-	{
-		listAddItemBefore((LISTHEADER*)&objused, (LISTHEADER*)lpobj);
-	}else
-	{
-		Write_Debug("[obmainGetNewNotObject] No more storage available for objects!");
-		piExitProgram(__FILE__, __LINE__, "No more storage available for objects");
-	}
-
+	listAddItemBefore((LISTHEADER*)&objused, (LISTHEADER*)lpobj);
 	return(lpobj);
-
 }
 
 OBJECT* obmainGetFreeObjectA()
 {
     OBJECT* o = _newObject(0);
-
-    if(o)
-    {
-		o->matid = -1;
-		o->texid = -1;
-		o->texname = "";
-		o->matname = "";
-        o->mat = IdentityMatrix;
-        o->comment = NULL;
-    }
-
+	o->matid = -1;
+	o->texid = -1;
+	o->texname = "";
+	o->matname = "";
+    o->mat = IdentityMatrix;
+    o->comment = NULL;
     return o;
 }
 
@@ -2549,26 +2526,26 @@ OBJECT* _newObject(UINT32 obtype)
 		break;
 	}
 
-	if(lpobj)
-	{
-		lpobj->matid = -1;
-		lpobj->texid = -1;
-		lpobj->texname = "";
-		lpobj->matname = "";
-        lpobj->mat = IdentityMatrix;
-        lpobj->comment = NULL;
-		lpobj->collider = NULL;
+	if (PN_UNLIKELY(!lpobj))
+		piExitProgram(__FILE__, __LINE__, "Out of memory");
 
-        NumObjUsed++;
+	lpobj->matid = -1;
+	lpobj->texid = -1;
+	lpobj->texname = "";
+	lpobj->matname = "";
+    lpobj->mat = IdentityMatrix;
+    lpobj->comment = NULL;
+	lpobj->collider = NULL;
+
+    NumObjUsed++;
 
 #ifdef ANDREWTEST
     objectset.insert( lpobj );
 #endif
 
 #if !NEW_OBJECT_MEM
-        objectmap.insert(lpobj);
+	objectmap.insert(lpobj);
 #endif
-    }
 
 	return lpobj;
 }
