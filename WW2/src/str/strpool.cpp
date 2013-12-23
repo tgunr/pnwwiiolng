@@ -1,13 +1,9 @@
 #include <syscfg.h> // Path is project specific.
 
 #include <string>
-#include <set>
 #include "str/strpool.h"
-#include "pi/pi.h"
 
-#if platOS == OS_WIN32
-#include <hash_set>
-#endif
+#include <unordered_set>
 
 /************************************************************************************************
 	strpool
@@ -15,11 +11,7 @@
 
 static char EMPTY_STR[] = "";
 
-#if platOS == OS_WIN32
-typedef stdext::hash_set<std::string> StringSet;
-#else
-typedef std::set<std::string> StringSet;
-#endif
+typedef std::unordered_set<std::string> StringSet;
 
 static StringSet strings;
 #ifdef STRPOOL_DEBUG
