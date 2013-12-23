@@ -172,23 +172,6 @@ void ldfltKill()
 	delete &streamBuffer;
 }
 
-static int localBufferRead(void* const dest, const int requestBytes)
-{
-	const int remainingBytes = streamBuffer.size() - streamOffset - 1;
-	const int readBytes = std::min(requestBytes, remainingBytes);
-	if ( readBytes <= 0 )
-	{
-		return 0;
-	}
-
-	// Copy the data from the buffer to the destination.
-	const char* const src = &streamBuffer[streamOffset];
-	streamOffset += readBytes;
-	memcpy(dest, src, readBytes);
-
-	return readBytes;
-}
-
 template<typename PtrType>
 size_t localBufferUseBytes(PtrType*& ptr, const size_t requestBytes)
 {
@@ -848,7 +831,8 @@ static bool ReadVertexList(void)
 	vlistlevel = level;
 
 	vertlist = (fltVERTEX*)memAlloc(length);
-	localBufferRead( vertlist, length);
+	if (!localBufferCopyBytes(vertlist, length))
+		return false;
 	num = length /= 4;
 
 	if( face.drawtype != fltWIRE_OPEN	&&
@@ -1339,7 +1323,8 @@ static bool ReadVertexList(void)
 
 static bool ReadMatrix(void)
 {
-	localBufferRead( &s_matrixRecord, sizeof(s_matrixRecord));
+	if (!localBufferCopyObject(&s_matrixRecord))
+		return false;
 
 	for(size_t i=0; i<16; i++)
 	{
@@ -1367,7 +1352,8 @@ static bool ReadMaterialTable(const char* name)
 	}
 
 	material = (fltMATERIAL*)memAlloc(materialsLen);
-	localBufferRead( material, s_nummaterials);
+	if (!localBufferCopyBytes(material, materialsLen))
+		return false;
 
 	matlevel = level;
 
@@ -1443,13 +1429,14 @@ static bool ReadMaterialPalette(const char* name)
 		matlevel = level;
 	}
 
-	localBufferRead( &matpal, sizeof(fltMATERIAL_PALETTE));
+	if (!localBufferCopyObject(&matpal))
+		return false;
 
 	size_t i = LongEndian(matpal.index);
 	if(i >= 64)
 	{
-	Write_Log(LOG_OLD, LOG_WARN, "[ReadMaterialPalette] material index is %d. It should be 0<=x<=63.", i);
-	return false;
+		Write_Log(LOG_OLD, LOG_WARN, "[ReadMaterialPalette] material index is %d. It should be 0<=x<=63.", i);
+		return false;
 	}
 
 	material[i].ambRed		= FloatEndian(matpal.ambRed);
@@ -1566,7 +1553,8 @@ static bool ReadTextureReference(void)
 		texlevel = level;
 	}
 
-	localBufferRead( &texref[numtexrefs], sizeof(fltTEXTUREREFERENCE));
+	if (!localBufferCopyObject(&texref[numtexrefs]))
+		return false;
 
 	texref[numtexrefs].patindex = LongEndian(texref[numtexrefs].patindex);
 	texref[numtexrefs].x		= LongEndian(texref[numtexrefs].x);
@@ -1648,7 +1636,8 @@ static bool ReadTextureReference(void)
 
 static bool ReadFace(void)
 {
-	localBufferRead( &face, sizeof(face));
+	if (!localBufferCopyObject(&face))
+		return false;
 
 	OBJECT*		o	= nullptr;
 
@@ -1712,7 +1701,8 @@ static bool ReadFace(void)
 
 static bool ReadLOD(void)
 {
-	localBufferRead( &lod, sizeof(lod));
+	if (!localBufferCopyObject(&lod))
+		return false;
 
 	lodlevel = level;
 	strcpy(lodname, lod.name);
@@ -1760,7 +1750,8 @@ static bool ReadLOD(void)
 
 static bool ReadObject(void)
 {
-	localBufferRead( &object, sizeof(object));
+	if (!localBufferCopyObject(&object))
+		return false;
 
 	strcpy(objname[level], object.id);
 	strlwr(objname[level]);
@@ -1964,7 +1955,8 @@ static bool ReadTextComment(void)
 	len = s_chunk->next - 4;
 
 	thisTextComment = (char*)memAlloc(len+1);
-	localBufferRead( thisTextComment, len);
+	if (!localBufferCopyBytes(thisTextComment, len))
+		return false;
 	len -= 1;
 
 	textlevel = level;
