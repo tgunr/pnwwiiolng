@@ -9,7 +9,6 @@
 #include "ob/obmain.h"
 #include "pers/persmsg.h"
 //#include "rn/rntextloc.h"
-#include "mem/mem.h"
 #include "fio/fio.h"
 #include "sdm/StratDB.h"
 #include "js/jsGame.h"

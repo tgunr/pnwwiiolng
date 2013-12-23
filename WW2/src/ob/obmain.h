@@ -1,7 +1,6 @@
 #pragma once
 
 #include "pi/pi.h"
-#include "mem/mem.h"
 struct LISTHEADER;
 
 #define MINOBJECTS				96000

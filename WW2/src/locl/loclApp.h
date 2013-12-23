@@ -4,7 +4,6 @@
 #include "include/vars.h"
 
 #include "fio/fio.h"
-#include "mem/mem.h"
 
 enum ENUM_CATEGORIES
 {

@@ -5,7 +5,6 @@
 #include "trn/trnmain.h"
 #include "client/client.h"
 #include "client/GameClient.h"
-#include "mem/mem.h"
 #include "trn/trncd.h"
 #include "trn/trnvars.h"
 #include "strt/strtEventTypes.h"

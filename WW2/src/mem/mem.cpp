@@ -101,6 +101,27 @@ void* memAllocReleaseX(size_t allocSize, const char* f, int n )
 	}
 	return calloc(1, allocSize);
 }
+
+// trap to see if there are large wild-ass allocation requests
+// so far I see 32,179,745 as the biggest
+void* memReallocReleaseX(void* ptr, size_t allocSize, const char* f, int n)
+{
+	if ( allocSize > maxAllocation )
+	{
+		maxAllocation = allocSize;
+		maxAllocFile = f;
+		maxAllocLine = n;
+#if platOS != OS_LINUX
+		if ( allocSize> 50L*1024*1024 )
+		{
+			char s[256];
+			sprintf(s,"Bigass memory request: %lu @ %s[%d]\n",maxAllocation,maxAllocFile,maxAllocLine);
+			OutputDebugStringA(s);
+		}
+#endif
+	}
+	return realloc(ptr, allocSize);
+}
 #endif
 
 // Statics
@@ -240,7 +261,7 @@ void memVerifyMemory(void)
 	CheckList();
 }
 
-void* memAllocDebug(SINT32 allocSize, SINT8* File, SINT32 Line)
+void* memAllocDebug(size_t allocSize, const char* File, int Line)
 {
 #ifdef MEMORY_DEBUG_EXTREME
 	CheckList();
@@ -266,7 +287,43 @@ void* memAllocDebug(SINT32 allocSize, SINT8* File, SINT32 Line)
 	return &(ptr->m_dataStart);
 }
 
-void memFreeDebug(void* allocptr, SINT8* File, SINT32 Line)
+void* memReallocDebug(void* inPtr, size_t allocSize, const char* file, int line)
+{
+#ifdef MEMORY_DEBUG_EXTREME
+	CheckList();
+#endif
+
+	if (PN_UNLIKELY(inPtr == nullptr))
+		return memAllocDebug(inPtr, file, line);
+
+	MemAllocation* oldBlock = (MemAllocation*)((char*)inPtr - offsetof(struct MemAllocation, m_data));
+	if (oldBlock->m_allocSize >= allocSize)
+		return inPtr;
+
+	// all references to oldBlock are going to become invalid once realloc is complete,
+	// which means realloc is going to invalidate memoryList until we fix it up.
+	MemAllocation* newBlock;
+	systhreadMutexLock(s_memoryListMutex);
+	{
+		newBlock = (MemAllocation*)(realloc(oldBlock, allocSize + sizeof(MemAllocation));
+		if (newBlock == nullptr)
+		{
+			free(s_ballast);
+			LogAbort("Out of memory");
+		}
+
+		// oldBlock is now completely invalid.
+
+		newBlock->m_prev = newBlock;
+		if (newBlock->m_next)
+			newBlock->m_next->m_prev = newBlock;
+	}
+	systhreadMutexUnlock(s_memoryListMutex);
+
+	return &(newBlock->m_dataStart);
+}
+
+void memFreeDebug(void* allocptr, const char* File, int Line)
 {
 	if (allocptr == nullptr)
 	{

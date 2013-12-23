@@ -5,7 +5,6 @@
 #include <math.h>
 #include "pi/pi.h"
 #include "include/vars.h"
-#include "mem/mem.h"
 #include "ob/obmain.h"
 #include "ob/obdraw.h"
 #include "ob/obplyr.h"

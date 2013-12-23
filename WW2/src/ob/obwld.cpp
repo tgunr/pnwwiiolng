@@ -2,7 +2,6 @@
 
 #include "pi/pi.h"
 #include "include/vars.h"
-#include "mem/mem.h"
 #include "fio/fio.h"
 #include "ld/ldmdl.h"
 #include "ld/ldflt.h"

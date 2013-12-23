@@ -13,7 +13,6 @@
 #include "veh/vehmain.h"
 #include "fp/fpFPS.h"
 #include "pers/pershud.h"
-#include "mem/mem.h"
 #include "trn/trntod.h"
 #include "trn/trnmain.h"
 #include "ob/obdraw.h"

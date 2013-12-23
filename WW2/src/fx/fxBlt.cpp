@@ -20,7 +20,6 @@
 #include "rn/rnmain.h"
 #include "rn/rnvis.h"
 #include "ob/obdlite.h"
-#include "mem/mem.h"
 #include "fio/fio.h"
 #include "pers/persmain.h"
 #include "ob/obpool.h"

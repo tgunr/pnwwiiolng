@@ -1,7 +1,6 @@
 #include <syscfg.h> // Path is project specific.
 
 #include "gr2/gr2anim.h"
-#include "mem/mem.h"
 #include "ob/obmain.h"
 #include "include/vars.h"
 #include "veh/vehmain.h"

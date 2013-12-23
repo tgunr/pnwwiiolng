@@ -19,7 +19,6 @@
 #include "fx/FXInterface.h"
 #include "fx/fxMgr.h"
 #include "rn/rnlogo.h"
-#include "mem/mem.h"
 #include "dimain.h"
 #include "ld/ldmdl.h"
 #include "gmlp/gmlpmain.h"

@@ -21,7 +21,6 @@
 #include "include/vars.h"
 #include "pers/persmain.h"
 #include "gr2/gr2Anim.h"
-#include "mem/mem.h"
 #include "ob/obpool.h"
 #include "ogrp/ogrptype.h"
 #include "fx/fxUtl.h"

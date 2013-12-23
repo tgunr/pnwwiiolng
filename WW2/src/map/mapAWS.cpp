@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Date: Fri Nov  9 12:42:29 CST 2007
 //
 // SHARED: Client/host functions
@@ -8,10 +7,6 @@
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-//
-
-
-#include "mem/mem.h"
 
 #include "map/mapAWS.h"				// Our header file
 #include "teul/teulPackers.h"

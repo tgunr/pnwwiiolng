@@ -4,7 +4,6 @@
 #include "fio/fio.h"
 #include "pa/parchive.h"
 
-#include "mem/mem.h"
 #include "systhread.h"
 
 /************************************************************************************************

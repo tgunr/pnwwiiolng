@@ -5,7 +5,6 @@
 #include <float.h>
 #include "pi/pi.h"
 #include "include/vars.h"
-#include "mem/mem.h"
 #include "ob/obmain.h"
 #include "ob/obdlite.h"
 #include "ob/obdshad.h"

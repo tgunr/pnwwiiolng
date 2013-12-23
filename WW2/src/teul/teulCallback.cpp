@@ -9,6 +9,7 @@
 //
 // Originating Programmer: Russell Mirabelli
 
+#include "mem/mem.h"
 #include "teul/teulCallback.h"
 #include "teul/teulCallbackInit.h"
 #include "teul/teulCallbackStruct.h"

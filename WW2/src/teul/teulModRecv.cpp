@@ -9,6 +9,7 @@
 //
 // Originating Programmer: Martin Poulin
 
+#include "mem/mem.h"
 #include "server/serverInterfaceDescription.h"
 #include "teul/teulBasic.h"
 #include "teul/teulCallbackStruct.h"

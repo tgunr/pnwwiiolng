@@ -1,7 +1,6 @@
 #include <syscfg.h> // Path is project specific.
 #include "pi/pi.h"
 #include "include/vars.h"
-#include "mem/mem.h"
 #include "math/mathvect.h"
 #include "ml/mltypes.h"
 #include "pers/persmain.h"

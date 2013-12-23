@@ -16,7 +16,6 @@
 #include "map/mapMissionList.h"
 #include "map/mapPersonaSummary.h"
 #include "map/mapSwingMeter.h"
-#include "mem/mem.h"
 #include "phui/Caption.h"
 #include "phui/View.h"
 #include "tut/tutGroupProgress.h"

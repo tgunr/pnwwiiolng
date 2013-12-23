@@ -2,7 +2,6 @@
 
 #include <string>
 #include <set>
-#include "mem/mem.h"
 #include "str/strpool.h"
 #include "pi/pi.h"
 
@@ -55,6 +54,8 @@ void strpoolKill()
 }
 
 #else
+
+#include "mem/mem.h"
 
 #define MAX_POOL_STRS 16384
 

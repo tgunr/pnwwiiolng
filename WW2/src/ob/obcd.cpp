@@ -5,7 +5,6 @@
 #include <float.h>
 #include "pi/pi.h"
 #include "include/vars.h"
-#include "mem/mem.h"
 #include "ob/obcd.h"
 #include "draw/draw3d.h"
 #include "math/math3d.h"

@@ -324,7 +324,6 @@
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
       <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
-      <Version>0.1</Version>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SolutionDir)\WW2\lib\win\3rdParty;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmtd;libcpmtd;msvcrtd;msvcprtd;msvcrt;msvcprt;vcomp;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
@@ -338,6 +337,8 @@
       <TargetMachine>MachineX86</TargetMachine>
       <MapFileName>$(IntDir)/Artifacts/WW2.map</MapFileName>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <MapExports>true</MapExports>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>

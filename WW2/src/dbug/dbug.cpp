@@ -15,7 +15,6 @@
 #include <fcntl.h>
 #include <string.h>
 #include <sys/stat.h>
-#include "mem/mem.h"
 #include "include/defs.h"
 #include "teul/teulTime.h"
 #include <locale.h>
