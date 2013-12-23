@@ -127,7 +127,6 @@ static fltTEXTUREREFERENCE*	texref;
 static fltLOD				lod;
 static fltOBJECT			object;
 static int					objreduce;
-static fltDOF				dof;
 static SINT8*				textcomment;
 static SINT32				textlevel;
 static std::vector<colorstruct>	s_colortable;
@@ -459,8 +458,6 @@ static bool CreateLevel(OBJECT** lpnewobj)
 static bool ReadGroup(void)
 {
 	fltGROUP	group;
-	OBJECT*		lpobj;
-
 
 	localBufferRead( &group, sizeof(group));
 
@@ -498,6 +495,7 @@ static bool ReadGroup(void)
 		return false;
 	}
 
+	OBJECT*		lpobj;
 	if (!CreateLevel(&lpobj))
 	{
 		FLTGeneralError("[ReadGroup] CreateLevel failed");
@@ -1812,7 +1810,10 @@ static bool ReadDOF(void)
 {
 	OBJECT*	lpobj;
 
-	localBufferRead( &dof, sizeof(dof));
+	fltDOF* dofPtr;
+	if (!localBufferUseObject(dofPtr))
+		return false;
+	fltDOF& dof = *dofPtr;
 
 #ifdef DEBUG_FPU
 	SetupFPU(false);
@@ -1978,7 +1979,7 @@ static bool ReadTextComment(void)
 	else
 	{	// Don't take comments from face attributes!
 		memFree(thisTextComment);
-		thisTextComment = 0;
+		thisTextComment = nullptr;
 		offset += s_chunk->next;
 		return true;
 	}
@@ -1987,7 +1988,7 @@ static bool ReadTextComment(void)
 	while (len >= 0 && iscntrl(textcomment[len]))
 	{
 		textcomment[len] = 0;
-		len -= 1;
+		--len;
 	}
 
 	if (len < 0)
