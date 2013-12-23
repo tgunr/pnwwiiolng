@@ -124,7 +124,6 @@ static UINT32				facecolor;
 static fltVERTEX*			vertlist;
 static fltMATERIAL*			material;
 static fltTEXTUREREFERENCE*	texref;
-static fltLOD				lod;
 static fltOBJECT			object;
 static int					objreduce;
 static SINT8*				textcomment;
@@ -145,8 +144,6 @@ static int					objectlevel;
 static int					doflevel;
 static piMATRIX				s_matrixRecord;
 static int					vlistlevel;
-static int					lodlevel;
-static char					lodname[8];
 static int					texid[64];
 //static int				numuses[64];
 static bool					texalpha[64];
@@ -161,6 +158,14 @@ static bool g_bSpeedTrees;
 static bool g_isGrass;
 static bool _hasspeedtree;
 static SINT32 g_grassType;
+
+static struct CurrentLod
+{
+	int				level;
+	const char*		name;
+	double			switchin;
+	double			switchout;
+} s_currentLod;
 
 // ----------------- faster loading
 
@@ -882,11 +887,11 @@ static bool ReadVertexList(void)
 	}
 
 	tv.flags |= OBJECT_CLIPPED;
-	if (lodlevel != -1)
+	if (s_currentLod.level != -1)
 	{
 		tv.flags |= OBJECT_USELOD;
-		tv.minlod = (float)lod.switchout * (float)lod.switchout * localscale * localscale;
-		tv.maxlod = (float)lod.switchin * (float)lod.switchin * localscale * localscale;
+		tv.minlod = (float)(s_currentLod.switchout * s_currentLod.switchout) * localscale * localscale;
+		tv.maxlod = (float)(s_currentLod.switchin * s_currentLod.switchin) * localscale * localscale;
 	}
 
 	if (s_face->drawtype == fltWIRE_OPEN)
@@ -1416,14 +1421,13 @@ static bool ReadMaterialTable(const char* name)
 
 static bool ReadMaterialPalette(const char* name)
 {
-	fltMATERIAL_PALETTE matpal;
-
 	if (material == nullptr)
 	{
 		material = (fltMATERIAL*)memAlloc(64 * sizeof(fltMATERIAL));
 		matlevel = level;
 	}
 
+	fltMATERIAL_PALETTE matpal;
 	if (!localBufferCopyObject(&matpal))
 		return false;
 
@@ -1694,23 +1698,24 @@ static bool ReadFace(void)
 
 static bool ReadLOD(void)
 {
-	if (!localBufferCopyObject(&lod))
+	fltLOD* lod;
+	if (!localBufferUseObject(lod))
 		return false;
 
-	lodlevel = level;
-	strcpy(lodname, lod.name);
+	const bool hasFx = (strncmp(lod->name, "fx", 2) == 0);
 
-	const bool hasFx = (strncmp(lod.name, "fx", 2) == 0);
-
-	lod.switchin	= DoubleEndian(lod.switchin);
-	lod.switchout	= DoubleEndian(lod.switchout);
-	lod.spfxid1	= ShortEndian(lod.spfxid1);
-	lod.spfxid2	= ShortEndian(lod.spfxid2);
-	lod.flags		= LongEndian(lod.flags);
-	lod.centerx	= DoubleEndian(lod.centerx);
-	lod.centery	= DoubleEndian(lod.centery);
-	lod.centerz	= DoubleEndian(lod.centerz);
-	lod.transition	= DoubleEndian(lod.transition);
+	s_currentLod.level = level;
+	s_currentLod.name = lod->name;
+	s_currentLod.switchin = DoubleEndian(lod->switchin);
+	s_currentLod.switchout = DoubleEndian(lod->switchout);
+	// these all appear to be unused, so no point translating them.
+	//s_currentLod.spfxid1     = ShortEndian(lod->spfxid1);
+	//s_currentLod.spfxid2     = ShortEndian(lod->spfxid2);
+	//s_currentLod.flags       = LongEndian(lod->flags);
+	//s_currentLod.centerx     = DoubleEndian(lod->centerx);
+	//s_currentLod.centery     = DoubleEndian(lod->centery);
+	//s_currentLod.centerz     = DoubleEndian(lod->centerz);
+	//s_currentLod.transition  = DoubleEndian(lod->transition);
 
 	OBJECT*	lpobj;
 	if (!CreateLevel(&lpobj))
@@ -1725,14 +1730,14 @@ static bool ReadLOD(void)
 		lpobj->flag2 |= OBJECT_HAS_FX;
 	}
 
-	strcpy(lpobj->name, lod.name);
-	lpobj->minlod = (float)lod.switchout * (float)lod.switchout * localscale * localscale;
-	lpobj->maxlod = (float)lod.switchin * (float)lod.switchin * localscale * localscale;
+	strcpy(lpobj->name, s_currentLod.name);
+	lpobj->minlod = (float)(s_currentLod.switchout * s_currentLod.switchout) * localscale * localscale;
+	lpobj->maxlod = (float)(s_currentLod.switchin * s_currentLod.switchin) * localscale * localscale;
 
 	attached = nullptr;
 	lastobject = lpobj;
 
-	//	Write_Debug("Processing LOD: %s; in=%g, out=%g (%d)", lod.name, (float)lod.switchin, (float)lod.switchout, level);
+	//	Write_Debug("Processing LOD: %s; in=%g, out=%g (%d)", lod->name, (float)s_currentLod.switchin, (float)s_currentLod.switchout, s_currentLod.level);
 
 	offset += s_chunk->next;
 
@@ -2151,8 +2156,8 @@ static bool ReadPopLevel(void)
 		}
 	}
 
-	if (lodlevel == level)
-		lodlevel = -1;
+	if (s_currentLod.level == level)
+		s_currentLod.level = -1;
 
 	if (facelevel == level)
 		facelevel = -1;
@@ -2399,7 +2404,7 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 	translate._33 = -localscale;
 
 	level		= 0;
-	lodlevel	= -1;
+	s_currentLod.level = -1;
 	objectlevel	= -1;
 	doflevel	= -1;
 	textlevel	= -1;
