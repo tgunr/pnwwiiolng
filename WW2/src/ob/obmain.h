@@ -416,6 +416,18 @@ struct OBJECT
 
 	// NOP now.
 	void SyncStaticData();
+
+	void PopulateIndexes(size_t index)
+	{
+		for (auto it = ptris + index, end = ptris + numtris; it != end; ++it)
+		{
+			// Funky useless indices
+			it->v1 = index++;
+			it->v2 = index++;
+			it->v3 = index++;
+		}
+	}
+
 #endif // __cplusplus
 
 	// treat these are private to obmain/obpool (although there is some outside code that does

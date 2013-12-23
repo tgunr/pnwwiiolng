@@ -1154,12 +1154,7 @@ static bool ReadVertexList(void)
 
 	if (s_face->drawtype != fltWIRE_OPEN && s_face->drawtype != fltWIRE_CLOSED)
 	{
-		for (i=0; i < tv.numtris; i++)
-		{
-			tv.ptris[i].v1 = (i*3);
-			tv.ptris[i].v2 = (i*3) + 1;
-			tv.ptris[i].v3 = (i*3) + 2;
-		}
+		tv.PopulateIndexes(0);
 	}
 
 	if (s_face->flags & fltFACE_HIDDEN)
