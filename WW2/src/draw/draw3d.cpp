@@ -549,10 +549,10 @@ LOGICAL draw3dLineDebug(const piVECTOR* point1, const piVECTOR* point2, UINT32 C
 
 LOGICAL draw3dGizmoLine(FLOAT64VECTOR const* inV1, FLOAT64VECTOR const* inV2, piMATRIX const* Mat, const FLOAT64VECTOR* Pos, UINT32 Color)
 {
+	if (!VehicleObjectAnalysis) return TRUE;
+
 	FLOAT64VECTOR v1, v2;
 	piLVERTEX Vertices[2];
-
-	if(!VehicleObjectAnalysis) return TRUE;
 
 	mathVectorMultiply64(&v1,inV1,Mat);
 	mathAddVectors(&v1,&v1, Pos);
