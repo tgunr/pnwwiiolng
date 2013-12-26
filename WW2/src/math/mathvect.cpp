@@ -9,22 +9,22 @@
 #include "math/math3d.h"
 #include "math/Vec3d.h"
 
-// for the modelling routines, pitch is the x axis, roll is the z axis and yaw is the y axis
+// for the modeling routines, pitch is the x axis, roll is the z axis and yaw is the y axis
 // zero for all three is straight down with the "top" of the object pointing north
 
 // rotation order is x,y,z axes in that order, or pitch,roll,yaw
-// attitudes follor right hand rule
+// attitudes follow right hand rule
 
 // rotate an attitude.
 // the rotation is relative to the original attitude, so that
 // if you were rolled 180 degrees, a positive pitch change
 // would result in a "real" pitch change of a negative
-UINT32 mathRotateAttByAtt(FLOAT64ATT* DestAtt,
-						 FLOAT64ATT* SourceAtt,
-						 FLOAT64ATT* RotateAtt)
+void mathRotateAttByAtt(FLOAT64ATT* DestAtt,
+						 const FLOAT64ATT* SourceAtt,
+						 const FLOAT64ATT* RotateAtt)
 {
-piMATRIX Mat,Mat1,Mat2;
-piVECTOR Att;
+	piMATRIX Mat,Mat1,Mat2;
+	piVECTOR Att;
 
 	Att.x = -(float)SourceAtt->Pitch;
 	Att.y = -(float)SourceAtt->Roll;
@@ -46,19 +46,16 @@ piVECTOR Att;
 	DestAtt->Pitch = -Att.x;
 	DestAtt->Roll = -Att.y;
 	DestAtt->Yaw = -Att.z;
-
-	return 0;
-
 }
 
 
 // haven't verified this function -hoof
-UINT32 mathCRotateAttByAtt(FLOAT64ATT* DestAtt,
-						 FLOAT64ATT* SourceAtt,
-						 FLOAT64ATT* RotateAtt)
+void mathCRotateAttByAtt(FLOAT64ATT* DestAtt,
+						 const FLOAT64ATT* SourceAtt,
+						 const FLOAT64ATT* RotateAtt)
 {
-piMATRIX Mat,Mat1,Mat2;
-piVECTOR Att;
+	piMATRIX Mat,Mat1,Mat2;
+	piVECTOR Att;
 
 	Att.x = -(float)SourceAtt->Pitch;
 	Att.y = -(float)SourceAtt->Roll;
@@ -80,20 +77,15 @@ piVECTOR Att;
 	DestAtt->Pitch = -Att.x;
 	DestAtt->Roll = -Att.y;
 	DestAtt->Yaw = -Att.z;
-
-	return 0;
-
 }
 
-
-
-UINT32 mathRotateVectorByAtt(FLOAT64VECTOR* DestVec,
-							FLOAT64VECTOR* SourceVec,
-							FLOAT64ATT* RotateAtt)
+void mathRotateVectorByAtt(FLOAT64VECTOR* DestVec,
+						   const FLOAT64VECTOR* SourceVec,
+						   const FLOAT64ATT* RotateAtt)
 {
-FLOAT64VECTOR TempVec;
-FLOAT64 CosValue,SinValue;
-FLOAT64 TempNum;
+	FLOAT64VECTOR TempVec;
+	FLOAT64 CosValue,SinValue;
+	FLOAT64 TempNum;
 
 	TempVec = *SourceVec;
 
@@ -122,17 +114,15 @@ FLOAT64 TempNum;
 	TempVec.x = -SinValue * TempNum + CosValue * TempVec.x;
 
 	*DestVec = TempVec;
-
-	return 0;
 }
 
-UINT32 mathCRotateVectorByAtt(FLOAT64VECTOR* DestVec,
-							 FLOAT64VECTOR* SourceVec,
-							 FLOAT64ATT* RotateAtt)
+void mathCRotateVectorByAtt(FLOAT64VECTOR* DestVec,
+							const FLOAT64VECTOR* SourceVec,
+							const FLOAT64ATT* RotateAtt)
 {
-FLOAT64VECTOR TempVec;
-FLOAT64 CosValue,SinValue;
-FLOAT64 TempNum;
+	FLOAT64VECTOR TempVec;
+	FLOAT64 CosValue,SinValue;
+	FLOAT64 TempNum;
 
 	TempVec = *SourceVec;
 
@@ -161,96 +151,75 @@ FLOAT64 TempNum;
 	TempVec.y = -SinValue * TempNum + CosValue * TempVec.y;
 
 	*DestVec = TempVec;
-	return 0;
 }
 
-UINT32 mathGetExactAttFromVec(FLOAT64ATT* DestAtt,
-							 FLOAT64VECTOR* SourceVec)
+void mathGetExactAttFromVec(FLOAT64ATT* DestAtt,
+							const FLOAT64VECTOR* SourceVec)
 {
-FLOAT64VECTOR TempVec;
-FLOAT64ATT TempAtt;
+	FLOAT64VECTOR TempVec = *SourceVec;
 
+	// roll is always zero when getting attitudes from vectors
+	DestAtt->Roll = DestAtt->Yaw = 0;
+
+	// get yaw (a yaw of zero is along the y axis)
+	DestAtt->Pitch = atan2(TempVec.y, TempVec.z);
+
+	mathCRotateVectorByAtt(&TempVec, &TempVec, DestAtt);
+
+	// get pitch
+	DestAtt->Yaw = atan2(TempVec.x, TempVec.z);
+}
+
+void mathGetExactAttFromVec1(FLOAT64ATT* DestAtt,
+							 const FLOAT64VECTOR* SourceVec)
+{
+	FLOAT64VECTOR TempVec;
 	TempVec = *SourceVec;
 
 	// roll is always zero when getting attitudes from vectors
-	TempAtt.Roll = TempAtt.Yaw = 0;
+	DestAtt->Roll = DestAtt->Pitch = 0;
 
 	// get yaw (a yaw of zero is along the y axis)
-	TempAtt.Pitch = atan2(TempVec.y,TempVec.z);
+	DestAtt->Yaw = atan2(TempVec.x, TempVec.y);
 
-	mathCRotateVectorByAtt(&TempVec,&TempVec,&TempAtt);
-
-	// get pitch
-	TempAtt.Yaw = atan2(TempVec.x,TempVec.z);
-
-	*DestAtt = TempAtt;
-
-	return 0;
-}
-
-UINT32 mathGetExactAttFromVec1(FLOAT64ATT* DestAtt,
-							 FLOAT64VECTOR* SourceVec)
-{
-FLOAT64VECTOR TempVec;
-FLOAT64ATT TempAtt;
-
-	TempVec = *SourceVec;
-
-	// roll is always zero when getting attitudes from vectors
-	TempAtt.Roll = TempAtt.Pitch = 0;
-
-	// get yaw (a yaw of zero is along the y axis)
-	TempAtt.Yaw = atan2(TempVec.x,TempVec.y);
-
-	mathCRotateVectorByAtt(&TempVec,&TempVec,&TempAtt);
+	mathCRotateVectorByAtt(&TempVec, &TempVec, DestAtt);
 
 	// get pitch
-	TempAtt.Pitch = atan2(TempVec.y,TempVec.z);
-
-	*DestAtt = TempAtt;
-
-	return 0;
+	DestAtt->Pitch = atan2(TempVec.y, TempVec.z);
 }
 
 FLOAT64VECTOR* mathNormalize( FLOAT64VECTOR* vec )
 {
-	FLOAT64 inv_mod;
-
-	inv_mod = vec->x * vec->x + vec->y * vec->y + vec->z * vec->z;
-	if (inv_mod)
+	const FLOAT64 magnitude = sqrt(vec->x * vec->x + vec->y * vec->y + vec->z * vec->z);
+	if (magnitude)
 	{
-		inv_mod = (float)( 1.0 / sqrt( inv_mod ) );
-
+		FLOAT64 inv_mod = (1.0 / magnitude);
 		vec->x *= inv_mod;
 		vec->y *= inv_mod;
 		vec->z *= inv_mod;
+	}
+	else
+	{
+		vec->x = vec->y = vec->z = 0.0;
 	}
 
 	return vec;
 }
 
-UINT32 mathVectorMultiply64(FLOAT64VECTOR * lpd, FLOAT64VECTOR const* inlpa, piMATRIX const* lpb)
+void mathVectorMultiply64(FLOAT64VECTOR * lpd, FLOAT64VECTOR const* inlpa, piMATRIX const* lpb)
 {
-FLOAT64VECTOR lpa;
-
-	lpa = *inlpa;
+	FLOAT64VECTOR lpa = *inlpa;
 
 	lpd->x = lpa.x * lpb->_11 + lpa.y * lpb->_21 + lpa.z * lpb->_31 + lpb->_41;
 	lpd->y = lpa.x * lpb->_12 + lpa.y * lpb->_22 + lpa.z * lpb->_32 + lpb->_42;
 	lpd->z = lpa.x * lpb->_13 + lpa.y * lpb->_23 + lpa.z * lpb->_33 + lpb->_43;
-
-  return 0;
 }
 
-UINT32 mathVectorRotate64(FLOAT64VECTOR * lpd, FLOAT64VECTOR const* inlpa, piMATRIX const* lpb)
+void mathVectorRotate64(FLOAT64VECTOR * lpd, FLOAT64VECTOR const* inlpa, piMATRIX const* lpb)
 {
-FLOAT64VECTOR lpa;
-
-	lpa = *inlpa;
+	FLOAT64VECTOR lpa = *inlpa;
 
 	lpd->x = lpa.x * lpb->_11 + lpa.y * lpb->_21 + lpa.z * lpb->_31;
 	lpd->y = lpa.x * lpb->_12 + lpa.y * lpb->_22 + lpa.z * lpb->_32;
 	lpd->z = lpa.x * lpb->_13 + lpa.y * lpb->_23 + lpa.z * lpb->_33;
-
-  return 0;
 }

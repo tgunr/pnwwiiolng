@@ -60,28 +60,28 @@
 	(a)->z = (b)->z * c; \
 }
 
-extern UINT32 mathRotateAttByAtt(FLOAT64ATT* DestAtt,
-								 FLOAT64ATT* SourceAtt,
-								 FLOAT64ATT* RotateAtt);
+extern void mathRotateAttByAtt(FLOAT64ATT* DestAtt,
+								 const FLOAT64ATT* SourceAtt,
+								 const FLOAT64ATT* RotateAtt);
 
-extern UINT32 mathCRotateAttByAtt(FLOAT64ATT* DestAtt,
-						 FLOAT64ATT* SourceAtt,
-						 FLOAT64ATT* RotateAtt);
+extern void mathCRotateAttByAtt(FLOAT64ATT* DestAtt,
+						 const FLOAT64ATT* SourceAtt,
+						 const FLOAT64ATT* RotateAtt);
 
-extern UINT32 mathRotateVectorByAtt(FLOAT64VECTOR* DestVec,
-									FLOAT64VECTOR* SourceVec,
-									FLOAT64ATT* RotateAtt);
+extern void mathRotateVectorByAtt(FLOAT64VECTOR* DestVec,
+									const FLOAT64VECTOR* SourceVec,
+									const FLOAT64ATT* RotateAtt);
 
-extern UINT32 mathCRotateVectorByAtt(FLOAT64VECTOR* DestVec,
-									 FLOAT64VECTOR* SourceVec,
-									 FLOAT64ATT* RotateAtt);
+extern void mathCRotateVectorByAtt(FLOAT64VECTOR* DestVec,
+									 const FLOAT64VECTOR* SourceVec,
+									 const FLOAT64ATT* RotateAtt);
 
-extern UINT32 mathGetExactAttFromVec(FLOAT64ATT* DestAtt,
-									 FLOAT64VECTOR* SourceVec);
-extern UINT32 mathGetExactAttFromVec1(FLOAT64ATT* DestAtt,
-									 FLOAT64VECTOR* SourceVec);
+extern void mathGetExactAttFromVec(FLOAT64ATT* DestAtt,
+									 const FLOAT64VECTOR* SourceVec);
+extern void mathGetExactAttFromVec1(FLOAT64ATT* DestAtt,
+									 const FLOAT64VECTOR* SourceVec);
 
 extern	FLOAT64VECTOR*	mathNormalize( FLOAT64VECTOR* vec );
 
-extern UINT32 mathVectorMultiply64(FLOAT64VECTOR * lpd, FLOAT64VECTOR const* inlpa, piMATRIX const* lpb);
-extern UINT32 mathVectorRotate64(FLOAT64VECTOR * lpd, FLOAT64VECTOR const* inlpa, piMATRIX const* lpb);
+extern void mathVectorMultiply64(FLOAT64VECTOR * lpd, FLOAT64VECTOR const* inlpa, piMATRIX const* lpb);
+extern void mathVectorRotate64(FLOAT64VECTOR * lpd, FLOAT64VECTOR const* inlpa, piMATRIX const* lpb);
