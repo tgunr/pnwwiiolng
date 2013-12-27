@@ -31,7 +31,6 @@
  *     bool chatIsWideCallsign( char* | wchar_t* | ChatHandle) will tell you if it does.
  *     bool chatIsValidHandle(ChatHandle) will check if a 64-bit handle looks good.
  *     bool chatIsValidCalsign( char* | wchar_t* ) will check the various constraints.
- *
  */
 
 // Maximum bits in a handle is 64, at 6 bits a character that limits us to 10 characters
@@ -58,11 +57,8 @@ extern bool chatIsValidHandle(ChatHandle handle);
 extern ChatHandle chatGetHandle(const char* callsign);
 extern ChatHandle chatGetHandle(const wchar_t* callsign);
 
-/// Wide-string variant
-extern ChatHandle chatGetHandle(const wchar_t* callsign);
 // Same function, but uses the lowercase version of the handle
 extern ChatHandle chatGetLowercaseHandle(const char* callsign);
-extern ChatHandle chatGetLowercaseHandle(const wchar_t* callsign);
 extern ChatHandle chatGetLowercaseHandle(const wchar_t* callsign);
 // Force a handle into lowercase
 extern ChatHandle chatGetLowercaseHandle(ChatHandle handle);
@@ -88,4 +84,3 @@ extern UINT16 chatGetHandleCharacterSymbol(const wchar_t character);
 static inline bool chatIsWideCallsign(const ChatHandle& handle) { return (handle & WIDE_HANDLE_BIT) != 0; }
 static inline bool chatIsWideCallsign(const char* callsign) { return (*(const unsigned char*)callsign > 0x7f); }
 static inline bool chatIsWideCallsign(const wchar_t* callsign) { return (callsign[0] > 0x7f); }
-
