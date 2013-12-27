@@ -109,9 +109,6 @@ JSFunctionSpec jsClient::jsfunctions[] =
 	JS_FUNCTION_SPEC(jsClient, joininstance,4),
 	JS_FUNCTION_SPEC(jsClient, isavailable, 0),
 	JS_FUNCTION_SPEC(jsClient, ismissionleader, 0),
-#ifdef DOROTHY
-	JS_FUNCTION_SPEC(jsClient, selectteam, 3),
-#endif
 	{0}
 };
 
@@ -334,65 +331,6 @@ JS_FUNCTION_DEF(jsClient, selectpersona)
 	return JS_TRUE;
 }
 
-#ifdef DOROTHY
-/************************************************************************************************
-	selectteam
-*************************************************************************************************/
-
-JS_FUNCTION_DEF(jsClient, selectteam)
-{
-	*rval = BOOLEAN_TO_JSVAL(JS_FALSE);
-
-	if(argc < 3) return JS_FALSE;
-
-	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx,jsobj);
-	if(!jsclient) return JS_FALSE;
-
-	int32 countryID	= 0;
-	int32 branchID	= 0;
-	int32 brigadeID	= 0;
-
-    JS_ValueToInt32(ctx, argv[0], &countryID);
-	JS_ValueToInt32(ctx, argv[1], &branchID);
-	JS_ValueToInt32(ctx, argv[2], &brigadeID);
-
-	// select the persona
-	PersonaSummaries const& persum = jsclient->client->Personas();
-
-	for(UINT32 i = 0; i < persum.m_count; i++)
-	{
-		const PersonaSummary& summary = persum.m_summaries[i];
-
-		if(summary.m_countryID == countryID && summary.m_branchID == branchID)
-		{
-			jsclient->client->RequestPersonaSelection(summary);
-			jsclient->client->WaitForMessage(ww2::Client::PERSONA_SELECT_WAIT, 5);
-			jsclient->brigade->SetDetail(BrigadeDetail());
-			jsclient->UpdatePersonas();
-			break;
-		}
-	}
-
-	if(jsclient->persona.valid())
-	{
-		PersonaSummary const& persel = jsclient->persona->Summary();
-
-		// was selection successful
-		if(persel.m_countryID == countryID && persel.m_branchID == branchID)
-		{
-			jsclient->client->RequestBrigadeSelection(brigadeID);
-			if(jsclient->client->WaitForMessage(ww2::Client::BRIGADE_SELECT_WAIT, 5) == 0)
-				jsclient->brigade->SetDetail(jsclient->client->BrigadeSelected().m_detail);
-
-			if(persel.m_brigadeID == brigadeID)
-				*rval = BOOLEAN_TO_JSVAL(JS_TRUE);
-		}
-	}
-
-	return JS_TRUE;
-}
-#endif
-
 /************************************************************************************************
 	sendchatmessage
 *************************************************************************************************/
@@ -479,7 +417,6 @@ JS_FUNCTION_DEF(jsClient, sendchatmessage)
 		int result = uiDotCommand(msg);
 		if(result <= DC_HANDLED) return JS_TRUE;
 
-#if !defined(USE_OSG)
 		// if we're online, set msg to the last command
 		// because it may have been updated to the english
 		// variant for processing by the host
@@ -487,7 +424,6 @@ JS_FUNCTION_DEF(jsClient, sendchatmessage)
 		// client
 		if(Online && result == DC_PASS_USE_LAST)
 			msg = uiDotCommandLast();
-#endif
 	}
 
 	unsigned int txmask = 0;

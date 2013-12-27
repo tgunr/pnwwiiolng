@@ -25,16 +25,7 @@
 #include "fx/FXInterface.h"
 #include "locl/loclMain.h"
 
-#if defined(USE_OSG)
-#include "osgFX/fxSound.h"
-#else
 #include "fx/fxSnd.h"
-#endif
-
-#if defined(USE_OSG)
-#undef PI
-#define PI osg::PI
-#endif
 
 #define _BUFFET_CP 0.25 // 0.2 since we are +/- 1.0 on the magnitude
 #define _BUFFET_CD 0.05 // 0.01 since we are +/- 1.0 on the magnitude
@@ -1649,28 +1640,10 @@ static UINT32 _GetClCmCd(FLOAT64* Cl,
 
 							if(AirfoilComponentData->lflapSoundId > 0)
 							{
-#if defined(USE_OSG)
-                                fxSoundStopSound(AirfoilComponentData->lflapSoundId);
-#else
 								fxSndStopSound(AirfoilComponentData->lflapSoundId);
-#endif
 								AirfoilComponentData->lflapSoundId = 0;
 							}
 
-#if defined(USE_OSG)
-                            osg::Vec3d pos = osg::Vec3d(Component->OriginalRelativePos.x, Component->OriginalRelativePos.y, Component->OriginalRelativePos.z);
-                            osg::Group* o = ((osg::Node*)TempObj->osgNode)->asGroup();
-
-                            int id = fxSoundPlayObjectSound((char*)LeftSlatSound,
-                                                            pos,
-                                                            finite_sound,
-                                                            sound_high,
-                                                            20.0f,
-                                                            100.0f,
-                                                            o);
-
-                            AirfoilComponentData->lflapSoundId = id;
-#else
                             SINT32 id = fxSndGetNewSound();
 
                             if(id > 0)
@@ -1692,7 +1665,6 @@ static UINT32 _GetClCmCd(FLOAT64* Cl,
                                 fxSndInitSound(id);
 								AirfoilComponentData->lflapSoundId = id;
                             }
-#endif
 						}
 					}
 				}
@@ -1718,28 +1690,10 @@ static UINT32 _GetClCmCd(FLOAT64* Cl,
 
 							if(AirfoilComponentData->rflapSoundId > 0)
 							{
-#if defined(USE_OSG)
-                                fxSoundStopSound(AirfoilComponentData->rflapSoundId);
-#else
 								fxSndStopSound(AirfoilComponentData->rflapSoundId);
-#endif
 								AirfoilComponentData->rflapSoundId = 0;
 							}
 
-#if defined(USE_OSG)
-                            osg::Vec3d pos = osg::Vec3d(Component->OriginalRelativePos.x, Component->OriginalRelativePos.y, Component->OriginalRelativePos.z);
-                            osg::Group* o = ((osg::Node*)TempObj->osgNode)->asGroup();
-
-                            int id = fxSoundPlayObjectSound((char*)RightSlatSound,
-                                                            pos,
-                                                            finite_sound,
-                                                            sound_high,
-                                                            20.0f,
-                                                            100.0f,
-                                                            o);
-
-                            AirfoilComponentData->rflapSoundId = id;
-#else
                             SINT32 id = fxSndGetNewSound();
 
                             if(id > 0)
@@ -1761,7 +1715,6 @@ static UINT32 _GetClCmCd(FLOAT64* Cl,
                                 fxSndInitSound(id);
 								AirfoilComponentData->rflapSoundId = id;
                             }
-#endif
 						}
 					}
 				}

@@ -17,10 +17,8 @@
 #include "include/mobileSpawnEnums.h"	// For MSPAWN_RESULT
 #include "draw/sneaky.h"
 
-#if !USE_OSG
 #include "physics/physicsMain.h"
 #include "veh/vehInterpolator.h"
-#endif
 /************************************************************************************************
 	vehmain
 *************************************************************************************************/
@@ -304,68 +302,6 @@ struct vehDamageQue
 /************************************************************************************************
 	vehVehicle
 *************************************************************************************************/
-#if defined(USE_OSG)
-class VehicleBase;
-
-struct vehVehicle
-{
-	vehVehicle* Next;
-	vehVehicle* Prev;
-
-	UINT32	VehicleHostIndex;
-	vehType const*	VehicleType;
-
-	LOGICAL	VehicleIsSquaddie:1;
-	LOGICAL	IsCommander:1;
-	LOGICAL IsBuilder:1;
-	LOGICAL SameBrigade:1;
-	LOGICAL	SameMission:1;
-	LOGICAL	IsMissionLeader:1;
-	LOGICAL	IsMyMissionLeader:1;
-	LOGICAL	IsTrainer:1;
-	UCHAR   persDecal:8;
-
-	UCHAR 	Handle[MAX_HANDLE_SIZE]; // SIZE includes null byte
-	UCHAR 	SquadHandle[MAX_HANDLE_SIZE];
-
-	UINT16	Rank;
-	SINT32	Country;
-	SINT32	Side;
-
-	UINT32	RideSeatNum;
-	UINT32	RideVehicleHostIndex;
-	UINT32 	LoadoutNum;
-
-	SINT32 iFXVehicleID;
-
-	REL_OBJ_ID fpsBuildingID;   // ID of building FPS is in/on.
-
-	ChatHandle	ChatHandle;
-
-	FLOAT32 EngineIdleVolume;
-	FLOAT32 EnginePowerVolume;
-
-	weapWeapon Weapons			[VEH_MAX_MOUNTS][VEH_MAX_WEAPONS_PER_MOUNT];
-	LOGICAL	MountIsFiring		[VEH_MAX_MOUNTS];
-	mlVehicleData* 	ModelData;
-	mlObjectData* 	VehicleObjectData;
-	vehVehiclePositionData PosData;
-	vehanimVehicleStateAnimations StateAnimation;
-	vehDamageQue DamageQue;
-
-	VehicleBase* vehicle;
-
-	vehVehicle();
-	~vehVehicle();
-
-bool isHulked() const { return false; }
-bool isSTO() const {return (SINT32)VehicleHostIndex < 0;}
-
-};
-
-
-#else
-
 struct vehVehicle
 {
 	weapWeapon Weapons			[VEH_MAX_MOUNTS][VEH_MAX_WEAPONS_PER_MOUNT];
@@ -472,9 +408,7 @@ struct vehVehicle
 	SINT32 deployedTimeout;
 	SINT32 interiorCheck;
 
-#if !defined(USE_OSG)
 	dSpaceID spaceID;
-#endif
 
 	UCHAR 	Handle[MAX_HANDLE_SIZE]; // SIZE includes null byte
 	UCHAR 	SquadHandle[MAX_HANDLE_SIZE];
@@ -547,7 +481,6 @@ private:
 #endif
 };
 
-#endif
 
 /************************************************************************************************
 	vehmain

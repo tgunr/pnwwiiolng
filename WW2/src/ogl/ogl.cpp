@@ -58,17 +58,6 @@ enum
     MAX_FILTER_INDEXES
 };
 
-#if defined(USE_OSG)
-#include <osgUtil/SceneView>
-#include "osg/osgMain.h"
-#undef PI
-#define PI osg::PI
-#define GL_BGR_EXT      GL_BGR
-#define GL_BGRA_EXT     GL_BGRA
-#elif(0)
-static CWW2Shader g_shaders[2][MAX_FILTER_SHADERS];
-#endif
-
 static std::vector<SINT32> g_textureIndex;
 
 static std::deque<TEXTURE *> g_freeTextures;
@@ -768,14 +757,7 @@ SINT32		retval, i, miplevels;
 			glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_HEIGHT, (GLint*)&height);
 			glGetTexLevelParameteriv(GL_TEXTURE_2D, 0, GL_TEXTURE_INTERNAL_FORMAT, (GLint*)&format);
 
-#if defined(USE_OSG)
-            unsigned int id = osgSceneView()->getState()->getContextID();
-
-            if(osg::isGLExtensionSupported(id, "GL_ARB_texture_compression"))
-#else
-
 			if(GLEW_ARB_texture_compression)
-#endif
 			{
                 size = 0;
                 compressed = 0;
@@ -814,13 +796,7 @@ SINT32		retval, i, miplevels;
 #endif	// OGL_EVENT_LOG
 
 #ifdef STORE_COMPRESSED_TEXTURES
-#if defined(USE_OSG)
-        unsigned int id = osgSceneView()->getState()->getContextID();
-
-        if(osg::isGLExtensionSupported(id, "GL_ARB_texture_compression"))
-#else
 		if (GLEW_ARB_texture_compression)
-#endif
 		{
 			if (!textures[texid].iswritable)
 			{
@@ -837,12 +813,7 @@ SINT32		retval, i, miplevels;
 
                     textures[texid].lpsurf[miplevel] = memAlloc(textures[texid].imagesize[miplevel]);
 
-#if defined(USE_OSG)
-                    osg::Texture::Extensions* ext = osg::Texture::getExtensions(osgSceneView()->getState()->getContextID(), true);
-                    ext->glGetCompressedTexImage(GL_TEXTURE_2D, miplevel, textures[texid].lpsurf[miplevel]);
-#else
 				    glGetCompressedTexImageARB(GL_TEXTURE_2D, miplevel, textures[texid].lpsurf[miplevel]);
-#endif
                 }
 
                 textures[texid].comp[miplevel] = textures[texid].format[miplevel];
@@ -898,12 +869,7 @@ SINT32		retval, i, miplevels;
 					glGetTexLevelParameteriv(GL_TEXTURE_2D, i, GL_TEXTURE_HEIGHT, (GLint*)&height);
 					glGetTexLevelParameteriv(GL_TEXTURE_2D, i, GL_TEXTURE_INTERNAL_FORMAT, (GLint*)&format);
 
-#if defined(USE_OSG)
-                    unsigned int id2 = osgSceneView()->getState()->getContextID();
-                    if(osg::isGLExtensionSupported(id2, "GL_ARB_texture_compression"))
-#else
 					if (GLEW_ARB_texture_compression)
-#endif
 					{
                         size = 0;
                         compressed = 0;
@@ -2511,10 +2477,7 @@ SINT32		numcomps, *comps;
 
 	gSupportedSrcBlendModes = oglSRCBLENDCAPS_ALL;
 
-#if defined(USE_OSG)
-#else
 	if (GLEW_ARB_imaging)
-#endif
 	{
 		gSupportedSrcBlendModes |= oglSRCBLENDCAPS_IMAGING_ALL;
 	}
@@ -2523,10 +2486,7 @@ SINT32		numcomps, *comps;
 
 	gSupportedDstBlendModes = oglDSTBLENDCAPS_ALL;
 
-#if defined(USE_OSG)
-#else
 	if (GLEW_ARB_imaging)
-#endif
 	{
 		gSupportedDstBlendModes |= oglDSTBLENDCAPS_IMAGING_ALL;
 	}
@@ -2546,13 +2506,7 @@ SINT32		numcomps, *comps;
 	gSupportDXT3 = FALSE;
 	gSupportDXT5 = FALSE;
 
-#if defined(USE_OSG)
-	gSupportDXT1 = TRUE;
-	gSupportDXT3 = TRUE;
-	gSupportDXT5 = TRUE;
-#else
 	if (GLEW_ARB_texture_compression && GLEW_EXT_texture_compression_s3tc)
-#endif
 	{
 		glGetIntegerv(GL_NUM_COMPRESSED_TEXTURE_FORMATS_ARB, (GLint*)&numcomps);
 		Write_Debug("Number of compressed texture formats supported: %d", numcomps);
@@ -3020,24 +2974,21 @@ static void _GetOpenGLState(oglRENDERSTATETYPES state)
 
 #if(0)// USE_STATESET
 #else
-LOGICAL oglSetRenderState(oglRENDERSTATETYPES enumStateType, UINT32 uState)
+void oglSetRenderState(oglRENDERSTATETYPES enumStateType, UINT32 uState)
 {
-#if defined(USE_OSG)
-    return FALSE;
-#else
 	if (enumStateType >= MAXRENDERSTATES)
-        return TRUE;
+        return;
 
     if(g_statelocked[enumStateType])
     {
-        return TRUE;
+        return;
     }
 
 #if USE_STATESET
 #else
     if (renderstates[enumStateType] == uState)
     {
-        return TRUE;
+        return;
     }
 #endif
 
@@ -3633,9 +3584,6 @@ LOGICAL oglSetRenderState(oglRENDERSTATETYPES enumStateType, UINT32 uState)
 	}
 
     renderstates[enumStateType] = uState;
-
-	return TRUE;
-#endif
 }
 #endif
 
@@ -5589,7 +5537,6 @@ void oglDrawScene(UINT32 mode,
                   SINT32 vertexcount,
                   SINT32 indexcount)
 {
-#if !defined(USE_OSG)
     if(coords)
     {
         ogl::SetVertexPointer(3, GL_FLOAT, stride, coords);
@@ -5618,7 +5565,6 @@ void oglDrawScene(UINT32 mode,
     {
 		ogl::DrawArrays(mode, 0, vertexcount);
     }
-#endif
 }
 
 /************************************************************************************************
@@ -5758,7 +5704,6 @@ static void _RenderScene3D(oglPRIMITIVETYPE oglt, oglVERTEXTYPE oglvt, UINT32 Ve
 							void* vertex, SINT32 vertexStride, void* normal, SINT32 normalStride,
 							void* color, SINT32 colorStride, void* tex, SINT32 texStride, void* index)
 {
-#if !defined(USE_OSG)
 	oglUpdateRenderIndexStats(oglt, VertexCount, IndexCount);
 
 	if (oglvt != oglVT_3DVERTEX)
@@ -5804,7 +5749,6 @@ static void _RenderScene3D(oglPRIMITIVETYPE oglt, oglVERTEXTYPE oglvt, UINT32 Ve
 	{
 		Write_Debug(" GL error in _RenderScene");
 	}
-#endif
 }
 
 /************************************************************************************************

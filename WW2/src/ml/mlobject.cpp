@@ -42,10 +42,6 @@
 #include "ogl/States.h"
 #endif
 
-#ifdef DOROTHY
-#include "gr2/gr2Main.h"
-#endif
-
 struct ReflectorSight
 {
     bool flip;
@@ -188,12 +184,6 @@ static UINT32 Counter = 0;
 	{
 		Object = gr2AnimCreateObject(Vehicle, Vehicle->VehicleType->VehicleTypeNum);
 	}
-#ifdef DOROTHY
-	else if (Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-	{
-		Object = gr2CreateVehicleObject(Vehicle, Vehicle->VehicleType->VehicleTypeNum);
-	}
-#endif
 	else
 	{
 		if(!obmgrCreateModelInstance((char*)ObjectName))
@@ -2420,13 +2410,6 @@ UCHAR * DamageObjectList = (UCHAR*)&VehicleType->DamageObjects[0][0];
 		(*ObjectData)->LowestPoint = 0.0f;
 		(*ObjectData)->HighestPoint = 2.0f;
 	}
-#ifdef DOROTHY
-	else if(VehicleType->Type == VEH_TYPE_MECH)
-	{
-		(*ObjectData)->LowestPoint = 0.0f;
-		(*ObjectData)->HighestPoint = 10.0f;
-	}
-#endif
 	else
 	{
 		(*ObjectData)->LowestPoint = -10000.0f; // z's are ass backwards
@@ -2556,12 +2539,6 @@ UCHAR * DamageObjectList = (UCHAR*)&VehicleType->DamageObjects[0][0];
 			(*ObjectData)->Radius = 3.0;
 		}
 
-#ifdef DOROTHY
-		if ((*ObjectData)->PlaneObject->flag3 & OBJECT_IS_GR2VEHICLE)
-		{
-			(*ObjectData)->Radius = 10.0;
-		}
-#endif
 	}
 
 

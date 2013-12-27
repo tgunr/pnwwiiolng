@@ -1,11 +1,8 @@
 #pragma once
 
 	#include "pi/pi.h"
-#if defined(USE_OSG)
-#else
 	#include "gl/glew.h"
-  #include "gl/glplat.h"
-#endif
+	#include "gl/glplat.h"
 #include "ogl/ogldefs.h"
 #include "math/Matrixf.h"
 
@@ -71,7 +68,7 @@
 	extern LOGICAL	oglSetViewportDimensions(SINT32 x, SINT32 y, SINT32 width, SINT32 height, FLOAT32 znear, FLOAT32 zfar);
 	extern LOGICAL oglGetViewportZ(FLOAT32* znear, FLOAT32* zfar);
 	extern LOGICAL oglSetViewportZ(FLOAT32 znear, FLOAT32 zfar);
-	extern LOGICAL	oglSetRenderState(oglRENDERSTATETYPES StateType, UINT32 State);
+	extern void oglSetRenderState(oglRENDERSTATETYPES StateType, UINT32 State);
 	extern LOGICAL	oglDisplayRenderStates(void);
 	extern LOGICAL oglReleaseLight(SINT32 numlight);
 	extern LOGICAL	oglSetLightState(SINT32 lightNum, UINT32 State);

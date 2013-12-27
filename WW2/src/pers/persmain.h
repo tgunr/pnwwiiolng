@@ -126,8 +126,6 @@ public:
 	Covert<UINT32> PayAttentionToPersona; // used for vehicle kill stuff
 };
 
-#if !defined(USE_OSG)
-
 // start lua compatibility functions and types with OSG
 
 //struct VehicleBase;
@@ -147,8 +145,6 @@ public:
 Player* playerGetPlayer();
 vehVehicle* playerGetVehicle();
 // end lua compatibility
-
-#endif
 
 extern UINT32 persInit(void); // initializes the persona system
 
@@ -213,8 +209,6 @@ extern bool persSubmergedDeathCamera(piVECTOR* pos, piVECTOR* aim);
 extern UINT32 persPersonaIsCreatedOnHost(void);
 extern UINT32 persIsPersonaCreated(void);
 
-extern UINT32 persGetCockpitViewMatrix(piMATRIX * Mat);
-
 extern UINT32 persSetExternalLockedCamera(SINT32 Param,UINT32 Id,UINT32 Detach);
 extern UINT32 persSetExternalRubberBandCamera(SINT32 Param,UINT32 Id,UINT32 Detach);
 extern UINT32 persSetExternalFixedCamera(SINT32 Param,UINT32 Id,UINT32 Detach);
@@ -240,25 +234,23 @@ extern UINT32 persAddHitSoundsForHitComponent(
 								SINT32 NumHits,
 								FLOAT32 DamageAccrued);
 
-extern LOGICAL persSetView(UINT32 type, UINT32 level);
-extern LOGICAL persSetGunsightView(FLOAT32 FieldOfView);
-extern LOGICAL persSetNormalView(FLOAT32 FieldOfView);
-extern UINT32 persResetHealths(void);
+extern void persSetView(UINT32 type, UINT32 level);
+extern void persSetNormalView(FLOAT32 FieldOfView);
+extern void persResetHealths(void);
 extern UINT32 persSetPersonaPositionCallback(SINT32 param, UINT32 id, UINT32 detach);
-extern UINT32 persShakeHead(const char* message = NULL);
-extern UINT32 persHurtEffect(FLOAT32 amount, SINT32 duration);
-extern UINT32 persKillCrew(void);
-extern LOGICAL persAllowHUDUpdate(void);
+extern void persShakeHead(const char* message = NULL);
+extern void persKillCrew(void);
+extern bool persAllowHUDUpdate(void);
 
-extern LOGICAL persCanVehicleExit(void);
-extern LOGICAL persIsCrewDead(void);
+extern bool persCanVehicleExit(void);
+extern bool persIsCrewDead(void);
 extern FLOAT32 persGetFogScaleMultiplier(void);
 
 extern LOGICAL persDrawGunsight(void);
 extern UINT32 persResetVehicleG(void);
 extern UINT32 persGetCrewDeadForKillScore(UINT32 Position);
 
-extern UINT32 persSetPayAttentionFlag(UINT32 Position);
+extern void persSetPayAttentionFlag(UINT32 Position);
 
 extern void persSetDeathCam(UINT32 mode = 1);
 extern LOGICAL persIsInDeathCam();

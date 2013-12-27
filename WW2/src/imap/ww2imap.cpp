@@ -24,12 +24,6 @@
 #include "tut/TutorialManager.h"
 #include "ui/uiDotCommands.h"
 
-#if defined(USE_OSG)
-#include "uimap/uiMap.h"
-#include "osgVehicle/vehicleSpawn.h"
-#include "vehicleIcon.h"
-#endif
-
 /************************************************************************************************
 	ww2imap
 *************************************************************************************************/
@@ -257,15 +251,6 @@ int ww2imapInit()
 	imapInstallNonRemovableControlCallback(IMAP_MOM_SHOW_GUI_CURSOR, uiImapCursorCallback);
 	imapInstallNonRemovableControlCallback(IMAP_CONTINUE_TUTORIAL, TutorialManager::Input);
 
-#if defined(USE_OSG)
-	imapInstallNonRemovableControlCallback(IMAP_TMP_EXIT_VEHICLE, vehicleSpawnImapExitVehicle);
-	imapInstallNonRemovableControlCallback(IMAP_MOM_TOGGLE_HUD, persHUDToggleHUD);
-	imapInstallNonRemovableControlCallback(IMAP_MOM_RESET_HUD, persHUDResetHUD);
-	imapInstallNonRemovableControlCallback(IMAP_SHOW_STATS, persHUDToggleReadout);
-	imapInstallNonRemovableControlCallback(IMAP_MOM_SHOW_IN_GAME_MAP, uiMapToggleIngameMap);
-	imapInstallNonRemovableControlCallback(IMAP_CYCLE_ICON_MODE, vehicleIconCycleMode);
-#endif
-
 	return IMAP_NO_ERR;
 }
 
@@ -402,11 +387,7 @@ int ww2imapSetKeymap(int vehtypeListIdx)
 #endif
 
 	// view
-#ifdef DOROTHY
-	if(vehtype->Type != VEH_TYPE_PERSON && vehtype->Type != VEH_TYPE_MECH)
-#else
 	if(vehtype->Type != VEH_TYPE_PERSON)
-#endif
 	{
 		ww2KeymapLoadRef(ref, WW2_FUNC_CATEGORY_VIEW, ALL_VEHICLES, FROM_ARCHIVE);
 		imapSetKeymap(ref, KEYMAP_VIEW_ARCHIVE);
@@ -422,9 +403,6 @@ int ww2imapSetKeymap(int vehtypeListIdx)
 			category = WW2_FUNC_CATEGORY_AIR;
 		break;
 		case VEH_TYPE_GROUND:
-#ifdef DOROTHY
-		case VEH_TYPE_MECH:
-#endif
 			for(i = 0; i < WW2_FUNC_NUM_CATEGORIES; i++)
 			{
 				if(!strcmp((char*)weaponClass[vehtypeWeaponSpec(vehtypeListIdx).wClass].name, categoryClassName[i]))
@@ -531,62 +509,6 @@ void ww2imapAddBuzzardKeymaps()
 	idx = 0;
 	keymap.numKeys = 1;
 
-#if defined(USE_OSG)
-	keymap.keymapType = IMAP_BUTTON_KEYMAP;
-	keymap.btn.iac[0] = IAC_UP;
-	imapKeymapAdd(ref, IMAP_BUZZARD_FORWARD, &idx, &keymap);
-
-	keymap.keymapType = IMAP_BUTTON_KEYMAP;
-	keymap.btn.iac[0] = IAC_DOWN;
-	imapKeymapAdd(ref, IMAP_BUZZARD_BACK, &idx, &keymap);
-
-	keymap.keymapType = IMAP_BUTTON_KEYMAP;
-	keymap.btn.iac[0] = IAC_A;
-	imapKeymapAdd(ref, IMAP_BUZZARD_LEFT, &idx, &keymap);
-
-	keymap.keymapType = IMAP_BUTTON_KEYMAP;
-	keymap.btn.iac[0] = IAC_D;
-	imapKeymapAdd(ref, IMAP_BUZZARD_RIGHT, &idx, &keymap);
-
-	keymap.keymapType = IMAP_BUTTON_KEYMAP;
-	keymap.btn.iac[0] = IAC_F;
-	imapKeymapAdd(ref, IMAP_BUZZARD_UP, &idx, &keymap);
-
-	keymap.keymapType = IMAP_BUTTON_KEYMAP;
-	keymap.btn.iac[0] = IAC_V;
-	imapKeymapAdd(ref, IMAP_BUZZARD_DOWN, &idx, &keymap);
-
-	keymap.keymapType = IMAP_BUTTON_KEYMAP;
-	keymap.btn.iac[0] = IAC_Q;
-	imapKeymapAdd(ref, IMAP_BUZZARD_PITCH_UP, &idx, &keymap);
-
-	keymap.keymapType = IMAP_BUTTON_KEYMAP;
-	keymap.btn.iac[0] = IAC_Z;
-	imapKeymapAdd(ref, IMAP_BUZZARD_PITCH_DOWN, &idx, &keymap);
-
-	keymap.keymapType = IMAP_BUTTON_KEYMAP;
-	keymap.btn.iac[0] = IAC_LEFT;
-	imapKeymapAdd(ref, IMAP_BUZZARD_YAW_LEFT, &idx, &keymap);
-
-	keymap.keymapType = IMAP_BUTTON_KEYMAP;
-	keymap.btn.iac[0] = IAC_RIGHT;
-	imapKeymapAdd(ref, IMAP_BUZZARD_YAW_RIGHT, &idx, &keymap);
-
-	keymap.keymapType = IMAP_BUTTON_KEYMAP;
-	keymap.btn.iac[0] = IAC_LEFTALT;
-	imapKeymapAdd(ref, IMAP_BUZZARD_SPEED1, &idx, &keymap);
-
-	keymap.keymapType = IMAP_BUTTON_KEYMAP;
-	keymap.btn.iac[0] = IAC_LEFTCONTROL;
-	imapKeymapAdd(ref, IMAP_BUZZARD_SPEED2, &idx, &keymap);
-
-	keymap.keymapType = IMAP_BUTTON_KEYMAP;
-	keymap.btn.iac[0] = IAC_LEFTSHIFT;
-	imapKeymapAdd(ref, IMAP_BUZZARD_SPEED3, &idx, &keymap);
-
-	imapSetKeymap(ref, KEYMAP_VEHICLE_ARCHIVE);
-	imapSetKeymap(0, KEYMAP_VEHICLE_DISK);
-#else
 	keymap.keymapType = IMAP_AXIS_KEYMAP;
 	keymap.axis.iac = IAC_MOUSEX;
 	imapKeymapAdd(ref, IMAP_MOUSE_LOOK_X, &idx, &keymap);
@@ -604,8 +526,6 @@ void ww2imapAddBuzzardKeymaps()
 	imapKeymapAdd(ref, IMAP_TMP_CHANGE_FOV_DOWN, &idx, &keymap);
 
 	imapSetKeymap(ref, KEYMAP_VEHICLE_ARCHIVE);
-
-#endif
 
 	imapKeymapFree(ref);
 }
@@ -1224,11 +1144,7 @@ static int ww2KeymapvehtypeListIdx(int category, int vehicleIdx)
 		if(!vehtype->OnlineOnly)
 		{
 			// subclass ground vehicles
-#ifdef DOROTHY
-			if(type == VEH_TYPE_GROUND && (vehtype->Type == VEH_TYPE_GROUND || vehtype->Type == VEH_TYPE_MECH))
-#else
 			if(type == VEH_TYPE_GROUND && vehtype->Type == VEH_TYPE_GROUND)
-#endif
 			{
 				if(!strcmp((char*)weaponClass[vehtypeWeaponSpec(i).wClass].name, categoryClassName[category]))
 					idx++;

@@ -42,9 +42,6 @@ void imapRemoveControlCallbacks();
 */
 void imapProcessInputs(imap_queue_entry*, int numEntries);
 
-/** Executes function callback associated with functionCode. For compatability with old imap. **/
-unsigned int imapExecuteFunction(unsigned int functionCode, int param, unsigned int unused);
-
 /** Enables or disables button input. */
 void imapButtonInputState(int enable);
 

@@ -49,18 +49,7 @@
 #include "fp/fpTPSKits.h"
 #include "wwii/wwiiBranchEnums.h"
 
-#if defined(USE_OSG)
-#include "osgFX/fxSound.h"
-#else
 #include "fx/fxSnd.h"
-#endif
-
-#if defined(USE_OSG)
-#include "fp/fpTPSPhysics.h"
-#include "osgStub/vehStub.h"
-#undef PI
-#define PI 3.14159265359
-#endif
 
 #define STOWED_WEAPON_POSITION 0
 #define STOWED_WEAPON_ATTACH "StowedAttach"
@@ -245,10 +234,6 @@ static FLOAT32 polishNear = POLISH_NEAR;
 /*--------------------------------
 DELAY DEATH CRAP
 ---------------------------------*/
-
-#if defined(USE_OSG)
-#undef USE_CORPSES
-#endif
 
 #ifdef USE_CORPSES
 #include "map/mapArenaDescription.h"
@@ -739,7 +724,6 @@ gr2AnimTrooper* gr2AnimCreateModel (vehVehicle*vehicle, UINT32 vehicleTypeNum, O
 	return newModel;
 }
 
-#if !defined(USE_OSG)
 OBJECT* gr2AnimCreateObject (vehVehicle*vehicle, UINT32 vehicleTypeNum)
 {
 	OBJECT* newObject, *childObject;
@@ -797,7 +781,6 @@ OBJECT* gr2AnimCreateObject (vehVehicle*vehicle, UINT32 vehicleTypeNum)
 
 	return newObject;
 }
-#endif
 
 // helper function!
 static void gr2AnimStartBlendedAnimation (gr2AnimTrooper* model, gr2AnimationBlend* blend, FLOAT32 easeInTime, FLOAT32 easeOutTime, bool allowResurrect = true)
@@ -2263,11 +2246,7 @@ bool gr2AnimHasWeapon(gr2AnimTrooper* model, fpFPSWeaponType type)
 
 LOGICAL gr2AnimIsRagdoll(gr2AnimTrooper* model)
 {
-#if defined(USE_OSG)
-	return (model->ragdoll) ? 1: 0;
-#else
     return 0;
-#endif
 }
 
 inline void _drawThirdPersonModel(gr2AnimTrooper* model)
@@ -2367,13 +2346,11 @@ bool gr2AnimDrawCallback (OBJECT* pObject)
 	model = pObject->animModel;
 
     // Object is inside building
-#if !defined(USE_OSG)
     if(pObject->flag3 & OBJECT_IS_INTERIOR)
     {
         oglSetActiveMaterial(interiorMaterialID);
     }
     else
-#endif
     {
         oglSetActiveMaterial(defaultInfantryMaterialID);
     }
@@ -2500,13 +2477,11 @@ bool gr2AnimDrawCallback (OBJECT* pObject)
 #endif
     }
 
-#if !defined(USE_OSG)
 #ifdef BETA_RELEASE
 	if(VehicleObjectAnalysis)
 		if (!gr2RenderDamageModel(model->collisionModel))
 			return (FALSE);
 #endif // BETA_RELEASE
-#endif // defined(USE_OSG)
 
 #ifdef DEBUG_DEPLOY_CRAP
     _fpsdrawline(pObject->mat);
@@ -2546,13 +2521,11 @@ bool gr2AnimDrawCallback (OBJECT* pObject)
 	model = pObject->animModel;
 
     // Object is inside building
-#if !defined(USE_OSG)
     if(pObject->flag3 & OBJECT_IS_INTERIOR)
     {
         piSetActiveMaterial(interiorMaterialID);
     }
     else
-#endif
     {
         piSetActiveMaterial(defaultInfantryMaterialID);
     }
@@ -2715,13 +2688,11 @@ bool gr2AnimDrawCallback (OBJECT* pObject)
 #endif
     }
 
-#if !defined(USE_OSG)
 #ifdef BETA_RELEASE
 	if(VehicleObjectAnalysis)
 		if (!gr2RenderDamageModel(model->collisionModel))
 			return (FALSE);
 #endif // BETA_RELEASE
-#endif // defined(USE_OSG)
 
 	if (pObject->flags & OBJECT_USEMATRIX)
 	{
@@ -3026,14 +2997,6 @@ void gr2AnimKill (void)
 
 void _freemodel(gr2AnimTrooper* model)
 {
-#if defined(USE_OSG)
-	if(model->ragdoll)
-	{
-		delete model->ragdoll;
-		model->ragdoll = NULL;
-	}
-#endif
-
     gr2FreeModel(model->skeleton);
     model->skeleton = NULL;
 
@@ -4136,8 +4099,6 @@ void gr2AnimCorpseTO(Corpse* c)
 
 extern LOGICAL gr2AnimInitShadow (OBJECT* pObject)
 {
-#if defined(USE_OSG)
-#else
 #if(1)
 	if (true || ShadowSizeSelect == 0) // disable trooper shadows for now
 	{
@@ -4181,7 +4142,6 @@ extern LOGICAL gr2AnimInitShadow (OBJECT* pObject)
 	obmainMoveToNotObjectTree(pShadowObject);
 
 	strcpy(pShadowObject->name, "shadow");
-#endif
 	return TRUE;
 }
 
@@ -5738,9 +5698,6 @@ void gr2AnimExecuteEvent(OBJECT* pObject, gr2Model* model, SINT32 typeID, const 
 
 SINT32 gr2GetSurfaceIDUnderfoot(vehVehicle*vehicle, FLOAT64VECTOR* offset)
 {
-#if defined(USE_OSG)
-	return fpsTrooper.currentSurfaceID;
-#else
 	FLOAT64VECTOR	WorldOriginOffset;
 	piVECTOR		V1,V2;
 	OBJECT*			pObject;
@@ -5768,26 +5725,23 @@ SINT32 gr2GetSurfaceIDUnderfoot(vehVehicle*vehicle, FLOAT64VECTOR* offset)
 	V2.z += 1.0f;
 	V1.z -= 0.25f;
 
-#ifdef BETA_RELEASE
-	if(0)
-	{
-		FLOAT64VECTOR	pt1, pt2;
-		SINT32			id;
-		static SINT32	counter;
-		SCHAR			buf[255];
+#ifdef BETA_RELEASE_DEBUG_FOOTSTEPS
+	FLOAT64VECTOR	pt1, pt2;
+	SINT32			id;
+	static SINT32	counter;
+	SCHAR			buf[255];
 
-		if (++counter > 10)
-			counter = 0;
+	if (++counter > 10)
+		counter = 0;
 
-		sprintf (buf, "inffoot_%d", counter);
+	sprintf (buf, "inffoot_%d", counter);
 
-		math32To64Vec(&pt1, &V1); mathAddVectors(&pt1, &pt1, &WorldOriginOffset);
-		math32To64Vec(&pt2, &V2); mathAddVectors(&pt2, &pt2, &WorldOriginOffset);
+	math32To64Vec(&pt1, &V1); mathAddVectors(&pt1, &pt1, &WorldOriginOffset);
+	math32To64Vec(&pt2, &V2); mathAddVectors(&pt2, &pt2, &WorldOriginOffset);
 
-		id = draw3dSetWorldDebugLine(&pt1, &pt2, buf, colorYELLOWALPHA);
-		draw3dSetDebugObjectFlipZ(id,FALSE);
-		draw3dSetDebugObjectAlwaysOnTop(id, TRUE);
-	}
+	id = draw3dSetWorldDebugLine(&pt1, &pt2, buf, colorYELLOWALPHA);
+	draw3dSetDebugObjectFlipZ(id,FALSE);
+	draw3dSetDebugObjectAlwaysOnTop(id, TRUE);
 #endif
 
     surfID = -1;
@@ -5833,7 +5787,6 @@ SINT32 gr2GetSurfaceIDUnderfoot(vehVehicle*vehicle, FLOAT64VECTOR* offset)
 
     return surfID;
 
-#endif
 	return -1;
 }
 
@@ -10075,474 +10028,6 @@ void gr2AnimTwist::SetTwists(gr2Model* skeleton)
 	// head pitch
 	skeleton->AddBoneTwist(18,2);
 }
-
-#if defined(USE_OSG)
-inline void _drawThirdPersonModelOSG(gr2AnimTrooper* model, osg::State& state)
-{
-    if(model->useSelfTrooperModel)
-    {
-        gr2RenderModelOSG(model->trooperSelfModel, state);
-    }
-    else if(model->useAltTrooperModel)
-    {
-        gr2RenderModelOSG(model->trooperAltModel[model->currentLOD], state);
-	}
-    else
-    {
-        gr2RenderModelOSG(model->model[model->currentLOD], state);
-    }
-
-    if(model->useAltWeaponModel)
-    {
-        if(model->weaponAltModels[model->currentWeapon][model->currentLOD] && !model->hideGun)
-        {
-            gr2RenderModelOSG(model->weaponAltModels[model->currentWeapon][model->currentLOD], state);
-        }
-    }
-    else
-    {
-        if(model->weaponModels[model->currentWeapon][model->currentLOD] && !model->hideGun)
-        {
-            gr2RenderModelOSG(model->weaponModels[model->currentWeapon][model->currentLOD], state);
-        }
-    }
-
-    if(!model->hideChute)
-    {
-        gr2RenderModelOSG(model->chuteModel, state);
-    }
-}
-#endif // defined(USE_OSG)
-
-#if defined(USE_OSG)
-#include <osg/Material>
-bool gr2AnimDrawCallbackOSG(osg::State& state, OBJECT* o)
-{
-    bool drawTPS = true;
-    bool retVal = true;
-    gr2AnimTrooper* model = NULL;
-
-    if(!(o->flags & OBJECT_VISIBLE)) return true;
-    if(o->flags & OBJECT_SKIPDRAWING) return true;
-	if(!o->animModel || !o->animModel->active) return false;
-
-    model = o->animModel;
-
-    static osg::*_ptr<osg::Material> forest1;
-    static bool first = true;
-
-    if(first)
-    {
-        forest1 = new osg::Material;
-
-        first = false;
-        forest1->setDiffuse(osg::Material::FRONT_AND_BACK, osg::Vec4(1, 1, 1, 1));
-        forest1->setAmbient(osg::Material::FRONT_AND_BACK, osg::Vec4(0.525490, 0.525490, 0.525490, 1.0));
-        forest1->setSpecular(osg::Material::FRONT_AND_BACK, osg::Vec4(0, 0, 0, 1));
-        forest1->setEmission(osg::Material::FRONT_AND_BACK, osg::Vec4(0, 0, 0, 1));
-        forest1->setShininess(osg::Material::FRONT_AND_BACK, 0.0);
-    }
-
-    forest1->apply(state);
-
-    if(o->flags & OBJECT_USEMATRIX)
-    {
-        glPushMatrix();
-
-		// FIXME
-		// Since we are using left handed matrices and granny doesn't support them
-		// we must kludge our way around that fact
-		piMATRIX world = o->mat;
-
-        world._31 = -world._31;
-        world._32 = -world._32;
-        world._33 = -world._33;
-
-    	glMultMatrixf((GLfloat*)&world);
-    }
-
-    if(o->flag2 & OBJECT_ISFPS)
-    {
-        if(fpFPSIsExternalView() || fpFPSIsTrooperParachuteOpen())
-        {
-            fpFPSDrawOSG(state, o, false);
-        }
-        else
-        {
-            drawTPS = false;
-            fpFPSDrawOSG(state, o, true);
-        }
-    }
-
-    double finalTorsoTwist = 0;
-    double finalHeadTwist = 0;
-    double finalModelTwist = 0;
-
-    // first off .. clear any previous rotations
-    gr2ModelSetTorsoRotation(model->skeleton, 0, 0);
-    gr2ModelSetHeadRotation(model->skeleton, 0);
-    gr2ModelSetModelRotation(model->skeleton, 0);
-
-#define	ROTATE_TO_MOVE
-#ifdef	ROTATE_TO_MOVE
-
-	// force facing to velocity vector .. problems with smoother make this less good than it should be
-	// only do this for crouch and stand .. prone leave alone
-    if((model && model->myVehicle) && ((model->currentPose == TPS_POSETYPE_STAND) || (model->currentPose == TPS_POSETYPE_CROUCH)))
-    {
-        FLOAT64VECTOR vel;
-        double theta = 0;
-        double yaw = 0;
-        double diff = 0;
-        double speed = 0;
-
-        if(model->myVehicle->ModelData)
-        {
-            vel = model->myVehicle->ModelData->VehicleVel;
-            yaw = model->myVehicle->ModelData->VehicleAtt.Yaw;
-        }
-        else
-        {
-            vel = model->myVehicle->PosData.Vel;
-            vel.x = -vel.x;
-            vel.z = -vel.z;
-            yaw = model->myVehicle->PosData.Att.Yaw;
-            yaw = -yaw;
-        }
-
-        speed = mathExactVectorLength2(&vel);
-
-		if(speed > 0)
-		{
-			if(vel.x == 0)
-			{
-				if(vel.y > 0)
-                {
-                    theta = 90.0;
-                }
-				else
-                {
-                    theta = -90.0;
-                }
-			}
-			else
-            {
-				theta = -1.0 * mlRAD_TO_DEG(atan2(vel.y, vel.x)) - 270.0; // 270 was 90 with the old game (non-OSG)
-            }
-
-			yaw = mlRAD_TO_DEG(yaw);
-			diff = yaw + theta;
-
-			// normalize to -180/+180
-			while(diff * diff > 180.0 * 180.0)
-			{
-				if(diff < 0)
-                {
-					diff += 360.0;
-                }
-                else if(diff >= 0)
-                {
-					diff -= 360.0;
-                }
-			}
-
-			// ok, now we're somewhere from -180/+180 with 0 being the "center"
-			gr2AnimDetermineMotionType(model, diff);
-
-			switch(model->currentMotion)
-			{
-            case TPS_MOTION_F:
-                {
-					if(gr2AnimGunPointStraight(model))
-					{
-						if(model->currentPose == TPS_POSETYPE_STAND)
-						{
-							finalModelTwist = diff;
-							finalHeadTwist = 0;
-							finalTorsoTwist = diff;
-						}
-						else if(model->currentPose == TPS_POSETYPE_CROUCH)
-						{
-							finalModelTwist = 0;
-							finalHeadTwist = 0;
-							finalTorsoTwist = 0;
-						}
-					}
-					else
-					{
-						finalModelTwist = diff;
-						finalHeadTwist = diff;
-						finalTorsoTwist = 0;
-					}
-
-					break;
-                }
-			case TPS_MOTION_RFF:
-                {
-					if(gr2AnimGunPointStraight(model))
-					{
-						if(model->currentPose == TPS_POSETYPE_STAND)
-						{
-							finalModelTwist = diff / 2.0;
-							finalHeadTwist = 0;
-							finalTorsoTwist = diff / 2.0;
-						}
-						else if(model->currentPose == TPS_POSETYPE_CROUCH)
-						{
-							finalModelTwist = 0;
-							finalHeadTwist = 0;
-							finalTorsoTwist = 0;
-						}
-					}
-					else
-					{
-						finalModelTwist = (diff / 2.0);
-						finalHeadTwist = diff / 2.0;
-						finalTorsoTwist = 0;
-					}
-
-                    break;
-                }
-			case TPS_MOTION_RFB:
-                {
-					if(gr2AnimGunPointStraight(model))
-					{
-						if(model->currentPose == TPS_POSETYPE_STAND)
-						{
-							finalModelTwist = - (diff / 2.0);
-							finalHeadTwist = 0;
-							finalTorsoTwist = - diff / 2.0;
-						}
-						else if(model->currentPose == TPS_POSETYPE_CROUCH)
-						{
-							finalModelTwist = 0;
-							finalHeadTwist = 0;
-							finalTorsoTwist = 0;
-						}
-					}
-					else
-					{
-						finalModelTwist = - (diff / 2.0);
-						finalHeadTwist = - diff / 2.0;
-						finalTorsoTwist = 0;
-					}
-
-					if(!model->movingBackwards)
-					{
-					    gr2AnimSetModelState(o,
-                                             model->currentLOD,
-                                             model->currentPose,
-                                             TPS_MOVETYPE_BACKWARD,
-                                             model->currentPoint,
-							                 model->currentWeapon,
-                                             model->deathState,
-                                             model->emoteID,
-                                             model->useAltWeaponModel,
-                                             model->chuteOpen,
-                                             model->freeFall,
-							                 model->useAltTrooperModel);
-					}
-
-					break;
-                }
-			case TPS_MOTION_LFF:
-                {
-					if(gr2AnimGunPointStraight(model))
-					{
-						if(model->currentPose == TPS_POSETYPE_STAND)
-						{
-							finalModelTwist = diff / 2.0;
-							finalHeadTwist = 0;
-							finalTorsoTwist = diff / 2.0;
-						}
-						else if(model->currentPose == TPS_POSETYPE_CROUCH)
-						{
-							finalModelTwist = 0;
-							finalHeadTwist = 0;
-							finalTorsoTwist = 0;
-						}
-					}
-					else
-					{
-						finalModelTwist = (diff / 2.0);
-						finalHeadTwist = diff / 2.0;
-						finalTorsoTwist = 0;
-					}
-
-                    break;
-                }
-			case TPS_MOTION_LFB:
-                {
-					if(gr2AnimGunPointStraight(model))
-					{
-						if(model->currentPose == TPS_POSETYPE_STAND)
-						{
-							finalModelTwist = - (diff / 2.0);
-							finalHeadTwist = 0;
-							finalTorsoTwist = - diff / 2.0;
-						}
-						else if(model->currentPose == TPS_POSETYPE_CROUCH)
-						{
-							finalModelTwist = 0;
-							finalHeadTwist = 0;
-							finalTorsoTwist = 0;
-						}
-					}
-					else
-					{
-						finalModelTwist = - (diff / 2.0);
-						finalHeadTwist = - diff / 2.0;
-						finalTorsoTwist = 0;
-					}
-					if(!model->movingBackwards)
-					{
-						gr2AnimSetModelState(o,
-                                             model->currentLOD,
-                                             model->currentPose,
-                                             TPS_MOVETYPE_BACKWARD,
-                                             model->currentPoint,
-							                 model->currentWeapon,
-                                             model->deathState,
-                                             model->emoteID,
-                                             model->useAltWeaponModel,
-                                             model->chuteOpen,
-                                             model->freeFall,
-							                 model->useAltTrooperModel);
-					}
-
-					break;
-                }
-			case TPS_MOTION_B:
-                {
-					if(gr2AnimGunPointStraight(model))
-					{
-						if(model->currentPose == TPS_POSETYPE_STAND)
-						{
-							finalModelTwist = 180.0 + diff;
-							finalHeadTwist = 0;
-							finalTorsoTwist = 180.0 + diff;
-						}
-						else if(model->currentPose == TPS_POSETYPE_CROUCH)
-						{
-							finalModelTwist = 0;
-							finalHeadTwist = 0;
-							finalTorsoTwist = 0;
-						}
-					}
-					else
-					{
-						finalModelTwist = 180.0 + diff;
-						finalHeadTwist = 180.0 + diff;
-						finalTorsoTwist = 0;
-					}
-
-					break;
-                }
-			}
-		}
-		else
-        {
-			model->currentMotion = TPS_MOTION_F;
-        }
-	}
-#endif
-
-	if(model->headPoint == TPS_HEAD_LEFT)
-	{
-		finalHeadTwist += 45.0;
-	}
-	else if(model->headPoint == TPS_HEAD_RIGHT)
-	{
-		finalHeadTwist -= 45.0;
-	}
-
-	if(finalTorsoTwist)
-    {
-        gr2ModelSetTorsoRotation(model->skeleton, finalTorsoTwist, (model->currentPose == TPS_POSETYPE_CROUCH));
-    }
-
-	if(finalHeadTwist)
-    {
-        gr2ModelSetHeadRotation (model->skeleton, finalHeadTwist);
-    }
-
-	if(finalModelTwist)
-    {
-        gr2ModelSetModelRotation (model->skeleton, finalModelTwist);
-    }
-
-	// determine LOD, then update the appropriate models
-	gr2AnimUpdateModel(o, o->flag2 & OBJECT_ISFPS);
-
-	if(gr2AnimIsRagdoll(model))
-		model->ragdoll->Update();
-	else
-		gr2UpdateModel (model->skeleton);
-
-	gr2UpdateModel(model->collisionModel);
-
-	if(model->useSelfTrooperModel)
-    {
-		gr2UpdateModel (model->trooperSelfModel);
-    }
-    else if(model->useAltTrooperModel)
-    {
-        gr2UpdateModel(model->trooperAltModel[model->currentLOD]);
-    }
-    else
-    {
-        gr2UpdateModel(model->model[model->currentLOD]);
-    }
-
-	if(model->useAltWeaponModel)
-	{
-		if(model->weaponAltModels[model->currentWeapon][model->currentLOD])
-        {
-			gr2UpdateModel(model->weaponAltModels[model->currentWeapon][model->currentLOD]);
-        }
-    }
-	else
-	{
-		if(model->weaponModels[model->currentWeapon][model->currentLOD])
-        {
-			gr2UpdateModel(model->weaponModels[model->currentWeapon][model->currentLOD]);
-        }
-    }
-
-	if(!model->hideChute && model->chuteModel)
-	{
-		gr2UpdateModel(model->chuteModel);
-	}
-
-	if(drawTPS)
-	{
-        _drawThirdPersonModelOSG(model, state);
-	}
-
-#if !defined(USE_OSG)
-#ifdef BETA_RELEASE
-	if(VehicleObjectAnalysis)
-    {
-	    if(!gr2RenderDamageModel(model->collisionModel))
-        {
-            return false;
-        }
-    }
-#endif // BETA_RELEASE
-#endif // defined(USE_OSG)
-
-	if(o->flags & OBJECT_USEMATRIX)
-	{
-        glPopMatrix();
-	}
-
-#ifdef DEBUG_DEPLOY_CRAP
-    _fpsdrawline(o->mat);
-#endif
-
-	return true;
-}
-#endif // defined(USE_OSG)
 
 void gr2AnimSound::Init(gr2AnimTrooper* anim)
 {

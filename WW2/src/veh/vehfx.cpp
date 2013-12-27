@@ -235,9 +235,6 @@ LOGICAL vehfxAttachVehicle(vehVehicle* const lpVehicle, SINT32* pIndex)
             break;
         }
     case VEH_TYPE_PERSON:
-#ifdef DOROTHY
-	case VEH_TYPE_MECH:
-#endif
         {
             vehfxAttachTrooperVehicle(lpVehicle, pIndex);
             break;

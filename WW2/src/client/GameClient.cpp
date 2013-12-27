@@ -68,15 +68,7 @@
 #include "strt/strtEventTypes.h"
 #include "strt/strtCPFlags.h"
 
-#if defined(USE_OSG)
-#include "osgVehicle/vehicleSpawn.h"
-#include "osgVehicle/vehicleMain.h"
-#include "osgVehicle/vehicleNetUpdate.h"
-#include "client/clientStrat.h"
-#include "osgTerrain/terrainTime.h"
-#else
 void clientStratControlUpdate(FULL_OBJ_ID const& id, int ownership, UINT32 flags);
-#endif
 
 using namespace ww2;
 
@@ -200,15 +192,6 @@ void GameClient::DoVehicleJoin()
 		return;
 	}
 
-#if defined(USE_OSG)
-	if(spawnnotify.spawnVehicleID > 0)
-		vehicleSpawnAtVehicle(spawnnotify.spawnVehicleID, spawnnotify.x, spawnnotify.y, spawnnotify.z);
-	else
-		vehicleSpawnAtFacility(weaponSerial.source);
-
-	RequestVehicleJoin(weaponSerial, frametime);
-
-#else
 	if(false && (spawnoverride.x || spawnoverride.y || spawnoverride.z))
 		mlSetMobileSpawnStuff(0, spawnoverride.x, spawnoverride.y, spawnoverride.z, mobilespawnyaw);
 	else if(spawnnotify.spawnVehicleID > 0)
@@ -220,7 +203,6 @@ void GameClient::DoVehicleJoin()
 	SetSpawnOverride(0, 0, 0);
 
 	vehcommSendVehicleRequest(vehtype->VehicleTypeNum, &weaponSerial);
-#endif
 
 	SpawnComplete();
 	//spawnStatus = SPAWN_SPAWNED;
@@ -283,11 +265,7 @@ void GameClient::ProcessCrewPostExpired(FE_POST_EXPIRED const& crewexpired)
 void GameClient::ProcessForcedCellExit(unsigned int exitCode)
 {
 	Client::ProcessForcedCellExit(exitCode);
-#if defined(USE_OSG)
-	vehicleSpawnExitWorld();
-#else
 	vehExitVehicle(1, 0, 0);
-#endif
 }
 
 /************************************************************************************************
@@ -297,11 +275,6 @@ void GameClient::ProcessForcedCellExit(unsigned int exitCode)
 void GameClient::ProcessGameTimeUpdate(Host::TimeUpdate const& update)
 {
 	Client::ProcessGameTimeUpdate(update);
-
-#if defined(USE_OSG)
-	terrainTimeSetTimeOfDay((int)update.gametime);
-	terrainTimeSetMultiplier((double)update.factor);
-#else
 
 	// scenarios have custom time of day and weather
 	if(!SCEN_MGR->IsActive())
@@ -322,7 +295,6 @@ void GameClient::ProcessGameTimeUpdate(Host::TimeUpdate const& update)
 
 	trnmainSetLightingUpdate(TRUE);
 	obdrawUpdateTerrainObjectLighting(TRUE);
-#endif
 }
 
 /************************************************************************************************
@@ -743,12 +715,6 @@ void GameClient::ActivateMap()
 		{
 #pragma message ("do something here?")
 			jsclient->RunScript("onspawnerror()");
-		}
-		else
-		{
-#if defined(USE_OSG)
-			vehicleSpawnExitWorld();
-#endif
 		}
 	}
 
@@ -1788,37 +1754,6 @@ void GameClient::ProcessMissionInvite(const MissionInvite& invite)
 	//jsclient->RunScript("game.onmissioninvite()");
 }
 
-#if defined(USE_OSG)
-
-void GameClient::ProcessVehicleRequest(VEHICLE_REPLY const& reply)
-{
-	vehicleSpawnWithVehicleReply(reply);
-	vehicleSpawnStartSpawn();
-}
-
-void GameClient::ProcessPositionUpdateMsg(VEHICLE_UPDATE_HEADER const& vupHeader)
-{
-	vehicleNetUpdateProcessMsg(vupHeader);
-}
-
-void GameClient::ProcessRemoveVehicle(unsigned int hostindex)
-{
-	vehicleRemoveVehicle(hostindex);
-}
-
-void GameClient::ProcessVehicleHit(Vehicle::Hit const& hit)
-{
-	// still go through old modelling code
-	vehProcessVehicleHit(hit);
-}
-
-bool GameClient::ReceiveServerTrackedObject(int type, ACTION_OBJECT* a)
-{
-	return false;
-}
-
-#else
-
 void clientStratControlUpdate(FULL_OBJ_ID const& id, int ownership, UINT32 flags)
 {
 	StratDB::StratObject* stratobj = StratDB::FindStratObject(id);
@@ -1875,8 +1810,6 @@ void GameClient::Edit(const char* type, const char* title, const char* value)
 {
 	uiCallJS("DoEdit", _editCallback, 3, type, title, value);
 }
-
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // Deploy a HCUnit to a CP

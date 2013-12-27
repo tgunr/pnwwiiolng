@@ -74,10 +74,6 @@
 #include "ez/EZManager.h"
 #include "veh/vehAnimEnum.h"
 
-#ifdef DOROTHY
-#include "gr2/gr2Main.h"
-#endif
-
 #ifdef GR2_BLEND_EDITOR
 #include "gr2/gr2Anim.h"
 #endif
@@ -1243,57 +1239,6 @@ void _checkForTornados(mlVehicleData* data)
 	TornadoCheckAtt(data->VehicleTorque, data->LastVehicleTorque);
 }
 
-#if defined(FRES)
-static bool _DoFRESRide(mlVehicleData* VehicleData)
-{
-	VehicleData->VehicleMasterPtr->RideVehicleHostIndex = 0;
-
-	int position = vehFRESCameraPosition();
-	if(position < 1) return false;
-
-	vehVehicle* fresVeh = vehFRESParentVehicle();
-	if(!fresVeh || !fresVeh->VehicleObjectData || !fresVeh->VehicleObjectData->PlaneObject) return false;
-
-	if(position >  fresVeh->VehicleType->NumFRESCameras
-	|| fresVeh->VehicleType->NumFRESCameras < 1
-	|| fresVeh->VehicleType->NumFRESCameras > VEH_MAX_CREW_POSITIONS)  return false;
-
-	persSetNormalView(fresVeh->VehicleType->Cameras[position-1].fov);
-
-	VehicleData->VehicleMasterPtr->RideVehicleHostIndex = fresVeh->VehicleHostIndex; // ensure fresVeh stays on our update list
-
-	FRESCameraInfo& info = fresVeh->VehicleType->Cameras[position-1];
-
-	FLOAT64VECTOR pos;
-	mathVectorMultiply64(&pos,&info.pos,&fresVeh->PosData.AttMat);
-	mathAddVectors(&pos, &fresVeh->PosData.RenderPos, &pos);
-
-	// my god it's full of needless complexity!
-	piMATRIX AttMat;
-	piVECTOR Att = {(float)info.att.Pitch, (float)info.att.Roll, (float)info.att.Yaw};
-	mathEul_ToMatrix(&AttMat,EulOrdXYZs,&Att);
-	math3dMatrixMultiply(&AttMat,  &AttMat, &fresVeh->PosData.AttMat);
-	mathEul_FromMatrix(&Att, &AttMat,EulOrdXYZs);
-	FLOAT64ATT Att64 = {Att.y,Att.x,Att.z};
-
-	VehicleData->VehicleRealAtt = Att64;
-
-	VehicleData->VehiclePos = pos;
-	VehicleData->RenderPos = VehicleData->VehiclePos;
-	VehicleData->RenderAtt = VehicleData->VehicleRealAtt;
-
-	VehicleData->VehicleMasterPtr->PosData.RenderPos = VehicleData->VehiclePos;
-	VehicleData->VehicleMasterPtr->PosData.RenderAtt = VehicleData->VehicleRealAtt;
-
-	VehicleData->VehicleMasterPtr->PosData.Pos = VehicleData->VehiclePos;
-	VehicleData->VehicleMasterPtr->PosData.Att = VehicleData->VehicleRealAtt;
-
-	VehicleData->VehicleAtt   = VehicleData->VehicleRealAtt;
-
-	return true;
-}
-#endif
-
 UINT32 mlUpdateVehicle(mlVehicleData* VehicleData)
 {
     FLOAT64ATT AngularMomentum = {0, 0, 0};
@@ -1360,9 +1305,6 @@ UINT32 mlUpdateVehicle(mlVehicleData* VehicleData)
 #ifdef ENABLE_FLOATERS
 	if(SuperFloat || playerVehicle->VehicleType->Type == VEH_TYPE_FLOATER)
 	{
-#if defined(FRES)
-		if(_DoFRESRide(VehicleData)) return 0;
-#endif
 		_DoEyeOperations(VehicleData);
 		// update the terrain object collider bounding box list
 		_UpdateBBoxList(VehicleData);
@@ -1407,11 +1349,7 @@ UINT32 mlUpdateVehicle(mlVehicleData* VehicleData)
 		VehicleData->CollisionSide = VehiclePtr->Side;
 	}
 
-#ifdef DOROTHY
-	if (VehicleData->ComponentList != NULL || VehiclePtr->VehicleType->Type == VEH_TYPE_PERSON || VehiclePtr->VehicleType->Type == VEH_TYPE_MECH)
-#else
 	if (VehicleData->ComponentList != NULL || VehiclePtr->VehicleType->Type == VEH_TYPE_PERSON)
-#endif
 	{
 		IsFirstTic = TRUE;
 
@@ -1522,12 +1460,6 @@ UINT32 mlUpdateVehicle(mlVehicleData* VehicleData)
 			{
 				mlInfantryUpdate(VehicleData, TicTime);
 			}
-#ifdef DOROTHY
-			else if(VehicleData->VehicleMasterPtr->VehicleType->Type == VEH_TYPE_MECH)
-			{
-				gr2UpdateVehicle(VehicleData->VehicleMasterPtr, TicTime);
-			}
-#endif
 			else
 			{
 				// Pass 0 is for non-contact point stuff
@@ -5493,9 +5425,6 @@ SINT32 _radioStatic(trnCDTerrainObject* t)
         {
         case VEH_TYPE_FLOATER:
         case VEH_TYPE_PERSON:
-#ifdef DOROTHY
-		case VEH_TYPE_MECH:
-#endif
         case VEH_TYPE_GROUND:
             {
                 SINT32 ID = fxSndGetNewSound();
@@ -7467,11 +7396,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
                 SpawnLocId = 8;
             else if(Vehicle->VehicleType->Type == VEH_TYPE_AIR)
                 SpawnLocId = 3;
-#ifdef DOROTHY
-			else if(Vehicle->VehicleType->Type == VEH_TYPE_GROUND || Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-#else
             else if(Vehicle->VehicleType->Type == VEH_TYPE_GROUND)
-#endif
                 SpawnLocId = 7;
             else if(Vehicle->VehicleType->Type == VEH_TYPE_SEA)
                 SpawnLocId = 21;
@@ -7489,11 +7414,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
                 SpawnLocId = 288;
             else if(Vehicle->VehicleType->Type == VEH_TYPE_AIR)
                 SpawnLocId = 286;
-#ifdef DOROTHY
-			else if(Vehicle->VehicleType->Type == VEH_TYPE_GROUND || Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-#else
             else if(Vehicle->VehicleType->Type == VEH_TYPE_GROUND)
-#endif
                 SpawnLocId = 289;
             else if(Vehicle->VehicleType->Type == VEH_TYPE_SEA)
                 SpawnLocId = 300;
@@ -7513,11 +7434,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
                     SpawnLocId = 288;
                 else if(Vehicle->VehicleType->Type == VEH_TYPE_AIR)
                     SpawnLocId = 286;
-#ifdef DOROTHY
-				else if(Vehicle->VehicleType->Type == VEH_TYPE_GROUND || Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-#else
 				else if(Vehicle->VehicleType->Type == VEH_TYPE_GROUND)
-#endif
                     SpawnLocId = 289;
                 else if(Vehicle->VehicleType->Type == VEH_TYPE_SEA)
                     SpawnLocId = 300;
@@ -7538,11 +7455,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
             SpawnLocId = 288;
         else if(Vehicle->VehicleType->Type == VEH_TYPE_AIR)
             SpawnLocId = 286;
-#ifdef DOROTHY
-		else if(Vehicle->VehicleType->Type == VEH_TYPE_GROUND || Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-#else
         else if(Vehicle->VehicleType->Type == VEH_TYPE_GROUND)
-#endif
             SpawnLocId = 289;
         else if(Vehicle->VehicleType->Type == VEH_TYPE_SEA)
             SpawnLocId = 300;
@@ -8302,36 +8215,19 @@ UINT32 _UpdateVehicleSounds(mlVehicleData * VehicleData)
 
 UINT32 mlDetermineVehicleCollisions(mlVehicleData * VehicleData, FLOAT64 DeltaTime)
 {
-piVECTOR TempPos;
-OBJECT * HitBox;
-FLOAT64VECTOR WorldOffsetOrigin;
-UINT32 i;
-piVECTOR V1,V2;
-
-SINT32 T1,T2;
-
-
-	if (VehicleData == NULL)
-	{
+	if (PN_UNLIKELY(VehicleData == nullptr || VehicleData->VehicleObjectData == nullptr))
 		return 0;
-	}
-	if (VehicleData->VehicleObjectData == NULL)
-	{
+	OBJECT* HitBox = VehicleData->VehicleObjectData->HitBox;
+	if (PN_UNLIKELY(HitBox == nullptr || HitBox->child == nullptr))
 		return 0;
-	}
-	if (VehicleData->VehicleObjectData->HitBox == NULL)
-	{
-		return 0;
-	}
 
-	HitBox = VehicleData->VehicleObjectData->HitBox;
+	piVECTOR TempPos;
+	FLOAT64VECTOR WorldOffsetOrigin;
+	UINT32 i;
+	piVECTOR V1,V2;
 
-	if (HitBox->child == NULL)
-	{
-		return 0;
-	}
-
-	T1 = piReadTimeStamp32();
+	SINT32 T1 = piReadTimeStamp32();
+	SINT32 T2;
 
 	trnGetWorldOriginOffset(&WorldOffsetOrigin);
 	WorldOffsetOrigin.z = -WorldOffsetOrigin.z;
@@ -9698,9 +9594,6 @@ static vehVehicle* mlHoistCollideRoundWithVehicles(vehVehicle* IgnoreVehicle, pi
 		if (CurrentVehicle == PlayerVehicle) continue;
 		if (CurrentVehicle == IgnoreVehicle) continue;
 		if (CurrentVehicle->VehicleType->Type == VEH_TYPE_PERSON) continue;
-#ifdef DOROTHY
-		if (CurrentVehicle->VehicleType->Type == VEH_TYPE_MECH) continue;
-#endif
 		if (CurrentVehicle->VehicleObjectData == NULL) continue;
 
 		if (CurrentVehicle->RideVehicleHostIndex == PlayerVehicle->VehicleHostIndex && CurrentVehicle->RideSeatNum == VEH_HOIST_RIDE_SEAT)

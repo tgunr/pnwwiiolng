@@ -9,9 +9,7 @@
 #define WIN32_LEAN_AND_MEAN
 #define FRONT_END
 
-#if !defined(USE_OSG)
 	#define _GDI32_
-#endif
 
 #define NO_DEBUG_WRITE
 #define USING_EXT_NAMESPACE using namespace stdext

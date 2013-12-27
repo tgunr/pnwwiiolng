@@ -20,26 +20,19 @@ void imeInit()
 void imeKill()
 {
 	if(_imeClient)
+	{
 		delete _imeClient;
-
-	_imeClient = NULL;
+		_imeClient = nullptr;
+	}
 }
 
 void imeSetAPI()
 {
 	imeKill();
-
-	IME_API api = (piinfoIsMinOS(PI_OS_PC)) ? IME_API_WIN: IME_API_MAC;
-
-	switch(api)
-	{
-		case IME_API_WIN:
-			_imeClient = new IMEClient;
-		break;
-		default:
-			// no ime
-		break;
-	}
+#if defined(_WIN32) || defined(_WIN64)
+	_imeClient = new IMEClient;
+#else
+#endif
 
 	// call setup?
 }

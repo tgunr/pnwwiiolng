@@ -535,9 +535,9 @@ LOGICAL piEndScene(void)
 	return(oglEndScene());
 }
 
-LOGICAL piSetRenderState(int StateType, UINT32 State)
+void piSetRenderState(int StateType, UINT32 State)
 {
-	return(oglSetRenderState((oglRENDERSTATETYPES)StateType, State));
+	oglSetRenderState((oglRENDERSTATETYPES)StateType, State);
 }
 
 LOGICAL piDisplayRenderStates(void)

@@ -50,11 +50,6 @@
 #include "scen/ScenarioManager.h"
 #include "ml/mlutility.h"
 
-#if defined(USE_OSG)
-#include "osgVehicle/vehicleSpawn.h"
-#include "osgTerrain/terrainTime.h"
-#endif
-
 /************************************************************************************************
 	jsGame
 *************************************************************************************************/
@@ -193,7 +188,7 @@ jsGame::jsGame() : phui::js::Object(&jsclass, NULL, NULL,jsfunctions,jspropertie
 	// scenario interface
 	DefineProperty("scenariostate", new jsScenarioState);
 
-#if FRES || defined(BETA_RELEASE)
+#if defined(BETA_RELEASE)
 	DefineProperty("betarelease", INT_TO_JSVAL(1));
 #else
 	DefineProperty("betarelease", INT_TO_JSVAL(0));
@@ -582,7 +577,6 @@ const StratDB::StratObject* jsGame::GetOfflineSpawn(const StratDB::StratObject* 
 
 	StratDB::StratObject::ChildList::iterator itr = children.begin();
 
-#if !defined(USE_OSG)
 	if(!Online && !spawner)
 	{
 		StratDB::StratObject::ChildList::iterator itr = children.begin();
@@ -611,7 +605,6 @@ const StratDB::StratObject* jsGame::GetOfflineSpawn(const StratDB::StratObject* 
 			}
 		}
 	}
-#endif
 
 	return spawner;
 }
@@ -733,11 +726,7 @@ JS_FUNCTION_DEF(jsGame, spawn)
 		return JS_TRUE;
 	}
 
-#if USE_OSG
-	vehicleSpawnAtDefaultLocation(vehtype->Type);
-#else
 	mlSetSpawnStuff(0,0,-1,1);
-#endif
 
 	if(argc > 1)
 	{
@@ -748,24 +737,14 @@ JS_FUNCTION_DEF(jsGame, spawn)
 
 			if(spawnobj)
 			{
-#if defined(USE_OSG)
-				vehicleSpawnAtFacility(*spawnobj->FullObjID());
-				*rval = BOOLEAN_TO_JSVAL(JS_TRUE);
-#else
 				mlSetSpawnStuff(spawnobj->SupercellX(),spawnobj->SupercellY(), spawnobj->Id(),1);
 				*rval = BOOLEAN_TO_JSVAL(JS_TRUE);
-#endif
 			}
 		}
 	}
 
-#if defined(USE_OSG)
-	vehicleSpawnWithVehicle(vehtypeWeaponSpec(vehtype->VehicleTypeNum));
-	vehicleSpawnStartSpawn();
-#else
 	WEAPON_SERIAL blah={0};
 	vehcommSendVehicleRequest(vehtype->VehicleTypeNum,&blah);
-#endif
 
 	return JS_TRUE;
 }
@@ -797,10 +776,6 @@ JS_FUNCTION_DEF(jsGame, spawnAt)
 
 		if(argc >= 5)
 			JS_ValueToNumber(ctx, argv[4], &yaw);
-
-#ifdef DOROTHY
-		trnmainLatLongToPosition(45, 11, 50, 1, 6, 29, 0, 0, &at.x, &at.y);
-#endif
 
 		if(Online)
 		{
@@ -885,12 +860,8 @@ JS_FUNCTION_DEF(jsGame, despawn)
 			SCEN_MGR->SetFlag(ScenarioManager::RESPAWN_ME, true);
 	}
 
-#if defined(USE_OSG)
-	vehicleSpawnStartDespawn();
-#else
 	persSetDeathCamForNextUpdate();
 	vehExitVehicle(1,0,0);
-#endif
 	return JS_TRUE;
 }
 
@@ -2595,11 +2566,7 @@ JSBool jsGame::GetProperty(JSContext* ctx, int propid, jsval* val)
 		case TIME_PROP:
 		{
 			UINT32 time;
-#if defined(USE_OSG)
-			time = (UINT32)terrainTimeGetTimeOfDay();
-#else
 			trnTODGetTimeOfDay(&time);
-#endif
 			*val = INT_TO_JSVAL(time);
 		}
 		break;

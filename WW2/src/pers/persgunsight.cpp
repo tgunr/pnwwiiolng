@@ -33,10 +33,6 @@
 #include "ogl/States.h"
 #endif
 
-#ifdef DOROTHY
-#include "gr2/gr2Main.h"
-#endif
-
 /************************************************************************************************
 	persGunsight
 *************************************************************************************************/
@@ -475,10 +471,6 @@ UINT32 persGunsightRangeInc(SINT32 Param,UINT32 Id,UINT32 Detach)
 	if (!pObjectData)
 		return 0;
 
-#ifdef DOROTHY
-	gr2ProcessControlInputs(Param, Id, Detach);
-#endif
-
 	if (pObjectData->flag2 & OBJECT_ISFPS)
 	{
 		return (fpFPSControlInput(Param, Id, Detach));
@@ -500,10 +492,6 @@ UINT32 persGunsightRangeDec(SINT32 Param,UINT32 Id,UINT32 Detach)
 	OBJECT*	pObjectData = persGetPersonaVehicleObjectDataPtr();
 	if (!pObjectData)
 		return 0;
-
-#ifdef DOROTHY
-	gr2ProcessControlInputs(Param, Id, Detach);
-#endif
 
 	if (pObjectData->flag2 & OBJECT_ISFPS)
 	{
@@ -1198,11 +1186,7 @@ static LOGICAL _DisplayMagLine(void*  Data)
 	FLOAT32* Mag = (FLOAT32*)&Data;
 	FLOAT32 FieldOfView = _BaseFOV / (*Mag);
 
-#ifdef DOROTHY
-	if (vehicle->VehicleType->Type == VEH_TYPE_PERSON || vehicle->VehicleType->Type == VEH_TYPE_MECH)
-#else
 	if (vehicle->VehicleType->Type == VEH_TYPE_PERSON)
-#endif
 	{
 		piSetFieldOfView(FieldOfView, 0.1f, horizon);
 	}

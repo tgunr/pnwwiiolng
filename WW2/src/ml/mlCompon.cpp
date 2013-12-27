@@ -308,16 +308,6 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
                                     CurrentComponent->SpecialData = NULL;
                                 }
                             }
-#if defined(USE_OSG)
-                            else if(CurrentComponent->Type == ML_COMPONENT_GEAR)
-                            {
-                                if(CurrentComponent->SpecialData)
-                                {
-                                    delete (mlGearComponentData*)CurrentComponent->SpecialData;
-                                    CurrentComponent->SpecialData = NULL;
-                                }
-                            }
-#endif
                             else
                             {
                                 if(CurrentComponent->SpecialData)
@@ -340,12 +330,8 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
 									break;
 
 								case ML_COMPONENT_GEAR:
-#if defined(USE_OSG)
-									CurrentComponent->SpecialData = new mlGearComponentData;
-#else
 										CurrentComponent->SpecialData = memAlloc(sizeof(mlGearComponentData));
 										memset(CurrentComponent->SpecialData, 0, sizeof(mlGearComponentData));
-#endif
 									break;
 								case ML_COMPONENT_WEAPONMOUNT:
 										CurrentComponent->SpecialData = new mlWeaponMount;//memAlloc(sizeof(mlWeaponMount));
@@ -653,12 +639,6 @@ UINT32 mlcomponFreeComponentList(mlComponentList* ComponentList)
 //					hackRemoveProtectedBlock(ComponentList->Components[i].SpecialData);
 					delete (mlWeaponMount*)ComponentList->Components[i].SpecialData;
 				}
-#if defined(USE_OSG)
-				else if(ComponentList->Components[i].Type == ML_COMPONENT_GEAR)
-				{
-					delete (mlGearComponentData*)ComponentList->Components[i].SpecialData;
-				}
-#endif
 				else
 				{
 					memFree(ComponentList->Components[i].SpecialData);
@@ -820,12 +800,11 @@ UINT32 mlcomponReadDamageComponents(mlComponentList** ComponentList,
 
                     break;
 
-#if !defined(USE_OSG) // move out of cmp
+				// move out of cmp
 				case ML_VEHICLEMASS_HACK:
 					if(VehicleMasterPtr) // horrid hack for concussion resistance hack
 						((vehType*)VehicleMasterPtr)->VehicleRealMass = (float)atof((char*)VarContents);
 				break;
-#endif
 			}
 		}
 	}

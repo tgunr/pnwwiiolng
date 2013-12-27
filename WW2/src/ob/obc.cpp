@@ -451,7 +451,6 @@ MATERIAL*	lpmats;
 	return(retval);
 }
 
-#if !defined(USE_OSG)
 // callback routine that creates an object
 // for each object in a model file
 OBJECT* obcObject(OBJECT* attached, OBJECT* tv)
@@ -518,9 +517,7 @@ char str[32];
 
 	return(lpobj);
 }
-#endif // USE_OSG
 
-#if !defined(USE_OSG)
 OBJECT* obcSphere(const char* name, const char* texname, int MeshSize, piVECTOR* Location, float Scale, UINT32 Color)
 {
 //LOGICAL		loadalpha=FALSE;
@@ -560,9 +557,7 @@ OBJECT*    lpobj;
 
 	return(lpobj);
 }
-#endif // USE_OSG
 
-#if !defined(USE_OSG)
 OBJECT* obcCylinder(const char* name, const char* texname, int MeshSize, piVECTOR* Location, float Scale, float Ellipse, UINT32 Color)
 {
 //LOGICAL		loadalpha=FALSE;
@@ -606,9 +601,7 @@ OBJECT*    lpobj;
 
 	return(lpobj);
 }
-#endif // USE_OSG
 
-#if !defined(USE_OSG)
 OBJECT* obcHemiSphere(const char* name, const char* texname, int MeshSize, piVECTOR* Location, float Scale, float Ellipse, UINT32 Color)
 {
 //LOGICAL		loadalpha=FALSE;
@@ -652,9 +645,7 @@ OBJECT*    lpobj;
 
 	return(lpobj);
 }
-#endif // USE_OSG
 
-#if !defined(USE_OSG)
 OBJECT* obcSphereVoxel(const char* name, const char* texname, int MeshSize, piVECTOR* Location, float Scale, float Depth, UINT32 Color)
 {
 char        filename[256]="";
@@ -694,9 +685,7 @@ OBJECT*    lpobj;
 
 	return(lpobj);
 }
-#endif // USE_OSG
 
-#if !defined(USE_OSG)
 void obcTextureFixup(OBJECT* lpobj)
 {
 int   i;
@@ -722,7 +711,6 @@ float widthfactor, heightfactor;
 		lpobj->SyncMutableData();
 	}
 }
-#endif // USE_OSG
 
 /* Modify materials changed during debug testing */
 #ifdef BETA_RELEASE

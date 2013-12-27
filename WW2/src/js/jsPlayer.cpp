@@ -14,17 +14,6 @@
 #include "js/jsStratDB.h"
 #include "client/GameClient.h"
 
-#ifdef DOROTHY
-#include "gr2/gr2Main.h"
-#include "mech/MechVehicle.h"
-#include "js/jsMech.h"
-#endif
-
-#if defined(USE_OSG)
-#include "osgPlayer/playerMain.h"
-#include "osgPlayer/Player.h"
-#endif
-
 /************************************************************************************************
 	jsPlayer
 *************************************************************************************************/
@@ -69,11 +58,6 @@ JSPropertySpec jsPlayer::jsproperties[] =
 	{"hulked",			jsPlayer::HULKED_PROP,		JSPROP_PERMANENT | JSPROP_READONLY},
 	{"deathcam",			jsPlayer::DEATHCAM_PROP,		JSPROP_PERMANENT | JSPROP_READONLY},
 	{"country",			jsPlayer::COUNTRY_PROP,		JSPROP_PERMANENT | JSPROP_READONLY},
-#ifdef DOROTHY
-	{"crosshairsx",		jsPlayer::CROSSHAIRSX_PROP,	JSPROP_PERMANENT | JSPROP_READONLY},
-	{"crosshairsy",		jsPlayer::CROSSHAIRSY_PROP,		JSPROP_PERMANENT | JSPROP_READONLY},
-	{"gr2vehicle",		jsPlayer::GR2VEHICLE_PROP,		JSPROP_PERMANENT | JSPROP_READONLY},
-#endif
 	{0}
 };
 
@@ -417,13 +401,8 @@ JSBool jsPlayer::GetProperty(JSContext* ctx, int propid, jsval* val)
 		case VEHICLETYPE_PROP:
 		{
 
-#if defined(USE_OSG)
-			if(!playerGetVehicle()) return JS_TRUE;
-			vehType const* vehtype = playerGetVehicle()->Type();
-#else
 			if(!Vehicle) return JS_TRUE;
 			vehType const* vehtype = Vehicle->VehicleType;
-#endif
 			switch(vehtype->Type)
 			{
 				case VEH_TYPE_FLOATER:
@@ -441,11 +420,6 @@ JSBool jsPlayer::GetProperty(JSContext* ctx, int propid, jsval* val)
 				case VEH_TYPE_SEA:
 					*val = phui::js::ConstString("sea");
 				break;
-#ifdef DOROTHY
-				case VEH_TYPE_MECH:
-					*val = phui::js::ConstString("mech");
-				break;
-#endif
 				default:
 				break;
 			}
@@ -510,45 +484,6 @@ JSBool jsPlayer::GetProperty(JSContext* ctx, int propid, jsval* val)
 			}
 		}
 		break;
-#ifdef DOROTHY
-		case CROSSHAIRSX_PROP:
-		{
-			gr2Vehicle* vehicle = gr2GetPersonaVehicle();
-			if(vehicle)
-			{
-				piVECTOR coords = {0,0,0};
-				//vehicle->GetAimPosition(&coords);
-				JS_NewDoubleValue(_jsctx, coords.x, val);
-			}
-		}
-		break;
-		case CROSSHAIRSY_PROP:
-		{
-			gr2Vehicle* vehicle = gr2GetPersonaVehicle();
-			if(vehicle)
-			{
-				piVECTOR coords = {0,0,0};
-				//vehicle->GetAimPosition(&coords);
-				JS_NewDoubleValue(_jsctx, coords.y, val);
-			}
-		}
-		break;
-		case GR2VEHICLE_PROP:
-		{
-			gr2Vehicle* vehicle = gr2GetPersonaVehicle();
-
-			if(vehicle && (!jsgr2vehicle.valid() || jsgr2vehicle.ptr()->object != vehicle))
-			{
-				if(vehicle->GetGameVehicle()->VehicleType->Type == VEH_TYPE_MECH)
-					jsgr2vehicle = new jsMech(dynamic_cast<MechVehicle*>(vehicle));
-				else
-					jsgr2vehicle = new jsGR2Object(vehicle);
-			}
-
-			*val = (jsgr2vehicle.valid()) ? jsgr2vehicle->jsVal(): JSVAL_NULL;
-		}
-		break;
-#endif
 		default:
 			return JS_FALSE;
 		break;

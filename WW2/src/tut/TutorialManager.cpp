@@ -15,18 +15,11 @@
 #include "osgImport/BoundingBox.h"
 #include "trn/trnMain.h"
 
-#if defined(USE_OSG)
-#include <osg/Vec3d>
-#include "osgPlayer/playerMain.h"
-#include "osgVehicle/VehicleBase.h"
-#include "osgSDM/SDMTerrainModelNode.h"
-#else
 #include "math/mathvect.h"
 #include "pers/persmain.h"
 #include "veh/vehmain.h"
 #include "trn/trncd.h"
 #include "ob/obmain.h"
-#endif
 
 // defines
 
@@ -98,11 +91,7 @@ void TutorialManager::Update()
 	{
 		if(WantsEvent(TUTORIAL_UPDATE_EVENTS))
 		{
-#if defined(USE_OSG)
-			VehicleBase* vehicle = NULL;
-#else
 			vehVehicle* vehicle = NULL;
-#endif
 
 			it = _eventHandlers.begin();
 
@@ -129,12 +118,6 @@ void TutorialManager::Update()
 
 						if(vehicle)
 						{
-#if defined(USE_OSG)
-							const osg::Vec3d& vpos	= vehicle->Position();
-							const osg::Vec3d lpos	= osg::Vec3d(handler.data.l.x,handler.data.l.y,handler.data.l.z);
-							osg::Vec3d diff			= vpos - lpos;
-							TUT_HANDLER_STATE state	= (diff.length() <= (double)handler.data.l.d) ? THS_EVENT_IN: THS_EVENT_OUT;
-#else
 							// old game style of calculating the location
 							Vec3d myPos		= Vec3d(vehicle->ModelData->VehiclePos);
 							Vec3d& dataPos  = handler.data.l.coords.at(0);
@@ -143,7 +126,6 @@ void TutorialManager::Update()
 
 							//mathSubVectors(&diff, &vehicle->ModelData->VehiclePos, &location);
 							TUT_HANDLER_STATE state	= (diff.length2() <= length2) ? THS_EVENT_IN: THS_EVENT_OUT;
-#endif
 
 							if(state != handler.state)
 							{
@@ -733,29 +715,17 @@ int TutorialManager::_handleEvent(TutorialHandler& handler, va_list& args)
 		break;
 		case TUT_EVENT_HIT:					// terrain object shot
 		{
-#if defined(USE_OSG)
-			tolua_pushusertype(_tutorial, va_arg(args,SDMTerrainModelNode*), "SDMTerrainModelNode"); // trn cd object
-#else
 			tolua_pushusertype(_tutorial, va_arg(args,trnCDTerrainObject*), "trnCDTerrainObject"); // trn cd object
 			tolua_pushusertype(_tutorial, va_arg(args,OBJECT*), "OBJECT"); // collision object
-#endif
 			lua_pushnumber(_tutorial, *(va_arg(args,double*))); // x
 			lua_pushnumber(_tutorial, *(va_arg(args,double*))); // y
 			lua_pushnumber(_tutorial, *(va_arg(args,double*))); // z
-#if defined(USE_OSG)
-			nargs = 5;
-#else
 			nargs = 6;
-#endif
 		}
 		break;
 		case TUT_EVENT_COLLISION:			// terrain object collided with
 		{
-#if defined(USE_OSG)
-			tolua_pushusertype(_tutorial, va_arg(args,SDMTerrainModelNode*), "SDMTerrainModelNode");
-#else
 			tolua_pushusertype(_tutorial, va_arg(args,trnCDTerrainObject*), "trnCDTerrainObject");
-#endif
 			nargs = 2;
 		}
 		break;

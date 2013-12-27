@@ -110,21 +110,13 @@ LOGICAL fpTPSLoad (void)
 		tpsBlendTypeBits + tpsBlendWeapBits + tpsBlendPoseBits + tpsBlendMoveBits + tpsBlendPointBits);
 
 
-#if defined(USE_OSG)
-    gr2LoadModelOSG(fpTPSSkeletonFile, NULL, &boneCount, 0);
-#else
 	// load, don't instantiate, and get the bone count of the skeleton
 	gr2Model* skeleton = gr2Model::Load(fpTPSSkeletonFile, NULL, &boneCount, 1);
-#endif
 
 	rnUpdateLoadingScreen();
 
-#if defined(USE_OSG)
-	gr2LoadModelOSG(fpTPSDamageFile, NULL, NULL, 0);
-#else
 	// load, don't instantiate, and don't get the bone count of the damage model
 	gr2Model::Load(fpTPSDamageFile, skeleton, NULL, 0);
-#endif
 
 	rnUpdateLoadingScreen();
 
@@ -137,12 +129,8 @@ LOGICAL fpTPSLoad (void)
 				bool stop = true;
 			if (fpTPSInfantryMeshFiles[i][j][0] != 0)
 			{
-#if defined(USE_OSG)
-                gr2LoadModelOSG(fpTPSInfantryMeshFiles[i][j], NULL, NULL, 0);
-#else
 //				Write_Log (LOG_FPS, LOG_INFO, "Country %d, LOD %d, loading mesh %s", i, j, fpTPSInfantryMeshFiles[i][j]);
 				gr2Model::Load(fpTPSInfantryMeshFiles[i][j], skeleton, NULL, 0, -1, (j < 2));
-#endif
 			}
 		}
 
@@ -156,33 +144,21 @@ LOGICAL fpTPSLoad (void)
 		{
 			if (fpTPSWeaponMeshFiles[i][j][0] != 0)
 			{
-#if defined(USE_OSG)
-				gr2LoadModelOSG(fpTPSWeaponMeshFiles[i][j], NULL, NULL, 0);
-#else
 //				Write_Log (LOG_FPS, LOG_INFO, "Weapon %d, LOD %d, loading weapon mesh %s", i, j, fpTPSWeaponMeshFiles[i][j]);
 				gr2Model::Load(fpTPSWeaponMeshFiles[i][j], NULL, NULL, 0, -1, (j < 2));
-#endif
 			}
 
 			if (fpTPSWeaponMeshAltFiles[i][j][0] != 0)
 			{
-#if defined(USE_OSG)
-				gr2LoadModelOSG(fpTPSWeaponMeshAltFiles[i][j], NULL, NULL, 0);
-#else
 //				Write_Log (LOG_FPS, LOG_INFO, "Weapon %d, LOD %d, loading alt weapon mesh %s", i, j, fpTPSWeaponMeshAltFiles[i][j]);
 				gr2Model::Load(fpTPSWeaponMeshAltFiles[i][j], NULL, NULL, 0, -1, (j < 2));
-#endif
 			}
 		}
 		rnUpdateLoadingScreen();
 	}
 
-#if defined(USE_OSG)
-	gr2LoadModelOSG(fpTPSParachuteFile, NULL, NULL, 0);
-#else
 	// and finally, the chute model
 	gr2Model::Load(fpTPSParachuteFile, NULL, NULL, 0);
-#endif
 
 	// idle animations
 	memset(fpTPSNumIdleAnims, 0, sizeof (fpTPSNumIdleAnims));
@@ -352,24 +328,6 @@ LOGICAL fpTPSLoad (void)
 	// combat stance
 	fpTPSCombatBlend = gr2LoadBlendedAnimation (fpTPSCombatBlendFile, boneCount);
 
-#if !defined(USE_OSG)
-	// identfy faces
-	/*
-	for (i=0; i < NUM_INFANTRY_TYPES; i++)
-	{
-		fpTPSDefaultFaceTexIDs[i] = piGetNamedTexture(fpTPSDefaultFaceNames[i]);
-		if (fpTPSDefaultFaceTexIDs[i] < 0)
-		{
-			char errorMessage[255];
-
-			snprintf (errorMessage, 254, "ERROR finding face %s", fpTPSDefaultFaceNames[i]);
-			Write_Log (LOG_FPS, LOG_INFO, "%s", errorMessage);
-			piExitProgram (__FILE__, __LINE__, errorMessage);
-		}
-	}
-	*/
-#endif
-
     SINT32 num = 0;
 
 #ifdef USE_NEW_DECALS
@@ -378,7 +336,6 @@ LOGICAL fpTPSLoad (void)
     num = NUM_INFANTRY_TYPES;
 #endif
 
-#if !defined(USE_OSG)
 	// identify patch textures
 	for (i=0; i < num; i++)
 	{
@@ -399,23 +356,14 @@ LOGICAL fpTPSLoad (void)
 
 		rnUpdateLoadingScreen();
 	}
-#endif
 
-#if defined(USE_OSG)
-	faceModel = gr2LoadModelOSG("TPS/meshes/faces/faces", NULL, NULL, 1);
-#else
 	faceModel = gr2LoadModel("TPS/meshes/faces/faces", NULL, NULL, 1);
-#endif
 
 	rnUpdateLoadingScreen();
 
 #ifdef REPLACE_MODEL_TEXTURES
-#if defined(USE_OSG)
-    _personalizedModel = gr2LoadModelOSG("TPS/meshes/infset/infset", NULL, NULL, 1);
-#else
     // Load textures for texture replacement
     _personalizedModel = gr2LoadModel("TPS/meshes/infset/infset", NULL, NULL, 1);
-#endif
 #endif
 
 	rnUpdateLoadingScreen();

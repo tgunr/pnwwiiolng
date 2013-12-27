@@ -11,14 +11,12 @@
 #include "ui/uiUTF.h"
 #include "veh/vehAnimEnum.h"
 
-#if !defined(USE_OSG)
 #include "weap/weapons.h"
 #include "veh/vehanim.h"
 #include "ml/mlutility.h"
 
 static void _vehxmlParseMass(vehType*, xmlNodePtr);
 static void _ReadFlatFiles(vehType*);
-#endif
 
 static void _vehxmlParseInclude(vehType*, xmlNodePtr, bool override);
 
@@ -54,9 +52,6 @@ int vehtypeInit()
 	_vehtypenames["air"] = VEH_TYPE_AIR;
 	_vehtypenames["ground"] = VEH_TYPE_GROUND;
 	_vehtypenames["sea"] = VEH_TYPE_SEA;
-#ifdef DOROTHY
-	_vehtypenames["mech"] = VEH_TYPE_MECH;
-#endif
 
 	xmlDocPtr doc = vehxmlLoad("vehicles.xml", _vehxmlopen, (xmlInputReadCallback)fioRead, (xmlInputCloseCallback)fioClose);
 	if(!doc) return -1;
@@ -94,10 +89,7 @@ int vehtypeInit()
 		{
 		}
 		_ReadInfoText(vehtype);
-#if !defined(USE_OSG)
 		_ReadFlatFiles(vehtype);
-#endif
-
 	}
 
 	xmlFreeDoc(doc);
@@ -257,21 +249,14 @@ static void _vehxmllParseVehicle(vehType* vehtype, xmlNodePtr vehnode, bool over
 	{
 		if(node->type != XML_ELEMENT_NODE) continue;
 
-#if defined(USE_OSG)
-		std::map<std::string, vehTypeXMLHandler>::iterator it = _xmlHandlers.find((char*)node->name);
-		if(it != _xmlHandlers.end())
-			it->second(vehtype, node);
-#endif
 		if (xmlStrcmp((xmlChar*)"include", node->name) == 0)
 		{ 	// this will go away when all files are xml-ized, for now, we get the file names for the non-xml files
 			_vehxmlParseInclude(vehtype, node, override);
 		}
-#if !defined(USE_OSG)
 		else if (xmlStrcmp((xmlChar*)"masses", node->name) == 0)
 		{
 			_vehxmlParseMass(vehtype, node);
 		}
-#endif
 	}
 }
 
@@ -403,7 +388,6 @@ static void _vehxmlParseInclude(vehType* vehtype, xmlNodePtr incnode, bool overr
 			if(vehtype->ModelFile[0] == '\0' || override)
 				strncpy((char*)vehtype->ModelFile, (char*)filename, 63);
 		}
-#if !defined(USE_OSG)
 		else if(strcmp(ext, ".control") == 0) // ControlFile .control
 		{
 			if(vehtype->ControlFile[0] == '\0' || override)
@@ -431,82 +415,10 @@ static void _vehxmlParseInclude(vehType* vehtype, xmlNodePtr incnode, bool overr
 		}else
 		{
 		}
-#endif
 	}
 
 	xmlFree(filename);
 }
-#if !defined(USE_OSG)
-
-#ifdef IM_A_RETARD_WHO_CANT_USE_ML_UTILITY
-UINT32 mlUtilityFindVarname(UINT32* VarNum,
-							const UCHAR* VarName,
-							const UCHAR* VehicleTypeVarNames,
-							UINT32 VarNameSize,
-							UINT32 MaxNames)
-{
-	const UCHAR* VehicleVarName = VehicleTypeVarNames;
-	UINT32 i;
-
-	while (*VarName == ' ' || *VarName == '=')
-		VarName++;
-
-	// Default value we may return is 0
-	*VarNum = 0;
-
-	if (*VarName == 0)
-		return 0;
-
-	VehicleVarName = VehicleTypeVarNames;
-
-	for (i=0;i<MaxNames;i++, VehicleVarName += VarNameSize)
-	{
-		if (strcasecmp((char*)VarName, (char*)VehicleVarName) == 0)
-		{
-			*VarNum = i;
-			return 0;
-		}
-	}
-
-	///QUERY: If there's no match, just return 0? That doesn't seem smart.
-	/// Since it effectively means the same as matching the first entry.
-
-	return 0;
-}
-
-UINT32 mlUtilityGetVarnameAndContents(UCHAR ** Varname, UCHAR ** Varcontents,UCHAR * InputString)
-{
-	*Varname = (UCHAR*)strtok((char*)InputString,"= ");
-	if (*Varname != NULL)
-	{
-		*Varcontents = (UCHAR*)strtok(NULL,"= ");
-		*Varcontents = (UCHAR*)strtok((char*)*Varcontents,"\n"); // strip off the ending newline
-	}
-	else
-	{
-		*Varcontents = NULL;
-	}
-
-	return 0;
-}
-
-UINT32 mlUtilityGetVarnameAndContents1(UCHAR ** Varname, UCHAR ** Varcontents,UCHAR * InputString)
-{
-
-	*Varname = (UCHAR*)strtok((char*)InputString,"= ");
-	if (*Varname != NULL)
-	{
-		*Varcontents = (UCHAR*)strtok(NULL,"\0");
-		*Varcontents = (UCHAR*)strtok((char*)*Varcontents,"\n"); // strip off the ending newline
-	}
-	else
-	{
-		*Varcontents = NULL;
-	}
-
-	return 0;
-}
-#endif
 
 static void _vehxmlParseMass(vehType* vehtype, xmlNodePtr massnode)
 {
@@ -1771,6 +1683,3 @@ static void _ReadFlatFiles(vehType* vehtype)
 		}
 	}
 }
-
-#endif
-

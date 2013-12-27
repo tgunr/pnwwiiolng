@@ -108,19 +108,6 @@ void imapProcessInputs(imap_queue_entry* queue, int numEntries)
 }
 
 /************************************************************************************************
-	imapExecuteFunction
-*************************************************************************************************/
-
-unsigned int imapExecuteFunction(unsigned int functionCode, int param, unsigned int unused)
-{
-	imapControlCallback func = imapFindControlCallback(functionCode);
-
-	if(func) return func(param, functionCode, 0);
-
-	return 0;
-}
-
-/************************************************************************************************
 	imapRegisterFunction
 *************************************************************************************************/
 

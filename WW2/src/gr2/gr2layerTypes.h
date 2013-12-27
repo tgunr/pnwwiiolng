@@ -481,10 +481,6 @@ struct gr2Mesh
 	// when we last deformed this mesh
 	SINT32 lastDeform;
 
-#if defined(USE_OSG)
-    std::map<int, NormalStateSet*> _ss;
-#endif
-
     gr2Mesh()
     {
 		data = NULL;

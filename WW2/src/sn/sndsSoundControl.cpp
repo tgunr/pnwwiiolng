@@ -1089,11 +1089,7 @@ void _sndsGetListenerPos(FLOAT64VECTOR* headPos, FLOAT64VECTOR* headLook, FLOAT6
 
     persGetPlayerVelocity(&vel);
 
-#ifdef DOROTHY
-	if(persIsPersonaVehicleType(VEH_TYPE_PERSON) || persIsPersonaVehicleType(VEH_TYPE_MECH))
-#else
     if(persIsPersonaVehicleType(VEH_TYPE_PERSON))
-#endif
     {
         // Even our velocities are turned around. This makes direct sound
         // pitch correctly. This was discovered by working on 2D sounds.

@@ -12,10 +12,6 @@ namespace phui
 };
 #endif
 
-#if defined(USE_OSG)
-#include <osg/State>
-#endif
-
 #define	GR2ANIM_USE_DEFAULT_WEAPON	9999
 #define GR2ANIM_AVG_YAWS 5
 #define GR2ANIM_CORPSE_LOD 15.0f
@@ -408,11 +404,6 @@ struct gr2AnimTrooper : public gr2AnimModel
 		}
 	}
 
-#if defined(USE_OSG)
-	// ragdoll death
-	fpTPSRagdoll*	ragdoll;
-#endif
-
 #ifdef GR2_MEMORY_PAD
 	//char pad[0];
 #endif
@@ -637,10 +628,6 @@ extern int getEditWeaponTypeToNum(int type);
 extern void setEditBlendWeights(int index, FLOAT32 weight1, FLOAT32 weight2, FLOAT32 weight3, FLOAT32 weight4);
 extern void setEditAnimation(const char* path);
 extern void clearAnimCache();
-#endif
-
-#if defined(USE_OSG)
-extern bool gr2AnimDrawCallbackOSG(osg::State& state, OBJECT* o);
 #endif
 
 #ifdef BETA_RELEASE

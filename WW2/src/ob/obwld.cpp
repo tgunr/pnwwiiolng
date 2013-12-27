@@ -739,10 +739,6 @@ static bool LoadSound(int numargs, FUNCARGS* args)
 {
 	rnlogoUpdateStatus("loading.sounds");
 
-#if FRES
-	if(NoBlitzWorPreload) return TRUE;
-#endif
-
     // Not an error
     if(bSoundEnable == FALSE)
         return TRUE;
@@ -763,7 +759,7 @@ static bool LoadSound(int numargs, FUNCARGS* args)
 
 static bool MultiTexture(int numargs, FUNCARGS* args)
 {
-#if FRES || defined(BETA_RELEASE)
+#if defined(BETA_RELEASE)
 	//if(NoBlitzWorPreload) return TRUE;
 #endif
 
@@ -881,7 +877,7 @@ logTimerEndExtMacro(parseWor);
 	// Granny2 system (needs materials loaded)
 
 
-#if FRES || defined(BETA_RELEASE)
+#if defined(BETA_RELEASE)
 	if(!NoInfPreload){
 #endif
 	rnlogoUpdateStatus("loading.infantry");
@@ -891,7 +887,7 @@ logTimerEndExtMacro(parseWor);
 		return(FALSE);
 	}
 
-#if FRES || defined(BETA_RELEASE)
+#if defined(BETA_RELEASE)
 }
 #endif
 

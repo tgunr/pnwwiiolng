@@ -13,9 +13,6 @@ enum
 	VEH_TYPE_AIR,
 	VEH_TYPE_GROUND,
 	VEH_TYPE_SEA,
-#ifdef DOROTHY
-	VEH_TYPE_MECH,
-#endif
 	VEH_MAXTYPE,
 };
 
@@ -80,135 +77,10 @@ struct vehLoadout
 	SINT32 		MountSoundNum	[VEH_MAX_MOUNTS];
 	UINT32 		RecoilNum		[VEH_MAX_MOUNTS];	//!< recoil DOF number to use for recoil, if applicable
 	FLOAT32 	RecoilTime		[VEH_MAX_MOUNTS]; 	//!< time to recoil to the full "back" position
-#if defined(USE_OSG)
-// infantry stuff from old JMM file
-	LOGICAL		Expendable		[VEH_MAX_MOUNTS];
-	UINT32		NumRounds		[VEH_MAX_MOUNTS][4];
-	weaponType const*	WeaponTypes		[VEH_MAX_MOUNTS][VEH_MAX_WEAPONS_PER_MOUNT];
-#else
 	weaponType*	WeaponTypes		[VEH_MAX_MOUNTS][VEH_MAX_WEAPONS_PER_MOUNT];
-#endif
 	UCHAR 		WeaponObject	[VEH_MAX_MOUNTS][VEH_MAX_WEAPONS_PER_MOUNT][32];
 
 };
-
-#if defined(USE_OSG)
-
-struct vehDamageObjectInfo
-{
-	vehDamageObjectInfo() : HitmapNum(0), Thickness(0), FaceHardness(0), AverageHardness(0)
-		, ConcussionResistance(0), DamageThreshold(0) ,DamageImportant(true) {}
-
-	std::string Name;
-	int		HitmapNum;
-	float	Thickness;
-	float	FaceHardness;
-	float	AverageHardness;
-	float 	ConcussionResistance;
-	float	DamageThreshold;
-	bool	DamageImportant;
-};
-
-struct vehCrewPositionInfo
-{
-    vehCrewPositionInfo() { memset(this,0x0,sizeof(vehCrewPositionInfo)); }
-
-	UINT32 	MultiCrewPos;
-	SINT32 	TurretNum				; 	//!< turret number for update system
-	SINT32	TurretAux				; 	//!< additional turret that can be controlled by position, 1-based
-
-	char	GunsightFile[32]			; 	//!< gunsight files for crew positions
-	char	InstGunsightFile[32]		; 	//!< instrument view gunsight files for crew positions
-	char	GunsightAlignmentObj[32]	; 	//!< gunsight alignment object
-	char	InstGunsightAlignmentObj[32];	//!< instrument view gunsight alignment object
-	FLOAT32	GunsightAlignmentRange	; 		//!< range at which gunsight is aligned
-	SINT32 	GunsightBlocked			; 		//!< when is the gunsight view blocked?
-	SINT32 	InstGunsightBlocked		; 		//!< when is the instrument view blocked?
-
-	FLOAT32 CanopyClosedSoundVol;
-	FLOAT32 CanopyOpenSoundVol;
-	FLOAT32 HatchClosedSoundVol;
-	FLOAT32 HatchOpenSoundVol;
-	FLOAT32 EngineIdleVol;
-	FLOAT32 EngineFullPowerVol;
-
-	SINT8 CanopySound[32];
-	SINT8 HatchSound[32];
-	SINT8 CanopyCloseSound[32];
-	SINT8 HatchCloseSound[32];
-
-	UINT32 NumberOfSecondaryWeapons; //!< number of secondary weapon groups available, minus 1
-	SINT8 SecondaryWeaponMsg[4][32]; //!< what message to display when selecting this weapon group
-
-	LOGICAL DefaultCanopyPosition;
-	LOGICAL DefaultHatchPosition;
-	LOGICAL ExposedByCanopy;
-	LOGICAL ExposedByHatch;
-	LOGICAL AlwaysExposed;
-
-	LOGICAL SetBombbayDoor;
-	LOGICAL BombbayDoorState;
-};
-
-struct vehTurretInfo
-{
-    vehTurretInfo() { memset(this,0x0,sizeof(vehTurretInfo)); }
-
-	UINT32 	TurretType				; 	//!< turret type
-	FLOAT32	TurretTraverseRate		;	//!< turret traverse rate for each turret (in seconds)
-	FLOAT32	TurretElevateRate		; 	//!< turret elevation rate for each turret (in seconds)
-	SINT32 	TurretNeutral			; 	//!< what forces the turret to neutral position
-	FLOAT32	TurretTraverseNeutral	; 	//!< neutral position for turret
-	FLOAT32	TurretElevateNeutral	; 	//!< neutral position for turret
-};
-
-#include <vector>
-#include "osgVehicle/VehicleState.h"
-
-struct vehType
-{
-	vehType() : NumCrewPositions(0), NumTurrets(0), VehicleTypeNum(0), Type(0), VehicleIsMultiCrew(0), OnlineOnly(false)
-	{
-		*Shape = *Id = *Icon = *Description = *ModelFile = *ModelDirectory = '\0';
-		memset(MountSounds, 0x0, sizeof(MountSounds));
-		memset(Loadout, 0x0, sizeof(Loadout));
-	}
-
-	UINT32 	VehicleTypeNum;
-	UINT32 	Type;
-	WEAPON_SPEC WeaponSpec;
-	bool VehicleIsMultiCrew;
-	bool OnlineOnly;
-
-	char 	Shape[32];
-	char 	Id[32];
-	char 	Icon[32];
-	char 	Description[64];
-	char 	ModelFile[64];
-	char 	ModelDirectory[64];
-
-	char 	MountSounds[VEH_MAX_MOUNTSOUNDS][32];
-	char 	HitSounds[3][32];
-	char	ShrapHitSounds[3][32];
-    FLOAT32	HitMaxVolumeEnergy;
-
-	vehLoadout Loadout[VEH_MAX_LOADOUTS];
-
-	int NumCrewPositions;
-	vehCrewPositionInfo CrewPosition[VEH_MAX_CREW_POSITIONS];
-
-	int NumTurrets;
-	vehTurretInfo TurretInfo[VEH_MAX_TURRETS];
-	vehTurretInfo const& TurretForPosition(int i) const { return TurretInfo[CrewPosition[i].TurretNum-1]; }
-
-	std::string InfoText;
-	typedef std::vector<osg::ref_ptr<VehicleState> >  VehicleStateList;
-	VehicleStateList VehicleStates;
-
-	std::map<std::string, vehDamageObjectInfo> DamageObjects;
-};
-
-#else
 
 //! @struct vehType
 //! @brief Data about a type of vehicle (as opposed to an instance of it).
@@ -306,7 +178,6 @@ struct vehType
 	UINT32 	BombSightPosition; 	//!< which position is the bombsight used?
 };
 
-#endif
 
 /************************************************************************************************
 	vehtype

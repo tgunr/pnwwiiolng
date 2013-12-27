@@ -8,6 +8,10 @@
 #include "ui/uiMain.h"
 #include "phui/IMEControl.h"
 
+#if platOS == OS_WIN32
+#include <VersionHelpers.h>
+#endif
+
 // Definition from Win98DDK version of IMM.H
 typedef struct tagINPUTCONTEXT2 {
     HWND                hWnd;
@@ -797,8 +801,10 @@ void IMEClient::Init()
 		tsfSink.UpdateState();
 	}
 
-	if(piinfoIsMaxOS(PI_OS_PC, 5)) // XP
+#if platOS == OS_WIN32
+	if (!IsWindowsVistaOrGreater())	// XP or earlier
 		ActivateKeyboardLayout(currentLocale, KLF_SETFORPROCESS);
+#endif
 
 	Deactivate();
 

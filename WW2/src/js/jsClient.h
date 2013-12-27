@@ -108,9 +108,6 @@ public:
 	JS_FUNCTION(joininstance); // simply joins the instance without any persona changes
 	JS_FUNCTION(isavailable);
 	JS_FUNCTION(ismissionleader);
-#ifdef DOROTHY
-	JS_FUNCTION(selectteam);
-#endif
 
 	enum{ 	COUNTRY_PROP, BRANCH_PROP, HANDLE_PROP,
 			MISSIONS_PROP, SPAWNABLE_VEHICLES_PROP, WEAPONCOUNTER_PROP, PERSONAS_PROP,

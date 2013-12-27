@@ -65,10 +65,6 @@ static LOGICAL abcd();
 //#define GLOBALS
 //#undef GLOBALS
 
-#if defined(USE_OSG)
-#include "osg/osgGame.h"
-#endif
-
 #include "fio/fioa.h"
 
 #ifdef DIRECT3D
@@ -1509,14 +1505,10 @@ int		screenmode;
 #endif
 #endif
 
-#if !defined(USE_OSG)
-
 	UINT32 host = 0, otp = 0;
 	UINT16 port = 0;
 	if(rnmainGetOnlineSetting() == false)
 		return FALSE;
-
-#endif
 
 #define DONT_USE_THREAD
 #if defined(DONT_USE_THREAD) || defined(DIRECT3D)	// Use this path for a single thread environment else a multi-thread environment
@@ -1540,19 +1532,12 @@ int		screenmode;
 	ddpSetDDKill(NULL);//oglKill);
 
 	ddpSetD3DInit(piInit);
-#if defined(USE_OSG)
-	ddpSetD3DRender(osgGameUpdate);
-#else
 	ddpSetD3DRender(gmlpMainUpdate);
-#endif
 	ddpSetD3DKill(piKill);
 
 	if (!ddpCreateWnd(WantedX, WantedY, WantedWidth, WantedHeight, WantedBpp, WantedWindow ? DDWND_FULLWINDOW : DDWND_FULLSCREEN, NULL))
 	{
-#if defined(USE_OSG)
-#else
 		ddpKill();
-#endif
 		return(0);
 	}
 #endif	// OPENGL3D
@@ -1626,12 +1611,9 @@ int		screenmode;
 	piKill();
 #endif
 
-#if defined(USE_OSG)
-#else
 #ifdef OPENGL3D
 	ddpKill();
 #endif	// OPENGL3D
-#endif
 
 	// teulShutdownTransport();
 
@@ -1725,16 +1707,6 @@ int _matherr(struct _exception* except)
 #endif // BETA_RELEASE
 #endif // USE_MATH_ERR
 
-#if defined(USE_OSG)
-void sysmainQuit(void)
-{
-	osgGameKill();
-    running = false;
-	//exit(0);
-}
-
-#else
-
 void sysmainQuit(void)
 {
 	cfgPrefsSave();
@@ -1746,7 +1718,6 @@ void sysmainQuit(void)
 		exit(0);
 #endif
 }
-#endif
 
 #ifdef DONT_USE
 void sysmainSetKeyboard(SYS_KEYBOARDFUNC NewKeyboardRoute)

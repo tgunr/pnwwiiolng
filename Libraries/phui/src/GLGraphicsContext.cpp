@@ -169,8 +169,9 @@ void GLGraphicsContext::SetColor(float r, float g, float b, float a)
 void GLGraphicsContext::MovePenPosition(float x, float y)
 {
     // Floor gives incorrect offsets
-    x = float(int(x));
-    y = float(int(y));
+	// ogs: yes, because floor uses doubles not floats.
+    x = truncf(x);
+    y = truncf(y);
 
 	glTranslatef(x, y, 0);
 }
@@ -293,7 +294,7 @@ void GLGraphicsContext::DrawString(unsigned int i, const char* str)
 	if(font)
 	{
 		MovePenPosition(0, -font->Descender());
-#ifdef _WIN32
+#ifdef _WIN32_NVIDIA_WORKAROUND
 		font->Render(""); // stupid nVidia workaround
 #endif
 		font->Render(str);
@@ -311,7 +312,7 @@ void GLGraphicsContext::DrawString(unsigned int i, const wchar_t* str)
 	if(font)
 	{
 		MovePenPosition(0, -font->Descender());
-#ifdef _WIN32
+#ifdef _WIN32_NVIDIA_WORKAROUND
 		font->Render(""); // stupid nVidia workaround
 #endif
 		font->Render(str);
@@ -325,7 +326,7 @@ void GLGraphicsContext::DrawString(unsigned int i, const wchar_t* str)
 
 float GLGraphicsContext::FontHeight(unsigned int i)
 {
-	FTFontAdaptor* font = _fonts->FontAt(i);
+	const FTFontAdaptor* font = _fonts->FontAt(i);
 	if(font)
 		return font->Ascender() - font->Descender();
 	
@@ -364,7 +365,7 @@ float GLGraphicsContext::FontAdvance(unsigned int i, const wchar_t* str)
 
 bool GLGraphicsContext::SetDefaultFont(const char* name, unsigned int size)
 {
-	int found = FindFont(name, size);
+	const int found = FindFont(name, size);
 
 	if(found)
 		_fonts->defaultfont = found;
@@ -404,8 +405,8 @@ unsigned int GLGraphicsContext::FindFont(const char* fontname, int size)
 	if(!_io) return 0;
     
 	FTFontAdaptor* font = NULL;
-	FontKey key = FontKey(fontname,size);
-	FontMap::iterator it = _fonts->fontmap.find(key);
+	const FontKey key = FontKey(fontname,size);
+	FontMap::const_iterator it = _fonts->fontmap.find(key);
 	int fontnum = 0;
 	
 	if(it == _fonts->fontmap.end())
@@ -451,7 +452,7 @@ unsigned int GLGraphicsContext::FindFont(const char* fontname, int size)
 	{
 		font = it->second;
         
-		for(unsigned int i = 0; i < _fonts->font.size(); i++)
+		for(size_t i = 0; i < _fonts->font.size(); i++)
 		{
 			if(_fonts->font[i] == font)
 			{
@@ -479,11 +480,10 @@ std::string GLGraphicsContext::FontName(unsigned int i)
 
 int GLGraphicsContext::FontSize(unsigned int i)
 {
-	FTFontAdaptor* font = _fonts->FontAt(i);
+	const FTFontAdaptor* font = _fonts->FontAt(i);
 	if(font)
 		return font->GetFaceSize();
-	else
-		return 0;
+	return 0;
 }
 
 /************************************************************************************************
@@ -556,10 +556,10 @@ void GLGraphicsContext::DrawRotatedTexture(TextureInfo const& info, float left, 
 	right = round(right);
 	top = round(top);
 
-	if(orient < 0 || orient > 3) orient = 0;
+	if((UINT32)orient > 3) orient = 0;
 	
 	BoxVerts coords;
-	float uv[4][8] = {	{info.uv[0],info.uv[1], info.uv[2],info.uv[3], info.uv[4],info.uv[5], info.uv[6],info.uv[7]}
+	const float uv[4][8] = {	{info.uv[0],info.uv[1], info.uv[2],info.uv[3], info.uv[4],info.uv[5], info.uv[6],info.uv[7]}
 					,	{info.uv[2],info.uv[3], info.uv[4],info.uv[5], info.uv[6],info.uv[7], info.uv[0],info.uv[1]}
 					,	{info.uv[4],info.uv[5], info.uv[6],info.uv[7], info.uv[0],info.uv[1], info.uv[2],info.uv[3]}
 					,	{info.uv[6],info.uv[7], info.uv[0],info.uv[1], info.uv[2],info.uv[3], info.uv[4],info.uv[5]} 

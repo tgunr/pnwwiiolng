@@ -120,11 +120,6 @@ extern void			gr2ControlSetWeight (gr2Control* gr2Control, FLOAT32 weight);
 extern UINT32		gr2IsControlActive (gr2Control* gr2Control);
 extern UINT32		gr2IsControlComplete (gr2Control* gr2Control);
 
-#if defined(USE_OSG)
-extern bool gr2RenderModelOSG(gr2Model* model, osg::State& state);
-extern gr2Model* gr2LoadModelOSG(const char* modelFile, gr2Model* wornOnModel, SINT32* boneCount, SINT32 instantiate, int modelIndex = -1);
-#endif
-
 extern LOGICAL		gr2RenderModel(gr2Model* model, bool update = false);
 extern void			gr2RenderShadowModel(gr2Model* model, bool update = false);
 

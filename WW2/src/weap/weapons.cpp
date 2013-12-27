@@ -282,10 +282,6 @@ UINT32 i;
 	return 0;
 }
 
-#if defined(USE_OSG)
-
-#else
-
 UINT32 weaponsKill(void)
 {
 	if (_WeaponList != NULL)
@@ -947,5 +943,3 @@ void weapAddFireCallback(WEAP_FIRE_CALLBACK callback)
 {
 	_fireCallbacks.push_back(callback);
 }
-
-#endif

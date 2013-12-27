@@ -728,11 +728,7 @@ void fxMiscDrawEffects()
                 // Reset
                 _drawDeathFade(1, i, 999);
 
-#ifdef DOROTHY
-				if(position == i && !persIsPersonaVehicleType(VEH_TYPE_MECH))
-#else
                 if(position == i)
-#endif
                 {
                     _drawBlackoutIfNecessary();
                 }

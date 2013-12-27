@@ -133,10 +133,8 @@ static void vehxmlExpandIncludeNode(xmlNodePtr parentnode, xmlNodePtr node, cons
 			filename += (char*)xfile;
 		}
 
-#if !defined(USE_OSG)
 // so we can xmlify stuff for OSG without worrying about old code
 		if(filename.find(".mass.xml") != std::string::npos)
-#endif
 		includedoc = xmlReadFile(filename.c_str(), NULL, XML_PARSE_RECOVER);
 		xmlFree(xfile);
 	}

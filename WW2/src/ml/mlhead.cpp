@@ -15,10 +15,6 @@
 #include "fp/fpFPS.h"
 #include "tut/TutorialManager.h"
 
-#ifdef DOROTHY
-#include "gr2/gr2Main.h"
-#endif
-
 /************************************************************************************************
 	mlHead
 *************************************************************************************************/
@@ -486,10 +482,6 @@ UINT32 mlMouseLook(SINT32 param, UINT32 functionNum, UINT32 data)
 
 	if (pVehicle && pVehicle->VehicleType->Type == VEH_TYPE_PERSON)
 		return fpFPSControlInput (param, functionNum, data);
-#ifdef DOROTHY
-	else if (pVehicle && pVehicle->VehicleType->Type == VEH_TYPE_MECH)
-		return gr2ProcessControlInputs(param, functionNum, data);
-#endif
 
 	if(!_mouseLook) return 0;
 

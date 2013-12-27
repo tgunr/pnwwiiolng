@@ -95,26 +95,8 @@
 #include "veh/vehcomms.h"
 #endif
 
-#ifdef DOROTHY
-#include "mech/MechTarget.h"
-#endif
-
 #if platOS == OS_WIN32
 #include "ime/imeMain.h"
-#endif
-
-#if defined(USE_OSG)
-#include "osg/osgMain.h"
-
-#include <osg/Geode>
-#include <osg/Projection>
-#include <osg/MatrixTransform>
-#include <osg/Camera>
-#include <osgUtil/SceneView>
-
-static osg::ref_ptr<osg::Group> _uinode;
-
-static void uiInitOSG();
 #endif
 
 #include "sys/sysWinISO.h"
@@ -225,11 +207,7 @@ static UIXMLCALLBACK _uiJsCallback = NULL;
 static drawIconRef _ContactIcons;
 static drawIconRef _FlagIcons;
 
-#if defined(USE_OSG)
-drawIconRef _ColorRankIcons;
-#else
 extern drawIconRef _ColorRankIcons;
-#endif
 
 /************************************************************************************************
 	uiInit
@@ -366,15 +344,10 @@ int uiInit()
 #ifdef GR2_BLEND_EDITOR
 	phui::RegisterTagWithUIXML("animscale", uiAnimWeightCreate);
 #endif
-#ifdef DOROTHY
-	phui::RegisterTagWithUIXML("mechtarget", uiMechTargetViewCreate);
-#endif
 
 	phui::SetUIXMLTextureCallback(uiGetAtlasTexture);
-#if !defined(USE_OSG)
 	phui::SetUIXMLCreateTextureCallback(uiCreateTexture);
 	phui::SetUIXMLDestroyTextureCallback(uiDestroyTexture);
-#endif
 	phui::SetUIXMLDrawerFactory(_drawfactory);
 	phui::SetUIXMLSetViewportSize(_viewport->Width(), _viewport->Height());
 	phui::SetUIXMLClipboardCallback(piinfoClipboard);
@@ -393,10 +366,6 @@ int uiInit()
 
 	_ContactIcons = drawIconLoad("ui/textures/mapvehicles");
 	_FlagIcons = drawIconLoad("ui/uidata/chat/commicons3");
-
-#if defined(USE_OSG)
-	_ColorRankIcons = drawIconLoad("ui/uidata/chat/commrank");
-#endif
 
 	_isafk = 0;
 	_isautoafk = false;
@@ -529,10 +498,8 @@ int uiKill()
 
 void uiUpdate()
 {
-#if !defined(USE_OSG)
 	TUT_MGR->Update();
 	SCEN_MGR->Update();
-#endif
 
 	if(uiInGame())
 	{
@@ -1145,9 +1112,6 @@ void uiGameToUI()
 	{
 		training = TUT_ACTIVE;
 
-#ifdef DOROTHY
-		uiLoadView(Online ? "dorothy/aar" : "dorothy/main");
-#else
 		// make sure we're back on the campaign persona and brigade
 		if(Online && _despawnReset && !PlayerClient()->LoadSavedPersona())
 			uiSetDespawnInfo("online");
@@ -1162,8 +1126,6 @@ void uiGameToUI()
 		// reset if we were requested to do so
 		if(_despawnReset)
 			uiSetDespawnInfo((Online) ? "mission": "offline");
-
-#endif //DOROTHY
 	}
 
 	uiChatShow();
@@ -1282,15 +1244,10 @@ void uiUIToGameStart()
 	imapButtonInputState(1);
 	uiSetCursor(0);
 
-#ifdef DOROTHY
-	if(!_spawnscreen)
-		_spawnscreen = uiLoadView("dorothy/spawn");
-#else
 	if(SCEN_MGR->HasFlag(ScenarioManager::RESPAWN_ME) && respawnView)
 		_spawnscreen = respawnView;
 	else if(!_spawnscreen)
 		_spawnscreen = uiLoadView("spawn");
-#endif
 
 	uiUpdate();
 	uiDraw();
@@ -1361,12 +1318,9 @@ void uiUIToGameEnd()
 		_spawnscreen = 0;
 	}
 
-#if defined(USE_OSG)
-#else
 #ifdef BETA_RELEASE
 	if(SuperTroop)
 		fpFPSSetSuperTroop(SuperTroop);
-#endif
 #endif
 	uiGC();
 
@@ -2723,15 +2677,7 @@ void BarCompassView::DrawCardinalIndicator(phui::GraphicsContext* ctx, float ang
 
 float BarCompassView::GetHeading()
 {
-	float angle;
-
-#if defined(USE_OSG)
-	angle = -(float)(atan2(playdir.x, playdir.y) * 180.0f / osg::PI);
-#else
-	angle = -(float)(atan2(playdir.x, playdir.y) * 180.0f / PI);
-#endif
-
-	return angle;
+	return -(float)(atan2(playdir.x, playdir.y) * 180.0f / float(PI));
 }
 
 /************************************************************************************************
@@ -2744,11 +2690,7 @@ float BarCompassView::Theta(float barCompassWidth, float scalar)
 
 	theta = 2.0f * ( atan2( (barCompassWidth)/2, scalar ) ); // In radians, yuck
 
-#if defined(USE_OSG)
-	theta = theta * (180.0f / osg::PI);
-#else
 	theta = theta * (180.0f / PI);		// Convert theta to degrees, much better
-#endif
 
 	return theta;
 }
@@ -3136,12 +3078,7 @@ void DrawIconView::DrawSelfColor(float r, float g, float b, float alpha)
 
 void CompassView::DrawSelf()
 {
-	float angle;
-#if defined(USE_OSG)
-	angle = -(float)(atan2(playdir.x, playdir.y) * 180.0f / osg::PI);
-#else
-	angle = -(float)(atan2(playdir.x, playdir.y) * 180.0f / PI);
-#endif
+	float angle = -(float)(atan2(playdir.x, playdir.y) * 180.0f / float(PI));
 	glPushMatrix();
 	glTranslatef(_width/2, _height/2, 0);
 	glRotatef(angle, 0, 0, 1);
@@ -3845,158 +3782,3 @@ void uiGC()
 {
 	JS_GC(_jsgame->jsContext());
 }
-
-#if defined(USE_OSG)
-
-class phuiDrawable: public osg::Drawable
-{
-public:
-	phuiDrawable(phui::Viewport* v): osg::Drawable(), _viewport(v)
-	{
-		setSupportsDisplayList(false);
-	}
-	explicit phuiDrawable() : osg::Drawable(), _viewport(0) {}
-	phuiDrawable(const Drawable &copy, const osg::CopyOp &copyop=osg::CopyOp::SHALLOW_COPY) : osg::Drawable(copy, copyop), _viewport(0) {}
-
-	META_Object(ww2, phuiDrawable);
-	virtual void drawImplementation(osg::RenderInfo &ri) const
-	{
-		// OSG ascends when disabling texture units, so make sure unit 0 is active
-		// before UI draws.
-		ri.getState()->setActiveTextureUnit(0);
-
-		push_gl_state();
-		_viewport->Draw();
-		pop_gl_state();
-	}
-
-	virtual osg::BoundingBox computeBound() const
-	{
-		osg::BoundingBox _bbox;
-		_bbox.init();
-
-		_bbox._min._v[0] = _viewport->X();
-		_bbox._min._v[1] = _viewport->Y();
-		_bbox._min._v[2] = 0;
-
-		_bbox._max._v[0] = _bbox._min._v[0] + _viewport->Width();
-		_bbox._max._v[1] = _bbox._min._v[1] + _viewport->Height();
-		_bbox._max._v[2] = 0;
-
-		return _bbox;
-	}
-
-	phui::Viewport* _viewport;
-};
-
-/*
-static void uiInitOSG()
-{
-	_ColorRankIcons = drawIconLoad("ui/uidata/chat/commrank");
-
-	osg::Geode* geode = new osg::Geode;
-	geode->addDrawable(new phuiDrawable(_viewport));
-
-	osg::MatrixTransform* modelview_abs = new osg::MatrixTransform;
-	modelview_abs->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
-	modelview_abs->setMatrix(osg::Matrix::identity());
-	modelview_abs->addChild(geode);
-
-#if(0)
-	osg::Projection* proj = new osg::Projection;
-	proj->setMatrix(osg::Matrix::ortho2D(0,_viewport->Width(),0,_viewport->Height()));
-	proj->getOrCreateStateSet()->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-	proj->getOrCreateStateSet()->setMode(GL_DEPTH_TEST,osg::StateAttribute::OFF);
-	proj->getOrCreateStateSet()->setMode(GL_CLIP_PLANE0,osg::StateAttribute::ON);
-	proj->getOrCreateStateSet()->setMode(GL_CLIP_PLANE1,osg::StateAttribute::ON);
-	proj->getOrCreateStateSet()->setMode(GL_CLIP_PLANE2,osg::StateAttribute::ON);
-	proj->getOrCreateStateSet()->setMode(GL_CLIP_PLANE3,osg::StateAttribute::ON);
-	proj->getOrCreateStateSet()->setMode(GL_BLEND,osg::StateAttribute::ON);
-	proj->getOrCreateStateSet()->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
-	proj->getOrCreateStateSet()->setMode(GL_FOG, osg::StateAttribute::OFF);
-
-	proj->getOrCreateStateSet()->setRenderBinDetails(UI_RENDERBIN,"RenderBin");
-	proj->addChild(modelview_abs);
-	proj->setName("__ui__");
-
-	_uinode = proj;
-
-	osgRootNode()->addChild(proj);
-#else
-	osg::Camera* ui = new osg::Camera;
-
-	// Exclude UI from any post render filtering
-	ui->setRenderOrder(osg::Camera::POST_RENDER);
-	ui->setName("__uiCamera__");
-
-	ui->setProjectionMatrix(osg::Matrix::ortho2D(0,_viewport->Width(),0,_viewport->Height()));
-	ui->getOrCreateStateSet()->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-	ui->getOrCreateStateSet()->setMode(GL_DEPTH_TEST,osg::StateAttribute::OFF);
-	ui->getOrCreateStateSet()->setMode(GL_CLIP_PLANE0,osg::StateAttribute::ON);
-	ui->getOrCreateStateSet()->setMode(GL_CLIP_PLANE1,osg::StateAttribute::ON);
-	ui->getOrCreateStateSet()->setMode(GL_CLIP_PLANE2,osg::StateAttribute::ON);
-	ui->getOrCreateStateSet()->setMode(GL_CLIP_PLANE3,osg::StateAttribute::ON);
-	ui->getOrCreateStateSet()->setMode(GL_BLEND,osg::StateAttribute::ON);
-	ui->getOrCreateStateSet()->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
-	ui->getOrCreateStateSet()->setMode(GL_FOG, osg::StateAttribute::OFF);
-	ui->setClearMask(0);
-
-	ui->addChild(modelview_abs);
-	ui->setName("__ui__");
-
-	_uinode = ui;
-
-	osgRootNode()->addChild(ui);
-#endif
-}
-*/
-
-static void uiCloseAllWindows()
-{
-// close all views except chat and terminal
-	for(unsigned int i = 0; i < uiViewport()->ChildCount();)
-	{
-		phui::View* child = uiViewport()->ChildAt(i);
-		if(child != uiChatWindow() && child != _terminal)
-		{
-			uiViewport()->RemoveChild(child);
-			delete child;
-			continue;
-		}
-		i++;
-	}
-}
-
-void uiSpawnLoadingScreen()
-{
-	if(!_spawnscreen)
-		_spawnscreen = uiLoadView("spawn");
-}
-
-void uiEnterWorld()
-{
-	uiViewport()->HideToolTip();
-	uiCloseAllWindows();
-	uiChatHide();
-	imapAxisInputState(1);
-	imapButtonInputState(1);
-	uiSetCursor(0);
-
-	_spawnscreen = 0;
-	_ingame = true;
-
-	uiChatShow();
-	persHUDShowHUD();
-
-	// let the tutorial manager know we've changed states
-	TUT_MGR->DoEvent(TUT_EVENT_SPAWN);
-
-#ifdef BETA_RELEASE
-	if(SuperTroop)
-		fpFPSSetSuperTroop(SuperTroop);
-#endif
-
-	uiGC();
-}
-
-#endif

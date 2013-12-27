@@ -33,16 +33,7 @@
 //#define ENGINE_DEBUG
 #endif
 
-#if defined(USE_OSG)
-#include "osgFX/fxSound.h"
-#else
 #include "fx/fxSnd.h"
-#endif
-
-#if defined(USE_OSG)
-#undef PI
-#define PI osg::PI
-#endif
 
 // Attempt to prevent some tornado variables
 #define SAFE_ASSIGN(x) x < 0.1e-10 ? 0.0 : x
@@ -2614,28 +2605,6 @@ FLOAT64 Delta = 0.0f;
 					TempObj = VehicleObjectData->PlaneObject;
 				}
 
-#if defined(USE_OSG)
-                osg::Vec3d pos = osg::Vec3d(Component->OriginalRelativePos.x, Component->OriginalRelativePos.y, Component->OriginalRelativePos.z);
-                osg::Group* o = ((osg::Node*)TempObj->osgNode)->asGroup();
-
-                int id = fxSoundPlayObjectSound((char*)PropellerData->EngineSound,
-                                                pos,
-                                                infinite_sound,
-                                                sound_mandatory,
-                                                10.0f,
-                                                3218.0f,
-                                                o);
-
-                PropellerData->EngineSoundId = id;
-
-                if(id > 0)
-                {
- 					PropellerData->EngineSoundLoaded = 1;
-                    fxSoundSetKillCallback(id, _EngineSoundStopped);
-                    fxSoundSetKillData(id, PropellerData);
-                }
-
-#else
                 SINT32 iID = fxSndGetNewSound();
 
                 if(iID > 0)
@@ -2660,7 +2629,6 @@ FLOAT64 Delta = 0.0f;
 					    PropellerData->EngineSoundLoaded = 1;
                     }
                 }
-#endif
 			}
 		}
 	}
@@ -2678,11 +2646,7 @@ FLOAT64 Delta = 0.0f;
         if(PropellerData->CurrentRpm < 0.001f)
             Volume = 0.0f;
 
-#if defined(USE_OSG)
-        fxSoundChangeVolume(PropellerData->EngineSoundId, Volume);
-#else
 		fxSndChangeVolume(PropellerData->EngineSoundId,Volume);
-#endif
 
 		Pitch = (FLOAT32)(PropellerData->CurrentRpm / EngineData->MilRpm);
 		if (Pitch < 0.05)
@@ -2694,11 +2658,7 @@ FLOAT64 Delta = 0.0f;
 			Pitch = (FLOAT32)2.0;
 		}
 
-#if defined(USE_OSG)
-        fxSoundChangePitch(PropellerData->EngineSoundId, Pitch);
-#else
 		fxSndChangePitch(PropellerData->EngineSoundId,Pitch);
-#endif
 	}
 
 
@@ -3781,7 +3741,6 @@ UINT32 mlUpdateEngine(FLOAT64VECTOR * Force,
 
     lpVeh = (vehVehicle*)VehicleData;
 
-#if !defined(USE_OSG)
    // HACK! Turn off first person smoke stack for ships if engine is shut off.
     if(lpVeh->VehicleType->Type == VEH_TYPE_SEA)
     {
@@ -3793,7 +3752,6 @@ UINT32 mlUpdateEngine(FLOAT64VECTOR * Force,
             }
         }
     }
-#endif
 	// do engine starting stuff;
 	EngineComponentData->EngineLastCaught = EngineComponentData->EngineCaught;
 	mlGetStarterOnInfo(((vehVehicle*)VehicleData)->ModelData, &StarterOn,EngineComponentData->EngineNumber);
@@ -4504,27 +4462,6 @@ static void _HandleEngineSounds(mlComponent* Component, mlEngineComponentData* E
 			{
 				obj = (VehicleObjectData->HitMap != NULL) ? VehicleObjectData->HitMap : VehicleObjectData->PlaneObject;
 
-#if defined(USE_OSG)
-                osg::Vec3d pos = osg::Vec3d(Component->OriginalRelativePos.x, Component->OriginalRelativePos.y, Component->OriginalRelativePos.z);
-                osg::Group* o = ((osg::Node*)obj->osgNode)->asGroup();
-
-                int id = fxSoundPlayObjectSound(ENGINE_DAMAGE_SOUND[i],
-                                                pos,
-                                                infinite_sound,
-                                                sound_mandatory,
-                                                10.0f,
-                                                3218.0f,
-                                                o);
-
-                EngineComponentData->DamageLevelSoundId[i] = id;
-
-                if(id > 0)
-                {
-                    fxSoundSetKillCallback(id, _DamageSoundStopped);
-                    fxSoundSetKillData(id, &EngineComponentData->DamageLevelSoundId[i]);
-                    EngineComponentData->DamageLevelSoundLoaded[i] = 1;
-                }
-#else
 		        SINT32 iID = fxSndGetNewSound();
 
                 if(iID > 0)
@@ -4549,7 +4486,6 @@ static void _HandleEngineSounds(mlComponent* Component, mlEngineComponentData* E
 		                EngineComponentData->DamageLevelSoundLoaded[i] = 1;
 		            }
                 }
-#endif
 	        }
 		}
 
@@ -4561,25 +4497,6 @@ static void _HandleEngineSounds(mlComponent* Component, mlEngineComponentData* E
 		{
 			obj = (VehicleObjectData->HitMap != NULL) ? VehicleObjectData->HitMap : VehicleObjectData->PlaneObject;
 
-#if defined(USE_OSG)
-            osg::Vec3d pos = osg::Vec3d(Component->OriginalRelativePos.x, Component->OriginalRelativePos.y, Component->OriginalRelativePos.z);
-            osg::Group* o = ((osg::Node*)obj->osgNode)->asGroup();
-
-            int id = fxSoundPlayObjectSound(ENGINE_DAMAGE_SOUND[3],
-                                            pos,
-                                            finite_sound,
-                                            sound_mandatory,
-                                            10.0f,
-                                            3218.0f,
-                                            o);
-
-            EngineComponentData->DamageLevelSoundId[3] = id;
-
-            if(id > 0)
-            {
-                 EngineComponentData->DamageLevelSoundLoaded[3] = 1;
-            }
-#else
 	        SINT32 iID = fxSndGetNewSound();
 
             if(iID > 0)
@@ -4607,17 +4524,12 @@ static void _HandleEngineSounds(mlComponent* Component, mlEngineComponentData* E
 				    fxSndChangePitch(EngineComponentData->DamageLevelSoundId[3], 1.0f);
 	            }
             }
-#endif
 
 	        for(i = 0; i < 3; i++)
 	        {
 	        	if(EngineComponentData->DamageLevelSoundLoaded[i] && EngineComponentData->DamageLevelSoundId[i] != 0)
 	        	{
-#if defined(USE_OSG)
-                    fxSoundStopSound(EngineComponentData->DamageLevelSoundId[i]);
-#else
 	        		fxSndStopSound(EngineComponentData->DamageLevelSoundId[i]);
-#endif
 	        	}
 	        }
 		}
@@ -4629,27 +4541,6 @@ static void _HandleEngineSounds(mlComponent* Component, mlEngineComponentData* E
 		{
 			obj = (VehicleObjectData->HitMap != NULL) ? VehicleObjectData->HitMap : VehicleObjectData->PlaneObject;
 
-#if defined(USE_OSG)
-            osg::Vec3d pos = osg::Vec3d(Component->OriginalRelativePos.x, Component->OriginalRelativePos.y, Component->OriginalRelativePos.z);
-            osg::Group* o = ((osg::Node*)obj->osgNode)->asGroup();
-
-            int id = fxSoundPlayObjectSound((char*)EngineComponentData->EngineSound,
-                                            pos,
-                                            infinite_sound,
-                                            sound_mandatory,
-                                            10.0f,
-                                            3218.0f,
-                                            o);
-
-            EngineComponentData->EngineSoundId = id;
-
-            if(id > 0)
-            {
-			    EngineComponentData->EngineSoundLoaded = 1;
-                fxSoundSetKillCallback(id, _EngineSoundStopped);
-                fxSoundSetKillData(id, EngineComponentData);
-            }
-#else
 	        SINT32 iID = fxSndGetNewSound();
 
             if(iID > 0)
@@ -4674,7 +4565,6 @@ static void _HandleEngineSounds(mlComponent* Component, mlEngineComponentData* E
 				    EngineComponentData->EngineSoundLoaded = 1;
 	            }
             }
-#endif
         }
 	}
 
@@ -4684,27 +4574,6 @@ static void _HandleEngineSounds(mlComponent* Component, mlEngineComponentData* E
 		{
 			obj = (VehicleObjectData->HitMap != NULL) ? VehicleObjectData->HitMap : VehicleObjectData->PlaneObject;
 
-#if defined(USE_OSG)
-            osg::Vec3d pos = osg::Vec3d(Component->OriginalRelativePos.x, Component->OriginalRelativePos.y, Component->OriginalRelativePos.z);
-            osg::Group* o = ((osg::Node*)obj->osgNode)->asGroup();
-
-            int id = fxSoundPlayObjectSound((char*)EngineComponentData->IdleSound,
-                                            pos,
-                                            infinite_sound,
-                                            sound_mandatory,
-                                            10.0f,
-                                            3218.0f,
-                                            o);
-
-            EngineComponentData->IdleSoundId = id;
-
-            if(id > 0)
-            {
-			    EngineComponentData->IdleSoundLoaded = 1;
-                fxSoundSetKillCallback(id, _IdleSoundStopped);
-                fxSoundSetKillData(id, EngineComponentData);
-            }
-#else
             SINT32 iID = fxSndGetNewSound();
 
             if(iID > 0)
@@ -4729,7 +4598,6 @@ static void _HandleEngineSounds(mlComponent* Component, mlEngineComponentData* E
 				    EngineComponentData->IdleSoundLoaded = 1;
 			    }
             }
-#endif
 		}
 	}
 
@@ -4741,27 +4609,6 @@ static void _HandleEngineSounds(mlComponent* Component, mlEngineComponentData* E
 		{
 			obj = (VehicleObjectData->HitMap != NULL) ? VehicleObjectData->HitMap : VehicleObjectData->PlaneObject;
 
-#if defined(USE_OSG)
-            osg::Vec3d pos = osg::Vec3d(Component->OriginalRelativePos.x, Component->OriginalRelativePos.y, Component->OriginalRelativePos.z);
-            osg::Group* o = ((osg::Node*)obj->osgNode)->asGroup();
-
-            int id = fxSoundPlayObjectSound((char*)EngineComponentData->StartupSound,
-                                            pos,
-                                            infinite_sound,
-                                            sound_mandatory,
-                                            10.0f,
-                                            3218.0f,
-                                            o);
-
-            EngineComponentData->StarterSoundId = id;
-
-            if(id > 0)
-            {
-			    EngineComponentData->StarterSoundLoaded = 1;
-                fxSoundSetKillCallback(id, _StarterSoundStopped);
-                fxSoundSetKillData(id, EngineComponentData);
-            }
-#else
             SINT32 iID = fxSndGetNewSound();
 
             if(iID > 0)
@@ -4786,18 +4633,13 @@ static void _HandleEngineSounds(mlComponent* Component, mlEngineComponentData* E
                     EngineComponentData->StarterSoundLoaded = 1;
 			    }
             }
-#endif
 		}
 	}
 
 	if (EngineComponentData->StarterSoundLoaded &&
 		(!StarterOn || EngineComponentData->CurrentRpm > EngineData->CriticalRpm))
 	{
-#if defined(USE_OSG)
-        fxSoundStopSound(EngineComponentData->StarterSoundId);
-#else
 		fxSndStopSound(EngineComponentData->StarterSoundId);
-#endif
 		EngineComponentData->StarterSoundLoaded = 0;
 	}
 
@@ -4816,11 +4658,7 @@ static void _HandleEngineSounds(mlComponent* Component, mlEngineComponentData* E
 		if (EngineData->Neg_G_Fuel_Cutout != 0 && VehicleG <= -0.2f)
 			Volume = 0.0;
 
-#if defined(USE_OSG)
-        fxSoundChangeVolume(EngineComponentData->EngineSoundId, Volume);
-#else
 		fxSndChangeVolume(EngineComponentData->EngineSoundId,Volume);
-#endif
 		Pitch = (FLOAT32)(EngineComponentData->CurrentRpm / EngineData->MilRpm);
 
 		if (Pitch < 0.05)
@@ -4828,11 +4666,7 @@ static void _HandleEngineSounds(mlComponent* Component, mlEngineComponentData* E
 		else if (Pitch > 2.0)
 			Pitch = (FLOAT32)2.0;
 
-#if defined(USE_OSG)
-        fxSoundChangePitch(EngineComponentData->EngineSoundId, Pitch);
-#else
 		fxSndChangePitch(EngineComponentData->EngineSoundId,Pitch);
-#endif
 	}
 
 	if (EngineComponentData->IdleSoundLoaded)
@@ -4842,11 +4676,7 @@ static void _HandleEngineSounds(mlComponent* Component, mlEngineComponentData* E
 		else
 			Volume = (FLOAT32)(EngineComponentData->CurrentRpm / EngineData->StarterRpm);
 
-#if defined(USE_OSG)
-        fxSoundChangeVolume(EngineComponentData->IdleSoundId, Volume);
-#else
 		fxSndChangeVolume(EngineComponentData->IdleSoundId,Volume);
-#endif
 		Pitch = (FLOAT32)(EngineComponentData->CurrentRpm / EngineData->MilRpm);
 
 		if (Pitch < 0.05)
@@ -4854,11 +4684,7 @@ static void _HandleEngineSounds(mlComponent* Component, mlEngineComponentData* E
 		else if (Pitch > 2.0)
 			Pitch = (FLOAT32)2.0;
 
-#if defined(USE_OSG)
-        fxSoundChangePitch(EngineComponentData->IdleSoundId, Pitch);
-#else
 		fxSndChangePitch(EngineComponentData->IdleSoundId,Pitch);
-#endif
 	}
 
 	if(veh->VehicleType->Type == VEH_TYPE_AIR) // only for aircraft at the moment
@@ -4877,21 +4703,13 @@ static void _HandleEngineSounds(mlComponent* Component, mlEngineComponentData* E
 				if(!EngineComponentData->EngineCaught || EngineComponentData->CurrentRpm < .1)
 					Volume = 0.0f;
 
-#if defined(USE_OSG)
-                fxSoundChangeVolume(EngineComponentData->DamageLevelSoundId[i], Volume);
-#else
 				fxSndChangeVolume(EngineComponentData->DamageLevelSoundId[i], Volume);
-#endif
 				Pitch = (FLOAT32)(EngineComponentData->CurrentRpm / EngineData->MilRpm);
 
 				if (Pitch < 0.05)		Pitch = 0.05f;
 				else if (Pitch > 2.0) 	Pitch = 2.0f;
 
-#if defined(USE_OSG)
-                fxSoundChangePitch(EngineComponentData->DamageLevelSoundId[i], Pitch);
-#else
 				fxSndChangePitch(EngineComponentData->DamageLevelSoundId[i],Pitch);
-#endif
 			}
 		}
 	}

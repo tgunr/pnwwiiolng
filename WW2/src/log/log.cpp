@@ -7,10 +7,6 @@
 #include "fio/fio.h"
 #include "ui/uiUTF.h"
 
-#if defined(USE_OSG)
-#include "osgStats/statsMain.h"
-#endif
-
 #if platOS == OS_WIN32
 #include "Psapi.h"
 #endif // #ifdef OS_WIN32
@@ -484,10 +480,6 @@ static	std::ostringstream 	frameTimesString;
 
 void logInitProfiling(const char* const profileName, FLOAT32 profilingDuration)
 {
-#if defined(USE_OSG)
-	rnmainListText("Started %s profiling for the duration of %.1f minute(s) ...", profileName, profilingDuration);
-#endif
-
 	CurrentProfileName = STRVER;
 	CurrentProfileName.append("_");
 	CurrentProfileName.append(profileName);
@@ -557,11 +549,7 @@ void logUpdateProfiling()
 
 	if(!remainingProfilingTime) return;
 
-#if defined(USE_OSG)
-	thisFrameTime = statsGetLastFrameTime();
-#else
 	thisFrameTime	= 1000 / gLastFrameFPS;
-#endif
 	totalFramesTime += thisFrameTime;
 	totalFrameCnt++;
 	lastFramesTime += thisFrameTime;

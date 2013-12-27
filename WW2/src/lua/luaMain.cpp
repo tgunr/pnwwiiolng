@@ -39,12 +39,6 @@
 #include "include/platforms.h"
 #include "fp/fpFPS.h"
 
-#if defined(USE_OSG)
-#include "osgVehicle/vehicleSpawn.h"
-#include "osgPlayer/osgPlayerLua.h"
-#include "osgVehicle/osgVehicleLua.h"
-#include "osgTerrain/osgTerrainLua.h"
-#else
 #include "pers/persLua.h"
 #include "veh/vehLua.h"
 #include "trn/trnLua.h"
@@ -52,7 +46,6 @@
 #include "ml/mltypes.h"
 #include "veh/vehtype.h"
 #include "veh/vehcomms.h"
-#endif
 
 #define LUA_GAME_LIB "game"
 #define LUA_GAME_RC "include/common.lua"
@@ -495,18 +488,6 @@ int _luaSpawn(lua_State* L)
 
 			if(vtype)
 			{
-#if defined(USE_OSG)
-				vehicleSpawnAtDefaultLocation(vtype->Type);
-				vehicleSpawnWithVehicle(vtype->WeaponSpec);
-
-				if(origin)
-				{
-					const StratDB::StratObject* spawner = jsGame::GetOfflineSpawn(origin, vtype->Type);
-					if(spawner) vehicleSpawnAtFacility(*spawner->FullObjID());
-				}
-
-				vehicleSpawnStartSpawn();
-#else
 				// do old game spawn stuff here
 				mlSetSpawnStuff(0, 0, -1, 1);
 
@@ -518,7 +499,6 @@ int _luaSpawn(lua_State* L)
 
 				WEAPON_SERIAL blah={0};
 				vehcommSendVehicleRequest(vtype->VehicleTypeNum, &blah);
-#endif
 
 				// call spawner
 				success = 1;
@@ -583,18 +563,11 @@ int _luaSpawnAt(lua_State* L)
 			}
 			else
 			{
-#if defined(USE_OSG)
-				vehicleSpawnAtDefaultLocation(vtype->Type);
-				vehicleSpawnWithVehicle(vtype->WeaponSpec);
-				vehicleSpawnAtWorldPosition(x, y, z);
-				vehicleSpawnStartSpawn();
-#else
 				// do old game spawn stuff here
 				mlSetSpawnStuff(0, 0, -1, 1);
 				mlSetMobileSpawnStuff(0, x, y, z);
 				WEAPON_SERIAL blah={0};
 				vehcommSendVehicleRequest(vtype->VehicleTypeNum, &blah);
-#endif
 				// call spawner
 				success = 1;
 			}

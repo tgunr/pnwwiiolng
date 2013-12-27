@@ -59,10 +59,6 @@
 #include "fx/TransformEffect.h"
 #include "trn/trnvars.h"
 
-#ifdef DOROTHY
-#include "gr2/gr2Main.h"
-#endif
-
 #define USE_FX2 1
 
 #define GREN_STAT_MODEL 1
@@ -350,10 +346,7 @@ UINT32 _ReadAmmoTypes(void)
 
 	FileName[0] = Buffer[0] = 0;
 
-#if defined(USE_OSG)
-#else
 	OBJECT * Object;
-#endif
 
 logTimerBeginMacro();
 	_NumAmmoTypes = 0;
@@ -458,8 +451,6 @@ logTimerBeginMacro();
                         AmmoType->TracerScale = (FLOAT32)atof((char*)VarContents);
                         break;
 					case WEAP_AMMOVAR_OBJECT:
-#if defined(USE_OSG)
-#else
 						if (strcmp((char*)VarContents,"bullet1") == 0)
 						{
 							AmmoType->UseParticlesForTracer = 1;
@@ -503,7 +494,6 @@ logTimerBeginMacro();
                             SetNull setnull;
                             setnull.Apply(Object);
                          }
-#endif
 						break;
 					case WEAP_AMMOVAR_EXPLOSIVEENERGY:
 						AmmoType->ExplosiveEnergy = (FLOAT32)atof((char*)VarContents);
@@ -696,20 +686,6 @@ logTimerEndMacro();
 
 	return 0;
 }
-
-#if defined(USE_OSG)
-
-/************************************************************************************************
-	weapAmmoInit
-*************************************************************************************************/
-
-UINT32 weapAmmoInit(void)
-{
-	return _ReadAmmoTypes();
-}
-
-
-#else
 
 /************************************************************************************************
 	weapammo
@@ -2393,46 +2369,6 @@ UINT32 weapCollideRoundWithVehicles(FASTCOLLIDE ** CollideListPtr,
 
 		if (Collision != 0)
 		{
-#ifdef DOROTHY
-			if (CurrentVehicle->VehicleObjectData->PlaneObject->flag3 & OBJECT_IS_GR2VEHICLE)
-			{
-				// gr2 vehicles don't collide like regular vehicles
-				if (UseHitBoxInstead) continue;
-
-				collisionOccurred = gr2DoWeaponCollision(CurrentVehicle, &UseOldPos, &UseNewPos, (SINT32*)&location, &CollisionPnt);
-
-				CollisionPnt.z = -CollisionPnt.z;
-
-				if (collisionOccurred)
-				{
-					mathSubVectors(&TempVec,&UseNewPos,&UseOldPos);
-					Dist1 = mathExactVectorLength(&TempVec);
-					TempVec = CollisionPnt;
-					math3dVectorMultiply(&TempVec,&TempVec,
-										&CurrentVehicle->VehicleObjectData->PlaneObject->mat);
-					mathSubVectors(&TempVec,&TempVec,&UseOldPos);
-					Dist2 = mathExactVectorLength(&TempVec);
-					if (Dist2 < Dist1 &&
-						*NumCollisionSlotsLeft > 0)
-					{
-						TempCollideListPtr = *CollideListPtr;
-						TempCollideListPtr->Flags |= _AMMOCD_FLAG_ISPERSONA;
-						TempCollideListPtr->CollideObject = CurrentVehicle->VehicleObjectData->PlaneObject;
-						TempCollideListPtr->TopLevelObject = (OBJECT*)CurrentVehicle;
-						TempCollideListPtr->CollideTime = (FLOAT32)(Dist2 / Dist1);
-						TempCollideListPtr->CollidePnt = CollisionPnt;
-						math3dInvertMatrix(&InvMat,&CurrentVehicle->VehicleObjectData->PlaneObject->mat);
-						math3dVectorMultiply(&TempCollideListPtr->OldPos,&UseOldPos,&InvMat);
-						math3dVectorMultiply(&TempCollideListPtr->NewPos,&UseNewPos,&InvMat);
-						TempCollideListPtr->Alpha = 1.0f;
-						TempCollideListPtr->PolyNum = location;
-						(*CollideListPtr)++;
-						(*NumCollisionSlotsLeft)--;
-					}
-				}
-			}
-			else
-#endif
 			if (CurrentVehicle->VehicleObjectData->PlaneObject->flag2 & OBJECT_ANIMATION)
 			{
 				// infantry don't collide like regular vehicles
@@ -3504,13 +3440,6 @@ static UINT32 _DoImprovedShrapnel(weapAmmo* Ammo, FLOAT64VECTOR const* InPos, FL
 			shrapTargetInfo.radius = shrapTargetInfo.radius/2;
 			shrapTargetInfo.targetPos.z += shrapTargetInfo.radius;
 		}
-#ifdef DOROTHY
- 		else if(CurrentVehicle->VehicleType->Type == VEH_TYPE_MECH)
-		{
-			shrapTargetInfo.radius = shrapTargetInfo.radius/2;
-			shrapTargetInfo.targetPos.z += shrapTargetInfo.radius;
-		}
-#endif
 
 		shrapList.push_back(shrapTargetInfo);
 	}
@@ -3878,9 +3807,6 @@ static UINT32 _DoExplosionConcussion(weapAmmo* Ammo, FLOAT64VECTOR const* InPos,
 	PlayerVehicle = persGetPersonaVehiclePtr();
 
     // Leave here to guarantee visible concussion effect
-#ifdef DOROTHY
-	if(PlayerVehicle && PlayerVehicle->VehicleType->Type != VEH_TYPE_MECH)
-#endif
 	{
 		persSetConcussionEffect(Ammo);
 	}
@@ -4040,12 +3966,6 @@ static UINT32 _DoExplosionConcussion(weapAmmo* Ammo, FLOAT64VECTOR const* InPos,
 			{
 				Pos.z -= 1.0f; // FPS center is at the feet, need to adjust for this
 			}
-#ifdef DOROTHY
-			else if (CurrentVehicle->VehicleType->Type == VEH_TYPE_MECH)
-			{
-				Pos.z -= 3.0f; // FPS center is at the feet, need to adjust for this
-			}
-#endif
 
 			if (Ammo->VehicleData == NULL)
 			{
@@ -4183,42 +4103,6 @@ static UINT32 _DoExplosionConcussion(weapAmmo* Ammo, FLOAT64VECTOR const* InPos,
 					weapAmmoApplyDamageToVehicleComponent(Ammo, CurrentVehicle, 29, Damage, Ammo->Id);	// leg
 				}
 			}
-#ifdef DOROTHY
-			else if (CurrentVehicle->VehicleType->Type == VEH_TYPE_MECH)
-			{
-				/*
-				mathSubVectors(&TempVec,&Pos,&Epicenter);
-				TempNum = (FLOAT32)mathExactVectorLength(&TempVec);
-				if (TempNum < 0.01f)
-				{
-					TempNum = 0.01f;
-				}
-				TempNum *= 95.0f;
-
-				Damage = Energy / (TempNum * TempNum);
-				if (Damage > Energy)
-				{
-					Damage = Energy;
-				}
-
-				// modify the resulting damage by the fps concussion mod
-				Damage *= fpFPSGetConcussionMod();
-
-				if (Damage > 10.0f)
-				{
-					Write_Log(LOG_WEAP, LOG_INFO, "WEAP Concussion to %s(%s) at %.1fm",
-								CurrentVehicle->VehicleType->Id, CurrentVehicle->Handle, (FLOAT32)mathExactVectorLength(&TempVec));
-//					for (i=0;i<4;i++)
-//						weapAmmoApplyDamageToVehicleComponent(Ammo, CurrentVehicle, i+1, Damage, Ammo->Id);
-					// replace one hack with another
-					weapAmmoApplyDamageToVehicleComponent(Ammo, CurrentVehicle, 5, Damage, Ammo->Id);	// head
-					weapAmmoApplyDamageToVehicleComponent(Ammo, CurrentVehicle, 1, Damage, Ammo->Id);	// torso
-					weapAmmoApplyDamageToVehicleComponent(Ammo, CurrentVehicle, 20, Damage, Ammo->Id);	// arms
-					weapAmmoApplyDamageToVehicleComponent(Ammo, CurrentVehicle, 29, Damage, Ammo->Id);	// leg
-				}
-				*/
-			}
-#endif
 			else
 			{
 				weapUpdateVehicleHitmap(CurrentVehicle);
@@ -5552,7 +5436,6 @@ static LOGICAL _StickTorpedoToWater(weapAmmo* Ammo)
 	return KillAmmo;
 }
 
-#endif
 
 #define AVERAGE_STO_LAG 350
 

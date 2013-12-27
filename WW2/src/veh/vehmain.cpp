@@ -96,11 +96,6 @@
 #include "strt/strtClientMessages.h"
 #include "strt/strtCPFlags.h"
 
-#ifdef DOROTHY
-#include "gr2/gr2Main.h"
-#include "mech/MechVehicle.h"
-#endif
-
 #ifdef TESTMAC
 //extern "C" void spawningin();
 //extern "C" void spawningout();
@@ -206,9 +201,6 @@ static UINT32 _CheckForDamage(vehVehicle* CurrentVehicle);
 static UINT32 _SendDamageUpdate(vehVehicle* CurrentVehicle, vehDamageQue * DQ);
 static void _sendSTODamage(vehVehicle*veh, vehDamageQue* que);
 static void	_LoadInfantryVehicle(vehVehicle* Vehicle);
-#ifdef DOROTHY
-static void _LoadMechVehicle(vehVehicle* Vehicle);
-#endif
 
 UINT32 _UpdateVehicleBoundingBox(mlObjectData* ObjectData,OBJECT * PlaneObject);
 static UINT32 _UpdateVehicleBoundingBox1(mlObjectData* ObjectData,OBJECT * PlaneObject,UINT32* FirstBBox);
@@ -379,13 +371,7 @@ static void _ReadComponentFiles(void)
 
 		if(mlcomponReadDamageComponents(&compList, (UCHAR*)fileName, (UCHAR*)"", i, veh) != 0)
 		{
-#ifdef DOROTHY
-			if(veh->Type != VEH_TYPE_PERSON &&
-			   veh->Type != VEH_TYPE_FLOATER &&
-			   veh->Type != VEH_TYPE_MECH)
-#else
 			if(veh->Type != VEH_TYPE_PERSON && veh->Type != VEH_TYPE_FLOATER)
-#endif
 			{
 				char str[256];
 				snprintf(str, 255, "_ReadComponentFiles: Can't open component file: %s", fileName);
@@ -429,10 +415,8 @@ UINT32 vehInit(void)
 {
 	if(vehtypeInit() !=0 ) return 1;
 
-#if !defined(USE_OSG)
 	if(!LowMemorySystem && !NoBlitzWorPreload)
 		_ReadComponentFiles();
-#endif
 
 	_NumVehicles = 0;
 
@@ -746,15 +730,6 @@ UINT32 RetValue;
 				return 1;
 			}
 		}
-#ifdef DOROTHY
-		else if (Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-		{
-			if (!gr2InitVehicle(Vehicle))
-			{
-				return 1;
-			}
-		}
-#endif
 	}
 
 	Vehicle->ModelData->MultiCrewPos = MultiCrewPos;
@@ -1429,10 +1404,6 @@ UINT32 vehUpdate(void)
 
 			if(CurrentVehicle->VehicleType->Type == VEH_TYPE_PERSON) // infantry load immediately
 				_LoadInfantryVehicle(CurrentVehicle);
-#ifdef DOROTHY
-			else if(CurrentVehicle->VehicleType->Type == VEH_TYPE_MECH)
-				_LoadMechVehicle(CurrentVehicle);
-#endif
 			else
 				vehloadCreateVehicleInstance(CurrentVehicle, FALSE);
 		}
@@ -1707,11 +1678,7 @@ UINT32 _UpdateVehicleObject(vehVehicle* Vehicle)
                 FLOAT64VECTOR vel = VehicleData->VehicleRealVel;
 
                 // Reverse x/z velocities for troopers to avoid 'walking twitch bug'
-#ifdef DOROTHY
-				if(persIsPersonaVehicleType(VEH_TYPE_PERSON) || persIsPersonaVehicleType(VEH_TYPE_MECH))
-#else
                 if(persIsPersonaVehicleType(VEH_TYPE_PERSON))
-#endif
                 {
                     vel.x = -vel.x;
                     vel.z = -vel.z;
@@ -3616,14 +3583,6 @@ UINT32 vehExitVehicle(SINT32 Param,UINT32 Id,UINT32 Detach)
 	SINT32 ExitStatus = 0;
 	FULL_OBJ_ID rtbFacilityID;
 
-#ifdef DOROTHY
-	if(Vehicle->VehicleType->Type == VEH_TYPE_MECH && gr2IsAnimVehicle(Vehicle))
-	{
-		MechVehicle* mech = dynamic_cast<MechVehicle*>(gr2GetVehicle(Vehicle));
-		if(mech) mech->ClearTarget();
-	}
-#endif
-
 	// clear our mobile spawn flag
 	/* new mobile spawn functionality
 	if(vehmainIsDeployed() && VehicleData->MultiCrewPos < 2)
@@ -4103,19 +4062,6 @@ static void _LoadInfantryVehicle(vehVehicle* Vehicle)
 
 	Vehicle->LoadVehicle = 0;
 }
-
-#ifdef DOROTHY
-static void _LoadMechVehicle(vehVehicle* Vehicle)
-{
-	if(!Vehicle || !Vehicle->LoadVehicle) return;
-
-	vehupdateCreateVehicleLoadObjectPortion(Vehicle,0);
-	//fpProcessVehicleAnimationFlags(Vehicle);
-	gr2InitVehicle(Vehicle);
-
-	Vehicle->LoadVehicle = 0;
-}
-#endif
 
 #define _ARMYBASE_DIST 500.0f
 #define _AIRBASE_DIST 1000.0f
@@ -4871,11 +4817,6 @@ UINT32 vehApplyDamageToVehicleComponent(vehVehicle* Vehicle,
 	{
 		_lastInfantryDamaged = 0;
 	}
-
-#ifdef DOROTHY
-	if(Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-		Vehicle->DamageQue.isImportant[ComponentNum] = 1; // as is infantry
-#endif
 
 // If we're below the damage threshold, set energy and isImportant to 0.
 	if(Energy < Vehicle->VehicleType->DamageThreshold[ComponentNum-1])
@@ -6350,12 +6291,9 @@ SINT32 vehmainRequestAmmo(const char* input)
 void _resetBombBayDoors()
 {
     mlVehicleData* vd = persGetPersonaModelDataPtr();
-    if(!vd) return;
-
-    if(vd->BombBayDoor == 1)
-    {
-        mlToggleBombBayDoor(1, 0, 0);
-    }
+	if (vd && vd->BombBayDoor == 1) {
+			mlToggleBombBayDoor(1, 0, 0);
+	}
 }
 
 /************************************************************************************************
@@ -6389,7 +6327,7 @@ static void _FetchSupercell (int x, int y, TERRAIN_DETAIL** td)
 
 UINT32 vehmainDetermineComponentKiller(mlComponent* killedComponent)
 {
-	if(!killedComponent)
+	if(PN_UNLIKELY(!killedComponent))
 		return 0;
 
 	// using a reverse iterator, scan the list of hit messages until we find one
@@ -7128,7 +7066,6 @@ std::string& vehVehiclesGameInfo()
 
 UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZero)
 {
-#ifndef DOROTHY
 	if(!keyState) return 0;
 	if(Online) return 0;
 
@@ -7428,7 +7365,6 @@ UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZer
             break;
         }
     }
-#endif
 
     return 0;
 }

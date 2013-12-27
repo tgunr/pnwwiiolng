@@ -1479,7 +1479,7 @@ bool physicsCollider::isCollidable(UINT32 cflags)
 
 int physicsCollider::createMesh(const void* Vertices, int VStride, int VCount, const void* Indices, int IStride, int ICount, void* userdata, piMATRIX* transform)
 {
-	if(!ICount)
+	if(PN_UNLIKELY(!ICount))
 		return -1;
 
 	// create our trimesh
@@ -1660,7 +1660,7 @@ physicsObjectCollider::~physicsObjectCollider()
 int physicsObjectCollider::create(OBJECT* o, piMATRIX* transform)
 {
 	// create our collider if we have some vertices
-	if(o && o->numtris)
+	if(PN_LIKELY(o && o->numtris))
 	{
 		return createMesh(o->RenderPositions().ptr,
 								 sizeof(piUNIFIED_VERTEX),

@@ -250,11 +250,6 @@ void radclutterUpdate()
         return;
     }
 
-#ifdef DOROTHY
-	if(!persIsPersonaVehicleType(VEH_TYPE_MECH))
-        return;
-#endif
-
     if(_dirty)
     {
         // Enabled set in gmlpmain each frame

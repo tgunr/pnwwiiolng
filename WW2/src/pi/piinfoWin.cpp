@@ -3,15 +3,8 @@
 #include "dd/dx3dinfo.h" // windows only
 #include "cfg/cfgCodes.h"
 
-#if defined(USE_OSG)
-#include <osg/GLExtensions>
-#include <osg/GL2Extensions>
-#include <osgUtil/SceneView>
-#include "osg/osgMain.h"
-#else
 #include "osgImport/FrameBufferObject.h"
 #include "gl/Glew.h"
-#endif
 
 #include "ui/uiMain.h"
 
@@ -94,30 +87,22 @@ bool piinfoIsSupportedPref(int type)
 	{
 		case cfgH2O_REFLECTIONS:
             {
-#if defined(USE_OSG)
-                supported = true;
-#else
                 FBOExtensions* ext = FBOExtensions::instance(0, true);
 
                 if(ext->isSupported() && piinfoIsSupportedPref(cfgENABLE_H2O_SHADERS))
                 {
                     supported = true;
                 }
-#endif
 			    break;
             }
 		case cfgH2O_REFRACTIONS:
             {
-#if defined(USE_OSG)
-                supported = true;
-#else
                 FBOExtensions* ext = FBOExtensions::instance(0, true);
 
                 if(ext->isSupported() && piinfoIsSupportedPref(cfgENABLE_H2O_SHADERS))
                 {
                     supported = true;
                 }
-#endif
 			    break;
             }
 		case cfgPOST_RENDER_FILTER:
@@ -133,21 +118,13 @@ bool piinfoIsSupportedPref(int type)
             }
 		case cfgENABLE_H2O_SHADERS:
 		case cfgNORMAL_MAPS:
-#if defined(USE_OSG)
-            supported = true;
-#else
 			supported = GLEW_ARB_fragment_program &&
                         GLEW_ARB_vertex_program &&
                         GL_ARB_fragment_shader;
-#endif
 			break;
 		case cfgGRASS_SHADER:
-#if defined(USE_OSG)
-            supported = true;
-#else
 			supported = GLEW_ARB_vertex_program &&
                         GLEW_ARB_fragment_program;
-#endif
 			break;
 		case cfgWANT_SSE2:
 		{
@@ -313,42 +290,4 @@ const TCHAR* piinfoClipboard(const TCHAR* in)
 	}
 
 	return out;
-}
-
-bool piinfoIsMinOS(PI_OS os, unsigned int minMajorVersion, unsigned int minMinorVersion)
-{
-	if(os == PI_OS_PC)
-	{
-		OSVERSIONINFO osvi;
-
-		ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
-		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-
-		if(GetVersionEx(&osvi))
-		{
-			if(osvi.dwMajorVersion >= minMajorVersion && osvi.dwMinorVersion >= minMinorVersion)
-				return true;
-		}
-	}
-
-	return false;
-}
-
-bool piinfoIsMaxOS(PI_OS os, unsigned int maxMajorVersion, unsigned int maxMinorVersion)
-{
-	if(os == PI_OS_PC)
-	{
-		OSVERSIONINFO osvi;
-
-		ZeroMemory(&osvi, sizeof(OSVERSIONINFO));
-		osvi.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-
-		if(GetVersionEx(&osvi))
-		{
-			if(osvi.dwMajorVersion <= maxMajorVersion && osvi.dwMinorVersion <= maxMinorVersion)
-				return true;
-		}
-	}
-
-	return false;
 }

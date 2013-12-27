@@ -512,7 +512,6 @@ static void _loadSpawnXML(const char* file)
     xmlCleanupInputCallbacks();
 }
 
-#ifndef DOROTHY
 static void _SetupFlagObject(OBJECT& Object)
 {
 	// UINT32 flagnum forces overflow on values less than '0'.
@@ -565,14 +564,12 @@ static void _ScanAndSetupFlags(OBJECT* Object)
 	}
 	while (Object != NULL);
 }
-#endif
 
 UINT32 trncdInit(void)
 {
 	trnmainSetObjectCreationCallback(trncdAddTerrainObject);
 	trnmainSetObjectDeletionCallback(trncdRemoveTerrainObject);
 
-#ifndef DOROTHY
 	if(!obmgrCreateModelInstance("flagtable1"))
 	{
 		Write_Debug("Unable to load terrain object flag file");
@@ -591,7 +588,6 @@ UINT32 trncdInit(void)
 
 	_ScanAndSetupFlags(_FlagObject);
 	obmainSetFlagsInThisTree(_FlagObject,OBJECT_SKIPDRAWING);
-#endif
 
 	for (int i=0;i<_MAX_STRAT_MESSAGE_QUE;i++)
 	{

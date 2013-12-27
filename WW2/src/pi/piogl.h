@@ -4,16 +4,8 @@
 static_assert( platBuild != TEUL_SERVER, "Can't include piogl.h in a server build." );
 #endif
 
-#if defined(USE_OSG)
-#include <osg/GLExtensions>
-#include <osg/GL2Extensions>
-#include <osg/Texture>
-#include <osg/TexEnvCombine>
-#include <osg/Image>
-#else
 #include "gl/glew.h"
 #include "gl/glplat.h"
-#endif
 
 #define USE_LINEAR_FOG
 //#define USE_EXP_FOG
@@ -1443,7 +1435,7 @@ extern LOGICAL piSetUnscaledViewMatrix(piMATRIX* lpNewView);
 extern LOGICAL	piSetFieldOfView(FLOAT32 fov, FLOAT32 zmin, FLOAT32 zmax);
 extern LOGICAL piBeginScene(void);
 extern LOGICAL piEndScene(void);
-extern LOGICAL piSetRenderState(int StateType, UINT32 State);
+extern void piSetRenderState(int StateType, UINT32 State);
 extern LOGICAL piDisplayRenderStates(void);
 extern LOGICAL piSetLightState(SINT32 lightnum, UINT32 State);
 extern LOGICAL	piUpdate(void);

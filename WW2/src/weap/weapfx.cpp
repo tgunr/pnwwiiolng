@@ -1067,11 +1067,7 @@ UINT32 weapfxAmmoHit(weapAmmo const* Ammo,
 
 		mathAddVectors(&Pos, &Pos, &WorldOriginOffset); Pos.z = -Pos.z;
 
-#ifdef DOROTHY
-		if (Vehicle->VehicleType->Type != VEH_TYPE_PERSON && Vehicle->VehicleType->Type != VEH_TYPE_MECH)
-#else
 		if (Vehicle->VehicleType->Type != VEH_TYPE_PERSON)
-#endif
 		{
 			if(lpFast->CollideObject)
 				Norm = lpFast->CollideObject->psnorms[lpFast->PolyNum];
@@ -1128,10 +1124,6 @@ UINT32 weapfxAmmoHit(weapAmmo const* Ammo,
 					gr2AnimAddTwitch (Vehicle->VehicleObjectData->PlaneObject);
 				}
 			break;
-#ifdef DOROTHY
-			case VEH_TYPE_MECH:
-			break;
-#endif
 			case VEH_TYPE_AIR:
 				if(Vehicle != PlayerVehicle)
 				{
@@ -1181,11 +1173,7 @@ UINT32 weapfxAmmoHit(weapAmmo const* Ammo,
 		}
 	}
 
-#ifdef DOROTHY
-	if(Vehicle == NULL || (Vehicle->VehicleType->Type != VEH_TYPE_PERSON && Vehicle->VehicleType->Type != VEH_TYPE_MECH))
-#else
 	if(Vehicle == NULL || Vehicle->VehicleType->Type != VEH_TYPE_PERSON)
-#endif
 	{
 		piVECTOR u;
 
@@ -1755,9 +1743,6 @@ UINT32 weapfxAmmoMuzzleFlash(weapAmmo const* Ammo,
 			switch(pVeh->VehicleType->Type)
 			{
 			case VEH_TYPE_PERSON:
-#ifdef DOROTHY
-			case VEH_TYPE_MECH:
-#endif
 			case VEH_TYPE_AIR:
 				{
 					bNewMuzzleFlash = TRUE;
@@ -2813,11 +2798,7 @@ UINT32 weapfxAmmoHitMark(weapAmmo const* Ammo,
 		if(pVeh->VehicleType != NULL)
 		{
 			// No hit marks on troops
-#ifdef DOROTHY
-			if(pVeh->VehicleType->Type == VEH_TYPE_PERSON || pVeh->VehicleType->Type == VEH_TYPE_MECH)
-#else
 			if(pVeh->VehicleType->Type == VEH_TYPE_PERSON)
-#endif
 				return 0;
 		}
 	}

@@ -81,10 +81,6 @@ enum
 /************************************************************************************************
 	weapType
 *************************************************************************************************/
-#if defined(USE_OSG)
-namespace osg { class Node; }
-#endif
-
 struct weapAmmoType
 {
 	UCHAR Name[32];
@@ -155,12 +151,7 @@ struct weapAmmoType
 	FLOAT32 GrenadeOrient;
 	FLOAT32 GrenadeRestitution;
 
-#if defined(USE_OSG)
-	osg::Node* Object;
-	char ObjectName[32];
-#else
 	OBJECT* Object;
-#endif
 };
 
 struct weaponType
@@ -183,13 +174,8 @@ struct weaponType
 	FLOAT32 InfResupply; // 0 - 1 float that indicates a percent of total ammo to fill on inf resupply
 	SINT32 ClipType; // defaults to clip (0)
 
-#if defined(USE_OSG)
-	weapAmmoType const* AmmoType[WEAP_MAX_AMMO_TYPE];
-	weapAmmoType const* GhostAmmoType;
-#else
 	weapAmmoType* AmmoType[WEAP_MAX_AMMO_TYPE];
 	weapAmmoType* GhostAmmoType;
-#endif
 };
 
 extern void weapTypeInit();

@@ -289,7 +289,6 @@ FASTCOLLIDE TempCollide;
 	return 0;
 }
 
-#if !defined(USE_OSG)
 SINT32 mlUtilityGetPosAndAttFromDOF(OBJECT* dofObj, piVECTOR const* relpos, piVECTOR* pos, piVECTOR* att)
 {
 	piMATRIX const* dofmatrix2 = NULL;
@@ -317,7 +316,7 @@ SINT32 mlUtilityGetPosAndAttFromDOF(OBJECT* dofObj, piVECTOR const* relpos, piVE
 
 	return 0;
 }
-#endif
+
 UINT32 mlUtilityCheckLineSphereCollide(UINT32 * Collision, piVECTOR const* SphereCenter,
 									piVECTOR const* UseOldPos, piVECTOR const* UseNewPos, FLOAT32 Radius)
 {

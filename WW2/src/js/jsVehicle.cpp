@@ -18,9 +18,6 @@ static const char* vehtypenames[VEH_MAXTYPE] =
 	"air",
 	"ground",
 	"sea"
-#ifdef DOROTHY
-	, "mech"
-#endif
 };
 
 JSClass jsVehtype::jsclass = JS_CLASS_MACRO("vehtype");

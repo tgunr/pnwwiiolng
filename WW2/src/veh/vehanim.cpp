@@ -765,14 +765,8 @@ FLOAT32 LastBombBayDoorPos;
 	}
 
 	// if fps set turret elevation
-#ifdef DOROTHY
-	if((Vehicle->VehicleType->Type == VEH_TYPE_PERSON ||
-		Vehicle->VehicleType->Type == VEH_TYPE_MECH) &&
-		Vehicle->Flags & VEH_FLAGS_UPDATESYSTEM_CONTROLLED)
-#else
 	if (Vehicle->VehicleType->Type == VEH_TYPE_PERSON &&
 		Vehicle->Flags & VEH_FLAGS_UPDATESYSTEM_CONTROLLED)
-#endif
 	{
 	FLOAT32 TempNum;
 	FLOAT32 TempNum1,TempNum2;

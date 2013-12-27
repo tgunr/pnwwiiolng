@@ -160,11 +160,7 @@ SINT32 commRecvWorldUpdateData(const SINT32 teulIndex, UCHAR* const data, SINT32
 
 	for(UINT32 i = 0; i < wu.header.numVehicles; i++)
 	{
-#ifdef USE_OSG
-		vehicleNetUpdateProessMsg(wu.vehUpdate[i]);
-#else
 		vehupdateProcessPositionUpdateMsg(&wu.vehUpdate[i]);
-#endif
 	}
 
 	clientWorldUpdate(teulIndex, &wu);

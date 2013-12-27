@@ -21,8 +21,6 @@ struct PIDeviceInfo
 typedef std::vector<PIDeviceInfo> DeviceList;
 typedef std::vector<std::string> InfoList;
 
-extern bool piinfoIsMinOS(PI_OS os, unsigned int minMajorVersion = 0, unsigned int minMinorVersion = 0);
-extern bool piinfoIsMaxOS(PI_OS os, unsigned int maxMajorVersion = 0xffffffff, unsigned int maxMinorVersion = 0xffffffff);
 extern bool piinfoGetVideoCards(DeviceList* list);
 extern bool piinfoGetSoundCards(DeviceList* list);
 extern bool piinfoGetSupportedResolutions(InfoList* list, int adaptor = 0);

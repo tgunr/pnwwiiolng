@@ -1,10 +1,6 @@
 #include <syscfg.h> // Path is project specific.
-#if defined(USE_OSG)
-#include <osg/GL2Extensions>
-#else
 #include "gl/glew.h"
 #include "gl/glplat.h"
-#endif
 
 #include "phui/Util.h"
 #include "phui/GraphicsContext.h"

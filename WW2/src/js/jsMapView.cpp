@@ -156,11 +156,7 @@ JSBool jsMapView::GetProperty(JSContext* ctx, int propid, jsval* val)
 				if(!_jsSelectedObject.valid() || _jsSelectedObject->_mapobj.ptr() != cp)
                 {
 #ifdef BETA_RELEASE
-#if defined(USE_OSG)
-                    OverrideSpawner = 0;
-#else
 					OverrideSpawner = NO_OVERRIDE;
-#endif
 #endif
 					_jsSelectedObject = new jsCPObject(cp);
                 }

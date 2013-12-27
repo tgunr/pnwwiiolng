@@ -490,11 +490,7 @@ LOGICAL fxSndSetListenerPosAndVel()
 
     persGetPlayerVelocity(&vecVel);
 
-#ifdef DOROTHY
-    if(persIsPersonaVehicleType(VEH_TYPE_PERSON) || persIsPersonaVehicleType(VEH_TYPE_MECH))
-#else
 	if(persIsPersonaVehicleType(VEH_TYPE_PERSON))
-#endif
     {
         // Even our velocities are turned around. This makes direct sound
         // pitch correctly. This was discovered by working on 2D sounds.
@@ -509,24 +505,6 @@ LOGICAL fxSndSetListenerPosAndVel()
     sndsSetListener3DVel(&vecVel, DEF_DEFERRED);
     sndsSetListener3DPos(&vecPos, DEF_DEFERRED);
 
-#if FRES
-	piVECTOR up = {0,0,-1};
-	piVECTOR vecFront = {0,1,0};
-
-	vehVehicle* Vehicle = persGetPersonaVehiclePtr();
-	if(Vehicle && Vehicle->ModelData)
-	{
-		math3dMultiplyRotation(&vecFront, &vecFront, &Vehicle->ModelData->VehicleAttMat);
-		vecFront.z = -vecFront.z; // ah yes random z-flip
-	}
-#if platOS != OS_WIN32
-    vecFront.x = -vecFront.x;
-    vecFront.y = -vecFront.y;
-    vecFront.z = -vecFront.z;
-#endif
-
-	sndsSetOrientation(&vecFront, &up, DEF_DEFERRED);
-#else
     piVECTOR vecFront = playdir;
 
 #if(platOS != OS_WIN32)
@@ -540,7 +518,6 @@ LOGICAL fxSndSetListenerPosAndVel()
 #else
 	sndsSetOrientation(&vecFront, &playup, DEF_DEFERRED);
 #endif // XAUDIO
-#endif
     logTimerEndMacro();
 
     return TRUE;

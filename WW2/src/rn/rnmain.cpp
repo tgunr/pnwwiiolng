@@ -100,10 +100,6 @@
 #include "mc/multiClient.h"
 #endif
 
-#ifdef DOROTHY
-#include "gr2/gr2Main.h"
-#endif
-
 //#define USE_VTUNE
 
 #define _DUMP_STRAT_TRANSLATIONS
@@ -592,9 +588,6 @@ LOGICAL rnmainInit(void)
 
 	uiPostInit();
 
-#ifdef DOROTHY
-	uiLoadView("dorothy/main");
-#else
 	if(!Online)
 	{
 		uiLoadView("offline");
@@ -617,13 +610,8 @@ LOGICAL rnmainInit(void)
 		else
 			uiLoadView("online");
 	}
-#endif //DOROTHY
 
 	uiChatShow();
-
-#ifdef USE_GAME_ADVERTISING
-    adPreloadAds();
-#endif
 
 	// make sure devices get detected
 	// testing for now
@@ -631,10 +619,6 @@ LOGICAL rnmainInit(void)
 	dimainInit();
 	imapLoadPresets();
 	// end testing
-
-#ifdef DOROTHY
-	gr2MainInit();
-#endif
 
 #ifdef MULTI_CLIENT
 	multiClientInit();

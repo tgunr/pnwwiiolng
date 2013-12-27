@@ -40,10 +40,6 @@ enum
 
 typedef void (*WEAP_FIRE_CALLBACK)(struct weapWeapon * Weapon);
 
-#if defined(USE_OSG)
-class Weapon;
-#endif
-
 struct weapWeapon
 {
 	weaponType * WeaponType;
@@ -71,27 +67,16 @@ struct weapWeapon
 		, ReloadStartTime(0.0f)
 		, WeaponFireType(0)
 		, Displacement(0.0f)
-#if defined(USE_OSG)
-		, weapon(0)
-#endif
 	{
 		memset(BeltSequence, 0x0, sizeof(BeltSequence));
 		memset(BeltName, 0x0, sizeof(BeltName));
 	}
-
-#if defined(USE_OSG)
-	Weapon* weapon;
-#endif
 };
 struct vehVehicle;
 
 extern SINT32 weaponsInit(void);
 extern UINT32 weaponsKill(void);
-extern UINT32 weapInitializeWeapon(weapWeapon * Weapon,weaponType * WeaponType
-#if defined(USE_OSG)
-, struct vehVehicle*, int MountNum, int weapIdx
-#endif
-);
+extern UINT32 weapInitializeWeapon(weapWeapon * Weapon,weaponType * WeaponType);
 extern UINT32 weapFindWeaponTypeByName(weaponType ** WeaponType,UCHAR * WeaponName);
 extern UINT32 weapCreateWeaponByName(weapWeapon * Weapon,
 									  UCHAR * WeaponName);

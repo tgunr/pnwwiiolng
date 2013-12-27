@@ -25,16 +25,10 @@
 
 #include "ddp.h"
 
-#if !defined(USE_OSG)
 #include "gl/wglew.h"
-#endif
 
 //#define GLOBALS
 //#undef GLOBALS
-
-#if defined(USE_OSG)
-#include "osg/osgGame.h"
-#endif
 
 extern void wwiiSendUserAbortedApp();
 
@@ -651,9 +645,7 @@ void ddpKill(void)
 		ddkillfunc();
 	}
 
-#if !defined(USE_OSG)
 	rnmainKill();
-#endif
 
 	strpoolKill();
 
@@ -904,9 +896,6 @@ RECT		rect, wrect;
 	IMEBase* ime = imeClient();
 	if(ime) ime->Init();
 
-#if defined(USE_OSG)
-	if(!osgGameInit()) return FALSE;
-#else
 	if (!rnmainInit())
 	{
 		return(FALSE);
@@ -919,7 +908,6 @@ RECT		rect, wrect;
     if(wglSwapIntervalEXT)
 	    wglSwapIntervalEXT(gSupportSwapInterval);
 
-#endif
 	return(TRUE);
 }
 
@@ -1328,19 +1316,12 @@ LOGICAL		retval, *running;
 	ddpSetDDKill(NULL);//oglKill);
 
 	ddpSetD3DInit(piInit);
-#if defined(USE_OSG)
-	ddpSetD3DRender(osgGameUpdate);
-#else
 	ddpSetD3DRender(gmlpMainUpdate);
-#endif
 	ddpSetD3DKill(piKill);
 
 	if (!ddpCreateWnd(WantedX, WantedY, WantedWidth, WantedHeight, WantedBpp, WantedWindow ? DDWND_FULLWINDOW : DDWND_FULLSCREEN, NULL))
 	{
-#if defined(USE_OSG)
-#else
 		ddpKill();
-#endif
 		return(0);
 	}
 

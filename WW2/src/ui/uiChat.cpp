@@ -662,11 +662,7 @@ void uiChatShow()
 {
 	if(!_chatwin)
 	{
-#ifdef DOROTHY
-		_chatwin = uiLoadView("dorothy/chat");
-#else
 		_chatwin = uiLoadView("chat");
-#endif
 
 		if(_chatwin)
 		{

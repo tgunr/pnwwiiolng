@@ -26,10 +26,6 @@
 #include "scen/ScenarioManager.h"
 #include "ez/EZManager.h"
 
-#ifdef DOROTHY
-#include "gr2/gr2Main.h"
-#endif
-
 typedef struct tagvehCntrlCommandListElement
 {
 	UCHAR CommandName[32];
@@ -251,41 +247,6 @@ vehCntrlCommandListElement vehCntrlCommandList[] =
 	{"changefov",						IMAP_TMP_CHANGE_FOV,							NULL,							VEH_CNTRL_IS_SPECIAL},
 	{"toggleinternalexternalviews",		IMAP_MOM_TOGGLE_INTERNAL_EXTERNAL_VIEWS,		NULL,							VEH_CNTRL_IS_SPECIAL},
 
-#ifdef DOROTHY
-	{"mechforward",			IMAP_MECH_FORWARD,		gr2ProcessControlInputs,		VEH_CNTRL_ISHOLDDOWN},
-	{"mechbackward",		IMAP_MECH_BACKWARD,		gr2ProcessControlInputs,		VEH_CNTRL_ISHOLDDOWN},
-	{"mechforwardauto",		IMAP_MECH_FORWARD_AUTO,	gr2ProcessControlInputs,		VEH_CNTRL_ISHOLDDOWN},
-	{"mechturbo",			IMAP_MECH_TURBO,		gr2ProcessControlInputs,		VEH_CNTRL_ISHOLDDOWN},
-	{"mechcrouch",			IMAP_MECH_CROUCH,		gr2ProcessControlInputs,		VEH_CNTRL_ISHOLDDOWN},
-	{"mechjump",			IMAP_MECH_JUMP,			gr2ProcessControlInputs,		VEH_CNTRL_ISHOLDDOWN},
-
-	{"mechfreelook",		IMAP_MECH_FREELOOK,		gr2ProcessControlInputs,		VEH_CNTRL_ISHOLDDOWN},
-	{"mechcamtraverse",		IMAP_MECH_CAM_TRAVERSE,	gr2ProcessControlInputs,		VEH_CNTRL_ISAXIS},
-	{"mechcamelevate",		IMAP_MECH_CAM_ELEVATE,	gr2ProcessControlInputs,		VEH_CNTRL_ISAXIS},
-	{"mechzoomlevel",		IMAP_MECH_ZOOM_LEVEL,	gr2ProcessControlInputs,		VEH_CNTRL_ISHOLDDOWN},
-
-	{"mechactivate1",		IMAP_MECH_ACTIVATE1,	gr2ProcessControlInputs,		VEH_CNTRL_ISHOLDDOWN},
-	{"mechactivate2",		IMAP_MECH_ACTIVATE2,	gr2ProcessControlInputs,		VEH_CNTRL_ISHOLDDOWN},
-	{"mechactiveup",		IMAP_MECH_ACTIVEUP,		gr2ProcessControlInputs,		VEH_CNTRL_ISHOLDDOWN},
-	{"mechactivedown",		IMAP_MECH_ACTIVEDOWN,	gr2ProcessControlInputs,		VEH_CNTRL_ISHOLDDOWN},
-
-	{"mechtarget",			IMAP_MECH_TARGET,		gr2ProcessControlInputs,		VEH_CNTRL_ISHOLDDOWN},
-	{"mechslow",			IMAP_MECH_SLOW,			gr2ProcessControlInputs,		VEH_CNTRL_ISHOLDDOWN},
-	{"mechslot0",			IMAP_MECH_SLOT0,		gr2ProcessControlInputs,		VEH_CNTRL_ISHOLDDOWN},
-	{"mechslot1",			IMAP_MECH_SLOT1,		gr2ProcessControlInputs,		VEH_CNTRL_ISHOLDDOWN},
-	{"mechslot2",			IMAP_MECH_SLOT2,		gr2ProcessControlInputs,		VEH_CNTRL_ISHOLDDOWN},
-	{"mechslot3",			IMAP_MECH_SLOT3,		gr2ProcessControlInputs,		VEH_CNTRL_ISHOLDDOWN},
-	{"mechslot4",			IMAP_MECH_SLOT4,		gr2ProcessControlInputs,		VEH_CNTRL_ISHOLDDOWN},
-	{"mechslot5",			IMAP_MECH_SLOT5,		gr2ProcessControlInputs,		VEH_CNTRL_ISHOLDDOWN},
-	{"mechslot6",			IMAP_MECH_SLOT6,		gr2ProcessControlInputs,		VEH_CNTRL_ISHOLDDOWN},
-	{"mechslot7",			IMAP_MECH_SLOT7,		gr2ProcessControlInputs,		VEH_CNTRL_ISHOLDDOWN},
-	{"mechslot8",			IMAP_MECH_SLOT8,		gr2ProcessControlInputs,		VEH_CNTRL_ISHOLDDOWN},
-	{"mechslot9",			IMAP_MECH_SLOT9,		gr2ProcessControlInputs,		VEH_CNTRL_ISHOLDDOWN},
-	{"mechtravelmode",		IMAP_MECH_TRAVEL_MODE,	gr2ProcessControlInputs,		VEH_CNTRL_ISHOLDDOWN},
-	{"mechtargetenemy",		IMAP_MECH_TARGET_ENEMY,		gr2ProcessControlInputs,	VEH_CNTRL_ISHOLDDOWN},
-	{"mechtargetfriendly",	IMAP_MECH_TARGET_FRIENDLY,	gr2ProcessControlInputs,	VEH_CNTRL_ISHOLDDOWN},
-	{"mechtargetclear",		IMAP_MECH_TARGET_CLEAR,		gr2ProcessControlInputs,	VEH_CNTRL_ISHOLDDOWN},
-#endif
     {"clonevehicle",		IMAP_CLONE_VEHICLE,	vehmainCloneVehicle,			VEH_CNTRL_ISHOLDDOWN},
 
 	{"ezmove",				IMAP_EZ_MOVE,		NULL,							VEH_CNTRL_ISAXIS},

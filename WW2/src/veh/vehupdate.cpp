@@ -54,10 +54,6 @@
 #include "cfg/cfgPrefs.h"
 #include "scen/ScenarioManager.h"
 
-#ifdef DOROTHY
-#include "gr2/gr2Main.h"
-#endif
-
 #define MAX_VIS_VEHICLES 128
 
 #define TIMEOUT_MS		300000	// 30000	// 30 sec to 5 minutes
@@ -141,11 +137,7 @@ UINT32 vehupdateCreatePlayerControlledVehicle(SINT32 VehicleNum,
 
 	*Vehicle->SquadHandle = 0;
 
-#ifdef DOROTHY
-	if(Vehicle->VehicleType->Type != VEH_TYPE_PERSON && Vehicle->VehicleType->Type != VEH_TYPE_MECH)
-#else
 	if(Vehicle->VehicleType->Type != VEH_TYPE_PERSON)
-#endif
 	{
 		vehloadCreateVehicleInstance(Vehicle, TRUE);
 	}
@@ -613,11 +605,7 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 	TurretMask = 0;
 	NumTurrets = 0;
 	// trooper turrets are handled differently (much simpler)
-#ifdef DOROTHY
-	if(trooper || Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-#else
 	if(trooper)
-#endif
 	{
 		for(i = 0; i <= 2; i++)
 		{
@@ -773,15 +761,6 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 		VehicleInfo.stateFlags0 = (UINT16)(animationFlags & 0xffff);
 		VehicleInfo.stateFlags1 = (UINT16)(animationFlags >> 16);
 	}
-#ifdef DOROTHY
-	else if (Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-	{
-		VehicleHdr.present |= (PR_STATE0|PR_STATE1);
-		gr2PackFlags(&VehicleHdr, &VehicleInfo);
-		//VehicleInfo.stateFlags0 = (UINT16)(Vehicle->AnimationBits & 0xffff);
-		//VehicleInfo.stateFlags1 = (UINT16)(Vehicle->AnimationBits >> 16);
-	}
-#endif
 
 	if (vehmainWaitingOnLogoutTimer())
 	{
@@ -933,13 +912,7 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 		}
 	}
 
-#ifdef DOROTHY
-	if (Vehicle->VehicleType->Type != VEH_TYPE_PERSON &&
-		Vehicle->VehicleType->Type != VEH_TYPE_MECH &&
-		VehicleHeader->present & PR_VEH_VIS)
-#else
 	if (Vehicle->VehicleType->Type != VEH_TYPE_PERSON && VehicleHeader->present & PR_VEH_VIS)
-#endif
 	{
 		for (i=32;i<64;i++)
 		{
@@ -1021,10 +994,6 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 
 	if (Vehicle->VehicleType && Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
 		ProcessInfantryAnimationFlags(Vehicle, VehicleHeader);
-#ifdef DOROTHY
-	else if (Vehicle->VehicleType && Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-		gr2UnpackFlags(Vehicle, VehicleHeader);
-#endif
 
 	if (!Rollover && (VehicleHeader->present & (PR_POSITION | PR_RELPOS)))
 	{
@@ -1395,11 +1364,7 @@ lastLowUpdateTime = frametime;
 	// maybe the host data isn't init'ed correctly or something
 	if (VehicleHeader->present & PR_TURRET && Vehicle->VehicleType != NULL)// && Vehicle->PosData.LastUpdateTime)
 	{
-#ifdef DOROTHY
-		if (Vehicle->VehicleType->Type == VEH_TYPE_PERSON || Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-#else
 		if (trooper)
-#endif
 		{
 			for (i=0; i<=2; i++)
 			{
@@ -1426,11 +1391,7 @@ lastLowUpdateTime = frametime;
 				{
 					for (i=0;i<ML_MAX_CREW_POSITIONS;i++)
 					{
-#ifdef DOROTHY
-						if ((Vehicle->VehicleType->TurretNum[i] == TurretNum + 1) || ((Vehicle->VehicleType->Type == VEH_TYPE_PERSON || Vehicle->VehicleType->Type == VEH_TYPE_MECH) && (TurretNum <= 1)))
-#else
 						if ((Vehicle->VehicleType->TurretNum[i] == TurretNum + 1) || ((trooper) && (TurretNum <= 1)))
-#endif
 						{
 							// ignore turret updates that the player controls
 							if (Vehicle->ModelData != NULL)
@@ -1444,11 +1405,7 @@ lastLowUpdateTime = frametime;
 								}
 							}
 
-#ifdef DOROTHY
-							if (Vehicle->VehicleType->Type == VEH_TYPE_PERSON || Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-#else
 							if (trooper)
-#endif
 							{
 #if defined(TURRET_GRANULARITY)
 								Vehicle->StateAnimation.TurretTraverse[i] = ((VehicleInfo->turret.pos[TurretNum].x / TURRET_GRANULARITY) * 2.0f) - 1.0f;
@@ -1597,11 +1554,7 @@ UINT32 vehupdateUpdateVehicle(vehVehicle* Vehicle)
 	{ // ground vehicles always stick to ground unless riding or hoisting
 		Vehicle->StickVehicleToGround = (Vehicle->RideVehicleHostIndex == 0);
 	}
-#ifdef DOROTHY
-	else if(Vehicle->VehicleType->Type != VEH_TYPE_MECH) // mech's handle this flag internally
-#else
 	else
-#endif
 	{
 		Vehicle->StickVehicleToGround = FALSE;
 	}
@@ -1684,11 +1637,7 @@ UINT32 vehupdateUpdateVehicle(vehVehicle* Vehicle)
 // Absolutely no idea why it works like this
 // Seems to be due to some retardation in the FPS math, but fixing it is
 // a real potential can of worms
-#ifdef DOROTHY
-if(Vehicle->VehicleType->Type == VEH_TYPE_PERSON || Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-#else
 if(Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
-#endif
 	PosData->Pos.x += -PosData->Vel.x * Delta;
 else
 	PosData->Pos.x += PosData->Vel.x * Delta;
@@ -1696,11 +1645,7 @@ else
 	PosData->Pos.y += PosData->Vel.y * Delta;
 	PosData->Pos.z += PosData->Vel.z * Delta;
 
-#ifdef DOROTHY
-if(Vehicle->VehicleType->Type == VEH_TYPE_PERSON || Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-#else
 if(Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
-#endif
 	PosData->LastUpdatePos.x += -PosData->LastUpdateVel.x * Delta1;
 else
 	PosData->LastUpdatePos.x += PosData->LastUpdateVel.x * Delta1;
@@ -1769,11 +1714,7 @@ else
 			Delta = 1.0;
 		}else
 		{
-#ifdef DOROTHY
-			if(Vehicle->VehicleType->Type == VEH_TYPE_PERSON || Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-#else
 			if(Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
-#endif
 			{
 			 	// Move the infantry to the correct position quicker.
 				//OGS- This doesn't look healthy,
@@ -2070,198 +2011,6 @@ SINT32			RecoilNum = 0;
 	if (Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
 		return 0;
 
-#ifdef DOROTHY
-	else if (Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-	{
-		/*
-		// shut down any weapon sounds if the weapon type has changed
-		gr2AnimGetCurrentWeapon(Vehicle->VehicleObjectData->PlaneObject,&i);
-
-		// i is -1 if the trooper isn't initialized yet
-		if (i < 0)
-			return 0;
-
-		SoundNum = i;
-		if ((SINT32)(i) != Vehicle->LastFPSWeaponNum)
-		{
-			// check for and shut down weapon sound
-			if (Vehicle->Weapons[Vehicle->LastFPSWeaponNum][0].WeaponType != NULL)
-			{
-				if (Vehicle->Weapons[Vehicle->LastFPSWeaponNum][0].WeaponType->FireType != WEAP_FIRETYPE_SINGLESHOT)
-				{
-					if (Vehicle->StateAnimation.MountSoundPlaying[Vehicle->LastFPSWeaponNum] == TRUE ||
-						Vehicle->StateAnimation.MountSoundId[Vehicle->LastFPSWeaponNum] != 0)
-					{
-						SoundNum = Vehicle->VehicleType->Loadout[Vehicle->LoadoutNum].MountSoundNum[Vehicle->LastFPSWeaponNum] - 1;
-						fxSndStopSound(Vehicle->StateAnimation.MountSoundId[i]);
-						Vehicle->StateAnimation.MountSoundPlaying[Vehicle->LastFPSWeaponNum] = FALSE;
-						Vehicle->StateAnimation.MountSoundId[i] = 0;
-
-						gr2AnimStopFiringWeapon (Vehicle);
-					}
-				}
-			}
-		}
-
-		Vehicle->LastFPSWeaponNum = i;
-
-		// only handles single-shot for now
-//		if (Vehicle->MountIsFiring[0] == TRUE)
-		if (gr2AnimIsWeaponFiring (Vehicle))
-		{
-			if (Vehicle->VehicleObjectData != NULL)
-			{
-				if (Vehicle->VehicleObjectData->PlaneObject != NULL)
-				{
-					if (!gr2AnimFireWeapon(Vehicle))
-					{
-						gr2AnimGetFirePointMatrix (Vehicle->VehicleObjectData->PlaneObject, &FirePointMatrix);
-
-						FlashPositionVector.x = FirePointMatrix._41;
-						FlashPositionVector.y = FirePointMatrix._42;
-						FlashPositionVector.z = FirePointMatrix._43;
-
-						TempMatrix = FirePointMatrix;
-						TempMatrix._41 = 0;
-						TempMatrix._42 = 0;
-						TempMatrix._43 = 0;
-
-						math3dMatrixMultiply(&TempMatrix, &TempMatrix, &Vehicle->PosData.AttMat);
-						mathVectorMultiply64(&FirePositionVector, &FlashPositionVector, &Vehicle->PosData.AttMat);
-						mathAddVectors(&FirePositionVector, &FirePositionVector, &(Vehicle->PosData.RenderPos));
-
-						if(!_isnan(FirePositionVector.x) && !_isnan(FirePositionVector.y) && !_isnan(FirePositionVector.z))
-						{
-							AmmoFlags = 0;
-							AmmoFlags |= WEAP_AMMOFLAG_USE_SHORTCOLLIDELIST;
-							AmmoFlags |= WEAP_AMMOFLAG_DONT_SEND_DAMAGE;
-	//						AmmoFlags |= WEAP_AMMOFLAG_CANTHITPLAYER;
-	//						AmmoFlags |= WEAP_AMMOFLAG_DONTCHECKVEHICLES;
-							AmmoFlags |= WEAP_AMMOFLAG_TPS_WEAPON;
-
-							FireDelta = (frametime - Vehicle->PosData.LastFireTime) / 1000.0;
-							if(Vehicle->PosData.LastFireTime == 0) FireDelta = 0.0f;
-							RecoilForce.x = RecoilForce.y = RecoilForce.z = 0.0;
-
-							gr2AnimGetCurrentWeapon(Vehicle->VehicleObjectData->PlaneObject,&i);
-
-							// i is -1 if the trooper isn't initialized yet
-							if (i < 0)
-								return 0;
-
-							weapFireWeapon(&RecoilForce,
-										&(Vehicle->Weapons[i][0]),
-										&FirePositionVector,
-										&vecVehicleVel,
-										&TempMatrix,
-										FireDelta,
-										frametime / 1000.0,
-										0,
-										1,
-										AmmoFlags,
-										NULL,
-										&FirePositionVector,
-										NULL,
-										Vehicle);
-
-							// used to be fabs(x,y,z) > 0.001
-							if ((RecoilForce.x * RecoilForce.x) > 0.00001 ||
-								(RecoilForce.y * RecoilForce.y) > 0.00001 ||
-								(RecoilForce.z * RecoilForce.z) > 0.00001)
-							{
-								fpFPSEjectShell (Vehicle->VehicleObjectData->PlaneObject, &TempMatrix, FALSE);
-
-								if (Vehicle->Weapons[i][0].WeaponType->FireType != WEAP_FIRETYPE_SINGLESHOT)
-								{
-									if (Vehicle->StateAnimation.MountSoundPlaying[i] == FALSE &&
-										Vehicle->StateAnimation.MountSoundId[i] == 0)
-									{
-                                        SINT32 iID = fxSndGetNewSound();
-
-                                        if(iID > 0)
-                                        {
-                                            FLOAT32 fMin, fMax;
-
-                                            fxSndSetSoundName(iID, (SCHAR*)Vehicle->VehicleType->MountSounds[i]);
-                                            fxSndSetPriority(iID, IDE_TP_PRIORITY_HIGH);
-                                            fxSndSetSoundType(iID, TYPE_INFINITE_EXTERNAL_SOUND);
-                                            fxSndSetPitch(iID, 1.0f);
-                                            fxSndSetVolume(iID, 1.0f);
-                                            fxSndSetPosition(iID, FlashPositionVector.x, FlashPositionVector.y, FlashPositionVector.z);
-                                            fxSndSetEmitterObject(iID, Vehicle->VehicleObjectData->PlaneObject);
-                                            fxSndSetPlayType(iID, DEF_PLAYTYPE_OBJECT);
-										    fxSndPushFlags(iID, DEF_SOUND_STOPS_AMBIENCE);
-
-										    _GetSoundDistance(&fMin, &fMax, &Vehicle->VehicleType->Type);
-
-                                            fxSndSetMinDistance(iID, fMin);
-                                            fxSndSetMaxDistance(iID, fMax);
-
-                                            if(fxSndInitSound(iID))
-                                            {
-											    Vehicle->StateAnimation.MountSoundPlaying[i] = TRUE;
-											    Vehicle->StateAnimation.MountSoundId[i] = iID;
-                                            }
-										}
-									}
-								}
-								else
-								{
-                                    FLOAT32 fMin, fMax;
-
-                                    SINT32 iID = fxSndGetNewSound();
-
-                                    if(iID > 0)
-                                    {
-                                        fxSndSetSoundName(iID, (SCHAR*)Vehicle->VehicleType->MountSounds[i]);
-									    fxSndSetPriority(iID, IDE_TP_PRIORITY_HIGH);
-									    fxSndSetSoundType(iID, TYPE_FINITE_EXTERNAL_SOUND);
-									    fxSndSetPitch(iID, 1.0f);
-									    fxSndSetVolume(iID, 1.0f);
-									    fxSndSetPosition(iID, FlashPositionVector.x, FlashPositionVector.y, FlashPositionVector.z);
-									    fxSndSetEmitterObject(iID, Vehicle->VehicleObjectData->PlaneObject);
-									    fxSndSetPlayType(iID, DEF_PLAYTYPE_OBJECT);
-									    fxSndPushFlags(iID, DEF_SOUND_STOPS_AMBIENCE);
-
-									    _GetSoundDistance(&fMin, &fMax, &Vehicle->VehicleType->Type);
-
-                                        fxSndSetMinDistance(iID, fMin);
-                                        fxSndSetMaxDistance(iID, fMax);
-
-									    fxSndInitSound(iID);
-
-									    Vehicle->MountIsFiring[0] = FALSE;
-                                    }
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		else
-		{
-			// check for and shut down weapon sound
-			if (Vehicle->Weapons[i][0].WeaponType != NULL)
-			{
-				if (Vehicle->Weapons[i][0].WeaponType->FireType != WEAP_FIRETYPE_SINGLESHOT)
-				{
-					if (Vehicle->StateAnimation.MountSoundPlaying[i] == TRUE ||
-						Vehicle->StateAnimation.MountSoundId[i] != 0)
-					{
-						SoundNum = Vehicle->VehicleType->Loadout[Vehicle->LoadoutNum].MountSoundNum[i] - 1;
-						fxSndStopSoundDelayedFromStart(Vehicle->StateAnimation.MountSoundId[i]);
-						Vehicle->StateAnimation.MountSoundPlaying[i] = FALSE;
-						Vehicle->StateAnimation.MountSoundId[i] = 0;
-
-						gr2AnimStopFiringWeapon (Vehicle);
-					}
-				}
-			}
-		}
-		*/
-	}
-#endif
 	//else
 	{
 		for (i=0;i<VEH_MAX_MOUNTS;i++)
@@ -2705,9 +2454,6 @@ LOGICAL _GetSoundDistance(FLOAT32* pMin, FLOAT32* pMax, UINT32* pType)
             break;
         }
     case VEH_TYPE_GROUND:
-#ifdef DOROTHY
-	case VEH_TYPE_MECH:
-#endif
         {
             *pMax = 1609.0f;
             *pMin = 50.0f;

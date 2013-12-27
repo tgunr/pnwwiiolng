@@ -9,7 +9,6 @@
 
 #include <wchar.h>
 
-#if !defined(USE_OSG)
 enum
 {
     NO_OVERRIDE,
@@ -20,7 +19,6 @@ enum
     BENCHRAMAGEN_OVERRIDE,
 	SCENARIO_OVERRIDE
 };
-#endif
 
 enum
 {
@@ -53,15 +51,6 @@ extern void uiDotCommandAddClone(int id);
 // we can continue on without interruption
 extern void uiClearSquadCommandTimeout();
 
-#if defined(USE_OSG)
-typedef int (*dotCmdFunction)(const char*);
-extern void uiDotCommandAdd(const char* cmdName, dotCmdFunction);
-
-#define ADD_DOT_COMMAND(func) \
-extern int func(const char*); \
-uiDotCommandAdd(#func, dot_##func);
-
-#else
 typedef int (*dotCmdFunctionA)(const char*);
 typedef int (*dotCmdFunctionW)(const wchar_t*);
 
@@ -73,7 +62,6 @@ extern int func(const char*); \
 	uiDotCommandAdd(#func, dot_##func, key);
 
 #define ADD_HOST_COMMAND(name, key) uiDotCommandAdd(#name, dot_host_command, key);
-#endif
 
 // handler return values
 

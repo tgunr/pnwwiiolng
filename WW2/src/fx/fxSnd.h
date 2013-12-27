@@ -91,11 +91,7 @@ struct FXSOUND
 
 };
 
-#if defined(USE_OSG)
-void fxSndUpdate();
-#else
 LOGICAL fxSndUpdate();
-#endif
 
 /*------------------------------------------------------------------
                             3D PROTOTYPES

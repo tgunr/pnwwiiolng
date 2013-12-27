@@ -154,9 +154,9 @@ extern LOGICAL		fpFPSIsCrouch(); // tolua_export
 extern LOGICAL		fpFPSIsAim(); // tolua_export
 extern LOGICAL		fpFPSIsFast(); // tolua_export
 extern LOGICAL		fpFPSIsWalking(); // tolua_export
-extern LOGICAL		fpFPSIsDead(); // tolua_export
+extern bool			fpFPSIsDead(); // tolua_export
 extern LOGICAL		fpFPSIsMoving(float threshold = 0.0f); // tolua_export
-extern LOGICAL		fpFPSIsNoFireZone(); // can we fire here?
+extern bool			fpFPSIsNoFireZone(); // can we fire here?
 extern LOGICAL		fpFPSIsCaptureZone(bool deathCheck = true); // can we fire here?
 extern LOGICAL		fpFPSIsBinocs();
 extern int			fpFPSIsLeaning();
@@ -276,9 +276,3 @@ extern LOGICAL	fpFPSUpdateInfantry(FLOAT64 DeltaTime);
 extern FLOAT32 fpFPSGetGrenadeThrowPower();
 extern AmmoTrajectory* fpFPSGetTrajectory();
 extern bool fpFPSCanProjectGrenade();
-
-#if defined(USE_OSG)
-#include <osg/State>
-extern bool fpFPSDrawOSG(osg::State& state, OBJECT* o, bool render);
-extern float fpFPSGetHeight();
-#endif

@@ -217,31 +217,6 @@ struct OBJECTDOF
 
 };
 
-#if defined(USE_OSG)
-
-struct OBJECT
-{
-	UINT32				flags, flag2;
-	gr2AnimTrooper*		animModel;
-	piMATRIX			mat, matint;
-	void*				osgNode;
-	struct OBJECT*	child;
-
-#ifdef __cplusplus
-
-	OBJECT() : flags(0), flag2(0), animModel(0), osgNode(0), child(0)
-	{
-	}
-
-	~OBJECT()
-	{
-	}
-#endif
-
-};
-
-#else
-
 //#ifdef DEBUG_WW2
 //#define NEW_OBJECT_MEM 1
 //#else
@@ -455,7 +430,6 @@ struct OBJECT
 #endif
 };
 
-#endif
 typedef OBJECT DOFOBJECT;
 typedef OBJECT LODOBJECT;
 typedef OBJECT GROUPOBJECT;

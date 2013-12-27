@@ -2,11 +2,7 @@
 
 //tolua_begin
 
-#if defined(USE_OSG) && defined(__OSG_MATH)
-
-#else
-	#define PI				3.14159265359f
-#endif
+#define PI				3.14159265359f
 
 #define PI2				6.28318530718f
 #define E_				2.718281828f

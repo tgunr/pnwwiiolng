@@ -17,11 +17,6 @@
 
 #define FP_ONE		0x3F800000
 
-#if defined(USE_OSG)
-#undef PI
-#define PI osg::PI
-#endif
-
 /*
  * Fast, Low Precision Reciprocal of float fx
  */
@@ -883,7 +878,6 @@ float sin_dec, cos_ha, sinalt, cosalt, sinlat, coslat;
  * Using the delta angles (pitch, yaw, roll) in lpa,
  * update the angles in lpd to make the new direction.
  */
-#if !defined(USE_OSG)
 INLINE piVECTOR* math3dOrientAngles(piVECTOR* lpd, piVECTOR* lpa)
 {
 float ha, ha2, dec, lat, lon, alt, az;
@@ -999,7 +993,7 @@ float ha, ha2, dec, lat, lon, alt, az;
 
 	return(lpd);
 }
-#endif
+
 // Spherical Linear Interpolation (Slerp)
 // t is the 0.0 to 1.0 interpolation value
 // with 0.0 returning from, and 1.0 returning to
