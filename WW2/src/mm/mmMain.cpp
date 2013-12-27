@@ -44,7 +44,6 @@
 #include "miss/missionHostMessages.h"
 #include "miss/missionUtils.h"
 #include "mm/mmAntiAddiction.h"
-#include "mm/mmdbClientMessages.h"
 #include "mm/mmHostInstanceImpl.h"
 #include "mm/mmHostMessages.h"
 #include "mm/mmMain.h"
@@ -1015,14 +1014,14 @@ _housekeeping()
 	,	mapCheckSideCounts
 	,	_fetchOpinionPolls
 #if !defined(DEV_BUILD)
-	, _pollChecksums
+	,	_pollChecksums
 #endif
-	, mmCheckAddictionTimers
-	, Instance::RecordPopulations
-	, _logWWIIPlayerStats
-	, (Housekeeper::FUNCTION*)chatHousekeepGroupPermissions
-	, mapExpireSorties
-	,	mmdbRequestBrigadeDetailsUpdate
+	,	mmCheckAddictionTimers
+	,	Instance::RecordPopulations
+	,	_logWWIIPlayerStats
+	,	(Housekeeper::FUNCTION*)chatHousekeepGroupPermissions
+	,	mapExpireSorties
+	,	mapRequestBrigadeDetailsUpdate
 	,	_checkForUpdatedMissionLists
 	,	Map::BroadcastSwingMeter
 	, NULL
