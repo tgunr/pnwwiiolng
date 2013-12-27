@@ -305,9 +305,10 @@ _fillReply(APP_LAUNCH& reply, SINT32 appID, UINT32 appVersion, const SCHAR* data
 {
 	reply.appID = appID;
 	reply.appVersion = appVersion;
-	reply.dataSize = strlencpy(reply.data,data,MAX_PARAM - 1);
+	strsafecpy(reply.data, data);
+	reply.dataSize = strlen(reply.data);
 
-	char* endURL = strchr((char*)reply.data,'\n');
+	char* endURL = strchr((char*)reply.data, '\n');
 	if(endURL)
 		(*endURL) = '\0';
 

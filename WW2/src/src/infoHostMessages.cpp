@@ -30,10 +30,8 @@ infoSendCompInfoRequest(SINT32 connection, const char* message)
 	// Don't pass a NULL, pass an empty string.
 	assert( message != NULL );
 
-	// Copy the string to within a byte of the text storage area
-	// (null bytes, dontcha know), and grab the size for reference
-	// add 1 for null byte
-	req.size = strlencpy(req.text, message, sizeof(req.text)-1) + 1;
+	strsafecpy(req.text, message);
+	req.size = strlen(req.text) + sizeof('\0');
 
 	return teulSend(connection, _INFO_REQ, &req);
 }

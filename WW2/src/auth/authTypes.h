@@ -111,7 +111,7 @@ struct APP_LAUNCH
 	SINT32	status;			// server status < 0 is an error, > 0 is # of players
 	SINT32	dataSize;
 	SCHAR	appleID[4];
-	SCHAR	data[MAX_PARAM];		//Application data.  Like parameters and such.
+	char	data[MAX_PARAM];		//Application data.  Like parameters and such.
 
 	APPDL_ACTION action;	// what to do with a file that we download
 	SINT32	dlAppID;		//Application ID

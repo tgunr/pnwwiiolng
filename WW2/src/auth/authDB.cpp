@@ -16,6 +16,7 @@
 #include "dbse/dbseWrapper.h"
 #include "auth/authDB.h"
 #include "mem/mem.h"
+#include "str/stringLib.h"
 #include <mysql.h>
 #include "include/infoMessageTypes.h"
 #include "include/infoHostMessages.h"
@@ -956,13 +957,12 @@ matchversion(UINT32 needle, SINT32 appID, UINT32 platform)
 LOGICAL
 authdbGetFileMD5(const UINT32 appID, const UINT32 platform, const char* filename, char* buffer, UINT32 bufLen)
 {
-	SCHAR statement[512+1];
-	SCHAR myFilename[MAXPATHLEN*2+1];
-
 	assert(buffer != NULL && bufLen > 1);
 
-	strncpy(statement, filename, sizeof(statement));
-	statement[sizeof(statement) - 1] = 0;
+	char statement[512 + 1];
+	char myFilename[MAXPATHLEN*2+1];
+
+	strsafecpy(statement, filename);
 	mysql_escape_string(myFilename, statement, strlen(statement));
 
 	snprintf(statement, sizeof(statement)-1
