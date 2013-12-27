@@ -419,6 +419,7 @@ add_executable(${AUTH_HOST_EXE}
 		auth/authClientData.h
 	auth/authDB.cpp
 		auth/authDB.h
+		auth/authDatabaseSchemas.h
 	auth/authHost.cpp
 		auth/authHost.h
 	auth/authHostMessages.cpp
@@ -861,8 +862,6 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 		miss/missionScoring.cpp
 		miss/missionUtils.cpp
 			miss/missionUtils.h
-		mm/mmdbClientMessages.cpp
-			mm/mmdbClientMessages.h
 		mm/mmdbPersonaSelections.cpp
 			mm/mmdbPersonaSelections.h
 		parse/parseWor.cpp
@@ -952,6 +951,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 				strt/strtProtos.h
 		dbse/dbseDatabaseSchema.cpp
 			dbse/dbseDatabaseSchema.h
+			strt/strtDatabaseSchemas.h
 		src/luaGlue.cpp
 			include/luaGlue.h
 		miss/missionPack.cpp
