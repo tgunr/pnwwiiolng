@@ -358,27 +358,7 @@ bool EZManager::IsCommandView(bool deathCheck)
 	return false;
 }
 
-UINT32 EZManager::OnMove(SINT32 param, UINT32 id, UINT32 extra)
-{
-	return 0;
-}
-
-UINT32 EZManager::OnTurn(SINT32 param, UINT32 id, UINT32 extra)
-{
-	return 0;
-}
-
-UINT32 EZManager::OnAction1(SINT32 param, UINT32 id,UINT32 extra)
-{
-	return 0;
-}
-
-UINT32 EZManager::OnAction2(SINT32 param, UINT32 id,UINT32 extra)
-{
-	return 0;
-}
-
-UINT32 EZManager::OnFreeLook(SINT32 param, UINT32 id,UINT32 extra)
+void EZManager::OnFreeLook(SINT32 param, UINT32 id,UINT32 extra)
 {
 	SetFlag(EZManager::FREELOOK, (param) ? true : false);
 
@@ -389,11 +369,9 @@ UINT32 EZManager::OnFreeLook(SINT32 param, UINT32 id,UINT32 extra)
 		else
 			GetCamera().Snap();
 	}
-
-	return 0;
 }
 
-UINT32 EZManager::OnCamera(SINT32 param, UINT32 id,UINT32 extra)
+void EZManager::OnCamera(SINT32 param, UINT32 id,UINT32 extra)
 {
 	static SINT32 thresholdX = 5;
 	static SINT32 thresholdY = 5;
@@ -419,8 +397,6 @@ UINT32 EZManager::OnCamera(SINT32 param, UINT32 id,UINT32 extra)
 		for(size_t i = 0; i < v.turrets.size(); i++)
 			v.turrets.at(i).tracking = true;
 	}
-
-	return 0;
 }
 
 bool EZManager::OnCamera(piVECTOR* pos, piVECTOR* aim)
@@ -643,12 +619,7 @@ bool EZManager::EasyControl(UINT32 position, const char* control)
 	return false;
 }
 
-UINT32 EZManager::OnEngine(SINT32 param, UINT32 id,UINT32 extra)
-{
-	return 0;
-}
-
-UINT32 EZManager::OnView(SINT32 param, UINT32 id,UINT32 extra)
+void EZManager::OnView(SINT32 param, UINT32 id,UINT32 extra)
 {
 	if(param && IsCommandView(true))
 	{
@@ -671,8 +642,6 @@ UINT32 EZManager::OnView(SINT32 param, UINT32 id,UINT32 extra)
 	{
 		SetFlag(EZManager::VIEW_OVERRIDE|EZManager::FREELOOK, false);
 	}
-
-	return 0;
 }
 
 SINT32 EZManager::ConstrainPosition(SINT32 position)
@@ -691,10 +660,10 @@ SINT32 EZManager::ConstrainPosition(SINT32 position)
 	return position;
 }
 
-UINT32 EZManager::OnPosition(SINT32 param, UINT32 id,UINT32 extra)
+void EZManager::OnPosition(SINT32 param, UINT32 id,UINT32 extra)
 {
 	if(!param || _positions.size() <= 1)
-		return 0;
+		return;
 
 	switch(id)
 	{
@@ -728,8 +697,6 @@ UINT32 EZManager::OnPosition(SINT32 param, UINT32 id,UINT32 extra)
 		}
 		break;
 	}
-
-	return 0;
 }
 
 bool EZManager::IsDriverDead()

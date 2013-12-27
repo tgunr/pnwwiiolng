@@ -305,15 +305,15 @@ public:
 	void AdjustCamera(Vec3d& camPos, Vec3d& aimPos);
 
 	// input callbacks
-	virtual UINT32 OnMove(SINT32 param, UINT32 id,UINT32 extra);
-	virtual UINT32 OnTurn(SINT32 param, UINT32 id,UINT32 extra);
-	virtual UINT32 OnAction1(SINT32 param, UINT32 id,UINT32 extra);
-	virtual UINT32 OnAction2(SINT32 param, UINT32 id,UINT32 extra);
-	virtual UINT32 OnFreeLook(SINT32 param, UINT32 id,UINT32 extra);
-	virtual UINT32 OnPosition(SINT32 param, UINT32 id,UINT32 extra);
-	virtual UINT32 OnEngine(SINT32 param, UINT32 id,UINT32 extra);
-	virtual UINT32 OnView(SINT32 param, UINT32 id,UINT32 extra);
-	virtual UINT32 OnCamera(SINT32 param, UINT32 id,UINT32 extra);
+	virtual void OnMove(SINT32 param, UINT32 id, UINT32 extra) {}
+	virtual void OnTurn(SINT32 param, UINT32 id, UINT32 extra) {}
+	virtual void OnAction1(SINT32 param, UINT32 id, UINT32 extra) {}
+	virtual void OnAction2(SINT32 param, UINT32 id, UINT32 extra) {}
+	virtual void OnFreeLook(SINT32 param, UINT32 id,UINT32 extra);
+	virtual void OnPosition(SINT32 param, UINT32 id,UINT32 extra);
+	virtual void OnEngine(SINT32 param, UINT32 id, UINT32 extra) {}
+	virtual void OnView(SINT32 param, UINT32 id,UINT32 extra);
+	virtual void OnCamera(SINT32 param, UINT32 id,UINT32 extra);
 	virtual bool OnCamera(piVECTOR* pos, piVECTOR* aim);
 	virtual void OnSpawn();
 	virtual void OnDespawn(){}

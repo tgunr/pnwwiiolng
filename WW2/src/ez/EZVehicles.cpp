@@ -122,10 +122,10 @@ void EZGameVehicle::UpdateGears()
 {
 }
 
-UINT32 EZGameVehicle::OnMove(SINT32 param, UINT32 id, UINT32 extra)
+void EZGameVehicle::OnMove(SINT32 param, UINT32 id, UINT32 extra)
 {
-	if(IsDriverDead())
-		return 0;
+	if(PN_UNLIKELY(IsDriverDead()))
+		return;
 
 	if(param > 0)
 	{
@@ -149,14 +149,12 @@ UINT32 EZGameVehicle::OnMove(SINT32 param, UINT32 id, UINT32 extra)
 		m = _move;
 	}
 	*/
-
-	return 0;
 }
 
-UINT32 EZGameVehicle::OnTurn(SINT32 param, UINT32 id, UINT32 extra)
+void EZGameVehicle::OnTurn(SINT32 param, UINT32 id, UINT32 extra)
 {
-	if(IsDriverDead())
-		return 0;
+	if(PN_UNLIKELY(IsDriverDead()))
+		return;
 
 	if(param < 0)
 	{
@@ -183,14 +181,12 @@ UINT32 EZGameVehicle::OnTurn(SINT32 param, UINT32 id, UINT32 extra)
 		t = _turn;
 	}
 	*/
-
-	return 0;
 }
 
-UINT32 EZGameVehicle::OnEngine(SINT32 param, UINT32 id,UINT32 extra)
+void EZGameVehicle::OnEngine(SINT32 param, UINT32 id, UINT32 extra)
 {
 	// no engine management if driver is dead
-	if(!param || IsDriverDead()) return 0;
+	if(!param || IsDriverDead()) return;
 
 	if(HasFlag(EZManager::START_ENGINES|EZManager::ENGINES_ON))
 	{
@@ -204,24 +200,18 @@ UINT32 EZGameVehicle::OnEngine(SINT32 param, UINT32 id,UINT32 extra)
 	{
 		SetFlag(EZManager::START_ENGINES, true);
 	}
-
-	return 0;
 }
 
-UINT32 EZGameVehicle::OnAction1(SINT32 param, UINT32 id,UINT32 extra)
+void EZGameVehicle::OnAction1(SINT32 param, UINT32 id,UINT32 extra)
 {
-	if(param && GetPosition().IsDead())
-		return 0;
-
-	return mlPrimaryTriggerDown(param, id, extra);
+	if(!(param && GetPosition().IsDead()))
+		mlPrimaryTriggerDown(param, id, extra);
 }
 
-UINT32 EZGameVehicle::OnAction2(SINT32 param, UINT32 id,UINT32 extra)
+void EZGameVehicle::OnAction2(SINT32 param, UINT32 id, UINT32 extra)
 {
-	if(param && GetPosition().IsDead())
-		return 0;
-
-	return mlSecondaryTriggerDown(param, id, extra);
+	if(!(param && GetPosition().IsDead()))
+		mlSecondaryTriggerDown(param, id, extra);
 }
 
 FLOAT32 EZGameVehicle::GetGaugeData(UINT32 gauge, UINT32 subGauge)
@@ -680,10 +670,10 @@ void EZTruck::UpdateGears()
 }
 
 
-UINT32 EZTruck::OnTurn(SINT32 param, UINT32 id, UINT32 extra)
+void EZTruck::OnTurn(SINT32 param, UINT32 id, UINT32 extra)
 {
-	if(IsDriverDead())
-		return 0;
+	if(PN_UNLIKELY(IsDriverDead()))
+		return;
 
 	SINT32 agear = abs(_currentGear);
 
@@ -717,14 +707,12 @@ UINT32 EZTruck::OnTurn(SINT32 param, UINT32 id, UINT32 extra)
 		t = _turn;
 	}
 	*/
-
-	return 0;
 }
 
-UINT32 EZTank::OnTurn(SINT32 param, UINT32 id, UINT32 extra)
+void EZTank::OnTurn(SINT32 param, UINT32 id, UINT32 extra)
 {
-	if(IsDriverDead())
-		return 0;
+	if(PN_UNLIKELY(IsDriverDead()))
+		return;
 
 	SINT32 agear = abs(_currentGear);
 
@@ -767,8 +755,6 @@ UINT32 EZTank::OnTurn(SINT32 param, UINT32 id, UINT32 extra)
 		t = _turn;
 	}
 	*/
-
-	return 0;
 }
 
 void EZStug::SetConfig(const char* name, const char* value)
@@ -787,7 +773,7 @@ void EZStug::OnSpawn()
 	mlToggleBombBayDoor(1, 0, 0);
 }
 
-UINT32 EZStug::OnAction2(SINT32 param, UINT32 id,UINT32 extra)
+void EZStug::OnAction2(SINT32 param, UINT32 id,UINT32 extra)
 {
 	if(param)
 	{
@@ -798,8 +784,6 @@ UINT32 EZStug::OnAction2(SINT32 param, UINT32 id,UINT32 extra)
 	{
 		SetPosition(_lastPosition);
 	}
-
-	return 0;
 }
 
 void EZATGun::FrameUpdate()
@@ -834,10 +818,10 @@ bool EZATGun::IsLoaderDead()
 	return IsDriverDead();
 }
 
-UINT32 EZATGun::OnTurn(SINT32 param, UINT32 id, UINT32 extra)
+void EZATGun::OnTurn(SINT32 param, UINT32 id, UINT32 extra)
 {
-	if(IsDriverDead())
-		return 0;
+	if(PN_UNLIKELY(IsDriverDead()))
+		return;
 
 	if(param < 0)
 	{
@@ -864,14 +848,12 @@ UINT32 EZATGun::OnTurn(SINT32 param, UINT32 id, UINT32 extra)
 		t = _turn;
 	}
 	*/
-
-	return 0;
 }
 
-UINT32 EZATGun::OnMove(SINT32 param, UINT32 id, UINT32 extra)
+void EZATGun::OnMove(SINT32 param, UINT32 id, UINT32 extra)
 {
-	if(IsDriverDead())
-		return 0;
+	if(PN_UNLIKELY(IsDriverDead()))
+		return;
 
 	if(param > 0)
 	{
@@ -898,16 +880,13 @@ UINT32 EZATGun::OnMove(SINT32 param, UINT32 id, UINT32 extra)
 		m = _move;
 	}
 	*/
-
-	return 0;
 }
 
-UINT32 EZATGun::OnAction2(SINT32 param, UINT32 id, UINT32 extra)
+void EZATGun::OnAction2(SINT32 param, UINT32 id, UINT32 extra)
 {
 	if(!param || IsGunnerDead())
-		return 0;
-
-	return mlToggleBombBayDoor(param, id, extra);
+		return;
+	mlToggleBombBayDoor(param, id, extra);
 }
 
 void EZBoat::UpdateEngine()
