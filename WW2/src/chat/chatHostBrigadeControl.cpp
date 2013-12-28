@@ -736,7 +736,7 @@ BrigadeController::requestResign(Player* player)
 	_requirePlayerInBrigade(player, unit());
 
 	// And you do, kinda, have to be leading the brigade :)
-	if ( !player->leadingBrigade() == unit().unitID() || !player->hasHandle(oicHandle()) )
+	if ( player->leadingBrigade() != unit().unitID() || !player->hasHandle(oicHandle()) )
 		throw BCERR_NOT_BRIGADE_LEADER;
 
 	// If we move to delayed resigns, we can change the last argument to false
