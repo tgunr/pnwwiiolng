@@ -1,4 +1,4 @@
-# GNU C++ Compiler configuratoin.
+# GNU C++ Compiler configuration.
 
 include(CheckCXXCompilerFlag)
 check_cxx_compiler_flag("-std=c++11" HAVE_STD_CPP11)
