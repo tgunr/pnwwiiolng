@@ -207,7 +207,7 @@ BRIGADE_MOVE_MSG::receive(SINT32 /*teulIndex*/, BRIGADE_MOVE_MSG& incoming)
 	}
 
 	// The incoming key is the packed* display* handle of the requester
-	const char* requester = chatGetCallsign(incoming.key());
+	Chat::Name requester(incoming.key());
 
 	StratHCUnit* unit = StratHCUnit::Lookup(request.m_brigadeID);
 	UINT32 origin = (unit && unit->homeCP()) ? unit->homeCP()->uOID : 0;
@@ -218,18 +218,18 @@ BRIGADE_MOVE_MSG::receive(SINT32 /*teulIndex*/, BRIGADE_MOVE_MSG& incoming)
 	const char* cpName = (cp ? cp->name : weapPrintFullObjIDC(&request.m_destination, fidBuffer));
 
 	dbugLog(_FLI, "%s: %s requesting %s %s(%u) to %s"
-					, __FUNCTION__, requester, (request.m_actionable ? "move" : "check")
+					, __FUNCTION__, requester.c_str(), (request.m_actionable ? "move" : "check")
 					, unitName, request.m_brigadeID
 					, cpName
 					);
 
-	request.m_action = request.process(incoming.key(), requester, unit, cp, (bool)incoming.flags());
+	request.m_action = request.process(incoming.key(), requester.c_str(), unit, cp, (bool)incoming.flags());
 	DBThread::Do(DBThread::Default
 				, "INSERT INTO strat.move_requests"
 					"(recorded, requester, action, unit_id, from_cp_oid, to_cp_oid, result)"
 					"VALUES"
 					"(NOW(), '%s', %u, %u, %u, %u, %d)"
-					, requester, request.m_actionable, request.m_brigadeID
+					, requester.c_str(), request.m_actionable, request.m_brigadeID
 					, origin, destination
 					, request.m_action
 					);

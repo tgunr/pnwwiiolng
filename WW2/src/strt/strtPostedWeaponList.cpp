@@ -143,7 +143,8 @@ POSTED_WEAPON::cancelReinforcement()
 	dbugLog(_FLD, "v:%u sup:%u c:%s cancelling reinforcement"
 					, serial()
 					, m_supplyingBrigade->unitID()
-					, chatGetCallsign(m_handle));
+					, Chat::Name(m_handle).c_str()
+					);
 
 	m_supplyingBrigade->cancelResupplyTicket(ticket);
 
@@ -169,7 +170,8 @@ POSTED_WEAPON::detachReinforcement()
 	dbugLog(_FLD, "v:%u shcu:%u c:%s detaching reinforcement"
 					, serial()
 					, m_supplyingBrigade->unitID()
-					, chatGetCallsign(m_handle));
+					, Chat::Name(m_handle).c_str()
+					);
 
 	// Sever the reverse reference to ourselves
 	m_resupplyTicket->m_postedWeapon = NULL;

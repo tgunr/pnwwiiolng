@@ -71,7 +71,7 @@ SquadVote::announce(UINT32 squadID, Player* player)
 	for ( COUNTS::iterator it = m_counts->begin(); it != m_counts->end(); ++it )
 	{
 		if ( results.size() > 0 ) results += ", ";
-		snprintf(str, 40, "%s (%u)", chatGetCallsign(it->first), it->second);
+		snprintf(str, 40, "%s (%u)", Chat::Name(it->first).c_str(), it->second);
 		results += str;
 	}
 
@@ -298,7 +298,7 @@ SquadVote::withdraw(UINT32 squadID, const ChatHandle& handle, SquadList* list)
 		return;
 	}
 	else if ( candidateRemoved )
-		list->sendMessage(LSTR_SQUAD, LSTR_SQUAD_ALL_VOTES_WITHDRAWN, chatGetCallsign(handle));
+		list->sendMessage(LSTR_SQUAD, LSTR_SQUAD_ALL_VOTES_WITHDRAWN, Chat::Name(handle).c_str());
 }
 
 //////////////////////////////////////////////////////////////////////

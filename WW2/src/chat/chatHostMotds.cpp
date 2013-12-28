@@ -38,7 +38,7 @@ chatSetMotd(UINT32 type, const ChatHandle& submitter, const std::string& text)
 {
 	if ( type >= MOTD::_MAX_TYPES )
 	{
-		dbugLog(_FLA, "c:%s attempting to update motd %u", chatGetCallsign(submitter), type);
+		dbugLog(_FLA, "c:%s attempting to update motd %u", Chat::Name(submitter).c_str(), type);
 		return false;
 	}
 
@@ -53,7 +53,7 @@ chatSetMotd(UINT32 type, const ChatHandle& submitter, const std::string& text)
 	else
 		motd.added = teulTime();
 
-	dbugLog(_FLI, "c:%s updated motd:%u to %s", chatGetCallsign(submitter), type, motd.message.c_str());
+	dbugLog(_FLI, "c:%s updated motd:%u to %s", Chat::Name(submitter).c_str(), type, motd.message.c_str());
 
 	return true;
 }

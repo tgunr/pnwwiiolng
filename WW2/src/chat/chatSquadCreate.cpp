@@ -335,7 +335,7 @@ chatExpireSquadCreates()
 			++it;
 		else
 		{
-			dbugLog(_FLD, "c:%s expiring squad request (%u:%u)", chatGetCallsign(it->first), it->second.expires, teulTime());
+			dbugLog(_FLD, "c:%s expiring squad request (%u:%u)", Chat::Name(it->first).c_str(), it->second.expires, teulTime());
 			if ( it->second.approved )
 				_expired(creator);
 			expired = it++;

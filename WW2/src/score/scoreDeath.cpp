@@ -293,7 +293,7 @@ Scoring::Death::process(Player* const lhsPlayer)
 	if ( killerSortie == NULL )
 	{
 		dbugLog(_FLW, "p:%u c:%s v:%u killer sortie #%u not found"
-						, lhs().playerID(), chatGetCallsign(lhs().handle()), lhs().sortieID()
+						, lhs().playerID(), Chat::Name(lhs().handle()).c_str(), lhs().sortieID()
 						, statedKillerID
 						);
 		return false;

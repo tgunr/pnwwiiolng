@@ -10,13 +10,18 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
+#include <atomic>
 #include <string.h>
 #include <ctype.h>
 #include <assert.h>
 #include <wctype.h>
 
 #include "chat/chatHandle.h"
+#include "chat/chatName.h"		// to ensure it gets instantiated.
 #include "wwii/wwiiUTF.h"
+
+Chat::Name g_chatSystem("SYSTEM");
+Chat::NameW g_chatUnknown(chatGetHandle(L"UNKNOWN"));
 
 static const int HANDLE_PLAIN_BITS = 6;
 static const UINT64 HANDLE_PLAIN_MASK = (1ULL << HANDLE_PLAIN_BITS) - 1;
@@ -5132,28 +5137,31 @@ chatGetCallsign(wchar_t* const callsign, const ChatHandle& srcHandle)
 
 	return true;
 }
+
 const char*
 chatGetCallsign(const ChatHandle& handle)
 {
-	static char callsign[10][MAX_HANDLE_SIZE];
-	static int instance = 0;
+	static const size_t NumInstances = 15;	// must be a power of 2.
+	Chat::Name callsigns[NumInstances];
+	static std::atomic<size_t> s_instance = 0;
 
-	instance = instance & 7;
-	chatGetCallsign(callsign[instance], handle);
+	const size_t instance = (s_instance++) & NumInstances;
+	callsigns[instance] = handle;
 
-	return callsign[instance++];
+	return callsigns[instance].c_str();
 }
 
 const wchar_t*
 chatGetWideCallsign(const ChatHandle& handle)
 {
-	static wchar_t callsign[10][MAX_HANDLE_WSIZE];
-	static int instance = 0;
+	static const size_t NumInstances = 15;	// must be a power of 2.
+	Chat::NameW callsigns[NumInstances];
+	static std::atomic<size_t> s_instance = 0;
 
-	instance = instance & 7;
-	chatGetCallsign(callsign[instance], handle);
+	const size_t instance = (s_instance++) & NumInstances;
+	callsigns[instance] = handle;
 
-	return callsign[instance++];
+	return callsigns[instance].c_str();
 }
 
 bool

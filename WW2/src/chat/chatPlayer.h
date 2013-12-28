@@ -452,7 +452,7 @@ protected:
 	bool			m_noEnemyChat	: 1;	// True disable enemy chat receipt
 	bool			m_invalidData	: 1;	// Set to true if they mess with Covert
 	bool			m_haveChannels	: 1;	// True once we've initialized channels
-	bool			m_announcedToSquad : 1;// Have they been announcd to the squad channel?
+	bool			m_announcedToSquad : 1;	// Have they been announced to the squad channel?
 	bool			m_isBuzzard 	: 1;	// True when player has reserved/spawned a buzzard
 
 	char			m_afkMessage[MAX_AFK_MESSAGE_LENGTH + 1];

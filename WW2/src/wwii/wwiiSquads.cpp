@@ -7,13 +7,12 @@
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-//
-
 
 #include "wwii/wwiiSquads.h"
 #include "teul/teulPackers.h"
 #include "wwii/wwiiPack.h"
 #include "wwii/wwiiPackString.h"
+#include "chat/chatName.h"
 
 //////////////////////////////////////////////////////////////////////
 // Default constructor
@@ -38,7 +37,7 @@ Squad::Squad(UINT32 withSquadID, const ChatHandle& handle, const std::string& wi
 	, m_description("")
 	, m_motd("")
 	, m_homepage("")
-	, m_callsign(chatGetCallsign(handle))
+	, m_callsign(Chat::Name(handle))
 	, m_voiceInfo("")
 	, m_slogan("")
 {
@@ -81,7 +80,7 @@ Squad::packer(LOGICAL mode, ACTION_OBJECT* a)
 	a->offset = teulPackUCHAR(mode, a->packed, a->offset, &m_language, 0);
 	a->offset = wwiiPackString(mode, a->packed, a->offset, m_slogan, SLOGAN_LENGTH);
 
-	m_callsign = chatGetCallsign(m_shortHandle);
+	m_callsign = Chat::Name(m_shortHandle);
 
 	return a->offset;
 }

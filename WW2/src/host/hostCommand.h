@@ -3,7 +3,7 @@
 #include <vector>
 #include <string>
 
-extern const char* chatGetCallsign(const ChatHandle&);
+#include "chat/chatName.h"
 
 namespace Host
 {
@@ -44,7 +44,7 @@ namespace Host
 	struct CellCommand : public CommandMsg
 	{
 		CellCommand(UINT32 playerID, const ChatHandle& handle, const char* withInput, UINT64 withInstID)
-			: CommandMsg(chatGetCallsign(handle), NULL, withInput, withInstID)
+			: CommandMsg(Chat::Name(handle).c_str(), NULL, withInput, withInstID)
 			, m_playerID(playerID)
 			, m_handle(handle)
 			{}

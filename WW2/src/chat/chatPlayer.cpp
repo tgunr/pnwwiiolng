@@ -31,6 +31,7 @@
 #include "chat/chatMissions.h"
 #include "chat/chatMissionTypes.h"
 #include "chat/chatModReport.h"
+#include "chat/chatName.h"
 #include "chat/chatPersonaUpdate.h"
 #include "chat/chatPlayer.h"
 #include "chat/chatPreferenceEnum.h"
@@ -256,18 +257,18 @@ Player::Player(const PlayerStatusNode* psn, const Chat::PlayerInfo* playerInfo)
 		throw std::domain_error("Tried to create Client with NULL playerInfo");
 
 	const bool playnet = (playerInfo->m_permissionMask & IS_PLAYNET) == IS_PLAYNET;
-	const char* newCallsign = chatGetCallsign(playerInfo->m_handle);
+	Chat::Name newCallsign(playerInfo->m_handle);
 	dbugLog(_FLI, "t:%d p:%u c:%s creating %s player %p"
 					, psn->teulIndex
 					, playerInfo->playerID
-					, newCallsign
+					, newCallsign.c_str()
 					, (playnet) ? "CRS" : "player"
 					, this
 					);
 
 	_construct(playerInfo->playerID);
 
-	_setCallsign(newCallsign, playnet);
+	_setCallsign(newCallsign.c_str(), playnet);
 
 	SetInstance(Instance::g_campaign);
 
@@ -2263,7 +2264,7 @@ Player::whereabouts(char* into, const FLOAT64& x, const FLOAT64& y) const
 
 	ChatMission* mission = chatFindMission(missionID());
 	if ( mission )
-		strcat(into, chatGetCallsign(mission->leader()));
+		strcat(into, Chat::Name(mission->leader()).c_str());
 	else
 		strcat(into, "unknown");
 	strcat(into, " mission " );

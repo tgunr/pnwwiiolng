@@ -10,6 +10,7 @@
 
 #include "chat/chatLocalizedMessage.h"
 #include "chat/chatModReport.h"
+#include "chat/chatName.h"
 #include "chat/chatSupportRPCMessages.h"
 #include "comm/commHostMessages.h"
 #include "comm/commTypes.h"
@@ -303,7 +304,7 @@ HostVehicle::acceptResupply(UINT32 fromSerial, const ChatHandle& fromHandle, Hos
 		UINT32 id = (vehCommander != NULL) ? vehCommander->playerID() : 0;
 		dbugLog(_FLD, "p:%u c:%s v:%u accepting resupply from %s"
 						, id, callsign(), index
-						, chatGetCallsign(fromHandle)
+						, Chat::Name(fromHandle).c_str()
 						);
 	}
 

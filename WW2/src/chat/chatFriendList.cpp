@@ -13,6 +13,7 @@
 #include <vector>
 
 #include "chat/chatLStringIDs.h"
+#include "chat/chatName.h"
 #include "chat/chatPlayer.h"
 #include "include/mydbQuery.h"
 #include "wwii/wwiiDBThreads.h"
@@ -66,7 +67,7 @@ class AddSocialCheck : public DBThreadQuery
 {
 public:
 	AddSocialCheck(const playerid_t playerID, const ChatHandle& handle, const bool ignore)
-		: DBThreadQuery(DBThread::Default, "AddSocialCheck", DBThreadQuery::_CALLBACK, _CHECK_QUERY, chatGetCallsign(handle))
+		: DBThreadQuery(DBThread::Default, "AddSocialCheck", DBThreadQuery::_CALLBACK, _CHECK_QUERY, Chat::Name(handle).c_str())
 		, m_playerID(playerID), m_handle(handle), m_ignore(ignore), m_success(false)
 		{}
 
@@ -178,7 +179,7 @@ AddSocialCheck::Success()
 
 	if ( m_success == false )
 	{
-		player->message(LSTR_CAUTION, LSTR_INVALID_CALLSIGN, chatGetCallsign(m_handle));
+		player->message(LSTR_CAUTION, LSTR_INVALID_CALLSIGN, Chat::Name(m_handle).c_str());
 		return;
 	}
 
@@ -220,7 +221,7 @@ chatIgnoreList(Player* player)
 	{
 		if ( !list.empty() )
 			list += ", ";
-		list += chatGetCallsign(*it);
+		list += Chat::Name(*it);
 	}
 
 	if ( list.empty() )
@@ -261,7 +262,7 @@ chatFriendsList(Player& player)
 		{
 			if ( !offlineList.empty() )
 				offlineList += " ";
-			offlineList += chatGetCallsign(*it);
+			offlineList += Chat::Name(*it);
 		}
 	}
 
@@ -338,7 +339,7 @@ chatModifySocialList(Player& player, ARGV& args, bool isIgnore)
 		done.insert(handle);
 		if ( chatIsValidCallsign(args[i]) == false || handle == 0 )
 		{
-			player.message(LSTR_CAUTION, LSTR_INVALID_CALLSIGN, chatGetCallsign(handle));
+			player.message(LSTR_CAUTION, LSTR_INVALID_CALLSIGN, Chat::Name(handle).c_str());
 			continue;
 		}
 		if ( handle == player.matchHandle() )

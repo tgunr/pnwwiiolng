@@ -250,7 +250,7 @@ StratHCUnit::save() const
 				, fallbackOID
 				, nextMove()
 				, lastMoved()
-				, ((0LL != lastMovedBy()) ? chatGetCallsign(lastMovedBy()) : "SYSTEM")
+				, ((0LL != lastMovedBy()) ? Chat::Name(lastMovedBy()).c_str() : "SYSTEM")
 				, unitID()
 				);
 }

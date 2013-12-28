@@ -19,6 +19,7 @@
 #include "mem/mem.h"
 #include "wwii/wwiiHash.h"
 #include "chat/chatMissions.h"
+#include "chat/chatName.h"
 #include "wwii/wwiiString.h"
 
 #include "chat/chatPlayer.h"
@@ -51,7 +52,8 @@ chatCreateChannel(const ChannelID& channelID, const char* const name, ChatHandle
 					, channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID());
 	}
 
-	dbugLog(_FLD, "Creating ch:%llu.%u.%u.%llu %s: %s [%s]", channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID(), chanTypeName[channelID.Type()], name, chatGetCallsign(chHandle));
+	Chat::Name chName(chHandle);
+	dbugLog(_FLD, "Creating ch:%llu.%u.%u.%llu %s: %s [%s]", channelID.InstID(), channelID.Type(), channelID.Side(), channelID.SubID(), chanTypeName[channelID.Type()], name, chName.c_str());
 	Chat::Channel* const channel = new Chat::Channel(channelID, name, chHandle);
 
 	_channelIndex[channelID] = channel;

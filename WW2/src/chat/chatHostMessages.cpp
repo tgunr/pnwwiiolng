@@ -42,6 +42,7 @@
 #include "chat/chatMissionTypes.h"
 #include "chat/chatModReport.h"
 #include "chat/chatMotds.h"
+#include "chat/chatName.h"
 #include "chat/chatOrdnanceSTO.h"
 #include "chat/chatPersonaUpdate.h"
 #include "chat/chatPlayer.h"
@@ -814,7 +815,7 @@ _recvPersonaUpdate(ACTION_OBJECT* const a)
 	{
 		// This can occur when the player isn't done logging in yet.
 #ifdef CLOSED_BETA
-		dbugLog(_FLD, "t:%d Unable to find player %s:%lld", a->teulIndex, chatGetCallsign(update.m_handleID), update.m_handleID);
+		dbugLog(_FLD, "t:%d Unable to find player %s:%lld", a->teulIndex, Chat::Name(update.m_handleID).c_str(), update.m_handleID);
 #endif
 		return a->offset;
 	}

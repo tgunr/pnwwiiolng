@@ -21,6 +21,7 @@
 #include "chat/chatDirectMessage.h"
 #include "chat/chatLStringIDs.h"
 #include "chat/chatModReport.h"
+#include "chat/chatName.h"
 #include "chat/chatSupportRPCMessages.h"
 #include "comm/commConstants.h"
 #include "comm/commHostMessages.h"
@@ -327,7 +328,7 @@ Host::VehicleRequest::execute()
 {
 	const WEAPON_SERIAL& ws = m_weaponSerial;
 
-	dbugLog(_FLD, "in:%llu v:%u c:%s executing host vehicle request", m_instanceID, m_weaponSerial.serial, chatGetCallsign(m_handle));
+	dbugLog(_FLD, "in:%llu v:%u c:%s executing host vehicle request", m_instanceID, m_weaponSerial.serial, Chat::Name(m_handle).c_str());
 
 	// OGS: There's some upper limit on the size of
 	// weapon serials, probably for packer reasons.

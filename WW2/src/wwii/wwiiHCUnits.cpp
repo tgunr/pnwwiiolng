@@ -13,6 +13,7 @@
 #include "wwii/wwiiHCUnits.h"
 #include "include/mydbQuery.h"
 #include "chat/chatHandle.h"
+#include "chat/chatName.h"
 #include "dbse/dbseHandle.h"
 
 extern DBHANDLE dbh;
@@ -170,8 +171,9 @@ wwiiReadHCUnits()
 				break;
 			}
 
+			Chat::Name lastMovedByName(lastMovedBy);
 			dbugLog(_FLD, "hcu:%u start:%u fall:%u nm:%u temp:%s lmb:%s lm:%u %p +ALLOC"
-					, unitID, startCpOID, fallbackCpOID, nextMove, toeTemplate, chatGetCallsign(lastMovedBy), lastMoved
+					, unitID, startCpOID, fallbackCpOID, nextMove, toeTemplate, lastMovedByName.c_str(), lastMoved
 					, newUnit);
 		}
 

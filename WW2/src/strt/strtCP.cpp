@@ -2010,7 +2010,7 @@ strtCaptureAndLog(FacilityStruct* facility, const ChatHandle& handle, UINT32 cus
 	// Is this a save?
 	if ( facility->side == unit->side() )
 	{
-		dbugLog(_FLD, "f:%s:cap saved by %s", facility->name, chatGetCallsign(handle));
+		dbugLog(_FLD, "f:%s:cap saved by %s", facility->name, Chat::Name(handle).c_str());
 		strtCaptureLog(facility, CAP_SAVED, facility->country, handle, customerID, missionID, unit, teulTime(), seconds, false, false, false);
 
 		if ( facility->cp->isObjective() )
@@ -2048,7 +2048,7 @@ _fromInsideFacility(const FacilityStruct* facility, const FULL_OBJ_ID& buildingI
 	if ( object == NULL || object->facility != facility )
 	{
 		dbugLog(_FLA, "p:%u c:%s fac:%s attempt to capture from invalid building %s"
-						, customerID, chatGetCallsign(handle)
+						, customerID, Chat::NAme(handle).c_str()
 						, facility->name, weapPrintFullObjIDC(&buildingID));
 		return false;
 	}

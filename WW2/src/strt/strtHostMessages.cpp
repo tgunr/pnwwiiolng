@@ -720,7 +720,7 @@ _recvMMJoinListRequest(ACTION_OBJECT* const a)
 
 	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &request, sizeof(MM_POST_INFO_REQUEST));
 
-	betaLog(_FLD, "p:%u joinListRequest %s %s %u", request.customerID, weapPrintSerialC(&request.weaponSerial), chatGetCallsign(request.handle), request.join);
+	betaLog(_FLD, "p:%u joinListRequest %s %s %u", request.customerID, weapPrintSerialC(&request.weaponSerial), Chat::Name(request.handle).c_str(), request.join);
 
 	if ( strtProcessJoinListRequest(a->teulIndex, request) == false )
 	{
@@ -974,7 +974,7 @@ _recvCaptureContrib(ACTION_OBJECT* const a)
 
 	auto& event = a->read<Strat::CaptureContributionEvent>();
 	dbugLog(_FLD, "p:%u c:%s v:%u m:%u f:%u hcu:%u status:%u"
-					, event.m_playerID, chatGetCallsign(event.m_handle), event.m_sortieID
+					, event.m_playerID, Chat::Name(event.m_handle).c_str(), event.m_sortieID
 					, event.m_missionID, event.m_facilityID, event.m_unitID
 					, event.m_status
 					);
@@ -982,13 +982,13 @@ _recvCaptureContrib(ACTION_OBJECT* const a)
 	FacilityStruct* forFacility = strtGetFacilityByOID(event.m_facilityID);
 	if ( NULL == forFacility )
 	{
-		dbugLog(_FLA, "p:%u c:%s %s: invalid facilityID %u", event.m_playerID, chatGetCallsign(event.m_handle), __FUNCTION__, event.m_facilityID);
+		dbugLog(_FLA, "p:%u c:%s %s: invalid facilityID %u", event.m_playerID, Chat::Name(event.m_handle).c_str(), __FUNCTION__, event.m_facilityID);
 		return -EINVAL;
 	}
 	HCUnit* forUnit = HCUnit::Lookup(event.m_unitID);
 	if ( NULL == forUnit )
 	{
-		dbugLog(_FLA, "p:%u c:%s %s: invalid unitID %u", event.m_playerID, chatGetCallsign(event.m_handle), __FUNCTION__, event.m_unitID);
+		dbugLog(_FLA, "p:%u c:%s %s: invalid unitID %u", event.m_playerID, Chat::Name(event.m_handle).c_str(), __FUNCTION__, event.m_unitID);
 		return -EINVAL;
 	}
 
@@ -1051,19 +1051,19 @@ AttackOrder::process()
 		switch (m_orderType)
 		{
 		case ORD_ATTACK:
-			dbugLog(_FLD, "received ORD_ATTACK order for %s from %s", cp->name, chatGetCallsign(m_requester));
+			dbugLog(_FLD, "received ORD_ATTACK order for %s from %s", cp->name, Chat::Name(m_requester).c_str());
 			m_result = cp->requestAttack(m_execute, m_brigadeID);
 		break;
 		case ORD_DEFEND:
-			dbugLog(_FLD, "received ORD_DEFEND order for %s from %s", cp->name, chatGetCallsign(m_requester));
+			dbugLog(_FLD, "received ORD_DEFEND order for %s from %s", cp->name, Chat::Name(m_requester).c_str());
 			m_result = cp->requestDefend(unit->side(), m_execute);
 		break;
 		case ORD_CLEAR:
-			dbugLog(_FLD, "received ORD_CLEAR order for %s from %s", cp->name, chatGetCallsign(m_requester));
+			dbugLog(_FLD, "received ORD_CLEAR order for %s from %s", cp->name, Chat::Name(m_requester).c_str());
 			m_result = cp->requestClear(unit->side(), m_delay, m_execute);
 		break;
 		default:
-			LogAbort("Unrecognized attack order packet from %s", chatGetCallsign(m_requester));
+			LogAbort("Unrecognized attack order packet from %s", Chat::Name(m_requester).c_str());
 		break;
 		}
 	}

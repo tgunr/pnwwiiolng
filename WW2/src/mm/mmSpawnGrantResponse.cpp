@@ -311,7 +311,7 @@ _processSpawnGrantResponse(const MM_SPAWN_GRANT_RESPONSE& grant
 		dbugLog(_FLD, "Notifying cell:%s spawning t:%d,p:%u,c:%s sq:%u(%s) ct:%d,cp:%u,cc:%s in:%u.%u.%llu.%llu %s#%d [%f/%f/%f]"
 						, teulGetAddress(grant.serverIP)
 						, commander->teulIndex(), grant.commander, commander->callsign()
-						, commander->squadID(), chatGetCallsign(commander->squadHandle())
+						, commander->squadID(), Chat::Name(commander->squadHandle()).c_str()
 						, ((crew) ? crew->teulIndex() : 0), grant.crew, ((crew) ? crew->callsign() : "n/a")
 						, instance.category(), instance.type(), instance.handle(), instance.id()
 						, weapPrintName(&spec), commander->weapon().serial

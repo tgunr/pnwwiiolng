@@ -18,6 +18,7 @@
 #include "chat/chatDotCommand.h"
 #include "chat/chatHost.h"
 #include "chat/chatMakeTempString.h"
+#include "chat/chatName.h"
 #include "chat/chatSquadList.h"
 #include "chat/chatSquadListTypes.h"
 #include "include/mydbQuery.h"
@@ -103,7 +104,8 @@ _checkName(char* name, bool isCurrent, Player& player)
 	}
 
 	ChatHandle id = chatGetHandle(name);
-	if ( !chatIsValidCallsign(name) || id == 0 || strcmp(name, chatGetCallsign(id)) != 0 )
+	Chat::Name idName(id);
+	if ( idName.Empty() || !idName.IsValid() || idName != name )
 	{
 		player.message(LSTR_CAUTION, LSTR_INVALID_SQUAD_NAME, name);
 		return false;

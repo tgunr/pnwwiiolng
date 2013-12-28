@@ -10,6 +10,7 @@
 
 #include "chat/chatBroadcastObject.h"
 #include "chat/chatPlayer.h"
+#include "chat/chatName.h"
 #include "include/mydbQuery.h"
 #include "wwii/wwiiDBThreads.h"
 
@@ -46,7 +47,7 @@ public:
 static const char* _QUERY = "SELECT f.playerID FROM chat_friends f WHERE f.target = LOWER('%s')";
 
 FriendLoginQuery::FriendLoginQuery(const ChatHandle& handle)
-	: DBThreadQuery(DBThread::Default, "FriendLoginQuery", DBThreadQuery::_CALLBACK, _QUERY, chatGetCallsign(handle))
+	: DBThreadQuery(DBThread::Default, "FriendLoginQuery", DBThreadQuery::_CALLBACK, _QUERY, Chat::Name(handle).c_str())
 	, m_handle(handle)
 	, m_players()
 {

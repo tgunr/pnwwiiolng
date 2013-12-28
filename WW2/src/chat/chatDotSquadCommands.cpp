@@ -17,6 +17,7 @@
 #include "chat/chatHandle.h"
 #include "chat/chatList.h"
 #include "chat/chatMakeTempString.h"
+#include "chat/chatName.h"
 #include "chat/chatSquadControl.h"
 #include "chat/chatSquadControlResults.h"
 #include "chat/chatSquadList.h"
@@ -43,16 +44,15 @@ _findClientSquadList(const Player& player)
 }
 
 static inline ChatHandle
-	_validateSquadName(const char* name)
+_validateSquadName(const char* name)
 {
 	ChatHandle handle = chatGetLowercaseHandle(name);
 	if ( handle == 0LL )
 		return handle;
-	char unpacked[MAX_HANDLE_SIZE];
-	chatGetCallsign(unpacked, handle);
-	if ( strcasecmp(name, unpacked) != 0 )
+	Chat::Name unpacked(handle);
+	if ( unpacked != name )
 		return 0LL;
-	int len = strlen(unpacked);
+	int len = strlen(name);
 	if ( len < 2 || len > Squad::SHORT_NAME_LEN )
 		return 0LL;
 
@@ -165,7 +165,7 @@ public:
 		ChatHandle handle = chatGetLowercaseHandle(arguments);
 		if ( list->find(handle) == NULL )
 		{
-			player.message(LSTR_CAUTION, LSTR_PLAYER_NOT_IN_SQUAD, chatGetCallsign(handle));
+			player.message(LSTR_CAUTION, LSTR_PLAYER_NOT_IN_SQUAD, Chat::Name(handle).c_str());
 			return;
 		}
 

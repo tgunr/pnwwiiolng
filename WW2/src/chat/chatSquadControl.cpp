@@ -16,6 +16,7 @@
 #include "wwii/wwiiPackString.h"
 #include "teul/teulBasic.h"
 #include "chat/chatHandle.h"
+#include "chat/chatName.h"
 
 SINT32
 SquadControl::packer(LOGICAL mode, ACTION_OBJECT* a)
@@ -94,7 +95,7 @@ SquadControl::CREATE_packer(LOGICAL mode, ACTION_OBJECT* a)
 	for ( UINT32 i = 0; i < len; ++i )
 	{
 		a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_players[i], 0);
-		dbugLog(_FLI, "squad contains %s", chatGetCallsign(m_players[i]));
+		dbugLog(_FLI, "squad contains %s", Chat::Name(m_players[i]).c_str());
 	}
 	return a->offset;
 }

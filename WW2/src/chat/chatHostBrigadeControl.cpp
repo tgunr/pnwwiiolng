@@ -21,6 +21,7 @@
 #include "chat/chatHostMessages.h"
 #include "chat/chatList.h"
 #include "chat/chatLStringErr.h"
+#include "chat/chatName.h"
 #include "chat/chatPlayer.h"						// For class and PlayerInterface::Lookup
 #include "strt/strtAttackOrder.h"
 #include "strt/strtConstants.h"
@@ -350,7 +351,7 @@ _noticeToSide(UINT32 notice, UINT32 action, const HCUnit& unit, const ChatHandle
 static void
 _voting(const ChatHandle& sponsor, UINT32 action, const char* description, UINT32 duration, const ChatHandle& nominee, const char* unitName, UINT32 mode)
 {
-	const char* sponsorCallsign = chatGetCallsign(sponsor);
+	Chat::Name sponsorCallsign(sponsor);
 	char nomineeCallsign[32];
 	if ( Vote::IsTargettedAction(mode) )
 	{
@@ -374,7 +375,7 @@ _voting(const ChatHandle& sponsor, UINT32 action, const char* description, UINT3
 	,	"todefend"
 	};
 	dbugLog(_FLI, "%s %s(in %u) %s %s %s %d"
-					, sponsorCallsign
+					, sponsorCallsign.c_str()
 					, description
 					, duration
 					, nomineeCallsign
@@ -1691,7 +1692,7 @@ public:
 				break;
 				}
 				if ( !Vote::IsTargettedAction(controller->vote()->m_voteMode) )
-					entry += chatGetCallsign(controller->vote()->m_nominee);
+					entry += Chat::Name(controller->vote()->m_nominee).c_str();
 			}
 			else if ( controller->oic() )
 				controller->oic()->addName(entry, ":");

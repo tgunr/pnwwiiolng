@@ -29,6 +29,7 @@
 #include "chat/chatMakeTempString.h"
 #include "chat/chatMissions.h"
 #include "chat/chatMissionTypes.h"
+#include "chat/chatName.h"
 #include "chat/chatPlayer.h"
 #include "chat/chatPreferenceEnum.h"
 #include "chat/chatSquadList.h"
@@ -904,11 +905,9 @@ public:
 			}
 			else
 			{
-				ChatHandle handle = chatGetHandle(arguments);
-				char callsign[MAX_HANDLE_SIZE];
-				chatGetCallsign(callsign, handle);
-				player.gmNote("GM", command(), callsign, NULL);
-				clause = chatMakeTempString("AND call = '%s'", callsign);
+				Chat::Name callsign(chatGetHandle(arguments));
+				player.gmNote("GM", command(), callsign.c_str(), NULL);
+				clause = chatMakeTempString("AND call = '%s'", callsign.c_str());
 			}
 		}
 
@@ -927,9 +926,9 @@ public:
 	LastDeathsQuery(const ChatHandle& requester, const ChatHandle& handleID)
 		: DBThreadQuery(DBThread::Default, "LastDeathsQuery", DBThreadQuery::_CALLBACK
 							, "CALL wwii.p_get_last_killers('%s')"
-								, chatGetCallsign(handleID))
+								, Chat::Name(handleID).c_str())
 		, m_requesterID(requester)
-		, m_callsign(chatGetCallsign(handleID))
+		, m_callsign(handleID)
 		, m_results()
 		{
 			m_results.clear();
@@ -938,7 +937,7 @@ public:
 
 protected:
 	ChatHandle	m_requesterID;
-	std::string m_callsign;
+	Chat::Name	m_callsign;
 	std::vector<std::string> m_results;
 
 protected:
@@ -1034,9 +1033,9 @@ public:
 	LastKillsQuery(const ChatHandle& requester, const ChatHandle& handleID)
 		: DBThreadQuery(DBThread::Default, "LastKillsQuery", DBThreadQuery::_CALLBACK
 						, "CALL wwii.p_get_last_kills('%s')"
-							, chatGetCallsign(handleID))
+							, Chat::Name(handleID).c_str())
 		, m_requesterID(requester)
-		, m_callsign(chatGetCallsign(handleID))
+		, m_callsign(handleID)
 		, m_results()
 		{
 			m_results.clear();
@@ -1045,7 +1044,7 @@ public:
 
 protected:
 	ChatHandle	m_requesterID;
-	std::string m_callsign;
+	Chat::Name	m_callsign;
 	std::vector<std::string> m_results;
 
 protected:
@@ -1176,14 +1175,14 @@ public:
 
 		if ( subject->squadRank() == Squad::CO )
 		{
-			player.message(LSTR_CAUTION, LSTR_PLAYER_ALREADY_CO, subject->callsign(), chatGetCallsign(subject->squadHandle()));
+			player.message(LSTR_CAUTION, LSTR_PLAYER_ALREADY_CO, subject->callsign(), Chat::Name(subject->squadHandle()).c_str());
 			return;
 		}
 
 		SquadList* list = chatFindSquadList(subject->squadID());
 		if ( list == NULL || list->online() == 0 )
 		{
-			player.message(LSTR_CAUTION, LSTR_SQUAD_NOT_ONLINE, chatGetCallsign(subject->squadHandle()));
+			player.message(LSTR_CAUTION, LSTR_SQUAD_NOT_ONLINE, Chat::Name(subject->squadHandle()).c_str());
 			return;
 		}
 
@@ -1199,7 +1198,7 @@ public:
 			}
 			else if ( !force )
 			{
-				player.message(LSTR_CAUTION, LSTR_MAKECO_USE_FORCE, squad.shortName(), chatGetCallsign(oldCO));
+				player.message(LSTR_CAUTION, LSTR_MAKECO_USE_FORCE, squad.shortName(), Chat::Name(oldCO).c_str());
 				return;
 			}
 		}
@@ -1223,7 +1222,7 @@ public:
 	QueryPlayerInfo(const ChatHandle& byMatchID, const ChatHandle& handle)
 		: DBThreadQuery(DBThread::Default, "QueryPlayerInfo", DBThreadQuery::_CALLBACK
 							, "CALL auth.p_get_player_details((SELECT playerid FROM wwiionline.wwii_player WHERE callsign = '%s'), %u)"
-								, chatGetCallsign(handle), Server::myServerInfo.stats.arenaID
+								, Chat::Name(handle).c_str(), Server::myServerInfo.stats.arenaID
 							)
 		, m_matchID(byMatchID)
 		, m_handle(handle)
@@ -1279,7 +1278,7 @@ protected:
 
 		if ( (m_callsign[0] == 0) | (m_response[0] == 0) )
 		{
-			player->message(LSTR_CAUTION, LSTR_INVALID_CALLSIGN, chatGetCallsign(m_handle));
+			player->message(LSTR_CAUTION, LSTR_INVALID_CALLSIGN, Chat::Name(m_handle).c_str());
 		}
 		else
 		{
@@ -1373,10 +1372,8 @@ DotPInfo::actionWith(Player& player, Chat::ClientMessage* message, char* argumen
 	}
 
 	ChatHandle handle = chatGetLowercaseHandle(sourceName);
-	char callsign[MAX_HANDLE_SIZE];
-	chatGetCallsign(callsign, handle);
-	const Player* const target = PlayerInterface::Lookup(callsign);
-	if ( target == NULL )
+	const Player* const target = PlayerInterface::Lookup(handle);
+	if ( target == nullptr )
 	{
 		(new QueryPlayerInfo(player.matchHandle(), handle))->Queue();
 		return;
@@ -2124,10 +2121,11 @@ class PlayerNote : public DBThreadQuery
 public:
 	PlayerNote(const ChatHandle& handle, UINT32 byPlayerID, const std::string& note, const char* orig)
 		: DBThreadQuery(DBThread::Default, "PlayerNote", DBThreadQuery::_CALLBACK
-							, "CALL `wwii`.`p_add_player_note`('%s', %u, 1, '%s')", chatGetCallsign(handle), byPlayerID, note.c_str())
+							, "CALL `wwii`.`p_add_player_note`('%s', %u, 1, '%s')", Chat::Name(handle).c_str(), byPlayerID, note.c_str())
 								, m_handle(handle), m_byPlayerID(byPlayerID), m_text(orig), m_err("")
 		{
-			m_err = chatGetCallsign(m_handle);
+			Chat::Name name(m_handle);
+			m_err = name;
 		}
 
 protected:
@@ -2163,7 +2161,7 @@ public:
 			return;
 
 		///LOCALIZE
-		chatDispatchGMMessage("INFO", chatMakeTempString("%s noted %s: %s", player->callsign(), chatGetCallsign(m_handle), m_text.c_str()));
+		chatDispatchGMMessage("INFO", chatMakeTempString("%s noted %s: %s", player->callsign(), Chat::Name(m_handle).c_str(), m_text.c_str()));
 	}
 
 	virtual void Failure()
@@ -2186,7 +2184,7 @@ public:
 			 				" WHERE p.callsign = '%s'"
 			 				" ORDER BY n.note_at DESC"
 			 				" LIMIT 10"
-							, chatGetCallsign(handle))
+							, Chat::Name(handle).c_str())
 		, m_handle(handle), m_byPlayerID(byPlayerID)
 		, m_results()
 		{
@@ -2205,8 +2203,7 @@ protected:
 		if ( numRows <= 0 )
 			return true;
 
-		char callsign[MAX_HANDLE_SIZE];
-		chatGetCallsign(callsign, m_handle);
+		Chat::Name callsign(m_handle);
 
 		std::string line;
 		while ( Query()->FetchRow() )
@@ -2254,10 +2251,9 @@ public:
 			return;
 
 		const size_t numRows = m_results.size();
-		const char* callsign = chatGetCallsign(m_handle);
 		if ( numRows <= 0 )
 		{
-			player->message(LSTR_NOTE, LSTR_NO_PNOTES_FOUND, callsign);
+			player->message(LSTR_NOTE, LSTR_NO_PNOTES_FOUND, Chat::Name(m_handle).c_str());
 			return;
 		}
 
@@ -2271,7 +2267,7 @@ public:
 	{
 		Player* player = PlayerInterface::Lookup(m_byPlayerID);
 		if ( player != NULL )
-			player->message(LSTR_NOTE, LSTR_INVALID_CALLSIGN, chatGetCallsign(m_handle));
+			player->message(LSTR_NOTE, LSTR_INVALID_CALLSIGN, Chat::Name(m_handle).c_str());
 
 	}
 };

@@ -40,6 +40,7 @@
 #include "chat/chatMissions.h"
 #include "chat/chatRecruiterList.h"
 #include "chat/chatDebugConditions.h"
+#include "chat/chatName.h"
 
 static const UINT32 SQUAD_UPDATE_INTERVAL_MS = 5 * 1000;
 
@@ -159,7 +160,7 @@ public:
 			if ( joined == 0 )
 			{
 				dbugLog(_FLA, "sq:%u p:%u c:%s has squad id but null squad_joined"
-								, m_squadID, playerID, chatGetCallsign(handle));
+								, m_squadID, playerID, Chat::Name(handle).c_str());
 				joined = teulTime();
 				DBThread::Do(DBThread::Default
 								, "UPDATE LOW_PRIORITY wwii_player"
@@ -189,7 +190,7 @@ public:
 			std::pair<const ChatHandle, SquadMemberEntry>& entry = *(mit++);
 			if ( entry.second.joined() == 0 )
 			{
-				dbugLog(_FLD, "sq:%u player %s no-longer in member list", m_squadID, chatGetCallsign(entry.first));
+				dbugLog(_FLD, "sq:%u player %s no-longer in member list", m_squadID, Chat::Name(entry.first).c_str());
 				list->memberLeave(true, &entry.second, LSTR_SQUAD_LEAVER, "missing");
 			}
 		}
@@ -267,7 +268,7 @@ SquadList::SquadList(const Squad& withSquad)
 }
 
 //////////////////////////////////////////////////////////////////////
-// SquadList internal function: add a member and update if neccessary
+// SquadList internal function: add a member and update if necessary
 
 void
 SquadList::_addMember(const ChatHandle& handle, RANK_NO squadRank, Player* player, UINT32 joined)
@@ -277,7 +278,7 @@ SquadList::_addMember(const ChatHandle& handle, RANK_NO squadRank, Player* playe
 
 #ifdef HEAVY_DEBUG
 	if ( g_debugSquads )
-		dbugLog(_FLD, "sq:%u +%s [%s]", squad().squadID(), chatGetCallsign(handle), (usePlayer) ? "online" : "offline");
+		dbugLog(_FLD, "sq:%u +%s [%s]", squad().squadID(), Chat::Name(handle).c_str(), (usePlayer) ? "online" : "offline");
 #endif
 
 	if ( joined == 0 )
@@ -293,7 +294,7 @@ SquadList::_addMember(const ChatHandle& handle, RANK_NO squadRank, Player* playe
 }
 
 //////////////////////////////////////////////////////////////////////
-// SquadList inernal function: update an existing member entry
+// SquadList internal function: update an existing member entry
 
 void
 SquadList::changeMemberEntry(SquadMemberEntry& member, RANK_NO squadRank, Player* player)
@@ -519,9 +520,8 @@ CHATDB_SQUAD_XCHG::receive(SINT32 /*teulIndex*/, CHATDB_SQUAD_XCHG& incoming)
 
 	if ( g_logDebug & g_debugSquads )
 	{
-		dbugLog(_FLD, "sq:%u received info short:%s name:%s", squad.squadID(), squad.callsign().c_str(), squad.name().c_str());
-		dbugLog(_FLDB, " co:%s", chatGetCallsign(squad.coHandle()));
-		dbugLog(_FLDB, " creator:%s", chatGetCallsign(squad.creatorHandle()));
+		Chat::Name co(squad.coHandle()), creator(squad.creatorHandle());
+		dbugLog(_FLD, "sq:%u received info short:%s name:%s co:%s creator:%s", squad.squadID(), squad.callsign().c_str(), squad.name().c_str(), co.c_str(), creator.c_str());
 	}
 
 	// The query might have been delayed and we might already have
@@ -976,7 +976,7 @@ SquadList::electNewCO()
 		return;
 	}
 
-	dbugLog(_FLN, "sq:%s(%u) voted new CO: %s", squad().callsign().c_str(), squad().squadID(), chatGetCallsign(winner));
+	dbugLog(_FLN, "sq:%s(%u) voted new CO: %s", squad().callsign().c_str(), squad().squadID(), Chat::Name(winner).c_str());
 
 	// Ok - now we have to elect a new CO
 	ChatHandle oldCO = squad().coHandle();
@@ -992,7 +992,7 @@ SquadList::electNewCO()
 
 	char lead[16+1];
 	snprintf(lead, 16, "%u", vote->m_lead);
-	sendMessage(LSTR_SQUAD, msg, chatGetCallsign(winner), lead);
+	sendMessage(LSTR_SQUAD, msg, Chat::Name(winner).c_str(), lead);
 	setUpdated();
 
 	// Close for the default period
@@ -1000,13 +1000,13 @@ SquadList::electNewCO()
 }
 
 //////////////////////////////////////////////////////////////////////
-// Update all the neccessary squad data after a renaming
+// Update all the necessary squad data after a renaming
 
 void
 SquadList::renamed(const ChatHandle& newHandle)
 {
 	const std::string oldCallsign = squad().m_callsign;
-	const std::string newCallsign = chatGetCallsign(newHandle);
+	const Chat::Name newCallsign(newHandle);
 	dbugLog(_FLN, "Squad %s renamed to %s, updating tables and players", squad().m_callsign.c_str(), newCallsign.c_str());
 	// Mark the squad as needing its details resent
 	squad().m_shortHandle = newHandle;

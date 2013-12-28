@@ -10,8 +10,8 @@
 // Originating Programmer: Oliver "kfsone" Smith
 //
 
-
 #include "chat/chatDotCommand.h"
+#include "chat/chatName.h"
 #include "chat/chatPlayer.h"
 #include "chat/chatFriendList.h"
 
@@ -45,7 +45,7 @@ public:
 		{
 			if ( !textlist.empty() )
 				textlist += ", ";
-			textlist += chatGetCallsign(*it);
+			textlist += Chat::Name(*it);
 		}
 		player.message(LSTR_NONE, LSTR_GENERIC, textlist.c_str());
 	}

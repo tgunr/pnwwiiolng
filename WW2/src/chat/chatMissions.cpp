@@ -23,6 +23,7 @@
 #include "chat/chatMakeTempString.h"
 #include "chat/chatMissions.h"
 #include "chat/chatMissionTypes.h"
+#include "chat/chatName.h"
 #include "chat/chatPlayer.h"
 #include "chat/chatPreferenceEnum.h"
 #include "chat/chatServerTrackedObjects.h"
@@ -541,8 +542,7 @@ ChatMission::addWaypoint(Waypoint& waypoint)
 			removeWaypoint(waypoint.handle(), false);
 
 #ifdef BETA_RELEASE
-		std::string wpName(chatGetCallsign(waypoint.handle()));
-		std::string wpPlayer(chatGetCallsign(waypoint.playerHandle()));
+		Chat::Name wpName(waypoint.handle()), wpPlayer(waypoint.playerHandle());
 		dbugLog(_FLD, "m:%u adding waypoint %s from p:%s", missionID(), wpName.c_str(), wpPlayer.c_str());
 #endif
 
@@ -576,7 +576,7 @@ ChatMission::removeWaypoint(const ChatHandle& handle, bool byPlayer)
 		sendMobileSpawn(0, waypoint.playerHandle(), (FLOAT32)waypoint.x(), (FLOAT32)waypoint.y(), 0.0f, false, 0);
 	}
 
-	dbugLog(_FLD, "m:%u removing waypoint %llu[%s]", missionID(), waypoint.handle(), chatGetCallsign(waypoint.handle()));
+	dbugLog(_FLD, "m:%u removing waypoint %llu[%s]", missionID(), waypoint.handle(), Chat::Name(waypoint.handle()).c_str());
 
 	if ( !m_members.empty() )
 	{
@@ -655,14 +655,13 @@ ChatMission::addMemberRemoval(Player* const player)
 void
 ChatMission::expireWaypoints()
 {
-	WAYPOINTS::iterator it;
-	UINT32 cutoff = (UINT32) teulTime() - CONTACT_REPORT_LIFETIME_S;
-	for ( it = m_waypoints.begin(); it != m_waypoints.end(); ++it )
+	const UINT32 cutoff = (UINT32) teulTime() - CONTACT_REPORT_LIFETIME_S;
+	for (auto it = m_waypoints.begin(), end = m_waypoints.end(); it != end; ++it )
 	{
 		Waypoint& wp = it->second;
 		if ( wp.type() == WPT_ENEMY && wp.posted() <= cutoff )
 		{
-			betaLog(_FLI, "m:%u removing waypoint %s", missionID(), chatGetCallsign(it->first));
+			betaLog(_FLI, "m:%u removing waypoint %s", missionID(), Chat::Name(it->first).c_str());
 			removeWaypoint(it->first, false);
 			break;
 		}
@@ -1029,7 +1028,7 @@ ChatMission::sendUpdates()
 			update.m_handle = *it;
 #ifdef CLOSED_BETA
 			if ( g_logDebug )
-				dbugLog(_FLDB, "-%s ", chatGetCallsign(update.m_handle));
+				dbugLog(_FLDB, "-%s ", Chat::Name(update.m_handle).c_str());
 #endif
 			m_mmu.add(update);
 		}
@@ -1044,7 +1043,7 @@ ChatMission::sendUpdates()
 	{
 #ifdef CLOSED_BETA
 		if ( g_logDebug )
-			dbugLog(_FLDB, "*%s ", chatGetCallsign(it->first));
+			dbugLog(_FLDB, "*%s ", Chat::Name(it->first).c_str());
 #endif
 
 		Player* const player = it->second;
@@ -1141,7 +1140,7 @@ chatSendMissionUpdates()
 void
 ChatMission::addMSPWaypoint(const ChatHandle& ownerCall, FLOAT64 x, FLOAT64 y, FLOAT64 z, UINT32 stoId)
 {
-	message(LSTR_MISSION, LSTR_MOBILE_SPAWN_AVAILABLE, chatGetCallsign(ownerCall));
+	message(LSTR_MISSION, LSTR_MOBILE_SPAWN_AVAILABLE, Chat::Name(ownerCall).c_str());
 	Waypoint newWP(false, _getMSPHandle(), ownerCall
 					, WPT_MOBILESPAWN, WPT_MS_LOCATION
 					, static_cast<SINT32>(x), static_cast<SINT32>(y)
@@ -1214,7 +1213,7 @@ MOBILE_SPAWN_WAYPOINT::receive(SINT32 /*teulIndex*/, MOBILE_SPAWN_WAYPOINT& inco
 {
 	const MobileSpawnWaypoint& wp = incoming.data();
 
-	betaLog(_FLI, "mspwp: m:%u p:%u c:%s d:%u sto:%u", wp.m_missionID, wp.m_playerID, chatGetCallsign(wp.m_ownerCall), wp.m_deployed, wp.m_stoUID);
+	betaLog(_FLI, "mspwp: m:%u p:%u c:%s d:%u sto:%u", wp.m_missionID, wp.m_playerID, Chat::Name(wp.m_ownerCall).c_str(), wp.m_deployed, wp.m_stoUID);
 
 	if ( wp.m_missionID == 0 )
 	{
@@ -1394,7 +1393,7 @@ public:
 		if ( player.isAFK() )
 			throw Chat::LStringErr(LSTR_NO_AFK_TAKELEAD);
 
-		player.gmNote("GM", command(), (mission->m_matchLeader) ? chatGetCallsign(mission->m_matchLeader) : "[no leader]", NULL);
+		player.gmNote("GM", command(), (mission->m_matchLeader) ? Chat::Name(mission->m_matchLeader).c_str() : "[no leader]", NULL);
 
 		mission->m_displacedLeader = 0LL;
 		mission->m_leaderDisplaced = 0;
@@ -1445,7 +1444,7 @@ DotMList::action(Player& player, Chat::ClientMessage* const /*message*/) const
 	{
 		const char* const p = chatMakeTempString("m:%u leader:%s memb:%u wps:%u mu:%u mr:%u"
 											, mission->missionID()
-											, chatGetCallsign(mission->leader())
+											, Chat::Name(mission->leader()).c_str()
 											, mission->m_members.size()
 											, mission->m_waypoints.size()
 											, mission->m_updates.size()

@@ -17,6 +17,7 @@
 #include <math.h>
 
 #include "chat/chatHandle.h"
+#include "chat/chatName.h"
 #include "strt/strtCPStruct.h"
 #include "strt/strtTOE.h"
 #include "strt/strtHCUnits.h"
@@ -60,7 +61,8 @@ TOE_::TemplateHeader::initialize(const ChatHandle& withHandle, const char* withN
 	// If ID isn't null, we're already initialized
 	assert( m_handle == 0LL );
 
-	dbugLog(_FLI, "toe:%s(%llu) c:%u b:%u %s", chatGetCallsign(withHandle), withHandle, withCountry, withBranch, withName);
+	Chat::Name newName(withHandle);
+	dbugLog(_FLI, "toe:%s(%llu) c:%u b:%u %s", newName.c_str(), withHandle, withCountry, withBranch, withName);
 
 	m_handle = withHandle;
 	m_name = withName;
@@ -78,7 +80,8 @@ TOE_::TemplateHeader::setName(const char* newName)
 	if ( name().compare(newName) == 0 )
 		return;
 
-	dbugLog(_FLI, "toe:%s(%llu) new name: %s", chatGetCallsign(handle()), handle(), newName);
+	Chat::Name oldName(handle());
+	dbugLog(_FLI, "toe:%s(%llu) new name: %s", oldName.c_str(), handle(), newName);
 
 	m_name = newName;
 }
@@ -95,13 +98,14 @@ TOE_::TemplateHeader::updateWeapon(const WEAPON_SPEC& spec, UINT16 capacity, UCH
 	// Is this a new entry?
 	if ( it == m_weapons.end() || it->first != spec )
 	{
+		Chat::Name toeName(handle());
 		const WEAPON* weapon = weapLookup(spec);
 		if ( weapon == NULL )
 			LogAbort("toe:%s(%llu) wanted unknown weapon spec %s"
-							, chatGetCallsign(handle()), handle(), weapPrintSpecC(&spec));
+							, toeName.c_str(), handle(), weapPrintSpecC(&spec));
 
 		dbugLog(_FLI, "toe:%s(%llu) adding %s(%s) capacity %u"
-						, chatGetCallsign(handle()), handle()
+						, toeName.c_str(), handle()
 						, weapon->name
 						, weapPrintSpecC(&spec)
 						, capacity

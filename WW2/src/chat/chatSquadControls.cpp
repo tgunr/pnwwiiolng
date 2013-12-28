@@ -94,12 +94,14 @@ _removeSquadMember(bool removeFromDB, SquadList* list, SquadMemberEntry* entry, 
 		player->stopRecruiting();
 	}
 
+	Chat::Name callsign(handle);
+	if (player)
+		callsign = player->callsign();
+
 	if ( removeFromDB )
 	{
+		Chat::Name remover(byHandle);
 		UINT32 squadID = list->squad().squadID();
-		char remover[MAX_HANDLE_LEN+1];
-		chatGetCallsign(remover, byHandle);
-		const char* callsign = (player) ? player->callsign() : chatGetCallsign(handle);
 
 		if ( player )
 		{
@@ -116,19 +118,18 @@ _removeSquadMember(bool removeFromDB, SquadList* list, SquadMemberEntry* entry, 
 				, "UPDATE wwii_player"
 					" SET squadid=0, squad_rank=0, squad_joined=NOW(), squad_time_played=0"
 					" WHERE callsign='%s' AND squadid=%u"
-					, callsign, squadID
+					, callsign.c_str(), squadID
 					);
 		}
 
-		_audit(squadID, SquadMemberUpdate::_REMOVE, remover, callsign, 0, entry->squadRank(), 0, (param ? param : ""));
+		_audit(squadID, SquadMemberUpdate::_REMOVE, remover.c_str(), callsign.c_str(), 0, entry->squadRank(), 0, (param ? param : ""));
 	}
 
 	if ( !list )
 		throw SQR_SQUAD_UNAVAILABLE;
 
 	list->removeMember(handle);
-	const char* callsign = (player) ? player->callsign() : chatGetCallsign(handle);
-	list->sendMessage(LSTR_SQUAD, lstringMsg, callsign, param);
+	list->sendMessage(LSTR_SQUAD, lstringMsg, callsign.c_str(), param);
 }
 
 void
@@ -136,11 +137,10 @@ SquadList::memberJoin(Player* player, const ChatHandle& handle, RANK_NO atRank, 
 {
 	if ( announceToSquad )
 	{
-		const char* callsign = (player) ? player->callsign() : chatGetCallsign(handle);
 		if ( recruitedBy )
-			sendMessage(LSTR_SQUAD, LSTR_SQUAD_RECRUITED_BY_RECRUITER, callsign, recruitedBy);
+			sendMessage(LSTR_SQUAD, LSTR_SQUAD_RECRUITED_BY_RECRUITER, player ? player->callsign() : Chat::Name(handle).c_str(), recruitedBy);
 		else
-			sendMessage(LSTR_SQUAD, LSTR_SQUAD_ADDITION, callsign, squad().shortName());
+			sendMessage(LSTR_SQUAD, LSTR_SQUAD_ADDITION, player ? player->callsign() : Chat::Name(handle).c_str(), squad().shortName());
 	}
 
 	updateMember(handle, atRank, player, joined);
@@ -339,7 +339,7 @@ _checkSquadMember(Player* player, SquadList* list, const ChatHandle& handle, RAN
 	SquadMemberEntry* entry = list->find(handle);
 	if ( entry == NULL )
 	{
-		dbugLog(_FLI, "%llu [%s] is not in squad list", handle, chatGetCallsign(handle));
+		dbugLog(_FLI, "%llu [%s] is not in squad list", handle, Chat::Name(handle).c_str());
 		throw SQR_PLAYER_NOT_IN_SQUAD;
 	}
 
@@ -436,7 +436,7 @@ _processCreate(SquadControl& request, Player* player, SquadList* /*squadList*/)
 	// Check the name isn't already being applied for
 	if ( chatCheckForSquadName(request.m_handle) )
 		throw SQR_SQUAD_EXISTS;
-	if ( chatFindSquadListByName(chatGetCallsign(request.m_handle)) )
+	if ( chatFindSquadListByName(Chat::Name(request.m_handle).c_str()) )
 		throw SQR_SQUAD_EXISTS;
 
 	if ( request.m_players.empty() )

@@ -361,7 +361,7 @@ Mission::~Mission()
 		dbugLog(_FLD, "m:%u posted:%d[%s] country:%d branch:%d side:%d brig:%d[%s] -REL"
 						, missionID()
 						, playerID()
-						, chatGetCallsign(m_poster)
+						, Chat::Name(m_poster).c_str()
 						, country()
 						, branch()
 						, side()
@@ -1703,7 +1703,7 @@ LeaderChange::process() const
 		return _SUCCESS;
 	}
 
-	dbugLog(_FLI, "m:%u processing leader change to %s", m_missionID, chatGetCallsign(m_leaderHandle));
+	dbugLog(_FLI, "m:%u processing leader change to %s", m_missionID, Chat::Name(m_leaderHandle).c_str());
 
 	// See if we know about this mission
 	Mission* const mission = mapFindMission(m_missionID);

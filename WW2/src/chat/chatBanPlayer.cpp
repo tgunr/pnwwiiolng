@@ -14,8 +14,9 @@
 
 #include "chat/chatPlayer.h"
 #include "chat/chatHost.h"
-#include "chat/chatMakeTempString.h"
 #include "chat/chatLStringIDs.h"
+#include "chat/chatMakeTempString.h"
+#include "chat/chatName.h"
 #include "wwii/wwiiThreads.h"
 #include "wwii/wwiiThreadText.h"
 #include "wwii/wwiiThreadTypes.h"
@@ -68,7 +69,8 @@ _banFail(void* data)
 	Player* player = PlayerInterface::Lookup(ban->m_issuerHandle);
 	if ( player != NULL )
 	{
-		player->message(LSTR_CAUTION, LSTR_ERROR_VERB_SUBJECT, (ban->m_duration > 0) ? "ban" : "kick", chatGetCallsign(ban->m_handle));
+		Chat::Name bannedName(ban->m_handle);
+		player->message(LSTR_CAUTION, LSTR_ERROR_VERB_SUBJECT, (ban->m_duration > 0) ? "ban" : "kick", bannedName.c_str());
 		player->message(LSTR_CAUTION, LSTR_GENERIC, ban->m_message.c_str());
 	}
 
@@ -86,14 +88,15 @@ _banSuccess(void* data)
 	{
 		// Tell the issuer they were successful
 		const char* p;
+		Chat::Name banned(ban->m_handle);
 		if ( ban->m_duration == 0 )
-			p = chatMakeTempString("%s has force-kicked %s: %s", issuer->callsign(), chatGetCallsign(ban->m_handle), ban->m_message.c_str());
+			p = chatMakeTempString("%s has force-kicked %s: %s", issuer->callsign(), banned.c_str(), ban->m_message.c_str());
 		else
 			p = chatMakeTempString("%s has issued a %s ban(#%u) on %s: %s"
 						, issuer->callsign()
 						, chatTimeInterval(ban->m_duration)
 						, ban->m_banNo
-						, chatGetCallsign(ban->m_handle)
+						, banned.c_str()
 						, ban->m_message.c_str()
 			);
 		chatDispatchGMMessage("INFO", p);
@@ -122,14 +125,14 @@ static void
 _processBan(DB::handle_t* conn, BAN& ban)
 {
 	char* p = NULL;
-	char callsign[MAX_HANDLE_SIZE];
-	chatGetCallsign(callsign, ban.m_handle);
+	Chat::Name name(ban.m_handle);
+	Chat::Name issuer(ban.m_issuerHandle);
 
 	try
 	{
 		mysql_ping(conn);
 
-		threadLog(_FLN, "p:%u c:%s %s(%u) %s", ban.m_issuer, chatGetCallsign(ban.m_issuerHandle), (ban.m_duration > 0) ? "ban":"kick", ban.m_duration, callsign);
+		threadLog(_FLN, "p:%u c:%s %s(%u) %s", ban.m_issuer, issuer.c_str(), (ban.m_duration > 0) ? "ban":"kick", ban.m_duration, name.c_str());
 
 		std::string message(ban.m_message);
 		wwiiEscapeString(message);
@@ -139,7 +142,7 @@ _processBan(DB::handle_t* conn, BAN& ban)
 		// 1, <#bans>
 		static const char QRY_CALL_BAN_PLAYER[] = "CALL wwii.p_ban_player ('%s', %u, %u, '%s')";
 
-		p = threadsPrintf(QRY_CALL_BAN_PLAYER, callsign, ban.m_duration, ban.m_issuer, message.c_str());
+		p = threadsPrintf(QRY_CALL_BAN_PLAYER, name.c_str(), ban.m_duration, ban.m_issuer, message.c_str());
 		DBQuery q(conn, p);
 
 		playerid_t playerID = 0;
@@ -155,13 +158,13 @@ _processBan(DB::handle_t* conn, BAN& ban)
 
 		threadCallback(_banSuccess, &ban);
 
-		threadLog(_FLN, "p:%u subj:%s %llu vs %llu issued %us ban", ban.m_issuer, callsign, ban.m_issuerHandle, ban.m_handle, ban.m_duration);
+		threadLog(_FLN, "p:%u subj:%s %llu vs %llu issued %us ban", ban.m_issuer, name.c_str(), ban.m_issuerHandle, ban.m_handle, ban.m_duration);
 	}
 	catch (std::exception& e)
 	{
 		ban.m_message = e.what();
 		threadCallback(_banFail, &ban);
-		threadLog(_FLW, "p:%u subj:%s failed: %s", ban.m_issuer, callsign, e.what());
+		threadLog(_FLW, "p:%u subj:%s failed: %s", ban.m_issuer, name.c_str(), e.what());
 	}
 
 	if ( p )

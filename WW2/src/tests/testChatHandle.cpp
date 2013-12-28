@@ -11,6 +11,7 @@
 #include "tests/testUnits.h"
 #include "wwii/wwiiPack.h"		// For wwiiPackHandle
 #include "wwii/wwiiUTF.h"		// For UTF functions
+#include "chat/chatName.h"		// For Chat::Name and Chat::NameW
 
 // Test unit class.
 class ChatHandleTestUnit : public TestUnit
@@ -346,6 +347,134 @@ ChatHandleTestUnit::Run()
 		END_SUB_STAGE( "wchar_t* chinese callsign" )
 
 	END_TEST_STAGE( "wwiiPackHandle" )
+
+	START_TEST_STAGE("Chat::Name")
+
+		START_SUB_STAGE( "Default ctor" )
+
+			Chat::Name name;
+			CRITICAL( ExpectTrue(name.Empty()) );
+			CRITICAL( ExpectFalse(name.IsValid()) );
+			CRITICAL( ExpectFalse(name.c_str() == nullptr) &&
+					  ExpectFalse(static_cast<const char*>(name) == nullptr) 
+					  );
+			CRITICAL( ExpectFalse(name.IsWideCallsign()) );
+			CRITICAL( ExpectEqual(name.Handle(), 0ULL) &&
+					  ExpectEqual(name.LowercaseHandle(), 0ULL) &&
+					  ExpectEqual(static_cast<ChatHandle>(name), 0ULL)
+					  );
+			CRITICAL( ExpectTrue(name == name) );
+			CRITICAL( ExpectTrue(name == "") );
+			CRITICAL( ExpectFalse(name == "hello") ) ;
+
+		END_SUB_STAGE( "Default ctor" )
+
+		START_SUB_STAGE( "String ctor" )
+
+			static const char* testString = "Hello";
+			Chat::Name name(testString);
+			CRITICAL( ExpectFalse(name.Empty()) );
+			CRITICAL( ExpectTrue(name.IsValid()) );
+			CRITICAL( ExpectFalse(name.c_str() == nullptr) &&
+					  ExpectFalse(static_cast<const char*>(name) == nullptr) 
+					  );
+			CRITICAL( ExpectFalse(name.IsWideCallsign()) );
+			CRITICAL( ExpectTrue(name.Handle() != 0ULL) &&
+					  ExpectTrue(name.LowercaseHandle() != 0ULL) &&
+					  ExpectTrue(name.Handle() != name.LowercaseHandle()) &&
+					  ExpectTrue(static_cast<ChatHandle>(name) != 0ULL)
+					  );
+
+			CRITICAL( ExpectEqual(strcmp(name.c_str(), testString), 0) );
+			CRITICAL( ExpectEqual(strcmp(chatGetCallsign(name.LowercaseHandle()), "hello"), 0) );
+			CRITICAL( ExpectTrue(name == name) );
+			CRITICAL( ExpectTrue(name == testString) );
+			CRITICAL( ExpectFalse(name == (testString + 1)) );
+
+		END_SUB_STAGE( "String ctor" )
+
+		START_SUB_STAGE( "Handle ctors" )
+
+			ChatHandle handle = chatGetHandle("hELLo");
+			ChatHandle lowerHandle = chatGetLowercaseHandle(handle);
+			Chat::Name name(handle);
+			CRITICAL( ExpectFalse(name.Empty()) );
+			CRITICAL( ExpectTrue(name.IsValid()) );
+			CRITICAL( ExpectFalse(name.c_str() == nullptr) &&
+					  ExpectFalse(static_cast<const char*>(name) == nullptr) 
+					  );
+			CRITICAL( ExpectFalse(name.IsWideCallsign()) );
+			CRITICAL( ExpectEqual(name.Handle(), handle) &&
+					  ExpectEqual(name.LowercaseHandle(), lowerHandle) &&
+					  ExpectEqual(static_cast<ChatHandle>(name), handle)
+					  );
+
+			CRITICAL( ExpectEqual(strcmp(name.c_str(), "hELLo"), 0) );
+			CRITICAL( ExpectEqual(strcmp(chatGetCallsign(name.LowercaseHandle()), "hello"), 0) );
+
+		END_SUB_STAGE( "Handle ctor" )
+
+		START_SUB_STAGE( "Copy ctor and operators" )
+
+			// a plain-ascii callsign can only contain 10 characters.
+			static const char testString[] = "1234567890";
+			static const ChatHandle testHandle = chatGetHandle(testString);
+			static_assert(sizeof(testString) == MAX_HANDLE_WSIZE, "copy ctor test string is the wrong size");
+
+			Chat::Name src(testString);
+			CRITICAL( ExpectFalse(src.Empty()) );
+			CRITICAL( ExpectEqual(strcmp(src.c_str(), testString), 0) );
+			CRITICAL( ExpectTrue(src.IsValid()) );
+			CRITICAL( ExpectFalse(src.IsWideCallsign()) );
+
+			Chat::Name copy(src);
+			CRITICAL( ExpectFalse(copy.Empty()) )
+			CRITICAL( ExpectEqual(strcmp(copy.c_str(), testString), 0) );
+			CRITICAL( ExpectEqual(copy.Handle(), testHandle) );
+			CRITICAL( ExpectTrue(src.IsValid()) );
+			CRITICAL( ExpectTrue(copy.IsValid()) );
+			CRITICAL( ExpectTrue(copy == src) );
+			CRITICAL( ExpectTrue(copy == testString) );
+
+			Chat::Name dest;
+			CRITICAL( ExpectTrue(dest.Empty()) );
+			dest = src;
+			CRITICAL( ExpectFalse(dest.Empty()) );
+			CRITICAL( ExpectEqual(strcmp(dest.c_str(), testString), 0) );
+			CRITICAL( ExpectTrue(dest.IsValid()) );
+
+			CRITICAL( ExpectFalse(copy.IsWideCallsign()) );
+			CRITICAL( ExpectFalse(dest.IsWideCallsign()) );
+			CRITICAL( ExpectEqual(strcmp(dest.c_str(), src.c_str()), 0) );
+
+			CRITICAL( ExpectTrue(dest == src) );
+			CRITICAL( ExpectTrue(dest == copy) );
+			CRITICAL( ExpectTrue(dest == testString));
+
+			dest = testString + 2;
+			CRITICAL( ExpectFalse(dest.Empty()) );
+			CRITICAL( ExpectTrue(dest.IsValid()) );
+			CRITICAL( ExpectFalse(dest.IsWideCallsign()) );
+			CRITICAL( ExpectTrue(*dest.c_str() == testString[2]) );
+			CRITICAL( ExpectFalse(dest == testString) );
+			CRITICAL( ExpectTrue(dest == testString + 2) );
+
+			dest = "hello";
+			CRITICAL( ExpectEqual(dest.Handle(), dest.LowercaseHandle()) );
+
+			// utf8 callsign can contain 13 char's representing 4 wides and an ascii.
+			static const char* wideCallsign = "龠---a";
+			dest.Clear();
+			CRITICAL( ExpectTrue(dest.Empty()) );
+			dest = wideCallsign;
+			CRITICAL( ExpectFalse(dest.Empty()) );
+			CRITICAL( ExpectTrue(dest.IsWideCallsign()) );
+			CRITICAL( ExpectTrue(dest.IsValid()) );
+			CRITICAL( ExpectTrue(dest == wideCallsign));
+
+		END_SUB_STAGE( "Copy ctor and operators" )
+
+	END_TEST_STAGE( "Chat::Name" )
 
 	return true;
 }

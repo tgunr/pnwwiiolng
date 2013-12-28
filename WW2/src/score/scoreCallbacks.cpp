@@ -48,7 +48,7 @@ _recvEvent(ACTION_OBJECT* const a)
 	auto& lhs = evt->lhs();
 	dbugLog(_FLI, "p:%u c:%s v:%u in:%llu Scoring::Event::recvEvent:: type %u. Processing: "
 					, lhs.playerID()
-					, chatGetCallsign(lhs.handle())
+					, Chat::Name(lhs.handle()).c_str()
 					, lhs.sortieID()
 					, lhs.instID()
 					, evt->type()
@@ -59,7 +59,7 @@ _recvEvent(ACTION_OBJECT* const a)
 	{
 		dbugLog(_FLM, "p:%u c:%s v:%u in:%llu Player not online for scoring event"
 					, lhs.playerID()
-					, chatGetCallsign(evt->lhs().handle())
+					, Chat::Name(evt->lhs().handle()).c_str()
 					, lhs.sortieID()
 					, lhs.instID()
 					);
@@ -257,7 +257,7 @@ bool Scoring::Kill::process(Player* const lhsPlayer)
 	if ( killerSortie == NULL )
 		dbugLog(_FLA, "p:%u c:%s v:%u unable to find this killer sortie", lhsPlayer->playerID(), lhsPlayer->callsign(), lhs().sortieID());
 	if ( deadSortie == NULL )
-		dbugLog(_FLA, "p:%u c:%s v:%u unable to find this victim sortie", rhs().playerID(), chatGetCallsign(rhs().handle()), rhs().sortieID());
+		dbugLog(_FLA, "p:%u c:%s v:%u unable to find this victim sortie", rhs().playerID(), Chat::Name(rhs().handle()).c_str(), rhs().sortieID());
 	if ( killerSortie == NULL || deadSortie == NULL )
 		return false;
 

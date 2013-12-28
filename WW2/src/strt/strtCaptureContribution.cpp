@@ -175,7 +175,7 @@ Strat::CaptureContribution::Queue(Status withStatus, FacilityStruct& forFacility
 	if ( forFacility.isCaptureEnabled() == false )
 	{
 		dbugLog(_FLD, "p:%u c:%s fac:%s:cap ignoring contribution for uncappable facility"
-						, forPlayerID, chatGetCallsign(forHandle), forFacility.name);
+						, forPlayerID, Chat::Name(forHandle).c_str(), forFacility.name);
 		return;
 	}
 

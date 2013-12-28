@@ -313,7 +313,7 @@ Player::selectPlayer(const playerid_t forPlayerID)
 		// Make sure the callsign is valid
 		if ( m_matchHandle == 0 )
 			throw std::logic_error("player's game name produces nullptr handle");
-		if ( strcmp(dispatch().m_callsign, chatGetCallsign(m_chatHandle)) != 0 )
+		if ( Chat::Name(m_chatHandle) != dispatch().m_callsign )
 			throw std::logic_error("invalid callsign");
 
 		SetSquad(details.squadID);

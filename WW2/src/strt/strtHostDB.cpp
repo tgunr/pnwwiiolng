@@ -756,7 +756,7 @@ strtCaptureLog(FacilityStruct* facility, UINT32 state, UINT32 fromCountry
 	{
 		case CAP_START:
 			dbugLog(_FLI, "cap: START %s#%d(%s)@%s(%s %s) requires %ds cs:%s"
-							, chatGetCallsign(handle)
+							, Chat::Name(handle).c_str()
 							, customerID
 							, _countryCode[unit->country()]
 							, unit->callsign()
@@ -768,7 +768,7 @@ strtCaptureLog(FacilityStruct* facility, UINT32 state, UINT32 fromCountry
 		break;
 		case CAP_ILLEGAL:
 			dbugLog(_FLW, "cap: ILLEGAL %s#%d(%s)@%s(%s %s) started %d took %d seconds"
-							, chatGetCallsign(handle)
+							, Chat::Name(handle).c_str()
 							, customerID
 							, _countryCode[unit->country()]
 							, unit->callsign()
@@ -780,7 +780,7 @@ strtCaptureLog(FacilityStruct* facility, UINT32 state, UINT32 fromCountry
 		break;
 		case CAP_CAPTURED:
 			dbugLog(_FLI, "cap: CAPTURED %s#%d(%s)@%s(%s %s) started %u took %u seconds cs:%s ctrl:%s own:%s"
-							, chatGetCallsign(handle)
+							, Chat::Name(handle).c_str()
 							, customerID
 							, _countryCode[unit->country()]
 							, unit->callsign()
@@ -795,7 +795,7 @@ strtCaptureLog(FacilityStruct* facility, UINT32 state, UINT32 fromCountry
 		break;
 		case CAP_SAVED:
 			dbugLog(_FLI, "cap: SAVED %s#%d(%s)@%s(%s %s) started %d took %d seconds"
-							, chatGetCallsign(handle)
+							, Chat::Name(handle).c_str()
 							, customerID
 							, _countryCode[unit->country()]
 							, unit->callsign()

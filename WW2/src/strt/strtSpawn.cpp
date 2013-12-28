@@ -177,7 +177,7 @@ _postWeapon(WeapJoinRequestNode* joinNode
 	if ( unit == NULL )
 	{
 		dbugLog(_FLA, "p:%u c:%s hc:%u invalid brigadeID"
-						, commander, chatGetCallsign(handle), brigadeID);
+						, commander, Chat::Name(handle).c_str(), brigadeID);
 		return NULL;
 	}
 
@@ -190,7 +190,7 @@ _postWeapon(WeapJoinRequestNode* joinNode
 		if ( supplyUnit == NULL )
 		{
 			dbugLog(_FLA, "p:%u c:%s hc:%u sup:%u invalid supplyUnitID"
-						, commander, chatGetCallsign(handle), brigadeID, supplyUnitID);
+						, commander, Chat::Name(handle).c_str(), brigadeID, supplyUnitID);
 			return NULL;
 		}
 	}
@@ -203,7 +203,7 @@ _postWeapon(WeapJoinRequestNode* joinNode
 	if ( toeEntry == NULL && spawnEntry->weapon().isSystemWeapon() == false && !(permMask & ALL_SPAWN) )
 	{
 		dbugLog(_FLA, "p:%u c:%s hc:%u sup:%u requested non-toe weapon: %s"
-						, commander, chatGetCallsign(handle), brigadeID, supplyUnitID
+						, commander, Chat::Name(handle).c_str(), brigadeID, supplyUnitID
 						, weapPrintName(&weapon));
 		return NULL;
 	}
@@ -213,11 +213,11 @@ _postWeapon(WeapJoinRequestNode* joinNode
 		if ( facility.supplyingFacility(*unit, false) == NULL )
 		{
 			dbugLog(_FLA, "p:%u c:%s hc:%u sup:%u no supply link"
-							, commander, chatGetCallsign(handle), brigadeID, supplyUnitID);
+							, commander, Chat::Name(handle).c_str(), brigadeID, supplyUnitID);
 			return NULL;
 		}
 		dbugLog(_FLN, "p:%u c:%s hc:%u sup:%u switching supply to brigade"
-							, commander, chatGetCallsign(handle), brigadeID, supplyUnitID);
+							, commander, Chat::Name(handle).c_str(), brigadeID, supplyUnitID);
 		supplyUnitID = brigadeID;
 		supplyUnit = unit;
 	}
@@ -281,7 +281,7 @@ _postWeapon(WeapJoinRequestNode* joinNode
 					, (isReserve) ? "reserved" : "posted"
 					, (spawnEntry->isThrottled()) ? "throttled" : "non-throttled"
 					, unit->name()
-					, chatGetCallsign(handle)
+					, Chat::Name(handle).c_str()
 					, (toeEntry ? toeEntry->present() : 0)
 					, (toeEntry ? toeEntry->capacity() : 0)
 					);
@@ -325,7 +325,7 @@ strtProcessPostRequest(SINT32 teulIndex, const MM_POST_REQUEST& request, MM_POST
 	if (facility == NULL)
 	{
 		dbugLog(_FLW,"p:%u c:%s couldn't find facility %d.%d.%u denying post"
-				, request.customerID, chatGetCallsign(request.handle)
+				, request.customerID, Chat::Name(request.handle).c_str()
 				, request.facility.cell.ox, request.facility.cell.oy, request.facility.id
 				);
 
@@ -342,7 +342,7 @@ strtProcessPostRequest(SINT32 teulIndex, const MM_POST_REQUEST& request, MM_POST
 		if ( g_logDebug )
 			dbugLog(_FLD, "p:%u c:%s br:%u m:%u post request %s @ %s"
 						, request.customerID
-						, chatGetCallsign(request.handle)
+						, Chat::Name(request.handle).c_str()
 						, request.brigadeID
 						, request.missionID
 						, weapPrintName(&request.weapon)
@@ -410,7 +410,7 @@ strtProcessPostRequest(SINT32 teulIndex, const MM_POST_REQUEST& request, MM_POST
 	{
 		dbugLog(_FLN, "p:%u c:%s br:%u m:%u %s@%s postReqFail %u: %s"
 						, request.customerID
-						, chatGetCallsign(request.handle)
+						, Chat::Name(request.handle).c_str()
 						, request.brigadeID
 						, request.missionID
 						, weapPrintName(&request.weapon)
@@ -671,7 +671,7 @@ _validateCrew(POSTED_WEAPON& post)
 		}
 	}
 
-	dbugLog(_FLD, "p:%u c:%s v:%u crew valid for vehicle %p", post.m_commander, chatGetCallsign(post.m_handle), post.m_weaponSerial.serial, &post);
+	dbugLog(_FLD, "p:%u c:%s v:%u crew valid for vehicle %p", post.m_commander, Chat::Name(post.m_handle).c_str(), post.m_weaponSerial.serial, &post);
 }
 
 //This function processes a spawn grant request
@@ -805,7 +805,7 @@ strtProcessJoinListRequest(SINT32 teulIndex, const MM_POST_INFO_REQUEST& request
 	// the vehicle's list of wannabes.
 	joinNode->AddToList(&currentWeapon->m_joinList);
 
-	strtSendMMJoinListResponse(currentWeapon->m_commander, joinNode->m_playerID, chatGetCallsign(joinNode->m_handle));
+	strtSendMMJoinListResponse(currentWeapon->m_commander, joinNode->m_playerID, Chat::Name(joinNode->m_handle).c_str());
 
 	return TRUE;
 }
@@ -912,13 +912,14 @@ strtProcessSpawnCancel(MM_SPAWN_CANCEL* spawnCancel)
 static FacilityStruct *
 _verifyRTBFacility(const WEAPON_SPEC& spec, const FULL_OBJ_ID& rtbFacility, const ChatHandle& handle)
 {
-	const char* callsign = ( handle == 0LL ) ? "SYSTEM" : chatGetCallsign(handle);
+	static const ChatHandle systemHandle = chatGetHandle("SYSTEM");
+	Chat::Name callsign((handle == 0ULL) ? systemHandle : handle);
 
 	// Nothing to do if we have a null object ID.
 	if ( rtbFacility.id == 0 )
 	{
 		// No facility means the client doesn't think you're rtbing any place
-		dbugLog(_FLI, "vrtb: %s facilityID", callsign);
+		dbugLog(_FLI, "vrtb: %s facilityID", callsign.c_str());
 		return NULL;
 	}
 
@@ -927,14 +928,14 @@ _verifyRTBFacility(const WEAPON_SPEC& spec, const FULL_OBJ_ID& rtbFacility, cons
 	{
 		dbugLog(_FLW, "vrtb: no facility matches %d.%d.%u for %s"
 						, rtbFacility.cell.ox, rtbFacility.cell.oy, rtbFacility.id
-						, callsign);
+						, callsign.c_str());
 		return NULL;
 	}
 
 	// It must be a spawn-type facility or else
 	if ( !facility->m_spawnable )
 	{
-		dbugLog(_FLW, "vrtb: %s had non-spawnable facility", callsign);
+		dbugLog(_FLW, "vrtb: %s had non-spawnable facility", callsign.c_str());
 		return NULL;
 	}
 
@@ -942,7 +943,7 @@ _verifyRTBFacility(const WEAPON_SPEC& spec, const FULL_OBJ_ID& rtbFacility, cons
 	if ( facility->isOpen() == false )
 	{
 #ifdef DEBUG
-		dbugLog(_FLD, "vrtb: %s@%s: facility is closed", callsign, facility->name);
+		dbugLog(_FLD, "vrtb: %s@%s: facility is closed", callsign.c_str(), facility->name);
 #endif
 		return NULL;
 	}
@@ -950,7 +951,7 @@ _verifyRTBFacility(const WEAPON_SPEC& spec, const FULL_OBJ_ID& rtbFacility, cons
 	// Non-matching ownerships
 	if ( facility->side != spec.side() )
 	{
-		dbugLog(_FLD, "vrtb: %s@%s wrong side", callsign, facility->name);
+		dbugLog(_FLD, "vrtb: %s@%s wrong side", callsign.c_str(), facility->name);
 		return NULL;
 	}
 
@@ -1001,7 +1002,7 @@ POSTED_WEAPON::reReserve()
 		post(spawnEntry, true);
 
 		dbugLog(_FLD, "p:%u c:%s hcu:%u(%s) v:%u=>%u posted reserve @ %s"
-						, m_commander, chatGetCallsign(m_handle)
+						, m_commander, Chat::Name(m_handle).c_str()
 						, m_brigade->unitID(), m_brigade->callsign()
 						, oldSerial, serial()
 						, m_facility->name
@@ -1015,7 +1016,7 @@ POSTED_WEAPON::reReserve()
 	{
 		TELL_TESTER(m_commander, "re-reserve failed: %s", reason);
 		dbugLog(_FLW, "p:%u c:%s v:%u reReserve failed: %s"
-						, m_commander, chatGetCallsign(m_handle), serial()
+						, m_commander, Chat::Name(m_handle).c_str(), serial()
 						, reason
 						);
 		detachCrewAndJoiners(true);
@@ -1076,7 +1077,7 @@ WeaponsReturn::process() const
 	currentWeapon->m_isDead = m_isVehicleDead;
 
 	static char info[128];
-	sprintf(info, "p:%u c:%s v:%u return:", currentWeapon->m_commander, chatGetCallsign(currentWeapon->m_handle), m_sortieID);
+	sprintf(info, "p:%u c:%s v:%u return:", currentWeapon->m_commander, Chat::Name(currentWeapon->m_handle).c_str(), m_sortieID);
 
 	dbugLog(_FLD,"%s to %d.%d.%u co-ords %d.%d.%d ex:%u %s %s %s"
 			, info
@@ -1163,7 +1164,7 @@ WeaponsReturn::process() const
 			, currentWeapon->m_status
 			, m_exitCode
 			, m_isVehicleDead
-			, (currentWeapon->m_crewList.empty()) ? "EMPTY_LIST": chatGetCallsign(currentWeapon->m_crewList.front()->m_handle)
+			, (currentWeapon->m_crewList.empty()) ? "EMPTY_LIST" : Chat::Name(currentWeapon->m_crewList.front()->m_handle).c_str()
 			, currentWeapon->m_facility->name
 			, destFacility->name
 			, (overSupply) ? "O/SUP" : "LMTD"	// oversupply or limited
@@ -1228,7 +1229,7 @@ strtExpireWeapon(POSTED_WEAPON& weapon)
 {
 	assert( weapon.m_facility != NULL );
 
-	dbugLog(_FLI, "c:%s v:%u expiring %s", chatGetCallsign(weapon.m_handle), weapon.m_weaponSerial.serial, weapPrintName(&weapon.spec()));
+	dbugLog(_FLI, "c:%s v:%u expiring %s", Chat::Name(weapon.m_handle).c_str(), weapon.m_weaponSerial.serial, weapPrintName(&weapon.spec()));
 
 	strtSendPostExpired(weapon.m_commander, weapon.m_weaponSerial, false);
 

@@ -201,6 +201,7 @@ SET_PROPERTY(TARGET instancing PROPERTY FOLDER "Libs")
 add_library (libwwii 
 	chat/chatHandle.cpp
 		chat/chatHandle.h
+		chat/chatName.h
 	chat/chatPackers.cpp
 	chat/chatTimeInterval.cpp
 		chat/chatTimeInterval.h

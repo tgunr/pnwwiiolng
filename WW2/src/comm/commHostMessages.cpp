@@ -11,6 +11,7 @@
 #include "chat/chatCellTypes.h"
 #include "chat/chatConstants.h"
 #include "chat/chatLStringIDs.h"
+#include "chat/chatName.h"
 #include "chat/chatServerTypes.h"
 #include "chat/chatSupportRPCMessages.h"
 #include "comm/commConstants.h"
@@ -1303,7 +1304,7 @@ _recvResupplyAccepted(ACTION_OBJECT* const a)
 	if ( vehicle == NULL || vehicle->isRemote() == true )
 		return a->offset;
 	if ( g_logDebug )
-		dbugLog(_FLD, "v:%u supply to %s acknowledged", incoming.m_supplierID, chatGetCallsign(incoming.m_recipient));
+		dbugLog(_FLD, "v:%u supply to %s acknowledged", incoming.m_supplierID, Chat::Name(incoming.m_recipient).c_str());
 	vehicle->scoreResupply(incoming.m_recipient);
 
 	return a->offset;

@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Date: Fri Aug 11 16:28:12 CDT 2006
 //
 // Dot Command that lists all known squad names or
@@ -9,14 +8,13 @@
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-//
-
 
 #include "chat/chatDotCommand.h"
 #include "chat/chatSquadList.h"
 #include "chat/chatSquadListTypes.h"
 #include "chat/chatPlayer.h"
 #include "chat/chatMakeTempString.h"
+#include "chat/chatName.h"
 #include "chat/chatTimeString.h"
 
 class ListSquad : public DotCommand
@@ -70,8 +68,8 @@ public:
 									, squad.name().c_str()
 									, list->online()
 									, list->members().size());
-		response += chatMakeTempString("Created: %s by %s. ", chatTimeString(squad.created()), chatGetCallsign(squad.creatorHandle()));
-		response += chatMakeTempString("CO: %s. ", chatGetCallsign(squad.coHandle()));
+		response += chatMakeTempString("Created: %s by %s. ", chatTimeString(squad.created()), Chat::Name(squad.creatorHandle()).c_str());
+		response += chatMakeTempString("CO: %s. ", Chat::Name(squad.coHandle()).c_str());
 		response += chatMakeTempString("R: %s. ", squad.recruiting() ? "Yes" : "No");
 		response += chatMakeTempString("V: %s. ", squad.recruiting() ? "Yes" : "No");
 		response += chatMakeTempString("URL: %s", squad.homepage().c_str());
@@ -97,7 +95,7 @@ public:
 			{
 				if ( !response.empty() )
 					response += " ";
-				entry = chatGetCallsign(it->first);
+				entry = Chat::Name(it->first);
 			}
 			else
 			{

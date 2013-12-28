@@ -8,12 +8,13 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "chat/chatWaypoint.h"
-#include "chat/chatWaypointExchg.h"
+#include "chat/chatList.h"
 #include "chat/chatMissionTypes.h"
 #include "chat/chatMissions.h"
+#include "chat/chatName.h"
 #include "chat/chatPlayer.h"
-#include "chat/chatList.h"
+#include "chat/chatWaypoint.h"
+#include "chat/chatWaypointExchg.h"
 
 #include "wwii/wwiiSerialNumber.h"		// For preserving contact report serial number of a campaign.
 
@@ -118,11 +119,11 @@ WAYPOINT_XFER::receive(SINT32 teulIndex, WAYPOINT_XFER& incoming)
 	if ( player == NULL )
 		return -EINVAL;							// No data on this player
 
-	dbugLog(_FLI, "t:%d p:%u c:%s received waypoint %llu %s"
+	dbugLog(_FLI, "t:%d p:%u c:%s received waypoint %llu %s x:%d y:%d posted by %s"
 					, player->teulIndex(), player->playerID(), player->callsign()
-					, incoming.data().handle(), chatGetCallsign(incoming.data().handle()));
-	dbugLog(_FLIB, " x:%d y:%d posted by %s"
-					, incoming.data().x(), incoming.data().y(), chatGetCallsign(incoming.data().playerHandle()));
+					, incoming.data().handle(), Chat::Name(incoming.data().handle()).c_str()
+					, incoming.data().x(), incoming.data().y(), Chat::Name(incoming.data().playerHandle()).c_str()
+					);
 
 	incoming.data().processIncomingFrom(player);
 
@@ -139,7 +140,7 @@ WAYPOINT_CONTROL::receive(SINT32 teulIndex, WAYPOINT_CONTROL& incoming)
 
 	dbugLog(_FLD, "t:%d p:%u c:%s received waypoint control %llu[%s] %u"
 					, player->teulIndex(), player->playerID(), player->callsign()
-					, incoming.key(), chatGetCallsign(incoming.key()), incoming.flags());
+					, incoming.key(), Chat::Name(incoming.key()).c_str(), incoming.flags());
 
 	ChatMission* const mission = chatFindMission(player->missionID());
 	if ( mission == NULL )
@@ -149,7 +150,7 @@ WAYPOINT_CONTROL::receive(SINT32 teulIndex, WAYPOINT_CONTROL& incoming)
 	{
 		betaLog(_FLA, "t:%d p:%u c:%s non-leader requesting waypoint %llu[%s] %u"
 						, player->teulIndex(), player->playerID(), player->callsign()
-						, incoming.key(), chatGetCallsign(incoming.key()), incoming.flags());
+						, incoming.key(), Chat::Name(incoming.key()).c_str(), incoming.flags());
 		return -EACCES;
 	}
 

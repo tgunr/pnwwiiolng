@@ -75,7 +75,7 @@ public:
 //tolua_end
 private:
 	ChatHandle		m_handle;					// packed short name of the template
-	std::string		m_name;					// Longer name of the template
+	std::string		m_name;						// Longer name of the template
 	UINT32			m_country;					// Country
 	UINT32			m_branch;					// Branch
 	TOE_WEAPONS 	m_weapons;					// Weapon templates

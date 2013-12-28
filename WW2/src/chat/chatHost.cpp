@@ -46,6 +46,7 @@
 #include "chat/chatMissions.h"
 #include "chat/chatMissionTypes.h"
 #include "chat/chatModReport.h"
+#include "chat/chatName.h"
 #include "chat/chatPlayer.h"
 #include "chat/chatPlayerInfo.h"
 #include "chat/chatSay.h"
@@ -639,7 +640,7 @@ static void
 _delayedBan(const ChatHandle& handle, UINT32 days, bool kick=true)
 {
 	Ban ban(handle, days, kick);
-	dbugLog(_FLD, "c:%s will be banned for %u days in %u seconds.", chatGetCallsign(handle), ban.m_days, ban.m_start - teulTime());
+	dbugLog(_FLD, "c:%s will be banned for %u days in %u seconds.", Chat::Name(handle).c_str(), ban.m_days, ban.m_start - teulTime());
 	_delayedBans.push_back(ban);
 }
 #endif // KICK_BANS
@@ -689,7 +690,7 @@ static DotDetectMe detectMe;
 void
 Chat::SendModReport(const ChatHandle& handle, const Chat::ModReport modType)
 {
-	const char* callsign = chatGetCallsign(handle);
+	Chat::Name callsign(handle);
 	const char* type = nullptr;
 	UINT32 days = 0;
 
@@ -725,10 +726,10 @@ Chat::SendModReport(const ChatHandle& handle, const Chat::ModReport modType)
 	break;
 	}
 
-	chatDispatchGMMessage("HOST", chatMakeTempString("%s %s client-mod detected", callsign, type));
+	chatDispatchGMMessage("HOST", chatMakeTempString("%s %s client-mod detected", callsign.c_str(), type));
 
-	dbugLog(_FLN, "!HACK:%s:%s", callsign, type);
-	chatdbRecordEvent("HACK", callsign, type, "", "");
+	dbugLog(_FLN, "!HACK:%s:%s", callsign.c_str(), type);
+	chatdbRecordEvent("HACK", callsign.c_str(), type, "", "");
 
 	if ( days > 0 )
 	{
@@ -775,7 +776,7 @@ chatSendAllMessage(const ChatHandle& handle, const char* message, UINT32 message
 	Chat::HostMessage& msg = chatBuildHostMessage(handle, messageID, LOBBY_CHAN_ICON, message);
 	chatBroadcastHostMessage(playerIndex.begin(), playerIndex.end(), msg);
 
-	wwiiIRCMessage("-sys", "ALL:%s: %s", chatGetCallsign(handle), message);
+	wwiiIRCMessage("-sys", "ALL:%s: %s", Chat::Name(handle).c_str(), message);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1134,7 +1135,7 @@ _injectUnitAndLeader(std::string& buffer, const size_t pos, UINT32 brigadeID, UI
 			{
 				if ( unitName.empty() == false )
 					unitName += "/";
-				unitName += chatGetCallsign(mission->leader());
+				unitName += Chat::Name(mission->leader()).c_str();
 			}
 		}
 	}

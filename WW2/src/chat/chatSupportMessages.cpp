@@ -13,6 +13,7 @@
 #include "chat/chatBuzzardSpawn.h"
 #include "chat/chatCellTypes.h"
 #include "chat/chatConstants.h"
+#include "chat/chatName.h"
 #include "chat/chatPersonaUpdate.h"
 #include "chat/chatServerInfo.h"
 #include "chat/chatTypes.h"
@@ -176,7 +177,7 @@ BRIGADE_MOVE_MSG::receive(SINT32 teulIndex, BRIGADE_MOVE_MSG& incoming)
 	{
 		CPStruct* cp = strtGetCP(data.m_destination);
 		if ( cp == NULL ) throw std::invalid_argument("invalid destination in brigade move");
-		dbugLog(_FLD, "t:%d moving %s (#%d) to %s by %s", teulIndex, unit->name(), unit->unitID(), cp->name, chatGetCallsign(incoming.key()));
+		dbugLog(_FLD, "t:%d moving %s (#%d) to %s by %s", teulIndex, unit->name(), unit->unitID(), cp->name, Chat::Name(incoming.key()).c_str());
 		unit->setHomeCPID(data.m_destination);
 	}
 
@@ -206,7 +207,7 @@ MOBILE_SPAWN_WAYPOINT::receive(SINT32 teulIndex, MOBILE_SPAWN_WAYPOINT& incoming
 	if ( wp.m_deployed )
 	{
 		if ( g_logDebug )
-			dbugLog(_FLD, "mswp add m:%u p:%u c:%s sto:%u", wp.m_missionID, wp.m_playerID, chatGetCallsign(wp.m_ownerCall), wp.m_stoUID);
+			dbugLog(_FLD, "mswp add m:%u p:%u c:%s sto:%u", wp.m_missionID, wp.m_playerID, Chat::Name(wp.m_ownerCall).c_str(), wp.m_stoUID);
 		// Request for* where* we want the MSP deployed
 		missAddMobileSpawn(wp.m_missionID, wp.m_playerID, wp.m_ownerCall, wp.m_x, wp.m_y, wp.m_z, wp.m_stoUID);
 	}
@@ -239,7 +240,7 @@ _recvLeaderChange(ACTION_OBJECT* const a)
 		dbugLog(_FLI, "m:%u leader change to p:%u c:%s"
 					, incoming.m_missionID
 					, incoming.m_leaderID
-					, chatGetCallsign(incoming.m_leaderHandle)
+					, Chat::Name(incoming.m_leaderHandle).c_str()
 					);
 
 	incoming.m_result = incoming.process();
@@ -284,7 +285,7 @@ _recvMapPersonaUpdate(ACTION_OBJECT* const a)
 	{
 		player->log(_FLD, "mpu isSquad:%c[%u/%llu/%s] isDecal:%c(%u)"
 							, (update.m_isSquadUpdate ? 'y':'n')
-							, update.m_squadID, update.m_squadHandle, chatGetCallsign(update.m_squadHandle)
+							, update.m_squadID, update.m_squadHandle, Chat::Name(update.m_squadHandle).c_str()
 							, (update.m_isDecalUpdate ? 'y':'n')
 							, update.m_decal
 							);
