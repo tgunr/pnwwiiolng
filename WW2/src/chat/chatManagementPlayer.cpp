@@ -49,7 +49,7 @@ ManagementPlayer::~ManagementPlayer()
 // Describe me to a GM
 
 void
-ManagementPlayer::describeTo(const Player* player, const FLOAT64& /*x*/, const FLOAT64& /*y*/, bool /*includePermissions*/) const
+ManagementPlayer::describeTo(const Player& player, const FLOAT64& /*x*/, const FLOAT64& /*y*/, bool /*includePermissions*/) const
 {
-	player->message(LSTR_NONE, LSTR_LABELLED_GENERIC, callsign(), "User is connected via management client.");
+	player.message(LSTR_NONE, LSTR_LABELLED_GENERIC, callsign(), "User is connected via management client.");
 }

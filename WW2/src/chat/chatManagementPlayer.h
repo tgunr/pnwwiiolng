@@ -23,5 +23,5 @@ public:
 	virtual bool isConnected() const { return true; }
 
 	// Describe to another GM
-	virtual void describeTo(const Player* player, const FLOAT64& x, const FLOAT64& y, bool includePermissions) const;
+	virtual void describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, bool includePermissions) const OVERRIDE_FN;
 };

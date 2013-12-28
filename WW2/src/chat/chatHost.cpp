@@ -277,7 +277,7 @@ IRCPlayer::message(int prefix, int messageID
 // Describe an IRC user to a GM.
 
 void
-IRCPlayer::describeTo(const Player* player, const FLOAT64& /*x*/, const FLOAT64& /*y*/, bool /*includePermissions*/) const
+IRCPlayer::describeTo(const Player& player, const FLOAT64& /*x*/, const FLOAT64& /*y*/, bool /*includePermissions*/) const
 {
 	std::string response = "User is connected via IRC on channel";
 	if ( m_channels.size() > 1 )
@@ -289,7 +289,7 @@ IRCPlayer::describeTo(const Player* player, const FLOAT64& /*x*/, const FLOAT64&
 		response += *it;
 	}
 
-	player->message(LSTR_NONE, LSTR_LABELLED_GENERIC, callsign(), response.c_str());
+	player.message(LSTR_NONE, LSTR_LABELLED_GENERIC, callsign(), response.c_str());
 }
 
 //////////////////////////////////////////////////////////////////////
