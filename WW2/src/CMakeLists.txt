@@ -510,6 +510,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 		chat/chatManagementPack.cpp
 		chat/chatManagementPlayer.cpp
 			chat/chatManagementPlayer.h
+				chat/chatIRCPlayer.h
 				chat/chatPlayer.h
 					auth/authDispatch.h
 					mm/mmEnums.h
