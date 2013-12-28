@@ -129,7 +129,7 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 		// Socket closed.
 		if ( result == 0 )
 		{
-			dbugLog(_FLW, "t:%d sock:%u socket closed on sendto for %" PRSizeT " bytes to %u,%hu [%u,%hu] attempt", teulIndex(), socket, sizeInBytes, address, port, inetAddress.sin_addr.s_addr, inetAddress.sin_port);
+			dbugLog(_FLW, "t:%d sock:%u socket closed on sendto for %" PRSizeT " bytes to %u,%u [%u,%hu] attempt", teulIndex(), socket, sizeInBytes, address, port, inetAddress.sin_addr.s_addr, inetAddress.sin_port);
 			teulClose(*this, Teul::Closing::Closed);
 			dbugSetErrno(Teul::Closing::Closed);
 			return -Teul::Closing::Closed;
@@ -139,7 +139,7 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 		const int err = dbugGetErrno();
 		if ( (err != EAGAIN) & (err != EINTR) & (err != EWOULDBLOCK) )
 		{
-			dbugLog(_FLW, "t:%d sock:%u send error on send %" PRSizeT " bytes to %u,%hu [%u,%hu] attempt, err:%d", teulIndex(), socket, sizeInBytes, address, port, inetAddress.sin_addr.s_addr, inetAddress.sin_port, err);
+			dbugLog(_FLW, "t:%d sock:%u send error on send %" PRSizeT " bytes to %u,%u [%u,%hu] attempt, err:%d", teulIndex(), socket, sizeInBytes, address, port, inetAddress.sin_addr.s_addr, inetAddress.sin_port, err);
 			return -ETEUL_ENOSPC_SEND_SOCKET;
 		}
 

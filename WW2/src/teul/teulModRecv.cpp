@@ -1462,9 +1462,9 @@ _checkPacketOrdering(ENDPOINT& endpoint, const Teul::PacketHeader& header)
 	// The new tag should be *exactly* one higher than the old
 	if ( PN_UNLIKELY(header.m_tag != expectTag) )
 	{
-		dbugLog(_FLW, "t:%d out of order packet rx:%hu, prev:%u, expected:%u"
+		dbugLog(_FLW, "t:%d out of order packet rx:%u, prev:%u, expected:%u"
 						, endpoint.teulIndex()
-						, header.m_tag, prevTag, expectTag);
+						, static_cast<UINT32>(header.m_tag), static_cast<UINT32>(prevTag), static_cast<UINT32>(expectTag));
 		endpoint.doError(ETEUL_ILLEGAL_PACKET_ORDER);
 		teulClose(endpoint, ETEUL_ILLEGAL_PACKET_ORDER);
 		return false;

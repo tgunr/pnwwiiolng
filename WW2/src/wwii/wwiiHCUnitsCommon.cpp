@@ -58,7 +58,7 @@ HCUnit::HCUnit(UINT32 withUnit, HCUNIT_TYPE withType, UINT32 withParent
 	chatGetCallsign(m_callsign, withHandle);
 	lookupParent();
 	hcUnits[m_unitID] = this;
-	dbugLog(_FLI, "registered %hu->%s", m_unitID, m_callsign);
+	dbugLog(_FLI, "registered %u->%s", m_unitID, m_callsign);
 	hcUnitsByHandle[withHandle] = this;
 
 	if ( home.id != 0 )
@@ -102,7 +102,7 @@ HCUnit::~HCUnit()
 		HCUNIT_INDEX::iterator it = hcUnits.find(m_unitID);
 		if ( it != hcUnits.end() && it->second == this )
 		{
-			dbugLog(_FLI, "unregistering %hu", m_unitID);
+			dbugLog(_FLI, "unregistering %u", m_unitID);
 			hcUnits.erase(it);
 		}
 	}
@@ -111,7 +111,7 @@ HCUnit::~HCUnit()
 		HCUNIT_HANDLES::iterator it = hcUnitsByHandle.find(m_handle);
 		if ( it != hcUnitsByHandle.end() && it->second == this )
 		{
-			dbugLog(_FLI, "unregistering %hu handle", m_unitID);
+			dbugLog(_FLI, "unregistering %u handle", m_unitID);
 			hcUnitsByHandle.erase(it);
 		}
 	}
