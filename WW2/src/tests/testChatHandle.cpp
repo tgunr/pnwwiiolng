@@ -480,6 +480,35 @@ ChatHandleTestUnit::Run()
 
 	END_TEST_STAGE( "Chat::Name" )
 
+	START_TEST_STAGE( "Static functions" )
+
+		const auto firstHandle = chatGetHandle("first");
+		const auto secondHandle = chatGetHandle("second");
+
+		CRITICAL( ExpectTrue(firstHandle != 0) && ExpectTrue(secondHandle != 0) );
+
+		const char* firstName = chatGetCallsign(firstHandle);
+		CRITICAL( ExpectTrue(firstName != nullptr) && ExpectEqual(strcmp(firstName, "first"), 0) );
+
+		const char* secondName = chatGetCallsign(secondHandle);
+		CRITICAL( ExpectTrue(firstName != nullptr) && ExpectEqual(strcmp(secondName, "second"), 0) );
+		CRITICAL( ExpectEqual(strcmp(firstName, "first"), 0) );
+
+		int n = 0;
+		// Do some things we expect should corrupt the stack.
+		{
+			char a, b, c;
+			char* temp = (char*)alloca(8);
+			snprintf(temp, 8, "%c%c%c", firstName[0], secondName[0], 'x');
+			n = sscanf(temp, "%c%c%c", &a, &b, &c);
+		}
+		Chat::Name tempName;
+		tempName.format("temp%d", n);
+
+		CRITICAL( ExpectEqual(strcmp(firstName, "first"), 0) && ExpectEqual(strcmp(secondName, "second"), 0) );
+		
+	END_TEST_STAGE( "Static functions" )
+
 	return true;
 }
 
