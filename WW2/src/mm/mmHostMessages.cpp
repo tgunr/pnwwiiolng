@@ -378,7 +378,7 @@ _recvDoDespawn(struct ACTION_OBJECT* const a)
 		return -Teul::Errors::LoginFail_DespawnNoPlayer;
 	}
 
-	const UINT32 cellIndex = serverGetPeerIndex(player->m_lastSpawnedTo, CELL_HOST);
+	const auto cellIndex = serverGetPeerIndex(player->m_lastSpawnedTo, CELL_HOST);
 	if ( cellIndex >= 0 )
 	{
 		Teul::Packet outgoing(0, Comm::CallbackX, DESPAWNED_Y);
