@@ -69,7 +69,7 @@ _editHCUnitMotd(Player* player, UINT32 id, std::string& text)
 	HCUnit* unit = HCUnit::Lookup(id);
 	if ( unit == NULL )
 	{
-		dbugLog(_FLA, "t:%d p:%u c:%s tried to edit MOTD for invalid hcUnit %hu"
+		dbugLog(_FLA, "t:%d p:%u c:%s tried to edit MOTD for invalid hcUnit %u"
 						, player->teulIndex(), player->playerID(), player->callsign()
 						, id);
 		return EditString::_INVALID;

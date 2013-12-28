@@ -2345,7 +2345,7 @@ _populateAWSReply(Player& player, const AWS::Request& request, const AWS_GRID& g
 
 	bool isAllied = (player.side() == ALLIED);
 
-	betaLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%llu.%llu requesting %s AWS [%hu,%hu]-[%hu,%hu](%hu)"
+	betaLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%llu.%llu requesting %s AWS [%hu,%hu]-[%hu,%hu](%u)"
 					, player.teulIndex(), player.playerID(), player.callsign()
 					, player.instance().category(), player.instance().type(), player.instance().handle(), player.instance().id()
 					, (isAllied ? "axis" : "allied")
@@ -2400,12 +2400,12 @@ _populateAWSReply(Player& player, const AWS::Request& request, const AWS_GRID& g
 
 	if ( g_logDebug )
 	{
-		dbugLog(_FLD, "t:%d p:%u c:%s %s aws request [%hu-%hu,%hu] data:%s rows:%u, cells:%u"
+		dbugLog(_FLD, "t:%d p:%u c:%s %s aws request [%u-%u,%u] data:%s rows:%u, cells:%u"
 						, player.teulIndex()
 						, player.playerID()
 						, player.callsign()
 						, (isAllied ? "allied" : "axis")
-						, request.m_startCol, request.m_startCol + AWS::MAX_COLUMNS, request.m_row
+						, static_cast<UINT32>(request.m_startCol), static_cast<UINT32>(request.m_startCol) + AWS::MAX_COLUMNS, static_cast<UINT32>(request.m_row)
 						, (reply.m_hasData ? "yes" : "no")
 						, populatedRows, populatedCells
 						);
