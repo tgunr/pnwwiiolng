@@ -217,7 +217,7 @@ public:
 #ifdef DEV_BUILD
 		if ( g_logDebug )
 		{
-			dbugLog(_FLD, "grp:%u %s maxRanks{army:%u,air:%u,navy:%u,sqd:%u} perm:%llx vehs:%u"
+			dbugLog(_FLD, "grp:%u %s maxRanks{army:%u,air:%u,navy:%u,sqd:%u} perm:%llx vehs:%" PRSizeT ""
 							, perm.m_groupOID
 							, (perm.m_enabled ? "enabled" : "disabled")
 							, perm.m_limitRank[BRANCH_LAND]

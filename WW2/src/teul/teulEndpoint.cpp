@@ -296,7 +296,7 @@ _releaseEndpoint(ENDPOINT& endpoint)
 	_freeEndpoints.push_back(&endpoint);
 
 #ifdef DEV_BUILD
-	dbugLog(_FLD, "t:%d pushed to freeList (%u endpoints)", endpoint.teulIndex(), _freeEndpoints.size());
+	dbugLog(_FLD, "t:%d pushed to freeList (%" PRSizeT " endpoints)", endpoint.teulIndex(), _freeEndpoints.size());
 	dbugWrite(_FLN, "t:%d released", endpoint.teulIndex());
 #endif
 
