@@ -253,11 +253,11 @@ namespace WWII
 
   /// tuple_size
   template<typename _Tp>
-    class tuple_size;
+    struct tuple_size;
 
   /// tuple_element
   template<size_t _Int, typename _Tp>
-    class tuple_element;
+    struct tuple_element;
 
   template<typename _Tp, size_t _Nm>
     struct tuple_size<inplace_vector<_Tp, _Nm> >
