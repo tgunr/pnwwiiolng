@@ -233,7 +233,7 @@ _findCustomer(const UINT32 customerID)
 static void
 _processBackDoor(PLAYER_LOGIN& login, Auth::Dispatch& dispatch)
 {
-	static std::atomic<UINT32> backGameCallsign = 0;
+	static std::atomic<UINT32> backGameCallsign { 0 };
 
 	if ( memcmp(AUTH_SEQ, login.CopyRightString, AUTH_SEQ_SIZE-1) != 0 )
 	{
