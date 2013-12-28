@@ -112,7 +112,7 @@ struct HISTORY
 	volatile bool m_inUse;
 	std::mutex m_mutex;
 
-	UNORDERED_MAP<unsigned long long, Activity> m_data;
+	std::unordered_map<unsigned long long, Activity> m_data;
 } s_history;
 
 void*

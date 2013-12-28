@@ -42,7 +42,7 @@
 #include <pthread.h>
 #endif
 
-typedef UNORDERED_SET<OBJECT*> ObjectSet;
+typedef std::unordered_set<OBJECT*> ObjectSet;
 
 #if !NEW_OBJECT_MEM
 static ObjectSet objectmap;

@@ -62,13 +62,6 @@
 
 #include "libxml/tree.h"
 
-#if platOS == OS_WIN32
-#include <unordered_map>
-#define UNORDERED_MAP std::unordered_map
-#else
-#define UNORDERED_MAP stdext::hash_map
-#endif
-
 bool _ingamemapon	= false;
 bool _ingamemaplock = false;
 
@@ -147,7 +140,7 @@ private:
 
 
 //static std::map<std::string, trnobjtextureinfo> _trnobjtexturemap;
-static UNORDERED_MAP<std::string, trnobjtextureinfo> _trnobjtexturemap;
+static std::unordered_map<std::string, trnobjtextureinfo> _trnobjtexturemap;
 
 static FULL_OBJ_ID _facOrigin, _missionTarget;
 

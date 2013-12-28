@@ -35,6 +35,3 @@ namespace std
 		template<> struct hash<void*>  { size_t operator()(void const* o) const  { return *(size_t*)(&o); } };
 }
 
-#define UNORDERED_MAP std::unordered_map
-#define UNORDERED_SET std::unordered_set
-

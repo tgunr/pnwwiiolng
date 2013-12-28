@@ -43,7 +43,7 @@ namespace Teul
 		public:
 			typedef void (*VirtualFileHandler)(unsigned int /*fd*/, const char* /*path*/, const char* /*args*/);
 		private:
-			typedef UNORDERED_MAP< std::string, std::pair<VirtualFileHandler /*handler*/, std::string /*description*/> > VirtualFileHandlers;
+			typedef std::unordered_map< std::string, std::pair<VirtualFileHandler /*handler*/, std::string /*description*/> > VirtualFileHandlers;
 			VirtualFileHandlers m_virtualFileHandlers;
 		private:
 			std::string m_resourceList;

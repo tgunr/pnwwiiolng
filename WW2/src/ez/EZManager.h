@@ -8,12 +8,6 @@
 // ----------- defines
 #define EZ_MGR EZManager::GetInstance()
 
-#if platOS == OS_WIN32
-#define UNORDERED_MAP std::unordered_map
-#else
-#define UNORDERED_MAP stdext::hash_map
-#endif
-
 #define SCREEN_POS_COUNT 5
 
 
@@ -197,7 +191,7 @@ public:
 
 	struct EZView
 	{
-		typedef UNORDERED_MAP<SINT32,SINT32> INPUT_MAP;
+		typedef std::unordered_map<SINT32,SINT32> INPUT_MAP;
 
 		enum EVENT
 		{

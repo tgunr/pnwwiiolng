@@ -83,12 +83,10 @@
 #include <regex>
 #include <unordered_map>
 #define RENS std
-#define UNORDERED_MAP std::unordered_map
 #else
 //#include <boost/unordered_map.hpp>
 #include <boost/regex.hpp>
 #define RENS boost
-//#define UNORDERED_MAP boost::unordered_map
 #endif
 
 #ifdef GR2_BLEND_EDITOR
@@ -190,8 +188,8 @@ static bool _holddowncursor;
 static phui::View* _terminal;
 static jsGame* _jsgame;
 static phui::View* _spawnscreen;
-typedef UNORDERED_MAP<std::string, std::wstring> LocMap;
-typedef UNORDERED_MAP<std::string, std::string> InputMap;
+typedef std::unordered_map<std::string, std::wstring> LocMap;
+typedef std::unordered_map<std::string, std::string> InputMap;
 static LocMap _locstrings;	// all translation strings; language with english fallback
 static InputMap _inputkeys;	// english only keys for input device names and functions
 static void _jsabort(const char*);
@@ -1031,7 +1029,7 @@ void uiIMEMessageProc(const MSG& m)
 }
 #endif
 
-typedef UNORDERED_MAP<std::string, int> TexMapType;
+typedef std::unordered_map<std::string, int> TexMapType;
 
 static TexMapType _texmap;
 
