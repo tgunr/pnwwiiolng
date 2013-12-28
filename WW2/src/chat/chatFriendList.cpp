@@ -221,7 +221,7 @@ chatIgnoreList(Player* player)
 	{
 		if ( !list.empty() )
 			list += ", ";
-		list += Chat::Name(*it);
+		list += Chat::Name(*it).c_str();
 	}
 
 	if ( list.empty() )
@@ -262,7 +262,7 @@ chatFriendsList(Player& player)
 		{
 			if ( !offlineList.empty() )
 				offlineList += " ";
-			offlineList += Chat::Name(*it);
+			offlineList += Chat::Name(*it).c_str();
 		}
 	}
 

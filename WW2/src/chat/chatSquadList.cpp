@@ -1010,7 +1010,7 @@ SquadList::renamed(const ChatHandle& newHandle)
 	dbugLog(_FLN, "Squad %s renamed to %s, updating tables and players", squad().m_callsign.c_str(), newCallsign.c_str());
 	// Mark the squad as needing its details resent
 	squad().m_shortHandle = newHandle;
-	squad().m_callsign = newCallsign;
+	squad().m_callsign = newCallsign.c_str();
 	setUpdated();
 
 	SQUAD_MEMBERS::iterator it;

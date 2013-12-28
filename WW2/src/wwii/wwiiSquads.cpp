@@ -80,7 +80,7 @@ Squad::packer(LOGICAL mode, ACTION_OBJECT* a)
 	a->offset = teulPackUCHAR(mode, a->packed, a->offset, &m_language, 0);
 	a->offset = wwiiPackString(mode, a->packed, a->offset, m_slogan, SLOGAN_LENGTH);
 
-	m_callsign = Chat::Name(m_shortHandle);
+	m_callsign = Chat::Name(m_shortHandle).c_str();
 
 	return a->offset;
 }

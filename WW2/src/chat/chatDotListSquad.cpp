@@ -95,7 +95,7 @@ public:
 			{
 				if ( !response.empty() )
 					response += " ";
-				entry = Chat::Name(it->first);
+				entry = Chat::Name(it->first).c_str();
 			}
 			else
 			{

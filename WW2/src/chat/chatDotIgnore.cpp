@@ -45,7 +45,7 @@ public:
 		{
 			if ( !textlist.empty() )
 				textlist += ", ";
-			textlist += Chat::Name(*it);
+			textlist += Chat::Name(*it).c_str();
 		}
 		player.message(LSTR_NONE, LSTR_GENERIC, textlist.c_str());
 	}

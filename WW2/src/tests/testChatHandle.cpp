@@ -111,8 +111,6 @@ ChatHandleTestUnit::Run()
 	#endif
 
 	ChatHandle test;
-	char plainCallsign[MAX_HANDLE_SIZE];
-	wchar_t wideCallsign[MAX_HANDLE_SIZE];
 	const ChatHandle characterHandle = 9223372036854775874ULL;
 
 	//////////////////////////////////////////////////////////////////////
@@ -122,6 +120,9 @@ ChatHandleTestUnit::Run()
 	START_TEST_STAGE( "UTF8 Conversions" )
 
 		#define FIRST_TEST "[" Character "]"
+
+		char plainCallsign[MAX_HANDLE_SIZE];
+		wchar_t wideCallsign[MAX_HANDLE_SIZE];
 
 		START_SUB_STAGE( "char->wide->char" )
 
@@ -205,6 +206,9 @@ ChatHandleTestUnit::Run()
 	// Now make sure chatGetCallsign works.
 
 	START_TEST_STAGE( "chatGetCallsign" )
+
+		char plainCallsign[MAX_HANDLE_SIZE];
+		wchar_t wideCallsign[MAX_HANDLE_SIZE];
 
 		test = chatGetHandle(Character);
 

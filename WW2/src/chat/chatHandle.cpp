@@ -5143,7 +5143,7 @@ chatGetCallsign(const ChatHandle& handle)
 {
 	static const size_t NumInstances = 15;	// must be a power of 2.
 	Chat::Name callsigns[NumInstances];
-	static std::atomic<size_t> s_instance = 0;
+	static std::atomic<size_t> s_instance { 0 };
 
 	const size_t instance = (s_instance++) & NumInstances;
 	callsigns[instance] = handle;
@@ -5156,7 +5156,7 @@ chatGetWideCallsign(const ChatHandle& handle)
 {
 	static const size_t NumInstances = 15;	// must be a power of 2.
 	Chat::NameW callsigns[NumInstances];
-	static std::atomic<size_t> s_instance = 0;
+	static std::atomic<size_t> s_instance { 0 };
 
 	const size_t instance = (s_instance++) & NumInstances;
 	callsigns[instance] = handle;

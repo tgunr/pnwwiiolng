@@ -2125,7 +2125,7 @@ public:
 								, m_handle(handle), m_byPlayerID(byPlayerID), m_text(orig), m_err("")
 		{
 			Chat::Name name(m_handle);
-			m_err = name;
+			m_err = name.c_str();
 		}
 
 protected:
@@ -2219,7 +2219,7 @@ protected:
 			const char* const by = row[3];
 			const char* const note = row[4];
 
-			line = callsign;
+			line = callsign.c_str();
 			line += ':';
 			line += by;
 			line += ':';
