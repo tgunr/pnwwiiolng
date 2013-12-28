@@ -336,7 +336,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth")
 	add_executable(checkGameName
 		src/checkGameName.cpp
 	)
-	target_link_libraries(checkGameName libwwii)
+	target_link_libraries(checkGameName libwwii teulserver)
 	SET_PROPERTY(TARGET checkGameName PROPERTY FOLDER "Tools")
 
 	# In theory, SDM pre-parser. In practice? Deletes SDM files that don't
