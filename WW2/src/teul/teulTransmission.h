@@ -89,5 +89,4 @@ private:
 	TEUL_CALLBACK*	m_callback;
 	void*			m_buffer;
 	SINT32			m_size;
-	FilterFn*		m_filterFn;
 };
