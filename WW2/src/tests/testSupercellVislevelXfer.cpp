@@ -129,8 +129,8 @@ public:
 			CRITICAL( ExpectEqual( sc.numObjects, 1 ) );
 			CRITICAL( ExpectTrue( sc.objects != NULL ) );
 
-			static const size_t expecting_bits = testtype_t::HeaderBits + testtype_t::FlagBits;
-			static const size_t expecting_bytes = (expecting_bits + 7) / 8;
+			const size_t expecting_bits = testtype_t::HeaderBits + testtype_t::FlagBits;
+			const size_t expecting_bytes = (expecting_bits + 7) / 8;
 			CRITICAL( ExpectEqual( testtype_t::calculateBytesNeededFor(sc), expecting_bytes ) );
 
 			fixture.allocate();
@@ -183,9 +183,10 @@ public:
 			CRITICAL( ExpectTrue( fixture.xfer()->scx() ==  -20 ) );
 			CRITICAL( ExpectTrue( fixture.xfer()->scy() ==  59 ) );
 
-			static const size_t expecting_bits = testtype_t::HeaderBits + testtype_t::FlagBits * 2;
-			static const size_t expecting_bytes = (expecting_bits + 7) / 8;
-			CRITICAL( ExpectEqual( fixture.xfer()->size_bytes(), expecting_bytes ) );
+			const size_t expecting_bits = (testtype_t::HeaderBits) + (testtype_t::FlagBits * 2);
+			const size_t expecting_bytes = (expecting_bits + 7) / 8;
+			const size_t actualBytes = fixture.xfer()->size_bytes();
+			CRITICAL( ExpectEqual( actualBytes, expecting_bytes ) );
 
 			CRITICAL( ExpectEqual( sc.objects[0].visLevel(), 1 ) );
 			CRITICAL( ExpectEqual( sc.objects[0].smokeLevel(), 0 ) );
