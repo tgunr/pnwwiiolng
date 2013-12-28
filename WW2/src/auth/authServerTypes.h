@@ -119,7 +119,7 @@ struct OTP_NODE
 	UINT32		customerID;					//!< Customer (auth) ID of client
 	UINT32		address;					//!< IP address of client
 	UINT32		appVersion;					//!< What version of the application this session used.
-	char		handle[MAX_HANDLE_SIZE];	//!< Customer (auth) handle
+	char		handle[MAX_HANDLE_SIZE];	//!< Customer (auth) handle (NOT a game name)
 	bool		fromAuth;					//!< Whether inserted from auth or locally.
 } ;
 
