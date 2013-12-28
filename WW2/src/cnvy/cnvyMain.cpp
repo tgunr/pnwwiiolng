@@ -54,7 +54,9 @@
 
 // ------------------------------ Prototypes
 
+#ifdef DEBUG_CONVOYS
 static LOGICAL _printConvoyList(CONVOYSTRUCT* convoy);
+#endif
 static LOGICAL _freeManifest(MANIFESTSTRUCT* manifest);
 
 // Number of strat updates to creates
@@ -850,6 +852,7 @@ cnvyInit(void)
 	return TRUE;
 }
 
+#ifdef DEBUG_CONVOYS
 static LOGICAL _printConvoyList(CONVOYSTRUCT* convoy)
 {
 	if (convoy!=NULL)
@@ -868,6 +871,7 @@ static LOGICAL _printConvoyList(CONVOYSTRUCT* convoy)
 	}
 	return TRUE;
 }
+#endif
 
 
 static LOGICAL
