@@ -64,7 +64,6 @@ static inline void strsafecpy(char (&dest)[_DestSize], const char* src)
 template <size_t _DestSize>
 static inline void strsafecpy(wchar_t (&dest)[_DestSize], const wchar_t* src)
 {
-	int x;
 	wcscpy(dest, src, _DestSize - 1);
 	dest[_DestSize - 1] = 0;
 }
