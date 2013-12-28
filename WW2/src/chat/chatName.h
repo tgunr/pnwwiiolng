@@ -124,6 +124,6 @@ namespace Chat
 	template<> inline bool BasicName<wchar_t>::operator == (const wchar_t* rhs) const { return wcscmp(m_name, rhs) == 0; }
 	template<> inline bool BasicName<wchar_t>::operator == (const BasicName<wchar_t>& rhs) const { return wcscmp(m_name, rhs.m_name) == 0; }
 
-	template<> inline int BasicName<char>::format(const char* format, ...) { va_list ap; va_start(ap, format); int ret = vsnprintf(m_name, MaxHandleSize, format, ap); va_end(ap); return ret;  }
-	template<> inline int BasicName<wchar_t>::format(const wchar_t* format, ...) { va_list ap; va_start(ap, format); int ret = vswprintf(m_name, MaxHandleSize, format, ap); va_end(ap); return ret; }
+	template<> inline int BasicName<char>::format(const char* fmt, ...) { va_list ap; va_start(ap, fmt); int ret = vsnprintf(m_name, MaxHandleSize, fmt, ap); va_end(ap); return ret;  }
+	template<> inline int BasicName<wchar_t>::format(const wchar_t* fmt, ...) { va_list ap; va_start(ap, fmt); int ret = vswprintf(m_name, MaxHandleSize, fmt, ap); va_end(ap); return ret; }
 }
