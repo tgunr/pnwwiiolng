@@ -2141,7 +2141,7 @@ _dotRedeploy(char* arguments, OOBMessage& message)
 											, (applyDelay ? "Yes" : "No")
 											);
 
-	unit->deploy(destination, (applyDelay) ? brigadeMoveTime_s : 0, message.originator(), transferSupply, applyDelay);
+	unit->deploy(destination, (applyDelay) ? brigadeMoveTime_s : 0, Chat::Name(message.m_originatorID).c_str(), transferSupply, applyDelay);
 
 	return TRUE;
 }
@@ -2167,7 +2167,7 @@ _dotRunLua(char* arguments, OOBMessage& message)
 	const char* script = script_args[0];
 
 	dbugLog(_FLI, "Player %s running unit '%s'"
-					, message.originator()
+					, Chat::Name(message.m_originatorID).c_str()
 					, script
 					);
 
@@ -2222,8 +2222,8 @@ _dotRunLua(char* arguments, OOBMessage& message)
 
 	_setTarget(nullObjID);
 
-	if ( !success ) dbugLog(_FLW, "FAIL: %s failed for %s", script, message.originator());
-	else if ( !publicMode ) dbugLog(_FLI, "OK: %s ran for %s", script, message.originator());
+	if ( !success ) dbugLog(_FLW, "FAIL: %s failed for %s", script, Chat::Name(message.m_originatorID).c_str());
+	else if ( !publicMode ) dbugLog(_FLI, "OK: %s ran for %s", script, Chat::Name(message.m_originatorID).c_str());
 
 	Lua::SCRIPT_RESULTS& results = Lua::Results();
 
@@ -2554,7 +2554,7 @@ void strtProcessOOBMessage(OOBMessage& message)
 
 	dbugLog(_FLI, "p:%u c:%s oob message: [%s]"
 					, message.m_originatorID
-					, message.originator()
+					, Chat::Name(message.m_originatorID).c_str()
 					, message.m_text
 					);
 

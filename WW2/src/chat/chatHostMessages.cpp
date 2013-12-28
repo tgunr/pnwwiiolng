@@ -430,7 +430,7 @@ _recvRecruiterRequest(ACTION_OBJECT* const a)
 void
 OOBMessage::send()
 {
-	dbugLog(_FLD, "p:%u c:%s sending oob string message: %s", m_originatorID, originator(), m_text);
+	dbugLog(_FLD, "p:%u c:%s sending oob string message: %s", m_originatorID, Chat::Name(m_originatorID).c_str(), m_text);
 
 	Teul::Packet outgoing(sizeof(*this), Chat::CallbackX, Chat::OOB_MESSAGE_Y);
 	outgoing.append(*this);

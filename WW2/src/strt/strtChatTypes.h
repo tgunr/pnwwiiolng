@@ -10,14 +10,12 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include <stdexcept>
 #include "chat/chatHandle.h"
 #include "wwii/wwiiFullObjID.h"
 #include "wwii/wwiiOwnershipEnums.h"
 
 static const int OOB_STRING_LEN	= 160;
 static const int OOB_STRING_SIZE = OOB_STRING_LEN + 1;
-static const int OOB_CALLSIGN_SIZE = MAX_HANDLE_LEN + 1;
 
 // Out of band messages for sending config/command packets between hosts
 // basically, a reduction in the number of callbacks required.
@@ -34,8 +32,6 @@ public:
 public:
 	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
 	void send();
-
-	const char* originator() const { return chatGetCallsign(m_handleID); }
 
 	// Used by the host
 	void Reply(int prefix, int msg, const char* text1=NULL, const char* text2=NULL);
