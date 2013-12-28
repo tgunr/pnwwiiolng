@@ -1344,7 +1344,7 @@ public:
 			HCUnit* unit = HCUnit::Lookup(bdu.m_brigadeID);
 			if (unit == nullptr)
 			{
-				dbugLog(_FLW, "Apparent new brigade(%hu): %s", bdu.m_brigadeID, bdu.m_title);
+				dbugLog(_FLW, "Apparent new brigade(%u): %s", bdu.m_brigadeID, bdu.m_title);
 				continue;
 			}
 
