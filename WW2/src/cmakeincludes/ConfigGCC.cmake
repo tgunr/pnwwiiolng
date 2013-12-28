@@ -1,13 +1,13 @@
 # GNU C++ Compiler configuratoin.
 
 include(CheckCXXCompilerFlag)
-check_cxx_compiler_flag("-std=gnu++11" HAVE_STD_CPP11)
+check_cxx_compiler_flag("-std=c++11" HAVE_STD_CPP11)
 IF ( HAVE_STD_CPP11 )
-	SET(_LANGUAGE_FLAGS "-std=gnu++11")
+	SET(_LANGUAGE_FLAGS "-std=c++11")
 ELSE ( )
-	check_cxx_compiler_flag("-std=gnu++0x" HAVE_STD_CPP0X )
+	check_cxx_compiler_flag("-std=c++0x" HAVE_STD_CPP0X )
 	IF ( HAVE_STD_CPP0X )
-		SET(_LANGUAGE_FLAGS "-std=gnu++0x")
+		SET(_LANGUAGE_FLAGS "-std=c++0x")
 	ELSE ( )
 		MESSAGE(FATAL_ERROR "Compiler doesn't support -std=gnu++11 or -std=gnu++0x")
 	ENDIF ( )
