@@ -52,6 +52,8 @@ class SupercellVislevelXfer
 	public:	static const size_t FlagBits = sizeof(vis_t) * 8;
 	public:	static const vis_t BitMask = (vis_t)((1 << BitsPerObject) - 1);
 
+	static_assert(SizeBits == 16 && SCXYBits == 32 && FlagBits == 8, "Wrong Bit Sizes");
+
 	//////////////////////////////////////////////////////////////////////
 	// Internal functions, they are public purely so that the Unit Tests
 	// are able to access them directly.
