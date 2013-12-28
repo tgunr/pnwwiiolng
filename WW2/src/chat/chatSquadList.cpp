@@ -1214,12 +1214,12 @@ public:
 		{}
 
 public:
-	virtual bool Process()
+	virtual bool Process(const size_t) OVERRIDE_FN
 	{
 		return true;
 	}
 
-	virtual void Success()
+	virtual void Success() OVERRIDE_FN
 	{
 		///TODO: Implement non-DBD squad updating
 	}
