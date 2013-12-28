@@ -253,6 +253,39 @@ public:
 } dotBackupLeader;
 
 //////////////////////////////////////////////////////////////////////
+// .friends command
+//////////////////////////////////////////////////////////////////////
+
+class DotFriends : public DotCommand
+{
+public:
+	DotFriends() : DotCommand("friends", "View/manipulate 'friends' list"
+							  , NO_MASK, LSTR_FRIENDS_USAGE, LSTR_FRIENDS_DETAIL
+							  )
+	{
+	}
+
+public:
+	virtual void action(Player& player, Chat::ClientMessage * /*message*/) const { chatFriendsList(player); }
+
+	virtual void actionWith(Player& player, Chat::ClientMessage * /*message*/, char* arguments) const OVERRIDE_FN
+	{
+		static ARGV args;
+
+		vectorize(arguments, args, 11);
+
+		// Request for assistance
+		if (args.size() < 1 || strcasecmp(args[0], "help") == 0)
+		{
+			help(player);
+			return;
+		}
+
+		chatModifySocialList(player, args, false);
+	}
+} dotFriends;
+
+//////////////////////////////////////////////////////////////////////
 // The .help command; takes a DotCommandIndex as a parameter so that it
 // can be used on different indexes
 //////////////////////////////////////////////////////////////////////
@@ -341,6 +374,60 @@ public:
 		player.message(LSTR_NOTE, LSTR_HQ_SUBS, NULL, NULL);
 	}
 } dotHQOn;
+
+//////////////////////////////////////////////////////////////////////
+// Ignore commands
+//////////////////////////////////////////////////////////////////////
+
+class DotIgnore : public DotCommand
+{
+public:
+	DotIgnore() : DotCommand("ignore", "Manage/view ignore list"
+							 , NO_MASK, LSTR_IGNORE_USAGE, LSTR_IGNORE_DETAIL
+							 )
+	{
+	}
+
+	virtual void action(Player& player, Chat::ClientMessage * /*message*/) const OVERRIDE_FN
+	{
+		static std::string textlist = "";
+
+		const HANDLES& ignores = player.ignores();
+		if (ignores.empty())
+		{
+			player.message(LSTR_NOTE, LSTR_NOT_IGNORING_ANYONE);
+			return;
+		}
+
+		textlist.clear();
+
+		player.message(LSTR_NOTE, LSTR_PLAYERS_IGNORED);
+		HANDLES::const_iterator it;
+		for (it = ignores.begin(); it != ignores.end(); ++it)
+		{
+			if (!textlist.empty())
+				textlist += ", ";
+			textlist += Chat::Name(*it).c_str();
+		}
+		player.message(LSTR_NONE, LSTR_GENERIC, textlist.c_str());
+	}
+
+	virtual void actionWith(Player& player, Chat::ClientMessage * /*message*/, char* arguments) const OVERRIDE_FN
+	{
+		static ARGV args;
+
+		vectorize(arguments, args, 11);
+
+		// Request for assistance
+		if (args.size() < 1 || strcasecmp(args[0], "help") == 0)
+		{
+			help(player);
+			return;
+		}
+
+		chatModifySocialList(player, args, true);
+	}
+} dotIgnore;
 
 //////////////////////////////////////////////////////////////////////
 // Change the mission leader

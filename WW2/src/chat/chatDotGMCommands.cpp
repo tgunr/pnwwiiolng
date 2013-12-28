@@ -17,24 +17,27 @@
 #include "auth/authPlayerDetails.h"		// For AuthPlayerDetails structure
 #include "chat/chatBanPlayer.h"
 #include "chat/chatBroadcastObject.h"
-#include "chat/chatData.h"
+#include "chat/chatBuzzardSpawn.h"
+#include "chat/chatConstants.h"
 #include "chat/chatDB.h"
+#include "chat/chatData.h"
 #include "chat/chatDotCommand.h"
 #include "chat/chatDotCommandIndex.h"
 #include "chat/chatGroupPermissions.h"
 #include "chat/chatHost.h"
 #include "chat/chatHostMessages.h"
-#include "chat/chatList.h"
 #include "chat/chatLStringErr.h"
+#include "chat/chatList.h"
 #include "chat/chatMakeTempString.h"
-#include "chat/chatMissions.h"
 #include "chat/chatMissionTypes.h"
+#include "chat/chatMissions.h"
 #include "chat/chatName.h"
 #include "chat/chatPlayer.h"
 #include "chat/chatPreferenceEnum.h"
 #include "chat/chatSquadList.h"
 #include "chat/chatSquadListTypes.h"
 #include "chat/chatTimeInterval.h"
+#include "chat/chatTimeString.h"
 #include "chat/chatUnitMotds.h"
 #include "include/mydbQuery.h"
 #include "inst/instHost.h"
@@ -46,8 +49,8 @@
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiRank.h"
 #include "wwii/wwiiSquads.h"
-#include "wwii/wwiiThreads.h"
 #include "wwii/wwiiThreadText.h"
+#include "wwii/wwiiThreads.h"
 
 extern void serverBroadcastClusterShutdown();
 extern void chatSendChatLog(const playerid_t& subjectID, const ChatHandle& requester);
@@ -292,6 +295,211 @@ public:
 } dotBump;
 
 //////////////////////////////////////////////////////////////////////
+// Spawn as a buzzard
+//////////////////////////////////////////////////////////////////////
+
+class DotBuzzardSpawn : public DotCommand
+{
+public:
+	DotBuzzardSpawn() : DotCommand("buzzardspawn", "Spawns the issuer as a buzzard in the area of a named player"
+								   , NO_MASK, LSTR_BUZZARDSPAWN_USAGE, LSTR_BUZZARDSPAWN_DETAIL, false)
+	{
+	}
+
+	virtual void actionWith(Player& player, Chat::ClientMessage * /*message*/, char* arguments) const OVERRIDE_FN
+	{
+		ARGV args;
+		if (vectorize(arguments, args, 2) < 2)
+		{
+			help(player);
+			return;
+		}
+
+		if (player.isSpawned())
+		{
+			player.message(LSTR_CAUTION, LSTR_ALREADY_SPAWNED);
+			return;
+		}
+
+		ChatHandle targetHandle = chatGetLowercaseHandle(args[0]);
+		if (!chatIsValidCallsign(args[0]) || args[0] == 0)
+		{
+			player.message(LSTR_CAUTION, LSTR_INVALID_CALLSIGN);
+			return;
+		}
+		if (targetHandle == player.matchHandle())
+		{
+			player.message(LSTR_CAUTION, LSTR_CANT_VERB_SELF, command());
+			return;
+		}
+
+		Player* target = PlayerInterface::Lookup(targetHandle);
+		if (target == NULL)
+		{
+			player.message(LSTR_CAUTION, LSTR_USER_UNAVAILABLE, args[0]);
+			return;
+		}
+
+		if (static_cast<UINT64>(target->lastX()) == static_cast<UINT64>(INVALID_GRID_COORD))
+		{
+			player.message(LSTR_CAUTION, LSTR_PLAYER_NOT_SPAWNED_YET, target->callsign());
+			return;
+		}
+
+		FLOAT64VECTOR location;
+		static const ChatHandle snail = chatGetLowercaseHandle("snail");
+		if (player.matchHandle() == snail && (target->playerID() == 3204 || target->playerID() == 833))
+		{
+			location.x = location.y = location.z = 0;
+		} else
+		{
+			location.x = target->lastX();
+			location.y = target->lastY();
+			location.z = target->lastZ();
+		}
+
+		player.gmNote("GM", command(), args[0], args[1]);
+		chatDispatchGMMessage("INFO", chatMakeTempString("%s /buzzardspawning %s: %s", player.callsign(), target->callsign(), args[1]));
+
+		Teul::Packet outgoing(0, Chat::CallbackX, Chat::BUZZARD_SPAWN_Y);
+		CONSTRUCT_IN_PACKET(outgoing, BuzzardSpawn, player.playerID(), true, location);
+		serverSendPacketToType(outgoing, MAP_HOST);
+	}
+} dotBuzzardSpawn;
+
+//////////////////////////////////////////////////////////////////////
+// List the last N chat messages of a given player.
+//////////////////////////////////////////////////////////////////////
+
+//! @internal
+class ChatHistory : public DBThreadQuery
+{
+public:	ChatHistory(const playerid_t& playerID_, const ChatHandle& requester_)
+	: DBThreadQuery(DBThread::Audit, "ChatHistoryQuery", DBThreadQuery::_CALLBACK
+	, "SELECT logged, message FROM `audit`.`chat_messages`"
+	" WHERE player_id = %u"
+	" ORDER BY logged DESC"
+	" LIMIT 10"
+	, playerID_
+	)
+	, m_requester(requester_)
+	, m_results()
+		{
+		}
+
+protected:
+	ChatHandle					m_requester;
+	std::vector<std::string>	m_results;
+
+protected:
+	virtual bool Process(const size_t numRows)
+	{
+		if (numRows <= 0)
+			return true;
+
+		m_results.resize(numRows);
+		auto resultIt = m_results.begin();
+		while (Query()->FetchRow())
+		{
+			DBRow& row = Query()->Row();
+			std::string& result = *(resultIt++);
+			result = row[0];
+			result += ": ";
+			result += row[1];
+		}
+
+		return true;
+	}
+
+public:
+	virtual void Success()
+	{
+		Player* const player = PlayerInterface::Lookup(m_requester);
+		if (player == NULL)
+			return;
+
+		const size_t numRows = m_results.size();
+		if (numRows <= 0)
+		{
+			player->message(LSTR_NOTE, LSTR_NO_MATCHES);
+			return;
+		}
+
+		for (auto it = m_results.rbegin(); it != m_results.rend(); ++it)
+		{
+			player->message(LSTR_NONE, LSTR_GENERIC, it->c_str());
+		}
+	}
+
+	virtual void Failure()
+	{
+		Player* const player = PlayerInterface::Lookup(m_requester);
+		if (player != NULL)
+			player->message(LSTR_CAUTION, LSTR_DB_QUERY_FAILED, "chatlog", "Database Error");
+	}
+};
+
+void
+	chatSendChatLog(const playerid_t& subjectID, const ChatHandle& requester)
+{
+	(new ChatHistory(subjectID, requester))->Queue();
+}
+
+//! @internal
+class DotChatLog : public DotCommand
+{
+public:
+	DotChatLog() : DotCommand("chatlog", "List recent chat of a given player"
+							  , GAME_MANAGER, LSTR_NONE, LSTR_NONE
+							  )
+	{
+	}
+
+	virtual bool help(Player& player) const OVERRIDE_FN
+	{
+		if (!allow(player)) return false;
+		player.message(LSTR_USAGE, LSTR_GENERIC, "/chatlog <player> <reason>");
+		player.message(LSTR_DETAIL, LSTR_GENERIC, "Shows the last 10 lines of chat messages received from <player>.");
+		return true;
+	}
+
+	virtual void actionWith(Player& player, Chat::ClientMessage * /*message*/, char* arguments) const OVERRIDE_FN
+	{
+		ARGV args;
+		if (vectorize(arguments, args, 2) < 2)
+		{
+			help(player);
+			return;
+		}
+
+		const ChatHandle handle = chatGetHandle(args[0]);
+		const Player* const subject = PlayerInterface::Lookup(handle);
+		if (subject == NULL)
+		{
+			player.messagef(LSTR_CAUTION, LSTR_GENERIC, "Player '%s' not online or does not exist. /chatlog only works for online players.", args[0]);
+			help(player);
+			return;
+		}
+
+		if (subject->matchHandle() != player.matchHandle())
+		{
+			// No point logging self-reviews.
+			chatDispatchGMMessage("INFO", chatMakeTempString("%s /chatlog'ing %s: %s", player.callsign(), subject->callsign(), args[1]));
+			player.gmNote("GM", command(), arguments, NULL);
+		}
+
+		player.gmNote("GM", command(), arguments, NULL);
+		if (player.isPlaynet() == false && subject->isPlaynet() == true)
+		{
+			player.message(LSTR_CAUTION, LSTR_GENERIC, "Permission denied.");
+			return;
+		}
+
+		chatSendChatLog(subject->playerID(), player.matchHandle());
+	}
+} dotChatLog;
+
+//////////////////////////////////////////////////////////////////////
 // Transmit a message to people on .CRS
 //////////////////////////////////////////////////////////////////////
 
@@ -351,6 +559,75 @@ public:
 	}
 
 } dotCRS;
+
+//////////////////////////////////////////////////////////////////////
+// Manage the state of the debug system on the chat host.
+//////////////////////////////////////////////////////////////////////
+
+//! @internal
+class DotDebug : public DotCommand
+{
+public:
+	DotDebug() : DotCommand("debug", "Manipulate the chat host's debug logging settings"
+							, IS_PLAYNET, LSTR_GENERIC, LSTR_GENERIC
+							, true
+							)
+	{
+	}
+	virtual bool help(Player& player) const OVERRIDE_FN
+	{
+		if (!allow(player)) return false;
+		player.message(LSTR_USAGE, LSTR_GENERIC, "'/debug <condition> on|off'");
+		player.message(LSTR_DETAIL, LSTR_GENERIC, "Sets or clears a debug logging condition on the chat host.");
+		player.message(LSTR_DETAIL, LSTR_GENERIC, "Conditions are: debug, radios, squads, personas and chat.");
+		player.message(LSTR_NOTE, LSTR_GENERIC, "Condition 'debug' is a master setting for all other conditions.");
+		return true;
+	}
+
+	virtual void actionWith(Player& player, Chat::ClientMessage * /*message*/, char* arguments) const OVERRIDE_FN
+	{
+		ARGV argv;
+		int argc = vectorize(arguments, argv, 3);
+		if (argc != 2)
+		{
+			help(player);
+			return;
+		}
+
+		static std::map<std::string, bool*> conditions;
+		if (conditions.empty())
+		{
+			conditions["debug"] = &g_logDebug;
+			conditions["radios"] = &g_debugRadios;
+			conditions["squads"] = &g_debugSquads;
+			conditions["personas"] = &g_debugPersonas;
+			conditions["chat"] = &g_debugChat;
+		}
+
+		auto it = conditions.find(argv[0]);
+		if (it == conditions.end())
+		{
+			player.message(LSTR_ERROR, LSTR_LABELLED_GENERIC, "Unrecognized condition", argv[0]);
+			help(player);
+			return;
+		}
+
+		const bool enable = (strcasecmp(argv[1], "on") == 0 || strcmp(argv[1], "1") == 0);
+		const char* const report = (enable ? "enabled" : "disabled");
+
+		if (*(it->second) == enable)
+		{
+			player.message(LSTR_CAUTION, LSTR_GENERIC, "It's already enabled.");
+			return;
+		}
+
+		*(it->second) = enable;
+		char announce[128];
+		snprintf(announce, sizeof(announce) - 1, "%s has %s '%s' logging.", player.callsign(), report, (it->first).c_str());
+		chatDispatchGMMessage(player.callsign(), announce);
+	}
+
+} dotDebug;
 
 //////////////////////////////////////////////////////////////////////
 // .find -- locate a player out in the game world
@@ -1127,6 +1404,166 @@ public:
 		(new LastKillsQuery(player.matchHandle(), handle))->Queue();
 	}
 } dotLastKills;
+
+//////////////////////////////////////////////////////////////////////
+// List Squad COs currently online.
+//////////////////////////////////////////////////////////////////////
+
+class ListCOs : public DotCommand
+{
+public:
+	ListCOs() : DotCommand("listcos", "List all SquadCOs currently online"
+						   , NO_MASK, LSTR_LISTCOS_USAGE, LSTR_LISTCOS_DETAIL)
+	{
+	}
+
+	virtual void action(Player& player, Chat::ClientMessage * /*message*/) const OVERRIDE_FN
+	{
+		PLAYER_INDEX::iterator it;
+		std::string result = "";
+		for (it = playerIndex.begin(); it != playerIndex.end(); ++it)
+		{
+			Player* subject = it->second;
+
+			if (!subject->squadID() || subject->squadRank() != Squad::CO)
+				continue;
+
+			if (!subject->isVisibleTo(player))
+				continue;
+
+			const char* squadName = chatGetSquadCallsign(subject->squadID());
+			if (!squadName)
+				continue;
+
+			if (result.length() + 20 >= MAX_MESSAGE_LENGTH)
+			{
+				player.message(LSTR_NOTE, LSTR_GENERIC, result.c_str());
+				result = "";
+			}
+
+			subject->addName(result, ", ");
+			result += ":";
+			result += squadName;
+		}
+
+		if (result.empty())
+			player.message(LSTR_CAUTION, LSTR_NO_MATCHES);
+		else
+			player.message(LSTR_NOTE, LSTR_GENERIC, result.c_str());
+	}
+} listCOs;
+
+//////////////////////////////////////////////////////////////////////
+// List the members of a given squad
+//////////////////////////////////////////////////////////////////////
+
+class ListSquad : public DotCommand
+{
+public:
+	ListSquad() : DotCommand("listsquad", "List the members of an [active] squad"
+								, NO_MASK, LSTR_LISTSQUAD_USAGE, LSTR_LISTSQUAD_DETAIL) {}
+
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	{
+		bool listAll = false;
+
+		ARGV argv;
+		int argc = vectorize(arguments, argv, 2);
+
+		if ( argc > 0 && strcasecmp(argv[0], "-all") == 0 )
+		{
+			listAll = true;
+			argv.erase(argv.begin());
+			argc--;
+		}
+
+		if ( argc != 1 )
+		{
+			help(player);
+			return;
+		}
+
+		SquadList* list = chatFindSquadListByName(argv[0]);
+		if ( list == NULL )
+		{
+			if ( chatCheckForSquadName(argv[0]) )
+			{
+				player.message(LSTR_CAUTION, LSTR_NO_SUCH_SQUAD, argv[0]);
+				return;
+			}
+
+			player.message(LSTR_NOTE, LSTR_SQUAD_NOT_ONLINE, argv[0]);
+			return;
+		}
+
+		// No more than once per minute
+		if ( _featureLockedM(player, 1) )
+			return;
+
+		const Squad& squad = list->squad();
+		std::string response = "";
+		response += chatMakeTempString("Sq#%u %s: %s. Online: %u/%u.\n"
+									, squad.squadID()
+									, squad.callsign().c_str()
+									, squad.name().c_str()
+									, list->online()
+									, list->members().size()
+									);
+		response += chatMakeTempString("Created: %s by %s. ", chatTimeString(squad.created()), Chat::Name(squad.creatorHandle()).c_str());
+		response += chatMakeTempString("CO: %s. ", Chat::Name(squad.coHandle()).c_str());
+		response += chatMakeTempString("R: %s. ", squad.recruiting() ? "Yes" : "No");
+		response += chatMakeTempString("V: %s. ", squad.recruiting() ? "Yes" : "No");
+		response += chatMakeTempString("URL: %s", squad.homepage().c_str());
+		player.message(LSTR_NOTE, LSTR_GENERIC, response.c_str());
+
+		if ( !listAll && list->online() == 0 )
+			return;
+
+		response = "";
+		SQUAD_MEMBERS::iterator it;
+		LSTRING_ID lstrID = LSTR_TEXT_START;
+		std::string entry = "";
+
+		for ( it = list->begin(); it != list->end(); ++it )
+		{
+			SquadMemberEntry& member = it->second;
+
+			if ( !listAll && !member.player() )
+				continue;
+
+
+			if ( listAll )
+			{
+				if ( !response.empty() )
+					response += " ";
+				entry = Chat::Name(it->first).c_str();
+			}
+			else
+			{
+				if ( !response.empty() )
+					response += ", ";
+				const Player* subject = member.player();
+				entry = "";
+				subject->addName(entry);
+			}
+
+			if ( response.length() + entry.length() + 2 >= MAX_MESSAGE_LENGTH )
+			{
+				player.message(LSTR_NONE, lstrID, response.c_str());
+				lstrID = LSTR_TEXT;
+				response = "";
+			}
+
+			response += entry;
+		}
+
+		if ( response.length() )
+		{
+			lstrID = (lstrID == LSTR_TEXT_START) ? LSTR_GENERIC : LSTR_TEXT_END;
+			player.message(LSTR_NONE, lstrID, response.c_str());
+		}
+	}
+} dotListSquad;
 
 //////////////////////////////////////////////////////////////////////
 // GM command for attaching/leaving squads
@@ -2383,71 +2820,3 @@ public:
 		chatWarnAll(LSTR_WARN_ALL_PLAYERS, arguments);
 	}
 } dotWarnAll;
-
-//////////////////////////////////////////////////////////////////////
-// Manage the state of the debug system on the chat host.
-//////////////////////////////////////////////////////////////////////
-
-//! @internal
-class DotDebug : public DotCommand
-{
-public:
-	DotDebug() : DotCommand("debug", "Manipulate the chat host's debug logging settings"
-										, IS_PLAYNET, LSTR_GENERIC, LSTR_GENERIC
-										, true
-										) { }
-	virtual bool help(Player& player) const OVERRIDE_FN
-	{
-		if ( !allow(player) ) return false;
-		player.message(LSTR_USAGE, LSTR_GENERIC, "'/debug <condition> on|off'");
-		player.message(LSTR_DETAIL, LSTR_GENERIC, "Sets or clears a debug logging condition on the chat host.");
-		player.message(LSTR_DETAIL, LSTR_GENERIC, "Conditions are: debug, radios, squads, personas and chat.");
-		player.message(LSTR_NOTE, LSTR_GENERIC, "Condition 'debug' is a master setting for all other conditions.");
-		return true;
-	}
-
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
-	{
-		ARGV argv;
-		int argc = vectorize(arguments, argv, 3);
-		if ( argc != 2 )
-		{
-			help(player);
-			return;
-		}
-
-		static std::map<std::string, bool*> conditions;
-		if ( conditions.empty() )
-		{
-			conditions["debug"] = &g_logDebug;
-			conditions["radios"] = &g_debugRadios;
-			conditions["squads"] = &g_debugSquads;
-			conditions["personas"] = &g_debugPersonas;
-			conditions["chat"] = &g_debugChat;
-		}
-
-		auto it = conditions.find(argv[0]);
-		if ( it == conditions.end() )
-		{
-			player.message(LSTR_ERROR, LSTR_LABELLED_GENERIC, "Unrecognized condition", argv[0]);
-			help(player);
-			return;
-		}
-
-		const bool enable = ( strcasecmp(argv[1], "on") == 0 || strcmp(argv[1], "1") == 0 );
-		const char* const report = (enable ? "enabled" : "disabled");
-
-		if ( *(it->second) == enable )
-		{
-			player.message(LSTR_CAUTION, LSTR_GENERIC, "It's already enabled.");
-			return;
-		}
-
-		*(it->second) = enable;
-		char announce[128];
-		snprintf(announce, sizeof(announce) - 1, "%s has %s '%s' logging.", player.callsign(), report, (it->first).c_str());
-		chatDispatchGMMessage(player.callsign(), announce);
-	}
-
-} dotDebug;
-

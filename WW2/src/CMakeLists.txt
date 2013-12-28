@@ -469,17 +469,12 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 		chat/chatDB.cpp
 			chat/chatDB.h
 		chat/chatDotBetaCommands.cpp
-		chat/chatDotBuzzardSpawn.cpp
-		chat/chatDotChatLog.cpp
 		chat/chatDotCommand.cpp
 			chat/chatDotCommand.h
 				chat/chatClientMessage.h
 				chat/chatGroupsType.h
 		chat/chatDotCommands.cpp
-		chat/chatDotFriends.cpp
 		chat/chatDotGMCommands.cpp
-		chat/chatDotIgnore.cpp
-		chat/chatDotProfRes.cpp
 		chat/chatEditString.cpp
 			chat/chatEditString.h
 		chat/chatFriendList.cpp
@@ -563,10 +558,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 		chat/chatDecisions.cpp
 			chat/chatDecisions.h
 		chat/chatDotHCCommands.cpp
-		chat/chatDotListCOs.cpp
-		chat/chatDotListSquad.cpp
 		chat/chatDotPassthrus.cpp
-		chat/chatDotRenameSquad.cpp
 		chat/chatDotSquadCommands.cpp
 		chat/chatHostBrigadeControl.cpp
 			chat/chatHostBrigadeControl.h
