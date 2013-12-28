@@ -17,7 +17,10 @@
 #include "teul/teulEndpoint.h"
 #include "teul/teulTimeMS.h"
 
-#define AUTH_BYPASS	1
+#define AUTH_BYPASS 1
+#ifdef AUTH_BYPASS
+#include <atomic>
+#endif
 
 static const TeulTimeMS LoginInterval_ms = 5 * 60 * 1000;
 
@@ -219,7 +222,8 @@ _findOTP(const UINT32 OTP)
 	return PN_LIKELY( it != _otps.end() ) ? it->second : nullptr;
 }
 
-static OTP_NODE*
+#if defined(AUTH_BYPASS)
+static OTP_NODE *
 _findCustomer(const UINT32 customerID)
 {
 	OTPS::iterator it = _custOtps.find(customerID);
@@ -229,13 +233,11 @@ _findCustomer(const UINT32 customerID)
 static void
 _processBackDoor(PLAYER_LOGIN& login, Auth::Dispatch& dispatch)
 {
-#ifdef AUTH_BYPASS
-	static SINT32 backGameCallSign = 0;
-#endif
+	static std::atomic<UINT32> backGameCallsign = 0;
 
 	if ( memcmp(AUTH_SEQ, login.CopyRightString, AUTH_SEQ_SIZE-1) != 0 )
 	{
-		snprintf(dispatch.m_callsign, MAX_HANDLE_LEN, "STAFF%05u", backGameCallSign++);
+		snprintf(dispatch.m_callsign, MAX_HANDLE_LEN, "STAFF%05u", backGameCallsign++);
 
 		const char* crs = (const char*)login.CopyRightString;
 
@@ -258,13 +260,14 @@ _processBackDoor(PLAYER_LOGIN& login, Auth::Dispatch& dispatch)
 	else
 	{
 		dispatch.m_customerID = _bypassCustomerID;
-		snprintf(dispatch.m_callsign, MAX_HANDLE_LEN, "CRS%07u", backGameCallSign++);
+		snprintf(dispatch.m_callsign, MAX_HANDLE_LEN, "CRS%07u", backGameCallsign++);
 	}
 
 	login.OTP = dispatch.m_OTP = _bypassCustomerID++;
 	dispatch.m_clientIP = 0;
 	dispatch.m_appVersion = login.appVersion;
 }
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // Checks to see if the auth server has assigned the incoming
