@@ -471,23 +471,24 @@ protected:
 //////////////////////////////////////////////////////////////////////
 // Check the validity of a name
 
-static bool
-	_checkName(char* name, bool isCurrent, Player& player)
+static bool _checkName(char* name, bool isCurrent, Player& player)
 {
 	size_t len = strlen(name);
-	if (len < 2 || len > MAX_HANDLE_LEN) {
+	if (len < 2 || len > MAX_HANDLE_LEN){
 		player.message(LSTR_CAUTION, LSTR_INVALID_SQUAD_NAME, name);
 		return false;
 	}
 
 	ChatHandle id = chatGetHandle(name);
 	Chat::Name idName(id);
-	if (idName.Empty() || !idName.IsValid() || idName != name) {
+	if (idName.Empty() || !idName.IsValid() || idName != name)
+	{
 		player.message(LSTR_CAUTION, LSTR_INVALID_SQUAD_NAME, name);
 		return false;
 	}
 
-	if (chatCheckForSquadName(id) != isCurrent) {
+	if (chatCheckForSquadName(id) != isCurrent)
+	{
 		if (isCurrent)
 			player.message(LSTR_CAUTION, LSTR_NO_SUCH_SQUAD, name);
 		else
