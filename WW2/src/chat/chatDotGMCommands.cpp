@@ -2233,7 +2233,7 @@ public:
 		}
 #endif
 
-		if ( !strcmp(argv[0], "in") == 0 || argv.size() < 3 || !isdigit(*argv[1]) )
+		if ( strcmp(argv[0], "in") != 0 || argv.size() < 3 || !isdigit(*argv[1]) )
 		{
 			help(player);
 			return;
