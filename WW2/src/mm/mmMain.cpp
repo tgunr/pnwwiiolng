@@ -961,7 +961,6 @@ public:
 
 private:
 	FUNCTION**		m_functions;
-	UINT32			m_size;
 	UINT32			m_state;
 
 public:
