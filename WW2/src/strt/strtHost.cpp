@@ -394,7 +394,7 @@ static void
 _restoreMapState()
 {
 	char mapStateScript[1024];
-	snprintf(mapStateScript, sizeof(mapStateScript), SUB_PATH("%s", "map-state.lua"), cv_luaPath.GetString());
+	strprintf(mapStateScript, SUB_PATH("%s", "map-state.lua"), cv_luaPath.GetString());
 	Lua::RunScript(mapStateScript);
 }
 

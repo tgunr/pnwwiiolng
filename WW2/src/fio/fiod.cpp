@@ -547,7 +547,7 @@ void fiodmkdir(const char* path)
 	char fullPath[PATH_MAX];
 
 #if platOS == OS_MACOS
-	snprintf(fullPath, PATH_MAX-1, "%s%s", macPreferencesPath(), path);
+	strprintf(fullPath, "%s%s", macPreferencesPath(), path);
 	OS_MKDIR(os_file_path(fullPath), S_IRWXU);
 #elif platOS == OS_WIN32
 
@@ -979,7 +979,7 @@ void fiocfgMkDir(const char* path, bool)
 LOGICAL fiocfgAccess(const char* filename, bool)
 {
 	char	fullpath[_MAX_PATH];
-	snprintf(fullpath,_MAX_PATH-1,"%s%s", macPreferencesPath(), filename);
+	strprintf(fullpath,"%s%s", macPreferencesPath(), filename);
 
 	return(OS_ACCESS(os_file_path(fullpath), 0) == 0);
 }
@@ -987,7 +987,7 @@ LOGICAL fiocfgAccess(const char* filename, bool)
 LOGICAL fiocfgModified(SINT32* modified, const char* filename)
 {
 	char	fullpath[_MAX_PATH];
-	snprintf(fullpath,_MAX_PATH-1,"%s%s", macPreferencesPath(), filename);
+	strprintf(fullpath,"%s%s", macPreferencesPath(), filename);
 
 	struct	stat	buffer;
 	int retval = stat(os_file_path(fullpath), &buffer);
@@ -1003,7 +1003,7 @@ size_t fiocfgOpen(const char* filename, bool)
 	int		hfile = -1;
 	struct stat st;
 
-	snprintf(fullpath,_MAX_PATH-1,"%s%s", macPreferencesPath(), filename);
+	strprintf(fullpath,"%s%s", macPreferencesPath(), filename);
 	os_file_path(fullpath);
 
 	stat(fullpath, &st);
@@ -1018,7 +1018,7 @@ size_t fiocfgOpenWrite(const char* filename, bool)
 	char  fullpath[_MAX_PATH];
 	int   hfile = -1;
 
-	snprintf(fullpath,_MAX_PATH-1,"%s%s", macPreferencesPath(), filename);
+	strprintf(fullpath,"%s%s", macPreferencesPath(), filename);
 	os_file_path(fullpath);
 
 	hfile = OS_OPEN(fullpath, O_CREAT|O_TRUNC|O_WRONLY|O_BINARY, S_IREAD | S_IWRITE);
@@ -1032,7 +1032,7 @@ SINT32 fiocfgFileSize(const char* filename, bool)
 	struct	stat	buffer;
 	SINT32 retval;
 
-	snprintf(fullpath,_MAX_PATH-1,"%s%s", macPreferencesPath(), filename);
+	strprintf(fullpath,"%s%s", macPreferencesPath(), filename);
 	os_file_path(fullpath);
 
 	retval = stat(fullpath, &buffer);

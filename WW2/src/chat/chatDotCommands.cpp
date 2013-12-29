@@ -879,7 +879,7 @@ public:
 		}
 
 		char buffer[MAX_MESSAGE_LENGTH + 1];
-		snprintf(buffer, sizeof(buffer) - 1, "%s: %s", player.callsign(), arguments);
+		strprintf(buffer, "%s: %s", player.callsign(), arguments);
 
 		const TRAINERS& trainers = chatGetTrainers();
 		TRAINERS::const_iterator it = trainers.begin();

@@ -56,7 +56,7 @@ mapChargeMinutes()
 				continue;
 
 			++charged;
-			snprintf(playerIDstr, sizeof(playerIDstr) - 1, "%u", player->playerID());
+			strprintf(playerIDstr, "%u", player->playerID());
 			balanceQry.addEntry(playerIDstr);
 		}
 

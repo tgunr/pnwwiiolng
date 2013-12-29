@@ -37,7 +37,7 @@ public: virtual bool TestVersion(const UINT32 version, const size_t bufSize, con
 			UINT16 len1 = bufSize, len2 = 0;
 
 			char versionStr[120];
-			snprintf(versionStr, sizeof(versionStr) - 1, "Encrypt: %04x: %" PRSizeT " bytes w/%llx", version, bufSize, startSeed);
+			strprintf(versionStr, "Encrypt: %04x: %" PRSizeT " bytes w/%llx", version, bufSize, startSeed);
 
 			BEGIN_SUB_STAGE( versionStr )
 
@@ -63,7 +63,7 @@ public: virtual bool TestVersion(const UINT32 version, const size_t bufSize, con
 
 			END_SUB_STAGE( versionStr )
 
-			snprintf(versionStr, sizeof(versionStr) - 1, "Decrypt: %04x: %" PRSizeT " bytes w/%llu", version, bufSize, startSeed);
+			strprintf(versionStr, "Decrypt: %04x: %" PRSizeT " bytes w/%llu", version, bufSize, startSeed);
 
 			BEGIN_SUB_STAGE( versionStr )
 

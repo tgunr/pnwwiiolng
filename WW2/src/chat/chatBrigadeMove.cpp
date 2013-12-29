@@ -141,6 +141,7 @@ BrigadeMove::process(const ChatHandle& byHandle) const
 
 	LSTRING_ID response = LSTR_NONE;
 	const char* text = NULL;
+	char temp[16];
 
 	switch (m_action)
 	{
@@ -205,12 +206,9 @@ BrigadeMove::process(const ChatHandle& byHandle) const
 		response = LSTR_HQU_FAILED_OFFMAP_NP;
 	break;
 	case BMR_FAILED_PREM_SURDR:
-		{
 			response = LSTR_HQU_FAILED_PREM_SURDR;
-			static char buf[16];
-			snprintf(buf, 15, "%14u", host_config.supply.surrenderInf);
-			text = buf;
-		}
+			strprintf(temp, "%14u", host_config.supply.surrenderInf);
+			text = temp;
 	break;
 	case BMR_FAILED_ENEMY_DEPOT:
 		response = LSTR_HQU_FAILED_ENEMY_DEPOT;

@@ -69,7 +69,7 @@ public:
 				nextSpamLine = 0;
 				const char* interval = chatTimeInterval(spamInterval);
 				char times[32];
-				snprintf(times, 31, "%u", spamLoops);
+				strprintf(times, "%u", spamLoops);
 				player.message(LSTR_NOTE, LSTR_SPAM_OPENING, times, interval);
 			}
 			else if ( strcasecmp("stop", argv[0]) == 0 )
@@ -105,8 +105,8 @@ public:
 
 		char numLines[32];
 		char loops[64];
-		snprintf(numLines, 31, "%" PRSizeT "", theSpamCan.size());
-		snprintf(loops, 63, "%u (%s)", spamLoops, chatTimeInterval(spamInterval));
+		strprintf(numLines, "%" PRSizeT "", theSpamCan.size());
+		strprintf(loops, "%u (%s)", spamLoops, chatTimeInterval(spamInterval));
 		player.message(LSTR_NOTE, LSTR_SPAM_STATUS, numLines, loops);
 
 		for ( UINT32 i = 0; i < theSpamCan.size(); ++i )

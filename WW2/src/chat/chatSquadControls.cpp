@@ -701,8 +701,7 @@ _checkSquadNight(std::string& text)
 		return false;
 
 	char reprint[Squad::MAX_NIGHT_LENGTH+1];
-	snprintf(reprint, Squad::MAX_NIGHT_LENGTH, "%u,%u,%d", night, hour, timeZone);
-	reprint[Squad::MAX_NIGHT_LENGTH] = 0;
+	strprintf(reprint, "%u,%u,%d", night, hour, timeZone);
 	text = reprint;
 
 	return true;

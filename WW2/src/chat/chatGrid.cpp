@@ -710,7 +710,7 @@ UMSSTO::activate()
 	catch (MSPAWN_RESULT error)
 	{
 		char errorMsg[256];
-		snprintf(errorMsg, 255, "t:%d p:%u c:%s m:%u %s activate failed: MSDR %u"
+		strprintf(errorMsg, "t:%d p:%u c:%s m:%u %s activate failed: MSDR %u"
 						, player->teulIndex(), player->playerID(), player->callsign(), player->missionID(), typeName(), error);
 		dbugLog(_FLA, "%s", errorMsg);
 		wwiiIRCChannelMessage("-sys", errorMsg);

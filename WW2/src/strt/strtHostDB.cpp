@@ -915,7 +915,7 @@ strtdbLoadTOETemplates()
 			strtLoadTOEWeaponTemplateHeader(id, name, country, branch);
 		}
 
-		snprintf(statement, sizeof(statement)
+		strprintf(statement
 				, "SELECT v.id, vt.countryID, vt.categoryID, vt.classID, vt.typeID, v.capacity, v.resupply_time_m"
 					" FROM toe.headers t"
 						" JOIN toe.vehicles v USING (id)"

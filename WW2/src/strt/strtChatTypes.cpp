@@ -30,11 +30,10 @@ OOBMessage
 	, m_side(side)
 {
 	if ( arguments == NULL || !*arguments )
-		strlcpy(m_text, command, sizeof(m_text));
+		strsafecpy(m_text, command);
 	else
 	{
-		snprintf(m_text, OOB_STRING_LEN, "%s %s", command, arguments);
-		m_text[sizeof(m_text)-1] = 0;
+		strprintf(m_text, "%s %s", command, arguments);
 	}
 }
 

@@ -334,14 +334,14 @@ weapListInit(const char* theaterPath)
 
 	atexit(weapListKill);
 
-	snprintf(importFile, PN_MAX_PATH, SUB_PATH("%s", "%s"), theaterPath, "weapCountry.csv");
+	strprintf(importFile, SUB_PATH("%s", "%s"), theaterPath, "weapCountry.csv");
 	if ( ! weapParseCountry(importFile))
 	{
 		dbugLog(_FLA, "couldnt parse countries file (%s)", importFile);
 		return FALSE;
 	}
 
-	snprintf(importFile, PN_MAX_PATH, SUB_PATH("%s", "%s"), theaterPath, "weapClasses.csv");
+	strprintf(importFile, SUB_PATH("%s", "%s"), theaterPath, "weapClasses.csv");
 	if ( ! weapParseClasses(importFile))
 	{
 		dbugLog(_FLA, "couldnt parse class file (%s)", importFile);
@@ -355,7 +355,7 @@ weapListInit(const char* theaterPath)
 
 		for ( category = 1; category < MAX_WEAP_CATEGORY; category++)
 		{
-			snprintf(importFile,PN_MAX_PATH, "%s" PATH_SEPSTR "%s%s%s"
+			strprintf(importFile, "%s" PATH_SEPSTR "%s%s%s"
 					, theaterPath, Parse::countryCode[weaponCountry[country].code], wwii_category[category], "weap.csv");
 //#define LIVE_DANGEROUS
 
@@ -376,7 +376,7 @@ weapListInit(const char* theaterPath)
 
 		for ( category = 1; category < MAX_WEAP_CATEGORY; category++)
 		{
-			snprintf(importFile, PN_MAX_PATH, "%s" PATH_SEPSTR "%s%s%s"
+			strprintf(importFile, "%s" PATH_SEPSTR "%s%s%s"
 					, theaterPath, Parse::countryCode[weaponCountry[country].code], wwii_category[category], "spawn.csv");
 			if ( ! weapParseSpawn(importFile, country, category) && category != _MUNITIONS )
 			{

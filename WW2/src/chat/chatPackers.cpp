@@ -148,7 +148,7 @@ Chat::LocalizedMessage::_copy(const char* const p0, const char* const p1, const 
 {
 	if ( (p0[0] | p1[0] | p2[0] | p3[0] | p4[0] | p5[0]) != 0 )
 	{
-		m_size = snprintf(m_data, MAX_MESSAGE_LENGTH
+		m_size = strprintf(m_data
 							, "%s%c%s%c%s%c%s%c%s%c%s"
 							, p0,0 , p1,0 , p2,0 , p3,0 , p4,0 , p5
 							);

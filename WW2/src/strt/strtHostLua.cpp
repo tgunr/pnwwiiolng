@@ -318,7 +318,7 @@ stratStartIntermission()
 	// BECD is a tool written by xiper for creating map configurations,
 	// becdwrapper defines glue functions for reading/loading these.
 	char becdScript[1024];
-	snprintf(becdScript, sizeof(becdScript), SUB_PATH("%s", "becdwrapper.lua"), cv_luaPath.GetString());
+	strprintf(becdScript, SUB_PATH("%s", "becdwrapper.lua"), cv_luaPath.GetString());
 	if ( Lua::RunScript(becdScript) == false )
 	{
 		dbugLog(_FLA, "Unable to load intermission functions");

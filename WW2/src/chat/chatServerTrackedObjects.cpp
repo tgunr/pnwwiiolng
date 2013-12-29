@@ -262,8 +262,8 @@ UMSSTO::applyJoules(const SINT64& joules, Player* const player)
 #if defined(BETA_RELEASE) || defined(TRAINING_SERVER)
 		char doneJoules[32];
 		char threshJoules[32];
-		snprintf(doneJoules, 31, "%llu", joules);
-		snprintf(threshJoules, 31, "%llu", damage().threshold());
+		strprintf(doneJoules, "%llu", joules);
+		strprintf(threshJoules, "%llu", damage().threshold());
 		player->message(LSTR_BETA, LSTR_STO_DMG_THRESHOLD, doneJoules, threshJoules);
 #endif
 		return false;
@@ -330,8 +330,8 @@ HulkSTO::applyJoules(const SINT64& joules, Player* const player)
 						, uid(), joules, damage().threshold());
 		char doneJoules[32];
 		char threshJoules[32];
-		snprintf(doneJoules, 31, "%llu", joules);
-		snprintf(threshJoules, 31, "%llu", damage().threshold());
+		strprintf(doneJoules, "%llu", joules);
+		strprintf(threshJoules, "%llu", damage().threshold());
 		player->message(LSTR_BETA, LSTR_STO_DMG_THRESHOLD, doneJoules, threshJoules);
 		return false;
 	}

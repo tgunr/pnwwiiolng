@@ -42,7 +42,7 @@ TestUnit::_failedTest(const char* file, unsigned int lineNo, const char* operati
 {
     // prefix, e.g.: file.cpp:25: testing explosions
     char str[256];
-    snprintf(str, sizeof(str) - 1, "\n%s:%u", file, lineNo);
+    strprintf(str, "\n%s:%u", file, lineNo);
     std::string text = str;
 	text += ": error: ";
 
@@ -72,7 +72,7 @@ TestUnit::_failedTest(const char* file, unsigned int lineNo, const char* operati
 
     if ( withOperands )
     {
-        snprintf(str, sizeof(str) - 1, " (%s vs %s)", m_lhsVal, m_rhsVal);
+        strprintf(str, " (%s vs %s)", m_lhsVal, m_rhsVal);
         text += str;
     }
 

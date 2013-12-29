@@ -1005,7 +1005,7 @@ Player::lastPosition(const char* prefix, const FLOAT64& x, const FLOAT64& y, boo
 
 	LatLong lastLoc(x * 100, y * 100);
 
-	snprintf(posn, sizeof(posn)-1
+	strprintf(posn
 					, " %s%s %s"
 					, prefix, m_lastCP->Name(), lastLoc.m_text);
 
@@ -1477,7 +1477,7 @@ Player::SetPreference(UINT32 prefId, UINT32 request, bool fromClient)
 		{
 			log(_FLI, "setting decal to %u", value);
 			char buffer[65];
-			snprintf(buffer, sizeof(buffer) - 1, "(%u,%u)", playerID(), value);
+			strprintf(buffer, "(%u,%u)", playerID(), value);
 			_decalUpdates.addEntry(buffer);
 			chatSendMapPersonaUpdate(playerID(), false, 0, 0, true, value);
 		}
@@ -1921,7 +1921,7 @@ _nameForCP(const Property* nearCP, const Property* lastCP)
 		return nearCP->Name();
 	if ( lastCP == NULL )
 		return "<wilderness>";
-	snprintf(buf, sizeof(buf), "<last near %s>", lastCP->Name());
+	strprintf(buf, "<last near %s>", lastCP->Name());
 	return buf;
 }
 
@@ -2149,7 +2149,7 @@ Player::updatePersona(const Chat::PersonaUpdate& update)
 		bool notManagement = memcmp("CRS", callsign(), 3) != 0;
 		if ( isPlaynet() && notManagement )
 		{
-			snprintf(note, 80, "%s has logged in", callsign());		///LSTR_SIGNED_ON
+			strprintf(note, "%s has logged in", callsign());		///LSTR_SIGNED_ON
 			chatDispatchCRSMessage("SYS", note, matchHandle());
 			const char* motd = chatGetUnitMotd(CRS_MOTD_UNIT);
 			if ( motd != NULL && *motd != 0 )
@@ -2159,7 +2159,7 @@ Player::updatePersona(const Chat::PersonaUpdate& update)
 		{
 			if ( !permissions(DARK_GLASSES) && (isExplicitGM() == true || isPlaynet() == false) )
 			{
-				snprintf(note, 80, "%s has logged in", callsign());	///LSTR_SIGNED_ON
+				strprintf(note, "%s has logged in", callsign());	///LSTR_SIGNED_ON
 				chatDispatchGMMessage("SYS", note, matchHandle());
 			}
 			const char* motd = chatGetUnitMotd(GM_MOTD_UNIT);
@@ -2307,12 +2307,9 @@ Player::whereabouts(char* into, const FLOAT64& x, const FLOAT64& y) const
 	if ( isSpawned() && m_impl->m_lastPing > 0 )
 	{
 		char ping[20];
-		snprintf(ping, sizeof(ping), " ping:%ums", m_impl->m_lastPing);
-		ping[sizeof(ping)-1] = 0;
+		strprintf(ping, " ping:%ums", m_impl->m_lastPing);
 		strcat(into, ping);
 	}
-
-	return;
 }
 
 //////////////////////////////////////////////////////////////////////

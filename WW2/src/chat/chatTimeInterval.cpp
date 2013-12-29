@@ -37,7 +37,7 @@ chatTimeInterval(unsigned int interval)
 
 	if ( days > 1 )
 	{
-		snprintf(str, STR_SIZE, "%u days", (unsigned int)days);
+		strprintf(str, "%u days", (unsigned int)days);
 		return str;
 	}
 	else if ( days == 1 )
@@ -50,33 +50,33 @@ chatTimeInterval(unsigned int interval)
 	if ( hours > 0 )
 	{
 		if ( minutes > 0 || seconds > 0 )
-			snprintf(sub, SUB_SIZE, "%02uh%02um%02u", (unsigned int)hours, (unsigned int)minutes, (unsigned int)seconds);
+			strprintf(sub, "%02uh%02um%02u", (unsigned int)hours, (unsigned int)minutes, (unsigned int)seconds);
 		else if ( hours > 1 )
-			snprintf(sub, SUB_SIZE, "%u hours", (unsigned int)hours);
+			strprintf(sub, "%u hours", (unsigned int)hours);
 		else
-			strcpy(sub, "1 hour");
+			strsafecpy(sub, "1 hour");
 	}
 	else if ( minutes > 0 )
 	{
 		if ( seconds > 0 )
-			snprintf(sub, SUB_SIZE, "%02um%02u", (unsigned int)minutes, (unsigned int)seconds);
+			strprintf(sub, "%02um%02u", (unsigned int)minutes, (unsigned int)seconds);
 		else if ( minutes > 1 )
-			snprintf(sub, SUB_SIZE, "%u minutes", (unsigned int)minutes);
+			strprintf(sub, "%u minutes", (unsigned int)minutes);
 		else
-			strcpy(sub, "1 minute");
+			strsafecpy(sub, "1 minute");
 	}
 	else if ( seconds > 0 )
 	{
 		if ( seconds > 1 )
-			snprintf(sub, SUB_SIZE, "%u seconds", (unsigned int)seconds);
+			strprintf(sub, "%u seconds", (unsigned int)seconds);
 		else
-			strcpy(sub, "1 second");
+			strsafecpy(sub, "1 second");
 	}
 
 	// 1 day X hours
 	if ( days == 1 && sub[0] != 0 )
 	{
-		snprintf(str, STR_SIZE, "1 day %s", sub);
+		strprintf(str, "1 day %s", sub);
 		return str;
 	}
 

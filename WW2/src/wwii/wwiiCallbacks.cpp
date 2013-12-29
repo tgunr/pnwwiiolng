@@ -42,11 +42,7 @@ CallbackRegister::callback(UCHAR callY, ACTION_FN sendFn, ACTION_FN recvFn)
 	catch (std::exception& e)
 	{
 		char buf[201];
-#if platOS == OS_WIN32
-		_snprintf_s(buf, 200, "Unable to register %u/%u: %s", sm_ci.callX, callY, e.what());
-#else
-		snprintf(buf, 200, "Unable to register %u/%u: %s", sm_ci.callX, callY, e.what());
-#endif
+		strprintf(buf, "Unable to register %u/%u: %s", sm_ci.callX, callY, e.what());
 		throw std::runtime_error(buf);	///Terminal
 	}
 }

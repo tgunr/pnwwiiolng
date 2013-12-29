@@ -132,7 +132,7 @@ public:
 	{
 		if ( arenaName == NULL )
 		{
-			snprintf(arena, sizeof(arena) - 1, "arena:%u", arenaID);
+			strprintf(arena, "arena:%u", arenaID);
 			arenaName = arena;
 		}
 		else
@@ -359,7 +359,7 @@ __buildURL(char* into, size_t intoSize, WEB_ERR errorType, SINT32 appID, UINT32 
 				, cv_authErrorUrl.GetString()
 				, errString, appID
 				, teulGetAddress(appVersion));
-	into[intoSize] = 0;
+	into[intoSize - 1] = 0;
 
 	return size;
 }
@@ -586,13 +586,9 @@ _setupVersionUpdate(APP_LAUNCH& launch, APP_LAUNCH_REQ& request, UINT32 platform
 	{
 
 		if ( vmatch->ftpURL[0])
-		{
-				snprintf(url,sizeof(url),"%s\n%s\n%s\n%s",vmatch->location,vmatch->ftpURL,vmatch->ftpDir,vmatch->ftpFile);
-		}
+			strprintf(url, "%s\n%s\n%s\n%s", vmatch->location, vmatch->ftpURL, vmatch->ftpDir, vmatch->ftpFile);
 		else
-		{
-			strncpy(url, vmatch->location, 256);
-		}
+			strsafecpy(url, vmatch->location);
 
 		wwiiIRCMessage("-err", "%s REDIR %s", request.username, url);
 		dbugLog(_FLI, "based on appID %d, sending APP_WEB_DOWNLOAD %s to \"%s\""
@@ -606,8 +602,8 @@ _setupVersionUpdate(APP_LAUNCH& launch, APP_LAUNCH_REQ& request, UINT32 platform
 
 		if(vmatch->protocol != DEF_PROTOCOL)
 		{
-			static SCHAR homeDir[128];
-			snprintf(homeDir,128,"appID%u/plat%u/", vmatch->appid, ((vmatch->newNo)>>24));
+			SCHAR homeDir[128];
+			strprintf(homeDir, "appID%u/plat%u/", vmatch->appid, ((vmatch->newNo) >> 24));
 			authDBInsertOTP(launch, request, homeDir);
 		}
 //		launch->status = -AUTH_GENERAL_ERROR;
@@ -1504,10 +1500,10 @@ authVerifyChecksum(const SINT32 teulIndex, const UINT32 appID, const UINT32 plat
 		dbugLog(_FLD, "t:%d app:%d plat:%u sending TOS appdl_repair", teulIndex, appID, platform);
 
 		// Please don't try to understand these fields without a bottle of advil
-		// "\n" is used as a seperator since the client isn't actually doing
+		// "\n" is used as a separator since the client isn't actually doing
 		// URI parsing. These things* look* like parts of URLs, but it's just an
 		// appearance designed to confuse you.
-		snprintf(url, sizeof(url)-1, "%s\n%s\n%s\n%s"
+		strprintf(url, "%s\n%s\n%s\n%s"
 					, "http://www.playnet.com/bv/wwiiol/downloads.jsp?tos.txt"
 					, "downloads.wwiionline.com"
 					, "/"

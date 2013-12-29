@@ -623,7 +623,7 @@ public:
 
 		*(it->second) = enable;
 		char announce[128];
-		snprintf(announce, sizeof(announce) - 1, "%s has %s '%s' logging.", player.callsign(), report, (it->first).c_str());
+		strprintf(announce, "%s has %s '%s' logging.", player.callsign(), report, (it->first).c_str());
 		chatDispatchGMMessage(player.callsign(), announce);
 	}
 
@@ -1085,7 +1085,7 @@ protected:
 		{
 			DBRow& row = Query()->Row();
 			UINT32 ctry = atoi(row[1]);
-			snprintf(buffer, sizeof(buffer) - 1, "%19s %s@%s(%s) %s", row[0], row[2], row[3], _countryName[ctry], row[4]);
+			strprintf(buffer, "%19s %s@%s(%s) %s", row[0], row[2], row[3], _countryName[ctry], row[4]);
 			m_results.insert(m_results.begin(), buffer);
 		}
 
@@ -1797,7 +1797,7 @@ DotPInfo::actionWith(Player& player, Chat::ClientMessage* message, char* argumen
 		else
 		{
 			char usage[80];
-			snprintf(usage, 79, "/%s [-full] [gamename]", command());
+			strprintf(usage, "/%s [-full] [gamename]", command());
 			player.message(LSTR_USAGE, LSTR_GENERIC, usage);
 			return;
 		}
@@ -1829,7 +1829,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 
 	if ( player.isPlaynet() )
 	{
-		snprintf(buf, sizeof(buf)-1, "Pid#%u", playerID());
+		strprintf(buf, "Pid#%u", playerID());
 		_addStr(response, buf);
 	}
 
@@ -1839,7 +1839,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		_addStr(response, "in:none");
 	else
 	{
-		snprintf(buf, sizeof(buf)-1, "in:%llu", player.instance().id());
+		strprintf(buf, "in:%llu", player.instance().id());
 		_addStr(response, buf);
 	}
 
@@ -1848,22 +1848,22 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		const char* squadName = chatGetSquadCallsign(squadID());
 		if ( squadName != NULL && squadRank() > 0 )
 		{
-			snprintf(buf, sizeof(buf)-1
+			strprintf(buf
 							, "%s:%s"
 								, chatGetSquadRankName(squadRank())
 								, squadName);
 		}
 		else if ( squadRank() == 0 && player.isPlaynet() )
 		{
-			snprintf(buf, sizeof(buf)-1, "Sqd:%s (UNRANKED!)", squadName);
+			strprintf(buf, "Sqd:%s (UNRANKED!)", squadName);
 		}
 		else if ( player.isPlaynet() )
 		{
-			snprintf(buf, sizeof(buf)-1, "Sqd#%u(NO DATA)", squadID());
+			strprintf(buf, "Sqd#%u(NO DATA)", squadID());
 		}
 		else
 		{
-			snprintf(buf, sizeof(buf)-1, "[Invalid Squad]");
+			strprintf(buf, "[Invalid Squad]");
 		}
 		if ( getPreference(CPR_IS_RECRUITING) )
 		{
@@ -1886,7 +1886,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		}
 		else if ( player.isPlaynet() )
 		{
-			snprintf(buf, sizeof(buf)-1, "B#%u:UNK", brigadeID());
+			strprintf(buf, "B#%u:UNK", brigadeID());
 			_addStr(response, buf);
 		}
 	}
@@ -1896,14 +1896,14 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		RANK_NO erank = effectiveRank();
 		const Rank* myRank = Rank::lookup(erank);
 		if ( myRank != NULL )
-			snprintf(buf, sizeof(buf)-1
+			strprintf(buf
 						, "R#%u(%s/%s)"
 							, erank
 							, _rankType(myRank->type())
 							, rankNames[erank]
 							);
 		else if ( player.isPlaynet() )
-			snprintf(buf, sizeof(buf)-1, "R#%u(INVALID)", erank);
+			strprintf(buf, "R#%u(INVALID)", erank);
 		_addStr(response, buf);
 	}
 
@@ -1917,9 +1917,9 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		char oic[21];
 		HCUnit* unit = HCUnit::Lookup(leadingBrigade());
 		if ( unit )
-			snprintf(oic, 20, "OIC:%s", unit->callsign());
+			strprintf(oic, "OIC:%s", unit->callsign());
 		else if ( player.isPlaynet() )
-			snprintf(oic, 20, "OIC:#%u", leadingBrigade());
+			strprintf(oic, "OIC:#%u", leadingBrigade());
 		_addStr(response, "OIC");
 	}
 	if ( permissions(ALLIED_COMMAND_STAFF) )
@@ -2063,12 +2063,12 @@ public:
 		}
 		else
 		{
-			snprintf(_roster, sizeof(_roster)-1, "Usage: /%s [all|campaign]", command());
+			strprintf(_roster, "Usage: /%s [all|campaign]", command());
 			player.message(LSTR_CAUTION, LSTR_GENERIC, _roster);
 			return;
 		}
 
-		snprintf(_roster, sizeof(_roster)-1, "Axis: %d. Allied: %d.", axis, allied);
+		strprintf(_roster, "Axis: %d. Allied: %d.", axis, allied);
 		player.message(LSTR_NONE, LSTR_GENERIC, _roster, NULL);
 	}
 
@@ -2120,7 +2120,7 @@ public:
 		if ( !isdigit(arguments[0]) || arguments[0] == '0' )
 		{
 			char max[11];
-			snprintf(max, 10, "%u", Rank::max());
+			strprintf(max, "%u", Rank::max());
 			player.message(LSTR_CAUTION, LSTR_INVALID_RANK, max);
 			return;
 		}
@@ -2133,7 +2133,7 @@ public:
 		if ( rank == NULL )
 		{
 			char max[11];
-			snprintf(max, 10, "%u", Rank::max());
+			strprintf(max, "%u", Rank::max());
 			player.message(LSTR_CAUTION, LSTR_INVALID_RANK, max);
 			return;
 		}
@@ -2727,7 +2727,7 @@ public:
 		}
 
 		ChatHandle handle = chatGetLowercaseHandle(args[0]);
-		if ( strlen(args[0]) > (size_t)MAX_HANDLE_LEN || handle == 0LL )
+		if ( handle == 0ULL || strlen(args[0]) > (size_t)MAX_HANDLE_LEN )
 		{
 			player.message(LSTR_CAUTION, LSTR_INVALID_CALLSIGN, args[0]);
 			return;

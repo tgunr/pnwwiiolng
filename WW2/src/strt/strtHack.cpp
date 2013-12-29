@@ -123,7 +123,7 @@ static LOGICAL _fakeStructure(CPStruct* cp)
 
 	//Initialize the object
 	//Fake an object name
-	snprintf(object->name, sizeof(object->name) - 1, "BRIDGE _ %s", cp->name);
+	strprintf(object->name, "BRIDGE _ %s", cp->name);
 
 	//copy over the object filename, so when we lookup its information in the
 	//	WOR file, we actually can find something

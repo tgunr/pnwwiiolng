@@ -352,13 +352,12 @@ chatSetShutdownTime(UINT32 forTime, const char* caller)
 const char*
 chatPropertyName(const FULL_OBJ_ID& id)
 {
-	static char name[20+1];
-
 	Property* property = chatFindProperty(id);
 	if ( property != nullptr )
 		return property->Name();
 
-	snprintf(name, 20, "[%d.%d.%d]", id.cell.ox, id.cell.oy, id.id);
+	static char name[20 + 1];
+	strprintf(name, "[%d.%d.%d]", id.cell.ox, id.cell.oy, id.id);
 
 	return name;
 }
@@ -367,12 +366,11 @@ chatPropertyName(const FULL_OBJ_ID& id)
 const char*
 chatPropertyName(const Property* property, const FULL_OBJ_ID& id)
 {
-	static char name[20+1];
-
 	if ( property != nullptr )
 		return property->Name();
 
-	snprintf(name, 20, "[%d.%d.%d]", id.cell.ox, id.cell.oy, id.id);
+	static char name[20 + 1];
+	strprintf(name, "[%d.%d.%d]", id.cell.ox, id.cell.oy, id.id);
 
 	return name;
 }
@@ -632,8 +630,6 @@ _processDelayedBan()
 			break;
 		}
 	}
-
-	return;
 }
 
 static void
@@ -1160,7 +1156,7 @@ _injectCaptureStatus(std::string& buffer, const size_t pos, const size_t charsTo
 		if ( progress > -1 )
 		{
 			char pctg[12];
-			snprintf(pctg, 11, " (%u%%)", std::min(progress, 100));
+			strprintf(pctg, " (%u%%)", std::min(progress, 100));
 			status += pctg;
 		}
 	}
@@ -2277,19 +2273,19 @@ chatHandleTickSample(const UINT32 source, Player& player, const Teul::TickSample
 	if ( lastReport > teulTime() - 60 && abs(sample.delta - lastDelta) <= 120 )
 		return;
 
-	const char* const hostNames[] = { "auth", "cell", "map", "chat", "start" };
+	static const char* const hostNames[] = { "auth", "cell", "map", "chat", "start" };
 
 	char hostname[64];
 	char report[256];
 
-	snprintf(hostname, sizeof(hostname) - 1, "%shost:%s", hostNames[source], player.callsign());
-	snprintf(report, sizeof(report) - 1, "Client clock anomaly: delta of %lldms (%s), drift %.6g", sample.delta, sample.delta < 0 ? "fast" : "slow", sample.ratio);
+	strprintf(hostname, "%shost:%s", hostNames[source], player.callsign());
+	strprintf(report, "Client clock anomaly: delta of %lldms (%s), drift %.6g", sample.delta, sample.delta < 0 ? "fast" : "slow", sample.ratio);
 	chatDispatchGMMessage(hostname, report);
 	reports[player.playerID()] = std::make_pair(teulTime(), sample.delta);
 
 	player.log(_FLW, "%s, host:%llu, client:%llu", report, sample.host_ms, sample.client_ms);
 
-	snprintf(report, sizeof(report) - 1
+	strprintf(report
 					, "{\"src\":\"%s\",\"elapsed\":{\"host\":%llu,\"client\":%llu},\"delta\":%llu,\"ratio\",\"%0.8g\"}"
 						, hostNames[source]
 						, sample.host_ms, sample.client_ms
@@ -2956,7 +2952,7 @@ _checkForShutdown()
 	g_shutdownLockedArena = teulTime();
 
 	char buf[16];
-	snprintf(buf, 15, "%2u", g_finalShutdownTime - teulTime());
+	strprintf(buf, "%2u", g_finalShutdownTime - teulTime());
 	chatWarnAll(LSTR_SHUTDOWN_NOW, buf);
 
 	return false;
@@ -3469,11 +3465,8 @@ _processIRCDotPassthru(void* v)
 
 	static Chat::ClientMessage fakeMessage;
 
-	static const size_t maxSize = sizeof(fakeMessage.m_message) - 1;
 	fakeMessage.m_handle = ircPlayer->chatHandle();
-	fakeMessage.m_length = snprintf(fakeMessage.m_message, maxSize, "/%s %s", command, args);
-	if ( fakeMessage.m_length > maxSize )
-		fakeMessage.m_length = maxSize;
+	fakeMessage.m_length = strprintf(fakeMessage.m_message, "/%s %s", command, args);
 
 	if ( ! DotCommand::index()->process(*ircPlayer, &fakeMessage) )
 		wwiiIRCMessage(tell, "Oops, had an internal error processing .%s for %s", command, from);

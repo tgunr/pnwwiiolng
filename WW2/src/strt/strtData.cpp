@@ -375,7 +375,7 @@ void
 strtDataCantFindBuilding(const char* linkName, const char* role, const FULL_OBJ_ID& fid)
 {
 	char description[256];
-	snprintf(description, 255, "%s (%d,%d:%u)", role, fid.cell.ox, fid.cell.oy, fid.id);
+	strprintf(description, "%s (%d,%d:%u)", role, fid.cell.ox, fid.cell.oy, fid.id);
 	errorList[ERR_CANT_FIND_LINK_BUILDING][linkName] = description;
 }
 
@@ -533,8 +533,8 @@ _supercellCheck(const char* typeName, const char* name, const Supercell& sc, int
 		return true;
 
 	char entity[256], expected[256];
-	snprintf(entity, 255, "%s '%s' from %d.%d", typeName, name, sc.x, sc.y);
-	snprintf(expected, 255, "sdm puts it in %d.%d", actualScx, actualScy);
+	strprintf(entity, "%s '%s' from %d.%d", typeName, name, sc.x, sc.y);
+	strprintf(expected, "sdm puts it in %d.%d", actualScx, actualScy);
 
 	errorList[ERR_WRONG_SUPERCELL][entity] = expected;
 
@@ -666,7 +666,7 @@ void
 strtDataErrorParentFacility(const char* buildingName, const char* filename, SINT32 scx, SINT32 scy, UINT16 bid, UINT16 bno, UINT16 fid)
 {
 	char description[256];
-	snprintf(description, 255, "%s sc:%d,%d bid:%d bldg:%d fid:%d"
+	strprintf(description, "%s sc:%d,%d bid:%d bldg:%d fid:%d"
 				, filename, scx, scy, bid, bno, fid);
 	errorList[ERR_CANT_FIND_PARENT_FACILITY][buildingName] = description;
 }

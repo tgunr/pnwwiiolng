@@ -357,7 +357,7 @@ _voting(const ChatHandle& sponsor, UINT32 action, const char* description, UINT3
 	{
 		FULL_OBJ_ID fullObjID;
 		fullObjID.FromKey(nominee);
-		snprintf(nomineeCallsign, 30, "%d.%d/%u", fullObjID.cell.ox, fullObjID.cell.oy, fullObjID.id);
+		strprintf(nomineeCallsign, "%d.%d/%u", fullObjID.cell.ox, fullObjID.cell.oy, fullObjID.id);
 	}
 	else
 		chatGetCallsign(nomineeCallsign, nominee);

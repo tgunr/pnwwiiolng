@@ -95,7 +95,7 @@ Schema::Update(const DB::Revisions& history)
 	catch ( std::exception& e )
 	{
 		char message[4096];
-		snprintf(message, 4095, "FATAL ERROR: Unable to apply `%s` database schema revision %u: %s.", m_database, currentRevision, e.what());
+		strprintf(message, "FATAL ERROR: Unable to apply `%s` database schema revision %u: %s.", m_database, currentRevision, e.what());
 //		wwiiIRCMessage("-sys,#servers", message);
 		LogAbort("dbschema: %s", message);
 		abort();

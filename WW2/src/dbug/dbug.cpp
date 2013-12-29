@@ -132,11 +132,8 @@ _roll(const char* const filename, const int baseNum)
 {
 	char oldName[DBUG_MAX_PATH + 1], newName[DBUG_MAX_PATH + 1];
 
-	snprintf(oldName, DBUG_MAX_PATH, "%s.%d.log", filename, baseNum);
-	oldName[DBUG_MAX_PATH] = 0;
-
-	snprintf(newName, DBUG_MAX_PATH, "%s.%d.log", filename, baseNum + 1);
-	newName[DBUG_MAX_PATH] = 0;
+	strprintf(oldName, "%s.%d.log", filename, baseNum);
+	strprintf(newName, "%s.%d.log", filename, baseNum + 1);
 
 	rename(oldName, newName);
 }
@@ -203,20 +200,17 @@ _openDbugFile(const char* const srcFile_)
 		}
 
 		// Delete the last file.
-		snprintf(ofn, DBUG_MAX_PATH, "%s.%" PRSizeT ".log", filename, MAX_FILE_NUM + 1);
-		ofn[DBUG_MAX_PATH] = 0;
+		strprintf(ofn, "%s.%" PRSizeT ".log", filename, MAX_FILE_NUM + 1);
 		unlink(ofn);
 
-		snprintf(ofn, DBUG_MAX_PATH, "%s.0.log", filename);
+		strprintf(ofn, "%s.0.log", filename);
 #else
 		static UINT32 _fileNumber = 0;
-		snprintf(ofn, DBUG_MAX_PATH, "%s.%u.log", filename, _fileNumber++);
+		strprintf(ofn, "%s.%u.log", filename, _fileNumber++);
 
 		if ( _fileNumber > MAX_FILE_NUM)
 			_fileNumber = 0;
 #endif
-
-		ofn[DBUG_MAX_PATH] = 0;
 
 		file = OS_OPEN(ofn, oflags, PMODE);
 		_fileSize = 0;
@@ -323,7 +317,7 @@ static char  backtraceReport[128];
 
 static void _report(const int fd, const char* const fmt, const int num)
 {
-	const int len = snprintf(backtraceReport, sizeof(backtraceReport) - 1, fmt, num);
+	const int len = strprintf(backtraceReport, fmt, num);
 	if ( len > 0 )
 		OS_WRITE(fd, (void*)backtraceReport, len);
 }

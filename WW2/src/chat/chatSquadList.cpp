@@ -991,7 +991,7 @@ SquadList::electNewCO()
 	}
 
 	char lead[16+1];
-	snprintf(lead, 16, "%u", vote->m_lead);
+	strprintf(lead, "%u", vote->m_lead);
 	sendMessage(LSTR_SQUAD, msg, Chat::Name(winner).c_str(), lead);
 	setUpdated();
 

@@ -113,7 +113,7 @@ static char* _makeNativePath(const char* const path_)
 
 	// Trim trailing slashes off of path names.
 	char nativePath[1024];
-	size_t len = snprintf(nativePath, sizeof(nativePath), "%s", path_);	// Get length in first pass.
+	size_t len = strprintf(nativePath, "%s", path_);	// Get length in first pass.
 	if ( len >= sizeof(nativePath) )
 		LogAbort("Invalid path: %s", path_);
 	while ( len > 0 && (nativePath[len-1] == '/' || nativePath[len-1] == '\\') )

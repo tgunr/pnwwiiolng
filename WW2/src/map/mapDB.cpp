@@ -115,7 +115,7 @@ static void
 _setArenaDescriptionHostRevision()
 {
 	char hostRevision[200];
-	snprintf(hostRevision, 199, "%s(%s)", REPOSITORY_INFO, cv_stratLanguage.GetString());
+	strprintf(hostRevision, "%s(%s)", REPOSITORY_INFO, cv_stratLanguage.GetString());
 
 	std::string revision = hostRevision;
 	_removePrefix(revision, "branches/");
@@ -375,7 +375,7 @@ void
 mapSaveRank(const Player* player, bool immediate)
 {
 	static char buffer[181];
-	snprintf(buffer, sizeof(buffer) - 1, "CALL wwii.p_increase_rank_score(%u,%u,%u,%u,%u,%u)"
+	strprintf(buffer, "CALL wwii.p_increase_rank_score(%u,%u,%u,%u,%u,%u)"
 							, (UINT32)player->playerID(), player->country(), player->branch()
 							, (UINT32)player->personaID(), (UINT32)player->realRank(), (UINT32)player->points());
 	dbugLog(_FLI, "t:%d p:%u c:%s %s", player->teulIndex(), player->playerID(), player->callsign(), buffer);

@@ -292,8 +292,8 @@ DotCommand::_featureLockedM(Player& player, UINT32 duration_m) const
 	if ( !player.featureLock(m_command, teulTime(), duration_m * 60) )
 		return false;
 
-	char mins[10+1];
-	snprintf(mins, sizeof(mins)-1, "%u", duration_m);
+	char mins[12+1];
+	strprintf(mins, "%u", duration_m);
 	player.message(LSTR_CAUTION, LSTR_FEATURE_LOCKED, command(), mins);
 	return true;
 }

@@ -117,7 +117,7 @@ void writeToLog(const char* file, const char* func, unsigned int line, const cha
 	output += filename;
 	output += ":";
 	char lineNo[22];
-	snprintf(lineNo, sizeof(lineNo) - 1, "%u", line);
+	strprintf(lineNo, "%u", line);
 	output += lineNo;
 	output += ": ";
 	output += message;
@@ -167,7 +167,7 @@ Lua::CallInstanceFunction(const char* func, const instanceid_t& instID, const ch
 	}
 
 	char instStr[20];
-	snprintf(instStr, sizeof(instStr) - 1, "%llu", instID);
+	strprintf(instStr, "%llu", instID);
 	lua_pushstring(_luaVM, instStr);
 	lua_pushstring(_luaVM, data);
 
@@ -184,7 +184,7 @@ Lua::CallInstanceFunction(const char* func_, const instanceid_t& instID_, player
 		return;
 	}
 	char instStr[20];
-	snprintf(instStr, sizeof(instStr) - 1, "%llu", instID_);
+	strprintf(instStr, "%llu", instID_);
 	lua_pushstring(_luaVM, instStr);
 	tolua_pushnumber(_luaVM, (lua_Number)playerID_);
 	tolua_pushusertype(_luaVM, (void*)state_, "PlayerState");

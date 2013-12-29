@@ -35,7 +35,7 @@ weapSaveVehicleTypes()
 			LogAbort("illegal weapon spec (country): %u.%u.%u.%u", spec.wCountry, spec.wCategory, spec.wClass, spec.wType);
 		}
 
-		snprintf(buf, sizeof(buf), "(%u,%u,%u,%u,\"%s\",%u,\"%s\",NOW())"
+		strprintf(buf, "(%u,%u,%u,%u,\"%s\",%u,\"%s\",NOW())"
 					, spec.wCountry, spec.wCategory, spec.wClass, spec.wType
 					, weap.name
 					, weap.value

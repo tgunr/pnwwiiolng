@@ -120,8 +120,8 @@ _saveSelections(DB::handle_t* conn)
 
 				// Add a new persona or start filling buf up from scratch
 				if ( offset == 0 )
-					offset = snprintf(buf, _BUF_SIZE,
-								"UPDATE LOW_PRIORITY wwii_persona SET modified = NOW(), brigade_id = %u WHERE personaID IN (%u"
+					offset = strprintf(buf
+								, "UPDATE LOW_PRIORITY wwii_persona SET modified = NOW(), brigade_id = %u WHERE personaID IN (%u"
 									, (UINT32)(it->first)
 									, *pit);
 				else

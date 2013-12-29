@@ -164,7 +164,7 @@ dbGetWWIIConfig(DBHANDLE& dbh)
 					std::string desc = configMap[g_numVars].description;
 					wwiiEscapeString(desc);
 					char buffer[255];
-					snprintf(buffer, sizeof(buffer) - 1, "('%s','%s',NOW(),'%s')",  configMap[g_numVars].name, configMap[g_numVars].defaultValue, desc.c_str());
+					strprintf(buffer, "('%s','%s',NOW(),'%s')",  configMap[g_numVars].name, configMap[g_numVars].defaultValue, desc.c_str());
 					qry.addEntry(buffer);
 				}
 			}
@@ -185,7 +185,7 @@ dbGetWWIIConfig(DBHANDLE& dbh)
 			if ( dbUpdateWWIIConfigValue(row[0], row[1], row[2]) == true )
 				continue;
 			char buffer[81];
-			snprintf(buffer, sizeof(buffer) - 2, "'%s'", row[0]);
+			strprintf(buffer, "'%s'", row[0]);
 			qry.addEntry(buffer);
 		}
 		qry.commit(0);

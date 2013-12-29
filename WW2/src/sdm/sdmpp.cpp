@@ -63,12 +63,12 @@ _processfile(const std::string& filename)
 	SINT32  retval;
 
 	char filepath[MAX_PATH+1];
-	snprintf(filepath, sizeof(filepath), SUB_PATH("%s", "%s"), cv_terrainSubdir.GetString(), filename.c_str());
+	strprintf(filepath, SUB_PATH("%s", "%s"), cv_terrainSubdir.GetString(), filename.c_str());
 
 	if ( s_verbose > 1 )
 	{
 		char fullpath[MAX_PATH+1];
-		snprintf(fullpath, sizeof(fullpath), SUB_PATH("%s", "%s"), cv_dataDir.GetString(), filepath);
+		strprintf(fullpath, SUB_PATH("%s", "%s"), cv_dataDir.GetString(), filepath);
 		fprintf(stderr, "# processing file: %s => %s (%s)\n", filename.c_str(), filepath, fullpath);
 	}
 
@@ -110,7 +110,7 @@ _processfile(const std::string& filename)
 		if ( s_renamesEnabled )
 		{
 			char newFilename[MAX_PATH+1];
-			snprintf(newFilename, sizeof(newFilename), "%s.old", filepath);
+			strprintf(newFilename, "%s.old", filepath);
 			rename(filepath, newFilename);
 		}
 		if ( s_unlinksEnabled )

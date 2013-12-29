@@ -918,7 +918,7 @@ _killOccupants(const instanceid_t& instanceID, OCCUPANTS& occupants, UINT32 bySo
 			{
 #ifdef BETA_RELEASE
 				char buf[16];
-				snprintf(buf, 15, "%u", bySortieID);
+				strprintf(buf, "%u", bySortieID);
 				(*pit)->message(LSTR_BETA, LSTR_KILLED_BY_BUILDING, byBuilding, buf);
 #endif
 				indexes.push_back(teulIndex);
@@ -1175,7 +1175,7 @@ Player::changeFPSBuilding(const FULL_OBJ_ID& newBuildingID, bool inCaptureBuildi
 		if ( obj )
 		{
 			char description[sizeof(obj->name) + sizeof(obj->filename) + sizeof(" []") + 2];
-			snprintf(description, sizeof(description), "%s [%s]", obj->name, obj->filename);
+			strprintf(description, "%s [%s]", obj->name, obj->filename);
 			message(LSTR_BETA, LSTR_ENTERED_BUILDING, description);
 		}
 		else

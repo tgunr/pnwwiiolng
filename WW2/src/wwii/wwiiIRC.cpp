@@ -350,7 +350,7 @@ wwiiIRCInitialize(UINT32 ip, bool plural)
 	// Cluster server notices
 	sprintf(buf, "#%s-sys", cv_clusterName.GetString());
 	char title[256];
-	snprintf(title, 255, "CRS, GM and System messages from %s servers", cv_clusterName.GetString());
+	strprintf(title, "CRS, GM and System messages from %s servers", cv_clusterName.GetString());
 	wwiiIRCAddInitialChannel(buf, "-nt", title);
 
 	// Initial modes

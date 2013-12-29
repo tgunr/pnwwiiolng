@@ -136,8 +136,8 @@ authResetConnectInfo(UINT32 arenaID)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Inserts otp records int ot the authOTP table to be used by
-// our ftp servers for authenication.
+// Inserts otp records into the authOTP table to be used by
+// our ftp servers for authentication.
 void
 authDBInsertOTP(const APP_LAUNCH& launch , const APP_LAUNCH_REQ& request, const char* dir)
 {
@@ -219,7 +219,7 @@ authValidateUser(SINT32 teulIndex, const APP_LAUNCH_REQ& request, Auth::Dispatch
 	wwiiEscapeString(username);
 	wwiiEscapeString(password);
 
-	UINT32 len = snprintf(buffer, sizeof(buffer)-1
+	UINT32 len = strprintf(buffer
 					, "CALL `auth`.`p_authenticate_user_for_arena`('%s','%s',%u)"
 						, username.c_str()
 						, password.c_str()
@@ -322,7 +322,7 @@ Auth::LoginRequest::validate(SINT32 teulIndex, Auth::ClientData& cdata)
 	wwiiEscapeString(username);
 	wwiiEscapeString(password);
 
-	UINT32 len = snprintf(buffer, sizeof(buffer)-1
+	UINT32 len = strprintf(buffer
 					, "CALL `auth`.`p_get_user_subscriptions`('%s','%s')"
 						, username.c_str()
 						, password.c_str()
@@ -965,7 +965,7 @@ authdbGetFileMD5(const UINT32 appID, const UINT32 platform, const char* filename
 	strsafecpy(statement, filename);
 	mysql_escape_string(myFilename, statement, strlen(statement));
 
-	snprintf(statement, sizeof(statement)-1
+	strprintf(statement
 				, "SELECT checksum"
 					" FROM auth_checksums"
 					" WHERE appID = appID"

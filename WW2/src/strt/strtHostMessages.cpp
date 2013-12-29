@@ -934,7 +934,7 @@ _recvLua(ACTION_OBJECT* const a)
 	else
 	{
 		char sender[81];
-		snprintf(sender, sizeof(sender), "t:%d ip:%s", a->teulIndex, (a->endpoint ? teulGetAddress(a->endpoint->fromAddress()) : "?.?.?.?"));
+		strprintf(sender, "t:%d ip:%s", a->teulIndex, (a->endpoint ? teulGetAddress(a->endpoint->fromAddress()) : "?.?.?.?"));
 		std::string object(input);
 		Lua::RunObject(sender, object);
 	}

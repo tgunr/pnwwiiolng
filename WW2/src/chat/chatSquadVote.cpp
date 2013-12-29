@@ -71,11 +71,11 @@ SquadVote::announce(UINT32 squadID, Player* player)
 	for ( COUNTS::iterator it = m_counts->begin(); it != m_counts->end(); ++it )
 	{
 		if ( results.size() > 0 ) results += ", ";
-		snprintf(str, 40, "%s (%u)", Chat::Name(it->first).c_str(), it->second);
+		strprintf(str, "%s (%u)", Chat::Name(it->first).c_str(), it->second);
 		results += str;
 	}
 
-	snprintf(str, 40, "%" PRSizeT "", m_votes->size());
+	strprintf(str, "%" PRSizeT "", m_votes->size());
 
 	if ( player != NULL )
 	{
