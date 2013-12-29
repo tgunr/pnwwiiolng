@@ -167,10 +167,20 @@ public:
 			sc.y = 59;
 
 			fixture.addBuilding(0, 1, 0);
-			fixture.addBuilding(0, 1, 1);	// Vislevel should be 2.
+			CRITICAL( ExpectEqual( sc.numObjects, 1 ) );
+			CRITICAL( ExpectTrue( sc.objects != NULL ) );
+			CRITICAL( ExpectEqual( sc.objects[0].visLevel(), 1 ) && ExpectEqual( sc.objects[0].smokeLevel(), 0 ) && ExpectEqual( sc.objects[0].effectiveVisLevel(), 1 ) );
+			fixture.addBuilding(0, 1, 1);	// effective Vislevel should be 2.
+			CRITICAL( ExpectEqual( sc.numObjects, 2 ) );
+			CRITICAL( ExpectTrue( sc.objects != NULL ) );
+			CRITICAL( ExpectEqual( sc.objects[0].visLevel(), 1 ) && ExpectEqual( sc.objects[0].smokeLevel(), 0 ) && ExpectEqual( sc.objects[0].effectiveVisLevel(), 1 ) );
+			CRITICAL( ExpectEqual( sc.objects[1].visLevel(), 1 ) && ExpectEqual( sc.objects[1].smokeLevel(), 1 ) && ExpectEqual( sc.objects[1].effectiveVisLevel(), 2 ) );
 			fixture.addBuilding(0, 255, 2); // Vislevel should be 255.
 			CRITICAL( ExpectEqual( sc.numObjects, 3 ) );
 			CRITICAL( ExpectTrue( sc.objects != NULL ) );
+			CRITICAL( ExpectEqual( sc.objects[0].visLevel(), 1 ) && ExpectEqual( sc.objects[0].smokeLevel(), 0 ) && ExpectEqual( sc.objects[0].effectiveVisLevel(), 1 ) );
+			CRITICAL( ExpectEqual( sc.objects[1].visLevel(), 1 ) && ExpectEqual( sc.objects[1].smokeLevel(), 1 ) && ExpectEqual( sc.objects[1].effectiveVisLevel(), 2 ) );
+			CRITICAL( ExpectEqual( sc.objects[2].visLevel(), 255 ) && ExpectEqual( sc.objects[2].smokeLevel(), 2 ) && ExpectEqual( sc.objects[2].effectiveVisLevel(), 255 ) );
 
 			fixture.allocate();
 
