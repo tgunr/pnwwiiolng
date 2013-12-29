@@ -72,8 +72,6 @@ struct Activity
 		if ( m_curAllocated > m_maxAllocated )
 			m_maxAllocated = m_curAllocated;
 		m_lastAccess = teulClock64;
-
-		ptr_->m_allocSize = amount_;
 		ptr_->m_activity = this;
 	}
 
@@ -120,7 +118,8 @@ memCallocDebug(const size_t units_, const size_t size_, const char* const file_,
 {
 	unsigned long long flLong = _fileLineToLong(file_, line_);
 
-	Header* ptr = (Header*)calloc(1, (units_ * size_) + sizeof(Header));
+	const size_t allocSize = units_ * size_;
+	Header* ptr = (Header*)calloc(1, sizeof(Header) + allocSize);
 	if ( PN_UNLIKELY(ptr == nullptr) )
 		return ptr;
 
@@ -131,6 +130,8 @@ memCallocDebug(const size_t units_, const size_t size_, const char* const file_,
 		act.alloc(ptr, size_);
 	}
 
+	ptr->m_allocSize = allocSize;
+
 	return ptr + 1;
 }
 
@@ -140,10 +141,10 @@ memReallocDebug(void* const oldPtr_, const size_t newSize_, const char* const fi
 	unsigned long long flLong = _fileLineToLong(file_, line_);
 
 	Header* const oldHeader = Header::FromPointer(oldPtr_);
-
 	const size_t oldSize = oldHeader->m_allocSize;
+	ABORT_IF(oldSize == 0);
 
-	Header* newPtr = (Header*)malloc(newSize_ + sizeof(Header));
+	Header* newPtr = (Header*)malloc(sizeof(Header) + newSize_);
 	memcpy(newPtr, oldHeader, sizeof(Header) + std::min(newSize_, oldSize));
 	Activity* const oldAct = newPtr->m_activity;
 
@@ -155,8 +156,10 @@ memReallocDebug(void* const oldPtr_, const size_t newSize_, const char* const fi
 		newAct.alloc(newPtr, newSize_);
 	}
 
+	newPtr->m_allocSize = newSize_;
+
 #ifdef DEV_BUILD
-	memset(oldHeader, 0xe3, oldSize);
+	memset(oldHeader, 0xbb, oldSize);
 #endif
 
 	free(oldHeader);
@@ -168,6 +171,7 @@ void
 memFreeDebug(void* const oldPtr_, const char* const file_, const size_t line_)
 {
 	Header* header = Header::FromPointer(oldPtr_);
+	ABORT_IF(header->m_allocSize == 0);
 	if ( PN_LIKELY(s_history.m_inUse) )
 	{
 		std::lock_guard<std::mutex> lock(s_history.m_mutex);
@@ -176,7 +180,7 @@ memFreeDebug(void* const oldPtr_, const char* const file_, const size_t line_)
 
 #ifdef DEV_BUILD
 	const size_t size = header->m_allocSize;
-	memset(header, 0xe5, size);
+	memset(header, 0xcc, size);
 #endif
 	free(header);
 }
