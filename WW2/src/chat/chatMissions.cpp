@@ -686,7 +686,7 @@ public:
 	EGGS m_result;
 
 public:
-	virtual bool Process(const size_t numRows)
+	virtual bool Process(const size_t numRows) OVERRIDE_FN
 	{
 		m_result.clear();
 
@@ -706,7 +706,7 @@ public:
 	}
 
 public:
-	virtual void Success()
+	virtual void Success() OVERRIDE_FN
 	{
 		eggs = m_result;
 	}

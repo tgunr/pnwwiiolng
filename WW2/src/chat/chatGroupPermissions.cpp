@@ -132,7 +132,7 @@ private:
 	std::vector<std::string> vehicles;
 
 public:
-	virtual bool Process(const size_t numRows)
+	virtual bool Process(const size_t numRows) OVERRIDE_FN
 	{
 		if ( numRows <= 0 )
 			return true;
@@ -156,7 +156,7 @@ public:
 	}
 
 public:
-	virtual void Success()
+	virtual void Success() OVERRIDE_FN
 	{
 		// Clear the previous list of groups
 		g_groupPermissions.clear();
@@ -177,7 +177,7 @@ public:
 			threadLog(_FLD, "%u groups loaded, %u in cache", numRows, g_pgc.size());
 	}
 
-	virtual void Failure()
+	virtual void Failure() OVERRIDE_FN
 	{
 		dbugLog(_FLA, "GroupReadQuery failed!");
 	}

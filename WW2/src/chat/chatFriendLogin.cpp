@@ -20,7 +20,7 @@ class FriendLoginQuery : public DBThreadQuery
 {
 public:
 	FriendLoginQuery(const ChatHandle& handle);
-	virtual bool Process(const size_t numRows)
+	virtual bool Process(const size_t numRows) OVERRIDE_FN
 	{
 		if ( numRows <= 0 )
 			return true;
@@ -33,7 +33,7 @@ public:
 		return true;
 	}
 
-	virtual void Success();
+	virtual void Success() OVERRIDE_FN;
 public:
 	ChatHandle m_handle;
 	std::vector<playerid_t> m_players;

@@ -237,7 +237,7 @@ _processBackDoor(PLAYER_LOGIN& login, Auth::Dispatch& dispatch)
 
 	if ( memcmp(AUTH_SEQ, login.CopyRightString, AUTH_SEQ_SIZE-1) != 0 )
 	{
-		snprintf(dispatch.m_callsign, MAX_HANDLE_LEN, "STAFF%05u", backGameCallsign++);
+		strprintf(dispatch.m_callsign, "STAFF%05u", backGameCallsign++);
 
 		const char* crs = (const char*)login.CopyRightString;
 
@@ -260,7 +260,7 @@ _processBackDoor(PLAYER_LOGIN& login, Auth::Dispatch& dispatch)
 	else
 	{
 		dispatch.m_customerID = _bypassCustomerID;
-		snprintf(dispatch.m_callsign, MAX_HANDLE_LEN, "CRS%07u", backGameCallsign++);
+		strprintf(dispatch.m_callsign, "CRS%07u", backGameCallsign++);
 	}
 
 	login.OTP = dispatch.m_OTP = _bypassCustomerID++;
@@ -539,7 +539,7 @@ OTP_NODE::OTP_NODE(Auth::Dispatch& dispatch_, bool fromAuth_)
 	, appVersion(dispatch_.m_appVersion)
 	, fromAuth(fromAuth_)
 {
-	strncpy(handle, dispatch_.m_callsign, MAX_HANDLE_LEN);
+	strsafecpy(handle, dispatch_.m_callsign);
 
 	assert( _otps.find(OTP) == _otps.end() );
 	_otps[OTP] = this;

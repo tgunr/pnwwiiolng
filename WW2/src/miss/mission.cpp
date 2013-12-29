@@ -1577,7 +1577,7 @@ NewMission::post()
 
 		// Populate the summary structure
 		summary.missionID = missionID;
-		strncpy(summary.callsign, posterCallsign, MAX_HANDLE_LEN);
+		strsafecpy(summary.callsign, posterCallsign);
 		summary.origin = launchFac->fullObjID;
 		summary.target = (targetFac != NULL) ? targetFac->fullObjID : targetCP->fullObjID;
 		summary.missionType = missionType;

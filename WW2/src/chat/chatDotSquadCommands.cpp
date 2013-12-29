@@ -431,14 +431,14 @@ protected:
 	std::string	m_to;
 	size_t		m_affectedRows;
 
-	virtual bool Process(const size_t numRows)
+	virtual bool Process(const size_t numRows) OVERRIDE_FN
 	{
 		m_affectedRows = Query()->AffectedRows();
 
 		return true;
 	}
 
-	virtual void Success()
+	virtual void Success() OVERRIDE_FN
 	{
 		if (m_affectedRows == 0)
 			return Failure();
@@ -458,7 +458,7 @@ protected:
 		chatDispatchGMMessage("INFO", message);
 	}
 
-	virtual void Failure()
+	virtual void Failure() OVERRIDE_FN
 	{
 		Player* player = PlayerInterface::Lookup(m_requester);
 		if (player == NULL)

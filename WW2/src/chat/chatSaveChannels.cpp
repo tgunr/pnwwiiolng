@@ -43,7 +43,7 @@ private:
 	std::vector<Result> m_results;
 
 public:
-	virtual bool Process(const size_t numRows)
+	virtual bool Process(const size_t numRows) OVERRIDE_FN
 	{
 		if ( numRows <= 0 )
 			return false;
@@ -61,8 +61,8 @@ public:
 	}
 
 public:
-	virtual void Success();
-	virtual void Failure();
+	virtual void Success() OVERRIDE_FN;
+	virtual void Failure() OVERRIDE_FN;
 
 private:
 	UINT32 m_playerID;

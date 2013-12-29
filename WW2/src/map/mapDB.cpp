@@ -917,7 +917,7 @@ protected:
 	std::vector<PersonaSummary>	m_results;
 
 protected:
-	virtual bool Process(const size_t numRows)
+	virtual bool Process(const size_t numRows) OVERRIDE_FN
 	{
 		if ( numRows <= 0 )
 			return true;
@@ -947,7 +947,7 @@ protected:
 	}
 
 protected:
-	virtual void Success()
+	virtual void Success() OVERRIDE_FN
 	{
 		Player* player = PlayerInterface::Lookup(m_playerID);
 		if ( player == nullptr || player->teulIndex() != m_teulIndex || m_results.empty() )
@@ -958,7 +958,7 @@ protected:
 		summary.send(player->teulIndex());
 	}
 
-	virtual void Failure()
+	virtual void Failure() OVERRIDE_FN
 	{
 		Player* player = PlayerInterface::Lookup(m_playerID);
 		if ( player != nullptr )
@@ -1161,7 +1161,7 @@ protected:
 	SINT32		m_teulIndex;
 	Tutorial::GroupProgressBatch m_results;
 
-	virtual bool Process(const size_t numRows)
+	virtual bool Process(const size_t numRows) OVERRIDE_FN
 	{
 		m_results.clear();
 
@@ -1181,7 +1181,7 @@ protected:
 		return true;
 	}
 
-	virtual void Success()
+	virtual void Success() OVERRIDE_FN
 	{
 		// Make sure we still have the same player on the same index.
 		Player* player = PlayerInterface::Lookup(m_teulIndex);
@@ -1297,7 +1297,7 @@ private:
 	std::vector<BrigadeDetailsUpdate> m_results;
 
 protected:
-	virtual bool Process(const size_t numRows)
+	virtual bool Process(const size_t numRows) OVERRIDE_FN
 	{
 		if (numRows <= 0)
 			return true;
@@ -1331,7 +1331,7 @@ protected:
 	}
 
 public:
-	virtual void Success()
+	virtual void Success() OVERRIDE_FN
 	{
 		for (size_t i = 0; i < m_results.size(); ++i)
 		{
@@ -1371,7 +1371,7 @@ public:
 		s_nextBrigadeDetailsQuery = teulClock64 + _STANDARD_BDU_INTERVAL_MS;
 	}
 
-	virtual void Failure()
+	virtual void Failure() OVERRIDE_FN
 	{
 		dbugLog(_FLW, "brigade details query failed");
 		s_nextBrigadeDetailsQuery = teulClock64 + 5000;

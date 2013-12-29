@@ -614,7 +614,7 @@ private:
 	std::vector<std::string> m_results;
 
 public:
-	virtual bool Process(const size_t numRows)
+	virtual bool Process(const size_t numRows) OVERRIDE_FN
 	{
 		if ( numRows <= 0 )
 			return true;
@@ -637,7 +637,7 @@ public:
 	}
 
 public:
-	virtual void Success()
+	virtual void Success() OVERRIDE_FN
 	{
 		Player* player = PlayerInterface::Lookup(m_matchHandle);
 		if ( player == NULL )
@@ -654,7 +654,7 @@ public:
 			player->message(LSTR_NONE, LSTR_GENERIC, m_results[i].c_str());
 		}
 	}
-	virtual void Failure()
+	virtual void Failure() OVERRIDE_FN
 	{
 		Player* player = PlayerInterface::Lookup(m_matchHandle);
 		if ( player == NULL ) return;

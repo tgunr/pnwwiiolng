@@ -9,6 +9,8 @@
 /// granted a particular OTP on a particular IP address and which game version/platform
 /// that was granted on.
 
+#include "str/stringLib.h"
+
 namespace Auth
 {
 	struct Dispatch
@@ -23,8 +25,7 @@ namespace Auth
 		Dispatch(playerid_t _playerID, UINT32 _otp, UINT32 _ip, UINT32 _version, UCHAR _plat, const char* const _gamename)
 			: m_customerID(_playerID), m_OTP(_otp), m_clientIP(_ip), m_appVersion(_version), m_platform(_plat)
 			{
-				strncpy(m_callsign, _gamename, MAX_HANDLE_LEN);
-				m_callsign[MAX_HANDLE_LEN] = 0;
+				strsafecpy(m_callsign, _gamename);
 			}
 
 		bool operator == (const Auth::Dispatch& rhs) const

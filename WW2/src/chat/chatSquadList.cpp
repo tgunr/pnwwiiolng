@@ -91,7 +91,7 @@ public:
 
 	std::vector<Result> m_results;
 
-	virtual bool Process(const size_t numRows)
+	virtual bool Process(const size_t numRows) OVERRIDE_FN
 	{
 		if ( numRows <= 0 )
 			return true;
@@ -113,7 +113,7 @@ public:
 		return true;
 	}
 
-	virtual void Success()
+	virtual void Success() OVERRIDE_FN
 	{
 		SquadList* list = chatFindSquadList(m_squadID);
 		if ( list == NULL )
@@ -198,7 +198,7 @@ public:
 		list->announce();
 	}
 
-	virtual void Failure()
+	virtual void Failure() OVERRIDE_FN
 	{
 		dbugLog(_FLW, "sq:%u error reading squad list", m_squadID);
 	}

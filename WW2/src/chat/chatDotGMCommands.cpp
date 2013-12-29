@@ -392,7 +392,7 @@ protected:
 	std::vector<std::string>	m_results;
 
 protected:
-	virtual bool Process(const size_t numRows)
+	virtual bool Process(const size_t numRows) OVERRIDE_FN
 	{
 		if (numRows <= 0)
 			return true;
@@ -412,7 +412,7 @@ protected:
 	}
 
 public:
-	virtual void Success()
+	virtual void Success() OVERRIDE_FN
 	{
 		Player* const player = PlayerInterface::Lookup(m_requester);
 		if (player == NULL)
@@ -431,7 +431,7 @@ public:
 		}
 	}
 
-	virtual void Failure()
+	virtual void Failure() OVERRIDE_FN
 	{
 		Player* const player = PlayerInterface::Lookup(m_requester);
 		if (player != NULL)
@@ -1075,7 +1075,7 @@ protected:
 	std::vector<std::string> m_results;
 
 protected:
-	virtual bool Process(const size_t numRows)
+	virtual bool Process(const size_t numRows) OVERRIDE_FN
 	{
 		if ( numRows <= 0 )
 			return true;
@@ -1093,7 +1093,7 @@ protected:
 	}
 
 protected:
-	virtual void Success()
+	virtual void Success() OVERRIDE_FN
 	{
 		Player* const player = PlayerInterface::Lookup(m_matchID);
 		if ( player == NULL )
@@ -1113,7 +1113,7 @@ protected:
 	}
 
 protected:
-	virtual void Failure()
+	virtual void Failure() OVERRIDE_FN
 	{
 		Player* player = PlayerInterface::Lookup(m_matchID);
 		if ( player == NULL )
@@ -1218,7 +1218,7 @@ protected:
 	std::vector<std::string> m_results;
 
 protected:
-	virtual bool Process(const size_t numRows)
+	virtual bool Process(const size_t numRows) OVERRIDE_FN
 	{
 		if ( numRows <= 0 )
 			return true;
@@ -1241,7 +1241,7 @@ protected:
 	}
 
 public:
-	virtual void Success()
+	virtual void Success() OVERRIDE_FN
 	{
 		Player* const player = PlayerInterface::Lookup(m_requesterID);
 		if ( player == NULL )
@@ -1262,7 +1262,7 @@ public:
 		}
 	}
 
-	virtual void Failure()
+	virtual void Failure() OVERRIDE_FN
 	{
 		Player* player = PlayerInterface::Lookup(m_requesterID);
 		if ( player != NULL )
@@ -1325,7 +1325,7 @@ protected:
 	std::vector<std::string> m_results;
 
 protected:
-	virtual bool Process(const size_t numRows)
+	virtual bool Process(const size_t numRows) OVERRIDE_FN
 	{
 		if ( numRows <= 0 )
 			return true;
@@ -1348,7 +1348,7 @@ protected:
 	}
 
 public:
-	virtual void Success()
+	virtual void Success() OVERRIDE_FN
 	{
 		Player* const player = PlayerInterface::Lookup(m_requesterID);
 		if ( player == NULL )
@@ -1369,7 +1369,7 @@ public:
 		}
 	}
 
-	virtual void Failure()
+	virtual void Failure() OVERRIDE_FN
 	{
 		Player* const player = PlayerInterface::Lookup(m_requesterID);
 		if ( player != NULL )
@@ -1673,7 +1673,7 @@ protected:
 	char		m_response[MAX_MESSAGE_LENGTH];
 
 protected:
-	virtual bool Process(const size_t numRows)
+	virtual bool Process(const size_t numRows) OVERRIDE_FN
 	{
 		if ( numRows <= 0 || Query()->FetchRow() == false )
 			return true;
@@ -1707,7 +1707,7 @@ protected:
 	}
 
 protected:
-	virtual void Success()
+	virtual void Success() OVERRIDE_FN
 	{
 		Player* player = PlayerInterface::Lookup(m_matchID);
 		if ( player == NULL )
@@ -1723,7 +1723,7 @@ protected:
 		}
 	}
 
-	virtual void Failure()
+	virtual void Failure() OVERRIDE_FN
 	{
 		Player* player = PlayerInterface::Lookup(m_matchID);
 		if ( player == NULL ) return;
@@ -2572,7 +2572,7 @@ protected:
 	std::string m_err;
 
 protected:
-	virtual bool Process(const size_t numRows)
+	virtual bool Process(const size_t numRows) OVERRIDE_FN
 	{
 		if ( numRows <= 0 || Query()->FetchRow() == false )
 		{
@@ -2591,7 +2591,7 @@ protected:
 	}
 
 public:
-	virtual void Success()
+	virtual void Success() OVERRIDE_FN
 	{
 		Player* const player = PlayerInterface::Lookup(m_byPlayerID);
 		if ( player == NULL )
@@ -2601,7 +2601,7 @@ public:
 		chatDispatchGMMessage("INFO", chatMakeTempString("%s noted %s: %s", player->callsign(), Chat::Name(m_handle).c_str(), m_text.c_str()));
 	}
 
-	virtual void Failure()
+	virtual void Failure() OVERRIDE_FN
 	{
 		Player* const player = PlayerInterface::Lookup(m_byPlayerID);
 		if ( player != NULL )
@@ -2635,7 +2635,7 @@ protected:
 	std::vector<std::string> m_results;
 
 protected:
-	virtual bool Process(const size_t numRows)
+	virtual bool Process(const size_t numRows) OVERRIDE_FN
 	{
 		if ( numRows <= 0 )
 			return true;
@@ -2681,7 +2681,7 @@ protected:
 	}
 
 public:
-	virtual void Success()
+	virtual void Success() OVERRIDE_FN
 	{
 		Player* player = PlayerInterface::Lookup(m_byPlayerID);
 		if ( player == NULL )
@@ -2700,7 +2700,7 @@ public:
 		}
 	}
 
-	virtual void Failure()
+	virtual void Failure() OVERRIDE_FN
 	{
 		Player* player = PlayerInterface::Lookup(m_byPlayerID);
 		if ( player != NULL )

@@ -37,7 +37,7 @@ private:
 	HANDLES m_list;
 
 public:
-	virtual bool Process(const size_t numRows)
+	virtual bool Process(const size_t numRows) OVERRIDE_FN
 	{
 		m_list.clear();
 
@@ -53,8 +53,8 @@ public:
 		return true;
 	}
 
-	virtual void Success();
-	virtual void Failure();
+	virtual void Success() OVERRIDE_FN;
+	virtual void Failure() OVERRIDE_FN;
 
 public:
 	playerid_t	m_playerID;
@@ -71,14 +71,14 @@ public:
 		, m_playerID(playerID), m_handle(handle), m_ignore(ignore), m_success(false)
 		{}
 
-	virtual bool Process(const size_t numRows)
+	virtual bool Process(const size_t numRows) OVERRIDE_FN
 	{
 		m_success = (numRows > 0);
 		return true;
 	}
 
-	virtual void Success();
-	virtual void Failure();
+	virtual void Success() OVERRIDE_FN;
+	virtual void Failure() OVERRIDE_FN;
 
 private:
 	playerid_t	m_playerID;
