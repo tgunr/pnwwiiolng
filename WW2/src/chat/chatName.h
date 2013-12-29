@@ -29,31 +29,31 @@ namespace Chat
 		value_type m_name[_Traits::MaxHandleSize];
 
 		//! Default ctor, initializes name to empty string.
-		BasicName()
+		inline BasicName()
 		{
 			m_name[0] = 0;
 		}
 
 		//! String ctor.
-		BasicName(const _CharType* name)
+		inline BasicName(const _CharType* name)
 		{
 			strsafecpy(m_name, name);
 		}
 
 		//! Ctor from handle value.
-		BasicName(ChatHandle handle)
+		inline BasicName(ChatHandle handle)
 		{
 			this->operator=(handle);
 		}
 
 		//! Copy constructor.
-		BasicName(const self_type& rhs)
+		inline BasicName(const self_type& rhs)
 		{
 			this->operator=(rhs);
 		}
 
 		//! Copy from string operator.
-		BasicName& operator = (const _CharType* rhs)
+		inline BasicName& operator = (const _CharType* rhs)
 		{
 			if (m_name != rhs)
 				strsafecpy(m_name, rhs);
@@ -61,7 +61,7 @@ namespace Chat
 		}
 
 		//! Copy operator.
-		BasicName& operator = (const self_type& rhs)
+		inline BasicName& operator = (const self_type& rhs)
 		{
 			if (m_name != rhs.m_name)
 				strsafecpy(m_name, rhs.m_name);
@@ -69,49 +69,52 @@ namespace Chat
 		}
 
 		//! Assign from handle.
-		BasicName& operator = (const ChatHandle handle)
+		inline BasicName& operator = (const ChatHandle handle)
 		{
 			chatGetCallsign(m_name, handle);
 			return *this;
 		}
 
+		size_t length() const;
+		inline size_t size() const { return length(); }
+
 		//! Return a pointer to the string representation.
-		const _CharType* c_str() const { return m_name; }
-		operator const _CharType* () const { return c_str(); }
+		inline const _CharType* c_str() const { return m_name; }
+		inline operator const _CharType* () const { return c_str(); }
 
 		//! Convert to a handle (not-cheap).
-		ChatHandle Handle() const { return chatGetHandle(m_name); }
-		operator ChatHandle() const { return Handle(); }
+		inline ChatHandle Handle() const { return chatGetHandle(m_name); }
+		inline operator ChatHandle() const { return Handle(); }
 
 		//! Return handle in lowercase, non-caching.
-		ChatHandle LowercaseHandle() const { return chatGetLowercaseHandle(m_name); }
+		inline ChatHandle LowercaseHandle() const { return chatGetLowercaseHandle(m_name); }
 
 		//! Convert to upper-case
-		void ToUpper() { strupr(m_name); }
+		inline void ToUpper() { strupr(m_name); }
 
 		//! Set the name to empty.
-		void Clear() { m_name[0] = 0; }
+		inline void Clear() { m_name[0] = 0; }
 
 		//! Ensure all bytes are zero
-		void Zero() { memset(m_name, 0, sizeof(m_name)); }
+		inline void Zero() { memset(m_name, 0, sizeof(m_name)); }
 
 		//! Whether or not the name is populated with anything.
-		bool Empty() const { return (m_name[0] == 0); }
+		inline bool Empty() const { return (m_name[0] == 0); }
 
 		//! Test if the current string is legal as a name.
-		bool IsValid() const { return chatIsValidCallsign(m_name); }
+		inline bool IsValid() const { return chatIsValidCallsign(m_name); }
 
 		//! Tests if the current name uses non-ascii characters - in a char-backed
 		//! name, these would be utf8 characters.
-		bool IsWideCallsign() const { return chatIsWideCallsign(m_name); }
+		inline bool IsWideCallsign() const { return chatIsWideCallsign(m_name); }
 
 		//! Tests equality between two names.
 		bool operator == (const value_type* rhs) const;
 		bool operator == (const self_type& rhs) const;
-		bool operator != (const value_type* rhs) const { return !operator==(rhs); }
-		bool operator != (const self_type& rhs) const { return !operator==(rhs); }
+		inline bool operator != (const value_type* rhs) const { return !operator==(rhs); }
+		inline bool operator != (const self_type& rhs) const { return !operator==(rhs); }
 
-		void packRaw(unsigned int mode, ACTION_OBJECT* a) { a->packBytes(mode, m_name, sizeof(m_name)); }
+		inline void packRaw(unsigned int mode, ACTION_OBJECT* a) { a->packBytes(mode, m_name, sizeof(m_name)); }
 
 		int format(const value_type* format, ...);
 	};

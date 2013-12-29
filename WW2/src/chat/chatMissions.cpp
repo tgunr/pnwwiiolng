@@ -774,14 +774,13 @@ ChatMission::SetLeader(const ChatHandle& newLeaderHandle)
 	if ( leader() == newLeaderHandle || m_matchLeader == matchHandle )
 		return;
 
-	char callsign[MAX_HANDLE_LEN+1];
-	chatGetCallsign(callsign, newLeaderHandle);
+	Chat::Name callsign(newLeaderHandle);
 
-	dbugLog(_FLI, "m:%u new leader %s", missionID(), callsign);
+	dbugLog(_FLI, "m:%u new leader %s", missionID(), callsign.c_str());
 
 	if ( newLeaderHandle != 0LL )
 	{
-		SetOrders(LSTR_NEW_LEADER, callsign);
+		SetOrders(LSTR_NEW_LEADER, callsign.c_str());
 		Player* const newLeader = PlayerInterface::Lookup(newLeaderHandle);
 		if ( newLeader != NULL )
 		{

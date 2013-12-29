@@ -222,12 +222,11 @@ chatCreatePlayer(PlayerStatusNode* psn, struct Chat::PlayerInfo* playerInfo)
 //////////////////////////////////////////////////////////////////////
 // Common management login functionality to both formats.
 
-static Player*
-_loginManagerAccount(const char* source, SINT32 teulIndex, const char* gameName)
+static Player* _loginManagerAccount(const char* source, SINT32 teulIndex, const Chat::Name& gameName)
 {
-	dbugLog(_FLI, "t:%d %s requesting name '%s'", teulIndex, source, gameName);
+	dbugLog(_FLI, "t:%d %s requesting name '%s'", teulIndex, source, gameName.c_str());
 
-	Player* player = new ManagementPlayer(teulIndex, gameName);
+	Player* player = new ManagementPlayer(teulIndex, gameName.c_str());
 	if ( player == NULL )
 		throw std::runtime_error("Out of memory for new player");		///Terminal
 
@@ -257,16 +256,14 @@ bool
 Chat::ManagementLogin2::Login(SINT32 teulIndex)
 {
 	static const ChatHandle autoHandle = chatGetHandle("auto");
+	Chat::Name gameName;
 	if ( this->m_wantHandle == autoHandle )
 	{
-		char autoName[MAX_HANDLE_SIZE];
-		snprintf(autoName, sizeof(autoName), "CRS-%04u", (UINT32)teulIndex);
-		this->m_wantHandle = chatGetHandle(autoName);
+		gameName.format("CRS-%04u", (UINT32)teulIndex);
+		this->m_wantHandle = gameName.Handle();
 	}
-
-	// Extract the name the user is requesting for display purposes.
-	char gameName[MAX_HANDLE_SIZE];
-	chatGetCallsign(gameName, this->m_wantHandle);
+	else
+		gameName = this->m_wantHandle;
 
 	try
 	{
@@ -287,7 +284,7 @@ Chat::ManagementLogin2::Login(SINT32 teulIndex)
 	}
 	catch ( std::exception& e )
 	{
-		dbugLog(_FLA, "t:%d ManagementLogin2:%s: %s", teulIndex, gameName, e.what());
+		dbugLog(_FLA, "t:%d ManagementLogin2:%s: %s", teulIndex, gameName.c_str(), e.what());
 	}
 
 	return false;
@@ -298,7 +295,7 @@ extern LOGICAL
 chatLogoutPlayer(SINT32 teulIndex)
 {
 	Player* player = PlayerInterface::Lookup(teulIndex);
-	return  chatFreePlayer(player);
+	return chatFreePlayer(player);
 }
 
 static Player*

@@ -1663,13 +1663,13 @@ public:
 							)
 		, m_matchID(byMatchID)
 		, m_handle(handle)
+		, m_name()
 		{
-			m_callsign[0] = 0;
 			m_response[0] = 0;
 		}
 protected:
 	ChatHandle	m_matchID, m_handle;
-	char		m_callsign[MAX_HANDLE_SIZE];
+	Chat::Name	m_name;
 	char		m_response[MAX_MESSAGE_LENGTH];
 
 protected:
@@ -1701,7 +1701,7 @@ protected:
 		else if ( details.lockSide > 0 )
 			p += sprintf(p, " Last side: %s", _sideName[details.lockSide]);
 
-		strcpy(m_callsign, details.callsign);
+		m_name = details.callsign;
 
 		return true;
 	}
@@ -1713,13 +1713,13 @@ protected:
 		if ( player == NULL )
 			return;
 
-		if ( (m_callsign[0] == 0) | (m_response[0] == 0) )
+		if (m_name.Empty() || (m_response[0] == 0))
 		{
 			player->message(LSTR_CAUTION, LSTR_INVALID_CALLSIGN, Chat::Name(m_handle).c_str());
 		}
 		else
 		{
-			player->message(LSTR_NONE, LSTR_LABELLED_GENERIC, m_callsign, m_response);
+			player->message(LSTR_NONE, LSTR_LABELLED_GENERIC, m_name.c_str(), m_response);
 		}
 	}
 

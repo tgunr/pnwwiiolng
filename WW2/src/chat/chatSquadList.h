@@ -8,6 +8,8 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
+#include "chat/chatName.h"
+
 class SquadList;
 class Player;
 
@@ -34,7 +36,7 @@ extern void chatAddSquadName(const ChatHandle& handle);
 extern bool chatCheckForSquadName(const ChatHandle& handle);
 extern void chatRemoveSquadName(const ChatHandle& handle);
 
-extern void chatRenameSquad(const char* fromName, const char* toName);
+extern void chatRenameSquad(const Chat::Name& fromName, const Chat::Name& toName);
 
 // Add/remove a player from the recruiter list
 extern void chatUpdateRecruiterList(const Player* player, bool isRecruiting, class SquadList* squadList /* or NULL */);

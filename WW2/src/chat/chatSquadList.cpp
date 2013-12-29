@@ -1027,29 +1027,29 @@ SquadList::renamed(const ChatHandle& newHandle)
 }
 
 void
-chatRenameSquad(const char* fromName, const char* toName)
+chatRenameSquad(const Chat::Name& fromName, const Chat::Name& toName)
 {
-	chatRemoveSquadName(fromName);
+	chatRemoveSquadName(fromName.c_str());
 
-	ChatHandle newHandle = chatGetHandle(toName);
-	SquadList* list = chatFindSquadListByName(fromName);
+	ChatHandle newHandle = toName;
+	SquadList* list = chatFindSquadListByName(fromName.c_str());
 	if ( list )
 		list->renamed(newHandle);
 	else
-		dbugLog(_FLN, "Renaming squad %s->%s: squad not loaded", fromName, toName);
+		dbugLog(_FLN, "Renaming squad %s->%s: squad not loaded", fromName.c_str(), toName.c_str());
 
 	chatAddSquadName(newHandle);
 
-	dbugLog(_FLN, "Completed rename of squad %s to %s", fromName, toName);
+	dbugLog(_FLN, "Completed rename of squad %s to %s", fromName.c_str(), toName.c_str());
 
 #ifdef BETA_RELEASE
 	if ( !list )
 		return;
 	SquadList* altList;
-	altList = chatFindSquadListByName(fromName);
+	altList = chatFindSquadListByName(fromName.c_str());
 	if ( altList != NULL )
 		LogAbort("Found list for old name after squad rename");
-	altList = chatFindSquadListByName(toName);
+	altList = chatFindSquadListByName(toName.c_str());
 	if ( altList == NULL )
 		LogAbort("No list for squad after rename");
 	else if ( altList->squad().shortHandle() != newHandle )

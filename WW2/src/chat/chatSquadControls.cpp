@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Date: Tue Sep 20 20:02:14 CDT 2005
 //
 // Handler functions for squad controls
@@ -8,7 +7,6 @@
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-//
 
 #include "versionNo.h"
 
@@ -71,11 +69,10 @@ _addSquadMember(SquadList* squadList, RANK_NO atRank, Player* addee, const ChatH
 			, atRank, addee->playerID(), squadID
 			);
 
-	char adder[MAX_HANDLE_LEN+1];
-	chatGetCallsign(adder, byHandle);
-	_audit(squadID, SquadMemberUpdate::_ADD, adder, addee->callsign(), atRank, 0, 0, (recruited) ? "recruit" : "invite");
+	Chat::Name adder(byHandle);
+	_audit(squadID, SquadMemberUpdate::_ADD, adder.c_str(), addee->callsign(), atRank, 0, 0, (recruited) ? "recruit" : "invite");
 
-	squadList->memberJoin(addee, addee->matchHandle(), atRank, teulTime(), (recruited) ? adder : NULL, true);
+	squadList->memberJoin(addee, addee->matchHandle(), atRank, teulTime(), (recruited) ? adder.c_str() : NULL, true);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -173,20 +170,20 @@ _checkSquadName(std::string& name)
 {
 	_trimWhitespace(name);
 
+	if (name.length() < 2 || name.length() > Squad::SHORT_NAME_LEN)
+		throw SQR_INVALID_SQUAD_SHORT;
+
 	// Does it make a legal handle?
 	ChatHandle handle = chatGetLowercaseHandle(name.c_str());
 	if ( handle == 0LL )
 		throw SQR_INVALID_SQUAD_SHORT;
 
 	// Did we use the whole thing?
-	char unpacked[MAX_HANDLE_SIZE];
-	chatGetCallsign(unpacked, handle);
-	if ( strcasecmp(name.c_str(), unpacked) != 0 )
-		throw SQR_INVALID_SQUAD_SHORT;
-	size_t len = strlen(unpacked);
-	if ( len < 2 || len > Squad::SHORT_NAME_LEN )
+	Chat::Name unpackedName(handle);
+	if ( strcasecmp(name.c_str(), unpackedName.c_str()) != 0 )
 		throw SQR_INVALID_SQUAD_SHORT;
 
+	// Not valid for the whole name to be numbers.
 	const char* p = name.c_str();
 	while ( isdigit(*p) )
 		++p;

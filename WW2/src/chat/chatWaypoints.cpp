@@ -34,9 +34,9 @@ static ChatHandle
 _getWaypointHandle()
 {
 	static SerialNumber waypointSerial("waypoint", 0, 100, ~0);
-	char wpName[MAX_WP_HANDLE_LEN+1];
-	snprintf(wpName, MAX_WP_HANDLE_LEN, "-%05X", (UINT32)(++waypointSerial) & 0x0fffff);
-	return chatGetHandle(wpName);
+	Chat::Name wpName;
+	wpName.format("-%05X", (UINT32)(++waypointSerial) & 0x0fffff);
+	return wpName.Handle();
 }
 
 void

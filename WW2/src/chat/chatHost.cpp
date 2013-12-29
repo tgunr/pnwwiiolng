@@ -210,7 +210,7 @@ Chat::Channel* adminChannel = nullptr;
 
 UINT32 g_shutdownLockAt = 0;
 UINT32 g_shutdownDowntime = 0;
-char g_shutdownRequestedBy[MAX_HANDLE_SIZE];
+static Chat::Name g_shutdownRequestedBy;
 static UINT32 g_shutdownLockedArena = 0;
 static UINT32 g_finalShutdownTime = 0;
 
@@ -337,7 +337,7 @@ chatSetShutdownTime(UINT32 forTime, const char* caller)
 				chatWarnAll(LSTR_SHUTDOWN_ADVANCED, chatTimeInterval(g_shutdownLockAt - forTime));
 		}
 
-		strlcpy(g_shutdownRequestedBy, caller, sizeof(g_shutdownRequestedBy));
+		g_shutdownRequestedBy = caller;
 	}
 
 	g_shutdownLockAt = forTime;
@@ -574,7 +574,6 @@ _processDelayedBan()
 
 	static const UINT32 SYSTEM_PLAYER_ID = 69611;
 
-	char callsign[MAX_HANDLE_SIZE];
 	char days[20];
 
 	for ( auto it = _delayedBans.begin(); it != _delayedBans.end(); ++it )
@@ -590,10 +589,10 @@ _processDelayedBan()
 			else
 				chatBanPlayer(ban.m_handle, (ban.m_days * DAY_S + (3 * 60)), "ACCOUNT SUSPENDED: Your account has been suspended indefinitely. Contact agm@playnet.com assistance.", SYSTEM_PLAYER_ID, systemHandleID);
 
-			chatGetCallsign(callsign, ban.m_handle);
-			snprintf(days, sizeof(days) - 1, "%u days", ban.m_days);
-			dbugLog(_FLN, "!GM:%s:banned:auto:%s", callsign, days);
-			chatdbRecordEvent("GM", callsign, "banned", "auto", days);
+			Chat::Name name(ban.m_handle);
+			strprintf(days, "%u days", ban.m_days);
+			dbugLog(_FLN, "!GM:%s:banned:auto:%s", name.c_str(), days);
+			chatdbRecordEvent("GM", name.c_str(), "banned", "auto", days);
 
 			if ( ban.m_kickTime == 0 || PlayerInterface::Lookup(ban.m_handle) == nullptr )
 				remove = true;
@@ -2027,8 +2026,6 @@ static inline bool _isANumber(const char* text) { while (isdigit(*text)) ++text;
 bool
 Player::tuneRadioToHandle(UCHAR index, const ChatHandle& handleID)
 {
-	SCHAR chanHandle[MAX_HANDLE_SIZE];
-
 	if ( handleID == 0 )
 	{
 		detuneRadio(index);
@@ -2051,19 +2048,19 @@ Player::tuneRadioToHandle(UCHAR index, const ChatHandle& handleID)
 		return false;
 	}
 
-	chatGetCallsign(chanHandle, chatGetLowercaseHandle(handleID));
+	Chat::Name chanName(chatGetLowercaseHandle(handleID));
 
 	if ( g_debugRadios )
 		dbugLog(_FLD, "t:%d p:%u c:%s tuning #%d to %s(%llx)"
 						, teulIndex(), playerID(), callsign()
 						, index
-						, chanHandle, handleID
+						, chanName.c_str(), handleID
 						);
 
 	//See if we are doing a 1-99 channel tune
-	if ( _isANumber(chanHandle) )
+	if ( _isANumber(chanName.c_str()) )
 	{
-		const UINT32 channelNo = atoi(chanHandle);
+		const UINT32 channelNo = atoi(chanName.c_str());
 		if ( channelNo > 0 && channelNo <= CHAT_MAX_NUM_STATIONS )
 		{
 			if ( tuneRadioToNumberedChannel(index, channelNo) )
@@ -2072,7 +2069,7 @@ Player::tuneRadioToHandle(UCHAR index, const ChatHandle& handleID)
 	}
 
 	// Check to see if it's a tuning command (e.g. "HQ" or "GM")
-	if ( tuneRadioToNamedChannel(index, chanHandle) )
+	if ( tuneRadioToNamedChannel(index, chanName.c_str()) )
 		return true;
 
 	detuneRadio(index);
@@ -2821,7 +2818,7 @@ _startShutdown()
 {
 	DBThread::Do(DBThread::Default, "UPDATE host_config SET value = '3' WHERE variablename = 'arenaLock'");
 
-	chatdbRecordEvent("SYS", g_shutdownRequestedBy, "shutdown", "NOW", "executing shutdown");
+	chatdbRecordEvent("SYS", g_shutdownRequestedBy.c_str(), "shutdown", "NOW", "executing shutdown");
 
 	chatDistributeLocMessage(playerIndex.begin(), playerIndex.end(), LSTR_WARNING, LSTR_SERVER_SHUTDOWN_NOW);
 
@@ -2925,7 +2922,7 @@ _checkForShutdown()
 
 		p_lastNotice = now;
 
-		dbugLog(_FLW, "%s until scheduled shutdown for %s.", chatTimeInterval(remaining), g_shutdownRequestedBy);
+		dbugLog(_FLW, "%s until scheduled shutdown for %s.", chatTimeInterval(remaining), g_shutdownRequestedBy.c_str());
 
 		return false;
 	}

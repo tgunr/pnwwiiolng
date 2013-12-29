@@ -34,7 +34,7 @@ public:
 	playerid_t			m_playerID;			//!< PlayerID of creator/owner.
 	UINT32				m_stoUID;			//!< STO we are attached to or 0.
 	FLOAT64				m_x, m_y, m_z;		//!< Spawn co-ordinates.
-	char				m_callsign[MAX_HANDLE_LEN+1];	//!< Callsign of owner.
+	char				m_callsign[MAX_HANDLE_SIZE];	//!< Callsign of owner.
 	ChatHandle			m_handle;			//!< Packed lowercase handle of owner.
 	UINT32				m_vehicleID;		//!< ID of vehicle we are attached to or 0.
 

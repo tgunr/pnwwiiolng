@@ -408,14 +408,14 @@ DotWho::action(Player& player, Chat::ClientMessage* /*message*/) const
 class SquadRename : public DBThreadQuery
 {
 public:
-	SquadRename(const ChatHandle& requester, const char* from, const char* to)
+	SquadRename(const ChatHandle& requester, const Chat::Name& from, const Chat::Name& to)
 		: DBThreadQuery(DBThread::Default, "SquadRename", DBThreadQuery::_CALLBACK
-		, "UPDATE LOW_PRIORITY wwii_squads"
-		" SET short_name = '%s'"
-		" WHERE LOWER(short_name) = LOWER('%s')"
-		, to
-		, from
-		)
+						, "UPDATE LOW_PRIORITY wwii_squads"
+						" SET short_name = '%s'"
+						" WHERE LOWER(short_name) = LOWER('%s')"
+						, to.c_str()
+						, from.c_str()
+						)
 		, m_requester(requester)
 		, m_from(from)
 		, m_to(to)
@@ -427,8 +427,8 @@ public:
 
 protected:
 	ChatHandle	m_requester;
-	std::string	m_from;
-	std::string	m_to;
+	Chat::Name	m_from;
+	Chat::Name	m_to;
 	size_t		m_affectedRows;
 
 	virtual bool Process(const size_t numRows) OVERRIDE_FN
@@ -450,7 +450,7 @@ protected:
 		if (player == NULL)
 			return;
 
-		chatRenameSquad(m_from.c_str(), m_to.c_str());
+		chatRenameSquad(m_from, m_to);
 
 		///LOCALIZE
 		const char* message =
@@ -471,10 +471,11 @@ protected:
 //////////////////////////////////////////////////////////////////////
 // Check the validity of a name
 
-static bool _checkName(char* name, bool isCurrent, Player& player)
+static bool _checkName(Chat::Name& name, bool isCurrent, Player& player)
 {
-	size_t len = strlen(name);
-	if (len < 2 || len > MAX_HANDLE_LEN){
+	size_t len = strlen(name.c_str());
+	if (len < 2 || len > MAX_HANDLE_LEN)
+	{
 		player.message(LSTR_CAUTION, LSTR_INVALID_SQUAD_NAME, name);
 		return false;
 	}
@@ -497,7 +498,7 @@ static bool _checkName(char* name, bool isCurrent, Player& player)
 	}
 
 	// Just to make absolutely sure the string is sanitized, reverse engineer it
-	chatGetCallsign(name, id);
+	name = id;
 
 	return true;
 }
@@ -522,10 +523,7 @@ public:
 			return;
 		}
 
-		char from[MAX_HANDLE_SIZE];
-		char to[MAX_HANDLE_SIZE];
-		strcpy(from, argv[0]);
-		strcpy(to, argv[1]);
+		Chat::Name from(argv[0]), to(argv[1]);
 
 		if (!_checkName(from, true, player))
 			return;

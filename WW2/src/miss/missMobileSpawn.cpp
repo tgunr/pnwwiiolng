@@ -347,9 +347,8 @@ missAddMobileSpawn(UINT32 missionID, const playerid_t playerID, const ChatHandle
 	}
 	catch ( std::domain_error& e )
 	{
-		char callsign[MAX_HANDLE_LEN];
-		chatGetCallsign(callsign, handle);
-		dbugLog(_FLA, "m:%u p:%u c:%s sto:%u unable to add mobile spawn: %s", missionID, playerID, callsign, stoUID, e.what());
+		Chat::Name callsign(handle);
+		dbugLog(_FLA, "m:%u p:%u c:%s sto:%u unable to add mobile spawn: %s", missionID, playerID, callsign.c_str(), stoUID, e.what());
 
 		MobileSpawnWaypoint wp(missionID, playerID, handle, x, y, z, false, stoUID, error);
 		chatSendMissionMobileSpawnWaypoint(wp);

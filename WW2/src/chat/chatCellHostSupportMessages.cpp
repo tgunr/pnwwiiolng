@@ -89,10 +89,7 @@ _recvSmiteUser(ACTION_OBJECT* const a)
 	smiteUser.m_handle = 0LL;
 	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &smiteUser, sizeof(CHAT_SMITE_USER));
 
-	char callsign[MAX_HANDLE_SIZE];
-	chatGetCallsign(callsign, smiteUser.m_handle);
-
-	dbugLog(_FLN, "received a smite user for customerID %u [%s]", smiteUser.customerID, callsign);
+	dbugLog(_FLN, "received a smite user for customerID %u [%s]", smiteUser.customerID, Chat::Name(smiteUser.m_handle).c_str());
 
 	//Smite the user
 	hostSmiteCustomer(smiteUser.customerID);

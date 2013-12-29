@@ -1365,12 +1365,11 @@ static LOGICAL
 _dotLua(char* arguments, OOBMessage& message)
 {
 	std::string object((const char*)arguments);
-	char sender[MAX_HANDLE_LEN];
-	chatGetCallsign(sender, message.m_handleID);
-	bool success = Lua::RunObject(sender, object);
+	Chat::Name sender(message.m_handleID);
+	bool success = Lua::RunObject(sender.c_str(), object);
 	if ( !success )
 	{
-		dbugLog(_FLW, "FAIL: '%s' failed for %s", arguments, sender);
+		dbugLog(_FLW, "FAIL: '%s' failed for %s", arguments, sender.c_str());
 	}
 
 	Lua::SCRIPT_RESULTS& results = Lua::Results();
@@ -1384,7 +1383,7 @@ _dotLua(char* arguments, OOBMessage& message)
 	}
 	else
 	{
-		for ( size_t i = 0; i < results.size(); ++i )
+		for ( size_t i = 0, size = results.size(); i < size; ++i )
 		{
 			RESPOND("%s", results[i].c_str());
 		}

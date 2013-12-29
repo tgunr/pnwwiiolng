@@ -92,8 +92,8 @@ static const char* _ADD_QUERY = "INSERT INTO chat_%s (playerid, target) VALUES (
 class FriendAdd : public DBThreadQuery
 {
 public:
-	FriendAdd(const playerid_t playerID, const char* const callsign, const bool ignore)
-		: DBThreadQuery(DBThread::Default, "FriendAdd", DBThreadQuery::_IMMEDIATE, _ADD_QUERY, (ignore) ? "ignore" : "friends", playerID, callsign)
+	FriendAdd(const playerid_t playerID, const Chat::Name& name, const bool ignore)
+		: DBThreadQuery(DBThread::Default, "FriendAdd", DBThreadQuery::_IMMEDIATE, _ADD_QUERY, (ignore) ? "ignore" : "friends", playerID, name.c_str())
 		{}
 };
 
@@ -102,8 +102,8 @@ static const char* _DEL_QUERY = "DELETE FROM chat_%s WHERE playerid = %u AND tar
 class FriendRemove : public DBThreadQuery
 {
 public:
-	FriendRemove(const playerid_t playerID, const char* const callsign, const bool ignore)
-		: DBThreadQuery(DBThread::Default, "FriendRemove", DBThreadQuery::_IMMEDIATE, _DEL_QUERY, (ignore) ? "ignore" : "friends", playerID, callsign)
+	FriendRemove(const playerid_t playerID, const Chat::Name& name, const bool ignore)
+		: DBThreadQuery(DBThread::Default, "FriendRemove", DBThreadQuery::_IMMEDIATE, _DEL_QUERY, (ignore) ? "ignore" : "friends", playerID, name.c_str())
 		{}
 };
 
@@ -123,13 +123,10 @@ FriendsQuery::Success()
 	list.clear();
 	list = m_list;
 
-	// Is the list empty?
-	if ( list.empty() ) return;
-
-	char callsign[MAX_HANDLE_SIZE];
-	for ( auto it = list.begin(); it != list.end(); ++it )
+	Chat::Name name;
+	for ( auto it = list.begin(), end = list.end(); it != end; ++it )
 	{
-		chatGetCallsign(callsign, *it);
+		name = *it;
 		betaLog(_FLD, "t:%d p:%u c:%s %s:%s"
 						, player->teulIndex(), player->playerID(), player->callsign()
 						, (m_ignore ? "ignoring" : "buddy")
@@ -154,17 +151,16 @@ FriendsQuery::Failure()
 static void
 _addSocialToList(Player& player, const ChatHandle& handle, bool ignore)
 {
-	char callsign[MAX_HANDLE_SIZE];
-	chatGetCallsign(callsign, handle);
+	Chat::Name name(handle);
 
-	(new FriendAdd(player.playerID(), callsign, ignore))->Queue();
+	(new FriendAdd(player.playerID(), name, ignore))->Queue();
 
 	if (ignore)
 		player.ignores().insert(handle);
 	else
 		player.friends().insert(handle);
 
-	player.message(LSTR_NOTE, (ignore) ? LSTR_IGNORING : LSTR_FRIEND_ADDED, callsign);
+	player.message(LSTR_NOTE, (ignore) ? LSTR_IGNORING : LSTR_FRIEND_ADDED, name.c_str());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -216,8 +212,7 @@ chatIgnoreList(Player* player)
 {
 	std::string list = "";
 
-	HANDLES::iterator it;
-	for ( it = player->ignores().begin(); it != player->ignores().end(); ++it )
+	for ( auto it = player->ignores().begin(), end = player->ignores().end(); it != end; ++it )
 	{
 		if ( !list.empty() )
 			list += ", ";
@@ -248,8 +243,7 @@ chatFriendsList(Player& player)
 		return;
 	}
 
-	HANDLES::iterator it;
-	for ( it = player.friends().begin(); it != player.friends().end(); ++it )
+	for ( auto it = player.friends().begin(), end = player.friends().end(); it != end; ++it )
 	{
 		Player* buddy = PlayerInterface::Lookup(*it);
 		if ( buddy && buddy->teulIndex() >= 0 && buddy->side() == player.side() )
@@ -355,11 +349,10 @@ chatModifySocialList(Player& player, ARGV& args, bool isIgnore)
 		}
 		else
 		{
-			char callsign[MAX_HANDLE_SIZE];
-			chatGetCallsign(callsign, handle);
-			(new FriendRemove(player.playerID(), callsign, isIgnore))->Queue();
+			Chat::Name name(handle);
+			(new FriendRemove(player.playerID(), name, isIgnore))->Queue();
 			list.erase(it);
-			player.message(LSTR_NOTE, (isIgnore) ? LSTR_UNIGNORING : LSTR_FRIEND_REMOVED, callsign);
+			player.message(LSTR_NOTE, (isIgnore) ? LSTR_UNIGNORING : LSTR_FRIEND_REMOVED, name.c_str());
 		}
 	}
 }

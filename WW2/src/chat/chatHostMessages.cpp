@@ -860,13 +860,12 @@ _recvKickNotice(ACTION_OBJECT* const a)
 	}
 
 	auto& incoming = a->read<Chat::KickNotice>();
-	char callsign[MAX_HANDLE_LEN+1];
-	chatGetCallsign(callsign, incoming.m_handle);
+	Chat::Name name(incoming.m_handle);
 
 	dbugLog(_FLI, "t:%d p:%u c:%s kick notice: %s"
 					, a->teulIndex
 					, incoming.m_playerID
-					, callsign
+					, name.c_str()
 					, incoming.m_problem
 					);
 
@@ -879,17 +878,17 @@ _recvKickNotice(ACTION_OBJECT* const a)
 	else
 	{
 		dbugLog(_FLW, "Kick notice for %s[%u]: player not connected to chat"
-						, callsign
+						, name.c_str()
 						, incoming.m_playerID
 						);
-		snprintf(message, sizeof(message), "[id: %u, not connected]", incoming.m_playerID);
+		strprintf(message, "[id: %u, not connected]", incoming.m_playerID);
 	}
 
-	chatdbRecordEvent("KICK", callsign, "kicked", incoming.m_problem, message);
+	chatdbRecordEvent("KICK", name.c_str(), "kicked", incoming.m_problem, message);
 
 	if ( incoming.m_problem[0] != '*' )
 	{
-		snprintf(message, 300, "KICKED %s: %s", callsign, incoming.m_problem);
+		strprintf(message, "KICKED %s: %s", name.c_str(), incoming.m_problem);
 		chatDispatchGMMessage("HOST", message);
 	}
 
@@ -1089,13 +1088,12 @@ static ThreadTextQuery _progressUpdates(DBThread::Default, _PROGRESS_UPDATE_PREF
 SINT32
 Tutorial::GroupProgress::receive(Player* player) const
 {
-	char callsign[MAX_HANDLE_SIZE];
-	chatGetCallsign(callsign, m_groupHandle);
+	Chat::Name name(m_groupHandle);
 #ifdef BETA_RELEASE
-	player->log(_FLD, "group progress update %s=%llu", callsign, m_flags);
+	player->log(_FLD, "group progress update %s=%llu", name.c_str(), m_flags);
 #endif
 	char entry[88];
-	sprintf(entry, "(%u,\"%s\",%llu)", player->playerID(), callsign, m_flags);
+	strprintf(entry, "(%u,\"%s\",%llu)", player->playerID(), name.c_str(), m_flags);
 	_progressUpdates.addEntry(entry);
 	return 0;
 }

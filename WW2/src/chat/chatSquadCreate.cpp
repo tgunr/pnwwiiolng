@@ -67,7 +67,6 @@ static void
 _checkMembers(Player* player, SquadControl& control, bool sendInvites)
 {
 	std::vector<ChatHandle>& players = control.m_players;
-	char callsign[MAX_HANDLE_SIZE];
 	PLAYER_INDEX approved;
 
 	approved.clear();
@@ -75,13 +74,12 @@ _checkMembers(Player* player, SquadControl& control, bool sendInvites)
 
 	SquadControlResult result(SquadControl::_INVALID, SquadControl::_CREATE, 0LL);
 
-	for ( UINT32 i = 0; i < players.size(); ++i )
+	for ( size_t i = 0, size = players.size(); i < size; ++i )
 	{
 		result.m_handle = players[i];
 		try
 		{
 			ChatHandle handleID = chatGetLowercaseHandle(players[i]);
-			chatGetCallsign(callsign, handleID);
 			if ( handleID == player->matchHandle() )
 				throw SQR_CANT_DO_TO_SELF;
 			// Skip duplicates

@@ -180,12 +180,8 @@ _createSquad(UINT32 ownerID, UINT32* members, const char* shortName, const char*
 void
 chatdbSquadMemberUpdate(SINT32 teulIndex, SquadMemberUpdate& update)
 {
-	static char callsign[MAX_HANDLE_LEN+1], orig[MAX_HANDLE_LEN+1];
-	static char safeText[SquadMemberUpdate::MAX_TEXT*2 + 1];
-
-	chatGetCallsign(callsign, update.m_handle);
-	chatGetCallsign(orig, update.m_originator);
-
+	Chat::Name callsign(update.m_handle), orig(update.m_originator);
+	char safeText[SquadMemberUpdate::MAX_TEXT*2 + 1];
 	safeText[0] = 0;
 	escapeString(update.m_text, safeText, SquadMemberUpdate::MAX_TEXT*2);
 
