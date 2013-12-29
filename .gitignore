@@ -1584,3 +1584,5 @@ WW2/src/xml/.dirstamp
 /Libraries/granny2/projects/Win32_Release_Static_2k8/*.lastbuildstate
 /Libraries/granny2/projects/Win32_Release_Static_2k8/win32_2k8_static.log
 *.vsp
+WW2.psess
+WW2/proj/win/WW2.sdf
