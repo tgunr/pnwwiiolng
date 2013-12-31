@@ -8,7 +8,7 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include <string.h>
+#include "str/stringLib.h"
 
 #include "teul/teulTime.h"
 
