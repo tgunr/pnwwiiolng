@@ -272,13 +272,12 @@ HCUnitList::packer(LOGICAL mode, ACTION_OBJECT* a)
 HCUnit*
 HCUnit::GetCommandUnit(WWII_COUNTRY forCountry, BRANCH_ENUM forBranch)
 {
-	HCUNIT_INDEX::iterator it;
-	for ( it = hcUnits.begin(); it != hcUnits.end(); ++it )
+	for ( auto it = hcUnits.begin(), end = hcUnits.end(); it != end; ++it )
 	{
+		if (it->second->parent() != nullptr)
+			continue;
 		// Ignore training units.
 		if ( it->second->isTrainingUnit() == true )
-			continue;
-		if ( it->second->parent() != NULL )
 			continue;
 		if ( it->second->country() != forCountry || it->second->branch() != forBranch )
 			continue;
@@ -287,5 +286,5 @@ HCUnit::GetCommandUnit(WWII_COUNTRY forCountry, BRANCH_ENUM forBranch)
 		return it->second;
 	}
 
-	return NULL;
+	return nullptr;
 }

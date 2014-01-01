@@ -333,10 +333,9 @@ chatSay(Player* player, Chat::ClientMessage* message, char* phrase, AREA_CHAT_MO
 	_populateSayMessage(outMsg, player, message, phrase, icon);
 	enemyMsg.msg = NULL;
 
-	PLAYERS_ARRAY::iterator it;
 	Player* cur;
 
-	for ( it = array.begin(); it != array.end(); ++it )
+	for ( auto it = array.begin(), end = array.end(); it != end; ++it )
 	{
 		PLAYERS::iterator cit = (*it)->begin();
 		while ( cit != (*it)->end() )
@@ -399,7 +398,7 @@ Player::Emit(const Chat::LocalizedMessage& lmsg)
 	chatGridGetPlayersVector(this, friendlyRange2, array);
 
 	Player* cur;
-	for ( auto it = array.begin(); it != array.end(); ++it )
+	for ( auto it = array.begin(), end = array.end(); it != end; ++it )
 	{
 		auto cit = (*it)->begin();
 		while ( cit != (*it)->end() )

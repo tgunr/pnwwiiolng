@@ -438,8 +438,7 @@ _checkSupplyLinksIn(const Supercell& sc)
 static void
 _checkSupplyLinks()
 {
-	SUPERCELLS::iterator it;
-	for ( it = g_supercells.begin(); it != g_supercells.end(); ++it )
+	for ( auto it = g_supercells.begin(), end = g_supercells.end(); it != end; ++it )
 	{
 		_checkSupplyLinksIn(it->second);
 	}
@@ -509,8 +508,7 @@ _facilityDistance(const FacilityStruct* facil1, const FacilityStruct* facil2)
 void
 _resetAllObjects()
 {
-	SUPERCELLS::iterator it;
-	for ( it = g_supercells.begin(); it != g_supercells.end(); ++it )
+	for ( auto it = g_supercells.begin(), end = g_supercells.end(); it != end; ++it )
 	{
 		Supercell& sc = it->second;
 		for ( int counter = 0; counter < sc.numObjects; ++counter )
@@ -752,14 +750,12 @@ _scPass1_objs(Supercell& sc)
 static void
 _supercellsPass1()
 {
-	SUPERCELLS::iterator it;
-
 #if defined(IS_STRAT_HOST) || defined(IS_MAP_HOST)
 	dbugLog(_FLI, "Loading data from database");
 	strtdbInitSupercells();
 #endif
 
-	for ( it = g_supercells.begin(); it != g_supercells.end(); ++it )
+	for ( auto it = g_supercells.begin(), end = g_supercells.end(); it != end; ++it )
 	{
 		totalCPs += it->second.numCPs;
 
@@ -992,11 +988,9 @@ _scPass2_links(Supercell& sc)
 static void
 _supercellsPass2()
 {
-	SUPERCELLS::iterator it;
-
-	//Now that all ither pointers have been resolved
+	// Now that all other pointers have been resolved
 	// we can do the links and do other initialization
-	for ( it = g_supercells.begin(); it != g_supercells.end(); ++it )
+	for ( auto it = g_supercells.begin(), end = g_supercells.end(); it != end; ++it )
 	{
 		_scPass2_linkSetup(it->second);
 		_scPass2_cps(it->second);

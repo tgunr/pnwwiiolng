@@ -25,8 +25,7 @@ weapSaveVehicleTypes()
 	ThreadTextQuery qry(DBThread::Default, QRY_SAVE_VEHICLES, "");
 	char buf[256];
 
-	WEAPON_LIST::iterator it;
-	for ( it = g_weaponList.begin(); it != g_weaponList.end(); ++it )
+	for ( auto it = g_weaponList.begin(), end = g_weaponList.end(); it != end; ++it )
 	{
 		WEAPON& weap = *it->second;
 		const WEAPON_SPEC& spec = it->first;

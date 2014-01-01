@@ -222,8 +222,7 @@ _populateControllers()
 	if ( hasRun )
 		return;
 
-	HCUNIT_INDEX::iterator it;
-	for ( it = hcUnits.begin(); it != hcUnits.end(); ++it )
+	for ( auto it = hcUnits.begin(), end = hcUnits.end(); it != end; ++it )
 		BrigadeController::Get(it->second->unitID());
 
 	hasRun = true;
@@ -256,8 +255,7 @@ _requestList(Player* player, UCHAR country, UCHAR branch)
 	outgoing.append(branch);
 	outgoing.append(player->permissionMask());
 
-	CONTROLLERS::iterator it;
-	for ( it = controllers.begin(); it != controllers.end(); ++it )
+	for ( auto it = controllers.begin(), end = controllers.end(); it != end; ++it )
 	{
 		BrigadeController& bc = *(it->second);
 		if ( bc.unit().side() != player->side() )
@@ -626,8 +624,7 @@ BrigadeController::requestNominate(Player* sponsor, const ChatHandle& officerHan
 		throw BCERR_PLAYER_IS_ALREADY_OIC;
 
 	// Make sure he's not being nominated or removed from another brigade
-	CONTROLLERS::iterator it;
-	for ( it = controllers.begin(); it != controllers.end(); ++it )
+	for ( auto it = controllers.begin(), end = controllers.end(); it != end; ++it )
 	{
 		BrigadeController* bc = it->second;
 		if ( !bc->vote() || bc->vote()->isTargettedAction() )
@@ -1644,8 +1641,7 @@ public:
 		bool assignments = false;
 		std::string results = "";
 		std::string entry = "";
-		CONTROLLERS::iterator it;
-		for ( it = controllers.begin(); it != controllers.end(); ++it )
+		for ( auto it = controllers.begin(), end = controllers.end(); it != end; ++it )
 		{
 			BrigadeController* controller = it->second;
 			if ( controller->unit().side() != player.side() )
@@ -1775,10 +1771,9 @@ _orderExecuted(AttackOrder& order, const ChatHandle& handle, BrigadeController& 
 		return;
 
 	WWII_SIDE otherSide = property->Side();
-	HCUNIT_INDEX::iterator it;
 	const HCUnit* defender = NULL;
 	UINT32 defScore = 0;
-	for ( it = hcUnits.begin(); defScore < 7 && it != hcUnits.end(); ++it )
+	for ( auto it = hcUnits.begin(), end = hcUnits.end(); defScore < 7 && it != end; ++it )
 	{
 		HCUnit* cur = it->second;
 		if ( cur->side() != otherSide )

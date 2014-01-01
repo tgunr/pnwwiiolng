@@ -301,8 +301,7 @@ chatLogoutPlayer(SINT32 teulIndex)
 static Player*
 _findLimboPlayer(const playerid_t playerID)
 {
-	PLAYERS::iterator it;
-	for ( it = s_limboPlayers.begin(); it != s_limboPlayers.end(); ++it )
+	for ( auto it = s_limboPlayers.begin(), end = s_limboPlayers.end(); it != end; ++it )
 	{
 		if ( (*it)->playerID() == playerID )
 			return static_cast<Player*>(*it);

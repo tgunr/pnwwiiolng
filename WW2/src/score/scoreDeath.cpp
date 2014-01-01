@@ -221,7 +221,7 @@ _awardAssists(Scoring::Sortie& deadSortie, Scoring::Sortie& killerSortie)
 
 	auto& hitsTaken = deadSortie.hitsTaken();
 	const TeulTimeMS window = host_config.kills.assistWindow_s * 1000;
-	for ( auto it = hitsTaken.rbegin(); it != hitsTaken.rend(); ++it )
+	for ( auto it = hitsTaken.rbegin(), end = hitsTaken.rend(); it != end; ++it )
 	{
 		auto& entry = *it;
 		const TeulTimeMS delta = teulClock64 - entry.m_timestamp;
@@ -233,7 +233,7 @@ _awardAssists(Scoring::Sortie& deadSortie, Scoring::Sortie& killerSortie)
 			continue;
 
 		Scoring::Sortie* const assistSortie = Scoring::Sortie::Lookup(entry.sortieID());
-		if ( assistSortie == NULL )
+		if ( assistSortie == nullptr )
 			continue;
 
 		// The more recent your damage, the more score you get, with a minimum of 1/4 value

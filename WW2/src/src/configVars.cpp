@@ -209,7 +209,7 @@ static void _readConfigEntriesFromFile(IO::MappedFile& file)
 			--eol;
 
 		auto it = configEntries.begin();
-		for (; it != configEntries.end(); ++it )
+		for ( auto end = configEntries.end(); it != end; ++it )
 		{
 			if ( strncasecmp(it->m_name, name, static_cast<size_t>(equals - name)) == 0 )
 			{

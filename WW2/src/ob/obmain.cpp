@@ -1899,14 +1899,11 @@ LOGICAL obmainUpdate(void)
 		return FALSE;
 
     // So we don't have to loop entire object list
-    ObjectSet::iterator itr = updatecallbacks.begin();
-    OBJECT* o;
-
     std::vector<OBJECT*> freelist;
 
-    for(; itr != updatecallbacks.end(); ++itr)
+    for(auto it = updatecallbacks.begin(), end = updatecallbacks.end(); it != end; ++it)
     {
-        o = *itr;
+        OBJECT* o = *itr;
 
         if(!obmainValidateObject(o))
             freelist.push_back(o);

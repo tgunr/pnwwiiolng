@@ -80,13 +80,13 @@ teulCloseAllEndpoints(const SINT32 errorCode)
 	// Make a copy.
 	if ( errorCode != 0 )
 	{
-		for ( it = eps.begin(); it != eps.end(); ++it )
+		for ( auto it = eps.begin(), end = eps.end(); it != end; ++it )
 		{
 			(*it)->sendError(errorCode);
 		}
 	}
 #endif
-	for ( it = eps.begin(); it != eps.end(); ++it )
+	for ( auto it = eps.begin(), end = eps.end(); it != end; ++it )
 	{
 		if ( *it != nullptr )
 			teulClose(*(*it), Teul::Closing::OrderlyShutdown);
@@ -336,7 +336,7 @@ teulKillDeadEndpoints(void)
 		return;
 	}
 
-	for ( ENDPOINT_VEC::iterator it = _deadEndpoints.begin(); it != _deadEndpoints.end(); ++it )
+	for ( ENDPOINT_VEC::iterator it = _deadEndpoints.begin(), end = _deadEndpoints.end(); it != end; ++it )
 	{
 		teulFreeEndpoint(*it);
 	}

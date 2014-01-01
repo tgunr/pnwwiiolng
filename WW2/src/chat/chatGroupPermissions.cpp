@@ -45,7 +45,7 @@ _aggregateVehicles(ChatPermissions& lhs, const CHAT_GROUPS& groups)
 {
 	lhs.m_vehicleGrants.clear();
 
-	for ( CHAT_GROUPS::iterator it = groups.begin(); it != groups.end(); ++it )
+	for ( auto it = groups.begin(), end = groups.end(); it != end; ++it )
 	{
 		GROUP_PERMISSIONS::iterator pit = g_groupPermissions.find(*it);
 		if( pit == g_groupPermissions.end() )
@@ -66,7 +66,7 @@ _aggregatePermissions(ChatPermissions& lhs, const CHAT_GROUPS& groups)
 	lhs = ChatPermissions();
 
 	// Read each chat group and aggregate
-	for ( CHAT_GROUPS::iterator it = groups.begin(); it != groups.end(); ++it )
+	for ( auto it = groups.begin(), end = groups.end(); it != end; ++it )
 	{
 		GROUP_PERMISSIONS::iterator pit = g_groupPermissions.find(*it);
 		if( pit == g_groupPermissions.end() )
@@ -98,10 +98,10 @@ _aggregatePermissions(ChatPermissions& lhs, const CHAT_GROUPS& groups)
 	if ( g_logDebug )
 	{
 		std::string groupNos = "";
-		for ( CHAT_GROUPS::iterator it = groups.begin(); it != groups.end(); ++it )
+		for ( auto it = groups.begin(), end = groups.end(); it != end; ++it )
 		{
 			char num[32];
-			sprintf(num, (it != groups.begin() ? ",%u" : "%u"), *it);
+			strprintf(num, (it != groups.begin() ? ",%u" : "%u"), *it);
 			groupNos += num;
 		}
 		char buffer[2048];
@@ -168,7 +168,7 @@ public:
 		}
 
 		// Recreate all the cached permissions
-		for ( PERMISSION_GROUP_CACHE::iterator it = g_pgc.begin(); it != g_pgc.end(); ++it )
+		for ( auto it = g_pgc.begin(), end = g_pgc.end(); it != end; ++it )
 		{
 			_aggregatePermissions(it->second.m_permissions, it->first);
 		}

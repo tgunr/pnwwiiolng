@@ -220,7 +220,7 @@ memReport()
 {
 	fprintf(stderr, "Memory Report:\n");
 	char buffer[128];
-	for ( auto it = s_history.m_data.begin(); it != s_history.m_data.end(); ++it )
+	for ( auto it = s_history.m_data.begin(), end = s_history.m_data.end(); it != end; ++it )
 	{
 		it->second.describe(it->first, buffer, sizeof(buffer));
 		fprintf(stderr, "%s\n", buffer);

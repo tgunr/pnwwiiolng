@@ -37,7 +37,7 @@ static FAKES _fakes;
 static void
 deleteFakes()
 {
-	for ( auto it = _fakes.begin(); it != _fakes.end(); ++it )
+	for ( auto it = _fakes.begin(), end = _fakes.end(); it != end; ++it )
 	{
 		delete it->first;
 		memFree(it->second);

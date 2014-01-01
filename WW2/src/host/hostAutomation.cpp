@@ -118,9 +118,8 @@ Fake::reset()
 void
 hostResetFakePositions()
 {
-	UINT32 i;
-	FAKES::iterator it;
-	for ( i = 0, it = _fakes.begin(); it != _fakes.end(); ++it, ++i )
+	UINT32 i = 0;
+	for ( auto it = _fakes.begin(), end = _fakes.end(); it != end; ++it, ++i )
 	{
 		it->reset();
 	}
@@ -186,8 +185,7 @@ hostRunFakeVehicles()
 	if ( _fakes.empty() )
 		_initializeFakeWeapons();
 
-	FAKES::iterator it;
-	for ( it = _fakes.begin(); it != _fakes.end(); ++it )
+	for ( auto it = _fakes.begin(), end = _fakes.end(); it != end; ++it )
 	{
 		(*it).update();
 	}

@@ -50,10 +50,10 @@ CPStruct::linkTo(const CPStruct* rhs) const
 
 	// Look through our facilities and find a link
 	LINKS::iterator it;
-	for ( it = m_links.begin(); it != m_links.end(); ++it )
+	for ( auto it = m_links.begin(), end = m_links.end(); it != end; ++it )
 	{
 		LinkStruct* outLink = *it;
-		if ( outLink == NULL || outLink->endDepot == NULL )
+		if ( PN_UNLIKELY(outLink == NULL || outLink->endDepot == NULL) )
 			continue;
 
 		if ( outLink->endDepot->cp == rhs )

@@ -219,8 +219,7 @@ HostVehicle::checkLocality(Teul::Packet& packet)
 	loc.m_riding = vehicleData.rideIndex;
 	loc.m_onAWS = false;
 
-	PLAYER_LIST::iterator it;
-	for ( it = m_impl->m_players.begin(); it != m_impl->m_players.end(); ++it )
+	for ( auto it = m_impl->m_players.begin(), end = m_impl->m_players.end(); it != end; ++it )
 	{
 		Player* player = *it;
 		if ( player->exitState != 0 )

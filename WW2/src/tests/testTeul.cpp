@@ -590,7 +590,7 @@ _usage(const char* const argv[], const bool listTests)
 	else
 	{
 		printf("\nTests:\n");
-		for ( TestItem::Index::iterator it = TestItem::s_index.begin(); it != TestItem::s_index.end(); ++it )
+		for ( auto it = TestItem::s_index.begin(), end = TestItem::s_index.end(); it != end; ++it )
 		{
 			const TestItem& test = *it->second;
 			printf("--test=%s\n\t%s\n", test.name(), test.description());
@@ -718,8 +718,7 @@ _processArguments(const int argc, const char* const argv[])
 
 	if ( explicitTests )
 	{
-		TestItem::Index::iterator it;
-		for ( it = TestItem::s_index.begin(); it != TestItem::s_index.end(); ++it )
+		for ( auto it = TestItem::s_index.begin(), end = TestItem::s_index.end(); it != end; ++it )
 		{
 			if ( !it->second->isExplicitlySet() )
 				it->second->setDisabled();
@@ -729,8 +728,7 @@ _processArguments(const int argc, const char* const argv[])
 	if ( Config::debugOutput )
 	{
 		Dprintf("Tests:\n");
-		TestItem::Index::iterator it;
-		for ( it = TestItem::s_index.begin(); it != TestItem::s_index.end(); ++it )
+		for ( auto it = TestItem::s_index.begin(), end = TestItem::s_index.end(); it != end; ++it )
 		{
 			Dprintf("%20s Enabled: %3s Explicit: %3s\n"
 						, it->second->name()

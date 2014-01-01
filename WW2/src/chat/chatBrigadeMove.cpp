@@ -45,8 +45,7 @@ _unitLocationsKeyframe(HC_UNIT_LOCATIONS& hculUpdate)
 
 	hculUpdate.clear();
 
-	HCUNIT_INDEX::iterator it;
-	for ( it = hcUnits.begin(); it != hcUnits.end(); ++it )
+	for ( auto it = hcUnits.begin(), end = hcUnits.end(); it != end; ++it )
 	{
 		HCUnit* unit = it->second;
 

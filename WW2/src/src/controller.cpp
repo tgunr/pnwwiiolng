@@ -159,7 +159,7 @@ static void _onRepeaterRead(struct bufferevent* bev_, void* arg_)
 		if ( n <= 0 || ebiov.iov_base == nullptr || ebiov.iov_len == 0 )
 			break;
 
-		for ( auto it = s_clients.begin(); it != s_clients.end(); ++it )
+		for ( auto it = s_clients.begin(), end = s_clients.end(); it != end; ++it )
 		{
 			auto destSock = it->first;
 			if ( destSock == srcSock )

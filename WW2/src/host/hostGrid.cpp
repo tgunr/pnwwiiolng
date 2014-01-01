@@ -528,7 +528,7 @@ _checkForNewVisListCandidates(HostVehicle& myVehicle)
 	auto neighborhood = myVehicle.m_cell->neighbors();
 	bool additions = false;
 	TIMER_START
-	for ( auto it = neighborhood.begin(); it != neighborhood.end(); ++it )
+		for (auto it = neighborhood.begin(), end = neighborhood.end(); it != end; ++it)
 	{
 		const bool additionsThisCell = _addCellNodesToVisList(myVehicle, (*it)->vehicles(), carriers);
 		additions |= additionsThisCell;

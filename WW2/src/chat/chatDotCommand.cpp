@@ -209,7 +209,7 @@ DotCommand::isHidden() const
 	if ( m_public == false && m_groups.empty() )
 		return true;
 
-	for ( auto it = m_usages.begin(); it != m_usages.end(); ++it )
+	for ( auto it = m_usages.begin(), end = m_usages.end(); it != end; ++it )
 	{
 		if ( (*it)->isHidden() == false )
 			return false;
@@ -244,12 +244,12 @@ DotCommand::allow(Player& player) const
 			return NULL;
 
 		// See if the player is in at least one of the required groups
-		CHAT_GROUPS::iterator cmdIt, cliIt;
+		CHAT_GROUPS::iterator clgIt, clgEnd = clGroups.end();
 		bool isIn = false;
-		for ( cmdIt = m_groups.begin(); isIn == false && cmdIt != m_groups.end(); ++cmdIt )
+		for (auto cmdIt = m_groups.begin(), end = m_groups.end(); isIn == false && cmdIt != end; ++cmdIt)
 		{
-			cliIt = clGroups.find(*cmdIt);
-			if ( cliIt != clGroups.end() )
+			clgIt = clGroups.find(*cmdIt);
+			if ( clgIt != clgEnd )
 				isIn = true;
 		}
 
@@ -348,11 +348,10 @@ DotCommandIndex::lookup(const std::string& target, bool cleanMatchOnly) const
 
 	DotCommand* last = NULL;
 	int matches = 0;
-	std::vector<DotCommand*>::const_iterator i;
 
-	for (i = begin(); i != end(); ++i)
+	for ( auto it = begin(), endIt = end(); it != endIt; ++it )
 	{
-		DotCommand* cur = *i;
+		DotCommand* cur = *it;
 
 		// If what we typed is longer than the current command, it can't match
 		if ( target.length() > cur->m_command.length() )
@@ -500,7 +499,7 @@ DotCommandIndex::readPermissions()
 	// Reset all commands to Playnet availability and no groups
 	// since deletions from the permissions data are not explicit
 	dbugLog(_FLI, "Flushing old permissions [setting all chat commands to CRS only]");
-	for ( auto it = begin(); it != end(); ++it )
+	for ( auto it = begin(), endIt = end(); it != endIt; ++it )
 	{
 		DotCommand* dc = *it;
 		dc->setAvailability('C');
@@ -594,7 +593,7 @@ DotCommandIndex::buildCommandListPacket()
 	g_commandListPacket->append((Chat::cmdcount_t)0);
 
 	// Rebuild the command packet.
-	for ( auto it = begin(); it != end(); ++it )
+	for ( auto it = begin(), endIt = end(); it != endIt; ++it )
 	{
 		const DotCommand* const dc = (*it);
 		// Skip commands that are intended to be hidden.
@@ -627,7 +626,7 @@ DotCommandIndex::broadcastCommandListPacket()
 
 	// Send to all players.
 	std::vector<ENDPOINT*> endpoints;
-	for ( auto it = playerIndex.begin(); it != playerIndex.end(); ++it )
+	for ( auto it = playerIndex.begin(), end = playerIndex.end(); it != end; ++it )
 	{
 		const Player* const player = it->second;
 		if ( player->teulIndex() >= 0 )

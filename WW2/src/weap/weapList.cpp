@@ -394,10 +394,9 @@ weapListInit(const char* theaterPath)
 void weapListKill(void)
 {
 	// Delete all the WEAPON's we allocated
-	WEAPON_LIST::iterator it;
-	for ( it = g_weaponList.begin(); it != g_weaponList.end(); ++it )
+	for ( auto it = g_weaponList.begin(), end = g_weaponList.end(); it != end; ++it )
 	{
-		if ( it->second != NULL )
+		if ( it->second != nullptr )
 			delete it->second;
 	}
 	g_weaponList.clear();

@@ -31,7 +31,7 @@ FacilityStruct::~FacilityStruct()
 	if ( m_joinList )
 	{
 		delete m_joinList;
-		m_joinList = NULL;
+		m_joinList = nullptr;
 	}
 
 	for ( it = m_weaponEntries.begin(); it != m_weaponEntries.end(); ++it )
@@ -39,7 +39,7 @@ FacilityStruct::~FacilityStruct()
 		if ( it->second )
 		{
 			delete it->second;
-			it->second = NULL;
+			it->second = nullptr;
 		}
 	}
 }
@@ -87,7 +87,7 @@ FacilityStruct::getSupplyingUnit(const HCUnit* brigade, const CPStruct* brigadeH
 	if ( type == FACILITY_DEPOT && brigade->movementType() == BRANCH_LAND )
 	{
 		const FacilityStruct* supplyFac = supplyingFacility(*brigade, false, true);
-		if ( supplyFac == NULL )
+		if ( supplyFac == nullptr )
 			return 0;
 		if ( supplyFac->cp == brigadeHomeCP )
 			return brigade->unitID();
@@ -170,35 +170,35 @@ FacilityStruct::supplyingFacility(const HCUnit& forUnit, bool ignoreDepot, bool 
 	case FACILITY_ARMYBASE:
 	case FACILITY_NAVALBASE:
 	case FACILITY_AIRBASE:
-		assert( armyBase != NULL );
+		assert( armyBase != nullptr );
 
 		if ( armyBase->canABSupply(forUnit.side()) == false )
-			return NULL;
+			return nullptr;
 
 		// Is the unit here?
 		if ( forUnit.homeCPID() != cp->fullObjID )
-			return NULL;
+			return nullptr;
 
 		return armyBase;
 	break;
 
 	case FACILITY_FIREBASE:
-		assert( armyBase != NULL );
+		assert( armyBase != nullptr );
 
 		if ( isOpen() == false )
-			return NULL;
+			return nullptr;
 
 		if ( side != forUnit.side() )
-			return NULL;
+			return nullptr;
 
 		return armyBase->supplyingFacility(forUnit, false);
 	break;
 
 	case FACILITY_DEPOT:
-		assert( armyBase != NULL );
+		assert( armyBase != nullptr );
 
 		if ( !ignoreDepot && (side != forUnit.side() || isOpen() == false) )
-			return NULL;
+			return nullptr;
 
 		// Check local ABs if we own and control this town.
 		if ( cp->side == forUnit.side() && cp->controllingSide == forUnit.side() )
@@ -212,27 +212,27 @@ FacilityStruct::supplyingFacility(const HCUnit& forUnit, bool ignoreDepot, bool 
 
 		// Don't follow links if we have units here.
 		if ( followLinks == false )
-			return NULL;
+			return nullptr;
 
 		//// I haven't found an armybase here, so I need to follow the link
 		//// that this depot sits on to see if I am connected to the
 		//// location of my brigade/division.
 
 		// Do we have links?
-		if ( m_incomingLink == NULL )
-			return NULL;
+		if ( m_incomingLink == nullptr )
+			return nullptr;
 
 		if ( m_incomingLink->hasEnemyFirebase(forUnit.side()) )
-			return NULL;
+			return nullptr;
 
 		if ( forUnit.homeCPID() != m_incomingLink->startDepot->cp->fullObjID )
-			return NULL;
+			return nullptr;
 
 		return m_incomingLink->startDepot->supplyingFacility(forUnit, false, false);
 	break;
 
 	default:
-		return NULL;
+		return nullptr;
 	break;
 	}
 }
@@ -244,7 +244,7 @@ FacilityStruct::supplyingFacility(const HCUnit& forUnit, bool ignoreDepot, bool 
 bool
 FacilityStruct::canABSupply(WWII_SIDE forSide) const
 {
-	return ( this != NULL && isOpen() == true && side == forSide && cp->side == forSide );
+	return ( this != nullptr && isOpen() == true && side == forSide && cp->side == forSide );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -377,7 +377,7 @@ WeaponEntry*
 FacilityStruct::weaponEntry(const WEAPON_SPEC& weapon) const
 {
 	WEAPON_ENTRIES::const_iterator it = m_weaponEntries.find(weapon);
-	return ( it != m_weaponEntries.end() ) ? (it->second) : NULL;
+	return ( it != m_weaponEntries.end() ) ? (it->second) : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -391,7 +391,7 @@ FacilityStruct::addWeaponSpawner(const WEAPON& weapon, const ObjectStruct& objec
 {
 	// Do we need to create a weapon entry for this
 	WeaponEntry* entry = weaponEntry(weapon.spec());
-	if ( entry != NULL )
+	if ( entry != nullptr )
 		entry->addSpawner(object);
 	else
 	{

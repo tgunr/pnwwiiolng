@@ -121,7 +121,7 @@ public:	TestPackers() : TestUnit("TestPackers") {}
 			a.packed  = (UCHAR*)alloca(MaxBits / 8);
 
 			size_t testNo = 1;
-			for ( auto it = tests.begin(); it != tests.end(); ++it, ++testNo )
+			for ( auto it = tests.begin(), end = tests.end(); it != end; ++it, ++testNo )
 			{
 				for ( SINT32 i = 0; i <= 64; ++i )
 				{

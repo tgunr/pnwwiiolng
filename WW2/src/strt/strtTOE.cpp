@@ -137,7 +137,7 @@ TOE_::TemplateHeader::updateWeapon(const WEAPON_SPEC& spec, UINT16 capacity, UCH
 		UINT32 increase = capacity - oldCapacity;
 		SUBSCRIBERS::iterator sit;
 
-		for ( sit = m_subscribers.begin(); sit != m_subscribers.end(); ++sit )
+		for ( auto sit = m_subscribers.begin(), end = m_subscribers.end(); sit != end; ++sit )
 		{
 			StratHCUnit* unit = *sit;
 			assert( unit != NULL );
@@ -165,8 +165,7 @@ TOE_::TemplateHeader::subscribe(StratHCUnit* unit, TOE& toe)
 	m_subscribers.insert(unit);
 
 	// Ensure that the HCUnit has all of the weapons in this template
-	TOE_WEAPONS::const_iterator it;
-	for ( it = m_weapons.begin(); it != m_weapons.end(); ++it )
+	for ( auto it = m_weapons.begin(), end = m_weapons.end(); it != end; ++it )
 	{
 		unit->addTOEInstance(it->second);
 	}
@@ -328,8 +327,7 @@ strtSaveTOESupplies()
 	char buffer[TEXT_POOL_SIZE+1];
 
 	UINT32 len = 0;
-	TOE_SAVE_LIST::iterator it;
-	for ( it = toeSaveList.begin(); it != toeSaveList.end(); ++it )
+	for (auto it = toeSaveList.begin(), end = toeSaveList.end(); it != end; ++it)
 	{
 		TOE_::WeaponInstance& entry = *it->first;
 

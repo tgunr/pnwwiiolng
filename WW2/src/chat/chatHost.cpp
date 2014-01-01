@@ -283,7 +283,7 @@ IRCPlayer::describeTo(const Player& player, const FLOAT64& /*x*/, const FLOAT64&
 	if ( m_channels.size() > 1 )
 		response += "s";
 
-	for ( std::set<std::string>::const_iterator it = m_channels.begin(); it != m_channels.end(); ++it )
+	for ( auto it = m_channels.begin(), end = m_channels.end(); it != end; ++it )
 	{
 		response += " ";
 		response += *it;
@@ -406,7 +406,7 @@ HCUnitBroadcast::operator()(wwiiPlayer* const& wwiiPlayer) const
 }
 
 //////////////////////////////////////////////////////////////////////
-// Populate _currentUnits with a specified unit and all of its descendents
+// Populate _currentUnits with a specified unit and all of its descendants
 
 void
 HCUnitBroadcast::buildUnitList(const HCUnit* unit)
@@ -414,7 +414,7 @@ HCUnitBroadcast::buildUnitList(const HCUnit* unit)
 	_currentUnits.clear();
 	_currentUnits.push_back(unit->unitID());
 	HCUNIT_INDEX::iterator it;
-	for ( it = hcUnits.begin(); it != hcUnits.end(); ++it )
+	for ( auto it = hcUnits.begin(), end = hcUnits.end(); it != end; ++it )
 	{
 		if ( it->second->isBelow(unit) )
 			_currentUnits.push_back(it->second->unitID());
@@ -746,7 +746,7 @@ chatRouteGCIMessage(Chat::GCIMessage& message, UINT32 messageID)
 	std::vector<ENDPOINT*> endpoints;
 	endpoints.reserve(playerIndex.size());
 
-	for ( auto it = playerIndex.begin(); it != playerIndex.end(); ++it )
+	for ( auto it = playerIndex.begin(), end = playerIndex.end(); it != end; ++it )
 	{
 		Player* const player = it->second;
 		if ( player->approveGCIMessage(messageID, message, true) )

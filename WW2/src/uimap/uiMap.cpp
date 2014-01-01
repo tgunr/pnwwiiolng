@@ -1428,9 +1428,8 @@ void uiMapProcessPlayerEventToMap(const char* mapname, ChatHandle handle, MAP_PL
 	}
 
 	SuperCellMapView::RendererList list = map->RenderList();
-	SuperCellMapView::RendererList::iterator it = list.begin();
 
-	for(; it != list.end(); ++it)
+	for(auto it = list.begin(), end = list.end(); it != end; ++it)
 	{
 		PlayerLayer* pl = dynamic_cast<PlayerLayer*>(it->ptr());
 
@@ -1439,9 +1438,8 @@ void uiMapProcessPlayerEventToMap(const char* mapname, ChatHandle handle, MAP_PL
 //		SuperCellMapView::MapObjectList* objects = pl->MapObjects();
 
 		PlayerLayer::VehicleMap& vehicles = pl->_vehicles;
-		PlayerLayer::VehicleMap::iterator vit = vehicles.begin();
 
-		for(; vit != vehicles.end(); vit++)
+		for(auto vit = vehicles.begin(), vend = vehicles.end(); vit != vend; vit++)
 		{
 			if(vit->second.ptr()->_handle == handle)
 			{

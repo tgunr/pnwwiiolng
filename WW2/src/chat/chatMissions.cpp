@@ -113,7 +113,7 @@ chatShareWaypoint(Waypoint& waypoint, ChatMission* const mission, WWII_SIDE side
 	if ( mission->addWaypoint(waypoint) )
 		++missions;
 
-	for ( auto it = g_missions.begin(); it != g_missions.end(); ++it )
+	for ( auto it = g_missions.begin(), end = g_missions.end(); it != end; ++it )
 	{
 		ChatMission& target = *(it->second);
 		if ( side != target.m_side || target.targetCP() != mission->targetCP() )
@@ -342,7 +342,7 @@ _sendWaypoints(const ChatMission::WAYPOINTS& wp, Player* player)
 	WAYPOINT_XFER_ARRAY array(0, 0, Teul::TCPStdPayload);
 	ChatMission::WAYPOINTS::const_iterator it;
 
-	for ( it = wp.begin(); it != wp.end(); ++it )
+	for ( auto it = wp.begin(), end = wp.end(); it != end; ++it )
 	{
 		array.add(it->second);
 	}
@@ -656,7 +656,7 @@ void
 ChatMission::expireWaypoints()
 {
 	const UINT32 cutoff = (UINT32) teulTime() - CONTACT_REPORT_LIFETIME_S;
-	for (auto it = m_waypoints.begin(), end = m_waypoints.end(); it != end; ++it )
+	for ( auto it = m_waypoints.begin(), end = m_waypoints.end(); it != end; ++it )
 	{
 		Waypoint& wp = it->second;
 		if ( wp.type() == WPT_ENEMY && wp.posted() <= cutoff )
@@ -1178,7 +1178,7 @@ ChatMission::removeMSPWaypoint(UINT32, bool byPlayer)
 static void
 _sendPendingStatuses(void*)
 {
-	for ( auto it = g_statuses.begin(); it != g_statuses.end(); ++it )
+	for ( auto it = g_statuses.begin(), end = g_statuses.end(); it != end; ++it )
 	{
 		ChatMission* const mission = chatFindMission(*it);
 		if ( mission )

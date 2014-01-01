@@ -107,8 +107,7 @@ ServerSync::sync()
 SYNC_LIST::iterator
 _findServerSync(UINT32 address)
 {
-	SYNC_LIST::iterator it;
-	for ( it = synclist.begin(); it != synclist.end(); ++it )
+	for ( auto it = synclist.begin(), end = synclist.end(); it != end; ++it )
 	{
 		if ( it->address() == address )
 		{

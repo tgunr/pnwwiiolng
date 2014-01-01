@@ -64,9 +64,9 @@ public:
 	}
 	~AuthQueueUnit()
 	{
-		for ( std::vector<Auth::ClientData*>::iterator it = m_cdatas.begin(); it != m_cdatas.end(); ++it )
+		for ( auto it = m_cdatas.begin(), end = m_cdatas.end(); it != end; ++it )
 		{
-			delete* it;
+			delete *it;
 		}
 	}
 
@@ -84,10 +84,10 @@ protected:
 	template<typename _Container> bool QueueEmpty(const _Container& queue) const { return IsContainerEmpty(queue.m_queue); }
 	size_t NumEntriesForPlayer(QueueHeader& queue, Auth::ClientData* player) const
 	{
-		if ( queue.m_queue.empty() ) return 0;
+		if ( queue.m_queue.empty() )
+			return 0;
 		size_t instances = 0;
-		PlayerQueue::iterator it;
-		for ( it = queue.m_queue.begin(); it != queue.m_queue.	end(); ++it )
+		for ( auto it = queue.m_queue.begin(), end = queue.m_queue.end(); it != end; ++it )
 		{
 			if ( *it == player )
 				++instances;

@@ -300,7 +300,6 @@ _timeToNextOpening(WWII_SIDE side)
 	if ( _histQueue.empty() )
 		return 0;
 
-	DECISION_QUEUE::iterator it;
 	UINT32 cutoff = teulTime() - (host_config.objective.holdFallWindow_m * 60);
 	UINT32 timeLeft = 0;
 	UINT32 count = 0;
@@ -308,7 +307,7 @@ _timeToNextOpening(WWII_SIDE side)
 	// Purge any pending events
 	_drainDecisions(_sideNameAdj[side], _histQueue, teulTime(), host_config.objective.holdFallWindow_m);
 
-	for ( it = _histQueue.begin(); it != _histQueue.end(); ++it )
+	for ( auto it = _histQueue.begin(), end = _histQueue.end(); it != end; ++it )
 	{
 		if ( (*it)->m_side == side )
 		{
@@ -726,8 +725,7 @@ _lookupDecision(const char* id, Player* player)
 	}
 
 	StratDecision* decision = NULL;
-	DECISION_QUEUE::iterator it;
-	for ( it = _pendQueue.begin(); it != _pendQueue.end(); ++it )
+	for ( auto it = _pendQueue.begin(), end = _pendQueue.end(); it != end; ++it )
 	{
 		if ( player->side() == (*it)->m_side && strcasecmp((*it)->m_property->Name(), id) == 0 )
 		{
@@ -1005,9 +1003,8 @@ chatCheckDecisionQueues()
 
 		// Find a player from the voters to hold accountable
 		VOTES& voters = decision->m_voters;
-		VOTES::iterator voter;
 		Player* player = NULL;
-		for ( voter = voters.begin(); voter != voters.end(); ++voter )
+		for ( auto voter = voters.begin(), end = voters.end(); voter != end; ++voter )
 		{
 			player = PlayerInterface::Lookup(*voter);
 			if ( player != NULL )

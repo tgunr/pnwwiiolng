@@ -462,7 +462,7 @@ STO_JOULES::receive(SINT32 teulIndex, STO_JOULES& incoming)
 
 	dbugLog(_FLD, "t:%d p:%u c:%s %" PRSizeT " sto joules messages ", teulIndex, player->playerID(), player->callsign(), incoming.data().size());
 
-	for ( auto it = incoming.data().begin(); it != incoming.data().end(); ++it )
+	for ( auto it = incoming.data().begin(), end = incoming.data().end(); it != end; ++it )
 	{
 		dbugLog(_FLD, "t:%d p:%u c:%s sto:%u damage:%lld", teulIndex, player->playerID(), player->callsign(), it->m_uid, it->m_joules);
 		ServerTrackedObject* const sto = ServerTrackedObject::lookup(it->m_uid);

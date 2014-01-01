@@ -420,7 +420,7 @@ void
 mapUpdateBrigadesWithMissionsAt(const CPStruct* cp)
 {
 	ACTIVE_BRIGADES::const_iterator it;
-	for ( it = cp->m_brigades.begin(); it != cp->m_brigades.end(); ++it )
+	for ( auto it = cp->m_brigades.begin(), end = cp->m_brigades.end(); it != end; ++it )
 	{
 		it->first->updateDestinations();
 	}

@@ -72,9 +72,9 @@ static std::set<std::string> ReferencedFiles;
 void dumpFileRefs()
 {
 	printf("\n\n");
-	for ( std::set<std::string>::iterator it = ReferencedFiles.begin(); it!= ReferencedFiles.end(); it++)
+	for ( auto it = ReferencedFiles.begin(), end = ReferencedFiles.end(); it != end; ++it)
 	{
-		printf("%s\n",it->c_str());
+		printf("%s\n", it->c_str());
 	}
 }
 

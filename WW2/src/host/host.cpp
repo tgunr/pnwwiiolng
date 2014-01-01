@@ -894,24 +894,19 @@ _killOccupants(const instanceid_t& instanceID, OCCUPANTS& occupants, UINT32 bySo
 	std::vector<SINT32> indexes(occupants.size());
 	indexes.clear();
 
-	for ( OCCUPANTS::iterator it = occupants.begin(); it != occupants.end(); ++it )
+	for ( auto it = occupants.begin(), end = occupants.end(); it != end; ++it )
 	{
 		HostVehicle* const veh = *it;
 		if ( veh->state == VEH_DEAD || (veh->vehicleData.globalFlags & VEHG_KILLED) != 0 )
 			continue;
-		if ( veh->isActive() == false )
-			continue;
-		if ( veh->players().empty() )
-			continue;
-		if ( veh->instance().id() != instanceID )
+		if ( PN_UNLIKELY(veh->isActive() == false ||veh->players().empty() || veh->instance().id() != instanceID) )
 			continue;
 		if ( veh->killedBySortieID() != 0 )
 			continue;
 		if ( ! veh->setVehicleKilled(bySortieID) )
 			continue;
 
-		PLAYER_LIST::iterator pit;
-		for ( pit = veh->players().begin(); pit != veh->players().end(); ++pit )
+		for ( auto pit = veh->players().begin(), pend = veh->players().end(); pit != pend; ++pit )
 		{
 			const SINT32 teulIndex = (*pit)->teulIndex();
 			if ( teulIndex >= 0 )
@@ -932,7 +927,7 @@ _killOccupants(const instanceid_t& instanceID, OCCUPANTS& occupants, UINT32 bySo
 #ifdef BETA_RELEASE
 	char message[2000];
 	char* p = message;
-	for ( std::vector<SINT32>::iterator it = indexes.begin(); it != indexes.end(); ++it )
+	for ( auto it = indexes.begin(), end = indexes.end(); it != end; ++it )
 	{
 		p += sprintf(p, "%d ", *it);
 	}
@@ -965,21 +960,19 @@ void
 hostGiveCaptureScoreToPlayers(const FULL_OBJ_ID& buildingID, WWII_SIDE forSide)
 {
 	OCCUPANCY_MAP::iterator it = occupancyMap.find(buildingID.Key());
-	if ( it == occupancyMap.end() )
-	{
+	if ( PN_UNLIKELY(it == occupancyMap.end()) )
 		return;
-	}
 
 	Scoring::Packet<Scoring::Capture> packet;
 
-	for ( auto inIt = it->second.occupants.begin(); inIt != it->second.occupants.end(); ++inIt )
+	for ( auto inIt = it->second.occupants.begin(), inEnd = it->second.occupants.end(); inIt != inEnd; ++inIt )
 	{
 		HostVehicle* const veh = *inIt;
 		if ( veh->state == VEH_DEAD || veh->isActive() == false || veh->players().empty() )
 			continue;
 		if ( veh->instance().isCampaign() == false )
 			continue;
-		for ( auto pit = veh->players().begin(); pit != veh->players().end(); ++pit )
+		for ( auto pit = veh->players().begin(), pend = veh->players().end(); pit != pend; ++pit )
 		{
 			Player* const player = *pit;
 			if ( player->active == false || player->exitState == PEXIT_DEAD || player->teulIndex() < 0 || player->vehicle == nullptr )
@@ -1759,7 +1752,7 @@ _writeEventCounters()
 
 		EVENT_COUNTER::iterator it;
 		bool started = false;
-		for ( it = g_eventCounter.begin(); it != g_eventCounter.end(); ++it )
+		for ( auto it = g_eventCounter.begin(), end = g_eventCounter.end(); it != end; ++it )
 		{
 			p += sprintf(p, "%c(%u,'%s',%llu)", (started) ? ',':' ', host, it->first.c_str(), it->second);
 			started = true;
@@ -1784,7 +1777,7 @@ HostVehicle::hasConnectedPlayers() const
 	if ( PN_UNLIKELY(players().empty() || crew <= 0) )
 		return false;
 
-	for ( auto it = players().begin(); it != players().end(); ++it )
+	for ( auto it = players().begin(), end = players().end(); it != end; ++it )
 	{
 		if ( PN_LIKELY((*it)->teulIndex() >= 0) )
 			return true;

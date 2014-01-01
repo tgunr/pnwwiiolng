@@ -229,7 +229,7 @@ strtBuildCPColliders()
 
 	CP_MAP::const_iterator it;
 	UINT32 cells = 0, entries = 0, overlaps = 0;
-	for ( it = _cpMap.begin(); it != _cpMap.end(); ++it )
+	for ( auto it = _cpMap.begin(), end = _cpMap.end(); it != end; ++it )
 	{
 		++cells;
 		entries += it->second.size();

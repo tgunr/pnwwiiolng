@@ -205,7 +205,7 @@ HostInstance::getSquadMemberCount(UINT32 squadID) const
 		return 0;
 
 	UINT32 members = 0;
-	for ( PLAYERS::const_iterator it = m_players.begin(); it != m_players.end(); ++it )
+	for ( auto it = m_players.begin(), end = m_players.end(); it != end; ++it )
 	{
 		if ( (*it)->inSquad(squadID) )
 			++members;

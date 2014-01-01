@@ -135,7 +135,7 @@ chatFindChannel(const ChannelID& id)
 void
 chatDeleteUnusedChannels()
 {
-	for ( auto it = _tentativeChannels.begin(); it != _tentativeChannels.end(); ++it )
+	for ( auto it = _tentativeChannels.begin(), end = _tentativeChannels.end(); it != end; ++it )
 	{
 		Chat::Channel* const channel = it->second;
 		if ( channel == NULL )

@@ -161,7 +161,7 @@ TestUnit::RunTests()
 
     UINT32 testsPassed = 0;
     UINT32 testsFailed = 0;
-    for ( TestIndex::iterator it = tests().begin(); it != tests().end(); ++it )
+    for ( auto it = tests().begin(), end = tests().end(); it != end; ++it )
     {
         TestUnit* unit = (*it);
         try

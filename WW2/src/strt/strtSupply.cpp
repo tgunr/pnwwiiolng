@@ -1,8 +1,7 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Created: Fri 29 Aug 11:30:00 2003
 //
-// Funcitons dealing with supply
+// Functions dealing with supply
 //
 // Copyright (c) 2000 Playnet, Inc., All Rights Reserved.
 // Not to be distributed in API form except as part of a
@@ -68,13 +67,13 @@ struct ResupplyTicketStore
 
 	void free(ResupplyTicket* ticket)
 	{
-		if ( ticket->m_postedWeapon != NULL )
+		if ( ticket->m_postedWeapon != nullptr )
 		{
-			assert( ticket->m_postedWeapon->m_resupplyTicket == NULL || ticket->m_postedWeapon->m_resupplyTicket == ticket );
-			ticket->m_postedWeapon->m_resupplyTicket = NULL;
+			assert( ticket->m_postedWeapon->m_resupplyTicket == nullptr || ticket->m_postedWeapon->m_resupplyTicket == ticket );
+			ticket->m_postedWeapon->m_resupplyTicket = nullptr;
 		}
 		memset(ticket, 0, sizeof(*ticket));
-		assert( ticket->m_postedWeapon == NULL );
+		assert( ticket->m_postedWeapon == nullptr );
 		m_freeTickets.push(ticket);
 	}
 
@@ -136,7 +135,7 @@ strtGetSupplyingUnit(const FacilityStruct& facility, UINT32 brigadeID)
 		return 0;
 
 	const StratHCUnit* brigade = StratHCUnit::Lookup(brigadeID);
-	if ( brigade == NULL || !brigade->isBrigade() )
+	if ( brigade == nullptr || !brigade->isBrigade() )
 	{
 		dbugLog(_FLA, "hcu:%u is not a brigade", brigadeID);
 		return 0;
@@ -166,7 +165,7 @@ StratHCUnit::cancelResupplyTicket(ResupplyTicket* ticket)
 	docket.remove(ticket);
 
 	TOE_::WeaponInstance* entry = toeWeaponInstance(ticket->m_spec);
-	if ( entry != NULL )
+	if ( entry != nullptr )
 		entry->adjustResupply(-ticket->m_units, ticket->m_isTransfer);
 
 	if ( ticket->m_isTransfer )
@@ -179,7 +178,7 @@ StratHCUnit::cancelResupplyTicket(ResupplyTicket* ticket)
 
 //////////////////////////////////////////////////////////////////////
 // Create a resupply ticket to deliver some vehicles
-// postedWeapon is NULL for non-posted vehicles
+// postedWeapon is nullptr for non-posted vehicles
 // Set isTransfer to 'true' if you want the units to ship regardless
 // of the bde's homeCP().isSupplied status.
 
@@ -188,14 +187,14 @@ StratHCUnit::createResupplyTicket(
 	TOE_::WeaponInstance& entry
 	, bool isTransfer				// Ship regardless of supplied status
 	, UINT32 seconds, UINT16 units
-	, POSTED_WEAPON* postedWeapon /* = NULL */
+	, POSTED_WEAPON* postedWeapon /* = nullptr */
 	)
 {
 	SINT32 spareCapacity = (SINT32) entry.capacity() - (SINT32)(entry.present() + entry.resupply());
 	if ( isTransfer == false )
 	{
 		if ( spareCapacity < 1 )
-			return NULL;
+			return nullptr;
 
 		if ( units > spareCapacity )
 			units = (UINT16) spareCapacity;
@@ -210,11 +209,11 @@ StratHCUnit::createResupplyTicket(
 	if ( entry.weapon().isSupplied() == false || host_config.supply.enabled == false )
 	{
 		entry.setPresent(entry.capacity());
-		return NULL;
+		return nullptr;
 	}
 
 	if ( offMap() == true )
-		return NULL;
+		return nullptr;
 
 	if ( seconds == 0 && isTransfer == false )
 	{
@@ -223,7 +222,7 @@ StratHCUnit::createResupplyTicket(
 			betaLog(_FLD, "hcu:%u(%s) weap:%s immediate delivery", unitID(), callsign(), weapPrintName(&entry.spec()));
 			entry.setPresent(entry.present() + units);
 		}
-		return NULL;
+		return nullptr;
 	}
 
 	ResupplyTicket* ticket = _resupplyTicketStore.get();
@@ -399,7 +398,7 @@ StratHCUnit::processResupply()
 		dbugLog(_FLI, "hcu:%u(%s) @ %s: Out of supply, flushing resupply queue"
 						, unitID()
 						, callsign()
-						, ((homeCP() == NULL || homeCP() == routDestination[country()]) ? "offmap" : homeCP()->name)
+						, ((homeCP() == nullptr || homeCP() == routDestination[country()]) ? "offmap" : homeCP()->name)
 						);
 
 		// Flush the resupply queue and reset the capacities
@@ -481,10 +480,10 @@ StratHCUnit::processResupply()
 	for ( order = transfers.begin(); order != transfers.end(); ++order )
 	{
 		TOE_::WeaponInstance* entry = toeWeaponInstance(order->first);
-		if ( entry != NULL )
+		if ( entry != nullptr )
 		{
 			entry->adjustResupply(-(SINT32)(order->second), true);
-			depositWeapons(order->first, order->second, true, NULL);
+			depositWeapons(order->first, order->second, true, nullptr);
 		}
 	}
 
@@ -492,10 +491,10 @@ StratHCUnit::processResupply()
 	for ( order = supplies.begin(); order != supplies.end(); ++order )
 	{
 		TOE_::WeaponInstance* entry = toeWeaponInstance(order->first);
-		if ( entry != NULL )
+		if ( entry != nullptr )
 		{
 			entry->adjustResupply(-(SINT32)(order->second), false);
-			depositWeapons(order->first, order->second, false, NULL);
+			depositWeapons(order->first, order->second, false, nullptr);
 		}
 	}
 
@@ -515,8 +514,7 @@ StratHCUnit::purgeResupply(bool zeroSupply)
 		dbugLog(_FLI, "hcu:%u(%s) purging entire supply list", unitID(), callsign());
 	else
 		dbugLog(_FLI, "hcu:%u(%s) purging resupply list", unitID(), callsign());
-	TOE::iterator it;
-	for ( it = m_toe.begin(); it != m_toe.end(); ++it )
+	for ( auto it = m_toe.begin(), end = m_toe.end(); it != end; ++it )
 	{
 		it->second.adjustResupply(- it->second.resupply(), true);
 		if ( zeroSupply )
@@ -528,13 +526,11 @@ StratHCUnit::purgeResupply(bool zeroSupply)
 						, it->second.transfers(), it->second.resupply());
 	}
 
-	RESUPPLY_QUEUE::iterator rit;
-	for ( rit = m_impl.m_resupplyQueue.begin(); rit != m_impl.m_resupplyQueue.end(); ++rit )
+	for ( auto it = m_impl.m_resupplyQueue.begin(), end = m_impl.m_resupplyQueue.begin(); it != end; ++it )
 	{
 		// Summarize the tickets into a manifest
-		RESUPPLY_DOCKET& docket = rit->second;
-		RESUPPLY_DOCKET::iterator dit;
-		for ( dit = docket.begin(); dit != docket.end(); ++dit )
+		RESUPPLY_DOCKET& docket = it->second;
+		for ( auto dit = docket.begin(), end = docket.end(); dit != end; ++dit )
 		{
 			_resupplyTicketStore.free(*dit);
 		}
@@ -583,8 +579,7 @@ StratHCUnit::deliverTransfers()
 	}
 
 	RESUPPLY_MANIFEST returns;
-	TRANSFERS::iterator it = m_impl.m_transfers.begin();
-	while ( it != m_impl.m_transfers.end() )
+	for ( auto it = m_impl.m_transfers.begin(); it != m_impl.m_transfers.end(); )
 	{
 		ResupplyTicket* ticket = *it;
 		++it;
@@ -593,10 +588,9 @@ StratHCUnit::deliverTransfers()
 		cancelResupplyTicket(ticket);
 	}
 
-	RESUPPLY_MANIFEST::iterator mit;
-	for ( mit = returns.begin(); mit != returns.end(); ++mit )
+	for ( auto it = returns.begin(), end = returns.end(); it != end; ++it )
 	{
-		depositWeapons(mit->first, mit->second, true, NULL);
+		depositWeapons(it->first, it->second, true, nullptr);
 	}
 }
 
@@ -607,8 +601,7 @@ void
 StratHCUnit::resetSupply()
 {
 	purgeResupply(false);
-	TOE::iterator it;
-	for ( it = m_toe.begin(); it != m_toe.end(); ++it )
+	for ( auto it = m_toe.begin(), end = m_toe.end(); it != end; ++it )
 	{
 		TOE_::WeaponInstance& entry = it->second;
 
@@ -672,8 +665,7 @@ StratHCUnit::restartSupply(UINT32 delay, UINT32 window, bool isTransfer)
 
 	// Go through all of our weapon entries and tell them to restart
 	// their resupply tickets.
-	TOE::iterator it;
-	for ( it = m_toe.begin(); it != m_toe.end(); ++it )
+	for ( auto it = m_toe.begin(), end = m_toe.end(); it != end; ++it )
 	{
 		TOE_::WeaponInstance& entry = it->second;
 		if ( entry.capacity() == 0 )
@@ -683,7 +675,7 @@ StratHCUnit::restartSupply(UINT32 delay, UINT32 window, bool isTransfer)
 		SINT32 absent;
 		if ( isTransfer )
 		{
-			// We are transfering vehicles from A->B, take all present units
+			// We are transferring vehicles from A->B, take all present units
 			absent = entry.present();
 			entry.setPresent(0);
 			betaLog(_FLI, "hcu:%u(%s) is transfer: %s absent = %u/%u", unitID(), callsign(), weapPrintName(&entry.spec()), absent, entry.capacity());
@@ -743,7 +735,7 @@ StratHCUnit::restartSupply(UINT32 delay, UINT32 window, bool isTransfer)
 static void
 _checkResupplyStatus(bool fullCheck)
 {
-	for ( HCUNIT_INDEX::iterator it = hcUnits.begin(); it != hcUnits.end(); ++it )
+	for ( auto it = hcUnits.begin(), end = hcUnits.end(); it != end; ++it )
 	{
 		if ( it->second->isBrigade() == false && it->second->isDivision() == false )
 			continue;
@@ -781,8 +773,8 @@ StratHCUnit::CheckResupplyStatus(bool fullCheck)
 	static std::string text = "";
 	text.clear();
 
-	TOE::const_iterator it;
-	for ( it = m_toe.begin(); it != m_toe.end(); ++it )
+	char buffer[128];
+	for (auto it = m_toe.begin(), end = m_toe.end(); it != end; ++it)
 	{
 		const TOE_::WeaponInstance& entry = it->second;
 		if ( entry.weapon().isSystemWeapon() )
@@ -796,13 +788,9 @@ StratHCUnit::CheckResupplyStatus(bool fullCheck)
 		UINT32 tickets = 0, queued = 0;
 
 		RESUPPLY_QUEUE::iterator qit;
-		for ( qit = m_impl.m_resupplyQueue.begin()
-			; qit != m_impl.m_resupplyQueue.end()
-			; ++qit
-			)
+		for ( auto qit = m_impl.m_resupplyQueue.begin(), qend = m_impl.m_resupplyQueue.end(); qit != qend; ++qit )
 		{
-			RESUPPLY_DOCKET::iterator dit;
-			for ( dit = qit->second.begin(); dit != qit->second.end(); ++dit )
+			for ( auto dit = qit->second.begin(), dend = qit->second.end(); dit != dend; ++dit )
 			{
 				ResupplyTicket* ticket = *dit;
 				if ( ticket->m_spec == entry.spec() )
@@ -813,24 +801,23 @@ StratHCUnit::CheckResupplyStatus(bool fullCheck)
 			}
 		}
 
-		static char buffer[128] = " ";
 		if ( present >= capacity )
 		{
 			if ( fullCheck == false )
 				continue;
-			sprintf(buffer+1, "%s:full", entry.weapon().name);
+			strprintf(buffer, " %s:full", entry.weapon().name);
 		}
 		else if ( delta == 0 && capacity - present == queued )
 		{
 			if ( fullCheck == false )
 				continue;
 			needsResupply = true;
-			sprintf(buffer+1, "%s:ok", entry.weapon().name);
+			strprintf(buffer, " %s:ok", entry.weapon().name);
 		}
 		else
 		{
 			needsResupply = true;
-			sprintf(buffer+1, "%s:[p:%u,t:%u,r:%u,c:%u,delta:%d,q:%u,t:%u]"
+			strprintf(buffer, " %s:[p:%u,t:%u,r:%u,c:%u,delta:%d,q:%u,t:%u]"
 								, entry.weapon().name
 								, present, transfers, resupply, capacity
 								, delta

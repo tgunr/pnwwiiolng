@@ -403,7 +403,7 @@ public:
 
 		player.message(LSTR_NOTE, LSTR_PLAYERS_IGNORED);
 		HANDLES::const_iterator it;
-		for (it = ignores.begin(); it != ignores.end(); ++it)
+		for ( auto it = ignores.begin(), end = ignores.end(); it != end; ++it )
 		{
 			if (!textlist.empty())
 				textlist += ", ";
@@ -801,7 +801,7 @@ public:
 //////////////////////////////////////////////////////////////////////
 
 static void
-	_listTrainersForTrainer(Player& player)
+_listTrainersForTrainer(Player& player)
 {
 	const TRAINERS& trainers = chatGetTrainers();
 	TRAINERS::const_iterator it;
@@ -827,7 +827,7 @@ static void
 }
 
 static void
-	_listTrainersForPlayer(Player& player)
+_listTrainersForPlayer(Player& player)
 {
 	const TRAINERS& trainers = chatGetTrainers();
 	if ( trainers.empty() )

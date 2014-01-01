@@ -405,7 +405,7 @@ _checkSpawnCounts()
 {
 	UINT32 spawnedCount[MAX_SIDES] = { 0, 0, 0, 0 };
 
-	for ( auto it = g_players.begin(); it != g_players.end(); ++it )
+	for ( auto it = g_players.begin(), end = g_players.end(); it != end; ++it )
 	{
 		Player* const player = (Player*)(*it);
 		if ( player->instance().isCampaign() && player->isSpawned() )

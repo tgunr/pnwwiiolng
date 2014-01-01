@@ -1067,7 +1067,7 @@ chatProcessPlayerGroups()
 	{
 		std::lock_guard<std::mutex> hashLock(playerGroupsMutex);
 		numGroupEntries = playerGroups.size();
-		for ( auto it = playerGroups.begin(); it != playerGroups.end(); ++it )
+		for ( auto it = playerGroups.begin(), end = playerGroups.end(); it != end; ++it )
 		{
 			Player* const player = PlayerInterface::Lookup(it->first);
 			if ( player == NULL )
@@ -1636,18 +1636,18 @@ Player::SetWeapon(const WEAPON_SPEC& toWeapon)
 void
 Player::stopRecruiting()
 {
-	RECRUITS::iterator it = _recruits.find(playerID());
-	if ( it == _recruits.end() )
+	RECRUITS::iterator rit = _recruits.find(playerID());
+	if ( rit == _recruits.end() )
 		return;
 
 	// Send a message to all of my recruits
-	if ( !it->second.empty() )
+	auto& recruits = rit->second;
+	if ( !recruits.empty() )
 	{
 		std::vector<SINT32> indexes;
-		std::set<UINT32>::const_iterator pit;
-		for ( pit = it->second.begin(); pit != it->second.end(); ++pit )
+		for ( auto it = recruits.begin(), end = recruits.end(); it != end; ++it )
 		{
-			Player* player = PlayerInterface::Lookup((UINT32)*pit);
+			Player* player = PlayerInterface::Lookup(*it);
 			if ( player != NULL && player->teulIndex() >= 0 )
 				indexes.push_back(player->teulIndex());
 		}
@@ -1657,11 +1657,9 @@ Player::stopRecruiting()
 			chatDistributeLocMessage(indexes.begin(), indexes.end()
 										, LSTR_CAUTION, LSTR_RECRUITER_UNAVAILABLE, callsign());
 		}
-
-		it->second.clear();
 	}
 
-	_recruits.erase(it);
+	_recruits.erase(rit);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2565,8 +2563,7 @@ chatUpdateAWSSnapshot()
 						);
 	}
 
-	AWS_INSTANCES::iterator it;
-	for ( it = g_awsGrids.begin(); it != g_awsGrids.end(); ++it )
+	for (auto it = g_awsGrids.begin(), end = g_awsGrids.end(); it != end; ++it)
 	{
 		g_awsSnapshots[it->first] = it->second;
 	}
@@ -2594,8 +2591,8 @@ chatSaveLogRecords()
 	{
 		char query[TEXT_POOL_SIZE + 1];
 		char* qp = query + strlcpy(query, "UPDATE wwii_player SET last_login=NOW() WHERE playerID IN (", TEXT_POOL_SIZE + 1);
-		PLAYERIDS::iterator it;
-		for ( it = _logins.begin(); it != _logins.end() && qp < query + TEXT_POOL_SIZE - 24; ++it )
+		auto it = _logins.begin();
+		for ( auto end = _logins.end(); it != end && qp < query + TEXT_POOL_SIZE - 24; ++it )
 		{
 			if ( it != _logins.begin() )
 				*(qp++) = ',';

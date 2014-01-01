@@ -193,7 +193,7 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd,SINT32 numBu
 
 		bldHash->building = (STRAT_BUILDING*)memAlloc(maxBldgId * sizeof(STRAT_BUILDING));
 
-		for ( std::map<SINT16, STRAT_BUILDING>::iterator it = bldgMap.begin(); it != bldgMap.end(); ++it )
+		for ( auto it = bldgMap.begin(), end = bldgMap.end(); it != end; ++it )
 		{
 			bldHash->building[it->first] = it->second;
 		}

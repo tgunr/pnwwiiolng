@@ -323,7 +323,7 @@ ChatGrid::addPlayer(Player* player, ChatGrid* oldGrid)
 		// Grids that have moved out of range
 		if ( oldGrid != NULL )
 		{
-			for ( it = oldGrid->m_neighbors.begin(); it != oldGrid->m_neighbors.end(); ++it )
+			for ( auto it = oldGrid->m_neighbors.begin(), end = oldGrid->m_neighbors.end(); it != end; ++it )
 			{
 				if ( (*it)->stos().empty() )
 					continue;
@@ -342,7 +342,7 @@ ChatGrid::addPlayer(Player* player, ChatGrid* oldGrid)
 			}
 
 			// Grids that have entered into range
-			for ( it = m_neighbors.begin(); it != m_neighbors.end(); ++it )
+			for ( auto it = m_neighbors.begin(), end = m_neighbors.end(); it != end; ++it )
 			{
 				if ( (*it)->stos().empty() )
 					continue;
@@ -354,7 +354,7 @@ ChatGrid::addPlayer(Player* player, ChatGrid* oldGrid)
 		}
 		else
 		{
-			for ( it = m_neighbors.begin(); it != m_neighbors.end(); ++it )
+			for ( auto it = m_neighbors.begin(), end = m_neighbors.end(); it != end; ++it )
 			{
 				if ( !(*it)->stos().empty() )
 				{
@@ -418,7 +418,7 @@ ChatGrid::extractPlayer(Player* const player)
 	GRID_INFO("removing c:%s", player->callsign());
 
 	// Remove the player from all of our STOs.
-	for ( auto it = stos().begin(); it != stos().end(); ++it )
+	for ( auto it = stos().begin(), end = stos().end(); it != end; ++it )
 	{
 		ServerSTO* const sto = (ServerSTO*)*it;
 		sto->extractPlayer(player);
@@ -865,7 +865,7 @@ chatGridGetPlayersVector(const Player* player, const SINT64& range, PLAYERS_ARRA
 					, botleft.X(), botleft.Y(), topright.X(), topright.Y()
 					, range);
 
-	for ( it = grid->neighbors().begin(); it != grid->neighbors().end(); ++it )
+	for ( auto it = grid->neighbors().begin(), end = grid->neighbors().end(); it != end; ++it )
 	{
 		const ChatGrid* node = (*it);
 		if ( node->players().empty() )
@@ -924,7 +924,7 @@ chatGridSnapshot()
 	int len = 0;
 
 	_CHAT_GRID::const_iterator it;
-	for ( it = _gridIndex.begin(); it != _gridIndex.end(); ++it )
+	for ( auto it = _gridIndex.begin(), end = _gridIndex.end(); it != end; ++it )
 	{
 		const ChatGrid* node = it->second;
 		if ( !g_enableFullSnapshot && !node->players().size() && !node->stos().size() )

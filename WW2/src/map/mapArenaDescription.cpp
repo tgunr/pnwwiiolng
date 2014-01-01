@@ -23,10 +23,9 @@ ArenaDescription::_pack(ACTION_OBJECT* const a)
 	if ( vars <= 0 )
 		return a->offset;
 
-	iterator it;
 	UINT32 nameLen, valLen;
 
-	for ( it = begin(); it != end(); ++it )
+	for ( auto it = begin(), endIt = end(); it != endIt; ++it )
 	{
 		nameLen = it->first.size();
 		valLen = it->second.size();

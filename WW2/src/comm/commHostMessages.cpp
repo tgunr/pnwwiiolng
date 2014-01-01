@@ -427,7 +427,7 @@ _recordPacketSize(UINT32 size)
 		return;
 
 	UINT32 mean = 0;
-	for ( SIZES::iterator it = sizes.begin(); it != sizes.end(); ++it )
+	for ( auto it = sizes.begin(), end = sizes.end(); it != end; ++it )
 	{
 		if ( mean == 0 || it->second >= sizes[mean] )
 			mean = it->first;
