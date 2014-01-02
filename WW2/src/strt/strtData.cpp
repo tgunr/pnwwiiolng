@@ -1199,26 +1199,26 @@ strtGetCP(const FULL_OBJ_ID& index)
 CPStruct*
 strtGetCPorBridge(const FULL_OBJ_ID& index)
 {
-	FULL_OBJ_ID* cp = _getStratObject(strtFullObjIDToFullID(index));
-	if ( cp == NULL )
-		return NULL;
+	FULL_OBJ_ID* cp = _getStratObject(index);
+	if (PN_UNLIKELY(!cp))
+		return nullptr;
 	if ( cp->objClass == CLASS_CP )
-		return (CPStruct*)cp;
+		return reinterpret_cast<CPStruct*>(cp);
 	if ( cp->objClass == CLASS_BUILDING )
 	{
 		ObjectStruct* building = (ObjectStruct*)cp;
-		if ( building->type == BUILDING_BRIDGE && building->facility )
+		if ( PN_LIKELY(building->type == BUILDING_BRIDGE && building->facility) )
 			return building->facility->cp;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 CPStruct*
 strtGetCPFromTarget(const FULL_OBJ_ID& index)
 {
-	FULL_OBJ_ID* target = _getStratObject(strtFullObjIDToFullID(index));
-	while ( target != NULL )
+	FULL_OBJ_ID* target = _getStratObject(index);
+	while ( target != nullptr )
 	{
 		if ( target->objClass == CLASS_CP )
 			return (CPStruct*) target;
