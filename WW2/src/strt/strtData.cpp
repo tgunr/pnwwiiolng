@@ -389,8 +389,8 @@ _checkSupplyLinksIn(const Supercell& sc)
 	{
 		newLink = &sc.links[counter];
 
-		bldg = strtGetObject(newLink->startDepotID);
-		if ( bldg != NULL )
+		bldg = sc.Get<ObjectStruct>(newLink->startDepotID.id);
+		if ( bldg != nullptr )
 		{
 			const FacilityStruct& facility = bldg->Facility();
 			if ( facility.m_outgoingLink == nullptr)
@@ -409,8 +409,8 @@ _checkSupplyLinksIn(const Supercell& sc)
 			strtDataCantFindBuilding(newLink->name, "start", newLink->startDepotID);
 		}
 
-		bldg = strtGetObject(newLink->endDepotID);
-		if ( bldg != NULL )
+		bldg = sc.Get<ObjectStruct>(newLink->endDepotID.id);
+		if ( bldg != nullptr )
 		{
 			const FacilityStruct& facility = bldg->Facility();
 			if ( facility.m_incomingLink == nullptr)
@@ -593,8 +593,8 @@ _scPass1_facs(Supercell& sc)
 
 		_supercellCheck("FAC", newFacility->name, sc, newFacility->m_posX, newFacility->m_posY);
 
-		CPStruct* parentCP = strtGetCP(newFacility->cpID);
-		if (parentCP == NULL)
+		CPStruct* parentCP = sc.Get<CPStruct>(newFacility->cpID.id);
+		if (parentCP == nullptr)
 		{
 			dbugLog(_FLA,"Supercell %d:%d: couldn't find parent CP %d for facility %d %s"
 						, sc.x, sc.y
@@ -685,7 +685,7 @@ _scPass1_objs(Supercell& sc)
 
 		_supercellCheck("BLDG", newObject->name, sc, newObject->posX, newObject->posY);
 
-		FacilityStruct* parentFacility = strtGetFacility(newObject->facilityID);
+		FacilityStruct* parentFacility = sc.Get<FacilityStruct>(newObject->facilityID.id);
 
 		if (parentFacility == nullptr)
 		{
@@ -775,8 +775,8 @@ _scPass2_linkSetup(Supercell& sc)
 	{
 		LinkStruct* newLink = &sc.links[counter];
 
-		ObjectStruct* startBldg = strtGetObject(newLink->startDepotID);
-		if ( startBldg == NULL )
+		ObjectStruct* startBldg = sc.Get<ObjectStruct>(newLink->startDepotID.id);
+		if ( startBldg == nullptr )
 		{
 			strtDataCantFindBuilding(newLink->name, "start", newLink->startDepotID);
 			continue;
@@ -794,8 +794,8 @@ _scPass2_linkSetup(Supercell& sc)
 			continue;
 		}
 
-		ObjectStruct* endBldg = strtGetObject(newLink->endDepotID);
-		if ( endBldg == NULL )
+		ObjectStruct* endBldg = sc.Get<ObjectStruct>(newLink->endDepotID.id);
+		if ( endBldg == nullptr )
 		{
 			strtDataCantFindBuilding(newLink->name, "end", newLink->endDepotID);
 			continue;
@@ -836,8 +836,8 @@ _scPass2_linkSetup(Supercell& sc)
 		start->cp->m_links.insert(newLink);
 
 		//Link up the firebase if we have one
-		FacilityStruct* firebase = strtGetFacility(newLink->firebaseID);
-		if ( firebase == NULL )
+		FacilityStruct* firebase = sc.Get<FacilityStruct>(newLink->firebaseID.id);
+		if ( firebase == nullptr )
 		{
 			if ( newLink->firebaseID == nullObjID )
 				continue;
@@ -1227,10 +1227,10 @@ strtGetCPFromTarget(const FULL_OBJ_ID& index)
 		else if ( target->objClass == CLASS_BUILDING )
 			target = (FULL_OBJ_ID*)((ObjectStruct*)target)->facility;
 		else
-			target = NULL;
+			target = nullptr;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 FacilityStruct*
