@@ -281,6 +281,7 @@ add_library (libwwii
 		include/wthrTime.h
 	strt/strtSupercell.cpp
 		strt/strtSupercell.h
+		strt/strtSupercells.h
 	wwii/wwiiCallbacks.cpp
 		wwii/wwiiCallbacks.h
 			teul/teulCallback.h
