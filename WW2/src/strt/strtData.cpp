@@ -1184,13 +1184,16 @@ strtGetSupercellFromPosition_m(const SINT32 x_m, const SINT32 y_m)
 FULL_OBJ_ID*
 strtGetFullObjID(const FULL_OBJ_ID& index)
 {
-	return _getStratObject(strtFullObjIDToFullID(index));
+	return _getStratObject(index);
 }
 
 CPStruct*
 strtGetCP(const FULL_OBJ_ID& index)
 {
-	return strtGetCP_FULL_ID(strtFullObjIDToFullID(index));
+	FULL_OBJ_ID* id = _getStratObject(index);
+	if (PN_LIKELY(id && id->objClass == CLASS_CP))
+		return reinterpret_cast<CPStruct*>(id);
+	return nullptr;
 }
 
 CPStruct*
@@ -1233,18 +1236,27 @@ strtGetCPFromTarget(const FULL_OBJ_ID& index)
 FacilityStruct*
 strtGetFacility(const FULL_OBJ_ID& index)
 {
-	return strtGetFacility_FULL_ID(strtFullObjIDToFullID(index));
+	FULL_OBJ_ID* fac = _getStratObject(index);
+	if (PN_LIKELY(fac && fac->objClass == CLASS_FACILITY))
+		return reinterpret_cast<FacilityStruct*>(fac);
+	return nullptr;
 }
 
 ObjectStruct*
 strtGetObject(const FULL_OBJ_ID& index)
 {
-	return strtGetObject_FULL_ID(strtFullObjIDToFullID(index));
+	FULL_OBJ_ID* obj = _getStratObject(index);
+	if (PN_LIKELY(obj && obj->objClass == CLASS_BUILDING))
+		return reinterpret_cast<ObjectStruct*>(obj);
+	return nullptr;
 }
 
 LinkStruct* strtGetLink(const FULL_OBJ_ID& index)
 {
-	return strtGetLink_FULL_ID(strtFullObjIDToFullID(index));
+	FULL_OBJ_ID* link = _getStratObject(index);
+	if (PN_LIKELY(link && link->objClass == CLASS_LINK))
+		return reinterpret_cast<LinkStruct*>(link);
+	return nullptr;
 }
 
 CPStruct* strtGetCP_FULL_ID(const FULL_ID& index)
