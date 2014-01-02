@@ -1252,12 +1252,10 @@ LinkStruct* strtGetLink(const FULL_OBJ_ID& index)
 
 CPStruct* strtGetCP_FULL_ID(const FULL_ID& index)
 {
-FULL_OBJ_ID* id = _getStratObject(index);
-
-	if ((id == NULL) || (id->objClass != CLASS_CP))
-		return NULL;
-	else return (CPStruct*)id;
-
+	FULL_OBJ_ID* id = _getStratObject(index);
+	if (PN_LIKELY(id && id->objClass == CLASS_CP))
+		return reinterpret_cast<CPStruct*>(id);
+	return nullptr;
 }
 
 FacilityStruct* strtGetFacility_FULL_ID(const FULL_ID& index)
