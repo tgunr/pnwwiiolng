@@ -1166,8 +1166,8 @@ strtGetSupercellFULL_OBJ_ID(const FULL_OBJ_ID& fullObjID)
 Supercell*
 strtGetSupercell(const SINT16 x, const SINT16 y)
 {
-	SUPERCELLS::iterator it = g_supercells.find(std::make_pair(x,y));
-	return ( it != g_supercells.end() ) ? &it->second : NULL;
+	SUPERCELLS::iterator it = g_supercells.find(std::make_pair(x, y));
+	return (it != g_supercells.end()) ? &it->second : nullptr;
 }
 
 Supercell*
