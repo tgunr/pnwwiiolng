@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Created: Tue Apr  4 23:09:26 2000
 //
 // This file contains all the input/output functions associated with

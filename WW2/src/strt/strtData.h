@@ -54,9 +54,13 @@ extern void strtInitPayload(PAYLOADSTRUCT* payload);
 extern void strtInitManifest(MANIFESTSTRUCT* manifest);
 
 //Conversion routines
-extern FULL_ID strtFullObjIDToFullID(FULL_OBJ_ID fullObjID);
+static inline FULL_ID strtFullObjIDToFullID(FULL_OBJ_ID fullObjID)
+{
+	FULL_ID fullID { fullObjID.cell.ox >> 4, fullObjID.cell.oy >> 4, fullObjID.id, 0 };
+	return fullID;
+}
 
-//strtDTL initialization finctions
+//strtDTL initialization functions
 extern LOGICAL strtInitCPStructwithCP(CPStruct* newcp, struct CP* cp);
 extern LOGICAL strtInitFacilityStructwithFACILITY(FacilityStruct* newfacility, struct FACILITY* facility);
 extern LOGICAL strtInitObjectStructwithBUILDING(ObjectStruct* newobject, struct BUILDING* building);

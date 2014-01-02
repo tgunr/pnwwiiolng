@@ -9,7 +9,7 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 #include <map>
-class Supercell ;
+class Supercell;
 
-typedef std::map< std::pair<SINT16,SINT16>, Supercell > SUPERCELLS ;
-extern SUPERCELLS g_supercells ;
+typedef std::map< std::pair<SINT16,SINT16>, Supercell > SUPERCELLS;
+extern SUPERCELLS g_supercells;
