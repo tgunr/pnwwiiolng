@@ -1282,12 +1282,10 @@ FULL_OBJ_ID* id = _getStratObject(index);
 
 LinkStruct* strtGetLink_FULL_ID(const FULL_ID& index)
 {
-FULL_OBJ_ID* id = _getStratObject(index);
-
-	if ((id == NULL) || (id->objClass != CLASS_LINK))
-		return NULL;
-	else return (LinkStruct*)id;
-
+	FULL_OBJ_ID* id = _getStratObject(index);
+	if (PN_LIKELY(id && id->objClass == CLASS_LINK))
+		return reinterpret_cast<LinkStruct*>(id);
+	return nullptr;
 }
 
 void
