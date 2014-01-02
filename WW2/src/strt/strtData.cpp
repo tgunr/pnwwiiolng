@@ -1142,17 +1142,14 @@ static FULL_OBJ_ID*
 _getStratObject(const FULL_ID& index)
 {
 	Supercell* sc = strtGetSupercell(index.sx, index.sy);
+	return sc ? sc->Ptr(index.id) : nullptr;
+}
 
-	if (sc == NULL)
-	{
-		return NULL;
-	}else
-	{
-		if (index.id < sc->indexSize)
-			return (FULL_OBJ_ID*)sc->index[index.id];
-		else
-			return NULL;
-	}
+static FULL_OBJ_ID*
+_getStratObject(const FULL_OBJ_ID& obj)
+{
+	Supercell* sc = strtGetSupercell(obj.cell.ox >> 4, obj.cell.oy >> 4);
+	return sc ? sc->Ptr(obj.id) : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
