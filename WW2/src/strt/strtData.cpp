@@ -1141,7 +1141,7 @@ strtInitializeStratData()
 static FULL_OBJ_ID*
 _getStratObject(const FULL_ID& index)
 {
-	Supercell* sc = strtGetSupercell(index.sx,index.sy);
+	Supercell* sc = strtGetSupercell(index.sx, index.sy);
 
 	if (sc == NULL)
 	{
