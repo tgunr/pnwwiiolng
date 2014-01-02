@@ -280,7 +280,7 @@ static WWII_COUNTRY _adjustCountryFor135(UINT32 country)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Add an errorlist entry for an object, if it isn't ignoring the
+// Add an error list entry for an object, if it isn't ignoring the
 // given error.
 
 void strtAddErrorListEntry(int errorNo, const char* objectName, const char* entryName, const char* entryData)
@@ -346,7 +346,7 @@ LinkStruct::hasEnemyFirebase(WWII_SIDE forSide) const
 }
 
 //////////////////////////////////////////////////////////////////////
-// Flag togglers
+// Flag toggles
 
 void
 strtEnemyLink(CPStruct& cp, bool state)
@@ -409,7 +409,8 @@ _checkSupplyLinksIn(const Supercell& sc)
 			strtDataCantFindBuilding(newLink->name, "start", newLink->startDepotID);
 		}
 
-		bldg = sc.Get<ObjectStruct>(newLink->endDepotID.id);
+		// end depot is unlikely to be in the same sc.
+		bldg = strtGetObject(newLink->endDepotID);
 		if ( bldg != nullptr )
 		{
 			const FacilityStruct& facility = bldg->Facility();
@@ -542,7 +543,7 @@ _supercellCheck(const char* typeName, const char* name, const Supercell& sc, int
 //////////////////////////////////////////////////////////////////////
 // First pass initialization of CPs
 //  - Establish Strat::cpList prev/next/head linkage
-//	- Make sure essential base variables are zerod
+//	- Make sure essential base variables are zeroed
 //	- Link the CP to its supercell
 
 static void
@@ -575,7 +576,7 @@ _scPass1_cps(Supercell& sc)
 
 //////////////////////////////////////////////////////////////////////
 // First pass initialization of Facilities
-//  - Make sure the neccessary parent CP is initialized (its valid
+//  - Make sure the necessary parent CP is initialized (its valid
 //    for a facility to exist in a different SC than its CP, e.g.
 //    firebases)
 //  - Link to its supercell
@@ -593,7 +594,8 @@ _scPass1_facs(Supercell& sc)
 
 		_supercellCheck("FAC", newFacility->name, sc, newFacility->m_posX, newFacility->m_posY);
 
-		CPStruct* parentCP = sc.Get<CPStruct>(newFacility->cpID.id);
+		// facilities aren't required to be in the same sc; e.g. firebases.
+		CPStruct* parentCP = strtGetCP(newFacility->cpID);
 		if (parentCP == nullptr)
 		{
 			dbugLog(_FLA,"Supercell %d:%d: couldn't find parent CP %d for facility %d %s"
@@ -627,8 +629,7 @@ _scPass1_facs(Supercell& sc)
 
 		if (newFacility->type == FACILITY_ARMYBASE)
 		{
-			//We track the # of army bases so we canff
-			//	track control of the CP
+			// We track the # of army bases so we can track control of the CP
 			parentCP->armyBasesOwned[newFacility->side]++;
 			parentCP->numArmyBases++;
 		}
@@ -685,8 +686,8 @@ _scPass1_objs(Supercell& sc)
 
 		_supercellCheck("BLDG", newObject->name, sc, newObject->posX, newObject->posY);
 
-		FacilityStruct* parentFacility = sc.Get<FacilityStruct>(newObject->facilityID.id);
-
+		// facility might possibly be in a different supercell to us.
+		FacilityStruct* parentFacility = strtGetFacility(newObject->facilityID);
 		if (parentFacility == nullptr)
 		{
 			strtDataErrorParentFacility(newObject->name, newObject->filename, sc.x, sc.y, newObject->fullObjID.id, counter, newObject->facilityID.id);
@@ -794,7 +795,8 @@ _scPass2_linkSetup(Supercell& sc)
 			continue;
 		}
 
-		ObjectStruct* endBldg = sc.Get<ObjectStruct>(newLink->endDepotID.id);
+		// end building can be in a different supercell.
+		ObjectStruct* endBldg = strtGetObject(newLink->endDepotID);
 		if ( endBldg == nullptr )
 		{
 			strtDataCantFindBuilding(newLink->name, "end", newLink->endDepotID);
@@ -835,8 +837,8 @@ _scPass2_linkSetup(Supercell& sc)
 
 		start->cp->m_links.insert(newLink);
 
-		//Link up the firebase if we have one
-		FacilityStruct* firebase = sc.Get<FacilityStruct>(newLink->firebaseID.id);
+		// Link up the firebase if we have one. Can easily be in a different supercell.
+		FacilityStruct* firebase = strtGetFacility(newLink->firebaseID);
 		if ( firebase == nullptr )
 		{
 			if ( newLink->firebaseID == nullObjID )
