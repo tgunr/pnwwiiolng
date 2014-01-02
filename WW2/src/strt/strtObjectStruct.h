@@ -20,6 +20,9 @@ class ObjectStruct
 {
 public:
 	ObjectStruct() { memset(this, 0, sizeof(*this)); }
+
+	enum { StratClass = CLASS_BUILDING };
+
 	//// ---- Accessors
 	//-- Read
 	bool isValid() const { return NULL != facility; }

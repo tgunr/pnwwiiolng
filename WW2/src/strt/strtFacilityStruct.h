@@ -131,6 +131,8 @@ public:
 
 	typedef std::map<WEAPON_SPEC, WeaponEntry*> WEAPON_ENTRIES;
 
+	enum { StratClass = CLASS_FACILITY };
+
 public:
 	void addWeaponSpawner(const WEAPON& weapon, const ObjectStruct& object);
 

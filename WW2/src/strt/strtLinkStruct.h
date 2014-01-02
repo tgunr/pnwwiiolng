@@ -13,6 +13,8 @@
 class LinkStruct
 {
 public:
+	enum { StratClass = CLASS_LINK };
+
 	// Determine if this link has an active enemy firebase for side "forSide"
 	bool hasFirebase() const { return firebase != NULL ; }
 	bool hasEnemyFirebase(WWII_SIDE forSide) const ;

@@ -143,6 +143,8 @@ public:
 	}
 
 //tolua_begin
+	enum { StratClass = CLASS_CP };
+
 	WWII_SIDE		ControllingSide() const { return controllingSide; }
 	WWII_COUNTRY	ControllingCountry() const { return controllingCountry; }
 
