@@ -1263,11 +1263,9 @@ FULL_OBJ_ID* id = _getStratObject(index);
 FacilityStruct* strtGetFacility_FULL_ID(const FULL_ID& index)
 {
 	FULL_OBJ_ID* id = _getStratObject(index);
-
-	if ((id == NULL) || (id->objClass != CLASS_FACILITY))
-		return NULL;
-	else return (FacilityStruct*)id;
-
+	if (PN_LIKELY(id && id->objClass == CLASS_FACILITY))
+		return reinterpret_cast<FacilityStruct*>(id);
+	return nullptr;
 }
 
 ObjectStruct* strtGetObject_FULL_ID(const FULL_ID& index)
