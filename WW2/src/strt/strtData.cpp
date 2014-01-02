@@ -2244,9 +2244,7 @@ LOGICAL strtInitLinkfromWOR(LinkStruct& link)
 
 static void _calcCapacity(ObjectStruct& object)
 {
-	SINT32 lastPercentDamage;
-
-	lastPercentDamage = object.percentDamage;
+	SINT32 lastPercentDamage = object.percentDamage;
 	object.calcPercentDamage();
 
 	if (lastPercentDamage < 50 && object.percentDamage >= 50)

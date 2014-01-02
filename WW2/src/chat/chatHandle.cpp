@@ -4883,8 +4883,6 @@ _plainEncode(const _CharType* const callsign, ChatHandle& handle)
 	size_t i;
 	for ( i = 0; callsign[i] && i < MAX_HANDLE_WLEN; ++i )
 	{
-		if ( callsign[i] == 0 )
-			break;
 		ChatHandle code = (ChatHandle)s_characterMap[callsign[i]];
 		if ( PN_UNLIKELY(code == 0ULL) )
 		{
@@ -4907,14 +4905,9 @@ _wideEncode(const wchar_t* const callsign, ChatHandle& handle)
 {
 	ChatHandle code = 1;
 	int bits = 0;
-	int i;
+	size_t i;
 	for ( i = 0; callsign[i] && i < MAX_WIDE_HANDLE_WCHARS; ++i, bits += HANDLE_WCHAR_BITS )
 	{
-		if ( callsign[i] == 0 )
-		{
-			_wideHandle(handle);
-			return;
-		}
 		code = s_wideCharacterMap[(UINT16)(callsign[i] & 0xffff)];
 		if ( PN_UNLIKELY(code == 0) )
 		{
