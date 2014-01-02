@@ -43,12 +43,30 @@ public:
 	~Supercell();
 	bool initialize(SINT16 scx, SINT16 scy, const char* filename);
 
+	FULL_OBJ_ID* Ptr(UINT16 id) const
+	{
+		if (id < indexSize)
+			return reinterpret_cast<FULL_OBJ_ID*>(index[id]);
+		return nullptr;
+	}
+
+//tolua_end
+	template<class ReturnType>
+	ReturnType* Get(UINT16 id) const
+	{
+		FULL_OBJ_ID* fid = Ptr(id);
+		if (PN_LIKELY(fid && fid->objClass == ReturnType::StratClass))
+			return reinterpret_cast<ReturnType*>(fid);
+		return nullptr;
+	}
+//tolua_begin
+
 public:
 	// All of the numXXX members of this structure count the actual number
 	// of non-nullptr entries in the array, where maxXXX is the size
 	// of the corresponding array.  For the normal, expected cases these
 	// will be the same.  This is just CYA for the times when the terrain
-	// editor leaves holes in the array of ojects.
+	// editor leaves holes in the array of objects.
 //tolua_end
 	void**				index;
 //tolua_begin
