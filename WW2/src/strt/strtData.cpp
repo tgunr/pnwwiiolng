@@ -1938,12 +1938,11 @@ ObjectStruct* currentObject;
 	return retval;
 }
 
-//strtDTL initialization finctions
-LOGICAL
-strtInitCPStructwithCP(CPStruct* newCP,CP* cp)
+//strtDTL initialization functions
+void strtInitCPStructwithCP(CPStruct* newCP,CP* cp)
 {
-	if ((newCP==nullptr) || (cp == nullptr))
-		return FALSE;
+	if (PN_UNLIKELY(newCP == nullptr || cp == nullptr))
+		return;
 
 	//Fill in the fullObjID
 	//Calculate octet x and y from POSITIONAL x and y
@@ -1967,15 +1966,12 @@ strtInitCPStructwithCP(CPStruct* newCP,CP* cp)
 
 	strlcpy(newCP->name, cp->name, sizeof(newCP->name));
 	newCP->filename = _filenamePool(cp->fileName);
-
-	return TRUE;
 }
 
-LOGICAL
-strtInitFacilityStructwithFACILITY(FacilityStruct* newFacility, FACILITY* facility)
+void strtInitFacilityStructwithFACILITY(FacilityStruct* newFacility, FACILITY* facility)
 {
-	if ((newFacility==nullptr) || (facility==nullptr))
-		return FALSE;
+	if (PN_UNLIKELY(newFacility == nullptr || facility == nullptr))
+		return;
 
 	// Remember the location
 	newFacility->m_posX = facility->posx;
@@ -2002,14 +1998,12 @@ strtInitFacilityStructwithFACILITY(FacilityStruct* newFacility, FACILITY* facili
 
 	strlcpy(newFacility->name, facility->name, sizeof(newFacility->name));
 	newFacility->filename = _filenamePool(facility->fileName);
-
-	return TRUE;
 }
 
-LOGICAL strtInitObjectStructwithBUILDING(ObjectStruct* newObject, BUILDING* building)
+void strtInitObjectStructwithBUILDING(ObjectStruct* newObject, BUILDING* building)
 {
-	if ((newObject==nullptr) || (building == nullptr))
-		return FALSE;
+	if (PN_UNLIKELY(newObject == nullptr || building == nullptr))
+		return;
 
 	//Remember the location
 	newObject->posX = building->posx;
@@ -2039,15 +2033,12 @@ LOGICAL strtInitObjectStructwithBUILDING(ObjectStruct* newObject, BUILDING* buil
 
 	strlcpy(newObject->name, building->name, sizeof(newObject->name));
 	newObject->filename = _filenamePool(building->fileName);
-
-	return TRUE;
 }
 
-LOGICAL
-strtInitLinkStructwithDEPOT_LINK(LinkStruct* newLink, DEPOT_LINK* depotlink)
+void strtInitLinkStructwithDEPOT_LINK(LinkStruct* newLink, DEPOT_LINK* depotlink)
 {
-	if ((newLink==nullptr) || (depotlink == nullptr))
-		return FALSE;
+	if (PN_UNLIKELY(newLink == nullptr || depotlink == nullptr))
+		return;
 
 	//Links don't have a posx and a posy, so we get the ox and oy from its
 	//	start depot
@@ -2065,13 +2056,11 @@ strtInitLinkStructwithDEPOT_LINK(LinkStruct* newLink, DEPOT_LINK* depotlink)
 
 	newLink->distance = depotlink->distance;
 	strlcpy(newLink->name, depotlink->name, sizeof(newLink->name));
-
-	return TRUE;
 }
 
 //This function looks up the information for a CP from
 //	the WOR parser that Marty gave us
-LOGICAL strtInitCPfromWOR(CPStruct& cp)
+bool strtInitCPfromWOR(CPStruct& cp)
 {
     CP_PARAMS* cpParams;
 
@@ -2103,17 +2092,17 @@ LOGICAL strtInitCPfromWOR(CPStruct& cp)
 		}
 	}
 
-	if (cpParams == nullptr)
-		return FALSE;
+	if (PN_UNLIKELY(cpParams == nullptr))
+		return false;
 
 	cp.timeToProduce = cpParams->ttp;
 
-	return TRUE;
+	return true;
 }
 
 //This function looks up the information for a Facility from
 //	the WOR parser that Marty gave us
-LOGICAL strtInitFacilityfromWOR(FacilityStruct& facility)
+bool strtInitFacilityfromWOR(FacilityStruct& facility)
 {
     FACILITY_PARAMS* facilityParams;
 
@@ -2157,8 +2146,8 @@ LOGICAL strtInitFacilityfromWOR(FacilityStruct& facility)
 		}
 	}
 
-	if (facilityParams == nullptr)
-		return FALSE;
+	if (PN_UNLIKELY(facilityParams == nullptr))
+		return false;
 
 	//Populate the struct
 	facility.shippingThreshold = facilityParams->shippingThreshold;
@@ -2167,20 +2156,20 @@ LOGICAL strtInitFacilityfromWOR(FacilityStruct& facility)
 	facility.rpsPerUnitTime = facilityParams->rput;
 	facility.multiplier = facilityParams->multiplier;
 
-	return TRUE;
+	return true;
 }
 
 //This function looks up the information for an Object from
 //	the WOR parser that Marty gave us
-LOGICAL strtInitObjectfromWOR(ObjectStruct& object)
+bool strtInitObjectfromWOR(ObjectStruct& object)
 {
     BUILDING_PARAMS* objectParams;
 
 	//Get the information from the object name
 	objectParams = parseGetBuildingValues(object.filename);
 
-	if (objectParams == nullptr)
-		return FALSE;
+	if (PN_UNLIKELY(objectParams == nullptr))
+		return false;
 
 	object.m_maxDamageJoules = objectParams->maxdamage;
 	object.totalRPs = objectParams->rpsrepair;
@@ -2193,18 +2182,17 @@ LOGICAL strtInitObjectfromWOR(ObjectStruct& object)
 
 	object.m_isCaptureBuilding = (objectParams->stratFlags != 0);
 
-	return TRUE;
+	return true;
 }
 
 //This function looks up the information for a Link from
 //	the WOR parser that Marty gave us
-LOGICAL strtInitLinkfromWOR(LinkStruct& link)
+bool strtInitLinkfromWOR(LinkStruct& link)
 {
-    DEPOT_LINK_PARAMS* linkParams;
+	if (PN_UNLIKELY(link.startDepot == nullptr))
+		return false;
 
-	if (link.startDepot==nullptr)
-		return FALSE;
-
+	DEPOT_LINK_PARAMS* linkParams;
 	switch (link.startDepot->subType)
 	{
 		case DEPOT_TRAIN:
@@ -2232,14 +2220,15 @@ LOGICAL strtInitLinkfromWOR(LinkStruct& link)
 		break;
 	}
 
-	if (linkParams == nullptr)
-		return FALSE;
+	if (PN_UNLIKELY(linkParams == nullptr))
+		return false;
+
 	//FIXME!!!!
 	link.latency = 10;
 	link.capacity = 1000;
 	//link.capacity = linkParams->maxCapacity;
 
-	return TRUE;
+	return true;
 }
 
 static void _calcCapacity(ObjectStruct& object)

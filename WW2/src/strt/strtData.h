@@ -38,7 +38,7 @@ extern LinkStruct* strtGetLink(const FULL_OBJ_ID& index);
 extern FULL_OBJ_ID* strtGetFullObjID(const FULL_OBJ_ID& index);
 extern CPStruct* strtGetCPFromTarget(const FULL_OBJ_ID& index);
 
-//same as abive, only using FULL_ID
+//same as above, only using FULL_ID
 extern CPStruct* strtGetCP_FULL_ID(const FULL_ID& index);
 extern FacilityStruct* strtGetFacility_FULL_ID(const FULL_ID& index);
 extern ObjectStruct* strtGetObject_FULL_ID(const FULL_ID& index);
@@ -61,18 +61,18 @@ static inline FULL_ID strtFullObjIDToFullID(FULL_OBJ_ID fullObjID)
 }
 
 //strtDTL initialization functions
-extern LOGICAL strtInitCPStructwithCP(CPStruct* newcp, struct CP* cp);
-extern LOGICAL strtInitFacilityStructwithFACILITY(FacilityStruct* newfacility, struct FACILITY* facility);
-extern LOGICAL strtInitObjectStructwithBUILDING(ObjectStruct* newobject, struct BUILDING* building);
-extern LOGICAL strtInitLinkStructwithDEPOT_LINK(LinkStruct* newlink, struct DEPOT_LINK* depotlink);
+extern void strtInitCPStructwithCP(CPStruct* newcp, struct CP* cp);
+extern void strtInitFacilityStructwithFACILITY(FacilityStruct* newfacility, struct FACILITY* facility);
+extern void strtInitObjectStructwithBUILDING(ObjectStruct* newobject, struct BUILDING* building);
+extern void strtInitLinkStructwithDEPOT_LINK(LinkStruct* newlink, struct DEPOT_LINK* depotlink);
 
 //strtWOR Initialization functions
 //These functions looks up the information for strat objects from
 //	the WOR parser that Marty gave us
-extern LOGICAL strtInitCPfromWOR(CPStruct& cp);
-extern LOGICAL strtInitFacilityfromWOR(FacilityStruct& facility);
-extern LOGICAL strtInitObjectfromWOR(ObjectStruct& object);
-extern LOGICAL strtInitLinkfromWOR(LinkStruct& link);
+extern bool strtInitCPfromWOR(CPStruct& cp);
+extern bool strtInitFacilityfromWOR(FacilityStruct& facility);
+extern bool strtInitObjectfromWOR(ObjectStruct& object);
+extern bool strtInitLinkfromWOR(LinkStruct& link);
 
 // get the total cps that are loaded
 extern UINT32 strtNumCPs(void);
