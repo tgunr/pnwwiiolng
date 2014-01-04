@@ -1903,7 +1903,7 @@ LOGICAL obmainUpdate(void)
 
     for(auto it = updatecallbacks.begin(), end = updatecallbacks.end(); it != end; ++it)
     {
-        OBJECT* o = *itr;
+        OBJECT* o = *it;
 
         if(!obmainValidateObject(o))
             freelist.push_back(o);
@@ -1915,8 +1915,8 @@ LOGICAL obmainUpdate(void)
 
     for(unsigned int i = 0; i < freelist.size(); i++)
     {
-        itr = updatecallbacks.find(freelist[i]);
-        updatecallbacks.erase(itr);
+        auto it = updatecallbacks.find(freelist[i]);
+        updatecallbacks.erase(it);
     }
 
 	return TRUE;
