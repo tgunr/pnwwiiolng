@@ -480,9 +480,9 @@ UINT16 sdmGetNumBUILDING(void)
 
 BUILDING* sdmGetNextBUILDING(void)
 {
-	if (buildingList == NULL || currentBuilding >= header.numBuildings)
-		return NULL;
-	return &buildingList[currentBuilding++];
+	if (PN_LIKELY(buildingList != nullptr && currentBuilding < header.numBuildings))
+		return &buildingList[currentBuilding++];
+	return nullptr;
 }
 
 BUILDING* sdmGetBUILDINGArray(void)
