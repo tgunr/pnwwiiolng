@@ -114,7 +114,7 @@ extern void chatRegisterDotCommands();
 
 #define DEF_ERR_FLAGS STD_ERR
 
-typedef LOGICAL (TUNE_COMMAND_CALLBACK)(Player* player, UCHAR index, const SCHAR* handle, UINT32 commandIndex);
+typedef bool (TUNE_COMMAND_CALLBACK)(Player* player, UCHAR index, const SCHAR* handle, UINT32 commandIndex);
 
 #if defined(DEV_BUILD)
 # define DEFAULT_SYS_MOTD		"MOTD: Internal Dev Cluster"
@@ -216,9 +216,9 @@ static UINT32 g_finalShutdownTime = 0;
 
 // Dot command list at end of file to avoid prototyping
 
-static LOGICAL _tuneHQ(Player* player, UCHAR index, const SCHAR* handle, UINT32 commandIndex);
-static LOGICAL _tuneOrigin(Player* player, UCHAR index, const SCHAR* handle, UINT32 commandIndex);
-static LOGICAL _tuneGM(Player* player, UCHAR index, const SCHAR* handle, UINT32 commandIndex);
+static bool _tuneHQ(Player* player, UCHAR index, const SCHAR* handle, UINT32 commandIndex);
+static bool _tuneOrigin(Player* player, UCHAR index, const SCHAR* handle, UINT32 commandIndex);
+static bool _tuneGM(Player* player, UCHAR index, const SCHAR* handle, UINT32 commandIndex);
 extern bool chatUpdateHCUnitLocations();
 
 struct TUNE_COMMAND
@@ -1915,17 +1915,15 @@ Player::tuneRadio(UCHAR index, CHANNEL_TYPE type, const ChatHandle& handleID)
 
 //Look for an hq tune
 //This temporary measure allows someone to tune to the hq channel
-static LOGICAL
-_tuneHQ(Player* player, UCHAR /*index*/, const SCHAR* /*handle*/, UINT32 /*commandIndex*/)
+static bool _tuneHQ(Player* player, UCHAR /*index*/, const SCHAR* /*handle*/, UINT32 /*commandIndex*/)
 {
 	player->SetHqOff(false);
-	return TRUE;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
 
-static LOGICAL
-_tuneOrigin(Player* player, UCHAR index, const SCHAR* /*handle*/, UINT32 /*commandIndex*/)
+static bool _tuneOrigin(Player* player, UCHAR index, const SCHAR* /*handle*/, UINT32 /*commandIndex*/)
 {
 	// Remove any pre-existing origin tune
 	player->detuneChannelsByType(ORIGIN_CP_CHANNEL);
@@ -1935,18 +1933,17 @@ _tuneOrigin(Player* player, UCHAR index, const SCHAR* /*handle*/, UINT32 /*comma
 
 //////////////////////////////////////////////////////////////////////
 
-static LOGICAL
-_tuneGM(Player* player, UCHAR index, const SCHAR* /*handle*/, UINT32 /*commandIndex*/)
+static bool _tuneGM(Player* player, UCHAR index, const SCHAR* /*handle*/, UINT32 /*commandIndex*/)
 {
 	if ( !player->isGM() )
-		return FALSE;
+		return false;
 
 	dbugLog(_FLI, "tuning %s to GM channel", player->callsign());
 
 	if ( adminChannel == nullptr )
 	{
 		dbugLog(_FLW, "adminChannel is null");
-		return FALSE;
+		return false;
 	}
 
 	return player->tuneRadioToChannel(index, adminChannel, adminChannel->type());
@@ -2589,8 +2586,7 @@ _serverStatusCallback(Server::ServerInfo* server, Server::Code scode)
 //This recounts the number of players on each side across the arena.
 //	It should be run only very periodically, since this could take a while
 
-static LOGICAL
-_countUserSides(LOGICAL report)
+static void _countUserSides()
 {
 	_sideCount[WWII_NO_SIDE] = 0;
 	_sideCount[AXIS] = 0;
@@ -2616,14 +2612,11 @@ _countUserSides(LOGICAL report)
 	UINT32 newCount = _sideCount[ALLIED] + _sideCount[AXIS];
 	Server::myServerInfo.stats.m_numPlayers = newCount;
 
-	if (report)
-	{
-		dbugLog(_FLN,"SIDE COUNT: %d:%" PRSizeT " axis, %d:%" PRSizeT " allied, %d:%" PRSizeT " neutral"
-						, _sideCount[AXIS], sidePlayers[AXIS].size()
-						, _sideCount[ALLIED], sidePlayers[ALLIED].size()
-						, _sideCount[WWII_NO_SIDE], sidePlayers[WWII_NO_SIDE].size()
-						);
-	}
+	dbugLog(_FLN,"SIDE COUNT: %d:%" PRSizeT " axis, %d:%" PRSizeT " allied, %d:%" PRSizeT " neutral"
+					, _sideCount[AXIS], sidePlayers[AXIS].size()
+					, _sideCount[ALLIED], sidePlayers[ALLIED].size()
+					, _sideCount[WWII_NO_SIDE], sidePlayers[WWII_NO_SIDE].size()
+					);
 
 	static UINT32 lastCount = 0;
 	static UINT32 lastNotice = 0;
@@ -2638,8 +2631,6 @@ _countUserSides(LOGICAL report)
 		lastNotice = teulTime();
 		lastCount = newCount;
 	}
-
-	return TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2738,7 +2729,7 @@ _lowFrequencyHouseKeeping()
 	if ( (tickCount & 3) == 0 )
 	{
 		//Count up the side
-		_countUserSides(TRUE);
+		_countUserSides();
 		chatSendPopulation();
 	}
 	else
@@ -3669,7 +3660,7 @@ main(int argc, char* argv[])
 	Server::myServerInfo.stats.status = Server::SERVER_ACCEPTING;
 	Server::myServerInfo.sync();
 
-	_countUserSides(TRUE);
+	_countUserSides();
 	chatSendPopulation();
 
 	teulSyncClock();
