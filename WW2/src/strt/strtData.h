@@ -56,8 +56,8 @@ static inline FULL_ID strtFullObjIDToFullID(FULL_OBJ_ID fullObjID)
 }
 
 //strtDTL initialization functions
-extern void strtInitCPStructwithCP(CPStruct& newcp, CP& cp);
-extern void strtInitFacilityStructwithFACILITY(FacilityStruct& newfacility, FACILITY& facility);
+extern void strtInitCPStructwithCP(CPStruct& newcp, const CP& cp);
+extern void strtInitFacilityStructwithFACILITY(FacilityStruct& newfacility, const FACILITY& facility);
 extern void strtInitObjectStructwithBUILDING(ObjectStruct& newobject, const BUILDING& building);
 extern void strtInitLinkStructwithDEPOT_LINK(LinkStruct& newlink, const DEPOT_LINK& depotlink);
 

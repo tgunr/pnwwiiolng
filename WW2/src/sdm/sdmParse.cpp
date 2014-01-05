@@ -318,6 +318,7 @@ SINT32 sdmOpenFile(const SCHAR* path, UINT16 /* mode */)
 
 			///OGS:06/22/07: Allow code to supersede SDM files as to
 			///which side a country indicates.
+			cp.country = wwiiAdjustedCountry(cp.country);
 			cp.side = wwiiSide(static_cast<WWII_COUNTRY>(cp.country));
 
 			_applyTranslationsToName(cp.name, s_cpTranslationFails, /*basicOnly=*/false);
@@ -337,6 +338,7 @@ SINT32 sdmOpenFile(const SCHAR* path, UINT16 /* mode */)
 
 			///OGS:06/22/07: Allow code to supersede SDM files as to
 			///which side a country indicates.
+			fac.originalCountry = wwiiAdjustedCountry(fac.originalCountry);
 			fac.originalSide = wwiiSide(static_cast<WWII_COUNTRY>(fac.originalCountry));
 
 			_applyTranslationsToName(fac.name, s_facilityTranslationFails, /*basicOnly=*/false);

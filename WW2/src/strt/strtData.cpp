@@ -272,13 +272,6 @@ ErrorInfo errorInfo[MAX_ERR_CODES] =
 
 static std::map<std::string, std::string> errorList[MAX_ERR_CODES];
 
-static WWII_COUNTRY _adjustCountryFor135(UINT32 country)
-{
-	if ( country >= MAX_COUNTRIES )
-		country -= 2;
-	return (WWII_COUNTRY) country;
-}
-
 //////////////////////////////////////////////////////////////////////
 // Add an error list entry for an object, if it isn't ignoring the
 // given error.
@@ -1852,7 +1845,7 @@ ObjectStruct* currentObject;
 }
 
 //strtDTL initialization functions
-void strtInitCPStructwithCP(CPStruct& newCP, CP& cp)
+void strtInitCPStructwithCP(CPStruct& newCP, const CP& cp)
 {
 	//Fill in the fullObjID
 	//Calculate octet x and y from POSITIONAL x and y
@@ -1871,7 +1864,6 @@ void strtInitCPStructwithCP(CPStruct& newCP, CP& cp)
 	newCP.setSide((WWII_SIDE)cp.side);
 	newCP.originalSide = newCP.controllingSide = (WWII_SIDE) cp.side;
 
-	cp.country = _adjustCountryFor135(cp.country);
 	newCP.country = newCP.originalCountry = newCP.controllingCountry = (WWII_COUNTRY) cp.country;
 
 	strlcpy(newCP.name, cp.name, sizeof(newCP.name));
@@ -1879,7 +1871,7 @@ void strtInitCPStructwithCP(CPStruct& newCP, CP& cp)
 	newCP.filename = newCP.m_filename->c_str();
 }
 
-void strtInitFacilityStructwithFACILITY(FacilityStruct& newFacility, FACILITY& facility)
+void strtInitFacilityStructwithFACILITY(FacilityStruct& newFacility, const FACILITY& facility)
 {
 	// Remember the location
 	newFacility.m_posX = facility.posx;
@@ -1901,7 +1893,6 @@ void strtInitFacilityStructwithFACILITY(FacilityStruct& newFacility, FACILITY& f
 
 	newFacility.side = newFacility.originalSide = (WWII_SIDE) facility.originalSide;
 
-	facility.originalCountry = _adjustCountryFor135(facility.originalCountry);
 	newFacility.country = newFacility.originalCountry = (WWII_COUNTRY) facility.originalCountry;
 
 	strlcpy(newFacility.name, facility.name, sizeof(newFacility.name));

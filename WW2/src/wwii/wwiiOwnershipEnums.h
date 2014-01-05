@@ -79,5 +79,10 @@ static inline WWII_SIDE wwiiOtherSide(UINT32 side)
 	}
 }
 
+static inline WWII_COUNTRY wwiiAdjustedCountry(UINT32 country)
+{
+	return static_cast<WWII_COUNTRY>((country < MAX_COUNTRIES) ? country : country - 2);
+}
+
 //tolua_end
 static inline bool isValidSide(WWII_SIDE n) { return (n == ALLIED || n == AXIS); }
