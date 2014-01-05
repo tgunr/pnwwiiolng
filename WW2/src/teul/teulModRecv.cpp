@@ -1201,7 +1201,7 @@ _pollRemoveEndpoint(ENDPOINT* const endpoint)
 				, endpoint->teulIndex()
 				, endpoint->state(), endpoint->socket, pollData.m_count);
 
-	const UINT16 slot = endpoint->m_impl->pollSlot();
+	const SINT16 slot = endpoint->m_impl->pollSlot();
 
 	if (pollData.m_count < (pollData.m_size / 2))
 	{
@@ -1305,6 +1305,7 @@ _pollSet(void)
 		const SOCKET sock = endpoint->socket;
 		if ( endpoint->state() != IS_DEAD && sock != INVALID_SOCKET )
 		{
+			assert(pollData.m_count <= std::numeric_limits<UINT16>);
 			endpoint->m_impl->pollSlot(pollData.m_count);
 			endpoint->updateSocketEvents();
 

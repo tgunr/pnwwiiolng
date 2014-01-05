@@ -21,7 +21,7 @@ struct EndpointImpl
 	void pollSlot(SINT16 newSlot_) { m_pollSlot = newSlot_; }
 
 	//! Retrieve the current poll slot.
-	UINT16 pollSlot() const { return m_pollSlot; }
+	SINT16 pollSlot() const { return m_pollSlot; }
 
 	//! Return the first packet in the send queue to the free list.
 	void FreeFirstPacketInSendQueue();
@@ -47,7 +47,7 @@ struct EndpointImpl
 
 	UINT16			m_version;				//!< Currently negotiated version.
 	UINT16			m_cryptVersion;			//!< Version to use for encryption.
-	UINT16			m_pollSlot;				//!< Position within the "poll" array under Linux/MacOS.
+	SINT16			m_pollSlot;				//!< Position within the "poll" array under Linux/MacOS.
 	UINT16			kliveInterval;			//!< Time between keep alives.
 	UINT16			m_lastPacketTick;		//!< Tick of the previous packet.
 };
