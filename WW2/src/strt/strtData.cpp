@@ -301,20 +301,11 @@ FilenamePool g_filenamePool;
 // Code that provides a shared memory of filename spaces, rather than using
 // 128 bytes per cp/facility/building/link/etc for the same names
 
-static const char*
+static const std::string&
 _filenamePool(const char* string)
 {
-	// Step 1: Look for the string in the existing set
-	FilenamePool::iterator it = g_filenamePool.find(string);
-	if ( it != g_filenamePool.end() )
-		return it->c_str();
 	auto insertion = g_filenamePool.insert(string);
-	if ( PN_UNLIKELY(!insertion.second) )
-	{
-		dbugLog(_FLAS, "failed to add %s to string pool", string);
-		exit(0);
-	}
-	return insertion.first->c_str();
+	return *(insertion.first);
 }
 
 UINT32
@@ -1876,7 +1867,7 @@ void strtInitCPStructwithCP(CPStruct& newCP, CP& cp)
 	newCP.country = newCP.originalCountry = newCP.controllingCountry = (WWII_COUNTRY) cp.country;
 
 	strlcpy(newCP.name, cp.name, sizeof(newCP.name));
-	newCP.filename = _filenamePool(cp.fileName);
+	newCP.filename = _filenamePool(cp.fileName).c_str();
 }
 
 void strtInitFacilityStructwithFACILITY(FacilityStruct& newFacility, FACILITY& facility)
@@ -1905,7 +1896,7 @@ void strtInitFacilityStructwithFACILITY(FacilityStruct& newFacility, FACILITY& f
 	newFacility.country = newFacility.originalCountry = (WWII_COUNTRY) facility.originalCountry;
 
 	strlcpy(newFacility.name, facility.name, sizeof(newFacility.name));
-	newFacility.filename = _filenamePool(facility.fileName);
+	newFacility.filename = _filenamePool(facility.fileName).c_str();
 }
 
 void strtInitObjectStructwithBUILDING(ObjectStruct& newObject, const BUILDING& building)
@@ -1937,7 +1928,8 @@ void strtInitObjectStructwithBUILDING(ObjectStruct& newObject, const BUILDING& b
 	newObject.facilityID.objType = building.pid.objType;
 
 	strsafecpy(newObject.name, building.name);
-	newObject.filename = _filenamePool(building.fileName);
+	newObject.m_filename = &_filenamePool(building.fileName);
+	newObject.filename = newObject.m_filename->c_str();
 }
 
 void strtInitLinkStructwithDEPOT_LINK(LinkStruct& newLink, const DEPOT_LINK& depotlink)
@@ -1971,25 +1963,26 @@ bool strtInitCPfromWOR(CPStruct& cp)
 
 	if (cpParams == nullptr)
 	{
-		switch(cp.fullObjID.objType)
+		static const std::string cpGeneric("CP_GENERIC"), cpSmall("SMALL_CP"), cpMed("MED_CP"), cpLarge("LARGE_CP"), cpBridge("CP_BRIDGE");
+		switch (cp.fullObjID.objType)
 		{
 			case CP_GENERIC:
-				cpParams = parseGetCPValues("CP_GENERIC");
+				cpParams = parseGetCPValues(cpGeneric);
 			break;
 			case CP_SMALL:
-				cpParams = parseGetCPValues("SMALL_CP");
+				cpParams = parseGetCPValues(cpSmall);
 			break;
 			case CP_MEDIUM:
-				cpParams = parseGetCPValues("MED_CP");
+				cpParams = parseGetCPValues(cpMed);
 			break;
 			case CP_LARGE:
-				cpParams = parseGetCPValues("LARGE_CP");
+				cpParams = parseGetCPValues(cpLarge);
 			break;
 			case CP_BRIDGE:
-				cpParams = parseGetCPValues("CP_BRIDGE");
+				cpParams = parseGetCPValues(cpBridge);
 			break;
 			default:
-				cpParams = parseGetCPValues("CP_GENERIC");
+				cpParams = parseGetCPValues(cpGeneric);
 			break;
 		}
 	}
@@ -2013,37 +2006,39 @@ bool strtInitFacilityfromWOR(FacilityStruct& facility)
 
 	if (facilityParams == nullptr)
 	{
+		const std::string facCity("CITY"), facFactory("FACTORY"), facBase("BASE"), facDepot("DEPOT"), facOMT("OMT"), facShipyard("SHIPYARD"),
+						facFirebase("FIREBASE"), facAirbase("AIRBASE"), facArmybase("ARMYBASE"), facNavalBase("NAVALBASE");
 		switch(facility.fullObjID.objType)
 		{
 			case FACILITY_CITY:
-				facilityParams = parseGetFacilityValues("CITY");
+				facilityParams = parseGetFacilityValues(facCity);
 			break;
 			case FACILITY_FACTORY:
-				facilityParams = parseGetFacilityValues("FACTORY");
+				facilityParams = parseGetFacilityValues(facFactory);
 			break;
 			case FACILITY_BASE:
-				facilityParams = parseGetFacilityValues("BASE");
+				facilityParams = parseGetFacilityValues(facBase);
 			break;
 			case FACILITY_DEPOT:
-				facilityParams = parseGetFacilityValues("DEPOT");
+				facilityParams = parseGetFacilityValues(facDepot);
 			break;
 			case FACILITY_OMT:
-				facilityParams = parseGetFacilityValues("OMT");
+				facilityParams = parseGetFacilityValues(facOMT);
 			break;
 			case FACILITY_SHIPYARD:
-				facilityParams = parseGetFacilityValues("SHIPYARD");
+				facilityParams = parseGetFacilityValues(facShipyard);
 			break;
 			case FACILITY_FIREBASE:
-				facilityParams = parseGetFacilityValues("FIREBASE");
+				facilityParams = parseGetFacilityValues(facFirebase);
 			break;
 			case FACILITY_AIRBASE:
-				facilityParams = parseGetFacilityValues("AIRBASE");
+				facilityParams = parseGetFacilityValues(facAirbase);
 			break;
 			case FACILITY_ARMYBASE:
-				facilityParams = parseGetFacilityValues("ARMYBASE");
+				facilityParams = parseGetFacilityValues(facArmybase);
 			break;
 			case FACILITY_NAVALBASE:
-				facilityParams = parseGetFacilityValues("NAVALBASE");
+				facilityParams = parseGetFacilityValues(facNavalBase);
 			break;
 		}
 	}
@@ -2068,7 +2063,7 @@ bool strtInitObjectfromWOR(ObjectStruct& object)
     BUILDING_PARAMS* objectParams;
 
 	//Get the information from the object name
-	objectParams = parseGetBuildingValues(object.filename);
+	objectParams = parseGetBuildingValues(*object.m_filename);
 
 	if (PN_UNLIKELY(objectParams == nullptr))
 		return false;
@@ -2095,30 +2090,33 @@ bool strtInitLinkfromWOR(LinkStruct& link)
 		return false;
 
 	DEPOT_LINK_PARAMS* linkParams;
+	static const std::string linkRail("RAIL_LINK"), linkBarge("BARGE_LINK"), linkConvoy("CONVOY_LINK"),
+						linkPackAnimal("PACK_ANIMAL_LINK"), linkWagon("WAGON_LINK"), linkPorter("PORTER_LINK"), 
+						linkTruck("TRUCK_LINK");
 	switch (link.startDepot->subType)
 	{
 		case DEPOT_TRAIN:
-			linkParams = parseGetDepotLinkValues("RAIL_LINK");
+			linkParams = parseGetDepotLinkValues(linkRail);
 		break;
 		case DEPOT_BARGE:
-			linkParams = parseGetDepotLinkValues("BARGE_LINK");
+			linkParams = parseGetDepotLinkValues(linkBarge);
 		break;
 		case DEPOT_CONVOY:
-			linkParams = parseGetDepotLinkValues("CONVOY_LINK");
+			linkParams = parseGetDepotLinkValues(linkConvoy);
 		break;
 		case DEPOT_PACK_ANIMAL:
-			linkParams = parseGetDepotLinkValues("PACK_ANIMAL_LINK");
+			linkParams = parseGetDepotLinkValues(linkPackAnimal);
 		break;
 		case DEPOT_WAGON:
-			linkParams = parseGetDepotLinkValues("WAGON_LINK");
+			linkParams = parseGetDepotLinkValues(linkWagon);
 		break;
 		case DEPOT_PORTER:
-			linkParams = parseGetDepotLinkValues("PORTER_LINK");
+			linkParams = parseGetDepotLinkValues(linkPorter);
 		break;
 		case DEPOT_GENERIC:
 		case DEPOT_TRUCK:
 		default:
-			linkParams = parseGetDepotLinkValues("TRUCK_LINK");
+			linkParams = parseGetDepotLinkValues(linkTruck);
 		break;
 	}
 

@@ -132,7 +132,7 @@ void parseWorKill(void)
 }
 
 template<typename _Type>
-static _Type* _getValue(SECTION_ENUM sec, const char* const name)
+static _Type* _getValue(SECTION_ENUM sec, const std::string& name)
 {
 	ObjMap& objects = _stratSections[sec].objects;
 	ObjMap::iterator it = objects.find(name);
@@ -140,22 +140,22 @@ static _Type* _getValue(SECTION_ENUM sec, const char* const name)
 }
 
 
-CP_PARAMS* parseGetCPValues(const char* const objName)
+CP_PARAMS* parseGetCPValues(const std::string& objName)
 {
 	return _getValue<CP_PARAMS>(WOR_CP, objName);
 }
 
-FACILITY_PARAMS* parseGetFacilityValues(const char* objName)
+FACILITY_PARAMS* parseGetFacilityValues(const std::string& objName)
 {
 	return _getValue<FACILITY_PARAMS>(WOR_FACILITY, objName);
 }
 
-BUILDING_PARAMS* parseGetBuildingValues(const char* objName)
+BUILDING_PARAMS* parseGetBuildingValues(const std::string& objName)
 {
 	return _getValue<BUILDING_PARAMS>(WOR_BUILDING, objName);
 }
 
-DEPOT_LINK_PARAMS* parseGetDepotLinkValues(const char* objName)
+DEPOT_LINK_PARAMS* parseGetDepotLinkValues(const std::string& objName)
 {
 	return _getValue<DEPOT_LINK_PARAMS>(WOR_DEPOT_LINK, objName);
 }

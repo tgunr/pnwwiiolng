@@ -23,14 +23,14 @@ extern bool parseWor(const char* levelfile, PARSE_CALLBACK* world);
 extern void parseWorKill(void);
 
 // find the cp value for objName
-extern CP_PARAMS* parseGetCPValues(const char* objName);
+extern CP_PARAMS* parseGetCPValues(const std::string& objName);
 
 // find the facility value for objName
-extern FACILITY_PARAMS* parseGetFacilityValues(const char* objName);
+extern FACILITY_PARAMS* parseGetFacilityValues(const std::string& objName);
 
 // find the building value for objName
-extern BUILDING_PARAMS* parseGetBuildingValues(const char* objName);
+extern BUILDING_PARAMS* parseGetBuildingValues(const std::string& objName);
 
 // find the depot link value for objName
-extern DEPOT_LINK_PARAMS* parseGetDepotLinkValues(const char* objName);
+extern DEPOT_LINK_PARAMS* parseGetDepotLinkValues(const std::string& objName);
 
