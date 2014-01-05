@@ -194,7 +194,7 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd, SINT32 numB
 		{
 			auto& cell = table[(x * CELLS_PER_SIDE) + y];
 			if (cell.numBuildings > 0)
-				Write_Debug("successfully added %d buildings to sc:%d,%d cell:%" PRSizeT ",%" PRSizeT ", cell.numBuildings, sx, sy, x, y);
+				Write_Debug("successfully added %d buildings to sc:%d,%d cell:%" PRSizeT ",%" PRSizeT "", cell.numBuildings, sx, sy, x, y);
 		}
 	}
 #endif
