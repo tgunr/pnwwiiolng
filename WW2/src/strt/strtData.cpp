@@ -876,7 +876,7 @@ _scPass2_linkSetup(Supercell& sc)
 static void
 _scPass2_cps(Supercell& sc)
 {
-	//Cp initialization stuff
+	//CP initialization stuff
 	for ( UINT32 counter = 0; counter < sc.numCPs; ++counter )
 	{
 		CPStruct& cp = sc.cps[counter];
@@ -1310,24 +1310,6 @@ strtResetObject(ObjectStruct& object)
 	object.setVisLevel(VISLEVEL_NORMAL);
 	object.m_smokeLevel = 0;
 
-#ifdef OLDSTYLE_FBS
-	//OGS Mon 2004-11-15 17:xx:xx
-	// Granik changed FB objects to be spawnable without requiring a separate
-	// spawn entity - so the following code breaks things.
-	//
-	//BRD Sat 2001-02-10 15:56:24
-	//
-	// if it's a firebase's spawn object, set it's capacity to 0
-	if ( object.type == BUILDING_SPAWN && object.facility().type == FACILITY_FIREBASE )
-	{
-		//dbugLog(_FLN,"Setting invisible spawn portal %s capacity to zero",object.name);
-		object.setMaxCapacity(0);
-		object.setCapacity(0);
-	}
-	else
-		object.setMaxCapacity(object.capacity);
-#endif
-
 	_calcCapacity(object);
 
 	//Add the RPs required to rebuild the object to the total
@@ -1335,69 +1317,6 @@ strtResetObject(ObjectStruct& object)
 	object.Facility().objectRPTotal += object.totalRPs;
 
 	object.save();
-}
-
-void strtInitCP(CPStruct* cp)
-{
-	cp->prev = nullptr;
-	cp->next = nullptr;
-	cp->facilityList=nullptr;
-	cp->payloadList=nullptr;
-}
-
-void strtInitFacility(FacilityStruct* facility)
-{
-	facility->next = nullptr;
-	facility->cp = nullptr;
-	facility->objectList = nullptr;
-	facility->m_outgoingLink = facility->m_incomingLink = nullptr;
-	facility->m_captureBuilding = nullptr;
-}
-
-void strtInitObject(ObjectStruct* object)
-{
-	object->next=nullptr;
-	object->facility=nullptr;
-	memset(object->name, 0, sizeof(object->name));
-	object->m_isCaptureBuilding = object->m_needsSync = false;
-	object->m_damageJoulesSaved = ~0ULL;
-	object->m_maxDamageJoulesSaved = ~0ULL;
-	object->m_capacitySaved = ~0;
-	object->m_lastCapacitySaved = ~0;
-	object->m_maxCapacitySaved = ~0;
-	object->m_repairRPsSaved = ~0;
-}
-
-void strtInitLink(LinkStruct* link)
-{
-	memset(link->name, 0, sizeof(link->name));
-	link->startDepot=nullptr;
-	link->endDepot=nullptr;
-}
-
-void strtInitConvoy(CONVOYSTRUCT* convoy)
-{
-	convoy->next=nullptr;
-	convoy->prev=nullptr;
-	convoy->link=nullptr;
-	convoy->payload=nullptr;
-}
-
-void strtInitPayload(PAYLOADSTRUCT* payload)
-{
-	payload->next=nullptr;
-	payload->cp=nullptr;
-	payload->convoy=nullptr;
-	payload->destination=nullptr;
-	payload->manifest=nullptr;
-	payload->spawnpoint=nullptr;
-}
-
-void
-strtInitManifest(MANIFESTSTRUCT* manifest)
-{
-	manifest->next=nullptr;
-	manifest->link=nullptr;
 }
 
 static LOGICAL _checkFirebasePair(FacilityStruct& firebase)
@@ -1903,7 +1822,7 @@ static bool _isSpawnObject(ObjectStruct* object)
 }
 
 //Returns true if all buildings that are capture objects have the capture subtype
-//also chaks spawn objects as well
+//also checks spawn objects as well
 //returns false otherwise
 static LOGICAL _verifySubtypes(FacilityStruct* facility)
 {
@@ -2388,9 +2307,9 @@ _cpOwnership(CPStruct& cp, WWII_COUNTRY country)
 
 	// Remove any entries that belong to the wrong side, but be lenient on
 	// country differences; this allows CPs to have mixed ownership, e.g.
-	// a french town with a british airfield.
+	// a French town with a British airfield.
 
-	// Start with Armybases, since depots etc will take their country from
+	// Start with Army bases, since depots etc will take their country from
 	// the AB that they belong to to make them spawnable
 	for ( facility = cp.facilityTypeIndex[FACILITY_ARMYBASE]; facility != nullptr; facility = facility->typeNext )
 		_forceFacilitySide(*facility, side, country);
@@ -2436,7 +2355,7 @@ _cpControl(CPStruct& cp, WWII_COUNTRY country)
 	memset(cp.armyBasesOwned, 0 , sizeof(cp.armyBasesOwned));
 	cp.armyBasesOwned[side] = cp.numArmyBases;
 
-	// Check the armybases first
+	// Check the army bases first
 	for ( facility = cp.facilityTypeIndex[FACILITY_ARMYBASE]; facility != nullptr; facility = facility->typeNext )
 	{
 		_forceFacilitySide(*facility, side, country);
@@ -2460,7 +2379,7 @@ _cpControl(CPStruct& cp, WWII_COUNTRY country)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Locate an armybase for a firebase
+// Locate an army base for a firebase
 
 static bool
 _findFirebaseArmybase(FacilityStruct* fb)

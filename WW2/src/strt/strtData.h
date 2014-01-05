@@ -17,6 +17,10 @@ struct MANIFESTSTRUCT;
 struct CONVOYSTRUCT;
 struct PAYLOADSTRUCT;
 struct FULL_ID;
+struct CP;
+struct FACILITY;
+struct BUILDING;
+struct DEPOT_LINK;
 
 //tolua_begin
 
@@ -43,15 +47,6 @@ extern CPStruct* strtGetCP_FULL_ID(const FULL_ID& index);
 extern FacilityStruct* strtGetFacility_FULL_ID(const FULL_ID& index);
 extern ObjectStruct* strtGetObject_FULL_ID(const FULL_ID& index);
 extern LinkStruct* strtGetLink_FULL_ID(const FULL_ID& index);
-
-//Initialization functions for the strat system
-extern void strtInitCP(CPStruct* cp);
-extern void strtInitFacility(FacilityStruct* facility);
-extern void strtInitObject(ObjectStruct* object);
-extern void strtInitLink(LinkStruct* link);
-extern void strtInitConvoy(CONVOYSTRUCT* convoy);
-extern void strtInitPayload(PAYLOADSTRUCT* payload);
-extern void strtInitManifest(MANIFESTSTRUCT* manifest);
 
 //Conversion routines
 static inline FULL_ID strtFullObjIDToFullID(FULL_OBJ_ID fullObjID)

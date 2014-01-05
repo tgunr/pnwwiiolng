@@ -190,7 +190,7 @@ _initLinks(Supercell* sc, const char* filename)
 }
 
 //////////////////////////////////////////////////////////////////////
-//poulates supercell with info from file name filename
+//populates supercell with info from file name filename
 
 bool
 Supercell::initialize(SINT16 scx, SINT16 scy, const char* filename)
