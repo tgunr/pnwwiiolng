@@ -107,6 +107,7 @@ static LOGICAL _fakeStructure(CPStruct* cp)
 
 	strlcpy(facility->name, cp->name, sizeof(facility->name));
 	facility->filename = cp->filename;
+	facility->m_filename = cp->m_filename;
 
 	//Setup the fake FULL_OBJ_ID
 	object->fullObjID = cp->fullObjID;
@@ -125,6 +126,7 @@ static LOGICAL _fakeStructure(CPStruct* cp)
 	//copy over the object filename, so when we lookup its information in the
 	//	WOR file, we actually can find something
 	object->filename = cp->filename;
+	object->m_filename = cp->m_filename;
 
 	//Initialize the object from the WOR file
 	strtInitObjectfromWOR(*object);
