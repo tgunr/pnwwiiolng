@@ -284,7 +284,7 @@ static bool _fillClass(SINT32 /*numArgs*/, FUNCARGS* args)
 
 	if ( weaponClass[classIndex].active )
 	{
-		dbugLog(_FLA, "duplicate weapClass %u (%s and %s)", classIndex, weaponClass[classIndex].name, args[1].svalue);
+		dbugLog(_FLA, "duplicate weapClass %u (%s and %s)", classIndex, weaponClass[classIndex].name.c_str(), args[1].svalue);
 		return false;
 	}
 
