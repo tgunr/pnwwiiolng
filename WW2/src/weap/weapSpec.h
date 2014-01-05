@@ -95,8 +95,8 @@ extern WEAPON_SPEC NULL_WEAP_SPEC; // removed const to work with broken MW Linke
 //tolua_end
 #pragma pack(pop)
 
-#define COMPARE_SPECS(s1,s2) (*((UINT32*)&(s1)) == *((UINT32*)&(s2)))
-#define	SPEC_IS_NULL(spec) COMPARE_SPECS(spec, NULL_WEAP_SPEC)
+#define COMPARE_SPECS(s1,s2) ((s1) == (s2))
+#define	SPEC_IS_NULL(spec) (spec.isNull())
 
 //tolua_begin
 
