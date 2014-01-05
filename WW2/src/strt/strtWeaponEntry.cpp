@@ -25,9 +25,8 @@
 
 WeaponEntry::WeaponEntry(const WEAPON& withWeapon, const ObjectStruct& withSpawner)
 	: m_weapon(withWeapon)
-	, m_portals()
+	, m_portals({ &withSpawner })
 {
-	addSpawner(withSpawner);
 }
 
 void
