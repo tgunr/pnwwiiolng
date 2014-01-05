@@ -27,19 +27,18 @@ const BASE_ARG_TYPES* baseAllow[] = {NULL
 
 ARG_KEY* parseGetArgKey(UCHAR* strIn)
 {
-static UINT32 tmpUint32;
-UINT16	tmpUint16;
-UINT8	tmpUint8;
-SINT32	tmpSint32;
-SINT16	tmpSint16;
-SINT8	tmpSint8;
+	static UINT32 tmpUint32;
+	UINT16	tmpUint16;
+	UINT8	tmpUint8;
+	SINT32	tmpSint32;
+	SINT16	tmpSint16;
+	SINT8	tmpSint8;
 
-FLOAT32	tmpFloat32;
-SCHAR*	str = (SCHAR*) strIn;
-SCHAR*	endPoint;
-SCHAR**	endPointP = &endPoint;
-SINT8	isNegative = 0;
-static	ARG_KEY tt = {0,0,0,0,0,0,0};
+	FLOAT32	tmpFloat32;
+	SCHAR*	str = (SCHAR*) strIn;
+	SCHAR*	endPoint;
+	SINT8	isNegative = 0;
+	static	ARG_KEY tt = {0,0,0,0,0,0,0};
 
 	dbugSetErrno(0);
 
@@ -55,13 +54,13 @@ static	ARG_KEY tt = {0,0,0,0,0,0,0};
 	if ( *str == '-')
 		tt.isNegative = TRUE;
 
-	tmpUint32 = (UINT32)strtoul(str, endPointP,10);
+	tmpUint32 = (UINT32)strtoul(str, &endPoint,10);
 
 	if (dbugGetErrno() != 0 || endPoint == str || *endPoint != 0)
 	{
 		tmpSint32 = 0;
 
-		tmpFloat32 = (FLOAT32)strtod(str,endPointP);
+		tmpFloat32 = (FLOAT32)strtod(str, &endPoint);
 		if (dbugGetErrno() != 0 || endPoint == str || *endPoint != 0)
 		{
 
@@ -88,7 +87,6 @@ static	ARG_KEY tt = {0,0,0,0,0,0,0};
 
 		if ( isNegative )
 		{
-
 			tmpSint8 = (SINT8) tmpSint32;
 			tmpSint16 = (SINT16) tmpSint32;
 
@@ -113,8 +111,7 @@ static	ARG_KEY tt = {0,0,0,0,0,0,0};
 				tt.numBytes = 4;
 		}
 
-		tmpFloat32 = (FLOAT32)strtod(str,endPointP);
-
+		tmpFloat32 = (FLOAT32)strtod(str, &endPoint);
 	}
 
 	tt.fvalue = tmpFloat32;
@@ -124,7 +121,6 @@ static	ARG_KEY tt = {0,0,0,0,0,0,0};
 		tt.baseType = T_EMPTY;
 
 	return (&tt);
-
 }
 
 static inline SINT32 _fillParamInt(UCHAR* /*arg*/, UCHAR* target, EXT_ARG_TYPES thisType, ARG_KEY* argSpec)
