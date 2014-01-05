@@ -287,14 +287,14 @@ void strtAddErrorListEntry(int errorNo, const char* objectName, const char* entr
 //////////////////////////////////////////////////////////////////////
 // Filename string pool definitions
 
-typedef std::map<UINT64, std::vector<std::string>> FilenamePool;
+typedef std::map<UINT64, std::vector<std::unique_ptr<std::string>>> FilenamePool;
 FilenamePool g_filenamePool;
 
 //////////////////////////////////////////////////////////////////////
 // Code that provides a shared memory of filename spaces, rather than using
 // 128 bytes per cp/facility/building/link/etc for the same names
 
-static const std::string&
+static const std::string*
 _filenamePool(const char* filename)
 {
 	auto hash = ConstCharHasher<0xbead0ec7, 6037>(filename);
@@ -302,11 +302,11 @@ _filenamePool(const char* filename)
 	auto it = names.begin();
 	for (auto end = names.end(); it != end; ++it)
 	{
-		if (strcmp(it->c_str(), filename) == 0)
-			return *it;
+		if (strcmp((*it)->c_str(), filename) == 0)
+			return it->get();
 	}
-	names.push_back(filename);
-	return names.back();
+	names.emplace_back(new std::string(filename));
+	return names.back().get();
 }
 
 UINT32
@@ -1867,7 +1867,7 @@ void strtInitCPStructwithCP(CPStruct& newCP, const CP& cp)
 	newCP.country = newCP.originalCountry = newCP.controllingCountry = (WWII_COUNTRY) cp.country;
 
 	strlcpy(newCP.name, cp.name, sizeof(newCP.name));
-	newCP.m_filename = &_filenamePool(cp.fileName);
+	newCP.m_filename = _filenamePool(cp.fileName);
 	newCP.filename = newCP.m_filename->c_str();
 }
 
@@ -1896,7 +1896,7 @@ void strtInitFacilityStructwithFACILITY(FacilityStruct& newFacility, const FACIL
 	newFacility.country = newFacility.originalCountry = (WWII_COUNTRY) facility.originalCountry;
 
 	strlcpy(newFacility.name, facility.name, sizeof(newFacility.name));
-	newFacility.m_filename = &_filenamePool(facility.fileName);
+	newFacility.m_filename = _filenamePool(facility.fileName);
 	newFacility.filename = newFacility.m_filename->c_str();
 }
 
@@ -1929,7 +1929,7 @@ void strtInitObjectStructwithBUILDING(ObjectStruct& newObject, const BUILDING& b
 	newObject.facilityID.objType = building.pid.objType;
 
 	strsafecpy(newObject.name, building.name);
-	newObject.m_filename = &_filenamePool(building.fileName);
+	newObject.m_filename = _filenamePool(building.fileName);
 	newObject.filename = newObject.m_filename->c_str();
 }
 
