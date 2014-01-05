@@ -35,3 +35,15 @@ namespace std
 		template<> struct hash<void*>  { size_t operator()(void const* o) const  { return *(size_t*)(&o); } };
 }
 
+// Crude hasher for const char* strings
+template<size_t BaseValue, size_t PrimeFactor>
+size_t ConstCharHasher(const char* text)
+{
+	size_t hash = BaseValue;
+	const char* it;
+	for (it = text; *it; ++it) {
+		hash = (hash << 3) ^ *it ^ (hash >> 29);
+	}
+	hash ^= (it - text);
+	return hash % PrimeFactor;
+}

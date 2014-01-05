@@ -294,7 +294,7 @@ void strtAddErrorListEntry(int errorNo, const char* objectName, const char* entr
 //////////////////////////////////////////////////////////////////////
 // Filename string pool definitions
 
-typedef std::unordered_set<std::string> FilenamePool;
+typedef std::map<UINT64, std::vector<std::string>> FilenamePool;
 FilenamePool g_filenamePool;
 
 //////////////////////////////////////////////////////////////////////
@@ -302,10 +302,20 @@ FilenamePool g_filenamePool;
 // 128 bytes per cp/facility/building/link/etc for the same names
 
 static const std::string&
-_filenamePool(const char* string)
+_filenamePool(const char* filename)
 {
-	auto insertion = g_filenamePool.insert(string);
-	return *(insertion.first);
+	auto hash = ConstCharHasher<0xbead0ec7, 6037>(filename);
+	auto& names = g_filenamePool[hash];
+	auto it = names.begin();
+	for (auto end = names.end(); it != end; ++it)
+	{
+		if (*it == filename)
+			return *it;
+	}
+	names.push_back(filename);
+	if (names.size() > 1)
+		DebugBreak();
+	return names.back();
 }
 
 UINT32
