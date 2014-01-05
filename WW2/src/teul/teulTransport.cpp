@@ -74,8 +74,6 @@ teulGetHostByName(const SCHAR* const name)
 		while (entry->h_addr_list[numEntries] != NULL)
 			++numEntries;
 
-		numEntries--;
-
 		if ( numEntries > 0)
 		{
 			list = (UINT32*)memAlloc((numEntries+1)*(sizeof(UINT32)));
