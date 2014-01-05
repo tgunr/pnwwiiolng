@@ -67,7 +67,7 @@ struct vers_manifest* matchversion(UINT32 needle, SINT32 appid, UINT32 platform)
 extern LOGICAL authdbStoreComputerInfo(const Auth::ClientData& data, const PLAY_COMPUTER_INFO& pci);
 
 // Get a checksum from the database
-extern LOGICAL authdbGetFileMD5(const UINT32 appID, const UINT32 platform, const char* filename, char* buffer, UINT32 bufLen);
+extern bool authdbGetFileMD5(const UINT32 appID, const UINT32 platform, const char* filename, char* buffer, UINT32 bufLen);
 
 extern void authdbSaveLastOTP(UINT64 otp);
 extern UINT32 authdbGetLastOTP();

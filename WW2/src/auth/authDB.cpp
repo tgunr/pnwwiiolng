@@ -954,30 +954,17 @@ matchversion(UINT32 needle, SINT32 appID, UINT32 platform)
 }
 
 //////////////////////////////////////////////////////////////////////
-LOGICAL
-authdbGetFileMD5(const UINT32 appID, const UINT32 platform, const char* filename, char* buffer, UINT32 bufLen)
+bool authdbGetFileMD5(const UINT32 appID, const UINT32 platform, const char* filename, char* buffer, UINT32 bufLen)
 {
 	assert(buffer != NULL && bufLen > 1);
 
-	char statement[512 + 1];
 	char myFilename[MAXPATHLEN*2+1];
-
-	strsafecpy(statement, filename);
-	mysql_escape_string(myFilename, statement, strlen(statement));
-
-	strprintf(statement
-				, "SELECT checksum"
-					" FROM auth_checksums"
-					" WHERE appID = appID"
-						" AND platform = platform"
-						" AND filename = LOWER('%s')"
-						" LIMIT 1"
-					, myFilename
-					);
+	mysql_escape_string(myFilename, filename, strlen(filename));
 
 	try
 	{
-		DBQuery q(dbh, statement);
+		DBQuery q(dbh, "SELECT checksum FROM auth_checksums WHERE appID = appID AND platform = %u AND filename = LOWER('%s') LIMIT 1"
+						, platform, myFilename);
 		if ( q.HasRows() && q.FetchRow() )
 		{
 			q.Row().NextString(buffer, bufLen);
