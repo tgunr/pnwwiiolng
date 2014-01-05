@@ -50,10 +50,16 @@
 #define PN_LIKELY(p) (p)
 #endif
 
+#if defined(_MSC_VER)
+# define PN_THREAD_LOCAL __declspec(thread)
+#else
+# define PN_THREAD_LOCAL thread_local
+#endif
+
 // Determine which version of GCC, if any, is being used,
 // and for GCC/MSVC, determine what C++0X support is
 // available.
-#ifdef __GNUC__
+#if defined(__GNUC__)
 # define GCC_VERSION ( ((__GNUC__) * 100) + (__GNUC_MINOR__) )
 # if GCC_VERSION < 400
 #	error("GCC version 4.0 or higher is required to compile this code.")
