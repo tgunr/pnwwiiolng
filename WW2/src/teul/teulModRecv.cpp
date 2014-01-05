@@ -112,8 +112,6 @@ static SocketToEndpoint socketToEndpoint;
 
 static TeulTimeMS	_lastIdle;
 
-extern SINT32 teulModResendPacket(ENDPOINT* inEndpoint, PACKET_HEAD* packet);
-
 static void	_pollSockets(const TeulTimeMS& duration_);
 
 static void	_routeCALLBACKs(ENDPOINT& inEndpoint);
@@ -1166,8 +1164,7 @@ ENDPOINT::updateSocketEvents()
 
 
 #if defined(NIX_VERSION)
-static void
-_pollAddEndpoint(ENDPOINT& endpoint)
+static void _pollAddEndpoint(ENDPOINT& endpoint)
 {
 	nfds_t slot;
 	for (slot = 0; slot < pollData.m_size; ++slot)
@@ -1184,15 +1181,14 @@ _pollAddEndpoint(ENDPOINT& endpoint)
 
 	dbugLog(_FLD,"t:%d adding endpoint state %d socket %d slot %d count %" PRSizeT ""
 				, endpoint.teulIndex()
-				, endpoint.state(), endpoint->socket
+				, endpoint.state(), endpoint.socket
 				, endpoint.m_impl->pollSlot(), pollData.m_count);
 
 	endpoint.updateSocketEvents();
 }
 
 // should only be called from teulMRecvRemoveFromPoll
-static void
-_pollRemoveEndpoint(ENDPOINT& const endpoint)
+static void _pollRemoveEndpoint(ENDPOINT& endpoint)
 {
 	const SINT16 slot = endpoint.m_impl->pollSlot();
 	if (slot == INVALID_SOCKET)	// not actually in the list
