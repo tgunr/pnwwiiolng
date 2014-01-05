@@ -11,5 +11,5 @@
 #include <map>
 class Supercell;
 
-typedef std::map< SINT32, Supercell > SUPERCELLS;
+typedef std::unordered_map< SINT32, Supercell > SUPERCELLS;
 extern SUPERCELLS g_supercells;
