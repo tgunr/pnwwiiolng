@@ -713,7 +713,7 @@ ENDPOINT::shutdown()
 
 		this->socket = INVALID_SOCKET;
 
-		teulMRecvRemoveFromPoll(this);
+		teulMRecvRemoveFromPoll(*this);
 	}
 
 	this->m_closed = true;

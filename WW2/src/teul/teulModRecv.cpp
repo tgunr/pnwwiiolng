@@ -405,7 +405,7 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 		newEndpoint->setSndBufferSize(4 * 1024);
 #endif
 //			teulModReadSet();
-		teulMRecvAddToPoll(newEndpoint);
+		teulMRecvAddToPoll(*newEndpoint);
 	}
 	while (newSock != INVALID_SOCKET);
 
@@ -788,7 +788,7 @@ _runPollEndpoints(struct pollfd* fdArray, nfds_t maxSlots, int numSlots)
 		if ( (endpoint.m_inUse == false) | (endpoint.socket == INVALID_SOCKET) )
 		{
 			dbugLog(_FLI,"t:%d attempted used of invalid endpoint", endpoint.teulIndex());
-			teulMRecvRemoveFromPoll(&endpoint);
+			teulMRecvRemoveFromPoll(endpoint);
 			continue;
 		}
 
@@ -1167,7 +1167,7 @@ ENDPOINT::updateSocketEvents()
 
 #if defined(NIX_VERSION)
 static void
-_pollAddEndpoint(ENDPOINT* const endpoint)
+_pollAddEndpoint(ENDPOINT& endpoint)
 {
 	nfds_t slot;
 	for (slot = 0; slot < pollData.m_size; ++slot)
@@ -1180,107 +1180,97 @@ _pollAddEndpoint(ENDPOINT* const endpoint)
 		pollData.m_size++;
 
 	pollData.m_count++;
-	endpoint->m_impl->pollSlot(slot);
+	endpoint.m_impl->pollSlot(slot);
 
 	dbugLog(_FLD,"t:%d adding endpoint state %d socket %d slot %d count %" PRSizeT ""
-				, endpoint->teulIndex()
-				, endpoint->state(), endpoint->socket
-				, endpoint->m_impl->pollSlot(), pollData.m_count);
+				, endpoint.teulIndex()
+				, endpoint.state(), endpoint->socket
+				, endpoint.m_impl->pollSlot(), pollData.m_count);
 
-	endpoint->updateSocketEvents();
+	endpoint.updateSocketEvents();
 }
 
 // should only be called from teulMRecvRemoveFromPoll
 static void
-_pollRemoveEndpoint(ENDPOINT* const endpoint)
+_pollRemoveEndpoint(ENDPOINT& const endpoint)
 {
+	const SINT16 slot = endpoint.m_impl->pollSlot();
+	if (slot == INVALID_SOCKET)	// not actually in the list
+		return;
+
 	assert(pollData.m_count > 0);
 	pollData.m_count--;
 
-	dbugLog(_FLD, "t:%d removing endpoint state %d socket %d count %" PRSizeT ""
-				, endpoint->teulIndex()
-				, endpoint->state(), endpoint->socket, pollData.m_count);
-
-	const SINT16 slot = endpoint->m_impl->pollSlot();
+	dbugLog(_FLD, "t:%d removing endpoint state %d socket %d slot %d count %" PRSizeT ""
+				, endpoint.teulIndex()
+				, endpoint.state(), endpoint.socket, slot, pollData.m_count);
 
 	if (pollData.m_count < (pollData.m_size / 2))
 	{
 		_pollSet();
 	}
-	else if (slot >= 0)
-	{
-		pollData.fd[slot].fd = INVALID_SOCKET;
-		endpoint->m_impl->pollSlot(-1);
-	}
 	else
 	{
-		dbugLog(_FLA,"attempt to release endpoint %d with invalid pollSlot %d", endpoint->teulIndex(), slot);
+		pollData.fd[slot].fd = INVALID_SOCKET;
+		endpoint.m_impl->pollSlot(-1);
 	}
-
 }
 #endif
 
 void
-teulMRecvRemoveFromPoll(ENDPOINT* const endpoint)
+teulMRecvRemoveFromPoll(ENDPOINT& endpoint)
 {
 #if defined(NIX_VERSION)
-	if ( endpoint->socket != INVALID_SOCKET )
+	if ( endpoint.socket != INVALID_SOCKET )
 	{
 		// set these here since _pollSet keys off of INVALID_SOCKET
-		socketToEndpoint.erase(endpoint->socket);
-		endpoint->socket = INVALID_SOCKET;
+		socketToEndpoint.erase(endpoint.socket);
+		endpoint.socket = INVALID_SOCKET;
 	}
 
 	_pollRemoveEndpoint(endpoint);
 
 #else
-	if ( endpoint->socket != INVALID_SOCKET )
+	if ( endpoint.socket != INVALID_SOCKET )
 	{
-		// Dissasociate the socket / event object with any events.
-		WSAEventSelect(endpoint->socket, endpoint->eventObject, 0);
+		// Disassociate the socket / event object with any events.
+		WSAEventSelect(endpoint.socket, endpoint.eventObject, 0);
 		// Now close the event object.
-		if (WSACloseEvent(endpoint->eventObject) < 0)
-			dbugLog(_FLA,"t:%d error closing wsa event: %d", endpoint->teulIndex(), WSAGetLastError());
+		if (WSACloseEvent(endpoint.eventObject) < 0)
+			dbugLog(_FLA,"t:%d error closing wsa event: %d", endpoint.teulIndex(), WSAGetLastError());
 	}
 #endif
 }
 
 #if defined(NIX_VERSION)
-void
-teulMRecvUpdatePoll(ENDPOINT* const endpoint)
+void teulMRecvUpdatePoll(ENDPOINT& endpoint)
 {
-	endpoint->updateSocketEvents();
+	endpoint.updateSocketEvents();
 #ifdef EXTREME_DEBUG
-	dbugLog(_FLD, "t:%d updating endpoint slot %d socket %d combined", endpoint->teulIndex(), endpoint->m_impl->pollSlot, endpoint->socket);
+	dbugLog(_FLD, "t:%d updating endpoint slot %d socket %d combined", endpoint.teulIndex(), endpoint.m_impl->pollSlot, endpoint.socket);
 #endif
 }
 #else
-void
-teulMRecvUpdatePoll(ENDPOINT* /* endpoint */)
+void teulMRecvUpdatePoll(ENDPOINT& /* endpoint */)
 {
 	_needSetFs = true;
 }
 #endif
 
-SINT32
-teulMRecvAddToPoll(ENDPOINT* endpoint)
+void teulMRecvAddToPoll(ENDPOINT& endpoint)
 {
-	if ( PN_UNLIKELY(endpoint == nullptr) )
-		return -EINVAL;
-
 #if defined(NIX_VERSION)
-	if ( PN_UNLIKELY((endpoint->state() == IS_DEAD) | (endpoint->socket == INVALID_SOCKET)) )
+	if ( PN_UNLIKELY((endpoint.state() == IS_DEAD) | (endpoint.socket == INVALID_SOCKET)) )
 	{
 		dbugLog(_FLA,"attempt to add an invalid endpoint to poll");
-		return -EINVAL;
+		return;
 	}
 
 	_pollAddEndpoint(endpoint);
 #else
-	endpoint->eventObject = WSACreateEvent();
-	endpoint->updateSocketEvents();
+	endpoint.eventObject = WSACreateEvent();
+	endpoint.updateSocketEvents();
 #endif
-	return 0;
 }
 
 #if defined(NIX_VERSION)

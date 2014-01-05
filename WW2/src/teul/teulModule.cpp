@@ -552,32 +552,31 @@ teulOpenConnection(const SINT32 teulIndex, const bool listening, const SINT32 ti
 						, newEndpoint->teulIndex(), error);
 	}
 
-	teulMRecvAddToPoll(newEndpoint);
+	teulMRecvAddToPoll(*newEndpoint);
 
 	return retval;
 }
 
-SINT32
-teulConnectENDPOINT(ENDPOINT* const inEndpoint)
+SINT32 teulConnectENDPOINT(ENDPOINT& inEndpoint)
 {
-	if (PN_UNLIKELY(inEndpoint->state() != IS_OPENING))
+	if (PN_UNLIKELY(inEndpoint.state() != IS_OPENING))
 	{
-		dbugLog(_FLA,"can't connect an endpoint in state %d", inEndpoint->state());
+		dbugLog(_FLA,"can't connect an endpoint in state %d", inEndpoint.state());
 		return -EINVAL;
 	}
 
-	if ( inEndpoint->m_reliable == false )
+	if ( inEndpoint.m_reliable == false )
 	{
-		SINT32 retval = connect(inEndpoint->socket, (struct sockaddr*)&inEndpoint->destSockAddress, sizeof(inEndpoint->destSockAddress));
+		SINT32 retval = connect(inEndpoint.socket, (struct sockaddr*)&inEndpoint.destSockAddress, sizeof(inEndpoint.destSockAddress));
 		if ( retval < 0 )
 		{
-			dbugWrite(_FLA, "t:%d couldn't connect socket",inEndpoint->teulIndex());
+			dbugWrite(_FLA, "t:%d couldn't connect socket",inEndpoint.teulIndex());
 			return retval;
 		}
 	}
 
-	inEndpoint->m_state = IS_OPEN;
-	inEndpoint->setConnected();
+	inEndpoint.m_state = IS_OPEN;
+	inEndpoint.setConnected();
 
 	teulMRecvUpdatePoll(inEndpoint);
 

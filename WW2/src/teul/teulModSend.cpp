@@ -352,11 +352,3 @@ teulModSendCallbackTo(SINT32 teulIndex, UINT32 address, UINT16 port, TEUL_CALLBA
 
 	return retval;
 }
-
-//////////////////////////////////////////////////////////////////////
-
-SINT32
-teulModResendPACKET(ENDPOINT* const /* inEndpoint */, PACKET_HEAD* const /* packet */)
-{
-	LogAbort("retransmit does not work.");
-}

@@ -290,7 +290,7 @@ _actionRecvSYN_ACK_TOKEN(ACTION_OBJECT* const a)
 
 	a->endpoint->destSockAddress = a->endpoint->fromSockAddress;
 
-	if( teulConnectENDPOINT(a->endpoint) == 0 )
+	if( teulConnectENDPOINT(*a->endpoint) == 0 )
 	{
 		const SINT32 retval = teulModSendCALLBACKe(*a->endpoint, *SYN_ACK_ACK_TOKEN);
 		if ( retval < 0)
@@ -342,7 +342,7 @@ _actionRecvSYN_ACK_ACK_TOKEN(ACTION_OBJECT* const a)
 
 	a->endpoint->destSockAddress = a->endpoint->fromSockAddress;
 
-	teulConnectENDPOINT( a->endpoint );
+	teulConnectENDPOINT( *a->endpoint );
 
 	dbugWrite(_FLN, "RecvSYN_ACK_ACK: parent: %d index:%d", a->endpoint->m_parent->teulIndex(), a->endpoint->teulIndex());
 	a->endpoint->m_parent->doAccept(*a->endpoint);
