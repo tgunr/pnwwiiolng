@@ -164,7 +164,7 @@ chatPurgeExpiredSquadRecruits()
 
 	// Check if its time for the next run
 	static Teul::BlipRepeater nextRun(5 * 60 * 1000);
-	if ( !nextRun )
+	if ( !nextRun.Ready() )
 		return;
 
 	// Queue up the query in the background

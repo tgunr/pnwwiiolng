@@ -291,7 +291,7 @@ chatHousekeepGroupPermissions()
 {
 	// Refresh data once an hour
 	static Teul::BlipRepeater nextRepeat(5 * 60 * 1000);
-	if ( !nextRepeat )
+	if ( !nextRepeat.Ready() )
 		return true;
 
 	chatReadGroupPermissions();

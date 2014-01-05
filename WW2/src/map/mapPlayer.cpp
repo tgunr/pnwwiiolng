@@ -445,7 +445,7 @@ mapCheckSideCounts()
 	const UINT32 spawnedPlayers = g_spawnedPlayers[1] + g_spawnedPlayers[2];
 
 	static Teul::BlipRepeater nextReport(60 * 1000);
-	if ( nextReport )
+	if ( nextReport.Ready() )
 	{
 		dbugLog(_FLI, "personas: %" PRSizeT "; campaign player counts: %u+%u+%u+%u = %u. campaign spawned players: %u+%u = %u"
 							, g_players.size()
