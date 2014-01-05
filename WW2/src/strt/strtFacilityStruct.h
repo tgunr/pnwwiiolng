@@ -36,11 +36,13 @@ struct CSAFE_FacilityStruct
 	FULL_OBJ_ID 	fullObjID;
 	bool			modified;
 	FacilityStruct* next;			//The next Facility in the CP
-	CPStruct* 		cp;				//The CP to which the
-									//	facility belogs
+	CPStruct* 		cp;				//The CP to which the facility belongs
 	SINT8 			subType;
 	FULL_OBJ_ID		cpID;
 	char			name[MAX_STRT_NAME_LENGTH];
+//tolua_end
+	const std::string*	m_filename;
+//tolua_begin
 	const char*		filename;
 	WWII_SIDE		side;			//the side that owns the facility
 	WWII_COUNTRY	country;		//the country that owns the facility
@@ -58,7 +60,7 @@ struct CSAFE_FacilityStruct
 									//	per unit time.
 	UINT32 objectRPTotal;	//The number of RPs required to rebuild the facility
 							//in its entirety.  This is used by the mission
-							//system to guage the relative value of a facility
+							//system to gauge the relative value of a facility
 
 	//Stuff for cities
 	UINT32 rpsPerUnitTime;

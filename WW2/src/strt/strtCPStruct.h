@@ -55,6 +55,9 @@ struct CSAFE_CPStruct
 	SINT8				subType;		//Not used for now, but maybe later...
 	char				name[MAX_STRT_NAME_LENGTH];
 	const char*			filename;
+//tolua_end
+	const std::string*	m_filename;
+//tolua_begin
 	WWII_SIDE			side;			//the side that owns the CP
 	WWII_COUNTRY		country;		//the country that owns the CP
 	WWII_SIDE			originalSide;

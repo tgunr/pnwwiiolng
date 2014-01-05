@@ -309,7 +309,7 @@ _filenamePool(const char* filename)
 	auto it = names.begin();
 	for (auto end = names.end(); it != end; ++it)
 	{
-		if (*it == filename)
+		if (strcmp(it->c_str(), filename) == 0)
 			return *it;
 	}
 	names.push_back(filename);
@@ -1875,7 +1875,8 @@ void strtInitCPStructwithCP(CPStruct& newCP, CP& cp)
 	newCP.country = newCP.originalCountry = newCP.controllingCountry = (WWII_COUNTRY) cp.country;
 
 	strlcpy(newCP.name, cp.name, sizeof(newCP.name));
-	newCP.filename = _filenamePool(cp.fileName).c_str();
+	newCP.m_filename = &_filenamePool(cp.fileName);
+	newCP.filename = newCP.m_filename->c_str();
 }
 
 void strtInitFacilityStructwithFACILITY(FacilityStruct& newFacility, FACILITY& facility)
@@ -1904,7 +1905,8 @@ void strtInitFacilityStructwithFACILITY(FacilityStruct& newFacility, FACILITY& f
 	newFacility.country = newFacility.originalCountry = (WWII_COUNTRY) facility.originalCountry;
 
 	strlcpy(newFacility.name, facility.name, sizeof(newFacility.name));
-	newFacility.filename = _filenamePool(facility.fileName).c_str();
+	newFacility.m_filename = &_filenamePool(facility.fileName);
+	newFacility.filename = newFacility.m_filename->c_str();
 }
 
 void strtInitObjectStructwithBUILDING(ObjectStruct& newObject, const BUILDING& building)
@@ -1967,7 +1969,7 @@ bool strtInitCPfromWOR(CPStruct& cp)
     CP_PARAMS* cpParams;
 
 	//First try and find out if we have any information on the object name
-	cpParams = parseGetCPValues(cp.filename);
+	cpParams = parseGetCPValues(*cp.m_filename);
 
 	if (cpParams == nullptr)
 	{
@@ -2010,11 +2012,11 @@ bool strtInitFacilityfromWOR(FacilityStruct& facility)
     FACILITY_PARAMS* facilityParams;
 
 	//First try and find out if we have any information on the object name
-	facilityParams = parseGetFacilityValues(facility.filename);
+	facilityParams = parseGetFacilityValues(*facility.m_filename);
 
 	if (facilityParams == nullptr)
 	{
-		const std::string facCity("CITY"), facFactory("FACTORY"), facBase("BASE"), facDepot("DEPOT"), facOMT("OMT"), facShipyard("SHIPYARD"),
+		static const std::string facCity("CITY"), facFactory("FACTORY"), facBase("BASE"), facDepot("DEPOT"), facOMT("OMT"), facShipyard("SHIPYARD"),
 						facFirebase("FIREBASE"), facAirbase("AIRBASE"), facArmybase("ARMYBASE"), facNavalBase("NAVALBASE");
 		switch(facility.fullObjID.objType)
 		{
