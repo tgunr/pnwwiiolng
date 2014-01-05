@@ -117,9 +117,6 @@ static inline const char* weapPrintSpecC(const WEAPON_SPEC* spec)
 // create a spec from a string
 extern WEAPON_SPEC weapCreateSpec(const char* weapString);
 
-// create a spec from its dotted quad
-extern WEAPON_SPEC weapCreateSpec(UINT32 country, UINT32 category, UINT32 klass, UINT32 type);
-
 // find *just* a weapon's class number
 extern UINT8 weapFindClassIndex(const std::string& className);
 

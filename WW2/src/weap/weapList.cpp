@@ -203,18 +203,6 @@ UINT8 weapFindClassIndex(const std::string& className)
 	return 0;
 }
 
-WEAPON_SPEC weapCreateSpec(UINT32 country, UINT32 category, UINT32 klass, UINT32 type)
-{
-	WEAPON_SPEC weap = NULL_WEAP_SPEC;
-
-	weap.wCountry	= (UINT8)country;
-	weap.wCategory	= (UINT8)category;
-	weap.wClass		= (UINT8)klass;
-	weap.wType		= (UINT8)type;
-
-	return weap;
-}
-
 WEAPON_SPEC weapCreateSpec(const char* weapString)
 {
 	WEAPON_SPEC weap = NULL_WEAP_SPEC;
