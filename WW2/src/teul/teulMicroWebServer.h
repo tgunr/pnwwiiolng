@@ -4,6 +4,7 @@
 
 #include "wwii/wwiiHash.h"
 #include "include/pnThread.h"
+#include <atomic>
 
 namespace Teul
 {
@@ -19,6 +20,7 @@ namespace Teul
 				, m_rootPath(rootPath_)
 				, m_port(port_)
 				, m_config_mutex()
+				, m_listenSock(INVALID_SOCKET)
 				, m_resourceList("[]")
 				{
 				}
@@ -31,6 +33,8 @@ namespace Teul
 			const unsigned short m_port;
 		private:
 			std::mutex m_config_mutex;
+		private:
+			std::atomic<int> m_listenSock;
 
 		public:
 			const std::string& rootPath() const { return m_rootPath; }
@@ -40,6 +44,18 @@ namespace Teul
 		public:
 			virtual void run();
 
+		public:
+			virtual void onCancel() OVERRIDE_FN
+			{
+				// If we aren't the ones cancelling the thread, do nothing.
+				// We caused cancellation. Close the socket so that the
+				// 'accept()' loop breaks and the thread can tell it needs
+				// to terminate.
+				int socket = m_listenSock.exchange(INVALID_SOCKET);
+				if ( socket != INVALID_SOCKET )
+					OS_CLOSESOCKET(socket);
+				std::this_thread::yield();
+			}
 		public:
 			typedef void (*VirtualFileHandler)(unsigned int /*fd*/, const char* /*path*/, const char* /*args*/);
 		private:

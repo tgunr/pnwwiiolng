@@ -68,7 +68,7 @@ _establishListenSocket(const unsigned short port_)
 {
 	// Tear up the basic socket object.
 	const int sock = socket(AF_INET, SOCK_STREAM, 0);
-	if ( sock < 0 )
+	if ( sock == INVALID_SOCKET )
 	{
 		printf("uWebServer terminated: unable to open listenSock [%d, %d]\n", sock, errno);
 		return sock;
@@ -185,18 +185,20 @@ _parseHTTPRequest(char* const source, char*& method, char*& path, char*& lastDot
 void
 Teul::uWeb::Server::run()
 {
-	const int listenSock = _establishListenSocket(port());
+	m_listenSock = _establishListenSocket(port());
+	if (m_listenSock == INVALID_SOCKET)
+		return;
 
 	char buffer[4096];
 	sockaddr_in addr;
 
-	for (;; )
+	for ( ; !isCancelled(); )
 	{
 		// Make sure we're not providing a denial of service to the host by using all the CPU.
 		std::this_thread::yield();
 
 		socklen_t sockLen = sizeof(addr);
-		const int newSock = accept(listenSock, (struct sockaddr*)&addr, &sockLen);
+		const int newSock = accept(m_listenSock, (struct sockaddr*)&addr, &sockLen);
 		if ( newSock < 0 )
 		{
 			printf("uWebServer error on accept: %d (%d)\n", newSock, errno);
@@ -219,11 +221,7 @@ Teul::uWeb::Server::run()
 			delete [] myBuf;
 		}
 
-#if platOS == OS_WIN32
-		closesocket(newSock);
-#else
-		close(newSock);
-#endif
+		OS_CLOSESOCKET(newSock);
 	}
 }
 

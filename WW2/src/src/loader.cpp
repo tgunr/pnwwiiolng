@@ -45,23 +45,21 @@ public:
 		, m_session(static_cast<irc_session_t*>(s))
 	{}
 
-	virtual void run()
+	virtual void run() OVERRIDE_FN
 	{
 		irc_run(m_session);
 	}
 
-	virtual int cancel()
+	virtual void onCancel() OVERRIDE_FN
 	{
 		irc_session_t* session = m_session;
 		m_session = nullptr;
 
 		irc_disconnect(session);
 		std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
-		return PNThread::cancel();
 	}
 
-	~IrcThread()
+	virtual ~IrcThread()
 	{
 		if ( m_session != nullptr )
 			irc_disconnect(m_session);

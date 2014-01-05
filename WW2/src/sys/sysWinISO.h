@@ -33,6 +33,7 @@
 # define OS_FILENO(...) _fileno(__VA_ARGS__)
 # define OS_ACCESS(...) _access(__VA_ARGS__)
 # define OS_WACCESS(...) _waccess(__VA_ARGS__)
+# define OS_CLOSESOCKET(...) closesocket(__VA_ARGS__)
 # ifndef stricmp
 #  define stricmp(x,y) _stricmp(x,y)
 # endif
@@ -91,5 +92,6 @@ static inline float strtof(const char* const src_, const char* const)
 # define OS_FILENO(f) fileno(f)
 # define OS_ACCESS(...) ::access(__VA_ARGS__)
 # define OS_WACCESS(...) waccess(__VA_ARGS__)
+# define OS_CLOSESOCKET(...) close(__VA_ARGS__)
 
 #endif // WIN32 || WIN64
