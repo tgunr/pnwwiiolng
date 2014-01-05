@@ -90,7 +90,7 @@ static UINT32 _lastPXferTotal = 0;
 
 #if defined(WINDOWS_VERSION)
 static fd_set 		master_readfs, master_writefs;//, exceptfs;
-static SINT32		maxSock;
+static size_t		maxSock;
 static bool			_needSetFs = true;
 #else
 // Linux uses "poll()" for checking sockets for events.
@@ -98,12 +98,11 @@ struct POLL_STRUCT
 {
 	static const size_t CAPACITY = Teul::MaxConnections;
 	struct pollfd	fd[CAPACITY];
-	SINT32		maxSock;
-	SINT32		size;
-	SINT32		count;
+	SOCKET		m_maxSock;
+	nfds_t		m_size;
+	nfds_t		m_count;
 };
 static POLL_STRUCT pollData;
-
 #endif
 
 // To save ourselves having to look up endpoints later...
@@ -745,7 +744,7 @@ _handleReceive(ENDPOINT& endpoint)
 }
 
 static void
-_runPollEndpoints(struct pollfd* fdArray, SINT32 maxSlots, SINT32 numSlots)
+_runPollEndpoints(struct pollfd* fdArray, nfds_t maxSlots, int numSlots)
 {
 	SINT32		count = 0, loopCount = 0;
 
@@ -757,7 +756,7 @@ _runPollEndpoints(struct pollfd* fdArray, SINT32 maxSlots, SINT32 numSlots)
 
 	_lastPXferTotal = totalPacketsXfer;
 
-	for ( SINT32 slot = 0; slot < maxSlots && count < numSlots; ++slot)
+	for ( nfds_t slot = 0; slot < maxSlots && count < numSlots; ++slot )
 	{
 		loopCount++;
 
@@ -778,7 +777,7 @@ _runPollEndpoints(struct pollfd* fdArray, SINT32 maxSlots, SINT32 numSlots)
 		if ( it == socketToEndpoint.end() )
 		{
 			// not sure how we get here yet but I know its bad...
-			dbugLog(_FLI,"attempt to use invalid null endpoint whacking slot %d, socket %d", slot, sock);
+			dbugLog(_FLI,"attempt to use invalid null endpoint whacking slot %" PRSizeT ", socket %d", slot, sock);
 			sfd.fd = INVALID_SOCKET;
 			continue;
 		}
@@ -1150,10 +1149,10 @@ ENDPOINT::updateSocketEvents()
 	if ( ((protocol == PROTOCOL_TCP) & (state() == IS_OPENING) & (m_connected == false)) | (m_writesPending == true) )
 		pollData.fd[slot].events |= POLLOUT;
 
-	if (pollData.maxSock == INVALID_SOCKET)
-		pollData.maxSock = socket;
+	if (pollData.m_maxSock == INVALID_SOCKET)
+		pollData.m_maxSock = socket;
 	else
-		pollData.maxSock = std::max(pollData.maxSock, socket);
+		pollData.m_maxSock = std::max(pollData.m_maxSock, socket);
 #else
 	auto flags = FD_READ | FD_OOB | FD_CLOSE;
 	if ( m_connected == false )
@@ -1170,23 +1169,23 @@ ENDPOINT::updateSocketEvents()
 static void
 _pollAddEndpoint(ENDPOINT* const endpoint)
 {
-	SINT32 slot;
-	for (slot = 0; slot < pollData.size; ++slot)
+	nfds_t slot;
+	for (slot = 0; slot < pollData.m_size; ++slot)
 	{
 		if ( pollData.fd[slot].fd == INVALID_SOCKET )
 			break;
 	}
 
-	if ( slot == pollData.size)
-		pollData.size++;
+	if (slot == pollData.m_size)
+		pollData.m_size++;
 
-	pollData.count++;
+	pollData.m_count++;
 	endpoint->m_impl->pollSlot(slot);
 
-	dbugLog(_FLD,"t:%d adding endpoint state %d socket %d slot %d count %d"
+	dbugLog(_FLD,"t:%d adding endpoint state %d socket %d slot %d count %" PRSizeT ""
 				, endpoint->teulIndex()
 				, endpoint->state(), endpoint->socket
-				, endpoint->m_impl->pollSlot(), pollData.count);
+				, endpoint->m_impl->pollSlot(), pollData.m_count);
 
 	endpoint->updateSocketEvents();
 }
@@ -1195,15 +1194,16 @@ _pollAddEndpoint(ENDPOINT* const endpoint)
 static void
 _pollRemoveEndpoint(ENDPOINT* const endpoint)
 {
-	pollData.count--;
+	assert(pollData.m_count > 0);
+	pollData.m_count--;
 
-	dbugLog(_FLD, "t:%d removing endpoint state %d socket %d count %d"
+	dbugLog(_FLD, "t:%d removing endpoint state %d socket %d count %" PRSizeT ""
 				, endpoint->teulIndex()
-				, endpoint->state(), endpoint->socket, pollData.count);
+				, endpoint->state(), endpoint->socket, pollData.m_count);
 
-	const SINT32 slot = endpoint->m_impl->pollSlot();
+	const UINT16 slot = endpoint->m_impl->pollSlot();
 
-	if (pollData.count < (pollData.size / 2))
+	if (pollData.m_count < (pollData.m_size / 2))
 	{
 		_pollSet();
 	}
@@ -1287,9 +1287,9 @@ teulMRecvAddToPoll(ENDPOINT* endpoint)
 static void
 _pollSet(void)
 {
-	pollData.count = 0;
-	pollData.size = 0;
-	pollData.maxSock = INVALID_SOCKET;
+	pollData.m_count = 0;
+	pollData.m_size = 0;
+	pollData.m_maxSock = INVALID_SOCKET;
 
 	// don't bother checking for when we don't have any endpoints
 	if ( idleEndpoints.empty() )
@@ -1305,11 +1305,11 @@ _pollSet(void)
 		const SOCKET sock = endpoint->socket;
 		if ( endpoint->state() != IS_DEAD && sock != INVALID_SOCKET )
 		{
-			endpoint->m_impl->pollSlot(pollData.count);
+			endpoint->m_impl->pollSlot(pollData.m_count);
 			endpoint->updateSocketEvents();
 
-			pollData.count++;
-			pollData.size++;
+			pollData.m_count++;
+			pollData.m_size++;
 		}
 		else
 		{
@@ -1319,7 +1319,7 @@ _pollSet(void)
 		}
 	}
 
-	dbugLog(_FLN,"combined %u sockets for reading, max %d", pollData.count, pollData.maxSock);
+	dbugLog(_FLN,"combined %" PRSizeT " sockets for reading, max %d", pollData.m_count, pollData.m_maxSock);
 }
 #endif
 
@@ -1328,7 +1328,6 @@ static void
 _pollSocketsInner(const TeulTimeMS& duration_)
 {
 	SINT32	retval = 0;
-	SINT32	numfds= 0;//cSlot,
 
 #ifdef CHECK_TIME
 	teulSyncClock();
@@ -1337,8 +1336,9 @@ _pollSocketsInner(const TeulTimeMS& duration_)
 
 	TIMER_USE_HERE
 
+	auto pollFds = &pollData.fd[0];
 	TIMER_START
-	numfds = retval = poll(pollData.fd, pollData.size, duration_);
+	int numfds = retval = poll(pollFds, pollData.m_size, duration_);
 	TIMER_STOP("tmi_idle_poll");
 
 	if (PN_UNLIKELY(retval < 0 && dbugGetErrno() != EINTR))
@@ -1352,7 +1352,7 @@ _pollSocketsInner(const TeulTimeMS& duration_)
 		_lastPXferTotal = totalPacketsXfer;
 
 		TIMER_START
-		_runPollEndpoints(pollData.fd, pollData.size, numfds);//COMMAND_UPDATE_INTERVAL);
+		_runPollEndpoints(pollData.fd, pollData.m_size, numfds);
 		TIMER_STOP("tmi_idle_rpe");
 	}
 
@@ -1361,7 +1361,7 @@ _pollSocketsInner(const TeulTimeMS& duration_)
 	const TeulTimeMS interval = teulClock64 - startTime;
 	if ( PN_UNLIKELY(interval > 20) )
 	{
-		dbugLog(_FLW, "STALL fds:%u size:%u. poll interval=%llums", numfds, pollData.size, interval);
+		dbugLog(_FLW, "STALL fds:%u size:%" PRSizeT ". poll interval=%llums", numfds, pollData.m_size, interval);
 	}
 #endif
 }
@@ -1369,7 +1369,7 @@ _pollSocketsInner(const TeulTimeMS& duration_)
 static bool
 _pollSetIsEmpty()
 {
-	return pollData.size <= 0;
+	return pollData.m_size <= 0;
 }
 #else
 static bool

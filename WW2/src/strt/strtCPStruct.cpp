@@ -49,7 +49,6 @@ CPStruct::linkTo(const CPStruct* rhs) const
 		return NULL;
 
 	// Look through our facilities and find a link
-	LINKS::iterator it;
 	for ( auto it = m_links.begin(), end = m_links.end(); it != end; ++it )
 	{
 		LinkStruct* outLink = *it;

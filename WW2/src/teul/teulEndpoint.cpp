@@ -74,7 +74,6 @@ teulCloseAllEndpoints(const SINT32 errorCode)
 	dbugLog(_FLM, "Orderly shutdown in progress [%d].", errorCode);
 
 	Teul::ENDPOINT_LIST eps = idleEndpoints;
-	Teul::ENDPOINT_LIST::iterator it;
 
 #if platBuild == TEUL_SERVER
 	// Make a copy.

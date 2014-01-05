@@ -626,7 +626,7 @@ DotCommandIndex::broadcastCommandListPacket()
 
 	// Send to all players.
 	std::vector<ENDPOINT*> endpoints;
-	for ( auto it = playerIndex.begin(), end = playerIndex.end(); it != end; ++it )
+	for ( auto it = playerIndex.begin(), endIt = playerIndex.end(); it != endIt; ++it )
 	{
 		const Player* const player = it->second;
 		if ( player->teulIndex() >= 0 )

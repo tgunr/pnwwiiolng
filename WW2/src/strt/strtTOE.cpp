@@ -135,8 +135,6 @@ TOE_::TemplateHeader::updateWeapon(const WEAPON_SPEC& spec, UINT16 capacity, UCH
 	if ( capacity > oldCapacity && m_subscribers.empty() == false )
 	{
 		UINT32 increase = capacity - oldCapacity;
-		SUBSCRIBERS::iterator sit;
-
 		for ( auto sit = m_subscribers.begin(), end = m_subscribers.end(); sit != end; ++sit )
 		{
 			StratHCUnit* unit = *sit;

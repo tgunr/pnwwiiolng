@@ -402,7 +402,6 @@ public:
 		textlist.clear();
 
 		player.message(LSTR_NOTE, LSTR_PLAYERS_IGNORED);
-		HANDLES::const_iterator it;
 		for ( auto it = ignores.begin(), end = ignores.end(); it != end; ++it )
 		{
 			if (!textlist.empty())

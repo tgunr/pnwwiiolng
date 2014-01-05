@@ -162,7 +162,6 @@ weapLoadSpawnXML()
 					dbugLog(_FLIB, "class:%s ", elText);
 
 					// Now add the spawnlist for all spawn lists of this class into our list
-					WEAPON_SPAWNS::iterator spawn;
 					for ( auto spawn = g_weaponSpawns.begin(), end = g_weaponSpawns.end(); spawn != end; ++spawn )
 					{
 						if ( (spawn->first & 255) != spec.wClass )

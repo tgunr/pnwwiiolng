@@ -123,27 +123,27 @@ _checkLeadership(UINT32 squadID, RANK_NO oldRank, RANK_NO newRank, SINT32 teulIn
 // Check the availability of a given squad name
 
 static void
-_checkExistingSquad(const char* callsign)
+_checkExistingSquad(const Chat::Name& gameName)
 {
-	DBQuery q(dbh, "SELECT squadID FROM wwii_squads WHERE LOWER(short_name) = LOWER('%s') LIMIT 1", callsign);
+	DBQuery q(dbh, "SELECT squadID FROM wwii_squads WHERE LOWER(short_name) = LOWER('%s') LIMIT 1", gameName.c_str());
 	if ( q.HasRows() )
 		throw SquadError("Squad already exists", SQR_SQUAD_EXISTS);
 }
 
 static void
-_checkReservedSquad(const char* callsign)
+_checkReservedSquad(const Chat::Name& gameName)
 {
-	DBQuery q(dbh, "SELECT short_name FROM wwii_reserved_squadnames WHERE lower(short_name) = LOWER('%s') LIMIT 1", callsign);
+	DBQuery q(dbh, "SELECT short_name FROM wwii_reserved_squadnames WHERE lower(short_name) = LOWER('%s') LIMIT 1", gameName.c_str());
 	if ( q.HasRows() )
 		throw SquadError("Squad name reserved", SQR_INVALID_SQUAD_SHORT);
 }
 
 static UINT32
-_createSquad(UINT32 ownerID, UINT32* members, const char* shortName, const char* fullName, SINT32 teulIndex)
+_createSquad(UINT32 ownerID, UINT32* members, const Chat::Name& shortName, const char* fullName, SINT32 teulIndex)
 {
 	DBQuery q(dbh, "INSERT INTO wwii_squads (creatorid, short_name, name, password, active, recruiting, voting, disbanded, created)"
 					" VALUES (%u, '%s', '%s', '', 1, 1, 1, 0, now())"
-					, ownerID, shortName, fullName);
+					, ownerID, shortName.c_str(), fullName);
 	UINT32 squadID = q.LastInsertID();
 	if ( squadID == 0 )
 		throw SquadError("No last insert ID from squad insertion");
@@ -180,7 +180,7 @@ _createSquad(UINT32 ownerID, UINT32* members, const char* shortName, const char*
 void
 chatdbSquadMemberUpdate(SINT32 teulIndex, SquadMemberUpdate& update)
 {
-	Chat::Name callsign(update.m_handle), orig(update.m_originator);
+	Chat::Name gameName(update.m_handle), orig(update.m_originator);
 	char safeText[SquadMemberUpdate::MAX_TEXT*2 + 1];
 	safeText[0] = 0;
 	escapeString(update.m_text, safeText, SquadMemberUpdate::MAX_TEXT*2);
@@ -197,8 +197,8 @@ chatdbSquadMemberUpdate(SINT32 teulIndex, SquadMemberUpdate& update)
 			if ( update.m_handle < 0x40LL ) throw SquadError("invalid handle", SQR_INVALID);
 			if ( update.m_rank <= Squad::NOT_IN_SQUAD || update.m_rank >= Squad::MAX_RANK )
 				throw SquadError("Invalid rank for promotion");
-			DBQuery q(dbh, "UPDATE wwii_player SET squad_rank = %u WHERE squadID = %u AND callsign = '%s' AND squad_rank = %u"
-							, update.m_rank, update.m_squadID, callsign, update.m_prev);
+			DBQuery q(dbh, "UPDATE wwii_player SET squad_rank = %u WHERE squadID = %u AND gameName = '%s' AND squad_rank = %u"
+							, update.m_rank, update.m_squadID, gameName.c_str(), update.m_prev);
 			if ( q.HasRows() == false )
 				throw SquadError("Unable to promote player");
 
@@ -210,8 +210,8 @@ chatdbSquadMemberUpdate(SINT32 teulIndex, SquadMemberUpdate& update)
 			if ( update.m_handle < 0x40LL ) throw SquadError("invalid handle", SQR_INVALID);
 			if ( update.m_rank <= Squad::NOT_IN_SQUAD || update.m_rank >= Squad::MAX_RANK )
 				throw SquadError("Invalid rank for demotion");
-			DBQuery q(dbh, "UPDATE wwii_player SET squad_rank = %u WHERE squadID = %u AND callsign = '%s' AND squad_rank = %u"
-							, update.m_rank, update.m_squadID, callsign, update.m_prev);
+			DBQuery q(dbh, "UPDATE wwii_player SET squad_rank = %u WHERE squadID = %u AND gameName = '%s' AND squad_rank = %u"
+							, update.m_rank, update.m_squadID, gameName.c_str(), update.m_prev);
 			if ( q.HasRows() == false )
 				throw SquadError("Unable to demote player");
 
@@ -226,16 +226,16 @@ chatdbSquadMemberUpdate(SINT32 teulIndex, SquadMemberUpdate& update)
 			DBQuery q(dbh, "UPDATE wwii_player"
 								" SET squad_rank=%u"
 									", squad_joined=IF(squad_joined,squad_joined,NOW())"
-								" WHERE squadID = %u AND callsign = '%s' AND squad_rank < %u"
-							, update.m_rank, update.m_squadID, callsign, update.m_rank);
+								" WHERE squadID = %u AND gameName = '%s' AND squad_rank < %u"
+							, update.m_rank, update.m_squadID, gameName.c_str(), update.m_rank);
 			if ( q.HasRows() == false )
 				throw SquadError("Unable to appoint player");
 
 			// If we've become CO remove the prior member
 			if ( update.m_rank == Squad::CO )
 			{
-				DBSimpleQuery(dbh, "UPDATE wwii_player SET squad_rank=%u WHERE squadID=%u AND squad_rank=%u AND callsign != '%s'"
-								, Squad::XO, update.m_squadID, update.m_rank, callsign);
+				DBSimpleQuery(dbh, "UPDATE wwii_player SET squad_rank=%u WHERE squadID=%u AND squad_rank=%u AND gameName != '%s'"
+								, Squad::XO, update.m_squadID, update.m_rank, gameName.c_str());
 			}
 
 			_checkLeadership(update.m_squadID, update.m_prev, update.m_rank, teulIndex);
@@ -246,8 +246,8 @@ chatdbSquadMemberUpdate(SINT32 teulIndex, SquadMemberUpdate& update)
 			if ( update.m_handle < 0x40LL ) throw SquadError("invalid handle", SQR_INVALID);
 			DBQuery q(dbh, "UPDATE wwii_player"
 								" SET squad_rank=0, squadID=0, squad_joined=NOW()"
-								" WHERE squadID = %u AND callsign = '%s'"
-							, update.m_squadID, callsign);
+								" WHERE squadID = %u AND gameName = '%s'"
+							, update.m_squadID, gameName.c_str());
 			if ( q.HasRows() == false )
 				throw SquadError("Player not in squad", SQR_PLAYER_NOT_IN_SQUAD);
 
@@ -256,16 +256,16 @@ chatdbSquadMemberUpdate(SINT32 teulIndex, SquadMemberUpdate& update)
 		break;
 		case SquadMemberUpdate::_CREATE_CHECK:
 		{
-			_checkExistingSquad(callsign);
-			_checkReservedSquad(callsign);
+			_checkExistingSquad(gameName);
+			_checkReservedSquad(gameName);
 		}
 		break;
 		case SquadMemberUpdate::_CREATE:
 		{
-			_checkExistingSquad(callsign);
-			_checkReservedSquad(callsign);
+			_checkExistingSquad(gameName);
+			_checkReservedSquad(gameName);
 
-			update.m_squadID = _createSquad(update.m_coID, update.m_members, callsign, safeText, teulIndex);
+			update.m_squadID = _createSquad(update.m_coID, update.m_members, gameName, safeText, teulIndex);
 		}
 		break;
 		default:
@@ -277,18 +277,18 @@ chatdbSquadMemberUpdate(SINT32 teulIndex, SquadMemberUpdate& update)
 		// Record this event
 		DBSimpleQuery(dbh, "INSERT INTO wwii_squad_audit (squadID, action, occured, originator, target, newval, prev, coID, textmessage)"
 							" VALUES (%u, %u, now(), '%s', '%s', %u, %u, %u, '%s')"
-							, update.m_squadID, update.m_action, orig, callsign, update.m_rank, update.m_prev, update.m_coID, safeText);
+							, update.m_squadID, update.m_action, orig.c_str(), gameName.c_str(), update.m_rank, update.m_prev, update.m_coID, safeText);
 
 		update.m_result = SQR_DONE;
 	}
 	catch ( SquadError& e )
 	{
-		dbugLog(_FLA, "sq:%d act:%d targ:%s orig:%s nr:%d failed: %s", update.m_squadID, update.m_action, callsign, orig, update.m_rank, e.what());
+		dbugLog(_FLA, "sq:%d act:%d targ:%s orig:%s nr:%d failed: %s", update.m_squadID, update.m_action, gameName.c_str(), orig.c_str(), update.m_rank, e.what());
 		update.m_result = e.errorCode();
 	}
 	catch ( std::exception& e )
 	{
-		dbugLog(_FLA, "sq:%d act:%d targ:%s orig:%s nr:%d failed: %s", update.m_squadID, update.m_action, callsign, orig, update.m_rank, e.what());
+		dbugLog(_FLA, "sq:%d act:%d targ:%s orig:%s nr:%d failed: %s", update.m_squadID, update.m_action, gameName.c_str(), orig.c_str(), update.m_rank, e.what());
 		update.m_result = SQR_OPERATION_FAILED;
 	}
 

@@ -73,24 +73,21 @@ STRAT_BUILDING_LIST * sdmGetFaciltyBidList(STRAT_FACILITY_TABLE* facTable, SINT1
 	return NULL;
 }
 
-static LOGICAL _addBuildingToFacTable(STRAT_FACILITY_TABLE* facTable, const BUILDING& building)
+static bool _addBuildingToFacTable(STRAT_FACILITY_TABLE* facTable, const BUILDING& building)
 {
 	const SINT16 facID = building.pid.id;
 	const SINT32 bid = building.oid.id;
-	STRAT_FACILITY_NODE* fac;
-	SINT32 i;
 
-	for(i = 0; i < facTable->numFacilities; i++)
+	for (auto it = facTable->facility, end = it + facTable->numFacilities; it < end; ++it)
 	{
-		fac = &facTable->facility[i];
-		if (facID == fac->id)
+		if (facID == it->id)
 		{
-			fac->bidList.bid[fac->bidList.numBuildings++] = static_cast<SINT16>(bid);
-			return (TRUE);
+			it->bidList.bid[it->bidList.numBuildings++] = static_cast<SINT16>(bid);
+			return true;
 		}
 	}
 
-	return FALSE;
+	return false;
 }
 
 // Creates a cell basesd table with each cell contatining a list of buildings in

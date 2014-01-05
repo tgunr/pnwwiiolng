@@ -340,8 +340,6 @@ _sendWaypoints(const ChatMission::WAYPOINTS& wp, Player* player)
 
 	// For any more, send them as an array
 	WAYPOINT_XFER_ARRAY array(0, 0, Teul::TCPStdPayload);
-	ChatMission::WAYPOINTS::const_iterator it;
-
 	for ( auto it = wp.begin(), end = wp.end(); it != end; ++it )
 	{
 		array.add(it->second);

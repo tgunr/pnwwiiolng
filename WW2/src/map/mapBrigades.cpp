@@ -419,7 +419,6 @@ typedef std::set<Brigade*> BRIGADE_SET;
 void
 mapUpdateBrigadesWithMissionsAt(const CPStruct* cp)
 {
-	ACTIVE_BRIGADES::const_iterator it;
 	for ( auto it = cp->m_brigades.begin(), end = cp->m_brigades.end(); it != end; ++it )
 	{
 		it->first->updateDestinations();

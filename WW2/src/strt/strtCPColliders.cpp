@@ -227,7 +227,6 @@ strtBuildCPColliders()
 		}
 	}
 
-	CP_MAP::const_iterator it;
 	UINT32 cells = 0, entries = 0, overlaps = 0;
 	for ( auto it = _cpMap.begin(), end = _cpMap.end(); it != end; ++it )
 	{

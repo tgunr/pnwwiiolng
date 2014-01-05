@@ -127,10 +127,6 @@ FriendsQuery::Success()
 	for ( auto it = list.begin(), end = list.end(); it != end; ++it )
 	{
 		name = *it;
-		betaLog(_FLD, "t:%d p:%u c:%s %s:%s"
-						, player->teulIndex(), player->playerID(), player->callsign()
-						, (m_ignore ? "ignoring" : "buddy")
-						, callsign);
 	}
 }
 

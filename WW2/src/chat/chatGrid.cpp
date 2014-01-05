@@ -307,8 +307,6 @@ ChatGrid::activate()
 void
 ChatGrid::addPlayer(Player* player, ChatGrid* oldGrid)
 {
-	_GRIDS::iterator it;
-
 	if ( oldGrid )
 	{
 		GRID_INFO("transfering c:%s from %d,%d", player->callsign(), oldGrid->gridKey().X(), oldGrid->gridKey().Y());
@@ -856,9 +854,6 @@ chatGridGetPlayersVector(const Player* player, const SINT64& range, PLAYERS_ARRA
 	GridKey botleft(player->instance().id(), (SINT32)(player->lastX() - range) >> ChatGrid::_KEY_SHIFT, (SINT32)(player->lastY() - range) >> ChatGrid::_KEY_SHIFT);
 	GridKey topright(player->instance().id(), (SINT32)(player->lastX() + range) >> ChatGrid::_KEY_SHIFT, (SINT32)(player->lastY() + range) >> ChatGrid::_KEY_SHIFT);
 
-	_GRIDS::const_iterator it;
-	PLAYERS::iterator cit;
-
 	betaLog(_FLD, "t:%d p:%u c:%s in:%u.%u.%llu.%llu getting cells within [%d,%d],[%d,%d] %lld range: "
 					, player->teulIndex(), player->playerID(), player->callsign()
 					, player->instance().category(), player->instance().type(), player->instance().handle(), player->instance().id()
@@ -923,7 +918,6 @@ chatGridSnapshot()
 	char query[4096];
 	int len = 0;
 
-	_CHAT_GRID::const_iterator it;
 	for ( auto it = _gridIndex.begin(), end = _gridIndex.end(); it != end; ++it )
 	{
 		const ChatGrid* node = it->second;

@@ -413,7 +413,6 @@ HCUnitBroadcast::buildUnitList(const HCUnit* unit)
 {
 	_currentUnits.clear();
 	_currentUnits.push_back(unit->unitID());
-	HCUNIT_INDEX::iterator it;
 	for ( auto it = hcUnits.begin(), end = hcUnits.end(); it != end; ++it )
 	{
 		if ( it->second->isBelow(unit) )

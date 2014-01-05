@@ -51,7 +51,7 @@ extern LinkStruct* strtGetLink_FULL_ID(const FULL_ID& index);
 //Conversion routines
 static inline FULL_ID strtFullObjIDToFullID(FULL_OBJ_ID fullObjID)
 {
-	FULL_ID fullID { fullObjID.cell.ox >> 4, fullObjID.cell.oy >> 4, fullObjID.id, 0 };
+	FULL_ID fullID { static_cast<SINT16>(fullObjID.cell.ox >> 4), static_cast<SINT16>(fullObjID.cell.oy >> 4), fullObjID.id, 0 };
 	return fullID;
 }
 

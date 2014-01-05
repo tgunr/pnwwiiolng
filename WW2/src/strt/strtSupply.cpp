@@ -530,7 +530,7 @@ StratHCUnit::purgeResupply(bool zeroSupply)
 	{
 		// Summarize the tickets into a manifest
 		RESUPPLY_DOCKET& docket = it->second;
-		for ( auto dit = docket.begin(), end = docket.end(); dit != end; ++dit )
+		for ( auto dit = docket.begin(), dend = docket.end(); dit != dend; ++dit )
 		{
 			_resupplyTicketStore.free(*dit);
 		}
@@ -787,7 +787,6 @@ StratHCUnit::CheckResupplyStatus(bool fullCheck)
 		SINT32 delta = (SINT32)(capacity - (present + transfers + resupply));
 		UINT32 tickets = 0, queued = 0;
 
-		RESUPPLY_QUEUE::iterator qit;
 		for ( auto qit = m_impl.m_resupplyQueue.begin(), qend = m_impl.m_resupplyQueue.end(); qit != qend; ++qit )
 		{
 			for ( auto dit = qit->second.begin(), dend = qit->second.end(); dit != dend; ++dit )
