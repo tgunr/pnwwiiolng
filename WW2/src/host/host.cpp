@@ -2892,6 +2892,30 @@ _ircChannelMessage(irc_session_t* session, const char* event, const char* origin
 }
 
 //////////////////////////////////////////////////////////////////////
+
+static bool _waitForStratPeering()
+{
+	Teul::BlipRepeater nextReport(15000);
+	Server::ServerInfo* server = nullptr;
+	for (;;)
+	{
+		if ( g_hostTerminating )
+			return false;
+		teulUpdateTransport(25);
+		server = Server::ServerInfo::GetBest(STRAT_HOST, true);
+		if (server != nullptr)
+			break;
+		if (nextReport.Ready())
+			dbugLog(_FLN, "waiting for strat host");
+	}
+
+	_stratHost = Server::BroadcastMaskAddress(server->stats.address);
+	dbugLog(_FLN,"strat host is at %s", teulGetAddress(_stratHost));
+
+	return true;
+}
+
+//////////////////////////////////////////////////////////////////////
 // Main entry point.
 
 static const char* g_serverName = "hostd";
@@ -3025,19 +3049,6 @@ main(const int argc, const char* const argv[])
 
 	wwiiIRCChannelMessage("-sys", "[[ Syncing ]]");
 
-	while ( serverPeeringWithType(STRAT_HOST) == false )
-	{
-		teulUpdateTransport(25);
-
-		Server::ServerInfo* const server = Server::ServerInfo::GetBest(STRAT_HOST, true);
-		if (server != nullptr)
-		{
-			_stratHost = Server::BroadcastMaskAddress(server->stats.address);
-		}
-	}
-
-	dbugLog(_FLN,"strat host is at %s", teulGetAddress(_stratHost));
-
 	g_exitHandlerRequired = true;
 	atexit(exitHandler);
 
@@ -3060,12 +3071,17 @@ main(const int argc, const char* const argv[])
 	// aren't spawned in any more - so mark them all as closed.
 	_closeAllOpenSortiesOnThisCell();
 
+	if (!_waitForStratPeering() )
+		return 0;
+
 	// Wait for the chat host to start.
 	teulSyncClock();
 	const TeulTimeMS timeout = teulClock64 + 15 * 1000;
 	TeulTimeMS longTimeout = teulClock64 + 30 * 1000;
 	while ( teulClock64 < timeout || (teulClock64 < longTimeout && serverPeeringWithType(CHAT_HOST) == false) )
 	{
+		if (g_hostTerminating)
+			return 0;
 		teulUpdateTransport(50);
 		threadsLogging();
 	}
@@ -3081,6 +3097,9 @@ main(const int argc, const char* const argv[])
 	}
 
 	threadsLogging();
+
+	if (g_hostTerminating)
+		return 0;
 
 	chatSendAdminMessage("cell host #%u %s", Server::localHost & 255, (g_serverReserved ? "*RESERVED*" : "online"));
 
