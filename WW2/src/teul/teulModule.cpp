@@ -46,10 +46,6 @@
 #include <sys/socket.h>
 #endif
 
-#if platOS == OS_LINUX
-#include "server/serverIfConf.h"
-#endif
-
 #if platBuild == TEUL_SERVER
 #include "server/serverInterfaceDescription.h"
 #endif
@@ -60,8 +56,8 @@ extern ConfigStr cv_defaultInterface;
 #endif
 
 #if platOS != OS_WIN32
-	#include <netinet/tcp.h>
-	#include <sys/un.h>
+	#include <sys/types.h>
+	#include <ifaddrs.h>
 #endif
 
 #define EXT_TOKENS		0x8000000
@@ -84,39 +80,40 @@ _getHostIPAddresses()
 	static const char* primaryInterfaceName = cv_defaultInterface.GetString();
 
 	// Get a list of IPv4 network interfaces.
-	auto ifiList = get_ifi_info(AF_INET, TRUE);
+	struct ifaddrs* ifap = nullptr;
+	if ( getifaddrs(&ifap) == -1 || ifap == nullptr )
+		LogAbort("Unable to get network interfaces");
 
 	// Get the addresses of upto MaxHostIPs interfaces.
 	auto& ifNo = Server::myInterface.numIP;
 	ifNo = 0;
-	for ( auto ifi = ifiList; ifi != NULL; ifi = ifi->ifi_next )
+	for ( auto ifa = ifap; ifa != nullptr; ifa = ifa->ifa_next)
 	{
-		if ( strcmp(ifi->ifi_name, primaryInterfaceName) == 0 )
-		{
-			memcpy(&(Server::myInterface.mac), ifi->ifi_haddr, sizeof(Server::myInterface.mac));
-			Server::myInterface.pid = getpid();
-			//Server::myInterface.id = (Server::myInterface.pid &0x0000ffff) | Server::myInterface.mac;
-			Server::myInterface.addr[ifNo].naddr = ((struct sockaddr_in*)(ifi->ifi_addr))->sin_addr.s_addr;
-			Server::myInterface.addr[ifNo].ip = ntohl(Server::myInterface.addr[ifNo].naddr);
-			dbugLog(_FLI, "read index %u interface %s, ip %s mac %llx pid %u"
-						, ifNo
-						, ifi->ifi_name
-						, teulGetAddress(ntohl(Server::myInterface.addr[ifNo].ip))
-						, Server::myInterface.mac
-						, Server::myInterface.pid
-						//, Server::myInterface.id
-						);
+		if ( ifa->ifa_addr == nullptr || ifa->ifa_addr->sa_family != AF_INET )
+			continue;
 
-			++ifNo;
-			if ( ifNo >= Server::InterfaceDescription::MaxHostIPs )
-				break;
-		}
+		if ( strcmp(ifa->ifa_name, primaryInterfaceName) != 0 )
+			continue;
+
+		Server::myInterface.pid = getpid();
+		Server::myInterface.addr[ifNo].naddr = ((struct sockaddr_in*)(ifa->ifa_addr))->sin_addr.s_addr;
+		Server::myInterface.addr[ifNo].ip = ntohl(Server::myInterface.addr[ifNo].naddr);
+		dbugLog(_FLI, "read index %u interface %s, ip %s pid %u"
+					, ifNo
+					, ifa->ifa_name
+					, teulGetAddress(ntohl(Server::myInterface.addr[ifNo].ip))
+					, Server::myInterface.pid
+					//, Server::myInterface.id
+					);
+
+		++ifNo;
+		if ( ifNo >= Server::InterfaceDescription::MaxHostIPs )
+			break;
 	}
 
-	if ( ifiList != NULL )
-		free_ifi_info(ifiList);
+	freeifaddrs(ifap);
 #elif platOS == OS_WIN32
-	PIP_ADAPTER_ADDRESSES pAddresses = NULL;
+	PIP_ADAPTER_ADDRESSES pAddresses = nullptr;
 	DWORD outBufLen = 32 * 1024;	// Start with 32Kb of buffer to retrieve data.
 	DWORD dwRetVal = ERROR_BUFFER_OVERFLOW;
 
@@ -127,14 +124,14 @@ _getHostIPAddresses()
 		if (pAddresses)
 			memFree(pAddresses);
 		pAddresses = static_cast<PIP_ADAPTER_ADDRESSES>(memAlloc(outBufLen));
-		ABORT_IF_EX(pAddresses == NULL, "Failed to allocate memory for listing network interfaces.");
-		dwRetVal = GetAdaptersAddresses(AF_INET, getAddrFlags, NULL, pAddresses, &outBufLen);
+		ABORT_IF_EX(pAddresses == nullptr, "Failed to allocate memory for listing network interfaces.");
+		dwRetVal = GetAdaptersAddresses(AF_INET, getAddrFlags, nullptr, pAddresses, &outBufLen);
 	}
 
 	ABORT_IF_EX(dwRetVal == ERROR_BUFFER_OVERFLOW, "Unable to retrieve network interfaces.");
 
-	PIP_ADAPTER_ADDRESSES preferredIf = NULL;
-	for ( auto curAddr = pAddresses; curAddr != NULL; curAddr = curAddr->Next )
+	PIP_ADAPTER_ADDRESSES preferredIf = nullptr;
+	for ( auto curAddr = pAddresses; curAddr != nullptr; curAddr = curAddr->Next )
 	{
 		// Only look for ethernet networks with IfOperStatusUp and a unicast address.
 		if ( curAddr->OperStatus != IfOperStatusUp || curAddr->FirstUnicastAddress == nullptr )
@@ -164,17 +161,14 @@ _getHostIPAddresses()
 		preferredIf = curAddr;
 	}
 
-	ABORT_IF_EX(preferredIf == NULL
+	ABORT_IF_EX(preferredIf == nullptr
 				, "Unable to find eth0. If you need to specify an interface, set the environment variable 'ETH0' to the friendly name of the adapter.");
 
-	assert( preferredIf->PhysicalAddressLength < sizeof(Server::myInterface.mac) );
-
-	memcpy(&(Server::myInterface.mac), preferredIf->PhysicalAddress, preferredIf->PhysicalAddressLength);
 	Server::myInterface.pid = static_cast<UINT32>(GetCurrentProcessId());
 
 	auto address = preferredIf->FirstUnicastAddress;
 	auto& ifNo = Server::myInterface.numIP;
-	for ( ifNo = 0; ifNo < Server::InterfaceDescription::MaxHostIPs && address != NULL; ++ifNo, address = address->Next)
+	for ( ifNo = 0; ifNo < Server::InterfaceDescription::MaxHostIPs && address != nullptr; ++ifNo, address = address->Next)
 	{
 		struct sockaddr_in* saddr = (struct sockaddr_in*)(address->Address.lpSockaddr);
 		Server::myInterface.addr[ifNo].naddr = saddr->sin_addr.S_un.S_addr;
@@ -182,13 +176,12 @@ _getHostIPAddresses()
 
 		TCHAR addrString[128];
 		DWORD addrSize = sizeof(addrString);
-		auto x = WSAAddressToString(address->Address.lpSockaddr, address->Address.iSockaddrLength, NULL, addrString, &addrSize);
+		auto x = WSAAddressToString(address->Address.lpSockaddr, address->Address.iSockaddrLength, nullptr, addrString, &addrSize);
 
-		dbugLog(_FLI, "read index %u interface %ls, ip %s mac %llX pid %u"
+		dbugLog(_FLI, "read index %u interface %ls, ip %s pid %u"
 						, ifNo
 						, preferredIf->FriendlyName
 						, addrString
-						, Server::myInterface.mac
 						, Server::myInterface.pid
 						);
 	}
@@ -528,7 +521,7 @@ teulOpenConnection(const SINT32 teulIndex, const bool listening, const SINT32 ti
 	catch ( Teul::OpenError& e )
 	{
 		const char* err = strerror(abs(e.errNo));
-		if ( err == NULL )
+		if ( err == nullptr )
 			err = "unknown";
 
 		dbugLog(_FLW, "t:%d sock:%d open error:%d [%s] %s", newEndpoint->teulIndex(), newEndpoint->socket, e.errNo, err, e.msg);
@@ -553,7 +546,7 @@ teulOpenConnection(const SINT32 teulIndex, const bool listening, const SINT32 ti
 	}
 	else if (newEndpoint->state() != IS_LISTENING && (newEndpoint->m_reliable == false) )
 	{
-		const SINT32 error = (SYN_TOKEN != NULL) ? teulModSendCALLBACKe(*newEndpoint, *SYN_TOKEN) : -EINVAL;
+		const SINT32 error = (SYN_TOKEN != nullptr) ? teulModSendCALLBACKe(*newEndpoint, *SYN_TOKEN) : -EINVAL;
 		if ( error < 0 )
 			dbugLog(_FLA,"t:%d err:%d couldn't send to new connection"
 						, newEndpoint->teulIndex(), error);
@@ -651,7 +644,7 @@ void
 teulClose(const SINT32 teulIndex, const UINT32 code)
 {
 	ENDPOINT* const theEndpoint = teulGetEndpoint(teulIndex);
-	if ( theEndpoint != NULL )
+	if ( theEndpoint != nullptr )
 		teulClose(*theEndpoint, code ? (UINT32)code : (UINT32)Teul::Closing::TeulClose);
 }
 

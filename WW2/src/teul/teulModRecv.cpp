@@ -1305,7 +1305,7 @@ _pollSet(void)
 		const SOCKET sock = endpoint->socket;
 		if ( endpoint->state() != IS_DEAD && sock != INVALID_SOCKET )
 		{
-			assert(pollData.m_count <= std::numeric_limits<UINT16>);
+			assert(pollData.m_count <= std::numeric_limits<UINT16>::max());
 			endpoint->m_impl->pollSlot(pollData.m_count);
 			endpoint->updateSocketEvents();
 

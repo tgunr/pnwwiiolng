@@ -113,8 +113,6 @@ add_library (teulserver
 	server/server.cpp
 		server/server.h
 			server/serverReleaseTypeEnum.h
-	server/serverIfConf.cpp
-		server/serverIfConf.h
 	server/serverLuaInterface.cpp
 	server/serverMessages.cpp
 		server/serverMessages.h
