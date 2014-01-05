@@ -135,17 +135,16 @@ static char* _makeNativePath(const char* const path_)
 struct ConfigEntry
 {
 	ConfigEntry() : m_name(nullptr), m_value(nullptr) {}
-	ConfigEntry(const char* name_, const char* equals_, const char* end_)
-		: m_name(name_, static_cast<size_t>(equals_ - name_))
-		, m_value(nullptr)
+	ConfigEntry(const char* name_, const char* nameEnd_, const char* value_, const char* valueEnd_)
+		: m_name(name_, static_cast<size_t>(nameEnd_ - name_))
+		, m_value(value_, static_cast<size_t>(valueEnd_ - value_))
 	{
-		setValueFromEquals(equals_, end_);
 	}
 	StrDupPtr	m_name;
 	StrDupPtr	m_value;
-	void setValueFromEquals(const char* equals_, const char* end_)
+	void setValue(const char* value_, const char* valueEnd_)
 	{
-		m_value.copy(equals_ + 1, static_cast<size_t>(end_ - (equals_ + 1)));
+		m_value.copy(value_, static_cast<size_t>(valueEnd_ - value_));
 	}
 };
 
@@ -197,17 +196,17 @@ static void _readConfigEntriesFromFile(IO::MappedFile& file)
 			continue;
 		}
 		const char* name = cur;
-		if (equals[1] == '"')
-			++equals;
-		cur = equals + 1;
-		const char* eol = strpbrk(cur, "\r\n\"");
+		const char* value = equals + 1;
+		if (*value == '"')
+			++value;
+		const char* eol = strpbrk(value, "\r\n\"");
 		if ( eol != nullptr )
 			cur = eol;
 		else
 			cur = eol = file.endPtr();
 
 		// Trim trailing white space.
-		while ( eol > equals && isspace(*(eol - 1)) )
+		while ( eol > value && isspace(*(eol - 1)) )
 			--eol;
 
 		auto it = configEntries.begin();
@@ -215,12 +214,12 @@ static void _readConfigEntriesFromFile(IO::MappedFile& file)
 		{
 			if ( strncasecmp(it->m_name, name, static_cast<size_t>(equals - name)) == 0 )
 			{
-				it->setValueFromEquals(equals, eol);
+				it->setValue(value, eol);
 				break;
 			}
 		}
 		if ( it == configEntries.end() )
-			configEntries.emplace_back(std::move(ConfigEntry(name, equals, eol)));
+			configEntries.emplace_back(std::move(ConfigEntry(name, equals, value, eol)));
 		file.skipline();
 	}
 }
