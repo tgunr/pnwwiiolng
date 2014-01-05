@@ -197,9 +197,9 @@ static void _readConfigEntriesFromFile(IO::MappedFile& file)
 			continue;
 		}
 		const char* name = cur;
+		if (equals[1] == '"')
+			++equals;
 		cur = equals + 1;
-		if (*cur == '"')
-			++cur;
 		const char* eol = strpbrk(cur, "\r\n\"");
 		if ( eol != nullptr )
 			cur = eol;
