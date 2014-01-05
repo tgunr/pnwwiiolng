@@ -215,8 +215,7 @@ memReportJSON(unsigned int fd, const char* const /*path*/, const char* const /*a
 }
 #endif
 
-void
-memReport()
+void memReport()
 {
 	fprintf(stderr, "Memory Report:\n");
 	char buffer[128];
@@ -227,8 +226,7 @@ memReport()
 	}
 }
 
-LOGICAL
-memInit()
+void memInit()
 {
 #if defined(MEMORY_DEBUG)
 	atexit(memReport);
@@ -236,6 +234,4 @@ memInit()
 	if ( Teul::uWeb::s_debugServer != nullptr )
 		Teul::uWeb::s_debugServer->addVirtualFile("Debug Memory Usage Statistics", "/mem.json", memReportJSON);
 #endif
-
-	return TRUE;
 }

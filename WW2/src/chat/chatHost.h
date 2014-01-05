@@ -38,9 +38,6 @@ extern void chatRouteMessage(
 			, bool allowDotCommands
 			);
 
-//This is the logic that is run whenver someone sends a handle update message
-extern LOGICAL chatUpdateHandle(Player* player, struct UPDATEHANDLE& updateHandle);
-
 extern UINT32 nextMessageID(void);
 
 extern void chatDispatchCRSMessage(const SCHAR* source, const SCHAR* text, const ChatHandle& excludeID=0LL);

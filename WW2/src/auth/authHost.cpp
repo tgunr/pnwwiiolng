@@ -777,7 +777,7 @@ static void _gameErrorFunction (const SINT32 teulIndex, const UCHAR* const /*dat
 
 // process the arena request
 // Sends information about an arena or a web redirection
-LOGICAL authProcessArenaRequest(const SINT32 teulIndex, ARENA_REQ& request)
+void authProcessArenaRequest(const SINT32 teulIndex, ARENA_REQ& request)
 {
 	/*  Very first thing, check the version of presenter that they have.
 	 *  if it's not up to date, don't even send them an APP_VERIFY,
@@ -793,13 +793,9 @@ LOGICAL authProcessArenaRequest(const SINT32 teulIndex, ARENA_REQ& request)
 	{
 		//fill out an APP_LAUNCH pointing to version server and
 		//send it
-		if(_updatePresenter(teulIndex, request, platform))
-			return TRUE;
-		else
-		{
+		if(!_updatePresenter(teulIndex, request, platform))
 			dbugLog(_FLA, "unable to update presenter. no APP_VERIFY returned");
-			return FALSE;
-		}
+		return;
 	}
 
 	UINT32 destAddress = teulGetEndpointRemoteAddress(teulIndex);
@@ -809,7 +805,7 @@ LOGICAL authProcessArenaRequest(const SINT32 teulIndex, ARENA_REQ& request)
 
 	dbugLog(_FLI,"t:%d plat:%d sess:%d arena:%d", teulIndex, platform, request.sessionID, request.arenaID);
 
-	return _sendArenaInfo(*cdata, request);
+	_sendArenaInfo(*cdata, request);
 }
 
 static void

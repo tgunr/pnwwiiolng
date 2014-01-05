@@ -13,7 +13,7 @@
 struct MobileSpawnWaypoint;
 
 //This function installs all the host callbacks
-extern SINT32 chatInstallSupportCallbacks(void);
+SINT32 chatInstallSupportCallbacks(void);
 
 //This function sends a message to a client apprising it of the location of
 //	the chat server.  To be used after chatSendPlayerInfo tells the chat
@@ -22,8 +22,8 @@ extern SINT32 chatInstallSupportCallbacks(void);
 //	<OTP> is the otp to use
 //	<ipAddress> is the address of the chat server
 //	<port> is the port of the chat server
-extern LOGICAL chatSendServerInfo(SINT32 teulIndex, UINT32 otp, UINT32 ipAddress, UINT16 port);
+void chatSendServerInfo(SINT32 teulIndex, UINT32 otp, UINT32 ipAddress, UINT16 port);
 
-extern SINT32 chatSendMissionDeletionNotice(const UINT32& missionID);
+SINT32 chatSendMissionDeletionNotice(const UINT32& missionID);
 
-extern SINT32 chatSendMissionMobileSpawnWaypoint(const MobileSpawnWaypoint& wp);
+SINT32 chatSendMissionMobileSpawnWaypoint(const MobileSpawnWaypoint& wp);

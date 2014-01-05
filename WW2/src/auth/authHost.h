@@ -23,7 +23,7 @@ enum WEB_ERR
 };
 
 extern bool authEstablishServer(SINT32 teulIndex, struct AUTH_GAME_INIT& hello);
-extern LOGICAL authProcessArenaRequest(SINT32 teulIndex, struct ARENA_REQ& request);
+extern void authProcessArenaRequest(SINT32 teulIndex, struct ARENA_REQ& request);
 extern SINT32 authLaunchRequest(SINT32 teulIndex, struct APP_LAUNCH_REQ& request);
 
 extern void handleServerLoadUpdate(const struct AUTH_SERVER_LOAD& message);

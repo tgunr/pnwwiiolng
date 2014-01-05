@@ -110,12 +110,12 @@ Chat::PersonaUpdate::send()
 //	<OTP> is the otp to use
 //	<ipAddress> is the address of the chat server
 //	<port> is the port of the chat server
-LOGICAL chatSendServerInfo(SINT32 teulIndex, UINT32 otp, UINT32 ipAddress, UINT16 port)
+void chatSendServerInfo(SINT32 teulIndex, UINT32 otp, UINT32 ipAddress, UINT16 port)
 {
 	ChatServerInfo info(otp, ipAddress, port);
 	dbugLog(_FLD ,"t:%d %s(%08x, %s:%u)", teulIndex, __FUNCTION__, otp, teulGetAddress(ipAddress), port);
 
-	return teulSend(teulIndex, _SEND_SERVER_INFO, &info);
+	teulSend(teulIndex, _SEND_SERVER_INFO, &info);
 }
 
 //////////////////////////////////////////////////////////////////////

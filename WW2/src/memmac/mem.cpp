@@ -152,12 +152,10 @@ void MemTracker::trackedFree(void* ptr,const char* file, int line)
 
 #else
 
-LOGICAL memInit(void)
+void memInit(void)
 {
 	numberallocs = numberalloced = maxallocs = maxalloced = 0;
 	totalallocs = totalalloced = 0;
-
-	return TRUE;
 }
 
 void memKill(void)

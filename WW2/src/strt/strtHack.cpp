@@ -48,11 +48,10 @@ deleteFakes()
 
 //Takes the cp list and runs through it all, turning each standalone
 //	bridge CP into one with a faked facility and object to take damage
-LOGICAL
-strtFakeBridges(CPStruct* cpList)
+void strtFakeBridges(CPStruct* cpList)
 {
 	if (cpList == NULL)
-		return FALSE;
+		return;
 
 	dbugLog(_FLI, "Initializing bridges");
 
@@ -70,8 +69,6 @@ strtFakeBridges(CPStruct* cpList)
 	}
 
 	atexit(deleteFakes);
-
-	return TRUE;
 }
 
 //Allocates the fake CP structure underneath bridge CPs

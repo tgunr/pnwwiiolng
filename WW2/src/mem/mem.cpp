@@ -216,11 +216,9 @@ static bool CheckList()
 	return true;
 }
 
-LOGICAL memInit(void)
+void memInit(void)
 {
 	s_memInitialization();
-
-	return TRUE;
 }
 
 #if platOS != OS_WIN32

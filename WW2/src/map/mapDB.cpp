@@ -551,8 +551,7 @@ Player::loadChatMask()
 	updateMask();
 }
 
-LOGICAL
-mapFillPersonaData(Player* const player)
+bool mapFillPersonaData(Player* const player)
 {
 	std::this_thread::yield();
 
@@ -615,13 +614,13 @@ mapFillPersonaData(Player* const player)
 						, teulClock64 - entryTime
 						);
 
-		return TRUE;
+		return true;
 	}
 	catch (std::exception& e)
 	{
 		dbugLog(_FLW, "t:%d p:%u c:%s per:%d %s: %s", player->teulIndex(), player->playerID(), player->callsign(), player->personaID(), __FUNCTION__, e.what());
 		player->loadChatMask();
-		return FALSE;
+		return false;
 	}
 }
 

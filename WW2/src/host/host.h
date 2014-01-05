@@ -38,7 +38,7 @@ struct VEHICLE_HOLDER
 	HostVehicle* vehicle;
 	UINT32	serial;
 
-	// for the bradcast list we need these
+	// for the broadcast list we need these
 	UINT16 	timeStamp;
 	UINT16	posTimeStamp;
 	UINT16	turretMask;
@@ -72,7 +72,6 @@ extern SINT32 updateBcastRecv, updateBcastSend;
 extern MY_SERVER_INFO msi;
 extern LOGICAL serverResync;
 
-extern LOGICAL hostEmpty(void);
 extern SINT32 hostGetMapConnection(void);
 extern UINT32 hostGetStratAddress(void);
 
@@ -106,10 +105,10 @@ extern void hostSendCaptureStatesToOccupants(const class CaptureState& incoming)
 
 /*
 
-The problems here are pretty striaght forward.
+The problems here are pretty straight forward.
 
 1. 	How do we add and delete people or vehicles from and array without having
-	to search the array for empty nodes.  How do we attacth these entries to
+	to search the array for empty nodes.  How do we attach these entries to
 	vehicles simple?
 
 1a:	Reference them also from a linked list that manages released nodes
@@ -117,22 +116,22 @@ The problems here are pretty striaght forward.
 	header entries are also used to link personas to vehicles, and vehicles to
 	locations.
 
-2.	How do we  ensure that a recycled ID doesnt get mistaken for the pervious
+2.	How do we  ensure that a recycled ID doest get mistaken for the previous
 	ID?
 
-2a:	Split the ID into 2 parts,  i.e. the lower 14 bits could actaully designate the
+2a:	Split the ID into 2 parts,  i.e. the lower 14 bits could actually designate the
 	location in the array, and the upper 2 bits that are incremented each time
-	the node changes hands to provide uniquness.  This way if an event comes
-	in for a defunct vehicle the ID will not match the ID valude refernced in the
+	the node changes hands to provide uniqueness.  This way if an event comes
+	in for a defunct vehicle the ID will not match the ID value referenced in the
 	array.
 
 
-3.	How do we inform the client that a change has occored in on e of the vehicles
+3.	How do we inform the client that a change has occurred in one of the vehicles
 	on its request list.
 
-3a:	We send an extra bit that is transmited with each update that tells weather
+3a:	We send an extra bit that is transmitted with each update that tells weather
 	the vehicle is "dirty".  If the vehicle is dirty the client will send an info
-	request for the updated info.  When the infor request for that vehicle is obtained
+	request for the updated info.  When the info request for that vehicle is obtained
 	the
 */
 

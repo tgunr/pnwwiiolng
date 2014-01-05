@@ -469,8 +469,7 @@ _findAppTable(UINT32 appID)
 }
 
 //////////////////////////////////////////////////////////////////////
-static bool
-_initAppInfoTable(GAME& gameEntry)
+static bool _initAppInfoTable(GAME& gameEntry)
 {
 	SCHAR statement[512];
 	SINT32 i, platform;
@@ -673,8 +672,7 @@ _getPlayerTable(GAME& gameEntry)
 }
 
 //////////////////////////////////////////////////////////////////////
-LOGICAL
-authInitGameEntry(GAME& gameEntry)
+bool authInitGameEntry(GAME& gameEntry)
 {
 	APP_TABLE_ENTRY* appEntry;
 
@@ -724,8 +722,7 @@ authInitGameEntry(GAME& gameEntry)
 }
 
 //////////////////////////////////////////////////////////////////////
-LOGICAL
-authdbStoreComputerInfo(const Auth::ClientData& cdata, const PLAY_COMPUTER_INFO& pci)
+void authdbStoreComputerInfo(const Auth::ClientData& cdata, const PLAY_COMPUTER_INFO& pci)
 {
 	SCHAR	statement[8000+1];
 	SCHAR	cardName[MAX_OGL_CARD_NAME*2 + 1];
@@ -744,7 +741,7 @@ authdbStoreComputerInfo(const Auth::ClientData& cdata, const PLAY_COMPUTER_INFO&
 	const PLAY_MIXER_CAPS& mix = pci.sound.mixer;
 
 	if ( cpu.manufacturer[0] == 0 )
-		return true;
+		return;
 
 	try
 	{
@@ -872,15 +869,11 @@ authdbStoreComputerInfo(const Auth::ClientData& cdata, const PLAY_COMPUTER_INFO&
 
 		mysql_escape_string(statement, cdata.m_username.c_str(), MAX_HANDLE_LEN * 2 + 1);
 		DBSimpleQuery(dbh, "UPDATE `auth`.`auth_customer` SET `flags` = (`flags` | 2) WHERE `username` = '%s'", statement);
-
-		return true;
 	}
 	catch (std::exception& e)
 	{
 		_dbugLog(_FLA, "%s: %s", __FUNCTION__, e.what());
 	}
-
-	return false;
 }
 
 //////////////////////////////////////////////////////////////////////

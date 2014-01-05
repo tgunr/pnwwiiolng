@@ -15,7 +15,7 @@
 	void* memAllocRelease(SINT32 allocSize);
 	void memFreeRelease(void* pointer);
 	static void* memCalloc(size_t members, size_t sz) { return calloc(members, sz); }
-	extern LOGICAL memInit(void);
+	extern void memInit(void);
 	extern void memKill(void);
 #else
 	#if platOS == OS_LINUX || platBuild == TEUL_SERVER
@@ -75,7 +75,7 @@
 	#endif
 
 	#if defined(MEMORY_DEBUG) || platOS == OS_LINUX || platBuild == TEUL_SERVER
-		extern LOGICAL memInit(void);
+		extern void memInit(void);
 		extern void memKill(void);
 	#else
 		#define memInit()

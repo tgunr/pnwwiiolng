@@ -77,12 +77,11 @@ struct ARG_SPEC
 	SINT32		maxArgBytes;
 };
 
-extern LOGICAL parseValidArgs(ARG_SPEC* argSpec, FUNCARGS* args, SINT32 numArgs, const char* section, SINT32 lineNum);
+bool parseValidArgs(ARG_SPEC* argSpec, FUNCARGS* args, SINT32 numArgs, const char* section, SINT32 lineNum);
 
-extern SINT32 parseFillKeys(ARG_KEY_HEAD* keyList, ARG_KEY_HEAD* defaultList, ARG_LIST* argList, SINT32 offset);
+SINT32 parseFillKeys(ARG_KEY_HEAD* keyList, ARG_KEY_HEAD* defaultList, ARG_LIST* argList, SINT32 offset);
 
-extern ERROR_TOKEN getParams(ARG_LIST* list, UCHAR* paramString
+ERROR_TOKEN getParams(ARG_LIST* list, UCHAR* paramString
 							, void* destination, SINT32 minParams);
 
-extern bool parseIsObjectIgnoringError(const char* objectName, const char* error);
-
+bool parseIsObjectIgnoringError(const char* objectName, const char* error);

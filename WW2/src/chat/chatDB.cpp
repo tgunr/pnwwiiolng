@@ -240,13 +240,12 @@ chatGetWWIIConfig(void)
 
 //////////////////////////////////////////////////////////////////////
 
-LOGICAL
-chatdbRecordEvent(const SCHAR* category
-					, const SCHAR* callsign
-					, const SCHAR* event
-					, const SCHAR* parameter
-					, const SCHAR* data
-					)
+void chatdbRecordEvent(const SCHAR* category
+						, const SCHAR* callsign
+						, const SCHAR* event
+						, const SCHAR* parameter
+						, const SCHAR* data
+						)
 {
 	static char escCategory[64];
 	static char escCallsign[64];
@@ -262,7 +261,6 @@ chatdbRecordEvent(const SCHAR* category
 						, escapeString(parameter, escParam, sizeof(escParam))
 						, escapeString(data, escData, sizeof(escData))
 				);
-	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -295,8 +293,7 @@ _readPermissionNames()
 //////////////////////////////////////////////////////////////////////
 // Initialize the database and load in bootstrap db data.
 
-LOGICAL
-chatInitDB()
+void chatInitDB()
 {
 	dbugLog(_FLD, "Initializing database");
 
@@ -309,7 +306,7 @@ chatInitDB()
 		wwiiReadRanks(dbh);
 
 		_readPermissionNames();
-		return chatdbLoadStratData();
+		chatdbLoadStratData();
 	}
 	catch ( std::exception& e )
 	{

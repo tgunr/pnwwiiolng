@@ -216,11 +216,9 @@ SINT32 i;
 	return (FALSE);
 }
 
-LOGICAL parseValidArgs(ARG_SPEC* argSpec, FUNCARGS* args, SINT32 numArgs, const char* section, SINT32 lineNum)
+bool parseValidArgs(ARG_SPEC* argSpec, FUNCARGS* args, SINT32 numArgs, const char* section, SINT32 lineNum)
 {
-SINT32 i;
-
-	for ( i = 0; i < numArgs; i++)
+	for (SINT32 i = 0; i < numArgs; i++)
 	{
 		if (! parseCmpBaseType(argSpec[i].baseType, (BASE_ARG_TYPES)args[i].baseType) )
 		{
@@ -231,7 +229,7 @@ SINT32 i;
 			Write_Debug("missing or bad parmeter (%d) type %d, value (%s) to type %d, section %s"
 						,i,args[i].baseType,args[i].svalue,argSpec[i].baseType,section);
 #endif
-			return (FALSE);
+			return false;
 		}
 		if (args[i].numBytes > argSpec[i].maxArgBytes)
 		{
@@ -241,12 +239,11 @@ SINT32 i;
 #else
 			Write_Debug("parameter too long in blitzWor");
 #endif
-			return (FALSE);
+			return false;
 		}
 	}
 
-	return TRUE;
-
+	return true;
 }
 
 SINT32 parseFillKeys(ARG_KEY_HEAD* keyList, ARG_KEY_HEAD* defaultList, ARG_LIST* argList, SINT32 offset)

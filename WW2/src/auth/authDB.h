@@ -47,13 +47,12 @@ extern void authResetConnectInfo(UINT32 gameID);
 
 //Validates a user against the database, and fills out the game cookie
 //	if they are a good user
-//extern LOGICAL authValidateUser(APP_LAUNCH_REQ* request, Auth::Dispatch * gamecookie);
 extern UINT32 authValidateUser(SINT32 teulIndex, const APP_LAUNCH_REQ& request, Auth::Dispatch& gamecookie, const Auth::ClientData& cdata);
 
 // Inserts otp records int ot the authOTP table to be used by
 // our ftp servers for authenication.
 extern void authDBInsertOTP(const APP_LAUNCH& launch, const APP_LAUNCH_REQ& request, const char* dir);
-extern LOGICAL authInitGameEntry(GAME& gameEntry);
+extern bool authInitGameEntry(GAME& gameEntry);
 extern void authInitApps(void);
 
 //
@@ -64,7 +63,7 @@ extern void authInitApps(void);
 struct vers_manifest* matchversion(UINT32 needle, SINT32 appid, UINT32 platform);
 
 // Save a computer info packet arriving on a connection
-extern LOGICAL authdbStoreComputerInfo(const Auth::ClientData& data, const PLAY_COMPUTER_INFO& pci);
+extern void authdbStoreComputerInfo(const Auth::ClientData& data, const PLAY_COMPUTER_INFO& pci);
 
 // Get a checksum from the database
 extern bool authdbGetFileMD5(const UINT32 appID, const UINT32 platform, const char* filename, char* buffer, UINT32 bufLen);

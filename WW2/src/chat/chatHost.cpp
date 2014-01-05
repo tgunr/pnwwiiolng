@@ -2434,12 +2434,7 @@ _personaCreate(const Server::PersonaLogin& login, PlayerStatusNode& psn)
 						, login.reason()
 						);
 
-	if ( !chatCreatePlayer(&psn, (struct Chat::PlayerInfo*) login.data.auxData) )
-	{
-		dbugLog(_FLW, "t:%d p:%u c:%s create player failed"
-					, psn.teulIndex, psn.dispatch().m_customerID, psn.dispatch().m_callsign);
-		return -EINVAL;
-	}
+	chatCreatePlayer(&psn, (struct Chat::PlayerInfo*) login.data.auxData);
 
 	if ( g_debugPersonas )
 		dbugLog(_FLD, "t:%d p:%u c:%s <- personaCreate"

@@ -141,11 +141,10 @@ Player::activate(SINT32 newIndex, PlayerStatusNode* psn)
 	_recordLogin();
 }
 
-LOGICAL
-chatPlayerDeactivate(Player* player)
+void chatPlayerDeactivate(Player* player)
 {
-	if ( player == nullptr )
-		return FALSE;
+	if ( PN_UNLIKELY(player == nullptr) )
+		return;
 
 	if ( isValidSide(player->side()) )
 	{
@@ -154,15 +153,13 @@ chatPlayerDeactivate(Player* player)
 	}
 
 	if ( !player->active() )
-		return FALSE;
+		return;
 
 	player->deactivate();
 
 	playerIndex.erase(player->matchHandle());
 
 	s_limboPlayers.insert(player);
-
-	return TRUE;
 }
 
 
@@ -170,31 +167,14 @@ chatPlayerDeactivate(Player* player)
 //	the player.  At this point, we match the player teulIndex up with the
 //	playerInfo we received earlier, put the handle on our main player list
 //	and take are of all the initialization and such
-LOGICAL
-chatCreatePlayer(PlayerStatusNode* psn, struct Chat::PlayerInfo* playerInfo)
+void chatCreatePlayer(PlayerStatusNode* psn, struct Chat::PlayerInfo* playerInfo)
 {
-	if (playerInfo == NULL || psn == NULL)
-	{
-		dbugLog(_FLA, "no player info, what gives?");
-#ifdef BETA_RELEASE
-		exit(0);
-#else
-		return FALSE;
-#endif
-	}
+	ABORT_IF(playerInfo == nullptr);
+	ABORT_IF(psn == nullptr);
 
 	// Create a new player and populate it
 	Player* player = new Player(psn, playerInfo);
-
-	///FIXME: Incorrect behavior; we should close and cancel out this
-	///FIXME: connection and do something to alert ourselves to the fact
-	///FIXME: that this host has run out of memory.
-
-	if ( player == NULL )
-	{
-		LogAbort("MEMORY: Failed to create new Player!");
-		exit(0);
-	}
+	ABORT_IF(player == nullptr);
 
 	// Populate the player and add us to the limbo list.
 	_registerPlayer(player);
@@ -215,8 +195,6 @@ chatCreatePlayer(PlayerStatusNode* psn, struct Chat::PlayerInfo* playerInfo)
 		, player->callsign()
 		, player->playerID()
 		);
-
-	return TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -291,11 +269,10 @@ Chat::ManagementLogin2::Login(SINT32 teulIndex)
 }
 
 //This is the logic that is run whenever a logout is received from the host
-extern LOGICAL
-chatLogoutPlayer(SINT32 teulIndex)
+void chatLogoutPlayer(SINT32 teulIndex)
 {
 	Player* player = PlayerInterface::Lookup(teulIndex);
-	return chatFreePlayer(player);
+	chatFreePlayer(player);
 }
 
 static Player*
@@ -331,11 +308,10 @@ _registerPlayer(Player* newPlayer)
 }
 
 //This is the logic that is run whenever a logout is received from the host
-extern LOGICAL
-chatFreePlayer(Player* player)
+void chatFreePlayer(Player* player)
 {
-	if (player == NULL)
-		return FALSE;
+	if (PN_UNLIKELY(player == nullptr))
+		return;
 
 	SINT32 teulIndex;
 
@@ -380,7 +356,7 @@ chatFreePlayer(Player* player)
 	// Remove them from any mission we think they are on
 	player->SetMission(0);
 
-//	dbugLog(_FLD,"1) alocating node %p p->%p n->%p"	, player, player->prev(), player->next());
+//	dbugLog(_FLD,"1) allocating node %p p->%p n->%p"	, player, player->prev(), player->next());
 
 	if ( player->teulIndex() >= 0 )
 	{
@@ -429,6 +405,4 @@ chatFreePlayer(Player* player)
 	}
 
 	delete player;
-
-	return TRUE;
 }
