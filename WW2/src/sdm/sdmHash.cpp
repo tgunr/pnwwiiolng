@@ -16,15 +16,6 @@
 #include "strt/strtDTL.h"
 #include "sdm/sdmHash.h"
 
-// temp struct for internal preprocessing
-typedef struct
-{
-	SINT32 numBuildings;
-	SINT16	bid[MAX_BUILDINGS_PER_CELL];
-} TEMP_BUILDING_LIST;
-
-static TEMP_BUILDING_LIST _tempTable[CELLS_PER_SIDE][CELLS_PER_SIDE];
-
 // allocates a facility nodes for each facility and a building list for each
 // facility that is filled out when sdmCreateBuildingTable is called.
 STRAT_FACILITY_TABLE*
@@ -90,21 +81,18 @@ static bool _addBuildingToFacTable(STRAT_FACILITY_TABLE* facTable, const BUILDIN
 	return false;
 }
 
-// Creates a cell basesd table with each cell contatining a list of buildings in
+// Creates a cell based table with each cell containing a list of buildings in
 // that cell. In addition this function fills out the facility table.
 STRAT_BUILDING_LIST*
-sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd,SINT32 numBuildings,STRAT_BUILDING_HASH* bldHash, UINT32* errors)
+sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd, SINT32 numBuildings, STRAT_BUILDING_HASH* bldHash, UINT32* errors)
 {
-	TEMP_BUILDING_LIST* cell;
-	STRAT_BUILDING_LIST* table, *tcell;
-	SINT32 i,x,y,sx,sy;
-
     static const char builder[] = "builder";
 
-	memset(_tempTable,0,sizeof(_tempTable));
+	STRAT_BUILDING_LIST tempTable[1 << CELL_RES_ADJUST][1 << CELL_RES_ADJUST];
+	memset(tempTable, 0, sizeof(tempTable));
 
-	sx = (bd[0].posx/SUPERCELL_SIZE_M);
-	sy = (bd[0].posy/SUPERCELL_SIZE_M);
+	SINT32 sx = (bd[0].posx/SUPERCELL_SIZE_M);
+	SINT32 sy = (bd[0].posy/SUPERCELL_SIZE_M);
 
 #ifdef SDM_DEBUG_EXTREAM
 	dbugLog(_FLW,"adding buildings to sc %d:%d",sx,sy);
@@ -112,7 +100,7 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd,SINT32 numBu
 
 	std::map<SINT16, STRAT_BUILDING> bldgMap;
 
-	for (i = 0; i< facTable->numFacilities; i++)
+	for (SINT32 i = 0; i< facTable->numFacilities; ++i)
 	{
 		const SINT16 bid = facTable->facility[i].id;
 		STRAT_BUILDING& bldg = bldgMap[bid];
@@ -121,7 +109,7 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd,SINT32 numBu
 		bldg.pobj = (void*) 1;	// Really?
 	}
 
-	for(i=0;i<numBuildings;i++)
+	for(SINT32 i = 0; i < numBuildings; ++i)
 	{
 		if (! _addBuildingToFacTable(facTable, bd[i]))
 		{
@@ -137,7 +125,8 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd,SINT32 numBu
 						, bd[i].fileName
 						);
 #endif
-			if(errors) (*errors)++;
+			if(errors)
+				(*errors)++;
 			continue;
 		}
 
@@ -154,30 +143,32 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd,SINT32 numBu
 
 		sx = (bd[i].posx / SUPERCELL_SIZE_M);
 		sy = (bd[i].posy / SUPERCELL_SIZE_M);
-		x = ((bd[i].posx / 800) & 0x0f) >> CELL_RES_ADJUST;
-		y = ((bd[i].posy / 800) & 0x0f) >> CELL_RES_ADJUST;
-		cell = &_tempTable[x][y];
-		cell->bid[cell->numBuildings++] = bd[i].oid.id;
+		size_t x = ((bd[i].posx / 800) & 0x0f) >> CELL_RES_ADJUST;
+		size_t y = ((bd[i].posy / 800) & 0x0f) >> CELL_RES_ADJUST;
+		auto& cell = tempTable[x][y];
+		if (cell.numBuildings == 0)
+			cell.bid = static_cast<decltype(cell.bid)>(alloca(sizeof(cell.bid) * MAX_BUILDINGS_PER_CELL));
+		cell.bid[cell.numBuildings++] = bd[i].oid.id;
 //		dbugLog(_FLW,"adding building %d to pos:%d,%d sc:%d,%d cell:%d,%d"
 //					,bd[i].oid.id,bd[i].posx,bd[i].posy,sx,sy,x,y);
 	}
 
-	table = (STRAT_BUILDING_LIST*)memAlloc(CELLS_PER_SUPER_CELL * sizeof(STRAT_BUILDING_LIST));
-	memset(table,0,(CELLS_PER_SUPER_CELL * sizeof(STRAT_BUILDING_LIST)));
+	STRAT_BUILDING_LIST* table = (STRAT_BUILDING_LIST*)memCalloc(CELLS_PER_SUPER_CELL, sizeof(STRAT_BUILDING_LIST));
 
-	for(x = 0; x < CELLS_PER_SIDE; x++)
+	for(size_t x = 0; x < CELLS_PER_SIDE; x++)
 	{
-		for(y = 0; y < CELLS_PER_SIDE;y++)
+		for (size_t y = 0; y < CELLS_PER_SIDE; y++)
 		{
-			cell = &_tempTable[x][y];
-			tcell = &table[(x * CELLS_PER_SIDE) + y];
-			if (cell->numBuildings > 0)
+			auto& src = tempTable[x][y];
+			if (src.numBuildings > 0)
 			{
+				auto& dst = table[(x * CELLS_PER_SIDE) + y];
 //				Write_Debug("adding %d buildings to sc:%d,%d cell:%d,%d"
 //							,cell->numBuildings,sx,sy,x,y);
-				tcell->bid = (SINT16*)memAlloc(cell->numBuildings * sizeof(STRAT_BUILDING_LIST));
-				memcpy(tcell->bid,cell->bid,(cell->numBuildings * sizeof(STRAT_BUILDING_LIST)));
-				tcell->numBuildings = cell->numBuildings;
+				dst.numBuildings = src.numBuildings;
+				const size_t dataSize = sizeof(dst.bid) * src.numBuildings;
+				dst.bid = static_cast<decltype(dst.bid)>(memAlloc(dataSize));
+				memcpy(dst.bid, src.bid, dataSize);
 			}
 		}
 	}
@@ -197,17 +188,13 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd,SINT32 numBu
 	}
 
 #ifdef HEAVY_DEBUG
-	for(x = 0; x < CELLS_PER_SIDE; x++)
+	for(size_t x = 0; x < CELLS_PER_SIDE; x++)
 	{
-		for(y = 0; y < CELLS_PER_SIDE;y++)
+		for(size_t y = 0; y < CELLS_PER_SIDE;y++)
 		{
-			tcell = &table[(x * CELLS_PER_SIDE) + y];
-			if (tcell->numBuildings > 0)
-			{
-				Write_Debug("sucessfully added %d buildings to sc:%d,%d cell:%d,%d"
-							,tcell->numBuildings,sx,sy,x,y);
-			}
-
+			auto& cell = table[(x * CELLS_PER_SIDE) + y];
+			if (cell.numBuildings > 0)
+				Write_Debug("successfully added %d buildings to sc:%d,%d cell:%" PRSizeT ",%" PRSizeT ", cell.numBuildings, sx, sy, x, y);
 		}
 	}
 #endif
