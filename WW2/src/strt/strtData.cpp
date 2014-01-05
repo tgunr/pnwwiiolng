@@ -313,8 +313,6 @@ _filenamePool(const char* filename)
 			return *it;
 	}
 	names.push_back(filename);
-	if (names.size() > 1)
-		DebugBreak();
 	return names.back();
 }
 
