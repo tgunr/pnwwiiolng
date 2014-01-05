@@ -20,25 +20,6 @@ TOLUA_API int  tolua_wwii_open (lua_State* tolua_S);
 #include "wwii/wwiiOwnershipEnums.h"
 #include "mm/mmEnums.h"
 
-/* function to release collected object via destructor */
-#ifdef __cplusplus
-
-static int tolua_collect_BRANCH_ENUM (lua_State* tolua_S)
-{
- BRANCH_ENUM* self = (BRANCH_ENUM*) tolua_tousertype(tolua_S,1,0);
-	delete self;
-	return 0;
-}
-
-static int tolua_collect_RANK_NO (lua_State* tolua_S)
-{
- RANK_NO* self = (RANK_NO*) tolua_tousertype(tolua_S,1,0);
-	delete self;
-	return 0;
-}
-#endif
-
-
 /* function to register type */
 static void tolua_reg_types (lua_State* tolua_S)
 {
