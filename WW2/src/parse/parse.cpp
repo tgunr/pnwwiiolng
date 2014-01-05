@@ -120,7 +120,7 @@ static	ARG_KEY tt = {0,0,0,0,0,0,0};
 	tt.fvalue = tmpFloat32;
 	tt.dvalue = tmpSint32;
 
-	if (strlen(str) == 0)
+	if (str[0] == 0)
 		tt.baseType = T_EMPTY;
 
 	return (&tt);
