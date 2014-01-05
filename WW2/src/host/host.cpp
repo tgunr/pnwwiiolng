@@ -134,7 +134,7 @@ UINT32 _stratHost = 0;
 
 SINT32 updateBcastSend = -1, updateBcastRecv = -1;
 
-static bool _running = true;
+static std::atomic<bool> g_hostTerminating;
 
 static UINT32				_personaCounter;
 static UINT32				_vehicleCounter;
@@ -163,8 +163,7 @@ static OCCUPANCY_MAP occupancyMap;
 
 // Set this to true to prevent logins to the server.
 bool g_serverReserved = false;
-// True while we're expecting to stay in the main loop.
-static bool g_hostRunning = false;
+static std::atomic<bool> g_exitHandlerRequired = false;
 // True while we are allowing incoming connections.
 static bool g_accepting = false;
 
@@ -199,7 +198,7 @@ _closeAllOpenSortiesOnThisCell()
 
 void exitHandler()
 {
-	if ( g_hostRunning == false )
+	if ( g_exitHandlerRequired.exchange(false) == false )
 		return;
 
 	chatSendAdminMessage("cell host #%u terminated", Server::localHost & 255);
@@ -1430,13 +1429,8 @@ static void
 _killUpdater(SINT32 /*teulIndex*/, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 /*error*/)
 {
 	dbugLog(_FLA, "killing host");
-
-	if ( ! _running )
-	{
+	if ( g_hostTerminating.exchange(true) == true)
 		exit(1);
-	}
-
-	_running = false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -2221,9 +2215,12 @@ _runHost(void)
 
 	TIMER_USE_HERE
 
-	while ( _running )
+	for ( ; ; )
 	{
 		TIMER_RESET
+
+		if (PN_UNLIKELY(g_hostTerminating == true))
+			return;
 
 		// Because dbugLog is not threadsafe, any worker
 		// threads have to queue up their log messages for
@@ -3042,7 +3039,7 @@ main(const int argc, const char* const argv[])
 
 	dbugLog(_FLN,"strat host is at %s", teulGetAddress(_stratHost));
 
-	g_hostRunning = true;
+	g_exitHandlerRequired = true;
 	atexit(exitHandler);
 
 	Server::myServerInfo.stats.status = Server::SERVER_INITIALIZING;
@@ -3094,8 +3091,6 @@ main(const int argc, const char* const argv[])
 	statsThread->join();
 
 	exitHandler();
-
-	g_hostRunning = false;
 }
 
 void HCUnit::setHomeCPID(const FULL_OBJ_ID& id)
