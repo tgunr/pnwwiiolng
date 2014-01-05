@@ -7,6 +7,28 @@
 //
 // Originating Programmer: John "Kango" Lundy
 
+#ifdef FUTURE
+namespace Mem
+{
+	//! Allocate unitSize * numUnits bytes of memory. Terminates app if no memory available.
+	void* Allocate(size_t unitSize, size_t numUnits, bool clear, const char* file, size_t lineNo);
+	void Free(void* ptr, const char* file, size_t lineNo);
+	void* Reallocate(void* ptr, size_t newSize, const char* file, size_t lineNo);
+	void* Dup(void* src, size_t srcSize, const char* file, size_t lineNo)
+	{
+		void* dst = Allocate(srcSize, 1, false, file, lineNo);
+		memcpy(dst, src, srcSize);
+		return dst;
+	}
+}
+
+#define PNMemAlloc(Size)			Mem::Allocate((Size), 1, false, __FILE__, __LINE__)
+#define PNMemCalloc(Size)			Mem::Allocate((Size), 1, true, __FILE__, __LINE__)
+#define PNMemAllocN(Size, Units)	Mem::Allocate((Size), (Units), false, __FILE__, __LINE__)
+#define PNMemCallocN(Size, Units)	Mem::Allocate((Size), Units, true, __FILE__, __LINE__)
+#define PNMemDup(Src, Size)			Mem::Dup(Src, Size)
+#endif
+
 #if platOS == OS_MACOS
 	#include <malloc/malloc.h>
 	#define memAlloc(a)   memAllocRelease(a)

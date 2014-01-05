@@ -22,10 +22,10 @@
 #include "systhread.h"
 #endif
 
-typedef UINT64 guard_t;
-static const guard_t GUARD_VALUE = 0xaafebbdccc12dd34ULL;
-//typedef UINT32 guard_t;
-//static const guard_t GUARD_VALUE = 0xfedc1234;
+//typedef UINT64 guard_t;
+//static const guard_t GUARD_VALUE = 0xaafebbdccc12dd34ULL;
+typedef UINT32 guard_t;
+static const guard_t GUARD_VALUE = 0xfedc1234;
 
 #ifdef MEMORY_DEBUG
 #pragma pack(push, 4)
