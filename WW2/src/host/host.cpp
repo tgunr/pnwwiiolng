@@ -134,8 +134,6 @@ UINT32 _stratHost = 0;
 
 SINT32 updateBcastSend = -1, updateBcastRecv = -1;
 
-static std::atomic<bool> g_hostTerminating;
-
 static UINT32				_personaCounter;
 static UINT32				_vehicleCounter;
 
@@ -163,7 +161,8 @@ static OCCUPANCY_MAP occupancyMap;
 
 // Set this to true to prevent logins to the server.
 bool g_serverReserved = false;
-static std::atomic<bool> g_exitHandlerRequired = false;
+static std::atomic<bool> g_exitHandlerRequired;
+static std::atomic<bool> g_hostTerminating;
 // True while we are allowing incoming connections.
 static bool g_accepting = false;
 

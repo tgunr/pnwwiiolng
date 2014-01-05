@@ -514,6 +514,9 @@ _teulConnectFn(ENDPOINT& endpoint)
 int
 main(int argc, char* argv[])
 {
+	Teul::SetAppName("luaClient");
+	Teul::ConfigVar::InitializeConfigVars();
+
 	// Command line argument processing.
 	int arg;
 	for ( arg = 1; arg < argc && argv[arg][0] == '-'; ++arg )
