@@ -96,7 +96,9 @@ public:
 	FULL_OBJ_ID		facilityID;
 	char			name[MAX_STRT_NAME_LENGTH];
 	const char*		filename;
+//tolua_end
 	const std::string*	m_filename;
+//tolua_begin
 	WWII_SIDE		m_side;		//the side that owns the object
 	WWII_COUNTRY	m_country;		//the country that owns the object
 	WWII_SIDE		originalSide;
