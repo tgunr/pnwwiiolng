@@ -299,7 +299,7 @@ _readSupercells()
 		if ( parseResult != 0 )
 			LogAbort("%s: sdmOpenFile failed %d", cFilename, parseResult);
 
-		Supercell& sc = g_supercells[static_cast<SINT32>(x) << 16 | (static_cast<SINT32>(y)];
+		Supercell& sc = g_supercells[static_cast<SINT32>(scx) << 16 | static_cast<SINT32>(scy)];
 		if ( sc.x != 0 || sc.y != 0 )
 			LogAbort("Supercell already loaded? %s [%d,%d : %d,%d]", filename.c_str(), scx, scy, sc.x, sc.y);
 
