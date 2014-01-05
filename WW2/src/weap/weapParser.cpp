@@ -252,12 +252,13 @@ static bool _fillCountry(SINT32 /*numArgs*/, FUNCARGS* args)
 }
 
 void
-weapAddClass(UINT32 classIndex, const char* name)
+weapAddClass(UINT32 classIndex, const std::string& name)
 {
-	strncpy((SCHAR*)weaponClass[classIndex].name, name, MAX_CLASS_NAME_LEN);
-	weaponClass[classIndex].active = true;
-	weaponClass[classIndex].spec = NULL_WEAP_SPEC;
-	weaponClass[classIndex].spec.wClass = classIndex;
+	WEAPON_CLASS& entry = weaponClass[classIndex];
+	entry.name = name;
+	entry.active = true;
+	entry.spec = { 0, classIndex, 0, 0 };
+	entry.m_hash = WEAPON_CLASS::GetHash(name);
 
 	if ( classIndex > g_maxWeaponClass )
 		g_maxWeaponClass = classIndex;

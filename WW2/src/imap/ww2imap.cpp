@@ -403,14 +403,17 @@ int ww2imapSetKeymap(int vehtypeListIdx)
 			category = WW2_FUNC_CATEGORY_AIR;
 		break;
 		case VEH_TYPE_GROUND:
+		{
+			const std::string& weapClassName = weaponClass[vehtypeWeaponSpec(vehtypeListIdx).wClass].name;
 			for(i = 0; i < WW2_FUNC_NUM_CATEGORIES; i++)
 			{
-				if(!strcmp((char*)weaponClass[vehtypeWeaponSpec(vehtypeListIdx).wClass].name, categoryClassName[i]))
+				if(weapClassName ==  categoryClassName[i])
 				{
 					category = i;
 					break;
 				}
 			}
+		}
 		break;
 		case VEH_TYPE_SEA:
 			category = WW2_FUNC_CATEGORY_SEA;
@@ -1146,9 +1149,10 @@ static int ww2KeymapvehtypeListIdx(int category, int vehicleIdx)
 			// subclass ground vehicles
 			if(type == VEH_TYPE_GROUND && vehtype->Type == VEH_TYPE_GROUND)
 			{
-				if(!strcmp((char*)weaponClass[vehtypeWeaponSpec(i).wClass].name, categoryClassName[category]))
+				if(weaponClass[vehtypeWeaponSpec(i).wClass].name == categoryClassName[category])
 					idx++;
-			}else if(vehtype->Type == (UINT32)type)
+			}
+			else if(vehtype->Type == (UINT32)type)
 			{
 				idx++;
 			}

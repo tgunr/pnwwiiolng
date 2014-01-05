@@ -120,7 +120,14 @@ extern WEAPON_SPEC weapCreateSpec(const char* weapString);
 // create a spec from its dotted quad
 extern WEAPON_SPEC weapCreateSpec(UINT32 country, UINT32 category, UINT32 klass, UINT32 type);
 
+// find *just* a weapon's class number
+extern UINT8 weapFindClassIndex(const std::string& className);
+
 // turn a class string into a weap spec
-extern WEAPON_SPEC weapFindClass(const char* weapClass);
+static inline WEAPON_SPEC weapFindClass(const std::string& className)
+{
+	return WEAPON_SPEC(0, 0, weapFindClassIndex(className), 0);
+}
+
 
 //tolua_end

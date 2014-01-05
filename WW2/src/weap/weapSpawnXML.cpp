@@ -94,12 +94,11 @@ weapLoadSpawnXML()
 				continue;
 			}
 
-			WEAPON_SPEC classSpec = NULL_WEAP_SPEC;
-			classSpec.wClass = firstFreeClass++;
+			WEAPON_SPEC classSpec(0, 0, firstFreeClass++, 0);
 
 			dbugLog(_FLI, "Adding virtual weapon-class #%u %s:: ", classSpec.wClass, buildingName.c_str());
 
-			weapAddClass(classSpec.wClass, buildingName.c_str());
+			weapAddClass(classSpec.wClass, buildingName);
 
 			WEAPON_LIST& weaponList = g_weaponSpawns[classSpec.wClass];
 			if ( weaponList.empty() == false )

@@ -16,8 +16,21 @@
 struct WEAPON_CLASS
 {
 	WEAPON_SPEC	spec;
-	bool active;
-	char  name[MAX_CLASS_NAME_LEN];
+	bool		active;
+	std::string	name;
+	UINT32		m_hash;
+
+	static UINT32 GetHash(const std::string& name_)
+	{
+		UINT32 hash = 937901;
+		for (auto it = name_.begin(), end = name_.end(); it != end; ++it)
+		{
+			hash ^= *it;
+			hash = (hash << 3) | (hash >> 29);
+		}
+		hash ^= name_.length();
+		return hash;
+	}
 };
 
 // Weapons by spec
@@ -73,7 +86,7 @@ extern WEAPON_SPEC	weapFindCategory(const char* category);
 extern WEAPON_SPEC weapAssociateIndex(const char* weapName, UINT32 localIndex);
 
 // Add a class to the class index.
-extern void weapAddClass(UINT32 classIndex, const char* className);
+extern void weapAddClass(UINT32 classIndex, const std::string& className);
 
 extern void weapListKill(void);
 

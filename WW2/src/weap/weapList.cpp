@@ -190,20 +190,17 @@ weapFindCategory(const char* weapCat)
 	return weap;
 }
 
-WEAPON_SPEC
-weapFindClass(const char* weapClass)
+UINT8 weapFindClassIndex(const std::string& className)
 {
-	WEAPON_SPEC weap = NULL_WEAP_SPEC;
-	for ( UINT32 i = 1; i <= g_maxWeaponClass; i++ )
+	UINT32 hash = WEAPON_CLASS::GetHash(className);
+	for ( size_t i = 1; i <= g_maxWeaponClass; ++i )
 	{
-		if ( weaponClass[i].active && strcasecmp((char*)weaponClass[i].name,weapClass) == 0 )
-		{
-			weap.wClass = i;
-			break;
-		}
+		if (PN_UNLIKELY(weaponClass[i].active == false))
+			continue;
+		if (weaponClass[i].m_hash == hash && weaponClass[i].name == className)
+			return i;
 	}
-
-	return weap;
+	return 0;
 }
 
 WEAPON_SPEC weapCreateSpec(UINT32 country, UINT32 category, UINT32 klass, UINT32 type)
