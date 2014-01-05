@@ -71,7 +71,8 @@ teulGetHostByName(const SCHAR* const name)
 
 	if (entry != NULL)
 	{
-		while (entry->h_addr_list[numEntries++] != NULL);
+		while (entry->h_addr_list[numEntries] != NULL)
+			++numEntries;
 
 		numEntries--;
 
