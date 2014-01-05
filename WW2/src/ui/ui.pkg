@@ -1,14 +1,14 @@
-$#include "uiSound.h"
-$#include "uiChat.h"
-$#include "chatChannelTypes.h"
-$#include "uiGameEvents.h"
+$#include "ui/uiSound.h"
+$#include "ui/uiChat.h"
+$#include "chat/chatChannelTypes.h"
+$#include "ui/uiGameEvents.h"
 $#include "phui/View.h"
 
-$pfile "..\\lua\\include.pkg"
+$pfile "lua\\include.pkg"
 
 module ui
 {
-	$cfile "uiMain.h"
+	$cfile "ui/uiMain.h"
 	
 	int uiGameEvent(int event, const char* message);
 	int uiPlaySound(const char* file, unsigned int finite, double volume);

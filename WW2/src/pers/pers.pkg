@@ -1,11 +1,11 @@
-$#include "vehmain.h"
-$#include "persmain.h"
+$#include "veh/vehmain.h"
+$#include "pers/persmain.h"
 
-$pfile "..\\lua\\include.pkg"
+$pfile "lua/include.pkg"
 
 module player
 {
-	$cfile "pershud.h"
+	$cfile "pers/pershud.h"
 	
 	class Player
 	{

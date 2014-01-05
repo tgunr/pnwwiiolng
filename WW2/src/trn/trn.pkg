@@ -1,7 +1,7 @@
-$#include "trncd.h"
-$#include "StratDB.h"
+$#include "trn/trncd.h"
+$#include "sdm/StratDB.h"
 
-$pfile "..\\lua\\include.pkg"
+$pfile "lua/include.pkg"
 
 module terrain
 {

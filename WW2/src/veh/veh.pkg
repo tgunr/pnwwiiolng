@@ -1,9 +1,9 @@
-$#include "vehmain.h"
-$#include "vehType.h"
-$#include "weapSpec.h"
-$#include "persmain.h"
+$#include "veh/vehmain.h"
+$#include "veh/vehType.h"
+$#include "weap/weapSpec.h"
+$#include "pers/persmain.h"
 
-$pfile "..\\lua\\include.pkg"
+$pfile "lua/include.pkg"
 
 module vehicle
 {
@@ -87,6 +87,5 @@ module vehicle
 		int side();
 	};
 	
-	WEAPON_SPEC weapCreateSpec(int country, int category, int klass, int type);
 	WEAPON_SPEC weapCreateSpec(const char* weapString);
 }

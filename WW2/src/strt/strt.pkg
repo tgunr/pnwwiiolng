@@ -1,11 +1,11 @@
-$#include "StratDB.h"
+$#include "sdm/StratDB.h"
 
-$pfile "..\\lua\\include.pkg"
+$pfile "lua/include.pkg"
 
 module strat
 {
-	$cfile "strtDTL.h"
-	$cfile "strtCPFlags.h"
+	$cfile "strt/strtDTL.h"
+	$cfile "strt/strtCPFlags.h"
 	
 	namespace StratDB
 	{

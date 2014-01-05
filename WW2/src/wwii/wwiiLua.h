@@ -1,6 +1,6 @@
 /*
 ** Lua binding: wwii
-** Generated automatically by tolua++-1.0.92 on 06/10/08 19:47:10.
+** Generated automatically by tolua++-1.0.92 on 01/04/14 22:00:09.
 */
 
 /* Exported function */

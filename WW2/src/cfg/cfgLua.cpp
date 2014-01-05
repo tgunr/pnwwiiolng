@@ -1,7 +1,7 @@
 #include <syscfg.h> // Path is project specific.
 /*
 ** Lua binding: cfg
-** Generated automatically by tolua++-1.0.92 on 09/03/11 11:16:29.
+** Generated automatically by tolua++-1.0.92 on 01/04/14 22:00:08.
 */
 
 #ifndef __cplusplus
@@ -14,7 +14,7 @@
 /* Exported function */
 TOLUA_API int  tolua_cfg_open (lua_State* tolua_S);
 
-#include "cfgPrefs.h"
+#include "cfg/cfgPrefs.h"
 
 /* function to register type */
 static void tolua_reg_types (lua_State* tolua_S)

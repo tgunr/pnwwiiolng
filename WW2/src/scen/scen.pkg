@@ -1,7 +1,7 @@
-$pfile "..\\lua\\include.pkg"
+$pfile "lua/include.pkg"
 
 module scenario
 {
-	$cfile "ScenarioManager.h"
+	$cfile "scen/ScenarioManager.h"
 }
 

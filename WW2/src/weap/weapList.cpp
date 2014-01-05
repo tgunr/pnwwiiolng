@@ -25,7 +25,7 @@
 
 #define WEAP_IDENT_SIZE 3
 
-static LOGICAL g_weaponListIsInitialized = FALSE;
+static bool g_weaponListIsInitialized;
 
 typedef std::map<UINT32, WEAPON*> WEAPON_INDEXES;
 static WEAPON_INDEXES s_weaponIndexes;
@@ -116,8 +116,7 @@ typedef stdext::hash_map<std::string,WEAPON*> WEAPON_NAME_INDEX;
 #endif
 static WEAPON_NAME_INDEX weaponNameIndex;
 
-LOGICAL
-weapHasInitialized()
+bool weapHasInitialized()
 {
 	return g_weaponListIsInitialized;
 }
@@ -307,8 +306,7 @@ weapAddWeaponIndex(WEAPON* weapon)
 	s_weaponIndexes[weapon->m_localIndex] = weapon;
 }
 
-LOGICAL
-weapListInit(const char* theaterPath)
+bool weapListInit(const char* theaterPath)
 {
 	SINT32 country,category;
 	char importFile[PN_MAX_PATH];
@@ -323,14 +321,14 @@ weapListInit(const char* theaterPath)
 	if ( ! weapParseCountry(importFile))
 	{
 		dbugLog(_FLA, "couldnt parse countries file (%s)", importFile);
-		return FALSE;
+		return false;
 	}
 
 	strprintf(importFile, SUB_PATH("%s", "%s"), theaterPath, "weapClasses.csv");
 	if ( ! weapParseClasses(importFile))
 	{
 		dbugLog(_FLA, "couldnt parse class file (%s)", importFile);
-		return FALSE;
+		return false;
 	}
 
 	for ( country = 1; country < MAX_COUNTRIES; country++)
@@ -348,7 +346,7 @@ weapListInit(const char* theaterPath)
 			{
 				dbugLog(_FLA,"couldn't parse %u.%u weapons file (%s)", country, category, importFile);
 #ifndef LIVE_DANGEROUS
-				return (FALSE);
+				return false;
 #endif
 			}
 		}
@@ -367,13 +365,15 @@ weapListInit(const char* theaterPath)
 			{
 				dbugLog(_FLA,"couldn't parse spawn file for %s",importFile);
 #ifndef LIVE_DANGEROUS
-				return (FALSE);
+				return false;
 #endif
 			}
 		}
 	}
 
-	return TRUE;
+	g_weaponListIsInitialized = true;
+
+	return true;
 }
 
 void weapListKill(void)

@@ -1,7 +1,7 @@
 #include <syscfg.h> // Path is project specific.
 /*
 ** Lua binding: fp
-** Generated automatically by tolua++-1.0.92 on 09/03/11 11:16:29.
+** Generated automatically by tolua++-1.0.92 on 01/04/14 22:00:08.
 */
 
 #ifndef __cplusplus
@@ -14,8 +14,8 @@
 /* Exported function */
 TOLUA_API int  tolua_fp_open (lua_State* tolua_S);
 
-#include "fpFPS.h"
-#include "fpFPSdata.h"
+#include "fp/fpFPS.h"
+#include "fp/fpFPSdata.h"
 
 /* function to register type */
 static void tolua_reg_types (lua_State* tolua_S)
@@ -131,6 +131,33 @@ static int tolua_fp_fp_fpFPSGetCurrentWeapon00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'fpFPSGetCurrentWeapon'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* function: fpFPSIsReloading */
+#ifndef TOLUA_DISABLE_tolua_fp_fp_fpFPSIsReloading00
+static int tolua_fp_fp_fpFPSIsReloading00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isnoobj(tolua_S,1,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  {
+   unsigned int tolua_ret = ( unsigned int)  fpFPSIsReloading();
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'fpFPSIsReloading'.",&tolua_err);
  return 0;
 #endif
 }
@@ -339,8 +366,8 @@ static int tolua_fp_fp_fpFPSIsDead00(lua_State* tolua_S)
 #endif
  {
   {
-   unsigned int tolua_ret = ( unsigned int)  fpFPSIsDead();
-   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+   bool tolua_ret = (bool)  fpFPSIsDead();
+   tolua_pushboolean(tolua_S,(bool)tolua_ret);
   }
  }
  return 1;
@@ -629,6 +656,7 @@ TOLUA_API int tolua_fp_open (lua_State* tolua_S)
    tolua_function(tolua_S,"fpFPSControlInput",tolua_fp_fp_fpFPSControlInput00);
    tolua_function(tolua_S,"fpFPSKillTrooper",tolua_fp_fp_fpFPSKillTrooper00);
    tolua_function(tolua_S,"fpFPSGetCurrentWeapon",tolua_fp_fp_fpFPSGetCurrentWeapon00);
+   tolua_function(tolua_S,"fpFPSIsReloading",tolua_fp_fp_fpFPSIsReloading00);
    tolua_function(tolua_S,"fpFPSIsSwimming",tolua_fp_fp_fpFPSIsSwimming00);
    tolua_function(tolua_S,"fpFPSIsWading",tolua_fp_fp_fpFPSIsWading00);
    tolua_function(tolua_S,"fpFPSIsProne",tolua_fp_fp_fpFPSIsProne00);
@@ -728,6 +756,7 @@ TOLUA_API int tolua_fp_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"PZSCHRECK",PZSCHRECK);
    tolua_constant(tolua_S,"M1903A3",M1903A3);
    tolua_constant(tolua_S,"USSMOKE",USSMOKE);
+   tolua_constant(tolua_S,"PIAT",PIAT);
    tolua_constant(tolua_S,"NUM_WEAPONS",NUM_WEAPONS);
    tolua_constant(tolua_S,"RELOAD",RELOAD);
    tolua_constant(tolua_S,"STAND_FIRE",STAND_FIRE);

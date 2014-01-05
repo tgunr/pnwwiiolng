@@ -1,7 +1,7 @@
 #include <syscfg.h> // Path is project specific.
 /*
 ** Lua binding: ui
-** Generated automatically by tolua++-1.0.92 on 09/03/11 11:16:31.
+** Generated automatically by tolua++-1.0.92 on 01/04/14 22:00:09.
 */
 
 #ifndef __cplusplus
