@@ -448,15 +448,13 @@ _checkSupplyLinks()
 //////////////////////////////////////////////////////////////////////
 //
 
-bool
-ObjectStruct::isProductionCenter() const
+bool ObjectStruct::isProductionCenter() const
 {
-	if ( type != BUILDING_RESEARCH ) return false;
-	if ( facility->type != FACILITY_FACTORY ) return false;
-	if ( facility->subType != FACTORY_VEHICLE ) return false;
-	if ( strncmp(filename, "fac", 3) != 0 ) return false;
-
-	return true;
+	return ( (type == BUILDING_RESEARCH)
+				&& *(UINT32*)(filename) == *(UINT32*)("fact")	// 4-byte string comparison
+				&& (facility->type == FACILITY_FACTORY)
+				&& (facility->subType == FACTORY_VEHICLE)
+				);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -935,11 +933,8 @@ _scPass2_objs(Supercell& sc)
 
 		if ( obj.spawnAbility.weap.wCategory > 0 || obj.spawnAbility.weap.wClass > 0 )
 		{
-			if ( obj.type != BUILDING_SPAWN )
-			{
-				obj.type = BUILDING_SPAWN;
-				obj.Facility().m_spawnable = true;
-			}
+			obj.type = BUILDING_SPAWN;
+			obj.Facility().m_spawnable = true;
 
 			// Flag which types of spawn this facility has
 			switch (obj.spawnAbility.weap.wCategory)
@@ -1858,123 +1853,111 @@ ObjectStruct* currentObject;
 }
 
 //strtDTL initialization functions
-void strtInitCPStructwithCP(CPStruct* newCP,CP* cp)
+void strtInitCPStructwithCP(CPStruct& newCP, CP& cp)
 {
-	if (PN_UNLIKELY(newCP == nullptr || cp == nullptr))
-		return;
-
 	//Fill in the fullObjID
 	//Calculate octet x and y from POSITIONAL x and y
-	newCP->fullObjID.cell.ox = cp->posx / 800;
-	newCP->fullObjID.cell.oy = cp->posy / 800;
-	newCP->m_posX = cp->posx;
-	newCP->m_posY = cp->posy;
+	newCP.fullObjID.cell.ox = cp.posx / 800;
+	newCP.fullObjID.cell.oy = cp.posy / 800;
+	newCP.m_posX = cp.posx;
+	newCP.m_posY = cp.posy;
 
 	//Get the class and type from oid
-	newCP->fullObjID.id = cp->oid.id;
-	newCP->fullObjID.objClass = cp->oid.objClass;
-	newCP->fullObjID.objType = cp->oid.objType;
+	newCP.fullObjID.id = cp.oid.id;
+	newCP.fullObjID.objClass = cp.oid.objClass;
+	newCP.fullObjID.objType = cp.oid.objType;
 
-	newCP->subType = cp->subType;
+	newCP.subType = cp.subType;
 
-	newCP->setSide((WWII_SIDE)cp->side);
-	newCP->originalSide = newCP->controllingSide = (WWII_SIDE) cp->side;
+	newCP.setSide((WWII_SIDE)cp.side);
+	newCP.originalSide = newCP.controllingSide = (WWII_SIDE) cp.side;
 
-	cp->country = _adjustCountryFor135(cp->country);
-	newCP->country = newCP->originalCountry = newCP->controllingCountry = (WWII_COUNTRY) cp->country;
+	cp.country = _adjustCountryFor135(cp.country);
+	newCP.country = newCP.originalCountry = newCP.controllingCountry = (WWII_COUNTRY) cp.country;
 
-	strlcpy(newCP->name, cp->name, sizeof(newCP->name));
-	newCP->filename = _filenamePool(cp->fileName);
+	strlcpy(newCP.name, cp.name, sizeof(newCP.name));
+	newCP.filename = _filenamePool(cp.fileName);
 }
 
-void strtInitFacilityStructwithFACILITY(FacilityStruct* newFacility, FACILITY* facility)
+void strtInitFacilityStructwithFACILITY(FacilityStruct& newFacility, FACILITY& facility)
 {
-	if (PN_UNLIKELY(newFacility == nullptr || facility == nullptr))
-		return;
-
 	// Remember the location
-	newFacility->m_posX = facility->posx;
-	newFacility->m_posY = facility->posy;
+	newFacility.m_posX = facility.posx;
+	newFacility.m_posY = facility.posy;
 
 	//Fill in the fullObjID
 	//Calculate octet x and y from x and y location in meters
-	newFacility->fullObjID.cell.ox = facility->posx / 800;
-	newFacility->fullObjID.cell.oy = facility->posy / 800;
+	newFacility.fullObjID.cell.ox = facility.posx / 800;
+	newFacility.fullObjID.cell.oy = facility.posy / 800;
 
 	//Get the class and type from oid
-	newFacility->fullObjID.id = facility->oid.id;
-	newFacility->fullObjID.objClass = facility->oid.objClass;
-	newFacility->fullObjID.objType = newFacility->type = (FACILITY_TYPE) facility->oid.objType;
+	newFacility.fullObjID.id = facility.oid.id;
+	newFacility.fullObjID.objClass = facility.oid.objClass;
+	newFacility.fullObjID.objType = newFacility.type = (FACILITY_TYPE) facility.oid.objType;
 
-	newFacility->subType = facility->subType;
+	newFacility.subType = facility.subType;
 
-	newFacility->cpID = facility->cpid;
+	newFacility.cpID = facility.cpid;
 
-	newFacility->side = newFacility->originalSide = (WWII_SIDE) facility->originalSide;
+	newFacility.side = newFacility.originalSide = (WWII_SIDE) facility.originalSide;
 
-	facility->originalCountry = _adjustCountryFor135(facility->originalCountry);
-	newFacility->country = newFacility->originalCountry = (WWII_COUNTRY) facility->originalCountry;
+	facility.originalCountry = _adjustCountryFor135(facility.originalCountry);
+	newFacility.country = newFacility.originalCountry = (WWII_COUNTRY) facility.originalCountry;
 
-	strlcpy(newFacility->name, facility->name, sizeof(newFacility->name));
-	newFacility->filename = _filenamePool(facility->fileName);
+	strlcpy(newFacility.name, facility.name, sizeof(newFacility.name));
+	newFacility.filename = _filenamePool(facility.fileName);
 }
 
-void strtInitObjectStructwithBUILDING(ObjectStruct* newObject, BUILDING* building)
+void strtInitObjectStructwithBUILDING(ObjectStruct& newObject, const BUILDING& building)
 {
-	if (PN_UNLIKELY(newObject == nullptr || building == nullptr))
-		return;
-
 	//Remember the location
-	newObject->posX = building->posx;
-	newObject->posY = building->posy;
+	newObject.posX = building.posx;
+	newObject.posY = building.posy;
 
 	//Fill in the fullObjID
 	//Calculate octet x and y from supercell x and y
-	newObject->fullObjID.cell.ox = building->posx / 800;
-	newObject->fullObjID.cell.oy = building->posy / 800;
+	newObject.fullObjID.cell.ox = building.posx / 800;
+	newObject.fullObjID.cell.oy = building.posy / 800;
 
 	//Get the class and type from oid
-	newObject->fullObjID.id = building->oid.id;
-	newObject->fullObjID.objClass = building->oid.objClass;
-	newObject->fullObjID.objType = newObject->type = (OBJECTTYPE)building->oid.objType;
+	newObject.fullObjID.id = building.oid.id;
+	newObject.fullObjID.objClass = building.oid.objClass;
+	newObject.fullObjID.objType = newObject.type = (OBJECTTYPE)building.oid.objType;
 
-	newObject->subType = building->subType;
+	newObject.subType = building.subType;
 
 	//Fake the facility ID for the parent. Why?  B/c we have no idea what
 	//	Octet the parent is in.  THis field is only used for lookup, and
 	//	we still store things based on supercells, not on octets
 	//	The long and the short of it is that this is more FULL_OBJ_ID BS
-	newObject->facilityID.cell.ox = building->posx / 800;
-	newObject->facilityID.cell.oy = building->posy / 800;
-	newObject->facilityID.id = building->pid.id;
-	newObject->facilityID.objClass = building->pid.objClass;
-	newObject->facilityID.objType = building->pid.objType;
+	newObject.facilityID.cell.ox = building.posx / 800;
+	newObject.facilityID.cell.oy = building.posy / 800;
+	newObject.facilityID.id = building.pid.id;
+	newObject.facilityID.objClass = building.pid.objClass;
+	newObject.facilityID.objType = building.pid.objType;
 
-	strlcpy(newObject->name, building->name, sizeof(newObject->name));
-	newObject->filename = _filenamePool(building->fileName);
+	strsafecpy(newObject.name, building.name);
+	newObject.filename = _filenamePool(building.fileName);
 }
 
-void strtInitLinkStructwithDEPOT_LINK(LinkStruct* newLink, DEPOT_LINK* depotlink)
+void strtInitLinkStructwithDEPOT_LINK(LinkStruct& newLink, const DEPOT_LINK& depotlink)
 {
-	if (PN_UNLIKELY(newLink == nullptr || depotlink == nullptr))
-		return;
-
 	//Links don't have a posx and a posy, so we get the ox and oy from its
 	//	start depot
-	newLink->fullObjID.cell.ox = depotlink->startDepotId.cell.ox;
-	newLink->fullObjID.cell.oy = depotlink->startDepotId.cell.oy;
+	newLink.fullObjID.cell.ox = depotlink.startDepotId.cell.ox;
+	newLink.fullObjID.cell.oy = depotlink.startDepotId.cell.oy;
 
 	//Get the class and type from oid
-	newLink->fullObjID.id = depotlink->oid.id;
-	newLink->fullObjID.objClass = depotlink->oid.objClass;
-	newLink->fullObjID.objType = depotlink->oid.objType;
+	newLink.fullObjID.id = depotlink.oid.id;
+	newLink.fullObjID.objClass = depotlink.oid.objClass;
+	newLink.fullObjID.objType = depotlink.oid.objType;
 
-	newLink->startDepotID = depotlink->startDepotId;
-	newLink->endDepotID = depotlink->endDepotId;
-	newLink->firebaseID = depotlink->firebaseId;
+	newLink.startDepotID = depotlink.startDepotId;
+	newLink.endDepotID = depotlink.endDepotId;
+	newLink.firebaseID = depotlink.firebaseId;
 
-	newLink->distance = depotlink->distance;
-	strlcpy(newLink->name, depotlink->name, sizeof(newLink->name));
+	newLink.distance = depotlink.distance;
+	strlcpy(newLink.name, depotlink.name, sizeof(newLink.name));
 }
 
 //This function looks up the information for a CP from

@@ -103,7 +103,7 @@ _initCPs(Supercell* sc, const char* filename)
 		if ( !tempcp )
 			continue;
 
-		strtInitCPStructwithCP(currentcp, tempcp);
+		strtInitCPStructwithCP(*currentcp, *tempcp);
 		UINT32 index = currentcp->fullObjID.id;
 		if (index >= sc->indexSize)
 			fprintf(stderr,"%d:Index too large!!!\n",index);
@@ -128,7 +128,7 @@ _initFacilities(Supercell* sc, const char* filename)
 		if ( !tempfacility )
 			continue;
 
-		strtInitFacilityStructwithFACILITY(currentfacility,tempfacility);
+		strtInitFacilityStructwithFACILITY(*currentfacility, *tempfacility);
 		UINT32 index = currentfacility->fullObjID.id;
 		if (index >= sc->indexSize)
 			fprintf(stderr,"%d:Index too large!!!\n",index);
@@ -153,7 +153,7 @@ _initObjects(Supercell* sc, const char* filename)
 		if (!tempbuilding)
 			continue;
 
-		strtInitObjectStructwithBUILDING(currentobject,tempbuilding);
+		strtInitObjectStructwithBUILDING(*currentobject, *tempbuilding);
 		UINT32 index = currentobject->fullObjID.id;
 		if (index >= sc->indexSize)
 			fprintf(stderr,"%d:Index too large!!!\n",index);
@@ -178,7 +178,7 @@ _initLinks(Supercell* sc, const char* filename)
 		if ( !templink )
 			continue;
 
-		strtInitLinkStructwithDEPOT_LINK(currentlink,templink);
+		strtInitLinkStructwithDEPOT_LINK(*currentlink, *templink);
 		UINT32 index = currentlink->fullObjID.id;
 		if (index >= sc->indexSize)
 			fprintf(stderr,"%d:Index too large!!!\n",index);

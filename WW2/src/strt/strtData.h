@@ -56,10 +56,10 @@ static inline FULL_ID strtFullObjIDToFullID(FULL_OBJ_ID fullObjID)
 }
 
 //strtDTL initialization functions
-extern void strtInitCPStructwithCP(CPStruct* newcp, struct CP* cp);
-extern void strtInitFacilityStructwithFACILITY(FacilityStruct* newfacility, struct FACILITY* facility);
-extern void strtInitObjectStructwithBUILDING(ObjectStruct* newobject, struct BUILDING* building);
-extern void strtInitLinkStructwithDEPOT_LINK(LinkStruct* newlink, struct DEPOT_LINK* depotlink);
+extern void strtInitCPStructwithCP(CPStruct& newcp, CP& cp);
+extern void strtInitFacilityStructwithFACILITY(FacilityStruct& newfacility, FACILITY& facility);
+extern void strtInitObjectStructwithBUILDING(ObjectStruct& newobject, const BUILDING& building);
+extern void strtInitLinkStructwithDEPOT_LINK(LinkStruct& newlink, const DEPOT_LINK& depotlink);
 
 //strtWOR Initialization functions
 //These functions looks up the information for strat objects from
