@@ -11,5 +11,5 @@
 #include <map>
 class Supercell;
 
-typedef std::map< std::pair<SINT16,SINT16>, Supercell > SUPERCELLS;
+typedef std::map< SINT32, Supercell > SUPERCELLS;
 extern SUPERCELLS g_supercells;
