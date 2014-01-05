@@ -195,8 +195,9 @@ _applyTranslationsToName(char* name, TRANSLATION_FAILS* fails, bool basicOnly)
 	}
 
 	// Chomp trailing whitespaces.
-	while ( nameLen > 0 && isspace(name[nameLen - 1]) )
-		name[--nameLen] = 0;
+	while (nameLen > 0 && isspace(name[nameLen - 1]))
+		--nameLen;
+	name[nameLen] = 0;
 
 	// Return true if the translations table is empty.
 	if ( basicOnly == true || s_translations.empty() )
