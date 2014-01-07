@@ -754,7 +754,7 @@ _runPollEndpoints(struct pollfd* fdArray, nfds_t maxSlots, int numSlots)
 
 	_lastPXferTotal = totalPacketsXfer;
 
-	for ( nfds_t slot = 0; slot < maxSlots && count < numSlots; ++slot )
+	for ( size_t slot = 0; slot < maxSlots && count < numSlots; ++slot )
 	{
 		loopCount++;
 
@@ -1182,7 +1182,7 @@ static void _pollAddEndpoint(ENDPOINT& endpoint)
 	dbugLog(_FLD,"t:%d adding endpoint state %d socket %d slot %d count %" PRSizeT ""
 				, endpoint.teulIndex()
 				, endpoint.state(), endpoint.socket
-				, endpoint.m_impl->pollSlot(), pollData.m_count);
+				, endpoint.m_impl->pollSlot(), static_cast<size_t>(pollData.m_count));
 
 	endpoint.updateSocketEvents();
 }
@@ -1199,7 +1199,7 @@ static void _pollRemoveEndpoint(ENDPOINT& endpoint)
 
 	dbugLog(_FLD, "t:%d removing endpoint state %d socket %d slot %d count %" PRSizeT ""
 				, endpoint.teulIndex()
-				, endpoint.state(), endpoint.socket, slot, pollData.m_count);
+				, endpoint.state(), endpoint.socket, slot, static_cast<size_t>(pollData.m_count));
 
 	if (pollData.m_count < (pollData.m_size / 2))
 	{
@@ -1306,7 +1306,7 @@ _pollSet(void)
 		}
 	}
 
-	dbugLog(_FLN,"combined %" PRSizeT " sockets for reading, max %d", pollData.m_count, pollData.m_maxSock);
+	dbugLog(_FLN,"combined %" PRSizeT " sockets for reading, max %" PRSizeT "", static_cast<size_t>(pollData.m_count), pollData.m_maxSock);
 }
 #endif
 
