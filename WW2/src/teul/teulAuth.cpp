@@ -640,21 +640,22 @@ void
 authExpirePendingOtps()
 {
 	static TeulTimeMS nextCheck = 0ULL;
-	if ( teulClock64 < nextCheck )
+	if ( _pendingOtps.empty() || teulClock64 < nextCheck )
 		return;
 	nextCheck = teulClock64 + 500;
 
-	auto it = _pendingOtps.begin();
-	while ( it != _pendingOtps.end() )
+	std::vector<OTP_NODE*> expiredNodes;
+	for (auto it = _pendingOtps.begin(), end = _pendingOtps.end(); it != end; ++it)
 	{
 		OTP_NODE* node = *it;
-		if ( node->timeOut <= teulClock64 )
-		{
-			dbugLog(_FLM, "p:%u otp:%u OTP has expired", node->customerID, node->OTP);
-			delete node;
-			continue;
-		}
-		++it;
+		if ( node && node->timeOut <= teulClock64 )
+			expiredNodes.push_back(node);
+	}
+
+	for (auto node : expiredNodes)
+	{
+		dbugLog(_FLM, "p:%u otp:%u OTP has expired", node->customerID, node->OTP);
+		delete node;
 	}
 }
 

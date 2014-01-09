@@ -309,7 +309,7 @@ mmDirectSpawn(Player& player, const WEAPON_SPEC& weapon, bool setIdentity, bool 
 			{
 				origin = _findOrigin(fac, weapon.wCategory);
 			}
-			if ( origin == NULL && useCustomLocation )
+			if ( origin == NULL && fac && useCustomLocation )
 				origin = fac->objectList;
 			if ( origin == NULL )
 				throw "no spawner for this weapon category";

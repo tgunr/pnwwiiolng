@@ -885,7 +885,7 @@ _checkEndpointState(ENDPOINT& endpoint)
 				dbugWrite(_FLN,"IS_CLOSING");
 				endpoint.doError(ENOTCONN);
 			}
-			if ( ((endpoint.m_closed == false) | (endpoint.lastKliveSent.elapsed() >= Teul::FynNeeded)) & (FYN_TOKEN != nullptr) )
+			if ( ((endpoint.m_closed == false) || (endpoint.lastKliveSent.elapsed() >= Teul::FynNeeded)) && (FYN_TOKEN != nullptr) )
 			{
 				teulModSendCALLBACKe(endpoint, *FYN_TOKEN);
 			}
@@ -1670,15 +1670,13 @@ teulModIdle(const TeulTimeMS& duration_)
 	_pollSockets(duration_);
 
 	numTeulUpdates++;
-	interval = teulClock64 - lastTeulUpdate;
 
+	interval = teulClock64 - lastTeulUpdate;
 	averageDelta += interval;		// divide by numTeulUpdates to get average
-	interval = std::max(interval, maxDelta);
+	maxDelta = std::max(interval, maxDelta);
 
 	// Can't merge with _lastIdle because this gets set elsewhere too
 	lastTeulUpdate = teulClock64;
-
-//	xferSendFilePackets(_updatesPerSec);
 
 	interval = teulClock64 - _lastIdle;
 #ifdef BETA_RELEASE

@@ -67,17 +67,17 @@ _listAddItemBefore(LISTHEADER** list, LISTHEADER* inpoint, LISTHEADER* node)
 	const char* reason = nullptr;
 	if (PN_UNLIKELY(list == nullptr))
 		reason = "NULL list";
-	if (PN_UNLIKELY(node == nullptr))
+	else if (PN_UNLIKELY(node == nullptr))
 		reason = "NULL node";
-	if (PN_UNLIKELY(inpoint == nullptr))
+	else if (PN_UNLIKELY(inpoint == nullptr))
 		reason = "NULL inpoint";
-	if (PN_UNLIKELY(*list == nullptr))
+	else if (PN_UNLIKELY(*list == nullptr))
 		reason = "empty list";
-	if (PN_UNLIKELY(node == inpoint))
+	else if (PN_UNLIKELY(node == inpoint))
 		reason = "node == inpoint";
-	if (PN_UNLIKELY(inpoint->next == node))
+	else if (PN_UNLIKELY(inpoint->next == node))
 		reason = "node already inplace";
-	if (PN_UNLIKELY(inpoint->prev == node))
+	else if (PN_UNLIKELY(inpoint->prev == node))
 		reason = "node already present";
 	if (PN_UNLIKELY(reason != nullptr))
 	{
@@ -166,7 +166,7 @@ listCLPushItem(LISTHEADER** list, LISTHEADER* node)
 
 LOGICAL listCLAppendList(LISTHEADER** dest, LISTHEADER** source)
 {
-LISTHEADER* temp;
+	LISTHEADER* temp;
 
 	if (dest == nullptr ||  source == nullptr )
 	{
@@ -184,10 +184,7 @@ LISTHEADER* temp;
 		*dest = *source;
 
 	if (PN_UNLIKELY((*dest)->prev == nullptr || (*source)->prev == nullptr))
-	{
-		dbugLog(_FLX, "illegal NULL prev pointer for dest %p or source %p"
-			, (*dest)->prev, (*source)->prev);
-	}
+		LogAbort("Illegal null prev pointer for dest %p or source %p", (*dest)->prev, (*source)->prev);
 
 	temp = (*dest)->prev;
 	(*dest)->prev->next = (*source);

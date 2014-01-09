@@ -990,19 +990,22 @@ int irc_cmd_notice (irc_session_t * session, const char * nch, const char * text
 
 void irc_target_get_nick (const char * target, char *nick, size_t size)
 {
-	const char *p = strstr (target, "!");
-	unsigned int len;
+    if (target && nick)
+    {
+		const char *p = strstr (target, "!");
+		unsigned int len;
 
-	if ( p )
-		len = p - target;
-	else
-		len = strlen (target);
+		if ( p )
+			len = p - target;
+		else
+			len = strlen (target);
 
-	if ( len > size-1 )
-		len = size - 1;
+		if ( len > size-1 )
+			len = size - 1;
 
-	memcpy (nick, target, len);
-	nick[len] = '\0';
+		memcpy (nick, target, len);
+		nick[len] = '\0';
+	}
 }
 
 
