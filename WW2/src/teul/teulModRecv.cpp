@@ -1306,7 +1306,7 @@ _pollSet(void)
 		}
 	}
 
-	dbugLog(_FLN,"combined %" PRSizeT " sockets for reading, max %" PRSizeT "", static_cast<size_t>(pollData.m_count), pollData.m_maxSock);
+	dbugLog(_FLN,"combined %" PRSizeT " sockets for reading, max %d", static_cast<size_t>(pollData.m_count), static_cast<int>(pollData.m_maxSock));
 }
 #endif
 
