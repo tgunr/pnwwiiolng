@@ -167,7 +167,7 @@ static bool _setSection(int /*numargs*/, FUNCARGS* args)
 		// Populate the wClass
 		_section.spec = weapFindClass(_section.name);
 
-		if (*((UINT32*)&_section.spec) == *((UINT32*)&NULL_WEAP_SPEC))
+		if (_section.spec.isNull())
 		{
 #ifdef FRONT_END
 			Write_Debug("invlid class name %s",_section.name);
