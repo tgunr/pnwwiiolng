@@ -93,7 +93,7 @@ wthrSetGameTime(UINT32 gameTime)
 
 class WeatherForecast
 {
-	public: WeatherForecast(const char* name, const UINT32 numOptions, const UINT32& lockTo);
+	public: WeatherForecast(const char* name, const UINT32 numOptions, const UINT16& lockTo);
 	public: ~WeatherForecast();
 
 	public: void GenerateNextForecast();
@@ -103,15 +103,15 @@ class WeatherForecast
 	public: UINT32 GetForecast() const { return m_tomorrow + 1; }
 	public: void SetForecast(const UINT32 selection);
 
-	private: const char* m_name;					// What we are describing
-	private: const UINT32 m_numOptions;			// Range of options (fixed)
-	private: const UINT32& m_lockTo;				// Dynamic value to lock to
+	private: const char* m_name;						// What we are describing
+	private: const UINT32 m_numOptions;					// Range of options (fixed)
+	private: const UINT16& m_lockTo;					// Dynamic value to lock to
 	private: UINT32 m_yesterday, m_today, m_tomorrow;	// Histogram
 
 	private: WeatherForecast(const WeatherForecast&);
 };
 
-WeatherForecast::WeatherForecast(const char* name, const UINT32 numOptions, const UINT32& lockTo)
+WeatherForecast::WeatherForecast(const char* name, const UINT32 numOptions, const UINT16& lockTo)
 	: m_name(name)
 	, m_numOptions(numOptions), m_lockTo(lockTo)
 	, m_yesterday(0), m_today(0), m_tomorrow(9999)
