@@ -153,7 +153,7 @@ static bool _setSection(int /*numargs*/, FUNCARGS* args)
 
 		_section.spec = weapFindCategory(_section.name);
 
-		if (*((UINT32*)&_section.spec) == *((UINT32*)&NULL_WEAP_SPEC))
+		if (_section.spec.isNull())
 			return false;
 		break;
 
