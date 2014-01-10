@@ -97,11 +97,10 @@ _initCPs(Supercell* sc, const char* filename)
 {
 	for ( UINT32 n = 0; n < sc->numCPs; ++n )
 	{
-		CPStruct* currentcp = &sc->cps[n];
 		CP* tempcp = sdmGetNextCP();
+		ABORT_IF(tempcp == nullptr);
 
-		if ( !tempcp )
-			continue;
+		CPStruct* currentcp = &sc->cps[n];
 
 		strtInitCPStructwithCP(*currentcp, *tempcp);
 		UINT32 index = currentcp->fullObjID.id;

@@ -31,9 +31,7 @@ typedef std::pair<UINT32,UINT32> PLAYER_REQUESTS;
 typedef std::vector<UINT32> OVERRUNS;
 typedef std::map<UINT32,EWSReport*> EWSREPORTS;
 typedef std::vector<PLAYER_REQUESTS> HISTORY;
-#if defined(IS_MAP_HOST)
 typedef std::map<Brigade*,UINT32> ACTIVE_BRIGADES;
-#endif
 
 // External data structures
 extern const UINT32 attackFlags[MAX_SIDES];
@@ -45,6 +43,14 @@ struct PAYLOADSTRUCT;
 
 struct CSAFE_CPStruct
 {
+	CSAFE_CPStruct()
+	{
+		memset(this, 0, sizeof(CSAFE_CPStruct));
+	}
+	~CSAFE_CPStruct()
+	{
+	}
+
 //FULL_OBJ_ID must be the first field in the structure.
 //DO NOT MOVE!!!!!!!!!! -Meat
 	FULL_OBJ_ID 		fullObjID;
@@ -114,13 +120,10 @@ struct CSAFE_CPStruct
 	SINT32				m_posX, m_posY;
 
 //tolua_end
-#if defined(IS_MAP_HOST)
 	class Mission*		m_missionsFrom;
 	class Mission*		m_missionsTo;
 	UINT64				m_lastUpdateNo;
-#else
 	TeulTimeMS			m_routeingRun;
-#endif
 //tolua_begin
 };
 
@@ -129,7 +132,8 @@ class CPStruct : public CSAFE_CPStruct
 public:
 //tolua_end
 	CPStruct()
-		: m_links()
+		: CSAFE_CPStruct()
+		, m_links()
 		, ews()
 		, m_fallback(WWII_NO_SIDE)
 		, m_fallbackTime(0)
@@ -138,11 +142,11 @@ public:
 		, m_attackingUnit(NULL)
 		, m_units()
 		, m_value(0)
-#if defined(IS_MAP_HOST)
 		, m_brigades()
-#endif
+	{}
+
+	~CPStruct()
 	{
-		memset(this, 0, sizeof(CSAFE_CPStruct));
 	}
 
 //tolua_begin
