@@ -37,15 +37,6 @@ static const char QRY_SELECT_MOTD_BY_TYPE[] =
 		" LIMIT 1"
 		;
 
-// Insert a report of a speed hacker
-static const char QRY_INSERT_SPEED_HACK[] =
-	"INSERT INTO wwii_hack_reports"
-		" (customerID, cycleno, hosttime, host_elapsed_ms, client_elapsed_ms"
-		" , delta_avg, faults, packets_counted, drift, kicked)"
-		" VALUES"
-		" (%u, %u, %u, %llu, %llu, %lld, %u, %u, %lld, '%c')"
-;
-
 static const char QRY_INSERT_CHAT_EVENT[] =
 	"INSERT INTO chat_events"
 		 " (event_stamp, category, callsign, event, parameter, data)"

@@ -60,12 +60,6 @@
 # define ON_CLIENT( _expr_ ) _expr_
 #endif
 
-// Similar variable defined in commPackers.cpp
-static const UINT32 MAX_PACK_CONFIG_LEVELS = 4; // high, med, low, vlow
-static const UINT32 NUM_PACK_CONFIG_TYPES = 4; // vel, accel, attvel, att
-
-static const UINT32 MAX_PACK_CONFIG_SIZES = NUM_PACK_CONFIG_TYPES * 2;
-
 #define P2_BASE			10000	// Fast X/Y is position expressed in 100ms.
 
 #define FIRST_TIME_TURRET_SIZE ((8*sizeof(turret_t))+1)
