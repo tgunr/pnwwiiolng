@@ -31,7 +31,6 @@ UINT32 totalPacketsXfer;
 #endif
 
 // Maximum send buffer of 256Kb.
-static const SINT32 MaxSendBufferSize = 256 * 1024;	// 256kb
 
 #include "mem/memPool.h"
 
