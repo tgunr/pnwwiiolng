@@ -111,15 +111,15 @@ Description:
 ---------------------------------------------------------------------------------------*/
 void glslSpecularDrawBin()
 {
-    OBJECT* o = NULL;
-    OBJECT* last = NULL;
+    OBJECT* o = nullptr;
+    OBJECT* last = nullptr;
 
     if(specularbin.empty())
         return;
 
     const unsigned int size = specularbin.size();
 
-    const RenderStateSet* old = NULL;
+    const RenderStateSet* old = nullptr;
 
     oglSetWorldMatrix(&IdentityMatrix);
 
@@ -152,15 +152,15 @@ Description:
 ---------------------------------------------------------------------------------------*/
 void glslSpecularDrawBin()
 {
-    OBJECT* o = NULL;
-    OBJECT* last = NULL;
+    OBJECT* o = nullptr;
+    OBJECT* last = nullptr;
 
     if(specularbin.empty())
         return;
 
     const unsigned int size = specularbin.size();
 
-    const oglMaterial* old = NULL;
+    const oglMaterial* old = nullptr;
 
     oglSetWorldMatrix(&IdentityMatrix);
 
@@ -195,13 +195,13 @@ Description:
 ---------------------------------------------------------------------------------------*/
 void glslSpecularDrawBinDeprecated()
 {
-    OBJECT* o = NULL;
+    OBJECT* o = nullptr;
 
     if(specularbin.empty())
         return;
 
     const unsigned int size = specularbin.size();
-    const RenderStateSet* old = NULL;
+    const RenderStateSet* old = nullptr;
 
     if(gCustomTerrain)
     {
@@ -286,7 +286,7 @@ Description:
 ---------------------------------------------------------------------------------------*/
 void glslSpecularDrawBinDeprecated()
 {
-    OBJECT* o = NULL;
+    OBJECT* o = nullptr;
 
     if(specularbin.empty())
         return;
@@ -294,7 +294,7 @@ void glslSpecularDrawBinDeprecated()
     oglSetRenderState(oglRENDERSTATE_LIGHTING, 0);
 
     const unsigned int size = specularbin.size();
-    const oglMaterial* old = NULL;
+    const oglMaterial* old = nullptr;
 
     if(gCustomTerrain)
     {

@@ -9,7 +9,7 @@
 
 gr2Animation* gr2Animation::Load(const char* path, SINT32 useCache)
 {
-	return NULL;
+	return nullptr;
 }
 
 /************ gr2Control ************/
@@ -99,29 +99,29 @@ const char*	gr2AnimationBlend::GetPath()
 /************ gr2Model ************/
 
 gr2Model::gr2Model()
-	: grannyModel(NULL)
-	, GrannyInstance(NULL)
-	, WorldPose(NULL)
+	: grannyModel(nullptr)
+	, GrannyInstance(nullptr)
+	, WorldPose(nullptr)
 	, lastUpdateTime(0)
 	, lastDeformTime(0)
-	, skeleton(NULL)
+	, skeleton(nullptr)
 	, boneCount(0)
 	, usesAnotherSkeleton(0)
-	, wornOnModel(NULL)
+	, wornOnModel(nullptr)
 	, attachBone(0)
 	, attachToBone(0)
-	, attachToModel(NULL)
-	, finalModelTransform(NULL)
+	, attachToModel(nullptr)
+	, finalModelTransform(nullptr)
 	, rootPositioningBone(0)
 	, numTextures(0)
-	, loadedTextures(NULL)
+	, loadedTextures(nullptr)
 	, currentFaceID(-1)
 	, patchTexID(-1)
-	, pObject(NULL)
+	, pObject(nullptr)
 	, active(FALSE)
 	, updateAttachment(1)
 	, eventHandler()
-	, blends(NULL)
+	, blends(nullptr)
 	, maxVis(0)
 	, minVis(0)
 	, surfaceID(-1)
@@ -133,7 +133,7 @@ gr2Model::~gr2Model()
     if(blends)
         delete blends;
 
-    blends = NULL;
+    blends = nullptr;
 	//reset();
 }
 
@@ -142,25 +142,25 @@ void gr2Model::reset()
     if(finalModelTransform)
     {
         delete finalModelTransform;
-        finalModelTransform = NULL;
+        finalModelTransform = nullptr;
     }
 
     if(WorldPose)
     {
         GrannyFreeWorldPose(WorldPose);
-        WorldPose = NULL;
+        WorldPose = nullptr;
     }
 
     if(GrannyInstance)
     {
         GrannyFreeModelInstance(GrannyInstance);
-        GrannyInstance = NULL;
+        GrannyInstance = nullptr;
     }
 
     if(loadedTextures)
     {
         delete[] loadedTextures;
-        loadedTextures = NULL;
+        loadedTextures = nullptr;
     }
 
 	FreeAttachments();
@@ -197,29 +197,29 @@ void gr2Model::reset()
 
 	twists.clear();
 	events.clear();
-	eventHandler = NULL;
+	eventHandler = nullptr;
 
 	piFreeMipTextures(patchTexID);
 
 	//memset(this, 0, (int)((char*)&name - (char*)this));
 
-	name = NULL;
+	name = nullptr;
 	currentFaceID = -1;
 	patchTexID = -1;
 	updateAttachment = 1; // always true initially
-	grannyModel = NULL;
+	grannyModel = nullptr;
 	lastUpdateTime = 0;
 #ifdef LOD_ANIMATIONS
 	lodError = 0;
 #endif
 
 	// pointer to my own skeleton
-	skeleton = NULL;
+	skeleton = nullptr;
 	boneCount = 0;
 
 	// wearing stuff
 	usesAnotherSkeleton = 0;
-	wornOnModel = attachToModel = NULL;
+	wornOnModel = attachToModel = nullptr;
 	attachBone = attachToBone = -1;
 
 	memset(&attachOffset, 0, sizeof(granny_matrix_4x4));
@@ -230,8 +230,8 @@ void gr2Model::reset()
 	// texture data
 	numTextures = 0;
 
-	pObject = NULL;
-	object = NULL;
+	pObject = nullptr;
+	object = nullptr;
 
 	active = 0;
 
@@ -305,7 +305,7 @@ bool gr2Model::Render(bool update, bool attached)
 	{
 		if(attached)
 		{
-			if(wornOnModel != NULL)
+			if(wornOnModel != nullptr)
 				wornOnModel->RenderAttachments(update);
 			else
 				RenderAttachments(update);
@@ -533,7 +533,7 @@ gr2AnimModel::gr2AnimModel() : gr2Model()
 	, modelTwist(0)
 	, headPitch(0)
 	, useAltTorsoAxis(FALSE)
-	, blends(NULL)
+	, blends(nullptr)
 {
 }
 
@@ -572,7 +572,7 @@ void gr2AnimModel::reset()
 	}
 
 	events.clear();
-	eventHandler = NULL;
+	eventHandler = nullptr;
 
 	// torso twist
 	torsoTwist = headTwist = modelTwist = headPitch = 0;
@@ -871,7 +871,7 @@ gr2Model* gr2ModelList::GetActive()
 			return lod;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 gr2Model* gr2ModelList::Get(SINT32 index)
@@ -879,7 +879,7 @@ gr2Model* gr2ModelList::Get(SINT32 index)
 	if(index >= 0 && index < (int)size())
 		return at(index);
 
-	return NULL;
+	return nullptr;
 }
 
 gr2Model* gr2ModelList::Get(FLOAT32 distance)
@@ -892,7 +892,7 @@ gr2Model* gr2ModelList::Get(FLOAT32 distance)
 			return lod;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void gr2ModelList::Set(SINT32 index, bool active)

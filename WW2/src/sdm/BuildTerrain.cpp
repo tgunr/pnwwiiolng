@@ -92,7 +92,7 @@ static bool findNextMatchingEntry( HANDLE&h, WIN32_FIND_DATAA* finddata )
   do
   {
     finddata->ent = readdir(h.dir);
-    if ( finddata->ent == NULL )
+    if ( finddata->ent == nullptr )
     {
       return false;
     }
@@ -108,7 +108,7 @@ static HANDLE FindFirstFileA(const char*pattern, WIN32_FIND_DATAA* finddata)
   HANDLE h;
 
   char* slash = strrchr( pattern, '/' );
-  *slash = NULL;
+  *slash = nullptr;
   strcpy( slash+2, h.pattern ); // skip *
 
   h.dir = opendir(pattern);
@@ -446,7 +446,7 @@ static void MergeCPFdata()
 
 		wptSDM->posx				= wptCPF->posx;
 		wptSDM->posy				= wptCPF->posy;
-		if(wptCPF->next != NULL)
+		if(wptCPF->next != nullptr)
 		{
 			wptSDM->nextpt.Populate(wptCPF->next, wptCPF->next->wpid.id, CLASS_WAYPOINT, 0);
 			FLOAT64	dx = (FLOAT64)wptCPF->next->posx - (FLOAT64)wptSDM->posx;
@@ -494,9 +494,9 @@ char*			ptr;
 int				i;
 bool			quoted;
 
-	if (buffer == NULL)
+	if (buffer == nullptr)
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
 	ptr = buffer;
@@ -560,14 +560,14 @@ static void LoadStratFile(const char* fileName)
 
 
 	hfile = fopen(fileName, "rb");
-	if (hfile == NULL)	return;
+	if (hfile == nullptr)	return;
 
 	Write_Debug("Loading CPF file %s", fileName);
 	do
 	{
 		if (feof(hfile))	break;
 		ptr = fgets(buffer, 255, hfile);
-		if (ptr == NULL)	continue;
+		if (ptr == nullptr)	continue;
 		if (buffer[0] == '#' ||	strncmp(buffer, "//", 2) == 0)	continue;
 
 		if (strncmp(buffer, "CP", 2) == 0)
@@ -728,7 +728,7 @@ static void LoadStratFile(const char* fileName)
 	}
 	while (TRUE);
 
-	if (pcp != NULL)
+	if (pcp != nullptr)
 	{
 		pcp->next = pcplist;
 		pcplist = pcp;
@@ -1763,7 +1763,7 @@ void TerrainObjectSafeDelete(SuperCellTerrainData::TerrainObject* to)
     if(to->instance && to->instance->rootObject)
     {
         obpoolFreeObjectCallback(to->instance->rootObject);
-        to->instance->rootObject = NULL;
+        to->instance->rootObject = nullptr;
     }
 
     ToDeleteTerrainObjects::iterator itr = TerrainObjectsToDelete.find(to);
@@ -2065,7 +2065,7 @@ void SuperCellTerrainData::PlaceTerrain()
     if(planes)
     {
         delete [] planes;
-        planes = NULL;
+        planes = nullptr;
     }
 }
 
@@ -2304,7 +2304,7 @@ void SuperCellTerrainData::PlaceTerrainObjects(int pass)
 
                 if(needcollider && object->instance)
                 {
-                    OBJECT* o = NULL;
+                    OBJECT* o = nullptr;
 
                     trnFindCollisionObject(&o, object->instance->rootObject);
 
@@ -2440,7 +2440,7 @@ void SuperCellTerrainData::Preprocess()
 SuperCellTerrainData::SuperCellTerrainData(int cellX, int cellY, const Vec3f& offset)
 	:	supercellX(cellX),
 		supercellY(cellY),
-        newHeightMap(NULL),
+        newHeightMap(nullptr),
 		cellPhysicsSpace(dHashSpaceCreate(worldPhysicsSpace)),
 		octets()
 {
@@ -2607,7 +2607,7 @@ SuperCellTerrainData::SuperCellTerrainData(int cellX, int cellY, const Vec3f& of
     ldmdlCalcSurfaceNormals(o);
     ldmdlGetBounds(o);
 
-    cellHeightMap->instance = NULL;
+    cellHeightMap->instance = nullptr;
     newHeightMap = o;
 
     // Create plane equations for terrain placement
@@ -2665,8 +2665,8 @@ SuperCellTerrainData::~SuperCellTerrainData()
                 if(octet->replacementTile->instance->rootObject)
                 {
                     obpoolFreeObjectCallback(octet->replacementTile->instance->rootObject);
-                    octet->replacementTile->instance->rootObject = NULL;
-                    octet->replacementTile->instance = NULL;
+                    octet->replacementTile->instance->rootObject = nullptr;
+                    octet->replacementTile->instance = nullptr;
                 }
             }
 
@@ -2693,7 +2693,7 @@ SuperCellTerrainData::~SuperCellTerrainData()
         }
 
         TerrainObjectSafeDelete(cellHeightMap);
-        cellHeightMap = NULL;
+        cellHeightMap = nullptr;
     }
 
     if(newHeightMap)
@@ -2704,7 +2704,7 @@ SuperCellTerrainData::~SuperCellTerrainData()
     if(planes)
     {
         delete [] planes;
-        planes = NULL;
+        planes = nullptr;
     }
 
     bushclutterdata.erase(bushclutterdata.begin(), bushclutterdata.end());
@@ -2904,9 +2904,9 @@ void BuildTerrain(bool mergeAll, short cellX, short cellY)
 #if platOS == OS_WIN32
                 MSG msg;
                 // May want to alt-tab out while building....
-                while(PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
+                while(PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE))
                 {
-                    if(GetMessage(&msg, NULL, 0, 0))
+                    if(GetMessage(&msg, nullptr, 0, 0))
                     {
                         TranslateMessage(&msg);
                         DispatchMessage(&msg);

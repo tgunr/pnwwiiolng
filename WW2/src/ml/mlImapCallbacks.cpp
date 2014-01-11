@@ -66,7 +66,7 @@ UINT32 mlAdjustFlapPosition(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
 	mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
 
-	if(VehicleData == NULL)  return 0;
+	if(VehicleData == nullptr)  return 0;
 
 //	mlAutopilotDisengage(VehicleData);
 
@@ -201,7 +201,7 @@ UINT32 mlAdjustClutch(SINT32 Param, UINT32 Id, UINT32 Detach)
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
 
-	if (VehicleData == NULL)
+	if (VehicleData == nullptr)
 	{
 		return 0;
 	}
@@ -229,7 +229,7 @@ UINT32 mlPrimaryTriggerDown(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
 	mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
 
-	if (VehicleData == NULL) return 0;
+	if (VehicleData == nullptr) return 0;
 	if (VehicleData->VehicleMasterPtr->RideVehicleHostIndex > 0) return 0;
 
 	VehicleData->PrimaryTriggerDown = Param;
@@ -242,7 +242,7 @@ UINT32 mlSecondaryTriggerDown(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
 	mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
 
-	if (VehicleData == NULL) return 0;
+	if (VehicleData == nullptr) return 0;
 	if (VehicleData->VehicleMasterPtr->RideVehicleHostIndex > 0) return 0;
 
 	VehicleData->SecondaryTriggerDown = Param;
@@ -368,7 +368,7 @@ static void FindMinDifferenceAndDirection(FLOAT64 from, FLOAT64 to, FLOAT64* dif
 UINT32 mlTraverseTurretSpeed(SINT32 Param, UINT32 Id, UINT32 data)
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-	if (VehicleData == NULL) return 1;
+	if (VehicleData == nullptr) return 1;
 	UINT32 Position;
 	imap_callback_ext_data* extdata = (imap_callback_ext_data*)data;
 	FLOAT64 Delta, diff, dir;
@@ -489,7 +489,7 @@ UINT32 mlTraverseTurretSpeed(SINT32 Param, UINT32 Id, UINT32 data)
 UINT32 mlTraverseTurret(UINT32 Position)
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-	if (VehicleData == NULL) return 1;
+	if (VehicleData == nullptr) return 1;
 
 	VehicleData->TurretTraverseDeltaInput[Position] = TRUE;
 
@@ -544,7 +544,7 @@ UINT32 mlTraverseTurret(UINT32 Position)
 UINT32 mlElevateTurretSpeed(SINT32 Param, UINT32 Id, UINT32 data)
 {
 	mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
-	if (VehicleData == NULL) return 1;
+	if (VehicleData == nullptr) return 1;
 	UINT32 Position;
 	imap_callback_ext_data* extdata = (imap_callback_ext_data*)data;
 
@@ -684,7 +684,7 @@ static void _soundkill(void* data)
 {
 	SINT32* id = (SINT32*)data;
 
-	if(id == NULL)
+	if(id == nullptr)
 		return;
 
 	*id = 0;
@@ -700,7 +700,7 @@ static void _buildFRU(JSContext* ctx, UINT32 argc, jsval* argv)
 		JS_ValueToBoolean(ctx, argv[0], &build);
 
 		if(!build || !ppo->Build())
-			fpPPOSet(NULL);
+			fpPPOSet(nullptr);
 	}
 }
 
@@ -739,7 +739,7 @@ UINT32 mlToggleBombBayDoor(SINT32 Param,UINT32 Id,UINT32 Detach)
 			else
 			{
 				fpPPOAlert();
-				fpPPOSet(NULL);
+				fpPPOSet(nullptr);
 			}
 		}
 		else
@@ -911,7 +911,7 @@ UINT32 mlToggleHatch(SINT32 Param,UINT32 Id,UINT32 Detach)
 UINT32 mlToggleCanopy(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-	if(VehicleData == NULL) return 0;
+	if(VehicleData == nullptr) return 0;
 	UINT32 Position;
 	FLOAT64VECTOR TempPos;
 	FLOAT64 Speed;
@@ -921,7 +921,7 @@ UINT32 mlToggleCanopy(SINT32 Param,UINT32 Id,UINT32 Detach)
 	if(VehicleData->CanopyJammed[Position])
 	{
 		rnmainListLocText(IDE_LANG_UI,CANOPY_JAMMED_ID);
-		_PlaySound(VehicleData, *VehicleData->CanopyJamSound ? VehicleData->CanopyJamSound : "sounds\\canopyjam.wav", NULL);
+		_PlaySound(VehicleData, *VehicleData->CanopyJamSound ? VehicleData->CanopyJamSound : "sounds\\canopyjam.wav", nullptr);
 		return 0;
 	}
 
@@ -1134,7 +1134,7 @@ UINT32 mlReverse(SINT32 Param,UINT32 Id,UINT32 Detach)
 UINT32 mlToggleDiveBrakes(SINT32 Param, UINT32 Id, UINT32 Detach)
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-	if (VehicleData == NULL)
+	if (VehicleData == nullptr)
 	{
 		return 0;
 	}
@@ -1164,7 +1164,7 @@ UINT32 mlToggleDiveBrakes(SINT32 Param, UINT32 Id, UINT32 Detach)
 UINT32 mlToggleGear(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-	if (VehicleData == NULL) return 0;
+	if (VehicleData == nullptr) return 0;
 
 	FLOAT64 Speed;
 
@@ -1197,7 +1197,7 @@ UINT32 mlToggleGear(SINT32 Param,UINT32 Id,UINT32 Detach)
 	if (VehicleData->GearSetting == 0.0)
 	{
 		VehicleData->GearSetting = 1.0;
-		if (VehicleData->VehicleMasterPtr != NULL)
+		if (VehicleData->VehicleMasterPtr != nullptr)
 		{
 			vehAnimChangeVehicleStateByName((vehVehicle*)VehicleData->VehicleMasterPtr, (UCHAR*)"gearstate", TRUE);
 		}
@@ -1205,7 +1205,7 @@ UINT32 mlToggleGear(SINT32 Param,UINT32 Id,UINT32 Detach)
 	}
 	else
 	{
-		if (VehicleData->VehicleMasterPtr != NULL)
+		if (VehicleData->VehicleMasterPtr != nullptr)
 		{
 			vehAnimChangeVehicleStateByName((vehVehicle*)VehicleData->VehicleMasterPtr, (UCHAR*)"gearstate", FALSE);
 		}
@@ -1233,7 +1233,7 @@ UINT32 mlToggleGear(SINT32 Param,UINT32 Id,UINT32 Detach)
 UINT32 mlToggleCowlFlaps(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-	if (VehicleData == NULL)
+	if (VehicleData == nullptr)
 	{
 		return 0;
 	}
@@ -1286,11 +1286,11 @@ UINT32 mlRangeFind(SINT32 Param,UINT32 Id,UINT32 Detach)
 	if (trncdCollideWithVehiclesAndTerrain(
 					&V1,
 					&V2,
-					NULL,
-					NULL,
-					NULL,
-					NULL,
-					NULL,
+					nullptr,
+					nullptr,
+					nullptr,
+					nullptr,
+					nullptr,
 					TRUE,
 					FALSE,
 					FALSE) == TRUE)
@@ -1375,7 +1375,7 @@ UINT32 mlToggleHoist(SINT32 Param,UINT32 Id,UINT32 Detach)
 UINT32 mlAdjustWinch(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-	if (VehicleData == NULL) return 1;
+	if (VehicleData == nullptr) return 1;
 	UINT32 Position;
 	SINT32 TurretNum;
 

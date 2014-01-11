@@ -11,7 +11,7 @@ class CRegionSelect : public CBDialog
 	DECLARE_DYNAMIC(CRegionSelect)
 
 public:
-	CRegionSelect(CWnd* pParent = NULL);   // standard constructor
+	CRegionSelect(CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CRegionSelect();
 	virtual UINT TitleLocID() const { return REGION_TITLE; }
 	virtual UINT HintLocID() const { return REGION_HINT; }

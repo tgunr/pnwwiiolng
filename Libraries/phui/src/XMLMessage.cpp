@@ -78,11 +78,11 @@ XMLMessage::~XMLMessage()
 
 void XMLMessage::Archive(const Message* msg, const char* name)
 {
-    xmlDocPtr doc = NULL;    
-	xmlNodePtr node = NULL;
+    xmlDocPtr doc = nullptr;    
+	xmlNodePtr node = nullptr;
 
 	doc = xmlNewDoc((xmlChar*)"1.0");
-    node = xmlNewNode(NULL, (xmlChar*)"message");
+    node = xmlNewNode(nullptr, (xmlChar*)"message");
     xmlDocSetRootElement(doc, node);
 	
 	archive_message(msg, node);
@@ -111,7 +111,7 @@ void XMLMessage::Restore(Message* msg, const char* name)
 								(xmlInputReadCallback)_io->read, 
 								(xmlInputCloseCallback)_io->close); 
 								
-	xmlDocPtr doc = xmlReadFile(name, NULL, XML_PARSE_DTDLOAD);
+	xmlDocPtr doc = xmlReadFile(name, nullptr, XML_PARSE_DTDLOAD);
 	if(doc)
 	{
 		xmlNodePtr node = xmlDocGetRootElement(doc);
@@ -170,7 +170,7 @@ static void restore_message(Message* msg, xmlNodePtr node)
 		node = node->next;
 	}
 
-	if(NULL == node) return;
+	if(nullptr == node) return;
 	
 	char* what = (char*)xmlGetProp(node, (xmlChar*)WHAT_ATTRIB);
 	if(what)
@@ -206,7 +206,7 @@ static void add_message_node(const Message* msg, xmlNodePtr node, const char* na
 	Message subMsg;
 	msg->FindMessage(name,&subMsg,j);
 	
-	xmlNodePtr child = xmlNewNode(NULL, (xmlChar*)MESSAGE_TAG);
+	xmlNodePtr child = xmlNewNode(nullptr, (xmlChar*)MESSAGE_TAG);
 	xmlNewProp(child, (xmlChar*)NAME_ATTRIB, (xmlChar*)name);	
 
 	archive_message(&subMsg, child);
@@ -222,7 +222,7 @@ static void add_scalar_node(const Message* msg, xmlNodePtr node, const char* nam
 	Scalar val;
 	msg->FindScalar(name, &val, j);
 		
-	const char* type = NULL;
+	const char* type = nullptr;
 	switch(val.Type())
 	{
 		case Scalar::UndefT:
@@ -257,7 +257,7 @@ static void add_scalar_node(const Message* msg, xmlNodePtr node, const char* nam
 
 	if(type)
 	{
-		xmlNodePtr child = xmlNewChild(node, NULL, (xmlChar*)SCALAR_TAG, NULL);
+		xmlNodePtr child = xmlNewChild(node, nullptr, (xmlChar*)SCALAR_TAG, nullptr);
 
 		xmlNewProp(child, (xmlChar*)NAME_ATTRIB, (xmlChar*)name);
 		xmlNewProp(child, (xmlChar*)TYPE_ATTRIB, (xmlChar*)type);	
@@ -274,7 +274,7 @@ static void add_scalar_node(const Message* msg, xmlNodePtr node, const char* nam
 static void add_value_node(const Message* msg, xmlNodePtr node, const char* name, int j, long type)
 {
 	char val[64];
-	const char* valtype = NULL;
+	const char* valtype = nullptr;
 	const char *valptr = val;
 
 	switch(type)
@@ -335,7 +335,7 @@ static void add_value_node(const Message* msg, xmlNodePtr node, const char* name
 		
 		case Message::POINTER_TYPE:
 		{
-			long ptr = NULL;
+			long ptr = 0;
 			msg->FindPointer(name,(void**)&ptr,j);
 			snprintf(val, 63, "%d", (int)ptr);
 			valtype = POINTER_VALUE;
@@ -350,14 +350,14 @@ static void add_value_node(const Message* msg, xmlNodePtr node, const char* name
 		break;
 		
 		default:
-			valtype = NULL;
-			valptr = NULL;
+			valtype = nullptr;
+			valptr = nullptr;
 		break;
 	}
 	
 	if(valtype && valptr)
 	{
-		xmlNodePtr childnode =  xmlNewChild(node, NULL, (xmlChar*)VALUE_TAG, NULL);
+		xmlNodePtr childnode =  xmlNewChild(node, nullptr, (xmlChar*)VALUE_TAG, nullptr);
 
 		xmlNewProp(childnode, (xmlChar*)NAME_ATTRIB, (xmlChar*)name);	
 		xmlNewProp(childnode, (xmlChar*)TYPE_ATTRIB, (xmlChar*)valtype);	

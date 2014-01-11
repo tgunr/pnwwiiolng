@@ -41,7 +41,7 @@ FULL_OBJ_ID* populateFullObjID(FULL_OBJ_ID* foid, SINT32 sx, SINT32 sy, REL_OBJ_
 	if ( foid == nullptr )
 	{
 #ifdef DEBUG
-		dbugLog(_FLW, "called %s with NULL foid", __FUNCTION__);
+		dbugLog(_FLW, "called %s with nullptr foid", __FUNCTION__);
 #endif
 		return nullptr;
 	}

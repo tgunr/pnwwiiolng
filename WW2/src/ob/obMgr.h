@@ -212,14 +212,14 @@ struct FindByName
 {
     FindByName()
     {
-        name = NULL;
-        node = NULL;
+        name = nullptr;
+        node = nullptr;
     }
 
     void set(const char* n)
     {
         name = n;
-        node = NULL;
+        node = nullptr;
     }
 
     void find(const T* o)
@@ -248,13 +248,13 @@ struct FindByComment
 {
     FindByComment()
     {
-        comment = NULL;
-        node = NULL;
+        comment = nullptr;
+        node = nullptr;
     }
 
     void set(const char* c)
     {
-        node = NULL;
+        node = nullptr;
         comment = c;
     }
 

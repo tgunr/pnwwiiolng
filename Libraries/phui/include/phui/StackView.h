@@ -20,7 +20,7 @@ public:
 	StackView();
 	virtual ~StackView(); 
 	
-	virtual int AddChild(View* v, View* before=NULL);
+	virtual int AddChild(View* v, View* before=nullptr);
 	virtual void SetValue(const Scalar& v);
 	virtual void Show();
 };

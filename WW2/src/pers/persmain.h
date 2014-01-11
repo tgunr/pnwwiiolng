@@ -161,7 +161,7 @@ extern UINT32 persGetCameraPosAndAtt(piVECTOR * Pos,piVECTOR * Att);
 // returns the persPersona structure pointer for the player's persona
 extern persPersona* persGetPersonaDataPtr();
 
-// returns the vehVehicle the player is attached to, or NULL if not attached
+// returns the vehVehicle the player is attached to, or nullptr if not attached
 extern vehVehicle* persGetPersonaVehiclePtr();
 
 // If the persona is controlling a populated and ready vehicle,
@@ -169,7 +169,7 @@ extern vehVehicle* persGetPersonaVehiclePtr();
 extern vehVehicle* persGetPersonaPilotedOnlineVehicle();
 
 // if the player is attached to a vehicle and that vehicle has an object,
-// returns that object, otherwise NULL
+// returns that object, otherwise nullptr
 extern OBJECT* persGetPersonaVehicleObjectDataPtr();
 
 // returns the current position number of the player
@@ -183,7 +183,7 @@ extern UINT32 persSetPersonaPosition(UINT32 InPosition);
 extern UINT32 persResetPersonaSettings();
 
 // if the player is attached to a vehicle and that vehicle has model data
-// returns the model data, otherwise NULL
+// returns the model data, otherwise nullptr
 extern mlVehicleData* persGetPersonaModelDataPtr();
 
 // checks if the persona is attached to a particular vehicle
@@ -238,7 +238,7 @@ extern void persSetView(UINT32 type, UINT32 level);
 extern void persSetNormalView(FLOAT32 FieldOfView);
 extern void persResetHealths(void);
 extern UINT32 persSetPersonaPositionCallback(SINT32 param, UINT32 id, UINT32 detach);
-extern void persShakeHead(const char* message = NULL);
+extern void persShakeHead(const char* message = nullptr);
 extern void persKillCrew(void);
 extern bool persAllowHUDUpdate(void);
 
@@ -284,9 +284,9 @@ extern LOGICAL persIsTired();
 extern void persSetDeathCamForNextUpdate();
 extern void persSetExitTime(SINT32 when);
 
-extern bool persIsPersonaVehicleTank(const vehVehicle* v = NULL);
-extern bool persIsPersonaVehicleDestroyer(const vehVehicle* v = NULL);
-extern bool persIsPersonaVehicleRiverBoat(const vehVehicle* v = NULL);
-extern bool persIsPersonaVehicleTruck(const vehVehicle* v = NULL);
-extern bool persIsPersonaVehicleBomber(const vehVehicle* v = NULL);
-extern bool persIsPersonaVehicleFighter(const vehVehicle* v = NULL);
+extern bool persIsPersonaVehicleTank(const vehVehicle* v = nullptr);
+extern bool persIsPersonaVehicleDestroyer(const vehVehicle* v = nullptr);
+extern bool persIsPersonaVehicleRiverBoat(const vehVehicle* v = nullptr);
+extern bool persIsPersonaVehicleTruck(const vehVehicle* v = nullptr);
+extern bool persIsPersonaVehicleBomber(const vehVehicle* v = nullptr);
+extern bool persIsPersonaVehicleFighter(const vehVehicle* v = nullptr);

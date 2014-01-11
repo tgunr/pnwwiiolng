@@ -43,19 +43,19 @@
 //! Register a receiver function.
 #define	REGISTER_RECEIVER(y, recvFn) cbr.receiver(y, recvFn)
 //! Register a function with both send and receive options.
-#define	REGISTER_SENDRECV(y, sendFn, recvFn, cb) { assert(cb == NULL); cb = cbr.callback(y, sendFn, recvFn); }
+#define	REGISTER_SENDRECV(y, sendFn, recvFn, cb) { assert(cb == nullptr); cb = cbr.callback(y, sendFn, recvFn); }
 //! Register a function with both receive and send options.
-#define	REGISTER_RECVSEND(y, recvFn, sendFn, cb) { assert(cb == NULL); cb = cbr.callback(y, sendFn, recvFn); }
+#define	REGISTER_RECVSEND(y, recvFn, sendFn, cb) { assert(cb == nullptr); cb = cbr.callback(y, sendFn, recvFn); }
 
 //! Register a bi-directional teul_network_array.
-#define REGISTER_ARRAY(y, typeName) { assert(cb == NULL); cb = cbr.callback(y, typeName::callbackSend, typeName::callbackRecv); }
+#define REGISTER_ARRAY(y, typeName) { assert(cb == nullptr); cb = cbr.callback(y, typeName::callbackSend, typeName::callbackRecv); }
 
 //! Register a teul_network entity sender.
 #define REGISTER_MSG_SENDER(y, typeName) cbr.sender(y, typeName::callbackSend, typeName::callback())
 //! Register a teul_network entity receiver.
 #define REGISTER_MSG_RECEIVER(y, typeName) cbr.receiver(y, typeName::callbackRecv)
 //! Register a bi-directional teul_network entity.
-#define REGISTER_MSG(y, typeName) { assert(typeName::callback() == NULL); typeName::callback() = cbr.callback(y, typeName::callbackSend, typeName::callbackRecv); }
+#define REGISTER_MSG(y, typeName) { assert(typeName::callback() == nullptr); typeName::callback() = cbr.callback(y, typeName::callbackSend, typeName::callbackRecv); }
 
 //! Receive message to _recv<ObjType>(ACTION_OBJECT*, ObjType&)
 #define REGISTER_RECEIVEOBJ(CallY, ObjType, RecvFn) cbr.receiveObj<ObjType>(CallY, RecvFn)

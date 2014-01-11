@@ -201,7 +201,7 @@ static int _loctime; // last time the loc strings were loaded
 static std::string _despawnUI = "offline";
 static int _despawnTab = 0;
 static bool _despawnReset = true;
-static UIXMLCALLBACK _uiJsCallback = NULL;
+static UIXMLCALLBACK _uiJsCallback = nullptr;
 static drawIconRef _ContactIcons;
 static drawIconRef _FlagIcons;
 
@@ -457,19 +457,19 @@ int uiKill()
 	if(_mapkeyicons)
 	{
 		drawIconKill(_mapkeyicons);
-		_mapkeyicons = NULL;
+		_mapkeyicons = nullptr;
 	}
 
     if(_ContactIcons)
     {
         drawIconKill(_ContactIcons);
-        _ContactIcons = NULL;
+        _ContactIcons = nullptr;
     }
 
     if(_FlagIcons)
     {
         drawIconKill(_FlagIcons);
-        _FlagIcons = NULL;
+        _FlagIcons = nullptr;
     }
 
 	uiChatKill();
@@ -594,7 +594,7 @@ void uiDraw()
 void uiDrawString(const char* text, UINT32 color, UINT32 size)
 {
 	phui::GraphicsContext* ctx = uiViewport()->GetGraphicsContext();
-	if(ctx == NULL) return;
+	if(ctx == nullptr) return;
 
 	//save our current state
 	//ctx->PushState();
@@ -720,7 +720,7 @@ static float lastMouseX,lastMouseY;
 							// if we hit exit again, kill the popup
 							phui::View* despawn = uiViewport()->FindView("despawn");
 
-							if(despawn != NULL)
+							if(despawn != nullptr)
 								uiRunScript(despawn, "doDespawnAction(false);");
 						}
 					}
@@ -747,7 +747,7 @@ static float lastMouseX,lastMouseY;
 
 bool uiFocused()
 {
-	return (uiFocusView() != NULL);
+	return (uiFocusView() != nullptr);
 }
 
 /************************************************************************************************
@@ -756,7 +756,7 @@ bool uiFocused()
 
 phui::View* uiFocusView()
 {
-	return (_viewport) ? _viewport->FindFocusView(): NULL;
+	return (_viewport) ? _viewport->FindFocusView(): nullptr;
 }
 
 /************************************************************************************************
@@ -1099,7 +1099,7 @@ void uiGameToUI()
 			phui::View* despawnUI = uiLoadView(_despawnUI.c_str());
 
 			// look up its body so we can set the tab
-			phui::View* body = (despawnUI != NULL) ? despawnUI->FindView("body"): NULL;
+			phui::View* body = (despawnUI != nullptr) ? despawnUI->FindView("body"): nullptr;
 			if(body) body->SetValue(_despawnTab);
 
 			// let everyone know I'm no longer spawned
@@ -1118,7 +1118,7 @@ void uiGameToUI()
 		phui::View* despawnUI = uiLoadView(_despawnUI.c_str());
 
 		// look up its body so we can set the tab
-		phui::View* body = (despawnUI != NULL) ? despawnUI->FindView("body"): NULL;
+		phui::View* body = (despawnUI != nullptr) ? despawnUI->FindView("body"): nullptr;
 		if(body) body->SetValue(_despawnTab);
 
 		// reset if we were requested to do so
@@ -1207,7 +1207,7 @@ void uiGameToUI()
 			phui::View* despawnUI = uiLoadView(_despawnUI.c_str());
 
 			// look up its body so we can set the tab
-			phui::View* body = (despawnUI != NULL) ? despawnUI->FindView("body"): NULL;
+			phui::View* body = (despawnUI != nullptr) ? despawnUI->FindView("body"): nullptr;
 			if(body) body->SetValue(_despawnTab);
 		}
 	}
@@ -1951,7 +1951,7 @@ void locInitStrings(bool force)
 	path = "loc://ui.dtd";
 
 	// load the doc
-	pDtd = xmlParseDTD(NULL, (xmlChar*)path.c_str());
+	pDtd = xmlParseDTD(nullptr, (xmlChar*)path.c_str());
 
 	if(pDtd)
 	{
@@ -1965,7 +1965,7 @@ void locInitStrings(bool force)
 		path = "languages/english/input.dtd";
 
 		// load the doc
-		pDtd = xmlParseDTD(NULL, (xmlChar*)path.c_str());
+		pDtd = xmlParseDTD(nullptr, (xmlChar*)path.c_str());
 
 		if(pDtd)
 		{
@@ -2001,7 +2001,7 @@ void locInitStrings(bool force)
 
 static void locProcessEntity(xmlEntityPtr entity, void* locmap)
 {
-	if(locmap != NULL)
+	if(locmap != nullptr)
 	{
 		if(locmap == &_inputkeys)
 		{
@@ -2117,7 +2117,7 @@ static void locProcessName(xmlEntityPtr entity, void* nametype)
 #if defined(BETA_RELEASE)
 static int interpreter(const char* line, int argc, const char** argv, int refcon)
 {
-	phui::DOM::RunScript(_msgloop, NULL, line);
+	phui::DOM::RunScript(_msgloop, nullptr, line);
 	return 0;
 }
 #endif

@@ -107,7 +107,7 @@ extern void teulCloseTransport(void);
 //! Associate local application data with a connection.
 extern void teulSetPersonaData(const SINT32 teulIndex, void* personaData);
 
-//! Returns the persona data for a connection, may be NULL.
+//! Returns the persona data for a connection, may be nullptr.
 extern void* teulGetPersonaData(const SINT32 teulIndex);
 
 //! Return a pointer to a specific connection data type, or null.

@@ -101,7 +101,7 @@ static SINT32 _RecievePlayGateOk(ACTION_OBJECT *a)
 {
 	playgate.SetStatus(GetLoc(AUTH_OK));
 /*
-	if (launchGetPassword(0, NULL))
+	if (launchGetPassword(0, nullptr))
 		launchArenaRequest(loginData.m_arenaID, g_sessionID);
 */
 
@@ -317,26 +317,26 @@ extern SINT32 launchInstallCallbacks(void)
 {
 	try
 	{
-		_ArenaReq = commInstallMessage(Auth::CallbackX, ARENA_REQ_Y, _SendArenaReq, NULL);
-		if ( _ArenaReq == NULL )
+		_ArenaReq = commInstallMessage(Auth::CallbackX, ARENA_REQ_Y, _SendArenaReq, nullptr);
+		if ( _ArenaReq == nullptr )
 			throw 1;
-		_ArenaReq2 = commInstallMessage(Auth::CallbackX, ARENA_REQ2_Y, _SendArenaReq2, NULL);
-		if ( _ArenaReq2 == NULL )
+		_ArenaReq2 = commInstallMessage(Auth::CallbackX, ARENA_REQ2_Y, _SendArenaReq2, nullptr);
+		if ( _ArenaReq2 == nullptr )
 			throw 2;
 		_LaunchReq = commInstallMessage(Auth::CallbackX, APP_LAUNCH_REQ_Y, _SendLaunchReq, _errorFunc);
-		if ( _LaunchReq == NULL )
+		if ( _LaunchReq == nullptr )
 			throw 3;
-		if ( commInstallMessage(Auth::CallbackX, APP_LAUNCH_Y, NULL, _ReceiveAppLaunch) == NULL )
+		if ( commInstallMessage(Auth::CallbackX, APP_LAUNCH_Y, nullptr, _ReceiveAppLaunch) == nullptr )
 			throw 4;
-		if ( commInstallMessage(Auth::CallbackX, APP_VERIFY_Y, NULL, _ReceiveAppVerify) == NULL)
+		if ( commInstallMessage(Auth::CallbackX, APP_VERIFY_Y, nullptr, _ReceiveAppVerify) == nullptr)
 			throw 5;
-		if ( commInstallMessage(Auth::CallbackX, APP_PLAYGATE_OK_Y, NULL, _RecievePlayGateOk) == NULL )
+		if ( commInstallMessage(Auth::CallbackX, APP_PLAYGATE_OK_Y, nullptr, _RecievePlayGateOk) == nullptr )
 			throw 6;
 		_GetGameList = commInstallMessage(Auth::CallbackX, APP_XCHG_GAME_LIST_Y, _RequestGameList, _ReceiveGameList);
-		if ( NULL == _GetGameList )
+		if ( nullptr == _GetGameList )
 			throw 7;
 		_LoginXchg = commInstallMessage(Auth::CallbackX, AUTH_XCHG_LOGIN_Y, _SendLoginRequest, _RecvLoginReply);
-		if ( NULL == _LoginXchg )
+		if ( nullptr == _LoginXchg )
 			throw 8;
 	}
 	catch ( int n )

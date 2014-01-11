@@ -70,7 +70,7 @@ private:
             m_dlTex(0),
             m_fPosition(0.0f),
             m_fWidth(0.0f),
-            m_pColor(NULL)
+            m_pColor(nullptr)
         {
         }
 

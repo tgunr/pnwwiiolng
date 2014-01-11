@@ -16,7 +16,7 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // CBDialog dialog
 
-CBDialog::CBDialog(UINT nIDTemplate, CWnd* pParent /*=NULL*/)
+CBDialog::CBDialog(UINT nIDTemplate, CWnd* pParent /*=nullptr*/)
 	: CDialog(nIDTemplate, pParent)
 {
 	//{{AFX_DATA_INIT(CBDialog)
@@ -30,7 +30,7 @@ CBDialog::CBDialog(UINT nIDTemplate, CWnd* pParent /*=NULL*/)
 void CBDialog::Localize(UINT itemId, UINT locID) const
 {
 	CWnd* item = GetDlgItem(itemId);
-	if ( item != NULL )
+	if ( item != nullptr )
 	{
 		if ( locID )
 			item->SetWindowTextW(GetLoc(locID));

@@ -160,7 +160,7 @@ UINT32 mlgearSetComponentSubtype(void*  SpecialData, char * SubType)
 {
 mlGearComponentData * ComponentData;
 
-	if (SpecialData == NULL || SubType == NULL)
+	if (SpecialData == nullptr || SubType == nullptr)
 	{
 		return 1;
 	}
@@ -185,9 +185,9 @@ UINT32 mlgearAddSpecialVariable(void*  SpecialData,
 mlGearComponentData * ComponentData;
 UINT32 VarNum;
 
-	if (SpecialData == NULL ||
-		VarName == NULL ||
-		VarContents == NULL)
+	if (SpecialData == nullptr ||
+		VarName == nullptr ||
+		VarContents == nullptr)
 	{
 		return 1;
 	}
@@ -305,7 +305,7 @@ UINT32 mlUpdateGearComponent(FLOAT64VECTOR * Force, // OUT
 							void*  InVehicleData)
 {
 piMATRIX Matrix1 = IdentityMatrix,Matrix2 = IdentityMatrix;
-mlGearComponentData * GearData = NULL,*DriveWheel = NULL;
+mlGearComponentData * GearData = nullptr,*DriveWheel = nullptr;
 FLOAT64VECTOR GearSumForce = {0, 0, 0};
 FLOAT64VECTOR TempForce = {0, 0, 0};
 FLOAT64VECTOR ComponentVel = {0, 0, 0};
@@ -321,11 +321,11 @@ mlVehicleData * VehicleData;
 	Force->x = Force->y = Force->z = 0;
 	Torque->Roll = Torque->Pitch = Torque->Yaw = 0;
 
-	if (Component == NULL) return 0;
+	if (Component == nullptr) return 0;
 	if (_DisableCollisions != 0) return 0;
 
 	GearData = (mlGearComponentData*)(Component->SpecialData);
-	if (GearData == NULL) return 0;
+	if (GearData == nullptr) return 0;
 
 
 // determine damage to gear
@@ -359,7 +359,7 @@ mlVehicleData * VehicleData;
 	{
 		// hack for boats and cheese
 		vehVehicle*Vehicle = persGetPersonaVehiclePtr();
-		if (Vehicle != NULL && Vehicle->VehicleType->Type == VEH_TYPE_SEA && Vehicle->ModelData != NULL)
+		if (Vehicle != nullptr && Vehicle->VehicleType->Type == VEH_TYPE_SEA && Vehicle->ModelData != nullptr)
 		{
 			if (Component->CurrentDamage > Component->DamageLevels[3])
 			{
@@ -379,10 +379,10 @@ mlVehicleData * VehicleData;
 	// first extract the position of the contact point right now in the universe
 	if (PassNum == 0)
 	{
-		if (GearData->ContactPoint == NULL)
+		if (GearData->ContactPoint == nullptr)
 		{
 			if (GearData->Subtype == ML_GEAR_SUBTYPE_TRACK_ROADWHEEL &&
-				GearData->DriveWheelComponent != NULL)
+				GearData->DriveWheelComponent != nullptr)
 			{
 				DriveWheel = (mlGearComponentData*)GearData->DriveWheelComponent->SpecialData;
 				mlUpdateWheelSpeed(GearData->GearNum - 1,
@@ -488,7 +488,7 @@ mlVehicleData * VehicleData;
 							CollisionsOff,
 							VehicleData,
 							Component);
-	if (PassNum == 1 && GearData->ContactPoint != NULL)
+	if (PassNum == 1 && GearData->ContactPoint != nullptr)
 	{
 		// wheel rotation speed is in radians, for the gauges it needs to be in rps
 		mlUpdateWheelSpeed(GearData->GearNum - 1,-GearData->WheelRotationSpeed / PI / 2);
@@ -528,8 +528,8 @@ static UINT32 _HandleCastor(mlGearComponentData * GearData,
 							   FLOAT64 DeltaTime,
 							   piMATRIX const*VehicleAttMat)
 {
-	if (GearData->CastorDOF == NULL) return 0;
-	if (GearData->ContactPoint == NULL) return 0;
+	if (GearData->CastorDOF == nullptr) return 0;
+	if (GearData->ContactPoint == nullptr) return 0;
 
 	GearData->LastCastorYaw = 0.0;
 
@@ -568,11 +568,11 @@ static UINT32 _HandleGearStrut(mlGearComponentData * GearData,
 
     vehVehicle* Vehicle = persGetPersonaVehiclePtr();
 
-	if (GearData->ShockDOF != NULL)
+	if (GearData->ShockDOF != nullptr)
 	{
 		// hack for boats and cheese
 			StrengthAdjust = 1.0;
-		if (Vehicle != NULL && Vehicle->VehicleType->Type == VEH_TYPE_SEA && Vehicle->ModelData != NULL)
+		if (Vehicle != nullptr && Vehicle->VehicleType->Type == VEH_TYPE_SEA && Vehicle->ModelData != nullptr)
 		{
 			StrengthAdjust = Component->DamageLevels[3];
 			if (StrengthAdjust > 0.001)
@@ -633,7 +633,7 @@ static UINT32 _HandleGearStrut(mlGearComponentData * GearData,
 
 
 			// added hack for boats and cheese
-			if (Vehicle != NULL && Vehicle->VehicleType->Type == VEH_TYPE_SEA)
+			if (Vehicle != nullptr && Vehicle->VehicleType->Type == VEH_TYPE_SEA)
 			{
 
 			}
@@ -740,7 +740,7 @@ static UINT32 _DetermineGearCollision(FLOAT64VECTOR * ReturnForce, // OUT
 									mlVehicleData const* VehicleData,
 									mlComponent const* Component)
 {
-	if (ContactPointDOF == NULL)
+	if (ContactPointDOF == nullptr)
 	{
 		ReturnForce->x = ReturnForce->y = ReturnForce->z = 0;
 		return 0;
@@ -762,7 +762,7 @@ static UINT32 _DetermineGearCollision(FLOAT64VECTOR * ReturnForce, // OUT
 	FLOAT64 WheelRotationForce = 0.0f;
 	FLOAT64 BrakeForce = 0.0f;
 	FLOAT64 EffectiveBrakeForce = 0.0f;
-	mlGearComponentData * DriveWheel = NULL;
+	mlGearComponentData * DriveWheel = nullptr;
 	FLOAT64 RotationalInertia = 0.0f;
 	FLOAT64 OneOverRotationalInertia = 0.0f;
 	UINT32 NumLoops = 0;
@@ -835,7 +835,7 @@ static UINT32 _DetermineGearCollision(FLOAT64VECTOR * ReturnForce, // OUT
 
 		{
 			vehVehicle* Vehicle = persGetPersonaVehiclePtr();
-			if (Vehicle != NULL && Vehicle->VehicleType->Type == VEH_TYPE_SEA)
+			if (Vehicle != nullptr && Vehicle->VehicleType->Type == VEH_TYPE_SEA)
 			{
 
 			}
@@ -989,10 +989,10 @@ static UINT32 _DetermineGearCollision(FLOAT64VECTOR * ReturnForce, // OUT
 		StaticFrictionVec.y = -ForceUnit.y * L1;
 		StaticFrictionVec.z = -ForceUnit.z * L1;
 
-		DriveWheel = NULL;
+		DriveWheel = nullptr;
 		if (GearData->Subtype == ML_GEAR_SUBTYPE_TRACK_ROADWHEEL)
 		{
-			if (GearData->DriveWheelComponent != NULL)
+			if (GearData->DriveWheelComponent != nullptr)
 			{
 				DriveWheel = (mlGearComponentData*)GearData->DriveWheelComponent->SpecialData;
 			}
@@ -1000,7 +1000,7 @@ static UINT32 _DetermineGearCollision(FLOAT64VECTOR * ReturnForce, // OUT
 
 		RollCoefficient = 0.02;
 
-		if (DriveWheel != NULL)
+		if (DriveWheel != nullptr)
 		{
 			if (DriveWheel->RollCoefficient != 0.0)
 			{
@@ -1088,7 +1088,7 @@ static UINT32 _DetermineGearCollision(FLOAT64VECTOR * ReturnForce, // OUT
 
 		{
 			vehVehicle* Vehicle = persGetPersonaVehiclePtr();
-			if (Vehicle != NULL && Vehicle->VehicleType->Type == VEH_TYPE_SEA)
+			if (Vehicle != nullptr && Vehicle->VehicleType->Type == VEH_TYPE_SEA)
 			{
 
 			}
@@ -1175,7 +1175,7 @@ static UINT32 _DetermineGearCollision(FLOAT64VECTOR * ReturnForce, // OUT
 
 			// factor in wheels
 			Vely = NormalVel.y;
-			if (GearData->Subtype == ML_GEAR_SUBTYPE_TRACK_ROADWHEEL && DriveWheel != NULL)
+			if (GearData->Subtype == ML_GEAR_SUBTYPE_TRACK_ROADWHEEL && DriveWheel != nullptr)
 			{
 				Vely -= DriveWheel->WheelRadius * DriveWheel->WheelRotationSpeed;
 			}
@@ -1285,7 +1285,7 @@ static UINT32 _DetermineGearCollision(FLOAT64VECTOR * ReturnForce, // OUT
 			WheelRotationalForceSum -= WheelRotationForce;
 
 
-			if (GearData->Subtype != ML_GEAR_SUBTYPE_TRACK_ROADWHEEL || DriveWheel == NULL)
+			if (GearData->Subtype != ML_GEAR_SUBTYPE_TRACK_ROADWHEEL || DriveWheel == nullptr)
 			{
 				NewWheelSpeed = *WheelRotationSpeed + WheelRotationForce * WheelRadius * OneOverRotationalInertia *
 								DeltaTime * 0.001 * OneOverNumLoops;
@@ -1335,7 +1335,7 @@ static UINT32 _DetermineGearCollision(FLOAT64VECTOR * ReturnForce, // OUT
 //			NormalForce.y = 0;
 		}
 
-		if (GearData->Subtype == ML_GEAR_SUBTYPE_TRACK_ROADWHEEL && DriveWheel != NULL)
+		if (GearData->Subtype == ML_GEAR_SUBTYPE_TRACK_ROADWHEEL && DriveWheel != nullptr)
 		{
 
 			DriveWheel->TrackCumulativeFrictionForce += WheelRotationalForceSum / NumLoops;
@@ -1571,7 +1571,7 @@ static int Count;
 
 	if (*RollCoefficientMult > 198.99 && *RollCoefficientMult < 199.01)
 	{
-		if (!(Vehicle != NULL && Vehicle->VehicleType->Type != VEH_TYPE_GROUND))
+		if (!(Vehicle != nullptr && Vehicle->VehicleType->Type != VEH_TYPE_GROUND))
 		{
 			RetVal = 0;
 		}
@@ -1580,7 +1580,7 @@ static int Count;
 
 	{
 		// sinking hack
-		if (Vehicle != NULL && Vehicle->VehicleType->Type == VEH_TYPE_SEA)
+		if (Vehicle != nullptr && Vehicle->VehicleType->Type == VEH_TYPE_SEA)
 		{
 			if (GearData->LastCompression > 0.9f)
 			{
@@ -1606,7 +1606,7 @@ static int Count;
 
 
 		// compute normal
-		if (CollideObject == NULL)
+		if (CollideObject == nullptr)
 		{
 			NormalVector->x = NormalVector->y = 0;
 			NormalVector->z = 1.0;
@@ -1625,7 +1625,7 @@ static int Count;
 										   StaticFriction,
 										   DynamicFriction,
 										   RollCoefficientMult,
-										   NULL,
+										   nullptr,
 										   CollideObject,
 										   TRUE);
 		}

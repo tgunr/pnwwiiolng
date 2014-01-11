@@ -188,7 +188,7 @@ void radclutterInit()
 {
     _attributes = (Attributes*)memAlloc(sizeof(Attributes) * max_attributes);
 
-    if(_attributes == NULL)
+    if(_attributes == nullptr)
     {
         g_bRadialClutter = FALSE;
         return;
@@ -280,10 +280,10 @@ void RemoveClutterIfNecessary()
 {
     vehVehicle* veh = persGetPersonaVehiclePtr();
 
-    if(veh == NULL)
+    if(veh == nullptr)
         return;
 
-    if(veh->ModelData == NULL)
+    if(veh->ModelData == nullptr)
         return;
 
     Vec2f p1, p2;
@@ -316,7 +316,7 @@ void RemoveClutterIfNecessary()
 Attributes* GetFreeAttribute()
 {
     if(_free.empty())
-        return NULL;
+        return nullptr;
 
     Attributes* attr = _free.front();
     _free.pop();
@@ -524,10 +524,10 @@ void CheckMovement_1()
 
     vehVehicle* veh = persGetPersonaVehiclePtr();
 
-    if(veh == NULL)
+    if(veh == nullptr)
         return;
 
-    if(veh->ModelData == NULL)
+    if(veh->ModelData == nullptr)
         return;
 
     Vec2f dis;
@@ -647,10 +647,10 @@ void CheckMovement_2()
 
     vehVehicle* veh = persGetPersonaVehiclePtr();
 
-    if(veh == NULL)
+    if(veh == nullptr)
         return;
 
-    if(veh->ModelData == NULL)
+    if(veh->ModelData == nullptr)
         return;
 
     Vec2f dis;
@@ -770,10 +770,10 @@ void CheckMovement_3()
 
     vehVehicle* veh = persGetPersonaVehiclePtr();
 
-    if(veh == NULL)
+    if(veh == nullptr)
         return;
 
-    if(veh->ModelData == NULL)
+    if(veh->ModelData == nullptr)
         return;
 
     Vec2f dis;

@@ -55,7 +55,7 @@ HCLinksMapObject* StrategicLayer::AddHCLinksMapObject()
 
  HCLinksMapObject::HCLinksMapObject(StrategicLayer* layer)
 			: SuperCellMapView::MapObject()
-			, _division(NULL)
+			, _division(nullptr)
 			, _strategiclayer(layer),
 			_x1(0),
 			_y1(0),
@@ -165,14 +165,14 @@ void HCLinksMapObject::DrawSelf(SuperCellMapView* mv)
 void HCLinksMapObject::SetDivision(unsigned int id)
 {
 	_division = GetDivision(HCUnit::Lookup(id));
-	_cp = (_division) ? StratDB::FindStratObject(_division->homeCPID()): NULL;
+	_cp = (_division) ? StratDB::FindStratObject(_division->homeCPID()): nullptr;
 	SetUnits();
 }
 
 void HCLinksMapObject::SetCP(StratDB::StratObject* cp)
 {
 	_cp = cp;
-	_division = NULL;
+	_division = nullptr;
 	SetUnits();
 }
 
@@ -251,5 +251,5 @@ HCUnit* HCLinksMapObject::GetDivision(HCUnit* unit)
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }

@@ -137,7 +137,7 @@ static void preload_sdms()
 #if defined(_DUMP_STRAT_TRANSLATIONS)
 	StratDB::StratObjList stratlist;
 
-	FILE* report = NULL;
+	FILE* report = nullptr;
 	errno_t err = fopen_s(&report, "c:\\projects\\stratlist.txt", "w");
 
 	if(!err)
@@ -632,7 +632,7 @@ void _UpdateInit(void)
 
 // Voice Communications
 #if defined(ENABLE_VOICE_COMMS)
-	if(VoiceCommsOn && mgr != NULL)
+	if(VoiceCommsOn && mgr != nullptr)
 	{
 		mgr->checkvoiceconnections();
 	}

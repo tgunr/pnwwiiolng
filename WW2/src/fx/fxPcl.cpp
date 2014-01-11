@@ -30,19 +30,19 @@ static std::vector<SINT32> g_v3Ddraw;
 #define DEF_FXPCL_MAX_PARTICLES     1024
 #define DEF_FXPCL_MAX_PARTS         64
 
-static FXPARTICLE* particles = NULL;
+static FXPARTICLE* particles = nullptr;
 
 static std::deque<int> freelist;
 
 static FXPARTICLE g_pclHead;
 static FXPARTICLE g_pclTail;
 
-static piCOLORVALUE* g_lpColor = NULL;
+static piCOLORVALUE* g_lpColor = nullptr;
 
 //static FLOAT32 g_fPi = PI;
 static FLOAT32 g_fPiOver180 = PI / 180.0f;
 
-static piMATRIX* g_lpInvertView = NULL;
+static piMATRIX* g_lpInvertView = nullptr;
 
 static FXINITFUNC g_fxInitFuncs[IDE_NUMBER_OF_PARTICLES];
 static FXUPDATEFUNC g_fxUpdateFuncs[IDE_NUMBER_OF_PARTICLES];
@@ -124,7 +124,7 @@ LOGICAL fxPclInit()
 
     particles = (FXPARTICLE*)memAlloc(sizeof(FXPARTICLE) * DEF_FXPCL_MAX_PARTICLES);
 
-    if(particles == NULL)
+    if(particles == nullptr)
         return FALSE;
 
 //	Uneccessary -- memAlloc == calloc
@@ -240,23 +240,23 @@ LOGICAL fxPclCreateExplosion(FLOAT64VECTOR* pPos, FLOAT64 energy)
     // Not using energy for determining size, since our energy
     // values go infinite on certain occasions.
 
-    TransformEffect* te = NULL;
+    TransformEffect* te = nullptr;
 
     if(energy > 300000000.0f)
     {
-        te = TransformEffect::AddEffect("genericlargeexplosion", n, 0, NULL);
+        te = TransformEffect::AddEffect("genericlargeexplosion", n, 0, nullptr);
     }
     else if(energy > 100000000.0f)
     {
-        te = TransformEffect::AddEffect("genericmediumexplosion", n, 0, NULL);
+        te = TransformEffect::AddEffect("genericmediumexplosion", n, 0, nullptr);
     }
     else if(energy > 1000000.0f)
     {
-        te = TransformEffect::AddEffect("genericsmallexplosion", n, 0, NULL);
+        te = TransformEffect::AddEffect("genericsmallexplosion", n, 0, nullptr);
     }
     else
     {
-        te = TransformEffect::AddEffect("smallcannon", n, 0, NULL);
+        te = TransformEffect::AddEffect("smallcannon", n, 0, nullptr);
     }
 
     if(te)
@@ -279,23 +279,23 @@ LOGICAL fxPclCreateH2OExplosion(FLOAT64VECTOR* pPos, FLOAT64 fEnergy)
     Vec3d p(*pPos);
     p.z() = -p.z();
 
-    TransformEffect* te = NULL;
+    TransformEffect* te = nullptr;
 
     if(fEnergy > 38000000.0f)
     {
-        te = TransformEffect::AddEffect("water_genericlargeexplosion", n, 0, NULL);
+        te = TransformEffect::AddEffect("water_genericlargeexplosion", n, 0, nullptr);
     }
     else if(fEnergy > 10000000.0f)
     {
-        te = TransformEffect::AddEffect("water_genericmediumexplosion", n, 0, NULL);
+        te = TransformEffect::AddEffect("water_genericmediumexplosion", n, 0, nullptr);
     }
     else if(fEnergy > 100000.0f)
     {
-        te = TransformEffect::AddEffect("water_genericsmallexplosion", n, 0, NULL);
+        te = TransformEffect::AddEffect("water_genericsmallexplosion", n, 0, nullptr);
     }
     else
     {
-        te = TransformEffect::AddEffect("water_smallcannon", n, 0, NULL);
+        te = TransformEffect::AddEffect("water_smallcannon", n, 0, nullptr);
     }
 
     if(te)
@@ -565,9 +565,9 @@ void fxPclFreeAll()
 {
     FXPARTICLE* lpPcl = g_pclHead.next;
     FXPARTICLE* lpTail = &g_pclTail;
-    FXPARTICLE* lpFree = NULL;
+    FXPARTICLE* lpFree = nullptr;
 
-    if(lpPcl == NULL) return;
+    if(lpPcl == nullptr) return;
 
     while(lpPcl != lpTail)
     {
@@ -586,13 +586,13 @@ void fxPclFreeAll()
 //////////////////////////////////////////
 LOGICAL fxPclKill()
 {
-    if(particles != NULL)
+    if(particles != nullptr)
     {
         memFree(particles);
-        particles = NULL;
+        particles = nullptr;
     }
 
-    // Set to NULL in case of further updates.
+    // Set to nullptr in case of further updates.
     memset(&g_pclHead, 0, sizeof(FXPARTICLE));
     memset(&g_pclTail, 0, sizeof(FXPARTICLE));
 
@@ -605,9 +605,9 @@ LOGICAL fxPclKill()
 //////////////////////////////////////////
 LOGICAL _FreeParticle(FXPARTICLE* pcl)
 {
-    FXPARTICLE* lpPrev = NULL;
+    FXPARTICLE* lpPrev = nullptr;
 
-    if(pcl == NULL)
+    if(pcl == nullptr)
         return FALSE;
 
     std::multimap<void* , SINT32>::iterator I;
@@ -669,7 +669,7 @@ LOGICAL _CheckForParticle()
 {
     if(freelist.empty())
     {
-        FXPARTICLE* lpPcl = NULL;
+        FXPARTICLE* lpPcl = nullptr;
 
         if(g_pclTail.prev == &g_pclHead)
             return FALSE;
@@ -695,23 +695,23 @@ LOGICAL _CheckForParticle()
 //////////////////////////////////////////////////////////////////////
 LOGICAL _ReleaseParticle(FXPARTICLE* lpPcl)
 {
-    FXPARTICLE* lpNext = NULL;
-    FXPARTICLE* lpPrev = NULL;
+    FXPARTICLE* lpNext = nullptr;
+    FXPARTICLE* lpPrev = nullptr;
 
-    if(lpPcl == NULL)
+    if(lpPcl == nullptr)
         return FALSE;
 
     lpNext = lpPcl->next;
     lpPrev = lpPcl->prev;
 
-    if(lpNext == NULL || lpPrev == NULL)
+    if(lpNext == nullptr || lpPrev == nullptr)
         return FALSE;
 
     lpPrev->next = lpNext;
     lpNext->prev = lpPrev;
 
-    lpPcl->prev = NULL;
-    lpPcl->next = NULL;
+    lpPcl->prev = nullptr;
+    lpPcl->next = nullptr;
 
     return TRUE;
 }
@@ -722,9 +722,9 @@ LOGICAL _ReleaseParticle(FXPARTICLE* lpPcl)
 //////////////////////////////////////////////////////////////////////
 LOGICAL _AddParticle(FXPARTICLE* lpPcl)
 {
-    FXPARTICLE* lpNext = NULL;
+    FXPARTICLE* lpNext = nullptr;
 
-    if(lpPcl == NULL)
+    if(lpPcl == nullptr)
         return FALSE;
 
     lpNext = g_pclHead.next;
@@ -762,7 +762,7 @@ void fxPclSetInvertView(piMATRIX* lpInvertView)
 //////////////////////////////////////////
 void fxPclUpdate()
 {
-    if(g_pclHead.next == NULL) return;
+    if(g_pclHead.next == nullptr) return;
     if(g_pclHead.next == &g_pclTail) return;
 
     FXPARTICLE* lpPcl = g_pclHead.next;
@@ -813,7 +813,7 @@ LOGICAL _UpdatePCL(FXPARTICLE* lpPcl)
     if(lpPcl->enumType >= IDE_NUMBER_OF_PARTICLES)
         return FALSE;
 
-    if(g_fxUpdateFuncs[lpPcl->enumType].pFn == NULL)
+    if(g_fxUpdateFuncs[lpPcl->enumType].pFn == nullptr)
         return FALSE;
 
     g_fxUpdateFuncs[lpPcl->enumType].pFn(lpPcl);
@@ -844,14 +844,14 @@ void _UpdateMuzzleFlash(FXPARTICLE* lpPcl)
 
     vehVehicle*pVeh = lpPcl->lpVehicle;
 
-    if(pVeh == NULL)
+    if(pVeh == nullptr)
         return;
 
     if(!pVeh->InUse)
         return;
 
     // Something bad has happened here.
-    if(pVeh->VehicleType == NULL)
+    if(pVeh->VehicleType == nullptr)
     {
         lpPcl->bDraw = FALSE;
         return;
@@ -891,11 +891,11 @@ void _updateVehicleFlash(FXPARTICLE* p)
     OBJECT* o = p->lpFxObj;
     vehVehicle* veh = p->lpVehicle;
 
-    if(veh == NULL) return;
+    if(veh == nullptr) return;
     if(!veh->InUse) return;
 
-    if(veh->VehicleObjectData == NULL) return;
-    if(veh->VehicleObjectData->PlaneObject == NULL) return;
+    if(veh->VehicleObjectData == nullptr) return;
+    if(veh->VehicleObjectData->PlaneObject == nullptr) return;
 
     if((FLOAT32)frametime < p->pclTime.p1)
         return;
@@ -1078,11 +1078,11 @@ void _updateTroopFlash(FXPARTICLE* p)
     OBJECT* o = p->lpFxObj;
     vehVehicle* veh = p->lpVehicle;
 
-    if(veh == NULL) return;
+    if(veh == nullptr) return;
     if(!veh->InUse) return;
 
-    if(veh->VehicleObjectData == NULL) return;
-    if(veh->VehicleObjectData->PlaneObject == NULL) return;
+    if(veh->VehicleObjectData == nullptr) return;
+    if(veh->VehicleObjectData->PlaneObject == nullptr) return;
 
     if((FLOAT32)frametime < p->pclTime.p1)
         return;
@@ -1115,7 +1115,7 @@ void _updateTroopFlash(FXPARTICLE* p)
     piMATRIX fireatt = IdentityMatrix;
 
     // Get player attitude and position
-    if(veh->ModelData == NULL)
+    if(veh->ModelData == nullptr)
     {
         fireatt = veh->PosData.AttMat;
         player = veh->PosData.Pos;
@@ -1192,7 +1192,7 @@ void _UpdateDebris(FXPARTICLE* lpPcl)
 {
     if(lpPcl->uFlags & DEF_FXFLAG_OBJECT)
     {
-        if(lpPcl->lpFxObj == NULL)
+        if(lpPcl->lpFxObj == nullptr)
             return;
 
         if(lpPcl->uFlags & DEF_FXFLAG_ROTATE)
@@ -1342,7 +1342,7 @@ void _UpdateShells(FXPARTICLE* lpPcl)
 {
     if(lpPcl->uFlags & DEF_FXFLAG_OBJECT)
     {
-        if(lpPcl->lpFxObj == NULL)
+        if(lpPcl->lpFxObj == nullptr)
             return;
 
         if(lpPcl->uFlags & DEF_FXFLAG_ROTATE)
@@ -1459,7 +1459,7 @@ void fxPclPlayDirtSound(void* posAddress)
 {
     FLOAT64VECTOR* pPos = (FLOAT64VECTOR*)posAddress;
 
-    if(pPos == NULL)
+    if(pPos == nullptr)
         return;
 
     SINT32 id = fxSndGetNewSound();
@@ -1573,8 +1573,8 @@ void _ApplyDOF(FXPARTICLE* lpPcl)
     piVECTOR vecDir;
     piVECTOR vecVel;
 
-    if(lpDOF == NULL) return;
-    if(lpObj == NULL) return;
+    if(lpDOF == nullptr) return;
+    if(lpObj == nullptr) return;
 
     fxUtlGetDOFPos(lpDOF, &lpObj->mat, &lpPcl->vecPos);
     fxUtlUpdatePosition(&lpPcl->vecPt, &lpPcl->vecPos);
@@ -1626,7 +1626,7 @@ void _ApplyAmmo(FXPARTICLE* lpPcl)
 {
     weapAmmo* pAmmo = (weapAmmo*)lpPcl->pAmmo;
 
-    if(pAmmo == NULL)
+    if(pAmmo == nullptr)
         return;
 
     lpPcl->vecPos = pAmmo->Position;
@@ -2054,7 +2054,7 @@ void fxPclGetList(void* lpParticleSort, SINT32* pIndex)
     g_v3Ddraw.clear();
 
     if(!lpSort || !pIndex) return;
-    if(g_pclHead.next == NULL) return;
+    if(g_pclHead.next == nullptr) return;
     if(g_pclHead.next == &g_pclTail) return;
 
     FXPARTICLE* lpPcl = g_pclHead.next;
@@ -2106,7 +2106,7 @@ LOGICAL fxPclDraw3D()
 //////////////////////////////////////////
 LOGICAL fxPclDraw(SINT32 ID)
 {
-    if(g_pclHead.next == NULL)
+    if(g_pclHead.next == nullptr)
         return FALSE;
 
     if(g_pclHead.next == &g_pclTail)
@@ -2426,7 +2426,7 @@ LOGICAL _CanDraw(FXPARTICLE* lpPcl)
 //////////////////////////////////////////////////////////////////////
 LOGICAL _FreeParticleIfNecessary(FXPARTICLE* lpPcl)
 {
-    if(lpPcl == NULL)
+    if(lpPcl == nullptr)
         return FALSE;
 
     if(lpPcl->bDraw == TRUE)
@@ -2443,12 +2443,12 @@ LOGICAL _FreeParticleIfNecessary(FXPARTICLE* lpPcl)
                 if(lpPcl->pFnUserKill)
                 {
                     lpPcl->pFnUserKill(lpPcl->pKillData);
-                    lpPcl->pFnUserKill = NULL;
+                    lpPcl->pFnUserKill = nullptr;
                 }
                 else if(lpPcl->lpFxObj)
                 {
                     ogrpFreeObjectTree(lpPcl->lpFxObj);
-                    lpPcl->lpFxObj = NULL;
+                    lpPcl->lpFxObj = nullptr;
                 }
             }
 
@@ -2480,7 +2480,7 @@ void fxPclDetachByID(SINT32 id)
         return;
     }
 
-    if(particles == NULL)
+    if(particles == nullptr)
     {
         return;
     }
@@ -2499,7 +2499,7 @@ void fxPclDetachByID(SINT32 id)
 //////////////////////////////////////////////////////////////////////
 void fxPclDetachObj(OBJECT* lpObj)
 {
-    if(particles == NULL)
+    if(particles == nullptr)
         return;
 
     if(!lpObj)
@@ -2528,7 +2528,7 @@ void fxPclDetachObj(OBJECT* lpObj)
     for(UINT32 u = 0; u < removeList.size(); u++)
     {
          particles[removeList[u] - 1].bDraw = FALSE;
-         particles[removeList[u] - 1].lpEmitterObj = NULL;
+         particles[removeList[u] - 1].lpEmitterObj = nullptr;
 
         _FreeParticleIfNecessary(&particles[removeList[u] - 1]);
    }
@@ -2540,7 +2540,7 @@ void fxPclDetachObj(OBJECT* lpObj)
 //////////////////////////////////////////////////////////////////////
 void fxPclDetachVehicle(vehVehicle* v)
 {
-    if(particles == NULL)
+    if(particles == nullptr)
         return;
 
     std::multimap<void* , SINT32>::iterator I = g_mappedVehicles.find(v);
@@ -2563,7 +2563,7 @@ void fxPclDetachVehicle(vehVehicle* v)
     for(UINT32 u = 0; u < removeList.size(); u++)
     {
          particles[removeList[u] - 1].bDraw = FALSE;
-         particles[removeList[u] - 1].lpVehicle = NULL;
+         particles[removeList[u] - 1].lpVehicle = nullptr;
 
         _FreeParticleIfNecessary(&particles[removeList[u] - 1]);
    }
@@ -2578,7 +2578,7 @@ void fxPclDetachAmmo(void const* pAmmo)
 {
     FXPARTICLE* lpPcl = g_pclHead.next;
 
-    if(lpPcl == NULL) return;
+    if(lpPcl == nullptr) return;
 
     weapAmmo* ammo = (weapAmmo*)pAmmo;
 
@@ -2595,7 +2595,7 @@ void fxPclDetachAmmo(void const* pAmmo)
 //////////////////////////////////////////////////////////////////////
 SINT32 fxPclGetNewParticle()
 {
-    FXPARTICLE* pcl = NULL;
+    FXPARTICLE* pcl = nullptr;
 
     if(!_GetParticle(&pcl))
         return -1;
@@ -3334,7 +3334,7 @@ LOGICAL fxPclInitParticle(SINT32 id)
     if(lpPcl->enumType >= IDE_NUMBER_OF_PARTICLES)
         return FALSE;
 
-    if(g_fxInitFuncs[lpPcl->enumType].pFn == NULL)
+    if(g_fxInitFuncs[lpPcl->enumType].pFn == nullptr)
         return FALSE;
 
     if(!g_fxInitFuncs[lpPcl->enumType].pFn(lpPcl))

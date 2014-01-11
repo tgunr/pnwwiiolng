@@ -96,7 +96,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	rdcount1 = piReadTimeStamp64();
 #endif
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -222,7 +222,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	rdcount1 = piReadTimeStamp64();
 #endif
 
-	if (lpmain == NULL)
+	if (lpmain == nullptr)
 	{
 		return(FALSE);
 	}
@@ -280,7 +280,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	ay = ymx - (ymx - ymn) * 0.5f;
 	az = zmx - (zmx - zmn) * 0.5f;
 
-	if (loc != NULL)
+	if (loc != nullptr)
 	{
 		loc->x = ax;
 		loc->y = ay;
@@ -296,7 +296,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	zmx -= az;
 
 	// bounding box
-	if (obox != NULL)
+	if (obox != nullptr)
 	{
 		obox[0].x = xmn;
 		obox[0].y = ymn;
@@ -308,12 +308,12 @@ __int64		rdcount, rdcount1, rdcount2;
 	}
 
 	// min and max radii
-	if (minrad != NULL)
+	if (minrad != nullptr)
 	{
 		*minrad = xmn * xmn + ymn * ymn + zmn * zmn;
 	}
 
-	if (maxrad != NULL)
+	if (maxrad != nullptr)
 	{
 		*maxrad = xmx * xmx + ymx * ymx + zmx * zmx;
 	}
@@ -333,7 +333,7 @@ LOGICAL ldmdlUpdateLocation(OBJECT* lpobj)
 {
 piVECTOR		loc;
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -1031,7 +1031,7 @@ __int64		rdcount, rdcount1, rdcount2;
 
 	piVectorConstPtr rpos = lpobj->RenderPositions();
 	piVectorPtr mnorm = lpobj->StaticNormals();
-	if(mnorm.ptr == NULL)
+	if(mnorm.ptr == nullptr)
 	{
 		return FALSE;
 	}
@@ -1165,7 +1165,7 @@ __int64		rdcount, rdcount1, rdcount2;
 
 	piVectorConstPtr rpos = lpobj->RenderPositions();
 	piVectorPtr mnorm = lpobj->MutableNormals();
-	if(mnorm.ptr == NULL)
+	if(mnorm.ptr == nullptr)
 	{
 		return FALSE;
 	}
@@ -1384,13 +1384,13 @@ piVECTOR*		pso;
 piVECTOR*		psn;
 piINDICES*		pt;
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
 
 	piVectorPtr snorm = lpobj->StaticNormals();
-	if (snorm.ptr == NULL)
+	if (snorm.ptr == nullptr)
 	{
 		return FALSE;
 	}
@@ -1430,7 +1430,7 @@ piINDICES*		pt;
 // reverse the vertex normals
 LOGICAL ldmdlReverseObjectNormals(OBJECT* lpobj)
 {
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -1440,7 +1440,7 @@ LOGICAL ldmdlReverseObjectNormals(OBJECT* lpobj)
 		ldmdlReverseNormals(lpobj);
 		lpobj = lpobj->attached;
 	}
-	while (lpobj != NULL);
+	while (lpobj != nullptr);
 
 	return(TRUE);
 }
@@ -1451,8 +1451,8 @@ static OBJECT* _reduceTrees(OBJECT* o)
 
     SINT32 tris = 0;
 
-    OBJECT* commentobjects = NULL;
-    OBJECT* head = NULL;
+    OBJECT* commentobjects = nullptr;
+    OBJECT* head = nullptr;
 
     while(sibling)
     {
@@ -1489,7 +1489,7 @@ static OBJECT* _reduceTrees(OBJECT* o)
         return o;
     }
 
-    OBJECT* newobj = NULL;
+    OBJECT* newobj = nullptr;
 
     // One triangle old object for one vertice new object
     obmainCreateObjectFull(&newobj, o->name, tris, tris);
@@ -1551,7 +1551,7 @@ static OBJECT* _reduceTrees(OBJECT* o)
 
     if(commentobjects)
     {
-        head->sibling = NULL;
+        head->sibling = nullptr;
         newobj->sibling = commentobjects;
     }
 
@@ -1760,7 +1760,7 @@ piINDICES	ndx;
 piINDICES*	pt;
 
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -1823,20 +1823,20 @@ LOGICAL _SetObjectToNoFiltering(OBJECT * Obj)
 {
 OBJECT * ObjAtt, *ObjSib;
 
-	if (Obj == NULL)
+	if (Obj == nullptr)
 	{
 		return 0;
 	}
 
 	ObjSib = Obj;
 
-	while (ObjSib != NULL)
+	while (ObjSib != nullptr)
 	{
 		if (!(ObjSib->flags & OBJECT_NOTOBJECT))
 		{
 			ObjAtt = ObjSib;
 
-			while (ObjAtt != NULL)
+			while (ObjAtt != nullptr)
 			{
 				ObjAtt->flags |= OBJECT_NOFILTER;
 
@@ -1844,7 +1844,7 @@ OBJECT * ObjAtt, *ObjSib;
 			}
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_SetObjectToNoFiltering(ObjSib->child);
 		}
@@ -1861,7 +1861,7 @@ LOGICAL ldmdlUpdateGroupFilteringAndBlendStatus(OBJECT * ObjGrp)
 OBJECT * ObjAtt;
 SINT8*		ptr;
 
-	if (ObjGrp == NULL)
+	if (ObjGrp == nullptr)
 	{
 		return (TRUE);
 	}
@@ -1881,9 +1881,9 @@ SINT8*		ptr;
 
 		ObjAtt = ObjAtt->attached;
 	}
-	while (ObjAtt != NULL);
+	while (ObjAtt != nullptr);
 
-	if (ObjGrp->child != NULL)
+	if (ObjGrp->child != nullptr)
 	{
 		_UpdateGroupFilteringAndBlendStatus(ObjGrp->child);
 	}
@@ -1897,7 +1897,7 @@ static LOGICAL _UpdateGroupFilteringAndBlendStatus(OBJECT * ObjGrp)
 OBJECT* ObjAtt,*ObjSib;
 SINT8*		ptr;
 
-	if (ObjGrp == NULL)
+	if (ObjGrp == nullptr)
 	{
 		return (TRUE);
 	}
@@ -1921,16 +1921,16 @@ SINT8*		ptr;
 
 			ObjAtt = ObjAtt->attached;
 		}
-		while (ObjAtt != NULL);
+		while (ObjAtt != nullptr);
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_UpdateGroupFilteringAndBlendStatus(ObjSib->child);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 	return (TRUE);
 }
@@ -1940,7 +1940,7 @@ LOGICAL ldmdlUpdateGroupFilteringStatus(OBJECT * ObjGrp)
 {
 SINT8*		ptr;
 
-	if (ObjGrp == NULL)
+	if (ObjGrp == nullptr)
 	{
 		return (TRUE);
 	}
@@ -2085,11 +2085,11 @@ bool MergeObjectsIfPossible(OBJECT* main, OBJECT* o)
 	memRelease(main->pscdon);
 	memRelease(main->ptverts);
 
-	main->psnorig		= NULL;
-	main->psnorms		= NULL;
-	main->pscdon		= NULL;
-	main->pscdn			= NULL;
-	main->ptverts		= NULL;
+	main->psnorig		= nullptr;
+	main->psnorms		= nullptr;
+	main->pscdon		= nullptr;
+	main->pscdn			= nullptr;
+	main->ptverts		= nullptr;
 
 	main->puverts		= (piUNIFIED_VERTEX*)memRealloc(main->puverts, main->numverts * sizeof(piUNIFIED_VERTEX));
 	main->ptris			= (piINDICES*)memRealloc(main->ptris, main->numtris * sizeof(piINDICES));
@@ -2183,7 +2183,7 @@ static void MergeObjectWithBranch(OBJECT* o, OBJECT* node)
 			if(MergeObjectsIfPossible(o, node))
 			{
 				// attached takes over sibling pointer if node is deleted
-				if(attached) sibling = NULL;
+				if(attached) sibling = nullptr;
 			}
 		}
 		if(child) MergeObjectWithBranch(o, child);
@@ -2295,7 +2295,7 @@ typedef std::multimap<size_t,ogl::VertexIdx> UniVertexIndexer;
 void ldmdlIndexVertices(OBJECT* o)
 {
 //	std::vector<piUNIFIED_VERTEX>::iterator	existingElement;
-	piUNIFIED_VERTEX*						crtVertex			= NULL;
+	piUNIFIED_VERTEX*						crtVertex			= nullptr;
 
 	if(o->numverts)
 	{

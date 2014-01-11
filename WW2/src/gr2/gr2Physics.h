@@ -35,7 +35,7 @@ struct gr2ValueModel
 	float _start, _stop;
 	int _duration;
 
-	gr2ValueModel() : _value(NULL), _start(0), _stop(0), _duration(0)
+	gr2ValueModel() : _value(nullptr), _start(0), _stop(0), _duration(0)
 	{
 	}
 
@@ -175,8 +175,8 @@ public:
 
 	virtual ~gr2PhysicsBone();
 
-	virtual void BodyToBone(gr2Model* from = NULL); // bone to body
-	virtual void BoneToBody(gr2Model* to = NULL); // body to bone
+	virtual void BodyToBone(gr2Model* from = nullptr); // bone to body
+	virtual void BoneToBody(gr2Model* to = nullptr); // body to bone
 
 	// creation override for custom setups
 	virtual void Init();
@@ -370,7 +370,7 @@ public:
 
 	// so we can calculate our relative position to our parent
 	void Init();
-	void BodyToBone(gr2Model* to = NULL);
+	void BodyToBone(gr2Model* to = nullptr);
 
 	void SetParent(int p) { _parent = p; }
 
@@ -439,7 +439,7 @@ public:
 	typedef std::vector<dJointID> JointList;
 
 	gr2PhysicsModel(int timeout = -1);
-	gr2PhysicsModel(gr2Model* model, OBJECT* ob = NULL, int timeout = -1);
+	gr2PhysicsModel(gr2Model* model, OBJECT* ob = nullptr, int timeout = -1);
 	virtual ~gr2PhysicsModel();
 
 	// inits should be called roughly in this order the first time
@@ -466,8 +466,8 @@ public:
 	virtual DRAW_STATE OnDraw();
 	virtual void Draw();
 
-	void BonesToBodies(gr2Model* to = NULL); // bodies to bones
-	void BodiesToBones(gr2Model* from = NULL); // bones to bodies
+	void BonesToBodies(gr2Model* to = nullptr); // bodies to bones
+	void BodiesToBones(gr2Model* from = nullptr); // bones to bodies
 
 	void UpdateBones();		// updates bone positions and rotations from bodies
 	void UpdateVelocity();  // bleed model velocity over time
@@ -479,14 +479,14 @@ public:
 	void SetExpires(int timeout);
 	void SetActive(bool a, int timeout = -1);
 
-	virtual bool ProcessFlag(unsigned int flag, physicsObject* o = NULL);
-	//virtual void SetFlag(unsigned int f, gr2PhysicsBody* b = NULL);
+	virtual bool ProcessFlag(unsigned int flag, physicsObject* o = nullptr);
+	//virtual void SetFlag(unsigned int f, gr2PhysicsBody* b = nullptr);
 
 	// gr2 bone accessors
 	virtual bool GetBoneTransform(const char* name, Matrixf* transform);
 	virtual bool GetBoneTransform(int bone, Matrixf* transform);
 	virtual bool GetWorldBoneTransform(const char* bone, Matrixd* transform);
-	virtual bool GetWorldBonePosition(const char* bone, Vec3d& position, Vec3d* offset = NULL);
+	virtual bool GetWorldBonePosition(const char* bone, Vec3d& position, Vec3d* offset = nullptr);
 	virtual Vec3d& GetWorldBonePosition(const char* bone);
 
 	const Matrixd& GetWorldTransform() const { return _worldTransform; }
@@ -601,7 +601,7 @@ public:
 	virtual void InitPose(gr2Model* poseModel);
 	virtual void OnExpire(gr2PhysicsModel::DRAW_STATE& state);
 	virtual void OnRemove();
-	virtual bool ProcessFlag(unsigned int flag, physicsObject* o = NULL);
+	virtual bool ProcessFlag(unsigned int flag, physicsObject* o = nullptr);
 
 protected:
 	void damp();

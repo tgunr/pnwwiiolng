@@ -110,7 +110,7 @@ static inline void _report(UINT32 level, const char* message)
 {
 	std::string output;
 
-	if ( message == NULL )
+	if ( message == nullptr )
 		return;
 
 	// Save the output
@@ -140,7 +140,7 @@ static inline void _report(UINT32 level, const char* message)
 
 char* luaARGS(int i)
 {
-	return ( i >= (int)script_args.size() ) ? NULL : (char*)script_args[i];
+	return ( i >= (int)script_args.size() ) ? nullptr : (char*)script_args[i];
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -293,7 +293,7 @@ bool __luaRunCode(lua_State* L, const char* code, const char* function)
 
 lua_State* luaGetVM(bool defaultVM)
 {
-	if(defaultVM && _luaVM != NULL)
+	if(defaultVM && _luaVM != nullptr)
 	{
 		uiConsoleprintf("Attempted to restart active default vm");
 		return _luaVM;
@@ -304,10 +304,10 @@ lua_State* luaGetVM(bool defaultVM)
 
 	lua_State* vm = lua_open();
 
-	if (vm == NULL)
+	if (vm == nullptr)
 	{
 		uiConsoleprintf("Unable to start lua interpreter");
-		return NULL;
+		return nullptr;
 	}
 
 	// open default libs
@@ -348,7 +348,7 @@ bool luaStopVM(lua_State* L)
 		if(_luaVM)
 		{
 			lua_close(_luaVM);
-			_luaVM = NULL;
+			_luaVM = nullptr;
 			return true;
 		}
 	}
@@ -398,8 +398,8 @@ int luaLoadLib(GAME_PKG_TYPE type, lua_State* L)
 bool _initGameLib(lua_State* L)
 {
 	tolua_open(L);
-	tolua_module(L,NULL,0);
-	tolua_beginmodule(L,NULL);
+	tolua_module(L,nullptr,0);
+	tolua_beginmodule(L,nullptr);
 	    tolua_module(L,LUA_GAME_LIB,0);
 		tolua_beginmodule(L,LUA_GAME_LIB);
 			tolua_function(L,"LoadLib",_luaLoadLib);
@@ -476,13 +476,13 @@ int _luaSpawn(lua_State* L)
 		}
 		else
 		{
-			const vehType* vtype = NULL;
-			const StratDB::StratObject* origin = NULL;
+			const vehType* vtype = nullptr;
+			const StratDB::StratObject* origin = nullptr;
 
-			if(tolua_isusertype(L, 1, "const vehType", 0, NULL))
+			if(tolua_isusertype(L, 1, "const vehType", 0, nullptr))
 				vtype = ((const vehType*)tolua_tousertype(L, 1, 0));
 
-			if(tolua_isusertype(L, 2, "const StratDB::StratObject", 0, NULL))
+			if(tolua_isusertype(L, 2, "const StratDB::StratObject", 0, nullptr))
 				origin = ((const StratDB::StratObject*)tolua_tousertype(L, 2, 0));
 
 			if(vtype)
@@ -516,16 +516,16 @@ int _luaSpawnAt(lua_State* L)
 
 	if(!uiInGame())
 	{
-		const vehType* vtype = NULL;
+		const vehType* vtype = nullptr;
 		double x, y, z;
 		x = y = z = 0;
 
-		if(tolua_isusertype(L, 1, "const vehType", 0, NULL))
+		if(tolua_isusertype(L, 1, "const vehType", 0, nullptr))
 			vtype = ((const vehType*)tolua_tousertype(L, 1, 0));
 
-		if(tolua_isnumber(L, 2, 0, NULL)) x = tolua_tonumber(L, 2, 0);
-		if(tolua_isnumber(L, 3, 0, NULL)) y = tolua_tonumber(L, 3, 0);
-		if(tolua_isnumber(L, 4, 0, NULL)) z = tolua_tonumber(L, 4, 0);
+		if(tolua_isnumber(L, 2, 0, nullptr)) x = tolua_tonumber(L, 2, 0);
+		if(tolua_isnumber(L, 3, 0, nullptr)) y = tolua_tonumber(L, 3, 0);
+		if(tolua_isnumber(L, 4, 0, nullptr)) z = tolua_tonumber(L, 4, 0);
 
 		if(vtype)
 		{

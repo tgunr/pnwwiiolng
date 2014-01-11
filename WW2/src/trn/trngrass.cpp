@@ -48,7 +48,7 @@ void trngrassAddGrass(OBJECT* obj)
     piVECTOR pos;
     math3dVectorMultiply(&pos, &o->pos, &o->mat);
 
-    speedgrassAddAndCollide(Vec3d(pos) + WorldOriginOffset, modelname, key, 1000.0f, NULL, o);
+    speedgrassAddAndCollide(Vec3d(pos) + WorldOriginOffset, modelname, key, 1000.0f, nullptr, o);
 
     if(o && o->flag2 & OBJECT_IS_GRASS)
     {

@@ -236,7 +236,7 @@ static OGL_EXTENSION	ogl_extension[]=
 			{"GL_NV_texture_shader3", &gNV_texture_shader3},
 			{"GL_NV_vertex_program1_1", &gNV_vertex_program1_1},
 			{"GL_NV_multisample_filter_hint", &gNV_multisample_filter_hint},
-			{"", NULL}	// Last in array
+			{"", nullptr}	// Last in array
 		};
 
 static void DisplayLastError(void)
@@ -246,12 +246,12 @@ static void DisplayLastError(void)
 	FormatMessage(	FORMAT_MESSAGE_ALLOCATE_BUFFER | 
 					FORMAT_MESSAGE_FROM_SYSTEM | 
 					FORMAT_MESSAGE_IGNORE_INSERTS,
-					NULL,
+					nullptr,
 					GetLastError(),
 					MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
 					(LPTSTR) &lpMsgBuf,
 					0,
-					NULL);
+					nullptr);
 
 	// Display the string
 	Write_Debug((char*)lpMsgBuf);
@@ -279,18 +279,18 @@ static BOOL ParseExtensions(const char *tp, PLAY_OGL_EXTENSIONS *ext)
 	// We don't know for a fact that 'tp' is writable. So lets assume it
 	// isn't, and take a copy of it
 	tpCopy = _strdup(tp);
-	if ( tpCopy == NULL )
+	if ( tpCopy == nullptr )
 	{
 		Write_Debug("Unable to allocate copy of the token string");
 		return FALSE;
 	}
 
-	char* context = NULL;
+	char* context = nullptr;
 	for (token = strtok_s( tpCopy, " ", &context );
-		token != NULL;
-		token = strtok_s( NULL, " ", &context ))
+		token != nullptr;
+		token = strtok_s( nullptr, " ", &context ))
 	{
-		for (i=0; ogl_extension[i].pflag != NULL; i++)
+		for (i=0; ogl_extension[i].pflag != nullptr; i++)
 		{
 			if (strcmp(ogl_extension[i].name, token) == 0)
 			{
@@ -408,7 +408,7 @@ int			numcomps, *comps;
 
 	// Extract data from OpenGL
 	tp = (char*)glGetString(GL_VENDOR);
-	if (tp != NULL)
+	if (tp != nullptr)
 	{
 		strncpy(info->vendor, tp, MAX_OGL_VENDOR_NAME);
 		Write_Debug("Vendor:    %s", tp);
@@ -420,7 +420,7 @@ int			numcomps, *comps;
 	info->oglVersion = 0;
 
 	tp = (char*)glGetString(GL_VERSION);
-	if (tp != NULL)
+	if (tp != nullptr)
 	{
 		info->oglVersion = ConvertVersion(tp);
 		Write_Debug("Version:   %s [%u]", tp, info->oglVersion);
@@ -433,7 +433,7 @@ int			numcomps, *comps;
 
 
 	tp = (char*)glGetString(GL_RENDERER);
-	if (tp != NULL)
+	if (tp != nullptr)
 	{
 		Write_Debug("Renderer:  %s", tp);
 		info->cardName[MAX_OGL_CARD_NAME] = 0;
@@ -441,7 +441,7 @@ int			numcomps, *comps;
 	}
 
 	tp = (char*)glGetString(GL_EXTENSIONS);
-	if (tp != NULL)
+	if (tp != nullptr)
 	{
 		if (!ParseExtensions(tp, &info->extension))
 		{
@@ -568,15 +568,15 @@ BOOL oglBegin(HWND hwnd, PIXEL_FORMAT_DESC *pixinfo)
 PIXELFORMATDESCRIPTOR	pfd;
 
 	// Already begun
-	if (myhrc != NULL)
+	if (myhrc != nullptr)
 	{
 		return(TRUE);
 	}
 
-	if (myhdc == NULL)
+	if (myhdc == nullptr)
 	{
 		myhdc = GetDC(hwnd);
-		if (myhdc == NULL)
+		if (myhdc == nullptr)
 		{
 			Write_Debug("Failed to GetDC");
 			return(FALSE);
@@ -587,18 +587,18 @@ PIXELFORMATDESCRIPTOR	pfd;
 	if (!ddpChooseScreenFormat(myhdc, &pfd, pixinfo))
 	{
 		ReleaseDC(hwnd, myhdc);
-		myhdc = NULL;
+		myhdc = nullptr;
 		return(FALSE);
 	}
 
 	// Create the rendering context
 	myhrc = wglCreateContext(myhdc);
-	if (myhrc == NULL)
+	if (myhrc == nullptr)
 	{
 		DisplayLastError();
 		Write_Debug("Could not create the rendering context");
 		ReleaseDC(hwnd, myhdc);
-		myhdc = NULL;
+		myhdc = nullptr;
 		return(FALSE);
 	}
 
@@ -607,7 +607,7 @@ PIXELFORMATDESCRIPTOR	pfd;
 	{
 		Write_Debug("Could not make the rendering context current");
 		ReleaseDC(hwnd, myhdc);
-		myhdc = NULL;
+		myhdc = nullptr;
 		return(FALSE);
 	}
 
@@ -618,15 +618,15 @@ void oglEnd(void)
 {
 	if (myhdc && myhrc)
 	{
-		wglMakeCurrent(myhdc, NULL);
+		wglMakeCurrent(myhdc, nullptr);
 		wglDeleteContext(myhrc);
-		myhrc = NULL;
+		myhrc = nullptr;
 	}
 
 	if (myhdc)
 	{
 		ReleaseDC(myhwnd, myhdc);
-		myhdc = NULL;
+		myhdc = nullptr;
 	}
 }
 
@@ -636,7 +636,7 @@ void	Write_Debug(char *str, ...)
 char		buf[2048];
 va_list		marker;
 
-	if (str == NULL)
+	if (str == nullptr)
 		return;
 
 	va_start(marker, str);

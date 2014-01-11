@@ -103,12 +103,12 @@ dSpaceID colliderForPosition(FLOAT64VECTOR const& pos)
 dSpaceID colliderForPosition(Vec3d const& pos)
 {
 	if(_isnan(pos.x()) || _isnan(pos.y()))
-		return NULL;
+		return nullptr;
 
 	int sx = (int)(pos.x()/SDM_SUPERCELL_SIZE);
 	int sy = (int)(pos.y()/SDM_SUPERCELL_SIZE);
 
-	dSpaceID space = NULL;
+	dSpaceID space = nullptr;
 
 	// supercell 0,0 is considered scenario space now
 	if(false && !sx && !sy)

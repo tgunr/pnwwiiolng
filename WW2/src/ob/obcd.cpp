@@ -293,9 +293,9 @@ static int        number=0;
 	}
 
 	objects = (OBJECT*)lplist->next;
-	for (lpobj=objects; lpobj != NULL; lpobj=(OBJECT*)lpobj->next)
+	for (lpobj=objects; lpobj != nullptr; lpobj=(OBJECT*)lpobj->next)
 	{
-		if (object != NULL && lpobj != object)
+		if (object != nullptr && lpobj != object)
 		{
 			continue;
 		}

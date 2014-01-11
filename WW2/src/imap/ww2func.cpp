@@ -276,7 +276,7 @@ static const functionEntry functionTable[] =
 	{IMAP_NO_FUNCTION,"",0,0,0,-1}, // end
 };
 
-static void (*localized_string) (const char*, int, char*, int) = NULL;
+static void (*localized_string) (const char*, int, char*, int) = nullptr;
 
 static int get_function_index_from_name(const char* language, const char* name);
 static int get_function_index_from_code(unsigned int functionCode);
@@ -292,7 +292,7 @@ void ww2funcName(unsigned int functionCode, char* name, int maxlen)
 	name[0] = '\0';
 
 	if(i > -1)
-		localized_string(NULL, functionTable[i].locID, name, maxlen);
+		localized_string(nullptr, functionTable[i].locID, name, maxlen);
 }
 
 const char* ww2GetFuncName(unsigned int functionCode)

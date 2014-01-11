@@ -61,7 +61,7 @@ piSURFACEDESC	pisd;
 PCXHEADER*		pfh;
 void*  bits, *inbits;
 int   stream;
-    TEXTURE* t = NULL;
+    TEXTURE* t = nullptr;
 
 	stream = fioOpen(Filename);
 	if (stream == -1)
@@ -72,7 +72,7 @@ int   stream;
 	length = fioSeek(stream, 0, fioSEEK_END);
 	fioSeek(stream, 0, fioSEEK_SET);
 	pfh = (PCXHEADER*)memAlloc(length);
-	if (pfh == NULL)
+	if (pfh == nullptr)
 	{
 		fioClose(stream);
 		return(-1);

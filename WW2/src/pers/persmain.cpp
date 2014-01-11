@@ -230,8 +230,8 @@ static FLOAT32 _VehicleG;
 static persPersona _Persona;
 static UINT32 _UseGyroStabilizedEyes = 0;
 UINT32 _CameraMode;
-static ExternalCameraAdjust _ExternalCameraAdjuster = NULL;
-static ExternalCameraPivot _ExternalCameraPivot = NULL;
+static ExternalCameraAdjust _ExternalCameraAdjuster = nullptr;
+static ExternalCameraPivot _ExternalCameraPivot = nullptr;
 
 static UINT32 _ExternalViewMode;
 static UINT32 _InternalViewMode;
@@ -366,7 +366,7 @@ UINT32 persInit(void)
 {
 	_ExternalFieldOfView = DEFAULT_EXTERN_FOV;
 
-	_GenericHead = NULL;
+	_GenericHead = nullptr;
 
 	persmsgInit();
 	persrankLoad("ranklist.xml", (xmlInputOpenCallback)fioOpen, (xmlInputReadCallback)fioRead, (xmlInputCloseCallback)fioClose);
@@ -421,7 +421,7 @@ UINT32 persInit(void)
 
 		if(!pgm)
 		{
-			pgm = GLSL.loadProgram("basiccolor", NULL, NULL);
+			pgm = GLSL.loadProgram("basiccolor", nullptr, nullptr);
 
 			pgm->AddShader(GLSL.loadVertexShader("fx/shaders/GLSL+/draw/basiccolor.vert").get());
 			pgm->AddShader(GLSL.loadFragmentShader("fx/shaders/GLSL+/draw/basiccolor.frag").get());
@@ -444,10 +444,10 @@ UINT32 persKill(void)
 {
 	persmsgKill();
 
-	if (_GenericHead != NULL)
+	if (_GenericHead != nullptr)
 	{
 		ogrpFreeObjectTree(_GenericHead);
-		_GenericHead = NULL;
+		_GenericHead = nullptr;
 	}
 
 	return 0;
@@ -456,13 +456,13 @@ UINT32 persKill(void)
 UINT32 persUpdate(void)
 {
 	// update the player's vehicle controls (hack for now)
-	if (_Persona.VehicleAttached != NULL)
+	if (_Persona.VehicleAttached != nullptr)
 	{
-		if (_Persona.VehicleAttached->ModelData != NULL)
+		if (_Persona.VehicleAttached->ModelData != nullptr)
 		{
-			if (_Persona.VehicleAttached->VehicleObjectData != NULL)
+			if (_Persona.VehicleAttached->VehicleObjectData != nullptr)
 			{
-				if (_Persona.VehicleAttached->VehicleObjectData->PlaneObject != NULL)
+				if (_Persona.VehicleAttached->VehicleObjectData->PlaneObject != nullptr)
 				{
 					if(_Persona.VehicleAttached->VehicleType->Type != VEH_TYPE_FLOATER)
 					{
@@ -515,9 +515,9 @@ UINT32 persUpdate(void)
 
 	_UpdatePersonaSounds();
 
-	if (_Persona.VehicleAttached != NULL)
+	if (_Persona.VehicleAttached != nullptr)
 	{
-		if (_Persona.VehicleAttached->VehicleType != NULL)
+		if (_Persona.VehicleAttached->VehicleType != nullptr)
 		{
 			if (_Persona.VehicleAttached->VehicleType->BombSightPosition != 0)
 			{
@@ -564,7 +564,7 @@ UINT32 persUpdate(void)
 
 	if(_exitTime && frametime >= _exitTime)
 	{
-		if(uiViewport()->FindView("exitvehicle") == NULL)
+		if(uiViewport()->FindView("exitvehicle") == nullptr)
 		{
 			if(SCEN_MGR->IsActive())
 				uiLoadView("scenarios/exitvehicle");
@@ -593,13 +593,13 @@ static UINT32 _UpdateCockpitCameraPos(void)
 {
 piVECTOR Pos;
 
-	if (_Persona.VehicleAttached == NULL)
+	if (_Persona.VehicleAttached == nullptr)
 	{
 		_Persona.CockpitCameraPos.x = _Persona.CockpitCameraPos.y = _Persona.CockpitCameraPos.z = 0;
 		return 0;
 	}
 
-	if (_Persona.VehicleAttached->ModelData == NULL)
+	if (_Persona.VehicleAttached->ModelData == nullptr)
 	{
 		_Persona.CockpitCameraPos.x = _Persona.CockpitCameraPos.y = _Persona.CockpitCameraPos.z = 0;
 		return 0;
@@ -611,7 +611,7 @@ piVECTOR Pos;
 	_Persona.CockpitCameraPos.y = (FLOAT32)-_Persona.VehicleAttached->ModelData->RenderPos.y;
 	_Persona.CockpitCameraPos.z = (FLOAT32)_Persona.VehicleAttached->ModelData->RenderPos.z;
 
-	if (_Persona.PersonaEyeDOF != NULL)
+	if (_Persona.PersonaEyeDOF != nullptr)
 	{
 		// get the basic position
 		Pos.x = _Persona.PersonaEyeDOF->dof->dofmatrix2._41;
@@ -727,18 +727,18 @@ UINT32 persAttachPlayerToVehicle(vehVehicle* Vehicle,UINT32 Position)
 
 	_Persona.VehicleAttached = Vehicle;
 
-	if (Vehicle == NULL)
+	if (Vehicle == nullptr)
 	{
 		return 0;
 	}
 
 
-	if (Vehicle->VehicleObjectData == NULL)
+	if (Vehicle->VehicleObjectData == nullptr)
 	{
 		return 0;
 	}
 
-	if (Vehicle->VehicleObjectData->PlaneObject == NULL)
+	if (Vehicle->VehicleObjectData->PlaneObject == nullptr)
 	{
 		return 0;
 	}
@@ -771,30 +771,30 @@ UINT32 persAttachPlayerToVehicle(vehVehicle* Vehicle,UINT32 Position)
 	}
 	else
 	{
-		_Persona.PersonaObject = NULL;
+		_Persona.PersonaObject = nullptr;
 	}
 
-	if (Object != NULL)
+	if (Object != nullptr)
 	{
 		ogrpFindSubObjectByDOFVar(&Object,Object,ML_DOF_ELEMENT_BODY);
 		_Persona.PersonaBodyDOF = Object;
 	}
 	else
 	{
-		_Persona.PersonaBodyDOF = NULL;
+		_Persona.PersonaBodyDOF = nullptr;
 	}
 
-	if (Object != NULL)
+	if (Object != nullptr)
 	{
 		ogrpFindSubObjectByDOFVar(&Object,Object,ML_DOF_ELEMENT_HEAD);
 		_Persona.PersonaHeadDOF = Object;
 	}
 	else
 	{
-		_Persona.PersonaHeadDOF = NULL;
+		_Persona.PersonaHeadDOF = nullptr;
 	}
 
-	if (Object != NULL)
+	if (Object != nullptr)
 	{
 		ogrpFindSubObjectByDOFVar(&Object,Object,ML_DOF_ELEMENT_EYE);
 		_Persona.PersonaEyeDOF = Object;
@@ -803,19 +803,19 @@ UINT32 persAttachPlayerToVehicle(vehVehicle* Vehicle,UINT32 Position)
 	}
 	else
 	{
-		_Persona.PersonaEyeDOF = NULL;
+		_Persona.PersonaEyeDOF = nullptr;
 	}
 	_Persona.PersonaEye = _Persona.PersonaEyeDOF;
 	// get the instrument view, if it exists for the position
 	sprintf((char*)s,"iview%d",Position+1);
-	Object = NULL;
-	_Persona.InstrumentViewDOF = NULL;
+	Object = nullptr;
+	_Persona.InstrumentViewDOF = nullptr;
 	ogrpFindSubObjectByName(&Object,Vehicle->VehicleObjectData->PlaneObject,(char*)s);
-	if (Object != NULL)
+	if (Object != nullptr)
 	{
 		if (Object->flags & OBJECT_DOF)
 		{
-			if (Object->dof != NULL && Object->comment != NULL)
+			if (Object->dof != nullptr && Object->comment != nullptr)
 			{
 				_Persona.InstrumentViewDOF = Object;
 
@@ -866,14 +866,14 @@ UINT32 persAttachPlayerToVehicle(vehVehicle* Vehicle,UINT32 Position)
 
 	// get the gunsight view, if it exists for the position
 	sprintf((char*)s,"gview%d",Position+1);
-	Object = NULL;
-	_Persona.GunsightViewDOF = NULL;
+	Object = nullptr;
+	_Persona.GunsightViewDOF = nullptr;
 	ogrpFindSubObjectByName(&Object,Vehicle->VehicleObjectData->PlaneObject,(char*)s);
-	if (Object != NULL)
+	if (Object != nullptr)
 	{
 		if (Object->flags & OBJECT_DOF)
 		{
-			if (Object->dof != NULL && Object->comment != NULL)
+			if (Object->dof != nullptr && Object->comment != nullptr)
 			{
 				_Persona.GunsightViewDOF = Object;
 
@@ -921,7 +921,7 @@ UINT32 persAttachPlayerToVehicle(vehVehicle* Vehicle,UINT32 Position)
 	}
 
 	// ensure we're in "inplane" mode
-	if (Vehicle->ModelData != NULL)
+	if (Vehicle->ModelData != nullptr)
 	{
 		mlObjectSetInplaneObject(Vehicle->VehicleObjectData->PlaneObject,_Persona.Position+1);
 	}
@@ -954,14 +954,14 @@ UINT32 persAttachPlayerToVehicle(vehVehicle* Vehicle,UINT32 Position)
 	else
 	{
 		persSetInternalCamera(1,0,0);
-		persSetExternalCameraAdjuster(NULL);
-		persSetExternalCameraPivot(NULL);
+		persSetExternalCameraAdjuster(nullptr);
+		persSetExternalCameraPivot(nullptr);
 	}
 	*/
 
 	persSetInternalCamera(1,0,0);
-	persSetExternalCameraAdjuster(NULL);
-	persSetExternalCameraPivot(NULL);
+	persSetExternalCameraAdjuster(nullptr);
+	persSetExternalCameraPivot(nullptr);
 
 	memset(&_ViewTarget, 0, sizeof(piVECTOR));
 	memset(&_ViewTargetMove, 0, sizeof(piVECTOR));
@@ -1001,7 +1001,7 @@ static UINT32 _SetGunsightToUserDraw(OBJECT * Object,UINT32 IncludeSibs)
 OBJECT * ObjSib;
 OBJECT * ObjAtt;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -1022,18 +1022,18 @@ OBJECT * ObjAtt;
 
 				ObjAtt = ObjAtt->attached;
 			}
-			while (ObjAtt != NULL);
+			while (ObjAtt != nullptr);
 		}
 
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_SetGunsightToUserDraw(ObjSib->child,1);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL && IncludeSibs == 1);
+	while (ObjSib != nullptr && IncludeSibs == 1);
 
 	return 0;
 }
@@ -1060,10 +1060,10 @@ LOGICAL persDrawGunsight(void)
 	if(_CameraMode != _INTERNAL_CAMERA)
         return FALSE;
 
-	if(_Persona.GunsightViewDOF == NULL)
+	if(_Persona.GunsightViewDOF == nullptr)
         return FALSE;
 
-	if(_Persona.VehicleAttached->ModelData == NULL)
+	if(_Persona.VehicleAttached->ModelData == nullptr)
 	    return FALSE;
 
 	if(_InternalViewMode == _INTERNAL_GUNSIGHT)
@@ -1104,12 +1104,12 @@ LOGICAL persDrawGunsight(void)
 	// so _DrawStats gets cleared
 	persPrepGunsightDraw();
 
-	if (_Persona.VehicleAttached == NULL)
+	if (_Persona.VehicleAttached == nullptr)
 	{
 		return 0;
 	}
 
-	if (_Persona.VehicleAttached->VehicleType == NULL)
+	if (_Persona.VehicleAttached->VehicleType == nullptr)
 	{
 		return 0;
 	}
@@ -1125,12 +1125,12 @@ LOGICAL persDrawGunsight(void)
 		return 0;
 	}
 
-	if (_Persona.GunsightViewDOF == NULL)
+	if (_Persona.GunsightViewDOF == nullptr)
 	{
 		return 0;
 	}
 
-	if (_Persona.VehicleAttached->ModelData == NULL)
+	if (_Persona.VehicleAttached->ModelData == nullptr)
 	{
 		return 0;
 	}
@@ -1298,7 +1298,7 @@ static LOGICAL _DrawGunsightTree(OBJECT * Object,SINT32 DoSibs)
 OBJECT * ObjSib;
 OBJECT * ObjAtt;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -1322,18 +1322,18 @@ OBJECT * ObjAtt;
 
 				ObjAtt = ObjAtt->attached;
 			}
-			while (ObjAtt != NULL);
+			while (ObjAtt != nullptr);
 		}
 
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_DrawGunsightTree(ObjSib->child,1);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL && DoSibs != 0);
+	while (ObjSib != nullptr && DoSibs != 0);
 
 
 	return 0;
@@ -1365,7 +1365,7 @@ UINT32 IsPersona;
 OBJECT * TempObj;
 
 	IsPersona = 0;
-	if (_Persona.VehicleAttached != NULL)
+	if (_Persona.VehicleAttached != nullptr)
 	{
 		if (_Persona.VehicleAttached->InUse != FALSE)
 		{
@@ -1376,13 +1376,13 @@ OBJECT * TempObj;
 		}
 	}
 
-	if (_Persona.PersonaEye != NULL)
+	if (_Persona.PersonaEye != nullptr)
 	{
 		// get basic look attitude
 		if (_InternalViewMode == _INTERNAL_INSTRUMENT && IsPersona == 0)
 		{
 			TempObj = _Persona.InstrumentViewDOF;
-			while (TempObj->flags & OBJECT_NOTOBJECT && TempObj->child != NULL)
+			while (TempObj->flags & OBJECT_NOTOBJECT && TempObj->child != nullptr)
 			{
 				TempObj = TempObj->child;
 			}
@@ -1394,7 +1394,7 @@ OBJECT * TempObj;
 		else if (_InternalViewMode == _INTERNAL_GUNSIGHT && IsPersona == 0)
 		{
 			TempObj = _Persona.GunsightViewDOF;
-			while (TempObj->flags & OBJECT_NOTOBJECT && TempObj->child != NULL)
+			while (TempObj->flags & OBJECT_NOTOBJECT && TempObj->child != nullptr)
 			{
 				TempObj = TempObj->child;
 			}
@@ -1409,7 +1409,7 @@ OBJECT * TempObj;
 
 			// since this is based on object center we need to move it to
 			// the eye point
-			if (_Persona.PersonaEyeDOF != NULL)
+			if (_Persona.PersonaEyeDOF != nullptr)
 			{
 				math3dMatrixMultiply(Mat,&(_Persona.PersonaEyeDOF->dof->dofmatrix2),Mat);
 			}
@@ -1424,9 +1424,9 @@ OBJECT * TempObj;
 		Pos->z = -Mat->_43;
 
 		Att->x = Att->y = Att->z = 0;
-		if (_Persona.VehicleAttached != NULL)
+		if (_Persona.VehicleAttached != nullptr)
 		{
-			if (_Persona.VehicleAttached->ModelData != NULL)
+			if (_Persona.VehicleAttached->ModelData != nullptr)
 			{
 				if (IsPersona == 1)
 				{
@@ -1468,11 +1468,11 @@ OBJECT * TempObj;
 		Att->x = Att->y = Att->z = 0;
 		Pos->x = Pos->y = Pos->z = 0;
 
-		if (_Persona.VehicleAttached != NULL)
+		if (_Persona.VehicleAttached != nullptr)
 		{
-			if (_Persona.VehicleAttached != NULL)
+			if (_Persona.VehicleAttached != nullptr)
 			{
-				if (_Persona.VehicleAttached->VehicleType != NULL)
+				if (_Persona.VehicleAttached->VehicleType != nullptr)
 				{
 					if (_Persona.VehicleAttached->VehicleType->Type == VEH_TYPE_PERSON)
 					{
@@ -1495,7 +1495,7 @@ OBJECT * TempObj;
 						Att->z = -Att->z;
 
 						// if we're sitting, we're slave to our vehicle
-						if (fpFPSIsTrooperSitting(NULL))
+						if (fpFPSIsTrooperSitting(nullptr))
 						{
 							Att->x = -Att->x;
 							Att->y = -Att->y;
@@ -1506,7 +1506,7 @@ OBJECT * TempObj;
 						Pos->z = -TempMat._43;
 
 					}
-					else if (_Persona.VehicleAttached->ModelData != NULL)
+					else if (_Persona.VehicleAttached->ModelData != nullptr)
 					{
 						// Eliminate zig-zag using double.
 						FLOAT64 px, py, pz;
@@ -1894,7 +1894,7 @@ piVECTOR ViewVec;
 static UINT32 _GetPlayerPos(piVECTOR * Pos,piMATRIX * AttMat)
 {
 	vehVehicle* VehicleData = persGetPersonaVehiclePtr();
-	if (VehicleData == NULL)
+	if (VehicleData == nullptr)
 	{
 		return 0;
 	}
@@ -1906,7 +1906,7 @@ static UINT32 _GetPlayerPos(piVECTOR * Pos,piMATRIX * AttMat)
 	trnGetWorldOriginOffset(&WorldOffsetOrigin);
 	WorldOffsetOrigin.z = -WorldOffsetOrigin.z;
 
-	if (VehicleData->ModelData != NULL)
+	if (VehicleData->ModelData != nullptr)
 	{
 		TempAtt.x = (FLOAT32)VehicleData->ModelData->RenderAtt.Pitch;
 		TempAtt.y = (FLOAT32)VehicleData->ModelData->RenderAtt.Roll;
@@ -1975,21 +1975,21 @@ FLOAT64 DeltaTime;
 piMATRIX Mat1;
 static SINT32 _LastCallTime;
 
-	if (_Persona.VehicleAttached == NULL)
+	if (_Persona.VehicleAttached == nullptr)
 	{
 		return 1;
 	}
 
-	if (_Persona.VehicleAttached->ModelData == NULL)
+	if (_Persona.VehicleAttached->ModelData == nullptr)
 	{
 		return 1;
 	}
-	if (_Persona.PersonaEyeDOF == NULL)
+	if (_Persona.PersonaEyeDOF == nullptr)
 	{
 		return 1;
 	}
 
-	if (_Persona.PersonaHeadDOF == NULL)
+	if (_Persona.PersonaHeadDOF == nullptr)
 	{
 		return 1;
 	}
@@ -2132,7 +2132,7 @@ vehVehicle* persGetPersonaVehiclePtr()
 
 vehVehicle* persGetPersonaPilotedOnlineVehicle()
 {
-	if(!Online) return NULL;
+	if(!Online) return nullptr;
 
 	vehVehicle* vehicle = _Persona.VehicleAttached;
 	if(
@@ -2144,7 +2144,7 @@ vehVehicle* persGetPersonaPilotedOnlineVehicle()
 		)
 		return vehicle;
 
-	return NULL;
+	return nullptr;
 }
 
 UINT32 persGetPersonaPosition(UINT32 * Position)
@@ -2168,9 +2168,9 @@ UINT32 persSetPersonaPositionCallback(SINT32 param,UINT32 id,UINT32 Detach)
 		return 0;
 	}
 
-	if (_Persona.VehicleAttached != NULL)
+	if (_Persona.VehicleAttached != nullptr)
 	{
-		if (_Persona.VehicleAttached->VehicleType != NULL)
+		if (_Persona.VehicleAttached->VehicleType != nullptr)
 		{
 			if (_Persona.VehicleAttached->VehicleType->Type == VEH_TYPE_PERSON)
 			{
@@ -2282,9 +2282,9 @@ OBJECT * TempObj;
 	}
 #endif
 
-	if (_Persona.VehicleAttached != NULL)
+	if (_Persona.VehicleAttached != nullptr)
 	{
-		if (_Persona.VehicleAttached->ModelData != NULL)
+		if (_Persona.VehicleAttached->ModelData != nullptr)
 		{
 			if (_Persona.VehicleAttached->ModelData->MultiCrewPos == 0)
 			{
@@ -2292,7 +2292,7 @@ OBJECT * TempObj;
 			}
 			else
 			{
-				if (_Persona.VehicleAttached->VehicleType != NULL)
+				if (_Persona.VehicleAttached->VehicleType != nullptr)
 				{
 					if (_Persona.VehicleAttached->VehicleType->MultiCrewPos[InPosition] !=
 							_Persona.VehicleAttached->ModelData->MultiCrewPos)
@@ -2318,7 +2318,7 @@ OBJECT * TempObj;
 	}
 
 	persAttachPlayerToVehicle(_Persona.VehicleAttached,Position);
-	if (_Persona.VehicleAttached == NULL)
+	if (_Persona.VehicleAttached == nullptr)
 	{
 		return 1;
 	}
@@ -2340,7 +2340,7 @@ OBJECT * TempObj;
 	}
 
 	// check if we don't have an eyepoint, if not, we force to position zero
-	if (_Persona.PersonaEyeDOF == NULL)
+	if (_Persona.PersonaEyeDOF == nullptr)
 	{
 		persAttachPlayerToVehicle(_Persona.VehicleAttached,LowPosition);
 		Position = LowPosition;
@@ -2356,19 +2356,19 @@ OBJECT * TempObj;
 
 		if (_Persona.VehicleAttached->VehicleType->GunsightAlignmentObj[Position][0] != 0)
 		{
-			TempObj = NULL;
+			TempObj = nullptr;
 			ogrpFindSubObjectByName(&TempObj,_Persona.VehicleAttached->VehicleObjectData->PlaneObject,
 						_Persona.VehicleAttached->VehicleType->GunsightAlignmentObj[Position]);
 
-			if (TempObj != NULL)
+			if (TempObj != nullptr)
 			{
 				ogrpFindSubObjectByDOFVarAndSubVar(&TempObj,TempObj,ML_DOF_CONNECT,0);
 
-				if (TempObj != NULL)
+				if (TempObj != nullptr)
 				{
 					ogrpFindSubObjectByDOFVar(&TempObj,TempObj,ML_DOF_FIREPOINT);
 
-					if (TempObj != NULL)
+					if (TempObj != nullptr)
 					{
 						persAlignGunsight(TempObj,_Persona.GunsightViewDOF,
 								_Persona.VehicleAttached->VehicleType->GunsightAlignmentRange[Position]);
@@ -2383,19 +2383,19 @@ OBJECT * TempObj;
 		persLoadInstGunsight(_Persona.VehicleAttached->VehicleType->InstGunsightFile[Position]);
 		if (_Persona.VehicleAttached->VehicleType->InstGunsightAlignmentObj[Position][0] != 0)
 		{
-			TempObj = NULL;
+			TempObj = nullptr;
 			ogrpFindSubObjectByName(&TempObj,_Persona.VehicleAttached->VehicleObjectData->PlaneObject,
 						_Persona.VehicleAttached->VehicleType->InstGunsightAlignmentObj[Position]);
 
-			if (TempObj != NULL)
+			if (TempObj != nullptr)
 			{
 				ogrpFindSubObjectByDOFVarAndSubVar(&TempObj,TempObj,ML_DOF_CONNECT,0);
 
-				if (TempObj != NULL)
+				if (TempObj != nullptr)
 				{
 					ogrpFindSubObjectByDOFVar(&TempObj,TempObj,ML_DOF_FIREPOINT);
 
-					if (TempObj != NULL)
+					if (TempObj != nullptr)
 					{
 						persAlignInstGunsight(TempObj,_Persona.InstrumentViewDOF,
 								_Persona.VehicleAttached->VehicleType->GunsightAlignmentRange[Position]);
@@ -2432,21 +2432,21 @@ UINT32 persResetPersonaSettings()
 
 OBJECT* persGetPersonaVehicleObjectDataPtr()
 {
-	if (_Persona.VehicleAttached != NULL && _Persona.VehicleAttached->VehicleObjectData != NULL)
+	if (_Persona.VehicleAttached != nullptr && _Persona.VehicleAttached->VehicleObjectData != nullptr)
 	{
 		return _Persona.VehicleAttached->VehicleObjectData->PlaneObject;
 	}
-	return NULL;
+	return nullptr;
 }
 
 mlVehicleData* persGetPersonaModelDataPtr()
 {
-	return (_Persona.VehicleAttached != NULL) ? _Persona.VehicleAttached->ModelData : NULL;
+	return (_Persona.VehicleAttached != nullptr) ? _Persona.VehicleAttached->ModelData : nullptr;
 }
 
 UINT32 persDetachFromVehicle(vehVehicle* Vehicle)
 {
-	if (_Persona.VehicleAttached == Vehicle && Vehicle != NULL)
+	if (_Persona.VehicleAttached == Vehicle && Vehicle != nullptr)
 	{
 		persDetachPersona();
 		persGunsightClearData();
@@ -2462,15 +2462,15 @@ UINT32 persDetachFromVehicle(vehVehicle* Vehicle)
 
 UINT32 persDetachPersona(void)
 {
-	_Persona.PersonaPosition = NULL;
-	_Persona.PersonaBodyDOF = NULL;
-	_Persona.PersonaHeadDOF = NULL;
-	_Persona.PersonaEye = NULL;
-	_Persona.PersonaEyeDOF = NULL;
+	_Persona.PersonaPosition = nullptr;
+	_Persona.PersonaBodyDOF = nullptr;
+	_Persona.PersonaHeadDOF = nullptr;
+	_Persona.PersonaEye = nullptr;
+	_Persona.PersonaEyeDOF = nullptr;
 	_Persona.Position = 0;
-	_Persona.VehicleAttached = NULL;
+	_Persona.VehicleAttached = nullptr;
 
-	persSetExternalCameraAdjuster(NULL);
+	persSetExternalCameraAdjuster(nullptr);
 	vehcntrlDisableAllControls();
 
 	return 0;
@@ -2478,7 +2478,7 @@ UINT32 persDetachPersona(void)
 
 UINT32 persToggleCamera()
 {
-	if (_Persona.VehicleAttached == NULL || _Persona.VehicleAttached->VehicleType == NULL)
+	if (_Persona.VehicleAttached == nullptr || _Persona.VehicleAttached->VehicleType == nullptr)
 		return 0;
 
 	if (_CameraMode == _INTERNAL_CAMERA)
@@ -2507,7 +2507,7 @@ UINT32 persToggleCamera()
 
 UINT32 persToggleInternalExternalViews(SINT32 Param, UINT32 Id, UINT32 Detach)
 {
-	if (_Persona.VehicleAttached == NULL || _Persona.VehicleAttached->VehicleType == NULL)
+	if (_Persona.VehicleAttached == nullptr || _Persona.VehicleAttached->VehicleType == nullptr)
 		return 0;
 
 #ifndef BETA_RELEASE
@@ -2538,11 +2538,11 @@ FLOAT32	horizon;
 	piSetFieldOfView(_ExternalFieldOfView, 1.0f, horizon);
 	trnUpdateTerrainObjectLODs(1);
 
-	if (_Persona.VehicleAttached != NULL)
+	if (_Persona.VehicleAttached != nullptr)
 	{
-		if (_Persona.VehicleAttached->VehicleObjectData != NULL)
+		if (_Persona.VehicleAttached->VehicleObjectData != nullptr)
 		{
-			if (_Persona.VehicleAttached->VehicleObjectData->PlaneObject != NULL)
+			if (_Persona.VehicleAttached->VehicleObjectData->PlaneObject != nullptr)
 			{
 
 				// note: this is a hack to hide close-in problems
@@ -2595,7 +2595,7 @@ void persSetExternalCameraPos(FLOAT32 horAxis, FLOAT32 verAxis, FLOAT32 zoom, bo
 
 	// disable any current camera pans
 	persSetExternalCameraTarget(0.0f, 0.0f, 0.0f, 0.0f);
-	persSetExternalCameraPivot(NULL);
+	persSetExternalCameraPivot(nullptr);
 
 	// let the UI know we did it
 	TUT_MGR->DoEvent(TUT_EVENT_CAMERA);
@@ -2642,11 +2642,11 @@ FLOAT32	horizon;
 
 	_CameraMode = _INTERNAL_CAMERA;
 
-	if (_Persona.VehicleAttached != NULL)
+	if (_Persona.VehicleAttached != nullptr)
 	{
-		if (_Persona.VehicleAttached->VehicleObjectData != NULL)
+		if (_Persona.VehicleAttached->VehicleObjectData != nullptr)
 		{
-			if (_Persona.VehicleAttached->VehicleObjectData->PlaneObject != NULL)
+			if (_Persona.VehicleAttached->VehicleObjectData->PlaneObject != nullptr)
 			{
 				// note: this is a hack to hide close-in problems
 				if (_Persona.VehicleAttached->VehicleObjectData->PlaneObject->flag2 & OBJECT_ANIMATION)
@@ -3121,7 +3121,7 @@ bool _tpsCamera(piVECTOR* pos, piVECTOR* aim)
 
 UINT32 persSetExternalLockedCamera(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
-	persSetExternalCameraAdjuster(NULL);
+	persSetExternalCameraAdjuster(nullptr);
 	_ExternalViewMode = _EXTERNAL_LOCKED;
 	return 0;
 }
@@ -3149,7 +3149,7 @@ UINT32 persSetExternalRubberBandCamera(SINT32 Param,UINT32 Id,UINT32 Detach)
 
 UINT32 persSetExternalFixedCamera(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
-	persSetExternalCameraAdjuster(NULL);
+	persSetExternalCameraAdjuster(nullptr);
 	_ExternalViewMode = _EXTERNAL_FIXED;
 	if (_CameraNeverSet == 0)
 	{
@@ -3239,27 +3239,27 @@ UINT32 persGetPlayerVelocity(piVECTOR * Vel)
 	Vel->x = Vel->y = Vel->z = 0.0;
 
 	vehVehicle* Vehicle = persGetPersonaVehiclePtr();
-	if (Vehicle == NULL)
+	if (Vehicle == nullptr)
 	{
 		return 1;
 	}
-	if (Vehicle->VehicleObjectData == NULL)
+	if (Vehicle->VehicleObjectData == nullptr)
 	{
 		return 1;
 	}
 
 	OBJECT* Object = Vehicle->VehicleObjectData->HitMap;
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		Object = Vehicle->VehicleObjectData->PlaneObject;
 	}
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
 
-	while (Object->child != NULL)
+	while (Object->child != nullptr)
 	{
 		Object = Object->child;
 	}
@@ -3295,9 +3295,9 @@ FLOAT32		fov;
 	fov = _InternalFieldOfView;
 
 	vehVehicle* vehicle = persGetPersonaVehiclePtr();
-	if (vehicle != NULL)
+	if (vehicle != nullptr)
 	{
-		if (vehicle->VehicleType != NULL)
+		if (vehicle->VehicleType != nullptr)
 		{
 			if (vehicle->VehicleType->Type == VEH_TYPE_PERSON)
 			{
@@ -3306,7 +3306,7 @@ FLOAT32		fov;
 		}
 	}
 
-	if (_Persona.PersonaEyeDOF == NULL)
+	if (_Persona.PersonaEyeDOF == nullptr)
 	{
 		piSetFieldOfView(fov, 0.1f, horizon);
 
@@ -3320,13 +3320,13 @@ FLOAT32		fov;
 	trnUpdateTerrainObjectLODs(1);
 
 	// hide scope gunsight
-	if (_Persona.GunsightViewDOF != NULL)
+	if (_Persona.GunsightViewDOF != nullptr)
 	{
 		obmainClearFlagsInThisTree(_Persona.GunsightViewDOF, OBJECT_VISIBLE);
 		obAdjustObjectTreeVisListStatus(_Persona.GunsightViewDOF,0);
 	}
 	// hide instrument view gunsight
-	if (_Persona.InstrumentViewDOF != NULL)
+	if (_Persona.InstrumentViewDOF != nullptr)
 	{
 		obmainClearFlagsInThisTree(_Persona.InstrumentViewDOF, OBJECT_VISIBLE);
 		obAdjustObjectTreeVisListStatus(_Persona.InstrumentViewDOF,0);
@@ -3348,7 +3348,7 @@ FLOAT32 FOV;
 		return 0;
 	}
 
-	if (_Persona.InstrumentViewDOF == NULL)
+	if (_Persona.InstrumentViewDOF == nullptr)
 	{
 		return 0;
 	}
@@ -3374,13 +3374,13 @@ FLOAT32 FOV;
 	trnUpdateTerrainObjectLODs(1);
 
 	// hide scope gunsight
-	if (_Persona.GunsightViewDOF != NULL)
+	if (_Persona.GunsightViewDOF != nullptr)
 	{
 		obmainClearFlagsInThisTree(_Persona.GunsightViewDOF, OBJECT_VISIBLE);
 		obAdjustObjectTreeVisListStatus(_Persona.GunsightViewDOF,0);
 	}
 	// show scope instrument view
-	if (_Persona.InstrumentViewDOF != NULL)
+	if (_Persona.InstrumentViewDOF != nullptr)
 	{
 		obmainSetFlagsInThisTree(_Persona.InstrumentViewDOF, OBJECT_VISIBLE);
 		obAdjustObjectTreeVisListStatus(_Persona.InstrumentViewDOF,0);
@@ -3402,7 +3402,7 @@ FLOAT32 FOV;
 		return 0;
 	}
 
-	if (_Persona.GunsightViewDOF == NULL)
+	if (_Persona.GunsightViewDOF == nullptr)
 	{
 		return 0;
 	}
@@ -3427,13 +3427,13 @@ FLOAT32 FOV;
 	trnUpdateTerrainObjectLODs(1);
 
 	// show scope gunsight
-	if (_Persona.GunsightViewDOF != NULL)
+	if (_Persona.GunsightViewDOF != nullptr)
 	{
 		obmainSetFlagsInThisTree(_Persona.GunsightViewDOF, OBJECT_VISIBLE);
 		obAdjustObjectTreeVisListStatus(_Persona.GunsightViewDOF,0);
 	}
 	// hide scope instrument view
-	if (_Persona.InstrumentViewDOF != NULL)
+	if (_Persona.InstrumentViewDOF != nullptr)
 	{
 		obmainClearFlagsInThisTree(_Persona.InstrumentViewDOF, OBJECT_VISIBLE);
 		obAdjustObjectTreeVisListStatus(_Persona.InstrumentViewDOF,0);
@@ -3491,13 +3491,13 @@ UINT32 persResetVehicleG(void)
 
 UINT32 persSetVehicleG(FLOAT32 VehicleG, vehVehicle* Vehicle)
 {
-	if (Vehicle == _Persona.VehicleAttached && Vehicle != NULL)
+	if (Vehicle == _Persona.VehicleAttached && Vehicle != nullptr)
 	{
 		_VehicleG = VehicleG;
 
-		if (_Persona.VehicleAttached->ModelData != NULL)
+		if (_Persona.VehicleAttached->ModelData != nullptr)
 		{
-			if (_Persona.VehicleAttached->VehicleType != NULL)
+			if (_Persona.VehicleAttached->VehicleType != nullptr)
 			{
 				// if we're being towed, g is treated as 1g to keep bumpiness
 				// from killing the crew
@@ -3549,7 +3549,7 @@ static UINT32 _UpdatePersonaHealths(void)
 		FLOAT32 brainOxyLevel = Health.BrainOxyLevel.Get();	// Covert access
 
 		// brain & brain oxy
-		if(_Persona.VehicleAttached != NULL)
+		if(_Persona.VehicleAttached != nullptr)
 		{
 			if(brainOxyLevel > _BRAIN_NOMORE_CONTROL)
 				Delta = 1.0f - ((1.0f - Health.BloodCurrentLevel) * 2.0f - 1.0f); // hack to prevent g death
@@ -3628,8 +3628,8 @@ static UINT32 _UpdatePersonaHealths(void)
 
 		// fatigue
 		IsFPS = FALSE;
-		if (_Persona.VehicleAttached != NULL && _Persona.VehicleAttached->VehicleObjectData != NULL &&
-			_Persona.VehicleAttached->VehicleObjectData->PlaneObject != NULL &&
+		if (_Persona.VehicleAttached != nullptr && _Persona.VehicleAttached->VehicleObjectData != nullptr &&
+			_Persona.VehicleAttached->VehicleObjectData->PlaneObject != nullptr &&
 			_Persona.VehicleAttached->VehicleObjectData->PlaneObject->flag2 & OBJECT_ANIMATION)
 		{
 			IsFPS = TRUE;
@@ -3846,9 +3846,9 @@ static UINT32 _UpdatePersonaHealths(void)
 
 	// handle fps death
 	vehVehicle* Vehicle = persGetPersonaVehiclePtr();
-	if (Vehicle != NULL)
+	if (Vehicle != nullptr)
 	{
-		if (Vehicle->VehicleType != NULL)
+		if (Vehicle->VehicleType != nullptr)
 		{
 			if (Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
 			{
@@ -3875,19 +3875,19 @@ UINT32 persGetHealthStats(FLOAT32 * BrainOxy,
 						  FLOAT32 * BloodLevel)
 {
 
-	if (BrainOxy != NULL)
+	if (BrainOxy != nullptr)
 	{
 		*BrainOxy = (1.0f - _PersonaHealth[_Persona.Position].BrainOxyLevel);
 	}
-	if (ATPLevel != NULL)
+	if (ATPLevel != nullptr)
 	{
 		*ATPLevel = (1.0f - _PersonaHealth[_Persona.Position].ATPLevel);
 	}
-	if (BloodPressure != NULL)
+	if (BloodPressure != nullptr)
 	{
 		*BloodPressure = _PersonaHealth[_Persona.Position].BloodPressure;
 	}
-	if (BloodLevel != NULL)
+	if (BloodLevel != nullptr)
 	{
 		*BloodLevel = (1.0f - _PersonaHealth[_Persona.Position].BloodCurrentLevel);
 	}
@@ -3897,12 +3897,12 @@ UINT32 persGetHealthStats(FLOAT32 * BrainOxy,
 
 UINT32 persGetMaxBrainOxy(FLOAT32 * MaxBrainOxy, FLOAT32* BlackoutFullPercent)
 {
-	if (MaxBrainOxy != NULL)
+	if (MaxBrainOxy != nullptr)
 	{
 		*MaxBrainOxy = (1.0f - _PersonaHealth[_Persona.Position].BrainOxyMaxLevel);
 	}
 
-	if (BlackoutFullPercent != NULL)
+	if (BlackoutFullPercent != nullptr)
 	{
 		*BlackoutFullPercent = (1.0f - _BRAIN_BLACKOUT_FULL);
 	}
@@ -4023,7 +4023,7 @@ static UINT32 _DrawRedoutBlackoutNew(void)
 	FLOAT32 AlphaValue;
 	FLOAT32 SmokeLevel;
 
-	if (_Persona.VehicleAttached != NULL)
+	if (_Persona.VehicleAttached != nullptr)
 	{
 		SmokeLevel = _Persona.VehicleAttached->StateAnimation.CockpitSmokeLevel;
 
@@ -4063,8 +4063,8 @@ static UINT32 _DrawRedoutBlackoutNew(void)
 		Redout = _Persona.Redout;
 	}
 
-	if (_Persona.VehicleAttached != NULL && _Persona.VehicleAttached->VehicleObjectData != NULL &&
-		_Persona.VehicleAttached->VehicleObjectData->PlaneObject != NULL &&
+	if (_Persona.VehicleAttached != nullptr && _Persona.VehicleAttached->VehicleObjectData != nullptr &&
+		_Persona.VehicleAttached->VehicleObjectData->PlaneObject != nullptr &&
 		_Persona.VehicleAttached->VehicleObjectData->PlaneObject->flag2 & OBJECT_ANIMATION)
 	{
 		isFPS = TRUE;
@@ -4164,7 +4164,7 @@ static UINT32 _CheckUnderground(void)
 
 	// and, of course, disable visibility if the camera goes underground
 	// anything 10cm above the ground and below counts
-	if (_Persona.VehicleAttached != NULL && _Persona.VehicleAttached->ModelData != NULL &&
+	if (_Persona.VehicleAttached != nullptr && _Persona.VehicleAttached->ModelData != nullptr &&
 		(_Persona.VehicleAttached->VehicleType->Type != VEH_TYPE_FLOATER && !SuperFloat))
 	{
 		piVECTOR TempVec,TempVec2;
@@ -4212,7 +4212,7 @@ FLOAT32 Delta,SmokeLevel;
 	trnGetWorldOriginOffset(&WorldOriginOffset);
 
 	// cockpit smoke effect
-	if (_Persona.VehicleAttached != NULL)
+	if (_Persona.VehicleAttached != nullptr)
 	{
 		SmokeOpacity = 0.0f;
 
@@ -4297,9 +4297,9 @@ FLOAT32 Delta,SmokeLevel;
 			if (SmokeOpacity > 0.5f)
 			{
 				FXCreateNewParticle(&Pos,
-									NULL,
+									nullptr,
 									0.0f,
-									NULL,
+									nullptr,
 									(SmokeOpacity - 0.5f) / 0.5f,
 									0.0f,
 									0.0f,
@@ -4318,16 +4318,16 @@ FLOAT32 Delta,SmokeLevel;
 										PARTICLE_FLAG_INCOCKPIT_PARTICLE |
 										PARTICLE_FLAG_PRIORITY |
 										PARTICLE_FLAG_DISPLAY_FOR_ONE_FRAME,
-									NULL);
+									nullptr);
 
 				Pos.x += playdir.x * 0.001;
 				Pos.y += playdir.y * 0.001;
 				Pos.z += playdir.z * 0.001;
 
 				FXCreateNewParticle(&Pos,
-									NULL,
+									nullptr,
 									0.0f,
-									NULL,
+									nullptr,
 									SmokeOpacity,
 									0.0f,
 									0.0f,
@@ -4346,15 +4346,15 @@ FLOAT32 Delta,SmokeLevel;
 										PARTICLE_FLAG_INCOCKPIT_PARTICLE |
 										PARTICLE_FLAG_PRIORITY |
 										PARTICLE_FLAG_DISPLAY_FOR_ONE_FRAME,
-									NULL);
+									nullptr);
 
 			}
 			else
 			{
 				FXCreateNewParticle(&Pos,
-									NULL,
+									nullptr,
 									0.0f,
-									NULL,
+									nullptr,
 									SmokeOpacity,
 									0.0f,
 									0.0f,
@@ -4373,7 +4373,7 @@ FLOAT32 Delta,SmokeLevel;
 										PARTICLE_FLAG_INCOCKPIT_PARTICLE |
 										PARTICLE_FLAG_PRIORITY |
 										PARTICLE_FLAG_DISPLAY_FOR_ONE_FRAME,
-									NULL);
+									nullptr);
 			}
 			_Persona.VehicleAttached->StateAnimation.CockpitSmokeLevel = SmokeOpacity;
 		}
@@ -4386,11 +4386,11 @@ FLOAT32 Delta,SmokeLevel;
 
 UINT32 persGetControlStatus(FLOAT32 * StrengthControl, LOGICAL * ControlsDisabled)
 {
-	if (StrengthControl != NULL)
+	if (StrengthControl != nullptr)
 	{
 		*StrengthControl = _Persona.Strength;
 	}
-	if (ControlsDisabled != NULL)
+	if (ControlsDisabled != nullptr)
 	{
 		*ControlsDisabled = _Persona.ControlsDisabled;
 	}
@@ -4405,9 +4405,9 @@ FLOAT64VECTOR Acc;
 FLOAT64 AccVal;
 piVECTOR Att;
 
-	if (_Persona.PersonaBodyDOF == NULL ||
-		_Persona.VehicleAttached == NULL ||
-		_Persona.VehicleAttached->ModelData == NULL ||
+	if (_Persona.PersonaBodyDOF == nullptr ||
+		_Persona.VehicleAttached == nullptr ||
+		_Persona.VehicleAttached->ModelData == nullptr ||
 		_CameraMode == _EXTERNAL_CAMERA)
 	{
 		*RetMat = IdentityMatrix;
@@ -4622,11 +4622,11 @@ FLOAT32 Pitch;
 	if (_CameraMode == _INTERNAL_CAMERA)
 	{
 		PosNum = _Persona.Position;
-		if (_Persona.VehicleAttached == NULL)
+		if (_Persona.VehicleAttached == nullptr)
 		{
 			return 0;
 		}
-		if (_Persona.VehicleAttached->ModelData == NULL)
+		if (_Persona.VehicleAttached->ModelData == nullptr)
 		{
 			return 0;
 		}
@@ -4655,7 +4655,7 @@ FLOAT32 Pitch;
 	LOGICAL hit = FALSE;
 
 	// handle hit sounds
-	if (_Persona.VehicleAttached != NULL)
+	if (_Persona.VehicleAttached != nullptr)
 	{
 		for (i=0;i<MAX_DAMAGE_SOUND_QUE;i++)
 		{
@@ -4817,7 +4817,7 @@ UINT32 persAddHitSoundsForHitComponent(
 SINT32 i,j;
 FLOAT32 Damage;
 
-	if (HitMapObject == NULL)
+	if (HitMapObject == nullptr)
 	{
 		return 0;
 	}
@@ -4826,7 +4826,7 @@ FLOAT32 Damage;
 		return 0;
 	}
 
-	if (_Persona.VehicleAttached == NULL)
+	if (_Persona.VehicleAttached == nullptr)
 	{
 		return 0;
 	}
@@ -4939,7 +4939,7 @@ static UINT32 _UpdateDeathCam(void)
 	FLOAT32 TempNum;
 	FLOAT32 Delta;
 
-	if (_Persona.VehicleAttached == NULL) return 0;
+	if (_Persona.VehicleAttached == nullptr) return 0;
 
 
 	if (_CameraMode != _EXTERNAL_CAMERA)
@@ -4959,10 +4959,10 @@ static UINT32 _UpdateDeathCam(void)
 		_GetPlayerPos(&_CameraPos,&DummyMat);
 		_InDeathCam = 1;
 
-		if (_Persona.VehicleAttached != NULL)
+		if (_Persona.VehicleAttached != nullptr)
 		{
-			if (_Persona.VehicleAttached->VehicleType != NULL &&
-				_Persona.VehicleAttached->ModelData != NULL)
+			if (_Persona.VehicleAttached->VehicleType != nullptr &&
+				_Persona.VehicleAttached->ModelData != nullptr)
 
 			{
 				_CameraPos.x -= (FLOAT32)(_Persona.VehicleAttached->ModelData->VehicleRealVel.x * 1.5);
@@ -5025,10 +5025,10 @@ static UINT32 _UpdateDeathCam(void)
 	}
 
 	// adjust deathcam
-	if (_RotateDeathCam == TRUE && _Persona.VehicleAttached != NULL)
+	if (_RotateDeathCam == TRUE && _Persona.VehicleAttached != nullptr)
 	{
-		if (_Persona.VehicleAttached->ModelData != NULL &&
-			_Persona.VehicleAttached->VehicleType != NULL)
+		if (_Persona.VehicleAttached->ModelData != nullptr &&
+			_Persona.VehicleAttached->VehicleType != nullptr)
 		{
 			_GetPlayerPos(&_CameraPos,&DummyMat);
 			Delta = (frametime - _Persona.VehicleAttached->VehicleDeadTime) / 1000.0f;
@@ -5079,7 +5079,7 @@ int _DoResupplyCheck(void)
 	_resupplyCheck = frametime + 1000;
 
 	// no vehicle, no resupply
-	if(_Persona.VehicleAttached == NULL || _Persona.VehicleAttached->ModelData == NULL)
+	if(_Persona.VehicleAttached == nullptr || _Persona.VehicleAttached->ModelData == nullptr)
 		return GAMEEVENT_RESUPPLY_NA;
 
 	// can't be dead
@@ -5147,7 +5147,7 @@ static bool _findResupplyFRU(ServerTrackedObject& sto, void* cookie)
 
 UINT32 _DoGroundResupplyCheck(void)
 {
-	static vehVehicle* VehicleResupplier = NULL;
+	static vehVehicle* VehicleResupplier = nullptr;
 
 	static FLOAT64VECTOR supplierPos	= {0,0,0}; // my supplier's position
 	static FLOAT64VECTOR playerPos		= {0,0,0}; // my position
@@ -5159,7 +5159,7 @@ UINT32 _DoGroundResupplyCheck(void)
 	// from the vehicle list, no need to validate it again
 	bool confirmedValid = false;
 
-	if(VehicleResupplier == NULL)
+	if(VehicleResupplier == nullptr)
 	{
 		// we don't have a resupplier, try to find a new one
 		vehVehicle*VehicleHead, *CurrentVehicle;
@@ -5196,7 +5196,7 @@ UINT32 _DoGroundResupplyCheck(void)
 			if(VehicleResupplier)
 				_resupplyBreak = frametime + _resupplyPause;
 
-			VehicleResupplier = NULL;
+			VehicleResupplier = nullptr;
 
 			// resupplying not available
 			return GAMEEVENT_RESUPPLY_NA;
@@ -5274,7 +5274,7 @@ UINT32 _DoGroundResupplyCheck(void)
 			else
 			{
 				// we must be full; lets reset
-				VehicleResupplier = NULL;
+				VehicleResupplier = nullptr;
 
 				// reset the supply positions
 				POS_RESET(supplierPos);
@@ -5292,10 +5292,10 @@ UINT32 _DoGroundResupplyCheck(void)
 
 UINT32 _DoStaticResupplyCheck(void)
 {
-	static StratDB::StratObject* CurrentResupplier = NULL;
+	static StratDB::StratObject* CurrentResupplier = nullptr;
 
 	// we have to look for any resupply buildings that are near us
-	if(CurrentResupplier == NULL)
+	if(CurrentResupplier == nullptr)
 		CurrentResupplier = _LookupResupplyBuilding();
 
 	// is the resupply building valid
@@ -5306,7 +5306,7 @@ UINT32 _DoStaticResupplyCheck(void)
 		if(CurrentResupplier)
 			_resupplyBreak = frametime + _resupplyPause;
 
-		CurrentResupplier = NULL;
+		CurrentResupplier = nullptr;
 
 		// resupplying not available
 		return GAMEEVENT_RESUPPLY_NA;
@@ -5363,7 +5363,7 @@ UINT32 _DoStaticResupplyCheck(void)
 				else
 				{
 					// we must be full; lets reset
-					CurrentResupplier = NULL;
+					CurrentResupplier = nullptr;
 
 					// make em wait the delay length
 					_resupplyBreak = frametime + _resupplyPause;
@@ -5509,19 +5509,19 @@ StratDB::StratObject* _LookupResupplyBuilding()
 
 	// must be same side as me
 	if(!cp || cp->Side() != _Persona.VehicleAttached->Side)
-		return NULL;
+		return nullptr;
 
 	// cp can't be contested
 	if(cp->StratFlags() & CP_STAT_CONTENTION)
-		return NULL;
+		return nullptr;
 
 	// bail out early if the flags indicate a failure
 	if(vehType == VEH_TYPE_AIR && !(cp->StratFlags() & CP_STAT_HAS_AIRBASE))
-		return NULL;
+		return nullptr;
 	else if(vehType == VEH_TYPE_SEA && !(cp->StratFlags() & CP_STAT_HAS_NAVYBASE))
-		return NULL;
+		return nullptr;
 
-	StratDB::StratObject* closest	= NULL;
+	StratDB::StratObject* closest	= nullptr;
 	FLOAT64 lastDistance2			= 0;
 	FLOAT64VECTOR stratPos, diff;
 
@@ -5668,9 +5668,9 @@ void persKillCrew(void)
 	if(vehmainHasBailedOut())
 		return;
 
-	if (_Persona.VehicleAttached != NULL)
+	if (_Persona.VehicleAttached != nullptr)
 	{
-		if (_Persona.VehicleAttached->ModelData != NULL)
+		if (_Persona.VehicleAttached->ModelData != nullptr)
 		{
 			_Persona.VehicleAttached->ModelData->KillCrew = TRUE;
 		}
@@ -5816,13 +5816,13 @@ void persSetDeathCam(UINT32 mode)
 		persSetExternalCameraPos(GetRandom(-180.0f, 180.0f), (float)50.0f, (float)2.0f);
 
 		if(_ExternalCameraAdjuster)
-			_ExternalCameraAdjuster(NULL, NULL);
+			_ExternalCameraAdjuster(nullptr, nullptr);
 
 		if(mode == 1)
 		{
 			persSetExternalCameraPivot(fpTPSDeathPivot);
 			persSetExternalCameraTarget(1800.0f, 0.0f, 0.0f, 30.0f);
-			persSetExternalCameraAdjuster(NULL);
+			persSetExternalCameraAdjuster(nullptr);
 
 			//gr2AnimTrooper* anim = v->VehicleObjectData->PlaneObject->animModel;
 			//if(anim) anim->twist.Straighten(anim);
@@ -5830,7 +5830,7 @@ void persSetDeathCam(UINT32 mode)
 	}
 	else
 	{
-		bool hulked = (v != NULL && v->isHulked());
+		bool hulked = (v != nullptr && v->isHulked());
 
 		if(persIsPersonaVehicleType(VEH_TYPE_GROUND))
 		{
@@ -5840,12 +5840,12 @@ void persSetDeathCam(UINT32 mode)
 				persSetExternalCameraPos(GetRandom(-180.0f, 180.0f), 20.0f, (hulked) ? 20.0f: 8.0f);
 
 				if(_ExternalCameraAdjuster)
-					_ExternalCameraAdjuster(NULL, NULL);
+					_ExternalCameraAdjuster(nullptr, nullptr);
 			}
 			else
 			{
 				persSetExternalCameraPos(GetRandom(-180.0f, 180.0f), 20.0f, (hulked) ? 20.0f: 8.0f);
-				persSetExternalCameraAdjuster(NULL);
+				persSetExternalCameraAdjuster(nullptr);
 			}
 		}
 		else if(persIsPersonaVehicleType(VEH_TYPE_AIR))
@@ -5856,12 +5856,12 @@ void persSetDeathCam(UINT32 mode)
 				persSetExternalCameraPos(GetRandom(-180.0f, 180.0f), (float)50.0f, (float)2.0f);
 
 				if(_ExternalCameraAdjuster)
-					_ExternalCameraAdjuster(NULL, NULL);
+					_ExternalCameraAdjuster(nullptr, nullptr);
 			}
 			else
 			{
 				persSetExternalCameraPos(GetRandom(-180.0f, 180.0f), 20, 15);
-				persSetExternalCameraAdjuster(NULL);
+				persSetExternalCameraAdjuster(nullptr);
 			}
 		}
 		else if(persIsPersonaVehicleType(VEH_TYPE_SEA))
@@ -5925,12 +5925,12 @@ void persShakeCamera(FLOAT32 mag, SINT32 duration)
 //////////////////////////////////////////////////////////////////////
 LOGICAL persIsPersonaVehicleType(UINT32 uType)
 {
-	if(_Persona.VehicleAttached == NULL)
+	if(_Persona.VehicleAttached == nullptr)
 	{
 		return FALSE;
 	}
 
-	if(_Persona.VehicleAttached->VehicleType == NULL)
+	if(_Persona.VehicleAttached->VehicleType == nullptr)
 	{
 		return FALSE;
 	}

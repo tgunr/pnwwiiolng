@@ -13,7 +13,7 @@ class CPlaygateDlg : public CBDialog
 {
 // Construction
 public:
-	CPlaygateDlg(CWnd* pParent = NULL);	// standard constructor
+	CPlaygateDlg(CWnd* pParent = nullptr);	// standard constructor
 	virtual ~CPlaygateDlg();
 	virtual UINT TitleLocID() const { return SERVSEL_TITLE; }
 	virtual UINT OkLocID() const { return SERVSEL_OK; }

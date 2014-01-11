@@ -1158,8 +1158,8 @@ void CPMapObject::Over(SuperCellMapView* mv, int state)
 				tip += _renderer->tooltip("widgets.map.tooltip.units");
 				tip += L"\n";
 
-				HCUnit* unit			= NULL;
-				BrigadeControlList* oic	= NULL;
+				HCUnit* unit			= nullptr;
+				BrigadeControlList* oic	= nullptr;
 				unsigned int current	= 0;
 				bool foundMine			= false;
 

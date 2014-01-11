@@ -100,7 +100,7 @@ public:
             if(pgm)
                 return false;
 
-            pgm = GLSL.loadProgram(s, NULL, NULL);
+            pgm = GLSL.loadProgram(s, nullptr, nullptr);
         }
         else
         {
@@ -185,7 +185,7 @@ public:
         {
             struct _xmlAttr* prop = node->properties;
 
-            for(; prop != NULL; prop = prop->next)
+            for(; prop != nullptr; prop = prop->next)
             {
                 const char* p = (const char*)prop->children->content;
                 pgm->AddTransformFeedbackVarying(p);
@@ -199,7 +199,7 @@ public:
 	{
         if(first)
         {
-            const char* p = NULL;
+            const char* p = nullptr;
             std::string name;
             std::string type;
             bool onetimeapply = false;
@@ -368,7 +368,7 @@ struct LightUniforms
     glslUniform* ambient;
 };
 
-static glslUniform* globalambient = NULL;
+static glslUniform* globalambient = nullptr;
 
 #define max_lights  4
 static struct LightUniforms lightuniforms[max_lights];
@@ -550,7 +550,7 @@ Description:
 -------------------------------------------------------------------*/
 static inline void UpdateLightsDeprecated()
 {
-    DYNALITE* lights = NULL;
+    DYNALITE* lights = nullptr;
     int num = 0;
 
     num = obdliteGetLights(&lights);
@@ -598,7 +598,7 @@ Description:
 -------------------------------------------------------------------*/
 static inline void UpdateLights()
 {
-    DYNALITE* lights = NULL;
+    DYNALITE* lights = nullptr;
     int num = 0;
 
     num = obdliteGetLights(&lights);
@@ -768,7 +768,7 @@ Description:
 -------------------------------------------------------------------*/
 static inline void UpdateFog()
 {
-    static glslUniformBlock* fog = NULL;
+    static glslUniformBlock* fog = nullptr;
 
     if(!fog)
         fog = glslGetUniformBlock("FogBlock");
@@ -817,7 +817,7 @@ Description:
 -------------------------------------------------------------------*/
 void glslSetModelViewMatrix()
 {
-    static glslUniformBlock* u = NULL;
+    static glslUniformBlock* u = nullptr;
 
     if(!u)
         u = glslGetUniformBlock("MatrixBlock");
@@ -845,7 +845,7 @@ Description:
 -------------------------------------------------------------------*/
 void glslSetProjectionMatrix()
 {
-    static glslUniformBlock* u = NULL;
+    static glslUniformBlock* u = nullptr;
 
     if(!u)
         u = glslGetUniformBlock("MatrixBlock");
@@ -871,7 +871,7 @@ Description:
 -------------------------------------------------------------------*/
 void glslSetTextureMatrix(int unit, const Matrixf& mat)
 {
-    static glslUniformBlock* u = NULL;
+    static glslUniformBlock* u = nullptr;
 
     if(!u)
         u = glslGetUniformBlock("TextureMatrixBlock");
@@ -1073,7 +1073,7 @@ glslProgram* OpenGLShader::getProgram(const char* name)
         return _programs.find(name)->second.get();
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /*------------------------------------------------------------------

@@ -213,7 +213,7 @@ _openListen(const UINT32 ipAddress
 // installed.  returns the number of the teulIndex associated with this
 // connection acceptFnPtr is an optional ptr to callback function which is
 // called when a connection is made to the listening socket, and hence a new
-// connection is created.  pass NULL if you do not want this notification
+// connection is created.  pass nullptr if you do not want this notification
 SINT32 teulOpenListen(const UINT16 portNumber
 					, CONNECT_FUNCTION* acceptFnPtr
 					, const SINT32 timeout
@@ -240,7 +240,7 @@ SINT32 teulOpenListen(const UINT16 portNumber
 // Assumes that all callbacks have been properly installed.  returns -error_number or 0 on success.
 // connection acceptFnPtr is an optional ptr to callback function which is
 // called when a connection is made to the listening socket, and hence a new
-// connection is created.  pass NULL if you do not want this notification
+// connection is created.  pass nullptr if you do not want this notification
 bool teulOpenListenInterface(const UINT16 portNumber
 					, CONNECT_FUNCTION* acceptFnPtr
 					, const SINT32 timeout
@@ -274,7 +274,7 @@ bool teulOpenListenInterface(const UINT16 portNumber
 // installed.  returns the number of the teulIndex associated with this
 // connection acceptFnPtr is an optional ptr to callback function which is
 // called when a connection is made to the listening socket, and hence a new
-// connection is created.  pass NULL if you do not want this notification
+// connection is created.  pass nullptr if you do not want this notification
 SINT32 teulOpenListenHost(const UINT32 ipAddress
 					, const UINT16 portNumber
 					, CONNECT_FUNCTION* acceptFnPtr
@@ -326,7 +326,7 @@ teulMaskNetworkAddress(UINT32 address)
 // returns the number of the teulIndex associated with this connection.
 // connectFnPtr is an optional ptr to callback function which is called when
 // a connection is established to the destination socket, and hence a new connection
-// is created.  pass NULL if you do not want this notification
+// is created.  pass nullptr if you do not want this notification
 SINT32
 teulOpenSend(UINT32 host
 			, const UINT16 portNumber
@@ -543,7 +543,7 @@ teulSend(ENDPOINT& endpoint, TEUL_CALLBACK* const object, void* const data)
 {
 	if (PN_UNLIKELY(object == nullptr))
 	{
-		dbugLog(_FLA, "teulSend called with NULL callback");
+		dbugLog(_FLA, "teulSend called with nullptr callback");
 		return -EINVAL;
 	}
 
@@ -557,7 +557,7 @@ teulSend(SINT32 teulIndex, TEUL_CALLBACK* const object, void* const data)
 {
 	if (PN_UNLIKELY(object == nullptr))
 	{
-		dbugLog(_FLA, "teulSend called with NULL callback");
+		dbugLog(_FLA, "teulSend called with nullptr callback");
 		return -EINVAL;
 	}
 

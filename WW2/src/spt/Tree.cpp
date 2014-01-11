@@ -57,24 +57,24 @@ CTree::CTree()
 #if CHRISTMAS
       christmas(false),
 #endif
-      wind(NULL)
+      wind(nullptr)
 
 {
-    branchmaterialON = NULL;
-    branchmaterialOFF = NULL;
-    branchmaterial = NULL;
+    branchmaterialON = nullptr;
+    branchmaterialOFF = nullptr;
+    branchmaterial = nullptr;
 
-    leafmaterialON = NULL;
-    leafmaterialOFF = NULL;
-    leafmaterial = NULL;
+    leafmaterialON = nullptr;
+    leafmaterialOFF = nullptr;
+    leafmaterial = nullptr;
 
-    billboardmaterial = NULL;
-    billboardmaterialON = NULL;
-    billboardmaterialOFF = NULL;
+    billboardmaterial = nullptr;
+    billboardmaterialON = nullptr;
+    billboardmaterialOFF = nullptr;
 
-    horizbillboardmaterial = NULL;
-    horizbillboardmaterialON = NULL;
-    horizbillboardmaterialOFF = NULL;
+    horizbillboardmaterial = nullptr;
+    horizbillboardmaterialON = nullptr;
+    horizbillboardmaterialOFF = nullptr;
 
     if(!ogl::UseDeprecatedPath())
     {
@@ -233,7 +233,7 @@ bool CTree::LoadSPTFile(const char* filename,
     SetTreeSize(FT_TO_METER(treesize));
 #endif
 
-    if(!Compute(NULL, seed))
+    if(!Compute(nullptr, seed))
     {
         Write_Log(LOG_OLD, LOG_WARN, CSpeedTreeRT::GetCurrentError());
         return false;
@@ -2567,7 +2567,7 @@ Description:
 void CTree::SetAlphaRef(float alpharef, int type)
 {
 #if USE_STATESET
-    AlphaFunc* af = NULL;
+    AlphaFunc* af = nullptr;
 
     if(type == TREE_BRANCHES)
         af = dynamic_cast<AlphaFunc*>(branchmaterial->GetRenderState(RS_ALPHAFUNC));
@@ -2583,7 +2583,7 @@ void CTree::SetAlphaRef(float alpharef, int type)
     }
 #else
 
-    glslProgram* pgm = NULL;
+    glslProgram* pgm = nullptr;
 
     if(type == TREE_BRANCHES)
         pgm = branchmaterial->GetProgram();

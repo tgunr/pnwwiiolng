@@ -354,8 +354,8 @@ void ReadoutView::DisplayAircraftReadout()
 	float ail	= (float)_VehicleData->AileronTabPosition * 100;
 	float elev	= (float)_VehicleData->ElevatorTabPosition * 100;
 	float rud	= (float)_VehicleData->RudderTabPosition * 100;
-	const wchar_t* gearstate	= NULL;
-	const wchar_t* flapstate	= NULL;
+	const wchar_t* gearstate	= nullptr;
+	const wchar_t* flapstate	= nullptr;
 
 	// Localized Strings for use in displaying trim settings
 	const wchar_t* left		= uiLocString("hud.readout.left").c_str();
@@ -568,7 +568,7 @@ void ReadoutView::DisplayTorpedo()
 void ReadoutView::DisplayRiding()
 {
 	vehVehicle* PlayerVehicle = _VehicleData->VehicleMasterPtr;
-	if(PlayerVehicle->VehicleObjectData == NULL) return;
+	if(PlayerVehicle->VehicleObjectData == nullptr) return;
 
 	// display yourself
 	GetGraphicsContext()->SetColor(0,1,0);
@@ -888,7 +888,7 @@ SINT32 mlSetBombsightReadoutEnglish(FLOAT32 Alt, FLOAT32 TAS)
 	_ReadoutAlt = Alt * 3.281f + 0.5f;
 	swprintf(_ReadoutTAS, 63, L"TAS: %1.0fmph", TAS * 2.237f + 0.5f);
 
-	if (VehicleData != NULL)
+	if (VehicleData != nullptr)
 	{
 		mlGetAltDensity(&Density1,0);
 		mlGetAltDensity(&Density2,VehicleData->VehiclePos.z);
@@ -913,7 +913,7 @@ SINT32 mlSetBombsightReadoutMKS(FLOAT32 Alt, FLOAT32 TAS)
 	_ReadoutAlt = Alt;
 	swprintf(_ReadoutTAS, 63, L"TAS: %1.0fkph", TAS * 3.6f);
 
-	if (VehicleData != NULL)
+	if (VehicleData != nullptr)
 	{
 		mlGetAltDensity(&Density1,0);
 		mlGetAltDensity(&Density2,VehicleData->VehiclePos.z);
@@ -1042,7 +1042,7 @@ void ReadoutView::DisplayVehicleObjectAnalysis()
 
 
 #ifdef BETA_RELEASE
-	if (_VehicleData->VehicleMasterPtr->VehicleType != NULL && _HighlightHitmapObjectNum != 0)
+	if (_VehicleData->VehicleMasterPtr->VehicleType != nullptr && _HighlightHitmapObjectNum != 0)
 	{
 		DrawString("Highlighted Hitmap Obj: %s\n",
 					_VehicleData->VehicleMasterPtr->VehicleType->DamageObjects[_HighlightHitmapObjectNum-1]);

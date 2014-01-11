@@ -122,10 +122,10 @@ LOGICAL persBombsightKill(void)
 
 LOGICAL persClearBombsight(void)
 {
-	if (_Data != NULL)
+	if (_Data != nullptr)
 	{
 		memFree(_Data);
-		_Data = NULL;
+		_Data = nullptr;
 	}
 
 	_BombsightType = 0;
@@ -141,14 +141,14 @@ LOGICAL persBombsightSetup(SINT32 Type,SINT8* MountName, void*  InVehicleData)
 {
 mlVehicleData * VehicleData;
 
-	if (MountName == NULL || InVehicleData == NULL || Type == 0)
+	if (MountName == nullptr || InVehicleData == nullptr || Type == 0)
 	{
 		return FALSE;
 	}
 
 	VehicleData = (mlVehicleData*)InVehicleData;
 
-	if (VehicleData->ComponentList == NULL)
+	if (VehicleData->ComponentList == nullptr)
 	{
 		return FALSE;
 	}
@@ -230,19 +230,19 @@ FLOAT32 persBombsightAltitude()
 
 static LOGICAL _SetupBombsight(SINT8 * MountName, mlVehicleData * VehicleData, SINT32 type)
 {
-	BombSightData* BSD = NULL;
-	weapAmmoType * AmmoType = NULL;
-	mlComponent * Component = NULL;
-	mlWeaponMount * Mount = NULL;
-	OBJECT * TempObj1 = NULL;
-	OBJECT * PivotDOF = NULL;
-	OBJECT * AltPntDOF = NULL;
-	OBJECT * SpeedPntDOF = NULL;
-	OBJECT * ForeSightDOF = NULL;
-	OBJECT * BackSightDOF = NULL;
+	BombSightData* BSD = nullptr;
+	weapAmmoType * AmmoType = nullptr;
+	mlComponent * Component = nullptr;
+	mlWeaponMount * Mount = nullptr;
+	OBJECT * TempObj1 = nullptr;
+	OBJECT * PivotDOF = nullptr;
+	OBJECT * AltPntDOF = nullptr;
+	OBJECT * SpeedPntDOF = nullptr;
+	OBJECT * ForeSightDOF = nullptr;
+	OBJECT * BackSightDOF = nullptr;
 	mlComponentListIterator it;
 
-	if (_Data != NULL)
+	if (_Data != nullptr)
 	{
 		piExitProgram(__FILE__,__LINE__,"Bombsight data being setup with non-null data pointer!");
 	}
@@ -256,7 +256,7 @@ static LOGICAL _SetupBombsight(SINT8 * MountName, mlVehicleData * VehicleData, S
 		{
 			Mount = (mlWeaponMount*)Component->SpecialData;
 
-			if (Mount == NULL)
+			if (Mount == nullptr)
 			{
 				continue;
 			}
@@ -271,22 +271,22 @@ static LOGICAL _SetupBombsight(SINT8 * MountName, mlVehicleData * VehicleData, S
 		}
 	}
 
-	if (AmmoType == NULL)
+	if (AmmoType == nullptr)
 	{
 		Write_Debug("Unable to find ammo type %s for bombsight",MountName);
 		return FALSE;
 	}
 
-	if (VehicleData->VehicleObjectData == NULL ||
-		VehicleData->VehicleObjectData->PlaneObject == NULL)
+	if (VehicleData->VehicleObjectData == nullptr ||
+		VehicleData->VehicleObjectData->PlaneObject == nullptr)
 	{
 		return FALSE;
 	}
 
 	TempObj1 = VehicleData->VehicleObjectData->PlaneObject;
-	PivotDOF = AltPntDOF = SpeedPntDOF = ForeSightDOF = BackSightDOF = NULL;
+	PivotDOF = AltPntDOF = SpeedPntDOF = ForeSightDOF = BackSightDOF = nullptr;
 	ogrpFindSubObjectByDOFVar(&PivotDOF,TempObj1,ML_DOF_BOMBSIGHT_PIVOT);
-	if (PivotDOF == NULL)
+	if (PivotDOF == nullptr)
 	{
 		Write_Debug("Unable to find pivot point for bombsight");
 		return FALSE;
@@ -296,22 +296,22 @@ static LOGICAL _SetupBombsight(SINT8 * MountName, mlVehicleData * VehicleData, S
 	ogrpFindSubObjectByDOFVar(&ForeSightDOF,PivotDOF,ML_DOF_BOMBSIGHT_FORESIGHT);
 	ogrpFindSubObjectByDOFVar(&BackSightDOF,PivotDOF,ML_DOF_BOMBSIGHT_BACKSIGHT);
 
-	if (AltPntDOF == NULL)
+	if (AltPntDOF == nullptr)
 	{
 		Write_Debug("Unable to find altitude point for bombsight");
 		return FALSE;
 	}
-	if (SpeedPntDOF == NULL)
+	if (SpeedPntDOF == nullptr)
 	{
 		Write_Debug("Unable to find speed point for bombsight");
 		return FALSE;
 	}
-	if (ForeSightDOF == NULL)
+	if (ForeSightDOF == nullptr)
 	{
 		Write_Debug("Unable to find foresight point for bombsight");
 		return FALSE;
 	}
-	if (BackSightDOF == NULL)
+	if (BackSightDOF == nullptr)
 	{
 		Write_Debug("Unable to find backsight point for bombsight");
 		return FALSE;
@@ -492,7 +492,7 @@ static LOGICAL _UpdateBombsight()
 	FLOAT32 Pitch,Roll;
 	static SINT32 _LastUpdateTime;
 
-	if (_Data == NULL)
+	if (_Data == nullptr)
 	{
 		return FALSE;
 	}
@@ -567,13 +567,13 @@ static LOGICAL _UpdateBombsight()
 	// calculate the overall angle needed
 
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-	if (VehicleData == NULL)
+	if (VehicleData == nullptr)
 	{
 		Angle = 0.0;
 	}
 	else
 	{
-		if (VehicleData->BombSightAmmoType == NULL)
+		if (VehicleData->BombSightAmmoType == nullptr)
 		{
 			Angle = 0.0;
 		}
@@ -623,7 +623,7 @@ static LOGICAL _UpdateBombsight()
 static LOGICAL _PlaneAttitudeAdjustFactor(FLOAT32 * Pitch,FLOAT32 * Roll)
 {
 	mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
-	if (VehicleData == NULL)
+	if (VehicleData == nullptr)
 	{
 		return FALSE;
 	}

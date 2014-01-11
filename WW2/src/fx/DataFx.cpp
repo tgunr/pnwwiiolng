@@ -26,9 +26,9 @@ static std::map<std::string, TransformFx*> _transformeffects;
 static std::map<std::string, ParticleEffect*> _particleeffects;
 static std::map<std::string, int> _materials;
 
-static ParticleEffect* ParticleEffectChunk = NULL;
-static Emitterfx* EmitterFxChunk = NULL;
-static TransformFx* TransformFxChunk = NULL;
+static ParticleEffect* ParticleEffectChunk = nullptr;
+static Emitterfx* EmitterFxChunk = nullptr;
+static TransformFx* TransformFxChunk = nullptr;
 
 static std::deque<ParticleEffect*> _freeparticleeffects;
 static std::deque<Emitterfx*> _freeemittereffects;
@@ -206,7 +206,7 @@ void _parseuvelements(xmlNodePtr root, const char* name)
 
     uvStringToId[name] = texid++;
 
-	for(; node != NULL; node = node->next)
+	for(; node != nullptr; node = node->next)
 	{
         if(node->type != XML_ELEMENT_NODE)
         {
@@ -278,7 +278,7 @@ void _parseuvtree(xmlNodePtr root)
 {
     xmlNodePtr node = root;
 
-	for(; node != NULL; node = node->next)
+	for(; node != nullptr; node = node->next)
 	{
         if(node->type != XML_ELEMENT_NODE)
         {
@@ -314,7 +314,7 @@ void loadTextureUVs()
     uvStringToId.clear();
     texid = 0;
 
-    xmlDocPtr doc = xmlReadFile(name, NULL, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
+    xmlDocPtr doc = xmlReadFile(name, nullptr, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
 
     if(doc)
     {
@@ -346,7 +346,7 @@ void ParseParticleElements(xmlNodePtr root, ParticleEffect* fx)
 {
     xmlNodePtr node = root;
 
-    for(; node != NULL; node = node->next)
+    for(; node != nullptr; node = node->next)
 	{
         if(node->type != XML_ELEMENT_NODE)
         {
@@ -983,7 +983,7 @@ static void ParseEmitterElements(xmlNodePtr root, Emitterfx* e)
 {
     xmlNodePtr node = root;
 
-	for(; node != NULL; node = node->next)
+	for(; node != nullptr; node = node->next)
 	{
         if(node->type != XML_ELEMENT_NODE)
         {
@@ -1076,7 +1076,7 @@ static void ParseTransformEffects(xmlNodePtr root, TransformFx* te)
 {
     xmlNodePtr node = root;
 
-	for(; node != NULL; node = node->next)
+	for(; node != nullptr; node = node->next)
 	{
         if(node->type != XML_ELEMENT_NODE)
         {
@@ -1177,7 +1177,7 @@ void _parseeffectstree(xmlNodePtr root)
 {
     xmlNodePtr node = root;
 
-	for(; node != NULL; node = node->next)
+	for(; node != nullptr; node = node->next)
 	{
         if(node->type != XML_ELEMENT_NODE)
         {
@@ -1242,7 +1242,7 @@ void loadeffects()
 
     char*name = "fx/xml/effects2.xml";
 
-    xmlDocPtr doc = xmlReadFile(name, NULL, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
+    xmlDocPtr doc = xmlReadFile(name, nullptr, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
 
     if(doc)
     {
@@ -1407,7 +1407,7 @@ TransformFx* DataFx::gettransformeffect(const char* name)
         return find->second;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /*----------------------------------------------------------------------
@@ -1484,7 +1484,7 @@ ParticleEffect* DataFx::cloneparticleeffect(const char* effect)
         return p;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /*----------------------------------------------------------------------
@@ -1493,7 +1493,7 @@ Description: When creating dynamic particle effects
 -----------------------------------------------------------------------*/
 ParticleEffect* DataFx::getfreeparticleeffect()
 {
-    ParticleEffect* pe = NULL;
+    ParticleEffect* pe = nullptr;
 
     if(_freeparticleeffects.empty())
     {
@@ -1516,7 +1516,7 @@ Description:
 -----------------------------------------------------------------------*/
 Emitterfx* DataFx::getfreeemittereffect()
 {
-    Emitterfx* e = NULL;
+    Emitterfx* e = nullptr;
 
     if(_freeemittereffects.empty())
     {
@@ -1539,7 +1539,7 @@ Description:
 -----------------------------------------------------------------------*/
 TransformFx* DataFx::getfreetransformeffect()
 {
-    TransformFx* t = NULL;
+    TransformFx* t = nullptr;
 
     if(_freeemittereffects.empty())
     {
@@ -1571,5 +1571,5 @@ ParticleEffect* DataFx::getparticleeffect(const char* name)
         return find->second;
     }
 
-    return NULL;
+    return nullptr;
 }

@@ -38,7 +38,7 @@ SINT32 fpTPSNumIdleAnims[TPS_POSETYPE_NUM_TYPES][TPS_WEAPONTYPE_NUM_TYPES];
 FLOAT32 fpTPSBodyEmoteLengths[TPS_BODYEMOTE_NUM_TYPES];
 
 static gr2Model* faceModel;
-static gr2Model* _personalizedModel = NULL;
+static gr2Model* _personalizedModel = nullptr;
 static TPS_BLEND_MAP _fpTPSAnimLib; // using tps weapon types
 static SINT32 tpsBlendTypeBits, tpsBlendWeapBits, tpsBlendPoseBits, tpsBlendMoveBits, tpsBlendPointBits;
 
@@ -111,12 +111,12 @@ LOGICAL fpTPSLoad (void)
 
 
 	// load, don't instantiate, and get the bone count of the skeleton
-	gr2Model* skeleton = gr2Model::Load(fpTPSSkeletonFile, NULL, &boneCount, 1);
+	gr2Model* skeleton = gr2Model::Load(fpTPSSkeletonFile, nullptr, &boneCount, 1);
 
 	rnUpdateLoadingScreen();
 
 	// load, don't instantiate, and don't get the bone count of the damage model
-	gr2Model::Load(fpTPSDamageFile, skeleton, NULL, 0);
+	gr2Model::Load(fpTPSDamageFile, skeleton, nullptr, 0);
 
 	rnUpdateLoadingScreen();
 
@@ -130,7 +130,7 @@ LOGICAL fpTPSLoad (void)
 			if (fpTPSInfantryMeshFiles[i][j][0] != 0)
 			{
 //				Write_Log (LOG_FPS, LOG_INFO, "Country %d, LOD %d, loading mesh %s", i, j, fpTPSInfantryMeshFiles[i][j]);
-				gr2Model::Load(fpTPSInfantryMeshFiles[i][j], skeleton, NULL, 0, -1, (j < 2));
+				gr2Model::Load(fpTPSInfantryMeshFiles[i][j], skeleton, nullptr, 0, -1, (j < 2));
 			}
 		}
 
@@ -145,20 +145,20 @@ LOGICAL fpTPSLoad (void)
 			if (fpTPSWeaponMeshFiles[i][j][0] != 0)
 			{
 //				Write_Log (LOG_FPS, LOG_INFO, "Weapon %d, LOD %d, loading weapon mesh %s", i, j, fpTPSWeaponMeshFiles[i][j]);
-				gr2Model::Load(fpTPSWeaponMeshFiles[i][j], NULL, NULL, 0, -1, (j < 2));
+				gr2Model::Load(fpTPSWeaponMeshFiles[i][j], nullptr, nullptr, 0, -1, (j < 2));
 			}
 
 			if (fpTPSWeaponMeshAltFiles[i][j][0] != 0)
 			{
 //				Write_Log (LOG_FPS, LOG_INFO, "Weapon %d, LOD %d, loading alt weapon mesh %s", i, j, fpTPSWeaponMeshAltFiles[i][j]);
-				gr2Model::Load(fpTPSWeaponMeshAltFiles[i][j], NULL, NULL, 0, -1, (j < 2));
+				gr2Model::Load(fpTPSWeaponMeshAltFiles[i][j], nullptr, nullptr, 0, -1, (j < 2));
 			}
 		}
 		rnUpdateLoadingScreen();
 	}
 
 	// and finally, the chute model
-	gr2Model::Load(fpTPSParachuteFile, NULL, NULL, 0);
+	gr2Model::Load(fpTPSParachuteFile, nullptr, nullptr, 0);
 
 	// idle animations
 	memset(fpTPSNumIdleAnims, 0, sizeof (fpTPSNumIdleAnims));
@@ -258,7 +258,7 @@ LOGICAL fpTPSLoad (void)
 			}
 			else
 			{
-				fpTPSDeathBlends[i][j] = NULL;
+				fpTPSDeathBlends[i][j] = nullptr;
 			}
 		}
 
@@ -268,7 +268,7 @@ LOGICAL fpTPSLoad (void)
 			{
 //				Write_Log (LOG_FPS, LOG_INFO, "Pose %d, twitch %d, loading blend %s", i, j, fpTPSTwitchFiles[i][j]);
 				fpTPSTwitchBlends[i][j] = gr2LoadBlendedAnimation (fpTPSTwitchFiles[i][j], boneCount);
-				if (fpTPSTwitchBlends[i][j] == NULL)
+				if (fpTPSTwitchBlends[i][j] == nullptr)
 				{
 					char errorMessage[255];
 
@@ -279,7 +279,7 @@ LOGICAL fpTPSLoad (void)
 			}
 			else
 			{
-				fpTPSTwitchBlends[i][j] = NULL;
+				fpTPSTwitchBlends[i][j] = nullptr;
 			}
 		}
 
@@ -298,7 +298,7 @@ LOGICAL fpTPSLoad (void)
 				}
 				else
 				{
-					fpTPSCombatEmotes[i][j][k] = NULL;
+					fpTPSCombatEmotes[i][j][k] = nullptr;
 				}
 			}
 		}
@@ -314,7 +314,7 @@ LOGICAL fpTPSLoad (void)
 		}
 		else
 		{
-			fpTPSBodyEmotes[i] = NULL;
+			fpTPSBodyEmotes[i] = nullptr;
 			fpTPSBodyEmoteLengths[i] = 0;
 		}
 		rnUpdateLoadingScreen();
@@ -357,13 +357,13 @@ LOGICAL fpTPSLoad (void)
 		rnUpdateLoadingScreen();
 	}
 
-	faceModel = gr2LoadModel("TPS/meshes/faces/faces", NULL, NULL, 1);
+	faceModel = gr2LoadModel("TPS/meshes/faces/faces", nullptr, nullptr, 1);
 
 	rnUpdateLoadingScreen();
 
 #ifdef REPLACE_MODEL_TEXTURES
     // Load textures for texture replacement
-    _personalizedModel = gr2LoadModel("TPS/meshes/infset/infset", NULL, NULL, 1);
+    _personalizedModel = gr2LoadModel("TPS/meshes/infset/infset", nullptr, nullptr, 1);
 #endif
 
 	rnUpdateLoadingScreen();
@@ -406,7 +406,7 @@ void fpTPSKill (void)
 	{
 		for (j=0; j < TPS_NUM_DEATHS; j++)
 		{
-			if (fpTPSDeathFiles[i][j] == NULL)
+			if (fpTPSDeathFiles[i][j] == nullptr)
 				continue;
 
 			if (fpTPSDeathFiles[i][j][0] != 0)
@@ -680,6 +680,6 @@ gr2AnimationBlend* fpTPSGetBlend(int pose, int move, int weap, int point, int ty
 	}
 #endif
 
-	return NULL;
+	return nullptr;
 }
 

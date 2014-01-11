@@ -51,7 +51,7 @@ bool TutorialHandler::Handle(TUT_EVENT_TYPE t) const
 *************************************************************************************************/
 
 TutorialManager::TutorialManager() :
-	_tutorial(NULL),
+	_tutorial(nullptr),
 	_eventFlags(0),
 	_nextUpdate(0),
 	_stop(false),
@@ -91,7 +91,7 @@ void TutorialManager::Update()
 	{
 		if(WantsEvent(TUTORIAL_UPDATE_EVENTS))
 		{
-			vehVehicle* vehicle = NULL;
+			vehVehicle* vehicle = nullptr;
 
 			it = _eventHandlers.begin();
 
@@ -228,7 +228,7 @@ void TutorialManager::Update()
 
 bool TutorialManager::IsActive() const
 {
-	return (_tutorial != NULL);
+	return (_tutorial != nullptr);
 }
 
 bool TutorialManager::WantsEvent(UINT32 eventType)
@@ -348,7 +348,7 @@ bool TutorialManager::Stop(bool delayed)
 		// reset it
 		_current.Reset();
 
-		_tutorial	= NULL;
+		_tutorial	= nullptr;
 		_eventFlags	= 0;
 		_stop		= false;
 
@@ -368,7 +368,7 @@ TutorialHandler* TutorialManager::FindHandler(const char* name)
 	if(found != _eventHandlers.end())
 		return &found->second;
 
-	return NULL;
+	return nullptr;
 }
 
 TutorialHandler* TutorialManager::AddHandler(UINT32 eventType, const char* callback, const char* name)
@@ -391,7 +391,7 @@ TutorialHandler* TutorialManager::AddHandler(UINT32 eventType, const char* callb
 
 		// init out callback (c) and scope (s) strings
 		const char* c = buffer;
-		const char* s = NULL;
+		const char* s = nullptr;
 
 		if(point)
 		{
@@ -423,7 +423,7 @@ TutorialHandler* TutorialManager::AddHandler(UINT32 eventType, const char* callb
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 TutorialHandler* TutorialManager::AddTimedHandler(const char* callback, const char* name, int duration)

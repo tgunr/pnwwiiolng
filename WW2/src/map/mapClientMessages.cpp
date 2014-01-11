@@ -57,7 +57,7 @@ _check64(const char* filename)
 	UINT64	checksum = 0;
 
 	char* memory = (char*)alloca(READ_BUF_SIZE);
-	if ( memory == NULL )
+	if ( memory == nullptr )
 	{
 		dbugWrite("No memory");
 		return 0;
@@ -338,7 +338,7 @@ _recvTutProgressBatch(ACTION_OBJECT* const a)
 	while ( a->atEndOfBuffer() == false )
 	{
 		Tutorial::GroupProgress incoming(a);
-		incoming.receive(NULL);
+		incoming.receive(nullptr);
 	}
 	return a->offset;
 }
@@ -376,7 +376,7 @@ _recvBuildingVisLevels(ACTION_OBJECT* const a)
 
 SINT32 mapSendExitWWIIOL(SINT32 hostIndex)
 {
-	return teulSend(hostIndex,MAP_SEND_EXIT_WWIIOL, NULL);
+	return teulSend(hostIndex,MAP_SEND_EXIT_WWIIOL, nullptr);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -402,7 +402,7 @@ PersonaSelection::send(SINT32 teulIndex)
 	char filename[256];
 
 	// Checksum the current executable
-	if ( GetModuleFileNameA(NULL, filename, sizeof(filename)-1) )
+	if ( GetModuleFileNameA(nullptr, filename, sizeof(filename)-1) )
 	{
 		m_checksum = _check64(filename);	// See function for description; its cryptic on purpose.
 	}

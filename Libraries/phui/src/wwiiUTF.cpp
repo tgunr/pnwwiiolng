@@ -127,8 +127,8 @@ static const UTF8 firstByteMark[7] = { 0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC 
 bool
 WWII::ConvertChars(const wchar_t* source, char* targetStart, size_t sizeofTarget_InBytes)
 {
-	assert( source != NULL );
-	assert( targetStart != NULL );
+	assert( source != nullptr );
+	assert( targetStart != nullptr );
 	assert( (void*)source != (void*)targetStart );
 
 	const size_t targetEntries = sizeofTarget_InBytes / sizeof(*targetStart) - 1;
@@ -237,8 +237,8 @@ WWII::IsLegalUTF8(const char* source)
 bool
 WWII::ConvertChars(const char* source, wchar_t* target, size_t sizeofTarget_InBytes)
 {
-	assert( source != NULL );
-	assert( target != NULL );
+	assert( source != nullptr );
+	assert( target != nullptr );
 	assert( (void*)source != (void*)target );
 
 	const size_t targetEntries = sizeofTarget_InBytes / sizeof(*target) - 1;

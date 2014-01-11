@@ -27,7 +27,7 @@ HeightField* HeightField::GetHeightField(const std::string& name)
     if(itr != nameRegister.end())
         return itr->second;
 
-    return NULL;
+    return nullptr;
 }
 
 /*-------------------------------------------------------------------------------------
@@ -43,7 +43,7 @@ HeightField* HeightField::GetHeightField(const OBJECT* o)
     if(itr != objectRegister.end())
         return itr->second;
 
-    return NULL;
+    return nullptr;
 }
 
 /*-------------------------------------------------------------------------------------

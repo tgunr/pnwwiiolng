@@ -567,7 +567,7 @@ SINT32	dbugGetErrno(void)
 #endif
 }
 
-// _dbugLogPrivate: if the current filename, lineno or string is NULL then it
+// _dbugLogPrivate: if the current filename, lineno or string is nullptr then it
 // sets these members.  The parameters are output as a string to the debug
 // file depending on the debug level selected and the current error type.
 static inline SINT32
@@ -652,7 +652,7 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 
 	if ( PN_UNLIKELY(len == 0) )
 	{
-		text = "[NULL]";
+		text = "[nullptr]";
 		len = strlen(text);
 	}
 
@@ -696,7 +696,7 @@ SINT32 _dbugLogV(const char* const filename, const SINT32 lineno, const UINT32 e
 	return result;
 }
 
-// dbugLog: if the current filename, lineno or string is NULL then it
+// dbugLog: if the current filename, lineno or string is nullptr then it
 // sets these members.  The parameters are output as a string to the debug
 // file depending on the debug level selected and the current error type.
 SINT32 _dbugLog(const char* const filename, const SINT32 lineno, const UINT32 errType, const char* const fmt, ...)
@@ -742,7 +742,7 @@ _LogAbort(const char* file_, unsigned int line_, unsigned int error_, const char
 	va_start(args, fmt_);
 
 #if platOS == OS_WIN32
-	if ( assertion_ == NULL || *assertion_ == 0 )
+	if ( assertion_ == nullptr || *assertion_ == 0 )
 		assertion_ = "";
 
 	const size_t roughSize = vsnprintf(_logger.m_text, sizeof(_logger.m_text), fmt_, args);

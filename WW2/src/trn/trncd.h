@@ -138,7 +138,7 @@ typedef struct SpawnData
             return itr->second[index];
         }
 
-        return NULL;
+        return nullptr;
     }
 
     inline void addSpawnObject(unsigned int key, OBJECT* o)

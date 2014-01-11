@@ -13,7 +13,7 @@
 
 BOOL ldwavParse(BYTE* infile, BYTE* outbuffer, WAVEFORMATEX* WaveFormat, DWORD* length)
 {
-HMMIO         hmmioIn=NULL;
+HMMIO         hmmioIn=nullptr;
 MMCKINFO      ckInRIFF;
 MMCKINFO      ckIn;
 MMIOINFO      mmioinfo;
@@ -34,8 +34,8 @@ DWORD         howmuch;
 		/*
 		. Open the input file for reading using buffered I/O.
 		*/
-		hmmioIn = mmioOpen(NULL, &mmioinfo, MMIO_READ);
-		if (hmmioIn == NULL)
+		hmmioIn = mmioOpen(nullptr, &mmioinfo, MMIO_READ);
+		if (hmmioIn == nullptr)
 		{
 			retval = FALSE;
 			break;
@@ -44,7 +44,7 @@ DWORD         howmuch;
 		/*
 		 . Descend the input file into the 'RIFF' chunk.
 		*/
-		if (mmioDescend(hmmioIn, &ckInRIFF, NULL, 0) != 0)
+		if (mmioDescend(hmmioIn, &ckInRIFF, nullptr, 0) != 0)
 		{
 			retval = FALSE;
 			break;
@@ -69,7 +69,7 @@ DWORD         howmuch;
 			break;
 		}
 
-		if (WaveFormat != NULL)
+		if (WaveFormat != nullptr)
 		{
       memset(WaveFormat, 0, sizeof(WAVEFORMATEX));
 
@@ -115,7 +115,7 @@ DWORD         howmuch;
 		/*
 		 . User wants to know how much memory to allocate
 		 */
-		if (outbuffer == NULL)
+		if (outbuffer == nullptr)
 		{
 			break;
 		}
@@ -133,7 +133,7 @@ DWORD         howmuch;
 	/*
 	 . Close the file
 	*/
-	if (hmmioIn != NULL)
+	if (hmmioIn != nullptr)
 	{
 		mmioClose(hmmioIn, 0);
 	}
@@ -206,7 +206,7 @@ BOOL ldwavLoadFile(char* filename, BYTE** outbuffer, WAVEFORMATEX* WaveFormat, D
   filesize = fioSeek(stream, 0, SEEK_END);
   fioSeek(stream, 0, SEEK_SET);
   inriff = (BYTE*)memAlloc(filesize);
-  if (inriff == NULL)
+  if (inriff == nullptr)
   {
     fioClose(stream);
     Write_Log(LOG_SOUND, LOG_INFO, "[ldwavLoadFile] FAILED to load %s", filename);
@@ -225,7 +225,7 @@ BOOL ldwavLoadFile(char* filename, BYTE** outbuffer, WAVEFORMATEX* WaveFormat, D
 
   *length = (DWORD)filesize;
 
-  if (!ldwavParse(inriff, NULL, NULL, (DWORD*)&filesize))
+  if (!ldwavParse(inriff, nullptr, nullptr, (DWORD*)&filesize))
   {
     memFree(inriff);
     Write_Log(LOG_SOUND, LOG_INFO, "[ldwavLoadFile] FAILED to load %s", filename);
@@ -233,7 +233,7 @@ BOOL ldwavLoadFile(char* filename, BYTE** outbuffer, WAVEFORMATEX* WaveFormat, D
   }
 
   outwave = (BYTE*)memAlloc(filesize);
-  if (outwave == NULL)
+  if (outwave == nullptr)
   {
     memFree(inriff);
     Write_Log(LOG_SOUND, LOG_INFO, "[ldwavLoadFile] FAILED to load %s", filename);

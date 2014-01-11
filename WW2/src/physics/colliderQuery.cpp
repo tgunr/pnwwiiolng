@@ -456,7 +456,7 @@ const colliderQuery::Collision* colliderRay::getCollision()
 		return &_collisions.at(0);
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 const colliderQuery::CollisionList& collideRayList(unsigned int bits,

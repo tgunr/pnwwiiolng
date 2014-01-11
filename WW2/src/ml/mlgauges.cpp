@@ -51,7 +51,7 @@ UCHAR mlDOFVarNameTable[ML_DOF_MAXNUM][32];
 
 mlGaugeTranslationTable mlDOFTransTable[ML_DOF_MAXNUM] =
 {
-	{"none",1, ML_DOF_NONE,NULL},
+	{"none",1, ML_DOF_NONE,nullptr},
 	{"gearhandle",1,ML_DOF_CONTROL_GEARHANDLE,(void*)&_VarData.GearHandlePos,0,0},	// gear handle 0,1
 	{"gearshiftx",1,ML_DOF_CONTROL_GEARSHIFTX,(void*)&_VarData.GearShiftX,0,1}, // h-type gearshift x pos, 0.0 = upper left (gear 1)
 	{"gearshifty",1,ML_DOF_CONTROL_GEARSHIFTY,(void*)&_VarData.GearShiftY,0,1}, // h-type gearshift y pos, 0.0 = upper left (gear 1)
@@ -86,7 +86,7 @@ mlGaugeTranslationTable mlDOFTransTable[ML_DOF_MAXNUM] =
 	{"secondtrigger",1,ML_DOF_CONTROL_SECONDTRIGGER,(void*)&_VarData.SecondTrigger,0,0},// secondary weapon trigger 0,1
 	{"ordtrigger",1,ML_DOF_CONTROL_ORDTRIGGER,(void*)&_VarData.OrdTrigger,0,0},	// ordinance trigger 0,1
 	{"ordselector",1,ML_DOF_CONTROL_ORDSELECTOR,(void*)&_VarData.OrdSelector,0,0},	// ordinance selector 0,maxhardpoints
-	{"divebrake",1,ML_DOF_CONTROL_DIVEBRAKE,NULL,0,0},	// dive brake control 0,1
+	{"divebrake",1,ML_DOF_CONTROL_DIVEBRAKE,nullptr,0,0},	// dive brake control 0,1
 	{"autodive",1,ML_DOF_CONTROL_AUTODIVE,(void*)&_VarData.AutoDive,0,0},	// autodive system control 0,1
 	{"map",1,ML_DOF_CONTROL_MAP,(void*)&_VarData.Map,0,0},			// map mode 0,1
 	{"starter",ML_MAX_ENGINES,ML_DOF_CONTROL_STARTER,(void*)&_VarData.StarterPos,0,0}, // starter pos 0,1
@@ -98,18 +98,18 @@ mlGaugeTranslationTable mlDOFTransTable[ML_DOF_MAXNUM] =
 	{"proppitch",ML_MAX_ENGINES,ML_DOF_ELEMENT_PROPPITCH,(void*)&_VarData.PropPitch,0,1},	// propeller pitch 0,90
 	{"proppitchdial",ML_MAX_ENGINES,ML_DOF_ELEMENT_PROPPITCHDIAL,(void*)&_VarData.PropPitch,1,0}, // prop pitch dial 0,90
 	{"propeffect",ML_MAX_ENGINES,ML_DOF_ELEMENT_PROPEFFECT,(void*)&_VarData.PropEffect,0,0},	// propeller effect spin position 0,1
-	{"flap",1,ML_DOF_ELEMENT_FLAP,NULL,0,0},		// flap position 0,maxflapposition
-	{"gear",1,ML_DOF_ELEMENT_GEAR,NULL,0,0},		// gear position 0,1
+	{"flap",1,ML_DOF_ELEMENT_FLAP,nullptr,0,0},		// flap position 0,maxflapposition
+	{"gear",1,ML_DOF_ELEMENT_GEAR,nullptr,0,0},		// gear position 0,1
 	{"bombbaydoor",1,ML_DOF_ELEMENT_BOMBBAYDOOR,0,0},
-	{"canopy",ML_MAX_CREW_POSITIONS,ML_DOF_ELEMENT_CANOPY,NULL,0,0},		// canopy position 0,1
+	{"canopy",ML_MAX_CREW_POSITIONS,ML_DOF_ELEMENT_CANOPY,nullptr,0,0},		// canopy position 0,1
 	{"lslot",1,ML_DOF_ELEMENT_LEFTSLOTOPEN,(void*)&_VarData.LeftSlotOpen,0,0}, // left slot open 0,1
 	{"gearshift",1,ML_DOF_ELEMENT_GEARSHIFT,(void*)&_VarData.GearShiftState,0,0}, // gear shift, zero is neutral, negative is reverse
 	{"clutch",1,ML_DOF_ELEMENT_CLUTCHSTATE,(void*)&_VarData.ClutchState,0,0}, // clutch state, 0.0 to 1.0
 	{"rslot",1,ML_DOF_ELEMENT_RIGHTSLOTOPEN,(void*)&_VarData.RightSlotOpen,0,0}, // right slot open 0,1
-	{"body",1,ML_DOF_ELEMENT_BODY,NULL,0,0},		// body position dof (special case)
-	{"eye",1,ML_DOF_ELEMENT_EYE,NULL,0,0},			// eye position dof (special case)
-	{"head",1,ML_DOF_ELEMENT_HEAD,NULL,0,0},		// head position dof (special case)
-	{"hatch",ML_MAX_CREW_POSITIONS,ML_DOF_ELEMENT_HATCH, NULL,0,0},		// hatch position 0,1
+	{"body",1,ML_DOF_ELEMENT_BODY,nullptr,0,0},		// body position dof (special case)
+	{"eye",1,ML_DOF_ELEMENT_EYE,nullptr,0,0},			// eye position dof (special case)
+	{"head",1,ML_DOF_ELEMENT_HEAD,nullptr,0,0},		// head position dof (special case)
+	{"hatch",ML_MAX_CREW_POSITIONS,ML_DOF_ELEMENT_HATCH, nullptr,0,0},		// hatch position 0,1
 	{"asimph",1,ML_DOF_GAUGE_ASIMPH,(void*)&_VarData.AirspeedMPH,1,0},		// airspeed indicator, mph
 	{"asikph",1,ML_DOF_GAUGE_ASIKPH,(void*)&_VarData.AirspeedKPH,1,0},		// airspeed indicator, kph
 	{"asikts",1,ML_DOF_GAUGE_ASIKTS,(void*)&_VarData.AirspeedKTS,1,0},		// airspeed indicator, knots
@@ -162,42 +162,42 @@ mlGaugeTranslationTable mlDOFTransTable[ML_DOF_MAXNUM] =
 	{"totalammo",1,ML_DOF_GAUGE_TOTALAMMO,(void*)&_VarData.TotalAmmo,0,0}, // total ammo
 	{"bspeed",1,ML_DOF_GAUGE_BOMBSIGHT_SPEED,(void*)&_VarData.BombSightSpeedSetting,0,1}, // bombsight speed setting gauge
 	{"balt",1,ML_DOF_GAUGE_BOMBSIGHT_ALT,(void*)&_VarData.BombSightAltSetting,0,1}, // bombsight alt setting gauge
-	{"bmpivot",1,ML_DOF_BOMBSIGHT_PIVOT,NULL,0,0}, // british mk9a pivot point
-	{"bforesight",1,ML_DOF_BOMBSIGHT_FORESIGHT,NULL,0,0}, // british mk9a foresight point
+	{"bmpivot",1,ML_DOF_BOMBSIGHT_PIVOT,nullptr,0,0}, // british mk9a pivot point
+	{"bforesight",1,ML_DOF_BOMBSIGHT_FORESIGHT,nullptr,0,0}, // british mk9a foresight point
 	{"bbacksight",1,ML_DOF_BOMBSIGHT_BACKSIGHT,0,0}, // british mk9a backsight point
 	{"ttraverse",ML_MAX_CREW_POSITIONS,ML_DOF_ELEMENT_TTRAVERSE,(void*)&_VarData.TurretTraverse,1,1}, // turret traverse position
 	{"televate",ML_MAX_CREW_POSITIONS,ML_DOF_ELEMENT_TELEVATE,(void*)&_VarData.TurretElevate,0,1}, // turret elevation position
 	{"ttraversestops",ML_MAX_CREW_POSITIONS,ML_DOF_ELEMENT_TRAVERSELIMITED,(void*)&_VarData.TurretTraverseWithStops,0,1}, // turret traverse with stops
 	{"flextraverse",ML_MAX_CREW_POSITIONS,ML_DOF_ELEMENT_FLEXTRAVERSE,(void*)&_VarData.TurretTraverseWithStops,0,1}, // flexible traverse
 	{"flexelevate",ML_MAX_CREW_POSITIONS,ML_DOF_ELEMENT_FLEXELEVATE,(void*)&_VarData.TurretElevate,0,1}, // flexible elevator
-	{"recoil",VEH_MAX_MOUNTS,ML_DOF_RECOIL,NULL,0,0},
-	{"iklink1",1,ML_DOF_IK_LINK1,NULL,0,0},
-	{"iklink2",1,ML_DOF_IK_LINK2,NULL,0,0},
-	{"iklink3",1,ML_DOF_IK_LINK3,NULL,0,0},
-	{"ikchainend",1,ML_DOF_IK_CHAINEND,NULL,0,0},
-	{"ik",1,ML_DOF_IK_ENDEFFECTOR,NULL,0,0},
-	{"viewpoint",1,ML_DOF_VIEWPOINT,NULL,0,0},
-	{"spawn",TRN_MAX_SPAWN_LOCATIONS,ML_DOF_SPAWNLOCATION,NULL,0,0},
+	{"recoil",VEH_MAX_MOUNTS,ML_DOF_RECOIL,nullptr,0,0},
+	{"iklink1",1,ML_DOF_IK_LINK1,nullptr,0,0},
+	{"iklink2",1,ML_DOF_IK_LINK2,nullptr,0,0},
+	{"iklink3",1,ML_DOF_IK_LINK3,nullptr,0,0},
+	{"ikchainend",1,ML_DOF_IK_CHAINEND,nullptr,0,0},
+	{"ik",1,ML_DOF_IK_ENDEFFECTOR,nullptr,0,0},
+	{"viewpoint",1,ML_DOF_VIEWPOINT,nullptr,0,0},
+	{"spawn",TRN_MAX_SPAWN_LOCATIONS,ML_DOF_SPAWNLOCATION,nullptr,0,0},
 	{"ailocate",1,ML_DOF_AG_LOCATE,0,0},
 	{"aielevate",1,ML_DOF_AG_ELEVATE,0,0},
 	{"aitraverse",1,ML_DOF_AG_TRAVERSE,0,0},
 	{"aiview",1,ML_DOF_AG_VIEW,0,0},
 	{"aifire",1,ML_DOF_AG_FIRE,0,0},
-	{"wcontact",ML_MAX_GEARNUM,ML_DOF_WHEEL_CONTACTPOINT,NULL,0,1}, // contact points for gear
+	{"wcontact",ML_MAX_GEARNUM,ML_DOF_WHEEL_CONTACTPOINT,nullptr,0,1}, // contact points for gear
 	{"wrotate",ML_MAX_GEARNUM,ML_DOF_WHEEL_ROTATE,(void*)&_VarData.WheelRotate,0,1}, // wheel rotation value
 	{"wstrut",ML_MAX_GEARNUM,ML_DOF_WHEEL_STRUT,(void*)&_VarData.WheelStrut,0,1}, // suspension compression
 	{"wbogie",ML_MAX_GEARNUM,ML_DOF_WHEEL_BOGIE,(void*)&_VarData.WheelBogie,0,1}, // bogie tilt
 	{"wcastor",ML_MAX_GEARNUM,ML_DOF_WHEEL_CASTOR,(void*)&_VarData.WheelCastor,1,1}, // bogie castor value
 	{"wsteer",1,ML_DOF_WHEEL_STEER,(void*)&_VarData.WheelSteer,0,0}, // steering
-	{"mount",ML_MAX_CONFIGURATIONS,ML_DOF_MOUNT,NULL,0,0}, // weapon mount pnt
-	{"connect",ML_MAX_WEAPONS_PER_MOUNT,ML_DOF_CONNECT,NULL,0,0}, // weapon connection points
-	{"firepoint",1,ML_DOF_FIREPOINT,NULL,0,0}, // weapon fire point
-	{"hitchlight",1,ML_DOF_TOWPOINT_LIGHT,NULL,0,0}, // tow point
-	{"hitchmedium",1,ML_DOF_TOWPOINT_MEDIUM,NULL,0,0}, // tow point
-	{"hitchheavy",1,ML_DOF_TOWPOINT_HEAVY,NULL,0,0}, // tow point
-	{"fpsseat",1,ML_DOF_FPS_SEAT,NULL,0,0}, // fps seat
-	{"crap",1,ML_DOF_CRAPPOINT,NULL,0,0}, // weapon crap point
-	{"pointcollide",1,ML_DOF_POINTCOLLIDE,NULL,0,0}, // point collide point
+	{"mount",ML_MAX_CONFIGURATIONS,ML_DOF_MOUNT,nullptr,0,0}, // weapon mount pnt
+	{"connect",ML_MAX_WEAPONS_PER_MOUNT,ML_DOF_CONNECT,nullptr,0,0}, // weapon connection points
+	{"firepoint",1,ML_DOF_FIREPOINT,nullptr,0,0}, // weapon fire point
+	{"hitchlight",1,ML_DOF_TOWPOINT_LIGHT,nullptr,0,0}, // tow point
+	{"hitchmedium",1,ML_DOF_TOWPOINT_MEDIUM,nullptr,0,0}, // tow point
+	{"hitchheavy",1,ML_DOF_TOWPOINT_HEAVY,nullptr,0,0}, // tow point
+	{"fpsseat",1,ML_DOF_FPS_SEAT,nullptr,0,0}, // fps seat
+	{"crap",1,ML_DOF_CRAPPOINT,nullptr,0,0}, // weapon crap point
+	{"pointcollide",1,ML_DOF_POINTCOLLIDE,nullptr,0,0}, // point collide point
 	{"demovar",1,ML_DOF_DEMOVAR,(void*)&_VarData.DemoVar,0,0}, // demo variable
 	{"ttraverseconverge1_",VEH_MAX_MOUNTS,ML_DOF_ELEMENT_TTRAVERSE1_CONV,(void*)&_VarData.TurretTraverseConv[0],1,1},
 	{"ttraverseconverge2_",VEH_MAX_MOUNTS,ML_DOF_ELEMENT_TTRAVERSE2_CONV,(void*)&_VarData.TurretTraverseConv[1],1,1},
@@ -231,8 +231,8 @@ mlGaugeTranslationTable mlDOFTransTable[ML_DOF_MAXNUM] =
 	{"televateconverge14_",VEH_MAX_MOUNTS,ML_DOF_ELEMENT_TELEVATE14_CONV,(void*)&_VarData.TurretElevateConv[13],1,1},
 	{"televateconverge15_",VEH_MAX_MOUNTS,ML_DOF_ELEMENT_TELEVATE15_CONV,(void*)&_VarData.TurretElevateConv[14],1,1},
 	{"televateconverge16_",VEH_MAX_MOUNTS,ML_DOF_ELEMENT_TELEVATE16_CONV,(void*)&_VarData.TurretElevateConv[15],1,1},
-	{"hoist",1,ML_DOF_HOIST,NULL,0,0},
-	{"vehseat",1,ML_DOF_VEH_SEAT,NULL,0,0}
+	{"hoist",1,ML_DOF_HOIST,nullptr,0,0},
+	{"vehseat",1,ML_DOF_VEH_SEAT,nullptr,0,0}
 };
 
 UINT32 mlGaugeInit(void)
@@ -325,7 +325,7 @@ UCHAR s[32];
 		// set prop transparency
 		sprintf((char*)s,"propa%u",i+1);
 		ogrpFindSubObjectByName(&Object1,Object,(char*)s);
-		if (Object1 != NULL)
+		if (Object1 != nullptr)
 		{
 			if(VehicleData->AnimationData.PropFailed[i])
 			{
@@ -347,7 +347,7 @@ UCHAR s[32];
 		// set visdamage prop transparency
 		sprintf((char*)s,"propa%u_vd",i+1);
 		ogrpFindSubObjectByName(&Object1,Object,(char*)s);
-		if (Object1 != NULL)
+		if (Object1 != nullptr)
 		{
 			if(VehicleData->AnimationData.PropFailed[i])
 			{
@@ -764,7 +764,7 @@ FLOAT32 VarContents;
 UINT32 IgnoreCenter;
 OBJECT* ObjSib;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -782,7 +782,7 @@ OBJECT* ObjSib;
 				TableEntry = _VarDataReference[DOFVarNum];
 				DataPtr = (FLOAT32*)mlDOFTransTable[TableEntry].Variable;
 				IgnoreCenter = mlDOFTransTable[TableEntry].IgnoreCurrent;
-				if (DataPtr != NULL)
+				if (DataPtr != nullptr)
 				{
 					if (DOFSubVarNum < mlDOFTransTable[TableEntry].NumVars)
 					{
@@ -798,14 +798,14 @@ OBJECT* ObjSib;
 			}
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_SetDOFObjects(ObjSib->child);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 	return 0;
 }
@@ -990,7 +990,7 @@ UINT32 mlGetGaugeData(FLOAT32 * ReturnData,UINT32 GaugeNum,UINT32 SubGaugeNum)
 	}
 
 	FLOAT32* VarPtr = (FLOAT32*)(mlDOFTransTable[_VarDataReference[GaugeNum]].Variable);
-	if (VarPtr == NULL)
+	if (VarPtr == nullptr)
 	{
 		*ReturnData = 0.0f;
 	}
@@ -1006,7 +1006,7 @@ static UINT32 _SetObjectTreeToAlpha(OBJECT * Object,UINT32 Alpha)
 {
 OBJECT * ObjAtt;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -1024,10 +1024,10 @@ OBJECT * ObjAtt;
 
 			ObjAtt = ObjAtt->attached;
 		}
-		while (ObjAtt != NULL);
+		while (ObjAtt != nullptr);
 	}
 
-	if (Object->child != NULL)
+	if (Object->child != nullptr)
 	{
 		_SetObjectSubTreeToAlpha(Object->child,Alpha);
 	}
@@ -1039,7 +1039,7 @@ static UINT32 _SetObjectSubTreeToAlpha(OBJECT * Object, UINT32 Alpha)
 {
 OBJECT * ObjSib, * ObjAtt;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -1062,17 +1062,17 @@ OBJECT * ObjSib, * ObjAtt;
 
 				ObjAtt = ObjAtt->attached;
 			}
-			while (ObjAtt != NULL);
+			while (ObjAtt != nullptr);
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_SetObjectSubTreeToAlpha(ObjSib->child,Alpha);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 
 	return 0;

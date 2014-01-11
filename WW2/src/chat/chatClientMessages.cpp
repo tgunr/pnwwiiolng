@@ -488,7 +488,7 @@ static SINT32 _recvAWS(ACTION_OBJECT* const a)
 		if ( grid.m_hasData == false || grid.m_rowHasData[i] == false )
 		{
 			row.m_hasData = false;
-			row.m_data = NULL;
+			row.m_data = nullptr;
 		}
 		else
 		{

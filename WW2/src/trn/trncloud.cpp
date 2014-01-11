@@ -136,7 +136,7 @@ static UINT32 AddCloudWisps(void)
     FLOAT64VECTOR WorldOriginOffset;
     mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
 
-	if (VehicleData != NULL)
+	if (VehicleData != nullptr)
 	{
 		Velocity.x = (FLOAT32)(VehicleData->VehicleRealVel.x);
 		Velocity.y = (FLOAT32)(VehicleData->VehicleRealVel.y);
@@ -213,7 +213,7 @@ static UINT32 AddCloudWisps(void)
 		FXCreateNewParticle(&PPos,
 							&TempVel,
 							0.0f,
-							NULL,
+							nullptr,
 							0.0f,
 						   Intensity * 0.5f,
 						   Intensity * 0.5f,
@@ -229,7 +229,7 @@ static UINT32 AddCloudWisps(void)
 						   10,
 						   &RotationRate,
 						   PARTICLE_FLAG_USESROTATION,
-						   NULL);
+						   nullptr);
 #endif
 	}
 

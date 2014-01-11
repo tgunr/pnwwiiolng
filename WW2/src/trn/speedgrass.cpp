@@ -85,7 +85,7 @@ static ref_ptr<oglTextureObject> grasstbo;
 static bool initialized = false;
 static int grass_tbo_size = 0;
 
-static SpeedGrassDeprecated* Grass = NULL;
+static SpeedGrassDeprecated* Grass = nullptr;
 
 /*------------------------------------------------------------------
 Function: speedgrassToggle
@@ -1036,7 +1036,7 @@ void SpeedGrassDeprecated::DrawForCustomShadows()
     oglSetWorldMatrix(&IdentityMatrix);
     int createcount = 0;
 
-    static glslUniform* alphatest = NULL;
+    static glslUniform* alphatest = nullptr;
 
     if(!alphatest)
         alphatest = pgm->GetUniform("alphatest");
@@ -1142,7 +1142,7 @@ void SpeedGrassDeprecated::DrawForShadows()
     oglSetWorldMatrix(&IdentityMatrix);
     int createcount = 0;
 
-    static glslUniform* alphatest = NULL;
+    static glslUniform* alphatest = nullptr;
 
     if(!alphatest)
         alphatest = pgm->GetUniform("alphatest");
@@ -1244,7 +1244,7 @@ void SpeedGrassDeprecated::Draw()
     oglSetWorldMatrix(&IdentityMatrix);
     int createcount = 0;
 
-    static glslUniform* alphatest = NULL;
+    static glslUniform* alphatest = nullptr;
 
     if(!alphatest)
         alphatest = pgm->GetUniform("alphatest");
@@ -1325,8 +1325,8 @@ void SpeedGrassDeprecated::DrawCustom()
     oglSetWorldMatrix(&IdentityMatrix);
     int createcount = 0;
 
-    static glslUniform* alphatest = NULL;
-    static glslUniform* origin = NULL;
+    static glslUniform* alphatest = nullptr;
+    static glslUniform* origin = nullptr;
 
     if(!origin)
         origin = pgm->GetUniform("origin");
@@ -1430,7 +1430,7 @@ void SpeedGrassDeprecated::DrawCustom()
     oglSetWorldMatrix(&IdentityMatrix);
     int createcount = 0;
 
-    static glslUniform* alphatest = NULL;
+    static glslUniform* alphatest = nullptr;
 
     if(!alphatest)
         alphatest = pgm->GetUniform("alphatest");
@@ -1531,7 +1531,7 @@ void SpeedGrassDeprecated::Draw()
     oglSetWorldMatrix(&IdentityMatrix);
     int createcount = 0;
 
-    static glslUniform* alphatest = NULL;
+    static glslUniform* alphatest = nullptr;
 
     if(!alphatest)
         alphatest = pgm->GetUniform("alphatest");
@@ -1921,7 +1921,7 @@ void speedgrassKill()
     }
 
     delete Grass;
-    Grass = NULL;
+    Grass = nullptr;
 }
 
 /*------------------------------------------------------------------
@@ -3092,7 +3092,7 @@ bool speedgrassAddPatch(const Vec3d& pos, const char* type, const char* key, flo
     if(!wantspeedgrass)
         return false;
 
-    if(type == NULL || key == NULL)
+    if(type == nullptr || key == nullptr)
         return false;
 
     struct CollideQue* que = new CollideQue;
@@ -3138,7 +3138,7 @@ bool SpeedGrassDeprecated::GrassFromHeightMap(CollideQue* que)
     sx = sx < 0 ? sx - 1 : sx;
     sy = sy < 0 ? sy - 1 : sy;
 
-    TERRAIN_DETAIL* td = NULL;
+    TERRAIN_DETAIL* td = nullptr;
 
     for(int q = 0; q < NUM_TERRAIN_RECTANGLES; q++)
     {
@@ -3218,7 +3218,7 @@ bool SpeedGrassDeprecated::GrassFromHeightMap(CollideQue* que)
         x = patch.collide[i].x();
         y = patch.collide[i].y();
 
-        float z = trnmainHeightAt(NULL, x + que->pos.x(), y + que->pos.y());
+        float z = trnmainHeightAt(nullptr, x + que->pos.x(), y + que->pos.y());
 
         for(int r = 0; r < size; r++)
         {
@@ -3404,7 +3404,7 @@ static void CollideDown(Vec3d pos, colliderQuery::CollisionList& collisions, con
     {
         colliderQuery::CollisionList& c = collider.getCollisions();
 
-        dGeomID current = NULL;
+        dGeomID current = nullptr;
 
         for(unsigned int i = 0; i < c.size(); i++)
         {
@@ -3514,7 +3514,7 @@ bool SpeedGrassDeprecated::CollideWithTerrain(CollideQue* que)
 
     patch.collider->setDirty(true);
 
-    dGeomID current = NULL;
+    dGeomID current = nullptr;
     bool good = false;
 
     if(!patch.collider->findCollisions(true))
@@ -3524,7 +3524,7 @@ bool SpeedGrassDeprecated::CollideWithTerrain(CollideQue* que)
 
     colliderQuery::CollisionList& collisions = patch.collider->getCollisions();
 
-    current = NULL;
+    current = nullptr;
 
     size_t code = que->key;
 
@@ -3657,7 +3657,7 @@ bool SpeedGrass::CollideWithTerrain(CollideQue* que)
 
     patch.collider->setDirty(true);
 
-    dGeomID current = NULL;
+    dGeomID current = nullptr;
     bool good = false;
 
     if(!patch.collider->findCollisions(true))
@@ -3667,7 +3667,7 @@ bool SpeedGrass::CollideWithTerrain(CollideQue* que)
 
     colliderQuery::CollisionList& collisions = patch.collider->getCollisions();
 
-    current = NULL;
+    current = nullptr;
 
     size_t code = que->key;
 
@@ -3732,7 +3732,7 @@ bool speedgrassAddAndCollide(const Vec3d& pos, const char* type, const char* key
     if(!wantspeedgrass)
         return false;
 
-    if(type == NULL || key == NULL)
+    if(type == nullptr || key == nullptr)
         return false;
 
     struct CollideQue* que = new CollideQue;
@@ -3759,7 +3759,7 @@ bool speedgrassAddAndCollide(const Vec3d& pos, const char* type, size_t key, flo
     if(!wantspeedgrass)
         return false;
 
-    if(type == NULL || key == 0)
+    if(type == nullptr || key == 0)
         return false;
 
     struct CollideQue* que = new CollideQue;
@@ -3786,7 +3786,7 @@ PatchInstance* speedgrassGetOrCreateInstance(unsigned int key, const char* name,
     GrassPatchMap::iterator gp = grasspatch.find(name);
 
     if(gp == grasspatch.end())
-        return NULL;
+        return nullptr;
 
     PatchInstance& instance = Grass->GetOrCreateInstance(key, created);
     instance.instanceof = gp->second;
@@ -3920,7 +3920,7 @@ const char* speedgrassGetGrassByPos(const Vec4d& pos)
     unsigned int size = clutterregister[SpeedGrassDeprecated::type_grass].size();
 
     if(size == 0)
-        return NULL;
+        return nullptr;
 
 	unsigned int id = (int)(7159 * (pos.x() - (int)pos.x()) + 15137 * (pos.y() - (int)pos.y())) % size;
 
@@ -3936,7 +3936,7 @@ const char* speedgrassGetClutterByPos(const Vec4d& pos)
     unsigned int size = clutterregister[SpeedGrassDeprecated::type_clutter].size();
 
     if(size == 0)
-        return NULL;
+        return nullptr;
 
 	unsigned int id = (unsigned int)(7159 * (pos.x() - (int)pos.x()) + 15137 * (pos.y() - (int)pos.y())) % size;
 
@@ -3952,7 +3952,7 @@ const char* speedgrassGetRandomRadialType()
     unsigned int size = clutterregister[SpeedGrassDeprecated::type_radclutter].size();
 
     if(size == 0)
-        return NULL;
+        return nullptr;
 
     int idx = rand() % size;
 

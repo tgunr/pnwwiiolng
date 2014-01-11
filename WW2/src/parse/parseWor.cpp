@@ -210,7 +210,7 @@ _grow(SECTION_HEADER* header, FUNCARGS* args)
 	if ( ((UINT32)header->numObjects & (_GROWTH_RATE - 1)) == 0 )
 	{
 		void* newData = memAlloc((header->numObjects + _GROWTH_RATE) * sizeof(_Type));
-		if ( header->objArray != NULL )
+		if ( header->objArray != nullptr )
 		{
 			memcpy(newData, header->objArray, header->numObjects * sizeof(_Type));
 			memFree(header->objArray);

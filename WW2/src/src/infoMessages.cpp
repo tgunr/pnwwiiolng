@@ -33,7 +33,7 @@ static SINT32 _recvInfoReq(ACTION_OBJECT* const a)
 	//StatusSetStatus("RX/TX Info Request");
 
 	memset(&compInfo, 0, sizeof(compInfo));
-	if ( hMainInstance != NULL )
+	if ( hMainInstance != nullptr )
 		GetComputerInfo(hMainInstance, &compInfo, FALSE);
 
 	_sendInfo(a->teulIndex, &compInfo);

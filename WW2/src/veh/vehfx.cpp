@@ -33,7 +33,7 @@
 
 #define MAX_METAL_DEBRIS    32
 
-static FXVEHCONTAINER* g_lpCon = NULL;
+static FXVEHCONTAINER* g_lpCon = nullptr;
 
 static FXVEHCONTAINER g_conHead;
 static FXVEHCONTAINER g_conTail;
@@ -94,7 +94,7 @@ LOGICAL vehfxInit()
 {
     g_lpCon = (FXVEHCONTAINER*)memAlloc(sizeof(FXVEHCONTAINER) * MAX_POSSIBLE_VIS_VEHICLES);
 
-    if(g_lpCon == NULL)
+    if(g_lpCon == nullptr)
         return FALSE;
 
     memset(&g_conFreeHead, 0, sizeof(FXVEHCONTAINER));
@@ -165,10 +165,10 @@ LOGICAL vehfxInitDebris()
 //////////////////////////////////////////////////
 void vehfxKill()
 {
-    if(g_lpCon != NULL)
+    if(g_lpCon != nullptr)
     {
         memFree(g_lpCon);
-        g_lpCon = NULL;
+        g_lpCon = nullptr;
     }
 
     SINT32 i;
@@ -183,7 +183,7 @@ void vehfxKill()
 
     _freedebris.clear();
 
-    // Set to NULL in case of further updates.
+    // Set to nullptr in case of further updates.
     memset(&g_conFreeHead, 0, sizeof(FXVEHCONTAINER));
     memset(&g_conFreeTail, 0, sizeof(FXVEHCONTAINER));
     memset(&g_conHead, 0, sizeof(FXVEHCONTAINER));
@@ -196,10 +196,10 @@ void vehfxKill()
 //////////////////////////////////////////////////
 LOGICAL vehfxFreeVehicle(FXVEHCONTAINER* lpCon)
 {
-    FXVEHCONTAINER* lpPrev = NULL;
+    FXVEHCONTAINER* lpPrev = nullptr;
     SINT32 i;
 
-    if(lpCon == NULL)
+    if(lpCon == nullptr)
         return FALSE;
 
     i = lpCon->index;
@@ -225,8 +225,8 @@ LOGICAL vehfxFreeVehicle(FXVEHCONTAINER* lpCon)
 //////////////////////////////////////////////////
 LOGICAL vehfxAttachVehicle(vehVehicle* const lpVehicle, SINT32* pIndex)
 {
-    if(lpVehicle == NULL) return FALSE;
-    if(lpVehicle->VehicleType == NULL) return FALSE;
+    if(lpVehicle == nullptr) return FALSE;
+    if(lpVehicle->VehicleType == nullptr) return FALSE;
 
     switch(lpVehicle->VehicleType->Type)
     {
@@ -265,7 +265,7 @@ LOGICAL vehfxAttachVehicle(vehVehicle* const lpVehicle, SINT32* pIndex)
 //////////////////////////////////////////////////////////////////////
 LOGICAL vehfxAttachTrooperVehicle(vehVehicle* lpVehicle, SINT32* pIndex)
 {
-    FXVEHCONTAINER* lpCon = NULL;
+    FXVEHCONTAINER* lpCon = nullptr;
 
     if(!lpVehicle)
         return FALSE;
@@ -292,7 +292,7 @@ LOGICAL vehfxAttachTrooperVehicle(vehVehicle* lpVehicle, SINT32* pIndex)
 //////////////////////////////////////////////////////////////////////
 LOGICAL vehfxAttachAirVehicle(vehVehicle* lpVehicle, SINT32* pIndex)
 {
-    FXVEHCONTAINER* lpCon = NULL;
+    FXVEHCONTAINER* lpCon = nullptr;
 
     if(!lpVehicle)
         return FALSE;
@@ -319,7 +319,7 @@ LOGICAL vehfxAttachAirVehicle(vehVehicle* lpVehicle, SINT32* pIndex)
 //////////////////////////////////////////////////////////////////////
 LOGICAL vehfxAttachSeaVehicle(vehVehicle* lpVehicle, SINT32* pIndex)
 {
-    FXVEHCONTAINER* lpCon = NULL;
+    FXVEHCONTAINER* lpCon = nullptr;
 
     if(!lpVehicle)
         return FALSE;
@@ -346,7 +346,7 @@ LOGICAL vehfxAttachSeaVehicle(vehVehicle* lpVehicle, SINT32* pIndex)
 //////////////////////////////////////////////////////////////////////
 LOGICAL vehfxAttachGroundVehicle(vehVehicle* lpVehicle, SINT32* pIndex)
 {
-    FXVEHCONTAINER* lpCon = NULL;
+    FXVEHCONTAINER* lpCon = nullptr;
 
     if(!lpVehicle)
         return FALSE;
@@ -380,7 +380,7 @@ LOGICAL vehfxDetachVehicle(SINT32 iID)
         return FALSE;
     }
 
-    if(g_lpCon == NULL)
+    if(g_lpCon == nullptr)
     {
         return FALSE;
     }
@@ -405,22 +405,22 @@ LOGICAL vehfxDetachVehicle(SINT32 iID)
 //////////////////////////////////////////////////////////////////////
 void vehfxReleaseVehicle(FXVEHCONTAINER* lpCon)
 {
-    FXVEHCONTAINER* lpNext = NULL;
-    FXVEHCONTAINER* lpPrev = NULL;
+    FXVEHCONTAINER* lpNext = nullptr;
+    FXVEHCONTAINER* lpPrev = nullptr;
 
-    if(lpCon == NULL) return;
+    if(lpCon == nullptr) return;
 
     lpNext = lpCon->next;
     lpPrev = lpCon->prev;
 
-    if(lpNext == NULL || lpPrev == NULL)
+    if(lpNext == nullptr || lpPrev == nullptr)
         return;
 
     lpPrev->next = lpNext;
     lpNext->prev = lpPrev;
 
-    lpCon->prev = NULL;
-    lpCon->next = NULL;
+    lpCon->prev = nullptr;
+    lpCon->next = nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -429,11 +429,11 @@ void vehfxReleaseVehicle(FXVEHCONTAINER* lpCon)
 //////////////////////////////////////////////////////////////////////
 LOGICAL vehfxGrabAVehicle(FXVEHCONTAINER** lpCon)
 {
-    FXVEHCONTAINER* lpNode = NULL;
-    FXVEHCONTAINER* lpNext = NULL;
-    FXVEHCONTAINER* lpPrev = NULL;
+    FXVEHCONTAINER* lpNode = nullptr;
+    FXVEHCONTAINER* lpNext = nullptr;
+    FXVEHCONTAINER* lpPrev = nullptr;
 
-    if(lpCon == NULL)
+    if(lpCon == nullptr)
         return FALSE;
 
     if(!vehfxCheckForVehicles())
@@ -447,8 +447,8 @@ LOGICAL vehfxGrabAVehicle(FXVEHCONTAINER** lpCon)
     lpPrev->next = lpNext;
     lpNext->prev = lpPrev;
 
-    lpNode->next = NULL;
-    lpNode->prev = NULL;
+    lpNode->next = nullptr;
+    lpNode->prev = nullptr;
 
     *lpCon = lpNode;
 
@@ -464,7 +464,7 @@ LOGICAL vehfxCheckForVehicles()
     // Are we out of free vehicles?
     if(g_conFreeHead.next == &g_conFreeTail)
     {
-        FXVEHCONTAINER* lpCon = NULL;
+        FXVEHCONTAINER* lpCon = nullptr;
 
         if(g_conTail.prev == &g_conHead)
             return FALSE;
@@ -489,9 +489,9 @@ LOGICAL vehfxCheckForVehicles()
 //////////////////////////////////////////////////////////////////////
 LOGICAL vehfxAddVehicle(FXVEHCONTAINER* lpCon)
 {
-    FXVEHCONTAINER* lpNext = NULL;
+    FXVEHCONTAINER* lpNext = nullptr;
 
-    if(lpCon == NULL)
+    if(lpCon == nullptr)
         return FALSE;
 
     lpNext = g_conHead.next;
@@ -511,7 +511,7 @@ LOGICAL vehfxAddVehicle(FXVEHCONTAINER* lpCon)
 //////////////////////////////////////////////////////////////////////
 LOGICAL _UpdateTankFire(FXVEHCONTAINER* lpCon)
 {
-    if(lpCon->lpVeh == NULL) return FALSE;
+    if(lpCon->lpVeh == nullptr) return FALSE;
 
     SINT32 i;
 
@@ -595,7 +595,7 @@ LOGICAL _UpdateTankFire(FXVEHCONTAINER* lpCon)
 //////////////////////////////////////////////////////////////////////
 LOGICAL _UpdateTreadDust(FXVEHCONTAINER* lpCon)
 {
-    if(lpCon->lpVeh == NULL) return FALSE;
+    if(lpCon->lpVeh == nullptr) return FALSE;
 
     for(SINT32 i = 0; i < VEH_MAX_TREAD_DUST; i++)
     {
@@ -651,7 +651,7 @@ LOGICAL _UpdateTreadDust(FXVEHCONTAINER* lpCon)
 LOGICAL _UpdateWingVortex(FXVEHCONTAINER* lpCon)
 {
 #if(0)
-    if(lpCon->lpVeh == NULL) return FALSE;
+    if(lpCon->lpVeh == nullptr) return FALSE;
 
     for(SINT32 i = 0; i < 2; i++)
     {
@@ -683,7 +683,7 @@ LOGICAL _UpdateWingVortex(FXVEHCONTAINER* lpCon)
 //////////////////////////////////////////////////////////////////////
 LOGICAL _UpdateExhaust(FXVEHCONTAINER* lpCon)
 {
-    if(lpCon->lpVeh == NULL) return FALSE;
+    if(lpCon->lpVeh == nullptr) return FALSE;
 
     for(SINT32 i = 0; i < ML_MAX_ENGINES; i++)
     {
@@ -732,7 +732,7 @@ LOGICAL _UpdateExhaust(FXVEHCONTAINER* lpCon)
 //////////////////////////////////////////////////////////////////////
 LOGICAL _UpdateExplosion(FXVEHCONTAINER* lpCon)
 {
-    if(lpCon->lpVeh == NULL) return FALSE;
+    if(lpCon->lpVeh == nullptr) return FALSE;
 
     SINT32 i;
 
@@ -753,7 +753,7 @@ LOGICAL _UpdateExplosion(FXVEHCONTAINER* lpCon)
 //////////////////////////////////////////////////////////////////////
 LOGICAL _UpdateDebris(FXVEHCONTAINER* lpCon)
 {
-    if(lpCon->lpVeh == NULL) return FALSE;
+    if(lpCon->lpVeh == nullptr) return FALSE;
 
     SINT32 i;
 
@@ -774,7 +774,7 @@ LOGICAL _UpdateDebris(FXVEHCONTAINER* lpCon)
 //////////////////////////////////////////////////////////////////////
 LOGICAL _UpdateVehicleFire(FXVEHCONTAINER* lpCon)
 {
-    if(lpCon->lpVeh == NULL) return FALSE;
+    if(lpCon->lpVeh == nullptr) return FALSE;
 
     _CreateVehicleFire(lpCon, 0);
 
@@ -787,14 +787,14 @@ LOGICAL _UpdateVehicleFire(FXVEHCONTAINER* lpCon)
 //////////////////////////////////////////////////////////////////////
 LOGICAL _UpdateSparks(FXVEHCONTAINER* lpCon)
 {
-    if(lpCon->lpVeh == NULL) return FALSE;
+    if(lpCon->lpVeh == nullptr) return FALSE;
 
     if(lpCon->lpVeh->VehicleType->Type != VEH_TYPE_AIR)
         return TRUE;
 
     for(SINT32 i = 0; i < ML_MAX_FUELTANKS; i++)
     {
-        if(lpCon->lpVeh->StateAnimation.FuelFireEmitter[i] == NULL)
+        if(lpCon->lpVeh->StateAnimation.FuelFireEmitter[i] == nullptr)
             continue;
 
         if(lpCon->lpVeh->StateAnimation.FuelFireOn[i])
@@ -955,7 +955,7 @@ void _updateTraverseSound(FXVEHCONTAINER* c, SINT32 i)
                 std::string str = "sounds\\";
                 str += v->VehicleType->turretSound[i]["turrettraverse"];
 
-                SCHAR* handsound = NULL;
+                SCHAR* handsound = nullptr;
 
                 // Don't play hand move sounds if 3rd person
                 if(playType == DEF_PLAYTYPE_OBJECT)
@@ -963,7 +963,7 @@ void _updateTraverseSound(FXVEHCONTAINER* c, SINT32 i)
                     handsound = (char*)strstr(str.c_str(), "hand_turret_move");
                 }
 
-                if(handsound == NULL)
+                if(handsound == nullptr)
                 {
                     SINT32 ID = fxSndGetNewSound();
 
@@ -1149,7 +1149,7 @@ void _updateElevateSound(FXVEHCONTAINER* c, SINT32 i)
                 std::string str = "sounds\\";
                 str += v->VehicleType->turretSound[i]["turretelevate"];
 
-                SCHAR* handsound = NULL;
+                SCHAR* handsound = nullptr;
 
                 // Don't play hand move sounds if 3rd person
                 if(playType == DEF_PLAYTYPE_OBJECT)
@@ -1157,7 +1157,7 @@ void _updateElevateSound(FXVEHCONTAINER* c, SINT32 i)
                     handsound = (char*)strstr(str.c_str(), "hand_turret_move");
                 }
 
-                if(handsound == NULL)
+                if(handsound == nullptr)
                 {
                     SINT32 ID = fxSndGetNewSound();
 
@@ -1202,12 +1202,12 @@ void _updateElevateSound(FXVEHCONTAINER* c, SINT32 i)
 LOGICAL _CreateSparks(FXVEHCONTAINER* lpCon, SINT32 iTank)
 {
 #if(0)
-    if(lpCon->lpVeh == NULL) return FALSE;
+    if(lpCon->lpVeh == nullptr) return FALSE;
 
     OBJECT* lpObj = lpCon->lpVeh->StateAnimation.FuelFireEmitter[iTank];
 
-    if(lpObj == NULL) return FALSE;
-    if(lpObj->dof == NULL) return FALSE;
+    if(lpObj == nullptr) return FALSE;
+    if(lpObj->dof == nullptr) return FALSE;
 
 #if USE_FX2
     piVECTOR n = {0, 0, 1};
@@ -1246,13 +1246,13 @@ LOGICAL _CreateSparks(FXVEHCONTAINER* lpCon, SINT32 iTank)
 void _BoatTrailCallback(FXPARTICLE* p)
 {
 #ifndef USE_FX2
-    if(p->lpVehicle == NULL)
+    if(p->lpVehicle == nullptr)
         return;
 
-    if(p->lpEmitterObj == NULL)
+    if(p->lpEmitterObj == nullptr)
         return;
 
-    if(p->lpDOF == NULL)
+    if(p->lpDOF == nullptr)
         return;
 
     SINT32 sprites[3] = {21, 44, 20};
@@ -1350,13 +1350,13 @@ void _BoatTrailCallback(FXPARTICLE* p)
 void _BoatWakeCallback(FXPARTICLE* p)
 {
 #if(0)
-    if(p->lpVehicle == NULL)
+    if(p->lpVehicle == nullptr)
         return;
 
-    if(p->lpEmitterObj == NULL)
+    if(p->lpEmitterObj == nullptr)
         return;
 
-    if(p->lpDOF == NULL)
+    if(p->lpDOF == nullptr)
         return;
 
     FLOAT32 starttime = (FLOAT32)frametime;
@@ -1483,8 +1483,8 @@ void vehfxFuelEmitterSparkCallback(FXPARTICLE* lpPcl)
 {
     OBJECT* lpEmitObj = lpPcl->lpEmitterObj;
 
-    if(lpEmitObj == NULL) return;
-    if(lpPcl->lpDOF == NULL) return;
+    if(lpEmitObj == nullptr) return;
+    if(lpPcl->lpDOF == nullptr) return;
 
     // Random occurance
     if(abs(mathGetChaoticNumber() & 15) != 2)	// fast modulo 16
@@ -1520,8 +1520,8 @@ void vehfxSparkNoDragCallback(FXPARTICLE* lpPcl)
 {
     OBJECT* lpEmitObj = lpPcl->lpEmitterObj;
 
-    if(lpEmitObj == NULL) return;
-    if(lpPcl->lpDOF == NULL) return;
+    if(lpEmitObj == nullptr) return;
+    if(lpPcl->lpDOF == nullptr) return;
 
     // Random occurance
     if(abs(mathGetChaoticNumber() % 17) != 2)
@@ -1596,7 +1596,7 @@ void vehfxStopSmokeStack(SINT32 iID)
 LOGICAL _CreateTankFire(FXVEHCONTAINER* lpCon, SINT32 i)
 {
 #if(0)
-    if(lpCon->lpVeh == NULL)
+    if(lpCon->lpVeh == nullptr)
         return FALSE;
 
     if(lpCon->lpVeh->StateAnimation.TankFireSmokeEmitter[i] > 0)
@@ -1604,8 +1604,8 @@ LOGICAL _CreateTankFire(FXVEHCONTAINER* lpCon, SINT32 i)
 
     OBJECT* lpObj = lpCon->lpVeh->StateAnimation.TankFireEmitterPoint[i];
 
-    if(lpObj == NULL) return FALSE;
-    if(lpObj->dof == NULL) return FALSE;
+    if(lpObj == nullptr) return FALSE;
+    if(lpObj->dof == nullptr) return FALSE;
 
 #ifdef USE_FX2
     piVECTOR n = {0, 0, -1};
@@ -1722,13 +1722,13 @@ LOGICAL _CreateTreadDust(FXVEHCONTAINER* c, SINT32 i)
     if(c->lpVeh->StateAnimation.TreadDustHandle[i] > 0)
         return FALSE;
 
-    if(c->lpVeh->StateAnimation.TreadDustEmitter[i] == NULL)
+    if(c->lpVeh->StateAnimation.TreadDustEmitter[i] == nullptr)
         return FALSE;
 
     OBJECT* o = c->lpVeh->StateAnimation.TreadDustEmitter[i];
 
-    if(o == NULL) return FALSE;
-    if(o->dof == NULL) return FALSE;
+    if(o == nullptr) return FALSE;
+    if(o->dof == nullptr) return FALSE;
 
     if(c->uType == VEH_TYPE_SEA)
     {
@@ -1806,7 +1806,7 @@ void _CreateBoatWakesAndTrails(FXVEHCONTAINER* c, SINT32 i)
                             c->lpVeh->VehicleObjectData->EffectsObject,
                             pStr);
 
-    if(o == NULL)
+    if(o == nullptr)
         return;
 
 #if USE_FX2
@@ -1853,13 +1853,13 @@ LOGICAL _CreateWingVortex(FXVEHCONTAINER* lpCon, SINT32 i)
     if(lpCon->lpVeh->StateAnimation.WingtipVortexSmokeHandle[i] > 0)
         return FALSE;
 
-    if(lpCon->lpVeh->StateAnimation.WingtipVortexEmitter[i] == NULL)
+    if(lpCon->lpVeh->StateAnimation.WingtipVortexEmitter[i] == nullptr)
         return FALSE;
 
     OBJECT* lpObj = lpCon->lpVeh->StateAnimation.WingtipVortexEmitter[i];
 
-    if(lpObj == NULL) return FALSE;
-    if(lpObj->dof == NULL) return FALSE;
+    if(lpObj == nullptr) return FALSE;
+    if(lpObj->dof == nullptr) return FALSE;
 
     piVECTOR pos;
 
@@ -1907,7 +1907,7 @@ LOGICAL _CreateWingVortex(FXVEHCONTAINER* lpCon, SINT32 i)
 LOGICAL _CreateExhaust(FXVEHCONTAINER* lpCon, SINT32 iEngine, SINT32 iSide)
 {
 #if(0)
-    OBJECT* lpObj = NULL;
+    OBJECT* lpObj = nullptr;
 
     // Already have exhaust created for this engine.
     if(lpCon->lpVeh->StateAnimation.ExhaustSmokeHandle[iEngine][iSide] > 0)
@@ -1917,8 +1917,8 @@ LOGICAL _CreateExhaust(FXVEHCONTAINER* lpCon, SINT32 iEngine, SINT32 iSide)
 
     lpObj = lpCon->lpVeh->StateAnimation.ExhaustSmokeEmitter[iEngine][iSide];
 
-    if(lpObj == NULL) return FALSE;
-    if(lpObj->dof == NULL) return FALSE;
+    if(lpObj == nullptr) return FALSE;
+    if(lpObj->dof == nullptr) return FALSE;
 
 #if USE_FX2
     piVECTOR n = {0, 0, -1};
@@ -1993,15 +1993,15 @@ LOGICAL _CreateExhaust(FXVEHCONTAINER* lpCon, SINT32 iEngine, SINT32 iSide)
 LOGICAL _CreateSmokeStack(FXVEHCONTAINER* lpCon, SINT32 iEngine, SINT32 iSide)
 {
 #if(0)
-    OBJECT* lpObj = NULL;
+    OBJECT* lpObj = nullptr;
 
     if(lpCon->iShipStackSmoke[iEngine][iSide] > 0)
         return FALSE;
 
     lpObj = lpCon->lpVeh->StateAnimation.ExhaustSmokeEmitter[iEngine][iSide];
 
-    if(lpObj == NULL) return FALSE;
-    if(lpObj->dof == NULL) return FALSE;
+    if(lpObj == nullptr) return FALSE;
+    if(lpObj->dof == nullptr) return FALSE;
 
 #if USE_FX2
     piVECTOR n = {0, 0, 0};
@@ -2081,7 +2081,7 @@ void _SmokeStackKill(void* pData)
 {
     SINT32* pID = (SINT32*)pData;
 
-    if(pID == NULL)
+    if(pID == nullptr)
         return;
 
     *pID = 0;
@@ -2117,8 +2117,8 @@ LOGICAL vehfxCreateShockSmoke(SINT32 id)
     {
         OBJECT* lpObj = g_lpCon[idx].lpVeh->StateAnimation.TreadDustEmitter[i];
 
-        if(lpObj == NULL) continue;
-        if(lpObj->dof == NULL) continue;
+        if(lpObj == nullptr) continue;
+        if(lpObj->dof == nullptr) continue;
 
         TransformEffect* te = TransformEffect::AddEffect("shockdust", Vec3f(0, 0, 0), 0, lpObj);
 
@@ -2138,12 +2138,12 @@ LOGICAL vehfxCreateShockSmoke(SINT32 id)
 //////////////////////////////////////////////////////////////////////
 LOGICAL _CreateDebris(FXVEHCONTAINER* lpCon, SINT32 i, FLOAT32 scale)
 {
-	if(lpCon->lpVeh == NULL) return FALSE;
+	if(lpCon->lpVeh == nullptr) return FALSE;
 
 	OBJECT* lpObj = lpCon->lpVeh->StateAnimation.DebrisEmitter[i];
 
-	if(lpObj == NULL) return FALSE;
-	if(lpObj->dof == NULL) return FALSE;
+	if(lpObj == nullptr) return FALSE;
+	if(lpObj->dof == nullptr) return FALSE;
 
 	SINT32 iID;
 
@@ -2225,12 +2225,12 @@ LOGICAL _CreateDebris(FXVEHCONTAINER* lpCon, SINT32 i, FLOAT32 scale)
 //////////////////////////////////////////////////////////////////////
 LOGICAL _CreateExplosion(FXVEHCONTAINER* lpCon, SINT32 i)
 {
-    if(lpCon->lpVeh == NULL) return FALSE;
+    if(lpCon->lpVeh == nullptr) return FALSE;
 
     OBJECT* lpObj = lpCon->lpVeh->StateAnimation.DebrisEmitter[i];
 
-    if(lpObj == NULL) return FALSE;
-    if(lpObj->dof == NULL) return FALSE;
+    if(lpObj == nullptr) return FALSE;
+    if(lpObj->dof == nullptr) return FALSE;
 
     FLOAT64VECTOR vecPos;
 
@@ -2294,13 +2294,13 @@ LOGICAL _CreateExplosion(FXVEHCONTAINER* lpCon, SINT32 i)
 //////////////////////////////////////////////////////////////////////
 LOGICAL _CreateVehicleFire(FXVEHCONTAINER* lpCon, SINT32 i)
 {
-    if(lpCon->lpVeh == NULL)
+    if(lpCon->lpVeh == nullptr)
         return FALSE;
 
     if(lpCon->_fireid[i] > 0)
         return FALSE;
 
-    OBJECT* lpObj = NULL;
+    OBJECT* lpObj = nullptr;
 
     // Currently all vehicle fire stems from hfire1. If more are needed
     // in the future, add an emitter array to the state animation structure.
@@ -2308,8 +2308,8 @@ LOGICAL _CreateVehicleFire(FXVEHCONTAINER* lpCon, SINT32 i)
                             lpCon->lpVeh->VehicleObjectData->EffectsObject,
                             "hfire1");
 
-    if(lpObj == NULL) return FALSE;
-    if(lpObj->dof == NULL) return FALSE;
+    if(lpObj == nullptr) return FALSE;
+    if(lpObj->dof == nullptr) return FALSE;
 
     TransformEffect* te = TransformEffect::AddEffect("vehiclefire", Vec3f(0, 0, -1), 0, lpObj);
 
@@ -2330,7 +2330,7 @@ OBJECT* _getFreeDebris()
 {
     if(_freedebris.empty())
     {
-        return NULL;
+        return nullptr;
     }
 
     OBJECT* o = _freedebris.front();
@@ -2347,7 +2347,7 @@ void vehfxFXOBJKillCallback(void* data)
 {
     OBJECT* o = (OBJECT*)data;
 
-    if(o == NULL)
+    if(o == nullptr)
     {
         return;
     }
@@ -2536,7 +2536,7 @@ LOGICAL vehfxPlayTankTreadInternal(SINT32 id, LOGICAL bOn)
 
     FXVEHCONTAINER* lpCon = &g_lpCon[iIndex];
 
-    if(lpCon->lpVeh == NULL)
+    if(lpCon->lpVeh == nullptr)
         return FALSE;
 
     if(!lpCon->lpVeh->VehicleType)
@@ -2582,13 +2582,13 @@ LOGICAL vehfxPlayTankTreadInternal(SINT32 id, LOGICAL bOn)
             continue;
         }
 
-        if(lpCon->lpVeh->StateAnimation.TreadDustEmitter[i] == NULL)
+        if(lpCon->lpVeh->StateAnimation.TreadDustEmitter[i] == nullptr)
             continue;
 
         OBJECT* lpObj = lpCon->lpVeh->StateAnimation.TreadDustEmitter[i];
 
-        if(lpObj == NULL) return FALSE;
-        if(lpObj->dof == NULL) return FALSE;
+        if(lpObj == nullptr) return FALSE;
+        if(lpObj->dof == nullptr) return FALSE;
 
         FLOAT64VECTOR vecPos;
 
@@ -2638,7 +2638,7 @@ LOGICAL vehfxPlayTankBrake(SINT32 id, LOGICAL bOn)
 
     FXVEHCONTAINER* lpCon = &g_lpCon[iIndex];
 
-    if(lpCon->lpVeh == NULL)
+    if(lpCon->lpVeh == nullptr)
         return FALSE;
 
     if(!lpCon->lpVeh->VehicleType)
@@ -2670,13 +2670,13 @@ LOGICAL vehfxPlayTankBrake(SINT32 id, LOGICAL bOn)
             continue;
         }
 
-        if(lpCon->lpVeh->StateAnimation.TreadDustEmitter[i] == NULL)
+        if(lpCon->lpVeh->StateAnimation.TreadDustEmitter[i] == nullptr)
             return FALSE;
 
         OBJECT* lpObj = lpCon->lpVeh->StateAnimation.TreadDustEmitter[i];
 
-        if(lpObj == NULL) return FALSE;
-        if(lpObj->dof == NULL) return FALSE;
+        if(lpObj == nullptr) return FALSE;
+        if(lpObj->dof == nullptr) return FALSE;
 
         FLOAT64VECTOR vecPos;
 
@@ -2718,10 +2718,10 @@ LOGICAL vehfxPlayTankBrake(SINT32 id, LOGICAL bOn)
 //////////////////////////////////////////////////////////////////////
 FLOAT32 _GetPitch(vehVehicle* lpVeh)
 {
-    if(lpVeh == NULL)
+    if(lpVeh == nullptr)
         return 1.0f;
 
-    if(lpVeh->VehicleType == NULL)
+    if(lpVeh->VehicleType == nullptr)
         return 1.0f;
 
     FLOAT32 fSpeedEnd = lpVeh->VehicleType->EngineSpeedEnd[0];
@@ -2748,7 +2748,7 @@ void _KillSoundCallback(void* data)
 {
     SINT32* pHandle = (SINT32*)data;
 
-    if(pHandle == NULL)
+    if(pHandle == nullptr)
         return;
 
     *pHandle = 0;
@@ -2958,7 +2958,7 @@ void vehfxCreateHulkSmoke(SINT32 id)
     }
 
     vehVehicle*veh = container->lpVeh;
-    OBJECT* emitter = NULL;
+    OBJECT* emitter = nullptr;
 
     if(!veh->VehicleObjectData)
     {

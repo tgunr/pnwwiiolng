@@ -37,8 +37,8 @@ MessageLoop::MessageLoop() : MessageHandler()
 {
 	_handlers = new HandlerList;
 	_messages = new MessageQueue;
-	_commonfilters = NULL;
-	_preferredhandler = NULL;
+	_commonfilters = nullptr;
+	_preferredhandler = nullptr;
 	_currentMessage = 0;
 	_parentloop = this;
 	_id = _loopid++;
@@ -48,7 +48,7 @@ MessageLoop::MessageLoop() : MessageHandler()
 
 MessageLoop::~MessageLoop()
 {
-	_parentloop = NULL;
+	_parentloop = nullptr;
 	
 	std::list<MessageLoop*>::iterator delit = find(_loops.begin(), _loops.end(), this);
 	if(delit != _loops.end())
@@ -57,9 +57,9 @@ MessageLoop::~MessageLoop()
 	// we don't own handlers just remove us as parent
 	for(HandlerList::iterator it = _handlers->begin(); it != _handlers->end(); ++it)
 	{
-        (*it)->_parentloop = NULL;
+        (*it)->_parentloop = nullptr;
         if((*it)->NextHandler() == this)
-            (*it)->SetNextHandler(NULL);
+            (*it)->SetNextHandler(nullptr);
 	}
 	
 	if(_commonfilters)
@@ -91,7 +91,7 @@ void MessageLoop::Update(unsigned int ms)
 		MessageQueueElem& elem = _messages->back();
 		
 		// make sure the handler still exists
-		if(elem._handler == NULL ||	ValidHandler(elem._handler))
+		if(elem._handler == nullptr ||	ValidHandler(elem._handler))
 		{ // send the message
 			_currentMessage = &elem._msg; 
 			DispatchMessage(&elem._msg, elem._handler, elem._reply);
@@ -108,7 +108,7 @@ void MessageLoop::Update(unsigned int ms)
 
 bool MessageLoop::AddHandler(MessageHandler* handler)
 {
-	if(handler->ParentLoop() == NULL)
+	if(handler->ParentLoop() == nullptr)
     {
         handler->SetNextHandler(this);
         handler->_parentloop = this;
@@ -132,10 +132,10 @@ bool MessageLoop::RemoveHandler(MessageHandler* handler)
 	
 	if(it != _handlers->end())
 	{
-        handler->SetNextHandler(NULL);
-        handler->_parentloop = NULL;
+        handler->SetNextHandler(nullptr);
+        handler->_parentloop = nullptr;
 		if(handler == PreferredHandler())
-			SetPreferredHandler(NULL);
+			SetPreferredHandler(nullptr);
 
 		_handlers->erase(it);
         
@@ -151,7 +151,7 @@ bool MessageLoop::RemoveHandler(MessageHandler* handler)
 
 int MessageLoop::PostMessage(Message* msg, MessageHandler* handler, MessageHandler* replyhandler)
 {
-	if(handler == NULL || handler == this || find(_handlers->begin(), _handlers->end(), handler) != _handlers->end() )
+	if(handler == nullptr || handler == this || find(_handlers->begin(), _handlers->end(), handler) != _handlers->end() )
 	{
 		_messages->push_front(MessageQueueElem(*msg, handler,replyhandler));
 		return 0;
@@ -166,10 +166,10 @@ int MessageLoop::PostMessage(Message* msg, MessageHandler* handler, MessageHandl
 
 void MessageLoop::DispatchMessage(Message* msg, MessageHandler* handler,MessageHandler* replyhandler)
 {
-	if(handler == NULL) // use preferred handler
+	if(handler == nullptr) // use preferred handler
 		handler = PreferredHandler();
 
-    if(handler == NULL)
+    if(handler == nullptr)
         handler = this;
     
 	MessageFilter* filter;
@@ -189,7 +189,7 @@ void MessageLoop::DispatchMessage(Message* msg, MessageHandler* handler,MessageH
 		}
 	}
 	
-	for(int i = 0; ValidHandler(handler) && (filter = handler->FilterAt(i)) != NULL; i++)
+	for(int i = 0; ValidHandler(handler) && (filter = handler->FilterAt(i)) != nullptr; i++)
 	{
 		if((filter->Command() == phui::ANY_EVENT || filter->Command() == msg->what) &&
 			filter->Filter(msg, &handler, &replyhandler))
@@ -209,7 +209,7 @@ void MessageLoop::DispatchMessage(Message* msg, MessageHandler* handler,MessageH
 
 void MessageLoop::SetPreferredHandler(MessageHandler* handler)
 {
-	if(handler == NULL)
+	if(handler == nullptr)
 	{
 		_preferredhandler = this;
 	} else if(handler->_parentloop == this)
@@ -225,7 +225,7 @@ void MessageLoop::SetPreferredHandler(MessageHandler* handler)
 
 int MessageLoop::AddCommonFilter(MessageFilter* filter)
 {
-	assert( filter != NULL );
+	assert( filter != nullptr );
 
     if(!_commonfilters) _commonfilters = new FilterList;
 	_commonfilters->push_back(filter);

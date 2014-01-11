@@ -164,7 +164,7 @@ physicsObject* physicsFindObject(PHYSICS_MODEL_FILTER* filter, void* const data)
 	if(filter)
 	{
 		physicsObjectSet::iterator it;
-		physicsObject* found = NULL;
+		physicsObject* found = nullptr;
 
 		for( it = _objects.begin() ; it != _objects.end(); ++it)
 		{
@@ -173,7 +173,7 @@ physicsObject* physicsFindObject(PHYSICS_MODEL_FILTER* filter, void* const data)
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 bool physicsFindObject(physicsObjectSet& list, PHYSICS_MODEL_FILTER* filter, void* const data)
@@ -181,7 +181,7 @@ bool physicsFindObject(physicsObjectSet& list, PHYSICS_MODEL_FILTER* filter, voi
 	if(filter)
 	{
 		physicsObjectSet::iterator it;
-		physicsObject* found = NULL;
+		physicsObject* found = nullptr;
 
 		for(it = _objects.begin(); it != _objects.end(); ++it)
 		{
@@ -636,7 +636,7 @@ void physicsCreateObjectCollider(OBJECT* Object, dSpaceID space, unsigned int ca
 	//	isSheared = false;
 
 #ifdef OBJECT_COLLIDER_DEBUG
-	static OBJECT* lo = NULL;
+	static OBJECT* lo = nullptr;
 
 	OBJECT* check = (Object->modelInstance) ? Object->modelInstance->rootObject: Object;
 

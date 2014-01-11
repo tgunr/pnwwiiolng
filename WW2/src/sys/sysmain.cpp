@@ -116,7 +116,7 @@ void GetNamedFileVersion(const TCHAR** ppFFI, const TCHAR* name)
 
 	TCHAR*        pFFI, txt[512];
 	DWORD       Nothing, VSize, Len;
-	LPVOID      pVersion=NULL;
+	LPVOID      pVersion=nullptr;
 	struct LANGANDCODEPAGE
 	{
 		WORD wLanguage;
@@ -137,7 +137,7 @@ void GetNamedFileVersion(const TCHAR** ppFFI, const TCHAR* name)
 		}
 
 		pVersion = malloc(VSize);
-		if (pVersion == NULL)
+		if (pVersion == nullptr)
 		{
 			// Severe error
 			FFI[0] = 0;
@@ -173,7 +173,7 @@ void GetNamedFileVersion(const TCHAR** ppFFI, const TCHAR* name)
 	}
 	while(FALSE);
 
-	if (pVersion != NULL)
+	if (pVersion != nullptr)
 	{
 		free(pVersion);
 	}
@@ -187,7 +187,7 @@ void GetFileVersion(const TCHAR** ppFFI)
 
 	TCHAR* pFFI, txt[512], filename[256];
 	DWORD Nothing, VSize, Len;
-	LPVOID pVersion = NULL;
+	LPVOID pVersion = nullptr;
 
 	struct LANGANDCODEPAGE
 	{
@@ -199,7 +199,7 @@ void GetFileVersion(const TCHAR** ppFFI)
 
 	do
 	{
-		if (!GetModuleFileName(NULL, filename, sizeof(filename)))
+		if (!GetModuleFileName(nullptr, filename, sizeof(filename)))
 		{
 			ustrcpy(filename, _T("Unknown"));
 		}
@@ -214,7 +214,7 @@ void GetFileVersion(const TCHAR** ppFFI)
 		}
 
 		pVersion = malloc(VSize);
-		if (pVersion == NULL)
+		if (pVersion == nullptr)
 		{
 			// Severe error
 			FFI[0] = 0;
@@ -247,7 +247,7 @@ void GetFileVersion(const TCHAR** ppFFI)
 	}
 	while(FALSE);
 
-	if (pVersion != NULL)
+	if (pVersion != nullptr)
 	{
 		free(pVersion);
 	}
@@ -265,7 +265,7 @@ int sysmainExceptionHandler(int code, EXCEPTION_POINTERS* ep)
 	SYSTEMTIME	SystemTime;
 	WWII_ERROR_INFO errInfo;
 
-    ClipCursor(NULL);
+    ClipCursor(nullptr);
 
 	memset(&errInfo, 0x0, sizeof(errInfo));
 
@@ -287,11 +287,11 @@ int sysmainExceptionHandler(int code, EXCEPTION_POINTERS* ep)
     TCHAR filename[256];
     memset(filename, 0, sizeof(filename));
 
-    GetModuleFileName(NULL, filename, sizeof(filename));
+    GetModuleFileName(nullptr, filename, sizeof(filename));
 	fprintf(ExceptionLog, "%s\n", UTF8(filename));
 
 	GetFileVersion(&pFFI);
-	if (pFFI != NULL)
+	if (pFFI != nullptr)
 	{
 		fprintf(ExceptionLog, "File version: %s\n", UTF8(pFFI));
 	}
@@ -613,12 +613,12 @@ BOOL				bOsVersionInfo;
 		break;
 	}
 
-	if (MajorVersion != NULL)
+	if (MajorVersion != nullptr)
 	{
 		*MajorVersion = osvi.dwMajorVersion;
 	}
 
-	if (MinorVersion != NULL)
+	if (MinorVersion != nullptr)
 	{
 		*MinorVersion = osvi.dwMinorVersion;
 	}
@@ -752,7 +752,7 @@ TCHAR        txt[512], filename[256];
 char		divisor[]="K";
 BOOL        retval=FALSE;
 DWORD       Nothing, VSize, Len, cpuspeed;
-LPVOID      pVersion=NULL;
+LPVOID      pVersion=nullptr;
 char*		pFFI;
 MEMORYSTATUS	memstat;
 struct LANGANDCODEPAGE
@@ -764,7 +764,7 @@ struct LANGANDCODEPAGE
 
 	do
 	{
-		if (!GetModuleFileName(NULL, filename, sizeof(filename)))
+		if (!GetModuleFileName(nullptr, filename, sizeof(filename)))
 		{
 			ustrcpy(filename, _T("Unknown"));
 		}
@@ -778,7 +778,7 @@ struct LANGANDCODEPAGE
 		}
 
 		pVersion = memCalloc(1, VSize);
-		if (pVersion == NULL)
+		if (pVersion == nullptr)
 		{
 			// Severe error
 			break;
@@ -824,7 +824,7 @@ struct LANGANDCODEPAGE
 	}
 	while (0);
 
-	if (pVersion != NULL)
+	if (pVersion != nullptr)
 	{
 		memFree(pVersion);
 	}
@@ -848,10 +848,10 @@ SYSTEMTIME	SystemTime;
 	//FILE* ValidExitLog = Fio::OpenLogFile();
 
 	Write_Debug("Abort handler information...");
-    ClipCursor(NULL);
+    ClipCursor(nullptr);
 
 	GetFileVersion(&pFFI);
-	if (pFFI != NULL)
+	if (pFFI != nullptr)
 	{
 		//fprintf(ValidExitLog, "File version: %s\n", UTF8(pFFI));
 	}
@@ -991,7 +991,7 @@ MEM_BOOL MEM_CALLBACK MyErrorHandler( MEM_ERROR_INFO* errorInfo)
 	delete emergencybuffer;
 
     Write_Debug("Smartheap Reports Out Of Memory\n");
-	//MessageBox(NULL, _T("Application is out of memory and will exit."), _T("Out Of Memory"), MB_ICONERROR|MB_OK|MB_SYSTEMMODAL);
+	//MessageBox(nullptr, _T("Application is out of memory and will exit."), _T("Out Of Memory"), MB_ICONERROR|MB_OK|MB_SYSTEMMODAL);
 
 	/*
 	FILE* fp = Fio::OpenLogFile();
@@ -1002,7 +1002,7 @@ MEM_BOOL MEM_CALLBACK MyErrorHandler( MEM_ERROR_INFO* errorInfo)
 
 
 	MEM_POOL_ENTRY entry;
-	entry.entry = NULL;
+	entry.entry = nullptr;
 	size_t sumInUse=0, countInUse=0;
 	size_t sumFree=0, countFree=0;
 	size_t greaterThan20MB = 0, biggestOne=0;
@@ -1055,7 +1055,7 @@ static void initSmartHeap()
 
 	MemInitDefaultPool();
 //	PrevErrorHandler = MemSetErrorHandler(MyErrorHandler);
-	PrevErrorHandler = MemSetErrorHandler(NULL); // make smartheap return null for out of memory errors
+	PrevErrorHandler = MemSetErrorHandler(nullptr); // make smartheap return null for out of memory errors
 
 	dbgMemSetSafetyLevel(MEM_SAFETY_DEBUG);
 
@@ -1095,7 +1095,7 @@ static void HandleHackID()
 		size_t len = strlen(HackID);
 		if ( len == 44 )
 		{
-			unsigned long otp  = strtoul(ServerOTP, NULL, 10);
+			unsigned long otp  = strtoul(ServerOTP, nullptr, 10);
 			srand(otp);
 			wchar_t text[12];
 			int j=0;
@@ -1114,7 +1114,7 @@ static void HandleHackID()
 				text[j] ^= rand();
 			}
 			text[j]=0;
-			if ( wcschr(text,'[')!=NULL )
+			if ( wcschr(text,'[')!=nullptr )
 			{
 				// hacker
 			}
@@ -1151,7 +1151,7 @@ int		screenmode;
 #endif
 
 #if platOS == OS_WIN32 && defined(PERFORMANCE_ENTER_EXIT)
-	if (GetModuleFileName(NULL, filename, sizeof(filename)))
+	if (GetModuleFileName(nullptr, filename, sizeof(filename)))
 	{
 		if (!syspeeParseMapFunction(filename))
 		{
@@ -1283,7 +1283,7 @@ int		screenmode;
 #endif
 
 #if XAUDIO
-    HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+    HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
     if(hr != S_OK)
     {
@@ -1295,7 +1295,7 @@ int		screenmode;
 	memInit();
 
 #ifdef DIRECT3D
-	dx3dinfoGetAdaptersAndModes(NULL, NULL);
+	dx3dinfoGetAdaptersAndModes(nullptr, nullptr);
 #endif	// DIRECT3D
 
 	// look up the product region (us/china)
@@ -1334,7 +1334,7 @@ int		screenmode;
 		TCHAR  HelpInfo[512];
 
 		LoadString(hInstance, IDS_HELPINFO, HelpInfo, 512);
-		MessageBox(NULL, HelpInfo, _T("WW2 Online Help"), MB_OK|MB_ICONINFORMATION);
+		MessageBox(nullptr, HelpInfo, _T("WW2 Online Help"), MB_OK|MB_ICONINFORMATION);
 		return(0);
 	}
 
@@ -1433,7 +1433,7 @@ int		screenmode;
 
 #ifdef EVENT_LOG
 #if platOS == OS_WIN32
-	GetWindowsVersion(NULL, NULL);
+	GetWindowsVersion(nullptr, nullptr);
 
 	if (!DisplayInformation())
 	{
@@ -1527,15 +1527,15 @@ int		screenmode;
 	ddpDrawNotActive(TRUE);
 	ddpDisableScreenSaver(TRUE);
 
-	ddpSetDDInit(NULL);//oglInit);
-	ddpSetDDRender(NULL);//rnlogoRender);
-	ddpSetDDKill(NULL);//oglKill);
+	ddpSetDDInit(nullptr);//oglInit);
+	ddpSetDDRender(nullptr);//rnlogoRender);
+	ddpSetDDKill(nullptr);//oglKill);
 
 	ddpSetD3DInit(piInit);
 	ddpSetD3DRender(gmlpMainUpdate);
 	ddpSetD3DKill(piKill);
 
-	if (!ddpCreateWnd(WantedX, WantedY, WantedWidth, WantedHeight, WantedBpp, WantedWindow ? DDWND_FULLWINDOW : DDWND_FULLSCREEN, NULL))
+	if (!ddpCreateWnd(WantedX, WantedY, WantedWidth, WantedHeight, WantedBpp, WantedWindow ? DDWND_FULLWINDOW : DDWND_FULLSCREEN, nullptr))
 	{
 		ddpKill();
 		return(0);
@@ -1544,9 +1544,9 @@ int		screenmode;
 
 	do
 	{
-		while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
+		while (PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE))
 		{
-			if (GetMessage(&msg, NULL, 0, 0))
+			if (GetMessage(&msg, nullptr, 0, 0))
 			{
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
@@ -1576,7 +1576,7 @@ int		screenmode;
 	{
 		do
 		{
-			if (GetMessage(&msg, NULL, 0, 0))
+			if (GetMessage(&msg, nullptr, 0, 0))
 			{
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
@@ -1590,7 +1590,7 @@ int		screenmode;
 
 		Sleep(250);	// wait for thread to run down
 		CloseHandle(threadhandle);
-		threadhandle = NULL;
+		threadhandle = nullptr;
 	}
 
 #endif	// DONT_USE_THREAD
@@ -1636,8 +1636,8 @@ static LOGICAL abcd()
 {
     TCHAR szSysDir[_MAX_PATH+1];
 
-    HMODULE hModule1 = NULL;
-    HMODULE hModule2 = NULL;
+    HMODULE hModule1 = nullptr;
+    HMODULE hModule2 = nullptr;
 
 	// Get the handle to the OpenGL dll
     hModule1 = GetModuleHandle(_T("OPENGL32.dll"));
@@ -1649,7 +1649,7 @@ static LOGICAL abcd()
     hModule2 = GetModuleHandle(szSysDir);
 
     // No OpenGL in system32 directory
-    if(hModule2 == NULL)
+    if(hModule2 == nullptr)
     {
         return TRUE;
     }
@@ -1666,7 +1666,7 @@ static LOGICAL abcd()
     ustrcat(szSysDir, _T("\\KERNEL32.dll"));
 
     hModule2 = GetModuleHandle(szSysDir);
-	if(hModule2 == NULL || hModule1 != hModule2)
+	if(hModule2 == nullptr || hModule1 != hModule2)
 	{
 		return TRUE;
 	}
@@ -1749,11 +1749,11 @@ void sysmainSetMouse(SYS_MOUSEFUNC NewMouseRoute)
 
 static void AddArchives()
 {
-	SCHAR** fileList = NULL;
+	SCHAR** fileList = nullptr;
 	SINT32 numfiles, i;
 	bool foundthem=false;
 
-	fiodGetDirFileList(NULL, &fileList, &numfiles);
+	fiodGetDirFileList(nullptr, &fileList, &numfiles);
 	if(!fileList)
 	{
 		throw std::runtime_error("Archive directory is wrong");

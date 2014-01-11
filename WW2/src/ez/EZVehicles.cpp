@@ -244,7 +244,7 @@ bool EZGameVehicle::SetForward()
 
 	mlComponentVector list;
 	mlengineGetComponents(_vehicle->ModelData, list, ML_COMPONENT_ENGINE, ML_ENGINE_SUBTYPE_GEARBOX);
-	mlEngineComponentData* gearBox = NULL;
+	mlEngineComponentData* gearBox = nullptr;
 
 	if(!list.empty())
 		gearBox = (mlEngineComponentData*)(list.at(0)->SpecialData);
@@ -279,7 +279,7 @@ bool EZGameVehicle::SetReverse()
 
 	mlComponentVector list;
 	mlengineGetComponents(_vehicle->ModelData, list, ML_COMPONENT_ENGINE, ML_ENGINE_SUBTYPE_GEARBOX);
-	mlEngineComponentData* gearBox = NULL;
+	mlEngineComponentData* gearBox = nullptr;
 
 	if(!list.empty())
 		gearBox = (mlEngineComponentData*)(list.at(0)->SpecialData);
@@ -354,8 +354,8 @@ void EZGameVehicle::UpdateHUD()
 	TargetView* target = dynamic_cast<TargetView*>(reticle);
 	if(!target) return;
 
-	mlWeaponMount* mount = NULL;
-	mlComponent* component = NULL;
+	mlWeaponMount* mount = nullptr;
+	mlComponent* component = nullptr;
 
 	mlComponentListIterator it;
 	mlComponentListBegin(_vehicle->ModelData->ComponentList, &it);
@@ -1002,7 +1002,7 @@ void EZTrooper::FrameUpdate()
 		if(reticle)
 		{
 			reticle->Close();
-			reticle = NULL;
+			reticle = nullptr;
 		}
 
 		_lastWeapon = weapType;
@@ -1016,7 +1016,7 @@ void EZTrooper::FrameUpdate()
 			if(reticle)
 			{
 				reticle->Close();
-				reticle = NULL;
+				reticle = nullptr;
 			}
 		}
 		else

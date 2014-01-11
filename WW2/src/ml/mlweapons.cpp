@@ -227,7 +227,7 @@ UINT32 mlWeaponMountAddSpecialVariable(void* SpecialData, const char * VarName, 
 	VehiclePtr = (vehVehicle*)VehicleMasterPtr;
 	VehicleType = VehiclePtr->VehicleType;
 
-	if(VehicleType == NULL) return 1;
+	if(VehicleType == nullptr) return 1;
 
 	MountData = (mlWeaponMount*)SpecialData;
 
@@ -262,7 +262,7 @@ UINT32 mlWeaponMountAddSpecialVariable(void* SpecialData, const char * VarName, 
 			if (WeaponNumber >= VEH_MAX_WEAPONS_PER_MOUNT)
 				Write_Log(LOG_VEHICLE, LOG_WARN, "Too many weapons in %s", Component->ComponentName);
 
-			if (VehicleType->Loadout[ConfigNumber].WeaponTypes[MountNumber][WeaponNumber] == NULL)
+			if (VehicleType->Loadout[ConfigNumber].WeaponTypes[MountNumber][WeaponNumber] == nullptr)
 			{
 				Write_Log(LOG_VEHICLE, LOG_WARN, "Loadout file for vehicle has no weapon for mount %d, loadout/config %d, weaponnum %d",
 							MountNumber+1, ConfigNumber+1, WeaponNumber+1);
@@ -361,7 +361,7 @@ UINT32 mlWeaponMountAddSpecialVariable(void* SpecialData, const char * VarName, 
 				if(Position >= 0 && Position < ML_MAX_CREW_POSITIONS)
 					MountData->CanJettison[Position] = 1;
 
-				s = strtok(NULL, " ");
+				s = strtok(nullptr, " ");
 			}
 		}
 		break;
@@ -405,7 +405,7 @@ UINT32 mlLoadBeltFile(weapWeapon* Weapon,UCHAR* VarContents,SINT32 AmmoGroupNum)
 	while(fioGetString(File, Buffer, 255) > 1)
 	{
 		weapFindAmmoTypeByName(&Weapon->BeltSequence[AmmoGroupNum][numRounds], (UCHAR*)Buffer);
-		if (Weapon->BeltSequence[AmmoGroupNum][numRounds] != NULL)
+		if (Weapon->BeltSequence[AmmoGroupNum][numRounds] != nullptr)
 			++numRounds;
 	}
 
@@ -435,10 +435,10 @@ UINT32 mlUpdateWeaponMount(FLOAT64VECTOR* Force, FLOAT64ATT* Torque,
 	Force->x = Force->y = Force->z = 0;
 	Torque->Roll = Torque->Pitch = Torque->Yaw = 0;
 
-	if(Component == NULL || Component->SpecialData == NULL) return (UINT32)-1;
+	if(Component == nullptr || Component->SpecialData == nullptr) return (UINT32)-1;
 
 	Mount = (mlWeaponMount*)(Component->SpecialData);
-	if(Mount->MountObject == NULL || Mount->MountObject->dof == NULL) return (UINT32)-1;
+	if(Mount->MountObject == nullptr || Mount->MountObject->dof == nullptr) return (UINT32)-1;
 
 	if(ConvergenceRange < Mount->MinConvergence)
 		ConvergenceRange =  Mount->MinConvergence;
@@ -506,10 +506,10 @@ static void _HandleDamage(mlWeaponMount* Mount, mlComponent* Component, mlVehicl
 	UINT32 AmmoOriginal = 0, AmmoCurrent = 0;
 	FLOAT64 Probability = 0;
 	FLOAT64 Damage = 0;
-	weapAmmoType* Ammo = NULL;
+	weapAmmoType* Ammo = nullptr;
 	UINT32 TempInt = 0, TempInt1 = 0;
 	SINT32 DamageComponentNum = 0;
-	vehVehicle* Vehicle = NULL;
+	vehVehicle* Vehicle = nullptr;
 
 	Vehicle = (vehVehicle*)VehicleData->VehicleMasterPtr;
 
@@ -629,7 +629,7 @@ static void _HandleDamage(mlWeaponMount* Mount, mlComponent* Component, mlVehicl
 							// note: real energy from propellant would be much higher,
 							// however most wouldn't go directly into damaging stuff
 							// so we're going to use this for an approximation
-							if (Ammo != NULL)
+							if (Ammo != nullptr)
 							{
 								Damage = Ammo->InitVelocity * Ammo->InitVelocity * Ammo->ProjectileWeight * 0.05 * 0.1;
 
@@ -928,9 +928,9 @@ static void _SetupConvergence(mlWeaponMount * Mount,vehVehicle* Vehicle,FLOAT64 
 	// first find the gunsight view for the position
 	char s[32];
 	strprintf(s, "gview%d", Mount->UsesConvergence); // UsesConvergence specifies position number
-	Object = NULL;
+	Object = nullptr;
 	ogrpFindSubObjectByName(&Object,Vehicle->VehicleObjectData->PlaneObject,s);
-	if (Object == NULL)
+	if (Object == nullptr)
 		return;
 
 	ViewDOF = Object;
@@ -950,7 +950,7 @@ static void _SetupConvergence(mlWeaponMount * Mount,vehVehicle* Vehicle,FLOAT64 
 
 	for (i=0;i<ML_MAX_WEAPONS_PER_MOUNT;i++)
 	{
-		if (Mount->WeaponFirePoints[i] != NULL)
+		if (Mount->WeaponFirePoints[i] != nullptr)
 		{
 			Mount->WeaponFirePoints[i]->dof->dofposmatrix = Mount->ConvergenceMat;
 			Mount->WeaponFirePoints[i]->dof->dofflags |= DOF_USE_DOFPOSMATRIX;
@@ -971,7 +971,7 @@ static UINT32 _FireMountUpdate(mlWeaponMount* Mount, mlVehicleData* VehicleData,
 	UINT32 MountFired = 0;
 	FLOAT64 LastFireTime = 0;
 	SINT32 RecoilNum = 0;
-	vehVehicle* Vehicle = NULL;
+	vehVehicle* Vehicle = nullptr;
     FLOAT64VECTOR TempForce = {0, 0, 0};
 	LOGICAL MountWeaponFiring = 0;
 
@@ -1083,7 +1083,7 @@ static UINT32 _FireMountUpdate(mlWeaponMount* Mount, mlVehicleData* VehicleData,
 	if(MountFired)
 	{
 		// trigger recoil
-		if (Vehicle != NULL && Mount->MountNum > 0)
+		if (Vehicle != nullptr && Mount->MountNum > 0)
 		{
 			RecoilNum = Vehicle->VehicleType->Loadout[Vehicle->LoadoutNum].RecoilNum[Mount->MountNum-1]-1;
 			if (RecoilNum >= 0)
@@ -1114,7 +1114,7 @@ static void _UpdateMountWeight(mlWeaponMount* Mount, mlComponent* Component)
 	Mass = 0;
 	for (i=0;i<Mount->NumberOfWeaponsInMount;i++)
 	{
-		if (Mount->Weapons[i].WeaponType != NULL)
+		if (Mount->Weapons[i].WeaponType != nullptr)
 		{
 			Mass += Mount->Weapons[i].WeaponType->Mass;
 		}
@@ -1123,14 +1123,14 @@ static void _UpdateMountWeight(mlWeaponMount* Mount, mlComponent* Component)
 		{
 			if (Mount->Weapons[i].NumRoundsInBeltSequence[Mount->Weapons[i].AmmoTypeInUse] == 0)
 			{
-				if (Mount->Weapons[i].BeltSequence[Mount->Weapons[i].AmmoTypeInUse][0] != NULL)
+				if (Mount->Weapons[i].BeltSequence[Mount->Weapons[i].AmmoTypeInUse][0] != nullptr)
 				{
 					Mass += Mount->Weapons[i].NumRoundsAmmoLeft[Mount->Weapons[i].AmmoTypeInUse] *
 							Mount->Weapons[i].BeltSequence[Mount->Weapons[i].AmmoTypeInUse][0]->AmmoWeight;
 				}
 				else
 				{
-					if (Mount->Weapons[i].WeaponType->AmmoType[0] != NULL)
+					if (Mount->Weapons[i].WeaponType->AmmoType[0] != nullptr)
 					{
 						Mass += Mount->Weapons[i].NumRoundsAmmoLeft[Mount->Weapons[i].AmmoTypeInUse] *
 									Mount->Weapons[i].WeaponType->AmmoType[0]->AmmoWeight;
@@ -1145,7 +1145,7 @@ static void _UpdateMountWeight(mlWeaponMount* Mount, mlComponent* Component)
 				TempMass = 0.0;
 				while (Accumulator < Mount->Weapons[i].NumRoundsInBeltSequence[Mount->Weapons[i].AmmoTypeInUse])
 				{
-					if (Mount->Weapons[i].BeltSequence[Accumulator] != NULL)
+					if (Mount->Weapons[i].BeltSequence[Accumulator] != nullptr)
 					{
 						TempMass += Mount->Weapons[i].BeltSequence[Mount->Weapons[i].AmmoTypeInUse][Accumulator]->AmmoWeight;
 					}
@@ -1159,7 +1159,7 @@ static void _UpdateMountWeight(mlWeaponMount* Mount, mlComponent* Component)
 				Accumulator = 0;
 				while (NumRounds > 0)
 				{
-					if (Mount->Weapons[i].BeltSequence[Mount->Weapons[i].AmmoTypeInUse][Accumulator] != NULL)
+					if (Mount->Weapons[i].BeltSequence[Mount->Weapons[i].AmmoTypeInUse][Accumulator] != nullptr)
 					{
 						Mass += Mount->Weapons[i].BeltSequence[Mount->Weapons[i].AmmoTypeInUse][Accumulator]->AmmoWeight;
 					}

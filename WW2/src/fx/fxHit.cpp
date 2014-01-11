@@ -24,7 +24,7 @@
 #define DEF_MAX_NUM_OF_COLLISIONS   32
 #define DEF_MAX_HITS                128
 
-static FXHIT* g_lpHits = NULL;
+static FXHIT* g_lpHits = nullptr;
 
 static FXHIT g_hitFreeHead;
 static FXHIT g_hitFreeTail;
@@ -32,7 +32,7 @@ static FXHIT g_hitFreeTail;
 static FXHIT g_hitHead;
 static FXHIT g_hitTail;
 
-static piCOLORVALUE* g_lpColor = NULL;
+static piCOLORVALUE* g_lpColor = nullptr;
 
 static std::multimap<void* , SINT32> g_mappedHits;
 static std::vector<FXHIT*> drawlist;
@@ -59,7 +59,7 @@ LOGICAL fxHitInit()
 
     g_lpHits = (FXHIT*)memAlloc(sizeof(FXHIT) * DEF_MAX_HITS);
 
-    if(g_lpHits == NULL)
+    if(g_lpHits == nullptr)
         return FALSE;
 
 //	Uneccessary -- memAlloc = calloc
@@ -102,9 +102,9 @@ void fxHitFreeAll()
 {
     FXHIT* lpHit = g_hitHead.next;
     FXHIT* lpTail = &g_hitTail;
-    FXHIT* lpFree = NULL;
+    FXHIT* lpFree = nullptr;
 
-    if(lpHit == NULL) return;
+    if(lpHit == nullptr) return;
 
     while(lpHit != lpTail)
     {
@@ -124,13 +124,13 @@ void fxHitFreeAll()
 //////////////////////////////////////////////
 LOGICAL fxHitKill()
 {
-    if(g_lpHits != NULL)
+    if(g_lpHits != nullptr)
     {
         memFree(g_lpHits);
-        g_lpHits = NULL;
+        g_lpHits = nullptr;
     }
 
-    // Set to NULL in case of further updates.
+    // Set to nullptr in case of further updates.
     memset(&g_hitHead, 0, sizeof(FXHIT));
     memset(&g_hitTail, 0, sizeof(FXHIT));
     memset(&g_hitFreeHead, 0, sizeof(FXHIT));
@@ -145,7 +145,7 @@ LOGICAL fxHitKill()
 //////////////////////////////////////////////////////////////////////
 SINT32 fxHitGetNewHit()
 {
-    FXHIT* lpHit = NULL;
+    FXHIT* lpHit = nullptr;
 
     if(!fxHitGetHit(&lpHit))
         return -1;
@@ -175,8 +175,8 @@ LOGICAL fxHitGetObjectForHit(FXHIT* lpHit, OBJECT* lpObj)
 //////////////////////////////////////////////////////////////////////
 OBJECT* fxHitGetObject(OBJECT* lpObj)
 {
-    if(lpObj == NULL)
-        return NULL;
+    if(lpObj == nullptr)
+        return nullptr;
 
     if(!(lpObj->flags & OBJECT_NOTOBJECT))
     {
@@ -356,7 +356,7 @@ LOGICAL fxHitCollideObject(piVECTOR* pV1,
                            UINT32* pNumCls,
                            FASTCOLLIDE cldArray[])
 {
-    FASTCOLLIDE* pList = NULL;
+    FASTCOLLIDE* pList = nullptr;
 
     UINT32 uNumCollisions = DEF_MAX_NUM_OF_COLLISIONS;
 
@@ -419,7 +419,7 @@ LOGICAL fxHitHandleCollision(FASTCOLLIDE cldArray[],
 //////////////////////////////////////////////////////////////////////
 LOGICAL fxHitSetHitVector(FXHIT* lpHit, FASTCOLLIDE* lpCld, SINT32 i)
 {
-    if(lpHit->lpVehAttach == NULL)
+    if(lpHit->lpVehAttach == nullptr)
     {
         math3dVectorMultiply(&lpHit->hitPt[i],
                              &lpCld->CollidePnt,
@@ -460,7 +460,7 @@ LOGICAL fxHitDraw()
     {
         hit = (*itr);
 
-        if(hit->lpVehAttach != NULL)
+        if(hit->lpVehAttach != nullptr)
         {
             fxHitUpdateVehicleHit(hit);
         }
@@ -479,7 +479,7 @@ LOGICAL fxHitDraw()
     {
         lpHit = (*B);
 
-        if(lpHit->lpVehAttach != NULL)
+        if(lpHit->lpVehAttach != nullptr)
         {
             fxHitUpdateVehicleHit(lpHit);
         }
@@ -503,7 +503,7 @@ LOGICAL fxHitDraw()
 //////////////////////////////////////////////////////////////////////
 void _DrawDecals()
 {
-    FXHIT* lpHit = NULL;
+    FXHIT* lpHit = nullptr;
 
     // 128 max * 5
     static piLVERTEX lv[640];
@@ -613,13 +613,13 @@ void _DrawDecals()
 //////////////////////////////////////////////////////////////////////
 LOGICAL fxHitUpdateVehicleHit(FXHIT* lpHit)
 {
-    if(lpHit == NULL)
+    if(lpHit == nullptr)
         return FALSE;
 
-    if(lpHit->lpVehAttach == NULL)
+    if(lpHit->lpVehAttach == nullptr)
         return FALSE;
 
-    if(lpHit->lpVehAttach->VehicleObjectData == NULL)
+    if(lpHit->lpVehAttach->VehicleObjectData == nullptr)
         return FALSE;
 
     weapUpdateVehicleHitmap(lpHit->lpVehAttach);
@@ -704,7 +704,7 @@ LOGICAL fxHitGetHitTexture(FXHIT* lpHit)
         return FALSE;
     }
 
-    if(lpHit->lpVehAttach != NULL)
+    if(lpHit->lpVehAttach != nullptr)
     {
         // Use scorch mark for now.
         lpHit->enumTex = IDE_HIT_TERRAIN;
@@ -727,17 +727,17 @@ LOGICAL fxHitIsWater(FXHIT* lpHit)
 
     vehVehicle*pVehicle = persGetPersonaVehiclePtr();
 
-    mlGetObjectBumpinessAndFriction(NULL,
-									NULL,
-									NULL,
-									NULL,
+    mlGetObjectBumpinessAndFriction(nullptr,
+									nullptr,
+									nullptr,
+									nullptr,
 									&fRollCoef,
-									NULL,
+									nullptr,
                                     lpHit->lpObj);
 
-    if(pVehicle != NULL)
+    if(pVehicle != nullptr)
     {
-        if(pVehicle->VehicleType != NULL)
+        if(pVehicle->VehicleType != nullptr)
         {
             if(pVehicle->VehicleType->Type == VEH_TYPE_SEA)
             {
@@ -766,10 +766,10 @@ LOGICAL fxHitIsWater(FXHIT* lpHit)
 //////////////////////////////////////////////
 LOGICAL fxHitFreeHit(FXHIT* lpHit)
 {
-    FXHIT* lpPrev = NULL;
+    FXHIT* lpPrev = nullptr;
     SINT32 i;
 
-    if(lpHit == NULL)
+    if(lpHit == nullptr)
         return FALSE;
 
     if(lpHit->lpObj)
@@ -801,9 +801,9 @@ LOGICAL fxHitFreeHit(FXHIT* lpHit)
 //////////////////////////////////////////////////////////////////////
 LOGICAL fxHitAddHit(FXHIT* lpHit)
 {
-    FXHIT* lpNext = NULL;
+    FXHIT* lpNext = nullptr;
 
-    if(lpHit == NULL)
+    if(lpHit == nullptr)
         return FALSE;
 
     lpNext = g_hitHead.next;
@@ -824,11 +824,11 @@ LOGICAL fxHitAddHit(FXHIT* lpHit)
 //////////////////////////////////////////////////////////////////////
 LOGICAL fxHitGetHit(FXHIT** lpHit)
 {
-    FXHIT* lpNode = NULL;
-    FXHIT* lpNext = NULL;
-    FXHIT* lpPrev = NULL;
+    FXHIT* lpNode = nullptr;
+    FXHIT* lpNext = nullptr;
+    FXHIT* lpPrev = nullptr;
 
-    if(lpHit == NULL)
+    if(lpHit == nullptr)
         return FALSE;
 
     if(!fxHitCheckForHits())
@@ -842,8 +842,8 @@ LOGICAL fxHitGetHit(FXHIT** lpHit)
     lpPrev->next = lpNext;
     lpNext->prev = lpPrev;
 
-    lpNode->next = NULL;
-    lpNode->prev = NULL;
+    lpNode->next = nullptr;
+    lpNode->prev = nullptr;
 
     lpNode->matSize = IdentityMatrix;
 
@@ -861,7 +861,7 @@ LOGICAL fxHitCheckForHits()
 {
     if(g_hitFreeHead.next == &g_hitFreeTail)
     {
-        FXHIT* lpHit = NULL;
+        FXHIT* lpHit = nullptr;
 
         if(g_hitTail.prev == &g_hitHead)
             return FALSE;
@@ -887,23 +887,23 @@ LOGICAL fxHitCheckForHits()
 //////////////////////////////////////////////////////////////////////
 LOGICAL fxHitReleaseHit(FXHIT* lpHit)
 {
-    FXHIT* lpNext = NULL;
-    FXHIT* lpPrev = NULL;
+    FXHIT* lpNext = nullptr;
+    FXHIT* lpPrev = nullptr;
 
-    if(lpHit == NULL)
+    if(lpHit == nullptr)
         return FALSE;
 
     lpNext = lpHit->next;
     lpPrev = lpHit->prev;
 
-    if(lpNext == NULL || lpPrev == NULL)
+    if(lpNext == nullptr || lpPrev == nullptr)
         return FALSE;
 
     lpPrev->next = lpNext;
     lpNext->prev = lpPrev;
 
-    lpHit->prev = NULL;
-    lpHit->next = NULL;
+    lpHit->prev = nullptr;
+    lpHit->next = nullptr;
 
     return TRUE;
 }
@@ -914,7 +914,7 @@ LOGICAL fxHitReleaseHit(FXHIT* lpHit)
 //////////////////////////////////////////////////////////////////////
 LOGICAL fxHitDetachHit(OBJECT* lpObj)
 {
-    if(g_lpHits == NULL)
+    if(g_lpHits == nullptr)
         return TRUE;
 
     if(lpObj)
@@ -960,7 +960,7 @@ void _UnMap(void* pKey)
 
     for(UINT32 u = 0; u < removeList.size(); u++)
     {
-        g_lpHits[removeList[u]].lpObj = NULL;
+        g_lpHits[removeList[u]].lpObj = nullptr;
 
         fxHitReleaseHit(&g_lpHits[removeList[u]]);
         fxHitFreeHit(&g_lpHits[removeList[u]]);
@@ -982,12 +982,12 @@ void fxHitSetColor(piCOLORVALUE* lpColor)
 //////////////////////////////////////////
 void fxHitUpdate()
 {
-    if(g_hitHead.next == NULL) return;
+    if(g_hitHead.next == nullptr) return;
     if(g_hitHead.next == &g_hitTail) return;
 
     FXHIT* lpHit = g_hitHead.next;
     FXHIT* tail = &g_hitTail;
-    FXHIT* free = NULL;
+    FXHIT* free = nullptr;
 
     piVECTOR vecDiff;
     FLOAT32 fLenSqrd = 0.0f;
@@ -1194,7 +1194,7 @@ void fxHitInitHit(SINT32 id)
     if(index < 0 || index >= DEF_MAX_HITS)
         return;
 
-    if(g_lpHits[index].lpObj == NULL)
+    if(g_lpHits[index].lpObj == nullptr)
     {
         fxHitReleaseHit(&g_lpHits[index]);
         fxHitFreeHit(&g_lpHits[index]);
@@ -1231,7 +1231,7 @@ void fxHitInitHit(SINT32 id)
 
     fxUtlUpdatePosition(&g_lpHits[index].vecPt, &g_lpHits[index].vecPos);
 
-    if(g_lpHits[index].lpVehAttach != NULL)
+    if(g_lpHits[index].lpVehAttach != nullptr)
     {
         // Hack for now so we can see scorch marks on vehicles.
         g_lpHits[index].fRadius = g_lpHits[index].fEnergy * 0.001f;

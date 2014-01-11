@@ -151,12 +151,12 @@ using namespace phui;
 typedef std::map<std::string, ViewFromUIXML> ViewCreateMap;
 
 static IOCallbacks _io = phui::fdIOCallbacks;
-static UIXMLTextureCallback _gettexture = NULL;
-static UIXMLCreateTextureCallback _createtexture = NULL;
-static UIXMLDestroyTextureCallback _destroytexture = NULL;
-static UIXMLClipboardCallback _clipboard = NULL;
-static UIXMLLocalizationCallbackA _localizerA = NULL;
-static UIXMLLocalizationCallbackW _localizerW = NULL;
+static UIXMLTextureCallback _gettexture = nullptr;
+static UIXMLCreateTextureCallback _createtexture = nullptr;
+static UIXMLDestroyTextureCallback _destroytexture = nullptr;
+static UIXMLClipboardCallback _clipboard = nullptr;
+static UIXMLLocalizationCallbackA _localizerA = nullptr;
+static UIXMLLocalizationCallbackW _localizerW = nullptr;
 static ViewCreateMap _viewcreatemap;
 static CSSViewDrawerFactory* _drawerfactory;
 
@@ -420,7 +420,7 @@ View* phui::LoadUIXML(const char* name, IOCallbacks const *io, View* parent)
 								(xmlInputCloseCallback)_io.close); 
 	}
 
-	xmlDocPtr doc = xmlReadFile(name, NULL, XML_PARSE_DTDLOAD|XML_PARSE_RECOVER);
+	xmlDocPtr doc = xmlReadFile(name, nullptr, XML_PARSE_DTDLOAD|XML_PARSE_RECOVER);
 	View* v = 0;
 	if(doc)
 	{
@@ -456,7 +456,7 @@ const wchar_t* phui::UIXMLClipboard(const wchar_t* c)
 	if(_clipboard)
 		return _clipboard(c);
 
-	return NULL;
+	return nullptr;
 }
 
 /************************************************************************************************
@@ -637,7 +637,7 @@ static void process_view_fields(View* view, View* parent, xmlNodePtr node)
 	// other flag types carry over from the parent
 	//aspectmode &= ~View::ASPECT_ALIGN;
 	
-	xmlChar* val = NULL;
+	xmlChar* val = nullptr;
 	
 	// viewport width, height, needs to come first
 	val = xmlGetProp(node, (xmlChar*)UIXML_VIEWPORTWIDTH_FIELD);
@@ -1063,7 +1063,7 @@ static void process_view_fields(View* view, View* parent, xmlNodePtr node)
 static View* process_class_field(xmlNodePtr node, View* parent)
 {
 	xmlChar* val;
-	View* v = NULL;
+	View* v = nullptr;
 	
 	val = xmlGetProp(node, (xmlChar*)UIXML_CLASS_FIELD);
 	if(val) 
@@ -1350,7 +1350,7 @@ static View* script_tag(xmlNodePtr node, View* parent)
 			}
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 
@@ -1363,7 +1363,7 @@ static View* create_caption(xmlNodePtr node, View* parent)
 	View* v;
 	
 	v = process_class_field(node, parent);
-	if(v == NULL) v = new Caption;
+	if(v == nullptr) v = new Caption;
 	
 	process_view_fields(v, parent, node);
 	
@@ -1421,7 +1421,7 @@ static View* create_tabview(xmlNodePtr node, View* parent)
 	View* v;
 	
 	v = process_class_field(node, parent);
-	if(v == NULL) v = new TabView;	
+	if(v == nullptr) v = new TabView;	
 	
 	process_view_fields(v, parent, node);
 
@@ -1437,7 +1437,7 @@ static View* create_tab(xmlNodePtr node, View* parent)
 	View* v;
 	
 	v = process_class_field(node, parent);
-	if(v == NULL) v = new View;
+	if(v == nullptr) v = new View;
 
 	process_view_fields(v, parent, node);
 
@@ -1490,7 +1490,7 @@ static View* create_button(xmlNodePtr node, View* parent)
 	View* v;
 	
 	v = process_class_field(node, parent);
-	if(v == NULL) v = new Button;
+	if(v == nullptr) v = new Button;
 	
 	process_view_fields(v, parent, node);
 	process_control_fields(dynamic_cast<Control*>(v), node);
@@ -1519,7 +1519,7 @@ static View* create_radiobutton(xmlNodePtr node, View* parent)
 	View* v;
 	
 	v = process_class_field(node, parent);
-	if(v == NULL) v = new RadioButton;
+	if(v == nullptr) v = new RadioButton;
 	
 	process_view_fields(v, parent, node);
 	process_control_fields(dynamic_cast<Control*>(v), node);
@@ -1536,7 +1536,7 @@ static View* create_radiogroup(xmlNodePtr node, View* parent)
 	View* v;
 	
 	v = process_class_field(node, parent);
-	if(v == NULL) v = new RadioGroup;
+	if(v == nullptr) v = new RadioGroup;
 	
 	process_view_fields(v, parent, node);
 	process_control_fields(dynamic_cast<Control*>(v), node);
@@ -1553,7 +1553,7 @@ static View* create_panel(xmlNodePtr node, View* parent)
 	View* v;
 	
 	v = process_class_field(node, parent);
-	if(v == NULL) v = new Panel;
+	if(v == nullptr) v = new Panel;
 	
 	process_view_fields(v, parent, node);
 
@@ -1605,7 +1605,7 @@ static View* create_panel(xmlNodePtr node, View* parent)
 
 static void process_control_fields(Control* v, xmlNodePtr node)
 {
-	if(v == NULL) return;
+	if(v == nullptr) return;
 	
 	xmlChar* val;
 	
@@ -1633,7 +1633,7 @@ static View* create_checkbox(xmlNodePtr node, View* parent)
 	View* v;
 	
 	v = process_class_field(node, parent);
-	if(v == NULL) v = new Checkbox;
+	if(v == nullptr) v = new Checkbox;
 	
 	process_view_fields(v, parent, node);
 	process_control_fields(dynamic_cast<Control*>(v), node);
@@ -1747,7 +1747,7 @@ static View* create_stackview(xmlNodePtr node, View* parent)
 	View* v;
 	
 	v = process_class_field(node, parent);
-	if(v == NULL) v = new StackView;	
+	if(v == nullptr) v = new StackView;	
 	
 	process_view_fields(v, parent, node);
 
@@ -1771,25 +1771,25 @@ void phui::UIXMLColor(const unsigned char* val, float* r, float* g, float* b, fl
 		if(val[0] && val[1])
 		{
 			bs[0] = val[0]; bs[1] = val[1];
-			*r = strtoul(bs, NULL, 16) / 255.0f;
+			*r = strtoul(bs, nullptr, 16) / 255.0f;
 			val += 2;				
 		}
 		if(val[0] && val[1])
 		{
 			bs[0] = val[0]; bs[1] = val[1];
-			*g = strtoul(bs, NULL, 16) / 255.0f;
+			*g = strtoul(bs, nullptr, 16) / 255.0f;
 			val += 2;				
 		}
 		if(val[0] && val[1])
 		{
 			bs[0] = val[0]; bs[1] = val[1];
-			*b = strtoul(bs, NULL, 16) / 255.0f;
+			*b = strtoul(bs, nullptr, 16) / 255.0f;
 			val += 2;				
 		}
 		if(val[0] && val[1])
 		{
 			bs[0] = val[0]; bs[1] = val[1];
-			if(a) *a = strtoul(bs, NULL, 16) / 255.0f;
+			if(a) *a = strtoul(bs, nullptr, 16) / 255.0f;
 			val += 2;				
 		}
 	}
@@ -1804,7 +1804,7 @@ static View* create_listview(xmlNodePtr node, View* parent)
 	View* v;
 	
 	v = process_class_field(node, parent);
-	if(v == NULL) v = new ListView;	
+	if(v == nullptr) v = new ListView;	
 	
 	process_view_fields(v, parent, node);
 
@@ -1821,7 +1821,7 @@ static View* create_textview(xmlNodePtr node, View* parent)
 	xmlChar* val;
 	
 	v = process_class_field(node, parent);
-	if(v == NULL) v = new TextView;	
+	if(v == nullptr) v = new TextView;	
 	
 	process_view_fields(v, parent, node);
 	
@@ -1893,7 +1893,7 @@ static View* create_console(xmlNodePtr node, View* parent)
 	View* v;
 	
 	v = process_class_field(node, parent);
-	if(v == NULL) v = new ConsoleView;	
+	if(v == nullptr) v = new ConsoleView;	
 	
 	process_view_fields(v, parent, node);
 	
@@ -1938,7 +1938,7 @@ static View* create_contextmenu(xmlNodePtr node, View* parent)
 	xmlChar* val;
 
 	v = process_class_field(node, parent);
-	if(v == NULL) v = new ContextMenu;	
+	if(v == nullptr) v = new ContextMenu;	
 	
 	process_view_fields(v, parent, node);
 	
@@ -2008,7 +2008,7 @@ static View* create_ctxmenu(xmlNodePtr node, View* parent)
 	xmlChar* val;
 
 	v = process_class_field(node, parent);
-	if(v == NULL) v = new CtxMenu;	
+	if(v == nullptr) v = new CtxMenu;	
 	
 	process_view_fields(v, parent, node);
 	
@@ -2077,7 +2077,7 @@ static View* create_textcontrol(xmlNodePtr node, View* parent)
 	View* v;
 	
 	v = process_class_field(node, parent);
-	if(v == NULL) v = new TextControl;	
+	if(v == nullptr) v = new TextControl;	
 	
 	process_view_fields(v, parent, node);
 	
@@ -2134,7 +2134,7 @@ static View* create_imecontrol(xmlNodePtr node, View* parent)
 	View* v;
 	
 	v = process_class_field(node, parent);
-	if(v == NULL) v = new IMEControl;	
+	if(v == nullptr) v = new IMEControl;	
 	
 	process_view_fields(v, parent, node);
 	
@@ -2191,12 +2191,12 @@ static View* create_imecontrol(xmlNodePtr node, View* parent)
 static View* menu_tags(xmlNodePtr node, View* parent)
 {
 	xmlChar* val;
-	View* v = NULL;
+	View* v = nullptr;
 	
 	if(xmlStrcmp((xmlChar*)UIXML_POPUP_TAG, node->name) == 0)
 	{
 			v = process_class_field(node, parent);
-			if(v == NULL) v = new PopupMenuButton;
+			if(v == nullptr) v = new PopupMenuButton;
 
 			process_view_fields(v, parent, node);
 			
@@ -2218,11 +2218,11 @@ static View* menu_tags(xmlNodePtr node, View* parent)
 				xmlFree(val);
 			}
 			
-			return NULL;
+			return nullptr;
 		}
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 /************************************************************************************************
@@ -2236,7 +2236,7 @@ static View* process_include_tag(xmlNodePtr node, View* parent)
 	val = xmlGetProp(node, (xmlChar*)UIXML_FILE_FIELD);
 	if(val)
 	{
-		xmlDocPtr doc = xmlReadFile((char*)val, NULL, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
+		xmlDocPtr doc = xmlReadFile((char*)val, nullptr, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
 		if(doc)
 		{
 			xmlNodePtr root = xmlDocGetRootElement(doc);
@@ -2280,7 +2280,7 @@ static View* create_scrollbar(xmlNodePtr node, View* parent)
 	}
 	
 	v = process_class_field(node, parent);
-	if(v == NULL) v = new Scrollbar(orient, 0.0f);
+	if(v == nullptr) v = new Scrollbar(orient, 0.0f);
 	
 	if(orient == phui::Scrollbar::ORIENT_VERTICAL)
 		minbarsize = v->ScaleValue(View::SCALE_HEIGHT, minbarsize);
@@ -2305,7 +2305,7 @@ static View* create_scrollbar(xmlNodePtr node, View* parent)
 	View* v;		
 		
 	v = process_class_field(node, parent);
-	if(v == NULL) v = new ResizeWidget;
+	if(v == nullptr) v = new ResizeWidget;
 	
 	process_view_fields(v, parent, node);
 	v->SetLayer(100);
@@ -2354,7 +2354,7 @@ static View* create_slider(xmlNodePtr node, View* parent)
 	}
 	
 	v = process_class_field(node, parent);
-	if(v == NULL) v = new Slider(orient);
+	if(v == nullptr) v = new Slider(orient);
 	
 	process_view_fields(v, parent, node);
 	

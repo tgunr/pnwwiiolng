@@ -23,7 +23,7 @@ PopupMenuButton::PopupMenuButton()
 
 PopupMenuButton::~PopupMenuButton()
 {
-	if(_menu->Parent() == NULL)
+	if(_menu->Parent() == nullptr)
 		delete _menu;
 }
 
@@ -122,7 +122,7 @@ bool PopupMenuButton::MouseMove (float x, float y, int state )
 void PopupMenuButton::PreferredSize(float* w, float* h)
 {
 	float menuheight, menuwidth;
-	if(_menu->Parent() == NULL) AddChild(_menu);
+	if(_menu->Parent() == nullptr) AddChild(_menu);
 	_menu->PreferredSize(&menuwidth,&menuheight);
 	if(_menu->Parent() == this) RemoveChild(_menu);
 	

@@ -83,8 +83,8 @@ LOGICAL loclLangKill()
         loclLangTableFree(g_LangTable[i].next);
         loclLangTableFree(g_englishTable[i].next);
 
-        g_LangTable[i].next = NULL;
-        g_englishTable[i].next = NULL;
+        g_LangTable[i].next = nullptr;
+        g_englishTable[i].next = nullptr;
     }
 	*/
 
@@ -97,7 +97,7 @@ LOGICAL loclLangKill()
 /////////////////////////////////////////////////////
 LANGTABLE* loclLangReadFile(SCHAR* pszPath)
 {
-	LANGTABLE* langTable = NULL;
+	LANGTABLE* langTable = nullptr;
 
 /*#ifdef FRONT_END
     LOGICAL langDirectory = FALSE;
@@ -143,9 +143,9 @@ LANGTABLE* loclLangReadFile(SCHAR* pszPath)
 
         LANGTABLE* lpNode = (LANGTABLE*)memAlloc(sizeof(LANGTABLE));
 
-        if(!lpNode) return NULL;
+        if(!lpNode) return nullptr;
 
-        lpNode->uID = strtoul(strId.c_str(), NULL, 0);
+        lpNode->uID = strtoul(strId.c_str(), nullptr, 0);
 
         pos++;
 
@@ -212,7 +212,7 @@ UCHAR* loclLangGetString(ENUM_CATEGORIES enumCategory, UINT32 uID)
 UCHAR* loclGetStringCategory(ENUM_CATEGORIES e)
 {
     if(e < 0 || e >= NUMBER_OF_CATEGORIES)
-        return NULL;
+        return nullptr;
 
     return (UCHAR*)g_szFiles[e];
 }
@@ -226,10 +226,10 @@ LANGTABLE* loclLangTableLoad(ENUM_LANGUAGES enumLang, SINT32 category)
     SCHAR pszPath[128];
 
 	if(enumLang < 0	|| enumLang >= NUMBER_OF_LANGUAGES)
-        return NULL;
+        return nullptr;
 
     if(category < 0 || category >= NUMBER_OF_CATEGORIES)
-        return NULL;
+        return nullptr;
 
     snprintf(pszPath, 128, "%s%s.loc", g_szPaths[enumLang], g_szFiles[category]);
 
@@ -284,15 +284,15 @@ LOGICAL loclGetString(ENUM_CATEGORIES e, UINT32 uID, const SCHAR** returnStr)
 /////////////////////////////////////////////////////
 const SCHAR* _GetString(LANGTABLE* langTable, UINT32 uID)
 {
-	LANGTABLE* lpHead = NULL;
-	const SCHAR* p = NULL;
+	LANGTABLE* lpHead = nullptr;
+	const SCHAR* p = nullptr;
 
-    if(langTable == NULL)
+    if(langTable == nullptr)
         return LANG_ERROR;
 
     lpHead = langTable;
 
-    for(lpHead; lpHead != NULL; lpHead = lpHead->next)
+    for(lpHead; lpHead != nullptr; lpHead = lpHead->next)
     {
         if(lpHead->uID == uID)
         {
@@ -310,15 +310,15 @@ const SCHAR* _GetString(LANGTABLE* langTable, UINT32 uID)
 /////////////////////////////////////////////////////
 void loclLangTableFree(LANGTABLE* langTable)
 {
-    if(langTable == NULL)
+    if(langTable == nullptr)
         return;
 
-   	LANGTABLE* lpHead = NULL;
-    LANGTABLE* lpFree = NULL;
+   	LANGTABLE* lpHead = nullptr;
+    LANGTABLE* lpFree = nullptr;
 
 	lpHead = langTable;
 
-    while(lpHead != NULL)
+    while(lpHead != nullptr)
     {
         lpFree = lpHead;
         lpHead = lpHead->next;

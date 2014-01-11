@@ -9,7 +9,7 @@ class IMEClient;
 class CDisableCicero
 {
 public:
-	CDisableCicero() : m_ptim( NULL ), m_bComInit( false )
+	CDisableCicero() : m_ptim( nullptr ), m_bComInit( false )
 	{
 	}
 	~CDisableCicero()
@@ -26,7 +26,7 @@ public:
 #if XAUDIO
         // CoInitialize done in sysmain once...
 #else
-		hr = CoInitializeEx( NULL, COINIT_APARTMENTTHREADED );
+		hr = CoInitializeEx( nullptr, COINIT_APARTMENTTHREADED );
 #endif
 
 	    if ( SUCCEEDED( hr ) )
@@ -34,7 +34,7 @@ public:
 			m_bComInit = true;
 
 			hr = CoCreateInstance( CLSID_TF_ThreadMgr,
-				NULL,
+				nullptr,
 				CLSCTX_INPROC_SERVER,
 				__uuidof(ITfThreadMgr),
 				(void**)&m_ptim );
@@ -47,7 +47,7 @@ public:
 		if ( m_ptim )
 		{
 			m_ptim->Release();
-			m_ptim = NULL;
+			m_ptim = nullptr;
 		}
 
 		m_bComInit = false;
@@ -55,14 +55,14 @@ public:
 
 	void DisableCiceroOnThisWnd( HWND hwnd )
 	{
-		if ( m_ptim == NULL )
+		if ( m_ptim == nullptr )
 			return;
 
 		ITfDocumentMgr* pdimPrev; // the dim that is associated previously.
-		// Associate NULL dim to the window.
+		// Associate nullptr dim to the window.
 		// When this window gets the focus, Cicero does not work and IMM32 IME
 		// will be activated.
-		if ( SUCCEEDED( m_ptim->AssociateFocus( hwnd, NULL, &pdimPrev ) ) )
+		if ( SUCCEEDED( m_ptim->AssociateFocus( hwnd, nullptr, &pdimPrev ) ) )
 		{
 			if ( pdimPrev )
 				pdimPrev->Release();
@@ -84,7 +84,7 @@ public:
 		_cRef(1),
 		_isTip(false),
 		_client(c),
-		_manager(NULL),
+		_manager(nullptr),
 		_dwUIElementSinkCookie(TF_INVALID_COOKIE),
 		_dwAlpnSinkCookie(TF_INVALID_COOKIE),
 		_dwOpenModeSinkCookie(TF_INVALID_COOKIE),
@@ -96,8 +96,8 @@ public:
 	TSFSink::TSFSink() :
 		_cRef(1),
 		_isTip(false),
-		_client(NULL),
-		_manager(NULL),
+		_client(nullptr),
+		_manager(nullptr),
 		_dwUIElementSinkCookie(TF_INVALID_COOKIE),
 		_dwAlpnSinkCookie(TF_INVALID_COOKIE),
 		_dwOpenModeSinkCookie(TF_INVALID_COOKIE),
@@ -140,7 +140,7 @@ public:
 	void SetReadingString(ITfReadingInformationUIElement* preading);
 	void SetCandidateStrings(ITfCandidateListUIElement* pcandidate);
 	BOOL GetCompartments( ITfCompartmentMgr** ppcm, ITfCompartment** ppTfOpenMode, ITfCompartment** ppTfConvMode );
-	BOOL SetupCompartmentSinks( BOOL bResetOnly = FALSE, ITfCompartment* pTfOpenMode = NULL, ITfCompartment* ppTfConvMode = NULL );
+	BOOL SetupCompartmentSinks( BOOL bResetOnly = FALSE, ITfCompartment* pTfOpenMode = nullptr, ITfCompartment* ppTfConvMode = nullptr );
 
 	bool IsActive(){ return _active; }
 	bool IsTIP(bool check = false);

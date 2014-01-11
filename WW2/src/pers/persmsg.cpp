@@ -89,12 +89,12 @@ LOGICAL persmsgBuilderMessage(FULL_OBJ_ID* pID, LOGICAL on)
     if(on && pID)
     {
      	StratDB::StratObject* stratobj =  StratDB::FindStratObject(*(sdm_full_obj_id*)pID);
-      	const wchar_t* buildingname = NULL;
+      	const wchar_t* buildingname = nullptr;
 
       	if(stratobj)
       		buildingname = stratobj->DisplayName();
 
-        if(buildingname == NULL)
+        if(buildingname == nullptr)
         {
             _drawBuilderMessage = false;
             return FALSE;

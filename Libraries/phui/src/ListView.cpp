@@ -151,7 +151,7 @@ View* ListView::SelectedRow() const
 	if(val >= 0 && val < (int)_rows.size())
 		return _rows[val].view;
 	
-	return NULL;
+	return nullptr;
 }
 
 /************************************************************************************************
@@ -213,7 +213,7 @@ void ListView::SetRowData(unsigned int row, Referenced* data)
 
 Referenced* ListView::GetRowData(unsigned int row)
 {
-	if(row >= _rows.size()) return NULL;
+	if(row >= _rows.size()) return nullptr;
 	return _rows[row].data.ptr();
 }
 
@@ -223,7 +223,7 @@ Referenced* ListView::GetRowData(unsigned int row)
 
 View* ListView::GetRowView(unsigned int row)
 {
-	if(row >= _rows.size()) return NULL;
+	if(row >= _rows.size()) return nullptr;
 	return _rows[row].view;
 }
 

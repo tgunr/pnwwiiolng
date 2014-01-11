@@ -157,8 +157,8 @@ static ElementCreateMap _elemcreatemap;
 
 static GraphicsContext::TextureInfo (*_gettexture)(const char*,bool);
 
-static void dom_init(View* view, ElementDOM* parent, const char* filename = NULL);
-static void dom_script_init(View* view, const char* filename = NULL);
+static void dom_init(View* view, ElementDOM* parent, const char* filename = nullptr);
+static void dom_script_init(View* view, const char* filename = nullptr);
 
 /************************************************************************************************
 	RegisterTagWithDOM
@@ -187,7 +187,7 @@ ElementDOM* phui::DOM::CreateElementFromView(const char* classname, View* view, 
 
 void phui::DOM::Init(View* view)
 {
-	dom_init(view, NULL, view->GetSource());	
+	dom_init(view, nullptr, view->GetSource());	
 	dom_script_init(view);
 }
 
@@ -225,7 +225,7 @@ ElementDOM::ElementDOM(View* view, ElementDOM* window, JSClass* jsclass) :
 	_view->SetUserData(DOM_VIEW_USERDATA, this);
 
 	Message* msg = view->UserMessage();
-	const char* script = NULL;
+	const char* script = nullptr;
 	
 	Message scriptMsg(DOM_SCRIPT_MSG);
 	Invoker* ctl = dynamic_cast<Invoker*>(view);
@@ -570,7 +570,7 @@ JSBool ElementDOM::GetProperty(JSContext* ctx, int propid, jsval* val)
 			if(_view->Parent())
 			{
 				TabView* tv = dynamic_cast<TabView*>(_view->Parent());
-				TabView::Tab* tab = (tv) ? tv->GetTab(_view): NULL;
+				TabView::Tab* tab = (tv) ? tv->GetTab(_view): nullptr;
 				if(tab) x = tab->x;
 			}
 			
@@ -584,7 +584,7 @@ JSBool ElementDOM::GetProperty(JSContext* ctx, int propid, jsval* val)
 			if(_view->Parent())
 			{
 				TabView* tv = dynamic_cast<TabView*>(_view->Parent());
-				TabView::Tab* tab = (tv) ? tv->GetTab(_view): NULL;
+				TabView::Tab* tab = (tv) ? tv->GetTab(_view): nullptr;
 				if(tab) y = tab->y;
 			}
 			
@@ -598,7 +598,7 @@ JSBool ElementDOM::GetProperty(JSContext* ctx, int propid, jsval* val)
 			if(_view->Parent())
 			{
 				TabView* tv = dynamic_cast<TabView*>(_view->Parent());
-				TabView::Tab* tab = (tv) ? tv->GetTab(_view): NULL;
+				TabView::Tab* tab = (tv) ? tv->GetTab(_view): nullptr;
 				if(tab) w = tab->width;
 			}
 			
@@ -613,7 +613,7 @@ JSBool ElementDOM::GetProperty(JSContext* ctx, int propid, jsval* val)
 			if(_view->Parent())
 			{
 				TabView* tv = dynamic_cast<TabView*>(_view->Parent());
-				TabView::Tab* tab = (tv) ? tv->GetTab(_view): NULL;
+				TabView::Tab* tab = (tv) ? tv->GetTab(_view): nullptr;
 				if(tab) h = tab->height;
 			}
 			
@@ -970,7 +970,7 @@ bool ElementDOM::AddEventHandler(const char* event, const char* code)
 			}
 		}
 		
-		const char* script = NULL;
+		const char* script = nullptr;
 		if(msg->FindString(event, &script) == Message::OK && strcmp(code, script) == 0)
 			return true;
 	}
@@ -1040,7 +1040,7 @@ JS_FUNCTION_DEF(ElementDOM,findparent)
 		View *parent = view->Parent();
 		int tries = 50;
 		
-		while(parent != NULL && tries)
+		while(parent != nullptr && tries)
 		{
 			if(parent->Name() && std::strcmp(parent->Name(), name) == 0)
 			{
@@ -1077,7 +1077,7 @@ JS_FUNCTION_DEF(ElementDOM,addrow)
 	ListView* lv = dynamic_cast<ListView*>(dom->_view);
 	if(!lv) return JS_FALSE;
 	
-	View* row = NULL;
+	View* row = nullptr;
 	bool init = true;
 
 	if(JSVAL_IS_OBJECT(argv[0]))
@@ -1156,7 +1156,7 @@ JS_FUNCTION_DEF(ElementDOM,addrow)
 		if(argc > 1)
 			lv->AddRow(row, new js::jsvalRef(ctx, argv[1]), selectable);
 		else
-			lv->AddRow(row, NULL, selectable);
+			lv->AddRow(row, nullptr, selectable);
 		
 		if(init)
 		{
@@ -1675,7 +1675,7 @@ JS_FUNCTION_DEF(ElementDOM, addmenu)
 	if(!parentDom) return JS_FALSE;
 	
 	View* parentView = parentDom->_view;
-	View* childView = NULL;
+	View* childView = nullptr;
 	
 	// lets create the new menu
 	const wchar_t* wstr = phui::js::ValueToWideString(argv[0]);
@@ -1810,10 +1810,10 @@ ScriptFilter::ScriptFilter() : MessageFilter(ANY_EVENT)
 
 bool ScriptFilter::Filter(Message* msg, MessageHandler** target, MessageHandler**)
 {
-	const char* script = NULL;
-	const char* filename = NULL;
-	js::Object* obj = NULL;
-	View* v = NULL;
+	const char* script = nullptr;
+	const char* filename = nullptr;
+	js::Object* obj = nullptr;
+	View* v = nullptr;
 
 	if(target && *target)
 		v = dynamic_cast<View*>(*target);
@@ -1825,7 +1825,7 @@ bool ScriptFilter::Filter(Message* msg, MessageHandler** target, MessageHandler*
 		msg->FindString(DOM_SCRIPT, &script);
 		msg->FindPointer(DOM_OBJECT, (void**)&obj);
 		
-		if(obj == NULL)
+		if(obj == nullptr)
 			obj = js::GlobalObject();
 			
 		if(script)
@@ -2018,7 +2018,7 @@ static void dom_init(View* view, ElementDOM* parent, const char* filename)
 	if(!elem)
 		elem = new ElementDOM(view, parent);
 
-	if(parent == NULL)
+	if(parent == nullptr)
 		parent = elem;
 	
 	const char* script;	

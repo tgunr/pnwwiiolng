@@ -142,13 +142,13 @@ snSound*		eachSound;
 	eachSound = _activeSoundsHead.next;
 
 #ifdef SOUND_DEBUG
-	if (eachSound != NULL)
+	if (eachSound != nullptr)
 	{
 		Write_Log(LOG_SOUND, LOG_INFO, "Sounds still allocated...");
 	}
 #endif
 
-	while(eachSound != NULL && eachSound != &_activeSoundsTail)
+	while(eachSound != nullptr && eachSound != &_activeSoundsTail)
 	{
 #ifdef SOUND_DEBUG
 		Write_Log(LOG_SOUND, LOG_INFO, "Sound: %s' - File: %s, Line: %d",
@@ -197,9 +197,9 @@ static void _sndsFreeRemainingSounds()
 {
 #if(0)
     snSound* s = _BaseSound.next;
-    snSound* free = NULL;
+    snSound* free = nullptr;
 
-    while(s != NULL)
+    while(s != nullptr)
     {
         free = s;
         s = s->next;
@@ -245,8 +245,8 @@ static void _sndsRemoveSoundFromList(snSound* removeSound)
     prev->next = next;
     next->prev = prev;
 
-    removeSound->next = NULL;
-    removeSound->prev = NULL;
+    removeSound->next = nullptr;
+    removeSound->prev = nullptr;
 }
 
 //		this is a debugging routine useful for examining the contents of the soundlist at any given time
@@ -281,19 +281,19 @@ snSound*	listSound;
 	snSound * sndsLoadSound(LPSNDSCREATE lpCreate)
 #endif
 {
-snSound* newSound = NULL;
+snSound* newSound = nullptr;
 LOGICAL	success;
 
 	if (bSoundEnable == FALSE)
 	{
-		return NULL;
+		return nullptr;
 	}
 
-    if(lpCreate == NULL)
-        return NULL;
+    if(lpCreate == nullptr)
+        return nullptr;
 
-    if(lpCreate->pszName == NULL)
-        return NULL;
+    if(lpCreate->pszName == nullptr)
+        return nullptr;
 
     if(!_freesounds.empty())
     {
@@ -305,7 +305,7 @@ LOGICAL	success;
         newSound = (snSound*)memAlloc(sizeof(snSound));
     }
 
-    if(newSound != NULL)
+    if(newSound != nullptr)
     {
         memset(newSound, 0, sizeof(snSound));
 
@@ -334,7 +334,7 @@ LOGICAL	success;
 			SINT8*	ptr;
 
 				ptr = strrchr(file, '\\');
-				if (ptr != NULL)
+				if (ptr != nullptr)
 				{
 					ptr += 1;
 				}
@@ -352,7 +352,7 @@ LOGICAL	success;
 		else // something failed along the way, so free the structure
 		{
             _freesounds.push_back(newSound);
-            return NULL;
+            return nullptr;
 		}
 	}
 
@@ -382,7 +382,7 @@ LOGICAL sndsFreeSound(snSound* whichSound)
 LOGICAL sndsStartSound(snSound* whichSound)
 {
 UINT32		numSoundsPlaying = 0;
-snSound*	soundToDie = NULL;
+snSound*	soundToDie = nullptr;
 
 	if (bSoundEnable == FALSE)
 	{
@@ -472,7 +472,7 @@ LOGICAL sndsSetLooping(snSound* whichSound, bool looping)
 	{
 		return TRUE;
 	}
-	if(whichSound != NULL)
+	if(whichSound != nullptr)
 	{
 		whichSound->looping = looping;
 		return TRUE;
@@ -489,7 +489,7 @@ LOGICAL sndsSetLoopPoints(snSound* whichSound, float loopStart, float loopEnd)
 #if XAUDIO
     return TRUE;
 #else
-	if((whichSound != NULL) && (loopEnd >= loopStart))
+	if((whichSound != nullptr) && (loopEnd >= loopStart))
 	{
 		whichSound->loopStartPt = loopStart;
 		whichSound->loopEndPt = loopEnd;
@@ -508,7 +508,7 @@ LOGICAL sndsSetDelayedStart(snSound* whichSound, LOGICAL toBeDelayed)
 #if XAUDIO
     return TRUE;
 #else
-	if(whichSound != NULL)
+	if(whichSound != nullptr)
 	{
 		whichSound->delayedStart = toBeDelayed;
 		return TRUE;
@@ -526,7 +526,7 @@ LOGICAL sndsSetDelayTime(snSound* whichSound, UINT32 delayTime)
 #if XAUDIO
     return TRUE;
 #else
-	if(whichSound != NULL)
+	if(whichSound != nullptr)
 	{
 		whichSound->delayTime = delayTime;
 		return TRUE;
@@ -541,7 +541,7 @@ LOGICAL sndsSetFrequency(snSound* whichSound, FLOAT64 frequencyFactor)
 	{
 		return TRUE;
 	}
-	if(whichSound != NULL)
+	if(whichSound != nullptr)
 	{
 		whichSound->freqShift = frequencyFactor;
 		LOGICAL rVal = sndsPlatformSetFrequency(whichSound);
@@ -556,7 +556,7 @@ LOGICAL sndsSetVolume(snSound* whichSound, FLOAT64 newVolume)
 	{
 		return TRUE;
 	}
-	if(whichSound != NULL)
+	if(whichSound != nullptr)
 	{
 		whichSound->volume = newVolume;
 		LOGICAL rVal = sndsPlatformSetVolume(whichSound);
@@ -574,7 +574,7 @@ LOGICAL sndsSetPanPosition(snSound* whichSound, short panPosition)
 #if XAUDIO
     return TRUE;
 #else
-	if((whichSound != NULL) && (panPosition >= 0) && (panPosition <= 100))
+	if((whichSound != nullptr) && (panPosition >= 0) && (panPosition <= 100))
 	{
 		whichSound->pan = panPosition;
 		LOGICAL rVal = sndsPlatformSetPanPosition(whichSound);
@@ -593,7 +593,7 @@ LOGICAL sndsSetSoundPriority(snSound* whichSound, short priority)
 #if XAUDIO
     return TRUE;
 #else
-	if((whichSound != NULL) && (priority >= 0) && (priority <= 3))
+	if((whichSound != nullptr) && (priority >= 0) && (priority <= 3))
 	{
 		whichSound->priority = priority;
 		return TRUE;
@@ -604,17 +604,17 @@ LOGICAL sndsSetSoundPriority(snSound* whichSound, short priority)
 
 snSound * sndsDuplicateSound(snSound* whichSound)
 {
-snSound*	newSound = NULL;
+snSound*	newSound = nullptr;
 LOGICAL	success;
 
 	if (bSoundEnable == FALSE)
 	{
-		return NULL;
+		return nullptr;
 	}
-	if(whichSound != NULL)
+	if(whichSound != nullptr)
 	{
 		newSound = (snSound*)memAlloc(sizeof(snSound));
-		if(newSound != NULL)
+		if(newSound != nullptr)
 		{
 			memcpy(newSound, whichSound, sizeof(snSound));
 			success = sndsPlatformDuplicateSound(newSound, whichSound);
@@ -624,15 +624,15 @@ LOGICAL	success;
 				newSound->next = whichSound->next;
 				newSound->prev = whichSound;
 				whichSound->next = newSound;
-				if(newSound->next != NULL)
+				if(newSound->next != nullptr)
 					newSound->next->prev = newSound;
 			} // end linked list insertion
 			else
 			{
                 _freesounds.push_back(newSound);
 			}
-		} // end if(newSound != NULL)
-	} // end if(whichSound != NULL)
+		} // end if(newSound != nullptr)
+	} // end if(whichSound != nullptr)
 	return newSound;
 }
 
@@ -642,7 +642,7 @@ LOGICAL sndsApplyDefaultOptions(snSound* whichSound)
 	{
 		return TRUE;
 	}
-	if(whichSound != NULL)
+	if(whichSound != nullptr)
 	{
 		FLOAT64VECTOR nullVec = { 0,0,0 };
 
@@ -680,7 +680,7 @@ LOGICAL sndsSet3DPosition(snSound* whichSound, const FLOAT64VECTOR* pos)
 	{
 		return TRUE;
 	}
-	if(whichSound != NULL)
+	if(whichSound != nullptr)
 	{
 		whichSound->position = *pos;
 		return TRUE;
@@ -694,7 +694,7 @@ LOGICAL sndsSet3DVelocity(snSound* whichSound, const FLOAT64VECTOR* vel)
 	{
 		return TRUE;
 	}
-	if(whichSound != NULL)
+	if(whichSound != nullptr)
 	{
 		whichSound->velocity = *vel;
 		return TRUE;
@@ -711,7 +711,7 @@ LOGICAL  sndsSet3DDistanceAttenuation(snSound* whichSound, LOGICAL volume3Dactiv
 #if XAUDIO
     return TRUE;
 #else
-	if(whichSound != NULL)
+	if(whichSound != nullptr)
 	{
 		whichSound->use3DVolume = volume3Dactive;
 		return TRUE;
@@ -729,7 +729,7 @@ LOGICAL  sndsSet3DPan(snSound* whichSound, LOGICAL pan3Dactive)
 #if XAUDIO
     return TRUE;
 #else
-	if(whichSound != NULL)
+	if(whichSound != nullptr)
 	{
 		whichSound->use3DPan = pan3Dactive;
 		return TRUE;
@@ -747,7 +747,7 @@ LOGICAL  sndsSet3DDoppler(snSound* whichSound, LOGICAL dopplerActive)
 #if XAUDIO
     return TRUE;
 #else
-	if(whichSound != NULL)
+	if(whichSound != nullptr)
 	{
 		whichSound->use3DFreqShift = dopplerActive;
 		return TRUE;
@@ -764,7 +764,7 @@ LOGICAL sndsSetCurrentPosition(snSound* pWhichSound, UINT32 uPosition)
     return TRUE;
 #else
 
-    if(pWhichSound != NULL)
+    if(pWhichSound != nullptr)
     {
         pWhichSound->uCurrentPosition = uPosition;
         LOGICAL rVal = sndsPlatformSetCurrentPosition(pWhichSound);
@@ -785,7 +785,7 @@ void _sndsCalcDoppler(snSound* snd)
 	}
 #if XAUDIO
 #else
-	if(snd != NULL && snd->use3DFreqShift == true)
+	if(snd != nullptr && snd->use3DFreqShift == true)
 	{
 	FLOAT64VECTOR listenerPos, listenerVel, listenerLook, listenerUp, listenerRight, distSourceListen;
 	FLOAT64 velSource, velListen;
@@ -820,7 +820,7 @@ LOGICAL _sndsCalcDistanceFade(snSound* snd)
 
 #if XAUDIO
 #else
-	if(snd != NULL && snd->use3DVolume == true)
+	if(snd != nullptr && snd->use3DVolume == true)
 	{
 #if(0)
         FLOAT32 minDist2 = snd->fMinDistance * snd->fMinDistance;	// meters - wild guess for now to be applied to all sounds
@@ -901,7 +901,7 @@ void _sndsCalcPan3D(snSound* snd)
 	}
 #if XAUDIO
 #else
-	if(snd != NULL && snd->use3DPan == true)
+	if(snd != nullptr && snd->use3DPan == true)
 	{
         FLOAT64VECTOR listenerPos, listenerVel, listenerLook, listenerUp, listenerRight, distSourceListen;
         FLOAT64 costheta;
@@ -937,7 +937,7 @@ FLOAT64			velSpeedSound;
 FLOAT64VECTOR	listenerPos, listenerVel, listenerLook, listenerUp, listenerRight, dsl;
 LOGICAL			withinSphere = FALSE;
 
-	if(snd != NULL && snd->use3DDelay == true && sndsIsPlaying(snd) == FALSE)
+	if(snd != nullptr && snd->use3DDelay == true && sndsIsPlaying(snd) == FALSE)
 	{
 		deltaTime = curTime - snd->delay_time;
 		mlGetAltSpeedOfSound(&velSpeedSound, snd->delay_position.x);
@@ -972,7 +972,7 @@ LOGICAL sndsApply3D(snSound* snd)
 
 #if XAUDIO
 #else
-    if(snd == NULL)
+    if(snd == nullptr)
         return TRUE;
 
 	if(snd->use3DVolume)
@@ -1120,7 +1120,7 @@ void _sndsGetListenerPos(FLOAT64VECTOR* headPos, FLOAT64VECTOR* headLook, FLOAT6
 //////////////////////////////////////////////////////////////////////
 LOGICAL sndsSetListener3DPos(piVECTOR* pPos, UINT32 uApply)
 {
-    if(pPos == NULL)
+    if(pPos == nullptr)
         return FALSE;
 
     return sndsPlatformSetListener3DPos(pPos, uApply);
@@ -1132,7 +1132,7 @@ LOGICAL sndsSetListener3DPos(piVECTOR* pPos, UINT32 uApply)
 //////////////////////////////////////////////////////////////////////
 LOGICAL sndsSetListener3DVel(piVECTOR* pVel, UINT32 uApply)
 {
-    if(pVel == NULL)
+    if(pVel == nullptr)
         return FALSE;
 
     return sndsPlatformSetListener3DVel(pVel, uApply);
@@ -1144,7 +1144,7 @@ LOGICAL sndsSetListener3DVel(piVECTOR* pVel, UINT32 uApply)
 //////////////////////////////////////////////////////////////////////
 LOGICAL sndsSetSound3DPos(snSoundPtr lpSound, piVECTOR* pPos, UINT32 uApply)
 {
-    if(lpSound == NULL || pPos == NULL)
+    if(lpSound == nullptr || pPos == nullptr)
         return FALSE;
 
     lpSound->position.x = pPos->x;
@@ -1160,7 +1160,7 @@ LOGICAL sndsSetSound3DPos(snSoundPtr lpSound, piVECTOR* pPos, UINT32 uApply)
 //////////////////////////////////////////////////////////////////////
 LOGICAL sndsSetSound3DVel(snSoundPtr lpSound, piVECTOR* pVel, UINT32 uApply)
 {
-    if(lpSound == NULL || pVel == NULL)
+    if(lpSound == nullptr || pVel == nullptr)
         return FALSE;
 
     lpSound->velocity.x = pVel->x;
@@ -1179,7 +1179,7 @@ LOGICAL sndsSetSound3DMode(snSoundPtr lpSound, UINT32 uMode, UINT32 uApply)
 #if XAUDIO
     return TRUE;
 #else
-    if(lpSound == NULL)
+    if(lpSound == nullptr)
         return FALSE;
 
     lpSound->uMode = uMode;
@@ -1203,7 +1203,7 @@ LOGICAL sndsCommitDeferredSettings()
 //////////////////////////////////////////////////////////
 LOGICAL sndsSetMinDistance(snSoundPtr sound, FLOAT32 mindist, UINT32 apply)
 {
-    if(sound == NULL)
+    if(sound == nullptr)
         return FALSE;
 
     sound->fMinDistance = mindist;
@@ -1217,7 +1217,7 @@ LOGICAL sndsSetMinDistance(snSoundPtr sound, FLOAT32 mindist, UINT32 apply)
 //////////////////////////////////////////////////////////
 LOGICAL sndsSetMaxDistance(snSoundPtr sound, FLOAT32 maxdist, UINT32 apply)
 {
-    if(sound == NULL)
+    if(sound == nullptr)
         return FALSE;
 
     sound->fMaxDistance = maxdist;
@@ -1240,7 +1240,7 @@ LOGICAL sndsSetOrientation(piVECTOR* pFront, piVECTOR* pTop, UINT32 uApply)
 //////////////////////////////////////////////////////////
 LOGICAL sndsSetConeAngles(snSoundPtr lpSound, UINT32 uIn, UINT32 uOut, UINT32 uApply)
 {
-    if(lpSound == NULL)
+    if(lpSound == nullptr)
         return FALSE;
 
 #if XAUDIO
@@ -1259,7 +1259,7 @@ LOGICAL sndsSetConeAngles(snSoundPtr lpSound, UINT32 uIn, UINT32 uOut, UINT32 uA
 //////////////////////////////////////////////////////////
 LOGICAL sndsSetConeOrientation(snSoundPtr lpSound, piVECTOR* pVec, UINT32 uApply)
 {
-    if(lpSound == NULL || pVec == NULL)
+    if(lpSound == nullptr || pVec == nullptr)
         return FALSE;
 
 #if XAUDIO
@@ -1277,7 +1277,7 @@ LOGICAL sndsSetConeOrientation(snSoundPtr lpSound, piVECTOR* pVec, UINT32 uApply
 //////////////////////////////////////////////////////////
 LOGICAL sndsGetVolume(snSoundPtr lpSound, SINT32* pVolume)
 {
-    if(lpSound == NULL || pVolume == NULL)
+    if(lpSound == nullptr || pVolume == nullptr)
         return FALSE;
 
     return sndsPlatformGetVolume(lpSound, pVolume);

@@ -191,7 +191,7 @@ public:
 public:
 	//! Find an STO by it's unique ID.
 	//! @param[in]	uid			Unique ID of the STO.
-	//! @return NULL if not found, otherwise pointer to the ServerTrackedObject base class
+	//! @return nullptr if not found, otherwise pointer to the ServerTrackedObject base class
 	//!         of the STO.
 	static ServerTrackedObject* lookup(UINT32 uid);
 

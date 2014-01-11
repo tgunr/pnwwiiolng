@@ -432,8 +432,8 @@ static UINT32 _ppoCheck = 0;
 // how steep a hill are we going UP
 static FLOAT32 _steepness = 0.0f;
 
-static ScenarioVolume* _volumeCollider = NULL;
-static trnCDTerrainObject* _lastCollision = NULL;
+static ScenarioVolume* _volumeCollider = nullptr;
+static trnCDTerrainObject* _lastCollision = nullptr;
 
 static bool _candeploy(int direction);
 static void _calculateConvergenceAngle(int weaponIndex = -1); // 0 - 9
@@ -462,19 +462,19 @@ static piVECTOR _leftp1,_leftp2;
 fpPersonData* fpGetFPPersonDataPtr()
 {
 	mlVehicleData* vehicleData = persGetPersonaModelDataPtr();
-	return (vehicleData) ? (fpPersonData*) vehicleData->PersonData : NULL;
+	return (vehicleData) ? (fpPersonData*) vehicleData->PersonData : nullptr;
 }
 
 // Save a call to persGetPersonaModelDataPtr if you already have this pointer
 fpPersonData* fpGetFPPersonDataPtr(mlVehicleData* fromVehicleData)
 {
-	assert(fromVehicleData != NULL);
+	assert(fromVehicleData != nullptr);
 	return (fpPersonData*)(fromVehicleData->PersonData);
 }
 
 void fpFPSInit(vehVehicle*vehicle)
 {
-	SCHAR*		pPtr = NULL;
+	SCHAR*		pPtr = nullptr;
 
 	SINT32		countryID;
 
@@ -497,7 +497,7 @@ void fpFPSInit(vehVehicle*vehicle)
 	aimVertAngle = 0.0;
 	aimVertAngleOffset = 0.0;
 
-	currentGameWeapon = NULL;
+	currentGameWeapon = nullptr;
 
 	persClearGunsights();
 	// Load Binoculars
@@ -520,7 +520,7 @@ void fpFPSInit(vehVehicle*vehicle)
 	memset (secondaryModels, 0, sizeof (secondaryModels));
 	memset (auxModels, 0, sizeof (auxModels));
 	memset (legsModels, 0, sizeof (legsModels));
-	armTexModel = NULL;
+	armTexModel = nullptr;
 	memset (weapDefaultAnim, 0, sizeof (weapDefaultAnim));
 	memset (weapEmptyDefaultAnim, 0, sizeof (weapEmptyDefaultAnim));
 	memset (clipDefaultAnim, 0, sizeof (clipDefaultAnim));
@@ -715,10 +715,10 @@ void fpFPSInit(vehVehicle*vehicle)
 	prevPose = FPS_POSITION_STAND;
 	currentEyeHeight = fpFPSGetEyeAdjust(FPS_POSITION_STAND);
 
-	currSkelControl		= NULL;
-	currWeapControl		= NULL;
-	currClipControl		= NULL;
-	currRGCupControl	= NULL;
+	currSkelControl		= nullptr;
+	currWeapControl		= nullptr;
+	currClipControl		= nullptr;
+	currRGCupControl	= nullptr;
 
 	mouseLookOn = 0;
 	_collider.Reset();
@@ -856,15 +856,15 @@ LOGICAL fpFPSLoadModels (vehVehicle*vehicle)
 	// ok, now do the FPS specific stuff
 	fpFPSInit(vehicle);
 
-	skeletonModel = gr2Model::Load(skel_model, NULL, NULL, 1);
-	armsModels[currentArms] = gr2Model::Load(arm_models[currentArms], skeletonModel, NULL, 1);
-	legsModels[currentArms] = gr2Model::Load(leg_models[currentArms], NULL, NULL, 1);
+	skeletonModel = gr2Model::Load(skel_model, nullptr, nullptr, 1);
+	armsModels[currentArms] = gr2Model::Load(arm_models[currentArms], skeletonModel, nullptr, 1);
+	legsModels[currentArms] = gr2Model::Load(leg_models[currentArms], nullptr, nullptr, 1);
 
 	if (default_arms_tex_names[currentArms])
 	{
 		SINT32		baseArmTexID, replacementArmTexID;
 
-		armTexModel = gr2Model::Load(replacement_arms_file, NULL, NULL, 1);
+		armTexModel = gr2Model::Load(replacement_arms_file, nullptr, nullptr, 1);
 
 		baseArmTexID = piGetNamedTexture (default_arms_tex_names[currentArms]);
 		replacementArmTexID = piGetNamedTexture (replacement_arms_tex_names[currentArms]);
@@ -891,8 +891,8 @@ LOGICAL fpFPSLoadModels (vehVehicle*vehicle)
 		if (fpsWeapons[weaponID].weaponModel)
 		{
 			//int modelIndex = (strstr(fpsWeapons[weaponID].weaponModel, "gunmesh-g30")) ? 1: 0;
-            weaponModels[weaponID] = gr2Model::Load(fpsWeapons[weaponID].weaponModel, NULL, NULL, 1); //, modelIndex
-            gr2ModelSetEventHandler(weaponModels[weaponID], (OBJECT*)NULL, gr2AnimHandleEvent);
+            weaponModels[weaponID] = gr2Model::Load(fpsWeapons[weaponID].weaponModel, nullptr, nullptr, 1); //, modelIndex
+            gr2ModelSetEventHandler(weaponModels[weaponID], (OBJECT*)nullptr, gr2AnimHandleEvent);
 
 			// hide any hidden meshes
 			if(fpsWeapons[weaponID].hiddenMeshes)
@@ -901,17 +901,17 @@ LOGICAL fpFPSLoadModels (vehVehicle*vehicle)
 				strncpy(line, fpsWeapons[weaponID].hiddenMeshes, 128);
 
 				char* meshName = strtok(line," ,");
-				while(meshName != NULL)
+				while(meshName != nullptr)
 				{
 					gr2SetMeshActiveByName(weaponModels[weaponID], meshName, false);
-					meshName = strtok(NULL, " ,");
+					meshName = strtok(nullptr, " ,");
 				}
 			}
 		}
 
 		if (fpsWeapons[weaponID].clipModel)
 		{
-			secondaryModels[weaponID] = gr2Model::Load(fpsWeapons[weaponID].clipModel, NULL, NULL, 1);
+			secondaryModels[weaponID] = gr2Model::Load(fpsWeapons[weaponID].clipModel, nullptr, nullptr, 1);
         }
 
 		for (j=0; j < FPS_NUM_AUX_MODELS; j++)
@@ -919,7 +919,7 @@ LOGICAL fpFPSLoadModels (vehVehicle*vehicle)
 			if (fpsWeapons[weaponID].auxModel[j])
 			{
 				// model index?
-				auxModels[weaponID][j] = gr2Model::Load(fpsWeapons[weaponID].auxModel[j], NULL, NULL, 1);
+				auxModels[weaponID][j] = gr2Model::Load(fpsWeapons[weaponID].auxModel[j], nullptr, nullptr, 1);
                 gr2SetModelActive(auxModels[weaponID][j], false);
 			}
 		}
@@ -970,7 +970,7 @@ LOGICAL fpFPSLoadModels (vehVehicle*vehicle)
 	{
 		auxModel[i] = auxModels[currentWeaponModel][i];
 	}
-	legsModel = NULL;
+	legsModel = nullptr;
 
 	if (fpsWeapons[currentWeaponModel].sniperGunSight)
 	{
@@ -1175,7 +1175,7 @@ static fpsWeaponStates _determineNextRifleState()
 fpsWeaponStates fpFPSDetermineNextState ()
 {
 	mlVehicleData*	vehicleData = persGetPersonaModelDataPtr();
-	assert( vehicleData != NULL );
+	assert( vehicleData != nullptr );
 
 	fpsWeaponStates	newState;
 	UINT32			animationStateFlags;
@@ -1458,7 +1458,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 	// special handling for sprint
 	if (stateFlags & STATE_MOVE_FAST)
 	{
-		persGetHealthStats(NULL, &currentATP, NULL, NULL);
+		persGetHealthStats(nullptr, &currentATP, nullptr, nullptr);
 
 		// if we're sprinting already, let them burn down to atpSprintMinimum ..
 		// don't let them start sprinting, though, until they're at atpSprintAllowAgain
@@ -1660,7 +1660,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 				}
 			}
 
-			fpPPOSet(NULL);
+			fpPPOSet(nullptr);
 
 			if (fpsTrooper.weaponPositionModel[fpsTrooper.nextWeaponNumber] != BINOCS)
 			{
@@ -2577,26 +2577,26 @@ LOGICAL fpFPSCleanupAnimationState ()
 	if (currClipControl)
 	{
 		gr2FreeControl (currClipControl);
-		currClipControl = NULL;
+		currClipControl = nullptr;
 	}
 
 	if (currWeapControl)
 	{
 		gr2FreeControl (currWeapControl);
-		currWeapControl = NULL;
+		currWeapControl = nullptr;
 		gr2UpdateBlendEvents(weapModel);
 	}
 
 	if (currSkelControl)
 	{
 		gr2FreeControl (currSkelControl);
-		currSkelControl = NULL;
+		currSkelControl = nullptr;
 	}
 
 	if(currRGCupControl)
 	{
 		gr2FreeControl(currRGCupControl);
-		currRGCupControl = NULL;
+		currRGCupControl = nullptr;
 	}
 
 	return TRUE;
@@ -2673,7 +2673,7 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 
                     if(fpsWeapons[weapon].reload2Sound)
                     {
-                        fpFPSfxPlayNormalSound(fpsWeapons[weapon].reload2Sound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, NULL, persGetPersonaVehicleObjectDataPtr());
+                        fpFPSfxPlayNormalSound(fpsWeapons[weapon].reload2Sound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, nullptr, persGetPersonaVehicleObjectDataPtr());
                     }
 
 				    repeatCount = 1;
@@ -2685,7 +2685,7 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 
                     if(fpsWeapons[weapon].reload3Sound)
                     {
-                        fpFPSfxPlayNormalSound(fpsWeapons[weapon].reload3Sound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, NULL, persGetPersonaVehicleObjectDataPtr());
+                        fpFPSfxPlayNormalSound(fpsWeapons[weapon].reload3Sound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, nullptr, persGetPersonaVehicleObjectDataPtr());
                     }
 
                     repeatCount = 1;
@@ -2704,7 +2704,7 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 
 				if (fpsWeapons[currentWeaponModel].reload2Sound)
 				{
-					fpFPSfxPlayNormalSound (fpsWeapons[currentWeaponModel].reload2Sound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, NULL, persGetPersonaVehicleObjectDataPtr());
+					fpFPSfxPlayNormalSound (fpsWeapons[currentWeaponModel].reload2Sound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, nullptr, persGetPersonaVehicleObjectDataPtr());
 				}
 
 				repeatCount = 1;
@@ -2715,7 +2715,7 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 
 				if (fpsWeapons[currentWeaponModel].reload3Sound)
 				{
-					fpFPSfxPlayNormalSound (fpsWeapons[currentWeaponModel].reload3Sound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, NULL, persGetPersonaVehicleObjectDataPtr());
+					fpFPSfxPlayNormalSound (fpsWeapons[currentWeaponModel].reload3Sound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, nullptr, persGetPersonaVehicleObjectDataPtr());
                 }
 
 				repeatCount = 1;
@@ -2813,7 +2813,7 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 				SCHAR* reloadSound = fpsWeapons[currentWeaponModel].reloadSound;
 				if (reloadSound)
 				{
-					fpFPSfxPlayNormalSound (reloadSound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, NULL, persGetPersonaVehicleObjectDataPtr());
+					fpFPSfxPlayNormalSound (reloadSound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, nullptr, persGetPersonaVehicleObjectDataPtr());
 				}
 			}
 			else
@@ -2919,7 +2919,7 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 	}
 	else
 	{
-		currClipControl = NULL;
+		currClipControl = nullptr;
 	}
 
 	if (currClipControl)
@@ -2972,7 +2972,7 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 	}
 	else
 	{
-		currWeapControl = NULL;
+		currWeapControl = nullptr;
 		gr2UpdateBlendEvents(weapModel);
 	}
 
@@ -3035,7 +3035,7 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 	}
 	else
 	{
-		currSkelControl = NULL;
+		currSkelControl = nullptr;
 	}
 
 	if (currSkelControl)
@@ -3810,7 +3810,7 @@ FLOAT32 fpFPSGetBulletDispersion()
 	speed = (FLOAT32) (mathExactVectorLength(&(pVehicleData->VehicleVel)));
 	speedFactor = std::min(1.0f, (fpsWeapons[currentWeaponModel].speedMultiplier * speed * speed * speed));
 
-	persGetHealthStats(NULL, &currentATP, NULL, NULL);
+	persGetHealthStats(nullptr, &currentATP, nullptr, nullptr);
 
 	// at 100%, 0% extra error
 	// at 90%, 23% extra error
@@ -3952,7 +3952,7 @@ void fpFPSGetWobble(FLOAT32* horizWobble, FLOAT32* vertWobble, FLOAT32*	horizAng
 	}
 
 	deltaTime = (frametime - lastCalcTime) / 1000.0f;
-	persGetHealthStats(NULL, &currentATP, NULL, NULL);
+	persGetHealthStats(nullptr, &currentATP, nullptr, nullptr);
 
 	bool aiming = (stateFlags & STATE_AIM);
 
@@ -3962,7 +3962,7 @@ void fpFPSGetWobble(FLOAT32* horizWobble, FLOAT32* vertWobble, FLOAT32*	horizAng
 		if ((totalAimTime == 0) && (fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_AUTO_RIFLE || ((fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_RIFLE) && (!(fpsWeapons[currentWeaponModel].auxEnable[FPS_AUX_RGCUP])))))
 		{
 			if(!persIsTired())
-				fpsTrooper.breathSoundID = fpFPSfxPlayNormalSound (fpsTrooper.aimBreathSound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, NULL, persGetPersonaVehicleObjectDataPtr());
+				fpsTrooper.breathSoundID = fpFPSfxPlayNormalSound (fpsTrooper.aimBreathSound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, nullptr, persGetPersonaVehicleObjectDataPtr());
 		}
 
 		totalAimTime += deltaTime;
@@ -4365,7 +4365,7 @@ AmmoTrajectory* fpFPSGetTrajectory()
 	static AmmoTrajectory _trajectory;
 
     if(!fpFPSCanProjectGrenade())
-        return NULL;
+        return nullptr;
 
 	if(frametime <= lastUpdate)
 		return &_trajectory;
@@ -4561,7 +4561,7 @@ LOGICAL fpFPSUpdatePerson(mlVehicleData* pVehicleData, FLOAT64 deltaTime)
 	// handle movement
 	movementStateFlags = stateFlags & STATE_MOVEMENT_MASK;
 
-	persGetHealthStats(NULL, &currentATP, NULL, NULL);
+	persGetHealthStats(nullptr, &currentATP, nullptr, nullptr);
 
 	if (stateFlags & STATE_WALK)
 		forwardSpeedValue = FPS_SPEED_WALK;
@@ -5027,11 +5027,11 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 	bool prone = (fpFPSGetPlayerPose() == POSE_PRONE);
 
 	vehVehicle* player = persGetPersonaVehiclePtr();
-	if(player == NULL) return;
+	if(player == nullptr) return;
 
 	UINT32 newCollisionFlags = 0;
-	StratDB::StratObject* captureStrat = NULL;
-	StratDB::StratObject* nofireStrat = NULL;
+	StratDB::StratObject* captureStrat = nullptr;
+	StratDB::StratObject* nofireStrat = nullptr;
 
 	// setup rays
 	Vec3d up				= Vec3d(0,0,1.0f);
@@ -5057,7 +5057,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 	_collider.groundHit.x	= pos.x();
 	_collider.groundHit.y	= pos.y();
 	_collider.groundHit.z	= pos.z();
-	_collider.objectHit		= NULL;
+	_collider.objectHit		= nullptr;
 
 	// convert to the physical world
 	pos = physicsGameToPhysical(pos);
@@ -5081,8 +5081,8 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 	FLOAT32 wadeZ = -10000;
 	FLOAT32 wading = 0;
 
-	ScenarioVolume* currentVolume = NULL;
-	trnCDTerrainObject* currentTO = NULL;
+	ScenarioVolume* currentVolume = nullptr;
+	trnCDTerrainObject* currentTO = nullptr;
 
 	// resuse dir to indicate our normalized velocity vector in the xy plane
 	dir.z() = 0;
@@ -5124,8 +5124,8 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 		{
 			// get all collisions and loop over them for inspection
 			const colliderQuery::CollisionList& hits = collider->getCollisions();
-			const colliderQuery::Collision* best = NULL;
-			const colliderQuery::Collision* walk = NULL;
+			const colliderQuery::Collision* best = nullptr;
+			const colliderQuery::Collision* walk = nullptr;
 
 			tHitCount += hits.size();
 
@@ -5218,13 +5218,13 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 						if(!nofireStrat && colliderIsType(categoryBits, COLLIDER_NOFIRE) && fabs(hit.pos.z() - myZ) <= 1.0f)
 						{
 							trnCDTerrainObject* TO = colliderSpaceData<trnCDTerrainObject>(hit.g2);
-							nofireStrat	= (TO) ? TO->StratObj() : NULL;
+							nofireStrat	= (TO) ? TO->StratObj() : nullptr;
 						}
 
 						if(!captureStrat && colliderIsType(categoryBits, COLLIDER_CAPTURE) && fabs(hit.pos.z() - myZ) <= 1.0f)
 						{
 							trnCDTerrainObject* TO = colliderSpaceData<trnCDTerrainObject>(hit.g2);
-							captureStrat = (TO) ? TO->StratObj() : NULL;
+							captureStrat = (TO) ? TO->StratObj() : nullptr;
 						}
 					}
 					break;
@@ -5348,7 +5348,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 						// throw this contact out?
 						if(throwOut)
 						{
-							colliderDebugContact(hit.pos, normal, colorBLACKALPHA, NULL, depth);
+							colliderDebugContact(hit.pos, normal, colorBLACKALPHA, nullptr, depth);
 							continue;
 						}
 						else
@@ -5386,13 +5386,13 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 							// debug it
 							if(klass == dRayClass)
 							{
-								colliderDebugContact(hit.pos, normal, colorBLUEALPHA, NULL, depth);
-								//colliderDebugContact(hit.pos, thisPush, colorCYANALPHA, NULL, hit.depth);
+								colliderDebugContact(hit.pos, normal, colorBLUEALPHA, nullptr, depth);
+								//colliderDebugContact(hit.pos, thisPush, colorCYANALPHA, nullptr, hit.depth);
 							}
 							else
 							{
-								colliderDebugContact(hit.pos, normal, colorREDALPHA, NULL, depth);
-								//colliderDebugContact(hit.pos, thisPush, colorMAGENTAALPHA, NULL, hit.depth);
+								colliderDebugContact(hit.pos, normal, colorREDALPHA, nullptr, depth);
+								//colliderDebugContact(hit.pos, thisPush, colorMAGENTAALPHA, nullptr, hit.depth);
 							}
 
 							if(false && lastNormal.length2())
@@ -5518,7 +5518,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 		{
 			ServerTrackedObject* sto = wwiiGetSTO(_ppoLastHit);
 
-			if(sto != NULL && sto->type() == ServerTrackedObject::_PPO)
+			if(sto != nullptr && sto->type() == ServerTrackedObject::_PPO)
 			{
 				PlayerPlacedSTO* ppo = dynamic_cast<PlayerPlacedSTO*>(sto);
 				ppo->leave();
@@ -5531,7 +5531,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 		{
 			ServerTrackedObject* sto = wwiiGetSTO(ppoHit);
 
-			if(sto != NULL && sto->type() == ServerTrackedObject::_PPO)
+			if(sto != nullptr && sto->type() == ServerTrackedObject::_PPO)
 			{
 				PlayerPlacedSTO* ppo = dynamic_cast<PlayerPlacedSTO*>(sto);
 				ppo->enter();
@@ -5558,7 +5558,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 #endif
 
 	/*
-	static StratDB::StratObject* lastNofireStrat = NULL;
+	static StratDB::StratObject* lastNofireStrat = nullptr;
 
 	if(lastNofireStrat != nofireStrat)
 	{
@@ -5654,11 +5654,11 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 	noFire = false;
 
 	vehVehicle* player = persGetPersonaVehiclePtr();
-	if(player == NULL) return;
+	if(player == nullptr) return;
 
 	UINT32 newCollisionFlags = 0;
-	StratDB::StratObject* captureStrat = NULL;
-	StratDB::StratObject* nofireStrat = NULL;
+	StratDB::StratObject* captureStrat = nullptr;
+	StratDB::StratObject* nofireStrat = nullptr;
 
 	// setup rays
 	Vec3d velocity			= Vec3d(player->ModelData->VehicleVel);
@@ -5672,7 +5672,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 	collider.groundHit.x	= pos.x();
 	collider.groundHit.y	= pos.y();
 	collider.groundHit.z	= badZ;
-	collider.objectHit		= NULL;
+	collider.objectHit		= nullptr;
 
 	// convert to the physical world
 	pos = physicsGameToPhysical(pos);
@@ -5776,8 +5776,8 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 	{
 		// get all collisions and loop over them for inspection
 		const colliderQuery::CollisionList& hits = collider.getCollisions();
-		const colliderQuery::Collision* best = NULL;
-		const colliderQuery::Collision* walk = NULL;
+		const colliderQuery::Collision* best = nullptr;
+		const colliderQuery::Collision* walk = nullptr;
 
 		tHitCount += (int)hits.size();
 
@@ -5839,13 +5839,13 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 					if(!nofireStrat && colliderIsType(category2, COLLIDER_NOFIRE) && fabs(hit.pos.z() - myZ) <= 1.0f)
 					{
 						trnCDTerrainObject* TO = colliderSpaceData<trnCDTerrainObject>(hit.g2);
-						nofireStrat	= (TO) ? TO->StratObj() : NULL;
+						nofireStrat	= (TO) ? TO->StratObj() : nullptr;
 					}
 
 					if(!captureStrat && colliderIsType(category2, COLLIDER_CAPTURE) && fabs(hit.pos.z() - myZ) <= 1.0f)
 					{
 						trnCDTerrainObject* TO = colliderSpaceData<trnCDTerrainObject>(hit.g2);
-						captureStrat = (TO) ? TO->StratObj() : NULL;
+						captureStrat = (TO) ? TO->StratObj() : nullptr;
 					}
 				}
 
@@ -5927,7 +5927,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 				// throw out contacts with normals in the direction of our velocity
 				if(angle > .1)
 				{
-					colliderDebugContact(hit, colorBLACKALPHA, NULL, hit.depth);
+					colliderDebugContact(hit, colorBLACKALPHA, nullptr, hit.depth);
 					continue;
 				}
 				else
@@ -5958,11 +5958,11 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 
 					// red in front, magenta in back
 					if(hit.g1 == collider.geom(5))
-						colliderDebugContact(hit, colorREDALPHA, NULL, hit.depth);
+						colliderDebugContact(hit, colorREDALPHA, nullptr, hit.depth);
 					else if(hit.g1 == collider.geom(6))
-						colliderDebugContact(hit, colorMAGENTAALPHA, NULL, hit.depth);
+						colliderDebugContact(hit, colorMAGENTAALPHA, nullptr, hit.depth);
 					else
-						colliderDebugContact(hit, colorBLUEALPHA, NULL, hit.depth);
+						colliderDebugContact(hit, colorBLUEALPHA, nullptr, hit.depth);
 				}
 
 				//pcount++;
@@ -6032,7 +6032,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 		{
 			ServerTrackedObject* sto = wwiiGetSTO(_ppoLastHit);
 
-			if(sto != NULL && sto->type() == ServerTrackedObject::_PPO)
+			if(sto != nullptr && sto->type() == ServerTrackedObject::_PPO)
 			{
 				PlayerPlacedSTO* ppo = dynamic_cast<PlayerPlacedSTO*>(sto);
 				ppo->leave();
@@ -6043,7 +6043,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 		{
 			ServerTrackedObject* sto = wwiiGetSTO(ppoHit);
 
-			if(sto != NULL && sto->type() == ServerTrackedObject::_PPO)
+			if(sto != nullptr && sto->type() == ServerTrackedObject::_PPO)
 			{
 				PlayerPlacedSTO* ppo = dynamic_cast<PlayerPlacedSTO*>(sto);
 				ppo->enter();
@@ -6203,7 +6203,7 @@ LOGICAL fpFPSUpdate ()
 		return (FALSE);
 
 	// go ahead and update the eye here too
-	fpFPSGetEyeMatrix (NULL);
+	fpFPSGetEyeMatrix (nullptr);
 
 	// Handle Weapon Firing
 	fpFPSWeaponFire(persGetPersonaModelDataPtr());
@@ -6740,7 +6740,7 @@ static bool _poseCheck()
 
 			// grab current level
 			FLOAT32 currentATP = 0;
-			persGetHealthStats(NULL, &currentATP, NULL, NULL);
+			persGetHealthStats(nullptr, &currentATP, nullptr, nullptr);
 
 			// calculate hit
 			poseChangeATPEffect = _atpHit * severity * delta;
@@ -6779,7 +6779,7 @@ static bool _toProneCheck()
 		return false;
 
 	vehVehicle* player = persGetPersonaVehiclePtr();
-	if(player == NULL) return false;
+	if(player == nullptr) return false;
 
 	// which way are we moving
 	Vec3d dir = Vec3d(player->ModelData->VehicleVel);
@@ -6851,7 +6851,7 @@ static bool _toPoseCheck2(int pose)
 	if(!_poseCheck())
 		return false;
 
-	FPSCollider* collider = NULL;
+	FPSCollider* collider = nullptr;
 
 	// check colliders
 	switch(pose)
@@ -6868,7 +6868,7 @@ static bool _toPoseCheck2(int pose)
 	bool prone = (fpFPSGetPlayerPose() == POSE_PRONE);
 
 	vehVehicle* player = persGetPersonaVehiclePtr();
-	if(player == NULL) return false;
+	if(player == nullptr) return false;
 
 	// setup rays
 	Vec3d up				= Vec3d(0,0,1.0f);
@@ -6948,13 +6948,13 @@ static bool _toPoseCheck2(int pose)
 				if(fabs(normal.z()) >= .9f)
 					throwOut = true;
 
-				colliderDebugContact(hit.pos, normal, colorBLACKALPHA, NULL, hit.depth);
+				colliderDebugContact(hit.pos, normal, colorBLACKALPHA, nullptr, hit.depth);
 
 				// throw this contact out?
 				if(throwOut)
 					continue;
 
-				colliderDebugContact(hit.pos, normal, colorREDALPHA, NULL, hit.depth);
+				colliderDebugContact(hit.pos, normal, colorREDALPHA, nullptr, hit.depth);
 
 				// we hit something so bail
 				return false;
@@ -8708,7 +8708,7 @@ void fpFPSFireResupply (mlVehicleData* pVehicleData, FLOAT64VECTOR* pFirePos, pi
 	V2.y = (FLOAT32)(endPos.y - WorldOriginOffset.y);
 	V2.z = (FLOAT32)(endPos.z);
 
-	if (trncdCollideWithVehiclesAndTerrain(&V1, &V2, NULL, NULL, NULL, &collideVehicle, NULL, FALSE, FALSE, TRUE) == TRUE)
+	if (trncdCollideWithVehiclesAndTerrain(&V1, &V2, nullptr, nullptr, nullptr, &collideVehicle, nullptr, FALSE, FALSE, TRUE) == TRUE)
 	{
 		// check to see if we poked an infantry of the same country
 		if ((collideVehicle) && (playerVehicle->Side == collideVehicle->Side) && (collideVehicle->VehicleType->Type == VEH_TYPE_PERSON))
@@ -8732,7 +8732,7 @@ void fpFPSFireResupply (mlVehicleData* pVehicleData, FLOAT64VECTOR* pFirePos, pi
 
 static bool _isValidRepairTarget(const trnCDTerrainObject* TO)
 {
-	if ( NULL == TO )
+	if ( nullptr == TO )
 		return false;
 
 	// Bridges are valid, but we ought to check for a defend objective.
@@ -8750,7 +8750,7 @@ static bool _isValidRepairTarget(const trnCDTerrainObject* TO)
 
 		vehVehicle*playerVehicle = persGetPersonaVehiclePtr();
 		// And it oughta be friendly
-		if ( NULL == playerVehicle || wwiiSide(TO->Country) != (WWII_SIDE)playerVehicle->GetSide() )
+		if ( nullptr == playerVehicle || wwiiSide(TO->Country) != (WWII_SIDE)playerVehicle->GetSide() )
 			return false;
 		return true;
 	}
@@ -8767,7 +8767,7 @@ void fpFPSFireBridgeRepair (mlVehicleData* pVehicleData, FLOAT64VECTOR* pFirePos
 	FLOAT64VECTOR	WorldOriginOffset;
 	FLOAT64VECTOR	projVel;		// unit vector in Y
 	piVECTOR		V1, V2;
-	trnCDTerrainObject* TO = NULL;
+	trnCDTerrainObject* TO = nullptr;
 
 	trnGetWorldOriginOffset(&WorldOriginOffset);
 
@@ -8797,7 +8797,7 @@ void fpFPSFireBridgeRepair (mlVehicleData* pVehicleData, FLOAT64VECTOR* pFirePos
 	V2.y = (FLOAT32)(endPos.y - WorldOriginOffset.y);
 	V2.z = (FLOAT32)(endPos.z);
 
-	if (trncdCollideWithVehiclesAndTerrain(&V1, &V2, NULL, NULL, NULL, NULL, &TO, FALSE, FALSE, TRUE) == TRUE)
+	if (trncdCollideWithVehiclesAndTerrain(&V1, &V2, nullptr, nullptr, nullptr, nullptr, &TO, FALSE, FALSE, TRUE) == TRUE)
 	{
 		if ( _isValidRepairTarget(TO) )
 		{
@@ -8805,7 +8805,7 @@ void fpFPSFireBridgeRepair (mlVehicleData* pVehicleData, FLOAT64VECTOR* pFirePos
 			--currentGameWeapon->NumRoundsAmmoLeft[currentGameWeapon->AmmoTypeInUse];
 			fpFPSFireRound (currentGameWeapon, pFireAtt);
 			Write_Log (LOG_FPS, LOG_INFO, "Repair Bridge <0x%x>, name >%s<!", TO, TO->TerrainMasterObject->name);
-			vehApplyDamageToObject(fpFPSGetBridgeRepair(), TO, NULL, NULL);
+			vehApplyDamageToObject(fpFPSGetBridgeRepair(), TO, nullptr, nullptr);
 		}
 	}
 
@@ -8873,8 +8873,8 @@ LOGICAL fpFPSWeaponFire (mlVehicleData* pVehicleData)
 {
 	if (fpFPSStateOKToFire())
 	{
-		OBJECT*			pObject = NULL;
-		vehVehicle*		pVehicle = NULL;
+		OBJECT*			pObject = nullptr;
+		vehVehicle*		pVehicle = nullptr;
 
 		FLOAT64VECTOR	EmptyVector = {0, 0, 0}; // For placeholder vectors, etc.
 		FLOAT64VECTOR	RecoilVector = {0, 0, 0};
@@ -8884,7 +8884,7 @@ LOGICAL fpFPSWeaponFire (mlVehicleData* pVehicleData)
 		FLOAT64VECTOR	FlashPositionVector = {0, 0, 0};
 		FLOAT64VECTOR	MuzzlePositionVector = {0, 0, 0}; // for relative muzzle flash positioning (if needed be)
 		SINT32			weaponNumber = 0;
-		SINT32			FireType = 0, SoundType = 0, TempID = 0, *pSoundID = NULL;
+		SINT32			FireType = 0, SoundType = 0, TempID = 0, *pSoundID = nullptr;
 
 		pObject = pVehicleData->VehicleObjectData->PlaneObject;
 
@@ -8987,7 +8987,7 @@ LOGICAL fpFPSWeaponFire (mlVehicleData* pVehicleData)
 			fpFPSFireBridgeRepair (pVehicleData, &FirePositionVector, &FireAttitudeMatrix);
 			//fpsTrooper.firedWeapon = 1;
 		}
-		else if (pVehicle != NULL)
+		else if (pVehicle != nullptr)
 		{
 			UINT32 fired = weapFireWeapon(&RecoilVector,
 							  currentGameWeapon,
@@ -8999,12 +8999,12 @@ LOGICAL fpFPSWeaponFire (mlVehicleData* pVehicleData)
 							  1,
 							  0,
 							  flags,
-							  NULL,
+							  nullptr,
 							  &MuzzlePositionVector,
-							  NULL,
+							  nullptr,
 							  pVehicle);
 
-			if (currentGameWeapon->WeaponType != NULL)
+			if (currentGameWeapon->WeaponType != nullptr)
 			{
 				FireType = currentGameWeapon->WeaponType->FireType;
 
@@ -9049,7 +9049,7 @@ LOGICAL fpFPSWeaponFire (mlVehicleData* pVehicleData)
                         {
                             if(pObject->animModel->currentWeaponType == TPS_WEAPONTYPE_ROCKET)
                             {
-								TransformEffect* te = NULL;
+								TransformEffect* te = nullptr;
                                 piMATRIX m = IdentityMatrix;
                                 gr2AnimGetBoneMatrix(pObject, &m, "alt_firepoint");
 
@@ -9069,7 +9069,7 @@ LOGICAL fpFPSWeaponFire (mlVehicleData* pVehicleData)
 
 									Matrixd mat(m);
 
-									te = TransformEffect::AddEffect("bazookabackflash", Vec3f(dir), 0, NULL);
+									te = TransformEffect::AddEffect("bazookabackflash", Vec3f(dir), 0, nullptr);
 
 									if(te)
 									{
@@ -9088,9 +9088,9 @@ LOGICAL fpFPSWeaponFire (mlVehicleData* pVehicleData)
 								}
 
                                 if(pObject->animModel->weaponArray[pObject->animModel->currentWeapon] == PIAT)
-			                        te = TransformEffect::AddEffect("muzzlesmoke", Vec3f(0, 0, 0), 0, NULL);
+			                        te = TransformEffect::AddEffect("muzzlesmoke", Vec3f(0, 0, 0), 0, nullptr);
                                 else
-			                        te = TransformEffect::AddEffect("bazookafrontflash", Vec3f(0, 0, 0), 0, NULL);
+			                        te = TransformEffect::AddEffect("bazookafrontflash", Vec3f(0, 0, 0), 0, nullptr);
 
 			                    if(te)
 			                    {
@@ -9336,7 +9336,7 @@ void fpFPSFireRound (weapWeapon* weapon, piMATRIX* fireAtt, void* FireVehicle)
 	// garand's distinctive ping sound
 	if(currentWeaponModel == M1GARAND && fpsWeapons[currentWeaponModel].clipBullets == 0)
 	{
-		SINT32 id = fpFPSfxPlayNormalSound("sounds/troop/garandping.wav", IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, NULL, persGetPersonaVehicleObjectDataPtr());
+		SINT32 id = fpFPSfxPlayNormalSound("sounds/troop/garandping.wav", IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, nullptr, persGetPersonaVehicleObjectDataPtr());
 		if(id > -1) fxSndSetVolume(id, 2.0f);
 	}
 
@@ -9475,7 +9475,7 @@ void fpFPSRecycle ()
 
 	if (fpsWeapons[currentWeaponModel].recycleSound)
 	{
-		fpFPSfxPlayNormalSound (fpsWeapons[currentWeaponModel].recycleSound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, NULL, persGetPersonaVehicleObjectDataPtr());
+		fpFPSfxPlayNormalSound (fpsWeapons[currentWeaponModel].recycleSound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, nullptr, persGetPersonaVehicleObjectDataPtr());
     }
 
 	if (currentWeaponModel == BOYSMK1)
@@ -9558,7 +9558,7 @@ void fpFPSReload (weapWeapon* weapon)
 
 	assert (currentGameWeapon == weapon);
 
-	SCHAR* reloadSound = NULL;
+	SCHAR* reloadSound = nullptr;
 
 	if (fpsWeapons[currentWeaponModel].auxEnable[FPS_AUX_RGCUP])
 		reloadSound = fpsWeapons[currentWeaponModel].rgReloadSound;
@@ -9567,7 +9567,7 @@ void fpFPSReload (weapWeapon* weapon)
 
 	if (reloadSound)
 	{
-		fpFPSfxPlayNormalSound (reloadSound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, NULL, persGetPersonaVehicleObjectDataPtr());
+		fpFPSfxPlayNormalSound (reloadSound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, nullptr, persGetPersonaVehicleObjectDataPtr());
     }
 }
 
@@ -10447,19 +10447,19 @@ void fpFPSKill ()
 		if (weapDefaultAnim[i])
 		{
 			gr2FreeAnimation (weapDefaultAnim[i]);
-			weapDefaultAnim[i] = NULL;
+			weapDefaultAnim[i] = nullptr;
 		}
 
 		if (weapEmptyDefaultAnim[i])
 		{
 			gr2FreeAnimation (weapEmptyDefaultAnim[i]);
-			weapEmptyDefaultAnim[i] = NULL;
+			weapEmptyDefaultAnim[i] = nullptr;
 		}
 
 		if (clipDefaultAnim[i])
 		{
 			gr2FreeAnimation (clipDefaultAnim[i]);
-			clipDefaultAnim[i] = NULL;
+			clipDefaultAnim[i] = nullptr;
 		}
 
 		for (j=0; j < NUM_WEAP_STATES; j++)
@@ -10473,34 +10473,34 @@ void fpFPSKill ()
 			if (clipAnims[i][j])
 				gr2FreeAnimation (clipAnims[i][j]);
 
-			armsAnims[i][j] = NULL;
-			weapAnims[i][j] = NULL;
-			clipAnims[i][j] = NULL;
+			armsAnims[i][j] = nullptr;
+			weapAnims[i][j] = nullptr;
+			clipAnims[i][j] = nullptr;
 		}
 	}
 
 	gr2FreeModel (skeletonModel);
-	skeletonModel = NULL;
+	skeletonModel = nullptr;
 
 	for (i=0; i < NUM_INFANTRY_TYPES; i++)
 	{
 		if (armsModels[i])
 		{
 			gr2FreeModel (armsModels[i]);
-			armsModels[i] = NULL;
+			armsModels[i] = nullptr;
 		}
 
 		if (legsModels[i])
 		{
 			gr2FreeModel (legsModels[i]);
-			legsModels[i] = NULL;
+			legsModels[i] = nullptr;
 		}
 	}
 
 	if (armTexModel)
 	{
 		gr2FreeModel (armTexModel);
-		armTexModel = NULL;
+		armTexModel = nullptr;
 	}
 
 	for (i=0; i < NUM_WEAPONS; i++)
@@ -10508,13 +10508,13 @@ void fpFPSKill ()
 		if (weaponModels[i])
 		{
 			gr2FreeModel (weaponModels[i]);
-			weaponModels[i] = NULL;
+			weaponModels[i] = nullptr;
 		}
 
 		if (secondaryModels[i])
 		{
 			gr2FreeModel (secondaryModels[i]);
-			secondaryModels[i] = NULL;
+			secondaryModels[i] = nullptr;
 		}
 
 		for(int j = 0; j < FPS_NUM_AUX_MODELS; j++)
@@ -10522,7 +10522,7 @@ void fpFPSKill ()
 			if(auxModels[i][j])
 			{
 				gr2FreeModel (auxModels[i][j]);
-				auxModels[i][j] = NULL;
+				auxModels[i][j] = nullptr;
 			}
 		}
 	}
@@ -10539,7 +10539,7 @@ void fpFPSKill ()
 		fpsTrooper.autoWeaponFireSoundId = 0;
 	}
 
-	currentGameWeapon = NULL;
+	currentGameWeapon = nullptr;
 
 	fpsTrooper.initialized = FALSE;
 }
@@ -10712,21 +10712,21 @@ LOGICAL fpFPSGetHUDAmmoData (HUD_AMMO_DATA type, SINT32* data)
 LOGICAL fpFPSRideUnrideVehicle ()
 {
 	mlVehicleData*	vehicleData = persGetPersonaModelDataPtr();
-	if (vehicleData == NULL)
+	if (vehicleData == nullptr)
 	{
 		return FALSE;
 	}
-	if (vehicleData->VehicleMasterPtr == NULL)
+	if (vehicleData->VehicleMasterPtr == nullptr)
 	{
 		return FALSE;
 	}
 
 	vehVehicle*		vehicle = (vehVehicle*)(vehicleData->VehicleMasterPtr);;
-	vehVehicle*		FPSRideVehicle = NULL;
+	vehVehicle*		FPSRideVehicle = nullptr;
 	FLOAT64			speed;
 	FLOAT32			damage;
 
-	vehVehicle*currentVehicle = NULL;
+	vehVehicle*currentVehicle = nullptr;
 
 #if 0
 	if (stateFlags & STATE_SIT)
@@ -10741,7 +10741,7 @@ LOGICAL fpFPSRideUnrideVehicle ()
 		FPSRideVehicle = vehFindVehicle(vehicle->RideVehicleHostIndex);
 
 		// check for vehicle poofing on us .. if so, act like we jumped off
-		if(FPSRideVehicle == NULL)
+		if(FPSRideVehicle == nullptr)
 		{
 			FLOAT64VECTOR& pos = vehicle->ModelData->VehiclePos;
 			const FLOAT32 rayLength = 10.0f;
@@ -10764,7 +10764,7 @@ LOGICAL fpFPSRideUnrideVehicle ()
 	}
 
 	// if we're riding a vehicle, jump off
-	if (FPSRideVehicle != NULL && vehicle->RideSeatNum != VEH_TROOPER_ON_DECK_RIDE_SEAT)
+	if (FPSRideVehicle != nullptr && vehicle->RideSeatNum != VEH_TROOPER_ON_DECK_RIDE_SEAT)
 	{
 		// special handling for airplanes
 		if (FPSRideVehicle->VehicleType->Type == VEH_TYPE_AIR)
@@ -10872,14 +10872,14 @@ LOGICAL fpFPSRideUnrideVehicle ()
 	//   target vehicle cannot be moving faster than 1m/s when boarding
 
 	vehGetVehicleHead(&currentVehicle);
-	FPSRideVehicle = NULL;
+	FPSRideVehicle = nullptr;
 
     for(;currentVehicle; currentVehicle = currentVehicle->getNext())
 	{
 		UINT32 i;
 
 		if (currentVehicle == vehicle) continue;
-		if (currentVehicle->VehicleObjectData == NULL) continue;
+		if (currentVehicle->VehicleObjectData == nullptr) continue;
 		if (currentVehicle->VehicleObjectData->NumFPSSeats == 0) continue;
 		if (currentVehicle->Side != vehicle->Side) continue;
         if (currentVehicle->isSTO()) continue;
@@ -10891,7 +10891,7 @@ LOGICAL fpFPSRideUnrideVehicle ()
 		for(i = 0; i < currentVehicle->VehicleObjectData->NumFPSSeats; i++)
 		{
 			OBJECT* RideObject = currentVehicle->VehicleObjectData->FPSSeats[i];
-			if(RideObject == NULL) break;
+			if(RideObject == nullptr) break;
 			FLOAT64VECTOR TrooperPos = {0,0,0}, RidePos, DeltaVec;
 			FLOAT64VECTOR WorldOriginOffset;
 
@@ -11050,7 +11050,7 @@ LOGICAL fpFPSSit(SINT32 Param, vehVehicle* rideVehicle)
 
 		if (legsModel)
 			gr2DetachModel (legsModel);
-		legsModel = NULL;
+		legsModel = nullptr;
 
 		targetPose = FPS_POSITION_STAND;
 		// this is added to fix a sit until we have all the set states. DEG
@@ -11068,7 +11068,7 @@ LOGICAL fpFPSSit(SINT32 Param, vehVehicle* rideVehicle)
 			{
 				case VEH_TYPE_AIR:
 				{
-					OBJECT* exit = NULL;
+					OBJECT* exit = nullptr;
 
 					offset.x = -2.0f;
 					offset.y = -4.0f;
@@ -11076,7 +11076,7 @@ LOGICAL fpFPSSit(SINT32 Param, vehVehicle* rideVehicle)
 					for(size_t i = 0; i < rideVehicle->VehicleObjectData->NumFPSSeats; i++)
 					{
 						OBJECT* seat = rideVehicle->VehicleObjectData->FPSSeats[i];
-						if(seat == NULL) continue;
+						if(seat == nullptr) continue;
 
 						if(!exit || (exit->dof->dofmatrix2._41 <= 0 && seat->dof->dofmatrix2._42 < exit->dof->dofmatrix2._42))
 							exit = seat;
@@ -11162,7 +11162,7 @@ LOGICAL fpFPSGetATPGain(FLOAT32* pATPGain, FLOAT32 deltaTime)
 	else
 		forwardSpeedValue = FPS_SPEED_TROT;
 
-	persGetHealthStats(NULL, &currentATP, NULL, NULL);
+	persGetHealthStats(nullptr, &currentATP, nullptr, nullptr);
 
 	currentSpeed = currentForwardVectorLength * currentForwardVectorLength +
 		currentStrafeVectorLength * currentStrafeVectorLength;
@@ -11556,7 +11556,7 @@ LOGICAL fpFPSIsObjectFPS (OBJECT* pObject)
 
 LOGICAL fpFPSIsTrooperSitting (OBJECT* pObject)
 {
-	// passing in NULL means I already know I'm a fps object
+	// passing in nullptr means I already know I'm a fps object
 	if (!pObject || fpFPSIsObjectFPS(pObject))
 	{
 		if (fpFPSGetPlayerPose() == POSE_SIT)
@@ -11823,9 +11823,9 @@ UINT32 fpFPSVehicleCollideCheckNeeded()
 
 void fpFPSHitBuilderObject(const StratDB::StratObject* pStatue)
 {
-	if(pStatue == NULL) return;
+	if(pStatue == nullptr) return;
 
-    if(currentBuilderObject == NULL)
+    if(currentBuilderObject == nullptr)
         fpFPSResetBuilderPosition();
 
 	currentBuilderObject = pStatue;
@@ -11834,8 +11834,8 @@ void fpFPSHitBuilderObject(const StratDB::StratObject* pStatue)
 
 void fpFPSBuilderEnd()
 {
-    currentBuilderObject = NULL;
-    uiShowBuilderInfo(NULL, false);
+    currentBuilderObject = nullptr;
+    uiShowBuilderInfo(nullptr, false);
 }
 
 void fpFPSResetBuilderPosition()
@@ -11921,7 +11921,7 @@ void fpFPSStartEmote (SCHAR* emote, SCHAR* handle, LOGICAL force)
 	}
 
 	vehVehicle* playerVehicle = persGetPersonaVehiclePtr();
-	append = NULL;
+	append = nullptr;
 
 	// ID the emote
 	for (i=0; i < TPS_COMBATEMOTE_NUM_TYPES; i++)
@@ -12061,11 +12061,11 @@ void fpFPSStartEmote (SCHAR* emote, SCHAR* handle, LOGICAL force)
 
 	if (newEmoteType == TPS_EMOTETYPE_FULLBODY)
 	{
-		rnmainListEmoteText (IDE_LANG_UI, FPS_BODYEMOTE_OFFSET + i, colorGREENALPHA, NULL, append);
+		rnmainListEmoteText (IDE_LANG_UI, FPS_BODYEMOTE_OFFSET + i, colorGREENALPHA, nullptr, append);
 	}
 	else
 	{
-		rnmainListEmoteText (IDE_LANG_UI, FPS_COMBATEMOTE_OFFSET + i, colorGREENALPHA, NULL, append);
+		rnmainListEmoteText (IDE_LANG_UI, FPS_COMBATEMOTE_OFFSET + i, colorGREENALPHA, nullptr, append);
 	}
 
 	// set the global stuff so determineNextState can figure things out
@@ -12112,7 +12112,7 @@ void fpFPSResupplySelf(vehVehicle*vehicle)
 {
 	if (!vehicle)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "NULL vehicle tried to resupply me?!!");
+		Write_Log (LOG_FPS, LOG_INFO, "nullptr vehicle tried to resupply me?!!");
 		return;
 	}
 
@@ -12294,7 +12294,7 @@ SINT32 fpFPSPlaySound (SCHAR* sound)
 	if (!sound)
 		return -1;
 
-	return (fpFPSfxPlayNormalSound (sound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, NULL, persGetPersonaVehicleObjectDataPtr()));
+	return (fpFPSfxPlayNormalSound (sound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, nullptr, persGetPersonaVehicleObjectDataPtr()));
 }
 
 SINT32 fpFPSGetAmmoTypeNum (bool forType)
@@ -12407,7 +12407,7 @@ void fpFPSSetInfantrySurfaceID (SINT32 surfaceID, struct trnCDTerrainObject* TO)
 
 	fpsTrooper.currentSurfaceID = surfaceID;
 
-	trnCDTerrainObject* lastEnteredTO = NULL;
+	trnCDTerrainObject* lastEnteredTO = nullptr;
 
 	// override with vehmain's idea of the last entered TO if we found one
 	if(vehmainLastEntered(&lastEnteredTO))
@@ -12424,7 +12424,7 @@ void fpFPSSetInfantrySurfaceID (SINT32 surfaceID, struct trnCDTerrainObject* TO)
 	if (!TO)
 	{
 		// terra non firma? :)
-		fpsTrooper.lastTO = NULL;
+		fpsTrooper.lastTO = nullptr;
 		fpsTrooper.lastTODamageLevel = 0;
 	}
 	else if (fpsTrooper.lastTO != TO)
@@ -12639,7 +12639,7 @@ void fpFPSSightAdjust (SINT32 sightParam)
 	{
 		char tString[255];
 		sprintf (tString, "%.0dm", fpsWeapons[currentWeaponModel].getSightDist());
-		rnmainListEmoteText (IDE_LANG_UI, 9000, colorWHITEALPHA, NULL, tString);
+		rnmainListEmoteText (IDE_LANG_UI, 9000, colorWHITEALPHA, nullptr, tString);
 	}
 	*/
 
@@ -12661,7 +12661,7 @@ FLOAT32	fpFPSGetRedScreenMinAlpha()
 
 bool fpFPSOnBridge()
 {
-    if(fpsTrooper.lastTO == NULL)
+    if(fpsTrooper.lastTO == nullptr)
     {
         return false;
     }
@@ -12895,8 +12895,8 @@ void fpFPSControlBlockReset()
 // have to be sitting on a plane to trigger this emote
 LOGICAL fpFPSOkToJumpEmote()
 {
-	fpPersonData*	pPersonData = NULL;
-	vehVehicle*		FPSRideVehicle = NULL;
+	fpPersonData*	pPersonData = nullptr;
+	vehVehicle*		FPSRideVehicle = nullptr;
 
 	mlVehicleData*	pVehicleData = persGetPersonaModelDataPtr();
 	if (pVehicleData)
@@ -12919,7 +12919,7 @@ LOGICAL fpFPSOkToJumpEmote()
 	if(pPlayerVehicle->RideVehicleHostIndex > 0)
 		FPSRideVehicle = vehFindVehicle(pPlayerVehicle->RideVehicleHostIndex);
 
-	if (FPSRideVehicle == NULL)
+	if (FPSRideVehicle == nullptr)
 		return FALSE;
 
 	if (FPSRideVehicle->VehicleType->Type != VEH_TYPE_AIR)
@@ -13053,7 +13053,7 @@ UINT32 fpFPSGetHighlightedWeaponType()
 	fpsWeaponTypes weaponType = fpsTrooper.weaponPositionModel[fpsTrooper.highlightedWeaponNumber];
 
 	/*
-	SINT32 ammoTypeNum = fpFPSGetAmmoTypeNumByWeapon((SINT32)weaponType, NULL);
+	SINT32 ammoTypeNum = fpFPSGetAmmoTypeNumByWeapon((SINT32)weaponType, nullptr);
 
 	if (ammoTypeNum == 0)
 	{
@@ -13749,7 +13749,7 @@ dGeomID _createFPSCapsuleTest(dSpaceID space, double length, double radius, doub
 
 void _updateFPSColliders()
 {
-	_collider.collider = NULL;
+	_collider.collider = nullptr;
 
 	switch(fpFPSGetPlayerPose())
 	{
@@ -13814,7 +13814,7 @@ FPSCollider::FPSCollider() : colliderQuery()
 void FPSCollider::Update(double deltaTime)
 {
 	vehVehicle* player = persGetPersonaVehiclePtr();
-	if(player == NULL) return;
+	if(player == nullptr) return;
 
 	// setup rays
 	Vec3d pos				= Vec3d(player->ModelData->VehiclePos);

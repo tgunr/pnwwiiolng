@@ -70,14 +70,14 @@ SINT32 j;
 
 	g_lpiac = (imap_queue_entry*)memAlloc(NUM_IAC_QUEUE_ENTRIES * sizeof(imap_queue_entry));
 
-	if(g_lpiac == NULL)
+	if(g_lpiac == nullptr)
 	{
 		return(FALSE);
 	}
 
 	g_di2iac = (UINT16*)memAlloc(MAX_IAC_CODES * sizeof(UINT16));
 
-	if(g_di2iac == NULL)
+	if(g_di2iac == nullptr)
 	{
 		return(FALSE);
 	}
@@ -379,16 +379,16 @@ UINT32 dimainVKToIAC(UINT32 uVK)
 
 void dimainKill(void)
 {
-	if(g_lpiac != NULL)
+	if(g_lpiac != nullptr)
 	{
 		memFree(g_lpiac);
-		g_lpiac = NULL;
+		g_lpiac = nullptr;
 	}
 
-	if(g_di2iac != NULL)
+	if(g_di2iac != nullptr)
 	{
 		memFree(g_di2iac);
-		g_di2iac = NULL;
+		g_di2iac = nullptr;
 	}
 
 	dipKill();
@@ -538,7 +538,7 @@ LOGICAL dimainGetInputs(imap_queue_entry**plpiac, UINT32* pnumentries)
     DIDEVICEOBJECTDATA	od[_DIMAIN_INPUT_BUFFERSIZE];
     UINT32				pov[IAC_MAX_JOYSTICKS][4];
 
-	if(g_lpiac == NULL || g_di2iac == NULL)
+	if(g_lpiac == nullptr || g_di2iac == nullptr)
 	{
 		return FALSE;
 	}

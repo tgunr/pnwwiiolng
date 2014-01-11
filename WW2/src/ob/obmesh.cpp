@@ -29,7 +29,7 @@ SINT32 obmeshCreate(SINT32 iNumVertsAlongX,
 
     *lpVertices = (piLVERTEX*)memAlloc(sizeof(piLVERTEX) * iMeshVertCount);
 
-    if(lpVertices == NULL)
+    if(lpVertices == nullptr)
     {
         return -1;
     }

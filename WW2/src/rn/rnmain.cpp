@@ -139,7 +139,7 @@ LOGICAL rnmainSetDefaultRenderStates(void)
     States::SetGlobalDefaultModeValue(GL_FOG, 1);
     States::SetGlobalDefaultModeValue(GL_DEPTH_TEST, 1);
 
-    States::ApplyRenderModes(NULL);
+    States::ApplyRenderModes(nullptr);
 #else
     piSetRenderState(piRENDERSTATE_SRCBLEND, SrcBlend);
     piSetRenderState(piRENDERSTATE_DESTBLEND, DestBlend);
@@ -286,9 +286,9 @@ bool rnmainGetOnlineSetting()
 	if (BypassString[0] != '\0')
 	{
 		if (BypassString[0] == 'R')
-			BypassID = strtoul(&BypassString[1], NULL, 10);
+			BypassID = strtoul(&BypassString[1], nullptr, 10);
 		else
-			BypassID = strtoul(&BypassString[0], NULL, 10);
+			BypassID = strtoul(&BypassString[0], nullptr, 10);
 	}
 	else
 		BypassID = 0;
@@ -305,7 +305,7 @@ bool rnmainGetOnlineSetting()
 
 		GamePort = WWII::Net::Ports::MapHost;
 		CommType = PROTOCOL_TCP;
-		GameOTP = strtoul(ServerOTP, NULL, 10);
+		GameOTP = strtoul(ServerOTP, nullptr, 10);
 
 #if FRES || defined(BETA_RELEASE)
 		if(GameOTP == 0)
@@ -389,7 +389,7 @@ static bool _connectClientToGameNetwork()
 		// character 0 will be a '?' if the uiLocString lookup failed
 		// this can happen if a non ui loc string was passed to the
 		// ClientNetError constructor
-		MessageBox(NULL, message.c_str(), uiLocString("connect.popup.title").c_str(), MB_OK | MB_TOPMOST);
+		MessageBox(nullptr, message.c_str(), uiLocString("connect.popup.title").c_str(), MB_OK | MB_TOPMOST);
 
 		// launch the browser with a local html page
 		// describing what to do next
@@ -1201,7 +1201,7 @@ DateTimeRec	time;
 
 UINT32 rnmainGetViewScaleFactor(FLOAT32 * ScaleFactor)
 {
-	if (ScaleFactor != NULL)
+	if (ScaleFactor != nullptr)
 	{
 		*ScaleFactor = _ViewScaleFactor;
 	}
@@ -1230,7 +1230,7 @@ UINT32 rnmainSetZBufferNearVal(FLOAT32 ZBufferNearVal)
 
 UINT32 rnmainGetZBufferNearVal(FLOAT32* ZBufferNearVal)
 {
-	if (ZBufferNearVal != NULL)
+	if (ZBufferNearVal != nullptr)
 	{
 		*ZBufferNearVal = _ZBufferNearVal;
 	}
@@ -1245,7 +1245,7 @@ static void OutputStatusMessageToFile(SINT8* File, SINT32 Line, SINT8* MessageSt
 
 	Write_Debug("Status handler information...");
 
-	if (MessageString == NULL)
+	if (MessageString == nullptr)
 	{
 		if ( ExitLog )
 			fprintf(ExitLog, "No exit message!\n");
@@ -1288,7 +1288,7 @@ SINT8*	ptr, apID[64], data[64], serverIP[64], serverport[64], serverprotocol[64]
 FILE*	stream;
 
 	stream = fopen(TicketFile, "r");
-	if (stream == NULL)
+	if (stream == nullptr)
 	{
 		Online = 0;
 		return(FALSE);
@@ -1296,14 +1296,14 @@ FILE*	stream;
 
 	do
 	{
-		if (fgets(apID, 64, stream) == NULL)
+		if (fgets(apID, 64, stream) == nullptr)
 		{
 			retval = FALSE;
 			Write_Debug("Error when reading apID");
 			break;
 		}
 
-		if (fgets(data, 64, stream) == NULL)
+		if (fgets(data, 64, stream) == nullptr)
 		{
 			retval = FALSE;
 			Write_Debug("Error when reading data");
@@ -1311,7 +1311,7 @@ FILE*	stream;
 		}
 
 
-		if (fgets(serverIP, 64, stream) == NULL)
+		if (fgets(serverIP, 64, stream) == nullptr)
 		{
 			retval = FALSE;
 			Write_Debug("Error when reading serverIP");
@@ -1319,7 +1319,7 @@ FILE*	stream;
 		}
 
 		ptr = strchr(serverIP, ' ');
-		if (ptr == NULL)
+		if (ptr == nullptr)
 		{
 			retval = FALSE;
 			Write_Debug("Could not parse serverIP");
@@ -1327,9 +1327,9 @@ FILE*	stream;
 		}
 
 		ptr += 1;
-		*host = strtoul(ptr, NULL, 10);
+		*host = strtoul(ptr, nullptr, 10);
 
-		if (fgets(serverport, 64, stream) == NULL)
+		if (fgets(serverport, 64, stream) == nullptr)
 		{
 			retval = FALSE;
 			Write_Debug("Error when reading port");
@@ -1337,7 +1337,7 @@ FILE*	stream;
 		}
 
 		ptr = strchr(serverport, ' ');
-		if (ptr == NULL)
+		if (ptr == nullptr)
 		{
 			retval = FALSE;
 			Write_Debug("Could not parse port");
@@ -1345,9 +1345,9 @@ FILE*	stream;
 		}
 
 		ptr += 1;
-		*port = (UINT16)strtoul(ptr, NULL, 10);
+		*port = (UINT16)strtoul(ptr, nullptr, 10);
 
-		if (fgets(serverprotocol, 64, stream) == NULL)
+		if (fgets(serverprotocol, 64, stream) == nullptr)
 		{
 			retval = FALSE;
 			Write_Debug("Error when reading protocol");
@@ -1355,7 +1355,7 @@ FILE*	stream;
 		}
 
 		ptr = strchr(serverprotocol, ' ');
-		if (ptr == NULL)
+		if (ptr == nullptr)
 		{
 			retval = FALSE;
 			Write_Debug("Could not parse port");
@@ -1363,9 +1363,9 @@ FILE*	stream;
 		}
 
 		ptr += 1;
-		*protocol = (UINT16)strtoul(ptr, NULL, 10);
+		*protocol = (UINT16)strtoul(ptr, nullptr, 10);
 
-		if (fgets(otp, 64, stream) == NULL)
+		if (fgets(otp, 64, stream) == nullptr)
 		{
 			retval = FALSE;
 			Write_Debug("Error when reading OTP");
@@ -1373,7 +1373,7 @@ FILE*	stream;
 		}
 
 		ptr = strchr(otp, ' ');
-		if (ptr == NULL)
+		if (ptr == nullptr)
 		{
 			retval = FALSE;
 			Write_Debug("Could not parse OTP");
@@ -1381,14 +1381,14 @@ FILE*	stream;
 		}
 
 		ptr += 1;
-		*cookie = strtoul(ptr, NULL, 10);
+		*cookie = strtoul(ptr, nullptr, 10);
 
-		if (fgets(bypass, 64, stream) != NULL)
+		if (fgets(bypass, 64, stream) != nullptr)
 		{
 
 			ptr = strchr(serverIP, ' ');
 
-			if (ptr == NULL)
+			if (ptr == nullptr)
 			{
 				retval = FALSE;
 				Write_Debug("Could not parse IP");
@@ -1405,7 +1405,7 @@ FILE*	stream;
 
 			ptr = strchr(bypass, ' ');
 
-			if (ptr == NULL)
+			if (ptr == nullptr)
 			{
 				retval = FALSE;
 				Write_Debug("Could not parse BP");
@@ -1419,9 +1419,9 @@ FILE*	stream;
 			if (BypassString[0] != '\0')
 			{
 				if (BypassString[0] == 'R')
-					BypassID = strtoul(&BypassString[1], NULL, 10);
+					BypassID = strtoul(&BypassString[1], nullptr, 10);
 				else
-					BypassID = strtoul(&BypassString[0], NULL, 10);
+					BypassID = strtoul(&BypassString[0], nullptr, 10);
 			}
 			else
 				BypassID = 0;
@@ -1451,10 +1451,10 @@ static LOGICAL _ParseCommandArgs(UINT32* host, UINT16* port, UINT16* protocol, U
 		return (FALSE);
 	}
 
-	*port = (UINT16)strtoul(ServerPort, NULL, 10);
+	*port = (UINT16)strtoul(ServerPort, nullptr, 10);
 	*protocol = PROTOCOL_TCP;
 
-	*otp = strtoul(ServerOTP, NULL, 10);
+	*otp = strtoul(ServerOTP, nullptr, 10);
 
 	return TRUE;
 

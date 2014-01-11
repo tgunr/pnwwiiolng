@@ -58,7 +58,7 @@ _errorCALLBACK(SINT32 /*teulIndex*/, const UCHAR* const /*data*/, SINT32 /*size*
 }
 
 //////////////////////////////////////////////////////////////////////
-///TODO: Make this generally available as the NULL callback.
+///TODO: Make this generally available as the nullptr callback.
 
 // base TM callbacks
 static SINT32

@@ -32,7 +32,7 @@ static void _getcolor(xmlNodePtr root, piCOLORVALUE* c)
 {
     xmlNodePtr node = root;
 
-	for(; node != NULL; node = node->next)
+	for(; node != nullptr; node = node->next)
 	{
         if(node->type != XML_ELEMENT_NODE)
         {
@@ -88,7 +88,7 @@ static void _terrainsky(xmlNodePtr root, TERRAINSKY* s)
 {
     xmlNodePtr node = root;
 
-	for(; node != NULL; node = node->next)
+	for(; node != nullptr; node = node->next)
 	{
         if(node->type != XML_ELEMENT_NODE)
         {
@@ -184,7 +184,7 @@ static void _getfogoptions(xmlNodePtr root, FOGOPTION* option)
 {
     xmlNodePtr node = root;
 
-	for(; node != NULL; node = node->next)
+	for(; node != nullptr; node = node->next)
 	{
         if(node->type != XML_ELEMENT_NODE)
         {
@@ -224,7 +224,7 @@ static void _terrainfog(xmlNodePtr root, TERRAINFOG* f)
 {
     xmlNodePtr node = root;
 
-	for(; node != NULL; node = node->next)
+	for(; node != nullptr; node = node->next)
 	{
         if(node->type != XML_ELEMENT_NODE)
         {
@@ -262,7 +262,7 @@ static void _lightproperties(xmlNodePtr root)
 {
     xmlNodePtr node = root;
 
-	for(; node != NULL; node = node->next)
+	for(; node != nullptr; node = node->next)
 	{
         if(node->type != XML_ELEMENT_NODE)
         {
@@ -305,7 +305,7 @@ static void _fogproperties(xmlNodePtr root)
 {
     xmlNodePtr node = root;
 
-	for(; node != NULL; node = node->next)
+	for(; node != nullptr; node = node->next)
 	{
         if(node->type != XML_ELEMENT_NODE)
         {
@@ -337,7 +337,7 @@ static void _loadLightData()
 
     SCHAR* name = "terrain/xml/light.xml";
 
-    xmlDocPtr doc = xmlReadFile(name, NULL, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
+    xmlDocPtr doc = xmlReadFile(name, nullptr, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
 
     if(doc)
     {
@@ -374,7 +374,7 @@ static void _loadFogData()
 
     SCHAR* name = "terrain/xml/fog.xml";
 
-    xmlDocPtr doc = xmlReadFile(name, NULL, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
+    xmlDocPtr doc = xmlReadFile(name, nullptr, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
 
     if(doc)
     {
@@ -472,7 +472,7 @@ TERRAINSKY* trndataGetSkyData(SINT32 i)
 {
     if(_lightSettings.empty())
     {
-        return NULL;
+        return nullptr;
     }
 
     if(i < 0 || i >= (SINT32)_lightSettings.size())
@@ -493,7 +493,7 @@ FOGOPTION* trndataGetFogData(SINT32 i, SINT32 option)
 {
     if(_fogSettings.empty())
     {
-        return NULL;
+        return nullptr;
     }
 
     if(i < 0 || i >= (SINT32)_fogSettings.size())

@@ -90,7 +90,7 @@ _recvInstanceListing(ACTION_OBJECT* const a)
 	else
 	{
 		ww2::Client* client = ww2::Client::FromTeulIndex(a->teulIndex);
-		if(client) client->ProcessInstanceList(NULL);
+		if(client) client->ProcessInstanceList(nullptr);
 	}
 
 	return a->offset;

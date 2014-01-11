@@ -19,7 +19,7 @@
 #define DEF_BOMB_NAME  "fxbomb"
 #define DEF_MUZZLE_NAME "fxmuzzle"
 
-static FXLIGHTS* g_lpLgts = NULL;
+static FXLIGHTS* g_lpLgts = nullptr;
 
 static FXLIGHTS g_lgtFreeHead;
 static FXLIGHTS g_lgtFreeTail;
@@ -29,10 +29,10 @@ static FXLIGHTS g_lgtTail;
 //static FLOAT32 g_fPi = PI;
 static FLOAT32 g_fMaxLightRange = 0.0f;
 
-static LIGHT* g_lpLight = NULL;
-static LIGHT* g_lpMuzzle = NULL;
+static LIGHT* g_lpLight = nullptr;
+static LIGHT* g_lpMuzzle = nullptr;
 
-static piMATRIX* g_lpInvertView = NULL;
+static piMATRIX* g_lpInvertView = nullptr;
 
 static LOGICAL _CheckForLight();
 static LOGICAL _DrawBombLight(FXLIGHTS* lpLgt);
@@ -57,7 +57,7 @@ LOGICAL fxLgtInit()
 
     g_lpLgts = (FXLIGHTS*)memAlloc(sizeof(FXLIGHTS) * DEF_FXLGT_MAX_LIGHTS);
 
-    if(g_lpLgts == NULL)
+    if(g_lpLgts == nullptr)
         return FALSE;
 
 //	Uneccessary -- memAlloc = calloc
@@ -95,13 +95,13 @@ LOGICAL fxLgtInit()
 //////////////////////////////////////////
 void fxLgtKill()
 {
-    if(g_lpLgts != NULL)
+    if(g_lpLgts != nullptr)
     {
         memFree(g_lpLgts);
-        g_lpLgts = NULL;
+        g_lpLgts = nullptr;
     }
 
-    // Set to NULL in case of further updates.
+    // Set to nullptr in case of further updates.
     memset(&g_lgtHead, 0, sizeof(FXLIGHTS));
     memset(&g_lgtTail, 0, sizeof(FXLIGHTS));
     memset(&g_lgtFreeHead, 0, sizeof(FXLIGHTS));
@@ -204,7 +204,7 @@ LOGICAL fxLgtCreateMuzzleLight(FLOAT64VECTOR* pPos, piVECTOR* dir)
 //////////////////////////////////////////
 void fxLgtUpdate()
 {
-    if(g_lgtHead.next == NULL) return;
+    if(g_lgtHead.next == nullptr) return;
 
     if(g_lgtHead.next == &g_lgtTail)
     {
@@ -331,7 +331,7 @@ void fxLgtSetLights()
 //////////////////////////////////////////
 LOGICAL fxLgtDraw(SINT32 iIndex)
 {
-    if(g_lgtHead.next == NULL)
+    if(g_lgtHead.next == nullptr)
         return FALSE;
 
     if(g_lgtHead.next == &g_lgtTail)
@@ -397,7 +397,7 @@ LOGICAL _DrawMuzzleLight(FXLIGHTS* lpLgt)
 //////////////////////////////////////////
 LOGICAL _FreeLightIfNecessary(FXLIGHTS* lpLgt)
 {
-    if(lpLgt != NULL)
+    if(lpLgt != nullptr)
     {
         switch(lpLgt->enumType)
         {
@@ -433,9 +433,9 @@ LOGICAL _FreeLightIfNecessary(FXLIGHTS* lpLgt)
 //////////////////////////////////////////
 LOGICAL _FreeLight(FXLIGHTS* lpLgt)
 {
-    FXLIGHTS* lpPrev = NULL;
+    FXLIGHTS* lpPrev = nullptr;
 
-    if(lpLgt == NULL)
+    if(lpLgt == nullptr)
         return FALSE;
 
     lpPrev = g_lgtFreeTail.prev;
@@ -455,23 +455,23 @@ LOGICAL _FreeLight(FXLIGHTS* lpLgt)
 //////////////////////////////////////////////////////////////////////
 LOGICAL _ReleaseLight(FXLIGHTS* lpLgt)
 {
-    FXLIGHTS* lpNext = NULL;
-    FXLIGHTS* lpPrev = NULL;
+    FXLIGHTS* lpNext = nullptr;
+    FXLIGHTS* lpPrev = nullptr;
 
-    if(lpLgt == NULL)
+    if(lpLgt == nullptr)
         return FALSE;
 
     lpNext = lpLgt->next;
     lpPrev = lpLgt->prev;
 
-    if(lpNext == NULL || lpPrev == NULL)
+    if(lpNext == nullptr || lpPrev == nullptr)
         return FALSE;
 
     lpPrev->next = lpNext;
     lpNext->prev = lpPrev;
 
-    lpLgt->prev = NULL;
-    lpLgt->next = NULL;
+    lpLgt->prev = nullptr;
+    lpLgt->next = nullptr;
 
     return TRUE;
 }
@@ -484,7 +484,7 @@ LOGICAL _CheckForLight()
 {
     if(g_lgtFreeHead.next == &g_lgtFreeTail)
     {
-        FXLIGHTS* lpLgt = NULL;
+        FXLIGHTS* lpLgt = nullptr;
 
         if(g_lgtTail.prev == &g_lgtHead)
             return FALSE;
@@ -510,9 +510,9 @@ LOGICAL _CheckForLight()
 //////////////////////////////////////////////////////////////////////
 LOGICAL fxLgtAddLight(FXLIGHTS* lpLgt)
 {
-    FXLIGHTS* lpNext = NULL;
+    FXLIGHTS* lpNext = nullptr;
 
-    if(lpLgt == NULL)
+    if(lpLgt == nullptr)
         return FALSE;
 
     lpNext = g_lgtHead.next;
@@ -532,11 +532,11 @@ LOGICAL fxLgtAddLight(FXLIGHTS* lpLgt)
 //////////////////////////////////////////////////////////////////////
 LOGICAL fxLgtGetLight(FXLIGHTS** lpLgt)
 {
-    FXLIGHTS* lpNode = NULL;
-    FXLIGHTS* lpNext = NULL;
-    FXLIGHTS* lpPrev = NULL;
+    FXLIGHTS* lpNode = nullptr;
+    FXLIGHTS* lpNext = nullptr;
+    FXLIGHTS* lpPrev = nullptr;
 
-    if(lpLgt == NULL)
+    if(lpLgt == nullptr)
         return FALSE;
 
     if(!_CheckForLight())
@@ -550,8 +550,8 @@ LOGICAL fxLgtGetLight(FXLIGHTS** lpLgt)
     lpPrev->next = lpNext;
     lpNext->prev = lpPrev;
 
-    lpNode->next = NULL;
-    lpNode->prev = NULL;
+    lpNode->next = nullptr;
+    lpNode->prev = nullptr;
 
     *lpLgt = lpNode;
 
@@ -576,7 +576,7 @@ void fxLgtGetList(void* lpLgtSort, SINT32* pIndex)
     FXSORT* lpSort = (FXSORT*)lpLgtSort;
 
     if(!lpSort || !pIndex) return;
-    if(g_lgtHead.next == NULL) return;
+    if(g_lgtHead.next == nullptr) return;
     if(g_lgtHead.next == &g_lgtTail) return;
 
     FXLIGHTS* lpLgt = g_lgtHead.next;
@@ -917,7 +917,7 @@ void fxLgtInitLight(SINT32 iID)
 ////////////////////////////////////////////////////
 SINT32 fxLgtGetNewLight()
 {
-    FXLIGHTS* lpLgt = NULL;
+    FXLIGHTS* lpLgt = nullptr;
 
     if(!fxLgtGetLight(&lpLgt))
         return -1;

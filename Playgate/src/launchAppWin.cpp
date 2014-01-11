@@ -101,7 +101,7 @@ HKEY   RegKey;
 DWORD  Bytes = PN_MAX_STRING;
 DWORD  Type;
 LOGICAL retval;
-REG_ENTRY entries[] = {{_T("Params"),Params},{_T("Path"),path},{_T("Exec"),Exec},{NULL, NULL}};
+REG_ENTRY entries[] = {{_T("Params"),Params},{_T("Path"),path},{_T("Exec"),Exec},{nullptr, nullptr}};
 REG_ENTRY entry;
 int i;
 
@@ -111,9 +111,9 @@ int i;
 	{
 		retval = TRUE;
 
-		for (i = 0, entry = entries[i] ; entry.name != NULL; ++i, entry = entries[i])
+		for (i = 0, entry = entries[i] ; entry.name != nullptr; ++i, entry = entries[i])
 		{
-			if (RegQueryValueEx(RegKey, entry.name, NULL, &Type, (LPBYTE)entry.value, &Bytes) != ERROR_SUCCESS)
+			if (RegQueryValueEx(RegKey, entry.name, nullptr, &Type, (LPBYTE)entry.value, &Bytes) != ERROR_SUCCESS)
 			{
 				retval = FALSE;
 				break;
@@ -151,7 +151,7 @@ launchApplication(const TCHAR* exeFile, const TCHAR* parameters, std::wstring pa
 
 	memset(&sei, 0, sizeof(sei));
 	sei.cbSize = sizeof(sei);
-	sei.hwnd = NULL;
+	sei.hwnd = nullptr;
 	sei.lpFile = exeFile;		// binary .exe we are launching
 	sei.lpParameters = parameters;	// command line arguments
 	sei.lpDirectory = path.c_str();		// initial working directory
@@ -217,7 +217,7 @@ bool launchAppWinGetHost(char* HostIP, char *HostPort)
 
 	DWORD  Bytes = 64;
 	DWORD  Type;
-	if (RegQueryValueExA(RegKey, "hostIP", NULL, &Type, (LPBYTE)HostIP, &Bytes) !=
+	if (RegQueryValueExA(RegKey, "hostIP", nullptr, &Type, (LPBYTE)HostIP, &Bytes) !=
 		ERROR_SUCCESS)
 	{
 		RegCloseKey(RegKey);
@@ -226,7 +226,7 @@ bool launchAppWinGetHost(char* HostIP, char *HostPort)
 
 	Bytes = 64;
 
-	if (RegQueryValueExA(RegKey, "hostPort", NULL, &Type, (UCHAR *)HostPort, 
+	if (RegQueryValueExA(RegKey, "hostPort", nullptr, &Type, (UCHAR *)HostPort, 
 						&Bytes) != ERROR_SUCCESS)
 	{
 		RegCloseKey(RegKey);

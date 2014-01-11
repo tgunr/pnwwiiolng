@@ -51,7 +51,7 @@ HCUnit::HCUnit(UINT32 withUnit, HCUNIT_TYPE withType, UINT32 withParent
 	, m_training(false)
 {
 	if ( withName == nullptr )
-		throw std::runtime_error("HCUnit with NULL name");			///Terminal
+		throw std::runtime_error("HCUnit with null name");			///Terminal
 
 	strlcpy(m_name, withName, sizeof(m_name));
 	strlcpy(m_shortName, nick, sizeof(m_shortName));

@@ -295,10 +295,10 @@ UINT32 _NoHorizStab;
 
 UINT32 mlfoilsFreeAirfoilData(mlAirfoilList * AirfoilList)
 {
-	if (AirfoilList->AirfoilData != NULL)
+	if (AirfoilList->AirfoilData != nullptr)
 	{
 		memFree(AirfoilList->AirfoilData);
-		AirfoilList->AirfoilData = NULL;
+		AirfoilList->AirfoilData = nullptr;
 	}
 	AirfoilList->NumAirfoils = 0;
 
@@ -330,7 +330,7 @@ UCHAR * VarContents;
 	if (AirfoilFile == -1)
 	{
 		Write_Debug("Can't find airfoil list filename %s\n",(char*)AirfoilListFilename);
-		*AirfoilList = NULL;
+		*AirfoilList = nullptr;
 		return 1;
 	}
 
@@ -349,7 +349,7 @@ UCHAR * VarContents;
 	AirfoilFile = fioOpen((char*)UseFileName);
 	if (AirfoilFile == -1)
 	{
-		*AirfoilList = NULL;
+		*AirfoilList = nullptr;
 
 		return 1;
 	}
@@ -392,7 +392,7 @@ UCHAR * VarContents;
 
 			mlUtilityGetVarnameAndContents(&VarName,&VarContents,Buffer);
 
-			if (VarName == NULL || VarContents == NULL)
+			if (VarName == nullptr || VarContents == nullptr)
 			{
 				continue;
 			}
@@ -483,7 +483,7 @@ UCHAR Buffer[256];
 
 		mlUtilityGetVarnameAndContents(&VarName,&VarContents,Buffer);
 
-		if (VarName == NULL || VarContents == NULL)
+		if (VarName == nullptr || VarContents == nullptr)
 		{
 			continue;
 		}
@@ -564,7 +564,7 @@ UCHAR Buffer[256];
 
 		mlUtilityGetVarnameAndContents(&VarName,&VarContents,Buffer);
 
-		if (VarName == NULL || VarContents == NULL)
+		if (VarName == nullptr || VarContents == nullptr)
 		{
 			continue;
 		}
@@ -657,7 +657,7 @@ UINT32 mlfoilSetComponentSubtype(void*  SpecialData, char * SubType)
 {
 mlAirfoilComponentData * ComponentData;
 
-	if (SpecialData == NULL || SubType == NULL)
+	if (SpecialData == nullptr || SubType == nullptr)
 	{
 		return 1;
 	}
@@ -687,10 +687,10 @@ UINT32 mlfoilAddSpecialVariable(void*  SpecialData,
 	UINT32 i;
 	mlVehicleData* VehicleData = ((vehVehicle*)VehicleMasterPtr)->ModelData;
 
-	if (SpecialData == NULL ||
-		VarName == NULL ||
-		VarContents == NULL ||
-		AirfoilList == NULL)
+	if (SpecialData == nullptr ||
+		VarName == nullptr ||
+		VarContents == nullptr ||
+		AirfoilList == nullptr)
 	{
 		return 1;
 	}
@@ -721,7 +721,7 @@ UINT32 mlfoilAddSpecialVariable(void*  SpecialData,
 
 			if (Found == 0)
 			{
-				ComponentData->AirfoilData = NULL;
+				ComponentData->AirfoilData = nullptr;
 				Write_Debug("Airfoil type %s for component %s not found",VarContents,Component->ComponentName);
 			}
 
@@ -797,7 +797,7 @@ UINT32 mlfoilAddSpecialVariable(void*  SpecialData,
 
 			if (Found == 0)
 			{
-				ComponentData->SlotAirfoilData = NULL;
+				ComponentData->SlotAirfoilData = nullptr;
 				Write_Debug("Airfoil slot deployed type %s for component %s not found",VarContents,Component->ComponentName);
 			}
 			break;
@@ -1055,8 +1055,8 @@ UINT32 mlGetAirfoilForcesAndTorques(FLOAT64VECTOR* RetForce,
     FLOAT64 Ratio1 = 0.0f;
     FLOAT64 Ratio2 = 0.0f;
 	FLOAT64 GroundEffect = 0.0f;
-	mlEngineComponentData * PropellerData = NULL;
-	mlAirfoilComponentData * AirfoilComponentData = NULL;
+	mlEngineComponentData * PropellerData = nullptr;
+	mlAirfoilComponentData * AirfoilComponentData = nullptr;
 	FLOAT64VECTOR ComponentVel;
 	FLOAT64VECTOR Force;
 	FLOAT64ATT TempAtt;
@@ -1065,7 +1065,7 @@ UINT32 mlGetAirfoilForcesAndTorques(FLOAT64VECTOR* RetForce,
 
 	Force.x = Force.y = Force.z = 0;
 
-	if (Component->SpecialData == NULL)
+	if (Component->SpecialData == nullptr)
 	{
 		RetTorque->Pitch = RetTorque->Roll = RetTorque->Yaw = 0;
 		RetForce->x = RetForce->y = RetForce->z = 0;
@@ -1073,7 +1073,7 @@ UINT32 mlGetAirfoilForcesAndTorques(FLOAT64VECTOR* RetForce,
 	}
 	AirfoilComponentData = (mlAirfoilComponentData*)Component->SpecialData;
 
-	if (AirfoilComponentData->AirfoilData == NULL)
+	if (AirfoilComponentData->AirfoilData == nullptr)
 	{
 		return 0;
 	}
@@ -1138,9 +1138,9 @@ UINT32 mlGetAirfoilForcesAndTorques(FLOAT64VECTOR* RetForce,
 	}
 
 	// adjust AoA and ComponentVel for propwash effects
-	if (AirfoilComponentData->VortexComponent != NULL)
+	if (AirfoilComponentData->VortexComponent != nullptr)
 	{
-		if (AirfoilComponentData->VortexComponent->SpecialData != NULL)
+		if (AirfoilComponentData->VortexComponent->SpecialData != nullptr)
 		{
 			PropellerData = (mlEngineComponentData*)AirfoilComponentData->VortexComponent->SpecialData;
 			// add in backwash velocity
@@ -1341,7 +1341,7 @@ UINT32 mlGetAirfoilForcesAndTorques(FLOAT64VECTOR* RetForce,
 		 AirfoilComponentData->Subtype == ML_VORTEX_POINT_RUDDER) &&
 		AirfoilComponentData->AspectRatio != 0.0)
 	{
-		if (AirfoilComponentData->InducedDragLiftComp[0] != NULL)
+		if (AirfoilComponentData->InducedDragLiftComp[0] != nullptr)
 		{
 		FLOAT64 TempLift;
 		FLOAT64 TempArea;
@@ -1352,7 +1352,7 @@ UINT32 mlGetAirfoilForcesAndTorques(FLOAT64VECTOR* RetForce,
 
 			for (i=0;i<8;i++)
 			{
-				if (AirfoilComponentData->InducedDragLiftComp[i] != NULL)
+				if (AirfoilComponentData->InducedDragLiftComp[i] != nullptr)
 				{
 					Airfoil = (mlAirfoilComponentData*)(AirfoilComponentData->InducedDragLiftComp[i]->SpecialData);
 					TempLift += Airfoil->LastCl * Airfoil->Area;
@@ -1373,7 +1373,7 @@ UINT32 mlGetAirfoilForcesAndTorques(FLOAT64VECTOR* RetForce,
 		{
 			UseCl = Cl;
 
-			if (AirfoilComponentData->InducedDragCoefficientsComponent != NULL)
+			if (AirfoilComponentData->InducedDragCoefficientsComponent != nullptr)
 			{
 				UseCl = ((mlAirfoilComponentData*)
 					(AirfoilComponentData->InducedDragCoefficientsComponent->SpecialData))->LastCl;
@@ -1521,7 +1521,7 @@ static UINT32 _GetClCmCd(FLOAT64* Cl,
 	AirfoilData = AirfoilComponentData->AirfoilData;
 
 
-	if (AirfoilData == NULL)
+	if (AirfoilData == nullptr)
 	{
 		*Cl = 0;
 		*Cd = 0;
@@ -1623,13 +1623,13 @@ static UINT32 _GetClCmCd(FLOAT64* Cl,
 			{
 				if(LeftSlatSound[0] && Volume > 0.0f)
 				{
-					if (VehicleObjectData != NULL)
+					if (VehicleObjectData != nullptr)
 					{
-						if (VehicleObjectData->PlaneObject != NULL)
+						if (VehicleObjectData->PlaneObject != nullptr)
 						{
 						OBJECT * TempObj;
 
-							if (VehicleObjectData->HitMap != NULL)
+							if (VehicleObjectData->HitMap != nullptr)
 							{
 								TempObj = VehicleObjectData->HitMap;
 							}
@@ -1673,13 +1673,13 @@ static UINT32 _GetClCmCd(FLOAT64* Cl,
 			{
 				if(RightSlatSound[0] && Volume > 0.0f)
 				{
-					if (VehicleObjectData != NULL)
+					if (VehicleObjectData != nullptr)
 					{
-						if (VehicleObjectData->PlaneObject != NULL)
+						if (VehicleObjectData->PlaneObject != nullptr)
 						{
 						OBJECT * TempObj;
 
-							if (VehicleObjectData->HitMap != NULL)
+							if (VehicleObjectData->HitMap != nullptr)
 							{
 								TempObj = VehicleObjectData->HitMap;
 							}
@@ -2173,17 +2173,17 @@ static UINT32 _GetAlphaAdjust(FLOAT64 * DeltaAoA,
 
 	*DeltaAoA = 0;
 
-	if (AirfoilComponentData == NULL)
+	if (AirfoilComponentData == nullptr)
 	{
 		return 1;
 	}
 
-	if (AirfoilComponentData->DownwashComponent == NULL)
+	if (AirfoilComponentData->DownwashComponent == nullptr)
 	{
 		return 1;
 	}
 
-	if (AirfoilComponentData->DownwashComponent->SpecialData == NULL)
+	if (AirfoilComponentData->DownwashComponent->SpecialData == nullptr)
 	{
 		return 1;
 	}

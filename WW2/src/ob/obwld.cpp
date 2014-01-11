@@ -148,7 +148,7 @@ static PARSE_CALLBACK  world[]={{"backdrop",				Backdrop},
 //								{"attachanimationtoobject",	AttachAnimationToObject},
                                {"loadsound",				LoadSound},
 							   {"multitexture",				MultiTexture},
-                               {"",							NULL},
+                               {"",							nullptr},
                               };
 
 static SINT8	worldfile[64];
@@ -198,7 +198,7 @@ UINT32		mesh, color;
 	loc.x = x;
 	loc.y = y;
 	loc.z = z;
-	if (obcSphere(args[0].svalue, args[1].svalue, (int)mesh, &loc, scale, color) == NULL)
+	if (obcSphere(args[0].svalue, args[1].svalue, (int)mesh, &loc, scale, color) == nullptr)
 	{
 		return(FALSE);
 	}
@@ -223,7 +223,7 @@ UINT32		mesh, color;
 	loc.x = x;
 	loc.y = y;
 	loc.z = z;
-	if (obcSphereVoxel(args[0].svalue, args[1].svalue, (int)mesh, &loc, scale, depth, color) == NULL)
+	if (obcSphereVoxel(args[0].svalue, args[1].svalue, (int)mesh, &loc, scale, depth, color) == nullptr)
 	{
 		return(FALSE);
 	}
@@ -237,7 +237,7 @@ UINT32		flagval;
 OBJECT*	lpobj;
 
 	lpobj = obmainFindNamedObject(args[0].svalue);
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -273,7 +273,7 @@ UINT32		flagval;
 OBJECT*	lpobj;
 
 	lpobj = obmainFindTopmostObject(args[0].svalue);
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -302,14 +302,14 @@ OBJECT*	lpobj;
 
 	// no object by new name can exist
 	lpobj = obmainFindNamedObject(args[1].svalue);
-	if (lpobj != NULL)
+	if (lpobj != nullptr)
 	{
 		return(FALSE);
 	}
 
 	// object with old name must exist
 	lpobj = obmainFindNamedObject(args[0].svalue);
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -325,7 +325,7 @@ static bool ChangeLayer(int numargs, FUNCARGS* args)
 OBJECT*	lpobj;
 
 	lpobj = obmainFindNamedObject(args[0].svalue);
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -372,7 +372,7 @@ OBJECT*	lpobj;
 piVECTOR	loc;
 
 	lpobj = obmainFindNamedObject(args[0].svalue);
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -389,13 +389,13 @@ static bool OffsetTree(OBJECT* lpgrp, piVECTOR* loc)
 {
 OBJECT*	lpobj;
 
-	if (lpgrp == NULL)
+	if (lpgrp == nullptr)
 	{
 		return(FALSE);
 	}
 
 	lpobj = lpgrp;
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
 		if (!(lpobj->flags & OBJECT_NOTOBJECT))
 		{
@@ -417,7 +417,7 @@ OBJECT*	lpgrp;
 piVECTOR	loc;
 
 	lpgrp = obmainFindGroupObject(args[0].svalue);
-	if (lpgrp == NULL)
+	if (lpgrp == nullptr)
 	{
 		return(FALSE);
 	}
@@ -448,13 +448,13 @@ piVECTOR	pos, rot;
 COLLISION	collision;
 
 	OBJECT* lpsph = obmainFindNamedObject(args[1].svalue);
-	if (lpsph == NULL)
+	if (lpsph == nullptr)
 	{
 		return(FALSE);
 	}
 
 	OBJECT* lpobj = obmainFindNamedObject(args[0].svalue);
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -505,7 +505,7 @@ COLLISION	collision;
 		lpobj->mat = IdentityMatrix;
 		lpobj = lpobj->attached;
 	}
-	while (lpobj != NULL);
+	while (lpobj != nullptr);
 
 	return(TRUE);
 }
@@ -589,7 +589,7 @@ LIGHT   light;
 
 	light.light.dvDirection = light.light.dvPosition;
 	math3dNormalize(&light.light.dvDirection);
-	if (!obdliteAddDynaLite(&light, NULL))
+	if (!obdliteAddDynaLite(&light, nullptr))
 	{
 		return(FALSE);
 	}
@@ -601,13 +601,13 @@ LIGHT   light;
 static bool AddShadow(int numargs, FUNCARGS* args)
 {
 	OBJECT* lpgrp = obmainFindTopmostObject(args[0].svalue);
-	if (lpgrp == NULL)
+	if (lpgrp == nullptr)
 	{
 		return(FALSE);
 	}
 
 	OBJECT* lpobj = obmainFindChildFromObject(lpgrp, "shadow");
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		Write_Debug("Shadow object not found in model");
 		return(FALSE);
@@ -628,7 +628,7 @@ UINT32			flagval;
 LIGHT*	  lplite;
 
 	lplite = obdliteFindDynaLight(args[0].svalue);
-	if (lplite == NULL)
+	if (lplite == nullptr)
 	{
 		return(FALSE);
 	}
@@ -657,7 +657,7 @@ static bool ReverseNormals(int numargs, FUNCARGS* args)
 OBJECT*	lpobj;
 
 	lpobj = obmainFindNamedObject(args[0].svalue);
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -716,7 +716,7 @@ OBJECT*	lpobj;
 	}
 
 	lpobj = obmainFindTopmostObject(args[0].svalue);
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}

@@ -66,7 +66,7 @@ public:
 	virtual void ProcessMissionDetail(MissionDetail const&) OVERRIDE_FN;
 	virtual void ProcessMissionInvite(const MissionInvite& invite) OVERRIDE_FN;
 	virtual void ProcessStratEventPacket(const Strat::EventPacket& packet) OVERRIDE_FN;
-	virtual int  RequestDirectSpawn(WEAPON_SPEC const& spec, const FLOAT64VECTOR* at = NULL, FLOAT64 yaw = 0) OVERRIDE_FN;
+	virtual int  RequestDirectSpawn(WEAPON_SPEC const& spec, const FLOAT64VECTOR* at = nullptr, FLOAT64 yaw = 0) OVERRIDE_FN;
 	virtual void SendPlayerExit(int exitcode, FULL_OBJ_ID const&) OVERRIDE_FN;
 
 	virtual void ProcessPositionUpdateMsg(VEHICLE_UPDATE_HEADER const&) OVERRIDE_FN;

@@ -13,7 +13,7 @@
 #include "wwii/wwiiPackString.h"
 
 //////////////////////////////////////////////////////////////////////
-// Return the title of the opinion poll or NULL
+// Return the title of the opinion poll or nullptr
 
 const char*
 OpinionPoll::title() const

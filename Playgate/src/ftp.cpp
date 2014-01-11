@@ -66,7 +66,7 @@ bool ftpStop(const TCHAR* reason, UINT32 cmd, LPARAM code)
 	if ( ftpInProgress == false )
 		return false;
 
-	if ( NULL != reason && 0 != reason[0] )
+	if ( nullptr != reason && 0 != reason[0] )
 		playgate.SetStatus(reason);
 
 	if ( 0 != code )
@@ -236,7 +236,7 @@ int ftpProcess()
 
 		case STATE_CLEANUP:
 			NextState = STATE_IDLE;
-			ftpStop(NULL, 0, 0);
+			ftpStop(nullptr, 0, 0);
 			return 0;
 			//NextState
 			break;
@@ -270,13 +270,13 @@ void download()
 
 	if (AppLaunch.serverPort == 0)
 	{
-		ftpStop(NULL, MSG_DOWNLOAD, (LPARAM)ERR_FTP_NOPATCH);
+		ftpStop(nullptr, MSG_DOWNLOAD, (LPARAM)ERR_FTP_NOPATCH);
 		return;
 	}
 
 	if (AppLaunch.serverPort == 1)
 	{
-		ftpStop(NULL, MSG_DOWNLOAD, (LPARAM)webURL);
+		ftpStop(nullptr, MSG_DOWNLOAD, (LPARAM)webURL);
 		return;
 	}
 
@@ -319,7 +319,7 @@ void download()
 
 	if(! _fileName[0] ||  fnLen < 2 )
 	{
-		ftpStop(NULL, webID, (LPARAM)ERR_FTP_NOPATCH);
+		ftpStop(nullptr, webID, (LPARAM)ERR_FTP_NOPATCH);
 		return;
 	}
 
@@ -411,10 +411,10 @@ static void FileCheck(const char *File2)
 	hFile = CreateFileA(File2,		// file name 
 	GENERIC_READ,                   // open for reading 
 	1,                              // Share
-	NULL,                           // no security 
+	nullptr,                           // no security 
 	OPEN_EXISTING,                  // existing file only 
 	FILE_ATTRIBUTE_NORMAL,          // normal file 
-	NULL);                          // no attr. template 
+	nullptr);                          // no attr. template 
 
 	if (hFile == INVALID_HANDLE_VALUE) 
 	{ 
@@ -423,7 +423,7 @@ static void FileCheck(const char *File2)
 	else 
 	{
 		Exists = 1;
-		AppendStart = GetFileSize(hFile,NULL);
+		AppendStart = GetFileSize(hFile,nullptr);
 		fceSetInteger(0, FCE_SET_APPEND_MODE, 1);
 		fceSetInteger(0, FCE_SET_SERVER_OFFSET, AppendStart);
 		fceSetInteger(0, FCE_SET_CLIENT_OFFSET, AppendStart);

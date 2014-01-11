@@ -49,7 +49,7 @@ static inline void draw(OBJECT* o)
                     (float*)o->RenderPositions().ptr,
                     (float*)o->RenderNormals().ptr,
                     (float*)o->RenderTexCoords().ptr,
-                    NULL,
+                    nullptr,
                     (unsigned short*)o->ptris,
                     sizeof(piUNIFIED_VERTEX),
                     o->numverts,
@@ -162,15 +162,15 @@ Description:
 ---------------------------------------------------------------------------------------*/
 void glslNormalDrawBin()
 {
-    OBJECT* o = NULL;
-    const OBJECT* last = NULL;
+    OBJECT* o = nullptr;
+    const OBJECT* last = nullptr;
 
     if(normalbin.empty())
         return;
 
     const unsigned int size = normalbin.size();
 
-    const oglMaterial* old = NULL;
+    const oglMaterial* old = nullptr;
 
 #if DEBUG_WW2
     int same = 0;
@@ -214,14 +214,14 @@ Description:
 ---------------------------------------------------------------------------------------*/
 void glslNormalDrawBinDeprecated()
 {
-    OBJECT* o = NULL;
+    OBJECT* o = nullptr;
 
     if(normalbin.empty())
         return;
 
     const unsigned int size = normalbin.size();
 
-    const RenderStateSet* old = NULL;
+    const RenderStateSet* old = nullptr;
 
     if(gCustomTerrain)
     {
@@ -276,7 +276,7 @@ Description:
 ---------------------------------------------------------------------------------------*/
 void glslNormalDrawBinDeprecated()
 {
-    OBJECT* o = NULL;
+    OBJECT* o = nullptr;
 
     if(normalbin.empty())
         return;
@@ -285,7 +285,7 @@ void glslNormalDrawBinDeprecated()
 
     const unsigned int size = normalbin.size();
 
-    const oglMaterial* old = NULL;
+    const oglMaterial* old = nullptr;
 
     if(gCustomTerrain)
     {
@@ -742,7 +742,7 @@ void glslNormalFpsSetup(gr2MeshData* data)
      }
     else
     {
-        data->drawcallback = NULL;
+        data->drawcallback = nullptr;
     }
 }
 #endif

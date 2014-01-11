@@ -88,10 +88,10 @@ extern HWND myhwnd;
 
 STDAPI TSFSink::QueryInterface(REFIID riid, void** ppvObj)
 {
-    if (ppvObj == NULL)
+    if (ppvObj == nullptr)
         return E_INVALIDARG;
 
-    *ppvObj = NULL;
+    *ppvObj = nullptr;
 
     if (IsEqualIID(riid, IID_IUnknown))
 	{
@@ -140,7 +140,7 @@ BOOL TSFSink::SetupSinks()
 {
 	// ITfThreadMgrEx is available on Vista or later.
 	HRESULT hr = CoCreateInstance(CLSID_TF_ThreadMgr,
-                          NULL,
+                          nullptr,
                           CLSCTX_INPROC_SERVER,
                           __uuidof(ITfThreadMgrEx),
                           (void**)&_manager);
@@ -200,7 +200,7 @@ void TSFSink::ReleaseSinks()
 
 		_manager->Deactivate();
 		_manager->Release();
-		_manager = NULL;
+		_manager = nullptr;
 	}
 }
 
@@ -212,8 +212,8 @@ STDAPI TSFSink::BeginUIElement(DWORD dwUIElementId, BOOL* pbShow)
     if (!pElement)
         return E_INVALIDARG;
 
-    ITfReadingInformationUIElement* preading = NULL;
-	ITfCandidateListUIElement* pcandidate = NULL;
+    ITfReadingInformationUIElement* preading = nullptr;
+	ITfCandidateListUIElement* pcandidate = nullptr;
 
 	*pbShow = FALSE;
 
@@ -241,8 +241,8 @@ STDAPI TSFSink::UpdateUIElement(DWORD dwUIElementId)
     if (!pElement)
         return E_INVALIDARG;
 
-    ITfReadingInformationUIElement* preading = NULL;
-    ITfCandidateListUIElement* pcandidate = NULL;
+    ITfReadingInformationUIElement* preading = nullptr;
+    ITfCandidateListUIElement* pcandidate = nullptr;
 
 	if (SUCCEEDED(pElement->QueryInterface(__uuidof(ITfReadingInformationUIElement), (void** )&preading)))
     {
@@ -267,22 +267,22 @@ STDAPI TSFSink::EndUIElement(DWORD dwUIElementId)
     if (!pElement)
         return E_INVALIDARG;
 
-    ITfReadingInformationUIElement* preading = NULL;
+    ITfReadingInformationUIElement* preading = nullptr;
 
 	if (SUCCEEDED(pElement->QueryInterface(__uuidof(ITfReadingInformationUIElement), (void** )&preading)))
     {
-		SetReadingString(NULL);
+		SetReadingString(nullptr);
         preading->Release();
     }
 
-	ITfCandidateListUIElement* pcandidate = NULL;
+	ITfCandidateListUIElement* pcandidate = nullptr;
 
 	if (SUCCEEDED(pElement->QueryInterface(__uuidof(ITfCandidateListUIElement), (void** )&pcandidate)))
 	{
 		_nCandidateRefCount--;
 
 		if (_nCandidateRefCount == 0)
-			SetCandidateStrings(NULL);
+			SetCandidateStrings(nullptr);
 
 		pcandidate->Release();
 	}
@@ -295,8 +295,8 @@ STDAPI TSFSink::EndUIElement(DWORD dwUIElementId)
 void TSFSink::UpdateState(BOOL bResetCompartmentEventSink)
 {
 	ITfCompartmentMgr* pcm;
-	ITfCompartment* pTfOpenMode = NULL;
-	ITfCompartment* pTfConvMode = NULL;
+	ITfCompartment* pTfOpenMode = nullptr;
+	ITfCompartment* pTfConvMode = nullptr;
 
 	if ( GetCompartments( &pcm, &pTfOpenMode, &pTfConvMode ) )
 	{
@@ -410,16 +410,16 @@ void TSFSink::SetCandidateStrings(ITfCandidateListUIElement* pcandidate)
 		UINT uIndex			= 0;
 		UINT uCount			= 0;
 		UINT uCurrentPage	= 0;
-		UINT* IndexList		= NULL;
+		UINT* IndexList		= nullptr;
 		UINT uPageCnt		= 0;
 		DWORD dwPageStart	= 0;
 		DWORD dwPageSize	= 0;
-		BSTR bstr			= NULL;
+		BSTR bstr			= nullptr;
 
 		pcandidate->GetSelection(&uIndex);
 		pcandidate->GetCount(&uCount);
 		pcandidate->GetCurrentPage(&uCurrentPage);
-		pcandidate->GetPageIndex(NULL, 0, &uPageCnt);
+		pcandidate->GetPageIndex(nullptr, 0, &uPageCnt);
 
 		candidates.selection	= (DWORD)uIndex;
 		candidates.count		= (DWORD)uCount;
@@ -465,14 +465,14 @@ void TSFSink::SetCandidateStrings(ITfCandidateListUIElement* pcandidate)
 	}
 	else
 	{
-		_client->SetCandidateList(0, NULL);
+		_client->SetCandidateList(0, nullptr);
 	}
 }
 
 ITfUIElement* TSFSink::GetUI(DWORD dwUIElementId)
 {
     ITfUIElementMgr* puiem;
-    ITfUIElement* pElement = NULL;
+    ITfUIElement* pElement = nullptr;
 
 	// need to lookup thread manager
 
@@ -495,7 +495,7 @@ bool TSFSink::IsTIP(bool check)
 
 		ITfInputProcessorProfiles* pProfiles;
 
-		hr = CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER, __uuidof(ITfInputProcessorProfiles), (LPVOID*)&pProfiles);
+		hr = CoCreateInstance(CLSID_TF_InputProcessorProfiles, nullptr, CLSCTX_INPROC_SERVER, __uuidof(ITfInputProcessorProfiles), (LPVOID*)&pProfiles);
 
 		if (SUCCEEDED(hr))
 		{
@@ -529,7 +529,7 @@ void TSFSink::GetDescription()
 
 	ITfInputProcessorProfiles* pProfiles;
 
-	hr = CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER, __uuidof(ITfInputProcessorProfiles), (LPVOID*)&pProfiles);
+	hr = CoCreateInstance(CLSID_TF_InputProcessorProfiles, nullptr, CLSCTX_INPROC_SERVER, __uuidof(ITfInputProcessorProfiles), (LPVOID*)&pProfiles);
 
 	if (SUCCEEDED(hr))
 	{
@@ -566,10 +566,10 @@ void TSFSink::GetDescription()
 // otherwise the sink can be triggered when a game has multiple instances of IME UI library.
 void TSFSink::Activate()
 {
-	if ( _manager == NULL || _dwUIElementSinkCookie != TF_INVALID_COOKIE )
+	if ( _manager == nullptr || _dwUIElementSinkCookie != TF_INVALID_COOKIE )
 		return;
 
-	ITfSource* srcTm = NULL;
+	ITfSource* srcTm = nullptr;
 	HRESULT hr = E_FAIL;
 
 	if (SUCCEEDED(hr = _manager->QueryInterface(__uuidof(ITfSource), (void** )&srcTm)))
@@ -586,10 +586,10 @@ void TSFSink::Deactivate()
 	_active = false;
 	//ShowComposition(false);
 
-	if ( _manager == NULL || _dwUIElementSinkCookie == TF_INVALID_COOKIE )
+	if ( _manager == nullptr || _dwUIElementSinkCookie == TF_INVALID_COOKIE )
 		return;
 
-	ITfSource* srcTm = NULL;
+	ITfSource* srcTm = nullptr;
 	HRESULT hr = E_FAIL;
 
 	if (SUCCEEDED(hr = _manager->QueryInterface(__uuidof(ITfSource), (void** )&srcTm)))
@@ -605,9 +605,9 @@ void TSFSink::Deactivate()
 // Function fails if it fails to acquire any of the objects to be returned.
 BOOL TSFSink::GetCompartments( ITfCompartmentMgr** ppcm, ITfCompartment** ppTfOpenMode, ITfCompartment** ppTfConvMode )
 {
-	ITfCompartmentMgr* pcm = NULL;
-	ITfCompartment* pTfOpenMode = NULL;
-	ITfCompartment* pTfConvMode = NULL;
+	ITfCompartmentMgr* pcm = nullptr;
+	ITfCompartment* pTfOpenMode = nullptr;
+	ITfCompartment* pTfConvMode = nullptr;
 
 	static GUID _GUID_COMPARTMENT_KEYBOARD_INPUTMODE_CONVERSION = { 0xCCF05DD8, 0x4A87, 0x11D7, 0xA6, 0xE2, 0x00, 0x06, 0x5B, 0x84, 0x43, 0x5C };
 
@@ -640,7 +640,7 @@ BOOL TSFSink::GetCompartments( ITfCompartmentMgr** ppcm, ITfCompartment** ppTfOp
 BOOL TSFSink::SetupCompartmentSinks( BOOL bRemoveOnly, ITfCompartment* pTfOpenMode, ITfCompartment* pTfConvMode )
 {
 	bool bLocalCompartments = false;
-	ITfCompartmentMgr* pcm = NULL;
+	ITfCompartmentMgr* pcm = nullptr;
 	BOOL bRc = FALSE;
 	HRESULT hr = E_FAIL;
 
@@ -656,7 +656,7 @@ BOOL TSFSink::SetupCompartmentSinks( BOOL bRemoveOnly, ITfCompartment* pTfOpenMo
 		return FALSE;
 	}
 
-	ITfSource* srcOpenMode = NULL;
+	ITfSource* srcOpenMode = nullptr;
 
 	if (SUCCEEDED(hr = pTfOpenMode->QueryInterface( IID_ITfSource, (void**)&srcOpenMode )))
 	{
@@ -670,7 +670,7 @@ BOOL TSFSink::SetupCompartmentSinks( BOOL bRemoveOnly, ITfCompartment* pTfOpenMo
 		// Setup sink for open mode (toggle state) change
 		if ( bRemoveOnly || SUCCEEDED(hr = srcOpenMode->AdviseSink( IID_ITfCompartmentEventSink, (ITfCompartmentEventSink*)this, &_dwOpenModeSinkCookie )))
 		{
-			ITfSource* srcConvMode = NULL;
+			ITfSource* srcConvMode = nullptr;
 			if (SUCCEEDED(hr = pTfConvMode->QueryInterface( IID_ITfSource, (void**)&srcConvMode )))
 			{
 				// Remove existing sink for open mode
@@ -713,15 +713,15 @@ IMEClient::~IMEClient()
 	if(currentContext)
 		_ImmReleaseContext(myhwnd, currentContext);
 
-	currentContext = NULL;
+	currentContext = nullptr;
 
 	if ( myhwnd )
-		_ImmAssociateContext(myhwnd, NULL);
+		_ImmAssociateContext(myhwnd, nullptr);
 
 	if ( immDLL )
 	{
 		FreeLibrary(immDLL);
-		immDLL = NULL;
+		immDLL = nullptr;
 	}
 
 	g_disableCicero.Uninitialize();
@@ -877,7 +877,7 @@ IME_CANDIDATES& IMEClient::GetAllCandidates(bool force)
 
 				ImmGetCandidateListCount(context, &lcount);
 
-				dwBufLen = ImmGetCandidateList(context, 0, NULL, 0);
+				dwBufLen = ImmGetCandidateList(context, 0, nullptr, 0);
 
 				if(dwBufLen)
 				{
@@ -893,13 +893,13 @@ IME_CANDIDATES& IMEClient::GetAllCandidates(bool force)
 						//wchar_t wcandidate[10+1]; // 2 bytes plus null terminator
 
 						const char* start		= (const char*)list;
-						const char* ptr			= NULL;
-						const TCHAR* candidate	= NULL;
+						const char* ptr			= nullptr;
+						const TCHAR* candidate	= nullptr;
 
 						/*
 						// locale id: 0x0804
 						lpLCData locale = 0;
-						DWORD lsize = GetLocaleInfoEx("zh-CHS", 0, NULL, 0);
+						DWORD lsize = GetLocaleInfoEx("zh-CHS", 0, nullptr, 0);
 
 						if(lsize)
 						{
@@ -981,7 +981,7 @@ const std::wstring& IMEClient::GetString(IME_STRING type, bool force)
 		// show in the composition window
 
 		if(immType >= 0)
-			dwSize = ImmGetCompositionString(context, immType, NULL, 0);
+			dwSize = ImmGetCompositionString(context, immType, nullptr, 0);
 
 		if(dwSize) // this is in bytes
 		{
@@ -1027,7 +1027,7 @@ unsigned int IMEClient::GetCursor(bool force)
 
 		if(context)
 		{
-			cursor = ImmGetCompositionString(context, GCS_CURSORPOS, NULL, 0);
+			cursor = ImmGetCompositionString(context, GCS_CURSORPOS, nullptr, 0);
 			ImmReleaseContext(myhwnd, context);
 		}
 	}
@@ -1205,7 +1205,7 @@ bool IMEClient::OnMessage(UINT& umsg, WPARAM& wParam, LPARAM& lParam)
 					// user has made a candidate selection
 					// each bit is lParam is a list that is about to close
 					// tell phui
-					SetCandidateList(0, NULL);
+					SetCandidateList(0, nullptr);
 				}
 				break;
 				case IMN_PRIVATE:
@@ -1252,7 +1252,7 @@ void IMEClient::InputChange(bool alertUI)
 		native = (conversion & IME_CMODE_NATIVE);
 	}
 
-	DWORD dsize = ImmGetDescription(currentLocale, NULL, 0);
+	DWORD dsize = ImmGetDescription(currentLocale, nullptr, 0);
 
 	if(dsize)
 	{
@@ -1313,7 +1313,7 @@ void IMEClient::Deactivate()
 	tsfSink.Deactivate();
 
 	// associate context
-	//_ImmAssociateContext( myhwnd, NULL);
+	//_ImmAssociateContext( myhwnd, nullptr);
 	SetOpenStatus(false);
 
 	// kill our UI
@@ -1374,7 +1374,7 @@ void IMEClient::OnInputChange()
 	if(focusView)
 	{
 		OnUnfocus();
-		focusView = NULL;
+		focusView = nullptr;
 	}
 
 	Update();
@@ -1406,7 +1406,7 @@ void IMEClient::CheckToggleState()
 	chineseIME = ( GETPRIMLANG() == LANG_CHINESE ) && bIme;
 
 	HIMC himc;
-	if (NULL != (himc = _ImmGetContext(myhwnd)))
+	if (nullptr != (himc = _ImmGetContext(myhwnd)))
 	{
 		if (chineseIME)
 		{
@@ -1445,7 +1445,7 @@ void IMEClient::InitInputLocale()
 	char szCodePage[8];
 	int iRc = GetLocaleInfoA( MAKELCID( GETLANG(), SORT_DEFAULT ), LOCALE_IDEFAULTANSICODEPAGE, szCodePage, COUNTOF( szCodePage ) ); iRc;
 
-	g_uCodePage = _strtoul( szCodePage, NULL, 0 );
+	g_uCodePage = _strtoul( szCodePage, nullptr, 0 );
 
 	for ( int i = 0; i < 256; i++ )
 	{
@@ -1468,7 +1468,7 @@ void IMEClient::InitInputLocale()
 	if(ImmGetConversionStatus(context, &conversion, &sentence))
 		native = (conversion & IME_CMODE_NATIVE);
 
-	DWORD dsize = ImmGetDescription(currentLocale, NULL, 0);
+	DWORD dsize = ImmGetDescription(currentLocale, nullptr, 0);
 
 	if(dsize)
 	{
@@ -1541,7 +1541,7 @@ void IMEClient::SetDescription()
 		if(sysregGetHKeyText(HKEY_LOCAL_MACHINE, key, _T("Layout Display Name"), description))
 		{
 			TCHAR display[256];
-			if(SHLoadIndirectString(description, display, 255, NULL) == S_OK && display[0] != L'@')
+			if(SHLoadIndirectString(description, display, 255, nullptr) == S_OK && display[0] != L'@')
 				strings[IME_STRING_DESC] = display;
 		}
 
@@ -1590,8 +1590,8 @@ void IMEClient::SetDescription()
 // this function isn't really useful
 void IMEClient::Setup()
 {
-	_GetReadingString = NULL;
-	_ShowReadingWindow = NULL;
+	_GetReadingString = nullptr;
+	_ShowReadingWindow = nullptr;
 
 	if(IsIME(IME_TYPE_TSF)) //!IsOldIME()
 		return;
@@ -1614,7 +1614,7 @@ void IMEClient::Setup()
 	if ( _ShowReadingWindow )
 	{
 		HIMC himc;
-		if ( NULL != ( himc = _ImmGetContext( myhwnd ) ) )
+		if ( nullptr != ( himc = _ImmGetContext( myhwnd ) ) )
 		{
 			_ShowReadingWindow( himc, false );
 			_ImmReleaseContext( myhwnd, himc );

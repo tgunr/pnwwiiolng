@@ -259,35 +259,35 @@ void _drawscope(SINT32 texid, float scale, bool hasAlpha = false);
 // commmand look up
 static GunfileLookup Lookup[MAX_GUNFILE_COMMANDS] =
 {
-	{"none",			NULL,				NULL,					NULL},
-	{"mag",				_ReadGenericFloat,	_DisplayMagLine,		NULL},
-	{"fov",				_ReadGenericFloat,	_DisplayFovLine,		NULL},
+	{"none",			nullptr,				nullptr,					nullptr},
+	{"mag",				_ReadGenericFloat,	_DisplayMagLine,		nullptr},
+	{"fov",				_ReadGenericFloat,	_DisplayFovLine,		nullptr},
 	{"thinline",		_ReadThinLine,		_DisplayThinLine,		_KillGeneric},
 	{"thickline",		_ReadThickLine,		_DisplayThickLine,		_KillGeneric},
 	{"triangle",		_ReadTriangleLine,	_DisplayTriangle,		_KillGeneric},
 	{"trianglefill",	_ReadTriangleLine,	_DisplayTriangleFill,	_KillGeneric},
 	{"text",			_ReadTextLine,		_DisplayTextLine,		_KillGeneric},
-	{"textscalex",		_ReadGenericFloat,	_SetTextScaleX,			NULL},
-	{"textscaley",		_ReadGenericFloat,	_SetTextScaleY,			NULL},
-	{"anglerangeon",	NULL,				_SetAngleRange,			NULL},
-	{"anglerangeoff",	NULL,				_ResetAngleRange,		NULL},
-	{"pitchladder",		NULL,				_NewPitchLadder,		NULL},
+	{"textscalex",		_ReadGenericFloat,	_SetTextScaleX,			nullptr},
+	{"textscaley",		_ReadGenericFloat,	_SetTextScaleY,			nullptr},
+	{"anglerangeon",	nullptr,				_SetAngleRange,			nullptr},
+	{"anglerangeoff",	nullptr,				_ResetAngleRange,		nullptr},
+	{"pitchladder",		nullptr,				_NewPitchLadder,		nullptr},
 	{"ammotype",		_ReadAmmoTypeLine,	_SetAmmoType,			_KillGeneric},
-	{"pos",				_ReadGenericFloat,	_SetPLPos,				NULL},
-	{"range",			_ReadGenericFloat,	_SetPLRange,			NULL},
+	{"pos",				_ReadGenericFloat,	_SetPLPos,				nullptr},
+	{"range",			_ReadGenericFloat,	_SetPLRange,			nullptr},
 	{"line",			_ReadPLLine,		_DrawPLLine,			_KillGeneric},
 	{"rangeline",		_ReadRangeLine,		_DrawRangeLine,			_KillGeneric},
-	{"pitchscale",		_ReadGenericFloat,	_SetPitchScale,			NULL},
-	{"endpitchladder",	NULL,				_NewPitchLadder,		NULL},
-	{"angleoffset",		_ReadGenericFloat,	_SetAngleOffset,		NULL},
-	{"setrangeanglemin",_ReadGenericFloat,	_SetRangeAngleMin,		NULL},
-	{"setrangeanglemax",_ReadGenericFloat,	_SetRangeAngleMax,		NULL},
-	{"usetilt",			_SetTilt,			NULL,					NULL},
-	{"setrangereadout",	NULL,				_SetRangeReadout,		NULL},
+	{"pitchscale",		_ReadGenericFloat,	_SetPitchScale,			nullptr},
+	{"endpitchladder",	nullptr,				_NewPitchLadder,		nullptr},
+	{"angleoffset",		_ReadGenericFloat,	_SetAngleOffset,		nullptr},
+	{"setrangeanglemin",_ReadGenericFloat,	_SetRangeAngleMin,		nullptr},
+	{"setrangeanglemax",_ReadGenericFloat,	_SetRangeAngleMax,		nullptr},
+	{"usetilt",			_SetTilt,			nullptr,					nullptr},
+	{"setrangereadout",	nullptr,				_SetRangeReadout,		nullptr},
 	{"ladder",			_ReadLadder,		_SetLadder,				_KillLadder},
-	{"bearingladder",	_ReadGenericFloat,	_DisplayBearingLadder,	NULL},
-	{"torpedosolution",	_ReadGenericFloat,	_DisplayTorpedoSolution,NULL},
-	{"max",				NULL,				NULL,					NULL},
+	{"bearingladder",	_ReadGenericFloat,	_DisplayBearingLadder,	nullptr},
+	{"torpedosolution",	_ReadGenericFloat,	_DisplayTorpedoSolution,nullptr},
+	{"max",				nullptr,				nullptr,					nullptr},
 };
 /************************************************************************************************
 	persGunsightInit
@@ -645,12 +645,12 @@ SINT32 i;
 
 	for (i=0;i<MAX_GUNFILE_ELEMENTS;i++)
 	{
-		if (Lookup[GSCL->GE[i].CommandCode].KillFunction != NULL)
+		if (Lookup[GSCL->GE[i].CommandCode].KillFunction != nullptr)
 		{
 			Lookup[GSCL->GE[i].CommandCode].KillFunction(GSCL->GE[i].Data);
 		}
 
-		GSCL->GE[i].Data = NULL;
+		GSCL->GE[i].Data = nullptr;
 
 		if (GSCL->GE[i].CommandCode == 0)
 		{
@@ -677,9 +677,9 @@ static LOGICAL _ReadGunfileData(GSCommandList * GSCL,SINT8 * FileName)
 	SINT32 i;
 	SINT32 LineCount;
 
-	GSCL->AlignRT = NULL;
+	GSCL->AlignRT = nullptr;
 
-	GSCL->ViewDOF = NULL;
+	GSCL->ViewDOF = nullptr;
 
     std::string str = FileName;
     std::replace(str.begin(), str.end(), '\\', '/');
@@ -750,11 +750,11 @@ static LOGICAL _ReadGunfileData(GSCommandList * GSCL,SINT8 * FileName)
 			continue;
 		}
 
-		VarName = NULL;
-		VarContents = NULL;
+		VarName = nullptr;
+		VarContents = nullptr;
 		mlUtilityGetVarnameAndContents1(&VarName,&VarContents,Buffer);
 
-		if (VarName == NULL)
+		if (VarName == nullptr)
 		{
 			continue;
 		}
@@ -779,7 +779,7 @@ static LOGICAL _ReadGunfileData(GSCommandList * GSCL,SINT8 * FileName)
 
 		if (VarNum != 0)
 		{
-			if (Lookup[VarNum].ReadFunction != NULL)
+			if (Lookup[VarNum].ReadFunction != nullptr)
 			{
 				if (Lookup[VarNum].ReadFunction(GSCL,(char*)VarContents) != TRUE)
 				{
@@ -824,21 +824,21 @@ FLOAT32 X1,Y1,X2,Y2;
 SINT8* Ptr1,*Ptr2;
 
 	mlUtilityGetVarnameAndContents1((UCHAR**)&Ptr1,(UCHAR**)&Ptr2,(UCHAR*)Params);
-	if (Ptr1 == NULL || Ptr2 == NULL)
+	if (Ptr1 == nullptr || Ptr2 == nullptr)
 	{
 		return FALSE;
 	}
 	X1 = (FLOAT32)(atof(Ptr1));
 
 	mlUtilityGetVarnameAndContents1((UCHAR**)&Ptr1,(UCHAR**)&Ptr2,(UCHAR*)Ptr2);
-	if (Ptr2 == NULL)
+	if (Ptr2 == nullptr)
 	{
 		return FALSE;
 	}
 	Y1 = (FLOAT32)(atof(Ptr1));
 
 	mlUtilityGetVarnameAndContents1((UCHAR**)&Ptr1,(UCHAR**)&Ptr2,(UCHAR*)Ptr2);
-	if (Ptr2 == NULL)
+	if (Ptr2 == nullptr)
 	{
 		return FALSE;
 	}
@@ -847,7 +847,7 @@ SINT8* Ptr1,*Ptr2;
 
 	Ptr = (float*)memAlloc(sizeof(FLOAT32)*4);
 
-	if (Ptr == NULL)
+	if (Ptr == nullptr)
 	{
 		Write_Debug("Memory Allocation Error!");
 		return FALSE;
@@ -871,28 +871,28 @@ FLOAT32 Thickness;
 SINT8* Ptr1,*Ptr2;
 
 	mlUtilityGetVarnameAndContents1((UCHAR**)&Ptr1,(UCHAR**)&Ptr2,(UCHAR*)Params);
-	if (Ptr1 == NULL || Ptr2 == NULL)
+	if (Ptr1 == nullptr || Ptr2 == nullptr)
 	{
 		return FALSE;
 	}
 	X1 = (FLOAT32)(atof(Ptr1));
 
 	mlUtilityGetVarnameAndContents1((UCHAR**)&Ptr1,(UCHAR**)&Ptr2,(UCHAR*)Ptr2);
-	if (Ptr2 == NULL)
+	if (Ptr2 == nullptr)
 	{
 		return FALSE;
 	}
 	Y1 = (FLOAT32)(atof(Ptr1));
 
 	mlUtilityGetVarnameAndContents1((UCHAR**)&Ptr1,(UCHAR**)&Ptr2,(UCHAR*)Ptr2);
-	if (Ptr2 == NULL)
+	if (Ptr2 == nullptr)
 	{
 		return FALSE;
 	}
 	X2 = (FLOAT32)(atof(Ptr1));
 
 	mlUtilityGetVarnameAndContents1((UCHAR**)&Ptr1,(UCHAR**)&Ptr2,(UCHAR*)Ptr2);
-	if (Ptr2 == NULL)
+	if (Ptr2 == nullptr)
 	{
 		return FALSE;
 	}
@@ -902,7 +902,7 @@ SINT8* Ptr1,*Ptr2;
 
 	Ptr = (float*)memAlloc(sizeof(FLOAT32)*5);
 
-	if (Ptr == NULL)
+	if (Ptr == nullptr)
 	{
 		Write_Debug("Memory Allocation Error!");
 		return FALSE;
@@ -926,35 +926,35 @@ FLOAT32 X1,Y1,X2,Y2,X3,Y3;
 SINT8* Ptr1,*Ptr2;
 
 	mlUtilityGetVarnameAndContents1((UCHAR**)&Ptr1,(UCHAR**)&Ptr2,(UCHAR*)Params);
-	if (Ptr1 == NULL || Ptr2 == NULL)
+	if (Ptr1 == nullptr || Ptr2 == nullptr)
 	{
 		return FALSE;
 	}
 	X1 = (FLOAT32)(atof(Ptr1));
 
 	mlUtilityGetVarnameAndContents1((UCHAR**)&Ptr1,(UCHAR**)&Ptr2,(UCHAR*)Ptr2);
-	if (Ptr2 == NULL)
+	if (Ptr2 == nullptr)
 	{
 		return FALSE;
 	}
 	Y1 = (FLOAT32)(atof(Ptr1));
 
 	mlUtilityGetVarnameAndContents1((UCHAR**)&Ptr1,(UCHAR**)&Ptr2,(UCHAR*)Ptr2);
-	if (Ptr2 == NULL)
+	if (Ptr2 == nullptr)
 	{
 		return FALSE;
 	}
 	X2 = (FLOAT32)(atof(Ptr1));
 
 	mlUtilityGetVarnameAndContents1((UCHAR**)&Ptr1,(UCHAR**)&Ptr2,(UCHAR*)Ptr2);
-	if (Ptr2 == NULL)
+	if (Ptr2 == nullptr)
 	{
 		return FALSE;
 	}
 	Y2 = (FLOAT32)(atof(Ptr1));
 
 	mlUtilityGetVarnameAndContents1((UCHAR**)&Ptr1,(UCHAR**)&Ptr2,(UCHAR*)Ptr2);
-	if (Ptr2 == NULL)
+	if (Ptr2 == nullptr)
 	{
 		return FALSE;
 	}
@@ -963,7 +963,7 @@ SINT8* Ptr1,*Ptr2;
 
 	Ptr = (float*)memAlloc(sizeof(FLOAT32)*6);
 
-	if (Ptr == NULL)
+	if (Ptr == nullptr)
 	{
 		Write_Debug("Memory Allocation Error!");
 		return FALSE;
@@ -991,28 +991,28 @@ static LOGICAL _ReadTextLine(GSCommandList * GSCL,SINT8 * Params)
 	FLOAT32* Ptr;
 
 	mlUtilityGetVarnameAndContents1((UCHAR**)&Ptr1,(UCHAR**)&Ptr2,(UCHAR*)Params);
-	if (Ptr1 == NULL || Ptr2 == NULL)
+	if (Ptr1 == nullptr || Ptr2 == nullptr)
 	{
 		return FALSE;
 	}
 	X = (FLOAT32)(atof(Ptr1));
 
 	mlUtilityGetVarnameAndContents1((UCHAR**)&Ptr1,(UCHAR**)&Ptr2,(UCHAR*)Ptr2);
-	if (Ptr2 == NULL)
+	if (Ptr2 == nullptr)
 	{
 		return FALSE;
 	}
 	Y = (FLOAT32)(atof(Ptr1));
 
 	mlUtilityGetVarnameAndContents1((UCHAR**)&Ptr1,(UCHAR**)&Ptr2,(UCHAR*)Ptr2);
-	if (Ptr2 == NULL)
+	if (Ptr2 == nullptr)
 	{
 		return FALSE;
 	}
 	Size = (FLOAT32)(atof(Ptr1));
 
 	mlUtilityGetVarnameAndContents1((UCHAR**)&Ptr1,(UCHAR**)&Ptr2,(UCHAR*)Ptr2);
-	if (Ptr2 == NULL)
+	if (Ptr2 == nullptr)
 	{
 		return FALSE;
 	}
@@ -1021,7 +1021,7 @@ static LOGICAL _ReadTextLine(GSCommandList * GSCL,SINT8 * Params)
 	strcpy(TextString,Ptr2);
 
 	Ptr = (float*)memAlloc(sizeof(FLOAT32)*16 + 128);
-	if (Ptr == NULL)
+	if (Ptr == nullptr)
 	{
 		Write_Debug("Memory Allocation Error!");
 		return FALSE;
@@ -1045,7 +1045,7 @@ FLOAT32 X1,X2;
 SINT8* Ptr1,*Ptr2;
 
 	mlUtilityGetVarnameAndContents1((UCHAR**)&Ptr1,(UCHAR**)&Ptr2,(UCHAR*)Params);
-	if (Ptr1 == NULL || Ptr2 == NULL)
+	if (Ptr1 == nullptr || Ptr2 == nullptr)
 	{
 		return FALSE;
 	}
@@ -1054,7 +1054,7 @@ SINT8* Ptr1,*Ptr2;
 
 	Ptr = (float*)memAlloc(sizeof(FLOAT32)*2);
 
-	if (Ptr == NULL)
+	if (Ptr == nullptr)
 	{
 		Write_Debug("Memory Allocation Error!");
 		return FALSE;
@@ -1075,14 +1075,14 @@ FLOAT32 X1,X2,Range1,Range2;
 SINT8* Ptr1,*Ptr2;
 
 	mlUtilityGetVarnameAndContents1((UCHAR**)&Ptr1,(UCHAR**)&Ptr2,(UCHAR*)Params);
-	if (Ptr1 == NULL || Ptr2 == NULL)
+	if (Ptr1 == nullptr || Ptr2 == nullptr)
 	{
 		return FALSE;
 	}
 	X1 = (FLOAT32)(atof(Ptr1));
 
 	mlUtilityGetVarnameAndContents1((UCHAR**)&Ptr1,(UCHAR**)&Ptr2,(UCHAR*)Ptr2);
-	if (Ptr2 == NULL)
+	if (Ptr2 == nullptr)
 	{
 		return FALSE;
 	}
@@ -1090,7 +1090,7 @@ SINT8* Ptr1,*Ptr2;
 
 
 	mlUtilityGetVarnameAndContents1((UCHAR**)&Ptr1,(UCHAR**)&Ptr2,(UCHAR*)Ptr2);
-	if (Ptr1 == NULL || Ptr2 == NULL)
+	if (Ptr1 == nullptr || Ptr2 == nullptr)
 	{
 		return FALSE;
 	}
@@ -1099,7 +1099,7 @@ SINT8* Ptr1,*Ptr2;
 
 	Ptr = (float*)memAlloc(sizeof(FLOAT32)*4);
 
-	if (Ptr == NULL)
+	if (Ptr == nullptr)
 	{
 		Write_Debug("Memory Allocation Error!");
 		return FALSE;
@@ -1124,7 +1124,7 @@ SINT8* Ptr1,*Ptr2;
 weapAmmoType * AmmoType;
 
 	mlUtilityGetVarnameAndContents1((UCHAR**)&Ptr1,(UCHAR**)&Ptr2,(UCHAR*)Params);
-	if (Ptr1 == NULL || Ptr2 == NULL)
+	if (Ptr1 == nullptr || Ptr2 == nullptr)
 	{
 		return FALSE;
 	}
@@ -1132,14 +1132,14 @@ weapAmmoType * AmmoType;
 	MaxRange = (FLOAT32)(atof(Ptr2));
 
 	RT = (persGunsightRangeTable*)memAlloc(sizeof(persGunsightRangeTable));
-	if (RT == NULL)
+	if (RT == nullptr)
 	{
 		return FALSE;
 	}
 
-	AmmoType = NULL;
+	AmmoType = nullptr;
 	weapFindAmmoTypeByName(&AmmoType,(UCHAR*)Ptr1);
-	if (AmmoType == NULL)
+	if (AmmoType == nullptr)
 	{
 		return FALSE;
 	}
@@ -1157,7 +1157,7 @@ weapAmmoType * AmmoType;
 
 	GSCL->GE[GSCL->GECounter].Data = RT;
 
-	if (GSCL->AlignRT == NULL)
+	if (GSCL->AlignRT == nullptr)
 	{
 		GSCL->AlignRT = RT;
 	}
@@ -1175,7 +1175,7 @@ static LOGICAL _SetTilt(GSCommandList * GSCL,SINT8 * Params)
 static LOGICAL _DisplayMagLine(void*  Data)
 {
 	vehVehicle* vehicle = persGetPersonaVehiclePtr();
-	if ( vehicle == NULL || vehicle->VehicleType == NULL ) return TRUE;
+	if ( vehicle == nullptr || vehicle->VehicleType == nullptr ) return TRUE;
 
 	FLOAT32 horizon = piLongLikeFloat(FogEnd);
     // HACK!
@@ -1309,7 +1309,7 @@ FLOAT32 Mils;
 	V2.x = Ptr[2];
 	V2.y = Ptr[3];
 
-	if (_CurrentRT != NULL)
+	if (_CurrentRT != nullptr)
 	{
 		V1.x += _PLPos;
 		V2.x += _PLPos;
@@ -1346,7 +1346,7 @@ FLOAT32 Mils;
 	_TranslateCoordinatesByAngle(&V1.x,&V1.y);
 	_TranslateCoordinatesByAngle(&V2.x,&V2.y);
 
-	if (_CurrentRT != NULL)
+	if (_CurrentRT != nullptr)
 	{
 		V1.x += _PLPos;
 		V2.x += _PLPos;
@@ -1367,7 +1367,7 @@ FLOAT32 Mils;
 	_TranslateCoordinatesByAngle(&V1.x,&V1.y);
 	_TranslateCoordinatesByAngle(&V2.x,&V2.y);
 
-	if (_CurrentRT != NULL)
+	if (_CurrentRT != nullptr)
 	{
 		V1.x += _PLPos;
 		V2.x += _PLPos;
@@ -1388,7 +1388,7 @@ FLOAT32 Mils;
 	_TranslateCoordinatesByAngle(&V1.x,&V1.y);
 	_TranslateCoordinatesByAngle(&V2.x,&V2.y);
 
-	if (_CurrentRT != NULL)
+	if (_CurrentRT != nullptr)
 	{
 		V1.x += _PLPos;
 		V2.x += _PLPos;
@@ -1424,7 +1424,7 @@ FLOAT32 Mils;
 	_TranslateCoordinatesByAngle(&V2.x,&V2.y);
 	_TranslateCoordinatesByAngle(&V3.x,&V3.y);
 
-	if (_CurrentRT != NULL)
+	if (_CurrentRT != nullptr)
 	{
 		V1.x += _PLPos;
 		V2.x += _PLPos;
@@ -1457,7 +1457,7 @@ FLOAT32 Mils;
 static LOGICAL _NewPitchLadder(void*  Data)
 {
 	_PLPos = 0.0f;
-	_CurrentRT = NULL;
+	_CurrentRT = nullptr;
 	_CurrentRange = 0.0f;
 	_UseAngleRange = FALSE;
 	_PitchScale = 1.0f;
@@ -1536,7 +1536,7 @@ FLOAT32 Angle;
 FLOAT32 Range;
 
 
-	if (GunSightView.AlignRT != NULL)
+	if (GunSightView.AlignRT != nullptr)
 	{
 		Angle = _AdjustGunsight * (_AdjustMax - _AdjustMin);
 
@@ -1564,7 +1564,7 @@ piVECTOR V1,V2;
 FLOAT32 Mils;
 FLOAT32* Ptr;
 
-	if (_CurrentRT == NULL)
+	if (_CurrentRT == nullptr)
 	{
 		return FALSE;
 	}
@@ -1600,7 +1600,7 @@ FLOAT32 Mils;
 FLOAT32* Ptr;
 FLOAT32 SaveRange;
 
-	if (_CurrentRT == NULL)
+	if (_CurrentRT == nullptr)
 	{
 		return FALSE;
 	}
@@ -1650,7 +1650,7 @@ static LOGICAL _DisplayTextLine(void*  Data)
 	strcpy(TextString,(char*)(&Ptr[4]));
 
 	// check for pitch ladder text
-	if (_CurrentRT != NULL)
+	if (_CurrentRT != nullptr)
 	{
 		X += _PLPos;
 
@@ -1682,7 +1682,7 @@ FLOAT32* Ptr;
 	V2.y = Ptr[3];
 	Thickness = Ptr[4];
 
-	if (_CurrentRT != NULL)
+	if (_CurrentRT != nullptr)
 	{
 		V1.x += _PLPos;
 		V2.x += _PLPos;
@@ -1729,7 +1729,7 @@ FLOAT32* Ptr;
 
 static LOGICAL _KillGeneric(void*  Data)
 {
-	if (Data != NULL)
+	if (Data != nullptr)
 	{
 		memFree(Data);
 	}
@@ -1773,7 +1773,7 @@ LOGICAL persGunsightDraw(OBJECT* DOF, UINT32 IsInstrumentView)
 	piSetWorldMatrix(&IdentityMatrix);
 
 	// reset pitch ladder stuff
-	_NewPitchLadder(NULL);
+	_NewPitchLadder(nullptr);
 
 	// draw the sight
 	for(i = 0; i < GSCL->GECounter; i++)
@@ -2178,8 +2178,8 @@ static LOGICAL _UpdateView(GSCommandList * GSCL)
 // called when the player's vehicle goes away
 LOGICAL persGunsightClearData(void)
 {
-	GunSightView.ViewDOF = NULL;
-	InstView.ViewDOF = NULL;
+	GunSightView.ViewDOF = nullptr;
+	InstView.ViewDOF = nullptr;
 
 	return TRUE;
 }
@@ -2359,9 +2359,9 @@ FLOAT32 Angle,Angle1,Angle2;
 FLOAT32 Delta;
 SINT32 I1,I2;
 
-	AmmoType = NULL;
+	AmmoType = nullptr;
 	weapFindAmmoTypeByName(&AmmoType,(UCHAR*)AmmoName);
-	if(AmmoType == NULL) return FALSE;
+	if(AmmoType == nullptr) return FALSE;
 
 	if(AmmoType->SubType == WEAPAMMO_SUBTYPE_MORTAR)
 	{
@@ -2411,7 +2411,7 @@ static LOGICAL _ReadLadder(GSCommandList * GSCL,SINT8 * Params)
 	memset(&ladder, 0x0, sizeof(ladder));
 
 	mlUtilityGetVarnameAndContents1((UCHAR**)&Ptr1,(UCHAR**)&Ptr2,(UCHAR*)Params);
-	if (Ptr1 == NULL || Ptr2 == NULL || Ptr1[0] == '\0') return FALSE;
+	if (Ptr1 == nullptr || Ptr2 == nullptr || Ptr1[0] == '\0') return FALSE;
 
 	// dir
 	ladder.dir = (Ptr1[strlen((char*)Ptr1) - 1] == '-') ? -1 : 1;
@@ -2421,19 +2421,19 @@ static LOGICAL _ReadLadder(GSCommandList * GSCL,SINT8 * Params)
 	mlUtilityFindVarname(&ladder.type, Ptr1, (UCHAR*)&_LadderTypeNames[0][0], 32, GL_LADDER_TYPE_MAX);
 
 	mlUtilityGetVarnameAndContents1((UCHAR**)&Ptr1,(UCHAR**)&Ptr2,(UCHAR*)Ptr2);
-	if (Ptr2 == NULL) return FALSE;
+	if (Ptr2 == nullptr) return FALSE;
 
 	// input
 	mlUtilityFindVarname(&ladder.input, Ptr1, (UCHAR*)&_LadderInputNames[0][0], 32, GS_LADDER_INPUT_MAX);
 
 	mlUtilityGetVarnameAndContents1((UCHAR**)&Ptr1,(UCHAR**)&Ptr2,(UCHAR*)Ptr2);
-	if (Ptr2 == NULL) return FALSE;
+	if (Ptr2 == nullptr) return FALSE;
 
 	// min
 	ladder.inputMin = mathUnitAsciiToMetric((char*)Ptr1);
 
 	mlUtilityGetVarnameAndContents1((UCHAR**)&Ptr1,(UCHAR**)&Ptr2,(UCHAR*)Ptr2);
-	if (Ptr2 == NULL) return FALSE;
+	if (Ptr2 == nullptr) return FALSE;
 
 	// max
 	ladder.inputMax = mathUnitAsciiToMetric((char*)Ptr1);
@@ -2443,7 +2443,7 @@ static LOGICAL _ReadLadder(GSCommandList * GSCL,SINT8 * Params)
 
 	GSCL->GE[GSCL->GECounter].Data = memAlloc(sizeof(ladder));
 
-	if (GSCL->GE[GSCL->GECounter].Data == NULL)
+	if (GSCL->GE[GSCL->GECounter].Data == nullptr)
 	{
 		Write_Debug("Memory Allocation Error!");
 		return FALSE;
@@ -2464,7 +2464,7 @@ static LOGICAL _SetLadder(void* Data)
 	FLOAT32 inputVal = 0.0f;
 	FLOAT32* val;
 
-	if(ladder == NULL) return FALSE;
+	if(ladder == nullptr) return FALSE;
 
 	switch(ladder->input)
 	{
@@ -2567,7 +2567,7 @@ static LOGICAL _DisplayTorpedoSolution(void* Data)
 	FLOAT32 FireBearing;
 	FLOAT32 TargetSpeed, TargetRange, TargetAngleOnBow;
 	FLOAT32 TorpSpeed, TorpDepth;
-	weapAmmoType* AmmoType = NULL;
+	weapAmmoType* AmmoType = nullptr;
 
 	TargetSpeed = _AdjustSpeed * GUNGISHT_MAX_TARGET_SPEED;
 	TargetRange = _AdjustGunsight * GUNGISHT_MAX_TARGET_RANGE;
@@ -2981,7 +2981,7 @@ void _drawscope(SINT32 texid, float scale, bool hasAlpha)
 
     if(ogl::UseDeprecatedPath())
     {
-        static TextureUnit* tu = NULL;
+        static TextureUnit* tu = nullptr;
 
         if(!scopess.valid())
         {

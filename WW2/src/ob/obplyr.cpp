@@ -185,26 +185,26 @@ LOGICAL obplyrApplyMatrixToObjectNormals(OBJECT* lpmain, piMATRIX* mat)
 int				i;
 piVECTOR		n, cn;
 
-	if (lpmain == NULL)
+	if (lpmain == nullptr)
 	{
 		return(FALSE);
 	}
 
-	if (mat == NULL)
+	if (mat == nullptr)
 	{
 		return(FALSE);
 	}
 
 	OBJECT* lpobj = lpmain;
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
-		if (lpobj->sibling != NULL)
+		if (lpobj->sibling != nullptr)
 		{
 			obplyrApplyMatrixToObjectNormals(lpobj->sibling, mat);
 		}
 
 		OBJECT* lpatt = lpobj->attached;
-		while (lpatt != NULL)
+		while (lpatt != nullptr)
 		{
 			piVectorPtr mnorm = lpatt->MutableNormals();
 			pn	= lpatt->psnorms;
@@ -262,12 +262,12 @@ piVECTOR*		pcn;
 piMATRIX		mat;
 piVECTOR		obox[2];
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
 
-	if (inmat == NULL)
+	if (inmat == nullptr)
 	{
 		return(FALSE);
 	}
@@ -298,7 +298,7 @@ piVECTOR		obox[2];
 
 			piVectorPtr spos  = lpobj->StaticPositions();
 			piVectorPtr snorm = lpobj->StaticNormals();
-			if(spos.ptr == NULL) return FALSE;
+			if(spos.ptr == nullptr) return FALSE;
 
 			for (i=lpobj->numverts; i; i--, ++spos, ++snorm)
 			{
@@ -404,7 +404,7 @@ static __int64    count=0;
 static int        number=0;
 #endif
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -523,7 +523,7 @@ piVECTOR	vec, normal;
 piVECTOR*  pno, pn, pcon, pcn;
 piMATRIX	mat;
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -616,7 +616,7 @@ piVECTOR	objpos, objrot;
 OBJECT*	lpobj;
 
 	lpobj = obmainFindNamedObject(name);
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -638,7 +638,7 @@ piVERTEX*	pvo, pv;
 piLVERTEX*	pdl, psl;
 OBJECT*	lpobj;
 
-	if (lpmain == NULL)
+	if (lpmain == nullptr)
 	{
 		return(FALSE);
 	}

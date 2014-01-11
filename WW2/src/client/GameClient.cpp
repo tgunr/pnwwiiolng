@@ -111,7 +111,7 @@ void GameClientKill()
     if(_playerclient)
     {
         delete _playerclient;
-        _playerclient = NULL;
+        _playerclient = nullptr;
     }
 }
 
@@ -362,7 +362,7 @@ void GameClient::ProcessChatLocalizedMessage(Chat::LocalizedMessage const& msg)
 		{
 			case LSTR_NEW_LEADER:
 			{
-				vehVehicle* vehicle = NULL;
+				vehVehicle* vehicle = nullptr;
 
 				vehicle = vehFindVehicleByChatHandle(SelectedMission().m_poster);
 				if(vehicle)
@@ -446,11 +446,11 @@ void GameClient::ProcessChatLocalizedMessage(Chat::LocalizedMessage const& msg)
 			const wchar_t* ptr = wcsstr(str, L" ");
 
 			wchar_t		ptr2[128];			// Copy of ptr for tokenization
-			wchar_t*	ptrtok = NULL;			// For tokenization
-			wchar_t*	killerName = NULL;			// The name of the killer
+			wchar_t*	ptrtok = nullptr;			// For tokenization
+			wchar_t*	killerName = nullptr;			// The name of the killer
 			int			isFriendly = 0;				// If this is a kill, is the killer on my side? -1 = enemy, 0 = neutral, 1 = friendly
 			std::vector<std::wstring> tokens;		// By pushing tokens back, the top entry should be killer's name
-			vehVehicle* killer = NULL;
+			vehVehicle* killer = nullptr;
 			vehVehicle* me = persGetPersonaVehiclePtr();
 
 #if platOS == OS_MACOS
@@ -469,7 +469,7 @@ void GameClient::ProcessChatLocalizedMessage(Chat::LocalizedMessage const& msg)
 #endif
 
 			// Tokenize, and the last token should be the
-			while(ptrtok != NULL)
+			while(ptrtok != nullptr)
 			{
 				// Stop tokenizing if we run into "(x hits)"
 				if(ptrtok[0] == lparenth)
@@ -477,9 +477,9 @@ void GameClient::ProcessChatLocalizedMessage(Chat::LocalizedMessage const& msg)
 
 				tokens.push_back(ptrtok);
 #if platOS == OS_MACOS
-				ptrtok = wcstok(NULL, L" ",&temp);
+				ptrtok = wcstok(nullptr, L" ",&temp);
 #else
-				ptrtok = wcstok(NULL, L" "); // <----- this function is deprecated under windows, use wcstok_s on windows
+				ptrtok = wcstok(nullptr, L" "); // <----- this function is deprecated under windows, use wcstok_s on windows
 #endif
 			}
 
@@ -488,7 +488,7 @@ void GameClient::ProcessChatLocalizedMessage(Chat::LocalizedMessage const& msg)
 
 			// Strip the period from the end
 			if(killerName[wcslen(killerName)-1] == period)
-				killerName[wcslen(killerName)-1] = NULL;   // <----- bad idea, you are overwriting a std::wstring behind it's back
+				killerName[wcslen(killerName)-1] = 0;   // <----- bad idea, you are overwriting a std::wstring behind it's back
 
 			killer = vehFindVehicleByChatHandle(chatGetHandle(killerName));
 
@@ -497,7 +497,7 @@ void GameClient::ProcessChatLocalizedMessage(Chat::LocalizedMessage const& msg)
 				WWII_SIDE killerside = wwiiSide(killer->VehicleType->WeaponSpec.country());
 				WWII_SIDE myside = wwiiSide(me->VehicleType->WeaponSpec.country());
 
-				if(me == NULL || (*killerName) == accident)
+				if(me == nullptr || (*killerName) == accident)
 					isFriendly = 0;		// Neutral case
 				else if(myside == killerside)
 					isFriendly = 1;		// Killer is my ally
@@ -944,7 +944,7 @@ void GameClient::ProcessWaypoint(Waypoint const& waypoint, int type)
 {
 	if(type == WPXT_REQUEST && !waypoint.handle() && IsMissionLeader())
 	{
-		uiChatPrintUILocLine(NULL, colorGREENALPHA, "mission.contact", chatGetWideCallsign(waypoint.playerHandle()));
+		uiChatPrintUILocLine(nullptr, colorGREENALPHA, "mission.contact", chatGetWideCallsign(waypoint.playerHandle()));
 		jsclient->RunScript("game.oncontact()");
 	}
 
@@ -958,7 +958,7 @@ void GameClient::ProcessWaypoint(Waypoint const& waypoint, int type)
 
 			// temp variables
 			vehVehicle* player = persGetPersonaVehiclePtr();
-			vehVehicle* requestor = NULL;
+			vehVehicle* requestor = nullptr;
 
 			// lookup the ammo requestor
 			requestor = vehFindVehicleByChatHandle(waypoint.playerHandle());
@@ -1436,13 +1436,13 @@ void GameClient::ProcessChatWho(int type, const Chat::Who& who)
 		return;
 
 	// Offline?
-	persRank const* rank = NULL;
+	persRank const* rank = nullptr;
 	if ( who.online() && who.rank() > 0 )
 		rank = persrankFind(who.rank());
 
 	const wchar_t* callsign = chatGetWideCallsign(who.handle());
 
-	if ( !who.online() || who.country() == WWII_NO_COUNTRY || who.rank() == 0 || rank == NULL )
+	if ( !who.online() || who.country() == WWII_NO_COUNTRY || who.rank() == 0 || rank == nullptr )
 	{
 		uiChatPrintLineMessageLoc(IDE_LANG_UI, LSTR_NONE, 534, callsign);
 		return;
@@ -1499,7 +1499,7 @@ void GameClient::ProcessChatWho(int type, const Chat::Who& who)
 		if ( who.extendedInfo() && who.spawned() )
 		{
 			StratDB::StratObject* so = StratDB::FindStratObject((sdm_full_obj_id&)who.nearCP());
-			if ( so != NULL )
+			if ( so != nullptr )
 			{
 				description += L" ";
 				description += uiLocString("chat.near");
@@ -1795,8 +1795,8 @@ bool GameClient::ReceiveServerTrackedObject(int type, ACTION_OBJECT* a)
 
 static void _editCallback(JSContext* ctx, UINT32 argc, jsval* argv)
 {
-	const char* type = (argc > 0) ? JS_GetStringBytes(JS_ValueToString(ctx, argv[0])) : NULL;
-	const char* value = (argc > 1) ? JS_GetStringBytes(JS_ValueToString(ctx, argv[1])) : NULL;
+	const char* type = (argc > 0) ? JS_GetStringBytes(JS_ValueToString(ctx, argv[0])) : nullptr;
+	const char* value = (argc > 1) ? JS_GetStringBytes(JS_ValueToString(ctx, argv[1])) : nullptr;
 
 	// do something with the values
 	if(strcmp(type, "capture") == 0)

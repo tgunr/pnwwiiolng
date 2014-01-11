@@ -74,7 +74,7 @@ extern void sndsUpdateSounds(void);
 // any standard WAV options beyond that one provision.
 // Default values as defined in snApplyDefaultOptions are applied.
 //
-// returns a pointer to the loaded snSound, or NULL if unsuccessful.
+// returns a pointer to the loaded snSound, or nullptr if unsuccessful.
 
 extern LOGICAL sndsFreeSound(snSound* whichSound);
 // frees the snSoundBuffer associated with whichSound.
@@ -178,7 +178,7 @@ extern LOGICAL sndsOverLimit( UINT32 numSounds );
 extern snSound * sndsDuplicateSound(snSound* whichSound);
 // duplicates the designated sound and all associated options currently set
 // for that sound.
-// returns a pointer to the new snSound, or NULL if not successful
+// returns a pointer to the new snSound, or nullptr if not successful
 
 extern LOGICAL sndsApplyDefaultOptions(snSound* whichSound);
 // sets all values for the sound indicated in whichSound to the default options

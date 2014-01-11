@@ -43,7 +43,7 @@ public:
 	
 	void SetParentMenu(CtxMenu* parent){ _parentmenu = parent; }
 	CtxMenu* GetRootMenu();
-	CtxMenu* GetParentMenu(){ return (_parentmenu) ? dynamic_cast<CtxMenu*>(_parentmenu): NULL; }
+	CtxMenu* GetParentMenu(){ return (_parentmenu) ? dynamic_cast<CtxMenu*>(_parentmenu): nullptr; }
 	MenuItems* GetSubMenus(){ return _submenus; }
 	void SetMouseOver(unsigned int o);
 	unsigned int IsMouseOver(){ return _mouseover; }

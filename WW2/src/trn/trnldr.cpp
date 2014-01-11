@@ -420,9 +420,9 @@ SINT32			i;
 piVectorConstPtr pv;
 OBJECT*		lpatt;
 
-	while (lptop != NULL)
+	while (lptop != nullptr)
 	{
-		if (lptop->child != NULL)
+		if (lptop->child != nullptr)
 		{
 			if (!GetFullObjectBBox(lptop->child, bbox))
 			{
@@ -433,7 +433,7 @@ OBJECT*		lpatt;
 		if (!(lptop->flags & OBJECT_NOTOBJECT))
 		{
 			lpatt = lptop;
-			while (lpatt != NULL)
+			while (lpatt != nullptr)
 			{
 				pv = lptop->RenderPositions();
 				for (i=0; i < lptop->numverts; i++, ++pv)
@@ -547,7 +547,7 @@ SINT32	i;
 	for (i=0; i < NUM_TERRAIN_RECTANGLES; i++)
 	{
 		trnldrReleaseSupercell(i);
-		if (trndtl[i].terrain != NULL)
+		if (trndtl[i].terrain != nullptr)
 		{
   			obpoolFreeObjectCallback(trndtl[i].terrain);
 			obpoolFreeObjectCallback(trndtl[i].terrainorig);
@@ -590,7 +590,7 @@ static LOGICAL ReleaseSupercellTextureObjects(TERRAIN_DETAIL* td)
 {
 SINT32		i;
 
-	if (td == NULL)
+	if (td == nullptr)
 	{
 		return(FALSE);
 	}
@@ -599,10 +599,10 @@ SINT32		i;
 
 	for (i=0; i < MAX_TERRAIN_TEXTURES; i++)
 	{
-		if (td->nonreplacementtiles[i] != NULL)
+		if (td->nonreplacementtiles[i] != nullptr)
 		{
 			obpoolFreeObjectCallback(td->nonreplacementtiles[i]);
-			td->nonreplacementtiles[i] = NULL;
+			td->nonreplacementtiles[i] = nullptr;
 		}
 	}
 
@@ -623,10 +623,10 @@ TRNSTATEBLOCK*	tsb;
 
 	for (i=tsb->varone; i < MAX_TERRAIN_TEXTURES; i++)
 	{
-		if (td->nonreplacementtiles[i] != NULL)
+		if (td->nonreplacementtiles[i] != nullptr)
 		{
 			obpoolFreeObjectCallback(td->nonreplacementtiles[i]);
-			td->nonreplacementtiles[i] = NULL;
+			td->nonreplacementtiles[i] = nullptr;
 		}
 
 		tsb->varone += 1;
@@ -640,14 +640,14 @@ TRNSTATEBLOCK*	tsb;
 
 LOGICAL trnldrReleaseTerrainObject(OBJECT* lpobj, TERRAIN_DETAIL* td)
 {
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
 
     logTimerBeginMacro();
 
-	if (deletion != NULL)
+	if (deletion != nullptr)
 	{
 		switch(lpobj->modelInstance->GetModelType())
 		{
@@ -663,7 +663,7 @@ LOGICAL trnldrReleaseTerrainObject(OBJECT* lpobj, TERRAIN_DETAIL* td)
 
         int idx = 0;
 
-		deletion(lpobj, 0, 0, 0, NULL);
+		deletion(lpobj, 0, 0, 0, nullptr);
 		trnUpdateStratData(td, lpobj, -1, FALSE);
 	}
 
@@ -679,7 +679,7 @@ static LOGICAL ReleaseSupercellObjects(TERRAIN_DETAIL* td)
 SINT32		i;//, place=0;
 SINT8		filename[_MAX_PATH];
 
-	if (td == NULL)
+	if (td == nullptr)
 	{
 		return(FALSE);
 	}
@@ -695,7 +695,7 @@ SINT8		filename[_MAX_PATH];
 
 		// strip off the directory subname
 		ptr = strrchr(filename,'\\');
-		if (ptr != NULL)
+		if (ptr != nullptr)
 		{
 			strcpy(filename,++ptr);
 		}
@@ -740,7 +740,7 @@ TRNSTATEBLOCK*	tsb;
 
 		// strip off the directory subname
 		ptr = strrchr(filename,'\\');
-		if (ptr != NULL)
+		if (ptr != nullptr)
 		{
 			strcpy(filename,++ptr);
 		}
@@ -1166,7 +1166,7 @@ STRT_DTL_HEADER		sdh;
 
         td->tobndx++;
 
-		if (td->toldflags != NULL)
+		if (td->toldflags != nullptr)
 		{
 			memFree(td->toldflags);
 		}
@@ -1307,7 +1307,7 @@ STRT_DTL_HEADER		sdh;
                             pos.z = (float)((bits & 0xfff) * 0.1f) + minheight;
                             pos.z = -pos.z;
 
-                            sptAddTree(NULL, bushes[i], td, pos, true);
+                            sptAddTree(nullptr, bushes[i], td, pos, true);
                         }
                     }
                 }
@@ -1529,14 +1529,14 @@ static LOGICAL DuplicateBaseSupercell(TERRAIN_DETAIL* td)
 {
     logTimerBeginMacro();
 
-    if (td->terrainorig != NULL)
+    if (td->terrainorig != nullptr)
 	{
 		obpoolFreeObjectCallback(td->terrainorig);
-		td->terrainorig = NULL;
+		td->terrainorig = nullptr;
 	}
 
 	td->terrainorig = obmainCopyObject(td->terrain);
-	if (td->terrainorig == NULL)
+	if (td->terrainorig == nullptr)
 	{
 		Write_Debug("error copying terrain object to collision terrain object");
 	}
@@ -1662,7 +1662,7 @@ TERRAIN_DETAIL*	td;
 
 	for (i=0; i < td->tricnt; i++)
 	{
-		if (td->nonreplacementtiles[i] == NULL)
+		if (td->nonreplacementtiles[i] == nullptr)
 		{
 			sprintf(objname, "%s_t%d", td->terrain->name, i);
 
@@ -1733,7 +1733,7 @@ TERRAIN_DETAIL*	td;
 			// Added materials to objects based on texture names
 			strcpy(filename, td->triname[i]);
 			ptr = strrchr(filename, '.');
-			if (ptr != NULL)
+			if (ptr != nullptr)
 			{
 				// get rid of extension
 				*ptr = 0;
@@ -1873,7 +1873,7 @@ TRNSTATEBLOCK*		tsb;
 
 	for (i=tsb->vartwo; i < td->tricnt; i++)
 	{
-		if (td->nonreplacementtiles[i] == NULL)
+		if (td->nonreplacementtiles[i] == nullptr)
 		{
 			sprintf(objname, "%s_t%d", td->terrain->name, i);
 
@@ -1945,7 +1945,7 @@ TRNSTATEBLOCK*		tsb;
 			// Added materials to objects based on texture names
 			strcpy(filename, td->triname[i]);
 			ptr = strrchr(filename, '.');
-			if (ptr != NULL)
+			if (ptr != nullptr)
 			{
 				// get rid of extension
 				*ptr = 0;
@@ -2008,7 +2008,7 @@ SINT32		i, j;
 	{
 		for (j=0; j < td->tricnt; j++)
 		{
-			if (td->nonreplacementtiles[j] == NULL)
+			if (td->nonreplacementtiles[j] == nullptr)
 			{
 				continue;
 			}
@@ -2070,7 +2070,7 @@ static LOGICAL		trip=FALSE;
 	{
 		for (j=0; j < td->tricnt; j++)
 		{
-			if (td->nonreplacementtiles[j] == NULL)
+			if (td->nonreplacementtiles[j] == nullptr)
 			{
 				continue;
 			}
@@ -2122,7 +2122,7 @@ static LOGICAL FindStratObject(TERRAIN_DETAIL* td, SINT8* objname, piVECTOR* pos
 	BUILDING*		pbld;		// Building
 
 	filename = strrchr(objname, '\\');
-	if (filename != NULL)
+	if (filename != nullptr)
 	{
 		filename += 1;
 	}
@@ -2147,7 +2147,7 @@ static LOGICAL FindStratObject(TERRAIN_DETAIL* td, SINT8* objname, piVECTOR* pos
 			fullid->id = pcp->oid.id;
 //			fullid->type = pcp->oid.objClass;
 			fullid->type = 0;
-			if (ObjId != NULL)
+			if (ObjId != nullptr)
 			{
 				*ObjId = pcp->oid;
 			}
@@ -2171,7 +2171,7 @@ static LOGICAL FindStratObject(TERRAIN_DETAIL* td, SINT8* objname, piVECTOR* pos
 			fullid->id = pfac->oid.id;
 //			fullid->type = pfac->oid.objClass;
 			fullid->type = 0;
-			if (ObjId != NULL)
+			if (ObjId != nullptr)
 			{
 				*ObjId = pfac->oid;
 			}
@@ -2195,7 +2195,7 @@ static LOGICAL FindStratObject(TERRAIN_DETAIL* td, SINT8* objname, piVECTOR* pos
 			fullid->id = pbld->oid.id;
 //			fullid->type = pbld->oid.objClass;
 			fullid->type = 0;
-			if (ObjId != NULL)
+			if (ObjId != nullptr)
 			{
 				*ObjId = pbld->oid;
 			}
@@ -2512,7 +2512,7 @@ SINT32		i;
 	obmainSnapObjectToXYGrid(td->terrain, (FLOAT32)TERRAIN_SNAPTO_GRIDSIZE, 1);
 	for (i=0; i < MAX_TERRAIN_TEXTURES; i++)
 	{
-		if (td->nonreplacementtiles[i] != NULL)
+		if (td->nonreplacementtiles[i] != nullptr)
 		{
 			obmainSnapObjectToXYGrid(td->nonreplacementtiles[i], (FLOAT32)TERRAIN_SNAPTO_GRIDSIZE, 1);
 		}
@@ -2541,7 +2541,7 @@ TRNSTATEBLOCK*	tsb;
 
 	for (i=tsb->varone-1; i < MAX_TERRAIN_TEXTURES; i++)
 	{
-		if (td->nonreplacementtiles[i] != NULL)
+		if (td->nonreplacementtiles[i] != nullptr)
 		{
 			obmainSnapObjectToXYGrid(td->nonreplacementtiles[i], (FLOAT32)TERRAIN_SNAPTO_GRIDSIZE, 1);
 		}
@@ -2560,7 +2560,7 @@ SINT32		i;
 
 	for (i=0; i < MAX_TERRAIN_TEXTURES; i++)
 	{
-		if (td->nonreplacementtiles[i] != NULL)
+		if (td->nonreplacementtiles[i] != nullptr)
 		{
 			if (td->nonreplacementtiles[i]->flags & OBJECT_VISIBLE)
 			{
@@ -2587,7 +2587,7 @@ TRNSTATEBLOCK*	tsb;
 
 	for (i=tsb->varone; i < MAX_TERRAIN_TEXTURES; i++)
 	{
-		if (td->nonreplacementtiles[i] != NULL)
+		if (td->nonreplacementtiles[i] != nullptr)
 		{
 			if (td->nonreplacementtiles[i]->flags & OBJECT_VISIBLE)
 			{
@@ -2612,7 +2612,7 @@ SINT32		i;
 
 	for (i=0; i < MAX_TERRAIN_TEXTURES; i++)
 	{
-		if (td->nonreplacementtiles[i] != NULL)
+		if (td->nonreplacementtiles[i] != nullptr)
 		{
 			if (strcmp(td->nonreplacementtiles[i]->texname, "null1.bmp") != 0)
 			{
@@ -2638,7 +2638,7 @@ SINT32		i;
 
 	for (i=0; i < MAX_TERRAIN_TEXTURES; i++)
 	{
-		if (td->nonreplacementtiles[i] != NULL)
+		if (td->nonreplacementtiles[i] != nullptr)
 		{
 			td->nonreplacementtiles[i]->flags |= OBJECT_SKIPDRAWING;
 		}
@@ -2660,7 +2660,7 @@ SINT32		i;
 
 	for (i=0; i < MAX_TERRAIN_TEXTURES; i++)
 	{
-		if (td->nonreplacementtiles[i] != NULL)
+		if (td->nonreplacementtiles[i] != nullptr)
 		{
 			td->nonreplacementtiles[i]->trnum = sc;
 		}
@@ -3245,32 +3245,32 @@ TERRAIN_DETAIL*	td;
 
 		if(td->pcp)
 			memFree(td->pcp);
-		td->pcp = NULL;
+		td->pcp = nullptr;
 		td->numCPs = 0;
 
 		if (td->numFacilities > 0)
 		{
 			memFree(td->facTable);
-			td->pfac = NULL;
+			td->pfac = nullptr;
 			td->numFacilities = 0;
 		}
 
 		if (td->numBuildings > 0)
 		{
 			td->buildingTable->destroy(td->buildingTable);
-			td->pbld = NULL;
+			td->pbld = nullptr;
 			td->numBuildings = 0;
 		}
 
 		if (td->numLinks > 0)
 		{
-			td->plink = NULL;
+			td->plink = nullptr;
 			td->numLinks = 0;
 		}
 
 		if (td->numWaypoints > 0)
 		{
-			td->pwp = NULL;
+			td->pwp = nullptr;
 			td->numWaypoints = 0;
 		}
 
@@ -3279,25 +3279,25 @@ TERRAIN_DETAIL*	td;
             sptFreeClutter(td->m_trees);
 //            delete td->m_trees;
 			_treePool.push(td->m_trees);
-            td->m_trees = NULL;
+            td->m_trees = nullptr;
         }
 
-		if ( td->bldHash.building != NULL)
+		if ( td->bldHash.building != nullptr)
 		{
 			memFree(td->bldHash.building);
-			td->bldHash.building = NULL;
+			td->bldHash.building = nullptr;
 		}
 
 		td->bldHash.maxBldID = 0;
 
-		if (td->toldflags != NULL)
+		if (td->toldflags != nullptr)
 		{
 			memFree(td->toldflags);
-			td->toldflags = NULL;
+			td->toldflags = nullptr;
 		}
 
 		trncdDTLColliderFree(td->collider);
-		td->collider = NULL;
+		td->collider = nullptr;
 
 		td->stratLoaded = FALSE;
 
@@ -3892,32 +3892,32 @@ TERRAIN_DETAIL*	td;
 
 	if(td->pcp)
 		memFree(td->pcp);
-	td->pcp = NULL;
+	td->pcp = nullptr;
 	td->numCPs = 0;
 
 	if (td->numFacilities > 0)
 	{
 		memFree(td->facTable);
-		td->pfac = NULL;
+		td->pfac = nullptr;
 		td->numFacilities = 0;
 	}
 
 	if (td->numBuildings > 0)
 	{
 		td->buildingTable->destroy(td->buildingTable);
-		td->pbld = NULL;
+		td->pbld = nullptr;
 		td->numBuildings = 0;
 	}
 
 	if (td->numLinks > 0)
 	{
-		td->plink = NULL;
+		td->plink = nullptr;
 		td->numLinks = 0;
 	}
 
 	if (td->numWaypoints > 0)
 	{
-		td->pwp = NULL;
+		td->pwp = nullptr;
 		td->numWaypoints = 0;
 	}
 
@@ -3927,7 +3927,7 @@ TERRAIN_DETAIL*	td;
 //        delete td->m_trees;
 
 		_treePool.push(td->m_trees);
-        td->m_trees = NULL;
+        td->m_trees = nullptr;
     }
 
 
@@ -3937,22 +3937,22 @@ TERRAIN_DETAIL*	td;
 		trndtl[sc].trnstate.nextstate[i] = 0;
 	}
 
-	if ( td->bldHash.building != NULL)
+	if ( td->bldHash.building != nullptr)
 	{
 		memFree(td->bldHash.building);
-		td->bldHash.building = NULL;
+		td->bldHash.building = nullptr;
 	}
 
 	td->bldHash.maxBldID = 0;
 
-	if (td->toldflags != NULL)
+	if (td->toldflags != nullptr)
 	{
 		memFree(td->toldflags);
-		td->toldflags = NULL;
+		td->toldflags = nullptr;
 	}
 
 	trncdDTLColliderFree(td->collider);
-	td->collider = NULL;
+	td->collider = nullptr;
 
 	td->stratLoaded = FALSE;
 
@@ -3974,7 +3974,7 @@ piTexCoordPtr tex;
 
     extern LOGICAL trnwtrIsWaterTexture(SINT32);
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}

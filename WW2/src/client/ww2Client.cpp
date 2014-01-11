@@ -67,7 +67,7 @@ using namespace ww2;
 void clientErrorLog(const char* const fmt, ...)
 {
 	FILE* fp = Fio::OpenLogFile();
-	if ( fp == NULL )
+	if ( fp == nullptr )
 		return;
 
 	const time_t now = teulTime();
@@ -106,7 +106,7 @@ static Teul::PlayerIdent _defaultPlayerIdent;
 #define MessageBoxA(_X_, _err_, _title_, _Y_) fprintf(stderr, "\n%s\n\n%s\nTerminating.\n", _title_, _err_)
 #endif
 
-#define INCOMPLETE_WORK(_str_) { MessageBoxA(NULL, \
+#define INCOMPLETE_WORK(_str_) { MessageBoxA(nullptr, \
 		"###################################\n\n" \
 		"You are seeing this because of an error\n" \
 		"error for which no behavior is defined.\n\n" \
@@ -293,7 +293,7 @@ Client::Client()
 
 	// assume we're in the campaign instance
 	_classdata->instance.m_status = Instance::_SUCCESS;
-	_classdata->instances = NULL;
+	_classdata->instances = nullptr;
 
 	// clear our permissions to start with; the host will send them down
 	memset(&_classdata->permissions, 0x0, sizeof(_classdata->permissions));
@@ -334,7 +334,7 @@ Client::~Client()
 				delete state;
 			}
 
-			_classdata->connections[i] = NULL;
+			_classdata->connections[i] = nullptr;
 		}
 	}
 
@@ -345,7 +345,7 @@ Client::~Client()
         if(_classdata->connections[i])
         {
             delete _classdata->connections[i];
-            _classdata->connections[i] = NULL;
+            _classdata->connections[i] = nullptr;
         }
     }
 
@@ -811,7 +811,7 @@ BrigadeControlList* Client::LookupBrigadeOIC(int brigadeID) const
 	if(_classdata->oics.find(brigadeID) != _classdata->oics.end())
 		return &_classdata->oics[brigadeID];
 
-	return NULL;
+	return nullptr;
 }
 
 /************************************************************************************************
@@ -1149,7 +1149,7 @@ const Teul::ServerAddr* Client::GetCellIdent() const
 ww2::HostState* Client::GetHostStateByIndex(int teulIndex)
 {
 	if(teulIndex < 0)
-		return NULL;
+		return nullptr;
 
 	for(int i = 0; i < Teul::Connection::NumHostTypes; i++)
 	{
@@ -1157,7 +1157,7 @@ ww2::HostState* Client::GetHostStateByIndex(int teulIndex)
 			return _classdata->connections[i];
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 ww2::HostState* Client::GetHostStateByType(int type)
@@ -1165,7 +1165,7 @@ ww2::HostState* Client::GetHostStateByType(int type)
 	if(type >= 0 && type < Teul::Connection::NumHostTypes)
 		return _classdata->connections[type];
 
-	return NULL;
+	return nullptr;
 }
 
 /************************************************************************************************
@@ -2612,7 +2612,7 @@ bool Client::SelectPersona(const PersonaSummary& persona, bool save, bool force)
 
 	if(force || !current || *current != persona)
 	{
-		current = NULL;
+		current = nullptr;
 
 		RequestPersonaSelection(persona);
 
@@ -2714,7 +2714,7 @@ const PersonaSummary* Client::GetPersona(int country, int branch) const
 			return &summary;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 // defaults to getting the saved persona
@@ -2723,7 +2723,7 @@ const PersonaSummary* Client::GetSavedPersona() const
 	if(_classdata->saved.Valid())
 		return GetPersona(_classdata->saved.country, _classdata->saved.branch);
 
-	return NULL;
+	return nullptr;
 }
 
 BrigadeSelection const& Client::BrigadeSelected() const
@@ -3214,7 +3214,7 @@ void HostState::Reset()
 	if(connection)
 		connection->close();
 
-	connection = NULL;
+	connection = nullptr;
 	lastError = 0;
 	errorName = "";
 }
@@ -3897,7 +3897,7 @@ static void _describeState(const wchar_t* const hostName, std::wstring& into, co
 	into += hostName;
 	into += LocOrStr(L"? ", L": ");
 
-	if ( state == NULL )
+	if ( state == nullptr )
 	{
 		into += LocOrStr(L"?network.state.label.nostate?", L"----");
 		return;
@@ -3965,7 +3965,7 @@ extern SINT32 g_lastPing, g_averagePing;
 std::wstring clientGetNetworkState()
 {
 	Client* const client = PlayerClient();
-	if ( !Online || client == NULL )
+	if ( !Online || client == nullptr )
 		return LocOrStr(L"?network.state.offline?", L"Network: Offline\n");
 
 	std::wstring states(L"");

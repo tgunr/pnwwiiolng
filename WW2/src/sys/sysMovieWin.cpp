@@ -17,7 +17,7 @@
 #include <control.h>
 #include <evcode.h>
 
-#define SAFE_RELEASE(x) { if (x) x->Release(); x = NULL; }
+#define SAFE_RELEASE(x) { if (x) x->Release(); x = nullptr; }
 
 #define NUMBEROFBUFFERS 3
 #define SOUNDBUFFERTIME 100
@@ -61,7 +61,7 @@ struct sysMovie::platimp
 sysMovie::sysMovie()
 {
 	_platimp = new platimp;
-	CoInitialize(NULL);
+	CoInitialize(nullptr);
 }
 
 sysMovie::~sysMovie()
@@ -110,7 +110,7 @@ void sysMovie::Stop()
 		_platimp->playing = false;
 		_platimp->pMC->Stop();
 		_platimp->pMS->SetPositions(&_platimp->pos, AM_SEEKING_AbsolutePositioning,
-								NULL, AM_SEEKING_NoPositioning);
+								nullptr, AM_SEEKING_NoPositioning);
 		_platimp->pMC->Pause();
 	}
 }
@@ -135,13 +135,13 @@ void sysMovie::Enable(bool toggle)
 		{
 			_platimp->pMC->Stop();
 			_platimp->pMS->SetPositions(&_platimp->pos, AM_SEEKING_AbsolutePositioning,
-								NULL, AM_SEEKING_NoPositioning);
+								nullptr, AM_SEEKING_NoPositioning);
 			_platimp->pMC->Pause();
 		}
 		else
 		{
 			_platimp->pMC->Pause();
-			_platimp->pMS->GetPositions(&_platimp->pos, NULL);
+			_platimp->pMS->GetPositions(&_platimp->pos, nullptr);
 		}
 	}
 }
@@ -164,7 +164,7 @@ sysMovie::platimp::~platimp()
 
 	// Disable video notifications - if needed
 	if (pME)
-		hr = pME->SetNotifyWindow((OAHWND)NULL, 0, 0);
+		hr = pME->SetNotifyWindow((OAHWND)nullptr, 0, 0);
 
 	// Release all media handles
 	SAFE_RELEASE(pME);

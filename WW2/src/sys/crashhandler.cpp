@@ -63,7 +63,7 @@ static void addGenericInfo(std::stringstream& sstr, std::stringstream& miniInfo)
 
 	const TCHAR* pFFI;
 	GetFileVersion(&pFFI);
-	if (pFFI != NULL)
+	if (pFFI != nullptr)
 	{
 		sprintf(s, "File version: %s\n", UTF8(pFFI));
 		sstr << s;

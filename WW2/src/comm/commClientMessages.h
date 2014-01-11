@@ -45,7 +45,7 @@ extern TEUL_CALLBACK*		commSTRAT_DAMAGE;
 
 // sends a simple, no-data message to the host that we are disconnecting.
 //	Usage:
-//		teulSend(Connection,commDISCONNECT,NULL);
+//		teulSend(Connection,commDISCONNECT,nullptr);
 //
 extern TEUL_CALLBACK*		commDISCONNECT;
 

@@ -64,7 +64,7 @@ teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback)
 	}
 	if ( PN_UNLIKELY(callback.m_sendAction == nullptr) )
 	{
-		dbugLog(_FLA, "cant execute NULL callback x:%d y:%d", callback.callX(), callback.callY());
+		dbugLog(_FLA, "cant execute nullptr callback x:%d y:%d", callback.callX(), callback.callY());
 		return -ETEUL_CB_SEND_NULL;
 	}
 

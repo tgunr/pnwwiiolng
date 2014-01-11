@@ -165,10 +165,10 @@ void obpoolKill(void)
 
 	POOL_OBJECT_TO_DIRECTORY * TransTablePtr, *nextPtr;
 
-	if (PoolObjectDirectoryHead.next != NULL)
+	if (PoolObjectDirectoryHead.next != nullptr)
 	{
 		for (TransTablePtr = PoolObjectDirectoryHead.next;
-			TransTablePtr != NULL;
+			TransTablePtr != nullptr;
 			TransTablePtr = nextPtr)
 		{
 			nextPtr = TransTablePtr->next;
@@ -180,7 +180,7 @@ void obpoolKill(void)
 
 	Write_Debug("Pool objects still allocated: %d", numobjused);
 
-	for (lpobj=objused.next ; lpobj != NULL ; lpobj=next)
+	for (lpobj=objused.next ; lpobj != nullptr ; lpobj=next)
 	{
 		next = lpobj->next;
 		obpoolFreeObject((POOLOBJHDR*)lpobj);
@@ -189,10 +189,10 @@ void obpoolKill(void)
 	numobjused = 0;
 	numobjects = 0;
 
-	if (objects != NULL)
+	if (objects != nullptr)
 	{
 		memFree(objects);
-		objects = NULL;
+		objects = nullptr;
 	}
 
    // FreeQueuedObjects();
@@ -209,7 +209,7 @@ void obpoolKill(void)
 POOLOBJHDR* obpoolObjectToPool(OBJECT* lpgrp, FLOAT32 localscale, SINT32 reduce)
 {
 
-	POOLOBJHDR*	lphdr = ScanObjectCallback(lpgrp, NULL, CopyObjectToPool);;
+	POOLOBJHDR*	lphdr = ScanObjectCallback(lpgrp, nullptr, CopyObjectToPool);;
 
 	assert(lpgrp);
 	Write_Debug("Object %s was copied to pool", lpgrp->name);
@@ -272,14 +272,14 @@ static void AddObjectItemToList(OBJECT* o)
 
 static LOGICAL ProcessObjectTree(OBJECT* lpobj, UINT32 setflags, UINT32 setflag2, UINT32 clrflags, UINT32 clrflag2)
 {
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
 
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
-		if (lpobj->sibling != NULL)
+		if (lpobj->sibling != nullptr)
 		{
 			if (!ProcessObjectTree(lpobj->sibling, setflags, setflag2, clrflags, clrflag2))
 			{
@@ -289,7 +289,7 @@ static LOGICAL ProcessObjectTree(OBJECT* lpobj, UINT32 setflags, UINT32 setflag2
 
 		OBJECT* lpatt = lpobj->attached;
 		OBJECT* lptmp;
-		while (lpatt != NULL)
+		while (lpatt != nullptr)
 		{
 			lptmp = lpatt->attached;
 			lpatt->flags |= setflags;
@@ -370,7 +370,7 @@ static void FreeQueuedObjects()
         {
 #ifndef ANDREWTEST
             delete o->modelInstance;
-            o->modelInstance = NULL;
+            o->modelInstance = nullptr;
 #endif
         }
 
@@ -396,7 +396,7 @@ void obpoolFreeObjectFinish()
 {
     FreeQueuedObjects();
 #if SERIALIZED
-    while(objectList.next != NULL)
+    while(objectList.next != nullptr)
     {
         FreeObjectSerialized();
     }
@@ -409,7 +409,7 @@ void obpoolFreeObjectFinish()
 
 LOGICAL obpoolFreeObjectCallback(OBJECT* lpgrp)
 {
-	if (lpgrp == NULL)
+	if (lpgrp == nullptr)
 	{
 		return(FALSE);
 	}
@@ -428,10 +428,10 @@ POOLOBJHDR* obpoolGetNewObject(void)
 POOLOBJHDR*    lphdr;
 
 	lphdr = (POOLOBJHDR*)listGetItem((LISTHEADER*)&objfree);
-	if (lphdr == NULL)
+	if (lphdr == nullptr)
 	{
 		Write_Debug("[obpoolGetNewObject] No more storage available for objects!");
-		return(NULL);
+		return(nullptr);
 	}
 
 	numobjused += 1;
@@ -455,7 +455,7 @@ POOLOBJHDR*	lphdr;
 POOLOBJ*		lppool;
 
 	lphdr = (POOLOBJHDR*)objused.next;
-	while (lphdr != NULL)
+	while (lphdr != nullptr)
 	{
 		lppool = lphdr->pool;
 		// search only the topmost objects in the list
@@ -473,7 +473,7 @@ POOLOBJ*		lppool;
 		lphdr = (POOLOBJHDR*)lphdr->next;
 	}
 
-	return(NULL);
+	return(nullptr);
 }
 
 
@@ -486,13 +486,13 @@ POOLOBJHDR* obpoolCopyObject(POOLOBJ* lpcopy)
 POOLOBJHDR*	lphdr;
 
 	lphdr = obpoolGetNewObject();
-	if (lphdr == NULL)
+	if (lphdr == nullptr)
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
 	lphdr->pool =(POOLOBJ*)memAlloc(lpcopy->size);
-	if(lphdr->pool != NULL)
+	if(lphdr->pool != nullptr)
 	{
 		memcpy(lphdr->pool, lpcopy, lpcopy->size);
 	}
@@ -508,9 +508,9 @@ POOLOBJHDR* obpoolCopyNamedObject(char* name)
 POOLOBJHDR*	lphdr;
 
 	lphdr = obpoolFindNamedObject(name);
-	if (lphdr == NULL)
+	if (lphdr == nullptr)
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
 	return(obpoolCopyObject(lphdr->pool));
@@ -523,7 +523,7 @@ POOLOBJHDR*	lphdr;
 // number of used objects in the pool.
 SINT32 obpoolGetObjects(POOLOBJ* *lpobj)
 {
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(-1);
 	}
@@ -542,7 +542,7 @@ LOGICAL obpoolGetObjectSize(int* objsize, OBJECT* lpobj)
 {
 int		os;
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -587,13 +587,13 @@ int		os;
 		os += SIZEOF_DOF;
 	}
 
-	if (lpobj->comment != NULL)
+	if (lpobj->comment != nullptr)
 	{
 		// Add the strlen + null byte 4 byte aligned (+3&~3)
 		os += (strlen(lpobj->comment) + 1 + 3) & ~3;
 	}
 
-	if (lpobj->lpspare != NULL)
+	if (lpobj->lpspare != nullptr)
 	{
 		os += *(SINT32*)lpobj->lpspare;
 	}
@@ -613,7 +613,7 @@ LOGICAL obpoolFreeObject(POOLOBJHDR* lphdr)
 {
 POOLOBJ*	lppool;
 
-	if (lphdr == NULL)
+	if (lphdr == nullptr)
 	{
 		return(FALSE);
 	}
@@ -622,7 +622,7 @@ POOLOBJ*	lppool;
 
 	lppool = lphdr->pool;
 
-	if (lppool == NULL)
+	if (lppool == nullptr)
 	{
 		return(FALSE);
 	}
@@ -653,13 +653,13 @@ LOGICAL obpoolPoolOffsetsCallback(POOLOBJHDR* lpgrp, POOLOBJHDR* lpparent, UINT3
 	POOLOBJHDR*	lplast;
 	UINT32			offset;
 
-	if (lpgrp == NULL)
+	if (lpgrp == nullptr)
 	{
 		return(FALSE);
 	}
 
 	offset = lpgrp->pool->size;
-	if (lpparent != NULL)
+	if (lpparent != nullptr)
 	{
 		lpparent->pool->sibling = lpparent->pool->size;
 	}
@@ -667,9 +667,9 @@ LOGICAL obpoolPoolOffsetsCallback(POOLOBJHDR* lpgrp, POOLOBJHDR* lpparent, UINT3
 	lpparent = lpgrp;
 
 	lpobj = lpgrp;
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
-		if (lpobj->sibling != NULL)
+		if (lpobj->sibling != nullptr)
 		{
 			if (!obpoolPoolOffsetsCallback(lpobj->sibling, lpobj, &offset))
 			{
@@ -677,12 +677,12 @@ LOGICAL obpoolPoolOffsetsCallback(POOLOBJHDR* lpgrp, POOLOBJHDR* lpparent, UINT3
 			}
 		}
 
-		if (lpobj->attached != NULL)
+		if (lpobj->attached != nullptr)
 		{
 			lpobj->pool->attached = offset;
 			lplast = lpobj;
 			lpatt = lpobj->attached;
-			while (lpatt != NULL)
+			while (lpatt != nullptr)
 			{
 				if (lplast->pool->attached == 0)
 				{
@@ -696,7 +696,7 @@ LOGICAL obpoolPoolOffsetsCallback(POOLOBJHDR* lpgrp, POOLOBJHDR* lpparent, UINT3
 		}
 
 		lplast = lpobj->child;
-		if (lplast != NULL)
+		if (lplast != nullptr)
 		{
 			lpobj->pool->child = offset;
 			offset += lpobj->pool->size;
@@ -723,7 +723,7 @@ LOGICAL obpoolSavePoolCallback(POOLOBJHDR* lpgrp, int hfile)
 	POOLOBJHDR*	lpatt;
 	POOLOBJHDR*	lplast;
 
-	if (lpgrp == NULL)
+	if (lpgrp == nullptr)
 	{
 		return(FALSE);
 	}
@@ -731,9 +731,9 @@ LOGICAL obpoolSavePoolCallback(POOLOBJHDR* lpgrp, int hfile)
 	SavePool(hfile, lpgrp->pool);
 
 	lpobj = lpgrp;
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
-		if (lpobj->sibling != NULL)
+		if (lpobj->sibling != nullptr)
 		{
 			if (!obpoolSavePoolCallback(lpobj->sibling, hfile))
 			{
@@ -741,11 +741,11 @@ LOGICAL obpoolSavePoolCallback(POOLOBJHDR* lpgrp, int hfile)
 			}
 		}
 
-		if (lpobj->attached != NULL)
+		if (lpobj->attached != nullptr)
 		{
 			lplast = lpobj;
 			lpatt = lpobj->attached;
-			while (lpatt != NULL)
+			while (lpatt != nullptr)
 			{
 				SavePool(hfile, lpatt->pool);
 				lplast = lpatt;
@@ -754,7 +754,7 @@ LOGICAL obpoolSavePoolCallback(POOLOBJHDR* lpgrp, int hfile)
 		}
 
 		lplast = lpobj->child;
-		if (lplast != NULL)
+		if (lplast != nullptr)
 		{
 			SavePool(hfile, lplast->pool);
 		}
@@ -780,7 +780,7 @@ static POOLOBJHDR* ScanObjectCallback(OBJECT* lpgrp, POOLOBJHDR* lpparent, SCANO
 	assert(lpgrp);
 
 	callfunc(lpgrp, &lproot);
-	if (lpparent != NULL)
+	if (lpparent != nullptr)
 	{
 		lpparent->sibling = lproot;
 	}
@@ -789,21 +789,21 @@ static POOLOBJHDR* ScanObjectCallback(OBJECT* lpgrp, POOLOBJHDR* lpparent, SCANO
 	lpparent = lproot;
 
 	OBJECT* lpobj = lpgrp;
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
-		if (lpobj->sibling != NULL)
+		if (lpobj->sibling != nullptr)
 		{
 			if(!ScanObjectCallback(lpobj->sibling, lpparent, callfunc))
 			{
-				return(NULL);
+				return(nullptr);
 			}
 		}
 
 		lplast = lproot;
-		if (lpobj->attached != NULL)
+		if (lpobj->attached != nullptr)
 		{
 			OBJECT* lpatt = lpobj->attached;
-			while (lpatt != NULL)
+			while (lpatt != nullptr)
 			{
 				callfunc(lpatt, &lphdr);
 				lplast->attached = lphdr;
@@ -813,7 +813,7 @@ static POOLOBJHDR* ScanObjectCallback(OBJECT* lpgrp, POOLOBJHDR* lpparent, SCANO
 		}
 
 		lpobj = lpobj->child;
-		if (lpobj != NULL)
+		if (lpobj != nullptr)
 		{
 			callfunc(lpobj, &lproot);
 			lpparent->child = lproot;
@@ -856,7 +856,7 @@ static LOGICAL CopyObjectToPool(OBJECT* lpobj, POOLOBJHDR** lpret)
 	}
 
 	lphdr = obpoolGetNewObject();
-	if (lphdr == NULL)
+	if (lphdr == nullptr)
 	{
 		return(FALSE);
 	}
@@ -890,7 +890,7 @@ static LOGICAL CopyObjectToPool(OBJECT* lpobj, POOLOBJHDR** lpret)
 		{
 			memset(objdata->matname, 0, 32);
 
-            MATERIAL* materials = NULL;
+            MATERIAL* materials = nullptr;
             piGetMaterials(&materials);
 
             int id = oglFindMaterialName(lpobj->matname);
@@ -1011,7 +1011,7 @@ static LOGICAL CopyObjectToPool(OBJECT* lpobj, POOLOBJHDR** lpret)
 		ptr += elemsize;
 	}
 
-	if (lpobj->comment != NULL)
+	if (lpobj->comment != nullptr)
 	{
 		elemsize = (strlen(lpobj->comment) + 1 + 3) & ~3;	// fast 4 byte align (+3&~3)
 		memcpy(ptr, lpobj->comment, elemsize);
@@ -1020,7 +1020,7 @@ static LOGICAL CopyObjectToPool(OBJECT* lpobj, POOLOBJHDR** lpret)
 		ptr += elemsize;
 	}
 
-	if (lpobj->lpspare != NULL)
+	if (lpobj->lpspare != nullptr)
 	{
 		elemsize = *(SINT32*)lpobj->lpspare;
 		if (elemsize != 0)

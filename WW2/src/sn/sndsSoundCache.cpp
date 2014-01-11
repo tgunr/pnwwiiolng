@@ -43,12 +43,12 @@ static LPSOUNDCACHE GetNewSound(void)
 {
     // Not an error
     if(bSoundEnable == FALSE)
-        return NULL;
+        return nullptr;
 
     if(g_sndFree.empty())
     {
         Write_Log(LOG_SOUND, LOG_WARN, "[GetNewSound] ** FAILED ** ");
-        return NULL;
+        return nullptr;
     }
 
     LPSOUNDCACHE lpS = g_sndFree.front();
@@ -65,7 +65,7 @@ static LPSOUNDCACHE GetNewSound(void)
 ////////////////////////////////////////////////////////
 static LOGICAL FreeSound(LPSOUNDCACHE lpSnd)
 {
-    if(lpSnd == NULL)
+    if(lpSnd == nullptr)
         return FALSE;
 
     if(numsndused <= 0)
@@ -102,7 +102,7 @@ static LPSOUNDCACHE FindNamedSound(SCHAR* pszName)
 
     if(hashFind == g_hashSnd.end())
     {
-        return NULL;
+        return nullptr;
     }
 
     return hashFind->second;
@@ -187,11 +187,11 @@ void sndsKillCache(void)
 static LPSOUNDCACHE _preloadSoundCache(const SCHAR* name)
 {
 #if XAUDIO
-    return NULL;
+    return nullptr;
 #else
     LPSOUNDCACHE sc = FindNamedSound((char*)name);
 
-    if(sc != NULL)
+    if(sc != nullptr)
     {
         // Already cached
         return sc;
@@ -351,7 +351,7 @@ LOGICAL sndsPreloadSoundCache(const SCHAR* name, float maxattenuation)
     std::replace(str.begin(), str.end(), '\\', '/');
     strcpy(newSound->name, str.c_str());
 
-    if(!sndsPlatformCreateSound(NULL, newSound))
+    if(!sndsPlatformCreateSound(nullptr, newSound))
         return FALSE;
 
     return TRUE;
@@ -392,7 +392,7 @@ LOGICAL sndsReleaseSoundInCache(snSound* oldSound)
     return TRUE;
 #else
     LOGICAL bReturn = FALSE;
-    LPSOUNDCACHE lpSnd = NULL;
+    LPSOUNDCACHE lpSnd = nullptr;
 
     // Not an error
     if(bSoundEnable == FALSE)
@@ -400,7 +400,7 @@ LOGICAL sndsReleaseSoundInCache(snSound* oldSound)
 
     lpSnd = FindNamedSound(oldSound->name);
 
-    if(lpSnd != NULL)
+    if(lpSnd != nullptr)
 	{
         // numuses only incremented on duplicates. Original is 0.
         if(lpSnd->numuses <= 0)

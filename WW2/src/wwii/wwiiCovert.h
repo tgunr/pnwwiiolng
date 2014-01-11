@@ -295,7 +295,7 @@ private:
 		bool allocateFeint = (rand() & 1);
  #endif
 
-		UINT64* feint = NULL;
+		UINT64* feint = nullptr;
 		try
 		{
 			if ( allocateFeint == true )

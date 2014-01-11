@@ -679,9 +679,9 @@ piMATRIX*		lpmat;
 	dz = zmx - zmn;
 
 	lpobj = lpmain;
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
-		if (lpobj->sibling != NULL)
+		if (lpobj->sibling != nullptr)
 		{
 			if (!IterateShadow(lpobj->sibling, lpshad, calclv, lp, lv, color, lppisd))
 			{
@@ -696,7 +696,7 @@ piMATRIX*		lpmat;
 		}
 
 		lpatt = lpobj;
-		while (lpatt != NULL)
+		while (lpatt != nullptr)
 		{
 			piVectorConstPtr ipos = lpatt->ImmutablePositions();
 			piVertexColorConstPtr ic = lpatt->ImmutableColors();
@@ -796,13 +796,13 @@ LIGHT*			lplite;
 		return(TRUE);
 	}
 
-	if (lpmain == NULL)
+	if (lpmain == nullptr)
 	{
 		return(FALSE);
 	}
 
 	lplite = obdliteFindDynaLight("sun");
-	if (lplite == NULL)
+	if (lplite == nullptr)
 	{
 		// No sun, no light, no error
 		return(TRUE);
@@ -924,7 +924,7 @@ piMATRIX		mat;
 	piVertexColorPtr sc = lpshad->StaticColors();
 	piTexCoordPtr stex = lpshad->StaticTexCoords();
 
-	if(spos.ptr == NULL) return FALSE;
+	if(spos.ptr == nullptr) return FALSE;
 
 	ptris		= lpshad->ptris;
 
@@ -1000,7 +1000,7 @@ piMATRIX		mat;
         trncdIgnoreTreeCollide(true);
 
 		if (!trncdCollideDownMediumList(&oldpos, &newpos))
-		//if (!trncdObjectToTerrain(NULL, &oldpos, &newpos))
+		//if (!trncdObjectToTerrain(nullptr, &oldpos, &newpos))
 		{
 			lpshad->flags |= OBJECT_SKIPDRAWING;
 			return(FALSE);
@@ -1066,7 +1066,7 @@ static int        number=0;
 	}
 
 	sun = obdliteFindDynaLight("sun");
-	if (sun == NULL)
+	if (sun == nullptr)
 	{
 		return(TRUE);
 	}
@@ -1085,13 +1085,13 @@ static int        number=0;
 
 	shadcnt = 0;
 	lpobj = obmainGetFirstTopmostObject();
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		// No objects, no error
 		return(TRUE);
 	}
 
-    for(; lpobj !=  NULL; lpobj = obmainGetNextTopmostObject(lpobj))
+    for(; lpobj !=  nullptr; lpobj = obmainGetNextTopmostObject(lpobj))
     {
 		if ((lpobj->flag2 & OBJECT_IS_PARTOF_VEHICLE) &&
 			(!(lpobj->flags & OBJECT_TERRAIN)) &&

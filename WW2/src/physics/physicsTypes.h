@@ -21,7 +21,7 @@ public:
 
 	virtual void BeginStep() = 0;
 	virtual void EndStep() = 0;
-	virtual bool ProcessFlag(unsigned int flag, physicsObject* o = NULL){ return false; }
+	virtual bool ProcessFlag(unsigned int flag, physicsObject* o = nullptr){ return false; }
 	virtual void OnRemove() {}
 };
 
@@ -196,7 +196,7 @@ public:
 
 	void makeCapsuleColliderFromObject(struct OBJECT*, FLOAT32 scaler = 1.0f);	// aligned with z
 	void makeBoxColliderFromObject(struct OBJECT*, FLOAT32 scaler = 1.0f);
-	void makeMeshColliderFromObject(struct OBJECT*, FLOAT64VECTOR* offset = NULL);
+	void makeMeshColliderFromObject(struct OBJECT*, FLOAT64VECTOR* offset = nullptr);
 
 	dMass const* getMass() const;
 
@@ -284,9 +284,9 @@ public:
 	}
 
 	// sub classes override for some specific source object type
-	//virtual int create(void* o, piMATRIX* transform = NULL){ return -1;}
+	//virtual int create(void* o, piMATRIX* transform = nullptr){ return -1;}
 
-	int createMesh(const void* Vertices, int VStride, int VCount, const void* Indices, int IStride, int ICount, void* userdata, piMATRIX* transform = NULL);
+	int createMesh(const void* Vertices, int VStride, int VCount, const void* Indices, int IStride, int ICount, void* userdata, piMATRIX* transform = nullptr);
 	int createCapsule(float radius, float len);
 	int createSphere(float radius);
 	int createBox(float lx, float ly, float lz);
@@ -318,10 +318,10 @@ public:
 		if(index >= 0 && index < (int)_geom.size())
 			return _geom.at(index).geom;
 
-		return NULL;
+		return nullptr;
 	}
 
-	static UINT32 DetermineCategory(UINT32 cat, const char* path, const char* comments = NULL, int texid = -1);
+	static UINT32 DetermineCategory(UINT32 cat, const char* path, const char* comments = nullptr, int texid = -1);
 	static UINT32 DetermineCategory(UINT32 cat, OBJECT* o);
 
 protected:
@@ -344,7 +344,7 @@ public:
 	{
 	}
 
-	virtual int create(struct PoolNode* n, piMATRIX* transform = NULL);
+	virtual int create(struct PoolNode* n, piMATRIX* transform = nullptr);
 
 	// the poolnode we represent
 	struct PoolNode* node;
@@ -356,7 +356,7 @@ public:
 	physicsObjectCollider(dSpaceID space, UINT32 cat = COLLIDER_ALL, UINT32 col = COLLIDER_ALL);
 	virtual ~physicsObjectCollider();
 
-	virtual int create(OBJECT* o, piMATRIX* transform = NULL);
+	virtual int create(OBJECT* o, piMATRIX* transform = nullptr);
 };
 
 // this type of collider wraps a pool node collider
@@ -366,7 +366,7 @@ public:
 	physicsTransformCollider(dSpaceID space, UINT32 cat = COLLIDER_ALL, UINT32 col = COLLIDER_ALL);
 	virtual ~physicsTransformCollider();
 
-	virtual int create(OBJECT* o, piMATRIX* transform = NULL);
+	virtual int create(OBJECT* o, piMATRIX* transform = nullptr);
 
 protected:
 
@@ -382,7 +382,7 @@ public:
 	virtual ~physicsShearedCollider();
 
 	virtual void updateTransform(piMATRIX const&);
-	virtual int create(OBJECT* o, piMATRIX* transform = NULL);
+	virtual int create(OBJECT* o, piMATRIX* transform = nullptr);
 
 protected:
 

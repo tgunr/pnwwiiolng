@@ -27,7 +27,7 @@
 #define CAMERA_THRESHOLD 1
 
 // current manager, could be null
-static EZManager* _ezMgr = NULL;
+static EZManager* _ezMgr = nullptr;
 
 // static functions
 
@@ -766,7 +766,7 @@ void EZManager::AdjustCamera(Vec3d& camPos, Vec3d& aimPos)
 		// the closest hist to work with
 
 		const colliderQuery::CollisionList& hits = _collider.getCollisions();
-		const colliderQuery::Collision* closest = NULL;
+		const colliderQuery::Collision* closest = nullptr;
 
 		for(size_t i = 0; i < hits.size(); i++)
 		{
@@ -854,7 +854,7 @@ bool EZManager::CreateManager(vehVehicle* v)
 		}
 
 		delete _ezMgr;
-		_ezMgr = NULL;
+		_ezMgr = nullptr;
 	}
 
 	return false;
@@ -865,7 +865,7 @@ void EZManager::FreeManager()
 	if(_ezMgr)
 		delete _ezMgr;
 
-	_ezMgr = NULL;
+	_ezMgr = nullptr;
 }
 
 void EZManager::EZCamera::EZAxis::Clamp()
@@ -1015,8 +1015,8 @@ bool EZManager::EZTurret::FindMount()
 	if(mount) return true;
 	if(!vehicle) return false;
 
-	mlWeaponMount* weapMount = NULL;
-	mlComponent* component = NULL;
+	mlWeaponMount* weapMount = nullptr;
+	mlComponent* component = nullptr;
 
 	if(vehicle->ModelData->ComponentList)
 	{
@@ -1044,7 +1044,7 @@ bool EZManager::EZTurret::FindMount()
 		}
 	}
 
-	return (mount != NULL);
+	return (mount != nullptr);
 }
 
 void EZManager::EZTurret::PreUpdate()
@@ -1442,7 +1442,7 @@ void EZManager::EZTurret::Unload()
 bool EZManager::EZView::Load()
 {
 	persSetPersonaPositionCallback(1, IMAP_MOM_POSITION_1 + position, 0);
-	persSetExternalCameraAdjuster(NULL);
+	persSetExternalCameraAdjuster(nullptr);
 
 	switch(view)
 	{

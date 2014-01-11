@@ -25,10 +25,10 @@ Description:
 
 #define MAX_TRANSFORMS  4096
 
-static ParticleMgr* _particlemgr = NULL;
+static ParticleMgr* _particlemgr = nullptr;
 
 typedef std::set<TransformEffect*> TransformList;
-static TransformEffect* TxEffects = NULL;
+static TransformEffect* TxEffects = nullptr;
 
 static TransformList updatelist;
 static TransformList removelist;
@@ -233,7 +233,7 @@ void KillFxSystem()
     if(_particlemgr)
     {
         delete _particlemgr;
-        _particlemgr = NULL;
+        _particlemgr = nullptr;
     }
 
     DataFxKill();
@@ -241,7 +241,7 @@ void KillFxSystem()
     if(TxEffects)
     {
         delete[] TxEffects;
-        TxEffects = NULL;
+        TxEffects = nullptr;
     }
 
     Write_Log(LOG_OLD, LOG_INFO, "[KillFxSystem]");
@@ -272,7 +272,7 @@ void UpdateFxSystem()
 
     TransformList::iterator itr;
 
-    TransformEffect* te = NULL;
+    TransformEffect* te = nullptr;
 
     for(itr = removelist.begin(); itr != removelist.end(); ++itr)
     {
@@ -320,19 +320,19 @@ void TransformEffect::reset()
     _dragcoef = 0.0f;
     _dir = Vec3f(0, 0, -1);
     _isenabled = false;
-    _stratobj = NULL;
+    _stratobj = nullptr;
     _emittername = "noname";
     _effectname = "noname";
-    _txobject = NULL;
-    _to = NULL;
-    _weapammo = NULL;
+    _txobject = nullptr;
+    _to = nullptr;
+    _weapammo = nullptr;
     _dead = false;
     _lastwooffset = Vec3d(WorldOriginOffset);
-    _state = NULL;
+    _state = nullptr;
     _enablestatevalue = 0;
     _lastdamagelevel = -1;
-    _vehicle = NULL;
-    _updatecallback = NULL;
+    _vehicle = nullptr;
+    _updatecallback = nullptr;
 }
 
 /*----------------------------------------------------------------------
@@ -514,7 +514,7 @@ void ApplyWingVortex(struct vehVehicle* v)
 
     for(int i = 0; i < 2; i++)
     {
-        if(v->StateAnimation.WingtipVortexEmitter[i] == NULL)
+        if(v->StateAnimation.WingtipVortexEmitter[i] == nullptr)
             continue;
 
         te = TransformEffect::AddEffect("wingtipvortex", Vec3f(0, 0, 0), 0, v->StateAnimation.WingtipVortexEmitter[i]);
@@ -539,7 +539,7 @@ void ApplyGlycolLeak(struct vehVehicle* v)
     {
         for(int j = 0; j < ML_MAX_RADIATORS_PER_ENGINE; j++)
         {
-            if(v->StateAnimation.GlycolLeakSmokeEmitter[i][j] == NULL)
+            if(v->StateAnimation.GlycolLeakSmokeEmitter[i][j] == nullptr)
                 continue;
 
             te = TransformEffect::AddEffect("glycolleak1", Vec3f(0, 0, 0), 0, v->StateAnimation.GlycolLeakSmokeEmitter[i][j]);
@@ -563,7 +563,7 @@ void ApplyOilLeak(struct vehVehicle* v)
 
     for(int i = 0; i < ML_MAX_ENGINES; i++)
     {
-        if(v->StateAnimation.OilLeakSmokeEmitter[i] == NULL)
+        if(v->StateAnimation.OilLeakSmokeEmitter[i] == nullptr)
             continue;
 
         te = TransformEffect::AddEffect("oilleak1", Vec3f(0, 0, 0), 0, v->StateAnimation.OilLeakSmokeEmitter[i]);
@@ -588,7 +588,7 @@ void ApplyExhaust(struct vehVehicle* v)
     {
         for(int j = 0; j < 2; j++)
         {
-            if(v->StateAnimation.ExhaustSmokeEmitter[i][j] == NULL)
+            if(v->StateAnimation.ExhaustSmokeEmitter[i][j] == nullptr)
                 continue;
 
             te = TransformEffect::AddEffect("exhaust1", Vec3f(0, 0, 0), 0, v->StateAnimation.ExhaustSmokeEmitter[i][j]);
@@ -612,7 +612,7 @@ void ApplyFuelLeak(struct vehVehicle* v)
 
     for(int i = 0; i < ML_MAX_FUELTANKS; i++)
     {
-        if(v->StateAnimation.FuelLeakSmokeEmitter[i] == NULL)
+        if(v->StateAnimation.FuelLeakSmokeEmitter[i] == nullptr)
             continue;
 
         te = TransformEffect::AddEffect("fuelleak1", Vec3f(0, 0, 0), 0, v->StateAnimation.FuelLeakSmokeEmitter[i]);
@@ -635,7 +635,7 @@ void ApplyEngineFire(struct vehVehicle* v)
 
     for(int i = 0; i < ML_MAX_ENGINES; i++)
     {
-        if(v->StateAnimation.EngineFireEmitter[i] == NULL)
+        if(v->StateAnimation.EngineFireEmitter[i] == nullptr)
             continue;
 
         te = TransformEffect::AddEffect("enginefire1", Vec3f(0, 0, 0), 0, v->StateAnimation.EngineFireEmitter[i]);
@@ -671,7 +671,7 @@ void ApplyTankFire(struct vehVehicle* v)
 						        v->VehicleObjectData->EffectsObject,
 						        s);
 
-        if(v->StateAnimation.TankFireEmitterPoint[i] == NULL)
+        if(v->StateAnimation.TankFireEmitterPoint[i] == nullptr)
             continue;
 
         te = TransformEffect::AddEffect("tankfire", Vec3f(0, 0, -1), 0, v->StateAnimation.TankFireEmitterPoint[i]);
@@ -712,7 +712,7 @@ void ApplySpecial(struct vehVehicle* v)
             "rscrew"
         };
 
-        OBJECT* o = NULL;
+        OBJECT* o = nullptr;
 
         // Ship screws
         for(int i = 0; i < 2; i++)
@@ -736,7 +736,7 @@ void ApplySpecial(struct vehVehicle* v)
     {
         for(int i = 0; i < VEH_MAX_TREAD_DUST; i++)
         {
-            if(v->StateAnimation.TreadDustEmitter[i] == NULL)
+            if(v->StateAnimation.TreadDustEmitter[i] == nullptr)
                 continue;
 
             if(!strncmp(v->StateAnimation.TreadDustEmitter[i]->name, "tdustl1", 7) ||
@@ -765,7 +765,7 @@ void ApplySpecial(struct vehVehicle* v)
     {
         for(int i = 0; i < VEH_MAX_TREAD_DUST; i++)
         {
-            if(v->StateAnimation.TreadDustEmitter[i] == NULL)
+            if(v->StateAnimation.TreadDustEmitter[i] == nullptr)
                 continue;
 
             if(!strncmp(v->StateAnimation.TreadDustEmitter[i]->name, "tdustl1", 7) ||
@@ -819,7 +819,7 @@ void ApplyTreadDust(struct vehVehicle* v)
 
     for(int i = 0; i < VEH_MAX_TREAD_DUST; i++)
     {
-        if(v->StateAnimation.TreadDustEmitter[i] == NULL)
+        if(v->StateAnimation.TreadDustEmitter[i] == nullptr)
             continue;
 
         if(v->VehicleType->Type == VEH_TYPE_SEA)
@@ -852,7 +852,7 @@ void ApplyDebris(struct vehVehicle* v)
 
     for(int i = 0; i < VEH_MAX_DEBRIS_POINTS; i++)
     {
-        if(v->StateAnimation.DebrisEmitter[i] == NULL)
+        if(v->StateAnimation.DebrisEmitter[i] == nullptr)
             continue;
 
         te = TransformEffect::AddEffect("manydebris", Vec3f(0, 0, 0), 0, v->StateAnimation.DebrisEmitter[i]);
@@ -902,7 +902,7 @@ void TransformEffect::Apply(struct trnAutoGun* autogun)
     {
         if(autogun->Weapon->WeaponType->muzzleflash[0])
         {
-            TransformEffect* te = NULL;
+            TransformEffect* te = nullptr;
 
             te = TransformEffect::AddEffect(autogun->Weapon->WeaponType->muzzleflash, Vec3f(0, 0, 0), 0, autogun->FirePnt);
 
@@ -945,7 +945,7 @@ void TransformEffect::Apply(struct trnCDTerrainObject* to)
 
     for(int i = 0; i < TRN_MAX_LOD; i++)
     {
-        if(to->LOD[i] == NULL)
+        if(to->LOD[i] == nullptr)
         {
             continue;
         }
@@ -1012,7 +1012,7 @@ void TransformEffect::Apply(struct trnCDTerrainObject* to)
 
     for(int i = 0; i < TRN_MAX_LOD; i++)
     {
-        if(to->LOD[i] == NULL)
+        if(to->LOD[i] == nullptr)
         {
             continue;
         }
@@ -1117,7 +1117,7 @@ void TransformEffect::Apply(struct trnCDTerrainObject* to)
 
                     if(p)
                     {
-                        TransformEffect* te = NULL;
+                        TransformEffect* te = nullptr;
                         te = TransformEffect::AddEffect(p, Vec3f(0, 0, -1), 0, o2);
 
                         if(te)
@@ -1141,7 +1141,7 @@ Description:
 -----------------------------------------------------------------------*/
 TransformEffect* TransformEffect::AddTracer(const weapAmmo* ammo, const char* effect)
 {
-    TransformEffect* te = TransformEffect::AddEffect(effect, Vec3f(float(ammo->Velocity.x), float(ammo->Velocity.y), float(-ammo->Velocity.z)), 0, NULL);
+    TransformEffect* te = TransformEffect::AddEffect(effect, Vec3f(float(ammo->Velocity.x), float(ammo->Velocity.y), float(-ammo->Velocity.z)), 0, nullptr);
 	if(te)
     {
         te->setweapammo(ammo);
@@ -1160,7 +1160,7 @@ TransformEffect* TransformEffect::AddTargetAim(const char* effect)
     TransformEffect* te = GetFreeTransform();
     if(!te)
     {
-        return NULL;
+        return nullptr;
     }
 
     if(!te->allocateparticles(effect, max_trajectory_steps))
@@ -1214,10 +1214,10 @@ TransformEffect* TransformEffect::AddEffect(const char* effect,
 
     if(!fx)
     {
-        return NULL;
+        return nullptr;
     }
 
-    TransformEffect* te = NULL;
+    TransformEffect* te = nullptr;
 
     if(fx->flags & transform_is_standalone)
     {
@@ -1231,7 +1231,7 @@ TransformEffect* TransformEffect::AddEffect(const char* effect,
 
     if(!te)
     {
-        return NULL;
+        return nullptr;
     }
 
     if(te->addemittereffect(effect, n, lifetime, state))
@@ -1244,7 +1244,7 @@ TransformEffect* TransformEffect::AddEffect(const char* effect,
         FreeTransform(te);
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /*----------------------------------------------------------------------
@@ -1259,10 +1259,10 @@ TransformEffect* TransformEffect::AddStandAloneEffect(const char* effect,
 
     if(!te)
     {
-        return NULL;
+        return nullptr;
     }
 
-    if(te->addemittereffect(effect, Vec3f(0, 0, 0), lifetime, NULL))
+    if(te->addemittereffect(effect, Vec3f(0, 0, 0), lifetime, nullptr))
     {
         TransformFx* fx = FxGet().gettransformeffect(effect);
 
@@ -1339,7 +1339,7 @@ TransformEffect* TransformEffect::AddStandAloneEffect(const char* effect,
         FreeTransform(te);
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /*----------------------------------------------------------------------
@@ -1356,7 +1356,7 @@ TransformEffect* TransformEffect::CreateEffect(const char* effect,
 
     if(!te)
     {
-        return NULL;
+        return nullptr;
     }
 
     if(te->createemittereffect(effect, n, lifetime, state, numemitters))
@@ -1370,7 +1370,7 @@ TransformEffect* TransformEffect::CreateEffect(const char* effect,
         FreeTransform(te);
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /*----------------------------------------------------------------------
@@ -1413,10 +1413,10 @@ bool TransformEffect::allocateparticles(const char* effect, int numparticles)
 
     if(!fx)
     {
-        return NULL;
+        return nullptr;
     }
 
-    Particle2* part = NULL;
+    Particle2* part = nullptr;
 
     unsigned int q;
 
@@ -1426,7 +1426,7 @@ bool TransformEffect::allocateparticles(const char* effect, int numparticles)
 
         if(!part)
         {
-            return NULL;
+            return nullptr;
         }
 
         link(part);
@@ -1463,15 +1463,15 @@ bool TransformEffect::addtracer(const weapAmmo* ammo)
 
     if(!fx)
     {
-        return NULL;
+        return nullptr;
     }
 
     if(fx->number.empty())
     {
-        return NULL;
+        return nullptr;
     }
 
-    Particle2* part = NULL;
+    Particle2* part = nullptr;
 
     unsigned int size = fx->number.size();
 
@@ -1486,7 +1486,7 @@ bool TransformEffect::addtracer(const weapAmmo* ammo)
 
         if(!part)
         {
-            return NULL;
+            return nullptr;
         }
 
         _particles.push_back(part);

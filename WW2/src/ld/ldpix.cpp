@@ -90,7 +90,7 @@ struct GFX_FORMATS
  //               {"tga",ldtgaLoadTGAFileToSurface},
  //               {"tif",ldtifLoadTIFFFileToSurface},
  //               {"tiff",ldtifLoadTIFFFileToSurface},
-                {"",NULL}
+                {"",nullptr}
                };
 
 static LOGICAL reduceTextures = FALSE;
@@ -133,9 +133,9 @@ static void _checkTexture(int texid)
 
 		const char* name = t->name;
 		UINT32 ts = t->imageheight[0] * t->imagewidth[0];
-		const char* ptr = NULL;
+		const char* ptr = nullptr;
 
-		while((ptr = strstr(name, "\\")) != NULL)
+		while((ptr = strstr(name, "\\")) != nullptr)
 		{
 			name = ptr + 1;
 		}
@@ -219,7 +219,7 @@ SINT32		t1, t2, t3, t4;
 		}
 	}
 
-	if (GfxFormats[i].Routine == NULL)
+	if (GfxFormats[i].Routine == nullptr)
 	{
 		Write_Debug("Texture file not found: %s", localname);
 		return(-1);
@@ -1105,7 +1105,7 @@ piRGBQUAD PalColor;
   if (lppisd->PixelFormat.dwRGBBitCount <= 8)
   {
     cptr = (char*)lppisd->Surface + offset;
-    if (pal == NULL)
+    if (pal == nullptr)
     {
       for (i=0; i < height; i++)
       {
@@ -1157,7 +1157,7 @@ piRGBQUAD PalColor;
   if (lppisd->PixelFormat.dwRGBBitCount <= 16)
   {
     sptr = (short*)lppisd->Surface + offset;
-    if (pal == NULL)
+    if (pal == nullptr)
     {
       for (i=0; i < height; i++)
       {
@@ -1211,7 +1211,7 @@ piRGBQUAD PalColor;
   if (lppisd->PixelFormat.dwRGBBitCount <= 32)
   {
     lptr = (long*)lppisd->Surface + offset;
-    if (pal == NULL)
+    if (pal == nullptr)
     {
       for (i=0; i < height; i++)
       {
@@ -1271,9 +1271,9 @@ UCHAR*	outbits, *tmpbits;
 int		i, j;
 
 	outbits = (UCHAR*)memAlloc(width * 3 * height);
-	if (outbits == NULL)
+	if (outbits == nullptr)
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
 	tmpbits = outbits;
@@ -1457,9 +1457,9 @@ short*		sptr1, *sptr2;
 long*		lptr1, *lptr2;
 int			i, j, width, height;
 
-	if (lppisd1 == NULL || lppisd2 == NULL)
+	if (lppisd1 == nullptr || lppisd2 == nullptr)
 	{
-		Write_Debug("Surface's descriptor is NULL");
+		Write_Debug("Surface's descriptor is nullptr");
 		return(FALSE);
 	}
 

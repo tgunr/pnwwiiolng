@@ -1473,7 +1473,7 @@ void Texture::generateMipmap() const
     TextureObject* textureObject = getTextureObject(contextID);
 
     // if not initialized before, then do nothing
-    if(textureObject == NULL) return;
+    if(textureObject == nullptr) return;
 
     _texMipmapGenerationDirtyList[contextID] = 0;
 
@@ -1710,7 +1710,7 @@ extern "C" void stopcollection();
 void Texture::Extensions::CompressedTexImage2D(GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid* data) const
 {
 #ifdef TESTMAC
-  //startcollection(NULL);
+  //startcollection(nullptr);
 #endif
   if(glCompressedTexImage2D)
     {

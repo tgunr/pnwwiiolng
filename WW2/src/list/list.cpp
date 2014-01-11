@@ -6,16 +6,16 @@
 
 void* listGetItem(LISTHEADER* const list)
 {
-  if (list == NULL)
+  if (list == nullptr)
   {
-    return(NULL);
+    return(nullptr);
   }
 
   LISTHEADER* const head = list->next;
-  if (head != NULL)
+  if (head != nullptr)
   {
     list->next = head->next;
-    if (list->next != NULL)
+    if (list->next != nullptr)
     {
       ((LISTHEADER*)list->next)->prev = list;
     }
@@ -28,7 +28,7 @@ LOGICAL listAddItem(LISTHEADER* list, LISTHEADER* part)
 {
 LISTHEADER*  head;
 
-  if (list == NULL || part == NULL || list == part)
+  if (list == nullptr || part == nullptr || list == part)
   {
     return(FALSE);
   }
@@ -37,7 +37,7 @@ LISTHEADER*  head;
   part->next = head;
   part->prev = list;
   list->next = part;
-  if (head != NULL)
+  if (head != nullptr)
   {
     head->prev = part;
   }
@@ -47,13 +47,13 @@ LISTHEADER*  head;
 
 LOGICAL listAddItemAfter(LISTHEADER* part, LISTHEADER* after)
 {
-  if (part == NULL || after == NULL || part == after)
+  if (part == nullptr || after == nullptr || part == after)
   {
     return(FALSE);
   }
 
   after->next = part->next;
-  if (after->next != NULL)
+  if (after->next != nullptr)
   {
     ((LISTHEADER*)after->next)->prev = after;
   }
@@ -65,13 +65,13 @@ LOGICAL listAddItemAfter(LISTHEADER* part, LISTHEADER* after)
 
 LOGICAL listAddItemBefore(LISTHEADER* part, LISTHEADER* before)
 {
-  if (part == NULL || before == NULL || part == before)
+  if (part == nullptr || before == nullptr || part == before)
   {
     return(FALSE);
   }
 
   before->prev = part->prev;
-  if (before->prev != NULL)
+  if (before->prev != nullptr)
   {
     ((LISTHEADER*)before->prev)->next = before;
   }
@@ -83,23 +83,23 @@ LOGICAL listAddItemBefore(LISTHEADER* part, LISTHEADER* before)
 
 LOGICAL listDeleteItem(LISTHEADER* part)
 {
-  if (part == NULL)
+  if (part == nullptr)
   {
     return(FALSE);
   }
 
-	if ((LISTHEADER*)part->prev != NULL)
+	if ((LISTHEADER*)part->prev != nullptr)
 	{
 		((LISTHEADER*)part->prev)->next = part->next;
 	}
 
-  if (part->next != NULL)
+  if (part->next != nullptr)
   {
     ((LISTHEADER*)part->next)->prev = part->prev;
   }
 
 // i can't believe this wasn't in here already
-	part->prev = part->next = NULL;
+	part->prev = part->next = nullptr;
 
   return(TRUE);
 }
@@ -109,13 +109,13 @@ LOGICAL listInitList(LISTHEADER* free, int numitems, int itemsize)
 int   i;
 LISTHEADER*  part;
 
-  if (free == NULL || free->next == NULL || numitems <= 0 || itemsize <= 0)
+  if (free == nullptr || free->next == nullptr || numitems <= 0 || itemsize <= 0)
   {
     return(FALSE);
   }
 
   part = free->next;
-  free->next = NULL;
+  free->next = nullptr;
   for (i=0; i < numitems; i++)
   {
     memset(part, 0, itemsize);

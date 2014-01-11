@@ -47,7 +47,7 @@ static Image* loadImage(const std::string& name, unsigned int flags, unsigned in
 
     if(!img.valid() || !img->data())
     {
-        return NULL;
+        return nullptr;
     }
 
     if(flags & LDPIX_FLIP)
@@ -66,7 +66,7 @@ static Image* loadImage(const std::string& name, unsigned int flags, unsigned in
         return img.release();
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /*--------------------------------------------------------------------------------
@@ -222,7 +222,7 @@ static int loadTexture(const std::string& name, unsigned int flags = 0, unsigned
 #endif
 
   // Image is alreay copied to the card. Remove data to save memory
-    dynamic_cast<Texture2D*>(tex.get())->setImage(NULL);
+    dynamic_cast<Texture2D*>(tex.get())->setImage(nullptr);
     assert(img->referenceCount() == 1);
 
     Write_Debug("[loadTexture] %s texture created", regionPath.c_str());
@@ -376,7 +376,7 @@ int ldLoadTexture2D(const std::string& texturename,
     }
 
    // Image is alreay copied to the card. Remove data to save memory
-    dynamic_cast<Texture2D*>(tex.get())->setImage(NULL);
+    dynamic_cast<Texture2D*>(tex.get())->setImage(nullptr);
     assert(img->referenceCount() == 1);
 
     Write_Debug("[loadTexture] %s texture created", regionPath.c_str());
@@ -512,7 +512,7 @@ int ldLoadTextureRectangle(const std::string& texturename,
     }
 
    // Image is alreay copied to the card. Remove data to save memory
-    dynamic_cast<TextureRectangle*>(tex.get())->setImage(NULL);
+    dynamic_cast<TextureRectangle*>(tex.get())->setImage(nullptr);
     assert(img->referenceCount() == 1);
 
     Write_Debug("[loadTexture] %s texture created", regionPath.c_str());
@@ -563,7 +563,7 @@ int ldLoadTexture2DArray(const std::string& texturename,
     if(!tex->getTextureObject(0))
     {
         tex->unref();
-        return NULL;
+        return 0;
     }
 
     // Put it into our list
@@ -599,7 +599,7 @@ int ldLoadTexture2DArray(const std::string& texturename,
     // Remove data since it has been unloaded to the card.
     for(unsigned int i = 0; i < names.size(); ++i)
     {
-        tex->setImage(i, NULL);
+        tex->setImage(i, nullptr);
     }
 
     return id;
@@ -646,7 +646,7 @@ int ldLoadTextureCubeMap(const std::string& texturename,
     if(!tex->getTextureObject(0))
     {
         tex->unref();
-        return NULL;
+        return 0;
     }
 
     // Put it into our list
@@ -682,7 +682,7 @@ int ldLoadTextureCubeMap(const std::string& texturename,
     // Remove data since it has been unloaded to the card.
     for(unsigned int i = 0; i < names.size(); ++i)
     {
-        tex->setImage(i, NULL);
+        tex->setImage(i, nullptr);
     }
 
     return id;
@@ -729,7 +729,7 @@ Description:
 --------------------------------------------------------------------------------*/
 void ldTextureRelease(TEXTURE* t)
 {
-    if(t == NULL)
+    if(t == nullptr)
         return;
 
     int id = t->id - 1;
@@ -759,7 +759,7 @@ Texture2D* ldTextureGet2D(int id)
         return dynamic_cast<Texture2D*>(itr->second.get());
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /*--------------------------------------------------------------------------------
@@ -777,7 +777,7 @@ TextureRectangle* ldTextureGetRectangle(int id)
         return dynamic_cast<TextureRectangle*>(itr->second.get());
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /*--------------------------------------------------------------------------------
@@ -795,7 +795,7 @@ Texture2DArray* ldTextureGet2DTextureArray(int id)
         return dynamic_cast<Texture2DArray*>(itr->second.get());
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /*--------------------------------------------------------------------------------

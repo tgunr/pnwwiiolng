@@ -70,7 +70,7 @@ teulSyncClock(void)
 	}
 #elif platOS == OS_WIN32
 	static const DWORD  BaseClockTime = timeGetTime();
-	static const TeulTimeMS BaseClock64 = time(NULL) * 1000ULL + BaseClockTime % 1000ULL;
+	static const TeulTimeMS BaseClock64 = time(nullptr) * 1000ULL + BaseClockTime % 1000ULL;
 
 	teulClock64 = BaseClock64 + (timeGetTime() - BaseClockTime);
 	teulClockTime = (UINT32)(teulClock64 / 1000LL);

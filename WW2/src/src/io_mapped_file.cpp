@@ -42,7 +42,7 @@ static inline imf_handle_t OsOpenFile(const char* filename_)
 #if IO_MAP_TYPE != _IMT_WINDOWS
 	return OS_OPEN(filename_, O_RDONLY);
 #else
-	return CreateFileA(filename_, FILE_GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+	return CreateFileA(filename_, FILE_GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
 #endif
 }
 
@@ -50,7 +50,7 @@ static inline imf_handle_t OsOpenFile(const char* filename_)
 #if IO_MAP_TYPE == _IMT_WINDOWS && defined(UNICODE)
 static inline imf_handle_t OsOpenFile(const wchar_t* filename_)
 {
-	return CreateFileW(filename_, FILE_GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+	return CreateFileW(filename_, FILE_GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
 }
 #endif
 
@@ -164,12 +164,12 @@ MappedFile::mapFileHandleInternal()
 	// but then give us direct access to the buffer memory".
 #if IO_MAP_TYPE == _IMT_WINDOWS
 	// Windows implementation.
-	m_mapping = CreateFileMapping(m_handle, NULL, PAGE_READONLY, 0, 0, NULL);
-	if ( m_mapping == IMF_INVALID_HANDLE || m_mapping == NULL )
+	m_mapping = CreateFileMapping(m_handle, nullptr, PAGE_READONLY, 0, 0, nullptr);
+	if ( m_mapping == IMF_INVALID_HANDLE || m_mapping == nullptr )
 		return unmapFile();
 
-	LPVOID const ptr = MapViewOfFileEx(m_mapping, FILE_MAP_READ, 0, 0, 0, NULL);
-	if ( ptr == NULL )
+	LPVOID const ptr = MapViewOfFileEx(m_mapping, FILE_MAP_READ, 0, 0, 0, nullptr);
+	if ( ptr == nullptr )
 		return unmapFile();
 #else
 	// Posix implementation.

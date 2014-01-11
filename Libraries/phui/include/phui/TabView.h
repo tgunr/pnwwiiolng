@@ -30,7 +30,7 @@ public:
 	struct Tab;
 	void AddTab(Tab tab);
 	
-	virtual int AddChild(View* v, View* before=NULL);
+	virtual int AddChild(View* v, View* before=nullptr);
 	
 	virtual void DrawSelf();
 

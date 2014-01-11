@@ -61,7 +61,7 @@ struct WaveData
         if(data)
         {
             memFree(data);
-            data = NULL;
+            data = nullptr;
         }
     }
 };
@@ -110,10 +110,10 @@ struct Emitters
         emitter.InnerRadius = 2.0f;
         emitter.InnerRadiusAngle = PI/4.0f;;
 
-        emitter.pVolumeCurve = NULL;//(X3DAUDIO_DISTANCE_CURVE*)&LinearCurve;
-        emitter.pLFECurve = NULL;//(X3DAUDIO_DISTANCE_CURVE*)&Emitter_LFE_Curve;
-        emitter.pLPFDirectCurve = NULL; // use default curve
-        emitter.pLPFReverbCurve = NULL; // use default curve
+        emitter.pVolumeCurve = nullptr;//(X3DAUDIO_DISTANCE_CURVE*)&LinearCurve;
+        emitter.pLFECurve = nullptr;//(X3DAUDIO_DISTANCE_CURVE*)&Emitter_LFE_Curve;
+        emitter.pLPFDirectCurve = nullptr; // use default curve
+        emitter.pLPFReverbCurve = nullptr; // use default curve
         emitter.pReverbCurve = (X3DAUDIO_DISTANCE_CURVE*)&Emitter_Reverb_Curve;
         emitter.CurveDistanceScaler = 1.0f;
         emitter.DopplerScaler = 1.0f;
@@ -128,8 +128,8 @@ struct Emitters
 
         frequency = 1.0f;
 
-        callback = NULL;
-        voice = NULL;
+        callback = nullptr;
+        voice = nullptr;
     }
 
     ~Emitters()
@@ -137,7 +137,7 @@ struct Emitters
         if(callback)
         {
             delete callback;
-            callback = NULL;
+            callback = nullptr;
         }
     }
 };
@@ -150,8 +150,8 @@ typedef std::map<unsigned int, struct Emitters*> EmitterMap;
 
 static EmitterMap emitters;
 
-static IXAudio2* xaudio2 = NULL;
-static IXAudio2MasteringVoice* MasterVoice = NULL;
+static IXAudio2* xaudio2 = nullptr;
+static IXAudio2MasteringVoice* MasterVoice = nullptr;
 static X3DAUDIO_LISTENER listener;
 static X3DAUDIO_HANDLE x3DInstance;
 
@@ -357,14 +357,14 @@ void AudioKill()
     if(MasterVoice)
     {
         MasterVoice->DestroyVoice();
-        MasterVoice = NULL;
+        MasterVoice = nullptr;
     }
 
     if(xaudio2)
     {
         xaudio2->StopEngine();
         xaudio2->Release();
-        xaudio2 = NULL;
+        xaudio2 = nullptr;
     }
 #endif
 }
@@ -400,7 +400,7 @@ bool AudioInit()
         return false;
     }
 
-    hr = xaudio2->CreateMasteringVoice(&MasterVoice, XAUDIO2_DEFAULT_CHANNELS, XAUDIO2_DEFAULT_SAMPLERATE, 0, device, NULL);
+    hr = xaudio2->CreateMasteringVoice(&MasterVoice, XAUDIO2_DEFAULT_CHANNELS, XAUDIO2_DEFAULT_SAMPLERATE, 0, device, nullptr);
 
     if(hr != S_OK)
     {
@@ -484,7 +484,7 @@ bool AudioLoadSound(const std::string& file, float maxattenuation)
 
         data = new WaveData;
 
-        HRESULT hr = data->wave.Open(file.c_str(), NULL, WAVEFILE_READ);
+        HRESULT hr = data->wave.Open(file.c_str(), nullptr, WAVEFILE_READ);
 
         if(hr != S_OK)
         {
@@ -511,7 +511,7 @@ Description:
 -------------------------------------------------------------------------*/
 bool AudioCreateEmitter(snSound& sound)
 {
-	if ( xaudio2 == NULL )
+	if ( xaudio2 == nullptr )
 		return false;
 
     AudioLoadSound(sound.name);
@@ -543,9 +543,9 @@ bool AudioCreateEmitter(snSound& sound)
                                             data->wave.GetFormat(),
                                             0,
                                             XAUDIO2_DEFAULT_FREQ_RATIO,
-                                            NULL,//emitter->callback,
-                                            NULL,
-                                            NULL);
+                                            nullptr,//emitter->callback,
+                                            nullptr,
+                                            nullptr);
 
     if(hr != S_OK)
     {
@@ -585,10 +585,10 @@ Description:
 static struct Emitters* AudioGetEmitter(unsigned int handle)
 {
     if(emitters.empty())
-        return NULL;
+        return nullptr;
 
     if(emitters.empty())
-        return NULL;
+        return nullptr;
 
     EmitterMap::iterator itr = emitters.find(handle);
 
@@ -597,7 +597,7 @@ static struct Emitters* AudioGetEmitter(unsigned int handle)
         return itr->second;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /*------------------------------------------------------------------------

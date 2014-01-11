@@ -185,7 +185,7 @@ public:
 	//virtual int RequestMissionResults();
 	virtual int RequestMotd(unsigned int id);
 	virtual int RequestVehicleJoin(WEAPON_SERIAL const&, int timestamp);
-	virtual int RequestDirectSpawn(WEAPON_SPEC const& spec, const FLOAT64VECTOR* at = NULL, FLOAT64 yaw = 0);
+	virtual int RequestDirectSpawn(WEAPON_SPEC const& spec, const FLOAT64VECTOR* at = nullptr, FLOAT64 yaw = 0);
 	virtual int RequestRecruiters(int language);
 	virtual void ClearMissionWeap();
 	virtual void SetAreaChat(bool on);

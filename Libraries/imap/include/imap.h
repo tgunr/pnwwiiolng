@@ -57,7 +57,7 @@ void imapCalibrateAxis(unsigned int iac, int scaleType, int numParams, float* pa
 /**. Clears all axis calibration. */
 void imapClearAxisCalibration();
 
-/**  Sets a keymap for imap to use. Higher indexes override lower ones. Pass NULL to clear an index.*/
+/**  Sets a keymap for imap to use. Higher indexes override lower ones. Pass nullptr to clear an index.*/
 int imapSetKeymap(const imapKeymapRef, int idx);
 
 /** Allocates a new keymap object. */

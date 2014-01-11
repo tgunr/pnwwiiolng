@@ -475,7 +475,7 @@ Image* ReadBMPFile(const std::string& name, unsigned int transparentColor)
     if(fd < 0)
     {
         Write_Debug("[ReadBMPFile] cannot open %s", name.c_str());
-        return NULL;
+        return nullptr;
     }
 
     unsigned char* imageData = bmp_load(fd, s, t, internalFormat, transparentColor);
@@ -483,7 +483,7 @@ Image* ReadBMPFile(const std::string& name, unsigned int transparentColor)
     fioClose(fd);
 
     if(imageData == 0)
-        return NULL;
+        return nullptr;
 
     unsigned int pixelFormat;
 

@@ -106,7 +106,7 @@ static interp_cmd_lookup INTERP_CMDS[] =
 	//{"visdam", 		visdam_cmd,		VIS_HELP},		// fps client#(s) type state
 	//{"ride", 		ride_cmd,		""},				// ride client#(s) vehname seatnumber
 	//{"resupply",	resupply_cmd,   ""},				// resupply client#(s) vehname
-	{NULL, 	NULL}
+	{nullptr, 	nullptr}
 };
 
 static const char* STATE_NAMES[] =
@@ -132,7 +132,7 @@ static const char* STATE_NAMES[] =
 	"crashexplosion",
 	"crashejectriders",
 	"treaddust",
-	NULL
+	nullptr
 };
 
 // ticket info
@@ -520,7 +520,7 @@ static int list_cmd(int argc, char* argv[])
 	if(argc > 1)
 		interp_range(argv[1], start, end);
 
-	MultiClient* client = NULL;
+	MultiClient* client = nullptr;
 	ClientMap::iterator it;
 
 	for(int i = start; i <= end; i++)
@@ -779,7 +779,7 @@ static int circle_cmd(int argc, char* argv[])
 	if(argc == 2) // clear
 	{
 		for(i = start; i <= end; i++)
-			client_add_controller(&clientModelData[i], NULL, NULL);
+			client_add_controller(&clientModelData[i], nullptr, nullptr);
 		return 0;
 	}
 
@@ -1660,32 +1660,32 @@ static int ticket_cmd(int argc, char* argv[])
 	SINT8* ptr, tktApp[64], tktData[64], tktIP[64], tktPort[64], tktProtocol[64], tktOTP[64], tktBypass[64];
 
 	FILE* stream = fopen(argv[1], "r");
-	if (stream == NULL)
+	if (stream == nullptr)
 		return -1;
 
 	do
 	{
-		if (fgets(tktApp, 64, stream) == NULL)
+		if (fgets(tktApp, 64, stream) == nullptr)
 		{
 			uiChatPrintLine("Error when reading apID");
 			break;
 		}
 
-		if (fgets(tktData, 64, stream) == NULL)
+		if (fgets(tktData, 64, stream) == nullptr)
 		{
 			uiChatPrintLine("Error when reading data");
 			break;
 		}
 
 
-		if (fgets(tktIP, 64, stream) == NULL)
+		if (fgets(tktIP, 64, stream) == nullptr)
 		{
 			uiChatPrintLine("Error when reading serverIP");
 			break;
 		}
 
 		ptr = strchr(tktIP, ' ');
-		if (ptr == NULL)
+		if (ptr == nullptr)
 		{
 			uiChatPrintLine("Could not parse serverIP");
 			break;
@@ -1699,62 +1699,62 @@ static int ticket_cmd(int argc, char* argv[])
 			break;
 		}
 
-		if (fgets(tktPort, 64, stream) == NULL)
+		if (fgets(tktPort, 64, stream) == nullptr)
 		{
 			uiChatPrintLine("Error when reading port");
 			break;
 		}
 
 		ptr = strchr(tktPort, ' ');
-		if (ptr == NULL)
+		if (ptr == nullptr)
 		{
 			uiChatPrintLine("Could not parse port");
 			break;
 		}
 
 		ptr += 1;
-		port = (UINT16)strtoul(ptr, NULL, 10);
+		port = (UINT16)strtoul(ptr, nullptr, 10);
 
-		if (fgets(tktProtocol, 64, stream) == NULL)
+		if (fgets(tktProtocol, 64, stream) == nullptr)
 		{
 			uiChatPrintLine("Error when reading protocol");
 			break;
 		}
 
 		ptr = strchr(tktProtocol, ' ');
-		if (ptr == NULL)
+		if (ptr == nullptr)
 		{
 			uiChatPrintLine("Could not parse port");
 			break;
 		}
 
 		ptr += 1;
-		protocol = (UINT16)strtoul(ptr, NULL, 10);
+		protocol = (UINT16)strtoul(ptr, nullptr, 10);
 
-		if (fgets(tktOTP, 64, stream) == NULL)
+		if (fgets(tktOTP, 64, stream) == nullptr)
 		{
 			uiChatPrintLine("Error when reading OTP");
 			break;
 		}
 
 		ptr = strchr(tktOTP, ' ');
-		if (ptr == NULL)
+		if (ptr == nullptr)
 		{
 			uiChatPrintLine("Could not parse OTP");
 			break;
 		}
 
 		ptr += 1;
-		otp = strtoul(ptr, NULL, 10);
+		otp = strtoul(ptr, nullptr, 10);
 
-		if (fgets(tktBypass, 64, stream) == NULL)
+		if (fgets(tktBypass, 64, stream) == nullptr)
 		{
 			uiChatPrintLine("Error when reading starting playerid");
 			break;
 		}
 
 		ptr = strchr(tktBypass, ' ');
-		if (ptr == NULL)
+		if (ptr == nullptr)
 		{
 			uiChatPrintLine("Could not parse starting playerid");
 			break;
@@ -1793,7 +1793,7 @@ static void interp_range(char* s, int& start, int& end)
 	s = strtok(s, "-");
 	*start = s ? atoi(s) : 0;
 
-	s = strtok(NULL, "-");
+	s = strtok(nullptr, "-");
 	*end = s ? atoi(s) : *start;
 	*/
 }
@@ -1863,7 +1863,7 @@ static interp_cmd lookup_interp_cmd(const char* cmdName)
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /************************************************************************************************
@@ -1878,7 +1878,7 @@ static interp_cmd_lookup& lookup_interp_cmd_lookup(const char* cmdName)
 			return INTERP_CMDS[i];
 	}
 
-	static interp_cmd_lookup dummy = { NULL, NULL, NULL, false };
+	static interp_cmd_lookup dummy = { nullptr, nullptr, nullptr, false };
 
 	return dummy;
 }

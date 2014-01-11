@@ -79,7 +79,7 @@ UINT32 trnTODUpdate(void)
 
 UINT32 trnTODGetTimeOfDay(UINT32 * TimeOfDay)
 {
-	if (TimeOfDay != NULL)
+	if (TimeOfDay != nullptr)
 	{
 		*TimeOfDay = _TimeOfDay;
 	}
@@ -89,7 +89,7 @@ UINT32 trnTODGetTimeOfDay(UINT32 * TimeOfDay)
 
 UINT32 trnTODGetDayOfYear(UINT32 * DayOfYear)
 {
-	if (DayOfYear != NULL)
+	if (DayOfYear != nullptr)
 	{
 		*DayOfYear = _DayOfYear;
 	}
@@ -99,7 +99,7 @@ UINT32 trnTODGetDayOfYear(UINT32 * DayOfYear)
 
 UINT32 trnTODGetDayOfMonth(UINT32 * DayOfMonth)
 {
-	if (DayOfMonth != NULL)
+	if (DayOfMonth != nullptr)
 	{
 		*DayOfMonth = _DayOfMonth;
 	}
@@ -135,7 +135,7 @@ UINT32 trnTODSetDayOfMonth(UINT32 DayOfMonth)
 
 UINT32 trnTODGetTimeMultiplier(FLOAT32 * Multiplier)
 {
-	if (Multiplier == NULL)
+	if (Multiplier == nullptr)
 	{
 		return 0;
 	}

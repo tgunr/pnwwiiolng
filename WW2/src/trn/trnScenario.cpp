@@ -136,7 +136,7 @@ struct ClutterObjects
     const char* GetClutterObject(int color, unsigned int seed)
     {
         if(clutterobjects[color].empty())
-            return NULL;
+            return nullptr;
 
         int idx = seed % clutterobjects[color].size();
         return clutterobjects[color][idx].c_str();
@@ -478,7 +478,7 @@ public:
                     int i = atol(p);
                     color.push_back(i);
 
-                    p = strtok(NULL, " ");
+                    p = strtok(nullptr, " ");
                     count++;
                 }
 
@@ -729,7 +729,7 @@ public:
                 while(p)
                 {
                     red->push_back(p);
-                    p = strtok(NULL, " ");
+                    p = strtok(nullptr, " ");
                 }
             }
         }
@@ -760,7 +760,7 @@ public:
                 while(p)
                 {
                     grn->push_back(p);
-                    p = strtok(NULL, " ");
+                    p = strtok(nullptr, " ");
                 }
             }
         }
@@ -791,7 +791,7 @@ public:
                 while(p)
                 {
                     blu->push_back(p);
-                    p = strtok(NULL, " ");
+                    p = strtok(nullptr, " ");
                 }
             }
         }
@@ -828,7 +828,7 @@ public:
                     else
                         red.push_back(i);
 
-                    p = strtok(NULL, " ");
+                    p = strtok(nullptr, " ");
                 }
             }
         }
@@ -865,7 +865,7 @@ public:
                     else
                         green.push_back(i);
 
-                    p = strtok(NULL, " ");
+                    p = strtok(nullptr, " ");
                 }
             }
         }
@@ -902,7 +902,7 @@ public:
                     else
                         blue.push_back(i);
 
-                    p = strtok(NULL, " ");
+                    p = strtok(nullptr, " ");
                 }
             }
         }
@@ -1265,7 +1265,7 @@ private:
 
 static ExposedLoader exposedloader;
 
-static colliderQuery* collider = NULL;
+static colliderQuery* collider = nullptr;
 
 /*--------------------------------------------------------------------
 Function: InitColliderIfNecessary
@@ -1298,7 +1298,7 @@ static void Collide(colliderQuery::CollisionList& list)
 {
     collider->setDirty(true);
 
-    dGeomID current = NULL;
+    dGeomID current = nullptr;
 
     if(collider->findCollisions(true))
     {
@@ -1387,7 +1387,7 @@ Description: Retrieves alpha (shadow) value from the mask.
 inline static float GetShadowValue(int id, double x, double y)
 {
    if(!gCustomTerrain)
-        return NULL;
+        return 0.0f;
 
     // Translate to origin
     float xx = (float)(x - WorldOriginOffset.x + SDM_OCTET_SIZE_2);
@@ -1411,7 +1411,7 @@ Description:
 const char* TerrainScenario::GetMaterial(double x, double y, int id)
 {
    if(!gCustomTerrain)
-        return NULL;
+        return nullptr;
 
    TerrainTile* tt = (TerrainTile*)id;
 
@@ -1448,7 +1448,7 @@ const char* TerrainScenario::GetMaterial(double x, double y, int id)
             int id = oglGetNamedTexture(str.c_str());
 
             if(id < 0)
-                return NULL;
+                return nullptr;
 
             float u = xx / SDM_OCTET_SIZE;
             float v = 1.0f - (yy / SDM_OCTET_SIZE);
@@ -1461,7 +1461,7 @@ const char* TerrainScenario::GetMaterial(double x, double y, int id)
             float b = piRGBA_GETBLUE(color) * colorONEOVER255;
             float a = piRGBA_GETALPHA(color) * colorONEOVER255;
 
-            const char* mat = NULL;
+            const char* mat = nullptr;
 
             if(b > 0.75f)
             {
@@ -2507,7 +2507,7 @@ struct AddMultiTexture
     {
         TileMap::iterator itr = tilemap.find(key);
 
-        tt = NULL;
+        tt = nullptr;
 
         if(itr != tilemap.end())
         {
@@ -2610,7 +2610,7 @@ struct AddMultiTexture
     {
         TileMap::iterator itr = tilemap.find(key);
 
-        tt = NULL;
+        tt = nullptr;
 
         if(itr != tilemap.end())
         {

@@ -112,7 +112,7 @@ static cfgPARAM_DETAILS _prefDetails[cfgNUM_TOTAL_PARAMS] =
 	{"app.missionleadercolor",  &gIconMissionLeaderColor,   cfgPARAM_UINT,		1,		0,	0, true	},
 	{"app.language",			&gLanguage,					cfgPARAM_UINT,		1,		0,	0, true	},
 	{"app.ambientlevel",        &g_iAmbLevel,               cfgPARAM_SINT,		0,		0,	0, false	},
-	{"app.radialclutter",       NULL,                       cfgPARAM_BOOLEAN,	1,		0,	1, true	},
+	{"app.radialclutter",       nullptr,                       cfgPARAM_BOOLEAN,	1,		0,	1, true	},
 	{"app.radialdensity",       &g_fRadialDensity,          cfgPARAM_FLOAT,		1,		0,	0, true	},
 	{"app.radialradius",        &g_fRadialRadius,           cfgPARAM_FLOAT,		1,		0,	0, true	},
 	{"app.visplayerlimit",      &g_iVisiblePlayerLimit,     cfgPARAM_SINT,		0,		0,	0, true	},
@@ -131,33 +131,33 @@ static cfgPARAM_DETAILS _prefDetails[cfgNUM_TOTAL_PARAMS] =
 	{"app.wantmessagealert",    &g_wantMessageAlert,        cfgPARAM_BOOLEAN,	1,		0,	1, true	},
 	{"app.usenetworkroute",     &g_useNetworkRoute,         cfgPARAM_SINT,		0,		0,	0, true	},
 	{"app.wantsse2",            &g_wantSSE2,				cfgPARAM_BOOLEAN,	0,		0,	1, false	},
-	{"app.fontsize",			NULL,						cfgPARAM_UINT,		1,		9,	12, true	},
+	{"app.fontsize",			nullptr,						cfgPARAM_UINT,		1,		9,	12, true	},
 	{"app.squadinvites",        &SquadInvites,				cfgPARAM_BOOLEAN,	1,		0,	1, true	},
-	{"app.tooltips",			NULL,						cfgPARAM_BOOLEAN,	1,		0,	1, true	},
-	{"app.showreadout",			NULL,						cfgPARAM_BOOLEAN,	1,		0,	1, true	},
-	{"app.iconmode",			NULL,						cfgPARAM_SINT,		1,		0,	2, true	},
-	{"app.playmusic",			NULL,						cfgPARAM_BOOLEAN,	1,		0,	1, true	},
-	{"app.isrecruiting",		NULL,						cfgPARAM_BOOLEAN,	1,		0,	1, true	},
-	{"app.autoleader",			NULL,						cfgPARAM_BOOLEAN,	1,		0,	1, true	},
-	{"app.awslow",				NULL,						cfgPARAM_UINT,		1,		0,	0, true	},
-	{"app.awshigh",				NULL,						cfgPARAM_UINT,		1,		0,	0, true	},
-	{"app.awsalpha",			NULL,						cfgPARAM_FLOAT,		1,		0,	1, true	},
-	{"app.ragdolls",			NULL,						cfgPARAM_BOOLEAN,	1,		0,	1, true	},
-	{"app.setdecal",			NULL,						cfgPARAM_UINT,		1,		0,	0, true	},
+	{"app.tooltips",			nullptr,						cfgPARAM_BOOLEAN,	1,		0,	1, true	},
+	{"app.showreadout",			nullptr,						cfgPARAM_BOOLEAN,	1,		0,	1, true	},
+	{"app.iconmode",			nullptr,						cfgPARAM_SINT,		1,		0,	2, true	},
+	{"app.playmusic",			nullptr,						cfgPARAM_BOOLEAN,	1,		0,	1, true	},
+	{"app.isrecruiting",		nullptr,						cfgPARAM_BOOLEAN,	1,		0,	1, true	},
+	{"app.autoleader",			nullptr,						cfgPARAM_BOOLEAN,	1,		0,	1, true	},
+	{"app.awslow",				nullptr,						cfgPARAM_UINT,		1,		0,	0, true	},
+	{"app.awshigh",				nullptr,						cfgPARAM_UINT,		1,		0,	0, true	},
+	{"app.awsalpha",			nullptr,						cfgPARAM_FLOAT,		1,		0,	1, true	},
+	{"app.ragdolls",			nullptr,						cfgPARAM_BOOLEAN,	1,		0,	1, true	},
+	{"app.setdecal",			nullptr,						cfgPARAM_UINT,		1,		0,	0, true	},
 	{"app.waterrefractions",    &wantWaterRefractions,      cfgPARAM_BOOLEAN,	1,		0,	1, true	},
 	{"app.wantbloodeffects",    &WantBloodEffects,          cfgPARAM_BOOLEAN,   1,      0,  1 , true  },
 	{"app.shadowreceivers",		&ShadowMapFlags,			cfgPARAM_UINT,		1,      0,  1 , true  },
-	{"app.corpses",				NULL,						cfgPARAM_BOOLEAN,	1,		0,	1, true	},
-	{"app.ragdollweapons",		NULL,						cfgPARAM_BOOLEAN,	1,		0,	1, true	},
+	{"app.corpses",				nullptr,						cfgPARAM_BOOLEAN,	1,		0,	1, true	},
+	{"app.ragdollweapons",		nullptr,						cfgPARAM_BOOLEAN,	1,		0,	1, true	},
 	{"app.combatsmoke",			&WantCombatSmoke,			cfgPARAM_BOOLEAN,	1,		0,	1, true	},
 	{"app.radialclutterwhenflying",		&g_bRadialWhenFlying,	cfgPARAM_BOOLEAN,	1,		0,	1, true	},
-	{"app.lowmemory",			NULL,						cfgPARAM_BOOLEAN,	1,		0,	1, true	},
-	{"app.corpsetime",			NULL,						cfgPARAM_FLOAT,		1,		0,	1, true	},
-	{"app.corpsecount",			NULL,						cfgPARAM_FLOAT,		1,		0,	1, true	},
-	{"app.corpsedetail",		NULL,						cfgPARAM_BOOLEAN,	1,		0,	1, true	},
-	{"app.ppook",				NULL,						cfgPARAM_UINT,		1,		0,	1, true	},
-	{"app.pponok",				NULL,						cfgPARAM_UINT,		1,		0,	1, true	},
-	{"app.macsound",			NULL,						cfgPARAM_UINT,		1,		0,	1, true	},
+	{"app.lowmemory",			nullptr,						cfgPARAM_BOOLEAN,	1,		0,	1, true	},
+	{"app.corpsetime",			nullptr,						cfgPARAM_FLOAT,		1,		0,	1, true	},
+	{"app.corpsecount",			nullptr,						cfgPARAM_FLOAT,		1,		0,	1, true	},
+	{"app.corpsedetail",		nullptr,						cfgPARAM_BOOLEAN,	1,		0,	1, true	},
+	{"app.ppook",				nullptr,						cfgPARAM_UINT,		1,		0,	1, true	},
+	{"app.pponok",				nullptr,						cfgPARAM_UINT,		1,		0,	1, true	},
+	{"app.macsound",			nullptr,						cfgPARAM_UINT,		1,		0,	1, true	},
 	{"app.inflodmod",			&gTrooperMOD,				cfgPARAM_FLOAT,		1,		0,	4, true	},
 	{"app.conv",				&Convergence,				cfgPARAM_UINT,		1,		0,	800, true },
 	{"app.aimScalar",			&aimMouse,					cfgPARAM_FLOAT,		1,		0, 8, true }
@@ -363,7 +363,7 @@ void cfgPrefsKill()
 	if(gAppPrefs)
 	{
 		delete gAppPrefs;
-		gAppPrefs = NULL;
+		gAppPrefs = nullptr;
 	}
 }
 
@@ -561,7 +561,7 @@ bool cfgPrefsGetGlobal(_cfgPARAMS key, void* value, bool config)
 					break;
 				case cfgPARAM_STRING:
 				{
-					const char* sval = NULL;
+					const char* sval = nullptr;
 					success = cfgPrefsGetString(_prefDetails[key].name, &sval);
 
 					if(success)
@@ -571,7 +571,7 @@ bool cfgPrefsGetGlobal(_cfgPARAMS key, void* value, bool config)
 			}
 		}
 
-		if(_prefDetails[key].var != NULL && (!config || !success))  // we want the global from memory
+		if(_prefDetails[key].var != nullptr && (!config || !success))  // we want the global from memory
 		{
 			success = true;
 
@@ -617,7 +617,7 @@ cfgPARAM_DETAILS* cfgPrefsGetGlobalDetails(_cfgPARAMS key)
 	if(gAppPrefs && key >= 0 && key < cfgNUM_TOTAL_PARAMS)
 		return &_prefDetails[key];
 
-	return NULL;
+	return nullptr;
 }
 
 /*************************************************************************************************
@@ -635,7 +635,7 @@ cfgPARAM_DETAILS* cfgPrefsGetGlobalDetails(const char* name)
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /*************************************************************************************************
@@ -665,7 +665,7 @@ const char* cfgPrefsGetGlobalName(_cfgPARAMS key) // gets a global's name
 	if(gAppPrefs && key >= 0 && key < cfgNUM_TOTAL_PARAMS)
 		return _prefDetails[key].name;
 
-	return NULL;
+	return nullptr;
 }
 
 // set arbitrary preferences

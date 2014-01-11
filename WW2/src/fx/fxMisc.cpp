@@ -26,7 +26,7 @@
 static piLVERTEX* _mesh;
 static SINT32 _meshsize;
 
-static glslProgram* _blackOut = NULL;
+static glslProgram* _blackOut = nullptr;
 
 struct MISCTEXTURE
 {
@@ -132,7 +132,7 @@ static LOGICAL _createTexture(SINT32 width, SINT32 height, GLenum target, GLuint
                  0,
                  GL_RGBA,
                  GL_UNSIGNED_BYTE,
-                 NULL);
+                 nullptr);
 
     if(!glIsTexture(texid))
     {
@@ -315,7 +315,7 @@ static void _grabScene()
 static void _drawConcussionIfNecessary(CONCUSSION* c)
 {
     persPersona* p = persGetPersonaDataPtr();
-	if ( p == NULL ) return;
+	if ( p == nullptr ) return;
 
     if(!c->on)
     {
@@ -503,7 +503,7 @@ static void _drawDeathFade(SINT32 reset, UINT32 position, UINT32 playposition)
 static void _drawBlackoutIfNecessary()
 {
     persPersona* p = persGetPersonaDataPtr();
-	if ( p == NULL ) return;
+	if ( p == nullptr ) return;
 
     static UINT32 insidecolor = colorBLACK;
     static UINT32 outsidecolor = colorBLACK;
@@ -791,7 +791,7 @@ LOGICAL fxMiscInit()
         return FALSE;
     }
 
-    _blackOut = GLSL.loadProgram("blackout", NULL, NULL);
+    _blackOut = GLSL.loadProgram("blackout", nullptr, nullptr);
 
     char* v = "fx/shaders/GLSL/postrender/blackout.vert";
     char* f = "fx/shaders/GLSL/postrender/blackout.frag";

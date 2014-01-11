@@ -6,7 +6,7 @@ struct FindTree
 
     FindTree()
     {
-        tree = NULL;
+        tree = nullptr;
     }
 
     void Find(OBJECT* o)

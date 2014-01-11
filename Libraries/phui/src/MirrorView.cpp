@@ -124,7 +124,7 @@ void MirrorView::capture()
 		//glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 		
 		// create a new image
-		//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, sw, sh, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+		//glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, sw, sh, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr);
 
 		// copy a region of the back buffer
 		glCopyTexSubImage2D(GL_TEXTURE_2D, (GLint)0, (GLint)0, (GLint)0, (GLint)_sx, (GLint)_sy, (GLsizei)_sw, (GLsizei)_sh);

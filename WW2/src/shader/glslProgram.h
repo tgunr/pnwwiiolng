@@ -23,7 +23,7 @@ struct ActiveVarInfo
     }
 
     ActiveVarInfo(GLint l, GLenum t, GLint s) :
-        uniform(NULL),
+        uniform(nullptr),
         location(l),
         type(t),
         size(s),

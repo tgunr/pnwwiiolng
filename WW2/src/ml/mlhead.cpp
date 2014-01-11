@@ -257,7 +257,7 @@ UINT32 mlGetHeadPos(FLOAT64VECTOR* Displacement, FLOAT64ATT* AttChange,
 	static FLOAT64VECTOR _LastVel;
 	static FLOAT64 _LastTime;
 
-	if (VehicleData == NULL)
+	if (VehicleData == nullptr)
 	{
 		return 0;
 	}

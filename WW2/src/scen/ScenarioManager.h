@@ -87,7 +87,7 @@ struct ScenarioObject
 		team(0),
 		round(0),
 		stage(0),
-		resource(NULL),
+		resource(nullptr),
 		runtime(0),
 		duration(0), // anytime
 		loadFlags(ON_RUN_OBJECT)
@@ -102,7 +102,7 @@ struct ScenarioObject
 		team(0),
 		round(0),
 		stage(0),
-		resource(NULL),
+		resource(nullptr),
 		runtime(0),
 		duration(0), // anytime
 		loadFlags(lf)
@@ -709,7 +709,7 @@ public:
 		RESPAWN_ME				= 1<<10 // respawn me right away
 	};
 
-    // Not dependent on _scenario being NULL
+    // Not dependent on _scenario being nullptr
     enum GLOBAL_GAME_CONTROL
     {
         GLOBAL_NONE         = 0,
@@ -760,7 +760,7 @@ public:
 
 	SCENPLAYER_MAP& GetPlayers();
 	ScenarioPlayer* GetPlayer(const char* callsign);
-	ScenarioPlayer* GetPlayer(const wchar_t* callsign = NULL);
+	ScenarioPlayer* GetPlayer(const wchar_t* callsign = nullptr);
 
 	void SetPlayerState(const char* name, const char* value);
 	void AddPlayerState(const char* name, const char* value);
@@ -812,7 +812,7 @@ public:
 	bool SameTeam(vehVehicle* player);
 
 	// create a custom map path
-	const char* MapPath(const char* file, const char* ender = NULL);
+	const char* MapPath(const char* file, const char* ender = nullptr);
 	const char* MapName();
 	const char* MapModelName();
 
@@ -836,7 +836,7 @@ public:
 	void RunObject(ScenarioObject::TYPE type, int load); // tolua_export
 	void RunObject(const char* name, int load, const char* data); // tolua_export
 	void RunObject(ScenarioObject::TYPE type, int load, const char* data); // tolua_export
-	void LoadObject(ScenarioObject* ob, UINT32 loadFlags, const char* data = NULL);
+	void LoadObject(ScenarioObject* ob, UINT32 loadFlags, const char* data = nullptr);
 	void UnloadObject(ScenarioObject* ob);
 	bool FindObjects(SCENOBJ_LIST& list, const char* name, ScenarioObject::TYPE type = ScenarioObject::ANY, bool relevant = false);
 	bool FindObjects(SCENOBJ_LIST& list, ScenarioObject::TYPE type, bool relevant = false);

@@ -317,11 +317,11 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 	{
 		if (buf[0] == '#') continue;
 
-		char* varName = NULL;
-		char* varData = NULL;
+		char* varName = nullptr;
+		char* varData = nullptr;
 		fpFPSDataGetVarnameAndContents(&varName, &varData, buf);
 
-		if (varName == NULL || varData == NULL) continue;
+		if (varName == nullptr || varData == nullptr) continue;
 
 		if (stricmp(buf, "weaponType") == 0)
 			_fpFPSDataHandleWeaponTypeString (weapon, varData);
@@ -401,7 +401,7 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 			fpsWeapons[weapon].weapDeployKneelDeployDownAngle = (FLOAT32) atof (varData);
 
 		else if (stricmp(buf, "staticDeploy") == 0)
-			fpsWeapons[weapon].staticDeploy = strtoul(varData, NULL, 10);
+			fpsWeapons[weapon].staticDeploy = strtoul(varData, nullptr, 10);
 		else if (stricmp(buf, "holdfire") == 0)
 			fpsWeapons[weapon].holdfire = (SINT32) atol (varData);
 		else if (stricmp(buf, "sniperGunSight") == 0)
@@ -413,7 +413,7 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 		else if (stricmp(buf, "hudIconType") == 0)
 			fpsWeapons[weapon].hudIconType = (fpFPSIconType) atol (varData);
 		else if (stricmp(buf, "ejectImmediate") == 0)
-			fpsWeapons[weapon].ejectImmediate = strtoul(varData, NULL, 10);
+			fpsWeapons[weapon].ejectImmediate = strtoul(varData, nullptr, 10);
 		else if (stricmp(buf, "clipBullets") == 0)
 			fpsWeapons[weapon].clipBullets = atol(varData);
 		else if (stricmp(buf, "reloadSound") == 0)
@@ -492,18 +492,18 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 			fpsWeapons[weapon].rgFiringAngle = (FLOAT32) atof (varData);
 
 		else if (stricmp(buf, "leanFireOK") == 0)
-			fpsWeapons[weapon].leanFireOK = strtoul(varData, NULL, 10);
+			fpsWeapons[weapon].leanFireOK = strtoul(varData, nullptr, 10);
 
 		else if (stricmp(buf, "onlyFireDeployed") == 0)
-			fpsWeapons[weapon].onlyFireDeployed = strtoul(varData, NULL, 10);
+			fpsWeapons[weapon].onlyFireDeployed = strtoul(varData, nullptr, 10);
 		else if (stricmp(buf, "suppressAim") == 0)
-			fpsWeapons[weapon].suppressAim = strtoul(varData, NULL, 10);
+			fpsWeapons[weapon].suppressAim = strtoul(varData, nullptr, 10);
 		else if (stricmp(buf, "deployPivotBone") == 0)
 			fpsWeapons[weapon].deployPivotBone = (SCHAR*) strpool (varData);
 		else if (stricmp(buf, "perBulletATP") == 0)
 			fpsWeapons[weapon].perBulletATP = (FLOAT32) atof (varData);
 		else if (stricmp(buf, "riseStopsReload") == 0)
-			fpsWeapons[weapon].riseStopsReload = strtoul(varData, NULL, 10);
+			fpsWeapons[weapon].riseStopsReload = strtoul(varData, nullptr, 10);
 		else if (stricmp(buf, "delayAfterFire") == 0)
 			fpsWeapons[weapon].delayAfterFire = (FLOAT32) atof (varData);
 
@@ -558,7 +558,7 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 
 static void _fpFPSDataHandleWeaponTypeString (fpsWeaponTypes weapon, char* typestring)
 {
-	if (typestring == NULL)
+	if (typestring == nullptr)
 		return;
 
 	int	type;
@@ -620,7 +620,7 @@ void fpFPSDataReadFPSFile()
 
 		fpFPSDataGetVarnameAndContents(&varName, &varData, buf);
 
-		if ((varName == NULL) || (varData == NULL))
+		if ((varName == nullptr) || (varData == nullptr))
 			continue;
 
 		// for easy lookup of new variable hashes
@@ -1226,9 +1226,9 @@ UINT32 fpFPSDataGetVarnameAndContents(SCHAR ** varname, SCHAR ** varcontents, SC
 {
 	*varname = strtok((char*)inputString,"=");
 
-	if (*varname != NULL)
+	if (*varname != nullptr)
 	{
-		*varcontents = strtok(NULL,"=");
+		*varcontents = strtok(nullptr,"=");
 		*varcontents = strtok((char*)*varcontents,"\n"); // strip off the ending newline
 
 		// strip off leading & trailing spaces
@@ -1242,7 +1242,7 @@ UINT32 fpFPSDataGetVarnameAndContents(SCHAR ** varname, SCHAR ** varcontents, SC
 			(*varname)[strlen(*varname)-1] = 0;
 		}
 
-		if (*varcontents != NULL)
+		if (*varcontents != nullptr)
 		{
 			while (*varcontents[0] == ' ')
 			{
@@ -1257,7 +1257,7 @@ UINT32 fpFPSDataGetVarnameAndContents(SCHAR ** varname, SCHAR ** varcontents, SC
 	}
 	else
 	{
-		*varcontents = NULL;
+		*varcontents = nullptr;
 	}
 
 
@@ -2457,29 +2457,29 @@ void fpFPSDataInit ()
 
 #ifdef CACHE_FPS_DATA
 		if(fpsWeapons[i].weaponModel)
-			gr2LoadModel(fpsWeapons[i].weaponModel, NULL, NULL, 0);
+			gr2LoadModel(fpsWeapons[i].weaponModel, nullptr, nullptr, 0);
 
 		if(fpsWeapons[i].clipModel)
-			gr2LoadModel(fpsWeapons[i].clipModel, NULL, NULL, 0);
+			gr2LoadModel(fpsWeapons[i].clipModel, nullptr, nullptr, 0);
 
 		for (int j=0; j < FPS_NUM_AUX_MODELS; j++)
 		{
 			if (fpsWeapons[i].auxModel[j])
-				gr2LoadModel(fpsWeapons[i].auxModel[j], NULL, NULL, 0);
+				gr2LoadModel(fpsWeapons[i].auxModel[j], nullptr, nullptr, 0);
 		}
 #endif
 	}
 
 #ifdef CACHE_FPS_DATA
-	gr2Model* skeleton = gr2Model::Load(skel_model, NULL, NULL, 1);
+	gr2Model* skeleton = gr2Model::Load(skel_model, nullptr, nullptr, 1);
 
 	for(int i = 0; i < NUM_INFANTRY_TYPES; i++)
 	{
 		if(arm_models[i])
-			gr2LoadModel(arm_models[i], skeleton, NULL, 0);
+			gr2LoadModel(arm_models[i], skeleton, nullptr, 0);
 
 		if(leg_models[i])
-			gr2LoadModel(leg_models[i], NULL, NULL, 0);
+			gr2LoadModel(leg_models[i], nullptr, nullptr, 0);
 	}
 
 	gr2FreeModel(skeleton);
@@ -2493,7 +2493,7 @@ fpFPSTrooperLoadout* fpFPSGetTrooperLoadout(const char* id)
 	fpFPSLoadoutMap::iterator found = _loadouts.find(id);
 	if(found != _loadouts.end()) return &(found->second);
 
-	return NULL;
+	return nullptr;
 }
 
 void _fpFPSReadVisualLoadouts()

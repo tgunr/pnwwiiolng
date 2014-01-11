@@ -143,8 +143,8 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
 								   UINT32 VehicleTypeNum,
 								   void* VehicleMasterPtr)
 {
-	*ComponentList = NULL;
-	if (ComponentListFilename == NULL || *ComponentListFilename == '\0')
+	*ComponentList = nullptr;
+	if (ComponentListFilename == nullptr || *ComponentListFilename == '\0')
 		return 1;
 
 #ifdef PRINT_COMPONENTS
@@ -229,7 +229,7 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
 
 			mlUtilityGetVarnameAndContents(&VarName,&VarContents,Buffer);
 
-			if (VarName == NULL || VarContents == NULL)
+			if (VarName == nullptr || VarContents == nullptr)
 			{
 				continue;
 			}
@@ -305,7 +305,7 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
                                 if(CurrentComponent->SpecialData)
                                 {
                                     delete (mlWeaponMount*)CurrentComponent->SpecialData;
-                                    CurrentComponent->SpecialData = NULL;
+                                    CurrentComponent->SpecialData = nullptr;
                                 }
                             }
                             else
@@ -313,7 +313,7 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
                                 if(CurrentComponent->SpecialData)
                                 {
                                     memFree(CurrentComponent->SpecialData);
-                                    CurrentComponent->SpecialData = NULL;
+                                    CurrentComponent->SpecialData = nullptr;
                                 }
                             }
 
@@ -346,7 +346,7 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
                                     }
 								break;
 								default:
-									CurrentComponent->SpecialData = NULL;
+									CurrentComponent->SpecialData = nullptr;
 								break;
 
 							}
@@ -606,9 +606,9 @@ UINT32 mlFindComponent(mlComponent** ComponentPtr,
 {
 	UINT32 i;
 
-	if(ComponentPtr == NULL) return 1;
-	*ComponentPtr = NULL;
-	if(ComponentList == NULL ||  ComponentName == NULL) return 1;
+	if(ComponentPtr == nullptr) return 1;
+	*ComponentPtr = nullptr;
+	if(ComponentList == nullptr ||  ComponentName == nullptr) return 1;
 
 	for (i = 0; i < ComponentList->NumComponents; i++)
 	{
@@ -628,11 +628,11 @@ UINT32 mlFindComponent(mlComponent** ComponentPtr,
 
 UINT32 mlcomponFreeComponentList(mlComponentList* ComponentList)
 {
-	if (ComponentList->Components != NULL)
+	if (ComponentList->Components != nullptr)
 	{
 		for (size_t i=0;i<ComponentList->NumComponents;i++)
 		{
-			if (ComponentList->Components[i].SpecialData != NULL)
+			if (ComponentList->Components[i].SpecialData != nullptr)
 			{
 				if (ComponentList->Components[i].Type == ML_COMPONENT_WEAPONMOUNT)
 				{
@@ -672,7 +672,7 @@ UINT32 mlcomponReadDamageComponents(mlComponentList** ComponentList,
 	mlComponent * CurrentComponent;
 
 	*ComponentList = nullptr;
-	if(ComponentListFilename == NULL || *ComponentListFilename == '\0')
+	if(ComponentListFilename == nullptr || *ComponentListFilename == '\0')
 		return 1;
 
 	strcpy((char*)UseFileName,(char*)DirName);
@@ -742,7 +742,7 @@ UINT32 mlcomponReadDamageComponents(mlComponentList** ComponentList,
 
 			mlUtilityGetVarnameAndContents(&VarName,&VarContents,Buffer);
 
-			if (VarName == NULL || VarContents == NULL)
+			if (VarName == nullptr || VarContents == nullptr)
 				continue;
 
             const char* nnn = (const char*) UseFileName;
@@ -830,7 +830,7 @@ void mlComponentListBegin(mlComponentList* List, mlComponentListIterator* it)
 
 void mlComponentListNext(mlComponentListIterator* it)
 {
-	it->comp = NULL;
+	it->comp = nullptr;
 
 	for(; it->idx < (int)it->List->NumComponents; it->idx++)
 	{

@@ -17,7 +17,7 @@ public:
     ref_ptr<glslShader> loadFragmentShader(const char* shader);
     ref_ptr<glslShader> loadGeometryShader(const char* shader);
 
-    glslProgram* loadProgram(const char* name, const char* v = NULL, const char* f = NULL);
+    glslProgram* loadProgram(const char* name, const char* v = nullptr, const char* f = nullptr);
     glslProgram* getProgram(const char* name);
 
     void update();

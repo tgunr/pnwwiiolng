@@ -48,7 +48,7 @@ static int _offMat			= -1;
 static bool _resetMaterials = true;
 static std::wstring _fail	= L"";
 
-static PlayerPlacedObject* _placedObject = NULL;
+static PlayerPlacedObject* _placedObject = nullptr;
 
 static PPO_SPEC_MAP _ppoSpecMap;
 static PPO_SINK_MAP _ppoSinkMap;
@@ -87,20 +87,20 @@ struct AddDrawCallback
 };
 
 PlayerPlacedObject::PlayerPlacedObject(PPOSpec* s) :
-	obj(NULL),
+	obj(nullptr),
 	valid(false),
 	lastValid(false),
 	failOnInvalid(false),
 	interruptNextUpdate(false),
 	pauseBuild(false),
-	abox(NULL),
+	abox(nullptr),
 	spec(s),
 	buildAt(0),
 	lastUpdate(0),
-	buildUI(NULL),
-	updateCallback(NULL),
-	executeCallback(NULL),
-	validityCallback(NULL)
+	buildUI(nullptr),
+	updateCallback(nullptr),
+	executeCallback(nullptr),
+	validityCallback(nullptr)
 {
 	if(!spec) return;
 
@@ -162,14 +162,14 @@ PlayerPlacedObject::~PlayerPlacedObject()
 	if(obj)
 		obpoolFreeObjectCallback(obj);
 
-	obj = NULL;
+	obj = nullptr;
 	valid = false;
 	lastValid = false;
 }
 
 void PlayerPlacedObject::UpdateColliders()
 {
-	if(obj == NULL)
+	if(obj == nullptr)
 		return;
 
 	BoundBox bbox = BoundBox(obj, FALSE);
@@ -226,7 +226,7 @@ void PlayerPlacedObject::UpdateColliders()
 	Matrixf attitude			= Matrixf(player->ModelData->VehicleAttMat);
 	Vec3d rayPos				= Vec3d(0, 1, 0);
 	Vec3d dir					= Vec3d(0, 0, -1.0f); // direction pointer
-	dGeomID	 geom				= NULL;
+	dGeomID	 geom				= nullptr;
 	double viewOffset			= (player->VehicleType->Type == VEH_TYPE_PERSON) ? -spec->viewOffset: spec->viewOffset * 2.0f;
 	piVECTOR forward			= {0,(float)viewOffset,0};
 
@@ -353,7 +353,7 @@ static bool _foundMaterial(std::vector<std::string>& texnames, const char* texna
 static bool _badSurface(UINT32 flags, OBJECT* o)
 {
 	SINT32 sid = -1;
-	mlGetObjectBumpinessAndFriction(NULL,NULL,NULL,NULL,NULL,&sid,o);
+	mlGetObjectBumpinessAndFriction(nullptr,nullptr,nullptr,nullptr,nullptr,&sid,o);
 
 	return (sid >= 0) ? ((flags & (1<<sid)) == 0): false;
 }
@@ -401,7 +401,7 @@ bool PlayerPlacedObject::CalculatePlacement(piVECTOR& pos, piVECTOR& att, bool c
 	Vec3d worldNormal;
 	FLOAT64 zTotal = 0;
 	UINT32 zCount = 0;
-	dGeomID geom = NULL;
+	dGeomID geom = nullptr;
 
 	UINT32 allHits = 0;
 	bool noAdjust = false;
@@ -429,7 +429,7 @@ bool PlayerPlacedObject::CalculatePlacement(piVECTOR& pos, piVECTOR& att, bool c
 				if(r == rayCount - 1 && !valid) // our line of sight ray
 					continue;
 
-				colliderQuery::Collision* hit = NULL;
+				colliderQuery::Collision* hit = nullptr;
 
 				for(unsigned int i = 0; i < hits.size(); ++i)
 				{
@@ -571,16 +571,16 @@ bool PlayerPlacedObject::CalculatePlacement(piVECTOR& pos, piVECTOR& att, bool c
 
 	if(valid)
 	{
-		vehVehicle* current = NULL;
+		vehVehicle* current = nullptr;
 		Vec3d currentPos;
 		Vec3d diff;
 
 		// check for troopers in the way
 		vehGetVehicleHead(&current);
 
-		if(current != NULL)
+		if(current != nullptr)
 		{
-			for (;current != NULL; current = current->getNext())
+			for (;current != nullptr; current = current->getNext())
 			{
 				if(current != player && current->VehicleType->Type == VEH_TYPE_PERSON)
 				{
@@ -620,7 +620,7 @@ bool PlayerPlacedObject::CalculatePlacement(piVECTOR& pos, piVECTOR& att, bool c
 				SetInvalid("ppos.badtargetrange.toofar");
 		}
 
-		StratDB::StratObject* strat = NULL;
+		StratDB::StratObject* strat = nullptr;
 
 		// enemy check
 		if(valid)
@@ -992,7 +992,7 @@ void PlayerPlacedObject::Interrupt()
 	if(buildUI)
 	{
 		buildUI->Close();
-		buildUI = NULL;
+		buildUI = nullptr;
 
 		// reset the cursor state if we closed the modal ui
 		uiSetCursor((int)uiViewport()->HasModalChild("", true));
@@ -1111,7 +1111,7 @@ bool fpPPOUpdate()
 
 	if(_placedObject && _placedObject->Update())
 	{
-		fpPPOSet(NULL);
+		fpPPOSet(nullptr);
 		return true;
 	}
 
@@ -1121,7 +1121,7 @@ bool fpPPOUpdate()
 void fpPPOKill()
 {
 	fpPPOCancel();
-	fpPPOSet(NULL);
+	fpPPOSet(nullptr);
 }
 
 void fpPPOCancel()
@@ -1170,7 +1170,7 @@ void fpPPOCreateMaterial()
 
 	if(_resetMaterials)
 	{
-		MATERIAL* mats = NULL;
+		MATERIAL* mats = nullptr;
 		oglGetMaterials(&mats);
 
 		UINT32 good	= (UINT32)cfgPrefsGetInt(cfgPrefsGetGlobalName(cfgPPO_OK), piRGB_MAKE(0, 255, 0));
@@ -1246,10 +1246,10 @@ PlayerPlacedObject* fpPPOCreate(int type,  bool save)
 	_fail = L"";
 
 	PPOSpec* spec = fpPPOGetSpec(type);
-	if(!spec) return NULL;
+	if(!spec) return nullptr;
 
 	if(!fpPPOReady(type))
-		return NULL;
+		return nullptr;
 
 	// make sure our materials are created
     fpPPOCreateMaterial();
@@ -1274,7 +1274,7 @@ PlayerPlacedObject* fpPPOCreate(int type,  bool save)
 	if(ppo && !ppo->obj)
 	{
 		delete ppo;
-		ppo = NULL;
+		ppo = nullptr;
 	}
 
 	if(save)
@@ -1310,7 +1310,7 @@ PPOSpec* fpPPOGetSpec(int type)
 	if(found != _ppoSpecMap.end())
 		return &found->second;
 
-	return NULL;
+	return nullptr;
 }
 
 void fpPPOAlert(const wchar_t* message)
@@ -1469,7 +1469,7 @@ static bool _inTargetFacilityRange(FLOAT32 distance, SINT32 side)
 	vehVehicle* player = persGetPersonaVehiclePtr();
 	if(!player) return false;
 
-	StratDB::StratObject* best = NULL;
+	StratDB::StratObject* best = nullptr;
 	double bestDistance2 = 0;
 
 	for(; B != E; ++B)

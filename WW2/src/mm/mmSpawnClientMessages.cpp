@@ -125,7 +125,7 @@ UINT32 i;
 #endif
 
 	postListResponse.numWeapons = 0;
-	postListResponse.commandedWeapon = NULL;
+	postListResponse.commandedWeapon = nullptr;
 
 	a->offset = mmPackFEPostListResponse(TEUL_UNPACK, a->packed, a->offset, &(postListResponse), 0);
 
@@ -153,7 +153,7 @@ postListResponse.numWeapons);
 
 	clientProcessPostList(a->teulIndex, &postListResponse);
 
-	if (postListResponse.commandedWeapon!= NULL)
+	if (postListResponse.commandedWeapon!= nullptr)
 		memFree(postListResponse.commandedWeapon);
 
 	return a->offset;

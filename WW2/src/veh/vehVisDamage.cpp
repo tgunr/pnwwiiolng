@@ -70,15 +70,15 @@ public:
 		physicsBody(COLLIDER_DEBRIS, COLLIDER_TERRAIN_MASK),
 		veh(v),
 		obj(o),
-		next(NULL),
-		prev(NULL),
+		next(nullptr),
+		prev(nullptr),
 		expires(frametime + CRAP_LIFETIME),
 		_allCollisions(0),
 		_lastCollision(0),
 		_lastFX(0),
 		_nextPush(0),
 		_explosion(false),
-		_effect(NULL)
+		_effect(nullptr)
 	{
 		if(v->ChunksOfCrap)
 			v->ChunksOfCrap->prev = this;
@@ -154,7 +154,7 @@ public:
 
 	virtual void InitObject(OBJECT* o)
 	{
-		if (o == NULL)
+		if (o == nullptr)
 			return;
 
 		OBJECT* current = o;
@@ -287,7 +287,7 @@ public:
 		// only play this once
 		if(!_allCollisions)
 		{
-			TransformEffect* te = TransformEffect::AddEffect("shockdust", Vec3d(0,0,1.0f), 0, NULL);
+			TransformEffect* te = TransformEffect::AddEffect("shockdust", Vec3d(0,0,1.0f), 0, nullptr);
 
 			if(te)
 			{
@@ -317,8 +317,8 @@ public:
 			return false;
 
 		bool allowContact = true;
-		const char* effect = NULL;
-		const char* sound = NULL;
+		const char* effect = nullptr;
+		const char* sound = nullptr;
 		Vec3d fxNormal = Vec3d(0,0,-1.0f);
 		Vec3d fxPos = Vec3d(c->geom.pos[0], c->geom.pos[1], c->geom.pos[2]);
 
@@ -376,7 +376,7 @@ public:
 
 			if(effect)
 			{
-				TransformEffect* te = TransformEffect::AddEffect(effect, fxNormal, 0, NULL);
+				TransformEffect* te = TransformEffect::AddEffect(effect, fxNormal, 0, nullptr);
 
 				if(te)
 				{
@@ -399,7 +399,7 @@ public:
 #if(0)
 			_effect->enable(false);
 #endif
-			_effect = NULL;
+			_effect = nullptr;
 
 			// start smoking
 			TransformEffect* te = TransformEffect::AddEffect(VD_SMOKE_EFFECT, Vec3d(0,0,1.0f), CRAP_LIFETIME, obj);
@@ -527,7 +527,7 @@ public:
 				fxNormal.z() += GetRandom(-.1f, .1f);
 				fxNormal.normalize();
 
-				TransformEffect* te = TransformEffect::AddEffect("metalbullethit", fxNormal, 0, NULL);
+				TransformEffect* te = TransformEffect::AddEffect("metalbullethit", fxNormal, 0, nullptr);
 
 				if(te)
 				{
@@ -938,7 +938,7 @@ SINT32 vehVisDamageGroupDestroyed(vehVehicle* veh, const char* visdamgroup, LOGI
 	LOGICAL HulkVehicle = FALSE;
 	veh->VisDamageNoStick = TRUE;
 
-	if(veh->VehicleObjectData == NULL)
+	if(veh->VehicleObjectData == nullptr)
 		return -1;
 
 	// remove components if it is a user controlled vehicle we're running physics on and determine if we're hulked.
@@ -992,7 +992,7 @@ SINT32 vehVisDamageGroupRepaired(vehVehicle* veh, const char* visdamgroup)
 {
 	veh->VisDamageNoStick = TRUE;
 
-	if(veh->VehicleObjectData == NULL)
+	if(veh->VehicleObjectData == nullptr)
 		return -1;
 
 	// add components if it is a user controlled vehicle we're running physics on and determine if we're hulked.
@@ -1052,11 +1052,11 @@ SINT32 vehVisDamageGroupRepaired(vehVehicle* veh, const char* visdamgroup)
 
 SINT32 vehVisDamageHulkVehicle(vehVehicle* veh, LOGICAL CreateCrap)
 {
-	if(veh->VehicleObjectData == NULL || veh->VehicleObjectData->VisDamageHulkLOD == NULL)
+	if(veh->VehicleObjectData == nullptr || veh->VehicleObjectData->VisDamageHulkLOD == nullptr)
 		return -1;
 
 	const vehanimVehicleStateType* stateType = vehFindStateByName(veh->VehicleType, "hulk");
-	if(stateType == NULL) return -1;
+	if(stateType == nullptr) return -1;
 
 	//int index = vehAnimFindVehicleStateNumber(veh, "hulk");
 
@@ -1065,7 +1065,7 @@ SINT32 vehVisDamageHulkVehicle(vehVehicle* veh, LOGICAL CreateCrap)
 	//	return -1;
 
 	vehVehicle* player = persGetPersonaVehiclePtr();
-	if(player == NULL || player->VehicleType == NULL) return -1;
+	if(player == nullptr || player->VehicleType == nullptr) return -1;
 
 	bool myVehicle = (veh == player);
 	int i = 0;
@@ -1075,17 +1075,17 @@ SINT32 vehVisDamageHulkVehicle(vehVehicle* veh, LOGICAL CreateCrap)
 	for(i = 0; i < ML_MAX_LODS; i++)
 	{
 		Object = veh->VehicleObjectData->LODObjects[i];
-		if (Object != NULL)
+		if (Object != nullptr)
 		{
 			while (Object->flags & OBJECT_NOTOBJECT)
 			{
 				Object = Object->child;
-				if (Object == NULL)
+				if (Object == nullptr)
 					break;
 			}
 		}
 
-		if (Object != NULL)
+		if (Object != nullptr)
 		{
 			Object->minlod = 0.0f;
 			Object->maxlod = 0.0f;
@@ -1191,7 +1191,7 @@ SINT32 vehVisDamageHulkVehicle(vehVehicle* veh, LOGICAL CreateCrap)
 
 	// make LOD Hulk visible
 	Object = veh->VehicleObjectData->VisDamageHulkLOD;
-	if (Object != NULL)
+	if (Object != nullptr)
 	{
 		veh->VehicleObjectData->VisDamageHulkLOD->flag2 &= ~OBJECT_DONT_UPDATE;
 		ogrpShowObjectAndSubtree(veh->VehicleObjectData->VisDamageHulkLOD);
@@ -1199,7 +1199,7 @@ SINT32 vehVisDamageHulkVehicle(vehVehicle* veh, LOGICAL CreateCrap)
 		while (Object->flags & OBJECT_NOTOBJECT)
 		{
 			Object = Object->child;
-			if (Object == NULL)
+			if (Object == nullptr)
 				break;
 		}
 
@@ -1208,7 +1208,7 @@ SINT32 vehVisDamageHulkVehicle(vehVehicle* veh, LOGICAL CreateCrap)
 		{
 			veh->VehicleObjectData->CollideWalkObject = Object;
 			veh->VehicleObjectData->CollideExternObject = Object;
-			veh->VehicleObjectData->CollideInternObject = NULL;
+			veh->VehicleObjectData->CollideInternObject = nullptr;
 
 			// update our walk object's flags so the collider get's created correctly
 			//obmainSetFlag3InThisTree(Object, OBJECT_WALK);
@@ -1221,7 +1221,7 @@ SINT32 vehVisDamageHulkVehicle(vehVehicle* veh, LOGICAL CreateCrap)
 		if(createHulkBody)
 		{
 			HulkDamageBody* crap = new HulkDamageBody(veh, veh->VehicleObjectData->VisDamageHulkLOD);
-			if(crap) crap->Init(NULL, NULL, FALSE);
+			if(crap) crap->Init(nullptr, nullptr, FALSE);
 
 			if(0)
 			{
@@ -1249,7 +1249,7 @@ SINT32 vehVisDamageHulkVehicle(vehVehicle* veh, LOGICAL CreateCrap)
 	}
 
 	// this probably doesn't need to be an LOD but what the heck
-	if (Object != NULL)
+	if (Object != nullptr)
 	{
 		Object->minlod = 0.0f;
 		Object->maxlod = 100000000.0f;
@@ -1309,28 +1309,28 @@ SINT32 vehVisDamageUnHulkVehicle(vehVehicle* veh)
 	OBJECT* Object;
 	vehanimVehicleStateType const* stateType;
 
-	if(veh->VehicleObjectData == NULL || veh->VehicleObjectData->VisDamageHulkLOD == NULL)
+	if(veh->VehicleObjectData == nullptr || veh->VehicleObjectData->VisDamageHulkLOD == nullptr)
 		return -1;
 
 	stateType = vehFindStateByName(veh->VehicleType, "hulk");
-	if(stateType == NULL) return -1;
+	if(stateType == nullptr) return -1;
 
 	// nuke all the LOD's
 	/*
 	for(i = 0; i < ML_MAX_LODS; i++)
 	{
 		Object = veh->VehicleObjectData->LODObjects[i];
-		if (Object != NULL)
+		if (Object != nullptr)
 		{
 			while (Object->flags & OBJECT_NOTOBJECT)
 			{
 				Object = Object->child;
-				if (Object == NULL)
+				if (Object == nullptr)
 					break;
 			}
 		}
 
-		if (Object != NULL)
+		if (Object != nullptr)
 		{
 			Object->minlod = 0.0f;
 			Object->maxlod = 0.0f;
@@ -1344,7 +1344,7 @@ SINT32 vehVisDamageUnHulkVehicle(vehVehicle* veh)
 
 	// make LOD Hulk visible
 	Object = veh->VehicleObjectData->VisDamageHulkLOD;
-	if (Object != NULL)
+	if (Object != nullptr)
 	{
 		veh->VehicleObjectData->VisDamageHulkLOD->flag2 |= OBJECT_DONT_UPDATE;
 		ogrpHideObjectAndSubtree(veh->VehicleObjectData->VisDamageHulkLOD);
@@ -1357,17 +1357,17 @@ SINT32 vehVisDamageUnHulkVehicle(vehVehicle* veh)
 	ogrpFindSubObjectByName(&Object,veh->VehicleObjectData->PlaneObject,"hitmap");
 	veh->VehicleObjectData->HitMap = Object;
 
-	if (Object != NULL)
+	if (Object != nullptr)
 	{
-		OBJECT* Object1 = NULL;
+		OBJECT* Object1 = nullptr;
 		ogrpFindSubObjectByName(&Object1,Object,"inside");
 		veh->VehicleObjectData->CollideInternObject = Object1;
 
-		Object1 = NULL;
+		Object1 = nullptr;
 		ogrpFindSubObjectByName(&Object1,Object,"outside");
 		veh->VehicleObjectData->CollideExternObject = Object1;
 
-		Object1 = NULL;
+		Object1 = nullptr;
 		ogrpFindSubObjectByName(&Object1,Object,"walk");
 		veh->VehicleObjectData->CollideWalkObject = Object1;
 
@@ -1378,8 +1378,8 @@ SINT32 vehVisDamageUnHulkVehicle(vehVehicle* veh)
 	}
 	else
 	{
-		veh->VehicleObjectData->CollideInternObject = NULL;
-		veh->VehicleObjectData->CollideExternObject = NULL;
+		veh->VehicleObjectData->CollideInternObject = nullptr;
+		veh->VehicleObjectData->CollideExternObject = nullptr;
 		veh->VehicleObjectData->Radius = 0.0;
 		if (veh->VehicleObjectData->PlaneObject->flag2 & OBJECT_ANIMATION)
 			veh->VehicleObjectData->Radius = 3.0;
@@ -1609,7 +1609,7 @@ SINT32 vehVisDamageRemoveAllCrap(vehVehicle* veh)
 		crap = next;
 	}
 
-	veh->ChunksOfCrap = NULL;
+	veh->ChunksOfCrap = nullptr;
 
 	return 0;
 }
@@ -1772,7 +1772,7 @@ static void _HideChildStubs(vehVehicle* veh, const char* visdamgroup)
 	vehanimVehicleStateType* stateType;
 	int i;
 
-	if(veh->VehicleObjectData->VisDamageStubGroup == NULL) return;
+	if(veh->VehicleObjectData->VisDamageStubGroup == nullptr) return;
 
 	for(i = 0; i < VEH_MAX_STATE_BITS; i++)
 	{
@@ -1800,7 +1800,7 @@ static void _ShowChildStubs(vehVehicle* veh, const char* visdamgroup)
 	vehanimVehicleStateType* stateType;
 	int i;
 
-	if(veh->VehicleObjectData->VisDamageStubGroup == NULL) return;
+	if(veh->VehicleObjectData->VisDamageStubGroup == nullptr) return;
 
 	for(i = 0; i < VEH_MAX_STATE_BITS; i++)
 	{
@@ -1885,7 +1885,7 @@ typedef struct
 static LOGICAL _CreateCrapCallback(OBJECT* obj, UINT32 user)
 {
 	SINT32 i = 0;
-	char* str = NULL;
+	char* str = nullptr;
 
 	// update crap object's position
 	crapcallbackdata* cb = (crapcallbackdata*)user;
@@ -1918,7 +1918,7 @@ static LOGICAL _FixCrapCallback(OBJECT* obj, UINT32 user)
 {
 	/*
 	SINT32 i = 0;
-	char* str = NULL;
+	char* str = nullptr;
 
 	obmainClearFlag2InThisTree(obj, OBJECT_DONT_UPDATE | OBJECT_HIDDEN);
 	ogrpShowObjectAndSubtree(obj);
@@ -1951,7 +1951,7 @@ static void _CreateCrapAndStubs(vehVehicle* veh, const char* visdamgroup, LOGICA
 	// show stub
 	if(LeaveStub)
 	{
-		obj = NULL;
+		obj = nullptr;
 		if(veh->VehicleObjectData->VisDamageStubGroup)
 			 obmainFindComment(&obj, veh->VehicleObjectData->VisDamageStubGroup->child, _comment);
 
@@ -1984,7 +1984,7 @@ static void _FixCrapAndStubs(vehVehicle* veh, const char* visdamgroup)
 	snprintf(_comment, sizeof(_comment) - 1, "visdamage=%s", visdamgroup);
 
 	// hid stub
-	obj = NULL;
+	obj = nullptr;
 	if(veh->VehicleObjectData->VisDamageStubGroup)
 		 obmainFindComment(&obj, veh->VehicleObjectData->VisDamageStubGroup->child, _comment);
 
@@ -1996,7 +1996,7 @@ static void _FixCrapAndStubs(vehVehicle* veh, const char* visdamgroup)
 
 	// fix crap
 	if(false && veh->VehicleObjectData->VisDamageCrapGroup)
-		obmainFindCommentFirstPartCallback(veh->VehicleObjectData->VisDamageCrapGroup->child, _comment, NULL, _FixCrapCallback);
+		obmainFindCommentFirstPartCallback(veh->VehicleObjectData->VisDamageCrapGroup->child, _comment, nullptr, _FixCrapCallback);
 }
 #endif
 
@@ -2012,7 +2012,7 @@ static void _CreateCrap(vehVehicle* veh, OBJECT* obj, const char* visdamgroup, L
 
 	const vehanimVehicleStateType* st = vehFindStateByName(veh->VehicleType, visdamgroup);
 
-	if(st == NULL)
+	if(st == nullptr)
 	{
 #ifdef BETA_RELEASE
 		Write_Log(LOG_VEHICLE, LOG_WARN,  "no visdamage group called %s in state file!", visdamgroup);
@@ -2029,7 +2029,7 @@ static void _CreateCrap(vehVehicle* veh, OBJECT* obj, const char* visdamgroup, L
 
 	const vehInertiaComponent* ic = vehFindInertiaComponent(veh->VehicleType, MassName);
 
-	if(ic == NULL)
+	if(ic == nullptr)
 	{
 		if(i == 0)
 		{
@@ -2043,13 +2043,13 @@ static void _CreateCrap(vehVehicle* veh, OBJECT* obj, const char* visdamgroup, L
 		return;
 	}
 
-	VisualDamageBody* crap = NULL;
+	VisualDamageBody* crap = nullptr;
 
 	// create a new physics object representing the crap
 	if(strstr(MassName,"wheel"))
 		crap = new WheelDamageBody(veh, obj);
 	else if(strstr(MassName,"wing") || strstr(MassName,"stab"))
-		crap = new WingDamageBody(veh, obj, strstr(MassName,"wing") != NULL);
+		crap = new WingDamageBody(veh, obj, strstr(MassName,"wing") != nullptr);
 	else if(strstr(MassName,"turret"))
 		crap = new TurretDamageBody(veh, obj);
 	else if(strstr(MassName,"engine") || strstr(MassName,"mass_eng"))

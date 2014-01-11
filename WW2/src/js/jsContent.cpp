@@ -31,20 +31,20 @@ void jsContentData::Reset()
 	{
 		links->clear();
 		delete links;
-		links = NULL;
+		links = nullptr;
 	}
 
 	if(includes)
 	{
 		includes->clear();
 		delete includes;
-		includes = NULL;
+		includes = nullptr;
 	}
 
 	if(locMap)
 	{
 		delete locMap;
-		locMap = NULL;
+		locMap = nullptr;
 	}
 
 	clear();
@@ -449,7 +449,7 @@ void jsContent::ProcessBody(jsContent* content, jsContentData* data)
 jsContent::jsContent(JSContext* ctx, JSObject* parent, int type) :
 	phui::js::Object(&jsclass, ctx, parent, jsfunctions, jsproperties),
 	_type(type),
-	_locMap(NULL)
+	_locMap(nullptr)
 {
 	JS_CONSTRUCTOR_LOCK;
 };
@@ -459,7 +459,7 @@ jsContent::~jsContent()
 	if(_locMap)
 	{
 		delete _locMap;
-		_locMap = NULL;
+		_locMap = nullptr;
 	}
 }
 
@@ -508,5 +508,5 @@ void jsContent::SetLoc(jsContentData* data)
 	_locMap = data->locMap;
 
 	// the data no longer need its
-	data->locMap = NULL;
+	data->locMap = nullptr;
 }

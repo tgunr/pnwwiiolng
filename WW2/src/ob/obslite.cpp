@@ -50,7 +50,7 @@ static int		number=0;
 
 	matnum = piGetMaterials(&lpmats);
 
-	for (i=0 ; object != NULL ; i++, object=(OBJECT*)object->attached)
+	for (i=0 ; object != nullptr ; i++, object=(OBJECT*)object->attached)
 	{
 		lpobj = object;
 		if (!(lpobj->flags & OBJECT_LITE))
@@ -64,10 +64,10 @@ static int		number=0;
 		}
 		else
 		{
-			lpmaterial = NULL;
+			lpmaterial = nullptr;
 		}
 
-		if (lpmaterial != NULL)
+		if (lpmaterial != nullptr)
 		{
 			Kar = lpmaterial->ambient.r;
 			Kag = lpmaterial->ambient.g;

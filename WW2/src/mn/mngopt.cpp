@@ -64,7 +64,7 @@ static KEY	vars[]={{"help", ENULL},
                     {"buildterrain", ENULL},
     {"o", ESTRING},
     {"altfont", ENULL},
-					{NULL, ENULL}};
+					{nullptr, ENULL}};
 
 static void*	pvars[]={&WantedHelp,
 					&WantedWidth,
@@ -99,7 +99,7 @@ static void*	pvars[]={&WantedHelp,
 					&g_buildTerrain,
     &HackID,
     &AltFont,
-					NULL};
+					nullptr};
 
 static char* _skipFilename(const char* ptr)
 {
@@ -114,8 +114,8 @@ static char* _skipFilename(const char* ptr)
 	else
 		ptr = strchr(ptr, ' ');
 
-	if ( ptr == NULL )
-		return NULL;
+	if ( ptr == nullptr )
+		return nullptr;
 
 	while ( *ptr == ' ' )
 		++ptr;
@@ -135,7 +135,7 @@ LOGICAL mngoptParse(char* InputLine)
 	ptr = _skipFilename(GetCommandLine());
 #endif
 
-	if ( ptr == NULL )
+	if ( ptr == nullptr )
 		return TRUE;
 	if ( *ptr != '-' && *ptr != '/' )
 		return TRUE;
@@ -147,7 +147,7 @@ LOGICAL mngoptParse(char* InputLine)
 
     ptr = strtok(ptr, sep);
 
-	while ( ptr != NULL )
+	while ( ptr != nullptr )
 	{
 		// find end of command
 		for (i=0; ptr[i]; i++)
@@ -209,10 +209,10 @@ LOGICAL mngoptParse(char* InputLine)
 			}
 		}
 
-		ptr = strtok(NULL, sep);
+		ptr = strtok(nullptr, sep);
 
 		// continue if command not known
-		if (NULL == vars[i].key)
+		if (nullptr == vars[i].key)
 		{
 			Write_Debug("Unknown switch: '%s', '%s'", cmd, value);
 			continue;
@@ -242,32 +242,32 @@ LOGICAL mngoptParse(char* InputLine)
 			}
 			case EINT:
 			{
-				*(int*)pvars[i] = (int)strtol(value, NULL, 0);
+				*(int*)pvars[i] = (int)strtol(value, nullptr, 0);
 				break;
 			}
 			case EUINT:
 			{
-				*(unsigned int*)pvars[i] = (unsigned int)strtol(value, NULL, 0);
+				*(unsigned int*)pvars[i] = (unsigned int)strtol(value, nullptr, 0);
 				break;
 			}
 			case ELONG:
 			{
-				*(long*)pvars[i] = (long)strtol(value, NULL, 0);
+				*(long*)pvars[i] = (long)strtol(value, nullptr, 0);
 				break;
 			}
 			case EDWORD:
 			{
-				*(unsigned long*)pvars[i] = (unsigned long)strtoul(value, NULL, 0);
+				*(unsigned long*)pvars[i] = (unsigned long)strtoul(value, nullptr, 0);
 				break;
 			}
 			case EFLOAT:
 			{
-				*(float*)pvars[i] = (float)strtod(value, NULL);
+				*(float*)pvars[i] = (float)strtod(value, nullptr);
 				break;
 			}
 			case EDOUBLE:
 			{
-				*(double*)pvars[i] = (double)strtod(value, NULL);
+				*(double*)pvars[i] = (double)strtod(value, nullptr);
 				break;
 			}
 			case ESTRING:
@@ -282,7 +282,7 @@ LOGICAL mngoptParse(char* InputLine)
 			}
 		}
 	}
-	while (ptr != NULL);
+	while (ptr != nullptr);
 
 	return(TRUE);
 }

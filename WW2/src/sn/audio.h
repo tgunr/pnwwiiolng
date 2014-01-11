@@ -13,14 +13,14 @@ public:
     HANDLE BufferEndEvent;
 
     VoiceCallback() :
-        BufferEndEvent(CreateEvent(NULL, FALSE, FALSE, NULL))
+        BufferEndEvent(CreateEvent(nullptr, FALSE, FALSE, nullptr))
     {
-        sound = NULL;
+        sound = nullptr;
     }
 
     ~VoiceCallback()
     {
-        sound = NULL;
+        sound = nullptr;
         CloseHandle(BufferEndEvent);
     }
 

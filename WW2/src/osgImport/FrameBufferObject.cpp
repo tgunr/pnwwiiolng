@@ -594,7 +594,7 @@ void FrameBufferKill()
     if(s_deletedFrameBufferObjectCache)
         delete s_deletedFrameBufferObjectCache;
 
-    s_deletedFrameBufferObjectCache = NULL;
+    s_deletedFrameBufferObjectCache = nullptr;
 }
 
 void FrameBufferObject::deleteFrameBufferObject(unsigned int contextID, GLuint rb)

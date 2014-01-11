@@ -32,13 +32,13 @@ void fioInit()
 #if platOS == OS_WIN32
 
 	TCHAR path[_MAX_PATH];
-	const TCHAR* base = NULL;
+	const TCHAR* base = nullptr;
 
 	// default to this directory
 	ustrcpy(path, _T("."));
 
 #if GREEN_INSTALL != 1
-    SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS | CSIDL_FLAG_CREATE, NULL, 0, path);
+    SHGetFolderPath(nullptr, CSIDL_MYDOCUMENTS | CSIDL_FLAG_CREATE, nullptr, 0, path);
 
 	base = sysregGetInstallValue(_T("Version"));
 #endif // GREEN_INSTALL != 1
@@ -83,7 +83,7 @@ void fioInit()
 		Opens the file, allocates memory for it, returns a pointer to the memory.
 		outSize can be null if you don't care about the size.
 		Returns false if there is an error loading the file, otherwise true.
-		NOTE: outPtr may be NULL if the file was empty.
+		NOTE: outPtr may be nullptr if the file was empty.
 *************************************************************************************************/
 
 bool fioLoad(const char* filename, char*& outPtr, unsigned int* outSize)
@@ -92,7 +92,7 @@ bool fioLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 	if ( fio_switch == ISDIRECTORY )
 		return fiodLoad(filename, outPtr, outSize);
 
-	outPtr = NULL;
+	outPtr = nullptr;
 
 	// Assess the file size, assume fioFileSize will
 	// report any errors locating the file etc.
@@ -115,7 +115,7 @@ bool fioLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 
 	// Allocate the memory.
 	char* data = (char*)memAlloc(fileSize + 1);
-	if ( PN_UNLIKELY(data == NULL) )
+	if ( PN_UNLIKELY(data == nullptr) )
 	{
 		DEBUG_ERR("Unable to allocate %u bytes of memory for loading %s.", fileSize + 1);
 		fiodClose(fd);
@@ -139,7 +139,7 @@ bool fioLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 
 	data[bytesRead] = 0;
 
-	if ( outSize != NULL )
+	if ( outSize != nullptr )
 		*outSize = (unsigned int)fileSize;
 
 	outPtr = data;
@@ -835,7 +835,7 @@ namespace Fio
 	{
 		FILE* fp = fioUserFile(Fio::LogFileName(), "a");
 		// If that fails, return stderr
-		if ( PN_UNLIKELY(fp == NULL) )
+		if ( PN_UNLIKELY(fp == nullptr) )
 			return OS_FDOPEN(OS_DUP(OS_FILENO(stderr)), "a");
 		return fp;
 	}

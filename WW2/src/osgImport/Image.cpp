@@ -523,7 +523,7 @@ void Image::allocateImage(int s,int t,int r,
         if (newTotalSize)
             setData(new unsigned char [newTotalSize],USE_NEW_DELETE);
         else
-            deallocateData(); // and sets it to NULL.
+            deallocateData(); // and sets it to nullptr.
     }
 
     if (_data)
@@ -700,7 +700,7 @@ void Image::readImageFromCurrentTexture(unsigned int contextID, bool copyMipMaps
             return;
         }
 
-        deallocateData(); // and sets it to NULL.
+        deallocateData(); // and sets it to nullptr.
 
         glGetTexLevelParameteriv(textureMode, 0, GL_TEXTURE_INTERNAL_FORMAT, &internalformat);
         glGetTexLevelParameteriv(textureMode, 0, GL_TEXTURE_WIDTH, &width);
@@ -762,7 +762,7 @@ void Image::readImageFromCurrentTexture(unsigned int contextID, bool copyMipMaps
             return;
         }
 
-        deallocateData(); // and sets it to NULL.
+        deallocateData(); // and sets it to nullptr.
 
         glGetTexLevelParameteriv(textureMode, 0, GL_TEXTURE_WIDTH, &width);
         glGetTexLevelParameteriv(textureMode, 0, GL_TEXTURE_HEIGHT, &height);
@@ -795,9 +795,9 @@ void Image::scaleImage(int s,int t,int r, GLenum newDataType)
 {
     if (_s==s && _t==t && _r==r) return;
 
-    if (_data==NULL)
+    if (_data==nullptr)
     {
-        //notify(WARN) << "Error Image::scaleImage() do not succeed : cannot scale NULL image."<<std::endl;
+        //notify(WARN) << "Error Image::scaleImage() do not succeed : cannot scale nullptr image."<<std::endl;
         return;
     }
 
@@ -911,9 +911,9 @@ void Image::copySubImage(int s_offset,int t_offset,int r_offset,Image* source)
 
 void Image::flipHorizontal()
 {
-    if (_data==NULL)
+    if (_data==nullptr)
     {
-        //notify(WARN) << "Error Image::flipHorizontal() did not succeed : cannot flip NULL image."<<std::endl;
+        //notify(WARN) << "Error Image::flipHorizontal() did not succeed : cannot flip nullptr image."<<std::endl;
         return;
     }
 
@@ -968,9 +968,9 @@ void flipImageVertical(unsigned char* top, unsigned char* bottom, unsigned int r
 
 void Image::flipVertical()
 {
-    if (_data==NULL)
+    if (_data==nullptr)
     {
-        //notify(WARN) << "Error Image::flipVertical() do not succeed : cannot flip NULL image."<<std::endl;
+        //notify(WARN) << "Error Image::flipVertical() do not succeed : cannot flip nullptr image."<<std::endl;
         return;
     }
 

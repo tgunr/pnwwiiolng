@@ -7,7 +7,7 @@
 #include "phui/IMEControl.h"
 #include "ui/uiMain.h"
 
-static IMEBase* _imeClient = NULL;
+static IMEBase* _imeClient = nullptr;
 
 const std::wstring IMEBase::emptyString = L"";
 
@@ -115,7 +115,7 @@ void IMEBase::OnUnfocus()
 phui::IMEControl* IMEBase::Control()
 {
 	phui::Viewport* vp = uiViewport();
-	if(!vp) return NULL;
+	if(!vp) return nullptr;
 
 	phui::View* ime = vp->FindView("ime");
 	if(!ime)
@@ -124,7 +124,7 @@ phui::IMEControl* IMEBase::Control()
 		if(ime) ime->Hide();
 	}
 
-	return (ime) ? dynamic_cast<phui::IMEControl*>(ime): NULL;
+	return (ime) ? dynamic_cast<phui::IMEControl*>(ime): nullptr;
 }
 
 void IMEBase::OnInputChange()
@@ -192,5 +192,5 @@ void IMEBase::ResetControl(bool updateui)
 
 phui::TextContainer* IMEBase::FocusView() const
 {
-	return (focusView) ? dynamic_cast<phui::TextContainer*>(focusView): NULL;
+	return (focusView) ? dynamic_cast<phui::TextContainer*>(focusView): nullptr;
 }

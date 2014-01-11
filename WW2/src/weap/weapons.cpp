@@ -134,7 +134,7 @@ SINT32 weaponsInit(void)
 
 				mlUtilityGetVarnameAndContents(&VarName,&VarContents,Buffer);
 
-				if (VarName == NULL || VarContents == NULL)
+				if (VarName == nullptr || VarContents == nullptr)
 					continue;
 
 				mlUtilityFindVarname(&VarNum,
@@ -165,7 +165,7 @@ SINT32 weaponsInit(void)
                         {
 						    weapFindAmmoTypeByName(&WeaponType->GhostAmmoType,VarContents);
 
-                            if(WeaponType->GhostAmmoType == NULL)
+                            if(WeaponType->GhostAmmoType == nullptr)
                             {
                                 char s[128];
                                 sprintf(s, "ghostammotype %s not found", VarContents);
@@ -188,7 +188,7 @@ SINT32 weaponsInit(void)
                         {
 						    weapFindAmmoTypeByName(&WeaponType->AmmoType[VarNum-WEAP_VAR_AMMOTYPE1],VarContents);
 
-                            if(WeaponType->AmmoType[VarNum-WEAP_VAR_AMMOTYPE1] == NULL)
+                            if(WeaponType->AmmoType[VarNum-WEAP_VAR_AMMOTYPE1] == nullptr)
                             {
                                 char s[128];
                                 sprintf(s, "ammotype %s not found", VarContents);
@@ -263,12 +263,12 @@ UINT32 weapFindWeaponTypeByName(weaponType ** WeaponType,UCHAR * WeaponName)
 {
 UINT32 i;
 
-	if (WeaponType == NULL || WeaponName == NULL)
+	if (WeaponType == nullptr || WeaponName == nullptr)
 	{
 		return 1;
 	}
 
-	*WeaponType = NULL;
+	*WeaponType = nullptr;
 
 	for (i=0;i<_NumWeaponTypes;i++)
 	{
@@ -284,10 +284,10 @@ UINT32 i;
 
 UINT32 weaponsKill(void)
 {
-	if (_WeaponList != NULL)
+	if (_WeaponList != nullptr)
 	{
 		memFree(_WeaponList);
-		_WeaponList = NULL;
+		_WeaponList = nullptr;
 	}
 
 	return 0;
@@ -296,7 +296,7 @@ UINT32 weaponsKill(void)
 
 UINT32 weapInitializeWeapon(weapWeapon * Weapon,weaponType * WeaponType)
 {
-	if (Weapon == NULL || WeaponType == NULL)
+	if (Weapon == nullptr || WeaponType == nullptr)
 	{
 		return 1;
 	}
@@ -315,7 +315,7 @@ weaponType * WeaponType;
 
 	weapFindWeaponTypeByName(&WeaponType,WeaponName);
 
-	if (WeaponType == NULL)
+	if (WeaponType == nullptr)
 	{
 		return 1;
 	}
@@ -342,7 +342,7 @@ UINT32 weapFireWeapon(FLOAT64VECTOR * RecoilForce,
 					  void* FireVehicle) // note: FireDelta is in seconds
 {
 	FLOAT64			FireInterval = 0.0f;
-	weapAmmoType*	AmmoType = NULL;
+	weapAmmoType*	AmmoType = nullptr;
     FLOAT64VECTOR	TempRecoilForce = {0, 0, 0};
 	piMATRIX		FinalFireAtt = IdentityMatrix;
     piVECTOR		Dispersion = {0, 0, 0};
@@ -353,13 +353,13 @@ UINT32 weapFireWeapon(FLOAT64VECTOR * RecoilForce,
     piVECTOR        V2 = {0, 0, 0};
     piVECTOR		origV1 = {0, 0, 0};
     piVECTOR		CollidePnt = {0, 0, 0};
-	OBJECT*			CollideObject = NULL;
+	OBJECT*			CollideObject = nullptr;
 	SINT32			PolyNum = 0;
-	vehVehicle*		CollideVehicle = NULL;
-	trnCDTerrainObject*	TO = NULL;
+	vehVehicle*		CollideVehicle = nullptr;
+	trnCDTerrainObject*	TO = nullptr;
 	LOGICAL			reloading = FALSE;
 
-	if (Weapon->WeaponType == NULL)
+	if (Weapon->WeaponType == nullptr)
 	{
 		Write_Debug("Attempted to fire a weapon without a weapontype");
 		return 0;
@@ -667,7 +667,7 @@ UINT32 weapFireWeapon(FLOAT64VECTOR * RecoilForce,
                 // Show dust coming off of tanks when firing big guns.
                 if(Weapon->WeaponType->bShockDust)
                 {
-                    if(FireVehicle != NULL)
+                    if(FireVehicle != nullptr)
                     {
                         vehVehicle* lpVeh = (vehVehicle*)FireVehicle;
 
@@ -681,7 +681,7 @@ UINT32 weapFireWeapon(FLOAT64VECTOR * RecoilForce,
 				fpFPSFireRound(Weapon, FireAtt);
 			}
 
-			if (LastFireTime != NULL)
+			if (LastFireTime != nullptr)
 			{
 				*LastFireTime = Weapon->LastFireTime;
 			}
@@ -854,7 +854,7 @@ UINT32 weapFireWeapon(FLOAT64VECTOR * RecoilForce,
 
 LOGICAL weapIsWeaponReloading(weapWeapon * Weapon, FLOAT64 CurrentTime)
 {
-	if (Weapon == NULL)
+	if (Weapon == nullptr)
 	{
 		return FALSE;
 	}
@@ -886,7 +886,7 @@ LOGICAL weapIsWeaponReloading(weapWeapon * Weapon, FLOAT64 CurrentTime)
 
 UINT32 weapResupplyWeapon(weapWeapon* Weapon, FLOAT32 percentOfTotal, bool allowOversupply)
 {
-	if(Weapon == NULL || Weapon->WeaponType == NULL)
+	if(Weapon == nullptr || Weapon->WeaponType == nullptr)
 		return FALSE;
 
 	UINT32 numResupplied	= 0;

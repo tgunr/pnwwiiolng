@@ -90,12 +90,12 @@ LOGICAL trnInitAutogunSystem(void)
 
 static LOGICAL _ReadAndSetupAutogunTypes(void)
 {
-    trnAutoGunType * AGT = NULL;
+    trnAutoGunType * AGT = nullptr;
     UINT32 Country = 0;
     UINT32 i = 0;
     SINT32 AutoGunFile = 0;
-    SCHAR* BufferPtr = NULL;
-    SCHAR* Ptr1 = NULL;
+    SCHAR* BufferPtr = nullptr;
+    SCHAR* Ptr1 = nullptr;
     LOGICAL ReadingAutoguns = FALSE;
     SINT32 GroupNum = 0;
     SINT32 ElementNum = 0;
@@ -150,13 +150,13 @@ static LOGICAL _ReadAndSetupAutogunTypes(void)
 			if (GroupNum >= 0 && GroupNum < _MAX_GROUPS && ElementNum < _MAX_IN_A_GROUP)
 			{
 				BufferPtr = strtok(Buffer,",");
-				if (BufferPtr == NULL)
+				if (BufferPtr == nullptr)
 				{
 					continue;
 				}
 				strcpy(TempStr1,BufferPtr);
-				BufferPtr = strtok(NULL,",");
-				if (BufferPtr == NULL)
+				BufferPtr = strtok(nullptr,",");
+				if (BufferPtr == nullptr)
 				{
 					continue;
 				}
@@ -176,7 +176,7 @@ static LOGICAL _ReadAndSetupAutogunTypes(void)
 		else
 		{
 			BufferPtr = strtok(Buffer,",");
-			if (BufferPtr == NULL)
+			if (BufferPtr == nullptr)
 			{
 				continue;
 			}
@@ -187,8 +187,8 @@ static LOGICAL _ReadAndSetupAutogunTypes(void)
 			AGT = &_AutoGunType[atoi(BufferPtr)];
 
 
-			BufferPtr = strtok(NULL,",");
-			if (BufferPtr == NULL)
+			BufferPtr = strtok(nullptr,",");
+			if (BufferPtr == nullptr)
 			{
 				continue;
 			}
@@ -199,8 +199,8 @@ static LOGICAL _ReadAndSetupAutogunTypes(void)
 			Country = atoi(BufferPtr);
 
 
-			BufferPtr = strtok(NULL,",");
-			if (BufferPtr == NULL)
+			BufferPtr = strtok(nullptr,",");
+			if (BufferPtr == nullptr)
 			{
 				continue;
 			}
@@ -208,14 +208,14 @@ static LOGICAL _ReadAndSetupAutogunTypes(void)
 			{
 				BufferPtr++;
 			}
-			while ((Ptr1 = strrchr(BufferPtr,' ')) != NULL)
+			while ((Ptr1 = strrchr(BufferPtr,' ')) != nullptr)
 			{
 				*Ptr1 = '\0';
 			}
 			strcpy(AGT->ObjectName[Country],BufferPtr);
 
-			BufferPtr = strtok(NULL,",");
-			if (BufferPtr == NULL)
+			BufferPtr = strtok(nullptr,",");
+			if (BufferPtr == nullptr)
 			{
 				continue;
 			}
@@ -223,14 +223,14 @@ static LOGICAL _ReadAndSetupAutogunTypes(void)
 			{
 				BufferPtr++;
 			}
-			while ((Ptr1 = strrchr(BufferPtr,' ')) != NULL)
+			while ((Ptr1 = strrchr(BufferPtr,' ')) != nullptr)
 			{
 				*Ptr1 = '\0';
 			}
 			strcpy(AGT->WeaponName[Country],BufferPtr);
 
-			BufferPtr = strtok(NULL,",");
-			if (BufferPtr == NULL)
+			BufferPtr = strtok(nullptr,",");
+			if (BufferPtr == nullptr)
 			{
 				continue;
 			}
@@ -238,91 +238,91 @@ static LOGICAL _ReadAndSetupAutogunTypes(void)
 			{
 				BufferPtr++;
 			}
-			while ((Ptr1 = strrchr(BufferPtr,' ')) != NULL)
+			while ((Ptr1 = strrchr(BufferPtr,' ')) != nullptr)
 			{
 				*Ptr1 = '\0';
 			}
 			strcpy(AGT->BeltFile[Country],BufferPtr);
 
-			BufferPtr = strtok(NULL,",");
-			if (BufferPtr == NULL)
+			BufferPtr = strtok(nullptr,",");
+			if (BufferPtr == nullptr)
 			{
 				continue;
 			}
 			AGT->MaxConeAngle[Country] = mlDEG_TO_RAD((FLOAT32)atof(BufferPtr));
 
-			BufferPtr = strtok(NULL,",");
-			if (BufferPtr == NULL)
+			BufferPtr = strtok(nullptr,",");
+			if (BufferPtr == nullptr)
 			{
 				continue;
 			}
 			AGT->MinConeAngle[Country] = mlDEG_TO_RAD((FLOAT32)atof(BufferPtr));
 
-			BufferPtr = strtok(NULL,",");
-			if (BufferPtr == NULL)
+			BufferPtr = strtok(nullptr,",");
+			if (BufferPtr == nullptr)
 			{
 				continue;
 			}
 			AGT->TimeToMinCone[Country] = (FLOAT32)atof(BufferPtr);
 
-			BufferPtr = strtok(NULL,",");
-			if (BufferPtr == NULL)
+			BufferPtr = strtok(nullptr,",");
+			if (BufferPtr == nullptr)
 			{
 				continue;
 			}
 			AGT->AngleOffMult[Country] = (FLOAT32)atof(BufferPtr);
 
-			BufferPtr = strtok(NULL,",");
-			if (BufferPtr == NULL)
+			BufferPtr = strtok(nullptr,",");
+			if (BufferPtr == nullptr)
 			{
 				continue;
 			}
 			AGT->DegreesOffMult[Country] = (FLOAT32)atof(BufferPtr);
 
-			BufferPtr = strtok(NULL,",");
-			if (BufferPtr == NULL)
+			BufferPtr = strtok(nullptr,",");
+			if (BufferPtr == nullptr)
 			{
 				continue;
 			}
 			AGT->VisAdditionalAngle[Country] = mlDEG_TO_RAD((FLOAT32)atof(BufferPtr));
 
-			BufferPtr = strtok(NULL,",");
-			if (BufferPtr == NULL)
+			BufferPtr = strtok(nullptr,",");
+			if (BufferPtr == nullptr)
 			{
 				continue;
 			}
 			AGT->MaxEngagementRange[Country] = AGT->MaxEffectiveRange[Country] = (FLOAT32)atof(BufferPtr);
 
-			BufferPtr = strtok(NULL,",");
-			if (BufferPtr == NULL)
+			BufferPtr = strtok(nullptr,",");
+			if (BufferPtr == nullptr)
 			{
 				continue;
 			}
 			AGT->EngageVehiclePriority[Country][0] = atoi(BufferPtr);
 
-			BufferPtr = strtok(NULL,",");
-			if (BufferPtr == NULL)
+			BufferPtr = strtok(nullptr,",");
+			if (BufferPtr == nullptr)
 			{
 				continue;
 			}
 			AGT->EngageVehiclePriority[Country][1] = atoi(BufferPtr);
 
-			BufferPtr = strtok(NULL,",");
-			if (BufferPtr == NULL)
+			BufferPtr = strtok(nullptr,",");
+			if (BufferPtr == nullptr)
 			{
 				continue;
 			}
 			AGT->EngageVehiclePriority[Country][2] = atoi(BufferPtr);
 
-			BufferPtr = strtok(NULL,",");
-			if (BufferPtr == NULL)
+			BufferPtr = strtok(nullptr,",");
+			if (BufferPtr == nullptr)
 			{
 				continue;
 			}
 			AGT->GunFiresContinuously[Country] = atoi(BufferPtr);
 
-			BufferPtr = strtok(NULL,",");
-			if (BufferPtr == NULL)
+			BufferPtr = strtok(nullptr,",");
+			if (BufferPtr == nullptr)
 			{
 				continue;
 			}
@@ -330,14 +330,14 @@ static LOGICAL _ReadAndSetupAutogunTypes(void)
 			{
 				BufferPtr++;
 			}
-			while ((Ptr1 = strrchr(BufferPtr,' ')) != NULL)
+			while ((Ptr1 = strrchr(BufferPtr,' ')) != nullptr)
 			{
 				*Ptr1 = '\0';
 			}
 			strcpy(AGT->FireSound[Country],BufferPtr);
 
-			BufferPtr = strtok(NULL,",");
-			if (BufferPtr == NULL)
+			BufferPtr = strtok(nullptr,",");
+			if (BufferPtr == nullptr)
 			{
 				continue;
 			}
@@ -345,21 +345,21 @@ static LOGICAL _ReadAndSetupAutogunTypes(void)
 			{
 				BufferPtr++;
 			}
-			while ((Ptr1 = strrchr(BufferPtr,' ')) != NULL)
+			while ((Ptr1 = strrchr(BufferPtr,' ')) != nullptr)
 			{
 				*Ptr1 = '\0';
 			}
 			strcpy(AGT->ReloadSound[Country],BufferPtr);
 
-			BufferPtr = strtok(NULL,",");
-			if (BufferPtr == NULL)
+			BufferPtr = strtok(nullptr,",");
+			if (BufferPtr == nullptr)
 			{
 				continue;
 			}
 			AGT->ElevateRate[Country] = mlDEG_TO_RAD((FLOAT32)atof(BufferPtr));
 
-			BufferPtr = strtok(NULL,",");
-			if (BufferPtr == NULL)
+			BufferPtr = strtok(nullptr,",");
+			if (BufferPtr == nullptr)
 			{
 				continue;
 			}
@@ -376,7 +376,7 @@ static LOGICAL _ReadAndSetupAutogunTypes(void)
 LOGICAL trnKillAutogunSystem(void)
 {
 	// note: if there are any autoguns left to kill, we've got a problem
-	if (_AutoGunHead.next != NULL)
+	if (_AutoGunHead.next != nullptr)
 	{
 		Write_Debug("******************");
 		Write_Debug("Autoguns remaining after trnldrkill!!!!!");
@@ -388,11 +388,11 @@ LOGICAL trnKillAutogunSystem(void)
 
 LOGICAL trnKillAutogun(trnAutoGun** ppAutoGun)
 {
-trnAutoGun* pAutoGun = NULL;
+trnAutoGun* pAutoGun = nullptr;
 
 	pAutoGun = *ppAutoGun;
 
-	if (pAutoGun == NULL)
+	if (pAutoGun == nullptr)
 	{
 		return FALSE;
 	}
@@ -403,12 +403,12 @@ trnAutoGun* pAutoGun = NULL;
 		pAutoGun->FireSoundId = 0;
 	}
 
-	if (pAutoGun->TO != NULL)
+	if (pAutoGun->TO != nullptr)
 	{
-		pAutoGun->TO->TrnAutoGun = NULL;
+		pAutoGun->TO->TrnAutoGun = nullptr;
 	}
 
-	if (pAutoGun->Object != NULL)
+	if (pAutoGun->Object != nullptr)
 	{
 		obpoolFreeObjectCallback(pAutoGun->Object);
 	}
@@ -423,20 +423,20 @@ trnAutoGun* pAutoGun = NULL;
 
 LOGICAL trnAddAutoGun(trnCDTerrainObject * TO)
 {
-	if (TO == NULL)
+	if (TO == nullptr)
 	{
 		return FALSE;
 	}
 
-	trnAutoGun * AG = NULL;
+	trnAutoGun * AG = nullptr;
 	FLOAT64VECTOR WorldOffsetOrigin = {0, 0, 0};
 	piMATRIX AttMat = IdentityMatrix;
 	FLOAT64VECTOR Pos = {0, 0, 0};
-	OBJECT * PlaceObject = NULL;
+	OBJECT * PlaceObject = nullptr;
 	FLOAT32 Num1 = 0;
 	FLOAT32 Num2 = 0;
 	FLOAT32 Num3 = 0;
-	BUILDING* bld = NULL;
+	BUILDING* bld = nullptr;
 	static SINT8 ObjectName[64];
 	static SINT8 Buffer[128];
 
@@ -448,7 +448,7 @@ LOGICAL trnAddAutoGun(trnCDTerrainObject * TO)
 	// find somewhere to put the autogun
 	ogrpParseDOFParameters(TO->TerrainObject,(UCHAR*)(&mlDOFVarNameTable[0][0]),ML_DOF_MAXNUM,32);
 	ogrpFindSubObjectByDOFVar(&PlaceObject,TO->TerrainObject,ML_DOF_AG_LOCATE);
-	if (PlaceObject == NULL)
+	if (PlaceObject == nullptr)
 	{
 		Write_Debug("Unable to find placement point in base object %s",
 					TO->TerrainMasterObject->name);
@@ -457,7 +457,7 @@ LOGICAL trnAddAutoGun(trnCDTerrainObject * TO)
 
 	// initialize an autogun
 	AG = (trnAutoGun*)memAlloc(sizeof(trnAutoGun));
-	if (AG == NULL)
+	if (AG == nullptr)
 	{
 		Write_Debug("Unable to allocate memory for autogun");
 		return FALSE;
@@ -465,7 +465,7 @@ LOGICAL trnAddAutoGun(trnCDTerrainObject * TO)
 	memset(AG,0,sizeof(trnAutoGun));
 
 	AG->Weapon = new weapWeapon;
-	if (AG->Weapon == NULL)
+	if (AG->Weapon == nullptr)
 	{
 		Write_Debug("Unable to allocate weapon space memory for autogun");
 		memFree(AG);
@@ -528,18 +528,18 @@ LOGICAL trnAddAutoGun(trnCDTerrainObject * TO)
 		listDeleteItem((LISTHEADER*)AG);
 		delete AG->Weapon;
 		memFree(AG);
-		TO->TrnAutoGun = NULL;
+		TO->TrnAutoGun = nullptr;
 		return FALSE;
 	}
 
 	AG->Object = obmainFindNamedObject(ObjectName);
 	obmainSetFlag2InObjectTree(AG->Object,OBJECT_SPECIAL_LOD);
-	if (AG->Object == NULL)
+	if (AG->Object == nullptr)
 	{
 		listDeleteItem((LISTHEADER*)AG);
 		delete AG->Weapon;
 		memFree(AG);
-		TO->TrnAutoGun = NULL;
+		TO->TrnAutoGun = nullptr;
 		return FALSE;
 	}
 
@@ -547,13 +547,13 @@ LOGICAL trnAddAutoGun(trnCDTerrainObject * TO)
 	ogrpParseDOFParameters(AG->Object,(UCHAR*)(&mlDOFVarNameTable[0][0]),ML_DOF_MAXNUM,32);
 
 	ogrpFindSubObjectByDOFVar(&(AG->FirePnt),AG->Object,ML_DOF_AG_FIRE);
-	if (AG->FirePnt == NULL)
+	if (AG->FirePnt == nullptr)
 	{
 		Write_Debug("Unable to find fire point in autogun %s",AG->Object->name);
 	}
 	ogrpFindSubObjectByDOFVar(&(AG->ViewPnt),AG->Object,ML_DOF_AG_VIEW);
 
-    if (AG->ViewPnt == NULL)
+    if (AG->ViewPnt == nullptr)
 	{
 		Write_Debug("[trnAddAutoGun] ** FAILED ** Unable to find view point in autogun %s",AG->Object->name);
 	}
@@ -598,7 +598,7 @@ LOGICAL trnAddAutoGun(trnCDTerrainObject * TO)
 		    listDeleteItem((LISTHEADER*)AG);
 		    delete AG->Weapon;
 		    memFree(AG);
-		    TO->TrnAutoGun = NULL;
+		    TO->TrnAutoGun = nullptr;
             return FALSE;
         }
     }
@@ -607,7 +607,7 @@ LOGICAL trnAddAutoGun(trnCDTerrainObject * TO)
 	    listDeleteItem((LISTHEADER*)AG);
 	    delete AG->Weapon;
 	    memFree(AG);
-	    TO->TrnAutoGun = NULL;
+	    TO->TrnAutoGun = nullptr;
         return FALSE;
     }
 */
@@ -645,9 +645,9 @@ LOGICAL trnAddAutoGun(trnCDTerrainObject * TO)
 
 	obmainClearFlagsInThisTree(AG->Object, OBJECT_VISIBLE);
 
-	AG->CollisionObject = NULL;
+	AG->CollisionObject = nullptr;
 	trnFindCollisionObject(&(AG->CollisionObject), AG->Object);
-	if (AG->CollisionObject == NULL)
+	if (AG->CollisionObject == nullptr)
 	{
 		AG->CollisionObject = AG->Object;
 	}
@@ -673,9 +673,9 @@ void trnautogunToggleAI()
 
 LOGICAL trnUpdateAutoGuns(void)
 {
-    trnAutoGun* AG = NULL;
-    trnAutoGun* AGSaved = NULL;
-    trnAutoGun* AGTempPtr = NULL;
+    trnAutoGun* AG = nullptr;
+    trnAutoGun* AGSaved = nullptr;
+    trnAutoGun* AGTempPtr = nullptr;
 
     FLOAT64VECTOR WorldOffsetOrigin = {0, 0, 0};
     FLOAT64VECTOR ViewPnt = {0, 0, 0};
@@ -693,7 +693,7 @@ LOGICAL trnUpdateAutoGuns(void)
 #if HAVE_AI_GUNS_ALWAYS_FIRE
         if(!_updateAI)
         {
-            for(AG = _AutoGunHead.next; AG != NULL; AG = AG->next)
+            for(AG = _AutoGunHead.next; AG != nullptr; AG = AG->next)
             {
                 if(AG->FireSoundId > 0)
                     fxSndStopSound(AG->FireSoundId);
@@ -718,7 +718,7 @@ LOGICAL trnUpdateAutoGuns(void)
 
 	// recalculate distance squared for all autoguns
 	// and resort
-	if (AG != NULL)
+	if (AG != nullptr)
 	{
 		mathSubVectors(&TempVec,&ViewPnt,&AG->Pos);
 
@@ -727,7 +727,7 @@ LOGICAL trnUpdateAutoGuns(void)
 		AG = AG->next;
 	}
 
-	while (AG != NULL)
+	while (AG != nullptr)
 	{
 		AGSaved = AG->next;
 
@@ -739,7 +739,7 @@ LOGICAL trnUpdateAutoGuns(void)
 				AG->prev != &_AutoGunHead)
 		{
 			AGTempPtr = AG->prev->prev;
-			if (AGTempPtr != NULL)
+			if (AGTempPtr != nullptr)
 			{
 				listDeleteItem((LISTHEADER*)AG);
 				listAddItem((LISTHEADER*)AGTempPtr,(LISTHEADER*)AG);
@@ -752,7 +752,7 @@ LOGICAL trnUpdateAutoGuns(void)
 
 	AG = _AutoGunHead.next;
 	Count = 0;
-	while (AG != NULL)
+	while (AG != nullptr)
 	{
 		if (AG->AGDeadOrHidden != 0)
 		{
@@ -813,7 +813,7 @@ LOGICAL trnUpdateAutoGuns(void)
 
 static LOGICAL _UpdateWeapon(trnAutoGun * AG)
 {
-	weapWeapon * Weapon = NULL;
+	weapWeapon * Weapon = nullptr;
 	piMATRIX AttMat = IdentityMatrix;
     FLOAT64VECTOR TempForce = {0, 0, 0};
 	FLOAT64VECTOR Pos = {0, 0, 0};
@@ -826,7 +826,7 @@ static LOGICAL _UpdateWeapon(trnAutoGun * AG)
 	UINT32 CanCauseDamage = 0;
 
 	Weapon = (weapWeapon*)AG->Weapon;
-	if(Weapon == NULL) return FALSE;
+	if(Weapon == nullptr) return FALSE;
 
 	// trick used to guarantee always ammo to fire, yet reload sequences occur
 	if (Weapon->NumRoundsAmmoLeft[0] <= (SINT32)Weapon->WeaponType->NumRoundsInClip)
@@ -862,7 +862,7 @@ static LOGICAL _UpdateWeapon(trnAutoGun * AG)
 					WEAP_AMMOFLAG_CANDAMAGE | WEAP_AMMOFLAG_ONLY_CHECKPLAYER;
 
 		// use ghost fire effects for guns that aren't shooting player
-		if (AG->Target != NULL && ((vehVehicle*)(AG->Target))->ModelData == NULL)
+		if (AG->Target != nullptr && ((vehVehicle*)(AG->Target))->ModelData == nullptr)
 			GhostFire = 1;
 		else
 			GhostFire = 0;
@@ -896,16 +896,16 @@ static LOGICAL _UpdateWeapon(trnAutoGun * AG)
 					  CanCauseDamage,
 					  GhostFire,
 					  Flags | WEAP_AMMOFLAG_IS_AUTOGUNROUND,
-					  NULL,
-					  NULL,
-					  NULL,
-					  NULL); // note: FireDelta is in seconds
+					  nullptr,
+					  nullptr,
+					  nullptr,
+					  nullptr); // note: FireDelta is in seconds
 
 		if (TempForce.x > 0.001 || TempForce.x < -0.001 ||
 			TempForce.y > 0.001 || TempForce.y < -0.001 ||
 			TempForce.z > 0.001 || TempForce.z < -0.001)
 		{
-			if (Weapon->WeaponType != NULL)
+			if (Weapon->WeaponType != nullptr)
 			{
 				if (Weapon->WeaponType->FireType == WEAP_FIRETYPE_SINGLESHOT)
 				{
@@ -1003,7 +1003,7 @@ static LOGICAL _SetupElevAndTraverse(OBJECT * Object, piMATRIX * TravMat, piMATR
 {
 OBJECT * ObjSib;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return TRUE;
 	}
@@ -1029,14 +1029,14 @@ OBJECT * ObjSib;
 			}
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_SetupElevAndTraverse(ObjSib->child,TravMat,ElevMat);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 	return TRUE;
 }
@@ -1138,16 +1138,16 @@ static LOGICAL _MoveGun(trnAutoGun * AG,piVECTOR* AimAtt)
 
 static LOGICAL _SetupWeapon(weapWeapon* Weapon,SINT8 * WeaponName, SINT8 * BeltFile)
 {
-weaponType * WeaponType = NULL;
+weaponType * WeaponType = nullptr;
 
-	if (Weapon == NULL || WeaponName == NULL || BeltFile == NULL)
+	if (Weapon == nullptr || WeaponName == nullptr || BeltFile == nullptr)
 	{
 		return FALSE;
 	}
 
-	WeaponType = NULL;
+	WeaponType = nullptr;
 	weapFindWeaponTypeByName(&WeaponType,(UCHAR*)WeaponName);
-	if (WeaponType == NULL)
+	if (WeaponType == nullptr)
 	{
 		return FALSE;
 	}
@@ -1169,7 +1169,7 @@ weaponType * WeaponType = NULL;
 
 static LOGICAL _AimGunAtTargetPnt(trnAutoGun * AG,FLOAT64VECTOR * AimPnt)
 {
-	if (AG == NULL || AimPnt == NULL)
+	if (AG == nullptr || AimPnt == nullptr)
 	{
 		return 0;
 	}
@@ -1185,7 +1185,7 @@ static LOGICAL _AimGunAtTargetPnt(trnAutoGun * AG,FLOAT64VECTOR * AimPnt)
 
 	vehVehicle* PlayerVehicle = persGetPersonaVehiclePtr();
 
-	if (AG->Target == NULL)
+	if (AG->Target == nullptr)
 	{
 		AimAtt.x = AimAtt.y = AimAtt.z = 0.0f;
 		AimAtt.z = AG->CenterTraverse;
@@ -1287,20 +1287,20 @@ static LOGICAL _CalculateActualAimPnt(trnAutoGun * AG,FLOAT64VECTOR * AimPnt)
     FLOAT32 Shrink = 0;
     piVECTOR V1 = {0, 0, 0};
     UINT32 PartNum = 0;
-    OBJECT * Object = NULL;
+    OBJECT * Object = nullptr;
     piMATRIX TempMat = IdentityMatrix;
     piMATRIX TempMat1 = IdentityMatrix;
     piVECTOR Att = {0, 0, 0};
-    vehVehicle* Target = NULL;
-    OBJECT*	pAnimationObject = NULL;
+    vehVehicle* Target = nullptr;
+    OBJECT*	pAnimationObject = nullptr;
 
 
-	if (AG == NULL || AimPnt == NULL)
+	if (AG == nullptr || AimPnt == nullptr)
 	{
 		return FALSE;
 	}
 
-	if (AG->Target == NULL)
+	if (AG->Target == nullptr)
 	{
 		return FALSE;
 	}
@@ -1309,7 +1309,7 @@ static LOGICAL _CalculateActualAimPnt(trnAutoGun * AG,FLOAT64VECTOR * AimPnt)
 	Dist = mathExactVectorLength(&DistVec);
 
 	if (((vehVehicle*)(AG->Target))->Flags & VEH_FLAGS_UPDATESYSTEM_CONTROLLED ||
-		((vehVehicle*)(AG->Target))->ModelData == NULL)
+		((vehVehicle*)(AG->Target))->ModelData == nullptr)
 	{
 		Velocity = ((vehVehicle*)(AG->Target))->PosData.Vel;
 	}
@@ -1466,20 +1466,20 @@ static LOGICAL _CalculateActualAimPnt(trnAutoGun * AG,FLOAT64VECTOR * AimPnt)
 			// get new aim point on vehicle/person
 			// pick a random internal component to aim for and apply its position
 			Target = (vehVehicle*)AG->Target;
-			if (Target->VehicleType != NULL)
+			if (Target->VehicleType != nullptr)
 			{
 				// if a person aim at the center of the person
 				if (Target->VehicleType->Type == VEH_TYPE_PERSON)
 				{
-					if (Target->VehicleObjectData != NULL)
+					if (Target->VehicleObjectData != nullptr)
 					{
-						if (Target->VehicleObjectData->PlaneObject != NULL)
+						if (Target->VehicleObjectData->PlaneObject != nullptr)
 						{
 							vehVehicle* PlayerVehicle = persGetPersonaVehiclePtr();
 
 							pAnimationObject = Target->VehicleObjectData->PlaneObject;
 
-							if (pAnimationObject == NULL)
+							if (pAnimationObject == nullptr)
 							{
 								Write_Debug("Error! Unable to find Animation Model in _CalculateActualAimPnt()");
 								return FALSE;
@@ -1513,7 +1513,7 @@ static LOGICAL _CalculateActualAimPnt(trnAutoGun * AG,FLOAT64VECTOR * AimPnt)
 						ogrpFindSubObjectByName(&Object,
 											Target->VehicleObjectData->HitMap,
 											(SCHAR*)Target->VehicleType->DamageObjects[PartNum]);
-						if (Object != NULL)
+						if (Object != nullptr)
 						{
 							V1 = Object->pos;
 							TempMat = Object->mat;
@@ -1544,7 +1544,7 @@ static LOGICAL _CalculateActualAimPnt(trnAutoGun * AG,FLOAT64VECTOR * AimPnt)
 
 static LOGICAL _UpdateFireStatus(trnAutoGun * AG)
 {
-	if (AG == NULL)
+	if (AG == nullptr)
 	{
 		return FALSE;
 	}
@@ -1554,7 +1554,7 @@ static LOGICAL _UpdateFireStatus(trnAutoGun * AG)
     return 1;
 #endif
 
-	if (AG->Target == NULL)
+	if (AG->Target == nullptr)
 	{
 		AG->GunIsFiring = FALSE;
 
@@ -1596,9 +1596,9 @@ static LOGICAL _UpdateFireStatus(trnAutoGun * AG)
 
 static LOGICAL _DetermineTarget(trnAutoGun * AG)
 {
-    vehVehicle* CurrentVehicle = NULL;
-    vehVehicle* TempVehicle = NULL;
-    vehVehicle* NoVis = NULL;
+    vehVehicle* CurrentVehicle = nullptr;
+    vehVehicle* TempVehicle = nullptr;
+    vehVehicle* NoVis = nullptr;
     UINT32 Found = 0;
     FLOAT32 Dist = 0;
     SINT32 Position = 0;
@@ -1608,7 +1608,7 @@ static LOGICAL _DetermineTarget(trnAutoGun * AG)
 
     memset(&Spec, 0, sizeof(WEAPON_SPEC));
 
-	if (AG == NULL)
+	if (AG == nullptr)
 	{
 		return FALSE;
 	}
@@ -1627,7 +1627,7 @@ static LOGICAL _DetermineTarget(trnAutoGun * AG)
 	    LOGICAL IsDead = 0;
 	    UINT32 Break = 0;
 
-        void*  LastTrackingList[TRN_MAX_AUTOGUN_TRACK] = {NULL};
+        void*  LastTrackingList[TRN_MAX_AUTOGUN_TRACK] = {nullptr};
 
 		// traverse through list of vehicles
 		vehGetVehicleHead(&CurrentVehicle);
@@ -1636,13 +1636,13 @@ static LOGICAL _DetermineTarget(trnAutoGun * AG)
 		for (i=0;i<TRN_MAX_AUTOGUN_TRACK;i++)
 		{
 			LastTrackingList[i] = AG->TrackingList[i];
-			AG->TrackingList[i] = NULL;
+			AG->TrackingList[i] = nullptr;
 			Distances[i] = 100000000.0f;
 			Priorities[i] = 100;
 			Visible[i] = 0;
 		}
 
-		while (CurrentVehicle != NULL)
+		while (CurrentVehicle != nullptr)
 		{
 			// country check
             WWII_SIDE aiside = wwiiSide(AG->Country);
@@ -1661,7 +1661,7 @@ static LOGICAL _DetermineTarget(trnAutoGun * AG)
 				continue;
 			}
 
-			if (CurrentVehicle->VehicleObjectData == NULL)
+			if (CurrentVehicle->VehicleObjectData == nullptr)
 			{
 				CurrentVehicle = CurrentVehicle->getNext();
 				continue;
@@ -1671,7 +1671,7 @@ static LOGICAL _DetermineTarget(trnAutoGun * AG)
 			Found = 0;
 			for (i=0;i<3;i++)
 			{
-				if (CurrentVehicle->VehicleType != NULL)
+				if (CurrentVehicle->VehicleType != nullptr)
 				{
 					Spec = CurrentVehicle->VehicleType->WeaponSpec;
 
@@ -1827,14 +1827,14 @@ static LOGICAL _DetermineTarget(trnAutoGun * AG)
 	if (frametime - AG->NextTargetSelectTime > _TARGET_SELECTION_TIME)
 	{
 		AG->LastTarget = AG->Target;
-		AG->Target = NULL;
+		AG->Target = nullptr;
 		AG->FireAtTarget = FALSE;
-		NoVis = NULL;
+		NoVis = nullptr;
 		for (i=0;i<TRN_MAX_AUTOGUN_TRACK;i++)
 		{
-			if (AG->TrackingList[i] != NULL)
+			if (AG->TrackingList[i] != nullptr)
 			{
-				if (_IsVehicleInLineOfSight(AG,(vehVehicle*)AG->TrackingList[i],NULL,FALSE) == TRUE)
+				if (_IsVehicleInLineOfSight(AG,(vehVehicle*)AG->TrackingList[i],nullptr,FALSE) == TRUE)
 				{
 					AG->Target = AG->TrackingList[i];
 					AG->FireAtTarget = TRUE;
@@ -1846,7 +1846,7 @@ static LOGICAL _DetermineTarget(trnAutoGun * AG)
 				}
 			}
 		}
-		if (AG->Target == NULL)
+		if (AG->Target == nullptr)
 		{
 			AG->Target = NoVis;
 		}
@@ -1867,21 +1867,21 @@ static LOGICAL _DetermineTarget(trnAutoGun * AG)
 // aim gun at deflection point
 static LOGICAL _DetermineOptimumAimPnt(trnAutoGun * AG, FLOAT64VECTOR * AimPnt)
 {
-	if (AG == NULL || AimPnt == NULL)
+	if (AG == nullptr || AimPnt == nullptr)
 	{
 		return FALSE;
 	}
 
 	// check for target
 	vehVehicle* Target = (vehVehicle*)AG->Target;
-	if (Target == NULL)
+	if (Target == nullptr)
 	{
 		return TRUE;
 	}
 
 	vehVehicle* PlayerVehicle = persGetPersonaVehiclePtr();
 	*AimPnt =
-		(PlayerVehicle == Target && PlayerVehicle->ModelData != NULL)
+		(PlayerVehicle == Target && PlayerVehicle->ModelData != nullptr)
 			? Target->ModelData->RenderPos
 			: Target->PosData.RenderPos
 			;
@@ -1906,10 +1906,10 @@ static LOGICAL _IsVehicleInLineOfSight(trnAutoGun * AG,vehVehicle* Vehicle,FLOAT
     piVECTOR V1 = {0, 0, 0};
     piVECTOR V2 = {0, 0, 0};
     UINT32 i = 0;
-    OBJECT*	pAnimationObject = NULL;
+    OBJECT*	pAnimationObject = nullptr;
 
 
-	if (AG == NULL || Vehicle == NULL)
+	if (AG == nullptr || Vehicle == nullptr)
 	{
 		return FALSE;
 	}
@@ -1918,12 +1918,12 @@ static LOGICAL _IsVehicleInLineOfSight(trnAutoGun * AG,vehVehicle* Vehicle,FLOAT
 
 	if (Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
 	{
-		if (Vehicle->VehicleObjectData != NULL)
+		if (Vehicle->VehicleObjectData != nullptr)
 		{
-			if (Vehicle->VehicleObjectData->PlaneObject != NULL)
+			if (Vehicle->VehicleObjectData->PlaneObject != nullptr)
 			{
 				pAnimationObject = Vehicle->VehicleObjectData->PlaneObject;
-				if (pAnimationObject == NULL)
+				if (pAnimationObject == nullptr)
 				{
 					Write_Debug("Error! Unable to find Animation Model in _CalculateActualAimPnt()");
 					return FALSE;
@@ -1933,7 +1933,7 @@ static LOGICAL _IsVehicleInLineOfSight(trnAutoGun * AG,vehVehicle* Vehicle,FLOAT
 	}
 
 	if (Vehicle->Flags & VEH_FLAGS_UPDATESYSTEM_CONTROLLED ||
-		Vehicle->ModelData == NULL || Vehicle->VehicleObjectData == NULL)
+		Vehicle->ModelData == nullptr || Vehicle->VehicleObjectData == nullptr)
 	{
 		NumCornersToCheck = 1;
 		Corners[0] = Vehicle->PosData.Pos;
@@ -2021,7 +2021,7 @@ static LOGICAL _IsVehicleInLineOfSight(trnAutoGun * AG,vehVehicle* Vehicle,FLOAT
 		mathSubVectors(&DistVec,&Corners[i],&TempVec);
 
 		Dist = mathExactVectorLength(&DistVec);
-		if (Dist32 != NULL)
+		if (Dist32 != nullptr)
 		{
 			*Dist32 = (FLOAT32)Dist;
 		}
@@ -2126,21 +2126,21 @@ draw3dLineDebug(&V1,&V2,colorBLUEALPHA);
 
 LOGICAL trnAutoVehicleDisappearing(void*  Vehicle)
 {
-trnAutoGun* AG = NULL;
+trnAutoGun* AG = nullptr;
 UINT32 i = 0;
 
-	for (AG = _AutoGunHead.next;AG != NULL;AG = AG->next)
+	for (AG = _AutoGunHead.next;AG != nullptr;AG = AG->next)
 	{
 		if (AG->Target == Vehicle)
 		{
-			AG->Target = NULL;
+			AG->Target = nullptr;
 		}
 
 		for (i=0;i<TRN_MAX_AUTOGUN_TRACK;i++)
 		{
 			if (AG->TrackingList[i] == Vehicle)
 			{
-				AG->TrackingList[i] = NULL;
+				AG->TrackingList[i] = nullptr;
 			}
 		}
 	}
@@ -2150,9 +2150,9 @@ UINT32 i = 0;
 
 LOGICAL trnUpdateAutogunStatus(void*  InAG,SINT32 country,SINT32 vislevel)
 {
-trnAutoGun * AG = NULL;
+trnAutoGun * AG = nullptr;
 
-	if (InAG == NULL)
+	if (InAG == nullptr)
 	{
 		return FALSE;
 	}
@@ -2221,8 +2221,8 @@ static LOGICAL _FireInstantRoundAndGetDisplacement(trnAutoGun* AG,piVECTOR * Aim
     FLOAT64VECTOR TempVec1 = {0, 0, 0};
 
     piVECTOR TempVec = {0, 0, 0};
-    weapAmmoType * AmmoType = NULL;
-    vehVehicle* Vehicle = NULL;
+    weapAmmoType * AmmoType = nullptr;
+    vehVehicle* Vehicle = nullptr;
 
     weapAmmo Ammo;
 
@@ -2237,11 +2237,11 @@ static LOGICAL _FireInstantRoundAndGetDisplacement(trnAutoGun* AG,piVECTOR * Aim
 	AmmoType = ((weapWeapon*)AG->Weapon)->WeaponType->AmmoType[0];
 
     // Sanity check.
-    if(AmmoType == NULL)
+    if(AmmoType == nullptr)
     {
         // Program should bail during init if there are bad ammo files...
         // but just in case...
-        Write_Debug("[trnautogun] *** AmmoType is NULL! Need to validate ammo files ***");
+        Write_Debug("[trnautogun] *** AmmoType is nullptr! Need to validate ammo files ***");
         return FALSE;
     }
 
@@ -2260,7 +2260,7 @@ static LOGICAL _FireInstantRoundAndGetDisplacement(trnAutoGun* AG,piVECTOR * Aim
 
 	TargetPos = *AimPnt;
 	Vehicle = (vehVehicle*)(AG->Target);
-	if (Vehicle->ModelData != NULL)
+	if (Vehicle->ModelData != nullptr)
 	{
 		TargetVel = Vehicle->ModelData->VehicleRealVel;
 		TargetAcc = Vehicle->ModelData->VehicleAcc;

@@ -101,7 +101,7 @@ _DoDialog(CBDialog& dlg)
 {
 	hMainWnd = &dlg;
 	INT_PTR nResponse = dlg.DoModal();
-	hMainWnd = NULL;
+	hMainWnd = nullptr;
 	return(nResponse == IDOK);
 }
 
@@ -169,7 +169,7 @@ _attemptConnection()
 			// having trouble and give them a chance to confirm whether they want
 			// us to continue trying.
 			// This is mostly to let the user know we were having problems.
-			if ( MessageBox(NULL, GetLoc(ERROR_CONNECTION), GetLoc(AUTH_ERROR), MB_ICONEXCLAMATION|MB_YESNO) != IDYES )
+			if ( MessageBox(nullptr, GetLoc(ERROR_CONNECTION), GetLoc(AUTH_ERROR), MB_ICONEXCLAMATION|MB_YESNO) != IDYES )
 			{
 				// They said "no" to our "do you want to continue trying" question,
 				// shutdown.
@@ -257,7 +257,7 @@ BOOL CPlaygateApp::InitInstance()
 	// OGS: First things first, determine what kind of client we are.
 	// If the version number ends in .255 we are appID 1, otherwise we're beta.
 	g_gameAppID = Auth::Apps::LIVE_APP_ID;
-	if (strstr(STRVER, ".255") == NULL)
+	if (strstr(STRVER, ".255") == nullptr)
 		g_gameAppID = Auth::Apps::BETA_APP_ID;
 	_snprintf(g_registryKey, 255, "Software\\Playnet\\apps\\appid%u\\instance1", g_gameAppID);
 	WWII::ConvertChars(g_registryKey, g_registryKeyW, sizeof(g_registryKeyW));
@@ -266,7 +266,7 @@ BOOL CPlaygateApp::InitInstance()
 	
 	if (g_SingleInstanceObj.IsAnotherInstanceRunning())
 	{
-		MessageBox(NULL, GetLoc(ERROR_PLAYGATE), GetLoc(APP_TITLE), MB_ICONEXCLAMATION|MB_OK);
+		MessageBox(nullptr, GetLoc(ERROR_PLAYGATE), GetLoc(APP_TITLE), MB_ICONEXCLAMATION|MB_OK);
 		return FALSE;
 	}
 
@@ -309,7 +309,7 @@ BOOL CPlaygateApp::InitInstance()
 	if ( registryGetPaths(g_exePath, g_dataPath) == false )
 	{
 		dbugLog(_FLA, "Unable to retrieve paths from registry.");
-		MessageBox(NULL, GetLoc(ERROR_INSTALL), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
+		MessageBox(nullptr, GetLoc(ERROR_INSTALL), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
 		exit(0);
 	}
 
@@ -322,7 +322,7 @@ BOOL CPlaygateApp::InitInstance()
 
 	if ( _tchdir(g_exePath.c_str()) != 0 )
 	{
-		MessageBox(NULL, GetLoc(ERROR_APP_FOLDER, g_exePath.c_str()), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
+		MessageBox(nullptr, GetLoc(ERROR_APP_FOLDER, g_exePath.c_str()), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
 		exit(0);
 	}
 
@@ -365,18 +365,18 @@ BOOL CPlaygateApp::InitInstance()
 	if ( _tchdir(g_dataPath.c_str()) != 0 )
 	{
 		dbugLog(_FLA, "Unable to access datapath [%ls]", g_dataPath.c_str());
-		MessageBox(NULL, GetLoc(ERROR_DATA_FOLDER, g_dataPath.c_str()), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
+		MessageBox(nullptr, GetLoc(ERROR_DATA_FOLDER, g_dataPath.c_str()), GetLoc(ERROR_INSTALL_T), MB_ICONEXCLAMATION | MB_OK);
 		return FALSE;
 	}
 
-	hStatusMutex = CreateMutex(NULL, FALSE, NULL);
-	hExitMutex = CreateMutex(NULL, TRUE, NULL);
-	hApplicationMutex = CreateMutex(NULL, TRUE, NULL);
+	hStatusMutex = CreateMutex(nullptr, FALSE, nullptr);
+	hExitMutex = CreateMutex(nullptr, TRUE, nullptr);
+	hApplicationMutex = CreateMutex(nullptr, TRUE, nullptr);
 
 	pgState = PgAuthentication;
 
 	DWORD threadId;
-	::CreateThread(NULL, 0, threadFunc, NULL,0, &threadId);
+	::CreateThread(nullptr, 0, threadFunc, nullptr,0, &threadId);
 	if ( _Login() )
 	{
 		loginData.MarkForWrite();
@@ -427,7 +427,7 @@ void CPlaygateApp::Quit()
 
 	// Post a message to the main window to tell it to shut down
 	if ( hMainWnd )
-		hMainWnd->SetTimer('QUIT', 100, NULL);
+		hMainWnd->SetTimer('QUIT', 100, nullptr);
 }
 
 static bool
@@ -445,14 +445,14 @@ _getDefaultBrowser(TCHAR* browserName, LONG nameSize)
 	{
 		// Its quoted, find the end quote and snip.
 		p = _tcschr(p + 1, '"');
-		if ( p != NULL )
+		if ( p != nullptr )
 			*(p + 1) = 0;
 	}
 	else
 	{
 		// Otherwise, snip at the first space
 		p = _tcschr(browserName, ' ');
-		if ( p != NULL )
+		if ( p != nullptr )
 			*p = 0;
 	}
 
@@ -479,7 +479,7 @@ CPlaygateApp::StartBrowser(std::string WebPage)
 		_stprintf(parameters, L"%hs", WebPage.c_str());
 	}
 
-	ShellExecute(NULL, _T("open"), parameters, NULL, NULL, SW_SHOWNORMAL);
+	ShellExecute(nullptr, _T("open"), parameters, nullptr, nullptr, SW_SHOWNORMAL);
 
 	return;
 }
@@ -505,7 +505,7 @@ CPlaygateApp::ftping(bool actively)
 	{
 		playgate.m_progress->SetRange(0, 100);
 		m_inputAllowed = false;
-		hMainWnd->SetTimer('FTP', 50, NULL);
+		hMainWnd->SetTimer('FTP', 50, nullptr);
 	}
 	else
 	{
@@ -519,7 +519,7 @@ CPlaygateApp::ftping(bool actively)
 
 void CPlaygateApp::SetWindowText(CWnd* wnd, const char* text)
 {
-	if ( wnd != NULL )
+	if ( wnd != nullptr )
 	{
 		wchar_t buffer[512];
 		WWII::ConvertChars(text, buffer, sizeof(buffer));

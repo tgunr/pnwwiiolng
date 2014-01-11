@@ -349,7 +349,7 @@ struct OBJECT
 	otherwise the original immutable data.
 
 	Static - This is a special case for objects that were not created from the pool, which therefore
-	can have modifiable "original" vertex data. This function will return NULL if the object
+	can have modifiable "original" vertex data. This function will return nullptr if the object
 	was created from the pool.
 */
 #ifdef __cplusplus

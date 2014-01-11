@@ -30,7 +30,7 @@
 
 #define DEF_MAX_EXPLOSIONS          128
 
-static FXEXPLOSION* g_lpExp = NULL;
+static FXEXPLOSION* g_lpExp = nullptr;
 
 static FXEXPLOSION g_expFreeHead;
 static FXEXPLOSION g_expFreeTail;
@@ -38,7 +38,7 @@ static FXEXPLOSION g_expFreeTail;
 static FXEXPLOSION g_expHead;
 static FXEXPLOSION g_expTail;
 
-static piCOLORVALUE* g_lpColor = NULL;
+static piCOLORVALUE* g_lpColor = nullptr;
 
 static FLOAT32 g_fPi = PI;
 static FLOAT32 g_fPiOver180 = 0.0f;
@@ -82,7 +82,7 @@ LOGICAL fxExpInit()
 
     g_lpExp = (FXEXPLOSION*)memAlloc(sizeof(FXEXPLOSION) * DEF_MAX_EXPLOSIONS);
 
-    if(g_lpExp == NULL)
+    if(g_lpExp == nullptr)
         return FALSE;
 
     memset(&g_expHead, 0, sizeof(FXEXPLOSION));
@@ -116,9 +116,9 @@ void fxExpFreeAll()
 {
     FXEXPLOSION* lpExp = g_expHead.next;
     FXEXPLOSION* lpTail = &g_expTail;
-    FXEXPLOSION* lpFree = NULL;
+    FXEXPLOSION* lpFree = nullptr;
 
-    if(lpExp == NULL) return;
+    if(lpExp == nullptr) return;
 
     while(lpExp != lpTail)
     {
@@ -136,13 +136,13 @@ void fxExpFreeAll()
 //////////////////////////////////////////////
 LOGICAL fxExpKill()
 {
-    if(g_lpExp != NULL)
+    if(g_lpExp != nullptr)
     {
         memFree(g_lpExp);
-        g_lpExp = NULL;
+        g_lpExp = nullptr;
     }
 
-    // Set to NULL in case of further updates to Explosions.
+    // Set to nullptr in case of further updates to Explosions.
     memset(&g_expHead, 0, sizeof(FXEXPLOSION));
     memset(&g_expTail, 0, sizeof(FXEXPLOSION));
     memset(&g_expFreeHead, 0, sizeof(FXEXPLOSION));
@@ -203,15 +203,15 @@ LOGICAL _SatchelExp(SINT32 ID)
 
     Vec3f n(g_lpExp[ID-1].n);
 
-    TransformEffect* te = NULL;
+    TransformEffect* te = nullptr;
 
     if(g_lpExp[ID-1].bIsWater)
     {
-        te = TransformEffect::AddEffect("water_satchelgeneric", n, 0, NULL);
+        te = TransformEffect::AddEffect("water_satchelgeneric", n, 0, nullptr);
     }
     else
     {
-        te = TransformEffect::AddEffect("satchelgeneric", n, 0, NULL);
+        te = TransformEffect::AddEffect("satchelgeneric", n, 0, nullptr);
     }
 
     if(te)
@@ -235,7 +235,7 @@ LOGICAL _SatchelExp(SINT32 ID)
 //////////////////////////////////////////////////////////////////////
 LOGICAL _VehicleExplosion(SINT32 id)
 {
-    OBJECT* o = NULL;
+    OBJECT* o = nullptr;
     o = g_lpExp[id-1].lpVehAttach->VehicleObjectData->PlaneObject;
 
     fxPclCreateExplosion(&g_lpExp[id-1].vecPos, g_lpExp[id-1].fEnergy);
@@ -279,7 +279,7 @@ LOGICAL _AirBurst(SINT32 iID)
         {
             _CreateLight(iID);
 
-            TransformEffect* te = TransformEffect::AddEffect("flak", Vec3f(0, 0, 0), 0, NULL);
+            TransformEffect* te = TransformEffect::AddEffect("flak", Vec3f(0, 0, 0), 0, nullptr);
 
             if(te)
             {
@@ -303,7 +303,7 @@ LOGICAL _AirBurst(SINT32 iID)
         {
             _CreateLight(iID);
 
-            TransformEffect* te = TransformEffect::AddEffect("smallcannon", Vec3f(0, 0, 0), 0, NULL);
+            TransformEffect* te = TransformEffect::AddEffect("smallcannon", Vec3f(0, 0, 0), 0, nullptr);
 
             if(te)
             {
@@ -399,15 +399,15 @@ LOGICAL _GroundBurst(SINT32 ID)
 //////////////////////////////////////////////////////////////////////
 LOGICAL _GrenadeExp(SINT32 id)
 {
-    TransformEffect* te = NULL;
+    TransformEffect* te = nullptr;
 
     if(g_lpExp[id-1].bIsWater)
     {
-        te = TransformEffect::AddEffect("watergrenade", Vec3f(g_lpExp[id-1].n), 0, NULL);
+        te = TransformEffect::AddEffect("watergrenade", Vec3f(g_lpExp[id-1].n), 0, nullptr);
     }
     else
     {
-        te = TransformEffect::AddEffect("grenade", Vec3f(g_lpExp[id-1].n), 0, NULL);
+        te = TransformEffect::AddEffect("grenade", Vec3f(g_lpExp[id-1].n), 0, nullptr);
     }
 
     if(te)
@@ -529,12 +529,12 @@ LOGICAL _CreatePlaneFire(SINT32 iID, OBJECT* lpObj)
 {
     SINT32 iIndex = iID - 1;
     SCHAR szBuff[3][16] = {"efire", "efire1", "efire2"};
-    OBJECT* fireobj = NULL;
+    OBJECT* fireobj = nullptr;
 
     if(iIndex < 0 || iIndex >= DEF_MAX_EXPLOSIONS)
         return FALSE;
 
-    if(lpObj == NULL)
+    if(lpObj == nullptr)
         return FALSE;
 
     TransformEffect* te;
@@ -543,7 +543,7 @@ LOGICAL _CreatePlaneFire(SINT32 iID, OBJECT* lpObj)
     {
         ogrpFindSubObjectByName(&fireobj, lpObj, szBuff[i]);
 
-        if(fireobj == NULL)
+        if(fireobj == nullptr)
             continue;
 
         te = TransformEffect::AddEffect("planecrashfire", Vec3f(0, 0, -1), 0, fireobj);
@@ -573,7 +573,7 @@ LOGICAL _CreateBombExp(SINT32 id)
         if(g_lpExp[id-1].ammo && g_lpExp[id-1].ammo->AmmoType && g_lpExp[id-1].ammo->AmmoType->Name[0])
         {
             TransformEffect* te = TransformEffect::AddEffect((char*)g_lpExp[id-1].ammo->AmmoType->Name,
-                Vec3f(g_lpExp[id-1].n), 0, NULL);
+                Vec3f(g_lpExp[id-1].n), 0, nullptr);
 
             if(te)
             {
@@ -600,7 +600,7 @@ LOGICAL _CreateBombExp(SINT32 id)
 //////////////////////////////////////////////////////////////////////
 LOGICAL _CreateSparks(FLOAT64VECTOR* pPos, FLOAT32 energy)
 {
-    TransformEffect* te = TransformEffect::AddEffect("manysparks", Vec3f(0, 0, -1), 0, NULL);
+    TransformEffect* te = TransformEffect::AddEffect("manysparks", Vec3f(0, 0, -1), 0, nullptr);
 
     if(te)
     {
@@ -680,7 +680,7 @@ LOGICAL _CreateShake(SINT32 iID)
         // Shake tied to vehicle mass.
         mlVehicleData* pData = persGetPersonaModelDataPtr();
 
-        if(pData == NULL)
+        if(pData == nullptr)
             return FALSE;
 
         if(pData->VehicleMass > 100.0f)
@@ -787,7 +787,7 @@ LOGICAL _CreateShockWave(SINT32 iID)
 //////////////////////////////////////////////////////////////////////
 LOGICAL fxExpDraw(SINT32 iIndex)
 {
-    if(g_expHead.next == NULL)
+    if(g_expHead.next == nullptr)
         return FALSE;
 
     if(g_expHead.next == &g_expTail)
@@ -1010,10 +1010,10 @@ void _UpdateShockWave(SINT32 iID)
 //////////////////////////////////////////////
 LOGICAL _FreeExp(FXEXPLOSION* lpExp)
 {
-    if(lpExp == NULL)
+    if(lpExp == nullptr)
         return FALSE;
 
-    FXEXPLOSION* lpPrev = NULL;
+    FXEXPLOSION* lpPrev = nullptr;
 
     SINT32 iIndex = lpExp->iIndex;
 
@@ -1038,9 +1038,9 @@ LOGICAL _FreeExp(FXEXPLOSION* lpExp)
 //////////////////////////////////////////////////////////////////////
 LOGICAL _AddExp(FXEXPLOSION* lpExp)
 {
-    FXEXPLOSION* lpNext = NULL;
+    FXEXPLOSION* lpNext = nullptr;
 
-    if(lpExp == NULL)
+    if(lpExp == nullptr)
         return FALSE;
 
     lpNext = g_expHead.next;
@@ -1060,11 +1060,11 @@ LOGICAL _AddExp(FXEXPLOSION* lpExp)
 //////////////////////////////////////////////////////////////////////
 LOGICAL _GetExp(FXEXPLOSION** lpExp)
 {
-    FXEXPLOSION* lpNode = NULL;
-    FXEXPLOSION* lpNext = NULL;
-    FXEXPLOSION* lpPrev = NULL;
+    FXEXPLOSION* lpNode = nullptr;
+    FXEXPLOSION* lpNext = nullptr;
+    FXEXPLOSION* lpPrev = nullptr;
 
-    if(lpExp == NULL)
+    if(lpExp == nullptr)
         return FALSE;
 
     if(!_CheckForExps())
@@ -1078,8 +1078,8 @@ LOGICAL _GetExp(FXEXPLOSION** lpExp)
     lpPrev->next = lpNext;
     lpNext->prev = lpPrev;
 
-    lpNode->next = NULL;
-    lpNode->prev = NULL;
+    lpNode->next = nullptr;
+    lpNode->prev = nullptr;
 
     lpNode->matSize = IdentityMatrix;
 
@@ -1096,7 +1096,7 @@ LOGICAL _CheckForExps()
 {
     if(g_expFreeHead.next == &g_expFreeTail)
     {
-        FXEXPLOSION* lpExp = NULL;
+        FXEXPLOSION* lpExp = nullptr;
 
         if(g_expTail.prev == &g_expHead)
             return FALSE;
@@ -1122,23 +1122,23 @@ LOGICAL _CheckForExps()
 //////////////////////////////////////////////////////////////////////
 LOGICAL _ReleaseExp(FXEXPLOSION* lpExp)
 {
-    FXEXPLOSION* lpNext = NULL;
-    FXEXPLOSION* lpPrev = NULL;
+    FXEXPLOSION* lpNext = nullptr;
+    FXEXPLOSION* lpPrev = nullptr;
 
-    if(lpExp == NULL)
+    if(lpExp == nullptr)
         return FALSE;
 
     lpNext = lpExp->next;
     lpPrev = lpExp->prev;
 
-    if(lpNext == NULL || lpPrev == NULL)
+    if(lpNext == nullptr || lpPrev == nullptr)
         return FALSE;
 
     lpPrev->next = lpNext;
     lpNext->prev = lpPrev;
 
-    lpExp->prev = NULL;
-    lpExp->next = NULL;
+    lpExp->prev = nullptr;
+    lpExp->next = nullptr;
 
     return TRUE;
 }
@@ -1158,7 +1158,7 @@ void fxExpSetColor(piCOLORVALUE* lpColor)
 //////////////////////////////////////////
 void fxExpUpdate()
 {
-    if(g_expHead.next == NULL) return;
+    if(g_expHead.next == nullptr) return;
     if(g_expHead.next == &g_expTail) return;
 
     FXEXPLOSION* lpExp = g_expHead.next;
@@ -1180,7 +1180,7 @@ void fxExpGetList(void* lpExpSort, SINT32* pIndex)
     FXSORT* lpSort = (FXSORT*)lpExpSort;
 
     if(!lpSort || !pIndex) return;
-    if(g_expHead.next == NULL) return;
+    if(g_expHead.next == nullptr) return;
     if(g_expHead.next == &g_expTail) return;
 
     FXEXPLOSION* lpExp = g_expHead.next;
@@ -1205,11 +1205,11 @@ void fxExpGetList(void* lpExpSort, SINT32* pIndex)
 //////////////////////////////////////////////////////////////////////
 void _SetMaterial(FXEXPLOSION* lpExp)
 {
-    MATERIAL* lpMat = NULL;
+    MATERIAL* lpMat = nullptr;
 
     piGetMaterials(&lpMat);
 
-    if(lpMat == NULL) return;
+    if(lpMat == nullptr) return;
 
     SINT32 iMatID = fxMgrGetMaterial();
 
@@ -1518,7 +1518,7 @@ void fxExpSetAmmo(SINT32 id, const weapAmmo* ammo)
 //////////////////////////////////////////////////////////////////////
 SINT32 fxExpGetNewExplosion()
 {
-    FXEXPLOSION* lpExp = NULL;
+    FXEXPLOSION* lpExp = nullptr;
 
     if(!_GetExp(&lpExp))
         return -1;

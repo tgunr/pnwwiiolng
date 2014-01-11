@@ -25,10 +25,10 @@ public:
 public:
 	// Accessors
 	bool empty() const { return (m_title[0] == 0 || m_size <= 0); }
-	const char* entry(UINT32 i) const;		// NULL if no such entry
+	const char* entry(UINT32 i) const;		// nullptr if no such entry
 	UINT32 pollID() const { return m_pollID; }
 	UINT32 size() const;
-	const char* title() const;				// NULL if none set
+	const char* title() const;				// nullptr if none set
 
 public:		// Member functions
 	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);

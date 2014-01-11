@@ -51,14 +51,14 @@ UINT32 mlUtilityFindVarname(UINT32* VarNum,
 UINT32 mlUtilityGetVarnameAndContents(UCHAR ** Varname, UCHAR ** Varcontents,UCHAR * InputString)
 {
 	*Varname = (UCHAR*)strtok((char*)InputString,"= ");
-	if (*Varname != NULL)
+	if (*Varname != nullptr)
 	{
-		*Varcontents = (UCHAR*)strtok(NULL,"= ");
+		*Varcontents = (UCHAR*)strtok(nullptr,"= ");
 		*Varcontents = (UCHAR*)strtok((char*)*Varcontents,"\n"); // strip off the ending newline
 	}
 	else
 	{
-		*Varcontents = NULL;
+		*Varcontents = nullptr;
 	}
 
 	return 0;
@@ -68,14 +68,14 @@ UINT32 mlUtilityGetVarnameAndContents1(UCHAR ** Varname, UCHAR ** Varcontents,UC
 {
 
 	*Varname = (UCHAR*)strtok((char*)InputString,"= ");
-	if (*Varname != NULL)
+	if (*Varname != nullptr)
 	{
-		*Varcontents = (UCHAR*)strtok(NULL,"\0");
+		*Varcontents = (UCHAR*)strtok(nullptr,"\0");
 		*Varcontents = (UCHAR*)strtok((char*)*Varcontents,"\n"); // strip off the ending newline
 	}
 	else
 	{
-		*Varcontents = NULL;
+		*Varcontents = nullptr;
 	}
 
 	return 0;
@@ -105,7 +105,7 @@ UINT32 mlUtilityFindComponentByName(mlComponent** ComponentPtr,
 		}
 	}
 
-	*ComponentPtr = NULL;
+	*ComponentPtr = nullptr;
 	Write_Debug("Unable to find component called %s stated in component %s\n",ComponentName,Component->ComponentName);
 
 	return 0;
@@ -130,7 +130,7 @@ UINT32 mlConvertModelAttitudeToWorldAttitude(piVECTOR * WorldAtt,piVECTOR * Mode
 piMATRIX Mat1;
 piVECTOR Att;
 
-	if (WorldAtt == NULL || ModelAtt == NULL)
+	if (WorldAtt == nullptr || ModelAtt == nullptr)
 	{
 		return 1;
 	}
@@ -291,10 +291,10 @@ FASTCOLLIDE TempCollide;
 
 SINT32 mlUtilityGetPosAndAttFromDOF(OBJECT* dofObj, piVECTOR const* relpos, piVECTOR* pos, piVECTOR* att)
 {
-	piMATRIX const* dofmatrix2 = NULL;
+	piMATRIX const* dofmatrix2 = nullptr;
 	piMATRIX AttMat;
 
-	if(dofObj == NULL || dofObj->dof == NULL) return -1;
+	if(dofObj == nullptr || dofObj->dof == nullptr) return -1;
 	dofmatrix2 = &dofObj->dof->dofmatrix2;
 
 	if(pos)

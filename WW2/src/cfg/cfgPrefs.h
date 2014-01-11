@@ -68,7 +68,7 @@ extern bool cfgPrefsSetFloat(const char* key, float value); // sets a float
 extern bool cfgPrefsSetDouble(const char* key, double value); // sets a double
 extern bool cfgPrefsSetString(const char* key, const char* value); // sets a string
 
-extern bool cfgPrefsRemove(const char* key = NULL); // delete a pref; deletes all keys if one wasn't specified
+extern bool cfgPrefsRemove(const char* key = nullptr); // delete a pref; deletes all keys if one wasn't specified
 
 // get arbitrary preferences by reference
 extern bool cfgPrefsGetBool(const char* key, bool* value); // gets a bool

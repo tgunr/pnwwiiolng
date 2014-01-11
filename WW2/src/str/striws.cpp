@@ -66,5 +66,5 @@ char* strstriws(const char* str1, const char* str2)
 		if((c1 != c2) || !c1) break;
 	}
 
-	return NULL;
+	return nullptr;
 }

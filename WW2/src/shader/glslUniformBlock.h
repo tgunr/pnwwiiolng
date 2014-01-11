@@ -86,7 +86,7 @@ public:
             return itr->second;
         }
 
-        return NULL;
+        return nullptr;
     }
 
     void Buffer();

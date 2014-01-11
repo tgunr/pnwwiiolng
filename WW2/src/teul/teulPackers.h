@@ -98,7 +98,7 @@ namespace Teul
 
 //! Helper macro for receive actions that want to verify a live connection.
 #define REQUIRE_CLIENT_DATA()	\
-	if ( PN_UNLIKELY(a->m_client == NULL) )	\
+	if ( PN_UNLIKELY(a->m_client == nullptr) )	\
 		return -ETEUL_CB_REQ_DATA;
 
 //! Helper macro for receive actions that require a player/client entity,
@@ -115,9 +115,9 @@ struct ACTION_OBJECT
 #if __cplusplus <= 199711L
 	ACTION_OBJECT()
 		: teulIndex(-1)
-		, actionObj(NULL), localRawData(NULL), packed(NULL), offset(0), m_size_bytes(0)
+		, actionObj(nullptr), localRawData(nullptr), packed(nullptr), offset(0), m_size_bytes(0)
 		, fromAddress(0), fromPort(0)
-		, endpoint(NULL), m_client(NULL)
+		, endpoint(nullptr), m_client(nullptr)
 	{}
 #else
 	// Required to turn ACTION_OBJECT back into POD now that
@@ -220,8 +220,8 @@ struct ACTION_OBJECT
 	UINT32			fromAddress;	// address the callback originated from (UDP)
 	UINT32			fromPort;		// port the callback originated from (UDP)
 
-	struct ENDPOINT*	endpoint;	// The endpoint (or NULL) this is on.
-	void*			m_client;		//! Pointer to the local client info OR NULL.
+	struct ENDPOINT*	endpoint;	// The endpoint (or nullptr) this is on.
+	void*			m_client;		//! Pointer to the local client info OR nullptr.
 
 	DEF_PACKER(SINT32*, teulPackSINT32, 0)
 	DEF_PACKREF(SINT32, teulPackSINT32, 0)

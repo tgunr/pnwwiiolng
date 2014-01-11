@@ -22,7 +22,7 @@ UINT32 vehcommSendVehicleRequest(SINT32 VehicleType, WEAPON_SERIAL const* pWeapo
 	{
 		VEHICLE_REQUEST vRequest;
 
-        if(pWeaponSerial == NULL)
+        if(pWeaponSerial == nullptr)
             return 0;
 
 		memset(&vRequest,0,sizeof(vRequest));
@@ -58,16 +58,16 @@ UINT32 vehcommSendVehicleRequest(SINT32 VehicleType, WEAPON_SERIAL const* pWeapo
 
 UINT32 vehcommProcessVehicleRequestResponse( VEHICLE_REPLY const* Reply)
 {
-    if(Reply == NULL)
-		piExitProgram(__FILE__, __LINE__,"[vehcommProcessVehicleRequestResponse] Reply == NULL");
+    if(Reply == nullptr)
+		piExitProgram(__FILE__, __LINE__,"[vehcommProcessVehicleRequestResponse] Reply == nullptr");
 
 	if (Reply->replyCode < 0)
 		piExitProgram(__FILE__, __LINE__,"[vehcommProcessVehicleRequestResponse] replyCode == %d");
 
 	const WEAPON* const pWeapon = weapLookup(Reply->spec);
 
-    if(pWeapon == NULL)
-        piExitProgram(__FILE__, __LINE__,"[vehcommProcessVehicleRequestResponse] pWeapon == NULL");
+    if(pWeapon == nullptr)
+        piExitProgram(__FILE__, __LINE__,"[vehcommProcessVehicleRequestResponse] pWeapon == nullptr");
 
 	vehmainSpawnVehicle(Reply);
 

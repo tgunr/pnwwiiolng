@@ -213,7 +213,7 @@ extern SINT32
 wwiiQueuedSend_WWII_ERROR_INFO(WWII_ERROR_INFO* info)
 {
 	WWII_ERROR_INFO* errInfo = _getErrInfo();
-	if(errInfo == NULL) return -1;
+	if(errInfo == nullptr) return -1;
 
 	*errInfo = *info;
 
@@ -406,7 +406,7 @@ static WWII_ERROR_INFO* _getErrInfo()
 			return &errInfoQueue[i];
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /************************************************************************************************
@@ -547,11 +547,11 @@ Teul::Connection::close()
 	// Disassociate ourselves entirely.
 	m_teulIndex = -1;
 	_ConnectionsByTeulIndex.erase(teulIndex);
-	teulSetPersonaData(teulIndex, NULL);
+	teulSetPersonaData(teulIndex, nullptr);
 
 	// Look away, look away! Teul shenanigans!
 	ENDPOINT* const ep = teulGetEndpoint(teulIndex);
-	if ( ep != NULL && ep->m_inUse && ep->state() < IS_CLOSING )
+	if ( ep != nullptr && ep->m_inUse && ep->state() < IS_CLOSING )
 		teulClose(*ep, Teul::Closing::ClientConnClose);
 	// Ok, you can look again now.
 
@@ -630,10 +630,10 @@ Teul::Connection::start(class ww2::Client* const client)
 struct ClientAndConn
 {
 	ClientAndConn(SINT32 teulIndex)
-		: client(NULL), conn(NULL)
+		: client(nullptr), conn(nullptr)
 	{
 		ww2::Client* const thisClient = ww2::Client::FromTeulIndex(teulIndex);
-		if ( thisClient == NULL )
+		if ( thisClient == nullptr )
 			return;
 
 		std::map<SINT32, Teul::Connection*>::iterator it = _ConnectionsByTeulIndex.find(teulIndex);
@@ -658,7 +658,7 @@ void
 Teul::Connection::s_onConnect(ENDPOINT& endpoint)
 {
 	ClientAndConn ccpair(endpoint.teulIndex());
-	if ( ccpair.conn != NULL )
+	if ( ccpair.conn != nullptr )
 	{
 		ccpair.conn->m_connected = true;
 		ccpair.conn->onConnect(ccpair.client);
@@ -683,7 +683,7 @@ Teul::Connection::s_onError(SINT32 teulIndex, const UCHAR* /*data*/, SINT32 /*si
 	// If we just closed this connection down, teulKit will send
 	// us an onError for a connection that no-longer has any
 	// wrappers, thus conn will be null.
-	if ( ccpair.conn != NULL )
+	if ( ccpair.conn != nullptr )
 	{
 		ccpair.conn->onError(ccpair.client, error);
 	}
@@ -734,7 +734,7 @@ void
 Teul::Connection::onLoginResult(SINT32 result)
 {
 	ww2::Client* const client = ww2::Client::FromTeulIndex(m_teulIndex);
-	if ( client != NULL )
+	if ( client != nullptr )
 	{
 		if ( result >= 0 )
 			onLogin(client);

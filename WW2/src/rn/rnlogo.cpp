@@ -131,7 +131,7 @@ LOGICAL rnlogoInit(void)
 
 LOGICAL rnlogoRender(void)
 {
-	piSetDDRender(NULL);
+	piSetDDRender(nullptr);
 
 	piSetD3DRender(gmlpMainUpdate);
 	piResetFPS();

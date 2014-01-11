@@ -204,19 +204,19 @@ int				expendable;
 	VehicleData = vehicle->ModelData;
 
 	VehicleData->PersonData = (fpPersonData*)memCalloc(1, sizeof(fpPersonData));
-	if (VehicleData->PersonData == NULL)
+	if (VehicleData->PersonData == nullptr)
 	{
 		return FALSE;
 	}
 
 	PersonData = (fpPersonData*)VehicleData->PersonData;
 
-	if (VehicleData != NULL)
+	if (VehicleData != nullptr)
 	{
 		Vehicle = (vehVehicle*)VehicleData->VehicleMasterPtr;
-		if (Vehicle != NULL)
+		if (Vehicle != nullptr)
 		{
-			if (Vehicle->VehicleType != NULL)
+			if (Vehicle->VehicleType != nullptr)
 			{
 				strcpy(JMMFileName, "vehicles/");
 				strcat(JMMFileName, (char*)Vehicle->VehicleType->ModelDirectory);
@@ -244,12 +244,12 @@ int				expendable;
 							char* ammo = strtok(AmmoLine, ",");
 							int ammoIndex = 0;
 
-							while(ammo != NULL && ammoIndex < 4)
+							while(ammo != nullptr && ammoIndex < 4)
 							{
 								int ammoAmount = atoi(ammo);
 								Vehicle->Weapons[MountNumber][0].NumRoundsAmmoLeft[ammoIndex] = ammoAmount;
 								Vehicle->Weapons[MountNumber][0].NumTotalRounds[ammoIndex] = (ammoAmount >= 0) ? ammoAmount: 0;
-								ammo = strtok(NULL, ",");
+								ammo = strtok(nullptr, ",");
 								++ammoIndex;
 							}
 
@@ -288,12 +288,12 @@ LOGICAL fpKill(mlVehicleData* VehicleData)
 {
 	fpPersonData* PersonData;
 
-	if(VehicleData->PersonData != NULL)
+	if(VehicleData->PersonData != nullptr)
 	{
 		PersonData = (fpPersonData*)VehicleData->PersonData;
 
 		memFree(VehicleData->PersonData);
-		VehicleData->PersonData = NULL;
+		VehicleData->PersonData = nullptr;
 	}
 
 	fpFPSKill ();
@@ -443,7 +443,7 @@ static FLOAT64 _doFalling(mlVehicleData* vd, OBJECT* ColObj, piVECTOR& Pos, FLOA
 	// test for falling
 	// if we're falling, check the waist (outer) ring
 	// if the outer ring gets a hit
-	if (ColObj && (fpFPSGetPlayerPose() != POSE_PRONE) && fpCheckFallRing (vd, 6, _WaistOuterRing, _WaistInnerRing, &ColObj, &Pos, NULL)) // &VehicleWalkingOn
+	if (ColObj && (fpFPSGetPlayerPose() != POSE_PRONE) && fpCheckFallRing (vd, 6, _WaistOuterRing, _WaistInnerRing, &ColObj, &Pos, nullptr)) // &VehicleWalkingOn
 	{
 		outerRingGroundHeight = -Pos.z - WorldOriginOffset.z;
 
@@ -583,7 +583,7 @@ static FLOAT64 _doGravityScenario(mlVehicleData* vd, vehVehicle** walkOn, FLOAT6
 			*walkOn = colliderSpaceData<vehVehicle>((dGeomID)collider.objectHit->collider->getSpace());
 
 			if(!*walkOn || !vehVehicleInList(*walkOn))
-				*walkOn = NULL;
+				*walkOn = nullptr;
 		}
 	}
 
@@ -805,7 +805,7 @@ static FLOAT64 _doGravityCampaign(mlVehicleData* vd, vehVehicle** walkOn, FLOAT6
 			*walkOn = colliderSpaceData<vehVehicle>((dGeomID)collider.objectHit->collider->getSpace());
 
 			if(!*walkOn || !vehVehicleInList(*walkOn))
-				*walkOn = NULL;
+				*walkOn = nullptr;
 		}
 	}
 
@@ -992,8 +992,8 @@ static LOGICAL _updatePersonScenario(mlVehicleData* pVehicleData, FLOAT64 DeltaT
 	fpFPSSetStandingOnVehicle(FALSE);
 
 	SINT32 i						= 0;
-	vehVehicle* FPSRideVehicle		= NULL;
-	vehVehicle* VehicleWalkingOn	= NULL;
+	vehVehicle* FPSRideVehicle		= nullptr;
+	vehVehicle* VehicleWalkingOn	= nullptr;
 	vehVehicle* Vehicle				= pVehicleData->VehicleMasterPtr;
 	fpPersonData* pPersonData		= (fpPersonData*) pVehicleData->PersonData;
 	OBJECT* pObject					= pVehicleData->VehicleObjectData->PlaneObject;
@@ -1002,7 +1002,7 @@ static LOGICAL _updatePersonScenario(mlVehicleData* pVehicleData, FLOAT64 DeltaT
 	if(Vehicle->RideVehicleHostIndex > 0)
 		FPSRideVehicle = vehFindVehicle(Vehicle->RideVehicleHostIndex);
 
-	if (FPSRideVehicle != NULL && FPSRideVehicle->RideVehicleHostIndex == 0)
+	if (FPSRideVehicle != nullptr && FPSRideVehicle->RideVehicleHostIndex == 0)
 	{
 		if(Vehicle->RideSeatNum == VEH_TROOPER_ON_DECK_RIDE_SEAT && pVehicleData->LastRideVehicle == Vehicle->RideVehicleHostIndex)
 			fpMoveToRelRidePos(FPSRideVehicle, Vehicle);	// allows trooper to "stick" to the deck
@@ -1016,18 +1016,18 @@ static LOGICAL _updatePersonScenario(mlVehicleData* pVehicleData, FLOAT64 DeltaT
 		if (FPSRideVehicle->StateAnimation.EjectRiders == 1) // check for ejection
 		{
 			// kick rider off of vehicle
-			FPSRideVehicle = NULL;
+			FPSRideVehicle = nullptr;
 			fpFPSRideUnrideVehicle();
 		}
 	}
 	else if(fpFPSGetPlayerPose() == POSE_SIT) // ahh, disappeared from under our feet
 	{
-		FPSRideVehicle = NULL;
+		FPSRideVehicle = nullptr;
 		fpFPSRideUnrideVehicle();
 	}
 
 	// if riding a vehicle, vehicle attitude and position override all
-	if (FPSRideVehicle != NULL && Vehicle->RideSeatNum != VEH_TROOPER_ON_DECK_RIDE_SEAT)
+	if (FPSRideVehicle != nullptr && Vehicle->RideSeatNum != VEH_TROOPER_ON_DECK_RIDE_SEAT)
 	{
 		vehAttachToRidePoint(Vehicle);
 		fpFPSSetInheritedVelocity (&FPSRideVehicle->PosData.Vel);
@@ -1112,8 +1112,8 @@ static LOGICAL _updatePersonCampaign(mlVehicleData* pVehicleData, FLOAT64 DeltaT
 
 	SINT32 i = 0;
 
-	vehVehicle* FPSRideVehicle		= NULL;
-	vehVehicle* VehicleWalkingOn	= NULL;
+	vehVehicle* FPSRideVehicle		= nullptr;
+	vehVehicle* VehicleWalkingOn	= nullptr;
 
 	// Initialize
 	fpPersonData* pPersonData = (fpPersonData*) pVehicleData->PersonData;
@@ -1129,7 +1129,7 @@ static LOGICAL _updatePersonCampaign(mlVehicleData* pVehicleData, FLOAT64 DeltaT
 	if(Vehicle->RideVehicleHostIndex > 0)
 		FPSRideVehicle = vehFindVehicle(Vehicle->RideVehicleHostIndex);
 
-	if (FPSRideVehicle != NULL && FPSRideVehicle->RideVehicleHostIndex == 0)
+	if (FPSRideVehicle != nullptr && FPSRideVehicle->RideVehicleHostIndex == 0)
 	{
 		if(Vehicle->RideSeatNum == VEH_TROOPER_ON_DECK_RIDE_SEAT && pVehicleData->LastRideVehicle == Vehicle->RideVehicleHostIndex)
 			fpMoveToRelRidePos(FPSRideVehicle, Vehicle);	// allows trooper to "stick" to the deck
@@ -1143,18 +1143,18 @@ static LOGICAL _updatePersonCampaign(mlVehicleData* pVehicleData, FLOAT64 DeltaT
 		if (FPSRideVehicle->StateAnimation.EjectRiders == 1) // check for ejection
 		{
 			// kick rider off of vehicle
-			FPSRideVehicle = NULL;
+			FPSRideVehicle = nullptr;
 			fpFPSRideUnrideVehicle();
 		}
 	}
 	else if(fpFPSGetPlayerPose() == POSE_SIT) // ahh, disappeared from under our feet
 	{
-		FPSRideVehicle = NULL;
+		FPSRideVehicle = nullptr;
 		fpFPSRideUnrideVehicle();
 	}
 
 	// if riding a vehicle, vehicle attitude and position override all
-	if (FPSRideVehicle != NULL && Vehicle->RideSeatNum != VEH_TROOPER_ON_DECK_RIDE_SEAT)
+	if (FPSRideVehicle != nullptr && Vehicle->RideSeatNum != VEH_TROOPER_ON_DECK_RIDE_SEAT)
 	{
 		vehAttachToRidePoint(Vehicle);
 		fpFPSSetInheritedVelocity (&FPSRideVehicle->PosData.Vel);
@@ -1200,7 +1200,7 @@ static LOGICAL _updatePersonCampaign(mlVehicleData* pVehicleData, FLOAT64 DeltaT
 		// if collision, move back, then forward to collide point
 		// could be .. more efficient
 		// checks only for models
-		vehVehicle* collideVehicle = NULL;
+		vehVehicle* collideVehicle = nullptr;
 
 		if (mlDetermineInfantryCollisions(pVehicleData, &CurrentVelocity, (UINT32)(fpFPSGetPlayerPose()), FALSE, 0, &collideVehicle))
 		{
@@ -1302,9 +1302,9 @@ static LOGICAL _updatePersonCampaign(mlVehicleData* pVehicleData, FLOAT64 DeltaT
 LOGICAL fpUpdatePerson(mlVehicleData* pVehicleData, FLOAT64 DeltaTime)
 {
 	// Sanity Checks
-	if (pVehicleData == NULL) return 0;
-	if (pVehicleData->VehicleObjectData == NULL) return 0;
-	if (pVehicleData->VehicleObjectData->PlaneObject == NULL) return 0;
+	if (pVehicleData == nullptr) return 0;
+	if (pVehicleData->VehicleObjectData == nullptr) return 0;
+	if (pVehicleData->VehicleObjectData->PlaneObject == nullptr) return 0;
 	if (pVehicleData->LastResetTime == 0) return 0;
 	if (gCustomTerrain && !SCEN_MGR->IsTerrainLoaded()) return 0;
 
@@ -1350,19 +1350,19 @@ LOGICAL fpUpdatePerson2(mlVehicleData* pVehicleData, FLOAT64 DeltaTime)
 	fpPersonData*	pPersonData;
 	OBJECT*			pObject;
 	FLOAT64VECTOR	LastPos;
-	vehVehicle*		VehicleWalkingOn = NULL;
+	vehVehicle*		VehicleWalkingOn = nullptr;
 	// z-physics hack vars
 	//piVECTOR*		testArray;
 	SINT32			i;
-	//OBJECT*			keeperColObj = NULL;
+	//OBJECT*			keeperColObj = nullptr;
 	//piVECTOR		keeperPos;
-	vehVehicle*		FPSRideVehicle = NULL;
+	vehVehicle*		FPSRideVehicle = nullptr;
 //	static LOGICAL	fallShortSoundPlayed, fallFarSoundPlayed;
 
 	// Sanity Checks
-	if (pVehicleData == NULL) return 0;
-	if (pVehicleData->VehicleObjectData == NULL) return 0;
-	if (pVehicleData->VehicleObjectData->PlaneObject == NULL) return 0;
+	if (pVehicleData == nullptr) return 0;
+	if (pVehicleData->VehicleObjectData == nullptr) return 0;
+	if (pVehicleData->VehicleObjectData->PlaneObject == nullptr) return 0;
 
 	vehVehicle* Vehicle = pVehicleData->VehicleMasterPtr;
 
@@ -1380,7 +1380,7 @@ LOGICAL fpUpdatePerson2(mlVehicleData* pVehicleData, FLOAT64 DeltaTime)
 	if(Vehicle->RideVehicleHostIndex > 0)
 		FPSRideVehicle = vehFindVehicle(Vehicle->RideVehicleHostIndex);
 
-	if (FPSRideVehicle != NULL && FPSRideVehicle->RideVehicleHostIndex == 0)
+	if (FPSRideVehicle != nullptr && FPSRideVehicle->RideVehicleHostIndex == 0)
 	{
 		if(Vehicle->RideSeatNum == VEH_TROOPER_ON_DECK_RIDE_SEAT && pVehicleData->LastRideVehicle == Vehicle->RideVehicleHostIndex)
 			fpMoveToRelRidePos(FPSRideVehicle, Vehicle);	// allows trooper to "stick" to the deck
@@ -1394,18 +1394,18 @@ LOGICAL fpUpdatePerson2(mlVehicleData* pVehicleData, FLOAT64 DeltaTime)
 		if (FPSRideVehicle->StateAnimation.EjectRiders == 1) // check for ejection
 		{
 			// kick rider off of vehicle
-			FPSRideVehicle = NULL;
+			FPSRideVehicle = nullptr;
 			fpFPSRideUnrideVehicle();
 		}
 	}
 	else if(fpFPSGetPlayerPose() == POSE_SIT) // ahh, disappeared from under our feet
 	{
-		FPSRideVehicle = NULL;
+		FPSRideVehicle = nullptr;
 		fpFPSRideUnrideVehicle();
 	}
 
 	// if riding a vehicle, vehicle attitude and position override all
-	if (FPSRideVehicle != NULL && Vehicle->RideSeatNum != VEH_TROOPER_ON_DECK_RIDE_SEAT)
+	if (FPSRideVehicle != nullptr && Vehicle->RideSeatNum != VEH_TROOPER_ON_DECK_RIDE_SEAT)
 	{
 		vehAttachToRidePoint(Vehicle);
 		fpFPSSetInheritedVelocity (&FPSRideVehicle->PosData.Vel);
@@ -1821,13 +1821,13 @@ LOGICAL fpSetExternal(mlVehicleData * ModelData)
 {
 fpPersonData* PersonData;
 
-	if (ModelData == NULL)
+	if (ModelData == nullptr)
 	{
 		return FALSE;
 	}
 
 	PersonData = (fpPersonData*) ModelData->PersonData;
-	if (PersonData == NULL)
+	if (PersonData == nullptr)
 	{
 		return FALSE;
 	}
@@ -1841,13 +1841,13 @@ LOGICAL fpSetInternal(mlVehicleData * ModelData)
 {
 fpPersonData* PersonData;
 
-	if (ModelData == NULL)
+	if (ModelData == nullptr)
 	{
 		return FALSE;
 	}
 
 	PersonData = (fpPersonData*) ModelData->PersonData;
-	if (PersonData == NULL)
+	if (PersonData == nullptr)
 	{
 		return FALSE;
 	}
@@ -1931,7 +1931,7 @@ UINT32 fpCollideRoundWithVehicleWalkObject(FASTCOLLIDE ** CollideListPtr,
 		if (CurrentVehicle->VehicleType->Type == VEH_TYPE_PERSON)
 			continue;
 
-		if (CurrentVehicle->VehicleObjectData == NULL)
+		if (CurrentVehicle->VehicleObjectData == nullptr)
 			continue;
 
 		if (!CurrentVehicle->InUse)
@@ -1951,7 +1951,7 @@ UINT32 fpCollideRoundWithVehicleWalkObject(FASTCOLLIDE ** CollideListPtr,
 			colObject = CurrentVehicle->VehicleObjectData->CollideExternObject;
 		}
 
-		if (colObject == NULL)
+		if (colObject == nullptr)
 			continue;
 
 		//CurrentVehicle->VehicleObjectData->CollideExternObject
@@ -2046,7 +2046,7 @@ LOGICAL fpCheckFallRing (mlVehicleData* pVehicleData, SINT32 numLines,// piVECTO
 	FLOAT64			CosValue, SinValue;
 	SINT32			i;
 	FLOAT64VECTOR	WorldOriginOffset;
-	OBJECT*			keeperColObj = NULL;
+	OBJECT*			keeperColObj = nullptr;
 	piVECTOR		keeperPos;
 	piVECTOR		rayStart, rayEnd;
 	UINT32			TempUint;
@@ -2059,7 +2059,7 @@ LOGICAL fpCheckFallRing (mlVehicleData* pVehicleData, SINT32 numLines,// piVECTO
 	piVECTOR		colPos;
 	FLOAT32			colTime, keeperColTime;
 	OBJECT*			ColObj;
-	vehVehicle*		VehicleWalkingOn = NULL;
+	vehVehicle*		VehicleWalkingOn = nullptr;
 
 	CosValue = cos((pVehicleData->VehicleAtt.Yaw));
 	SinValue = sin((pVehicleData->VehicleAtt.Yaw));
@@ -2153,8 +2153,8 @@ LOGICAL fpCheckFallRing (mlVehicleData* pVehicleData, SINT32 numLines,// piVECTO
 
 			if(VehicleWalkingOn && !vehVehicleInList(VehicleWalkingOn))
 			{
-				VehicleWalkingOn = NULL;
-				ColObj = NULL;
+				VehicleWalkingOn = nullptr;
+				ColObj = nullptr;
 			}
 			else
 			{
@@ -2168,7 +2168,7 @@ LOGICAL fpCheckFallRing (mlVehicleData* pVehicleData, SINT32 numLines,// piVECTO
 		}
 		else
 		{
-			ColObj = NULL;
+			ColObj = nullptr;
 		}
 
 		if (ColObj)

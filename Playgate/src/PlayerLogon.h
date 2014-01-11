@@ -12,7 +12,7 @@ class CPlayerLogon : public CBDialog
 	DECLARE_DYNAMIC(CPlayerLogon)
 
 public:
-	CPlayerLogon(CWnd* pParent = NULL);   // standard constructor
+	CPlayerLogon(CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CPlayerLogon();
 	virtual UINT TitleLocID() const { return LOGIN_TITLE; }
 	virtual UINT OkLocID() const { return LOGIN_OK; }

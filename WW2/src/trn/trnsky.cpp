@@ -432,9 +432,9 @@ LOGICAL trnskyInit(SINT8* name, SINT32 mesh, FLOAT32 scale)
 	// ellipse should be "shallow" to display correct fog.
 	ellipse = 0.6f;
 
-	sky = obcHemiSphere("sky1", NULL, mesh, &loc, scale * 1.1f, ellipse, color);
+	sky = obcHemiSphere("sky1", nullptr, mesh, &loc, scale * 1.1f, ellipse, color);
 
-	if (sky == NULL)
+	if (sky == nullptr)
 	{
 		return(FALSE);
 	}
@@ -460,8 +460,8 @@ LOGICAL trnskyInit(SINT8* name, SINT32 mesh, FLOAT32 scale)
 	_horizheight = ellipse * scale * 1.2f;
 	horiz = obcHemiSphere("horiz", "horizon1", mesh, &loc, scale, 0.6f, color);
 	horiztop = obcCylinder("horiztop", "horizon1", mesh, &loc, scale, ellipse, color);
-	if (horiz == NULL ||
-		horiztop == NULL)
+	if (horiz == nullptr ||
+		horiztop == nullptr)
 	{
 		return(FALSE);
 	}
@@ -504,13 +504,13 @@ LOGICAL trnskyInit(SINT8* name, SINT32 mesh, FLOAT32 scale)
 	}
 
 	sundisk = obmainFindNamedObject("sunglare1");
-	if (sundisk == NULL)
+	if (sundisk == nullptr)
 	{
 		Write_Debug("Can't find sunglare1.flt object!");
 		return(FALSE);
 	}
 
-	if (sundisk->child == NULL)
+	if (sundisk->child == nullptr)
 	{
 		Write_Debug("no child object in sunglare1.flt object!");
 		return(FALSE);
@@ -535,13 +535,13 @@ LOGICAL trnskyInit(SINT8* name, SINT32 mesh, FLOAT32 scale)
 	}
 
 	moondisk = obmainFindNamedObject("fullmoon1");
-	if (moondisk == NULL)
+	if (moondisk == nullptr)
 	{
 		Write_Debug("Can't find fullmoon1.flt object!");
 		return(FALSE);
 	}
 
-	if (moondisk->child == NULL)
+	if (moondisk->child == nullptr)
 	{
 		Write_Debug("no child object in fullmoon1.flt object!");
 		return(FALSE);
@@ -833,11 +833,11 @@ FLOAT32		horizon;
 
 static FLOAT32 _LastAlt;
 
-	if (sky == NULL ||
-		horiz == NULL ||
-		sundisk == NULL ||
-		moondisk == NULL ||
-		horiztop == NULL)
+	if (sky == nullptr ||
+		horiz == nullptr ||
+		sundisk == nullptr ||
+		moondisk == nullptr ||
+		horiztop == nullptr)
 	{
 		return(TRUE);
 	}
@@ -1436,8 +1436,8 @@ LOGICAL trnskyDrawDeprecated(void)
         ogl::DrawArrays(GL_QUADS, 0, 4);
 
 #if USE_STATESET
-        States::ApplyRenderStates(NULL);
-        States::ApplyRenderModes(NULL);
+        States::ApplyRenderStates(nullptr);
+        States::ApplyRenderModes(nullptr);
 #else
         oglSetRenderState(oglRENDERSTATE_ZWRITEENABLE, bZWrite);
         oglSetRenderState(oglRENDERSTATE_ALPHABLENDENABLE, piALPHABLENDENABLE_DEFAULT);
@@ -1459,7 +1459,7 @@ LOGICAL trnskyDrawDeprecated(void)
         piSetRenderState(piRENDERSTATE_ALPHABLENDENABLE, piALPHABLENDENABLE_DEFAULT);
 #endif
 
-        if(horiztop != NULL)
+        if(horiztop != nullptr)
 	    {
 #if USE_STATESET
             horiztop->material->Apply();
@@ -1470,7 +1470,7 @@ LOGICAL trnskyDrawDeprecated(void)
 #endif
 	    }
 
-	    if(sky != NULL)
+	    if(sky != nullptr)
 	    {
 #if USE_STATESET
             sky->material->Apply();
@@ -1481,7 +1481,7 @@ LOGICAL trnskyDrawDeprecated(void)
 #endif
 	    }
 
-	    if(sundisk != NULL)
+	    if(sundisk != nullptr)
 	    {
 		    if (!(sundisk->child->flag2 & OBJECT_HIDDEN))
 		    {
@@ -1497,7 +1497,7 @@ LOGICAL trnskyDrawDeprecated(void)
 		    }
 	    }
 
-	    if(moondisk != NULL)
+	    if(moondisk != nullptr)
 	    {
 		    if(!(moondisk->child->flag2 & OBJECT_HIDDEN))
 		    {
@@ -1513,7 +1513,7 @@ LOGICAL trnskyDrawDeprecated(void)
 
         _DrawStarsDeprecated();
 
-	    if(horiz != NULL)
+	    if(horiz != nullptr)
 	    {
 #if USE_STATESET
             horiz->material->Apply();
@@ -1703,34 +1703,34 @@ void trnskyKill(void)
 {
     LensFlareKill();
 
-	if (sky != NULL)
+	if (sky != nullptr)
 	{
 		obmainFreeObject(sky);
-		sky = NULL;
+		sky = nullptr;
 	}
 
-	if (horiz != NULL)
+	if (horiz != nullptr)
 	{
 		obmainFreeObject(horiz);
-		horiz = NULL;
+		horiz = nullptr;
 	}
 
-	if (horiztop != NULL)
+	if (horiztop != nullptr)
 	{
 		obmainFreeObject(horiztop);
-		horiztop = NULL;
+		horiztop = nullptr;
 	}
 
-	if (sundisk != NULL)
+	if (sundisk != nullptr)
 	{
 		obpoolFreeObjectCallback(sundisk);
-		sundisk = NULL;
+		sundisk = nullptr;
 	}
 
-	if (moondisk != NULL)
+	if (moondisk != nullptr)
 	{
 		obpoolFreeObjectCallback(moondisk);
-		moondisk = NULL;
+		moondisk = nullptr;
 	}
 
     oglFreeMipTextures(skyboxtexture);
@@ -1777,7 +1777,7 @@ LIGHT Light;
 	Light.light.dvTheta = 0.0f;//PI / 8;
 	Light.light.dvPhi = 0.0f;//PI / 16;
 
-	if (!obdliteAddDynaLite(&Light, NULL))
+	if (!obdliteAddDynaLite(&Light, nullptr))
 	{
 		return(FALSE);
 	}
@@ -1828,7 +1828,7 @@ static UINT32 _InitMoon(void)
 	Light.light.dvTheta = 0.0f;//PI / 8;
 	Light.light.dvPhi = 0.0f;//PI / 16;
 
-	if (!obdliteAddDynaLite(&Light, NULL))
+	if (!obdliteAddDynaLite(&Light, nullptr))
 	{
 		return(FALSE);
 	}
@@ -2516,7 +2516,7 @@ static UINT32 _ColorObject(OBJECT * Object,UINT32 Color)
 	OBJECT * ObjAtt;
 	UINT32 i;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -2538,10 +2538,10 @@ static UINT32 _ColorObject(OBJECT * Object,UINT32 Color)
 
 			ObjAtt = ObjAtt->attached;
 		}
-		while (ObjAtt != NULL);
+		while (ObjAtt != nullptr);
 	}
 
-	if (Object->child != NULL)
+	if (Object->child != nullptr)
 	{
 		_ColorSubObject(Object->child,Color);
 	}
@@ -2554,7 +2554,7 @@ static UINT32 _ColorSubObject(OBJECT * Object,UINT32 Color)
 	OBJECT * ObjAtt,*ObjSib;
 	UINT32 i;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -2581,9 +2581,9 @@ static UINT32 _ColorSubObject(OBJECT * Object,UINT32 Color)
 
 				ObjAtt = ObjAtt->attached;
 			}
-			while (ObjAtt != NULL);
+			while (ObjAtt != nullptr);
 
-			if (ObjSib->child != NULL)
+			if (ObjSib->child != nullptr)
 			{
 				_ColorSubObject(ObjSib->child,Color);
 			}
@@ -2591,7 +2591,7 @@ static UINT32 _ColorSubObject(OBJECT * Object,UINT32 Color)
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 	return 0;
 }

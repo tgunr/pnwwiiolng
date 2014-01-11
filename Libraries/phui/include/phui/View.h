@@ -33,7 +33,7 @@ public:
 			_wlimiter(0), _hlimiter(0), _wscaler(0), _hscaler(0),
 			_x(0), _y(0), _width(0), _height(0), _owidth(0), _oheight(0),
 			_scroll_x(0), _scroll_y(0),
-			_parent(NULL),
+			_parent(nullptr),
 			_preferredwidth(0), _preferredheight(0),
 			_minwidth(0), _minheight(0),
 			_maxwidth(10000), _maxheight(10000),
@@ -52,17 +52,17 @@ public:
 			_acceptsmouseclick(true),
 			_layer(0),
 			_isclosing(false),
-			_drawer(NULL),
+			_drawer(nullptr),
 			_contentwidth(0), _contentheight(0),
 			_tooltipdelay(0),
 			_tooltip(),
 			_tooltippath(),
-			_source(NULL),
-			_parentviewport(NULL),
-			_graphicscontext(NULL),
-			_children(NULL),
-			_userdata(NULL),
-			_usermsg(NULL)
+			_source(nullptr),
+			_parentviewport(nullptr),
+			_graphicscontext(nullptr),
+			_children(nullptr),
+			_userdata(nullptr),
+			_usermsg(nullptr)
 	{
 		_bgcolor[0] = _bgcolor[1] = _bgcolor[2] = _bgcolor[3] = 0;
 		_bordercolor[0] = _bordercolor[1] = _bordercolor[2] = _bordercolor[3] = 0;
@@ -98,7 +98,7 @@ public:
     virtual View* FindViewHit(float x, float y, bool wincheck = false) const; // x,y in local co-ordinates;
 	virtual bool FindViewsHit(float x, float y, std::vector<View*>& views, bool wincheck = false) const;
 	virtual View* FindSibling(const char *name) const;
-	bool HasModalChild(const char* exclude = NULL, bool onlyVisible = false) const;
+	bool HasModalChild(const char* exclude = nullptr, bool onlyVisible = false) const;
 	
 	// co-ordinate system starts bottom left, values are relative to the parent
 	float Width()  const { return _width; }

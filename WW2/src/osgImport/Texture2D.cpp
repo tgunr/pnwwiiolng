@@ -266,7 +266,7 @@ void Texture2D::copyTexImage2D(int x, int y, int width, int height )
 
 
     // remove any previously assigned images as these are nolonger valid.
-    _image = NULL;
+    _image = nullptr;
 
     // switch off mip-mapping.
     //
@@ -379,7 +379,7 @@ void Texture2D::allocateMipmap() const
             glTexImage2D( GL_TEXTURE_2D, k, _internalFormat,
                      width, height, _borderWidth,
                      _sourceFormat ? _sourceFormat : _internalFormat,
-                     _sourceType ? _sourceType : GL_UNSIGNED_BYTE, NULL);
+                     _sourceType ? _sourceType : GL_UNSIGNED_BYTE, nullptr);
 
             width >>= 1;
             height >>= 1;

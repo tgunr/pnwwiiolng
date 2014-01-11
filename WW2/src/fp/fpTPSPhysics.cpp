@@ -37,7 +37,7 @@
 
 // make limb joints straighten out if possible
 static float tforce = 50.0f;
-static fpTPSRagdoll* _playerRagdoll = NULL;
+static fpTPSRagdoll* _playerRagdoll = nullptr;
 // external ragdoll camera variables
 
 static Vec3d _lookAt;
@@ -212,7 +212,7 @@ void fpTPSRagdollInit()
 
 void fpTPSRagdollKill()
 {
-	_playerRagdoll = NULL;
+	_playerRagdoll = nullptr;
 
 	for(unsigned int i = 0; i < _ragdolls.size(); i++)
 	{
@@ -239,7 +239,7 @@ static const WeaponShape* _getWeaponShape(int type, int weapon = 0)
 			return &found->second;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 bool fpTPSAllowRagdoll(FLOAT64VECTOR& pos)
@@ -280,12 +280,12 @@ fpTPSRagdoll* fpTPSAddRagdoll(gr2AnimTrooper* anim, int timeout, int delay, bool
 	/*
 	TestRagdoll* newTest = new TestRagdoll();
 	newTest->AnimInit(anim);
-	return NULL;
+	return nullptr;
 	*/
 
 	static int instance = 1; // 0 is reserved for me
 
-	fpTPSRagdoll* ragdoll = NULL;
+	fpTPSRagdoll* ragdoll = nullptr;
 
 #if INFINITE_RAGDOLLS
 	{
@@ -373,7 +373,7 @@ fpTPSRagdoll* fpTPSAddRagdoll(gr2AnimTrooper* anim, int timeout, int delay, bool
 				push.set(0, 0, -8.0f);
 
 			ragdoll->AnimInit(anim, &push, timeout, delay);
-			//ragdoll->AnimInit(anim, NULL, timeout, delay);
+			//ragdoll->AnimInit(anim, nullptr, timeout, delay);
 
 			gr2RemoveAllBlendedAnimations (anim->skeleton, -1);
 
@@ -399,7 +399,7 @@ fpTPSRagdoll* fpTPSAddRagdoll(gr2AnimTrooper* anim, int timeout, int delay, bool
 		}
 		else
 		{
-			ragdoll = NULL;
+			ragdoll = nullptr;
 		}
 	}
 
@@ -418,7 +418,7 @@ static void _calculateCamPos(Vec3d& camPos, Vec3d& lookAt, UINT32 maxLOS)
 	FLOAT64 rayLen				= 5.0f;
 	FLOAT64 vertAngle			= 30.0f;
 	FLOAT64 rayAngle			= vertAngle/90.0f;
-	dGeomID ray					= NULL;
+	dGeomID ray					= nullptr;
 
 	Vec3d start						= physicsGameToPhysical(lookAt);
 	Vec3d dir						= Vec3d(0, 1.0f, rayAngle);
@@ -668,7 +668,7 @@ void fpTPSDeathCameraReset()
 	_lookAt.set(0,0,0);
 	_camPos.set(0,0,0);
 	_focusPos.set(0,0,0);
-	_playerRagdoll = NULL;
+	_playerRagdoll = nullptr;
 }
 
 #define RAGDOLL_FALLING_THRESHOLD 30
@@ -687,7 +687,7 @@ bool fpTPSDeathCamera(piVECTOR* pos, piVECTOR* aim)
 		return true;
 
 	vehVehicle* v							= persGetPersonaVehiclePtr();
-	fpPersonData* pData				= (v) ? (fpPersonData*)v->ModelData->PersonData: NULL;
+	fpPersonData* pData				= (v) ? (fpPersonData*)v->ModelData->PersonData: nullptr;
 	UINT32 aboveGround					= (pData) ? (UINT32)pData->heightAboveGround : 0;
 	UINT32 maxLOS						= 100;
 
@@ -752,7 +752,7 @@ bool fpTPSDeathCamera(piVECTOR* pos, piVECTOR* aim)
 		{
 			if(_playerRagdoll && _playerRagdoll->IsActive())
 			{
-				GR2PhysicsBoneRef bone = NULL;
+				GR2PhysicsBoneRef bone = nullptr;
 				FLOAT64VECTOR vel;
 				static float chance = .01f;
 				static float push = 1.75f;
@@ -1007,7 +1007,7 @@ TestRagdoll::TestRagdoll() : gr2PhysicsModel()
 	/*
 	if(1)
 	{
-		dJointID jid = NULL;
+		dJointID jid = nullptr;
 
 		// link all of the bodies together via joints
 		// neck
@@ -1159,7 +1159,7 @@ fpTPSRagdoll::fpTPSRagdoll() : gr2PhysicsModel(),
 	_decal(-1),
 	_nextImpactSound(0),
 	_nextContactSound(0),
-	_weapJoint(NULL)
+	_weapJoint(nullptr)
 {
 	// our base skeleton
 	InitSkeleton(fpTPSSkeletonFile);
@@ -1331,7 +1331,7 @@ fpTPSRagdoll::fpTPSRagdoll() : gr2PhysicsModel(),
 	// setup our bone joints
 	if(1)
 	{
-		dJointID jid = NULL;
+		dJointID jid = nullptr;
 
 		// link all of the bodies together via joints
 		// neck
@@ -1547,7 +1547,7 @@ void fpTPSRagdoll::AddDrama(const Vec3d* force)
 		};
 
 		bool moving = (_velocity.length2() > 1.0f);
-		gr2PhysicsBone* bone = NULL;
+		gr2PhysicsBone* bone = nullptr;
 		Vec3d localForce = *force;
 		Vec3d tempForce;
 
@@ -1685,7 +1685,7 @@ void fpTPSRagdoll::Personalize(gr2AnimTrooper* anim)
 
 		// add our 3rd person weapon model
 		if(weapCollider && anim->weapons[anim->currentWeapon].GetActive())
-			Attach(new fpTPSWeapon(anim, NULL, weapCollider));
+			Attach(new fpTPSWeapon(anim, nullptr, weapCollider));
 	}
 }
 
@@ -1756,7 +1756,7 @@ void fpTPSRagdoll::EndStep()
 			}
 
 			dJointDestroy(_weapJoint);
-			_weapJoint = NULL;
+			_weapJoint = nullptr;
 		}
 	}
 }
@@ -1764,7 +1764,7 @@ void fpTPSRagdoll::EndStep()
 void fpTPSRagdoll::Deactivate()
 {
 	if(_playerRagdoll == this)
-		_playerRagdoll = NULL;
+		_playerRagdoll = nullptr;
 
 	_lastCollision = 0;
 
@@ -1819,7 +1819,7 @@ void fpTPSRagdoll::OnUnattach(gr2PhysicsModel* m)
 	if(_weapJoint)
 		dJointDestroy(_weapJoint);
 
-	_weapJoint = NULL;
+	_weapJoint = nullptr;
 
 	gr2PhysicsModel::OnUnattach(m);
 }
@@ -1925,7 +1925,7 @@ void fpTPSWeapon::EndStep()
 			for(unsigned int j = 0; j < _joints.size(); ++j)
 				dJointDestroy(_joints[j]);
 
-			_rootBone->SetJointID(NULL);
+			_rootBone->SetJointID(nullptr);
 			_joints.clear();
 		}
 	}
@@ -2079,7 +2079,7 @@ fpTPSWeapon::~fpTPSWeapon()
 	{
 		if(!colliderIsType(_lastCollision, COLLIDER_DRIVABLE_MASK) && cfgPrefsGetBool("app.corpses", true))
 		{
-			Corpse* c = gr2AnimAddCorpse(this, NULL, false, 30000); // , bone->getName(), false
+			Corpse* c = gr2AnimAddCorpse(this, nullptr, false, 30000); // , bone->getName(), false
 			c->shadow = false;
 		}
 	}
@@ -2451,7 +2451,7 @@ fpTPSKitObject::~fpTPSKitObject()
 	{
 		if(!colliderIsType(_lastCollision, COLLIDER_DRIVABLE_MASK) && cfgPrefsGetBool("app.corpses", true))
 		{
-			Corpse* c = gr2AnimAddCorpse(this, NULL, false, 30000); // , bone->getName(), false
+			Corpse* c = gr2AnimAddCorpse(this, nullptr, false, 30000); // , bone->getName(), false
 			c->shadow = false;
 		}
 	}
@@ -2490,7 +2490,7 @@ void fpTPSKitObject::EndStep()
 			for(unsigned int j = 0; j < _joints.size(); ++j)
 				dJointDestroy(_joints[j]);
 
-			_rootBone->SetJointID(NULL);
+			_rootBone->SetJointID(nullptr);
 			_joints.clear();
 		}
 	}
@@ -2764,9 +2764,9 @@ static OBJECT* _getRopeObject();
 // head of rope
 fpTPSRope::fpTPSRope(dBody* anchor) :
 	physicsBody(COLLIDER_WEAPON, COLLIDER_HARDTERRAIN_MASK),
-	_node(NULL),
-	_parent(NULL),
-	_child(NULL),
+	_node(nullptr),
+	_parent(nullptr),
+	_child(nullptr),
 	_links(0),
 	_nextLinkCheck(0)
 {
@@ -2818,9 +2818,9 @@ fpTPSRope::fpTPSRope(dBody* anchor) :
 // subsequent rope links
 fpTPSRope::fpTPSRope(fpTPSRope* rope) :
 	physicsBody(COLLIDER_WEAPON, COLLIDER_HARDTERRAIN_MASK),
-	_node(NULL),
-	_parent(NULL),
-	_child(NULL),
+	_node(nullptr),
+	_parent(nullptr),
+	_child(nullptr),
 	_links(0),
 	_nextLinkCheck(0)
 {
@@ -3070,7 +3070,7 @@ OBJECT* _getRopeObject()
 	newObject->flag2 |= OBJECT_TOPMOST;
 
 	newObject->drawcallback = _rodeDraw; //gr2PhysicsDrawCallback;
-	newObject->cullcallback = NULL;//gr2AnimCullCallback;
+	newObject->cullcallback = nullptr;//gr2AnimCullCallback;
 
 	newObject->bbox[0].x = -3.0f;
 	newObject->bbox[0].y = -3.0f;

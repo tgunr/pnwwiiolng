@@ -105,16 +105,16 @@ static int MipFilterMap[cfgNUM_TEXTURE_MIP_FILTER_VALUES]=
 
 static int* EnumValueMap[cfgNUM_TYPE_VALUES]=
 {
-	NULL,				// cfgTYPE_INTEGER
-	NULL,				// cfgTYPE_FLOAT
-	NULL,				// cfgTYPE_STRING
+	nullptr,				// cfgTYPE_INTEGER
+	nullptr,				// cfgTYPE_FLOAT
+	nullptr,				// cfgTYPE_STRING
 	ShadeModeMap,		// cfgTYPE_TEXTURE_SHADE_MODE,
 	MagFilterMap,		// cfgTYPE_TEXTURE_MAG_FILTER,
 	MinFilterMap,		// cfgTYPE_TEXTURE_MIN_FILTER,
 	MipFilterMap,		// cfgTYPE_TEXTURE_MIP_FILTER,
-	NULL,				// cfgTYPE_TEXTURE_ANTIALIASING,
-	NULL,				// cfgTYPE_SHADOW_SIZE_SELECT,
-	NULL,				// cfgTYPE_TRUE_FALSE,
+	nullptr,				// cfgTYPE_TEXTURE_ANTIALIASING,
+	nullptr,				// cfgTYPE_SHADOW_SIZE_SELECT,
+	nullptr,				// cfgTYPE_TRUE_FALSE,
 };
 
 static LOGICAL ConvertTypes()
@@ -124,7 +124,7 @@ int i, Type;
 	for (i = 0; i < cfgNUM_TOTAL_PARAMS; ++i)
 	{
 		Type = cfgParameters[i].Type;
-		if (EnumValueMap[Type] != NULL)
+		if (EnumValueMap[Type] != nullptr)
 		{
 			*(int*)pGlobalVars[i] = EnumValueMap[Type][*(int*)pGlobalVars[i]];
 		}
@@ -142,7 +142,7 @@ extern ADAPTERMODES*		adaptermodes;
 int FindVideoDriverIndexFromString(char* Driver)
 {
 DWORD		i;
-const char* guid = NULL;
+const char* guid = nullptr;
 
 	for (i = 0; i < numadapters; ++i)
 	{

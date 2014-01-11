@@ -70,9 +70,9 @@ void phui::js::Kill()
 
 	JS_ShutDown();
 
-	_jsrt = NULL;
-	_jsglob = NULL;
-	_jsglobctx = NULL;
+	_jsrt = nullptr;
+	_jsglob = nullptr;
+	_jsglobctx = nullptr;
 }
 
 /************************************************************************************************
@@ -123,7 +123,7 @@ phui::js::Object::Object(JSClass* jsclass, JSContext* ctx, JSObject* parent, JSF
 phui::js::Object::Object(JSClass* jsclass, JSFunctionSpec* func, JSPropertySpec* prop)
 			: _jsctx(_jsglobctx),_jsobj(0), _jsval(JSVAL_NULL)
 {
-	CreateJS(jsclass, _jsctx, NULL,func ? func->name : "?",prop ? prop->name : "?");
+	CreateJS(jsclass, _jsctx, nullptr,func ? func->name : "?",prop ? prop->name : "?");
 	
 	if(func)
 		DefineFunctions(func);
@@ -153,12 +153,12 @@ static char lasterror[512];
 
 void phui::js::Object::CreateJS(JSClass* jsclass, JSContext* ctx, JSObject* parent, const char* lastfunc, const char* lastprop)
 {
-	if(parent == NULL && _jsglob)
+	if(parent == nullptr && _jsglob)
 		parent = _jsglob->jsObject();
 	
 	if(jsclass)
 	{
-		_jsobj = JS_NewObject(_jsctx, jsclass, NULL, parent);
+		_jsobj = JS_NewObject(_jsctx, jsclass, nullptr, parent);
 #ifdef SHOW_JS_ALLOCATIONS
 //        printf( "JS_NewObject created: %s.%s.%s\n", jsclass ? jsclass->name : "?", lastfunc ? lastfunc : "nil", lastprop ? lastprop : "nil" );
 #endif
@@ -282,7 +282,7 @@ void phui::js::Object::DefineProperty(const char* name, jsval val, uintN flags)
 	{
 		jsval_root jsvalroot;
 		jsvalroot.set(_jsctx, val);
-		JS_DefineProperty(_jsctx, _jsobj, name, val, NULL, NULL, flags);
+		JS_DefineProperty(_jsctx, _jsobj, name, val, nullptr, nullptr, flags);
 	}
 }
 
@@ -350,9 +350,9 @@ void phui::js::Object::JSClassFinalize(JSContext *cx, JSObject *obj)
 	Array
 *************************************************************************************************/
 
-phui::js::Array::Array() : js::Object(NULL)
+phui::js::Array::Array() : js::Object(nullptr)
 {
-	_jsobj = JS_NewArrayObject(_jsctx, 0, NULL);
+	_jsobj = JS_NewArrayObject(_jsctx, 0, nullptr);
 	_jsval = OBJECT_TO_JSVAL(_jsobj);	
 	_jsclass = &js_ArrayClass;
 	

@@ -47,8 +47,8 @@ struct SNDDETDRIVERS
 
 static DSBUFFERDESC				dsbdesc;
 static LPGUID					dsguid;
-static LPDIRECTSOUND8           lpds = NULL;
-static LPDIRECTSOUND3DLISTENER8 g_lpListener8 = NULL;
+static LPDIRECTSOUND8           lpds = nullptr;
+static LPDIRECTSOUND3DLISTENER8 g_lpListener8 = nullptr;
 
 // used to enumerate direct sound devices
 static int                      dsnumdrivers = 0;
@@ -75,7 +75,7 @@ static inline void _soundError(const char* description)
 	message += UTF16(description);
 	message += _SND_ERR_2;
 
-	MessageBox(NULL, message.c_str(), _SND_TITLE, MB_ICONEXCLAMATION|MB_OK);
+	MessageBox(nullptr, message.c_str(), _SND_TITLE, MB_ICONEXCLAMATION|MB_OK);
 }
 
 ////////////////////////////////////////////////
@@ -89,14 +89,14 @@ LOGICAL sndsPlatformInit(void)
 #else
     WAVEFORMATEX wf;
     HRESULT hr;
-    LPDIRECTSOUNDBUFFER lpPrimary = NULL;
+    LPDIRECTSOUNDBUFFER lpPrimary = nullptr;
 
 	try
 	{
 	    /////////////////////////////
 		// Create DirectSound object
 	    /////////////////////////////
-		hr = DirectSoundCreate8(NULL, &lpds, NULL);
+		hr = DirectSoundCreate8(nullptr, &lpds, nullptr);
 	    if(hr != DS_OK)
 	    {
 			DDError(hr);
@@ -122,9 +122,9 @@ LOGICAL sndsPlatformInit(void)
 	    dsbdesc.dwSize = sizeof(DSBUFFERDESC);
 	    dsbdesc.dwFlags = DSBCAPS_PRIMARYBUFFER;
 
-	    LPDIRECTSOUNDBUFFER primary = NULL;
+	    LPDIRECTSOUNDBUFFER primary = nullptr;
 
-	    hr = lpds->CreateSoundBuffer(&dsbdesc, &primary, NULL);
+	    hr = lpds->CreateSoundBuffer(&dsbdesc, &primary, nullptr);
 
 	    if(hr != DS_OK)
 	    {
@@ -154,7 +154,7 @@ LOGICAL sndsPlatformInit(void)
 
 		// Don't need this anymore
 		primary->Release();
-		primary = NULL;
+		primary = nullptr;
 
 	    if(b3DSoundEnable && !sndsPlatformInitListener())
 	    {
@@ -241,9 +241,9 @@ LOGICAL sndsPlatformInitListener()
     desc.dwSize = sizeof(DSBUFFERDESC);
     desc.dwFlags = DSBCAPS_CTRL3D | DSBCAPS_PRIMARYBUFFER;
 
-    LPDIRECTSOUNDBUFFER primary = NULL;
+    LPDIRECTSOUNDBUFFER primary = nullptr;
 
-    HRESULT hr = lpds->CreateSoundBuffer(&desc, &primary, NULL);
+    HRESULT hr = lpds->CreateSoundBuffer(&desc, &primary, nullptr);
 
     if(hr != DS_OK)
     {
@@ -286,16 +286,16 @@ LOGICAL sndsPlatformKill(void)
 #if XAUDIO
     AudioKill();
 #else
-    if(g_lpListener8 != NULL)
+    if(g_lpListener8 != nullptr)
     {
         g_lpListener8->Release();
-        g_lpListener8 = NULL;
+        g_lpListener8 = nullptr;
     }
 
-    if(lpds != NULL)
+    if(lpds != nullptr)
     {
         lpds->Release();
-        lpds = NULL;
+        lpds = nullptr;
     }
 #endif
 
@@ -333,7 +333,7 @@ LOGICAL sndsPlatformReloadSound(snSound* oldSound, snSound* newSound)
 LOGICAL sndsPlatformLoadSound(snSound* whichSound)
 {
 #if XAUDIO
-    if(whichSound == NULL)
+    if(whichSound == nullptr)
         return FALSE;
 
     return AudioLoadSound(whichSound->name);
@@ -347,10 +347,10 @@ DWORD			abytes1, abytes2;
 void*			aptr1, *aptr2;
 HRESULT         hr;
 
-    if(lpds == NULL)
+    if(lpds == nullptr)
         return FALSE;
 
-    if (whichSound == NULL)
+    if (whichSound == nullptr)
 	{
 		return(FALSE);
 	}
@@ -391,7 +391,7 @@ HRESULT         hr;
 	dsbdesc.dwBufferBytes = length;
 	dsbdesc.lpwfxFormat = &wf;
 
-    hr = lpds->CreateSoundBuffer(&dsbdesc, &whichSound->lpdsb, NULL);
+    hr = lpds->CreateSoundBuffer(&dsbdesc, &whichSound->lpdsb, nullptr);
 
     if(hr != DS_OK)
     {
@@ -415,7 +415,7 @@ HRESULT         hr;
 
 	writepos = 0;
 	wavelen = length;
-	if ((whichSound->lpdsb != NULL) && (DS_OK != DDError(whichSound->lpdsb->Lock(writepos, wavelen,
+	if ((whichSound->lpdsb != nullptr) && (DS_OK != DDError(whichSound->lpdsb->Lock(writepos, wavelen,
 														                        &aptr1, &abytes1,
 														                        &aptr2, &abytes2,
 														                        0))))
@@ -433,7 +433,7 @@ HRESULT         hr;
 	// copy the wave data into the buffer.  Note that Lock may have returned 2 chunks in the buffer to write into
 	memcpy(aptr1, wave, std::min(abytes1, wavelen));
 	wavelen -= abytes1;
-	if (aptr2 != NULL && wavelen != 0)
+	if (aptr2 != nullptr && wavelen != 0)
 	{
 		memcpy(aptr2, &wave[abytes1], std::min(abytes2, wavelen));
 	}
@@ -443,7 +443,7 @@ HRESULT         hr;
 		memFree(wave);
 	}
 
-	if ((whichSound->lpdsb != NULL) && (DS_OK != DDError(whichSound->lpdsb->Unlock(aptr1, abytes1,
+	if ((whichSound->lpdsb != nullptr) && (DS_OK != DDError(whichSound->lpdsb->Unlock(aptr1, abytes1,
 														                           aptr2, abytes2))))
 	{
 		Write_Log(LOG_SOUND, LOG_WARN, "Could not unlock sound buffer");
@@ -471,23 +471,23 @@ HRESULT         hr;
 LOGICAL sndsPlatformFreeSound(snSound* whichSound)
 {
 #if XAUDIO
-    if(whichSound == NULL)
+    if(whichSound == nullptr)
         return FALSE;
 
     AudioKillSound(*whichSound);
 #else
-	if (whichSound == NULL)
+	if (whichSound == nullptr)
 	{
 		return(FALSE);
 	}
 
 	sndsPlatformStopSound(whichSound);
 
-	if (whichSound->lpdsb != NULL)
+	if (whichSound->lpdsb != nullptr)
 	{
 		whichSound->lpdsb->Stop();
 		whichSound->lpdsb->Release();
-		whichSound->lpdsb = NULL;
+		whichSound->lpdsb = nullptr;
 	}
 #endif
 
@@ -510,7 +510,7 @@ LOGICAL sndsPlatformReset(void)
 LOGICAL sndsPlatformCreateSound(snSound* lpOld, snSound* lpNew)
 {
 #if XAUDIO
-    if(lpNew == NULL)
+    if(lpNew == nullptr)
         return FALSE;
 
     return AudioCreateEmitter(*lpNew);
@@ -519,15 +519,15 @@ LOGICAL sndsPlatformCreateSound(snSound* lpOld, snSound* lpNew)
     DSBUFFERDESC dsDesc;
     HRESULT hr;
     DSBCAPS dsCaps;
-    LPDIRECTSOUNDBUFFER lpDSB = NULL;
+    LPDIRECTSOUNDBUFFER lpDSB = nullptr;
     DWORD dwVol;
     DWORD dwWritePos;
     DWORD dwWaveLen;
     DWORD toBytes1, toBytes2, fromBytes1, fromBytes2;
     void* toPtr1, *toPtr2, *fromPtr1, *fromPtr2;
 
-    if(lpOld == NULL) return FALSE;
-    if(lpNew == NULL) return FALSE;
+    if(lpOld == nullptr) return FALSE;
+    if(lpNew == nullptr) return FALSE;
     if(lpOld == lpNew) return FALSE;
 
     memset(&dsDesc, 0, sizeof(DSBUFFERDESC));
@@ -565,7 +565,7 @@ LOGICAL sndsPlatformCreateSound(snSound* lpOld, snSound* lpNew)
 
     dsDesc.dwBufferBytes = dsCaps.dwBufferBytes;
 
-    hr = lpOld->lpdsb->GetFormat(&wf, sizeof(WAVEFORMATEX), NULL);
+    hr = lpOld->lpdsb->GetFormat(&wf, sizeof(WAVEFORMATEX), nullptr);
 
     if(hr != DS_OK)
     {
@@ -576,7 +576,7 @@ LOGICAL sndsPlatformCreateSound(snSound* lpOld, snSound* lpNew)
 
 	dsDesc.lpwfxFormat = &wf;
 
-    hr = lpds->CreateSoundBuffer(&dsDesc, &lpDSB, NULL);
+    hr = lpds->CreateSoundBuffer(&dsDesc, &lpDSB, nullptr);
 
     if(hr != DS_OK)
     {
@@ -624,10 +624,10 @@ LOGICAL sndsPlatformCreateSound(snSound* lpOld, snSound* lpNew)
     {
         if(toBytes1 == fromBytes1)
         {
-            if(toBytes1 > 0 && toPtr1 != NULL)
+            if(toBytes1 > 0 && toPtr1 != nullptr)
                 memcpy(toPtr1, fromPtr1, toBytes1);
 
-            if(toBytes2 > 0 && toPtr2 != NULL)
+            if(toBytes2 > 0 && toPtr2 != nullptr)
                 memcpy(toPtr2, fromPtr2, toBytes2);
         }
         else
@@ -762,7 +762,7 @@ LPDIRECTSOUNDBUFFER		newSoundBuffer;
 LOGICAL					canCopyData = TRUE, retval = TRUE;
 DSBCAPS					caps;
 
-	if(to == NULL || from == NULL || to == from)
+	if(to == nullptr || from == nullptr || to == from)
 		return retval;
 
 	memset(&dsbdesc, 0, sizeof(DSBUFFERDESC));
@@ -796,14 +796,14 @@ DSBCAPS					caps;
 
 	dsbdesc.dwBufferBytes = caps.dwBufferBytes;
 
-	if(DS_OK != DDError(from->lpdsb->GetFormat(&wf, sizeof(wf), NULL)))
+	if(DS_OK != DDError(from->lpdsb->GetFormat(&wf, sizeof(wf), nullptr)))
 	{
 		Write_Log(LOG_SOUND, LOG_WARN, "DuplicateSound: Could not obtain format of original buffer");
 		retval = FALSE;
 	}
 	dsbdesc.lpwfxFormat = &wf;
 
-	if(DS_OK != DDError(lpds->CreateSoundBuffer(&dsbdesc, &newSoundBuffer, NULL)))
+	if(DS_OK != DDError(lpds->CreateSoundBuffer(&dsbdesc, &newSoundBuffer, nullptr)))
 	{
 		Write_Log(LOG_SOUND, LOG_WARN, "DuplicateSound: Could not create the duplicate sound buffer");
 		retval = FALSE;
@@ -811,7 +811,7 @@ DSBCAPS					caps;
 
 	writepos = 0;
 	wavelen = caps.dwBufferBytes;
-	if((newSoundBuffer != NULL) && (DS_OK != DDError(newSoundBuffer->Lock(writepos, wavelen,
+	if((newSoundBuffer != nullptr) && (DS_OK != DDError(newSoundBuffer->Lock(writepos, wavelen,
 															              &toPtr1, &toBytes1,
 															              &toPtr2, &toBytes2,
 															              DSBLOCK_ENTIREBUFFER ))))
@@ -836,10 +836,10 @@ DSBCAPS					caps;
 		{
 			if(toBytes1 == fromBytes1)
 			{
-				if(toBytes1 > 0 && toPtr1 != NULL)
+				if(toBytes1 > 0 && toPtr1 != nullptr)
 					memcpy(toPtr1, fromPtr1, toBytes1);
 
-				if(toBytes2 > 0 && toPtr2 != NULL)
+				if(toBytes2 > 0 && toPtr2 != nullptr)
 					memcpy(toPtr2, fromPtr2, toBytes2);
 			}
 			else
@@ -908,7 +908,7 @@ DSBCAPS					caps;
 		}
 	}
 
-	if ((newSoundBuffer != NULL) && DS_OK != DDError(newSoundBuffer->Unlock(toPtr1, toBytes1,
+	if ((newSoundBuffer != nullptr) && DS_OK != DDError(newSoundBuffer->Unlock(toPtr1, toBytes1,
                                                                             toPtr2, toBytes2)))
 	{
 		Write_Log(LOG_SOUND, LOG_WARN, "DuplicateSound: Could not unlock duplicate sound buffer");
@@ -995,7 +995,7 @@ int   i;
 
 	if (dsnumdrivers != 0)
 	{
-		const char* guid = NULL;
+		const char* guid = nullptr;
 
 		if(dsnumdrivers > 0)
 			curdriver = 0;
@@ -1015,8 +1015,8 @@ int   i;
 		{
 		char* args[1] = {""};
 
-			DialogBox(hinst, MAKEINTRESOURCE(IDD_AUDIO_DEVICE), NULL, DlgProc);
-			_spawnl(_P_NOWAIT, "Settings.exe", "Settings.exe", NULL);
+			DialogBox(hinst, MAKEINTRESOURCE(IDD_AUDIO_DEVICE), nullptr, DlgProc);
+			_spawnl(_P_NOWAIT, "Settings.exe", "Settings.exe", nullptr);
 			return 0;
 		}
 
@@ -1047,7 +1047,7 @@ static BOOL CALLBACK EnumDriverCallback(LPGUID lpGuid, const TCHAR* lpDriverDesc
 		return(FALSE);
 	}
 
-	if (lpGuid == NULL)
+	if (lpGuid == nullptr)
 	{
 		memset(&dsdrivers[dsnumdrivers].Guid, 0, sizeof(GUID));
 	}
@@ -1075,7 +1075,7 @@ static BOOL dsEnumDrivers(void)
 #else
 	dsnumdrivers = 0;
 
-	if (DS_OK != DDError(DirectSoundEnumerate(EnumDriverCallback, NULL)))
+	if (DS_OK != DDError(DirectSoundEnumerate(EnumDriverCallback, nullptr)))
 	{
 		Write_Log(LOG_SOUND, LOG_WARN, "The audio drivers could not be enumerated");
 		return(FALSE);
@@ -1092,14 +1092,14 @@ static BOOL dsEnumDrivers(void)
 LOGICAL sndsPlatformSetListener3DPos(piVECTOR* pPos, UINT32 uApply)
 {
 #if XAUDIO
-    if(pPos == NULL)
+    if(pPos == nullptr)
         return FALSE;
 
     AudioSetListenerPosition(*pPos);
 #else
     HRESULT hr = 0;
 
-    if(g_lpListener8 == NULL || pPos == NULL)
+    if(g_lpListener8 == nullptr || pPos == nullptr)
         return FALSE;
 
     hr = g_lpListener8->SetPosition(pPos->x, pPos->y, pPos->z, uApply);
@@ -1121,14 +1121,14 @@ LOGICAL sndsPlatformSetListener3DPos(piVECTOR* pPos, UINT32 uApply)
 LOGICAL sndsPlatformSetListener3DVel(piVECTOR* pVel, UINT32 uApply)
 {
 #if XAUDIO
-    if(pVel == NULL)
+    if(pVel == nullptr)
         return FALSE;
 
     AudioSetListenerVelocity(*pVel);
 #else
     HRESULT hr = 0;
 
-    if(g_lpListener8 == NULL || pVel == NULL)
+    if(g_lpListener8 == nullptr || pVel == nullptr)
         return FALSE;
 
     hr = g_lpListener8->SetVelocity(pVel->x, pVel->y, pVel->z, uApply);
@@ -1157,10 +1157,10 @@ LOGICAL sndsPlatformSetOrientation(piVECTOR* pFront, piVECTOR* pTop, UINT32 uApp
 #else
     HRESULT hr;
 
-    if(pFront == NULL || pTop == NULL)
+    if(pFront == nullptr || pTop == nullptr)
         return FALSE;
 
-    if(g_lpListener8 == NULL)
+    if(g_lpListener8 == nullptr)
         return FALSE;
 
     hr = g_lpListener8->SetOrientation(pFront->x,
@@ -1188,16 +1188,16 @@ LOGICAL sndsPlatformSetOrientation(piVECTOR* pFront, piVECTOR* pTop, UINT32 uApp
 LOGICAL sndsPlatformSetSound3DPos(snSound* sound, UINT32 uApply)
 {
 #if XAUDIO
-    if(sound == NULL)
+    if(sound == nullptr)
         return FALSE;
 
     AudioSetPosition(*sound);
 #else
     HRESULT hr = 0;
-    LPDIRECTSOUND3DBUFFER8 lpDS3D = NULL;
+    LPDIRECTSOUND3DBUFFER8 lpDS3D = nullptr;
 
-    if(sound == NULL) return FALSE;
-    if(sound->lpdsb == NULL) return FALSE;
+    if(sound == nullptr) return FALSE;
+    if(sound->lpdsb == nullptr) return FALSE;
 
     hr = sound->lpdsb->QueryInterface(IID_IDirectSound3DBuffer8, (void**)&lpDS3D);
 
@@ -1232,16 +1232,16 @@ LOGICAL sndsPlatformSetSound3DPos(snSound* sound, UINT32 uApply)
 LOGICAL sndsPlatformSetSound3DVel(snSound* sound, UINT32 uApply)
 {
 #if XAUDIO
-    if(sound == NULL)
+    if(sound == nullptr)
         return FALSE;
 
     AudioSetVelocity(*sound);
 #else
     HRESULT hr = 0;
-    LPDIRECTSOUND3DBUFFER8 lpDS3D = NULL;
+    LPDIRECTSOUND3DBUFFER8 lpDS3D = nullptr;
 
-    if(sound == NULL) return FALSE;
-    if(sound->lpdsb == NULL) return FALSE;
+    if(sound == nullptr) return FALSE;
+    if(sound->lpdsb == nullptr) return FALSE;
 
     hr = sound->lpdsb->QueryInterface(IID_IDirectSound3DBuffer8, (void**)&lpDS3D);
 
@@ -1278,13 +1278,13 @@ LOGICAL sndsPlatformSetSound3DMode(snSoundPtr s, UINT32 uApply)
 #if XAUDIO
 #else
     HRESULT hr = 0;
-    LPDIRECTSOUND3DBUFFER8 lpDS3D = NULL;
+    LPDIRECTSOUND3DBUFFER8 lpDS3D = nullptr;
 
-    if(s == NULL) return FALSE;
+    if(s == nullptr) return FALSE;
 
     if(!s->bIs3D) return TRUE;
 
-    if(s->lpdsb == NULL) return FALSE;
+    if(s->lpdsb == nullptr) return FALSE;
 
     hr = s->lpdsb->QueryInterface(IID_IDirectSound3DBuffer8, (void**)&lpDS3D);
 
@@ -1319,7 +1319,7 @@ LOGICAL sndsPlatformCommitDeferredSettings()
 #else
     HRESULT hr;
 
-    if(g_lpListener8 == NULL)
+    if(g_lpListener8 == nullptr)
         return FALSE;
 
     hr = g_lpListener8->CommitDeferredSettings();
@@ -1344,13 +1344,13 @@ LOGICAL sndsPlatformSetMaxDistance(snSoundPtr s, UINT32 uApply)
     return TRUE;
 #else
     HRESULT hr;
-    LPDIRECTSOUND3DBUFFER8 lpDS3D = NULL;
+    LPDIRECTSOUND3DBUFFER8 lpDS3D = nullptr;
 
-    if(s == NULL) return FALSE;
+    if(s == nullptr) return FALSE;
 
     if(!s->bIs3D) return TRUE;
 
-    if(s->lpdsb == NULL) return FALSE;
+    if(s->lpdsb == nullptr) return FALSE;
 
     hr = s->lpdsb->QueryInterface(IID_IDirectSound3DBuffer8, (void**)&lpDS3D);
 
@@ -1385,13 +1385,13 @@ LOGICAL sndsPlatformSetMinDistance(snSoundPtr s, UINT32 uApply)
     return TRUE;
 #else
     HRESULT hr;
-    LPDIRECTSOUND3DBUFFER8 lpDS3D = NULL;
+    LPDIRECTSOUND3DBUFFER8 lpDS3D = nullptr;
 
-    if(s == NULL) return FALSE;
+    if(s == nullptr) return FALSE;
 
     if(!s->bIs3D) return TRUE;
 
-    if(s->lpdsb == NULL) return FALSE;
+    if(s->lpdsb == nullptr) return FALSE;
 
     hr = s->lpdsb->QueryInterface(IID_IDirectSound3DBuffer8, (void**)&lpDS3D);
 
@@ -1425,10 +1425,10 @@ LOGICAL sndsPlatformSetConeAngles(snSoundPtr sound, UINT32 uApply)
 #if XAUDIO
 #else
     HRESULT hr;
-    LPDIRECTSOUND3DBUFFER8 lpDS3D = NULL;
+    LPDIRECTSOUND3DBUFFER8 lpDS3D = nullptr;
 
-    if(sound == NULL) return FALSE;
-    if(sound->lpdsb == NULL) return FALSE;
+    if(sound == nullptr) return FALSE;
+    if(sound->lpdsb == nullptr) return FALSE;
 
     hr = sound->lpdsb->QueryInterface(IID_IDirectSound3DBuffer8, (void**)&lpDS3D);
 
@@ -1464,10 +1464,10 @@ LOGICAL sndsPlatformSetConeOrientation(snSoundPtr sound, UINT32 uApply)
 #if XAUDIO
 #else
     HRESULT hr;
-    LPDIRECTSOUND3DBUFFER8 lpDS3D = NULL;
+    LPDIRECTSOUND3DBUFFER8 lpDS3D = nullptr;
 
-    if(sound == NULL) return FALSE;
-    if(sound->lpdsb == NULL) return FALSE;
+    if(sound == nullptr) return FALSE;
+    if(sound->lpdsb == nullptr) return FALSE;
 
     hr = sound->lpdsb->QueryInterface(IID_IDirectSound3DBuffer8, (void**)&lpDS3D);
 
@@ -1505,12 +1505,12 @@ LOGICAL sndsPlatformGetVolume(snSound* sound, SINT32* pVolume)
     //AudioGetVolume(sound->handle, volume);
     return TRUE;
 #else
-    LPDIRECTSOUNDBUFFER8 lpDSB = NULL;
+    LPDIRECTSOUNDBUFFER8 lpDSB = nullptr;
     HRESULT hr;
 
-    if(sound == NULL) return FALSE;
-    if(sound->lpdsb == NULL) return FALSE;
-    if(pVolume == NULL) return FALSE;
+    if(sound == nullptr) return FALSE;
+    if(sound->lpdsb == nullptr) return FALSE;
+    if(pVolume == nullptr) return FALSE;
 
     /////////////////////////////////////////////////////////////////
     // If this fails, make sure you are not using a duplicate sound.
@@ -1546,7 +1546,7 @@ LOGICAL sndsPlatformGetVolume(snSound* sound, SINT32* pVolume)
 LOGICAL sndsPlatformSetVolume(snSoundPtr sound)
 {
 #if XAUDIO
-    if(sound == NULL)
+    if(sound == nullptr)
         return FALSE;
 
     AudioSetVolume(*sound);
@@ -1554,11 +1554,11 @@ LOGICAL sndsPlatformSetVolume(snSoundPtr sound)
 #else
     SINT32 iDecibel = 0;
     FLOAT64 fuseVol = 0.0f;
-    LPDIRECTSOUNDBUFFER8 lpDSB = NULL;
+    LPDIRECTSOUNDBUFFER8 lpDSB = nullptr;
     HRESULT hr;
 
-    if(sound == NULL) return FALSE;
-    if(sound->lpdsb == NULL) return FALSE;
+    if(sound == nullptr) return FALSE;
+    if(sound->lpdsb == nullptr) return FALSE;
 
     /////////////////////////////////////////////////////////////////
     // If this fails, make sure you are not using a duplicate sound.
@@ -1619,11 +1619,11 @@ LOGICAL sndsPlatformIsPlaying(snSound* sound)
 
     return FALSE;
 #else
-    LPDIRECTSOUNDBUFFER8 lpDSB = NULL;
+    LPDIRECTSOUNDBUFFER8 lpDSB = nullptr;
     HRESULT hr;
     DWORD dwStatus = 0;
 
-	// Check lpds NULL which is set on program kill. This may be called after application
+	// Check lpds nullptr which is set on program kill. This may be called after application
 	// exit by UI and results in a crash.
 	if(!lpds || !sound || !sound->lpdsb)
 	{
@@ -1670,11 +1670,11 @@ LOGICAL sndsPlatformSetCurrentPosition(snSoundPtr sound)
 {
 #if XAUDIO
 #else
-    LPDIRECTSOUNDBUFFER8 lpDSB = NULL;
+    LPDIRECTSOUNDBUFFER8 lpDSB = nullptr;
     HRESULT hr = 0;
 
-    if(sound == NULL) return FALSE;
-    if(sound->lpdsb == NULL) return FALSE;
+    if(sound == nullptr) return FALSE;
+    if(sound->lpdsb == nullptr) return FALSE;
 
     /////////////////////////////////////////////////////////////////
     // If this fails, make sure you are not using a duplicate sound.
@@ -1727,11 +1727,11 @@ LOGICAL sndsPlatformSetFrequency(snSound* sound)
     return FALSE;//AudioSetPitch(sound->handle, sound->freqShift);
 #else
     DWORD dwFreq = 0;
-    LPDIRECTSOUNDBUFFER8 lpDSB = NULL;
+    LPDIRECTSOUNDBUFFER8 lpDSB = nullptr;
     HRESULT hr = 0;
 
-    if(sound == NULL) return FALSE;
-    if(sound->lpdsb == NULL) return FALSE;
+    if(sound == nullptr) return FALSE;
+    if(sound->lpdsb == nullptr) return FALSE;
 
     /////////////////////////////////////////////////////////////////
     // If this fails, make sure you are not using a duplicate sound.
@@ -1782,16 +1782,16 @@ LOGICAL sndsPlatformSetFrequency(snSound* sound)
 LOGICAL sndsPlatformStopSound(snSound* sound)
 {
 #if XAUDIO
-    if(sound == NULL)
+    if(sound == nullptr)
         return FALSE;
 
     return AudioStop(sound->handle);
 #else
-    LPDIRECTSOUNDBUFFER8 lpDSB = NULL;
+    LPDIRECTSOUNDBUFFER8 lpDSB = nullptr;
     HRESULT hr = 0;
 
-    if(sound == NULL) return FALSE;
-    if(sound->lpdsb == NULL) return FALSE;
+    if(sound == nullptr) return FALSE;
+    if(sound->lpdsb == nullptr) return FALSE;
 
     /////////////////////////////////////////////////////////////////
     // If this fails, make sure you are not using a duplicate sound.
@@ -1827,17 +1827,17 @@ LOGICAL sndsPlatformStopSound(snSound* sound)
 LOGICAL sndsPlatformStartSound(snSound* sound)
 {
 #if XAUDIO
-    if(sound == NULL)
+    if(sound == nullptr)
         return FALSE;
 
     return AudioPlay(*sound);
 #else
     DWORD dwPlayFlags = 0;
-    LPDIRECTSOUNDBUFFER8 lpDSB = NULL;
+    LPDIRECTSOUNDBUFFER8 lpDSB = nullptr;
     HRESULT hr = 0;
 
-    if(sound == NULL) return FALSE;
-    if(sound->lpdsb == NULL) return FALSE;
+    if(sound == nullptr) return FALSE;
+    if(sound->lpdsb == nullptr) return FALSE;
 
     /////////////////////////////////////////////////////////////////
     // If this fails, make sure you are not using a duplicate sound.
@@ -1883,10 +1883,10 @@ LOGICAL sndsPlatformSetPanPosition(snSoundPtr sound)
     SINT32  iDSPan;
     LOGICAL bLeftPan = FALSE;
     HRESULT hr = 0;
-    LPDIRECTSOUNDBUFFER8 lpDSB = NULL;
+    LPDIRECTSOUNDBUFFER8 lpDSB = nullptr;
 
-    if(sound == NULL) return FALSE;
-    if(sound->lpdsb == NULL) return FALSE;
+    if(sound == nullptr) return FALSE;
+    if(sound->lpdsb == nullptr) return FALSE;
 
     if(sound->use3DPan)
     {

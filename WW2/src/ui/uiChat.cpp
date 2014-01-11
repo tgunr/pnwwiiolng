@@ -122,7 +122,7 @@ std::wstring lastplayerhandle;
 
 static int uiChatPrintLinev(int* icons, unsigned int color, const wchar_t* format, va_list& marker);
 static drawIconRef _commicons;
-static phui::TextHistory* _chatHistorySave = NULL; // used to save history of chat window resets
+static phui::TextHistory* _chatHistorySave = nullptr; // used to save history of chat window resets
 static OBSCENITY_FILTER _wordFilter;
 
 struct ChatLine
@@ -186,7 +186,7 @@ void uiChatKill()
     if(_commicons)
     {
         drawIconKill(_commicons);
-        _commicons = NULL;
+        _commicons = nullptr;
     }
 }
 
@@ -211,7 +211,7 @@ int uiChatPrintLine(const char* format, ...)
 		buffer[len] = 0;
 
 	// pass on down to chat
-	len = uiChatPrintLinev(NULL, MSG_COLOR, uiUTF8toUTF16(buffer), marker);
+	len = uiChatPrintLinev(nullptr, MSG_COLOR, uiUTF8toUTF16(buffer), marker);
 
 	va_end(marker);
 
@@ -224,7 +224,7 @@ int uiChatPrintLine(const wchar_t* format, ...)
 
 	va_list marker;
 	va_start(marker, format);
-	int len = uiChatPrintLinev(NULL,MSG_COLOR, format, marker);
+	int len = uiChatPrintLinev(nullptr,MSG_COLOR, format, marker);
 	va_end(marker);
 
 	return len;
@@ -244,7 +244,7 @@ void uiChatPrintUILocLine(int icons[CHATICON_MAX], unsigned int color, const cha
 
 	int index = -1;
 	wchar_t placeHolder[4]; // placeholders are in the form {0}, {1}, {n}... in ui.dtd
-	wchar_t* arg = NULL;
+	wchar_t* arg = nullptr;
 
 	// the format string
 	std::wstring format = uiLocString(key);
@@ -286,7 +286,7 @@ void uiChatPrintLineColor(unsigned int color, const wchar_t* format, ...)
 
 	va_list marker;
 	va_start(marker, format);
-	uiChatPrintLinev(NULL,color, format, marker);
+	uiChatPrintLinev(nullptr,color, format, marker);
 	va_end(marker);
 }
 
@@ -332,8 +332,8 @@ void uiChatPrintLineFeedback(int locgroup, int locid, bool iserror, ...)
 }
 
 /************************************************************************************************
-  _lstringToText (may return NULL)
-* helper function for uiChatPrintLineMessageLoc to convert lstring IDs into text* OR NULL*
+  _lstringToText (may return nullptr)
+* helper function for uiChatPrintLineMessageLoc to convert lstring IDs into text* OR nullptr*
 ************************************************************************************************/
 
 static inline const wchar_t* _lstringToText(ENUM_CATEGORIES loc, int message
@@ -386,7 +386,7 @@ static inline const wchar_t* _lstringToText(ENUM_CATEGORIES loc, int message
 	{
 		// Start a new long-string message
 		stringBuf = arg1;
-		return NULL;
+		return nullptr;
 	}
 	else if ( message == LSTR_TEXT_LINE )
 	{
@@ -399,7 +399,7 @@ static inline const wchar_t* _lstringToText(ENUM_CATEGORIES loc, int message
 	stringBuf.append(arg1);
 
 	if ( message != LSTR_TEXT_END )
-		return NULL;
+		return nullptr;
 
 	clearStringBuf = true;
 	return stringBuf.c_str();
@@ -413,9 +413,9 @@ static void _buzzer()
 	if ( ft1000mscount >= nextPlayWindow )
 	{
 #ifdef ORIGINALLY
-		uiPlaySound("sounds/buzzer.wav", true, 0.50, NULL);
+		uiPlaySound("sounds/buzzer.wav", true, 0.50, nullptr);
 #else
-		uiPlaySound("sounds/Drum1.wav", true, 0.48, NULL);
+		uiPlaySound("sounds/Drum1.wav", true, 0.48, nullptr);
 #endif
 		nextPlayWindow = ft1000mscount + 6;
 	}
@@ -516,7 +516,7 @@ void uiChatPrintLineMessageLoc(int loc, int prefix, int message
 		icons[1] = (side == ALLIED) ? IDE_ICON_ALLIED : IDE_ICON_AXIS;
 
 	const wchar_t* textPtr = _lstringToText((ENUM_CATEGORIES)loc, message, arg1, arg2, arg3, arg4, arg5, arg6);
-	if ( textPtr == NULL )
+	if ( textPtr == nullptr )
 		return;
 
 	// we don't handle generic orders because thats handled in GameClient
@@ -682,7 +682,7 @@ void uiChatShow()
 				// kill our saved history
 				_chatHistorySave->clear();
 				delete _chatHistorySave;
-				_chatHistorySave = NULL;
+				_chatHistorySave = nullptr;
 			}
 		}
 	}
@@ -718,10 +718,10 @@ void uiChatHide(bool close)
 			}
 
 			_chatwin->Close();
-			_chatwin = NULL;
-			_chatview = NULL;
-			_chatmsg = NULL;
-			_chatsay = NULL;
+			_chatwin = nullptr;
+			_chatview = nullptr;
+			_chatmsg = nullptr;
+			_chatsay = nullptr;
 		}
 	}
 }
@@ -916,7 +916,7 @@ void uiChatGCIMessage(Chat::GCIMessage const& pgciMsg, bool alertOnly)
 {
 	int uiMsgNo = 0;
 	int gameEvent = GAMEEVENT_INVALID;
-	const char* specifics = NULL;
+	const char* specifics = nullptr;
 	bool facilityEvent = false;
 
 	switch(pgciMsg.gci)
@@ -1003,10 +1003,10 @@ void uiChatGCIMessage(Chat::GCIMessage const& pgciMsg, bool alertOnly)
 
 		if(mission.m_isCurrent)
 		{
-			const StratDB::StratObject* eventTarget = NULL;
+			const StratDB::StratObject* eventTarget = nullptr;
 			StratDB::StratObject* missionStrat = StratDB::FindStratObject(mission.m_origin);
 
-			if(missionStrat != NULL && missionStrat->IsRelated(pgciMsg.where))
+			if(missionStrat != nullptr && missionStrat->IsRelated(pgciMsg.where))
 			{
 				eventTarget = StratDB::FindStratObject((facilityEvent) ? pgciMsg.facility: pgciMsg.where);
 			}
@@ -1014,7 +1014,7 @@ void uiChatGCIMessage(Chat::GCIMessage const& pgciMsg, bool alertOnly)
 			{
 				missionStrat = StratDB::FindStratObject(mission.m_target);
 
-				if(missionStrat != NULL && missionStrat->IsRelated(pgciMsg.where))
+				if(missionStrat != nullptr && missionStrat->IsRelated(pgciMsg.where))
 					eventTarget = StratDB::FindStratObject((facilityEvent) ? pgciMsg.facility: pgciMsg.where);
 			}
 
@@ -1051,7 +1051,7 @@ void uiChatGCIMessage(Chat::GCIMessage const& pgciMsg, bool alertOnly)
 	}
 
 	if(!alertOnly)
-		uiChatPrintLineMessageLoc(IDE_LANG_UI, LSTR_HQ, uiMsgNo, UTF16(pgciMsg.name), NULL);
+		uiChatPrintLineMessageLoc(IDE_LANG_UI, LSTR_HQ, uiMsgNo, UTF16(pgciMsg.name), nullptr);
 }
 
 bool uiChatInitWordFilter()
@@ -1182,7 +1182,7 @@ static const wchar_t* _filterTextOld(const wchar_t* source)
 	wchar_t* filteredPtr = filterBuffer; // init dest to beginning of wide filtered buffer
 
 	// used to find word breaks
-	const wchar_t* wordEnd = NULL;
+	const wchar_t* wordEnd = nullptr;
 
 	// point to the converted wide string source
 	const wchar_t* sourcePtr = source;
@@ -1562,7 +1562,7 @@ LOGICAL rnmainListEmoteText(SINT32 category, SINT32 locID, UINT32 uColor, const 
 
 LOGICAL rnmainListText(const char* text, ...)
 {
-	if ( NULL == text )
+	if ( nullptr == text )
 		return FALSE;
 
  	va_list marker;
@@ -1579,7 +1579,7 @@ LOGICAL rnmainListText(const char* text, ...)
 
 LOGICAL rnmainListText(const wchar_t* text, ...)
 {
-	if ( NULL == text )
+	if ( nullptr == text )
 		return FALSE;
 
  	va_list marker;

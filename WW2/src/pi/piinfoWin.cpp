@@ -165,7 +165,7 @@ static bool _continueChecks(const char* failed)
 	feedback += L" ";
 	feedback += con;
 
-	if(MessageBox(NULL, feedback.c_str(), title.c_str(), MB_YESNO | MB_TOPMOST | MB_ICONEXCLAMATION) == IDYES)
+	if(MessageBox(nullptr, feedback.c_str(), title.c_str(), MB_YESNO | MB_TOPMOST | MB_ICONEXCLAMATION) == IDYES)
 		return true;
 
 	return false;
@@ -228,7 +228,7 @@ const char* piinfoGetDeviceIDAsString(const void* id)
 
 const TCHAR* piinfoClipboard(const TCHAR* in)
 {
-	const TCHAR* out = NULL;
+	const TCHAR* out = nullptr;
 
 	if(OpenClipboard(GetForegroundWindow()))
 	{

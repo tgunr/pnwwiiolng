@@ -38,7 +38,7 @@ void _killSound(void* data)
 {
     SINT32* handle = (SINT32*)data;
 
-    if(handle == NULL)
+    if(handle == nullptr)
         return;
 
     *handle = 0;
@@ -282,7 +282,7 @@ bool TerrainSTO::load()
         if(!activeTerrainDetail[i])
             continue;
 
-        if(trndtl[i].terrain == NULL)
+        if(trndtl[i].terrain == nullptr)
             continue;
 
         if(trndtl[i].scx == sx && trndtl[i].scy == sy)
@@ -335,7 +335,7 @@ bool TerrainSTO::load()
 	    if(!trnopOrientSubobjects(_to, &posxyz, true))
 	    {
 		    obpoolFreeObjectCallback(_to);
-		    _to = NULL
+		    _to = nullptr
 	    }
 
         posxyz.x -= (float)WorldOriginOffset.x;
@@ -346,7 +346,7 @@ bool TerrainSTO::load()
 	preProcess();
 
 	// add a TO object
-	trncdAddTerrainObject(_to, 0, 0, 0, NULL);
+	trncdAddTerrainObject(_to, 0, 0, 0, nullptr);
 
 	postProcess();
 
@@ -381,7 +381,7 @@ bool TerrainSTO::load()
         {
             static struct FindTree ft;
 
-            ft.tree = NULL;
+            ft.tree = nullptr;
             ft.Find(_to->child);
 
             if(ft.tree)
@@ -412,9 +412,9 @@ void TerrainSTO::deactivate()
 	// kill terrain object
 	if(_to)
 	{
-		trncdRemoveTerrainObject(_to, 0, 0, 0, NULL);
+		trncdRemoveTerrainObject(_to, 0, 0, 0, nullptr);
 		obpoolFreeObjectCallback(_to);
-		_to = NULL;
+		_to = nullptr;
 	}
 
 	ServerTrackedObject::deactivate();

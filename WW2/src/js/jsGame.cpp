@@ -174,7 +174,7 @@ JSPropertySpec jsGame::jsproperties[] =
 	jsGame
 *************************************************************************************************/
 
-jsGame::jsGame() : phui::js::Object(&jsclass, NULL, NULL,jsfunctions,jsproperties)
+jsGame::jsGame() : phui::js::Object(&jsclass, nullptr, nullptr,jsfunctions,jsproperties)
 {
 	JS_CONSTRUCTOR_LOCK;
 	phui::js::SetGlobalObject(this);
@@ -427,7 +427,7 @@ JS_FUNCTION_DEF(jsGame, playsound)
 	JSBool finite			= 1;
 	JSBool limit			= 1; // do we time limit ui sounds to prevent double clicks, etc...
 	JSFloat64 volume		= 1.0;
-	const SCHAR* callback	= NULL;
+	const SCHAR* callback	= nullptr;
 
 	JS_ValueToBoolean(ctx, argv[1], &finite);
 	JS_ValueToNumber(ctx, argv[2], &volume);
@@ -493,7 +493,7 @@ JS_FUNCTION_DEF(jsGame, stopsound)
 
 const StratDB::StratObject* jsGame::GetOfflineSpawn(const StratDB::StratObject* origin, const void* vt)
 {
-	if(!origin) return NULL;
+	if(!origin) return nullptr;
 
 	vehType* vehtype = (vehType*)vt;
 
@@ -516,7 +516,7 @@ const StratDB::StratObject* jsGame::GetOfflineSpawn(const StratDB::StratObject* 
 		gun = weapCreateSpec("GV_gun.1");
 	}
 
-	StratDB::StratObject const* spawner = NULL;
+	StratDB::StratObject const* spawner = nullptr;
 
 	StratDB::StratObject::ChildList children = origin->ChildStratObjects();
 	StratDB::StratObject::ChildList::iterator it = children.begin();
@@ -571,7 +571,7 @@ const StratDB::StratObject* jsGame::GetOfflineSpawn(const StratDB::StratObject* 
 			else if(vtype == VEH_TYPE_FLOATER)
 				break;
 
-			spawner = NULL;
+			spawner = nullptr;
 		}
 	}
 
@@ -896,7 +896,7 @@ JS_FUNCTION_DEF(jsGame, arena)
 
 	const char* key = JS_GetStringBytes(JS_ValueToString(ctx, argv[0]));
 
-	if(key != NULL && *key != 0)
+	if(key != nullptr && *key != 0)
 	{
 		ARENA_VARS::iterator it = g_arenaDescription.find(key);
 		if(it != g_arenaDescription.end())
@@ -969,7 +969,7 @@ JS_FUNCTION_DEF(jsGame, saveconvergence)
 	jsGame* jsgame = phui::js::Cast<jsGame*>(ctx, jsobj);
 	if(!jsgame) return JS_FALSE;
 
-	jsVehtype* jsvehtype = NULL;
+	jsVehtype* jsvehtype = nullptr;
 	int32 isDirty = 0;		// True if the convergence value has changed
 	int32 value = 200;		// Convergence value
 
@@ -1035,7 +1035,7 @@ JS_FUNCTION_DEF(jsGame, getconvergence)
 	{
 		jsVehtype* jsvehtype = phui::js::Cast<jsVehtype*>(ctx, argv[0]);
 
-		if(jsvehtype != NULL)
+		if(jsvehtype != nullptr)
 		{
 			UINT16 key = jsvehtype->vehtype->WeaponSpec.asUINT16();
 
@@ -1093,13 +1093,13 @@ JS_FUNCTION_DEF(jsGame, getkeymapvehicles)
 		JS_ValueToInt32(ctx, argv[0], &category);
 
 	phui::js::Array* vehicles = new phui::js::Array;
-	const vehType* vehtype = NULL;
+	const vehType* vehtype = nullptr;
 
 	for(int i = 0;; i++)
 	{
 		vehtype = ww2imapGetVehTypeByIndex(category, i);
 
-		if(vehtype == NULL)
+		if(vehtype == nullptr)
 			break;
 
 		vehicles->SetElement(new jsVehtype(vehtype), i);
@@ -1126,7 +1126,7 @@ JS_FUNCTION_DEF(jsGame, getkeymapkey)
 	if(argc > 1) JS_ValueToInt32(ctx, argv[1], &key);
 	if(argc > 2) JS_ValueToInt32(ctx, argv[2], &type);
 
-	const char* keyname = NULL;
+	const char* keyname = nullptr;
 	unsigned int code	= ww2FunctionCode(control);
 
 	if(code > 0)
@@ -1347,7 +1347,7 @@ JS_FUNCTION_DEF(jsGame, getcontent)
 
 	const char* path = JS_GetStringBytes(JS_ValueToString(ctx, argv[0]));
 
-	jsContent* content = (*path) ? jsContent::GetContent(ctx, jsobj, path): NULL;
+	jsContent* content = (*path) ? jsContent::GetContent(ctx, jsobj, path): nullptr;
 
 	*rval = (content) ? content->jsVal() : JSVAL_NULL;
 
@@ -1571,7 +1571,7 @@ JS_FUNCTION_DEF(jsGame, getpref)
 		break;
 		case cfgPARAM_STRING:
 		{
-			const char* sval = NULL;
+			const char* sval = nullptr;
 			if(cfgPrefsGetString(name, &sval))
 				*rval = phui::js::NewString(sval);
 		}
@@ -1953,7 +1953,7 @@ JS_FUNCTION_DEF(jsGame, getrgbcolor)
 
 JS_FUNCTION_DEF(jsGame, gethexcolor)
 {
-	const SCHAR* color = NULL;
+	const SCHAR* color = nullptr;
 
 	if(argc == 1)
 		color = JS_GetStringBytes(JS_ValueToString(ctx, argv[0]));
@@ -2445,13 +2445,13 @@ JS_FUNCTION_DEF(jsGame, removeanimation)
 			et->skeleton->ClearBlends();
 
 			gr2FreeAnimation(eb->blend->animations[index]);
-			eb->blend->animations[index] = NULL;
+			eb->blend->animations[index] = nullptr;
 
 			for(int i = index + 1; i < eb->blend->numBlends; i++)
 			{
 				// move all animations down
 				eb->blend->animations[i - 1] = eb->blend->animations[i];
-				eb->blend->animations[i] = NULL;
+				eb->blend->animations[i] = nullptr;
 			}
 
 			eb->blend->numBlends--;
@@ -2780,7 +2780,7 @@ JS_FUNCTION_DEF(jsCursor,update)
 {
 	if(uiInGame())
 	{
-		const char* exclude = NULL;
+		const char* exclude = nullptr;
 
 		if(argc > 0)
 			exclude = JS_GetStringBytes(JS_ValueToString(ctx, argv[0]));
@@ -2916,8 +2916,8 @@ jsSettings::jsSettings() : phui::js::Object(&jsclass, jsfunctions)
 			spec.name	= name;
 			spec.tinyid = i;
 			spec.flags	= JSPROP_PERMANENT;
-			spec.setter	= NULL;
-			spec.getter	= NULL;
+			spec.setter	= nullptr;
+			spec.getter	= nullptr;
 
 			jsproperties[i] = spec;
 		}
@@ -3123,7 +3123,7 @@ JSBool jsSettings::GetProperty(JSContext* ctx, int propid, jsval* val)
 									*val = phui::js::NewString(UTF16(sval));
 
 								delete [] sval;
-								sval = NULL;
+								sval = nullptr;
 							}
 						}
 						break;
@@ -3735,7 +3735,7 @@ JSBool jsBlendEditor::GetProperty(JSContext* ctx, int propid, jsval* val)
 			_animations->clear();
 
 			// create a list of scripts to display
-			SCHAR** fileList = NULL;
+			SCHAR** fileList = nullptr;
 			SINT32 numfiles = 0;
 			SINT32 f = 0;
 			SINT32 i = 0;
@@ -3987,7 +3987,7 @@ JSBool jsBlend::SetProperty(JSContext* ctx, int propid, jsval* val)
 			eb->weight = w;
 
 			// reset this when we adjust the weight
-			setEditAnimation(NULL);
+			setEditAnimation(nullptr);
 
 			setEditBlendWeights(_blend, eb->weights[0], eb->weights[1], eb->weights[2], eb->weights[3]);
 

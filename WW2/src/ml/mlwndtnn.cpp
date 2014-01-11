@@ -107,7 +107,7 @@ UINT32 time1,time2;
 	_DisableCollisions = 1;
 
 	TlistFile = fopen("tlist.txt","r");
-	if (TlistFile != NULL)
+	if (TlistFile != nullptr)
 	{
 		do
 		{
@@ -179,7 +179,7 @@ UINT32 time1,time2;
 
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
 
-	if (VehicleData == NULL)
+	if (VehicleData == nullptr)
 	{
 		Write_Debug("No vehicle model data for player");
 		return 0;
@@ -489,7 +489,7 @@ mlComponentListIterator it;
 	}
 
 	ThrustFile = fopen("thrustfile.bin","wb");
-	if (ThrustFile == NULL)
+	if (ThrustFile == nullptr)
 	{
 		return 1;
 	}
@@ -507,7 +507,7 @@ static UINT32 _ReadThrustFile(void)
 FILE* ThrustFile;
 
 	ThrustFile = fopen("thrustfile.bin","rb");
-	if (ThrustFile == NULL)
+	if (ThrustFile == nullptr)
 	{
 		Write_Debug("Cannot find thrust file");
 		return 1;
@@ -554,7 +554,7 @@ UINT32 i;
 						  &DummyTorque,
 						  0,
 						  1,
-						  NULL);
+						  nullptr);
 	}
 
 	// now 20 minutes of the actual prop running to get average thrust
@@ -571,7 +571,7 @@ UINT32 i;
 						  &TempAtt,
 						  0,
 						  1,
-						  NULL);
+						  nullptr);
 
 		SumThrust += ReturnForce.y;
 	}

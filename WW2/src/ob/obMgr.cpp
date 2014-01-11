@@ -277,8 +277,8 @@ void obmgrHandleSpecialObjects(OBJECT* o)
 
 struct	OBJECT*	obmgrCreateModelInstance(const char* modelName, const piMATRIX& transform, bool handleSpecialObjects)
 {
-	PoolModel*	poolModel		= NULL;
-	OBJECT*		topInstanceNode	= NULL;
+	PoolModel*	poolModel		= nullptr;
+	OBJECT*		topInstanceNode	= nullptr;
 	std::string	name(modelName);
 	size_t		lastbslash		= name.rfind('\\');
 
@@ -305,10 +305,10 @@ struct	OBJECT*	obmgrCreateModelInstance(const char* modelName, const piMATRIX& t
 *************************************************************************************************/
 PoolNode::PoolNode()
 {
-	parent = NULL;
-	sibling = NULL;
-	child = NULL;
-	attached = NULL;
+	parent = nullptr;
+	sibling = nullptr;
+	child = nullptr;
+	attached = nullptr;
 
 	memset(name, 0, sizeof(char)*32);
 	flags = 0;
@@ -316,18 +316,18 @@ PoolNode::PoolNode()
     flag3 = 0;
     vboid = -1;
 
-	objdata = NULL;
-	vertices = NULL;
-	indices = NULL;
-	faceNormals = NULL;
-	collisionNormals = NULL;
-	dof = NULL;
-	comment = NULL;
+	objdata = nullptr;
+	vertices = nullptr;
+	indices = nullptr;
+	faceNormals = nullptr;
+	collisionNormals = nullptr;
+	dof = nullptr;
+	comment = nullptr;
 	texid = matid = -1;
 
-	meshContext = NULL;
-    material = NULL;
-	collider = NULL;
+	meshContext = nullptr;
+    material = nullptr;
+	collider = nullptr;
 }
 
 PoolNode::~PoolNode()
@@ -364,10 +364,10 @@ PoolNode::~PoolNode()
 	if(meshContext)
 	{
 		delete meshContext;
-		meshContext = NULL;
+		meshContext = nullptr;
 	}
 
-    material = NULL;
+    material = nullptr;
 }
 
 #ifdef ANDREWTEST
@@ -375,10 +375,10 @@ size_t PoolNode::calcMemoryUsage()
 {
     size_t sum = 0;
 
-    if ( sibling != NULL ) sum += sibling->calcMemoryUsage();
-    if ( child != NULL ) sum += child->calcMemoryUsage();
-    if ( attached != NULL ) sum += attached->calcMemoryUsage();
-    if ( objdata != NULL )
+    if ( sibling != nullptr ) sum += sibling->calcMemoryUsage();
+    if ( child != nullptr ) sum += child->calcMemoryUsage();
+    if ( attached != nullptr ) sum += attached->calcMemoryUsage();
+    if ( objdata != nullptr )
     {
         sum += sizeof(POOLOBJDATA);
         sum += objdata->numverts * sizeof(piUNIFIED_VERTEX);
@@ -1370,13 +1370,13 @@ OBJECT* PoolNode::createPoolInstance(ModelInstance* modelInstance, const piMATRI
         if(count >= 1)
         {
             if(meshContext)
-                meshContext->AddVertexAttribute(NULL, TEX1);
+                meshContext->AddVertexAttribute(nullptr, TEX1);
         }
 
         if(count >= 2)
         {
             if(meshContext)
-                meshContext->AddVertexAttribute(NULL, TEX2);
+                meshContext->AddVertexAttribute(nullptr, TEX2);
         }
 
         if(meshContext)
@@ -1414,7 +1414,7 @@ OBJECT* PoolNode::createPoolInstance(ModelInstance* modelInstance, const piMATRI
     {
     }
 
-	if(lpobj->prev == NULL && lpobj->next == NULL)
+	if(lpobj->prev == nullptr && lpobj->next == nullptr)
 	{
 		if(lpobj->flags & OBJECT_NOTOBJECT)
 			obmainMoveToNotObjectTree(lpobj);
@@ -1616,7 +1616,7 @@ OBJECT* PoolNode::createPoolInstance(ModelInstance* modelInstance, const piMATRI
     {
     }
 
-	if(lpobj->prev == NULL && lpobj->next == NULL)
+	if(lpobj->prev == nullptr && lpobj->next == nullptr)
 	{
 		if(lpobj->flags & OBJECT_NOTOBJECT)
 			obmainMoveToNotObjectTree(lpobj);
@@ -1640,10 +1640,10 @@ PoolModel::PoolModel(const char* path, unsigned int flags)
 	:	modelType(ModelTypes::GENERAL),
 		placeMode(OBJVAL_NO_PLACEMODE),
 		propertyFlags(PropertyFlags::HOLLOW_REFERENCE),
-		node(NULL),
+		node(nullptr),
         hastrees(false),
         hasRoads(false),
-        vbo(NULL),
+        vbo(nullptr),
 		loadFlags(flags)
 {
 }
@@ -1656,7 +1656,7 @@ PoolModel::~PoolModel()
     if(vbo)
     {
         delete vbo;
-        vbo = NULL;
+        vbo = nullptr;
     }
 
     if(node)
@@ -1868,7 +1868,7 @@ void PoolModel::LoadMDL(const char* path)
 
 	fioClose(fd);
 #ifdef TESTMAC
-//  showmemstuff(NULL);
+//  showmemstuff(nullptr);
 #endif
 
   /* I now create the pool node's collider at runtime if needed in
@@ -2069,8 +2069,8 @@ void PoolModel::SetModelType()
 //////////////////////////////////////////////////////////////////////
 void PoolModel::RebuildMDL()
 {
-	OBJECT*						topmostObj		= NULL;								// Topmost object of the temporary .flt object tree
-	POOLOBJHDR*					poolObjHdr		= NULL;
+	OBJECT*						topmostObj		= nullptr;								// Topmost object of the temporary .flt object tree
+	POOLOBJHDR*					poolObjHdr		= nullptr;
 	std::string					fltPath			= directory + modelname + ".flt";
 	UINT32						poolOffset		= 0;
 	MODELMATERIALS				modelMaterials;
@@ -2118,7 +2118,7 @@ void PoolModel::RebuildMDL()
 	//CheckModelSanity();
 
 	poolObjHdr = obpoolObjectToPool(topmostObj, 1, 1);
-	obpoolPoolOffsetsCallback(poolObjHdr, NULL, &poolOffset);
+	obpoolPoolOffsetsCallback(poolObjHdr, nullptr, &poolOffset);
 
 
 	SaveMDL(poolObjHdr, &modelMaterials);
@@ -2298,7 +2298,7 @@ void PoolModel::CollectModelTextures(OBJECT* o, TextureRefSet& refset)
 void PoolModel::CollectModelMaterials(OBJECT* o, MODELMATERIALS* modelmaterials)
 {
 	MODELMATERIALS::iterator	cur				= modelmaterials->begin();
-	MATERIAL*					globalmats		= NULL;
+	MATERIAL*					globalmats		= nullptr;
 	SINT32						globalmatcnt	= piGetMaterials(&globalmats);
 
     if(o)
@@ -2437,7 +2437,7 @@ void PoolNode::InterleaveTangentData(const std::vector<Vec4f>& t,
 	int						bufferIdx		= 0;
 
 
-	meshContext->AddVertexAttribute(NULL, ATTRIB6 | ATTRIB7 | ATTRIB15);
+	meshContext->AddVertexAttribute(nullptr, ATTRIB6 | ATTRIB7 | ATTRIB15);
 
     rawVertices.resize(objdata->numverts);
 
@@ -2494,7 +2494,7 @@ void PoolModel::CreateContexts(OBJECT* o, LOGICAL isStaticMeshBranch)
 	RawVertex								tmpRawVertex		= {0};
 	piUNIFIED_VERTEX*						puvert				= o->puverts;
 	UINT32									vertexType			= 0;
-	MeshContext*							meshContext			= NULL;
+	MeshContext*							meshContext			= nullptr;
 	LOGICAL									isBufferable		= TRUE;				// Indicates if the objects mesh can be buffered at preloading
 	UINT32									bufferIdx			= 0;
 
@@ -2532,9 +2532,9 @@ void PoolModel::CreateContexts(OBJECT* o, LOGICAL isStaticMeshBranch)
 		vertexType |= TEX0;
 
         TangentSpaceGenerator tsg;
-        std::vector<Vec4f>* t = NULL;
-        std::vector<Vec4f>* b = NULL;
-        std::vector<Vec4f>* n = NULL;
+        std::vector<Vec4f>* t = nullptr;
+        std::vector<Vec4f>* b = nullptr;
+        std::vector<Vec4f>* n = nullptr;
 
         if(isBufferable && (o->flag2 & OBJECT_NORMALMAP))
         {
@@ -2754,7 +2754,7 @@ bool PoolModel::GetSubObjectBoundsByName(BoundingBox* bounds, const char* name, 
 
     const PoolNode* oo = fpn.node;
 
-    for(; oo != NULL; oo = oo->attached)
+    for(; oo != nullptr; oo = oo->attached)
     {
         bounds->expandBy(oo->objdata->bbox[0].x + oo->objdata->pos.x,
                          oo->objdata->bbox[0].y + oo->objdata->pos.y,
@@ -2783,7 +2783,7 @@ bool PoolModel::GetSubObjectBoundsByComment(BoundingBox* bounds, const char* com
 
     const PoolNode* oo = fpn.node;
 
-    for(; oo != NULL; oo = oo->attached)
+    for(; oo != nullptr; oo = oo->attached)
     {
         bounds->expandBy(oo->objdata->bbox[0].x + oo->objdata->pos.x,
                          oo->objdata->bbox[0].y + oo->objdata->pos.y,
@@ -2800,8 +2800,8 @@ bool PoolModel::GetSubObjectBoundsByComment(BoundingBox* bounds, const char* com
 // Only for debugging in BuildTerrain
 const PoolNode* GetNextLODPoolNode(const PoolNode* node)
 {
-	static const PoolNode*	branchTopNode	= NULL;
-	static const PoolNode*	nextLODnode		= NULL;
+	static const PoolNode*	branchTopNode	= nullptr;
+	static const PoolNode*	nextLODnode		= nullptr;
 	bool					stepInto		= true;
 
 
@@ -2828,11 +2828,11 @@ const PoolNode* GetNextLODPoolNode(const PoolNode* node)
 	if(node == branchTopNode)
 	{
 		const PoolNode* nextLODnodeRetVal = nextLODnode;
-		branchTopNode = NULL;
-		nextLODnode = NULL;
+		branchTopNode = nullptr;
+		nextLODnode = nullptr;
 		return nextLODnodeRetVal;
 	}
-	else return NULL;
+	else return nullptr;
 }
 
 

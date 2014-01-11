@@ -38,7 +38,7 @@ extern SINT32 teulInitTransport(SINT32 logType
 // installed.
 // [acceptFnPtr] is an optional ptr to callback function which is called when
 // a connection is made to the listening socket, and hence a new connection
-// is created.  pass NULL if you do not want this notification
+// is created.  pass nullptr if you do not want this notification
 // [timeout] is a timeout for this connection in ms for this connection (0 uses default).
 // [protocol] is the protocol for this connection (TCP, UDP, etc).
 // returns the teulIndex associated with this connection.
@@ -65,7 +65,7 @@ extern bool teulOpenListenInterface(const UINT16 portNumber
 // installed.  returns the number of the teulIndex associated with this
 // connection acceptFnPtr is an optional ptr to callback function which is
 // called when a connection is made to the listening socket, and hence a new
-// connection is created.  pass NULL if you do not want this notification
+// connection is created.  pass nullptr if you do not want this notification
 extern SINT32 teulOpenListenHost(const UINT32 ipAddress
 						, const UINT16 portNumber
 						, CONNECT_FUNCTION* acceptFnPtr
@@ -79,7 +79,7 @@ extern SINT32 teulOpenListenHost(const UINT32 ipAddress
 //  returned as [A].[B].[C].[D] = (A<<24) + (B<<16) + (C<<8) + D;
 // [connectFnPtr] is an optional ptr to callback function which is called when
 // a connection is established to the destination socket, and hence a new connection
-// is created.  pass NULL if you do not want this notification.
+// is created.  pass nullptr if you do not want this notification.
 // [timeout] is a timeout for this connection in ms for this connection (0 uses default).
 // [protocol] is the protocol for this connection (TCP, UDP, etc).
 // returns the teulIndex associated with this connection.

@@ -44,9 +44,9 @@ LOGICAL ldtexPaintSurfacePixels(piSURFACEDESC* lpdest, int count, UINT32 FillCol
 {
 	int     i;
 	int     Color;
-	char*    cdptr = NULL;
-	short*   sdptr = NULL;
-	long*    ldptr = NULL;
+	char*    cdptr = nullptr;
+	short*   sdptr = nullptr;
+	long*    ldptr = nullptr;
 	int		offset;
 
 	if (lpdest->PixelFormat.dwRGBBitCount <= 8)
@@ -670,7 +670,7 @@ piSURFACEDESC	pisd;
   }
   else
   {
-    prgb = NULL;
+    prgb = nullptr;
   }
 
   w = pbmi->bmiHeader.biWidth;

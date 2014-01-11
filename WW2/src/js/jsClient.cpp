@@ -1040,7 +1040,7 @@ JS_FUNCTION_DEF(jsClient, requestmotd)
 	int32 mid = 0;
 	JS_ValueToInt32(ctx, argv[0], &mid);
 
-	jsMotd* motd = NULL;
+	jsMotd* motd = nullptr;
 
 	MotdList::iterator it = jsclient->motds.find((UINT32)mid);
 	if(it != jsclient->motds.end())
@@ -1739,7 +1739,7 @@ JSBool jsClient::SetProperty(JSContext* ctx, int propid, jsval* val)
 static bool _isRegularVehicle(const WEAPON_SPEC& spec)
 {
 	const WEAPON* weapon = weapLookup(spec);
-	return (NULL == weapon || weapon->isPlayerWeapon());
+	return (nullptr == weapon || weapon->isPlayerWeapon());
 }
 #endif
 
@@ -1807,7 +1807,7 @@ void jsClient::ProcessMissionLeaderUpdate(Chat::LocalizedMessage const& lmsg)
 
 void jsClient::UpdatePersonas()
 {
-	persona = NULL;
+	persona = nullptr;
 	personas->clear();
 
 	const PersonaSummaries& persum	= client->Personas();
@@ -2421,7 +2421,7 @@ JSBool jsBrigade::GetProperty(JSContext* ctx, int propid, jsval* val)
 			*val = INT_TO_JSVAL(detail.brigadeID());
 		break;
 		case PARENT_PROP:
-			if(unit != NULL && unit->parent())
+			if(unit != nullptr && unit->parent())
 				*val = (new jsHCUnit(unit->parent()))->jsVal();
 			else if(detail.parent())
 				*val = (new jsHCUnit(detail.parent()))->jsVal();
@@ -3075,49 +3075,49 @@ JSBool jsHCUnit::GetProperty(JSContext* ctx, int propid, jsval* val)
 	switch(propid)
 	{
 		case NAME_PROP:
-			if(unit != NULL)
+			if(unit != nullptr)
 				*val = phui::js::NewString(uiUTF8toUTF16(unit->name()));
 		break;
 
 		case ID_PROP:
-			if(unit != NULL)
+			if(unit != nullptr)
 				*val = INT_TO_JSVAL(unit->unitID());
 		break;
 
 		case PARENT_PROP:
-			if(unit != NULL && unit->parent())
+			if(unit != nullptr && unit->parent())
 				*val = (new jsHCUnit(unit->parent()))->jsVal();
 		break;
 
 		case BRANCH_PROP:
-			if(unit != NULL && unit->branch() < MAX_BRANCHES)
+			if(unit != nullptr && unit->branch() < MAX_BRANCHES)
 				*val = phui::js::NewString(branches[unit->branch()]);
 		break;
 
 		case TYPE_PROP:
-			if(unit != NULL)
+			if(unit != nullptr)
 				*val = INT_TO_JSVAL((UINT32)unit->type());
 		break;
 
 		case RANK_PROP:
-			if(unit != NULL)
+			if(unit != nullptr)
 				*val = INT_TO_JSVAL((UINT32)unit->rank());
 		break;
 
 		case OWNER_PROP:
-			if(unit != NULL)
+			if(unit != nullptr)
 				*val = phui::js::NewString(chatGetWideCallsign(unit->owner()));
 		break;
 
 		case OWNERRANK_PROP:
-			if(unit != NULL)
+			if(unit != nullptr)
 				*val = (new jsRank(unit->country(), unit->branch(), unit->ownerRank()))->jsVal();
 		break;
 		case HOME_PROP:
             {
 				*val = JSVAL_NULL;
 
-				if(unit != NULL)
+				if(unit != nullptr)
 				{
 					StratDB::StratObject* stratobj = StratDB::FindStratObject(unit->homeCPID());
 					if(stratobj)
@@ -3127,7 +3127,7 @@ JSBool jsHCUnit::GetProperty(JSContext* ctx, int propid, jsval* val)
 		break;
 
 		case CALLSIGN_PROP:
-			if(unit != NULL)
+			if(unit != nullptr)
 				*val = phui::js::NewString(unit->callsign());
 		break;
 
@@ -3473,7 +3473,7 @@ JSBool jsSquad::GetProperty(JSContext* ctx, int propid, jsval* val)
 
 			char created[31];
 #if platOS == OS_WIN32
-			strftime(created, 30, "%a %b %d %X %Y", localtime_r(&stamp, NULL));
+			strftime(created, 30, "%a %b %d %X %Y", localtime_r(&stamp, nullptr));
 #else
       struct tm tmStruct;
 			strftime(created, 30, "%a %b %d %X %Y", localtime_r(&stamp, &tmStruct));

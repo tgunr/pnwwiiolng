@@ -106,5 +106,5 @@ namespace Mem
 #endif
 
 #ifdef __cplusplus
-	#define memRelease(ptr) { if((ptr) != NULL) { memFree(ptr); ptr = NULL; } }
+	#define memRelease(ptr) { if((ptr) != nullptr) { memFree(ptr); ptr = nullptr; } }
 #endif

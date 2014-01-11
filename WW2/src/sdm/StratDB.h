@@ -25,12 +25,12 @@ void Kill();
 
 StratObject* FindStratObject(const sdm_full_obj_id&);
 StratObject* FindStratObject(const FULL_OBJ_ID&);
-StratObject* FindStratObject(const char* cp, const char* fac = NULL);
+StratObject* FindStratObject(const char* cp, const char* fac = nullptr);
 
 // returns a list of objects with klass and type starting from start
 // if start is null, loops through all objects (probably expensive)
 // returns true if it found anything
-bool FindStratObjects(StratObjList& list, int klass = -1, int type = -1, int subtype = -1, StratObject* strat = NULL);
+bool FindStratObjects(StratObjList& list, int klass = -1, int type = -1, int subtype = -1, StratObject* strat = nullptr);
 
 void AllStratObjectsInWorld(StratObjList&);
 void AllCPsInWorld(StratObjList&);
@@ -93,7 +93,7 @@ public:
 	StratObject(sdm_building const&, int sx, int sy);
 	virtual ~StratObject();
 
-	// Comparison operator == just compare addresses (so that NULL ptr compares work too)
+	// Comparison operator == just compare addresses (so that nullptr ptr compares work too)
 	bool operator==(const StratObject& rhs) const { return this == &rhs ; }
 	bool operator==(const StratObject* rhs) const { return this == rhs ; }
 	bool operator!=(const StratObject& rhs) const { return this != &rhs ; }

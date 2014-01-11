@@ -211,17 +211,17 @@ UINT32 mlDetermineInfantryCollisions(mlVehicleData*	VehicleData,
 									vehVehicle**	collideVehicle)
 {
 	static const UINT32 _MAX_COLLISIONS = 32;
-	static trnCDTerrainObject* _lastCollision = NULL;
+	static trnCDTerrainObject* _lastCollision = nullptr;
 
 	UINT32				i,j;
 
 	// Line Collider Info
 	UINT32				NumLines = 0;
 	piVECTOR			(*pCollideLines)[2];
-	piVECTOR*			pCollideCenterPnt = NULL;
+	piVECTOR*			pCollideCenterPnt = nullptr;
 
 	static FASTCOLLIDE			CollisionList[_MAX_COLLISIONS];
-	FASTCOLLIDE*			CollideListPtr = NULL;
+	FASTCOLLIDE*			CollideListPtr = nullptr;
 	UINT32				TempNum = 0;
 	piVECTOR			OldPos = {0, 0, 0};
     piVECTOR            NewPos = {0, 0, 0};
@@ -235,9 +235,9 @@ UINT32 mlDetermineInfantryCollisions(mlVehicleData*	VehicleData,
 	UINT32				Alpha = 0;
 	LOGICAL				Found = 0;
     piVECTOR			trooperPos = {0, 0, 0};
-	trnCDTerrainObject*	TO1 = NULL;
-	vehVehicle*			Vehicle = NULL;
-    vehVehicle*          RideVehicle = NULL;
+	trnCDTerrainObject*	TO1 = nullptr;
+	vehVehicle*			Vehicle = nullptr;
+    vehVehicle*          RideVehicle = nullptr;
     piVECTOR			collidePoint = {0, 0, 0};
     piVECTOR            collideVector = {0, 0, 0};
 
@@ -261,15 +261,15 @@ UINT32 mlDetermineInfantryCollisions(mlVehicleData*	VehicleData,
 	static UINT32		debugCounter;
 #endif
 
-	if (VehicleData == NULL)
+	if (VehicleData == nullptr)
 	{
 		return 0;
 	}
-	if (VehicleData->VehicleObjectData == NULL)
+	if (VehicleData->VehicleObjectData == nullptr)
 	{
 		return 0;
 	}
-	if (VehicleData->VehicleObjectData->PlaneObject == NULL)
+	if (VehicleData->VehicleObjectData->PlaneObject == nullptr)
 	{
 		return 0;
 	}
@@ -428,7 +428,7 @@ UINT32 mlDetermineInfantryCollisions(mlVehicleData*	VehicleData,
 								 VehicleData->CollisionSide);
 		}
 
-		vehVehicle* cv = NULL;
+		vehVehicle* cv = nullptr;
 
 		for (j=NumCollisions;j<_MAX_COLLISIONS;j++)
 		{
@@ -437,11 +437,11 @@ UINT32 mlDetermineInfantryCollisions(mlVehicleData*	VehicleData,
 			if (j < _MAX_COLLISIONS - TempNum)
 			{
 				Vehicle = (vehVehicle*)CollisionList[j].TopLevelObject;
-				if (Vehicle != NULL)
+				if (Vehicle != nullptr)
 				{
 					if( VehicleData->VehicleMasterPtr->Side != Vehicle->Side)
 					{
-						if (Vehicle->VehicleType != NULL)
+						if (Vehicle->VehicleType != nullptr)
 						{
 							// only vehicles can run over infantry
 							if (Vehicle->VehicleType->Type != VEH_TYPE_PERSON && Vehicle != RideVehicle)
@@ -522,15 +522,15 @@ UINT32 mlDetermineInfantryCollisions(mlVehicleData*	VehicleData,
 				collisionsSaveList[i] = CollisionList[j];
 
 				Found = TRUE;
-				TO1 = NULL;
+				TO1 = nullptr;
 
 				if ((frametime - fpFPSGetLastUnrideTime()) > 2500)
 				{
-					if (CollisionList[j].TopLevelObject != NULL && CollisionList[j].Flags != 1 && !(CollisionList[j].Flags & _FP_WALK_COLLIDE_FLAG))
+					if (CollisionList[j].TopLevelObject != nullptr && CollisionList[j].Flags != 1 && !(CollisionList[j].Flags & _FP_WALK_COLLIDE_FLAG))
 					{
-						if ((CollisionList[j].TopLevelObject != NULL) && (CollisionList[j].TopLevelObject->child != NULL))
+						if ((CollisionList[j].TopLevelObject != nullptr) && (CollisionList[j].TopLevelObject->child != nullptr))
 						{
-							if (CollisionList[j].TopLevelObject->child->lpspare != NULL)
+							if (CollisionList[j].TopLevelObject->child->lpspare != nullptr)
 							{
 								TO1 = (trnCDTerrainObject*)(CollisionList[j].TopLevelObject->child->lpspare);
 
@@ -585,7 +585,7 @@ UINT32 mlDetermineInfantryCollisions(mlVehicleData*	VehicleData,
 				}
 
 				if(!TO1)
-					_lastCollision = NULL;
+					_lastCollision = nullptr;
 			}
 		}
 
@@ -883,9 +883,9 @@ void mlInfantryCheckLeanLines (mlVehicleData* VehicleData)
 	piMATRIX			troopMat;
 	piVECTOR			trooperPos;
 
-	if (VehicleData == NULL) return;
-	if (VehicleData->VehicleObjectData == NULL) return;
-	if (VehicleData->VehicleObjectData->PlaneObject == NULL) return;
+	if (VehicleData == nullptr) return;
+	if (VehicleData->VehicleObjectData == nullptr) return;
+	if (VehicleData->VehicleObjectData->PlaneObject == nullptr) return;
 
 	if (!fpFPSGetLeanPoints(&startPos, &endPos))
 		return;
@@ -914,7 +914,7 @@ void mlInfantryCheckLeanLines (mlVehicleData* VehicleData)
 	draw3dLineDebug(&startPos, &endPos, colorMAGENTAALPHA);
 #endif
 
-	if (trncdCollideWithVehiclesAndTerrain(&startPos, &endPos, NULL, NULL, NULL, NULL, NULL, FALSE, FALSE, TRUE) == TRUE)
+	if (trncdCollideWithVehiclesAndTerrain(&startPos, &endPos, nullptr, nullptr, nullptr, nullptr, nullptr, FALSE, FALSE, TRUE) == TRUE)
 	{
 		fpFPSLeanOff();
 	}
@@ -1009,11 +1009,11 @@ SINT32 mlInfantryInsideVehicleCheck (mlVehicleData* pVehicleData, piVECTOR* eyeP
 	for(;CurrentVehicle; CurrentVehicle = CurrentVehicle->Next)
 	{
 		if (CurrentVehicle == PlayerVehicle) continue;
-		if (CurrentVehicle->VehicleObjectData == NULL) continue;
+		if (CurrentVehicle->VehicleObjectData == nullptr) continue;
 		if ((pVehicleData->CollisionSide > 0) && (pVehicleData->CollisionSide == CurrentVehicle->Side)) continue;
 		if (CurrentVehicle->VehicleType->Type != VEH_TYPE_GROUND) continue;
 /*
-		if (CurrentVehicle->VehicleObjectData->HitBox != NULL)
+		if (CurrentVehicle->VehicleObjectData->HitBox != nullptr)
 			colObject = CurrentVehicle->VehicleObjectData->HitBox;
 		else if (CurrentVehicle->VehicleObjectData->CollideExternObject)
 			colObject = CurrentVehicle->VehicleObjectData->CollideExternObject;

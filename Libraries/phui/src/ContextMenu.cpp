@@ -16,8 +16,8 @@ using namespace phui;
 
 ContextMenu::ContextMenu(): Caption()
 {
-	_rootmenu = _parentmenu = _lastovermenu = NULL;
-	_submenus = NULL;
+	_rootmenu = _parentmenu = _lastovermenu = nullptr;
+	_submenus = nullptr;
 	_acceptsmouseclick = true;
 	_hindent = _vindent = _menux = _menuy = 0;
 	_isVisible = _isWindow = _open = _nextstate = false;
@@ -310,7 +310,7 @@ ContextMenu* ContextMenu::FindMenuHit(float x, float y) const
 			return (ContextMenu*)this;
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 /************************************************************************************************

@@ -74,7 +74,7 @@ TextureFont::TextureFont( const char* name, int size )
     if(text)
     {
         memFree(text);
-        text = NULL;
+        text = nullptr;
     }
 }
 

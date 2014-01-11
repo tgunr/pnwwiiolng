@@ -68,7 +68,7 @@ ShadowMap::ShadowMap():
     DynamicTexWidth(1024),
     DynamicTexHeight(1024),
     _polyOffset(1.0f, 1.0f),
-    _light(NULL),
+    _light(nullptr),
     _DynamicShadowDistance(40.0f),
     _StaticShadowDistance(800.0f),
     lastshadowcreate(0)
@@ -300,7 +300,7 @@ bool ShadowMap::FindOctetCenter(int corner)
     collide.newpos.y = y;
     collide.newpos.z = 10000.0f;
 
-    TERRAIN_DETAIL* dtl = NULL;
+    TERRAIN_DETAIL* dtl = nullptr;
 
     for(int i = 0; i < NUM_TERRAIN_RECTANGLES; i++)
 	{
@@ -632,7 +632,7 @@ void ShadowMap::RenderDynamicShadowCasters()
         return;
     }
 
-    struct LISTHEADER* list = NULL;
+    struct LISTHEADER* list = nullptr;
 	int numobjects = obmainGetObjects(&list);
 	OBJECT* o = (OBJECT*)list->next;
 
@@ -731,7 +731,7 @@ void ShadowMap::RenderDynamicShadowCasters()
         return;
     }
 
-    struct LISTHEADER* list = NULL;
+    struct LISTHEADER* list = nullptr;
 	int numobjects = obmainGetObjects(&list);
 	OBJECT* o = (OBJECT*)list->next;
 
@@ -889,7 +889,7 @@ bool ShadowMap::BeginStaticShadowMap(int corner)
     playerup = playerup ^ Vec3f(1, 0, 0);
     playerup.get(up);
 
-    oglCreateModelView(&_smOctet[corner].mv, &eye, &center, &up, NULL);
+    oglCreateModelView(&_smOctet[corner].mv, &eye, &center, &up, nullptr);
 
     // This also sets playright, playup, etc...
     rnmainSetViewMatrix2(&_smOctet[corner].mv);
@@ -989,7 +989,7 @@ bool ShadowMap::BeginStaticShadowMap(int corner)
     playerup = playerup ^ Vec3f(1, 0, 0);
     playerup.get(up);
 
-    oglCreateModelView(&_smOctet[corner].mv, &eye, &center, &up, NULL);
+    oglCreateModelView(&_smOctet[corner].mv, &eye, &center, &up, nullptr);
 
     // This also sets playright, playup, etc...
     rnmainSetViewMatrix2(&_smOctet[corner].mv);
@@ -1084,7 +1084,7 @@ bool ShadowMap::BeginDynamicShadowMap()
     playerup = playerup ^ Vec3f(1, 0, 0);
     playerup.get(up);
 
-    oglCreateModelView(&DynShadowMap.mv, &eye, &center, &up, NULL);
+    oglCreateModelView(&DynShadowMap.mv, &eye, &center, &up, nullptr);
 
     // This also sets playright, playup, etc...
     rnmainSetViewMatrix2(&DynShadowMap.mv);
@@ -1191,7 +1191,7 @@ bool ShadowMap::BeginDynamicShadowMap()
     playerup = playerup ^ Vec3f(1, 0, 0);
     playerup.get(up);
 
-    oglCreateModelView(&DynShadowMap.mv, &eye, &center, &up, NULL);
+    oglCreateModelView(&DynShadowMap.mv, &eye, &center, &up, nullptr);
 
     // This also sets playright, playup, etc...
     rnmainSetViewMatrix2(&DynShadowMap.mv);
@@ -2177,12 +2177,12 @@ void ShadowMap::Kill()
         while(_smOctet[i].fbo->referenceCount() > 1)
             _smOctet[i].fbo->unref();
 
-        _smOctet[i].fbo = NULL;
+        _smOctet[i].fbo = nullptr;
 
         while(_smOctet[i].map->referenceCount() > 1)
             _smOctet[i].map->unref();
 
-        _smOctet[i].map = NULL;
+        _smOctet[i].map = nullptr;
     }
 
     if(DynShadowMap.fbo.valid())
@@ -2190,17 +2190,17 @@ void ShadowMap::Kill()
         while(DynShadowMap.fbo->referenceCount() > 1)
             DynShadowMap.fbo->unref();
 
-        DynShadowMap.fbo = NULL;
+        DynShadowMap.fbo = nullptr;
     }
 
 #if USE_STATESET
 #else
-    DynShadowMap.map = NULL;
+    DynShadowMap.map = nullptr;
 #endif
 
 #if USE_STATESET
 #else
-    smoctet.fbo = NULL;
+    smoctet.fbo = nullptr;
 #endif
 
     if(_white.valid())
@@ -2208,11 +2208,11 @@ void ShadowMap::Kill()
         while(_white->referenceCount() > 1)
             _white->unref();
 
-        _white = NULL;
+        _white = nullptr;
     }
 
-    smoctet.map = NULL;
-    _shadowmap = NULL;
+    smoctet.map = nullptr;
+    _shadowmap = nullptr;
 }
 
 /*---------------------------------------------------------------------------

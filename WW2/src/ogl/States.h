@@ -175,7 +175,7 @@ public:
     const RenderState* GetRenderState(int i) const
     {
         if(i >= (int)RenderStates.size())
-            return NULL;
+            return nullptr;
 
         return RenderStates[i].get();
     }
@@ -190,7 +190,7 @@ public:
             }
         }
 
-        return NULL;
+        return nullptr;
     }
 
     unsigned int GetRenderStateSize() const
@@ -422,7 +422,7 @@ class Program : public RenderState
 {
 public:
     Program() :
-        program(NULL)
+        program(nullptr)
     {
     }
 
@@ -1875,30 +1875,30 @@ Shader& operator=(const Shader& other)
 
     if (other.mRenderStateSet.get())
     {
-    if (mRenderStateSet.get() == NULL)
+    if (mRenderStateSet.get() == nullptr)
         mRenderStateSet = new RenderStateSet;
     *mRenderStateSet = *other.mRenderStateSet;
     }
     else
-    mRenderStateSet = NULL;
+    mRenderStateSet = nullptr;
 
     if (other.mEnableSet.get())
     {
-    if (mEnableSet.get() == NULL)
+    if (mEnableSet.get() == nullptr)
         mEnableSet = new EnableSet;
     *mEnableSet = *other.mEnableSet;
     }
     else
-    mEnableSet = NULL;
+    mEnableSet = nullptr;
 
     if (other.mUniformSet.get())
     {
-    if (mUniformSet.get() == NULL)
+    if (mUniformSet.get() == nullptr)
         mUniformSet = new UniformSet;
     *mUniformSet = *other.mUniformSet;
     }
     else
-    mUniformSet = NULL;
+    mUniformSet = nullptr;
 
     mScissor = other.mScissor;
     mShaderAnimator = other.mShaderAnimator;
@@ -1929,10 +1929,10 @@ void reset()
 /** Gets or creates a GLSLProgram and returns it. */
 GLSLProgram* gocGLSLProgram();
 
-/** Returns a GLSLProgram if it exists or NULL otherwise. */
+/** Returns a GLSLProgram if it exists or nullptr otherwise. */
 const GLSLProgram* getGLSLProgram() const;
 
-/** Returns a GLSLProgram if it exists or NULL otherwise. */
+/** Returns a GLSLProgram if it exists or nullptr otherwise. */
 GLSLProgram* getGLSLProgram();
 PixelTransfer* gocPixelTransfer();
 const PixelTransfer* GetPixelTransfer() const {return dynamic_cast<const PixelTransfer*>(GetRenderStateSet()->GetRenderState(RS_PIXELTRANSFER));}
@@ -2113,7 +2113,7 @@ bool blendingEnabled() const { if (!getEnableSet()) return false; return getEnab
 
 void setRenderState(RenderState* renderstate) { gocRenderStateSet()->setRenderState(renderstate);}
 
-const RenderState* renderState( int type ) const { if (!getRenderStateSet()) return NULL; return getRenderStateSet()->renderState(type);}
+const RenderState* renderState( int type ) const { if (!getRenderStateSet()) return nullptr; return getRenderStateSet()->renderState(type);}
 
 RenderState* renderState( int type ) {return gocRenderStateSet()->renderState(type);}
 
@@ -2126,7 +2126,7 @@ void erasint(RenderState* rs) { if (rs) gocRenderStateSet()->erasint(rs->type())
 void eraseAllRenderStates() { if(getRenderStateSet()) getRenderStateSet()->eraseAllRenderStates();}
 
 //! Returns the GLSLProgram associated to a Shader (if any)
-const GLSLProgram* glslProgram() const { if (!getRenderStateSet()) return NULL; return getRenderStateSet()->glslProgram();}
+const GLSLProgram* glslProgram() const { if (!getRenderStateSet()) return nullptr; return getRenderStateSet()->glslProgram();}
 
 //! Returns the GLSLProgram associated to a Shader (if any)
 GLSLProgram* glslProgram() {return gocRenderStateSet()->glslProgram();}

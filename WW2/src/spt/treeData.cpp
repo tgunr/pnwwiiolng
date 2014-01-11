@@ -256,7 +256,7 @@ Description:
 ------------------------------------------------------------------------*/
 static void loadTrees(CSpeedWind* wind)
 {
-    CTree* base = NULL;
+    CTree* base = nullptr;
 
     for(unsigned int i = 0; i < treedata.size(); i++)
     {
@@ -334,7 +334,7 @@ Description:
 CTree* treeDataGetBaseTree(int base)
 {
     if(base < 0 || base >= (int)basetrees.size())
-        return NULL;
+        return nullptr;
 
     return basetrees[base];
 }
@@ -399,8 +399,8 @@ static void addToFreeList(Tree* t)
     freetreesH.next = t;
     t->prev = &freetreesH;
 
-    t->o = NULL;
-    t->octet = NULL;
+    t->o = nullptr;
+    t->octet = nullptr;
     t->collidemat.clear();
     t->isbush_isclutter_base = 0;
 
@@ -420,8 +420,8 @@ static void releaseActiveTree(Tree* t)
     p->next = n;
     n->prev = p;
 
-    t->next = NULL;
-    t->prev = NULL;
+    t->next = nullptr;
+    t->prev = nullptr;
 }
 
 /*------------------------------------------------------------------------
@@ -446,7 +446,7 @@ Description:
 ------------------------------------------------------------------------*/
 Tree* treeDataGetFreeTree()
 {
-    Tree* t = NULL;
+    Tree* t = nullptr;
 
 #if USE_PREALLOCATED_TREES
     if(freetreesH.next == &freetreesT)
@@ -462,8 +462,8 @@ Tree* treeDataGetFreeTree()
         n->prev = &freetreesH;
     }
 
-    t->next = NULL;
-    t->prev = NULL;
+    t->next = nullptr;
+    t->prev = nullptr;
 
     addToActiveList(t);
 #else
@@ -570,7 +570,7 @@ void treeDataKill()
     texCoordOffset = 0;
     totaltrees = 0;
 
-    vbo = NULL;
+    vbo = nullptr;
 
 #if USE_PREALLOCATED_TREES
     Tree* n = activetreesH.next;

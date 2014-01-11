@@ -126,7 +126,7 @@ struct ShadowCull
 
             if(o->distsqr < SDM_OCTET_SIZE || o->flag3 & (OBJECT_CLOUDS | OBJECT_RAINCLOUDS))
             {
-                if(!(o->flag2 & OBJECT_HASALPHA) && obdrawGetMultiTextureOpcode(o->texid, NULL) == MT_SINGLEPASS)
+                if(!(o->flag2 & OBJECT_HASALPHA) && obdrawGetMultiTextureOpcode(o->texid, nullptr) == MT_SINGLEPASS)
                 {
                     ShadowMultiTextureBin.push_back(o);
                 }
@@ -265,7 +265,7 @@ struct WaterReflectionCull
 
                     if(o->reflectiondist < SDM_OCTET_SIZE || o->flag3 & (OBJECT_CLOUDS | OBJECT_RAINCLOUDS))
                     {
-                        if(!(o->flag2 & OBJECT_HASALPHA) && obdrawGetMultiTextureOpcode(o->texid, NULL) == MT_SINGLEPASS)
+                        if(!(o->flag2 & OBJECT_HASALPHA) && obdrawGetMultiTextureOpcode(o->texid, nullptr) == MT_SINGLEPASS)
                         {
                             ReflectionMultiTextureBin.push_back(o);
                         }
@@ -349,7 +349,7 @@ LOGICAL obcsGetObjectCullStats(SINT32 * CullObjectCnt,SINT32 * DisplayedObjectCn
 LOGICAL obcsInit(void)
 {
 	sortfree.prev = sortfree.next = (LISTHEADER*)memAlloc(MINOBJECTS * sizeof(SORTHEADER));
-	if (sortfree.next == NULL)
+	if (sortfree.next == nullptr)
 	{
 		return(FALSE);
 	}
@@ -359,24 +359,24 @@ LOGICAL obcsInit(void)
 		return(FALSE);
 	}
 
-	sortedlist.prev = sortedlist.next = NULL;
-	sortedlisttail = NULL;
-	unsortedlist.prev = unsortedlist.next = NULL;
-	unsortedlisttail = NULL;
-	sortedcockpitlist.prev = sortedcockpitlist.next = NULL;
-	sortedcockpitlisttail = NULL;
-	unsortedcockpitlist.prev = unsortedcockpitlist.next = NULL;
-	unsortedcockpitlisttail = NULL;
+	sortedlist.prev = sortedlist.next = nullptr;
+	sortedlisttail = nullptr;
+	unsortedlist.prev = unsortedlist.next = nullptr;
+	unsortedlisttail = nullptr;
+	sortedcockpitlist.prev = sortedcockpitlist.next = nullptr;
+	sortedcockpitlisttail = nullptr;
+	unsortedcockpitlist.prev = unsortedcockpitlist.next = nullptr;
+	unsortedcockpitlisttail = nullptr;
 
 	return(TRUE);
 }
 
 void obcsKill(void)
 {
-	if (sortfree.prev != NULL)
+	if (sortfree.prev != nullptr)
 	{
 		memFree(sortfree.prev);
-		sortfree.prev = NULL;
+		sortfree.prev = nullptr;
 	}
 }
 
@@ -419,8 +419,8 @@ static int sortByTexture(OBJECT* l, OBJECT* r)
 
 void obcsCullForWaterReflection(float planeheight)
 {
-    OBJECT* o = NULL;
-    LISTHEADER* list = NULL;
+    OBJECT* o = nullptr;
+    LISTHEADER* list = nullptr;
 
     _transparentbin.clear();
     _opaquebin.clear();
@@ -430,7 +430,7 @@ void obcsCullForWaterReflection(float planeheight)
 
     piVECTOR p;
 
-	for(; o != NULL; o = o->next)
+	for(; o != nullptr; o = o->next)
 	{
 		// only operate on selected objects
 		if(o->flags & (OBJECT_ATTACHED|OBJECT_TERRAIN))
@@ -439,9 +439,9 @@ void obcsCullForWaterReflection(float planeheight)
 		}
 
         unsigned int skipdrawflags = 0;
-        OBJECT* attach = NULL;
+        OBJECT* attach = nullptr;
 
-		for(attach = o; attach != NULL; attach = attach->attached)
+		for(attach = o; attach != nullptr; attach = attach->attached)
 		{
             // Better for debugging to see which flags are set
             skipdrawflags |= !(attach->flags & OBJECT_VISIBLE);
@@ -545,7 +545,7 @@ struct AddToDrawList
                     if(!cull)
                     {
                         // Separate multitexture and water
-                        if(!(o->flag2 & OBJECT_HASALPHA) && obdrawGetMultiTextureOpcode(o->texid, NULL) == MT_SINGLEPASS)
+                        if(!(o->flag2 & OBJECT_HASALPHA) && obdrawGetMultiTextureOpcode(o->texid, nullptr) == MT_SINGLEPASS)
                         {
                             _multitexturebin.push_back(o);
                         }
@@ -597,13 +597,13 @@ void obcsCull()
     _transparentcockpitbin.clear();
     _opaquecockpitbin.clear();
 
-    trnCDTerrainObject* to = NULL;
+    trnCDTerrainObject* to = nullptr;
 
     trncdGetTOHead(&to);
 
     static BoundingBox bb;
 
-    for(; to != NULL; to = to->Next)
+    for(; to != nullptr; to = to->Next)
     {
         unsigned int mask = CLIP_ALL_PLANES;
         static piVECTOR p1, p2;
@@ -647,10 +647,10 @@ void obcsCull()
         }
     }
 
-    vehVehicle* veh = NULL;
+    vehVehicle* veh = nullptr;
     vehGetVehicleHead(&veh);
 
-    for(; veh != NULL; veh = veh->getNext())
+    for(; veh != nullptr; veh = veh->getNext())
     {
         piVECTOR pos;
 
@@ -746,7 +746,7 @@ int obcsCullAndSortObjects(int numobjects, OBJECT* object)
     if(gCustomTerrain)
         shadowcull.Reset();
 
-	for(; object != NULL; object = object->next)
+	for(; object != nullptr; object = object->next)
 	{
 		// only operate on selected objects
 		if (object->flags & OBJECT_NOTOBJECT)
@@ -810,7 +810,7 @@ int obcsCullAndSortObjects(int numobjects, OBJECT* object)
             }
 
             // Separate multitexture and water
-            if(!(lpobj->flag2 & OBJECT_HASALPHA) && obdrawGetMultiTextureOpcode(lpobj->texid, NULL) == MT_SINGLEPASS)
+            if(!(lpobj->flag2 & OBJECT_HASALPHA) && obdrawGetMultiTextureOpcode(lpobj->texid, nullptr) == MT_SINGLEPASS)
             {
                 _multitexturebin.push_back(lpobj);
                 continue;
@@ -987,9 +987,9 @@ SORTHEADER* obcsGetMultiTextureList()
 /* not used
 LOGICAL unsortMultiTexture(SORTHEADER* lpsort)
 {
-	if (lplastMultiTexture == NULL || !bPerFrameBSP)
+	if (lplastMultiTexture == nullptr || !bPerFrameBSP)
 	{
-		if (lplastMultiTexture == NULL)
+		if (lplastMultiTexture == nullptr)
 		{
 			tailMultiTexture = lpsort;
 		}
@@ -1010,7 +1010,7 @@ LOGICAL unsortMultiTexture(SORTHEADER* lpsort)
 					lplastMultiTexture = lpsort;
 					break;
 				}
-				if (lplastMultiTexture->next == NULL)
+				if (lplastMultiTexture->next == nullptr)
 				{
 					listAddItemAfter((LISTHEADER*)lplastMultiTexture, (LISTHEADER*)lpsort);
 					tailMultiTexture = lplastMultiTexture = lpsort;
@@ -1035,7 +1035,7 @@ LOGICAL unsortMultiTexture(SORTHEADER* lpsort)
 				}
 				lplastMultiTexture = lplastMultiTexture->prev;
 			}
-			if (lplastMultiTexture->prev == NULL)
+			if (lplastMultiTexture->prev == nullptr)
 			{
 				listAddItemBefore((LISTHEADER*)lplastMultiTexture->next, (LISTHEADER*)lpsort);
 				lplastMultiTexture = lpsort;
@@ -1055,7 +1055,7 @@ LOGICAL unsortMultiTexture(SORTHEADER* lpsort)
 						lplastMultiTexture = lpsort;
 						break;
 					}
-					if (lplastMultiTexture->next == NULL)
+					if (lplastMultiTexture->next == nullptr)
 					{
 						listAddItemAfter((LISTHEADER*)lplastMultiTexture, (LISTHEADER*)lpsort);
 						tailMultiTexture = lplastMultiTexture = lpsort;
@@ -1079,7 +1079,7 @@ LOGICAL unsortMultiTexture(SORTHEADER* lpsort)
 					}
 					lplastMultiTexture = lplastMultiTexture->prev;
 				}
-				if (lplastMultiTexture->prev == NULL)
+				if (lplastMultiTexture->prev == nullptr)
 				{
 					listAddItemBefore((LISTHEADER*)lplastMultiTexture->next, (LISTHEADER*)lpsort);
 					lplastMultiTexture = lpsort;
@@ -1096,9 +1096,9 @@ static LOGICAL UnsortBSP(SORTHEADER* lpsort)
 {
     logTimerBeginMacro();
 
-	if (lplastunsorted == NULL || !bPerFrameBSP )//|| true)
+	if (lplastunsorted == nullptr || !bPerFrameBSP )//|| true)
 	{
-		if (lplastunsorted == NULL)
+		if (lplastunsorted == nullptr)
 		{
 			unsortedlisttail = lpsort;
 		}
@@ -1119,7 +1119,7 @@ static LOGICAL UnsortBSP(SORTHEADER* lpsort)
 					lplastunsorted = lpsort;
 					break;
 				}
-				if (lplastunsorted->next == NULL)
+				if (lplastunsorted->next == nullptr)
 				{
 					listAddItemAfter((LISTHEADER*)lplastunsorted, (LISTHEADER*)lpsort);
 					unsortedlisttail = lplastunsorted = lpsort;
@@ -1144,7 +1144,7 @@ static LOGICAL UnsortBSP(SORTHEADER* lpsort)
 				}
 				lplastunsorted = lplastunsorted->prev;
 			}
-			if (lplastunsorted->prev == NULL)
+			if (lplastunsorted->prev == nullptr)
 			{
 				listAddItemBefore((LISTHEADER*)lplastunsorted->next, (LISTHEADER*)lpsort);
 				lplastunsorted = lpsort;
@@ -1164,7 +1164,7 @@ static LOGICAL UnsortBSP(SORTHEADER* lpsort)
 						lplastunsorted = lpsort;
 						break;
 					}
-					if (lplastunsorted->next == NULL)
+					if (lplastunsorted->next == nullptr)
 					{
 						listAddItemAfter((LISTHEADER*)lplastunsorted, (LISTHEADER*)lpsort);
 						unsortedlisttail = lplastunsorted = lpsort;
@@ -1188,7 +1188,7 @@ static LOGICAL UnsortBSP(SORTHEADER* lpsort)
 					}
 					lplastunsorted = lplastunsorted->prev;
 				}
-				if (lplastunsorted->prev == NULL)
+				if (lplastunsorted->prev == nullptr)
 				{
 					listAddItemBefore((LISTHEADER*)lplastunsorted->next, (LISTHEADER*)lpsort);
 					lplastunsorted = lpsort;
@@ -1207,9 +1207,9 @@ static LOGICAL SortBSP(SORTHEADER* lpsort)
 {
     logTimerBeginMacro();
 
-	if (lplast == NULL || !bPerFrameBSP)
+	if (lplast == nullptr || !bPerFrameBSP)
 	{
-		if (lplast == NULL)
+		if (lplast == nullptr)
 		{
 			sortedlisttail = lpsort;
 		}
@@ -1230,7 +1230,7 @@ static LOGICAL SortBSP(SORTHEADER* lpsort)
 					lplast = lpsort;
 					break;
 				}
-				if (lplast->next == NULL)
+				if (lplast->next == nullptr)
 				{
 					listAddItemAfter((LISTHEADER*)lplast, (LISTHEADER*)lpsort);
 					sortedlisttail = lplast = lpsort;
@@ -1255,7 +1255,7 @@ static LOGICAL SortBSP(SORTHEADER* lpsort)
 				}
 				lplast = lplast->prev;
 			}
-			if (lplast->prev == NULL)
+			if (lplast->prev == nullptr)
 			{
 				listAddItemBefore((LISTHEADER*)lplast->next, (LISTHEADER*)lpsort);
 				lplast = lpsort;
@@ -1275,7 +1275,7 @@ static LOGICAL SortBSP(SORTHEADER* lpsort)
 						lplast = lpsort;
 						break;
 					}
-					if (lplast->next == NULL)
+					if (lplast->next == nullptr)
 					{
 						listAddItemAfter((LISTHEADER*)lplast, (LISTHEADER*)lpsort);
 						sortedlisttail = lplast = lpsort;
@@ -1299,7 +1299,7 @@ static LOGICAL SortBSP(SORTHEADER* lpsort)
 					}
 					lplast = lplast->prev;
 				}
-				if (lplast->prev == NULL)
+				if (lplast->prev == nullptr)
 				{
 					listAddItemBefore((LISTHEADER*)lplast->next, (LISTHEADER*)lpsort);
 					lplast = lpsort;
@@ -1319,9 +1319,9 @@ static LOGICAL SortCockpitBSP(SORTHEADER* lpsort)
 {
     logTimerBeginMacro();
 
-	if (lplastcockpit == NULL || !bPerFrameBSP)
+	if (lplastcockpit == nullptr || !bPerFrameBSP)
 	{
-		if (lplastcockpit == NULL)
+		if (lplastcockpit == nullptr)
 		{
 			sortedcockpitlisttail = lpsort;
 		}
@@ -1342,7 +1342,7 @@ static LOGICAL SortCockpitBSP(SORTHEADER* lpsort)
 					lplastcockpit = lpsort;
 					break;
 				}
-				if (lplastcockpit->next == NULL)
+				if (lplastcockpit->next == nullptr)
 				{
 					listAddItemAfter((LISTHEADER*)lplastcockpit, (LISTHEADER*)lpsort);
 					sortedcockpitlisttail = lplastcockpit = lpsort;
@@ -1367,7 +1367,7 @@ static LOGICAL SortCockpitBSP(SORTHEADER* lpsort)
 				}
 				lplastcockpit = lplastcockpit->prev;
 			}
-			if (lplastcockpit->prev == NULL)
+			if (lplastcockpit->prev == nullptr)
 			{
 				listAddItemBefore((LISTHEADER*)lplastcockpit->next, (LISTHEADER*)lpsort);
 				lplastcockpit = lpsort;
@@ -1387,7 +1387,7 @@ static LOGICAL SortCockpitBSP(SORTHEADER* lpsort)
 						lplastcockpit = lpsort;
 						break;
 					}
-					if (lplastcockpit->next == NULL)
+					if (lplastcockpit->next == nullptr)
 					{
 						listAddItemAfter((LISTHEADER*)lplastcockpit, (LISTHEADER*)lpsort);
 						sortedcockpitlisttail = lplastcockpit = lpsort;
@@ -1411,7 +1411,7 @@ static LOGICAL SortCockpitBSP(SORTHEADER* lpsort)
 					}
 					lplastcockpit = lplastcockpit->prev;
 				}
-				if (lplastcockpit->prev == NULL)
+				if (lplastcockpit->prev == nullptr)
 				{
 					listAddItemBefore((LISTHEADER*)lplastcockpit->next, (LISTHEADER*)lpsort);
 					lplastcockpit = lpsort;
@@ -1431,9 +1431,9 @@ static LOGICAL UnsortCockpitBSP(SORTHEADER* lpsort)
 {
     logTimerBeginMacro();
 
-	if (lplastunsortedcockpit == NULL || !bPerFrameBSP)
+	if (lplastunsortedcockpit == nullptr || !bPerFrameBSP)
 	{
-		if (lplastunsortedcockpit == NULL)
+		if (lplastunsortedcockpit == nullptr)
 		{
 			unsortedcockpitlisttail = lpsort;
 		}
@@ -1454,7 +1454,7 @@ static LOGICAL UnsortCockpitBSP(SORTHEADER* lpsort)
 					lplastunsortedcockpit = lpsort;
 					break;
 				}
-				if (lplastunsortedcockpit->next == NULL)
+				if (lplastunsortedcockpit->next == nullptr)
 				{
 					listAddItemAfter((LISTHEADER*)lplastunsortedcockpit, (LISTHEADER*)lpsort);
 					unsortedcockpitlisttail = lplastunsortedcockpit = lpsort;
@@ -1479,7 +1479,7 @@ static LOGICAL UnsortCockpitBSP(SORTHEADER* lpsort)
 				}
 				lplastunsortedcockpit = lplastunsortedcockpit->prev;
 			}
-			if (lplastunsortedcockpit->prev == NULL)
+			if (lplastunsortedcockpit->prev == nullptr)
 			{
 				listAddItemBefore((LISTHEADER*)lplastunsortedcockpit->next, (LISTHEADER*)lpsort);
 				lplastunsortedcockpit = lpsort;
@@ -1499,7 +1499,7 @@ static LOGICAL UnsortCockpitBSP(SORTHEADER* lpsort)
 						lplastunsortedcockpit = lpsort;
 						break;
 					}
-					if (lplastunsortedcockpit->next == NULL)
+					if (lplastunsortedcockpit->next == nullptr)
 					{
 						listAddItemAfter((LISTHEADER*)lplastunsortedcockpit, (LISTHEADER*)lpsort);
 						unsortedcockpitlisttail = lplastunsortedcockpit = lpsort;
@@ -1523,7 +1523,7 @@ static LOGICAL UnsortCockpitBSP(SORTHEADER* lpsort)
 					}
 					lplastunsortedcockpit = lplastunsortedcockpit->prev;
 				}
-				if (lplastunsortedcockpit->prev == NULL)
+				if (lplastunsortedcockpit->prev == nullptr)
 				{
 					listAddItemBefore((LISTHEADER*)lplastunsortedcockpit->next, (LISTHEADER*)lpsort);
 					lplastunsortedcockpit = lpsort;
@@ -1547,24 +1547,24 @@ void obcsResetSortedList(void)
 
 	// reset the sort list
 	tail = (LISTHEADER*)sortedlisttail;
-	if (tail != NULL)
+	if (tail != nullptr)
 	{
 		tail->next = sortfree.next;
-		if (tail->next != NULL)
+		if (tail->next != nullptr)
 		{
 			((LISTHEADER*)tail->next)->prev = tail;
 		}
 
 		sortfree.next = sortedlist.next;
-		sortedlist.next = NULL;
-		if (sortfree.next != NULL)
+		sortedlist.next = nullptr;
+		if (sortfree.next != nullptr)
 		{
 			((LISTHEADER*)sortfree.next)->prev = &sortfree;
 		}
 	}
 
-	lplast = NULL;
-	sortedlisttail = NULL;
+	lplast = nullptr;
+	sortedlisttail = nullptr;
 }
 
 void obcsResetMultiTexture()
@@ -1574,24 +1574,24 @@ void obcsResetMultiTexture()
     LISTHEADER*	tail;
 
 	tail = (LISTHEADER*)tailMultiTexture;
-	if (tail != NULL)
+	if (tail != nullptr)
 	{
 		tail->next = sortfree.next;
-		if (tail->next != NULL)
+		if (tail->next != nullptr)
 		{
 			((LISTHEADER*)tail->next)->prev = tail;
 		}
 
 		sortfree.next = multiTextureList.next;
-		multiTextureList.next = NULL;
-		if (sortfree.next != NULL)
+		multiTextureList.next = nullptr;
+		if (sortfree.next != nullptr)
 		{
 			((LISTHEADER*)sortfree.next)->prev = &sortfree;
 		}
 	}
 
-	lplastMultiTexture = NULL;
-	tailMultiTexture = NULL;
+	lplastMultiTexture = nullptr;
+	tailMultiTexture = nullptr;
 }
 
 // Fast reset of the unsorted list
@@ -1602,24 +1602,24 @@ void obcsResetUnsortedList(void)
     LISTHEADER*	tail;
 
 	tail = (LISTHEADER*)unsortedlisttail;
-	if (tail != NULL)
+	if (tail != nullptr)
 	{
 		tail->next = sortfree.next;
-		if (tail->next != NULL)
+		if (tail->next != nullptr)
 		{
 			((LISTHEADER*)tail->next)->prev = tail;
 		}
 
 		sortfree.next = unsortedlist.next;
-		unsortedlist.next = NULL;
-		if (sortfree.next != NULL)
+		unsortedlist.next = nullptr;
+		if (sortfree.next != nullptr)
 		{
 			((LISTHEADER*)sortfree.next)->prev = &sortfree;
 		}
 	}
 
-	lplastunsorted = NULL;
-	unsortedlisttail = NULL;
+	lplastunsorted = nullptr;
+	unsortedlisttail = nullptr;
 }
 
 // Fast reset of the sorted cockpit list
@@ -1630,24 +1630,24 @@ void obcsResetSortedCockpitList(void)
     LISTHEADER*	tail;
 
 	tail = (LISTHEADER*)sortedcockpitlisttail;
-	if (tail != NULL)
+	if (tail != nullptr)
 	{
 		tail->next = sortfree.next;
-		if (tail->next != NULL)
+		if (tail->next != nullptr)
 		{
 			((LISTHEADER*)tail->next)->prev = tail;
 		}
 
 		sortfree.next = sortedcockpitlist.next;
-		sortedcockpitlist.next = NULL;
-		if (sortfree.next != NULL)
+		sortedcockpitlist.next = nullptr;
+		if (sortfree.next != nullptr)
 		{
 			((LISTHEADER*)sortfree.next)->prev = &sortfree;
 		}
 	}
 
-	lplastcockpit = NULL;
-	sortedcockpitlisttail = NULL;
+	lplastcockpit = nullptr;
+	sortedcockpitlisttail = nullptr;
 }
 
 // Fast reset of the unsorted cockpit list
@@ -1658,24 +1658,24 @@ void obcsResetUnsortedCockpitList(void)
     LISTHEADER*	tail;
 
 	tail = (LISTHEADER*)unsortedcockpitlisttail;
-	if (tail != NULL)
+	if (tail != nullptr)
 	{
 		tail->next = sortfree.next;
-		if (tail->next != NULL)
+		if (tail->next != nullptr)
 		{
 			((LISTHEADER*)tail->next)->prev = tail;
 		}
 
 		sortfree.next = unsortedcockpitlist.next;
-		unsortedcockpitlist.next = NULL;
-		if (sortfree.next != NULL)
+		unsortedcockpitlist.next = nullptr;
+		if (sortfree.next != nullptr)
 		{
 			((LISTHEADER*)sortfree.next)->prev = &sortfree;
 		}
 	}
 
-	lplastunsortedcockpit = NULL;
-	unsortedcockpitlisttail = NULL;
+	lplastunsortedcockpit = nullptr;
+	unsortedcockpitlisttail = nullptr;
 }
 
 void obcsAddToUnsortedList(SORTHEADER* lpsort)
@@ -1735,13 +1735,13 @@ OBJECT* nxtprev;
 	}
 
 	lpobj = lpobjorig;
-	if (lpobj != NULL && lpobj->next != NULL)
+	if (lpobj != nullptr && lpobj->next != nullptr)
 	{
 		lpnxt = lpobj->next;
 		while (lpnxt->flags & OBJECT_NOTOBJECT)
 		{
 			lpnxt = lpnxt->next;
-			if (lpnxt == NULL)
+			if (lpnxt == nullptr)
 			{
 				break;
 			}
@@ -1773,12 +1773,12 @@ OBJECT* nxtprev;
 
 			lpobj = lpnxt;
 			lpnxt = lpnxt->next;
-			if (lpnxt != NULL)
+			if (lpnxt != nullptr)
 			{
 				while (lpnxt->flags & OBJECT_NOTOBJECT)
 				{
 					lpnxt = lpnxt->next;
-					if (lpnxt == NULL)
+					if (lpnxt == nullptr)
 					{
 						break;
 					}
@@ -1798,13 +1798,13 @@ OBJECT*	objprev;
 OBJECT* nxtprev;
 
 	lpobj = lpobjorig;
-	if (lpobj != NULL && lpobj->next != NULL)
+	if (lpobj != nullptr && lpobj->next != nullptr)
 	{
 		lpnxt = lpobj->next;
 		while (lpnxt->flags & OBJECT_NOTOBJECT)
 		{
 			lpnxt = lpnxt->next;
-			if (lpnxt == NULL)
+			if (lpnxt == nullptr)
 			{
 				break;
 			}
@@ -1836,12 +1836,12 @@ OBJECT* nxtprev;
 
 			lpobj = lpnxt;
 			lpnxt = lpnxt->next;
-			if (lpnxt != NULL)
+			if (lpnxt != nullptr)
 			{
 				while (lpnxt->flags & OBJECT_NOTOBJECT)
 				{
 					lpnxt = lpnxt->next;
-					if (lpnxt == NULL)
+					if (lpnxt == nullptr)
 					{
 						break;
 					}
@@ -1864,7 +1864,7 @@ piINDICES		ndx;
 piINDICES*		pt;
 
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -1942,9 +1942,9 @@ SORTHEADER* obcsGetNextSortItem(void)
 
 SORTHEADER* obcsGetNextOnList(SORTHEADER* list)
 {
-	if (list == NULL)
+	if (list == nullptr)
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
 	return((SORTHEADER*)list->next);
@@ -1952,14 +1952,14 @@ SORTHEADER* obcsGetNextOnList(SORTHEADER* list)
 
 SORTHEADER* obcsGetPrevOnList(SORTHEADER* list)
 {
-	if (list == NULL)
+	if (list == nullptr)
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
-	if (list->prev->prev == NULL)
+	if (list->prev->prev == nullptr)
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
 	return((SORTHEADER*)list->prev);
@@ -1967,9 +1967,9 @@ SORTHEADER* obcsGetPrevOnList(SORTHEADER* list)
 
 OBJECT* obcsGetListPart(SORTHEADER* list)
 {
-	if (list == NULL)
+	if (list == nullptr)
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
 	return(list->part);

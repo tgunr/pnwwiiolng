@@ -75,7 +75,7 @@ public:
 	void*				appConnectionData;
 
 	ENDPOINT* 			m_parent;				///! Pointer to endpoint that spawned this connection, if this is an accepted incoming connection.
-												///! Otherwise NULL if created by teulOpenSend.
+												///! Otherwise nullptr if created by teulOpenSend.
 
 	SOCKET				socket;					// the socket handle
 

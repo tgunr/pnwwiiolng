@@ -39,7 +39,7 @@ void _materialElements(xmlNodePtr root)
     piCOLORVALUE* a = &mat.material.ambient;
     piCOLORVALUE* e = &mat.material.emissive;
 
-	for(; node != NULL; node = node->next)
+	for(; node != nullptr; node = node->next)
 	{
         if(node->type != XML_ELEMENT_NODE)
         {
@@ -163,7 +163,7 @@ void _materialMapTree(xmlNodePtr root)
 {
     xmlNodePtr node = root;
 
-	for(; node != NULL; node = node->next)
+	for(; node != nullptr; node = node->next)
 	{
         if(node->type != XML_ELEMENT_NODE)
         {
@@ -202,7 +202,7 @@ LOGICAL materialsMapInit()
 
     SCHAR* name = "materialmap.xml";
 
-    xmlDocPtr doc = xmlReadFile(name, NULL, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
+    xmlDocPtr doc = xmlReadFile(name, nullptr, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
 
     if(doc)
     {
@@ -237,7 +237,7 @@ void _materialTree(xmlNodePtr root)
 {
     xmlNodePtr node = root;
 
-	for(; node != NULL; node = node->next)
+	for(; node != nullptr; node = node->next)
 	{
         if(node->type != XML_ELEMENT_NODE)
         {
@@ -261,7 +261,7 @@ LOGICAL obcInit()
 
     SCHAR* name = "materials.xml";
 
-    xmlDocPtr doc = xmlReadFile(name, NULL, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
+    xmlDocPtr doc = xmlReadFile(name, nullptr, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
 
     if(doc)
     {
@@ -463,13 +463,13 @@ char str[32];
 	matid = tv->matid;
 	if (!piIsMaterial(matid))
 	{
-		if (tv->matname != NULL && tv->matname[0] != 0)
+		if (tv->matname != nullptr && tv->matname[0] != 0)
 		{
 			matid = piFindMaterialName(tv->matname);
 			if (!piIsMaterial(matid))
 			{
 				Write_Debug("Material not found: %s\n", tv->matname);
-				return(NULL);
+				return(nullptr);
 			}
 		}
 	}
@@ -495,7 +495,7 @@ char str[32];
 	if (numverts == 0 || numverts < tv->numverts)
 	{
 		Write_Debug("Entity has too many vertices: %d, max: %d\n", tv->numverts, numverts);
-		return(NULL);
+		return(nullptr);
 	}
 
 	obcTextureFixup(tv);
@@ -510,7 +510,7 @@ char str[32];
 
 	obmainSetObject(lpobj, tv);
 
-    if (attached != NULL)
+    if (attached != nullptr)
 	{
 		obmainAttachObject(attached, lpobj);
 	}
@@ -525,7 +525,7 @@ char        filename[256]="";
 int         texid;
 OBJECT*    lpobj;
 
-	if (texname != NULL)
+	if (texname != nullptr)
 	{
 		strcpy(filename, texname);
 
@@ -539,9 +539,9 @@ OBJECT*    lpobj;
 	}
 
 	lpobj = obmainGetNewObject();
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
 	lpobj->matid = -1;
@@ -550,7 +550,7 @@ OBJECT*    lpobj;
 
 	if (!obsphCreate(name, MeshSize, Location, Scale, Color, lpobj))
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
 	obcTextureFixup(lpobj);
@@ -565,7 +565,7 @@ char        filename[256]="";
 int         texid;
 OBJECT*    lpobj;
 
-  if (texname != NULL)
+  if (texname != nullptr)
   {
 		strcpy(filename, texname);
 
@@ -574,7 +574,7 @@ OBJECT*    lpobj;
 		texid = ldpixLoadImageFileToSurface(filename, colorBLACK, LDPIX_MIPMAP);
 		if (!piIsTexture(texid, 0))
 		{
-			return(NULL);
+			return(nullptr);
 		}
 	}
 	else
@@ -583,9 +583,9 @@ OBJECT*    lpobj;
 	}
 
 	lpobj = obmainGetNewObject();
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
 	lpobj->matid = -1;
@@ -594,7 +594,7 @@ OBJECT*    lpobj;
 
 	if (!obsphCreateCylinder(name, MeshSize, Location, Scale, Ellipse, Color, lpobj))
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
 	obcTextureFixup(lpobj);
@@ -609,7 +609,7 @@ char        filename[256]="";
 int         texid;
 OBJECT*    lpobj;
 
-	if (texname != NULL)
+	if (texname != nullptr)
 	{
 		strcpy(filename, texname);
 
@@ -618,7 +618,7 @@ OBJECT*    lpobj;
 		texid = ldpixLoadImageFileToSurface(filename, colorBLACK, LDPIX_MIPMAP);
 		if (!piIsTexture(texid, 0))
 		{
-			return(NULL);
+			return(nullptr);
 		}
 	}
 	else
@@ -627,9 +627,9 @@ OBJECT*    lpobj;
 	}
 
 	lpobj = obmainGetNewObject();
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
 	lpobj->matid = -1;
@@ -638,7 +638,7 @@ OBJECT*    lpobj;
 
 	if (!obsphCreateHemi(name, MeshSize, Location, Scale, Ellipse, Color, lpobj))
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
 	obcTextureFixup(lpobj);
@@ -652,24 +652,24 @@ char        filename[256]="";
 int         texid;
 OBJECT*    lpobj;
 
-	if (texname != NULL)
+	if (texname != nullptr)
 	{
 		strcpy(filename, texname);
 		texid = ldpixLoadImageFileToSurface(filename, colorBLACK, LDPIX_MIPMAP);
 		if (!piIsTexture(texid, 0))
 		{
-			return(NULL);
+			return(nullptr);
 		}
 	}
 	else
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
 	lpobj = obmainGetNewObject();
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
 	lpobj->matid = -1;
@@ -678,7 +678,7 @@ OBJECT*    lpobj;
 
 	if (!obsphCreateVoxel(name, texname, MeshSize, Location, Scale, Depth, Color, lpobj))
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
 	obcTextureFixup(lpobj);
@@ -691,7 +691,7 @@ void obcTextureFixup(OBJECT* lpobj)
 int   i;
 float widthfactor, heightfactor;
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return;
 	}
@@ -718,12 +718,12 @@ void _modifymaterialElements(xmlNodePtr root)
 {
     xmlNodePtr node = root;
 
-    MATERIAL* materials = NULL;
+    MATERIAL* materials = nullptr;
     MATERIAL* mat;
 
     piGetMaterials(&materials);
 
-	for(; node != NULL; node = node->next)
+	for(; node != nullptr; node = node->next)
 	{
         if(node->type != XML_ELEMENT_NODE)
         {
@@ -848,7 +848,7 @@ void _modifymaterialTree(xmlNodePtr root)
 {
     xmlNodePtr node = root;
 
-	for(; node != NULL; node = node->next)
+	for(; node != nullptr; node = node->next)
 	{
         if(node->type != XML_ELEMENT_NODE)
         {
@@ -872,7 +872,7 @@ void _modifyMaterials()
 
     SCHAR* name = "materials.xml";
 
-    xmlDocPtr doc = xmlReadFile(name, NULL, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
+    xmlDocPtr doc = xmlReadFile(name, nullptr, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
 
     if(doc)
     {

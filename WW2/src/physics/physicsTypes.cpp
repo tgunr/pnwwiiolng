@@ -43,7 +43,7 @@ static unsigned int _totalVsize = 0;
 #endif //DEBUG_ODE_VERTEX_SHEARING
 
 /*
-static void _debugContact(Vec3d pos, Vec3d normal, UINT32 color = 0, const char* altName = NULL)
+static void _debugContact(Vec3d pos, Vec3d normal, UINT32 color = 0, const char* altName = nullptr)
 {
 	// physics object line
 	FLOAT64VECTOR v1, v2, temp;
@@ -193,7 +193,7 @@ void physicsModel::Deactivate()
 
 physicsBodyBase::physicsBodyBase() :
 	_expired(false),
-	_owner(NULL)
+	_owner(nullptr)
 {
 	_lastFreePos[0] = _lastFreePos[1] = _lastFreePos[2] = 0.0f;
 	_prevPos[0] = _prevPos[1] = _prevPos[2] = 0.0f;
@@ -220,7 +220,7 @@ physicsBodyBase::~physicsBodyBase()
 		delete _body;
 	}
 
-	_body = NULL;
+	_body = nullptr;
 }
 
 
@@ -645,7 +645,7 @@ dMass const* physicsBody::getMass() const
 dGeomID physicsBody::preCheck()
 {
 	if(!_velocity.length2())
-		return NULL;
+		return nullptr;
 
 	Vec3d pos = GetPosition(false);
 	Vec3d dir = _velocity;
@@ -655,7 +655,7 @@ dGeomID physicsBody::preCheck()
 	const colliderQuery::CollisionList& hits = collideRayList(COLLIDER_MOVE_MASK, .3f, pos, dir, true);
 
 	if(hits.empty())
-		return NULL;
+		return nullptr;
 
 	const colliderQuery::Collision& hit = hits.at(0);
 
@@ -680,7 +680,7 @@ dGeomID physicsBody::preCheck()
 		return hit.g2;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 dGeomID physicsBody::rayCheck()
@@ -691,7 +691,7 @@ dGeomID physicsBody::rayCheck()
 	dir = dir - start;
 
 	if(dir.length2() <= 0.0f)
-		return NULL;
+		return nullptr;
 
 	double len = dir.length();
 
@@ -700,7 +700,7 @@ dGeomID physicsBody::rayCheck()
 	const colliderQuery::CollisionList& hits = collideRayList(COLLIDER_MOVE_MASK, len, start, dir, true);
 
 	if(hits.empty())
-		return NULL;
+		return nullptr;
 
 	const colliderQuery::Collision& hit = hits.at(0);
 
@@ -759,7 +759,7 @@ dGeomID physicsBody::rayCheck()
 		return hit.g2;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /* old method
@@ -865,7 +865,7 @@ void physicsBody::BeginStep()
 	}
 
 	// reset this each frame so we can compare the next frame's _lastContact to it
-	_thisContact = NULL;
+	_thisContact = nullptr;
 
 	// clear out old contact joints
 	if(collideJoints)
@@ -1009,12 +1009,12 @@ physicsBody::physicsBody() : physicsBodyBase(),
 	_restitution(.5),
 	_enhancedCollisionCheck(true),
 	_collided(0),
-	_lastContact(NULL),
-	_thisContact(NULL),
+	_lastContact(nullptr),
+	_thisContact(nullptr),
 	_nextUpdate(0),
 	_speed(0),
 	_allHits(0),
-	collideJoints(NULL)
+	collideJoints(nullptr)
 {
 	// create our model's collider
 	collider = new colliderQuery;
@@ -1031,12 +1031,12 @@ physicsBody::physicsBody(UINT32 cat, UINT32 col) : physicsBodyBase(),
 	_restitution(.5),
 	_enhancedCollisionCheck(true),
 	_collided(0),
-	_lastContact(NULL),
-	_thisContact(NULL),
+	_lastContact(nullptr),
+	_thisContact(nullptr),
 	_nextUpdate(0),
 	_speed(0),
 	_allHits(0),
-	collideJoints(NULL)
+	collideJoints(nullptr)
 {
 	// create our model's collider
 	collider = new colliderQuery;
@@ -1056,12 +1056,12 @@ physicsBody::physicsBody(dSpaceID s, UINT32 cat, UINT32 col) : physicsBodyBase()
 	_restitution(.5),
 	_enhancedCollisionCheck(true),
 	_collided(0),
-	_lastContact(NULL),
-	_thisContact(NULL),
+	_lastContact(nullptr),
+	_thisContact(nullptr),
 	_nextUpdate(0),
 	_speed(0),
 	_allHits(0),
-	collideJoints(NULL)
+	collideJoints(nullptr)
 {
 	// create our model's collider
 	collider = new colliderQuery(s);
@@ -1218,7 +1218,7 @@ void physicsBody::makeCapsuleColliderFromObject(OBJECT* object, FLOAT32 scaler)
 // convenience function for single geom bodies
 dGeomID physicsBody::geom(int index)
 {
-	return (_geom) ? _geom->id(index) : NULL;
+	return (_geom) ? _geom->id(index) : nullptr;
 }
 
 // update OBJECT matrix fromphysics object
@@ -1613,7 +1613,7 @@ UINT32 physicsCollider::DetermineCategory(UINT32 cat, OBJECT* o)
 		cat |= COLLIDER_STO;
 
 	ModelInstance* mInstance = o->modelInstance;
-	const char* path = NULL;
+	const char* path = nullptr;
 
 	if(mInstance)
 	{
@@ -1696,7 +1696,7 @@ int physicsTransformCollider::create(OBJECT* o, piMATRIX* transform)
 		{
 			_nodeCollider = node->collider;
 
-			dGeomID nodeGeom = NULL;
+			dGeomID nodeGeom = nullptr;
 
 			for(int i = 0; i < _nodeCollider->geoms(); ++i)
 			{
@@ -1710,7 +1710,7 @@ int physicsTransformCollider::create(OBJECT* o, piMATRIX* transform)
 				dGeomTransformSetInfo(geom, 1); // collisions return the transform geom
 
 				// keep track of our transform geom
-				_geom.push_back(geomMesh(geom, NULL));
+				_geom.push_back(geomMesh(geom, nullptr));
 			}
 
 			// update our transform
@@ -1726,7 +1726,7 @@ int physicsTransformCollider::create(OBJECT* o, piMATRIX* transform)
 
 physicsShearedCollider::physicsShearedCollider(dSpaceID space, UINT32 cat, UINT32 col) :
 	physicsObjectCollider(space, cat, col),
-	_vertices(NULL)
+	_vertices(nullptr)
 {
 }
 
@@ -1735,7 +1735,7 @@ physicsShearedCollider::~physicsShearedCollider()
 	if(_vertices)
 		delete [] _vertices;
 
-	_vertices = NULL;
+	_vertices = nullptr;
 }
 
 void physicsShearedCollider::updateTransform(piMATRIX const& m)

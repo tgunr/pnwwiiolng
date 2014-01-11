@@ -2,7 +2,7 @@
 
 #include "colliderQuery.h"
 
-#define SPACE_DATA(s,t) ((s) ? ((t)*)dGeomGetData((dGeomID)(s)): NULL)
+#define SPACE_DATA(s,t) ((s) ? ((t)*)dGeomGetData((dGeomID)(s)): nullptr)
 
 extern int  colliderInit();
 void colliderKill();
@@ -34,15 +34,15 @@ extern bool colliderIsType(unsigned int catFlags, unsigned int checkFlags); // c
 
 // debug
 extern std::vector<std::string> colliderGetDescription(unsigned int flags);
-void colliderDebugContact(Vec3d pos, Vec3d normal, UINT32 color = 0, const char* altName = NULL, double scaler = .1f);
-void colliderDebugContact(const colliderQuery::Collision& contact, UINT32 color = 0, const char* altName = NULL, double scaler = .1f);
-void colliderDebugContact(dContact& contact, UINT32 color = 0, const char* altName = NULL, double scaler = .1f);
+void colliderDebugContact(Vec3d pos, Vec3d normal, UINT32 color = 0, const char* altName = nullptr, double scaler = .1f);
+void colliderDebugContact(const colliderQuery::Collision& contact, UINT32 color = 0, const char* altName = nullptr, double scaler = .1f);
+void colliderDebugContact(dContact& contact, UINT32 color = 0, const char* altName = nullptr, double scaler = .1f);
 
 template<class T>
 T* colliderData(dGeomID g)
 {
 	if(!g)
-		return NULL;
+		return nullptr;
 
 	return (T*)dGeomGetData(g);
 }
@@ -52,14 +52,14 @@ template<class T>
 T* colliderSpaceData(dGeomID g)
 {
 	if(!g)
-		return NULL;
+		return nullptr;
 
 	dSpaceID space = (dGeomIsSpace(g)) ?  (dSpaceID)g: colliderSpace(g);
 
 	if(space)
 		return (T*)dGeomGetData((dGeomID)space);
 
-	return NULL;
+	return nullptr;
 }
 
 // if you add to this list, make sure and update the final enumeration COLLIDER_COUNT and

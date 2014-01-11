@@ -115,7 +115,7 @@ void clientStrtQueueReleaseSupercell(int sx, int sy)
 /*
 void clientStrtCopyQuedData(TERRAIN_DETAIL* td)
 {
-	if(td == NULL) return;
+	if(td == nullptr) return;
 
 	CellBuildingStatus::iterator it =  _statusMap.find(std::make_pair(td->scx,td->scy));
 	if(it == _statusMap.end()) return;

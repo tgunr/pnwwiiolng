@@ -370,7 +370,7 @@ SINT32 vehIconDrawDeprecated(void)
     piSetRenderState(piRENDERSTATE_LIGHTING, FALSE);
     oglSetRenderState(oglRENDERSTATE_ALPHABLENDENABLE, TRUE);
 
-	for (CurrentVehicle = _VehicleHead; CurrentVehicle != NULL; CurrentVehicle = CurrentVehicle->getNext())
+	for (CurrentVehicle = _VehicleHead; CurrentVehicle != nullptr; CurrentVehicle = CurrentVehicle->getNext())
 	{
 		if(CurrentVehicle == PlayerVehicle || CurrentVehicle->MinVehicleLOD < 0 || CurrentVehicle->VehicleDeadTime)
 			continue;
@@ -420,7 +420,7 @@ SINT32 vehIconDrawDeprecated(void)
 	piSetWorldMatrix(&worldMat);
 
 	bool ProjecteGrenade = fpFPSCanProjectGrenade();
-    static TransformEffect* te = NULL;
+    static TransformEffect* te = nullptr;
 
     if(ProjecteGrenade)
     {
@@ -434,7 +434,7 @@ SINT32 vehIconDrawDeprecated(void)
         if(te)
         {
             te->kill();
-            te = NULL;
+            te = nullptr;
         }
     }
 
@@ -460,7 +460,7 @@ void vehIconDraw()
 
     piSetRenderStageState(0, piTSS_MIPFILTER, piTFP_NONE);
 
-    for(CurrentVehicle = _VehicleHead; CurrentVehicle != NULL; CurrentVehicle = CurrentVehicle->getNext())
+    for(CurrentVehicle = _VehicleHead; CurrentVehicle != nullptr; CurrentVehicle = CurrentVehicle->getNext())
     {
 	    if(CurrentVehicle == PlayerVehicle || CurrentVehicle->MinVehicleLOD < 0)
             continue;
@@ -470,7 +470,7 @@ void vehIconDraw()
 
 #if(0)
     bool ProjecteGrenade = fpFPSCanProjectGrenade();
-    static TransformEffect* te = NULL;
+    static TransformEffect* te = nullptr;
 
     if(ProjecteGrenade)
     {
@@ -484,7 +484,7 @@ void vehIconDraw()
         if(te)
         {
             te->kill();
-            te = NULL;
+            te = nullptr;
         }
     }
 #endif
@@ -614,7 +614,7 @@ static void _DrawVehicleIcon(vehVehicle* CurrentVehicle)
 		_DrawIconString(&Pos, size, -vOffset, uiUTF8toUTF16(CurrentVehicle->VehicleType->Icon), Color);
 }
 
-static vehVehicle* CV = NULL;
+static vehVehicle* CV = nullptr;
 
 static void _DrawVehicleIconDeprecated(vehVehicle* CurrentVehicle)
 {

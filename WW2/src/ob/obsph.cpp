@@ -48,7 +48,7 @@ LOGICAL obsphCreate(const char* name, int MeshSize, piVECTOR* Location, float Sc
 	lpobj->flags |= OBJECT_COLLISION;
 	lpobj->flags |= OBJECT_INDEXED;
 	lpobj->flags |= OBJECT_TRIANGLELIST;
-	if (name != NULL)
+	if (name != nullptr)
 		lstrcpy(lpobj->name, name);
 
 	lpobj->numverts = NumSphereVertices;
@@ -195,7 +195,7 @@ piVECTOR	loc;
 	lpobj->flags |= OBJECT_COLLISION;
 	lpobj->flags |= OBJECT_INDEXED;
 	lpobj->flags |= OBJECT_TRIANGLELIST;
-	if (name != NULL) lstrcpy(lpobj->name, name);
+	if (name != nullptr) lstrcpy(lpobj->name, name);
 	lpobj->numverts = NumSphereVertices;
 	lpobj->numtris  = NumSphereIndices / 3;
 	lpobj->ptris    = (piINDICES*)memAlloc(NumSphereIndices * sizeof(UINT16));;
@@ -336,7 +336,7 @@ piVECTOR loc;
 	lpobj->flags |= OBJECT_COLLISION;
 	lpobj->flags |= OBJECT_INDEXED;
 	lpobj->flags |= OBJECT_TRIANGLELIST;
-	if (name != NULL) lstrcpy(lpobj->name, name);
+	if (name != nullptr) lstrcpy(lpobj->name, name);
 
 	lpobj->numverts = NumSphereVertices;
 	lpobj->numtris  = NumSphereIndices / 3;
@@ -477,7 +477,7 @@ UINT16*		ptris;
 	lpobj->flags |= OBJECT_COLLISION;
 	lpobj->flags |= OBJECT_INDEXED;
 	lpobj->flags |= OBJECT_TRIANGLELIST;
-	if (name != NULL) lstrcpy(lpobj->name, name);
+	if (name != nullptr) lstrcpy(lpobj->name, name);
 	lpobj->numverts = NumSphereVertices;
 	lpobj->numtris  = NumSphereIndices / 3;
 	lpobj->ptris    = (piINDICES*)memAlloc(NumSphereIndices * sizeof(UINT16));

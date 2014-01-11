@@ -92,7 +92,7 @@ UINT16		  indices[6] = { 0, 1, 3, 1, 2, 3 };
 	}
 
 	// if there are any obscuring objects, don't show a flare
-	if (obcdObject(NULL, &p, &l))
+	if (obcdObject(nullptr, &p, &l))
 	{
 		return(TRUE);
 	}

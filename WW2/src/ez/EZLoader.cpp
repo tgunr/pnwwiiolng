@@ -62,7 +62,7 @@ EZLoader::EZLoader(const char* path) :
 	XMLLoader2<EZLoader>(path),
 	currentLevel(1),
 	maxLevelLoaded(0),
-	rootLoader(NULL)
+	rootLoader(nullptr)
 {
 	AddHandler("vehicle", &EZLoader::DoVehicle, this);
 	AddHandler("include", &EZLoader::DoInclude, this);
@@ -144,7 +144,7 @@ bool EZLoader::DoEZ(xmlNode* node, bool first, void* userData)
 		SINT32 position = -1;
 
 		if(xmlGetNodeValue(node, XML_DATA_SINT, &position, "position"))
-			DoPosition(node, true, NULL);
+			DoPosition(node, true, nullptr);
 	}
 
 	return true;
@@ -406,7 +406,7 @@ public:
 		AddHandler("vehicle", &EZManagerType::DoVehicle, this);
 
 		const char* dir = strstr((const char*)vtype->ModelDirectory, "/");
-		const char* filename = (dir) ? dir + 1 : NULL;
+		const char* filename = (dir) ? dir + 1 : nullptr;
 		bool found = false;
 
 		while(dir)

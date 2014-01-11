@@ -188,7 +188,7 @@ static void CollideDown(Vec3d pos, colliderQuery::CollisionList& collisions, con
 // New for ADD_DOT_COMMAND
 struct dotCmdInfo
 {
-	dotCmdInfo() : asciiFunc(NULL), wideFunc(NULL), locCmd(NULL), help(NULL), key(false)
+	dotCmdInfo() : asciiFunc(nullptr), wideFunc(nullptr), locCmd(nullptr), help(nullptr), key(false)
 	{
 	}
 
@@ -232,7 +232,7 @@ ARGV::ARGV(const char* utf8Source, UINT32 maxArguments, bool fillLastArgument)
 	, argc(0)
 {
 	ARGV_BASE::clear();
-	if ( utf8Source == NULL )
+	if ( utf8Source == nullptr )
 		return;
 
 	const wchar_t* source = uiUTF8toUTF16(utf8Source);
@@ -442,7 +442,7 @@ static SINT32 dot_conv(const wchar_t* line)
 	int argc = swscanf(line, L"%*ls %u", &range);
 
 	bool ingame = uiInGame();
-	const vehType* vtype = NULL;
+	const vehType* vtype = nullptr;
 
 	if(ingame)
 	{
@@ -854,7 +854,7 @@ static HCUnit* _lookupUnit(const std::wstring& name)
 {
 	ChatHandle handle = chatGetLowercaseHandle(name.c_str());
 	HCUnit* unit = HCUnit::Lookup(handle);
-	if ( unit == NULL )
+	if ( unit == nullptr )
 		_unknownBrigade(name);
 	return unit;
 }
@@ -878,7 +878,7 @@ static SINT32 dot_oicvolunteer(const char* line)
 		return _commandUsage(LSTR_OICVOL_USAGE, LSTR_OICVOL_DETAIL);
 
 	HCUnit* unit = _lookupUnit(argv[1]);
-	if ( unit == NULL )
+	if ( unit == nullptr )
 		return DC_HANDLED;
 
 	BrigadeControlRequest control;
@@ -897,7 +897,7 @@ static SINT32 dot_oicnominate(const char* line)
 		return _commandUsage(LSTR_OICNOM_USAGE, LSTR_OICNOM_DETAIL);
 
 	HCUnit* unit = _lookupUnit(argv[1]);
-	if ( unit == NULL )
+	if ( unit == nullptr )
 		return DC_HANDLED;
 	if ( chatIsValidCallsign(argv[2].c_str()) == false )
 	{
@@ -924,7 +924,7 @@ static SINT32 dot_oicveto(const char* line)
 		return _commandUsage(LSTR_OICVETO_USAGE, LSTR_OICVETO_DETAIL);
 
 	HCUnit* unit = _lookupUnit(argv[1]);
-	if ( unit == NULL )
+	if ( unit == nullptr )
 		return DC_HANDLED;
 
 	if ( chatIsValidCallsign(argv[2].c_str()) )
@@ -947,7 +947,7 @@ static SINT32 dot_oicresign(const char* line)
 	if ( argv.argc != 1 )
 		return _commandUsage(LSTR_OICRES_USAGE, LSTR_OICRES_DETAIL);
 	HCUnit* unit = _lookupUnit(argv[1]);
-	if ( unit == NULL )
+	if ( unit == nullptr )
 		return DC_HANDLED;
 
 	BrigadeControlRequest control;
@@ -988,7 +988,7 @@ static SINT32 dot_oicremove(const char* line)
 		return _commandUsage(LSTR_OICREM_USAGE, LSTR_OICREM_DETAIL);
 
 	HCUnit* unit = _lookupUnit(argv[1]);
-	if ( unit == NULL )
+	if ( unit == nullptr )
 		return DC_HANDLED;
 
 	if ( !chatIsValidCallsign(argv[2].c_str()) )
@@ -1243,7 +1243,7 @@ static SINT32 dot_spawn(const char* line)
 	}
 
 	vehType const* vehtype = vehTypeGetById(id);
-	if(vehtype == NULL)
+	if(vehtype == nullptr)
 	{
 		uiChatPrintLine("Invalid vehicle id specified!");
 		return DC_HANDLED;
@@ -1389,7 +1389,7 @@ static SINT32 dot_vspawn(const char* line)
 
 	for(int i = 0; i < (int)vehtypeCount(); i++)
 	{
-        vehType const* vehtype = NULL;
+        vehType const* vehtype = nullptr;
 
         vehtype = vehtypeGetByIndex(i);
 
@@ -1846,7 +1846,7 @@ static void CollideDown(Vec3d pos, colliderQuery::CollisionList& collisions, con
     {
         colliderQuery::CollisionList& c = collider.getCollisions();
 
-        dGeomID current = NULL;
+        dGeomID current = nullptr;
 
         for(unsigned int i = 0; i < c.size(); i++)
         {
@@ -1911,7 +1911,7 @@ static SINT32 dot_allinf(const char*)
 		"-para-lmg",
 		"-para-eng",
 		"-para-snpr",
-		NULL,
+		nullptr,
 		"-para-atr",
 		"-para-mrtr"
 	};
@@ -2612,7 +2612,7 @@ static SINT32 dot_inertia(const char* line)
 	{
 		if(!strcmp((char*)vehtypeGetByIndex(i)->Id, vehname))
 		{
-			OBJECT* PlaneObject = NULL, *massobj, *obj;
+			OBJECT* PlaneObject = nullptr, *massobj, *obj;
 			FILE* f;
 			char filename[256] = "\0";
 
@@ -2628,7 +2628,7 @@ static SINT32 dot_inertia(const char* line)
 
 			if(f)
 			{
-				obj = NULL;
+				obj = nullptr;
 				ogrpFindSubObjectByName(&massobj, PlaneObject,"lodc");
 				if(massobj)
 					ogrpFindSubObjectByName(&massobj, massobj,"mass");
@@ -2637,7 +2637,7 @@ static SINT32 dot_inertia(const char* line)
 
 				while(obj)
 				{
-					_CalcInertia(obj, f, TRUE, NULL, NULL, NULL);
+					_CalcInertia(obj, f, TRUE, nullptr, nullptr, nullptr);
 					obj = obj->sibling;
 				}
 				fprintf(f, "\n</masses>\n");
@@ -2657,7 +2657,7 @@ static SINT32 dot_inertia(const char* line)
 static SINT32 dot_exhaust(const char* line)
 {
     vehVehicle*pVeh = persGetPersonaVehiclePtr();
-	if(pVeh == NULL) return DC_ERROR;
+	if(pVeh == nullptr) return DC_ERROR;
 
     SCHAR szBuff[64];
     SINT32 i;
@@ -2669,7 +2669,7 @@ static SINT32 dot_exhaust(const char* line)
 
     for(i = 0; i < ML_MAX_ENGINES; i++)
     {
-        if(pVeh->StateAnimation.ExhaustSmokeEmitter[i] != NULL)
+        if(pVeh->StateAnimation.ExhaustSmokeEmitter[i] != nullptr)
         {
             pVeh->StateAnimation.ExhaustSmokeOn[i] = bOn;
         }
@@ -2870,10 +2870,10 @@ static SINT32 dot_hulkall(const char* line)
     {
         int id = *itr;
 
-        vehVehicle*veh = NULL;
+        vehVehicle*veh = nullptr;
         vehGetVehicleHead(&veh);
 
-        for(; veh != NULL; veh = veh->getNext())
+        for(; veh != nullptr; veh = veh->getNext())
         {
             if(veh->VehicleNum == -id)
             {
@@ -2937,10 +2937,10 @@ static SINT32 dot_hulk(const char* line)
 
     int id = atol(p);
 
-    vehVehicle*veh = NULL;
+    vehVehicle*veh = nullptr;
     vehGetVehicleHead(&veh);
 
-    for(; veh != NULL; veh = veh->getNext())
+    for(; veh != nullptr; veh = veh->getNext())
     {
         if(veh->VehicleNum == -id)
         {
@@ -3172,7 +3172,7 @@ static SINT32 dot_movevehicle(const char* line)
 
     std::set<int>::iterator find = vehicles.find(id);
 
-    vehVehicle*veh = NULL;
+    vehVehicle*veh = nullptr;
 
     if(find != vehicles.end())
     {
@@ -3491,14 +3491,14 @@ static int dot_duplicate(const char* line)
 
     veh->VehicleHostIndex;
 
-    vehVehicle* list = NULL;
+    vehVehicle* list = nullptr;
 
     vehGetVehicleHead(&list);
 
     uiChatPrintLine("Check for duplicate vehicle ids");
     bool found = false;
 
-    for(; list != NULL; list = list->getNext())
+    for(; list != nullptr; list = list->getNext())
     {
         if(list->IsMe())
             continue;
@@ -3570,7 +3570,7 @@ static int dot_bailout(const char* line)
     WorldPosition_m position(pos.x, pos.y, pos.z);
 	AttitudeVector attitude(0, 0, (FLOAT32)yaw);
 
-	const char* vid = NULL;
+	const char* vid = nullptr;
 
 	switch(country)
 	{
@@ -3588,7 +3588,7 @@ static int dot_bailout(const char* line)
 			break;
 	}
 
-	if(vid == NULL)
+	if(vid == nullptr)
 		return DC_HANDLED;
 
 	const vehType* vt = vehTypeGetById(vid);
@@ -3626,7 +3626,7 @@ static int dot_wtfamistandingon(const char* line)
         return DC_HANDLED;
     }
 
-    dGeomID current = NULL;
+    dGeomID current = nullptr;
 
     uiChatPrintLine("BEGIN");
 
@@ -3958,7 +3958,7 @@ static int dot_damagevehicle(const char* line)
 }
 
 // Spawn a building at 0,0,0
-static OBJECT* buildingobj = NULL;
+static OBJECT* buildingobj = nullptr;
 
 static SINT32 dot_tspawn(const char* input)
 {
@@ -3968,8 +3968,8 @@ static SINT32 dot_tspawn(const char* input)
     std::vector<omap::iterator> remove;
 
 	int							modelType		= 0;
-	static OBJECT*				masterInstance	= NULL;
-	PoolModel*					masterModel		= NULL;
+	static OBJECT*				masterInstance	= nullptr;
+	PoolModel*					masterModel		= nullptr;
 	piMATRIX					transform		= IdentityMatrix;
 	unsigned int				subModelIndex	= 0;
 
@@ -3989,7 +3989,7 @@ static SINT32 dot_tspawn(const char* input)
 			{
 				if((*itr)->modelInstance->GetModelType() != ModelTypes::TERRAIN_TILE)
 				{
-					trncdRemoveTerrainObject(*itr, 0, 0, 0, NULL);
+					trncdRemoveTerrainObject(*itr, 0, 0, 0, nullptr);
 					obpoolFreeObjectCallback(*itr);
 					remove.push_back(itr);
 				}
@@ -4000,7 +4000,7 @@ static SINT32 dot_tspawn(const char* input)
                 instances.erase(remove[i]);
             }
 
-            buildingobj = NULL;
+            buildingobj = nullptr;
 		    trndtl[12].terrain->flag2 &= ~OBJECT_VISIBLE;
 	    }
     }
@@ -4011,11 +4011,11 @@ static SINT32 dot_tspawn(const char* input)
 
 	    for(; itr != instances.end(); ++itr)
 	    {
-	        trncdRemoveTerrainObject(*itr, 0, 0, 0, NULL);
+	        trncdRemoveTerrainObject(*itr, 0, 0, 0, nullptr);
 	        obpoolFreeObjectCallback(*itr);
 	    }
 		instances.clear();
-        buildingobj = NULL;
+        buildingobj = nullptr;
 		trndtl[12].terrain->flag2 &= ~OBJECT_VISIBLE;
 	}
 #endif
@@ -4110,7 +4110,7 @@ static SINT32 dot_tspawn(const char* input)
         if(!activeTerrainDetail[i])
             continue;
 
-        if(trndtl[i].terrain == NULL)
+        if(trndtl[i].terrain == nullptr)
             continue;
 
         if(trndtl[i].scx == sx && trndtl[i].scy == sy)
@@ -4173,7 +4173,7 @@ static SINT32 dot_tspawn(const char* input)
             posxyz.y -= (float)WorldOriginOffset.y;
 	    }
 
-		trncdAddTerrainObject(buildingobj, 0, 0, 0, NULL);
+		trncdAddTerrainObject(buildingobj, 0, 0, 0, nullptr);
 
 		OBJECT* o = buildingobj->child;
 
@@ -4670,7 +4670,7 @@ static SINT32 dot_bdamage(const char* input)
 
     if(damage == 0)
     {
-        dot_reset(NULL);
+        dot_reset(nullptr);
     }
 
     rnmainListText("damage at %d", damage);
@@ -4938,7 +4938,7 @@ static SINT32 dot_set(const char* line)
 {
 	vehVehicle*veh = persGetPersonaVehiclePtr();
 	mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
-	if(veh == NULL || VehicleData == NULL) return DC_ERROR;
+	if(veh == nullptr || VehicleData == nullptr) return DC_ERROR;
 
 	char cmd[16];
 	FLOAT32 x,y,z;
@@ -4966,7 +4966,7 @@ static SINT32 dot_set(const char* line)
 static SINT32 dot_mvcmp(const char* line)
 {
 	mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
-	if(VehicleData == NULL) return DC_ERROR;
+	if(VehicleData == nullptr) return DC_ERROR;
 	FLOAT32 x,y,z;
 	int argc;
 	mlComponentListIterator it;
@@ -5042,7 +5042,7 @@ SINT32 dot_vehstats(const char* line)
 	for(i = 0; i < (int)vehtypeCount(); i++)
 	{
 		vehType const* vehtype;
-		OBJECT* PlaneObject = NULL;
+		OBJECT* PlaneObject = nullptr;
 		mlObjectData objdata;
 		FLOAT64VECTOR pos = {0,0,0};
 		FLOAT64ATT att = {0,0,0};
@@ -5083,7 +5083,7 @@ static SINT32 dot_slomo(const char* line)
 
 static SINT32 dot_rank(const char* line)
 {
-	vehVehicle*_VehicleHead = NULL, *CurrentVehicle;
+	vehVehicle*_VehicleHead = nullptr, *CurrentVehicle;
 	UINT32 Rank;
 	char handle[16];
 
@@ -5110,9 +5110,9 @@ static SINT32 dot_rank(const char* line)
 static SINT32 dot_ride(const char* line)
 {
 	vehVehicle*PlayerVehicle = persGetPersonaVehiclePtr();
-	if(PlayerVehicle == NULL) return DC_ERROR;
+	if(PlayerVehicle == nullptr) return DC_ERROR;
 
-	vehVehicle*_VehicleHead = NULL, *CurrentVehicle;
+	vehVehicle*_VehicleHead = nullptr, *CurrentVehicle;
 	char handle[16] = "";
 	UINT32 seatnum = 0;
 	UINT32 RideVehicleHostIndex = 0;
@@ -5330,7 +5330,7 @@ static void _PrintHitmap(OBJECT* obj, void* fp)
 
 void _PrintVehHitmap(vehType const* vehtype )
 {
-	OBJECT* PlaneObject = NULL, *hitmap, *obj;
+	OBJECT* PlaneObject = nullptr, *hitmap, *obj;
 	FILE* f;
 	char filename[256] = "\0";
 
@@ -5378,7 +5378,7 @@ typedef struct
 
 static void _ValidateVehHit(vehType const* vehtype)
 {
-	OBJECT* PlaneObject = NULL, *hitmap, *obj;
+	OBJECT* PlaneObject = nullptr, *hitmap, *obj;
 	char str[256] = "\0";
 	hitmapNameList list;
 	int fd, i;
@@ -6020,7 +6020,7 @@ static SINT32 dot_trntex(const char* line)
 	mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
 	if(!VehicleData) return DC_ERROR;
 
-	OBJECT* CollideObject = NULL;
+	OBJECT* CollideObject = nullptr;
 	piVECTOR V1,V2;
 	FLOAT64VECTOR WorldOriginOffset;
 
@@ -6029,7 +6029,7 @@ static SINT32 dot_trntex(const char* line)
 	V1.y = (FLOAT32)(VehicleData->VehiclePos.y - WorldOriginOffset.y);
 	V2 = V1; V2.z = 10000; V1.z = -10000;
 
-	trncdCollideWithVehiclesAndTerrain(&V1,&V2,NULL,&CollideObject,NULL,NULL,NULL,FALSE,TRUE, FALSE);
+	trncdCollideWithVehiclesAndTerrain(&V1,&V2,nullptr,&CollideObject,nullptr,nullptr,nullptr,FALSE,TRUE, FALSE);
 
 	if(CollideObject)
 		uiChatPrintLine("Texture: %s", CollideObject->texname);
@@ -6054,7 +6054,7 @@ static LOGICAL _CollideRoundWithTerrain(FASTCOLLIDE** CollideListPtr,  UINT32* N
 	if(trnopCollide(OldPos,NewPos,&CollidePnt,&CollideObject,&PolyNum) != 0)
 	{
 		(*CollideListPtr)[0].CollideObject = CollideObject;
-		(*CollideListPtr)[0].TopLevelObject = NULL;
+		(*CollideListPtr)[0].TopLevelObject = nullptr;
 		(*CollideListPtr)[0].PolyNum = PolyNum;
 		(*CollideListPtr)[0].CollideTime = 0;// this apparently isn't time but the t param of the collision point on the between old and new pos
 		(*CollideListPtr)[0].CollidePnt = CollidePnt;
@@ -6166,12 +6166,12 @@ static SINT32 dot_tps(const char* line)
 
     int id = -atol(buff);
 
-    vehVehicle*head = NULL;
-    vehVehicle*v = NULL;
+    vehVehicle*head = nullptr;
+    vehVehicle*v = nullptr;
 
     vehGetVehicleHead(&head);
 
-    for(; head != NULL; head = head->getNext())
+    for(; head != nullptr; head = head->getNext())
     {
         if(head->VehicleNum == id)
         {
@@ -6489,7 +6489,7 @@ static int dot_effect(const char* line)
         return 0;
     }
 
-    TransformEffect* te = NULL;
+    TransformEffect* te = nullptr;
 
     int lifetime = 0;
     Vec3d pos;
@@ -6546,7 +6546,7 @@ static int dot_effect(const char* line)
     }
     else
     {
-        te = TransformEffect::AddEffect(effect, n, lifetime, NULL);
+        te = TransformEffect::AddEffect(effect, n, lifetime, nullptr);
     }
 
     if(te)
@@ -6611,7 +6611,7 @@ static int dot_fire(const char* line)
 	AttVec.z = DEG_TO_RAD(traverse);
 	mathEul_ToMatrix(&FireAtt,EulOrdXYZs,&AttVec);
 
-	weapFireRound(&Recoil, AmmoType, &Pos, &Vel, &FireAtt, frametime/ 1000,  Flags, NULL, &Pos, 0, NULL);
+	weapFireRound(&Recoil, AmmoType, &Pos, &Vel, &FireAtt, frametime/ 1000,  Flags, nullptr, &Pos, 0, nullptr);
 
 	strncpy(LastAmmoName, AmmoName,63);
 	lastX = x; lastY = y; lastZ = z;
@@ -6634,7 +6634,7 @@ static int dot_float(const char* line)
 		{
 			if(veh->VehicleType->Type == VEH_TYPE_PERSON)
 			{
-				fpFPSAreaChecks(NULL, 0.0, true);
+				fpFPSAreaChecks(nullptr, 0.0, true);
 
 				if(fpsTrooper.parachuteWorn)
 				{
@@ -6687,7 +6687,7 @@ static int dot_ai(const char* line)
 static int dot_gizmo(const char* line)
 {
 	mlVehicleData* Vehicle = persGetPersonaModelDataPtr();
-	if(Vehicle == NULL) return DC_ERROR;
+	if(Vehicle == nullptr) return DC_ERROR;
 
 	int argc;
 	char subcmd[32] = "", state[32];
@@ -6796,7 +6796,7 @@ static int dot_aion(const char* line)
 static SINT32 dot_dev(const char* line)
 {
 	const char* p = strchr(line, ' ');
-	if(p == NULL)
+	if(p == nullptr)
 	{
 		uiChatPrintLine("/dev <weapon name>");
 		return DC_HANDLED;
@@ -6878,7 +6878,7 @@ static SINT32 dot_blendeditor(const char* line)
 	else
 	{
 		const char* p = strchr(line, ' ');
-		if(p == NULL || (p + 1) == NULL || !strlen(p + 1))
+		if(p == nullptr || (p + 1) == nullptr || !strlen(p + 1))
 		{
 			uiLoadView("blendeditselect");
 			//uiChatPrintLine("/blendedit <vid>");
@@ -7024,13 +7024,13 @@ static SINT32 dot_kit(const char* line)
 
 static SINT32 dot_time(const char* line)
 {
-	if (strchr(line, ' ') != NULL) return DC_PASS_TO_HOST;
+	if (strchr(line, ' ') != nullptr) return DC_PASS_TO_HOST;
 
 	// Grab the formatted "ctime" and remove the trailing eol
-	time_t now = time(NULL);
+	time_t now = time(nullptr);
 	wchar_t myTime[31];
 #if platOS == OS_WIN32
-	wcsftime(myTime, 30, L"%a %b %d %X %Y", localtime_r(&now, NULL));
+	wcsftime(myTime, 30, L"%a %b %d %X %Y", localtime_r(&now, nullptr));
 #else
   struct tm tmStruct;
 	wcsftime(myTime, 30, L"%a %b %d %X %Y", localtime_r(&now, &tmStruct));
@@ -7234,7 +7234,7 @@ static int dot_vcache(const char* line)
 #if defined(BETA_RELEASE)
 static int dot_vcount(const char* line)
 {
-	vehVehicle*_VehicleHead = NULL, *CurrentVehicle;
+	vehVehicle*_VehicleHead = nullptr, *CurrentVehicle;
 
 	char handle[16];
 	strcpy(handle, "unknown");
@@ -7420,10 +7420,10 @@ static int dot_vehprint(const char* line)
 
 	if(sscanf(line, "%*s %10s %32s", callsign, key) == 2)
 	{
-		vehVehicle* v = NULL;
+		vehVehicle* v = nullptr;
 		vehGetVehicleHead(&v);
 
-		for(; v != NULL; v = v->getNext())
+		for(; v != nullptr; v = v->getNext())
 		{
 			if(stricmp(callsign, (const char*)v->Handle) == 0)
 				break;
@@ -7443,7 +7443,7 @@ static int dot_vehprint(const char* line)
 			if(stats.fp)
 			{
 				fprintf(stats.fp, "Vehicle flag stats for %s\n", v->Handle);
-				OBJECT* top = NULL;
+				OBJECT* top = nullptr;
 
 				ogrpFindSubObjectByName(&top, PlaneObject,"visdamage");
 				if(top)
@@ -7638,8 +7638,8 @@ void uiDotCommandAdd(const char* cmdName, dotCmdFunctionA ascii, bool key)
 	dotCmdInfo info;
 
 	info.asciiFunc	= ascii;
-	info.locCmd		= NULL;
-	info.help		= NULL;
+	info.locCmd		= nullptr;
+	info.help		= nullptr;
     info.key		= key;
 
 	// convert it to a wide string for easy lookup later
@@ -7653,8 +7653,8 @@ void uiDotCommandAdd(const char* cmdName, dotCmdFunctionW wide, bool key)
 	dotCmdInfo info;
 
 	info.wideFunc	= wide;
-	info.locCmd		= NULL;
-	info.help		= NULL;
+	info.locCmd		= nullptr;
+	info.help		= nullptr;
     info.key		= key;
 
 	// convert it to a wide string for easy lookup later
@@ -7673,7 +7673,7 @@ int uiDotCommand(const wchar_t* line)
 		return DC_PASS_TO_HOST;
 
 	wchar_t cmd[DOT_COMMAND_SIZE+1] = L"";
-	wchar_t* pcmd = NULL;
+	wchar_t* pcmd = nullptr;
 	int result = DC_PASS_TO_HOST;
 
 	if(swscanf(line, L"%255ls", cmd) == 0)
@@ -8202,8 +8202,8 @@ void uiDotCommandsInitLoc()
 
 		const std::wstring& loc = uiLocString(locKey.c_str());
 
-		it->second.locCmd	= NULL;
-		it->second.help	= NULL;
+		it->second.locCmd	= nullptr;
+		it->second.help	= nullptr;
 
 		if(loc.size() && loc[0] != L'?')
 			it->second.locCmd = loc.c_str();

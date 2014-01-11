@@ -4,7 +4,7 @@
 #include "ogl/oglVertexBuffer.h"
 #include "math/SuperFastHash.h"
 
-#define BUFFER_OFFSET(i) ((char*)NULL + (i))
+#define BUFFER_OFFSET(i) ((char*)nullptr + (i))
 
 namespace ogl
 {
@@ -156,7 +156,7 @@ namespace ogl
 
 			UINT32	GetVertexType()			const	{return vertexType;}
 			UINT32	GetVertexSize()			const	{return vertexSize;}
-			LOGICAL	IsBuffered()			const	{return staticBuffer != NULL;}
+			LOGICAL	IsBuffered()			const	{return staticBuffer != nullptr;}
 
 			void	Draw() const;
             void DrawInstanced(int primcount) const;

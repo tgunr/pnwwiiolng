@@ -49,7 +49,7 @@ static wchar_t*
 _readString(const char* name, wchar_t* p, std::wstring& into, bool allowSpaces)
 {
 	into.clear();
-	if ( p == NULL )
+	if ( p == nullptr )
 		throw region_error(name, "No data for column");
 
 	// Skip leading spaces
@@ -60,7 +60,7 @@ _readString(const char* name, wchar_t* p, std::wstring& into, bool allowSpaces)
 
 	// Chop the string at the first ','
 	wchar_t* end = wcschr(p, ',');
-	if ( end != NULL )
+	if ( end != nullptr )
 		*(end++) = 0;
 
 	into = p;
@@ -96,8 +96,8 @@ CRegionSelect::ReadRegionsFile()
 
 	const wchar_t* regionsTxt = L"\\regions.txt";
 	std::wstring filename = g_exePath + regionsTxt;
-	FILE *fp = NULL;
-	if ( _wfopen_s(&fp, filename.c_str(), L"r, ccs=UTF-8") != 0 || fp == NULL )
+	FILE *fp = nullptr;
+	if ( _wfopen_s(&fp, filename.c_str(), L"r, ccs=UTF-8") != 0 || fp == nullptr )
 	{
 		dbugLog(_FLI, "No %s", asUTF8(filename.c_str()));
 		return true;
@@ -115,7 +115,7 @@ CRegionSelect::ReadRegionsFile()
 			++p;
 
 		wchar_t* comment = wcschr(p, '#');
-		if ( comment != NULL )
+		if ( comment != nullptr )
 		{
 			*comment = 0;
 		}
@@ -152,7 +152,7 @@ CRegionSelect::ReadRegionsFile()
 
 IMPLEMENT_DYNAMIC(CRegionSelect, CDialog)
 
-CRegionSelect::CRegionSelect(CWnd* pParent /*=NULL*/)
+CRegionSelect::CRegionSelect(CWnd* pParent /*=nullptr*/)
 	: CBDialog(CRegionSelect::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CRegionSelect)
@@ -195,11 +195,11 @@ static bool _lookupAuthHost()
 	g_authPort = WWII::Net::Ports::AuthHost;
 
 	UINT32* ipList = teulGetHostByName(g_region.authSuffix().c_str());
-	if ( ipList == NULL || NULL == *ipList )
+	if ( ipList == nullptr || NULL == *ipList )
 	{
 		sprintf_s(g_authHostName, 256, "auth%s", g_region.authSuffix().c_str());
 		ipList = teulGetHostByName(g_authHostName);
-		if ( NULL == ipList || NULL == *ipList )
+		if ( nullptr == ipList || NULL == *ipList )
 		{
 			dbugLog(_FLW, "lookup(%s) no addresses", g_authHostName);
 			return false;
@@ -220,7 +220,7 @@ static bool _lookupAuthHost()
 void CRegionSelect::OnOK()
 {
 	CListBox* lb = (CListBox*)GetDlgItem(IDC_REGION_LIST);
-	assert( lb != NULL );
+	assert( lb != nullptr );
 
 	UINT32 regionNo = lb->GetCurSel();
 	g_region = g_regions[regionNo];
@@ -265,7 +265,7 @@ RegionSelect()
 	if ( CRegionSelect::ReadRegionsFile() == false )
 	{
 		dbugLog(_FLW, "No region selection - bailing");
-		MessageBox(NULL, GetLoc(ERROR_SELECTION), GetLoc(ERROR_SELECTION_T), MB_ICONSTOP|MB_OK);
+		MessageBox(nullptr, GetLoc(ERROR_SELECTION), GetLoc(ERROR_SELECTION_T), MB_ICONSTOP|MB_OK);
 		return false;
 	}
 
@@ -283,7 +283,7 @@ RegionSelect()
 		g_region = g_regions[0];
 		if ( !_lookupAuthHost() )
 		{
-			MessageBox(NULL, GetLoc(ERROR_AUTH_SERVER), GetLoc(ERROR_AUTH), MB_ICONSTOP|MB_OK);
+			MessageBox(nullptr, GetLoc(ERROR_AUTH_SERVER), GetLoc(ERROR_AUTH), MB_ICONSTOP|MB_OK);
 			playgate.StartBrowser(ERR_AUTH_RESOLVE);
 			return false;
 		}
@@ -293,7 +293,7 @@ RegionSelect()
 	CRegionSelect dlg;
 	hMainWnd = &dlg;
 	bool result = ( dlg.DoModal() == IDOK );
-	hMainWnd = NULL;
+	hMainWnd = nullptr;
 
 	return result;
 }

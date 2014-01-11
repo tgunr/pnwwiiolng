@@ -103,13 +103,13 @@ void DoHitSound(FLOAT64VECTOR* Pos, FLOAT32 Energy,	const char* TextureName)
 	FLOAT32 MaxVolumeEnergy;
 	FLOAT32 Volume;
 
-	HitSoundName = NULL;
+	HitSoundName = nullptr;
 	mlGetRandomHitSound(&HitSoundName,
 						&MinVolume,
 						&MaxVolumeEnergy,
 						TextureName);
 
-	if (HitSoundName == NULL)
+	if (HitSoundName == nullptr)
 	{
 		return;
 	}
@@ -302,11 +302,11 @@ LOGICAL _InitFlashObjs()
 
 void _updateVehicleFlash(OBJECT* o, vehVehicle* veh)
 {
-	if(veh == NULL) return;
+	if(veh == nullptr) return;
 	if(!veh->InUse) return;
 
-	if(veh->VehicleObjectData == NULL) return;
-	if(veh->VehicleObjectData->PlaneObject == NULL) return;
+	if(veh->VehicleObjectData == nullptr) return;
+	if(veh->VehicleObjectData->PlaneObject == nullptr) return;
 
 	piVECTOR dir;
 	FLOAT64VECTOR gunpos;
@@ -401,11 +401,11 @@ void _updateTroopFlash(OBJECT* o, vehVehicle* veh)
 {
 	piMATRIX firept = IdentityMatrix;
 
-	if(veh == NULL) return;
+	if(veh == nullptr) return;
 	if(!veh->InUse) return;
 
-	if(veh->VehicleObjectData == NULL) return;
-	if(veh->VehicleObjectData->PlaneObject == NULL) return;
+	if(veh->VehicleObjectData == nullptr) return;
+	if(veh->VehicleObjectData->PlaneObject == nullptr) return;
 
 	if(o->feature) // Using this variable to declare ghost rounds
 	{
@@ -426,7 +426,7 @@ void _updateTroopFlash(OBJECT* o, vehVehicle* veh)
 	piMATRIX fireatt = IdentityMatrix;
 
 	// Get player attitude and position
-	if(veh->ModelData == NULL)
+	if(veh->ModelData == nullptr)
 	{
 		fireatt = veh->PosData.AttMat;
 		player = veh->PosData.Pos;
@@ -577,7 +577,7 @@ static bool _updateDebris(OBJECT* o)
 	{
 		o->soundID = 0;
 		o->treeID = 0;
-		o->updatecallback = NULL; // Removes from obmainUpdate
+		o->updatecallback = nullptr; // Removes from obmainUpdate
 		fxUtlSetMatrixInTree(o, &IdentityMatrix);
 		obmainMoveToNotObjectTree(o);
 
@@ -704,8 +704,8 @@ LOGICAL weapfxOkForDebris(weapAmmo const* pAmmo, void* pVehicle)
 	vehVehicle*pVeh = (vehVehicle*)pVehicle;
 
 	// Currently only supported for aircraft hits.
-	if(pVeh == NULL) return FALSE;
-	if(pVeh->VehicleType == NULL) return FALSE;
+	if(pVeh == nullptr) return FALSE;
+	if(pVeh->VehicleType == nullptr) return FALSE;
 
 	// Valid for sea and air for now
 	switch(pVeh->VehicleType->Type)
@@ -860,7 +860,7 @@ void _DebrisKillCallback(void* data)
 {
 	OBJECT* o = (OBJECT*)data;
 
-	if(o == NULL)
+	if(o == nullptr)
 	{
 		return;
 	}
@@ -877,7 +877,7 @@ void weapfxFlashKillCallback(void* data)
 {
 	OBJECT* o = (OBJECT*)data;
 
-	if(o == NULL)
+	if(o == nullptr)
 	{
 		return;
 	}
@@ -893,7 +893,7 @@ OBJECT* _GetFreeDebris()
 {
 	if(_freedebris.empty())
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	OBJECT* o = _freedebris.front();
@@ -904,13 +904,13 @@ OBJECT* _GetFreeDebris()
 
 static void ReleaseFlash(OBJECT* o)
 {
-	o->dof = NULL;
-	o->lpspare = NULL;
+	o->dof = nullptr;
+	o->lpspare = nullptr;
 	o->rot.x = 0;
 	o->feature = 0;
-	o->shadow = NULL;
-	o->killcallback = NULL;
-	o->updatecallback = NULL;
+	o->shadow = nullptr;
+	o->killcallback = nullptr;
+	o->updatecallback = nullptr;
 
 	_freeflash.push_back(o);
 	obmainMoveToNotObjectTree(o);
@@ -923,17 +923,17 @@ OBJECT* _GetFreeFlash()
 {
 	if(_freeflash.empty())
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	OBJECT* o = _freeflash.front();
 	_freeflash.pop_front();
 
-	o->dof = NULL;
-	o->lpspare = NULL;
+	o->dof = nullptr;
+	o->lpspare = nullptr;
 	o->rot.x = 0;
 	o->feature = 0;
-	o->shadow = NULL;
+	o->shadow = nullptr;
 
 	return o;
 }
@@ -1016,7 +1016,7 @@ void weapfxRicochetEffect(const weapAmmo& Ammo, const FASTCOLLIDE& collide, cons
 
 		math3dMultiplyRotation(&n, &n, &o->mat);
 
-		TransformEffect* te = TransformEffect::AddEffect(effect, Vec3f(n), 0, NULL);
+		TransformEffect* te = TransformEffect::AddEffect(effect, Vec3f(n), 0, nullptr);
 
 		if(te)
 		{
@@ -1100,7 +1100,7 @@ UINT32 weapfxAmmoHit(weapAmmo const* Ammo,
 						n.fastnormalize();
 						n *= scale;
 
-						TransformEffect* te = TransformEffect::AddEffect("trooperhit", n, 0, NULL);
+						TransformEffect* te = TransformEffect::AddEffect("trooperhit", n, 0, nullptr);
 
 						if(te)
 						{
@@ -1113,7 +1113,7 @@ UINT32 weapfxAmmoHit(weapAmmo const* Ammo,
 						}
 					}
 				}
-				//FXDoHitEffect(&Pos, KE, NULL, lpFast->CollideObject, lpFast->PolyNum, "fps");
+				//FXDoHitEffect(&Pos, KE, nullptr, lpFast->CollideObject, lpFast->PolyNum, "fps");
 
 				// same side twich effects if I fired at the vehicle
 				if(Ammo->FireVehicle &&
@@ -1173,7 +1173,7 @@ UINT32 weapfxAmmoHit(weapAmmo const* Ammo,
 		}
 	}
 
-	if(Vehicle == NULL || Vehicle->VehicleType->Type != VEH_TYPE_PERSON)
+	if(Vehicle == nullptr || Vehicle->VehicleType->Type != VEH_TYPE_PERSON)
 	{
 		piVECTOR u;
 
@@ -1198,7 +1198,7 @@ UINT32 weapfxAmmoHit(weapAmmo const* Ammo,
 				n.set((float)-Ammo->Velocity.x, (float)-Ammo->Velocity.y, (float)-Ammo->Velocity.z);
 				n.fastnormalize();
 
-				TransformEffect* te = TransformEffect::AddEffect("genericbullethit", n, 0, NULL);
+				TransformEffect* te = TransformEffect::AddEffect("genericbullethit", n, 0, nullptr);
 
 				if(te)
 				{
@@ -1238,7 +1238,7 @@ UINT32 weapfxAmmoHit(weapAmmo const* Ammo,
 			}
 		}
 
-		if(lpFast->CollideObject && lpFast->CollideObject->psnorms == NULL)
+		if(lpFast->CollideObject && lpFast->CollideObject->psnorms == nullptr)
 			return 0;
 
 		if(lpFast->CollideObject)
@@ -1271,7 +1271,7 @@ UINT32 weapfxAmmoHit(weapAmmo const* Ammo,
 				   Ammo->AmmoType->SubType != WEAPAMMO_SUBTYPE_KNIFE)
 				{
 					TransformEffect* te;
-					te = TransformEffect::AddEffect("genericbullethit", Vec3f(u), 0, NULL);
+					te = TransformEffect::AddEffect("genericbullethit", Vec3f(u), 0, nullptr);
 
 					if(te)
 					{
@@ -1315,10 +1315,10 @@ UINT32 weapfxAmmoHit(weapAmmo const* Ammo,
 		}
 	}
 
-	if(Vehicle == NULL)
+	if(Vehicle == nullptr)
 		return 0;
 
-	if(Vehicle->VehicleType == NULL)
+	if(Vehicle->VehicleType == nullptr)
 		return 0;
 
 #define MAX_DISTANCE2_TO_DISPLAY_BLOOD 4
@@ -1385,11 +1385,11 @@ UINT32 weapfxAmmoExplosion(weapAmmo const* Ammo, FLOAT64VECTOR const* Pos, FASTC
 		return 0;
 
 	// Vehicle/Ground hit
-	if(lpFast != NULL)
+	if(lpFast != nullptr)
 	{
 		piVECTOR n = {1.0f, 0.0f, 0.0f};
 
-		if(lpFast->CollideObject && lpFast->CollideObject->psnorms != NULL)
+		if(lpFast->CollideObject && lpFast->CollideObject->psnorms != nullptr)
 		{
 			n = lpFast->CollideObject->psnorms[lpFast->PolyNum];
 
@@ -1403,7 +1403,7 @@ UINT32 weapfxAmmoExplosion(weapAmmo const* Ammo, FLOAT64VECTOR const* Pos, FASTC
 		}
 		else
 		{
-			weapfxExplosion(Ammo, Pos, NULL, FALSE);
+			weapfxExplosion(Ammo, Pos, nullptr, FALSE);
 		}
 	}
 	// Special case with satchels
@@ -1414,7 +1414,7 @@ UINT32 weapfxAmmoExplosion(weapAmmo const* Ammo, FLOAT64VECTOR const* Pos, FASTC
 	// Air burst
 	else
 	{
-		weapfxExplosion(Ammo, Pos, NULL, FALSE);
+		weapfxExplosion(Ammo, Pos, nullptr, FALSE);
 	}
 
 	physicsAddWorldForce(*Pos, (FLOAT64)Ammo->AmmoType->ExplosiveEnergy);
@@ -1457,7 +1457,7 @@ UINT32 weapfxAmmoTracer(weapAmmo* Ammo, FLOAT64VECTOR const* LastPosition)
 		FXCreateNewParticle(&TempVec1,
 							&Stretch,
 							0.0f,
-							NULL,
+							nullptr,
 							0.2f,
 							0.1f,
 							0.05f,
@@ -1471,10 +1471,10 @@ UINT32 weapfxAmmoTracer(weapAmmo* Ammo, FLOAT64VECTOR const* LastPosition)
 							frametime + 400,
 							frametime + 800,
 							15,//12,
-							NULL,
+							nullptr,
 							PARTICLE_FLAG_USE_VEL_FOR_STRETCH |
 								PARTICLE_FLAG_AT_LEAST_1_PIXEL,
-							NULL);
+							nullptr);
 #endif
 	}
 
@@ -1488,7 +1488,7 @@ UINT32 weapfxAmmoTracer(weapAmmo* Ammo, FLOAT64VECTOR const* LastPosition)
 
 	if(Ammo->iParticleID == 0 && Ammo->AmmoType->TracerTime > 0.0f)
 	{
-		TransformEffect* te = NULL;
+		TransformEffect* te = nullptr;
 
 		Vec3f stretch(Stretch);
 		stretch = -stretch;
@@ -1521,7 +1521,7 @@ UINT32 weapfxAmmoTracer(weapAmmo* Ammo, FLOAT64VECTOR const* LastPosition)
 			pe2->separation = len;
 		}
 
-		te = TransformEffect::AddEffect("tracer", stretch, 0, NULL);
+		te = TransformEffect::AddEffect("tracer", stretch, 0, nullptr);
 
 		if(te)
 		{
@@ -1736,9 +1736,9 @@ UINT32 weapfxAmmoMuzzleFlash(weapAmmo const* Ammo,
 	// Hack until all muzzle flashes are done.
 	LOGICAL bNewMuzzleFlash = FALSE;
 
-	if(pVeh != NULL)
+	if(pVeh != nullptr)
 	{
-		if(pVeh->VehicleType != NULL)
+		if(pVeh->VehicleType != nullptr)
 		{
 			switch(pVeh->VehicleType->Type)
 			{
@@ -1759,7 +1759,7 @@ UINT32 weapfxAmmoMuzzleFlash(weapAmmo const* Ammo,
 	// i.e., 'muzzelflash = muzzlesmoke' instead of 'muzzleflash = 1'.
 	if(!(Ammo->Flags & WEAP_AMMOFLAG_NOMUZZLEFLASH))
 	{
-		if (EmitterObject != NULL)
+		if (EmitterObject != nullptr)
 		{
 			if(Ammo->AmmoType->MuzzleFlashType == WEAP_MUZZLEFLASH_GUN)
 			{
@@ -1783,7 +1783,7 @@ UINT32 weapfxAmmoMuzzleFlash(weapAmmo const* Ammo,
 				n.set(float(Ammo->Velocity.x), float(Ammo->Velocity.y), float(-Ammo->Velocity.z));
 				n.fastnormalize();
 
-				TransformEffect* te = TransformEffect::AddEffect("mortarflash", n, 0, NULL);
+				TransformEffect* te = TransformEffect::AddEffect("mortarflash", n, 0, nullptr);
 
 				if(te)
 				{
@@ -1801,7 +1801,7 @@ UINT32 weapfxAmmoMuzzleFlash(weapAmmo const* Ammo,
 				n.set(float(Ammo->Velocity.x), float(Ammo->Velocity.y), float(-Ammo->Velocity.z));
 				n.fastnormalize();
 
-				TransformEffect* te = TransformEffect::AddEffect("smalltankgunflash", n, 0, NULL);
+				TransformEffect* te = TransformEffect::AddEffect("smalltankgunflash", n, 0, nullptr);
 
 				if(te)
 				{
@@ -1826,7 +1826,7 @@ UINT32 weapfxAmmoMuzzleFlash(weapAmmo const* Ammo,
 						n.set(float(Ammo->Velocity.x), float(Ammo->Velocity.y), float(-Ammo->Velocity.z));
 						n.fastnormalize();
 
-						TransformEffect* te = TransformEffect::AddEffect("mortarflash", n, 0, NULL);
+						TransformEffect* te = TransformEffect::AddEffect("mortarflash", n, 0, nullptr);
 
 						if(te)
 						{
@@ -1854,7 +1854,7 @@ UINT32 weapfxAmmoMuzzleFlash(weapAmmo const* Ammo,
 						n.set(float(Ammo->Velocity.x), float(Ammo->Velocity.y), float(-Ammo->Velocity.z));
 						n.fastnormalize();
 
-						TransformEffect* te = TransformEffect::AddEffect("smalltankgunflash", n, 0, NULL);
+						TransformEffect* te = TransformEffect::AddEffect("smalltankgunflash", n, 0, nullptr);
 
 						if(te)
 						{
@@ -1870,7 +1870,7 @@ UINT32 weapfxAmmoMuzzleFlash(weapAmmo const* Ammo,
 					}
 				default:
 					{
-						_CreateMuzzleFlash(Ammo, NULL, &Ammo->Position);
+						_CreateMuzzleFlash(Ammo, nullptr, &Ammo->Position);
 					}
 				}
 			}
@@ -1885,7 +1885,7 @@ UINT32 weapfxAmmoMuzzleFlash(weapAmmo const* Ammo,
 						n.set(float(Ammo->Velocity.x), float(Ammo->Velocity.y), float(-Ammo->Velocity.z));
 						n.fastnormalize();
 
-						TransformEffect* te = TransformEffect::AddEffect(weapon->WeaponType->muzzleflash, n, 0, NULL);
+						TransformEffect* te = TransformEffect::AddEffect(weapon->WeaponType->muzzleflash, n, 0, nullptr);
 
 						if(te)
 						{
@@ -1941,7 +1941,7 @@ SINT32 _CreateTankGunFlash(const weapAmmo* pAmmo, OBJECT* o, const FLOAT64VECTOR
 
 	mathReallyFastNormalize(vDir);
 
-	TransformEffect* te = TransformEffect::AddEffect("tankgunflash", Vec3f(vDir), 0, NULL);
+	TransformEffect* te = TransformEffect::AddEffect("tankgunflash", Vec3f(vDir), 0, nullptr);
 
 	if(te)
 	{
@@ -1989,7 +1989,7 @@ SINT32 _CreateBigGunFlash(const weapAmmo* pAmmo, OBJECT* o, const FLOAT64VECTOR*
 
 	mathReallyFastNormalize(vDir);
 
-	TransformEffect* te = TransformEffect::AddEffect("biggunflash", Vec3f(vDir), 0, NULL);
+	TransformEffect* te = TransformEffect::AddEffect("biggunflash", Vec3f(vDir), 0, nullptr);
 
 	if(te)
 	{
@@ -2012,7 +2012,7 @@ SINT32 _CreateBigGunFlash(const weapAmmo* pAmmo, OBJECT* o, const FLOAT64VECTOR*
 *************************************************************************************************/
 UINT32 _CreateMuzzleFlash(weapAmmo const* pAmmo, OBJECT* o, const FLOAT64VECTOR* pos)
 {
-	if(pAmmo == NULL)
+	if(pAmmo == nullptr)
 		return 1;
 
 	OBJECT* fx = _GetFreeFlash();
@@ -2052,7 +2052,7 @@ UINT32 _CreateMuzzleFlash(weapAmmo const* pAmmo, OBJECT* o, const FLOAT64VECTOR*
 	fxPclSetPosition(id, position.x, position.y, position.z);
 	fxPclSetAmmoFlags(id, pAmmo->Flags);
 
-	if(o != NULL)
+	if(o != nullptr)
 	{
 		fxPclSetEmitterObject(id, o);
 		fxPclSetDOFObject(id, o->dof);
@@ -2102,7 +2102,7 @@ UINT32 _CreateMuzzleFlash(weapAmmo const* pAmmo, OBJECT* o, const FLOAT64VECTOR*
 
 	scale = (FLOAT32)(pow(intensity, 0.333333f) * 2.0) * 0.008f;
 
-	fx->updatecallback = NULL;
+	fx->updatecallback = nullptr;
 
 	if(pAmmo->FireVehicle)
 	{
@@ -2160,7 +2160,7 @@ UINT32 weapfxAmmoWaterSplash(weapAmmo const* Ammo, FLOAT64VECTOR const* CollideP
 	{
 		Vec3f n(0, 0, -1);
 
-		TransformEffect* te = TransformEffect::AddEffect("shellwaterhit", n, 0, NULL);
+		TransformEffect* te = TransformEffect::AddEffect("shellwaterhit", n, 0, nullptr);
 
 		if(te)
 		{
@@ -2186,7 +2186,7 @@ UINT32 weapfxAmmoWaterSplash(weapAmmo const* Ammo, FLOAT64VECTOR const* CollideP
 
 		Vec3f n(0, 0, -1);
 
-		TransformEffect* te = TransformEffect::AddEffect("watersplash", n, 0, NULL);
+		TransformEffect* te = TransformEffect::AddEffect("watersplash", n, 0, nullptr);
 
 		if(te)
 		{
@@ -2231,9 +2231,9 @@ UINT32 weapfxAmmoWaterSplash(weapAmmo const* Ammo, FLOAT64VECTOR const* CollideP
 
 UINT32 weapfxAmmoAttachSound(weapAmmo* Ammo)
 {
-	if(Ammo == NULL) return 1;
-	if(Ammo->AmmoType == NULL) return 1;
-	if(Ammo->AmmoType->Object == NULL) return 1;
+	if(Ammo == nullptr) return 1;
+	if(Ammo->AmmoType == nullptr) return 1;
+	if(Ammo->AmmoType->Object == nullptr) return 1;
 
 	// Bomb whistle
 	if(Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_BOMB)
@@ -2515,7 +2515,7 @@ UINT32 AddBulletDecal(weapAmmo const* lpAmmo,
 
 		float size = pow(joules, expo);
 
-		TransformEffect* te = TransformEffect::AddEffect("waterhit", n, 0, NULL);
+		TransformEffect* te = TransformEffect::AddEffect("waterhit", n, 0, nullptr);
 
 		if(te)
 		{
@@ -2535,7 +2535,7 @@ UINT32 AddBulletDecal(weapAmmo const* lpAmmo,
 			pe1->size[2] = pe1->size[1] + size;
 			pe1->size[3] = pe1->size[2] + size;
 
-			Emitter* e = NULL;
+			Emitter* e = nullptr;
 
 			for(int i = 0; te->getemitter(i); i++)
 			{
@@ -2565,7 +2565,7 @@ UINT32 AddBulletDecal(weapAmmo const* lpAmmo,
 
 	if(usehiteffect && lpAmmo->AmmoType->hiteffect[0])
 	{
-		TransformEffect* te = TransformEffect::AddEffect(lpAmmo->AmmoType->hiteffect, Vec3f(n), 0, NULL);
+		TransformEffect* te = TransformEffect::AddEffect(lpAmmo->AmmoType->hiteffect, Vec3f(n), 0, nullptr);
 
 		if(te)
 		{
@@ -2752,7 +2752,7 @@ UINT32 weapfxAmmoHitMark(weapAmmo const* Ammo,
 			}
 		case WEAPAMMO_SUBTYPE_BOMB:
 			{
-				TransformEffect* te = TransformEffect::AddEffect("bigshellwaterhit", Vec3f(0, 0, -1), 0, NULL);
+				TransformEffect* te = TransformEffect::AddEffect("bigshellwaterhit", Vec3f(0, 0, -1), 0, nullptr);
 
 				if(te)
 				{
@@ -2767,7 +2767,7 @@ UINT32 weapfxAmmoHitMark(weapAmmo const* Ammo,
 			{
 				if(Ammo->AmmoType->ExplosiveEnergy > 30000000.0f)
 				{
-					TransformEffect* te = TransformEffect::AddEffect("bigshellwaterhit", Vec3f(0, 0, -1), 0, NULL);
+					TransformEffect* te = TransformEffect::AddEffect("bigshellwaterhit", Vec3f(0, 0, -1), 0, nullptr);
 
 					if(te)
 					{
@@ -2778,7 +2778,7 @@ UINT32 weapfxAmmoHitMark(weapAmmo const* Ammo,
 				}
 				else
 				{
-					TransformEffect* te = TransformEffect::AddEffect("shellwaterhit", Vec3f(0, 0, -1), 0, NULL);
+					TransformEffect* te = TransformEffect::AddEffect("shellwaterhit", Vec3f(0, 0, -1), 0, nullptr);
 
 					if(te)
 					{
@@ -2793,9 +2793,9 @@ UINT32 weapfxAmmoHitMark(weapAmmo const* Ammo,
 		return 0;
 	}
 
-	if(pVeh != NULL)
+	if(pVeh != nullptr)
 	{
-		if(pVeh->VehicleType != NULL)
+		if(pVeh->VehicleType != nullptr)
 		{
 			// No hit marks on troops
 			if(pVeh->VehicleType->Type == VEH_TYPE_PERSON)
@@ -2820,7 +2820,7 @@ UINT32 weapfxAmmoHitMark(weapAmmo const* Ammo,
 	fxHitSetAttachedObject(iID, lpCollideObj);
 	fxHitSetTopLevelObject(iID, lpTopLevelObj);
 	fxHitSetPosition(iID, vecPos.x, vecPos.y, vecPos.z);
-	if ( pVeh != NULL )
+	if ( pVeh != nullptr )
 	  fxHitSetVehicle(iID, pVeh);
 	fxHitSetRadius(iID, fRadius);
 	fxHitSetCreateTime(iID, (FLOAT32)frametime);
@@ -2832,7 +2832,7 @@ UINT32 weapfxAmmoHitMark(weapAmmo const* Ammo,
 
 /************************************************************************************************
 	weapfxExplosion
-	Use this for all explosions. If normal is NULL, implies air explosion.
+	Use this for all explosions. If normal is nullptr, implies air explosion.
 *************************************************************************************************/
 static UINT32 weapfxExplosion(weapAmmo const* pAmmo,
 					   FLOAT64VECTOR const* pPos,
@@ -2843,7 +2843,7 @@ static UINT32 weapfxExplosion(weapAmmo const* pAmmo,
 
 	if(!pPos)
 	{
-		Write_Log(LOG_FX, LOG_WARN, "[weapfxExplosion] pPos is NULL");
+		Write_Log(LOG_FX, LOG_WARN, "[weapfxExplosion] pPos is nullptr");
 		return 1;
 	}
 
@@ -2867,13 +2867,13 @@ static UINT32 weapfxExplosion(weapAmmo const* pAmmo,
 
 	if(!pAmmo)
 	{
-		Write_Log(LOG_FX, LOG_WARN, "[weapfxExplosion] pAmmo is NULL");
+		Write_Log(LOG_FX, LOG_WARN, "[weapfxExplosion] pAmmo is nullptr");
 		return 1;
 	}
 
 	if(!pAmmo->AmmoType)
 	{
-		Write_Log(LOG_FX, LOG_WARN, "[weapfxExplosion] pAmmo->AmmoType is NULL");
+		Write_Log(LOG_FX, LOG_WARN, "[weapfxExplosion] pAmmo->AmmoType is nullptr");
 		return 1;
 	}
 
@@ -2894,7 +2894,7 @@ static UINT32 weapfxExplosion(weapAmmo const* pAmmo,
 			n.set(*pNormal);
 		}
 
-		TransformEffect* te = TransformEffect::AddEffect(pAmmo->AmmoType->hiteffect, n, 0, NULL);
+		TransformEffect* te = TransformEffect::AddEffect(pAmmo->AmmoType->hiteffect, n, 0, nullptr);
 
 		if(te)
 		{
@@ -2918,7 +2918,7 @@ static UINT32 weapfxExplosion(weapAmmo const* pAmmo,
 			{
 				Vec3f n(0, 0, -1);
 
-				TransformEffect* te = TransformEffect::AddEffect("watersplash", n, 0, NULL);
+				TransformEffect* te = TransformEffect::AddEffect("watersplash", n, 0, nullptr);
 
 				if(te)
 				{
@@ -2950,7 +2950,7 @@ static UINT32 weapfxExplosion(weapAmmo const* pAmmo,
 		Write_Log(LOG_FX, LOG_INFO, "[weapfxExplosion] Weapon is ground torpedo burst");
 		fxExpSetType(iID, IDE_EXPTYPE_AMMOGROUND);
 	}
-	else if(pNormal == NULL)
+	else if(pNormal == nullptr)
 	{
 		Write_Log(LOG_FX, LOG_INFO, "[weapfxExplosion] Weapon is air burst");
 		fxExpSetType(iID, IDE_EXPTYPE_AMMOAIR);
@@ -3022,7 +3022,7 @@ UINT32 weapfxAmmoExpHitAttached(weapAmmo const* Ammo, SINT32 iPenetration)
 
 	bWater = _IsWater(Ammo->AttachedObject);
 
-	if(Ammo->AttachedObject != NULL)
+	if(Ammo->AttachedObject != nullptr)
 	{
 		vecNorm = Ammo->AttachedNorm;
 
@@ -3055,7 +3055,7 @@ UINT32 weapfxAmmoExpHitAttached(weapAmmo const* Ammo, SINT32 iPenetration)
 						  &Ammo->AttachedPnt,
 						  &vecNorm,
 						  Ammo->AttachedObject,
-						  NULL,
+						  nullptr,
 						  Ammo->AttachedToVehicle,
 						  iPenetration);
 	}
@@ -3070,7 +3070,7 @@ UINT32 weapfxAmmoExpHitAttached(weapAmmo const* Ammo, SINT32 iPenetration)
 *************************************************************************************************/
 LOGICAL _IsWater(OBJECT* lpObj)
 {
-	if(lpObj == NULL)
+	if(lpObj == nullptr)
 		return FALSE;
 
 	if(trnwtrIsWaterTexture(lpObj->texid))
@@ -3079,19 +3079,19 @@ LOGICAL _IsWater(OBJECT* lpObj)
 	}
 
 	FLOAT32 fRollCoef = 0.0f;
-	mlGetObjectBumpinessAndFriction(NULL,
-									NULL,
-									NULL,
-									NULL,
+	mlGetObjectBumpinessAndFriction(nullptr,
+									nullptr,
+									nullptr,
+									nullptr,
 									&fRollCoef,
-									NULL,
+									nullptr,
 									lpObj);
 
 	vehVehicle*pVehicle = persGetPersonaVehiclePtr();
 
-	if(pVehicle != NULL)
+	if(pVehicle != nullptr)
 	{
-		if(pVehicle->VehicleType != NULL)
+		if(pVehicle->VehicleType != nullptr)
 		{
 			if(pVehicle->VehicleType->Type == VEH_TYPE_SEA)
 			{
@@ -3197,7 +3197,7 @@ UINT32 weapfxDetonateSmokeGrenade(FLOAT64VECTOR* pos, const weapAmmo* ammo)
 	combattime = frametime;
 
 	/*
-	const char* modelPath = NULL;
+	const char* modelPath = nullptr;
 
 	if(strcmp((const char*)ammo->AmmoType->Name, "uk_smokegrenade") == 0)
 		modelPath = "TPS\\meshes\\uk_gren_smk\\uk_gren_smk";
@@ -3229,7 +3229,7 @@ void weapfxTorpedo(weapAmmo* ammo)
 
 	if(ammo->iParticleID == 0)
 	{
-		TransformEffect* te = TransformEffect::AddEffect("torpedotrail", Vec3f(0, 0, 0), 0, NULL);
+		TransformEffect* te = TransformEffect::AddEffect("torpedotrail", Vec3f(0, 0, 0), 0, nullptr);
 
 		if(te)
 		{

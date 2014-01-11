@@ -278,7 +278,7 @@ JSBool jsMapView::GetProperty(JSContext* ctx, int propid, jsval* val)
 		break;
 		case ACTIVEWAYPOINT_PROP:
 		{
-			jsWaypointObject* wp = NULL;
+			jsWaypointObject* wp = nullptr;
 			ChatHandle activehandle = PlayerClient()->ActiveWaypointHandle();
 
 			if(activehandle)
@@ -396,10 +396,10 @@ JSBool jsMapView::SetProperty(JSContext* ctx, int propid, jsval* val)
 		case SELECTEDOBJECT_PROP:
 		{
 			jsCPObject* cpobj = phui::js::Cast<jsCPObject*>(_jsctx,*val);
-			if(cpobj == NULL)
+			if(cpobj == nullptr)
 			{
-				_jsSelectedObject = NULL;
-				_mapview->SelectMapObject(NULL);
+				_jsSelectedObject = nullptr;
+				_mapview->SelectMapObject(nullptr);
 			}else
 			{
 				_jsSelectedObject = cpobj;
@@ -424,7 +424,7 @@ JS_FUNCTION_DEF(jsMapView, enablelayer)
 	jsMapView* dom = phui::js::Cast<jsMapView*>(ctx,jsobj);
 	if(!dom) return JS_FALSE;
 
-	const char* name = NULL;
+	const char* name = nullptr;
 	long val = 0;
 	if(argc > 0)
 		name = JS_GetStringBytes(JS_ValueToString(ctx, argv[0]));
@@ -520,8 +520,8 @@ JS_FUNCTION_DEF(jsMapView, stratfilter)
 	jsMapView* dom = phui::js::Cast<jsMapView*>(ctx,jsobj);
 	if(!dom) return JS_FALSE;
 
-	const char* name = NULL;
-	const char* value = NULL;
+	const char* name = nullptr;
+	const char* value = nullptr;
 
 	name	= JS_GetStringBytes(JS_ValueToString(ctx, argv[0]));
 	value	= JS_GetStringBytes(JS_ValueToString(ctx, argv[1]));
@@ -589,8 +589,8 @@ JS_FUNCTION_DEF(jsMapView, findstratob)
 	jsMapView* dom = phui::js::Cast<jsMapView*>(ctx,jsobj);
 	if(!dom) return JS_FALSE;
 
-	const char* cp	= NULL;
-	const char* fac = NULL;
+	const char* cp	= nullptr;
+	const char* fac = nullptr;
 
 	if(argc > 0) cp		= JS_GetStringBytes(JS_ValueToString(ctx, argv[0]));
 	if(argc > 1) fac	= JS_GetStringBytes(JS_ValueToString(ctx, argv[1]));
@@ -630,7 +630,7 @@ JS_FUNCTION_DEF(jsMapView, deletereports)
 	jsMapView* dom = phui::js::Cast<jsMapView*>(ctx,jsobj);
 	if(!dom) return JS_FALSE;
 
-	const char* type = NULL;
+	const char* type = nullptr;
 	if(argc > 0) type = JS_GetStringBytes(JS_ValueToString(ctx, argv[0]));
 
 	const std::vector<Waypoint>& waypoints = PlayerClient()->Waypoints();
@@ -772,7 +772,7 @@ JS_FUNCTION_DEF(jsMapView, addlayer)
 								(xmlInputReadCallback)phui::memIOCallbacks.read,
 								(xmlInputCloseCallback)phui::memIOCallbacks.close);
 
-	xmlDocPtr doc = xmlReadFile("mapview.addlayer", NULL, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
+	xmlDocPtr doc = xmlReadFile("mapview.addlayer", nullptr, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
 	if(doc)
 	{
 		xmlNodePtr node = xmlDocGetRootElement(doc);

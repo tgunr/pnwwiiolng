@@ -47,7 +47,7 @@ public:
 		if(i > 0 && i <= font.size())
 			return font[i - 1];
 		else
-			return NULL;
+			return nullptr;
 	}
 	
 	std::string FontName(unsigned int i)
@@ -395,7 +395,7 @@ int GLGraphicsContext::GetDefaultFont()
 	FindFont
 *************************************************************************************************/
 
-static unsigned char* FontBuff = NULL;
+static unsigned char* FontBuff = nullptr;
 static size_t FontBuffLen = 0;
 
 extern unsigned int gLanguage;
@@ -404,7 +404,7 @@ unsigned int GLGraphicsContext::FindFont(const char* fontname, int size)
 {
 	if(!_io) return 0;
     
-	FTFontAdaptor* font = NULL;
+	FTFontAdaptor* font = nullptr;
 	const FontKey key = FontKey(fontname,size);
 	FontMap::const_iterator it = _fonts->fontmap.find(key);
 	int fontnum = 0;
@@ -417,7 +417,7 @@ unsigned int GLGraphicsContext::FindFont(const char* fontname, int size)
         }
         else
         {
-            if ( FontBuff == NULL )
+            if ( FontBuff == nullptr )
             {
                 int fd = _io->openread(fontname);
                 if(fd > -1)
@@ -443,7 +443,7 @@ unsigned int GLGraphicsContext::FindFont(const char* fontname, int size)
         else
         {
             delete font; 
-            font = NULL;
+            font = nullptr;
         }
 		
 		_fonts->fontmap[key] = font;

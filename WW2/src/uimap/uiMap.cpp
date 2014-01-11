@@ -347,7 +347,7 @@ void uiMapHideIngameMap(bool close)
 	{
 		_mapchild->Hide();
 		_mapchild->Close();
-		_mapchild = NULL;
+		_mapchild = nullptr;
 	}
 
 	_mapchild = uiViewport()->FindView("report");
@@ -355,7 +355,7 @@ void uiMapHideIngameMap(bool close)
 	{
 		_mapchild->Hide();
 		_mapchild->Close();
-		_mapchild = NULL;
+		_mapchild = nullptr;
 	}
 
 	_mapchild = uiViewport()->FindView("waypoint");
@@ -363,7 +363,7 @@ void uiMapHideIngameMap(bool close)
 	{
 		_mapchild->Hide();
 		_mapchild->Close();
-		_mapchild = NULL;
+		_mapchild = nullptr;
 	}
 
 	_mapchild = uiViewport()->FindView("mapcontext");
@@ -371,7 +371,7 @@ void uiMapHideIngameMap(bool close)
 	{
 		_mapchild->Hide();
 		_mapchild->Close();
-		_mapchild = NULL;
+		_mapchild = nullptr;
 	}
 
 	if(_ingamemap)
@@ -383,7 +383,7 @@ void uiMapHideIngameMap(bool close)
 		if(close || fioQuery() == ISDIRECTORY)
 		{
 			_ingamemap->Close();
-			_ingamemap = NULL;
+			_ingamemap = nullptr;
 		}
 	}
 
@@ -648,7 +648,7 @@ static int get_rendered_octet_icon(IconMapRenderer* r, const char* name, float u
 
 static int get_terrain_data(int sx, int sy, sdm_replacement_octet_data* data)
 {
-	return get_sdm_data(sx,sy, NULL, data);
+	return get_sdm_data(sx,sy, nullptr, data);
 }
 
 /************************************************************************************************
@@ -979,7 +979,7 @@ bool MapMessageFilter::Filter(phui::Message* msg, phui::MessageHandler** target,
 
 //			strtRequestCPFacilitiesUpdate(PlayerClient()->MapConnection(), fullid);
 			///TODO: strtRequestCPFacilitiesUpdate is no-longer required.
-//			assert( "TROY: Fix Me" == NULL );
+//			assert( "TROY: Fix Me" == nullptr );
 		}
 		break;
 		*/
@@ -1068,7 +1068,7 @@ void uiMapAddLayer(SuperCellMapView* mapview, xmlNode* node)
 
 		xmlChar* id = xmlGetProp(node, (xmlChar*)"id");
 
-		SuperCellMapView::Renderer* r = NULL;
+		SuperCellMapView::Renderer* r = nullptr;
 		if(!strcmp((char*)type, "texture") && !scenarioActive)
 		{
 			MapTextureRenderer* mtr = new MapTextureRenderer;

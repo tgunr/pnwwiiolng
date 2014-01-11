@@ -41,7 +41,7 @@ static UINT32 _GetInstanceVersion(const char* VersionKey, const char* SubKey, ch
 		return 0;
 
 	DWORD Bytes = sizeof(Location) - 1;
-	if (RegQueryValueExW(RegKey, L"Path", NULL, &Type, (LPBYTE)Location, &Bytes) !=
+	if (RegQueryValueExW(RegKey, L"Path", nullptr, &Type, (LPBYTE)Location, &Bytes) !=
 		ERROR_SUCCESS)
 	{
 		RegCloseKey(RegKey);
@@ -87,7 +87,7 @@ SINT32 versionWinGetVersion(SINT32 AppId, UINT32 MaxVer, UINT32 *CurrentVer, cha
 	SavedKey[0] = '\0';
 
 	//  Enumertate all the installed versions . . . .
-	while (RegEnumKeyExA(RegKey, Index, SubKey, &Bytes, NULL, NULL, NULL,
+	while (RegEnumKeyExA(RegKey, Index, SubKey, &Bytes, nullptr, nullptr, nullptr,
 						&KeyTime) == ERROR_SUCCESS)
 	{
 		//  make sure the key is of the type "instance#"
@@ -102,7 +102,7 @@ SINT32 versionWinGetVersion(SINT32 AppId, UINT32 MaxVer, UINT32 *CurrentVer, cha
 				NumberOfMatches++;
 				strcpy_s(SavedKey, VersionKey);
 				*CurrentVer = InstanceVersion;
-				if ( SavedRegistryKey != NULL )
+				if ( SavedRegistryKey != nullptr )
 					sprintf_s(SavedRegistryKey, 255, "%s\\%s", VersionKey, SubKey);
 			}
 		}
@@ -116,12 +116,12 @@ SINT32 versionWinGetVersion(SINT32 AppId, UINT32 MaxVer, UINT32 *CurrentVer, cha
 
 	TmpPtr = strchr(SavedKey, 'n');
 
-	if (TmpPtr == NULL)
+	if (TmpPtr == nullptr)
 		return 0;
 
 	TmpPtr++;
 
-	if (TmpPtr == NULL || *TmpPtr == '\0')
+	if (TmpPtr == nullptr || *TmpPtr == '\0')
 		return 0;
 
 //Z	*CurrentVer = atoi(TmpPtr);
@@ -141,7 +141,7 @@ bool GetFileVersion(TCHAR* const dest, const size_t destSize, TCHAR* const filen
 
 	} *ptranslate;
 
-	const DWORD VSize = GetFileVersionInfoSize(filename, NULL);
+	const DWORD VSize = GetFileVersionInfoSize(filename, nullptr);
 	if (VSize == 0)
 	{
 		DWORD n = GetLastError();
@@ -151,7 +151,7 @@ bool GetFileVersion(TCHAR* const dest, const size_t destSize, TCHAR* const filen
 	}
 
 	void* pVersion = alloca(VSize);
-	if (pVersion == NULL)
+	if (pVersion == nullptr)
 	{
 		// Severe error
 		return false;

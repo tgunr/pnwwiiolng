@@ -94,7 +94,7 @@ MessageFilter* MessageHandler::FilterAt(unsigned int i)
 	if(_filters && i < _filters->size())
 		return (*_filters)[i].ptr();
 
-	return NULL;
+	return nullptr;
 }
 
 /************************************************************************************************

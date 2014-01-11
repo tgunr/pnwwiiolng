@@ -73,13 +73,13 @@ wstring Antihack::check()
 	PidMap pids;
 	getProcesses(pids);
 
-	MIB_TCPTABLE_OWNER_MODULE *tcpTable = NULL;
+	MIB_TCPTABLE_OWNER_MODULE *tcpTable = nullptr;
 	DWORD size = sizeof(MIB_TCPTABLE_OWNER_MODULE)*1;
 
 	DWORD result = ERROR_INSUFFICIENT_BUFFER;
 	do
 	{
-		if ( tcpTable == NULL ) free (tcpTable);
+		if ( tcpTable == nullptr ) free (tcpTable);
 		tcpTable = (MIB_TCPTABLE_OWNER_MODULE*)calloc( 1, size );
 		result = GetExtendedTcpTable( tcpTable, &size, false, AF_INET,
 			TCP_TABLE_OWNER_MODULE_CONNECTIONS, 0 );
@@ -133,7 +133,7 @@ wstring Antihack::check()
 
 	wchar_t s[12];
 
-	srand((unsigned int)time(NULL));
+	srand((unsigned int)time(nullptr));
 	for ( int i=0; i<11; i++ )
 	{
 		wchar_t c = 'A'+(rand()%26);

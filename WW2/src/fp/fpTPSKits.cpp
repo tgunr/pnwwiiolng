@@ -113,7 +113,7 @@ static void _applyKit(gr2AnimTrooper* anim, Kit* kit)
 			KitModelLOD& lod	= model->lods.at(0);
 
 			// load the attachment
-			gr2Model* attachment = gr2Model::Load(lod.first.c_str(), NULL, NULL, 1);
+			gr2Model* attachment = gr2Model::Load(lod.first.c_str(), nullptr, nullptr, 1);
 
 			// if we found one, add it
 			// true indicates we're letting the skeleton manage the attachment (draw, updated, etc...)
@@ -138,7 +138,7 @@ Kit* _getRandomKit(KitTrooper* trooper)
 	if(trooper && !trooper->kits.empty())
 		return trooper->kits.at(GetRandom(0, trooper->kits.size() - 1));
 
-	return NULL;
+	return nullptr;
 }
 
 // prototypes
@@ -171,7 +171,7 @@ void fpTPSKitsReset(gr2AnimTrooper* anim)
 {
 	if(anim && anim->kit)
 	{
-		anim->kit = NULL;
+		anim->kit = nullptr;
 		anim->skeleton->FreeAttachments();
 	}
 }
@@ -183,7 +183,7 @@ void fpTPSKitsSetByVehicle(gr2AnimTrooper* anim, SINT32 index)
 	if(anim && anim->myVehicle && anim->myVehicle->VehicleType)
 	{
 		KitTrooper* spec = _kits.FindTrooper((const char*)anim->myVehicle->VehicleType->Id);
-		Kit* kit = NULL;
+		Kit* kit = nullptr;
 
 		if(spec)
 		{
@@ -244,7 +244,7 @@ bool KitLoader::DoModel(xmlNode* node, bool first, void* userData)
 			KitObject* object		= (KitObject*)userData;
 			const char* modelName	= xmlGetStringFromNode(node, "name");
 
-			if(modelName != NULL)
+			if(modelName != nullptr)
 			{
 				KitModel* model = _kits.FindModel(modelName);
 
@@ -261,11 +261,11 @@ bool KitLoader::DoModel(xmlNode* node, bool first, void* userData)
 			const char* path		= xmlGetStringFromNode(node, "path");
 
 			// cache this kit object model
-			gr2Model::Load(path, NULL, NULL, 0);
+			gr2Model::Load(path, nullptr, nullptr, 0);
 
 			xmlGetNodeValue(node, XML_DATA_UINT, &model.attachToBone, "attach");
 
-			if(path != NULL)
+			if(path != nullptr)
 			{
 				UINT32 distance = _lod;
 				xmlGetNodeValue(node, XML_DATA_UINT, &distance, "lod");
@@ -290,7 +290,7 @@ bool KitLoader::DoLOD(xmlNode* node, bool first, void* userData)
 
 		const char* path = xmlGetStringFromNode(node, "path");
 
-		if(path != NULL)
+		if(path != nullptr)
 		{
 			UINT32 distance = _lod;
 			xmlGetNodeValue(node, XML_DATA_UINT, &distance, "lod");
@@ -311,7 +311,7 @@ bool KitLoader::DoObject(xmlNode* node, bool first, void* userData)
 			Kit* kit				= (Kit*)userData;
 			const char* objectName	= xmlGetStringFromNode(node, "name");
 
-			if(objectName != NULL)
+			if(objectName != nullptr)
 			{
 				KitObject* object = _kits.FindObject(objectName);
 
@@ -326,7 +326,7 @@ bool KitLoader::DoObject(xmlNode* node, bool first, void* userData)
 			std::string name		= xmlGetStringFromNode(node, "name");
 			const char* modelName	= xmlGetStringFromNode(node, "model");
 
-			if(modelName != NULL)
+			if(modelName != nullptr)
 			{
 				KitModel* model = _kits.FindModel(modelName);
 
@@ -354,7 +354,7 @@ bool KitLoader::DoKit(xmlNode* node, bool first, void* userData)
 			KitTrooper* trooper		= (KitTrooper*)userData;
 			const char* kitName		= xmlGetStringFromNode(node, "name");
 
-			if(kitName != NULL)
+			if(kitName != nullptr)
 			{
 				Kit* kit = _kits.FindKit(kitName);
 
@@ -369,7 +369,7 @@ bool KitLoader::DoKit(xmlNode* node, bool first, void* userData)
 			std::string name		= xmlGetStringFromNode(node, "name");
 			const char* objectName	= xmlGetStringFromNode(node, "object");
 
-			if(objectName != NULL)
+			if(objectName != nullptr)
 			{
 				KitObject* object = _kits.FindObject(objectName);
 
@@ -397,7 +397,7 @@ bool KitLoader::DoTrooper(xmlNode* node, bool first, void* userData)
 		std::string id		= xmlGetStringFromNode(node, "id");
 		const char* kitName	= xmlGetStringFromNode(node, "kit");
 
-		if(kitName != NULL)
+		if(kitName != nullptr)
 		{
 			Kit* kit = _kits.FindKit(kitName);
 
@@ -425,23 +425,23 @@ void Kits::Reset()
 KitModel* Kits::FindModel(const char* name)
 {
 	KitModelMap::iterator found = models.find(name);
-	return (found != models.end()) ? &found->second : NULL;
+	return (found != models.end()) ? &found->second : nullptr;
 }
 
 KitObject* Kits::FindObject(const char* name)
 {
 	KitObjectMap::iterator found = objects.find(name);
-	return (found != objects.end()) ? &found->second : NULL;
+	return (found != objects.end()) ? &found->second : nullptr;
 }
 
 Kit* Kits::FindKit(const char* name)
 {
 	KitMap::iterator found = kits.find(name);
-	return (found != kits.end()) ? &found->second : NULL;
+	return (found != kits.end()) ? &found->second : nullptr;
 }
 
 KitTrooper* Kits::FindTrooper(const char* id)
 {
 	KitTrooperMap::iterator found = troopers.find(id);
-	return (found != troopers.end()) ? &found->second : NULL;
+	return (found != troopers.end()) ? &found->second : nullptr;
 }

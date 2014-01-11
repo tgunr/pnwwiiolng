@@ -238,7 +238,7 @@ Description:
 RenderState* States::GetDefaultAttribute(int attrib)
 {
     if(attrib >= RS_COUNT)
-        return NULL;
+        return nullptr;
 
     return DefaultRenderStates[attrib].get();
 }
@@ -253,7 +253,7 @@ void States::ApplyRenderModes(RenderStateSet* cur)
 
     RenderStateSet::ModeList& modes = GlobalStateSet->GetModes();
 
-    if(cur != NULL)
+    if(cur != nullptr)
         modes = cur->GetModes();
 
     RenderStateSet::ModeList::iterator modeitr = modes.begin();
@@ -366,7 +366,7 @@ void States::ApplyRenderStates(const RenderStateSet* cur)
 {
     static int StateTable[RS_COUNT];
     static RenderState* CurrentStates[RS_COUNT];
-    static const RenderStateSet* prev = NULL;
+    static const RenderStateSet* prev = nullptr;
     static bool first = true;
 
     logTimerBeginMacro();
@@ -377,7 +377,7 @@ void States::ApplyRenderStates(const RenderStateSet* cur)
         memset(CurrentStates, 0, sizeof(RenderState*) * RS_COUNT);
     }
 
-    if(prev == NULL)
+    if(prev == nullptr)
         memset(StateTable, 0, sizeof(int) * RS_COUNT);
 
     if(cur)

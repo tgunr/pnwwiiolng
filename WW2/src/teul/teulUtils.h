@@ -39,9 +39,9 @@ namespace Teul
 	//! to accommodate the trailing null.
 	//! @param[in] host_ value of the address to query.
 	//! @param[in] port_ value of the port number to query.
-	//! @param[in] hostBuf_ destination for the host name (dotted numeric) or NULL if not required.
+	//! @param[in] hostBuf_ destination for the host name (dotted numeric) or nullptr if not required.
 	//! @param[in] hostBufLen_ size of the host name buffer (including trailing zero).
-	//! @param[in] portBuf_ destination for the port number or NULL if not required.
+	//! @param[in] portBuf_ destination for the port number or nullptr if not required.
 	//! @param[in] portBufLen_ size of the port buffer (including trailing zero).
 	int HostToAddr(const UINT32 host_, const UINT16 port_, char* const hostBuf_, const size_t hostBufLen_, char* const portBuf_, const size_t portBufLen_);
 
@@ -50,9 +50,9 @@ namespace Teul
 	//! to accommodate the trailing null.
 	//! @param[in] host_ value of the address to query.
 	//! @param[in] port_ value of the port number to query.
-	//! @param[in] hostBuf_ destination for the host name (dotted numeric) or NULL if not required.
+	//! @param[in] hostBuf_ destination for the host name (dotted numeric) or nullptr if not required.
 	//! @param[in] hostBufLen_ size of the host name buffer (including trailing zero).
-	//! @param[in] portBuf_ destination for the port number or NULL if not required.
+	//! @param[in] portBuf_ destination for the port number or nullptr if not required.
 	//! @param[in] portBufLen_ size of the port buffer (including trailing zero).
 	int	HostToAddr(const struct sockaddr_in* const sa, char* const hostBuf_, size_t hostBufLen_, char* const portBuf_, size_t portBufLen_);
 }

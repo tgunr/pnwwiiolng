@@ -498,7 +498,7 @@ extern UINT32 	vehSetVehicleToUserControlled(vehVehicle*,SINT32 MultiCrewPos);
 extern UINT32 	vehKillVehicle(vehVehicle*);
 
 extern UINT32 	vehUpdatePositionInfo(vehVehicle*);
-extern UINT32	vehApplyDamageToVehicleComponent(vehVehicle* InVehicle, UINT32 ComponentNum, FLOAT64 Energy, UINT32 Counter, weapAmmo* Ammo = NULL);
+extern UINT32	vehApplyDamageToVehicleComponent(vehVehicle* InVehicle, UINT32 ComponentNum, FLOAT64 Energy, UINT32 Counter, weapAmmo* Ammo = nullptr);
 extern UINT32	vehGetHitmapComponentThickness(FLOAT64* Thickness,vehVehicle* Vehicle, UINT32 PartNum);
 extern UINT32	vehFindHitmapObjectNumByName(UINT32* ComponentNum, UCHAR* ComponentName, UINT32 VehicleNum);
 
@@ -556,10 +556,10 @@ extern LOGICAL vehmainIsUndeploying();
 extern LOGICAL vehmainIsUndeployed();
 
 extern LOGICAL vehmainIsOverSupplied(vehVehicle* vehicle);
-extern SINT32 vehmainRequestAmmo(const char* input = NULL); // sends a "I need ammo" message to everyone on mission
+extern SINT32 vehmainRequestAmmo(const char* input = nullptr); // sends a "I need ammo" message to everyone on mission
 
 extern LOGICAL vehmainWaitingOnLogoutTimer();
-extern void vehmainBailout(BailoutSTO* pilot = NULL);
+extern void vehmainBailout(BailoutSTO* pilot = nullptr);
 extern LOGICAL vehmainHasBailedOut();
 
 UINT32 vehmainDetermineKiller();
@@ -570,7 +570,7 @@ void vehmainSpawnVehicle(VEHICLE_REPLY const*);
 extern UINT32 vehDetermineExitStatus(SINT32* ExitStatus, FULL_OBJ_ID* id);
 extern void vehmainCreateODECollider(vehVehicle* vehicle);
 namespace StratDB { class StratObject; }
-extern StratDB::StratObject* vehmainLastEntered(trnCDTerrainObject** TO = NULL);
+extern StratDB::StratObject* vehmainLastEntered(trnCDTerrainObject** TO = nullptr);
 extern ChatHandle vehLastInfantryDamaged();
 
 #ifdef VEHICLES_GAME_INFO

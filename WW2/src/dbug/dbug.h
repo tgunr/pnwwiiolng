@@ -128,20 +128,20 @@ extern void		dbugSetErrno( int err);
 // with compatibility.
 extern int		dbugGetErrno(void);
 
-// dbugLog: if the current filename, lineno or string is NULL then it sets these members. The
+// dbugLog: if the current filename, lineno or string is nullptr then it sets these members. The
 // parameters are output as a string to the debug file depending on the debug level selected and
 // the current error type.  calls handlers.
 extern int _dbugLog(const char* filename, int lineno, unsigned int errType, const char* fmt, ...) __attribute__ ((format (printf,4,5)));
 extern int _dbugLogV(const char* filename, int lineno, unsigned int errType, const char* fmt, va_list& args);
 
 extern NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, unsigned int errType, const char* assertion, const char* fmt, ...);
-#define LogAbort(...) _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, NULL, __VA_ARGS__)
+#define LogAbort(...) _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, nullptr, __VA_ARGS__)
 
 // These macros assume that the condition is unlikely and try to provide the compiler an optimization hint by
 // ordering the abort as the second choice.
-#define ABORT_UNLESS(assertion_) PN_LIKELY(!!(assertion_)) ? (void)0 : (void)_LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, NULL, "Assertion: !(%s)", #assertion_)
+#define ABORT_UNLESS(assertion_) PN_LIKELY(!!(assertion_)) ? (void)0 : (void)_LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, nullptr, "Assertion: !(%s)", #assertion_)
 #define ABORT_UNLESS_EX(assertion_, ...) PN_LIKELY(!!(assertion_)) ? (void)0 : (void)_LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, #assertion_, __VA_ARGS__)
-#define ABORT_IF(assertion_) PN_LIKELY(!(assertion_)) ? (void)0 : (void)_LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, NULL, "Assertion: %s", #assertion_)
+#define ABORT_IF(assertion_) PN_LIKELY(!(assertion_)) ? (void)0 : (void)_LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, nullptr, "Assertion: %s", #assertion_)
 #define ABORT_IF_EX(assertion_, ...) PN_LIKELY(!(assertion_)) ? (void)0 : (void)_LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, #assertion_, __VA_ARGS__)
 
 #ifdef DBUG_TEST

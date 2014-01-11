@@ -356,15 +356,15 @@ LOGICAL ddpInit(void)
 	resetfps = FALSE;
 	focus = FALSE;
 	capture = 0;
-	ddinitfunc = NULL;
-	d3dinitfunc = NULL;
-	ddrenderfunc = NULL;
-	d3drenderfunc = NULL;
-	ddkillfunc = NULL;
-	d3dkillfunc = NULL;
-	mousefunc = NULL;
-	timerfunc = NULL;
-	keyboardfunc = NULL;
+	ddinitfunc = nullptr;
+	d3dinitfunc = nullptr;
+	ddrenderfunc = nullptr;
+	d3drenderfunc = nullptr;
+	ddkillfunc = nullptr;
+	d3dkillfunc = nullptr;
+	mousefunc = nullptr;
+	timerfunc = nullptr;
+	keyboardfunc = nullptr;
 
 	imeInit();
 
@@ -381,12 +381,12 @@ LPVOID lpMsgBuf;
 	FormatMessage(	FORMAT_MESSAGE_ALLOCATE_BUFFER |
 					FORMAT_MESSAGE_FROM_SYSTEM |
 					FORMAT_MESSAGE_IGNORE_INSERTS,
-					NULL,
+					nullptr,
 					GetLastError(),
 					MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
 					(LPTSTR) &lpMsgBuf,
 					0,
-					NULL);
+					nullptr);
 
 	// Display the string
 	Write_Debug((const char*)lpMsgBuf);
@@ -409,7 +409,7 @@ static inline void _initializationError(const char* problem)
 	std::wstring message = _ERR_STR_1;
 	message += UTF16(problem);
 	message += _ERR_STR_2;
-	MessageBox(NULL, message.c_str(), _T("Video initialization error"), MB_ICONEXCLAMATION|MB_OK);
+	MessageBox(nullptr, message.c_str(), _T("Video initialization error"), MB_ICONEXCLAMATION|MB_OK);
 }
 
 bool CreateGLContext(HDC dc)
@@ -450,14 +450,14 @@ bool CreateGLContext(HDC dc)
 
     if(wglewIsSupported("WGL_ARB_create_context") == 1)
     {
-            // FIXME: Set to NULL so NVIDIA will not create a NULL context.
-            myhrc = wglCreateContextAttribsARB(dc, 0, NULL);//attribs);
+            // FIXME: Set to nullptr so NVIDIA will not create a nullptr context.
+            myhrc = wglCreateContextAttribsARB(dc, 0, nullptr);//attribs);
 
         if(myhrc)
         {
             Write_Debug("WGL_ARB_create_context supported.");
 
-            wglMakeCurrent(NULL, NULL);
+            wglMakeCurrent(nullptr, nullptr);
             wglDeleteContext(Context);
 
             wglMakeCurrent(dc, myhrc);
@@ -528,7 +528,7 @@ bool CreateGLContext(HDC dc)
         if(ogl::UseDeprecatedPath())
         {
             // Features not supported, go to old path
-            wglMakeCurrent(NULL, NULL);
+            wglMakeCurrent(nullptr, nullptr);
             wglDeleteContext(myhrc);
 
 	        myhrc = wglCreateContext(dc);
@@ -561,12 +561,12 @@ static LOGICAL oglBegin(HWND hwnd)
 	PIXELFORMATDESCRIPTOR	pfd;
 
 	// Already begun
-	if (myhrc != NULL)
+	if (myhrc != nullptr)
 	{
 		return(TRUE);
 	}
 
-	if (myhdc == NULL)
+	if (myhdc == nullptr)
 	{
 		myhdc = GetDC(hwnd);
 	}
@@ -577,7 +577,7 @@ static LOGICAL oglBegin(HWND hwnd)
 		if (!ddpChooseScreenFormat(myhdc, &pfd))
 		{
 			ReleaseDC(hwnd, myhdc);
-			myhdc = NULL;
+			myhdc = nullptr;
 			throw "Configured resolution not supported by video card";
 		}
 
@@ -602,15 +602,15 @@ static void oglEnd(void)
 {
 	if (myhdc && myhrc)
 	{
-		wglMakeCurrent(myhdc, NULL);
+		wglMakeCurrent(myhdc, nullptr);
 		wglDeleteContext(myhrc);
-		myhrc = NULL;
+		myhrc = nullptr;
 	}
 
 	if (myhdc)
 	{
 		ReleaseDC(myhwnd, myhdc);
-		myhdc = NULL;
+		myhdc = nullptr;
 	}
 }
 
@@ -624,7 +624,7 @@ void ddpKill(void)
         return;
     }
 
-    ClipCursor(NULL);
+    ClipCursor(nullptr);
 
     alreadykilled = 1;
 
@@ -635,12 +635,12 @@ void ddpKill(void)
 		ddpResetDisplay();
 	}
 
-	if (d3dkillfunc != NULL)
+	if (d3dkillfunc != nullptr)
 	{
 		d3dkillfunc();
 	}
 
-	if (ddkillfunc != NULL)
+	if (ddkillfunc != nullptr)
 	{
 		ddkillfunc();
 	}
@@ -687,11 +687,11 @@ RECT		rect, wrect;
 
 		WantedWindow = TRUE;
 
-		hdc = GetDC(NULL);
+		hdc = GetDC(nullptr);
 		WantedBpp = GetDeviceCaps(hdc, BITSPIXEL);
-		ReleaseDC(NULL, hdc);
+		ReleaseDC(nullptr, hdc);
 
-		if (parent == NULL)
+		if (parent == nullptr)
 		{
 			style |= WS_POPUP;
 		}
@@ -731,9 +731,9 @@ RECT		rect, wrect;
 	wndClass.lpfnWndProc    = WindowProc;
 	wndClass.hInstance      = (HINSTANCE)hinst;
 	wndClass.hIcon          = LoadIcon((HINSTANCE)hinst, MAKEINTRESOURCE(IDI_WWII_ICON));
-	wndClass.hCursor        = LoadCursor(NULL, MAKEINTRESOURCE(IDC_ARROW));
+	wndClass.hCursor        = LoadCursor(nullptr, MAKEINTRESOURCE(IDC_ARROW));
 	wndClass.hbrBackground  = (HBRUSH)GetStockObject(BLACK_BRUSH);
-	wndClass.lpszMenuName   = NULL;
+	wndClass.lpszMenuName   = nullptr;
 	swprintf(classname, 255, _T("OpenGLClass_%dx%dx%d"), WantedWidth, WantedHeight, WantedBpp);
 	wndClass.lpszClassName  = classname;
 
@@ -805,7 +805,7 @@ RECT		rect, wrect;
 
 	myhwnd = CreateWindowEx(0, wndClass.lpszClassName, _T(SYS_TITLE),
 							style, rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top,
-							parent, NULL, (HINSTANCE)hinst, NULL);
+							parent, nullptr, (HINSTANCE)hinst, nullptr);
 
 	if (!myhwnd)
 	{
@@ -818,9 +818,9 @@ RECT		rect, wrect;
 	{
 	MSG		msg;
 
-		while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
+		while (PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE))
 		{
-			if (GetMessage(&msg, NULL, 0, 0))
+			if (GetMessage(&msg, nullptr, 0, 0))
 			{
 				uiIMEMessageProc(msg);
 				TranslateMessage(&msg);
@@ -846,7 +846,7 @@ RECT		rect, wrect;
 	cfgPrefsInit();
 
 	// Call external init functions; if present
-	if (ddinitfunc != NULL)
+	if (ddinitfunc != nullptr)
 	{
 		if (!ddinitfunc())
 		{
@@ -855,7 +855,7 @@ RECT		rect, wrect;
 		}
 	}
 
-	if (d3dinitfunc != NULL)
+	if (d3dinitfunc != nullptr)
 	{
 		if (!d3dinitfunc())
 		{
@@ -882,9 +882,9 @@ RECT		rect, wrect;
 	{
 	MSG		msg;
 
-		while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
+		while (PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE))
 		{
-			if (GetMessage(&msg, NULL, 0, 0))
+			if (GetMessage(&msg, nullptr, 0, 0))
 			{
 				uiIMEMessageProc(msg);
 				TranslateMessage(&msg);
@@ -1012,9 +1012,9 @@ LOGICAL ddpFlip(void)
 	{
 	MSG		msg;
 
-		while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
+		while (PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE))
 		{
-			if (GetMessage(&msg, NULL, 0, 0))
+			if (GetMessage(&msg, nullptr, 0, 0))
 			{
 				uiIMEMessageProc(msg);
 				TranslateMessage(&msg);
@@ -1034,8 +1034,8 @@ LOGICAL ddpFlip(void)
 
 LOGICAL ddpGetDDRect(RECT* rect)
 {
-	if (myhwnd == NULL ||
-		rect == NULL)
+	if (myhwnd == nullptr ||
+		rect == nullptr)
 	{
 		return(FALSE);
 	}
@@ -1060,7 +1060,7 @@ void ddpUnlockBackbuffer()
 LPVOID ddpGetBackbuffer()
 {
 	//// FIXME
-	return(NULL);
+	return(nullptr);
 }
 
 LOGICAL ddpGetBackbufferSurface(void** lpdds)
@@ -1075,7 +1075,7 @@ static SINT8	txt[64]="", ssz[64]="";
 LOGICAL		retval=TRUE;
 RECT		rect;
 
-	if (ddrenderfunc != NULL)
+	if (ddrenderfunc != nullptr)
 	{
 		if (!ddrenderfunc())
 		{
@@ -1083,7 +1083,7 @@ RECT		rect;
 		}
 	}
 
-	if (d3drenderfunc != NULL)
+	if (d3drenderfunc != nullptr)
 	{
 		if (!d3drenderfunc())
 		{
@@ -1311,15 +1311,15 @@ LOGICAL		retval, *running;
 	ddpDrawNotActive(FALSE);
 	ddpDisableScreenSaver(TRUE);
 
-	ddpSetDDInit(NULL);//oglInit);
-	ddpSetDDRender(NULL);//rnlogoRender);
-	ddpSetDDKill(NULL);//oglKill);
+	ddpSetDDInit(nullptr);//oglInit);
+	ddpSetDDRender(nullptr);//rnlogoRender);
+	ddpSetDDKill(nullptr);//oglKill);
 
 	ddpSetD3DInit(piInit);
 	ddpSetD3DRender(gmlpMainUpdate);
 	ddpSetD3DKill(piKill);
 
-	if (!ddpCreateWnd(WantedX, WantedY, WantedWidth, WantedHeight, WantedBpp, WantedWindow ? DDWND_FULLWINDOW : DDWND_FULLSCREEN, NULL))
+	if (!ddpCreateWnd(WantedX, WantedY, WantedWidth, WantedHeight, WantedBpp, WantedWindow ? DDWND_FULLWINDOW : DDWND_FULLSCREEN, nullptr))
 	{
 		ddpKill();
 		return(0);
@@ -1347,7 +1347,7 @@ LOGICAL		retval, *running;
 	}
 #endif
 
-	if (myhwnd != NULL)
+	if (myhwnd != nullptr)
 	{
 		*running = 0;
 		PostMessageA(myhwnd, WM_CLOSE, 0, 0);
@@ -1374,7 +1374,7 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	if (umsg >= WM_MOUSEFIRST &&
 		umsg <= WM_MOUSELAST)
 	{
-		if (mousefunc != NULL)
+		if (mousefunc != nullptr)
 		{
 			mousefunc(umsg, wParam, lParam);
 		}
@@ -1403,7 +1403,7 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 		cfgPrefsSave();
 		wwiiSendUserAbortedApp();
 		OnClose();
-		myhwnd = NULL;
+		myhwnd = nullptr;
 		PostQuitMessage(0);
 		break;
 	}
@@ -1426,7 +1426,7 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	case WM_KILLFOCUS:
 	{
 		OnKillFocus((HWND) wParam);
-        ClipCursor(NULL);
+        ClipCursor(nullptr);
 		break;
 	}
 	case WM_NCACTIVATE:
@@ -1591,7 +1591,7 @@ static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM l
 	}
 	case WM_TIMER:
 	{
-		if (timerfunc != NULL)
+		if (timerfunc != nullptr)
 		{
 			timerfunc(wParam, lParam);
 		}
@@ -1665,7 +1665,7 @@ static LOGICAL Create(HWND hwnd)
 {
 RECT					rect;
 
-	if (hwnd == NULL)
+	if (hwnd == nullptr)
 	{
 		return(TRUE);
 	}
@@ -1679,7 +1679,7 @@ RECT					rect;
 
 	running = TRUE;
 
-	InvalidateRect(hwnd, NULL, FALSE);
+	InvalidateRect(hwnd, nullptr, FALSE);
 
 	ddpResetFPS();
 	//lastframetime = frametime = timeGetTime();
@@ -2106,7 +2106,7 @@ DEVMODE			testmode, presentmode;
 		displaydevice.cb = sizeof(DISPLAY_DEVICE);
 		do
 		{
-			if (!EnumDisplayDevices(NULL, displaynum, &displaydevice, 0))
+			if (!EnumDisplayDevices(nullptr, displaynum, &displaydevice, 0))
 			{
 				break;
 			}
@@ -2205,7 +2205,7 @@ DEVMODE			testmode, presentmode;
 			return(FALSE);
 		}
 
-		retval = ChangeDisplaySettingsEx(displaydevice.DeviceName, &devmode, NULL, CDS_TEST, NULL);
+		retval = ChangeDisplaySettingsEx(displaydevice.DeviceName, &devmode, nullptr, CDS_TEST, nullptr);
 		switch (retval)
 		{
 		case DISP_CHANGE_BADFLAGS:
@@ -2228,7 +2228,7 @@ DEVMODE			testmode, presentmode;
 			break;
 		case DISP_CHANGE_SUCCESSFUL:
 			Write_Debug("DISP_CHANGE_SUCCESSFUL");
-			ChangeDisplaySettingsEx(displaydevice.DeviceName, &devmode, NULL, CDS_FULLSCREEN, NULL);
+			ChangeDisplaySettingsEx(displaydevice.DeviceName, &devmode, nullptr, CDS_FULLSCREEN, nullptr);
 
 			return(TRUE);
 		}
@@ -2241,7 +2241,7 @@ DEVMODE			testmode, presentmode;
 
 void ddpResetDisplay(void)
 {
-	ChangeDisplaySettingsEx(displaydevice.DeviceName, NULL, NULL, 0, NULL);
+	ChangeDisplaySettingsEx(displaydevice.DeviceName, nullptr, nullptr, 0, nullptr);
 }
 
 LOGICAL ddpDrawToScreen(LPVOID lpdds)
@@ -2337,7 +2337,7 @@ static void capSave(UCHAR* const bptr, UINT32 width, UINT32 height, const char* 
 		}
 
 		// create a file from the DIB
-		if (NULL != bname)
+		if (nullptr != bname)
 		{
 			piBITMAPFILEHEADER	bmfh;
 
@@ -2373,7 +2373,7 @@ static void glScreenCapture()
 	int shotCount=0;
 	char fileName[128], *fptr;
 	UCHAR* bitmap = (UCHAR*)memAlloc(WantedWidth * WantedHeight * 3);
-	if(bitmap == NULL)
+	if(bitmap == nullptr)
 		return;
 
 #ifdef BUZZARDCAM
@@ -2427,9 +2427,9 @@ void ddpPumpMessage()
 {
     static MSG msg;
 
-    while( PeekMessage( &msg, NULL, 0, 0, PM_NOREMOVE ) )
+    while( PeekMessage( &msg, nullptr, 0, 0, PM_NOREMOVE ) )
     {
-        if( !GetMessage( &msg, NULL, 0, 0 ) )
+        if( !GetMessage( &msg, nullptr, 0, 0 ) )
         {
             PostQuitMessage( ( int )msg.wParam );
             return;

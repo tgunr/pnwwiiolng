@@ -29,8 +29,8 @@ TextControl::TextControl(): Control(), TextContainer()
 	_drawx = _lmargin;
 	_alignment = ALIGN_LEFT;
 	_historySize = _historyIndex = 0;
-	_history = NULL;
-	_autoCompletor = NULL;
+	_history = nullptr;
+	_autoCompletor = nullptr;
 	_lastKeyDown = -1;
 	_selecting = false;
 }
@@ -41,7 +41,7 @@ TextControl::~TextControl()
 	{
 		_history->clear();
 		delete _history;
-		_history = NULL;
+		_history = nullptr;
 		_historySize = 0;
 	}
 }
@@ -428,7 +428,7 @@ void TextControl::SetHistorySize(int size)
 		{
 			_history->clear();
 			delete _history;
-			_history = NULL;
+			_history = nullptr;
 			_historySize = 0;
 		}
 	}

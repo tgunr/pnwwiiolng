@@ -18,7 +18,7 @@ extern HANDLE hApplicationMutex;
 
 IMPLEMENT_DYNAMIC(CPlayerLogon, CDialog)
 
-CPlayerLogon::CPlayerLogon(CWnd* pParent /*=NULL*/)
+CPlayerLogon::CPlayerLogon(CWnd* pParent /*=nullptr*/)
 	: CBDialog(CPlayerLogon::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CTermsOfServiceDlg)
@@ -110,9 +110,9 @@ void CPlayerLogon::ToggleInput(bool enable, bool changeFocus)
 	if ( changeFocus )
 	{
 		if ( userLen <= 2 )
-			SetTimer('Fusr', 10, NULL);
+			SetTimer('Fusr', 10, nullptr);
 		else
-			SetTimer('Fpwd', 10, NULL);
+			SetTimer('Fpwd', 10, nullptr);
 	}
 }
 
@@ -186,11 +186,11 @@ void Auth::LoginReply::process()
 	{
 		playgate.SetStatus(GetLoc(AUTH_LOGIN), AppProgress);
 		playgate.m_playnet = m_playnet;
-		hMainWnd->SetTimer('AOK', 1500, NULL);
+		hMainWnd->SetTimer('AOK', 1500, nullptr);
 		return;
 	}
 	const char* p = m_code.c_str();
-	const TCHAR* message = NULL;
+	const TCHAR* message = nullptr;
 	if ( strcmp(p, "full") == 0 )
 		message = GetLoc(AUTH_REGION_FULL);
 	else if ( strcmp(p, "login") == 0 || strcmp(p, "internal") == 0 || strcmp(p, "unknown") == 0 )
@@ -217,7 +217,7 @@ void Auth::LoginReply::process()
 	playgate.SetStatus(message, AppError);
 
 	// Re-enable input in 1 second.
-	hMainWnd->SetTimer('AERR', 1000, NULL);
+	hMainWnd->SetTimer('AERR', 1000, nullptr);
 }
 
 void CPlayerLogon::OnEnChangeInputs()
@@ -254,7 +254,7 @@ void CPlayerLogon::OnTimer(UINT_PTR nIDEvent)
 void CPlayerLogon::Browse()
 {
 	CPlayerLogon* logon = (CPlayerLogon*)hMainWnd;
-	logon->m_browser.Navigate(logon->m_startUrl.c_str(), NULL, NULL, NULL, NULL);
+	logon->m_browser.Navigate(logon->m_startUrl.c_str(), nullptr, nullptr, nullptr, nullptr);
 }
 
 void CPlayerLogon::WinHelp(DWORD dwData, UINT nCmd)

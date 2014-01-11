@@ -10,7 +10,7 @@
 
 IMPLEMENT_DYNAMIC(CTermsOfServiceDlg, CDialog)
 
-CTermsOfServiceDlg::CTermsOfServiceDlg(CWnd* pParent /*=NULL*/)
+CTermsOfServiceDlg::CTermsOfServiceDlg(CWnd* pParent /*=nullptr*/)
 	: CBDialog(CTermsOfServiceDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CTermsOfServiceDlg)
@@ -54,7 +54,7 @@ _loadTOS(CRichEditCtrl* const ctrl)
 {
 	ctrl->LimitText(64 * 1024);
 	ctrl->SetAutoURLDetect(1);
-	ctrl->SetTargetDevice(NULL, 0);
+	ctrl->SetTargetDevice(nullptr, 0);
 	ctrl->SetWordWrapMode(WBF_WORDWRAP | WBF_WORDBREAK | WBF_LEVEL2);
 
 	// CRichEditCtrl beeps in read only mode.

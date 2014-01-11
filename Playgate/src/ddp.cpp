@@ -267,7 +267,7 @@ DEVMODE			devmode;
 
 	do
 	{
-		EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &presentmode);
+		EnumDisplaySettings(nullptr, ENUM_CURRENT_SETTINGS, &presentmode);
 		Write_Debug("Present mode: w=%d, h=%d, bpp=%d, ref=%d",
 			presentmode.dmPelsWidth,
 			presentmode.dmPelsHeight,
@@ -279,7 +279,7 @@ DEVMODE			devmode;
 		Write_Debug("Enumerated modes:");
 		do
 		{
-			if (!EnumDisplaySettings(NULL, modenum, &devmode))
+			if (!EnumDisplaySettings(nullptr, modenum, &devmode))
 			{
 				break;
 			}
@@ -311,7 +311,7 @@ DEVMODE			devmode;
 			return(FALSE);
 		}
 
-		retval = ChangeDisplaySettingsEx(NULL, &devmode, NULL, CDS_TEST, NULL);
+		retval = ChangeDisplaySettingsEx(nullptr, &devmode, nullptr, CDS_TEST, nullptr);
 		switch (retval)
 		{
 		case DISP_CHANGE_BADFLAGS:
@@ -334,7 +334,7 @@ DEVMODE			devmode;
 			break;
 		case DISP_CHANGE_SUCCESSFUL:
 			Write_Debug("DISP_CHANGE_SUCCESSFUL");
-			ChangeDisplaySettingsEx(NULL, &devmode, NULL, CDS_FULLSCREEN, NULL);
+			ChangeDisplaySettingsEx(nullptr, &devmode, nullptr, CDS_FULLSCREEN, nullptr);
 
 			return(TRUE);
 		}
@@ -346,5 +346,5 @@ DEVMODE			devmode;
 
 void ddpResetDisplay(void)
 {
-	ChangeDisplaySettingsEx(NULL, NULL, NULL, 0, NULL);
+	ChangeDisplaySettingsEx(nullptr, nullptr, nullptr, 0, nullptr);
 }

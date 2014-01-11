@@ -16,7 +16,7 @@ const TCHAR* GetLoc(UINT id, ...)
 	
 	instance = instance & (instances - 1);
 
-	HMODULE hm = GetModuleHandle(NULL);
+	HMODULE hm = GetModuleHandle(nullptr);
 
 	// lookup the format string
 	int read = LoadString(hm, LOC(language,id), format, MAX_LOC_VALUE);

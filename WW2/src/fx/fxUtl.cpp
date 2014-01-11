@@ -94,7 +94,7 @@ void _parseElements(xmlNodePtr root, MATERIALPROP* m)
 {
     xmlNodePtr node = root;
 
-	for(; node != NULL; node = node->next)
+	for(; node != nullptr; node = node->next)
 	{
         if(node->type != XML_ELEMENT_NODE)
         {
@@ -187,7 +187,7 @@ void _parseTree(xmlNodePtr root)
 {
     xmlNodePtr node = root;
 
-	for(; node != NULL; node = node->next)
+	for(; node != nullptr; node = node->next)
 	{
         if(node->type != XML_ELEMENT_NODE)
         {
@@ -229,7 +229,7 @@ LOGICAL _initMaterialSounds()
 
     SCHAR* name = "fx/xml/materialprops.xml";
 
-    xmlDocPtr doc = xmlReadFile(name, NULL, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
+    xmlDocPtr doc = xmlReadFile(name, nullptr, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
 
     if(doc)
     {
@@ -303,12 +303,12 @@ const char* fxUtlGetBulletEffectFromMaterial(const char* material)
 
     if(find == g_materialProperties.end())
     {
-        return NULL;
+        return nullptr;
     }
 
     if(find->second->bulleteffectname.empty())
     {
-        return NULL;
+        return nullptr;
     }
 
     return find->second->bulleteffectname.c_str();
@@ -832,15 +832,15 @@ void fxUtlInterpolateAlpha(INTFLOAT32* lpTime, INTCOLOR* lpIn, piCOLORVALUE* lpO
 //////////////////////////////////////////////////////////////////////
 OBJECT* fxUtlGetObject(OBJECT* lpObj)
 {
-    if(lpObj == NULL)
-        return NULL;
+    if(lpObj == nullptr)
+        return nullptr;
 
     OBJECT* lpReturnObj = lpObj;
 
-    while(lpReturnObj != NULL)
+    while(lpReturnObj != nullptr)
     {
 		if(!obmainValidateObject(lpReturnObj))
-			return NULL;
+			return nullptr;
 
         if(!(lpReturnObj->flags & OBJECT_NOTOBJECT))
         {
@@ -850,7 +850,7 @@ OBJECT* fxUtlGetObject(OBJECT* lpObj)
         lpReturnObj = lpReturnObj->child;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -987,7 +987,7 @@ LOGICAL fxUtlTerrainCollide(FASTCOLLIDE* pFastCollision)
     UINT32 i;
 
     FASTCOLLIDE collisionList[32];
-    FASTCOLLIDE* pCollisionList = NULL;
+    FASTCOLLIDE* pCollisionList = nullptr;
 
     COLLISION collision;
 
@@ -998,7 +998,7 @@ LOGICAL fxUtlTerrainCollide(FASTCOLLIDE* pFastCollision)
 
     mlVehicleData* pVehData = persGetPersonaModelDataPtr();
 
-    if(pVehData != NULL)
+    if(pVehData != nullptr)
     {
         pCollisionList = collisionList;
 

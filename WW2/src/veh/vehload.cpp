@@ -39,37 +39,37 @@ mlObjectData::Get()
 
 void mlObjectData::Release(mlObjectData* object)
 {
-	assert( object != NULL );
+	assert( object != nullptr );
 	_objectDataPool.push(object);
 }
 
 void mlObjectData::Reset()
 {
-    PlaneObject = NULL;
-    TrackSection = NULL;
-    TrackAnimation = NULL;
-    HitMap = NULL;
-    HitBox = NULL;
-    CollideExternObject = NULL;
-    CollideInternObject = NULL;
-    CollideWalkObject = NULL;
-    EffectsObject = NULL;
-    MassObject = NULL;
-	VisDamageGroup = NULL;
-	VisDamageCrapGroup = NULL;
-	VisDamageStubGroup = NULL;
-	VisDamageHulkLOD = NULL;
-	LineCollideObject = NULL;
-	CollidePntList = NULL;
-	LoadoutLODObject = NULL;
-	WheelRadius = NULL;
-	TowObject = NULL;
-	ShadowObject = NULL;
-	HoistObject = NULL;
-	HoistHitBox = NULL;
-	HoistLineCollideObject = NULL;
-	HoistCollidePntList = NULL;
-    spawnObject = NULL;
+    PlaneObject = nullptr;
+    TrackSection = nullptr;
+    TrackAnimation = nullptr;
+    HitMap = nullptr;
+    HitBox = nullptr;
+    CollideExternObject = nullptr;
+    CollideInternObject = nullptr;
+    CollideWalkObject = nullptr;
+    EffectsObject = nullptr;
+    MassObject = nullptr;
+	VisDamageGroup = nullptr;
+	VisDamageCrapGroup = nullptr;
+	VisDamageStubGroup = nullptr;
+	VisDamageHulkLOD = nullptr;
+	LineCollideObject = nullptr;
+	CollidePntList = nullptr;
+	LoadoutLODObject = nullptr;
+	WheelRadius = nullptr;
+	TowObject = nullptr;
+	ShadowObject = nullptr;
+	HoistObject = nullptr;
+	HoistHitBox = nullptr;
+	HoistLineCollideObject = nullptr;
+	HoistCollidePntList = nullptr;
+    spawnObject = nullptr;
 
 	TrackCount = 0;
 	TrackAnimationCount = 0;
@@ -121,7 +121,7 @@ void mlObjectData::Reset()
 // superfluous logging
 void vehloadKill()
 {
-    mlObjectData* p = NULL;
+    mlObjectData* p = nullptr;
 
     while(!_objectDataPool.empty())
     {

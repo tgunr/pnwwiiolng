@@ -95,8 +95,8 @@ struct FPSColliderData
 
 	void Reset()
 	{
-		collider = NULL;
-		objectHit = NULL;
+		collider = nullptr;
+		objectHit = nullptr;
 		groundMisses = 0;
 		groundHit.x = groundHit.y = groundHit.z = 0.0f;
 		lastNBPos = groundHit;
@@ -132,7 +132,7 @@ extern UINT32		fpFPSControlInput (SINT32 Param, UINT32 Id, UINT32 reserve); // t
 extern LOGICAL		fpFPSUpdatePerson (mlVehicleData* pVehicleData, FLOAT64 DeltaTime);
 extern void		fpFPSGetVelocity (FLOAT64VECTOR* velocity);
 extern LOGICAL		fpFPSWeaponFire (mlVehicleData* pVehicleData);
-extern void		fpFPSFireRound (struct weapWeapon* weapon, piMATRIX* fireAtt, void* FireVehicle = NULL);
+extern void		fpFPSFireRound (struct weapWeapon* weapon, piMATRIX* fireAtt, void* FireVehicle = nullptr);
 extern void		fpFPSReload (struct weapWeapon* weapon);
 extern LOGICAL		fpFPSReloadCheck (struct weapWeapon* weapon, SINT32 ammoGroup);
 extern LOGICAL		fpFPSSetAnimationFlags();
@@ -182,14 +182,14 @@ extern void		fpFPSResupplySelf (const wchar_t* from);
 extern void		fpFPSSetStandMaterial (SINT32 matid);
 extern SINT32		fpFPSPlaySound(SCHAR* sound);
 extern SINT32		fpFPSGetAmmoTypeNum (bool forType = false);
-extern SINT32		fpFPSGetAmmoTypeNumByWeapon (SINT32 weaponType, weapWeapon* weapon = NULL);
+extern SINT32		fpFPSGetAmmoTypeNumByWeapon (SINT32 weaponType, weapWeapon* weapon = nullptr);
 extern void		fpFPSLeanOff();
 extern LOGICAL		fpFPSGetLeanPoints(piVECTOR* startPos, piVECTOR* endPos);
 extern void		mlInfantryCheckLeanLines(mlVehicleData*	VehicleData);
 extern LOGICAL		fpFPSStateWeaponReadyToFire(bool honorDelays = true);
 extern void			fpFPSetHeadFixed(LOGICAL fixed); // set whether our head fixed looking forward or not
 extern void			fpFPSSetSteepness(FLOAT32 s);
-extern void			fpFPSAreaChecks(FLOAT64VECTOR* v = NULL, FLOAT64 DeltaTime = 0.0f, bool force = false);
+extern void			fpFPSAreaChecks(FLOAT64VECTOR* v = nullptr, FLOAT64 DeltaTime = 0.0f, bool force = false);
 extern FPSColliderData& fpFPSGetCollider();
 extern void fpFPSCancelPPO();
 
@@ -231,7 +231,7 @@ extern UINT32		fpFPSGetHighlightedWeaponType();
 extern SINT32		fpFPSGetWeaponType();
 
 // fixes up clipBullets and ammo; last argument is for convenience, quite often we know this
-extern void		fpFPSUpdateAmmo(SINT32 weaponNumber, weapWeapon* weapon = NULL, SINT32 forceAmmo = -1);
+extern void		fpFPSUpdateAmmo(SINT32 weaponNumber, weapWeapon* weapon = nullptr, SINT32 forceAmmo = -1);
 extern void		fpFPSUpdateOverSupply(mlVehicleData* vd);
 extern void		fpFPSAddWeaponLag(int plane, FLOAT64 amount, bool absolute = false);
 extern void		fpFPSProcessTPSEmote(ChatHandle handle, SINT32 emoteID); // tolua_export

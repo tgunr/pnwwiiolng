@@ -43,7 +43,7 @@ public:
 	SINT32 currentLevel;
 	SINT32 maxLevelLoaded;
 
-	// top of the include chain; NULL if we are the top
+	// top of the include chain; nullptr if we are the top
 	EZLoader* rootLoader;
 };
 

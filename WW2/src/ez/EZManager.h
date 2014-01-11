@@ -142,8 +142,8 @@ public:
 		EZTurret() :
 			position(0),
 			tracking(false),
-			mount(NULL),
-			vehicle(NULL),
+			mount(nullptr),
+			vehicle(nullptr),
 			screenPosIndex(0)
 		{
 			for(int i = 0; i < SCREEN_POS_COUNT; i++)

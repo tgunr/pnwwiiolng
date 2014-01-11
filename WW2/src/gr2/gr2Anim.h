@@ -158,18 +158,18 @@ struct gr2AnimTwist
 struct gr2AnimSound
 {
 	gr2AnimSound() :
-		model(NULL),
+		model(nullptr),
 		pose(-1),
 		move(-1),
 		ID(-1),
 		loopID(-1),
-		name(NULL),
+		name(nullptr),
 		footNextTime(0),
 		footOKTime(0)
 	{
 	}
 
-	void Init(gr2AnimTrooper* m = NULL);
+	void Init(gr2AnimTrooper* m = nullptr);
 	void Update();
 	void Stop();
 
@@ -373,7 +373,7 @@ struct gr2AnimTrooper : public gr2AnimModel
 	gr2AnimTwist		twist;
 
 	void Reset();
-	void SetKit(SINT32 index = -1, const char* vid = NULL);
+	void SetKit(SINT32 index = -1, const char* vid = nullptr);
 
 	// is this trooper within a certain range of me?
 	inline bool InRange(FLOAT32 distance, bool applyMod = false)
@@ -427,9 +427,9 @@ struct Corpse
 	bool update;
 
     Corpse() :
-		skeleton(NULL),
-		model(NULL),
-		TO(NULL),
+		skeleton(nullptr),
+		model(nullptr),
+		TO(nullptr),
 		TOLevel(0),
 		expires(-1),
 		inittime(0),
@@ -457,9 +457,9 @@ struct Corpse
 		memset(&pos, 0, sizeof(pos));
 		memset(&gr2Offset, 0, sizeof(gr2Offset));
 
-		skeleton = NULL;
-		model	= NULL;
-		TO = NULL;
+		skeleton = nullptr;
+		model	= nullptr;
+		TO = nullptr;
 		TOLevel = 0;
 		expires = -1;
 		inittime = 0;
@@ -477,7 +477,7 @@ extern struct gr2AnimTrooper* gr2AnimCreateModel (struct vehVehicle*vehicle, UIN
 
 extern OBJECT* gr2AnimCreateObject(struct vehVehicle*vehicle, UINT32 vehicleTypeNum);
 extern void	gr2AnimHandleEvent(struct OBJECT* pObject, gr2Model* model, SINT32 eventID);
-extern void	gr2AnimExecuteEvent(struct OBJECT* pObject, gr2Model* model, SINT32 typeID, const char* data = NULL);
+extern void	gr2AnimExecuteEvent(struct OBJECT* pObject, gr2Model* model, SINT32 typeID, const char* data = nullptr);
 
 // old stuff
 extern LOGICAL gr2AnimDoWeaponCollision (struct OBJECT* pObject, piVECTOR* startPnt, piVECTOR* endPnt, SINT32* location, piVECTOR* collisionPnt);
@@ -564,9 +564,9 @@ extern void gr2AnimExpireCorpses();
 extern bool gr2AnimHasWeapon(gr2AnimTrooper* model, fpFPSWeaponType type);
 
 // lifetime of 0 means use the default; greater than 0 is the lifetime; -1 means don't expire
-extern Corpse* gr2AnimAddCorpse(gr2AnimTrooper* a, const char* offset = NULL, bool blood = false, SINT32 lifeTime = 0, SINT32 material = -1);
-extern Corpse* gr2AnimAddCorpse(gr2PhysicsModel* m, const char* offset = NULL, bool blood = false, SINT32 lifeTime = 0, SINT32 material = -1);
-extern Corpse* gr2AnimAddCorpse(OBJECT* o, gr2Model* s, const char* m, const char* offset = NULL, bool blood = false, SINT32 lifeTime = 0, SINT32 material = -1);
+extern Corpse* gr2AnimAddCorpse(gr2AnimTrooper* a, const char* offset = nullptr, bool blood = false, SINT32 lifeTime = 0, SINT32 material = -1);
+extern Corpse* gr2AnimAddCorpse(gr2PhysicsModel* m, const char* offset = nullptr, bool blood = false, SINT32 lifeTime = 0, SINT32 material = -1);
+extern Corpse* gr2AnimAddCorpse(OBJECT* o, gr2Model* s, const char* m, const char* offset = nullptr, bool blood = false, SINT32 lifeTime = 0, SINT32 material = -1);
 extern Corpse* gr2AnimAddCorpse(const char* modelPath, FLOAT64VECTOR& pos, piMATRIX& mat, SINT32 lifeTime = 0, SINT32 material = -1);
 extern void gr2AnimCorpseTO(Corpse* c);
 

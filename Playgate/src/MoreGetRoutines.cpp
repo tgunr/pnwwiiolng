@@ -181,7 +181,7 @@ BOOL GetDirectXFileVersion(TCHAR* DirectXFile, PLAY_DX_VERS *vers, BOOL Messages
 	BOOL				retval=FALSE;
 	DWORD				Nothing, VSize;
 	UINT				Len;
-	LPVOID				pVersion=NULL;
+	LPVOID				pVersion=nullptr;
 	VS_FIXEDFILEINFO*	pFFI;
 
 	vers->isInstalled = 0;
@@ -199,14 +199,14 @@ BOOL GetDirectXFileVersion(TCHAR* DirectXFile, PLAY_DX_VERS *vers, BOOL Messages
 				wsprintf(txt, _T("DirectX is not installed on your system.\n")
 							_T("%s requires you to install DirectX "),
 							_T("Get DirectX File Version"));
-				MessageBox(NULL, txt, _T("Verify DirectX File Version"), MB_OK|MB_ICONSTOP);
+				MessageBox(nullptr, txt, _T("Verify DirectX File Version"), MB_OK|MB_ICONSTOP);
 			}
 
 			break;
 		}
 
 		pVersion = malloc(VSize);
-		if (pVersion == NULL)
+		if (pVersion == nullptr)
 		{
 			// Severe error
 			// If we can't alloc memory, then message
@@ -223,7 +223,7 @@ BOOL GetDirectXFileVersion(TCHAR* DirectXFile, PLAY_DX_VERS *vers, BOOL Messages
 				wsprintf(txt, _T("DirectX is not installed properly on your system.\n")
 											_T("%s requires you to install DirectX"),
 											_T("Get DirectX File Version"));
-				MessageBox(NULL, txt, _T("Verify DirectX File Version"), MB_OK|MB_ICONSTOP);
+				MessageBox(nullptr, txt, _T("Verify DirectX File Version"), MB_OK|MB_ICONSTOP);
 			}
 
 			break;
@@ -240,7 +240,7 @@ BOOL GetDirectXFileVersion(TCHAR* DirectXFile, PLAY_DX_VERS *vers, BOOL Messages
 						LOWORD(pFFI->dwProductVersionMS),
 						HIWORD(pFFI->dwProductVersionLS),
 						LOWORD(pFFI->dwProductVersionLS));
-			MessageBox(NULL, txt, "Verify DirectX File Version", MB_OK|MB_ICONINFORMATION);
+			MessageBox(nullptr, txt, "Verify DirectX File Version", MB_OK|MB_ICONINFORMATION);
 		}
 #endif
 
@@ -252,7 +252,7 @@ BOOL GetDirectXFileVersion(TCHAR* DirectXFile, PLAY_DX_VERS *vers, BOOL Messages
 	}
 	while (0);
 
-	if (pVersion != NULL)
+	if (pVersion != nullptr)
 	{
 
 		free(pVersion);
@@ -284,7 +284,7 @@ BOOL VerifyDirectXFileVersion(PLAY_DX_VERS *vers, DWORD MinProductVersionMS, DWO
 										LOWORD(vers->hiVersion),
 										_T("Verify DirectX File Version"),
 										LOWORD(MinProductVersionMS));
-			MessageBox(NULL, txt, _T("Verify DirectX File Version"), MB_OK|MB_ICONSTOP);
+			MessageBox(nullptr, txt, _T("Verify DirectX File Version"), MB_OK|MB_ICONSTOP);
 		}
 	}
 
@@ -338,7 +338,7 @@ void GetSoundDevice(PLAY_SOUND *sound)
 
 	sound->isValid = FALSE;
 	
-	result = mixerGetID(NULL, &uMxId, MIXER_OBJECTF_WAVEOUT);
+	result = mixerGetID(nullptr, &uMxId, MIXER_OBJECTF_WAVEOUT);
 	if (result != MMSYSERR_NOERROR)
 		return;
 

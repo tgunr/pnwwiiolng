@@ -117,9 +117,9 @@ SuperCellMapView::~SuperCellMapView()
 
 	// remove any shared filters from the main message loop
 	// map input filters are shared
-	phui::MessageFilter* filter = NULL;
+	phui::MessageFilter* filter = nullptr;
 
-	for(int i = 0; (filter = FilterAt(i)) != NULL; i++)
+	for(int i = 0; (filter = FilterAt(i)) != nullptr; i++)
 		uiMessageLoop()->RemoveMessageFilter(filter);
 
 	// keep track of how many maps are currently running
@@ -937,7 +937,7 @@ void SuperCellMapView::Renderer::LoadThread::run()
 		_cells.erase(_cells.begin());
 		lock.unlock();
 
-		if ( NULL != sc && sc->loading == true )
+		if ( nullptr != sc && sc->loading == true )
 			sc->Load();
 	}
 }

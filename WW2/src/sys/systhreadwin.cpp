@@ -9,7 +9,7 @@
 systhread systhreadCreate(systhread_start_routine func, void* userdata)
 {
 	DWORD threadid;
-	return (systhread)CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE)func, userdata, 0, &threadid);
+	return (systhread)CreateThread(nullptr, 0, (LPTHREAD_START_ROUTINE)func, userdata, 0, &threadid);
 }
 
 /************************************************************************************************
@@ -18,7 +18,7 @@ systhread systhreadCreate(systhread_start_routine func, void* userdata)
 
 systhread_mutex systhreadMutexCreate()
 {
-	return (systhread_mutex)CreateMutex(NULL, FALSE, NULL);
+	return (systhread_mutex)CreateMutex(nullptr, FALSE, nullptr);
 }
 
 /************************************************************************************************

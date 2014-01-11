@@ -471,7 +471,7 @@ LOGICAL oglIsTexture(SINT32 texid, SINT32 miplevel)
     {
         if(textures[texid].iswritable)
         {
-            if(textures[texid].lpsurf[miplevel] == NULL)
+            if(textures[texid].lpsurf[miplevel] == nullptr)
             {
                 return FALSE;
             }
@@ -480,7 +480,7 @@ LOGICAL oglIsTexture(SINT32 texid, SINT32 miplevel)
     else if(textures[texid].iswritable || textures[texid].hasalpha)
     {
         // Need lpsurf for these types
-        if(textures[texid].lpsurf[miplevel] == NULL)
+        if(textures[texid].lpsurf[miplevel] == nullptr)
         {
             return FALSE;
         }
@@ -491,7 +491,7 @@ LOGICAL oglIsTexture(SINT32 texid, SINT32 miplevel)
 
 LOGICAL oglIsTexture3D(SINT32 texid)
 {
-	if (texid < 0 || texid >= numtexture3Ds || texture3Ds == NULL)
+	if (texid < 0 || texid >= numtexture3Ds || texture3Ds == nullptr)
 	{
 		return(FALSE);
 	}
@@ -548,7 +548,7 @@ TEXTURE* oglGetTextureData2(SINT32 texid)
 {
     if(texid < 0 || texid >= numtextures || !textures)
     {
-        return NULL;
+        return nullptr;
     }
 
     return &textures[texid];
@@ -561,7 +561,7 @@ TEXTURE* oglGetTextureData(SINT32 texid)
         return &textures[texid];
     }
 
-    return NULL;
+    return nullptr;
 }
 
 TEXTURE3D* oglGetTexture3DData(SINT32 texid)
@@ -571,7 +571,7 @@ TEXTURE3D* oglGetTexture3DData(SINT32 texid)
 		return(&texture3Ds[texid]);
 	}
 
-	return(NULL);
+	return(nullptr);
 }
 
 void oglSetMinTextureDim(SINT32 mintexdim)
@@ -642,7 +642,7 @@ SINT32		retval, i, miplevels;
         return 0;
     }
 
-	if (textures[texid].lpsurf[miplevel] == NULL)
+	if (textures[texid].lpsurf[miplevel] == nullptr)
 	{
 		return(-1);
 	}
@@ -829,9 +829,9 @@ SINT32		retval, i, miplevels;
 		{
 			if (textures[texid].hdevtex[i] == 0)
 			{
-				if (textures[texid].lpsurf[i] == NULL)
+				if (textures[texid].lpsurf[i] == nullptr)
 				{
-					Write_Debug("Found an active mip level with a NULL surface pointer!");
+					Write_Debug("Found an active mip level with a nullptr surface pointer!");
 				}
 
 #ifdef DDP_REVERSE_GL_COLORS
@@ -914,7 +914,7 @@ SINT32		retval, i, miplevels;
                 {
 				    // These are not needed after initial load
 				    memFree(textures[texid].lpsurf[i]);
-				    textures[texid].lpsurf[i] = NULL;
+				    textures[texid].lpsurf[i] = nullptr;
                 }
 
                 textures[texid].hdevtex[i] = 1;
@@ -931,7 +931,7 @@ SINT32		retval, i, miplevels;
     {
 	    // These are not needed unless writable or for alpha collider
 	    memFree(textures[texid].lpsurf[0]);
-	    textures[texid].lpsurf[0] = NULL;
+	    textures[texid].lpsurf[0] = nullptr;
     }
 
     textures[texid].timeaccessed = frametime;
@@ -972,10 +972,10 @@ void oglUnloadTexture(SINT32 texid, SINT32 miplevel)
 		}
 	}
 
-	if (textures[texid].lpsurf[miplevel] != NULL)
+	if (textures[texid].lpsurf[miplevel] != nullptr)
 	{
 		memFree(textures[texid].lpsurf[miplevel]);
-		textures[texid].lpsurf[miplevel] = NULL;
+		textures[texid].lpsurf[miplevel] = nullptr;
 	}
 
 	textures[texid].hdevtex[miplevel] = 0;
@@ -999,10 +999,10 @@ SINT32	i, j, texid;
 		texid = texture3Ds[tex3d].texid[i];
 		for (j=textures[texid].miplevels-1; j >= 0; j--)
 		{
-			if (textures[texid].lpsurf[j] != NULL)
+			if (textures[texid].lpsurf[j] != nullptr)
 			{
 				memFree(textures[texid].lpsurf[j]);
-				textures[texid].lpsurf[j] = NULL;
+				textures[texid].lpsurf[j] = nullptr;
 			}
 
 			textures[texid].hdevtex[j] = 0;
@@ -1016,7 +1016,7 @@ SINT32	i, j, texid;
     if(texture3Ds[tex3d].texid)
     {
 	    memFree(texture3Ds[tex3d].texid);
-	    texture3Ds[tex3d].texid = NULL;
+	    texture3Ds[tex3d].texid = nullptr;
     }
 }
 
@@ -1490,7 +1490,7 @@ LOGICAL oglGetTextureFactors(SINT32 texid, SINT32 miplevel, FLOAT32* widthfactor
 */
 LOGICAL oglIsMaterial(SINT32 matid)
 {
-	if (matid < 0 || matid >= nummaterials || materials == NULL ||
+	if (matid < 0 || matid >= nummaterials || materials == nullptr ||
 		materials[matid].numuses == 0)
 	{
 		return(FALSE);
@@ -2362,7 +2362,7 @@ SINT32		numcomps, *comps;
 
 	numtextures = MINTEXTURES;
 	textures = (TEXTURE*)memAlloc(sizeof(TEXTURE) * numtextures);
-	if ( textures == NULL )
+	if ( textures == nullptr )
 		throw "Out of memory for textures";
 
     for(i = 0; i < MINTEXTURES; i++)
@@ -2373,17 +2373,17 @@ SINT32		numcomps, *comps;
 
 	numtexture3Ds = MIN3DTEXTURES;
 	texture3Ds = (TEXTURE3D*)memAlloc(sizeof(TEXTURE3D) * numtexture3Ds);
-	if ( texture3Ds == NULL )
+	if ( texture3Ds == nullptr )
 		throw "Out of memory for texture3Ds";
 
 	nummaterials = MINMATERIALS;
 	materials = (MATERIAL*)memAlloc(sizeof(MATERIAL) * nummaterials);
-	if ( materials == NULL )
+	if ( materials == nullptr )
 		throw "Out of memory for materials";
 
 	// Extract data from OpenGL
 	tp = (SINT8*)glGetString(GL_VENDOR);
-	if (tp != NULL)
+	if (tp != nullptr)
 	{
 		Write_Debug("Vendor:    %s", tp);
 	}
@@ -2391,13 +2391,13 @@ SINT32		numcomps, *comps;
 	tp = (SINT8*)glGetString(GL_VERSION);
 	static char OGL_Requirements[128];
 	sprintf(OGL_Requirements, "OpenGL drivers %u.%u or higher are required", OPENGL_MAJOR_VERSION, OPENGL_MINOR_VERSION);
-	if (tp != NULL)
+	if (tp != nullptr)
 	{
 		Write_Debug("Version:   %s", tp);
 		gOpenGLMajorVersion = atoi(tp);
 		gOpenGLMinorVersion = 0;
 		tp = strchr(tp, '.');
-		if (tp != NULL)
+		if (tp != nullptr)
 		{
 			tp += 1;
 			gOpenGLMinorVersion = atoi(tp);
@@ -2417,7 +2417,7 @@ SINT32		numcomps, *comps;
 
 	tp = (SINT8*)glGetString(GL_RENDERER);
 
-    if (tp != NULL)
+    if (tp != nullptr)
 	{
 		Write_Debug("Renderer:  %s", tp);
 
@@ -2426,14 +2426,14 @@ SINT32		numcomps, *comps;
         {
 	        static const TCHAR* _ERR_TITLE = _T("Video initialization error");
 	        std::wstring message = UTF16("OpenGL drivers may need to be updated. Click ok to continue");
-	        MessageBox(NULL, message.c_str(), _ERR_TITLE, MB_ICONEXCLAMATION|MB_OK);
+	        MessageBox(nullptr, message.c_str(), _ERR_TITLE, MB_ICONEXCLAMATION|MB_OK);
         }
 #endif
 	}
 
 	tp = (SINT8*)glGetString(GL_EXTENSIONS);
 
-    if (tp != NULL)
+    if (tp != nullptr)
 	{
 		if (!ParseExtensions(tp))
 		{
@@ -2443,7 +2443,7 @@ SINT32		numcomps, *comps;
 
 	glGetIntegerv(GL_MAX_LIGHTS, (GLint*)&gMaxLights);
 	lights = (LIGHT*)memAlloc(sizeof(LIGHT) * gMaxLights);
-	if ( lights == NULL )
+	if ( lights == nullptr )
 		throw "Out of memory for lights";
 
 	numlights = 0;
@@ -2513,7 +2513,7 @@ SINT32		numcomps, *comps;
 		if (numcomps > 0)
 		{
 			comps = (SINT32*)memAlloc(numcomps * sizeof(SINT32));
-			if (comps == NULL)
+			if (comps == nullptr)
 				throw "Out of memory for compressed textures";
 			glGetIntegerv(GL_COMPRESSED_TEXTURE_FORMATS_ARB, (GLint*)comps);
 			for (i=0; i < numcomps; i++)
@@ -2611,7 +2611,7 @@ static inline void _initializationError(const char* problem)
 	std::wstring message = _ERR_STR_1;
 	message += UTF16(problem);
 	message += _ERR_STR_2;
-	MessageBox(NULL, message.c_str(), _ERR_TITLE, MB_ICONEXCLAMATION|MB_OK);
+	MessageBox(nullptr, message.c_str(), _ERR_TITLE, MB_ICONEXCLAMATION|MB_OK);
 #elif platOS == OS_MACOS
 	MacVideoInitializationFailed(problem);
 #endif
@@ -2648,10 +2648,10 @@ SINT32		total, free;
 
 	numlights = 0;
 
-	if (lights != NULL)
+	if (lights != nullptr)
 	{
 		memFree(lights);
-		lights = NULL;
+		lights = nullptr;
 	}
 
 	// Materials
@@ -2662,10 +2662,10 @@ SINT32		total, free;
 
 	nummaterials = 0;
 
-	if (materials != NULL)
+	if (materials != nullptr)
 	{
 		memFree(materials);
-		materials = NULL;
+		materials = nullptr;
 	}
 
 	// Textures
@@ -2698,18 +2698,18 @@ SINT32		total, free;
 
 	numtexture3Ds = 0;
 
-	if (texture3Ds != NULL)
+	if (texture3Ds != nullptr)
 	{
 		memFree(texture3Ds);
-		texture3Ds = NULL;
+		texture3Ds = nullptr;
 	}
 
 	numtextures = 0;
 
-	if (textures != NULL)
+	if (textures != nullptr)
 	{
 		memFree(textures);
-		textures = NULL;
+		textures = nullptr;
 	}
 
 	if(textureMutex)
@@ -3907,14 +3907,14 @@ LOGICAL oglGetTextureMemoryDescriptor(SINT32 texid, SINT32 miplevel, oglSURFACED
 TEXTURE*	texture;
 
 	texture = oglGetTextureData(texid);
-	if(texture == NULL) return FALSE;
+	if(texture == nullptr) return FALSE;
 
 	lpsd->Width       = texture->po2width[miplevel];
 	lpsd->Height      = texture->po2height[miplevel];
 	lpsd->Pitch       = texture->comp[miplevel] * lpsd->Width;
 	lpsd->Surface     = texture->lpsurf[miplevel];
 
-	if (lpsd->Surface == NULL)
+	if (lpsd->Surface == nullptr)
 		return FALSE;
 
 	lpsd->PixelFormat.BitCount = texture->comp[miplevel] * 8;
@@ -4489,7 +4489,7 @@ oglSURFACEDESC sd;
 	if(y >= height) y = height-1;
 
 	lpdds = oglGetTextureMemorySurface(texid, miplevel);
-	if (lpdds == NULL)
+	if (lpdds == nullptr)
 	{
 		return(FALSE);
 	}
@@ -4553,16 +4553,16 @@ SINT32 oglGetTextureUVColor(UINT32* pColor,
                             FLOAT32 u,
                             FLOAT32 v)
 {
-    UINT8* cPtr = NULL;
+    UINT8* cPtr = nullptr;
 
-    UINT16* sPtr = NULL;
+    UINT16* sPtr = nullptr;
 
     UINT32 uColor = 0;
  //   UINT32 uAlpha = 0;
     UINT32 uAlphaBits = 0;
     UINT32 uAlphaShift = 0;
     UINT32 uAlphaMask = 0;
-    UINT32* lPtr = NULL;
+    UINT32* lPtr = nullptr;
 
     FLOAT32 uf, vf;
 
@@ -4571,7 +4571,7 @@ SINT32 oglGetTextureUVColor(UINT32* pColor,
     SINT32 x, y;
     SINT32 iStride;
 
-    TEXTURE* lpTex = NULL;
+    TEXTURE* lpTex = nullptr;
 
     piSURFACEDESC pisd;
 
@@ -4733,7 +4733,7 @@ void* oglGetTextureMemorySurface(SINT32 iTexID, SINT32 iMipLevel)
 {
 	if (!oglIsTexture(iTexID, iMipLevel))
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	return(textures[iTexID].lpsurf[iMipLevel]);
@@ -5357,7 +5357,7 @@ SINT32		stride;
 			_RenderScene(oglt, oglvt, VertexCount, IndexCount,
 							&pv->x, stride,
 							&pv->nx, stride,
-							NULL, 0,
+							nullptr, 0,
 							&pv->tu,stride,
 							lpIndices);
 		}
@@ -5369,7 +5369,7 @@ SINT32		stride;
 			stride = sizeof(oglLVERTEX);
 			_RenderScene(oglt, oglvt, VertexCount, IndexCount,
 							&pv->x, stride,
-							NULL, 0,
+							nullptr, 0,
 							&pv->color, stride,
 							&pv->tu, stride,
 							lpIndices);
@@ -5382,7 +5382,7 @@ SINT32		stride;
 			stride = sizeof(oglTLVERTEX);
 			_RenderScene(oglt, oglvt, VertexCount, IndexCount,
 							&pv->sx, stride,
-							NULL, 0,
+							nullptr, 0,
 							&pv->color, stride,
 							&pv->tu, stride,
 							lpIndices);
@@ -5453,7 +5453,7 @@ oglSTRIDEDDATA* sverts = (oglSTRIDEDDATA*)lpStridedData;
 		{
 			_RenderScene(oglt, oglvt, VertexCount, IndexCount,
 							sverts->position.pdata, sverts->position.stride,
-							NULL, 0,
+							nullptr, 0,
 							sverts->diffuse.pdata, sverts->diffuse.stride,
 							sverts->textureCoords[0].pdata,  sverts->textureCoords[0].stride,
 							lpIndices);
@@ -5464,7 +5464,7 @@ oglSTRIDEDDATA* sverts = (oglSTRIDEDDATA*)lpStridedData;
 		{
 			_RenderScene(oglt, oglvt, VertexCount, IndexCount,
 							sverts->position.pdata, sverts->position.stride,
-							NULL, 0,
+							nullptr, 0,
 							sverts->diffuse.pdata, sverts->diffuse.stride,
 							sverts->textureCoords[0].pdata,  sverts->textureCoords[0].stride,
 							lpIndices);
@@ -5509,7 +5509,7 @@ oglSTRIDEDDATA* sverts = (oglSTRIDEDDATA*)lpStridedData;
 
 LOGICAL	oglRenderStridedScene(oglPRIMITIVETYPE oglt, oglVERTEXTYPE oglvt, LPVOID lpStridedData, UINT32 VertexCount)
 {
-	return oglRenderIndexStridedScene( oglt, oglvt, lpStridedData, VertexCount, NULL, 0);
+	return oglRenderIndexStridedScene( oglt, oglvt, lpStridedData, VertexCount, nullptr, 0);
 }
 
 /************************************************************************************************
@@ -5518,7 +5518,7 @@ LOGICAL	oglRenderStridedScene(oglPRIMITIVETYPE oglt, oglVERTEXTYPE oglvt, LPVOID
 
 LOGICAL oglRenderScene(oglPRIMITIVETYPE oglt, oglVERTEXTYPE oglvt, LPVOID lpVertices, UINT32 VertexCount)
 {
-	return oglRenderIndexScene(oglt, oglvt, lpVertices, VertexCount, NULL, 0);
+	return oglRenderIndexScene(oglt, oglvt, lpVertices, VertexCount, nullptr, 0);
 }
 
 // Start with a clean slate, since other elements of this app do not go through the
@@ -5812,7 +5812,7 @@ TEXTURE3D*		ptex;
 
 	num = numtexture3Ds + MIN3DTEXTURES;
 	ptex = (TEXTURE3D*)memAlloc(sizeof(TEXTURE3D) * num);
-	if (ptex == NULL)
+	if (ptex == nullptr)
 	{
 		return(-1);
 	}
@@ -5851,7 +5851,7 @@ MATERIAL*	pmat;
 
 	num = nummaterials + MINMATERIALS;
 	pmat = (MATERIAL*)memAlloc(sizeof(MATERIAL) * num);
-	if (pmat == NULL)
+	if (pmat == nullptr)
 	{
 		systhreadMutexUnlock(materialMutex);
 		return(-1);

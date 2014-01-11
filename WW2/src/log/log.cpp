@@ -101,7 +101,7 @@ UINT32 Log_System_Mask(const char* system)
 
 	for(i = 0; i < 31; i++)
 	{
-		if(LOG_SYSTEM_NAMES[i] == NULL)
+		if(LOG_SYSTEM_NAMES[i] == nullptr)
 			break;
 
 		if(!strcmp(LOG_SYSTEM_NAMES[i], system))
@@ -127,7 +127,7 @@ const char* Log_System_Name(UINT32 mask)
 		mask >>= 1;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /************************************************************************************************
@@ -167,7 +167,7 @@ void Close_Debug(void)
 #include "include/vars.h"
 
 static char					ofn[_MAX_PATH];
-static FILE*				ofp = NULL;
+static FILE*				ofp = nullptr;
 
 /************************************************************************************************
 	Open_Debug
@@ -175,7 +175,7 @@ static FILE*				ofp = NULL;
 
 LOGICAL Open_Debug(const char* filename)
 {
-	if (filename == NULL)
+	if (filename == nullptr)
 		return(FALSE);
 
     strcpy(ofn, filename);
@@ -186,7 +186,7 @@ LOGICAL Open_Debug(const char* filename)
 
 	ofp = fioUserFile(ofn, "w");
 
-	if ( ofp == NULL )
+	if ( ofp == nullptr )
 		return FALSE;
 
 	Write_Debug("\r\nDebug Message System Open.\r\n");
@@ -200,9 +200,9 @@ LOGICAL Open_Debug(const char* filename)
 
 void Close_Debug(void)
 {
-	if ( ofp != NULL )
+	if ( ofp != nullptr )
 		fclose(ofp);
-	ofp = NULL;
+	ofp = nullptr;
 }
 
 /************************************************************************************************
@@ -211,8 +211,8 @@ void Close_Debug(void)
 
 static void logv(UINT32 system, SINT32 level, const char* str, va_list marker)
 {
-	if(logLevel < level || !(system & logMask) || str == NULL) return;
-	if ( ofp == NULL )
+	if(logLevel < level || !(system & logMask) || str == nullptr) return;
+	if ( ofp == nullptr )
 	{
 		vprintf(str, marker);
 		printf("\n");
@@ -308,7 +308,7 @@ void logTimerReset()
 
 void logTimerBegin(const char* parent, const char* child, int* timerid)
 {
-	logTimer* timer = NULL;
+	logTimer* timer = nullptr;
 
 	if(*timerid < 0)
 	{
@@ -425,7 +425,7 @@ void logTimerPrint(int maintimerid, int frameidx)
 	{
 		sortTime = &sortedTimes[i];
 
-		if(sortTime->funcname == NULL)
+		if(sortTime->funcname == nullptr)
 			break;
 
 		if(sortTime->tottime > 0)

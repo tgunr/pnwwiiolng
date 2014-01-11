@@ -25,7 +25,7 @@ enum
 											//! (probably connection manipulation by player)
 ,	ETEUL_CONNECTION_STALLED	=	20033	//! Difficulty sending keepalives.
 ,	ETEUL_CB_CONN_DEAD			=	20034	//! Connection not accepting callbacks.
-,	ETEUL_CB_SEND_NULL			=	20035	//! Tried to send NULL data.
+,	ETEUL_CB_SEND_NULL			=	20035	//! Tried to send nullptr.
 ,	ETEUL_CB_REQ_DATA			=	20036	//! Callback requires data.
 };
 

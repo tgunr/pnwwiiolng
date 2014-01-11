@@ -246,7 +246,7 @@ Image* ReadDDSFile(const std::string& name)
     if(fd < 0)
     {
         Write_Debug("[ReadDDSFile] cannot open %s", name.c_str());
-        return NULL;
+        return nullptr;
     }
 
     char filecode[4];
@@ -257,7 +257,7 @@ Image* ReadDDSFile(const std::string& name)
     {
         Write_Debug("[ReadDDSFile] File %s not DDS", name.c_str());
         fioClose(fd);
-        return NULL;
+        return nullptr;
     }
 
     // Get the surface desc.
@@ -275,7 +275,7 @@ Image* ReadDDSFile(const std::string& name)
     {
         Write_Debug("[ReadDDSFile] File %s not valid structure size", name.c_str());
         fioClose(fd);
-        return NULL;
+        return nullptr;
     }
 
     bool is3dImage = false;
@@ -302,14 +302,14 @@ Image* ReadDDSFile(const std::string& name)
     {
         fioClose(fd);
         Write_Log(LOG_OLD, LOG_WARN, "ERROR: DDPF_BUMPDUDV format is not supported");
-        return NULL;
+        return nullptr;
     }
 
     if(ddsd.ddpfPixelFormat.dwFlags & DDPF_BUMPLUMINANCE)
     {
         fioClose(fd);
         Write_Log(LOG_OLD, LOG_WARN, "ERROR: DDPF_BUMPLUMINANCE format is not supported");
-        return NULL;
+        return nullptr;
     }
 
     // Uncompressed formats will usually use DDPF_RGB to indicate an RGB format,
@@ -383,7 +383,7 @@ Image* ReadDDSFile(const std::string& name)
                 {
                     fioClose(fd);
                     Write_Log(LOG_OLD, LOG_WARN, "ERROR: format is not supported");
-                    return NULL;
+                    return nullptr;
                 }
             }
         }
@@ -392,7 +392,7 @@ Image* ReadDDSFile(const std::string& name)
         {
             fioClose(fd);
             Write_Log(LOG_OLD, LOG_WARN, "ERROR: unhandled RGB pixel format in dds file");
-            return NULL;
+            return nullptr;
         }
     }
     else if(ddsd.ddpfPixelFormat.dwFlags & DDPF_LUMINANCE)
@@ -481,12 +481,12 @@ Image* ReadDDSFile(const std::string& name)
         case 0x00000070: // G16R16F
             fioClose(fd);
             Write_Log(LOG_OLD, LOG_INFO, "G16R16F format is not supported");
-            return NULL;
+            return nullptr;
             break;
         case 0x00000073: // G32R32F
             Write_Log(LOG_OLD, LOG_INFO, "G32R32F format is not supported");
             fioClose(fd);
-            return NULL;
+            return nullptr;
             break;
         case 0x00000072: // R32F
             Write_Log(LOG_OLD, LOG_INFO, "format = R32F");
@@ -509,7 +509,7 @@ Image* ReadDDSFile(const std::string& name)
         case 0x00000075: // CxV8U8
             fioClose(fd);
             Write_Log(LOG_OLD, LOG_INFO, "CxV8U8 format is not supported");
-            return NULL;
+            return nullptr;
 
         case MAKEFOURCC( 'U', 'Y', 'V', 'Y'): // not supported in OSG
         case MAKEFOURCC( 'U', 'Y', 'V', '2'): // not supported in OSG
@@ -520,14 +520,14 @@ Image* ReadDDSFile(const std::string& name)
         default:
             fioClose(fd);
             Write_Log(LOG_OLD, LOG_WARN, "ERROR: unhandled FOURCC pixel format");
-            return NULL;
+            return nullptr;
         }
     }
     else
     {
         fioClose(fd);
         Write_Log(LOG_OLD, LOG_WARN, "ERROR: unhandled FOURCC pixel format");
-        return NULL;
+        return nullptr;
     }
 
     // Now set mipmap data (offsets into image raw data)
@@ -606,7 +606,7 @@ Image* ReadDDSFile(const std::string& name)
     {
         Write_Log(LOG_OLD, LOG_WARN, "ERROR: size <= 0");
         fioClose(fd);
-        return NULL;
+        return nullptr;
     }
 
     unsigned char* imageData = new unsigned char [size];
@@ -618,8 +618,8 @@ Image* ReadDDSFile(const std::string& name)
     if(!imageData)
     {
         fioClose(fd);
-        Write_Log(LOG_OLD, LOG_WARN, "ERROR: imageData == NULL");
-        return NULL;
+        Write_Log(LOG_OLD, LOG_WARN, "ERROR: imageData == nullptr");
+        return nullptr;
     }
 
     // Read image data
@@ -924,7 +924,7 @@ public:
     virtual ReadResult readImage(std::istream& fin, const Options* options) const
     {
         osg::Image* osgImage = ReadDDSFile(fin);
-        if (osgImage==NULL) return ReadResult::FILE_NOT_HANDLED;
+        if (osgImage==nullptr) return ReadResult::FILE_NOT_HANDLED;
 
         if (options && options->getOptionString().find("dds_flip")!=std::string::npos)
         {

@@ -180,7 +180,7 @@ void PlayerLayer::RenderSuperCells(SuperCellMapView* mv, int scx1, int scy1, int
 		// lets show all other friendlies
 		if(PlayerVehicle)
 		{
-			vehVehicle* Vehicle = NULL;
+			vehVehicle* Vehicle = nullptr;
 			vehGetVehicleHead(&Vehicle);
 
 			for(; Vehicle; Vehicle = Vehicle->getNext())
@@ -268,7 +268,7 @@ void VehicleMapObject::DrawSelf(SuperCellMapView* mv)
     playery = -playpos.y + vecWorldOriginOffset.y;
 
 	// lets get my friend's position
-	vehVehicle*	veh = NULL;
+	vehVehicle*	veh = nullptr;
 	if(!_issamemission)
 		veh = vehFindVehicle((UINT32)_handle); // vehicle host index
 	else
@@ -320,7 +320,7 @@ void VehicleMapObject::DrawSelf(SuperCellMapView* mv)
 	}
 	else
 	{
-		if(veh == NULL)
+		if(veh == nullptr)
 		{
 			if(r) r *= .9f;
 			else r = .4f;

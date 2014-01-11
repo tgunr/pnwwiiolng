@@ -367,7 +367,7 @@ public:
 	FLOAT32				weaponBreathMultiplier;
 	FLOAT32				weaponPoseMultiplier;
 
-	SCHAR*				deployPivotBone;		// bone around which to pivot if deployed (NULL if no pivot)
+	SCHAR*				deployPivotBone;		// bone around which to pivot if deployed (nullptr if no pivot)
 
 	SINT32				rgFiringRules;			// enable special rules for kneeling rifle grenade firing
 	FLOAT32				rgFiringAngle;			// angle that the gun is pitched at

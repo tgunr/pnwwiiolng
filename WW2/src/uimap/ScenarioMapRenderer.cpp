@@ -41,7 +41,7 @@ SuperCellMapView::Renderer::SuperCell* ScenarioMapRenderer::NewSuperCell(Rendere
 	if(scx == 1 && scy == 1)
 		return new ScenarioMapRenderer::SuperCell(r, scx, scy);
 
-	return NULL;
+	return nullptr;
 }
 
 /************************************************************************************************

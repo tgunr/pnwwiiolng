@@ -39,7 +39,7 @@
 
 #define GROUND_BLOOD_ANIM_SCALE 0.1f // How fast pool spreads
 
-static FXBULLET* g_blts = NULL;
+static FXBULLET* g_blts = nullptr;
 
 static std::multimap<void* , SINT32> g_mappedBullets;
 static std::vector<FXBULLET*> drawlist;
@@ -52,7 +52,7 @@ static FXBULLET g_bltTail;
 
 static SINT32 g_iNumMat = 0;
 
-static piCOLORVALUE* g_lpColor = NULL;
+static piCOLORVALUE* g_lpColor = nullptr;
 
 static SINT32 _SortBackToFront(FXBULLET* l, FXBULLET* r);
 static void _UnMap(void* pData);
@@ -72,11 +72,11 @@ static ref_ptr<RenderStateSet> stateset;
 LOGICAL fxBltInit()
 {
     SINT32 i;
-    MATERIAL* lpMat = NULL;
+    MATERIAL* lpMat = nullptr;
 
     g_blts = new FXBULLET[MAX_DECALS];
 
-    if(g_blts == NULL)
+    if(g_blts == nullptr)
         return FALSE;
 
     g_iNumMat = piGetMaterials(&lpMat);
@@ -122,9 +122,9 @@ inline void _clear(FXBULLET* b)
     b->isStreak = 0;
     b->isWater = 0;
 
-    b->lpVehAttach = NULL;
-    b->o = NULL;
-    b->lpTop = NULL;
+    b->lpVehAttach = nullptr;
+    b->o = nullptr;
+    b->lpTop = nullptr;
 
     b->uVehicleType = 0;
     b->uAmmoSubType = 0;
@@ -152,9 +152,9 @@ void fxBltFreeAll()
 {
     FXBULLET* blt = g_bltHead.next;
     FXBULLET* lpTail = &g_bltTail;
-    FXBULLET* lpFree = NULL;
+    FXBULLET* lpFree = nullptr;
 
-    if(blt == NULL) return;
+    if(blt == nullptr) return;
 
     while(blt != lpTail)
     {
@@ -174,13 +174,13 @@ void fxBltFreeAll()
 //////////////////////////////////////////////
 LOGICAL fxBltKill()
 {
-    if(g_blts != NULL)
+    if(g_blts != nullptr)
     {
         delete [] g_blts;
-        g_blts = NULL;
+        g_blts = nullptr;
     }
 
-    // Set to NULL in case other bullet update routines are called.
+    // Set to nullptr in case other bullet update routines are called.
     memset(&g_bltHead, 0, sizeof(FXBULLET));
     memset(&g_bltTail, 0, sizeof(FXBULLET));
     memset(&_freeH, 0, sizeof(FXBULLET));
@@ -195,7 +195,7 @@ LOGICAL fxBltKill()
 //////////////////////////////////////////////
 LOGICAL fxBltCreate(FXBULLETCREATE* create)
 {
-    if(PN_UNLIKELY(create == NULL))
+    if(PN_UNLIKELY(create == nullptr))
         return FALSE;
 
 	return fxBltCreateBulletDecal(create);
@@ -207,7 +207,7 @@ LOGICAL fxBltCreate(FXBULLETCREATE* create)
 //////////////////////////////////////////////////////////////////////
 LOGICAL fxBltCreateBulletDecal(FXBULLETCREATE* create)
 {
-	if (PN_UNLIKELY(create == NULL))
+	if (PN_UNLIKELY(create == nullptr))
 		return FALSE;
 
 	bool blood = create->flags & (blt_decal_is_blood_splat | blt_decal_is_ground_blood);
@@ -218,7 +218,7 @@ LOGICAL fxBltCreateBulletDecal(FXBULLETCREATE* create)
             return FALSE;
     }
 
-    FXBULLET* blt = NULL;
+    FXBULLET* blt = nullptr;
     if(!fxBltGetBullet(&blt))
         return FALSE;
 
@@ -269,7 +269,7 @@ LOGICAL fxBltCreateBulletDecal(FXBULLETCREATE* create)
 //////////////////////////////////////////////////////////////////////
 LOGICAL fxBltCreateSmoke(FXBULLET* b)
 {
-    if(b->o == NULL)
+    if(b->o == nullptr)
         return FALSE;
 
     if(!b->o->psnorms)
@@ -283,7 +283,7 @@ LOGICAL fxBltCreateSmoke(FXBULLET* b)
 
     math3dMultiplyRotation(&n, &n, &b->o->mat);
 
-    const char* effect = NULL;
+    const char* effect = nullptr;
 
     if(gCustomTerrain && b->o && b->o->modelInstance)
     {
@@ -299,15 +299,15 @@ LOGICAL fxBltCreateSmoke(FXBULLET* b)
     if(!effect)
         effect = fxUtlGetBulletEffectFromMaterial(b->o->matname);
 
-    TransformEffect* te = NULL;
+    TransformEffect* te = nullptr;
 
     if(effect)
     {
-        te = TransformEffect::AddEffect(effect, Vec3f(n), 0, NULL);
+        te = TransformEffect::AddEffect(effect, Vec3f(n), 0, nullptr);
     }
     else
     {
-        te = TransformEffect::AddEffect("genericbullethit", Vec3f(n), 0, NULL);
+        te = TransformEffect::AddEffect("genericbullethit", Vec3f(n), 0, nullptr);
     }
 
     if(te)
@@ -337,14 +337,14 @@ LOGICAL fxBltSetBltValues(FXBULLET* blt, FXBULLETCREATE* create)
     blt->uAmmoSubType = create->uAmmoSubType;
     blt->flags = create->flags;
 
-    if(create->pVehicle != NULL)
+    if(create->pVehicle != nullptr)
     {
         blt->lpVehAttach = (vehVehicle*)create->pVehicle;
         blt->uVehicleType = blt->lpVehAttach->VehicleType->Type;
     }
     else
     {
-        blt->lpVehAttach = NULL;
+        blt->lpVehAttach = nullptr;
     }
 
     blt->o = create->lpAttachedObj;
@@ -643,7 +643,7 @@ LOGICAL fxBltCollideObject(piVECTOR* pV1,
                            UINT32* pNumCls,
                            FASTCOLLIDE cldArray[])
 {
-    FASTCOLLIDE* pList = NULL;
+    FASTCOLLIDE* pList = nullptr;
 
     UINT32 uNumCollisions = MAX_NUM_OF_COLLISIONS;
 
@@ -704,7 +704,7 @@ LOGICAL fxBltHandleCollision(FASTCOLLIDE cldArray[],
 //////////////////////////////////////////////////////////////////////
 LOGICAL fxBltSetBulletVector(FXBULLET* blt, FASTCOLLIDE* lpCld, SINT32 i)
 {
-    if(blt->lpVehAttach == NULL)
+    if(blt->lpVehAttach == nullptr)
     {
         math3dVectorMultiply(&blt->original[i],
                              &lpCld->CollidePnt,
@@ -778,7 +778,7 @@ LOGICAL fxBltPlayHitSound(FXBULLET* bullet)
 //////////////////////////////////////////////////////////////////////
 LOGICAL fxBltGetHitSound(FXBULLET* blt, SCHAR hitname[])
 {
-    SCHAR* hitsound = NULL;
+    SCHAR* hitsound = nullptr;
 
     if(blt->uAmmoSubType == WEAPAMMO_SUBTYPE_KNIFE)
 	{
@@ -799,7 +799,7 @@ LOGICAL fxBltGetHitSound(FXBULLET* blt, SCHAR hitname[])
 
             char* sound;
 
-            if(fxUtlGetRandomHitSound(hitsound, &sound, NULL, NULL))
+            if(fxUtlGetRandomHitSound(hitsound, &sound, nullptr, nullptr))
             {
                 strncpy(hitname, sound, 79);
                 return true;
@@ -830,7 +830,7 @@ LOGICAL fxBltGetHitSound(FXBULLET* blt, SCHAR hitname[])
         hitsound = "sounds\\hitwater1.wav";
     }
 
-    if(hitsound != NULL)
+    if(hitsound != nullptr)
     {
         if(!hitsound[0])
         {
@@ -876,7 +876,7 @@ bool fxBltPlaySound(FLOAT64VECTOR* pos, const OBJECT* o)
     if(!o)
         return false;
 
-    SCHAR* sound = NULL;
+    SCHAR* sound = nullptr;
 
     if(oglIsMaterial(o->matid))
     {
@@ -886,8 +886,8 @@ bool fxBltPlaySound(FLOAT64VECTOR* pos, const OBJECT* o)
 
         fxUtlGetRandomHitSound(mat[o->matid].name,
                                &sound,
-                               NULL,
-                               NULL);
+                               nullptr,
+                               nullptr);
     }
     else
     {
@@ -949,7 +949,7 @@ LOGICAL fxBltDraw()
     {
         blt = (*itr);
 
-        if(blt->lpVehAttach != NULL)
+        if(blt->lpVehAttach != nullptr)
         {
             fxBltUpdateVehicleBullet(blt);
         }
@@ -969,7 +969,7 @@ LOGICAL fxBltDraw()
     {
         blt = (*B);
 
-        if(blt->lpVehAttach != NULL)
+        if(blt->lpVehAttach != nullptr)
         {
             fxBltUpdateVehicleBullet(blt);
         }
@@ -994,7 +994,7 @@ LOGICAL fxBltDraw()
     {
         blt = (*B);
 
-        if(blt->lpVehAttach != NULL)
+        if(blt->lpVehAttach != nullptr)
         {
             piVECTOR p1 = blt->decal[0];
             piVECTOR p2 = p1;
@@ -1019,7 +1019,7 @@ LOGICAL fxBltDraw()
 //////////////////////////////////////////////////////////////////////
 void _DrawDecals()
 {
-    FXBULLET* blt = NULL;
+    FXBULLET* blt = nullptr;
 
     // 128 max * 4
     static piLVERTEX lv[512];
@@ -1096,13 +1096,13 @@ void _DrawDecals()
 //////////////////////////////////////////////////////////////////////
 LOGICAL fxBltUpdateVehicleBullet(FXBULLET* blt)
 {
-    if(blt == NULL)
+    if(blt == nullptr)
         return FALSE;
 
-    if(blt->lpVehAttach == NULL)
+    if(blt->lpVehAttach == nullptr)
         return FALSE;
 
-    if(blt->lpVehAttach->VehicleObjectData == NULL)
+    if(blt->lpVehAttach->VehicleObjectData == nullptr)
         return FALSE;
 
     weapUpdateVehicleHitmap(blt->lpVehAttach);
@@ -1123,7 +1123,7 @@ LOGICAL fxBltIsWater(FXBULLET* b)
         return TRUE;
     }
 
-    if(b->o == NULL)
+    if(b->o == nullptr)
     {
         return FALSE;
     }
@@ -1153,9 +1153,9 @@ LOGICAL fxBltIsWater(FXBULLET* b)
     FLOAT32 rollcoeff = 0.0f;
     vehVehicle*veh = persGetPersonaVehiclePtr();
 
-    mlGetObjectBumpinessAndFriction(NULL, NULL, NULL, NULL, &rollcoeff, NULL, b->o);
+    mlGetObjectBumpinessAndFriction(nullptr, nullptr, nullptr, nullptr, &rollcoeff, nullptr, b->o);
 
-    if(veh != NULL && veh->VehicleType != NULL)
+    if(veh != nullptr && veh->VehicleType != nullptr)
     {
         if(veh->VehicleType->Type == VEH_TYPE_SEA)
         {
@@ -1269,9 +1269,9 @@ LOGICAL fxBltGetBulletTexture(FXBULLET* blt)
 //////////////////////////////////////////////
 LOGICAL fxBltFreeBullet(FXBULLET* blt)
 {
-    FXBULLET* lpPrev = NULL;
+    FXBULLET* lpPrev = nullptr;
 
-    if(blt == NULL)
+    if(blt == nullptr)
         return FALSE;
 
     if(blt->o)
@@ -1299,9 +1299,9 @@ LOGICAL fxBltFreeBullet(FXBULLET* blt)
 //////////////////////////////////////////////////////////////////////
 LOGICAL fxBltAddBullet(FXBULLET* blt)
 {
-    FXBULLET* lpNext = NULL;
+    FXBULLET* lpNext = nullptr;
 
-    if(blt == NULL)
+    if(blt == nullptr)
         return FALSE;
 
     lpNext = g_bltHead.next;
@@ -1322,11 +1322,11 @@ LOGICAL fxBltAddBullet(FXBULLET* blt)
 //////////////////////////////////////////////////////////////////////
 LOGICAL fxBltGetBullet(FXBULLET** blt)
 {
-    FXBULLET* lpNode = NULL;
-    FXBULLET* lpNext = NULL;
-    FXBULLET* lpPrev = NULL;
+    FXBULLET* lpNode = nullptr;
+    FXBULLET* lpNext = nullptr;
+    FXBULLET* lpPrev = nullptr;
 
-    if(blt == NULL)
+    if(blt == nullptr)
         return FALSE;
 
     if(!fxBltCheckForBullets())
@@ -1340,8 +1340,8 @@ LOGICAL fxBltGetBullet(FXBULLET** blt)
     lpPrev->next = lpNext;
     lpNext->prev = lpPrev;
 
-    lpNode->next = NULL;
-    lpNode->prev = NULL;
+    lpNode->next = nullptr;
+    lpNode->prev = nullptr;
 
     *blt = lpNode;
 
@@ -1357,7 +1357,7 @@ LOGICAL fxBltCheckForBullets()
 {
     if(_freeH.next == &_freeT)
     {
-        FXBULLET* blt = NULL;
+        FXBULLET* blt = nullptr;
 
         if(g_bltTail.prev == &g_bltHead)
             return FALSE;
@@ -1383,23 +1383,23 @@ LOGICAL fxBltCheckForBullets()
 //////////////////////////////////////////////////////////////////////
 LOGICAL fxBltReleaseBullet(FXBULLET* blt)
 {
-    FXBULLET* lpNext = NULL;
-    FXBULLET* lpPrev = NULL;
+    FXBULLET* lpNext = nullptr;
+    FXBULLET* lpPrev = nullptr;
 
-    if(blt == NULL)
+    if(blt == nullptr)
         return FALSE;
 
     lpNext = blt->next;
     lpPrev = blt->prev;
 
-    if(lpNext == NULL || lpPrev == NULL)
+    if(lpNext == nullptr || lpPrev == nullptr)
         return FALSE;
 
     lpPrev->next = lpNext;
     lpNext->prev = lpPrev;
 
-    blt->prev = NULL;
-    blt->next = NULL;
+    blt->prev = nullptr;
+    blt->next = nullptr;
 
     return TRUE;
 }
@@ -1410,7 +1410,7 @@ LOGICAL fxBltReleaseBullet(FXBULLET* blt)
 //////////////////////////////////////////////////////////////////////
 LOGICAL fxBltDetachBlt(OBJECT* lpObj)
 {
-    if(g_blts == NULL)
+    if(g_blts == nullptr)
         return TRUE;
 
     if(lpObj)
@@ -1466,7 +1466,7 @@ void _UnMap(void* key)
 
     for(UINT32 u = 0; u < removeList.size(); u++)
     {
-        g_blts[removeList[u]].o = NULL;
+        g_blts[removeList[u]].o = nullptr;
 
         fxBltReleaseBullet(&g_blts[removeList[u]]);
         fxBltFreeBullet(&g_blts[removeList[u]]);
@@ -1488,12 +1488,12 @@ void fxBltSetColor(piCOLORVALUE* lpColor)
 //////////////////////////////////////////
 void fxBltUpdate()
 {
-    if(g_bltHead.next == NULL) return;
+    if(g_bltHead.next == nullptr) return;
     if(g_bltHead.next == &g_bltTail) return;
 
     FXBULLET* blt = g_bltHead.next;
     FXBULLET* lpTail = &g_bltTail;
-    FXBULLET* free = NULL;
+    FXBULLET* free = nullptr;
 
     piVECTOR vecDiff;
     FLOAT32 len2 = 0.0f;
@@ -1534,7 +1534,7 @@ void fxBltUpdate()
 
         blt->oldrelpos = blt->relpos;
 
-        if(blt->lpVehAttach != NULL)
+        if(blt->lpVehAttach != nullptr)
         {
             fxBltUpdateVehicleBullet(blt);
         }

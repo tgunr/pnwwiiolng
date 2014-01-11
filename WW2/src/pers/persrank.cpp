@@ -63,7 +63,7 @@ static char str[256];
 		return str;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /************************************************************************************************
@@ -75,7 +75,7 @@ int persrankLoad(const char* name, xmlInputOpenCallback openfn, xmlInputReadCall
 	int err = -1;
 
 	xmlRegisterInputCallbacks(xmlinputmatch, openfn, readfn, closefn);
-	xmlDocPtr doc = xmlReadFile(name, NULL, XML_PARSE_RECOVER);
+	xmlDocPtr doc = xmlReadFile(name, nullptr, XML_PARSE_RECOVER);
 	if(doc)
 	{
 		err = _parseRankDoc(doc);

@@ -35,7 +35,7 @@ _createWindow(HINSTANCE hInstance)
 	wndClass.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_WINLOGO));
 	wndClass.hCursor        = LoadCursor(hInstance, MAKEINTRESOURCE(IDC_ARROW));
 	wndClass.hbrBackground  = (HBRUSH)GetStockObject(BLACK_BRUSH);
-	wndClass.lpszMenuName   = NULL;
+	wndClass.lpszMenuName   = nullptr;
 	wsprintf(classname, _T("OpenGLClass_%dx%dx%d"), WantedWidth, WantedHeight, WantedBpp);
 	wndClass.lpszClassName  = classname;
 
@@ -48,7 +48,7 @@ _createWindow(HINSTANCE hInstance)
 	UINT32 style = WS_POPUP | WS_VISIBLE | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX | WS_MAXIMIZEBOX | WS_THICKFRAME;
 	myhwnd = CreateWindowEx(0, wndClass.lpszClassName, _T("OglTek"),
 							style, 0, 0, WantedWidth, WantedHeight,
-							NULL, NULL, hinst, NULL);
+							nullptr, nullptr, hinst, nullptr);
 	if (!myhwnd)
 	{
 		Write_Debug("Failed to CreateWindowEx");

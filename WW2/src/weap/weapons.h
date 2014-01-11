@@ -62,7 +62,7 @@ struct weapWeapon
 	FLOAT32 Displacement; // displacement of bullet vs muzzle flash
 
 	weapWeapon()
-		: WeaponType(NULL)
+		: WeaponType(nullptr)
 		, LastFireTime(0.0f)
 		, ReloadStartTime(0.0f)
 		, WeaponFireType(0)

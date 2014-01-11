@@ -781,7 +781,7 @@ static void _drawScene(OBJECT* o)
         }
     }
 
-    SINT32 texType = obdrawGetMultiTextureOpcode(o->texid, NULL);
+    SINT32 texType = obdrawGetMultiTextureOpcode(o->texid, nullptr);
 
     if(texType == MT_SINGLEPASS)
     {
@@ -940,7 +940,7 @@ FLOAT32 trnwtrGetShaderFloat(WATER_PARAMS type)
 
 FLOAT32* trnwtrGetShaderFloatArray(WATER_PARAMS type)
 {
-    return NULL;
+    return nullptr;
 }
 
 UINT32 trnwtrGetShaderColor(WATER_PARAMS type)

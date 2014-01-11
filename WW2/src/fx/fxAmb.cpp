@@ -121,8 +121,8 @@ LOGICAL fxAmbInitRegion(REGION* lpReg, SCHAR* pFile)
 {
     SINT32 hHandle = -1;
     SCHAR szBuff[80];
-    REGION* lpNode = NULL;
-    REGION* lpTail = NULL;
+    REGION* lpNode = nullptr;
+    REGION* lpTail = nullptr;
 
     if(!bSoundEnable)
         return TRUE;
@@ -136,7 +136,7 @@ LOGICAL fxAmbInitRegion(REGION* lpReg, SCHAR* pFile)
     {
         lpNode = (REGION*)memAlloc(sizeof(REGION));
 
-        if(lpNode == NULL)
+        if(lpNode == nullptr)
         {
             Write_Log(LOG_SOUND, LOG_FATAL, "[fxAmbInitRegion] Out of memory");
             fioClose(hHandle);
@@ -150,7 +150,7 @@ LOGICAL fxAmbInitRegion(REGION* lpReg, SCHAR* pFile)
                &lpNode->iRight,
                &lpNode->iBottom);
 
-        if(lpReg->next == NULL)
+        if(lpReg->next == nullptr)
         {
             lpReg->next = lpNode;
             lpNode->prev = lpReg;
@@ -585,17 +585,17 @@ void fxAmbDayOrNight()
 ///////////////////////////////////
 void fxAmbOnCity(SINT32 x, SINT32 y, SINT32 z)
 {
-    static REGION* lpCity = NULL;
-    static REGION* lpMark = NULL;
+    static REGION* lpCity = nullptr;
+    static REGION* lpMark = nullptr;
     LOGICAL bOnCity = FALSE;
 
     if(!bSoundEnable) return;
 
-    if(g_regCity.next != NULL)
+    if(g_regCity.next != nullptr)
     {
-        if(lpCity == NULL) lpCity = g_regCity.next;
+        if(lpCity == nullptr) lpCity = g_regCity.next;
 
-        if(lpMark != NULL)
+        if(lpMark != nullptr)
         {
             if(x > lpMark->iLeft && x < lpMark->iRight)
             {
@@ -611,7 +611,7 @@ void fxAmbOnCity(SINT32 x, SINT32 y, SINT32 z)
             }
             else
             {
-                lpMark = NULL;
+                lpMark = nullptr;
                 g_uState &= ~DEF_PLAY_CITY;
             }
         }
@@ -634,17 +634,17 @@ void fxAmbOnCity(SINT32 x, SINT32 y, SINT32 z)
 ///////////////////////////////////
 void fxAmbOnRiver(SINT32 x, SINT32 y, SINT32 z)
 {
-    static REGION* lpRiver = NULL;
-    static REGION* lpMark = NULL;
+    static REGION* lpRiver = nullptr;
+    static REGION* lpMark = nullptr;
     LOGICAL bOnRiver = FALSE;
 
     if(!bSoundEnable) return;
 
-    if(g_regRiver.next != NULL)
+    if(g_regRiver.next != nullptr)
     {
-        if(lpRiver == NULL) lpRiver = g_regRiver.next;
+        if(lpRiver == nullptr) lpRiver = g_regRiver.next;
 
-        if(lpMark != NULL)
+        if(lpMark != nullptr)
         {
             if(x > lpMark->iLeft && x < lpMark->iRight)
             {
@@ -660,7 +660,7 @@ void fxAmbOnRiver(SINT32 x, SINT32 y, SINT32 z)
             }
             else
             {
-                lpMark = NULL;
+                lpMark = nullptr;
                 g_uState &= ~DEF_PLAY_RIVER;
             }
         }
@@ -683,17 +683,17 @@ void fxAmbOnRiver(SINT32 x, SINT32 y, SINT32 z)
 ///////////////////////////////////
 void fxAmbOnCoast(SINT32 x, SINT32 y, SINT32 z)
 {
-    static REGION* lpCoast = NULL;
-    static REGION* lpMark = NULL;
+    static REGION* lpCoast = nullptr;
+    static REGION* lpMark = nullptr;
     LOGICAL bOnCoast = FALSE;
 
     if(!bSoundEnable) return;
 
-    if(g_regCoast.next != NULL)
+    if(g_regCoast.next != nullptr)
     {
-        if(lpCoast == NULL) lpCoast = g_regCoast.next;
+        if(lpCoast == nullptr) lpCoast = g_regCoast.next;
 
-        if(lpMark != NULL)
+        if(lpMark != nullptr)
         {
             if(x > lpMark->iLeft && x < lpMark->iRight)
             {
@@ -709,7 +709,7 @@ void fxAmbOnCoast(SINT32 x, SINT32 y, SINT32 z)
             }
             else
             {
-                lpMark = NULL;
+                lpMark = nullptr;
                 g_uState &= ~DEF_PLAY_COAST;
             }
         }
@@ -732,8 +732,8 @@ void fxAmbOnCoast(SINT32 x, SINT32 y, SINT32 z)
 ///////////////////////////////////
 void fxAmbKill()
 {
-    REGION* lpFree = NULL;
-    REGION* lpReg = NULL;
+    REGION* lpFree = nullptr;
+    REGION* lpReg = nullptr;
 
     if(!bSoundEnable) return;
 
@@ -741,7 +741,7 @@ void fxAmbKill()
 
     lpReg = g_regCity.next;
 
-    while(lpReg != NULL)
+    while(lpReg != nullptr)
     {
         lpFree = lpReg;
         lpReg = lpReg->next;
@@ -751,7 +751,7 @@ void fxAmbKill()
 
     lpReg = g_regRiver.next;
 
-    while(lpReg != NULL)
+    while(lpReg != nullptr)
     {
         lpFree = lpReg;
         lpReg = lpReg->next;
@@ -761,7 +761,7 @@ void fxAmbKill()
 
     lpReg = g_regCoast.next;
 
-    while(lpReg != NULL)
+    while(lpReg != nullptr)
     {
         lpFree = lpReg;
         lpReg = lpReg->next;
@@ -920,7 +920,7 @@ void fxAmbStopDayCallback(void* data)
     AMBIENTSOUND* lpAmbSnd = (AMBIENTSOUND*)data;
     SINT32 iDay = DEF_DAY * g_iAmbDelay;
 
-    if(lpAmbSnd == NULL || !bSoundEnable)
+    if(lpAmbSnd == nullptr || !bSoundEnable)
         return;
 
     SINT32 iNextTime = 0;
@@ -942,7 +942,7 @@ void fxAmbStopNightCallback(void* data)
     AMBIENTSOUND* lpAmbSnd = (AMBIENTSOUND*)data;
     SINT32 iNight = DEF_NIGHT * g_iAmbDelay;
 
-    if(lpAmbSnd == NULL || !bSoundEnable)
+    if(lpAmbSnd == nullptr || !bSoundEnable)
         return;
 
     SINT32 iNextTime = 0;
@@ -964,7 +964,7 @@ void fxAmbStopAlwaysCallback(void* data)
     AMBIENTSOUND* lpAmbSnd = (AMBIENTSOUND*)data;
     SINT32 iAlways = DEF_ALWAYS * g_iAmbDelay;
 
-    if(lpAmbSnd == NULL || !bSoundEnable)
+    if(lpAmbSnd == nullptr || !bSoundEnable)
         return;
 
     SINT32 iNextTime = 0;
@@ -986,7 +986,7 @@ void fxAmbStopCoastCallback(void* data)
     AMBIENTSOUND* lpAmbSnd = (AMBIENTSOUND*)data;
     SINT32 iCoast = DEF_COAST * g_iAmbDelay;
 
-    if(lpAmbSnd == NULL || !bSoundEnable)
+    if(lpAmbSnd == nullptr || !bSoundEnable)
         return;
 
     SINT32 iNextTime = 0;
@@ -1008,7 +1008,7 @@ void fxAmbStopRiverCallback(void* data)
     AMBIENTSOUND* lpAmbSnd = (AMBIENTSOUND*)data;
   //  SINT32 iRiver = DEF_RIVER * g_iAmbDelay;
 
-    if(lpAmbSnd == NULL || !bSoundEnable)
+    if(lpAmbSnd == nullptr || !bSoundEnable)
         return;
 
     SINT32 iNextTime = 0;
@@ -1030,7 +1030,7 @@ void fxAmbStopCityCallback(void* data)
     AMBIENTSOUND* lpAmbSnd = (AMBIENTSOUND*)data;
     SINT32 iCity = DEF_CITY * g_iAmbDelay;
 
-    if(lpAmbSnd == NULL || !bSoundEnable)
+    if(lpAmbSnd == nullptr || !bSoundEnable)
         return;
 
     SINT32 iNextTime = 0;

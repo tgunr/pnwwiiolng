@@ -24,7 +24,7 @@ namespace Fio
 	extern const char* LogFileName();
 
 	// Open the standard logging file or return stderr.
-	// (guaranteed not to return NULL)
+	// (guaranteed not to return nullptr)
 	extern FILE* OpenLogFile( void );
 	extern void DeleteLogFile();
 }
@@ -47,7 +47,7 @@ namespace Fio
 	// sets up the user data directory on Windows
 	extern void fioInit();
 
-	extern bool fioLoad(const char* filename, char*& outPtr, unsigned int* outSize=NULL);
+	extern bool fioLoad(const char* filename, char*& outPtr, unsigned int* outSize=nullptr);
 	extern int  fioOpen(const char* const filename);
 	extern int  fioOpenWrite(const char*filename);
 

@@ -10,7 +10,7 @@ class CTermsOfServiceDlg : public CBDialog
 	DECLARE_DYNAMIC(CTermsOfServiceDlg)
 
 public:
-	CTermsOfServiceDlg(CWnd* pParent = NULL);   // standard constructor
+	CTermsOfServiceDlg(CWnd* pParent = nullptr);   // standard constructor
 	virtual ~CTermsOfServiceDlg();
 	virtual UINT TitleLocID() const { return TOS_TITLE ; }
 	virtual UINT HintLocID() const { return TOS_HINT ; }

@@ -30,7 +30,7 @@ static DIDEVICEINSTANCE		didi[MAX_DIDEVICES];
 static HRESULT				retval;
 
 static DIJOYCONFIG joystickconfigs[MAX_JOYSTICKS];
-static IDirectInputJoyConfig8* joyconfig8 = NULL;
+static IDirectInputJoyConfig8* joyconfig8 = nullptr;
 static int numjoysticks = 0;
 
 
@@ -73,14 +73,14 @@ LOGICAL dipInit(void)
 {
 HRESULT				dirval;
 
-	if (lpdi != NULL)
+	if (lpdi != nullptr)
 	{
 		Write_Debug("DirectInput device already initialized (0x%x)", lpdi);
 		return TRUE;
 	}
 
 	// Manage the DirectInput Object
-	dirval = DirectInput8Create(GetModuleHandle(NULL), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&lpdi, NULL);
+	dirval = DirectInput8Create(GetModuleHandle(nullptr), DIRECTINPUT_VERSION, IID_IDirectInput8, (void**)&lpdi, nullptr);
 	if (dirval != DI_OK)
 	{
 		Write_Debug("Could not create a direct input device");
@@ -115,7 +115,7 @@ HRESULT				dirval;
     }
 
 	numdidi = 0;
-	dirval = DIError(lpdi->EnumDevices(0, (LPDIENUMDEVICESCALLBACK)DIEnumDevicesProc, NULL, DIEDFL_ATTACHEDONLY));
+	dirval = DIError(lpdi->EnumDevices(0, (LPDIENUMDEVICESCALLBACK)DIEnumDevicesProc, nullptr, DIEDFL_ATTACHEDONLY));
 	if (dirval != DI_OK)
 	{
 		Write_Debug("Enumeration of direct input devices failed");
@@ -138,11 +138,11 @@ HRESULT				dirval;
 // Always unacquire the device before calling Release().
 void dipKillKeyboard(void)
 {
-	if (lpkbd != NULL)
+	if (lpkbd != nullptr)
 	{
 		lpkbd->Unacquire();
 		lpkbd->Release();
-		lpkbd = NULL;
+		lpkbd = nullptr;
 	}
 }
 
@@ -150,22 +150,22 @@ void dipKillKeyboard(void)
 // Always unacquire the device before calling Release().
 void dipKillMouse(void)
 {
-	if (lpmd != NULL)
+	if (lpmd != nullptr)
 	{
 		lpmd->Unacquire();
 		lpmd->Release();
-		lpmd = NULL;
+		lpmd = nullptr;
 	}
 }
 
 
 static void KillJoystick(SINT32 number)
 {
-	if (lpjsd[number] != NULL)
+	if (lpjsd[number] != nullptr)
 	{
 		lpjsd[number]->Unacquire();
 		lpjsd[number]->Release();
-		lpjsd[number] = NULL;
+		lpjsd[number] = nullptr;
 	}
 }
 
@@ -185,14 +185,14 @@ SINT32		i;
 // Always unacquire the device before calling Release().
 void dipKill(void)
 {
-	if (lpdi != NULL)
+	if (lpdi != nullptr)
 	{
 		dipKillKeyboard();
 		dipKillMouse();
 		dipKillJoystick();
 
 		lpdi->Release();
-		lpdi = NULL;
+		lpdi = nullptr;
 	}
 
     Write_Log(LOG_OLD, LOG_INFO, "[dipKill]");
@@ -204,7 +204,7 @@ void dipUnacquireKeyboard(void)
 {
 HRESULT	result;
 
-	if (lpkbd != NULL)
+	if (lpkbd != nullptr)
 	{
 		result = DIError(lpkbd->Unacquire());
 		if (result != DI_OK && result != DI_NOEFFECT)
@@ -220,7 +220,7 @@ void dipUnacquireMouse(void)
 {
 HRESULT	result;
 
-	if (lpmd != NULL)
+	if (lpmd != nullptr)
 	{
 		result = DIError(lpmd->Unacquire());
 		if (result != DI_OK && result != DI_NOEFFECT)
@@ -239,7 +239,7 @@ SINT32		i;
 
 	for (i=0; i < numjsd; i++)
 	{
-		if (lpjsd[i] != NULL)
+		if (lpjsd[i] != nullptr)
 		{
 			result = DIError(lpjsd[i]->Unacquire());
 			if (result != DI_OK && result != DI_NOEFFECT)
@@ -254,7 +254,7 @@ SINT32		i;
 // At certain times the devices might need to be unacquired (but not "killed")
 void dipUnacquire(void)
 {
-	if (lpdi != NULL)
+	if (lpdi != nullptr)
 	{
 		dipUnacquireKeyboard();
 		dipUnacquireMouse();
@@ -269,7 +269,7 @@ LOGICAL dipAcquireKeyboard(void)
 LOGICAL	retval=TRUE;
 HRESULT	result;
 
-	if (lpkbd != NULL)
+	if (lpkbd != nullptr)
 	{
 		result = DIError(lpkbd->Acquire());
 		if (result != DI_OK && result != S_FALSE)
@@ -289,7 +289,7 @@ LOGICAL dipAcquireMouse(void)
 LOGICAL	retval=TRUE;
 HRESULT	result;
 
-	if (lpmd != NULL)
+	if (lpmd != nullptr)
 	{
 		result = DIError(lpmd->Acquire());
 		if (result != DI_OK && result != S_FALSE)
@@ -312,7 +312,7 @@ SINT32		i;
 
 	for (i=0; i < numjsd; i++)
 	{
-		if (lpjsd[i] != NULL)
+		if (lpjsd[i] != nullptr)
 		{
 			result = DIError(lpjsd[i]->Acquire());
 			if (result != DI_OK && result != S_FALSE)
@@ -330,7 +330,7 @@ SINT32		i;
 // At certain times, the devices might need to be acquired
 LOGICAL dipAcquire(void)
 {
-	if (lpdi != NULL)
+	if (lpdi != nullptr)
 	{
 		if (!dipAcquireKeyboard() ||
 			!dipAcquireMouse() ||
@@ -351,7 +351,7 @@ LOGICAL dipSetupKeyboard(void)
 	LPDIRECTINPUTDEVICE8 lpd;
 
 	// Manage the keyboard object
-	dirval = DIError(lpdi->CreateDevice(GUID_SysKeyboard, &lpd, NULL));
+	dirval = DIError(lpdi->CreateDevice(GUID_SysKeyboard, &lpd, nullptr));
 	if (dirval != DI_OK)
 	{
 		Write_Debug("CreateDevice for keyboard failed");
@@ -413,7 +413,7 @@ LOGICAL dipSetupMouse(void)
 	LPDIRECTINPUTDEVICE8 lpd;
 
 	// Manage the mouse object
-	dirval = DIError(lpdi->CreateDevice(GUID_SysMouse, &lpd, NULL));
+	dirval = DIError(lpdi->CreateDevice(GUID_SysMouse, &lpd, nullptr));
 	if (dirval != DI_OK)
 	{
 		Write_Debug("CreateDevice for mouse failed");
@@ -489,7 +489,7 @@ LPDIRECTINPUTDEVICE8	lpd;
 DIDEVCAPS				didevcaps;
 LPDIRECTINPUTDEVICE8	lpjs;
 
-	dirval = DIError(lpdi->CreateDevice(*lpguid, &lpd, NULL));	// &GUID_Joystick
+	dirval = DIError(lpdi->CreateDevice(*lpguid, &lpd, nullptr));	// &GUID_Joystick
 	if (dirval != DI_OK)
 	{
 		Write_Debug("CreateDevice for joystick failed");
@@ -843,7 +843,7 @@ LOGICAL dipGetKeyboardData(DIDEVICEOBJECTDATA* od, UINT32* dwElements)
 {
 HRESULT				dirval;
 
-	if (lpkbd == NULL)
+	if (lpkbd == nullptr)
 	{
 		return(FALSE);
 	}
@@ -879,7 +879,7 @@ LOGICAL dipGetKeyboardState(int bufsize, LPVOID buffer)
 {
 HRESULT				dirval;
 
-	if (lpkbd == NULL)
+	if (lpkbd == nullptr)
 	{
 		return(FALSE);
 	}
@@ -908,7 +908,7 @@ LOGICAL dipGetMouseData(DIDEVICEOBJECTDATA* od, UINT32* dwElements)
 {
 HRESULT				dirval;
 
-	if (lpmd == NULL)
+	if (lpmd == nullptr)
 	{
 		return(FALSE);
 	}
@@ -944,7 +944,7 @@ LOGICAL dipGetMouseState(DIMOUSESTATE* ms)
 {
 HRESULT				dirval;
 
-	if (lpmd == NULL)
+	if (lpmd == nullptr)
 	{
 		return(FALSE);
 	}
@@ -974,7 +974,7 @@ static LOGICAL GetJoystickData(SINT32 number, DIDEVICEOBJECTDATA* od, UINT32* dw
 HRESULT				dirval;
 static SINT32		retry[MAX_JOYSTICKS];
 
-	if (lpjsd[number] == NULL)
+	if (lpjsd[number] == nullptr)
 	{
 		// Incase a joystick disappears during play, fake return of no data
 		*dwElements = 0;
@@ -1073,7 +1073,7 @@ LOGICAL dipGetJoystickState(SINT32 number, DIJOYSTATE* js)
 HRESULT				dirval;
 static SINT32		retry[MAX_JOYSTICKS];
 
-	if (lpjsd[number] == NULL)
+	if (lpjsd[number] == nullptr)
 	{
 		return(FALSE);
 	}

@@ -63,7 +63,7 @@ mapOBJList mapOBJ; // All objects associated with a TO
 //#ifndef ANDREWCOLLISIONTESTS
 
 static LOGICAL g_bCheckTreeBox;
-static colliderQuery* _trnCollider = NULL;
+static colliderQuery* _trnCollider = nullptr;
 
 typedef struct tagTERRAINID
 {
@@ -246,9 +246,9 @@ static _StratMessageQue * _GetNewStratMsg(void)
 {
 _StratMessageQue * StratMsg;
 
-	if (_StratMsgFree.next == NULL)
+	if (_StratMsgFree.next == nullptr)
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	StratMsg = _StratMsgFree.next;
@@ -271,7 +271,7 @@ static UINT32 _FreeStratMsg(_StratMessageQue * StratMsg)
 
 static UINT32 _RemoveStratMsgFromList(_StratMessageQue * StratMsg)
 {
-	if (StratMsg == NULL)
+	if (StratMsg == nullptr)
 	{
 		return 0;
 	}
@@ -281,29 +281,29 @@ static UINT32 _RemoveStratMsgFromList(_StratMessageQue * StratMsg)
 		_StratMsgTail = StratMsg->prev;
 	}
 
-	if (StratMsg->prev != NULL)
+	if (StratMsg->prev != nullptr)
 	{
 		StratMsg->prev->next = StratMsg->next;
 	}
-	if (StratMsg->next != NULL)
+	if (StratMsg->next != nullptr)
 	{
 		StratMsg->next->prev = StratMsg->prev;
 	}
-	StratMsg->next = StratMsg->prev = NULL;
+	StratMsg->next = StratMsg->prev = nullptr;
 
 	return 0;
 }
 
 static UINT32 _AddStratMsgToFreeList(_StratMessageQue * StratMsg)
 {
-	if (StratMsg == NULL)
+	if (StratMsg == nullptr)
 	{
 		return 0;
 	}
 
 	StratMsg->next = _StratMsgFree.next;
 	StratMsg->prev = &_StratMsgFree;
-	if (_StratMsgFree.next != NULL)
+	if (_StratMsgFree.next != nullptr)
 	{
 		_StratMsgFree.next->prev = StratMsg;
 	}
@@ -314,21 +314,21 @@ static UINT32 _AddStratMsgToFreeList(_StratMessageQue * StratMsg)
 
 static UINT32 _AddStratMsgToActiveList(_StratMessageQue * StratMsg)
 {
-	if (StratMsg == NULL)
+	if (StratMsg == nullptr)
 	{
 		return 0;
 	}
 
 	StratMsg->next = _StratMsgHead.next;
 	StratMsg->prev = &_StratMsgHead;
-	if (_StratMsgHead.next != NULL)
+	if (_StratMsgHead.next != nullptr)
 	{
 		_StratMsgHead.next->prev = StratMsg;
 	}
 	_StratMsgHead.next = StratMsg;
 
 	if (_StratMsgTail == &_StratMsgHead ||
-		_StratMsgTail == NULL)
+		_StratMsgTail == nullptr)
 	{
 		_StratMsgTail = StratMsg;
 	}
@@ -371,7 +371,7 @@ static void _classhandler(xmlNode* root, std::vector<UINT32>& weaponspecs)
 {
     xmlNodePtr node = root;
 
-	for(; node != NULL; node = node->next)
+	for(; node != nullptr; node = node->next)
 	{
         if(node->type != XML_ELEMENT_NODE)
         {
@@ -419,7 +419,7 @@ static void _buildinghandler(xmlNode* root, dofToWeapSpecs& dws)
 {
     xmlNodePtr node = root;
 
-	for(; node != NULL; node = node->next)
+	for(; node != nullptr; node = node->next)
 	{
         if(node->type != XML_ELEMENT_NODE)
         {
@@ -452,7 +452,7 @@ static void _spawnhandler(xmlNode* root)
 {
     xmlNode* node = root;
 
-    for(; node != NULL; node = node->next)
+    for(; node != nullptr; node = node->next)
     {
         if(node->type != XML_ELEMENT_NODE)
         {
@@ -489,7 +489,7 @@ static void _loadSpawnXML(const char* file)
 
     fioXmlRegisterInputCallbacks();
 
-    xmlDocPtr doc = xmlReadFile(file, NULL, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
+    xmlDocPtr doc = xmlReadFile(file, nullptr, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
 
     if(doc)
     {
@@ -555,14 +555,14 @@ static void _ScanAndSetupFlags(OBJECT* Object)
 			}
 		}
 
-		if (Object->child != NULL)
+		if (Object->child != nullptr)
 		{
 			_ScanAndSetupFlags(Object->child);
 		}
 
 		Object = Object->sibling;
 	}
-	while (Object != NULL);
+	while (Object != nullptr);
 }
 
 UINT32 trncdInit(void)
@@ -579,7 +579,7 @@ UINT32 trncdInit(void)
 
 	_FlagObject = obmainFindNamedObject("flagtable1");
 
-	if (_FlagObject == NULL)
+	if (_FlagObject == nullptr)
 	{
 		Write_Debug("Terrain flag object copied, but unable to find it by name");
 
@@ -630,7 +630,7 @@ UINT32 trncdKill(void)
     }
 
     trnCDTerrainObject*	to = _TerrainObjectsHead.Next;
-    trnCDTerrainObject* free = NULL;
+    trnCDTerrainObject* free = nullptr;
 
     while(to)
 	{
@@ -656,15 +656,15 @@ UINT32 trncdKill(void)
 
 static UINT32 _KillCDTerrainObject(trnCDTerrainObject* TO)
 {
-	if (TO == NULL)
+	if (TO == nullptr)
 	{
 		return 0;
 	}
 
-	if (TO->TrnAutoGun != NULL)
+	if (TO->TrnAutoGun != nullptr)
 	{
 		trnKillAutogun(&(TO->TrnAutoGun));
-		TO->TrnAutoGun = NULL;
+		TO->TrnAutoGun = nullptr;
 	}
 
 	// make sure that this TO is no longer on any of the collision lists used by the colliders
@@ -696,7 +696,7 @@ static UINT32 _KillCDTerrainObject(trnCDTerrainObject* TO)
         mapOBJ.erase(I1);
     }
 
-	TO->TerrainObject = NULL;
+	TO->TerrainObject = nullptr;
 	TO->InUse = 0;
 
     TERRAINID ID = {TO->StratSupercellX, TO->StratSupercellY, TO->StratId};
@@ -719,7 +719,7 @@ static UINT32 _KillCDTerrainObject(trnCDTerrainObject* TO)
     if(TO->spawndata)
     {
         delete TO->spawndata;
-        TO->spawndata = NULL;
+        TO->spawndata = nullptr;
     }
 
 	_NumTO--;
@@ -731,7 +731,7 @@ trnCDTerrainObject* trncdFindTerrainObject(OBJECT* o)
 {
     if(!o)
     {
-        return NULL;
+        return nullptr;
     }
 
     mapOBJList::iterator find = mapOBJ.find(o);
@@ -741,12 +741,12 @@ trnCDTerrainObject* trncdFindTerrainObject(OBJECT* o)
         return find->second;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 static UINT32 _GetNewCDTerrainObject(trnCDTerrainObject** TerrainObject)
 {
-	if (TerrainObject == NULL)
+	if (TerrainObject == nullptr)
 	{
 		return 1;
 	}
@@ -792,36 +792,36 @@ static UINT32 _AddToFreeList(trnCDTerrainObject* TerrainObject)
 
 static UINT32 _RemoveFromList(trnCDTerrainObject* TO)
 {
-	if (TO == NULL)
+	if (TO == nullptr)
 	{
 		return 1;
 	}
 
-	if (TO->Next != NULL)
+	if (TO->Next != nullptr)
 	{
 		TO->Next->Prev = TO->Prev;
 	}
 
-	if (TO->Prev != NULL)
+	if (TO->Prev != nullptr)
 	{
 		TO->Prev->Next = TO->Next;
 	}
 
-	TO->Prev = TO->Next = NULL;
+	TO->Prev = TO->Next = nullptr;
 
 	return 0;
 }
 
 static UINT32 _AddToListHead(trnCDTerrainObject* TO)
 {
-	if (TO == NULL)
+	if (TO == nullptr)
 	{
 		return 1;
 	}
 
 	TO->Prev = &_TerrainObjectsHead;
 	TO->Next = _TerrainObjectsHead.Next;
-	if (_TerrainObjectsHead.Next != NULL)
+	if (_TerrainObjectsHead.Next != nullptr)
 	{
 		_TerrainObjectsHead.Next->Prev = TO;
 	}
@@ -838,14 +838,14 @@ LOGICAL trncdRemoveTerrainObject(OBJECT* Object, SINT32 DummyNum1, SINT32 DummyN
 	Write_Debug("Removing overall object %s",Object->name);
 #endif
 
-	if (Object != NULL)
+	if (Object != nullptr)
 	{
 		//_cdRemoveTerrainObject(Object->child);
 
         OBJECT* x = Object->child;
-        while(x != NULL)
+        while(x != nullptr)
         {
-            if(x->child != NULL)
+            if(x->child != nullptr)
             {
                 _RemoveTerrainObject(x);
             }
@@ -927,9 +927,9 @@ void trncdProcessODEQueue(bool all)
 /*
 static void _cdRemoveTerrainObject(OBJECT* o)
 {
-	while(o != NULL)
+	while(o != nullptr)
 	{
-        if(o->child != NULL)
+        if(o->child != nullptr)
         {
             _RemoveTerrainObject(o);
         }
@@ -952,23 +952,23 @@ LOGICAL trncdAddTerrainObject(OBJECT* Object,SINT32 SuperCellX, SINT32 SuperCell
     Write_Debug("Adding overall object %s",Object->name);
 #endif
 
-	if (Object != NULL)
+	if (Object != nullptr)
 	{
 		DamThreshold = 0;
 
 		strcpy(Buffer,Object->name);
 		ptr = strrchr(Buffer,'_');
-		if (ptr != NULL)
+		if (ptr != nullptr)
 		{
 			*ptr = '\0';
 			ptr = strrchr(Buffer,'_');
-			if (ptr != NULL)
+			if (ptr != nullptr)
 			{
 				*ptr = '\0';
 
 				Params = parseGetBuildingValues(Buffer);
 
-				if (Params != NULL)
+				if (Params != nullptr)
 				{
 					DamThreshold = Params->damageThreshold;
 				}
@@ -976,18 +976,18 @@ LOGICAL trncdAddTerrainObject(OBJECT* Object,SINT32 SuperCellX, SINT32 SuperCell
 			}
 		}
 
-        if(Object->child != NULL) // check the children
+        if(Object->child != nullptr) // check the children
         {
             OBJECT* Object1 = Object->child;
             do
             {
-                if (Object1->child != NULL)
+                if (Object1->child != nullptr)
                 {
                     _AddTerrainObject( Object1, Object, SuperCellX, SuperCellY, Id, ObjId, DamThreshold );
                 }
                 Object1 = Object1->sibling;
 
-            } while (Object1 != NULL);
+            } while (Object1 != nullptr);
         }
 
 		//_cdAddTerrainObject(Object->child,Object,SuperCellX,SuperCellY,Id,ObjId,DamThreshold);
@@ -1001,7 +1001,7 @@ static UINT32 _cdAddTerrainObject(OBJECT* Object, OBJECT* TopObject, SINT32 Supe
 {
 OBJECT*	Object1;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -1009,26 +1009,26 @@ OBJECT*	Object1;
 	Object1 = Object;
 	do
 	{
-//		if (Object1->comment != NULL)
+//		if (Object1->comment != nullptr)
 //		{
 //			if (strncmp(Object1->comment,"lod1",4) == 0)
 //			{
 //				_AddTerrainObject(Object1,TopObject);
 //			}
 //		}
-		if (Object1->child != NULL)
+		if (Object1->child != nullptr)
 		{
 			_AddTerrainObject(Object1,TopObject,SuperCellX,SuperCellY,Id,ObjId,DamThreshold);
 
 		}
 
-//		if (Object1->child != NULL)
+//		if (Object1->child != nullptr)
 //		{
 //			_cdAddTerrainObject(Object1->child,TopObject);
 //		}
 
 		Object1 = Object1->sibling;
-	} while (Object1 != NULL);
+	} while (Object1 != nullptr);
 
 	return 0;
 }
@@ -1112,7 +1112,7 @@ static void _findSpawnData(trnCDTerrainObject* to)
 
     if(itr == _buildingsWithSpawnData.end())
     {
-        to->spawndata = NULL;
+        to->spawndata = nullptr;
     }
     else
     {
@@ -1166,7 +1166,7 @@ struct ShearObject
 static void _AddTerrainObject(OBJECT* Object, OBJECT* TopObject, SINT32 SuperCellX, SINT32 SuperCellY, UINT32 Id,REL_OBJ_ID * ObjId,
 								SINT32 DamThreshold)
 {
-trnCDTerrainObject*	TO = NULL;
+trnCDTerrainObject*	TO = nullptr;
 piVECTOR			BBox1, BBox2;
 piVECTOR			TempVec;
 UINT32				LODSlotsLeft;
@@ -1178,7 +1178,7 @@ SINT8*				ptr;
 _StratMessageQue*	StratMsg;
 _StratMessageQue*	PrevStratMsg;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return;
 	}
@@ -1196,7 +1196,7 @@ _StratMessageQue*	PrevStratMsg;
     }
 
 	// first grab an object slot
-	if (_GetNewCDTerrainObject(&TO) == 1 || TO == NULL)
+	if (_GetNewCDTerrainObject(&TO) == 1 || TO == nullptr)
 	{
 		Write_Debug("Unable to get new terrain object");
 		return;
@@ -1204,7 +1204,7 @@ _StratMessageQue*	PrevStratMsg;
 
 	TO->TerrainObject = Object;
 	TO->TerrainMasterObject = TopObject;
-	if (Object->child != NULL)
+	if (Object->child != nullptr)
 	{
 		Object->child->lpspare = (void*)TO;
 	}
@@ -1225,17 +1225,17 @@ _StratMessageQue*	PrevStratMsg;
 
 	TO->StratId = Id;
 	TO->DamThreshold = DamThreshold;
-	if (ObjId != NULL)
+	if (ObjId != nullptr)
 	{
 		TO->ObjId = *ObjId;
 	}
 
 	// find the collision object
-	TO->CollisionObject = NULL;
+	TO->CollisionObject = nullptr;
 	trnFindCollisionObject(&TO->CollisionObject,Object->child);
 	_FindDamageCollisionObject(&TO->DamageCollisionObject,Object->child);
 
-	if (TO->DamageCollisionObject == NULL)
+	if (TO->DamageCollisionObject == nullptr)
 	{
 		if(!TO->CollisionObject)
 		{
@@ -1252,7 +1252,7 @@ _StratMessageQue*	PrevStratMsg;
 	}
 
 
-	if (TO->CollisionObject == NULL)
+	if (TO->CollisionObject == nullptr)
 	{
 #ifdef TERRAIN_EDITOR
 		Write_Debug("Cannot find collision object for object %s, using entire object tree instead",
@@ -1297,7 +1297,7 @@ _StratMessageQue*	PrevStratMsg;
 	BBox1.x = BBox1.y = BBox1.z = 0;
 	BBox2.x = BBox2.y = BBox2.z = 0;
 
-	if (TO->CollisionObject->child != NULL)
+	if (TO->CollisionObject->child != nullptr)
 	{
 		bool FirstBBox = true;
 		_RecurseAndSetBoundingBox(TO->CollisionObject->child,BBox1,BBox2,FirstBBox);
@@ -1346,10 +1346,10 @@ _StratMessageQue*	PrevStratMsg;
 
 	for (i=0;i<TRN_MAX_LOD;i++)
 	{
-		if (TO->LOD[i] != NULL)
+		if (TO->LOD[i] != nullptr)
 		{
 			Obj = TO->LOD[i];
-			while (Obj->child != NULL)
+			while (Obj->child != nullptr)
 			{
 				Obj = Obj->child;
 			}
@@ -1397,12 +1397,12 @@ _StratMessageQue*	PrevStratMsg;
 
 		for (i=0;i<TRN_MAX_SPAWN_LOCATIONS;i++)
 		{
-			TO->SpawnLocations[i] = NULL;
+			TO->SpawnLocations[i] = nullptr;
 			ogrpFindSubObjectByDOFVarAndSubVar(&TO->SpawnLocations[i],
 												Object,
 												ML_DOF_SPAWNLOCATION,
 												i);
-			if (TO->SpawnLocations[i] != NULL)
+			if (TO->SpawnLocations[i] != nullptr)
 			{
 				TO->SpawnEntries += 1;
 
@@ -1460,7 +1460,7 @@ _StratMessageQue*	PrevStratMsg;
     }
 
 	// check que for updates to this object
-	for (StratMsg = _StratMsgTail;StratMsg != NULL && StratMsg != &_StratMsgHead;)
+	for (StratMsg = _StratMsgTail;StratMsg != nullptr && StratMsg != &_StratMsgHead;)
 	{
 		if (StratMsg->scx == SuperCellX &&
 			StratMsg->scy == SuperCellY &&
@@ -1495,11 +1495,11 @@ UINT32 trnGetSpawnObject(OBJECT** o,
                          UINT32 SpawnNum,
                          WEAPON_SPEC& spec)
 {
-    trnCDTerrainObject* to = NULL;
+    trnCDTerrainObject* to = nullptr;
 
     if(!Id)
     {
-        *o = NULL;
+        *o = nullptr;
         return 0;
     }
 
@@ -1537,7 +1537,7 @@ UINT32 trnGetSpawnObject(OBJECT** o,
     {
         OBJECT* obj = sd->findSpawnObject(spec);
 
-        if(obj != NULL)
+        if(obj != nullptr)
         {
             *o = obj;
             useold = false;
@@ -1565,7 +1565,7 @@ static UINT32 _FindLODs(OBJECT*** CurrentLODSlot, SINT32** CurrentLODDamageSlot,
 OBJECT*	ObjSib;
 SINT8*	ptr;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -1598,7 +1598,7 @@ SINT8*	ptr;
 		}
 		else
 		{
-			if (ObjSib->child != NULL)
+			if (ObjSib->child != nullptr)
 			{
 				_FindLODs(CurrentLODSlot,CurrentLODDamageSlot,LODSlotsLeft,ObjSib->child);
 			}
@@ -1606,7 +1606,7 @@ SINT8*	ptr;
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL && *LODSlotsLeft > 0);
+	while (ObjSib != nullptr && *LODSlotsLeft > 0);
 
 	return 0;
 }
@@ -1617,7 +1617,7 @@ void trnFindCollisionObject(OBJECT ** const CollisionObject, OBJECT* Object)
 OBJECT*	ObjSib;
 SCHAR*	RetPtr;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return;
 	}
@@ -1626,7 +1626,7 @@ SCHAR*	RetPtr;
 
 	do
 	{
-		if (ObjSib->comment != NULL)
+		if (ObjSib->comment != nullptr)
 		{
 			if (obmainFindCommentName(&RetPtr,ObjSib->comment,"collideobject") == TRUE)
 			{
@@ -1635,14 +1635,14 @@ SCHAR*	RetPtr;
 			}
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			trnFindCollisionObject(CollisionObject,ObjSib->child);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL && *CollisionObject == NULL);
+	while (ObjSib != nullptr && *CollisionObject == nullptr);
 
 	return;
 }
@@ -1652,7 +1652,7 @@ static void _FindDamageCollisionObject(OBJECT** const CollisionObject, OBJECT* O
 OBJECT*	ObjSib;
 SCHAR*	RetPtr;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return;
 	}
@@ -1661,7 +1661,7 @@ SCHAR*	RetPtr;
 
 	do
 	{
-		if (ObjSib->comment != NULL)
+		if (ObjSib->comment != nullptr)
 		{
 			if (obmainFindCommentName(&RetPtr,ObjSib->comment,"damagecollideobject") == TRUE)
 			{
@@ -1670,21 +1670,21 @@ SCHAR*	RetPtr;
 			}
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_FindDamageCollisionObject(CollisionObject,ObjSib->child);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL && *CollisionObject == NULL);
+	while (ObjSib != nullptr && *CollisionObject == nullptr);
 }
 
 static void _AdjustObjectMatrixPosition(OBJECT* Object, const piVECTOR* const Adjustment)
 {
-	while(Object != NULL)
+	while(Object != nullptr)
 	{
-		if (Object->child != NULL)
+		if (Object->child != nullptr)
 		{
 			_AdjustObjectMatrixPosition(Object->child, Adjustment);
 		}
@@ -1699,7 +1699,7 @@ static void _AdjustObjectMatrixPosition(OBJECT* Object, const piVECTOR* const Ad
 				ObjAtt->mat._43 += Adjustment->z;
 				math3dInvertMatrixComplete(ObjAtt->matint, ObjAtt->mat);
 				ObjAtt = ObjAtt->attached;
-			} while(ObjAtt != NULL);
+			} while(ObjAtt != nullptr);
 		}
 
 		Object = Object->sibling;
@@ -1708,9 +1708,9 @@ static void _AdjustObjectMatrixPosition(OBJECT* Object, const piVECTOR* const Ad
 
 static void _UpdateObjectInvMatrix(OBJECT* Object)
 {
-	while(Object != NULL)
+	while(Object != nullptr)
 	{
-		if (Object->child != NULL)
+		if (Object->child != nullptr)
 			_UpdateObjectInvMatrix(Object->child);
 
 		if (!(Object->flags & OBJECT_NOTOBJECT))
@@ -1722,7 +1722,7 @@ static void _UpdateObjectInvMatrix(OBJECT* Object)
 				math3dInvertMatrixComplete(ObjAtt->matint, ObjAtt->mat);
 				ObjAtt = ObjAtt->attached;
 			}
-			while(ObjAtt != NULL);
+			while(ObjAtt != nullptr);
 		}
 
 		Object = Object->sibling;
@@ -1756,7 +1756,7 @@ piVECTOR	bbox[2];
 piVECTOR	BBox[8];
 UINT32		i;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return;
 	}
@@ -1829,19 +1829,19 @@ UINT32		i;
 				}
 
 				Object2 = Object2->attached;
-			} while (Object2 != NULL);
+			} while (Object2 != nullptr);
 
 		}
 
 
-		if (Object1->child != NULL)
+		if (Object1->child != nullptr)
 		{
 			_RecurseAndSetBoundingBox(Object1->child,BBox1,BBox2,FirstBBox);
 		}
 
 		Object1 = Object1->sibling;
 
-	} while (Object1 != NULL);
+	} while (Object1 != nullptr);
 }
 
 LOGICAL trncdGetListOfTerrainPolysNearBoundingBox(piVECTOR* BBox, OBJECT** CollideObj, UINT32* CollidePoly,
@@ -1868,14 +1868,14 @@ piVECTOR const*		pv1, *pv2, *pv3;
 	for (l=0; l < NUM_TERRAIN_RECTANGLES && *NumCollisionSlotsLeft > 0; l++, td++)
 	{
 		lpobj = td->terrain;
-		if (lpobj == NULL)
+		if (lpobj == nullptr)
 		{
 			continue;
 		}
 
 		for (m=0; m < MAX_TERRAIN_TEXTURES && *NumCollisionSlotsLeft > 0; lpobj=td->nonreplacementtiles[m++])
 		{
-			if (lpobj == NULL)
+			if (lpobj == nullptr)
 			{
 				continue;
 			}
@@ -2378,7 +2378,7 @@ UINT32 TriNum;
 		td = &(trndtl[i]);
 
 		ColObject = td->terrainorig;
-		if (ColObject == NULL)
+		if (ColObject == nullptr)
 		{
 			continue;
 		}
@@ -2584,7 +2584,7 @@ UINT32 TriNum;
     td = lpDTL;
 
     ColObject = td->terrainorig;
-    if (ColObject == NULL)
+    if (ColObject == nullptr)
     {
 	    return FALSE;
     }
@@ -2796,14 +2796,14 @@ SINT32			texid;
 	for (l=0; l < NUM_TERRAIN_RECTANGLES && !retval; l++, td++)
 	{
 		lpobj = td->terrain;
-		if (lpobj == NULL)
+		if (lpobj == nullptr)
 		{
 			continue;
 		}
 
 		for (m=0; m < MAX_TERRAIN_TEXTURES && !retval; lpobj=td->nonreplacementtiles[m++])
 		{
-			if (lpobj == NULL)
+			if (lpobj == nullptr)
 			{
 				continue;
 			}
@@ -3051,7 +3051,7 @@ TERRAIN_DETAIL*	td;
 	for (l=0; l < NUM_TERRAIN_RECTANGLES; l++, td++)
 	{
 		lpobj = td->terrainorig;
-		if (lpobj == NULL)
+		if (lpobj == nullptr)
 		{
 			continue;
 		}
@@ -3319,7 +3319,7 @@ static int		number=0;
 		newpos->x = collision.colpos.x;
 		newpos->y = collision.colpos.y;
 		newpos->z = collision.colpos.z;
-		if (collision.colobj != NULL)
+		if (collision.colobj != nullptr)
 		{
 			newpos->x += collision.colobj->mat._41;
 			newpos->y += collision.colobj->mat._42;
@@ -3803,7 +3803,7 @@ TERRAIN_DETAIL*	td = trndtl;
 			// iterate-through-each-object-in-database scan
 			sprintf(objname, "%s_%d_%d", td->trnobj[obnum].objname, (SINT32)td->trnobj[obnum].pos.x, (SINT32)td->trnobj[obnum].pos.y);
 			lpobj = obmainFindTopmostObject(objname);
-			if (lpobj == NULL)
+			if (lpobj == nullptr)
 			{
 				continue;
 			}
@@ -4082,7 +4082,7 @@ piVECTOR			OldPnt1, NewPnt1, OldPnt2, NewPnt2;
 		TO = TOList[Count];
 		Count++;
 
-		if (TO == NULL || Object2 == NULL)
+		if (TO == nullptr || Object2 == nullptr)
 		{
 			break;
 		}
@@ -4215,7 +4215,7 @@ UINT32				Count;
 FLOAT32				mnx, mny, mnz, mxx, mxy, mxz;
 FLOAT64VECTOR		WorldOriginOffset;
 
-	if (CollisionList == NULL)
+	if (CollisionList == nullptr)
 	{
 		return 1;
 	}
@@ -4235,14 +4235,14 @@ FLOAT64VECTOR		WorldOriginOffset;
 	Count = 0;
 
 	TO = &_TerrainObjectsHead;
-	while (TO != NULL)
+	while (TO != nullptr)
 	{
 		TO = TO->Next;
 
 //		TO = TOList[Count];
 		Count++;
 
-		if (TO == NULL)
+		if (TO == nullptr)
 		{
 			break;
 		}
@@ -4427,7 +4427,7 @@ FLOAT32				mnx, mny, mnz, mxx, mxy, mxz;
 FLOAT64VECTOR		WorldOriginOffset;
 
 
-	if (CollisionList == NULL || TOList == NULL)
+	if (CollisionList == nullptr || TOList == nullptr)
 	{
 		return 1;
 	}
@@ -4452,7 +4452,7 @@ FLOAT64VECTOR		WorldOriginOffset;
 		TO = TOList[Count];
 		Count++;
 
-		if (TO == NULL)
+		if (TO == nullptr)
 		{
 			break;
 		}
@@ -4599,7 +4599,7 @@ OBJECT*		Object1, *Object2;
 FLOAT32		mnx, mny, mnz, mxx, mxy, mxz;
 piVECTOR	OldPnt1, NewPnt1, OldPnt2, NewPnt2;
 
-	if (CurrentObject == NULL)
+	if (CurrentObject == nullptr)
 	{
 		return 0;
 	}
@@ -4739,10 +4739,10 @@ piVECTOR	OldPnt1, NewPnt1, OldPnt2, NewPnt2;
 
 				Object2 = Object2->attached;
 
-			} while (Object2 != NULL);
+			} while (Object2 != nullptr);
 		}
 
-		if (Object1->child != NULL)
+		if (Object1->child != nullptr)
 		{
 			_CollideWithTerrainObject(CollisionList,
 									  NumCollisionSlotsLeft,
@@ -4758,7 +4758,7 @@ piVECTOR	OldPnt1, NewPnt1, OldPnt2, NewPnt2;
 
 		Object1 = Object1->sibling;
 
-	} while (Object1 != NULL && NoSiblings == 0);
+	} while (Object1 != nullptr && NoSiblings == 0);
 
 	return 0;
 }
@@ -4778,7 +4778,7 @@ SINT32 trncdCollideSpeedTree(OBJECT* o,
         return 0;
 
     piVECTOR collidept;
-    FASTCOLLIDE* list = NULL;
+    FASTCOLLIDE* list = nullptr;
     bool collided = false;
 
     if(*numslotsleft <= 4)
@@ -4884,7 +4884,7 @@ static bool CollideUsingODE(const Vec3d& p1,
     if(!o.collider)
         return false;
 
-    static colliderQuery* collider = NULL;
+    static colliderQuery* collider = nullptr;
 
     FASTCOLLIDE* collidelist = *list;
 
@@ -4920,7 +4920,7 @@ static bool CollideUsingODE(const Vec3d& p1,
     colliderSetBits(geoms[0], 0, collidebits);
 
     collider->setDirty(true);
-    dGeomID current = NULL;
+    dGeomID current = nullptr;
 
     if(collider->findCollisions(true))
     {
@@ -4940,7 +4940,7 @@ static bool CollideUsingODE(const Vec3d& p1,
 
             if(colliderIsType(collisions[i].g2, collidebits))
             {
-				//colliderDebugContact(collisions[i], colorCYANALPHA, NULL, .3f);
+				//colliderDebugContact(collisions[i], colorCYANALPHA, nullptr, .3f);
 
                 p = physicsPhysicalToGame(collisions[i].pos);
 
@@ -5213,7 +5213,7 @@ FLOAT32				Radius;
 piMATRIX			InvMat;
 
 
-	if (CollisionList == NULL || TOList == NULL)
+	if (CollisionList == nullptr || TOList == nullptr)
 	{
 		return 1;
 	}
@@ -5223,7 +5223,7 @@ piMATRIX			InvMat;
 		return 1;
 	}
 
-	if (CollideObject == NULL)
+	if (CollideObject == nullptr)
 	{
 		return 1;
 	}
@@ -5242,7 +5242,7 @@ piMATRIX			InvMat;
 		TO = TOList[Count];
 		Count++;
 
-		if (TO == NULL)
+		if (TO == nullptr)
 		{
 			break;
 		}
@@ -5283,7 +5283,7 @@ UINT32		i;
 piVECTOR	OldPnt,NewPnt;
 piMATRIX	Mat1;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -5332,7 +5332,7 @@ piMATRIX	Mat1;
 														  NumCollisionSlotsLeft,
 														  LineCollideObject, // line collider object
 														  TopObject,
-														  NULL,
+														  nullptr,
 														  &OldPnt,
 														  &NewPnt,
 														  1,
@@ -5349,7 +5349,7 @@ piMATRIX	Mat1;
 														  NumCollisionSlotsLeft,
 														  LineCollideObject, // line collider object
 														  TopObject,
-														  NULL,
+														  nullptr,
 														  &OldPnt,
 														  &NewPnt,
 														  1,
@@ -5365,7 +5365,7 @@ piMATRIX	Mat1;
 														  NumCollisionSlotsLeft,
 														  LineCollideObject, // line collider object
 														  TopObject,
-														  NULL,
+														  nullptr,
 														  &OldPnt,
 														  &NewPnt,
 														  1,
@@ -5375,10 +5375,10 @@ piMATRIX	Mat1;
 
 				ObjectAtt = ObjectAtt->attached;
 
-			} while (ObjectAtt != NULL);
+			} while (ObjectAtt != nullptr);
 		}
 
-		if (ObjectSib->child != NULL)
+		if (ObjectSib->child != nullptr)
 		{
 			_CheckObjectTreeForLineCollision(CollisionList,
 											 NumCollisionSlotsLeft,
@@ -5391,7 +5391,7 @@ piMATRIX	Mat1;
 
 		ObjectSib = ObjectSib->sibling;
 
-	} while (ObjectSib != NULL);
+	} while (ObjectSib != nullptr);
 
 	return 0;
 }
@@ -5401,7 +5401,7 @@ UINT32 trncdInitSingleTerrainObject(trnCDTerrainObject* TO)
 	if(!TO)
 		return 0;
 
-	if (TO->TerrainObject != NULL)
+	if (TO->TerrainObject != nullptr)
 	{
 		if(TO->TerrainObject)
 			_UpdateObjectInvMatrix(TO->TerrainObject);
@@ -5413,14 +5413,14 @@ UINT32 trncdInitSingleTerrainObject(trnCDTerrainObject* TO)
 UINT32 trncdAdjustTerrainObjects(piVECTOR* CameraAdjustment)
 {
 	trnCDTerrainObject* TO;
-	OBJECT*				childObj	= NULL;
+	OBJECT*				childObj	= nullptr;
 
 	// next line should be called from the function that calls this function
 	persAdjustExternalFixedCamera(CameraAdjustment);
 
-		for (TO = _TerrainObjectsHead.Next; TO != NULL; TO = TO->Next)
+		for (TO = _TerrainObjectsHead.Next; TO != nullptr; TO = TO->Next)
 		{
-			if (TO->TerrainObject != NULL)
+			if (TO->TerrainObject != nullptr)
 			{
 				mathAddVectors(&(TO->Center),&(TO->Center),CameraAdjustment);
 
@@ -5611,11 +5611,11 @@ static UINT32	_Count;
 	// remember: count will increase by an average of 2 for each LOD change
 	Count = 0;
 
-	while (TO != NULL && (LODLimitPerFrame == FALSE || Count < 1000))
+	while (TO != nullptr && (LODLimitPerFrame == FALSE || Count < 1000))
 	{
 		for (i=0; i < TRN_MAX_LOD; i++)
 		{
-			if (TO->LOD[i] == NULL)
+			if (TO->LOD[i] == nullptr)
 			{
 				break;
 			}
@@ -5682,7 +5682,7 @@ static UINT32	_Count;
                             fxSndInitSound(id);
                         }
 
-                        TransformEffect* te = TransformEffect::AddEffect("genericbuildingexplosion", Vec3f(0, 0, -1), 0, NULL);
+                        TransformEffect* te = TransformEffect::AddEffect("genericbuildingexplosion", Vec3f(0, 0, -1), 0, nullptr);
 
                         if(te)
                         {
@@ -5695,11 +5695,11 @@ static UINT32	_Count;
 			}
 
 			Obj = TO->LOD[i];
-			if (Obj == NULL)
+			if (Obj == nullptr)
 			{
 				continue;
 			}
-			while (Obj->child != NULL)
+			while (Obj->child != nullptr)
 			{
 				Obj = Obj->child;
 			}
@@ -5737,12 +5737,12 @@ static UINT32	_Count;
 
 UINT32 trnSetDamageLevel(trnCDTerrainObject* TO, UINT32 DamageLevel)
 {
-	if (TO == NULL)
+	if (TO == nullptr)
 	{
 		return 0;
 	}
 
-	if (TO->TerrainObject == NULL)
+	if (TO->TerrainObject == nullptr)
 	{
 		return 0;
 	}
@@ -5752,9 +5752,9 @@ UINT32 trnSetDamageLevel(trnCDTerrainObject* TO, UINT32 DamageLevel)
 
 	TO->DamageLevel = DamageLevel;
 
-	if (TO->TerrainObject != NULL)
+	if (TO->TerrainObject != nullptr)
 	{
-		if (TO->TerrainObject->child != NULL)
+		if (TO->TerrainObject->child != nullptr)
 		{
 			_SetDamageLevel(TO->TerrainObject->child,DamageLevel);
 		}
@@ -5770,7 +5770,7 @@ OBJECT*	ObjSib;
 UCHAR*	RetPtr;
 UINT32	CurrentDamageNum;
 
-	if (Obj == NULL)
+	if (Obj == nullptr)
 	{
 		return 0;
 	}
@@ -5795,7 +5795,7 @@ UINT32	CurrentDamageNum;
 		}
 		else
 		{
-			if (ObjSib->child != NULL)
+			if (ObjSib->child != nullptr)
 			{
 				_SetDamageLevel(ObjSib->child,DamageLevel);
 			}
@@ -5803,7 +5803,7 @@ UINT32	CurrentDamageNum;
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 #endif
 
 	return 0;
@@ -5861,7 +5861,7 @@ UINT32 trnUpdateObjectStatus(SINT32 x, SINT32 y, UINT32 id, SINT32 country, SINT
 
 	Found = 0;
 
-	for (TO = _TerrainObjectsHead.Next; TO != NULL; TO = TO->Next)
+	for (TO = _TerrainObjectsHead.Next; TO != nullptr; TO = TO->Next)
 	{
 		if (TO->StratSupercellX == x && TO->StratSupercellY == y &&
 			TO->StratId == id)
@@ -5946,13 +5946,13 @@ UINT32 trnUpdateObjectStatus(SINT32 x, SINT32 y, UINT32 id, SINT32 country, SINT
 				}
 			}
 
-			if (TO->TrnAutoGun != NULL)
+			if (TO->TrnAutoGun != nullptr)
 			{
 				trnKillAutogun(&(TO->TrnAutoGun));
-				TO->TrnAutoGun = NULL;
+				TO->TrnAutoGun = nullptr;
 				trnAddAutoGun(TO);
 
-				if (TO->TrnAutoGun != NULL)
+				if (TO->TrnAutoGun != nullptr)
 				{
 					trnUpdateAutogunStatus(TO->TrnAutoGun,
                                            country,
@@ -5965,7 +5965,7 @@ UINT32 trnUpdateObjectStatus(SINT32 x, SINT32 y, UINT32 id, SINT32 country, SINT
 					TO->ObjId.objType == BUILDING_AUTOGUNNER)
 				{
 					trnAddAutoGun(TO);
-					if (TO->TrnAutoGun != NULL)
+					if (TO->TrnAutoGun != nullptr)
 					{
 						trnUpdateAutogunStatus(TO->TrnAutoGun,
                                                country,
@@ -6033,7 +6033,7 @@ _StratMessageQue * StratMsg;
 
 	StratMsg = _GetNewStratMsg();
 
-	if (StratMsg == NULL)
+	if (StratMsg == nullptr)
 	{
 		Write_Debug("Unable to allocate new strat message que element");
 		return 0;
@@ -6050,7 +6050,7 @@ _StratMessageQue * StratMsg;
 
 UINT32 trnSetCountry(trnCDTerrainObject * TO, UINT32 Country)
 {
-	if (TO == NULL || TO->TerrainObject == NULL)
+	if (TO == nullptr || TO->TerrainObject == nullptr)
 		return 0;
 
 	if(!(TO->TerrainObject->flag3 & OBJECT_HANDLES_COUNTRY))
@@ -6080,7 +6080,7 @@ UINT32 i;
 		return 0;
 	}
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -6142,17 +6142,17 @@ UINT32 i;
 
 				ObjAtt = ObjAtt->attached;
 			}
-			while (ObjAtt != NULL);
+			while (ObjAtt != nullptr);
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_SetTOObjectCountry(ObjSib->child,Country,1);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL && IncludeSibs != 0);
+	while (ObjSib != nullptr && IncludeSibs != 0);
 
 
 	return 0;
@@ -6198,7 +6198,7 @@ LOGICAL trncdCollideDownMediumList(piVECTOR* OldPos, piVECTOR* NewPos, UINT32 Fl
 	COLLISION		collision;
 	UINT32 i;
 
-	if (VehicleData != NULL)
+	if (VehicleData != nullptr)
 	{
 		NumCollides = 32;
 		CollideListPtr = CollisionList;
@@ -6233,7 +6233,7 @@ LOGICAL trncdCollideDownMediumList(piVECTOR* OldPos, piVECTOR* NewPos, UINT32 Fl
 		}
 	}
 
-	if (trncdObjectToTerrain(NULL, OldPos, NewPos))
+	if (trncdObjectToTerrain(nullptr, OldPos, NewPos))
 	{
 		return(TRUE);
 	}
@@ -6254,7 +6254,7 @@ _StratMessageQue * PrevStratMsg;
 	// flush que if no more terrain objects loading
 	if (TerrainStable == TRUE)
 	{
-		for (StratMsg = _StratMsgTail;StratMsg != NULL && StratMsg != &_StratMsgHead;)
+		for (StratMsg = _StratMsgTail;StratMsg != nullptr && StratMsg != &_StratMsgHead;)
 		{
 			PrevStratMsg = StratMsg->prev;
 
@@ -6277,7 +6277,7 @@ _StratMessageQue * PrevStratMsg;
 // note: this algorithm* doesn't* take into account target vehicle velocity
 //
 // note also: CollisionPnt,CollisionObject,and CollisionPolyNum are all optional
-// put NULL for these values if not applicable
+// put nullptr for these values if not applicable
 //
 // if CollideWithAllTerrainObjects is true, *all* currently tracked TO's are checked
 // this is really slow, so don't use it on a frame-by-frame basis
@@ -6333,7 +6333,7 @@ LOGICAL trncdCollideWithVehiclesAndTerrain(piVECTOR* V1,
 
 	if (IgnoreVehicles == FALSE && (!Flags || Flags & COLLIDER_VEHICLE_MASK))
 	{
-		if (VehicleData != NULL)
+		if (VehicleData != nullptr)
 		{
 			weapCollideRoundWithVehicles(&CollideListPtr,
 								 &TempNum,
@@ -6421,19 +6421,19 @@ LOGICAL trncdCollideWithVehiclesAndTerrain(piVECTOR* V1,
 			*V1 = CollisionList[i].CollidePnt;
 			math3dVectorMultiply(V1,V1,&CollisionList[i].CollideObject->mat);
 
-			if (CollisionPnt != NULL)
+			if (CollisionPnt != nullptr)
 			{
 				*CollisionPnt = CollisionList[i].CollidePnt;
 			}
-			if (CollisionObject != NULL)
+			if (CollisionObject != nullptr)
 			{
 				*CollisionObject = CollisionList[i].CollideObject;
 			}
-			if (CollisionPolyNum != NULL)
+			if (CollisionPolyNum != nullptr)
 			{
 				*CollisionPolyNum = CollisionList[i].PolyNum;
 			}
-			if (CollisionVehicle != NULL)
+			if (CollisionVehicle != nullptr)
 			{
 				if (CollisionList[i].Flags & _AMMOCD_FLAG_ISAVEHICLE)
 				{
@@ -6441,10 +6441,10 @@ LOGICAL trncdCollideWithVehiclesAndTerrain(piVECTOR* V1,
 				}
 				else
 				{
-					*((vehVehicle**)(CollisionVehicle)) = NULL;
+					*((vehVehicle**)(CollisionVehicle)) = nullptr;
 				}
 			}
-			if (TO != NULL)
+			if (TO != nullptr)
 			{
 				if (CollisionList[i].Flags & _AMMOCD_FLAG_ISABUILDING)
 				{
@@ -6452,7 +6452,7 @@ LOGICAL trncdCollideWithVehiclesAndTerrain(piVECTOR* V1,
 				}
 				else
 				{
-					*TO = NULL;
+					*TO = nullptr;
 				}
 			}
 
@@ -6479,13 +6479,13 @@ void trncdResetFXDamageFlags()
 
     TO = _TerrainObjectsHead.Next;
 
-    if(TO == NULL) return;
+    if(TO == nullptr) return;
 
-    while(TO != NULL && (LODLimitPerFrame == FALSE || Count < 1000))
+    while(TO != nullptr && (LODLimitPerFrame == FALSE || Count < 1000))
 	{
 		for(i=0; i < TRN_MAX_LOD; i++)
 		{
-			if(TO->LOD[i] == NULL)
+			if(TO->LOD[i] == nullptr)
 			{
 				break;
 			}
@@ -6544,7 +6544,7 @@ static void drawOctetDebug(TERRAIN_DETAIL*, int ox, int oy, int trinum, piVECTOR
 
 trncdDTLColliderRef trncdDTLColliderAlloc(TERRAIN_DETAIL* td)
 {
-	if(td == NULL) return NULL;
+	if(td == nullptr) return nullptr;
 	if(td->trindx != SUPERCELL_OCTETS_XY)
 	{
 		char s[64];
@@ -6606,8 +6606,8 @@ SINT32 trncdCollideWithBaseTerrain(FASTCOLLIDE* collisionList, SINT32 maxcols,
 	logTimerBeginMacro();
 
 	td = &trndtl[12]; // center terrain tile;
-	if(td == NULL)
-		piExitProgram(__FILE__, __LINE__, "center tile is NULL!");
+	if(td == nullptr)
+		piExitProgram(__FILE__, __LINE__, "center tile is nullptr!");
 
 	// get which supercells to test
 	trnGrid.originX = (FLOAT32)((td->scx - 2) * SUPERCELL_WIDTH  - WorldOriginOffset.x); // relative to
@@ -6622,9 +6622,9 @@ SINT32 trncdCollideWithBaseTerrain(FASTCOLLIDE* collisionList, SINT32 maxcols,
 	for(numcols = 0, i = 0; i < numSC && numcols < maxcols; i++)
 	{
 		td = &trndtl[(4 - scy[i]) * 5 + scx[i]];
-		if(td == NULL) continue;
-		if(td->collider == NULL) td->collider = trncdDTLColliderAlloc(td);
-		if(td->collider == NULL) continue;
+		if(td == nullptr) continue;
+		if(td->collider == nullptr) td->collider = trncdDTLColliderAlloc(td);
+		if(td->collider == nullptr) continue;
 
 		numcols += collideWithSuperCell(td, &collisionList[numcols], maxcols - numcols, start, end);
 	}
@@ -6707,7 +6707,7 @@ static int collideWithSuperCell(TERRAIN_DETAIL* td, FASTCOLLIDE* collisionList, 
 
 	 			FASTCOLLIDE* collision = &collisionList[numcols];
 
-	 			collision->TopLevelObject = NULL;
+	 			collision->TopLevelObject = nullptr;
 				collision->CollideObject = td->terrainorig; // grr can't export texture information correctly will have to
 				collision->PolyNum = PolyNum + tri[j];		// wait until entire collider API is redone and can use the txtobj field
 				if(td->collider->txtobj[idx] && td->collider->txtobj[idx]->texname) // fairly horrible hack in the meantime,
@@ -7030,7 +7030,7 @@ void trncdDrawShortCollisionObjects()
         return;
     }
 
-    trnCDTerrainObject* to = NULL;
+    trnCDTerrainObject* to = nullptr;
 
 #if USE_STATESET
     static ref_ptr<RenderStateSet> stateset;
@@ -7091,7 +7091,7 @@ void trncdDrawShortTOBoundingBox()
         return;
     }
 
-    trnCDTerrainObject* to = NULL;
+    trnCDTerrainObject* to = nullptr;
 
 #ifdef ANDREWTEST
     for(SINT32 i = 0; i < ML_NUM_MED_LIST_ELEMENTS; i++)
@@ -7246,7 +7246,7 @@ bool trncdCollideWithMouse(int sx, int sy)
 
     oglGetScreenToWorld(sx, sy, x, y, z);
 
-    static colliderQuery* cq = NULL;
+    static colliderQuery* cq = nullptr;
 
     if(!cq)
     {
@@ -7417,7 +7417,7 @@ bool trncdToggleDamageWithMouseClick(int sx, int sy)
 
     oglGetScreenToWorld(sx, sy, x, y, z);
 
-    static colliderQuery* cq = NULL;
+    static colliderQuery* cq = nullptr;
 
     if(!cq)
     {

@@ -37,7 +37,7 @@ static bool g_launchInProgress;
 
 // CPlaygateDlg dialog
 
-CPlaygateDlg::CPlaygateDlg(CWnd* pParent /*=NULL*/)
+CPlaygateDlg::CPlaygateDlg(CWnd* pParent /*=nullptr*/)
 	: CBDialog(CPlaygateDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CPlaygateDlg)
@@ -50,7 +50,7 @@ CPlaygateDlg::CPlaygateDlg(CWnd* pParent /*=NULL*/)
 
 CPlaygateDlg::~CPlaygateDlg()
 {
-	g_dlg = NULL;
+	g_dlg = nullptr;
 }
 
 void CPlaygateDlg::DoDataExchange(CDataExchange* pDX)
@@ -86,7 +86,7 @@ BOOL CPlaygateDlg::OnInitDialog()
 
 	std::wstring wideUrl(url.begin(), url.end());
 
-	m_browser.Navigate(wideUrl.c_str(), NULL, NULL, NULL, NULL);
+	m_browser.Navigate(wideUrl.c_str(), nullptr, nullptr, nullptr, nullptr);
 
 	playgate.m_nextGameListRequest = teulTime();
 
@@ -194,7 +194,7 @@ static void _ServerSelection(CListBox* serverList, int i)
 		info += "\nLocal: ";
 
 		UINT32 localVersion = 0;
-		SINT32 installs = versionWinGetVersion(server.m_appID, ~0, &localVersion, NULL);
+		SINT32 installs = versionWinGetVersion(server.m_appID, ~0, &localVersion, nullptr);
 		if ( installs <= 0 )
 			info += "Not Installed";
 		else
@@ -214,7 +214,7 @@ static void _ServerSelection(CListBox* serverList, int i)
 
 #if(0)
 		// I can't see a way to clear the text, wtf?
-		if (stateText != NULL )
+		if (stateText != nullptr )
 		{
 			CPlaygateDlg* pgdialog = (CPlaygateDlg*)hMainWnd->GetDlgItem(IDD_PLAYGATE_DIALOG);
 			
@@ -226,7 +226,7 @@ static void _ServerSelection(CListBox* serverList, int i)
 			url += g_region.m_webSuffix;
 			url += "/pgservers.html";
 			std::wstring wideUrl(url.begin(), url.end());
-			pgdialog->m_browser.Navigate(wideUrl.c_str(), NULL, NULL, NULL, NULL);
+			pgdialog->m_browser.Navigate(wideUrl.c_str(), nullptr, nullptr, nullptr, nullptr);
 
 		}
 #endif
@@ -267,9 +267,9 @@ static void _ServerSelection(CListBox* serverList, int i)
 
 void Auth::GameList::process()
 {
-	if ( g_dlg == NULL ) return;
+	if ( g_dlg == nullptr ) return;
 	CListBox* serverList = (CListBox*)g_dlg->GetDlgItem(IDC_SERVER_LIST);
-	if ( serverList == NULL ) return;
+	if ( serverList == nullptr ) return;
 
 	int sel = serverList->GetCurSel();
 	UINT32 arenaID = (sel >= 0 && sel < (int)m_games.size()) ? m_games[sel].m_arenaID : loginData.m_arenaID;
@@ -415,7 +415,7 @@ void CPlaygateDlg::OnTimer(UINT_PTR nIDEvent)
 		hMainWnd->KillTimer('FTP');
 		int delay = ftpProcess();
 		if ( delay > 0 )
-			hMainWnd->SetTimer('FTP', delay, NULL);
+			hMainWnd->SetTimer('FTP', delay, nullptr);
 		return;
 	}
 

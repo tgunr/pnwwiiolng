@@ -36,7 +36,7 @@ glslUniformBlock* glslGetUniformBlock(const std::string& name)
         return itr->second;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /*------------------------------------------------------------------------------------
@@ -140,7 +140,7 @@ void glslUniformBlock::Buffer()
     glBindBuffer(GL_UNIFORM_BUFFER, _ubo);
 
     // Allocate room for this size
-    glBufferData(GL_UNIFORM_BUFFER, _blocksize, NULL, GL_DYNAMIC_DRAW);
+    glBufferData(GL_UNIFORM_BUFFER, _blocksize, nullptr, GL_DYNAMIC_DRAW);
     glBindBuffer(GL_UNIFORM_BUFFER, 0);
 }
 

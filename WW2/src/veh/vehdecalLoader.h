@@ -50,7 +50,7 @@ public:
 
 			spec.shortname.clear();
 
-            const char* p = NULL;
+            const char* p = nullptr;
 			xmlGetNodeValue(node, XML_DATA_STRING, &p, "id");
             spec.shortname = p;
 

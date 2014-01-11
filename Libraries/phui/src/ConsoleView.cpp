@@ -20,8 +20,8 @@ class ConsoleView::CmdHistory : public std::deque<std::wstring> {};
 ConsoleView::ConsoleView() : TextView()
 {
 	_cmdHistory = new CmdHistory;
-	_cmdCallback = NULL;
-	_cmdCompletion = NULL;
+	_cmdCallback = nullptr;
+	_cmdCompletion = nullptr;
 	_curhistory = 0;
 	_cmdCallbackRefcon = _cmdCompletionRefcon = 0;
 }
@@ -171,7 +171,7 @@ void ConsoleView::executeCommandLine(std::wstring const& in_line)
 	for(int i = 0; i < len; i++) ascii += (int)in_line[i];
 	strncpy(argstr, ascii.c_str(), 255);
 	
-	if(_cmdCallback == NULL || ascii.empty()) return;
+	if(_cmdCallback == nullptr || ascii.empty()) return;
 	
 	pos = (unsigned int)ascii.find_first_not_of(' ');
 	
@@ -203,7 +203,7 @@ void ConsoleView::doTabCommandCompletion(std::wstring const& line)
 	unsigned int i, nummatches;
 	int pos;
 	
-	if(_cmdCompletion == NULL) return;
+	if(_cmdCompletion == nullptr) return;
 
 	pos = (int)line.rfind(' ');
 	if(pos == (int)std::wstring::npos) pos = -1;
@@ -212,9 +212,9 @@ void ConsoleView::doTabCommandCompletion(std::wstring const& line)
 	
 	for(i = 0; i < MAX_MATCHES; i++)
 	{
-		matchcstr = NULL;// fix _cmdCompletion(line.c_str(), matchText.c_str(), i, _cmdCompletionRefcon);
+		matchcstr = nullptr;// fix _cmdCompletion(line.c_str(), matchText.c_str(), i, _cmdCompletionRefcon);
 		
-		if(matchcstr == NULL)
+		if(matchcstr == nullptr)
 			break;
 			
 //		matches[i] = matchcstr;
