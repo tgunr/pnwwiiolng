@@ -33,19 +33,19 @@ struct WEAPON_CLASS
 	}
 };
 
-// Weapons by spec
-typedef std::map<WEAPON_SPEC,WEAPON*> WEAPON_LIST;
-// Lists of WEAPON_ARRAYs by country+category+class
-typedef std::map<UINT32, WEAPON_LIST> WEAPON_SPAWNS;
+//tolua_end
 
+// Weapons by spec
+typedef std::map<WEAPON_SPEC, WEAPON*> WEAPON_LIST;
 // g_weaponList defines ALL known vehicles, including unusable ones
 extern WEAPON_LIST g_weaponList;
+
+// Lists of WEAPON_ARRAYs by country+category+class
+typedef std::map<UINT32, WEAPON_LIST> WEAPON_SPAWNS;
 
 // g_weaponSpawns provides lists of which weapons can be spawned
 // by which category of spawner.
 extern WEAPON_SPAWNS g_weaponSpawns;
-
-//tolua_end
 
 // If you ever have to look up a class name.
 extern size_t g_maxWeaponClass;

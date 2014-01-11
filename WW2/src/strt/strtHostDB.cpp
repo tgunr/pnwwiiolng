@@ -408,8 +408,7 @@ strtdbPopulateVehTypesTable()
 
 	dbugLog(_FLI, "%s", inserts.c_str());
 
-	WEAPON_LIST::iterator it;
-	for ( it = g_weaponList.begin(); it != g_weaponList.end(); ++it )
+	for ( auto it = g_weaponList.begin(), end = g_weaponList.end(); it != end; ++it )
 	{
 		assert( it->second != NULL );
 
@@ -495,8 +494,7 @@ strtdbSaveVehicleCVCs()
 
 		q.Query("START TRANSACTION");
 
-		WEAPON_LIST::iterator it;
-		for ( it = g_weaponList.begin(); it != g_weaponList.end(); ++it )
+		for ( auto it = g_weaponList.begin(), end = g_weaponList.end(); it != end; ++it )
 		{
 			WEAPON* weap = it->second;
 			if ( weap == NULL || weap->localIndex() == 0 )
@@ -537,8 +535,7 @@ strtdbSaveVehicleAccess()
 		int length;
 		UINT32 saved = 0;
 
-		WEAPON_LIST::iterator it;
-		for ( it = g_weaponList.begin(); it != g_weaponList.end(); ++it )
+		for ( auto it = g_weaponList.begin(), end = g_weaponList.end(); it != end; ++it )
 		{
 			WEAPON* weap = it->second;
 			if ( weap == NULL || weap->localIndex() == 0 || !weap->m_modified )

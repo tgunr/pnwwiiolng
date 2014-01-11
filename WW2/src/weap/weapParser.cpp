@@ -88,6 +88,8 @@ static SINT32 _curCategory;
 
 static SINT32 _parseConstant;
 
+std::vector<std::unique_ptr<WEAPON>> g_weaponPtrs;
+
 bool weapParseCountry(char* countryfile)
 {
 	strncpy(_fileName, countryfile, PN_MAX_PATH);
@@ -340,6 +342,7 @@ _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 		WEAPON* weapon = new WEAPON(thisSpec, args[1].svalue, args[2].svalue
 									, args[4].dvalue, args[7].dvalue * 100, args[8].dvalue, args[9].dvalue, args[10].dvalue
 									);
+		g_weaponPtrs.emplace_back(weapon);
 
 #ifndef FRONT_END
 		SINT32 i, bIndex;

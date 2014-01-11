@@ -104,6 +104,7 @@ size_t g_maxWeaponClass = 0;
 
 // All known weapons
 WEAPON_LIST g_weaponList;
+extern std::vector<std::unique_ptr<WEAPON>> g_weaponPtrs;
 
 // Weapon Category tables
 WEAPON_SPAWNS g_weaponSpawns;
@@ -314,8 +315,7 @@ bool weapListInit(const char* theaterPath)
 	memset(weapCountryIndex, 0, sizeof(weapCountryIndex));
 	g_weaponList.clear();
 	g_weaponSpawns.clear();
-
-	atexit(weapListKill);
+	g_weaponPtrs.clear();
 
 	strprintf(importFile, SUB_PATH("%s", "%s"), theaterPath, "weapCountry.csv");
 	if ( ! weapParseCountry(importFile))
@@ -378,14 +378,9 @@ bool weapListInit(const char* theaterPath)
 
 void weapListKill(void)
 {
-	// Delete all the WEAPON's we allocated
-	for ( auto it = g_weaponList.begin(), end = g_weaponList.end(); it != end; ++it )
-	{
-		if ( it->second != nullptr )
-			delete it->second;
-	}
 	g_weaponList.clear();
 	g_weaponSpawns.clear();
+	g_weaponPtrs.clear();
 }
 
 #if platOS != OS_WIN32

@@ -16,10 +16,6 @@
 #include "dbug/dbug.h"
 #include "mem/mem.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
 #include "strt/strtTypes.h"
 #include "strt/strtCPStruct.h"
 #include "strt/strtFacilityStruct.h"
@@ -31,20 +27,8 @@
 #include "wwii/wwiiString.h"
 
 static LOGICAL _fakeStructure(CPStruct* cp);
-typedef std::vector< std::pair<FacilityStruct*, ObjectStruct*> > FAKES;
-static FAKES _fakes;
-
-static void
-deleteFakes()
-{
-	for ( auto it = _fakes.begin(), end = _fakes.end(); it != end; ++it )
-	{
-		delete it->first;
-		memFree(it->second);
-	}
-
-	_fakes.clear();
-}
+static std::vector<std::unique_ptr<FacilityStruct>> _fakeFacilitys;
+static std::vector<std::unique_ptr<ObjectStruct>> _fakeObjects;
 
 //Takes the cp list and runs through it all, turning each standalone
 //	bridge CP into one with a faked facility and object to take damage
@@ -67,8 +51,6 @@ void strtFakeBridges(CPStruct* cpList)
 			_fakeStructure(cp);
 		}
 	}
-
-	atexit(deleteFakes);
 }
 
 //Allocates the fake CP structure underneath bridge CPs
@@ -79,10 +61,10 @@ static LOGICAL _fakeStructure(CPStruct* cp)
 
 	//Get memory for our darling little hack
 	FacilityStruct* const facility = new FacilityStruct;
+	_fakeFacilitys.emplace_back(facility);
 	//Our hack is hungry!  I needs more memory!
-	ObjectStruct* const object = (ObjectStruct*)memCalloc(sizeof(ObjectStruct), 1);
-
-	_fakes.push_back(std::make_pair(facility, object));
+	ObjectStruct* const object = new ObjectStruct;
+	_fakeObjects.emplace_back(object);
 
 	// Make sure we never try to save these.
 	facility->modified = object->modified = true;
