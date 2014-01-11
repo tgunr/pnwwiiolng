@@ -918,13 +918,24 @@ static SINT32
 _recvLua(ACTION_OBJECT* const a)
 {
 	const UINT32 bytes = a->sizeInBytes();
-	if ( bytes == 0 )
+	if ( bytes <= 1 )	// null byte is included
 		return a->offset;
 
 	const char* const input = (char*)(a->packed);
+	if ( input[bytes - 1] != '\0' )
+	{
+		char sender[81];
+		if (a->endpoint)
+			teulGetAddress(a->endpoint->fromAddress(), sender, sizeof(sender));
+		else
+			strsafecpy(sender, "?.?.?.?");
+		dbugLog(_FLW, "t:%d ip:%s ignoring non-nul-terminated input", a->teulIndex, sender);
+		return -EINVAL;
+	}
+
 	dbugLog(_FLI, "luaSrc: received command: %s", input);
 
-	if ( bytes > 1 && input[0] == ';' )
+	if ( input[0] == ';' )
 	{
 		std::string object(cv_luaPath.GetString());
 		object += input + 1;
@@ -950,7 +961,6 @@ _recvLua(ACTION_OBJECT* const a)
 
 	dbugLog(_FLI, "reply:[%s]", reply.c_str());
 	reply += LUA_END_SEQ;
-	dbugLog(_FLI, "reply with lua_end_seq:[%s]", reply.c_str());
 
 	const size_t lenWithNullByte = reply.length() + 1;
 	Teul::Packet outgoing(lenWithNullByte, (UCHAR)Host::CallbackX, (UCHAR)Host::Callbacks::LuaPacket_Y);

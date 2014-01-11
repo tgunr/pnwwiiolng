@@ -151,7 +151,7 @@ _sendCmd(const std::string& command)
 
 	Teul::Packet outgoing(command.length(), Host::CallbackX, (UCHAR)Host::Callbacks::LuaPacket_Y);
 	outgoing.setUnencrypted();
-	outgoing.append(command.c_str(), command.length());
+	outgoing.append(command.c_str(), command.length() + 1);
 	outgoing.send(serverTeulIndex);
 
 	g_waitingForResponse = true;
