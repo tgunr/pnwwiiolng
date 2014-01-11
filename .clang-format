@@ -4,7 +4,6 @@ AlwaysBreakTemplateDeclarations: true
 BreakBeforeBinaryOperators: true
 BreakBeforeBraces: Allman
 BreakConstructorInitializersBeforeComma: true
-ColumnLimit: 0
 ColumnLimit: 132
 Cpp11BracedListStyle: true
 IndentCaseLabels: false
