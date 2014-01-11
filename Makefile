@@ -5,7 +5,12 @@ all:	| $(BUILD_DIR)/Makefile
 
 $(BUILD_DIR)/Makefile:
 	mkdir -p "$(BUILD_DIR)"
-	cd "$(BUILD_DIR)" && cmake -G "Unix Makefiles" ../WW2/src && cd ".."
+	cd "$(BUILD_DIR)" && cmake -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON ../WW2/src && cd ".."
+
+distclean:
+	rm -rf "$(BUILD_DIR)"
 
 clean:
-	rm -rf "$(BUILD_DIR)"
+	cd build
+	make clean
+

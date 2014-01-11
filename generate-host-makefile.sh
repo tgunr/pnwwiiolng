@@ -28,5 +28,5 @@ if [ ! \( -d "${projDir}" -o -L "${projDir}" \) ] ; then
 fi
 cd "${projDir}" || exit 1
 
-cmake -G "Unix Makefiles" "${relativeSrcDir}" $*
+cmake -G "Unix Makefiles" -DCMAKE_EXPORT_COMPILE_COMMANDS=ON "${relativeSrcDir}" $*
 
