@@ -30,7 +30,7 @@ public:
 		: cells()
 		, numBuildings(~0)
 		, maxBuildings(~0)
-		, m_allocation(NULL)
+		, m_allocation(nullptr)
 		, m_size(0)
 		{}
 
@@ -49,10 +49,10 @@ public:
 
 	~Fixture()
 	{
-		if ( m_allocation != NULL )
+		if ( m_allocation != nullptr )
 		{
 			memFree(m_allocation);
-			m_allocation = NULL;
+			m_allocation = nullptr;
 		}
 	}
 
@@ -108,7 +108,7 @@ public:
 			Fixture fixture;
 			fixture.allocate();
 
-			CRITICAL( ExpectEqual( fixture.allocation(), (void*)NULL ) );
+			CRITICAL( ExpectEqual( fixture.allocation(), (void*)nullptr ) );
 			CRITICAL( ExpectEqual( fixture.size(), (size_t)0 ) );
 		END_SUB_STAGE( "No supercells" )
 
@@ -120,14 +120,14 @@ public:
 
 			// We haven't given the supercell any buildings.
 			fixture.allocate();
-			CRITICAL( ExpectEqual( fixture.allocation(), (void*)NULL ) );
+			CRITICAL( ExpectEqual( fixture.allocation(), (void*)nullptr ) );
 			CRITICAL( ExpectEqual( fixture.size(), (size_t)0 ) );
 
-			CRITICAL( ExpectTrue( sc.m_xfer == NULL ) );
+			CRITICAL( ExpectTrue( sc.m_xfer == nullptr ) );
 
 			fixture.addBuilding(0, 0, 0);
 			CRITICAL( ExpectEqual( sc.numObjects, 1 ) );
-			CRITICAL( ExpectTrue( sc.objects != NULL ) );
+			CRITICAL( ExpectTrue( sc.objects != nullptr ) );
 
 			const size_t expecting_bits = testtype_t::HeaderBits + testtype_t::FlagBits;
 			const size_t expecting_bytes = (expecting_bits + 7) / 8;
@@ -135,11 +135,11 @@ public:
 
 			fixture.allocate();
 
-			CRITICAL( ExpectFalse( fixture.allocation() == NULL ) );
-			CRITICAL( ExpectFalse( fixture.xfer() == NULL ) );
+			CRITICAL( ExpectFalse( fixture.allocation() == nullptr ) );
+			CRITICAL( ExpectFalse( fixture.xfer() == nullptr ) );
 			CRITICAL( ExpectFalse( fixture.size() == 0 ) );
 
-			CRITICAL( ExpectFalse( sc.m_xfer == NULL ) );
+			CRITICAL( ExpectFalse( sc.m_xfer == nullptr ) );
 
 			CRITICAL( ExpectTrue( fixture.xfer()->scx() ==  1 ) );
 			CRITICAL( ExpectTrue( fixture.xfer()->scy() ==  2 ) );
@@ -168,27 +168,27 @@ public:
 
 			fixture.addBuilding(0, 1, 0);
 			CRITICAL( ExpectEqual( sc.numObjects, 1 ) );
-			CRITICAL( ExpectTrue( sc.objects != NULL ) );
+			CRITICAL( ExpectTrue( sc.objects != nullptr ) );
 			CRITICAL( ExpectEqual( sc.objects[0].visLevel(), 1 ) && ExpectEqual( sc.objects[0].smokeLevel(), 0 ) && ExpectEqual( sc.objects[0].effectiveVisLevel(), 1 ) );
 			fixture.addBuilding(0, 1, 1);	// effective Vislevel should be 2.
 			CRITICAL( ExpectEqual( sc.numObjects, 2 ) );
-			CRITICAL( ExpectTrue( sc.objects != NULL ) );
+			CRITICAL( ExpectTrue( sc.objects != nullptr ) );
 			CRITICAL( ExpectEqual( sc.objects[0].visLevel(), 1 ) && ExpectEqual( sc.objects[0].smokeLevel(), 0 ) && ExpectEqual( sc.objects[0].effectiveVisLevel(), 1 ) );
 			CRITICAL( ExpectEqual( sc.objects[1].visLevel(), 1 ) && ExpectEqual( sc.objects[1].smokeLevel(), 1 ) && ExpectEqual( sc.objects[1].effectiveVisLevel(), 2 ) );
 			fixture.addBuilding(0, 255, 2); // Vislevel should be 255.
 			CRITICAL( ExpectEqual( sc.numObjects, 3 ) );
-			CRITICAL( ExpectTrue( sc.objects != NULL ) );
+			CRITICAL( ExpectTrue( sc.objects != nullptr ) );
 			CRITICAL( ExpectEqual( sc.objects[0].visLevel(), 1 ) && ExpectEqual( sc.objects[0].smokeLevel(), 0 ) && ExpectEqual( sc.objects[0].effectiveVisLevel(), 1 ) );
 			CRITICAL( ExpectEqual( sc.objects[1].visLevel(), 1 ) && ExpectEqual( sc.objects[1].smokeLevel(), 1 ) && ExpectEqual( sc.objects[1].effectiveVisLevel(), 2 ) );
 			CRITICAL( ExpectEqual( sc.objects[2].visLevel(), 255 ) && ExpectEqual( sc.objects[2].smokeLevel(), 2 ) && ExpectEqual( sc.objects[2].effectiveVisLevel(), 255 ) );
 
 			fixture.allocate();
 
-			CRITICAL( ExpectFalse( fixture.allocation() == NULL ) );
-			CRITICAL( ExpectFalse( fixture.xfer() == NULL ) );
+			CRITICAL( ExpectFalse( fixture.allocation() == nullptr ) );
+			CRITICAL( ExpectFalse( fixture.xfer() == nullptr ) );
 			CRITICAL( ExpectFalse( fixture.size() == 0 ) );
 
-			CRITICAL( ExpectFalse( sc.m_xfer == NULL ) );
+			CRITICAL( ExpectFalse( sc.m_xfer == nullptr ) );
 
 			CRITICAL( ExpectTrue( fixture.xfer()->scx() ==  -20 ) );
 			CRITICAL( ExpectTrue( fixture.xfer()->scy() ==  59 ) );
@@ -283,15 +283,15 @@ public:
 				}
 			END_SUB_STAGE( "Populating fixture" )
 
-			CRITICAL( ExpectTrue( fixture.allocation() == NULL ) );
-			CRITICAL( ExpectTrue( fixture.xfer() == NULL ) );
+			CRITICAL( ExpectTrue( fixture.allocation() == nullptr ) );
+			CRITICAL( ExpectTrue( fixture.xfer() == nullptr ) );
 			CRITICAL( ExpectTrue( fixture.size() == 0 ) );
 
 			// Create the allocation.
 			fixture.allocate();
 
-			CRITICAL( ExpectFalse( fixture.allocation() == NULL ) );
-			CRITICAL( ExpectFalse( fixture.xfer() == NULL ) );
+			CRITICAL( ExpectFalse( fixture.allocation() == nullptr ) );
+			CRITICAL( ExpectFalse( fixture.xfer() == nullptr ) );
 
 			CRITICAL( ExpectEqual( fixture.size(), expectingSize_bits / 8 ) );
 
@@ -316,7 +316,7 @@ public:
 						continue;
 					}
 
-					CRITICAL( ExpectFalse( sc.m_xfer == NULL ) );
+					CRITICAL( ExpectFalse( sc.m_xfer == nullptr ) );
 
 					CRITICAL( ExpectEqual( sc.m_xfer->scx(), sc.x ) );
 					CRITICAL( ExpectEqual( sc.m_xfer->scy(), sc.y ) );

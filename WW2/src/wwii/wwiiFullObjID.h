@@ -95,7 +95,7 @@ extern const FULL_OBJ_ID nullObjID;
 
 static inline const char* weapPrintFullObjIDC(const FULL_OBJ_ID* id, char* buffer)
 {
-	if ( id == NULL )
+	if ( id == nullptr )
 		return "<nullFOID>";
 
 	sprintf(buffer, "x:%d y:%d id:%hu c:%hd t:%hd"

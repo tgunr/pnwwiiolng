@@ -130,7 +130,7 @@ ServerTrackedObject*
 ServerTrackedObject::lookup(UINT32 uid)
 {
 	STO_MAP::iterator it = stoMap.find(uid);
-	return ( it != stoMap.end() ) ? it->second : NULL;
+	return ( it != stoMap.end() ) ? it->second : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -211,7 +211,7 @@ void wwiiRemoveSTO(UINT32 uid)
 		return;
 	}
 
-	if( it->second != NULL )
+	if( it->second != nullptr )
 	{
 		// Call the object's destructor
 		if ( it->second->activated() )
@@ -239,7 +239,7 @@ bool wwiiValidSTO(UINT32 uid)
 ServerTrackedObject* wwiiGetSTO(UINT32 uid)
 {
 	STO_MAP::iterator it = stoMap.find(uid);
-	return (it != stoMap.end()) ? it->second : NULL;
+	return (it != stoMap.end()) ? it->second : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -304,7 +304,7 @@ wwiiForEachSTO(STO_ITERATOR& func)
 	{
 		ServerTrackedObject* const sto = it->second;
 		++it;
-		if ( sto != NULL )
+		if ( sto != nullptr )
 			func(*sto);
 	}
 }
@@ -321,7 +321,7 @@ wwiiForEachSTO(STO_COOKIE_ITERATOR& func, void* cookie)
 	{
 		ServerTrackedObject* const sto = it->second;
 		++it;
-		if ( sto != NULL && func(*sto, cookie))
+		if ( sto != nullptr && func(*sto, cookie))
 			return true;
 	}
 

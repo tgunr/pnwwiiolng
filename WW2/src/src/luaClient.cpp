@@ -206,7 +206,7 @@ _processCommands(std::vector<std::string>& commands, bool exitAfterCommands)
 void
 inputHandler(char* input)
 {
-	if ( input == NULL || strcmp(input, "quit") == 0 || strcmp(input, "exit") == 0 )
+	if ( input == nullptr || strcmp(input, "quit") == 0 || strcmp(input, "exit") == 0 )
 	{
 		rl_crlf();
 		rl_callback_handler_remove();
@@ -461,7 +461,7 @@ _recvLuaPacket(ACTION_OBJECT* const a)
 		return a->offset;
 	}
 	char* p = strstr(text, LUA_END_SEQ);
-	if ( p != NULL )
+	if ( p != nullptr )
 	{
 		g_waitingForEnd = false;
 		*p = 0;
@@ -481,7 +481,7 @@ _recvLuaPacket(ACTION_OBJECT* const a)
 		else
 			_printf("%s\n", (const char*)p);
 	}
-	while ( z != NULL && *z != 0 );
+	while ( z != nullptr && *z != 0 );
 
 	return a->offset;
 }

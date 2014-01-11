@@ -12,7 +12,7 @@ static inline
 void _betaInfo(SINT32 teulIndex, const char* fn, const char* msg)
 {
 	Player* player = PlayerInterface::Lookup(teulIndex) ;
-	if ( player != NULL )
+	if ( player != nullptr )
 		dbugLog(_FLI, "t:%d p:%d c:%s %s(): %s", teulIndex, player->playerID(), player->callsign(), fn, msg) ;
 	else
 		dbugLog(_FLI, "t:%d %s [unknown]: %s", teulIndex, fn, msg) ;

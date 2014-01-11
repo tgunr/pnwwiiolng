@@ -40,8 +40,8 @@ class ChannelSubscription
 public:
 	ChannelSubscription()
 		: m_type(NO_CHANNEL)
-		, m_channel(NULL)
-		, m_subscriber(NULL)
+		, m_channel(nullptr)
+		, m_subscriber(nullptr)
 		{}
 
 	class Chat::Channel* channel() const { return m_channel; }
@@ -49,8 +49,8 @@ public:
 
 	// Channel node can be used to reserve a particular radio slot to a particular radio type
 	bool inUse() const { return (m_type > NO_CHANNEL); }
-	bool isPlaceHolder() const { return (inUse() && m_channel == NULL); }
-	bool isTuned() const { return (inUse() && m_channel != NULL); }
+	bool isPlaceHolder() const { return (inUse() && m_channel == nullptr); }
+	bool isTuned() const { return (inUse() && m_channel != nullptr); }
 
 	SINT32 teulIndex() const;
 

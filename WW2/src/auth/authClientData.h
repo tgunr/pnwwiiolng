@@ -17,7 +17,7 @@ struct ClientData
 {
 	ClientData(SINT32 _teulIndex, UINT32 _platform, UINT32 _address
 				, UINT32 _oVersion, const char* _username, const char* _password)
-		: server(NULL)
+		: server(nullptr)
 		, teulIndex(_teulIndex)
 		, platform(_platform)
 		, address(_address)
@@ -29,7 +29,7 @@ struct ClientData
 		, appVersion(0)
 		, m_username(_username), m_password(_password)
 		, m_subscribedArenaIDs()
-		, m_launchRequest(NULL)
+		, m_launchRequest(nullptr)
 		, isPlaynet(false)
 		, isPremium(false)
 		, isQueued(false)

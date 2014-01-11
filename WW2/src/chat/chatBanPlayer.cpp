@@ -66,7 +66,7 @@ _banFail(void* data)
 
 	// Tell the banner it failed
 	Player* player = PlayerInterface::Lookup(ban->m_issuerHandle);
-	if ( player != NULL )
+	if ( player != nullptr )
 	{
 		Chat::Name bannedName(ban->m_handle);
 		player->message(LSTR_CAUTION, LSTR_ERROR_VERB_SUBJECT, (ban->m_duration > 0) ? "ban" : "kick", bannedName.c_str());
@@ -83,7 +83,7 @@ _banSuccess(void* data)
 {
 	BAN* const ban = (BAN*)data;
 	Player* const issuer = PlayerInterface::Lookup(ban->m_issuerHandle);
-	if ( issuer != NULL )
+	if ( issuer != nullptr )
 	{
 		// Tell the issuer they were successful
 		const char* p;
@@ -110,7 +110,7 @@ _banSuccess(void* data)
 	{
 		// Tell the banee he's banned
 		Player* const player = PlayerInterface::Lookup(ban->m_handle);
-		if ( player != NULL )
+		if ( player != nullptr )
 			player->message(LSTR_WARNING, LSTR_ACCOUNT_SUSPENDED_NOTICE, chatTimeInterval(ban->m_duration), ban->m_message.c_str());
 	}
 
@@ -123,7 +123,7 @@ _banSuccess(void* data)
 static void
 _processBan(DB::handle_t* conn, BAN& ban)
 {
-	char* p = NULL;
+	char* p = nullptr;
 	Chat::Name name(ban.m_handle);
 	Chat::Name issuer(ban.m_issuerHandle);
 
@@ -177,10 +177,10 @@ void*
 chatBanQueueThread(void*)
 {
 	static DB::handle_t* conn = threadsOpenDBConnection(false);
-	if ( conn == NULL )
+	if ( conn == nullptr )
 	{
 		threadLog(_FLA, "bqt: Unable to open database connection");
-		return NULL;
+		return nullptr;
 	}
 
 	threadLog(_FLI, "Ban Queue Thread active");

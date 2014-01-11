@@ -85,14 +85,14 @@ main(int argc, char* argv[])
 {
 	Teul::ConfigVar::InitializeConfigVars();
 
-	teulInitTransport(LOG_TO_FILE, "./testAuthConnect", NULL);
+	teulInitTransport(LOG_TO_FILE, "./testAuthConnect", nullptr);
 
 	teulSyncClock();
 
 	dbugSetLogLevel(Debug::ERR_DBUG);
 
 	UINT32* const address = teulGetHostByName("auth.playnet.com");
-	if ( address == NULL )
+	if ( address == nullptr )
 	{
 		fprintf(stderr, "failed to resolve auth.playnet.com\n");
 		return -2;

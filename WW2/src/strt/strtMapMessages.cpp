@@ -77,7 +77,7 @@ static SINT32 _recvMMPostAccept(ACTION_OBJECT* const a)
 		//postAccept.portal = 1;
 
 	Player* player = PlayerInterface::Lookup(postAccept.customerID);
-	if ( player != NULL )
+	if ( player != nullptr )
 	{
 		mmProcessPostAccept(*player, postAccept, MM_ACCEPT_NEW);
 		return a->offset;
@@ -305,7 +305,7 @@ static SINT32 _recvMMFacilityCapacityResponse(ACTION_OBJECT* const a)
 #else
 
 	Player* player = PlayerInterface::Lookup(response.customerID);
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		dbugLog(_FLA, "%s(%u): null persona", __FUNCTION__, response.customerID);
 		return -EINVAL;
@@ -598,14 +598,14 @@ SINT32 strtSendMMCapacityRequest(SINT32 connection, UINT32 tag, UINT32 missionID
 static SINT32
 _recvMissionDamageEvent(ACTION_OBJECT* const a)
 {
-	if ( a->m_client != NULL || a->canRead<MissionDamageEvent>() == false )
+	if ( a->m_client != nullptr || a->canRead<MissionDamageEvent>() == false )
 		return -EINVAL;
 
 	auto& incoming = a->read<MissionDamageEvent>();
 
 	// Can we find this player?
 	Player* player = PlayerInterface::Lookup(incoming.m_playerID);
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		dbugLog(_FLI, "t:%d p:%u received mde for non-existant (logged out?) player", a->teulIndex, incoming.m_playerID);
 		return -EINVAL;

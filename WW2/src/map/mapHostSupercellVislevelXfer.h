@@ -78,12 +78,12 @@ public:		static size_t calculateBytesNeededFor(const Supercell& sc)
 
 				if ( totalBytes == 0 )
 				{
-					return std::make_pair<void*, size_t>(NULL, 0);
+					return std::make_pair<void*, size_t>(nullptr, 0);
 				}
 
 				// Allocate the memory.
 				void* allocation = memCalloc(1, totalBytes);
-				assert( allocation != NULL );
+				assert( allocation != nullptr );
 
 				// Partition and populate.
 				char* curPtr = (char*)allocation;

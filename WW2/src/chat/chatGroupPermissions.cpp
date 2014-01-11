@@ -235,18 +235,18 @@ public:
 	{
 		perm.m_vehicleGrants.clear();
 
-		if ( perm.m_permissionMask & UNMASKED_VEHICLES || list == NULL || *list == 0 )
+		if ( perm.m_permissionMask & UNMASKED_VEHICLES || list == nullptr || *list == 0 )
 		{
 			return;
 		}
 
-		const char* end = NULL;
+		const char* end = nullptr;
 		while ( list && *list != 0 )
 		{
 			// Read the number between here and there
-			UINT32 typeOID = (UINT32)strtol(list, NULL, 10);
+			UINT32 typeOID = (UINT32)strtol(list, nullptr, 10);
 			WEAPON* weap = weapLookupWeaponByIndex(typeOID);
-			if ( weap == NULL )
+			if ( weap == nullptr )
 			{
 				dbugLog(_FLD, "Group %u contains unknown vehtype_oid %u", perm.m_groupOID, typeOID);
 			}
@@ -329,7 +329,7 @@ chatReadGroups(const char* source, CHAT_GROUPS& into)
 	into.clear();
 
 	UINT32 groupOID;
-	while ( source != NULL && *source )
+	while ( source != nullptr && *source )
 	{
 		// Find and skip the trailing comma
 		const char* p = strchr(source, ',');

@@ -16,7 +16,7 @@ public:
 	enum { StratClass = CLASS_LINK };
 
 	// Determine if this link has an active enemy firebase for side "forSide"
-	bool hasFirebase() const { return firebase != NULL ; }
+	bool hasFirebase() const { return firebase != nullptr ; }
 	bool hasEnemyFirebase(WWII_SIDE forSide) const ;
 	void setEnabled(bool newEnabled) { m_enabled = newEnabled ; }
 

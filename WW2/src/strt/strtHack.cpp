@@ -34,13 +34,13 @@ static std::vector<std::unique_ptr<ObjectStruct>> _fakeObjects;
 //	bridge CP into one with a faked facility and object to take damage
 void strtFakeBridges(CPStruct* cpList)
 {
-	if (cpList == NULL)
+	if (cpList == nullptr)
 		return;
 
 	dbugLog(_FLI, "Initializing bridges");
 
 	//Go through every cp
-	for ( CPStruct* cp = cpList; cp != NULL; cp = cp->next )
+	for ( CPStruct* cp = cpList; cp != nullptr; cp = cp->next )
 	{
 		if (cp->fullObjID.objType == CP_BRIDGE)
 		{
@@ -56,7 +56,7 @@ void strtFakeBridges(CPStruct* cpList)
 //Allocates the fake CP structure underneath bridge CPs
 static LOGICAL _fakeStructure(CPStruct* cp)
 {
-	if (cp == NULL)
+	if (cp == nullptr)
 		return FALSE;
 
 	//Get memory for our darling little hack
@@ -117,7 +117,7 @@ static LOGICAL _fakeStructure(CPStruct* cp)
 	//	Bridge CP.  This is the big scary hack part.  What it does is
 	//	allow damage lookups on the bridge to find out fake object
 	Supercell* const sc = strtGetSupercellFULL_OBJ_ID(cp->fullObjID);
-	if ( sc != NULL && sc->index[cp->fullObjID.id] == (void*) cp)
+	if ( sc != nullptr && sc->index[cp->fullObjID.id] == (void*) cp)
 	{
 		sc->index[cp->fullObjID.id] = (void*) object;
 	}

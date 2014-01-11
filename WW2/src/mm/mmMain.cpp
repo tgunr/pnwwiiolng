@@ -200,7 +200,7 @@ SINT32
 PersonaMirrorTo<CHAT_HOST>::onComplete(SINT32 resultCode) const
 {
 	Player* const player = PlayerInterface::Lookup(dispatch().m_customerID);
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		// Player has logged out.
 		if ( resultCode >= 0 )
@@ -254,7 +254,7 @@ bool
 Player::mirrorToChat()
 {
 	Server::ServerInfo* const server = Server::ServerInfo::GetBest(CHAT_HOST);
-	if ( server == NULL )
+	if ( server == nullptr )
 	{
 		dbugLog(_FLA, "No chat server for logins!");
 		return false;
@@ -310,13 +310,13 @@ _playerActivate(SINT32 teulIndex, PlayerStatusNode* psn)
 {
 	Player* player = (Player*)psn->localInfo;
 
-	if (player == NULL)
+	if (player == nullptr)
 	{
 		return -Teul::Errors::LoginFail_ActivateNoPlayerInfo;
 	}
 
 	if (player->teulIndex() >= 0)
-		teulSetPersonaData(player->teulIndex(), NULL);
+		teulSetPersonaData(player->teulIndex(), nullptr);
 
 #ifdef NEW_FOUND_BEST_METHOD
 	// Until they do the alter connect bit, don't let them in
@@ -386,7 +386,7 @@ _playerErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 size, con
 	dbugLog(_FLA,"playerError: index %d, error %d", teulIndex, error);
 
 	Player* player = PlayerInterface::Lookup(teulIndex);
-	if ( player != NULL)
+	if ( player != nullptr)
 	{
 		teulClose(player->teulIndex(), Teul::Closing::PlayerErrFn);
 		player->setDisconnected();
@@ -504,7 +504,7 @@ _errorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEU
 	if ( error == ENOTCONN )
 	{
 		Player* player = PlayerInterface::Lookup(teulIndex);
-		if ( player != NULL)
+		if ( player != nullptr)
 		{
 			--_userConnections;
 			dbugLog(_FLI, "t:%d p:%u c:%s connection closed %d connections remaining"
@@ -521,7 +521,7 @@ _errorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEU
 	{
 		auto* sample = (Teul::TickSample*)(data);
 		Player* player = PlayerInterface::Lookup(teulIndex);
-		if ( player != NULL )
+		if ( player != nullptr )
 		{
 			dbugLog(_FLD, "t:%d p:%u c:%s clock drift host:%llu, client:%llu, delta:%lld, ratio:%.6g", player->teulIndex(), player->playerID(), player->callsign(), sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
 			chatSendTickSample(MAP_HOST, player->playerID(), data);
@@ -558,7 +558,7 @@ _connectToStrat()
 		if ( _stratReady )
 		{
 			const Server::ServerInfo* const server = Server::ServerInfo::GetBest(STRAT_HOST, true);
-			if (server != NULL)
+			if (server != nullptr)
 			{
 				_stratHost = Server::BroadcastMaskAddress(server->stats.address);
 			}
@@ -589,7 +589,7 @@ static bool
 _checkChatMaster()
 {
 	Server::ServerInfo* server = Server::ServerInfo::GetBest(CHAT_HOST, true);
-	if ( server == NULL )
+	if ( server == nullptr )
 	{
 		_chatReady = false;
 		return false;
@@ -637,7 +637,7 @@ static SINT32
 _acceptLogin(const SINT32 teulIndex, Auth::Dispatch* const dispatch)
 {
 	const ENDPOINT* const endpoint = teulGetEndpoint(teulIndex);
-	if ( endpoint == NULL )
+	if ( endpoint == nullptr )
 	{
 		dbugLog(_FLW, "t:%d p:%u c:%s otp:%u LOGIN DENIED: cannot look up teulIndex"
 						, teulIndex, dispatch->m_customerID, dispatch->m_callsign, dispatch->m_OTP);
@@ -707,7 +707,7 @@ _checkStratMaster()
 {
 	// Update the strat host master
 	Server::ServerInfo* server = Server::ServerInfo::GetBest(STRAT_HOST, true);
-	if (server != NULL)
+	if (server != nullptr)
 	{
 		_stratHost = server->stats.address;
 	}
@@ -968,14 +968,14 @@ public:
 		: m_functions(functions)
 		, m_state(0)
 		{
-			assert( NULL != m_functions );
+			assert( nullptr != m_functions );
 		}
 
 	bool poll()
 	{
 		m_functions[m_state++]();
 
-		if ( NULL == m_functions[m_state] )
+		if ( nullptr == m_functions[m_state] )
 		{
 			m_state = 0;
 			return false;
@@ -1023,7 +1023,7 @@ _housekeeping()
 	,	mapRequestBrigadeDetailsUpdate
 	,	_checkForUpdatedMissionLists
 	,	Map::BroadcastSwingMeter
-	, NULL
+	, nullptr
 	};
 	static Housekeeper housekeeper(functions);
 
@@ -1248,7 +1248,7 @@ main(int argc, char* argv[])
 		,	mapProcessLogins
 		,	mapSendHCUpdates
 		,	mapChargeMinutes
-		,	NULL
+		,	nullptr
 		};
 		static Housekeeper housekeeper(functions);
 		housekeeper.poll();
@@ -1275,7 +1275,7 @@ void
 mapSmiteCustomer(const playerid_t playerID)
 {
 	Player* player = PlayerInterface::Lookup(playerID);
-	if ( player == NULL )
+	if ( player == nullptr )
 		return;
 
 	dbugLog(_FLN, "t:%d p:%u c:%s smiting", player->teulIndex(), player->playerID(), player->callsign());

@@ -51,14 +51,14 @@ strtProcessCapacityRequest(const MM_CAPACITY_REQUEST& request, MM_CAPACITY_RESPO
 	{
 		response.rtbFacility = destFacilityID;
 		joinNode = WeapJoinRequestNode::Lookup(request.customerID);
-		if ( joinNode != NULL )
+		if ( joinNode != nullptr )
 		{
 			JOIN_LIST* list = joinNode->m_joinList;
-			if ( list == NULL )
+			if ( list == nullptr )
 			{
 				dbugLog(_FLW, "joinNode with NULL list");
 			}
-			else if ( list->m_weapon == NULL )
+			else if ( list->m_weapon == nullptr )
 			{
 				dbugLog(_FLW, "joinNode with NULL weapon");
 			}
@@ -72,7 +72,7 @@ strtProcessCapacityRequest(const MM_CAPACITY_REQUEST& request, MM_CAPACITY_RESPO
 
 	FULL_OBJ_ID* dest = strtGetFullObjID(response.facility);
 
-	if (dest != NULL && dest->objClass == CLASS_CP)
+	if (dest != nullptr && dest->objClass == CLASS_CP)
 	{
 		capacity = 0;
 		totalRPs = 0;
@@ -83,7 +83,7 @@ strtProcessCapacityRequest(const MM_CAPACITY_REQUEST& request, MM_CAPACITY_RESPO
 		{
 			facility = cp->facilityList;
 
-			while (facility!=NULL)
+			while (facility!=nullptr)
 			{
 				if (facility->fullObjID.objType != FACILITY_FIREBASE)
 				{
@@ -106,7 +106,7 @@ strtProcessCapacityRequest(const MM_CAPACITY_REQUEST& request, MM_CAPACITY_RESPO
 		response.capacity = capacity;
 		response.totalRPs = totalRPs;
 	}
-	else if ( dest != NULL )
+	else if ( dest != nullptr )
 	{
 		facility = (FacilityStruct*)dest;
 		if ( facility->capacity >= 0 )

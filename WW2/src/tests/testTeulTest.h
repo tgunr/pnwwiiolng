@@ -25,7 +25,7 @@ public:
 	static TestItem* Lookup(const char* const name_)
 	{
 		TestItem::Index::iterator it = s_index.find(std::string(name_));
-		return ( it != s_index.end() ) ? it->second : NULL;
+		return ( it != s_index.end() ) ? it->second : nullptr;
 	}
 
 public:

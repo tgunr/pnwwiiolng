@@ -97,18 +97,18 @@ extern WEAPON* weapLookupWeaponByIndex(UINT32 localIndex);
 
 static inline const char* weapPrintName(const WEAPON_SPEC* spec)
 {
-	if ( spec == NULL )
+	if ( spec == nullptr )
 		return "<null>";
 	WEAPON* weap = weapLookup(*spec);
-	return ( weap == NULL ) ? weapPrintSpecC(spec) : weap->name;
+	return ( weap == nullptr ) ? weapPrintSpecC(spec) : weap->name;
 }
 
 static inline const char* weapPrintFullName(const WEAPON_SPEC* spec)
 {
-	if ( spec == NULL )
+	if ( spec == nullptr )
 		return "<null>";
 	WEAPON* weap = weapLookup(*spec);
-	return ( weap == NULL ) ? weapPrintSpecC(spec) : weap->fullName;
+	return ( weap == nullptr ) ? weapPrintSpecC(spec) : weap->fullName;
 }
 
 //tolua_end

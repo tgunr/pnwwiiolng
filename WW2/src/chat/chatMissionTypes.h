@@ -52,7 +52,7 @@ public:
 	void flagForStatusUpdate() ;
 
 	//! Send a message to everyone on this mission, not channel restricted
-	void message(LSTRING_ID prefix, LSTRING_ID message, const char* arg1=NULL, const char* arg2=NULL) ;
+	void message(LSTRING_ID prefix, LSTRING_ID message, const char* arg1=nullptr, const char* arg2=nullptr) ;
 
 	//! Remove the STO attached to a mission (if any)
 	void removeSTO() ;

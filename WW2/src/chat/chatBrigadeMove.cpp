@@ -89,7 +89,7 @@ chatUpdateHCUnitLocations()
 		Player* player = it->second;
 		++it;
 
-		if ( player == NULL || player->teulIndex() < 0 || !player->active() || !player->isSpawned() )
+		if ( player == nullptr || player->teulIndex() < 0 || !player->active() || !player->isSpawned() )
 			continue;
 		if ( hculUpdate.send(player->teulIndex()) < 0 )
 		{
@@ -108,7 +108,7 @@ static void
 _changeHome(const ChatHandle& handle, const UINT32 brigadeID, const FULL_OBJ_ID& destinationID)
 {
 	HCUnit* const unit = HCUnit::Lookup(brigadeID);
-	if ( unit == NULL )
+	if ( unit == nullptr )
 		return;
 
 	if ( destinationID.id != 0 && destinationID != unit->homeCPID() )
@@ -138,7 +138,7 @@ BrigadeMove::process(const ChatHandle& byHandle) const
 	Property* destination = chatFindProperty(m_destination);
 
 	LSTRING_ID response = LSTR_NONE;
-	const char* text = NULL;
+	const char* text = nullptr;
 	char temp[16];
 
 	switch (m_action)

@@ -33,7 +33,7 @@
 
 extern DBHANDLE& chatdbGetDBH();
 
-static Teul::Packet* g_commandListPacket = NULL;
+static Teul::Packet* g_commandListPacket = nullptr;
 
 DotCommand* g_commands;
 
@@ -43,7 +43,7 @@ DotCommand* g_commands;
 void
 chatRegisterDotCommands()
 {
-	for ( auto cmd = g_commands; cmd != NULL; cmd = cmd->m_next )
+	for ( auto cmd = g_commands; cmd != nullptr; cmd = cmd->m_next )
 	{
 		DotCommand::index()->add(cmd);
 	}
@@ -85,7 +85,7 @@ DotCommand::DotCommand(const std::string& newCommand, const std::string& dotDesc
 	, m_description(dotDescription)
 	, m_public(false)				// Never assume its public
 	, m_playnetOnly(playnetOnly)
-	, m_next(NULL)
+	, m_next(nullptr)
 	, m_usages()
 {
 	addUsage(mask, usage, detail);
@@ -226,14 +226,14 @@ DotCommand::allow(Player& player) const
 {
 	// Some dot commands* require* you to be playnet
 	if ( m_playnetOnly && !player.isPlaynet() )
-		return NULL;
+		return nullptr;
 
 	// Are group permissions required?
 	if ( !player.isManager() && !m_public )
 	{
 		// Command is not in any groups, ergo not available
 		if ( m_groups.empty() )
-			return NULL;
+			return nullptr;
 
 		// Request the most recent group set; groups will load
 		// in the player's permissions if they're not already loaded.
@@ -241,7 +241,7 @@ DotCommand::allow(Player& player) const
 
 		// Client is not in any groups, don't bother checking
 		if ( clGroups.empty() )
-			return NULL;
+			return nullptr;
 
 		// See if the player is in at least one of the required groups
 		CHAT_GROUPS::iterator clgIt, clgEnd = clGroups.end();
@@ -254,7 +254,7 @@ DotCommand::allow(Player& player) const
 		}
 
 		if ( !isIn )
-			return NULL;
+			return nullptr;
 	}
 
 	for ( UINT32 i = 0; i < m_usages.size(); i++ )
@@ -263,7 +263,7 @@ DotCommand::allow(Player& player) const
 			return m_usages[i];
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -276,11 +276,11 @@ DotCommand::help(Player& player) const
 	const DotUsage* commandHelp = allow(player);
 
 	// Does this player have permission?
-	if ( commandHelp == NULL || commandHelp->isHidden() )
+	if ( commandHelp == nullptr || commandHelp->isHidden() )
 		return false;
 
-	player.message(LSTR_USAGE, commandHelp->usage, NULL, NULL);
-	player.message(LSTR_DETAIL, commandHelp->detail, NULL, NULL);
+	player.message(LSTR_USAGE, commandHelp->usage, nullptr, nullptr);
+	player.message(LSTR_DETAIL, commandHelp->detail, nullptr, nullptr);
 
 	return true;
 }
@@ -318,13 +318,13 @@ DotCommandIndex::addAlias(const char* old, const char* alias)
 {
 	const DotCommand* command = lookup(old, true);
 
-	if ( command == NULL )
+	if ( command == nullptr )
 	{
 		dbugLog(_FLW, "Unable to find command '%s' for alias '%s'", old, alias);
 		return;
 	}
 
-	if ( lookup(alias, true) != NULL )
+	if ( lookup(alias, true) != nullptr )
 	{
 		dbugLog(_FLW, "Can't add alias '%s' for '%s', command already exists", alias, old);
 		return;
@@ -346,7 +346,7 @@ DotCommandIndex::lookup(const std::string& target, bool cleanMatchOnly) const
 	if ( alias != m_aliases.end() )
 		return (alias->second);
 
-	DotCommand* last = NULL;
+	DotCommand* last = nullptr;
 	int matches = 0;
 
 	for ( auto it = begin(), endIt = end(); it != endIt; ++it )
@@ -379,7 +379,7 @@ DotCommandIndex::lookup(const std::string& target, bool cleanMatchOnly) const
 	if ( !cleanMatchOnly && matches == 1 )
 		return last;
 
-	return NULL;
+	return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -390,7 +390,7 @@ DotCommandIndex::add(DotCommand* dotCommand)
 {
 	betaLog(_FLI, "Registering dotCommand: %s", dotCommand->command());
 
-	if ( lookup(dotCommand->m_command, TRUE) != NULL )
+	if ( lookup(dotCommand->m_command, TRUE) != nullptr )
 		throw std::domain_error("Duplicate dot command");
 
 	// Insert ourselves alphabetically
@@ -434,7 +434,7 @@ DotCommandIndex::helpFor(Player& player, const char* command) const
 bool
 DotCommandIndex::process(Player& player, Chat::ClientMessage* message) const
 {
-	if ( message == NULL )
+	if ( message == nullptr )
 	{
 		dbugLog(_FLW, "Tried to process NULL playerMessage");
 		return false;
@@ -516,11 +516,11 @@ DotCommandIndex::readPermissions()
 			DBRow& row = dbq.Row();
 
 			// Blank command or "." command
-			if ( row[0] == 0 || row[0][0] == '.' )
+			if ( row[0] == nullptr || row[0][0] == '.' )
 				continue;
 
 			DotCommand* dc = const_cast<DotCommand*> (lookup(row[0], true));
-			if ( dc == NULL )
+			if ( dc == nullptr )
 			{
 				betaLog(_FLW, "chat_command %s not recognized", row[0]);
 				continue;
@@ -537,7 +537,7 @@ DotCommandIndex::readPermissions()
 	try
 	{
 		UINT32 lastCmd = 0;
-		DotCommand* dc = NULL;
+		DotCommand* dc = nullptr;
 
 		DBQuery dbq(chatdbGetDBH()
 						, "SELECT cc.cmd_oid, cc.command, cgc.group_oid"
@@ -555,7 +555,7 @@ DotCommandIndex::readPermissions()
 			{
 				lastCmd = cmdNo;
 				dc = const_cast<DotCommand*> (lookup(cmd, true));
-				if ( dc == NULL )
+				if ( dc == nullptr )
 				{
 					dbugLog(_FLD, "Ignoring unknown command '%s'", cmd);
 					continue;
@@ -563,7 +563,7 @@ DotCommandIndex::readPermissions()
 			}
 
 			// If we didn't know the command last time, ignore it again
-			if ( dc == NULL )
+			if ( dc == nullptr )
 				continue;
 
 			dc->addGroup((UINT32)atol(row[2]));
@@ -621,7 +621,7 @@ DotCommandIndex::buildCommandListPacket()
 void
 DotCommandIndex::broadcastCommandListPacket()
 {
-	if ( g_commandListPacket == NULL )
+	if ( g_commandListPacket == nullptr )
 		return;
 
 	// Send to all players.
@@ -632,7 +632,7 @@ DotCommandIndex::broadcastCommandListPacket()
 		if ( player->teulIndex() >= 0 )
 		{
 			ENDPOINT* const endpoint = teulGetEndpoint(player->teulIndex());
-			if ( endpoint != NULL )
+			if ( endpoint != nullptr )
 				endpoints.push_back(endpoint);
 		}
 	}
@@ -718,7 +718,7 @@ chatGetTimeInterval(Player& player, const char* timeString, UINT32& interval, co
 void
 chatSendCommandListPacket(const class Player* const player)
 {
-	if ( player->teulIndex() < 0 || g_commandListPacket == NULL )
+	if ( player->teulIndex() < 0 || g_commandListPacket == nullptr )
 		return;
 
 	ENDPOINT* const endpoint = teulGetEndpoint(player->teulIndex());

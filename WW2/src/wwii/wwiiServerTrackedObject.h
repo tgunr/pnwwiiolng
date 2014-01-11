@@ -215,7 +215,7 @@ public:
 #endif
 
 	//! Apply this many joules damage to this STO.
-	virtual bool applyJoules(const SINT64& joules, class Player* player=NULL);
+	virtual bool applyJoules(const SINT64& joules, class Player* player=nullptr);
 
 public:
 	//! Get the unique ID.
@@ -323,7 +323,7 @@ typedef bool (STO_COOKIE_ITERATOR) (ServerTrackedObject& sto, void* cookie);
 
 //! Patrol function.
 extern void wwiiForEachSTO(STO_ITERATOR&);
-extern bool wwiiForEachSTO(STO_COOKIE_ITERATOR&, void* cookie = NULL);
+extern bool wwiiForEachSTO(STO_COOKIE_ITERATOR&, void* cookie = nullptr);
 
 // return a count of the specified type or of all types
 extern UINT32 wwiiCountSTOs(UINT16 type = 0, UINT16 subtype = 0);

@@ -114,7 +114,7 @@ _scriptClient(SCHAR* string)
 		_pause() ;
 	}
 
-	if ( string == NULL || *string == 0 )
+	if ( string == nullptr || *string == 0 )
 		return ;
 
 	// 2 character string = set country
@@ -277,7 +277,7 @@ main(int argc, char* argv[])
 	chatReadHostLocFile() ;
 
 	program = strrchr(argv[0], '/') ;
-	if ( program == NULL )
+	if ( program == nullptr )
 		program = argv[0] ;
 	else
 		program = program + 1 ;

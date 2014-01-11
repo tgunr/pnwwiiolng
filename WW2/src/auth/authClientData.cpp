@@ -16,10 +16,10 @@ Auth::ClientData::~ClientData()
 	if ( isQueued )
 		RemoveFromQueue(false);
 
-	if ( m_launchRequest != NULL )
+	if ( m_launchRequest != nullptr )
 	{
 		delete m_launchRequest;
-		m_launchRequest = NULL;
+		m_launchRequest = nullptr;
 	}
 }
 
@@ -40,7 +40,7 @@ Auth::ClientData::AddToQueue(const APP_LAUNCH_REQ& request)
 	isQueued = true;
 
 	// Take a copy of the request
-	if ( m_launchRequest == NULL )
+	if ( m_launchRequest == nullptr )
 		m_launchRequest = new APP_LAUNCH_REQ(request);
 	else
 		*m_launchRequest = request;
@@ -57,7 +57,7 @@ Auth::ClientData::RemoveFromQueue(bool enteredGame)
 	if ( isQueued == false )
 		return;
 
-	assert( m_launchRequest != NULL );
+	assert( m_launchRequest != nullptr );
 
 	Auth::Queue::RemovePlayer((UINT32)m_launchRequest->arenaID, this, isPremium, enteredGame);
 

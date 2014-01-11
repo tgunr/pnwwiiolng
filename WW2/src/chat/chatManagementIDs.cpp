@@ -73,6 +73,6 @@ Player*
 Chat::ManagementIDAllocator::Lookup(const playerid_t playerID)
 {
 	IN_USE::iterator it = inUse.find(playerID);
-	return (it == inUse.end()) ? NULL : it->second;
+	return (it == inUse.end()) ? nullptr : it->second;
 }
 

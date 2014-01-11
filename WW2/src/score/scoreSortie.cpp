@@ -24,7 +24,7 @@ static FLOAT32
 _getVehicleValue(const WEAPON_SPEC& vehicleType)
 {
 	WEAPON* weapon = weapLookup(vehicleType);
-	if ( weapon == NULL )
+	if ( weapon == nullptr )
 		return 0.0f;
 
 	if ( weapon->value <= 0 )
@@ -52,7 +52,7 @@ Scoring::Sortie::Sortie(Player& pilot_)
 	, m_value(_getVehicleValue(pilot_.weapon().spec))
 	, m_hitsTaken()
 	, m_pilot(&pilot_)
-	, m_crew(NULL)
+	, m_crew(nullptr)
 	, m_sortiesHit()
 	, m_sortiesKilled()
 	, m_typesHit()
@@ -68,8 +68,8 @@ Scoring::Sortie::Sortie(Player& pilot_)
 Scoring::Sortie::~Sortie()
 {
 	// Ensure they've actually left the sortie.
-	assert( m_pilot == NULL );
-	assert( m_crew == NULL );
+	assert( m_pilot == nullptr );
+	assert( m_crew == nullptr );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -136,7 +136,7 @@ Scoring::Sortie::addKill(const UINT32 sortieID_, const WEAPON_SPEC& spec_)
 void
 Scoring::Sortie::attachCrew(Player& crew_)
 {
-	assert( m_crew == NULL );
+	assert( m_crew == nullptr );
 	m_crew = &crew_;
 	m_crewID = crew_.playerID();
 }
@@ -228,7 +228,7 @@ Scoring::Sortie*
 Scoring::Sortie::Lookup(UINT32 sortieID_)
 {
 	auto it = sorties.find(sortieID_);
-	return (it != sorties.end()) ? (it->second) : NULL;
+	return (it != sorties.end()) ? (it->second) : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -237,7 +237,7 @@ Scoring::Sortie::Lookup(UINT32 sortieID_)
 void
 Player::closeCurrentSortie()
 {
-	if ( m_sortie != NULL )
+	if ( m_sortie != nullptr )
 	{
 		dbugLog(_FLD, "p:%u c:%s v:%u detaching from sortie %p", playerID(), callsign(), m_sortie->sortieID(), m_sortie);
 
@@ -253,7 +253,7 @@ Player::closeCurrentSortie()
 
 		saveMissionPacket();
 
-		m_sortie = NULL;
+		m_sortie = nullptr;
 		m_sortieID = 0;
 	}
 }
@@ -264,7 +264,7 @@ Player::closeCurrentSortie()
 void
 Player::newSortie(UINT32 newSortieID, bool isPilot)
 {
-	if ( m_sortie != NULL && m_sortie->sortieID() == newSortieID )
+	if ( m_sortie != nullptr && m_sortie->sortieID() == newSortieID )
 	{
 		dbugLog(_FLA, "tried to re-allocate same sortie!");
 		return;
@@ -277,14 +277,14 @@ Player::newSortie(UINT32 newSortieID, bool isPilot)
 	Scoring::Sortie* const existingSortie = Scoring::Sortie::Lookup(sortieID());
 	if ( isPilot )
 	{
-		if ( existingSortie != NULL )
+		if ( existingSortie != nullptr )
 			LogAbort("p:%u v:%u duplicate sortie assigned to a pilot", playerID(), sortieID());
 		m_sortie = new Scoring::Sortie(*this);
 		dbugLog(_FLD, "p:%u c:%s v:%u pilot assigned new sortie %p", playerID(), callsign(), sortieID(), m_sortie);
 	}
 	else
 	{
-		if ( existingSortie == NULL )
+		if ( existingSortie == nullptr )
 			LogAbort("p:%u v:%u absent sortie for crew", playerID(), sortieID());
 		m_sortie = existingSortie;
 		existingSortie->attachCrew(*this);

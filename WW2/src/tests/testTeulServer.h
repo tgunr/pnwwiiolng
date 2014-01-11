@@ -82,7 +82,7 @@ struct ServerRole : public Role
 	static SINT32 recvShutdown(ACTION_OBJECT* const a)
 	{
 		ServerRole* role = (ServerRole*)teulGetPersonaData(0);
-		if ( role != NULL )
+		if ( role != nullptr )
 		{
 			Iprintf("Got shutdown.\n");
 			role->m_running = false;
@@ -151,10 +151,10 @@ struct ServerRole : public Role
 
 	static void acceptFn(ENDPOINT& endpoint)
 	{
-		if ( endpoint.m_parent == NULL )
+		if ( endpoint.m_parent == nullptr )
 			throw Teul::Error("Accepted endpoint doesn't have a parent!", endpoint.teulIndex());
 		ServerRole* const server = (ServerRole*)teulGetPersonaData(endpoint.m_parent->teulIndex());
-		if ( server == NULL )
+		if ( server == nullptr )
 			throw Teul::Error("Incoming connection's teulIndex doesn't appear to match a server", endpoint.m_parent->teulIndex());
 
 		server->Accept(endpoint);

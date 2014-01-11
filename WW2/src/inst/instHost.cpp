@@ -58,8 +58,8 @@ Instance::RegisterHostInstanceImplFactory(Instance::HostInstanceImplFactory* fac
 Instance::HostInstance::~HostInstance()
 {
 	HostInstanceImpl* himpl = m_impl;
-	m_impl = NULL;
-	if ( himpl == NULL )
+	m_impl = nullptr;
+	if ( himpl == nullptr )
 		return;
 
 	himpl->PreDestructionHandler();
@@ -141,7 +141,7 @@ static Instance::HostInstance*
 _getHostInstance(const Instance::Descriptor& descriptor)
 {
 	Instance::HostInstance* instance = Instance::HostInstance::LookupByUID(descriptor.id());
-	if ( instance != NULL )
+	if ( instance != nullptr )
 		return instance;
 
 	// Get the data on this scenario.
@@ -191,7 +191,7 @@ HostInstance*
 HostInstance::LookupByUID(const instanceid_t& uid)
 {
 	INSTANCE_UIDS::iterator it = g_hostInstanceUIDs.find(uid);
-	return ( it != g_hostInstanceUIDs.end() ) ? it->second : NULL;
+	return ( it != g_hostInstanceUIDs.end() ) ? it->second : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -351,7 +351,7 @@ wwiiPlayer::SetInstance(const Instance::Descriptor& toInstance)
 		m_hostInstance->removePlayer(this);
 	}
 
-	m_hostInstance = NULL;
+	m_hostInstance = nullptr;
 	m_instance = Instance::g_invalid;
 	dbugLog(_FLD, "t:%d p:%u c:%s switching to in:%u.%u.%llu.%llu", teulIndex(), playerID(), callsign(), toInstance.category(), toInstance.type(), toInstance.handle(), toInstance.id());
 

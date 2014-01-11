@@ -50,7 +50,7 @@ struct STRAT_BUILDING_LIST
 
 	static void destroy(STRAT_BUILDING_LIST* list)
 	{
-		if ( list == NULL )
+		if ( list == nullptr )
 			return;
 
 		for ( size_t x = 0; x < (size_t)CELLS_PER_SIDE; ++x )
@@ -58,10 +58,10 @@ struct STRAT_BUILDING_LIST
 			for ( size_t y = 0; y < (size_t)CELLS_PER_SIDE; ++y )
 			{
 				STRAT_BUILDING_LIST* cell = &list[(x * CELLS_PER_SIDE) + y];
-				if ( cell->bid != NULL )
+				if ( cell->bid != nullptr )
 				{
 					memFree(cell->bid);
-					cell->bid = NULL;
+					cell->bid = nullptr;
 				}
 			}
 		}
@@ -99,7 +99,7 @@ extern STRAT_BUILDING_LIST* sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTabl
 													, BUILDING* bd
 													, SINT32 numBuildings
 													, STRAT_BUILDING_HASH* bldHash
-													, UINT32* errors = NULL
+													, UINT32* errors = nullptr
 													);
 
 // x,y are the base octet address of the cell

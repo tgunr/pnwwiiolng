@@ -41,7 +41,7 @@ public:
 	virtual bool activate() ;
 	virtual void deactivate() ;
 
-	virtual bool applyJoules(const SINT64& /*joules*/, class Player* /*player*/=NULL) { return false ; }
+	virtual bool applyJoules(const SINT64& /*joules*/, class Player* /*player*/=nullptr) { return false ; }
 
 	virtual void extractPlayer(const Player* /*player*/) { }
 

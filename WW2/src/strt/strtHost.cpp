@@ -552,7 +552,7 @@ main(int argc, char* argv[])
 				,_personaRelease
 				,_personaActivate
 				,_personaExit
-				,NULL
+				,nullptr
 				,_personaErrorFunction);
 
 	Server::myServerInfo.flags = (Server::Flags)0;//SVRFLAG_SEND_PSTAT | SVRFLAG_RELOGIN;

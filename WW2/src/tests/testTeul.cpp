@@ -641,7 +641,7 @@ _processArguments(const int argc, const char* const argv[])
 					_usage(argv, true);
 
 				TestItem* test = TestItem::Lookup(testName);
-				if ( test == NULL )
+				if ( test == nullptr )
 				{
 					printf("ERROR: Unknown test: %s\n", testName);
 					_usage(argv, true);

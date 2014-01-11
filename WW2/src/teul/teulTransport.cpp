@@ -62,14 +62,14 @@ teulGetHostByName(const char* const name)
 #else
 	struct hostent hostEnt;
 	char buf[512];
-	struct hostent* entry = NULL;
+	struct hostent* entry = nullptr;
 	int herrnop = 0;	// gethostbyname wants an errono parameter.
 	gethostbyname_r(name, &hostEnt, buf, sizeof(buf), &entry, &herrnop);
 #endif
 
-	if (entry != NULL)
+	if (entry != nullptr)
 	{
-		while (entry->h_addr_list[numEntries] != NULL)
+		while (entry->h_addr_list[numEntries] != nullptr)
 			++numEntries;
 
 		if ( numEntries > 0)
@@ -87,7 +87,7 @@ teulGetHostByName(const char* const name)
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 // wrapper for inet_aton.
@@ -125,7 +125,7 @@ teulGetHost(const char* address_, UINT32* host_)
 void
 ENDPOINT::doConnect()
 {
-	if (PN_LIKELY(this->connectFn != NULL))
+	if (PN_LIKELY(this->connectFn != nullptr))
 	{
 		dbugLog(_FLN, "t:%d connected calling %p", this->teulIndex(), this->connectFn);
 		this->connectFn(*this);
@@ -168,7 +168,7 @@ teulGetPersonaData(const SINT32 teulIndex)
 	if (PN_LIKELY(endpoint != nullptr))
 		return endpoint->appConnectionData;
 
-	return NULL;
+	return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -426,7 +426,7 @@ _initializePlatform()
 	Teul::eventBase = event_base_new_with_config(cfg);
 	event_config_free(cfg);
 
-	ABORT_IF( Teul::eventBase == NULL );
+	ABORT_IF( Teul::eventBase == nullptr );
 }
 
 // We all have to start somewhere and this one function is it for teul.
@@ -575,7 +575,7 @@ teulSend(SINT32 teulIndex, TEUL_CALLBACK* const object, void* const data)
 SINT32
 teulSendTo(SINT32 teulIndex, UINT32 address, UINT16 port, TEUL_CALLBACK* callback, void* data)
 {
-	if (PN_UNLIKELY(callback == NULL))
+	if (PN_UNLIKELY(callback == nullptr))
 	{
 		dbugLog(_FLA,"illegal callback");
 		return -EINVAL;

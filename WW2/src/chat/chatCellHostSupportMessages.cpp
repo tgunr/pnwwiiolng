@@ -43,12 +43,12 @@ _findVehicleByPlayerID(const playerid_t playerID)
 	// Since they* might* be on another cell host, we have to look them up this way
 	///TODO: Don't do it this way :)
 	PlayerStatusNode* psn = ServerInterface::PlayerStatusNodeByPlayerID(playerID);
-	if ( psn == NULL || psn->curServer.id != Server::myServerInfo.stats.id )
-		return NULL;
+	if ( psn == nullptr || psn->curServer.id != Server::myServerInfo.stats.id )
+		return nullptr;
 
 	const Player* player = (Player*)(psn->localInfo);
-	if ( player == NULL )
-		return NULL;
+	if ( player == nullptr )
+		return nullptr;
 
 	return player->vehicle;
 }
@@ -65,7 +65,7 @@ _recvLocateUser(ACTION_OBJECT* a, CHAT_LOC_USER& locUser_)
 	found.serverType = Server::myServerInfo.stats.type;
 
 	HostVehicle* vref = _findVehicleByPlayerID(locUser_.playerID);
-	if ( vref != NULL )
+	if ( vref != nullptr )
 	{
 		found.isFound = TRUE;
 		found.vehicleID = vref->index;
@@ -119,7 +119,7 @@ _recvBandwidthNotice(ACTION_OBJECT* const a)
 	}
 
 	Player* player = (Player*)ServerInterface::LookupByPlayerID(request.playerID);
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		dbugLog(_FLA, "p:%u invalid player holder", request.playerID);
 		return -EINVAL;

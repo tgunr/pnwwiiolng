@@ -42,7 +42,7 @@ Rank::add(const RANK_NO level, const Rank::TYPE type, const UINT32 points, const
 	if ( level > s_max )
 		s_max = level;
 
-	if ( description == NULL )
+	if ( description == nullptr )
 		description = rankNames[0];
 
 	dbugLog(_FLD, "r:%d new rank: type:%d, perms:%llx, points: %d :: %s", level, type, perm, points, description);
@@ -63,18 +63,18 @@ Rank*
 Rank::next() const
 {
 	if ( level() == 0 )
-		return NULL;
+		return nullptr;
 
 	if ( kingOfTheHill() )
-		return NULL;
+		return nullptr;
 
 	RANK_NO nextLevel = level() + 1;
 	if ( nextLevel >= s_ranks.size() )
-		return NULL;
+		return nullptr;
 
 	// To become "if ( s_ranks[nextLevel].kingOfTheHill() )" once KOTH includes officers
 	if ( s_ranks[nextLevel].kingOfTheHill() )
-		return NULL;
+		return nullptr;
 
 	return &s_ranks[nextLevel];
 }
@@ -113,7 +113,7 @@ wwiiReadRanks(DBHANDLE& dbh)
 		// Ranks are 1-indexed
 		for ( UINT32 i = 1; i <= dbq.Rows(); ++i )
 		{
-			rankNames[i] = NULL;
+			rankNames[i] = nullptr;
 		}
 		rankNames[0] = strdup("<none>");
 
@@ -148,10 +148,10 @@ wwiiFreeRanks()
 
 	for ( i = 0; i < Rank::count(); ++i )
 	{
-		if ( rankNames[i] != NULL )
+		if ( rankNames[i] != nullptr )
 		{
 			free((void*)rankNames[i]);
-			rankNames[i] = NULL;
+			rankNames[i] = nullptr;
 		}
 	}
 }

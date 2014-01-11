@@ -16,12 +16,12 @@
 
 typedef void (SIG_FUNCTION) ( SINT32 signo );
 
-static ERROR_FUNCTION* _userExitHandler = NULL;
+static ERROR_FUNCTION* _userExitHandler = nullptr;
 
 static void
 _sigTermHandler(int /*signo*/)
 {
-	_userExitHandler (0, NULL, 0, NULL, SIGTERM);
+	_userExitHandler (0, nullptr, 0, nullptr, SIGTERM);
 //	exit(0);
 }
 

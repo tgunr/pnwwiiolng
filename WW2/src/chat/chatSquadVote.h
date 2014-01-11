@@ -14,7 +14,7 @@ class SquadList;
 class SquadVote
 {
 public:
-	SquadVote() : m_started(0), m_closedUntil(0), m_counts(NULL), m_votes(NULL), m_colead(false) {}
+	SquadVote() : m_started(0), m_closedUntil(0), m_counts(nullptr), m_votes(nullptr), m_colead(false) {}
 	~SquadVote()
 	{
 		if ( m_votes ) delete m_votes;
@@ -37,7 +37,7 @@ public:
 	bool		m_colead;
 
 	void addVote(UINT32 squadID, const ChatHandle& voteBy, const ChatHandle& voteFor);
-	void announce(UINT32 squadID, Player* player=NULL);
+	void announce(UINT32 squadID, Player* player=nullptr);
 	void close(UINT32 duration=0);				// 0 = use default
 	void erase(UINT32 squadID);				// Close it and erase it
 	UINT32 expires() const;

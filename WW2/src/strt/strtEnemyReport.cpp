@@ -61,7 +61,7 @@ strtAddEnemyReport(const STRAT_ENEMY_REPORT& report)
 {
 	FacilityStruct* facility;
 	facility = strtGetFacility(report.reportingFacility);
-	if (facility == NULL)
+	if (facility == nullptr)
 		return false;
 
 	facility->cp->enemyReport(report.enemyReported, facility);
@@ -100,7 +100,7 @@ strtEvaluateEWSUpdates()
 	for ( it = _changedCPs.begin(); it != _changedCPs.end(); ++it )
 	{
 		cp = strtGetCPByOID(*it);
-		if ( cp != NULL )
+		if ( cp != nullptr )
 			cp->evaluateEWS();
 	}
 
@@ -140,7 +140,7 @@ _effectiveCategory(const WEAPON_SERIAL& weapon)
 bool
 CPStruct::enemyReport(const WEAPON_SERIAL& weapon, FacilityStruct* facility)
 {
-	assert(facility != NULL);
+	assert(facility != nullptr);
 
 	if ( weapon.serial <= 0 )
 	{
@@ -167,7 +167,7 @@ CPStruct::enemyReport(const WEAPON_SERIAL& weapon, FacilityStruct* facility)
 	UINT32 serial = (UINT32)weapon.serial;
 
 	POSTED_WEAPON* culprit = strtFindPostedWeapon(serial);
-	if ( culprit != NULL )
+	if ( culprit != nullptr )
 	{
 		culprit->m_lastEWSFacility = facility;
 	}
@@ -378,7 +378,7 @@ EWSReport::hasExpired(UINT32 now) const
 	///NOTE: Don't cache this value, it doubles as a test of
 	/// whether or not the vehicle is still spawned. OGS
 	POSTED_WEAPON* culprit = strtFindPostedWeapon(m_weapon);
-	if ( culprit == NULL )
+	if ( culprit == nullptr )
 		return (age >= EWS_SHORT_TIMEOUT);
 
 	// If they have reported EWS at someplace else, move along
@@ -469,7 +469,7 @@ EWSReport::EWSReport(UINT32 weaponSerial, FacilityStruct* facility, UINT8 side, 
 	, m_weapCategory(weapCategory)
 {
 	register CPStruct* cp = m_facility->cp;
-	assert(cp != NULL);
+	assert(cp != nullptr);
 
 	// Adjust the facility counters
 	_incPresence();
@@ -492,7 +492,7 @@ EWSReport::EWSReport(UINT32 weaponSerial, FacilityStruct* facility, UINT8 side, 
 EWSReport::~EWSReport()
 {
 	register CPStruct* cp = m_facility->cp;
-	assert(cp != NULL);
+	assert(cp != nullptr);
 
 	dbugLog(_FLD, "ews: deleting report for %d at %s", m_weapon, cp->name);
 

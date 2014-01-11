@@ -65,7 +65,7 @@ FriendLoginQuery::Success()
 
 	// If the player is somehow no-longer online, then don't do anything
 	const Player* player = PlayerInterface::Lookup(m_handle);
-	if ( player == NULL )
+	if ( player == nullptr )
 		return;
 
 	const size_t numRows = m_players.size();
@@ -82,7 +82,7 @@ FriendLoginQuery::Success()
 		Player* buddy = PlayerInterface::Lookup(m_players[i]);
 
 		// Ignore various "invalid" buddies (not online or logged in)
-		if ( buddy == NULL )
+		if ( buddy == nullptr )
 			continue;
 		if ( buddy->teulIndex() < 0 || buddy->initialized() == false )
 			continue;

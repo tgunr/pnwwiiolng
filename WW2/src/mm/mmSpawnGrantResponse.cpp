@@ -109,7 +109,7 @@ _checkCrew(const UINT32 playerID, const Player* const crew, const Player* const 
 	if ( playerID == 0 )
 		return;
 
-	if ( crew == NULL )
+	if ( crew == nullptr )
 		throw SGFLostCrew("crew absconded");
 	if ( crew->teulIndex() < 0 )
 		throw SGFLostCrew("crew not connected");
@@ -159,7 +159,7 @@ static Server::ServerInfo*
 _getBestCell(const MM_SPAWN_GRANT_RESPONSE& grant, const Player* const commander)
 {
 	Server::ServerInfo* const server = Server::ServerInfo::GetBest(CELL_HOST);
-	if ( server == NULL )
+	if ( server == nullptr )
 		throw SGFSpawningDisabled("no cell hosts available for spawning", true);
 	return server;
 }
@@ -277,7 +277,7 @@ _processSpawnGrantResponse(const MM_SPAWN_GRANT_RESPONSE& grant
 	commander->updateMissionTaker(false);
 	commander->updateChat();
 
-	if ( crew != NULL )
+	if ( crew != nullptr )
 	{
 		_sendPlayerInfoToCell(*crew, *server, grant, *commander, ejectable);
 		//Tell the crew front end to spawn
@@ -289,7 +289,7 @@ _processSpawnGrantResponse(const MM_SPAWN_GRANT_RESPONSE& grant
 			crew->SetWeapon(NULL_WEAP_SERIAL);
 			crew->updateMissionTaker(false);
 			crew->updateChat();
-			crew = NULL;
+			crew = nullptr;
 		}
 		else
 		{
@@ -355,7 +355,7 @@ mmFakeSpawnGrantResponse(Player* const player, const UINT32 serialNumber)
 	player->SetWeapon(grant.weaponSerial);
 
 	Server::ServerInfo* const server = Server::ServerInfo::GetBest(CELL_HOST);
-	if ( server == NULL )
+	if ( server == nullptr )
 	{
 		dbugLog(_FLA, "t:%d p:%u c:%s v:%u No cells available"
 						, player->teulIndex(), player->playerID(), player->callsign()
@@ -380,25 +380,25 @@ LOGICAL
 mmProcessSpawnGrantResponse(const MM_SPAWN_GRANT_RESPONSE& grant)
 {
 	PlayerStatusNode* const commandPlayer = ServerInterface::PlayerStatusNodeByPlayerID(grant.commander);
-	if ( commandPlayer == NULL )
+	if ( commandPlayer == nullptr )
 	{
 		dbugLog(_FLA, "p:%u v:%u No commandPlayer for vehicle to spawn", grant.commander, grant.weaponSerial.serial);
 		return FALSE;
 	}
 
 	Player* const commander = (Player*)commandPlayer->localInfo;
-	if ( commander == NULL )
+	if ( commander == nullptr )
 	{
 		dbugLog(_FLA, "p:%u v:%u commander is NULL", grant.commander, grant.weaponSerial.serial);
 		return FALSE;
 	}
 
-	PlayerStatusNode* crewPlayer = NULL;
-	Player* crew = NULL;
+	PlayerStatusNode* crewPlayer = nullptr;
+	Player* crew = nullptr;
 	if ( grant.crew > 0 )
 	{
 		crewPlayer = ServerInterface::PlayerStatusNodeByPlayerID(grant.crew);
-		if ( crewPlayer != NULL )
+		if ( crewPlayer != nullptr )
 			crew = (Player*)crewPlayer->localInfo;
 	}
 

@@ -51,8 +51,8 @@ class BrigadeController
 {
 public:
 	BrigadeController(HCUnit& fromUnit)
-		: m_unit(fromUnit), m_oic(NULL), m_oicHandle(0LL), m_appointed(0)
-		, m_vote(NULL)
+		: m_unit(fromUnit), m_oic(nullptr), m_oicHandle(0LL), m_appointed(0)
+		, m_vote(nullptr)
 	{
 	}
 
@@ -154,14 +154,14 @@ BrigadeController::~BrigadeController()
 BrigadeController&
 BrigadeController::Get(UINT32 unitID)
 {
-	BrigadeController* result = NULL;
+	BrigadeController* result = nullptr;
 	CONTROLLERS::iterator it = controllers.lower_bound(unitID);
 	if ( it != controllers.end() && it->first == unitID )
 		result = it->second;
 	else
 	{
 		HCUnit* unit = HCUnit::Lookup(unitID);
-		if ( unit == NULL )
+		if ( unit == nullptr )
 		{
 			dbugLog(_FLA, "Invalid HCUnit: %u", unitID);
 			throw BCERR_INVALID_REQ;
@@ -180,7 +180,7 @@ BrigadeController*
 BrigadeController::Lookup(UINT32 unitID)
 {
 	CONTROLLERS::iterator it = controllers.find(unitID);
-	return ( it != controllers.end() ) ? it->second : NULL;
+	return ( it != controllers.end() ) ? it->second : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -202,7 +202,7 @@ _requiresOfficer(const ChatHandle& officer)
 static void
 _requirePlayerInBrigade(const Player* player, const HCUnit& unit)
 {
-	if ( player == NULL )
+	if ( player == nullptr )
 		throw BCERR_PLAYER_UNAVAILABLE;
 	if ( player->brigadeID() == unit.unitID() )
 		return;
@@ -308,7 +308,7 @@ _noticeToBrigade(UINT32 notice, UINT32 action, UINT32 error, VOTE_PERMIT votePer
 static void
 _noticeToOfficers(UINT32 notice, UINT32 action, UINT32 error, VOTE_PERMIT votePermit
 				, const HCUnit& unit, const ChatHandle& nominee, const ChatHandle& sponsor, UINT32 delay=0, const FULL_OBJ_ID origin=nullObjID
-				, Player* alsoPlayer=NULL)
+				, Player* alsoPlayer=nullptr)
 {
 	BrigadeControlNotice outgoing(notice, error, action, votePermit, unit, nominee, sponsor, delay);
 	if ( outgoing.isTargettedAction() )
@@ -470,7 +470,7 @@ BrigadeController::cancelVote()
 	if ( m_vote )
 	{
 		delete m_vote;
-		m_vote = NULL;
+		m_vote = nullptr;
 	}
 
 	// Remove this brigade from the list of pending elections
@@ -540,7 +540,7 @@ BrigadeController::removeOIC(UINT32 action, const ChatHandle& sponsor, bool anno
 		if ( announce )
 			_noticeToSide(BrigadeControl::_REMOVED, action, unit(), oicHandle(), sponsor);
 
-		if ( nominee == NULL )
+		if ( nominee == nullptr )
 		{
 			dbugLog(_FLN, "hcu:%u(%s) during removal OIC was not online", unit().unitID(), unit().callsign());
 		}
@@ -552,7 +552,7 @@ BrigadeController::removeOIC(UINT32 action, const ChatHandle& sponsor, bool anno
 			LogAbort("hcu:%u(%s) during removal OIC did not match the one being removed", unit().unitID(), unit().callsign());
 	}
 
-	setOIC(NULL);
+	setOIC(nullptr);
 
 	// Check for a replacement vote and, if it exists, execute it.
 	if ( checkForReplacement && vote() && vote()->m_voteMode == Vote::TOREPLACE )
@@ -573,7 +573,7 @@ BrigadeController::checkOIC(bool announce)
 		return;
 
 	Player* player = PlayerInterface::Lookup(oicHandle());
-	if ( player == NULL || player != oic() )
+	if ( player == nullptr || player != oic() )
 		removeOIC(BrigadeControl::REQ_REMOVE, oicHandle(), announce, true);
 }
 
@@ -874,13 +874,13 @@ BrigadeController::requestAttack(Player* player, FULL_OBJ_ID& target)
 		throw BCERR_ALREADY_VOTING;
 
 	Property* property = chatFindProperty(target);
-	if ( property == NULL )
+	if ( property == nullptr )
 		throw BCERR_INVALID_REQ;
 
 	// If the guy clicked on a facility; upgrade to the CP
 	if ( property->IsFacility() )
 	{
-		if ( property->Parent() == NULL )
+		if ( property->Parent() == nullptr )
 			throw BCERR_INVALID_REQ;
 		property = property->Parent();
 		target = property->m_fid;
@@ -925,14 +925,14 @@ BrigadeController::requestDefend(Player* player, FULL_OBJ_ID& target)
 		throw BCERR_ALREADY_VOTING;
 
 	Property* property = chatFindProperty(target);
-	if ( property == NULL )
+	if ( property == nullptr )
 		throw BCERR_INVALID_REQ;
 
 	// If the guy clicked on a facility; upgrade to the CP
 	if ( property->IsFacility() )
 	{
 		Property* parent = property->Parent();
-		if ( parent == NULL )
+		if ( parent == nullptr )
 		{
 			dbugLog(_FLA, "Property %s has NULL parent???", property->Name());
 			throw BCERR_INVALID_REQ;
@@ -974,7 +974,7 @@ BrigadeController::requestClear(Player* player, FULL_OBJ_ID& target)
 		throw BCERR_ALREADY_VOTING;
 
 	Property* property = chatFindProperty(target);
-	if ( property == NULL )
+	if ( property == nullptr )
 		throw BCERR_INVALID_REQ;
 
 	if ( player->side() == ALLIED && (property->m_flags & CP_ALLIED_OBJECTIVES) == 0 )
@@ -1204,7 +1204,7 @@ BrigadeControlRequest::processRequest(SINT32 teulIndex)
 
 	// First up, find out who's requesting
 	Player* player = PlayerInterface::Lookup(teulIndex);
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		dbugLog(_FLA, "t:%d no persona, disconnecting", teulIndex);
 		teulClose(teulIndex, Teul::Closing::BCRNoPersona);
@@ -1369,7 +1369,7 @@ BrigadeController::processElectionExpired()
 {
 	// Check if the player is still online
 	Player* nominee = PlayerInterface::Lookup(vote()->m_nominee);
-	if ( nominee == NULL || nominee->brigadeID() != unit().unitID() )
+	if ( nominee == nullptr || nominee->brigadeID() != unit().unitID() )
 	{
 		// Player is not online for us to extend an offer to them
 		_noticeToOfficers(BrigadeControl::_APPOINTMENT_FAILED, vote()->m_forAction, 0, VP_NONE
@@ -1398,7 +1398,7 @@ bool
 BrigadeController::processOfferExpired()
 {
 	Player* nominee = PlayerInterface::Lookup(vote()->m_nominee);
-	if ( nominee == NULL )
+	if ( nominee == nullptr )
 	{
 		// Officer has gone offline without accepting the appointment
 		_noticeToOfficers(BrigadeControl::_APPOINTMENT_FAILED
@@ -1442,7 +1442,7 @@ BrigadeController::processReplacingExpired()
 	checkOIC(false);
 
 	Player* player = PlayerInterface::Lookup(vote()->m_sponsor);
-	if ( player == NULL || player->brigadeID() != unit().unitID() || player->leadingBrigade() )
+	if ( player == nullptr || player->brigadeID() != unit().unitID() || player->leadingBrigade() )
 	{
 		// The guy wanting to take charge has gone offline, so leave the OIC inplace
 		_noticeToOfficers(BrigadeControl::_APPOINTMENT_FAILED, BrigadeControl::REQ_REPLACE, 0, VP_NONE, unit(), vote()->m_nominee, vote()->m_sponsor);
@@ -1494,7 +1494,7 @@ BrigadeController::processToAttackExpired()
 		return;
 
 	Player* player = PlayerInterface::Lookup(vote()->m_sponsor);
-	if ( player == NULL )
+	if ( player == nullptr )
 		return;
 
 	// Attack (true), execute (true)
@@ -1515,7 +1515,7 @@ BrigadeController::processToDefendExpired()
 		return;
 
 	Player* player = PlayerInterface::Lookup(vote()->m_sponsor);
-	if ( player == NULL )
+	if ( player == nullptr )
 		return;
 
 	// Attack (true), execute (true)
@@ -1536,7 +1536,7 @@ BrigadeController::processToClearExpired()
 		return;
 
 	Player* player = PlayerInterface::Lookup(vote()->m_sponsor);
-	if ( player == NULL )
+	if ( player == nullptr )
 		return;
 
 	// Cancel (false), execute (true)
@@ -1598,7 +1598,7 @@ BrigadeController::processVoteExpired()
 		/// CAUTION: Don't call cancelVote() here because
 		/// you will confuse the election poll routine
 		delete m_vote;
-		m_vote = NULL;
+		m_vote = nullptr;
 	}
 }
 
@@ -1616,7 +1616,7 @@ chatPatrolBrigadeElections()
 		BrigadeController& bc = BrigadeController::Get(*it);
 		++it;
 		bc.processVoteExpired();
-		if ( bc.vote() == NULL )
+		if ( bc.vote() == nullptr )
 			bc.cancelVote();
 	}
 	return true;
@@ -1645,7 +1645,7 @@ public:
 			BrigadeController* controller = it->second;
 			if ( controller->unit().side() != player.side() )
 				continue;
-			if ( controller->oic() == NULL && controller->vote() == NULL )
+			if ( controller->oic() == nullptr && controller->vote() == nullptr )
 				continue;
 
 			if ( results.length() )
@@ -1743,7 +1743,7 @@ chatBrigadeMoveProposal(UINT32 brigadeID, const FULL_OBJ_ID& destination, ChatHa
 	catch (BRIGADE_CONTROL_ERROR error)
 	{
 		Player* player = PlayerInterface::Lookup(byHandle);
-		if ( player != NULL && player->teulIndex() >= 0 )
+		if ( player != nullptr && player->teulIndex() >= 0 )
 		{
 			BrigadeControlNotice outgoing(BrigadeControl::_ERROR, error, BrigadeControl::REQ_MOVE, VP_NONE, bc.unit(), destination.Key(), byHandle, 0);
 			outgoing.m_origin = origin;
@@ -1770,7 +1770,7 @@ _orderExecuted(AttackOrder& order, const ChatHandle& handle, BrigadeController& 
 		return;
 
 	WWII_SIDE otherSide = property->Side();
-	const HCUnit* defender = NULL;
+	const HCUnit* defender = nullptr;
 	UINT32 defScore = 0;
 	for ( auto it = hcUnits.begin(), end = hcUnits.end(); defScore < 7 && it != end; ++it )
 	{
@@ -1789,7 +1789,7 @@ _orderExecuted(AttackOrder& order, const ChatHandle& handle, BrigadeController& 
 			defender = cur;
 	}
 
-	if ( defender == NULL )
+	if ( defender == nullptr )
 		defender = &bc.unit();
 
 	_noticeToSide(BrigadeControl::_OBJECTIVE, BrigadeControl::REQ_DEFEND, *defender, order.m_target, handle, otherSide);
@@ -1803,7 +1803,7 @@ chatBrigadeAttackOrderResponse(AttackOrder& order)
 {
 	Player* player = PlayerInterface::Lookup(order.m_requester);
 	bool isConclusion = ( order.m_execute && order.m_result == SCMD_SUCCESS );
-	if ( player == NULL && !isConclusion )
+	if ( player == nullptr && !isConclusion )
 	{
 		dbugLog(_FLD, "player (%llu) went away during attack order request", order.m_requester);
 		return;
@@ -1903,7 +1903,7 @@ chatRemoveOICStatus(UINT32 brigadeID, const ChatHandle& handle)
 
 	// Check that they* are* actually who we think is running this brigade
 	BrigadeController* bc = BrigadeController::Lookup(brigadeID);
-	if ( bc == NULL )
+	if ( bc == nullptr )
 		return;
 
 	// Is this guy actually the OIC of the brigade?

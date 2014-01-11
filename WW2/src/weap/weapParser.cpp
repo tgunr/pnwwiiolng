@@ -61,15 +61,15 @@ static bool _fillWeapon(SINT32 numArgs, FUNCARGS* args);
 static bool _fillSpawn(SINT32 numArgs, FUNCARGS* args);
 
 static PARSE_CALLBACK	_sectionCallbacks[] = {{"section",	_setSection}
-											,{"",			NULL}};
+											,{"",			nullptr}};
 
 
-static PARSE_CALLBACK	_userCallbacks[] = {{"",			NULL}
-											,{"",			NULL}};
+static PARSE_CALLBACK	_userCallbacks[] = {{"",			nullptr}
+											,{"",			nullptr}};
 
 
 static PARSE_CALLBACK	_spawnCallbacks[] = {{"spawn",		_fillSpawn}
-											,{"",			NULL}};
+											,{"",			nullptr}};
 struct WEAP_SECTION_HEAD
 {
 	WEAPON_SPEC		spec;
@@ -227,7 +227,7 @@ static bool _fillCountry(SINT32 /*numArgs*/, FUNCARGS* args)
 	WEAPON_COUNTRY* thisCountry;
 	WEAPON_SPEC spec;
 
-	thisCountry = NULL;
+	thisCountry = nullptr;
 
 	if ( ! parseValidArgs(argSpec, args, _NUM_SPECS, _section.name, weapFileLineNum) )
 		return false;
@@ -336,7 +336,7 @@ _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 		thisSpec = _section.spec;			// set class
 		thisSpec.wType = args[0].dvalue;	// set type
 
-		if ( weapLookup(thisSpec) != NULL )
+		if ( weapLookup(thisSpec) != nullptr )
 			throw "multiple definitions of vehicle";
 
 		WEAPON* weapon = new WEAPON(thisSpec, args[1].svalue, args[2].svalue
@@ -475,7 +475,7 @@ static bool _fillSpawn(SINT32 /*numArgs*/, FUNCARGS* args)
 
 		const WEAPON_SPEC& mySpec = _section.spec;
 		WEAPON* weap = weapLookupWeaponByName(weapName);
-		if ( weap == NULL || weap->spec().wType == 0 )
+		if ( weap == nullptr || weap->spec().wType == 0 )
 			throw "weapon not found";
 		const WEAPON_SPEC& spec = weap->spec();
 		if ( mySpec.wCountry != spec.wCountry )

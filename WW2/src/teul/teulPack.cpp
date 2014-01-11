@@ -111,7 +111,7 @@ _packBits(UCHAR* const buffer, SINT32 bitOffset, UINT32* const idata, SINT32 sig
 	}
 
 
-	if (buffer == NULL || idata == NULL)
+	if (buffer == nullptr || idata == nullptr)
 	{
 		dbugSetErrno(EINVAL);
 		dbugLog(_FLA, "invalid buffer %p or data %p",(UINT32*) buffer, (UINT32*) idata);

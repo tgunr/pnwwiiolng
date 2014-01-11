@@ -15,7 +15,7 @@ static const char* revisions[] =
 		",`implemented` TIMESTAMP NOT NULL"
 		")"
 		" COMMENT 'Track current database schema revision to allow automatic updates'"
-	,	NULL
+	,	nullptr
 	//}
 ,	// Revision 1: Add the CAN_USE_PPO_TOOL permission.
 	//{
@@ -23,7 +23,7 @@ static const char* revisions[] =
 			"(permissionID, maskvalue, description, modified, internal, details)"
 		"VALUES"
 			"(36, POW(2,35), 'CAN_USE_PPO_TOOL', NOW(), 0, 'Allows access to the PPO building tool')"
-	,	NULL
+	,	nullptr
 	//}
 ,	// Revision 2: Lets tidy up the auth_customers table.
 	//{
@@ -35,7 +35,7 @@ static const char* revisions[] =
 			",	DROP	`email`"
 	,	"ALTER TABLE `auth`.`auth_subscription`"
 			"	MODIFY `description`	CHAR(128)	NOT NULL					COMMENT 'Internal description of subscription.'"
-	,	NULL
+	,	nullptr
 	//}
 ,	// Revision 3: Clean up on several views to reduce locking times.
 	//{
@@ -85,7 +85,7 @@ static const char* revisions[] =
 		"	GROUP	BY 1, 2"
 	,
 		"DROP VIEW IF EXISTS `auth`.`v_player_active_group_grants`"
-	,	NULL
+	,	nullptr
 	//}
 ,	// Revision 4: 1.34 product permissions
 	//{
@@ -112,6 +112,6 @@ static const char* revisions[] =
 			",(57, POW(2,56), 'PRODUCT18', NOW(), 0, 'Product Permission 18')"
 			",(58, POW(2,57), 'PRODUCT19', NOW(), 0, 'Product Permission 19')"
 			",(59, POW(2,58), 'PRODUCT20', NOW(), 0, 'Product Permission 20')"
-	,	NULL
+	,	nullptr
 	//}
 } ;

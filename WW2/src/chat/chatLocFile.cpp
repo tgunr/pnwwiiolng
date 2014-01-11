@@ -23,7 +23,7 @@ chatReadHostLocFile()
 	hostLocFile += PATH_SEPARATOR;
 	hostLocFile += "host.loc";
 	FILE* fp = fopen(hostLocFile.c_str(), "rb");
-	if ( fp == NULL )
+	if ( fp == nullptr )
 	{
 		fprintf(stderr, "Unable to read %s\n", hostLocFile.c_str());
 		return false;

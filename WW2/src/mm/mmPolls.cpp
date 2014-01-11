@@ -115,7 +115,7 @@ static OpinionPoll*
 _checkPolls(Player* player)
 {
 	if ( player->m_lastPoll >= g_maxPoll )
-		return NULL;
+		return nullptr;
 
 	_POLLS::iterator it;
 	for ( it = polls.begin(); it != polls.end(); ++it )
@@ -124,7 +124,7 @@ _checkPolls(Player* player)
 			return &(it->second);
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 bool
@@ -164,7 +164,7 @@ OPINION_CHOICE_MSG::receive(SINT32 teulIndex, OPINION_CHOICE_MSG& incoming)
 {
 	// Check we know someone on this connection
 	Player* player = PlayerInterface::Lookup(teulIndex);
-	if ( player == NULL )
+	if ( player == nullptr )
 		return 0;
 
 	// Is it the same poll we've asked the player about?

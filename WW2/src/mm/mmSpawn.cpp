@@ -152,7 +152,7 @@ mmProcessFEPostRequest(Player& player, const FE_POST_REQUEST& request)
 		return false;
 	}
 
-	if ( Server::ServerInfo::GetBest(CELL_HOST) == NULL )
+	if ( Server::ServerInfo::GetBest(CELL_HOST) == nullptr )
 	{
 		player.postDenied(player.weapon().spec, SPAWN_DISABLED_BY_SERVER, false);
 		return false;
@@ -234,13 +234,13 @@ static ObjectStruct*
 _findOrigin(const FacilityStruct* facility, UINT8 weaponCategory)
 {
 	ObjectStruct* object;
-	for ( object = facility->objectList; object != NULL; object = object->next )
+	for ( object = facility->objectList; object != nullptr; object = object->next )
 	{
 		if ( object->spawnAbility.weap.wCategory == weaponCategory )
 			return object;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -301,17 +301,17 @@ mmDirectSpawn(Player& player, const WEAPON_SPEC& weapon, bool setIdentity, bool 
 
 		// Figure out the origin spawner
 		ObjectStruct* origin = _findOrigin(player.mission()->originFac(), weapon.wCategory);
-		if ( origin == NULL )
+		if ( origin == nullptr )
 		{
 			// Check other facilities.
 			FacilityStruct* fac = player.mission()->originCP()->facilityList;
-			for (; origin == NULL && fac != NULL; fac = fac->next )
+			for (; origin == nullptr && fac != nullptr; fac = fac->next )
 			{
 				origin = _findOrigin(fac, weapon.wCategory);
 			}
-			if ( origin == NULL && fac && useCustomLocation )
+			if ( origin == nullptr && fac && useCustomLocation )
 				origin = fac->objectList;
-			if ( origin == NULL )
+			if ( origin == nullptr )
 				throw "no spawner for this weapon category";
 		}
 
@@ -367,7 +367,7 @@ SERIAL_NUMBER_REQUEST::receive(SINT32 teulIndex, SERIAL_NUMBER_REQUEST& incoming
 {
 	const SerialNumberRequest& reply = incoming.data();
 	Player* player = PlayerInterface::Lookup(reply.playerID);
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		dbugLog(_FLA, "p:%u player not online for serial number", reply.playerID);
 		return -EINVAL;
@@ -473,7 +473,7 @@ mmProcessPostDeny(const MM_POST_DENY& denial)
 {
 	//Find the customer that the message is destined for
 	Player* const player = PlayerInterface::Lookup(denial.customerID);
-	if (player == NULL || player->isAtLobby() == false)
+	if (player == nullptr || player->isAtLobby() == false)
 	{
 		return false;
 	}
@@ -493,7 +493,7 @@ mmProcessPostExpired(const MM_POST_EXPIRED& expiry)
 {
 	//Find the customer that the message is destined for
 	Player* const player = PlayerInterface::Lookup(expiry.customerID);
-	if (player == NULL || player->isAtLobby() == false)
+	if (player == nullptr || player->isAtLobby() == false)
 	{
 		return false;
 	}
@@ -544,18 +544,18 @@ PostListReply::Process(ACTION_OBJECT* const a)
 
 	//Find the customer that the message is destined for
 	Player* const player = PlayerInterface::Lookup(reply.m_customerID);
-	if (player == NULL || player->isAtLobby() == false)
+	if (player == nullptr || player->isAtLobby() == false)
 		return a->offset;
 
 	BETAInfo(player->teulIndex());
 
 	const FacilityStruct* const facility = strtGetFacilityByOID(reply.m_facilityOID);
-	FULL_OBJ_ID fullObjID = (facility != NULL) ? facility->fullObjID : nullObjID;
+	FULL_OBJ_ID fullObjID = (facility != nullptr) ? facility->fullObjID : nullObjID;
 
 	//Translate the posted weapons to commanded weapons
 	static UCHAR _buffer[Teul::MaxPacket];
 	UINT32 postsFound = 0;
-	COMMANDED_WEAPON* commandedWeapon = NULL;
+	COMMANDED_WEAPON* commandedWeapon = nullptr;
 
 	if ( a->canRead<MM_POSTED_WEAPON>() == true )
 	{
@@ -568,7 +568,7 @@ PostListReply::Process(ACTION_OBJECT* const a)
 		{
 			auto& weapon = a->read<MM_POSTED_WEAPON>();
 			commander = PlayerInterface::Lookup(weapon.commander);
-			if ( commander == NULL || commander->isAtLobby() == false )
+			if ( commander == nullptr || commander->isAtLobby() == false )
 				continue;
 
 			if ( commander->brigade() != player->brigade() )
@@ -635,7 +635,7 @@ mmProcessJoinListResponse(const MM_JOIN_LIST_RESPONSE& response)
 {
 	//Find the customer that the message is destined for
 	Player* const player = PlayerInterface::Lookup(response.commandID);
-	if ( player == NULL || player->isAtLobby() == false )
+	if ( player == nullptr || player->isAtLobby() == false )
 	{
 		return false;
 	}
@@ -669,14 +669,14 @@ bool
 mmProcessJoinAccept(const MM_JOIN_ACCEPT& accept)
 {
 	Player* const poster = PlayerInterface::Lookup(accept.postedWeapon.commander);
-	if ( poster == NULL || poster->isAtLobby() == false )
+	if ( poster == nullptr || poster->isAtLobby() == false )
 	{
 		return false;
 	}
 	BETALog(poster->teulIndex(), "commander");
 
 	Player* const joiner = PlayerInterface::Lookup(accept.postedWeapon.crew);
-	if ( joiner == NULL || poster->isAtLobby() == false )
+	if ( joiner == nullptr || poster->isAtLobby() == false )
 	{
 		return false;
 	}
@@ -696,7 +696,7 @@ mmProcessJoinDeny(const MM_JOIN_DENY& denial)
 {
 	//Find the customer that the message is destined for
 	Player* const player = PlayerInterface::Lookup(denial.customerID);
-	if ( player == NULL || player->isAtLobby() == false )
+	if ( player == nullptr || player->isAtLobby() == false )
 	{
 		dbugLog(_FLA, "p:%u no player for this customerID, ignoring joinDeny", denial.customerID);
 		return false;
@@ -745,7 +745,7 @@ mmProcessFEClientSpawn(Player& player, const FE_CLIENT_SPAWN& request)
 	BETAInfo(player.teulIndex());
 
 	Mission* mission = player.mission();
-	if ( mission == NULL )
+	if ( mission == nullptr )
 	{
 		dbugLog(_FLA, "t:%d p:%u c:%s player attempting to spawn without mission", player.teulIndex(), player.playerID(), player.callsign());
 		player.postDenied(request.weaponSerial.spec, SPAWN_COMPLEX_DISABLED, true);
@@ -814,7 +814,7 @@ bool
 mmProcessCrewBailed(const MM_CREW_BAILED& crewBailed)
 {
 	Player* const player = PlayerInterface::Lookup(crewBailed.comanderID);
-	if ( player == NULL || player->isAtLobby() == false )
+	if ( player == nullptr || player->isAtLobby() == false )
 	{
 		dbugLog(_FLW, "p:%u no player for this customerID, ignoring bail message", crewBailed.comanderID);
 		return false;
@@ -832,11 +832,11 @@ mmProcessCrewBailed(const MM_CREW_BAILED& crewBailed)
 void
 mmProcessBuzzardSpawn(SINT32 teulIndex, const BuzzardSpawn& request)
 {
-	Player* player = NULL;
+	Player* player = nullptr;
 	try
 	{
 		player = PlayerInterface::Lookup(request.m_playerID);
-		if ( player == NULL || player->isConnected() == false )
+		if ( player == nullptr || player->isConnected() == false )
 			throw "Not connected to map host. Please relog";
 		if ( player->isSpawned() == true )
 			throw "You'll have to despawn first.";

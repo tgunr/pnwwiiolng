@@ -34,7 +34,7 @@ protected:
 			CRITICAL( ExpectEqual( LSTR_NONE, lmsg.m_message) );
 			CRITICAL( ExpectEqual( lmsg.m_size, 1 ) );
 			CRITICAL( ExpectEqual( lmsg.m_data[0], '\0' ) );
-			CRITICAL( ExpectTrue( lmsg.m_ptr[0] != NULL ) );
+			CRITICAL( ExpectTrue( lmsg.m_ptr[0] != nullptr ) );
 			return
 				ExpectEqual( lmsg.m_ptr[0], &lmsg.m_data[0] )
 				&& ExpectEqual( lmsg.m_ptr[1], &lmsg.m_data[0] )

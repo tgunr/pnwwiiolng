@@ -42,7 +42,7 @@ SquadVote::addVote(UINT32 squadID, const ChatHandle& voteBy, const ChatHandle& v
 		m_colead = true;
 
 	if ( m_votes->size() == 1 )
-		announce(squadID, NULL);
+		announce(squadID, nullptr);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -55,10 +55,10 @@ SquadVote::announce(UINT32 squadID, Player* player)
 	if ( !m_votes )
 		return;
 
-	SquadList* list = NULL;
-	if ( player == NULL )
+	SquadList* list = nullptr;
+	if ( player == nullptr )
 		list = chatFindSquadList(squadID);
-	if ( player == NULL && list == NULL )
+	if ( player == nullptr && list == nullptr )
 		return;
 
 	char str[40+1];
@@ -73,7 +73,7 @@ SquadVote::announce(UINT32 squadID, Player* player)
 
 	strprintf(str, "%" PRSizeT "", m_votes->size());
 
-	if ( player != NULL )
+	if ( player != nullptr )
 	{
 		player->message(LSTR_SQUAD, LSTR_SQUAD_ELECTION, str, results.c_str());
 		if ( m_votes->find(player->matchHandle()) == m_votes->end() )
@@ -114,12 +114,12 @@ SquadVote::close(UINT32 duration)
 	if ( m_counts )
 	{
 		delete m_counts;
-		m_counts = NULL;
+		m_counts = nullptr;
 	}
 	if ( m_votes )
 	{
 		delete m_votes;
-		m_votes = NULL;
+		m_votes = nullptr;
 	}
 	recount();
 }
@@ -164,7 +164,7 @@ SquadVote::recount()
 	m_lead = 0;
 	m_colead = false;
 
-	if ( m_counts == NULL || m_counts->empty() )
+	if ( m_counts == nullptr || m_counts->empty() )
 		return;
 
 	COUNTS::iterator it;
@@ -206,7 +206,7 @@ SquadVote::startVote()
 ChatHandle
 SquadVote::winner(SquadList* list)
 {
-	if ( m_started == 0 || m_votes == NULL || m_counts == NULL || m_votes->empty() || m_votes->size() <= 1 )
+	if ( m_started == 0 || m_votes == nullptr || m_counts == nullptr || m_votes->empty() || m_votes->size() <= 1 )
 		return 0LL;
 
 	// Check if the leader has left the squad
@@ -314,5 +314,5 @@ SquadVote*
 chatFindSquadVote(UINT32 squadID)
 {
 	SQUAD_VOTES::iterator it = g_squadVotes.find(squadID);
-	return ( it == g_squadVotes.end() ) ? NULL : &(it->second);
+	return ( it == g_squadVotes.end() ) ? nullptr : &(it->second);
 }

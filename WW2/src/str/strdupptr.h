@@ -11,7 +11,7 @@ class StrDupPtr
 	size_t	m_length;
 
 public:
-	StrDupPtr() : m_ptr(NULL), m_length(0) {}
+	StrDupPtr() : m_ptr(nullptr), m_length(0) {}
 	StrDupPtr(const char* const str_) : m_ptr(nullptr) { _initialize(str_, str_ ? strlen(str_) : 0);	}
 	StrDupPtr(const char* const str_, size_t length_) : m_ptr(nullptr) { _initialize(str_, length_); }
 	StrDupPtr(const StrDupPtr& rhs_) : m_ptr(nullptr) { copy(rhs_); }
@@ -32,7 +32,7 @@ public:
 	void copy(const char* const str_)
 	{
 		release();
-		if ( str_ != NULL )
+		if ( str_ != nullptr )
 			_initialize(str_, strlen(str_));
 	}
 	void copy(const char* const str_, size_t length_)
@@ -48,10 +48,10 @@ public:
 
 	bool release()
 	{
-		if (m_ptr == NULL)
+		if (m_ptr == nullptr)
 			return false;
 		free((void*)m_ptr);
-		m_ptr = NULL;
+		m_ptr = nullptr;
 		m_length = 0;
 		return true;
 	}

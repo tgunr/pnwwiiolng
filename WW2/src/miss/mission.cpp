@@ -101,7 +101,7 @@ static bool
 _validBrigadeOrigin(const HCUnit* unit, const FacilityStruct* facility)
 {
 	const CPStruct* cp = facility->cp;
-	if ( cp == NULL )
+	if ( cp == nullptr )
 	{
 		dbugLog(_FLA, "no cp");
 		return false;
@@ -142,14 +142,14 @@ _validBrigadeOrigin(const HCUnit* unit, const FacilityStruct* facility)
 bool
 missionValidBrigadeOrigin(const FacilityStruct* facility, UINT32 brigadeID)
 {
-	if ( facility == NULL || brigadeID == 0 )
+	if ( facility == nullptr || brigadeID == 0 )
 	{
 		dbugLog(_FLA, "invalid facility/brigade lookup");
 		return false;
 	}
 
 	const HCUnit* unit = HCUnit::Lookup(brigadeID);
-	if ( unit == NULL )
+	if ( unit == nullptr )
 	{
 		dbugLog(_FLI, "XXX can't find brigade %u", brigadeID);
 		return false;
@@ -164,12 +164,12 @@ missionValidBrigadeOrigin(const FacilityStruct* facility, UINT32 brigadeID)
 void
 missionCheckOrigins(CPStruct* cp)
 {
-	assert( NULL != cp );
+	assert( nullptr != cp );
 
 	Mission* current;
 	Mission* next;
 
-	for ( current = cp->m_missionsFrom; current != NULL; current = next )
+	for ( current = cp->m_missionsFrom; current != nullptr; current = next )
 	{
 		next = current->m_nextFromOrigin;
 		current->checkOrigin();
@@ -196,7 +196,7 @@ void
 missionFirebaseDestroyed(const FacilityStruct& facility)
 {
 	const Mission* current;
-	for ( current = facility.cp->m_missionsTo; current != NULL; current = current->m_nextToTarget )
+	for ( current = facility.cp->m_missionsTo; current != nullptr; current = current->m_nextToTarget )
 	{
 		if ( current->numTakers() <= 0 )
 			continue;
@@ -204,7 +204,7 @@ missionFirebaseDestroyed(const FacilityStruct& facility)
 			chatSendBroadcast(Chat::_ORDERS, current->instanceID(), current->missionID(), LSTR_ORDERS, LSTR_OBJECT_DESTROYED, facility.name);
 	}
 
-	for ( current = facility.cp->m_missionsFrom; current != NULL; current = current->m_nextFromOrigin )
+	for ( current = facility.cp->m_missionsFrom; current != nullptr; current = current->m_nextFromOrigin )
 	{
 		if ( current->numTakers() <= 0 )
 			continue;
@@ -220,13 +220,13 @@ missionFirebaseDestroyed(const FacilityStruct& facility)
 void
 missionRevokeMissionsFrom(const FacilityStruct& facility)
 {
-	if ( facility.cp->m_missionsTo == NULL )
+	if ( facility.cp->m_missionsTo == nullptr )
 		return;
 
 	Mission* current;
 	Mission* next;
 
-	for ( current = facility.cp->m_missionsFrom; current != NULL; current = next )
+	for ( current = facility.cp->m_missionsFrom; current != nullptr; current = next )
 	{
 		next = current->m_nextFromOrigin;
 
@@ -318,7 +318,7 @@ Mission*
 Player::activeMission() const
 {
 	MissionIndex::iterator it = g_postedMissions.find(playerID());
-	return ( it == g_postedMissions.end() ) ? NULL : it->second;
+	return ( it == g_postedMissions.end() ) ? nullptr : it->second;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -368,7 +368,7 @@ Mission::~Mission()
 		purgeTakers();
 		removeFromCPLists();
 
-		if ( brigade() != NULL )
+		if ( brigade() != nullptr )
 			brigade()->removeMission(this);
 
 		g_missions.erase(missionID());
@@ -397,7 +397,7 @@ Mission::activate()
 	m_isActive = m_isOngoing = true;
 	m_deactivatedAt = 0;
 
-	if ( brigade() != NULL && !isSystemMission() )
+	if ( brigade() != nullptr && !isSystemMission() )
 		brigade()->activateMission();
 
 	sendLaunchUpdates(!wasActive);
@@ -409,7 +409,7 @@ Mission::activate()
 BRANCH_ENUM
 Mission::branch() const
 {
-	return (NULL != brigade()) ? brigade()->branch() : BRANCH_LAND;
+	return (nullptr != brigade()) ? brigade()->branch() : BRANCH_LAND;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -429,7 +429,7 @@ Mission::deactivate()
 	m_isActive = false;
 	m_isOngoing = true;
 
-	if ( brigade() != NULL )
+	if ( brigade() != nullptr )
 		brigade()->deactivateMission();
 
 	m_deactivatedAt = teulTime();
@@ -444,7 +444,7 @@ Mission::deactivate()
 bool
 Mission::addPlayer(Player* player)
 {
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		dbugLog(_FLA, "NULL persona in addPlayer");
 		return false;
@@ -482,7 +482,7 @@ Mission::accessibility(Player* player) const
 	if ( player->branch() != branch() )
 		return MC_BRANCH;
 
-	if ( m_originFac == NULL || m_originFac->side != side() )
+	if ( m_originFac == nullptr || m_originFac->side != side() )
 		return MC_CAPTURED;
 
 	if ( player->side() != side() )
@@ -510,7 +510,7 @@ Mission::cancel()
 	{
 		dbugLog(_FLI, "m:%u being cancelled", missionID());
 
-		if ( active() && brigade() != NULL )
+		if ( active() && brigade() != nullptr )
 			brigade()->deactivateMission();
 
 		m_isActive = m_isOngoing = false;
@@ -529,10 +529,10 @@ Mission::changeLeadership(Player* player)
 	UINT32 oldLeaderID = m_playerID;
 	_releasePlayerPosting(this);
 
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		player = PlayerInterface::Lookup(m_backupLeader);
-		if ( player == NULL || player->missionID() != missionID() || player->playerID() == playerID() )
+		if ( player == nullptr || player->missionID() != missionID() || player->playerID() == playerID() )
 		{
 			dbugLog(_FLD, "m:%u no new leadership, deactivating", missionID());
 			deactivate();
@@ -552,7 +552,7 @@ Mission::changeLeadership(Player* player)
 	player->updateChat();
 
 	player = PlayerInterface::Lookup(oldLeaderID);
-	if ( player != NULL && player->missionID() == missionID() )
+	if ( player != nullptr && player->missionID() == missionID() )
 	{
 		player->SetPersonaMissionFlags();
 		player->updateMissionTaker(false);
@@ -582,7 +582,7 @@ Mission::initializeHelpers(WWII_SIDE withSide, Brigade* withBrigade)
 		m_side = withSide;
 
 	m_originFac = strtGetFacility(summary().origin);
-	if ( m_originFac != NULL )
+	if ( m_originFac != nullptr )
 	{
 		summary().origin = m_originFac->fullObjID;
 		m_originCP = m_originFac->cp;
@@ -590,12 +590,12 @@ Mission::initializeHelpers(WWII_SIDE withSide, Brigade* withBrigade)
 	else
 	{
 		m_originCP = strtGetCPorBridge(summary().origin);
-		if ( m_originCP != NULL )
+		if ( m_originCP != nullptr )
 			summary().origin = m_originCP->fullObjID;
 	}
 
 	m_targetFac = strtGetFacility(summary().target);
-	if ( m_targetFac != NULL )
+	if ( m_targetFac != nullptr )
 	{
 		summary().target = m_targetFac->fullObjID;
 		m_targetCP = m_targetFac->cp;
@@ -603,17 +603,17 @@ Mission::initializeHelpers(WWII_SIDE withSide, Brigade* withBrigade)
 	else
 	{
 		m_targetCP = strtGetCPorBridge(summary().target);
-		if ( m_targetCP != NULL )
+		if ( m_targetCP != nullptr )
 			summary().target = m_targetCP->fullObjID;
 	}
 
-	if ( m_originCP == NULL )
+	if ( m_originCP == nullptr )
 	{
 		dbugLog(_FLA, "can't create mission with invalid origin %d.%d.%u", summary().origin.cell.ox, summary().origin.cell.oy, summary().origin.id);
 		return false;
 	}
 
-	if ( m_targetCP == NULL )
+	if ( m_targetCP == nullptr )
 	{
 		m_targetFac = m_originFac;
 		m_targetCP = m_originCP;
@@ -643,7 +643,7 @@ Mission::initializeHelpers(WWII_SIDE withSide, Brigade* withBrigade)
 bool
 Mission::isFrontLine() const
 {
-	return ( m_originCP != NULL && (m_originCP->isEnemyLinked() || m_originCP->isContested()) );
+	return ( m_originCP != nullptr && (m_originCP->isEnemyLinked() || m_originCP->isContested()) );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -652,7 +652,7 @@ Mission::isFrontLine() const
 void
 Mission::markForUpdate()
 {
-	if ( brigade() != NULL )
+	if ( brigade() != nullptr )
 		brigade()->updateMissionList();
 }
 
@@ -687,7 +687,7 @@ Mission::removeFromCPLists()
 		return;
 
 	// Remove it from the CP lists
-	if ( m_nextFromOrigin != NULL )
+	if ( m_nextFromOrigin != nullptr )
 		m_nextFromOrigin->m_prevFromOrigin = m_prevFromOrigin;
 	if ( m_prevFromOrigin )
 		m_prevFromOrigin->m_nextFromOrigin = m_nextFromOrigin;
@@ -725,7 +725,7 @@ Mission::removePlayer(UINT32 withPlayerID, bool announce)
 
 	m_takers.erase(it);
 
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		dbugLog(_FLA, "p:%u m:%u player has NULL persona on mission list", withPlayerID, missionID());
 		return false;
@@ -812,7 +812,7 @@ Mission::sendLaunchUpdates(bool force)
 	{
 		Player* const player = it->second;
 		++it;
-		if ( player == NULL || player->isAtLobby() == false )
+		if ( player == nullptr || player->isAtLobby() == false )
 			continue;
 
 		bool goForLaunch = false;
@@ -857,7 +857,7 @@ Mission::updateTaker(Player* player, RMLIST_ACTION action, bool excludeSelf)
 	for ( it = m_takers.begin(); it != m_takers.end(); ++it )
 	{
 		current = it->second;
-		if ( current == NULL )
+		if ( current == nullptr )
 			continue;
 
 		if ( excludeSelf && current->playerID() == player->playerID() )
@@ -1028,7 +1028,7 @@ static void
 _populateMissionDescription(Mission& mission, const char* desc)
 {
 	//make a description
-	if ( desc == NULL )
+	if ( desc == nullptr )
 		desc = "";
 	else
 	{
@@ -1067,7 +1067,7 @@ _createMission(instanceid_t instanceID
 				, bool makeAvailable
 				)
 {
-	Mission* mission = NULL;
+	Mission* mission = nullptr;
 
 	try
 	{
@@ -1095,14 +1095,14 @@ _createMission(instanceid_t instanceID
 		if ( !isValidSide(side) )
 			throw std::invalid_argument("can only create missions for ALLIED or AXIS");
 
-		if ( brigade == NULL )
+		if ( brigade == nullptr )
 			throw std::invalid_argument("can't create mission with NULL brigade");
 
 		//set up space for the mission structure
 		mission = new Mission(instanceID, summary);
 
 #ifdef BETA_RELEASE
-		if ( brigade == NULL )
+		if ( brigade == nullptr )
 			LogAbort("managed to get past NULL brigade check");
 #endif
 
@@ -1110,7 +1110,7 @@ _createMission(instanceid_t instanceID
 			throw std::runtime_error("unable to initialize mission helpers");	///Terminal
 
 #ifdef BETA_RELEASE
-		if ( brigade == NULL )
+		if ( brigade == nullptr )
 			LogAbort("stack clobber?");
 #endif
 
@@ -1159,9 +1159,9 @@ _createMission(instanceid_t instanceID
 	catch (std::exception& e)
 	{
 		dbugLog(_FLA, "unable to create mission: %s", e.what());
-		if ( mission != NULL )
+		if ( mission != nullptr )
 			delete mission;
-		return NULL;
+		return nullptr;
 	}
 
 	return mission;
@@ -1172,7 +1172,7 @@ mapFindMission(UINT32 id)
 {
 	MissionIndex::iterator it = g_missions.find(id);
 	if ( it == g_missions.end() )
-		return NULL;
+		return nullptr;
 	return it->second;
 }
 
@@ -1186,7 +1186,7 @@ mapFindMission(UINT32 id)
 SINT32
 missionSendMissionPostReply(MISSION_POST_REQ& request, Player* player, SINT32 connection)
 {
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		dbugLog(_FLA, "NULL persona passed to %s()",__FUNCTION__);
 		return -EINVAL;
@@ -1259,7 +1259,7 @@ missionSendMissionPostReply(MISSION_POST_REQ& request, Player* player, SINT32 co
 			reply.reasonCode = MC_NO_PERMISSION;
 //		}
 	}
-	else if ( postingFacility == NULL )
+	else if ( postingFacility == nullptr )
 	{
 		player->log("Mission post denied: Invalid facility");
 		char fidBuffer[FULL_OBJ_ID::PrintLen];
@@ -1295,7 +1295,7 @@ missionSendMissionPostReply(MISSION_POST_REQ& request, Player* player, SINT32 co
 	//set up the mission
 	Mission* mission = _createMission(player->instance().id(), summary, player->side(), player->country(), request.desc, PLAYER_GENERATED, player->playerID(), now, now, player->brigade(), false);
 
-	if ( mission == NULL )
+	if ( mission == nullptr )
 	{
 		dbugLog(_FLA, "t:%d p:%u c:%s failed to create mission", player->teulIndex(), player->playerID(), player->callsign());
 		reply.posted=FALSE;
@@ -1335,7 +1335,7 @@ Player::enterMission(Mission* newMission)
 {
 	BETAInfo(teulIndex());
 
-	if ( newMission == NULL )
+	if ( newMission == nullptr )
 	{
 		dbugLog(_FLA, "t:%d p:%u c:%s trying to add to NULL mission", teulIndex(), playerID(), callsign());
 		return false;
@@ -1363,7 +1363,7 @@ Player::enterMission(Mission* newMission)
 void
 Player::sendFullMissionTakerList()
 {
-	assert( mission() != NULL );
+	assert( mission() != nullptr );
 
 	// Make sure we have a clear list
 	clearMissionTakerList();
@@ -1383,7 +1383,7 @@ Player::sendFullMissionTakerList()
 	for ( it = mission()->m_takers.begin(); it != mission()->m_takers.end(); ++it )
 	{
 		Player* const subject = it->second;
-		if ( subject == NULL )
+		if ( subject == nullptr )
 			LogAbort("t:%d p:%u c:%s m:%u NULL persona in list for %u", teulIndex(), playerID(), callsign(), missionID(), it->first);
 
 		if ( i >= MAX_ROOM_LIST_ENTRIES )
@@ -1424,7 +1424,7 @@ Mission::registerToLists()
 		return;
 	}
 
-	if ( m_originCP == NULL || m_targetCP == NULL )
+	if ( m_originCP == nullptr || m_targetCP == nullptr )
 	{
 		LogAbort("crap mission");
 	}
@@ -1455,7 +1455,7 @@ Mission::registerToLists()
 
 SINT32 missionSendMMCapacityRequest(Player* player, CAPACITY_REQUEST_STATE tag)
 {
-	if (PN_UNLIKELY(player == NULL || !player->validMissionPacket()))
+	if (PN_UNLIKELY(player == nullptr || !player->validMissionPacket()))
 		return -1;
 
 	BETAInfo(player->teulIndex());
@@ -1516,16 +1516,16 @@ Mission*
 NewMission::post()
 {
 	static MISSION_SUMMARY summary;
-	CPStruct* launchCP = NULL;
-	FacilityStruct* launchFac = NULL;
-	CPStruct* targetCP = NULL;
-	FacilityStruct* targetFac = NULL;
-	Brigade* brigade = NULL;
+	CPStruct* launchCP = nullptr;
+	FacilityStruct* launchFac = nullptr;
+	CPStruct* targetCP = nullptr;
+	FacilityStruct* targetFac = nullptr;
+	Brigade* brigade = nullptr;
 	WWII_SIDE side = wwiiSide(country);
 
 	try
 	{
-		if ( missionID > 0 && mapFindMission(missionID) != NULL )
+		if ( missionID > 0 && mapFindMission(missionID) != nullptr )
 			throw std::domain_error("mission already posted");
 
 		if ( instanceID == 0 )
@@ -1533,10 +1533,10 @@ NewMission::post()
 
 		// Locate the origin and target
 		launchCP = strtGetCPByOID(launchCP_oid);
-		if ( launchCP == NULL )
+		if ( launchCP == nullptr )
 			throw std::invalid_argument("Unable to find origin cp");
 		launchFac = strtGetFacilityByOID(launchFac_oid);
-		if ( launchFac == NULL )
+		if ( launchFac == nullptr )
 			throw std::invalid_argument("Unable to find origin facility");
 
 		if ( targetFac_oid == launchFac_oid )
@@ -1551,15 +1551,15 @@ NewMission::post()
 			else
 			{
 				targetCP = strtGetCPByOID(targetCP_oid);
-				if ( targetCP == NULL )
+				if ( targetCP == nullptr )
 					throw std::invalid_argument("Unable to find target CP");
 			}
 			if ( targetFac_oid == 0 )
-				targetFac = NULL;
+				targetFac = nullptr;
 			else
 			{
 				targetFac = strtGetFacilityByOID(targetFac_oid);
-				if ( targetFac == NULL )
+				if ( targetFac == nullptr )
 					throw std::invalid_argument("Unable to find target facility");
 			}
 		}
@@ -1568,14 +1568,14 @@ NewMission::post()
 			throw std::domain_error("Mission/Facility country mismatch");
 
 		brigade = mapFindBrigade(brigadeID);
-		if ( brigade == NULL )
+		if ( brigade == nullptr )
 			throw std::domain_error("Invalid brigade ID for mission");
 
 		// Populate the summary structure
 		summary.missionID = missionID;
 		strsafecpy(summary.callsign, posterCallsign);
 		summary.origin = launchFac->fullObjID;
-		summary.target = (targetFac != NULL) ? targetFac->fullObjID : targetCP->fullObjID;
+		summary.target = (targetFac != nullptr) ? targetFac->fullObjID : targetCP->fullObjID;
 		summary.missionType = missionType;
 		summary.subType = 0;	///TODO: Fixme
 
@@ -1599,7 +1599,7 @@ NewMission::post()
 						, true
 						);
 
-		if ( mission != NULL )
+		if ( mission != nullptr )
 			mission->activate();
 
 		return mission;
@@ -1608,7 +1608,7 @@ NewMission::post()
 	{
 		dbugLog(_FLW, "mis:%d ctry:%u side:%u brig %d from %d/%d to %d/%d: %s"
 						, missionID, country, side, brigadeID, launchCP_oid, launchFac_oid, targetCP_oid, targetFac_oid, e.what());
-		return NULL;
+		return nullptr;
 	}
 }
 
@@ -1660,7 +1660,7 @@ SINT32
 missionCancel(UINT32 missionID)
 {
 	Mission* mission = mapFindMission(missionID);
-	if ( mission == NULL )
+	if ( mission == nullptr )
 	{
 		dbugLog(_FLN, "m:%u no such mission for cancellation", missionID);
 		return -EINVAL;
@@ -1680,7 +1680,7 @@ static void
 _setBackupLeader(UINT32 missionID, UINT32 playerID)
 {
 	Mission* mission = mapFindMission(missionID);
-	if ( mission == NULL || mission->m_backupLeader == playerID )
+	if ( mission == nullptr || mission->m_backupLeader == playerID )
 		return;
 	dbugLog(_FLD, "m:%u leader:%u got backup leader change to p:%u"
 					, missionID, mission->playerID(), playerID);
@@ -1703,7 +1703,7 @@ LeaderChange::process() const
 
 	// See if we know about this mission
 	Mission* const mission = mapFindMission(m_missionID);
-	if ( mission == NULL )
+	if ( mission == nullptr )
 		return _FAIL_NO_MISSION;
 
 	if ( mission->isSystemMission() )
@@ -1717,7 +1717,7 @@ LeaderChange::process() const
 		return _FAIL_IS_LEADER;
 
 	Player* player = PlayerInterface::Lookup(m_leaderID);
-	if ( player == NULL || player->missionID() != m_missionID )
+	if ( player == nullptr || player->missionID() != m_missionID )
 		return _FAIL_OTHER_MISSION;
 
 	mission->m_backupLeader = m_leaderID;
@@ -1744,7 +1744,7 @@ _lookupExistingInstanceMission(instanceid_t instanceID, WWII_COUNTRY forCountry,
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1753,7 +1753,7 @@ _lookupExistingInstanceMission(instanceid_t instanceID, WWII_COUNTRY forCountry,
 static Mission*
 _postNewInstanceMission(instanceid_t instanceID, WWII_COUNTRY forCountry, BRANCH_ENUM forBranch)
 {
-	static const char* adminCPs[MAX_COUNTRIES] = { NULL, "British Training", "British Training", "French Training", "German Training", NULL, NULL, NULL };
+	static const char* adminCPs[MAX_COUNTRIES] = { nullptr, "British Training", "British Training", "French Training", "German Training", nullptr, nullptr, nullptr };
 
 	try
 	{
@@ -1764,13 +1764,13 @@ _postNewInstanceMission(instanceid_t instanceID, WWII_COUNTRY forCountry, BRANCH
 			throw "Invalid country";
 
 		const char* facName = adminCPs[forCountry];
-		if ( facName == NULL )
+		if ( facName == nullptr )
 			throw "Country has no adminCP entry";
 
 		// See if we can find the training ground for this country
 		const std::string facilityName = sdmTranslateName(facName);
 		CPStruct* const cp = strtGetCPByName(facilityName.c_str());
-		if ( cp == NULL )
+		if ( cp == nullptr )
 			throw "No training facility";
 
 		FacilityStruct* ab = cp->facilityTypeIndex[FACILITY_ARMYBASE];
@@ -1809,7 +1809,7 @@ _postNewInstanceMission(instanceid_t instanceID, WWII_COUNTRY forCountry, BRANCH
 		sprintf(post.description, "%s system mission", _countryNameAdj[forCountry]);
 
 		Mission* mission = post.post();
-		if ( mission != NULL )
+		if ( mission != nullptr )
 		{
 			InstanceMissions& index = g_instanceMissionIndex[mission->instanceID()];
 			index.push_back(mission);
@@ -1835,7 +1835,7 @@ Mission*
 missionGetInstanceMission(instanceid_t instanceID, WWII_COUNTRY forCountry, BRANCH_ENUM forBranch)
 {
 	Mission* const mission = _lookupExistingInstanceMission(instanceID, forCountry, forBranch);
-	if ( mission != NULL )
+	if ( mission != nullptr )
 		return mission;
 
 	return _postNewInstanceMission(instanceID, forCountry, forBranch);
@@ -1865,7 +1865,7 @@ missDeleteInstanceMissions(instanceid_t instanceID)
 		// destructor to swap the element with the index.back()
 		// so we can just keep popping the front off.
 		Mission* mission = index.front();
-		if ( mission == NULL )
+		if ( mission == nullptr )
 		{
 			LogAbort("in:%llu contains NULL in mission index at position %u", instanceID, i);
 		}

@@ -19,7 +19,7 @@
 #include "strt/strtData.h"
 #include "include/mydbQuery.h"
 
-FILE* fp = NULL;
+FILE* fp = nullptr;
 
 class WorldSave
 {
@@ -44,7 +44,7 @@ public:
 		if ( cp->controllingCountry != cp->country ) _add(CP_CONCOUNTRY, cp->controllingCountry);
 		if ( cp->isContested() ) _add(CP_CONTENTION, 1);
 
-		for ( FacilityStruct* fac = cp->facilityList; fac != NULL; fac = fac->next )
+		for ( FacilityStruct* fac = cp->facilityList; fac != nullptr; fac = fac->next )
 			add(fac);
 
 		cp->modified = false;
@@ -59,7 +59,7 @@ public:
 		if ( fac->isOpen() == false ) _add(FAC_OPEN, false);
 		fac->modified = false;
 
-		for ( ObjectStruct* obj = fac->objectList; obj != NULL; obj = obj->next )
+		for ( ObjectStruct* obj = fac->objectList; obj != nullptr; obj = obj->next )
 			add(obj);
 
 		if ( fac->m_outgoingLink )
@@ -289,7 +289,7 @@ strtdbSaveWorld(CPStruct* cp, DBQuery& q)
 	dbugLog(_FLI, "%s", __FUNCTION__);
 	WorldSave worldSave(q);
 
-	for (; cp != NULL; cp = cp->next )
+	for (; cp != nullptr; cp = cp->next )
 	{
 		worldSave.add(cp);
 	}

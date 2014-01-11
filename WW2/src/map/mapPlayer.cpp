@@ -502,7 +502,7 @@ Player::Player(SINT32 newTeulIndex, const Auth::Dispatch& newDispatch, const pla
 	timeIn = teulTime();
 
 	m_useRank = m_actualRank = Rank::lookup(0);
-	assert( m_useRank != NULL );
+	assert( m_useRank != nullptr );
 
 	if ( !selectPlayer(newPlayerID) || playerID() <= DEFAULT_PLAYER_ID )
 		throw std::runtime_error("No such player");	///Terminal
@@ -559,7 +559,7 @@ Player::SetCountry(WWII_COUNTRY newCountry, WWII_SIDE newSide)
 void
 Player::SetGroups(const char* groupList)
 {
-	if ( groupList == NULL || *groupList == 0 )
+	if ( groupList == nullptr || *groupList == 0 )
 		m_permissions = &nullChatPermissions;
 	else
 	{
@@ -585,7 +585,7 @@ Player::SetGroups(const char* groupList)
 	if ( personaID() > 0 )
 	{
 		const Rank* rankEntry = Rank::lookup(effectiveRank());
-		m_useRank = (rankEntry != NULL) ? rankEntry : m_actualRank;
+		m_useRank = (rankEntry != nullptr) ? rankEntry : m_actualRank;
 	}
 
 	updateMask();
@@ -621,7 +621,7 @@ Player::~Player()
 	if ( m_missionResults )
 	{
 		delete m_missionResults;
-		m_missionResults = NULL;
+		m_missionResults = nullptr;
 	}
 
 	if ( m_registered )
@@ -636,7 +636,7 @@ Player::~Player()
 		// are currently in.
 		SetInstance(Instance::g_invalid);
 
-		if ( NULL != m_antiAddiction )
+		if ( nullptr != m_antiAddiction )
 			mmRemoveMinor(this);
 
 		ExitBrigade(PERS_EXITING);
@@ -658,15 +658,15 @@ Player::~Player()
 	dbugLog(_FLD, "t:%d p:%u c:%s ptr:%p PERS: active:%d -REL", teulIndex(), playerID(), callsign(), this, _numTotalPlayers());
 
 	if ( teulIndex() >= 0 )
-		teulSetPersonaData(teulIndex(), NULL);
+		teulSetPersonaData(teulIndex(), nullptr);
 	else
 	{
 		///TODO: Check that this should be an ELSE
 		PlayerStatusNode* psn = ServerInterface::PlayerStatusNodeByPlayerID(playerID());
-		if ( psn != NULL && (Player*)(psn->localInfo) == this )
+		if ( psn != nullptr && (Player*)(psn->localInfo) == this )
 		{
 			dbugLog(_FLW, "t:%d p:%u c:%s dropping localInfo reference", teulIndex(), playerID(), callsign());
-			psn->localInfo = NULL;
+			psn->localInfo = nullptr;
 		}
 	}
 }
@@ -681,7 +681,7 @@ Player::bumpRank()
 	m_promoted = false;
 
 	const Rank* next = actualRank().next();
-	if ( next == NULL || next->level() == 0 || actualRank().points() >= 65535 )
+	if ( next == nullptr || next->level() == 0 || actualRank().points() >= 65535 )
 	{
 #ifdef BETA_RELEASE
 		dbugLog(_FLN, "t:%d p:%u c:%s persona reached max advanceable rank", teulIndex(), playerID(), callsign());
@@ -726,7 +726,7 @@ Player::calculateMissionResults(MM_PERS_STATE toState)
 
 	const FULL_OBJ_ID& origin = missionPacket().sortie().originFac();
 	const FacilityStruct* const facility = strtGetFacility(origin);
-	if ( facility == NULL )
+	if ( facility == nullptr )
 	{
 		dbugLog(_FLW, "t:%d p:%u c:%s has invalid origin: %d.%d.%u"
 						, teulIndex()
@@ -755,7 +755,7 @@ Player::calculateMissionResults(MM_PERS_STATE toState)
 	// mapFillPersonaData(this);
 
 	// Take me out of "spawned" mode
-	if ( mission() != NULL )
+	if ( mission() != nullptr )
 		mission()->updateTaker(this, RMLIST_UPDATE, true);
 
 	if ( missionPacket().vehicle().rtbState() == RTB_SUCCESS )
@@ -823,7 +823,7 @@ Player::CheckWeaponMask(UINT16 weaponSpecShort) const
 {
 	if ( permissions(UNMASKED_VEHICLES) )
 		return true;
-	if ( chatPermissions() == NULL )
+	if ( chatPermissions() == nullptr )
 		return false;
 	return chatPermissions()->m_vehicleGrants.find(weaponSpecShort) != chatPermissions()->m_vehicleGrants.end();
 }
@@ -930,7 +930,7 @@ Player::evaluateMissionPacket()
 	if ( pointsScored == 0 || actualRank().kingOfTheHill() )
 		return true;
 
-	if ( useRank().level() >= maxRank() && useRank().next() != NULL )
+	if ( useRank().level() >= maxRank() && useRank().next() != nullptr )
 	{
 		messagef(LSTR_NOTE, LSTR_WOULD_HAVE_SCORED, "%u", pointsScored);
 		return true;
@@ -994,7 +994,7 @@ Player::ExitBrigade(UINT32 withState)
 	brigade()->removePlayer(this);
 
 	wwiiPlayer::ExitBrigade(withState);
-	SetBrigade(NULL);
+	SetBrigade(nullptr);
 
 	SetState((MM_PERS_STATE)withState);
 
@@ -1010,10 +1010,10 @@ Player::ExitMission()
 	if ( mission() )
 	{
 		if ( isMissionLeader() )
-			mission()->changeLeadership(NULL);
+			mission()->changeLeadership(nullptr);
 		clearMissionTakerList();
 		mission()->removePlayer(playerID(), true);
-		SetMission(NULL);
+		SetMission(nullptr);
 		updateChat();
 		SetState(PERS_SELECTING_MISSION);
 	}
@@ -1034,9 +1034,9 @@ Player::fillMissionPacket(Mission* forMission)
 	SetState(PERS_SELECTING_MISSION);
 	m_promoted = false;
 
-	if ( forMission != NULL )
+	if ( forMission != nullptr )
 	{
-		if ( forMission->originFac() == NULL )
+		if ( forMission->originFac() == nullptr )
 		{
 			dbugLog(_FLW, "t:%d p:%u c:%s m:%u mission has NULL originFac", teulIndex(), playerID(), callsign(), forMission->missionID());
 			return false;
@@ -1064,7 +1064,7 @@ Player::fillMissionPacket(Mission* forMission)
 	}
 	else
 	{
-		SetMission(NULL);
+		SetMission(nullptr);
 		m_launchPermitted = isPlaynet();
 		m_nextLaunch = 0;
 	}
@@ -1121,7 +1121,7 @@ Player::onDespawn(SINT32 onTeulIndex)
 		///              but this potentially opens up a race condition if a player is in mid-reconnect.
 		///              Other option: boot the player.
 		PlayerStatusNode* const psn = ServerInterface::PlayerStatusNodeByTeulIndex(onTeulIndex);
-		if ( psn != NULL )
+		if ( psn != nullptr )
 			psn->takeAuthorityForThisPlayer();
 	}
 
@@ -1344,7 +1344,7 @@ Player::SelectBrigade(Brigade* selection)
 MISSION_CODE
 Player::selectMission(Mission* toMission, bool enter)
 {
-	if ( toMission == NULL )
+	if ( toMission == nullptr )
 	{
 		dbugLog(_FLD, "t:%d p:%u c:%s %s: called with NULL mission", teulIndex(), playerID(), callsign(), __FUNCTION__);
 		return MC_EXPIRED;
@@ -1443,7 +1443,7 @@ void
 Player::SetBrigade(Brigade* newBrigade)
 {
 	m_brigade = newBrigade;
-	if ( m_brigade != NULL )
+	if ( m_brigade != nullptr )
 		m_brigadeID = m_brigade->m_unitID;
 	else
 		m_brigadeID = 0;
@@ -1559,7 +1559,7 @@ Player::SetRank(RANK_NO level)
 		return;
 
 	const Rank* entry = Rank::lookup(level);
-	if ( entry == NULL )
+	if ( entry == nullptr )
 	{
 		dbugLog(_FLW, "t:%d p:%u c:%s tried to set rank to %d", teulIndex(), playerID(), callsign(), level);
 		if ( level != 0 )
@@ -1573,7 +1573,7 @@ Player::SetRank(RANK_NO level)
 	if ( effectiveRank() < level )
 	{
 		const Rank* effectiveEntry = Rank::lookup(effectiveRank());
-		m_useRank = (effectiveEntry != NULL) ? effectiveEntry : m_actualRank;
+		m_useRank = (effectiveEntry != nullptr) ? effectiveEntry : m_actualRank;
 	}
 	else
 		m_useRank = m_actualRank;
@@ -1607,7 +1607,7 @@ Player::SetState(MM_PERS_STATE toState)
 void
 Player::SetTarget(const FacilityStruct* facility)
 {
-	if ( facility == NULL )
+	if ( facility == nullptr )
 		missionPacket().sortie().target = missionPacket().sortie().originFac();
 	else
 		missionPacket().sortie().target = facility->fullObjID;
@@ -1679,7 +1679,7 @@ static SINT32
 _playerLoggingIn(SINT32 teulIndex, const playerid_t playerID, PlayerStatusNode& psn, const Server::PersonaXfer& xfer)
 {
 	Player* const previous = PlayerInterface::Lookup(playerID);
-	if ( previous != NULL )
+	if ( previous != nullptr )
 	{
 		dbugLog(_FLA, "t:%d p:%u c:%s *** Previous instance %p still present! SHOULD NOT HAPPEN"
 					, teulIndex, playerID, xfer.dispatch().m_callsign, previous);
@@ -1690,11 +1690,11 @@ _playerLoggingIn(SINT32 teulIndex, const playerid_t playerID, PlayerStatusNode& 
 		previous->Release(oldTeulIndex, Server::RELEASE_COLLISION);
 	}
 
-	if ( xfer.data.auxData != NULL )
+	if ( xfer.data.auxData != nullptr )
 		throw std::logic_error("Non-NULL xfer data in login");
 
 	Player* const player = new Player(-EINVAL, xfer.dispatch(), playerID);
-	if ( player == NULL )
+	if ( player == nullptr )
 		throw std::runtime_error("Out of memory");								///Terminal
 
 	dbugLog(_FLD, "t:%d p:%u c:%s ip:%s ptr:%p +ALLOC", teulIndex, playerID, player->callsign(), teulGetAddress(xfer.dispatch().m_clientIP), player);
@@ -1723,7 +1723,7 @@ static SINT32
 _playerExiting(SINT32 teulIndex, const playerid_t playerID, const Server::PersonaXfer& xfer)
 {
 	Player* player = PlayerInterface::Lookup(playerID);
-	if ( player == NULL )
+	if ( player == nullptr )
 		return 0;
 
 	if ( player->OTP() != xfer.dispatch().m_OTP )
@@ -1757,7 +1757,7 @@ mapCreatePlayer(SINT32 teulIndex, PlayerStatusNode* psn, const Server::PersonaXf
 		switch ( xfer.reason() )
 		{
 		case Server::Transfer::XferReason::Login:
-			assert( psn != NULL );
+			assert( psn != nullptr );
 			return _playerLoggingIn(teulIndex, playerID, *psn, xfer);
 		break;
 
@@ -1777,8 +1777,8 @@ mapCreatePlayer(SINT32 teulIndex, PlayerStatusNode* psn, const Server::PersonaXf
 	catch (std::exception& e)
 	{
 		dbugLog(_FLW, "t:%d p:%u c:%s PERS: %s %s", teulIndex, playerID, xfer.dispatch().m_callsign, xferReasons[(UINT32)xfer.reason()], e.what());
-		if ( psn != NULL )
-			psn->localInfo = NULL;
+		if ( psn != nullptr )
+			psn->localInfo = nullptr;
 	}
 
 	return -EINVAL;
@@ -1791,9 +1791,9 @@ mapCreatePlayer(SINT32 teulIndex, PlayerStatusNode* psn, const Server::PersonaXf
 SINT32
 mapReleasePlayer(SINT32 teulIndex, PlayerStatusNode* psn, Server::ReleaseType releaseType)
 {
-	if ( psn == NULL && teulIndex < 0 )
+	if ( psn == nullptr && teulIndex < 0 )
 		LogAbort("can't handle NULL player node and teulIndex");
-	else if ( psn == NULL )
+	else if ( psn == nullptr )
 	{
 		dbugLog(_FLA, "t:%d don't know what to do with NULL player", teulIndex);
 		return -EINVAL;
@@ -1815,7 +1815,7 @@ mapReleasePlayer(SINT32 teulIndex, PlayerStatusNode* psn, Server::ReleaseType re
 	{
 		playerID = psn->dispatch().m_customerID;
 		Player* player = PlayerInterface::Lookup(playerID);
-		if ( player == NULL )
+		if ( player == nullptr )
 		{
 			dbugLog(_FLD, "t:%d p:%u persona already released", teulIndex, playerID);
 			return 0;
@@ -1823,11 +1823,11 @@ mapReleasePlayer(SINT32 teulIndex, PlayerStatusNode* psn, Server::ReleaseType re
 
 		dbugLog(_FLD, "t:%d p:%u c:%s PERS: releasing from state %s", player->teulIndex(), player->playerID(), player->callsign(), _pstates[player->state()]);
 
-		psn->localInfo = NULL;
+		psn->localInfo = nullptr;
 		if ( teulIndex >= 0 )
-			teulSetPersonaData(teulIndex, NULL);
+			teulSetPersonaData(teulIndex, nullptr);
 		else if ( player->teulIndex() >= 0 )
-			teulSetPersonaData(player->teulIndex(), NULL);
+			teulSetPersonaData(player->teulIndex(), nullptr);
 
 		///TODO: Think about this, it doesn't seem like such
 		///a great idea. What if we have the wrong teulIndex?
@@ -1871,7 +1871,7 @@ mapPlayerExitCluster(PlayerStatusNode& psn)
 	}
 
 	Player* const player = PlayerInterface::Lookup(playerID);
-	if ( player == NULL )
+	if ( player == nullptr )
 		return 0;
 	if ( player->OTP() != psn.dispatch().m_OTP )
 	{
@@ -2315,6 +2315,6 @@ mapPlayerInit()
 	g_chatSyncQueue.clear();
 	g_logins.clear();
 
-	if ( Teul::uWeb::s_debugServer != NULL )
+	if ( Teul::uWeb::s_debugServer != nullptr )
 		Teul::uWeb::s_debugServer->addVirtualFile("Player counts", "/player-balance.json", _reportPlayerDetails);
 }

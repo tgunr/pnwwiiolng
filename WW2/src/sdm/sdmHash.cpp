@@ -20,8 +20,8 @@ sdmCreateFacilityTable(FACILITY* const fac, const size_t numFacilities, const si
 {
 	// Bridges get fake facilities, so we have to look at CPs.
 	const size_t potentialFacs = numFacilities + numCPs;
-	if ( (fac == NULL) | (potentialFacs <= 0) )
-		return NULL;
+	if ( (fac == nullptr) | (potentialFacs <= 0) )
+		return nullptr;
 
 	const size_t HeaderNodeSize = sizeof(STRAT_FACILITY_TABLE);
 	const size_t FacilityNodeListSize = sizeof(STRAT_FACILITY_NODE) * potentialFacs;
@@ -58,7 +58,7 @@ STRAT_BUILDING_LIST * sdmGetFaciltyBidList(STRAT_FACILITY_TABLE* facTable, SINT1
 			return &facTable->facility[i].bidList;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 static bool _addBuildingToFacTable(STRAT_FACILITY_TABLE* facTable, const BUILDING& building)

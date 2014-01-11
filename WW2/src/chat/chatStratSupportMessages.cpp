@@ -183,12 +183,12 @@ void
 chatSendBrigadeMoveResult(BRIGADE_MOVE_MSG& outgoing)
 {
 	ENDPOINT* endpoint = serverPeerEndpointByType(CHAT_HOST);
-	if ( endpoint != NULL )
+	if ( endpoint != nullptr )
 		outgoing.send(*endpoint);
 	if ( outgoing.data().m_action == BMR_APPROVED && outgoing.data().m_actionable )
 	{
 		endpoint = serverPeerEndpointByType(MAP_HOST);
-		if ( endpoint != NULL )
+		if ( endpoint != nullptr )
 			outgoing.send(*endpoint);
 	}
 }
@@ -243,12 +243,12 @@ BRIGADE_MOVE_MSG::receive(SINT32 /*teulIndex*/, BRIGADE_MOVE_MSG& incoming)
 BRIGADE_MOVE_RESULT
 BrigadeMove::process(const ChatHandle& mover, const char* callsign, StratHCUnit* unit, CPStruct* cp, bool isGM)
 {
-	if ( unit == NULL )
+	if ( unit == nullptr )
 	{
 		dbugLog(_FLW, "%s: no such brigade: %u", callsign, m_brigadeID);
 		return BMR_FAILED;
 	}
-	if ( cp == NULL )
+	if ( cp == nullptr )
 	{
 		dbugLog(_FLW, "%s/%s: invalid destination: %d.%d.%u", callsign, unit->callsign()
 						, m_destination.cell.ox, m_destination.cell.oy, m_destination.id

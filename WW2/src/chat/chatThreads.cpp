@@ -17,7 +17,7 @@
 
 struct BanThread : public PNThread
 {
-	virtual void run() { chatBanQueueThread(NULL);	}
+	virtual void run() { chatBanQueueThread(nullptr);	}
 };
 static BanThread _banThread;
 static StatsThread _statsThread;

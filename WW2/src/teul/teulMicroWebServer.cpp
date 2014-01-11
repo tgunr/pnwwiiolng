@@ -114,7 +114,7 @@ _establishListenSocket(const unsigned short port_)
 static size_t
 _parseHTTPRequest(char* const source, char*& method, char*& path, char*& lastDot, char*& args)
 {
-	args = NULL;
+	args = nullptr;
 
 	// Skip leading white space.
 	char* ptr = source;
@@ -314,7 +314,7 @@ _sendPhysicalFile(const unsigned int sock, const char* const rootPath, const cha
 #if defined(HAVE_SYS_SENDFILE_H) && HAVE_SYS_SENDFILE_H == 1
 			// The first write might fail, if it does we don't care
 			// but we don't need to try and send the second.
-			sendfile(sock, filefd, NULL, statBuf.st_size);
+			sendfile(sock, filefd, nullptr, statBuf.st_size);
 #else
 			char xferBuffer[4096];
 			for (;; )
@@ -355,15 +355,15 @@ _sendPhysicalFile(const unsigned int sock, const char* const rootPath, const cha
 void
 Teul::uWeb::Server::processHTTPRequest(const int sock, char* const request)
 {
-	char* method = NULL;
-	char* path = NULL;
-	char* lastDot = NULL;
-	char* args = NULL;
+	char* method = nullptr;
+	char* path = nullptr;
+	char* lastDot = nullptr;
+	char* args = nullptr;
 
 	_parseHTTPRequest(request, /*in*/ method, /*in*/ path, /*in*/ lastDot, /*in*/ args);
 
 	// Is there a function registered to handle this request?
-	VirtualFileHandler handler = NULL;
+	VirtualFileHandler handler = nullptr;
 	{
 		std::lock_guard<std::mutex> lock(m_config_mutex);
 		auto it = m_virtualFileHandlers.find(path);
@@ -371,7 +371,7 @@ Teul::uWeb::Server::processHTTPRequest(const int sock, char* const request)
 			handler = it->second.first;
 	}
 
-	if ( handler != NULL )
+	if ( handler != nullptr )
 	{
 		_callHandler(sock, handler, path, args, this);
 		return;

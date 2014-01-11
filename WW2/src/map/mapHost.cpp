@@ -48,7 +48,7 @@ SINT32
 PersonaSummaries::receive(SINT32 teulIndex)
 {
 	Player* const player = PlayerInterface::Lookup(teulIndex);
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		dbugLog(_FLA, "t:%d %s: no persona associated with teulIndex", teulIndex, __FUNCTION__);
 		return -EINVAL;
@@ -154,7 +154,7 @@ SINT32
 PersonaSelection::receive(SINT32 teulIndex)
 {
 	Player* const player = PlayerInterface::Lookup(teulIndex);
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		dbugLog(_FLA, "t:%d %s: no persona associated with teulIndex", teulIndex, __FUNCTION__);
 		return -EINVAL;
@@ -258,7 +258,7 @@ SINT32
 BrigadeSummaries::receive(SINT32 teulIndex)
 {
 	Player* const player = PlayerInterface::Lookup(teulIndex);
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		dbugLog(_FLA, "t:%d %s: no persona associated with teulIndex", teulIndex, __FUNCTION__);
 		return -EINVAL;
@@ -325,7 +325,7 @@ SINT32
 BrigadeSelection::receive(SINT32 teulIndex)
 {
 	Player* const player = PlayerInterface::Lookup(teulIndex);
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		dbugLog(_FLA, "t:%d %s: no persona associated with teulIndex", teulIndex, __FUNCTION__);
 		return _sendResult(teulIndex, BRIG_ERROR);
@@ -347,7 +347,7 @@ BrigadeSelection::receive(SINT32 teulIndex)
 	}
 
 	Brigade* const brigade = mapFindBrigade(m_detail.brigadeID());
-	if ( brigade == NULL )
+	if ( brigade == nullptr )
 	{
 		chatSendLocalizedMessage(player->playerID(), LSTR_NONE, LSTR_BDESEL_REFUSED_BDE);
 		dbugLog(_FLW, "t:%d p:%u c:%s brigade select request for non-existant brigade %d"
@@ -409,7 +409,7 @@ MissionList::receive(SINT32 teulIndex)
 	m_listStart = m_listEnd = true;
 	m_canPost = false;
 
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		dbugLog(_FLA, "t:%d %s: no persona associated with teulIndex", teulIndex, __FUNCTION__);
 		return _sendResult(teulIndex, MLR_ERROR);
@@ -422,14 +422,14 @@ MissionList::receive(SINT32 teulIndex)
 	}
 
 	Brigade* const brigade = player->brigade();
-	if ( brigade == NULL )
+	if ( brigade == nullptr )
 	{
 		dbugLog(_FLW, "t:%d p:%u c:%s mission list without brigade selected", player->teulIndex(), player->playerID(), player->callsign());
 		return _sendResult(teulIndex, MLR_NO_BRIGADE);
 	}
 
 	const Mission* const activeMission = player->activeMission();
-	if ( player->ableToPost() && activeMission == NULL )
+	if ( player->ableToPost() && activeMission == nullptr )
 		m_canPost = true;
 	m_activeMission.populate(activeMission);
 
@@ -501,7 +501,7 @@ MissionList::receive(SINT32 teulIndex)
 void
 ActiveMission::populate(const Mission* const mission)
 {
-	if ( mission == NULL || mission->missionID() == 0 )
+	if ( mission == nullptr || mission->missionID() == 0 )
 	{
 		m_missionID = 0;
 		return;

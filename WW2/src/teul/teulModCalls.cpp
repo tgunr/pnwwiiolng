@@ -82,7 +82,7 @@ static void
 _errorSYN_CALLBACK(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 error)
 {
 	ENDPOINT* const inEndpoint = teulGetEndpoint(teulIndex);
-	if ( inEndpoint == NULL)
+	if ( inEndpoint == nullptr)
 	{
 		dbugLog(_FLA, "t:%d illegal index", teulIndex);
 		return;
@@ -137,7 +137,7 @@ _actionSendSYN_TOKEN(ACTION_OBJECT* const a)
 {
 	_report(a, "Tx SYN");
 
-	if ( PN_UNLIKELY(a->endpoint == NULL) )
+	if ( PN_UNLIKELY(a->endpoint == nullptr) )
 		return -EINVAL;
 
 	struct SYN_TOKEN_STRUCT token;
@@ -182,7 +182,7 @@ _actionRecvSYN_TOKEN(ACTION_OBJECT* const a)
 {
 	_report(a, "Rx SYN");
 
-	if ( PN_UNLIKELY((a->endpoint == NULL) | (SYN_ACK_TOKEN == NULL)) )
+	if ( PN_UNLIKELY((a->endpoint == nullptr) | (SYN_ACK_TOKEN == nullptr)) )
 		return -EINVAL;
 
 	struct SYN_TOKEN_STRUCT token;
@@ -227,7 +227,7 @@ _actionSendSYN_ACK_TOKEN(ACTION_OBJECT* const a)
 {
 	_report(a, "Tx SAK");
 
-	if ( PN_UNLIKELY(a->endpoint == NULL) )
+	if ( PN_UNLIKELY(a->endpoint == nullptr) )
 		return -EINVAL;
 
 	struct SYN_TOKEN_STRUCT token;
@@ -252,7 +252,7 @@ _actionRecvSYN_ACK_TOKEN(ACTION_OBJECT* const a)
 {
 	_report(a, "Rx SAK");
 
-	if ( PN_UNLIKELY((a->endpoint == NULL) | (SYN_ACK_ACK_TOKEN == NULL)) )
+	if ( PN_UNLIKELY((a->endpoint == nullptr) | (SYN_ACK_ACK_TOKEN == nullptr)) )
 		return -EINVAL;
 
 	if (PN_UNLIKELY(a->endpoint->state() == IS_LISTENING))
@@ -322,7 +322,7 @@ _actionRecvSYN_ACK_ACK_TOKEN(ACTION_OBJECT* const a)
 {
 	_report(a, "Rx SAA");
 
-	if ( PN_UNLIKELY(a->endpoint == NULL) )
+	if ( PN_UNLIKELY(a->endpoint == nullptr) )
 		return -EINVAL;
 
 	struct SYN_TOKEN_STRUCT token;
@@ -368,13 +368,13 @@ _actionRecvFYN_TOKEN(ACTION_OBJECT* const a)
 	_report(a, "Rx FYN");
 
 	ENDPOINT* const inEndpoint = teulGetEndpoint(a->teulIndex);
-	if ( (inEndpoint == NULL) | (FYN_ACK_TOKEN == NULL) )
+	if ( (inEndpoint == nullptr) | (FYN_ACK_TOKEN == nullptr) )
 		return -EINVAL;
 
 	if ( (inEndpoint->state() != IS_CLOSING) & (inEndpoint->state() != IS_CLOSED) )
 	{
 		dbugLog(_FLD, "t:%d rxFyn: closing", a->teulIndex);
-		if ( FYN_TOKEN != NULL )
+		if ( FYN_TOKEN != nullptr )
 			teulModSendCALLBACKe(*inEndpoint, *FYN_TOKEN);
 		teulClose(*inEndpoint, Teul::Closing::FynRx);
 	}
@@ -424,7 +424,7 @@ _packKLIVE_ACK_TOKEN(LOGICAL mode,  UCHAR* const data, SINT32 offset, KDATA* kt,
 static SINT32
 _actionSendKLIVE_TOKEN(ACTION_OBJECT* const a)
 {
-	if ( PN_UNLIKELY(a->endpoint == NULL) )
+	if ( PN_UNLIKELY(a->endpoint == nullptr) )
 		return -EINVAL;
 
 	a->endpoint->lastKliveSent.makeCurrent();
@@ -438,7 +438,7 @@ _actionSendKLIVE_TOKEN(ACTION_OBJECT* const a)
 static SINT32
 _actionRecvKLIVE_TOKEN(ACTION_OBJECT* const a)
 {
-	if ( PN_UNLIKELY((a->endpoint == NULL) | (KLIVE_ACK_TOKEN == NULL)) )
+	if ( PN_UNLIKELY((a->endpoint == nullptr) | (KLIVE_ACK_TOKEN == nullptr)) )
 		return -EINVAL;
 
 	struct KDATA kt;
@@ -448,7 +448,7 @@ _actionRecvKLIVE_TOKEN(ACTION_OBJECT* const a)
 	const bool oldNagleValue = a->endpoint->setNagleEnabled(false);
 	KLIVE_ACK_TOKEN->outData = &kt;				// point to the struct
 	teulModSendCALLBACKe(*a->endpoint, *KLIVE_ACK_TOKEN);	// send it
-	KLIVE_ACK_TOKEN->outData = NULL;
+	KLIVE_ACK_TOKEN->outData = nullptr;
 	if ( oldNagleValue == true )
 		a->endpoint->setNagleEnabled(oldNagleValue);
 
@@ -472,7 +472,7 @@ _actionSendKLIVE_ACK_TOKEN(ACTION_OBJECT* const a)
 static SINT32
 _actionRecvKLIVE_ACK_TOKEN(ACTION_OBJECT* const a)
 {
-	if ( PN_UNLIKELY(a->endpoint == NULL) )
+	if ( PN_UNLIKELY(a->endpoint == nullptr) )
 		return -EINVAL;
 
 	struct KDATA kt;
@@ -621,6 +621,6 @@ void
 teulSendError(const SINT32 teulIndex, const SINT32 error)
 {
 	ENDPOINT* const endpoint = teulGetEndpoint(teulIndex);
-	if ( endpoint != NULL )
+	if ( endpoint != nullptr )
 		endpoint->sendError(error);
 }

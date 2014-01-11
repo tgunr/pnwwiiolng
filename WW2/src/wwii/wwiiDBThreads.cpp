@@ -48,7 +48,7 @@ DBThreadQuery::~DBThreadQuery()
 	if ( m_query )
 	{
 		delete m_query;
-		m_query = NULL;
+		m_query = nullptr;
 	}
 }
 
@@ -119,7 +119,7 @@ DBThreadQuery::Execute(UINT32 threadNo, DB::handle_t* conn, DBThread::DBNo* last
 			// hand the reult back to the parent thread.
 			const bool processed = Process(Query()->Rows());
 			delete m_query;
-			m_query = NULL;
+			m_query = nullptr;
 
 			if ( processed == true )
 				threadCallback(_callSuccess, this);
@@ -140,7 +140,7 @@ DBThreadQuery::Execute(UINT32 threadNo, DB::handle_t* conn, DBThread::DBNo* last
 			if ( m_query )
 			{
 				delete m_query;
-				m_query = NULL;
+				m_query = nullptr;
 			}
 
 			threadCallback(_callFailure, this);

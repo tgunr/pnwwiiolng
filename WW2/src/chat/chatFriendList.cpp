@@ -114,7 +114,7 @@ void
 FriendsQuery::Success()
 {
 	Player* player = PlayerInterface::Lookup(m_playerID);
-	if ( player == NULL )
+	if ( player == nullptr )
 		return;
 
 	HANDLES& list = (m_ignore) ? player->ignores() : player->friends();
@@ -135,7 +135,7 @@ void
 FriendsQuery::Failure()
 {
 	Player* player = PlayerInterface::Lookup(m_playerID);
-	if ( player != NULL )
+	if ( player != nullptr )
 		player->message(LSTR_CAUTION, (m_ignore) ? LSTR_IGNORE_ERROR : LSTR_FRIENDS_ERROR);
 }
 
@@ -164,7 +164,7 @@ void
 AddSocialCheck::Success()
 {
 	Player* player = PlayerInterface::Lookup(m_playerID);
-	if ( player == NULL )
+	if ( player == nullptr )
 		return;
 
 	if ( m_success == false )
@@ -183,7 +183,7 @@ void
 AddSocialCheck::Failure()
 {
 	Player* player = PlayerInterface::Lookup(m_playerID);
-	if ( player != NULL )
+	if ( player != nullptr )
 		player->message(LSTR_CAUTION, (m_ignore) ? LSTR_IGNORE_ERROR : LSTR_FRIENDS_ERROR);
 }
 

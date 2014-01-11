@@ -30,7 +30,7 @@ void
 strtProcessSyncCPs(const STRT_SYNC_CPS& syncCPs)
 {
 	Supercell* sc = strtGetSupercell(syncCPs.sx, syncCPs.sy);
-	if (sc == NULL)
+	if (sc == nullptr)
 	{
 		//Log the fact that we have an error.  But we arent' going to return
 		//	here.  Why?  We need to go ahead and unpack the rest of the
@@ -79,7 +79,7 @@ strtProcessSyncFacilities(const STRT_SYNC_FACILITIES& syncFacilities)
 	//Find the supercell being referenced here
 	Supercell* sc = strtGetSupercell(syncFacilities.sx, syncFacilities.sy);
 
-	if (sc == NULL)
+	if (sc == nullptr)
 	{
 		//Log the fact that we have an error.  But we arent' going to return
 		//	here.  Why?  We need to go ahead and unpack the rest of the
@@ -130,7 +130,7 @@ strtProcessSyncBuildings(const STRT_SYNC_BUILDINGS& syncBuildings)
 {
 	//Find the supercell being referenced here
 	Supercell* sc = strtGetSupercell(syncBuildings.sx, syncBuildings.sy);
-	if (sc == NULL)
+	if (sc == nullptr)
 	{
 		dbugLog(_FLA,"received sync buildings for supercell %d:%d, but it doesn't exist!  Unpacking rest of bogus message"
 			, syncBuildings.sx, syncBuildings.sy);
@@ -151,7 +151,7 @@ strtProcessSyncBuildings(const STRT_SYNC_BUILDINGS& syncBuildings)
 	for (i=0, b = syncBuildings.startID; i<syncBuildings.numEntries; ++i, ++b)
 	{
 		//Here's the NULL check repeated from above.
-		if (sc != NULL)
+		if (sc != nullptr)
 		{
 			sc->objects[b].setVisLevel(syncBuildings.vislevel[i]);
 #if defined(IS_MAP_HOST)

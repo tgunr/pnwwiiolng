@@ -21,7 +21,7 @@ public:
 
 public:
 	virtual bool activate() ;		// Special activation case.
-	virtual bool applyJoules(const SINT64& joules, class Player* player=NULL) ;
+	virtual bool applyJoules(const SINT64& joules, class Player* player=nullptr) ;
 
 public:
 	STODamage& damage() { return m_damage ; }

@@ -10,8 +10,8 @@ public:
 	static void Add(char _flag, const char* const _option, const char* _valueName, void (*handler)(const char*));
 	static void Add(const char* const _valueName, void (*handler)(const char*));
 
-	bool IsLast() const { return handler != NULL; }
-	bool IsRequired() const { return valueName != NULL && flag == 0 && option == NULL; }
+	bool IsLast() const { return handler != nullptr; }
+	bool IsRequired() const { return valueName != nullptr && flag == 0 && option == nullptr; }
 
 	std::string GetDescription() const;
 

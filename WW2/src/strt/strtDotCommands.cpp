@@ -176,22 +176,22 @@ _getCPByArguments(char* arguments, OOBMessage& message, bool allowBridges)
 {
 	SINT32 cpOID;
 	CPStruct* cp;
-	if ( arguments == NULL || *arguments == 0 )
+	if ( arguments == nullptr || *arguments == 0 )
 	{
 		if ( allowBridges )
 			cp = strtGetCPorBridge(message.m_cpID);
 		else
 			cp = strtGetCP(message.m_cpID);
 
-		if ( cp == NULL )
+		if ( cp == nullptr )
 		{
 			// If we couldn't find a cp, maybe they have a facility selected
 			FacilityStruct* facility;
 			facility = strtGetFacility(message.m_cpID);
-			if ( facility == NULL || facility->cp == NULL )
+			if ( facility == nullptr || facility->cp == nullptr )
 			{
 				LOCMESSAGE(LSTR_CAUTION, LSTR_SPECIFY_TOWN);
-				return NULL;
+				return nullptr;
 			}
 			cp = facility->cp;
 		}
@@ -205,16 +205,16 @@ _getCPByArguments(char* arguments, OOBMessage& message, bool allowBridges)
 		else
 			cp = strtGetCPByName(arguments);
 
-		if ( cp == NULL )
+		if ( cp == nullptr )
 		{
 			LOCMESSAGE(LSTR_CAUTION, LSTR_INVALID_CP_NAME, arguments);
-			return NULL;
+			return nullptr;
 		}
 
 		if ( cp->isBridge() && !allowBridges )
 		{
 			LOCMESSAGE(LSTR_CAUTION, LSTR_CANNOT_USE_BRIDGE);
-			return NULL;
+			return nullptr;
 		}
 	}
 
@@ -323,7 +323,7 @@ LOGICAL _dotHelp(char* arguments, OOBMessage& message)
 	UINT32 i;
 	char buf[2048];
 
-	if ( arguments == NULL || *arguments == 0 )
+	if ( arguments == nullptr || *arguments == 0 )
 	{
 		BETAMSG("';' commands available:");
 		buf[0] = 0;
@@ -390,7 +390,7 @@ _setIntegerValue(const char* arguments, const OOBMessage& message
 {
 	Tp newVal;
 
-	if ( arguments == NULL || *arguments == 0 )
+	if ( arguments == nullptr || *arguments == 0 )
 	{
 		BETAMSG("Please specify %s in %s.", fieldName, unit);
 		return FALSE;
@@ -398,7 +398,7 @@ _setIntegerValue(const char* arguments, const OOBMessage& message
 
 	if ( *arguments == '?' )
 	{
-		if ( zeroMessage != NULL && variable <= (Tp)min )
+		if ( zeroMessage != nullptr && variable <= (Tp)min )
 			BETAMSG(zeroMessage);
 		else
 			BETAMSG("Current %s: %d %s.", fieldName, variable, unit);
@@ -447,7 +447,7 @@ _dotArenaLock(char* arguments, OOBMessage& message)
 	if ( _setIntegerValue(arguments, message
 				, host_config.arena.lock
 				, "arena lock", "(0=off, 1=cap, 2=spawn, 4=kill, 8=entry)", 0, 15
-				, NULL
+				, nullptr
 				) )
 	{
 		dotApplyConfig();
@@ -532,7 +532,7 @@ static void
 _makeList(CPStruct* cp, const OOBMessage& message)
 {
 	const FacilityStruct* fac;
-	const char* joiner = NULL;
+	const char* joiner = nullptr;
 
 	std::string& list = cp->ownMessage[message.m_side];
 
@@ -542,12 +542,12 @@ _makeList(CPStruct* cp, const OOBMessage& message)
 		{
 			list = ( message.m_side == AXIS ) ? "Allied: " : "Axis: ";
 
-			for ( fac = cp->facilityList; fac != NULL; fac = fac->next )
+			for ( fac = cp->facilityList; fac != nullptr; fac = fac->next )
 			{
 				if ( fac->side == message.m_side || fac->type == FACILITY_FIREBASE )
 					continue;
 
-				if ( joiner == NULL )
+				if ( joiner == nullptr )
 					joiner = ", ";
 				else
 					list += joiner;
@@ -587,7 +587,7 @@ _factoryOwnership(FacilityStruct* fac, OOBMessage& message)
 
 	UINT32 damage = 0;
 	UINT32 factories = 0;
-	for ( ObjectStruct* object = fac->objectList; object != NULL; object = object->next )
+	for ( ObjectStruct* object = fac->objectList; object != nullptr; object = object->next )
 	{
 		if ( !object->isProductionCenter() )
 			continue;
@@ -621,7 +621,7 @@ _fbOwnership(FacilityStruct* fb, OOBMessage& message)
 	UINT64 otherDmg = 0LL;
 	char pctg[6];
 	ObjectStruct* obj;
-	for ( obj = fb->objectList; obj != NULL; obj = obj->next )
+	for ( obj = fb->objectList; obj != nullptr; obj = obj->next )
 	{
 		if ( obj->m_maxDamageJoules == 0 )
 			continue;
@@ -676,14 +676,14 @@ _dotOwn(char* arguments, OOBMessage& message)
 		return FALSE;
 	}
 
-	if ( arguments != NULL && *arguments != 0 && !isalpha(*arguments) )
+	if ( arguments != nullptr && *arguments != 0 && !isalpha(*arguments) )
 	{
 		LOCMESSAGE(LSTR_CAUTION, LSTR_SPECIFY_TOWN);
 		return FALSE;
 	}
 
 	FacilityStruct* fb = strtGetFacility(message.m_cpID);
-	if ( fb != NULL )
+	if ( fb != nullptr )
 	{
 		if ( fb->type == FACILITY_FIREBASE )
 			return _fbOwnership(fb, message);
@@ -692,7 +692,7 @@ _dotOwn(char* arguments, OOBMessage& message)
 	}
 
 	cp = _getCPByArguments(arguments, message, true);
-	if ( cp == NULL )
+	if ( cp == nullptr )
 		return FALSE;
 
 	// Describe objectives
@@ -755,18 +755,18 @@ _makeFBList(CPStruct* cp, const OOBMessage& message)
 	lists[AXIS] = "";
 
 	// Iterate across all the depots and check to see if we have an FB on it
-	for ( fac = cp->facilityTypeIndex[FACILITY_DEPOT]; fac != NULL; fac = fac->typeNext )
+	for ( fac = cp->facilityTypeIndex[FACILITY_DEPOT]; fac != nullptr; fac = fac->typeNext )
 	{
-		if ( fac->m_outgoingLink == NULL
-			|| fac->m_incomingLink == NULL
-			|| fac->m_outgoingLink->endDepot == NULL )
+		if ( fac->m_outgoingLink == nullptr
+			|| fac->m_incomingLink == nullptr
+			|| fac->m_outgoingLink->endDepot == nullptr )
 			continue;
 
 		fb = fac->m_outgoingLink->firebase;
-		if ( fb == NULL || fb->isOpen() == false )
+		if ( fb == nullptr || fb->isOpen() == false )
 		{
 			fb = fac->m_incomingLink->firebase;
-			if ( fb == NULL || fb->isOpen() == false )
+			if ( fb == nullptr || fb->isOpen() == false )
 				continue;
 		}
 
@@ -801,14 +801,14 @@ _dotFBs(char* arguments, OOBMessage& message)
 		return FALSE;
 	}
 
-	if ( arguments != NULL && *arguments != 0 && !isalpha(*arguments) )
+	if ( arguments != nullptr && *arguments != 0 && !isalpha(*arguments) )
 	{
 		LOCMESSAGE(LSTR_CAUTION, LSTR_SPECIFY_TOWN);
 		return FALSE;
 	}
 
 	cp = _getCPByArguments(arguments, message, false);
-	if ( cp == NULL )
+	if ( cp == nullptr )
 		return FALSE;
 
 	const char* hold = (message.m_side == cp->side && cp->isHolding()) ? " HOLD" : "";
@@ -835,7 +835,7 @@ _dotCPInfo(char* arguments, OOBMessage& message)
 	CPStruct* cp;
 
 	cp = _getCPByArguments(arguments, message, true);
-	if ( cp == NULL )
+	if ( cp == nullptr )
 		return FALSE;
 
 	_printCPInfo(message, cp);
@@ -885,7 +885,7 @@ _dotCPDump(char* arguments, OOBMessage& message)
     }
 
 	cp = _getCPByArguments(arguments, message, true);
-	if ( cp == NULL )
+	if ( cp == nullptr )
 		return FALSE;
 
 	_printCPInfo(message, cp);
@@ -908,7 +908,7 @@ _dotCPDump(char* arguments, OOBMessage& message)
 				supplier = fac->supplyingFacility((StratHCUnit&)*fac->CP().m_units.begin()->second, false);
 
 			const char* supplyName;
-			if ( supplier != NULL )
+			if ( supplier != nullptr )
 				supplyName = strtAbbrFacilityName(supplier, cp);
 			else
 				supplyName = "self";
@@ -926,7 +926,7 @@ _dotCPDump(char* arguments, OOBMessage& message)
 static LOGICAL
 _dotPwnFacQuery(OOBMessage& message, CPStruct* cp)
 {
-	if ( cp == NULL )
+	if ( cp == nullptr )
 	{
 		BETAMSG("You must select a CP at the map first");
 		return FALSE;
@@ -941,7 +941,7 @@ _dotPwnFacQuery(OOBMessage& message, CPStruct* cp)
 	SINT32 i;
 	FacilityStruct* facility;
 
-	for ( i = 0, facility = cp->facilityList; facility != NULL; facility = facility->next )
+	for ( i = 0, facility = cp->facilityList; facility != nullptr; facility = facility->next )
 	{
 		if ( facility->type == FACILITY_FIREBASE )
 			continue;
@@ -975,13 +975,13 @@ _dotPwnFac(char* arguments, OOBMessage& message)
 	if ( message.m_text[0] == 'c' )
 		quietly = true;
 
-	if ( arguments != NULL && *arguments != 0 )
+	if ( arguments != nullptr && *arguments != 0 )
 	{
 		if ( *arguments == '?' )
 			return _dotPwnFacQuery(message, cp);
 
 		facilityStr = strchr(arguments, ' ');
-		if ( facilityStr != NULL )
+		if ( facilityStr != nullptr )
 		{
 			*(facilityStr++) = 0;
 
@@ -993,7 +993,7 @@ _dotPwnFac(char* arguments, OOBMessage& message)
 			}
 
 			uFacNo = atoi(facilityStr);
-			if ( uFacNo < 1 || (facility = strtGetFacilityByOID(uFacNo)) == NULL )
+			if ( uFacNo < 1 || (facility = strtGetFacilityByOID(uFacNo)) == nullptr )
 			{
 				BETAMSG("Invalid facility number, '%s', use '%s ?' for cp-facility list"
 						, facilityStr
@@ -1025,21 +1025,21 @@ _dotPwnFac(char* arguments, OOBMessage& message)
 static LOGICAL
 _dotPwnCP(char* arguments, OOBMessage& message)
 {
-	char* cpName = NULL;
+	char* cpName = nullptr;
 	WWII_COUNTRY newOwner;
 	CPStruct* cp;
 	bool quietly = false;
 	bool force = true;
 
 	// Find the second argument
-	if ( arguments == NULL || *arguments == 0 )
+	if ( arguments == nullptr || *arguments == 0 )
 	{
 		BETAMSG("Specify Country Code and (optionally) CP name");
 		return FALSE;
 	}
 
 	cpName = strchr(arguments, ' ');
-	if ( cpName != NULL )
+	if ( cpName != nullptr )
 		*(cpName++) = 0;
 
 	if ( *arguments == '~' )
@@ -1056,7 +1056,7 @@ _dotPwnCP(char* arguments, OOBMessage& message)
 	}
 
 	cp = _getCPByArguments(cpName, message, false);
-	if ( cp == NULL )
+	if ( cp == nullptr )
 		return FALSE;
 
 	if ( strncmp(message.m_text, "ch", 2) == 0 )
@@ -1084,7 +1084,7 @@ _dotFacilities(char* arguments, OOBMessage& message)
 	UINT16 uNextOID;
 	FacilityStruct* cur;
 
-	if ( arguments == NULL || *arguments == '?' || *arguments == 0 )
+	if ( arguments == nullptr || *arguments == '?' || *arguments == 0 )
 	{
 		BETAMSG("*** Use with diligence - this operation is expensive");
 		BETAMSG("Usage: %s <beginning of facility name>, e,g. %s Antw"
@@ -1096,7 +1096,7 @@ _dotFacilities(char* arguments, OOBMessage& message)
 
 	uNextOID = 0;
 	uCount = 0;
-	while ( (cur = strtNextMatchingFacility(arguments, uNextOID)) != NULL )
+	while ( (cur = strtNextMatchingFacility(arguments, uNextOID)) != nullptr )
 	{
 		if ( uCount == 15 )
 		{
@@ -1124,7 +1124,7 @@ _dotRebuildCP(char* arguments, OOBMessage& message)
 	CPStruct* cp;
 
 	cp = _getCPByArguments(arguments, message, true);
-	if ( cp == NULL )
+	if ( cp == nullptr )
 		return FALSE;
 
 	strtForceRebuildCP(*cp);
@@ -1138,14 +1138,14 @@ static LOGICAL
 _dotOpenCloseFac(char* arguments, OOBMessage& message)
 {
 	LOGICAL opening = TRUE;				// Open is the default
-	FacilityStruct* fac = NULL;
+	FacilityStruct* fac = nullptr;
 	UINT32 facID;
 
-	if ( arguments == NULL || *arguments == 0 )
+	if ( arguments == nullptr || *arguments == 0 )
 	{
 		CPStruct* cp;
 		cp = strtGetCP(message.m_cpID);
-		if ( cp == NULL )
+		if ( cp == nullptr )
 		{
 			LOCMESSAGE(LSTR_CAUTION, LSTR_SELECT_FACILITY);
 			return FALSE;
@@ -1162,7 +1162,7 @@ _dotOpenCloseFac(char* arguments, OOBMessage& message)
 	if ( facID > 0 )
 		fac = strtGetFacilityByOID(facID);
 
-	if ( fac == NULL )
+	if ( fac == nullptr )
 	{
 		BETAMSG("Invalid facility number, '%s', use '%s' for list of facilities"
 						, arguments
@@ -1204,7 +1204,7 @@ _dotForceFacilitys(char* arguments, OOBMessage& message)
 	CPStruct* cp;
 	FacilityStruct* fac;
 
-	if ( arguments != NULL && strcasecmp(arguments, "all") == 0 )
+	if ( arguments != nullptr && strcasecmp(arguments, "all") == 0 )
 	{
 		cp = strtGetCPList();
 		doAll = TRUE;
@@ -1219,13 +1219,13 @@ _dotForceFacilitys(char* arguments, OOBMessage& message)
 	if ( tolower(message.m_text[0]) == 'c' )
 		opening = FALSE;
 
-	for (; cp != NULL; cp = cp->next )
+	for (; cp != nullptr; cp = cp->next )
 	{
 		// Find all matching CPs (or 'all' cps)
-		if ( arguments != NULL && doAll == false && strcasecmp(arguments, cp->name) != 0 )
+		if ( arguments != nullptr && doAll == false && strcasecmp(arguments, cp->name) != 0 )
 			continue;
 
-		for ( fac = cp->facilityList; fac != NULL; fac = fac->next )
+		for ( fac = cp->facilityList; fac != nullptr; fac = fac->next )
 		{
 			if ( fac->type == FACILITY_FIREBASE )
 				continue;
@@ -1250,7 +1250,7 @@ _dotForceFacilitys(char* arguments, OOBMessage& message)
 			BETAMSG("*CAUTION* No facilities indexed in world???");
 			return FALSE;
 		}
-		else if ( arguments != NULL && *arguments != 0 )
+		else if ( arguments != nullptr && *arguments != 0 )
 		{
 			BETAMSG("No CP matching '%s' found", arguments);
 			return FALSE;
@@ -1298,7 +1298,7 @@ _dotForceFBs(char* arguments, OOBMessage& message)
 	CPStruct* cp;
 	FacilityStruct* fb;
 
-	if ( arguments != NULL && strcasecmp(arguments, "all") == 0 )
+	if ( arguments != nullptr && strcasecmp(arguments, "all") == 0 )
 	{
 		cp = strtGetCPList();
 		doAll = TRUE;
@@ -1306,7 +1306,7 @@ _dotForceFBs(char* arguments, OOBMessage& message)
 	else
 	{
 		cp = _getCPByArguments(arguments, message, false);
-		if ( cp == NULL )
+		if ( cp == nullptr )
 			return FALSE;
 	}
 
@@ -1318,13 +1318,13 @@ _dotForceFBs(char* arguments, OOBMessage& message)
 		doAll = TRUE;
 	}
 
-	for (; cp != NULL; cp = cp->next )
+	for (; cp != nullptr; cp = cp->next )
 	{
 		// Find all matching CPs (or 'all' cps)
 		if ( doAll == FALSE && strcasecmp(arguments, cp->name) != 0 )
 			continue;
 
-		for ( fb = cp->facilityTypeIndex[FACILITY_FIREBASE]; fb != NULL; fb = fb->typeNext )
+		for ( fb = cp->facilityTypeIndex[FACILITY_FIREBASE]; fb != nullptr; fb = fb->typeNext )
 		{
 			strtInitFirebase(*fb, opening);
 			affected++;
@@ -1444,14 +1444,14 @@ _dotBroadcastCP(char* arguments, OOBMessage& message)
 {
 	SINT32 currentTime = teulTime();
 
-	if ( arguments != NULL && arguments[0] == '?' )
+	if ( arguments != nullptr && arguments[0] == '?' )
 	{
 		LOCMESSAGE(LSTR_USAGE, LSTR_BROADCAST_USAGE, message.m_text);
 		LOCMESSAGE(LSTR_DETAIL, LSTR_BROADCAST_DETAIL);
 		return TRUE;
 	}
 
-	if ( arguments != NULL && strcasecmp(arguments, "all") == 0 )
+	if ( arguments != nullptr && strcasecmp(arguments, "all") == 0 )
 	{
 		if ( currentTime > _lastCPBroadcast + 60 )
 		{
@@ -1467,7 +1467,7 @@ _dotBroadcastCP(char* arguments, OOBMessage& message)
 		CPStruct* cp;
 
 		cp = _getCPByArguments(arguments, message, true);
-		if ( cp == NULL )
+		if ( cp == nullptr )
 			return FALSE;
 
 		strtQueueCPStatus(cp);
@@ -1484,17 +1484,17 @@ _dotBroadcastFacs(char* arguments, OOBMessage& message)
 	CPStruct* cp;
 	FacilityStruct* facility;
 
-	if ( arguments != NULL && arguments[0] == '?' )
+	if ( arguments != nullptr && arguments[0] == '?' )
 	{
 		BETAMSG("%s [cp name]: Retransmit status of facilities in specified or current CP", message.m_text);
 		return TRUE;
 	}
 
 	cp = _getCPByArguments(arguments, message, true);
-	if ( cp == NULL )
+	if ( cp == nullptr )
 		return FALSE;
 
-	for ( facility = cp->facilityList; facility != NULL; facility = facility->next )
+	for ( facility = cp->facilityList; facility != nullptr; facility = facility->next )
 	{
 		strtQueueFacilityStatus(facility);
 		i++;
@@ -1509,18 +1509,18 @@ _dotBroadcastFacs(char* arguments, OOBMessage& message)
 static StratHCUnit*
 _getHCUnit(const char* arguments, const OOBMessage& message)
 {
-	StratHCUnit* unit = NULL;
+	StratHCUnit* unit = nullptr;
 
-	if ( arguments != NULL && arguments[0] != 0 )
+	if ( arguments != nullptr && arguments[0] != 0 )
 	{
 		unit = StratHCUnit::Lookup(arguments);
-		if ( unit == NULL )
+		if ( unit == nullptr )
 			RESPOND("%s requires you be in or specify a brigade", message.m_text);
 	}
 	else
 	{
 		unit = StratHCUnit::Lookup(message.m_brigadeID);
-		if ( unit == NULL )
+		if ( unit == nullptr )
 			RESPOND("Unrecognized brigadeID, sorry");
 	}
 
@@ -1531,7 +1531,7 @@ static LOGICAL
 _dotResupplyUnit(char* arguments, OOBMessage& message)
 {
 	StratHCUnit* unit = _getHCUnit(arguments, message);
-	if ( unit == NULL )
+	if ( unit == nullptr )
 		return FALSE;
 
 	BETAMSG("Resetting full supply of %s (%s)", unit->name(), unit->callsign());
@@ -1545,7 +1545,7 @@ static LOGICAL
 _dotRestartSupply(char* arguments, OOBMessage& message)
 {
 	StratHCUnit* unit = _getHCUnit(arguments, message);
-	if ( unit == NULL )
+	if ( unit == nullptr )
 		return FALSE;
 
 	RESPOND("Restart resupply queue for %s (%s) [no effect if unit is out of supply]", unit->name(), unit->callsign());
@@ -1568,7 +1568,7 @@ _dotDumpResupply(char* arguments, OOBMessage& message)
 	}
 
 	StratHCUnit* unit = _getHCUnit(arguments, message);
-	if ( unit == NULL )
+	if ( unit == nullptr )
 		return FALSE;
 
 #ifdef PUBLIC_RELEASE
@@ -1607,10 +1607,10 @@ _dotDumpResupply(char* arguments, OOBMessage& message)
 static LOGICAL
 _dotBlowFB(char* arguments, OOBMessage& message)
 {
-	FacilityStruct* fb = NULL;
+	FacilityStruct* fb = nullptr;
 	UINT32 fbOID = 0;
 
-	if ( arguments != NULL && *arguments != 0 )
+	if ( arguments != nullptr && *arguments != 0 )
 	{
 		fbOID = atol(arguments);
 		if ( fbOID > 0 )
@@ -1619,7 +1619,7 @@ _dotBlowFB(char* arguments, OOBMessage& message)
 	else
 		fb = strtGetFacility(message.m_cpID);
 
-	if ( fb == NULL || fb->type != FACILITY_FIREBASE )
+	if ( fb == nullptr || fb->type != FACILITY_FIREBASE )
 	{
 		BETAMSG("Specify firebase to destroy");
 		return FALSE;
@@ -1699,14 +1699,14 @@ _dotFallback(char* arguments, OOBMessage& message)
 	CPStruct* cp;
 
 	cp = strtGetCP(message.m_cpID);
-	if ( cp == NULL )
+	if ( cp == nullptr )
 	{
 		LOCMESSAGE(LSTR_CAUTION, LSTR_SELECT_FACILITY);
 		return FALSE;
 	}
 
 	// Whether we are in "try" or "do" mode depends on the supply of a '!'
-	bool testOnly = ( arguments == NULL || *arguments != '!' );
+	bool testOnly = ( arguments == nullptr || *arguments != '!' );
 	SCMD_RESULT result = cp->issueFallback(message.m_side, testOnly, message.m_originatorID);
 
 	chatSendSCMDResult(message.m_originatorID
@@ -1744,7 +1744,7 @@ _nextMove(const OOBMessage& message, const StratHCUnit* unit)
 		text += " Fallback: ";
 
 		const CPStruct* fallback = unit->findFallback();
-		if ( NULL != fallback )
+		if ( nullptr != fallback )
 			text += fallback->name;
 		else
 			text += "None";
@@ -1765,7 +1765,7 @@ _dotNextMove(char* arguments, OOBMessage& message)
 	if ( args.empty() )
 	{
 		unit = _getHCUnit(arguments, message);
-		if ( unit == NULL )
+		if ( unit == nullptr )
 		{
 			LOCMESSAGE(LSTR_CAUTION, LSTR_NO_BRIGADE);
 			return TRUE;
@@ -1784,7 +1784,7 @@ _dotNextMove(char* arguments, OOBMessage& message)
 	for ( UINT32 i = 0; i < args.size() && visited.size() < 6; ++i )
 	{
 		unit = StratHCUnit::Lookup(args[i]);
-		if ( unit == NULL )
+		if ( unit == nullptr )
 		{
 			LOCMESSAGE(LSTR_CAUTION, LSTR_UNKNOWN_UNIT, args[i]);
 			return TRUE;
@@ -1809,14 +1809,14 @@ _dotHoldAtAllCosts(char* arguments, OOBMessage& message)
 	CPStruct* cp;
 
 	cp = strtGetCP(message.m_cpID);
-	if ( cp == NULL )
+	if ( cp == nullptr )
 	{
 		LOCMESSAGE(LSTR_CAUTION, LSTR_SELECT_FACILITY);
 		return FALSE;
 	}
 
 	// Pass a trailing '*' to indicate 'do it now'
-	bool execute = ( arguments != NULL && *arguments == '!' );
+	bool execute = ( arguments != nullptr && *arguments == '!' );
 	SCMD_RESULT result = cp->holdAtAllCosts(message.m_side, execute);
 
 	chatSendSCMDResult(message.m_originatorID
@@ -1834,7 +1834,7 @@ _dotOverrun(char* arguments, OOBMessage& message)
 	CPStruct* cp;
 
 	cp = strtGetCP(message.m_cpID);
-	if ( cp == NULL )
+	if ( cp == nullptr )
 	{
 		LOCMESSAGE(LSTR_CAUTION, LSTR_SELECT_FACILITY);
 		return FALSE;
@@ -1856,8 +1856,8 @@ static void
 _showObjectiveInfo(OOBMessage& message)
 {
 	// Have they targetted something
-	CPStruct* cp = _getCPByArguments(NULL, message, true);
-	if ( cp == NULL )
+	CPStruct* cp = _getCPByArguments(nullptr, message, true);
+	if ( cp == nullptr )
 	{
 		LOCMESSAGE(LSTR_CAUTION, LSTR_SEL_TARGET);
 		return;
@@ -1993,16 +1993,16 @@ _dotObjectives(char* arguments, OOBMessage& message)
 static void
 _setTarget(const FULL_OBJ_ID& id)
 {
-	targeted_cp = NULL;
-	targeted_fac = NULL;
+	targeted_cp = nullptr;
+	targeted_fac = nullptr;
 
 	if ( id.id )
 	{
 		targeted_cp = strtGetCP(id);
-		if ( targeted_cp == NULL )
+		if ( targeted_cp == nullptr )
 		{
 			targeted_fac = strtGetFacility(id);
-			if ( targeted_fac != NULL )
+			if ( targeted_fac != nullptr )
 				targeted_cp = targeted_fac->cp;
 		}
 	}
@@ -2027,8 +2027,8 @@ _dotRedeploy(char* arguments, OOBMessage& message)
 	bool applyDelay = false;
 	bool transferSupply = false;
 	bool illegal = false;
-	StratHCUnit* unit = NULL;
-	CPStruct* destination = NULL;
+	StratHCUnit* unit = nullptr;
+	CPStruct* destination = nullptr;
 
 	std::vector<const char*> args;
 	_vectorize(arguments, args);
@@ -2045,16 +2045,16 @@ _dotRedeploy(char* arguments, OOBMessage& message)
 			LOCMESSAGE(LSTR_DETAIL, LSTR_REDEPLOY_DETAIL);
 			return TRUE;
 		}
-		else if ( unit == NULL )
+		else if ( unit == nullptr )
 		{
 			unit = StratHCUnit::Lookup(args[i]);
-			if ( unit == NULL )
+			if ( unit == nullptr )
 			{
 				LOCMESSAGE(LSTR_CAUTION, LSTR_UNKNOWN_UNIT, args[i]);
 				return FALSE;
 			}
 		}
-		else if ( destination == NULL )
+		else if ( destination == nullptr )
 		{
 			UINT32 id = atol(args[i]);
 			if ( id == 0 )
@@ -2062,7 +2062,7 @@ _dotRedeploy(char* arguments, OOBMessage& message)
 			else
 				destination = strtGetCPByOID(id);
 
-			if ( destination == NULL )
+			if ( destination == nullptr )
 			{
 				LOCMESSAGE(LSTR_CAUTION, LSTR_INVALID_CP_NAME, args[i]);
 				return FALSE;
@@ -2075,27 +2075,27 @@ _dotRedeploy(char* arguments, OOBMessage& message)
 		}
 	}
 
-	if ( destination == NULL )
+	if ( destination == nullptr )
 	{
 		destination = strtGetCP(message.m_cpID);
-		if ( destination == NULL )
+		if ( destination == nullptr )
 		{
 			FacilityStruct* fac = strtGetFacility(message.m_cpID);
-			if ( fac != NULL )
+			if ( fac != nullptr )
 				destination = fac->cp;
 		}
 
-		if ( destination == NULL )
+		if ( destination == nullptr )
 		{
 			LOCMESSAGE(LSTR_CAUTION, LSTR_SPECIFY_TOWN);
 			return FALSE;
 		}
 	}
 
-	if ( unit == NULL )
+	if ( unit == nullptr )
 	{
 		unit = StratHCUnit::Lookup(message.m_brigadeID);
-		if ( unit == NULL )
+		if ( unit == nullptr )
 		{
 			LOCMESSAGE(LSTR_CAUTION, LSTR_JOIN_OR_SPECIFY_BDE, message.m_text);
 			return FALSE;
@@ -2439,14 +2439,14 @@ _describeSHCU(StratHCUnit* unit)
 static LOGICAL
 _dotBrigade(char* arguments, OOBMessage& message)
 {
-	if ( arguments == NULL || *arguments == 0 )
+	if ( arguments == nullptr || *arguments == 0 )
 	{
 		BETAMSG("Specificy brigade/division short name");
 		return TRUE;
 	}
 
 	StratHCUnit* unit = (StratHCUnit*)HCUnit::Lookup(arguments);
-	if ( unit == NULL || (!unit->isBrigade() && !unit->isDivision()) )
+	if ( unit == nullptr || (!unit->isBrigade() && !unit->isDivision()) )
 	{
 		LOCMESSAGE(LSTR_CAUTION, LSTR_UNKNOWN_UNIT, arguments);
 		return TRUE;
@@ -2459,7 +2459,7 @@ _dotBrigade(char* arguments, OOBMessage& message)
 		std::string response = "";
 		StratHCUnit* child;
 
-		for ( child = unit->next(); child != NULL; child = child->next() )
+		for ( child = unit->next(); child != nullptr; child = child->next() )
 		{
 			if ( !response.empty() ) response +=", ";
 			response += "+";
@@ -2542,7 +2542,7 @@ DOT_COMMANDS dotCommands[] =
 #ifdef BETA_RELEASE
 ,	{	"restart",		_dotRestart,		"Force strat-host restart" }
 #endif // DEV_BUILD
-,	{	NULL,			NULL,				NULL }
+,	{	nullptr,			nullptr,				nullptr }
 };
 
 // Process an out-of-band message such as a config change command, etc.
@@ -2563,7 +2563,7 @@ void strtProcessOOBMessage(OOBMessage& message)
 
 	// Locate the arguments or end of string
 	args = strchr(message.m_text, ' ');
-	if ( args != NULL )
+	if ( args != nullptr )
 	{
 		// We've found a space, nuke it and find the arguments
 		*args++ = 0;
@@ -2573,10 +2573,10 @@ void strtProcessOOBMessage(OOBMessage& message)
 
 		// Finding the EOS means there was only trailing whitespace
 		if ( *args == 0 )
-			args = NULL;
+			args = nullptr;
 	}
 
-	if ( args == NULL )
+	if ( args == nullptr )
 		args = const_cast<char*>("");
 
 	for ( i = 0; dotCommands[i].command; i++ )

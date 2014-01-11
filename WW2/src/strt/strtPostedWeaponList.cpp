@@ -51,7 +51,7 @@ POSTED_WEAPON::_register()
 	m_weaponSerial.serial = static_cast<UINT32>(serialCounter.getNext());
 	if ( m_weaponSerial.serial == 0 )
 		LogAbort("Got zero for posted weapon serial number");
-	if ( strtFindPostedWeapon(m_weaponSerial.serial) != NULL )
+	if ( strtFindPostedWeapon(m_weaponSerial.serial) != nullptr )
 		LogAbort("v:%u already in use", m_weaponSerial.serial);
 
 	postedWeapons[m_weaponSerial.serial] = this;
@@ -108,7 +108,7 @@ POSTED_WEAPON*
 strtFindPostedWeapon(UINT32 serialID)
 {
 	POSTED_WEAPONS::iterator it = postedWeapons.find(serialID);
-	return ( it != postedWeapons.end() ) ? it->second : NULL;
+	return ( it != postedWeapons.end() ) ? it->second : nullptr;
 }
 UINT32
 strtGetNextSerial()
@@ -124,7 +124,7 @@ POSTED_WEAPON::cancelReinforcement()
 {
 	ResupplyTicket* ticket = m_resupplyTicket;
 
-	if ( ticket == NULL )
+	if ( ticket == nullptr )
 		return;
 
 	// We don't handle multiple-unit deliveries just yet
@@ -139,8 +139,8 @@ POSTED_WEAPON::cancelReinforcement()
 
 	m_supplyingBrigade->cancelResupplyTicket(ticket);
 
-	assert( m_resupplyTicket == NULL );
-	assert( ticket->m_postedWeapon == NULL );
+	assert( m_resupplyTicket == nullptr );
+	assert( ticket->m_postedWeapon == nullptr );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -152,7 +152,7 @@ POSTED_WEAPON::detachReinforcement()
 {
 	ResupplyTicket* ticket = m_resupplyTicket;
 
-	if ( ticket == NULL )
+	if ( ticket == nullptr )
 		return;
 
 	assert( ticket->m_postedWeapon == this );
@@ -165,8 +165,8 @@ POSTED_WEAPON::detachReinforcement()
 					);
 
 	// Sever the reverse reference to ourselves
-	m_resupplyTicket->m_postedWeapon = NULL;
-	m_resupplyTicket = NULL;
+	m_resupplyTicket->m_postedWeapon = nullptr;
+	m_resupplyTicket = nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -176,7 +176,7 @@ POSTED_WEAPON::detachReinforcement()
 void
 POSTED_WEAPON::scheduleReinforcement()
 {
-	assert( m_supplyingBrigade != NULL );
+	assert( m_supplyingBrigade != nullptr );
 
 	detachReinforcement();
 
@@ -192,14 +192,14 @@ POSTED_WEAPON::scheduleReinforcement()
 		return;
 	}
 
-	if ( m_supplyingBrigade->homeCP() == NULL )
+	if ( m_supplyingBrigade->homeCP() == nullptr )
 	{
 		TELL_TESTER(m_commander, "Brigade is off-map, not scheduling reinforcement");
 		return;
 	}
 
 	TOE_::WeaponInstance* toeEntry = m_supplyingBrigade->toeWeaponInstance(spec());
-	if ( toeEntry == NULL )
+	if ( toeEntry == nullptr )
 	{
 		TELL_TESTER(m_commander, "ERROR: No toeWeaponInstance!");
 		dbugLog(_FLA, "hcu:%u TOE has no toeWeaponInstance for %s while scheduling reinforcement"
@@ -216,7 +216,7 @@ POSTED_WEAPON::scheduleReinforcement()
 	}
 
 	m_resupplyTicket = m_supplyingBrigade->createResupplyTicket(*toeEntry, false, resupplyTime, 1, this);
-	if ( m_resupplyTicket == NULL )
+	if ( m_resupplyTicket == nullptr )
 	{
 		TELL_TESTER(m_commander, "I tried to create a resupply ticket for you, but all I got was this NULL");
 		return;
@@ -234,7 +234,7 @@ POSTED_WEAPON::scheduleReinforcement()
 void
 POSTED_WEAPON::post(WeaponEntry* atEntry, bool isReserve)
 {
-	assert( m_supplyingBrigade != NULL );
+	assert( m_supplyingBrigade != nullptr );
 
 	if ( isReserve )
 		m_status = _RESERVED;
@@ -255,16 +255,16 @@ POSTED_WEAPON::post(WeaponEntry* atEntry, bool isReserve)
 		m_supplyingBrigade->incrementThrottle(this);
 	}
 	else
-		m_postingEntry = NULL;
+		m_postingEntry = nullptr;
 
-	assert( m_resupplyTicket == NULL || m_resupplyTicket->m_postedWeapon == this );
+	assert( m_resupplyTicket == nullptr || m_resupplyTicket->m_postedWeapon == this );
 }
 
 void
 POSTED_WEAPON::cancelPost()
 {
 	assert( m_status == _RESERVED || m_status == _POSTED || m_status == _SPAWNED );
-	assert( m_supplyingBrigade != NULL );
+	assert( m_supplyingBrigade != nullptr );
 
 	dbugLog(_FLD, "v:%u cancelling post", serial());
 
@@ -276,17 +276,17 @@ POSTED_WEAPON::cancelPost()
 	// (where applicable, e.g. depots)
 	m_supplyingBrigade->decrementThrottle(this);
 
-	if ( m_expiryUpdate != NULL )
+	if ( m_expiryUpdate != nullptr )
 		cnvyRemoveWeaponFromExpireList(*this);
 
 	// Remove the posting facility link
 	if ( m_postingEntry )
-		m_postingEntry = NULL;
+		m_postingEntry = nullptr;
 
 	m_supplyingBrigade->postedWeaponList().remove(this);
 
 	m_status = _CANCELLED;
 
-	assert( m_resupplyTicket == NULL );
+	assert( m_resupplyTicket == nullptr );
 }
 

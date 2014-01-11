@@ -125,14 +125,14 @@ int select_fn(const struct dirent* file)
 static bool
 _getListOfSDMFiles(std::vector<std::string>& into)
 {
-	struct dirent** namelist = NULL;
+	struct dirent** namelist = nullptr;
 	SINT32 n = scandir(cv_terrainSubdir.GetString(), &namelist, select_fn, alphasort);
 	for ( SINT32 i = 0; i < n; ++i )
 	{
 		into.push_back(namelist[i]->d_name);
 		free(namelist[i]);
 	}
-	if ( namelist != NULL )
+	if ( namelist != nullptr )
 		free(namelist);
 	return (n >= 0);
 }
@@ -256,7 +256,7 @@ main(int argc, char** argv)
 	else
 	{
 		man = fopen(cv_importFile.GetString(), "w");
-		if ( man == NULL )
+		if ( man == nullptr )
 		{
 			fprintf(stderr, "ERROR: %s: unable to write to manifest file, %s.\n", program, cv_importFile.GetString());
 			exit(-1);

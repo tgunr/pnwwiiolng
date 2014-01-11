@@ -28,7 +28,7 @@ infoSendCompInfoRequest(SINT32 connection, const char* message)
 	COMPUTER_INFO_REQ req;
 
 	// Don't pass a NULL, pass an empty string.
-	assert( message != NULL );
+	assert( message != nullptr );
 
 	strsafecpy(req.text, message);
 	req.size = strlen(req.text) + sizeof('\0');
@@ -62,7 +62,7 @@ _recvPlayInfoSend(ACTION_OBJECT* const a)
 	}
 
 	Auth::ClientData* cdata = (Auth::ClientData*)teulGetPersonaData(a->teulIndex);
-	if ( cdata == NULL )
+	if ( cdata == nullptr )
 	{
 		dbugLog(_FLW, "t:%d no connection data for playInfoSend", a->teulIndex);
 		return -EINVAL;

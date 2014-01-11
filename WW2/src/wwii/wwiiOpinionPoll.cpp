@@ -19,7 +19,7 @@ const char*
 OpinionPoll::title() const
 {
 	if ( empty() )
-		return NULL;
+		return nullptr;
 	else
 		return m_title.c_str();
 }
@@ -31,7 +31,7 @@ const char*
 OpinionPoll::entry(UINT32 i) const
 {
 	if ( i >= m_size )
-		return NULL;
+		return nullptr;
 	return m_strings[i];
 }
 
@@ -58,7 +58,7 @@ OpinionPoll::addEntry(const char* newEntry)
 
 	char* dest = m_strings[m_size++];
 
-	if ( newEntry == NULL )
+	if ( newEntry == nullptr )
 		*dest = 0;
 	else
 	{

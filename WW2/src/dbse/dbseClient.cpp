@@ -141,7 +141,7 @@ dbseOpenConnection()
 	if ( tempIndex < 0)
 	{
 		dbugLog(_FLA,"couldnt make dbseDaemon connection, err:%d", hostIndex);
-		_errorFn(hostIndex, NULL, 0, NULL, tempIndex);
+		_errorFn(hostIndex, nullptr, 0, nullptr, tempIndex);
 		return tempIndex;
 	}
 

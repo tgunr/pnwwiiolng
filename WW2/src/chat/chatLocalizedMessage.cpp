@@ -58,7 +58,7 @@ wwiiPlayer::message(int prefix, int messageID, const char* const p0, const char*
 bool
 wwiiPlayer::messagef(int prefix, int messageID, const char* fmt, ...)
 {
-	if ( fmt == NULL )
+	if ( fmt == nullptr )
 		return false;
 
 	va_list args;

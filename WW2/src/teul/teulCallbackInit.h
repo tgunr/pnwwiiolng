@@ -16,7 +16,7 @@ namespace Teul
 		CallbackInit()
 			: sendAction(nullptr)
 			, recvAction(nullptr)
-			, error(NULL)
+			, error(nullptr)
 			, callX(0), callY(0)
 		{}
 

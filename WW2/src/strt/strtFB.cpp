@@ -93,12 +93,12 @@ bool
 LinkStruct::processFirebases()
 {
 	// Not all links have a firebase
-	if ( firebase == NULL )
+	if ( firebase == nullptr )
 		return false;
 
 	// Shortcut the return link
 	LinkStruct* mate = endDepot->m_outgoingLink;
-	if ( mate == NULL || mate->firebase == NULL )
+	if ( mate == nullptr || mate->firebase == nullptr )
 	{
 		dbugLog(_FLD, "%s: no firebase", name);
 		return false;
@@ -248,7 +248,7 @@ _initFirebaseObjects(FacilityStruct& firebase)
 {
 	UCHAR visLevel = (firebase.isOpen()) ? 0 : FB_CLOSED_VISLEVEL;
 
-	for ( ObjectStruct* object = firebase.objectList; object != NULL; object = object->next )
+	for ( ObjectStruct* object = firebase.objectList; object != nullptr; object = object->next )
 		object->setVisLevel(visLevel);
 }
 
@@ -257,7 +257,7 @@ _initFirebaseObjects(FacilityStruct& firebase)
 static void
 _initFirebases(FacilityStruct& depot)
 {
-	if ( depot.m_outgoingLink == NULL || depot.m_outgoingLink->firebase == NULL )
+	if ( depot.m_outgoingLink == nullptr || depot.m_outgoingLink->firebase == nullptr )
 		return;
 
 	FacilityStruct& outFB = *depot.m_outgoingLink->firebase;
@@ -280,12 +280,12 @@ strtInitStratSystemFirebases(CPStruct* cpList)
 	CPStruct* cp;
 	FacilityStruct* facility;
 
-	if ( cpList == NULL )
+	if ( cpList == nullptr )
 		return FALSE;
 
-	for ( cp = cpList; cp != NULL; cp = cp->next )
+	for ( cp = cpList; cp != nullptr; cp = cp->next )
 	{
-		for ( facility = cp->facilityTypeIndex[FACILITY_DEPOT]; facility != NULL; facility = facility->typeNext )
+		for ( facility = cp->facilityTypeIndex[FACILITY_DEPOT]; facility != nullptr; facility = facility->typeNext )
 		{
 			_initFirebases(*facility);
 		}
@@ -333,7 +333,7 @@ strtOpenFirebase(FacilityStruct& openingFirebase)
 	//Set every object to fully rebuilt and send the vislevel
 	//	update
 	ObjectStruct* currentObject = openingFirebase.objectList;
-	while (currentObject != NULL)
+	while (currentObject != nullptr)
 	{
 		currentObject->setDamageJoules(0);
 		currentObject->setCapacity(currentObject->m_maxCapacity);
@@ -369,7 +369,7 @@ strtCloseFirebase(FacilityStruct& closingFirebase)
 
 	//Set every object to "closed" and send the visLevel update
 	ObjectStruct* currentObject = closingFirebase.objectList;
-	while (currentObject != NULL)
+	while (currentObject != nullptr)
 	{
 		currentObject->setDamageJoules(currentObject->m_maxDamageJoules);
 		currentObject->setCapacity(0);

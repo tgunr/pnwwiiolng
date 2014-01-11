@@ -74,7 +74,7 @@ void
 PlayerChannels::Failure()
 {
 	Player* player = PlayerInterface::Lookup(m_playerID);
-	if ( player == NULL )
+	if ( player == nullptr )
 		return;
 
 	player->tuneInitialChannels();
@@ -87,7 +87,7 @@ PlayerChannels::Success()
 {
 	// First check if the player is still around
 	Player* player = PlayerInterface::Lookup(m_playerID);
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		dbugLog(_FLI, "p:%u player has gone away, discarding channel tunes", m_playerID);
 		return;
@@ -128,7 +128,7 @@ PlayerChannels::Success()
 void
 chatRestoreChannels(const Player* player)
 {
-	if ( player->haveChannels() || player->m_tunes != NULL )
+	if ( player->haveChannels() || player->m_tunes != nullptr )
 		return;
 
 	// Queue the request
@@ -211,7 +211,7 @@ Player::tuneInitialChannels(bool forceReset)
 		if ( m_tunes )
 		{
 			memFree(m_tunes);
-			m_tunes = NULL;
+			m_tunes = nullptr;
 		}
 	}
 
@@ -220,7 +220,7 @@ Player::tuneInitialChannels(bool forceReset)
 
 	Tunes* tunes = m_tunes;
 
-	if ( m_tunes == NULL )
+	if ( m_tunes == nullptr )
 	{
 		static bool _haveInitialized = false;
 		static Tunes defaultTunes;
@@ -264,7 +264,7 @@ Player::tuneInitialChannels(bool forceReset)
 	if ( m_tunes )
 	{
 		memFree(m_tunes);
-		m_tunes = NULL;
+		m_tunes = nullptr;
 	}
 
 	m_haveChannels = true;

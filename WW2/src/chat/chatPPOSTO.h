@@ -17,7 +17,7 @@ public:
 	virtual const char* typeName() const { return "ppo" ; }
 
 public:
-	virtual bool applyJoules(const SINT64& joules, class Player* player=NULL) ;
+	virtual bool applyJoules(const SINT64& joules, class Player* player=nullptr) ;
 
 	virtual void extractPlayer(const Player* player) ;
 

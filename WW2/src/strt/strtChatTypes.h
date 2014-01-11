@@ -34,7 +34,7 @@ public:
 	void send();
 
 	// Used by the host
-	void Reply(int prefix, int msg, const char* text1=NULL, const char* text2=NULL);
+	void Reply(int prefix, int msg, const char* text1=nullptr, const char* text2=nullptr);
 
 public:
 	UINT32			m_originatorID;		// Player ID of originator (or 0 for system)

@@ -26,12 +26,12 @@ TeulTransmission::_staticBuffer()
 bool
 TeulTransmission::_checkData() const
 {
-	if ( m_callback == NULL )
+	if ( m_callback == nullptr )
 	{
 		dbugLog(_FLA, "%s: tried to send TeulTransmission with NULL callback", __FUNCTION__);
 		return false;
 	}
-	if ( m_buffer == NULL )
+	if ( m_buffer == nullptr )
 	{
 		dbugLog(_FLA, "%s tried to send TeulTransmission with NULL buffer", __FUNCTION__);
 		return false;
@@ -48,7 +48,7 @@ SINT32
 TeulTransmission::send(SINT32 teulIndex) const
 {
 	ENDPOINT* const endpoint = teulGetEndpoint(teulIndex);
-	if ( endpoint == NULL )
+	if ( endpoint == nullptr )
 		return -EINVAL;
 
 	if ( endpoint->state() != IS_OPEN )
@@ -66,12 +66,12 @@ TeulTransmission::send(SINT32 teulIndex) const
 SINT32
 TeulTransmission::populate(void* data, SINT32 teulIndex)
 {
-	if ( m_callback == NULL )
+	if ( m_callback == nullptr )
 	{
 		dbugLog(_FLA, "%s: no callback to populate transmission from", __FUNCTION__);
 		return -ENOENT;
 	}
-	if ( m_buffer == NULL )
+	if ( m_buffer == nullptr )
 	{
 		dbugLog(_FLA, "%s: no buffer to populate transmission into", __FUNCTION__);
 		return -EINVAL;

@@ -68,7 +68,7 @@ static inline UINT32 weapClassIndex(const WEAPON_SPEC& spec)
 static inline WEAPON_LIST* weapFindSpawnList(const WEAPON_SPEC& spec)
 {
 	WEAPON_SPAWNS::iterator it = g_weaponSpawns.find(weapClassIndex(spec));
-	return ( it != g_weaponSpawns.end() ) ? &(it->second) : NULL;
+	return ( it != g_weaponSpawns.end() ) ? &(it->second) : nullptr;
 }
 
 extern WWII_SIDE weapFindSide(const char* side);

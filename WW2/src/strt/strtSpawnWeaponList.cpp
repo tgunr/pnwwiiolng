@@ -33,7 +33,7 @@ WeaponEntry::getCounter(WeaponCounter* into, const TOE_::WeaponInstance* toeEntr
 		return counter;
 	}
 
-	if ( toeEntry == NULL || toeEntry->capacity() == 0 )
+	if ( toeEntry == nullptr || toeEntry->capacity() == 0 )
 	{
 		counter->clear();
 		return counter;

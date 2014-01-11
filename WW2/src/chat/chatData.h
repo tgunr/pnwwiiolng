@@ -44,7 +44,7 @@ public:
 	bool Matches(const FULL_OBJ_ID& rhs) const
 			{ return (m_key == rhs.Key()) ; }
 	bool Matches(const Property& rhs) const { return m_key == rhs.m_key ; }
-	virtual Property* Parent() const { return NULL ; }
+	virtual Property* Parent() const { return nullptr ; }
 	bool IsBridge() const { return m_fid.objClass == CLASS_CP && m_fid.objType == CP_BRIDGE ; }
 	virtual bool IsCP() const { return (m_fid.objClass == CLASS_CP) ; }
 	virtual bool IsFacility() const { return (m_fid.objClass == CLASS_FACILITY) ; }

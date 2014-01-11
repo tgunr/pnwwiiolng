@@ -49,7 +49,7 @@
 static void
 _setObjectsOwner(ObjectStruct* const objectList, WWII_SIDE side, WWII_COUNTRY country)
 {
-	if ( objectList == NULL )
+	if ( objectList == nullptr )
 		return;
 	if ( side == 0 || country == 0 )
 	{
@@ -58,7 +58,7 @@ _setObjectsOwner(ObjectStruct* const objectList, WWII_SIDE side, WWII_COUNTRY co
 	}
 
 	//Rip through the object list, changing ownership along the way
-	for ( auto current = objectList; current != NULL; current = current->next )
+	for ( auto current = objectList; current != nullptr; current = current->next )
 	{
 #ifdef HEAVY_DEBUG
 		dbugLog(_FLD,"setting object %d.%d.%u to side %d country %d"
@@ -82,7 +82,7 @@ _facilityStatusHandler(FULL_OBJ_ID fullObjID, WWII_COUNTRY country, CP_STATUS_FL
 {
 	//get the facility
 	FacilityStruct* const facility = strtGetFacility(fullObjID);
-	if (facility == NULL)
+	if (facility == nullptr)
 	{
 		dbugLog(_FLA,"cant find facility for id %d.%d.%u", fullObjID.cell.ox, fullObjID.cell.oy, fullObjID.id);
 		return false;
@@ -160,7 +160,7 @@ _cpStatusHandler(FULL_OBJ_ID fullObjID, WWII_COUNTRY country, WWII_COUNTRY contr
 {
 	//get the cp
 	CPStruct* const cp = strtGetCPorBridge(fullObjID);
-	if ( cp == NULL )
+	if ( cp == nullptr )
 	{
 		dbugLog(_FLI, "CP status on unrecognized object: %d.%d.%u", fullObjID.cell.ox, fullObjID.cell.oy, fullObjID.id);
 		return;
@@ -202,7 +202,7 @@ _buildingStatusHandler(FULL_OBJ_ID fullObjID, UINT32 visLevel, UINT32 damagedBy)
 {
 	//Find the item and fix its level locally
 	ObjectStruct* const object = strtGetObject(fullObjID);
-	if (object == NULL)
+	if (object == nullptr)
 	{
 		dbugLog(_FLA, "invalid object for vislevel update: %d.%d.%u", fullObjID.cell.ox, fullObjID.cell.oy, fullObjID.id);
 		return;
@@ -239,7 +239,7 @@ _buildingStatusHandler(FULL_OBJ_ID fullObjID, UINT32 visLevel, UINT32 damagedBy)
 static SINT32
 _recvStratUpdate(ACTION_OBJECT* const a)
 {
-	if ( a->m_client != NULL )
+	if ( a->m_client != nullptr )
 		return -EINVAL;
 
 	UINT32 updates = 0;
@@ -325,7 +325,7 @@ _recvConfigUpdate(ACTION_OBJECT* const a)
 static SINT32
 _recvTimeUpdate(ACTION_OBJECT* const a)
 {
-	if ( a->m_client != NULL || a->canRead<Host::TimeUpdate>() == false )
+	if ( a->m_client != nullptr || a->canRead<Host::TimeUpdate>() == false )
 		return -EINVAL;
 
 	auto& incoming = a->read<Host::TimeUpdate>();

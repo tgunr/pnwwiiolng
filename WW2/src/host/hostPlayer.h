@@ -52,7 +52,7 @@ public:
 
 public:
 	static SINT32 Create(const Server::PersonaLogin& xfer, class PlayerStatusNode& psn);
-	Player() : wwiiPlayer(), vehicle(NULL), m_antiHack(NULL) {}
+	Player() : wwiiPlayer(), vehicle(nullptr), m_antiHack(nullptr) {}
 	Player(const Server::PersonaXfer& xfer);
 	~Player();
 

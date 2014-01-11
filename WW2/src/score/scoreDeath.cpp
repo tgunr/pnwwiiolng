@@ -152,7 +152,7 @@ _calculateKillValue(const Scoring::Sortie& killer, const Scoring::Sortie& victim
 static void
 _creditKill(Player* const killer, Scoring::Sortie& killerSortie, const Scoring::Actor& victim, const Scoring::Sortie& victimSortie, const bool fromCapture)
 {
-	if ( killer == NULL )
+	if ( killer == nullptr )
 		return;
 
 	killerSortie.addKill(victimSortie.sortieID(), victimSortie.spec());
@@ -184,7 +184,7 @@ _creditKill(Player* const killer, Scoring::Sortie& killerSortie, const Scoring::
 static bool
 _awardAssistToPlayer(Scoring::Sortie& victimSortie, Player* const player, UINT32 sortieID, const char* const victimName, const char* const killerName, const FLOAT32& value)
 {
-	if ( player == NULL )
+	if ( player == nullptr )
 		return false;
 	if ( player->sortieID() != sortieID )
 		return false;
@@ -259,7 +259,7 @@ Scoring::Death::process(Player* const lhsPlayer)
 
 	// We need to look up the sortie on which the player died.
 	Scoring::Sortie* const deadSortie = FindSortieForPlayer(lhsPlayer, lhs().sortieID());
-	if ( deadSortie == NULL )
+	if ( deadSortie == nullptr )
 		return false;
 
 	// Suicide.
@@ -269,7 +269,7 @@ Scoring::Death::process(Player* const lhsPlayer)
 		return true;
 	}
 
-	Sortie* killerSortie = NULL;
+	Sortie* killerSortie = nullptr;
 	const UINT32 statedKillerID = rhs().sortieID();
 	if ( statedKillerID != 0 )
 	{
@@ -279,7 +279,7 @@ Scoring::Death::process(Player* const lhsPlayer)
 
 	// Do we need to try the last person to hit us?
 	const TeulTimeMS lastHitCutoff = teulClock64 - 60 * 1000;	// 60 seconds ago.
-	if ( killerSortie == NULL && (deadSortie->lastHitBySortieID() != 0 && deadSortie->lastHitTime() >= lastHitCutoff) )
+	if ( killerSortie == nullptr && (deadSortie->lastHitBySortieID() != 0 && deadSortie->lastHitTime() >= lastHitCutoff) )
 	{
 		killerSortie = Sortie::Lookup(deadSortie->lastHitBySortieID());
 	}
@@ -290,7 +290,7 @@ Scoring::Death::process(Player* const lhsPlayer)
 		return true;
 	}
 
-	if ( killerSortie == NULL )
+	if ( killerSortie == nullptr )
 	{
 		dbugLog(_FLW, "p:%u c:%s v:%u killer sortie #%u not found"
 						, lhs().playerID(), Chat::Name(lhs().handle()).c_str(), lhs().sortieID()

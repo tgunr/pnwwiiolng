@@ -37,7 +37,7 @@ private:
 	// Constructor.
 public:
 	HostSupercellData()
-		: m_allocation(NULL)
+		: m_allocation(nullptr)
 		, m_size(0)
 	{
 		UINT32 numBuildings = 0, maxBuildings = 0;
@@ -53,7 +53,7 @@ public:
 public:
 	~HostSupercellData()
 	{
-		if ( m_allocation != NULL )
+		if ( m_allocation != nullptr )
 			memFree(m_allocation);
 	}
 
@@ -61,7 +61,7 @@ public:
 public:
 	bool updateBuilding(const ObjectStruct* const obj)
 	{
-		if ( obj->supercell == NULL || obj->supercell->m_xfer == NULL )
+		if ( obj->supercell == nullptr || obj->supercell->m_xfer == nullptr )
 			return false;
 		return obj->supercell->m_xfer->setBuildingLevel(obj->m_bid, obj->effectiveVisLevel());
 	}

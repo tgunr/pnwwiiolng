@@ -308,7 +308,7 @@ chatMakeTempString(const char* fmt, ...)
 
 	buffer[bufNo][0] = 0;
 
-	if (fmt != NULL) {
+	if (fmt != nullptr) {
 		va_start(args, fmt);
 		vsnprintf(buffer[bufNo], MAX_MESSAGE_LENGTH, fmt, args);
 		va_end(args);

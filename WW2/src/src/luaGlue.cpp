@@ -37,7 +37,7 @@ _report(UINT32 level, const char* message, const char* file = _luaSubSystem.c_st
 {
 	std::string output;
 
-	if ( message == NULL )
+	if ( message == nullptr )
 		return;
 
 	// Save the output
@@ -79,7 +79,7 @@ void warn(const char* message) { _report(Debug::ERR_WARN, message); }
 void error(const char* message) { _report(Debug::ERR_ABORT, message); }
 void writeToLog(const char* file, const char* func, unsigned int line, const char* level, const char* facil, const char* message)
 {
-	if ( ((file == NULL) | (func == NULL) | (message == NULL) | (level == NULL)) || *level == 0 )
+	if ( ((file == nullptr) | (func == nullptr) | (message == nullptr) | (level == nullptr)) || *level == 0 )
 		return;
 
 	char levelChar = toupper(level[0]);
@@ -124,7 +124,7 @@ void writeToLog(const char* file, const char* func, unsigned int line, const cha
 	output += "\n";
 	_luaOutput.push_back(output);
 }
-char* ARGS(int i) { return ( i >= (int)script_args.size() ) ? NULL : const_cast<char*>(script_args[i]); }
+char* ARGS(int i) { return ( i >= (int)script_args.size() ) ? nullptr : const_cast<char*>(script_args[i]); }
 
 extern bool chatSendAdminMessage(const char* fmt, ...);
 void gmMessage(const char* message) { chatSendAdminMessage("%s", message); }
@@ -337,7 +337,7 @@ _executeScript(const char* script)
 bool
 Lua::RunScript(const char* script)
 {
-	if ( script == NULL || *script == 0 )
+	if ( script == nullptr || *script == 0 )
 	{
 		dbugLog(_FLW, "%s called with null script name", __FUNCTION__);
 		return false;
@@ -352,11 +352,11 @@ Lua::RunScript(const char* script)
 const char*
 _luaReader(lua_State* L, void* data, size_t* size)
 {
-	static const void* lastData = NULL;
+	static const void* lastData = nullptr;
 	if ( data == lastData )
 	{
-		lastData = NULL;
-		return NULL;
+		lastData = nullptr;
+		return nullptr;
 	}
 
 	lastData = data;
@@ -469,7 +469,7 @@ static bool
 _startInterpreter()
 {
 	_luaVM = lua_open();
-	if ( _luaVM == NULL )
+	if ( _luaVM == nullptr )
 	{
 		dbugLog(_FLA, "Unable to start lua interpreter");
 		return false;
@@ -494,7 +494,7 @@ _startInterpreter()
 	std::string rcFile = cv_luaPath.GetString();
 	rcFile += PATH_SEPARATOR;
 	rcFile += cv_luaRCFile.GetString();
-	if ( !_executeScript(rcFile.c_str()) || _luaVM == NULL )
+	if ( !_executeScript(rcFile.c_str()) || _luaVM == nullptr )
 	{
 		dbugLog(_FLW, "startup file failed");
 		exit(0);
@@ -520,7 +520,7 @@ _startInterpreter()
 bool
 Lua::Start(const char* const hostName)
 {
-	if ( _luaVM != NULL )
+	if ( _luaVM != nullptr )
 	{
 		dbugLog(_FLW, "Attempted to restart active global vm");
 		return true;
@@ -550,11 +550,11 @@ Lua::Stop()
 	_luaContext();
 	_luaOutput.clear();
 
-	if ( _luaVM == NULL )
+	if ( _luaVM == nullptr )
 		return false;
 
 	lua_close(_luaVM);
-	_luaVM = NULL;
+	_luaVM = nullptr;
 
 	return true;
 }

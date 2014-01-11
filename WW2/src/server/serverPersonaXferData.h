@@ -17,9 +17,9 @@ namespace Server
 	struct PersonaXferData
 	{
 		//! @brief Default ctor.
-		PersonaXferData() : dispatch(), auxSize(0), auxData(0ULL) {}
+		PersonaXferData() : dispatch(), auxSize(0), auxData(nullptr) {}
 		//! @brief Initializing ctor.
-		PersonaXferData(const Auth::Dispatch& _dispatch, SINT32 _auxSize=0, void* const _auxData=NULL)
+		PersonaXferData(const Auth::Dispatch& _dispatch, SINT32 _auxSize=0, void* const _auxData=nullptr)
 			: dispatch(_dispatch), auxSize(_auxSize), auxData(_auxData)
 			{}
 
@@ -36,7 +36,7 @@ namespace Server
 			a->packer(mode, auxSize) ;
 			if ( auxSize > 0 )
 			{
-				assert( auxData != NULL ) ;
+				assert( auxData != nullptr ) ;
 				a->packBytes(mode, auxData, auxSize) ;
 			}
 		}

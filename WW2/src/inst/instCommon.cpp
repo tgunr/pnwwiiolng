@@ -49,7 +49,7 @@ Descriptor::operator<(const Instance::Descriptor& rhs) const
 instanceid_t
 StrToInstanceID(const char* instStr)
 {
-	return strtoull(instStr, NULL, 10);
+	return strtoull(instStr, nullptr, 10);
 }
 
 }	// namespace Instance

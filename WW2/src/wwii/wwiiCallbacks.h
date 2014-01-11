@@ -84,7 +84,7 @@ public:
 	~CallbackRegister() {}
 
 	TEUL_CALLBACK* callback(UCHAR callY, ACTION_FN sendFn, ACTION_FN recvFn);
-	void sender(UCHAR callY, ACTION_FN sendFn, TEUL_CALLBACK*& toRef) { assert(toRef == NULL); toRef = callback(callY, sendFn, nullptr); }
+	void sender(UCHAR callY, ACTION_FN sendFn, TEUL_CALLBACK*& toRef) { assert(toRef == nullptr); toRef = callback(callY, sendFn, nullptr); }
 	void receiver(UCHAR callY, ACTION_FN recvFn) { callback(callY, nullptr, recvFn); }
 	template<typename T_>
 	void receiveObj(UCHAR callY, SINT32(*recvFn)(ACTION_OBJECT*, T_&))

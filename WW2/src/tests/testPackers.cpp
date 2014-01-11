@@ -531,7 +531,7 @@ public: virtual bool Run()
 				ACTION_OBJECT out;
 				out.packed = msg;
 				out.offset = 0;
-				out.localRawData = NULL;
+				out.localRawData = nullptr;
 
 				offset = hit.packer(TEUL_PACK, &out);
 
@@ -574,7 +574,7 @@ public: virtual bool Run()
 				ACTION_OBJECT out;
 				out.packed = msg;
 				out.offset = 0;
-				out.localRawData = NULL;
+				out.localRawData = nullptr;
 
 				offset = hit.packer(TEUL_PACK, &out);
 

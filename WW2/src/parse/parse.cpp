@@ -17,13 +17,13 @@ const BASE_ARG_TYPES charAllow[] = {T_CHAR, T_ZERO};
 const BASE_ARG_TYPES stringAllow[] = {T_STRING, T_CHAR, T_ZERO, T_INT};
 const BASE_ARG_TYPES emptyAllow[] = {T_EMPTY};
 
-const BASE_ARG_TYPES* baseAllow[] = {NULL
+const BASE_ARG_TYPES* baseAllow[] = {nullptr
 									,intAllow
 									,floatAllow
 									,charAllow
 									,stringAllow
 									,emptyAllow
-									,NULL};
+									,nullptr};
 
 ARG_KEY* parseGetArgKey(UCHAR* strIn)
 {
@@ -38,14 +38,14 @@ ARG_KEY* parseGetArgKey(UCHAR* strIn)
 	SCHAR*	str = (SCHAR*) strIn;
 	SCHAR*	endPoint;
 	SINT8	isNegative = 0;
-	static	ARG_KEY tt = {0,0,0,0,0,0,0};
+	static	ARG_KEY tt = {nullptr,0,0,0,0,0,0};
 
 	dbugSetErrno(0);
 
-	if(str==NULL)
+	if(str==nullptr)
 	{
 		dbugSetErrno(EINVAL);
-		return (NULL);
+		return (nullptr);
 	}
 
 	tt.svalue = str;
@@ -304,8 +304,8 @@ SINT32	len, retval;
 
 	et.error = -EINVAL;
 
-	if ( destination == NULL
-		|| paramString == NULL
+	if ( destination == nullptr
+		|| paramString == nullptr
 		|| minParams < 0
 		|| minParams > (maxParams = (SINT32)strlen((char*)paramString)) )
 		return (et);
@@ -313,7 +313,7 @@ SINT32	len, retval;
 	target = destination;
 
 	et.error = EMPTY_LINE;
-	if (list == NULL)
+	if (list == nullptr)
 		return (et);
 
 	et.error = -EINVAL;

@@ -13,7 +13,7 @@
 #include "chat/chatBrigadeControlList.h"
 #include "wwii/wwiiPack.h"
 
-TEUL_CALLBACK* BrigadeControl::s_callback = NULL;
+TEUL_CALLBACK* BrigadeControl::s_callback = nullptr;
 
 //////////////////////////////////////////////////////////////////////
 // Base class packer (so much more elegant with Teul::Serialize)

@@ -48,7 +48,7 @@ chatBroadcastObject(const _Iterator& begin, const _Iterator& end, TEUL_CALLBACK*
 
 template<typename _Iterator>
 void
-chatDistributeLocMessage(const _Iterator& begin, const _Iterator& end, int prefix, int msg, const char* const t1=NULL, const char* const t2=NULL, const char* const t3=NULL, const char* const t4=NULL, const char* const t5=NULL, const char* const t6=NULL)
+chatDistributeLocMessage(const _Iterator& begin, const _Iterator& end, int prefix, int msg, const char* const t1=nullptr, const char* const t2=nullptr, const char* const t3=nullptr, const char* const t4=nullptr, const char* const t5=nullptr, const char* const t6=nullptr)
 {
 	Chat::LocalizedMessage lmsg(prefix, msg, t1, t2, t3, t4, t5, t6) ;
 	chatBroadcastLocMessage(begin, end, lmsg) ;

@@ -285,7 +285,7 @@ static void _getCurrentProcessPath(char (& processPath)[MAX_PATH])
 	strncpy(processPath, g_argv0, sizeof(processPath) - 1);
 #endif
 	char* endCharacter = strrchr(processPath, PATH_SEPARATOR);
-	if ( endCharacter != NULL )
+	if ( endCharacter != nullptr )
 		*(endCharacter) = 0;
 	else
 		strncpy(processPath, ".", sizeof(processPath) - 1);

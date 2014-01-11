@@ -17,14 +17,14 @@ public:
 		: stats(), flags((Server::Flags)0)
 		, m_lastRecv(0)
 		, availPlayers(0)
-		, m_players(), localInfo(NULL), exitDestType(0)
+		, m_players(), localInfo(nullptr), exitDestType(0)
 		{
 		}
 	ServerInfo(const HeartBeat& beat)
 		: stats(beat), flags((Server::Flags)0)
 		, m_lastRecv(0)
 		, availPlayers(0)
-		, m_players(), localInfo(NULL), exitDestType(0)
+		, m_players(), localInfo(nullptr), exitDestType(0)
 		{
 		}
 

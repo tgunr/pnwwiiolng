@@ -29,7 +29,7 @@ public:	// Templated to accept char* and wchar_t*
 	TestGoodCallsigns(const _Type** goodSigns)
 	{
 		START_SUB_STAGE( "Good Callsigns" )
-			for ( UINT32 i = 0; goodSigns[i] != NULL; ++i )
+			for ( UINT32 i = 0; goodSigns[i] != nullptr; ++i )
 			{
 				TestFocus(goodSigns[i]);
 
@@ -50,7 +50,7 @@ public: // Templated to accept char* and wchar_t*
 	TestBadCallsigns(const _Type** badSigns)
 	{
 		START_SUB_STAGE( "Bad Callsigns" )
-			for ( UINT32 i = 0; badSigns[i] != NULL; ++i )
+			for ( UINT32 i = 0; badSigns[i] != nullptr; ++i )
 			{
 				TestFocus(badSigns[i]);
 				// Test char* overload of chatIsValidCallsign
@@ -295,11 +295,11 @@ ChatHandleTestUnit::Run()
 		,	"凸-", "凸凸凸凸-", "龠", "龠龠", "龠aa龠", "龠aa龠a", "龠---a", "gamemgr-07", "前个例子1"
 		,	"aaa", "AAA", "aaaa", "AAAA", "aaaaa", "AAAAA", "aaaaaa", "AAAAAA", "aaaaaaa", "AAAAAAA", "aaaaaaaa", "AAAAAAAA", "aaaaaaaaaa", "AAAAAAAAAA"
 		,	"AaAaAaAaAa", "aAaAaAaAaA"
-		, NULL
+		, nullptr
 		};
-		const wchar_t* goodWcharSigns[] = { L"aa", L"ab", L"AA", L"12", L"1-", L"12-", L"ZZ", L"A-A", L"A123Z", L"A-1-2-3-4", L"A12345678b", L"\u51f8-", L"\u51f8\u51f8\u51f8\u51f8-", L"\u9fa0", L"\u9fa0\u9fa0", L"\u9fa0aa\u9fa0", L"\u9fa0aa\u9fa0a", L"\u9fa0---a", L"gamemgr-07", L"\u524d\u4e2a\u4f8b\u5b501", NULL };
-		const char* badCharSigns[] = { "-", "1", "a", "--", "abcdefghijklmnop", "凸凸凸凸凸", "冖冖冖冖冖冖冖冖", "a冖", NULL };
-		const wchar_t* badWcharSigns[] = { L"-", L"1", L"a", L"--", L"abcdefghijklmnop", L"\u51f8\u51f8\u51f8\u51f8\u51f8", L"\u5196\u5196\u5196\u5196\u5196\u5196\u5196\u5196", L"a\u5196", L"\u044b\u0441\u0434\u0444\u043a", NULL };
+		const wchar_t* goodWcharSigns[] = { L"aa", L"ab", L"AA", L"12", L"1-", L"12-", L"ZZ", L"A-A", L"A123Z", L"A-1-2-3-4", L"A12345678b", L"\u51f8-", L"\u51f8\u51f8\u51f8\u51f8-", L"\u9fa0", L"\u9fa0\u9fa0", L"\u9fa0aa\u9fa0", L"\u9fa0aa\u9fa0a", L"\u9fa0---a", L"gamemgr-07", L"\u524d\u4e2a\u4f8b\u5b501", nullptr };
+		const char* badCharSigns[] = { "-", "1", "a", "--", "abcdefghijklmnop", "凸凸凸凸凸", "冖冖冖冖冖冖冖冖", "a冖", nullptr };
+		const wchar_t* badWcharSigns[] = { L"-", L"1", L"a", L"--", L"abcdefghijklmnop", L"\u51f8\u51f8\u51f8\u51f8\u51f8", L"\u5196\u5196\u5196\u5196\u5196\u5196\u5196\u5196", L"a\u5196", L"\u044b\u0441\u0434\u0444\u043a", nullptr };
 
 		START_SUB_STAGE( "char* callsigns" )
 

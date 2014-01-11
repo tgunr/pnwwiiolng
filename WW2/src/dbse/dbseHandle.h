@@ -29,7 +29,7 @@ class DBHANDLE
 	DB::handle_t* m_conn;
 
 public:
-	DBHANDLE() : m_initialized(false), m_conn(NULL) {}
+	DBHANDLE() : m_initialized(false), m_conn(nullptr) {}
 	~DBHANDLE() { disconnect() ; }
 
 public:
@@ -43,7 +43,7 @@ public:
 	void disconnect() ;
 
 public:
-	operator const DB::handle_t* () const { return m_initialized ? m_conn : NULL ; }
-	operator DB::handle_t* () { return m_initialized ? m_conn : NULL ; }
+	operator const DB::handle_t* () const { return m_initialized ? m_conn : nullptr ; }
+	operator DB::handle_t* () { return m_initialized ? m_conn : nullptr ; }
 } ;
 

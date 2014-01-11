@@ -39,7 +39,7 @@ _getMode(HostVehicle* vehicle)
 		Player* player = (*it);
 		++it;
 
-		if ( PN_UNLIKELY(player == NULL) )
+		if ( PN_UNLIKELY(player == nullptr) )
 			continue;
 
 		if ( player->teulIndex() < 0 || !player->active )
@@ -100,7 +100,7 @@ Player::setFramingMode(UINT16 newMode)
 
 	m_framingMode = newMode;
 
-	if ( vehicle != NULL )
+	if ( vehicle != nullptr )
 	{
 		vehicle->selectBestFramingMode();
 		if ( g_logDebug )

@@ -49,7 +49,7 @@ HostVehicle*
 HostVehicle::Lookup(const ChatHandle& handle)
 {
 	auto it = g_vehicleLookup.find(handle);
-	return ( it != g_vehicleLookup.end() ? it->second : NULL );
+	return ( it != g_vehicleLookup.end() ? it->second : nullptr );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -60,7 +60,7 @@ HostVehicleImpl::reset()
 {
 	m_players.clear();
 	memset(&m_locality, 0, sizeof(m_locality));
-	m_nearCP = NULL;
+	m_nearCP = nullptr;
 
 	m_resupplies.clear();
 
@@ -105,10 +105,10 @@ HostVehicleImpl::~HostVehicleImpl()
 SINT32
 _getCaptureProgress(const HostVehicle& vehicle)
 {
-	if ( vehicle.m_isInCaptureBuilding == false || vehicle.m_inBuildingObject == NULL )
+	if ( vehicle.m_isInCaptureBuilding == false || vehicle.m_inBuildingObject == nullptr )
 		return -1;
 	const FacilityStruct* const facility = vehicle.m_inBuildingObject->facility;
-	if ( facility == NULL || facility->isCaptureEnabled() == false )
+	if ( facility == nullptr || facility->isCaptureEnabled() == false )
 		return -1;
 
 	return facility->m_captureCounter;
@@ -165,10 +165,10 @@ HostVehicle::checkLocality(Teul::Packet& packet)
 
 	if ( posChanged )
 	{
-		CPStruct* nearestCP = NULL;
+		CPStruct* nearestCP = nullptr;
 		if ( m_inBuildingObject && m_inBuildingObject->facility )
 			nearestCP = m_inBuildingObject->facility->cp;
-		if ( nearestCP == NULL )
+		if ( nearestCP == nullptr )
 			nearestCP = strtFindClosestCP((SINT32)x_m, (SINT32)y_m);
 
 		if ( firstUpdate || nearestCP != m_impl->m_nearCP )
@@ -260,7 +260,7 @@ HostVehicle::initialize(VEHICLE_HOLDER* const _holder, HostVehicleImpl* const _i
 	vehicleData.side = side();
 	m_holder->timeStamp = teulClock();
 	m_spawnTime = teulTime();
-	m_cell = NULL;
+	m_cell = nullptr;
 
 //	m_nextUpdateClock = ~0ULL;
 
@@ -300,7 +300,7 @@ HostVehicle::acceptResupply(UINT32 fromSerial, const ChatHandle& fromHandle, Hos
 	if ( g_logDebug )
 	{
 		Player* vehCommander = activeCommander();
-		UINT32 id = (vehCommander != NULL) ? vehCommander->playerID() : 0;
+		UINT32 id = (vehCommander != nullptr) ? vehCommander->playerID() : 0;
 		dbugLog(_FLD, "p:%u c:%s v:%u accepting resupply from %s"
 						, id, callsign(), index
 						, Chat::Name(fromHandle).c_str()
@@ -311,7 +311,7 @@ HostVehicle::acceptResupply(UINT32 fromSerial, const ChatHandle& fromHandle, Hos
 
 	if ( fromAddress != 0 )
 		hostSendResupplyAccepted(fromAddress, fromSerial, vehicleData.packedCallsign);
-	else if ( fromVehicle != NULL )
+	else if ( fromVehicle != nullptr )
 		fromVehicle->scoreResupply(vehicleData.packedCallsign);
 }
 
@@ -359,7 +359,7 @@ bool
 HostVehicle::canSeeHiddenBuzzards() const
 {
 	const Player* const cmdr = commander();
-	return ( cmdr != NULL && cmdr->isEffectiveGM() == true );
+	return ( cmdr != nullptr && cmdr->isEffectiveGM() == true );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -372,11 +372,11 @@ HostVehicle::activeCommander() const
 	for ( it = players().begin(); it != players().end(); ++it )
 	{
 		Player* player = (*it);
-		if ( player != NULL && player->teulIndex() >= 0 && player->active && player->station != UPDT_OTHER )
+		if ( player != nullptr && player->teulIndex() >= 0 && player->active && player->station != UPDT_OTHER )
 			return player;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 Player*
@@ -386,11 +386,11 @@ HostVehicle::commander() const
 	for ( it = players().begin(); it != players().end(); ++it )
 	{
 		Player* player = (*it);
-		if ( player != NULL && player->station != UPDT_OTHER )
+		if ( player != nullptr && player->station != UPDT_OTHER )
 			return player;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -408,7 +408,7 @@ _despawnTimeLimit(const WEAPON_SPEC& spec, bool isInBuilding)
 		return baseDespawnTime;
 
 	WEAPON* weapon = weapLookup(spec);
-	if ( weapon != NULL && weapon->access() >= 8 )
+	if ( weapon != nullptr && weapon->access() >= 8 )
 	{
 		// System vehicles can instantly despawn
 		return 1;
@@ -466,7 +466,7 @@ HostVehicle::issueResupply(const Player* const player, UINT32 toSerial)
 	}
 
 	HostVehicle* toVehicle = hostFindVehicleLocal(toSerial);
-	if ( toVehicle == NULL )
+	if ( toVehicle == nullptr )
 	{
 		dbugLog(_FLI, "t:%d p:%u c:%s v:%u invalid vehicle %u (gone away?)"
 						, player->teulIndex(), player->playerID(), player->callsign(), index, toSerial);
@@ -613,7 +613,7 @@ HostVehicle::getHideCallsign(const HostVehicle* const viewer) const
 		return false;
 
 	const Player* const player = viewer->activeCommander();
-	if ( player != NULL && player->stationID == UPDT_LONE && (player->permissions(IS_PLAYNET | GAME_MANAGER)) )
+	if ( player != nullptr && player->stationID == UPDT_LONE && (player->permissions(IS_PLAYNET | GAME_MANAGER)) )
 		return false;
 
 	return true;
@@ -685,7 +685,7 @@ HostVehicle::setVehicleKilled(sortieid_t bySortieID)
 	if ( m_killedBySortieID != 0 )
 	{
 		const HostVehicle* const killer = hostFindVehicleLocal(m_killedBySortieID);
-		if ( killer != NULL )
+		if ( killer != nullptr )
 		{
 			actShooter = Scoring::Actor(killer);
 		}
@@ -726,10 +726,10 @@ HostVehicle::isMoving() const
 WWII_SIDE
 HostVehicle::isInCaptureBuilding() const
 {
-	if ( !m_inBuilding || !m_isInCaptureBuilding || m_inBuildingObject == NULL || m_inBuildingObject->m_isCaptureBuilding == false )
+	if ( !m_inBuilding || !m_isInCaptureBuilding || m_inBuildingObject == nullptr || m_inBuildingObject->m_isCaptureBuilding == false )
 		return WWII_NO_SIDE;
 
-	if ( m_inBuildingObject->facility == NULL )
+	if ( m_inBuildingObject->facility == nullptr )
 	{
 		dbugLog(_FLA, "XXX capture building object isn't tied into strat");
 		return WWII_NO_SIDE;
@@ -747,7 +747,7 @@ _reportBuildingIssue(TeulTimeMS& nextBlip, const char* const fmt, ...) __attribu
 static void
 _reportBuildingIssue(TeulTimeMS& nextBlip, const char* const fmt, ...)
 {
-	assert( fmt != NULL );
+	assert( fmt != nullptr );
 	if ( nextBlip > teulClock64 )
 		return;
 
@@ -769,7 +769,7 @@ _reportBuildingIssue(TeulTimeMS& nextBlip, const char* const fmt, ...)
 void
 HostVehicle::setInCaptureBuilding(bool newValue)
 {
-	if ( newValue == true && m_inBuildingObject == NULL )
+	if ( newValue == true && m_inBuildingObject == nullptr )
 	{
 		if ( m_inBuilding == 0ULL )
 		{
@@ -777,7 +777,7 @@ HostVehicle::setInCaptureBuilding(bool newValue)
 			_reportBuildingIssue(nextBlip, "p:%u c:%s v:%u client reporting 'in-capture' with a null building ID", seats[0], vehicleData.callsign, index);
 			newValue = false;
 		}
-		else if ( m_inBuildingObject == NULL )
+		else if ( m_inBuildingObject == nullptr )
 		{
 			static TeulTimeMS nextBlip = 0ULL;
 			FULL_OBJ_ID bid;
@@ -786,7 +786,7 @@ HostVehicle::setInCaptureBuilding(bool newValue)
 											, seats[0], vehicleData.callsign, index, bid.cell.ox, bid.cell.oy, bid.id);
 			newValue = false;
 		}
-		else if ( m_inBuildingObject->facility == NULL )
+		else if ( m_inBuildingObject->facility == nullptr )
 		{
 			FULL_OBJ_ID bid;
 			bid.FromKey(m_inBuilding);
@@ -815,7 +815,7 @@ HostVehicle::setInCaptureBuilding(bool newValue)
 		interruptCapture();
 
 		// Did we just enter a building?
-		if ( m_isInCaptureBuilding && m_inBuildingObject->facility != NULL )
+		if ( m_isInCaptureBuilding && m_inBuildingObject->facility != nullptr )
 		{
 #ifdef BETA_RELEASE
 			message(LSTR_BETA, LSTR_GENERIC, "Entered capture building");
@@ -838,7 +838,7 @@ HostVehicle::setInCaptureBuilding(bool newValue)
 void
 HostVehicle::sendCaptureContribution(Player* const player, UINT32 status)
 {
-	if ( player == NULL || host_config.isArenaLocked(AL_CAPTURE) )
+	if ( player == nullptr || host_config.isArenaLocked(AL_CAPTURE) )
 		return;
 
 	if ( m_inBuildingObject )
@@ -898,7 +898,7 @@ HostVehicle::checkCapture()
 		return;
 
 	Player* const player = activeCommander();
-	if ( player == NULL )
+	if ( player == nullptr )
 		return;
 
 	// Must have the "CAN_CAPTURE" permission to capture stuff.

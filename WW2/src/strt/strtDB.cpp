@@ -211,7 +211,7 @@ _initAllEntries(const char* query, _PROCESSOR* processFn)
 	if ( q.Rows() <= 0 )
 		return;
 
-	Supercell* sc = NULL;
+	Supercell* sc = nullptr;
 
 	while ( q.FetchRow() )
 	{
@@ -234,7 +234,7 @@ _initAllEntries(const char* query, _PROCESSOR* processFn)
 			throw std::domain_error("id outside range for supercell");
 
 		void* data = sc->index[id];
-		if ( data == NULL )
+		if ( data == nullptr )
 			throw std::domain_error("no matching sdm data");
 
 		UINT32 oid = row.NextUInt();
@@ -248,7 +248,7 @@ _initAllEntries(const char* query, _PROCESSOR* processFn)
 void
 strtdbInitSupercells()
 {
-	const char* resource = NULL;
+	const char* resource = nullptr;
 
 	try
 	{

@@ -20,7 +20,7 @@ namespace Server
 			: PersonaXfer(XferReason::Mirror, _data, _destination)
 			{}
 		virtual ~PersonaMirror() {}
-		public: PersonaMirror(void* auxBuffer_=NULL) : PersonaXfer(Transfer::XferReason::Mirror)
+		public: PersonaMirror(void* auxBuffer_=nullptr) : PersonaXfer(Transfer::XferReason::Mirror)
 		{
 			data.auxSize = 0 ;
 			data.auxData = auxBuffer_ ;

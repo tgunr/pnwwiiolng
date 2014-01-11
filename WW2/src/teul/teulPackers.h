@@ -128,10 +128,10 @@ struct ACTION_OBJECT
 #endif
 
 	ACTION_OBJECT(void* const packed_, const SINT32 offset_bits_, const SINT32 size_bytes_=0)
-		: teulIndex(-1), actionObj(NULL), localRawData(NULL), packed((UCHAR*)packed_)
+		: teulIndex(-1), actionObj(nullptr), localRawData(nullptr), packed((UCHAR*)packed_)
 		, offset(offset_bits_), m_size_bytes(size_bytes_)
 		, fromAddress(0), fromPort(0)
-		, endpoint(NULL), m_client(NULL)
+		, endpoint(nullptr), m_client(nullptr)
 	{}
 
 	void packer(LOGICAL mode, bool& value, SINT32 size_bytes_=0);

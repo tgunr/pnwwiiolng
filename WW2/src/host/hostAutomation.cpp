@@ -16,7 +16,7 @@
 class Fake
 {
 public:
-	Fake() : hv(NULL), sx(0), sy(0), dist(0)
+	Fake() : hv(nullptr), sx(0), sy(0), dist(0)
 		   , cx(0), cy(0), cz(0), radius(0), speed(0), started(0)
 		   , x(0), y(0), z(0), pitch(0), roll(0), yaw(0)
 		   , vx(0), vy(0), vz(0), ax(0), ay(0), az(0)

@@ -110,7 +110,7 @@ public:
 	bool featureLock(const std::string& feature, UINT32 now, UINT32 duration=0);	// In chatHost.cpp
 
 	// Get the last octet of the cell host or 0 if player isn't spawned
-	UINT32 getCellHost(class PlayerStatusNode* psn=NULL) const;
+	UINT32 getCellHost(class PlayerStatusNode* psn=nullptr) const;
 
 	// Find the first available channel index
 	UINT32 getOpenChannelIndex(UCHAR type=NO_CHANNEL);
@@ -180,7 +180,7 @@ public:
 	// Implement the groups returned from an SQL query
 	void setGroups(std::vector<UINT32>& groups_);
 
-	void recordEvent(const char* level, const char* index, const char* data1=NULL, const char* data2=NULL) const;
+	void recordEvent(const char* level, const char* index, const char* data1=nullptr, const char* data2=nullptr) const;
 
 	bool recruited(const Player* byPlayer);
 
@@ -199,14 +199,14 @@ public:
 	bool approveGCIMessage(UINT32 messageID, const Chat::GCIMessage& message, bool isGlobal);
 
 	void sendSquadCreateInvite(const ChatHandle& handle, const std::string& name, const ChatHandle& from, RANK_NO rank);
-	void sendSquadInfo(class SquadList* list=NULL);
+	void sendSquadInfo(class SquadList* list=nullptr);
 	bool sendSquadInvite(UINT32 squadID, const ChatHandle& from);
 
 	// Send a command to the strat host in the player's context
 	bool sendStratCommand(const char* string, const char* arguments, bool useMapTarget=true);
 
 	// Change the AFK state and optionally the message
-	void SetAFK(bool to, const char* newMessage=NULL);
+	void SetAFK(bool to, const char* newMessage=nullptr);
 
 	void SetGMHide(bool to) { m_gmHide = to; }
 

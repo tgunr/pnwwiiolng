@@ -101,7 +101,7 @@ public:
 	//! while trying to avoid loading it from disk.
 	//! @param[in] filename_ the file/sub-path of the file to open.
 	//! @param[in] dirname_ [optional] prefix path.
-	MappedFile(const char* const filename_, const char* const dirname_=NULL);
+	MappedFile(const char* const filename_, const char* const dirname_=nullptr);
 
 #if IO_MAP_TYPE == _IMT_WINDOWS && defined(UNICODE)
 	//! Create an in-memory view of a file from disk,
@@ -142,7 +142,7 @@ public:
 	//! @param[in] filename_ the file/sub-path of the file to open.
 	//! @param[in] dirname_ [optional] prefix path.
 	//! @return true if the file was opened, false otherwise.
-	bool mapFile(const char* const filename_, const char* const dirname_=NULL);
+	bool mapFile(const char* const filename_, const char* const dirname_=nullptr);
 
 #if IO_MAP_TYPE == _IMT_WINDOWS && defined(UNICODE)
 	//! Open a new file (closes any currently open file first).

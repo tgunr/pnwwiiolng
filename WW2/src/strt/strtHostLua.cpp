@@ -280,7 +280,7 @@ _execute(const char* name, bool dbOnly)
 bool
 stratStartLua()
 {
-	if ( _luaVM == NULL )
+	if ( _luaVM == nullptr )
 		return false;
 
 	std::string stratLib = cv_luaPath.GetString();

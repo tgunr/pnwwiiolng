@@ -195,7 +195,7 @@ _findCP(SINT32 ox, SINT32 oy, SINT32 id)
 {
 	CPWITHID* cpw;
 
-	for ( cpw = cps; cpw != NULL; cpw = cpw->next )
+	for ( cpw = cps; cpw != nullptr; cpw = cpw->next )
 	{
 		if ( cpw->ox == ox && cpw->oy == oy && cpw->id == id && cpw->bIsCurrent )
 			return cpw->cp_oid;
@@ -227,12 +227,12 @@ _newCPW(UINT32 uOID, SINT32 ox, SINT32 oy, SINT32 id, const char* name, WWII_COU
 
 	// Link it to the list
 
-	if ( cps == NULL )
+	if ( cps == nullptr )
 		cps = newCP;
 	newCP->prev = lastCW;
-	if ( lastCW != NULL )
+	if ( lastCW != nullptr )
 		lastCW->next = newCP;
-	newCP->next = NULL;
+	newCP->next = nullptr;
 	lastCW = newCP;
 
 	return (void*)newCP;
@@ -244,13 +244,13 @@ dbseLoadCP(CP* cp)
 	SINT32 ox, oy;
 	CPWITHID* newCP;
 
-	if ( cp == NULL )
+	if ( cp == nullptr )
 		return FALSE;
 
 	ox = cp->posx / 800;
 	oy = cp->posy / 800;
 
-	for ( newCP = cps; newCP != NULL; newCP = newCP->next )
+	for ( newCP = cps; newCP != nullptr; newCP = newCP->next )
 	{
 		if ( newCP->bIsCurrent )
 			continue;
@@ -260,7 +260,7 @@ dbseLoadCP(CP* cp)
 			break;
 	}
 
-	if ( newCP == NULL )
+	if ( newCP == nullptr )
 	{	// Reached end of list, its not in the table
 		uMaxCPOID++;
 		newCP = (CPWITHID*)_newCPW(uMaxCPOID, ox, oy, cp->oid.id, cp->name, (WWII_COUNTRY)cp->country, (WWII_COUNTRY)cp->country, cp->posx, cp->posy);
@@ -305,7 +305,7 @@ dbseLoadCP(CP* cp)
 static void
 dbseSaveCP(CPWITHID* cpw)
 {
-	if ( cpw == NULL )
+	if ( cpw == nullptr )
 	{
 		if ( _statement[0] != 0 )
 			_executeStatement("save cp", _statement);
@@ -316,8 +316,8 @@ dbseSaveCP(CPWITHID* cpw)
 	if ( !cpw->bIsCurrent )
 		return;
 
-	static char* start = NULL;
-	static char* p = NULL;
+	static char* start = nullptr;
+	static char* p = nullptr;
 
 	if ( _statement[0] == 0 )
 	{
@@ -382,7 +382,7 @@ _findFacility(SINT32 ox, SINT32 oy, SINT32 id)
 {
 FACWITHID* facw;
 
-	for ( facw = facs; facw != NULL; facw = facw->next )
+	for ( facw = facs; facw != nullptr; facw = facw->next )
 	{
 		if ( facw->ox == ox && facw->oy == oy && facw->id == id )
 			return facw->fac_oid;
@@ -396,7 +396,7 @@ _findFacilityBySC(SINT32 sx, SINT32 sy, SINT32 id)
 {
 FACWITHID* facw;
 
-	for ( facw = facs; facw != NULL; facw = facw->next )
+	for ( facw = facs; facw != nullptr; facw = facw->next )
 	{
 		if ( facw->sx == sx && facw->sy == sy && facw->id == id )
 			return facw->fac_oid;
@@ -429,12 +429,12 @@ _newFacW(UINT32 uOID, SINT32 ox, SINT32 oy, SINT32 id, const char* name, WWII_CO
 
 	// Link it to the list
 
-	if ( facs == NULL )
+	if ( facs == nullptr )
 		facs = newFac;
 	newFac->prev = lastFW;
-	if ( lastFW != NULL )
+	if ( lastFW != nullptr )
 		lastFW->next = newFac;
-	newFac->next = NULL;
+	newFac->next = nullptr;
 	lastFW = newFac;
 
 	newFac->bIsCurrent = FALSE;
@@ -448,13 +448,13 @@ dbseLoadFacility(FACILITY* fac)
 	FACWITHID* newFac;
 	SINT32 ox, oy;
 
-	if ( fac == NULL )
+	if ( fac == nullptr )
 		return FALSE;
 
 	ox = fac->posx / 800;
 	oy = fac->posy / 800;
 
-	for ( newFac = facs; newFac != NULL; newFac = newFac->next )
+	for ( newFac = facs; newFac != nullptr; newFac = newFac->next )
 	{
 		if ( newFac->bIsCurrent )
 			continue;
@@ -464,7 +464,7 @@ dbseLoadFacility(FACILITY* fac)
 			break;
 	}
 
-	if ( newFac == NULL )
+	if ( newFac == nullptr )
 	{
 		uMaxFacOID++;
 		newFac = (FACWITHID*)_newFacW(uMaxFacOID, ox, oy, fac->oid.id, fac->name, (WWII_COUNTRY)fac->originalCountry, WWII_NO_COUNTRY, fac->posx, fac->posy);
@@ -506,7 +506,7 @@ dbseLoadFacility(FACILITY* fac)
 static void
 dbseSaveFACILITY(FACWITHID* facw)
 {
-	if ( facw == NULL )
+	if ( facw == nullptr )
 	{
 		if ( _statement[0] != 0 )
 			_executeStatement("save facility", _statement);
@@ -517,8 +517,8 @@ dbseSaveFACILITY(FACWITHID* facw)
 	if ( !facw->bIsCurrent )
 		return;
 
-	static char* start = NULL;
-	static char* p = NULL;
+	static char* start = nullptr;
+	static char* p = nullptr;
 
 	if ( _statement[0] == 0 )
 	{
@@ -594,31 +594,31 @@ _findBuilding(SINT32 ox, SINT32 oy, SINT32 id)
 {
 	BUILDWITHID* buildw;
 
-	for ( buildw = builds; buildw != NULL; buildw = buildw->next )
+	for ( buildw = builds; buildw != nullptr; buildw = buildw->next )
 	{
 		if ( buildw->ox == ox && buildw->oy == oy && buildw->object.oid.id == id )
 			return buildw;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 LOGICAL
 dbseLoadBuilding(BUILDING* object)
 {
-	if ( object == NULL )
+	if ( object == nullptr )
 		return FALSE;
 
 	BUILDWITHID* newObj = new BUILDWITHID;
 	newObj->object = *object;
 	newObj->oid = ++uNumBuilds;
 
-	if ( builds == NULL )
+	if ( builds == nullptr )
 		builds = newObj;
 	newObj->prev = lastBW;
-	if ( lastBW != NULL )
+	if ( lastBW != nullptr )
 		lastBW->next = newObj;
-	newObj->next = NULL;
+	newObj->next = nullptr;
 	lastBW = newObj;
 
 	return TRUE;
@@ -627,15 +627,15 @@ dbseLoadBuilding(BUILDING* object)
 static void
 dbseSaveBUILDING(BUILDWITHID* buildw)
 {
-	if ( buildw == NULL )
+	if ( buildw == nullptr )
 	{
 		if ( _statement[0] != 0 )
 			_executeStatement("save building", _statement);
 		return;
 	}
 
-	static char* start = NULL;
-	static char* p = NULL;
+	static char* start = nullptr;
+	static char* p = nullptr;
 
 	if ( _statement[0] == 0 )
 	{
@@ -703,7 +703,7 @@ dbseSaveBUILDING(BUILDWITHID* buildw)
 static bool
 _addLink(SINT32 ox, SINT32 oy, SINT32 id)
 {
-	for ( BUILDWITHID* b = builds; b != NULL; b = b->next )
+	for ( BUILDWITHID* b = builds; b != nullptr; b = b->next )
 	{
 		SINT32 box = b->object.posx / 800;
 		SINT32 boy = b->object.posy / 800;
@@ -711,11 +711,11 @@ _addLink(SINT32 ox, SINT32 oy, SINT32 id)
 		{
 			SINT32 sx = box >> 4;
 			SINT32 sy = boy >> 4;
-			for ( FACWITHID* f = facs; f != NULL; f = f->next )
+			for ( FACWITHID* f = facs; f != nullptr; f = f->next )
 			{
 				if ( f->sx == sx && f->sy == sy && f->id == b->object.pid.id )
 				{
-					for ( CPWITHID* c = cps; c != NULL; c = c->next )
+					for ( CPWITHID* c = cps; c != nullptr; c = c->next )
 					{
 						if ( c->ox == f->fac.cpid.cell.ox && c->oy == f->fac.cpid.cell.oy && c->id == f->fac.cpid.id )
 						{
@@ -741,19 +741,19 @@ dbseLoadDepotLink(DEPOT_LINK* object)
 {
 	DLINKWITHID* newObj;
 
-	if ( object == NULL )
+	if ( object == nullptr )
 		return FALSE;
 
 	newObj = new DLINKWITHID;
 	newObj->object = *object;
 	newObj->oid = ++uNumDlinks;
 
-	if ( dlinks == NULL )
+	if ( dlinks == nullptr )
 		dlinks = newObj;
 	newObj->prev = lastDLW;
-	if ( lastDLW != NULL )
+	if ( lastDLW != nullptr )
 		lastDLW->next = newObj;
-	newObj->next = NULL;
+	newObj->next = nullptr;
 	lastDLW = newObj;
 
 	return TRUE;
@@ -762,15 +762,15 @@ dbseLoadDepotLink(DEPOT_LINK* object)
 static void
 dbseSaveDEPOT_LINK(DLINKWITHID* linkw)
 {
-	if ( linkw == NULL )
+	if ( linkw == nullptr )
 	{
 		if ( _statement[0] != 0 )
 			_executeStatement("save depot link", _statement);
 		return;
 	}
 
-	static char* start = NULL;
-	static char* p = NULL;
+	static char* start = nullptr;
+	static char* p = nullptr;
 
 	if ( _statement[0] == 0 )
 	{
@@ -797,7 +797,7 @@ dbseSaveDEPOT_LINK(DLINKWITHID* linkw)
 
 	BUILDWITHID* bldg;
 	bldg = _findBuilding(link->startDepotId.cell.ox, link->startDepotId.cell.oy, link->startDepotId.id);
-	if ( bldg == NULL )
+	if ( bldg == nullptr )
 	{
 		fprintf(stderr, "link %s (%d.%d.%d) unable to find startDepot building\n"
 						, g_name, ox, oy, link->oid.id);
@@ -812,7 +812,7 @@ dbseSaveDEPOT_LINK(DLINKWITHID* linkw)
 	}
 
 	bldg = _findBuilding(link->endDepotId.cell.ox, link->endDepotId.cell.oy, link->endDepotId.id);
-	if ( bldg == NULL )
+	if ( bldg == nullptr )
 	{
 		fprintf(stderr, "link %s (%d.%d.%d) unable to find endDepot building\n"
 						, g_name, ox, oy, link->oid.id);
@@ -904,7 +904,7 @@ dbseSaveIndexChanges()
 	start = _statement + sprintf(_statement, "REPLACE INTO ids_cp(cp_oid,cp_ox,cp_oy,cp_id,name)VALUES");
 	p = start;
 
-	for ( cpw = cps; cpw != NULL; cpw = cpw->next )
+	for ( cpw = cps; cpw != nullptr; cpw = cpw->next )
 	{
 		if ( !cpw->bIsInDB && cpw->bIsCurrent )
 		{
@@ -920,7 +920,7 @@ dbseSaveIndexChanges()
 	start = _statement + sprintf(_statement, "REPLACE INTO ids_facility(facility_oid,facility_ox,facility_oy,facility_id,name)VALUES");
 	p = start;
 
-	for ( facw = facs; facw != NULL; facw = facw->next )
+	for ( facw = facs; facw != nullptr; facw = facw->next )
 	{
 		if ( !facw->bIsInDB && facw->bIsCurrent )
 		{
@@ -969,7 +969,7 @@ dbseResolveReferences()
 	title("~~~ Loaded data ~~~");
 
 	title("~~~ resolving links ~~~");
-	for ( dlinkw = dlinks; dlinkw != NULL; dlinkw = dlinkw->next )
+	for ( dlinkw = dlinks; dlinkw != nullptr; dlinkw = dlinkw->next )
 	{
 		if ( !_addLink(dlinkw->object.startDepotId.cell.ox, dlinkw->object.startDepotId.cell.oy, dlinkw->object.startDepotId.id) )
 			printf("no cp for %d.%d.%d %s\n", dlinkw->object.startDepotId.cell.ox, dlinkw->object.startDepotId.cell.oy, dlinkw->object.startDepotId.id, dlinkw->object.name);
@@ -977,38 +977,38 @@ dbseResolveReferences()
 
 	title("~~~ saving cps ~~~");
 	_begin("cp");
-	for ( cpw = cps; cpw != NULL; cpw = cpw->next )
+	for ( cpw = cps; cpw != nullptr; cpw = cpw->next )
 	{
 		dbseSaveCP(cpw);
 	}
-	dbseSaveCP(NULL);
+	dbseSaveCP(nullptr);
 	_end("cp");
 
 	title("~~~ saving facilities ~~~");
 	_begin("facility");
-	for ( facw = facs; facw != NULL; facw = facw->next )
+	for ( facw = facs; facw != nullptr; facw = facw->next )
 	{
 		dbseSaveFACILITY(facw);
 	}
-	dbseSaveFACILITY(NULL);
+	dbseSaveFACILITY(nullptr);
 	_end("facility");
 
 	title("~~~ saving buildings ~~~");
 	_begin("object");
-	for ( buildw = builds; buildw != NULL; buildw = buildw->next )
+	for ( buildw = builds; buildw != nullptr; buildw = buildw->next )
 	{
 		dbseSaveBUILDING(buildw);
 	}
-	dbseSaveBUILDING(NULL);
+	dbseSaveBUILDING(nullptr);
 	_end("object");
 
 	title("~~~ saving depot links ~~~");
 	_begin("link");
-	for ( dlinkw = dlinks; dlinkw != NULL; dlinkw = dlinkw->next )
+	for ( dlinkw = dlinks; dlinkw != nullptr; dlinkw = dlinkw->next )
 	{
 		dbseSaveDEPOT_LINK(dlinkw);
 	}
-	dbseSaveDEPOT_LINK(NULL);
+	dbseSaveDEPOT_LINK(nullptr);
 	_end("link");
 
 	return 0;
@@ -1017,7 +1017,7 @@ dbseResolveReferences()
 SINT32
 dbseLoadFile(SCHAR* path)
 {
-	if ( path == NULL || *path == '\0' )
+	if ( path == nullptr || *path == '\0' )
 	{
 		sdmFinish();
 		return 1;

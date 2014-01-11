@@ -120,29 +120,29 @@ StratHCUnit::StratHCUnit(UINT32 withUnitID, HCUNIT_TYPE withTypeID, UINT32 withP
 				, const char* withToeTemplate
 				)
 	: HCUnit(withUnitID, withTypeID, withParentID, withCountryID, withBranchID, withMovementType, withUnitClass, withHandle, withName, withNick, withRank, withHomeCPID, withOwner, withOwnerRank)
-	, m_homeCP(NULL)
+	, m_homeCP(nullptr)
 	, m_startCP(strtGetCPByOID(withStartCpOID))
 	, m_fallbackCP(strtGetCPByOID(withFallbackCpOID))
 	, m_lastMoved(withLastMove)
 	, m_nextMove(withNextMove)
-	, m_next(NULL)
+	, m_next(nullptr)
 	, m_lastMovedBy(withLastMovedBy)
-	, m_nextEvent(NULL)
+	, m_nextEvent(nullptr)
 	, m_postedWeaponList()
 	, m_toeTemplateHeader(TOE_::TemplateHeader::Lookup(withToeTemplate))
 	, m_toe()
 	, m_impl(*(new StratHCUnitImpl(*this)))
 {
-	if ( NULL == m_startCP && 0 != withStartCpOID )
+	if ( nullptr == m_startCP && 0 != withStartCpOID )
 		dbugLog(_FLA, "hcu:%u(%s) invalid startCP %u", withUnitID, withNick, withStartCpOID);
-	if ( NULL == m_fallbackCP && 0 != withFallbackCpOID )
+	if ( nullptr == m_fallbackCP && 0 != withFallbackCpOID )
 		dbugLog(_FLA, "hcu:%u(%s) invalid fallbackCP %u", withUnitID, withName, withFallbackCpOID);
 
 	// If I'm a brigade, add me to the tail of my parent's list
 	if ( isBrigade() && parent() )
 	{
 		StratHCUnit* tail = parent();
-		while ( tail->next() != NULL )
+		while ( tail->next() != nullptr )
 			tail = tail->next();
 		tail->m_next = this;
 	}
@@ -150,9 +150,9 @@ StratHCUnit::StratHCUnit(UINT32 withUnitID, HCUNIT_TYPE withTypeID, UINT32 withP
 		LogAbort("brigades loaded out of sequence: %u:%s", m_unitID, m_name);
 
 	if ( isTrainingUnit() )
-		m_toeTemplateHeader = NULL;
+		m_toeTemplateHeader = nullptr;
 
-	if ( m_toeTemplateHeader == NULL )
+	if ( m_toeTemplateHeader == nullptr )
 	{
 		if ( !isTrainingUnit() )
 			dbugLog(_FLM, "hcu:%u %s has no/missing TOE template [%s]", m_unitID, m_name, (withToeTemplate ? withToeTemplate : "(null)"));
@@ -171,7 +171,7 @@ StratHCUnit::StratHCUnit(UINT32 withUnitID, HCUNIT_TYPE withTypeID, UINT32 withP
 
 StratHCUnit::~StratHCUnit()
 {
-	if ( m_toeTemplateHeader != NULL )
+	if ( m_toeTemplateHeader != nullptr )
 		m_toeTemplateHeader->unsubscribe(this, m_toe);
 	delete &m_impl;
 }
@@ -258,14 +258,14 @@ const TOE_::WeaponInstance*
 StratHCUnit::toeWeaponInstance(const WEAPON_SPEC& forWeapon) const
 {
 	TOE::const_iterator it = m_toe.find(forWeapon);
-	return ( it != m_toe.end() ) ? &(it->second) : NULL;
+	return ( it != m_toe.end() ) ? &(it->second) : nullptr;
 }
 
 TOE_::WeaponInstance*
 StratHCUnit::toeWeaponInstance(const WEAPON_SPEC& forWeapon)
 {
 	TOE::iterator it = m_toe.find(forWeapon);
-	return ( it != m_toe.end() ) ? &(it->second) : NULL;
+	return ( it != m_toe.end() ) ? &(it->second) : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -281,12 +281,12 @@ StratHCUnit::initialize()
 	}
 
 	CPStruct* home = strtGetCP(homeCPID());
-	if ( home == NULL )
+	if ( home == nullptr )
 	{
 		// A "new" HCU might not have a home and need to be
 		// deployed to either its startCP or else to the
 		// off-map routing destination.
-		if ( m_startCP != NULL )
+		if ( m_startCP != nullptr )
 			home = m_startCP;
 		else
 			home = routDestination[country()];
@@ -318,16 +318,16 @@ StratHCUnit::initialize()
 		rout();
 	}
 
-	if ( m_nextEvent != NULL )
+	if ( m_nextEvent != nullptr )
 	{
 		cnvyCancelBrigadeEvent(m_nextEvent);
-		m_nextEvent = NULL;
+		m_nextEvent = nullptr;
 	}
 
 	if ( isBrigade() && offMap() )
 		m_nextEvent = cnvyScheduleBrigadeReformation(unitID(), nextMoveIn());
 
-	if ( isBrigade() && offMap() == false && fallbackCP() == NULL && parent() != NULL && parent()->homeCP() != NULL )
+	if ( isBrigade() && offMap() == false && fallbackCP() == nullptr && parent() != nullptr && parent()->homeCP() != nullptr )
 		m_fallbackCP = parent()->homeCP();
 }
 
@@ -367,22 +367,22 @@ StratHCUnit*
 StratHCUnit::Lookup(UINT32 unitID)
 {
 	HCUnit* unit = HCUnit::Lookup(unitID);
-	if ( unit == NULL )
-		return NULL;
+	if ( unit == nullptr )
+		return nullptr;
 	if ( unit->isBrigade() || unit->isDivision() )
 		return (StratHCUnit*) unit;
-	return NULL;
+	return nullptr;
 }
 
 StratHCUnit*
 StratHCUnit::Lookup(const char* name)
 {
 	HCUnit* unit = HCUnit::Lookup(name);
-	if ( unit == NULL )
-		return NULL;
+	if ( unit == nullptr )
+		return nullptr;
 	if ( unit->isBrigade() || unit->isDivision() )
 		return (StratHCUnit*) unit;
-	return NULL;
+	return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -391,13 +391,13 @@ StratHCUnit::Lookup(const char* name)
 bool
 StratHCUnit::hasLinkTo(const CPStruct* cp, LinkStruct*& link ) const
 {
-	if ( cp == NULL || homeCP() == NULL )
+	if ( cp == nullptr || homeCP() == nullptr )
 		return false;
-	link = NULL;
+	link = nullptr;
 	if ( cp == homeCP() )
 		return true;
 	link = cp->linkTo(homeCP());
-	return ( link != NULL );
+	return ( link != nullptr );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -433,7 +433,7 @@ StratHCUnit::isSupplyInTransit() const
 bool
 StratHCUnit::setFallbackCP(CPStruct* toCP)
 {
-	assert( toCP != NULL );
+	assert( toCP != nullptr );
 
 	// Cannot fallback to off-map
 	if ( toCP == routDestination[country()] )
@@ -467,7 +467,7 @@ StratHCUnit::setHomeCP(CPStruct* toCP, UINT32 redeployDelay, bool forceDelay)
 	// During normal movement, the previous CP is remembered to provide
 	// a first option for automatic brigade movement (routing, etc)
 	if ( offMap() || toCP == routDestination[country()] )
-		m_fallbackCP = NULL;
+		m_fallbackCP = nullptr;
 	else if ( toCP != homeCP() )
 		m_fallbackCP = homeCP();
 
@@ -482,7 +482,7 @@ StratHCUnit::setHomeCP(CPStruct* toCP, UINT32 redeployDelay, bool forceDelay)
 		// Change -- record movement
 		m_lastMoved = teulTime();
 		m_homeCP = toCP;
-		if ( toCP != NULL )
+		if ( toCP != nullptr )
 			setHomeCPID(toCP->fullObjID);
 
 		if ( redeployDelay > 0 )
@@ -505,10 +505,10 @@ StratHCUnit::setHomeCP(CPStruct* toCP, UINT32 redeployDelay, bool forceDelay)
 	// after a period of time
 	if ( isBrigade() )
 	{
-		if ( m_nextEvent != NULL )
+		if ( m_nextEvent != nullptr )
 		{
 			cnvyCancelBrigadeEvent(m_nextEvent);
-			m_nextEvent = NULL;
+			m_nextEvent = nullptr;
 		}
 
 		if ( offMap() )
@@ -526,7 +526,7 @@ UINT32
 StratHCUnit::unitsOnMap() const
 {
 	UINT32 count = 0;
-	for ( const StratHCUnit* unit = division(); unit != NULL; unit = unit->next() )
+	for ( const StratHCUnit* unit = division(); unit != nullptr; unit = unit->next() )
 	{
 		if ( !unit->offMap() )
 			++count;
@@ -542,10 +542,10 @@ StratHCUnit::unitsOnMap() const
 BRIGADE_MOVE_RESULT
 StratHCUnit::deployPermission(const CPStruct* const cp, bool manualMove) const
 {
-	if ( cp == NULL )
+	if ( cp == nullptr )
 		return BMR_FAILED;
 
-	if ( manualMove == true && cp != routDestination[country()] && toeTemplateHeader() == NULL )
+	if ( manualMove == true && cp != routDestination[country()] && toeTemplateHeader() == nullptr )
 	{
 		return BMR_FAILED_PERMISSION;
 	}
@@ -599,14 +599,14 @@ StratHCUnit::deployPermission(const CPStruct* const cp, bool manualMove) const
 #ifndef FRES
 		if ( !offMap() )
 		{
-			LinkStruct* link = NULL;
+			LinkStruct* link = nullptr;
 			// We must already be at the CP or directly linked to it.
 			// If a link is involved, return it to us so we don't have
 			// to look it up again.
 			if ( hasLinkTo(cp, link) == false )
 				return BMR_FAILED_LINK;
 			// If the brigade is being moved and a link is involved, is it enemy owned?
-			if ( manualMove == true && link != NULL )
+			if ( manualMove == true && link != nullptr )
 			{
 				if ( link->endDepot->side != side() || link->startDepot->side != side() )
 					return BMR_FAILED_ENEMY_DEPOT;
@@ -664,7 +664,7 @@ StratHCUnit::deploy(CPStruct* cp, UINT32 redeployDelay, const char* byCallsign, 
 	dbugLog(_FLI, "hcu:%u(%s) delay:%u redeploying to %s from %s"
 					, unitID(), callsign(), redeployDelay
 					, cp ? cp->name : "offmap"
-					, (homeCP() != NULL ? homeCP()->name : "<nowhere>")
+					, (homeCP() != nullptr ? homeCP()->name : "<nowhere>")
 					);
 
 	const UINT32 fromOID = homeCP() ? homeCP()->uOID : 0;
@@ -680,12 +680,12 @@ StratHCUnit::deploy(CPStruct* cp, UINT32 redeployDelay, const char* byCallsign, 
 		);
 
 	cnvyCancelBrigadeEvent(m_nextEvent);
-	m_nextEvent = NULL;
+	m_nextEvent = nullptr;
 
 	bool wasOffMap = !offMap();
 
 	if ( wasOffMap )
-		m_fallbackCP = NULL;
+		m_fallbackCP = nullptr;
 	else
 		m_fallbackCP = m_homeCP;
 	setHomeCP(cp, redeployDelay, forceDelay);
@@ -756,7 +756,7 @@ StratHCUnit::findFallback() const
 	if ( offMap() )
 	{
 		dbugLog(_FLIB, "offmaps don't fallback");
-		return NULL;
+		return nullptr;
 	}
 
 	// Priority 1: Last location
@@ -772,11 +772,11 @@ StratHCUnit::findFallback() const
 
 	CPStruct::LINKS::iterator it;
 	LinkStruct* link;
-	LinkStruct* candidate = NULL;
+	LinkStruct* candidate = nullptr;
 	bool hadDivisionLink = false;
 	bool hadSupply = false;
 
-	const CPStruct* parentCP = (NULL != parent()) ? parent()->homeCP() : homeCP();
+	const CPStruct* parentCP = (nullptr != parent()) ? parent()->homeCP() : homeCP();
 
 	// Look thru the links for the shortest link
 	// if one or more links closes in on the parent, use that.
@@ -809,7 +809,7 @@ StratHCUnit::findFallback() const
 			continue;
 		}
 
-		bool divisionLink = (NULL != parentCP && parentCP->linkTo(cp) != NULL);
+		bool divisionLink = (nullptr != parentCP && parentCP->linkTo(cp) != nullptr);
 
 		// Priority 3: DivHQ + 1
 		if ( false == divisionLink && true == hadDivisionLink )
@@ -821,7 +821,7 @@ StratHCUnit::findFallback() const
 		dbugLog(_FLIB, "%d[%c] ", link->distance, (divisionLink ? 'Y' : 'n'));
 
 		// Show less interest in contested towns when an uncontested town is available.
-		if ( candidate != NULL && true == cp->isContested() && false == candidate->endDepot->cp->isContested() )
+		if ( candidate != nullptr && true == cp->isContested() && false == candidate->endDepot->cp->isContested() )
 		{
 			dbugLog(_FLIB, "<contested ");
 			continue;
@@ -830,7 +830,7 @@ StratHCUnit::findFallback() const
 		// This destination must meet one or more of the deployment/movement
 		// rules for adjacency, etc, which means its either towards a member
 		// brigade or it is towards a friendly brigade.
-		if ( NULL == candidate || (divisionLink && !hadDivisionLink) || (isSupplied && !hadSupply) || _preferableFallback(candidate, link) )
+		if ( nullptr == candidate || (divisionLink && !hadDivisionLink) || (isSupplied && !hadSupply) || _preferableFallback(candidate, link) )
 		{
 			dbugLog(_FLIB, "candidate ");
 			candidate = link;
@@ -839,10 +839,10 @@ StratHCUnit::findFallback() const
 		}
 	}
 
-	if ( candidate == NULL )
+	if ( candidate == nullptr )
 	{
 		dbugLog(_FLIB, "no fallback options");
-		return NULL;
+		return nullptr;
 	}
 
 	dbugLog(_FLIB, "Using %s", candidate->endDepot->cp->name);
@@ -871,7 +871,7 @@ StratHCUnit::fallback()
 
 	deploy(fallbackCP(), brigadeFallbackTime_s, "SYSTEM", true);
 
-	m_fallbackCP = NULL;
+	m_fallbackCP = nullptr;
 
 	return true;
 }
@@ -892,7 +892,7 @@ StratHCUnit::rout()
 
 	// Make sure there IS an offmap location
 	CPStruct* destination = routDestination[country()];
-	if ( destination == NULL )
+	if ( destination == nullptr )
 	{
 		dbugLog(_FLA, "*** No fallback destination for country %u", country());
 		return false;
@@ -902,7 +902,7 @@ StratHCUnit::rout()
 	deploy(destination, unitReformTime_s, "SYSTEM", true);
 
 	// You can't fallback
-	m_fallbackCP = NULL;
+	m_fallbackCP = nullptr;
 
 	return false;
 }
@@ -945,7 +945,7 @@ _redeployTime(UINT32 deployTime, const CPStruct* const cp, UINT32 lastTimeInSupp
 BRIGADE_MOVE_RESULT
 StratHCUnit::move(const char* byCallsign, CPStruct* cp)
 {
-	if ( cp == NULL )
+	if ( cp == nullptr )
 	{
 		dbugLog(_FLW, "%s requested move %s to NULL CP", byCallsign, callsign());
 		return BMR_FAILED_TARGET;
@@ -988,7 +988,7 @@ StratHCUnit::move(const char* byCallsign, CPStruct* cp)
 
 	if ( fromOffMap && isDivision() )
 	{
-		for ( auto brigade = next(); brigade != NULL; brigade = brigade->next() )
+		for ( auto brigade = next(); brigade != nullptr; brigade = brigade->next() )
 		{
 			if ( brigade->offMap() && brigade->nextMoveIn() < 30 )
 				brigade->deploy(cp, brigadeMoveTime_s, byCallsign, true);
@@ -1023,7 +1023,7 @@ strtDeployDivision(HCUnit* unit, CPStruct* cp, bool transferSupply)
 
 	division->deploy(cp, 0, "SYSTEM", transferSupply);
 
-	for ( auto brigade = division->next(); brigade != NULL; brigade = brigade->next() )
+	for ( auto brigade = division->next(); brigade != nullptr; brigade = brigade->next() )
 	{
 		brigade->deploy(cp, 0, "SYSTEM", transferSupply);
 	}
@@ -1038,7 +1038,7 @@ bool
 strtReformBrigade(UINT32 brigadeID, STRAT_UPDATE* const fromEvent)
 {
 	StratHCUnit* const brigade = StratHCUnit::Lookup(brigadeID);
-	ABORT_IF(brigade == NULL);
+	ABORT_IF(brigade == nullptr);
 	if ( brigade->isTrainingUnit() )
 		return true;
 
@@ -1048,7 +1048,7 @@ strtReformBrigade(UINT32 brigadeID, STRAT_UPDATE* const fromEvent)
 		return false;
 	}
 
-	if ( fromEvent != NULL && brigade->nextEvent() != fromEvent )
+	if ( fromEvent != nullptr && brigade->nextEvent() != fromEvent )
 	{
 		betaLog(_FLW, "hcu:%u incorrect event %p", brigadeID, fromEvent);
 		return false;
@@ -1104,7 +1104,7 @@ StratHCUnit::depositWeapons(const WEAPON_SPEC& spec, UINT16 numUnits, bool allow
 	}
 
 	TOE_::WeaponInstance* entry = toeWeaponInstance(spec);
-	if ( entry == NULL )
+	if ( entry == nullptr )
 	{
 		dbugLog(_FLA, "hcu:%u(%s) weap:%s weapon not in TOE"
 						, unitID(), callsign(), weapPrintName(&spec));
@@ -1149,7 +1149,7 @@ StratHCUnit::depositWeapons(const WEAPON_SPEC& spec, UINT16 numUnits, bool allow
 
 
 	// Deposited -- if it came with a resupply ticket, cancel it
-	if ( replaceTicket != NULL )
+	if ( replaceTicket != nullptr )
 		cancelResupplyTicket(replaceTicket);
 
 	// Don't check resupply overage if we are over-limit but not over-supply.
@@ -1203,7 +1203,7 @@ bool
 StratHCUnit::initializeWeapon(const WEAPON_SPEC& spec, UINT16 numUnits)
 {
 	TOE_::WeaponInstance* const entry = toeWeaponInstance(spec);
-	if ( entry == NULL )
+	if ( entry == nullptr )
 	{
 		dbugLog(_FLA, "hcu:%u weap:%s weapon not in TOE", unitID(), weapPrintSpecC(&spec));
 		return false;
@@ -1242,7 +1242,7 @@ StratHCUnit::withdrawWeapons(const WEAPON_SPEC& spec, UINT16 numUnits)
 	}
 
 	TOE_::WeaponInstance* const entry = toeWeaponInstance(spec);
-	if ( entry == NULL )
+	if ( entry == nullptr )
 	{
 		dbugLog(_FLA, "hcu:%u weap:%s weapon not in TOE", unitID(), weapPrintName(&spec));
 		return false;
@@ -1283,10 +1283,10 @@ StratHCUnit::reset()
 
 	// If we're a brigade and we have a division parent,
 	// its location should be our default fallback position
-	if ( isBrigade() == true && division() != NULL )
+	if ( isBrigade() == true && division() != nullptr )
 		m_fallbackCP = division()->startCP();
 	else
-		m_fallbackCP = NULL;
+		m_fallbackCP = nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1314,7 +1314,7 @@ StratHCUnit::decrementThrottle(const POSTED_WEAPON* const postedWeapon)
 	if ( host_config.supply.enabled == false || host_config.throttle.enabled == false )
 		return;
 
-	if ( postedWeapon->m_postingEntry != NULL && (postedWeapon->m_status == POSTED_WEAPON::_POSTED || postedWeapon->m_status == POSTED_WEAPON::_RESERVED) )
+	if ( postedWeapon->m_postingEntry != nullptr && (postedWeapon->m_status == POSTED_WEAPON::_POSTED || postedWeapon->m_status == POSTED_WEAPON::_RESERVED) )
 		m_impl.decrementThrottle(StratHCUnitImpl::ThrottleKey(postedWeapon->m_postingEntry->facility(), postedWeapon->spec()));
 }
 
@@ -1324,7 +1324,7 @@ StratHCUnit::incrementThrottle(const POSTED_WEAPON* const postedWeapon)
 	if ( host_config.supply.enabled == false || host_config.throttle.enabled == false )
 		return;
 
-	if ( postedWeapon->m_postingEntry != NULL )
+	if ( postedWeapon->m_postingEntry != nullptr )
 		m_impl.incrementThrottle(StratHCUnitImpl::ThrottleKey(postedWeapon->m_postingEntry->facility(), postedWeapon->spec()));
 }
 

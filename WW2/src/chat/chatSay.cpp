@@ -33,7 +33,7 @@ static const char* g_fsNoCountry[] =
 	"kre", "hun", "lo", "hum", "mo", "pff",
 	"thpo", "mak", "na", "kik", "chak", "zik",
 	"mipt", "niha", "mah", "buh", "rahka",
-	NULL
+	nullptr
 };
 
 static const char* g_fsEnglish[] =
@@ -51,12 +51,12 @@ static const char* g_fsEnglish[] =
 	"gun", "shot", "me", "elp", "my", "a", "cig",
 	"vick", "bof", "tuf", "nar", "wor", "ers",
 	"mar", "ek", "un", "ole", "oke", "ad",
-	NULL
+	nullptr
 };
 
 static const char* g_fsAmerican[] =
 {	// American
-	NULL
+	nullptr
 };
 
 static const char* g_fsFrench[] =
@@ -72,7 +72,7 @@ static const char* g_fsFrench[] =
 	"dieu", "nest", "pistol", "aide", "moi",
 	"donner", "mon", "tir", "clope", "pinard",
 	"jamais", "dans", "plus", "mama",
-	NULL
+	nullptr
 };
 
 static const char* g_fsGerman[] =
@@ -92,22 +92,22 @@ static const char* g_fsGerman[] =
 	"reis", "hand", "hoch", "grenaten", "schuss",
 	"hilf", "gevare", "rauch", "tsum", "maus",
 	"luger", "mess", "sch", "viss", "haff", "ink",
-	NULL
+	nullptr
 };
 
 static const char* g_fsItalian[] =
 {	// Italian
-	NULL
+	nullptr
 };
 
 static const char* g_fsChina[] =
 {	// China
-	NULL
+	nullptr
 };
 
 static const char* g_fsRussia[] =
 {	// Russia
-	NULL
+	nullptr
 };
 
 static const char* g_fsPirate[] =
@@ -118,7 +118,7 @@ static const char* g_fsPirate[] =
 	"plank", "scurvy", "dog", "rum", "chest", "off",
 	"doubloons", "mighty", "yo", "ho", "hoho",
 	"baytah", "teh", "doh", "twowiks", "gold", "thar",
-	NULL
+	nullptr
 };
 
 static int g_foreignCounts[MAX_COUNTRIES+1];
@@ -209,7 +209,7 @@ const char*
 chatForeignizeMessage(WWII_COUNTRY country, size_t maxLen)
 {
 	static char text[MAX_MESSAGE_LENGTH+1];
-	const char** parts = NULL;
+	const char** parts = nullptr;
 	int selection = 0;
 	size_t destOff = 0;
 	const char* selected;
@@ -226,7 +226,7 @@ chatForeignizeMessage(WWII_COUNTRY country, size_t maxLen)
 		country = WWII_NO_COUNTRY;
 
 	parts = g_foreignParts[country];
-	if ( parts == NULL )
+	if ( parts == nullptr )
 	{
 		dbugLog(_FLI, "NULL POINTER for g_foreignParts[%d]", country);
 		return text;
@@ -331,7 +331,7 @@ chatSay(Player* player, Chat::ClientMessage* message, char* phrase, AREA_CHAT_MO
 	static Chat::HostMessage enemyMsg;
 
 	_populateSayMessage(outMsg, player, message, phrase, icon);
-	enemyMsg.msg = NULL;
+	enemyMsg.msg = nullptr;
 
 	Player* cur;
 
@@ -369,7 +369,7 @@ chatSay(Player* player, Chat::ClientMessage* message, char* phrase, AREA_CHAT_MO
 					continue;
 
 				// If this is our first enemy, the message isn't populated yet.
-				if ( enemyMsg.msg == NULL )
+				if ( enemyMsg.msg == nullptr )
 					_populateEnemyMessage(enemyMsg, outMsg, player->country(), phrase);
 
 				cur->send(enemyMsg);

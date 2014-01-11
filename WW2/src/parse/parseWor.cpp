@@ -65,7 +65,7 @@ static PARSE_CALLBACK	_stratCallbacks[] = {{"cp",			_fillCp}
 											,{"facility",	_fillFacility}
 											,{"building",	_fillCpObject}
 											,{"depot_link",	_fillDepotLink}
-											,{"",			NULL}};
+											,{"",			nullptr}};
 
 #if platBuild == TEUL_SERVER
 static bool doNothing(SINT32 numArgss, FUNCARGS* args) { return true; }
@@ -100,7 +100,7 @@ static PARSE_CALLBACK  blank[]={{"backdrop",				doNothing},
                                {"attachanimationtoobject",	doNothing},
                                {"loadsound",				doNothing},
                                {"multitexture",				doNothing},
-                               {"",						NULL},
+                               {"",						nullptr},
                               };
 #endif
 
@@ -130,7 +130,7 @@ static _Type* _getValue(SECTION_ENUM sec, const std::string& name)
 {
 	ObjMap& objects = _stratSections[sec].objects;
 	ObjMap::iterator it = objects.find(name);
-	return (_Type*)( it != objects.end() ? it->second : NULL );
+	return (_Type*)( it != objects.end() ? it->second : nullptr );
 }
 
 
@@ -191,7 +191,7 @@ static void _copyObjName(const char* sourceName, char* destName)
 {
 	// If there is a directory separator, advance past it.
 	const char* p = strrchr(sourceName, '\\');
-	if ( p != NULL )
+	if ( p != nullptr )
 		sourceName = ++p;
 
 	// Trim off any trailing extension
@@ -366,7 +366,7 @@ WEAPON_SPEC spec;
 	// Some mechanism may need to be used for the 64 bit ASCII to 64 bit integer conversion.
 	// The atoll function is not supported on the PC; however, _atoi64 is supported.
 #ifndef FRONT_END // max damage is not used on front end anyway
-	thisParam->maxdamage		= strtoull(args[MAX_LM_ARG+0].svalue, NULL, 10);
+	thisParam->maxdamage		= strtoull(args[MAX_LM_ARG+0].svalue, nullptr, 10);
 #endif
 	thisParam->rpsrepair		= args[MAX_LM_ARG+1].dvalue;
 	thisParam->repairtime		= args[MAX_LM_ARG+2].dvalue;

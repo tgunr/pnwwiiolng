@@ -76,7 +76,7 @@ WWII_CONFIG host_config;
 
 WWII_CONFIG_MAP configMap[] =
 {
-	{ NULL,	TYPE_UNUSED, NULL, 0, NULL, NULL }
+	{ nullptr,	TYPE_UNUSED, nullptr, 0, nullptr, nullptr }
 ,	{ "arena.banCheats",			TYPE_BOOL,	&host_config.arena.banCheats,			0,		"n",	"Ban DamnCheaters detects" }
 ,	{ "arena.checksums",			TYPE_BOOL,	&host_config.arena.checksums,			0,		"n",	"Detect and eject players with modified clients" }
 ,	{ "arena.enableIRCCommands",	TYPE_BOOL,	&host_config.arena.enableIRCCommands, 	0,		"y",	"Enable '.command's from IRC management interface" }
@@ -224,7 +224,7 @@ WWII_CONFIG_MAP configMap[] =
 ,	{ "weather.chanceOf",			TYPE_SINT,	&host_config.weather.chanceOf,		100,	"10",	"Per-day chance it will be a rainy day (0=never,	100=always)" }
 
 // -- End of list
-,	{ NULL, MAX_WWII_CONFIG_TYPES, NULL, 0, NULL, NULL }
+,	{ nullptr, MAX_WWII_CONFIG_TYPES, nullptr, 0, nullptr, nullptr }
 };
 
 static bool
@@ -244,7 +244,7 @@ _isAffirmative(const char* const string)
 bool
 wwiiConfigSetINT(UINT32* data, const char* const source, UINT64 max)
 {
-	if ( data == NULL || source == NULL )
+	if ( data == nullptr || source == nullptr )
 	{
 		dbugLog(_FLAS, "called with NULL data or source");
 		return false;
@@ -269,7 +269,7 @@ bool
 wwiiConfigSetSINT(UINT16* data, const char* const source, UINT64 max)
 {
 	UINT32 value;
-	if ( data == NULL || source == NULL )
+	if ( data == nullptr || source == nullptr )
 	{
 		dbugLog(_FLAS, "called with NULL data or source");
 		return false;
@@ -299,7 +299,7 @@ wwiiConfigSetSINT(UINT16* data, const char* const source, UINT64 max)
 bool
 wwiiConfigSetFLOAT(FLOAT32* data, const char* const source, UINT64 /*max*/)
 {
-	if ( data == NULL || source == NULL )
+	if ( data == nullptr || source == nullptr )
 	{
 		dbugLog(_FLAS, "called with NULL data or source");
 		return false;
@@ -321,7 +321,7 @@ wwiiConfigSetFLOAT(FLOAT32* data, const char* const source, UINT64 /*max*/)
 bool
 wwiiConfigSetSTRING(char* data, const char* const source, UINT64 max)
 {
-	if ( data == NULL || source == NULL )
+	if ( data == nullptr || source == nullptr )
 	{
 		dbugLog(_FLAS, "called with NULL data or source");
 		return false;
@@ -346,7 +346,7 @@ wwiiConfigSetSTRING(char* data, const char* const source, UINT64 max)
 bool
 wwiiConfigSetBOOL(UCHAR* data, const char* const source, UINT64 /*max*/)
 {
-	if ( data == NULL || source == NULL )
+	if ( data == nullptr || source == nullptr )
 	{
 		dbugLog(_FLAS, "called with NULL data or source");
 		return false;
@@ -365,7 +365,7 @@ wwiiConfigSetBOOL(UCHAR* data, const char* const source, UINT64 /*max*/)
 bool
 wwiiConfigSetBYTE(UCHAR* data, const char* const source, UINT64 max)
 {
-	if ( data == NULL || source == NULL )
+	if ( data == nullptr || source == nullptr )
 	{
 		dbugLog(_FLAS, "called with NULL data or source");
 		return false;

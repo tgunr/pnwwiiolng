@@ -99,7 +99,7 @@ public:
 	//! Notify our application of a connection becoming connected.
 	void doConnect();
 	//! Report error to our application.
-	void doError(const SINT32 error, void* data = NULL);
+	void doError(const SINT32 error, void* data = nullptr);
 
 	//! Close down the socket.
 	void shutdown();

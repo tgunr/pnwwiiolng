@@ -100,7 +100,7 @@ MobileSpawn::incrementSpawnees(const playerid_t forPlayer) const
 
 	// You are either new or more than INTERVAL secs ago
 	Player* const player = PlayerInterface::Lookup(m_playerID);
-	if ( player != NULL )
+	if ( player != nullptr )
 	{
 		player->addMobileSpawnee();
 		m_spawnees[forPlayer] = teulTime();
@@ -120,7 +120,7 @@ Mission::activateMobileSpawn(Player* const player, UINT32 stoUID, FLOAT64 x, FLO
 
 	if ( !wasActive )
 	{
-		if ( brigade() != NULL )
+		if ( brigade() != nullptr )
 			++(brigade()->m_mobileSpawns);
 	}
 
@@ -170,7 +170,7 @@ Mission::deactivateMobileSpawn(MSPAWN_RESULT reason)
 					, missionID()
 					, reason);
 
-	if ( brigade() != NULL )
+	if ( brigade() != nullptr )
 		--(brigade()->m_mobileSpawns);
 
 	/// - Send a timer update to all our listners
@@ -187,12 +187,12 @@ Mission::deactivateMobileSpawn(MSPAWN_RESULT reason)
 static inline bool
 _isIncomingEnemyFirebase(FacilityStruct* fb, CPStruct* cp, WWII_SIDE forSide)
 {
-	if ( fb == NULL ) return false;
+	if ( fb == nullptr ) return false;
 	if ( fb->type != FACILITY_FIREBASE ) return false;
 	if ( !fb->isOpen() ) return false;
 	if ( fb->side == WWII_NO_SIDE || fb->side == forSide ) return false;
-	if ( fb->link == NULL ) return false;
-	if ( fb->link->endDepot == NULL ) return false;
+	if ( fb->link == nullptr ) return false;
+	if ( fb->link->endDepot == nullptr ) return false;
 	if ( fb->link->endDepot->cp != cp ) return false;
 	return true;
 }
@@ -209,7 +209,7 @@ Mission::getMobileSpawnPermission() const
 
 	///RULE: OWNER
 	// Must own the origin facility
-	if ( m_originFac == NULL || m_originFac->side != m_side )
+	if ( m_originFac == nullptr || m_originFac->side != m_side )
 	{
 		threadLog(_FLD, "msp: m#%d no-longer origin owner", missionID());
 		return MSDR_OWNER;
@@ -224,7 +224,7 @@ Mission::getMobileSpawnPermission() const
 	{
 		///RULE: LINK
 		// Must be a link between non-same cp
-		if ( m_linkFromTarget == NULL )
+		if ( m_linkFromTarget == nullptr )
 		{
 			threadLog(_FLD, "msp: m#%d no link from %s to %s"
 							, missionID()
@@ -318,10 +318,10 @@ missAddMobileSpawn(UINT32 missionID, const playerid_t playerID, const ChatHandle
 	try
 	{
 		Mission* const mission = mapFindMission(missionID);
-		if ( mission == NULL )
+		if ( mission == nullptr )
 			throw std::domain_error("Unknown mission");
 		Player* const player = PlayerInterface::Lookup(playerID);
-		if ( player == NULL )
+		if ( player == nullptr )
 			throw std::domain_error("Unknown player");
 
 		error = mission->getMobileSpawnPermission();
@@ -362,7 +362,7 @@ void
 missMobileSpawnCancel(UINT32 missionID, const ChatHandle& handle, SINT32 x, SINT32 y)
 {
 	Mission* mission = mapFindMission(missionID);
-	if ( mission == NULL )
+	if ( mission == nullptr )
 	{
 		dbugLog(_FLM, "m:%u no such mission for msp cancel", missionID);
 		return;

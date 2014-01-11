@@ -86,7 +86,7 @@ public:
 	UINT32 lastTimeInSupply() const;
 	bool isSupplyInTransit() const;
 	BRIGADE_MOVE_RESULT move(const char* moveBy, CPStruct* toCP);
-	StratHCUnit* parent() const { return (type() == HCU_BRIGADE) ? (StratHCUnit*)m_parent : NULL; }
+	StratHCUnit* parent() const { return (type() == HCU_BRIGADE) ? (StratHCUnit*)m_parent : nullptr; }
 //tolua_end
 	POSTED_WEAPON_LIST& postedWeaponList() { return m_postedWeaponList; }
 	const POSTED_WEAPON_LIST& postedWeaponList() const { return m_postedWeaponList; }
@@ -101,7 +101,7 @@ public:
 
 	// Deliver a number of vehicles into this TOE
 	// Pass replaceTicket if you are planning to re-extract the vehicle on success
-	bool depositWeapons(const WEAPON_SPEC& spec, UINT16 numUnits, bool allowOverstock, ResupplyTicket* replaceTicket=NULL);
+	bool depositWeapons(const WEAPON_SPEC& spec, UINT16 numUnits, bool allowOverstock, ResupplyTicket* replaceTicket=nullptr);
 
 	const char* describe() const;
 
@@ -115,7 +115,7 @@ public:
 	// Specify a level for a particular vehicle
 	bool initializeWeapon(const WEAPON_SPEC& spec, UINT16 numUnits);
 
-	bool isSpawnable() const { return ( m_toeTemplateHeader != NULL && m_toe.empty() == false ); }
+	bool isSpawnable() const { return ( m_toeTemplateHeader != nullptr && m_toe.empty() == false ); }
 
 	// Delay the scheduling of the next resupply queue by this long
 	void pauseResupplyQueue(UINT32 seconds);
@@ -185,7 +185,7 @@ public:
 	// Create and queue a resupply ticket for me; never overstocks.
 	// Unless isTransfer is true, ticket will not be completed if the unit is
 	// in a non-supplied CP when it comes up for processing.
-	ResupplyTicket* createResupplyTicket(TOE_::WeaponInstance& entry, bool isTransfer, UINT32 inSeconds, UINT16 units, POSTED_WEAPON* source=NULL);
+	ResupplyTicket* createResupplyTicket(TOE_::WeaponInstance& entry, bool isTransfer, UINT32 inSeconds, UINT16 units, POSTED_WEAPON* source=nullptr);
 	// Cancel a resupply ticket for me
 	void cancelResupplyTicket(ResupplyTicket* ticket);
 
@@ -216,6 +216,6 @@ extern bool strtDeployDivision(HCUnit* division, CPStruct* cp, bool transferSupp
 
 extern void strtInitializeHCUnits();
 
-extern bool strtReformBrigade(UINT32 brigadeID, STRAT_UPDATE* fromEvent=NULL);
+extern bool strtReformBrigade(UINT32 brigadeID, STRAT_UPDATE* fromEvent=nullptr);
 
 //tolua_end

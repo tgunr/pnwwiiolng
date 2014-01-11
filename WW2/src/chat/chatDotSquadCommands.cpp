@@ -35,12 +35,12 @@ _findClientSquadList(const Player& player)
 {
 	SquadList* list = chatFindSquadList(player.squadID());
 
-	if ( list != NULL ) return list;
+	if ( list != nullptr ) return list;
 
 	SquadControlResult error(SQR_SQUAD_UNAVAILABLE, SquadControl::_INVALID, 0LL);
 	error.send(player.teulIndex());
 
-	return NULL;
+	return nullptr;
 }
 
 static inline ChatHandle
@@ -136,7 +136,7 @@ public:
 		}
 
 		SquadList* list = _findClientSquadList(player);
-		if ( list == NULL )
+		if ( list == nullptr )
 			return;
 
 		if ( !list->squad().votingEnabled() )
@@ -145,7 +145,7 @@ public:
 			return;
 		}
 
-		if ( player.squadRank() == Squad::RECRUIT && chatFindSquadVote(player.squadID()) == NULL )
+		if ( player.squadRank() == Squad::RECRUIT && chatFindSquadVote(player.squadID()) == nullptr )
 		{
 			player.message(LSTR_CAUTION, LSTR_SQUAD_NOT_VOTING);
 			return;
@@ -163,7 +163,7 @@ public:
 		}
 
 		ChatHandle handle = chatGetLowercaseHandle(arguments);
-		if ( list->find(handle) == NULL )
+		if ( list->find(handle) == nullptr )
 		{
 			player.message(LSTR_CAUTION, LSTR_PLAYER_NOT_IN_SQUAD, Chat::Name(handle).c_str());
 			return;
@@ -183,7 +183,7 @@ public:
 		}
 
 		SquadList* list = _findClientSquadList(player);
-		if ( list == NULL ) return;
+		if ( list == nullptr ) return;
 
 		if ( !list->squad().votingEnabled() )
 		{
@@ -193,7 +193,7 @@ public:
 
 		SquadVote* vote = chatFindSquadVote(player.squadID());
 
-		if ( vote == NULL || vote->m_started == false )
+		if ( vote == nullptr || vote->m_started == false )
 		{
 			player.message(LSTR_CAUTION, LSTR_SQUAD_NOT_VOTING);
 			return;
@@ -230,7 +230,7 @@ public:
 
 		// Make sure the squad is in memory
 		SquadList* list = _findClientSquadList(player);
-		if ( list == NULL ) return;
+		if ( list == nullptr ) return;
 
 		if ( strcasecmp(arguments, "on") == 0 )			 // Turn voting on
 		{
@@ -271,7 +271,7 @@ public:
 
 			// Cancel any pending vote
 			SquadVote* vote = chatFindSquadVote(player.squadID());
-			if ( vote != NULL )
+			if ( vote != nullptr )
 				vote->erase(player.squadID());
 		}
 		else
@@ -313,7 +313,7 @@ DotWho::actionWith(Player& player, Chat::ClientMessage* /*message*/, char* argum
 	CHAT_WHO_LIST whoList(CWT_HC, 0, Teul::TCPStdPayload);
 	Chat::Who who;
 	SquadList* list = chatFindSquadList(player.squadID());
-	SquadMemberEntry* entry = NULL;
+	SquadMemberEntry* entry = nullptr;
 
 	whoList.clear();
 
@@ -322,7 +322,7 @@ DotWho::actionWith(Player& player, Chat::ClientMessage* /*message*/, char* argum
 		ChatHandle handleID = chatGetLowercaseHandle(args[i]);
 		Player* target = PlayerInterface::Lookup(handleID);
 
-		if ( target != NULL
+		if ( target != nullptr
 			&& target->isVisibleTo(player)
 			&& (!target->noWho() || player.isEffectiveGM())
 			)
@@ -331,7 +331,7 @@ DotWho::actionWith(Player& player, Chat::ClientMessage* /*message*/, char* argum
 		}
 		else
 		{
-			entry = (list) ? list->find(handleID) : NULL;
+			entry = (list) ? list->find(handleID) : nullptr;
 			if ( entry )
 				who.setBasics(handleID, false, true, entry->squadRank(), list->squad().shortHandle());
 			else
@@ -377,7 +377,7 @@ DotWho::action(Player& player, Chat::ClientMessage* /*message*/) const
 		{
 			if ( reply.length() + 10 > MAX_MESSAGE_LENGTH )
 			{
-				player.message(LSTR_NONE, lstringID, reply.c_str(), NULL);
+				player.message(LSTR_NONE, lstringID, reply.c_str(), nullptr);
 				lstringID = LSTR_TEXT;
 				reply.clear();
 			}
@@ -395,9 +395,9 @@ DotWho::action(Player& player, Chat::ClientMessage* /*message*/) const
 		}
 	}
 	if ( count == 0 )
-		player.message(LSTR_NONE, LSTR_NO_MATCHES, NULL, NULL);
+		player.message(LSTR_NONE, LSTR_NO_MATCHES, nullptr, nullptr);
 	else if ( reply.length() > 0 )
-		player.message(LSTR_NONE, LSTR_TEXT_END, reply.c_str(), NULL);
+		player.message(LSTR_NONE, LSTR_TEXT_END, reply.c_str(), nullptr);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -446,7 +446,7 @@ protected:
 			threadLog(_FLA, "Updated multiple squads during rename!");
 
 		Player* player = PlayerInterface::Lookup(m_requester);
-		if (player == NULL)
+		if (player == nullptr)
 			return;
 
 		chatRenameSquad(m_from, m_to);
@@ -460,7 +460,7 @@ protected:
 	virtual void Failure() OVERRIDE_FN
 	{
 		Player* player = PlayerInterface::Lookup(m_requester);
-		if (player == NULL)
+		if (player == nullptr)
 			return;
 
 		player->message(LSTR_CAUTION, LSTR_DB_QUERY_FAILED, "rename squad", "Database error");
@@ -536,7 +536,7 @@ public:
 		if (!isCaseChange && !_checkName(to, false, player))
 			return;
 
-		player.gmNote("GM", command(), arguments, NULL);
+		player.gmNote("GM", command(), arguments, nullptr);
 
 		(new SquadRename(player.matchHandle(), from, to))->Queue();
 	}

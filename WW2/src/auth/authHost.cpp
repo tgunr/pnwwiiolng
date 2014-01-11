@@ -130,7 +130,7 @@ public:
 	ArenaName(UINT32 arenaID)
 		: arenaName(authdbGetArenaAlias(arenaID))
 	{
-		if ( arenaName == NULL )
+		if ( arenaName == nullptr )
 		{
 			strprintf(arena, "arena:%u", arenaID);
 			arenaName = arena;
@@ -165,7 +165,7 @@ GAME::GAME()
 	,	clusterID(0)
 	,	m_lastReported(0)
 	,	lock(AL_OFFLINE)
-	,	m_server(NULL)
+	,	m_server(nullptr)
 	,	requiresMax(true)
 	,	calcMaxUsersOnTheFly(true)
 	,	usePlayerID(true)
@@ -187,7 +187,7 @@ GAME::GAME(const AUTH_GAME_INIT& gInit)
 	, clusterID(0)
 	, m_lastReported(0)
 	, lock(AL_OFFLINE)
-	, m_server(NULL)
+	, m_server(nullptr)
 	, requiresMax(true)
 	, calcMaxUsersOnTheFly(true)
 	, usePlayerID(true)
@@ -206,7 +206,7 @@ GAME::GAME(const AUTH_GAME_INIT& gInit)
 	teulGetAddress(curHostVersion, hostVer, sizeof(hostVer) - 1);
 
 	const char* gameName = authdbGetArenaAlias(arenaID);
-	if ( gameName == NULL )
+	if ( gameName == nullptr )
 		gameName = description;
 
 	wwiiIRCMessage("-sys,#servers", "AuthInit %s host:%s arena:%u app:%u game:%u grp:%u clu:%u maxu:%u"
@@ -221,7 +221,7 @@ GAME::NeedsQueueProcessing() const
 {
 #if defined(USE_LOGIN_QUEUES)
 	// Check for conditions that make the queue invalid:
-	if ( m_server == NULL )
+	if ( m_server == nullptr )
 		return true;			// Server offline;
 	if ( lock < AL_OFF || (lock & AL_ENTRY) )
 		return true;			// Not allowing play;
@@ -246,7 +246,7 @@ GAME::CheckLoginQueue()
 	{
 		// Get the first person off the queues
 		Auth::ClientData* cdata = Auth::Queue::GetNextPlayer(arenaID);
-		if ( cdata == NULL )
+		if ( cdata == nullptr )
 			return;
 
 		cdata->RemoveFromQueue(true);
@@ -274,19 +274,19 @@ static GAME*
 _findGame(UINT32 arenaID)
 {
 	GameIndex::iterator it = gameIndex.find(arenaID);
-	return (it != gameIndex.end() ? it->second : NULL);
+	return (it != gameIndex.end() ? it->second : nullptr);
 }
 
 static void
 _releaseConnection(const SINT32 teulIndex)
 {
 	Auth::ClientData* cdata = (Auth::ClientData*)teulGetPersonaData(teulIndex);
-	if ( cdata == NULL )
+	if ( cdata == nullptr )
 		return;
 
 	cdata->RemoveFromQueue(false);
 
-	teulSetPersonaData(teulIndex, NULL);
+	teulSetPersonaData(teulIndex, nullptr);
 	delete cdata;
 
 	dbugLog(_FLD, "t:%d connection closed", teulIndex);
@@ -372,7 +372,7 @@ _sendArenaInfo(Auth::ClientData& cdata, ARENA_REQ& request)
 {
 	//check to see if the game host has actually connected
 	GAME* game = _findGame(request.arenaID);
-	if ( game != NULL )
+	if ( game != nullptr )
 	{
 		dbugLog(_FLD, "t:%d app:%u plat:%u arena:%u got gameEntry", cdata.teulIndex, cdata.appID, cdata.platform, request.arenaID);
 
@@ -448,7 +448,7 @@ _verifyChecksum(const SINT32 /*teulIndex*/, const UINT32 appID, const UINT32 pla
 {
 	UINT32 i;
 
-	if ( appID == 0 || checksum == NULL )
+	if ( appID == 0 || checksum == nullptr )
 		return false;
 
 	for ( i = 0; i < numTOSChecksums; i++ )
@@ -547,7 +547,7 @@ _presenterOutdated(UINT32 presenterVersion, UINT32 platform)
 
 	//use cave's readmanifest stuff
 	vers_manifest* vmatch = matchversion(presenterVersion, Auth::Apps::PRESENTER, platform);	// appID=5
-	if ( vmatch == NULL )
+	if ( vmatch == nullptr )
 		return true;
 
 	return (vmatch->isfile != ISFILE_NUN);
@@ -574,7 +574,7 @@ _setupVersionUpdate(APP_LAUNCH& launch, APP_LAUNCH_REQ& request, UINT32 platform
 
 	vmatch = matchversion(request.appVersion, request.appID, platform);
 
-	if( vmatch == NULL)
+	if( vmatch == nullptr)
 	{
 		dbugLog(_FLW, "unable to find web page for appVersion %x appID %d, platform %d redirecting to general game page"
 					, request.appVersion, request.appID, platform);
@@ -722,14 +722,14 @@ GAME::~GAME()
 {
 	dbugLog(_FLI, "deleting game %p", this);
 
-	m_server = NULL;
+	m_server = nullptr;
 
 	authdbUpdateArenaStatus(arenaID, AL_OFFLINE, 0);
 
 	// Remove ourselves from the index.
 	auto it = gameIndex.find(arenaID);
 	if ( it != gameIndex.end() && it->second == this )
-		it->second = NULL;
+		it->second = nullptr;
 }
 
 static void _gameErrorFunction (const SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 error)
@@ -742,7 +742,7 @@ static void _gameErrorFunction (const SINT32 teulIndex, const UCHAR* const /*dat
 
 	//If the game host endpoint toasts up, then we need to hold off
 	SERVER* server = (SERVER*)teulGetPersonaData(teulIndex);
-	if ( server == NULL )
+	if ( server == nullptr )
 	{
 		dbugLog(_FLA, "lost unknown connection");
 		return;
@@ -766,13 +766,13 @@ static void _gameErrorFunction (const SINT32 teulIndex, const UCHAR* const /*dat
 	if ( game->server() == server )
 	{
 		delete game;
-		server->game = NULL;
+		server->game = nullptr;
 	}
 
-	if ( server->game == NULL )
+	if ( server->game == nullptr )
 		delete server;
 
-	teulSetPersonaData(teulIndex, NULL);
+	teulSetPersonaData(teulIndex, nullptr);
 }
 
 // process the arena request
@@ -952,8 +952,8 @@ static const char* _describeLock(SINT32 lock)
 	}
 	static std::string buffer;
 	buffer = "";
-	static const char* bits[] = { "NoCap", "NoSpawn", "NoKill", "CLOSED", NULL };
-	for ( UINT32 i = 0; bits[i] != NULL; ++i )
+	static const char* bits[] = { "NoCap", "NoSpawn", "NoKill", "CLOSED", nullptr };
+	for ( UINT32 i = 0; bits[i] != nullptr; ++i )
 	{
 		if ( (lock & (1 << i)) == 0 )
 			continue;
@@ -969,7 +969,7 @@ void
 handleGameCapacityUpdate(const AUTH_GAME_CAPACITY& message)
 {
 	GAME* const game = _findGame(message.arenaID);
-	if ( game == NULL )
+	if ( game == nullptr )
 	{
 		// This can occur when the server is running ahead of the auth server
 		// e.g. if the auth server is restarted.
@@ -1031,7 +1031,7 @@ void
 handleServerLoadUpdate(const AUTH_SERVER_LOAD& message)
 {
 	GAME* game = _findGame(message.arenaID);
-	if( game == NULL )
+	if( game == nullptr )
 	{
 		dbugLog(_FLA, "update received from %s for arenaID %u, but we have no info for that server"
 						, teulGetAddress(message.hostAddress)
@@ -1043,7 +1043,7 @@ handleServerLoadUpdate(const AUTH_SERVER_LOAD& message)
 	bool changed = false;
 
 	SERVER* const server = game->server();
-	if ( server != NULL )
+	if ( server != nullptr )
 	{
 		if ( server->ipAddress == message.hostAddress && server->currentUsers != message.numPlayers )
 		{
@@ -1297,7 +1297,7 @@ _okToLaunch(const SINT32 teulIndex, UINT32 platform, const char* ip, const APP_L
 SERVER::~SERVER()
 {
 	if ( teulIndex >= 0 )
-		teulSetPersonaData(teulIndex, NULL);
+		teulSetPersonaData(teulIndex, nullptr);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1308,7 +1308,7 @@ static bool
 _processLaunchRequest(const SINT32 teulIndex, APP_LAUNCH_REQ& request, Auth::ClientData& cdata, APP_LAUNCH& reply)
 {
 	Auth::Dispatch dispatch;
-	GAME* gameEntry = NULL;
+	GAME* gameEntry = nullptr;
 	UINT32 platform = 0;
 
 	char ip[64+1];
@@ -1329,7 +1329,7 @@ _processLaunchRequest(const SINT32 teulIndex, APP_LAUNCH_REQ& request, Auth::Cli
 					, (gameEntry ? gameEntry->currentUsers : 0), (gameEntry ? gameEntry->maxUsers : 0)
 					);
 
-	if( gameEntry == NULL )
+	if( gameEntry == nullptr )
 	{
 		_noGameEntry(teulIndex, platform, ip, request, reply);
 		return false;
@@ -1371,7 +1371,7 @@ _processLaunchRequest(const SINT32 teulIndex, APP_LAUNCH_REQ& request, Auth::Cli
 	// everything's peachy
 	/////////////////////////////////////
 	SERVER* bestServer = _findOptimumServer(*gameEntry);
-	if ( bestServer == NULL )
+	if ( bestServer == nullptr )
 	{
 		_noServerAvailable(teulIndex, request, *gameEntry, reply);
 		return false;
@@ -1392,7 +1392,7 @@ _processLaunchRequest(const SINT32 teulIndex, APP_LAUNCH_REQ& request, Auth::Cli
 SINT32 authLaunchRequest(const SINT32 teulIndex, APP_LAUNCH_REQ& request)
 {
 	Auth::ClientData* cdata = (Auth::ClientData*)teulGetPersonaData(teulIndex);
-	if (cdata == NULL)
+	if (cdata == nullptr)
 		return -EINVAL;
 
 	cdata->teulIndex = teulIndex;
@@ -1427,7 +1427,7 @@ authEstablishServer(const SINT32 teulIndex, AUTH_GAME_INIT& gInit)
 
 	//Try to find out if this is a new game
 	GAME* game = _findGame(gInit.arenaID);
-	if ( game == NULL )
+	if ( game == nullptr )
 	{
 		//No game entry found, we must create a new one
 		dbugLog(_FLN,"Creating a new game entry for this arena type");
@@ -1563,7 +1563,7 @@ void AppGameList::process()
 	{
 		GAME* game =_findGame(arenaIDs[numGames]);
 		arenaID[numGames] = arenaIDs[numGames];
-		lockState[numGames] = (NULL != game) ? game->lock : AL_OFFLINE;
+		lockState[numGames] = (nullptr != game) ? game->lock : AL_OFFLINE;
 	}
 }
 
@@ -1683,11 +1683,11 @@ Auth::GameList::populate(const std::vector<UCHAR>& clientSubs)
 	{
 		entry.m_arenaID = clientSubs[i];
 		const char* alias = authdbGetArenaAlias(entry.m_arenaID);
-		if ( alias == NULL )
+		if ( alias == nullptr )
 			continue;
 		entry.m_name = alias;
 		GAME* game = _findGame(clientSubs[i]);
-		if ( game == NULL )
+		if ( game == nullptr )
 		{
 			entry.m_appID = 0;
 			entry.m_lockState = AL_OFFLINE;
@@ -1713,7 +1713,7 @@ SINT32
 Auth::LoginRequest::process(const SINT32 teulIndex)
 {
 	Auth::ClientData* cdata = (Auth::ClientData*)teulGetPersonaData(teulIndex);
-	if (cdata != NULL)
+	if (cdata != nullptr)
 	{
 		dbugLog(_FLA, "t:%d c:%s ignoring multiple login requests from client", teulIndex, cdata->m_username.c_str());
 		return -EINVAL;

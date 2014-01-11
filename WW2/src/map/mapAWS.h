@@ -82,7 +82,7 @@ namespace AWS
 		Row(UINT16 row, bool hasData, UINT16 startCol)
 			: m_row(row), m_hasData(hasData)
 			, m_startCol(startCol)
-			, m_data(NULL)
+			, m_data(nullptr)
 			{}
 
 		// Which row this is. It needs to be xfered because lag/loss of

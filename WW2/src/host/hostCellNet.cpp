@@ -127,7 +127,7 @@ hostPushVehicleBroadcasts()
 bool
 hostSendVehicleBroadcast(UCHAR* buffer, SINT32 size)
 {
-	if ( buffer == NULL )
+	if ( buffer == nullptr )
 	{
 		LogAbort("called hostSendVehicleBroadcast with NULL");
 	}
@@ -178,7 +178,7 @@ hostQueueVehicleRemove(UINT32 vehIndex, UCHAR exitCode)
 	if ( !g_clustered )
 		return;
 
-	static Teul::Packet* outgoing = NULL;
+	static Teul::Packet* outgoing = nullptr;
 	static UINT32 vehiclesQueued = 0;
 
 	if ( vehIndex == 0 && vehiclesQueued == 0 )
@@ -186,7 +186,7 @@ hostQueueVehicleRemove(UINT32 vehIndex, UCHAR exitCode)
 
 	if ( vehIndex != 0 )
 	{
-		if ( outgoing == NULL )
+		if ( outgoing == nullptr )
 		{
 			outgoing = new Teul::Packet(0, Comm::CallbackX, BCAST_VEH_REMOVE_Y);
 			outgoing->setUnencrypted();
@@ -206,7 +206,7 @@ hostQueueVehicleRemove(UINT32 vehIndex, UCHAR exitCode)
 	outgoing->send(updateBcastSend);
 
 	delete outgoing;
-	outgoing = NULL;
+	outgoing = nullptr;
 
 	vehiclesQueued = 0;
 }

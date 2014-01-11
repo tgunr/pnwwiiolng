@@ -83,7 +83,7 @@ const char* errorTypes[] = {
 };
 
 #if platBuild == TEUL_SERVER
-namespace Teul { namespace uWeb { class Server; Server* s_debugServer = NULL; } }
+namespace Teul { namespace uWeb { class Server; Server* s_debugServer = nullptr; } }
 #endif
 
 //static SINT32	theError = 0;
@@ -142,7 +142,7 @@ _roll(const char* const filename, const int baseNum)
 static void
 _qualifyFilename(const char* filename, char* const output, const size_t outputSize)
 {
-	if ( filename == NULL || filename[0] == 0 )
+	if ( filename == nullptr || filename[0] == 0 )
 		filename = "logfile";
 
 	// Already qualified.
@@ -186,7 +186,7 @@ _openDbugFile(const char* const srcFile_)
 
 	_qualifyFilename(srcFile_, filename, sizeof(filename));
 
-	if (PN_UNLIKELY(filename != NULL))
+	if (PN_UNLIKELY(filename != nullptr))
 	{
 		int oflags = _O_CREAT|_O_WRONLY|_O_TRUNC;
 
@@ -268,8 +268,8 @@ void DebugLogger::initialize(SINT32 logType_, Debug::ERROR_TYPE level_, SINT32 f
 	lineno = -1;
 
 	setProgram(program_);
-	setFileName(NULL);		// Don't have an open file.
-	setText(NULL);
+	setFileName(nullptr);		// Don't have an open file.
+	setText(nullptr);
 
 	initialized = true;
 }
@@ -361,7 +361,7 @@ _setSignal(int signum, void (*handler)(int))
 {
 	struct sigaction action;
 	// Get the pre-existing setup.
-	const int err = sigaction(signum, NULL, &action);
+	const int err = sigaction(signum, nullptr, &action);
 	if ( err < 0 )
 		return err;
 
@@ -369,7 +369,7 @@ _setSignal(int signum, void (*handler)(int))
 	sigfillset(&action.sa_mask);
 	action.sa_flags = SA_RESETHAND;
 
-	return sigaction(signum, &action, NULL);
+	return sigaction(signum, &action, nullptr);
 }
 #endif
 
@@ -426,7 +426,7 @@ void dbugInit(SINT32 logType, const char* const filename)
 	}
 
 	static struct timeval tv;
-	gettimeofday(&tv, 0);
+	gettimeofday(&tv, nullptr);
 	const TeulTimeMS newTimeMS = ((TeulTimeMS)tv.tv_sec * 1000LL) + (tv.tv_usec / 1000);
 	if ( newTimeMS < teulClock64 )
 	{
@@ -605,9 +605,9 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 	if ( PN_LIKELY((_logger.errType != Debug::ERR_FATAL) && (_logger.errType > minLevel)) )
 		return 0;
 
-	if ( (myName = strrchr(filename,'/')) != NULL)
+	if ( (myName = strrchr(filename,'/')) != nullptr)
 		myName++;
-	else if ( (myName = strrchr(filename,'\\')) != NULL)
+	else if ( (myName = strrchr(filename,'\\')) != nullptr)
 		myName++;
 	else
 		myName = filename;
@@ -635,8 +635,8 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 		_dbugOut(_logger.dbugfile, _logger.logType, _logger.errType, flags, _logger.text(), len, false);
 	}
 
-	const char* text = NULL;
-	if ( PN_UNLIKELY(fmt == NULL) )
+	const char* text = nullptr;
+	if ( PN_UNLIKELY(fmt == nullptr) )
 		len = 0;
 	else
 	{
@@ -775,7 +775,7 @@ _LogAbort(const char* file_, unsigned int line_, unsigned int error_, const char
 #else
 	if ( PN_LIKELY(_logger.isInitialized()) )
 	{
-		if ( assertion_ != NULL && *assertion_ != 0 )
+		if ( assertion_ != nullptr && *assertion_ != 0 )
 			_dbugLog(file_, line_, error_, "ASSERTION: %s", assertion_);
 		_dbugLogPrivate(FALSE, file_, line_, error_, fmt_, args);
 	}

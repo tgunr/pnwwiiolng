@@ -178,7 +178,7 @@ MappedFile::mapFileHandleInternal()
 			| MAP_SHARED	// Share buffers with any other mmappers of this file.
 			;
 	void* const ptr =
-		mmap(NULL, m_size + 1, PROT_READ, flags, m_handle, 0);
+		mmap(nullptr, m_size + 1, PROT_READ, flags, m_handle, 0);
 	if ( ptr == MAP_FAILED )
 		return unmapFile();
 
@@ -239,7 +239,7 @@ MappedFile::mapFile(const wchar_t* const filename_, const wchar_t* const dirname
 bool
 MappedFile::unmapFile()
 {
-	if ( m_basePtr != NULL )
+	if ( m_basePtr != nullptr )
 	{
 #if IO_MAP_TYPE == _IMT_WINDOWS
 		UnmapViewOfFile(m_basePtr);
@@ -247,8 +247,8 @@ MappedFile::unmapFile()
 		munmap(m_basePtr, m_size + 1);
 #endif
 
-		m_basePtr = NULL;
-		m_startPtr = m_endPtr = m_currentPtr = NULL;
+		m_basePtr = nullptr;
+		m_startPtr = m_endPtr = m_currentPtr = nullptr;
 		m_size = 0;
 	}
 
@@ -285,12 +285,12 @@ MappedFile::unmapFile()
 MappedFile&
 MappedFile::operator = (const MappedFile& rhs_)
 {
-	if ( rhs_.m_basePtr != NULL )
+	if ( rhs_.m_basePtr != nullptr )
 		throw std::runtime_error("illegal mapped-file operation");
-	if ( m_basePtr != NULL )
+	if ( m_basePtr != nullptr )
 		throw std::runtime_error("illegal mapped-file overwrite operation");
 
-	m_basePtr = NULL;
+	m_basePtr = nullptr;
 	m_startPtr = rhs_.m_startPtr;
 	m_endPtr = rhs_.m_endPtr;
 	m_currentPtr = rhs_.m_currentPtr;

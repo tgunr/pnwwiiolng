@@ -51,7 +51,7 @@ chatSendBroadcastAll(LSTRING_ID prefix, LSTRING_ID messageID
 bool
 chatSendAdminMessage(const char* fmt, ...)
 {
-	if ( fmt == NULL )
+	if ( fmt == nullptr )
 		return false;
 
 	va_list args;
@@ -93,7 +93,7 @@ chatSendDirectMessage(const playerid_t playerID, LSTRING_ID prefix, LSTRING_ID m
 		return false;
 	}
 
-	if ( fmt == NULL )
+	if ( fmt == nullptr )
 		return false;
 
 	va_list args;

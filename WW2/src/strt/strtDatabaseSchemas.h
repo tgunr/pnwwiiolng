@@ -12,7 +12,7 @@ static const char* revisions[] =
 		",`implemented` TIMESTAMP NOT NULL"
 		")"
 		" COMMENT 'Track current database schema revision to allow automatic updates'"
-	,	NULL
+	,	nullptr
 	//}
 ,	// Revision 1: Update/add the wthr_report table
 	//{
@@ -26,21 +26,21 @@ static const char* revisions[] =
 		",`rain_pattern` INT(11) UNSIGNED NOT NULL COMMENT 'Rain pattern (if applicable)'"
 		",`weather_forecast` INT(11) UNSIGNED NOT NULL COMMENT 'Prediction for tomorrow'"
 		")"
-	,	NULL
+	,	nullptr
 	//}
 ,	// Revision 2: Move the weather report stuff to the 'strat' database.
 	//{
 		"DROP TABLE IF EXISTS `strat`.`wthr_report`"
 	,	"CREATE TABLE `strat`.`wthr_report` LIKE `wwiionline`.`wthr_report`"
 	,	"DROP TABLE IF EXISTS `wwiionline`.`wthr_report`"
-	,	NULL
+	,	nullptr
 	//}
 ,	// Revision 3: Change the layout of the recordings table to match new enums.
 	//{
 		"TRUNCATE TABLE `sys`.`cell_sessions`"
 	,	"TRUNCATE TABLE `sys`.`cell_recording`"
 	,	"ALTER TABLE `sys`.`cell_recording` MODIFY `event_type` ENUM('Misc', 'Removal', 'Update', '1Time')"
-	,	NULL
+	,	nullptr
 	//}
 ,	// Revision 4: Add the audit.sto_history table.
 	//{
@@ -63,17 +63,17 @@ static const char* revisions[] =
 		", `flags` INT(11) UNSIGNED NOT NULL"
 		", `lifespan` INT(11) UNSIGNED NOT NULL"
 		") COMMENT 'Audit trail of STO creation/destruction'"
-	,	NULL
+	,	nullptr
 	//}
 ,	// Revision 5: Fix the primary key on the audit.sto_history table.
 	//{
 		"ALTER TABLE `audit`.`sto_history` DROP PRIMARY KEY, ADD INDEX (`uid`, `event`), ADD INDEX (`clock64`)"
-	,	NULL
+	,	nullptr
 	//}
 ,	// Revision 6: Enable country 2.
 	//{
 		"UPDATE `wwiionline`.`wwii_country` SET abbr = 'US', fullName = 'USA', sideID = 1, is_active = 1 WHERE countryID = 2"
-	,	NULL
+	,	nullptr
 	//}
 ,	// Revision 7: Add US training HC Units.
 	//{
@@ -100,7 +100,7 @@ static const char* revisions[] =
 			", 0, 0, 0, 0"
 			", 0, 0, '', 3, 'SYSTEM'"
 			")"
-	,	NULL
+	,	nullptr
 	//}
 ,	// Revision 8: Make the sto history table less inaccurate.
 	//{
@@ -108,7 +108,7 @@ static const char* revisions[] =
 		"	MODIFY `pos_x` DECIMAL(12,4) NOT NULL COMMENT 'X co-ordinate'"
 		",	MODIFY `pos_y` DECIMAL(12,4) NOT NULL COMMENT 'Y co-ordinate'"
 		",	MODIFY `pos_z` DECIMAL(12,4) NOT NULL COMMENT 'Y co-ordinate'"
-	,	NULL
+	,	nullptr
 	//}
 ,	// Revision 9: Add American structure.
 	//{
@@ -140,13 +140,13 @@ static const char* revisions[] =
 			", 0, 0, 0, 0"
 			", 0, 0, '', 3, 'SYSTEM'"
 			")"
-	,	NULL
+	,	nullptr
 	//}
 ,	// Revision 10: Add clientRevision to the client_terminations table.
 	//{
 		"ALTER TABLE `wwii`.`client_terminations`"
 			" ADD COLUMN `clientRevision` int(11) unsigned NOT NULL DEFAULT '0'"
-	,	NULL
+	,	nullptr
 	//}
 ,	// Revision 11: Create wwiionline.chat_messages table.
 	//{
@@ -156,20 +156,20 @@ static const char* revisions[] =
 		",message text"
 		",logged timestamp NOT NULL"
 		")"
-	,	NULL
+	,	nullptr
 	//}
 ,	// Revision 12: Rename wwiionline.wwii_config and replace with a view.
 	//{
 		"RENAME TABLE `wwiionline`.`wwii_config` TO `game`.`host_config`"
 	,	"CREATE SQL SECURITY INVOKER VIEW `wwiionline`.`wwii_config` AS SELECT * FROM `game`.`host_config`"
-	,	NULL
+	,	nullptr
 	//}
 ,	// Revision 13: Update wwii_country
 	//{
 		"DELETE FROM `wwiionline`.`wwii_country` WHERE abbr IN ('JP', 'CW')"
 	,	"UPDATE `wwiionline`.`wwii_country` SET countryID = 6 WHERE abbr = 'CN'"
 	,	"UPDATE `wwiionline`.`wwii_country` set countryID = 7 WHERE abbr = 'RU'"
-	,	NULL
+	,	nullptr
 	//}
 ,	// Revision 14: Update countries.
 	//{
@@ -180,7 +180,7 @@ static const char* revisions[] =
 	,	"UPDATE `wwiionline`.`strat_facility` SET originalcountry = originalcountry - 2 WHERE originalcountry > 7"
 	,	"UPDATE `wwiionline`.`strat_object` SET country = country - 2 WHERE country > 7"
 	,	"UPDATE `wwiionline`.`strat_object` SET originalcountry = originalcountry - 2 WHERE originalcountry > 7"
-	,	NULL
+	,	nullptr
 	//}
 ,	// Revision 15: Add weapon spec column to vehicle table so we don't have to keep calculating it.
 	//{
@@ -188,14 +188,14 @@ static const char* revisions[] =
 	,	"UPDATE `wwiionline`.`wwii_vehtype` SET `weapon_spec` = wwii.f_weapon_spec(countryid, categoryid, classid, vehtype_oid)"
 	,	"ALTER TABLE `wwiionline`.`wwii_vehtype` MODIFY COLUMN `weapon_spec` INT(11) UNSIGNED NOT NULL"
 	,	"ALTER TABLE `wwiionline`.`wwii_vehtype` ADD INDEX `vt_os` (weapon_spec)"
-	,	NULL
+	,	nullptr
 	//}
 ,	// Revision 16: Fixes from playnet database.
 	//{
 		"ALTER TABLE `wwiionline`.`wwii_sortie` MODIFY `successful` TINYINT(1) UNSIGNED DEFAULT 0"
 	,	"ALTER TABLE `wwiionline`.`wwii_sortie` MODIFY `capture_assists` SMALLINT(5) UNSIGNED DEFAULT 0"
 	,	"ALTER TABLE `wwiionline`.`wwii_sortie` MODIFY `resupplies` SMALLINT(5) UNSIGNED DEFAULT 0"
-	,	NULL
+	,	nullptr
 	//}
 ,	// Revision 17: Fix wwii.v_vehicle_vs_vehicle view.
 	//{
@@ -221,6 +221,6 @@ static const char* revisions[] =
 				"((`k`.`victim_vehtype_oid` = `vv`.`vehtype_oid`) "
 				"and (`k`.`killer_vehtype_oid` = `kv`.`vehtype_oid`)) "
 				"group by 1, 2"
-	,	NULL
+	,	nullptr
 	//}
 } ;

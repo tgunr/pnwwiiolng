@@ -74,7 +74,7 @@ chatFindMission(UINT32 missionID)
 {
 	CHAT_MISSIONS::iterator it = g_missions.find(missionID);
 	if ( it == g_missions.end() )
-		return NULL;
+		return nullptr;
 	return it->second;
 }
 
@@ -213,7 +213,7 @@ void
 chatMissionOrders(const Player* player)
 {
 	ChatMission* mission = chatFindMission(player->missionID());
-	if ( mission == NULL || mission->m_ordersMsg == LSTR_NONE )
+	if ( mission == nullptr || mission->m_ordersMsg == LSTR_NONE )
 		player->message(LSTR_NOTE, LSTR_NO_STANDING_ORDERS);
 	else
 		player->message(LSTR_ORDERS, (LSTRING_ID)mission->m_ordersMsg, mission->m_ordersText1.c_str(), mission->m_ordersText2.c_str());
@@ -293,7 +293,7 @@ void
 chatMessageMissionChannel(UINT32 missionID, Chat::LocalizedMessage& lmsg)
 {
 	ChatMission* const mission = chatFindMission(missionID);
-	if ( mission != NULL && mission->m_members.empty() == false )
+	if ( mission != nullptr && mission->m_members.empty() == false )
 		chatBroadcastLocMessage(mission->m_members.begin(), mission->m_members.end(), lmsg);
 }
 
@@ -400,7 +400,7 @@ void
 chatMissionRemovePlayer(Player* player, UINT32 missionID, UINT32 sponsor)
 {
 	ChatMission* const mission = chatFindMission(missionID);
-	if ( mission == NULL )
+	if ( mission == nullptr )
 	{
 		dbugLog(_FLA, "t:%d p:%u c:%s m:%u no mission data for removal"
 						, player->teulIndex(), player->playerID(), player->callsign(), missionID);
@@ -426,7 +426,7 @@ chatMissionRemovePlayer(Player* player, UINT32 missionID, UINT32 sponsor)
 	if ( player->matchHandle() == chatGetLowercaseHandle(mission->backupLeader()) )
 	{
 		Player* leader = PlayerInterface::Lookup(mission->m_matchLeader);
-		if ( leader != NULL )
+		if ( leader != nullptr )
 			leader->message(LSTR_CAUTION, LSTR_BACKUP_LEADER_LEFT, player->callsign());
 		mission->setBackupLeader(0);
 	}
@@ -507,7 +507,7 @@ ChatMission::sendMobileSpawn(UINT32 playerID, const ChatHandle& handle, FLOAT64 
 	dbugLog(_FLD, "mswp %s m:%u p:%u sto:%u @ %0.3g,%0.3g,%0.3g", (deployed ? "cre" : "del"), missionID(), playerID, stosUID, x, y, z);
 
 	ENDPOINT* const endpoint = serverPeerEndpointByType(MAP_HOST);
-	if ( endpoint != NULL )
+	if ( endpoint != nullptr )
 	{
 		MobileSpawnWaypoint wp(missionID(), playerID, handle, x, y, z, deployed, stosUID, 0);
 		MOBILE_SPAWN_WAYPOINT packet(wp);
@@ -621,7 +621,7 @@ chatMissionUpdateMember(Player* const player)
 		return;
 
 	ChatMission* const mission = chatFindMission(player->missionID());
-	if ( mission == NULL )
+	if ( mission == nullptr )
 		return;
 
 	mission->addMemberUpdate(player);
@@ -779,7 +779,7 @@ ChatMission::SetLeader(const ChatHandle& newLeaderHandle)
 	{
 		SetOrders(LSTR_NEW_LEADER, callsign.c_str());
 		Player* const newLeader = PlayerInterface::Lookup(newLeaderHandle);
-		if ( newLeader != NULL )
+		if ( newLeader != nullptr )
 		{
 			if ( !_egg(newLeader) )
 			{
@@ -820,8 +820,8 @@ _candidateRank(const Player* const player)
 static const Player*
 _findNewLeader(ChatMission::MEMBERS::const_iterator start, ChatMission::MEMBERS::const_iterator end, bool allowAfk)
 {
-	const Player* preferred = NULL;
-	const Player* previous = NULL;
+	const Player* preferred = nullptr;
+	const Player* previous = nullptr;
 	RANK_NO preferredRank = (previous) ? _candidateRank(previous) : 0;
 
 	while ( start != end )
@@ -874,7 +874,7 @@ ChatMission::checkDisplacedLeader() const
 bool
 ChatMission::electBackupLeader()
 {
-	const Player* candidate = NULL;
+	const Player* candidate = nullptr;
 	if ( !m_members.empty() && m_members.size() > 1 )
 	{
 		if ( backupLeader() != 0LL )
@@ -884,20 +884,20 @@ ChatMission::electBackupLeader()
 			if ( candidate->rejectLead() )
 			{
 				lead().backup(0);
-				candidate = NULL;
+				candidate = nullptr;
 			}
 		}
 
 		// Try and find a non-afk leader
-		if ( candidate == NULL )
+		if ( candidate == nullptr )
 			candidate = _findNewLeader(m_members.begin(), m_members.end(), false);
 
 		// Try and find* any* leader
-		if ( candidate == NULL )
+		if ( candidate == nullptr )
 			candidate = _findNewLeader(m_members.begin(), m_members.end(), true);
 	}
 
-	if ( candidate == NULL || candidate->missionID() != missionID() || candidate->isMissionLeader() )
+	if ( candidate == nullptr || candidate->missionID() != missionID() || candidate->isMissionLeader() )
 	{
 		lead().backup(0ULL);
 		m_backupCandidate = 0;
@@ -1062,7 +1062,7 @@ ChatMission::sendUpdates()
 			Player* const player = it->second;
 			++it;
 
-			if ( player == NULL || player->teulIndex() < 0 )
+			if ( player == nullptr || player->teulIndex() < 0 )
 				continue;
 
 #ifdef CLOSED_BETA
@@ -1197,7 +1197,7 @@ ChatMission::flagForStatusUpdate()
 	const bool firstMission = g_statuses.empty();
 	g_statuses.insert(missionID());
 	if ( firstMission )
-		threadCallback(_sendPendingStatuses, NULL);
+		threadCallback(_sendPendingStatuses, nullptr);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1218,7 +1218,7 @@ MOBILE_SPAWN_WAYPOINT::receive(SINT32 /*teulIndex*/, MOBILE_SPAWN_WAYPOINT& inco
 	}
 
 	ChatMission* const mission = chatFindMission(wp.m_missionID);
-	if ( mission == NULL )
+	if ( mission == nullptr )
 	{
 		dbugLog(_FLA, "m:%u no such mission to delete waypoint for", wp.m_missionID);
 		return -EINVAL;
@@ -1339,7 +1339,7 @@ public:
 
 		// Additional rules for non-GMs/backup leaders when there is
 		// an existing leader
-		if ( leader != NULL )
+		if ( leader != nullptr )
 		{
 			if ( player.matchHandle() != mission->backupLeader() )
 				_checkNewLeader(mission, player, leader);
@@ -1389,7 +1389,7 @@ public:
 		if ( player.isAFK() )
 			throw Chat::LStringErr(LSTR_NO_AFK_TAKELEAD);
 
-		player.gmNote("GM", command(), (mission->m_matchLeader) ? Chat::Name(mission->m_matchLeader).c_str() : "[no leader]", NULL);
+		player.gmNote("GM", command(), (mission->m_matchLeader) ? Chat::Name(mission->m_matchLeader).c_str() : "[no leader]", nullptr);
 
 		mission->m_displacedLeader = 0LL;
 		mission->m_leaderDisplaced = 0;

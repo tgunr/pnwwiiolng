@@ -372,7 +372,7 @@ static SINT32
 _recvDoDespawn(struct ACTION_OBJECT* const a)
 {
 	Player* const player = static_cast<Player*>(a->m_client);
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		dbugLog(_FLW, "t:%d login return on index with no player associated", a->teulIndex);
 		return -Teul::Errors::LoginFail_DespawnNoPlayer;

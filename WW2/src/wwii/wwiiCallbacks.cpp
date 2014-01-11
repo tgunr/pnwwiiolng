@@ -34,7 +34,7 @@ CallbackRegister::callback(UCHAR callY, ACTION_FN sendFn, ACTION_FN recvFn)
 		sm_ci.recvAction = recvFn;
 		TEUL_CALLBACK* const newRef = teulAllocCallback(&sm_ci);
 
-		if ( newRef == NULL )
+		if ( newRef == nullptr )
 			throw std::logic_error("callback allocation failed");
 
 		return newRef;

@@ -11,37 +11,37 @@ Supercell::~Supercell()
 	if ( cps )
 	{
 		delete [] cps;
-		cps = NULL;
+		cps = nullptr;
 	}
 	if ( facilities )
 	{
 		delete [] facilities;
-		facilities = NULL;
+		facilities = nullptr;
 	}
 	if ( objects )
 	{
 		memFree(objects);
-		objects = NULL;
+		objects = nullptr;
 	}
 	if ( links )
 	{
 		memFree(links);
-		links = NULL;
+		links = nullptr;
 	}
 	if ( index )
 	{
 		memFree(index);
-		links = NULL;
+		links = nullptr;
 	}
 	if ( facilityTable )
 	{
 		memFree(facilityTable);
-		facilityTable = NULL;
+		facilityTable = nullptr;
 	}
 	if ( buildingTable )
 	{
 		buildingTable->destroy(buildingTable);
-		buildingTable = NULL;
+		buildingTable = nullptr;
 	}
 }
 

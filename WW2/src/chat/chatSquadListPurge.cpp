@@ -95,11 +95,11 @@ public:
 
 		// See who was listed.
 		UINT32 prevSquadID = 0;
-		SquadList* squadList = NULL;
-		SquadMemberEntry* entry = NULL;
+		SquadList* squadList = nullptr;
+		SquadMemberEntry* entry = nullptr;
 
-		char* text = NULL;
-		char* tp = NULL;
+		char* text = nullptr;
+		char* tp = nullptr;
 
 		for ( size_t i = 0; i < numRows; ++i )
 		{
@@ -114,7 +114,7 @@ public:
 			}
 
 			// If we have the squad loaded, player might be online, handle nicely.
-			if ( squadList != NULL )
+			if ( squadList != nullptr )
 			{
 				entry = squadList->find(result.m_handle);
 				if ( entry )
@@ -141,11 +141,11 @@ public:
 			{
 				strcpy(tp, ")");
 				DBThread::Do(DBThread::Default, text);
-				text = NULL;
+				text = nullptr;
 			}
 		}
 
-		if ( text != NULL )
+		if ( text != nullptr )
 		{
 			strcpy(tp, ")");
 			DBThread::Do(DBThread::Default, text);

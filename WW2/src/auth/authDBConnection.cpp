@@ -31,7 +31,7 @@ authGetDBConnectionInfo(DBCONNECTION* connectionInfo)
 	// Look up the cannonical name/address of the auth database
 	// and resolve it to an IP
 	UINT32* dbIp = teulGetHostByName(cv_authdbAddress.GetString());
-	if ( dbIp == NULL )
+	if ( dbIp == nullptr )
 		LogAbort("Invalid %s: %s (unable to resolve)"
 					, cv_authdbAddress.GetEnvVarName(), cv_authdbAddress.GetString());
 

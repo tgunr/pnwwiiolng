@@ -19,7 +19,7 @@ public:
 	virtual const char* typeName() const { return "hulk" ; }
 
 public:
-	virtual bool applyJoules(const SINT64& joules, class Player* player=NULL) ;
+	virtual bool applyJoules(const SINT64& joules, class Player* player=nullptr) ;
 
 public:
 	const STODamage& damage() const { return m_damage ; }

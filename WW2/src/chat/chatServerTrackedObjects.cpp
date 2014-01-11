@@ -54,7 +54,7 @@ void
 _processSTOKillRequest(ACTION_OBJECT* const a)
 {
 	Player* const player = PlayerInterface::Lookup(a->teulIndex);
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		dbugLog(_FLW, "t:%d ignoring sto kill request from unknown connection", a->teulIndex);
 		return;
@@ -73,7 +73,7 @@ _processSTOKillRequest(ACTION_OBJECT* const a)
 	a->offset = teulPackUINT32(TEUL_UNPACK, a->packed, a->offset, &uid, 32);
 
 	ServerSTO* const sto = (ServerSTO*)ServerTrackedObject::lookup(uid);
-	if ( sto == NULL )
+	if ( sto == nullptr )
 	{
 		dbugLog(_FLM, "t:%d p:%u c:%s ignoring sto kill for non-existant sto:%u", a->teulIndex, player->playerID(), player->callsign(), uid);
 		return;
@@ -100,9 +100,9 @@ _processSTOKillRequest(ACTION_OBJECT* const a)
 void
 chatReceiveSTO(UINT16 type, ACTION_OBJECT* const a)
 {
-	assert( a != NULL );
+	assert( a != nullptr );
 
-	ServerSTO* sto = NULL;
+	ServerSTO* sto = nullptr;
 	switch ( type )
 	{
 	case ServerTrackedObject::_REMOVAL:
@@ -144,11 +144,11 @@ chatReceiveSTO(UINT16 type, ACTION_OBJECT* const a)
 	break;
 	}
 
-	if ( sto == NULL )
+	if ( sto == nullptr )
 		return;
 
 	Player* const player = (Player*)(a->m_client);
-	sto->m_instanceID = (player != NULL) ? player->instance().id() : (instanceid_t)Instance::_CAMPAIGN;
+	sto->m_instanceID = (player != nullptr) ? player->instance().id() : (instanceid_t)Instance::_CAMPAIGN;
 
 	switch ( ServerTrackedObject::addToIndex(sto) )
 	{
@@ -452,7 +452,7 @@ SINT32
 STO_JOULES::receive(SINT32 teulIndex, STO_JOULES& incoming)
 {
 	Player* const player = PlayerInterface::Lookup(teulIndex);
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		dbugLog(_FLA, "t:%d sto joules from unregistered player", teulIndex);
 		return -EINVAL;
@@ -464,7 +464,7 @@ STO_JOULES::receive(SINT32 teulIndex, STO_JOULES& incoming)
 	{
 		dbugLog(_FLD, "t:%d p:%u c:%s sto:%u damage:%lld", teulIndex, player->playerID(), player->callsign(), it->m_uid, it->m_joules);
 		ServerTrackedObject* const sto = ServerTrackedObject::lookup(it->m_uid);
-		if ( sto == NULL )
+		if ( sto == nullptr )
 		{
 			dbugLog(_FLW, "t:%d p:%u c:%s unknown sto joules target %u", teulIndex, player->playerID(), player->callsign(), it->m_uid);
 		}
@@ -485,7 +485,7 @@ ServerSTO::ServerSTO(ACTION_OBJECT* const a)
 	, m_missionID(0)
 {
 	const Player* const player = static_cast<Player*>(a->m_client);
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		dbugLog(_FLA, "t:%d unregistered player sending %s sto", a->teulIndex, typeName());
 		return;
@@ -745,7 +745,7 @@ public:
 static PPOConfig
 _getConfig(const TiXmlNode* const parent, const PPOConfig defaultConfig)
 {
-	if ( parent == NULL )
+	if ( parent == nullptr )
 		return defaultConfig;
 
 	static const char* const timeoutAttributeName = "timeout-minutes";
@@ -756,7 +756,7 @@ _getConfig(const TiXmlNode* const parent, const PPOConfig defaultConfig)
 
 	// Look through the <param>s for <param name='timeout-minutes'/>
 	for ( auto	node = parent->FirstChild("param")
-		;		node != NULL
+		;		node != nullptr
 		;		node = node->NextSibling("param")
 		)
 	{
@@ -764,25 +764,25 @@ _getConfig(const TiXmlNode* const parent, const PPOConfig defaultConfig)
 		if ( strcasecmp(param->Attribute("name"), timeoutAttributeName) == 0 )
 		{
 			const char* const valueStr = param->Attribute("value");
-			if ( valueStr != NULL && isdigit(*valueStr) )
+			if ( valueStr != nullptr && isdigit(*valueStr) )
 			{
-				config.m_timeout = (TeulTimeMS)(strtof(valueStr, NULL) * 60.0 * 1000.0);
+				config.m_timeout = (TeulTimeMS)(strtof(valueStr, nullptr) * 60.0 * 1000.0);
 			}
 		}
 		else if ( strcasecmp(param->Attribute("name"), dmgThresholdName) == 0 )
 		{
 			const char* const valueStr = param->Attribute("value");
-			if ( valueStr != NULL && isdigit(*valueStr) )
+			if ( valueStr != nullptr && isdigit(*valueStr) )
 			{
-				config.m_damageThreshold = strtoull(valueStr, NULL, 10);
+				config.m_damageThreshold = strtoull(valueStr, nullptr, 10);
 			}
 		}
 		else if ( strcasecmp(param->Attribute("name"), dmgCapacityName) == 0 )
 		{
 			const char* const valueStr = param->Attribute("value");
-			if ( valueStr != NULL && isdigit(*valueStr) )
+			if ( valueStr != nullptr && isdigit(*valueStr) )
 			{
-				config.m_damageCapacity = strtoull(valueStr, NULL, 10);
+				config.m_damageCapacity = strtoull(valueStr, nullptr, 10);
 			}
 		}
 	}
@@ -807,7 +807,7 @@ chatLoadPPOXML()
 			throw std::runtime_error("Unable to load ppo.xml");
 
 		const TiXmlNode* const root = doc.FirstChild("ppos");
-		if ( root == NULL )
+		if ( root == nullptr )
 			throw std::runtime_error("Unable to find <ppos> container in ppo.xml");
 
 		dbugLog(_FLI, "ppo: reading file %s", xmlFile.c_str());
@@ -823,7 +823,7 @@ chatLoadPPOXML()
 
 		// Now read through the <ppo> objects in order and determine the timeouts.
 		for ( auto node = root->FirstChild("ppo")
-			; node != NULL
+			; node != nullptr
 			; node = node->NextSibling("ppo")
 			)
 		{
@@ -837,7 +837,7 @@ chatLoadPPOXML()
 				const char* const desc = ppo->Attribute("description");
 				const char* const type = ppo->Attribute("sto-type");
 
-				UINT32 stoType = strtoul(type, NULL, 10);
+				UINT32 stoType = strtoul(type, nullptr, 10);
 
 				dbugLog(_FLI, "ppo:%u.%u %s %s [sto-type:%s]", stoType, static_cast<UINT32>(ppoConfigs.size() + 1U), name, desc, type);
 

@@ -589,7 +589,7 @@ HostVehicle::UpdateVehicleList()
 	EXTREME(_FLD, "UPDT v:%u updating list", index);
 
 	// Find where I am on the grid.
-	if ( m_cell == NULL )
+	if ( m_cell == nullptr )
 	{
 		EXTREME(_FLDB, " cell=NULL");
 		TIMER_START

@@ -36,7 +36,7 @@ public:
 		,	errType(0)
 		,	err(0)
 		,	lineno(0)
-		,	m_program(NULL), m_file(NULL)
+		,	m_program(nullptr), m_file(nullptr)
 		{
 			m_text[0] = m_text[sizeof(m_text)-1] = 0;
 		}

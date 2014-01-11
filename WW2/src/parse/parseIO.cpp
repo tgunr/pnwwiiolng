@@ -39,7 +39,7 @@ static bool _executeFunc(char* func, FUNCARGS* fargs, SINT32 nargs
 static PARSE_CALLBACK  _defCallbacks[]={ {"section",		_setSection}
 										,{"default",		_setDefault}
 										,{"ignore",		_setIgnore}
-										,{"",				NULL}	};
+										,{"",				nullptr}	};
 
 struct SECTION_HEAD
 {
@@ -69,7 +69,7 @@ static ARG_LIST* paramGetArgList(char* src)
 		list.arg[list.numArgs] = src;
 		src = strchr(src, ',');
 
-		if ( src != NULL )
+		if ( src != nullptr )
 		{
 			// Remove trailing white space and any quotes.
 			for ( char* p = src - 1; p > list.arg[list.numArgs] && (isspace(*p) || *p == '\"'); --p )
@@ -93,7 +93,7 @@ static ARG_LIST* paramGetArgList(char* src)
 
 	// if the last arg's last char is a quote, kill it here; above code doesn't catch it for some reason
 	int lastArg = list.numArgs - 1;
-	char* lastArgChar = (lastArg >= 0) ? list.arg[lastArg] + strlen(list.arg[lastArg]) - 1 : NULL;
+	char* lastArgChar = (lastArg >= 0) ? list.arg[lastArg] + strlen(list.arg[lastArg]) - 1 : nullptr;
 
 	if(lastArgChar && *lastArgChar == '\"')
 		*lastArgChar = 0;
@@ -101,12 +101,12 @@ static ARG_LIST* paramGetArgList(char* src)
 	// Trim empty arguments from the end.
 	for ( int i = list.numArgs - 1; i >= 0 && list.arg[i] && list.arg[i][0] == 0; --i )
 	{
-		list.arg[i] = NULL;
+		list.arg[i] = nullptr;
 		--list.numArgs;
 	}
 
 	if ( list.numArgs == 0)
-		return NULL;
+		return nullptr;
 
 	return &list;
 }
@@ -142,7 +142,7 @@ _getEndOfLine(char* src)
 static char*
 _getNextValidLine(char*& eol, UINT32& lineCounter)
 {
-	char* src = NULL;
+	char* src = nullptr;
 	bool inComment = false;
 	while ( eol && *eol )
 	{
@@ -168,7 +168,7 @@ _getNextValidLine(char*& eol, UINT32& lineCounter)
 
 		if ( src[0] == '/' && src[1] == '*' )
 		{
-			if ( strstr(src + 2, "*/") == NULL )
+			if ( strstr(src + 2, "*/") == nullptr )
 			{
 				/* Not a comment like this */
 				inComment = true;
@@ -183,7 +183,7 @@ _getNextValidLine(char*& eol, UINT32& lineCounter)
 		return src;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 bool parseFile(char* pathName, PARSE_CALLBACK* sectionCallbacks
@@ -203,9 +203,9 @@ bool parseFile(char* pathName, PARSE_CALLBACK* sectionCallbacks
 
 	strncpy(_fileName, pathName, PN_MAX_PATH);
 
-	char* data = NULL;
+	char* data = nullptr;
 	bool loaded = fioLoad(_fileName, data);
-	if ( data == NULL )
+	if ( data == nullptr )
 		return loaded;
 
 	_section = (SECTION_HEAD*)memAlloc(sizeof(SECTION_HEAD));
@@ -230,12 +230,12 @@ bool parseFile(char* pathName, PARSE_CALLBACK* sectionCallbacks
 	while ( eol && *eol )
 	{
 		char* p = _getNextValidLine(eol, *lineCounter);
-		if ( p == NULL || *p == 0 )
+		if ( p == nullptr || *p == 0 )
 			continue;
 
 		argList = paramGetArgList(p);
 
-		if (argList == NULL || argList->numArgs < 1)
+		if (argList == nullptr || argList->numArgs < 1)
 			continue;
 
 		// if we get an error and break retval its false
@@ -318,7 +318,7 @@ static bool _executeFunc(char* func, FUNCARGS* fargs, SINT32 nargs
 {
 SINT32 i,sendNum;
 
-	if (callback == NULL)
+	if (callback == nullptr)
 		return true;
 
 	sendNum = nargs-argOffset;

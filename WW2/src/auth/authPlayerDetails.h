@@ -31,7 +31,7 @@ struct AuthPlayerDetails
 		, lockTimePretty(row.NextString())
 		, minuteBalance(row.NextUInt())
 		{
-			if ( groups == NULL || *groups == 0 )
+			if ( groups == nullptr || *groups == 0 )
 			{
 				// If you have no groups, you don't have any active subscriptions.
 				permissions &= ~SUBSCRIPTION_ACTIVE ;

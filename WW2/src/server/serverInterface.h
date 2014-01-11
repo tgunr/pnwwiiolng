@@ -28,7 +28,7 @@ public:
 	static PlayerStatusNode* PlayerStatusNodeByPlayerID(playerid_t id)
 	{
 		PLAYERID_HASH::iterator it = s_byPlayerID.find(id) ;
-		return ( it != s_byPlayerID.end() ) ? it->second : NULL ;
+		return ( it != s_byPlayerID.end() ) ? it->second : nullptr ;
 	}
 	static wwiiPlayer* LookupByPlayerID(playerid_t id) ;
 
@@ -36,9 +36,9 @@ public:
 	{
 		// This has to be different than just teulGetPersonaData
 		// because it has to reference our PlayerStatusNode data
-		if ( teulIndex < 0 ) return NULL ;
+		if ( teulIndex < 0 ) return nullptr ;
 		PLAYERIDX_MAP::iterator it = s_byTeulIndex.find((UINT32)teulIndex) ;
-		return ( it != s_byTeulIndex.end() ) ? it->second : NULL ;
+		return ( it != s_byTeulIndex.end() ) ? it->second : nullptr ;
 	}
 	static wwiiPlayer* LookupByTeulIndex(SINT32 teulIndex)
 	{

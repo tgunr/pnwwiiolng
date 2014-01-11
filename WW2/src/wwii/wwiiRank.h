@@ -25,7 +25,7 @@ private:
 public:
 	static void add(const RANK_NO level, const TYPE type, const UINT32 points, const char* description, const PermissionMask& perm);
 	static size_t count() { return ( s_ranks.empty() ? 0 : s_ranks.size() ); }
-	static const Rank* lookup(RANK_NO level) { return ( valid(level) ? &s_ranks[level] : NULL ); }
+	static const Rank* lookup(RANK_NO level) { return ( valid(level) ? &s_ranks[level] : nullptr ); }
 	static UINT32 max() { return s_max; }
 	static void setSize(size_t num);
 	static bool valid(RANK_NO level) { return (level <= s_max); }

@@ -46,11 +46,11 @@ static const char* s_translationLanguage = "en";
 //#undef CANTPACKSTRUCT
 static STRT_DTL_HEADER header;
 static void*			currentData = nullptr;
-static CP*				cpList = NULL;
-static FACILITY*		facilityList = NULL;
-static BUILDING*		buildingList = NULL;
-static DEPOT_LINK*		linkList = NULL;
-static WAYPOINT*		waypointList = NULL;
+static CP*				cpList = nullptr;
+static FACILITY*		facilityList = nullptr;
+static BUILDING*		buildingList = nullptr;
+static DEPOT_LINK*		linkList = nullptr;
+static WAYPOINT*		waypointList = nullptr;
 static UINT32 maxId = 0;
 static UINT16 currentCP = 0, currentFacility  = 0, currentBuilding = 0, currentLink = 0, currentWaypoint = 0;
 
@@ -69,7 +69,7 @@ _getTranslationFile()
 	const char* envValue = cv_stratLanguage.GetString();
 
 	static char translationFileName[128];
-	if ( envValue == NULL || strcmp(envValue, "en") == 0 )
+	if ( envValue == nullptr || strcmp(envValue, "en") == 0 )
 	{
 		s_translationsRequired = false;
 		envValue = "en";
@@ -103,11 +103,11 @@ sdmLoadTranslationList()
 		return;
 
 	static const char* fromFile = _getTranslationFile();
-	if ( fromFile == NULL )
+	if ( fromFile == nullptr )
 		return;
 
 	FILE* fp = fopen(fromFile, "rb");
-	if ( fp == NULL )
+	if ( fp == nullptr )
 	{
 		if ( s_translationsRequired )
 			LogAbort("Unable to open translation file: %s", fromFile);
@@ -126,7 +126,7 @@ sdmLoadTranslationList()
 			continue;
 
 		char* translation = strchr(key, ',');
-		if ( translation == NULL )
+		if ( translation == nullptr )
 			continue;
 		*(translation++) = 0;
 
@@ -247,7 +247,7 @@ SINT32 sdmOpenFile(const SCHAR* path, UINT16 /* mode */)
 {
 	maxId = 0;
 
-	if ( PN_UNLIKELY(path == NULL || *path == '\0') )
+	if ( PN_UNLIKELY(path == nullptr || *path == '\0') )
 		return SDMFILE_READ_ERR;
 
 	sdmLoadTranslationList();
@@ -282,7 +282,7 @@ SINT32 sdmOpenFile(const SCHAR* path, UINT16 /* mode */)
 	{
 		if ( PN_UNLIKELY(s_cpTranslationFails == nullptr) )
 			s_cpTranslationFails = new TRANSLATION_FAILS;
-		if ( PN_UNLIKELY(s_facilityTranslationFails == NULL) )
+		if ( PN_UNLIKELY(s_facilityTranslationFails == nullptr) )
 			s_facilityTranslationFails = new TRANSLATION_FAILS;
 	}
 
@@ -356,7 +356,7 @@ SINT32 sdmOpenFile(const SCHAR* path, UINT16 /* mode */)
 		{
 			BUILDING& building = buildingList[_BUILDindex];
 
-			_applyTranslationsToName(building.name, NULL, /*basicOnly=*/true);
+			_applyTranslationsToName(building.name, nullptr, /*basicOnly=*/true);
 
 			maxId = (maxId >= building.oid.id) ? maxId : building.oid.id;
 		}
@@ -371,7 +371,7 @@ SINT32 sdmOpenFile(const SCHAR* path, UINT16 /* mode */)
 		{
 			DEPOT_LINK& link = linkList[_DEPOTindex];
 
-			_applyTranslationsToName(link.name, NULL, /*basicOnly=*/true);
+			_applyTranslationsToName(link.name, nullptr, /*basicOnly=*/true);
 
 			maxId = (maxId >= link.oid.id) ? maxId : link.oid.id;
 		}
@@ -430,7 +430,7 @@ sdmFinish()
 		if ( _reportTranslationFails("CPs", *s_cpTranslationFails) )
 			failed = true;
 		delete s_cpTranslationFails;
-		s_cpTranslationFails = NULL;
+		s_cpTranslationFails = nullptr;
 	}
 
 	if ( s_facilityTranslationFails )
@@ -438,7 +438,7 @@ sdmFinish()
 		if ( _reportTranslationFails("Facilities", *s_facilityTranslationFails) )
 			failed = true;
 		delete s_facilityTranslationFails;
-		s_facilityTranslationFails = NULL;
+		s_facilityTranslationFails = nullptr;
 	}
 
 	if ( failed )
@@ -454,8 +454,8 @@ UINT16 sdmGetNumCP(void)
 
 CP* sdmGetNextCP(void)
 {
-	if (cpList == NULL || currentCP >= header.numCPs)
-		return NULL;
+	if (cpList == nullptr || currentCP >= header.numCPs)
+		return nullptr;
 	return &cpList[currentCP++];
 }
 
@@ -466,8 +466,8 @@ UINT16 sdmGetNumFACILITY(void)
 
 FACILITY* sdmGetNextFACILITY(void)
 {
-	if (facilityList == NULL || currentFacility >= header.numFacilities)
-		return NULL;
+	if (facilityList == nullptr || currentFacility >= header.numFacilities)
+		return nullptr;
 	return &facilityList[currentFacility++];
 }
 
@@ -500,8 +500,8 @@ UINT16 sdmGetNumDEPOT_LINK(void)
 
 DEPOT_LINK* sdmGetNextDEPOT_LINK(void)
 {
-	if (linkList == NULL || currentLink >= header.numLinks)
-		return NULL;
+	if (linkList == nullptr || currentLink >= header.numLinks)
+		return nullptr;
 	return &linkList[currentLink++];
 }
 
@@ -512,8 +512,8 @@ UINT16 sdmGetNumWAYPOINT(void)
 
 WAYPOINT* sdmGetNextWAYPOINT(void)
 {
-	if (waypointList == NULL || currentWaypoint >= header.numWaypoints)
-		return NULL;
+	if (waypointList == nullptr || currentWaypoint >= header.numWaypoints)
+		return nullptr;
 	return &waypointList[currentWaypoint++];
 }
 

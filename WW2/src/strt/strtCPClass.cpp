@@ -131,7 +131,7 @@ ObjectiveStats::calculate()
 static CPStruct*
 _leastCaptured(CPStruct* prev, CPStruct* cur, WWII_SIDE forSide)
 {
-	if ( prev == NULL )
+	if ( prev == nullptr )
 		return cur;
 
 	// If we control one but not the other, volunteer the uncontrolled one
@@ -167,8 +167,8 @@ static CPStruct*
 _findSacrificialObjective(WWII_SIDE forSide, UINT32 currentTime)
 {
 	CPSET::iterator it;
-	CPStruct* lastFit = NULL;
-	CPStruct* desperateFit = NULL;
+	CPStruct* lastFit = nullptr;
+	CPStruct* desperateFit = nullptr;
 
 	// Look through all the iterators
 	for ( it = g_objectives[forSide].begin(); it != g_objectives[forSide].end(); ++it )
@@ -193,17 +193,17 @@ _findSacrificialObjective(WWII_SIDE forSide, UINT32 currentTime)
 	}
 
 	// Did we find a fit?
-	if ( lastFit != NULL )
+	if ( lastFit != nullptr )
 		return lastFit;
 
 	// Ok - are we desperate enough to use a desperate fit?
 	// i.e. two or more objectives out of whack
-	if ( desperateFit == NULL )
-		return NULL;
+	if ( desperateFit == nullptr )
+		return nullptr;
 
 	SINT32 overBudget = (SINT32)(g_objectiveStats.m_cityLimit - g_objectiveStats.m_cityAttacks[forSide]);
 	if ( overBudget <= 1 )
-		return NULL;
+		return nullptr;
 
 	dbugLog(_FLI, "ao: %s sacrificing %s objective out of desperation (%d over budget)"
 					, _sideName[forSide]
@@ -287,7 +287,7 @@ ObjectiveStats::checkSideLimits(WWII_SIDE forSide, UINT32 currentTime)
 
 	CPStruct* cp = _findSacrificialObjective((WWII_SIDE)forSide, currentTime);
 
-	if ( cp == NULL )
+	if ( cp == nullptr )
 	{
 #ifdef BETA_RELEASE
 		chatSendHCMessage(forSide, LSTR_GENERIC, "[beta] Too many objectives, no fit for removal");
@@ -563,7 +563,7 @@ CPStruct::changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly)
 
 	// Firstly change standard facilities
 	FacilityStruct* facility;
-	for ( facility = facilityList; facility != NULL; facility = facility->next )
+	for ( facility = facilityList; facility != nullptr; facility = facility->next )
 	{
 		if ( facility->type == FACILITY_FIREBASE )
 			continue;
@@ -583,10 +583,10 @@ CPStruct::changeOwnership(WWII_COUNTRY toCountry, bool force, bool quietly)
 static void
 _checkUnit(StratHCUnit* unit, const CPStruct* cp)
 {
-	if ( NULL == unit || NULL == cp || cp != unit->homeCP() )
+	if ( nullptr == unit || nullptr == cp || cp != unit->homeCP() )
 		return;
 	// Ensure we rout parents first.
-	if ( NULL != unit->parent() && cp == unit->parent()->homeCP() )
+	if ( nullptr != unit->parent() && cp == unit->parent()->homeCP() )
 		_checkUnit(unit->parent(), cp);
 	dbugLog(_FLIB, "(hcu:%d name:%s side:%u) ", unit->unitID(), unit->callsign(), unit->side());
 	if ( unit->canDeployTo(cp) )
@@ -685,7 +685,7 @@ CPStruct::clearObjective(WWII_SIDE forSide)
 		{
 			setTableStates();
 			m_attackStarted = 0;
-			m_attackingUnit = NULL;
+			m_attackingUnit = nullptr;
 		}
 		m_attacker = WWII_NO_SIDE;
 	}
@@ -704,7 +704,7 @@ CPStruct::clearObjective(WWII_SIDE forSide)
 void
 CPStruct::drainHistories()
 {
-	if ( m_overruns == NULL )
+	if ( m_overruns == nullptr )
 		return;
 
 	// Drain the overruns
@@ -893,7 +893,7 @@ CPStruct::markOverrunReported()
 {
 	UINT32 now = teulTime();
 
-	if ( m_overruns == NULL )
+	if ( m_overruns == nullptr )
 		m_overruns = new OVERRUNS;
 
 	// Record the timestamp of this event
@@ -1039,7 +1039,7 @@ SCMD_RESULT
 CPStruct::requestAttack(bool execute, UINT32 brigadeID)
 {
 	StratHCUnit* unit = StratHCUnit::Lookup(brigadeID);
-	if ( unit == NULL )
+	if ( unit == nullptr )
 	{
 		dbugLog(_FLA, "Attempted to issue attack request with brigadeID %u", brigadeID);
 		return SCMD_ERROR;
@@ -1287,7 +1287,7 @@ CPStruct::setTableStates(bool isNewObjective)
 
 	dbugLog(_FLI, "contentionTables(%s) : %s", name, ((isContested())?"con":"uncon"));
 
-	for ( fac = facilityList; fac != NULL; fac = fac->next )
+	for ( fac = facilityList; fac != nullptr; fac = fac->next )
 	{
 		if ( fac->canBeCaptured() == false )
 			continue;
@@ -1388,9 +1388,9 @@ CPStruct::hasContactWithDivision(const StratHCUnit* unit) const
 	else
 		return false;
 
-	for (; candidate != NULL; candidate = candidate->next() )
+	for (; candidate != nullptr; candidate = candidate->next() )
 	{
-		if ( candidate->unitID() == unit->unitID() || candidate->homeCP() == NULL )
+		if ( candidate->unitID() == unit->unitID() || candidate->homeCP() == nullptr )
 			continue;
 
 		if ( candidate->homeCP() == this )
@@ -1398,7 +1398,7 @@ CPStruct::hasContactWithDivision(const StratHCUnit* unit) const
 			return true;
 		}
 
-		if ( linkTo(candidate->homeCP()) != NULL )
+		if ( linkTo(candidate->homeCP()) != nullptr )
 		{
 			return true;
 		}
@@ -1428,7 +1428,7 @@ static UINT32 _getValue(const HCUnit& unit)
 static inline bool
 _updateFirebases(const HCUnit& unit, CPStruct* cp)
 {
-	if ( cp == NULL )
+	if ( cp == nullptr )
 		return false;
 	if ( unit.movementType() == BRANCH_LAND && unit.branch() == BRANCH_LAND && unit.isBrigade() == true )
 		return true;

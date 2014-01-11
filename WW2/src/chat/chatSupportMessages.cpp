@@ -85,7 +85,7 @@ _recvRefreshPlayer(ACTION_OBJECT* const a)
 static SINT32
 _recvMissionDeletionRequest(ACTION_OBJECT* const a)
 {
-	if ( a->m_client != NULL || a->canRead<UINT32>() == false )
+	if ( a->m_client != nullptr || a->canRead<UINT32>() == false )
 		return -EINVAL;
 
 	auto& missionID = a->read<UINT32>();
@@ -171,12 +171,12 @@ BRIGADE_MOVE_MSG::receive(SINT32 teulIndex, BRIGADE_MOVE_MSG& incoming)
 {
 	const BrigadeMove& data = incoming.data();
 	HCUnit* unit = HCUnit::Lookup((UINT32)data.m_brigadeID);
-	if ( unit == NULL ) throw std::invalid_argument("move message for unknown brigade");
+	if ( unit == nullptr ) throw std::invalid_argument("move message for unknown brigade");
 
 	if ( data.m_destination.id != 0 )
 	{
 		CPStruct* cp = strtGetCP(data.m_destination);
-		if ( cp == NULL ) throw std::invalid_argument("invalid destination in brigade move");
+		if ( cp == nullptr ) throw std::invalid_argument("invalid destination in brigade move");
 		dbugLog(_FLD, "t:%d moving %s (#%d) to %s by %s", teulIndex, unit->name(), unit->unitID(), cp->name, Chat::Name(incoming.key()).c_str());
 		unit->setHomeCPID(data.m_destination);
 	}
@@ -226,7 +226,7 @@ MOBILE_SPAWN_WAYPOINT::receive(SINT32 teulIndex, MOBILE_SPAWN_WAYPOINT& incoming
 static SINT32
 _recvLeaderChange(ACTION_OBJECT* const a)
 {
-	if ( a->m_client != NULL || a->canRead<LeaderChange>() == false )
+	if ( a->m_client != nullptr || a->canRead<LeaderChange>() == false )
 	{
 		dbugLog(_FLA, "t:%d invalid LeaderChange packet", a->teulIndex);
 		return -EINVAL;
@@ -249,7 +249,7 @@ _recvLeaderChange(ACTION_OBJECT* const a)
 	{
 		// Send result back to the originating server.
 		ENDPOINT* const endpoint = a->endpoint;
-		if ( endpoint != NULL )
+		if ( endpoint != nullptr )
 		{
 			Teul::Packet outgoing(0, Chat::CallbackX, Chat::MISSION_LEADER_CHANGE_Y);
 			outgoing.append(incoming);
@@ -266,7 +266,7 @@ _recvLeaderChange(ACTION_OBJECT* const a)
 SINT32
 _recvMapPersonaUpdate(ACTION_OBJECT* const a)
 {
-	if ( a->m_client != NULL || a->canRead<MapPersonaUpdate>() == false )
+	if ( a->m_client != nullptr || a->canRead<MapPersonaUpdate>() == false )
 	{
 		dbugLog(_FLW, "t:%d invalid MapPersonaUpdate packet", a->teulIndex);
 		return -EINVAL;
@@ -275,7 +275,7 @@ _recvMapPersonaUpdate(ACTION_OBJECT* const a)
 	auto& update = a->read<MapPersonaUpdate>();
 
 	Player* const player = PlayerInterface::Lookup(update.m_playerID);
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		dbugLog(_FLW, "p:%u persona update from chat but no such player", update.m_playerID);
 		return -EINVAL;

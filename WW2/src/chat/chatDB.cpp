@@ -98,7 +98,7 @@ chatFindProperty(const FULL_OBJ_ID& id)
 
 	it = _properties.find(id.Key());
 	if ( it == _properties.end() )
-		return NULL;
+		return nullptr;
 
 	return it->second;
 }
@@ -109,10 +109,10 @@ chatFindProperty(const FULL_OBJ_ID& id)
 
 PropFacility::PropFacility(const FULL_OBJ_ID& id, WWII_COUNTRY owner, const char* name, const FULL_OBJ_ID& cpID, UINT32 oid)
 	: Property(id, owner, name, oid)
-	, m_cp(NULL)
+	, m_cp(nullptr)
 {
 	Property* cp = chatFindProperty(cpID);
-	if ( cp == NULL )
+	if ( cp == nullptr )
 	{
 		dbugLog(_FLA, "%s has invalid CP data %d.%d.%u", name, cpID.cell.ox, cpID.cell.oy, cpID.id);
 		return;

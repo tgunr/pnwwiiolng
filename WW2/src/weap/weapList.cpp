@@ -214,7 +214,7 @@ WEAPON_SPEC weapCreateSpec(const char* weapString)
 
 	const char* const sType = strstr(weapString, ".");
 
-	if (sType == NULL || sType < weapString )
+	if (sType == nullptr || sType < weapString )
 		return NULL_WEAP_SPEC;
 
 	wType = (SINT32)atol(sType+1);
@@ -232,7 +232,7 @@ WEAPON_SPEC weapCreateSpec(const char* weapString)
 	memset(sCountry,0,WEAP_IDENT_SIZE+1);
 	memset(sCategory,0,WEAP_IDENT_SIZE+1);
 
-	if (tempString != NULL)
+	if (tempString != nullptr)
 	{
 		tempString++;
 
@@ -276,7 +276,7 @@ WEAPON_SPEC weapCreateSpec(const char* weapString)
 WEAPON_SPEC
 weapAssociateIndex(const char* objName, UINT32 localIndex)
 {
-	if ( objName == NULL )
+	if ( objName == nullptr )
 		return NULL_WEAP_SPEC;
 
 	char weapName[MAX_WEAP_NAME_LEN];
@@ -285,7 +285,7 @@ weapAssociateIndex(const char* objName, UINT32 localIndex)
 	_strlwr(weapName);
 
 	WEAPON* weapon = weapLookupWeaponByName(weapName);
-	if ( weapon == NULL )
+	if ( weapon == nullptr )
 	{
 #ifdef FRONT_END
 		Write_Debug("weapon %s not defined li:%u", weapName, localIndex);
@@ -391,11 +391,11 @@ void weapListKill(void)
 const WEAPON_SPEC&
 weapFindWeaponByName(const char* name)
 {
-	if ( name == NULL || *name == 0 )
+	if ( name == nullptr || *name == 0 )
 		return NULL_WEAP_SPEC;
 
 	WEAPON_NAME_INDEX::iterator it = weaponNameIndex.find(name);
-	if ( it == weaponNameIndex.end() || it->second == NULL )
+	if ( it == weaponNameIndex.end() || it->second == nullptr )
 		return NULL_WEAP_SPEC;
 	return it->second->spec();
 }
@@ -403,25 +403,25 @@ weapFindWeaponByName(const char* name)
 WEAPON*
 weapLookupWeaponByName(const char* name)
 {
-	if ( name == NULL || *name == 0 )
-		return NULL;
+	if ( name == nullptr || *name == 0 )
+		return nullptr;
 
 	WEAPON_NAME_INDEX::iterator it = weaponNameIndex.find(name);
-	return ( it != weaponNameIndex.end() ) ? it->second : NULL;
+	return ( it != weaponNameIndex.end() ) ? it->second : nullptr;
 }
 
 WEAPON*
 weapLookupWeaponByIndex(UINT32 localIndex)
 {
 	WEAPON_INDEXES::iterator it = s_weaponIndexes.find(localIndex);
-	return ( it != s_weaponIndexes.end() ? it->second : NULL );
+	return ( it != s_weaponIndexes.end() ? it->second : nullptr );
 }
 
 // Lookup the weapon with the fast index
 WEAPON* weapLookup(const WEAPON_SPEC& spec)
 {
 	WEAPON_LIST::iterator it = g_weaponList.find(spec);
-	return ( it != g_weaponList.end() ) ? it->second : NULL;
+	return ( it != g_weaponList.end() ) ? it->second : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -430,7 +430,7 @@ WEAPON* weapLookup(const WEAPON_SPEC& spec)
 static SINT16
 _getAccessValue(const char* key)
 {
-	if ( key == NULL || *key == 0 )
+	if ( key == nullptr || *key == 0 )
 		return 0;
 	if ( isdigit(*key) )
 		return atoi(key);
@@ -464,7 +464,7 @@ WEAPON::WEAPON(const WEAPON_SPEC& withSpec
 
 	memset(bias, 0, sizeof(bias));
 
-	if ( weapLookupWeaponByName(name) != NULL )
+	if ( weapLookupWeaponByName(name) != nullptr )
 		throw std::runtime_error("multiple definitions of vehicle");		///Terminal
 
 	weaponNameIndex[name] = this;

@@ -24,7 +24,7 @@ namespace Server
 		PersonaXfer(XferReason _reason=XferReason::Login) : Transfer(_reason), data() {}
 
 	public:
-		PersonaXfer(XferReason _reason, const Auth::Dispatch& _dispatch, SINT32 _size=0, void* _auxData=0ULL, UINT64 _source=0)
+		PersonaXfer(XferReason _reason, const Auth::Dispatch& _dispatch, SINT32 _size=0, void* _auxData=nullptr, UINT64 _source=0)
 			: Transfer(_reason)
 			, data(_dispatch, _size, _auxData)
 			{

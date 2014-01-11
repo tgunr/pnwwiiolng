@@ -118,7 +118,7 @@ wwiiReadHCUnits()
 			lastMovedBy = chatGetHandle(row.NextColumn());
 			unitClass = (UCHAR)row.NextUInt();
 
-			if ( nick == NULL )
+			if ( nick == nullptr )
 			{
 				dbugLog(_FLD, "hcu:%u(%s) unit has no nickname", unitID, name);
 				nick = name;
@@ -130,7 +130,7 @@ wwiiReadHCUnits()
 			if ( movementType >= MAX_BRANCHES ) throw std::domain_error("HCUnit list contains unit with illegal movementType");
 			if ( movementType == 0 )
 				movementType = branchID;
-			if ( name == NULL ) throw std::domain_error("HCUnit list contains unit with NULL or empty name");
+			if ( name == nullptr ) throw std::domain_error("HCUnit list contains unit with NULL or empty name");
 
 			if ( typeID > MAX_HCUNIT_TYPES )
 				typeID = HCU_GENERIC;

@@ -68,14 +68,14 @@ static const UCHAR PRIVATE_CHAN_ICON = 15;
 static bool
 _leaderFindMember(Player& player, const char* command, char* arguments, ChatMission*& mission, const Player*& subject)
 {
-	subject = NULL;
+	subject = nullptr;
 
 	if ( player.isMissionLeader() )
 		mission = chatFindMission(player.missionID());
 	else
-		mission = NULL;
+		mission = nullptr;
 
-	if ( mission == NULL )
+	if ( mission == nullptr )
 	{
 		player.message(LSTR_CAUTION, LSTR_NOT_MISSION_LEADER);
 		return false;
@@ -95,7 +95,7 @@ _leaderFindMember(Player& player, const char* command, char* arguments, ChatMiss
 	}
 
 	subject = PlayerInterface::Lookup(member);
-	if ( subject == NULL || !subject->isVisibleTo(player) || subject->missionID() != player.missionID() )
+	if ( subject == nullptr || !subject->isVisibleTo(player) || subject->missionID() != player.missionID() )
 	{
 		player.message(LSTR_CAUTION, LSTR_NOT_ON_SAME_MISSION, arguments);
 		return false;
@@ -129,7 +129,7 @@ public:
 		if ( strcasecmp(arguments, "bio") == 0 )
 			player.message(LSTR_NOTE, LSTR_GENERIC, "Uhh, good luck with that.");
 		else
-			player.message(LSTR_NOTE, LSTR_AFK, NULL, NULL);
+			player.message(LSTR_NOTE, LSTR_AFK, nullptr, nullptr);
 	}
 
 	virtual void action(Player& player, Chat::ClientMessage* message) const OVERRIDE_FN
@@ -138,12 +138,12 @@ public:
 		if ( player.isAFK() )
 		{	// Toggle from ON to OFF
 			player.SetAFK(false);
-			player.message(LSTR_NOTE, LSTR_NOT_AFK, NULL, NULL);
+			player.message(LSTR_NOTE, LSTR_NOT_AFK, nullptr, nullptr);
 		}
 		else
 		{	// Toggle from OFF to ON
 			player.SetAFK(true);
-			player.message(LSTR_NOTE, LSTR_AFK, NULL, NULL);
+			player.message(LSTR_NOTE, LSTR_AFK, nullptr, nullptr);
 		}
 	}
 } dotAfk;
@@ -224,14 +224,14 @@ public:
 	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
 	{
 		// Make sure no spaces
-		if ( strchr(arguments, ' ') != NULL )
+		if ( strchr(arguments, ' ') != nullptr )
 		{
 			help(player);
 			return;
 		}
 
-		ChatMission* mission = NULL;
-		const Player* subject = NULL;
+		ChatMission* mission = nullptr;
+		const Player* subject = nullptr;
 
 		if ( !_leaderFindMember(player, command(), arguments, mission, subject) )
 			return;
@@ -310,7 +310,7 @@ public:
 			// Limit ourselves to the variants of commands that
 			// this user has access to
 			const DotUsage* usage = cur->allow(player);
-			if ( usage != NULL && usage->usage != LSTR_CAUTION )
+			if ( usage != nullptr && usage->usage != LSTR_CAUTION )
 			{
 				if ( reply.length() )	// Add , between entries
 				{
@@ -326,7 +326,7 @@ public:
 				reply += cur->command();
 			}
 		}
-		player.message(LSTR_NONE, LSTR_TEXT_END, reply.c_str(), NULL);
+		player.message(LSTR_NONE, LSTR_TEXT_END, reply.c_str(), nullptr);
 	}
 
 	// When a user requests help with a specific command
@@ -338,7 +338,7 @@ public:
 		if ( !index()->helpFor(player, arguments) )
 		{
 			// They typed .help <something unintelligible>
-			player.message(LSTR_ERROR, LSTR_NO_SUCH_COMMAND, arguments, NULL);
+			player.message(LSTR_ERROR, LSTR_NO_SUCH_COMMAND, arguments, nullptr);
 		}
 	}
 } dotHelp;
@@ -357,7 +357,7 @@ public:
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
 	{
 		player.SetHqOff(true);
-		player.message(LSTR_NOTE, LSTR_HQ_UNSUBS, NULL, NULL);
+		player.message(LSTR_NOTE, LSTR_HQ_UNSUBS, nullptr, nullptr);
 	}
 } dotHQOff;
 
@@ -370,7 +370,7 @@ public:
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
 	{
 		player.SetHqOff(false);
-		player.message(LSTR_NOTE, LSTR_HQ_SUBS, NULL, NULL);
+		player.message(LSTR_NOTE, LSTR_HQ_SUBS, nullptr, nullptr);
 	}
 } dotHQOn;
 
@@ -441,14 +441,14 @@ public:
 	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
 	{
 		// Make sure no spaces
-		if ( strchr(arguments, ' ') != NULL )
+		if ( strchr(arguments, ' ') != nullptr )
 		{
 			help(player);
 			return;
 		}
 
-		ChatMission* mission = NULL;
-		const Player* subject = NULL;
+		ChatMission* mission = nullptr;
+		const Player* subject = nullptr;
 
 		if ( !_leaderFindMember(player, command(), arguments, mission, subject) )
 			return;
@@ -489,14 +489,14 @@ public:
 		Player* dest = PlayerInterface::Lookup(args[0]);
 
 		// Trying to send to a non-existant player or CRS staff in GM mode gets not available message
-		if ( dest == NULL || !dest->isVisibleTo(player) )
+		if ( dest == nullptr || !dest->isVisibleTo(player) )
 		{
 			//Notify the user that the person is unavailable for messaging
-			player.message(LSTR_CAUTION, LSTR_USER_UNAVAILABLE, args[0], NULL);
+			player.message(LSTR_CAUTION, LSTR_USER_UNAVAILABLE, args[0], nullptr);
 
 			// If the destination isn't a GM in hide mode, return now,
 			// otherwise pass the message thru
-			if ( dest == NULL || !dest->gmHide() )
+			if ( dest == nullptr || !dest->gmHide() )
 				return;
 		}
 		else
@@ -526,7 +526,7 @@ public:
 		{
 			player.gmNote("GM", "/gmm", dest->callsign(), args[1]);
 			chatDispatchGMMessage("GMM", chatMakeTempString("%s->%s %s", player.callsign(), dest->callsign(), args[1]));
-			dest->message(LSTR_GM, LSTR_GENERIC, args[1], NULL);
+			dest->message(LSTR_GM, LSTR_GENERIC, args[1], nullptr);
 		}
 		else
 		{
@@ -564,7 +564,7 @@ public:
 		// Do they have a radio tuned in this slot?
 		if ( !cnode.inUse() )
 		{
-			player.message(LSTR_SYSTEM, LSTR_CHANNEL_UNAVAILABLE, NULL, NULL);
+			player.message(LSTR_SYSTEM, LSTR_CHANNEL_UNAVAILABLE, nullptr, nullptr);
 			return;
 		}
 
@@ -724,7 +724,7 @@ public:
 		wwiiIRCChannelMessage("-sys", ircMessage);
 		chatBroadcastLocMessage(commandList.begin(), commandList.end(), lmsg, [] (wwiiPlayer* const& subject) { return subject->isEffectiveGM(); });
 
-		player.message(LSTR_NOTE, LSTR_REPORTED, NULL, NULL);
+		player.message(LSTR_NOTE, LSTR_REPORTED, nullptr, nullptr);
 
 		return;
 	}
@@ -772,7 +772,7 @@ public:
 	// Player typed ".sysmotd" - display the sysmotd
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
 	{
-		player.message(LSTR_SYSTEM, LSTR_GENERIC, chatGetUnitMotd(SYSTEM_MOTD_UNIT), NULL);
+		player.message(LSTR_SYSTEM, LSTR_GENERIC, chatGetUnitMotd(SYSTEM_MOTD_UNIT), nullptr);
 	}
 } dotSysMotd;
 
@@ -810,7 +810,7 @@ _listTrainersForTrainer(Player& player)
 	for ( it = trainers.begin(); it != trainers.end(); ++it )
 	{
 		Player* trainer = PlayerInterface::Lookup(*it);
-		if ( trainer == NULL )
+		if ( trainer == nullptr )
 			continue;
 		if ( !trainer->isVisibleTo(player) )
 			continue;
@@ -837,7 +837,7 @@ _listTrainersForPlayer(Player& player)
 	for ( it = trainers.begin(); it != trainers.end(); ++it )
 	{
 		Player* trainer = PlayerInterface::Lookup(*it);
-		if ( trainer == NULL )
+		if ( trainer == nullptr )
 			continue;
 		if ( !trainer->isVisibleTo(player) )
 			continue;
@@ -884,7 +884,7 @@ public:
 		while ( it != trainers.end() )
 		{
 			Player* recipient = PlayerInterface::Lookup(*(it++));
-			if ( recipient != NULL )
+			if ( recipient != nullptr )
 				recipient->message(LSTR_NONE, LSTR_TRAINER_LIST, buffer);
 		}
 	}

@@ -116,7 +116,7 @@ public:
 			return;
 		}
 
-		player.gmNote("HC", command(), arguments, NULL);
+		player.gmNote("HC", command(), arguments, nullptr);
 
 		Chat::Broadcast broadcast(Chat::_SIDE, Instance::_CAMPAIGN, ALLIED, LSTR_ALLIED, LSTR_LABELLED_GENERIC, player.callsign(), arguments);
 		broadcast.route();
@@ -143,7 +143,7 @@ public:
 			return;
 		}
 
-		player.gmNote("HC", command(), arguments, NULL);
+		player.gmNote("HC", command(), arguments, nullptr);
 
 		Chat::Broadcast broadcast(Chat::_SIDE, Instance::_CAMPAIGN, AXIS, LSTR_AXIS, LSTR_LABELLED_GENERIC, player.callsign(), arguments);
 		broadcast.route();
@@ -165,7 +165,7 @@ public:
 	{
 		if ( player.noSide() )
 		{
-			player.message(LSTR_SYSTEM, LSTR_SELECT_SIDE, NULL, NULL);
+			player.message(LSTR_SYSTEM, LSTR_SELECT_SIDE, nullptr, nullptr);
 			return;
 		}
 
@@ -193,13 +193,13 @@ public:
 	{
 		if ( player.noSide() )
 		{
-			player.message(LSTR_SYSTEM, LSTR_SELECT_SIDE, NULL, NULL);
+			player.message(LSTR_SYSTEM, LSTR_SELECT_SIDE, nullptr, nullptr);
 			return;
 		}
 
 		if ( !player.inFacility() )
 		{
-			player.message(LSTR_SYSTEM, LSTR_SELECT_FACILITY, command(), NULL);
+			player.message(LSTR_SYSTEM, LSTR_SELECT_FACILITY, command(), nullptr);
 			return;
 		}
 
@@ -212,7 +212,7 @@ public:
 	{
 		if ( player.noSide() )
 		{
-			player.message(LSTR_SYSTEM, LSTR_SELECT_SIDE, NULL, NULL);
+			player.message(LSTR_SYSTEM, LSTR_SELECT_SIDE, nullptr, nullptr);
 			return;
 		}
 
@@ -233,18 +233,18 @@ _hclistRoster(Player& player, WWII_SIDE side)
 	UINT32 i = 0;
 
 	if ( side == ALLIED )
-		player.message(LSTR_NONE, LSTR_ALLIED_OFFICERS, NULL, NULL);
+		player.message(LSTR_NONE, LSTR_ALLIED_OFFICERS, nullptr, nullptr);
 	else if ( side == AXIS )
-		player.message(LSTR_NONE, LSTR_AXIS_OFFICERS, NULL, NULL);
+		player.message(LSTR_NONE, LSTR_AXIS_OFFICERS, nullptr, nullptr);
 	else
 	{
-		player.message(LSTR_NONE, LSTR_SELECT_SIDE, NULL, NULL);
+		player.message(LSTR_NONE, LSTR_SELECT_SIDE, nullptr, nullptr);
 		return;
 	}
 
 	if ( commandList.empty() )
 	{
-		player.message(LSTR_NONE, LSTR_NO_MATCHES, NULL, NULL);
+		player.message(LSTR_NONE, LSTR_NO_MATCHES, nullptr, nullptr);
 		return;
 	}
 
@@ -264,15 +264,15 @@ _hclistRoster(Player& player, WWII_SIDE side)
 		// Try not to overflow the message length buffer
 		if ( roster.length() + 12 >= MAX_MESSAGE_LENGTH )
 		{
-			player.message(LSTR_NONE, LSTR_GENERIC, roster.c_str(), NULL);
+			player.message(LSTR_NONE, LSTR_GENERIC, roster.c_str(), nullptr);
 			roster = "";
 		}
 	}
 
 	if ( i == 0 )
-		player.message(LSTR_NONE, LSTR_NO_MATCHES, NULL, NULL);
+		player.message(LSTR_NONE, LSTR_NO_MATCHES, nullptr, nullptr);
 	else if ( roster.length() )
-		player.message(LSTR_NONE, LSTR_GENERIC, roster.c_str(), NULL);
+		player.message(LSTR_NONE, LSTR_GENERIC, roster.c_str(), nullptr);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -340,7 +340,7 @@ DotHC::action(Player& player, Chat::ClientMessage* /*message*/) const
 
 	if ( !isValidSide(player.side()) )
 	{
-		player.message(LSTR_NONE, LSTR_SELECT_SIDE, NULL, NULL);
+		player.message(LSTR_NONE, LSTR_SELECT_SIDE, nullptr, nullptr);
 		return;
 	}
 
@@ -395,7 +395,7 @@ public:
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
 	{
 		player.SetHcOff(true);
-		player.message(LSTR_NOTE, LSTR_HC_OFF, NULL, NULL);
+		player.message(LSTR_NOTE, LSTR_HC_OFF, nullptr, nullptr);
 	}
 } dotHCOff;
 
@@ -409,7 +409,7 @@ public:
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
 	{
 		player.SetHcOff(false);
-		player.message(LSTR_NOTE, LSTR_HC_ON, NULL, NULL);
+		player.message(LSTR_NOTE, LSTR_HC_ON, nullptr, nullptr);
 	}
 } dotHCOn;
 
@@ -463,13 +463,13 @@ DotHold::action(Player& player, Chat::ClientMessage* /*message*/) const
 {
 	if ( player.noSide() )
 	{
-		player.message(LSTR_SYSTEM, LSTR_SELECT_SIDE, NULL, NULL);
+		player.message(LSTR_SYSTEM, LSTR_SELECT_SIDE, nullptr, nullptr);
 		return;
 	}
 
 	if ( !player.inFacility() )
 	{
-		player.message(LSTR_SYSTEM, LSTR_SELECT_FACILITY, command(), NULL);
+		player.message(LSTR_SYSTEM, LSTR_SELECT_FACILITY, command(), nullptr);
 		return;
 	}
 
@@ -484,7 +484,7 @@ DotHold::actionWith(Player& player, Chat::ClientMessage* /*message*/, char* argu
 {
 	if ( player.noSide() )
 	{
-		player.message(LSTR_SYSTEM, LSTR_SELECT_SIDE, NULL, NULL);
+		player.message(LSTR_SYSTEM, LSTR_SELECT_SIDE, nullptr, nullptr);
 		return;
 	}
 
@@ -514,7 +514,7 @@ public:
 		else
 		{
 			Property* home = chatFindProperty(brigade->homeCPID());
-			if ( home != NULL )
+			if ( home != nullptr )
 				player.message(LSTR_NOTE, LSTR_LABELLED_GENERIC, brigade->name(), home->Name());
 			else
 				player.message(LSTR_NOTE, LSTR_UNIT_HAS_NO_HOME, brigade->name());
@@ -573,7 +573,7 @@ public:
 
 		if ( !player.inFacility() )
 		{
-			player.message(LSTR_SYSTEM, LSTR_SELECT_FACILITY, command(), NULL);
+			player.message(LSTR_SYSTEM, LSTR_SELECT_FACILITY, command(), nullptr);
 			return;
 		}
 
@@ -639,7 +639,7 @@ public:
 	virtual void Success() OVERRIDE_FN
 	{
 		Player* player = PlayerInterface::Lookup(m_matchHandle);
-		if ( player == NULL )
+		if ( player == nullptr )
 			return;
 		if ( m_results.empty() == true )
 		{
@@ -656,7 +656,7 @@ public:
 	virtual void Failure() OVERRIDE_FN
 	{
 		Player* player = PlayerInterface::Lookup(m_matchHandle);
-		if ( player == NULL ) return;
+		if ( player == nullptr ) return;
 
 		player->message(LSTR_CAUTION, LSTR_DB_QUERY_FAILED, "lastmoves", "Database error");
 	}

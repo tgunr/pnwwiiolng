@@ -142,7 +142,7 @@ void
 PersonaSelectionThread::run()
 {
 	DB::handle_t* conn = threadsOpenDBConnection(true);
-	if ( conn == NULL )
+	if ( conn == nullptr )
 	{
 		LogAbort("spt: Unable to open database connection");
 	}

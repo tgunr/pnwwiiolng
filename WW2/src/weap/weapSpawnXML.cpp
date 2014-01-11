@@ -69,7 +69,7 @@ weapLoadSpawnXML()
 
 		// Look for the spawner root object
 		TiXmlNode* root = doc.FirstChild("SPAWNER");
-		if ( root == NULL )
+		if ( root == nullptr )
 			throw std::runtime_error("Unable to find root object");		///Terminal
 
 		std::set<WEAPON_SPEC> classes;
@@ -79,7 +79,7 @@ weapLoadSpawnXML()
 
 		TiXmlNode* node;
 		for ( node = root->FirstChild("building")
-			; node != NULL
+			; node != nullptr
 			; node = node->NextSibling("building")
 			)
 		{
@@ -112,13 +112,13 @@ weapLoadSpawnXML()
 
 			// Grab a unique list of all the classes this dof introduces.
 			for ( dof = building->FirstChildElement("dof")
-				; dof != NULL
+				; dof != nullptr
 				; dof = dof->NextSiblingElement("dof")
 				)
 			{
-				TiXmlElement* child = NULL;
+				TiXmlElement* child = nullptr;
 				for ( child = dof->FirstChildElement()
-					; child != NULL
+					; child != nullptr
 					; child = child->NextSiblingElement()
 					)
 				{
@@ -130,7 +130,7 @@ weapLoadSpawnXML()
 					{
 						dbugLog(_FLIB, "weapon:%s ", elText);
 						WEAPON* weap = weapLookupWeaponByName(elText);
-						if ( weap == NULL )
+						if ( weap == nullptr )
 						{
 							dbugLog(_FLA, "Invalid weapon '%s' in spawn.xml", elText);
 							fail = true;

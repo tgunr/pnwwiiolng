@@ -174,8 +174,8 @@ Player::_construct(const playerid_t withPlayerID)
 	}
 
 	m_lastX = m_lastY = m_lastZ = INVALID_GRID_COORD;
-	m_lastCP = NULL;
-	m_insideFacility = NULL;
+	m_lastCP = nullptr;
+	m_insideFacility = nullptr;
 
 	m_gridX = INVALID_GRID_COORD;
 	m_gridY = INVALID_GRID_COORD;
@@ -250,9 +250,9 @@ Player::Player(UINT32 withPlayerid, bool playerIsManager)
 Player::Player(const PlayerStatusNode* psn, const Chat::PlayerInfo* playerInfo)
 	: wwiiPlayer()
 {
-	if ( psn == NULL )
+	if ( psn == nullptr )
 		throw std::domain_error("Tried to create Client with NULL player");
-	if ( playerInfo == NULL )
+	if ( playerInfo == nullptr )
 		throw std::domain_error("Tried to create Client with NULL playerInfo");
 
 	const bool playnet = (playerInfo->m_permissionMask & IS_PLAYNET) == IS_PLAYNET;
@@ -319,11 +319,11 @@ Player::~Player()
 	// Make sure we don't leak OICs
 	assert( leadingBrigade() == 0 );
 
-	SetSquadInvite(NULL);
+	SetSquadInvite(nullptr);
 	if ( m_tunes )
 	{
 		memFree(m_tunes);
-		m_tunes = NULL;
+		m_tunes = nullptr;
 	}
 
 	if ( m_impl )
@@ -657,14 +657,14 @@ Player::deactivate()
 	if ( squadID() )
 	{
 		SquadList* squadList = chatFindSquadList(squadID());
-		if ( squadList != NULL )
-			squadList->updateMember(matchHandle(), squadRank(), NULL);
+		if ( squadList != nullptr )
+			squadList->updateMember(matchHandle(), squadRank(), nullptr);
 	}
 
 	// Remove from trainer list etc
 	chatUpdateTrainerStatus(playerID(), false);
 	// Remove from recruiter list etc
-	chatUpdateRecruiterList(this, false, NULL);
+	chatUpdateRecruiterList(this, false, nullptr);
 
 	removeFromAWS();
 	removeFromGrid();
@@ -734,7 +734,7 @@ Player::detuneRadio(UCHAR index)
 {
 	Chat::ChannelSubscription& cnode = this->getChannelSub(index);
 
-	if ( cnode.channel() == NULL && cnode.type() == NO_CHANNEL )
+	if ( cnode.channel() == nullptr && cnode.type() == NO_CHANNEL )
 		return;
 
 	cnode.unsubscribe();
@@ -793,9 +793,9 @@ Player::featureLock(const std::string& feature, UINT32 now, UINT32 duration)
 UINT32
 Player::getCellHost(PlayerStatusNode* psn) const
 {
-	if ( psn == NULL )
+	if ( psn == nullptr )
 		psn = ServerInterface::PlayerStatusNodeByPlayerID(playerID());
-	if ( psn == NULL )
+	if ( psn == nullptr )
 		return 0;
 
 	if ( psn->curServer.type == CELL_HOST )
@@ -895,17 +895,17 @@ Player::isAvailableRecruiter(const Player* player) const
 {
 	// Do inexpensive tests first
 	if ( player->squadID() || !this->squadID() )
-		return NULL;
+		return nullptr;
 
 	if ( player->side() != this->side() )
-		return NULL;
+		return nullptr;
 
 	// Can we see each other?
 	if ( !this->isVisibleTo(player) || !player->isVisibleTo(this) )
-		return NULL;
+		return nullptr;
 
 	if ( this->missionID() <= 0 || this->teulIndex() < 0 || player->teulIndex() < 0 )
-		return NULL;
+		return nullptr;
 
 /*	/// TODO: Enable this code
 	if ( country() != player->country() || branch() != player->branch() )
@@ -913,23 +913,23 @@ Player::isAvailableRecruiter(const Player* player) const
 */
 
 	if ( isAFK() || isBuzzard() || player->isBuzzard() )
-		return NULL;
+		return nullptr;
 
 	if ( squadRank() < Squad::STAFFER )
-		return NULL;
+		return nullptr;
 
 	// Am I actually recruiting?
 	if ( getPreference(CPR_IS_RECRUITING) == 0 )
-		return NULL;
+		return nullptr;
 
 	if ( ignoring(player) || player->ignoring(this) )
-		return NULL;
+		return nullptr;
 
 	SquadList* squadList = chatFindSquadList(squadID());
-	if ( squadList == NULL )
-		return NULL;
+	if ( squadList == nullptr )
+		return nullptr;
 	if ( !squadList->squad().recruiting() )
-		return NULL;
+		return nullptr;
 
 	return squadList;
 }
@@ -983,7 +983,7 @@ const char*
 Player::lastPosition(const char* prefix, const FLOAT64& x, const FLOAT64& y, bool onlyIfValid) const
 {
 	static char posn[80+1];
-	if ( !isSpawned() && m_lastCP == NULL )
+	if ( !isSpawned() && m_lastCP == nullptr )
 	{
 		if ( onlyIfValid )
 			return "";
@@ -993,7 +993,7 @@ Player::lastPosition(const char* prefix, const FLOAT64& x, const FLOAT64& y, boo
 	{
 		return " (spawning)";
 	}
-	if ( m_lastCP == NULL )
+	if ( m_lastCP == nullptr )
 	{
 #ifdef BETA_RELEASE
 		return " nowhere (unexpected result)";
@@ -1045,14 +1045,14 @@ Player::originCP() const
 {
 	const Property* prop = chatFindProperty(originCpID());
 
-	return ( (prop == NULL) ? "<unknown>" : prop->Name() );
+	return ( (prop == nullptr) ? "<unknown>" : prop->Name() );
 }
 
 const char*
 Player::objectiveCP() const
 {
 	const Property* prop = chatFindProperty(objectiveCpID());
-	return ( (prop == NULL) ? "<unknown>" : prop->Name() );
+	return ( (prop == nullptr) ? "<unknown>" : prop->Name() );
 }
 
 #include <unordered_map>
@@ -1069,7 +1069,7 @@ chatProcessPlayerGroups()
 		for ( auto it = playerGroups.begin(), end = playerGroups.end(); it != end; ++it )
 		{
 			Player* const player = PlayerInterface::Lookup(it->first);
-			if ( player == NULL )
+			if ( player == nullptr )
 				continue;
 			auto& groups = it->second;
 			player->setGroups(groups);
@@ -1182,9 +1182,9 @@ Player::recordEvent(const char* level, const char* index, const char* data1, con
 	const SCHAR* link1 = ":";
 	const SCHAR* link2 = ":";
 
-	if ( data1 == NULL )
+	if ( data1 == nullptr )
 		link1 = data1 = "";
-	if ( data2 == NULL )
+	if ( data2 == nullptr )
 		link2 = data2 = "";
 
 	dbugLog(_FLN, "!%s:%s:.%s%s%s%s%s", level, callsign(), index, link1, data1, link2, data2);
@@ -1197,7 +1197,7 @@ Player::recordEvent(const char* level, const char* index, const char* data1, con
 bool
 Player::recruited(const Player* byPlayer)
 {
-	assert( byPlayer != NULL );
+	assert( byPlayer != nullptr );
 
 	dbugLog(_FLI, "t:%d p:%u c:%s has been recruited by t:%d p:%u c:%s"
 					, teulIndex(), playerID(), callsign()
@@ -1285,12 +1285,12 @@ Player::sendStratCommand(const char* string, const char* arguments, bool useMapT
 		return false;
 
 	// Has the player selected something on the map?
-	Property* property = NULL;
+	Property* property = nullptr;
 	if ( useMapTarget && uiTarget().id != 0 )
 		property = chatFindProperty(uiTarget());
 
 	FULL_OBJ_ID asCpID;
-	if ( property != NULL )
+	if ( property != nullptr )
 		asCpID = property->m_fid;
 	else if ( isSpawned() && lastCP() )
 		asCpID = lastCP()->m_fid;
@@ -1330,7 +1330,7 @@ Player::SetAFK(bool goingAFK, const char* newMessage)
 	else
 		m_goneAFK = 0;
 
-	if ( !isAFK() || newMessage == NULL )
+	if ( !isAFK() || newMessage == nullptr )
 		m_afkMessage[0] = 0;
 	else
 		strlcpy(m_afkMessage, newMessage, sizeof(m_afkMessage));
@@ -1499,7 +1499,7 @@ chatCheckSpawningPlayers()
 	{
 		++nextIt;
 		Player* player = PlayerInterface::Lookup(*it);
-		if ( player == NULL || player->isSpawned() )
+		if ( player == nullptr || player->isSpawned() )
 		{
 			_spawning.erase(it);
 			continue;
@@ -1559,14 +1559,14 @@ Player::SetSpawned(bool newValue)
 		// If they have a non-zero update mode, then update their vis mode
 		chatSendBandwidthNotice(playerID(), getPreference(CPR_UPDATE_MODE));
 
-		if ( m_snoopBy != NULL )
+		if ( m_snoopBy != nullptr )
 			chatDispatchGMMessage("SNOOP", chatMakeTempString("Snooped player %s is spawning", callsign()));
-		else if ( m_crsSnoopBy != NULL )
+		else if ( m_crsSnoopBy != nullptr )
 			chatDispatchCRSMessage("SNOOP", chatMakeTempString("CRSSnooped player %s is spawning", callsign()));
 	}
 	else
 	{
-		m_capping = NULL;
+		m_capping = nullptr;
 
 		removeFromAWS();
 		removeFromGrid();
@@ -1647,7 +1647,7 @@ Player::stopRecruiting()
 		for ( auto it = recruits.begin(), end = recruits.end(); it != end; ++it )
 		{
 			Player* player = PlayerInterface::Lookup(*it);
-			if ( player != NULL && player->teulIndex() >= 0 )
+			if ( player != nullptr && player->teulIndex() >= 0 )
 				indexes.push_back(player->teulIndex());
 		}
 
@@ -1709,7 +1709,7 @@ Player::tunePlaceHolder(UCHAR index, CHANNEL_TYPE type)
 	if ( g_debugRadios )
 		dbugLog(_FLD, "t:%d p:%u c:%s tuning radio %d to %s placeholder", teulIndex(), playerID(), callsign(), index, chanTypeName[type]);
 
-	_setChannel(index, type, NULL, false);
+	_setChannel(index, type, nullptr, false);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1914,9 +1914,9 @@ const char*
 _nameForCP(const Property* nearCP, const Property* lastCP)
 {
 	static char buf[80+1];
-	if ( nearCP != NULL )
+	if ( nearCP != nullptr )
 		return nearCP->Name();
-	if ( lastCP == NULL )
+	if ( lastCP == nullptr )
 		return "<wilderness>";
 	strprintf(buf, "<last near %s>", lastCP->Name());
 	return buf;
@@ -1965,10 +1965,10 @@ Player::updateLocality(FLOAT64 x, FLOAT64 y, FLOAT64 z
 
 	m_impl->m_lastPing = lastPing;
 	bool capBldgChanged = false;
-	if ( (m_capping == NULL && inCapBldg == true) || (m_capping != NULL && inCapBldg == false) )
+	if ( (m_capping == nullptr && inCapBldg == true) || (m_capping != nullptr && inCapBldg == false) )
 	{
 		capBldgChanged = true;
-		m_capping = NULL;
+		m_capping = nullptr;
 	}
 	if ( isSpawned() && m_lastX == x && m_lastY == y && m_lastZ == z && cpChanged == false && isOnAWS == m_impl->onAWS() && capBldgChanged == false && progress == m_capProgress )
 		return;
@@ -1983,13 +1983,13 @@ Player::updateLocality(FLOAT64 x, FLOAT64 y, FLOAT64 z
 							, teulIndex(), playerID(), callsign(), x, y, z);
 		if ( _flagClientSpawned(this) == false )
 			return;
-		if ( nearest == NULL )
+		if ( nearest == nullptr )
 			nearest = m_lastCP;
 	}
 
 	if ( nowInFacility.id == 0 )
-		m_insideFacility = NULL;
-	else if ( m_insideFacility == NULL || m_insideFacility->Fid().id != nowInFacility.id )
+		m_insideFacility = nullptr;
+	else if ( m_insideFacility == nullptr || m_insideFacility->Fid().id != nowInFacility.id )
 	{
 		m_insideFacility = chatFindProperty(nowInFacility);
 	}
@@ -1998,7 +1998,7 @@ Player::updateLocality(FLOAT64 x, FLOAT64 y, FLOAT64 z
 	m_lastY = y;
 	m_lastZ = z;
 
-	if ( nearest != NULL )
+	if ( nearest != nullptr )
 	{
 		if ( nearest != m_lastCP )
 		{
@@ -2024,12 +2024,12 @@ Player::updateLocality(FLOAT64 x, FLOAT64 y, FLOAT64 z
 
 	if ( inCapBldg )
 	{
-		if ( m_capping == NULL )
+		if ( m_capping == nullptr )
 			m_capping = (PropFacility*)chatFindProperty(capFac);
 	}
 	else
 	{
-		m_capping = NULL;
+		m_capping = nullptr;
 	}
 
 	m_capProgress = progress;
@@ -2123,7 +2123,7 @@ Player::updatePersona(const Chat::PersonaUpdate& update)
 	if ( !inFacility() )
 	{
 //		m_lastCP = NULL;
-		m_insideFacility = NULL;
+		m_insideFacility = nullptr;
 	}
 
 	// Read groups and apply permissions as apropriate
@@ -2149,7 +2149,7 @@ Player::updatePersona(const Chat::PersonaUpdate& update)
 			strprintf(note, "%s has logged in", callsign());		///LSTR_SIGNED_ON
 			chatDispatchCRSMessage("SYS", note, matchHandle());
 			const char* motd = chatGetUnitMotd(CRS_MOTD_UNIT);
-			if ( motd != NULL && *motd != 0 )
+			if ( motd != nullptr && *motd != 0 )
 				message(LSTR_NONE, LSTR_CRS_MOTD, motd);
 		}
 		if ( isEffectiveGM() )
@@ -2160,7 +2160,7 @@ Player::updatePersona(const Chat::PersonaUpdate& update)
 				chatDispatchGMMessage("SYS", note, matchHandle());
 			}
 			const char* motd = chatGetUnitMotd(GM_MOTD_UNIT);
-			if ( motd != NULL && *motd != 0 )
+			if ( motd != nullptr && *motd != 0 )
 				message(LSTR_NONE, LSTR_GM_MOTD, motd);
 		}
 		if ( !permissions(DARK_GLASSES) && isActiveCommander() && isPlaynet() == false && isExplicitGM() == false )
@@ -2198,7 +2198,7 @@ Player::unrecruit(LSTRING_ID notifyRecruiter)
 	if ( notifyRecruiter != LSTR_NONE )
 	{
 		Player* player = PlayerInterface::Lookup(m_impl->m_recruiter);
-		if ( player != NULL )
+		if ( player != nullptr )
 			player->message(LSTR_NOTE, notifyRecruiter, callsign());
 	}
 
@@ -2227,7 +2227,7 @@ Player::validatePreference(UINT32 prefId, UINT32 request) const
 void
 Player::whereabouts(char* into, const FLOAT64& x, const FLOAT64& y) const
 {
-	assert(into != NULL);
+	assert(into != nullptr);
 
 	if ( noSide() )
 	{
@@ -2253,7 +2253,7 @@ Player::whereabouts(char* into, const FLOAT64& x, const FLOAT64& y) const
 	strcat(into, " ");
 
 	HCUnit* unit = HCUnit::Lookup(brigadeID());
-	if ( unit != NULL )
+	if ( unit != nullptr )
 	{
 		strcat(into, unit->name());
 		strcat(into, " ");
@@ -2293,7 +2293,7 @@ Player::whereabouts(char* into, const FLOAT64& x, const FLOAT64& y) const
 			if ( isBuzzard() )
 				strcat(into, " buzzard");
 			strcat(into, lastPosition("near ", x, y, false));
-			if ( lastCP() == NULL || lastCP()->Matches(originCpID()) == false )
+			if ( lastCP() == nullptr || lastCP()->Matches(originCpID()) == false )
 			{
 				strcat(into, " origin: ");
 				strcat(into, originCP());
@@ -2625,7 +2625,7 @@ Player*
 PlayerInterface::Lookup(UINT32 playerID)
 {
 	Player* player = (Player*)ServerInterface::LookupByPlayerID(playerID);
-	if ( player != NULL )
+	if ( player != nullptr )
 		return player;
 	return (Player*)Chat::ManagementIDAllocator::Lookup(playerID);
 }
@@ -2634,5 +2634,5 @@ Player*
 PlayerInterface::Lookup(const ChatHandle& handle)
 {
 	PLAYER_INDEX::iterator it = playerIndex.find(chatGetLowercaseHandle(handle));
-	return ( it == playerIndex.end() ) ? NULL : it->second;
+	return ( it == playerIndex.end() ) ? nullptr : it->second;
 }

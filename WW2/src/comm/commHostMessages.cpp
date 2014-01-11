@@ -71,7 +71,7 @@ static TEUL_CALLBACK*		_SEND_MOVE;
 
 static TEUL_CALLBACK*		_SEND_CAPTURE_STATE;
 
-TEUL_CALLBACK*		Host::TimeUpdate::Callback = NULL;
+TEUL_CALLBACK*		Host::TimeUpdate::Callback = nullptr;
 
 UCHAR commCookieString[] = AUTH_SEQ;
 
@@ -116,7 +116,7 @@ _badPlayer(Player& player, const SCHAR* problem, bool alert)
 
 	// Find out who we are dealing with
 	PlayerStatusNode* psn = ServerInterface::PlayerStatusNodeByPlayerID(player.playerID());
-	if ( psn != NULL )
+	if ( psn != nullptr )
 		callsign = psn->dispatch().m_callsign;
 
 	dbugLog(_FLW, "t:%d p:%u c:%s *** Kicking: %s", player.teulIndex(), player.playerID(), callsign, problem);
@@ -264,7 +264,7 @@ commRecvVehicleUpdate(UINT32 serverAddress, const UCHAR* const buffer)
 	}
 
 	static VEHICLE_HOLDER vh;
-	vh.vehicle = NULL;
+	vh.vehicle = nullptr;
 	SINT32 result = updtPackVehicleBroadcast(TEUL_UNPACK, const_cast<UCHAR*>(buffer), 0, &vh, 0);
 
 	if (!vh.vehicle)
@@ -347,7 +347,7 @@ _recvVehicleJoinRequest(ACTION_OBJECT* const a)
 				);
 
 	const SINT32 vIndex = hostJoinVehicle(player, localVehicleRequest);
-	if ( (vIndex < 0) | (player.vehicle == NULL) )
+	if ( (vIndex < 0) | (player.vehicle == nullptr) )
 	{
 		dbugLog(_FLW, "t:%d p:%u v:%i FAILED TO JOIN VEHICLE"
 						, a->teulIndex
@@ -532,7 +532,7 @@ SINT32
 commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* const message, const SINT32 startOffset, const bool isFromTeul)
 {
 	PlayerStatusNode* psn = ServerInterface::PlayerStatusNodeByPlayerID(player->playerID());
-	if ( psn == NULL)
+	if ( psn == nullptr)
 	{
 		dbugLog(_FLA,"t:%d _recvUpdateInfo: invalid player", teulIndex);
 		return -EINVAL;
@@ -569,7 +569,7 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 	}
 
 	HostVehicle* const vref = hostFindVehicleLocal(vh.vehInfo->index);
-	if (vref == NULL)
+	if (vref == nullptr)
 	{
 		dbugLog(_FLA,"t:%d p:%u c:%s v:%u_recvUpdateInfo: ERROR (3)"
 					, player->teulIndex(), player->playerID(), player->callsign(), vehInfo.index);
@@ -727,7 +727,7 @@ static SINT32
 _recvUpdateInfo(ACTION_OBJECT* const a)
 {
 	Player* const player = (Player*)teulGetPersonaData(a->teulIndex);
-	if ( player == NULL)
+	if ( player == nullptr)
 	{
 		dbugLog(_FLA,"t:%d _recvUpdateInfo: invalid player", a->teulIndex);
 		commSendPlayerExit(a->teulIndex, PDEST_MAP, PEXIT_DEAD, nullObjID);
@@ -819,7 +819,7 @@ _processVehicleHit(Vehicle::Hit& hit, Player* const shooter, const SINT32 fromTe
 	}
 
 	HostVehicle* const vTarget = hostFindVehicleLocal(hit.m_target);
-	if ( vTarget == NULL)
+	if ( vTarget == nullptr)
 	{
 		dbugLog(_FLW, "cant apply hit, unknown m_target %u, may have already despawned",hit.m_target);
 		return true;
@@ -887,7 +887,7 @@ _processVehicleHit(Vehicle::Hit& hit, Player* const shooter, const SINT32 fromTe
 	{
 		Player* const thePlayer = *it;
 		++it;
-		if ( thePlayer == NULL || thePlayer->teulIndex() < 0 )
+		if ( thePlayer == nullptr || thePlayer->teulIndex() < 0 )
 			continue;
 
 		if ( host_config.kills.reportDamage )
@@ -928,7 +928,7 @@ commProcessApplyHit(ACTION_OBJECT* const a)
 		return -EINVAL;
 	}
 
-	_processVehicleHit(hit, NULL, a->teulIndex, a->packed, a->sizeInBits());
+	_processVehicleHit(hit, nullptr, a->teulIndex, a->packed, a->sizeInBits());
 
 	return a->offset + a->sizeInBits();
 }
@@ -947,7 +947,7 @@ _recvClientVehicleHit(ACTION_OBJECT* const a)
 	}
 
 	Player* const shooter = (Player*)teulGetPersonaData(a->teulIndex);
-	if ( shooter == NULL || shooter->vehicle == NULL )
+	if ( shooter == nullptr || shooter->vehicle == nullptr )
 	{
 		dbugLog(_FLW, "t:%d suspicious looking vehicleHit - non-local player from non-broadcast source", a->teulIndex);
 		commSendPlayerExit(a->teulIndex, PDEST_MAP, PEXIT_DEAD, nullObjID);
@@ -1055,7 +1055,7 @@ _recvDespawned(ACTION_OBJECT* const a)
 {
 	const playerid_t playerID = a->read<playerid_t>();
 	Player* const player = (Player*)ServerInterface::LookupByPlayerID(playerID);
-	if ( player == NULL )
+	if ( player == nullptr )
 		return a->offset;
 
 	_playerExit.destination = PDEST_MAP;
@@ -1126,14 +1126,14 @@ _sendMove(ACTION_OBJECT* const a)
 static SINT32
 _recvMovePlayer(ACTION_OBJECT* const a)
 {
-	if ( a->m_client != NULL )
+	if ( a->m_client != nullptr )
 	{
 		threadLog(_FLW, "t:%d unexpected player move from player", a->teulIndex);
 		return -EINVAL;
 	}
 	auto& incoming = a->read<Chat::PlayerMove>();
 	Player* player = static_cast<Player*>(ServerInterface::LookupByPlayerID(incoming.m_playerID));
-	if ( player == NULL || player->teulIndex() < 0 || player->vehicle == NULL )
+	if ( player == nullptr || player->teulIndex() < 0 || player->vehicle == nullptr )
 	{
 		threadLog(_FLD, "p:%u ignoring move request", incoming.m_playerID);
 		return a->offset;
@@ -1154,14 +1154,14 @@ _recvMovePlayer(ACTION_OBJECT* const a)
 static SINT32
 _recvForceDespawn(ACTION_OBJECT* const a)
 {
-	if ( a->m_client != NULL )
+	if ( a->m_client != nullptr )
 	{
 		dbugLog(_FLW, "t:%d received unexpected force despawn from player", a->teulIndex);
 		return -EINVAL;
 	}
 	auto& playerID = a->read<playerid_t>();
 	Player* player = static_cast<Player*>(ServerInterface::LookupByPlayerID(playerID));
-	if ( player == NULL )
+	if ( player == nullptr )
 		return a->offset;
 	threadLog(_FLD, "p:%u c:%s v:%u received force-despawn instruction", player->playerID(), player->callsign(), player->sortieID());
 
@@ -1215,7 +1215,7 @@ HostVehicle::sendCaptureState(const CaptureState& capState)
 		return;
 
 	Player* player = activeCommander();
-	if ( player == NULL || player->teulIndex() < 0 )
+	if ( player == nullptr || player->teulIndex() < 0 )
 		return;
 
 	teulSend(player->teulIndex(), _SEND_CAPTURE_STATE, (void*)&capState);
@@ -1229,7 +1229,7 @@ _recvCaptureScore(ACTION_OBJECT* const a)
 {
 	if ( a->canRead<CaptureScore>() == false )
 		return -EINVAL;
-	if ( a->m_client != NULL )
+	if ( a->m_client != nullptr )
 		return -EINVAL;
 
 	auto& incoming = a->read<CaptureScore>();
@@ -1253,7 +1253,7 @@ _recvCaptureState(ACTION_OBJECT* const a)
 		dbugLog(_FLA, "t:%d sent capture state we can't read", a->teulIndex);
 		return -EINVAL;
 	}
-	if ( a->m_client != NULL )
+	if ( a->m_client != nullptr )
 	{
 		dbugLog(_FLA, "t:%d sending us capture state, naughty naughty", a->teulIndex);
 		return -EINVAL;
@@ -1272,12 +1272,12 @@ _recvCaptureState(ACTION_OBJECT* const a)
 static SINT32
 _recvResupplyIssue(ACTION_OBJECT* const a)
 {
-	if ( a->m_client != NULL || a->canRead<HostResupplyIssue>() == false )
+	if ( a->m_client != nullptr || a->canRead<HostResupplyIssue>() == false )
 		return -EINVAL;
 
 	auto& incoming = a->read<HostResupplyIssue>();
 	HostVehicle* const vehicle = hostFindVehicleLocal(incoming.m_toSerial);
-	if ( vehicle == NULL )
+	if ( vehicle == nullptr )
 	{
 		dbugLog(_FLI, "rv:%u v:%u received resupply message for NULL vehicle (too late?)", incoming.m_fromSerial, incoming.m_toSerial);
 		return a->offset;
@@ -1288,7 +1288,7 @@ _recvResupplyIssue(ACTION_OBJECT* const a)
 		return a->offset;
 	}
 
-	vehicle->acceptResupply(incoming.m_fromSerial, incoming.m_fromHandle, NULL, a->endpoint->fromAddress());
+	vehicle->acceptResupply(incoming.m_fromSerial, incoming.m_fromHandle, nullptr, a->endpoint->fromAddress());
 
 	return a->offset;
 }
@@ -1296,12 +1296,12 @@ _recvResupplyIssue(ACTION_OBJECT* const a)
 static SINT32
 _recvResupplyAccepted(ACTION_OBJECT* const a)
 {
-	if ( a->m_client != NULL || a->canRead<HostResupplyAccepted>() == false )
+	if ( a->m_client != nullptr || a->canRead<HostResupplyAccepted>() == false )
 		return -EINVAL;
 
 	auto& incoming = a->read<HostResupplyAccepted>();
 	HostVehicle* vehicle = hostFindVehicleLocal(incoming.m_supplierID);
-	if ( vehicle == NULL || vehicle->isRemote() == true )
+	if ( vehicle == nullptr || vehicle->isRemote() == true )
 		return a->offset;
 	if ( g_logDebug )
 		dbugLog(_FLD, "v:%u supply to %s acknowledged", incoming.m_supplierID, Chat::Name(incoming.m_recipient).c_str());

@@ -44,7 +44,7 @@ SQUAD_REQUESTS requestIndex;
 static void
 _expired(Player* player)
 {
-	if ( player == NULL || player->teulIndex() < 0 || player->squadID() ) return;
+	if ( player == nullptr || player->teulIndex() < 0 || player->squadID() ) return;
 
 	static SquadControlResult reply(SQR_CREATE_EXPIRED, SquadControl::_CREATE, 0);
 	reply.send(player->teulIndex());
@@ -87,7 +87,7 @@ _checkMembers(Player* player, SquadControl& control, bool sendInvites)
 				continue;
 			Player* invitee = PlayerInterface::Lookup(handleID);
 			approved[handleID] = invitee;
-			if ( invitee == NULL
+			if ( invitee == nullptr
 				|| !invitee->isVisibleTo(player)
 				|| invitee->ignoring(player)
 				)
@@ -114,7 +114,7 @@ _checkMembers(Player* player, SquadControl& control, bool sendInvites)
 
 	// Can't proceed without the XO
 	ChatHandle& xo = players[0];
-	if ( approved[xo] == NULL )
+	if ( approved[xo] == nullptr )
 		throw SQR_CREATE_MEMBER_ERROR;
 
 	if ( sendInvites )
@@ -168,18 +168,18 @@ _processCreateComplete(const ChatHandle& /*originator*/, SQUAD_REQUEST& request,
 	for ( UINT32 i = 0; i < request.control.m_players.size(); ++i )
 	{
 		member = PlayerInterface::Lookup(request.control.m_players[i]);
-		if ( member != NULL )
+		if ( member != nullptr )
 		{
 			if ( member == player )
 				updatedPlayer = true;
-			member->SetSquadInvite(NULL);
+			member->SetSquadInvite(nullptr);
 			member->tuneChannelType(SQUAD_CHANNEL);
 			chatSaveChannels(*member);
 		}
 	}
 	if ( !updatedPlayer && player && player->teulIndex() >= 0 && player->initialized() )
 	{
-		player->SetSquadInvite(NULL);
+		player->SetSquadInvite(nullptr);
 		player->tuneChannelType(SQUAD_CHANNEL);
 		chatSaveChannels(*player);
 	}
@@ -226,7 +226,7 @@ chatProcessSquadCreateReply(bool created, const ChatHandle& originator, Player* 
 void
 chatSquadDeclineCreateInvite(Player* decliner, Player* creator)
 {
-	if ( decliner == NULL || creator == NULL )
+	if ( decliner == nullptr || creator == nullptr )
 	{
 		dbugLog(_FLA, "%s: NULL pointers", __FUNCTION__);
 		return;
@@ -247,8 +247,8 @@ chatSquadDeclineCreateInvite(Player* decliner, Player* creator)
 		for ( UINT32 i = 0; i < request.control.m_players.size(); ++i )
 		{
 			member = PlayerInterface::Lookup(request.control.m_players[i]);
-			if ( member != NULL )
-				member->SetSquadInvite(NULL);
+			if ( member != nullptr )
+				member->SetSquadInvite(nullptr);
 		}
 	}
 
@@ -266,7 +266,7 @@ chatSquadAcceptCreateInvite(Player* acceptor, Player* creator)
 	// invited to another squad after helping create the
 	// first one.
 	// Pointer check
-	if ( acceptor == NULL || creator == NULL )
+	if ( acceptor == nullptr || creator == nullptr )
 	{
 		betaLog(_FLA, "NULL pointers");
 		throw SQR_NO_INVITE;
@@ -329,7 +329,7 @@ chatExpireSquadCreates()
 	for ( it = requestIndex.begin(); it != requestIndex.end(); )
 	{
 		Player* creator = PlayerInterface::Lookup(it->first);
-		if ( it->second.expires > teulTime() && creator != NULL && creator->teulIndex() >= 0 )
+		if ( it->second.expires > teulTime() && creator != nullptr && creator->teulIndex() >= 0 )
 			++it;
 		else
 		{

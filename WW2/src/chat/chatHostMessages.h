@@ -39,7 +39,7 @@ extern void chatSendLocateUser(Player& requester, UINT32 playerID);
 
 extern bool chatSendBandwidthNotice(playerid_t playerID, UINT32 mode);
 
-extern bool chatMessageChannel(const ChannelID& channelID, LSTRING_ID prefix, LSTRING_ID message, const char* arg1 = NULL, const char* arg2 = NULL);
+extern bool chatMessageChannel(const ChannelID& channelID, LSTRING_ID prefix, LSTRING_ID message, const char* arg1 = nullptr, const char* arg2 = nullptr);
 
 extern void chatSendMotd(SINT32 teulIndex, struct MOTD_REPLY& reply);
 

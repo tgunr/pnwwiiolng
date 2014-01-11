@@ -102,7 +102,7 @@ static void
 _sendPlayerInQueue(const PlayerEntry& entry, UINT32 position, const QueueHeader& header)
 {
 	// Ignore players with a teulIndex of 0.
-	if ( entry.m_cdata == NULL )
+	if ( entry.m_cdata == nullptr )
 		return;
 
 	// How long do we expect them to have to wait?
@@ -118,7 +118,7 @@ _trimDeadEntries(QueueHeader& header)
 {
 	// Find the first non-dead entry
 	PlayerQueue::iterator it = header.m_queue.begin();
-	while ( it != header.m_queue.end() && it->m_cdata == NULL )
+	while ( it != header.m_queue.end() && it->m_cdata == nullptr )
 	{
 		++it;
 	}
@@ -176,7 +176,7 @@ _processArenaQueue(QueueHeader& header)
 	PlayerQueue::const_iterator it;
 	for ( it = header.m_queue.begin(); it != header.m_queue.end(); ++it )
 	{
-		if ( it->m_cdata != NULL )
+		if ( it->m_cdata != nullptr )
 		{
 			_sendPlayerInQueue(*it, ++i, header);
 		}
@@ -207,7 +207,7 @@ _getNextPlayer(QueueHeader& header)
 {
 	_trimDeadEntries(header);
 	if ( header.m_queue.empty() )
-		return NULL;
+		return nullptr;
 	return header.m_queue.front().m_cdata;
 }
 
@@ -216,10 +216,10 @@ GetNextPlayer(UINT32 arenaID)
 {
 	Arenas::iterator it = arenas.find(arenaID);
 	if ( it == arenas.end() )
-		return NULL;
+		return nullptr;
 
 	ClientData* cdata = _getNextPlayer(it->second.m_premium);
-	if ( cdata != NULL )
+	if ( cdata != nullptr )
 		return cdata;
 	return _getNextPlayer(it->second.m_nonPremium);
 }
@@ -298,7 +298,7 @@ RemovePlayer(UINT32 arenaID, Auth::ClientData* cdata, bool premium, bool entered
 	}
 
 	// Kill the entry.
-	entry.m_cdata = NULL;
+	entry.m_cdata = nullptr;
 
 	// If the player is at the front of the queue, trimDeadEntries
 	// will remove all the dead entries from the front of the queue

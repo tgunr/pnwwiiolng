@@ -207,7 +207,7 @@ _findGrid(const GridKey& key)
 {
 	_CHAT_GRID::iterator it = _gridIndex.find(key);
 	if ( it == _gridIndex.end() )
-		return NULL;
+		return nullptr;
 	return it->second;
 }
 
@@ -218,7 +218,7 @@ static ChatGrid*
 _getGrid(const GridKey& key)
 {
 	ChatGrid* grid = _findGrid(key);
-	if ( grid != NULL )
+	if ( grid != nullptr )
 		return grid;
 
 	if ( !_freeGrids.empty() )
@@ -314,7 +314,7 @@ ChatGrid::addPlayer(Player* player, ChatGrid* oldGrid)
 	if ( player->teulIndex() >= 0 )
 	{
 		// Grids that have moved out of range
-		if ( oldGrid != NULL )
+		if ( oldGrid != nullptr )
 		{
 			for ( auto it = oldGrid->m_neighbors.begin(), end = oldGrid->m_neighbors.end(); it != end; ++it )
 			{
@@ -432,7 +432,7 @@ _checkHulksInCell(ChatGrid* cell, UINT32 limit)
 {
 	STOS::iterator it;
 	UINT32 hulks = 0;
-	ServerSTO* oldest = NULL;
+	ServerSTO* oldest = nullptr;
 
 	// Count the hulks and track which is oldest incase
 	// we need to remove it
@@ -444,7 +444,7 @@ _checkHulksInCell(ChatGrid* cell, UINT32 limit)
 			continue;
 		++hulks;
 
-		if ( oldest == NULL || (*it)->age() > oldest->age() )
+		if ( oldest == nullptr || (*it)->age() > oldest->age() )
 			oldest = (*it);
 	}
 
@@ -455,7 +455,7 @@ _checkHulksInCell(ChatGrid* cell, UINT32 limit)
 		return hulks;
 
 	// Simple sanity check
-	assert( oldest != NULL );
+	assert( oldest != nullptr );
 
 	// We've now determined that there is one or more hulk here,
 	// and that we need to remove at least one hulk
@@ -485,7 +485,7 @@ _checkHulksInArea(ChatGrid* cell)
 		return;
 	}
 
-	ChatGrid* highestPopulatedCell = NULL;
+	ChatGrid* highestPopulatedCell = nullptr;
 	_GRIDS::iterator it;
 	UINT32 hulksInArea = 0;
 	UINT32 highestPopulation = 0;
@@ -521,7 +521,7 @@ _checkHulksInArea(ChatGrid* cell)
 	if ( hulksInArea >= host_config.sto.hulkLimitPerArea )
 	{
 		// Simple sanity check
-		assert( highestPopulatedCell != NULL );
+		assert( highestPopulatedCell != nullptr );
 		_checkHulksInCell(highestPopulatedCell, 0);
 	}
 }
@@ -570,7 +570,7 @@ _announceSTOToGrid(ServerSTO& sto, bool isCreation)
 		cell = _getGrid(key);
 
 		// DEBUG: Make sure we're not adding the same guy
-		assert( cell != NULL );
+		assert( cell != nullptr );
 		assert( cell->stos().find(&sto) == cell->stos().end() );
 
 		cell->addSTO(sto);
@@ -582,7 +582,7 @@ _announceSTOToGrid(ServerSTO& sto, bool isCreation)
 		op = "remove";
 		cell = _findGrid(key);
 
-		assert( cell != NULL );
+		assert( cell != nullptr );
 		assert( cell->stos().find(&sto) != cell->stos().end() );
 
 		cell->removeSTO(sto);
@@ -684,13 +684,13 @@ UMSSTO::activate()
 
 	// Make sure we can look this dude up
 	Player* const player = PlayerInterface::Lookup(creatorID());
-	if ( player == NULL || player->missionID() == 0 )
+	if ( player == nullptr || player->missionID() == 0 )
 		return false;
 
 	try
 	{
 		ChatMission* mission = chatFindMission(player->missionID());
-		if ( mission == NULL )
+		if ( mission == nullptr )
 			throw MSDR_MISSION_EXPIRED;
 
 		if ( player->isMissionLeader() == false && mission->m_stoUID != 0 )
@@ -827,7 +827,7 @@ Player::removeFromGrid()
 		log(_FLD, "removing from grid [%d,%d]", m_gridX, m_gridY);
 
 	ChatGrid* grid = _findGrid(GridKey(instance().id(), m_gridX, m_gridY));
-	if ( grid != NULL )
+	if ( grid != nullptr )
 		grid->extractPlayer(this);
 
 	m_gridX = m_gridY = INVALID_GRID_COORD;
@@ -840,7 +840,7 @@ chatGridGetPlayersVector(const Player* player, const SINT64& range, PLAYERS_ARRA
 
 	GridKey origin(player->instance().id(), player->gridX(), player->gridY());
 	ChatGrid* grid = _findGrid(origin);
-	if ( grid == NULL )
+	if ( grid == nullptr )
 	{
 		player->log(_FLW, "g:%d,%d no grid?", player->gridX(), player->gridY());
 		return;

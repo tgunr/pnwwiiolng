@@ -75,11 +75,11 @@ static void _saveMinorUsage(Player* player)
 void
 mmAddMinor(Player* player, UINT32 priorPlayedTime)
 {
-	assert( player != NULL );
-	assert( player->m_antiAddiction == NULL );
+	assert( player != nullptr );
+	assert( player->m_antiAddiction == nullptr );
 
 	player->m_antiAddiction = new AAStatus(priorPlayedTime);
-	assert( player->m_antiAddiction != NULL );
+	assert( player->m_antiAddiction != nullptr );
 
 	player->m_implementAntiAddiction = false;
 
@@ -96,14 +96,14 @@ mmAddMinor(Player* player, UINT32 priorPlayedTime)
 void
 mmRemoveMinor(Player* player)
 {
-	assert( player != NULL );
+	assert( player != nullptr );
 
-	assert( player->m_antiAddiction != NULL );
+	assert( player->m_antiAddiction != nullptr );
 
 	_saveMinorUsage(player);
 
 	delete player->m_antiAddiction;
-	player->m_antiAddiction = NULL;
+	player->m_antiAddiction = nullptr;
 
 	g_minors.erase(player);
 
@@ -193,7 +193,7 @@ mmCheckAddictionTimers()
 		Player* player = static_cast<Player*>(*it);
 		AAStatus* status = player->m_antiAddiction;
 
-		assert( status != NULL );
+		assert( status != nullptr );
 
 		++it;
 
@@ -248,14 +248,14 @@ mmCheckAddictionTimers()
 FLOAT32
 mmAntiAddictionScoringMultiplier(const Player* player)
 {
-	assert( NULL != player );
+	assert( nullptr != player );
 
 	// Setting minutes-per-hour to zero disables anti-addiction systems.
 	if ( host_config.arena.minutesPerAAHour == 0 )
 		return 1.0;
 
 	const AAStatus* const status = player->m_antiAddiction;
-	if ( NULL == status || status->m_state <= AntiAddiction::_STANDARD_TIME )
+	if ( nullptr == status || status->m_state <= AntiAddiction::_STANDARD_TIME )
 		return 1.0;
 	if ( status->m_state == AntiAddiction::_TIRED_TIME )
 		return 0.5;

@@ -42,7 +42,7 @@ chatCreateChannel(const ChannelID& channelID, const char* const name, ChatHandle
 	if ( channelID.IsPlaceHolder() )
 	{
 		dbugLog(_FLA, "attempting to create placeholder channel - id not properly populated");
-		return NULL;
+		return nullptr;
 	}
 
 	// Check to see if channel already exists.
@@ -126,7 +126,7 @@ Chat::Channel*
 chatFindChannel(const ChannelID& id)
 {
 	CHANNEL_INDEX::iterator it = _channelIndex.find(id);
-	return ( it != _channelIndex.end() ) ? it->second : NULL;
+	return ( it != _channelIndex.end() ) ? it->second : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -138,7 +138,7 @@ chatDeleteUnusedChannels()
 	for ( auto it = _tentativeChannels.begin(), end = _tentativeChannels.end(); it != end; ++it )
 	{
 		Chat::Channel* const channel = it->second;
-		if ( channel == NULL )
+		if ( channel == nullptr )
 			LogAbort("dead channel in list");
 
 		if ( channel->numSubscribers() > 0 )
@@ -252,7 +252,7 @@ Chat::ChannelSubscription::unsubscribe()
 	}
 
 	m_type = NO_CHANNEL;
-	m_channel = NULL;
+	m_channel = nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -262,14 +262,14 @@ Chat::ChannelSubscription::unsubscribe()
 void
 Chat::ChannelSubscription::subscribe(CHANNEL_TYPE type_, Chat::Channel* channel_)
 {
-	if ( m_channel != NULL )
+	if ( m_channel != nullptr )
 		unsubscribe();
 
 	this->m_channel = channel_;
 	this->m_type = type_;
 
 	// Channel will be null if this is a placeholder tune.
-	if ( m_channel != NULL )
+	if ( m_channel != nullptr )
 		m_channel->addSubscriber(*this);
 }
 

@@ -204,7 +204,7 @@ public:
 	void setCaptureProgress(FLOAT32 newValue, const Strat::CaptureContribution& claimaint);
 
 	// Given CORRECT conditions, can this facility be captured?
-	bool canBeCaptured() const { return NULL != m_captureBuilding; }
+	bool canBeCaptured() const { return nullptr != m_captureBuilding; }
 	// Given CURRENT conditions, can this facility be captured?
 	bool isCapturable() const;
 	bool isCaptureEnabled() const { return m_captureStage >= _CAP_ENABLED; }

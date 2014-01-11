@@ -42,7 +42,7 @@ _handleHitList(SINT32 teulIndex, CP_HIT_HEADER& hitHeader)
 	//   a StratPersona
 
 	Player* player = static_cast<Player*>(ServerInterface::LookupByTeulIndex(teulIndex));
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		dbugLog(_FLW, "t:%d not associated with player for damage list"
 						, teulIndex
@@ -55,7 +55,7 @@ _handleHitList(SINT32 teulIndex, CP_HIT_HEADER& hitHeader)
 	{
 		if ( player->teulIndex() < 0 ) throw std::logic_error("Invalid teulIndex");
 		if ( player->playerID() <= 0 ) throw std::logic_error("Invalid playerID");
-		if ( player->vehicle == NULL ) throw std::logic_error("Not joined to any vehicle");
+		if ( player->vehicle == nullptr ) throw std::logic_error("Not joined to any vehicle");
 		if ( player->instance().isCampaign() == false ) throw std::logic_error("Non-campaign instance"); ///TODO:INST Have to handle this
 	}
 	catch (std::logic_error& e)
@@ -96,7 +96,7 @@ _recvHitList(ACTION_OBJECT* const a)
 	_handleHitList(a->teulIndex, hitHeader);
 
 	// 3. Release any memory allocated for the list
-	if ( hitHeader.list != NULL )
+	if ( hitHeader.list != nullptr )
 		memFree(hitHeader.list);
 
 	return a->offset;

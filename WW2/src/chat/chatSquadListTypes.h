@@ -62,7 +62,7 @@ public:
 	SquadMemberEntry* find(const ChatHandle& handle)
 	{
 		SQUAD_MEMBERS::iterator it = m_members.find(handle) ;
-		return ( it == m_members.end() ) ? NULL : &(it->second) ;
+		return ( it == m_members.end() ) ? nullptr : &(it->second) ;
 	}
 	bool isNewSquad() const { return m_newSquad ; }
 	TeulTimeMS lastMemberMod() const { return m_lastMemberMod ; }
@@ -79,13 +79,13 @@ public:
 	void created() ;
 	void electNewCO() ;
 	void memberJoin(Player* player, const ChatHandle& handle, RANK_NO atRank, UINT32 joined, const char* recruitedBy, bool announceToSquad) ;
-	void memberLeave(bool removeFromDB, SquadMemberEntry* entry, int reasonLstringID, const char* extraText=NULL) ;
+	void memberLeave(bool removeFromDB, SquadMemberEntry* entry, int reasonLstringID, const char* extraText=nullptr) ;
 	void removeMember(ChatHandle handle) ;
 	void renamed(const ChatHandle& newHandle) ;
 	void updateMember(const ChatHandle& handle, RANK_NO squadRank, Player* player, UINT32 joined=0) ;
 	void updateRecruiter(const ChatHandle& handle, bool isRecruiting) ;
 
-	void sendMessage(int prefix, int message, const char* m1=NULL, const char* m2=NULL) ;
+	void sendMessage(int prefix, int message, const char* m1=nullptr, const char* m2=nullptr) ;
 	void changeNotice(Player* player, int message) ;
 
 	void setFullName(const std::string& name) ;
@@ -93,13 +93,13 @@ public:
 	void setMOTD(const std::string& name) ;
 	void setHomepage(const std::string& name) ;
 	void setLanguage(UINT32 language) ;
-	void setRecruiting(bool newFlag, Player* player=NULL) ;
+	void setRecruiting(bool newFlag, Player* player=nullptr) ;
 	void setSlogan(const std::string& text) ;
 	void setSquad(const Squad& toSquad) { m_squad = toSquad ; setUpdated() ; }
 	void setSquadNight(const std::string& text) ;
 	void setUpdated() { m_msstamp = teulClock64 ; }
 	void clearUpdated() { m_msstamp = 0LL ; }
-	void setVoting(bool newFlag, Player* player=NULL) ;
+	void setVoting(bool newFlag, Player* player=nullptr) ;
 
 private:
 	void _addMember(const ChatHandle& handle, RANK_NO squadRank, Player* player, UINT32 joined) ;

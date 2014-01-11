@@ -84,12 +84,12 @@ _createMissionResults(const Player& player, MISSION_RESULTS& results)
 
 	const FULL_OBJ_ID& origin = packet.sortie().originFac();
 	FacilityStruct* facility = strtGetFacility(origin);
-	if ( facility != NULL )
+	if ( facility != nullptr )
 		side = facility->side;
 	else
 	{
 		const CPStruct* const cp = strtGetCP(origin);
-		if (cp == NULL)
+		if (cp == nullptr)
 		{
 			dbugLog(_FLW, "t:%d p:%u c:%s Mission packet has invalid origin: %d.%d.%u"
 							, player.teulIndex(), player.playerID(), player.callsign()
@@ -146,19 +146,19 @@ _createMissionResults(const Player& player, MISSION_RESULTS& results)
 		results.pointsNextRank = 0;
 
 	const Rank* nextRank = player.useRank().next();
-	if ( nextRank != NULL )
+	if ( nextRank != nullptr )
 		results.nextRank = std::min(nextRank->level(), player.maxRank());
 	else
 		results.nextRank = 0;
 
 	const UINT32 sortieID = player.missionPacket().sortieID();
 	const Scoring::Sortie* sortie = player.sortie();
-	if ( sortie == NULL || sortie->sortieID() == sortieID )
+	if ( sortie == nullptr || sortie->sortieID() == sortieID )
 	{
 		sortie = Scoring::Sortie::Lookup(sortieID);
 		results.numHits = 0;
 	}
-	if ( sortie != NULL )
+	if ( sortie != nullptr )
 	{
 		auto dr = sortie->m_typesInteractedWith;
 		const size_t types = std::min((size_t)dr.size(), (size_t)MapMiss::MAX_HIT_ARRAY);
@@ -293,7 +293,7 @@ MISSION_DETAIL::receive(SINT32 teulIndex, MISSION_DETAIL& packet)
 	Mission* mission;
 
 	Player* player = PlayerInterface::Lookup(teulIndex);
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		dbugLog(_FLW, "t:%d mission check on unpopulated connection", teulIndex);
 		return -EINVAL;
@@ -305,7 +305,7 @@ MISSION_DETAIL::receive(SINT32 teulIndex, MISSION_DETAIL& packet)
 	//see if the mission has expired
 
 	mission = mapFindMission(missionID);
-	if ( mission == NULL || !mission->ongoing() )
+	if ( mission == nullptr || !mission->ongoing() )
 		data.m_result = MC_EXPIRED;
 	else if ( joinRequest )
 	{
@@ -338,7 +338,7 @@ _recvMISSION_EXIT(ACTION_OBJECT* const a)
 
 	// Last one out turn off the lights
 	Mission* const mission = mapFindMission(missionID);
-	if ( mission != NULL && mission->numTakers() <= 0 )
+	if ( mission != nullptr && mission->numTakers() <= 0 )
 	{
 		dbugLog(_FLI, "t:%d p:%u c:%s m:%u abandoned, cancelling"
 						, player.teulIndex(), player.playerID(), player.callsign(), missionID);
@@ -375,7 +375,7 @@ _recvMISSION_RESULTS_REQ(ACTION_OBJECT* const a)
 		return -EINVAL;
 	}
 
-	if ( player.m_missionResults == NULL )
+	if ( player.m_missionResults == nullptr )
 	{
 		dbugLog(_FLW, "t:%d p:%u c:%s v:%u req for mission results, but player has no results", a->teulIndex, player.playerID(), player.callsign(), sortieID);
 		return -1;
@@ -412,7 +412,7 @@ mmSendMissionResults(Player& player)
 	//by now missionCalcResults should have been called, and we got the info
 	//we needed just now take them off the mission
 	facility = strtGetFacility(player.missionPacket().sortie().originFac());
-	if ( facility == NULL && results.rtbFacility.id != 0 )
+	if ( facility == nullptr && results.rtbFacility.id != 0 )
 	{
 		facility = strtGetFacility(results.rtbFacility);
 	}
@@ -420,12 +420,12 @@ mmSendMissionResults(Player& player)
 	// Cleanup/reset their mission packet
 	player.clearSortieResults(false);
 
-	results.missionInvalid = (bool)(player.mission() == NULL);
+	results.missionInvalid = (bool)(player.mission() == nullptr);
 	dbugLog(_FLD, "t:%d p:%u c:%s m:%d mission is %s", player.teulIndex(), player.playerID(), player.callsign(), player.missionID(), (results.missionInvalid ? "invalid" : "valid"));
 
 	// If they've got a reserved vehicle, we need to register it to them
 	if (
-		facility != NULL
+		facility != nullptr
 		&& facility->side == player.side()
 		&& activeCountries[facility->country]
 		&& results.rtbReservedWeapon.serial > 0
@@ -448,7 +448,7 @@ mmSendMissionResults(Player& player)
 	else
 	{
 		const char* msg;
-		if ( facility == NULL )
+		if ( facility == nullptr )
 			msg = "no facility";
 		else if ( facility->side != player.side() || activeCountries[facility->country] == false )
 			msg = "wrong side";
@@ -515,7 +515,7 @@ _recvWeapList(ACTION_OBJECT* const a)
 	auto& fwl = a->read<FacilityWeaponList>();
 	// Find the player
 	const Player* const player = PlayerInterface::Lookup(fwl.m_playerID);
-	if ( player == NULL || player->isAtLobby() == false )
+	if ( player == nullptr || player->isAtLobby() == false )
 		return a->offset;
 
 	if ( player->permissions(UNMASKED_VEHICLES) == false )
@@ -540,7 +540,7 @@ _recvLockMission(ACTION_OBJECT* const a)
 		return -EINVAL;
 
 	Player* const player = (Player*)a->m_client;
-	if ( a->m_client != NULL )
+	if ( a->m_client != nullptr )
 	{
 		dbugLog(_FLA, "t:%d p:%u c:%s received mission lock from player!", a->teulIndex, player->playerID(), player->callsign());
 		return -EINVAL;

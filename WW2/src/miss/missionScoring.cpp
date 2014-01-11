@@ -121,7 +121,7 @@ Player::calculateSortieScore()
 {
 	UINT32 uniqueHits = 0;
 	UINT32 vehtypesHit = 0;
-	if ( m_sortie != NULL )
+	if ( m_sortie != nullptr )
 	{
 		uniqueHits = m_sortie->m_sortiesHit.size();
 		vehtypesHit = m_sortie->m_typesHit.size();

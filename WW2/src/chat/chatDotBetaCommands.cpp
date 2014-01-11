@@ -103,7 +103,7 @@ public:
 			// Extended CPU data
 			numCpus = (UINT32)atoi(argv[argn++]);
 			// cpuFlags are in hex -- because I'm a sadist?
-			cpuFlags = (UINT32)strtoul(argv[argn++], NULL, 16);
+			cpuFlags = (UINT32)strtoul(argv[argn++], nullptr, 16);
 			// cpu speed in ~mhx
 			cpuMhz = (UINT32)atoi(argv[argn++]);
 			// Finally, the last argument should be the name

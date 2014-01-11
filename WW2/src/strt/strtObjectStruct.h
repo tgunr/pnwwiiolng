@@ -25,7 +25,7 @@ public:
 
 	//// ---- Accessors
 	//-- Read
-	bool isValid() const { return NULL != facility; }
+	bool isValid() const { return nullptr != facility; }
 	const FacilityStruct& Facility() const { return *facility; }
 	FacilityStruct& Facility() { return *facility; }
 

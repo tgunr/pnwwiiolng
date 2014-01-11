@@ -176,7 +176,7 @@ SetSignalHandler(int signum, void (*handler)(int))
 {
 	struct sigaction action;
 	// Get the pre-existing setup.
-	const int err = sigaction(signum, NULL, &action);
+	const int err = sigaction(signum, nullptr, &action);
 	if ( err < 0 )
 		return err;
 
@@ -184,7 +184,7 @@ SetSignalHandler(int signum, void (*handler)(int))
 	sigfillset(&action.sa_mask);
 	action.sa_flags = SA_RESETHAND;
 
-	return sigaction(signum, &action, NULL);
+	return sigaction(signum, &action, nullptr);
 }
 #endif
 }

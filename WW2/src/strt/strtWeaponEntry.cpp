@@ -47,7 +47,7 @@ WeaponEntry::isAccessible(const FacilityStruct& spawnFac) const
 bool
 WeaponEntry::isThrottled() const
 {
-	if ( facility() == NULL || facility()->type != FACILITY_DEPOT )
+	if ( facility() == nullptr || facility()->type != FACILITY_DEPOT )
 		return false;
 
 	if ( host_config.supply.enabled == false || host_config.throttle.enabled == false )

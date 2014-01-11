@@ -30,17 +30,17 @@ using namespace std;
 //////////////////////////////////////////////////////////////////////
 // Constructor
 DBRow::DBRow(UINT32 columns, DB::result_t* result) :
-	m_row(NULL),
+	m_row(nullptr),
 	m_columns(columns),
 	m_currentColumn(0)
 {
 	if ( columns == 0 )
 		throw std::domain_error("Tried to create 0 column row");
-	if ( result == NULL )
+	if ( result == nullptr )
 		throw std::domain_error("NULL result pointer");
 
 	m_row = mysql_fetch_row(result);
-	if ( m_row == NULL )
+	if ( m_row == nullptr )
 		throw std::logic_error("fetch_row returned null");
 }
 
@@ -49,14 +49,14 @@ DBRow::DBRow(UINT32 columns, DB::result_t* result) :
 const char*
 DBRow::NextString(char* destination, size_t size)
 {
-	if ( destination == NULL )
+	if ( destination == nullptr )
 		throw std::invalid_argument("null destination for nextString");
 
 	destination[0] = 0;
 	if ( m_currentColumn < m_columns && size > 0 )
 	{
 		const char* source = NextColumn();
-		if ( source != NULL ) strlcpy(destination, source, size);
+		if ( source != nullptr ) strlcpy(destination, source, size);
 	}
 
 	return destination;
@@ -74,17 +74,17 @@ void
 DBQuery::_finish(bool thorough)
 {
 	// Clean up the row object
-	if ( m_row != NULL )
+	if ( m_row != nullptr )
 	{
 		delete m_row;
-		m_row = NULL;
+		m_row = nullptr;
 	}
 
 	// Clean up the MySQL result
 	if ( m_result )
 	{
 		mysql_free_result(m_result);
-		m_result = NULL;
+		m_result = nullptr;
 	}
 
 	if ( thorough )
@@ -115,14 +115,14 @@ _throwSqlite3Error(DB::handle_t* handle)
 void
 DBQuery::_processResultSet()
 {
-	if ( m_row != NULL )
+	if ( m_row != nullptr )
 	{
 		delete m_row;
-		m_row = NULL;
+		m_row = nullptr;
 	}
 
 	m_result = mysql_store_result(m_conn);
-	if ( m_result != NULL )
+	if ( m_result != nullptr )
 	{
 		m_rows = (UINT32)mysql_num_rows(m_result);
 		m_affectedRows = 0;
@@ -185,7 +185,7 @@ DBQuery::_query(const char* statement, size_t stlen)
 
 DBQuery::DBQuery(DBHANDLE& dbh, const char* query, ...) :
 	m_conn(dbh),
-	m_result(NULL),
+	m_result(nullptr),
 	m_executed(false),
 	m_error(0),
 	m_affectedRows(0),
@@ -194,12 +194,12 @@ DBQuery::DBQuery(DBHANDLE& dbh, const char* query, ...) :
 	m_currentRow(0),
 	m_nextRow(0),
 	m_rows(0),
-	m_row(NULL)
+	m_row(nullptr)
 {
-	if ( m_conn == NULL )
+	if ( m_conn == nullptr )
 		throw std::domain_error("NULL dbh");
 
-	if ( query == NULL )
+	if ( query == nullptr )
 		throw std::invalid_argument("query == NULL");
 
 	while (*query && isspace(*query))
@@ -230,7 +230,7 @@ DBQuery::DBQuery(DBHANDLE& dbh, const char* query, ...) :
 // Constructor (with a prepared query)
 DBQuery::DBQuery(DB::handle_t* conn, const char* query) :
 	m_conn(conn),
-	m_result(NULL),
+	m_result(nullptr),
 	m_executed(false),
 	m_error(0),
 	m_affectedRows(0),
@@ -239,9 +239,9 @@ DBQuery::DBQuery(DB::handle_t* conn, const char* query) :
 	m_currentRow(0),
 	m_nextRow(0),
 	m_rows(0),
-	m_row(NULL)
+	m_row(nullptr)
 {
-	if ( m_conn == NULL )
+	if ( m_conn == nullptr )
 		throw std::domain_error("null connection");
 
 	size_t len = strlen(query);
@@ -255,7 +255,7 @@ DBQuery::DBQuery(DB::handle_t* conn, const char* query) :
 // Constructor (without a query)
 DBQuery::DBQuery(DB::handle_t* conn) :
 	m_conn(conn),
-	m_result(NULL),
+	m_result(nullptr),
 	m_executed(false),
 	m_error(0),
 	m_affectedRows(0),
@@ -264,9 +264,9 @@ DBQuery::DBQuery(DB::handle_t* conn) :
 	m_currentRow(0),
 	m_nextRow(0),
 	m_rows(0),
-	m_row(NULL)
+	m_row(nullptr)
 {
-	if ( m_conn == NULL )
+	if ( m_conn == nullptr )
 		throw std::domain_error("dbh has null connection[0]");
 }
 
@@ -287,20 +287,20 @@ DBQuery::~DBQuery()
 	_finish(false);
 
 	// Drain any unconsumed result sets
-	if ( m_conn != NULL )
+	if ( m_conn != nullptr )
 	{
 		while ( mysql_next_result(m_conn) == 0 )
 		{
 			m_result = mysql_store_result(m_conn);
-			if ( m_result != NULL )
+			if ( m_result != nullptr )
 			{
 				mysql_free_result(m_result);
-				m_result = NULL;
+				m_result = nullptr;
 			}
 		}
 	}
 
-	m_conn = NULL;
+	m_conn = nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -317,7 +317,7 @@ DBQuery::FetchRow()
 	if ( m_row )
 	{
 		delete m_row;
-		m_row = NULL;
+		m_row = nullptr;
 	}
 
 	// Have we reached the end of the data, or is the result

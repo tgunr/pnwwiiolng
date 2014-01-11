@@ -20,7 +20,7 @@
 STRAT_UPDATE* strtCreateStratUpdateList(UINT32 numItems)
 {
 	if (numItems == 0)
-		return NULL;
+		return nullptr;
 
 	STRAT_UPDATE* list = (STRAT_UPDATE*)listInitCList(numItems, sizeof(STRAT_UPDATE));
 
@@ -43,10 +43,10 @@ STRAT_UPDATE* strtRemoveFirstStratUpdate(STRAT_UPDATE** stratUpdateList)
 LOGICAL
 strtInsertStratUpdate(STRAT_UPDATE** stratUpdateList, STRAT_UPDATE* stratUpdate)
 {
-	if ((stratUpdateList == NULL) || (stratUpdate == NULL))
+	if ((stratUpdateList == nullptr) || (stratUpdate == nullptr))
 		return FALSE;
 
-	if (*stratUpdateList == NULL)
+	if (*stratUpdateList == nullptr)
 	{
 		//Its the first stratUpdate
 		*stratUpdateList = stratUpdate;
@@ -66,9 +66,9 @@ strtInsertStratUpdate(STRAT_UPDATE** stratUpdateList, STRAT_UPDATE* stratUpdate)
 		STRAT_UPDATE* current = *stratUpdateList;
 
 		//Find the spot where it belongs on the list
-		while ((current!=NULL) && (current->updateTime < stratUpdate->updateTime))
+		while ((current!=nullptr) && (current->updateTime < stratUpdate->updateTime))
 			current=current->next;
-		if (current!=NULL)
+		if (current!=nullptr)
 			listAddItemBefore((LISTHEADER **) stratUpdateList, (LISTHEADER*) current, (LISTHEADER*) stratUpdate);
 	}
 
@@ -79,8 +79,8 @@ strtInsertStratUpdate(STRAT_UPDATE** stratUpdateList, STRAT_UPDATE* stratUpdate)
 STRAT_UPDATE*
 strtDeleteStratUpdate(STRAT_UPDATE** stratUpdateList, STRAT_UPDATE* stratUpdate)
 {
-	if ((stratUpdateList == NULL) || (*stratUpdateList == NULL) || (stratUpdate == NULL))
-		return NULL;
+	if ((stratUpdateList == nullptr) || (*stratUpdateList == nullptr) || (stratUpdate == nullptr))
+		return nullptr;
 
 	listExtractItem((LISTHEADER **) stratUpdateList, (LISTHEADER*) stratUpdate);
 
@@ -92,7 +92,7 @@ void
 strtPrintStratUpdates(STRAT_UPDATE* stratUpdateList)
 {
 	STRAT_UPDATE* current = stratUpdateList;
-	while (current != NULL)
+	while (current != nullptr)
 	{
 		fprintf(stderr,"stratUpdate: %d\n",current->updateTime);
 		current = current->next;

@@ -46,11 +46,11 @@ HCUnit::HCUnit(UINT32 withUnit, HCUNIT_TYPE withType, UINT32 withParent
 	, m_rank(Rank)
 	, m_ownerRank(withOwnerRank)
 	, m_unitClass(withUnitClass)
-	, m_parent(NULL)
+	, m_parent(nullptr)
 	, m_registered(true)
 	, m_training(false)
 {
-	if ( withName == NULL )
+	if ( withName == nullptr )
 		throw std::runtime_error("HCUnit with NULL name");			///Terminal
 
 	strlcpy(m_name, withName, sizeof(m_name));
@@ -74,7 +74,7 @@ HCUnit::HCUnit(UINT32 UnitID, HCUNIT_TYPE Type)
 	, m_rank(0)
 	, m_ownerRank(0LL)
 	, m_unitClass(0)
-	, m_parent(NULL)
+	, m_parent(nullptr)
 	, m_registered(false)
 	, m_training(false)
 {
@@ -198,7 +198,7 @@ HCUnit::isBelow(UINT32 rhs) const
 		return false;
 
 	HCUnit* ancestor;
-	for ( ancestor = m_parent; ancestor != NULL; ancestor = ancestor->m_parent )
+	for ( ancestor = m_parent; ancestor != nullptr; ancestor = ancestor->m_parent )
 	{
 		if ( ancestor->unitID() == rhs )
 			return true;
@@ -214,10 +214,10 @@ void
 HCUnit::lookupParent()
 {
 	if ( !m_parentID || m_parentID == m_unitID )
-		m_parent = NULL;
+		m_parent = nullptr;
 	else
 		m_parent = Lookup(m_parentID);
-	m_training = ( isBrigade() && m_parent == NULL && strncmp(m_callsign, "trng", 4) == 0 );
+	m_training = ( isBrigade() && m_parent == nullptr && strncmp(m_callsign, "trng", 4) == 0 );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -227,7 +227,7 @@ HCUnit*
 HCUnit::Lookup(UINT32 unitID)
 {
 	HCUNIT_INDEX::iterator it = hcUnits.find(unitID);
-	return (it != hcUnits.end()) ? it->second : NULL;
+	return (it != hcUnits.end()) ? it->second : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -239,7 +239,7 @@ HCUnit::Lookup(const ChatHandle handle)
 	HCUNIT_HANDLES::iterator it = hcUnitsByHandle.find(handle);
 	if ( it == hcUnitsByHandle.end() )
 		it = hcUnitsByHandle.find(chatGetLowercaseHandle(handle));
-	return (it != hcUnitsByHandle.end()) ? it->second : NULL;
+	return (it != hcUnitsByHandle.end()) ? it->second : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////

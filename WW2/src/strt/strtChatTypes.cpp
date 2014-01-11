@@ -29,7 +29,7 @@ OOBMessage
 	, m_country(country)
 	, m_side(side)
 {
-	if ( arguments == NULL || !*arguments )
+	if ( arguments == nullptr || !*arguments )
 		strsafecpy(m_text, command);
 	else
 	{

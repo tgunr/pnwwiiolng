@@ -52,7 +52,7 @@ mapChargeMinutes()
 		for ( auto it = g_players.begin(), end = g_players.end(); it != end; ++it )
 		{
 			Player* const player = (Player*)(*it);
-			if ( player == NULL || player->charge() == false )
+			if ( player == nullptr || player->charge() == false )
 				continue;
 
 			++charged;

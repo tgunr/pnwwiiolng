@@ -41,7 +41,7 @@ static SINT32
 _recvEnemySpotted(ACTION_OBJECT* const a)
 {
 	wwiiPlayer* player = ServerInterface::LookupByTeulIndex(a->teulIndex);
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		dbugLog(_FLW, "t:%d ignoring EWS from unregistered player", a->teulIndex);
 		return -EINVAL;

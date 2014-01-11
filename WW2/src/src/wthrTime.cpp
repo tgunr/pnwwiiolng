@@ -235,14 +235,14 @@ const char*
 wthrConvertTimeToString(UINT32 _time)
 {
 	if(_time >= SECONDS_PER_DAY) //no such time
-		return NULL;
+		return nullptr;
 
 	UINT32 hours =_time/(SECONDS_PER_HOUR);
 	if ( hours > 23 )
-		return NULL;
+		return nullptr;
 	UINT32 mins =(_time - (hours*SECONDS_PER_HOUR))/60;
 	if ( mins > 59 )
-		return NULL;
+		return nullptr;
 
 	static char timeStr[5+1] = "00:00";
 	// Very simple placement of corresponding time characters

@@ -22,7 +22,7 @@ CONVOYSTRUCT* list;
 UINT32 i;
 
 	if (numItems == 0)
-		return NULL;
+		return nullptr;
 
 	list = (CONVOYSTRUCT*)listInitCList(numItems, sizeof(CONVOYSTRUCT));
 
@@ -38,7 +38,7 @@ UINT32 i;
 //Removes the first item from an convoyList
 CONVOYSTRUCT* cnvyRemoveFirstConvoy(CONVOYSTRUCT** convoyList)
 {
-CONVOYSTRUCT* current = NULL;
+CONVOYSTRUCT* current = nullptr;
 
 	current = (CONVOYSTRUCT*) listPopItem((LISTHEADER **) convoyList);
 
@@ -49,10 +49,10 @@ CONVOYSTRUCT* current = NULL;
 LOGICAL cnvyInsertConvoy(CONVOYSTRUCT** convoyList, CONVOYSTRUCT* convoy)
 {
 CONVOYSTRUCT * current;
-	if ((convoyList == NULL) || (convoy == NULL))
+	if ((convoyList == nullptr) || (convoy == nullptr))
 		return FALSE;
 
-	if ((*convoyList) == NULL)
+	if ((*convoyList) == nullptr)
 	{
 		//Its the first convoy
 		*convoyList = convoy;
@@ -72,9 +72,9 @@ CONVOYSTRUCT * current;
 		current = *convoyList;
 
 		//Find the spot where it belongs on the list
-		while ((current!=NULL) && (current->nextEvent < convoy->nextEvent))
+		while ((current!=nullptr) && (current->nextEvent < convoy->nextEvent))
 			current=current->next;
-		if (current!=NULL)
+		if (current!=nullptr)
 			listAddItemBefore((LISTHEADER**) convoyList, (LISTHEADER*) current, (LISTHEADER*) convoy);
 	}
 
@@ -84,8 +84,8 @@ CONVOYSTRUCT * current;
 //Deletes a nextEvent from the convoyList
 CONVOYSTRUCT* cnvyDeleteConvoy(CONVOYSTRUCT** convoyList, CONVOYSTRUCT* convoy)
 {
-	if ((convoyList == NULL) || (*convoyList == NULL) || (convoy == NULL))
-		return NULL;
+	if ((convoyList == nullptr) || (*convoyList == nullptr) || (convoy == nullptr))
+		return nullptr;
 
 	listExtractItem((LISTHEADER **) convoyList, (LISTHEADER*) convoy);
 
@@ -99,13 +99,13 @@ CONVOYSTRUCT* current;
 
 	current = convoyList;
 
-	while ((current != NULL) && (current->nextEvent != nextEvent))
+	while ((current != nullptr) && (current->nextEvent != nextEvent))
 		current = current->next;
 
-	if ((current!=NULL) && (current->nextEvent == nextEvent))
+	if ((current!=nullptr) && (current->nextEvent == nextEvent))
 		return current;
 	else
-		return NULL;
+		return nullptr;
 }
 
 //Prints an convoy list
@@ -114,7 +114,7 @@ LOGICAL cnvyPrintConvoys(CONVOYSTRUCT* convoyList)
 CONVOYSTRUCT* current;
 
 	current = convoyList;
-	while (current != NULL)
+	while (current != nullptr)
 	{
 		fprintf(stderr,"convoy: 0x%x\n",current->nextEvent);
 		current = current->next;

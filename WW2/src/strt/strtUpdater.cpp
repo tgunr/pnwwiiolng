@@ -101,7 +101,7 @@ void
 strtAccumulateDamageMessage(const FULL_OBJ_ID& object, const SINT64& damageJoules, UINT32 playerID, const WEAPON_SERIAL& serial)
 {
 	ObjectStruct* const currentObject = strtGetObject(object);
-	if (currentObject == NULL)
+	if (currentObject == nullptr)
 	{
 		dbugLog(_FLD, "p:%u v:%u couldn't find damage object %d:%d:%u"
 					, playerID, serial.serial

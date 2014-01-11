@@ -138,7 +138,7 @@ public:
 		, m_fallbackTime(0)
 		, m_attacker(WWII_NO_SIDE)
 		, m_attackStarted(0)
-		, m_attackingUnit(NULL)
+		, m_attackingUnit(nullptr)
 		, m_units()
 		, m_value(0)
 		, m_brigades()
@@ -165,7 +165,7 @@ public:
 	CPStruct* clearHolding()				{ return clearFlag(CP_STAT_OWN_HAAC); }
 	CPStruct* clearObjective(WWII_SIDE forSide);
 	CPStruct* clearOverrun()				{ return clearFlag(CP_STAT_OVERRUN); }
-	CPStruct* clearOverrunHistory()			{ if ( m_overruns != NULL ) { delete m_overruns; m_overruns = NULL; } return this; }
+	CPStruct* clearOverrunHistory()			{ if ( m_overruns != nullptr ) { delete m_overruns; m_overruns = nullptr; } return this; }
 
 	CPStruct* endContention();
 
@@ -185,7 +185,7 @@ public:
 	bool hasFactories()						const { return ( flags & CP_STAT_MAKES_RDP ) != 0; }
 
 	CPStruct* setAlert(UINT32 flag) { _changeFlags((flags&~_alertFlags())|flag); return this; }
-	CPStruct* setAttackObjective(bool modifyObjectiveList=false, HCUnit* unit=NULL);
+	CPStruct* setAttackObjective(bool modifyObjectiveList=false, HCUnit* unit=nullptr);
 	CPStruct* setDefendObjective(WWII_SIDE forSide, bool modifyObjectiveList=false);
 	CPStruct* setFlag(UINT32 flag)	{ _changeFlags(flags|flag); return this; }
 	CPStruct* checkForUnderAttack(void);

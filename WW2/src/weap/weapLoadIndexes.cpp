@@ -98,7 +98,7 @@ weapLoadIndexes(DB::handle_t* conn)
 						);
 #endif
 
-		if ( weap == NULL )
+		if ( weap == nullptr )
 			continue;
 
 		weap->m_localIndex = oid;

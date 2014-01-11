@@ -22,7 +22,7 @@ Scoring::Actor::Actor(const HostVehicle* vehicle)
 
 	// Use the first available player as a guide.
 	const Player* const player = vehicle->players().front();
-	if ( player == NULL )
+	if ( player == nullptr )
 		return;
 
 	m_playerID = player->playerID();

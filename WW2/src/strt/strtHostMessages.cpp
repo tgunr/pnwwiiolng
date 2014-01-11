@@ -100,7 +100,7 @@ class SyncQueue : public std::vector<Type*>
 public:
 	bool queue(Type* t)
 	{
-		if ( t == NULL || !_allowSyncing || t->m_needsSync )
+		if ( t == nullptr || !_allowSyncing || t->m_needsSync )
 			return false;
 		this->push_back(t);
 		t->m_needsSync = true;
@@ -110,11 +110,11 @@ public:
 	Type* next()
 	{
 		if ( this->empty() )
-			return NULL;
+			return nullptr;
 		Type* t = this->front();
 		this->erase(this->begin());
 		if ( !t->m_needsSync )
-			return NULL;
+			return nullptr;
 		t->m_needsSync = false;
 		return (Type*)t;
 	}
@@ -193,21 +193,21 @@ void
 strtSendChatInitialUpdates()
 {
 	ENDPOINT* endpoint = serverPeerEndpointByType(CHAT_HOST);
-	if ( endpoint == NULL )
+	if ( endpoint == nullptr )
 		return;
 
 	Teul::Packet outgoing(0, Strat::CallbackX, STRT_UPDATE_Y);
 	UINT32 entries = 0;
 
 	CPStruct* cp = strtGetCPList();
-	while ( cp != NULL )
+	while ( cp != nullptr )
 	{
 		// Bridges have totally BS data in them
 		if ( !cp->isBridge() )
 		{
 			// Write the facilities
 			FacilityStruct* fac = cp->facilityList;
-			while ( fac != NULL )
+			while ( fac != nullptr )
 			{
 				_populateEntry(outgoing, fac);
 				++entries;
@@ -233,20 +233,20 @@ strtBroadcastStratUpdates()
 {
 	Teul::Packet outgoing(0, Strat::CallbackX, STRT_UPDATE_Y);
 
-	FacilityStruct* fac = NULL;
-	while ( (fac = _facilityQueue.next()) != NULL )
+	FacilityStruct* fac = nullptr;
+	while ( (fac = _facilityQueue.next()) != nullptr )
 	{
 		_populateEntry(outgoing, fac);
 	}
 
-	CPStruct* cp = NULL;
-	while ( (cp = _cpQueue.next()) != NULL )
+	CPStruct* cp = nullptr;
+	while ( (cp = _cpQueue.next()) != nullptr )
 	{
 		_populateEntry(outgoing, cp);
 	}
 
-	ObjectStruct* obj = NULL;
-	while ( (obj = _objectQueue.next()) != NULL )
+	ObjectStruct* obj = nullptr;
+	while ( (obj = _objectQueue.next()) != nullptr )
 	{
 		auto& entry = outgoing.allocate<StratUpdates>();
 		entry.m_fullObjID = obj->fullObjID;
@@ -329,7 +329,7 @@ SINT32
 strtSyncCPs(UINT32 address, UINT16 port, Supercell* sc)
 {
 	//Return an error if handed a NULL
-	if (sc == NULL)
+	if (sc == nullptr)
 		return -1;
 
 	//Technically, a no-op is a success. :)
@@ -397,7 +397,7 @@ strtSyncCPs(UINT32 address, UINT16 port, Supercell* sc)
 SINT32 strtSyncFacilities(UINT32 address, UINT16 port, Supercell* sc)
 {
 	//Return an error if handed a NULL
-	if (sc == NULL)
+	if (sc == nullptr)
 		return -1;
 
 	//Technically, a no-op is a success. :)
@@ -464,7 +464,7 @@ SINT32 strtSyncFacilities(UINT32 address, UINT16 port, Supercell* sc)
 SINT32 strtSyncObjects(UINT32 address, UINT16 port, Supercell* sc)
 {
 	//Return an error if handed a NULL
-	if (sc == NULL)
+	if (sc == nullptr)
 		return -1;
 
 	//Technically, a no-op is a success. :)
@@ -843,7 +843,7 @@ _requestRequiresWeaponReturn(const MM_CAPACITY_REQUEST& request, SINT32 teulInde
 
 	// Can we find valid data for this user climbing into a vehicle?
 	WeapJoinRequestNode* const joinNode = WeapJoinRequestNode::Lookup(request.customerID);
-	if ( joinNode == NULL || joinNode->m_joinList == NULL || joinNode->m_joinList->m_weapon == NULL )
+	if ( joinNode == nullptr || joinNode->m_joinList == nullptr || joinNode->m_joinList->m_weapon == nullptr )
 		return false;
 
 	dbugLog(_FLD, "queueing capacity request for %u to ti:%d", request.customerID, teulIndex);
@@ -990,13 +990,13 @@ _recvCaptureContrib(ACTION_OBJECT* const a)
 					);
 
 	FacilityStruct* forFacility = strtGetFacilityByOID(event.m_facilityID);
-	if ( NULL == forFacility )
+	if ( nullptr == forFacility )
 	{
 		dbugLog(_FLA, "p:%u c:%s %s: invalid facilityID %u", event.m_playerID, Chat::Name(event.m_handle).c_str(), __FUNCTION__, event.m_facilityID);
 		return -EINVAL;
 	}
 	HCUnit* forUnit = HCUnit::Lookup(event.m_unitID);
-	if ( NULL == forUnit )
+	if ( nullptr == forUnit )
 	{
 		dbugLog(_FLA, "p:%u c:%s %s: invalid unitID %u", event.m_playerID, Chat::Name(event.m_handle).c_str(), __FUNCTION__, event.m_unitID);
 		return -EINVAL;
@@ -1047,11 +1047,11 @@ AttackOrder::process()
 	CPStruct* cp = strtGetCPorBridge(m_target);
 	HCUnit* unit = HCUnit::Lookup((UINT32)m_brigadeID);
 
-	if ( cp == NULL )
+	if ( cp == nullptr )
 	{
 		dbugLog(_FLA, "AttackOrder(%d.%d.%u) invalid target", m_target.cell.ox, m_target.cell.oy, m_target.id);
 	}
-	else if ( unit == NULL )
+	else if ( unit == nullptr )
 	{
 		dbugLog(_FLA, "AttackOrder(%u) invalid unit", m_brigadeID);
 		return;
@@ -1090,7 +1090,7 @@ bool
 CPStruct::placeAttackObjective(const StratHCUnit* byUnit)
 {
 	static const ChatHandle systemID = chatGetHandle("SYSTEM");
-	if ( byUnit == NULL )
+	if ( byUnit == nullptr )
 		return false;
 	AttackOrder order(systemID, byUnit->unitID(), fullObjID, ORD_ATTACK, true);
 	order.process();
@@ -1112,7 +1112,7 @@ _recvWeaponListRequest(ACTION_OBJECT* const a)
 	try
 	{
 		FacilityStruct* facility = strtGetFacility(request.m_fullObjID);
-		if ( facility == NULL )
+		if ( facility == nullptr )
 		{
 			dbugLog(_FLI, "p:%u hc:%u requested unknown facility %d.%d.%u"
 							, request.m_playerID, request.m_brigadeID
@@ -1126,7 +1126,7 @@ _recvWeaponListRequest(ACTION_OBJECT* const a)
 			supplyingBrigade = request.m_brigadeID;
 
 		StratHCUnit* unit = StratHCUnit::Lookup(supplyingBrigade);
-		if ( unit == NULL )
+		if ( unit == nullptr )
 		{
 			dbugLog(_FLI, "p:%u requested FWL for unknown brigade %u"
 							, request.m_playerID, request.m_brigadeID

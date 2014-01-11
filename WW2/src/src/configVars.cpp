@@ -58,20 +58,20 @@ CFG_PATH(thblitzPath, "th_blitz" PATH_SEPSTR "weapon", "THBLITZ_PATH", true, "Pa
 CFG_BOOL(stratIgnoreErrors, "0", "STRAT_IGNORE_ERRORS", "Disables sdm-loading errors from causing termination.");
 CFG_PATH(blitzworPath, "blitzWor.csv", "BLITZWOR_PATH", true, "DATA_DIR-relative path/filename for the blitzWor csv file");
 CFG_PATH(luaPath, PN_PLAYNET_PATH PATH_SEPSTR "wwiiol" PATH_SEPSTR "lua", "LUA_BASE_PATH", true, "Path to the Lua scripts.");
-CFG_PATH(defaultLogPath, NULL, "LOG_PATH", false, "Default location for log files.");
+CFG_PATH(defaultLogPath, nullptr, "LOG_PATH", false, "Default location for log files.");
 CFG_PATH(teulWebPath, PN_PLAYNET_PATH PATH_SEPSTR "wwiiol" PATH_SEPSTR "web" PATH_SEPSTR "debug", "TEUL_UWEB_PATH", true, "Path to the top-level directory for the internal web server.");
 CFG_PATH(luaRCFile, "rc.lua", "LUA_RC_FILE", true, "Name of the startup (rc) Lua script");
 CFG_PATH(luaStratlibFile, "stratlib.lua", "LUA_STRATLIB_FILE", true, "Name of the Lua strat library.");
 
 CFG_ADDR(wwiiDBAddress, nullptr, "WWII_DB_ADDRESS", true, "IP address of the MySQL Database.");
 CFG_STRING(wwiiDBDefaultSchema, "wwiionline", "WWII_DB_SCHEMA", true, "Default schema for game data.");
-CFG_ADDR(dbsePrimaryAddress, NULL, "DBSE_PRIMARY_ADDRESS", true, "IP address dbd clients will reach the dbd on.");
+CFG_ADDR(dbsePrimaryAddress, nullptr, "DBSE_PRIMARY_ADDRESS", true, "IP address dbd clients will reach the dbd on.");
 CFG_UINT(dbseConnectionTimeout_ms, "3000", "DBSE_CONNECTION_TIMEOUT_MS", "Time in miliseconds before database proxy connections timeout.");
 CFG_BOOL(mysqlCompression, "0", "MYSQL_COMPRESSION", "Enable compression when communicating with the MySQL server");
 
 CFG_STRING(clusterName, nullptr, "WWII_CLUSTER", true, "Short-name for this cluster, e.g. 'dev'");
 CFG_UINT(arenaID, nullptr, "ARENA_ID", "Numeric ID for this arena.");
-CFG_UINT(appID, NULL, "APP_ID", "App ID for this server - 1 being release, 12 being beta.");
+CFG_UINT(appID, nullptr, "APP_ID", "App ID for this server - 1 being release, 12 being beta.");
 CFG_ADDR(ircServer, "", "WWII_IRC_SERVER", false, "Address of the IRC server. If not defined, disables IRC.");
 CFG_STRING(ircPassword, "blooGit", "WWII_IRC_PASSWD", true, "Server-password for the IRC server.");
 CFG_UINT(ircPort, "6667", "WWII_IRC_PORT", "Port to connect to the IRC server on.");
@@ -79,7 +79,7 @@ CFG_STRING(authErrorUrl, "http://www.wwiionline.com/auth/errors/", "AUTH_ERROR_U
 CFG_ADDR(baseAddress, nullptr, "BASE_ADDRESS", true, "Network address (/24) for the cluster. Server's will map their last octets (x.x.x.N) into this network for inter-host communications.");
 
 CFG_ADDR(authHost, "auth.playnet.com", "AUTH_ADDRESS", true, "Host name or IP Address of the authentication server.");
-CFG_ADDR(authdbAddress, NULL, "AUTH_DB", true, "Address of the MySQL server hosting the auth database.");
+CFG_ADDR(authdbAddress, nullptr, "AUTH_DB", true, "Address of the MySQL server hosting the auth database.");
 CFG_STRING(authdbPort, "", "AUTH_DB_PORT", true, "Port of the Auth MySQL server if not default.");
 #if defined( HAPPYOO )
 CFG_STRING(authdbPassword, "m4nd0l1n", "AUTH_DB_PASSWD", true, "Password to use for the auth database.");
@@ -99,7 +99,7 @@ CFG_STRING(defaultInterface, NULL, "DEFAULT_IFACE", false, "Name of the network 
 CFG_STRING(defaultInterface, "eth0", "DEFAULT_IFACE", true, "Name of the network interface to treat as primary.");
 #endif
 
-CFG_STRING(manageProcesses, NULL, "MANAGE_PROCESSES", false, "Semi-colon separated list of processes this machine should run.");
+CFG_STRING(manageProcesses, nullptr, "MANAGE_PROCESSES", false, "Semi-colon separated list of processes this machine should run.");
 
 //////////////////////////////////////////////////////////////////////////
 // Helper for creating ensuring a string is in native path style and
@@ -326,7 +326,7 @@ void teulGenerateEnvironmentCfgFile(const char* const filename_)
 	std::vector<Teul::ConfigVar*> myList;
 	_getSortedConfigVars(myList);
 	FILE* fp = fopen(filename_, "w");
-	if ( fp == NULL )
+	if ( fp == nullptr )
 	{
 		fprintf(stderr, "Unable to create config file: %s\n", filename_);
 		exit(-1);
@@ -479,7 +479,7 @@ namespace Teul
 	void ConfigVar::SetUint32Value(const char* newValue_)
 	{
 		if ( newValue_ != nullptr && *newValue_ )
-			SetUint32Value(strtoul(newValue_, NULL, 10));
+			SetUint32Value(strtoul(newValue_, nullptr, 10));
 		else
 		{
 			m_initialized = true;
@@ -491,7 +491,7 @@ namespace Teul
 	void ConfigVar::SetSint32Value(const char* newValue_)
 	{
 		if ( newValue_ != nullptr && *newValue_ )
-			SetSint32Value(strtol(newValue_, NULL, 10));
+			SetSint32Value(strtol(newValue_, nullptr, 10));
 		else
 		{
 			m_initialized = true;

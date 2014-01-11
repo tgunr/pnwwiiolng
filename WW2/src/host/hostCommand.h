@@ -41,7 +41,7 @@ namespace Host
 	struct CellCommand : public CommandMsg
 	{
 		CellCommand(UINT32 playerID, const ChatHandle& handle, const char* withInput, UINT64 withInstID)
-			: CommandMsg(Chat::Name(handle).c_str(), NULL, withInput, withInstID)
+			: CommandMsg(Chat::Name(handle).c_str(), nullptr, withInput, withInstID)
 			, m_playerID(playerID)
 			, m_handle(handle)
 			{}

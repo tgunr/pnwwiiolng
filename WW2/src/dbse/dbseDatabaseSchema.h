@@ -35,7 +35,7 @@ public:
 		DB::Revisions revs;
 		std::vector<const char*> curRevision;
 		for ( size_t i = 0; i < size; ++i ) {
-			if ( revisionArray[i] == NULL ) {
+			if ( revisionArray[i] == nullptr ) {
 				if ( !curRevision.empty() )
 					revs.push_back(curRevision);
 				curRevision.clear();

@@ -39,7 +39,7 @@ public:
 
 	void Apply(CPStruct* const cpList) const
 	{
-		for ( auto cp = cpList ; cp != NULL ; cp = cp->next )
+		for ( auto cp = cpList ; cp != nullptr ; cp = cp->next )
 		{
 			if ( cp->isCity() == false || cp->side == NEUTRAL )
 				continue ;

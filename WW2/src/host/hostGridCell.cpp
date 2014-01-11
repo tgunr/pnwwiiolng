@@ -265,7 +265,7 @@ HostVehicle::removeFromGrid()
 	if ( m_cell )
 	{
 		m_cell->removeVehicle(this);
-		m_cell = NULL;
+		m_cell = nullptr;
 	}
 }
 

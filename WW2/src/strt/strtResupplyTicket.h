@@ -16,7 +16,7 @@ struct POSTED_WEAPON ;
 class ResupplyTicket
 {
 public:
-	ResupplyTicket() : m_docket(0), m_spec(NULL_WEAP_SPEC), m_units(0), m_postedWeapon(NULL), m_isTransfer(false) {}
+	ResupplyTicket() : m_docket(0), m_spec(NULL_WEAP_SPEC), m_units(0), m_postedWeapon(nullptr), m_isTransfer(false) {}
 
 	// To allow TOEs to change templates, we can't persist any entry
 	// references outside of the template/toe itself.

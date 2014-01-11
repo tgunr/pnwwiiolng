@@ -32,7 +32,7 @@ public: bool TestCommand(const char* source, const char* expectCommand, const ch
 
 			Chat::CommandWithArgs result(command);
 
-			CRITICAL( ExpectFalse( result.Args() == NULL ) )
+			CRITICAL( ExpectFalse( result.Args() == nullptr ) )
 			CRITICAL( ExpectEqual(strcmp(result.Command(), expectCommand), 0) );
 			CRITICAL( ExpectEqual(strcmp(result.Args(), expectArgs), 0) );
 

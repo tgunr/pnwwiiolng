@@ -62,10 +62,10 @@ public:
 	const char*	m_arg1;
 	const char*	m_arg2;
 
-	ScmdResponse() : m_type(LSTR_NONE), m_message(LSTR_NONE), m_arg1(NULL), m_arg2(NULL)
+	ScmdResponse() : m_type(LSTR_NONE), m_message(LSTR_NONE), m_arg1(nullptr), m_arg2(nullptr)
 	{ }
 
-	void set(LSTRING_ID type, LSTRING_ID message, const char* arg1 = NULL, const char* arg2 = NULL)
+	void set(LSTRING_ID type, LSTRING_ID message, const char* arg1 = nullptr, const char* arg2 = nullptr)
 	{
 		m_type = type;
 		m_message = message;
@@ -73,18 +73,18 @@ public:
 		m_arg2 = arg2;
 	}
 
-	void caution(LSTRING_ID msg, const char* arg1 = NULL, const char* arg2 = NULL)
+	void caution(LSTRING_ID msg, const char* arg1 = nullptr, const char* arg2 = nullptr)
 	{	set(LSTR_CAUTION, msg, arg1, arg2);	}
 
-	void note(LSTRING_ID msg, const char* arg1 = NULL, const char* arg2 = NULL)
+	void note(LSTRING_ID msg, const char* arg1 = nullptr, const char* arg2 = nullptr)
 	{	set(LSTR_NOTE, msg, arg1, arg2);	}
 
-	void generic(LSTRING_ID msg, const char* arg1 = NULL, const char* arg2 = NULL)
+	void generic(LSTRING_ID msg, const char* arg1 = nullptr, const char* arg2 = nullptr)
 	{	set(LSTR_NONE, msg, arg1, arg2);	}
 
-	void warn(const char* arg1, const char* arg2 = NULL)
+	void warn(const char* arg1, const char* arg2 = nullptr)
 	{	set(LSTR_WARNING, LSTR_GENERIC, arg1, arg2); }
-	void warn(LSTRING_ID msg, const char* arg1 = NULL, const char* arg2 = NULL)
+	void warn(LSTRING_ID msg, const char* arg1 = nullptr, const char* arg2 = nullptr)
 	{	set(LSTR_WARNING, msg, arg1, arg2); }
 
 	void send(Player* player)
@@ -241,7 +241,7 @@ _addOverrun(WWII_SIDE side, const Property* property)
 		_pendQueue.erase(it);
 
 	StratDecision* decision = new StratDecision(side, property);
-	if ( decision == NULL )
+	if ( decision == nullptr )
 		throw std::runtime_error("Out of memory allocating strat decision");	///Terminal
 
 	_pendQueue.push_back(decision);
@@ -361,7 +361,7 @@ _voted(Player* player, const StratDecision* decision)
 static void
 _overrunSuccess(Player* player, const Property* property, WWII_SIDE side)
 {
-	if ( player == NULL || property == NULL )
+	if ( player == nullptr || property == nullptr )
 	{
 		dbugLog(_FLA, "*** %s called with NULL player=%p, property=%p", __FUNCTION__, player, property);
 		return;
@@ -504,7 +504,7 @@ _vote(Player* player, const Property* property, WWII_SIDE side, SINT32 score)
 		decision = _addOverrun(side, property);
 
 		// If we get here, we ran out of memory
-		assert(decision != NULL);
+		assert(decision != nullptr);
 	}
 
 	// See if they managed to sneak in a vote while we were away
@@ -620,11 +620,11 @@ void
 StratCommand::process(void)
 {
 	Player* player = PlayerInterface::Lookup(m_issuer);
-	Property* property = NULL;
-	const char* cpName = NULL;
-	const char* command = NULL;
+	Property* property = nullptr;
+	const char* cpName = nullptr;
+	const char* command = nullptr;
 
-	if ( player == NULL )
+	if ( player == nullptr )
 		throw std::logic_error("Unable to find persona on this teulIndex");
 
 	property = chatFindProperty(m_cp);
@@ -641,7 +641,7 @@ StratCommand::process(void)
 	if ( player->playerID() != m_issuer )
 		throw std::logic_error("TeulIndex does not correspond to issuing player");
 
-	if ( property == NULL )
+	if ( property == nullptr )
 		throw std::logic_error("Unable to locate a Property at those co-ordinates");
 
 	if ( m_command < SC_NUM_COMMANDS )
@@ -679,7 +679,7 @@ StratCommand::process(void)
 void
 chatSendSCMDResultMessage(Player* player, UINT32 result, const char* cmd, const char* cpName, UINT32 delay)
 {
-	if ( player == NULL || result == SCMD_ALLOWED || result == SCMD_SUCCESS )
+	if ( player == nullptr || result == SCMD_ALLOWED || result == SCMD_SUCCESS )
 		return;
 	ScmdResponse sr;
 	_printSCMDResult(sr, result, cmd, cpName, delay);
@@ -709,13 +709,13 @@ _validVoter(Player* player, StratDecision* decision)
 static StratDecision*
 _lookupDecision(const char* id, Player* player)
 {
-	if ( player == NULL || id == NULL )
+	if ( player == nullptr || id == nullptr )
 	{
 		dbugLog(_FLW, "%s called with player=%p, id=%p", __FUNCTION__, player, id);
-		return NULL;
+		return nullptr;
 	}
 
-	StratDecision* decision = NULL;
+	StratDecision* decision = nullptr;
 	for ( auto it = _pendQueue.begin(), end = _pendQueue.end(); it != end; ++it )
 	{
 		if ( player->side() == (*it)->m_side && strcasecmp((*it)->m_property->Name(), id) == 0 )
@@ -726,10 +726,10 @@ _lookupDecision(const char* id, Player* player)
 	}
 
 	// If we didn't find a decision, you can't vote
-	if ( decision == NULL )
+	if ( decision == nullptr )
 	{
 		player->message(LSTR_WARNING, LSTR_NO_SUCH_ORDER, id);
-		return NULL;
+		return nullptr;
 	}
 
 	// If a decision has already been made, you're too late
@@ -737,11 +737,11 @@ _lookupDecision(const char* id, Player* player)
 	{
 		player->message(LSTR_WARNING, LSTR_ORDER_IN_PROGRESS
 				, id, (decision->m_chosen == SC_HOLD) ? "hold" : "fallback");
-		return NULL;
+		return nullptr;
 	}
 
 	if ( !_validVoter(player, decision) )
-		return NULL;
+		return nullptr;
 
 	return decision;
 }
@@ -753,7 +753,7 @@ bool
 chatVoteHold(Player* player, const char* id)
 {
 	StratDecision* decision = _lookupDecision(id, player);
-	if ( decision == NULL )
+	if ( decision == nullptr )
 		return false;
 
 	// If nobody has voted and no openings are open for a new vote, decline.
@@ -780,7 +780,7 @@ bool
 chatVoteFallback(Player* player, const char* id)
 {
 	StratDecision* decision = _lookupDecision(id, player);
-	if ( decision == NULL )
+	if ( decision == nullptr )
 		return false;
 
 	// If nobody has voted and no openings are open for a new vote, decline.
@@ -797,9 +797,9 @@ bool
 chatStartHold(Player* player, const FULL_OBJ_ID& target)
 {
 	const Property* property = chatFindProperty(target);
-	if ( property == NULL )
+	if ( property == nullptr )
 	{
-		player->message(LSTR_SYSTEM, LSTR_SELECT_FACILITY, "hold", NULL);
+		player->message(LSTR_SYSTEM, LSTR_SELECT_FACILITY, "hold", nullptr);
 		return false;
 	}
 
@@ -823,9 +823,9 @@ bool
 chatStartFallback(Player* player, const FULL_OBJ_ID& target)
 {
 	const Property* property = chatFindProperty(target);
-	if ( property == NULL )
+	if ( property == nullptr )
 	{
-		player->message(LSTR_SYSTEM, LSTR_SELECT_FACILITY, "fallback", NULL);
+		player->message(LSTR_SYSTEM, LSTR_SELECT_FACILITY, "fallback", nullptr);
 		return false;
 	}
 
@@ -850,7 +850,7 @@ bool
 chatVetoDecision(Player* player, const char* id)
 {
 	StratDecision* decision = _lookupDecision(id, player);
-	if ( decision == NULL )
+	if ( decision == nullptr )
 		return false;
 
 	// Add to the history and veto and extend voting time
@@ -994,15 +994,15 @@ chatCheckDecisionQueues()
 
 		// Find a player from the voters to hold accountable
 		VOTES& voters = decision->m_voters;
-		Player* player = NULL;
+		Player* player = nullptr;
 		for ( auto voter = voters.begin(), end = voters.end(); voter != end; ++voter )
 		{
 			player = PlayerInterface::Lookup(*voter);
-			if ( player != NULL )
+			if ( player != nullptr )
 				break;
 		}
 
-		if ( player == NULL )
+		if ( player == nullptr )
 		{
 			dbugLog(_FLI, "Decision %s has no players present, ignoring", decision->m_property->Name());
 			continue;
@@ -1045,7 +1045,7 @@ _checkObjectiveTarget(const FULL_OBJ_ID& fid, Player* player)
 	if ( fid.id == 0 )
 	{
 		player->message(LSTR_CAUTION, LSTR_SEL_TARGET);
-		return NULL;
+		return nullptr;
 	}
 
 	const Property* property = chatFindProperty(fid);
@@ -1067,7 +1067,7 @@ _checkObjectiveTarget(const FULL_OBJ_ID& fid, Player* player)
 	if ( property->m_fid.objClass != CLASS_CP )
 	{
 		player->message(LSTR_CAUTION, LSTR_TARGET_CP);
-		return NULL;
+		return nullptr;
 	}
 
 	return (PropCP*)property;

@@ -49,7 +49,7 @@ Brigade::Brigade(UINT32 withBrigadeID, UINT32 withParentID
 		, m_missionPartitionIt(m_missionList.end())
 		, m_ownerID(0)
 		, m_syncMissionList(false)
-		, m_objective(NULL)
+		, m_objective(nullptr)
 {
 	dbugLog(_FLI, "brig:%d cmd:%d ctry:%d brch:%d(%s) name=%s nick=%s parent=%s rank=%d"
 					, m_unitID, m_parentID, m_countryID, m_branchID, callsign(), m_name, m_shortName
@@ -107,7 +107,7 @@ _removeBrigadeMission(Brigade* brigade, ACTIVE_BRIGADES& list)
 void
 Brigade::addMission(Mission* const mission)
 {
-	if ( mission == NULL )
+	if ( mission == nullptr )
 		throw std::runtime_error("NULL mission in brigade->addMission");	///Terminal
 
 	if ( mission->isSystemMission() )
@@ -203,7 +203,7 @@ Brigade::removePlayer(Player* const player)
 void
 Brigade::removeMission(Mission* const mission)
 {
-	if ( mission == NULL )
+	if ( mission == nullptr )
 		throw std::runtime_error("NULL mission in brigade->removeMission");	///Terminal
 
 	if ( mission->isSystemMission() )
@@ -254,7 +254,7 @@ Brigade::sendMissionUpdates()
 	for ( it = m_currentMembers.begin(); it != m_currentMembers.end(); ++it )
 	{
 		player = it->second;
-		if ( player == NULL || player->teulIndex() < 0 || !player->inState(PERS_SELECTING_MISSION) )
+		if ( player == nullptr || player->teulIndex() < 0 || !player->inState(PERS_SELECTING_MISSION) )
 			continue;
 		outgoing.request(player->teulIndex());
 	}
@@ -279,7 +279,7 @@ Brigade::updateDestinations()
 	// list, so that we can then easily find the most occuring CP
 	// and choose that as our objective.
 
-	CPStruct* newObjective = NULL;
+	CPStruct* newObjective = nullptr;
 	if ( !m_missionList.empty() && m_missionList.size() > 0 )
 	{
 		// Split the mission list into active and inactive missions,
@@ -317,7 +317,7 @@ Brigade::updateDestinations()
 			}
 
 			// Flap avoidance: prefer the currentObjective if we can
-			if ( m_objective != NULL && m_objective == curTarget )
+			if ( m_objective != nullptr && m_objective == curTarget )
 				missionsToCurrentObjective = missionsToTarget;
 
 			// Remember which target we saw most of
@@ -346,7 +346,7 @@ Brigade::updateDestinations()
 	{
 		m_objective = newObjective;
 
-		if ( newObjective == NULL )
+		if ( newObjective == nullptr )
 		{
 #ifdef BETA_RELEASE
 			///LOCALIZE
@@ -363,7 +363,7 @@ Brigade::updateDestinations()
 		}
 	}
 
-	if ( m_objective == NULL )
+	if ( m_objective == nullptr )
 		m_missionPartitionIt = m_missionList.end();
 }
 
@@ -408,7 +408,7 @@ Brigade*
 mapFindBrigade(UINT32 brigadeID)
 {
 	HCUnit* unit = HCUnit::Lookup(brigadeID);
-	return ( unit != NULL && unit->type() == HCU_BRIGADE ) ? (Brigade*)unit : NULL;
+	return ( unit != nullptr && unit->type() == HCU_BRIGADE ) ? (Brigade*)unit : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////

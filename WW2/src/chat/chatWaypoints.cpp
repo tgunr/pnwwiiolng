@@ -96,7 +96,7 @@ Waypoint::processIncomingFrom(class Player* const player)
 
 		Player* const leader = PlayerInterface::Lookup(mission.matchLeader());
 
-		if ( leader != NULL && leader->teulIndex() >= 0 )
+		if ( leader != nullptr && leader->teulIndex() >= 0 )
 		{
 			betaLog(_FLI, "t:%d p:%u c:%s m:%u forwarding waypoint to mission leader %s", player->teulIndex(), player->playerID(), player->callsign(), mission.missionID(), leader->callsign());
 			WAYPOINT_XFER forward(*this, WPXT_REQUEST);
@@ -116,7 +116,7 @@ WAYPOINT_XFER::receive(SINT32 teulIndex, WAYPOINT_XFER& incoming)
 {
 	// Mission leader approving/removing a waypoint
 	Player* player = PlayerInterface::Lookup(teulIndex);
-	if ( player == NULL )
+	if ( player == nullptr )
 		return -EINVAL;							// No data on this player
 
 	dbugLog(_FLI, "t:%d p:%u c:%s received waypoint %llu %s x:%d y:%d posted by %s"
@@ -135,7 +135,7 @@ SINT32
 WAYPOINT_CONTROL::receive(SINT32 teulIndex, WAYPOINT_CONTROL& incoming)
 {
 	Player* const player = PlayerInterface::Lookup(teulIndex);
-	if ( player == NULL )
+	if ( player == nullptr )
 		return -EINVAL;							// No data on this player
 
 	dbugLog(_FLD, "t:%d p:%u c:%s received waypoint control %llu[%s] %u"
@@ -143,7 +143,7 @@ WAYPOINT_CONTROL::receive(SINT32 teulIndex, WAYPOINT_CONTROL& incoming)
 					, incoming.key(), Chat::Name(incoming.key()).c_str(), incoming.flags());
 
 	ChatMission* const mission = chatFindMission(player->missionID());
-	if ( mission == NULL )
+	if ( mission == nullptr )
 		return -EINVAL;
 
 	if ( !player->isMissionLeader() )

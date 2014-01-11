@@ -465,7 +465,7 @@ _findAppTable(UINT32 appID)
 			return &appTable[i];
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -677,7 +677,7 @@ bool authInitGameEntry(GAME& gameEntry)
 	APP_TABLE_ENTRY* appEntry;
 
 	 appEntry = _findAppTable(gameEntry.appID);
-	 if (appEntry == NULL)
+	 if (appEntry == nullptr)
 	 	return false;
 
 	memcpy(gameEntry.appleID, appEntry->appleID, APPLE_ID_LEN);
@@ -881,9 +881,9 @@ struct vers_manifest*
 matchversion(UINT32 needle, SINT32 appID, UINT32 platform)
 {
 	if ( appID < 0 || appID > MAX_APPIDS )
-		return NULL;
+		return nullptr;
 
-	struct vers_manifest* vers_mans = NULL;
+	struct vers_manifest* vers_mans = nullptr;
 	SINT32 numEntries = 0;
 
 	for ( SINT32 i = 0; i < config.numApps; ++i )
@@ -896,10 +896,10 @@ matchversion(UINT32 needle, SINT32 appID, UINT32 platform)
 		break;
 	}
 
-	if ( vers_mans == NULL || numEntries < 1 )
-		return NULL;
+	if ( vers_mans == nullptr || numEntries < 1 )
+		return nullptr;
 
-	struct vers_manifest* fullInstaller = NULL;
+	struct vers_manifest* fullInstaller = nullptr;
 	SINT32 lastMatchingEntry = 0;
 	bool foundPlatform = false;
 
@@ -916,7 +916,7 @@ matchversion(UINT32 needle, SINT32 appID, UINT32 platform)
 
 		// Fallback version
 		if ( vers_mans[i].oldNo == 0 && vers_mans[i].newNo > needle
-			&& (fullInstaller == NULL  || fullInstaller->newNo < vers_mans[i].newNo) )
+			&& (fullInstaller == nullptr  || fullInstaller->newNo < vers_mans[i].newNo) )
 			fullInstaller = &vers_mans[i];
 
 		if( needle == vers_mans[i].oldNo )
@@ -932,7 +932,7 @@ matchversion(UINT32 needle, SINT32 appID, UINT32 platform)
 	}
 
 	if ( foundPlatform == false )
-		return NULL;
+		return nullptr;
 
 	if ( needle > vers_mans[lastMatchingEntry].oldNo
 		&& needle < vers_mans[lastMatchingEntry].newNo )
@@ -940,16 +940,16 @@ matchversion(UINT32 needle, SINT32 appID, UINT32 platform)
 		return &vers_mans[lastMatchingEntry];
 	}
 
-	if ( fullInstaller != NULL )
+	if ( fullInstaller != nullptr )
 		return fullInstaller;
 
-	return NULL;
+	return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
 bool authdbGetFileMD5(const UINT32 appID, const UINT32 platform, const char* filename, char* buffer, UINT32 bufLen)
 {
-	assert(buffer != NULL && bufLen > 1);
+	assert(buffer != nullptr && bufLen > 1);
 
 	char myFilename[MAXPATHLEN*2+1];
 	mysql_escape_string(myFilename, filename, strlen(filename));
@@ -1087,5 +1087,5 @@ const char*
 authdbGetArenaAlias(UINT32 arenaID)
 {
 	ARENA_ALIASES::iterator it = g_arenaAliases.find(arenaID);
-	return ( it != g_arenaAliases.end() ) ? it->second.c_str() : NULL;
+	return ( it != g_arenaAliases.end() ) ? it->second.c_str() : nullptr;
 }

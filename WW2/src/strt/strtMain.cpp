@@ -40,8 +40,8 @@ static void _weapTest(UCHAR * tag);
 #endif
 
 static CPStruct* _cpList;	//The list of free CPs
-static Supercell* _supercellList = NULL;
-static CPStruct* _currentCP = NULL;
+static Supercell* _supercellList = nullptr;
+static CPStruct* _currentCP = nullptr;
 static bool _initialized = false;
 static UINT32 _starttime=0;
 
@@ -129,7 +129,7 @@ strtMain(UINT32 currentTime)
 	if (!_initialized)
 		strtInitializeStratSystem();
 
-	FacilityStruct* fac = NULL;
+	FacilityStruct* fac = nullptr;
 	while ( (fac = Strat::CaptureContribution::GetNextActiveFacility(fac)) )
 	{
 		if ( fac->isCapturePending() && fac->getCaptureRemaining() <= 0 )
@@ -140,7 +140,7 @@ strtMain(UINT32 currentTime)
 	toRun = (CPSPERCALL < leftToRun) ? CPSPERCALL : leftToRun;
 
 	//Run the iteration on it
-	for ( i = 0; i < toRun && _currentCP != NULL; ++i, _currentCP = _currentCP->next )
+	for ( i = 0; i < toRun && _currentCP != nullptr; ++i, _currentCP = _currentCP->next )
 	{
 		// Run the normal CP processes
 		strtRunCP(*_currentCP);
@@ -152,7 +152,7 @@ strtMain(UINT32 currentTime)
 	dbugLog(_FLD, "%d cps ran so far this cycle",CPsRan);
 #endif
 
-	if ( _currentCP == NULL )
+	if ( _currentCP == nullptr )
 	{
 		//Set the currentCP to the beginning of the list
 		_currentCP = _cpList;
@@ -180,10 +180,10 @@ strtBroadcastCPs(void)
 {
 	CPStruct* cp;
 
-	if ( _cpList == NULL )
+	if ( _cpList == nullptr )
 		return FALSE;
 
-	for ( cp = _cpList; cp != NULL; cp = cp->next )
+	for ( cp = _cpList; cp != nullptr; cp = cp->next )
 	{
 		//Send the CP status
 		strtQueueCPStatus(cp);
@@ -242,7 +242,7 @@ strtInitializeStratSystem()
 
 	// Parse the Wor Files and load terrain data.
 	_cpList = strtImportStratData();
-	if (_cpList == NULL)
+	if (_cpList == nullptr)
 	{
 		strtReportDataErrors();
 		fprintf(stderr,"Strat system failed to initialize, /tmp/strt*.log\n");

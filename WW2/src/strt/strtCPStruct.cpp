@@ -24,7 +24,7 @@ bool
 CPStruct::hasFacilities(UINT32 type, WWII_SIDE forSide) const
 {
 	FacilityStruct* fac = facilityTypeIndex[type];
-	while ( fac != NULL )
+	while ( fac != nullptr )
 	{
 		if ( fac->side == forSide )
 			return true;
@@ -41,21 +41,21 @@ CPStruct::hasFacilities(UINT32 type, WWII_SIDE forSide) const
 LinkStruct*
 CPStruct::linkTo(const CPStruct* rhs) const
 {
-	if ( rhs == NULL || rhs == this )
-		return NULL;
+	if ( rhs == nullptr || rhs == this )
+		return nullptr;
 
 	// Look through our facilities and find a link
 	for ( auto it = m_links.begin(), end = m_links.end(); it != end; ++it )
 	{
 		LinkStruct* outLink = *it;
-		if ( PN_UNLIKELY(outLink == NULL || outLink->endDepot == NULL) )
+		if ( PN_UNLIKELY(outLink == nullptr || outLink->endDepot == nullptr) )
 			continue;
 
 		if ( outLink->endDepot->cp == rhs )
 			return outLink;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -81,12 +81,12 @@ CPStruct::processFirebases(bool incoming)
 	LinkStruct* fbLink;
 
 	for ( facility = facilityTypeIndex[FACILITY_DEPOT]
-		; facility != NULL
+		; facility != nullptr
 		; facility = facility->typeNext
 		)
 	{
 		fbLink = incoming ? facility->m_incomingLink : facility->m_outgoingLink;
-		if ( fbLink != NULL && fbLink->firebase )
+		if ( fbLink != nullptr && fbLink->firebase )
 			fbLink->processFirebases();
 	}
 }
@@ -142,7 +142,7 @@ LinkStruct*
 CPStruct::link(UINT32 n) const
 {
 	if ( n >= m_links.size() )
-		return NULL;
+		return nullptr;
 	LINKS::iterator it = m_links.begin();
 	UINT32 i = 0;
 	while ( i < n ) {

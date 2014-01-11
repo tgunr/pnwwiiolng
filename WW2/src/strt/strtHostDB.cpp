@@ -67,7 +67,7 @@ struct QUEUE
 	UINT32 uHead, uTail;
 
 public:
-	bool isEmpty() const { return obj[uHead] == NULL; }
+	bool isEmpty() const { return obj[uHead] == nullptr; }
 };
 
 static QUEUE objQueue, weaponQueue;
@@ -81,7 +81,7 @@ UINT32 g_gameDay;
 static SINT32
 _addToQueue(void* object, QUEUE* queue)
 {
-	if (queue->obj[queue->uTail] != NULL)
+	if (queue->obj[queue->uTail] != nullptr)
 	{
 		dbugLog(_FLA,"%s queue out of space [h=%d,t=%d], object not added!"
 					, queue->name, queue->uHead, queue->uTail);
@@ -99,13 +99,13 @@ _addToQueue(void* object, QUEUE* queue)
 static void*
 _removeFromQueue(QUEUE* queue)
 {
-	void* retval = NULL;
+	void* retval = nullptr;
 
 	if ( queue->isEmpty() )
 		return retval;
 
 	retval = queue->obj[queue->uHead];
-	queue->obj[queue->uHead] = NULL;
+	queue->obj[queue->uHead] = nullptr;
 	queue->uHead++;
 	if (queue->uHead >= MAX_QUEUE_SIZE)
 		queue->uHead = 0;
@@ -164,7 +164,7 @@ _saveData(SAVE_SET& saves, const char* const tableName, const char* const indexF
 static void
 _commitCP(CPStruct* cp)
 {
-	UINT16 attacker = (cp->isCity() && cp->attackingUnit() != NULL) ? cp->attackingUnit()->unitID() : 0;
+	UINT16 attacker = (cp->isCity() && cp->attackingUnit() != nullptr) ? cp->attackingUnit()->unitID() : 0;
 	char valuesKey[128];
 	sprintf(valuesKey, "conside=%u,concountry=%u,side=%u,country=%u,contention=%u,is_objective=%u"
 			, cp->controllingSide
@@ -269,7 +269,7 @@ _commitLink(LinkStruct* link)
 {
 	static _SAVE_IDS _enabled, _disabled;
 
-	if ( link != NULL )
+	if ( link != nullptr )
 	{
 		if ( link->isEnabled() )
 			_enabled.push_back(link->m_uid);
@@ -278,9 +278,9 @@ _commitLink(LinkStruct* link)
 		link->modified = false;
 	}
 
-	if ( link == NULL || _enabled.size() > 200 )
+	if ( link == nullptr || _enabled.size() > 200 )
 		_saveRows("strat_link", "disabled", 0, "link_oid", _enabled);
-	if ( link == NULL || _disabled.size() > 200 )
+	if ( link == nullptr || _disabled.size() > 200 )
 		_saveRows("strat_link", "disabled", 0, "link_oid", _disabled);
 }
 
@@ -292,12 +292,12 @@ strtProcessDBQueue()
 	// send two packets when that occurs
 	strtBroadcastStratUpdates();
 
-	FULL_OBJ_ID* object = NULL;
+	FULL_OBJ_ID* object = nullptr;
 
 	while ( objQueue.isEmpty() == false )
 	{
 		object = (FULL_OBJ_ID*)_removeFromQueue(&objQueue);
-		if (object == NULL)
+		if (object == nullptr)
 			break;
 
 		switch(object->objClass)
@@ -331,13 +331,13 @@ strtProcessDBQueue()
 	_saveData(_objStateSaves, "strat_object", "object_oid");
 
 	// Save off any uncommitted link state changes
-	_commitLink(NULL);
+	_commitLink(nullptr);
 }
 
 void
 strtSaveCP(CPStruct* cp)
 {
-	if ( cp == NULL || !_queueEnabled || cp->modified )
+	if ( cp == nullptr || !_queueEnabled || cp->modified )
 		return;
 
 	_addToQueue(cp, &objQueue);
@@ -347,7 +347,7 @@ strtSaveCP(CPStruct* cp)
 void
 strtSaveFacility(FacilityStruct* facility)
 {
-	if ( facility == NULL || !_queueEnabled || facility->modified )
+	if ( facility == nullptr || !_queueEnabled || facility->modified )
 		return;
 
 	_addToQueue(facility, &objQueue);
@@ -407,7 +407,7 @@ strtdbPopulateVehTypesTable()
 
 	for ( auto it = g_weaponList.begin(), end = g_weaponList.end(); it != end; ++it )
 	{
-		assert( it->second != NULL );
+		assert( it->second != nullptr );
 
 		WEAPON& weap = *it->second;
 
@@ -494,7 +494,7 @@ strtdbSaveVehicleCVCs()
 		for ( auto it = g_weaponList.begin(), end = g_weaponList.end(); it != end; ++it )
 		{
 			WEAPON* weap = it->second;
-			if ( weap == NULL || weap->localIndex() == 0 )
+			if ( weap == nullptr || weap->localIndex() == 0 )
 				continue;
 
 			length = snprintf(buf, _BUF_SIZE
@@ -535,7 +535,7 @@ strtdbSaveVehicleAccess()
 		for ( auto it = g_weaponList.begin(), end = g_weaponList.end(); it != end; ++it )
 		{
 			WEAPON* weap = it->second;
-			if ( weap == NULL || weap->localIndex() == 0 || !weap->m_modified )
+			if ( weap == nullptr || weap->localIndex() == 0 || !weap->m_modified )
 				continue;
 			length = snprintf(buf, _BUF_SIZE
 								, QRY_SAVE_VEHICLE_ACCESS
@@ -581,7 +581,7 @@ strtdbReadVehicleAccess()
 	{
 		UINT32 localIndex = q.Row().NextUInt();
 		WEAPON* weap = weapLookupWeaponByIndex(localIndex);
-		if ( weap == NULL )
+		if ( weap == nullptr )
 		{
 			dbugLog(_FLD, "no vehtype_oid entry for %u", localIndex);
 			continue;
@@ -613,7 +613,7 @@ strtSaveFactoryOutput(ObjectStruct* factory)
 #if defined(TRAINING_SERVER) || defined(DEV_BUILD) || defined(FRES)
 	return;
 #else
-	if ( host_config.arena.intermission > 0 || factory == NULL )
+	if ( host_config.arena.intermission > 0 || factory == nullptr )
 		return;
 
 	UINT32 contributing = 0;
@@ -966,7 +966,7 @@ strtdbRestoreTOESupplies()
 						" FROM toe.supply s JOIN wwii_vehtype v USING (vehtype_oid)"
 						" ORDER BY 1, 2");
 
-		StratHCUnit* unit = NULL;
+		StratHCUnit* unit = nullptr;
 		UINT32 lastUnitID = 0;
 		WEAPON_SPEC spec;
 		while ( q.FetchRow() )
@@ -983,13 +983,13 @@ strtdbRestoreTOESupplies()
 			if ( unitID != lastUnitID )
 			{
 				unit = StratHCUnit::Lookup(unitID);
-				if ( unit == NULL )
+				if ( unit == nullptr )
 					dbugLog(_FLW, "toe.supply: unrecognized unit ID %u", unitID);
 				lastUnitID = unitID;
 			}
 
 			// See if the unit lookup failed.
-			if ( unit == NULL )
+			if ( unit == nullptr )
 				continue;
 
 			// Set this as the initial value

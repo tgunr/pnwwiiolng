@@ -16,7 +16,7 @@
 class DeathByBuilding
 {
 public:
-	DeathByBuilding(ACTION_OBJECT* /*a*/=NULL) { }
+	DeathByBuilding(ACTION_OBJECT* /*a*/=nullptr) { }
 	~DeathByBuilding() {}
 
 public:

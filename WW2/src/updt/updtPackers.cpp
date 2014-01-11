@@ -273,7 +273,7 @@ static SINT32 _packONE_TIME_INFO(LOGICAL mode, UCHAR* const data, SINT32 offset,
 		oneTimeBits = vehInfo->m_vehicle->getOneTimeBitsFor(viewer);
 
 		// Try to avoid packing the squad name
-		if ( wu == NULL || ((oneTimeBits & OTB_IN_SQUAD) == 0 && vehInfo->squadHandle > 0 && (vehInfo->side == wu->myVehicle->side() || wu->myVehicle->isBuzzard())) )
+		if ( wu == nullptr || ((oneTimeBits & OTB_IN_SQUAD) == 0 && vehInfo->squadHandle > 0 && (vehInfo->side == wu->myVehicle->side() || wu->myVehicle->isBuzzard())) )
 			packSquadName = true;
 
 		if ( packSquadName )
@@ -363,7 +363,7 @@ static SINT32 _packVehicleHead(LOGICAL mode, UCHAR* const data, SINT32 offset, V
 			LogAbort("Failed unpacking vehicle update: %d", offset);
 
 		HostVehicle* const vehicle = hostFindVehicleLocal(myIndex);
-		if (vehicle == NULL)
+		if (vehicle == nullptr)
 		{
 #ifdef BETA_RELEASE
 			LogAbort("BAD VEHICLE DATA (claimed %u) offset:%d", myIndex, offset);
@@ -675,7 +675,7 @@ updtPackWORLD_UPDATE(const LOGICAL mode, UCHAR* data, SINT32 offset, WORLD_UPDAT
 	TIMER_USE_HERE
 
 	ON_SERVER(  const HostVehicle* const myVehicle = wu->myVehicle  );
-	ON_SERVER(  assert( myVehicle != NULL )  );
+	ON_SERVER(  assert( myVehicle != nullptr )  );
 	ON_SERVER(  VEHICLE_UPDATE_HEADER vhdr  );
 
 	TIMER_ACCUMULATOR(pack_initvh);
@@ -840,7 +840,7 @@ static SINT32 _getBroadcastVehicle(LOGICAL mode, UCHAR* const data, SINT32 offse
 		vhold->vehicle = hostFindVehicleLocal(vehIndex);
 		threadLog(_FLD, "rv:%u received first time", vehIndex);
 
-		if (vhold->vehicle == NULL)
+		if (vhold->vehicle == nullptr)
 		{
 			// If we don't have it, then we need to create it.
 			retval  = tempVehicle.packFirstTime(mode, data, offset);
@@ -860,7 +860,7 @@ static SINT32 _getBroadcastVehicle(LOGICAL mode, UCHAR* const data, SINT32 offse
 			}
 		}
 
-		if (vhold->vehicle == NULL || ! (vhold->vehicle->isRemote()))
+		if (vhold->vehicle == nullptr || ! (vhold->vehicle->isRemote()))
 		{
 			if (Server::myServerInfo.stats.status == Server::SERVER_ACCEPTING)
 			{
@@ -874,7 +874,7 @@ static SINT32 _getBroadcastVehicle(LOGICAL mode, UCHAR* const data, SINT32 offse
 	else
 	{
 		vhold->vehicle = hostFindVehicleLocal(vehIndex);
-		if (vhold->vehicle == NULL )
+		if (vhold->vehicle == nullptr )
 		{
 			static TeulTimeMS nextBlip = teulClock64;
 			if ( Server::myServerInfo.stats.status == Server::SERVER_ACCEPTING && teulClock64 >= nextBlip )
@@ -899,14 +899,14 @@ static SINT32 _getBroadcastVehicle(LOGICAL mode, UCHAR* const data, SINT32 offse
 SINT32
 updtPackVehicleBroadcast(LOGICAL mode, UCHAR* const data, SINT32 offset, VEHICLE_HOLDER* vhold, SINT32 size)
 {
-	SHARED_VEHICLE_INFO* vehInfo = NULL;
+	SHARED_VEHICLE_INFO* vehInfo = nullptr;
 	TURRET_HEADER turretHeader;
 	UINT32 vehIndex;
 	SINT32 retval;
 
 	if ( mode == TEUL_PACK)
 	{
-		if (vhold == NULL || vhold->vehicle == NULL)
+		if (vhold == nullptr || vhold->vehicle == nullptr)
 			return -EINVAL;
 
 		vehIndex = vhold->vehicle->index;
@@ -983,7 +983,7 @@ updtPackVehicleBroadcast(LOGICAL mode, UCHAR* const data, SINT32 offset, VEHICLE
 
 	if  (vhold->serial == 0)
 	{
-		vhold->vehicle = NULL;
+		vhold->vehicle = nullptr;
 	}
 
 	FULL_OBJ_ID inBuilding;
@@ -1003,7 +1003,7 @@ updtPackVehicleBroadcast(LOGICAL mode, UCHAR* const data, SINT32 offset, VEHICLE
 SINT32
 HostVehicle::packFirstTime(LOGICAL mode, UCHAR* const data, SINT32 offset)
 {
-	offset = _packONE_TIME_INFO(mode, data, offset, &vehicleData, 0, NULL);
+	offset = _packONE_TIME_INFO(mode, data, offset, &vehicleData, 0, nullptr);
 	offset = teulPackUINT32(mode, data, offset, &vehicleData.squad, 0);
 	offset = wwiiPackHandle(mode, data, offset, &vehicleData.squadHandle, 0);
 	offset = teulPackUINT32(mode, data, offset, &m_missionID, 0);
@@ -1029,7 +1029,7 @@ SINT32 updtPackSHARED_VEHICLE_INFO(LOGICAL mode, UCHAR* const data, SINT32 offse
 {
 	// On the host, packVehicleHead will look up the vehicle and set
 	// vehInfo/vupHeader accordingly
-	offset = _packVehicleHead(mode, data, offset, vupHeader, PRX_NUM_BITS, NULL);
+	offset = _packVehicleHead(mode, data, offset, vupHeader, PRX_NUM_BITS, nullptr);
 	if ( offset < 0 )
 		return offset;
 

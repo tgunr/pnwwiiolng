@@ -55,7 +55,7 @@ wwiiEscapeString(std::string& text)
 bool
 dbUpdateWWIIConfigValue(const char* varName, const char* value, const char* modstamp)
 {
-	if ( varName == NULL || *varName == 0 )
+	if ( varName == nullptr || *varName == 0 )
 	{
 		dbugLog(_FLA, "NULL variableName in config");
 		return true;
@@ -65,16 +65,16 @@ dbUpdateWWIIConfigValue(const char* varName, const char* value, const char* mods
 		LogAbort("managed to call %s with numVars == 0", __FUNCTION__);
 
 
-	if ( value == NULL )
+	if ( value == nullptr )
 		value = "";
-	if ( modstamp == NULL )
+	if ( modstamp == nullptr )
 		modstamp = "0";
 
 	// Find a match
 	UINT32 varNo;
 	for ( varNo = 1; varNo < g_numVars; ++varNo )
 	{
-		if ( configMap[varNo].type == TYPE_UNUSED || configMap[varNo].name == NULL )
+		if ( configMap[varNo].type == TYPE_UNUSED || configMap[varNo].name == nullptr )
 			continue;
 		if ( strcasecmp(configMap[varNo].name, varName) == 0 )
 			break;

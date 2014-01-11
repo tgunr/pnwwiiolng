@@ -183,7 +183,7 @@ void
 FacilityStruct::recalculateCapacity()
 {
 	capacity = 0;
-	for ( ObjectStruct* it = objectList; it != NULL; it = it->next )
+	for ( ObjectStruct* it = objectList; it != nullptr; it = it->next )
 	{
 		if ( it->m_maxDamageJoules > 0 )
 			capacity += it->m_capacity;
@@ -231,13 +231,13 @@ strtInitBases(CPStruct* cpList)
 
 	dbugLog(_FLN, "Performing strtInitBases");
 
-	if ( cpList == NULL)
+	if ( cpList == nullptr)
 	{
 		dbugLog(_FLA, "Trying to initialize bases on a NULL stratSytem");
 		return false;
 	}
 
-	for ( cp = cpList; cp != NULL; cp = cp->next )
+	for ( cp = cpList; cp != nullptr; cp = cp->next )
 	{
 		if ( cp->isBridge() && cp->isContested() )
 		{
@@ -245,7 +245,7 @@ strtInitBases(CPStruct* cpList)
 			strtQueueCPStatus(cp);
 		}
 
-		for ( facility = cp->facilityList; facility != NULL; facility = facility->next )
+		for ( facility = cp->facilityList; facility != nullptr; facility = facility->next )
 		{
 			switch( facility->type )
 			{
@@ -376,7 +376,7 @@ _repairFirebase(FacilityStruct* fb)
 
 	ObjectStruct* obj;
 	bool processed = false;
-	for ( obj = fb->objectList; obj != NULL; obj = obj->next )
+	for ( obj = fb->objectList; obj != nullptr; obj = obj->next )
 	{
 		if ( obj->m_damageJoules <= 0 )
 			continue;
@@ -508,7 +508,7 @@ strtRunCP(CPStruct& cp)
 	cp.nextEvent = cp.nextEvent + (cp.timeToProduce * host_config.rpTime);
 
 	CP_ACC ca;
-	FacilityStruct* currentFacility = NULL;
+	FacilityStruct* currentFacility = nullptr;
 
 	if ( !cp.isBridge() )
 	{
@@ -528,7 +528,7 @@ strtRunCP(CPStruct& cp)
 
 		//If the cp is NOT under contention OR both sides are allowed to produce on a CP
 		//Run every Facility
-		for ( currentFacility=cp.facilityList; currentFacility!=NULL; currentFacility=currentFacility->next)
+		for ( currentFacility=cp.facilityList; currentFacility!=nullptr; currentFacility=currentFacility->next)
 		{
 			//We don't run firebases
 			if (currentFacility->type != FACILITY_FIREBASE)
@@ -598,11 +598,11 @@ strtRunCP(CPStruct& cp)
 void
 _requestRPs(FacilityStruct* currentFacility)
 {
-	if ( currentFacility == NULL )
+	if ( currentFacility == nullptr )
 		return;
 
 	LinkStruct* currentLink = currentFacility->m_incomingLink;
-	if ( currentLink == NULL )
+	if ( currentLink == nullptr )
 		return;
 
 	// Check the RPs present and inbound to see if they are below the watermark (threshold)
@@ -614,7 +614,7 @@ _requestRPs(FacilityStruct* currentFacility)
 		return;
 
 	const FacilityStruct* const remoteDepot = currentLink->startDepot;
-	if ( remoteDepot == NULL )
+	if ( remoteDepot == nullptr )
 		return;
 
 	// Depot ownership is breaking supply.
@@ -655,7 +655,7 @@ _distributeRPs(CPStruct& cp, SINT32 rpsProduced, WWII_SIDE side)
 
 	//Distribute leftover RPs to the Depot facilities
 	for (	currentFacility=cp.facilityList
-		;currentFacility!=NULL
+		;currentFacility!=nullptr
 		;currentFacility=currentFacility->next)
 	{
 		if ( currentFacility->side != side )
@@ -913,7 +913,7 @@ _repairFacility(FacilityStruct& facility, WWII_SIDE_ACC& sa, UCHAR* lastPercentD
 
 	//Run through all the objects
 	for (	currentObject=facility.objectList
-		; currentObject!=NULL
+		; currentObject!=nullptr
 		; currentObject=currentObject->next)
 	{
 		// No damage, no repairs
@@ -987,7 +987,7 @@ _repairCP(CPStruct& cp, CP_ACC& ca)
 	FacilityStruct* currentFacility;
 
 	//Run through every facility
-	for ( currentFacility=cp.facilityList; (currentFacility!=NULL); currentFacility=currentFacility->next)
+	for ( currentFacility=cp.facilityList; (currentFacility!=nullptr); currentFacility=currentFacility->next)
 	{
 		// We don't run firebases
 		if ( currentFacility->type == FACILITY_FIREBASE )
@@ -1031,7 +1031,7 @@ strtAcceptConvoy(CONVOYSTRUCT& convoy)
 		//	to the CP
 
 		_attachPayload(convoy.payload, depot->cp);
-		convoy.payload=NULL;
+		convoy.payload=nullptr;
 	}
 
 	convoy.link->convoy=FALSE;
@@ -1049,12 +1049,12 @@ strtAcceptConvoy(CONVOYSTRUCT& convoy)
 //
 static LOGICAL _attachPayload(PAYLOADSTRUCT* payload, CPStruct* cp)
 {
-	if ((payload==NULL) || (cp==NULL))
+	if ((payload==nullptr) || (cp==nullptr))
 		return FALSE;
 
 	//Attach payload to the head of the list.  Its the easiest.
 	payload->next=cp->payloadList;
-	payload->convoy=NULL;
+	payload->convoy=nullptr;
 	payload->cp=cp;
 	cp->payloadList=payload;
 
@@ -1068,22 +1068,22 @@ static LOGICAL _attachPayload(PAYLOADSTRUCT* payload, CPStruct* cp)
 //	them all.
 static void _dispatchPayloads(CPStruct& cp)
 {
-	PAYLOADSTRUCT* currentPayload=NULL;
-	PAYLOADSTRUCT* rejectedPayloadList=NULL;
-	PAYLOADSTRUCT* tmpPayload=NULL;
+	PAYLOADSTRUCT* currentPayload=nullptr;
+	PAYLOADSTRUCT* rejectedPayloadList=nullptr;
+	PAYLOADSTRUCT* tmpPayload=nullptr;
 	MANIFESTSTRUCT* tmpManifest;
 
 	currentPayload=cp.payloadList;
 
-	while (currentPayload!=NULL)
+	while (currentPayload!=nullptr)
 	{
 
-		if (currentPayload->manifest==NULL)
+		if (currentPayload->manifest==nullptr)
 		{
 			dbugLog(_FLN,"Payload reached destination.");
 			//We've reached our destination.  Attach the spawnpoint to the
 			//	facility pointed to in the payloads destination
-			if (currentPayload->destination==NULL)
+			if (currentPayload->destination==nullptr)
 				return;
 
 			//Gonna change spawnpoint shipping anyway
@@ -1092,7 +1092,7 @@ static void _dispatchPayloads(CPStruct& cp)
 			currentPayload->spawnpoint->next=currentPayload->destination->objectList;
 			currentPayload->destination->objectList=currentPayload->spawnpoint;
 			currentPayload->spawnpoint->facility=currentPayload->destination;
-			currentPayload->spawnpoint=NULL;
+			currentPayload->spawnpoint=nullptr;
 			tmpPayload=currentPayload;
 
 			//Advance current Payload Pointer
@@ -1100,7 +1100,7 @@ static void _dispatchPayloads(CPStruct& cp)
 
 			//Free up our ending payload
 			memFree(tmpPayload);
-			tmpPayload=NULL;
+			tmpPayload=nullptr;
 		}
 		else
 		{
@@ -1343,7 +1343,7 @@ _canApplyJoulesToBridge(const WEAPON_SERIAL& weapon, const ObjectStruct* bridge,
 
 	// Look up who is doing the damage
 	posting = strtFindPostedWeapon(weapon.serial);
-	if ( posting == NULL )
+	if ( posting == nullptr )
 	{
 		dbugLog(_FLW, "Discarding damage packets from despawned vehicle: %d"
 						, weapon.serial);
@@ -1542,7 +1542,7 @@ _checkDamage(WWII_SIDE vehSide, ObjectStruct* object, const WEAPON_SERIAL& weapo
 void
 strtDamage(const FULL_OBJ_ID& fullObjID, SINT64 damageJoules, const WEAPON_SERIAL& weapon, UINT32 playerID)
 {
-	ObjectStruct*			object = NULL;
+	ObjectStruct*			object = nullptr;
 	UCHAR					prevVisLevel;
 	SINT64					prevDamageJoules;
 	SINT64					appliedJoules;
@@ -1556,7 +1556,7 @@ strtDamage(const FULL_OBJ_ID& fullObjID, SINT64 damageJoules, const WEAPON_SERIA
 
 	//Find the object
 	object = strtGetObject(fullObjID);
-	if (object == NULL)
+	if (object == nullptr)
 	{
 		dbugLog(_FLD, "couldn't find damage object %d:%d:%d",fullObjID.cell.ox, fullObjID.cell.oy,fullObjID.id);
 		return;
@@ -1629,7 +1629,7 @@ strtDamage(const FULL_OBJ_ID& fullObjID, SINT64 damageJoules, const WEAPON_SERIA
 bool
 strtProcessFirebase(FacilityStruct& firebase)
 {
-	if ( firebase.link == NULL )
+	if ( firebase.link == nullptr )
 		return false;
 
 	dbugLog(_FLN,"Firebase %s completely destroyed", firebase.name);
@@ -1750,9 +1750,9 @@ _checkEnemyLinked(CPStruct& cp)
 	if ( cp.country != WWII_CHINA )	// Russia is neutral-hostile
 	{
 		const FacilityStruct* facility;
-		for ( facility = cp.facilityTypeIndex[FACILITY_DEPOT]; facility != NULL; facility = facility->typeNext )
+		for ( facility = cp.facilityTypeIndex[FACILITY_DEPOT]; facility != nullptr; facility = facility->typeNext )
 		{
-			if ( facility->m_outgoingLink == NULL )
+			if ( facility->m_outgoingLink == nullptr )
 				continue;
 
 			const CPStruct* const endCP = facility->m_outgoingLink->endDepot->cp;
@@ -1811,9 +1811,9 @@ _updateSupplyAndLinkStatus(CPStruct& cp)
 void
 FacilityStruct::updateSupplyLinks()
 {
-	if ( type != FACILITY_DEPOT || m_outgoingLink == NULL || m_incomingLink == 0 )
+	if ( type != FACILITY_DEPOT || m_outgoingLink == nullptr || m_incomingLink == nullptr )
 		return;
-	assert( cp != NULL );
+	assert( cp != nullptr );
 	assert( m_outgoingLink->hasFirebase() == m_incomingLink->hasFirebase() );
 
 	FacilityStruct& endDepot = *m_outgoingLink->endDepot;
@@ -1972,11 +1972,11 @@ strtOpenBase(FacilityStruct& facility)
 //Rip through a list of bridge entries and change all the links
 static LOGICAL _changeLinks(BRIDGE_ENTRY* linkList, bool closed)
 {
-	if (linkList == NULL)
+	if (linkList == nullptr)
 		return FALSE;
 
 	BRIDGE_ENTRY* current = linkList;
-	while (current != NULL)
+	while (current != nullptr)
 	{
 		linkList->link->setEnabled(!closed);
 #ifdef DEBUG
@@ -2001,7 +2001,7 @@ static LOGICAL _changeLinks(BRIDGE_ENTRY* linkList, bool closed)
 void
 strtCaptureAndLog(FacilityStruct* facility, const ChatHandle& handle, UINT32 customerID, UINT32 missionID, const HCUnit* unit, UINT32 seconds)
 {
-	if ( unit == NULL )
+	if ( unit == nullptr )
 	{
 		dbugLog(_FLW, "f:%s:cap cannot capture facilities with a null unit", facility->name);
 		return;
@@ -2060,7 +2060,7 @@ _fromInsideFacility(const FacilityStruct* facility, const FULL_OBJ_ID& buildingI
 void
 strtForceRebuildCP(CPStruct& cp)
 {
-	for ( FacilityStruct* facil = cp.facilityList; facil != NULL; facil = facil->next )
+	for ( FacilityStruct* facil = cp.facilityList; facil != nullptr; facil = facil->next )
 	{
 		// Don't rebuild closed FBs
 		if ( facil->type == FACILITY_FIREBASE && facil->isOpen() == false )
@@ -2069,7 +2069,7 @@ strtForceRebuildCP(CPStruct& cp)
 		// Bump the capture progression state.
 		facil->setCaptureEnabled();
 
-		for ( ObjectStruct* obj = facil->objectList; obj != NULL; obj = obj->next )
+		for ( ObjectStruct* obj = facil->objectList; obj != nullptr; obj = obj->next )
 		{
 			if ( obj->m_damageJoules <= 0 && obj->m_repairTime == 0 )
 			{
@@ -2195,7 +2195,7 @@ _allBrigadesCanFallback(const CPStruct* cp, UINT32 playerID)
 	for ( it = cp->m_units.begin(); it != cp->m_units.end(); ++it )
 	{
 		unit = (StratHCUnit*)it->second;
-		if ( unit->findFallback() == NULL )
+		if ( unit->findFallback() == nullptr )
 		{
 			dbugLog(_FLI, "hcu:%u @ %s could not find fallback destination for fallback"
 							, unit->unitID()
@@ -2252,13 +2252,13 @@ strtFallback(CPStruct* cp, WWII_SIDE forSide, FALLBACK_MODE mode, UINT32 playerI
 
 	// Must be an attacking unit listed so we can decide which country to award ownership.
 	///CAVEAT: This wouldn't be true if we required contention at execution.
-	FALLBACK_ASSERT( SCMD_ERROR, cp->attackingUnit() == NULL );
+	FALLBACK_ASSERT( SCMD_ERROR, cp->attackingUnit() == nullptr );
 
 	// If we're only testing, then permission granted.
 	FALLBACK_ASSERT( SCMD_ALLOWED, mode != FALLBACK_EXECUTE );
 
 	FacilityStruct* facility;
-	for ( facility = cp->facilityList; facility != NULL; facility = facility->next )
+	for ( facility = cp->facilityList; facility != nullptr; facility = facility->next )
 	{
 		if ( facility->side == forSide && facility->isMilitaryFacility() )
 		{

@@ -33,7 +33,7 @@ class TestPersonaXfer : public TestUnit
 	{
 		BEGIN_SUB_STAGE( model )
 
-			PersonaXfer xfer(_reason, dispatch, 0, NULL, 0);
+			PersonaXfer xfer(_reason, dispatch, 0, nullptr, 0);
 
 			CRITICAL( ExpectEqual( xfer.xferID(), 0 )
 					&& ExpectEqual( xfer.reason(), _reason )
@@ -42,7 +42,7 @@ class TestPersonaXfer : public TestUnit
 					&& ExpectEqual( xfer.timestamp(), BaseClock() )
 					&& ExpectTrue( xfer.data.dispatch == dispatch )
 					&& ExpectTrue( xfer.data.auxSize == 0 )
-					&& ExpectTrue( xfer.data.auxData == NULL )
+					&& ExpectTrue( xfer.data.auxData == nullptr )
 					);
 
 			// Trying to call onComplete should get us an EINVAL.

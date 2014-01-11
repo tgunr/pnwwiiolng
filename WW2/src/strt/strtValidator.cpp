@@ -37,7 +37,7 @@ _factor1k(FacilityStruct* const facility, UINT32 amount)
 // This function actually runs the internal stuff on a CP
 static SINT32 _runFacility(FacilityStruct* const currentFacility, WWII_SIDE_ACC* const sa)
 {
-	if ( currentFacility == NULL || sa == NULL)
+	if ( currentFacility == nullptr || sa == nullptr)
 		return -1;
 
 	//Check to see if facility is under contention and check to
@@ -96,7 +96,7 @@ _calcStratSystem(const SCHAR* filename, CPStruct* cpList)
 	WWII_SIDE_ACC sa;
 
 	fp = fopen(filename, "w");
-	if (fp == NULL)
+	if (fp == nullptr)
 	{
 		dbugLog(_FLN,"Filename %s invalid", filename);
 		return FALSE;
@@ -104,7 +104,7 @@ _calcStratSystem(const SCHAR* filename, CPStruct* cpList)
 
 	CPStruct* cp;
 	FacilityStruct* facility;
-	for ( cp = cpList; cp != NULL; cp = cp->next )
+	for ( cp = cpList; cp != nullptr; cp = cp->next )
 	{
 		if (cp->fullObjID.objType != CP_BRIDGE)
 		{
@@ -112,7 +112,7 @@ _calcStratSystem(const SCHAR* filename, CPStruct* cpList)
 			memset(&sa,0,sizeof(WWII_SIDE_ACC));
 			sa.factoryMultiplier = 1;
 
-			for ( facility = cp->facilityList; facility != NULL; facility = facility->next )
+			for ( facility = cp->facilityList; facility != nullptr; facility = facility->next )
 			{
 				//We don't run firebases
 				if (facility->type != FACILITY_FIREBASE)
@@ -163,7 +163,7 @@ main (int argc, char** argv)
 	//Get the starting time
 
 	cpList = strtImportStratData();
-	if ( cpList == NULL)
+	if ( cpList == nullptr)
 	{
 		strtReportDataErrors();
 		dbugLog(_FLA,"[X][X][X] Strat System would not init [X][X][X]");

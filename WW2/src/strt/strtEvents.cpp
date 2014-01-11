@@ -213,14 +213,14 @@ Strat::Events::SendMapState(SINT32 teulIndex, bool isCampaign, const CPStruct* c
 	///TODO:INST: lots of time recreating them when 100 people log in together.
 	dbugLog(_FLD, "t:%d SendMapState", teulIndex);
 	DirectPacket packet(teulIndex);
-	for ( const CPStruct* cp = cpList; cp != NULL; cp = cp->next )
+	for ( const CPStruct* cp = cpList; cp != nullptr; cp = cp->next )
 	{
 		const WWII_COUNTRY country = isCampaign ? cp->country : cp->originalCountry;
 		const UINT32 flags = isCampaign ? cp->flags : ((cp->flags & (CP_STAT_HAS_NAVYBASE|CP_STAT_HAS_AIRBASE|CP_STAT_MAKES_RDP)) | CP_STAT_OPEN | CP_STAT_IN_SUPPLY);
 
 		packet.Add(Strat::Event(cp->fullObjID, country, flags));
 
-		for ( FacilityStruct* fac = cp->facilityList; fac != NULL; fac = fac->next )
+		for ( FacilityStruct* fac = cp->facilityList; fac != nullptr; fac = fac->next )
 		{
 			if ( fac->country != cp->country || fac->flags != 0 )
 				packet.Add(Strat::Event(fac->fullObjID, fac->country, fac->flags));

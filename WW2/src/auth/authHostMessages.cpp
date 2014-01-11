@@ -135,7 +135,7 @@ static SINT32
 _recvManagementMsg(ACTION_OBJECT* const a)
 {
 	SERVER* serverEntry = (SERVER*)teulGetPersonaData(a->teulIndex);
-	if ( serverEntry == NULL )
+	if ( serverEntry == nullptr )
 	{
 		dbugLog(_FLA,"no server info avalable on %d:",a->teulIndex);
 		return 0;
@@ -259,7 +259,7 @@ static SINT32
 _recvGameListRequest(ACTION_OBJECT* const a)
 {
 	Auth::GameList* list = authGetGameList(a->teulIndex);
-	if ( list == NULL )
+	if ( list == nullptr )
 		return -EINVAL;
 	if ( teulSend(a->teulIndex, _XCHG_GAME_LIST2, list) < 0 )
 		return -EINVAL;
@@ -282,7 +282,7 @@ _sendAuthQueuePosition(ACTION_OBJECT* const a)
 SINT32
 authSendAppPlaygateOk(SINT32 teulIndex)
 {
-	return teulSend(teulIndex, _APP_PLAYGATE_OK, NULL);
+	return teulSend(teulIndex, _APP_PLAYGATE_OK, nullptr);
 }
 
 void

@@ -85,7 +85,7 @@ SINT32 missPackMISSION_POST_REPLY(LOGICAL mode, UCHAR* data,
 					SINT32 offset , MISSION_POST_REPLY* object,
 					SINT32 /*size*/)
 {
-	if (object == NULL)
+	if (object == nullptr)
 	{
 		dbugLog(_FLA,"passed in a null object!");
 		return -EINVAL;
@@ -110,7 +110,7 @@ SINT32 missPackMISSION_POST_REQ(LOGICAL mode, UCHAR* data,
 					SINT32 offset , MISSION_POST_REQ* object,
 					SINT32 /*size*/)
 {
-	if (object == NULL)
+	if (object == nullptr)
 	{
 		dbugLog(_FLA,"passed in a null object!");
 		return -EINVAL;
@@ -130,7 +130,7 @@ SINT32 missPackMISSION_POST_REQ(LOGICAL mode, UCHAR* data,
 
 SINT32 missPackWEP_LIST_REQ(LOGICAL mode, UCHAR* data, SINT32 offset, WEP_LIST_REQ* object, SINT32 /*size*/)
 {
-	if (object == NULL)
+	if (object == nullptr)
 	{
 		dbugLog(_FLA,"passed in a null object!");
 		return -EINVAL;
@@ -145,7 +145,7 @@ SINT32 missPackWEP_LIST_REQ(LOGICAL mode, UCHAR* data, SINT32 offset, WEP_LIST_R
 SINT32
 missPackMISSION_SUMMARY(LOGICAL mode, UCHAR* data, SINT32 offset, MISSION_SUMMARY* object, SINT32 /*size*/)
 {
-	if (object == NULL)
+	if (object == nullptr)
 	{
 		dbugLog(_FLA,"passed in a null object!");
 		return -EINVAL;
@@ -174,7 +174,7 @@ missPackMISSION_SUMMARY(LOGICAL mode, UCHAR* data, SINT32 offset, MISSION_SUMMAR
 //MISSION RESULTS are only sent to the FRONT_END
 SINT32 missPackMISSION_RESULTS(LOGICAL mode, UCHAR* packed, SINT32 offset, MISSION_RESULTS* object, SINT32 /*size*/)
 {
-	if (object == NULL)
+	if (object == nullptr)
 	{
 		dbugLog(_FLA,"passed in a null object!");
 		return -EINVAL;

@@ -114,7 +114,7 @@ struct ClientRole : public Role
 	{
 		// Test hostname lookup.
 		const UINT32* const addresses = teulGetHostByName(Config::serverName);
-		if ( addresses == NULL )
+		if ( addresses == nullptr )
 			throw std::runtime_error("teulGetHostByName returned NULL");
 		// Lets just use the first address in the list.
 		const UINT32 address = addresses[0];
@@ -317,9 +317,9 @@ struct ClientRole : public Role
 				{
 	loop:
 					teulUpdateTransport(0);
-					if ( Teul::GetConnectedEndpoint(0) == NULL )
+					if ( Teul::GetConnectedEndpoint(0) == nullptr )
 						throw Teul::Error("Connection 0 closed unexpectedly.", 0);
-					if ( Teul::GetConnectedEndpoint(1) == NULL )
+					if ( Teul::GetConnectedEndpoint(1) == nullptr )
 						throw Teul::Error("Connection 1 closed unexpectedly.", 1);
 
 					if ( g_bulkConnections.size() < expectedIndexes.size() )
@@ -447,13 +447,13 @@ struct ClientRole : public Role
 				ENDPOINT* endpoint;
 
 				endpoint = Teul::GetConnectedEndpoint(0);
-				if ( (endpoint != NULL) != firstConnIsOpen )
+				if ( (endpoint != nullptr) != firstConnIsOpen )
 					throw Teul::IterationError(i, "First connection in wrong state", 0);
 				if (!firstConnIsOpen)
 					dbugLog(_FLI, "[ignore 'endpoint %d is not in use']", 0);
 
 				endpoint = Teul::GetConnectedEndpoint(1);
-				if ( (endpoint != NULL) != secondConnIsOpen )
+				if ( (endpoint != nullptr) != secondConnIsOpen )
 					throw Teul::IterationError(i, "Second connection in wrong state", 0);
 				if (!secondConnIsOpen)
 					dbugLog(_FLI, "[ignore 'endpoint %d is not in use']", 1);
@@ -584,7 +584,7 @@ struct ClientRole : public Role
 
 		Dprintf("sending unregistered callback\n");
 
-		teulSend(teulIndex, s_cbUnregistered, NULL);
+		teulSend(teulIndex, s_cbUnregistered, nullptr);
 	}
 
 	public:
@@ -692,16 +692,16 @@ struct ClientRole : public Role
 		SendRandom(m_teulIndex, s_cbHello, "final via unrel");
 		SendRandom(m_teulIndex, s_cbRelHello, "final via rel");
 
-		if ( Teul::GetConnectedEndpoint(1) != NULL )
+		if ( Teul::GetConnectedEndpoint(1) != nullptr )
 			throw Teul::Error("Second endpoint is still showing 'connected' after close", 0);
-		if ( Teul::GetConnectedEndpoint(0) == NULL )
+		if ( Teul::GetConnectedEndpoint(0) == nullptr )
 			throw Teul::Error("We lost the primary endpoint", 0);
 
 		// If the "killserver" test is enabled, we send the "shutdown" callback.
 		if ( tKillServer.isEnabled() )
 		{
 			Iprintf("Sending KILLSERVER.\n");
-			teulSend(m_teulIndex, s_cbShutdown, NULL);
+			teulSend(m_teulIndex, s_cbShutdown, nullptr);
 			teulUpdateTransport(250);	// Give it time to send.
 		}
 	}
@@ -709,7 +709,7 @@ struct ClientRole : public Role
 	static void connectFn(ENDPOINT& endpoint)
 	{
 		ClientRole* const client = (ClientRole*)endpoint.appConnectionData;
-		if ( client == NULL )
+		if ( client == nullptr )
 			throw Teul::Error("Connection on index that isn't associated with a Client", endpoint.teulIndex());
 		client->Connected();
 	}
@@ -753,7 +753,7 @@ struct ClientRole : public Role
 		const TeulTimeMS startTime = teulClock64;
 		const TeulTimeMS cutoff = teulClock64 + Config::ConnectTimeoutMS + 100;
 
-		while ( s_lastError == 0 && Teul::GetConnectedEndpoint(teulIndex) == NULL && teulClock64 <= cutoff )
+		while ( s_lastError == 0 && Teul::GetConnectedEndpoint(teulIndex) == nullptr && teulClock64 <= cutoff )
 		{
 			// Loiter for 100ms letting teulKit do it's thing.
 			teulUpdateTransport(5);

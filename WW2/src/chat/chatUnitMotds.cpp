@@ -30,7 +30,7 @@ chatGetUnitMotd(UINT32 unit)
 {
 	MOTD_INDEX::iterator it = motds.find(unit);
 	if ( it == motds.end() || it->second.empty() )
-		return NULL;
+		return nullptr;
 	return it->second.c_str();
 }
 

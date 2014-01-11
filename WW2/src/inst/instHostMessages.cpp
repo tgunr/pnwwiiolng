@@ -41,7 +41,7 @@ static SINT32
 _recvInstanceRequest(ACTION_OBJECT* const a)
 {
 	wwiiPlayer* const player = ServerInterface::LookupByTeulIndex(a->teulIndex);
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		dbugLog(_FLD, "t:%d Instance::Listing request with no player", a->teulIndex);
 		return -EINVAL;
@@ -269,7 +269,7 @@ SINT32 _recvInstanceSelect(ACTION_OBJECT* const a)
 
 	bool success = false;
 	wwiiPlayer* const player = ServerInterface::LookupByTeulIndex(a->teulIndex);
-	if ( player != NULL )
+	if ( player != nullptr )
 	{
 		player->log(_FLD, "received instance request %u.%u.%llu.%llu"
 					, request.category(), request.type(), request.handle(), request.id());
@@ -321,7 +321,7 @@ SINT32 _recvInstanceCreate(ACTION_OBJECT* const a)
 
 	bool success = false;
 	wwiiPlayer* const player = ServerInterface::LookupByTeulIndex(a->teulIndex);
-	if ( player != NULL )
+	if ( player != nullptr )
 	{
 		if ( request.id() != 0 )
 		{

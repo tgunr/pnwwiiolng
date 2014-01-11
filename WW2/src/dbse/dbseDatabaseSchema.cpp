@@ -73,14 +73,14 @@ Schema::Update(const DB::Revisions& history)
 	{
 		for (; currentRevision < latestRevision; ++currentRevision )
 		{
-			if ( history[currentRevision].empty() || history[currentRevision][0] == NULL )
+			if ( history[currentRevision].empty() || history[currentRevision][0] == nullptr )
 				continue;
 
 			dbugLog(_FLI, "dbschema: applying revision #%u", currentRevision);
 			unsigned int entry = 0;
 			for ( auto it = history[currentRevision].begin(); it != history[currentRevision].end(); ++it, ++entry )
 			{
-				if ( *it == NULL )
+				if ( *it == nullptr )
 					continue;
 				dbugLog(_FLD, "dbschema:%u/%u: %s", currentRevision, entry, *it);
 				DBQuery q(m_dbh, "%s", *it);

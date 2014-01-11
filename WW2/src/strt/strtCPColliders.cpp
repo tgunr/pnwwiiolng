@@ -35,7 +35,7 @@
 class CPCollider
 {
 public:
-	CPCollider() : x1(0x7fffffff), y1(0x7fffffff), x2(0x80000000), y2(0x80000000), cx(0), cy(0), cp(NULL) {}
+	CPCollider() : x1(0x7fffffff), y1(0x7fffffff), x2(0x80000000), y2(0x80000000), cx(0), cy(0), cp(nullptr) {}
 	SINT32	x1, y1;	// bottom left
 	SINT32	x2, y2;	// top right
 	SINT32	cx, cy;	// Center x/y
@@ -170,13 +170,13 @@ strtBuildCPColliders()
 
 	CPStruct* cp;
 	FacilityStruct* fac;
-	for ( cp = _cpList; cp != NULL; cp = cp->next )
+	for ( cp = _cpList; cp != nullptr; cp = cp->next )
 	{
 		if ( !cp->isCity() )
 			continue;						// Bridges don't count.
 
 		CPCollider* collider = new CPCollider;
-		for ( fac = cp->facilityList; fac != NULL; fac = fac->next )
+		for ( fac = cp->facilityList; fac != nullptr; fac = fac->next )
 		{
 			if ( fac->type == FACILITY_FIREBASE )
 			{
@@ -256,7 +256,7 @@ strtFindClosestCP(SINT32 x, SINT32 y)
 	CP_MAP::iterator it;
 	it = _cpMap.find(std::make_pair(x>>COLLISION_GRID_SHIFT, y>>COLLISION_GRID_SHIFT));
 	if ( it == _cpMap.end() )
-		return NULL;
+		return nullptr;
 
 	COLLIDERS& colliders = it->second;
 	if ( colliders.size() == 1 && _collide(*colliders[0], x, y) )
@@ -288,7 +288,7 @@ strtFindClosestCP(SINT32 x, SINT32 y)
 	}
 
 	if ( !gotCandidate )
-		return NULL;
+		return nullptr;
 
 #ifdef PICKY
 	if ( candidate2 == 0 )

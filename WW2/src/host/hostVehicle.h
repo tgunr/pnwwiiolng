@@ -140,7 +140,7 @@ public:
 	void setRemote() { m_isRemote = true; }
 	const Instance::Descriptor& instance() const { return m_instance; }
 
-	bool message(int prefix, int msgid, const char* t1=NULL, const char* t2=NULL) const;
+	bool message(int prefix, int msgid, const char* t1=nullptr, const char* t2=nullptr) const;
 
 	// Presence functions.
 public:

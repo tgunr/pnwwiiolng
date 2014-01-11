@@ -22,7 +22,7 @@ struct JOIN_LIST
 		_POST_CREW
 	};
 
-	JOIN_LIST() : m_type(_FREE), m_facility(NULL), m_weapon(NULL), m_list() {}
+	JOIN_LIST() : m_type(_FREE), m_facility(nullptr), m_weapon(nullptr), m_list() {}
 	JOIN_LIST(_TYPE type, FacilityStruct* facility, POSTED_WEAPON* weapon)
 		: m_type(type), m_facility(facility), m_weapon(weapon), m_list() { if ( type == _FACILITY ) m_list.reserve(16); }
 
@@ -32,10 +32,10 @@ struct JOIN_LIST
 	// Iterators
 	WeapJoinRequestList::const_iterator begin() const { return m_list.begin(); }
 	WeapJoinRequestList::const_iterator end() const { return m_list.end(); }
-	const WeapJoinRequestNode* front() const { return empty() ? NULL : m_list.front(); }
-	const WeapJoinRequestNode* back() const { return empty() ? NULL : m_list.back(); }
-	WeapJoinRequestNode* front() { return empty() ? NULL : m_list.front(); }
-	WeapJoinRequestNode* back() { return empty() ? NULL : m_list.back(); }
+	const WeapJoinRequestNode* front() const { return empty() ? nullptr : m_list.front(); }
+	const WeapJoinRequestNode* back() const { return empty() ? nullptr : m_list.back(); }
+	WeapJoinRequestNode* front() { return empty() ? nullptr : m_list.front(); }
+	WeapJoinRequestNode* back() { return empty() ? nullptr : m_list.back(); }
 	bool empty() const { return m_list.empty(); }
 
 	void Add(WeapJoinRequestNode* node);

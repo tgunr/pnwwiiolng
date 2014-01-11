@@ -32,7 +32,7 @@ static int allocations = 0;
 char*
 threadsAllocText()
 {
-	char* p = NULL;
+	char* p = nullptr;
 
 #if !defined(XMEMORY_DEBUG)
 	{
@@ -45,11 +45,11 @@ threadsAllocText()
 		}
 
 		++inUse;
-		if ( p == NULL )
+		if ( p == nullptr )
 			++allocations;
 	}
 
-	if ( p == NULL )
+	if ( p == nullptr )
 	{
 		p = new char[TEXT_POOL_SIZE+1]; // (char*)memCalloc(1, TEXT_POOL_SIZE + 1);
 		p[TEXT_POOL_SIZE] = 0;
@@ -69,11 +69,11 @@ threadsAllocText()
 char*
 threadsPrintf(const char* fmt, ...)
 {
-	if ( fmt == NULL )
+	if ( fmt == nullptr )
 		LogAbort("%s called with NULL fmt", __FUNCTION__);
 
 	char* p = threadsAllocText();
-	if ( p == NULL )
+	if ( p == nullptr )
 		LogAbort("%s out of memory", __FUNCTION__);
 	else
 	{
@@ -106,7 +106,7 @@ threadsFreeText(char* text)
 void
 ThreadTextQuery::addEntry(const char* const entry)
 {
-	assert( entry != NULL );
+	assert( entry != nullptr );
 
 	// Are we about to fill the buffer?
 	size_t len = strlen(entry);

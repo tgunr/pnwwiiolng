@@ -36,13 +36,13 @@
 static bool
 _setObjectsOwner(ObjectStruct* objectList, WWII_SIDE side, WWII_COUNTRY country)
 {
-	if (objectList == NULL || side == 0 || country == 0)
+	if (objectList == nullptr || side == 0 || country == 0)
 		return false;
 
 	ObjectStruct* current;
 
 	//Rip through the object list, changing ownership along the way
-	for ( current = objectList; current != NULL; current = current->next )
+	for ( current = objectList; current != nullptr; current = current->next )
 	{
 		//If autogunner, destroy the object
 		if ( current->m_side != side && current->type == BUILDING_AUTOGUNNER )
@@ -69,7 +69,7 @@ _findMajorityOwner(const CPStruct& cp, WWII_SIDE side)
 	SINT32 maxOwned = 0;
 	bool matchedOwnership = false;
 	WWII_COUNTRY maxOwner = WWII_NO_COUNTRY;
-	FacilityStruct* ab = NULL;
+	FacilityStruct* ab = nullptr;
 
 	// A single AB means there's no contest
 	if ( cp.numArmyBases == 1 )
@@ -77,7 +77,7 @@ _findMajorityOwner(const CPStruct& cp, WWII_SIDE side)
 
 	memset(owned, 0, sizeof(owned));
 
-	for ( ab = cp.facilityTypeIndex[FACILITY_ARMYBASE]; ab != NULL; ab = ab->typeNext )
+	for ( ab = cp.facilityTypeIndex[FACILITY_ARMYBASE]; ab != nullptr; ab = ab->typeNext )
 	{
 		// Redundant, but double check that its owned by whom it should be
 		// since we're dealing with control...
@@ -110,7 +110,7 @@ _findMajorityOwner(const CPStruct& cp, WWII_SIDE side)
 		return maxOwner;
 
 	// We have tied ownership; use AFs to try and tie-off
-	for ( ab = cp.facilityList; ab != NULL; ab = ab->next )
+	for ( ab = cp.facilityList; ab != nullptr; ab = ab->next )
 	{
 		if ( ab->type != FACILITY_AIRBASE && ab->type != FACILITY_NAVALBASE )
 			continue;
@@ -202,7 +202,7 @@ _setFBsToMatch(FacilityStruct& ab)
 {
 	FacilityStruct* fb;
 
-	for ( fb = ab.CP().facilityTypeIndex[FACILITY_FIREBASE]; fb != NULL; fb = fb->typeNext )
+	for ( fb = ab.CP().facilityTypeIndex[FACILITY_FIREBASE]; fb != nullptr; fb = fb->typeNext )
 	{
 		if ( fb->armyBase->uOID == ab.uOID && fb->country != ab.country && fb->side == ab.side )
 		{
@@ -438,12 +438,12 @@ CaptureAction::SetControl() const
 	//Run through all the depots and check all the links
 	//	to see where we need to open firebases
 	FacilityStruct* facility;
-	for ( facility = m_cp.facilityList; facility!=NULL	; facility = facility->next)
+	for ( facility = m_cp.facilityList; facility!=nullptr	; facility = facility->next)
 	{
 		switch ( facility->type )
 		{
 			case FACILITY_DEPOT:
-				if ( facility->m_outgoingLink != NULL )
+				if ( facility->m_outgoingLink != nullptr )
 				{
 					facility->updateSupplyLinks();
 				}
@@ -509,7 +509,7 @@ CaptureAction::LeaveContention() const
 				, m_cp.fullObjID.cell.oy
 				, m_cp.fullObjID.id);
 
-	for ( FacilityStruct* fac = m_cp.facilityList; fac != NULL; fac = fac->next )
+	for ( FacilityStruct* fac = m_cp.facilityList; fac != nullptr; fac = fac->next )
 	{
 		//Turn on spawning at all non-army bases
 		if ( fac->side != m_cp.side && fac->type != FACILITY_FIREBASE )
@@ -527,11 +527,11 @@ CaptureAction::LeaveContention() const
 				strtOpenBase(*fac);
 		}
 
-		if ( fac->type == FACILITY_DEPOT && fac->m_outgoingLink != NULL )
+		if ( fac->type == FACILITY_DEPOT && fac->m_outgoingLink != nullptr )
 		{
 			fac->updateSupplyLinks();
 			LinkStruct* link = fac->m_outgoingLink;
-			if ( link != NULL && link->firebase != NULL && link->firebase->isOpen() && link->endDepot->cp->side == m_newSide )
+			if ( link != nullptr && link->firebase != nullptr && link->firebase->isOpen() && link->endDepot->cp->side == m_newSide )
 				strtCloseFirebase(*link->firebase);
 		}
 

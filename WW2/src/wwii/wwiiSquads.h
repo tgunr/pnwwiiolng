@@ -109,7 +109,7 @@ public:
 class Recruiter
 {
 public:
-	Recruiter(const ChatHandle& withHandle=0LL, const Squad* withSquad=NULL);
+	Recruiter(const ChatHandle& withHandle=0LL, const Squad* withSquad=nullptr);
 	Recruiter(const class Player* withPlayer, const class SquadList* withSquad, const class ChatMission* withMission);
 	Recruiter(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 	virtual ~Recruiter() {}

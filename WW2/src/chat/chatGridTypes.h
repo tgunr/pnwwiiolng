@@ -38,7 +38,7 @@ public:
 
 	ServerSTO* fetch()
 	{
-		if ( completed() ) return NULL ;
+		if ( completed() ) return nullptr ;
 		if ( isRemoval() ) return m_removes[m_sent] ;
 		else return m_adds[m_sent - m_removes.size()] ;
 	}

@@ -213,7 +213,7 @@ Strat::CaptureContribution::GetNextActiveFacility(FacilityStruct* current)
 	ACTIVE_FACILITIES::iterator it = activeFacilities.upper_bound(current);
 	if ( it == activeFacilities.end() || *it == current)
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	return *it;

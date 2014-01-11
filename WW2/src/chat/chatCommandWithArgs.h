@@ -29,9 +29,9 @@ class CommandWithArgs
 
 	public: CommandWithArgs(char* input)
 		: m_input(input)
-		, m_args(NULL)
+		, m_args(nullptr)
 	{
-		assert( m_input != NULL ) ;
+		assert( m_input != nullptr ) ;
 		// Translate the input into wide characters.
 		wchar_t wide[MAX_MESSAGE_LENGTH] ;
 		WWII::ConvertChars(m_input, wide, sizeof(wide)) ;

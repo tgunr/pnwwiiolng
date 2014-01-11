@@ -74,7 +74,7 @@ extern void chatSendChatLog(const playerid_t& subjectID, const ChatHandle& reque
 static void
 _smite(Player* target)
 {
-	if ( target == NULL ) return;
+	if ( target == nullptr ) return;
 
 	// Yes, use the broadcast index because we don't know where this guy is
 	///FIXME: We should know where this player is, thank you teul
@@ -82,7 +82,7 @@ _smite(Player* target)
 
 	// Now forcibly get rid of them
 	PlayerStatusNode* psn = ServerInterface::PlayerStatusNodeByPlayerID(target->playerID());
-	if ( psn != NULL )
+	if ( psn != nullptr )
 		target->Release(psn->teulIndex, Server::RELEASE_EXIT);
 }
 
@@ -114,7 +114,7 @@ _executeBan(Player& player, const ARGV& argv, bool kick)
 	Player* subject = PlayerInterface::Lookup(argv[0]);
 	if ( kick )
 	{
-		if ( subject != NULL )
+		if ( subject != nullptr )
 		{
 			player.message(LSTR_WARNING, LSTR_KICKBAN_PLAYER, subject->callsign());
 			subject->message(LSTR_WARNING, LSTR_GENERIC, argv[2]);
@@ -123,7 +123,7 @@ _executeBan(Player& player, const ARGV& argv, bool kick)
 	}
 	else
 	{
-		if ( subject != NULL )
+		if ( subject != nullptr )
 			player.message(LSTR_WARNING, LSTR_BAN_ONLINE_PLAYER, subject->callsign());
 	}
 
@@ -242,7 +242,7 @@ public:
 			throw Chat::LStringErr(LSTR_ONLY_WHILE_BUZZARD);
 
 		Player* target = PlayerInterface::Lookup(args[0]);
-		if ( target == NULL )
+		if ( target == nullptr )
 			throw Chat::LStringErr(LSTR_USER_UNAVAILABLE, args[0]);
 
 		if ( target->matchHandle() == player.matchHandle() )
@@ -321,7 +321,7 @@ public:
 		}
 
 		ChatHandle targetHandle = chatGetLowercaseHandle(args[0]);
-		if (!chatIsValidCallsign(args[0]) || args[0] == 0)
+		if (!chatIsValidCallsign(args[0]) || args[0] == nullptr)
 		{
 			player.message(LSTR_CAUTION, LSTR_INVALID_CALLSIGN);
 			return;
@@ -333,7 +333,7 @@ public:
 		}
 
 		Player* target = PlayerInterface::Lookup(targetHandle);
-		if (target == NULL)
+		if (target == nullptr)
 		{
 			player.message(LSTR_CAUTION, LSTR_USER_UNAVAILABLE, args[0]);
 			return;
@@ -414,7 +414,7 @@ public:
 	virtual void Success() OVERRIDE_FN
 	{
 		Player* const player = PlayerInterface::Lookup(m_requester);
-		if (player == NULL)
+		if (player == nullptr)
 			return;
 
 		const size_t numRows = m_results.size();
@@ -433,7 +433,7 @@ public:
 	virtual void Failure() OVERRIDE_FN
 	{
 		Player* const player = PlayerInterface::Lookup(m_requester);
-		if (player != NULL)
+		if (player != nullptr)
 			player->message(LSTR_CAUTION, LSTR_DB_QUERY_FAILED, "chatlog", "Database Error");
 	}
 };
@@ -473,7 +473,7 @@ public:
 
 		const ChatHandle handle = chatGetHandle(args[0]);
 		const Player* const subject = PlayerInterface::Lookup(handle);
-		if (subject == NULL)
+		if (subject == nullptr)
 		{
 			player.messagef(LSTR_CAUTION, LSTR_GENERIC, "Player '%s' not online or does not exist. /chatlog only works for online players.", args[0]);
 			help(player);
@@ -484,10 +484,10 @@ public:
 		{
 			// No point logging self-reviews.
 			chatDispatchGMMessage("INFO", chatMakeTempString("%s /chatlog'ing %s: %s", player.callsign(), subject->callsign(), args[1]));
-			player.gmNote("GM", command(), arguments, NULL);
+			player.gmNote("GM", command(), arguments, nullptr);
 		}
 
-		player.gmNote("GM", command(), arguments, NULL);
+		player.gmNote("GM", command(), arguments, nullptr);
 		if (player.isPlaynet() == false && subject->isPlaynet() == true)
 		{
 			player.message(LSTR_CAUTION, LSTR_GENERIC, "Permission denied.");
@@ -535,9 +535,9 @@ public:
 		}
 
 		if ( reply.length() == 0 )
-			player.message(LSTR_NONE, LSTR_NO_MATCHES, NULL, NULL);
+			player.message(LSTR_NONE, LSTR_NO_MATCHES, nullptr, nullptr);
 		else
-			player.message(LSTR_NONE, LSTR_GENERIC, reply.c_str(), NULL);
+			player.message(LSTR_NONE, LSTR_GENERIC, reply.c_str(), nullptr);
 	}
 
 	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
@@ -663,9 +663,9 @@ public:
 		// Locate the user
 		Player* subject = PlayerInterface::Lookup(args[0]);
 
-		if ( subject == NULL )
+		if ( subject == nullptr )
 		{
-			player.message(LSTR_CAUTION, LSTR_USER_UNAVAILABLE, args[0], NULL);
+			player.message(LSTR_CAUTION, LSTR_USER_UNAVAILABLE, args[0], nullptr);
 			return;
 		}
 
@@ -727,7 +727,7 @@ public:
 			if ( cur->inGrab() )
 			{
 				const Player* grabbed = PlayerInterface::Lookup(cur->grabbing());
-				if ( grabbed != NULL )
+				if ( grabbed != nullptr )
 				{
 					roster += "<=>";
 					roster += grabbed->callsign();
@@ -737,7 +737,7 @@ public:
 			// Try not to overflow the message length buffer
 			if ( roster.length() >= MAX_MESSAGE_LENGTH - 12 )
 			{
-				player.message(LSTR_NONE, LSTR_GENERIC, roster.c_str(), NULL);
+				player.message(LSTR_NONE, LSTR_GENERIC, roster.c_str(), nullptr);
 				roster = "";
 			}
 
@@ -745,9 +745,9 @@ public:
 		}
 
 		if ( i == 0 )
-			player.message(LSTR_NONE, LSTR_NO_MATCHES, NULL, NULL);
+			player.message(LSTR_NONE, LSTR_NO_MATCHES, nullptr, nullptr);
 		else if ( roster.length() )
-			player.message(LSTR_NONE, LSTR_GENERIC, roster.c_str(), NULL);
+			player.message(LSTR_NONE, LSTR_GENERIC, roster.c_str(), nullptr);
 	}
 
 	// Send message to the channel
@@ -791,15 +791,15 @@ public:
 	{
 		player.SetGMHide(!player.gmHide());
 		if ( player.gmHide() )
-			player.message(LSTR_NOTE, LSTR_GM_ON, NULL, NULL);
+			player.message(LSTR_NOTE, LSTR_GM_ON, nullptr, nullptr);
 		else
-			player.message(LSTR_NOTE, LSTR_GM_OFF, NULL, NULL);
+			player.message(LSTR_NOTE, LSTR_GM_OFF, nullptr, nullptr);
 	}
 
 	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
 	{
 		static const DotCommand* dotMsg = DotCommand::index()->lookup("m", true);
-		if ( NULL == dotMsg )
+		if ( nullptr == dotMsg )
 		{
 			player.message(LSTR_CAUTION, LSTR_INTERNAL_ERROR);
 			return;
@@ -839,28 +839,28 @@ public:
 
 		// Make sure the subject user is online/spelled correctly, etc
 		Player* target = PlayerInterface::Lookup(args[0]);
-		if ( target == NULL )
+		if ( target == nullptr )
 		{
-			player.message(LSTR_CAUTION, LSTR_USER_UNAVAILABLE, args[0], NULL);
+			player.message(LSTR_CAUTION, LSTR_USER_UNAVAILABLE, args[0], nullptr);
 			return;
 		}
 
 		// If we have been grabbed, then we don't continue
 		if ( player.takenBy() )
 		{
-			player.message(LSTR_SYSTEM, LSTR_GRABBED_ALREADY, NULL, NULL);
+			player.message(LSTR_SYSTEM, LSTR_GRABBED_ALREADY, nullptr, nullptr);
 			return;
 		}
 
 		if ( args.size() == 1 )
-			player.gmNote("GM", command(), args[0], NULL);
+			player.gmNote("GM", command(), args[0], nullptr);
 		else
 			player.gmNote("GM", command(), args[0], args[1]);
 
 		// However if we have grabbed someone else, we should cancel that grab
 		if ( player.inGrab() )
 		{
-			player.message(LSTR_NOTE, LSTR_GRABBED_RELEASING, NULL, NULL);
+			player.message(LSTR_NOTE, LSTR_GRABBED_RELEASING, nullptr, nullptr);
 			chatReleaseGrab(player);
 		}
 
@@ -876,7 +876,7 @@ public:
 		player.grab(target);
 
 		// Tell me that we were successful
-		player.message(LSTR_NOTE, LSTR_HAVE_GRABBED, target->callsign(), NULL);
+		player.message(LSTR_NOTE, LSTR_HAVE_GRABBED, target->callsign(), nullptr);
 
 		// Now let the subject know what is happening to him
 		const char* grabber = player.callsign();
@@ -889,7 +889,7 @@ public:
 		if ( args.size() > 1 )
 			target->message(LSTR_WARNING, LSTR_BEEN_GRABBED_MSG, grabber, args[1]);
 		else
-			target->message(LSTR_WARNING, LSTR_BEEN_GRABBED, grabber, NULL);
+			target->message(LSTR_WARNING, LSTR_BEEN_GRABBED, grabber, nullptr);
 	}
 } dotGrab;
 
@@ -912,7 +912,7 @@ public:
 		if ( vectorize(arguments, args, 2) >= 2 )
 			reason = args[1];
 		else
-			reason = NULL;
+			reason = nullptr;
 
 		const char* reasonText;
 		reasonText = (reason) ? reason : "Reason not given";
@@ -922,7 +922,7 @@ public:
 
 		// Determine if the specified user is online
 		Player* target = PlayerInterface::Lookup(args[0]);
-		if ( target == NULL )
+		if ( target == nullptr )
 		{
 			chatForceKickPlayer(chatGetHandle(args[0]), reasonText, player.playerID(), player.matchHandle());
 			return;
@@ -933,14 +933,14 @@ public:
 		// If the victim is afk, it'd be fun to know
 		target->notifyOtherIfAFK(player);
 
-		if ( reason == NULL )
+		if ( reason == nullptr )
 		{
-			target->message(LSTR_WARNING, LSTR_BEEN_KICKED, NULL, NULL);
-			player.message(LSTR_WARNING, LSTR_HAVE_KICKED, args[0], NULL);
+			target->message(LSTR_WARNING, LSTR_BEEN_KICKED, nullptr, nullptr);
+			player.message(LSTR_WARNING, LSTR_HAVE_KICKED, args[0], nullptr);
 		}
 		else
 		{
-			target->message(LSTR_WARNING, LSTR_BEEN_KICKED_MSG, reason, NULL);
+			target->message(LSTR_WARNING, LSTR_BEEN_KICKED_MSG, reason, nullptr);
 			player.message(LSTR_WARNING, LSTR_HAVE_KICKED_MSG, args[0], reason);
 		}
 
@@ -967,7 +967,7 @@ public:
 
 	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
 	{
-		player.gmNote("GM", command(), arguments, NULL);
+		player.gmNote("GM", command(), arguments, nullptr);
 
 		PLAYER_INDEX::iterator it, cur;
 		for ( it = playerIndex.begin(); it != playerIndex.end(); )
@@ -981,7 +981,7 @@ public:
 				target->message(LSTR_WARNING, LSTR_LABELLED_GENERIC, player.callsign(), arguments);
 			else
 			{
-				target->message(LSTR_WARNING, LSTR_GENERIC, arguments, NULL);
+				target->message(LSTR_WARNING, LSTR_GENERIC, arguments, nullptr);
 				_smite(target);
 			}
 		}
@@ -1003,7 +1003,7 @@ public:
 
 	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
 	{
-		player.gmNote("GM", command(), arguments, NULL);
+		player.gmNote("GM", command(), arguments, nullptr);
 		chatDispatchGMMessage("INFO", chatMakeTempString("%s forcing all players to despawn: %s", player.callsign(), arguments));
 
 		UINT32 affected = 0;
@@ -1095,7 +1095,7 @@ protected:
 	virtual void Success() OVERRIDE_FN
 	{
 		Player* const player = PlayerInterface::Lookup(m_matchID);
-		if ( player == NULL )
+		if ( player == nullptr )
 			return;
 
 		const size_t numRows = m_results.size();
@@ -1115,7 +1115,7 @@ protected:
 	virtual void Failure() OVERRIDE_FN
 	{
 		Player* player = PlayerInterface::Lookup(m_matchID);
-		if ( player == NULL )
+		if ( player == nullptr )
 			return;
 
 		player->message(LSTR_CAUTION, LSTR_DB_QUERY_FAILED, "lastcap", "Database Error");
@@ -1135,16 +1135,16 @@ public:
 		const char* clause = "";
 
 		Property* property = chatFindProperty(player.uiTarget());
-		if ( property != NULL )
+		if ( property != nullptr )
 		{
 			if ( property->IsCP() )
 				clause = chatMakeTempString("WHERE cp_oid = %u", property->OID());
 			else if ( property->IsFacility() )
 				clause = chatMakeTempString("WHERE facility_oid = %u", property->OID());
-			player.gmNote("GM", command(), property->Name(), NULL);
+			player.gmNote("GM", command(), property->Name(), nullptr);
 		}
 		else
-			player.gmNote("GM", command(), "global", NULL);
+			player.gmNote("GM", command(), "global", nullptr);
 
 		(new LastCapQuery(player.matchHandle(), clause))->Queue();
 	}
@@ -1155,7 +1155,7 @@ public:
 
 		if ( strncasecmp(arguments, "glob", 4) == 0 || strcasecmp(arguments, "all") == 0 )
 		{
-			player.gmNote("GM", command(), "global", NULL);
+			player.gmNote("GM", command(), "global", nullptr);
 			(new LastCapQuery(player.matchHandle(), clause))->Queue();
 			return;
 		}
@@ -1163,12 +1163,12 @@ public:
 		UINT32 i = isSideName(arguments);
 		if ( i == ALLIED )
 		{
-			player.gmNote("GM", command(), "allied", NULL);
+			player.gmNote("GM", command(), "allied", nullptr);
 			clause = "AND ctry IN (1,2,3,7,8)";
 		}
 		else if ( i == AXIS )
 		{
-			player.gmNote("GM", command(), "axis", NULL);
+			player.gmNote("GM", command(), "axis", nullptr);
 			clause = "AND ctry IN (4,5,6)";
 		}
 		else
@@ -1176,13 +1176,13 @@ public:
 			i = isCountry(arguments);
 			if ( i > WWII_NO_COUNTRY )
 			{
-				player.gmNote("GM", command(), _countryName[i], NULL);
+				player.gmNote("GM", command(), _countryName[i], nullptr);
 				clause = chatMakeTempString("AND ctry = %u", i);
 			}
 			else
 			{
 				Chat::Name callsign(chatGetHandle(arguments));
-				player.gmNote("GM", command(), callsign.c_str(), NULL);
+				player.gmNote("GM", command(), callsign.c_str(), nullptr);
 				clause = chatMakeTempString("AND call = '%s'", callsign.c_str());
 			}
 		}
@@ -1243,7 +1243,7 @@ public:
 	virtual void Success() OVERRIDE_FN
 	{
 		Player* const player = PlayerInterface::Lookup(m_requesterID);
-		if ( player == NULL )
+		if ( player == nullptr )
 			return;
 
 		const size_t numRows = m_results.size();
@@ -1264,7 +1264,7 @@ public:
 	virtual void Failure() OVERRIDE_FN
 	{
 		Player* player = PlayerInterface::Lookup(m_requesterID);
-		if ( player != NULL )
+		if ( player != nullptr )
 			player->message(LSTR_CAUTION, LSTR_DB_QUERY_FAILED, "lastdeath", "Database Error");
 	}
 };
@@ -1286,7 +1286,7 @@ public:
 			return;
 		}
 
-		player.gmNote("GM", command(), arguments, NULL);
+		player.gmNote("GM", command(), arguments, nullptr);
 
 		if ( !player.isPlaynet() && handle == player.matchHandle() )
 		{
@@ -1350,7 +1350,7 @@ public:
 	virtual void Success() OVERRIDE_FN
 	{
 		Player* const player = PlayerInterface::Lookup(m_requesterID);
-		if ( player == NULL )
+		if ( player == nullptr )
 			return;
 
 		const size_t numRows = m_results.size();
@@ -1371,7 +1371,7 @@ public:
 	virtual void Failure() OVERRIDE_FN
 	{
 		Player* const player = PlayerInterface::Lookup(m_requesterID);
-		if ( player != NULL )
+		if ( player != nullptr )
 			player->message(LSTR_CAUTION, LSTR_DB_QUERY_FAILED, "lastkills", "Database Error");
 	}
 };
@@ -1393,7 +1393,7 @@ public:
 			return;
 		}
 
-		player.gmNote("GM", command(), arguments, NULL);
+		player.gmNote("GM", command(), arguments, nullptr);
 		if ( !player.isPlaynet() && handle == player.matchHandle() )
 		{
 			player.message(LSTR_CAUTION, LSTR_GENERIC, "Due to overuse, we have disabled self-queries.");
@@ -1483,7 +1483,7 @@ public:
 		}
 
 		SquadList* list = chatFindSquadListByName(argv[0]);
-		if ( list == NULL )
+		if ( list == nullptr )
 		{
 			if ( chatCheckForSquadName(argv[0]) )
 			{
@@ -1598,7 +1598,7 @@ public:
 
 		ChatHandle handle = chatGetLowercaseHandle(argv[0]);
 		Player* subject = PlayerInterface::Lookup(handle);
-		if ( subject == NULL )
+		if ( subject == nullptr )
 		{
 			player.message(LSTR_CAUTION, LSTR_USER_UNAVAILABLE, argv[0]);
 			return;
@@ -1616,7 +1616,7 @@ public:
 		}
 
 		SquadList* list = chatFindSquadList(subject->squadID());
-		if ( list == NULL || list->online() == 0 )
+		if ( list == nullptr || list->online() == 0 )
 		{
 			player.message(LSTR_CAUTION, LSTR_SQUAD_NOT_ONLINE, Chat::Name(subject->squadHandle()).c_str());
 			return;
@@ -1685,12 +1685,12 @@ protected:
 			p += sprintf(p, " %s:%s.", chatGetSquadRankName(details.squadRank), details.squadCallsign);
 
 		p += sprintf(p, " Not Online.");
-		if ( details.lastLogin == NULL || *details.lastLogin == 0 )
+		if ( details.lastLogin == nullptr || *details.lastLogin == 0 )
 			p += sprintf(p, " No logins recorded.");
 		else
 			p += sprintf(p, " Last Login: %s", details.lastLogin);
 
-		if ( details.lockSide == 3 && details.lockTime > (UINT32)teulTime() && details.lockTimePretty != NULL && *details.lockTimePretty )
+		if ( details.lockSide == 3 && details.lockTime > (UINT32)teulTime() && details.lockTimePretty != nullptr && *details.lockTimePretty )
 		{
 			if ( details.lockTime > teulTime() + (7 * DAY_S) )
 				p += sprintf(p, " BANNED UNTIL %s.", details.lockTimePretty);
@@ -1709,7 +1709,7 @@ protected:
 	virtual void Success() OVERRIDE_FN
 	{
 		Player* player = PlayerInterface::Lookup(m_matchID);
-		if ( player == NULL )
+		if ( player == nullptr )
 			return;
 
 		if (m_name.Empty() || (m_response[0] == 0))
@@ -1725,7 +1725,7 @@ protected:
 	virtual void Failure() OVERRIDE_FN
 	{
 		Player* player = PlayerInterface::Lookup(m_matchID);
-		if ( player == NULL ) return;
+		if ( player == nullptr ) return;
 		player->message(LSTR_CAUTION, LSTR_DB_QUERY_FAILED, "pinfo", "Database Error");
 	}
 };
@@ -1845,7 +1845,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 	if ( squadID() )
 	{
 		const char* squadName = chatGetSquadCallsign(squadID());
-		if ( squadName != NULL && squadRank() > 0 )
+		if ( squadName != nullptr && squadRank() > 0 )
 		{
 			strprintf(buf
 							, "%s:%s"
@@ -1894,7 +1894,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 	{
 		RANK_NO erank = effectiveRank();
 		const Rank* myRank = Rank::lookup(erank);
-		if ( myRank != NULL )
+		if ( myRank != nullptr )
 			strprintf(buf
 						, "R#%u(%s/%s)"
 							, erank
@@ -1968,7 +1968,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 
 	whereabouts(response, x, y);
 
-	player.message(LSTR_NONE, LSTR_GENERIC, response, NULL);
+	player.message(LSTR_NONE, LSTR_GENERIC, response, nullptr);
 
 	return;
 }
@@ -2017,9 +2017,9 @@ public:
 
 		// Locate the user
 		Player* subject = PlayerInterface::Lookup(args[0]);
-		if ( subject == NULL )
+		if ( subject == nullptr )
 		{
-			player.message(LSTR_CAUTION, LSTR_USER_UNAVAILABLE, args[0], NULL);
+			player.message(LSTR_CAUTION, LSTR_USER_UNAVAILABLE, args[0], nullptr);
 			return;
 		}
 
@@ -2043,14 +2043,14 @@ public:
 
 	virtual void action(Player& player, Chat::ClientMessage* message) const OVERRIDE_FN
 	{
-		actionWith(player, message, NULL);
+		actionWith(player, message, nullptr);
 	}
 
 	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, SCHAR* arguments) const OVERRIDE_FN
 	{
 		UINT32 axis = 0, allied = 0;
 		char _roster[100+1];		// Place to store rosters we generate
-		if ( arguments == NULL || strcmp(arguments, "all") == 0 )
+		if ( arguments == nullptr || strcmp(arguments, "all") == 0 )
 		{
 			axis = _sideCount[AXIS];
 			allied = _sideCount[ALLIED];
@@ -2068,7 +2068,7 @@ public:
 		}
 
 		strprintf(_roster, "Axis: %d. Allied: %d.", axis, allied);
-		player.message(LSTR_NONE, LSTR_GENERIC, _roster, NULL);
+		player.message(LSTR_NONE, LSTR_GENERIC, _roster, nullptr);
 	}
 
 } dotRoster;
@@ -2087,7 +2087,7 @@ public:
 								) { }
 	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
 	{
-		player.gmNote("GM", command(), arguments, NULL);
+		player.gmNote("GM", command(), arguments, nullptr);
 
 		// Set a new motd
 		chatSetUnitMotd(SYSTEM_MOTD_UNIT, arguments);
@@ -2127,9 +2127,9 @@ public:
 		RANK_NO rankNo = atoi(arguments);
 		const Rank* rank = Rank::lookup(rankNo);
 		if ( !player.isPlaynet() && rank && rank->type() == Rank::STAFF )
-			rank = NULL;
+			rank = nullptr;
 
-		if ( rank == NULL )
+		if ( rank == nullptr )
 		{
 			char max[11];
 			strprintf(max, "%u", Rank::max());
@@ -2207,7 +2207,7 @@ public:
 		if ( strcmp(argv[0], "stop") == 0 )
 		{
 			chatSetShutdownTime(0, player.callsign());
-			player.gmNote("SYS", "shutdown", "stopped", NULL);
+			player.gmNote("SYS", "shutdown", "stopped", nullptr);
 			return;
 		}
 
@@ -2264,7 +2264,7 @@ public:
 
 		player.message(LSTR_NOTE, LSTR_SHUTDOWN_SCHEDULED, intervalText);
 
-		player.gmNote("SYS", "shutdown", intervalText, (argv.size() > 2) ? argv[2] : NULL);
+		player.gmNote("SYS", "shutdown", intervalText, (argv.size() > 2) ? argv[2] : nullptr);
 		chatSystemMessage(LSTR_SHUTDOWN_ANNOUNCEMENT, intervalText, argv[2]);
 
 		chatSetUnitMotd(SYSTEM_MOTD_UNIT, argv[2]);
@@ -2311,8 +2311,8 @@ public:
 			{
 				///LOCALIZE
 				chatDispatchGMMessage("INFO", chatMakeTempString("%s is no-longer snooping on %s", player.callsign(), target->callsign()));
-				player.m_snoopOn = NULL;
-				target->m_snoopBy = NULL;
+				player.m_snoopOn = nullptr;
+				target->m_snoopBy = nullptr;
 			}
 
 			return;
@@ -2334,7 +2334,7 @@ public:
 			throw Chat::LStringErr("Please give a reason for your snoop.");
 
 		target = PlayerInterface::Lookup(argv[0]);
-		if ( target == NULL )
+		if ( target == nullptr )
 			throw Chat::LStringErr(LSTR_USER_UNAVAILABLE, argv[0]);
 		if ( target->matchHandle() == player.matchHandle() )
 			throw Chat::LStringErr(LSTR_CANT_VERB_SELF, command());
@@ -2392,8 +2392,8 @@ public:
 			else
 			{
 				chatDispatchCRSMessage("INFO", chatMakeTempString("%s is no-longer crssnooping on %s", player.callsign(), target->callsign()));
-				player.m_crsSnoopOn = NULL;
-				target->m_crsSnoopBy = NULL;
+				player.m_crsSnoopOn = nullptr;
+				target->m_crsSnoopBy = nullptr;
 			}
 
 			return;
@@ -2414,7 +2414,7 @@ public:
 		}
 
 		target = PlayerInterface::Lookup(argv[0]);
-		if ( target == NULL )
+		if ( target == nullptr )
 		{
 			player.message(LSTR_CAUTION, LSTR_USER_UNAVAILABLE, argv[0]);
 			return;
@@ -2426,7 +2426,7 @@ public:
 		}
 
 		// time to let people know about this attempt
-		player.gmNote("CRS", command(), arguments, NULL);
+		player.gmNote("CRS", command(), arguments, nullptr);
 
 		///LOCALIZE
 		chatDispatchCRSMessage("INFO", chatMakeTempString("%s crsSnooping on %s", player.callsign(), target->callsign()));
@@ -2472,7 +2472,7 @@ public:
 			throw Chat::LStringErr(LSTR_ONLY_WHILE_SPAWNED);
 
 		Player* target = PlayerInterface::Lookup(args[0]);
-		if ( target == NULL )
+		if ( target == nullptr )
 			throw Chat::LStringErr(LSTR_USER_UNAVAILABLE, args[0]);
 
 		if ( target->matchHandle() == player.matchHandle() )
@@ -2512,7 +2512,7 @@ public:
 							) { }
 	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
 	{
-		player.gmNote("GM", command(), arguments, NULL);
+		player.gmNote("GM", command(), arguments, nullptr);
 		chatSystemMessage(LSTR_GENERIC, arguments);
 	}
 } dotSys;
@@ -2540,7 +2540,7 @@ public:
 
 		if ( !player.grabbing() )
 		{
-			player.message(LSTR_SYSTEM, LSTR_NOBODY_GRABBED, NULL, NULL);
+			player.message(LSTR_SYSTEM, LSTR_NOBODY_GRABBED, nullptr, nullptr);
 			return;
 		}
 
@@ -2593,7 +2593,7 @@ public:
 	virtual void Success() OVERRIDE_FN
 	{
 		Player* const player = PlayerInterface::Lookup(m_byPlayerID);
-		if ( player == NULL )
+		if ( player == nullptr )
 			return;
 
 		///LOCALIZE
@@ -2603,7 +2603,7 @@ public:
 	virtual void Failure() OVERRIDE_FN
 	{
 		Player* const player = PlayerInterface::Lookup(m_byPlayerID);
-		if ( player != NULL )
+		if ( player != nullptr )
 			player->message(LSTR_CAUTION, LSTR_DB_QUERY_FAILED, "pnote", m_err.c_str());
 	}
 };
@@ -2647,7 +2647,7 @@ protected:
 			DBRow& row = Query()->Row();
 
 			const char* const desc = row[0];
-			if ( desc == NULL || *desc == 0 )
+			if ( desc == nullptr || *desc == 0 )
 				continue;
 
 			const char* const at = row[1];
@@ -2662,7 +2662,7 @@ protected:
 			line += desc;
 			line += ':';
 			line += at;
-			if ( end != NULL && *end )
+			if ( end != nullptr && *end )
 			{
 				line += "->";
 				line += end;
@@ -2683,7 +2683,7 @@ public:
 	virtual void Success() OVERRIDE_FN
 	{
 		Player* player = PlayerInterface::Lookup(m_byPlayerID);
-		if ( player == NULL )
+		if ( player == nullptr )
 			return;
 
 		const size_t numRows = m_results.size();
@@ -2702,7 +2702,7 @@ public:
 	virtual void Failure() OVERRIDE_FN
 	{
 		Player* player = PlayerInterface::Lookup(m_byPlayerID);
-		if ( player != NULL )
+		if ( player != nullptr )
 			player->message(LSTR_NOTE, LSTR_INVALID_CALLSIGN, Chat::Name(m_handle).c_str());
 
 	}
@@ -2773,9 +2773,9 @@ public:
 		}
 
 		Player* target = PlayerInterface::Lookup(args[0]);
-		if ( target == NULL )
+		if ( target == nullptr )
 		{
-			player.message(LSTR_CAUTION, LSTR_USER_UNAVAILABLE, args[0], NULL);
+			player.message(LSTR_CAUTION, LSTR_USER_UNAVAILABLE, args[0], nullptr);
 			return;
 		}
 
@@ -2786,9 +2786,9 @@ public:
 
 		target->notifyOtherIfAFK(player);
 
-		player.message(LSTR_WARNING, LSTR_GENERIC, args[1], NULL);
+		player.message(LSTR_WARNING, LSTR_GENERIC, args[1], nullptr);
 		if ( target->matchHandle() != player.matchHandle() )
-			target->message(LSTR_WARNING, LSTR_GENERIC, args[1], NULL);
+			target->message(LSTR_WARNING, LSTR_GENERIC, args[1], nullptr);
 
 		// Add the relevant note
 		std::string note = args[1];
@@ -2814,7 +2814,7 @@ public:
 								) { }
 	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
 	{
-		player.gmNote("GM", command(), arguments, NULL);
+		player.gmNote("GM", command(), arguments, nullptr);
 
 		chatWarnAll(LSTR_WARN_ALL_PLAYERS, arguments);
 	}

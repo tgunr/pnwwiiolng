@@ -123,7 +123,7 @@ public:
 
 	bool fillMissionPacket(class Mission*);
 
-	bool hasActiveMission() const { return (activeMission() != NULL); }
+	bool hasActiveMission() const { return (activeMission() != nullptr); }
 
 	bool hasAvailableVehicle() const;
 	bool hasCompletedSpam() const { return (m_loginState == 255); }
@@ -213,7 +213,7 @@ public:
 
 	// Clear out the mission fields (not the missionPacket)
 	// NOTE: Does not remove the player* from* the mission
-	void unsetMission() { m_mission = NULL; m_permissionMask &= ~MISSION_LEADER; }
+	void unsetMission() { m_mission = nullptr; m_permissionMask &= ~MISSION_LEADER; }
 
 	// Notify chat of a persona status/whereabouts change
 	void updateChat();

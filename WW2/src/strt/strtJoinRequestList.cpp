@@ -26,7 +26,7 @@ static JOIN_MAP joinMap;
 void
 JOIN_LIST::clear(UINT32 exceptPlayerID, bool announce)
 {
-	WeapJoinRequestNode* exceptedNode = NULL;
+	WeapJoinRequestNode* exceptedNode = nullptr;
 	while ( m_list.empty() == false )
 	{
 		WeapJoinRequestNode* node = m_list.front();
@@ -60,15 +60,15 @@ WeapJoinRequestNode*
 WeapJoinRequestNode::Lookup(UINT32 playerID)
 {
 	JOIN_MAP::iterator it = joinMap.find(playerID);
-	return ( it != joinMap.end() ) ? it->second : NULL;
+	return ( it != joinMap.end() ) ? it->second : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Ctor for WeapJoinRequestNode
 
 WeapJoinRequestNode::WeapJoinRequestNode(UINT32 playerID, const ChatHandle& handle, UINT32 missionID)
-	: prev(NULL), next(NULL)
-	, m_joinList(NULL)
+	: prev(nullptr), next(nullptr)
+	, m_joinList(nullptr)
 	, m_playerID(playerID)
 	, m_missionID(missionID)
 	, m_capacityTeulIndex(-1)
@@ -92,7 +92,7 @@ WeapJoinRequestNode::WeapJoinRequestNode(UINT32 playerID, const ChatHandle& hand
 
 WeapJoinRequestNode::~WeapJoinRequestNode()
 {
-	if ( m_joinList != NULL )
+	if ( m_joinList != nullptr )
 	{
 		dbugLog(_FLD, "p:%u removing node %p from list %p on dtor"
 						, m_playerID, this, this->m_joinList
@@ -117,7 +117,7 @@ WeapJoinRequestNode::~WeapJoinRequestNode()
 void
 WeapJoinRequestNode::_register()
 {
-	if ( WeapJoinRequestNode::Lookup(m_playerID) != NULL )
+	if ( WeapJoinRequestNode::Lookup(m_playerID) != nullptr )
 	{
 		LogAbort("p:%u c:%s attempted to allocate additional WeapJoinRequestNode", m_playerID, Chat::Name(m_handle).c_str());
 	}
@@ -156,13 +156,13 @@ WeapJoinRequestNode::_unregister()
 bool
 WeapJoinRequestNode::AddToList(JOIN_LIST* dest)
 {
-	if ( dest == NULL )
+	if ( dest == nullptr )
 	{
 		LogAbort("p:%u c:%s ptr:%p attempted to add JRN to NULL list", m_playerID, Chat::Name(m_handle).c_str(), this);
 	}
 
 	// if the node is currently on a list...
-	if ( m_joinList != NULL )
+	if ( m_joinList != nullptr )
 	{
 		// Already on the dest list...
 		if ( m_joinList == dest )
@@ -187,7 +187,7 @@ WeapJoinRequestNode::AddToList(JOIN_LIST* dest)
 void
 JOIN_LIST::Add(WeapJoinRequestNode* node)
 {
-	assert( node != NULL );
+	assert( node != nullptr );
 
 	try
 	{
@@ -196,7 +196,7 @@ JOIN_LIST::Add(WeapJoinRequestNode* node)
 		if ( WeapJoinRequestNode::Lookup(node->m_playerID) != node ) throw "orphaned node";
 #endif
 		if ( node->m_joinList == this ) throw "unnecessary attempt to re-add node";
-		if ( node->m_joinList != NULL ) throw "node is already on another list";
+		if ( node->m_joinList != nullptr ) throw "node is already on another list";
 		for ( UINT32 i = 0; i < m_list.size(); ++i )
 		{
 			if ( m_list[i] == node || m_list[i]->m_playerID == node->m_playerID )
@@ -220,12 +220,12 @@ JOIN_LIST::Add(WeapJoinRequestNode* node)
 void
 JOIN_LIST::Extract(WeapJoinRequestNode* node)
 {
-	assert( node != NULL );
+	assert( node != nullptr );
 
 	try
 	{
 		if ( node->m_playerID == 0 ) throw "Node has playerID 0";
-		if ( node->m_joinList == NULL ) throw "NULL joinList";
+		if ( node->m_joinList == nullptr ) throw "NULL joinList";
 		if ( node->m_joinList != this ) throw "Node not on this list";
 		if ( m_list.empty() ) throw "list is empty";
 
@@ -238,7 +238,7 @@ JOIN_LIST::Extract(WeapJoinRequestNode* node)
 				continue;
 			}
 
-			node->m_joinList = NULL;
+			node->m_joinList = nullptr;
 
 			// Swap the last node in to this slot.
 			m_list[i] = m_list.back();

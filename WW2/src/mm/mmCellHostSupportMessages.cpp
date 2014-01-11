@@ -16,7 +16,7 @@ TEUL_CALLBACK*	Host::VehicleRequest::s_callback;
 
 namespace Scoring
 {
-	TEUL_CALLBACK* xchgEventCallback = NULL;
+	TEUL_CALLBACK* xchgEventCallback = nullptr;
 }
 
 SINT32

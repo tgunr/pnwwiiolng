@@ -105,7 +105,7 @@ wwiiPlayer::operator new(size_t actualSize)
 
 	Pool& pool = pools[poolNo];
 
-	StorageHeader* ptr = NULL;
+	StorageHeader* ptr = nullptr;
 
 	// We'll need a lock.
 	auto* lock = new std::lock_guard<std::mutex>(allocMutex);
@@ -119,7 +119,7 @@ wwiiPlayer::operator new(size_t actualSize)
 		// calloc: so that we have pre-zero'd memory.
 		void* block = memCalloc(_CALLOC_RATE, allocSize);
 		_callocs++;
-		if ( block == NULL )
+		if ( block == nullptr )
 		{
 			delete lock;
 			throw std::bad_alloc();
@@ -147,7 +147,7 @@ wwiiPlayer::operator new(size_t actualSize)
 
 	delete lock;
 
-	assert( ptr != NULL );
+	assert( ptr != nullptr );
 
 	if ( *ptr != 0 )
 	{
@@ -227,7 +227,7 @@ wwiiPlayer::logStats()
 wwiiPlayer&
 wwiiPlayer::operator=(const wwiiPlayer* const rhs)
 {
-	m_hostInstance = NULL;
+	m_hostInstance = nullptr;
 	m_instance = Instance::g_invalid;
 
 	m_teulIndex = -EINVAL;

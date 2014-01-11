@@ -36,14 +36,14 @@ TOE_::TemplateHeader*
 TOE_::TemplateHeader::Lookup(const char* id)
 {
 	TOE_TEMPLATES::iterator it = toeTemplates.find(chatGetHandle(id));
-	return (it != toeTemplates.end()) ? &it->second : NULL;
+	return (it != toeTemplates.end()) ? &it->second : nullptr;
 }
 
 TOE_::TemplateHeader*
 TOE_::TemplateHeader::Lookup(const ChatHandle& handle)
 {
 	TOE_TEMPLATES::iterator it = toeTemplates.find(handle);
-	return (it != toeTemplates.end()) ? &it->second : NULL;
+	return (it != toeTemplates.end()) ? &it->second : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -70,7 +70,7 @@ TOE_::TemplateHeader::initialize(const ChatHandle& withHandle, const char* withN
 void
 TOE_::TemplateHeader::setName(const char* newName)
 {
-	assert( newName != NULL );
+	assert( newName != nullptr );
 	if ( name().compare(newName) == 0 )
 		return;
 
@@ -94,7 +94,7 @@ TOE_::TemplateHeader::updateWeapon(const WEAPON_SPEC& spec, UINT16 capacity, UCH
 	{
 		Chat::Name toeName(handle());
 		const WEAPON* weapon = weapLookup(spec);
-		if ( weapon == NULL )
+		if ( weapon == nullptr )
 			LogAbort("toe:%s(%llu) wanted unknown weapon spec %s"
 							, toeName.c_str(), handle(), weapPrintSpecC(&spec));
 
@@ -132,14 +132,14 @@ TOE_::TemplateHeader::updateWeapon(const WEAPON_SPEC& spec, UINT16 capacity, UCH
 		for ( auto sit = m_subscribers.begin(), end = m_subscribers.end(); sit != end; ++sit )
 		{
 			StratHCUnit* unit = *sit;
-			assert( unit != NULL );
+			assert( unit != nullptr );
 			if ( newWeapon )
 				unit->addTOEInstance(weaponTemplate);
 			if ( (*sit)->offMap() || (*sit)->homeCP()->isSupplied() == false )
 				continue;
 			// Inject this many vehicles into the unit's spawn list,
 			// false = don't allow overstocking.
-			(*sit)->depositWeapons(spec, increase, false, NULL);
+			(*sit)->depositWeapons(spec, increase, false, nullptr);
 		}
 	}
 }
@@ -150,7 +150,7 @@ TOE_::TemplateHeader::updateWeapon(const WEAPON_SPEC& spec, UINT16 capacity, UCH
 void
 TOE_::TemplateHeader::subscribe(StratHCUnit* unit, TOE& toe)
 {
-	assert( unit != NULL );
+	assert( unit != nullptr );
 	assert( m_subscribers.find(unit) == m_subscribers.end() );
 	assert( toe.empty() );
 
@@ -248,7 +248,7 @@ TOE_::WeaponInstance::throttleCapacity() const
 void
 strtLoadTOEWeaponTemplateHeader(const char* id, const char* name, UINT32 country, UINT32 branch)
 {
-	assert( id != NULL );
+	assert( id != nullptr );
 
 	ChatHandle handle = chatGetHandle(id);
 	if ( handle == 0LL )
@@ -270,7 +270,7 @@ strtLoadTOEWeaponTemplateHeader(const char* id, const char* name, UINT32 country
 void
 strtLoadTOEWeaponInstance(const char* id, const WEAPON_SPEC& spec, UINT16 capacity, UCHAR access, UINT16 resupplyTime_m)
 {
-	assert( id != NULL );
+	assert( id != nullptr );
 
 	ChatHandle handle = chatGetHandle(id);
 	if ( handle == 0LL )

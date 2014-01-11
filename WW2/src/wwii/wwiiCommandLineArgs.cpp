@@ -51,7 +51,7 @@ _usage(const char* info)
 		printf(" [%s]", (*it).GetDescription().c_str());
 	}
 	printf("\n");
-	exit((info == NULL) ? 0 : -1);
+	exit((info == nullptr) ? 0 : -1);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -80,8 +80,8 @@ static Argument* _getArgument(char a)
 			return &(*it);
 	}
 	if ( a == '?' || a == 'h' )
-		_usage(NULL);
-	return NULL;
+		_usage(nullptr);
+	return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -92,14 +92,14 @@ static Argument* _getArgument(const char* const a)
 	const char* const option = a + 2;		// Skip the '--'.
 	for ( auto it = arguments.begin(); it != arguments.end(); ++it )
 	{
-		if ( (*it).option == NULL )
+		if ( (*it).option == nullptr )
 			continue;
 		if ( strcmp((*it).option, option) == 0 )
 			return &(*it);
 	}
 	if ( strcmp(a, "help") == 0 )
-		_usage(NULL);
-	return NULL;
+		_usage(nullptr);
+	return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -147,7 +147,7 @@ Argument::Add(char flag, const char* const name, const char* const valueName, vo
 void
 Argument::Add(const char* const valueName, void (*handler)(const char*))
 {
-	Argument addition = { 0, NULL, valueName, handler };
+	Argument addition = { 0, nullptr, valueName, handler };
 	arguments.push_back(addition);
 }
 
@@ -172,15 +172,15 @@ Argument::ProcessCommandLine(size_t argc, char* const argv[])
 		if ( argv[i][1] == '-' )
 		{
 			char* value = strchr(argv[i], '=');
-			if ( value != NULL )
+			if ( value != nullptr )
 				*(value++) = 0;
 			Argument* arg = _getArgument(argv[i]);
-			if ( arg == NULL )
+			if ( arg == nullptr )
 				_unknownArgument(argv[i]);
 
 			if ( arg->valueName )
 			{
-				if ( value == NULL )
+				if ( value == nullptr )
 				{
 					if ( (i + 1) >= argc )
 						_missingValue(arg);
@@ -201,7 +201,7 @@ Argument::ProcessCommandLine(size_t argc, char* const argv[])
 			for ( size_t a = 1; argv[switchList][a] != 0; ++a )
 			{
 				Argument* arg = _getArgument(argv[switchList][a]);
-				if ( arg == NULL )
+				if ( arg == nullptr )
 					_unknownArgument(argv[switchList][a]);
 				if ( arg->valueName )
 				{
@@ -210,7 +210,7 @@ Argument::ProcessCommandLine(size_t argc, char* const argv[])
 					arg->handler(argv[i]);
 				}
 				else
-					arg->handler(NULL);
+					arg->handler(nullptr);
 			}
 		}
 	}

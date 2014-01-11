@@ -55,7 +55,7 @@ _recvEvent(ACTION_OBJECT* const a)
 					);
 
 	Player* const lhsPlayer = PlayerInterface::Lookup(lhs.playerID());
-	if ( lhsPlayer == NULL )
+	if ( lhsPlayer == nullptr )
 	{
 		dbugLog(_FLM, "p:%u c:%s v:%u in:%llu Player not online for scoring event"
 					, lhs.playerID()
@@ -130,7 +130,7 @@ bool Scoring::Capture::process(Player* const lhsPlayer)
 	dbugLog(_FLIB, " capture");	///TODO:134:REMOVE
 
 	Scoring::Sortie* const sortie = FindSortieForPlayer(lhsPlayer, lhs().sortieID());
-	if ( sortie == NULL )
+	if ( sortie == nullptr )
 		return true;
 
 	///TODO:SCORING+: We need to move the fancy stuff to Scoring::Sortie rather than
@@ -155,7 +155,7 @@ bool Scoring::Despawn::process(Player* const lhsPlayer)
 	dbugLog(_FLIB, " despawn, ec:%u rtb:%u", exitCode(), rtbCode);
 
 	Scoring::Sortie* const sortie = FindSortieForPlayer(lhsPlayer, lhs().sortieID());
-	if ( sortie == NULL )
+	if ( sortie == nullptr )
 	{
 		dbugLog(_FLIB, " no sortie"); ///TODO:134:REMOVE
 		return true;
@@ -199,7 +199,7 @@ bool Scoring::Guard::process(Player* const lhsPlayer)
 		return true;
 
 	Scoring::Sortie* const sortie = FindSortieForPlayer(lhsPlayer, lhs().sortieID());
-	if ( sortie == NULL )
+	if ( sortie == nullptr )
 		return true;
 
 	const UINT32 guardPoints = seconds() / pointsPer_s;
@@ -222,16 +222,16 @@ bool Scoring::Hit::process(Player* const lhsPlayer)
 	dbugLog(_FLIB, " hit"); ///TODO:134:REMOVE
 
 	Scoring::Sortie* const sortie = FindSortieForPlayer(lhsPlayer, lhs().sortieID());
-	if ( sortie == NULL )
+	if ( sortie == nullptr )
 		return true;
 
 	Player* const rhsPlayer = PlayerInterface::Lookup(rhs().playerID());
-	if ( rhsPlayer != NULL )
+	if ( rhsPlayer != nullptr )
 	{
 		++rhsPlayer->missionPacket().scoring().hits;
 
 		Scoring::Sortie* const shooterSortie = FindSortieForPlayer(rhsPlayer, rhs().sortieID());
-		if ( shooterSortie != NULL )
+		if ( shooterSortie != nullptr )
 		{
 			shooterSortie->addHitTo(lhs(), joules());
 		}
@@ -254,11 +254,11 @@ bool Scoring::Kill::process(Player* const lhsPlayer)
 
 	Scoring::Sortie* const killerSortie = FindSortieForPlayer(lhsPlayer, lhs().sortieID());
 	Scoring::Sortie* const deadSortie = Sortie::Lookup(rhs().sortieID());
-	if ( killerSortie == NULL )
+	if ( killerSortie == nullptr )
 		dbugLog(_FLA, "p:%u c:%s v:%u unable to find this killer sortie", lhsPlayer->playerID(), lhsPlayer->callsign(), lhs().sortieID());
-	if ( deadSortie == NULL )
+	if ( deadSortie == nullptr )
 		dbugLog(_FLA, "p:%u c:%s v:%u unable to find this victim sortie", rhs().playerID(), Chat::Name(rhs().handle()).c_str(), rhs().sortieID());
-	if ( killerSortie == NULL || deadSortie == NULL )
+	if ( killerSortie == nullptr || deadSortie == nullptr )
 		return false;
 
 	///TODO:SCORING: Process the kill.
