@@ -261,6 +261,9 @@ _openNumClients(UINT32 host, UINT32 port)
 int
 main(int argc, char* argv[])
 {
+	Teul::SetAppName("chatClient");
+	Teul::ConfigVar::InitializeConfigVars();
+
 	SINT32 retval;
 	SCHAR hostAddress[1024], hostPort[1024];
 	UINT32 i;
