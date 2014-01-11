@@ -135,6 +135,7 @@ struct DATA_GRAM
 static const size_t NUM_DATAGRAM_SIZES = 16;
 static const size_t DATAGRAM_ROUNDING = 1024;	// round datagram sizes up to this.
 static std::array<std::stack<DATA_GRAM*>, NUM_DATAGRAM_SIZES> s_freeDatagrams;
+static const size_t LARGEST_POOLED_SIZE = NUM_DATAGRAM_SIZES * DATAGRAM_ROUNDING;
 
 //////////////////////////////////////////////////////////////////////
 // Given a requested data size, work out the best buffer size for it
@@ -148,9 +149,12 @@ static inline size_t _roundDatagramSize(UINT32 size)
 
 static DATA_GRAM* _getNextDatagram(size_t size)
 {
+	assert(size > 0);
+	if (PN_UNLIKELY(size <= 0))
+		return nullptr;
 	size_t allocSize;
-	// For sizes we are going to pool, use regular 1k rounding.
-	if (PN_LIKELY(size <= s_freeDatagrams.size() * DATAGRAM_ROUNDING))
+	// Determine if the packet is in the range of sizes we try to pool.
+	if (PN_LIKELY(size <= LARGEST_POOLED_SIZE))
 	{
 		allocSize = _roundDatagramSize<DATAGRAM_ROUNDING>(size);
 		const size_t bucketNo = (allocSize / DATAGRAM_ROUNDING) - 1;
