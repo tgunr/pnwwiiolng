@@ -22,12 +22,9 @@
 #include "wwii/wwiiRTBCodes.h"
 #include "score/scoreSortie.h"
 
-static const FLOAT32 SCORING_FACTOR = 10.0f;	// multiply scores by this much before adding bonuses
-
 static const FLOAT32 CAPTURE_VALUE = 20.0f;	// points per capture
 static const FLOAT32 AI_VALUE = 2.5f;			// points per ai killed
 static const FLOAT32 RESUP_VALUE = 1.0f;		// Points per resupply
-static const FLOAT32 CAP_KILL_BONUS = 1.0f;	// Bonus for a guard or offense kill
 static const FLOAT32 VEHICLE_SUPPLY_SCORE = 5.0f;	// Resupply points
 static const FLOAT32 UMS_KILL_BONUS = 2.0f;	// 2 points for a UMS kill
 
