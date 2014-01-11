@@ -117,7 +117,7 @@ teulGetAddress(const UINT32 hostOrderIP)
 	const size_t instance = (s_instance++) & (NumInstances - 1);
 
 	const UCHAR* quads = (const UCHAR*)&hostOrderIP;
-	// naive implementation: if they're in host order on a little-endian system (intel), they're backwards.
+	// naive implementation: on a little-endian (intel), the octets are stored in reverse order.
 	strprintf(ntoa[instance], "%u.%u.%u.%u", quads[3], quads[2], quads[1], quads[0]);
 
 	return ntoa[instance];

@@ -101,7 +101,7 @@ _getHostIPAddresses()
 		dbugLog(_FLI, "read index %u interface %s, ip %s pid %u"
 					, ifNo
 					, ifa->ifa_name
-					, teulGetAddress(ntohl(Server::myInterface.addr[ifNo].ip))
+					, teulGetAddress(Server::myInterface.addr[ifNo].ip)
 					, Server::myInterface.pid
 					//, Server::myInterface.id
 					);
