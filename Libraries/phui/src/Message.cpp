@@ -2,7 +2,6 @@
 
 #include <string>
 #include <map>
-#include <stdio.h>
 
 #include "phui/Message.h"
 

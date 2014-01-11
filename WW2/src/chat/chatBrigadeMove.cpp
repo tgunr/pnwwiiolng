@@ -19,7 +19,6 @@
 #include "chat/chatPlayer.h"
 #include "chat/chatList.h"
 #include "wwii/wwiiHCUnits.h"
-#include "chat/chatMakeTempString.h"
 #include "chat/chatTimeInterval.h"
 #include "chat/chatData.h"
 #include "chat/chatDB.h"

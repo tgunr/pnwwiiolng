@@ -135,10 +135,6 @@ static inline float strtof(const char* const src_, const char* const);
 
 #include "sys/sysWinISO.h"
 
-#include <stdlib.h>
-#include <stdarg.h>
-#include <stdio.h>
-
 // Cross-platform path builder.
 template<size_t bufSize>
 size_t pathprintf(char (& buf)[bufSize], const char* lhs, const char* rhs)

@@ -8,11 +8,8 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include <assert.h>
-#include <vector>
 #include <map>
 #include "versionNo.h"
-#include "dbug/dbug.h"
 #include "wwii/wwiiPlayer.h"
 #include "wwii/wwiiExitCodes.h"
 #include "wwii/wwiiPermissions.h"

@@ -15,8 +15,6 @@
 #include "rn/rnlogo.h"
 #endif
 
-#include <ctype.h>
-
 #include "parse/parse.h"
 #include "parse/parseIO.h"
 #include "str/stringLib.h"
@@ -38,8 +36,6 @@ static bool _setIgnore(int numargs, FUNCARGS* args);
 static bool _executeFunc(char* func, FUNCARGS* fargs, SINT32 nargs
 						, SINT32 argOffset, PARSE_CALLBACK* callback, bool* funcFound, UINT32* lineCounter);
 
-#include "dbug/dbug.h"
-
 static PARSE_CALLBACK  _defCallbacks[]={ {"section",		_setSection}
 										,{"default",		_setDefault}
 										,{"ignore",		_setIgnore}
@@ -57,7 +53,6 @@ static SECTION_HEAD* _section;
 static char _fileName[PN_MAX_PATH];
 static ARG_KEY_HEAD _defaultKeys;
 
-#include <string>
 #include <set>
 typedef std::set< std::pair<std::string, std::string> > IGNORE_LIST;
 static IGNORE_LIST _ignoreList;

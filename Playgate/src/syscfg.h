@@ -13,7 +13,7 @@
 //	------------------------------	Public Definitions
 
 #include <stdexcept>
-#include <wchar.h>
+#include <cwchar>
 
 #include "dbug/dbug.h"
 #include "dbug/dbugExtErrors.h"

@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Date: Wed Dec  7 21:37:13 CST 2005
 //
 // Member functions of the WeaponEntry struct
@@ -8,10 +7,7 @@
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-//
 
-
-#include <assert.h>
 #include <algorithm>
 
 #include "strt/strtProtos.h"

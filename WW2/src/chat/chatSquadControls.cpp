@@ -10,8 +10,6 @@
 
 #include "versionNo.h"
 
-#include <assert.h>
-
 #include "chat/chatdbClientMessages.h"
 #include "chat/chatList.h"
 #include "chat/chatMissionInviteMsg.h"

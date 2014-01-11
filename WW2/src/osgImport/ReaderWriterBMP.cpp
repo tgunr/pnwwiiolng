@@ -23,13 +23,6 @@
 
 #include "fio/fio.h"
 
-#include <vector>
-
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <assert.h>
-
 /****************************************************************************
  *
  * Follows is code written by GWM and translated to fit with the OSG Ethos.

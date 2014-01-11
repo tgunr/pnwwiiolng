@@ -3,12 +3,6 @@
 //
 // Dump strat contents of an SDM file.
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-
-#include <string>
-
 #include "sdm/sdmParse.h"
 #include "include/defs.h"
 #include "strt/strtDTL.h"

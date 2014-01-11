@@ -38,7 +38,6 @@ namespace Tutorial
 }
 
 #if platBuild == TEUL_SERVER
-#include <vector>
 namespace Tutorial
 {
 	// For the host

@@ -8,12 +8,9 @@
 //
 // Originating Programmer: Martin Poulin
 
-#include "dbug/dbug.h"
 #include "dbug/dbugInternal.h"
 
-#include <stdarg.h>
 #include <fcntl.h>
-#include <string.h>
 #include <sys/stat.h>
 #include "include/defs.h"
 #include "teul/teulTime.h"

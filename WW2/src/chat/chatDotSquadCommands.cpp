@@ -15,7 +15,6 @@
 #include "chat/chatHandle.h"
 #include "chat/chatHost.h"
 #include "chat/chatList.h"
-#include "chat/chatMakeTempString.h"
 #include "chat/chatName.h"
 #include "chat/chatSquadControl.h"
 #include "chat/chatSquadControlResults.h"

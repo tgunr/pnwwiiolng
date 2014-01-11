@@ -1,8 +1,5 @@
 #include "phui-precompiled-header.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-
 #include "phui/PopupMenuButton.h"
 #include "phui/GraphicsContext.h"
 #include "phui/Menu.h"

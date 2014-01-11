@@ -8,6 +8,6 @@
 #define E_				2.718281828f
 
 // Replaces the MAX_PATH define used by the Windows environment
-#define PN_MAX_PATH		260
+enum { PN_MAX_PATH = 260 };
 
 //tolua_end

@@ -13,7 +13,6 @@
 
 #include <libircclient.h>
 #include <sys/stat.h>
-#include <memory>
 
 #include "sdm/sdmLoad.h"
 #include "teul/teulTime.h"

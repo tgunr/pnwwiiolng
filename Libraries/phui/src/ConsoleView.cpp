@@ -1,9 +1,6 @@
 #include "phui-precompiled-header.h"
 
-#include <string>
 #include <deque>
-#include <stdio.h>
-#include <string.h>
 
 #include "phui/KeyCodes.h"
 #include "phui/ConsoleView.h"

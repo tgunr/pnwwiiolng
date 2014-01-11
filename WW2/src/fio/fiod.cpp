@@ -1,7 +1,6 @@
 #include <syscfg.h> // Path is project specific.
 
 #include "wwii/wwiiHash.h" // does this work on linux?
-# include "dbug/dbug.h"
 #include <map>
 #include <set>
 
@@ -24,7 +23,6 @@
 # include <direct.h>
 #else
 # include <dirent.h>
-# include <unistd.h>
 # ifndef O_BINARY
 #  define O_BINARY 0
 # endif
@@ -45,8 +43,6 @@
 #ifndef _POSIX_
 # define _POSIX_
 #endif
-#include <limits.h>
-#include <string>
 
 #include "wwii/wwiiUTF.h"
 

@@ -1,9 +1,6 @@
 #include "phui-precompiled-header.h"
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdarg.h>
+#include <cstdarg>
 
 #include "phui/Scalar.h"
 #include "phui/Util.h"

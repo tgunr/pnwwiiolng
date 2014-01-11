@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Created: Tue Nov  7 16:34:36 2000
 //
 // Pack routines for the strat system
@@ -9,11 +8,7 @@
 // compiled library.
 //
 // Originating Programmer: Shane "Elmo" Wickson
-// Maintaining Programmer: Shane "Elmo" Wickson
 // Supporting Programmer:  Marty "Vandal" Poulin
-
-#include "dbug/dbug.h"
-#include <assert.h>
 
 #include "mem/mem.h"
 #include "strt/strtMapTypes.h"

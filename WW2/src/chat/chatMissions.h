@@ -14,7 +14,6 @@ class ChatMission;			// #include chatMissionTypes.h for full definition
 class Player;
 class Waypoint;
 
-#include <string>
 #include "wwii/wwiiOwnershipEnums.h"
 
 // Look for a mission without creating it

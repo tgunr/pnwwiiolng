@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include <vector>
-
 class SortieManager
 {
 public:

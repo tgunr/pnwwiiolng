@@ -10,12 +10,7 @@
 // Originating Programmer: Shane "Elmo" Wickson
 
 #include "versionNo.h"
-#include "dbug/dbug.h"
 
-#include <time.h>
-#include <assert.h>
-#include <math.h>
-#include <vector>
 #include <algorithm>
 
 #if platOS != OS_WIN32

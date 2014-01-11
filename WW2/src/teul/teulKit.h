@@ -13,10 +13,6 @@
 //! @details TeulKit is PlayNet Inc's proprietary networking/callback stack.
 namespace Teul { }
 
-#if platOS != OS_LINUX
-# include <string.h>
-#endif
-
 #include "teul/teulEnums.h"
 #include "teul/teulBasic.h"
 #include "teul/teulFuncTypes.h"

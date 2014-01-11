@@ -108,7 +108,7 @@ void testMonotonicClock()
 // that is in turn returned.
 // this allows up to 16 addresses to be returned
 // before we get an overwrite.
-const SCHAR*
+const char*
 teulGetAddress(const UINT32 hostOrderIP)
 {
 	static const size_t NumInstances = 16;

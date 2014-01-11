@@ -2,26 +2,28 @@
 
 ////////// SYSTEM INCLUDES ONLY -- NO PLAYNET SPECIFICS
 
-#include <string>
+#include <cstdlib>
+#include <cstring>
+#include <cassert>
+#include <ctime>
+#include <cmath>
+#include <cfloat>
+#include <cctype>
+#include <climits>
+#include <cstddef>
+#include <cstdint>
+
+#include <memory>
 #include <vector>
+#include <string>
 #include <map>
 #include <set>
 #include <list>
 #include <algorithm>
-#include <time.h>
-#include <assert.h>
-#include <string.h>
-#include <wchar.h>
-#include <float.h>
-#include <ctype.h>
 
 #include <thread>
 #include <mutex>
-#include <cstdint>
 
-#if defined(HAVE_SYS_CDEFS_H)
-# include <sys/cdefs.h>
-#endif
 #if defined(HAVE_UNISTD_H)
 # include <unistd.h>
 #endif
@@ -40,10 +42,11 @@
 ////////// PLAYNET INCLUDES GO AFTER HERE
 
 #include "include/defs.h"
+#include "dbug/dbug.h"
+#include "dbug/dbugExtErrors.h"
 
 #include "wwii/wwiiHash.h"
 #include "chat/chatHandle.h"
-#include "dbug/dbug.h"
 #include "wwii/wwiiOwnershipEnums.h"
 #include "wwii/wwiiTypes.h"
 #include "wwii/wwiiBranchEnums.h"
@@ -57,7 +60,6 @@
 #include "teul/teulPackEnums.h"
 #include "teul/teulKit.h"
 #include "teul/teulBasic.h"
-#include "dbug/dbugExtErrors.h"
 #include "wwii/wwiiPermissions.h"
 #include "inst/instTypes.h"
 #include "wwii/wwiiFullObjID.h"
@@ -65,4 +67,3 @@
 #include "weap/weapWeapon.h"
 #include "teul/teulEndpoint.h"
 #include "chat/chatLStringIDs.h"
-

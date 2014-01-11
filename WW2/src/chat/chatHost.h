@@ -103,3 +103,4 @@ static const UCHAR LOBBY_CHAN_ICON = 10;
 
 extern void chatSetHCMotd(const char* callsign, const char* motd, WWII_SIDE forSide);
 
+extern const char* chatMakeTempString(const char* fmt, ...);

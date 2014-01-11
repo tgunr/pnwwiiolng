@@ -9,16 +9,8 @@
 // compiled library.
 //
 // Originating Programmer: Shane "Elmo" Wickson
-// Maintaining Programmer: Eric "Meat" Hall
 // Supporting Programmer:  Eric "Meat" Hall
 
-#include "dbug/dbug.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <string>
-#include <vector>
 #include <fstream>
 
 #include "strt/strtProtos.h"

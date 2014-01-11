@@ -9,7 +9,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 #include <set>
-#include <vector>
 #include "strt/strtProtos.h"
 #include "wwii/wwiiHCUnits.h"
 #include "strt/strtDTL.h"

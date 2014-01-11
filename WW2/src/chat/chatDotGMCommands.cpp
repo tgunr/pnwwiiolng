@@ -28,7 +28,6 @@
 #include "chat/chatHostMessages.h"
 #include "chat/chatLStringErr.h"
 #include "chat/chatList.h"
-#include "chat/chatMakeTempString.h"
 #include "chat/chatMissionTypes.h"
 #include "chat/chatMissions.h"
 #include "chat/chatName.h"

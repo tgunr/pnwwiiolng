@@ -10,12 +10,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 //
 
-#include "dbug/dbug.h"							// For host "dbugLog" access
-
-#include <assert.h>
-#include <vector>
-#include <math.h>
-
 #include "chat/chatHandle.h"
 #include "chat/chatName.h"
 #include "strt/strtCPStruct.h"

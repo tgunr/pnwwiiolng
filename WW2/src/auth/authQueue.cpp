@@ -7,16 +7,11 @@
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-//
 
 
-#include "dbug/dbug.h"
 #include "auth/authQueue.h"				// Our header file
 #include "teul/teulTime.h"
 #include "wwii/wwiiRunningAverage.h"
-#include <map>
-#include <assert.h>
-#include <vector>
 
 // How long do we think the wait time is likely to be?
 static const UINT32 _DEFAULT_WAIT_TIME_S = 60;

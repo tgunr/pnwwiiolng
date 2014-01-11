@@ -15,10 +15,6 @@
 #include "pi/pi.h"
 #endif
 
-#include <ctype.h>
-#include <string.h>
-#include <string>
-
 #include "parse/parse.h"
 #include "parse/parseIO.h"
 #include "parse/parseWor.h"
@@ -37,8 +33,6 @@ extern ConfigPath cv_thblitzPath;
 #else
 	#include "fio/fio.h"
 #endif
-
-#include "dbug/dbug.h"
 
 enum SECTION_ENUM
 {

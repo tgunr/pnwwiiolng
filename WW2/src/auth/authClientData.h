@@ -7,9 +7,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include <vector>
-#include <string>
-
 struct SERVER;
 struct APP_LAUNCH_REQ;
 

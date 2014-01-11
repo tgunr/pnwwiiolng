@@ -11,8 +11,6 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include <stdlib.h>
-
 #include "teul/teulCLList.h"
 #include "strt/strtServerTypes.h"
 #include "cnvy/cnvyConvoyList.h"

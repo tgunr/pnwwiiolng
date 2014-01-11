@@ -34,7 +34,6 @@
 
 // Temporary
 #include "chat/chatDotCommand.h"
-#include "chat/chatMakeTempString.h"
 
 class BrigadeController;
 

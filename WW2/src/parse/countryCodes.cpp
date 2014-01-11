@@ -7,9 +7,6 @@
 //
 // Originating Programmer: Marty "Vandal" Poulin
 
-#include <string.h>
-#include <ctype.h>
-
 #include "parse/countryCodes.h"
 
 namespace Parse

@@ -15,9 +15,6 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include <ctype.h>
-#include <string.h>
-
 #if _MSC_VER >= 1400
 #else
 #ifdef USE_LOCAL_STRNLEN

@@ -9,9 +9,6 @@
 //
 // Originating Programmer: Martin Poulin
 
-#include <stddef.h>
-#include <cstdint>
-
 // True and False
 #ifndef TRUE
 #define TRUE 1
@@ -159,7 +156,7 @@ typedef UINT64 PermissionMask;
 //! Teul type for millisecond time.
 typedef	UINT64 TeulTimeMS;
 //! Teul type for a millisecond delta (signed).
-typedef SINT64 TeulDeltaMS	;
+typedef SINT64 TeulDeltaMS;
 
 //! Index for a player ID
 typedef unsigned int playerid_t;

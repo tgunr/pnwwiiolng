@@ -500,8 +500,6 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 				chat/chatHostPlayerIndex.h
 		chat/chatLocFile.cpp
 			chat/chatLocFile.h
-		chat/chatMakeTempString.cpp
-			chat/chatMakeTempString.h
 		chat/chatManagementHostMessages.cpp
 			chat/chatManagementHostMessages.h
 		chat/chatManagementIDs.cpp

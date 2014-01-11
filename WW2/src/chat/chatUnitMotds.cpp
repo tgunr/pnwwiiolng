@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Date: Wed Oct  5 14:33:48 CDT 2005
 //
 // Get/Set MOTDs for system, side and HCUnits
@@ -8,10 +7,8 @@
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-//
 
 #include "wwii/wwiiHash.h"
-#include <string>
 
 typedef std::unordered_map<UINT32,std::string> MOTD_INDEX;
 static MOTD_INDEX motds;

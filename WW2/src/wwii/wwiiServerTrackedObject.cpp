@@ -7,12 +7,8 @@
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-//
-
-#include "dbug/dbug.h"							// For host "dbugLog" access
 
 #include <map>
-#include <vector>
 
 #include "wwii/wwiiServerTrackedObject.h"                // Our header file
 #include "wwii/wwiiPack.h"

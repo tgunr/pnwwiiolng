@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Created: Thu Apr 12 19:30:21 2001
 //
 // Management for lists of posted weapons (weapons which have
@@ -11,23 +10,15 @@
 // compiled library.
 //
 // Originating Programmer: Shane "Elmo" Wickson
-// Maintaining Programmer: Shane "Elmo" Wickson
 // Supporting Programmer:  Eric "Meat" Hall
 
 #include "versionNo.h"
-#include "dbug/dbug.h"
 
-#include <string>
-#include <map>
 #include <list>
 #include <set>
 #include <algorithm>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
 #include <sys/stat.h>
 #include <fcntl.h>
-#include <assert.h>
 
 #include "chat/chatLStringIDs.h"
 #include "chat/chatSupportRPCMessages.h"

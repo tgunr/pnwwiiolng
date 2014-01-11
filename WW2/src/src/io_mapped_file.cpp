@@ -26,7 +26,6 @@
 #endif
 
 #include <stdexcept>
-#include <string.h>
 
 // Macros to help with the whole char/wchar crap.
 static inline size_t _getLen(const char* str_) { return OsStrlen(str_); }

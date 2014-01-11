@@ -130,8 +130,6 @@ static char* _makeNativePath(const char* const path_)
 ////////////////////////////////////////////////////////////////////////////////
 // Read values from the environment or configuration file.
 
-#include <vector>
-
 struct ConfigEntry
 {
 	ConfigEntry() : m_name(nullptr), m_value(nullptr) {}

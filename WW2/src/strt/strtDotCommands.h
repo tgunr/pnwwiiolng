@@ -10,8 +10,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include <vector>
-
 class OOBMessage;
 class CPStruct;
 class FacilityStruct;

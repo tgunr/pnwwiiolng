@@ -24,4 +24,3 @@
 #include <assert.h>
 
 // Extra Playnet includes
-

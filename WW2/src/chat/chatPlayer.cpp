@@ -25,7 +25,6 @@
 #include "chat/chatHostMessages.h"
 #include "chat/chatLatLong.h"
 #include "chat/chatList.h"
-#include "chat/chatMakeTempString.h"
 #include "chat/chatManagementIDs.h"
 #include "chat/chatMissionMember.h"
 #include "chat/chatMissions.h"

@@ -278,7 +278,7 @@ struct WAYPOINT
 	REL_OBJ_ID	oid;				// object ID of this waypoint
 	UINT32		serial;				// supercell relative serial number
 
-	REL_OBJ_ID	pid;				// Parent object ID (to bridge?) (object attatchment)
+	REL_OBJ_ID	pid;				// Parent object ID (to bridge?) (object attachment)
 	SINT32		posx;				// X Position in supercell (in meters)
 	SINT32		posy;				// Y Position in supercell (in meters)
 
@@ -300,4 +300,3 @@ struct WAYPOINT
 #elif platOS == OS_LINUX
 	#pragma pack(pop)
 #endif
-

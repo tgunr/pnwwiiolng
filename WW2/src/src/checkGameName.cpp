@@ -3,7 +3,6 @@
 
 #include "chat/chatHandle.h"
 #include "wwii/wwiiUTF.h"
-#include <string>
 
 //////////////////////////////////////////////////////////////////////
 // Test if a callsign has a legal mix of utf/roman characters.

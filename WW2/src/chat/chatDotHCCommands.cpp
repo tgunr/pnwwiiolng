@@ -22,7 +22,6 @@
 #include "chat/chatHost.h"
 #include "chat/chatHostMessages.h"
 #include "chat/chatList.h"
-#include "chat/chatMakeTempString.h"
 #include "chat/chatPlayer.h"
 #include "chat/chatUnitMotds.h"
 #include "chat/chatWhoList.h"

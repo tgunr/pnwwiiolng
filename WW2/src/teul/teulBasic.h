@@ -55,14 +55,14 @@ extern void teulClose(ENDPOINT&, const UINT32 reason=0);
 //! @param[in]	address			IP address to convert.
 //!	@param[out]	host			Pointer to where the address should be stored.
 //! @return false if address is invalid.
-extern bool teulGetHost(const SCHAR* address, UINT32* host);
+extern bool teulGetHost(const char* address, UINT32* host);
 
 //! Converts a binary network address to a string.
 //! @deprecated Use thread-safe version instead.
 //! @ingroup not-thread-safe
 //! @param[in]	host			Binary IP address.
 //!	@return pointer to static buffer with address as a string.
-extern const SCHAR* teulGetAddress(const UINT32 host);
+extern const char* teulGetAddress(const UINT32 host);
 
 //! Thread safe conversion of a network address to a string.
 //! @ingroup thread-safe
@@ -78,7 +78,7 @@ extern const char* teulGetAddress(const UINT32 host, char* buffer, const size_t 
 //! @param[in]	name			IP address/name
 //! @return binary IP address or 0.
 // NOTE: this is long blocking call!!!
-extern UINT32* teulGetHostByName(const SCHAR * name);
+extern UINT32* teulGetHostByName(const char* name);
 
 //! Perform core teul operations such as draining reads and writes on
 //! sockets, processing incoming callbacks and timing out connections.
@@ -101,7 +101,7 @@ extern UINT32 teulGetEndpointLocalAddress(SINT32 teulIndex);
 //! @return Teul::INVALID_INDEX if the index is not valid.
 extern UINT32 teulGetEndpointRemoteAddress(SINT32 teulIndex);
 
-// close all connections and the dugger. (teul go bye bye)
+// close all connections and the debugger. (teul go bye bye)
 extern void teulCloseTransport(void);
 
 //! Associate local application data with a connection.

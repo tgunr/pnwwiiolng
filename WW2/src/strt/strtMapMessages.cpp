@@ -11,11 +11,6 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include "dbug/dbug.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "wwii/wwiiCallbacks.h"
 #include "teul/teulBasic.h"
 #include "strt/strtConstants.h"

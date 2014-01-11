@@ -53,8 +53,6 @@ using namespace Teul;
 #include <winsock2.h>
 #endif
 
-#include <time.h>
-
 #include "teul/teulEndpoint.h"
 #include "teul/teulEndpointImpl.h"
 #include "teul/teulModCalls.h"

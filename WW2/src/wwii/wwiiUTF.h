@@ -43,7 +43,7 @@
 // for internal or external distribution as long as this notice
 // remains attached.
 
-#include "wchar.h"
+#include <cwchar>
 
 //! Shortcut-macro for conversion a buffer of a known-size.
 #define WWIIConvert(from,to) WWII::ConvertChars(from, to, sizeof(to))

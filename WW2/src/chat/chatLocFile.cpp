@@ -8,10 +8,7 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "dbug/dbug.h"							// For host "dbugLog" access
-
 #include <map>
-#include <string>
 
 #include "chat/chatLocFile.h"
 #include "chat/chatLocalizedMessage.h"

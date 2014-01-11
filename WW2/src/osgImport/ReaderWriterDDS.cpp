@@ -23,7 +23,6 @@
 #include "osgImport/Image.h"
 
 #include <iomanip>
-#include <stdio.h>
 
 #include "fio/fio.h"
 

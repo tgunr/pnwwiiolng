@@ -15,7 +15,6 @@
 #include "chat/chatHostMessages.h"
 #include "chat/chatIRCPlayer.h"
 #include "chat/chatList.h"
-#include "chat/chatMakeTempString.h"
 #include "chat/chatManagementIDs.h"
 #include "chat/chatManagementPlayer.h"
 #include "chat/chatManagementTypes.h"

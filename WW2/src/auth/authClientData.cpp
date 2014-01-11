@@ -5,7 +5,6 @@
 #include "auth/authClientData.h"
 #include "auth/authQueue.h"
 #include "auth/authTypes.h"
-#include <assert.h>
 
 #define USE_LOGIN_QUEUES
 

@@ -9,10 +9,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include <stdlib.h>
-#include <string.h>
-#include <assert.h>
-
 #include "wwii/wwiiCallbacks.h"
 #include "chat/chatdbClientMessages.h"
 #include "dbse/dbseClient.h"

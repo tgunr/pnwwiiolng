@@ -1,19 +1,13 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Created: Thu Oct  6 18:53:24 CDT 2005
 //
-// Functions to save the game worlda after startup
+// Functions to save the game world after startup
 //
 // Copyright (C) PlayNet, Inc 1999-2005 - All rights reserved.
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-//
 
-#include "dbug/dbug.h"
-
-#include <stdio.h>
-#include <string>
 #include <map>
 
 #include "teul/teulBasic.h"

@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include <time.h>
-
 const char*
 chatTimeString(time_t timestamp)
 {

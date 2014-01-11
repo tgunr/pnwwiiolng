@@ -1,11 +1,5 @@
 #include "phui-precompiled-header.h"
 
-#include <wchar.h>
-#include <vector>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
 #include "phui/TabView.h"
 #include "phui/GraphicsContext.h"
 #include "phui/UIMessages.h"

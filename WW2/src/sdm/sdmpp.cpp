@@ -14,12 +14,8 @@
 # include <dirent.h>
 #endif
 
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-
-#include <string>
-#include <map>
 
 #include "sdm/sdmpp.h"
 #include "sdm/sdmParse.h"

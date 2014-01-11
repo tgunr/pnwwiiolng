@@ -1,6 +1,5 @@
 #include <syscfg.h> // Path is project specific.
 #include "wwii/wwiiCommandLineArgs.h"
-#include <vector>
 
 static const char* programName;
 typedef std::vector<Argument> Arguments;

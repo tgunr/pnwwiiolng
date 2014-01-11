@@ -4,11 +4,6 @@
 #include <set>
 #include <typeinfo>
 #include <errno.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <wchar.h>
-#include <string>
 
 #include "phui/Javascript.h"
 #include "phui/Util.h"

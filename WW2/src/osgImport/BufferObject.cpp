@@ -11,11 +11,6 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * OpenSceneGraph Public License for more details.
 */
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include <map>
-
 #include "osgImport/BufferObject.h"
 #include "osgImport/Image.h"
 #include "osgImport/ref_ptr.h"

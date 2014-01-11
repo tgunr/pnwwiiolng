@@ -44,8 +44,6 @@ static const char* QRY_REMOVE_RECRUITS =
 	" WHERE playerID in (%u"
 ;
 
-#include <vector>
-
 class ExpiredRecruitQuery : public DBThreadQuery
 {
 public:

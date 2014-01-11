@@ -9,7 +9,6 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include <string>
 #include "wwii/wwiiOwnershipEnums.h"
 
 //	------------------------------	Non-exposed functions

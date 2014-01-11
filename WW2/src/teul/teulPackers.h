@@ -8,6 +8,7 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
+#include "dbug/dbug.h"
 #include "teul/teulPackEnums.h"
 
 //	The following routines pack and unpack the cross platform basic data types defined in teul.
@@ -47,10 +48,10 @@ extern SINT32 teulPackFLOAT32(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffse
 extern SINT32 teulPackFLOAT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, FLOAT64* const idata, SINT32 significantbits);
 
 //! Pack/unpack a signed value held in a 64-bit store.
-extern SINT32 teulPackSINT64 (LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, SINT64* const idata, SINT32 significantbits);
+extern SINT32 teulPackSINT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, SINT64* const idata, SINT32 significantbits);
 
 //! Pack/unpack an unsigned value held in a 64-bit store.
-extern SINT32 teulPackUINT64 (LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, UINT64* const idata, SINT32 significantbits);
+extern SINT32 teulPackUINT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, UINT64* const idata, SINT32 significantbits);
 
 // byte pack routine used only when you know the other side takes care of endian
 // or the data is byte format (UCHAR but 'NOT' UNICODE).
@@ -80,7 +81,7 @@ namespace Teul
 #define DEF_PACKER(_typename, _functor, _defSize) \
 	void packer(LOGICAL _mode, _typename _data, SINT32 bits=_defSize)	\
 	{\
-		this->offset = _functor(_mode, this->packed, this->offset, _data, bits); \
+		this->offset = _functor(_mode, this->packed, this->offset, (_typename)_data, bits); \
 	}
 
 #define DEF_PACKREF(_typename, _functor, _defSize) \

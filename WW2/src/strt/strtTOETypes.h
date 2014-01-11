@@ -12,8 +12,6 @@
 #include "weap/weapWeapon.h"
 #include <map>
 #include <set>
-#include <vector>
-#include <string>
 
 class StratHCUnit;
 struct POSTED_WEAPON;

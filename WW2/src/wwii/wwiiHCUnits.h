@@ -14,7 +14,6 @@
 #include "wwii/wwiiFullObjID.h"
 #include "wwii/wwiiOwnershipEnums.h"
 #include <map>
-#include <string>
 #include "chat/chatHandle.h"
 
 class HCUnit;

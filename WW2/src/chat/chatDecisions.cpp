@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Date: Thu Jun 03 10:00:00 2004
 //
 // Functions for handling chat/strat decisions and
@@ -10,17 +9,10 @@
 // compiled library.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-// Maintaining Programmer: Oliver "kfsone" Smith
 // Supporting Programmer:  Oliver "kfsone" Smith
 
-//// ---> Project headers
-#include "dbug/dbug.h"
 #include "versionNo.h"
 
-//// ---> System headers
-#include <assert.h>
-
-//// ---> Other headers
 #include "chat/chatPlayer.h"
 #include "chat/chatDB.h"
 #include "chat/chatDecisions.h"
@@ -29,7 +21,6 @@
 #include "chat/chatList.h"
 #include "chat/chatHost.h"
 #include "chat/chatIcons.h"
-#include "chat/chatMakeTempString.h"
 #include "chat/chatHostMessages.h"
 #include "chat/chatTimeInterval.h"
 #include "chat/chatHostBrigadeControl.h"

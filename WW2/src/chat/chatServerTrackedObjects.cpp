@@ -20,19 +20,17 @@
 #include "chat/chatPlayer.h"
 #include "chat/chatSTOJoules.h"
 #include "chat/chatVehicleSTO.h"
+#include "chat/chatHost.h"
 #include "chat/chatHulkSTO.h"
 #include "chat/chatOrdnanceSTO.h"
 #include "chat/chatPPOSTO.h"
 #include "chat/chatUMSSTO.h"
 #include "chat/chatSTODamage.h"
 #include "wwii/wwiiConfig.h"
-#include "chat/chatMakeTempString.h"
 #include "inst/instTypes.h"
 #include "chat/chatHostMessages.h"
 #include "wwii/wwiiThreads.h"
 #include "wwii/wwiiConfigVars.h"
-
-#include <vector>
 
 struct PPOConfig
 {

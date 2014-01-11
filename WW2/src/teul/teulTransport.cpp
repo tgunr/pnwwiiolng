@@ -30,8 +30,6 @@
 #include <sys/socket.h>
 #endif
 
-#include <string.h>
-
 #if platOS == OS_WIN32
 	#include <windows.h>
 #endif
@@ -54,7 +52,7 @@ static bool _transportInited, _transportClosing;
 UINT32 _hostAddressMask = 0;
 
 UINT32*
-teulGetHostByName(const SCHAR* const name)
+teulGetHostByName(const char* const name)
 {
 	UINT32* list;
 	SINT32 i, numEntries = 0;
@@ -96,7 +94,7 @@ teulGetHostByName(const SCHAR* const name)
 // converts a doted quad string to a UINT32.
 // returns 0 if address is invalid.
 bool
-teulGetHost(const SCHAR* address_, UINT32* host_)
+teulGetHost(const char* address_, UINT32* host_)
 {
 	if (strcmp(address_, "localhost") == 0)
 	{

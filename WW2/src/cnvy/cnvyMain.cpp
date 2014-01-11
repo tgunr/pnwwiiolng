@@ -11,14 +11,6 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include "dbug/dbug.h"
-#include <assert.h>
-#include <vector>
-#include <string>
-
-#include <stdlib.h>
-#include <time.h>
-
 #include "teul/teulKit.h"
 #include "strt/strtConstants.h"
 #include "strt/strtEventQueue.h"

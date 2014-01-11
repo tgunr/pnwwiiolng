@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Created: Wed Apr  5 04:33:15 2000
 //
 // These are all the main functions that comprise the Strat System
@@ -9,15 +8,7 @@
 // compiled library.
 //
 // Originating Programmer: Shane "Elmo" Wickson
-// Maintaining Programmer: Shane "Elmo" Wickson
 // Supporting Programmer:  Marty "Vandal" Poulin
-
-#include "dbug/dbug.h"
-
-#include <stdlib.h>
-#include <stdio.h>
-#include <time.h>
-#include <signal.h>
 
 #include "strt/strtIO.h"
 #include "strt/strtCP.h"

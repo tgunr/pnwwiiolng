@@ -9,9 +9,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 #include "versionNo.h"
-#include "dbug/dbug.h"
-
-#include <assert.h>
 
 #include "map/mapPlayer.h"
 #include "miss/missHitArrayNode.h"

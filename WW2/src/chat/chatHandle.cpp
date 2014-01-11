@@ -11,10 +11,7 @@
 // Originating Programmer: Shane "Elmo" Wickson
 
 #include <atomic>
-#include <string.h>
-#include <ctype.h>
-#include <assert.h>
-#include <wctype.h>
+#include <cwctype>
 
 #include "chat/chatHandle.h"
 #include "chat/chatName.h"		// to ensure it gets instantiated.

@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Created: Mon Dec 19 15:01:32 CST 2005
 //
 // Inter-server common CPStruct functions
@@ -8,11 +7,8 @@
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-//
-
 
 #include <set>
-#include <string>
 
 #include "strt/strtCPFlags.h"
 #include "strt/strtCPStruct.h"

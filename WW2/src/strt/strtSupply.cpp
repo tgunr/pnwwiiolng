@@ -8,17 +8,10 @@
 // compiled library.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-// Maintaining Programmer: Oliver "kfsone" Smith
 // Supporting Programmer:  Marty "Vandal" Poulin
 
 #include "versionNo.h"
-#include "dbug/dbug.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <time.h>
-#include <math.h>
-#include <assert.h>
 #include <stack>
 
 #include "include/arenaLockEnums.h"

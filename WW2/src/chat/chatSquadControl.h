@@ -10,8 +10,6 @@
 // Supporting Programmer: Troy "ramp" Lowe
 
 #include "teul/teulPackers.h"
-#include <string>
-#include <vector>
 #include "chat/chatSquadControlResults.h"
 
 class SquadControl

@@ -12,7 +12,6 @@
 
 #include "versionNo.h"
 #include <stack>
-#include <memory>
 
 #include "auth/authDaemon.h"
 #include "chat/chatCellHostSupportMessages.h"
@@ -145,7 +144,6 @@ static SINT32 iterationTime = -1, iterationLast = -1;
 typedef std::unordered_map<sortieid_t, class HostVehicle*> VEHICLE_HASH;
 static VEHICLE_HASH _vehicleHash;
 
-#include <vector>
 typedef std::vector<HostVehicle*> VEHICLES;
 
 // Tracking of players in a given building

@@ -1,6 +1,5 @@
 #pragma once
 
-#include <assert.h>
 #include "teul/teulCallback.h"
 #include "teul/teulCallbackInit.h"
 

@@ -89,7 +89,6 @@ static unsigned long long _fileLineToLong(const char* const file_, const size_t 
 	return ((unsigned long long)file_) << 32 | (unsigned long long)line_;
 }
 
-#include <memory>
 struct HISTORY
 {
 	HISTORY()

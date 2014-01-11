@@ -8,9 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-
-#include "dbug/dbug.h"
-
 #include "chat/chatSquadControl.h"
 #include "wwii/wwiiPack.h"
 #include "wwii/wwiiPackString.h"

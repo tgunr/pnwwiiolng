@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Created: Wed Dec 14 18:52:52 CST 2005
 //
 // Common member functions of strtFacilityStruct
@@ -8,10 +7,6 @@
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-//
-
-
-#include <assert.h>
 
 #include "strt/strtCaptureState.h"
 #include "strt/strtCPStruct.h"

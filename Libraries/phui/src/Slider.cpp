@@ -1,10 +1,5 @@
 #include "phui-precompiled-header.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <wchar.h>
-#include <math.h>
-
 #include "phui/Slider.h"
 #include "phui/GraphicsContext.h"
 #include "phui/UIMessages.h"

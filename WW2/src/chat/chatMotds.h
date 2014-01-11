@@ -8,7 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include <string>
 #include "teul/teulPackers.h"
 
 namespace MOTD

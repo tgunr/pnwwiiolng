@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Date: Tue Oct  4 13:29:53 CDT 2005
 //
 // class SquadVote and friends
@@ -8,20 +7,17 @@
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-//
-
-
-#include <string>
 
 #include "chat/chatHandle.h"
+#include "chat/chatHost.h"
 #include "chat/chatTimeInterval.h"
 #include "chat/chatSquadVote.h"
 #include "chat/chatSquadListTypes.h"
 #include "chat/chatSquadList.h"
 #include "chat/chatPlayer.h"
 #include "wwii/wwiiConfig.h"
-#include "chat/chatMakeTempString.h"
 
+#include "wwii/wwiiHash.h"
 typedef std::unordered_map<UINT32,SquadVote> SQUAD_VOTES;
 
 static SQUAD_VOTES g_squadVotes;

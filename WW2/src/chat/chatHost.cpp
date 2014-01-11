@@ -40,7 +40,6 @@
 #include "chat/chatIRCPlayer.h"
 #include "chat/chatList.h"
 #include "chat/chatLocFile.h"
-#include "chat/chatMakeTempString.h"
 #include "chat/chatManagementHostMessages.h"
 #include "chat/chatManagementTypes.h"
 #include "chat/chatMissions.h"
@@ -290,6 +289,32 @@ IRCPlayer::describeTo(const Player& player, const FLOAT64& /*x*/, const FLOAT64&
 	}
 
 	player.message(LSTR_NONE, LSTR_LABELLED_GENERIC, callsign(), response.c_str());
+}
+
+//////////////////////////////////////////////////////////////////////
+// Build a temporary string, basically a wrapper for sprintf that
+// helps us avoid having to continually allocate new buffers
+
+const char*
+chatMakeTempString(const char* fmt, ...)
+{
+	va_list args;
+
+	static int bufNo = 0;
+	static char buffer[4][MAX_MESSAGE_LENGTH + 1];
+
+	if (bufNo > 3)
+		bufNo = 0;
+
+	buffer[bufNo][0] = 0;
+
+	if (fmt != NULL) {
+		va_start(args, fmt);
+		vsnprintf(buffer[bufNo], MAX_MESSAGE_LENGTH, fmt, args);
+		va_end(args);
+	}
+
+	return buffer[bufNo++];
 }
 
 //////////////////////////////////////////////////////////////////////

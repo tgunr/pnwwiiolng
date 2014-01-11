@@ -23,9 +23,6 @@ must not be misrepresented as being the original software.
 distribution.
 */
 
-#include <ctype.h>
-#include <stddef.h>
-
 #include "tinyxml/tinyxml.h"
 
 //#define DEBUG_PARSER

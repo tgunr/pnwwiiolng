@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include <string>
-
 class CPStruct;
 class FacilityStruct;
 class WeaponEntry;

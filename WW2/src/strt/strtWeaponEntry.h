@@ -11,7 +11,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 #include "strt/strtTypes.h"
-#include <vector>
 #include "strt/strtObjectStruct.h"
 #include "weap/weapWeapon.h"
 

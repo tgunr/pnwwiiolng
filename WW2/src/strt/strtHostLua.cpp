@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Created: Thu Sep 23 12:45:00 2004
 //
 // Strat server specific lua wrappers
@@ -9,13 +8,9 @@
 // compiled library.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-// Maintaining Programmer: Oliver "kfsone" Smith
 // Supporting Programmer:  Patrick "thunder" Macgrude
 
-#include <stdlib.h>
-#include <time.h>
 #include <signal.h>
-#include <string>
 
 #include "dbug/dbug.h"
 #include "strt/strtHostLua.h"

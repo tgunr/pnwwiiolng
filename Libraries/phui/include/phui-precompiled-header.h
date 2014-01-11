@@ -1,9 +1,12 @@
 #pragma once
 
-#include <wchar.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
+#include <cwchar>
+#include <cctype>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <cstdint>
+#include <cmath>
 
 #include <vector>
 #include <list>

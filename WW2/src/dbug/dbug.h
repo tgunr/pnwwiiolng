@@ -7,7 +7,7 @@
 //
 // Originating Programmer: Marty Poulin
 
-#include <stdarg.h>
+#include <cstdarg>
 
 #ifndef EWOULDBLOCK
 	#include	<errno.h>

@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Date: Tue Mar 28 12:14:43 CST 2006
 //
 // Functions for managing/operating/interacting with the
@@ -9,13 +8,9 @@
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-//
 
 #include "versionNo.h"						// For version dependent code
-#include "dbug/dbug.h"						// For host "dbugLog" access
-#include <assert.h>
 
-#include <string>
 #include <set>
 #include <stack>
 #include <algorithm>
@@ -26,9 +21,9 @@
 #include "chat/chatPlayer.h"				// For Player
 #include "teul/teulTime.h"					// For teulClock64
 #include "wwii/wwiiHash.h"
-#include "chat/chatMakeTempString.h"
 #include "chat/chatServerSTO.h"
 #include "chat/chatBroadcastObject.h"
+#include "chat/chatHost.h"
 #include "chat/chatHostMessages.h"
 #include "chat/chatVehicleSTO.h"
 #include "chat/chatMissions.h"

@@ -36,9 +36,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include <assert.h>
-#include <ctype.h>
-
 #include "wwii/wwiiUTF.h"				// Our header file
 
 typedef unsigned long UTF32;

@@ -7,8 +7,7 @@
 
 #include <stdexcept>
 #include <iostream>
-#include <vector>
-#include <wchar.h>
+#include <cwchar>
 
 bool enableTestDebug = false;
 

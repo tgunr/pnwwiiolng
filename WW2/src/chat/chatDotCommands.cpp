@@ -23,7 +23,6 @@
 #include "chat/chatLocalizedMessage.h"
 #include "chat/chatLocFile.h"
 #include "chat/chatLStringErr.h"
-#include "chat/chatMakeTempString.h"
 #include "chat/chatMissions.h"
 #include "chat/chatMissionTypes.h"
 #include "chat/chatPlayer.h"

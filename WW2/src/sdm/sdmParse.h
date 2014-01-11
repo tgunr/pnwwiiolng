@@ -59,5 +59,4 @@ extern SINT32 sdmCloseFile(void);
 // there were any cumulatively fatal errors.
 extern void sdmFinish();
 
-#include <string>
 extern const std::string& sdmTranslateName(const std::string& from);

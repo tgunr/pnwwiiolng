@@ -9,8 +9,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 #include "versionNo.h"
-#include "dbug/dbug.h"
-#include <vector>
 
 #include "chat/chatLStringIDs.h"
 #include "chat/chatName.h"

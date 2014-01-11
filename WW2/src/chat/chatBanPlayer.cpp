@@ -15,7 +15,6 @@
 #include "chat/chatPlayer.h"
 #include "chat/chatHost.h"
 #include "chat/chatLStringIDs.h"
-#include "chat/chatMakeTempString.h"
 #include "chat/chatName.h"
 #include "wwii/wwiiThreads.h"
 #include "wwii/wwiiThreadText.h"

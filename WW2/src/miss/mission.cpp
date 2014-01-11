@@ -8,10 +8,6 @@
 // Originating Programmer: Brian "Stick" Duelm
 
 #include "versionNo.h"
-#include "dbug/dbug.h"
-
-#include <time.h>
-#include <assert.h>
 
 #include "chat/chatBroadcast.h"
 #include "chat/chatHandle.h"

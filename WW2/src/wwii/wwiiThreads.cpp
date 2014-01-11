@@ -9,10 +9,7 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 #include "versionNo.h"
-#include "dbug/dbug.h"
-#include <assert.h>
 
-#include <string>
 #include <mysql.h>
 #include <signal.h>
 #include <mutex>

@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Created: Fri Apr 20 17:07:02 2001
 //
 // list management routines for JoinRequest Lists.  These lists
@@ -10,14 +9,7 @@
 // compiled library.
 //
 // Originating Programmer: Shane "Elmo" Wickson
-// Maintaining Programmer: Shane "Elmo" Wickson
 // Supporting Programmer:  Eric "Meat" Hall
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <map>
-
-#include "dbug/dbug.h"
 
 #include "strt/strtServerTypes.h"
 #include "strt/strtJoinList.h"

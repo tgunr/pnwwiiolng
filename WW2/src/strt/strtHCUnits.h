@@ -11,8 +11,6 @@
 #include "wwii/wwiiHCUnits.h"
 #include "chat/chatBrigadeMoveResults.h"
 #include "strt/strtTOETypes.h"
-#include <string>
-#include <vector>
 #include <list>
 
 class CPStruct;

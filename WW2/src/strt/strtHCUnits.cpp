@@ -10,11 +10,7 @@
 
 #include "versionNo.h"
 
-#include <assert.h>
-#include <map>
 #include <set>
-#include <math.h>
-#include <cmath>
 
 #include "chat/chatBrigadeMove.h"
 #include "chat/chatStratSupportMessages.h"

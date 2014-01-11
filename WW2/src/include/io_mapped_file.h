@@ -46,7 +46,7 @@
 # define IO_MAP_TYPE _IMT_WINDOWS
 
 # if defined(UNICODE)
-#  include <wchar.h>
+#  include <cwchar>
 # endif
 # define PATH_SEP_CHAR '\\' 
 # define PATH_SEP_WCHAR L'\\'
@@ -78,8 +78,8 @@ static const imf_handle_t IMF_INVALID_HANDLE = -1;
 
 #endif
 
-#include <stdlib.h>
-#include <limits.h>
+#include <cstdlib>
+#include <climits>
 
 namespace IO
 {
