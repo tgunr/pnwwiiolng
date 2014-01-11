@@ -40,6 +40,8 @@
 #include <sys/timeb.h>
 #endif
 
+#include <atomic>
+
 TeulTimeMS teulClock64;
 UINT32 teulClockTime;
 
@@ -109,20 +111,16 @@ void testMonotonicClock()
 const SCHAR*
 teulGetAddress(const UINT32 hostOrderIP)
 {
-	const UINT32 netOrderIP = htonl(hostOrderIP);
-	in_addr thost;
-	thost.s_addr = netOrderIP;
-	char* addr = inet_ntoa(thost);
-	if  ( addr == NULL)
-		return NULL;
+	static const size_t NumInstances = 16;
+	static char ntoa[NumInstances][(4 * 3) + (3 * 1) + 1];	// 4 3-digit numbers plus 3 dots plus nul
+	static std::atomic<size_t> s_instance { 0 };
+	const size_t instance = (s_instance++) & (NumInstances - 1);
 
-	static SCHAR ntoa[16][16];
-	static SINT32 count = 0; 	// NO THREAD SAFE
-	SINT32 slot = (count++) & 0x0f;
+	const UCHAR* quads = (const UCHAR*)&hostOrderIP;
+	// naive implementation: if they're in host order on a little-endian system (intel), they're backwards.
+	strprintf(ntoa[instance], "%u.%u.%u.%u", quads[3], quads[2], quads[1], quads[0]);
 
-	strncpy(ntoa[slot], addr ,16);
-
-	return ntoa[slot];
+	return ntoa[instance];
 }
 
 #if platOS != OS_WIN32
