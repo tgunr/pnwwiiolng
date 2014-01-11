@@ -33,8 +33,10 @@ ENDIF( )
 
 IF (IS_CLANG)
 	OPTION( PN_NICE_STACKS		 "Disable tail call elimination" OFF )
-	OPTION( PN_ADDRESS_SANITIZER "Enable Clang address sanitizer" OFF )
+	SET( PN_CLANG_SANITIZER  "" CACHE STRING "Enable specific clang sanitizer(s)" )
 	OPTION( PN_STATIC_ANALYZER	 "Static Analyzer" OFF )
+ELSE ( )
+	mark_as_advanced(PN_NICE_STACKS PN_CLANG_SANITIZER PN_STATIC_ANALYZER)
 ENDIF( )
 
 OPTION( PN_BUILD_32BIT		"Enable 32-bit build" ON )
