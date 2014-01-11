@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Created: Thu Dec  8 12:56:05 CST 2005
 //
 // Out Of Band messages and Strat Commands
@@ -9,9 +8,7 @@
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-//
 
-#include "dbug/dbug.h"
 #include <stdexcept>
 
 #include "wwii/wwiiConfig.h"

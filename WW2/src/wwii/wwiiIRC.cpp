@@ -27,8 +27,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "dbug/dbug.h"							// For host "dbugLog" access
-
 #include <libircclient.h>
 #include <libirc_rfcnumeric.h>
 #include <signal.h>

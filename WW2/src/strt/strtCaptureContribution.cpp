@@ -7,10 +7,7 @@
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-//
 
-#include "dbug/dbug.h"
-//
 #include "chat/chatHandle.h"
 #include "strt/strtCaptureContribution.h"
 #include "strt/strtCP.h"

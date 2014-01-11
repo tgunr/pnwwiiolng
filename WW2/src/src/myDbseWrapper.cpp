@@ -12,7 +12,6 @@
 
 #include "dbse/dbseConnection.h"
 #include "dbse/dbseWrapper.h"
-#include "dbug/dbug.h"
 #include "mem/mem.h"
 #include <mutex>
 #include <mysql.h>

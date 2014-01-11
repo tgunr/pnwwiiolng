@@ -9,7 +9,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "dbug/dbug.h"
 #include "dbse/dbseConnection.h"
 #include "teul/teulBasic.h"
 #include "mem/mem.h"

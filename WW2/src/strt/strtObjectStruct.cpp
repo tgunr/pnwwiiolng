@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Created: Sat Dec 22 21:19:00 CST 2007
 //
 // ObjectStruct functions.
@@ -8,10 +7,8 @@
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-//
 
 #include "versionNo.h"						// For version dependent code
-#include "dbug/dbug.h"							// For host "dbugLog" access
 
 #include "strt/strtFacilityStruct.h"		// Facility
 #include "strt/strtHostDB.h"				// strtSaveObject

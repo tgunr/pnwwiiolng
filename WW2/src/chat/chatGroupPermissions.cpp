@@ -9,7 +9,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "dbug/dbug.h"
 #include "chat/chatGroupsType.h"			// For CHAT_GROUPS
 #include "chat/chatGroupPermissionTypes.h"	// For ChatPermissions struct
 #include "chat/chatDB.h"

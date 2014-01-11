@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "dbug/dbug.h"
-
 #include "wwii/wwiiHCUnits.h"
 #include "include/mydbQuery.h"
 #include "chat/chatHandle.h"

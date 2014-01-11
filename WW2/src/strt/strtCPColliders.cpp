@@ -24,8 +24,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 //
 
-#include "dbug/dbug.h"							// For host "dbugLog" access
-
 #include "wwii/wwiiHash.h"
 #include "strt/strtCPStruct.h"
 #include "strt/strtFacilityStruct.h"

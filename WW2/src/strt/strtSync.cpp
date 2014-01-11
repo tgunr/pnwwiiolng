@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Class and functions for synchronizing other servers with our data.
 //
 // Copyright (c) 2004 Playnet, Inc., All Rights Reserved.
@@ -7,10 +6,7 @@
 // compiled library.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-// Maintaining Programmer: Oliver "kfsone" Smith
 // Supporting Programmer:  Oliver "kfsone" Smith
-
-#include "dbug/dbug.h"
 
 #include <list>
 #include <algorithm>

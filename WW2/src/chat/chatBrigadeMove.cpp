@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Date: Fri Apr 22 20:14:47 CDT 2005
 //
 // Routines for chatBrigadeMove
@@ -11,7 +10,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 #include "versionNo.h"
-#include "dbug/dbug.h"
 
 #include "teul/teulKit.h"
 #include "wwii/wwiiPack.h"

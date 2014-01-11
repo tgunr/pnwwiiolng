@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Date: Thu Oct 13 20:33:57 CDT 2005
 //
 // Host MOTDs
@@ -8,9 +7,6 @@
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-//
-
-#include "dbug/dbug.h"
 
 #include "chat/chatHandle.h"
 #include "chat/chatHostMotds.h"

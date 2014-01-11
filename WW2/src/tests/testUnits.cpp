@@ -1,7 +1,6 @@
 #include <syscfg.h>	// Path is project dependent.
 // Test Unit Wrapper
 
-#include "dbug/dbug.h"
 #include "tests/testUnits.h"
 #include "wwii/wwiiUTF.h"
 

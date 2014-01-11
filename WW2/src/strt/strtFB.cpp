@@ -8,8 +8,6 @@
 // Originating Programmer: Shane "Elmo" Wickson
 // Supporting Programmer:  Marty "Vandal" Poulin
 
-#include "dbug/dbug.h"
-
 #include "strt/strtTypes.h"
 #include "strt/strtCPStruct.h"
 #include "strt/strtFacilityStruct.h"

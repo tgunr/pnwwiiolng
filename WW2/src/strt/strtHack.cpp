@@ -10,10 +10,8 @@
 // compiled library.
 //
 // Originating Programmer: Shane "Elmo" Wickson
-// Maintaining Programmer: Shane "Elmo" Wickson
 // Supporting Programmer:  Eric "Meat" Hall
 
-#include "dbug/dbug.h"
 #include "mem/mem.h"
 
 #include "strt/strtTypes.h"

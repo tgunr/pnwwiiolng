@@ -1,16 +1,10 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Created: Fri Dec  2 18:12:40 CST 2005
-//
-// << DESCRIPTION >>
 //
 // Copyright (C) PlayNet, Inc 1999-2005 - All rights reserved.
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-//
-
-#include "dbug/dbug.h"
 
 #include "strt/strtSyncData.h"
 #include "strt/strtServerTypes.h"

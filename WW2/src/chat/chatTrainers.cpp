@@ -6,8 +6,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "dbug/dbug.h"
-
 #include "chat/chatTrainers.h"
 
 static TRAINERS s_trainers;

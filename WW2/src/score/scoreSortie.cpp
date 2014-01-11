@@ -1,7 +1,6 @@
 #include <syscfg.h>	// Path is project specific.
 // Member functions of scoreSortie.
 
-#include "dbug/dbug.h"
 #include "score/scoreSortie.h"
 #include "teul/teulTime.h"
 #include <unordered_map>

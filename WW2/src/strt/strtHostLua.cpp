@@ -12,7 +12,6 @@
 
 #include <signal.h>
 
-#include "dbug/dbug.h"
 #include "strt/strtHostLua.h"
 #include "wwii/wwiiConfig.h"
 #include "include/luaGlue.h"

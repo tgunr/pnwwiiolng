@@ -9,8 +9,6 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include "dbug/dbug.h"
-
 #include <signal.h>
 #include "auth/authDaemon.h"
 

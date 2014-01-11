@@ -9,8 +9,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "dbug/dbug.h"
-
 #include "include/luaGlue.h"
 #include "wwii/wwiiIRC.h"
 #include "teul/teulConfigVar.h"

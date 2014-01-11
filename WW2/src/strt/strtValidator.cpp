@@ -8,8 +8,6 @@
 // Originating Programmer: Eric "Meat" Hall
 // Supporting Programmer:  Marty "Vandal" Poulin
 
-#include "dbug/dbug.h"
-
 #include "strt/strtData.h"
 #include "strt/strtIO.h"
 #include "strt/strtSpawn.h"

@@ -9,7 +9,6 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include "dbug/dbug.h"
 #include "teul/teulBasic.h"
 #include "auth/authTypes.h"
 #include "dbse/dbseConnection.h"

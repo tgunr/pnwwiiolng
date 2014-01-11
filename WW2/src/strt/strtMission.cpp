@@ -14,7 +14,6 @@
 #include "strt/strtPostedWeaponList.h"
 #include "strt/strtData.h"
 #include "strt/strtMission.h"
-#include "dbug/dbug.h"
 #include "strt/strtCPStruct.h"
 #include "strt/strtFacilityStruct.h"
 

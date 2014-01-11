@@ -9,8 +9,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "dbug/dbug.h"							// For host "dbugLog" access
-
 #include "chat/chatHandle.h"
 #include "chat/chatLStringIDs.h"
 #include "chat/chatPlayer.h"

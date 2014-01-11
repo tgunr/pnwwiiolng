@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Date: Wed Jun  8 11:30:09 CDT 2005
 //
 // Functions for handling area chat
@@ -8,10 +7,8 @@
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-//
 
 #include "versionNo.h"
-#include "dbug/dbug.h"
 
 #include "chat/chatClientMessage.h"
 #include "chat/chatGridTypes.h"

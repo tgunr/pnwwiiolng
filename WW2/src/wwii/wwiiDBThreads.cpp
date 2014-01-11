@@ -9,7 +9,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 #include "versionNo.h"
-#include "dbug/dbug.h"
 
 #include "include/mydbQuery.h"
 #include <mysql.h>

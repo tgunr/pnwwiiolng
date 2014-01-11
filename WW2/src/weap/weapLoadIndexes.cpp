@@ -6,7 +6,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "dbug/dbug.h"
 #include "include/mydbQuery.h"
 #include "weap/weapList.h"					// For weapAddWeaponIndex
 #include "wwii/wwiiThreadTextQuery.h"

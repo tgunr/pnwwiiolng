@@ -11,7 +11,6 @@
 
 #include <stdexcept>
 
-#include "dbug/dbug.h"
 #include "versionNo.h"
 
 #include "chat/chatDB.h"

@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Date: Thu Sep 22 11:57:18 CDT 2005
 //
 // Functions for managing squad creation
@@ -8,10 +7,8 @@
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-//
 
 #include "versionNo.h"
-#include "dbug/dbug.h"
 
 #include <algorithm>
 

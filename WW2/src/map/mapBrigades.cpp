@@ -1,6 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-// mapBrigades
-//
 // Date: Thu Mar  3 15:10:00 CST 2005
 //
 // Brigade Functionality
@@ -9,11 +7,8 @@
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-// Maintaining Programmer: Oliver "kfsone" Smith
 // Supporting Programmer: Patrick "thunder" Macgruder
-//
 
-#include "dbug/dbug.h"
 #include "versionNo.h"
 
 #include <stdexcept>

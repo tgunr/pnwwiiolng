@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-#include "dbug/dbug.h"
 #include "dbse/dbseDatabaseSchema.h"
 #include "dbse/dbseWrapper.h"
 #include "include/mydbQuery.h"

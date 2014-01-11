@@ -8,8 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "dbug/dbug.h"
-
 #include "chat/chatEditString.h"
 #include "chat/chatGenericString.h"
 #include "chat/chatPlayer.h"
