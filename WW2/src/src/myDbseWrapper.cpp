@@ -29,14 +29,12 @@ extern ConfigBool cv_mysqlCompression;
 static DB::handle_t*
 _doMyConnect(const DBCONNECTION& connection, bool autoReconnect)
 {
-	DB::handle_t* tempConn;
-
 	// Make sure MySQL is initialized and construct a connection structure.
-	tempConn = mysql_init(NULL);
-	if (tempConn == NULL)
+	DB::handle_t* tempConn = mysql_init(nullptr);
+	if (tempConn == nullptr)
 	{
 		dbugLog(_FLA, "mysql_init() failed!");
-		return(NULL);
+		return(nullptr);
 	}
 
 	// Attempt to establish the connection
@@ -44,12 +42,12 @@ _doMyConnect(const DBCONNECTION& connection, bool autoReconnect)
 	if ( cv_mysqlCompression.GetBool() )
 		flags |= CLIENT_COMPRESS;
 
-	if ( mysql_real_connect(tempConn, connection.host, connection.username, connection.password, connection.dbName, 0, NULL, flags) == NULL )
+	if ( mysql_real_connect(tempConn, connection.host, connection.username, connection.password, connection.dbName, 0, nullptr, flags) == nullptr )
 	{
 		threadLog(_FLA, "mysql_real_connect failed:\nError %u (%s) \n", mysql_errno(tempConn), mysql_error(tempConn));
 		threadLog(_FLA, "using host %s name %s password %s dbname %s"
 						, connection.host, connection.username, connection.password, connection.dbName);
-		return(NULL);
+		return(nullptr);
 	}
 
 #if MYSQL_VERSION_ID >= 50003
@@ -62,7 +60,7 @@ _doMyConnect(const DBCONNECTION& connection, bool autoReconnect)
 	{
 		threadLog(_FLA, "set names failed");
 		mysql_close(tempConn);
-		return NULL;
+		return nullptr;
 	}
 
 //	mysql_set_character_set(tempConn, "utf8");
@@ -77,12 +75,12 @@ static std::mutex dbconnMutex;
 DB::handle_t*
 dbseGetConnection(const DBCONNECTION& connection, bool report, bool autoReconnect)
 {
-	if ( connection.host == NULL ) return NULL;
-	if ( connection.dbName == NULL ) return NULL;
-	if ( connection.username == NULL ) return NULL;
-	if ( connection.password == NULL ) return NULL;
+	if ( connection.host == nullptr ) return nullptr;
+	if ( connection.dbName == nullptr ) return nullptr;
+	if ( connection.username == nullptr ) return nullptr;
+	if ( connection.password == nullptr ) return nullptr;
 
-	DB::handle_t* newConn = NULL;
+	DB::handle_t* newConn = nullptr;
 	std::this_thread::sleep_for(std::chrono::microseconds(250));
 	{
 		std::lock_guard<std::mutex> dbconnLock(dbconnMutex);
@@ -95,7 +93,7 @@ dbseGetConnection(const DBCONNECTION& connection, bool report, bool autoReconnec
 						, connection.host, connection.dbName
 						, connection.username, connection.password
 						, (autoReconnect ? "auto" : "manual")
-						, ((newConn != NULL) ? "successful" : "FAILED")
+						, ((newConn != nullptr) ? "successful" : "FAILED")
 						);
 	}
 
@@ -111,7 +109,7 @@ DBHANDLE::connect(const DBCONNECTION& connection)
 
 	//Initialization stuff;
 	m_conn = dbseGetConnection(connection, true);
-	if ( NULL == m_conn )
+	if ( nullptr == m_conn )
 		return false;
 
 	m_initialized = true;
@@ -123,7 +121,7 @@ void
 DBHANDLE::disconnect()
 {
 	DB::handle_t* const oldConn = m_conn;
-	m_conn = NULL;
+	m_conn = nullptr;
 
 	if ( m_initialized == false )
 		return;
