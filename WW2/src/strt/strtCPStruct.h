@@ -319,9 +319,7 @@ public:
 	UINT32				m_value;
 
 //tolua_end
-#if defined(IS_MAP_HOST)
 	ACTIVE_BRIGADES		m_brigades;
-#endif
 
 private:
 	//// Helper functions
