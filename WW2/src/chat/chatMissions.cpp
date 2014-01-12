@@ -834,6 +834,8 @@ _findNewLeader(ChatMission::MEMBERS::const_iterator start, ChatMission::MEMBERS:
 		// Are they accepting promotions?
 		if ( candidate->rejectLead() )
 			continue;
+		if (!allowAfk && candidate->isAFK())
+			continue;
 
 		const RANK_NO candidateRank = _candidateRank(candidate);
 		if ( preferredRank > candidateRank )
