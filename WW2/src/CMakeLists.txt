@@ -491,6 +491,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 				chat/chatChannelTypes.h
 				chat/chatPrototypes.h
 				chat/chatDebugConditions.h
+			chat/chatData.h
 		chat/chatHostMessages.cpp
 			chat/chatHostMessages.h
 				chat/chatChannelID.h
