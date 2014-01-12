@@ -187,7 +187,7 @@ chatBanQueueThread(void*)
 
 	threadIgnoreSIGPIPE();
 
-	while ( 1 )
+	for (;;)
 	{
 		_processBan(conn, *banQueue.getNext());
 	}
