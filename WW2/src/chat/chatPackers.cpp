@@ -86,7 +86,7 @@ Chat::HostMessage::packer(LOGICAL mode, ACTION_OBJECT* a)
 	if ( mode == TEUL_UNPACK && length > MAX_MESSAGE_LENGTH - 1 )
 		length = MAX_MESSAGE_LENGTH - 1;
 
-	a->offset = teulPackVoid(mode, a->packed, a->offset, (void*)msg, length+1);
+	a->offset = teulPackVoid(mode, a->packed, a->offset, const_cast<char*>(msg), length+1);
 
 	return a->offset;
 }

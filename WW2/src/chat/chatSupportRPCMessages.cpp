@@ -108,7 +108,7 @@ chatSendDirectMessage(const playerid_t playerID, LSTRING_ID prefix, LSTRING_ID m
 void
 chatSendTickSample(const UINT32 source, const playerid_t playerID, const void* data)
 {
-	Teul::TickSample* srcSample = (Teul::TickSample*)data;
+	const Teul::TickSample* srcSample = (const Teul::TickSample*)data;
 	Teul::Packet outgoing(0, Chat::CallbackX, Chat::TICK_SAMPLE_Y);
 	auto* sample = CONSTRUCT_IN_PACKET(outgoing, Teul::TickSample, srcSample->host_ms, srcSample->client_ms);
 	sample->source = source;

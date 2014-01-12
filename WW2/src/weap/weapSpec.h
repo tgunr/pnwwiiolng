@@ -50,7 +50,7 @@ struct WEAPON_SPEC
 
 	//! But I don't want a complicated structure. Just gimme a number.
 	UINT32 asUINT32() const { return ((UINT32)wCountry << 24) | ((UINT32)wCategory << 16) | ((UINT32)wClass << 8) | (UINT32)wType; }
-	UINT16 asUINT16() const { return *(UINT16*)this; }
+	UINT16 asUINT16() const { return *(const UINT16*)this; }
 	//! Compare two weapon specs, but do it real cheap, because we do it frequently.
 	bool operator==(const WEAPON_SPEC& rhs) const { return this->asUINT16() == rhs.asUINT16(); }
 

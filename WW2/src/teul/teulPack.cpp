@@ -674,7 +674,7 @@ wwiiPackString(LOGICAL mode, UCHAR* data, SINT32 offset, std::string& text, SINT
 	{
 		if ( mode == TEUL_PACK )
 		{
-			offset = teulPackVoid(mode, data, offset, (void*)text.c_str(), len);
+			offset = teulPackVoid(mode, data, offset, const_cast<char*>(text.c_str()), len);
 		}
 		else
 		{

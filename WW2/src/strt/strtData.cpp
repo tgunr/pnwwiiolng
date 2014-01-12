@@ -443,7 +443,7 @@ _checkSupplyLinks()
 bool ObjectStruct::isProductionCenter() const
 {
 	return ( (type == BUILDING_RESEARCH)
-				&& *(UINT32*)(filename) == *(UINT32*)("fact")	// 4-byte string comparison
+				&& *(const UINT32*)(filename) == *(const UINT32*)("fact")	// 4-byte string comparison
 				&& (facility->type == FACILITY_FACTORY)
 				&& (facility->subType == FACTORY_VEHICLE)
 				);

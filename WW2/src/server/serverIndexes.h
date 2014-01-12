@@ -12,7 +12,7 @@ namespace Server
 
 	// If the broadcastnet is not a network (xxxxxx00) or broadcast (xxxxxxff) value,
 	// then we're talking via a controller.
-	static inline bool IsBroadcastViaController() { return (UINT32)((broadcastNet & 0xff) - 1) < 254; }
+	static inline bool IsBroadcastViaController() { return ((broadcastNet & 0xff) - 1) < 254; }
 
 	static inline UINT32 BroadcastMaskAddress(const UINT32 ip)
 	{

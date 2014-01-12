@@ -230,14 +230,14 @@ _dbugOut(const SINT32		file
 			, const SINT32		logType
 			, const SINT32		// errType
 			, const SINT32		// flags
-			, const SCHAR*		outString
+			, const char*		outString
 			, const size_t		length
 			, const	bool		rollover)
 {
 	if (logType != LOG_TO_FILE || file < 0)
 		return;
 
-	size_t retval = OS_WRITE(file, (void*)outString, (unsigned long)length);
+	size_t retval = OS_WRITE(file, outString, (unsigned long)length);
 	if ( file == _stdErrFileNo )
 		return;
 

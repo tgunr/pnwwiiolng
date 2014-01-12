@@ -1225,7 +1225,7 @@ _personaXfer(Player& player, PLAYER_EXIT& pe)
 static void
 _badTicks(const SINT32 teulIndex, wwiiPlayer* const player_, const UCHAR* const data)
 {
-	auto* const sample = (Teul::TickSample*)(data);
+	auto* const sample = (const Teul::TickSample*)(data);
 	if ( player_ == nullptr )
 	{
 		dbugLog(_FLW, "t:%d clock drift host:%llu, client:%llu, delta:%lld, ratio:%.6g", teulIndex, sample->host_ms, sample->client_ms, sample->delta, sample->ratio);
