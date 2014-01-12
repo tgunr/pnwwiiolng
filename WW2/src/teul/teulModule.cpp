@@ -176,7 +176,7 @@ _getHostIPAddresses()
 
 		TCHAR addrString[128];
 		DWORD addrSize = sizeof(addrString);
-		auto x = WSAAddressToString(address->Address.lpSockaddr, address->Address.iSockaddrLength, nullptr, addrString, &addrSize);
+		WSAAddressToString(address->Address.lpSockaddr, address->Address.iSockaddrLength, nullptr, addrString, &addrSize);
 
 		dbugLog(_FLI, "read index %u interface %ls, ip %s pid %u"
 						, ifNo

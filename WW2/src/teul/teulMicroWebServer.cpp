@@ -229,7 +229,7 @@ Teul::uWeb::Server::run()
 // Call the handler for a path.
 
 static void
-_callHandler(const unsigned int sock, Teul::uWeb::Server::VirtualFileHandler handler, const char* const path, const char* const args, Teul::uWeb::Server* server)
+_callHandler(const unsigned int sock, Teul::uWeb::Server::VirtualFileHandler handler, const char* const path, const char* const args, Teul::uWeb::Server* /*server*/)
 {
 	// Write the HTTP header first
 	static const char ok200[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: text/javascript\r\nContent-Language: en\r\nContent-Encoding: UTF-8\r\n\r\n";
