@@ -160,7 +160,7 @@ public:
 
 	// See if "viewer" can see me under fairly ordinary constraints
 	bool isVisibleTo(const Player* viewer, bool ignoreSide=false) const;
-	bool isVisibleTo(const Player& viewer, bool ignoreSide=false) const { return isVisibleTo(&viewer); }
+	bool isVisibleTo(const Player& viewer, bool ignoreSide=false) const { return isVisibleTo(&viewer, ignoreSide); }
 
 	// Describe the last position of a player
 	const char* lastPosition(const char* prefix, const FLOAT64& x, const FLOAT64& y, bool onlyIfValid) const;
