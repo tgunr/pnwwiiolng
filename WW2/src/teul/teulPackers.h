@@ -81,7 +81,7 @@ namespace Teul
 #define DEF_PACKER(_typename, _functor, _defSize) \
 	void packer(LOGICAL _mode, _typename _data, SINT32 bits=_defSize)	\
 	{\
-		this->offset = _functor(_mode, this->packed, this->offset, (_typename)_data, bits); \
+		this->offset = _functor(_mode, this->packed, this->offset, _data, bits); \
 	}
 
 #define DEF_PACKREF(_typename, _functor, _defSize) \
