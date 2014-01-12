@@ -521,6 +521,15 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 			chat/chatPlayer.h
 		chat/chatServerTrackedObjects.cpp
 			chat/chatServerTrackedObjects.h
+				chat/chatBailSTO.h
+				chat/chatHulkSTO.h
+				chat/chatOrdnanceSTO.h
+				chat/chatPPOSTO.h
+				chat/chatServerSTO.h
+				chat/chatSTODamage.h
+				chat/chatSTOJoules.h
+				chat/chatUMSSTO.h
+				chat/chatVehicleSTO.h
 		chat/chatSpamCan.cpp
 			chat/chatSpamCan.h
 		chat/chatStrings.cpp
