@@ -70,7 +70,7 @@ hostReceiveVehicleUpdates(const unsigned char* const input, const UINT32 bytes, 
 	UINT32 count = 0;
 	while ( cur < end )
 	{
-		SINT32 size = *((SINT32*)cur);
+		SINT32 size = *((const SINT32*)cur);
 		cur = cur + sizeof(SINT32);
 		commRecvVehicleUpdate(source, cur);
 		cur += size;

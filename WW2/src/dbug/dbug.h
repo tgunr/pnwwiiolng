@@ -139,10 +139,10 @@ extern NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, uns
 
 // These macros assume that the condition is unlikely and try to provide the compiler an optimization hint by
 // ordering the abort as the second choice.
-#define ABORT_UNLESS(assertion_) PN_LIKELY(!!(assertion_)) ? (void)0 : (void)_LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, nullptr, "Assertion: !(%s)", #assertion_)
-#define ABORT_UNLESS_EX(assertion_, ...) PN_LIKELY(!!(assertion_)) ? (void)0 : (void)_LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, #assertion_, __VA_ARGS__)
-#define ABORT_IF(assertion_) PN_LIKELY(!(assertion_)) ? (void)0 : (void)_LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, nullptr, "Assertion: %s", #assertion_)
-#define ABORT_IF_EX(assertion_, ...) PN_LIKELY(!(assertion_)) ? (void)0 : (void)_LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, #assertion_, __VA_ARGS__)
+#define ABORT_UNLESS(assertion_) PN_LIKELY(!!(assertion_)) ? (void)0 : _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, nullptr, "Assertion: !(%s)", #assertion_)
+#define ABORT_UNLESS_EX(assertion_, ...) PN_LIKELY(!!(assertion_)) ? (void)0 : _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, #assertion_, __VA_ARGS__)
+#define ABORT_IF(assertion_) PN_LIKELY(!(assertion_)) ? (void)0 : _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, nullptr, "Assertion: %s", #assertion_)
+#define ABORT_IF_EX(assertion_, ...) PN_LIKELY(!(assertion_)) ? (void)0 : _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, #assertion_, __VA_ARGS__)
 
 #ifdef DBUG_TEST
 	#define dbugLog(x,args...) printf(args)

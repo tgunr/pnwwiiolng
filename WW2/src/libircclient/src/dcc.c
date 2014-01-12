@@ -224,11 +224,11 @@ static void libirc_dcc_process_descriptors (irc_session_t * ircsession, fd_set *
 		&& FD_ISSET (dcc->sock, in_set) )
 		{
 			socklen_t len = sizeof(dcc->remote_addr);
-			socket_t nsock = static_cast<socket_t>(-1);
+			socket_t nsock = -1;
 			int err = 0;
 
 			// New connection is available; accept it.
-			if ( socket_accept (static_cast<socket_t*>(&dcc->sock), static_cast<socket_t*>(&nsock), (struct sockaddr *) &dcc->remote_addr, &len) )
+			if ( socket_accept (&dcc->sock, &nsock, (struct sockaddr *) &dcc->remote_addr, &len) )
 				err = LIBIRC_ERR_ACCEPT;
 
 			// On success, change the active socket and change the state

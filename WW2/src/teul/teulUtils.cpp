@@ -163,7 +163,7 @@ HostToAddr(const UINT32 host_, const UINT16 port_, char* const hostBuf_, const s
 int
 HostToAddr(const struct sockaddr_in* const sa, char* const hostBuf_, const size_t hostBufLen_, char* const portBuf_, const size_t portBufLen_)
 {
-	return getnameinfo((sockaddr*)&sa, sizeof(sa), hostBuf_, hostBufLen_, portBuf_, portBufLen_, NI_NUMERICHOST | NI_NUMERICSERV);
+	return getnameinfo((const sockaddr*)(&sa), sizeof(sa), hostBuf_, hostBufLen_, portBuf_, portBufLen_, NI_NUMERICHOST | NI_NUMERICSERV);
 }
 
 #if platOS != OS_WIN32

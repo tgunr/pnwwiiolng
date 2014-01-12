@@ -1070,7 +1070,7 @@ _checkObjectiveTarget(const FULL_OBJ_ID& fid, Player* player)
 		return nullptr;
 	}
 
-	return (PropCP*)property;
+	return static_cast<PropCP*>(const_cast<Property*>(property));
 }
 
 //////////////////////////////////////////////////////////////////////

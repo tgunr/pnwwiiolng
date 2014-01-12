@@ -65,7 +65,7 @@ struct ClientRole : public Role
 
 	static SINT32 recvUnencrypted(ACTION_OBJECT* const a)
 	{
-		if ( strcmp((char*)a->packed, (char*)"unencrypted") != 0 )
+		if ( strcmp((const char*)a->packed, (const char*)"unencrypted") != 0 )
 			throw Teul::Error("Unencrypted data was bad", -1);
 		Iprintf("Received unencrypted data OK\n");
 		sm_gotUnencrypted = true;

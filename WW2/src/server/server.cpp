@@ -1712,7 +1712,7 @@ serverGetClusterCapacity()
 	nextCheck = teulClock64 + 250;
 
 	static const size_t environmentCapacity = serverGetMaxClusterUsers();
-	const size_t configCapacity = (size_t)host_config.arena.maxPlayers;
+	const size_t configCapacity = host_config.arena.maxPlayers;
 
 	// Get a peak capacity for each server type.
 	size_t clusterCapacity = 0;

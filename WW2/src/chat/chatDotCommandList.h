@@ -26,7 +26,7 @@ namespace Chat
 		HostCommands cmdList;
 
 		// Starts with a command count.
-		const cmdcount_t& numCommands = *(cmdcount_t*)source;
+		const cmdcount_t& numCommands = *(const cmdcount_t*)source;
 		source += sizeof(numCommands);
 
 		cmdList.resize(numCommands);
@@ -36,7 +36,7 @@ namespace Chat
 			HostCommand& cur = cmdList[i];
 			cur.playnetOnly = Teul::ExtractAndAdvance<const UCHAR>(source);
 
-			cur.command = (char*)source;
+			cur.command = reinterpret_cast<const char*>(source);
 			// Size (bytes) plus zero.
 			source += cur.command.size() + 1;
 

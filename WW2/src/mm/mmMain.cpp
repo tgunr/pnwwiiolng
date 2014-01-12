@@ -519,7 +519,7 @@ _errorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEU
 	}
 	else if ( error == ETEUL_ILLEGAL_TICKS )
 	{
-		auto* sample = (Teul::TickSample*)(data);
+		auto* sample = (const Teul::TickSample*)(data);
 		Player* player = PlayerInterface::Lookup(teulIndex);
 		if ( player != nullptr )
 		{

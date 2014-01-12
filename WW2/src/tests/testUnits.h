@@ -52,8 +52,8 @@ public: template<typename _Lhs, typename _Rhs> Equality Equals(const _Lhs& resul
 		{
 			snprintf(m_lhsVal, 64, "%llu", (UINT64)result);
 			snprintf(m_rhsVal, 64, "%llu", (UINT64)expect);
-			if ( result < (_Lhs)expect ) return IsLt;
-			if ( result > (_Lhs)expect ) return IsGt;
+			if ( result < (const _Lhs)expect ) return IsLt;
+			if ( result > (const _Lhs)expect ) return IsGt;
 			return IsEqual;
 		}
 public: Equality Equals(const FULL_OBJ_ID& result, const FULL_OBJ_ID& expect) const

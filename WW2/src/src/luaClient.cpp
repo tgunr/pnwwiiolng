@@ -398,7 +398,7 @@ _getHost(std::string ipAddress)
 				printf("Unrecognized host, '%s'\n", name);
 			break;
 			}
-			rl_free((void*)name);
+			rl_free(const_cast<char*>(name));
 		}
 		while ( ipAddress.empty() );
 

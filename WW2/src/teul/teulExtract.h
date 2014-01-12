@@ -11,7 +11,7 @@ namespace Teul
 template<typename _Type>
 const _Type& ExtractAndAdvance(const UCHAR*& from)
 {
-	const _Type& value = *(_Type*)from;
+	const _Type& value = *(const _Type*)from;
 	from += sizeof(_Type);
 	return value;
 }

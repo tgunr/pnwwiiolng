@@ -150,7 +150,7 @@ wwiiFreeRanks()
 	{
 		if ( rankNames[i] != nullptr )
 		{
-			free((void*)rankNames[i]);
+			free(const_cast<char*>(rankNames[i]));
 			rankNames[i] = nullptr;
 		}
 	}

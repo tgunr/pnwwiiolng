@@ -1233,7 +1233,7 @@ _processDollars(const Player* player, const char* base, char* start)
 		}
 		else if ( buffer.compare(pos + 1, _NAME_LEN, "here") == 0 )
 		{
-			translations = _injectCaptureStatus(buffer, pos, _TAG_LEN, player->m_capping, player->m_capProgress, (PropCP*)player->lastCP());
+			translations = _injectCaptureStatus(buffer, pos, _TAG_LEN, player->m_capping, player->m_capProgress, static_cast<const PropCP*>(player->lastCP()));
 		}
 		else if ( buffer.compare(pos + 1, _NAME_LEN, "lead") == 0 )
 		{
@@ -1575,7 +1575,7 @@ chatBuildHostMessage(const ChatHandle& senderID
 struct IsRat : public FilterFn
 {
 	static ChatHandle excludeID;
-	bool operator()(const wwiiPlayer* player) const { return player->isPlaynet() && ((Player*)player)->initialized() && player->matchHandle() != excludeID; }
+	bool operator()(const wwiiPlayer* player) const { return player->isPlaynet() && ((const Player*)player)->initialized() && player->matchHandle() != excludeID; }
 };
 ChatHandle IsRat::excludeID = 0LL;
 
@@ -1596,7 +1596,7 @@ chatDispatchCRSMessage(const SCHAR* source, const SCHAR* text, const ChatHandle&
 struct IsGM : public FilterFn
 {
 	static ChatHandle excludeID;
-	bool operator()(const wwiiPlayer* player) const { return (player->isGM() && player->matchHandle() != excludeID && ((Player*)player)->initialized()); }
+	bool operator()(const wwiiPlayer* player) const { return (player->isGM() && player->matchHandle() != excludeID && ((const Player*)player)->initialized()); }
 };
 ChatHandle IsGM::excludeID = 0LL;
 
@@ -2321,7 +2321,7 @@ _errorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/, const
 	UINT32 error = (UINT32) abs(error_);
 	if ( error == ETEUL_ILLEGAL_TICKS )
 	{
-		auto* sample = (Teul::TickSample*)(data);
+		auto* sample = (const Teul::TickSample*)(data);
 		Player* player = PlayerInterface::Lookup(teulIndex);
 		if ( player != nullptr )
 		{
@@ -2429,7 +2429,7 @@ _managementErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*siz
 	}
 	else if ( error == ETEUL_ILLEGAL_TICKS )
 	{
-		auto* sample = (Teul::TickSample*)(data);
+		auto* sample = (const Teul::TickSample*)(data);
 		Player* player = PlayerInterface::Lookup(teulIndex);
 		if ( player != nullptr )
 		{

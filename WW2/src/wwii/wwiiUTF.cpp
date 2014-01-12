@@ -103,7 +103,6 @@ WWII::ConvertChars(const wchar_t* source, char* target, size_t sizeofTarget_InBy
 {
 	assert( source != nullptr );
 	assert( target != nullptr );
-	assert( (void*)source != (void*)target );
 
 	const size_t targetEntries = sizeofTarget_InBytes / sizeof(*target) - 1;
 	assert( targetEntries > 0 );
@@ -182,7 +181,7 @@ WWII::IsLegalUTF8(const char* const source)
 {
 	const int length = WWII::BytesFromCharacter[(UTF8)*source];
 	UTF8 a;
-	const UTF8* srcptr = (UTF8*)(source + length);
+	const UTF8* srcptr = reinterpret_cast<const UTF8*>(source + length);
 	switch (length)
 	{
 		default: return false;
@@ -234,7 +233,6 @@ WWII::ConvertChars(const char* source, wchar_t* target, size_t sizeofTarget_InBy
 {
 	assert( source != nullptr );
 	assert( target != nullptr );
-	assert( (void*)source != (void*)target );
 
 	const size_t targetEntries = sizeofTarget_InBytes / sizeof(*target) - 1;
 	assert( targetEntries > 0 );
