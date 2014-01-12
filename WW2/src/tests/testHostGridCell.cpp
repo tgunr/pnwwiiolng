@@ -41,7 +41,7 @@ public:	bool TestXYConstructor(Grid::Key::Coord x, Grid::Key::Coord y)
 		return true;
 	}
 
-public: virtual bool Run()
+public: virtual bool Run() OVERRIDE_FN
 	{
 		START_TEST_STAGE( "Constructor/destructor" )
 			CRITICAL(
@@ -250,7 +250,7 @@ public: virtual ~HostGridCellTest() {}
 
 	//////////////////////////////////////////////////////////////////////
 	// Main body of the test.
-public: virtual bool Run()
+public: virtual bool Run() OVERRIDE_FN
 	{
 		static const instanceid_t inst = 1234;
 

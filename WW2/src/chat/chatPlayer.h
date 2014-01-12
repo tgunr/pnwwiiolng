@@ -71,7 +71,7 @@ public:
 	void SetBranch(BRANCH_ENUM newBranch);
 
 	// Change my country and side
-	virtual void SetCountry(WWII_COUNTRY toCountry, WWII_SIDE toSide);
+	virtual void SetCountry(WWII_COUNTRY toCountry, WWII_SIDE toSide) OVERRIDE_FN;
 
 	// If the last group read was less more than a minute ago,
 	// then force a re-read of the group memberships

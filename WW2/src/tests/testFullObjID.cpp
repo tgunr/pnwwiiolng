@@ -77,7 +77,7 @@ public:
 		return true;
 	}
 
-public: virtual bool Run()
+public: virtual bool Run() OVERRIDE_FN
 	{
 		TestID(0, 0, 0, true);
 		for ( SINT32 x = -1; x < 8; ++x )

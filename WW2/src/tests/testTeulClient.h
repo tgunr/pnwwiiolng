@@ -81,7 +81,7 @@ struct ClientRole : public Role
 		return a->offset;
 	}
 
-	virtual int RegisterCallbacks()
+	virtual int RegisterCallbacks() OVERRIDE_FN
 	{
 		BEGIN_CALLBACK_REGISTRATION(Role::Test_X)
 			REGISTER_RECVSEND(Role::Hello_Y, recvHello, sendHello, s_cbHello);
@@ -608,7 +608,7 @@ struct ClientRole : public Role
 		}
 	}
 
-	public: virtual void Run()
+	public: virtual void Run() OVERRIDE_FN
 	{
 		OpenConnection();
 

@@ -73,7 +73,7 @@ public:
 	FetchPollQuery() : DBThreadQuery(DBThread::Default, "FetchPollQuery", _FETCH_POLL_QUERY, DBThreadQuery::_IMMEDIATE) {}
 
 public:
-	virtual void Success()
+	virtual void Success() OVERRIDE_FN
 	{
 		if ( Query()->Rows() > 0 )
 		{

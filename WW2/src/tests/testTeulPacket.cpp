@@ -43,7 +43,7 @@ class TestTeulPacket : public TestUnit
 public:	TestTeulPacket() : TestUnit("Teul::Packet") {}
 public: virtual ~TestTeulPacket() {}
 
-public:	virtual bool Run()
+public:	virtual bool Run() OVERRIDE_FN
 		{
 			enum { TestCallX = 1, TestCallY = 10 };
 			START_TEST_STAGE( "Constructor" )

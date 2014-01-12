@@ -19,7 +19,7 @@ class ChatHandleTestUnit : public TestUnit
 public: ChatHandleTestUnit() : TestUnit("ChatHandle") {}
 public: virtual ~ChatHandleTestUnit() {}
 
-public: virtual bool Run();
+public: virtual bool Run() OVERRIDE_FN;
 
 	// Test chatIsValidCallsign and chatIsValidHandle
 	// with a series of valid callsigns.

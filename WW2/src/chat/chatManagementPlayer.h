@@ -19,8 +19,8 @@ public:
 	ManagementPlayer(SINT32 teulIndex, const char* withGameName);
 	virtual ~ManagementPlayer();
 
-	virtual bool isManager() const { return true; }
-	virtual bool isConnected() const { return true; }
+	virtual bool isManager() const OVERRIDE_FN { return true; }
+	virtual bool isConnected() const OVERRIDE_FN { return true; }
 
 	// Describe to another GM
 	virtual void describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, bool includePermissions) const OVERRIDE_FN;

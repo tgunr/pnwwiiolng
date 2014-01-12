@@ -100,7 +100,7 @@ private:
 	}
 
 public:
-	virtual bool Run()
+	virtual bool Run() OVERRIDE_FN
 	{
 		CRITICAL( ExpectEqual( sizeof(testtype_t), (testtype_t::HeaderBits + testtype_t::FlagBits) / 8 ) );
 

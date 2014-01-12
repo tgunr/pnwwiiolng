@@ -52,7 +52,7 @@ public:
 		PNThread::start();
 	}
 
-	virtual void run();
+	virtual void run() OVERRIDE_FN;
 };
 
 static const UINT32 NUM_HELPER_THREADS = 2;

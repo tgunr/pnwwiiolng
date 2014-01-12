@@ -21,7 +21,7 @@ public:
 
 	//! Construct from a subtype.
 	//! @param[in]	subType			Populate from this subtype's config.
-	explicit STODamage(UINT16) ;
+	explicit STODamage(UINT16);
 
 	//! Apply damage or repairs.
 	//! @param[in] joules		+ve joules of damage or -ve joules of repair.
@@ -29,13 +29,13 @@ public:
 	bool applyJoules(const SINT64& joules)
 	{
 		if ( m_capacity == 0 )
-			return false ;
+			return false;
 
 		if ( joules < 0 )
-			return _repair((UINT64)(-joules)) ;
+			return _repair((UINT64)(-joules));
 		else if ( joules > 0 )
-			return _damage((UINT64)joules) ;
-		return false ;
+			return _damage((UINT64)joules);
+		return false;
 	}
 
 	//! Test if the object is destroyed.
@@ -43,14 +43,14 @@ public:
 	//!         accumulated damage has exceeded it.
 	bool isDestroyed() const
 	{
-		return ( m_capacity > 0 && m_accumulated >= m_capacity ) ;
+		return ( m_capacity > 0 && m_accumulated >= m_capacity );
 	}
 
 	//! Test if the object is partially damaged.
 	//! @return true if the object has any damage, false otherwise.
 	bool isDamaged() const
 	{
-		return ( m_accumulated > 0 ) ;
+		return ( m_accumulated > 0 );
 	}
 
 private:
@@ -59,14 +59,14 @@ private:
 	bool _repair(const UINT64& joules)
 	{
 		if ( !isDamaged() )
-			return false ;
+			return false;
 
 		if ( joules > m_accumulated )
-			m_accumulated = 0 ;
+			m_accumulated = 0;
 		else
-			m_accumulated -= joules ;
+			m_accumulated -= joules;
 
-		return true ;
+		return true;
 	}
 
 	//! @internal Apply damage joules.
@@ -74,26 +74,26 @@ private:
 	bool _damage(const UINT64& joules)
 	{
 		if ( joules < m_threshold )
-			return false ;
+			return false;
 		// Avoid overflow.
 		if ( joules >= m_capacity || m_capacity - joules < m_accumulated )
 		{
-			m_accumulated = m_capacity ;
-			return true ;
+			m_accumulated = m_capacity;
+			return true;
 		}
 
-		m_accumulated += joules ;
+		m_accumulated += joules;
 
-		return true ;
+		return true;
 	}
 
 public:
-	const UINT64& threshold() const { return m_threshold ; }
-	const UINT64& capacity() const { return m_capacity ; }
-	const UINT64& accumulated() const { return m_accumulated ; }
+	const UINT64& threshold() const { return m_threshold; }
+	const UINT64& capacity() const { return m_capacity; }
+	const UINT64& accumulated() const { return m_accumulated; }
 
 private:
-	UINT64		m_threshold ;			//!< Damage requird to hurt me.
-	UINT64		m_capacity ;			//!< Total damage required to destroy me.
-	UINT64		m_accumulated ;			//!< Damage received.
-} ;
+	UINT64		m_threshold;			//!< Damage requird to hurt me.
+	UINT64		m_capacity;			//!< Total damage required to destroy me.
+	UINT64		m_accumulated;			//!< Damage received.
+};

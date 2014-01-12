@@ -15,5 +15,5 @@ class BailSTO : public ServerSTO
 public:
 	BailSTO(ACTION_OBJECT* const a) : ServerSTO(a) {}
 
-	virtual const char* typeName() const { return "bail" ; }
-} ;
+	virtual const char* typeName() const OVERRIDE_FN { return "bail"; }
+};

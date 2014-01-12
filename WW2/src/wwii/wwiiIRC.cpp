@@ -93,14 +93,14 @@ struct IRCImpl : public IRC, public PNThread
 
 	std::set<std::string>	m_ignores;
 
-	virtual bool ignoring(const char* channel) const
+	virtual bool ignoring(const char* channel) const OVERRIDE_FN
 	{
 		char realName[128];
 		return ( m_ignores.find(_getChannelName(channel, realName, sizeof(realName))) != m_ignores.end() );
 	}
-	virtual const std::string& nick() const { return m_nick; }
+	virtual const std::string& nick() const OVERRIDE_FN { return m_nick; }
 
-	virtual void run();
+	virtual void run() OVERRIDE_FN;
 };
 
 irc_callbacks_t ircCallbacks;

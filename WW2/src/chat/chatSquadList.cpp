@@ -1249,7 +1249,7 @@ public:
 	SquadNamesQuery() : DBThreadQuery(DBThread::Default, "SquadNamesQuery", "SELECT short_name FROM wwii_squads", DBThreadQuery::_IMMEDIATE) {}
 
 protected:
-	virtual void Success();
+	virtual void Success() OVERRIDE_FN;
 };
 
 void

@@ -23,8 +23,8 @@ public:
 	virtual bool message(int prefix, int msgid
 						, const char* const ptr0="", const char* const ptr1="", const char* const ptr2=""
 						, const char* const ptr3="", const char* const ptr4="", const char* const ptr5=""
-						) const;
-	virtual bool message(const Chat::LocalizedMessage& lmsg) const
+						) const OVERRIDE_FN;
+	virtual bool message(const Chat::LocalizedMessage& lmsg) const OVERRIDE_FN
 	{
 		return message(lmsg.m_prefix, lmsg.m_message, lmsg.m_ptr[0], lmsg.m_ptr[1], lmsg.m_ptr[2], lmsg.m_ptr[3], lmsg.m_ptr[4], lmsg.m_ptr[5]);
 	}

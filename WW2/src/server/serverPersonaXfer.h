@@ -41,8 +41,8 @@ namespace Server
 		Auth::Dispatch& dispatch() { return data.dispatch ; }
 		const Auth::Dispatch& dispatch() const { return data.dispatch ; }
 
-		public: virtual SINT32 onComplete(SINT32 /* result */) const { return -EINVAL ; }
-		public: virtual void packer(LOGICAL mode, ACTION_OBJECT* const a)
+		public: virtual SINT32 onComplete(SINT32 /* result */) const OVERRIDE_FN { return -EINVAL ; }
+		public: virtual void packer(LOGICAL mode, ACTION_OBJECT* const a) OVERRIDE_FN
 		{
 			Transfer::packer(mode, a) ;
 			data.packer(mode, a) ;

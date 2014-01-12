@@ -21,7 +21,7 @@ public:	ChatLocalizedMessageTestUnit() : TestUnit("Chat::LocalizedMessage") {}
 
 public: virtual ~ChatLocalizedMessageTestUnit() {}
 
-public:	virtual bool Run();
+public:	virtual bool Run() OVERRIDE_FN;
 
 private:
 		char buffer[1200];

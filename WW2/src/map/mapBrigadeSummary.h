@@ -158,7 +158,7 @@ public:
 	virtual ~BrigadeDetail() {}
 
 	// Packer
-	virtual SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	virtual SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) OVERRIDE_FN;
 
 	// Helpers
 	const FULL_OBJ_ID& homeCPID() const { return m_homeCPID; }

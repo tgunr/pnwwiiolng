@@ -27,7 +27,7 @@ struct IRC_Command : public Host::CommandMsg
 	IRC_Command(const char* fromNick, const char* reportTo, const char* withInput)
 		: Host::CommandMsg(fromNick, reportTo, withInput)
 		{}
-	virtual void Reply(ResponseType, const char* format, ...) const;
+	virtual void Reply(ResponseType, const char* format, ...) const OVERRIDE_FN;
 };
 
 // Incase you need to call these

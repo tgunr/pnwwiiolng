@@ -96,13 +96,13 @@ protected:
 	}
 	Equality PlayerInQueue(QueueHeader& queue, Auth::ClientData* player) const { return Equals(NumEntriesForPlayer(queue, player), 1); }
 
-	virtual void BeginStage()
+	virtual void BeginStage() OVERRIDE_FN
 	{
 		arenas.clear();
 		sendQueue.clear();
 	}
 
-	virtual void EndStage()
+	virtual void EndStage() OVERRIDE_FN
 	{
 		arenas.clear();
 		sendQueue.clear();
@@ -201,7 +201,7 @@ private: bool TestQueuePositions(bool premiums[_MAX_PLAYERS+1], UINT32 expectedP
 		return true;
 	}
 
-public: virtual bool Run()
+public: virtual bool Run() OVERRIDE_FN
 	{
 		ResetClock();
 

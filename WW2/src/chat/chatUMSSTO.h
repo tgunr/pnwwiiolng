@@ -13,19 +13,19 @@
 class UMSSTO : public ServerSTO
 {
 public:
-	UMSSTO(UINT16 subType, const WorldPosition_m& position, const AttitudeVector& attitude, Player* originator) ;
-	UMSSTO(ACTION_OBJECT* const a) ;
+	UMSSTO(UINT16 subType, const WorldPosition_m& position, const AttitudeVector& attitude, Player* originator);
+	UMSSTO(ACTION_OBJECT* const a);
 
-	virtual bool needsBroadcastRemoval() const { return true ; }
-	virtual const char* typeName() const { return "ums" ; }
-
-public:
-	virtual bool activate() ;		// Special activation case.
-	virtual bool applyJoules(const SINT64& joules, class Player* player=nullptr) ;
+	virtual bool needsBroadcastRemoval() const OVERRIDE_FN { return true; }
+	virtual const char* typeName() const OVERRIDE_FN { return "ums"; }
 
 public:
-	STODamage& damage() { return m_damage ; }
+	virtual bool activate() OVERRIDE_FN;		// Special activation case.
+	virtual bool applyJoules(const SINT64& joules, class Player* player=nullptr) OVERRIDE_FN;
+
+public:
+	STODamage& damage() { return m_damage; }
 
 private:
-	STODamage		m_damage ;
-} ;
+	STODamage		m_damage;
+};

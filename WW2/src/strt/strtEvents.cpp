@@ -59,7 +59,7 @@ class BroadcastPacket : public UpdatePacket
 		}
 	};
 
-	public: virtual void Send()
+	public: virtual void Send() OVERRIDE_FN
 	{
 		dbugLog(_FLD, "transmitting EventPacket with %" PRSizeT " events to %" PRSizeT " players"
 						, size(), m_playerList.size());
@@ -82,7 +82,7 @@ class DirectPacket : public UpdatePacket
 {
 	public: DirectPacket(SINT32 teulIndex) : UpdatePacket(), m_teulIndex(teulIndex) {}
 
-	public: virtual void Send()
+	public: virtual void Send() OVERRIDE_FN
 	{
 #ifdef HEAVY_DEBUG
 		dbugLog(_FLD, "t:%d transmitting EventPacket with %u events", m_teulIndex, events().size());

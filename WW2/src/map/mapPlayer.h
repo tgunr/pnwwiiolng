@@ -118,7 +118,7 @@ public:
 	bool evaluateMissionPacket();
 
 	// Exit the brigade/mission/etc you are currently on, if any
-	virtual void ExitBrigade(UINT32 state);
+	virtual void ExitBrigade(UINT32 state) OVERRIDE_FN;
 	void ExitMission();
 
 	bool fillMissionPacket(class Mission*);
@@ -187,9 +187,9 @@ public:
 	void SetBranch(BRANCH_ENUM newBranch);
 	void SetBrigade(Brigade* newBrig);
 	void SetChecksumIsDirty(bool toState) { m_flags.checksumsDirty = toState; }
-	virtual void SetCountry(WWII_COUNTRY newCountry, WWII_SIDE newSide);
+	virtual void SetCountry(WWII_COUNTRY newCountry, WWII_SIDE newSide) OVERRIDE_FN;
 	void SetDecal(UINT8 newDecal) { m_mp.m_player.decal = newDecal; }
-	virtual bool SetInstance(const Instance::Descriptor& _instance);
+	virtual bool SetInstance(const Instance::Descriptor& _instance) OVERRIDE_FN;
 	void SetGroups(const char* groupList);
 	void SetMeteredAccess(UINT32 newMinuteBalance);
 	void SetMission(Mission* to);

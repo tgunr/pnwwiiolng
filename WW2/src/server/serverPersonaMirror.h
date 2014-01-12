@@ -25,9 +25,9 @@ namespace Server
 			data.auxSize = 0 ;
 			data.auxData = auxBuffer_ ;
 		}
-		public: virtual SINT32 onReceive(SINT32 teulIndex) ;
-		public: virtual SINT32 onComplete(SINT32 resultCode) const ;
-		public: virtual void packer(LOGICAL mode, ACTION_OBJECT* const a) { PersonaXfer::packer(mode, a) ; }
+		public: virtual SINT32 onReceive(SINT32 teulIndex) OVERRIDE_FN ;
+		public: virtual SINT32 onComplete(SINT32 resultCode) const OVERRIDE_FN ;
+		public: virtual void packer(LOGICAL mode, ACTION_OBJECT* const a) OVERRIDE_FN { PersonaXfer::packer(mode, a) ; }
 		public: SINT32 send(const playerid_t playerID, class Server::ServerInfo* dest) ;
 	} ;
 }

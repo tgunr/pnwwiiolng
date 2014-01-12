@@ -56,7 +56,7 @@ class TestPersonaXfer : public TestUnit
 	}
 
 	//! @brief Test body.
-	public: virtual bool Run()
+	public: virtual bool Run() OVERRIDE_FN
 	{
 		// Test the baseclass constructor.
 		BEGIN_TEST_STAGE( "PersonaXfer Construction" )

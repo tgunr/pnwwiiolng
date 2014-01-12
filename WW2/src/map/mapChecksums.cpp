@@ -35,7 +35,7 @@ class ChecksumQuery : public DBThreadQuery
 public:
 	ChecksumQuery() : DBThreadQuery(DBThread::Default, "ChecksumQuery", _FETCH_CHECKSUMS_QUERY, DBThreadQuery::_IMMEDIATE) {}
 
-	virtual void Success()
+	virtual void Success() OVERRIDE_FN
 	{
 		static CHECKSUMS newChecksums;
 
@@ -57,7 +57,7 @@ public:
 		_inProgress = false;
 	}
 
-	virtual void Failure()
+	virtual void Failure() OVERRIDE_FN
 	{
 		_inProgress = false;
 	}

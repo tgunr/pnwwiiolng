@@ -20,14 +20,14 @@ namespace Server
 	{
 		public: PersonaMirrorReply(const Transfer& rhs, const SINT32 resultCode_=-EINVAL) : Transfer(rhs), resultCode(resultCode_) {}
 		virtual ~PersonaMirrorReply() {}
-		public: virtual void packer(LOGICAL mode, ACTION_OBJECT* const a)
+		public: virtual void packer(LOGICAL mode, ACTION_OBJECT* const a) OVERRIDE_FN
 		{
 			Transfer::packer(mode, a) ;
 			a->packer(mode, resultCode) ;
 		}
 		public: PersonaMirrorReply() : Transfer(XferReason::Mirror), resultCode(-EINVAL) {}
-		public: virtual SINT32 onReceive(SINT32 teulIndex) ;
-		public: virtual SINT32 onComplete(SINT32 /*resultCode*/) const { return -EINVAL ; }
+		public: virtual SINT32 onReceive(SINT32 teulIndex) OVERRIDE_FN ;
+		public: virtual SINT32 onComplete(SINT32 /*resultCode*/) const OVERRIDE_FN { return -EINVAL ; }
 		public: SINT32 resultCode ;
 	} ;
 }

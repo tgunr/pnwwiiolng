@@ -265,7 +265,7 @@ public:
 	}
 
 public:
-	virtual void action(Player& player, Chat::ClientMessage * /*message*/) const { chatFriendsList(player); }
+	virtual void action(Player& player, Chat::ClientMessage * /*message*/) const OVERRIDE_FN { chatFriendsList(player); }
 
 	virtual void actionWith(Player& player, Chat::ClientMessage * /*message*/, char* arguments) const OVERRIDE_FN
 	{
