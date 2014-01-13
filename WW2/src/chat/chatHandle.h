@@ -49,35 +49,35 @@ namespace Chat
 	static const UINT16 WIDE_HANDLE_CHARACTERS_SUPPORTED = 6827;
 }
 
-extern bool chatIsValidHandle(ChatHandle handle);
+bool chatIsValidHandle(ChatHandle handle);
 
 //These functions retrieve the unique handleID from the handle and
 //	the handle from the unique handleID
 //tolua_begin
-extern ChatHandle chatGetHandle(const char* callsign);
-extern ChatHandle chatGetHandle(const wchar_t* callsign);
+ChatHandle chatGetHandle(const char* callsign);
+ChatHandle chatGetHandle(const wchar_t* callsign);
 
 // Same function, but uses the lowercase version of the handle
-extern ChatHandle chatGetLowercaseHandle(const char* callsign);
-extern ChatHandle chatGetLowercaseHandle(const wchar_t* callsign);
+ChatHandle chatGetLowercaseHandle(const char* callsign);
+ChatHandle chatGetLowercaseHandle(const wchar_t* callsign);
 // Force a handle into lowercase
-extern ChatHandle chatGetLowercaseHandle(ChatHandle handle);
+ChatHandle chatGetLowercaseHandle(ChatHandle handle);
 //tolua_end
 
 //tolua_begin
 // Convert a handle into a callsign again
-extern const char* chatGetCallsign(const ChatHandle& handle);
-extern const wchar_t* chatGetWideCallsign(const ChatHandle& handle);
+const char* chatGetCallsign(const ChatHandle& handle);
+const wchar_t* chatGetWideCallsign(const ChatHandle& handle);
 // Convert a handle into the supplied buffer
-extern bool chatGetCallsign(char* into, const ChatHandle& from);
+bool chatGetCallsign(char* into, const ChatHandle& from);
 // Wide string variant
-extern bool chatGetCallsign(wchar_t* into, const ChatHandle& from);
+bool chatGetCallsign(wchar_t* into, const ChatHandle& from);
 
-extern bool chatIsValidCallsign(const char* callsign);
-extern bool chatIsValidCallsign(const wchar_t* callsign);
+bool chatIsValidCallsign(const char* callsign);
+bool chatIsValidCallsign(const wchar_t* callsign);
 
 // Looks a wide character up in the character map and returns the symbol # for it
-extern UINT16 chatGetHandleCharacterSymbol(const wchar_t character);
+UINT16 chatGetHandleCharacterSymbol(const wchar_t character);
 //tolua_end
 
 // Return true if a callsign contains wide characters

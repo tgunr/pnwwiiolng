@@ -63,7 +63,7 @@ namespace Chat
 }
 
 // HOST: (Non-Chathost) Sends a targeted SYSTEM message to a specific target
-extern bool chatSendBroadcast(Chat::BCAST_TYPE type, const instanceid_t& instanceID, UINT64 targetID, LSTRING_ID prefix, LSTRING_ID message
+bool chatSendBroadcast(Chat::BCAST_TYPE type, const instanceid_t& instanceID, UINT64 targetID, LSTRING_ID prefix, LSTRING_ID message
 						, const char* ptr0="", const char* ptr1="", const char* ptr2="", const char* ptr3="", const char* ptr4="", const char* ptr5="") ;
 //tolua_end
 

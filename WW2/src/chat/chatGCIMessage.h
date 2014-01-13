@@ -38,5 +38,5 @@ namespace Chat
 }
 #pragma pack(pop)
 
-extern void chatSendGCIMessage(GCI_TYPE gci_, WWII_SIDE side_, const class CPStruct& cp, const struct FULL_OBJ_ID& facID);
+void chatSendGCIMessage(GCI_TYPE gci_, WWII_SIDE side_, const class CPStruct& cp, const struct FULL_OBJ_ID& facID);
 

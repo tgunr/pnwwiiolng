@@ -10,4 +10,4 @@
 
 namespace Chat { class Who; }
 
-extern void chatWhoPopulate(Chat::Who& who, const Player* player, const Player* target, bool forceExtendedInfo);
+void chatWhoPopulate(Chat::Who& who, const Player* player, const Player* target, bool forceExtendedInfo);

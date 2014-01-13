@@ -467,7 +467,7 @@ private:
 	void _recordLogout();
 };
 
-extern void* teulGetPersonaData(SINT32);
+void* teulGetPersonaData(SINT32);
 
 class PlayerInterface
 {
@@ -478,10 +478,10 @@ public:
 	static Player* Lookup(const char* callsign) { return Lookup(chatGetLowercaseHandle(callsign)); }
 };
 
-extern bool chatCheckSpawningPlayers();
-extern UINT32 chatGetNumberOfRecruits(UINT32 playerID);
-extern bool chatSaveLogRecords();
-extern void chatUpdateAWSSnapshot();
+bool chatCheckSpawningPlayers();
+UINT32 chatGetNumberOfRecruits(UINT32 playerID);
+bool chatSaveLogRecords();
+void chatUpdateAWSSnapshot();
 
 #define PLAYER_LOGA(fmt, ...) dbugLog(_FLA, "t:%d p:%u c:%s " fmt, player->teulIndex(), player->playerID(), player->callsign(), __VA_ARGS__)
 #define PLAYER_LOGW(fmt, ...) dbugLog(_FLW, "t:%d p:%u c:%s " fmt, player->teulIndex(), player->playerID(), player->callsign(), __VA_ARGS__)

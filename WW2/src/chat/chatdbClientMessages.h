@@ -11,7 +11,7 @@
 
 struct SquadMemberUpdate;
 
-extern SINT32 chatdbInstallClientCallbacks();
-extern SINT32 chatdbRequestSquad(UINT32 squadID);
-extern SINT32 chatdbSendSquadMemberUpdate(SquadMemberUpdate& smu);
+SINT32 chatdbInstallClientCallbacks();
+SINT32 chatdbRequestSquad(UINT32 squadID);
+SINT32 chatdbSendSquadMemberUpdate(SquadMemberUpdate& smu);
 

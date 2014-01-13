@@ -10,6 +10,6 @@ namespace Chat { struct LocalizedMessage; }
 
 typedef std::map<int, std::string> HOSTLOC;
 
-extern bool chatReadHostLocFile();
-extern const char* chatLString(int prefix, int message, const char* ptr0="", const char* ptr1="", const char* ptr2="", const char* ptr3="", const char* ptr4="", const char* ptr5="");
-extern const char* chatLString(const Chat::LocalizedMessage&);
+bool chatReadHostLocFile();
+const char* chatLString(int prefix, int message, const char* ptr0="", const char* ptr1="", const char* ptr2="", const char* ptr3="", const char* ptr4="", const char* ptr5="");
+const char* chatLString(const Chat::LocalizedMessage&);

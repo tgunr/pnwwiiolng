@@ -8,4 +8,4 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-extern const char* chatTimeString(time_t time);
+const char* chatTimeString(time_t time);

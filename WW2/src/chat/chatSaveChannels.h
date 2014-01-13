@@ -8,5 +8,5 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-extern void chatSaveChannels(class Player& player);
-extern void chatRestoreChannels(const class Player* player);
+void chatSaveChannels(class Player& player);
+void chatRestoreChannels(const class Player* player);

@@ -8,6 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-extern struct MOTD_REPLY& chatGetMotd(UINT32);
-extern bool chatSetMotd(UINT32, const ChatHandle& poster, const std::string&);
+struct MOTD_REPLY& chatGetMotd(UINT32);
+bool chatSetMotd(UINT32, const ChatHandle& poster, const std::string&);
 

@@ -15,8 +15,8 @@ namespace Chat
 	,	_Mission		// Details of a mission.
 
 	,	_HLTypes
-	} ;
+	};
 
-	extern const HLTypes[_HLTypes] ;
+	extern const HLTypes[_HLTypes];
 } // namespace
 

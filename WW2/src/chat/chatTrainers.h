@@ -10,7 +10,7 @@
 
 typedef std::set<UINT32> TRAINERS;
 
-extern void chatUpdateTrainerStatus(const playerid_t playerID, bool isTrainer);
+void chatUpdateTrainerStatus(const playerid_t playerID, bool isTrainer);
 
 // You can read but not write from outside
-extern const TRAINERS& chatGetTrainers();
+const TRAINERS& chatGetTrainers();

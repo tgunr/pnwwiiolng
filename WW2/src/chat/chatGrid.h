@@ -8,7 +8,7 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-extern bool chatPatrolGridExpirations();
+bool chatPatrolGridExpirations();
 
-extern bool chatGridSnapshot();
+bool chatGridSnapshot();
 

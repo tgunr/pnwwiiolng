@@ -156,5 +156,5 @@ public:
 };
 
 //! Convert a time-interval string into a number of seconds.
-extern bool chatGetTimeInterval(class Player& player, const char* timestring, UINT32& interval, const char defaultUnit='m');
+bool chatGetTimeInterval(class Player& player, const char* timestring, UINT32& interval, const char defaultUnit='m');
 

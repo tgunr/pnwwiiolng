@@ -8,9 +8,9 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-extern void chatReceiveSTO(UINT16 type, ACTION_OBJECT* a);
-extern bool chatAddServerTrackedObject(class ServerTrackedObject* sto);
-extern void chatRemoveServerTrackedObject(UINT32 stoUID);
-extern bool chatPatrolSTOExpirations();
+void chatReceiveSTO(UINT16 type, ACTION_OBJECT* a);
+bool chatAddServerTrackedObject(class ServerTrackedObject* sto);
+void chatRemoveServerTrackedObject(UINT32 stoUID);
+bool chatPatrolSTOExpirations();
 
-extern void chatLoadPPOXML();
+void chatLoadPPOXML();

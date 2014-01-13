@@ -11,7 +11,7 @@
 #include "chat/chatGroupsType.h"
 
 struct ChatPermissions;
-extern const ChatPermissions* chatGroupPermissionsForGroups(const CHAT_GROUPS& groups);
+const ChatPermissions* chatGroupPermissionsForGroups(const CHAT_GROUPS& groups);
 
 // Load/update the master table of chat group permissions
 void chatReadGroupPermissions();

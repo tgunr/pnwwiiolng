@@ -7,8 +7,8 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-extern SINT32 chatInstallClientManagementCallbacks();
+SINT32 chatInstallClientManagementCallbacks();
 
 //Logs into the chat server to do management stuff
-extern bool chatSendManagementLogin2(SINT32 chatIndex, const char* gameName);
+bool chatSendManagementLogin2(SINT32 chatIndex, const char* gameName);
 

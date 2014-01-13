@@ -35,4 +35,4 @@ public:
 
 typedef teul_network_msg<BrigadeMove> BRIGADE_MOVE_MSG;
 
-extern void chatSendBrigadeMoveResult(BRIGADE_MOVE_MSG& outgoing);
+void chatSendBrigadeMoveResult(BRIGADE_MOVE_MSG& outgoing);

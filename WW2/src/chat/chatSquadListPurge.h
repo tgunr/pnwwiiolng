@@ -8,4 +8,4 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-extern void chatPurgeExpiredSquadRecruits();
+void chatPurgeExpiredSquadRecruits();

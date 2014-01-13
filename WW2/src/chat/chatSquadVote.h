@@ -48,5 +48,5 @@ public:
 	void withdraw(UINT32 squadID, const ChatHandle& voterHandle, SquadList* list);
 };
 
-extern SquadVote& chatGetSquadVote(UINT32 squadID);
-extern SquadVote* chatFindSquadVote(UINT32 squadID);
+SquadVote& chatGetSquadVote(UINT32 squadID);
+SquadVote* chatFindSquadVote(UINT32 squadID);
