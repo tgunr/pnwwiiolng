@@ -36,7 +36,7 @@ namespace Teul
 	bool IsTransportClosing();
 
 	//! Get the address of an endpoint, as long as it's connected/open.
-	extern ENDPOINT* GetConnectedEndpoint(const SINT32 teulIndex);
+	ENDPOINT* GetConnectedEndpoint(const SINT32 teulIndex);
 } // namespace Teul
 
 //! Send data through a callback on a given connection.
@@ -44,25 +44,25 @@ namespace Teul
 //! @param[in]	teulIndex		Connection to send to.
 //!	@param[in]	teulCallback	Callback structure (to determine send function and packer).
 //!	@param[in]	data			Pointer to the data.
-extern SINT32 teulSend(SINT32 teulIndex, struct TEUL_CALLBACK* const teulCallback, void* const data);
-extern SINT32 teulSend(ENDPOINT& endpoint, struct TEUL_CALLBACK* const teulCallback, void* const data);
+SINT32 teulSend(SINT32 teulIndex, struct TEUL_CALLBACK* const teulCallback, void* const data);
+SINT32 teulSend(ENDPOINT& endpoint, struct TEUL_CALLBACK* const teulCallback, void* const data);
 
 //! Close a local connection. will not work until its opened.
-extern void teulClose(const SINT32 teulIndex, const UINT32 reason=0);
-extern void teulClose(ENDPOINT&, const UINT32 reason=0);
+void teulClose(const SINT32 teulIndex, const UINT32 reason=0);
+void teulClose(ENDPOINT&, const UINT32 reason=0);
 
 //! Converts a doted quad string to a UINT32 host address.
 //! @param[in]	address			IP address to convert.
 //!	@param[out]	host			Pointer to where the address should be stored.
 //! @return false if address is invalid.
-extern bool teulGetHost(const char* address, UINT32* host);
+bool teulGetHost(const char* address, UINT32* host);
 
 //! Converts a binary network address to a string.
 //! @deprecated Use thread-safe version instead.
 //! @ingroup not-thread-safe
 //! @param[in]	host			Binary IP address.
 //!	@return pointer to static buffer with address as a string.
-extern const char* teulGetAddress(const UINT32 host);
+const char* teulGetAddress(const UINT32 host);
 
 //! Thread safe conversion of a network address to a string.
 //! @ingroup thread-safe
@@ -70,7 +70,7 @@ extern const char* teulGetAddress(const UINT32 host);
 //!	@param[out]	buffer			Pointer to output buffer.
 //!	@param[in]	bufferSize		Size of buffer.
 //! @return pointer to buffer (for compatibility with old version)
-extern const char* teulGetAddress(const UINT32 host, char* buffer, const size_t bufferSize);
+const char* teulGetAddress(const UINT32 host, char* buffer, const size_t bufferSize);
 
 //! Resolve the supplied host name into a binary IP address.
 //! @warning This is a long, blocking, call!
@@ -78,7 +78,7 @@ extern const char* teulGetAddress(const UINT32 host, char* buffer, const size_t 
 //! @param[in]	name			IP address/name
 //! @return binary IP address or 0.
 // NOTE: this is long blocking call!!!
-extern UINT32* teulGetHostByName(const char* name);
+UINT32* teulGetHostByName(const char* name);
 
 //! Perform core teul operations such as draining reads and writes on
 //! sockets, processing incoming callbacks and timing out connections.
@@ -90,25 +90,25 @@ extern UINT32* teulGetHostByName(const char* name);
 //!							(non-blocking), a negative value specifies
 //!							wait forever.
 //! @ingroup not-thread-safe
-extern void teulUpdateTransport(const TeulTimeMS& duration_=0ULL);
+void teulUpdateTransport(const TeulTimeMS& duration_=0ULL);
 
 //! Get the local address of a given teul index.
 //! @param[in]	teulIndex		Index of the connection to query.
 //! @return Teul::INVALID_INDEX if the index is not valid.
-extern UINT32 teulGetEndpointLocalAddress(SINT32 teulIndex);
+UINT32 teulGetEndpointLocalAddress(SINT32 teulIndex);
 //! Get the remote address of a given teul index.
 //! @param[in]	teulIndex		Index of the connection to query.
 //! @return Teul::INVALID_INDEX if the index is not valid.
-extern UINT32 teulGetEndpointRemoteAddress(SINT32 teulIndex);
+UINT32 teulGetEndpointRemoteAddress(SINT32 teulIndex);
 
 // close all connections and the debugger. (teul go bye bye)
-extern void teulCloseTransport(void);
+void teulCloseTransport(void);
 
 //! Associate local application data with a connection.
-extern void teulSetPersonaData(const SINT32 teulIndex, void* personaData);
+void teulSetPersonaData(const SINT32 teulIndex, void* personaData);
 
 //! Returns the persona data for a connection, may be nullptr.
-extern void* teulGetPersonaData(const SINT32 teulIndex);
+void* teulGetPersonaData(const SINT32 teulIndex);
 
 //! Return a pointer to a specific connection data type, or null.
 template<typename ObjType_>
@@ -117,18 +117,18 @@ ObjType_* teulGetConnectionData(SINT32 teulIndex_)
 	return static_cast<ObjType_*>(teulGetPersonaData(teulIndex_));
 }
 
-extern void teulSetNetworkMask(UINT32 address);
+void teulSetNetworkMask(UINT32 address);
 
-extern UINT32 teulMaskNetworkAddress(UINT32 address);
+UINT32 teulMaskNetworkAddress(UINT32 address);
 
 // if you detect an error in your data handler use this function to forward it to
 // the callbacks error handler. mode == TEUL_PACK or TEUL_UNPACK for whether
 // the error is detected in the send or recv CALLBACK.
-extern SINT32 teulPostCallbackError(const SINT32 teulIndex
+SINT32 teulPostCallbackError(const SINT32 teulIndex
 									, const UCHAR* const data, const SINT32 size
 									, const struct TEUL_CALLBACK* const object, const SINT32 error);
 
 //! Send an error code to the process at the remote end of a connection.
-extern void teulSendError(const SINT32 teulIndex, const SINT32 errorCode);
+void teulSendError(const SINT32 teulIndex, const SINT32 errorCode);
 
-extern ENDPOINT* teulGetEndpoint(const SINT32 index);
+ENDPOINT* teulGetEndpoint(const SINT32 index);

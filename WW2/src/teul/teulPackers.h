@@ -24,39 +24,39 @@
 //		 bits significant and are packed.data
 
 //! Pack/unpack a signed value held in a 32-bit store.
-extern SINT32 teulPackSINT32(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, SINT32* const idata, SINT32 significantbits);
+SINT32 teulPackSINT32(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, SINT32* const idata, SINT32 significantbits);
 
 //! Pack/unpack a signed value held in a 16-bit store.
-extern SINT32 teulPackSINT16(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, SINT16* const idata, SINT32 significantbits);
+SINT32 teulPackSINT16(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, SINT16* const idata, SINT32 significantbits);
 
 //! Pack/unpack an unsigned value held in a 32-bit store.
-extern SINT32 teulPackUINT32(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, UINT32* const idata, SINT32 significantbits);
+SINT32 teulPackUINT32(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, UINT32* const idata, SINT32 significantbits);
 
 //! Pack/unpack an unsigned value held in a 16-bit store.
-extern SINT32 teulPackUINT16(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, UINT16* const idata, SINT32 significantbits);
+SINT32 teulPackUINT16(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, UINT16* const idata, SINT32 significantbits);
 
 //! Pack/unpack a signed value held in a 8-bit store.
-extern SINT32 teulPackSCHAR(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, SCHAR* const idata, SINT32 significantbits);
+SINT32 teulPackSCHAR(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, SCHAR* const idata, SINT32 significantbits);
 
 //! Pack/unpack an unsigned value held in a 8-bit store.
-extern SINT32 teulPackUCHAR(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, UCHAR* const idata, SINT32 significantbits);
+SINT32 teulPackUCHAR(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, UCHAR* const idata, SINT32 significantbits);
 
 //! Pack/unpack a value stored as a 32-bit float.
-extern SINT32 teulPackFLOAT32(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, FLOAT32* const idata, SINT32 significantbits);
+SINT32 teulPackFLOAT32(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, FLOAT32* const idata, SINT32 significantbits);
 
 //! Pack/unpack a value stored as a 64-bit float.
-extern SINT32 teulPackFLOAT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, FLOAT64* const idata, SINT32 significantbits);
+SINT32 teulPackFLOAT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, FLOAT64* const idata, SINT32 significantbits);
 
 //! Pack/unpack a signed value held in a 64-bit store.
-extern SINT32 teulPackSINT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, SINT64* const idata, SINT32 significantbits);
+SINT32 teulPackSINT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, SINT64* const idata, SINT32 significantbits);
 
 //! Pack/unpack an unsigned value held in a 64-bit store.
-extern SINT32 teulPackUINT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, UINT64* const idata, SINT32 significantbits);
+SINT32 teulPackUINT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, UINT64* const idata, SINT32 significantbits);
 
 // byte pack routine used only when you know the other side takes care of endian
 // or the data is byte format (UCHAR but 'NOT' UNICODE).
 // [size]  in bytes.
-extern SINT32 teulPackVoid(LOGICAL mode , UCHAR* const buffer, SINT32 bitoffset, void* const anything, SINT32 size);
+SINT32 teulPackVoid(LOGICAL mode , UCHAR* const buffer, SINT32 bitoffset, void* const anything, SINT32 size);
 
 // converts bit offsets to actual size in bytes
 namespace Teul
@@ -247,7 +247,7 @@ struct ACTION_OBJECT
 	DEF_PACKER(void*, teulPackVoid, 0);
 };
 
-extern SINT32 teulPackSecondsDelta(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, UINT32* timer, SINT32 size=0);
+SINT32 teulPackSecondsDelta(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, UINT32* timer, SINT32 size=0);
 
 namespace Teul
 {

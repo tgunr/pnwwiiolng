@@ -16,6 +16,6 @@ enum ReleaseType
 ,	MAX_RELEASE_TYPES
 };
 
-extern const char* GetReleaseType(ReleaseType releaseType);
+const char* GetReleaseType(ReleaseType releaseType);
 }
 

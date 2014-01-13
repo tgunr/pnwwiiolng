@@ -156,16 +156,16 @@ private:
 
 /* Endpoint functions */
 
-extern void			teulCleanupEndpoints(void);
+void		teulCleanupEndpoints(void);
 
-extern ENDPOINT* 	teulCreateEndpoint(SINT32 teulIndex, bool isListening, SINT32 timeout, PROTOCOL protocol);
+ENDPOINT* 	teulCreateEndpoint(SINT32 teulIndex, bool isListening, SINT32 timeout, PROTOCOL protocol);
 
-extern void			teulFreeEndpoint(ENDPOINT* theEndpoint);
+void		teulFreeEndpoint(ENDPOINT* theEndpoint);
 
-extern void			teulRemoveEndpoint(ENDPOINT* inEndpoint);
-extern void			teulKillDeadEndpoints(void);
+void		teulRemoveEndpoint(ENDPOINT* inEndpoint);
+void		teulKillDeadEndpoints(void);
 
 // INTERNAL: Get the next free index.
 // Note: this value is incredibly transient.
-extern SINT32		teulQueryNextFreeIndex();
+SINT32		teulQueryNextFreeIndex();
 

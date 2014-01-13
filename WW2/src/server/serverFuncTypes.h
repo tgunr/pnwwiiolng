@@ -33,7 +33,7 @@ typedef SINT32 (SERVER_UPDATE) (Server::ServerInfo* server, Server::Code scode);
 //	activatePersona : called wehever the player logs in and associates to the PLAYER_STATUS
 // 	xferCompleteFn  : called when the persona transfer is completed by sendPlayerTp or sendGroupTo
 //	errorFunxtion	  : used to relay problems with transfers
-extern SINT32 serverInit(UINT32 appVersion
+SINT32 serverInit(UINT32 appVersion
 					, SERVER_TYPE serverType, UINT32 exitDestType
 					// sever managment callbacks
 					, SERVER_UPDATE* enterCallback

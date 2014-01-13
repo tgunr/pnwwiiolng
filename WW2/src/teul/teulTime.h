@@ -24,7 +24,7 @@ static const UINT32	DAY_S		=	24 * 60 * 60;	//!< Number of seconds in a day.
 
 static inline UINT32 teulTime() { return teulClockTime; }	//!< Seconds since epoch as of last teulSyncClock().
 
-extern void teulSyncClock(void);					//!< Updates the teulClock64 and teulClockTime values.
+void teulSyncClock(void);					//!< Updates the teulClock64 and teulClockTime values.
 
 //! \deprecated
 static inline UINT32 teulClock() { return (teulClock64 & 0x000fffff); } //!< Returns millisecond time in 20 bits (limited accuracy)

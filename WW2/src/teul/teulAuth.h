@@ -40,8 +40,8 @@ SINT32 authGameInit(UINT32 gameHost, UINT16 gamePort
 //	PARAMETERS:
 //		player - the pointer to the Auth::Dispatch struct that was returned by
 //			authValidatePlayer above
-extern SINT32 authExitPlayer(const Auth::Dispatch& player, UINT32 arenaID);
+SINT32 authExitPlayer(const Auth::Dispatch& player, UINT32 arenaID);
 
 
-extern SINT32 authUpdateServerLoad(SINT32 numPlayers, UINT32 hostAddress, UINT32 arenaID);
-extern SINT32 authSetGameCapacity(SINT32 capacity, SINT32 totalPlayers, UINT32 arenaID, SINT32 lock);
+SINT32 authUpdateServerLoad(SINT32 numPlayers, UINT32 hostAddress, UINT32 arenaID);
+SINT32 authSetGameCapacity(SINT32 capacity, SINT32 totalPlayers, UINT32 arenaID, SINT32 lock);

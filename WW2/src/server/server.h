@@ -10,25 +10,25 @@
 //----> player functions
 
 #include "server/serverReleaseTypeEnum.h"
-extern SINT32 serverReleasePlayer(SINT32 teulIndex, UINT32 id, UINT32 otp, UINT32 exitCode, Server::ReleaseType releaseType);
+SINT32 serverReleasePlayer(SINT32 teulIndex, UINT32 id, UINT32 otp, UINT32 exitCode, Server::ReleaseType releaseType);
 
-extern UINT32 serverGetAuthIP();
+UINT32 serverGetAuthIP();
 
 // Look up the maximum allowable cluster users.
-extern UINT32 serverGetMaxClusterUsers();
+UINT32 serverGetMaxClusterUsers();
 
 #include "wwii/wwiiServerTypeEnums.h"
-extern void serverEnableDebugWebServer(SERVER_TYPE offset);
+void serverEnableDebugWebServer(SERVER_TYPE offset);
 
-extern void serverInitAddresses();
+void serverInitAddresses();
 
-extern void serverOpenBroadcastIndexes();
+void serverOpenBroadcastIndexes();
 
-extern void serverBroadcastHostConfig();
+void serverBroadcastHostConfig();
 
-extern size_t serverGetPlayerCount(const UINT32 serverType_);
+size_t serverGetPlayerCount(const UINT32 serverType_);
 
 // Find out how many players the cluster can support, adjusted
 // by different host types and configuration parameters.
-extern size_t serverGetClusterCapacity();
+size_t serverGetClusterCapacity();
 
