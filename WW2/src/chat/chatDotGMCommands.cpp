@@ -83,7 +83,7 @@ _smite(Player* target)
 	// Now forcibly get rid of them
 	PlayerStatusNode* psn = ServerInterface::PlayerStatusNodeByPlayerID(target->playerID());
 	if ( psn != nullptr )
-		target->Release(psn->teulIndex, Server::RELEASE_EXIT);
+		target->Release(psn->teulIndex, Server::ReleaseType::Exit);
 }
 
 //////////////////////////////////////////////////////////////////////

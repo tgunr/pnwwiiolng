@@ -27,8 +27,10 @@
 #include "server/serverPersonaLogin.h"
 #include "server/serverPersonaMirror.h"
 #include "server/serverPersonaMirrorReply.h"
+#include "server/serverPlayerStatusEnum.h"
 #include "server/serverPlayerStatusNode.h"
 #include "server/serverPlayerStatusUpdate.h"
+#include "server/serverReleaseTypeEnum.h"
 #include "server/serverServerInfo.h"
 #include "server/serverTypes.h"
 #include "teul/teulAuth.h"
@@ -214,7 +216,7 @@ _playerReleasePersona(SINT32 teulIndex, PlayerStatusNode* psn, UINT32 exitCode, 
 	{
 
 		if ((Server::myServerInfo.flags & Server::SVRFLAG_SEND_PSTAT)
-			&& releaseType != Server::RELEASE_REDIRECTED
+			&& releaseType != Server::ReleaseType::Redirected
 			&& Server::myServerInfo.exitDestType != 0 )
 		{
 			destination = Server::ServerInfo::GetBest(Server::myServerInfo.exitDestType);
@@ -354,11 +356,11 @@ _pushPlayerToServer(Server::ServerInfo& server, PlayerStatusNode& psn)
 
 	switch (psn.status)
 	{
-		case Server::PLAYER_FREE:
+		case Server::PlayerStatus::Free:
 			LogAbort("invlid player node %p !!", &psn);
 			return -EINVAL;
-		case Server::PLAYER_NEW:
-			psn.status = Server::PLAYER_INIT;
+		case Server::PlayerStatus::New:
+			psn.status = Server::PlayerStatus::Init;
 			break;
 		default:
 				oldServer = Server::ServerInfo::GetByID(psn.curServer.id);
@@ -390,14 +392,14 @@ _pushPlayerToServer(Server::ServerInfo& server, PlayerStatusNode& psn)
 	{
 		if (&server == _exitServer && oldServer == &Server::myServerInfo)
 		{
-			psn.status = Server::PLAYER_IN_EXIT;
+			psn.status = Server::PlayerStatus::InExit;
 			_sendPlayerStatusUpdate(psn);
 		}
 	}
 
 	if ( &server == _exitServer)
 	{
-		psn.status = Server::PLAYER_IN_EXIT;
+		psn.status = Server::PlayerStatus::InExit;
 		psn.timeStamp.makeCurrent();
 	}
 	else
@@ -452,18 +454,18 @@ _playerRelease(SINT32 teulIndex, PlayerStatusNode* psn, UINT32 exitCode, Server:
 
 	switch (releaseType)
 	{
-	case Server::RELEASE_COLLISION:
-	case Server::RELEASE_DISCO:
+	case Server::ReleaseType::Collision:
+	case Server::ReleaseType::Disco:
 		teulSendError(teulIndex, Teul::Errors::LoginFail_Collision);
 
-	case Server::RELEASE_EXIT:
-	case Server::RELEASE_ERROR:
-	case Server::RELEASE_DELETED:
+	case Server::ReleaseType::Exit:
+	case Server::ReleaseType::Error:
+	case Server::ReleaseType::Deleted:
 		_playerDelete(psn, releaseType);
 
 		break;
 
-	case Server::RELEASE_ECONN:
+	case Server::ReleaseType::EConn:
 		// connection is invalid, extract and move to exitserver
 		_playerMove(psn, _exitServer);
 
@@ -480,7 +482,7 @@ _playerRelease(SINT32 teulIndex, PlayerStatusNode* psn, UINT32 exitCode, Server:
 
 		break;
 
-	case Server::RELEASE_REDIRECTED:
+	case Server::ReleaseType::Redirected:
 		// assumes player has been moved to new server before called
 		_playerReleasePersona(teulIndex, psn, exitCode, releaseType);
 
@@ -534,9 +536,9 @@ _playerDelete(PlayerStatusNode* const psn, Server::ReleaseType releaseType)
 		 _extractPlayerFromServer(_exitServer, psn);
 
 	// alert other servers of the players demise but only if its news
-	if ( psn->status != Server::PLAYER_DELETED && Server::myServerInfo.exitDestType == 0 && (Server::myServerInfo.flags & Server::SVRFLAG_SEND_PSTAT) )
+	if ( psn->status != Server::PlayerStatus::Deleted && Server::myServerInfo.exitDestType == 0 && (Server::myServerInfo.flags & Server::SVRFLAG_SEND_PSTAT) )
 	{
-		psn->status = Server::PLAYER_DELETED;
+		psn->status = Server::PlayerStatus::Deleted;
 		_sendPlayerStatusUpdate(*psn);
 	}
 
@@ -561,7 +563,7 @@ _deleteAllPlayersOnServer(Server::ServerInfo* const server)
 	while ( !server->m_players.empty() )
 	{
 		auto psn = *(server->m_players.begin());
-		_playerDelete(psn, Server::RELEASE_ERROR);
+		_playerDelete(psn, Server::ReleaseType::Error);
 	}
 }
 
@@ -591,7 +593,7 @@ _playerActivate(SINT32 teulIndex, PlayerStatusNode* const psn)
 
 	if (Server::myServerInfo.flags & Server::SVRFLAG_SEND_PSTAT)
 	{
-		psn->status = Server::PLAYER_INIT;
+		psn->status = Server::PlayerStatus::Init;
 		_sendPlayerStatusUpdate(*psn);
 	}
 
@@ -630,7 +632,7 @@ _playerDestroy(PlayerStatusNode* const psn, bool createComplete)
 	dbugLog(_FLN, "t:%d p:%u player destroy %p", psn->teulIndex, psn->dispatch().m_customerID, psn);
 	if (createComplete)
 	{
-		_playerRelease(psn->teulIndex, psn, 0, Server::RELEASE_ERROR);
+		_playerRelease(psn->teulIndex, psn, 0, Server::ReleaseType::Error);
 	}
 	else
 	{
@@ -694,7 +696,7 @@ _playerAdd(Server::PersonaXfer* const persXfer, Server::ServerInfo& server, Serv
 {
 	SINT32 retval;
 
-	PlayerStatusNode* psn = _releaseNonMatchingPlayer(-1, persXfer->dispatch().m_customerID, persXfer->dispatch().m_OTP, 0, Server::RELEASE_DISCO);
+	PlayerStatusNode* psn = _releaseNonMatchingPlayer(-1, persXfer->dispatch().m_customerID, persXfer->dispatch().m_OTP, 0, Server::ReleaseType::Disco);
 	if (psn != nullptr)
 	{
 		psn->xferState = persXfer->reason();
@@ -704,7 +706,7 @@ _playerAdd(Server::PersonaXfer* const persXfer, Server::ServerInfo& server, Serv
 		{
 			if ( _playerMove(psn, &server) < 0)
 			{
-				_playerRelease(psn->teulIndex, psn, 0, Server::RELEASE_ERROR);
+				_playerRelease(psn->teulIndex, psn, 0, Server::ReleaseType::Error);
 	//			_playerDelete(psn);
 				return nullptr;
 			}
@@ -731,7 +733,7 @@ _playerAdd(Server::PersonaXfer* const persXfer, Server::ServerInfo& server, Serv
 	psn->host = 0;
 	psn->inAuth = FALSE;
 	psn->xferState = persXfer->reason();
-	psn->status = Server::PLAYER_NEW;
+	psn->status = Server::PlayerStatus::New;
 
 	dbugLog(_FLD, "p:%u c:%s adding psn to %s server %llu"
 				, psn->dispatch().m_customerID, psn->dispatch().m_callsign
@@ -783,7 +785,7 @@ _acceptLoginFn(SINT32 teulIndex, Auth::Dispatch* const dispatch)
 
 	Server::PersonaLogin login(*dispatch);
 
-	PlayerStatusNode* psn = _playerAdd(&login, Server::myServerInfo, Server::PLAYER_INIT, nullptr);
+	PlayerStatusNode* psn = _playerAdd(&login, Server::myServerInfo, Server::PlayerStatus::Init, nullptr);
 	if (PN_UNLIKELY(psn == nullptr))
 	{
 		dbugLog(_FLA, "t:%d p:%u c:%s couldnt create persona, login denied!", teulIndex, dispatch->m_customerID, dispatch->m_callsign);
@@ -824,7 +826,7 @@ _timeOutPlayers(void)
 						, elapsed
 						);
 
-		_playerRelease(psn->teulIndex, psn, 0, Server::RELEASE_DISCO);
+		_playerRelease(psn->teulIndex, psn, 0, Server::ReleaseType::Disco);
 
 		_exitServer->m_players.erase(psn);
 	}
@@ -1049,18 +1051,18 @@ Server::GetReleaseType(Server::ReleaseType releaseType)
 {
 	static const char* releaseTypes[] =
 	{
-		"RELEASE_REDIRECTED"
-	,	"RELEASE_DELETED"
-	,	"RELEASE_DISCO"
-	,	"RELEASE_COLLISION"
-	,	"RELEASE_ERROR"
-	,	"RELEASE_EXIT"
-	,	"RELEASE_ECONN"
+		"Redirected"
+	,	"Deleted"
+	,	"Disco"
+	,	"Collision"
+	,	"Error"
+	,	"Exit"
+	,	"EConn"
 	};
 
-	if ( releaseType >= Server::MAX_RELEASE_TYPES )
+	if ( releaseType >= Server::ReleaseType::Max )
 		return "???";
-	return releaseTypes[releaseType];
+	return releaseTypes[static_cast<size_t>(releaseType)];
 }
 
 Server::ServerInfo*
@@ -1301,13 +1303,13 @@ SINT32 serverUpdatePlayer(const Server::PlayerStatusUpdate* const update)
 					, update->serverID
 					);
 
-	PlayerStatusNode* psn = _releaseNonMatchingPlayer(-1, update->dispatch.m_customerID, update->dispatch.m_OTP, 0, Server::RELEASE_DISCO);
+	PlayerStatusNode* psn = _releaseNonMatchingPlayer(-1, update->dispatch.m_customerID, update->dispatch.m_OTP, 0, Server::ReleaseType::Disco);
 
-	if ( update->status == Server::PLAYER_DELETED )
+	if ( update->status == Server::PlayerStatus::Deleted )
 	{
 		if (psn == nullptr)
 			return -ENOENT;
-		 return _playerRelease(psn->teulIndex, psn, 0, Server::RELEASE_DELETED);
+		 return _playerRelease(psn->teulIndex, psn, 0, Server::ReleaseType::Deleted);
 	}
 
 	Server::ServerInfo* const server = Server::ServerInfo::GetByID(update->serverID);
@@ -1344,7 +1346,7 @@ Server::PersonaExit::onReceive(SINT32 teulIndex)
 
 		dbugLog(_FLI, "t:%d p:%u c:%s remote PLAYER_EXIT for local player - releasing"
 						, psn->teulIndex, playerID, dispatch().m_callsign);
-		_playerRelease(psn->teulIndex, psn, 0, RELEASE_EXIT);
+		_playerRelease(psn->teulIndex, psn, 0, ReleaseType::Exit);
 	}
 
 	return 0;
@@ -1396,7 +1398,7 @@ SINT32
 Server::PersonaMirror::onReceive(SINT32 teulIndex)
 {
 	dbugLog(_FLD, "t:%d p:%u c:%s processing player mirror request", teulIndex, dispatch().m_customerID, dispatch().m_callsign);
-	if ( _playerAdd(this, Server::myServerInfo, PLAYER_INIT, nullptr) == nullptr )
+	if ( _playerAdd(this, Server::myServerInfo, PlayerStatus::Init, nullptr) == nullptr )
 		return -EINVAL;
 	return 0;
 }

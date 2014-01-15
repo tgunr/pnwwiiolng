@@ -640,7 +640,7 @@ _processDelayedBan()
 
 				PlayerStatusNode* const psn = ServerInterface::PlayerStatusNodeByPlayerID(player->playerID());
 				if ( psn != nullptr )
-					player->Release(psn->teulIndex, Server::RELEASE_ECONN);
+					player->Release(psn->teulIndex, Server::ReleaseType::EConn);
 			}
 		}
 
@@ -2397,9 +2397,9 @@ _listenErrorFunction(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*siz
 			dbugLog(_FLN, "t:%d p:%u c:%s closed", teulIndex, player->playerID(), player->callsign());
 			chatPlayerDeactivate(player);
 #ifdef PREVIOUSLY_IN_CHAT_HOST
-			serverReleasePlayer(teulIndex, player->playerID(), player->OTP(), 0, RELEASE_ECONN);
+			serverReleasePlayer(teulIndex, player->playerID(), player->OTP(), 0, ReleaseType::EConn);
 #else
-			player->Release(teulIndex, Server::RELEASE_ECONN);
+			player->Release(teulIndex, Server::ReleaseType::EConn);
 #endif
 		}
 		else
@@ -2843,7 +2843,7 @@ _startShutdown()
 		++it;
 
 		chatSmitePlayer(target->playerID());
-		target->Release(target->teulIndex(), Server::RELEASE_EXIT);
+		target->Release(target->teulIndex(), Server::ReleaseType::Exit);
 	}
 
 	threadsLogging();

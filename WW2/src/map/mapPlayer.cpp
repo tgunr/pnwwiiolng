@@ -1687,7 +1687,7 @@ _playerLoggingIn(SINT32 teulIndex, const playerid_t playerID, PlayerStatusNode& 
 		SINT32 oldTeulIndex = previous->teulIndex();
 		if ( oldTeulIndex < 0 )
 			oldTeulIndex = 0;
-		previous->Release(oldTeulIndex, Server::RELEASE_COLLISION);
+		previous->Release(oldTeulIndex, Server::ReleaseType::Collision);
 	}
 
 	if ( xfer.data.auxData != nullptr )
@@ -1832,7 +1832,7 @@ mapReleasePlayer(SINT32 teulIndex, PlayerStatusNode* psn, Server::ReleaseType re
 		///TODO: Think about this, it doesn't seem like such
 		///a great idea. What if we have the wrong teulIndex?
 		player->SetTeulIndex(teulIndex);
-		assert( releaseType != Server::RELEASE_REDIRECTED );
+		assert( releaseType != Server::ReleaseType::Redirected );
 
 		player->SetState(PERS_EXITING);
 

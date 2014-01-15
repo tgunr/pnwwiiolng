@@ -18,6 +18,7 @@ extern void* teulGetPersonaData(SINT32);
 
 namespace Instance { class HostInstance; }
 namespace Chat { struct LocalizedMessage; }
+namespace Server { enum class ReleaseType; }
 
 class wwiiPlayer
 {
@@ -151,7 +152,7 @@ public:
 	void log(const char* message) const;
 	void log(const char* filename, int lineno, unsigned int errType, const char* mask, ...) const;
 
-	virtual void Release(SINT32 teulIndex, int releaseType);
+	void Release(SINT32 teulIndex, Server::ReleaseType releaseType);
 
 protected:
 	void _setCallsign(const char* to, bool isPlayerPlaynet);

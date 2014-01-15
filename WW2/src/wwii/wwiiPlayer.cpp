@@ -347,11 +347,11 @@ wwiiPlayer::_setCallsign(const char* to, bool isPlayerPlaynet)
 // Send a player to the exit server
 
 void
-wwiiPlayer::Release(SINT32 onTeulIndex, int releaseType)
+wwiiPlayer::Release(SINT32 onTeulIndex, Server::ReleaseType releaseType)
 {
 	bool closeRequired = (onTeulIndex >= 0 && onTeulIndex == m_teulIndex);
 	this->m_teulIndex = -1;
-	serverReleasePlayer(onTeulIndex, this->playerID(), this->OTP(), PEXIT_DEAD, (Server::ReleaseType)releaseType);
+	serverReleasePlayer(onTeulIndex, this->playerID(), this->OTP(), PEXIT_DEAD, releaseType);
 
 	if ( closeRequired )
 		teulClose(onTeulIndex, Teul::Closing::PlayerDtor);

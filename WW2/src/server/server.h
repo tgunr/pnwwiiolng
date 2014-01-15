@@ -9,7 +9,7 @@
 
 //----> player functions
 
-#include "server/serverReleaseTypeEnum.h"
+namespace Server { enum class ReleaseType; }
 SINT32 serverReleasePlayer(SINT32 teulIndex, UINT32 id, UINT32 otp, UINT32 exitCode, Server::ReleaseType releaseType);
 
 UINT32 serverGetAuthIP();

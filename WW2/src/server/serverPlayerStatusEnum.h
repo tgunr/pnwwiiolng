@@ -2,12 +2,8 @@
 
 namespace Server
 {
-	enum PlayerStatus
+	enum class PlayerStatus
 	{
-		PLAYER_FREE,
-		PLAYER_NEW,
-		PLAYER_INIT,
-		PLAYER_IN_EXIT,
-		PLAYER_DELETED
-	} ;
+		Free, New, Init, InExit, Deleted
+	};
 }

@@ -59,6 +59,7 @@
 #include "server/serverPersonaMirror.h"
 #include "server/serverPersonaXfer.h"
 #include "server/serverPlayerStatusNode.h"
+#include "server/serverReleaseTypeEnum.h"
 #include "server/serverServerInfo.h"
 #include "strt/strtData.h"
 #include "strt/strtDB.h"
@@ -509,7 +510,7 @@ _errorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEU
 			--_userConnections;
 			dbugLog(_FLI, "t:%d p:%u c:%s connection closed %d connections remaining"
 							, teulIndex, player->playerID(), player->callsign(), _userConnections);
-			player->Release(teulIndex, Server::RELEASE_ECONN);
+			player->Release(teulIndex, Server::ReleaseType::EConn);
 			player->setDisconnected();
 		}
 		else
@@ -1279,7 +1280,7 @@ mapSmiteCustomer(const playerid_t playerID)
 		return;
 
 	dbugLog(_FLN, "t:%d p:%u c:%s smiting", player->teulIndex(), player->playerID(), player->callsign());
-	player->Release(player->teulIndex(), Server::RELEASE_EXIT);
+	player->Release(player->teulIndex(), Server::ReleaseType::Exit);
 }
 
 //////////////////////////////////////////////////////////////////////

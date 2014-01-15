@@ -670,7 +670,7 @@ _exitPlayer(Player& player)
 	{
 		_releaseVehicleList(player);
 
-		player.Release(teulIndex, Server::RELEASE_ECONN);
+		player.Release(teulIndex, Server::ReleaseType::EConn);
 
 		if ( teulIndex >= 0 )
 			teulClose(teulIndex, Teul::Closing::ExitWithPlayer);
@@ -1202,7 +1202,7 @@ _personaXfer(Player& player, PLAYER_EXIT& pe)
 		if ( psn == nullptr )
 			throw std::domain_error("No data for this player");
 
-		serverReleasePlayer(player.teulIndex(), player.playerID(), player.OTP(), pe.exitCode, Server::RELEASE_REDIRECTED);
+		serverReleasePlayer(player.teulIndex(), player.playerID(), player.OTP(), pe.exitCode, Server::ReleaseType::Redirected);
 
 		return 0;
 	}
@@ -1408,7 +1408,7 @@ _updaterErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 						, player->callsign()
 						, _userConnections
 						);
-			player->Release(teulIndex, Server::RELEASE_ECONN);
+			player->Release(teulIndex, Server::ReleaseType::EConn);
 		}
 		else
 		{

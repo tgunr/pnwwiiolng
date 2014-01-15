@@ -9,9 +9,10 @@
 
 #include "auth/authDispatch.h"
 #include "server/serverPersonaXferData.h"
-#include "server/serverPlayerStatusEnum.h"
 #include "server/serverServerSummaryEnum.h"
 #include "teul/teulTimeMS.h"
+
+namespace Server { enum class PlayerStatus; }
 
 class PlayerStatusNode
 {
