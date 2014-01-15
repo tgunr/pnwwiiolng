@@ -51,43 +51,46 @@ static bool _transportInited, _transportClosing;
 // For client network selection
 UINT32 _hostAddressMask = 0;
 
-UINT32*
-teulGetHostByName(const char* const name)
+namespace Teul
 {
-	UINT32* list;
-	SINT32 i, numEntries = 0;
-
-#if platOS == OS_WIN32 || platOS == OS_MACOS
-	struct hostent* entry = gethostbyname(name);
-#else
-	struct hostent hostEnt;
-	char buf[512];
-	struct hostent* entry = nullptr;
-	int herrnop = 0;	// gethostbyname wants an errono parameter.
-	gethostbyname_r(name, &hostEnt, buf, sizeof(buf), &entry, &herrnop);
-#endif
-
-	if (entry != nullptr)
+	UINT32 GetSingleIP(const char* const name)
 	{
-		while (entry->h_addr_list[numEntries] != nullptr)
-			++numEntries;
+		struct addrinfo hints;	
+		memset(&hints, 0, sizeof(hints));
+		hints.ai_family = AF_INET;
 
-		if ( numEntries > 0)
-		{
-			list = (UINT32*)memAlloc((numEntries+1)*(sizeof(UINT32)));
+		struct addrinfo* result = nullptr;
+		int res = getaddrinfo(name, nullptr, &hints, &result);
+		if ( res < 0 || result == nullptr )
+			return 0;
 
-			for (i = 0; i < numEntries; i++)
-			{
-				list[i] = ntohl( *((UINT32*)(entry->h_addr_list[i])));
-			}
+		UINT32 retval = ntohl(((struct sockaddr_in*) result->ai_addr)->sin_addr.s_addr);
 
-			list[i] = 0;
+		freeaddrinfo(result);
 
-			return list;
-		}
+		return retval;
 	}
 
-	return nullptr;
+	bool GetIPs(const char* const name, std::vector<UINT32>& ips)
+	{
+		struct addrinfo hints;	
+		memset(&hints, 0, sizeof(hints));
+		hints.ai_family = AF_INET;
+
+		struct addrinfo* result = nullptr;
+		int res = getaddrinfo(name, nullptr, &hints, &result);
+		if ( res < 0 )
+			return false;
+
+		for ( auto rp = result; rp != nullptr; rp = rp->ai_next )
+		{
+			ips.push_back(ntohl(((struct sockaddr_in*) rp->ai_addr)->sin_addr.s_addr));
+		}
+
+		freeaddrinfo(result);
+
+		return !ips.empty();
+	}
 }
 
 // wrapper for inet_aton.

@@ -91,19 +91,16 @@ main(int argc, char* argv[])
 
 	dbugSetLogLevel(Debug::ERR_DBUG);
 
-	UINT32* const address = teulGetHostByName("auth.playnet.com");
-	if ( address == nullptr )
+	UINT32 address = Teul::GetSingleIP("auth.playnet.com");
+	if ( address == 0 )
 	{
 		fprintf(stderr, "failed to resolve auth.playnet.com\n");
 		return -2;
 	}
 
-	for ( UINT32 i = 0; i < 10; ++i )
-	{
-		int result = _runTest(*address);
-		if ( result < 0 )
-			return result;
-	}
+	int result = _runTest(address);
+	if ( result < 0 )
+		return result;
 
 	return 0;
 }

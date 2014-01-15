@@ -194,12 +194,10 @@ static bool _lookupAuthHost()
 
 	g_authPort = WWII::Net::Ports::AuthHost;
 
-	UINT32* ipList = teulGetHostByName(g_region.authSuffix().c_str());
-	if ( ipList == nullptr || NULL == *ipList )
+	if ( !Teul::GetMultipleIPs(g_region.authSuffix().c_str(), g_authHosts) || g_authHosts.empty() )
 	{
-		sprintf_s(g_authHostName, 256, "auth%s", g_region.authSuffix().c_str());
-		ipList = teulGetHostByName(g_authHostName);
-		if ( nullptr == ipList || NULL == *ipList )
+		strprintf(g_authHostName, "auth%s", g_region.authSuffix().c_str());
+		if ( !Teul::GetMultipleIPs(g_authHostName, g_authHosts) || g_authHosts.empty() )
 		{
 			dbugLog(_FLW, "lookup(%s) no addresses", g_authHostName);
 			return false;
@@ -208,10 +206,9 @@ static bool _lookupAuthHost()
 
 	// Copy the list to a permanent home
 	dbugLog(_FLI, "lookup(%s) gave", g_authHostName);
-	while ( *ipList )
+	for ( auto ip : g_authHosts )
 	{
-		dbugLog(_FLIB, " %s", teulGetAddress(*ipList));
-		g_authHosts.push_back(*(ipList++));
+		dbugLog(_FLIB, " %s", teulGetAddress(ip));
 	}
 
 	return true;

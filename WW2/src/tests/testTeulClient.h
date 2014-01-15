@@ -113,13 +113,9 @@ struct ClientRole : public Role
 	void GetHostAddress()
 	{
 		// Test hostname lookup.
-		const UINT32* const addresses = teulGetHostByName(Config::serverName);
-		if ( addresses == nullptr )
-			throw std::runtime_error("teulGetHostByName returned nullptr");
-		// Lets just use the first address in the list.
-		const UINT32 address = addresses[0];
+		UINT32 address = Teul::GetSingleIP(Config::serverName);
 		if ( address == 0U || address == ~0U )
-			throw Teul::Error("teulGetHostByName failed", address);
+			throw Teul::Error("Teul::GetSingleIP failed", address);
 		hostAddress = address;
 	}
 

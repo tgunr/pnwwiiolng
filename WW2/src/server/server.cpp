@@ -1563,8 +1563,8 @@ serverGetAuthIP()
 	if ( !authName && !*authName )
 		LogAbort("Missing AUTH_ADDRESS");
 
-	UINT32* const addresses = teulGetHostByName(authName);	// Returns malloc'd pointer!
-	if ( addresses == nullptr )
+	UINT32 address = Teul::GetSingleIP(authName);	// Returns malloc'd pointer!
+	if ( address == 0 )
 	{
 		if ( useAuthServer == true )
 		{
@@ -1575,10 +1575,6 @@ serverGetAuthIP()
 		dbugLog(_FLN, "Couldn't resolve auth address '%s', ignoring", authName);
 		return 0;
 	}
-
-	UINT32 address = *addresses;
-
-	memFree(addresses);		// teulGetHostByName mallocs, grr.
 
 	return address;
 }

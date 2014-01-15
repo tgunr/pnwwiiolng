@@ -37,6 +37,14 @@ namespace Teul
 
 	//! Get the address of an endpoint, as long as it's connected/open.
 	ENDPOINT* GetConnectedEndpoint(const SINT32 teulIndex);
+
+	//! Look up a single IP address (host order) for a given name.
+	//! Returns the first IP from the list returned by getaddrinfo.
+	//! \return IP address in host order or zero.
+	UINT32 GetSingleIP(const char* const name);
+
+	//! Look up all IPs for a given hostname.
+	bool GetIPs(const char* const name, std::vector<UINT32>& ips);
 } // namespace Teul
 
 //! Send data through a callback on a given connection.
@@ -71,14 +79,6 @@ const char* teulGetAddress(const UINT32 host);
 //!	@param[in]	bufferSize		Size of buffer.
 //! @return pointer to buffer (for compatibility with old version)
 const char* teulGetAddress(const UINT32 host, char* buffer, const size_t bufferSize);
-
-//! Resolve the supplied host name into a binary IP address.
-//! @warning This is a long, blocking, call!
-//! @ingroup not-thread-safe
-//! @param[in]	name			IP address/name
-//! @return binary IP address or 0.
-// NOTE: this is long blocking call!!!
-UINT32* teulGetHostByName(const char* name);
 
 //! Perform core teul operations such as draining reads and writes on
 //! sockets, processing incoming callbacks and timing out connections.

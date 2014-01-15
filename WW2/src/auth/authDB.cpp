@@ -10,6 +10,7 @@
 // Originating Programmer: Shane "Elmo" Wickson
 
 #include "teul/teulBasic.h"
+#include "teul/teulConfigVar.h"
 #include "auth/authTypes.h"
 #include "dbse/dbseConnection.h"
 #include "dbse/dbseWrapper.h"
@@ -26,7 +27,6 @@
 #include "auth/authClientData.h"
 #include "auth/authGame.h"
 #include "auth/authPlaygateTypes.h"
-#include "auth/authDBConnection.h"
 #include "auth/authDatabaseSchemas.h"
 
 #define MAX_APPIDS	256
@@ -48,7 +48,6 @@ struct apps_holder
 	struct vers_manifest* manifest;
 	SCHAR	appleID[APPLE_ID_MAX+1];
 };
-
 
 struct conf_struct
 {
@@ -89,12 +88,11 @@ static const char QRY_SELECT_HOST_VERSIONS_BY_APPHOST[] =
 static const char QRY_GET_LAST_OTP[] =
 	"SELECT value FROM auth_variables WHERE name = '" AUTH_VAR_LAST_OTP "'";
 
-#if defined( HAPPYOO )
-# define AUTH_PASSWORD "m4nd0l1n"			// Happyoo's auth password
-#else
-# define AUTH_PASSWORD "scalar449"			// Playnet's auth password
-#endif
-
+extern ConfigAddr cv_authdbAddress;
+extern ConfigStr cv_authdbPort;
+extern ConfigStr cv_authdbPassword;
+extern ConfigStr cv_authdbSchema;
+extern ConfigStr cv_authdbUser;
 
 static struct conf_struct config;
 
@@ -113,7 +111,19 @@ DBCONNECTION dbConnection;
 //connect function
 void authInitDB(void)
 {
-	authGetDBConnectionInfo(&dbConnection);
+	// Look up the cannonical name/address of the auth database
+	// and resolve it to an IP
+	UINT32 dbIp = Teul::GetSingleIP(cv_authdbAddress.GetString());
+	if ( dbIp == 0 )
+		LogAbort("Invalid %s: %s (unable to resolve)"
+					, cv_authdbAddress.GetEnvVarName(), cv_authdbAddress.GetString());
+
+	// Populate the connection info structure.
+	teulGetAddress(dbIp, dbConnection.host, sizeof(dbConnection.host));
+	strcpy(dbConnection.dbName, cv_authdbSchema.GetString());
+	strcpy(dbConnection.username, cv_authdbUser.GetString());
+	strcpy(dbConnection.password, cv_authdbPassword.GetString());
+	strcpy(dbConnection.port, cv_authdbPort.GetString());
 
 	if ( dbh.connect(dbConnection) == false )
 		LogAbort("Unable to initialize auth database connection - check grants for %s on %s", dbConnection.username, dbConnection.host);

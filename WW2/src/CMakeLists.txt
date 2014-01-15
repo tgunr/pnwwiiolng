@@ -250,8 +250,6 @@ add_library (libwwii
 		wwii/wwiiThreadText.h
 	wwii/wwiiUTF.cpp
 		wwii/wwiiUTF.h
-	auth/authDBConnection.cpp
-		auth/authDBConnection.h
 	score/scoreActor.cpp
 		score/scoreActor.h
 	src/io_mapped_file.cpp

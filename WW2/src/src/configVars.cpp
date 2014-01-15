@@ -539,14 +539,12 @@ namespace Teul
 
 		if ( !teulGetHost(newValue_, &m_union.um_uint32) )
 		{
-			UINT32* addresses = teulGetHostByName(newValue_);
-			if ( addresses == nullptr || *addresses == 0 )
+			m_union.um_uint32 = Teul::GetSingleIP(newValue_);
+			if ( m_union.um_uint32 == 0 )
 			{
 				dbugLog(_FLA, "%s: invalid ip address: %s", GetName(), newValue_);
 				return;
 			}
-			m_union.um_uint32 = *addresses;
-			memFree(addresses);
 		}
 
 		m_value = strdup(newValue_);
