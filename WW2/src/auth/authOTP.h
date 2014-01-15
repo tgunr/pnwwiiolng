@@ -10,4 +10,4 @@
 // Originating Programmer: Shane "Elmo" Wickson
 
 //This function returns valid "ticket", or one time password
-extern UINT32 authGetOTP(void);
+UINT32 authGetOTP(void);

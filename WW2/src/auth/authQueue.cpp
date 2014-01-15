@@ -96,7 +96,7 @@ _getWaitTime(const PlayerEntry& entry, UINT32 position, const QueueHeader& heade
 // Send an update to a player to let them know they are in a queue,
 // what position they're at, and what their expected wait time is.
 
-extern void authSendPlayerInQueue(Auth::ClientData* cdata, UINT32 position, UINT32 waitTime);
+void authSendPlayerInQueue(Auth::ClientData* cdata, UINT32 position, UINT32 waitTime);
 
 static void
 _sendPlayerInQueue(const PlayerEntry& entry, UINT32 position, const QueueHeader& header)

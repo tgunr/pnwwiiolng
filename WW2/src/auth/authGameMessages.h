@@ -22,7 +22,7 @@ extern TEUL_CALLBACK*	authSERVER_LOAD;
 extern TEUL_CALLBACK*	authGAME_CAPACITY;
 
 // init auth game callbacks
-extern SINT32 authInstallGameCallbacks(ERROR_FUNCTION* externErrorFn);
+SINT32 authInstallGameCallbacks(ERROR_FUNCTION* externErrorFn);
 
 
 // used to report client actions (login, logout etc..)
@@ -31,7 +31,7 @@ extern SINT32 authInstallGameCallbacks(ERROR_FUNCTION* externErrorFn);
 // <gameID> the game that is being played.
 // <actionType> action (login, logout, etc..)
 // <ip> ip address of the player
-extern SINT32 authSendClientAction(SINT32 connection, UINT32 arenaID,
+SINT32 authSendClientAction(SINT32 connection, UINT32 arenaID,
 							UINT32 customerID
 							, CLIENT_ACTIONS action
 							, UINT32 ip);
@@ -39,8 +39,8 @@ extern SINT32 authSendClientAction(SINT32 connection, UINT32 arenaID,
 // used to clear the current client connection table.  Sent at the
 //	beginning to whack any stale data from the current connection table.
 //	<connection> is the connection the message should go out on
-extern SINT32 authSendGameInit(SINT32 connection);
+SINT32 authSendGameInit(SINT32 connection);
 
 // from teulAuth.c
-extern SINT32	authAcceptPlayer(SINT32 teulIndex, UINT32 playerIP, struct PLAYER_LOGIN& loginData);
+SINT32 authAcceptPlayer(SINT32 teulIndex, UINT32 playerIP, struct PLAYER_LOGIN& loginData);
 

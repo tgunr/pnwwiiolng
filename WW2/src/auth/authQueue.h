@@ -13,11 +13,11 @@ struct ClientData;
 
 	namespace Queue
 	{
-		extern bool AddPlayer(UINT32 arenaID, ClientData* cdata, bool premium);
-		extern bool RemovePlayer(UINT32 arenaID, ClientData* cdata, bool premium, bool enteredGame);
+		bool AddPlayer(UINT32 arenaID, ClientData* cdata, bool premium);
+		bool RemovePlayer(UINT32 arenaID, ClientData* cdata, bool premium, bool enteredGame);
 
-		extern ClientData* GetNextPlayer(UINT32 arenaID);
+		ClientData* GetNextPlayer(UINT32 arenaID);
 
-		extern void ProcessQueues();
+		void ProcessQueues();
 	}
 }
