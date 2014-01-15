@@ -13,26 +13,18 @@
 #include <cstddef>
 #include <cstdint>
 
+#include <string>
 #include <memory>
 #include <vector>
-#include <string>
 #include <map>
 #include <set>
 #include <list>
-#include <algorithm>
 
 #include <thread>
 #include <mutex>
 
 #if defined(HAVE_UNISTD_H)
 # include <unistd.h>
-#endif
-
-#if platOS == OS_MACOS
-#include <sys/types.h>
-#include <malloc/malloc.h>
-#else
-#include <malloc.h>
 #endif
 
 ////////// PLAYNET SYSTYPES NEEDS TO GO HERE
@@ -50,10 +42,6 @@
 #include "wwii/wwiiOwnershipEnums.h"
 #include "wwii/wwiiTypes.h"
 #include "wwii/wwiiBranchEnums.h"
-#if defined(AS_SERVER)
-#include "wwii/wwiiConfig.h"
-#include "server/serverServerInfo.h"
-#endif
 #include "teul/teulTime.h"
 #include "teul/teulClosingEnums.h"
 #include "teul/teulPackers.h"

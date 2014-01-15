@@ -11,6 +11,7 @@
 
 #include "mem/mem.h"
 #include "server/serverInterfaceDescription.h"
+#include "server/serverServerInfo.h"
 #include "teul/teulBasic.h"
 #include "teul/teulCallbackStruct.h"
 #include "teul/teulEndpointIdleList.h"

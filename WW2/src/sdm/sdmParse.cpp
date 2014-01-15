@@ -9,6 +9,7 @@
 // Supporting Programmer:  Shane "Elmo" Wickson
 
 #include <sys/stat.h>
+#include <set>
 
 #include "mem/mem.h"
 #include "sdm/sdmParse.h"

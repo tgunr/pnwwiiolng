@@ -1,5 +1,6 @@
 #pragma once
 
+#include <set>
 #include "server/serverFlagsEnum.h"
 #include "server/serverHeartBeat.h"
 #include "wwii/wwiiServerTypeEnums.h"
