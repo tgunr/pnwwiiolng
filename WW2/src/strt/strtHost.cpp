@@ -31,6 +31,7 @@
 #include "server/serverPersonaLogin.h"
 #include "server/serverReleaseTypeEnum.h"
 #include "server/serverServerInfo.h"
+#include "server/serverCodeEnum.h"
 #include "strt/strtConstants.h"
 #include "strt/strtCPClass.h"
 #include "strt/strtCP.h"
@@ -256,7 +257,7 @@ _serverEnterCallback(Server::ServerInfo* server, Server::Code scode)
 {
 	UINT32 broadAddr = Server::BroadcastMaskAddress(server->stats.address);
 
- 	dbugLog(_FLN,"server %s added code %s[%d], type %d", teulGetAddress(server->stats.address), _serverCode[scode], scode, server->stats.type);
+ 	dbugLog(_FLN,"server %s added code %s[%d], type %d", teulGetAddress(server->stats.address), _serverCode[static_cast<size_t>(scode)], scode, server->stats.type);
 
 	//If its a cell host and its already up, we need to sync it, since the
 	//	firebases have changed
@@ -306,7 +307,7 @@ static SINT32
 _serverLeaveCallback(Server::ServerInfo* server, Server::Code scode)
 {
  	dbugLog(_FLN,"server %s left code %s[%d], type %d"
-					, teulGetAddress(server->stats.address), _serverCode[scode], scode, server->stats.type);
+					, teulGetAddress(server->stats.address), _serverCode[static_cast<size_t>(scode)], scode, server->stats.type);
 
 	_checkArenalock(server, Server::SERVER_INITIALIZING);
 	strtRemoveSyncPeer(Server::BroadcastMaskAddress(server->stats.address));
@@ -332,7 +333,7 @@ _serverStatusCallback(Server::ServerInfo* server, Server::Code scode)
 
  	dbugLog(_FLN,"server status changed for %s, code is %s[%d] status is %s[%d]"
 				, teulGetAddress(server->stats.address)
-				, _serverCode[scode], scode
+				, _serverCode[static_cast<size_t>(scode)], scode
 				, _serverStatus[server->stats.status], server->stats.status
 				);
 
@@ -341,7 +342,7 @@ _serverStatusCallback(Server::ServerInfo* server, Server::Code scode)
 	//	system
 	//Removed master crap since "THERE CAN BE ONLY ONE" strat server (for
 	//	right now
-	if ( scode == Server::SCODE_STATUS )
+	if ( scode == Server::Code::Status )
 	{
 		if ( server->stats.status == Server::SERVER_INITIALIZING)
 		{

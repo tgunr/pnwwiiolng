@@ -1,14 +1,14 @@
 #pragma once
 
 #include "server/serverReleaseTypeEnum.h"
-#include "server/serverCodeEnum.h"
 #include "wwii/wwiiServerTypeEnums.h"
 
 namespace Server
 {
-	class PersonaLogin ;
-	class PersonaExit ;
-	class ServerInfo ;
+	class PersonaLogin;
+	class PersonaExit;
+	class ServerInfo;
+	enum class Code : uint32_t;
 }
 
 typedef SINT32 (CREATE_PERSONA_FUNCTION) (const Server::PersonaLogin&, class PlayerStatusNode& psn);

@@ -16,6 +16,7 @@
 #include "server/serverFuncTypes.h"
 #include "server/server.h"
 #include "server/serverBase.h"
+#include "server/serverCodeEnum.h"
 #include "server/serverConfigVars.h"
 #include "server/serverIndexes.h"
 #include "server/serverInterfaceDescription.h"
@@ -860,11 +861,11 @@ _addServer(Server::ServerInfo* const server)
 
 	Server::ServerInfo* oldServer = Server::ServerInfo::GetByID(server->stats.id);
 	if (oldServer != nullptr)
-		_releaseServer(oldServer, Server::SCODE_REPLACED);
+		_releaseServer(oldServer, Server::Code::Replaced);
 
 	oldServer = Server::ServerInfo::GetInfo(server->stats.address, server->stats.type);
 	if (oldServer != nullptr)
-		_releaseServer(oldServer, Server::SCODE_REPLACED);
+		_releaseServer(oldServer, Server::Code::Replaced);
 
 	// Make sure our server info gets sent ahead of our attempt to connect.
 	_sendHeartBeat();
@@ -877,7 +878,7 @@ _addServer(Server::ServerInfo* const server)
 	dbugLog(_FLN, "added %s server on %s", g_serverTypes[server->stats.type], teulGetAddress(server->stats.address));
 
 	if (_enterCallback)
-		(_enterCallback) (server, Server::SCODE_ADDED);
+		(_enterCallback) (server, Server::Code::Added);
 
 	return 0;
 }
@@ -1178,7 +1179,7 @@ serverUpdate(void)
 				dbugLog(_FLW, "%s serv:%s lastRecv too long, assuming server failed"
 								, g_serverTypes[server->stats.type], teulGetAddress(server->stats.address)
 								);
-				_releaseServer(server, Server::SCODE_TIMED_OUT);
+				_releaseServer(server, Server::Code::TimedOut);
 			}
 		}
 
@@ -1232,7 +1233,7 @@ Server::HeartBeat::process()
 							);
 			serverDisconnectPeer(server);
 			if ( _leaveCallback)
-				(_leaveCallback)(server, Server::SCODE_REPLACED);
+				(_leaveCallback)(server, Server::Code::Replaced);
 			_sendHeartBeat();
 			serverConnectPeer(this->address, this->type);
 		}
@@ -1250,7 +1251,7 @@ Server::HeartBeat::process()
 						, server->stats.maxPlayers()
 						);
 			if (_statusCallback)
-				(_statusCallback)(server, Server::SCODE_STATUS);
+				(_statusCallback)(server, Server::Code::Status);
 
 			// Check if we've lost our connection to this guy.
 			if ( serverPeeringWithIP(this->address, this->type) == false )
