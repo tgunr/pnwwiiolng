@@ -1,10 +1,11 @@
 # Server project dependencies.
 
+MARK_AS_ADVANCED(CNL LIBEVENT_FOUND LIBEVENT_INCLUDE_DIR)
+
 FIND_LIBRARY(CNL NAMES ncurses)
 IF ( UNIX AND NOT CNL )
  MESSAGE(SEND_ERROR "ncurses library not found")
 ENDIF ()
-MARK_AS_ADVANCED(CNL)
 
 # Include our macros etc
 find_package(MySQL REQUIRED)
@@ -49,4 +50,14 @@ IF ( WIN OR WIN32 OR WIN64 )
 	INCLUDE_DIRECTORIES(${LIBEVENT_INCLUDE_DIR})
 	INCLUDE_DIRECTORIES(${LIBEVENT_INCLUDE_DIR}/../WIN32-CODE)
 	SET_TARGET_PROPERTIES(event PROPERTIES FOLDER "Libs")
+ELSE ( )
+	FIND_LIBRARY(LIBEVENT_FOUND
+			NAMES	event-2.0-5 event-2.0 event2 event
+				libevent-2.0-5 libevent-2.0 libevent2 libevent
+			)
+	FIND_PATH(LIBEVENT_INCLUDE_DIR event2/event.h
+			HINTS /usr/include /usr/local/include)
+	IF (NOT LIBEVENT_FOUND OR NOT LIBEVENT_INCLUDE_DIR)
+		MESSAGE(FATAL_ERROR "libevent not found")
+	ENDIF ( )
 ENDIF ( )
