@@ -916,8 +916,6 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 		chat/chatdbParser.cpp
 			chat/chatdbParser.h
 		dbse/dbseHost.cpp
-		dbse/dbseDaemon.cpp
-			dbse/dbseDaemon.h
 		dbse/dbseHostMessages.cpp
 		wwii/wwiiSquads.cpp
 			wwii/wwiiSquads.h

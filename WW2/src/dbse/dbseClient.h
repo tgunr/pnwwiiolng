@@ -9,15 +9,11 @@
 //
 // Originating Programmer: Marty "Vandal" Poulin
 
-#include "dbse/dbseTypes.h"
-
 // initializes all standard dbse callbacks and launches update threads if necessary.
 // if no errorFnPtr is defined errors are ignored.
-SINT32 dbseInit();
+bool dbseInit(void);
 
-SINT32 dbseClose();
-
-void setConnectionStatus(CONNECTION_STATUS status);
+SINT32 dbseClose(void);
 
 // a wrapper for teulSend, dbse manages the actual connection
 // index and may need to return a specific error when no connection

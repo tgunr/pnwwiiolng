@@ -11,8 +11,8 @@
 #include "chat/chatdbParser.h"
 #include "dbse/dbseTypes.h"
 #include "dbse/dbseHandle.h"
-#include "dbse/dbseDaemon.h"
 #include "dbse/dbseConnection.h"
+#include "server/serverConfigVars.h"
 #include "server/serverInterfaceDescription.h"			// For myInterface
 #include "teul/teulKit.h"
 #include "wwii/wwiiIRC.h"
@@ -31,6 +31,13 @@
 DBCONNECTION dbConnection;
 DBHANDLE dbh;
 
+extern SINT32 dbseInstallHostCallbacks();
+
+static void _acceptFunction(ENDPOINT& endpoint)
+{
+	dbugLog(_FLN, "t:%d client connection %s", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()));
+}
+
 static void _errorFunction(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 error)
 {
 	if (error == ENOTCONN)
@@ -39,8 +46,7 @@ static void _errorFunction(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32
 		dbugLog(_FLA, "t:%d recieved error %d", error, teulIndex);
 }
 
-static void
-_initDB()
+static void _initDB()
 {
 	ABORT_IF_EX(dbh.connect(dbConnection) == false, "DBD can't operate without a database connection.");
 
@@ -53,8 +59,6 @@ int main(int argc, char* argv[])
 {
 	Teul::SetAppName(g_serverName);
 	Teul::ConfigVar::InitializeConfigVars();
-
-	SINT32 listenIndex;
 
 	if (teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction) < 0)
 	{
@@ -75,7 +79,12 @@ int main(int argc, char* argv[])
 	wwiiIRCInitialize(Server::myInterface.addr[0].ip, false);
 	wwiiIRCActivate(true);
 
-	listenIndex = dbseInitHost(WWII::Net::Ports::Dbse);
+	ABORT_IF(dbseInstallHostCallbacks() < 0);
+
+	dbugLog(_FLI, "Opening listen socket for arena:%u on port:%u", cv_arenaID.GetUint32(), WWII::Net::Ports::Dbse);
+
+	teulindex_t listenIndex = teulOpenListen(WWII::Net::Ports::Dbse, _acceptFunction, 20000, PROTOCOL_TCP, _errorFunction);
+	ABORT_IF(listenIndex < 0);
 
 	std::this_thread::sleep_for(std::chrono::milliseconds(50));
 
@@ -89,6 +98,6 @@ int main(int argc, char* argv[])
 
 	wwiiIRCTerminate("[[ Shutting Down ]]");
 	teulClose(listenIndex);
-	return(0);
-}
 
+	return 0;
+}

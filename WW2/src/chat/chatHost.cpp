@@ -3617,7 +3617,7 @@ main(int argc, char* argv[])
 
 	// Initialize dbse callbacks
 	chatdbInstallClientCallbacks();
-	if ( dbseInit() != SUCCESS )
+	if ( !dbseInit() )
 		return FALSE;
 
 	// Connect to the database
