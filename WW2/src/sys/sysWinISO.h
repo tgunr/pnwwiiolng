@@ -2,6 +2,8 @@
 
 #if defined(WIN32) || defined(WIN64)
 
+#include <algorithm>
+
 // This file is just a place to define all those
 // Microsoft/ISO departure from those "evil",
 // portable, POSIX standards like "open()".
