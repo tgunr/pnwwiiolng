@@ -2,7 +2,7 @@
 
 include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/../include
-	${CMAKE_CURRENT_SOURCE_DIR}/../../Libraries/raknet/Source
+	${CMAKE_CURRENT_SOURCE_DIR}/../proj/win
 )
 
 set(_FORCE_INCLUDE_FLAG "/FI")
