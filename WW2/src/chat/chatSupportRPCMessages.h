@@ -29,7 +29,7 @@ bool chatSendLocalizedMessage(const playerid_t playerID, LSTRING_ID prefix, LSTR
 // Broadcast a "SYSTEM:" message.
 bool chatSendBroadcastAll(LSTRING_ID prefix, LSTRING_ID message
  									, const char* ptr0="", const char* ptr1="", const char* ptr2="", const char* ptr3="", const char* ptr4="", const char* ptr5="");
+//tolua_end
 
 // Send a TickSample to the chat host.
 void chatSendTickSample(UINT32 source, playerid_t playerID, const void* data);
-//tolua_end

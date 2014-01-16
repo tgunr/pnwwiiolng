@@ -798,8 +798,8 @@ Player::getCellHost(PlayerStatusNode* psn) const
 	if ( psn == nullptr )
 		return 0;
 
-	if ( psn->curServer.type == CELL_HOST )
-		return (UINT32)(psn->curServer.address & 0xff);
+	if ( psn->m_curServer.type == CELL_HOST )
+		return (UINT32)(psn->m_curServer.address & 0xff);
 
 	return 0;
 }

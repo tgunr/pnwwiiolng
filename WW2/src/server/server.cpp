@@ -296,7 +296,7 @@ _extractPlayerFromServer(Server::ServerInfo* const server, PlayerStatusNode* con
 
 static UINT32 _updateId = 0;
 Server::PlayerStatusUpdate::PlayerStatusUpdate(const PlayerStatusNode& psn)
-	: serverID(psn.curServer.id)
+	: serverID(psn.m_curServer.id)
 	, status(psn.status)
 	, dispatch(psn.dispatch())
 	, source(Server::myServerInfo.stats.address)
@@ -363,7 +363,7 @@ _pushPlayerToServer(Server::ServerInfo& server, PlayerStatusNode& psn)
 			psn.status = Server::PlayerStatus::Init;
 			break;
 		default:
-				oldServer = Server::ServerInfo::GetByID(psn.curServer.id);
+				oldServer = Server::ServerInfo::GetByID(psn.m_curServer.id);
 				if (oldServer == &server)
 					return 0;
 				else if (oldServer)
@@ -384,9 +384,9 @@ _pushPlayerToServer(Server::ServerInfo& server, PlayerStatusNode& psn)
 				, teulGetAddress(server.stats.address), server.stats.type, server.stats.id
 				);
 
-	psn.curServer.address	= server.stats.address;
-	psn.curServer.type		= server.stats.type;
-	psn.curServer.id		= server.stats.id;
+	psn.m_curServer.address	= server.stats.address;
+	psn.m_curServer.type	= server.stats.type;
+	psn.m_curServer.id		= server.stats.id;
 
 	if (Server::myServerInfo.flags & Server::SVRFLAG_SEND_PSTAT)
 	{
@@ -421,18 +421,18 @@ _playerMove(PlayerStatusNode* const psn, Server::ServerInfo* const server)
 	if (PN_UNLIKELY(server == nullptr || psn == nullptr))
 		return -EINVAL;
 
-	if ( psn->curServer.address == server->stats.address )
+	if ( psn->m_curServer.address == server->stats.address )
 		return 0;
 
 	char fromAddr[64], toAddr[64];
-	teulGetAddress(psn->curServer.address, fromAddr, sizeof(fromAddr));
+	teulGetAddress(psn->m_curServer.address, fromAddr, sizeof(fromAddr));
 	teulGetAddress(server->stats.address, toAddr, sizeof(toAddr));
 
 	dbugLog(_FLD, "p:%u c:%s moving player %p"
 					" from %s server ip %s id %llu"
 					" to %s server ip %s id %llu"
 						, psn->dispatch().m_customerID, psn->dispatch().m_callsign, psn
-						, g_serverTypes[psn->curServer.type], fromAddr, psn->curServer.id
+						, g_serverTypes[psn->m_curServer.type], fromAddr, psn->m_curServer.id
 						, g_serverTypes[server->stats.type], toAddr, server->stats.id
 						);
 
@@ -529,7 +529,7 @@ _playerDelete(PlayerStatusNode* const psn, Server::ReleaseType releaseType)
 
 	// With player tracking it is possible to have a player whos server is invalid
 	// here we extract a player from a valid server if available
-	server = Server::ServerInfo::GetInfo(psn->curServer.address, psn->curServer.type);
+	server = Server::ServerInfo::GetInfo(psn->m_curServer.address, psn->m_curServer.type);
 	if ( server != nullptr)
 		 _extractPlayerFromServer(server, psn);
 	else

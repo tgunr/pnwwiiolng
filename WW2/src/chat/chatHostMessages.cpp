@@ -1114,7 +1114,7 @@ chatSendBandwidthNotice(const playerid_t playerID, UINT32 mode)
 {
 	PlayerStatusNode* psn = ServerInterface::PlayerStatusNodeByPlayerID(playerID);
 
-	if ( psn == nullptr || psn->curServer.type != CELL_HOST )
+	if ( psn == nullptr || psn->m_curServer.type != CELL_HOST )
 		return false;
 
 	Teul::Packet outgoing(0, Chat::CallbackX, Chat::BANDWIDTH_NOTICE_Y);
@@ -1124,7 +1124,7 @@ chatSendBandwidthNotice(const playerid_t playerID, UINT32 mode)
 
 	if ( g_debugPersonas )
 		dbugLog(_FLD, "p:%u c:%s Requesting host %s give mode %u after spawning"
-						, playerID, psn->dispatch().m_callsign, teulGetAddress(psn->curServer.address), mode);
+						, playerID, psn->dispatch().m_callsign, teulGetAddress(psn->m_curServer.address), mode);
 
 	return serverSendPacketToType(outgoing, CELL_HOST);
 }
@@ -1236,12 +1236,12 @@ chatSendLocateUser(Player& requester, const playerid_t playerID)
 
 	PlayerStatusNode* psn = ServerInterface::PlayerStatusNodeByPlayerID(playerID);
 
-	if (psn && psn->curServer.type == CELL_HOST)
+	if (psn && psn->m_curServer.type == CELL_HOST)
 	{
-		dbugLog(_FLI, "Sending chatSendLocateUser for %d to %s", playerID, teulGetAddress(psn->curServer.address));
+		dbugLog(_FLI, "Sending chatSendLocateUser for %d to %s", playerID, teulGetAddress(psn->m_curServer.address));
 		Teul::Packet outgoing(0, Chat::CallbackX, Chat::LOCATE_USER_Y);
 		outgoing.append(locUser);
-		SINT32 cellIndex = serverGetPeerIndex(psn->curServer.address, psn->curServer.type);
+		SINT32 cellIndex = serverGetPeerIndex(psn->m_curServer.address, psn->m_curServer.type);
 		outgoing.send(cellIndex);
 	}
 	else
@@ -1250,8 +1250,8 @@ chatSendLocateUser(Player& requester, const playerid_t playerID)
 
 		if (psn)
 		{
-			found.serverType = psn->curServer.type;
-			found.serverAddress = psn->curServer.address;
+			found.serverType = psn->m_curServer.type;
+			found.serverAddress = psn->m_curServer.address;
 			found.isFound = TRUE;
 		}
 		else

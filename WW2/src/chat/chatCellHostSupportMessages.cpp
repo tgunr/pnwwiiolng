@@ -43,7 +43,7 @@ _findVehicleByPlayerID(const playerid_t playerID)
 	// Since they* might* be on another cell host, we have to look them up this way
 	///TODO: Don't do it this way :)
 	PlayerStatusNode* psn = ServerInterface::PlayerStatusNodeByPlayerID(playerID);
-	if ( psn == nullptr || psn->curServer.id != Server::myServerInfo.stats.id )
+	if ( psn == nullptr || psn->m_curServer.id != Server::myServerInfo.stats.id )
 		return nullptr;
 
 	const Player* player = (Player*)(psn->localInfo);
