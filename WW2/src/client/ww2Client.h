@@ -443,5 +443,4 @@ enum MSG_TIME
 
 }
 
-extern std::wstring clientGetNetworkState();
-
+std::wstring clientGetNetworkState();

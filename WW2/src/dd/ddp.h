@@ -49,61 +49,61 @@
 	#define DDWND_ALLOW_NULL	0x00000040
 	#define DDWND_ALLOW_ANY		0x0000007f
 
-	extern HINSTANCE	ddpGetInstance(void);
-	extern void		ddpSetInstance(HINSTANCE hnewInst);
+	HINSTANCE	ddpGetInstance(void);
+	void		ddpSetInstance(HINSTANCE hnewInst);
 
-	extern LOGICAL		ddpInit(void);
-	extern void			ddpKill(void);
-	extern UINT32		ddpEngine(LPVOID dummy);
-	extern UINT32		ddpEngineCycle(LPVOID dummy);
+	LOGICAL		ddpInit(void);
+	void		ddpKill(void);
+	UINT32		ddpEngine(LPVOID dummy);
+	UINT32		ddpEngineCycle(LPVOID dummy);
 
-	extern LOGICAL		ddpCreateWnd(SINT32 myx, SINT32 myy, SINT32 mywidth, SINT32 myheight, SINT32 mybpp, UINT32 myflags, HWND parent);
+	LOGICAL		ddpCreateWnd(SINT32 myx, SINT32 myy, SINT32 mywidth, SINT32 myheight, SINT32 mybpp, UINT32 myflags, HWND parent);
 
-	extern LOGICAL		ddpFlip();
-	extern LOGICAL		ddpUpdate();
-	extern LOGICAL		ddpGetDDRect(RECT* rect);
-	extern LOGICAL		ddpGetAccess();
-	extern void		ddpReleaseAccess();
-	extern LOGICAL		ddpLockBackbuffer(UCHAR** pbyte);
-	extern void		ddpUnlockBackbuffer();
-	extern LPVOID		ddpGetBackbuffer();
-	extern LOGICAL		ddpGetBackbufferSurface(void** lpdds);
-	extern LOGICAL		ddpDrawToScreen(LPVOID lpdds);
-	extern LOGICAL		ddpDraw();
-	extern LOGICAL		ddpIsAccessed();
-	extern LOGICAL		ddpIsLocked();
-	extern LOGICAL		ddpDrawNotActive(LOGICAL newpna);
-	extern LOGICAL		ddpDisableScreenSaver(LOGICAL newss);
-	extern SINT32		ddpGetTotalPaints(void);
-	extern FLOAT32		ddpGetFPS();
-	extern FLOAT32		ddpGetInstantFPS();
-	extern void		ddpResetFPS();
-	extern void		ddpCapture();
-	extern SINT32		ddpGetWidth();
-	extern SINT32		ddpGetHeight();
-	extern SINT32		ddpGetBPP();
-	extern SINT32		ddpGetNumDrivers();
-	extern LOGICAL		ddpSetDDInit(DDWND_DDINITFUNC newfunc);
-	extern LOGICAL		ddpSetD3DInit(DDWND_D3DINITFUNC newfunc);
-	extern LOGICAL		ddpSetDDRender(DDWND_DDRENDERFUNC newfunc);
-	extern LOGICAL		ddpSetD3DRender(DDWND_D3DRENDERFUNC newfunc);
-	extern LOGICAL		ddpSetDDKill(DDWND_DDKILLFUNC newfunc);
-	extern LOGICAL		ddpSetD3DKill(DDWND_D3DKILLFUNC newfunc);
-	extern LOGICAL		ddpSetMouse(DDWND_MOUSEFUNC newfunc);
-	extern LOGICAL		ddpSetTimer(DDWND_TIMERFUNC newfunc);
-	extern LOGICAL		ddpSetKeyboard(DDWND_KEYBOARDFUNC newfunc);
+	LOGICAL		ddpFlip();
+	LOGICAL		ddpUpdate();
+	LOGICAL		ddpGetDDRect(RECT* rect);
+	LOGICAL		ddpGetAccess();
+	void		ddpReleaseAccess();
+	LOGICAL		ddpLockBackbuffer(UCHAR** pbyte);
+	void		ddpUnlockBackbuffer();
+	LPVOID		ddpGetBackbuffer();
+	LOGICAL		ddpGetBackbufferSurface(void** lpdds);
+	LOGICAL		ddpDrawToScreen(LPVOID lpdds);
+	LOGICAL		ddpDraw();
+	LOGICAL		ddpIsAccessed();
+	LOGICAL		ddpIsLocked();
+	LOGICAL		ddpDrawNotActive(LOGICAL newpna);
+	LOGICAL		ddpDisableScreenSaver(LOGICAL newss);
+	SINT32		ddpGetTotalPaints(void);
+	FLOAT32		ddpGetFPS();
+	FLOAT32		ddpGetInstantFPS();
+	void		ddpResetFPS();
+	void		ddpCapture();
+	SINT32		ddpGetWidth();
+	SINT32		ddpGetHeight();
+	SINT32		ddpGetBPP();
+	SINT32		ddpGetNumDrivers();
+	LOGICAL		ddpSetDDInit(DDWND_DDINITFUNC newfunc);
+	LOGICAL		ddpSetD3DInit(DDWND_D3DINITFUNC newfunc);
+	LOGICAL		ddpSetDDRender(DDWND_DDRENDERFUNC newfunc);
+	LOGICAL		ddpSetD3DRender(DDWND_D3DRENDERFUNC newfunc);
+	LOGICAL		ddpSetDDKill(DDWND_DDKILLFUNC newfunc);
+	LOGICAL		ddpSetD3DKill(DDWND_D3DKILLFUNC newfunc);
+	LOGICAL		ddpSetMouse(DDWND_MOUSEFUNC newfunc);
+	LOGICAL		ddpSetTimer(DDWND_TIMERFUNC newfunc);
+	LOGICAL		ddpSetKeyboard(DDWND_KEYBOARDFUNC newfunc);
 
 	// Set the screen to proper pixel depth and size requirements
-	extern LOGICAL		ddpChooseScreenFormat(HDC hdc, PIXELFORMATDESCRIPTOR* pfd);
-	extern LOGICAL		ddpSetDisplay(UINT32 flags);
-	extern void		ddpResetDisplay(void);
+	LOGICAL		ddpChooseScreenFormat(HDC hdc, PIXELFORMATDESCRIPTOR* pfd);
+	LOGICAL		ddpSetDisplay(UINT32 flags);
+	void		ddpResetDisplay(void);
 
-	extern LOGICAL ddcapStart(void);
+	LOGICAL		ddcapStart(void);
 
-	extern void ddpShowCursor();
-	extern void ddpHideCursor();
-	extern void ddpPumpMessage();
-	extern HWND ddpGetHWND();
-	extern void ddpSaveImgAsBitmap();
+	void		ddpShowCursor();
+	void		ddpHideCursor();
+	void		ddpPumpMessage();
+	HWND		ddpGetHWND();
+	void		ddpSaveImgAsBitmap();
 
-	extern DWORD GetMillisecondTick();
+	DWORD		GetMillisecondTick();

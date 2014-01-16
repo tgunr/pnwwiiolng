@@ -399,7 +399,7 @@ protected:
 // public interface functions
 
 // third person camera callback
-extern bool ezCameraCallback(piVECTOR* pos, piVECTOR* aim);
+bool ezCameraCallback(piVECTOR* pos, piVECTOR* aim);
 
 // ez input callback
-extern UINT32 ezInputControls(SINT32 param, UINT32 id, UINT32 extra);
+UINT32 ezInputControls(SINT32 param, UINT32 id, UINT32 extra);

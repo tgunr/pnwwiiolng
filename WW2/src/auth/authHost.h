@@ -33,4 +33,4 @@ void handleGameCapacityUpdate(const struct AUTH_GAME_CAPACITY& message);
 bool authVerifyChecksum(const SINT32 teulIndex, const UINT32 appID, const UINT32 platform, const char* const checksum);
 
 namespace Auth { class GameList; }
-extern Auth::GameList* authGetGameList(SINT32 teulIndex);
+Auth::GameList* authGetGameList(SINT32 teulIndex);

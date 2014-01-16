@@ -3,8 +3,8 @@
 // Not to be distributed in API form except as part of a compiled library
 // under License or NDA
 
-extern int cfgLoadW2(const char* ConfigName, void** pVariables);
-extern void cfgSetListItemValue(void** ppVariables, int index, void* value);
-extern void* cfgGetListItemValue(void** list, int index);
-extern int cfgGetListItemType(void** list, int index);
-extern int cfgLoadW2Defaults(void** ppVariables);
+int cfgLoadW2(const char* ConfigName, void** pVariables);
+void cfgSetListItemValue(void** ppVariables, int index, void* value);
+void* cfgGetListItemValue(void** list, int index);
+int cfgGetListItemType(void** list, int index);
+int cfgLoadW2Defaults(void** ppVariables);

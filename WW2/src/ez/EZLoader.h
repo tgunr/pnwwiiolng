@@ -54,5 +54,4 @@ public:
 // be populated; the manager will be which ez manager
 // class to use and the path will be the ez file used
 // to determine the manager type
-extern bool ezManagerType(const vehType* vtype, std::string& manager, std::string& path);
-
+bool ezManagerType(const vehType* vtype, std::string& manager, std::string& path);

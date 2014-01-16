@@ -103,38 +103,38 @@ typedef void  (*ERROR_HANDLER) (void);
 // the error object. The log type parameter of dbugInit can take any of the log facilities from
 // syslog including LOG_LOCAL0-7 or be set to LOG_TO_FILE to log
 // directly to a file only.
-extern void dbugInit(int logType, const char* filename);
+void dbugInit(int logType, const char* filename);
 
 // dbugClose: closes the debug file and cleans up.
-extern void	dbugClose(void);
+void dbugClose(void);
 
 // dbugSetLogLevel: set the current debug level for display of log messages.
-extern void	dbugSetLogLevel(Debug::ERROR_TYPE level);
+void dbugSetLogLevel(Debug::ERROR_TYPE level);
 
 // dbugSetWriteLevel: set the current debug level for display of dbug messages and interface to
 // the Microsoft debugger through the SetDebugErrorLevel function.
-extern void	dbugSetWriteLevel(Debug::ERROR_TYPE level);
+void dbugSetWriteLevel(Debug::ERROR_TYPE level);
 
 // dbugSetErrno: sets Errno. Error numbers adhere to errno.h. Under win32 "dbugWErrno.h"
 // may also be included to map windows socket errors to Unix errno.  Additional errors beyond
 // those covered in errno.h and dbugWErrno.h must be added to debugExtErrno.h and must adhere to
 // windows error code conventions to eliminate problems with compatibility.
-extern void		dbugSetErrno( int err);
+void dbugSetErrno( int err);
 
 // dbugGetErrno: returns the current error number.  Error numbers adhere to errno.h.  Under
 // win32 "dbugWErrno.h" may also be included to map windows socket errors to Unix errno.
 // Additional errors beyond those covered in errno.h and dbugWErrno.h must be added to
 // debugExtErrno.h and must adhere to windows error code conventions to eliminate problems
 // with compatibility.
-extern int		dbugGetErrno(void);
+int dbugGetErrno(void);
 
 // dbugLog: if the current filename, lineno or string is nullptr then it sets these members. The
 // parameters are output as a string to the debug file depending on the debug level selected and
 // the current error type.  calls handlers.
-extern int _dbugLog(const char* filename, int lineno, unsigned int errType, const char* fmt, ...) __attribute__ ((format (printf,4,5)));
-extern int _dbugLogV(const char* filename, int lineno, unsigned int errType, const char* fmt, va_list& args);
+int _dbugLog(const char* filename, int lineno, unsigned int errType, const char* fmt, ...) __attribute__ ((format (printf,4,5)));
+int _dbugLogV(const char* filename, int lineno, unsigned int errType, const char* fmt, va_list& args);
 
-extern NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, unsigned int errType, const char* assertion, const char* fmt, ...);
+NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, unsigned int errType, const char* assertion, const char* fmt, ...);
 #define LogAbort(...) _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, nullptr, __VA_ARGS__)
 
 // These macros assume that the condition is unlikely and try to provide the compiler an optimization hint by

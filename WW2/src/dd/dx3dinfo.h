@@ -25,12 +25,12 @@ struct ADAPTERMODES
 
 };
 
-extern char* dx3dinfoDeviceTypeToString(DWORD type);
-extern char* dx3dinfoAdapterToString(DWORD adapter);
+char* dx3dinfoDeviceTypeToString(DWORD type);
+char* dx3dinfoAdapterToString(DWORD adapter);
 
-extern bool dx3dinfoEnumAdaptersAndModes(void);
-extern bool dx3dinfoGetAdaptersAndModes(DWORD* retnumadapters, std::vector<ADAPTERMODES*>& adaptermodes);
+bool dx3dinfoEnumAdaptersAndModes(void);
+bool dx3dinfoGetAdaptersAndModes(DWORD* retnumadapters, std::vector<ADAPTERMODES*>& adaptermodes);
 
-extern int dx3dGetBPP(D3DFORMAT format);
+int dx3dGetBPP(D3DFORMAT format);
 
-extern DSOUNDDRIVERS* dx3dGetSoundInfo(int& numDrivers);
+DSOUNDDRIVERS* dx3dGetSoundInfo(int& numDrivers);

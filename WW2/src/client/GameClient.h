@@ -124,7 +124,7 @@ private:
 	GameClient& operator=(const GameClient&);	// prevent copy operator
 };
 
-extern int GameClientLogin(unsigned int hostAddress, int playerID, int otp,
+int GameClientLogin(unsigned int hostAddress, int playerID, int otp,
 					unsigned int appVersion, short port);
-extern GameClient* PlayerClient();
-extern void GameClientKill();
+GameClient* PlayerClient();
+void GameClientKill();

@@ -3,9 +3,9 @@
 struct FULL_OBJ_ID;
 struct CP_OBJ_EVENT;
 
-extern void clientForcedCellExit(int teulIndex, unsigned int exitCode);
-extern void clientActivateCell(int teulIndex, unsigned int on, unsigned int hostIP, unsigned int port);
-extern void clientActivateMap(int teulIndex, unsigned int on, unsigned int hostIP, unsigned int port);
+void clientForcedCellExit(int teulIndex, unsigned int exitCode);
+void clientActivateCell(int teulIndex, unsigned int on, unsigned int hostIP, unsigned int port);
+void clientActivateMap(int teulIndex, unsigned int on, unsigned int hostIP, unsigned int port);
 
 // strat
 namespace Strat
@@ -15,8 +15,8 @@ namespace Strat
 	struct EventData;
 }
 
-extern void clientWorldUpdate(int teulIndex, struct WORLD_UPDATE*);
-extern void clientApplyStratEventData(int teulIndex, const Strat::EventData&);
+void clientWorldUpdate(int teulIndex, struct WORLD_UPDATE*);
+void clientApplyStratEventData(int teulIndex, const Strat::EventData&);
 
 // mission
 struct MISSION_POST_REPLY;
@@ -26,12 +26,12 @@ class MissionDetail;
 class RoomList;
 class FacilityWeaponList;
 
-extern void clientMissionPostReply(int teulIndex, struct MISSION_POST_REPLY*);
-extern void clientMissionRoomListReply(int teulIndex, RoomList*);
-extern void clientMissionLaunchUpdate(int teulIndex, struct MISS_LAUNCH_UPDATE*);
-extern void clientMissionResultsReply(int teulIndex, struct MISSION_RESULTS*);
-extern void clientProcessWeapList(int teulIndex, struct ACTION_OBJECT*);
-extern void clientMissionDetailReply(int teulIndex, MissionDetail&);
+void clientMissionPostReply(int teulIndex, struct MISSION_POST_REPLY*);
+void clientMissionRoomListReply(int teulIndex, RoomList*);
+void clientMissionLaunchUpdate(int teulIndex, struct MISS_LAUNCH_UPDATE*);
+void clientMissionResultsReply(int teulIndex, struct MISSION_RESULTS*);
+void clientProcessWeapList(int teulIndex, struct ACTION_OBJECT*);
+void clientMissionDetailReply(int teulIndex, MissionDetail&);
 
 // mm
 struct FE_POST_ACCEPT;
@@ -45,38 +45,38 @@ class FESpawnNotify;
 struct FE_CREW_BAILED;
 struct ChatServerInfo;
 
-extern void clientProcessPostAccept(int teulIndex, struct FE_POST_ACCEPT*);
-extern void clientProcessPostDeny(int teulIndex, struct FE_POST_DENY*);
-extern void clientProcessPostExpired(int teulIndex, struct FE_POST_EXPIRED*);
-extern void clientProcessPostList(int teulIndex, struct FE_POST_LIST_RESPONSE*);
-extern void clientProcessJoinDeny(int teulIndex, struct FE_JOIN_DENY*);
-extern void clientProcessJoinPerm(int teulIndex, struct FE_JOIN_PERM_REQUEST*);
-extern void clientProcessJoinAccept(int teulIndex, struct FE_JOIN_ACCEPT*);
-extern void clientProcessSpawnNotify(int teulIndex, const FESpawnNotify&);
-extern void clientProcessCrewBailed(int teulIndex, struct FE_CREW_BAILED*);
+void clientProcessPostAccept(int teulIndex, struct FE_POST_ACCEPT*);
+void clientProcessPostDeny(int teulIndex, struct FE_POST_DENY*);
+void clientProcessPostExpired(int teulIndex, struct FE_POST_EXPIRED*);
+void clientProcessPostList(int teulIndex, struct FE_POST_LIST_RESPONSE*);
+void clientProcessJoinDeny(int teulIndex, struct FE_JOIN_DENY*);
+void clientProcessJoinPerm(int teulIndex, struct FE_JOIN_PERM_REQUEST*);
+void clientProcessJoinAccept(int teulIndex, struct FE_JOIN_ACCEPT*);
+void clientProcessSpawnNotify(int teulIndex, const FESpawnNotify&);
+void clientProcessCrewBailed(int teulIndex, struct FE_CREW_BAILED*);
 
 // chat
 #include "chat/chatPrototypes.h"		// Common chat forward protos
 struct MOTD_REPLY;
 
-extern void clientChatProcessMotdReply(int teulIndex, struct MOTD_REPLY const&);
-extern void clientChatProcessHostMessage(int teulIndex, const Chat::HostMessage*);
-extern void clientChatTuneToChannel(int teulIndex, const Chat::TuneToChannel*);
-extern void clientChatReceiveNLA(int teulIndex, const Chat::UserNLA*);
-extern void clientChatProcessLocalizedMessage(int teulIndex, const Chat::LocalizedMessage*);
-extern void clientChatProcessGCIMessage(int teulIndex, const Chat::GCIMessage*);
-extern void clientChatProcessServerInfo(int teulIndex, const ChatServerInfo*);
-extern void clientProcessChatMissionStatus(int teulIndex, const Chat::MissionStatus*);
+void clientChatProcessMotdReply(int teulIndex, struct MOTD_REPLY const&);
+void clientChatProcessHostMessage(int teulIndex, const Chat::HostMessage*);
+void clientChatTuneToChannel(int teulIndex, const Chat::TuneToChannel*);
+void clientChatReceiveNLA(int teulIndex, const Chat::UserNLA*);
+void clientChatProcessLocalizedMessage(int teulIndex, const Chat::LocalizedMessage*);
+void clientChatProcessGCIMessage(int teulIndex, const Chat::GCIMessage*);
+void clientChatProcessServerInfo(int teulIndex, const ChatServerInfo*);
+void clientProcessChatMissionStatus(int teulIndex, const Chat::MissionStatus*);
 
 struct VEHICLE_UPDATE_HEADER;
 struct VEHICLE_REPLY;
 namespace Vehicle { struct Hit; }
 
-extern void clientRemoveVehicle(int teulIndex, unsigned int index);
-extern void clientProcessPositionUpdateMsg(int teulIndex, VEHICLE_UPDATE_HEADER* VehicleHeader);
-extern void clientProcessVehicleRequestResponse(int teulIndex, VEHICLE_REPLY* Reply);
-extern void clientProcessVehicleHit(int teulIndex, Vehicle::Hit&);
+void clientRemoveVehicle(int teulIndex, unsigned int index);
+void clientProcessPositionUpdateMsg(int teulIndex, VEHICLE_UPDATE_HEADER* VehicleHeader);
+void clientProcessVehicleRequestResponse(int teulIndex, VEHICLE_REPLY* Reply);
+void clientProcessVehicleHit(int teulIndex, Vehicle::Hit&);
 
-extern bool clientReceiveServerTrackedObject(int teulIndex, int type, ACTION_OBJECT* a);
+bool clientReceiveServerTrackedObject(int teulIndex, int type, ACTION_OBJECT* a);
 
-extern void clientErrorLog(const char* const format, ...);
+void clientErrorLog(const char* const format, ...);

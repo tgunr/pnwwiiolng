@@ -21,13 +21,13 @@ struct CHAR_INPUT
 #define _DIMAIN_INPUT_BUFFERSIZE	256
 #define NUM_SLIDERS_PER_JOYSTICK	2
 
-extern LOGICAL dimainInit(void);
-extern void dimainKill(void);
-extern LOGICAL dimainGetInputs(imap_queue_entry** plpiac, UINT32* pnumentries);
+LOGICAL dimainInit(void);
+void dimainKill(void);
+LOGICAL dimainGetInputs(imap_queue_entry** plpiac, UINT32* pnumentries);
 
-extern UINT32 dimainVKToIAC(UINT32 uVK);
+UINT32 dimainVKToIAC(UINT32 uVK);
 
-extern void dimainGetTextInputs(struct CHAR_INPUT** lpBuf, SINT32* pNumElements);
-extern void dimainAddChar(UINT32 ucChar);
-extern void dimainVKUp(UINT32 uVK, UINT32 uScanCode);
-extern void dimainVKDown(UINT32 uVK, UINT32 uScanCode);
+void dimainGetTextInputs(struct CHAR_INPUT** lpBuf, SINT32* pNumElements);
+void dimainAddChar(UINT32 ucChar);
+void dimainVKUp(UINT32 uVK, UINT32 uScanCode);
+void dimainVKDown(UINT32 uVK, UINT32 uScanCode);

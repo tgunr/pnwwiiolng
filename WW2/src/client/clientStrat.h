@@ -10,9 +10,9 @@ namespace Strat { class EventPacket ; }
 	clientStrat
 *************************************************************************************************/
 
-extern void clientStratApplyEvent(CP_OBJ_EVENT const& event);
-extern void clientStratControlUpdate(FULL_OBJ_ID const& id, int ownership, UINT32 flags);
-extern void clientStratLevelUpdate(FULL_OBJ_ID const& id, int vislevel);
-extern void clientStratApplySuperCellStatus(STRAT_SUPERCELL_PACKET const&);
-extern void clientStratApplyCellStatus(STRAT_CELL_PACKET const&);
-extern void clientStratProcessEventPacket(const Strat::EventPacket& packet) ;
+void clientStratApplyEvent(CP_OBJ_EVENT const& event);
+void clientStratControlUpdate(FULL_OBJ_ID const& id, int ownership, UINT32 flags);
+void clientStratLevelUpdate(FULL_OBJ_ID const& id, int vislevel);
+void clientStratApplySuperCellStatus(STRAT_SUPERCELL_PACKET const&);
+void clientStratApplyCellStatus(STRAT_CELL_PACKET const&);
+void clientStratProcessEventPacket(const Strat::EventPacket& packet) ;

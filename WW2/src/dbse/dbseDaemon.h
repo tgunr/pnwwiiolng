@@ -7,5 +7,4 @@
 //
 // Originating Programmer: Eric Hall
 
-extern SINT32 dbseInitHost(UINT16 port);
-
+SINT32 dbseInitHost(UINT16 port);

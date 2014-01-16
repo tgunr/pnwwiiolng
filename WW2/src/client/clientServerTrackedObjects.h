@@ -8,5 +8,5 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-extern bool clientReceiveServerTrackedObject(UINT16 type, ACTION_OBJECT* a);
-extern void clientSendPendingSTOJoules();
+bool clientReceiveServerTrackedObject(UINT16 type, ACTION_OBJECT* a);
+void clientSendPendingSTOJoules();
