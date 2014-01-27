@@ -11,8 +11,11 @@
 
 struct ENDPOINT;
 
+enum { TEUL_UNPACK, TEUL_PACK };
+
 namespace Teul
 {
+	enum class Mode { Unpack, Pack };
 	typedef void (LoggingFn)(const char* const, ...);
 	extern LoggingFn* g_logFnPtr;
 

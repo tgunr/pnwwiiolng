@@ -49,7 +49,6 @@
 #include "chat/chatDotCommandList.h"
 #include "client/ww2client.h"
 #include "teul/teulPacket.h"
-#include "teul/teulPackEnums.h"
 #include "client/GameClient.h"
 
 ///TEMPORARY

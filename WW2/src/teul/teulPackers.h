@@ -9,7 +9,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 #include "dbug/dbug.h"
-#include "teul/teulPackEnums.h"
 
 //	The following routines pack and unpack the cross platform basic data types defined in teul.
 //	Extended types and structures should be packed with user defined routines that use these to

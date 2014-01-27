@@ -73,7 +73,6 @@ SET(PCH_INCLUDE_HEADERS
 	teul/teulClosingEnums.h
 	teul/teulConfigVar.h
 	teul/teulPackers.h
-	teul/teulPackEnums.h
 	teul/teulKit.h
 	teul/teulBasic.h
 	dbug/dbugExtErrors.h

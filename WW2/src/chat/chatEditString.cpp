@@ -10,7 +10,6 @@
 
 #include "chat/chatEditString.h"
 #include "wwii/wwiiPackString.h"
-#include "teul/teulPackEnums.h"
 
 //////////////////////////////////////////////////////////////////////
 // Network based constructor

@@ -2,8 +2,8 @@
 // Date: 11/08/99
 //
 //	This is where all declarations for commPack routines for universal
-//	game specific object structures thatwill be transmited
-//	accross the network must reside or be included into.  All commPack
+//	game specific object structures that will be transmitted
+//	across the network must reside or be included into.  All commPack
 //	routines must have an entry in this file.
 //
 // Copyright (c) 2000 Playnet, Inc., All Rights Reserved.
@@ -15,7 +15,6 @@
 #include "comm/commTypes.h"
 #include "updt/updtVehicleHit.h"
 #include "wwii/wwiiPack.h"
-#include "teul/teulPackEnums.h"
 
 SINT32 commPackInit(void)
 {
