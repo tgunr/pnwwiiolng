@@ -15,16 +15,16 @@ class WeaponCounter;
 struct STRAT_UPDATE;
 
 //Initializes the convoy system
-LOGICAL cnvyInit(void);
+void cnvyInit(void);
 
 //This is the call the Strat System will make to create a convoy.  It takes
 //	all the information to create a convoy and moves it to the appropriate
 //	lists
-LOGICAL cnvyCreateConvoy(WWII_SIDE owner, WWII_COUNTRY country, LinkStruct* link, struct PAYLOADSTRUCT* payload);
+void cnvyCreateConvoy(WWII_SIDE owner, WWII_COUNTRY country, LinkStruct* link, struct PAYLOADSTRUCT* payload);
 
 //This will be the function that the strat System calls to free a convoy after
 //	its supplies have been transported to the depot
-LOGICAL cnvyFreeConvoy(struct CONVOYSTRUCT* convoy);
+void cnvyFreeConvoy(struct CONVOYSTRUCT* convoy);
 
 //This function takes RPs and returns a payload for the item
 PAYLOADSTRUCT* cnvyMakeRPPayload(UINT32 RPs);
@@ -40,20 +40,9 @@ bool cnvyAddWeaponToExpireList(struct POSTED_WEAPON& weapon, UINT32 uExpireSecon
 //This function removes a weapon from the Expire List
 void cnvyRemoveWeaponFromExpireList(struct POSTED_WEAPON& weapon);
 
-// Request the begining of processing for a factory cycle
+// Request the beginning of processing for a factory cycle
 // Seconds specifies time until first processing; afterwards host_config.factoryPeriod is used
-LOGICAL cnvyBeginFactoryProduction(ObjectStruct* object, UINT32 seconds);
-
-//This function interrupts the waiting in the main convoy loop.  Its
-//	gonna be used to make sure that the incremental strat additions get
-//	processed normally
-LOGICAL cnvyInterrupt(void);
-
-//this checks the value of the flag
-LOGICAL cnvyInterrupted(void);
-
-//this resets the interrupt flag
-LOGICAL cnvyClearInterrupt(void);
+void cnvyBeginFactoryProduction(ObjectStruct* object, UINT32 seconds);
 
 //Various processing functions to run the whole of the convoy and
 //	strat system
@@ -62,7 +51,7 @@ LOGICAL cnvyClearInterrupt(void);
 void cnvyProcessConvoys();
 
 //This function processes strat updates, if necessary
-LOGICAL cnvyProcessStratUpdates(UINT32 currentTime);
+void cnvyProcessStratUpdates(UINT32 currentTime);
 
 // Request expiry of an objective at a later time
 bool cnvyScheduleObjectiveExpiry(CPStruct* cp, WWII_SIDE side, UINT32 expirySeconds);

@@ -1113,8 +1113,8 @@ static void _dispatchPayloads(CPStruct& cp)
 			{
 				//fprintf(stderr,"Sending spawnpoint convoy from facility %d to facility %d.\n", currentPayload->manifest->link->startDepot->id, currentPayload->manifest->link->endDepot->id);
 				//Remove the item from the manifest
-				tmpManifest=currentPayload->manifest;
-				currentPayload->manifest=currentPayload->manifest->next;
+				tmpManifest = currentPayload->manifest;
+				currentPayload->manifest = currentPayload->manifest->next;
 
 				cnvyCreateConvoy(tmpManifest->link->startDepot->side,
 								 tmpManifest->link->startDepot->country,

@@ -25,7 +25,6 @@
 #include "strt/strtIO.h"
 #include "strt/strtSyncSupportMessages.h"
 #include "strt/strtTypes.h"
-#include "strt/strtUpdateList.h"
 #include "strt/strtUpdater.h"
 #include "strt/strtUpdaterHostMessages.h"
 #include "teul/teulPacket.h"

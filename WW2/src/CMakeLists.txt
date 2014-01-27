@@ -105,9 +105,6 @@ ENDIF ( )
 # TeulServer library - this is a baseline library that provides
 # teulKit services and the cluster's "server" API.
 add_library (teulserver
-	list/listCL.cpp
-		list/listCL.h
-			list/list.h
 	mem/memlinux.cpp
 	server/server.cpp
 		server/server.h
@@ -945,6 +942,12 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 		cnvy/cnvyMain.cpp
 			cnvy/cnvyMain.h
 				strt/strtProtos.h
+			strt/strtEventQueue.h
+			strt/strtTypes.h
+			strt/strtServerTypes.h
+			mem/memPool.h
+			teul/teulCLList.h
+				list/listCL.h
 		dbse/dbseDatabaseSchema.cpp
 			dbse/dbseDatabaseSchema.h
 			strt/strtDatabaseSchemas.h
@@ -1035,8 +1038,6 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 				strt/strtConstants.h
 		strt/strtTOE.cpp
 			strt/strtTOE.h
-		strt/strtUpdateList.cpp
-			strt/strtUpdateList.h
 		strt/strtWeaponEntry.cpp
 			strt/strtWeaponEntry.h
 				strt/strtTypes.h
@@ -1045,6 +1046,9 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 			weap/weapSpawnXML.h
 		wwii/wwiiHCUnits.cpp
 			wwii/wwiiHCUnits.h
+		list/listCL.cpp
+			list/listCL.h
+				list/list.h
 
 		${_LUA_HOST}Lua.cc
 
