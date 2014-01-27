@@ -83,7 +83,15 @@ namespace Mem
 		Type* New()
 		{
 			Type* newNode = Alloc();
-			new (newNode)Type();
+			new (newNode) Type();
+			return newNode;
+		}
+
+		template<typename... Args>
+		Type* New(Args&&... args)
+		{
+			Type* newNode = Alloc();
+			new (newNode)Type(std::forward<Args>(args)...);
 			return newNode;
 		}
 
@@ -106,8 +114,8 @@ namespace Mem
 		//! Return a New()'d node to the pool.
 		void Delete(Type* ptr)
 		{
-			Free(ptr);
 			ptr->~Type();
+			Free(ptr);
 		}
 	};
 }
