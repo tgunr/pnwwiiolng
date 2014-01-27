@@ -60,7 +60,7 @@ int main(int argc, char* argv[])
 	Teul::SetAppName(g_serverName);
 	Teul::ConfigVar::InitializeConfigVars();
 
-	if (teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction) < 0)
+	if (teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction, nullptr) < 0)
 	{
 		fprintf(stderr, "Unable to initialize teulTransport\n");
 		exit(-ENOTCONN);

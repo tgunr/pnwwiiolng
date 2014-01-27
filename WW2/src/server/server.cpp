@@ -1763,7 +1763,7 @@ int main(int argc, const char* argv[])
 	Teul::SetAppName(g_serverName);
 	extern ERROR_FUNCTION serverErrorFunction;
 
-	if ( teulInitTransport(LOG_TO_FILE, g_serverName, serverErrorFunction) < 0 )
+	if ( teulInitTransport(LOG_TO_FILE, g_serverName, serverErrorFunction, nullptr) < 0 )
 		LogAbort("Can't init transport");
 
 	serverEnableDebugWebServer(g_hostType);
@@ -1791,7 +1791,7 @@ ServerBase::ServerBase(SERVER_TYPE serverType_, const char* serverName_)
 	memInit();
 
 	Teul::SetAppName(m_serverName);
-	if ( teulInitTransport(LOG_TO_FILE, m_serverName, s_ErrorDelegate) < 0 )
+	if ( teulInitTransport(LOG_TO_FILE, m_serverName, s_ErrorDelegate, nullptr) < 0 )
 		LogAbort("Can't initialize transport.");
 
 	serverInitAddresses();

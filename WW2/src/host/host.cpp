@@ -13,7 +13,6 @@
 #include "versionNo.h"
 #include <stack>
 
-#include "auth/authDaemon.h"
 #include "chat/chatCellHostSupportMessages.h"
 #include "chat/chatCellXfer.h"
 #include "chat/chatConstants.h"
@@ -1422,8 +1421,7 @@ _updaterErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/
 	inError = false;
 }
 
-static void
-_killUpdater(SINT32 /*teulIndex*/, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 /*error*/)
+static void _killUpdater(int /*signo*/)
 {
 	dbugLog(_FLA, "killing host");
 	if ( g_hostTerminating.exchange(true) == true)
@@ -2939,7 +2937,7 @@ main(const int argc, const char* const argv[])
 
 		fprintf(stderr, "Unrecognized command line option: %s\n", argv[i]);
 		fprintf(stderr, "Usage: %s [-db] [--reserved]\n", argv[0]);
-		fprintf(stderr, "    -db           Deprecated: Provided for backwards compatability only\n");
+		fprintf(stderr, "    -db           Deprecated: Provided for backwards compatibility only\n");
 		fprintf(stderr, "    --reserved    Disables logins to the server on startup\n");
 
 		exit(-1);
@@ -2951,7 +2949,7 @@ main(const int argc, const char* const argv[])
 	threadsSetup();
 
 	Teul::SetAppName(g_serverName);
-	if (teulInitTransport( LOG_TO_FILE, g_serverName, _updaterErrorFunction) < 0)
+	if (teulInitTransport(LOG_TO_FILE, g_serverName, _updaterErrorFunction, _killUpdater) < 0)
 	{
 		dbugLog(_FLA,"cant init transport");
 		exit(0);
@@ -2959,9 +2957,6 @@ main(const int argc, const char* const argv[])
 	dbugSetWriteLevel((Debug::ERROR_TYPE)(DEF_ERR_LEVEL | DEF_ERR_FLAGS));
 	dbugSetLogLevel((Debug::ERROR_TYPE)(DEF_ERR_LEVEL | DEF_ERR_FLAGS));
 	dbugLog(_FLN, "Cell Host starting. Compiled %s at %s ===", __DATE__, __TIME__);
-
-	// Set signal handlers
-	authInitDaemon(_killUpdater);
 
 	serverInitAddresses();
 

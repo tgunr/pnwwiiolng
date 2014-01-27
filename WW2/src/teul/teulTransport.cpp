@@ -442,6 +442,7 @@ SINT32
 teulInitTransport(SINT32 logType
 					, const char* name
 					, ERROR_FUNCTION* errorFnPtr
+					, void (*killFnPtr)(int)
 					, Teul::LoggingFn* const logFnPtr)
 {
 	if ( _transportInited )
@@ -486,6 +487,9 @@ teulInitTransport(SINT32 logType
 	}
 
 	teulGetVersion();
+
+	if (killFnPtr)
+		signal(SIGINT, killFnPtr);
 
 	return 0;
 }

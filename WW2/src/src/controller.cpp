@@ -136,7 +136,7 @@ static void _shutdownLibEventSocket(evutil_socket_t& socket_, event*& event_)
 
 static void _onRepeaterRead(struct bufferevent* bev_, void* arg_)
 {
-	int srcSock = *(int*)arg_;
+	const int srcSock = *(int*)arg_;
 	struct evbuffer* input = bufferevent_get_input(bev_);
 	ABORT_IF(input == nullptr);
 
@@ -148,7 +148,7 @@ static void _onRepeaterRead(struct bufferevent* bev_, void* arg_)
 #endif
 
 	struct evbuffer_iovec ebiov;
-	for (;; )
+	for ( ; ; )
 	{
 		size_t contigBytes = evbuffer_get_contiguous_space(input);
 		if ( contigBytes == 0 )
@@ -502,7 +502,7 @@ int main(int argc, const char* argv[])
 		LogAbort("environment.cfg could not be found - generated new one, please edit it.");
 	}
 
-	if (teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction) < 0)
+	if (teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction, nullptr) < 0)
 		LogAbort("Failed to initialize cluster boss");
 
 	// Prepare the repeater socket, which forwards packets from one peer to all other peers.
@@ -522,7 +522,7 @@ int main(int argc, const char* argv[])
 
 	GameProcessManager::Initialize();
 
-	// Our mainloop is handled by libevent rather than teulkit.
+	// Our main loop is handled by libevent rather than teulKit.
 	event_base_dispatch(Teul::eventBase);
 
 	if ( g_shuttingDown == false )

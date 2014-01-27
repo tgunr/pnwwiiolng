@@ -105,8 +105,6 @@ ENDIF ( )
 # TeulServer library - this is a baseline library that provides
 # teulKit services and the cluster's "server" API.
 add_library (teulserver
-	auth/authDaemon.cpp
-		auth/authDaemon.h
 	list/listCL.cpp
 		list/listCL.h
 			list/list.h

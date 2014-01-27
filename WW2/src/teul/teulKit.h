@@ -28,6 +28,7 @@ namespace Teul { }
 SINT32 teulInitTransport(SINT32 logType
 						, const char* name
 						, ERROR_FUNCTION* errorFnPtr
+						, void (*killFnPtr)(int /*signo*/)
 						, Teul::LoggingFn* const logFnPtr = nullptr
 						);
 

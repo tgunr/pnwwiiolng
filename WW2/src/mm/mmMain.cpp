@@ -1096,7 +1096,7 @@ main(int argc, char* argv[])
 
 	HostLanguage = cv_stratLanguage.GetString();
 	//Open transport for logging
-	if ( teulInitTransport(LOG_TO_FILE, "mmhostd", _errorFunction) < 0 )
+	if ( teulInitTransport(LOG_TO_FILE, "mmhostd", _errorFunction, nullptr) < 0 )
 		LogAbort("Cannot initialize teulTransport");
 
 	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | DEF_ERR_FLAGS));

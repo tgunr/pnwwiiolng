@@ -14,7 +14,6 @@
 #include <signal.h>  //to catch SIGHUPS with
 
 #include "mem/mem.h"
-#include "auth/authDaemon.h"
 #include "chat/chatStratSupportMessages.h"
 #include "chat/chatSupportRPCMessages.h"
 #include "cnvy/cnvyMain.h"
@@ -118,16 +117,11 @@ static void _cnvyErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32
 // Theoretically invoked by teulKit shutting down - so what this actually
 // does is probably not a really good idea.
 
-static void _killConvoy(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error)
+static void _killConvoy(int /*signo*/)
 {
-	//Close transport
+	dbugLog(_FLN, "server exiting normally");
 
-#ifdef DEBUG
-	dbugLog(_FLN,"closing transport");
-#endif
 	teulCloseTransport();
-
-	dbugLog(_FLN,"server exiting normally");
 
 	exit(0);
 }
@@ -501,7 +495,7 @@ main(int argc, char* argv[])
 
 	HostLanguage = cv_stratLanguage.GetString();
 
-	if (teulInitTransport(LOG_TO_FILE, g_serverName, _cnvyErrorFunction) < 0)
+	if (teulInitTransport(LOG_TO_FILE, g_serverName, _cnvyErrorFunction, _killConvoy) < 0)
 		LogAbort("Cannot initialize teulTransport");
 
 	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | DEF_ERR_FLAGS));
@@ -513,9 +507,6 @@ main(int argc, char* argv[])
 
 	threadsReadDBEnvironment();
 	threadsSetup();
-
-	//set up the signal handler
-	authInitDaemon(_killConvoy);
 
 	teulSyncClock();
 

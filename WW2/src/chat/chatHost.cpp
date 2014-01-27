@@ -88,8 +88,6 @@
 #include "wwii/wwiiString.h"
 #include "wwii/wwiiThreads.h"
 
-#include "auth/authDaemon.h"
-
 extern UINT32 serverGetAuthIP();
 
 extern SINT32 serverBroadcastClusterShutdown();
@@ -2350,8 +2348,7 @@ _errorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 /*size*/, const
 
 //////////////////////////////////////////////////////////////////////
 
-void
-_killFunction(SINT32 /*teulIndex*/, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 /*error*/)
+void _killFunction(int /*signo*/)
 {
 	dbugLog(_FLN,"server exiting normally");
 
@@ -3564,7 +3561,7 @@ main(int argc, char* argv[])
 	serverEnableDebugWebServer(CHAT_HOST);
 	memInit();
 
-	if (teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction) < 0)
+	if (teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction, _killFunction) < 0)
 		LogAbort("Can't Init transport");
 
 	// Get some environment variables, Before teulGetHost
@@ -3612,8 +3609,6 @@ main(int argc, char* argv[])
 
 	dbugSetWriteLevel(Debug::ERR_WARN | DEF_ERR_FLAGS);
 	dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
-
-	authInitDaemon(_killFunction);
 
 	// Initialize dbse callbacks
 	chatdbInstallClientCallbacks();

@@ -867,7 +867,7 @@ main(int argc, char* argv[])
 #endif
 
 	//Open transport for logging purposes
-	if(teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction) < 0)
+	if(teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction, nullptr) < 0)
 	{
 		fprintf(stderr, "couldn't initialize teulTransport\n");
 		exit(-1);

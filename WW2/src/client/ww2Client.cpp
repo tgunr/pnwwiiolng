@@ -2920,7 +2920,7 @@ int ww2::Client::Init(int playerID, int otp, unsigned int appVersion)
 	// go ahead and set the player ident info in it just to make sure
 	PlayerClient()->SetPlayerIdent(playerID, otp, appVersion);
 
-	int err = teulInitTransport(DBUGLOG_MODE, "wwiiClient", errorFn, clientErrorLog);
+	int err = teulInitTransport(DBUGLOG_MODE, "wwiiClient", errorFn, nullptr, clientErrorLog);
 
 	if(err > -1)
 	{
