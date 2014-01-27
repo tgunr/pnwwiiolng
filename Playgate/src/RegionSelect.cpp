@@ -194,10 +194,10 @@ static bool _lookupAuthHost()
 
 	g_authPort = WWII::Net::Ports::AuthHost;
 
-	if ( !Teul::GetMultipleIPs(g_region.authSuffix().c_str(), g_authHosts) || g_authHosts.empty() )
+	if ( !Teul::GetIPs(g_region.authSuffix().c_str(), g_authHosts) || g_authHosts.empty() )
 	{
 		strprintf(g_authHostName, "auth%s", g_region.authSuffix().c_str());
-		if ( !Teul::GetMultipleIPs(g_authHostName, g_authHosts) || g_authHosts.empty() )
+		if ( !Teul::GetIPs(g_authHostName, g_authHosts) || g_authHosts.empty() )
 		{
 			dbugLog(_FLW, "lookup(%s) no addresses", g_authHostName);
 			return false;
