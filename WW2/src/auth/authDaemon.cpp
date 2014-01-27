@@ -17,9 +17,9 @@ typedef void (SIG_FUNCTION) ( SINT32 signo );
 static ERROR_FUNCTION* _userExitHandler = nullptr;
 
 static void
-_sigTermHandler(int /*signo*/)
+_sigTermHandler(int signal)
 {
-	_userExitHandler (0, nullptr, 0, nullptr, SIGTERM);
+	_userExitHandler (0, nullptr, 0, nullptr, signal);
 //	exit(0);
 }
 
@@ -29,15 +29,6 @@ authInitDaemon(ERROR_FUNCTION* exitHandler)
 //pid_t	pid;
 
 	_userExitHandler = exitHandler;
-
-	//Then usurp SIGTERM.  We setup the function they pass into us
-	//	as our SIGTERM handler
-
-	if (signal(SIGTERM, _sigTermHandler) == SIG_ERR)
-	{
-		dbugLog(_FLA,"can't catch SIGTERM");
-		exit(1);
-	}
 
 	if (signal(SIGINT, _sigTermHandler) == SIG_ERR)
 	{
