@@ -20,11 +20,11 @@ public:
 
 	explicit request_failed(UINT32 withReturnCode, const char* withMessage)
 		: logic_error(withMessage), m_returnCode(withReturnCode) {}
-	UINT32 returnCode() const { return m_returnCode ; }
+	UINT32 returnCode() const { return m_returnCode; }
 
 protected:
-	UINT32 m_returnCode ;
-} ;
+	UINT32 m_returnCode;
+};
 
 }
 

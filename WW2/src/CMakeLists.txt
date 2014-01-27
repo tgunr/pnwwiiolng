@@ -151,11 +151,13 @@ add_library (teulserver
 	auth/authGameMessages.cpp
 		auth/authGameMessages.h
 			auth/authTypes.h
+				auth/authServerTypes.h
 	teul/teulAuth.cpp
 		teul/teulAuth.h
 			updt/loginTypes.h
 	wwii/wwiiConfig.cpp
 		wwii/wwiiConfig.h
+		wwii/wwiiConfigMap.h
 
 	${PCH_INCLUDE_HEADERS}
 	dbug/dbugInternal.h
@@ -240,8 +242,10 @@ add_library (libwwii
 		wwii/wwiiString.h
 	wwii/wwiiThreads.cpp
 		wwii/wwiiThreads.h
+		wwii/wwiiThreadTypes.h
 	wwii/wwiiThreadText.cpp
 		wwii/wwiiThreadText.h
+		wwii/wwiiThreadTextQuery.h
 	wwii/wwiiUTF.cpp
 		wwii/wwiiUTF.h
 	score/scoreActor.cpp
@@ -415,12 +419,15 @@ add_executable(${AUTH_HOST_EXE}
 		auth/authDatabaseSchemas.h
 	auth/authHost.cpp
 		auth/authHost.h
+		auth/authGame.h
 	auth/authHostMessages.cpp
 		auth/authHostMessages.h
+		auth/authQueuePosition.h
 	auth/authOTP.cpp
 		auth/authOTP.h
 	auth/authQueue.cpp
 		auth/authQueue.h
+		wwii/wwiiRunningAverage.h
 	src/infoHostMessages.cpp
 		include/infoHostMessages.h
 	src/infoPack.cpp
@@ -485,6 +492,9 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 				chat/chatPrototypes.h
 				chat/chatDebugConditions.h
 			chat/chatData.h
+			chat/chatBroadcast.h
+			chat/chatBroadcastHCPacket.h
+			chat/chatBroadcastObject.h
 		chat/chatHostMessages.cpp
 			chat/chatHostMessages.h
 				chat/chatChannelID.h
@@ -563,6 +573,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 		chat/chatDotSquadCommands.cpp
 		chat/chatHostBrigadeControl.cpp
 			chat/chatHostBrigadeControl.h
+			chat/chatBrigadeVote.h
 		chat/chatHostMotds.cpp
 			chat/chatHostMotds.h
 		chat/chatMissionInvite.cpp
@@ -643,6 +654,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 					updt/updtEnums.h
 					wwii/wwiiExitCodes.h
 					weap/weapSerial.h
+			updt/updtInfDeath.h
 		comm/commPackers.cpp
 			comm/commPackers.h
 		host/host.cpp
@@ -760,6 +772,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 			map/mapChecksums.h
 		map/mapDB.cpp
 			map/mapDB.h
+			auth/authPlayerDetails.h
 		map/mapHost.cpp
 		map/mapHostMessages.cpp
 			map/mapHostMessages.h
@@ -805,6 +818,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 				include/mobileSpawnEnums.h
 		mm/mmAntiAddiction.cpp
 			mm/mmAntiAddiction.h
+			wwii/wwiiAntiAddiction.h
 		mm/mmHostInstanceImpl.cpp
 			mm/mmHostInstanceImpl.h
 				inst/instHostInstanceImpl.h
@@ -1027,6 +1041,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 				strt/strtJoinList.h
 		strt/strtSpawn.cpp
 			strt/strtSpawn.h
+			strt/strtWeaponsReturn.h
 		strt/strtSpawnWeaponList.cpp
 		strt/strtSupply.cpp
 			strt/strtSupply.h

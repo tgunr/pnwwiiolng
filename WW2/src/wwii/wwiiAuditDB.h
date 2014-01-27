@@ -9,8 +9,8 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 // Setup the audit db thread
-extern void wwiiAuditDBInitialize() ;
+extern void wwiiAuditDBInitialize();
 
 // Queue a statement for the Audit DB
-extern void wwiiAuditDBStatement(const char* fmt, ...) ;
+extern void wwiiAuditDBStatement(const char* fmt, ...);
 

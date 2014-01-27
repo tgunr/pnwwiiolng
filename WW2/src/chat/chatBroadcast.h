@@ -26,7 +26,7 @@ namespace Chat
 	,	_ORDERS				// Mission orders
 	,	_INSTANCE			// Everyone in an instance by instanceid_t
 	,	_MAX_TYPES
-	} ;
+	};
 //tolua_end
 
 #pragma pack(push, 1)
@@ -49,21 +49,21 @@ namespace Chat
 		{
 		}
 
-		BCAST_TYPE			m_type ;
-		instanceid_t		m_instanceID ;
-		UINT64				m_targetID ;
+		BCAST_TYPE			m_type;
+		instanceid_t		m_instanceID;
+		UINT64				m_targetID;
 
 		// Host Only:
-		bool route() ;
+		bool route();
 
-		bool send() ;
-	} ;
+		bool send();
+	};
 #pragma pack(pop)
 //tolua_begin
 }
 
 // HOST: (Non-Chathost) Sends a targeted SYSTEM message to a specific target
 bool chatSendBroadcast(Chat::BCAST_TYPE type, const instanceid_t& instanceID, UINT64 targetID, LSTRING_ID prefix, LSTRING_ID message
-						, const char* ptr0="", const char* ptr1="", const char* ptr2="", const char* ptr3="", const char* ptr4="", const char* ptr5="") ;
+						, const char* ptr0="", const char* ptr1="", const char* ptr2="", const char* ptr3="", const char* ptr4="", const char* ptr5="");
 //tolua_end
 

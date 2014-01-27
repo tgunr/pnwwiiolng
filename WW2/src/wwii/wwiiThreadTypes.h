@@ -21,14 +21,14 @@ class ConditionQueue
 	std::condition_variable	m_condition;
 
 public:
-	typedef std::queue<_DataType> QUEUE ;
+	typedef std::queue<_DataType> QUEUE;
 
 public:
 	ConditionQueue() : m_mutex(), m_condition(), m_queue(), m_hits(0LL), m_maxSize(0) {}
 
-	QUEUE m_queue ;
-	unsigned long long m_hits ;
-	size_t m_maxSize ;
+	QUEUE m_queue;
+	unsigned long long m_hits;
+	size_t m_maxSize;
 
 	void doLocked(std::function<void(void)> lambda)
 	{
@@ -59,10 +59,10 @@ public:
 		std::unique_lock<std::mutex> lock(m_mutex);
 		m_condition.wait(lock, [=] () { return !m_queue.empty(); });
 
-		_DataType data = m_queue.front() ;
-		m_queue.pop() ;
+		_DataType data = m_queue.front();
+		m_queue.pop();
 
-		return data ;
+		return data;
 	}
 
 	void push_back(const _DataType& data)
@@ -74,5 +74,4 @@ public:
 			m_maxSize = m_queue.size();
 		m_condition.notify_one();
 	}
-} ;
-
+};

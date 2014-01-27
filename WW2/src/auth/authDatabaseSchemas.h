@@ -114,4 +114,4 @@ static const char* revisions[] =
 			",(59, POW(2,58), 'PRODUCT20', NOW(), 0, 'Product Permission 20')"
 	,	nullptr
 	//}
-} ;
+};

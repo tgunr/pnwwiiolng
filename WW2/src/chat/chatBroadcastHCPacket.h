@@ -13,20 +13,20 @@
 //#include "chat/chatList.h"
 #include "teul/teulTransmission.h"
 
-class wwiiPlayer ;
-class HCUnit ;
-struct TEUL_CALLBACK ;
+class wwiiPlayer;
+class HCUnit;
+struct TEUL_CALLBACK;
 
 struct HCUnitBroadcast : public FilterFn
 {
 public:
-	static void sendToOfficers(const HCUnit* unit, void* object, TEUL_CALLBACK* cb) ;
+	static void sendToOfficers(const HCUnit* unit, void* object, TEUL_CALLBACK* cb);
 	// Send an object to all players within a unit and below it,
 	// and all same-side active officers
-	static void send(const HCUnit* toUnit, void* object, TEUL_CALLBACK* cb) ;
-	bool operator()(wwiiPlayer* const& player) const ;
+	static void send(const HCUnit* toUnit, void* object, TEUL_CALLBACK* cb);
+	bool operator()(wwiiPlayer* const& player) const;
 
 private:
-	static void buildUnitList(const HCUnit* unit) ;
-} ;
+	static void buildUnitList(const HCUnit* unit);
+};
 

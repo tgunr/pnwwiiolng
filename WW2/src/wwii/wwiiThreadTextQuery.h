@@ -25,39 +25,39 @@ public:
 		, m_length(0)
 		, m_commitFrom(0LL)
 	{
-		m_statement[0] = 0 ;
-		assert( strlen(m_prefix) + strlen(m_suffix) < TEXT_POOL_SIZE - 80 ) ;
+		m_statement[0] = 0;
+		assert( strlen(m_prefix) + strlen(m_suffix) < TEXT_POOL_SIZE - 80 );
 	}
-	~ThreadTextQuery() { commit(0LL) ; }
+	~ThreadTextQuery() { commit(0LL); }
 
 	// Commit and hand-off the existing buffer if this data would fill the buffer;
 	// Allocate a new buffer if required;
 	// Add this text to the end of the buffer.
-	void addEntry(const char* const entry) ;
+	void addEntry(const char* const entry);
 
-	// Commit the buffer if maxAge miliseconds have elapsed since the last
+	// Commit the buffer if maxAge milliseconds have elapsed since the last
 	// commit (thus if maxAge = 0 it will force a commit)
-	bool commit(const TeulTimeMS& maxAge) ;
+	bool commit(const TeulTimeMS& maxAge);
 
 	// Return true if the number of bytes specified would exceed the available
 	// space left in the current buffer.
 	// current length + separator (,) plus new string length plus suffix string length plus null byte
-	bool noRoomFor(size_t lenBytes) { return m_length + 1 + lenBytes + m_sufLen + 1 >= TEXT_POOL_SIZE ; }
+	bool noRoomFor(size_t lenBytes) { return m_length + 1 + lenBytes + m_sufLen + 1 >= TEXT_POOL_SIZE; }
 
-	// Return the separator character - incase I decide to make it an option later.
-	char separator() const { return ',' ; }
-
-private:
-	DBThread::DBNo		m_db ;
-	const char* const	m_prefix ;
-	const char* const	m_suffix ;
-	const size_t		m_sufLen ;
-
-	char				m_statement[TEXT_POOL_SIZE + 1] ;
-	size_t				m_length ;
-	TeulTimeMS			m_commitFrom ;	// Timestamp from which we decide whether commit maturity has been reached
+	// Return the separator character - in case I decide to make it an option later.
+	char separator() const { return ','; }
 
 private:
-	ThreadTextQuery& operator = (const ThreadTextQuery& rhs) ;
-} ;
+	DBThread::DBNo		m_db;
+	const char* const	m_prefix;
+	const char* const	m_suffix;
+	const size_t		m_sufLen;
+
+	char				m_statement[TEXT_POOL_SIZE + 1];
+	size_t				m_length;
+	TeulTimeMS			m_commitFrom;	// Timestamp from which we decide whether commit maturity has been reached
+
+private:
+	ThreadTextQuery& operator = (const ThreadTextQuery& rhs);
+};
 

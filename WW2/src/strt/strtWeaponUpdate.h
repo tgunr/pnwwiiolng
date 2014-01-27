@@ -11,22 +11,22 @@
 class WeaponUpdate
 {
 public:
-	enum _TYPE { DELIVERY, RESUPPLY, THROTTLE, TRANSFER } ;
+	enum _TYPE { DELIVERY, RESUPPLY, THROTTLE, TRANSFER };
 
 public:
-	WeaponUpdate*			next ;		//!< Linked list of updates
-	WeaponUpdate*			prev ;		//!< at a given facility
+	WeaponUpdate*			next;		//!< Linked list of updates
+	WeaponUpdate*			prev;		//!< at a given facility
 
-	_TYPE					wuType ;	//!< Delivery, Resupply, Throttle or Transfer.
+	_TYPE					wuType;	//!< Delivery, Resupply, Throttle or Transfer.
 
-	class FacilityStruct*	facility ;	//!< Where this update is for.
-	WEAPON_SPEC				weapon ;	//!< Which weapon is being updated.
+	class FacilityStruct*	facility;	//!< Where this update is for.
+	WEAPON_SPEC				weapon;	//!< Which weapon is being updated.
 
-	struct STRAT_UPDATE*	stratUpdate ; //!< Pointer to our strat event.
+	struct STRAT_UPDATE*	stratUpdate; //!< Pointer to our strat event.
 
-	SINT32					weapValue ;	//!< Data value, meaning depends on wuType.
-	class WeaponCounter*	counter ;	//!< Optional weapon counter.
+	SINT32					weapValue;	//!< Data value, meaning depends on wuType.
+	class WeaponCounter*	counter;	//!< Optional weapon counter.
 
 public:
-	SINT32	value() const { return ( wuType == RESUPPLY ) ? 1 : weapValue ; }
-} ;
+	SINT32	value() const { return ( wuType == RESUPPLY ) ? 1 : weapValue; }
+};

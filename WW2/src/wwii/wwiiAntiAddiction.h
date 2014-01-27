@@ -10,14 +10,14 @@
 
 namespace AntiAddiction
 {
-	static const UINT32 TIRED_HOUR = 3 ;
-	static const UINT32 PENALTY_HOUR = 5 ;
-	static const UINT32 SLEEP_HOURS = 5 ;
-	static const FLOAT32 TIRED_WARNING_INTERVAL = 0.5f ;	// Half hour intervals
+	static const UINT32 TIRED_HOUR = 3;
+	static const UINT32 PENALTY_HOUR = 5;
+	static const UINT32 SLEEP_HOURS = 5;
+	static const FLOAT32 TIRED_WARNING_INTERVAL = 0.5f;	// Half hour intervals
 	enum
 	{
 		_STANDARD_TIME
 	,	_TIRED_TIME
 	,	_PENALTY_TIME
-	} ;
+	};
 }
