@@ -1483,17 +1483,6 @@ hostAddVehicleToBroadcast(HostVehicle* vehicle, VEHICLE_UPDATE_HEADER* vh)
 }
 
 //////////////////////////////////////////////////////////////////////
-// Pre-allocate, populate and assign all of the major memory allocation
-// pools.
-
-static SINT32
-_initWorld(void)
-{
-	Host::Vehicles::AllocateArray(MAX_HOST_VEHICLES);
-	return 0;
-}
-
-//////////////////////////////////////////////////////////////////////
 // New map host has announced itself on the teulServer network.
 
 static void
@@ -2923,8 +2912,6 @@ main(const int argc, const char* const argv[])
 	serverEnableDebugWebServer(CELL_HOST);
 	memInit();
 
-	SINT32 retval;
-
 	for ( int i = 1; i < argc; ++i )
 	{
 		if ( strcmp(argv[i], "-db") == 0 )
@@ -2986,16 +2973,14 @@ main(const int argc, const char* const argv[])
 	dbugLog(_FLN, "Initializing updater systems");
 	strtUpdaterInit();
 
-	retval = _initWorld();
-	if ( retval < 0 )
-		LogAbort("couldnt initialize the world retval:%d", retval);
+	Host::Vehicles::AllocateArray(MAX_HOST_VEHICLES);
 
 	// initialize the time system
 	wthrInitTime();
 
 	static const UINT32 ClientTimeoutTime_ms = 40 * 1000;
 	if ( !teulOpenListenInterface( WWII::Net::Ports::CellHost, _acceptFunction, ClientTimeoutTime_ms, _personaErrorFunction) )
-		LogAbort("Unable to open tcp listen port %u retval:%d", WWII::Net::Ports::CellHost, retval);
+		LogAbort("Unable to open tcp listen port %u", WWII::Net::Ports::CellHost);
 
 	sprintf(hostname, "cell%u", Server::localHost & 255);
 
