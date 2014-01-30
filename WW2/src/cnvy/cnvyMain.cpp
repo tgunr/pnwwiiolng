@@ -44,7 +44,7 @@
 #include "wwii/wwiiDBConfig.h"
 
 #include "mem/memPool.h"
-#include "teul/teulCLList.h"
+#include "include/intrusiveList.h"
 
 // ------------------------------ Prototypes
 
@@ -65,55 +65,34 @@ static UINT32 freeConvoys=MAXCONVOYS, numConvoys=0;
 static SINT32 convoyID=0, payloadID=0;
 static CONVOYSTRUCT* freeConvoyList;
 static CONVOYSTRUCT* dispatchedConvoyList;
-static STRAT_UPDATE* stratUpdateList;
+typedef IntrusiveList<STRAT_UPDATE> StratUpdateList;
+static StratUpdateList s_stratUpdateList;
 static STRAT_UPDATE* _convoyUpdate;
 
 static SINT32 _mapConnection = 0;
 
 //////////////////////////////////////////////////////////////////////
-//Removes the first item from an stratUpdatelist
-static STRAT_UPDATE* _getFirstStratUpdate()
-{
-	return (STRAT_UPDATE*)listPopItem((LISTHEADER **)&stratUpdateList);
-}
-
-//////////////////////////////////////////////////////////////////////
 //Inserts a updateTime into the stratUpdatelist
 
-static bool _insertStratUpdate(STRAT_UPDATE* stratUpdate)
+static void _insertStratUpdate(STRAT_UPDATE* stratUpdate)
 {
 	ABORT_IF(stratUpdate == nullptr);
 
-	if (stratUpdateList == nullptr) {
-		//Its the first stratUpdate
-		stratUpdateList = stratUpdate;
-	} else if (stratUpdateList->updateTime >= stratUpdate->updateTime) {
-		//Belongs at the head of the list
-		listPushItem((LISTHEADER **)&stratUpdateList, (LISTHEADER*)stratUpdate);
-	} else if (stratUpdateList->prev->updateTime <= stratUpdate->updateTime) {
-		//Belongs at the end of the list
-		listAddItemAfter((LISTHEADER **)&stratUpdateList, (LISTHEADER*)stratUpdateList->prev, (LISTHEADER*)stratUpdate);
-	} else {
-		STRAT_UPDATE* current = stratUpdateList;
-
-		//Find the spot where it belongs on the list
-		while ((current != nullptr) && (current->updateTime < stratUpdate->updateTime))
-			current = current->next;
-		if (current != nullptr)
-			listAddItemBefore((LISTHEADER **)&stratUpdateList, (LISTHEADER*)current, (LISTHEADER*)stratUpdate);
+	if (s_stratUpdateList.empty() || s_stratUpdateList.front()->updateTime >= stratUpdate->updateTime)
+	{
+		s_stratUpdateList.push_front(stratUpdate);
+		return;
+	}
+	for (auto it = s_stratUpdateList.rbegin(), end = s_stratUpdateList.rend(); it != end; ++it)
+	{
+		if (it->updateTime > stratUpdate->updateTime)
+			continue;
+		stratUpdate->link(it->m_next);
+		return;
 	}
 
-	return true;
-}
-
-//////////////////////////////////////////////////////////////////////
-//Deletes a updateTime from the stratUpdatelist
-
-static void _deleteStratUpdate(STRAT_UPDATE* stratUpdate)
-{
-	ABORT_IF(stratUpdate == nullptr);
-	if (PN_LIKELY(stratUpdateList != nullptr))
-		listExtractItem((LISTHEADER **)&stratUpdateList, (LISTHEADER*)stratUpdate);
+	// if we get here, the list must be out of order.
+	LogAbort("s_stratUpdateList is out of order");
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -122,7 +101,7 @@ static void _deleteStratUpdate(STRAT_UPDATE* stratUpdate)
 static void _releaseStratUpdate(STRAT_UPDATE* update)
 {
 	//Remove the update from the update list
-	_deleteStratUpdate(update);
+	update->unlink();
 
 	//Zero it out and put it on the free update list
 	update->updateTime = 0;
@@ -235,14 +214,13 @@ void cnvyCreateConvoy(WWII_SIDE side, WWII_COUNTRY country, LinkStruct* link, PA
 		//Make sure we sleep for the least amount of seconds necessary
 		if (_convoyUpdate->updateTime > tmpConvoy->nextEvent)
 		{
-			//Pull it out of the update list
-			_deleteStratUpdate(_convoyUpdate);
-
-			//Fix the time
+			// Pull the node out, adjust the time and reposition it.
+			StratUpdateList::iterator it(_convoyUpdate->m_next), end(s_stratUpdateList.end());
+			_convoyUpdate->unlink();
 			_convoyUpdate->updateTime = tmpConvoy->nextEvent;
-
-			//Put it back in the list
-			_insertStratUpdate(_convoyUpdate);
+			while (it != end && it->updateTime < _convoyUpdate->updateTime)
+				++it;
+			_convoyUpdate->link(_convoyUpdate);
 		}
 	}
 	else
@@ -257,8 +235,8 @@ void cnvyCreateConvoy(WWII_SIDE side, WWII_COUNTRY country, LinkStruct* link, PA
 	//dbugLog(_FLN,"Convoy %d sent from CP %s to CP %s", tmpConvoy->id, link->startDepot->cp->name, link->endDepot->cp->name);
 
 	//Set flag on link
-	link->convoy=TRUE;
-	link->startDepot->m_incomingLink->convoy=TRUE;
+	link->convoy = TRUE;
+	link->startDepot->m_incomingLink->convoy = TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -543,10 +521,20 @@ void cnvyProcessStratUpdates(UINT32 currentTime)
 	if ( lastStratUpdate == 0)
 		lastStratUpdate = teulTime();
 
-	//If we have updates
-	while ((stratUpdateList != nullptr) && (currentTime >= stratUpdateList->updateTime))
+	// Check if the update list is in order.
+	for (auto it = s_stratUpdateList.begin(), end = --s_stratUpdateList.end(); it != end; ++it)
 	{
-		STRAT_UPDATE* update = _getFirstStratUpdate();
+		if (it->updateTime > it->m_next->updateTime)
+			LogAbort("stratUpdateList is messed up");
+	}
+
+	//If we have updates
+	while (!s_stratUpdateList.empty())
+	{
+		auto update = s_stratUpdateList.front();
+		if (update->updateTime > currentTime)
+			break;
+		update->unlink();
 		switch (update->type)
 		{
 		case STRAT_UPDATE_STRAT_SYSTEM:
@@ -562,7 +550,7 @@ void cnvyProcessStratUpdates(UINT32 currentTime)
 			else
 			{
 				lastStratUpdate = update->updateTime = currentTime + (STRAT_INTERVAL - (currentTime - lastStratUpdate));
-				dbugLog(_FLD,"new lastStratUpdate and updateTime = %u",lastStratUpdate);
+				dbugLog(_FLD, "new lastStratUpdate and updateTime = %u", lastStratUpdate);
 			}
 			_insertStratUpdate(update);
 		break;
@@ -726,7 +714,6 @@ void cnvyInit()
 	freeConvoyList = cnvyCreateConvoyList(MAXCONVOYS);
 
 	s_stratUpdatePool.Reserve(40960);
-	stratUpdateList = nullptr;
 	_convoyUpdate = nullptr;
 
 	dbugLog(_FLN,"Initializing Time System");

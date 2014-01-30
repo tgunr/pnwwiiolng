@@ -8,6 +8,8 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
+#include "include/intrusiveList.h"
+
 enum STRAT_UPDATE_TYPE
 {
 	STRAT_UPDATE_OBJECTS		//Incremental strat, used by strat Updater
@@ -27,25 +29,24 @@ enum STRAT_UPDATE_TYPE
 };
 
 //This is the item that is on the list that
-struct STRAT_UPDATE
+struct STRAT_UPDATE;
+struct STRAT_UPDATE : public IntrusiveList<STRAT_UPDATE>::Node
 {
-	STRAT_UPDATE() : prev(nullptr), next(nullptr), updateTime(0), type(MAX_STRAT_UPDATE_TYPE), value(0), data(nullptr)
+	STRAT_UPDATE() : updateTime(0), type(MAX_STRAT_UPDATE_TYPE), value(0), data(nullptr)
 	{}
 	explicit STRAT_UPDATE(UINT32 updateTime_, STRAT_UPDATE_TYPE type_, UINT32 value_=0, void* data_=nullptr)
-		: prev(nullptr), next(nullptr)
+		: Node()
 		, updateTime(updateTime_)
 		, type(type_)
 		, value(value_)
 		, data(data_)
 	{}
 
-	STRAT_UPDATE* prev;
-	STRAT_UPDATE* next;
-	UINT32	updateTime;			// The time the update is going to go out
-								//	in real world time
-	STRAT_UPDATE_TYPE	type;	// type of update
-	UINT32	value;				// Any value we need to pass
-	void* 	data;				// In case of a weapon expiring (or other
-								//	such events), it points to the
-								//	appropriate data
+	UINT32				updateTime;		// The time the update is going to go out
+										//	in real world time
+	STRAT_UPDATE_TYPE	type;			// type of update
+	UINT32				value;			// Any value we need to pass
+	void* 				data;			// In case of a weapon expiring (or other
+										//	such events), it points to the
+										//	appropriate data
 };

@@ -961,6 +961,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 			mem/memPool.h
 			teul/teulCLList.h
 				list/listCL.h
+			include/intrusiveList.h
 		dbse/dbseDatabaseSchema.cpp
 			dbse/dbseDatabaseSchema.h
 			strt/strtDatabaseSchemas.h
