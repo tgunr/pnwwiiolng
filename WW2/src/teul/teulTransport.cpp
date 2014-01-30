@@ -459,10 +459,12 @@ teulInitTransport(SINT32 logType
 
 	dbugInit(logType, name);
 
-	const Debug::ERROR_TYPE dbugFlags = (Debug::ERROR_TYPE)STD_ERR;
-
-	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_DBUG | dbugFlags));
-	dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_DBUG | dbugFlags));
+	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | (Debug::ERROR_TYPE)STD_ERR));
+#ifdef CLOSED_BETA
+	dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_DBUG | (Debug::ERROR_TYPE)STD_ERR));
+#else
+	dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | (Debug::ERROR_TYPE)STD_ERR));
+#endif
 
 	teulSyncClock();
 
