@@ -74,6 +74,12 @@ namespace Teul
 		//! Will be true if we loaded either defaults file.
 		static bool LoadedConfig() { return LoadedGeneralConfig() || LoadedOSConfig(); }
 
+		//! Dump current config vars to stdout and exit.
+		static void PrintCurrentVars();
+
+		//! Generate a default config file to specified filename and exit.
+		static void Generate(const char* filename_);
+
 	protected:
 		void Initialize();
 

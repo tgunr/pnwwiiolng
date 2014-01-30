@@ -1,7 +1,7 @@
 #include <syscfg.h> // Path is project specific.
 // Created: Thu Jun 15 15:26:30 2000
 //
-// The authple Host
+// The auth Host
 //
 // Copyright (c) 2000 Playnet, Inc., All Rights Reserved.
 // Not to be distributed in API form except as part of a
@@ -54,7 +54,7 @@
 
 //uncomment the following if you want to tell authhost to ignore an address
 //if you do, if a connection is made from this ip, it is closed in the
-//acceptfunction
+//accept function
 
 //#define BLOCK_AN_ADDRESS
 

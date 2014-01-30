@@ -15,7 +15,6 @@
 #include "mem/mem.h"
 #include "server/serverFuncTypes.h"
 #include "server/server.h"
-#include "server/serverBase.h"
 #include "server/serverCodeEnum.h"
 #include "server/serverConfigVars.h"
 #include "server/serverIndexes.h"
@@ -133,9 +132,9 @@ static ENDPOINT* s_broadcastEndpoint = nullptr;
 #if defined(SERVER_AS_ENTRY_POINT)
 UINT32 g_portOffset = 0;
 extern const char* const g_serverName;
-#endif
 
 ServerBase* s_serverBase = nullptr;
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // Private functions.
@@ -1775,7 +1774,6 @@ int main(int argc, const char* argv[])
 	extern void serverMain();
 	serverMain();
 }
-#endif
 
 ServerBase::ServerBase(SERVER_TYPE serverType_, const char* serverName_)
 	: m_serverType(serverType_)
@@ -1801,4 +1799,5 @@ void ServerBase::s_ErrorDelegate(SINT32 teulIndex_, const UCHAR* const data_, SI
 {
 	s_serverBase->OnError(teulIndex_, data_, size_, object_, error_);
 }
+#endif
 

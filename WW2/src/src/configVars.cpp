@@ -301,7 +301,7 @@ static void _getSortedConfigVars(std::vector<Teul::ConfigVar*>& myList)
 	std::sort(myList.begin(), myList.end(), [](const Teul::ConfigVar* lhs, const Teul::ConfigVar* rhs) { return strcasecmp(rhs->GetEnvVarName(), lhs->GetEnvVarName()) > 0; });
 }
 
-void teulPrintConfigVars()
+void Teul::ConfigVar::PrintCurrentVars()
 {
 	std::vector<Teul::ConfigVar*> myList;
 	_getSortedConfigVars(myList);
@@ -321,7 +321,7 @@ void teulPrintConfigVars()
 	}
 }
 
-void teulGenerateEnvironmentCfgFile(const char* const filename_)
+void Teul::ConfigVar::Generate(const char* const filename_)
 {
 	std::vector<Teul::ConfigVar*> myList;
 	_getSortedConfigVars(myList);

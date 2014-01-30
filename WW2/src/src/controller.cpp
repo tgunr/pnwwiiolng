@@ -39,8 +39,6 @@ namespace Teul
 {
 	extern event_base* eventBase;
 }
-extern void teulPrintConfigVars();
-extern void teulGenerateEnvironmentCfgFile(const char* const filename);
 
 // Name of our server.
 const char* const g_serverName = "controller";
@@ -385,7 +383,7 @@ static void _processArguments(int argc, const char* argv[])
 			if ( strcasecmp(arg, "configs") == 0 )
 			{
 				Teul::ConfigVar::InitializeConfigVars();
-				teulPrintConfigVars();
+				Teul::ConfigVar::PrintCurrentVars();
 				exit(0);
 			}
 
@@ -396,7 +394,7 @@ static void _processArguments(int argc, const char* argv[])
 				else if ( argv[argn + 1][0] == '-' )
 					_exitWithUsage("make-config-file must be followed by a filename.", argv[argn+1]);
 
-				teulGenerateEnvironmentCfgFile(argv[argn + 1]);
+				Teul::ConfigVar::Generate(argv[argn + 1]);
 
 				exit(0);
 			}
