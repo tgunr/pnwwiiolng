@@ -18,6 +18,7 @@
 #include "server/serverCodeEnum.h"
 #include "server/serverConfigVars.h"
 #include "server/serverIndexes.h"
+#include "server/serverInitializeProcess.h"
 #include "server/serverInterfaceDescription.h"
 #include "server/serverInterface.h"
 #include "server/serverMessages.h"
@@ -1801,3 +1802,61 @@ void ServerBase::s_ErrorDelegate(SINT32 teulIndex_, const UCHAR* const data_, SI
 }
 #endif
 
+void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType, ERROR_FUNCTION* errorFnPtr, void(*killFnPtr)(int), int argc, const char* argv[], const std::vector<CommandLineOption>& commandLine)
+{
+	Teul::SetAppName(appName);
+
+	// Read in the environment.
+	Teul::ConfigVar::InitializeConfigVars();
+
+	for (int argn = 1; argn < argc; ++argn)
+	{
+		bool found = false;
+		if (strcmp(argv[argn], "--help") == 0 || strcmp(argv[argn], "-?") == 0)
+		{
+			printf("Usage: %s [arguments | --help]\n", argv[0]);
+			for (size_t i = 0; i < commandLine.size(); ++i)
+			{
+				if (commandLine[i].wantParameter)
+					printf("  %s ARG\n", commandLine[i].command);
+				else
+					printf("  %s\n", commandLine[i].command);
+				printf("\t\t%s\n", commandLine[i].help);
+			}
+			exit(0);
+		}
+		for (size_t i = 0; i < commandLine.size(); ++i)
+		{
+			if (strcmp(argv[argn], commandLine[i].command) != 0)
+				continue;
+			found = true;
+			const char* param = nullptr;
+			if (commandLine[i].wantParameter)
+			{
+				if (++argn >= argc)
+					LogAbort("'%s' switch expects an argument", commandLine[i]);
+				param = argv[argn];
+				if (param[0] == '-')
+					LogAbort("'%s' switch expects an argument, got '%s'", commandLine[i], argv[argn]);
+			}
+			commandLine[i].callback(param);
+			break;
+		}
+		if (!found)
+			LogAbort("unrecognized argument '%s', see '--help' for usage.", argv[argn]);
+	}
+
+	Teul::ConfigVar::CheckConfiguration();
+
+	memInit();
+
+	SINT32 retval = teulInitTransport(LOG_TO_FILE, appName, errorFnPtr, killFnPtr, nullptr);
+	if (retval != 0)
+		LogAbort("Unable to initialize transport: %d", retval);
+
+	serverEnableDebugWebServer(serverType);
+
+	serverInitAddresses();
+
+	dbugLog(_FLI, "%s started, compiled %s %s", appName, __DATE__, __TIME__);
+}

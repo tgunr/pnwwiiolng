@@ -358,7 +358,7 @@ namespace Teul
 {
 	void ConfigVar::InitializeConfigVars()
 	{
-		for ( auto it : _getConfigVars() )
+		for (auto& it : _getConfigVars())
 		{
 			it->Initialize();
 		}
@@ -413,9 +413,15 @@ namespace Teul
 
 		if ( m_default != nullptr )
 			Set(m_default);
+	}
 
-		if ( m_required && (m_value == nullptr || (m_default == nullptr && *m_value == 0)) )
-			LogAbort("Config variable %s (%s) must be defined with a non-empty value.", GetName(), GetEnvVarName());
+	void ConfigVar::CheckConfiguration()
+	{
+		for (auto it : _getConfigVars())
+		{
+			if (it->m_required && (it->m_value == nullptr || (it->m_default == nullptr && *it->m_value == 0)))
+				LogAbort("Config variable %s (%s) must be defined with a non-empty value.", it->GetName(), it->GetEnvVarName());
+		}
 	}
 
 	ConfigVar::~ConfigVar()

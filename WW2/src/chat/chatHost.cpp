@@ -67,6 +67,7 @@
 #include "server/serverFuncTypes.h"
 #include "server/server.h"
 #include "server/serverIndexes.h"
+#include "server/serverInitializeProcess.h"
 #include "server/serverInterfaceDescription.h"
 #include "server/serverInterface.h"
 #include "server/serverPersonaLogin.h"
@@ -3553,19 +3554,11 @@ _runHost()
 const char* const g_serverName = "chatd";
 
 int
-main(int argc, char* argv[])
+main(int argc, const char* argv[])
 {
-	Teul::SetAppName(g_serverName);
-	Teul::ConfigVar::InitializeConfigVars();
-
-	serverEnableDebugWebServer(CHAT_HOST);
-	memInit();
-
-	if (teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction, _killFunction) < 0)
-		LogAbort("Can't Init transport");
-
-	// Get some environment variables, Before teulGetHost
-	serverInitAddresses();
+	Server::InitializeProcess(g_serverName, CHAT_HOST, _errorFunction, _killFunction, argc, argv, {});
+	dbugSetWriteLevel(Debug::ERR_WARN | DEF_ERR_FLAGS);
+	dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 
 	chatReadHostLocFile();
 
@@ -3606,9 +3599,6 @@ main(int argc, char* argv[])
 
 	threadsReadDBEnvironment();
 	chatThreadsSetup();
-
-	dbugSetWriteLevel(Debug::ERR_WARN | DEF_ERR_FLAGS);
-	dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
 
 	// Initialize dbse callbacks
 	chatdbInstallClientCallbacks();

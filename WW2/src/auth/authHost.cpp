@@ -33,6 +33,7 @@
 #include "wwii/wwiiNetPorts.h"
 #include "wwii/wwiiThreads.h"
 #include "server/serverConfigVars.h"
+#include "server/serverInitializeProcess.h"
 #include "server/serverInterfaceDescription.h"
 #include "teul/teulAuthServer.h"
 #include "teul/teulEndpoint.h"
@@ -703,7 +704,7 @@ _acceptGameConnection(ENDPOINT& endpoint)
 	dbugLog(_FLD, "t:%d game connection opened from %s:%hu->%s:%hu", endpoint.teulIndex(), remote, endpoint.fromPort(), local, endpoint.localPort());
 }
 
-static void _errorFunction (const SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 error)
+static void _errorFunction(const SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 error)
 {
 	//If the game host endpoint toasts up, then we need to hold off
 	if(error == ENOTCONN)
@@ -857,28 +858,19 @@ _runHost()
 const char* const g_serverName = "authHost";
 
 int
-main(int argc, char* argv[])
+main(int argc, const char* argv[])
 {
-	Teul::SetAppName(g_serverName);
+	Server::InitializeProcess(g_serverName, AUTH_HOST, _errorFunction, nullptr, argc, argv, {});
+	dbugSetWriteLevel(Debug::ERR_WARN | STD_ERR);
+	dbugSetLogLevel(Debug::ERR_INFO | STD_ERR);
 
-	Teul::ConfigVar::InitializeConfigVars();
 #ifdef BLOCK_AN_ADDRESS
 	teulGetHost(BLOCK_ADDRESS, &blockedIP);
 #endif
 
-	//Open transport for logging purposes
-	if(teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction, nullptr) < 0)
-	{
-		fprintf(stderr, "couldn't initialize teulTransport\n");
-		exit(-1);
-	}
-	const UINT32 dbugFlags = STD_ERR;
-	dbugSetWriteLevel(Debug::ERR_WARN | dbugFlags);
-	dbugSetLogLevel(Debug::ERR_INFO | dbugFlags);
-
 	wwiiIRCInitialize(Server::myInterface.addr[0].ip, false);
 	wwiiIRCAddInitialChannel("-err", "", "Authentication errors");
-	wwiiIRCAddInitialChannel("-ok", "", "Authenication approvals");
+	wwiiIRCAddInitialChannel("-ok", "", "Authentication approvals");
 
 	threadsSetup();
 
@@ -1759,4 +1751,3 @@ void
 authExpirePendingOtps()
 {
 }
-

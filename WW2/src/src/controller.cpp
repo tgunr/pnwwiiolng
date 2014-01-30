@@ -13,6 +13,7 @@
 #include "teul/teulKit.h"
 #include "wwii/wwiiNetPorts.h"
 #include "src/controllerGameProcess.h"
+#include "server/serverInitializeProcess.h"
 
 #if platOS == OS_WIN32
 #include <winsock2.h>
@@ -336,75 +337,6 @@ static void _onManagedProcessAccept(evutil_socket_t listener_, short event_, voi
 }
 
 ////////////////////////////////////////////////////////////////////////////////
-// Describe how to use this application.
-
-static void  _usage(bool detailed_)
-{
-	fprintf(stderr, "Usage: controller [--help] [--configs] [--make-config-only]\n");
-	if ( detailed_ )
-	{
-		fprintf(stderr, "  --help                 Show this information and exit.\n");
-		fprintf(stderr, "  --configs              List configuration variables and exit.\n");
-		fprintf(stderr, "  --make-config-file     Generate an environment.cfg file and exit.\n");
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Describe command line usage and abort.
-
-static NORETURN_FN void _exitWithUsage(const char* const error_, const char* const cause_)
-{
-	fprintf(stderr, "ERROR: %s: %s\n", error_, cause_);
-	_usage(false);
-	exit(1);
-}
-
-////////////////////////////////////////////////////////////////////////////////
-// Process command line arguments.
-
-static void _processArguments(int argc, const char* argv[])
-{
-	for ( int argn = 1; argn < argc && argv[argn] != nullptr; ++argn )
-	{
-		const char* arg = nullptr;
-		if ( argv[argn][0] == '/' )
-			arg = argv[argn] + 1;
-		else if ( argv[argn][0] == '-' && argv[argn][1] == '-' )
-			arg = argv[argn] + 2;
-
-		if ( arg != nullptr  )
-		{
-			if ( strcasecmp(arg, "help") == 0 || strcasecmp(arg, "?") == 0 )
-			{
-				_usage(true);
-				exit(0);
-			}
-
-			if ( strcasecmp(arg, "configs") == 0 )
-			{
-				Teul::ConfigVar::InitializeConfigVars();
-				Teul::ConfigVar::PrintCurrentVars();
-				exit(0);
-			}
-
-			if ( strcasecmp(arg, "make-config-file") == 0 )
-			{
-				if ( argn + 1 >= argc )
-					_exitWithUsage("make-config-file must be followed by a filename.", "missing file name");
-				else if ( argv[argn + 1][0] == '-' )
-					_exitWithUsage("make-config-file must be followed by a filename.", argv[argn+1]);
-
-				Teul::ConfigVar::Generate(argv[argn + 1]);
-
-				exit(0);
-			}
-		}
-
-		_exitWithUsage("Unrecognized command line option", argv[argn]);
-	}
-}
-
-////////////////////////////////////////////////////////////////////////////////
 // Check to see if we need to manage any processes.
 
 static void _addInitialProcesses()
@@ -487,21 +419,26 @@ void _startShutdown(int /*signal*/)
 int main(int argc, const char* argv[])
 {
 	g_argv0 = argv[0];
+	Server::InitializeProcess(g_serverName, CONTROLLER_HOST, _errorFunction, nullptr, argc, argv, {
+		{ "--configs", "List configuration variables and exit.", false,
+			[](const char*) {
+				Teul::ConfigVar::PrintCurrentVars();
+				exit(0);
+			}
+		},
+		{ "--make-config-file", "Generate an environment.cfg file and exit.", true,
+			[](const char* filename) {
+				Teul::ConfigVar::Generate(filename);
+				exit(0);
+			}
+		}
+	});
 
-	Teul::SetAppName(g_serverName);
-
-	// Check arguments.
-	_processArguments(argc, argv);
-
-	Teul::ConfigVar::InitializeConfigVars();
 	if ( Teul::ConfigVar::LoadedConfig() == false )
 	{
-		teulGenerateEnvironmentCfgFile("environment.cfg");
+		Teul::ConfigVar::Generate("environment.cfg");
 		LogAbort("environment.cfg could not be found - generated new one, please edit it.");
 	}
-
-	if (teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction, nullptr) < 0)
-		LogAbort("Failed to initialize cluster boss");
 
 	// Prepare the repeater socket, which forwards packets from one peer to all other peers.
 	_prepareLibEventListenSocket(&s_repeaterSocket, &s_repeaterEvent, INADDR_ANY, WWII::Net::Ports::PrivateBcast, 16, _onRepeaterAccept);

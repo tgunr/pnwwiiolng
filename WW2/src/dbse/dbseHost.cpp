@@ -14,6 +14,7 @@
 #include "dbse/dbseConnection.h"
 #include "server/serverConfigVars.h"
 #include "server/serverInterfaceDescription.h"			// For myInterface
+#include "server/serverInitializeProcess.h"
 #include "teul/teulKit.h"
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiNetPorts.h"
@@ -55,21 +56,14 @@ static void _initDB()
 
 static const char* g_serverName = "dbd";
 
-int main(int argc, char* argv[])
+int main(int argc, const char* argv[])
 {
-	Teul::SetAppName(g_serverName);
-	Teul::ConfigVar::InitializeConfigVars();
-
-	if (teulInitTransport(LOG_TO_FILE, g_serverName, _errorFunction, nullptr) < 0)
-	{
-		fprintf(stderr, "Unable to initialize teulTransport\n");
-		exit(-ENOTCONN);
-	}
+	Server::InitializeProcess(g_serverName, DBD_HOST, _errorFunction, nullptr, argc, argv, {});
 	dbugSetWriteLevel(Debug::ERR_INFO | DEF_ERR_FLAGS);
 	dbugSetLogLevel(DEF_ERR_LEVEL | DEF_ERR_FLAGS);
-	dbugLog(_FLI,"Database Proxy Host starting. Compiled %s at %s", __DATE__, __TIME__);
 
 	threadsReadDBEnvironment();
+	dbugLog(_FLI,"Database Proxy Host starting. Compiled %s at %s", __DATE__, __TIME__);
 
 	if ( chatdbInstallHostCallbacks() )
 		LogAbort("Error installing callbacks");

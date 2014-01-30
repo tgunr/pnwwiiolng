@@ -61,6 +61,7 @@
 #include "server/serverPlayerStatusNode.h"
 #include "server/serverReleaseTypeEnum.h"
 #include "server/serverServerInfo.h"
+#include "server/serverInitializeProcess.h"
 #include "strt/strtData.h"
 #include "strt/strtDB.h"
 #include "strt/strtEvents.h"
@@ -86,6 +87,8 @@
 #include "wwii/wwiiNetPorts.h"
 #include "wwii/wwiiSortieManager.h"
 #include "wwii/wwiiThreads.h"
+
+const char* g_serverName = "mmhostd";
 
 #define CHECKSUM_POLL_INTERVAL	300000	// Every 5 minutes
 
@@ -1066,19 +1069,16 @@ _shutdown(SINT32 k)
 // [Why? Because network connections lead to interrupt time]
 
 int
-main(int argc, char* argv[])
+main(int argc, const char* argv[])
 {
-	Teul::SetAppName("mmhostd");
-
-	if (argc > 1 && strcmp(argv[1], "-teul") == 0)
-	{
-		printf("sizeof(E) = %" PRSizeT ", sizeof(EI) = %" PRSizeT ", sizeof(wwiiPlayer) = %" PRSizeT ", sizeof(Player) = %" PRSizeT "\n", sizeof(ENDPOINT), sizeof(EndpointImpl), sizeof(wwiiPlayer), sizeof(Player));
-		exit(0);
-	}
-
-	Teul::ConfigVar::InitializeConfigVars();
-	serverEnableDebugWebServer(MAP_HOST);
-	memInit();
+	Server::InitializeProcess(g_serverName, MAP_HOST, _errorFunction, nullptr, argc, argv, {
+		{ "-teul", "Dump information about teulKit", false
+			, [](const char*) {
+				printf("sizeof(E) = %" PRSizeT ", sizeof(EI) = %" PRSizeT ", sizeof(wwiiPlayer) = %" PRSizeT ", sizeof(Player) = %" PRSizeT "\n", sizeof(ENDPOINT), sizeof(EndpointImpl), sizeof(wwiiPlayer), sizeof(Player));
+				exit(0);
+			}
+		}
+	});
 
 	ABORT_IF(cv_appID.GetUint32() == 0 || cv_appID.GetUint32() > 255);
 
@@ -1095,15 +1095,10 @@ main(int argc, char* argv[])
 	mapThreadsSetup();
 
 	HostLanguage = cv_stratLanguage.GetString();
-	//Open transport for logging
-	if ( teulInitTransport(LOG_TO_FILE, "mmhostd", _errorFunction, nullptr) < 0 )
-		LogAbort("Cannot initialize teulTransport");
 
 	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | DEF_ERR_FLAGS));
 	dbugSetLogLevel((Debug::ERROR_TYPE)(DEF_ERR_LEVEL | DEF_ERR_FLAGS));
 	dbugLog(_FLN, "Map/Mission Host starting. Compiled %s at %s. AppID is %u", __DATE__, __TIME__, g_appID);
-
-	serverInitAddresses();
 
 	_authHost = serverGetAuthIP();
 	myMaxUsers = serverGetMaxClusterUsers();

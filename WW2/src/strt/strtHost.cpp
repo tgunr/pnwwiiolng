@@ -25,6 +25,7 @@
 #include "server/serverFuncTypes.h"
 #include "server/server.h"
 #include "server/serverIndexes.h"
+#include "server/serverInitializeProcess.h"
 #include "server/serverInterfaceDescription.h"
 #include "server/serverPersonaExit.h"
 #include "server/serverPersonaLogin.h"
@@ -483,27 +484,13 @@ _housekeeping()
 const char* g_serverName = "stratd";
 
 int
-main(int argc, char* argv[])
+main(int argc, const char* argv[])
 {
-	Teul::SetAppName(g_serverName);
-
-	Teul::ConfigVar::InitializeConfigVars();
-	serverEnableDebugWebServer(STRAT_HOST);
-	memInit();
-
-	bool runOnce = false;
+	Server::InitializeProcess(g_serverName, STRAT_HOST, _cnvyErrorFunction, _killConvoy, argc, argv, {});
 
 	HostLanguage = cv_stratLanguage.GetString();
 
-	if (teulInitTransport(LOG_TO_FILE, g_serverName, _cnvyErrorFunction, _killConvoy) < 0)
-		LogAbort("Cannot initialize teulTransport");
-
-	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_INFO | DEF_ERR_FLAGS));
-	dbugSetLogLevel((Debug::ERROR_TYPE)(DEF_ERR_LEVEL | DEF_ERR_FLAGS));
-	dbugLog(_FLN, "Strat Host starting. Compiled %s at %s", __DATE__, __TIME__);
-
 	_describeBuildConfigurationToLogFile();
-	serverInitAddresses();
 
 	threadsReadDBEnvironment();
 	threadsSetup();
@@ -621,7 +608,8 @@ main(int argc, char* argv[])
 	threadsLogging();
 
 	TeulTimeMS tick100ms = 0;
-	while ( !_exitSignaled )
+	bool runOnce = false;
+	while (!_exitSignaled)
 	{
 		// Process the strat update queue
 		cnvyProcessStratUpdates(teulTime());

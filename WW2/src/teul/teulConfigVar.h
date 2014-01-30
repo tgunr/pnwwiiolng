@@ -80,6 +80,9 @@ namespace Teul
 		//! Generate a default config file to specified filename and exit.
 		static void Generate(const char* filename_);
 
+		//! Check that all required variables are set.
+		static void CheckConfiguration();
+
 	protected:
 		void Initialize();
 

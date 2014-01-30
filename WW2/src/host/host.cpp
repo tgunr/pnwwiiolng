@@ -51,6 +51,7 @@
 #include "server/serverFuncTypes.h"
 #include "server/server.h"
 #include "server/serverIndexes.h"
+#include "server/serverInitializeProcess.h"
 #include "server/serverInterfaceDescription.h"
 #include "server/serverInterface.h"
 #include "server/serverMessages.h"
@@ -2906,46 +2907,19 @@ static bool _waitForStratPeering()
 static const char* g_serverName = "hostd";
 
 int
-main(const int argc, const char* const argv[])
+main(const int argc, const char* argv[])
 {
-	Teul::ConfigVar::InitializeConfigVars();
-	serverEnableDebugWebServer(CELL_HOST);
-	memInit();
-
-	for ( int i = 1; i < argc; ++i )
-	{
-		if ( strcmp(argv[i], "-db") == 0 )
-			continue;
-		if ( strcmp(argv[i], "--reserved") == 0 )
-		{
-			g_serverReserved = true;
-			continue;
-		}
-
-		fprintf(stderr, "Unrecognized command line option: %s\n", argv[i]);
-		fprintf(stderr, "Usage: %s [-db] [--reserved]\n", argv[0]);
-		fprintf(stderr, "    -db           Deprecated: Provided for backwards compatibility only\n");
-		fprintf(stderr, "    --reserved    Disables logins to the server on startup\n");
-
-		exit(-1);
-
-		break;
-	}
+	Server::InitializeProcess(g_serverName, CELL_HOST, _updaterErrorFunction, _killUpdater, argc, argv, {
+		{ "-db", "Deprecated.", false, [](const char*) {} },
+		{ "--reserved", "Flag cell as reserved for recordings.", false, [](const char*) { g_serverReserved = true; } }
+	});
+	dbugSetWriteLevel((Debug::ERROR_TYPE)(DEF_ERR_LEVEL | DEF_ERR_FLAGS));
+	dbugSetLogLevel((Debug::ERROR_TYPE)(DEF_ERR_LEVEL | DEF_ERR_FLAGS));
 
 	threadsReadDBEnvironment();
 	threadsSetup();
 
-	Teul::SetAppName(g_serverName);
-	if (teulInitTransport(LOG_TO_FILE, g_serverName, _updaterErrorFunction, _killUpdater) < 0)
-	{
-		dbugLog(_FLA,"cant init transport");
-		exit(0);
-	}
-	dbugSetWriteLevel((Debug::ERROR_TYPE)(DEF_ERR_LEVEL | DEF_ERR_FLAGS));
-	dbugSetLogLevel((Debug::ERROR_TYPE)(DEF_ERR_LEVEL | DEF_ERR_FLAGS));
 	dbugLog(_FLN, "Cell Host starting. Compiled %s at %s ===", __DATE__, __TIME__);
-
-	serverInitAddresses();
 
 	wwiiIRCInitialize(Server::localHost, true);
 	ircCallbacks.event_channel = _ircChannelMessage;
