@@ -18,9 +18,3 @@ LOGICAL cnvyInsertConvoy(CONVOYSTRUCT** convoyList, CONVOYSTRUCT* convoy);
 
 //Deletes a arrivalTime from the convoyList
 CONVOYSTRUCT* cnvyDeleteConvoy(CONVOYSTRUCT** convoyList, CONVOYSTRUCT* convoy);
-
-//Finds someone in the convoy list
-CONVOYSTRUCT* cnvyFindConvoy(CONVOYSTRUCT* convoyList, UINT16 arrivalTime);
-
-//Prints an convoy list
-LOGICAL cnvyPrintConvoys(CONVOYSTRUCT* convoyList);

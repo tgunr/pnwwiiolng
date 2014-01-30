@@ -91,35 +91,3 @@ CONVOYSTRUCT* cnvyDeleteConvoy(CONVOYSTRUCT** convoyList, CONVOYSTRUCT* convoy)
 
 	return convoy;
 }
-
-//Finds someone in the convoy list
-CONVOYSTRUCT* cnvyFindConvoy(CONVOYSTRUCT* convoyList, UINT16 nextEvent)
-{
-CONVOYSTRUCT* current;
-
-	current = convoyList;
-
-	while ((current != nullptr) && (current->nextEvent != nextEvent))
-		current = current->next;
-
-	if ((current!=nullptr) && (current->nextEvent == nextEvent))
-		return current;
-	else
-		return nullptr;
-}
-
-//Prints an convoy list
-LOGICAL cnvyPrintConvoys(CONVOYSTRUCT* convoyList)
-{
-CONVOYSTRUCT* current;
-
-	current = convoyList;
-	while (current != nullptr)
-	{
-		fprintf(stderr,"convoy: 0x%x\n",current->nextEvent);
-		current = current->next;
-	}
-
-	return TRUE;
-}
-
