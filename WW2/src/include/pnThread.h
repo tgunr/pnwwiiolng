@@ -16,8 +16,7 @@ public:
 	void start()
 	{
 		if (!m_cancelled && !m_started.exchange(true))
-			return;
-		m_thread = std::thread([=] { run(); });
+			m_thread = std::thread([=] { run(); });
 	}
 	//! Cancel thread and return whether or not we performed cancellation.
 	//! @return true if we changed the cancellation state.
@@ -27,7 +26,6 @@ public:
 		if (!wasCancelledBefore)
 			onCancel();
 		return !wasCancelledBefore;
-
 	}
 
 	//! behavior for handling with cancellation.
