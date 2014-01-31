@@ -20,7 +20,6 @@
 #include "strt/strtConstants.h"
 #include "strt/strtDamageQueueEntry.h"
 #include "strt/strtData.h"
-#include "strt/strtEventQueue.h"
 #include "strt/strtHack.h"
 #include "strt/strtIO.h"
 #include "strt/strtSyncSupportMessages.h"

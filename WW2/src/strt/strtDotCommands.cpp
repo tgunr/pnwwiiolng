@@ -29,7 +29,6 @@
 #include "strt/strtCPStruct.h"
 #include "strt/strtData.h"
 #include "strt/strtDotCommands.h"
-#include "strt/strtEventQueue.h"
 #include "strt/strtFacilityStruct.h"
 #include "strt/strtFB.h"
 #include "strt/strtHCUnits.h"
