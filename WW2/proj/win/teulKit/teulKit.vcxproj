@@ -392,7 +392,6 @@
     <ClInclude Include="..\..\..\src\teul\teulIPackable.h" />
     <ClInclude Include="..\..\..\src\teul\teulLIEndpoint.h" />
     <ClInclude Include="..\..\..\src\teul\teulNetTimeMS.h" />
-    <ClInclude Include="..\..\..\src\teul\teulPackEnums.h" />
     <ClInclude Include="..\..\..\src\teul\teulPacketClass.h" />
     <ClInclude Include="..\..\..\src\teul\teulPacketHeader.h" />
     <ClInclude Include="..\..\..\src\teul\teulTimeMS.h" />

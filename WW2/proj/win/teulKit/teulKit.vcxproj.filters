@@ -194,9 +194,6 @@
     <ClInclude Include="..\..\..\src\teul\teulNetTimeMS.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\src\teul\teulPackEnums.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\..\src\teul\teulEndpointImpl.h">
       <Filter>Header Files</Filter>
     </ClInclude>
