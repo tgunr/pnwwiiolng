@@ -580,7 +580,7 @@ main(int argc, char* argv[])
 		_printf("Initializing teulTransport\n");
 
 	Teul::SetAppName("luaClient");
-	teulInitTransport(LOG_TO_FILE, "./luaClient", _teulErrorFn);
+	teulInitTransport(LOG_TO_FILE, "./luaClient", _teulErrorFn, nullptr);
 	dbugSetLogLevel(Debug::ERR_WARN);
 
 	_registerCallbacks();

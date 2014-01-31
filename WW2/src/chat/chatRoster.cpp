@@ -344,7 +344,7 @@ main(int argc, char* argv[])
 		port = (UINT32)atol(hostPort);
 	}
 
-	teulInitTransport(LOG_OFF, "./chatRoster", _errorFunction);
+	teulInitTransport(LOG_OFF, "./chatRoster", _errorFunction, nullptr);
 	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_NOTE));
 	dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_NOTE));
 
