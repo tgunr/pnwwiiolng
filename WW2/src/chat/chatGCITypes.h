@@ -27,7 +27,7 @@ enum GCI_TYPE
 	GCI_CP_OBJECTIVE_WITHDRAWN,
 
 	MAX_GCI_TYPES
-} ;
+};
 
 //tolua_end
 

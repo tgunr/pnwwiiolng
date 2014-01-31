@@ -59,7 +59,7 @@ struct DECAL
     SINT32 age() {return frametime - createtime;}
     bool expired() {return lifetime != -1 && age() > lifetime;}
 
-} ;
+};
 
 class DecalMgr
 {

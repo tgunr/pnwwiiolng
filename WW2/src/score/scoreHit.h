@@ -23,11 +23,11 @@ namespace Scoring
 			, m_joules(joules_)
 		{}
 
-		public: UINT32 components() const { return m_components ; }
-		public: const UINT64& joules() const { return m_joules ; }
+		public: UINT32 components() const { return m_components; }
+		public: const UINT64& joules() const { return m_joules; }
 
-		protected:	UINT32		m_components ;		//!< Number of components hit.
-		protected:	UINT64		m_joules ;			//!< Total joules damage done.
+		protected:	UINT32		m_components;		//!< Number of components hit.
+		protected:	UINT64		m_joules;			//!< Total joules damage done.
 
 	END_SCORING_EVENT( )
 }

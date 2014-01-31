@@ -17,9 +17,9 @@ public:
 		: m_playerID(playerID), m_location(location), m_useLocation(useLocation) {}
 
 public:
-	playerid_t		m_playerID ;		// ID of player to spawn
-	FLOAT64VECTOR	m_location ;		// Location to spawn them at
-	bool			m_useLocation ;		// Whether to use custom location or not
-} ;
+	playerid_t		m_playerID;			// ID of player to spawn
+	FLOAT64VECTOR	m_location;			// Location to spawn them at
+	bool			m_useLocation;		// Whether to use custom location or not
+};
 #pragma pack(pop)
 

@@ -36,19 +36,19 @@ astrTypeToHeader = \
 
 strDefaultCode = """\
 	//! User implemented: somewhere to provide a reference to the Teul Callback for this object.
-	public: static TEUL_CALLBACK* Callback(void) ;
+	public: static TEUL_CALLBACK* Callback(void);
 """
 
 strDefaultVarGroupCode = """\
 	//! Last modified time of the structure or a member var group.
-	protected: TeulTimeMS m_lastModified ;
+	protected: TeulTimeMS m_lastModified;
 
 	//! Get milisecond timestamp of last modification.
 	//! @return Local teulClock64 timestamp of the last modification of a managed member of the structure.
-	public: const TeulTimeMS& lastModified() const { return m_lastModified ; }
+	public: const TeulTimeMS& lastModified() const { return m_lastModified; }
 
 	//! How many bits required to describe number of groups changed.
-	public: UINT32 groupsChangedBits() const { return %u ; }
+	public: UINT32 groupsChangedBits() const { return %u; }
 """
 
 strDefaultPackerComment = """\
@@ -56,6 +56,6 @@ strDefaultPackerComment = """\
 """
 
 strDefaultPacker = """\
-	public: bool packer(LOGICAL mode, ACTION_OBJECT* a, SINT32 size) ;
+	public: bool packer(LOGICAL mode, ACTION_OBJECT* a, SINT32 size);
 """
 

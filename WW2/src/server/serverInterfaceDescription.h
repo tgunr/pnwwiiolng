@@ -17,7 +17,7 @@ namespace Server
 			UINT32	ip;		// address in host byte order
 			UINT32	naddr;	// address in network byte order
 		} addr[MaxHostIPs];
-	} ;
+	};
 
 	extern InterfaceDescription myInterface;
 }

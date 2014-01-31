@@ -27,24 +27,24 @@ namespace Host
 		,	NetError
 
 		,	Max
-		} ;
+		};
 
-		size_t m_stat[ID::Max] ;
-		char m_description[ID::Max * (21 + 12 + 1 + 2)] ;
+		size_t m_stat[ID::Max];
+		char m_description[ID::Max * (21 + 12 + 1 + 2)];
 
-		void add(const ID id_) { ++m_stat[id_] ; }
+		void add(const ID id_) { ++m_stat[id_]; }
 
-		void describe(const char* const prefix) ;
+		void describe(const char* const prefix);
 
 		Stats& operator += ( Stats& rhs )
 		{
-			for ( size_t i = 0 ; i < ID::Max ; ++i )
+			for ( size_t i = 0; i < ID::Max; ++i )
 			{
-				m_stat[i] += rhs.m_stat[i] ;
-				rhs.m_stat[i] = 0 ;
+				m_stat[i] += rhs.m_stat[i];
+				rhs.m_stat[i] = 0;
 			}
-			return rhs ;
+			return rhs;
 		}
-	} ;
-	extern Stats totalStats, currentStats ;
+	};
+	extern Stats totalStats, currentStats;
 }

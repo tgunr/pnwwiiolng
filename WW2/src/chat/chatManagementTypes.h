@@ -13,14 +13,14 @@ namespace Chat
 	{
 		ManagementLogin2() : m_version(1), m_wantHandle(0ULL) {}
 
-		UINT16		m_version ;
+		UINT16		m_version;
 		// Desired username.
-		ChatHandle	m_wantHandle ;
+		ChatHandle	m_wantHandle;
 
 		// Server-side login function
-		bool Login(SINT32 teulIndex) ;
+		bool Login(SINT32 teulIndex);
 
 		// Network packer
-		SINT32 packer(LOGICAL, ACTION_OBJECT*) ;
-	} ;
+		SINT32 packer(LOGICAL, ACTION_OBJECT*);
+	};
 }

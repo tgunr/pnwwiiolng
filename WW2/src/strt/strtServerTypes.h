@@ -23,7 +23,7 @@
 #include "strt/strtMapTypes.h"
 #include "strt/strtChatTypes.h"
 
-struct JOIN_LIST ;
+struct JOIN_LIST;
 
 //tolua_begin
 
@@ -42,7 +42,7 @@ struct JOIN_LIST ;
 
 //The time to sleep for the stratSystem, in seconds
 #define		STRATSLEEP		1
-#define 		STRAT_INTERVAL	5//150
+#define 	STRAT_INTERVAL	5//150
 
 //Default Value for cp Time To Produce
 #define		STRTCP_DEFAULT_TTP	10//300
@@ -63,19 +63,10 @@ struct JOIN_LIST ;
 #define		STRTLINK_DEFAULT_DISTANCE		5
 #define		STRTLINK_DEFAULT_FLAGS	0x00000000
 
-#define 		SPAWN_TIMEOUT_FULL 1800
-#define 		SPAWN_TIMEOUT_CONTESTED 1800
+#define 	SPAWN_TIMEOUT_FULL 1800
+#define 	SPAWN_TIMEOUT_CONTESTED 1800
 
-#define 		FAC_OPEN_FLAG	0x80
-
-//------------------------------ENUM SECTION---------------------------------
-
-//------------------------------STRUCT SECTION-------------------------------
-
-//------------------------------STRUCT SECTION-------------------------------
-
-
-// ---------------------------  Exposed entities
+#define 	FAC_OPEN_FLAG	0x80
 
 typedef std::set<CPStruct*> CPSET;
 
@@ -87,26 +78,26 @@ enum STRAT_TIMEFACTOR
 	STRAT_DUSK,
 	STRAT_NIGHT,
 	MAX_STRAT_TIMEFACTOR
-} ;
+};
 
 //Structure used to build a list of people who have requested
 //	permission to join the posters vehicle
 class WeapJoinRequestNode
 {
 	// Look for a specific node
-	public: static WeapJoinRequestNode* Lookup(UINT32 playerID) ;
+	public: static WeapJoinRequestNode* Lookup(UINT32 playerID);
 
 	// Ctor/Dtor
-	public: WeapJoinRequestNode(UINT32 playerID, const ChatHandle& handle, UINT32 missionID) ;
-	public: ~WeapJoinRequestNode() ;
+	public: WeapJoinRequestNode(UINT32 playerID, const ChatHandle& handle, UINT32 missionID);
+	public: ~WeapJoinRequestNode();
 
 	// Add this node to a list - automatically extracts itself
 	// from any list it is currently registered to.
-	public: bool AddToList(JOIN_LIST* toList) ;
+	public: bool AddToList(JOIN_LIST* toList);
 
 //tolua_end
-	private: void _register() ;
-	private: void _unregister() ;
+	private: void _register();
+	private: void _unregister();
 
 public:
 //tolua_begin
@@ -116,12 +107,12 @@ public:
 
 	JOIN_LIST*	m_joinList;
 
-	UINT32		m_playerID ;
-	UINT32		m_missionID ;
-	SINT32		m_capacityTeulIndex ;
-	ChatHandle	m_handle ;
-	MM_CAPACITY_REQUEST m_capacityRequest ;
-} ;
+	UINT32		m_playerID;
+	UINT32		m_missionID;
+	SINT32		m_capacityTeulIndex;
+	ChatHandle	m_handle;
+	MM_CAPACITY_REQUEST m_capacityRequest;
+};
 
 //The weapon structure
 struct SPAWN_WEAPON
@@ -133,14 +124,14 @@ struct SPAWN_WEAPON
 		_LIMITED,
 		_RARE,
 		_MAX_ALLOCATION
-	} ;
+	};
 
 	SPAWN_WEAPON*		prev;	//Prev weapon in global list
 	SPAWN_WEAPON*		next;	//Next weapon in global list
 	WEAPON_SPEC			weapon;
 	char				name[32];
 	_ALLOCATION			allocation;  //Whether the weapon is common, rare, etc.
-} ;
+};
 
 //This will be the Payload's "Manifest"
 struct MANIFESTSTRUCT
@@ -212,7 +203,7 @@ struct BRIDGE_ENTRY
 	BRIDGE_ENTRY* next;
 	ObjectStruct* bridgeObject;
 	LinkStruct* link;
-} ;
+};
 
 // What smoke to aim for when real damage is done
 #define SMOKE_START_LEVEL SMOKELEVEL_LIGHT
@@ -227,27 +218,27 @@ class EWSReport
 {
 //tolua_end
 private:
-	UINT32			m_weapon ;			// Which vehicle is generating this
-	UINT32			m_time ;			// Time of report
-	FacilityStruct*	m_facility ;		// Location reported at
-	UINT8			m_side ;			// Side of report
-	UINT8			m_weapCategory ;	// Category of weapon in report
+	UINT32			m_weapon;			// Which vehicle is generating this
+	UINT32			m_time;				// Time of report
+	FacilityStruct*	m_facility;			// Location reported at
+	UINT8			m_side;				// Side of report
+	UINT8			m_weapCategory;		// Category of weapon in report
 
-	void _incPresence(void) ;			// Increase presence counts
-	void _decPresence(void) ;			// Decrease presence counts
+	void _incPresence(void);			// Increase presence counts
+	void _decPresence(void);			// Decrease presence counts
 //tolua_begin
 
 public:
 	// Constructor
-	EWSReport(UINT32 weaponSerial, FacilityStruct* facility, UINT8 side, UINT8 category) ;
+	EWSReport(UINT32 weaponSerial, FacilityStruct* facility, UINT8 side, UINT8 category);
 	// Destructor
-	~EWSReport() ;
+	~EWSReport();
 
-	bool hasExpired(UINT32 now) const ;
+	bool hasExpired(UINT32 now) const;
 
 	// Routine for updating an existing EWS report.
-	void update(UINT32 now, FacilityStruct* curFacility) ;
-} ;
+	void update(UINT32 now, FacilityStruct* curFacility);
+};
 
 //-------------------------MESSAGE SECTION-------------------------
 
@@ -257,7 +248,6 @@ struct CP_STATUS
 	WWII_COUNTRY		country;
 	WWII_COUNTRY		controllingCountry;
 	CP_STATUS_FLAGS		flags;
-} ;
+};
 
 //tolua_end
-

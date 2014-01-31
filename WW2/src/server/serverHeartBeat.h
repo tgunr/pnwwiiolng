@@ -20,23 +20,23 @@ struct HeartBeat
 	UINT32			teulVersion;	// version of teul being run
 	UINT32			procVersion;	// version of process being run
 	UINT32			appVersion;		// version of the client application
-	SINT32			m_numPlayers ;	//! current number of logged-in players.
-	SINT32			m_maxPlayers ;	//! maximum number of players (capacity).
+	SINT32			m_numPlayers;	//! current number of logged-in players.
+	SINT32			m_maxPlayers;	//! maximum number of players (capacity).
 	Server::Status	status;			// server status
 	UINT32			arenaID;
 
 // Member functions:
 public:
-	SINT32 numPlayers() const { return (m_numPlayers > 0) ? m_numPlayers : 0 ; }
-	SINT32 maxPlayers() const { return m_maxPlayers ; }
+	SINT32 numPlayers() const { return (m_numPlayers > 0) ? m_numPlayers : 0; }
+	SINT32 maxPlayers() const { return m_maxPlayers; }
 
-	void addPlayer() { ++m_numPlayers ; }
-	void removePlayer() { if ( m_numPlayers > 0 ) --m_numPlayers ; }
+	void addPlayer() { ++m_numPlayers; }
+	void removePlayer() { if ( m_numPlayers > 0 ) --m_numPlayers; }
 
-	SINT32 availPlayers() { return (maxPlayers() > numPlayers()) ? maxPlayers() - numPlayers() : 0 ; }
+	SINT32 availPlayers() { return (maxPlayers() > numPlayers()) ? maxPlayers() - numPlayers() : 0; }
 
-	void process() ;
-} ;
+	void process();
+};
 
 }
 

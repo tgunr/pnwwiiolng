@@ -13,7 +13,7 @@ struct CellXfer
 {
 	CellXfer(playerid_t playerID, bool onCell) : m_playerID(playerID), m_onCell(onCell) {}
 
-	playerid_t	m_playerID ;
-	bool		m_onCell ;
-} ;
+	playerid_t	m_playerID;
+	bool		m_onCell;
+};
 #pragma pack(pop)

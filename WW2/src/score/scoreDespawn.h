@@ -25,20 +25,19 @@ namespace Scoring
 					{}
 
 					//! Return To Base code: see wwiiRTBCodes.h.
-		public:		UINT32	exitCode() const { return m_exitCode ; }
-		public:		UINT32	exitDest() const { return m_exitDest ; }
-		public:		const XYZTuple<SINT32>& position() const { return m_position ; }
-		public:		bool isVehicleDead() const { return m_isVehicleDead ; }
-		public:		bool isResupply() const { return m_isResupply ; }
+		public:		UINT32	exitCode() const { return m_exitCode; }
+		public:		UINT32	exitDest() const { return m_exitDest; }
+		public:		const XYZTuple<SINT32>& position() const { return m_position; }
+		public:		bool isVehicleDead() const { return m_isVehicleDead; }
+		public:		bool isResupply() const { return m_isResupply; }
 
-		protected:	UINT32	m_exitCode ;	//! The state the vehicle was in.
-		protected:	UINT32	m_exitDest ;	//! Whether they are despawning or exiting the game.
-		protected:	XYZTuple<SINT32> m_position ;	//! Coordinates at time of despawn.
-		protected:	bool	m_isVehicleDead ;	//! Vehicle death is separate to crew death.
-		protected:	bool	m_isResupply ;	//! Was the player on a mission to resupply.
+		protected:	UINT32	m_exitCode;				//! The state the vehicle was in.
+		protected:	UINT32	m_exitDest;				//! Whether they are despawning or exiting the game.
+		protected:	XYZTuple<SINT32> m_position;	//! Coordinates at time of despawn.
+		protected:	bool	m_isVehicleDead;		//! Vehicle death is separate to crew death.
+		protected:	bool	m_isResupply;			//! Was the player on a mission to resupply.
 
 	END_SCORING_EVENT( )
 }
 #pragma pack(pop)
-
 

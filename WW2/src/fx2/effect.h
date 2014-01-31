@@ -48,7 +48,7 @@ struct EMITTER
     SINT32 lastparticletime() {return frametime - lastparticle;}
 
     bool expired() {return lifetime != -1 && age() > lifetime;}
-} ;
+};
 
 void fxinit();
 void fxdraw(float distance2, int& fxindex);

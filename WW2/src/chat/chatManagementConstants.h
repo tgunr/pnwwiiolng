@@ -11,7 +11,7 @@ namespace Chat
 {
 	namespace Management
 	{
-		enum { CallbackX = 217 } ;
+		enum { CallbackX = 217 };
 
 		enum
 		{

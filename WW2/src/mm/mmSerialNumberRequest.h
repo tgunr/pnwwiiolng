@@ -11,10 +11,10 @@
 
 struct SerialNumberRequest
 {
-	UINT32		playerID ;
-	WEAPON_SPEC	weapon ;
-	UINT32		serial ;
-} ;
+	UINT32		playerID;
+	WEAPON_SPEC	weapon;
+	UINT32		serial;
+};
 
-typedef teul_network_object< teul_void_obj<SerialNumberRequest> > SERIAL_NUMBER_REQUEST ;
+typedef teul_network_object< teul_void_obj<SerialNumberRequest> > SERIAL_NUMBER_REQUEST;
 

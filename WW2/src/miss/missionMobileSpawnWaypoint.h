@@ -24,16 +24,16 @@ struct MobileSpawnWaypoint
 		, m_reason(reason)
 		{}
 
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) { return a->offset = teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this)) ; }
+	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) { return a->offset = teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this)); }
 
-	UINT32		m_missionID ;				// ID of the mission
-	UINT32		m_playerID ;
-	ChatHandle	m_ownerCall ;				// Callsign of the owner
-	FLOAT64		m_x, m_y, m_z ;				// Co-ordinates
-	bool		m_deployed ;				// So we can tell its state
-	UINT32		m_stoUID ;					// STO if any associated with this
-	UINT32		m_reason ;					// MSPAWN_RESULT code.
-} ;
+	UINT32		m_missionID;				// ID of the mission
+	UINT32		m_playerID;
+	ChatHandle	m_ownerCall;				// Callsign of the owner
+	FLOAT64		m_x, m_y, m_z;				// Co-ordinates
+	bool		m_deployed;					// So we can tell its state
+	UINT32		m_stoUID;					// STO if any associated with this
+	UINT32		m_reason;					// MSPAWN_RESULT code.
+};
 
-typedef teul_network_object<MobileSpawnWaypoint> MOBILE_SPAWN_WAYPOINT ;
+typedef teul_network_object<MobileSpawnWaypoint> MOBILE_SPAWN_WAYPOINT;
 

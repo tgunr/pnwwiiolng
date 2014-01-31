@@ -11,5 +11,5 @@
 #include "teul/teulNetworkObject.h"
 #include "chat/chatGenericString.h"
 
-typedef teul_network_object<GenericString> GENERIC_STRING_MSG ;
+typedef teul_network_object<GenericString> GENERIC_STRING_MSG;
 

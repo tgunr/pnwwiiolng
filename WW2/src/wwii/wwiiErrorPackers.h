@@ -38,7 +38,7 @@ static inline SINT32 wwiiPackEXCEPTION_INFO(LOGICAL mode, UCHAR* data, SINT32 of
 	offset = teulPackUINT32(mode,data,offset,&(object->exceptionCode), 0);
 	offset = teulPackUINT32(mode,data,offset,&(object->exceptionAddr), 0);
 
-	for ( UINT32 i = 0 ; i < WWII_EXCEPTION_INFO::_STACK_LEN ; ++i )
+	for ( UINT32 i = 0; i < WWII_EXCEPTION_INFO::_STACK_LEN; ++i )
    {
 	   offset = teulPackUINT32(mode, data, offset, &(object->stackAddrs[i]), 0);
    }

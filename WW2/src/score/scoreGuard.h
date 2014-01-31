@@ -21,14 +21,14 @@ namespace Scoring
 			, m_seconds(seconds_)
 		{}
 
-		public: const WWII_SIDE& forSide() const { return m_forSide ; }
-		public: const UINT32& seconds() const { return m_seconds ; }
+		public: const WWII_SIDE& forSide() const { return m_forSide; }
+		public: const UINT32& seconds() const { return m_seconds; }
 
-		protected:	WWII_SIDE	m_forSide ;			//!< Which side they guarded for.
-		protected:	UINT32		m_seconds ;			//!< How long they were guarding for.
+		protected:	WWII_SIDE	m_forSide;			//!< Which side they guarded for.
+		protected:	UINT32		m_seconds;			//!< How long they were guarding for.
 
-		public: const LhsType& guard() const { return lhs() ; }
-		public: const RhsType& building() const { return rhs() ; }
+		public: const LhsType& guard() const { return lhs(); }
+		public: const RhsType& building() const { return rhs(); }
 
 	END_SCORING_EVENT( )
 }

@@ -17,8 +17,8 @@ namespace Scoring
 			: EventType(Type, resupplier_, resupplied_)
 		{}
 
-		public: const LhsType& resupplier() const { return lhs() ; }
-		public: const RhsType& resupplied() const { return rhs() ; }
+		public: const LhsType& resupplier() const { return lhs(); }
+		public: const RhsType& resupplied() const { return rhs(); }
 
 	END_SCORING_EVENT( )
 }

@@ -223,4 +223,4 @@ static const char* revisions[] =
 				"group by 1, 2"
 	,	nullptr
 	//}
-} ;
+};

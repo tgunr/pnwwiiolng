@@ -94,10 +94,10 @@ public:
 	virtual ~StratObject();
 
 	// Comparison operator == just compare addresses (so that nullptr ptr compares work too)
-	bool operator==(const StratObject& rhs) const { return this == &rhs ; }
-	bool operator==(const StratObject* rhs) const { return this == rhs ; }
-	bool operator!=(const StratObject& rhs) const { return this != &rhs ; }
-	bool operator!=(const StratObject* rhs) const { return this != rhs ; }
+	bool operator==(const StratObject& rhs) const { return this == &rhs; }
+	bool operator==(const StratObject* rhs) const { return this == rhs; }
+	bool operator!=(const StratObject& rhs) const { return this != &rhs; }
+	bool operator!=(const StratObject* rhs) const { return this != rhs; }
 
 	void SetName(const char* name);
 	void SetCountry(int country);
@@ -174,8 +174,7 @@ union StratTypeUnion
 
 	unsigned int _index;
 
-private:
-	StratObject(const StratObject&) ;	// Prevent copy ctor
+	StratObject(const StratObject&) = delete;	// Prevent copy ctor
 };
 
     class CPListItem

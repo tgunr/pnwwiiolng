@@ -21,6 +21,6 @@ namespace Server
 			{}
 
 		virtual ~PersonaLogin() {}
-	} ;
+	};
 }
 

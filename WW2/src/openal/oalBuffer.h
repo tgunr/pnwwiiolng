@@ -166,7 +166,7 @@ class OALBuffer
 
     ALuint GetToken(){return mSelfToken;}
     UInt32 GetFrameCount();
-    UInt32 GetFramesToBytes(UInt32 inOffsetInFrames) ;
+    UInt32 GetFramesToBytes(UInt32 inOffsetInFrames);
     Float64 GetSampleRate(){return mDataFormat.mSampleRate;}
     UInt32 GetBytesPerPacket(){return mDataFormat.mBytesPerPacket;}
     UInt32 GetFramesPerPacket(){return mDataFormat.mFramesPerPacket;}

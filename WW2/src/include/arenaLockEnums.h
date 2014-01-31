@@ -23,5 +23,5 @@ enum
 ,	AL_MAX_BIT		=	0x10
 
 ,	FULL_ARENA_LOCK = AL_CAPTURE + AL_SPAWN + AL_KILL + AL_ENTRY
-} ;
+};
 //tolua_end

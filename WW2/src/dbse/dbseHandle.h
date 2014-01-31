@@ -8,8 +8,8 @@
 // Overloaded operator allows it to be used like a
 // MYSQL* pointer.
 
-typedef struct st_mysql_res MYSQL_RES ;
-typedef struct st_mysql MYSQL ;
+typedef struct st_mysql_res MYSQL_RES;
+typedef struct st_mysql MYSQL;
 
 namespace DB
 {
@@ -17,33 +17,33 @@ namespace DB
 	// DB::result_t is a a query or result set handle,
 	// DB::row_t is the handle required to read columns
 
-	typedef MYSQL handle_t ;
-	typedef MYSQL_RES result_t ;
-	typedef char**	row_t ;
+	typedef MYSQL handle_t;
+	typedef MYSQL_RES result_t;
+	typedef char**	row_t;
 }
 
 //The database connection information
 class DBHANDLE
 {
-	bool m_initialized ;
+	bool m_initialized;
 	DB::handle_t* m_conn;
 
 public:
 	DBHANDLE() : m_initialized(false), m_conn(nullptr) {}
-	~DBHANDLE() { disconnect() ; }
+	~DBHANDLE() { disconnect(); }
 
 public:
-	bool connected() const { return m_initialized ; }
+	bool connected() const { return m_initialized; }
 
 public:
 	//! Connect to a given database, returns true if successful.
-	bool connect(const struct DBCONNECTION& connectionInfo) ;
+	bool connect(const struct DBCONNECTION& connectionInfo);
 
 	//! Close connection to the given database.
-	void disconnect() ;
+	void disconnect();
 
 public:
-	operator const DB::handle_t* () const { return m_initialized ? m_conn : nullptr ; }
-	operator DB::handle_t* () { return m_initialized ? m_conn : nullptr ; }
-} ;
+	operator const DB::handle_t* () const { return m_initialized ? m_conn : nullptr; }
+	operator DB::handle_t* () { return m_initialized ? m_conn : nullptr; }
+};
 

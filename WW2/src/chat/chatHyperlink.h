@@ -12,12 +12,11 @@
 //	char Chat::Hyperlink::Separator
 //		The character used to separate elements of a link.
 //
-//	Chat::Hyperlink myLink(HLType ofType [, const char* anchorText [, const char* typeSpecificData]]) ;
+//	Chat::Hyperlink myLink(HLType ofType [, const char* anchorText [, const char* typeSpecificData]]);
 //		Builds a hyperlink
 //
 //	Chat::Hyperlink myLink(const char* fromText)
 //		Builds a hyperlink object from a text string.
-//
 
 #include "chat/chatHyperlinkTypes.h"
 
@@ -28,12 +27,12 @@ class Hyperlink
 {
 public:
 	// Characters used.
-	enum { OpenCharacter = L'{', CloseCharacter = L'}', Separator = L'|' } ;
+	enum { OpenCharacter = L'{', CloseCharacter = L'}', Separator = L'|' };
 
 	// If the text contains <OpenCharacter> for some reason, it is escaped
 	// escaped as <OpenCharacter><OpenCharacter>
 	// and CheckText returns _EscapedText.
-	enum HLTextType { _NotHyperlink, _EscapedText, _Hyperlink } ;
+	enum HLTextType { _NotHyperlink, _EscapedText, _Hyperlink };
 
 private:
 	// Default, blank constructor, should never be used.
@@ -46,7 +45,7 @@ public:
 		{}
 
 	// Build a hyperlink from text.
-	Hyperlink(const char* source) ;
+	Hyperlink(const char* source);
 
 	// Copy constructor
 	Hyperlink(const Hyperlink& const m_rhs)
@@ -55,17 +54,17 @@ public:
 
 	Hyperlink& operator = (const Hyperlink& const m_rhs)
 	{
-		m_type = rhs.m_type ; m_anchor = rhs.m_anchor ; m_typeData = rhs.m_typeData ;
+		m_type = rhs.m_type; m_anchor = rhs.m_anchor; m_typeData = rhs.m_typeData;
 	}
 
 private:
-	HLType		m_type ;			// What type of hyperlink.
+	HLType		m_type;			// What type of hyperlink.
 protected:
-	std::string	m_anchor ;			// Anchor text to display.
-	std::string	m_typeData ;		// Type-specific data.
+	std::string	m_anchor;			// Anchor text to display.
+	std::string	m_typeData;		// Type-specific data.
 protected:
-	std::string	m_text ;			// Text of this hyperlink.
-} ;
+	std::string	m_text;			// Text of this hyperlink.
+};
 
 } // namespace
 

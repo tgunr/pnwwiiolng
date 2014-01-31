@@ -20,17 +20,17 @@
 //// ---> Typedefs
 
 // Forward declaration
-class StratDecision ;
+class StratDecision;
 
 // Array's of votes: maybe a userlist would be more appropriate
-typedef std::vector<ChatHandle> VOTES ;
+typedef std::vector<ChatHandle> VOTES;
 
 // Type we use for storing queues of strat events
-typedef std::vector<StratDecision*> DECISION_QUEUE ;
+typedef std::vector<StratDecision*> DECISION_QUEUE;
 
 //// ---> Constants
 
-static const UINT32 OVERRUN_TIMEOUT_MIN = 12 ;
+static const UINT32 OVERRUN_TIMEOUT_MIN = 12;
 
 //// ---> Class/Struct definitions
 
@@ -39,33 +39,33 @@ static const UINT32 OVERRUN_TIMEOUT_MIN = 12 ;
 class StratDecision
 {
 public:
-	UINT32			m_time ;				// When it occured
-	WWII_SIDE		m_side ;				// Which side it's for
-	const Property*	m_property ;			// The facility it occured at
-	VOTES			m_voters ;				// People voting
-	UINT32			m_score ;				// Highest vote
-	UINT32			m_holds ;				// People who chose 'hold'
-	UINT32			m_falls ;				// People who voted 'fall'
-	UINT32			m_vetos ;				// People who veto'd
-	UINT32			m_conceed ;				// Conceed at this time if no other votes
-	UINT32			m_chosen ;				// Which vote won?
+	UINT32			m_time;					// When it occured
+	WWII_SIDE		m_side;					// Which side it's for
+	const Property*	m_property;				// The facility it occured at
+	VOTES			m_voters;				// People voting
+	UINT32			m_score;				// Highest vote
+	UINT32			m_holds;				// People who chose 'hold'
+	UINT32			m_falls;				// People who voted 'fall'
+	UINT32			m_vetos;				// People who veto'd
+	UINT32			m_conceed;				// Conceed at this time if no other votes
+	UINT32			m_chosen;				// Which vote won?
 
 	void clear()
 	{
-		m_voters.clear() ;
-		m_score = m_holds = m_falls = m_vetos = 0 ;
-		m_conceed = 0 ;
-		m_chosen = SC_OVERRUN ;
+		m_voters.clear();
+		m_score = m_holds = m_falls = m_vetos = 0;
+		m_conceed = 0;
+		m_chosen = SC_OVERRUN;
 	}
 
 	StratDecision(WWII_SIDE side, const Property* property)
 		: m_time(teulTime()), m_side(side), m_property(property), m_chosen(0)
 	{
-		clear() ;
+		clear();
 	}
 
-	bool won() const ;
-	UINT32 eta() const ;
-	void reminder() ;
-} ;
+	bool won() const;
+	UINT32 eta() const;
+	void reminder();
+};
 

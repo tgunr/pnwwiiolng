@@ -17,4 +17,4 @@
 #define PLAYER_HASH_SIZE 64
 #endif
 
-static const TeulTimeMS SERVER_FAIL_INTERVAL = 45000ULL ;
+static const TeulTimeMS SERVER_FAIL_INTERVAL = 45000ULL;

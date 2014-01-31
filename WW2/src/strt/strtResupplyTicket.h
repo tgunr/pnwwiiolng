@@ -11,7 +11,7 @@
 
 #include "weap/weapSpec.h"			// For WEAPON_SPEC and NULL_WEAP_SPEC
 
-struct POSTED_WEAPON ;
+struct POSTED_WEAPON;
 
 class ResupplyTicket
 {
@@ -20,12 +20,12 @@ public:
 
 	// To allow TOEs to change templates, we can't persist any entry
 	// references outside of the template/toe itself.
-	UINT32			m_docket ;				// Number of the docket we're on
-	WEAPON_SPEC		m_spec ;				// What type of weapon
-	UINT16			m_units ;				// How many will be delivered
-	POSTED_WEAPON*	m_postedWeapon ;		// Can be NULL
-	bool			m_isTransfer ;			// If true, don't check cp.isSupplied
+	UINT32			m_docket;			// Number of the docket we're on
+	WEAPON_SPEC		m_spec;				// What type of weapon
+	UINT16			m_units;			// How many will be delivered
+	POSTED_WEAPON*	m_postedWeapon;		// Can be NULL
+	bool			m_isTransfer;		// If true, don't check cp.isSupplied
 
-//	bool operator==(const ResupplyTicket* rhs) { return this == rhs ; }
-} ;
+//	bool operator==(const ResupplyTicket* rhs) { return this == rhs; }
+};
 

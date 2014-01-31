@@ -17,7 +17,7 @@ struct PARTICLEINFO
     FLOAT64 fDistance;
     SINT32 iIndex;
 
-} ;
+};
 
 #define NUM_SINTABLE_ELEMENTS 1024 // sin/cos quick lookup table number of elements
 //#define RAD_TO_SINTABLE_UNITS 1024.0f / PI / 2.0f // precalced lookup table converter
@@ -57,7 +57,7 @@ struct PARTICLE
 
     SINT32 iIndex;
 
-} ;
+};
 
 class CFXParticle
 {

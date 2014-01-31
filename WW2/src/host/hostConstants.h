@@ -3,7 +3,7 @@
 
 namespace Host
 {
-	enum { CallbackX = 222 } ;
+	enum { CallbackX = 222 };
 
 	enum class Callbacks : unsigned char
 	{
@@ -14,5 +14,5 @@ namespace Host
 	,	CaptureState_Y
 	,	ResupplyIssue_Y
 	,	ResupplyAccepted_Y
-	} ;
+	};
 }

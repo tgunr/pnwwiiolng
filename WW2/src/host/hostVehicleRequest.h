@@ -13,9 +13,9 @@
 
 namespace Server
 {
-	class ServerInfo ;
+	class ServerInfo;
 }
-class Player ;
+class Player;
 
 namespace Host
 {
@@ -24,7 +24,7 @@ namespace Host
 struct VehicleRequest
 {
 	//! MMHost constructor.
-	VehicleRequest(const instanceid_t& instanceID, const struct MM_SPAWN_GRANT_RESPONSE& grant, const class Player& commander, const class Player* const crew) ;
+	VehicleRequest(const instanceid_t& instanceID, const struct MM_SPAWN_GRANT_RESPONSE& grant, const class Player& commander, const class Player* const crew);
 	VehicleRequest(const instanceid_t& instanceID, sortieid_t serial, const WEAPON_SPEC& spec)
 		: m_instanceID(instanceID)
 		, m_weaponSerial()
@@ -36,52 +36,52 @@ struct VehicleRequest
 		, m_rank(0)
 		, m_flags(0)
 	{
-		m_weaponSerial.source = nullObjID ;
-		m_weaponSerial.serial = serial ;
-		m_weaponSerial.spec = spec ;
+		m_weaponSerial.source = nullObjID;
+		m_weaponSerial.serial = serial;
+		m_weaponSerial.spec = spec;
 	}
 
 	//! Which instance this is for.
-	instanceid_t	m_instanceID ;
+	instanceid_t	m_instanceID;
 	//! The weapon serial stuff.
-	WEAPON_SERIAL	m_weaponSerial ;
+	WEAPON_SERIAL	m_weaponSerial;
 	//! Brigade and initial mission ID.
-	UINT32			m_brigadeID ;
-	UINT32			m_missionID ;
+	UINT32			m_brigadeID;
+	UINT32			m_missionID;
 	//! The origin for the vehicle.
 	//! List of players who will be joining it.
-	WWII::inplace_vector<UINT32,8>	m_players ;
+	WWII::inplace_vector<UINT32,8>	m_players;
 	//! Callsign for the vehicle.
-	ChatHandle		m_handle ;
+	ChatHandle		m_handle;
 	//! Decal for the vehicle.
-	UINT32			m_decal ;
+	UINT32			m_decal;
 	//! Rank to show.
-	RANK_NO			m_rank ;
+	RANK_NO			m_rank;
 	//! Vehicle's initial flags.
-	UINT32			m_flags ;
+	UINT32			m_flags;
 
-	UINT32 numPlayers() const { return (m_players.empty() == false ? m_players.size() : 0) ; }
-	UINT32 playerNo(size_t i) const { return ( i < numPlayers() ? m_players[i] : 0 ) ; }
+	UINT32 numPlayers() const { return (m_players.empty() == false ? m_players.size() : 0); }
+	UINT32 playerNo(size_t i) const { return ( i < numPlayers() ? m_players[i] : 0 ); }
 
-	void send(const Server::ServerInfo* server) ;
+	void send(const Server::ServerInfo* server);
 
 	// Callback receiver.
 	static SINT32 _recvCallback(ACTION_OBJECT* const a)
 	{
 		if ( a->canRead<Host::VehicleRequest>() == false )
-			return -EINVAL ;
-		auto& req = a->read<Host::VehicleRequest>() ;
-		dbugLog(_FLD, "p:%u v:%u in:%llu rxing host vehicle request", req.m_players[0], req.m_weaponSerial.serial, req.m_instanceID) ;
+			return -EINVAL;
+		auto& req = a->read<Host::VehicleRequest>();
+		dbugLog(_FLD, "p:%u v:%u in:%llu rxing host vehicle request", req.m_players[0], req.m_weaponSerial.serial, req.m_instanceID);
 		if ( !req.execute() )
-			return -1 ;
-		return a->offset ;
+			return -1;
+		return a->offset;
 	}
 
-	static TEUL_CALLBACK* s_callback ;
+	static TEUL_CALLBACK* s_callback;
 
 	// Handle receiving a vehicle request.
-	bool execute() ;
-} ;
+	bool execute();
+};
 #pragma pack(pop)
 
 

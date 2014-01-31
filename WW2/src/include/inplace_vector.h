@@ -37,17 +37,17 @@ namespace WWII
       typedef std::reverse_iterator<const_iterator>   const_reverse_iterator;
 
       // Support for zero-sized arrays mandatory.
-      size_type _M_size ;
+      size_type _M_size;
       value_type _M_instance[_Nm > 0 ? _Nm : 1];
 
       inplace_vector() : _M_size(0) { }
-      inplace_vector(const self& rhs) : _M_size(rhs.size()) { memcpy(data(), rhs.data(), sizeof(value_type) * rhs.size()) ; }
+      inplace_vector(const self& rhs) : _M_size(rhs.size()) { memcpy(data(), rhs.data(), sizeof(value_type) * rhs.size()); }
 
       // No explicit construct/copy/destroy for aggregate type.
 
       void
       assign(const value_type& __u)
-      { std::fill_n(begin(), _Nm, __u); _M_size = _Nm ; }
+      { std::fill_n(begin(), _Nm, __u); _M_size = _Nm; }
 
       void
       swap(inplace_vector& __other)
@@ -64,11 +64,11 @@ namespace WWII
 
       iterator
       end()
-      { return begin() + size() ; }
+      { return begin() + size(); }
 
       const_iterator
       end() const
-      { return begin() + size() ; }
+      { return begin() + size(); }
 
       reverse_iterator
       rbegin()
@@ -91,7 +91,7 @@ namespace WWII
       size() const { return _M_size; }
 
       size_type
-      max_size() const { return _Nm ; }
+      max_size() const { return _Nm; }
 
       size_type
       capacity() const { return _Nm; }
@@ -104,7 +104,7 @@ namespace WWII
 
       void
       clear()
-      { _M_size = 0 ; }
+      { _M_size = 0; }
 
       // Element access.
       reference
@@ -123,7 +123,7 @@ namespace WWII
 			std::__throw_out_of_range(__N("inplace_vector::at"));
 #else
 		if(__n >= size())
-			throw std::range_error("inplace_vector::at") ;
+			throw std::range_error("inplace_vector::at");
 #endif
 	return _M_instance[__n];
       }
@@ -136,7 +136,7 @@ namespace WWII
 			  std::__throw_out_of_range(__N("inplace_vector::at"));
 #else
 		  if(__n >= size())
-			  throw std::range_error("inplace_vector::at") ;
+			  throw std::range_error("inplace_vector::at");
 #endif
 	return _M_instance[__n];
       }
@@ -168,16 +168,16 @@ namespace WWII
       bool
       push_back(const value_type& __x)
       {
-        if ( size() >= capacity() ) return false ;
-        _M_instance[_M_size++] = __x ;
-        return true ;
+        if ( size() >= capacity() ) return false;
+        _M_instance[_M_size++] = __x;
+        return true;
       }
 
       void
       pop_back()
       {
         if ( size() > 0 )
-          --_M_size ;
+          --_M_size;
       }
 
       void
@@ -188,9 +188,9 @@ namespace WWII
 	  		std::__throw_out_of_range(__N("inplace_vector::resize"));
 #else
 		if (__n > capacity())
-			throw std::range_error("inplace_vector::resize") ;
+			throw std::range_error("inplace_vector::resize");
 #endif
-		_M_size = __n ;
+		_M_size = __n;
       }
 
       // Fast, unordered erasure.
@@ -199,13 +199,13 @@ namespace WWII
       swap_to_back_and_pop(iterator pos)
       {
         // You can't erase 'end'
-        if ( pos == end() ) return ;
+        if ( pos == end() ) return;
         // ASSUMPTION: You have an iterator that isn't end so size must be > 0
-        --_M_size ;
+        --_M_size;
         // If you were deleting end - 1, it will now be end and the swap
         // would no-longer be necessary.
         if ( pos != end() )
-          *pos = *end() ;
+          *pos = *end();
       }
     };
 

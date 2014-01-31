@@ -14,8 +14,8 @@
 struct CHAT_SMITE_USER
 {
 	playerid_t	customerID;
-	ChatHandle	m_handle ;
-} ;
+	ChatHandle	m_handle;
+};
 #pragma pack(pop)
 
 #pragma pack(push, 1)
@@ -24,7 +24,7 @@ struct CHAT_LOC_USER
 	playerid_t playerID;
 	UINT32 reqPlayer;
 	SINT32 reqConnection;
-} ;
+};
 #pragma pack(pop)
 
 struct RAW_POSITION
@@ -32,16 +32,16 @@ struct RAW_POSITION
 	SINT32	rawX;
 	SINT32	rawY;
 	SINT32	rawZ;
-} ;
+};
 
 struct CHAT_FOUND_USER
 {
-	CHAT_LOC_USER	locUser ;
-	UINT32			serverAddress ;
-	SINT16			serverType ;
-	UINT32			vehicleID ; 	// vehicle index
-	RAW_POSITION 	position ;		// position
-	LOGICAL 		isFound ;
-	WEAPON_SPEC		weapon ;
-} ;
+	CHAT_LOC_USER	locUser;
+	UINT32			serverAddress;
+	SINT16			serverType;
+	UINT32			vehicleID; 		// vehicle index
+	RAW_POSITION 	position;		// position
+	LOGICAL 		isFound;
+	WEAPON_SPEC		weapon;
+};
 

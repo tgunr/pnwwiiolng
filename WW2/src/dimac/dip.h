@@ -146,9 +146,9 @@ LOGICAL dipSetupMouse(void);
 LOGICAL dipSetupJoystick(void);
 void dipKill(void);
 
-int dipHasKeyboard(void) ;
-int dipHasJoystick(void) ;
-int dipHasMouse(void) ;
+int dipHasKeyboard(void);
+int dipHasJoystick(void);
+int dipHasMouse(void);
 
 #ifdef __cplusplus
 }

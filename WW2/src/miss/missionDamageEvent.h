@@ -23,12 +23,12 @@ public:
 	~MissionDamageEvent() {}
 
 public:
-	playerid_t			m_playerID ;
-	sortieid_t			m_sortieID ;
-	UINT64				m_targetID ;
-	STRAT_DAMAGE_TARGET	m_targetType ;
-	STRAT_DAMAGE_EFFECT	m_effectType ;
-	UINT64				m_joules ;
-} ;
+	playerid_t			m_playerID;
+	sortieid_t			m_sortieID;
+	UINT64				m_targetID;
+	STRAT_DAMAGE_TARGET	m_targetType;
+	STRAT_DAMAGE_EFFECT	m_effectType;
+	UINT64				m_joules;
+};
 #pragma pack(pop)
 

@@ -28,7 +28,7 @@ namespace Server
 			: Transfer(_reason)
 			, data(_dispatch, _size, _auxData)
 			{
-				m_source = _source ;
+				m_source = _source;
 			}
 
 		virtual ~PersonaXfer() {}
@@ -38,18 +38,18 @@ namespace Server
 			, data(_data)
 			{}
 
-		Auth::Dispatch& dispatch() { return data.dispatch ; }
-		const Auth::Dispatch& dispatch() const { return data.dispatch ; }
+		Auth::Dispatch& dispatch() { return data.dispatch; }
+		const Auth::Dispatch& dispatch() const { return data.dispatch; }
 
-		public: virtual SINT32 onComplete(SINT32 /* result */) const OVERRIDE_FN { return -EINVAL ; }
+		public: virtual SINT32 onComplete(SINT32 /* result */) const OVERRIDE_FN { return -EINVAL; }
 		public: virtual void packer(LOGICAL mode, ACTION_OBJECT* const a) OVERRIDE_FN
 		{
-			Transfer::packer(mode, a) ;
-			data.packer(mode, a) ;
+			Transfer::packer(mode, a);
+			data.packer(mode, a);
 		}
 
 	public:
-		PersonaXferData		data ;
-	} ;
+		PersonaXferData		data;
+	};
 }
 

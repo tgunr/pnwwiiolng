@@ -15,9 +15,9 @@ class DBSquad : public Squad
 {
 public:
 	DBSquad() : Squad() {}
-	DBSquad(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a) ; }
+	DBSquad(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 	~DBSquad() {}
-} ;
+};
 
-typedef teul_network_object<DBSquad> CHATDB_SQUAD_XCHG ;
+typedef teul_network_object<DBSquad> CHATDB_SQUAD_XCHG;
 

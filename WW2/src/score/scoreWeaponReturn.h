@@ -19,9 +19,9 @@ namespace Scoring
 				{}
 
 		//! Get condition of the vehicle when returned. See wwii/wwiiRTBCodes.h.
-		public: UINT32 rtbState() const { return m_rtbState ; }
+		public: UINT32 rtbState() const { return m_rtbState; }
 
-		protected: UINT32 m_rtbState ;		//! See wwii/wwiiRTBCodes.h
+		protected: UINT32 m_rtbState;		//! See wwii/wwiiRTBCodes.h
 
 	END_SCORING_EVENT( )
 

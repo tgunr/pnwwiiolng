@@ -61,7 +61,7 @@ typedef UINT32 DWORD;
 
 #define _T(__t_string__) L##__t_string__
 
-void MacVideoInitializationFailed(const char* problem) ;
+void MacVideoInitializationFailed(const char* problem);
 
 #ifdef __cplusplus
 extern "C"
@@ -85,7 +85,7 @@ void SetCommandLine(int argc, char** argv);
 const char* GetCommandLine();
 
 int wstrncasecmp(const wchar_t* ws1, const wchar_t* ws2, int n);
-int wstrcasecmp(const wchar_t* ws1, const wchar_t* ws2) ;
+int wstrcasecmp(const wchar_t* ws1, const wchar_t* ws2);
 void SetMouseScalingEnabled(int enabled);
 
 SINT32 GetMicroSeconds(void);

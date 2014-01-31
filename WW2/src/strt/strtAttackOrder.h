@@ -8,7 +8,7 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-enum ORDER_TYPE { ORD_ATTACK, ORD_DEFEND, ORD_CLEAR } ;
+enum ORDER_TYPE { ORD_ATTACK, ORD_DEFEND, ORD_CLEAR };
 
 #pragma pack(push, 1)
 struct AttackOrder
@@ -19,15 +19,15 @@ struct AttackOrder
 	{
 	}
 
-	void process() ;
+	void process();
 
-	ChatHandle	m_requester ;
-	UINT32		m_brigadeID ;
-	FULL_OBJ_ID	m_target ;
-	UCHAR		m_orderType ;
-	bool		m_execute ;
-	UINT32		m_result ;
-	UINT32		m_delay ;
-} ;
+	ChatHandle	m_requester;
+	UINT32		m_brigadeID;
+	FULL_OBJ_ID	m_target;
+	UCHAR		m_orderType;
+	bool		m_execute;
+	UINT32		m_result;
+	UINT32		m_delay;
+};
 #pragma pack(pop)
 

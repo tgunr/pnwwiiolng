@@ -74,7 +74,7 @@ omgTestFile.cpp
         <brief>Gets the current size of the inline array.</brief>
         <returns>0 if empty, otherwise a positive count of the number of testInlineArray elements.</returns>
       </doc>
-      <code> return ( testInlineArray.empty() ? 0 : testInlineArray.size() ) ; </code>
+      <code> return ( testInlineArray.empty() ? 0 : testInlineArray.size() ); </code>
     </function>
   </sub-class>
 </class>

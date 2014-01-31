@@ -28,8 +28,8 @@ namespace Chat
 			, m_playerID(playerID)
 		{
 		}
-		playerid_t		m_playerID ;
-	} ;
+		playerid_t		m_playerID;
+	};
 }
 #pragma pack(pop)
 

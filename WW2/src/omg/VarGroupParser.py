@@ -41,16 +41,16 @@ class VarGroupParser:
 	#{
 		""" Returns copy operator definition. """
 
-		astrCopies = [ 'm_lastModified = rhs.m_lastModified ;' ]
+		astrCopies = [ 'm_lastModified = rhs.m_lastModified;' ]
 		for elMember in self.aelMembers:
 			strName = elMember.get("name")
-			astrCopies.append("%s.operator=(rhs.%s) ;" % (strName, strName))
+			astrCopies.append("%s.operator=(rhs.%s);" % (strName, strName))
 
 		strOut = """\
 		%s& operator = (const %s& rhs)
 		{
 			%s
-			return *this ;
+			return *this;
 		}
 """
 
@@ -62,12 +62,12 @@ class VarGroupParser:
 	#{
 		""" Returns the group packer definition. """
 
-		astrMembers = [ ("%s.packer(mode, a, lastPack, changes, fieldNo++) ;" % elMember.get("name")) for elMember in self.aelMembers ]
+		astrMembers = [ ("%s.packer(mode, a, lastPack, changes, fieldNo++);" % elMember.get("name")) for elMember in self.aelMembers ]
 
 		strOut = """\
 		virtual void groupPacker(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)
 		{
-			UINT32 fieldNo = 0 ;
+			UINT32 fieldNo = 0;
 			%s
 		}
 """
@@ -97,9 +97,9 @@ class VarGroupParser:
 					strDefault = astrTypeDefaults[strType]
 
 			if strDefault:
-				strOut += "\t\tWWII::SyncVar<%s,%s> %s ;\n" % (strType, strDefault, elMember.get("name"))
+				strOut += "\t\tWWII::SyncVar<%s,%s> %s;\n" % (strType, strDefault, elMember.get("name"))
 			else:
-				strOut += "\t\tWWII::SyncVar<%s> %s ;\n" % (strType, elMember.get("name"))
+				strOut += "\t\tWWII::SyncVar<%s> %s;\n" % (strType, elMember.get("name"))
 
 		return strOut
 	#}
@@ -125,10 +125,10 @@ class VarGroupParser:
 			strOut += "\n"
 			strOut += fp.Parse()
 
-		strOut += "\t} m_%s ;\n" % strMemb
+		strOut += "\t} m_%s;\n" % strMemb
 
-		strOut += "\tconst %s& %s() const { return m_%s ; }\n" % (strName, strMemb, strMemb)
-		strOut += "\t%s& %s() { return m_%s ; }\n\n" % (strName, strMemb, strMemb)
+		strOut += "\tconst %s& %s() const { return m_%s; }\n" % (strName, strMemb, strMemb)
+		strOut += "\t%s& %s() { return m_%s; }\n\n" % (strName, strMemb, strMemb)
 
 		return strOut
 	#}

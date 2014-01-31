@@ -83,25 +83,25 @@
 <!--
 	<sub-group>
 		<sub-group name='Reservation'>
-			bool isReserved ;
-			FULL_OBJ_ID facility ;
+			bool isReserved;
+			FULL_OBJ_ID facility;
 		</sub-group>
 	</sub-group>
 -->
 
 	<function return-type='UINT32' name='sortieID' const='true'>
 		<doc><brief>Returns the sortieID.</brief></doc>
-		<code>return m_sortie.sortieID() ;</code>
+		<code>return m_sortie.sortieID();</code>
 	</function>
 
 	<function return-type='UINT32' name='duration_s' const='true'>
 		<doc><brief>Returns the duration the sortie has been spawned for.</brief></doc>
-		<code>return (UINT32)(sortie().despawned_ms() - sortie().spawned_ms()) / 1000U ;</code>
+		<code>return (UINT32)(sortie().despawned_ms() - sortie().spawned_ms()) / 1000U;</code>
 	</function>
 
 	<function return-type='TeulTimeMS' name='duration_ms' const='true'>
 		<doc><brief>Returns the duration the sortie has been spawned for.</brief></doc>
-		<code>return sortie().despawned_ms() - sortie().spawned_ms() ;</code>
+		<code>return sortie().despawned_ms() - sortie().spawned_ms();</code>
 	</function>
 
 </class>

@@ -22,12 +22,12 @@ namespace Scoring
 			, m_forSide(forSide_)
 		{}
 
-		public: WWII_SIDE forSide() const { return m_forSide ; }
+		public: WWII_SIDE forSide() const { return m_forSide; }
 
-		protected:	WWII_SIDE	m_forSide ;			//!< Which side they captured for.
+		protected:	WWII_SIDE	m_forSide;			//!< Which side they captured for.
 
-		public: const LhsType& capper() const { return lhs() ; }
-		public: const RhsType& building() const { return rhs() ; }
+		public: const LhsType& capper() const { return lhs(); }
+		public: const RhsType& building() const { return rhs(); }
 
 	END_SCORING_EVENT( )
 }

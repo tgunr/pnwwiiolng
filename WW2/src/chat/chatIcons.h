@@ -44,8 +44,8 @@ namespace Chat
 	,	CAUTION_ICON
 	,	WHISPER_ICON		// 30
 	,	YELL_ICON			// 31
-	} ;
+	};
 
 	// How many bits required to describe an icon?
-	static const UINT32 ICON_DESCRIPTION_BITS = 5 ;
+	static const UINT32 ICON_DESCRIPTION_BITS = 5;
 }

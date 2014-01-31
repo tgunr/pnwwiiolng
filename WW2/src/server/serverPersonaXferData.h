@@ -27,19 +27,19 @@ namespace Server
 
 		public:	Auth::Dispatch	dispatch;
 
-		public:	SINT32			auxSize ;
-		public:	void*			auxData ;
+		public:	SINT32			auxSize;
+		public:	void*			auxData;
 
 		virtual void packer(LOGICAL mode, ACTION_OBJECT* const a)
 		{
-			dispatch.packer(mode, a) ;
-			a->packer(mode, auxSize) ;
+			dispatch.packer(mode, a);
+			a->packer(mode, auxSize);
 			if ( auxSize > 0 )
 			{
-				assert( auxData != nullptr ) ;
-				a->packBytes(mode, auxData, auxSize) ;
+				assert( auxData != nullptr );
+				a->packBytes(mode, auxData, auxSize);
 			}
 		}
-	} ;
+	};
 }
 

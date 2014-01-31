@@ -10,39 +10,39 @@
 
 #include "wwii/wwiiHash.h"
 #include "teul/teulBasic.h"
-class wwiiPlayer ;
-class Player ;
+class wwiiPlayer;
+class Player;
 
 // Map of players by ID
-typedef std::unordered_map<playerid_t /*playerID*/, class PlayerStatusNode*> PLAYERID_HASH ;
-typedef std::map<UINT32 /*teulIndex*/, class PlayerStatusNode*> PLAYERIDX_MAP ;
+typedef std::unordered_map<playerid_t /*playerID*/, class PlayerStatusNode*> PLAYERID_HASH;
+typedef std::map<UINT32 /*teulIndex*/, class PlayerStatusNode*> PLAYERIDX_MAP;
 
 class ServerInterface
 {
 protected:
-	static PLAYERID_HASH	s_byPlayerID ;
-	static PLAYERIDX_MAP	s_byTeulIndex ;
+	static PLAYERID_HASH	s_byPlayerID;
+	static PLAYERIDX_MAP	s_byTeulIndex;
 
 public:
-	static bool isServerEmpty() { return s_byPlayerID.empty() ; }
+	static bool isServerEmpty() { return s_byPlayerID.empty(); }
 	static PlayerStatusNode* PlayerStatusNodeByPlayerID(playerid_t id)
 	{
-		PLAYERID_HASH::iterator it = s_byPlayerID.find(id) ;
-		return ( it != s_byPlayerID.end() ) ? it->second : nullptr ;
+		PLAYERID_HASH::iterator it = s_byPlayerID.find(id);
+		return ( it != s_byPlayerID.end() ) ? it->second : nullptr;
 	}
-	static wwiiPlayer* LookupByPlayerID(playerid_t id) ;
+	static wwiiPlayer* LookupByPlayerID(playerid_t id);
 
 	static PlayerStatusNode* PlayerStatusNodeByTeulIndex(SINT32 teulIndex)
 	{
 		// This has to be different than just teulGetPersonaData
 		// because it has to reference our PlayerStatusNode data
-		if ( teulIndex < 0 ) return nullptr ;
-		PLAYERIDX_MAP::iterator it = s_byTeulIndex.find((UINT32)teulIndex) ;
-		return ( it != s_byTeulIndex.end() ) ? it->second : nullptr ;
+		if ( teulIndex < 0 ) return nullptr;
+		PLAYERIDX_MAP::iterator it = s_byTeulIndex.find((UINT32)teulIndex);
+		return ( it != s_byTeulIndex.end() ) ? it->second : nullptr;
 	}
 	static wwiiPlayer* LookupByTeulIndex(SINT32 teulIndex)
 	{
-		return (wwiiPlayer*)teulGetPersonaData(teulIndex) ;
+		return (wwiiPlayer*)teulGetPersonaData(teulIndex);
 	}
-} ;
+};
 

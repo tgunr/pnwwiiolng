@@ -21,43 +21,43 @@ class LatLong
 public:
 	LatLong(const double& x, const double& y)
 	{
-		_translate(x / WORLD_WIDTH * WORLD_ARC_WIDTH, m_east, m_longdeg, m_longmin, m_longsec) ;
-		_translate(y / WORLD_HEIGHT * WORLD_ARC_HEIGHT, m_north, m_latdeg, m_latmin, m_latsec) ;
+		_translate(x / WORLD_WIDTH * WORLD_ARC_WIDTH, m_east, m_longdeg, m_longmin, m_longsec);
+		_translate(y / WORLD_HEIGHT * WORLD_ARC_HEIGHT, m_north, m_latdeg, m_latmin, m_latsec);
 
 		snprintf(m_text, 40, "%c%d.%d.%d %c%d.%d.%d"
 							, ((m_north) ? 'N':'S')
 							, m_latdeg, m_latmin, m_latsec
 							, ((m_east) ? 'E':'W')
 							, m_longdeg, m_longmin, m_longsec
-							) ;
+							);
 	}
 
-	operator const char* (void) { return m_text ; }
+	operator const char* (void) { return m_text; }
 
 public:
-	int		m_longdeg, m_longmin, m_longsec ;
-	bool	m_east ;
-	int		m_latdeg, m_latmin, m_latsec ;
-	bool	m_north ;
-	char	m_text[40+1] ;
+	int		m_longdeg, m_longmin, m_longsec;
+	bool	m_east;
+	int		m_latdeg, m_latmin, m_latsec;
+	bool	m_north;
+	char	m_text[40+1];
 
 private:
 	static inline void
 	_translate(double coord, bool& sign, int& deg, int& min, int& sec)
 	{
 		if ( coord >= 0 )
-			sign = true ;
+			sign = true;
 		else
 		{
-			coord = fabs(coord) ;
-			sign = false ;
+			coord = fabs(coord);
+			sign = false;
 		}
-		coord /= 100 ;
+		coord /= 100;
 
-		deg = (int)floor(coord) ;
-		coord = modf(coord, &coord) * 60.0 ;
-		min = (int)floor(coord) ;
-		coord = modf(coord, &coord) * 60.0 ;
-		sec = (int)floor(coord) ;
+		deg = (int)floor(coord);
+		coord = modf(coord, &coord) * 60.0;
+		min = (int)floor(coord);
+		coord = modf(coord, &coord) * 60.0;
+		sec = (int)floor(coord);
 	}
-} ;
+};

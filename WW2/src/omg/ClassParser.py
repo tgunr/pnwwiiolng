@@ -145,7 +145,7 @@ class ClassParser:
 		for elMember in self.aelMembers:
 			strType = elMember.get("type")
 			strOut += "\t//! %s\n" % elMember.get("brief")
-			strOut += "\t%s %s ;\n" % (strType, elMember.get("name"))
+			strOut += "\t%s %s;\n" % (strType, elMember.get("name"))
 
 		return strOut
 	#}
@@ -189,7 +189,7 @@ class ClassParser:
 			self.strDefaultCode += (strDefaultVarGroupCode % iBitsRequired) + "\n"
 			# Change the packer of the clpParent.
 			self.clpParent.strPacker = """\
-	public: bool packer(LOGICAL mode, ACTION_OBJECT* a, const TeulTimeMS& lastPack) ;
+	public: bool packer(LOGICAL mode, ACTION_OBJECT* a, const TeulTimeMS& lastPack);
 """
 	#}
 
@@ -235,7 +235,7 @@ class ClassParser:
 		strOut += self.memberFunctions()
 
 		## Close class definition.
-		strOut += "} ; // class %s\n\n" % self.strName
+		strOut += "}; // class %s\n\n" % self.strName
 
 		## Close namespace.
 		if self.strNamespace:

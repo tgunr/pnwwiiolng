@@ -29,7 +29,7 @@ class FunctionParser:
 		"""
 
 		if strCode == None:
-			return " ;"
+			return ";"
 
 		# Break into individual lines.
 		astrLines = strCode.splitlines()
@@ -43,7 +43,7 @@ class FunctionParser:
 			astrLines.pop(-1)
 
 		if len(astrLines) == 0:
-			return " ;"
+			return ";"
 
 		# Find the number of tabs on the first line.
 		ntabs = 0

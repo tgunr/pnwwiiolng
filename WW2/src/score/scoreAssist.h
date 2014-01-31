@@ -14,9 +14,9 @@ namespace Scoring
 					, m_value(value_)
 				{}
 
-		public: const SINT64& value() const { return m_value ; }
+		public: const SINT64& value() const { return m_value; }
 
-		protected: SINT64 m_value ;				//!< How much this type of kill is worth.
+		protected: SINT64 m_value;				//!< How much this type of kill is worth.
 
 	END_SCORING_EVENT( )
 }
