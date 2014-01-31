@@ -3,8 +3,8 @@
 template<typename T>
 struct IntrusiveList
 {
-	using value_type = typename T;
-	using self_type = typename IntrusiveList<T>;
+	typedef T value_type;
+	typedef IntrusiveList<T> self_type;
 
 	class iterator;
 	class const_iterator;
@@ -119,11 +119,11 @@ struct IntrusiveList
 };
 
 template<typename T>
-class IntrusiveList<T>::iterator : public std::iterator<std::bidirectional_iterator_tag, typename T>
+class IntrusiveList<T>::iterator : public std::iterator<std::bidirectional_iterator_tag, T>
 {
 public:
-	typedef typename T value_type;
-	typedef typename IntrusiveList<T> list_type;
+	typedef T value_type;
+	typedef IntrusiveList<T> list_type;
 	typedef typename list_type::Node node_type;
 	typedef typename list_type::iterator self_type;
 
@@ -151,11 +151,11 @@ public:
 };
 
 template<typename T>
-class IntrusiveList<T>::const_iterator : public std::iterator<std::bidirectional_iterator_tag, typename T>
+class IntrusiveList<T>::const_iterator : public std::iterator<std::bidirectional_iterator_tag, T>
 {
 public:
-	typedef typename T value_type;
-	typedef typename IntrusiveList<T> list_type;
+	typedef T value_type;
+	typedef IntrusiveList<T> list_type;
 	typedef typename list_type::Node node_type;
 	typedef typename list_type::const_iterator self_type;
 	typedef typename list_type::iterator mutable_iterator;
