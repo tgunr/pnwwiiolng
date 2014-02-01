@@ -206,8 +206,7 @@ missRequestMissionResults(const SINT32 teulIndex, const UINT32 sortieID)
 	if ( teulClock64 < nextReq )
 		return 0;
 
-	Teul::Packet outgoing(sizeof(sortieID), MISSION_X, FE_MISSION_RESULT_REPLY_Y);
-	outgoing.append(sortieID);
+	Teul::Packet outgoing(Teul::PacketId(MISSION_X, FE_MISSION_RESULT_REPLY_Y), sortieID);
 	const SINT32 retval = outgoing.send(teulIndex);
 
 	// No more than once every 2.5 seconds.

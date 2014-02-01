@@ -132,7 +132,7 @@ FULL_OBJ_ID chatGetTargetSelection()
 
 SINT32 chatSendModeNotice(SINT32 teulIndex, UCHAR updateMode)
 {
-	Teul::Packet outgoing(0, Chat::CallbackX, Chat::PREFERENCE_Y);
+	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::PREFERENCE_Y));
 	CONSTRUCT_IN_PACKET(outgoing, Chat::Preference, CPR_UPDATE_MODE, updateMode);
 	return outgoing.send(teulIndex);
 }
