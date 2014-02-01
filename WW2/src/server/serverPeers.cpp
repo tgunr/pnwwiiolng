@@ -44,6 +44,7 @@ struct ServerConnection
 #pragma pack(push, 1)
 struct PeerHello
 {
+	PeerHello(SERVER_TYPE type=SERVER_TYPE(~0)) : m_type(type) {}
 	SERVER_TYPE	m_type;
 };
 #pragma pack(pop)
@@ -156,9 +157,8 @@ _onConnect(ENDPOINT& endpoint)
 		connection->m_connected = true;
 	}
 
-	Teul::Packet outgoing(sizeof(PeerHello), Teul::PacketId(Teul::Serv::CallbackX, PEER_HELLO_Y));
-	auto& hello = outgoing.allocate<PeerHello>();
-	hello.m_type = Server::myServerInfo.stats.type;
+	Teul::Packet outgoing(Teul::PacketId(Teul::Serv::CallbackX, PEER_HELLO_Y));
+	outgoing.construct<PeerHello>(Server::myServerInfo.stats.type);
 	outgoing.send(endpoint);
 }
 

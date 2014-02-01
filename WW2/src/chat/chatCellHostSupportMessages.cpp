@@ -57,8 +57,8 @@ _findVehicleByPlayerID(const playerid_t playerID)
 static SINT32
 _recvLocateUser(ACTION_OBJECT* a, CHAT_LOC_USER& locUser_)
 {
-	Teul::Packet outgoing(sizeof(CHAT_FOUND_USER), Teul::PacketId(Chat::CallbackX, Chat::FOUND_USER_Y));
-	auto& found = outgoing.payloadRef<CHAT_FOUND_USER>();
+	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::FOUND_USER_Y));
+	auto& found = outgoing.allocate<CHAT_FOUND_USER>();
 	found.locUser = locUser_;
 	found.isFound = FALSE;
 	found.serverAddress = Server::myServerInfo.stats.address;
@@ -189,16 +189,15 @@ chatSendKickNotice(const playerid_t playerID, const SCHAR* callsign, const SCHAR
 					, problem
 					);
 
-	Teul::Packet outgoing(0, Teul::PacketId(Chat::CallbackX, Chat::KICK_NOTICE_Y));
-	CONSTRUCT_IN_PACKET(outgoing, Chat::KickNotice, playerID, chatGetHandle(callsign), problem);
-
+	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::KICK_NOTICE_Y));
+	outgoing.construct<Chat::KickNotice>(playerID, chatGetHandle(callsign), problem);
 	return serverSendPacketToType(outgoing, CHAT_HOST);
 }
 
 void
 Chat::SendModReport(const ChatHandle& handle, const Chat::ModReport report)
 {
-	Teul::Packet outgoing(sizeof(handle) + sizeof(report), Teul::PacketId(Chat::CallbackX, Chat::MOD_REPORT_Y));
+	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::MOD_REPORT_Y));
 	outgoing.append(report);
 	outgoing.append(handle);
 	serverSendPacketToType(outgoing, CHAT_HOST);

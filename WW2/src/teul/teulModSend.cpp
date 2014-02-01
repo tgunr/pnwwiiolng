@@ -64,7 +64,7 @@ teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback)
 	}
 	if ( PN_UNLIKELY(callback.m_sendAction == nullptr) )
 	{
-		dbugLog(_FLA, "cant execute nullptr callback x:%d y:%d", callback.callX(), callback.callY());
+		dbugLog(_FLA, "cant execute null callback x:%d y:%d", callback.callX(), callback.callY());
 		return -ETEUL_CB_SEND_NULL;
 	}
 
@@ -75,7 +75,8 @@ teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback)
 	actionObj.actionObj = &callback;
 	actionObj.localRawData = callback.outData;
 
-	Teul::Packet outgoing(Teul::MaxPacket, Teul::PacketId(callback.callX(), callback.callY()));
+	Teul::Packet outgoing(Teul::PacketId(callback.callX(), callback.callY()));
+	outgoing.reserve(Teul::MaxPacket);
 
 	actionObj.packed = (UCHAR*)outgoing.writePointer();
 	actionObj.offset = 0;

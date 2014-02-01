@@ -54,8 +54,7 @@ TeulTransmission::send(SINT32 teulIndex) const
 	if ( endpoint->state() != IS_OPEN )
 		return -EINVAL;
 
-	Teul::Packet outgoing(m_size, Teul::PacketId(m_callback->callX(), m_callback->callY()));
-	outgoing.append((UCHAR*)m_buffer, m_size);
+	Teul::Packet outgoing(Teul::PacketId(m_callback->callX(), m_callback->callY()), m_buffer, m_size);
 	return outgoing.send(*endpoint);
 }
 

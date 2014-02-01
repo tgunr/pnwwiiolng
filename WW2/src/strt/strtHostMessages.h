@@ -34,7 +34,7 @@ extern SINT32 strtSendPostExpired(UINT32 customerID, const WEAPON_SERIAL& weapon
 // Notify a specific connection of a time update
 extern SINT32 strtSendMMCrewBailed(UINT32 comanderID, UINT32 crewID);
 extern SINT32 strtSendMMJoinDeny(UINT32 crewID,UINT32 reasonCode);
-extern SINT32 strtSendMMJoinListResponse(UINT32 commandID, UINT32 crewID, const char* callsign);
+extern SINT32 strtSendMMJoinListResponse(UINT32 commandID, UINT32 crewID, ChatHandle crewHandle);
 
 // Process a capacity request and send the response
 extern LOGICAL strtReplyToCapacityRequest(SINT32 teulIndex, const MM_CAPACITY_REQUEST& request, FULL_OBJ_ID destFacility, bool vehicleDelivered);

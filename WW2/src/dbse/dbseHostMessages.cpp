@@ -38,7 +38,7 @@ static SINT32 _recvHandshake(ACTION_OBJECT* const a, Dbse::Handshake& handshake)
 					, a->teulIndex, myArenaID, teulGetAddress(destAddress));
 	}
 
-	Teul::Packet outgoing(Teul::PacketId(DBSE_GENERAL_X, DBSE_SERVER_HANDSHAKE_Y), std::move(handshake));
+	Teul::Packet outgoing(Teul::PacketId(DBSE_GENERAL_X, DBSE_SERVER_HANDSHAKE_Y), handshake);
 	outgoing.send(*a->endpoint);
 
 	return a->offset;

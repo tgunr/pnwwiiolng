@@ -559,8 +559,9 @@ strtProcessPostListRequest(SINT32 teulIndex, const MM_POST_LIST_REQUEST& request
 
 	// Find all the posted weapons that are valid for us.
 	const size_t maxPossibleSize = sizeof(PostListReply) + sizeof(MM_POSTED_WEAPON) * unit->postedWeaponList().size() + 16;
-	Teul::Packet outgoing(maxPossibleSize, Teul::PacketId(Strat::CallbackX, STRT_MM_POST_LIST_Y));
-	CONSTRUCT_IN_PACKET(outgoing, PostListReply, COMMANDED_WEAPON_ADD, request.crewID, facility->uOID);
+	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_MM_POST_LIST_Y));
+	outgoing.reserve(maxPossibleSize);
+	outgoing.construct<PostListReply>(COMMANDED_WEAPON_ADD, request.crewID, facility->uOID);
 
 	UINT32 weapons = 0;
 	POSTED_WEAPON_LIST::const_iterator it;
@@ -571,8 +572,7 @@ strtProcessPostListRequest(SINT32 teulIndex, const MM_POST_LIST_REQUEST& request
 			|| (weapon.m_status != POSTED_WEAPON::_POSTED && weapon.m_status != POSTED_WEAPON::_RESERVED)
 			|| weapon.m_multicrew == false )
 			continue;
-		auto& mmWeapon = outgoing.allocate<MM_POSTED_WEAPON>();
-		mmWeapon.copy(weapon);
+		outgoing.append(weapon);
 		++weapons;
 	}
 
@@ -800,7 +800,7 @@ strtProcessJoinListRequest(SINT32 teulIndex, const MM_POST_INFO_REQUEST& request
 	// the vehicle's list of wannabes.
 	joinNode->AddToList(&currentWeapon->m_joinList);
 
-	strtSendMMJoinListResponse(currentWeapon->m_commander, joinNode->m_playerID, Chat::Name(joinNode->m_handle).c_str());
+	strtSendMMJoinListResponse(currentWeapon->m_commander, joinNode->m_playerID, joinNode->m_handle);
 
 	return TRUE;
 }
@@ -854,7 +854,8 @@ POSTED_WEAPON::setMulticrew(bool isMulticrew)
 		if ( node->m_missionID != m_missionID )
 			continue;
 
-		Teul::Packet outgoing(sizeof(PostListReply) + sizeof(*this), Teul::PacketId(Strat::CallbackX, STRT_MM_POST_LIST_Y));
+		Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_MM_POST_LIST_Y));
+		outgoing.reserve(sizeof(PostListReply) + sizeof(*this));
 		outgoing.construct<PostListReply>(action, node->m_playerID, m_facility->uOID);
 		outgoing.append(*this);
 		serverSendPacketToType(outgoing, MAP_HOST);

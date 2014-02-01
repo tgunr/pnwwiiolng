@@ -465,10 +465,19 @@ struct ClientRole : public Role
 			return;
 
 		Dprintf("preparing large Teul::Packet\n");
-		Teul::Packet packet(Config::largePacketSize_bytes, Teul::PacketId(Role::Test_X, Role::LargePacket_Y));
+		Teul::Packet packet(Teul::PacketId(Role::Test_X, Role::LargePacket_Y));
+		if (packet.payloadSizeBytes() != 0)
+			throw Teul::Error("Expected packet to have 0 size after construction.", packet.payloadSizeBytes());
+		if (packet.packetCapacityBytes() < packet.headerSizeBytes())
+			throw Teul::Error("Expected packet to have headerSizeBytes capacity after construction.", packet.packetCapacityBytes());
+		if (packet.packetCapacityBytes() != Teul::Packet::DefaultLocalDataSize)
+			throw Teul::Error("Expected packet to have Default capacity after construction.", packet.packetCapacityBytes());
+		packet.reserve(Config::largePacketSize_bytes);
 		// We specified a capacity, so payloadSize should be zero.
 		if ( packet.payloadSizeBytes() != 0 )
-			throw Teul::Error("Expected packet to have 0 size after construction.", packet.payloadSizeBytes());
+			throw Teul::Error("Expected packet to have 0 size after reservation.", packet.payloadSizeBytes());
+		if (packet.packetCapacityBytes() < Config::largePacketSize_bytes)
+			throw Teul::Error("Expected packet to have at least largePacketSize capacity after reservation.", packet.packetCapacityBytes());
 
 		const size_t originalCapacity = packet.payloadCapacityBytes();
 
@@ -523,7 +532,7 @@ struct ClientRole : public Role
 
 		Dprintf("testing unencrypted send\n");
 
-		Teul::Packet outgoing(0, Teul::PacketId(Role::Test_X, Role::Unencrypted_Y));
+		Teul::Packet outgoing(Teul::PacketId(Role::Test_X, Role::Unencrypted_Y));
 		outgoing.setUnencrypted();
 		outgoing.append("unencrypted", strlen("unencrypted") + 1);
 
@@ -590,8 +599,9 @@ struct ClientRole : public Role
 
 		Iprintf("sending %u spam messages\n", numUnits);
 
-		Teul::Packet outgoing(size, Teul::PacketId(Role::Test_X, Role::Spam_Y));
+		Teul::Packet outgoing(Teul::PacketId(Role::Test_X, Role::Spam_Y));
 		outgoing.setUnencrypted();
+		outgoing.reserve(size);
 		for (size_t i = 0; i < size; ++i)
 		{
 			outgoing.append(UCHAR(rand() % 255));

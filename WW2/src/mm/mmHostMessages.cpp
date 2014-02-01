@@ -119,12 +119,12 @@ FE_JOIN_DENY joinDeny;
 
 //Sends a Join Permission Request to an FE
 SINT32
-mmSendJoinPermRequest(SINT32 connection, UINT32 joinRequestID, const SCHAR* const callsign)
+mmSendJoinPermRequest(SINT32 connection, UINT32 joinRequestID, const ChatHandle gameName)
 {
 	FE_JOIN_PERM_REQUEST joinPermRequest;
 
 	joinPermRequest.joinRequestID = joinRequestID;
-	joinPermRequest.chatHandle = chatGetHandle(callsign);
+	joinPermRequest.chatHandle = gameName;
 
 	return teulSend(connection, MM_SEND_FE_JOIN_PERM_REQUEST, &joinPermRequest);
 }

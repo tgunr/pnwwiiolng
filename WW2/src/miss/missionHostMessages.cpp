@@ -262,10 +262,10 @@ _recvWEP_LIST_REQ(ACTION_OBJECT* const a)
 			, facility->name, request.allWeapons, request.isRefresh, player.permissionMask()
 			);
 
-	Teul::Packet outgoing(0, Teul::PacketId(Strat::CallbackX, STRT_FACILITY_WEAP_LIST_Y));
-	CONSTRUCT_IN_PACKET(outgoing, WeaponListRequest, player.playerID(), player.brigadeID(), request.facility
-						, player.permissionMask()
-						, false, request.isRefresh != FALSE);
+	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_FACILITY_WEAP_LIST_Y));
+	outgoing.construct<WeaponListRequest>(player.playerID(), player.brigadeID(), request.facility
+										, player.permissionMask()
+										, false, request.isRefresh != FALSE);
 	outgoing.send(mapGetStratIndex());
 
 	return a->offset;

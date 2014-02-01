@@ -105,9 +105,9 @@ struct MM_POST_INFO_RESPONSE
 
 struct MM_JOIN_LIST_RESPONSE
 {
-	UINT32	commandID;
-	UINT32	crewID;
-	char	crewCallsign[MAX_HANDLE_SIZE];
+	playerid_t	commandID;
+	playerid_t	crewID;
+	ChatHandle	crewHandle;
 };
 
 //The mmhost uses this message to assign another person to that
@@ -138,7 +138,7 @@ struct MM_POST_EXPIRED
 {
 	UINT32 customerID;
 	WEAPON_SERIAL weaponSerial;
-	LOGICAL cancelled;
+	bool cancelled;
 };
 
 //This message comes from the mmhost asking to spawn a specific vehicle

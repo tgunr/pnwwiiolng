@@ -792,9 +792,9 @@ hostPlayerLeave(Player& player, PLAYER_EXIT& pe)
 		const bool isVehicleDead = (player.vehicle->vehicleData.globalFlags & VEHG_KILLED) == VEHG_KILLED;
 		const bool isResupply = (player.vehicle->missionPacket().m_missionType == RESUPPLY);
 
+		Teul::Packet outgoing(Teul::PacketId(Scoring::CallbackX, Scoring::EVENT_Y));
 		Scoring::Actor actDespawnee(player.vehicle, &player);
-		Scoring::Despawn evtDespawn(actDespawnee, pe.facility, (UINT32)pe.exitCode, (UINT32)pe.destination, player.vehicle->x_cm(), player.vehicle->y_cm(), player.vehicle->z_cm(), isVehicleDead, isResupply);
-		Teul::Packet outgoing(Teul::PacketId(Scoring::CallbackX, Scoring::EVENT_Y), evtDespawn);
+		outgoing.construct<Scoring::Despawn>(actDespawnee, pe.facility, (UINT32)pe.exitCode, (UINT32)pe.destination, player.vehicle->x_cm(), player.vehicle->y_cm(), player.vehicle->z_cm(), isVehicleDead, isResupply);
 		outgoing.setUnencrypted();
 		serverSendPacketToType(outgoing, MAP_HOST);
 	}
@@ -1846,7 +1846,7 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 	TIMER_STOP("gvwfu_sort");
 
 	TIMER_START
-	Teul::Packet outgoing(0, Teul::PacketId(Chat::CallbackX, Chat::HOST_LOCALITY_UPDATES_Y));
+	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::HOST_LOCALITY_UPDATES_Y));
 	for ( auto it = vehicles.begin(), end = vehicles.end(); it != end; ++it )
 	{
 		HostVehicle* const vehicle = (*it);
@@ -2044,7 +2044,8 @@ _sendNextUpdate(HostVehicle* const vehicle)
 
 	// Assume 16-bytes per vehicle.
 //	TIMER_START
-	Teul::Packet packet(sizeof(wu.header) + wu.header.numVehicles * 80, Teul::PacketId(Comm::CallbackX, WORLD_UPDATE_Y));
+	Teul::Packet packet(Teul::PacketId(Comm::CallbackX, WORLD_UPDATE_Y));
+	packet.reserve(sizeof(wu.header) + wu.header.numVehicles * 80);
 	wu.packet = &packet;
 
 	packet.append(wu.header);

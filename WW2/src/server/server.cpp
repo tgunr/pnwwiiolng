@@ -329,16 +329,16 @@ _sendPlayerStatusUpdate(const PlayerStatusNode& psn)
 	if ( s_broadcastEndpoint == nullptr )
 		return;
 
-	Teul::Packet outgoing(sizeof(PlayerStatusNode), Teul::PacketId(Teul::Serv::CallbackX, PLAYER_UPDATE_Y));
+	Teul::Packet outgoing(Teul::PacketId(Teul::Serv::CallbackX, PLAYER_UPDATE_Y));
 	outgoing.setUnencrypted();
-	Server::PlayerStatusUpdate* const update = CONSTRUCT_IN_PACKET(outgoing, Server::PlayerStatusUpdate, psn);
+	auto& update = outgoing.construct<Server::PlayerStatusUpdate>(psn);
 
 	dbugLog(_FLD, "p:%u c:%s sending update %d status %d server %llu"
-					, update->dispatch.m_customerID
-					, update->dispatch.m_callsign
-					, update->id
-					, update->status
-					, update->serverID
+					, update.dispatch.m_customerID
+					, update.dispatch.m_callsign
+					, update.id
+					, update.status
+					, update.serverID
 					);
 
 	outgoing.send(*s_broadcastEndpoint);
@@ -1599,9 +1599,9 @@ serverInitAddresses()
 
 	Server::broadcastNet = cv_baseAddress.GetUint32();
 	if ( Server::IsBroadcastViaController() )
-		dbugLog(_FLI, "Server peering via controller at %s", cv_baseAddress.GetString());
+		dbugLog(_FLI, "Server peering arena %u via controller at %s", Server::myServerInfo.stats.arenaID, cv_baseAddress.GetString());
 	else
-		dbugLog(_FLI, "Server peering via broadcast network %s", cv_baseAddress.GetString());
+		dbugLog(_FLI, "Server peering arena %u via broadcast network %s", Server::myServerInfo.stats.arenaID, cv_baseAddress.GetString());
 
 	Server::localHost = Server::myInterface.addr[0].ip;
 	Server::broadcastHost = Server::BroadcastMaskAddress(Server::localHost);
@@ -1675,9 +1675,8 @@ serverBroadcastHostConfig()
 {
 	dbugLog(_FLD, "broadcasting host configuration");
 
-	Teul::Packet outgoing(sizeof(host_config), Teul::PacketId(Teul::Serv::CallbackX, HOST_CONFIG_Y));
+	Teul::Packet outgoing(Teul::PacketId(Teul::Serv::CallbackX, HOST_CONFIG_Y), host_config);
 	outgoing.setUnencrypted();
-	outgoing.append(host_config);
 	outgoing.send(Server::broadcastIndex);
 }
 

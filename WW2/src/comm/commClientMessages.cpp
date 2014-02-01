@@ -325,8 +325,8 @@ InfDeath::Send(SINT32 teulIndex, const FLOAT32 x_, FLOAT32 y_, FLOAT32 z_, const
 				, const DeathType deathType_, const bool byEnvironment_, const UCHAR deathAngle_, const UCHAR deathForce_
 				)
 {
-	Teul::Packet outgoing(sizeof(InfDeath), Teul::PacketId(Comm::CallbackX, INF_DEATH_Y));
-	CONSTRUCT_IN_PACKET(outgoing, InfDeath, x_, y_, z_, killedByIndex_, killedByHandle_, deathType_, byEnvironment_, deathAngle_, deathForce_);
+	Teul::Packet outgoing(Teul::PacketId(Comm::CallbackX, INF_DEATH_Y));
+	outgoing.construct<InfDeath>(x_, y_, z_, killedByIndex_, killedByHandle_, deathType_, byEnvironment_, deathAngle_, deathForce_);
 	return outgoing.send(teulIndex);
 }
 

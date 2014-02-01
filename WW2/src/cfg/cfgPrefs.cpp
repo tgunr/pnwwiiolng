@@ -190,17 +190,17 @@ void cfgPrefsSendSharedPrefs()
 
 	const char* name;
 	name = cfgPrefsGetGlobalName(cfgVISIBLE_PLAYER_LIMIT);
-	CONSTRUCT_IN_PACKET(outgoing, Chat::Preference, CPR_UPDATE_MODE, cfgPrefsGetInt(name, 2));
+	outgoing.construct<Chat::Preference>(CPR_UPDATE_MODE, cfgPrefsGetInt(name, 2));
 
 	name = cfgPrefsGetGlobalName(cfgLANGUAGE_CHOICE);
-	CONSTRUCT_IN_PACKET(outgoing, Chat::Preference, CPR_CLIENT_LANGUAGE, cfgPrefsGetInt(name, 0));
-	CONSTRUCT_IN_PACKET(outgoing, Chat::Preference, CPR_PLAYER_LANGUAGE, cfgPrefsGetInt(name, 0));
+	outgoing.construct<Chat::Preference>(CPR_CLIENT_LANGUAGE, cfgPrefsGetInt(name, 0));
+	outgoing.construct<Chat::Preference>(CPR_PLAYER_LANGUAGE, cfgPrefsGetInt(name, 0));
 
 	name = cfgPrefsGetGlobalName(cfgIS_RECRUITING);
-	CONSTRUCT_IN_PACKET(outgoing, Chat::Preference, CPR_IS_RECRUITING, cfgPrefsGetBool(name, false));
+	outgoing.construct<Chat::Preference>(CPR_IS_RECRUITING, cfgPrefsGetBool(name, false));
 
 	name = cfgPrefsGetGlobalName(cfgAUTO_LEADER);
-	CONSTRUCT_IN_PACKET(outgoing, Chat::Preference, CPR_AUTO_LEADER, cfgPrefsGetBool(name, true));
+	outgoing.construct<Chat::Preference>(CPR_AUTO_LEADER, cfgPrefsGetBool(name, true));
 
 	outgoing.send(PlayerClient()->ChatConnection());
 }

@@ -20,7 +20,7 @@ namespace Scoring
 
 		//! Default constructor: Create a Teul::Packet with our
 		//! callback and a payload size that carries our event.
-	public: Packet() : Teul::Packet(sizeof(eventtype), Teul::PacketId(Scoring::CallbackX, Scoring::EVENT_Y)) {}
+	public: Packet() : Teul::Packet(Teul::PacketId(Scoring::CallbackX, Scoring::EVENT_Y)) { reserve(sizeof(eventtype));  }
 
 		//! Access the Event component.
 	public: const eventtype& data() const { return *(const eventtype*)payload(); }

@@ -749,9 +749,8 @@ _forwardHitsToRemoteServer(const HostVehicle& vehicle, const SINT32 bits, const 
 		return false;
 
 	const size_t bytes = Teul::BitsToBytes(bits);
-	Teul::Packet outgoing(bytes, Teul::PacketId(Comm::CallbackX, HOST_HIT_FWD_Y));
+	Teul::Packet outgoing(Teul::PacketId(Comm::CallbackX, HOST_HIT_FWD_Y), source, bytes);
 	outgoing.setUnencrypted();
-	outgoing.append(source, bytes);
 	const SINT32 result = outgoing.send(cellIndex);
 	if ( result < 0 )
 	{
@@ -772,15 +771,13 @@ _sendScoringHitEvent(const HostVehicle& victim, const HostVehicle& shooter, cons
 	Scoring::Actor actTarget(&victim);
 	Scoring::Actor actShooter(&shooter);
 
-	Teul::Packet outgoing(0, Teul::PacketId(Scoring::CallbackX, Scoring::EVENT_Y));
-	CONSTRUCT_IN_PACKET(outgoing, Scoring::Hit, actTarget, actShooter, numComponentsHit, joules);
-	outgoing.setUnencrypted();
-
 	dbugLog(_FLD, "sending hit event [p:%u]->[p:%u] to map host", actShooter.playerID(), actTarget.playerID());
+
+	Teul::Packet outgoing(Teul::PacketId(Scoring::CallbackX, Scoring::EVENT_Y));
+	outgoing.construct<Scoring::Hit>(actTarget, actShooter, numComponentsHit, joules);
+	outgoing.setUnencrypted();
 	if ( !serverSendPacketToType(outgoing, MAP_HOST) )
-	{
 		LogAbort("failed to send hit message");
-	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1407,8 +1404,8 @@ hostSendResupplyIssue(UINT32 cellIP, const sortieid_t& toSerial, const sortieid_
 	if ( cellIndex < 0 )
 		return;
 
-	Teul::Packet outgoing(0, Teul::PacketId(Host::CallbackX, (UCHAR)Host::Callbacks::ResupplyIssue_Y));
-	CONSTRUCT_IN_PACKET(outgoing, HostResupplyIssue, toSerial, fromSerial, fromHandle);
+	Teul::Packet outgoing(Teul::PacketId(Host::CallbackX, (UCHAR)Host::Callbacks::ResupplyIssue_Y));
+	outgoing.construct<HostResupplyIssue>(toSerial, fromSerial, fromHandle);
 	outgoing.send(cellIndex);
 }
 
@@ -1424,8 +1421,8 @@ hostSendResupplyAccepted(UINT32 cellIP, const sortieid_t& sendTo, const ChatHand
 	if ( cellIndex < 0 )
 		return;
 
-	Teul::Packet outgoing(0, Teul::PacketId(Host::CallbackX, (UCHAR)Host::Callbacks::ResupplyAccepted_Y));
-	CONSTRUCT_IN_PACKET(outgoing, HostResupplyAccepted, sendTo, byHandle);
+	Teul::Packet outgoing(Teul::PacketId(Host::CallbackX, (UCHAR)Host::Callbacks::ResupplyAccepted_Y));
+	outgoing.construct<HostResupplyAccepted>(sendTo, byHandle);
 	outgoing.send(cellIndex);
 }
 

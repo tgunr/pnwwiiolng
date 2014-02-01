@@ -609,8 +609,7 @@ ENDPOINT::sendError(const SINT32 error_)
 	if ( (teulIndex() < 0) | (m_inUse == false) | (m_closed == true) )
 		return;
 
-	Teul::Packet outgoing(sizeof(error_), Teul::PacketId(Teul::Module::CallbackX, TM_ERROR_Y));
-	outgoing.append(error_);
+	Teul::Packet outgoing(Teul::PacketId(Teul::Module::CallbackX, TM_ERROR_Y), error_);
 	outgoing.send(teulIndex());
 }
 

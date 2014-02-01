@@ -4,13 +4,6 @@
 //
 // Teul::Packet class.
 
-//! Helper macro to construct an in-place instance of a class.
-// Example:
-//  Teul::packet outgoing(0, MyCallbackX, MyCallbackY);
-//  CONSTRUCT_IN_PACKET(outgoing, MyClass, ctorArg1, ctorArg2, ctorArg3);
-//  outgoing.send(teulIndex);
-#define CONSTRUCT_IN_PACKET(Packet_, Type_, ...) new ((Packet_).allocatePtr<Type_>()) Type_(__VA_ARGS__)
-
 namespace Teul
 {
 
@@ -42,44 +35,37 @@ struct PacketId
 
 class Packet
 {
+public:
 	//! Create a packet for a specific callback.
-	public: Packet(const size_t payloadCapacityBytes_, PacketId id);
-	public: Packet(PacketId id) : Packet(0, id) {}
+	Packet(PacketId id);
 	//! Default/receive constructor.
-	public: Packet();
+	Packet();
 	//! Move constructor
-	public: Packet(Packet&& moveRef);
-	//! Destructor.
-	public: ~Packet();
-	public:
-			template<typename T> struct Type {};
-			template<typename T, typename... Args>
-			Packet(Type<T>, PacketId id, Args&&... args)
-				: Packet(sizeof(T), id)
-			{
-				new (m_data) T (std::forward<Args>(args)...);
-				increaseUsedPayloadBytes(sizeof(T));
-			}
+	Packet(Packet&& moveRef);
 
-			template<typename T>
-			Packet(PacketId id, T src)
-				: Packet(sizeof(T), id)
-			{
-				new (m_data) T (std::forward<T>(src));
-				increaseUsedPayloadBytes(sizeof(T));
-			}
+	//! Construct and populate with a copy of an existing object.
+	template<typename T>
+	Packet(PacketId id, T src)
+		: Packet(id)
+	{
+		new ((T*)allocateBytes(sizeof(T))) T(src);
+	}
 
-			explicit Packet(PacketId id, const void* source, size_t size)
-				: Packet(size, id)
-			{
-				append(source, size);
-			}
+	//! Construct and populate from a pre-existing data source.
+	Packet(PacketId id, const void* source, size_t size)
+		: Packet(id)
+	{
+		append(source, size);
+	}
 
 	//! Copy constructor.
-	public: Packet(const Packet& rhs);
+	Packet(const Packet& rhs);
 
 	//! Copy operator.
-	public: Packet& operator = (const Packet& rhs);
+	Packet& operator = (const Packet& rhs);
+
+	//! Destructor.
+	~Packet();
 
 public:
 	enum { DefaultLocalDataSize = 256 };
@@ -135,7 +121,7 @@ public:
 	//! @note We don't track the amount used.
 	void setPacketSizeBytes(const size_t sizeBytes_);
 
-	//! Increase the total packet allocation to accomodate the given payload size.
+	//! Increase the total packet allocation to accommodate the given payload size.
 	//! @note We don't track the amount used.
 	void setPayloadSizeBytes(const size_t sizeBytes_) { setPacketSizeBytes(sizeBytes_ + headerSizeBytes()); }
 
@@ -187,7 +173,7 @@ public:
 	Type_& construct(Args&&... args)
 	{
 		Type_* obj = allocatePtr<Type_>();
-		new (obj)Type_(std::forward<Args>(args)...);
+		new (obj) Type_(std::forward<Args>(args)...);
 		return *obj;
 	}
 

@@ -123,8 +123,8 @@ Player::activate(SINT32 newIndex, PlayerStatusNode* psn)
 	if ( isManager() )
 		return;
 
-	Teul::Packet outgoing(sizeof(playerID()), Teul::PacketId(CHAT_X, Chat::MAP_REFRESH_PLAYER_Y));
-	outgoing.append(playerID());
+	Teul::Packet outgoing(Teul::PacketId(CHAT_X, Chat::MAP_REFRESH_PLAYER_Y), playerID());
+	outgoing.setUnencrypted();
 	serverSendPacketToType(outgoing, MAP_HOST);
 
 	// If they're done loading, add them to the command list

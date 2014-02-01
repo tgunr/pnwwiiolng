@@ -9,21 +9,19 @@
 //////////////////////////////////////////////////////////////////////
 // Constructor for a Teul::Packet
 
-Teul::Packet::Packet(const size_t payloadCapacityBytes_, PacketId id)
+Teul::Packet::Packet(PacketId id)
 	: m_data(m_localData)
 	, m_packetSizeBytes(headerSizeBytes())
 	, m_capacity(DefaultLocalDataSize)
 	, m_address(0)
 	, m_port(0)
+	, m_sent(0)
 {
 	header().packetType(Teul::Tokens::Encrypted);
 	header().packetSizeBytes(headerSizeBytes());
 	header().m_tag = 0;
 	header().m_callX = id.m_x;
 	header().m_callY = id.m_y;
-
-	// Now ensure data is big enough to hold the payload.
-	reserve(payloadCapacityBytes_);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -35,10 +33,58 @@ Teul::Packet::Packet(const Teul::Packet& rhs)
 	, m_capacity(DefaultLocalDataSize)
 	, m_address(rhs.m_address)
 	, m_port(rhs.m_port)
+	, m_sent(0)
 {
 	const size_t newSize = rhs.packetSizeBytes();
 	setPacketSizeBytes(newSize);
 	memcpy(m_data, rhs.m_data, newSize);
+}
+
+//////////////////////////////////////////////////////////////////////
+// Move constructor
+
+Teul::Packet::Packet(Teul::Packet&& rhs)
+{
+	if (PN_UNLIKELY(&rhs == this))
+		return;
+
+	this->m_data = rhs.m_data;		// Take possession of the data,
+	rhs.m_data = rhs.m_localData;	// point rhs back at its local data.
+
+	// If the source is using it's local data buffer, just copy the data over
+	if (this->m_data == rhs.m_localData) {
+		// Data fits within the local data, so just copy that.
+		this->m_data = this->m_localData;
+		memcpy(this->m_localData, rhs.m_localData, rhs.m_packetSizeBytes);
+	}
+
+	// Steal the size counts.
+	this->m_packetSizeBytes = rhs.m_packetSizeBytes;
+	this->m_capacity = rhs.m_capacity;
+	this->m_sent = rhs.m_sent;
+	this->m_address = rhs.m_address;
+	this->m_port = rhs.m_port;
+
+	rhs.m_packetSizeBytes = 0;
+	rhs.m_capacity = 0;
+	rhs.m_sent = 0;
+}
+
+//////////////////////////////////////////////////////////////////////
+// Copy operator.
+
+Teul::Packet&
+Teul::Packet::operator=(const Teul::Packet& rhs)
+{
+	// We can't just "borrow" the packet data, we have to duplicate it.
+	const size_t dataSize = rhs.packetSizeBytes();
+	this->setPacketSizeBytes(dataSize);
+	memcpy(this->m_data, rhs.m_data, dataSize);
+	m_address = rhs.m_address;
+	m_port = rhs.m_port;
+	m_sent = 0;
+
+	return *this;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -61,6 +107,7 @@ Teul::Packet::reset()
 	m_packetSizeBytes = headerSizeBytes();
 	m_address = 0;
 	m_port = 0;
+	m_sent = 0;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -83,25 +130,8 @@ Teul::Packet::headerSizeBytes()
 }
 
 //////////////////////////////////////////////////////////////////////
-// Copy operator.
-
-Teul::Packet&
-Teul::Packet::operator=(const Teul::Packet& rhs)
-{
-	// We can't just "borrow" the packet data, we have to duplicate it.
-	const size_t dataSize = rhs.packetSizeBytes();
-	this->setPacketSizeBytes(dataSize);
-	memcpy(this->m_data, rhs.m_data, dataSize);
-	m_address = rhs.m_address;
-	m_port = rhs.m_port;
-	m_sent = 0;
-
-	return *this;
-}
-
-//////////////////////////////////////////////////////////////////////
-// Adjust the current size of the packet (and resultingly the write
-// position if we are writing).
+// Adjust the current size of the packet (and so the write position
+// if we are writing).
 
 void
 Teul::Packet::setPacketSizeBytes(const size_t sizeBytes_)
@@ -127,10 +157,11 @@ Teul::Packet::setPacketCapacityBytes(const size_t newCapacityBytes_)
 
 	// Increment capacity in fixed-size chunks until we reach
 	// a size that accommodates the desired packet size.
-	while ( m_capacity < 4096 && m_capacity < newCapacityBytes_ )
-		m_capacity += GrowthRate;
-	while ( m_capacity < newCapacityBytes_ )
-		m_capacity += 4096;
+	const UINT32 BigGrowthRate = 4096;
+	if ( newCapacityBytes_ <= BigGrowthRate )
+		m_capacity = ((newCapacityBytes_ - 1) & ~(GrowthRate - 1)) + GrowthRate;
+	else
+		m_capacity = ((newCapacityBytes_ - 1) & ~(BigGrowthRate - 1)) + BigGrowthRate;
 
 	// Initially, we use the local data buffer for data.
 	if ( m_data == m_localData )
@@ -261,37 +292,6 @@ bool
 Teul::Packet::wantsEncryption()
 {
 	return (header().packetType() != Teul::Tokens::Unencrypted);
-}
-
-//////////////////////////////////////////////////////////////////////
-// Move constructor
-
-Teul::Packet::Packet(Teul::Packet&& rhs)
-{
-	if (PN_UNLIKELY(&rhs == this))
-		return;
-
-	this->m_data = rhs.m_data;		// Take posession of the data,
-	rhs.m_data = rhs.m_localData;	// point rhs back at its local data.
-
-	// If the source is using it's local data buffer, just copy the data over
-	if ( this->m_data == rhs.m_localData )
-	{
-		// Data fits within the local data, so just copy that.
-		this->m_data = this->m_localData;
-		memcpy(this->m_localData, rhs.m_localData, rhs.m_packetSizeBytes);
-	}
-
-	// Steal the size counts.
-	this->m_packetSizeBytes = rhs.m_packetSizeBytes;
-	this->m_capacity = rhs.m_capacity;
-	this->m_sent = rhs.m_sent;
-	this->m_address = rhs.m_address;
-	this->m_port = rhs.m_port;
-
-	rhs.m_packetSizeBytes = 0;
-	rhs.m_capacity = 0;
-	rhs.m_sent = 0;
 }
 
 //////////////////////////////////////////////////////////////////////

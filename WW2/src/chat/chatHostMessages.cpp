@@ -432,8 +432,7 @@ OOBMessage::send()
 {
 	dbugLog(_FLD, "p:%u c:%s sending oob string message: %s", m_originatorID, Chat::Name(m_originatorID).c_str(), m_text);
 
-	Teul::Packet outgoing(sizeof(*this), Teul::PacketId(Chat::CallbackX, Chat::OOB_MESSAGE_Y));
-	outgoing.append(*this);
+	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::OOB_MESSAGE_Y), *this);
 	serverSendPacketToType(outgoing, STRAT_HOST);
 }
 
@@ -443,9 +442,8 @@ chatSendUMSKill(const Player* player, const UINT32 stoUID)
 	Scoring::Actor actShooter(player);
 	actShooter.setSortie(player->sortieID(), player->weapon(), false);
 	
-	Teul::Packet outgoing(0, Teul::PacketId(Scoring::CallbackX, Scoring::EVENT_Y));
-	CONSTRUCT_IN_PACKET(outgoing, Scoring::UMSKill, actShooter, stoUID);
-
+	Teul::Packet outgoing(Teul::PacketId(Scoring::CallbackX, Scoring::EVENT_Y));
+	outgoing.construct<Scoring::UMSKill>(actShooter, stoUID);
 	return serverSendPacketToType(outgoing, MAP_HOST);
 }
 
@@ -455,8 +453,7 @@ chatSendUMSKill(const Player* player, const UINT32 stoUID)
 SINT32
 StratCommand::send()
 {
-	Teul::Packet outgoing(sizeof(*this), Teul::PacketId(Chat::CallbackX, Chat::EXCHANGE_SCMD_Y));
-	outgoing.append(*this);
+	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::EXCHANGE_SCMD_Y), *this);
 	return serverSendPacketToType(outgoing, STRAT_HOST);
 }
 
@@ -487,7 +484,8 @@ chatSendStratCommand(SINT32 playerID, int cmd, const FULL_OBJ_ID& cp, WWII_SIDE 
 SINT32
 chatSendPopulation()
 {
-	Teul::Packet outgoing(sizeof(UINT32) * MAX_SIDES, Teul::PacketId(Strat::CallbackX, STRT_POPULATION_NOTICE_Y));
+	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_POPULATION_NOTICE_Y));
+	outgoing.reserve(sizeof(UINT32)* MAX_SIDES);
 	UINT32 sideCounts[MAX_SIDES];
 	for ( UINT32 i = 0; i < MAX_SIDES; ++i )
 	{
@@ -507,8 +505,7 @@ chatSendPopulation()
 SINT32
 chatSendMissionDeleteRequest(const UINT32& missionID)
 {
-	Teul::Packet outgoing(0, Teul::PacketId(Chat::CallbackX, Chat::MISSION_DELETION_Y));
-	outgoing.append(missionID);
+	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::MISSION_DELETION_Y), missionID);
 	return serverSendPacketToType(outgoing, MAP_HOST) ? 0 : -ENOTCONN;
 }
 
@@ -640,8 +637,8 @@ SquadList::sendMessage(int prefix, int message, const char* m1, const char* m2)
 void
 chatSendBackupLeaderChange(UINT32 missionID, UINT32 playerID)
 {
-	Teul::Packet outgoing(0, Teul::PacketId(Chat::CallbackX, Chat::MISSION_LEADER_CHANGE_Y));
-	CONSTRUCT_IN_PACKET(outgoing, LeaderChange, missionID, playerID, 0, 0, LeaderChange::_SET_BACKUP_LEADER);
+	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::MISSION_LEADER_CHANGE_Y));
+	outgoing.construct<LeaderChange>(missionID, playerID, 0, 0, LeaderChange::_SET_BACKUP_LEADER);
 	serverSendPacketToType(outgoing, MAP_HOST);
 }
 
@@ -651,8 +648,8 @@ chatSendBackupLeaderChange(UINT32 missionID, UINT32 playerID)
 void
 chatSendLeaderChange(UINT32 missionID, UINT32 playerID, const ChatHandle& handle, const ChatHandle& requester)
 {
-	Teul::Packet outgoing(0, Teul::PacketId(Chat::CallbackX, Chat::MISSION_LEADER_CHANGE_Y));
-	CONSTRUCT_IN_PACKET(outgoing, LeaderChange, missionID, playerID, handle, requester, LeaderChange::_SUCCESS);
+	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::MISSION_LEADER_CHANGE_Y));
+	outgoing.construct<LeaderChange>(missionID, playerID, handle, requester, LeaderChange::_SUCCESS);
 	serverSendPacketToType(outgoing, MAP_HOST);
 }
 
@@ -1117,10 +1114,8 @@ chatSendBandwidthNotice(const playerid_t playerID, UINT32 mode)
 	if ( psn == nullptr || psn->m_curServer.type != CELL_HOST )
 		return false;
 
-	Teul::Packet outgoing(0, Teul::PacketId(Chat::CallbackX, Chat::BANDWIDTH_NOTICE_Y));
-	auto& change = outgoing.allocate<BANDWIDTH_CHANGE>();
-	change.playerID = playerID;
-	change.mode = mode;
+	BANDWIDTH_CHANGE change { playerID, mode };
+	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::BANDWIDTH_NOTICE_Y), change);
 
 	if ( g_debugPersonas )
 		dbugLog(_FLD, "p:%u c:%s Requesting host %s give mode %u after spawning"
@@ -1194,11 +1189,8 @@ chatSendSmiteUser(UINT32 customerID, const char* handle)
 	if ( customerID == 0 && handle[0] == 0 )
 		return 0;
 
-	Teul::Packet outgoing(sizeof(CHAT_SMITE_USER), Teul::PacketId(Chat::CallbackX, Chat::SMITE_USER_Y));
-	CHAT_SMITE_USER& smiteUser = outgoing.allocate<CHAT_SMITE_USER>();
-	smiteUser.customerID = customerID;
-	smiteUser.m_handle = chatGetHandle(handle);
-
+	CHAT_SMITE_USER smite { customerID, chatGetHandle(handle) };
+	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::SMITE_USER_Y), smite);
 	return serverSendPacketToPeers(outgoing);
 }
 
@@ -1211,9 +1203,8 @@ namespace Chat
 bool
 SendPlayerMove(UINT32 cellHost, Chat::PlayerMove& move)
 {
-	Teul::Packet outgoing(sizeof(PlayerMove), Teul::PacketId(Host::CallbackX, Host::Callbacks::MovePlayer_Y));
 	dbugLog(_FLD, "sending p:%u moving:%d/%d/%d to cell %u", move.m_playerID, move.m_x, move.m_y, move.m_z, cellHost);
-	outgoing.append(move);
+	Teul::Packet outgoing(Teul::PacketId(Host::CallbackX, Host::Callbacks::MovePlayer_Y), move);
 	return outgoing.send(serverGetPeerIndex(cellHost, CELL_HOST));
 }
 
@@ -1239,8 +1230,7 @@ chatSendLocateUser(Player& requester, const playerid_t playerID)
 	if (psn && psn->m_curServer.type == CELL_HOST)
 	{
 		dbugLog(_FLI, "Sending chatSendLocateUser for %d to %s", playerID, teulGetAddress(psn->m_curServer.address));
-		Teul::Packet outgoing(0, Teul::PacketId(Chat::CallbackX, Chat::LOCATE_USER_Y));
-		outgoing.append(locUser);
+		Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::LOCATE_USER_Y), locUser);
 		SINT32 cellIndex = serverGetPeerIndex(psn->m_curServer.address, psn->m_curServer.type);
 		outgoing.send(cellIndex);
 	}
@@ -1282,10 +1272,8 @@ chatSendForcedDespawn(Player* player, LSTRING_ID messageID, const char* reason)
 	// Tell them
 	player->message(LSTR_WARNING, messageID, reason);
 
-	playerid_t playerID = player->playerID();
-	Teul::Packet outgoing(sizeof(playerID), Teul::PacketId(Host::CallbackX, Host::Callbacks::ForceDespawn_Y));
+	Teul::Packet outgoing(Teul::PacketId(Host::CallbackX, Host::Callbacks::ForceDespawn_Y), player->playerID());
 	outgoing.setUnencrypted();
-	outgoing.append(playerID);
 	outgoing.send(cellIndex);
 
 	return true;
@@ -1389,8 +1377,8 @@ _recvBroadcastMessage(ACTION_OBJECT* const a)
 void
 chatSendMapPersonaUpdate(playerid_t playerID, bool isSquadUpdate, UINT32 squadID, const ChatHandle& squadHandle, bool isDecalUpdate, UINT32 decal)
 {
-	Teul::Packet outgoing(0, Teul::PacketId(Chat::CallbackX, Chat::MAP_PERSONA_UPDATE_Y));
-	CONSTRUCT_IN_PACKET(outgoing, MapPersonaUpdate, squadHandle, isSquadUpdate, isDecalUpdate, playerID, squadID, decal);
+	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::MAP_PERSONA_UPDATE_Y));
+	outgoing.construct<MapPersonaUpdate>(squadHandle, isSquadUpdate, isDecalUpdate, playerID, squadID, decal);
 	serverSendPacketToType(outgoing, MAP_HOST);
 }
 

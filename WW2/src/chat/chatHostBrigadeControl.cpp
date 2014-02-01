@@ -248,8 +248,9 @@ _requestList(Player* player, UCHAR country, UCHAR branch)
 
 	_populateControllers();
 
-	Teul::Packet outgoing((controllers.size() / 3) * sizeof(BrigadeControlList), Teul::PacketId(Chat::CallbackX, Chat::BRIGADE_CONTROL_LIST_Y));
+	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::BRIGADE_CONTROL_LIST_Y));
 
+	outgoing.reserve((controllers.size() / 3) * sizeof(BrigadeControlList));
 	outgoing.append(country);
 	outgoing.append(branch);
 	outgoing.append(player->permissionMask());
@@ -265,7 +266,7 @@ _requestList(Player* player, UCHAR country, UCHAR branch)
 			continue;
 
 		// Create a new BCL on the packet.
-		auto& entry = *(CONSTRUCT_IN_PACKET(outgoing, BrigadeControlList, it->first, bc.canVote(player)));
+		auto& entry = outgoing.construct<BrigadeControlList>(it->first, bc.canVote(player));
 		if ( bc.oic() )
 		{
 			entry.m_officer = bc.oic()->chatHandle();
@@ -854,8 +855,8 @@ _sendAttackOrder(const Player* const player
 				, const ORDER_TYPE orderType
 				, const bool execute)
 {
-	Teul::Packet outgoing(0, Teul::PacketId(Strat::CallbackX, STRT_ATTACK_ORDER_Y));
-	CONSTRUCT_IN_PACKET(outgoing, AttackOrder, player->chatHandle(), unit.unitID(), property->m_fid, orderType, execute);
+	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_ATTACK_ORDER_Y));
+	outgoing.construct<AttackOrder>(player->chatHandle(), unit.unitID(), property->m_fid, orderType, execute);
 	return serverSendPacketToType(outgoing, STRAT_HOST);
 }
 

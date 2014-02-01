@@ -170,7 +170,8 @@ mapSendDirtySupercellData()
 	dbugLog(_FLI, "Sending %" PRSizeT " supercells to %" PRSizeT " players in %" PRSizeT " bytes", _dirtyCells.size(), indexes.size(), _dirtyData);
 
 	// Create a packet with all of the data.
-	Teul::Packet outgoing(_dirtyData, Teul::PacketId(Map::CallbackX, Map::BUILDING_VISLEVELS_Y));
+	Teul::Packet outgoing(Teul::PacketId(Map::CallbackX, Map::BUILDING_VISLEVELS_Y));
+	outgoing.reserve(_dirtyData);
 	outgoing.setUnencrypted();
 
 	const size_t numDirtyCells = _dirtyCells.size();

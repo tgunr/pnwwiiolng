@@ -191,7 +191,7 @@ strtSendChatInitialUpdates()
 	if ( endpoint == nullptr )
 		return;
 
-	Teul::Packet outgoing(0, Teul::PacketId(Strat::CallbackX, STRT_UPDATE_Y));
+	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_UPDATE_Y));
 	UINT32 entries = 0;
 
 	CPStruct* cp = strtGetCPList();
@@ -226,7 +226,7 @@ strtSendChatInitialUpdates()
 void
 strtBroadcastStratUpdates()
 {
-	Teul::Packet outgoing(0, Teul::PacketId(Strat::CallbackX, STRT_UPDATE_Y));
+	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_UPDATE_Y));
 
 	FacilityStruct* fac = nullptr;
 	while ( (fac = _facilityQueue.next()) != nullptr )
@@ -258,14 +258,16 @@ strtBroadcastStratUpdates()
 SINT32
 strtSendPostExpired(UINT32 customerID, const WEAPON_SERIAL& weaponSerial, bool cancelled)
 {
-	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_MM_POST_EXPIRED_Y), MM_POST_EXPIRED { customerID, weaponSerial, cancelled });
+	MM_POST_EXPIRED expired { customerID, weaponSerial, cancelled };
+	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_MM_POST_EXPIRED_Y), expired);
 	return serverSendPacketToType(outgoing, MAP_HOST) ? 0 : -EINVAL;
 }
 
 SINT32
 strtBroadcastTimeUpdate(UINT32 gameTime, UINT32 timeFactor, UINT32 weatherPattern, UINT32 fogPattern)
 {
-	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_BROADCAST_TIME_UPDATE_Y), Host::TimeUpdate(gameTime, timeFactor, weatherPattern, fogPattern));
+	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_BROADCAST_TIME_UPDATE_Y));
+	outgoing.construct<Host::TimeUpdate>(gameTime, timeFactor, weatherPattern, fogPattern);
 	return serverSendPacketToPeers(outgoing);
 }
 
@@ -281,24 +283,22 @@ SINT32 strtBroadcastConfigUpdate()
 
 SINT32 strtSendMMCrewBailed(UINT32 commanderID, UINT32 crewID)
 {
-	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_MM_CREW_BAILED_Y), MM_CREW_BAILED { commanderID, crewID });
+	MM_CREW_BAILED bailed { commanderID, crewID };
+	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_MM_CREW_BAILED_Y), bailed);
 	return serverSendPacketToType(outgoing, MAP_HOST) ? 0 : -EINVAL;
 }
 
 SINT32 strtSendMMJoinDeny(UINT32 crewID, UINT32 reasonCode)
 {
-	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_MM_JOIN_DENY_Y), MM_JOIN_DENY { crewID, reasonCode });
+	MM_JOIN_DENY deny { crewID, reasonCode };
+	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_MM_JOIN_DENY_Y), reasonCode);
 	return serverSendPacketToType(outgoing, MAP_HOST) ? 0 : -EINVAL;
 }
 
-SINT32 strtSendMMJoinListResponse(UINT32 commandID, UINT32 crewID, const char* callsign)
+SINT32 strtSendMMJoinListResponse(UINT32 commandID, UINT32 crewID, ChatHandle crewHandle)
 {
-	Teul::Packet outgoing(sizeof(MM_JOIN_LIST_RESPONSE), Teul::PacketId(Strat::CallbackX, STRT_MM_JOIN_LIST_Y));
-	auto& response = outgoing.allocate<MM_JOIN_LIST_RESPONSE>();
-	response.crewID = crewID;
-	response.commandID = commandID;
-	strsafecpy(response.crewCallsign, callsign);
-
+	MM_JOIN_LIST_RESPONSE response { commandID, crewID, crewHandle };
+	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_MM_JOIN_LIST_Y), response);
 	return serverSendPacketToType(outgoing, MAP_HOST) ? 0 : -EINVAL;
 }
 
@@ -1069,8 +1069,8 @@ _recvWeaponListRequest(ACTION_OBJECT* const a)
 		return -EINVAL;
 	auto& request = a->read<WeaponListRequest>();
 
-	Teul::Packet outgoing(0, Teul::PacketId(Strat::CallbackX, STRT_FACILITY_WEAP_LIST_Y));
-	auto& reply = *(CONSTRUCT_IN_PACKET(outgoing, FacilityWeaponList, request.m_playerID, request.m_fullObjID));
+	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_FACILITY_WEAP_LIST_Y));
+	auto& reply = outgoing.construct<FacilityWeaponList>(request.m_playerID, request.m_fullObjID);
 	try
 	{
 		FacilityStruct* facility = strtGetFacility(request.m_fullObjID);
@@ -1175,7 +1175,8 @@ void
 strtSendCaptureScoreNotice(const FULL_OBJ_ID& fid, WWII_SIDE forSide)
 {
 	dbugLog(_FLI, "capscore: bld:%d,%d:%u side:%u", fid.cell.ox, fid.cell.oy, fid.id, forSide);
-	Teul::Packet outgoing(Teul::PacketId(Host::CallbackX, Host::Callbacks::CaptureScore_Y), CaptureScore(fid, forSide));
+	Teul::Packet outgoing(Teul::PacketId(Host::CallbackX, Host::Callbacks::CaptureScore_Y));
+	outgoing.construct<CaptureScore>(fid, forSide);
 	serverSendPacketToType(outgoing, CELL_HOST);
 }
 
@@ -1185,7 +1186,7 @@ strtSendCaptureScoreNotice(const FULL_OBJ_ID& fid, WWII_SIDE forSide)
 void
 strtSendCaptureState(const FacilityStruct* facility, WWII_SIDE forSide, SINT32 rate, bool spawnable)
 {
-	Teul::Packet outgoing(0, Teul::PacketId(Host::CallbackX, (UCHAR)Host::Callbacks::CaptureState_Y));
+	Teul::Packet outgoing(Teul::PacketId(Host::CallbackX, Host::Callbacks::CaptureState_Y));
 	auto& state = outgoing.allocate<CaptureState>();
 	state.populate(facility, forSide, rate, spawnable);
 

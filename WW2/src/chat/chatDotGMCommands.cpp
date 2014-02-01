@@ -360,8 +360,8 @@ public:
 		player.gmNote("GM", command(), args[0], args[1]);
 		chatDispatchGMMessage("INFO", chatMakeTempString("%s /buzzardspawning %s: %s", player.callsign(), target->callsign(), args[1]));
 
-		Teul::Packet outgoing(0, Teul::PacketId(Chat::CallbackX, Chat::BUZZARD_SPAWN_Y));
-		CONSTRUCT_IN_PACKET(outgoing, BuzzardSpawn, player.playerID(), true, location);
+		Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::BUZZARD_SPAWN_Y));
+		outgoing.construct<BuzzardSpawn>(player.playerID(), true, location);
 		serverSendPacketToType(outgoing, MAP_HOST);
 	}
 } dotBuzzardSpawn;

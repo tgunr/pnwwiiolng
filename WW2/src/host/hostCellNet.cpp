@@ -31,7 +31,7 @@
 typedef std::unordered_map<UINT32, bool> SYNCHED_VEHICLES;
 static SYNCHED_VEHICLES g_synched;
 
-static Teul::Packet vehicleBroadcasts(0, Teul::PacketId(Comm::CallbackX, BCAST_VEH_UPDATE_Y));
+static Teul::Packet vehicleBroadcasts(Teul::PacketId(Comm::CallbackX, BCAST_VEH_UPDATE_Y));
 static UINT32 numberOfVehiclesPending = 0;
 static UINT32 maxSize = 0;
 
@@ -164,7 +164,7 @@ hostForceFirstTimeUpdates()
 		return;
 
 	g_synched.clear();
-	Teul::Packet outgoing(0, Teul::PacketId(Comm::CallbackX, RESYNC_VEHICLES_Y));
+	Teul::Packet outgoing(Teul::PacketId(Comm::CallbackX, RESYNC_VEHICLES_Y));
 	outgoing.send(updateBcastSend);
 }
 
@@ -188,7 +188,7 @@ hostQueueVehicleRemove(UINT32 vehIndex, UCHAR exitCode)
 	{
 		if ( outgoing == nullptr )
 		{
-			outgoing = new Teul::Packet(0, Teul::PacketId(Comm::CallbackX, BCAST_VEH_REMOVE_Y));
+			outgoing = new Teul::Packet(Teul::PacketId(Comm::CallbackX, BCAST_VEH_REMOVE_Y));
 			outgoing->setUnencrypted();
 		}
 

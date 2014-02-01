@@ -96,7 +96,7 @@ struct ServerRole : public Role
 			throw Teul::Error("Unencrypted data was bad", -1 );
 		Dprintf("Unencrypted data looked good, sending some back\n");
 
-		Teul::Packet outgoing(0, Teul::PacketId(Role::Test_X, Role::Unencrypted_Y));
+		Teul::Packet outgoing(Teul::PacketId(Role::Test_X, Role::Unencrypted_Y));
 		outgoing.setUnencrypted();
 		outgoing.append("unencrypted", strlen("unencrypted") + 1);
 		outgoing.send(*a->endpoint);

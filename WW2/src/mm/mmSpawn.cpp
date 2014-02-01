@@ -502,7 +502,7 @@ mmProcessPostExpired(const MM_POST_EXPIRED& expiry)
 
 	player->cancelWeapon(false);
 
-	//If he cancelled it, we don't want to tell him about it.  That would
+	//If he canceled it, we don't want to tell him about it.  That would
 	//	be redundant now, wouldn't it? :)
 	if ( player->isSpawned() == false &&  expiry.cancelled == false )
 	{
@@ -643,7 +643,7 @@ mmProcessJoinListResponse(const MM_JOIN_LIST_RESPONSE& response)
 	BETAInfo(player->teulIndex());
 
 	//Send the poster a weapon letting them know that someone want to join
-	mmSendJoinPermRequest(player->teulIndex(), response.crewID, response.crewCallsign);
+	mmSendJoinPermRequest(player->teulIndex(), response.crewID, response.crewHandle);
 
 	return true;
 }

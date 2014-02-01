@@ -52,7 +52,7 @@ _recvEnemySpotted(ACTION_OBJECT* const a)
 		return a->offset;
 	}
 
-	Teul::Packet outgoing(sizeof(STRAT_ENEMY_REPORT), Teul::PacketId(Strat::CallbackX, STRT_ENEMY_REPORT_Y));
+	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_ENEMY_REPORT_Y));
 	auto& report = outgoing.allocate<STRAT_ENEMY_REPORT>();
 	a->offset = strtPackEnemySpotted(TEUL_UNPACK, a->packed, a->offset, &report, 0);
 	if ( a->offset < 0 )

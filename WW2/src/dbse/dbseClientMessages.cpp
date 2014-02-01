@@ -30,6 +30,7 @@ SINT32 dbseInstallClientCallbacks(void)
 
 SINT32 dbseSendHandshake(SINT32 teulIndex, UINT32 arena)
 {
-	Teul::Packet outgoing(Teul::PacketId(DBSE_GENERAL_X, DBSE_CLIENT_HANDSHAKE_Y), Dbse::Handshake(arena));
+	Teul::Packet outgoing(Teul::PacketId(DBSE_GENERAL_X, DBSE_CLIENT_HANDSHAKE_Y));
+	outgoing.construct<Dbse::Handshake>(arena);
 	return outgoing.send(teulIndex);
 }
