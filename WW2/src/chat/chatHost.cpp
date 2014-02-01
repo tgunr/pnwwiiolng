@@ -780,7 +780,7 @@ chatRouteGCIMessage(Chat::GCIMessage& message, UINT32 messageID)
 		}
 	}
 
-	Teul::Packet outgoing(sizeof(message), Chat::CallbackX, Chat::CLIENT_GCI_MESSAGE_Y);
+	Teul::Packet outgoing(sizeof(message), Teul::PacketId(Chat::CallbackX, Chat::CLIENT_GCI_MESSAGE_Y));
 	outgoing.append(message);
 	outgoing.send(endpoints);
 }

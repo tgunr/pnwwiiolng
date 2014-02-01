@@ -136,7 +136,6 @@ static void
 _acceptMapConnection(ENDPOINT& endpoint)
 {
 	dbugLog(_FLN, "t:%d map connection opened %s", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()));
-	cnvySetMapConnection(endpoint.teulIndex());
 }
 
 static void _mapErrorFunction(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* const object, SINT32 error)

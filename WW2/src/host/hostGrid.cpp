@@ -110,7 +110,7 @@ HostVehicle::SendRemoveList()
 	const size_t dataSize  = entrySize * count;
 	const size_t packetSize = sizeof(count) + dataSize;
 
-	Teul::Packet outgoing(packetSize, Comm::CallbackX, REMOVE_LIST_Y);
+	Teul::Packet outgoing(packetSize, Teul::PacketId(Comm::CallbackX, REMOVE_LIST_Y));
 	outgoing.setUnencrypted();
 	outgoing.append(count);
 	outgoing.append(m_worldUpdate->removeList, packetSize);

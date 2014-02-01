@@ -75,7 +75,7 @@ teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback)
 	actionObj.actionObj = &callback;
 	actionObj.localRawData = callback.outData;
 
-	Teul::Packet outgoing(Teul::MaxPacket, callback.callX(), callback.callY());
+	Teul::Packet outgoing(Teul::MaxPacket, Teul::PacketId(callback.callX(), callback.callY()));
 
 	actionObj.packed = (UCHAR*)outgoing.writePointer();
 	actionObj.offset = 0;

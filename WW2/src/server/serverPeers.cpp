@@ -156,7 +156,7 @@ _onConnect(ENDPOINT& endpoint)
 		connection->m_connected = true;
 	}
 
-	Teul::Packet outgoing(sizeof(PeerHello), Teul::Serv::CallbackX, PEER_HELLO_Y);
+	Teul::Packet outgoing(sizeof(PeerHello), Teul::PacketId(Teul::Serv::CallbackX, PEER_HELLO_Y));
 	auto& hello = outgoing.allocate<PeerHello>();
 	hello.m_type = Server::myServerInfo.stats.type;
 	outgoing.send(endpoint);

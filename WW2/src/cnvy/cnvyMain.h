@@ -36,11 +36,6 @@ void cnvyCreateConvoy(WWII_SIDE owner, WWII_COUNTRY country, LinkStruct* link, U
 //	its supplies have been transported to the depot
 void cnvyFreeConvoy(struct CONVOYSTRUCT* convoy);
 
-//Get the map host connection
-SINT32 cnvyGetMapConnection(void);
-//Set the map connection
-SINT32 cnvySetMapConnection(SINT32 connection);
-
 //tolua_begin
 //This function adds a weapon to the Expire List
 bool cnvyAddWeaponToExpireList(struct POSTED_WEAPON& weapon, UINT32 uExpireSeconds);

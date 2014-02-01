@@ -175,9 +175,7 @@ bool Scoring::Despawn::process(Player* const lhsPlayer)
 	WeaponsReturn weaponsReturn(sortie->sortieID(), sortie->despawnedTo(), (UINT32)exitCode(), isVehicleDead(), wasRecentlyHit, false, isResupply());
 	weaponsReturn.m_position = position();
 
-	Teul::Packet outgoing(sizeof(WeaponsReturn), Strat::CallbackX, STRT_SYNC_WEAPONS_RETURN_Y);
-	outgoing.append(weaponsReturn);
-
+	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_SYNC_WEAPONS_RETURN_Y), weaponsReturn);
 	const SINT32 retval = outgoing.send(mapGetStratIndex());
 	if ( retval < 0 )
 	{

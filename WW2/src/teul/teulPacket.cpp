@@ -9,7 +9,7 @@
 //////////////////////////////////////////////////////////////////////
 // Constructor for a Teul::Packet
 
-Teul::Packet::Packet(const size_t payloadCapacityBytes_, const UCHAR callX_, const UCHAR callY_)
+Teul::Packet::Packet(const size_t payloadCapacityBytes_, PacketId id)
 	: m_data(m_localData)
 	, m_packetSizeBytes(headerSizeBytes())
 	, m_capacity(DefaultLocalDataSize)
@@ -19,8 +19,8 @@ Teul::Packet::Packet(const size_t payloadCapacityBytes_, const UCHAR callX_, con
 	header().packetType(Teul::Tokens::Encrypted);
 	header().packetSizeBytes(headerSizeBytes());
 	header().m_tag = 0;
-	header().m_callX = callX_;
-	header().m_callY = callY_;
+	header().m_callX = id.m_x;
+	header().m_callY = id.m_y;
 
 	// Now ensure data is big enough to hold the payload.
 	reserve(payloadCapacityBytes_);

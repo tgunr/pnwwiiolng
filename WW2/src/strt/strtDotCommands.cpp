@@ -20,7 +20,6 @@
 #include "chat/chatSupportRPCMessages.h"
 #include "chat/chatTimeInterval.h"
 #include "chat/chatTypes.h"
-#include "cnvy/cnvyMain.h"
 #include "include/arenaLockEnums.h"
 #include "include/luaGlue.h"
 #include "include/wthrTime.h"
@@ -1425,6 +1424,7 @@ _dotSetTime(char* arguments, OOBMessage& message)
 
 	wthrSetGameTime((hour * 3600) + (minutes * 60));
 
+	extern void cnvyUpdateTime();
 	cnvyUpdateTime();
 
 	char hourBuf[4];

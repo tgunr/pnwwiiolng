@@ -465,7 +465,7 @@ struct ClientRole : public Role
 			return;
 
 		Dprintf("preparing large Teul::Packet\n");
-		Teul::Packet packet(Config::largePacketSize_bytes, Role::Test_X, Role::LargePacket_Y);
+		Teul::Packet packet(Config::largePacketSize_bytes, Teul::PacketId(Role::Test_X, Role::LargePacket_Y));
 		// We specified a capacity, so payloadSize should be zero.
 		if ( packet.payloadSizeBytes() != 0 )
 			throw Teul::Error("Expected packet to have 0 size after construction.", packet.payloadSizeBytes());
@@ -523,7 +523,7 @@ struct ClientRole : public Role
 
 		Dprintf("testing unencrypted send\n");
 
-		Teul::Packet outgoing(0, Role::Test_X, Role::Unencrypted_Y);
+		Teul::Packet outgoing(0, Teul::PacketId(Role::Test_X, Role::Unencrypted_Y));
 		outgoing.setUnencrypted();
 		outgoing.append("unencrypted", strlen("unencrypted") + 1);
 
@@ -564,8 +564,7 @@ struct ClientRole : public Role
 
 		Dprintf("sending object-method test packets\n");
 
-		Teul::Packet outgoing(sizeof(s_sourceTestObject), Role::Test_X, Role::ObjTest_Y);
-		outgoing.append(s_sourceTestObject);
+		Teul::Packet outgoing(Teul::PacketId(Role::Test_X, Role::ObjTest_Y), s_sourceTestObject);
 		outgoing.send(teulIndex);
 		WaitForTestObjectReply();
 	}
@@ -591,7 +590,7 @@ struct ClientRole : public Role
 
 		Iprintf("sending %u spam messages\n", numUnits);
 
-		Teul::Packet outgoing(size, Role::Test_X, Role::Spam_Y);
+		Teul::Packet outgoing(size, Teul::PacketId(Role::Test_X, Role::Spam_Y));
 		outgoing.setUnencrypted();
 		for (size_t i = 0; i < size; ++i)
 		{

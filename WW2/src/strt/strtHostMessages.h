@@ -32,8 +32,8 @@ extern SINT32 strtSendCPStatus(UINT32 address, UINT16 port, class CPStruct* cp);
 extern SINT32 strtSendPostExpired(UINT32 customerID, const WEAPON_SERIAL& weaponSerial, bool cancelled);
 
 // Notify a specific connection of a time update
-extern SINT32 strtSendMMCrewBailed(SINT32 hostConnection, UINT32 comanderID,UINT32 crewID);
-extern SINT32 strtSendMMJoinDeny(SINT32 hostConnection, UINT32 crewID,UINT32 reasonCode);
+extern SINT32 strtSendMMCrewBailed(UINT32 comanderID, UINT32 crewID);
+extern SINT32 strtSendMMJoinDeny(UINT32 crewID,UINT32 reasonCode);
 extern SINT32 strtSendMMJoinListResponse(UINT32 commandID, UINT32 crewID, const char* callsign);
 
 // Process a capacity request and send the response

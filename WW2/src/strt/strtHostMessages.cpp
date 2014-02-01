@@ -14,7 +14,6 @@
 
 #include "chat/chatConstants.h"
 #include "chat/chatStratSupportMessages.h"
-#include "cnvy/cnvyMain.h"
 #include "host/hostConstants.h"
 #include "host/hostTimeUpdate.h"
 #include "include/luaClient.h"
@@ -80,17 +79,13 @@ static	TEUL_CALLBACK* _SEND_MM_POST_ACCEPT;
 static	TEUL_CALLBACK* _SEND_MM_POST_DENY;
 static	TEUL_CALLBACK* _SEND_MM_JOIN_ACCEPT;
 static	TEUL_CALLBACK* _SEND_MM_JOIN_DENY;
-static	TEUL_CALLBACK* _SEND_MM_POST_EXPIRED;
 static	TEUL_CALLBACK* _XCHG_MM_SPAWN_GRANT;
 static	TEUL_CALLBACK* _XCHG_MM_POST_INFO;
-static	TEUL_CALLBACK* _SEND_MM_CREW_BAILED;
 static	TEUL_CALLBACK* _XCHG_MM_CAPACITY;
 
 static	TEUL_CALLBACK* _SEND_SYNC_CPS;
 static	TEUL_CALLBACK* _SEND_SYNC_FACILITIES;
 static	TEUL_CALLBACK* _SEND_SYNC_BUILDINGS;
-
-static	TEUL_CALLBACK* _XCHG_MM_JOIN_LIST;
 
 static LOGICAL _allowSyncing = FALSE;
 
@@ -196,7 +191,7 @@ strtSendChatInitialUpdates()
 	if ( endpoint == nullptr )
 		return;
 
-	Teul::Packet outgoing(0, Strat::CallbackX, STRT_UPDATE_Y);
+	Teul::Packet outgoing(0, Teul::PacketId(Strat::CallbackX, STRT_UPDATE_Y));
 	UINT32 entries = 0;
 
 	CPStruct* cp = strtGetCPList();
@@ -231,7 +226,7 @@ strtSendChatInitialUpdates()
 void
 strtBroadcastStratUpdates()
 {
-	Teul::Packet outgoing(0, Strat::CallbackX, STRT_UPDATE_Y);
+	Teul::Packet outgoing(0, Teul::PacketId(Strat::CallbackX, STRT_UPDATE_Y));
 
 	FacilityStruct* fac = nullptr;
 	while ( (fac = _facilityQueue.next()) != nullptr )
@@ -263,20 +258,14 @@ strtBroadcastStratUpdates()
 SINT32
 strtSendPostExpired(UINT32 customerID, const WEAPON_SERIAL& weaponSerial, bool cancelled)
 {
-	MM_POST_EXPIRED postExpired;
-
-	postExpired.customerID = customerID;
-	postExpired.weaponSerial = weaponSerial;
-	postExpired.cancelled = cancelled;
-
-	return teulSend(cnvyGetMapConnection(), _SEND_MM_POST_EXPIRED, &postExpired);
+	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_MM_POST_EXPIRED_Y), MM_POST_EXPIRED { customerID, weaponSerial, cancelled });
+	return serverSendPacketToType(outgoing, MAP_HOST) ? 0 : -EINVAL;
 }
 
 SINT32
 strtBroadcastTimeUpdate(UINT32 gameTime, UINT32 timeFactor, UINT32 weatherPattern, UINT32 fogPattern)
 {
-	Teul::Packet outgoing(0, Strat::CallbackX, STRT_BROADCAST_TIME_UPDATE_Y);
-	CONSTRUCT_IN_PACKET(outgoing, Host::TimeUpdate, gameTime, timeFactor, weatherPattern, fogPattern);
+	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_BROADCAST_TIME_UPDATE_Y), Host::TimeUpdate(gameTime, timeFactor, weatherPattern, fogPattern));
 	return serverSendPacketToPeers(outgoing);
 }
 
@@ -286,40 +275,31 @@ SINT32 strtBroadcastConfigUpdate()
 	{
 		host_config.routDestination[i] = (routDestination[i] ? routDestination[i]->fullObjID.Key() : 0ULL);
 	}
-	Teul::Packet outgoing(sizeof(host_config), Strat::CallbackX, STRT_BROADCAST_CONFIG_UPDATE_Y);
-	outgoing.append(host_config);
+	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_BROADCAST_CONFIG_UPDATE_Y), host_config);
 	return serverSendPacketToPeers(outgoing);
 }
 
-SINT32 strtSendMMCrewBailed(SINT32 hostConnection, UINT32 comanderID,UINT32 crewID)
+SINT32 strtSendMMCrewBailed(UINT32 commanderID, UINT32 crewID)
 {
-MM_CREW_BAILED crewBailed;
-
-	crewBailed.comanderID = comanderID;
-	crewBailed.crewID = crewID;
-
-	return teulSend(hostConnection, _SEND_MM_CREW_BAILED, &crewBailed);
+	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_MM_CREW_BAILED_Y), MM_CREW_BAILED { commanderID, crewID });
+	return serverSendPacketToType(outgoing, MAP_HOST) ? 0 : -EINVAL;
 }
 
-SINT32 strtSendMMJoinDeny(SINT32 hostConnection, UINT32 crewID,UINT32 reasonCode)
+SINT32 strtSendMMJoinDeny(UINT32 crewID, UINT32 reasonCode)
 {
-MM_JOIN_DENY joinDeny;
-
-	joinDeny.customerID = crewID;
-	joinDeny.reasonCode = reasonCode;
-
-	return teulSend(hostConnection, _SEND_MM_JOIN_DENY, &joinDeny);
+	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_MM_JOIN_DENY_Y), MM_JOIN_DENY { crewID, reasonCode });
+	return serverSendPacketToType(outgoing, MAP_HOST) ? 0 : -EINVAL;
 }
 
 SINT32 strtSendMMJoinListResponse(UINT32 commandID, UINT32 crewID, const char* callsign)
 {
-	MM_JOIN_LIST_RESPONSE response;
-
+	Teul::Packet outgoing(sizeof(MM_JOIN_LIST_RESPONSE), Teul::PacketId(Strat::CallbackX, STRT_MM_JOIN_LIST_Y));
+	auto& response = outgoing.allocate<MM_JOIN_LIST_RESPONSE>();
 	response.crewID = crewID;
 	response.commandID = commandID;
-	strlcpy(response.crewCallsign, callsign, sizeof(response.crewCallsign));
+	strsafecpy(response.crewCallsign, callsign);
 
-	return teulSend(cnvyGetMapConnection(), _XCHG_MM_JOIN_LIST, &response);
+	return serverSendPacketToType(outgoing, MAP_HOST) ? 0 : -EINVAL;
 }
 
 //A lot smarter than the rest of the send functions, this function actually
@@ -651,11 +631,6 @@ static SINT32 _sendMMJoinDeny(ACTION_OBJECT* const a)
 	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(MM_JOIN_DENY));
 }
 
-static SINT32 _sendMMPostExpired(ACTION_OBJECT* const a)
-{
-	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(MM_POST_EXPIRED));
-}
-
 static SINT32 _recvMMSpawnGrantRequest(ACTION_OBJECT* const a)
 {
 MM_SPAWN_GRANT_REQUEST spawnGrantRequest;
@@ -725,7 +700,7 @@ _recvMMJoinListRequest(ACTION_OBJECT* const a)
 	if ( strtProcessJoinListRequest(a->teulIndex, request) == false )
 	{
 		betaLog(_FLD, "p:%u joinListRequest failed, sending deny", request.customerID);
-		strtSendMMJoinDeny(a->teulIndex, request.customerID, MM_JOIN_FAIL_CANT_FIND_POSTED_WEAPON);
+		strtSendMMJoinDeny(request.customerID, MM_JOIN_FAIL_CANT_FIND_POSTED_WEAPON);
 	}
 
 	return a->offset;
@@ -767,11 +742,6 @@ static SINT32 _sendMMPostInfoResponse(ACTION_OBJECT* const a)
 	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(MM_POST_INFO_RESPONSE));
 }
 
-static SINT32 _sendMMJoinListResponse(ACTION_OBJECT* const a)
-{
-	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(MM_JOIN_LIST_RESPONSE));
-}
-
 static SINT32 _recvWeaponsReturn(ACTION_OBJECT* const a)
 {
 	WeaponsReturn& incoming = *(WeaponsReturn*)(a->packed);
@@ -806,12 +776,6 @@ _recvMMSpawnCancel(ACTION_OBJECT* const a)
 	strtProcessSpawnCancel(&spawnCancel);
 
 	return a->offset;
-}
-
-static SINT32
-_sendMMCrewBailed(ACTION_OBJECT* const a)
-{
-	return teulPackVoid(TEUL_PACK, a->packed, a->offset, a->localRawData, sizeof(MM_CREW_BAILED));
 }
 
 static SINT32
@@ -963,9 +927,8 @@ _recvLua(ACTION_OBJECT* const a)
 	reply += LUA_END_SEQ;
 
 	const size_t lenWithNullByte = reply.length() + 1;
-	Teul::Packet outgoing(lenWithNullByte, (UCHAR)Host::CallbackX, (UCHAR)Host::Callbacks::LuaPacket_Y);
+	Teul::Packet outgoing(Teul::PacketId(Host::CallbackX, Host::Callbacks::LuaPacket_Y), reply.c_str(), lenWithNullByte);
 	outgoing.setUnencrypted();
-	outgoing.append(reply.c_str(), lenWithNullByte);
 	outgoing.send(a->teulIndex);
 
 	results.clear();
@@ -1081,8 +1044,7 @@ AttackOrder::process()
 		dbugLog(_FLDB, " result: %u", m_result);
 
 	// Send back the response
-	Teul::Packet outgoing(sizeof(*this), Chat::CallbackX, Chat::ATTACK_ORDER_Y);
-	outgoing.append(this, sizeof(*this));
+	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::ATTACK_ORDER_Y), *this);
 	serverSendPacketToType(outgoing, CHAT_HOST);
 }
 
@@ -1107,7 +1069,7 @@ _recvWeaponListRequest(ACTION_OBJECT* const a)
 		return -EINVAL;
 	auto& request = a->read<WeaponListRequest>();
 
-	Teul::Packet outgoing(0, Strat::CallbackX, STRT_FACILITY_WEAP_LIST_Y);
+	Teul::Packet outgoing(0, Teul::PacketId(Strat::CallbackX, STRT_FACILITY_WEAP_LIST_Y));
 	auto& reply = *(CONSTRUCT_IN_PACKET(outgoing, FacilityWeaponList, request.m_playerID, request.m_fullObjID));
 	try
 	{
@@ -1175,7 +1137,7 @@ strtHostInstallCallbacks(void)
 		REGISTER_RECEIVER(STRT_MM_POST_LIST_Y, _recvMMPostListRequest);
 		REGISTER_RECVSEND(STRT_MM_SPAWN_GRANT_Y, _recvMMSpawnGrantRequest, _sendMMSpawnGrantResponse, _XCHG_MM_SPAWN_GRANT);
 		REGISTER_RECVSEND(STRT_MM_POST_INFO_Y, _recvMMPostInfoRequest, _sendMMPostInfoResponse, _XCHG_MM_POST_INFO);
-		REGISTER_RECVSEND(STRT_MM_JOIN_LIST_Y, _recvMMJoinListRequest, _sendMMJoinListResponse, _XCHG_MM_JOIN_LIST);
+		REGISTER_RECEIVER(STRT_MM_JOIN_LIST_Y, _recvMMJoinListRequest);
 		REGISTER_RECVSEND(STRT_MM_CAPACITY_Y, _recvMMCapacityRequest, _sendMMCapacityResponse, _XCHG_MM_CAPACITY);
 
 		REGISTER_RECEIVER(STRT_SYNC_DAMAGE_LIST_Y, _recvSyncDamageList);
@@ -1191,8 +1153,6 @@ strtHostInstallCallbacks(void)
 		REGISTER_SENDER(STRT_MM_POST_DENY_Y, _sendMMPostDeny, _SEND_MM_POST_DENY);
 		REGISTER_SENDER(STRT_MM_JOIN_ACCEPT_Y, _sendMMJoinAccept, _SEND_MM_JOIN_ACCEPT);
 		REGISTER_SENDER(STRT_MM_JOIN_DENY_Y, _sendMMJoinDeny, _SEND_MM_JOIN_DENY);
-		REGISTER_SENDER(STRT_MM_POST_EXPIRED_Y, _sendMMPostExpired, _SEND_MM_POST_EXPIRED);
-		REGISTER_SENDER(STRT_MM_CREW_BAILED_Y, _sendMMCrewBailed, _SEND_MM_CREW_BAILED);
 		REGISTER_SENDER(STRT_SYNC_CPS_Y, _sendSyncCPs, _SEND_SYNC_CPS);
 		REGISTER_SENDER(STRT_SYNC_FACILITIES_Y, _sendSyncFacilities, _SEND_SYNC_FACILITIES);
 		REGISTER_SENDER(STRT_SYNC_BUILDINGS_Y, _sendSyncBuildings, _SEND_SYNC_BUILDINGS);
@@ -1217,10 +1177,8 @@ strtHostInstallCallbacks(void)
 void
 strtSendCaptureScoreNotice(const FULL_OBJ_ID& fid, WWII_SIDE forSide)
 {
-	Teul::Packet outgoing(0, Host::CallbackX, (UCHAR)Host::Callbacks::CaptureScore_Y);
-	CONSTRUCT_IN_PACKET(outgoing, CaptureScore, fid, forSide);
-
 	dbugLog(_FLI, "capscore: bld:%d,%d:%u side:%u", fid.cell.ox, fid.cell.oy, fid.id, forSide);
+	Teul::Packet outgoing(Teul::PacketId(Host::CallbackX, Host::Callbacks::CaptureScore_Y), CaptureScore(fid, forSide));
 	serverSendPacketToType(outgoing, CELL_HOST);
 }
 
@@ -1230,7 +1188,7 @@ strtSendCaptureScoreNotice(const FULL_OBJ_ID& fid, WWII_SIDE forSide)
 void
 strtSendCaptureState(const FacilityStruct* facility, WWII_SIDE forSide, SINT32 rate, bool spawnable)
 {
-	Teul::Packet outgoing(0, Host::CallbackX, (UCHAR)Host::Callbacks::CaptureState_Y);
+	Teul::Packet outgoing(0, Teul::PacketId(Host::CallbackX, (UCHAR)Host::Callbacks::CaptureState_Y));
 	auto& state = outgoing.allocate<CaptureState>();
 	state.populate(facility, forSide, rate, spawnable);
 

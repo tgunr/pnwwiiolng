@@ -124,8 +124,7 @@ void chatSendServerInfo(SINT32 teulIndex, UINT32 otp, UINT32 ipAddress, UINT16 p
 SINT32
 chatSendMissionDeletionNotice(const UINT32& missionID)
 {
-	Teul::Packet outgoing(0, Chat::CallbackX, Chat::MISSION_DELETION_Y);
-	outgoing.append(missionID);
+	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::MISSION_DELETION_Y), missionID);
 	return serverSendPacketToType(outgoing, CHAT_HOST) ? 0 : -ENOTCONN;
 }
 
@@ -251,8 +250,7 @@ _recvLeaderChange(ACTION_OBJECT* const a)
 		ENDPOINT* const endpoint = a->endpoint;
 		if ( endpoint != nullptr )
 		{
-			Teul::Packet outgoing(0, Chat::CallbackX, Chat::MISSION_LEADER_CHANGE_Y);
-			outgoing.append(incoming);
+			Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::MISSION_LEADER_CHANGE_Y), incoming);
 			outgoing.send(*endpoint);
 		}
 	}

@@ -51,7 +51,7 @@ public:	virtual bool Run() OVERRIDE_FN
 				START_SUB_STAGE( "Basic" )
 
 					// Test assumptions about the default configuration of the packet.
-					Teul::Packet packet(0, TestCallX, TestCallY);
+					Teul::Packet packet(0, Teul::PacketId(TestCallX, TestCallY));
 
 					// In terms of data, the packet should be empty.
 					CRITICAL( ExpectTrue( packet.empty() ) );
@@ -84,7 +84,7 @@ public:	virtual bool Run() OVERRIDE_FN
 					// Check that providing an initial capacity creates a capacity allocation.
 					static const size_t requestCapacityBytes = Teul::Packet::GrowthRate * 8 + 1;
 					static const size_t expectCapacityBytes = Teul::Packet::GrowthRate * 9;
-					Teul::Packet packet(requestCapacityBytes, TestCallX, TestCallY);
+					Teul::Packet packet(requestCapacityBytes, Teul::PacketId(TestCallX, TestCallY));
 					CRITICAL( ExpectEqual( packet.packetCapacityBytes(), expectCapacityBytes ) );
 					CRITICAL( ExpectTrue( packet.empty() ) );
 
@@ -95,7 +95,7 @@ public:	virtual bool Run() OVERRIDE_FN
 			// Test that adding data causes growth and/or reallocation.
 			START_TEST_STAGE( "Growth" )
 
-				Teul::Packet packet(0, TestCallX, TestCallY);
+				Teul::Packet packet(0, Teul::PacketId(TestCallX, TestCallY));
 				CRITICAL( ExpectEqual( packet.payloadCapacityBytes(), Teul::Packet::DefaultLocalDataSize - packet.headerSizeBytes() ) );
 
 				// The packet starts using it's own, small internal data store for the
@@ -144,7 +144,7 @@ public:	virtual bool Run() OVERRIDE_FN
 				static const float expectResult = (testFloat * 100) + (float)testUint + (float)testUchar;
 
 				// Test the in-place constructor.
-				Teul::Packet packet(0, TestCallX, TestCallY);
+				Teul::Packet packet(0, Teul::PacketId(TestCallX, TestCallY));
 				TestStruct* ts = CONSTRUCT_IN_PACKET(packet, TestStruct, testUint, testUchar, &testFloat);
 
 				// Ts should have the same address as the start of the payload.

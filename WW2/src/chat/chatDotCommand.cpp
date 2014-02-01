@@ -586,7 +586,7 @@ DotCommandIndex::buildCommandListPacket()
 	if ( g_commandListPacket )
 		delete g_commandListPacket;
 
-	g_commandListPacket = new Teul::Packet(0, CHAT_X, Chat::CMD_LIST_Y);
+	g_commandListPacket = new Teul::Packet(0, Teul::PacketId(CHAT_X, Chat::CMD_LIST_Y));
 	g_commandListPacket->setUnencrypted();
 
 	g_commandListPacket->append((Chat::cmdcount_t)0);

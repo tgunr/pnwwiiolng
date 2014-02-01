@@ -14,7 +14,6 @@
 
 #include "versionNo.h"
 
-#include "cnvy/cnvyMain.h"
 #include "map/mapConstants.h"
 #include "parse/parseWor.h"
 #include "sdm/sdmConfigVars.h"

@@ -16,7 +16,7 @@
 #include "chat/chatSideMessage.h"
 #include "chat/chatStratSupportMessages.h"
 #include "chat/chatTypes.h"
-#include "cnvy/cnvyMain.h"
+//#include "cnvy/cnvyMain.h"
 #include "server/serverServerInfo.h"
 #include "strt/strtCP.h"
 #include "strt/strtCPStruct.h"

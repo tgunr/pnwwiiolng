@@ -123,7 +123,7 @@ Player::activate(SINT32 newIndex, PlayerStatusNode* psn)
 	if ( isManager() )
 		return;
 
-	Teul::Packet outgoing(sizeof(playerID()), CHAT_X, Chat::MAP_REFRESH_PLAYER_Y);
+	Teul::Packet outgoing(sizeof(playerID()), Teul::PacketId(CHAT_X, Chat::MAP_REFRESH_PLAYER_Y));
 	outgoing.append(playerID());
 	serverSendPacketToType(outgoing, MAP_HOST);
 

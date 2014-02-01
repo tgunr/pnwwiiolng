@@ -460,7 +460,7 @@ POSTED_WEAPON::detachCrewAndJoiners(bool includeCommander)
 
 	if ( m_crew != 0 )
 	{
-		strtSendMMJoinDeny(cnvyGetMapConnection(), m_crew, MM_JOIN_FAIL_POSTER_DENIED_ACCESS);
+		strtSendMMJoinDeny(m_crew, MM_JOIN_FAIL_POSTER_DENIED_ACCESS);
 		m_crew = 0;
 	}
 }
@@ -516,7 +516,7 @@ _cleanUpJoinNode(WeapJoinRequestNode* joinNode)
 					postedWeapon.setMulticrew(false);
 				}
 
-				strtSendMMCrewBailed(cnvyGetMapConnection(), postedWeapon.m_commander, joinNode->m_playerID);
+				strtSendMMCrewBailed(postedWeapon.m_commander, joinNode->m_playerID);
 			}
 		}
 	}
@@ -559,7 +559,7 @@ strtProcessPostListRequest(SINT32 teulIndex, const MM_POST_LIST_REQUEST& request
 
 	// Find all the posted weapons that are valid for us.
 	const size_t maxPossibleSize = sizeof(PostListReply) + sizeof(MM_POSTED_WEAPON) * unit->postedWeaponList().size() + 16;
-	Teul::Packet outgoing(maxPossibleSize, Strat::CallbackX, STRT_MM_POST_LIST_Y);
+	Teul::Packet outgoing(maxPossibleSize, Teul::PacketId(Strat::CallbackX, STRT_MM_POST_LIST_Y));
 	CONSTRUCT_IN_PACKET(outgoing, PostListReply, COMMANDED_WEAPON_ADD, request.crewID, facility->uOID);
 
 	UINT32 weapons = 0;
@@ -854,9 +854,9 @@ POSTED_WEAPON::setMulticrew(bool isMulticrew)
 		if ( node->m_missionID != m_missionID )
 			continue;
 
-		Teul::Packet outgoing(0, Strat::CallbackX, STRT_MM_POST_LIST_Y);
-		CONSTRUCT_IN_PACKET(outgoing, PostListReply, action, node->m_playerID, m_facility->uOID);
-		outgoing.allocate<MM_POSTED_WEAPON>().copy(*this);
+		Teul::Packet outgoing(sizeof(PostListReply) + sizeof(*this), Teul::PacketId(Strat::CallbackX, STRT_MM_POST_LIST_Y));
+		outgoing.construct<PostListReply>(action, node->m_playerID, m_facility->uOID);
+		outgoing.append(*this);
 		serverSendPacketToType(outgoing, MAP_HOST);
 	}
 }

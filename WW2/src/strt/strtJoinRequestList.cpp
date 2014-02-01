@@ -14,7 +14,7 @@
 #include "strt/strtServerTypes.h"
 #include "strt/strtJoinList.h"
 #include "mem/mem.h"
-#include "cnvy/cnvyMain.h"
+//#include "cnvy/cnvyMain.h"
 #include "strt/strtHostMessages.h"
 
 typedef std::map<UINT32, WeapJoinRequestNode*> JOIN_MAP;
@@ -39,7 +39,7 @@ JOIN_LIST::clear(UINT32 exceptPlayerID, bool announce)
 		else
 		{
 			if ( announce )
-				strtSendMMJoinDeny(cnvyGetMapConnection(), node->m_playerID, MM_JOIN_FAIL_POSTER_DENIED_ACCESS);
+				strtSendMMJoinDeny(node->m_playerID, MM_JOIN_FAIL_POSTER_DENIED_ACCESS);
 			// Remember: Delete will extract the node from the list.
 			delete node;
 		}

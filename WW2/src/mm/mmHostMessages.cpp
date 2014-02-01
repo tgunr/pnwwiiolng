@@ -381,9 +381,8 @@ _recvDoDespawn(struct ACTION_OBJECT* const a)
 	const auto cellIndex = serverGetPeerIndex(player->m_lastSpawnedTo, CELL_HOST);
 	if ( cellIndex >= 0 )
 	{
-		Teul::Packet outgoing(0, Comm::CallbackX, DESPAWNED_Y);
+		Teul::Packet outgoing(Teul::PacketId(Comm::CallbackX, DESPAWNED_Y), player->playerID());
 		outgoing.setUnencrypted();
-		outgoing.append(player->playerID());
 		outgoing.send(cellIndex);
 	}
 
@@ -416,9 +415,8 @@ Host::VehicleRequest::send(const Server::ServerInfo* server)
 		return;
 	}
 
-	Teul::Packet outgoing(sizeof(*this), MMHost::CallbackX, MMHost::WEAPONS_HANDOFF_Y);
+	Teul::Packet outgoing(Teul::PacketId(MMHost::CallbackX, MMHost::WEAPONS_HANDOFF_Y), *this);
 	outgoing.setUnencrypted();
-	outgoing.append(this, sizeof(*this));
 	const SINT32 result = outgoing.send(cellIndex);
 	dbugLog(_FLD, "sending vehicle request to t:%d a:%u returned:%d", cellIndex, server->stats.address & DIRECT_MASK, result);
 }

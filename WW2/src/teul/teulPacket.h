@@ -34,16 +34,46 @@ struct PacketHeader;
 //! the data will be encrypted in-place immediately prior to sending,
 //! again avoiding a copy operation.
 
+struct PacketId
+{
+	uint8_t	m_x, m_y;
+	template<typename T1, typename T2> PacketId(T1 callX, T2 callY) : m_x((uint8_t)callX), m_y((uint8_t)callY) {}
+};
+
 class Packet
 {
 	//! Create a packet for a specific callback.
-	public: Packet(const size_t payloadCapacityBytes_, const unsigned char callX_, const unsigned char callY_);
+	public: Packet(const size_t payloadCapacityBytes_, PacketId id);
+	public: Packet(PacketId id) : Packet(0, id) {}
 	//! Default/receive constructor.
 	public: Packet();
 	//! Move constructor
 	public: Packet(Packet&& moveRef);
 	//! Destructor.
 	public: ~Packet();
+	public:
+			template<typename T> struct Type {};
+			template<typename T, typename... Args>
+			Packet(Type<T>, PacketId id, Args&&... args)
+				: Packet(sizeof(T), id)
+			{
+				new (m_data) T (std::forward<Args>(args)...);
+				increaseUsedPayloadBytes(sizeof(T));
+			}
+
+			template<typename T>
+			Packet(PacketId id, T src)
+				: Packet(sizeof(T), id)
+			{
+				new (m_data) T (std::forward<T>(src));
+				increaseUsedPayloadBytes(sizeof(T));
+			}
+
+			explicit Packet(PacketId id, const void* source, size_t size)
+				: Packet(size, id)
+			{
+				append(source, size);
+			}
 
 	//! Copy constructor.
 	public: Packet(const Packet& rhs);
@@ -153,6 +183,14 @@ public:
 	template<typename Type_>
 	Type_& allocate() { return *allocatePtr<Type_>(); }
 
+	template<typename Type_, typename... Args>
+	Type_& construct(Args&&... args)
+	{
+		Type_* obj = allocatePtr<Type_>();
+		new (obj)Type_(std::forward<Args>(args)...);
+		return *obj;
+	}
+
 	//! Add a piece of data to the end of the packet.
 	public:
 	template<typename _Type>
@@ -180,7 +218,7 @@ public:
 	void* writePointer() { return m_data + packetSizeBytes(); }
 
 	template<typename _Type>
-	_Type& payloadRef(size_t offset_) { return *(_Type*)(m_data + headerSizeBytes() + offset_); }
+	_Type& payloadRef(size_t offset_=0) { return *(_Type*)(m_data + headerSizeBytes() + offset_); }
 
 	//! Retrieve a reference to the header portion of the packet.
 	//! @caution This pointer is potentially invalidated by any call

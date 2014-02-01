@@ -57,10 +57,8 @@ _flushDamageQueue(void)
 		return;
 
 	const size_t dataSize = damageQueue.size() * sizeof(decltype(damageQueue[0]));
-	Teul::Packet outgoing(dataSize, Strat::CallbackX, STRT_SYNC_DAMAGE_LIST_Y);
+	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_SYNC_DAMAGE_LIST_Y), &damageQueue[0], dataSize);
 	outgoing.setUnencrypted();
-	outgoing.append(&damageQueue[0], dataSize);
-
 	serverSendPacketToType(outgoing, STRAT_HOST);
 
 	damageQueue.clear();

@@ -262,7 +262,7 @@ _recvWEP_LIST_REQ(ACTION_OBJECT* const a)
 			, facility->name, request.allWeapons, request.isRefresh, player.permissionMask()
 			);
 
-	Teul::Packet outgoing(0, Strat::CallbackX, STRT_FACILITY_WEAP_LIST_Y);
+	Teul::Packet outgoing(0, Teul::PacketId(Strat::CallbackX, STRT_FACILITY_WEAP_LIST_Y));
 	CONSTRUCT_IN_PACKET(outgoing, WeaponListRequest, player.playerID(), player.brigadeID(), request.facility
 						, player.permissionMask()
 						, false, request.isRefresh != FALSE);

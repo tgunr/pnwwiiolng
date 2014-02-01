@@ -248,7 +248,7 @@ _requestList(Player* player, UCHAR country, UCHAR branch)
 
 	_populateControllers();
 
-	Teul::Packet outgoing((controllers.size() / 3) * sizeof(BrigadeControlList), Chat::CallbackX, Chat::BRIGADE_CONTROL_LIST_Y);
+	Teul::Packet outgoing((controllers.size() / 3) * sizeof(BrigadeControlList), Teul::PacketId(Chat::CallbackX, Chat::BRIGADE_CONTROL_LIST_Y));
 
 	outgoing.append(country);
 	outgoing.append(branch);
@@ -854,7 +854,7 @@ _sendAttackOrder(const Player* const player
 				, const ORDER_TYPE orderType
 				, const bool execute)
 {
-	Teul::Packet outgoing(0, Strat::CallbackX, STRT_ATTACK_ORDER_Y);
+	Teul::Packet outgoing(0, Teul::PacketId(Strat::CallbackX, STRT_ATTACK_ORDER_Y));
 	CONSTRUCT_IN_PACKET(outgoing, AttackOrder, player->chatHandle(), unit.unitID(), property->m_fid, orderType, execute);
 	return serverSendPacketToType(outgoing, STRAT_HOST);
 }

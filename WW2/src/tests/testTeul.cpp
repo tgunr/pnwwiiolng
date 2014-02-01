@@ -474,7 +474,7 @@ struct Role
 
 		// Prepare the packet!
 		Dprintf("preparing Teul::Packet\n");
-		Teul::Packet packet(0, Role::Test_X, Role::PacketTest_Y);
+		Teul::Packet packet(0, Teul::PacketId(Role::Test_X, Role::PacketTest_Y));
 
 		static const UINT32 expectHeaderBytes = 8;
 		if ( packet.headerSizeBytes() != expectHeaderBytes )

@@ -66,8 +66,6 @@ typedef IntrusiveList<STRAT_UPDATE> StratUpdateList;
 static StratUpdateList s_stratUpdateList;
 static STRAT_UPDATE* _convoyUpdate;
 
-static SINT32 _mapConnection = 0;
-
 //////////////////////////////////////////////////////////////////////
 //Inserts a updateTime into the stratUpdatelist
 
@@ -105,28 +103,6 @@ static void _releaseStratUpdate(STRAT_UPDATE* update)
 	update->data = nullptr;
 
 	s_stratUpdatePool.Free(update);
-}
-
-//////////////////////////////////////////////////////////////////////
-//
-
-SINT32
-cnvyGetMapConnection(void)
-{
-	return _mapConnection;
-}
-
-//////////////////////////////////////////////////////////////////////
-//
-
-SINT32
-cnvySetMapConnection(SINT32 connection)
-{
-#ifdef DEBUG
-	dbugLog(_FLD, "setting map connection %d", connection);
-#endif
-	_mapConnection = connection;
-	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////

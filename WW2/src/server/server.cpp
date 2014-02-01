@@ -329,7 +329,7 @@ _sendPlayerStatusUpdate(const PlayerStatusNode& psn)
 	if ( s_broadcastEndpoint == nullptr )
 		return;
 
-	Teul::Packet outgoing(sizeof(PlayerStatusNode), Teul::Serv::CallbackX, PLAYER_UPDATE_Y);
+	Teul::Packet outgoing(sizeof(PlayerStatusNode), Teul::PacketId(Teul::Serv::CallbackX, PLAYER_UPDATE_Y));
 	outgoing.setUnencrypted();
 	Server::PlayerStatusUpdate* const update = CONSTRUCT_IN_PACKET(outgoing, Server::PlayerStatusUpdate, psn);
 
@@ -1675,7 +1675,7 @@ serverBroadcastHostConfig()
 {
 	dbugLog(_FLD, "broadcasting host configuration");
 
-	Teul::Packet outgoing(sizeof(host_config), Teul::Serv::CallbackX, HOST_CONFIG_Y);
+	Teul::Packet outgoing(sizeof(host_config), Teul::PacketId(Teul::Serv::CallbackX, HOST_CONFIG_Y));
 	outgoing.setUnencrypted();
 	outgoing.append(host_config);
 	outgoing.send(Server::broadcastIndex);
