@@ -39,7 +39,7 @@ ELSE ( )
 	mark_as_advanced(PN_NICE_STACKS PN_CLANG_SANITIZER PN_STATIC_ANALYZER)
 ENDIF( )
 
-OPTION( PN_BUILD_32BIT		"Enable 32-bit build" ON )
+OPTION( PN_BUILD_32BIT		"Enable 32-bit build" OFF )
 
 # User-settable option for enabling optimizations.
 IF ( PN_BUILD_TYPE MATCHES "Dev" OR CMAKE_BUILD_TYPE MATCHES "Debug" )
