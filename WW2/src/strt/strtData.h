@@ -13,9 +13,6 @@
 
 #include "strt/strtProtos.h"
 
-struct MANIFESTSTRUCT;
-struct CONVOYSTRUCT;
-struct PAYLOADSTRUCT;
 struct FULL_ID;
 struct CP;
 struct FACILITY;

@@ -38,7 +38,6 @@ extern const UINT32 defendFlags[MAX_SIDES];
 extern const UINT32 objectiveFlags[MAX_SIDES];
 
 class FacilityStruct;
-struct PAYLOADSTRUCT;
 
 struct CSAFE_CPStruct
 {
@@ -80,8 +79,6 @@ struct CSAFE_CPStruct
 	UINT32				timeToProduce;	//Time interval between CP runs
 	FacilityStruct*		facilityList; 	//the list of facilities in the CP
 	FacilityStruct*		facilityTypeIndex[MAX_FACILITY_TYPES];	// Facilities by type
-	PAYLOADSTRUCT*		payloadList;	//the list of payloads that need
-											//	to be sent on their merry way
 	//following 2 just used for mission system
 	UINT32				numOpenFriendlyFBs;
 	UINT32				numOpenEnemyFBs;

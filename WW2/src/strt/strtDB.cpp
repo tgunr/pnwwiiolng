@@ -196,7 +196,7 @@ _processLink(DBRow& row, void* data, UINT32 oid)
 
 	UINT32 disabled = row.NextUInt();
 	link->setEnabled(!disabled);
-	link->convoy = row.NextUInt();
+	link->m_convoy = false;
 }
 
 static void

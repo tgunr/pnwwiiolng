@@ -133,68 +133,6 @@ struct SPAWN_WEAPON
 	_ALLOCATION			allocation;  //Whether the weapon is common, rare, etc.
 };
 
-//This will be the Payload's "Manifest"
-struct MANIFESTSTRUCT
-{
-	MANIFESTSTRUCT* next;
-	UINT32 id;
-	UINT32 position;	//field used for sorting manifests
-	LinkStruct* link;
-	UINT32 linkId;		//Pointers to objects this manifest
-	UINT32 payloadId;	//   is associated with
-
-} ;
-
-struct PAYLOADSTRUCT
-{
-	enum _TYPE
-	{
-		_RPS = 1
-		, _SPAWNPOINT
-		, _KEEPALIVE
-	} ;
-
-	PAYLOADSTRUCT* next;	//If its part of a linked list, this
-								//	is the next payload
-	UINT32 id;
-
-	CPStruct* cp;				//Pointers back to the object they are
-	struct CONVOYSTRUCT* convoy; 	//	attached to
-
-	FacilityStruct* destination;	//The final destination of the payload
-	UINT32	destinationId;
-	MANIFESTSTRUCT* manifest;	//Linked list of links for the payload to
-								//traverse.  When NULL, the payload is
-								//delivered to the destination
-	_TYPE contents;
-	UINT32 RPs;
-	UINT32 startRPs;
-	ObjectStruct* spawnpoint;
-	UINT32	spawnpointId;
-
-} ;
-
-struct CONVOYSTRUCT
-{
-	CONVOYSTRUCT* prev;
-	CONVOYSTRUCT* next;
-	UINT32 id;			//The convoy id
-	WWII_SIDE side;			//AXIS or ALLIED?
-	WWII_COUNTRY country;	//The country who owns the convoy
-
-	LinkStruct* link;	//The link upon which its travelling
-	UINT32	linkId;
-	PAYLOADSTRUCT* payload;	//The payload the convoy is carrying
-	UINT32 arrivalTime;	//The arrival time in UNIX epoch time
-	UINT32 nextEvent;	//The next scheduled interdiction event (reaching a
-						//	bridge)
-	UINT32 speed;		//The speed in kilometers/hour that the convoy is
-						//	travelling
-	UINT32 damageJoules; //The amount of damage that the convoy has taken
-	UINT32 maxDamageJoules;	//The maximum amount of damage this convoy can
-							//	sustain
-} ;
-
 //This allows a bridge object to be associated with a link.  A list of these
 //	are attached to the bridge in question, so it can close/open all the links
 //	upon significant bridge events

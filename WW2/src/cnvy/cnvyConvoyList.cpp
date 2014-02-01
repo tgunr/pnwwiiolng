@@ -12,43 +12,25 @@
 // Originating Programmer: Shane "Elmo" Wickson
 
 #include "teul/teulCLList.h"
-#include "strt/strtServerTypes.h"
-#include "cnvy/cnvyConvoyList.h"
+#include "cnvy/cnvyMain.h"
 
 //Creates an spawn vehicle list of numItems size
 CONVOYSTRUCT* cnvyCreateConvoyList(UINT32 numItems)
 {
-CONVOYSTRUCT* list;
-UINT32 i;
+	ABORT_IF(numItems == 0);
 
-	if (numItems == 0)
-		return nullptr;
-
-	list = (CONVOYSTRUCT*)listInitCList(numItems, sizeof(CONVOYSTRUCT));
-
-	//Order the list
-	for (i=0; i<numItems; i++)
-	{
-		list[i].nextEvent= i;
-	}
-
-	return list;
+	return (CONVOYSTRUCT*)listInitCList(numItems, sizeof(CONVOYSTRUCT));
 }
 
 //Removes the first item from an convoyList
 CONVOYSTRUCT* cnvyRemoveFirstConvoy(CONVOYSTRUCT** convoyList)
 {
-CONVOYSTRUCT* current = nullptr;
-
-	current = (CONVOYSTRUCT*) listPopItem((LISTHEADER **) convoyList);
-
-	return current;
+	return (CONVOYSTRUCT*) listPopItem((LISTHEADER **) convoyList);
 }
 
 //Inserts a nextEvent into the convoyList
 LOGICAL cnvyInsertConvoy(CONVOYSTRUCT** convoyList, CONVOYSTRUCT* convoy)
 {
-CONVOYSTRUCT * current;
 	if ((convoyList == nullptr) || (convoy == nullptr))
 		return FALSE;
 
@@ -57,24 +39,24 @@ CONVOYSTRUCT * current;
 		//Its the first convoy
 		*convoyList = convoy;
 	}
-	else if ((*convoyList)->nextEvent >= convoy->nextEvent)
+	else if ((*convoyList)->arrivalTime >= convoy->arrivalTime)
 	{
 		//Belongs at the head of the list
 		listPushItem((LISTHEADER **) convoyList, (LISTHEADER*) convoy);
 	}
-	else if ((*convoyList)->prev->nextEvent < convoy->nextEvent)
+	else if ((*convoyList)->prev->arrivalTime < convoy->arrivalTime)
 	{
 		//Belongs at the end of the list
 		listAddItemAfter((LISTHEADER **) convoyList, (LISTHEADER*) (*convoyList)->prev, (LISTHEADER*) convoy);
 	}
 	else
 	{
-		current = *convoyList;
+		CONVOYSTRUCT* current = *convoyList;
 
 		//Find the spot where it belongs on the list
-		while ((current!=nullptr) && (current->nextEvent < convoy->nextEvent))
-			current=current->next;
-		if (current!=nullptr)
+		while ((current != nullptr) && (current->arrivalTime < convoy->arrivalTime))
+			current = current->next;
+		if (current != nullptr)
 			listAddItemBefore((LISTHEADER**) convoyList, (LISTHEADER*) current, (LISTHEADER*) convoy);
 	}
 

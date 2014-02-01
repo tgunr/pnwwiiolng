@@ -43,7 +43,7 @@ public:
 	/*These &&-ed together give us the status of the link*/
 	bool			playerValve;	//The player controlled valve
 	bool			m_enabled;		//The computer controlled valve
-	bool			convoy;			//Whether the link contains a convoy
+	bool			m_convoy;		//Whether the link contains a convoy
 
 	//For firebases
 	FacilityStruct* firebase;		//The firebase at the end of the link

@@ -14,7 +14,6 @@
 #include "strt/strtObjectStruct.h"
 #include "strt/strtLinkStruct.h"
 #include "strt/strtFB.h"
-#include "cnvy/cnvyMain.h"
 #include "strt/strtSpawn.h"
 #include "strt/strtHostMessages.h"
 #include "strt/strtData.h"

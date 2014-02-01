@@ -48,8 +48,6 @@
 
 // ------------------------------ Prototypes
 
-static void _freeManifest(MANIFESTSTRUCT* manifest);
-
 static Mem::Pool<STRAT_UPDATE, 4096> s_stratUpdatePool;
 
 // Macro for telling an update that it is to be returned to the free pool
@@ -62,7 +60,6 @@ static Mem::Pool<STRAT_UPDATE, 4096> s_stratUpdatePool;
 #define FACTORY_PERIOD_MINIMUM	5
 
 static UINT32 freeConvoys=MAXCONVOYS, numConvoys=0;
-static SINT32 convoyID=0, payloadID=0;
 static CONVOYSTRUCT* freeConvoyList;
 static CONVOYSTRUCT* dispatchedConvoyList;
 typedef IntrusiveList<STRAT_UPDATE> StratUpdateList;
@@ -111,18 +108,6 @@ static void _releaseStratUpdate(STRAT_UPDATE* update)
 }
 
 //////////////////////////////////////////////////////////////////////
-//Returns the next payloadid
-
-SINT32
-getNextPayloadID()
-{
-	if (++payloadID < 0)
-		payloadID=1;
-
-	return payloadID;
-}
-
-//////////////////////////////////////////////////////////////////////
 //
 
 SINT32
@@ -145,34 +130,12 @@ cnvySetMapConnection(SINT32 connection)
 }
 
 //////////////////////////////////////////////////////////////////////
-//
-
-PAYLOADSTRUCT*
-cnvyMakeRPPayload(UINT32 RPs)
-{
-	PAYLOADSTRUCT* tmpPayload;
-
-	//Get memory for our payload
-	tmpPayload= (PAYLOADSTRUCT*) memAlloc(sizeof(PAYLOADSTRUCT));
-
-	tmpPayload->next = nullptr;
-	tmpPayload->destination = nullptr;
-	tmpPayload->manifest = nullptr;
-	tmpPayload->spawnpoint = nullptr;
-	tmpPayload->contents = PAYLOADSTRUCT::_RPS;
-	tmpPayload->startRPs = tmpPayload->RPs = RPs;
-
-	return tmpPayload;
-}
-
-//////////////////////////////////////////////////////////////////////
 //Takes a Convoy off the freeConvoylist, inits it with the information its
 //	given, then puts it on the dispatched convoy list
 
-void cnvyCreateConvoy(WWII_SIDE side, WWII_COUNTRY country, LinkStruct* link, PAYLOADSTRUCT* payload)
+void cnvyCreateConvoy(WWII_SIDE side, WWII_COUNTRY country, LinkStruct* link, UINT32 rps)
 {
-	CONVOYSTRUCT* tmpConvoy=nullptr;
-	STRAT_UPDATE* update;
+	CONVOYSTRUCT* newConvoy = nullptr;
 
 	//If the freeConvoyList is empty, then get some more memory for it.
 	if (freeConvoyList == nullptr)
@@ -182,61 +145,48 @@ void cnvyCreateConvoy(WWII_SIDE side, WWII_COUNTRY country, LinkStruct* link, PA
 		freeConvoys = MAXCONVOYS;
 	}
 
-	tmpConvoy=cnvyRemoveFirstConvoy(&freeConvoyList);
+	newConvoy = cnvyRemoveFirstConvoy(&freeConvoyList);
 
 	//Decrement freeConvoy count
 	freeConvoys--;
 	numConvoys++;
 
-	//Now we have tmpConvoy pointing to our Convoy to populate
-	if (++convoyID < 0)
-		convoyID=0;
-	tmpConvoy->id = convoyID;
-	tmpConvoy->side = side;
-	tmpConvoy->country = country;
-	tmpConvoy->link = link;
-	tmpConvoy->payload = payload;
-	tmpConvoy->damageJoules = 0;
-	tmpConvoy->maxDamageJoules = 10;
-
-	//Point the payload back at the convoy
-	payload->convoy=tmpConvoy;
-	payload->cp=nullptr;
+	newConvoy->side = side;
+	newConvoy->link = link;
+	newConvoy->numRPs = rps;
 
 	//Time calculations.  To be replaced later with an actual calculation
 	//	based on the vehicle type, etc.
-	tmpConvoy->nextEvent = tmpConvoy->arrivalTime = teulTime() + link->latency;
+	newConvoy->arrivalTime = teulTime() + link->latency;
 
-	cnvyInsertConvoy(&dispatchedConvoyList,tmpConvoy);
+	cnvyInsertConvoy(&dispatchedConvoyList,newConvoy);
 
 	if (_convoyUpdate != nullptr)
 	{
 		//Make sure we sleep for the least amount of seconds necessary
-		if (_convoyUpdate->updateTime > tmpConvoy->nextEvent)
+		if (_convoyUpdate->updateTime > newConvoy->arrivalTime)
 		{
 			// Pull the node out, adjust the time and reposition it.
 			StratUpdateList::iterator it(_convoyUpdate->m_next), end(s_stratUpdateList.end());
 			_convoyUpdate->unlink();
-			_convoyUpdate->updateTime = tmpConvoy->nextEvent;
+			_convoyUpdate->updateTime = newConvoy->arrivalTime;
 			while (it != end && it->updateTime < _convoyUpdate->updateTime)
 				++it;
-			_convoyUpdate->link(_convoyUpdate);
+			_convoyUpdate->link(it);
 		}
 	}
 	else
 	{
 		//We must create a convoy update for this convoy
-		update = s_stratUpdatePool.New(tmpConvoy->nextEvent, STRAT_UPDATE_CONVOY_SYSTEM);
-		_insertStratUpdate(update);
-		//Save the pointer to it, so we can find it quickly
-		_convoyUpdate = update;
+		_convoyUpdate = s_stratUpdatePool.New(newConvoy->arrivalTime, STRAT_UPDATE_CONVOY_SYSTEM);
+		_insertStratUpdate(_convoyUpdate);
 	}
 
-	//dbugLog(_FLN,"Convoy %d sent from CP %s to CP %s", tmpConvoy->id, link->startDepot->cp->name, link->endDepot->cp->name);
+	//dbugLog(_FLN,"Convoy %d sent from CP %s to CP %s", newConvoy->id, link->startDepot->cp->name, link->endDepot->cp->name);
 
 	//Set flag on link
-	link->convoy = TRUE;
-	link->startDepot->m_incomingLink->convoy = TRUE;
+	link->m_convoy = true;
+	link->startDepot->m_incomingLink->m_convoy = true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -247,29 +197,10 @@ void cnvyFreeConvoy(CONVOYSTRUCT* convoy)
 	if (convoy == nullptr)
 		return;
 
-	//Get rid of all the associated memory, manifests and such
-	if (convoy->payload != nullptr)
-	{
-		//We have to free the payload
-		//First, free the manifest list
-		_freeManifest(convoy->payload->manifest);
-		memFree(convoy->payload);
-		convoy->payload = nullptr;
-	}
-
-	//If we are freeing the head of the dispatchedConvoy List (the most
-	//	common scenario)...
-	if (dispatchedConvoyList == convoy)
-	{
-		cnvyRemoveFirstConvoy(&dispatchedConvoyList);
-	}
-	else
-	{
-		cnvyDeleteConvoy(&dispatchedConvoyList, convoy);
-	}
+	cnvyDeleteConvoy(&dispatchedConvoyList, convoy);
 
 	//Put freed convoy at the head of the list
-	convoy->nextEvent = convoy->arrivalTime = 0;
+	convoy->arrivalTime = 0;
 	cnvyInsertConvoy(&freeConvoyList,convoy);
 
 	freeConvoys++;
@@ -613,7 +544,7 @@ void cnvyProcessStratUpdates(UINT32 currentTime)
 			{
 				//If there are convoys, then we need to reinsert this
 				//	update with an updated time
-				update->updateTime = dispatchedConvoyList->nextEvent;
+				update->updateTime = dispatchedConvoyList->arrivalTime;
 				_insertStratUpdate(update);
 
 				//Save the current convoyUpdate pointer
@@ -698,7 +629,7 @@ void cnvyProcessStratUpdates(UINT32 currentTime)
 void cnvyProcessConvoys()
 {
 	//Check status of any convoys that need it
-	while ( dispatchedConvoyList !=nullptr && dispatchedConvoyList->nextEvent <= teulTime() )
+	while ( dispatchedConvoyList != nullptr && dispatchedConvoyList->arrivalTime <= teulTime() )
 	{
 		strtAcceptConvoy(*dispatchedConvoyList);
 	}
@@ -749,13 +680,4 @@ void cnvyInit()
 	_insertStratUpdate(update);
 
 	dispatchedConvoyList = nullptr;
-}
-
-static void _freeManifest(MANIFESTSTRUCT* manifest)
-{
-	if (manifest != nullptr)
-	{
-		_freeManifest(manifest->next);
-		memFree(manifest);
-	}
 }

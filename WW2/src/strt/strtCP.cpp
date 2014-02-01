@@ -82,8 +82,6 @@ LOGICAL g_logRPProduction;
 //	strat system fuctions
 static void _distributeRPs(CPStruct& cp, SINT32 rpsProduced, WWII_SIDE side);
 static void _repairCP(CPStruct& cp, CP_ACC& fa);
-static LOGICAL _attachPayload(PAYLOADSTRUCT* payload, CPStruct* cp);
-static void _dispatchPayloads(CPStruct& cp);
 static SINT32 _runFacility(FacilityStruct& currentFacility, WWII_SIDE_ACC& sa);
 static void _repairObject(UCHAR* lastPercentDamage, ObjectStruct& currentObject);
 static void _repairBridge(ObjectStruct& bridgeObject);
@@ -523,9 +521,6 @@ strtRunCP(CPStruct& cp)
 		ca.axis.factoryMultiplier = 1;
 		ca.allied.factoryMultiplier = 1;
 
-		//Dispatch all the waiting payloads
-		_dispatchPayloads(cp);
-
 		//If the cp is NOT under contention OR both sides are allowed to produce on a CP
 		//Run every Facility
 		for ( currentFacility=cp.facilityList; currentFacility!=nullptr; currentFacility=currentFacility->next)
@@ -610,7 +605,7 @@ _requestRPs(FacilityStruct* currentFacility)
 		return;
 
 	// Check conditions that close a link.
-	if ( currentLink->playerValve || currentLink->isEnabled() == false || currentLink->convoy )
+	if ( currentLink->playerValve || currentLink->isEnabled() == false || currentLink->m_convoy )
 		return;
 
 	const FacilityStruct* const remoteDepot = currentLink->startDepot;
@@ -632,12 +627,8 @@ _requestRPs(FacilityStruct* currentFacility)
 	UINT32 requestRPs = std::min((UINT32)wantRPs, std::min((UINT32)currentLink->capacity, (UINT32)remoteDepot->storedRPs));
 	if ( requestRPs > 0 )
 	{
-		if ( currentLink->startDepot->storedRPs > requestRPs )
-			currentLink->startDepot->storedRPs -= requestRPs;
-		else
-			currentLink->startDepot->storedRPs = 0;
-
-		cnvyCreateConvoy(currentFacility->side, currentFacility->country, currentLink, cnvyMakeRPPayload(requestRPs));
+		currentLink->startDepot->storedRPs -= requestRPs;
+		cnvyCreateConvoy(currentFacility->side, currentFacility->country, currentLink, requestRPs);
 	}
 }
 
@@ -1002,7 +993,6 @@ _repairCP(CPStruct& cp, CP_ACC& ca)
 }
 
 //////////////////////////////////////////////////////////////////////
-//
 //This function allows the Strat System to accept a convoy into its
 //  depot
 
@@ -1010,10 +1000,10 @@ void
 strtAcceptConvoy(CONVOYSTRUCT& convoy)
 {
 	FacilityStruct* depot = convoy.link->endDepot;
-	if ( convoy.payload->contents == PAYLOADSTRUCT::_RPS && convoy.payload->RPs > 0 )
+	if ( convoy.numRPs > 0 )
 	{
 		//Transfer the RPs to the desitination Depot
-		UINT32 newRPs = depot->storedRPs + convoy.payload->RPs;
+		UINT32 newRPs = depot->storedRPs + convoy.numRPs;
 		if ( newRPs > depot->requestThreshold)
 			newRPs = depot->requestThreshold;
 		if ( newRPs != depot->storedRPs )
@@ -1022,20 +1012,12 @@ strtAcceptConvoy(CONVOYSTRUCT& convoy)
 			depot->storedRPs = newRPs;
 			//save Facility to DB
 			strtSaveFacility(convoy.link->endDepot);
-		}
 #endif
-	}
-	else if (convoy.payload->contents == PAYLOADSTRUCT::_SPAWNPOINT)
-	{
-		//Take the payload and add it to the list of payloads attached
-		//	to the CP
-
-		_attachPayload(convoy.payload, depot->cp);
-		convoy.payload=nullptr;
+		}
 	}
 
-	convoy.link->convoy=FALSE;
-	convoy.link->startDepot->m_incomingLink->convoy=FALSE;
+	convoy.link->m_convoy = false;
+	convoy.link->startDepot->m_incomingLink->m_convoy = false;
 
 	//Backup the current Facility
 	//strtBackUpFacility(convoy->link->endDepot);
@@ -1043,107 +1025,6 @@ strtAcceptConvoy(CONVOYSTRUCT& convoy)
 	//Free the convoy
 	cnvyFreeConvoy(&convoy);
 }
-
-
-//////////////////////////////////////////////////////////////////////
-//
-static LOGICAL _attachPayload(PAYLOADSTRUCT* payload, CPStruct* cp)
-{
-	if ((payload==nullptr) || (cp==nullptr))
-		return FALSE;
-
-	//Attach payload to the head of the list.  Its the easiest.
-	payload->next=cp->payloadList;
-	payload->convoy=nullptr;
-	payload->cp=cp;
-	cp->payloadList=payload;
-
-	return TRUE;
-}
-
-
-//////////////////////////////////////////////////////////////////////
-//
-//This function takes a linked list of payloads and attempts to dispatch
-//	them all.
-static void _dispatchPayloads(CPStruct& cp)
-{
-	PAYLOADSTRUCT* currentPayload=nullptr;
-	PAYLOADSTRUCT* rejectedPayloadList=nullptr;
-	PAYLOADSTRUCT* tmpPayload=nullptr;
-	MANIFESTSTRUCT* tmpManifest;
-
-	currentPayload=cp.payloadList;
-
-	while (currentPayload!=nullptr)
-	{
-
-		if (currentPayload->manifest==nullptr)
-		{
-			dbugLog(_FLN,"Payload reached destination.");
-			//We've reached our destination.  Attach the spawnpoint to the
-			//	facility pointed to in the payloads destination
-			if (currentPayload->destination==nullptr)
-				return;
-
-			//Gonna change spawnpoint shipping anyway
-			//dbugLog(_FLD,"Attempting to attach object %d:%d:%d to facility %%d:%d:%d\n", currentPayload->spawnpoint->id, currentPayload->destination->id);
-			//Attach the object/object to the destination facility
-			currentPayload->spawnpoint->next=currentPayload->destination->objectList;
-			currentPayload->destination->objectList=currentPayload->spawnpoint;
-			currentPayload->spawnpoint->facility=currentPayload->destination;
-			currentPayload->spawnpoint=nullptr;
-			tmpPayload=currentPayload;
-
-			//Advance current Payload Pointer
-			currentPayload=currentPayload->next;
-
-			//Free up our ending payload
-			memFree(tmpPayload);
-			tmpPayload=nullptr;
-		}
-		else
-		{
-			//Pass this bad boy along its way
-
-			//Check to see if we can send the convoy on its way.
-			if (!(	(currentPayload->manifest->link->convoy) ||
-					(currentPayload->manifest->link->playerValve) ||
-					(currentPayload->manifest->link->isEnabled() == false)))
-			{
-				//fprintf(stderr,"Sending spawnpoint convoy from facility %d to facility %d.\n", currentPayload->manifest->link->startDepot->id, currentPayload->manifest->link->endDepot->id);
-				//Remove the item from the manifest
-				tmpManifest = currentPayload->manifest;
-				currentPayload->manifest = currentPayload->manifest->next;
-
-				cnvyCreateConvoy(tmpManifest->link->startDepot->side,
-								 tmpManifest->link->startDepot->country,
-								 tmpManifest->link,
-								 currentPayload);
-				memFree(tmpManifest);
-
-				//Advance the currentPayload pointer
-				currentPayload=currentPayload->next;
-			}
-			else
-			{
-				//fprintf(stderr,"Route from facility %d to facility %d taken.  Payload stays at CP #%d.\n", currentPayload->manifest->link->startDepot->id, currentPayload->manifest->link->endDepot->id,cp->id);
-				//Pass it over.  Which means we put it on the temporary
-				//	payload list
-				tmpPayload=currentPayload->next;
-				currentPayload->next=rejectedPayloadList;
-				rejectedPayloadList=currentPayload;
-
-				//Advance the currentPayload pointer
-				currentPayload=tmpPayload;
-			}
-		}
-	}
-
-	//Attach all the rejected payloads to the current cp
-	cp.payloadList=rejectedPayloadList;
-}
-
 
 //////////////////////////////////////////////////////////////////////
 //This function actually damages an object in the strat system

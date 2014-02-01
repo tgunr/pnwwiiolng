@@ -14,20 +14,27 @@ struct WEAPON_SPEC;
 class WeaponCounter;
 struct STRAT_UPDATE;
 
+struct CONVOYSTRUCT
+{
+	CONVOYSTRUCT*	prev;
+	CONVOYSTRUCT*	next;
+	WWII_SIDE		side;				//AXIS or ALLIED?
+	UINT32			numRPs;
+	LinkStruct*		link;				//The link upon which its travelling
+	UINT32			arrivalTime;		//The arrival time in UNIX epoch time
+};
+
 //Initializes the convoy system
 void cnvyInit(void);
 
 //This is the call the Strat System will make to create a convoy.  It takes
 //	all the information to create a convoy and moves it to the appropriate
 //	lists
-void cnvyCreateConvoy(WWII_SIDE owner, WWII_COUNTRY country, LinkStruct* link, struct PAYLOADSTRUCT* payload);
+void cnvyCreateConvoy(WWII_SIDE owner, WWII_COUNTRY country, LinkStruct* link, UINT32 rps);
 
 //This will be the function that the strat System calls to free a convoy after
 //	its supplies have been transported to the depot
 void cnvyFreeConvoy(struct CONVOYSTRUCT* convoy);
-
-//This function takes RPs and returns a payload for the item
-PAYLOADSTRUCT* cnvyMakeRPPayload(UINT32 RPs);
 
 //Get the map host connection
 SINT32 cnvyGetMapConnection(void);
