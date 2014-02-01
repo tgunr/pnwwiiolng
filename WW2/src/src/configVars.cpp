@@ -22,7 +22,7 @@ extern bool teulGetHost(const SCHAR* address, UINT32* host);
 	ConfigStr cv_##Name_ ( CVT_STRING, #Name_, Default_, EnvName_, Required_, Description_ )
 
 #define CFG_UINT(Name_, Default_, EnvName_, Description_)	\
-	ConfigUint cv_##Name_ ( CVT_UNSIGNED_INT, #Name_, Default_, EnvName_, false, Description_ )
+	ConfigUint cv_##Name_ ( CVT_UNSIGNED_INT, #Name_, Default_, EnvName_, true, Description_ )
 
 #define CFG_SINT(Name_, Default_, EnvName_, Description_)	\
 	ConfigSint cv_##Name_ ( CVT_SIGNED_INT, #Name_, Default_, EnvName_, false, Description_ )
@@ -417,7 +417,7 @@ namespace Teul
 
 	void ConfigVar::CheckConfiguration()
 	{
-		for (auto it : _getConfigVars())
+		for (auto& it : _getConfigVars())
 		{
 			if (it->m_required && (it->m_value == nullptr || (it->m_default == nullptr && *it->m_value == 0)))
 				LogAbort("Config variable %s (%s) must be defined with a non-empty value.", it->GetName(), it->GetEnvVarName());
