@@ -477,7 +477,7 @@ _facilityDistance(const FacilityStruct* facil1, const FacilityStruct* facil2)
 {
 	if ( facil1 == nullptr || facil2 == nullptr )
 	{
-		dbugLog(_FLA, "nullptr facility pointer!");
+		dbugLog(_FLA, "null facility pointer!");
 		return 0xffffffff;				// A very long distance
 	}
 
@@ -1494,7 +1494,7 @@ strtVerifyStratSystem(CPStruct* cpList, UINT32 testLevel)
 {
 	if (cpList == nullptr)
 	{
-		dbugLog(_FLA,"CP List is nullptr, strat system is not initialized");
+		dbugLog(_FLA,"CP List is null, strat system is not initialized");
 		return false;
 	}
 
@@ -2383,7 +2383,7 @@ _findFirebaseArmybase(FacilityStruct* fb)
 		depot->armyBase = depot->findLocalAB(WWII_NO_SIDE);
 	if ( depot->armyBase == nullptr )
 	{
-		dbugLog(_FLW, "FB '%s' depot '%s' has nullptr armybase!"
+		dbugLog(_FLW, "FB '%s' depot '%s' has null armybase!"
 					, fb->name
 					, depot->name
 					);

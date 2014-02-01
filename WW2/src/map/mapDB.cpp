@@ -187,17 +187,17 @@ _connectGameDB()
 	DBSimpleQuery(dbh,
 			"CREATE TABLE IF NOT EXISTS `wwii`.`client_terminations`"
 			"("
-			"  `id` int(11) unsigned NOT nullptr auto_increment,"
+			"  `id` int(11) unsigned NOT NULL auto_increment,"
 			"  `sessionOTP` int(11) unsigned default '0',"
 			"  `eventID` int(11) unsigned default '0',"
 			"  `errorType` int(11) unsigned default '0',"
 			"  `playerID` int(11) unsigned default '0',"
 			"  `whereIP` char(16) default '',"
-			"  `clientVersion` char(16) NOT nullptr default '0.0.0.0',"
-			"  `platform` int(11) unsigned default nullptr,"
-			"  `rxTime` timestamp NOT nullptr,"
-			"  `hostTime` timestamp NOT nullptr,"
-			"  `clientTime` timestamp NOT nullptr,"
+			"  `clientVersion` char(16) NOT NULL default '0.0.0.0',"
+			"  `platform` int(11) unsigned default NULL,"
+			"  `rxTime` timestamp NOT NULL,"
+			"  `hostTime` timestamp NOT NULL,"
+			"  `clientTime` timestamp NOT NULL,"
 			"  `archiveCorrupt` tinyint(3) unsigned default '0',"
 			"  `piExitLine` int(11) unsigned default '0',"
 			"  `piExitFile` char(64) default '',"
@@ -210,7 +210,7 @@ _connectGameDB()
 			"  `invalidMD5` char(64) default '0',"
 			"  `stackinfo` char(255) default '',"
 			"  `exceptionText` char(255) default '',"
-			"  `clientRevision` int(11) unsigned NOT nullptr,"
+			"  `clientRevision` int(11) unsigned NOT NULL,"
 			"  PRIMARY KEY  (`id`),"
 			"  KEY (`id`, `clientVersion`),"
 			"  KEY `big_cv_idx` (`clientVersion`,`errorType`,`archiveCorrupt`)"
@@ -312,7 +312,7 @@ Player::selectPlayer(const playerid_t forPlayerID)
 
 		// Make sure the callsign is valid
 		if ( m_matchHandle == 0 )
-			throw std::logic_error("player's game name produces nullptr handle");
+			throw std::logic_error("player's game name produces null handle");
 		if ( Chat::Name(m_chatHandle) != dispatch().m_callsign )
 			throw std::logic_error("invalid callsign");
 

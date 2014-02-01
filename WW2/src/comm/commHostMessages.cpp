@@ -763,7 +763,7 @@ _forwardHitsToRemoteServer(const HostVehicle& vehicle, const SINT32 bits, const 
 }
 
 //////////////////////////////////////////////////////////////////////
-// Given the details of a hit packet, notify the scorig process.
+// Given the details of a hit packet, notify the scoring process.
 
 static void
 _sendScoringHitEvent(const HostVehicle& victim, const HostVehicle& shooter, const UINT32 numComponentsHit, const UINT64& joules)
@@ -1413,7 +1413,7 @@ hostSendResupplyIssue(UINT32 cellIP, const sortieid_t& toSerial, const sortieid_
 }
 
 //////////////////////////////////////////////////////////////////////
-// Acknowledgement that someone received resupply
+// Acknowledgment that someone received resupply
 
 void
 hostSendResupplyAccepted(UINT32 cellIP, const sortieid_t& sendTo, const ChatHandle& byHandle)

@@ -1863,7 +1863,7 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 // to that ejection. This avoids exposing the detection mechanism.
 // We then send the client a* request* to disconnect, and allow it
 // a period of time to honor this request before forcibly disconnecting
-// them. This allows us to detect individuals who experiement with
+// them. This allows us to detect individuals who experiment with
 // command interception.
 
 static inline bool

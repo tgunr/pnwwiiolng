@@ -72,7 +72,7 @@ chatSendLocalizedMessage(const playerid_t playerID, LSTRING_ID prefix, LSTRING_I
 					, const char* const ptr0, const char* const ptr1, const char* const ptr2, const char* const ptr3, const char* const ptr4, const char* const ptr5)
 {
 	// PlayerIDs of 0 or 1 are invalid ...
-	if ( playerID <= 1 )
+	if ( PN_UNLIKELY(playerID <= 1) )
 		return FALSE;
 
 	Teul::Packet outgoing(sizeof(Chat::DirectMessage), Teul::PacketId(Chat::CallbackX, Chat::LOCALIZED_MESSAGE_Y));

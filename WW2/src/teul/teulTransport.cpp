@@ -554,7 +554,7 @@ teulSend(ENDPOINT& endpoint, TEUL_CALLBACK* const object, void* const data)
 {
 	if (PN_UNLIKELY(object == nullptr))
 	{
-		dbugLog(_FLA, "teulSend called with nullptr callback");
+		dbugLog(_FLA, "teulSend called with null callback");
 		return -EINVAL;
 	}
 
@@ -568,7 +568,7 @@ teulSend(SINT32 teulIndex, TEUL_CALLBACK* const object, void* const data)
 {
 	if (PN_UNLIKELY(object == nullptr))
 	{
-		dbugLog(_FLA, "teulSend called with nullptr callback");
+		dbugLog(_FLA, "teulSend called with null callback");
 		return -EINVAL;
 	}
 

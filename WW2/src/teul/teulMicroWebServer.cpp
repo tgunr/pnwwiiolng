@@ -103,7 +103,7 @@ _establishListenSocket(const unsigned short port_)
 
 	evutil_make_listen_socket_reuseable(sock);
 
-	printf("uWebServer socket:%u listening on port %hu\n", sock, port_);
+	printf("uWebServer socket:%u listening on port %u\n", sock, port_);
 
 	return sock;
 }
