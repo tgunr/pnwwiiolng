@@ -147,13 +147,10 @@ size_t pathprintf(char (& buf)[bufSize], const char* lhs, const char* rhs)
 }
 
 // snprintf wrapper
-template<size_t bufSize>
-size_t strprintf(char (& buf)[bufSize], const char* fmt, ...)
+template<size_t bufSize, typename... Args>
+size_t strprintf(char (& buf)[bufSize], const char* fmt, Args... args)
 {
-	va_list list;
-	va_start(list, fmt);
-	int printed = vsnprintf(buf, bufSize, fmt, list);
-	va_end(list);
+	int printed = snprintf(buf, bufSize, fmt, std::forward<Args>(args)...);
 	if ( printed != -1 && static_cast<size_t>(printed) < bufSize )
 		return static_cast<size_t>(printed);
 	buf[bufSize - 1] = 0;
