@@ -116,7 +116,7 @@ namespace Chat
 
 		inline void packRaw(unsigned int mode, ACTION_OBJECT* a) { a->packBytes(mode, m_name, sizeof(m_name)); }
 
-		int format(const value_type* format, ...);
+		template<typename... Args> int format(const value_type* format, Args...);
 	};
 
 	typedef BasicName<char> Name;
@@ -127,6 +127,6 @@ namespace Chat
 	template<> inline bool BasicName<wchar_t>::operator == (const wchar_t* rhs) const { return wcscmp(m_name, rhs) == 0; }
 	template<> inline bool BasicName<wchar_t>::operator == (const BasicName<wchar_t>& rhs) const { return wcscmp(m_name, rhs.m_name) == 0; }
 
-	template<> inline int BasicName<char>::format(const char* fmt, ...) { va_list ap; va_start(ap, fmt); int ret = vsnprintf(m_name, MaxHandleSize, fmt, ap); va_end(ap); return ret;  }
-	template<> inline int BasicName<wchar_t>::format(const wchar_t* fmt, ...) { va_list ap; va_start(ap, fmt); int ret = vswprintf(m_name, MaxHandleSize, fmt, ap); va_end(ap); return ret; }
+	template<> template<typename... Args> inline int BasicName<char>::format(const char* fmt, Args... args) { return snprintf(m_name, MaxHandleSize, fmt, std::forward<Args>(args)...); }
+	template<> template<typename... Args> inline int BasicName<wchar_t>::format(const wchar_t* fmt, Args... args) { return swprintf(m_name, MaxHandleSize, fmt, std::forward<Args>(args)...); }
 }
