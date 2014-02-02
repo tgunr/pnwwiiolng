@@ -291,7 +291,7 @@ SINT32 strtSendMMCrewBailed(UINT32 commanderID, UINT32 crewID)
 SINT32 strtSendMMJoinDeny(UINT32 crewID, UINT32 reasonCode)
 {
 	MM_JOIN_DENY deny { crewID, reasonCode };
-	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_MM_JOIN_DENY_Y), reasonCode);
+	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_MM_JOIN_DENY_Y), deny);
 	return serverSendPacketToType(outgoing, MAP_HOST) ? 0 : -EINVAL;
 }
 
