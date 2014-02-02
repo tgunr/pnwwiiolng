@@ -13,9 +13,9 @@ Teul::Packet::Packet(PacketId id)
 	: m_data(m_localData)
 	, m_packetSizeBytes(headerSizeBytes())
 	, m_capacity(DefaultLocalDataSize)
+	, m_sent(0)
 	, m_address(0)
 	, m_port(0)
-	, m_sent(0)
 {
 	header().packetType(Teul::Tokens::Encrypted);
 	header().packetSizeBytes(headerSizeBytes());
@@ -31,9 +31,9 @@ Teul::Packet::Packet(const Teul::Packet& rhs)
 	: m_data(m_localData)
 	, m_packetSizeBytes(0)
 	, m_capacity(DefaultLocalDataSize)
+	, m_sent(0)
 	, m_address(rhs.m_address)
 	, m_port(rhs.m_port)
-	, m_sent(0)
 {
 	const size_t newSize = rhs.packetSizeBytes();
 	setPacketSizeBytes(newSize);
