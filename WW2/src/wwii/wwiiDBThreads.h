@@ -68,6 +68,12 @@ public:
 	//! after this, the query is deleted.
 	virtual bool Process(const size_t /*numRows*/) { return false; }
 
+	template<typename... Args>
+	void Do(const DBThread::DBNo db_, const char* fmt, Args&&... args)
+	{
+		(new DBThreadQuery(db_, "DBThread::Do(q)", DBThreadQuery::_IMMEDIATE, fmt, std::forward<Args>(args)...))->Queue();
+	}
+
 protected:
 	DBThread::DBNo		m_db;
 	const char* const	m_name;
