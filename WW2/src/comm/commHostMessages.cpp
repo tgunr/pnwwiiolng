@@ -518,7 +518,7 @@ Player::awsCheck()
 	if ( vel >= VEL_SQUARE_TRIP )
 		strprintf(vOver, "AWS Candidate (vel=%3.2fms/%3.2fMph)", sqrt(vel), sqrt(vel) / MPH_TO_MS);
 	else
-		strprintf(vOver, "UNEXPECTED AWS Trip!");
+		strsafecpy(vOver, "UNEXPECTED AWS Trip!");
 	message(LSTR_BETA, LSTR_GENERIC, vOver);
 #endif
 

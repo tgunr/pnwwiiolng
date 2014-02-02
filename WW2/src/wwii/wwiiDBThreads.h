@@ -27,7 +27,7 @@ public:
 	DBThreadQuery(const DBThread::DBNo db_, const char* const name_, const char* const statement_, bool immediate)
 		: m_db(db_), m_name(name_), m_immediate(immediate), m_query(nullptr)
 		{
-			strcpy(m_statement, statement_);
+			strsafecpy(m_statement, statement_);
 		}
 
 	DBThreadQuery(const DBThread::DBNo db_, const char* const name_, bool immediate, const char* const fmt_, ...)

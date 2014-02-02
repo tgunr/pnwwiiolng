@@ -1862,7 +1862,7 @@ Player::describeTo(const Player& player, const FLOAT64& x, const FLOAT64& y, boo
 		}
 		else
 		{
-			strprintf(buf, "[Invalid Squad]");
+			strsafecpy(buf, "[Invalid Squad]");
 		}
 		if ( getPreference(CPR_IS_RECRUITING) )
 		{
