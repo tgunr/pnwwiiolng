@@ -52,20 +52,16 @@ public:
 
 	int vformatText(const char* fmt, va_list args)
 	{
-		const int result = std::min(vsnprintf(m_text, DBUG_MAX_STRING, fmt, args), (int)DBUG_MAX_STRING - 1);
-		if ( static_cast<UINT64>(result) < DBUG_MAX_STRING )
-			m_text[result] = 0;
-		return result;
+		const int len = std::min(vsnprintf(m_text, DBUG_MAX_STRING, fmt, args), (int)DBUG_MAX_STRING - 1);
+		m_text[len] = 0;
+		return len;
 	}
 
-	int formatText(const char* fmt, ...)
+	template<typename... Args>
+	int formatText(const char* fmt, Args... args)
 	{
-		int len = 0;
-		va_list args;
-		va_start(args, fmt);
-		len = vsnprintf(m_text, DBUG_MAX_STRING, fmt, args);
-		va_end(args);
-		m_text[DBUG_MAX_STRING-1] = 0;
+		int len = std::min(snprintf(m_text, DBUG_MAX_STRING, fmt, std::forward<Args>(args)...), (int)DBUG_MAX_STRING-1);
+		m_text[len] = 0;
 		return len;
 	}
 
