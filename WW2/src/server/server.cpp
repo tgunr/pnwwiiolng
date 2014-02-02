@@ -1563,7 +1563,7 @@ serverGetAuthIP()
 		return 0;
 
 	const char* authName = cv_authHost.GetString();
-	if ( !authName && !*authName )
+	if ( !authName || !*authName )
 		LogAbort("Missing AUTH_ADDRESS");
 
 	UINT32 address = Teul::GetSingleIP(authName);	// Returns malloc'd pointer!
