@@ -30,25 +30,19 @@ public:
 			strsafecpy(m_statement, statement_);
 		}
 
-	DBThreadQuery(const DBThread::DBNo db_, const char* const name_, bool immediate, const char* const fmt_, ...)
-		: m_db(db_), m_name(name_), m_immediate(immediate), m_query(nullptr)
+	template<typename... Args>
+	DBThreadQuery(const DBThread::DBNo db_, const char* const name_, bool immediate_, const char* const fmt_, Args... args_)
+		: m_db(db_), m_name(name_), m_immediate(immediate_), m_query(nullptr)
 		{
-			va_list args;
-			va_start(args, fmt_);
-			vsetStatement(args, fmt_);
-			va_end(args);
+			strprintf(m_statement, fmt_, std::forward<Args>(args_)...);
+			m_statement[MaxStatementLen] = '\0';
 		}
 	DBThreadQuery(const DBThread::DBNo db_, const char* const name_, bool immediate, va_list& args, const char* const fmt_)
 		: m_db(db_), m_name(name_), m_immediate(immediate), m_query(nullptr)
 		{
-			vsetStatement(args, fmt_);
+			int bytes = vsnprintf(m_statement, MaxStatementLen, fmt_, args);
+			m_statement[bytes] = 0;
 		}
-
-	void vsetStatement(va_list& args, const char* const fmt_)
-	{
-		int bytes = vsnprintf(m_statement, MaxStatementLen, fmt_, args);
-		m_statement[bytes] = 0;
-	}
 
 	virtual ~DBThreadQuery();
 
