@@ -334,7 +334,10 @@ struct Role
 			throw Teul::Error("teulInitTransport failed", ret);
 
 		// Tell teulkit we want all of the debug log output.
-		dbugSetLogLevel(Debug::ERR_DBUG);
+		if ( Config::debugOutput == true )
+			dbugSetLogLevel(Debug::ERR_DBUG | STD_ERR | LOG_ALL_TO_STDERR);
+		else
+			dbugSetLogLevel(Debug::ERR_DBUG);
 
 		Dprintf("teulTransport initialized.\n");
 
@@ -428,6 +431,7 @@ struct Role
 	,	Echo_Y
 	,	ObjTest_Y
 	,	Spam_Y
+	,	LargePacketAck_Y
 		// Callbacks we don't specifically register.
 	,	Unregistered_Y = 100	// Neither send nor receive.
 	};

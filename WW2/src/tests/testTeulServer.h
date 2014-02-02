@@ -76,6 +76,10 @@ struct ServerRole : public Role
 
 		Dprintf("LargePacket looks good.\n");
 
+		Teul::Packet outgoing(Teul::PacketId(Role::Test_X, Role::LargePacketAck_Y));
+		outgoing.append((size_t)a->sizeInBytes());
+		outgoing.send(*a->endpoint);
+
 		return a->offset;
 	}
 

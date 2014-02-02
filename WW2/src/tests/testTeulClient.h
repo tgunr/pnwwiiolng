@@ -53,6 +53,14 @@ struct ClientRole : public Role
 		return a->offset;
 	}
 
+	static SINT32 recvLargePacketAck(ACTION_OBJECT* const a)
+	{
+		size_t size = a->read<size_t>();
+		Iprintf("Received large packet ack, for size %zu\n", size);
+		sm_gotLargePacketAck = true;
+		return a->offset;
+	}
+
 	static SINT32 sendLargePacket(ACTION_OBJECT* const /*a*/)
 	{
 		throw Teul::Error("Somehow we got into sendLargePacket", -1);
@@ -99,6 +107,8 @@ struct ClientRole : public Role
 			REGISTER_RECEIVEOBJ(Role::ObjTest_Y, TestObject, recvTestObject);
 
 			REGISTER_SENDER(Role::Unregistered_Y, CallbackRegister::NoDataHandler, s_cbUnregistered);
+
+			REGISTER_RECEIVER(Role::LargePacketAck_Y, recvLargePacketAck);
 
 		END_CALLBACK_REGISTRATION
 	}
@@ -457,6 +467,29 @@ struct ClientRole : public Role
 		}
 	}
 
+	private:
+	void WaitForLargePacketReply()
+	{
+		sm_gotLargePacketAck = false;
+
+		if ( tRecv.isEnabled() == false )
+			return;
+
+		Dprintf("Waiting %ums for large packet reply.\n", Config::ConnectTimeoutMS);
+
+		teulSyncClock();
+		const TeulTimeMS timeout = teulClock64 + Config::ConnectTimeoutMS;
+
+		while ( teulClock64 < timeout && sm_gotLargePacketAck == false )
+		{
+			teulUpdateTransport(5);
+		}
+
+		if ( sm_gotLargePacketAck == false )
+			throw Teul::Error("Failed to receive response to our large packet", 0);
+	}
+
+
 	public:
 	void TestLargePacket(const SINT32 teulIndex)
 	{
@@ -500,6 +533,8 @@ struct ClientRole : public Role
 			throw Teul::Error("Teul::Packet send failed", result);
 
 		Iprintf("Large packet sent, %" PRSizeT " bytes.\n", psb);
+
+		WaitForLargePacketReply();
 	}
 
 	private:
@@ -562,7 +597,7 @@ struct ClientRole : public Role
 		}
 
 		if ( sm_gotTestObject == false )
-			throw Teul::Error("Failed to receive response to our test object reply", 0);
+			throw Teul::Error("Failed to receive response to our test object", 0);
 	}
 
 	public:
@@ -782,8 +817,11 @@ struct ClientRole : public Role
 	static bool sm_gotHello;
 	static bool sm_gotUnencrypted;
 	static bool sm_gotTestObject;
+	static bool sm_gotLargePacketAck;
 };
 
 bool ClientRole::sm_gotHello = false;
 bool ClientRole::sm_gotUnencrypted = false;
 bool ClientRole::sm_gotTestObject = false;
+bool ClientRole::sm_gotLargePacketAck = false;
+
