@@ -619,7 +619,7 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 	{
 		time_t now = (time_t)(teulClock64 / 1000);
 #if platOS == OS_WIN32
-		struct tm* tm = locatime(&now);
+		struct tm* tm = localtime(&now);
 #else
 		struct tm tmStruct;
 		struct tm* tm = localtime_r(&now, &tmStruct);
