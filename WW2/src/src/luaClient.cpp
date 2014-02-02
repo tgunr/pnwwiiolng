@@ -149,7 +149,7 @@ _sendCmd(const std::string& command)
 	if ( command.compare("quit") == 0 || command.compare("exit") == 0 )
 		terminate(0);
 
-	Teul::Packet outgoing(command.length(), Teul::PacketId(Host::CallbackX, Host::Callbacks::LuaPacket_Y));
+	Teul::Packet outgoing(Teul::PacketId(Host::CallbackX, Host::Callbacks::LuaPacket_Y));
 	outgoing.setUnencrypted();
 	outgoing.append(command.c_str(), command.length() + 1);
 	outgoing.send(serverTeulIndex);
