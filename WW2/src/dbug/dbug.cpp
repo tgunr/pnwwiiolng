@@ -618,9 +618,12 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 	if ( ! (flags & BARE_DEBUG) )
 	{
 		time_t now = (time_t)(teulClock64 / 1000);
+#if platOS == OS_WIN32
+		struct tm* tm = locatime(&now);
+#else
 		struct tm tmStruct;
-		struct tm* tm = &tmStruct;
-		tm = localtime_r(&now, &tmStruct);
+		struct tm* tm = localtime_r(&now, &tmStruct);
+#endif
 		len = _logger.formatText(CARRIAGE_RETURN "%s [%04u-%02u-%02u %02u:%02u.%02u.%03u %s:%u] "
 								, errorTypes[_logger.errType]
 								, tm->tm_year + 1900
