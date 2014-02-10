@@ -43,6 +43,13 @@ Teul::Packet::Packet(const Teul::Packet& rhs)
 //////////////////////////////////////////////////////////////////////
 // Move constructor
 
+/*
+	The downside to having a move constructor is that we can't resend
+	a packet multiple times. Until we have a mechanism that allows us
+	to specify whether a packet is copyable or not, I guess we'll have
+	to pay the hit.
+*/
+#ifdef ALLOW_TEUL_PACKET_MOVE
 Teul::Packet::Packet(Teul::Packet&& rhs)
 {
 	if (PN_UNLIKELY(&rhs == this))
@@ -69,6 +76,7 @@ Teul::Packet::Packet(Teul::Packet&& rhs)
 	rhs.m_capacity = 0;
 	rhs.m_sent = 0;
 }
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // Copy operator.

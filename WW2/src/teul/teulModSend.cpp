@@ -184,7 +184,11 @@ ENDPOINT::sendPacket(Teul::Packet& packet)
 		// Partial or blocked send falls thru and queues the remainder.
 	}
 
+#if defined(ALLOW_TEUL_PACKET_MOVE)
 	Teul::Packet* const copy = s_delayedPackets.New(std::move(packet));
+#else
+	Teul::Packet* const copy = s_delayedPackets.New(packet);
+#endif
 
 	m_impl->m_sendQueue.push_back(copy);
 
@@ -253,9 +257,7 @@ Teul::Packet::send(ENDPOINT& endpoint)
 	ABORT_IF_EX(header().m_tag != 0 && header().packetType() != Teul::Tokens::Unencrypted
 					, "tried to re-send a Teul::Packet");
 
-#if !defined(__APPLE__)
 	static_assert( sizeof(header().m_tag) == sizeof(endpoint.m_impl->sentTag), "Endpoint and Packet disagree on tag size" );
-#endif
 
 	header().m_tag = ++endpoint.m_impl->sentTag;
 
@@ -272,7 +274,9 @@ Teul::Packet::send(ENDPOINT& endpoint)
 	// The packet size, as far as* teulkit* is concerned ...
 	// doesn't include the prefix.
 	const size_t psb = packetSizeBytes();
-	header().packetSizeBytes(psb - UnencryptedBytes);
+	const size_t payloadBytes = psb - UnencryptedBytes;
+	header().packetSizeBytes(payloadBytes);
+	ABORT_IF(header().packetSizeBytes() != payloadBytes);
 	m_sent = 0;
 
 	// Encrypt the data.

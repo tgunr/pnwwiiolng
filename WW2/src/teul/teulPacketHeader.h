@@ -22,7 +22,14 @@ namespace Teul
 		UINT32 packetType() const { return m_prefix[0] >> 4; }
 		void packetType(UINT32 type_) { m_prefix[0] = ((UCHAR)type_ << 4) | (m_prefix[0] & 0x0f); }
 		UINT32 packetSizeBytes() const { return ((m_prefix[0] & 0x0f) << 16) | (m_prefix[1] << 8) | (m_prefix[2]); }
-		void packetSizeBytes(UINT32 size_) { m_prefix[0] = (m_prefix[0] & 0xf0) | ((size_ >> 16) & 0x0f); m_prefix[1] = (size_ >> 8) & 0xff; m_prefix[2] = size_ & 0xff; }
+		void packetSizeBytes(UINT32 size_)
+		{
+			// preserve the upper 4 bits of [0] which represent the packet type,
+			// but completely replace the lower four bits
+			m_prefix[0] = (m_prefix[0] & 0xf0) | ((size_ >> 16) & 0x0f);
+			m_prefix[1] = (size_ >> 8) & 0xff;
+			m_prefix[2] = size_ & 0xff;
+		}
 
 		/// Encrypted
 		//! ID of this packet.
