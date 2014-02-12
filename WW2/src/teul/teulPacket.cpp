@@ -305,10 +305,8 @@ Teul::Packet::wantsEncryption()
 //////////////////////////////////////////////////////////////////////
 // Broadcast a packet to an array of endpoints.
 
-typedef std::vector<ENDPOINT*> ENDPOINTS;
-
 void
-Teul::Packet::send(const ENDPOINTS& endpoints)
+Teul::Packet::send(const std::vector<ENDPOINT*>& endpoints)
 {
 	if ( wantsEncryption() )
 	{
