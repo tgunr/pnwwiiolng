@@ -780,6 +780,9 @@ chatRouteGCIMessage(Chat::GCIMessage& message, UINT32 messageID)
 		}
 	}
 
+	if (PN_UNLIKELY(endpoints.empty()))
+		return;
+
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::CLIENT_GCI_MESSAGE_Y), message);
 	outgoing.send(endpoints);
 }
