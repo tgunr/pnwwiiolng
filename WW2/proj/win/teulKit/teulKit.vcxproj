@@ -374,11 +374,9 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\Libraries\raknet\Source\RakVoice.h" />
     <ClInclude Include="..\..\..\src\dbug\dbug.h" />
     <ClInclude Include="..\..\..\src\dbug\dbugInternal.h" />
     <ClInclude Include="..\..\..\src\dbug\dbugWErrno.h" />
-    <ClInclude Include="..\..\..\src\include\emem.h" />
     <ClInclude Include="..\..\..\src\include\precompile_includes.h" />
     <ClInclude Include="..\..\..\src\mem\memPool.h" />
     <ClInclude Include="..\..\..\src\teul\teulCallbackStruct.h" />
@@ -388,11 +386,9 @@
     <ClInclude Include="..\..\..\src\teul\teulExceptions.h" />
     <ClInclude Include="..\..\..\src\teul\teulExtract.h" />
     <ClInclude Include="..\..\..\src\teul\teulFuncTypes.h" />
-    <ClInclude Include="..\..\..\src\teul\teulHeader.h" />
     <ClInclude Include="..\..\..\src\teul\teulIPackable.h" />
-    <ClInclude Include="..\..\..\src\teul\teulLIEndpoint.h" />
     <ClInclude Include="..\..\..\src\teul\teulNetTimeMS.h" />
-    <ClInclude Include="..\..\..\src\teul\teulPacketClass.h" />
+    <ClInclude Include="..\..\..\src\teul\teulPacket.h" />
     <ClInclude Include="..\..\..\src\teul\teulPacketHeader.h" />
     <ClInclude Include="..\..\..\src\teul\teulTimeMS.h" />
     <ClInclude Include="..\..\..\src\teul\teulVersion.h" />
@@ -417,10 +413,8 @@
     <ClInclude Include="..\..\..\src\teul\teulNetworkMsg.h" />
     <ClInclude Include="..\..\..\src\teul\teulNetworkObject.h" />
     <ClInclude Include="..\..\..\src\teul\teulPackers.h" />
-    <ClInclude Include="..\..\..\src\teul\teulSerialize.h" />
     <ClInclude Include="..\..\..\src\teul\teulSockConfig.h" />
     <ClInclude Include="..\..\..\src\teul\teulTime.h" />
-    <ClInclude Include="..\..\..\src\teul\teulTransport.h" />
     <ClInclude Include="..\..\..\src\teul\teulUtils.h" />
     <ClInclude Include="..\..\..\src\wwii\wwiiCallbacks.h" />
   </ItemGroup>
