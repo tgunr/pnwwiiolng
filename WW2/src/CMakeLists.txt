@@ -124,6 +124,7 @@ add_library (teulserver
 		teul/teulEndpointImpl.h
 	teul/teulMicroWebServer.cpp
 		teul/teulMicroWebServer.h
+			include/pnThread.h
 	teul/teulModCalls.cpp
 		teul/teulModCalls.h
 	teul/teulModRecv.cpp
