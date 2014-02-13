@@ -201,6 +201,9 @@ Teul::uWeb::Server::run()
 		const int newSock = accept(m_listenSock, (struct sockaddr*)&addr, &sockLen);
 		if ( newSock < 0 )
 		{
+			if (isCancelled())
+				return;
+
 			printf("uWebServer error on accept: %d (%d)\n", newSock, errno);
 			continue;
 		}
