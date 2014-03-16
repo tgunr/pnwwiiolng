@@ -891,13 +891,8 @@ _addServer(Server::ServerInfo* const server)
 static void
 _killDebugWebServer()
 {
-	if ( Teul::uWeb::s_debugServer != nullptr )
-	{
-		Teul::uWeb::s_debugServer->cancel();
-		std::this_thread::sleep_for(std::chrono::milliseconds(100));
-		delete Teul::uWeb::s_debugServer;
-		Teul::uWeb::s_debugServer = nullptr;
-	}
+	Teul::uWeb::s_debugServer.cancel();
+	std::this_thread::sleep_for(std::chrono::milliseconds(100));
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -906,13 +901,8 @@ _killDebugWebServer()
 void
 serverEnableDebugWebServer(SERVER_TYPE serverType)
 {
-	if ( Teul::uWeb::s_debugServer != nullptr )
-		return;
-
 	UINT16 port = WWII::Net::Ports::DebugWebServer + static_cast<UINT16>(serverType);
-
-	Teul::uWeb::s_debugServer = new Teul::uWeb::Server(cv_teulWebPath.GetString(), port);
-	Teul::uWeb::s_debugServer->start();
+	Teul::uWeb::s_debugServer.start(cv_teulWebPath.GetString(), port);
 
 	atexit(_killDebugWebServer);
 }
@@ -1008,10 +998,7 @@ serverInit(UINT32 appVersion
 	_addServer(_exitServer);
 	_addServer(&Server::myServerInfo);
 
-	if ( Teul::uWeb::s_debugServer != nullptr )
-	{
-		Teul::uWeb::s_debugServer->addVirtualFile("Server Status", "/server-alive.json", _serverReportAlive);
-	}
+	Teul::uWeb::s_debugServer.addVirtualFile("Server Status", "/server-alive.json", _serverReportAlive);
 
 	return _myServerInfo->sync();
 }

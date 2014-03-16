@@ -15,10 +15,10 @@ namespace Teul
 		class Server : public PNThread
 		{
 		public:
-			Server(const char* const rootPath_, const unsigned short port_)
+			Server()
 				: PNThread()
-				, m_rootPath(rootPath_)
-				, m_port(port_)
+				, m_rootPath("")
+				, m_port(0)
 				, m_config_mutex()
 				, m_listenSock(INVALID_SOCKET)
 				, m_resourceList("[]")
@@ -27,10 +27,19 @@ namespace Teul
 
 			virtual ~Server() {}
 
+		public:
+			void start(const char* const rootPath_, const unsigned short port_)
+			{
+				ABORT_IF(isStarted());
+				m_rootPath = rootPath_;
+				m_port = port_;
+				PNThread::start();
+			}
+
 		private:
-			const std::string m_rootPath;
+			std::string m_rootPath;
 		private:
-			const unsigned short m_port;
+			unsigned short m_port;
 		private:
 			std::mutex m_config_mutex;
 		private:
@@ -71,7 +80,7 @@ namespace Teul
 			void processHTTPRequest(const int fd, char* const request);
 		};
 
-		extern Server* s_debugServer;
+		extern Server s_debugServer;
 	}
 }
 

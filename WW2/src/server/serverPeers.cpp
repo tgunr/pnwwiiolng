@@ -500,8 +500,7 @@ serverInitializePeering()
 
 	dbugLog(_FLN, "t:%d server peering interface opened on port %u", s_peeringIndex, peeringPort);
 
-	if ( Teul::uWeb::s_debugServer != nullptr )
-		Teul::uWeb::s_debugServer->addVirtualFile("Peering Status", "/peering.json", _reportJSONPeers);
+	Teul::uWeb::s_debugServer.addVirtualFile("Peering Status", "/peering.json", _reportJSONPeers);
 }
 
 //////////////////////////////////////////////////////////////////////

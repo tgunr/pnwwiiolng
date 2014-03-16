@@ -5,6 +5,14 @@
 
 #include "teul/teulMicroWebServer.h"
 
+namespace Teul
+{
+	namespace uWeb
+	{
+		Server s_debugServer;
+	}
+}
+
 extern TeulTimeMS teulClock64;
 
 struct Header
@@ -230,7 +238,6 @@ void memInit()
 #if defined(MEMORY_DEBUG)
 	atexit(memReport);
 
-	if ( Teul::uWeb::s_debugServer != nullptr )
-		Teul::uWeb::s_debugServer->addVirtualFile("Debug Memory Usage Statistics", "/mem.json", memReportJSON);
+	Teul::uWeb::s_debugServer.addVirtualFile("Debug Memory Usage Statistics", "/mem.json", memReportJSON);
 #endif
 }

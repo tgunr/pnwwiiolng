@@ -2315,6 +2315,5 @@ mapPlayerInit()
 	g_chatSyncQueue.clear();
 	g_logins.clear();
 
-	if ( Teul::uWeb::s_debugServer != nullptr )
-		Teul::uWeb::s_debugServer->addVirtualFile("Player counts", "/player-balance.json", _reportPlayerDetails);
+	Teul::uWeb::s_debugServer.addVirtualFile("Player counts", "/player-balance.json", _reportPlayerDetails);
 }

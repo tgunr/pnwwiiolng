@@ -82,10 +82,6 @@ const char* errorTypes[] = {
 	"D"		// debug level message
 };
 
-#if platBuild == TEUL_SERVER
-namespace Teul { namespace uWeb { class Server; Server* s_debugServer = nullptr; } }
-#endif
-
 //static SINT32	theError = 0;
 static size_t _fileSize = 0;
 static void _levelHandler(UINT32 errType, const char* const text);
