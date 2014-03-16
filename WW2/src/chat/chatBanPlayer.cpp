@@ -38,7 +38,7 @@ struct BAN
 	UINT32		m_banNo;
 	playerid_t	m_playerID;
 };
-typedef ConditionQueue<BAN*> BAN_QUEUE;
+typedef ConditionQueue<BAN> BAN_QUEUE;
 BAN_QUEUE banQueue;
 
 //////////////////////////////////////////////////////////////////////
@@ -173,22 +173,28 @@ _processBan(DB::handle_t* conn, BAN& ban)
 //////////////////////////////////////////////////////////////////////
 // Thread for processing bans
 
-void*
-chatBanQueueThread(void*)
+void chatBanQueueThread()
 {
 	static DB::handle_t* conn = threadsOpenDBConnection(false);
 	if ( conn == nullptr )
 	{
 		threadLog(_FLA, "bqt: Unable to open database connection");
-		return nullptr;
+		return;
 	}
 
 	threadLog(_FLI, "Ban Queue Thread active");
 
 	threadIgnoreSIGPIPE();
 
-	for (;;)
+	for ( ; ; )
 	{
-		_processBan(conn, *banQueue.getNext());
+		auto ban = banQueue.getNext();
+		if (ban == nullptr)
+			break;
+		_processBan(conn, *ban);
 	}
+
+	threadsCloseDBConnection(conn);
+
+	return;
 }

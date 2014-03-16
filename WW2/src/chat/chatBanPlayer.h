@@ -15,4 +15,4 @@ void chatBanPlayer(const ChatHandle& handle, UINT32 duration, const char* messag
 void chatForceKickPlayer(const ChatHandle& handle, const char* message, UINT32 issuer, const ChatHandle& issuerHandle);
 
 // Thread for banning players
-void* chatBanQueueThread(void*);
+void chatBanQueueThread();

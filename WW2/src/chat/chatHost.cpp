@@ -3715,6 +3715,4 @@ main(int argc, const char* argv[])
 	chatThreadsShutdown();
 
 	teulCloseTransport();
-
-	exit(0);
 }

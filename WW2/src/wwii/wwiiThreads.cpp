@@ -62,7 +62,7 @@ static LOG_QUEUE logQueue;
 static size_t logQueueMax, logQueuePushes;
 static std::mutex logQueueMutex;
 
-static ConditionQueue<DBThreadQuery*> dbQueue;
+static ConditionQueue<DBThreadQuery> dbQueue;
 DBQueueThread dbThread[NUM_HELPER_THREADS];
 
 typedef std::pair<THREAD_CALLBACK*, void*> CALLBACK_INFO;
@@ -91,11 +91,11 @@ DBQueueThread::run()
 
 	DBThread::DBNo dbNo = DBThread::Default;
 
-	for (;; )
+	for ( ; ; )
 	{
 		DBThreadQuery* query = dbQueue.getNext();
 		if ( query == nullptr )
-			continue;
+			break;
 		if ( query->Execute(threadId, m_conn, &dbNo) )
 			continue;
 
@@ -114,6 +114,12 @@ DBQueueThread::run()
 		} while ( m_conn == nullptr );
 
 		threadLog(_FLW, "dbc:%u reconnected to database", threadId);
+	}
+
+	if ( m_conn )
+	{
+		threadsCloseDBConnection(m_conn);
+		m_conn = nullptr;
 	}
 }
 
@@ -174,12 +180,10 @@ threadsOpenDBConnection(bool enableAutoCommit)
 // Close database connection
 
 void
-threadsCloseDBConnection(MYSQL* conn)
+threadsCloseDBConnection(DB::handle_t* conn)
 {
-	if ( conn == nullptr )
-		return;
-
-	mysql_close(conn);
+	if ( conn != nullptr )
+		mysql_close(conn);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -233,6 +237,7 @@ threadsEnable()
 void
 threadsShutdown()
 {
+	dbQueue.destroy();
 	for ( UINT32 i = 0; i < NUM_HELPER_THREADS; ++i )
 	{
 		dbThread[i].cancel();

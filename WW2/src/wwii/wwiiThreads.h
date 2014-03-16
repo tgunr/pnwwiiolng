@@ -8,6 +8,7 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 #include "include/pnThread.h"
+#include "dbse/dbseHandle.h"
 
 typedef struct st_mysql MYSQL;
 class DBQuery;
@@ -38,9 +39,10 @@ extern void threadsCallNextCallback();
 extern bool threadsReadDBEnvironment();
 
 // Open a new database connection in a thread-safe way
-extern MYSQL* threadsOpenDBConnection(bool enableAutoCommit);
+extern DB::handle_t* threadsOpenDBConnection(bool enableAutoCommit);
 
 // Close a connection.
+extern void threadsCloseDBConnection(DB::handle_t* conn);
 
 //////////////////////////////////////////////////////////////////////
 // Client calls ("thread")

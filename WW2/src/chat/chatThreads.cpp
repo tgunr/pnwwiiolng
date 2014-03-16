@@ -17,7 +17,7 @@
 
 struct BanThread : public PNThread
 {
-	virtual void run() OVERRIDE_FN { chatBanQueueThread(nullptr);	}
+	virtual void run() OVERRIDE_FN { chatBanQueueThread();	}
 };
 static BanThread _banThread;
 static StatsThread _statsThread;

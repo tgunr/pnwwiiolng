@@ -11,7 +11,17 @@ class PNThread
 
 public:
 	PNThread() : m_thread(), m_started(false), m_cancelled(false) {}
-	virtual ~PNThread() {}
+	virtual ~PNThread()
+	{
+		cancel();
+		if (isRunning()) {
+			try {
+				m_thread.detach();
+			} catch (...) {
+				// pass
+			}
+		}
+	}
 
 	void start()
 	{
@@ -35,8 +45,13 @@ public:
 
 	void join()
 	{
-		if (isRunning())
-			m_thread.join();
+		if (isRunning()) {
+			try {
+				m_thread.join();
+			} catch (...) {
+				//pass;
+			}
+		}
 	}
 
 	bool isStarted() const { return m_started; }

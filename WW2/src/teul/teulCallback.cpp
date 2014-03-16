@@ -151,9 +151,8 @@ TEUL_CALLBACK::Release()
 {
 	dbugLog(_FLI, "cb:%u,%u freeing callback", callX(), callY());
 
-	s_callbackArray[callX()][callY()] = nullptr;
-
 	memFree(this);
+	s_callbackArray[callX()][callY()] = nullptr;
 }
 
 // sometimes you just have to free them all
@@ -164,7 +163,7 @@ void teulFreeAllCallbacks()
 		for ( UINT32 y = 0; y < 256; ++y )
 		{
 			TEUL_CALLBACK* objPtr = TEUL_CALLBACK::Lookup((UINT8)x, (UINT8)y);
-			if ( objPtr != nullptr)
+			if ( objPtr != nullptr )
 				objPtr->Release();
 		}
 	}
