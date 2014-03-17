@@ -7,20 +7,24 @@
 
 extern YYSTYPE yylval;
 
-extern void yyerror(const char* message);
-extern void yyerrorDetail(const char* message, const char* text);
-
 extern int yylineno;
+int codeFragStart;
 extern const char* g_currentFile;
 std::string g_funcBody;
 
-void add_code(const char* line)
+extern void yyerror(const char* fmt, ...);
+
+void add_code(const char* yytext)
 {
-	char annotation[256];
-	sprintf(annotation, "#line %u \"%s\"\n", yylineno, g_currentFile);
-	g_funcBody += annotation;
-	g_funcBody += line;
-	g_funcBody += '\n';
+	const bool isNewLine = (g_funcBody.empty() || (g_funcBody.back() == '\n'));
+	if (isNewLine) {
+		if(*yytext == '\n')
+			return;
+		char annotation[1024];
+		snprintf(annotation, sizeof(annotation) - 1, "#line %u \"%s\"\n", yylineno, g_currentFile);
+		g_funcBody += annotation;
+	}
+	g_funcBody += *yytext;
 }
 %}
 
@@ -36,11 +40,11 @@ void add_code(const char* line)
 %%
 
 	/* {{ ... }} code fragments */
-"{{"[ ]*				{ g_funcBody = ""; yy_push_state(CODE_FRAG); }
+"{{"[ ]*				{ codeFragStart = yylineno; g_funcBody = ""; yy_push_state(CODE_FRAG); }
+<CODE_FRAG><<EOF>>		{ yyerror("unterminated code fragment from line %u\n", codeFragStart); yyterminate(); }
 <CODE_FRAG>"}}"			{ yy_pop_state(); yylval.sVal = g_funcBody.c_str(); return TCODE_FRAG; }
-<CODE_FRAG>.*?/"}}"		{ add_code(yytext); }
-<CODE_FRAG>.*?			{ add_code(yytext); }
-<CODE_FRAG>\n
+<CODE_FRAG>.			{ add_code(yytext); }
+<CODE_FRAG>\n			{ add_code(yytext); }
 
 	/* multi-line comments */
 <INITIAL,ML_CMT>"/*"	yy_push_state(ML_CMT);
@@ -78,6 +82,6 @@ void				return TKW_VOID;
 [ \t]				/* skip whitespace */
 \n
 
-.					{ yyerrorDetail("Unexpected string", yytext); exit(1); }
+.					{ yyerror("Unexpected string '%s'\n", yytext); yyterminate(); }
 
 

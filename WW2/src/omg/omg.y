@@ -2,18 +2,20 @@
 #include <cstdio>
 #include <iostream>
 #include <string>
+#include <cstdarg>
 #include "omg.yy.h"
 
 const char* g_currentFile = nullptr;
 extern int yylineno;
 
-void yyerror(const char* s)
+void yyerror(const char *s, ...)
 {
-	fprintf(stderr, "%s:%u: %s\n", g_currentFile, yylineno, s);
-}
-void yyerrorDetail(const char* s, const char* text)
-{
-	fprintf(stderr, "%s:%u: %s: %s\n", g_currentFile, yylineno, s, text);
+	fprintf(stderr, "%s:%u: ", g_currentFile, yylineno);
+	va_list ap;
+	va_start(ap, s);
+	vfprintf(stderr, s, ap);
+	va_end(ap);
+	fprintf(stderr, "\n");
 }
 
 void omg_type_decl(const char* str)
