@@ -1,5 +1,3 @@
-DEBUG;
-
 NAMESPACE MM;
 
 TYPE Teul::NetTimeMS;
@@ -7,6 +5,26 @@ TYPE FULL_OBJ_ID;
 TYPE WEAPON_SPEC;
 TYPE RANK_NO;
 TYPE ChatHandle;
+
+MESSAGE Test
+{
+};
+
+MESSAGE Test2
+{
+	GROUP Group1 { UINT32 i; };
+	GROUP Group2 { UINT32 i; };
+	GROUP Group3 { UINT32 i; };
+	GROUP Group4 { UINT32 i; };
+	GROUP Group5 { UINT32 i; };
+	GROUP Group6 { UINT32 i; };
+	GROUP Group7 { UINT32 i; };
+	GROUP Group8 { UINT32 i; };
+	GROUP Group9 { UINT32 i; };
+	GROUP Group10 { UINT32 i; };
+	GROUP Group11 { UINT32 i; };
+	GROUP Group12 { UINT32 i; };
+};
 
 MESSAGE SortieData
 {

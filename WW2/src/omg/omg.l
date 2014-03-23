@@ -1,8 +1,8 @@
 /* Flex file */
 
 %{
-#include "omg.tab.h"
 #include "omg.h"
+#include "omg.tab.h"
 #include <string>
 #include <utility>
 

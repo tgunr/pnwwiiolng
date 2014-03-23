@@ -1,5 +1,8 @@
 #pragma once
 
+#include <utility>
+#include <string>
+
 extern const char* g_currentFile;
 extern int yylineno;
 

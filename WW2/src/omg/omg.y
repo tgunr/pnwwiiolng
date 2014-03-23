@@ -36,8 +36,11 @@
 
 %%
 
-file			:	directives definitions
-				|	definitions
+file			:	optional-directives definitions
+				;
+
+optional-directives:	/* empty */
+				|	directives
 				;
 
 directives		:	directive
@@ -60,7 +63,6 @@ definitions		:	definition
 
 definition		:	message
 				;
-				
 				
 message			:	valid-message ';'
 				|	valid-message { yymissing("semicolon", "MESSAGE", $1); }
@@ -109,5 +111,5 @@ field-opts		:	/* empty */
 func			:	TCODE_FRAG { omg_add_code($1); } ;
 				
 qualified-type	:	TIDENTIFIER
-				|	qualified-type TKW_CPP_SCOPE TIDENTIFIER
+				|	qualified-type TKW_CPP_SCOPE TIDENTIFIER { char* str = (char*)malloc(strlen($1) + 2 + strlen($3) + 1); sprintf(str, "%s::%s", $1, $3); $$ = str; }
 				;
