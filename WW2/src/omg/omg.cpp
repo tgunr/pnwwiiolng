@@ -187,17 +187,17 @@ void yymissing(const char* what, const char* type, const char* reason)
 	exit(1);
 }
 
-void yyaddcode(const char* yytext, std::string& into)
+void yyaddcode(const char* text, std::string& into)
 {
 	const bool isNewLine = (into.empty() || (into.back() == '\n'));
 	if (isNewLine) {
-		if (*yytext == '\n')
+		if (*text == '\n')
 			return;
 		char annotation[1024];
 		sprintf(annotation, "#line %u \"%s\"\n", yylineno, g_currentFile);
 		into += annotation;
 	}
-	into += *yytext;
+	into += *text;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -608,7 +608,7 @@ void Group::Emit() const
 		"\n");
 
 	for (Field* child = static_cast<Field*>(m_child); child; child = static_cast<Field*>(child->m_next)) {
-		HDR("\t\tWWII::SyncVar<%s, %" PRSizeT "> %s;\n", child->m_typeName, child->m_name.c_str(), child->m_size);
+		HDR("\t\tWWII::SyncVar<%s, %" PRSizeT "> %s;\n", child->m_typeName, child->m_size, child->m_name.c_str());
 	}
 
 	if (m_extraCode.empty() == false) {
