@@ -1586,3 +1586,7 @@ WW2/src/xml/.dirstamp
 *.vsp
 WW2.psess
 WW2/proj/win/WW2.sdf
+WW2/src/omg/omg.tab.cpp
+WW2/src/omg/omg.tab.h
+WW2/src/omg/omg.yy.cpp
+WW2/src/omg/omg.yy.h
