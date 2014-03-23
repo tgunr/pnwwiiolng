@@ -1,62 +1,11 @@
 %{
-#include <cstdio>
-#include <iostream>
-#include <string>
-#include <cstdarg>
 #include "omg.yy.h"
+#include "omg.h"
 
-const char* g_currentFile = nullptr;
-extern int yylineno;
+#if defined(_MSC_VER)
+#pragma warning( disable : 4065 )		// Disable warning C4065: switch statement contains 'default' but no 'case' labels
+#endif
 
-void yyerror(const char *s, ...)
-{
-	fprintf(stderr, "%s:%u: ", g_currentFile, yylineno);
-	va_list ap;
-	va_start(ap, s);
-	vfprintf(stderr, s, ap);
-	va_end(ap);
-	fprintf(stderr, "\n");
-}
-
-void omg_type_decl(const char* str)
-{
-	printf("TYPE %s\n", str);
-}
-
-void omg_namespace(const char* str)
-{
-	printf("NAMESPACE %s\n", str);
-}
-
-void omg_start_message(const char* str)
-{
-	std::cout << "START MESSAGE " << str << "\n";
-}
-
-void omg_end_message(const char* str)
-{
-	std::cout << "END MESSAGE " << str << "\n";
-}
-
-void omg_start_field(const char* str)
-{
-	std::cout << "START FIELD " << str << "\n";
-}
-
-void omg_end_field(const char* str)
-{
-	std::cout << "END FIELD " << str << "\n";
-}
-
-void omg_hoist_as(const char* str)
-{
-	std::cout << "HOIST_AS " << str << "\n";
-}
-
-void omg_add_code(const char* str)
-{
-	std::cout << "code:\n" << str << "\n";
-}
 %}
 
 %union {
@@ -66,97 +15,99 @@ void omg_add_code(const char* str)
 }
 
 // declarations
-%token			TKW_TYPE TKW_NAMESPACE
+%token			TKW_DEBUG
+%token			TKW_NAMESPACE
+%token			TKW_TYPE
+
 // statement keywords
 %token			TKW_MESSAGE TKW_GROUP
-// member options
-%token			TKW_HOIST_AS
+
 // C++ keywords
-%token			TKW_CONST TKW_VOID TKW_CPP_SCOPE
+%token			TKW_CPP_SCOPE
 
 %token <sVal>	TIDENTIFIER TCODE_FRAG
 %token <iVal>	TINTEGER
 %token <dVal>	TDOUBLE
 
+%type <sVal>	valid-group
+%type <sVal>	valid-message
+%type <sVal>	valid-field
+%type <sVal>	qualified-type
+
 %%
 
-file			:	declarations messages
-				|	messages
+file			:	directives definitions
+				|	definitions
 				;
 
-declarations	:	declaration
-				|	declarations declaration
+directives		:	directive
+				|	directives directive
 				;
 
-declaration		:	TKW_TYPE TIDENTIFIER { omg_type_decl($2); } ';'
-				|	TKW_NAMESPACE TIDENTIFIER { omg_namespace($2); } ';'
+directive		:	TKW_DEBUG ';' { omg_enable_debug(); }
+				|	TKW_DEBUG { yymissing("semicolon", "keyword", "DEBUG"); }
+				|	TKW_NAMESPACE TIDENTIFIER ';' { omg_namespace($2); }
+				|	TKW_NAMESPACE TIDENTIFIER { yymissing("semicolon", "keyword", "NAMESPACE"); }
+				|	TKW_NAMESPACE { yymissing("identifier", "keyword", "NAMESPACE"); }
+				|	TKW_TYPE qualified-type ';' { omg_type_decl($2); }
+				|	TKW_TYPE qualified-type { yymissing("semicolon", "keyword", "TYPE"); }
+				|	TKW_TYPE { yymissing("typename", "keyword", "TYPE"); }
 				;
 
-messages		:	message
-				|	messages message
+definitions		:	definition
+				|	definitions definition
 				;
 
-message			:	TKW_MESSAGE TIDENTIFIER
-						{ omg_start_message($2); } 
-						'{' messagebody '}'
-						{ omg_end_message($2); }
-						';'
+definition		:	message
 				;
 				
-messagebody		:	/* empty */
-				|	messagestmts 
-				;
 				
-messagestmts	:	messagestmt
-				|	messagestmts messagestmt
+message			:	valid-message ';'
+				|	valid-message { yymissing("semicolon", "MESSAGE", $1); }
 				;
 
-messagestmt		:	group
+valid-message	:	TKW_MESSAGE TIDENTIFIER	{ omg_start_message($2); } message-body { omg_end_message(); $$ = $2; }
+				|	TKW_MESSAGE TIDENTIFIER	{ yymissing("open-brace ('{')", "MESSAGE", $2); }
+				|	TKW_MESSAGE { yymissing("identifier", "keyword", "MESSAGE"); }
+				;
+
+message-body	:	'{' '}'
+				|	'{' message-stmts '}'
+				;
+
+message-stmts	:	message-stmt
+				|	message-stmts message-stmt
+				;
+
+message-stmt	:	group
 				|	func
 				|	field
 				;
 
-group			:	TKW_GROUP '{' fields '}' ';'
+group			:	valid-group ';' 
+				|	valid-group { yyfatal("Missing semicolon after GROUP '%s'", $1); }
+				;
+
+valid-group		:	TKW_GROUP TIDENTIFIER { omg_start_group($2); } '{' fields '}' { omg_end_group(); $$ = $2; }
+				|	TKW_GROUP TIDENTIFIER { yymissing("open-brace ('{')", "GROUP", $2); }
 				;
 				
 fields			:	field
 				|	fields field
 				;
 				
-field			:	qualified_type TIDENTIFIER { omg_start_field($2); } fieldopts { omg_end_field($2); } ';'
+field			:	valid-field ';'
+				|	valid-field { yyfatal("Missing trailing semicolon after field '%s'", $1); }
 				;
 
-fieldopts		:	/* empty */
-				|	fieldopts fieldopt
+valid-field		:	qualified-type TIDENTIFIER { omg_start_field($1, $2); } field-opts { omg_end_field(); $$ = $2; }
 				;
 
-fieldopt		:	TKW_HOIST_AS TIDENTIFIER '(' ')' { omg_hoist_as($2); }
+field-opts		:	/* empty */
 				;
 
 func			:	TCODE_FRAG { omg_add_code($1); } ;
 				
-qualified_type	:	TIDENTIFIER
-				|	qualified_type TKW_CPP_SCOPE TIDENTIFIER
+qualified-type	:	TIDENTIFIER
+				|	qualified-type TKW_CPP_SCOPE TIDENTIFIER
 				;
-
-%%
-
-int main(int argc, const char** argv)
-{
-	if ( argc <= 1 ) {
-		g_currentFile = "stdin";
-		yyparse();
-	} else {
-		for (int i = 1; i < argc; ++i) {
-			g_currentFile = argv[i];
-			FILE* f = fopen(g_currentFile, "r");
-			if (!f) {
-				perror(g_currentFile);
-				return 1;
-			}
-			yyrestart(f);
-			yyparse();
-			fclose(f);
-		}
-	}
-}

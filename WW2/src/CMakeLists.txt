@@ -92,6 +92,41 @@ message(STATUS "${PN_BUILD_TYPE}/${BUILDNAME} build. Opt:${OPTIMIZATION}, MEM:${
 ######################################################################
 #### Libraries.
 
+# bison first, then flex.
+IF (WIN32)
+	SET(BISON_EXE "${CMAKE_CURRENT_SOURCE_DIR}/omg/win_bison.exe")
+	SET(FLEX_EXE "${CMAKE_CURRENT_SOURCE_DIR}/omg/win_flex.exe")
+ELSE ( )
+	SET(BISON_EXE "bison")
+	SET(FLEX_EXE "flex")
+ENDIF()
+
+SET(OMG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/omg")
+add_custom_command(OUTPUT ${OMG_DIR}/omg.tab.cpp ${OMG_DIR}/omg.tab.h
+	COMMAND	${BISON_EXE}
+	ARGS -o omg.tab.cpp --defines=omg.tab.h omg.y
+	DEPENDS ${OMG_DIR}/omg.y
+	COMMENT "[BISON] Building OMG"
+	WORKING_DIRECTORY ${OMG_DIR}
+)
+add_custom_command(OUTPUT ${OMG_DIR}/omg.yy.cpp ${OMG_DIR}/omg.yy.h
+	COMMAND ${FLEX_EXE}
+	ARGS -o omg.yy.cpp -B --nounistd --header-file=omg.yy.h omg.l
+	DEPENDS ${OMG_DIR}/omg.l ${OMG_DIR}/omg.tab.h
+	COMMENT "[FLEX] Building OMG"
+	WORKING_DIRECTORY ${OMG_DIR}
+)
+add_executable(omggen
+	omg/omg.tab.cpp
+		omg/omg.tab.h
+	omg/omg.yy.cpp
+		omg/omg.yy.h
+	omg/omg.cpp
+	omg/omg.y
+	omg/omg.l
+)
+add_dependencies(omggen ${OMG_DIR}/omg.y ${OMG_DIR}/omg.l)
+
 add_library (ircclient
 	libircclient/src/libircclient.cpp
 )
