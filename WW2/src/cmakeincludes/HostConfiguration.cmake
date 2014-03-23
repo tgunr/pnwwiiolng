@@ -9,7 +9,6 @@ include_directories(
 	${CMAKE_CURRENT_SOURCE_DIR}/sys
 	${MYSQL_INCLUDE_DIR}
     ${CMAKE_CURRENT_SOURCE_DIR}/libircclient/include
-	${CMAKE_CURRENT_SOURCE_DIR}/../../Libraries/raknet/Source
 	${CMAKE_CURRENT_SOURCE_DIR}/libevent/include
 )
 

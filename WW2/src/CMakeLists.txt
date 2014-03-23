@@ -125,6 +125,7 @@ add_executable(omggen
 	omg/omg.y
 	omg/omg.l
 )
+set_target_properties(omggen PROPERTIES COMPILE_FLAGS "-O3 -march=native -mtune=native -Wno-error -Wno-all -Wno-format-security") #
 add_dependencies(omggen ${OMG_DIR}/omg.y ${OMG_DIR}/omg.l)
 
 add_library (ircclient
@@ -1108,7 +1109,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 	ADD_PCH(${STRAT_HOST_EXE})
 	set_property(TARGET ${STRAT_HOST_EXE} PROPERTY COMPILE_DEFINITIONS AS_SERVER IS_STRAT_HOST LUA_MODULE_OPEN=tolua_stratd_open CHECK_SUPPLY=1)
 	set_property(TARGET ${_LUA_HOST} PROPERTY DEPENDS ${_LUA_HOST}Lua.cc)
-	IF ( UNIX )
+	IF ( NOT MSVC )
 		set_property(SOURCE ${_LUA_HOST}Lua.cc PROPERTY COMPILE_FLAGS "${COMPILE_FLAGS} -Wno-unused -Wno-unused-function")
 	ELSE ( )
 		set_property(SOURCE ${_LUA_HOST}Lua.cc PROPERTY COMPILE_FLAGS "/W0")
