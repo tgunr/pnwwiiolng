@@ -10,6 +10,7 @@ extern YYSTYPE yylval;
 
 static int codeFragStart;
 static std::string g_funcBody;
+static std::string g_condition;
 
 extern void yyerror(const char* fmt, ...);
 extern void yyaddcode(const char* text, std::string& into);
@@ -22,6 +23,7 @@ extern void yyaddcode(const char* text, std::string& into);
 %option				never-interactive
 
 %x ML_CMT
+%x IF_COND
 %x CODE_FRAG
 
 %%
@@ -34,7 +36,7 @@ extern void yyaddcode(const char* text, std::string& into);
 <CODE_FRAG>\n			{ yyaddcode(yytext, g_funcBody); }
 
 	/* multi-line comments */
-<INITIAL,ML_CMT>"/*"	yy_push_state(ML_CMT);
+<INITIAL,IF_COND,ML_CMT>"/*"	yy_push_state(ML_CMT);
 <ML_CMT>"*/"			yy_pop_state();
 <ML_CMT>\n
 <ML_CMT>.?
@@ -50,6 +52,21 @@ TYPE					return TKW_TYPE;
 	/* statement keywords */
 MESSAGE					return TKW_MESSAGE;
 GROUP					return TKW_GROUP;
+
+	/* message keywords */
+IF\ \(					{ yy_push_state(IF_COND); g_condition = ""; }
+<IF_COND>\(				{ yy_push_state(IF_COND); g_condition.push_back('('); }
+<IF_COND>\)				{
+	yy_pop_state();
+	if (yy_top_state() != IF_COND) {
+		g_condition.push_back('\n');
+		yylval.sVal = g_condition.c_str();
+		return TKW_IF;
+	}
+	g_condition.push_back(')');
+}
+<IF_COND>\n				{ yyaddcode(yytext, g_condition); }
+<IF_COND>.				{ yyaddcode(yytext, g_condition); }
 
 	/* C++ */
 ::						return TKW_CPP_SCOPE;

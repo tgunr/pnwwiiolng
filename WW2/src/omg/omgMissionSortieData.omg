@@ -1,3 +1,4 @@
+DEBUG;
 NAMESPACE MM;
 
 TYPE Teul::NetTimeMS;
@@ -5,26 +6,6 @@ TYPE FULL_OBJ_ID;
 TYPE WEAPON_SPEC;
 TYPE RANK_NO;
 TYPE ChatHandle;
-
-MESSAGE Test
-{
-};
-
-MESSAGE Test2
-{
-	GROUP Group1 { UINT32 i; };
-	GROUP Group2 { UINT32 i; };
-	GROUP Group3 { UINT32 i; };
-	GROUP Group4 { UINT32 i; };
-	GROUP Group5 { UINT32 i; };
-	GROUP Group6 { UINT32 i; };
-	GROUP Group7 { UINT32 i; };
-	GROUP Group8 { UINT32 i; };
-	GROUP Group9 { UINT32 i; };
-	GROUP Group10 { UINT32 i; };
-	GROUP Group11 { UINT32 i; };
-	GROUP Group12 { UINT32 i; };
-};
 
 MESSAGE SortieData
 {
@@ -97,4 +78,37 @@ MESSAGE SortieData
 		TeulTimeMS duration_ms() const { return sortie().despawned_ms() - sortie().spawned_ms(); }
 		UINT32 duration_s() const { return UINT32(duration_ms() / 1000U); }
 	}}
+};
+
+MESSAGE Test
+{
+};
+
+MESSAGE Test2
+{
+	GROUP FRU { UINT32 i; };
+	GROUP Group1 { UINT32 i; };
+	GROUP Group2 { UINT32 i; };
+	GROUP Group3 { UINT32 i; };
+	GROUP Group4 { UINT32 i; };
+	GROUP Group5 { UINT32 i; };
+	GROUP Group6 { UINT32 i; };
+	GROUP Group7 { UINT32 i; };
+	GROUP Group8 { UINT32 i; };
+	GROUP Group9 { UINT32 i; };
+	GROUP Group10 { UINT32 i; };
+	GROUP Group11 { UINT32 i; };
+	GROUP Group12 { UINT32 i; };
+};
+
+MESSAGE TestCond
+{
+	UINT32				sortieID;
+	UINT32				pilotID;
+	ChatHandle			pilotName;
+	UINT32				crewID;
+	IF (crewID != 0)
+	{
+		ChatHandle		crewHandle;
+	}
 };

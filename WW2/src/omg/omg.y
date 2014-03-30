@@ -24,6 +24,7 @@
 
 // C++ keywords
 %token			TKW_CPP_SCOPE
+%token <sVal>	TKW_IF
 
 %token <sVal>	TIDENTIFIER TCODE_FRAG
 %token <iVal>	TINTEGER
@@ -36,80 +37,93 @@
 
 %%
 
-file			:	optional-directives definitions
-				;
+file				:	optional-directives definitions
+					;
 
-optional-directives:	/* empty */
-				|	directives
-				;
+optional-directives	:	/* empty */
+					|	directives
+					;
 
-directives		:	directive
-				|	directives directive
-				;
+directives			:	directive
+					|	directives directive
+					;
 
-directive		:	TKW_DEBUG ';' { omg_enable_debug(); }
-				|	TKW_DEBUG { yymissing("semicolon", "keyword", "DEBUG"); }
-				|	TKW_NAMESPACE TIDENTIFIER ';' { omg_namespace($2); }
-				|	TKW_NAMESPACE TIDENTIFIER { yymissing("semicolon", "keyword", "NAMESPACE"); }
-				|	TKW_NAMESPACE { yymissing("identifier", "keyword", "NAMESPACE"); }
-				|	TKW_TYPE qualified-type ';' { omg_type_decl($2); }
-				|	TKW_TYPE qualified-type { yymissing("semicolon", "keyword", "TYPE"); }
-				|	TKW_TYPE { yymissing("typename", "keyword", "TYPE"); }
-				;
+directive			:	TKW_DEBUG ';' { omg_enable_debug(); }
+					|	TKW_DEBUG { yymissing("semicolon", "keyword", "DEBUG"); }
+					|	TKW_NAMESPACE TIDENTIFIER ';' { omg_namespace($2); }
+					|	TKW_NAMESPACE TIDENTIFIER { yymissing("semicolon", "keyword", "NAMESPACE"); }
+					|	TKW_NAMESPACE { yymissing("identifier", "keyword", "NAMESPACE"); }
+					|	TKW_TYPE qualified-type ';' { omg_type_decl($2); }
+					|	TKW_TYPE qualified-type { yymissing("semicolon", "keyword", "TYPE"); }
+					|	TKW_TYPE { yymissing("typename", "keyword", "TYPE"); }
+					;
 
-definitions		:	definition
-				|	definitions definition
-				;
+definitions			:	definition
+					|	definitions definition
+					;
 
-definition		:	message
-				;
+definition			:	message
+					;
 				
-message			:	valid-message ';'
-				|	valid-message { yymissing("semicolon", "MESSAGE", $1); }
-				;
+message				:	valid-message ';'
+					|	valid-message { yymissing("semicolon", "MESSAGE", $1); }
+					;
 
-valid-message	:	TKW_MESSAGE TIDENTIFIER	{ omg_start_message($2); } message-body { omg_end_message(); $$ = $2; }
-				|	TKW_MESSAGE TIDENTIFIER	{ yymissing("open-brace ('{')", "MESSAGE", $2); }
-				|	TKW_MESSAGE { yymissing("identifier", "keyword", "MESSAGE"); }
-				;
+valid-message		:	TKW_MESSAGE TIDENTIFIER	{ omg_start_message($2); } message-body { omg_end_message(); $$ = $2; }
+					|	TKW_MESSAGE TIDENTIFIER	{ yymissing("open-brace ('{')", "MESSAGE", $2); }
+					|	TKW_MESSAGE { yymissing("identifier", "keyword", "MESSAGE"); }
+					;
 
-message-body	:	'{' '}'
-				|	'{' message-stmts '}'
-				;
+message-body		:	'{' '}'
+					|	'{' message-stmts '}'
+					;
 
-message-stmts	:	message-stmt
-				|	message-stmts message-stmt
-				;
+message-stmts		:	message-stmt
+					|	message-stmts message-stmt
+					;
 
-message-stmt	:	group
-				|	func
-				|	field
-				;
+message-stmt		:	group
+					|	func
+					|	field
+					|	conditional-block
+					;
 
-group			:	valid-group ';' 
-				|	valid-group { yyfatal("Missing semicolon after GROUP '%s'", $1); }
-				;
+group				:	valid-group ';' 
+					|	valid-group { yymissing("semicolon", "GROUP", $1); }
+					;
 
-valid-group		:	TKW_GROUP TIDENTIFIER { omg_start_group($2); } '{' fields '}' { omg_end_group(); $$ = $2; }
-				|	TKW_GROUP TIDENTIFIER { yymissing("open-brace ('{')", "GROUP", $2); }
-				;
+valid-group			:	TKW_GROUP TIDENTIFIER { omg_start_group($2); } '{' fields '}' { omg_end_group(); $$ = $2; }
+					|	TKW_GROUP TIDENTIFIER { yymissing("open-brace ('{')", "GROUP", $2); }
+					;
 				
-fields			:	field
-				|	fields field
-				;
+fields				:	field
+					|	fields field
+					;
 				
-field			:	valid-field ';'
-				|	valid-field { yyfatal("Missing trailing semicolon after field '%s'", $1); }
-				;
+field				:	valid-field ';'
+					|	valid-field { yyfatal("Missing trailing semicolon after field '%s'", $1); }
+					;
 
-valid-field		:	qualified-type TIDENTIFIER { omg_start_field($1, $2); } field-opts { omg_end_field(); $$ = $2; }
-				;
+valid-field			:	qualified-type TIDENTIFIER { omg_start_field($1, $2); } field-opts { omg_end_field(); $$ = $2; }
+					;
 
-field-opts		:	/* empty */
-				;
+field-opts			:	/* empty */
+					;
 
-func			:	TCODE_FRAG { omg_add_code($1); } ;
+func				:	TCODE_FRAG { omg_add_code($1); } ;
 				
-qualified-type	:	TIDENTIFIER
-				|	qualified-type TKW_CPP_SCOPE TIDENTIFIER { char* str = (char*)malloc(strlen($1) + 2 + strlen($3) + 1); sprintf(str, "%s::%s", $1, $3); $$ = str; }
-				;
+qualified-type		:	TIDENTIFIER
+					|	qualified-type TKW_CPP_SCOPE TIDENTIFIER { char* str = (char*)malloc(strlen($1) + 2 + strlen($3) + 1); sprintf(str, "%s::%s", $1, $3); $$ = str; }
+					;
+
+conditional-block	:	TKW_IF '{' { omg_start_if($1); } conditional-stmts '}' { omg_end_if(); }
+					|	TKW_IF { yymissing("open-brace ('{')", "IF", "condition"); }
+					;
+
+conditional-stmts	:	conditional-stmt
+					|	conditional-stmts conditional-stmt
+					;
+
+conditional-stmt	:	field
+					|	conditional-block
+					;
