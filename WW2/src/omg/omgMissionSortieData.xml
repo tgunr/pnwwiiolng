@@ -24,17 +24,13 @@
 
 	</var-group>
 
-	<var-group name='Player'>
-		<doc> <brief> Description of the player driving the sortie. </brief> </doc>
-		<member type='UINT8' name='decal' brief="Player's decal."/>
-	</var-group>
-
 	<var-group name='Vehicle'>
 		<doc> <brief> Description of the vehicle used. </brief> </doc>
 
 		<member type='WEAPON_SPEC' name='weaponSpec' brief="Vehicle used for this sortie."/>
 		<member type='RANK_NO' name='effectiveRank' brief="Rank attributed to the vehicle."/>
 		<member type='UINT8' name='rtbState' brief="Vehicle's RTB status (or 0 for not yet despawned)."/>
+    <member type='UINT8' name='decal' brief='Decal of the player leading the sortie'/>
 		<member type='ChatHandle' name='killedBy' brief="Callsign of killer or 0."/>
 		<member type='FULL_OBJ_ID' name='rtbFacility' brief="Where the vehicle is RTBing to."/>
 	</var-group>

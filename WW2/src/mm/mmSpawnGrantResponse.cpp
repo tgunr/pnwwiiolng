@@ -205,7 +205,7 @@ _sendPlayerInfoToCell(Player& player, Server::ServerInfo& server, const MM_SPAWN
 	// Add the final touches needed to the mission packet.
 	player.missionPacket().sortie().sortieID = grant.weaponSerial.serial;
 	player.m_flags.canEject = ejectable;
-	player.missionPacket().player().decal = commander.decal();
+	player.missionPacket().vehicle().decal = commander.decal();
 
 	// Notify the cell host and tell the client's teulkit to connect to it.
 	player.mirrorToCellHost(&server);

@@ -9,10 +9,10 @@
 #include "wwii/wwiiSyncVar.h"
 // For Teul::NetTimeMS
 #include "teul/teulNetTimeMS.h"
-// For WEAPON_SPEC
-#include "weap/weapSpecPacker.h"
 // For FULL_OBJ_ID
 #include "wwii/wwiiFullObjIDPacker.h"
+// For WEAPON_SPEC
+#include "weap/weapSpecPacker.h"
 
 #if defined(_MSC_VER)
 # pragma warning(disable : 4355) // C4355: 'this': used in base member initializer list.
@@ -35,7 +35,6 @@ class SortieData
 	SortieData()
 		: m_lastModified(0ULL)
 		, m_sortie(m_lastModified)
-		, m_player(m_lastModified)
 		, m_vehicle(m_lastModified)
 		, m_location(m_lastModified)
 		, m_scoring(m_lastModified)
@@ -111,32 +110,6 @@ class SortieData
 	const Sortie& sortie() const { return m_sortie; }
 	Sortie& sortie() { return m_sortie; }
 
-	//! @struct Player
-	//! @brief Description of the player driving the sortie.
-	public:
-	struct Player : public WWII::VarGroup
-	{
-		Player(TeulTimeMS& parent)
-			: VarGroup(parent)
-			, decal(this)
-			{}
-		Player& operator = (const Player& rhs)
-		{
-			m_lastModified = rhs.m_lastModified;
-			decal.operator=(rhs.decal);
-			return *this;
-		}
-		virtual void groupPacker(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)
-		{
-			UINT32 fieldNo = 0;
-			decal.packer(mode, a, lastPack, changes, fieldNo++);
-		}
-		//! Player's decal.
-		WWII::SyncVar<UINT8,0> decal;
-	} m_player;
-	const Player& player() const { return m_player; }
-	Player& player() { return m_player; }
-
 	//! @struct Vehicle
 	//! @brief Description of the vehicle used.
 	public:
@@ -147,6 +120,7 @@ class SortieData
 			, weaponSpec(this)
 			, effectiveRank(this)
 			, rtbState(this)
+			, decal(this)
 			, killedBy(this)
 			, rtbFacility(this)
 			{}
@@ -156,6 +130,7 @@ class SortieData
 			weaponSpec.operator=(rhs.weaponSpec);
 			effectiveRank.operator=(rhs.effectiveRank);
 			rtbState.operator=(rhs.rtbState);
+			decal.operator=(rhs.decal);
 			killedBy.operator=(rhs.killedBy);
 			rtbFacility.operator=(rhs.rtbFacility);
 			return *this;
@@ -166,6 +141,7 @@ class SortieData
 			weaponSpec.packer(mode, a, lastPack, changes, fieldNo++);
 			effectiveRank.packer(mode, a, lastPack, changes, fieldNo++);
 			rtbState.packer(mode, a, lastPack, changes, fieldNo++);
+			decal.packer(mode, a, lastPack, changes, fieldNo++);
 			killedBy.packer(mode, a, lastPack, changes, fieldNo++);
 			rtbFacility.packer(mode, a, lastPack, changes, fieldNo++);
 		}
@@ -175,6 +151,8 @@ class SortieData
 		WWII::SyncVar<RANK_NO> effectiveRank;
 		//! Vehicle's RTB status (or 0 for not yet despawned).
 		WWII::SyncVar<UINT8,0> rtbState;
+		//! Decal of the player leading the sortie
+		WWII::SyncVar<UINT8,0> decal;
 		//! Callsign of killer or 0.
 		WWII::SyncVar<ChatHandle,0ULL> killedBy;
 		//! Where the vehicle is RTBing to.
