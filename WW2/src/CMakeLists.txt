@@ -125,7 +125,9 @@ add_executable(omggen
 	omg/omg.y
 	omg/omg.l
 )
-set_target_properties(omggen PROPERTIES COMPILE_FLAGS "-O3 -march=native -mtune=native -Wno-error -Wno-all -Wno-format-security") #
+IF (NOT MSVC)
+	set_target_properties(omggen PROPERTIES COMPILE_FLAGS "-O3 -march=native -mtune=native -Wno-error -Wno-all -Wno-format-security") #
+ENDIF ( )
 add_dependencies(omggen ${OMG_DIR}/omg.y ${OMG_DIR}/omg.l)
 
 add_library (ircclient
