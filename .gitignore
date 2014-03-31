@@ -1590,3 +1590,6 @@ WW2/src/omg/omg.tab.cpp
 WW2/src/omg/omg.tab.h
 WW2/src/omg/omg.yy.cpp
 WW2/src/omg/omg.yy.h
+WW2/src/omg/*.cxx
+WW2/src/omg/*.hxx
+

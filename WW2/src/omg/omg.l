@@ -48,6 +48,9 @@ extern void yyaddcode(const char* text, std::string& into);
 DEBUG					return TKW_DEBUG;
 NAMESPACE				return TKW_NAMESPACE;
 TYPE					return TKW_TYPE;
+AS						return TKW_AS;
+BY\ +REF				return TKW_BY_REF;
+INCLUDE					return TKW_INCLUDE;
 
 	/* statement keywords */
 MESSAGE					return TKW_MESSAGE;
@@ -75,6 +78,9 @@ IF\ \(					{ yy_push_state(IF_COND); g_condition = ""; }
 [A-Za-z][A-Za-z0-9_]*	{ yylval.sVal = strdup(yytext); return TIDENTIFIER; }
 [0-9]+\.[0-9]+			return TDOUBLE;
 [0-9]+					return TINTEGER;
+
+	/* quoted string */
+\"[^"+]\"				{ char* str = strdup(yytext + 1); str[strlen(str) - 1] = '\0'; yylval.sVal = str; return QUOTSTRING; }
 
 [{};()]					{ return yytext[0]; }
 

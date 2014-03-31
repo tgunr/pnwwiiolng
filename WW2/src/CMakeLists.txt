@@ -103,16 +103,20 @@ ENDIF()
 
 SET(OMG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/omg")
 add_custom_command(OUTPUT ${OMG_DIR}/omg.tab.cpp ${OMG_DIR}/omg.tab.h
+	PRE_BUILD
 	COMMAND	${BISON_EXE}
 	ARGS -o omg.tab.cpp --defines=omg.tab.h omg.y
-	DEPENDS ${OMG_DIR}/omg.y
+	DEPENDS "${OMG_DIR}/omg.y"
+	MAIN_DEPENDENCY "${OMG_DIR}/omg.y"
 	COMMENT "[BISON] Building OMG"
 	WORKING_DIRECTORY ${OMG_DIR}
 )
 add_custom_command(OUTPUT ${OMG_DIR}/omg.yy.cpp ${OMG_DIR}/omg.yy.h
+	PRE_BUILD
 	COMMAND ${FLEX_EXE}
 	ARGS -o omg.yy.cpp -B --nounistd --header-file=omg.yy.h omg.l
 	DEPENDS ${OMG_DIR}/omg.l ${OMG_DIR}/omg.tab.h
+	MAIN_DEPENDENCY "${OMG_DIR}/omg.l"
 	COMMENT "[FLEX] Building OMG"
 	WORKING_DIRECTORY ${OMG_DIR}
 )
@@ -122,9 +126,27 @@ add_executable(omggen
 	omg/omg.yy.cpp
 		omg/omg.yy.h
 	omg/omg.cpp
+		omg/omg.h
 	omg/omg.y
 	omg/omg.l
 )
+
+MACRO(ADD_OMG_TARGET _TARGET)
+	SET(_TARGET_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${_TARGET}")
+	ADD_CUSTOM_COMMAND(
+		PRE_BUILD
+		OUTPUT	"${_TARGET_PATH}.cxx" "${_TARGET_PATH}.hxx"
+		DEPENDS	omggen "${_TARGET_PATH}.omg"
+		MAIN_DEPENDENCY "${_TARGET_PATH}.omg"
+		COMMENT "[OMG] ${_TARGET}"
+		COMMAND omggen
+		ARGS "--cxx=${_TARGET_PATH}.cxx" "--hxx=${_TARGET_PATH}.hxx" "${_TARGET}.omg"
+		WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}"
+	)
+ENDMACRO()
+
+ADD_OMG_TARGET(omg/omgMissionSortieData)
+
 IF (NOT MSVC)
 	set_target_properties(omggen PROPERTIES COMPILE_FLAGS "-O3 -march=native -mtune=native -Wno-error -Wno-all -Wno-format-security") #
 ENDIF ( )

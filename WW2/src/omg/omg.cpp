@@ -5,6 +5,7 @@
 #include <iostream>
 #include <string>
 #include <cstdarg>
+#include <vector>
 #include <set>
 
 #include "omg.h"
@@ -14,36 +15,41 @@
 static const char* s_exeName;
 static std::string s_cxxFilename = "";
 static std::string s_hxxFilename = "";
+static FILE* s_hxx;
+static FILE* s_cxx;
 
 static bool s_debug = false;
 static std::string s_namespace = "";
 static std::string s_namespaceQual = "";
-static FILE* s_hxx;
-static FILE* s_cxx;
+static std::set<std::string> s_includes;
 
 const char* g_currentFile = nullptr;
 
 enum { MAX_MESSAGE_GROUPS = 32, MAX_GROUP_FIELDS = 32 };
 
-typedef std::set<std::string> TypeMap;
+typedef std::vector<TypeDef> TypeMap;
 static TypeMap s_typeMap {
-	"UINT8", "SINT8",
-	"UINT16", "SINT16",
-	"UINT32", "SINT32",
-	"UINT64", "SINT64",
-	"FLOAT", "DOUBLE",
-	"FULL_OBJ_ID",
-	"WEAPON_SPEC",
-	"WEAPON_SERIAL",
-	"RANK_NO",
-	"ChatHandle",
-	"Teul::NetTimeMS",
-	"TeulTimeMS",
-	"TeulDeltaMS",
-	"PermissionMask",
-	"playerid_t",
-	"sortieid_t",
-	"instanceid_t",
+	{ "UINT8", "", false, "" },
+	{ "SINT8", "", false, "" },
+	{ "UINT16", "", false, "" },
+	{ "SINT16", "", false, "" },
+	{ "UINT32", "", false, "" },
+	{ "SINT32", "", false, "" },
+	{ "UINT64", "", false, "" },
+	{ "SINT64", "", false, "" },
+	{ "FLOAT", "", false, "" },
+	{ "DOUBLE", "", false, "" },
+	{ "FULL_OBJ_ID", "", true, "wwii/wwiiFullObjIDPacker.h" },
+	{ "WEAPON_SPEC", "", true, "weap/weapSpecPacker.h" },
+	{ "WEAPON_SERIAL", "", true, "" },
+	{ "RANK_NO", "", false, "" },
+	{ "ChatHandle", "", false, "" },
+	{ "NetTimeMS", "Teul::NetTimeMS", false, "teul/teulNetTimeMS.h" },
+	{ "TeulTimeMS", "", false, "" },
+	{ "TeulDeltaMS", "", false, "" },
+	{ "PermissionMask", "", false, "" },
+	{ "playerid_t", "", false, "" },
+	{ "instanceid_t", "", false, "" },
 };
 
 static unsigned int s_msgX;					// X of messages defined in this file.
@@ -144,14 +150,14 @@ struct Group : public Node
 
 struct Field : public Node
 {
-	const char*			m_typeName;		// Variable type
+	const TypeDef*		m_typeDef;		// Variable type
 	std::string			m_memberName;
 	size_t				m_size;			// bits, length, etc.
 	const char*			m_defaultValue;
 
-	Field(const char* type, const char* name, Node* parent)
+	Field(const TypeDef* typeDef, const char* name, Node* parent)
 		: Node(Node::Type::Field, name, parent) 
-		, m_typeName(type)
+		, m_typeDef(typeDef)
 		, m_memberName("")
 		, m_size(0)
 		, m_defaultValue("")
@@ -217,11 +223,17 @@ void yyaddcode(const char* text, std::string& into)
 	if (isNewLine) {
 		if (*text == '\n')
 			return;
-		char annotation[1024];
-		sprintf(annotation, "#line %u \"%s\"\n", yylineno, g_currentFile);
-		into += annotation;
 	}
 	into += *text;
+}
+
+static const TypeDef* _findTypeDef(const char* name)
+{
+	for (auto& it : s_typeMap) {
+		if (it.Name() == name)
+			return &it;
+	}
+	return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -232,13 +244,12 @@ void omg_enable_debug()
 	annotate("Debugging output enabled");
 }
 
-void omg_type_decl(const char* name)
+void omg_type_decl(TypeDef&& typeDef)
 {
-	auto result = s_typeMap.insert(name);
-	if (result.second)
-		annotate("Added new type: %s", name);
-	else
-		annotate("Redefinition of type %s", name);
+	if (_findTypeDef(typeDef.Name().c_str()))
+		yyfatal("redefinition of %s", typeDef.Name().c_str());
+	annotate("Added new type: %s", typeDef.Name().c_str());
+	s_typeMap.push_back(std::move(typeDef));
 }
 
 void omg_namespace(const char* name)
@@ -309,6 +320,7 @@ void omg_start_group(const char* name)
 
 	annotate("Adding group '%s'", name);
 	s_currentNode = group;
+	s_includes.insert("wwii/wwiiSyncVar.h");
 }
 
 void omg_end_group()
@@ -330,10 +342,16 @@ void omg_start_field(const char* type, const char* name)
 	if (isupper(name[0]))
 		yyfatal("Field names must start with a lowercase letter ('%s')", name);
 
-	Field* field = new Field(type, name, s_currentNode);
+	const TypeDef* typeDef = _findTypeDef(type);
+	if (typeDef == nullptr)
+		yyfatal("Unrecognized type: %s", type);
+
+	Field* field = new Field(typeDef, name, s_currentNode);
 
 	annotate("Adding field %s %s;", type, name);
 	s_currentNode = field;
+	if (typeDef->Include().empty() == false)
+		s_includes.insert(typeDef->Include());
 }
 
 void omg_end_field()
@@ -369,8 +387,12 @@ void omg_end_if()
 
 void Message::AddExtraMember(const char* type, const char* name, const char* defaultValue)
 {
+	const TypeDef* typeDef = _findTypeDef(type);
+	if (typeDef == nullptr)
+		yyfatal("INTERNAL ERROR: Unknown type '%s'", type);
+
 	// extra members are added in reverse order
-	Field* newField = new Field(type, name, nullptr);
+	Field* newField = new Field(typeDef, name, nullptr);
 	newField->m_defaultValue = defaultValue;
 	newField->m_next = m_extraMembers;
 	m_extraMembers = newField;
@@ -433,7 +455,7 @@ void Message::EmitConstructor() const
 void Message::EmitPacker() const
 {
 	if (m_child == nullptr) {
-		HDR("\tpublic: bool packer(LOGICAL /*mode*/, ACTION_OBJECT* const /*a*/, SINT32 /*size*/ { return true; }\n");
+		HDR("\tpublic: bool packer(LOGICAL /*mode*/, ACTION_OBJECT* /*a*/, SINT32 /*size*/) { return true; }\n");
 		return;
 	}
 	const char* fingerprint;
@@ -453,7 +475,7 @@ void Message::EmitPacker() const
 		SRC("\ta->packer(mode, m_%s, %" PRSizeT ");\n", field->m_name.c_str(), field->m_size);
 	}
 	if (m_numGroups != 0)
-		SRC("\treturn (mode == TEUL_PACK) ? _pack(a, size, lastPack) : _unpack(a, size, lastPack);\n");
+		SRC("\treturn (mode == TEUL_PACK) ? _pack(a, lastPack) : _unpack(a, lastPack);\n");
 	else
 		SRC("\treturn (a->offset >= 0);\n");
 	SRC("}\n"
@@ -480,7 +502,7 @@ void Message::EmitGroupPackers() const
 		"\tpublic: enum { GroupPresenceBits = %u };\n"
 		"\tpublic: const TeulTimeMS& lastModified() const { return m_lastModified; }\n"
 		"\tprivate: bool _unpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack);\n"
-		"\tprivate: bool _pack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack) const;\n"
+		"\tprivate: bool _pack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack);\n"
 		, groupPresenceBits
 	);
 
@@ -489,7 +511,7 @@ void Message::EmitGroupPackers() const
 		"bool %s%s::_unpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack)\n"
 		"{\n"
 		"\t%s groupPresence(0);\n"
-		"\ta->packer(mode, groupPresence, %" PRSizeT ");\n"
+		"\ta->packer(TEUL_UNPACK, groupPresence, %" PRSizeT ");\n"
 		"\tif (groupPresence == 0)\n"
 		"\t\treturn false;\n"
 		, s_namespaceQual.c_str(), m_name.c_str()
@@ -515,11 +537,11 @@ void Message::EmitGroupPackers() const
 
 	// pack delta function
 	SRC(
-		"bool %s%s::_pack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack) const\n"
+		"bool %s%s::_pack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack)\n"
 		"{\n"
 		"\t%s groupPresence(0);\n"
 		"\tSINT32 groupPresenceOffset = a->offset;\n"
-		"\ta->packer(mode, groupPresence, %" PRSizeT ");\n"
+		"\ta->packer(TEUL_PACK, groupPresence, %" PRSizeT ");\n"
 		, s_namespaceQual.c_str(), m_name.c_str()
 		, groupPresenceType
 		, groupPresenceBits
@@ -538,7 +560,7 @@ void Message::EmitGroupPackers() const
 	SRC(
 		"\tif (groupPresence == 0)\n"
 		"\t\treturn false;\n"
-		"\ta->offset = teulPack%s(mode, a->packed, groupPresenceOffset, &groupPresenceOffset, %" PRSizeT ");\n"
+		"\ta->offset = teulPack%s(TEUL_PACK, a->packed, groupPresenceOffset, &groupPresence, %" PRSizeT ");\n"
 		"\treturn true;\n"
 		"}\n"
 		"\n"
@@ -623,7 +645,7 @@ void Group::Emit() const
 		"\n");
 
 	for (Field* child = static_cast<Field*>(m_child); child; child = static_cast<Field*>(child->m_next)) {
-		HDR("\t\tWWII::SyncVar<%s, %" PRSizeT "> %s;\n", child->m_typeName, child->m_size, child->m_name.c_str());
+		HDR("\t\tWWII::SyncVar<%s, %" PRSizeT "> %s;\n", child->m_typeDef->DeclType().c_str(), child->m_size, child->m_name.c_str());
 	}
 
 	if (m_extraCode.empty() == false) {
@@ -639,7 +661,7 @@ void Group::Emit() const
 
 void Field::Emit() const
 {
-	HDR("\t\t%s\t%s;\n", m_typeName, m_memberName.c_str());
+	HDR("\t\t%s\t%s;\n", m_typeDef->DeclType().c_str(), m_memberName.c_str());
 }
 
 static void _generateOutput()
@@ -647,6 +669,9 @@ static void _generateOutput()
 	///TODO: Generate the output code.
 	HDR("#pragma once\n");
 	HDR("// Automatically generated by omggen from %s - Manual edits will be lost.\n", g_currentFile);
+	for (auto& it : s_includes) {
+		HDR("#include \"%s\"\n", it.c_str());
+	}
 	if (s_namespace.empty() == false)
 		HDR("namespace %s\n{\n\n", s_namespace.c_str());
 

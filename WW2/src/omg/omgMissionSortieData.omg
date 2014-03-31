@@ -1,11 +1,4 @@
-DEBUG;
 NAMESPACE MM;
-
-TYPE Teul::NetTimeMS;
-TYPE FULL_OBJ_ID;
-TYPE WEAPON_SPEC;
-TYPE RANK_NO;
-TYPE ChatHandle;
 
 MESSAGE SortieData
 {
@@ -14,8 +7,8 @@ MESSAGE SortieData
 	GROUP Sortie
 	{
 		UINT32			sortieID;
-		Teul::NetTimeMS spawned_ms;
-		Teul::NetTimeMS despawned_ms;
+		NetTimeMS		spawned_ms;
+		NetTimeMS		despawned_ms;
 		FULL_OBJ_ID		originFac;
 		FULL_OBJ_ID		target;
 		UINT32			flags;

@@ -12,12 +12,17 @@
 	int			iVal;
 	double		dVal;	
 	const char*	sVal;
+	TypeDef*	typeDef;
+	bool		bVal;
 }
 
 // declarations
 %token			TKW_DEBUG
 %token			TKW_NAMESPACE
 %token			TKW_TYPE
+%token			TKW_AS
+%token			TKW_BY_REF
+%token			TKW_INCLUDE
 
 // statement keywords
 %token			TKW_MESSAGE TKW_GROUP
@@ -26,14 +31,19 @@
 %token			TKW_CPP_SCOPE
 %token <sVal>	TKW_IF
 
+// misc
 %token <sVal>	TIDENTIFIER TCODE_FRAG
 %token <iVal>	TINTEGER
 %token <dVal>	TDOUBLE
+%token <sVal>	QUOTSTRING
 
 %type <sVal>	valid-group
 %type <sVal>	valid-message
 %type <sVal>	valid-field
 %type <sVal>	qualified-type
+%type <typeDef>	type-definition
+%type <sVal>	typedef-as typedef-include
+%type <bVal>	typedef-ref
 
 %%
 
@@ -53,9 +63,24 @@ directive			:	TKW_DEBUG ';' { omg_enable_debug(); }
 					|	TKW_NAMESPACE TIDENTIFIER ';' { omg_namespace($2); }
 					|	TKW_NAMESPACE TIDENTIFIER { yymissing("semicolon", "keyword", "NAMESPACE"); }
 					|	TKW_NAMESPACE { yymissing("identifier", "keyword", "NAMESPACE"); }
-					|	TKW_TYPE qualified-type ';' { omg_type_decl($2); }
-					|	TKW_TYPE qualified-type { yymissing("semicolon", "keyword", "TYPE"); }
-					|	TKW_TYPE { yymissing("typename", "keyword", "TYPE"); }
+					|	TKW_TYPE type-definition ';'
+					|	TKW_TYPE qualified-type { yyfatal("TYPE declarations must specify a non-qualified typename. Use TYPE .. AS %s instead", $2); }
+					|	TKW_TYPE { yyfatal("Malformed TYPE definition", ""); }
+					;
+
+type-definition		:	TIDENTIFIER typedef-as typedef-ref typedef-include { omg_type_decl(TypeDef($1, $2, $3, $4)); }
+					;
+
+typedef-as			:	/* empty */ { $$ = ""; }
+					|	TKW_AS qualified-type { $$ = $2; }
+					;
+
+typedef-ref			:	/* empty */ { $$ = false; }
+					|	TKW_BY_REF { $$ = true; }
+					;
+
+typedef-include		:	/* empty */ { $$ = ""; }
+					|	TKW_INCLUDE QUOTSTRING { $$ = $2; }
 					;
 
 definitions			:	definition
