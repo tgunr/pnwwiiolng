@@ -62,7 +62,9 @@ IF\ \(					{ yy_push_state(IF_COND); g_condition = ""; }
 <IF_COND>\)				{
 	yy_pop_state();
 	if (yy_top_state() != IF_COND) {
-		g_condition.push_back('\n');
+		while (g_condition.empty() == false && isspace(g_condition.back())) {
+			g_condition.resize(g_condition.size() - 1);
+		}
 		yylval.sVal = g_condition.c_str();
 		return TKW_IF;
 	}

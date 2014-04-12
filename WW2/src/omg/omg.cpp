@@ -55,6 +55,9 @@ static TypeMap s_typeMap {
 static unsigned int s_msgX;					// X of messages defined in this file.
 static unsigned int s_msgY;					// next msgY to assign.
 
+static const char s_indents[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
+static const size_t MAX_INDENTS = sizeof(s_indents) -1;
+
 struct Node
 {
 	enum class Type
@@ -62,6 +65,7 @@ struct Node
 		Message
 	,	Group
 	,	Field
+	,	Condition
 	};
 
 	Node*				m_next;
@@ -95,12 +99,10 @@ struct Node
 		exit(9);
 	}
 
-	static void makeMemberName(std::string& field)
+	virtual void EmitPack(size_t /*indent level*/) const
 	{
-		for (auto it = field.begin() + 2, end = field.end(); it != end && isupper(*it); ++it) {
-			*it = static_cast<char>(tolower(*it));
-		}
 	}
+
 };
 
 struct Message : public Node
@@ -145,32 +147,46 @@ struct Group : public Node
 		makeMemberName(m_memberName);
 	}
 
+	static void makeMemberName(std::string& field)
+	{
+		for (auto it = field.begin() + 2, end = field.end(); it != end && isupper(*it); ++it) {
+			*it = static_cast<char>(tolower(*it));
+		}
+	}
+
 	void Emit() const override;
 };
 
 struct Field : public Node
 {
 	const TypeDef*		m_typeDef;		// Variable type
-	std::string			m_memberName;
 	size_t				m_size;			// bits, length, etc.
 	const char*			m_defaultValue;
 
 	Field(const TypeDef* typeDef, const char* name, Node* parent)
 		: Node(Node::Type::Field, name, parent) 
 		, m_typeDef(typeDef)
-		, m_memberName("")
 		, m_size(0)
 		, m_defaultValue("")
 	{
-		if (!parent || parent->m_type != Node::Type::Group) {
-			m_memberName = "m_" + m_name;
-			makeMemberName(m_memberName);
-		} else {
-			m_memberName = m_name;
-		}
 	}
 
 	void Emit() const override;
+	void EmitPack(size_t indent) const override;
+};
+
+struct Conditional : public Node
+{
+	std::string			m_condition;
+
+	Conditional(const char* condition, Node* parent)
+		: Node(Node::Type::Condition, "if", parent)
+		, m_condition(condition)
+	{
+	}
+
+	void Emit() const override;
+	void EmitPack(size_t indent) const override;
 };
 
 
@@ -180,8 +196,8 @@ static Node*	s_currentNode;
 
 //////////////////////////////////////////////////////////////////////
 
-#define HDR(...) fprintf(s_hxx, __VA_ARGS__)
-#define SRC(...) fprintf(s_cxx, __VA_ARGS__)
+#define HXX(...) fprintf(s_hxx, __VA_ARGS__)
+#define CXX(...) fprintf(s_cxx, __VA_ARGS__)
 
 //////////////////////////////////////////////////////////////////////
 
@@ -234,6 +250,11 @@ static const TypeDef* _findTypeDef(const char* name)
 			return &it;
 	}
 	return nullptr;
+}
+
+static const char* _getIndents(size_t indentLevel)
+{
+	return s_indents + (MAX_INDENTS - std::min(indentLevel, MAX_INDENTS));
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -296,8 +317,11 @@ void omg_end_message()
 
 void omg_start_group(const char* name)
 {
-	if (s_currentNode != s_lastMessage)
-		yyfatal("Internal error: Group declaration that is not directly below MESSAGE", name);
+	for (auto node = s_currentNode; node; node = node->m_parent) {
+		if (node->m_type == Node::Type::Group) {
+			yyfatal("Cannot nest GROUPs, sorry.", name);
+		}
+	}
 
 	if (islower(name[0]))
 		yyfatal("GROUP names must start with a capital letter ('%s')", name);
@@ -316,7 +340,7 @@ void omg_start_group(const char* name)
 
 	s_lastMessage->m_numGroups++;
 	if (s_lastMessage->m_numGroups == 1)
-		s_lastMessage->AddExtraMember("TeulTimeMS", "lastModified", "0ULL");
+		s_lastMessage->AddExtraMember("TeulTimeMS", "m_lastModified", "0ULL");
 
 	annotate("Adding group '%s'", name);
 	s_currentNode = group;
@@ -360,27 +384,39 @@ void omg_end_field()
 	s_currentNode = s_currentNode->m_parent;
 }
 
-void omg_add_code(const char* code)
-{
-	annotate("adding code");
-	switch (s_currentNode->m_type) {
-		case Node::Type::Message:
-			static_cast<Message*>(s_currentNode)->m_code += code;
-			break;
-		case Node::Type::Group:
-			static_cast<Group*>(s_currentNode)->m_extraCode += code;
-			break;
-	}
-}
-
 void omg_start_if(const char* condition)
 {
 	annotate("if (%s) ...", condition);
+	Conditional* cond = new Conditional(condition, s_currentNode);
+	s_currentNode = cond;
 }
 
 void omg_end_if()
 {
 	annotate("endif()");
+	s_currentNode = s_currentNode->m_parent;
+}
+
+void omg_add_code(const char* code)
+{
+	annotate("adding code");
+	// trim off leading blank lines.
+	const char* ptr = code;
+	for (const char* ptr = code; *ptr && isspace(*ptr); ++ptr) {
+		if (*ptr == '\n')
+			code = ptr + 1;
+	}
+	size_t len = strlen(code);
+	while (len > 0 && isspace(code[len - 1]))
+		--len;
+	switch (s_currentNode->m_type) {
+		case Node::Type::Message:
+			static_cast<Message*>(s_currentNode)->m_code.append(code, len);;
+			break;
+		case Node::Type::Group:
+			static_cast<Group*>(s_currentNode)->m_extraCode.append(code, len);
+			break;
+	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -402,13 +438,13 @@ void Message::AddExtraMember(const char* type, const char* name, const char* def
 
 void Message::Emit() const
 {
-	HDR(
+	HXX(
 		"struct %s\n"
 		"{\n"
 		, m_name.c_str()
 		);
 
-	HDR("\tenum { MessageY = %u };\n", m_y);
+	HXX("\tenum { MessageY = %u };\n", m_y);
 
 	EmitConstructor();
 	EmitPacker();
@@ -417,36 +453,38 @@ void Message::Emit() const
 	EmitPublicMembers();
 
 	if (!m_code.empty()) {
-		HDR(m_code.c_str());
+		HXX(m_code.c_str());
+		HXX("\n");
 	}
-	HDR("};\n"
+	HXX("}; // end message %s\n"
 		"\n"
+		, m_name.c_str()
 		);
 }
 
 void Message::EmitConstructor() const
 {
-	HDR("\tpublic: %s()\n", m_name.c_str());
+	HXX("\tpublic: %s()\n", m_name.c_str());
 	char joiner = ':';
 	for (Field* field = m_extraMembers; field; field = static_cast<Field*>(field->m_next)) {
-		HDR("\t\t%c m_%s(%s)\n", joiner, field->m_name.c_str(), field->m_defaultValue);
+		HXX("\t\t%c %s(%s)\n", joiner, field->m_name.c_str(), field->m_defaultValue);
 		joiner = ',';
 	}
 	for (Node* node = m_child; node; node = node->m_next) {
 		switch (node->m_type) {
 			case Node::Type::Group:
-				HDR("\t\t%c %s(%s)\n", joiner, static_cast<Group*>(node)->m_memberName.c_str(), "m_lastModified");
+				HXX("\t\t%c %s(%s)\n", joiner, static_cast<Group*>(node)->m_memberName.c_str(), "m_lastModified");
 				joiner = ',';
 				break;
 			case Node::Type::Field:
-				HDR("\t\t%c %s(%s)\n", joiner, static_cast<Field*>(node)->m_memberName.c_str(), static_cast<Field*>(node)->m_defaultValue);
+				HXX("\t\t%c %s(%s)\n", joiner, node->m_name.c_str(), static_cast<Field*>(node)->m_defaultValue);
 				joiner = ',';
 				break;
 			default:
 				break;
 		}
 	}
-	HDR("\t{\n"
+	HXX("\t{\n"
 		"\t}\n"
 		"\n"
 		);
@@ -455,7 +493,7 @@ void Message::EmitConstructor() const
 void Message::EmitPacker() const
 {
 	if (m_child == nullptr) {
-		HDR("\tpublic: bool packer(LOGICAL /*mode*/, ACTION_OBJECT* /*a*/, SINT32 /*size*/) { return true; }\n");
+		HXX("\tpublic: bool packer(LOGICAL /*mode*/, ACTION_OBJECT* /*a*/, SINT32 /*size*/) { return true; }\n");
 		return;
 	}
 	const char* fingerprint;
@@ -465,20 +503,17 @@ void Message::EmitPacker() const
 	} else {
 		fingerprint = "packer(LOGICAL mode, ACTION_OBJECT* const a, SINT32 size)";
 	}
-	HDR("\tpublic: bool %s;\n", fingerprint);
-	SRC("bool %s%s::%s\n", s_namespaceQual.c_str(), m_name.c_str(), fingerprint);
-	SRC("{\n");
+	HXX("\tpublic: bool %s;\n", fingerprint);
+	CXX("bool %s%s::%s\n", s_namespaceQual.c_str(), m_name.c_str(), fingerprint);
+	CXX("{\n");
 	for (Node* node = m_child; node; node = node->m_next) {
-		if (node->m_type != Node::Type::Field)
-			continue;
-		Field* field = static_cast<Field*>(node);
-		SRC("\ta->packer(mode, m_%s, %" PRSizeT ");\n", field->m_name.c_str(), field->m_size);
+		node->EmitPack(1);
 	}
 	if (m_numGroups != 0)
-		SRC("\treturn (mode == TEUL_PACK) ? _pack(a, lastPack) : _unpack(a, lastPack);\n");
+		CXX("\treturn (mode == TEUL_PACK) ? _pack(a, lastPack) : _unpack(a, lastPack);\n");
 	else
-		SRC("\treturn (a->offset >= 0);\n");
-	SRC("}\n"
+		CXX("\treturn (a->offset >= 0);\n");
+	CXX("}\n"
 		"\n"
 		);
 }
@@ -498,7 +533,7 @@ void Message::EmitGroupPackers() const
 	else
 		yyfatal("Internal Error: %s", "group presence bits > 64");
 
-	HDR(
+	HXX(
 		"\tpublic: enum { GroupPresenceBits = %u };\n"
 		"\tpublic: const TeulTimeMS& lastModified() const { return m_lastModified; }\n"
 		"\tprivate: bool _unpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack);\n"
@@ -507,7 +542,7 @@ void Message::EmitGroupPackers() const
 	);
 
 	// unpack delta function
-	SRC(
+	CXX(
 		"bool %s%s::_unpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack)\n"
 		"{\n"
 		"\t%s groupPresence(0);\n"
@@ -523,20 +558,20 @@ void Message::EmitGroupPackers() const
 		if (node->m_type != Node::Type::Group)
 			continue;
 		Group* group = static_cast<Group*>(node);
-		SRC("\tif (groupPresence & (1 << %" PRSizeT "))\n"
+		CXX("\tif (groupPresence & (1 << %" PRSizeT "))\n"
 			"\t\t%s.packer(TEUL_UNPACK, a, lastPack);\n"
 			, groupNo++
 			, group->m_memberName.c_str()
 			);
 	}
-	SRC(
-		"\treturn true;\n"
+	CXX(
+		"\treturn (a->offset >= 0);\n"
 		"}\n"
 		"\n"
 		);
 
 	// pack delta function
-	SRC(
+	CXX(
 		"bool %s%s::_pack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack)\n"
 		"{\n"
 		"\t%s groupPresence(0);\n"
@@ -551,17 +586,17 @@ void Message::EmitGroupPackers() const
 		if (node->m_type != Node::Type::Group)
 			continue;
 		Group* group = static_cast<Group*>(node);
-		SRC("\tif (%s.packer(TEUL_PACK, a, lastPack))\n"
+		CXX("\tif (%s.packer(TEUL_PACK, a, lastPack))\n"
 			"\t\tgroupPresence |= (1 << %" PRSizeT ");\n"
 			, group->m_memberName.c_str()
 			, groupNo++
 			);
 	}
-	SRC(
+	CXX(
 		"\tif (groupPresence == 0)\n"
 		"\t\treturn false;\n"
 		"\ta->offset = teulPack%s(TEUL_PACK, a->packed, groupPresenceOffset, &groupPresence, %" PRSizeT ");\n"
-		"\treturn true;\n"
+		"\treturn (a->offset >= 0);\n"
 		"}\n"
 		"\n"
 		, groupPresenceType
@@ -573,23 +608,24 @@ void Message::EmitExtraMembers() const
 {
 	if (!m_extraMembers)
 		return;
-	HDR("\tprotected:\n");
+	HXX("\tprotected:\n");
 	for (Field* field = m_extraMembers; field; field = static_cast<Field*>(field->m_next)) {
 		field->Emit();
 	}
-	HDR("\n");
+	HXX("\n");
 }
 
 void Message::EmitPublicMembers() const
 {
 	if (!m_child)
 		return;
-	HDR("\tpublic:\n");
+	HXX("\tpublic:\n");
 	for (Node* node = m_child; node; node = node->m_next) {
 		node->Emit();
 	}
-	HDR("\n");
 }
+
+//////////////////////////////////////////////////////////////////////
 
 void Group::Emit() const
 {
@@ -600,7 +636,7 @@ void Group::Emit() const
 	}
 	fqn += m_name;
 
-	HDR(
+	HXX(
 		"\tstruct %s : public WWII::VarGroup\n"
 		"\t{\n"
 		"\t\t%s(TeulTimeMS& parent)\n"
@@ -609,12 +645,12 @@ void Group::Emit() const
 		, m_name.c_str()
 		);
 	for (Field* child = static_cast<Field*>(m_child); child; child = static_cast<Field*>(child->m_next)) {
-		HDR("\t\t\t, %s(this)\n", child->m_name.c_str());
+		HXX("\t\t\t, %s(this)\n", child->m_name.c_str());
 	}
-	HDR("\t\t{}\n");
+	HXX("\t\t{}\n");
 
-	HDR("\t\t%s& operator = (const %s& rhs);\n", m_name.c_str(), m_name.c_str());
-	SRC(
+	HXX("\t\t%s& operator = (const %s& rhs);\n", m_name.c_str(), m_name.c_str());
+	CXX(
 		"%s& %s::operator = (const %s& rhs)\n"
 		"{\n"
 		"\tm_lastModified = rhs.m_lastModified;\n"
@@ -623,70 +659,173 @@ void Group::Emit() const
 		, fqn.c_str()
 		);
 	for (Field* child = static_cast<Field*>(m_child); child; child = static_cast<Field*>(child->m_next)) {
-		SRC("\t%s.operator=(rhs.%s);\n", child->m_name.c_str(), child->m_name.c_str());
+		CXX("\t%s.operator=(rhs.%s);\n", child->m_name.c_str(), child->m_name.c_str());
 	}
-	SRC(
+	CXX(
 		"\treturn *this;\n"
 		"}\n"
 		"\n"
 		);
 
-	HDR("\t\tvoid groupPacker(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) override;\n");
-	SRC(
+	HXX("\t\tvoid groupPacker(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) override;\n");
+	CXX(
 		"void %s::groupPacker(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)\n"
 		"{\n"
 		, fqn.c_str()
 		);
 	size_t fieldNo = 0;
 	for (Field* child = static_cast<Field*>(m_child); child; child = static_cast<Field*>(child->m_next)) {
-		SRC("\t%s.packer(mode, a, lastPack, changes, %" PRSizeT ");\n", child->m_name.c_str(), fieldNo++);
+		CXX("\t%s.packer(mode, a, lastPack, changes, %" PRSizeT ");\n", child->m_name.c_str(), fieldNo++);
 	}
-	SRC("}\n"
+	CXX("}\n"
 		"\n");
 
 	for (Field* child = static_cast<Field*>(m_child); child; child = static_cast<Field*>(child->m_next)) {
-		HDR("\t\tWWII::SyncVar<%s, %" PRSizeT "> %s;\n", child->m_typeDef->DeclType().c_str(), child->m_size, child->m_name.c_str());
+		HXX("\t\tWWII::SyncVar<%s, %" PRSizeT "> %s;\n", child->m_typeDef->DeclType().c_str(), child->m_size, child->m_name.c_str());
 	}
 
 	if (m_extraCode.empty() == false) {
-		HDR("\n");
-		HDR("%s", m_extraCode.c_str());
+		HXX("\n");
+		HXX("%s", m_extraCode.c_str());
 	}
 
-	HDR("\t} %s;\n", m_memberName.c_str());
-	HDR("\tconst %s& %s() const { return %s; }\n", m_name.c_str(), m_memberName.c_str() + 2, m_memberName.c_str());
-	HDR("\t%s& %s() { return %s; }\n", m_name.c_str(), m_memberName.c_str() + 2, m_memberName.c_str());
-	HDR("\n");
+	HXX("\t} %s;\n", m_memberName.c_str());
+	HXX("\tconst %s& %s() const { return %s; }\n", m_name.c_str(), m_memberName.c_str() + 2, m_memberName.c_str());
+	HXX("\t%s& %s() { return %s; }\n", m_name.c_str(), m_memberName.c_str() + 2, m_memberName.c_str());
+	HXX("\n");
 }
+
+//////////////////////////////////////////////////////////////////////
 
 void Field::Emit() const
 {
-	HDR("\t\t%s\t%s;\n", m_typeDef->DeclType().c_str(), m_memberName.c_str());
+	HXX("\t\t%s\t%s;\n", m_typeDef->DeclType().c_str(), m_name.c_str());
 }
+
+void Field::EmitPack(size_t indentLevel) const
+{
+	CXX("%sa->packer(mode, %s, %" PRSizeT ");\n", _getIndents(indentLevel), m_name.c_str(), m_size);
+}
+
+//////////////////////////////////////////////////////////////////////
+
+void Conditional::Emit() const
+{
+	for (Node* node = m_child; node; node = node->m_next) {
+		node->Emit();
+	}
+}
+
+void Conditional::EmitPack(size_t indentLevel) const
+{
+	CXX("%s%s (%s) {\n", _getIndents(indentLevel), m_name.c_str(), m_condition.c_str());
+	for (Node* child = m_child; child; child = child->m_next) {
+		child->EmitPack(indentLevel + 1);
+	}
+	CXX("%s}\n", _getIndents(indentLevel));
+}
+
+//////////////////////////////////////////////////////////////////////
+// Header file functions
+
+static void _emitHeaderMast()
+{
+	HXX("#pragma once\n");
+	HXX("// @file %s\n", s_hxxFilename.c_str());
+	HXX("// @attention Automatically generated FROM %s\n", g_currentFile);
+	HXX("// @attention Manual edits will be lost.\n");
+	HXX("\n");
+}
+
+static void _emitHeaderIncludes()
+{
+	if (s_includes.empty())
+		return;
+	for (auto& it : s_includes) {
+		HXX("#include \"%s\"\n", it.c_str());
+	}
+	HXX("\n");
+}
+
+static void _emitHeaderNamespaceOpen()
+{
+	if (!s_namespace.empty()) {
+		HXX(
+			"namespace %s\n"
+			"{\n"
+			"\n"
+			, s_namespace.c_str()
+			);
+	}
+}
+
+static void _emitHeaderPrologue()
+{
+	_emitHeaderMast();
+	_emitHeaderIncludes();
+	_emitHeaderNamespaceOpen();
+}
+
+static void _emitHeaderNamespaceClose()
+{
+	if (!s_namespace.empty()) {
+		HXX(
+			"\n"
+			"} // namespace %s\n"
+			, s_namespace.c_str()
+			);
+	}
+}
+
+static void _emitHeaderEpilog()
+{
+	_emitHeaderNamespaceClose();
+	HXX("\n");
+}
+
+//////////////////////////////////////////////////////////////////////
+// Source file functions
+
+static void _emitSourceMast()
+{
+	CXX("#include <syscfg.h> // path is project dependent\n");
+	CXX("// @file %s\n", s_cxxFilename.c_str());
+	CXX("// @attention Automatically generated FROM %s\n", g_currentFile);
+	CXX("// @attention Manual edits will be lost.\n");
+	CXX("\n");
+}
+
+static void _emitSourceIncludes()
+{
+	CXX("#include \"%s\"\n", s_hxxFilename.c_str());
+}
+
+static void _emitSourcePrologue()
+{
+	_emitSourceMast();
+	_emitSourceIncludes();
+}
+
+static void _emitSourceEpilog()
+{
+}
+
+//////////////////////////////////////////////////////////////////////
 
 static void _generateOutput()
 {
-	///TODO: Generate the output code.
-	HDR("#pragma once\n");
-	HDR("// Automatically generated by omggen from %s - Manual edits will be lost.\n", g_currentFile);
-	for (auto& it : s_includes) {
-		HDR("#include \"%s\"\n", it.c_str());
-	}
-	if (s_namespace.empty() == false)
-		HDR("namespace %s\n{\n\n", s_namespace.c_str());
-
-	SRC("#include <syscfg.h> // path is project dependent\n");
-	SRC("// Automatically generated by omggen from %s - Manual edits will be lost.\n", g_currentFile);
-	SRC("#include \"%s\"\n", s_hxxFilename.c_str());
-	SRC("\n");
+	_emitHeaderPrologue();
+	_emitSourcePrologue();
 
 	for (const Message* message = s_firstMessage; message; message = static_cast<const Message*>(message->m_next)) {
 		message->Emit();
 	}
 
-	if (s_namespace.empty() == false)
-		HDR("\n} // namespace %s\n", s_namespace.c_str());
+	_emitHeaderEpilog();
+	_emitSourceEpilog();
 }
+
+//////////////////////////////////////////////////////////////////////
 
 static FILE* _openOutputFile(const std::string& filename)
 {
