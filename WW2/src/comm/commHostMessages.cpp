@@ -360,7 +360,6 @@ _recvVehicleJoinRequest(ACTION_OBJECT* const a)
 		HostVehicle* const vehicle = player.vehicle;
 		VEHICLE_REPLY vReply;
 
-		vReply.timeStamp = vehicle->vehicleData.timeStamp;
 		vReply.hostIndex = vehicle->index;
 		vReply.spec = vehicle->spec();
 		vReply.source = vehicle->serial().source;
@@ -369,12 +368,9 @@ _recvVehicleJoinRequest(ACTION_OBJECT* const a)
 		// index of this vehicle on this persons
 	 	vReply.persVehicleIndex = (UCHAR) vIndex;
 
-	 	// tell up sucessful
-	 	vReply.replyCode = 0;
-
 	 	vReply.rankLevel = player.effectiveRank();
 
-	 	// only send postitve replies the FE cant handle it otherwise
+	 	// only send positive replies the FE cant handle it otherwise
 		const SINT32 retval = teulSend(a->teulIndex, _GRANT_VEHICLE_JOIN, &vReply);
 		if ( retval >= 0 )
 		{

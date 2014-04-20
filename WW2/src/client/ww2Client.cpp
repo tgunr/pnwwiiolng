@@ -3076,7 +3076,6 @@ int Client::RequestVehicleJoin(WEAPON_SERIAL const& serial, int timestamp)
 	VEHICLE_REQUEST vRequest;
 	memset(&vRequest,0,sizeof(vRequest));
 
-	vRequest.timeStamp = timestamp;
 	vRequest.weapon = serial;
 	commSendVehicleJoin(CellConnection(), &vRequest);
 

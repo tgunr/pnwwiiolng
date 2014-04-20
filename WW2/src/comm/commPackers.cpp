@@ -23,7 +23,6 @@ SINT32 commPackInit(void)
 
 SINT32 commPackVEHICLE_REQUEST(LOGICAL mode, UCHAR* const data, SINT32 offset, VEHICLE_REQUEST* request, SINT32 /*size*/)
 {
-	offset = teulPackSINT32(mode, data, offset, &request->timeStamp, 0);
 	offset = wwiiPackWeaponSerial(mode,data,offset, &request->weapon, 0);
 	offset = teulPackUCHAR(mode, data,offset,&request->country, 0);
 	offset = teulPackUCHAR(mode, data, offset, &request->side, 0);
@@ -34,18 +33,13 @@ SINT32 commPackVEHICLE_REQUEST(LOGICAL mode, UCHAR* const data, SINT32 offset, V
 
 SINT32 commPackVEHICLE_REPLY(LOGICAL mode, UCHAR* const data, SINT32 offset, VEHICLE_REPLY* reply, SINT32 /*size*/)
 {
-//	offset = teulPackUINT32(mode, data, offset, &reply->timeStamp, 0);
 	offset = teulPackUINT32(mode, data, offset, &reply->hostIndex, 0);
 	offset = wwiiPackWeaponSpec(mode, data, offset, &reply->spec, 0);
 	offset = wwiiPackFullObjID(mode, data, offset, &reply->source, 0);
 
-	// 3 + 3 + 4 + 6 = 16 bits
 	offset = teulPackUCHAR(mode, data, offset, &reply->persVehicleIndex, 0);
 	offset = teulPackUCHAR(mode, data, offset, &reply->station, 0);
-	offset = teulPackSINT32(mode, data,offset,&reply->replyCode, 8);
-	offset = teulPackUINT16(mode, data, offset, &reply->rankLevel, 8);
-
-//	offset = teulPackUINT32(mode, data, offset, (UINT32*)&reply->loadOutFlags, 3);
+	offset = wwiiPackRankNo(mode, data, offset, &reply->rankLevel, 0);
 
 	return offset;
 }

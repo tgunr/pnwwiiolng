@@ -26,15 +26,12 @@ UINT32 vehcommSendVehicleRequest(SINT32 VehicleType, WEAPON_SERIAL const* pWeapo
             return 0;
 
 		memset(&vRequest,0,sizeof(vRequest));
-		vRequest.timeStamp = frametime;
 		vRequest.weapon = *pWeaponSerial;
 		commSendVehicleJoin(PlayerClient()->CellConnection(), &vRequest);
 	}else
 	{
 		VEHICLE_REPLY vReply;
 		memset(&vReply,0,sizeof(vReply));
-
-		vReply.timeStamp = frametime;
 
 #if RELEASE_CLIENT
         switch(OverrideSpawner)
@@ -60,9 +57,6 @@ UINT32 vehcommProcessVehicleRequestResponse( VEHICLE_REPLY const* Reply)
 {
     if(Reply == nullptr)
 		piExitProgram(__FILE__, __LINE__,"[vehcommProcessVehicleRequestResponse] Reply == nullptr");
-
-	if (Reply->replyCode < 0)
-		piExitProgram(__FILE__, __LINE__,"[vehcommProcessVehicleRequestResponse] replyCode == %d");
 
 	const WEAPON* const pWeapon = weapLookup(Reply->spec);
 
