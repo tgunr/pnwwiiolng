@@ -61,10 +61,10 @@ _setObjectsOwner(ObjectStruct* const objectList, WWII_SIDE side, WWII_COUNTRY co
 	for ( auto current = objectList; current != nullptr; current = current->next )
 	{
 #ifdef HEAVY_DEBUG
-		dbugLog(_FLD,"setting object %d.%d.%u to side %d country %d"
-					, current->fullObjID.cell.ox, current->fullObjID.cell.oy, current->fullObjID.id
-					,current->side
-					,current->country);
+		dbugLog(_FLD,"setting object " PRF_FULL_OBJ_ID " to side %d country %d"
+					, PRA_FULL_OBJ_ID(current->fullObjID)
+					, current->side
+					, current->country);
 #endif
 
 		current->setCountry(country, side);
@@ -84,7 +84,7 @@ _facilityStatusHandler(FULL_OBJ_ID fullObjID, WWII_COUNTRY country, CP_STATUS_FL
 	FacilityStruct* const facility = strtGetFacility(fullObjID);
 	if (facility == nullptr)
 	{
-		dbugLog(_FLA,"cant find facility for id %d.%d.%u", fullObjID.cell.ox, fullObjID.cell.oy, fullObjID.id);
+		dbugLog(_FLA, "cant find facility for id " PRF_FULL_OBJ_ID "", PRA_FULL_OBJ_ID(fullObjID));
 		return false;
 	}
 
@@ -162,7 +162,7 @@ _cpStatusHandler(FULL_OBJ_ID fullObjID, WWII_COUNTRY country, WWII_COUNTRY contr
 	CPStruct* const cp = strtGetCPorBridge(fullObjID);
 	if ( cp == nullptr )
 	{
-		dbugLog(_FLI, "CP status on unrecognized object: %d.%d.%u", fullObjID.cell.ox, fullObjID.cell.oy, fullObjID.id);
+		dbugLog(_FLI, "CP status on unrecognized object: " PRF_FULL_OBJ_ID "", PRA_FULL_OBJ_ID(fullObjID));
 		return;
 	}
 
@@ -204,7 +204,7 @@ _buildingStatusHandler(FULL_OBJ_ID fullObjID, UINT32 visLevel, UINT32 damagedBy)
 	ObjectStruct* const object = strtGetObject(fullObjID);
 	if (object == nullptr)
 	{
-		dbugLog(_FLA, "invalid object for vislevel update: %d.%d.%u", fullObjID.cell.ox, fullObjID.cell.oy, fullObjID.id);
+		dbugLog(_FLA, "invalid object for vislevel update: " PRF_FULL_OBJ_ID "", PRA_FULL_OBJ_ID(fullObjID));
 		return;
 	}
 
@@ -254,13 +254,13 @@ _recvStratUpdate(ACTION_OBJECT* const a)
 		break;
 		case CLASS_FACILITY:
 #ifdef DEBUG_SYNC
-			dbugLog(_FLD, "i:%d fac:%d.%d.%u", i, entry.m_fullObjID.cell.ox, entry.m_fullObjID.cell.oy, entry.m_fullObjID.id);
+			dbugLog(_FLD, "i:%d fac:" PRF_FULL_OBJ_ID "", i, PRA_FULL_OBJ_ID(entry));
 #endif
 			_facilityStatusHandler(entry.fullObjID(), entry.owner(), entry.flags(), entry.captureStage(), entry.captureCounter(), entry.lastChange());
 		break;
 		case CLASS_BUILDING:
 #ifdef DEBUG_SYNC
-			dbugLog(_FLD, "i:%d obj:%d.%d.%u", i, entry.m_fullObjID.cell.ox, entry.m_fullObjID.cell.oy, entry.m_fullObjID.id);
+			dbugLog(_FLD, "i:%d obj:" PRF_FULL_OBJ_ID "", i, PRA_FULL_OBJ_ID(entry));
 #endif
 			_buildingStatusHandler(entry.fullObjID(), entry.flags(), (UINT32)entry.u_extra.m_buildingDamagedBy);
 		break;

@@ -57,7 +57,7 @@ public:
 	}
 
 	//! Construct and populate from a pre-existing data source.
-	Packet(PacketId id, const void* source, size_t size)
+	Packet(PacketId id, const void* source, UINT32 size)
 		: Packet(id)
 	{
 		append(source, size);
@@ -124,24 +124,24 @@ public:
 
 	//! Increase the total packet allocation.
 	//! @note We don't track the amount used.
-	void setPacketSizeBytes(const size_t sizeBytes_);
+	void setPacketSizeBytes(const UINT32 sizeBytes_);
 
 	//! Increase the total packet allocation to accommodate the given payload size.
 	//! @note We don't track the amount used.
-	void setPayloadSizeBytes(const size_t sizeBytes_) { setPacketSizeBytes(sizeBytes_ + headerSizeBytes()); }
+	void setPayloadSizeBytes(const UINT32 sizeBytes_) { setPacketSizeBytes(sizeBytes_ + headerSizeBytes()); }
 
 	//! Increase the PAYLOAD capacity. Has no effect if sizeBytes_ is less than current capacity).
-	void reserve(const size_t payloadSizeBytes_) { setPayloadCapacityBytes(payloadSizeBytes_); }
+	void reserve(const UINT32 payloadSizeBytes_) { setPayloadCapacityBytes(payloadSizeBytes_); }
 
 	//! Increase the payload capacity size.
-	void setPayloadCapacityBytes(const size_t payloadSizeBytes_) { setPacketCapacityBytes(payloadSizeBytes_ + headerSizeBytes()); }
+	void setPayloadCapacityBytes(const UINT32 payloadSizeBytes_) { setPacketCapacityBytes(payloadSizeBytes_ + headerSizeBytes()); }
 
 	//! Increase the overall capacity.
-	void setPacketCapacityBytes(const size_t packetSizeBytes_);
+	void setPacketCapacityBytes(const UINT32 packetSizeBytes_);
 
 	//! Mark additional payload space as used.
-	void increaseUsedPayloadBytes(const size_t bytes_) { m_packetSizeBytes += bytes_; }
-	void increaseUsedPayloadBits(const size_t bits_) { increaseUsedPayloadBytes((bits_+7)/8); }
+	void increaseUsedPayloadBytes(const UINT32 bytes_) { m_packetSizeBytes += bytes_; }
+	void increaseUsedPayloadBits(const UINT32 bits_) { increaseUsedPayloadBytes((bits_+7)/8); }
 
 	// Please don't use pointers.
 	private: template<typename _Type> void append(const _Type* data_);
@@ -151,9 +151,9 @@ public:
 	//! @caution This pointer is potentially invalidated by any call
 	//! that changes capacity and causes a reallocation. Use with care.
 	public:
-	void* allocateBytes(size_t growth_bytes)
+	void* allocateBytes(UINT32 growth_bytes)
 	{
-		const size_t oldSize_bytes = packetSizeBytes();
+		const UINT32 oldSize_bytes = packetSizeBytes();
 		reserve(oldSize_bytes + growth_bytes);	// May cause reallocation.
 		m_packetSizeBytes += growth_bytes;		// Change the end-of-data position.
 		return (char*)m_data + oldSize_bytes;	// Calculate pointer here because of potential realloc.
@@ -163,7 +163,7 @@ public:
 	//! @caution This pointer is potentially invalidated by any call
 	//! that changes capacity and causes a reallocation. Use with care.
 	template<typename Type_>
-	Type_* allocatePtr(size_t numEntries=1) { return (Type_*)allocateBytes(sizeof(Type_) * numEntries); }
+	Type_* allocatePtr(UINT32 numEntries=1) { return (Type_*)allocateBytes(sizeof(Type_) * numEntries); }
 
 	//! Assign space for and return a pointer to a
 	//! blank instance of a particular type.
@@ -191,7 +191,7 @@ public:
 	}
 
 	//! Add a given number of bytes from a given source.
-	void append(const void* const src_, const size_t bytes_);
+	void append(const void* const src_, const UINT32 bytes_);
 
 public:
 	//! Retrieve a const type-cast pointer to the payload portion of the packet.
@@ -209,7 +209,7 @@ public:
 	void* writePointer() { return m_data + packetSizeBytes(); }
 
 	template<typename _Type>
-	_Type& payloadRef(size_t offset_=0) { return *(_Type*)(m_data + headerSizeBytes() + offset_); }
+	_Type& payloadRef(UINT32 offset_=0) { return *(_Type*)(m_data + headerSizeBytes() + offset_); }
 
 	//! Retrieve a reference to the header portion of the packet.
 	//! @caution This pointer is potentially invalidated by any call
@@ -227,35 +227,35 @@ public:
 	//! @note This points to a part of the header.
 	//! @caution This pointer is potentially invalidated by any call
 	//! that changes capacity and causes a reallocation. Use with care.
-	UCHAR* encryptable() { return m_data + (size_t)UnencryptedBytes; }
+	UCHAR* encryptable() { return m_data + UnencryptedBytes; }
 
 	//! Get the size of the envelope section of the header
-	static size_t envelopeSizeBytes() { return headerSizeBytes() - (size_t)UnencryptedBytes; }
+	static UINT32 envelopeSizeBytes() { return headerSizeBytes() - UnencryptedBytes; }
 	//! Get the size of the envelope section of the header
-	static size_t envelopeSizeBits() { return envelopeSizeBytes() * 8; }
+	static UINT32 envelopeSizeBits() { return envelopeSizeBytes() * 8; }
 
 	//! Get the size of the entire packet header (in bytes).
-	static size_t headerSizeBytes();
+	static UINT32 headerSizeBytes();
 	//! Get the size of the payload portion of the packet (in bytes).
-	size_t payloadSizeBytes() const { return packetSizeBytes() - headerSizeBytes(); }
+	UINT32 payloadSizeBytes() const { return packetSizeBytes() - headerSizeBytes(); }
 	//! Get the size of the whole packet (in bytes).
-	size_t packetSizeBytes() const { return (size_t)m_packetSizeBytes; }
+	UINT32 packetSizeBytes() const { return m_packetSizeBytes; }
 
 	//! Get the size of the header portion of the packet (in bits).
 	//! @note We don't track the amount used.
-	static size_t headerSizeBits() { return headerSizeBytes() * 8; }
+	static UINT32 headerSizeBits() { return headerSizeBytes() * 8; }
 	//! Get the size of the payload portion of the packet (in bits).
 	//! @note We don't track the amount used.
-	size_t payloadSizeBits() const { return payloadSizeBytes() * 8; }
+	UINT32 payloadSizeBits() const { return payloadSizeBytes() * 8; }
 	//! Get the size of the whole packet (in bits).
 	//! @note We don't track the amount used.
-	size_t packetSizeBits() const { return packetSizeBytes() * 8; }
+	UINT32 packetSizeBits() const { return packetSizeBytes() * 8; }
 
 	//! Get the current capacity.
-	size_t packetCapacityBytes() const { return (size_t)m_capacity; }
+	UINT32 packetCapacityBytes() const { return m_capacity; }
 
 	//! Get the current payload capacity.
-	size_t payloadCapacityBytes() const { return packetCapacityBytes() - headerSizeBytes(); }
+	UINT32 payloadCapacityBytes() const { return packetCapacityBytes() - headerSizeBytes(); }
 
 	//! Address we are destined for (or zero for connected sockets).
 	UINT32 address() const { return m_address; }
@@ -263,9 +263,9 @@ public:
 	UINT32 port() const { return m_port; }
 
 	//! Bytes we have sent.
-	size_t sentBytes() const { return (size_t)m_sent; }
+	UINT32 sentBytes() const { return m_sent; }
 	//! Increment bytes sent.
-	void sentBytes(const size_t bytes_) { m_sent += bytes_; }
+	void sentBytes(const UINT32 bytes_) { m_sent += bytes_; }
 };
 
 }

@@ -506,7 +506,7 @@ strtReplyToCapacityRequest(SINT32 teulIndex, const MM_CAPACITY_REQUEST& request,
 
 	if ( strtProcessCapacityRequest(request, response, destFacilityID, vehicleDelivered) < 0 )
 	{
-		dbugLog(_FLA,"recieved unprocessible capacity request for facility %d.%d.%u", request.facility.cell.ox, request.facility.cell.oy, request.facility.id);
+		dbugLog(_FLA, "recieved unprocessible capacity request for facility " PRF_FULL_OBJ_ID "", PRA_FULL_OBJ_ID(request.facility));
 	}
 
 	//Send the response
@@ -527,7 +527,7 @@ static SINT32 _recvEnemyReport(ACTION_OBJECT* const a)
 
 	if ( a->offset > 0 )
 	{
-		betaLog(_FLI,"received enemy report for vehicle %s",weapPrintSerialC(&report.enemyReported));
+		betaLog(_FLI,"received enemy report for vehicle " PRF_WEAPON_SERIAL "", PRA_WEAPON_SERIAL(report.enemyReported));
 
 		if (! strtAddEnemyReport(report))
 			return -EINVAL;
@@ -677,7 +677,7 @@ static SINT32 _recvMMPostInfoRequest(ACTION_OBJECT* const a)
 
 	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &postInfoRequest, sizeof(MM_POST_INFO_REQUEST));
 
-	betaLog(_FLD, "p:%u postInfoRequest: %s %u", postInfoRequest.customerID, weapPrintSerialC(&postInfoRequest.weaponSerial), postInfoRequest.join);
+	betaLog(_FLD, "p:%u postInfoRequest: " PRF_WEAPON_SERIAL " %u", postInfoRequest.customerID, PRA_WEAPON_SERIAL(postInfoRequest.weaponSerial), postInfoRequest.join);
 
 	if (strtProcessPostInfoRequest(postInfoRequest, postInfoResponse))
 	{
@@ -695,7 +695,7 @@ _recvMMJoinListRequest(ACTION_OBJECT* const a)
 
 	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &request, sizeof(MM_POST_INFO_REQUEST));
 
-	betaLog(_FLD, "p:%u joinListRequest %s %s %u", request.customerID, weapPrintSerialC(&request.weaponSerial), Chat::Name(request.handle).c_str(), request.join);
+	betaLog(_FLD, "p:%u joinListRequest " PRF_WEAPON_SERIAL " %s %u", request.customerID, PRA_WEAPON_SERIAL(request.weaponSerial), Chat::Name(request.handle).c_str(), request.join);
 
 	if ( strtProcessJoinListRequest(a->teulIndex, request) == false )
 	{
@@ -713,7 +713,7 @@ static SINT32 _recvMMPostInfoUpdate(ACTION_OBJECT* const a)
 
 	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &update, sizeof(MM_POST_INFO_UPDATE));
 
-	betaLog(_FLD, "p:%u postInfoUpdate %s %u", update.customerID, weapPrintSerialC(&update.weaponSerial), update.multicrew);
+	betaLog(_FLD, "p:%u postInfoUpdate " PRF_WEAPON_SERIAL " %u", update.customerID, PRA_WEAPON_SERIAL(update.weaponSerial), update.multicrew);
 
 	strtProcessPostInfoUpdate(&update);
 
@@ -727,11 +727,9 @@ static SINT32 _recvMMPostCancel(ACTION_OBJECT* const a)
 
 	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &postCancel, sizeof(MM_POST_CANCEL));
 
-	LogAbort("postCancel: %d %d.%d.%u %s %s"
-					, postCancel.weaponSerial.serial
-					, postCancel.weaponSerial.source.cell.ox, postCancel.weaponSerial.source.cell.oy, postCancel.weaponSerial.source.id
+	LogAbort("postCancel: " PRF_WEAPON_SERIAL " %s"
+					, PRA_WEAPON_SERIAL(postCancel.weaponSerial)
 					, weapPrintName(&postCancel.weaponSerial.spec)
-					, weapPrintSpecC(&postCancel.weaponSerial.spec)
 					);
 
 	return a->offset;
@@ -828,10 +826,10 @@ _recvMMCapacityRequest(ACTION_OBJECT* const a)
 
 	MM_CAPACITY_REQUEST request;
 	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &request, sizeof(request));
-	dbugLog(_FLD, "capacityRequest: %u:%u:%u @ %d.%d.%u code:%u"
+	dbugLog(_FLD, "capacityRequest: %u:%u:%u @ " PRF_FULL_OBJ_ID " code:%u"
 				, request.tag, request.missionID
 				, request.customerID
-				, request.facility.cell.ox, request.facility.cell.oy, request.facility.id
+				, PRA_FULL_OBJ_ID(request.facility)
 				, request.rtb
 				);
 
@@ -1012,7 +1010,7 @@ AttackOrder::process()
 
 	if ( cp == nullptr )
 	{
-		dbugLog(_FLA, "AttackOrder(%d.%d.%u) invalid target", m_target.cell.ox, m_target.cell.oy, m_target.id);
+		dbugLog(_FLA, "AttackOrder(" PRF_FULL_OBJ_ID ") invalid target", PRA_FULL_OBJ_ID(m_target));
 	}
 	else if ( unit == nullptr )
 	{
@@ -1076,9 +1074,9 @@ _recvWeaponListRequest(ACTION_OBJECT* const a)
 		FacilityStruct* facility = strtGetFacility(request.m_fullObjID);
 		if ( facility == nullptr )
 		{
-			dbugLog(_FLI, "p:%u hc:%u requested unknown facility %d.%d.%u"
+			dbugLog(_FLI, "p:%u hc:%u requested unknown facility " PRF_FULL_OBJ_ID ""
 							, request.m_playerID, request.m_brigadeID
-							, request.m_fullObjID.cell.ox, request.m_fullObjID.cell.oy, request.m_fullObjID.id
+							, PRA_FULL_OBJ_ID(request.m_fullObjID)
 							);
 			throw FacilityWeaponList::_INVALID;
 		}

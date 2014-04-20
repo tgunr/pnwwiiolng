@@ -312,9 +312,9 @@ strtInitFirebase(FacilityStruct& firebase, bool isOpen)
 void
 strtOpenFirebase(FacilityStruct& openingFirebase)
 {
-	dbugLog(_FLN,"Opening firebase %s %d.%d.%u as %s"
+	dbugLog(_FLN, "Opening firebase %s " PRF_FULL_OBJ_ID " as %s"
 					, openingFirebase.name
-					, openingFirebase.fullObjID.cell.ox, openingFirebase.fullObjID.cell.oy, openingFirebase.fullObjID.id
+					, PRA_FULL_OBJ_ID(openingFirebase.fullObjID)
 					, strtPrintCountry(strtNewFBOwner(openingFirebase))
 					);
 
@@ -353,9 +353,9 @@ strtOpenFirebase(FacilityStruct& openingFirebase)
 void
 strtCloseFirebase(FacilityStruct& closingFirebase)
 {
-	dbugLog(_FLN,"Closeing firebase %s %d.%d.%u"
+	dbugLog(_FLN, "Closeing firebase %s " PRF_FULL_OBJ_ID ""
 					, closingFirebase.name
-					, closingFirebase.fullObjID.cell.ox, closingFirebase.fullObjID.cell.oy, closingFirebase.fullObjID.id
+					, PRA_FULL_OBJ_ID(closingFirebase.fullObjID)
 					);
 
 	//Set open flag

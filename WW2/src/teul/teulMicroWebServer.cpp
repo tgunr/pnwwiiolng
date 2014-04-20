@@ -51,7 +51,7 @@ struct WebError
 // Send a resource list.
 
 void
-_sendString200(const int fd, const std::string& content)
+_sendString200(const SOCKET fd, const std::string& content)
 {
 	static const char ok200[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: text/application-json\r\nContent-Language: en\r\nContent-Encoding: UTF-8\r\nContent-Length: %" PRSizeT "\r\n\r\n%s\n";
 	char* buf = new char[sizeof(ok200) + content.length() + 1];
@@ -63,11 +63,11 @@ _sendString200(const int fd, const std::string& content)
 //////////////////////////////////////////////////////////////////////
 // Tear up the listen socket.
 
-static unsigned int
+static SOCKET
 _establishListenSocket(const unsigned short port_)
 {
 	// Tear up the basic socket object.
-	const int sock = socket(AF_INET, SOCK_STREAM, 0);
+	const SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
 	if ( sock == INVALID_SOCKET )
 	{
 		printf("uWebServer terminated: unable to open listenSock [%d, %d]\n", sock, errno);
@@ -89,7 +89,7 @@ _establishListenSocket(const unsigned short port_)
 	if ( bindResult < 0 )
 	{
 		printf("uWebServer terminated: unable to bind listenSock on port %hu [%d, %d]\n", port_, bindResult, errno);
-		close(sock);
+		OS_CLOSESOCKET(sock);
 		return bindResult;
 	}
 
@@ -97,7 +97,7 @@ _establishListenSocket(const unsigned short port_)
 	if ( listenResult < 0 )
 	{
 		printf("uWebServer terminated: unable to set listen socket to listening on port %hu [%d]\n", port_, bindResult);
-		close(sock);
+		OS_CLOSESOCKET(sock);
 		return listenResult;
 	}
 
@@ -198,7 +198,7 @@ Teul::uWeb::Server::run()
 		std::this_thread::yield();
 
 		socklen_t sockLen = sizeof(addr);
-		const int newSock = accept(m_listenSock, (struct sockaddr*)&addr, &sockLen);
+		const SOCKET newSock = accept(m_listenSock, (struct sockaddr*)&addr, &sockLen);
 		if ( newSock < 0 )
 		{
 			if (isCancelled())
@@ -232,7 +232,7 @@ Teul::uWeb::Server::run()
 // Call the handler for a path.
 
 static void
-_callHandler(const unsigned int sock, Teul::uWeb::Server::VirtualFileHandler handler, const char* const path, const char* const args, Teul::uWeb::Server* /*server*/)
+_callHandler(const SOCKET sock, Teul::uWeb::Server::VirtualFileHandler handler, const char* const path, const char* const args, Teul::uWeb::Server* /*server*/)
 {
 	// Write the HTTP header first
 	static const char ok200[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: text/javascript\r\nContent-Language: en\r\nContent-Encoding: UTF-8\r\n\r\n";
@@ -267,7 +267,7 @@ _getContentTypeFor(const char* const fileExt)
 // Try and locate a physical file to be sent to the requestee.
 
 static bool
-_sendPhysicalFile(const unsigned int sock, const char* const rootPath, const char* const path, const char* const lastDot)
+_sendPhysicalFile(const SOCKET sock, const char* const rootPath, const char* const path, const char* const lastDot)
 {
 	int dirfd = -1, filefd = -1;
 	struct stat statBuf;
@@ -322,10 +322,10 @@ _sendPhysicalFile(const unsigned int sock, const char* const rootPath, const cha
 			char xferBuffer[4096];
 			for (;; )
 			{
-				size_t readBytes = read(filefd, xferBuffer, sizeof(xferBuffer));
+				int readBytes = read(filefd, xferBuffer, sizeof(xferBuffer));
 				if ( readBytes <= 0 )
 					break;
-				size_t wroteBytes = send(sock, xferBuffer, readBytes, 0);
+				int wroteBytes = send(sock, xferBuffer, readBytes, 0);
 				if ( wroteBytes < readBytes )
 					break;
 			}
@@ -356,7 +356,7 @@ _sendPhysicalFile(const unsigned int sock, const char* const rootPath, const cha
 // Process a HTTP request from a given fd.
 
 void
-Teul::uWeb::Server::processHTTPRequest(const int sock, char* const request)
+Teul::uWeb::Server::processHTTPRequest(const SOCKET sock, char* const request)
 {
 	char* method = nullptr;
 	char* path = nullptr;

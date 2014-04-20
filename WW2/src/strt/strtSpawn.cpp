@@ -319,9 +319,9 @@ strtProcessPostRequest(SINT32 teulIndex, const MM_POST_REQUEST& request, MM_POST
 	FacilityStruct* facility = strtGetFacility(request.facility);
 	if (facility == nullptr)
 	{
-		dbugLog(_FLW,"p:%u c:%s couldn't find facility %d.%d.%u denying post"
+		dbugLog(_FLW, "p:%u c:%s couldn't find facility " PRF_FULL_OBJ_ID " denying post"
 				, request.customerID, Chat::Name(request.handle).c_str()
-				, request.facility.cell.ox, request.facility.cell.oy, request.facility.id
+				, PRA_FULL_OBJ_ID(request.facility)
 				);
 
 		deny.reasonCode = SPAWN_FACILITY_NOT_FOUND;
@@ -486,9 +486,9 @@ _cleanUpJoinNode(WeapJoinRequestNode* joinNode)
 			if ( g_logDebug )
 			{
 				const FULL_OBJ_ID& fid = joinNode->m_joinList->m_facility->fullObjID;
-				dbugLog(_FLD,"deleting join %p id %d post from facility %d.%d.%u"
-						,joinNode, joinNode->m_playerID
-						, fid.cell.ox, fid.cell.oy, fid.id
+				dbugLog(_FLD, "deleting join %p id %d post from facility " PRF_FULL_OBJ_ID ""
+						, joinNode, joinNode->m_playerID
+						, PRA_FULL_OBJ_ID(fid)
 						);
 			}
 			break;
@@ -922,8 +922,8 @@ _verifyRTBFacility(const WEAPON_SPEC& spec, const FULL_OBJ_ID& rtbFacility, cons
 	FacilityStruct*	facility = strtGetFacility(rtbFacility);
 	if ( facility == nullptr )
 	{
-		dbugLog(_FLW, "vrtb: no facility matches %d.%d.%u for %s"
-						, rtbFacility.cell.ox, rtbFacility.cell.oy, rtbFacility.id
+		dbugLog(_FLW, "vrtb: no facility matches " PRF_FULL_OBJ_ID " for %s"
+						, PRA_FULL_OBJ_ID(rtbFacility)
 						, callsign.c_str());
 		return nullptr;
 	}
@@ -1075,9 +1075,9 @@ WeaponsReturn::process() const
 	static char info[128];
 	sprintf(info, "p:%u c:%s v:%u return:", currentWeapon->m_commander, Chat::Name(currentWeapon->m_handle).c_str(), m_sortieID);
 
-	dbugLog(_FLD,"%s to %d.%d.%u co-ords %d.%d.%d ex:%u %s %s %s"
+	dbugLog(_FLD, "%s to " PRF_FULL_OBJ_ID " co-ords %d.%d.%d ex:%u %s %s %s"
 			, info
-			, m_rtbFacility.cell.ox, m_rtbFacility.cell.oy, m_rtbFacility.id
+			, PRA_FULL_OBJ_ID(m_rtbFacility)
 			, m_position.x(), m_position.y(), m_position.z()
 			, m_exitCode
 			, (m_isVehicleDead ? "dead" : "alive")
@@ -1377,10 +1377,10 @@ _setupSpawnObject(ObjectStruct& object)
 		if ( strcmp(facility.name, s_DealDock.c_str()) == 0 )
 		{
 			// I think this is intended to only print the error once
-			dbugLog(_FLA,"Could not setup spawn for object %s %d.%d.%u, no class for %s"
+			dbugLog(_FLA,"Could not setup spawn for object %s " PRF_FULL_OBJ_ID ", no class for " PRF_WEAPON_SPEC ""
 						, object.name
-						, object.fullObjID.cell.ox, object.fullObjID.cell.oy, object.fullObjID.id
-						, weapPrintSpecC(&spawnAbility)
+						, PRA_FULL_OBJ_ID(object.fullObjID)
+						, PRA_WEAPON_SPEC(spawnAbility)
 						);
 		}
 		return FALSE;

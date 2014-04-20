@@ -1034,9 +1034,9 @@ ObjectStruct::applyDamage(const SINT64& joules, UINT32 originatingSortieID)
 {
 	if ( setDamageJoules(m_damageJoules + joules) == false )
 	{
-		dbugLog(_FLI, "%lld joules of damage* not applied* to %s (%s/%d.%d.%u)"
+		dbugLog(_FLI, "%lld joules of damage* not applied* to %s (%s/" PRF_FULL_OBJ_ID ")"
 					, joules, name, filename
-					, fullObjID.cell.ox, fullObjID.cell.oy, fullObjID.id
+					, PRA_FULL_OBJ_ID(fullObjID)
 					);
 		return;
 	}
@@ -1115,9 +1115,9 @@ ObjectStruct::applyDamage(const SINT64& joules, UINT32 originatingSortieID)
 
 	if ( percentDamage >= percentToDestroy && visLevel() == 0 )
 	{
-		dbugLog(_FLI, "v:%u destroyed %s (%d.%d.%u)"
+		dbugLog(_FLI, "v:%u destroyed %s (" PRF_FULL_OBJ_ID ")"
 						, originatingSortieID, name
-						, fullObjID.cell.ox, fullObjID.cell.oy, fullObjID.id
+						, PRA_FULL_OBJ_ID(fullObjID)
 						);
 		damagedVisLevel(originatingSortieID);
 		setSmokeLevel(SMOKE_START_LEVEL);
@@ -1811,9 +1811,9 @@ strtCloseBase(FacilityStruct& facility)
 {
 	if ( g_logDebug )
 	{
-		dbugLog(_FLI,"Closing facility %s %d.%d.%u"
+		dbugLog(_FLI, "Closing facility %s " PRF_FULL_OBJ_ID ""
 				, facility.name
-				, facility.fullObjID.cell.ox, facility.fullObjID.cell.oy, facility.fullObjID.id
+				, PRA_FULL_OBJ_ID(facility.fullObjID)
 				);
 	}
 
@@ -1835,7 +1835,7 @@ strtOpenBase(FacilityStruct& facility)
 {
 	if ( g_logDebug )
 	{
-		dbugLog(_FLI,"Opening facility %s %d.%d.%u", facility.name, facility.fullObjID.cell.ox, facility.fullObjID.cell.oy, facility.fullObjID.id);
+		dbugLog(_FLI, "Opening facility %s " PRF_FULL_OBJ_ID "", facility.name, PRA_FULL_OBJ_ID(facility.fullObjID));
 	}
 
 	//Set the flag on the facility indicating its open
@@ -1928,9 +1928,9 @@ _fromInsideFacility(const FacilityStruct* facility, const FULL_OBJ_ID& buildingI
 	ObjectStruct* object = strtGetObject(buildingID);
 	if ( object == NULL || object->facility != facility )
 	{
-		dbugLog(_FLA, "p:%u c:%s fac:%s attempt to capture from invalid building %s"
-						, customerID, Chat::NAme(handle).c_str()
-						, facility->name, weapPrintFullObjIDC(&buildingID));
+		dbugLog(_FLA, "p:%u c:%s fac:%s attempt to capture from invalid building " PRF_FULL_OBJ_ID ""
+						, customerID, Chat::Name(handle).c_str()
+						, facility->name, PRA_FULL_OBJ_ID(buildingID));
 		return false;
 	}
 
@@ -1988,9 +1988,9 @@ strtDestroyObject(ObjectStruct& object)
 void
 strtAddFactory(ObjectStruct* object)
 {
-	dbugLog(_FLI, "Object %s(%d.%d.%u) is production center, starting %ds cycle"
+	dbugLog(_FLI, "Object %s(" PRF_FULL_OBJ_ID ") is production center, starting %ds cycle"
 					, object->name
-					, object->fullObjID.cell.ox, object->fullObjID.cell.oy, object->fullObjID.id
+					, PRA_FULL_OBJ_ID(object->fullObjID)
 					, host_config.factoryPeriod);
 
 	// Schedule the first output event

@@ -114,7 +114,7 @@ const char* _pstates[] =
 };
 
 static void
-_reportPlayerDetails(unsigned int fd, const char* /*path*/, const char* /*args*/)
+_reportPlayerDetails(SOCKET fd, const char* /*path*/, const char* /*args*/)
 {
 	char buffer[2048];
 	int len = 0;
@@ -728,11 +728,11 @@ Player::calculateMissionResults(MM_PERS_STATE toState)
 	const FacilityStruct* const facility = strtGetFacility(origin);
 	if ( facility == nullptr )
 	{
-		dbugLog(_FLW, "t:%d p:%u c:%s has invalid origin: %d.%d.%u"
+		dbugLog(_FLW, "t:%d p:%u c:%s has invalid origin: " PRF_FULL_OBJ_ID ""
 						, teulIndex()
 						, playerID()
 						, callsign()
-						, origin.cell.ox, origin.cell.oy, origin.id
+						, PRA_FULL_OBJ_ID(origin)
 						);
 		return false;
 	}

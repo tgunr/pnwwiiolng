@@ -843,9 +843,9 @@ _scPass2_linkSetup(Supercell& sc)
 #ifdef HEAVY_DEBUG
 		if ( g_logDebug )
 		{
-			dbugLog(_FLD,"link %s to %s %d.%d.%u is associated with firebase %s %d.%d.%u"
-					, start->name, end->name, newLink->fullObjID.cell.ox, newLink->fullObjID.cell.oy, newLink->fullObjID.id
-					, firebase->name, firebase->fullObjID.cell.ox, firebase->fullObjID.cell.oy, firebase->fullObjID.id
+			dbugLog(_FLD,"link %s to %s " PRF_FULL_OBJ_ID " is associated with firebase %s " PRF_FULL_OBJ_ID ""
+					, start->name, end->name, PRA_FULL_OBJ_ID(newLink->fullObjID)
+					, firebase->name, PRA_FULL_OBJ_ID(firebase->fullObjID)
 					);
 		}
 #endif // HEAVY_DEBUG
@@ -1547,14 +1547,14 @@ strtVerifyStratSystem(CPStruct* cpList, UINT32 testLevel)
 				{
 					if ( building->type == BUILDING_AUTOGUNNER )
 					{
-						dbugLog(_FLI,"found autogunner %s %d.%d.%u subtype %d rebuild period %d, totRPS %d RPS/dlevel %d max djoules %lld"
-									,building->name
-									, building->fullObjID.cell.ox, building->fullObjID.cell.oy, building->fullObjID.id
-									,building->subType
-									,building->rebuildPeriod
-									,building->totalRPs
-									,building->rpsPerDamageLevel
-									,building->m_maxDamageJoules);
+						dbugLog(_FLI, "found autogunner %s " PRF_FULL_OBJ_ID " subtype %d rebuild period %d, totRPS %d RPS/dlevel %d max djoules %lld"
+									, building->name
+									, PRA_FULL_OBJ_ID(building->fullObjID)
+									, building->subType
+									, building->rebuildPeriod
+									, building->totalRPs
+									, building->rpsPerDamageLevel
+									, building->m_maxDamageJoules);
 					}
 				}
 			}

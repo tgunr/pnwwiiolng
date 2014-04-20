@@ -48,6 +48,7 @@ IF (NOT TOLUAPP_INCLUDE_DIR)
 					$ENV{ProgramFilesX86}/tolua*/include
 					$ENV{SystemDrive}/tolua*/include
 					../include/lua
+					../proj/win
 	)
 ENDIF (NOT TOLUAPP_INCLUDE_DIR)
 

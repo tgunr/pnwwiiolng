@@ -64,6 +64,8 @@
 # if GCC_VERSION < 400
 #	error("GCC version 4.0 or higher is required to compile this code.")
 # endif
+# define PRF_SOCKET "%d"
+# define PRA_SOCKET(s) (s)
 # ifdef __LP64__
 #  define PRSizeT "zu"
 # else
@@ -76,6 +78,12 @@
 # define __attribute__(...)
 # define PRSizeT "lu"
 # define PROffT "ld"
+# if defined(_WIN64)
+#  define PRF_SOCKET "%llu"
+# else
+#  define PRF_SOCKET "%u"
+# endif
+# define PRA_SOCKET(s) (s)
 # if defined(_MSC_VER)
 #  pragma warning( 1 : 4505 )	// unreferenced local functions
 #  pragma warning( 1 : 4101 )	// unreferenced local variables

@@ -2010,9 +2010,9 @@ Player::updateLocality(FLOAT64 x, FLOAT64 y, FLOAT64 z
 	{
 		if ( memcmp(&nearCP, &nullObjID, sizeof(FULL_OBJ_ID)) != 0 )
 		{
-			dbugLog(_FLI, "%s[%u] reporting invalid nearCP at %d.%d.%u"
+			dbugLog(_FLI, "%s[%u] reporting invalid nearCP at " PRF_FULL_OBJ_ID ""
 							, callsign(), playerID()
-							, nearCP.cell.ox, nearCP.cell.oy, nearCP.id
+							, PRA_FULL_OBJ_ID(nearCP)
 						);
 		}
 	}
@@ -2068,13 +2068,13 @@ Player::updatePersona(const Chat::PersonaUpdate& update)
 	if ( g_logDebug & g_debugPersonas )
 	{
 		WEAPON_SPEC ws = m_weapon;
-		dbugLog(_FLD, "t:%d p:%u c:%s update c:%u, b:%u, br:%u, m:%u, or:%d.%d.%u, ob:%d.%d.%u spawned:%d weap:%s"
+		dbugLog(_FLD, "t:%d p:%u c:%s update c:%u, b:%u, br:%u, m:%u, or:" PRF_FULL_OBJ_ID ", ob:" PRF_FULL_OBJ_ID " spawned:%d weap:" PRF_WEAPON_SPEC ""
 						, teulIndex(), playerID(), callsign()
 						, update.m_country, update.m_branch, update.m_brigadeID, update.m_missionID
-						, update.m_origin.cell.ox, update.m_origin.cell.oy, update.m_origin.id
-						, update.m_target.cell.ox, update.m_target.cell.oy, update.m_target.id
+						, PRA_FULL_OBJ_ID(update.m_origin)
+						, PRA_FULL_OBJ_ID(update.m_target)
 						, (int)update.m_isSpawned
-						, weapPrintSpecC(&ws)
+						, PRA_WEAPON_SPEC(ws)
 						);
 	}
 

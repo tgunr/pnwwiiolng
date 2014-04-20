@@ -114,7 +114,7 @@ PropFacility::PropFacility(const FULL_OBJ_ID& id, WWII_COUNTRY owner, const char
 	Property* cp = chatFindProperty(cpID);
 	if ( cp == nullptr )
 	{
-		dbugLog(_FLA, "%s has invalid CP data %d.%d.%u", name, cpID.cell.ox, cpID.cell.oy, cpID.id);
+		dbugLog(_FLA, "%s has invalid CP data " PRF_FULL_OBJ_ID "", name, PRA_FULL_OBJ_ID(cpID));
 		return;
 	}
 

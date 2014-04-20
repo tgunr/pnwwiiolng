@@ -66,10 +66,9 @@ static SINT32 _recvMMPostAccept(ACTION_OBJECT* const a)
 
 	if ( g_logDebug )
 	{
-		dbugLog(_FLD,"c:%u postAccept %d.%d.%u %s %d %d"
+		dbugLog(_FLD,"c:%u postAccept " PRF_WEAPON_SERIAL " %d %d"
 						, postAccept.customerID
-						, postAccept.weaponSerial.source.cell.ox, postAccept.weaponSerial.source.cell.oy, postAccept.weaponSerial.source.id
-						, weapPrintSpecC(&postAccept.weaponSerial.spec)
+						, PRA_WEAPON_SERIAL(postAccept.weaponSerial)
 						, postAccept.portal
 						, postAccept.immediateSpawn);
 	}
@@ -448,7 +447,7 @@ strtSendMMSpawnGrantRequest(SINT32 connection, const WEAPON_SERIAL& weaponSerial
 
 	if ( player.validMissionPacket() )
 	{
-		dbugLog(_FLI, "t:%d p:%u c:%s spawnGrantRequest m:%u br:%u v:%u %s at %d.%d.%u"
+		dbugLog(_FLI, "t:%d p:%u c:%s spawnGrantRequest m:%u br:%u v:%u %s at " PRF_FULL_OBJ_ID ""
 						, player.teulIndex()
 						, player.playerID()
 						, player.callsign()
@@ -456,7 +455,7 @@ strtSendMMSpawnGrantRequest(SINT32 connection, const WEAPON_SERIAL& weaponSerial
 						, player.brigadeID()
 						, spawnGrantRequest.weaponSerial.serial
 						, weapPrintName(&spawnGrantRequest.weaponSerial.spec)
-						, spawnGrantRequest.weaponSerial.source.cell.ox, spawnGrantRequest.weaponSerial.source.cell.oy, spawnGrantRequest.weaponSerial.source.id
+						, PRA_FULL_OBJ_ID(spawnGrantRequest.weaponSerial.source)
 						);
 
 		spawnGrantRequest.missionID = player.missionID();
@@ -576,10 +575,10 @@ SINT32 strtSendMMCapacityRequest(SINT32 connection, UINT32 tag, UINT32 missionID
 
 	if ( g_logDebug )
 	{
-		dbugLog(_FLD,"capacityRequest: %u:%u:%u @ %d.%d.%u code:%u"
+		dbugLog(_FLD, "capacityRequest: %u:%u:%u @ " PRF_FULL_OBJ_ID " code:%u"
 					, capacityRequest.tag, capacityRequest.missionID
 					, capacityRequest.customerID
-					, capacityRequest.facility.cell.ox, capacityRequest.facility.cell.oy, capacityRequest.facility.id
+					, PRA_FULL_OBJ_ID(capacityRequest.facility)
 					, capacityRequest.rtb
 					);
 	}

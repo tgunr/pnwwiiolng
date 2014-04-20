@@ -64,7 +64,7 @@ static std::mutex s_peerMutex;
 // JSON description of current peering info.
 
 static void
-_reportJSONPeers(unsigned int fd, const char* /*path*/, const char* /*args*/)
+_reportJSONPeers(SOCKET fd, const char* /*path*/, const char* /*args*/)
 {
 	size_t maxSize = 128 + (s_connections.size() * 128) + (s_pendingPeers.size() * 64) + 1;
 	char* report = static_cast<char*>(alloca(maxSize));
@@ -83,7 +83,7 @@ _reportJSONPeers(unsigned int fd, const char* /*path*/, const char* /*args*/)
 	}
 	p += sprintf(p, "]}\n");
 
-	send(fd, report, static_cast<size_t>(p - report), 0);
+	send(fd, report, int(p - report), 0);
 }
 
 //////////////////////////////////////////////////////////////////////

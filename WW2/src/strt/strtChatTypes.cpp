@@ -81,9 +81,9 @@ StratCommand::describe() const
 	}
 
 	// Report what we're receiving
-	dbugLog(_FLI, "p:%u Strat command %d: target %d.%d.%u for side %u"
+	dbugLog(_FLI, "p:%u Strat command %d: target " PRF_FULL_OBJ_ID " for side %u"
 					, m_issuer, m_command
-					, m_cp.cell.ox, m_cp.cell.oy, m_cp.id
+					, PRA_FULL_OBJ_ID(m_cp)
 					, m_side);
 	return true;
 }

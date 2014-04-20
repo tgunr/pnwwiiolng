@@ -362,12 +362,12 @@ Host::VehicleRequest::execute()
 	vehicle->vehicleData.packedCallsign = m_handle;
 	chatGetCallsign(vehicle->vehicleData.callsign, m_handle);
 
-	dbugLog(_FLI, "p:%u p:%u c:%s v:%u created vehicle (%s:%s) players:%u"
+	dbugLog(_FLI, "p:%u p:%u c:%s v:%u created vehicle (" PRF_WEAPON_SPEC ":%s) players:%u"
 					, playerNo(0)
 					, playerNo(1)
 					, vehicle->callsign()
 					, ws.serial
-					, weapPrintSpecC(&ws.spec)
+					, PRA_WEAPON_SPEC(ws.spec)
 					, weapon->name
 					, numPlayers()
 					);
@@ -803,22 +803,22 @@ hostPlayerLeave(Player& player, PLAYER_EXIT& pe)
 	{
 		player.m_isDespawning = true;
 
-		dbugLog(_FLI,"t:%d p:%u pe:%u xfer to map at facility %d.%d.%u"
+		dbugLog(_FLI, "t:%d p:%u pe:%u xfer to map at facility " PRF_FULL_OBJ_ID ""
 				, player.teulIndex()
 				, player.playerID()
 				, pe.exitCode
-				, pe.facility.cell.ox, pe.facility.cell.oy, pe.facility.id
+				, PRA_FULL_OBJ_ID(pe.facility)
 				);
 
 		_personaXfer(player, pe);
 	}
 	else if (pe.destination == PDEST_EXIT)
 	{
-		dbugLog(_FLW, "t:%d p:%u pe:%u exiting player to exitServer, facility %d.%d.%u"
+		dbugLog(_FLW, "t:%d p:%u pe:%u exiting player to exitServer, facility " PRF_FULL_OBJ_ID ""
 				, player.teulIndex()
 				, player.playerID()
 				, pe.exitCode
-				, pe.facility.cell.ox, pe.facility.cell.oy, pe.facility.id
+				, PRA_FULL_OBJ_ID(pe.facility)
 				);
 
 		_exitPlayer(player);
@@ -1105,10 +1105,10 @@ HostVehicle::setInBuilding(const FULL_OBJ_ID& newBuildingID)
 			{
 				if ( nextBlip <= teulClock64 )
 				{
-					dbugLog(_FLA, "v:%u c:%s reporting 'in building' %d.%d.%u, but we do not have any data for that building!"
-									, index, vehicleData.callsign, newBuildingID.cell.ox, newBuildingID.cell.oy, newBuildingID.id);
-					chatSendAdminMessage("v:%u c:%s reporting 'in building' %d.%d.%u, but we do not have any data for that building!"
-									, index, vehicleData.callsign, newBuildingID.cell.ox, newBuildingID.cell.oy, newBuildingID.id);
+					dbugLog(_FLA, "v:%u c:%s reporting 'in building' " PRF_FULL_OBJ_ID ", but we do not have any data for that building!"
+									, index, vehicleData.callsign, PRA_FULL_OBJ_ID(newBuildingID));
+					chatSendAdminMessage("v:%u c:%s reporting 'in building' " PRF_FULL_OBJ_ID ", but we do not have any data for that building!"
+									, index, vehicleData.callsign, PRA_FULL_OBJ_ID(newBuildingID));
 					nextBlip = teulClock64 + 5000;
 				}
 				return;
@@ -1154,9 +1154,9 @@ Player::changeFPSBuilding(const FULL_OBJ_ID& newBuildingID, bool inCaptureBuildi
 	if ( newBuildingID.id != 0 )
 	{
 		ObjectStruct* obj = strtGetObject(newBuildingID);
-		dbugLog(_FLD, "t:%d p:%u c:%s v:%u entered %d.%d.%u [%s]"
+		dbugLog(_FLD, "t:%d p:%u c:%s v:%u entered " PRF_FULL_OBJ_ID " [%s]"
 						, teulIndex(), playerID(), callsign(), vehicle->index
-						, newBuildingID.cell.ox, newBuildingID.cell.oy, newBuildingID.id
+						, PRA_FULL_OBJ_ID(newBuildingID)
 						, (obj ? obj->name : "*UNKNOWN*")
 						);
 # if defined(BETA_RELEASE)
@@ -2520,10 +2520,10 @@ _releaseVehicle(VEHICLE_HOLDER* const vehicleHold, FULL_OBJ_ID toFacility)
 		return;
 	}
 
-	dbugLog(_FLD, "v:%u/%u _releaseVehicle: toFacility = %d.%d.%u"
+	dbugLog(_FLD, "v:%u/%u _releaseVehicle: toFacility = " PRF_FULL_OBJ_ID ""
 					, index
 					, vehicle->index
-					, toFacility.cell.ox, toFacility.cell.oy, toFacility.id
+					, PRA_FULL_OBJ_ID(toFacility)
 					);
 
 	if (vehicle->isActive() )

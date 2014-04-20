@@ -303,17 +303,17 @@ StratHCUnit::initialize()
 
 	if ( canDeployTo(homeCP()) )
 	{
-		dbugLog(_FLI, "hcu:%u name:%s initial deployment at %s %d.%d.%u"
+		dbugLog(_FLI, "hcu:%u name:%s initial deployment at %s " PRF_FULL_OBJ_ID ""
 						, unitID(), callsign(), (homeCP() ? homeCP()->name : "unknown")
-						, homeCPID().cell.ox, homeCPID().cell.oy, homeCPID().id
+						, PRA_FULL_OBJ_ID(homeCPID())
 						);
 		announceHome();
 	}
 	else
 	{
-		dbugLog(_FLW, "hcu:%u name:%s unable to allow deployment at %s %d.%d.%u"
+		dbugLog(_FLW, "hcu:%u name:%s unable to allow deployment at %s " PRF_FULL_OBJ_ID ""
 						, unitID(), callsign(), (homeCP() ? homeCP()->name : "unknown")
-						, homeCPID().cell.ox, homeCPID().cell.oy, homeCPID().id
+						, PRA_FULL_OBJ_ID(homeCPID())
 						);
 		rout();
 	}
@@ -1205,7 +1205,7 @@ StratHCUnit::initializeWeapon(const WEAPON_SPEC& spec, UINT16 numUnits)
 	TOE_::WeaponInstance* const entry = toeWeaponInstance(spec);
 	if ( entry == nullptr )
 	{
-		dbugLog(_FLA, "hcu:%u weap:%s weapon not in TOE", unitID(), weapPrintSpecC(&spec));
+		dbugLog(_FLA, "hcu:%u weap:" PRF_WEAPON_SPEC " weapon not in TOE", unitID(), PRA_WEAPON_SPEC(spec));
 		return false;
 	}
 

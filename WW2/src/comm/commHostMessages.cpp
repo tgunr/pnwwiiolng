@@ -92,11 +92,11 @@ static bool g_enablePacketSizeRecording = false;
 SINT32
 commSendPlayerExit(SINT32 teulIndex, PLAYER_DESTINATION destination, PLAYER_EXIT_CODE exitCode, const FULL_OBJ_ID& facility)
 {
-	dbugLog(_FLN,"t:%d sending player exit %d dest %d to %d.%d.%u"
+	dbugLog(_FLN, "t:%d sending player exit %d dest %d to " PRF_FULL_OBJ_ID ""
 				, teulIndex
 				, destination
 				, exitCode
-				, facility.cell.ox, facility.cell.oy, facility.id
+				, PRA_FULL_OBJ_ID(facility)
 				);
 
 	_playerExit.destination = destination;
@@ -337,13 +337,13 @@ _recvVehicleJoinRequest(ACTION_OBJECT* const a)
 	VEHICLE_REQUEST localVehicleRequest;
 	a->offset = commPackVEHICLE_REQUEST(TEUL_UNPACK, a->packed, a->offset, &localVehicleRequest, 0);
 
-	dbugLog(_FLD, "t:%d p:%u v:%u st:%d joinReq %s %s"
+	dbugLog(_FLD, "t:%d p:%u v:%u st:%d joinReq %s " PRF_WEAPON_SPEC ""
 				, a->teulIndex
 				, player.playerID()
 				, localVehicleRequest.weapon.serial
 				, localVehicleRequest.station
 				, weapPrintName(&localVehicleRequest.weapon.spec)
-				, weapPrintSpecC(&localVehicleRequest.weapon.spec)
+				, PRA_WEAPON_SPEC(localVehicleRequest.weapon.spec)
 				);
 
 	const SINT32 vIndex = hostJoinVehicle(player, localVehicleRequest);
