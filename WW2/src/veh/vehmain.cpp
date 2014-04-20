@@ -6417,7 +6417,7 @@ UINT32 vehmainDeterminePlinkKiller()
 		}
 	}
 
-	// noone plink killed me
+	// no-one plink killed me
 	return 0;
 }
 
@@ -6458,13 +6458,12 @@ static void vehmainSpawn()
 	// fixes an init issue with ppo materials
 	fpPPOCreateMaterial();
 
-	VEHICLE_REPLY* Reply = &_vehicletospawn;
 	vehVehicle*pVehicle = nullptr;
     WEAPON* pWeapon = nullptr;
 
 	g_MyHitMessages.clear();
 
-    pWeapon = weapLookup(Reply->spec);
+    pWeapon = weapLookup(_vehicletospawn.spec);
 
 	ww2imapSetKeymap(pWeapon->localIndex());
 	uiUIToGameStart();
@@ -6492,23 +6491,23 @@ static void vehmainSpawn()
 	if(ait != g_arenaDescription.end())
 		sscanf("%d", ait->second.c_str(), &binocsRank);
 
-	fpFPSEnableBinoculars (Reply->rankLevel >= (UINT16)binocsRank && PlayerClient()->IsPermitted(USE_BINOCS));
+	fpFPSEnableBinoculars (_vehicletospawn.rankLevel >= (UINT16)binocsRank && PlayerClient()->IsPermitted(USE_BINOCS));
 	mlSetMouseLookEnabled(FALSE);
 
 	vehupdateCreatePlayerControlledVehicle(pWeapon->localIndex()
 											,0
-											,Reply->hostIndex
-											,Reply->persVehicleIndex
-											,Reply->station);
+											, _vehicletospawn.hostIndex
+											, _vehicletospawn.persVehicleIndex
+											, _vehicletospawn.station);
 
-	pVehicle = vehFindVehicle(Reply->hostIndex);
+	pVehicle = vehFindVehicle(_vehicletospawn.hostIndex);
 
     if(pVehicle == nullptr)
         piExitProgram(__FILE__,__LINE__,"[vehcommProcessVehicleRequestResponse] pVehicle == nullptr");
 
-	pVehicle->WeaponSerial.source = Reply->source;
-	pVehicle->WeaponSerial.serial = Reply->hostIndex;
-	pVehicle->WeaponSerial.spec = Reply->spec;
+	pVehicle->WeaponSerial.source = _vehicletospawn.source;
+	pVehicle->WeaponSerial.serial = _vehicletospawn.hostIndex;
+	pVehicle->WeaponSerial.spec = _vehicletospawn.spec;
 
 	if(!gEZMode || !EZManager::CreateManager(pVehicle))
 		EZManager::FreeManager();
@@ -6521,9 +6520,9 @@ static void vehmainSpawn()
 	// reset any old vehicle settings as needed
 	persResetPersonaSettings();
 
-	pVehicle->Country = Reply->spec.wCountry;
+	pVehicle->Country = _vehicletospawn.spec.wCountry;
 	pVehicle->Side = wwiiSide(pVehicle->Country);
-	pVehicle->Rank = Reply->rankLevel;
+	pVehicle->Rank = _vehicletospawn.rankLevel;
 
 	if(!Online)
 	{
