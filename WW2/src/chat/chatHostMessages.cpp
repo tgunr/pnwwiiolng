@@ -208,11 +208,11 @@ _recvGCIMessage(ACTION_OBJECT* const a)
 	if ( g_logDebug )
 	{
 		if ( g_debugChat )
-			dbugLog(_FLD, "gci:%u side:%u fac:%d.%d.%u cp:%d.%d.%u name:%s"
+			dbugLog(_FLD, "gci:%u side:%u fac:" PRF_FULL_OBJ_ID " cp:" PRF_FULL_OBJ_ID " name:%s"
 							, gciMessage.gci
 							, gciMessage.side
-							, gciMessage.facility.cell.ox, gciMessage.facility.cell.oy, gciMessage.facility.id
-							, gciMessage.where.cell.ox, gciMessage.where.cell.oy, gciMessage.where.id
+							, PRA_FULL_OBJ_ID(gciMessage.facility)
+							, PRA_FULL_OBJ_ID(gciMessage.where)
 							, gciMessage.name
 							);
 	}
@@ -467,7 +467,7 @@ chatSendStratCommand(SINT32 playerID, int cmd, const FULL_OBJ_ID& cp, WWII_SIDE 
 	{
 		StratCommand scmd(playerID, (SCMD_ENUM)cmd, cp, side);
 		scmd.send();
-		dbugLog(_FLI, "%d send scmd %d for %d.%d.%u", playerID, cmd, cp.cell.ox, cp.cell.oy, cp.id);
+		dbugLog(_FLI, "%d send scmd %d for " PRF_FULL_OBJ_ID "", playerID, cmd, PRA_FULL_OBJ_ID(cp));
 	}
 	catch (std::exception& e)
 	{

@@ -32,7 +32,7 @@
 
 // List of current clients and the bufferevent associated with each.
 #include <map>
-static std::map<int, bufferevent*> s_clients;
+static std::map<evutil_socket_t, bufferevent*> s_clients;
 
 // TeulKit uses libevent and has an eventBase which it is going to initialize,
 // so we want to expose it to ourselves.
@@ -135,7 +135,7 @@ static void _shutdownLibEventSocket(evutil_socket_t& socket_, event*& event_)
 
 static void _onRepeaterRead(struct bufferevent* bev_, void* arg_)
 {
-	const int srcSock = *(int*)arg_;
+	const evutil_socket_t srcSock = *(evutil_socket_t*)arg_;
 	struct evbuffer* input = bufferevent_get_input(bev_);
 	ABORT_IF(input == nullptr);
 
@@ -194,27 +194,27 @@ static void _onRepeaterRead(struct bufferevent* bev_, void* arg_)
 
 static void _onRepeaterError(struct bufferevent* bev_, short error_, void* arg_)
 {
-	int cliSock = *(int*)arg_;
+	evutil_socket_t cliSock = *(evutil_socket_t*)arg_;
     if (error_ & BEV_EVENT_EOF)
 	{
-		dbugLog(_FLM, "sock:%d disconnected.", cliSock);
+		dbugLog(_FLM, "sock:%" PRF_SOCKET " disconnected.", PRA_SOCKET(cliSock));
     }
 	else if (error_ & BEV_EVENT_ERROR)
 	{
-		dbugLog(_FLW, "sock:%d error:%d. disconnecting.", cliSock, dbugGetErrno());
+		dbugLog(_FLW, "sock:%" PRF_SOCKET "error:%d. disconnecting.", PRA_SOCKET(cliSock), dbugGetErrno());
     }
 	else if (error_ & BEV_EVENT_TIMEOUT)
 	{
-		dbugLog(_FLW, "sock:%d timeout. disconnecting.", cliSock);
+		dbugLog(_FLW, "sock:%" PRF_SOCKET " timeout. disconnecting.", PRA_SOCKET(cliSock));
     }
 	else
 	{
-		dbugLog(_FLW, "sock:%d error %d", cliSock, error_);
+		dbugLog(_FLW, "sock:%" PRF_SOCKET " error %d", PRA_SOCKET(cliSock), error_);
 	}
 
     bufferevent_free(bev_);
 	s_clients.erase(cliSock);
-	delete (int*)(arg_);
+	delete (evutil_socket_t*)(arg_);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -232,7 +232,7 @@ static void _onRepeaterAccept(evutil_socket_t listener_, short event_, void* arg
 
 	evutil_make_socket_nonblocking(cliSock);
 	struct bufferevent* bev = bufferevent_socket_new(static_cast<event_base*>(arg_), cliSock, BEV_OPT_CLOSE_ON_FREE);
-	bufferevent_setcb(bev, _onRepeaterRead, nullptr, _onRepeaterError, new int(cliSock));
+	bufferevent_setcb(bev, _onRepeaterRead, nullptr, _onRepeaterError, new evutil_socket_t(cliSock));
 	bufferevent_enable(bev, EV_READ|EV_WRITE|EV_PERSIST);
 
 	const bool socketAlreadyRegistered = (s_clients.find(cliSock) != s_clients.end());
@@ -253,22 +253,22 @@ static std::map<evutil_socket_t /*socket*/, UINT64 /*processID*/> s_processSocke
 
 static void _onManagedProcessError(struct bufferevent* bev_, short error_, void* arg_)
 {
-	int cliSock = *(int*)(arg_);
+	evutil_socket_t cliSock = *(evutil_socket_t*)(arg_);
 	if (error_ & BEV_EVENT_EOF)
 	{
-		dbugLog(_FLM, "sock:%d disconnected.", cliSock);
+		dbugLog(_FLM, "sock:" PRF_SOCKET " disconnected.", PRA_SOCKET(cliSock));
 	}
 	else if (error_ & BEV_EVENT_ERROR)
 	{
-		dbugLog(_FLW, "sock:%d error:%d. disconnecting.", cliSock, dbugGetErrno());
+		dbugLog(_FLW, "sock:" PRF_SOCKET " error:%d. disconnecting.", PRA_SOCKET(cliSock), dbugGetErrno());
 	}
 	else if (error_ & BEV_EVENT_TIMEOUT)
 	{
-		dbugLog(_FLW, "sock:%d timeout. disconnecting.", cliSock);
+		dbugLog(_FLW, "sock:" PRF_SOCKET " timeout. disconnecting.", PRA_SOCKET(cliSock));
 	}
 	else
 	{
-		dbugLog(_FLW, "sock:%d error %d", cliSock, error_);
+		dbugLog(_FLW, "sock:" PRF_SOCKET " error %d", PRA_SOCKET(cliSock), error_);
 	}
 
 	bufferevent_free(bev_);
@@ -277,7 +277,7 @@ static void _onManagedProcessError(struct bufferevent* bev_, short error_, void*
 	if ( it != s_processSockets.end() && it->second != 0ULL )
 	{
 		dbugLog(_FLI, "sock:%d process:%llu disconnecting", cliSock, it->second);
-		delete (int*)arg_;
+		delete (evutil_socket_t*)arg_;
 		///TODO: Tell GameProcessManager that the process went away.
 	}
 }
@@ -287,10 +287,10 @@ static void _onManagedProcessError(struct bufferevent* bev_, short error_, void*
 
 static void _onManagedProcessRead(struct bufferevent* bev_, void* arg_)
 {
-	int srcSock = *(int*)arg_;
+	evutil_socket_t srcSock = *(evutil_socket_t*)arg_;
 	if ( s_processSockets.find(srcSock) != s_processSockets.end() )
 	{
-		dbugLog(_FLW, "unexpected data from managed process socket %d", srcSock);
+		dbugLog(_FLW, "unexpected data from managed process socket " PRF_SOCKET "", PRA_SOCKET(srcSock));
 		evutil_closesocket(srcSock);
 	}
 
@@ -325,7 +325,7 @@ static void _onManagedProcessAccept(evutil_socket_t listener_, short event_, voi
 
 	evutil_make_socket_nonblocking(cliSock);
 	struct bufferevent* bev = bufferevent_socket_new(static_cast<event_base*>(arg_), cliSock, BEV_OPT_CLOSE_ON_FREE);
-	bufferevent_setcb(bev, _onManagedProcessRead, nullptr, _onManagedProcessError, new int(cliSock));
+	bufferevent_setcb(bev, _onManagedProcessRead, nullptr, _onManagedProcessError, new evutil_socket_t(cliSock));
 	bufferevent_enable(bev, EV_READ|EV_PERSIST);
 
 	const bool socketAlreadyRegistered = (s_processSockets.find(cliSock) != s_processSockets.end());

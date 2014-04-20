@@ -609,7 +609,8 @@ Mission::initializeHelpers(WWII_SIDE withSide, Brigade* withBrigade)
 
 	if ( m_originCP == nullptr )
 	{
-		dbugLog(_FLA, "can't create mission with invalid origin %d.%d.%u", summary().origin.cell.ox, summary().origin.cell.oy, summary().origin.id);
+		dbugLog(_FLA, "can't create mission with invalid origin " PRF_FULL_OBJ_ID ""
+						, PRA_FULL_OBJ_ID(summary().origin));
 		return false;
 	}
 
@@ -619,10 +620,10 @@ Mission::initializeHelpers(WWII_SIDE withSide, Brigade* withBrigade)
 		m_targetCP = m_originCP;
 	}
 
-	dbugLog(_FLI, "Initialized Mission Helpers: origin(%d.%d.%u) = %s, target(%d.%d.%u) = %s"
-					, summary().origin.cell.ox, summary().origin.cell.oy, summary().origin.id
+	dbugLog(_FLI, "Initialized Mission Helpers: origin(" PRF_FULL_OBJ_ID ") = %s, target(" PRF_FULL_OBJ_ID ") = %s"
+					, PRA_FULL_OBJ_ID(summary().origin)
 					, m_originCP->name
-					, summary().target.cell.ox, summary().target.cell.oy, summary().target.id
+					, PRA_FULL_OBJ_ID(summary().target)
 					, m_targetCP->name
 					);
 
@@ -1080,9 +1081,9 @@ _createMission(instanceid_t instanceID
 					);
 
 		{
-			dbugLog(_FLIB, " origin: %d.%d.%u, targ: %d.%d.%u"
-							, summary.origin.cell.ox, summary.origin.cell.oy, summary.origin.id
-							, summary.target.cell.ox, summary.target.cell.oy, summary.target.id
+			dbugLog(_FLIB, " origin: " PRF_FULL_OBJ_ID ", targ: " PRF_FULL_OBJ_ID ""
+							, PRA_FULL_OBJ_ID(summary.origin)
+							, PRA_FULL_OBJ_ID(summary.target)
 							);
 		}
 
@@ -1197,12 +1198,12 @@ missionSendMissionPostReply(MISSION_POST_REQ& request, Player* player, SINT32 co
 	if ( g_logDebug )
 	{
 		dbugLog(_FLD, "t:%d p:%u c:%s Mission Post: "
-						"brig:%d mt:%d %d.%d.%u %d.%d.%u [%s]"
+			"brig:%d mt:%d " PRF_FULL_OBJ_ID " -> " PRF_FULL_OBJ_ID " [%s]"
 						, player->teulIndex(), player->playerID(), player->callsign()
 						, player->brigadeID()
 						, request.missionType
-						, request.origin.cell.ox, request.origin.cell.oy, request.origin.id
-						, request.target.cell.ox, request.target.cell.oy, request.target.id
+						, PRA_FULL_OBJ_ID(request.origin)
+						, PRA_FULL_OBJ_ID(request.target)
 						, request.desc
 						);
 	}

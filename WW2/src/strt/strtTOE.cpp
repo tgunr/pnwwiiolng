@@ -95,13 +95,13 @@ TOE_::TemplateHeader::updateWeapon(const WEAPON_SPEC& spec, UINT16 capacity, UCH
 		Chat::Name toeName(handle());
 		const WEAPON* weapon = weapLookup(spec);
 		if ( weapon == nullptr )
-			LogAbort("toe:%s(%llu) wanted unknown weapon spec %s"
-							, toeName.c_str(), handle(), weapPrintSpecC(&spec));
+			LogAbort("toe:%s(%llu) wanted unknown weapon spec " PRF_WEAPON_SPEC ""
+							, toeName.c_str(), handle(), PRA_WEAPON_SPEC(spec));
 
-		dbugLog(_FLI, "toe:%s(%llu) adding %s(%s) capacity %u"
+		dbugLog(_FLI, "toe:%s(%llu) adding %s(" PRF_WEAPON_SPEC ") capacity %u"
 						, toeName.c_str(), handle()
 						, weapon->name
-						, weapPrintSpecC(&spec)
+						, PRA_WEAPON_SPEC(spec)
 						, capacity
 						);
 

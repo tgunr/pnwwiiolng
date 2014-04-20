@@ -1055,11 +1055,11 @@ _checkObjectiveTarget(const FULL_OBJ_ID& fid, Player* player)
 
 	if ( property == nullptr )
 	{
-		dbugLog(_FLW, "player %s[%d/%d] requested objective %d.%d.%u is not a valid target?"
+		dbugLog(_FLW, "player %s[%d/%d] requested objective " PRF_FULL_OBJ_ID " is not a valid target?"
 					, player->callsign()
 					, player->playerID()
 					, player->teulIndex()
-					, fid.cell.ox, fid.cell.oy, fid.id
+					, PRA_FULL_OBJ_ID(fid)
 					);
 		return nullptr;
 	}
@@ -1082,13 +1082,13 @@ chatVoteAttack(Player* player, const FULL_OBJ_ID& id)
 	if ( !target )
 		return false;
 
-	dbugLog(_FLI, "%s[%u/%d] requesting %s attack for %s (%d.%d.%u)"
+	dbugLog(_FLI, "%s[%u/%d] requesting %s attack for %s (" PRF_FULL_OBJ_ID ")"
 					, player->callsign()
 					, player->playerID()
 					, player->teulIndex()
 					, _sideNameAdj[player->side()]
 					, target->Name()
-					, id.cell.ox, id.cell.oy, id.id
+					, PRA_FULL_OBJ_ID(id)
 					);
 
 	chatSendStratCommand(player->playerID(), SC_ATTACK, target->m_fid, player->side());
@@ -1105,13 +1105,13 @@ chatVoteClear(Player* player, const FULL_OBJ_ID& id)
 	if ( !target )
 		return false;
 
-	dbugLog(_FLI, "%s[%d/%d] requesting %s clear for %s (%d.%d.%u)"
+	dbugLog(_FLI, "%s[%d/%d] requesting %s clear for %s (" PRF_FULL_OBJ_ID ")"
 					, player->callsign()
 					, player->playerID()
 					, player->teulIndex()
 					, _sideNameAdj[player->side()]
 					, target->Name()
-					, id.cell.ox, id.cell.oy, id.id
+					, PRA_FULL_OBJ_ID(id)
 					);
 
 	chatSendStratCommand(player->playerID(), SC_CLEAR, target->m_fid, player->side());
@@ -1134,13 +1134,13 @@ chatVoteDefend(Player* player, const FULL_OBJ_ID& id)
 		return false;
 	}
 
-	dbugLog(_FLI, "%s[%d/%d] requesting %s defend for %s (%d.%d.%u)"
+	dbugLog(_FLI, "%s[%d/%d] requesting %s defend for %s (" PRF_FULL_OBJ_ID ")"
 					, player->callsign()
 					, player->playerID()
 					, player->teulIndex()
 					, _sideNameAdj[player->side()]
 					, target->Name()
-					, id.cell.ox, id.cell.oy, id.id
+					, PRA_FULL_OBJ_ID(id)
 					);
 
 	chatSendStratCommand(player->playerID(), SC_DEFEND, target->m_fid, player->side());

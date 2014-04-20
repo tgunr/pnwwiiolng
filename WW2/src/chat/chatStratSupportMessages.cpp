@@ -250,8 +250,8 @@ BrigadeMove::process(const ChatHandle& mover, const char* callsign, StratHCUnit*
 	}
 	if ( cp == nullptr )
 	{
-		dbugLog(_FLW, "%s/%s: invalid destination: %d.%d.%u", callsign, unit->callsign()
-						, m_destination.cell.ox, m_destination.cell.oy, m_destination.id
+		dbugLog(_FLW, "%s/%s: invalid destination: " PRF_FULL_OBJ_ID "", callsign, unit->callsign()
+						, PRA_FULL_OBJ_ID(m_destination)
 						);
 		return BMR_FAILED_TARGET;
 	}

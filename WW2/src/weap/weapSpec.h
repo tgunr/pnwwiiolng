@@ -98,10 +98,8 @@ extern WEAPON_SPEC NULL_WEAP_SPEC; // removed const to work with broken MW Linke
 #define COMPARE_SPECS(s1,s2) ((s1) == (s2))
 #define	SPEC_IS_NULL(spec) (spec.isNull())
 
-//tolua_begin
-
-// find a weapon spec based on the weapon's name
-extern const WEAPON_SPEC& weapFindWeaponByName(const char* weaponName);
+#define PRF_WEAPON_SPEC "%u:%u:%u:%u"
+#define PRA_WEAPON_SPEC(s) (s).wCountry, (s).wCategory, (s).wClass, (s).wType
 
 static inline const char* weapPrintSpecC(const WEAPON_SPEC* spec)
 {
@@ -109,10 +107,15 @@ static inline const char* weapPrintSpecC(const WEAPON_SPEC* spec)
 		return "<null>";
 
 	static char buffer[24];
-	sprintf(buffer, "%u:%u:%u:%u", (UINT8)spec->wCountry, (UINT8)spec->wCategory, (UINT8)spec->wClass, (UINT8)spec->wType);
+	sprintf(buffer, "" PRF_WEAPON_SPEC "", PRA_WEAPON_SPEC(*spec));
 
 	return buffer;
 }
+
+//tolua_begin
+
+// find a weapon spec based on the weapon's name
+extern const WEAPON_SPEC& weapFindWeaponByName(const char* weaponName);
 
 // create a spec from a string
 extern WEAPON_SPEC weapCreateSpec(const char* weapString);

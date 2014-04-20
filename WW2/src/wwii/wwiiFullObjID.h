@@ -93,6 +93,11 @@ struct FULL_OBJ_ID
 
 extern const FULL_OBJ_ID nullObjID;
 
+//tolua_end
+#define PRF_FULL_OBJ_ID "%d.%d:%u"
+#define PRA_FULL_OBJ_ID(s) (s).cell.ox, (s).cell.oy, (s).id
+//tolua_begin
+
 static inline const char* weapPrintFullObjIDC(const FULL_OBJ_ID* id, char* buffer)
 {
 	if ( id == nullptr )

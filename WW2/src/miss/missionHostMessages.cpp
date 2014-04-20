@@ -91,9 +91,9 @@ _createMissionResults(const Player& player, MISSION_RESULTS& results)
 		const CPStruct* const cp = strtGetCP(origin);
 		if (cp == nullptr)
 		{
-			dbugLog(_FLW, "t:%d p:%u c:%s Mission packet has invalid origin: %d.%d.%u"
+			dbugLog(_FLW, "t:%d p:%u c:%s Mission packet has invalid origin: " PRF_FULL_OBJ_ID ""
 							, player.teulIndex(), player.playerID(), player.callsign()
-							, origin.cell.ox, origin.cell.oy, origin.id
+							, PRA_FULL_OBJ_ID(origin)
 							);
 			return false;
 		}

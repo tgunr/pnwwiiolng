@@ -662,7 +662,7 @@ dbseSaveBUILDING(BUILDWITHID* buildw)
 	fac_oid = _findFacilityBySC(sx, sy, building->pid.id);
 	if ( fac_oid == 0 )
 	{
-		fprintf(stderr, "building %s (%d.%d.%u %s) can't find parent facility (%d.%d.%u)\n"
+		fprintf(stderr, "building %s (%d.%d:%u %s) can't find parent facility (%d.%d:%u)\n"
 					, g_name
 					, buildw->ox, buildw->oy, building->oid.id
 					, building->fileName

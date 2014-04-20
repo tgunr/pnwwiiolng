@@ -426,7 +426,7 @@ _fillWeapon(SINT32 numArgs, FUNCARGS* args)
 #endif //!FRONT_END
 
 #ifdef EXTREME_DEBUG
-		dbugLog(_FLD, "adding %s => %p", weapPrintSpecC(&thisSpec), weapon);
+		dbugLog(_FLD, "adding " PRF_WEAPON_SPEC " => %p", PRA_WEAPON_SPEC(thisSpec), weapon);
 #endif
 		g_weaponList[thisSpec] = weapon;
 

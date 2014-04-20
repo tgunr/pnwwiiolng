@@ -27,9 +27,9 @@ strtProcessCapacityRequest(const MM_CAPACITY_REQUEST& request, MM_CAPACITY_RESPO
 	UINT32 totalRPs;
 	WeapJoinRequestNode* joinNode;
 
-	dbugLog(_FLD, "c:%u m:%d f:%d.%d.%u processing capacity request tag %d"
+	dbugLog(_FLD, "c:%u m:%d f:" PRF_FULL_OBJ_ID " processing capacity request tag %d"
                 , request.customerID, request.missionID
-				, request.facility.cell.ox, request.facility.cell.oy, request.facility.id
+				, PRA_FULL_OBJ_ID(request.facility)
                 , request.tag);
 
 	//Copy the necessary information from one to the other
@@ -99,7 +99,7 @@ strtProcessCapacityRequest(const MM_CAPACITY_REQUEST& request, MM_CAPACITY_RESPO
 		}
 		else
 		{
-			dbugLog(_FLA,"Unpopulated cp: %s [%d.%d.%u]", cp->name, dest->cell.ox, dest->cell.oy, dest->id);
+			dbugLog(_FLA, "Unpopulated cp: %s [" PRF_FULL_OBJ_ID "]", cp->name, PRA_FULL_OBJ_ID(*dest));
 		}
 
 		response.capacity = capacity;
@@ -119,7 +119,7 @@ strtProcessCapacityRequest(const MM_CAPACITY_REQUEST& request, MM_CAPACITY_RESPO
 	}
 	else
 	{
-		dbugLog(_FLA,"Couldn't find strat object %d.%d.%u", request.facility.cell.ox, request.facility.cell.oy, request.facility.id);
+		dbugLog(_FLA, "Couldn't find strat object " PRF_FULL_OBJ_ID "", PRA_FULL_OBJ_ID(request.facility));
 	}
 
 	return response.capacity;

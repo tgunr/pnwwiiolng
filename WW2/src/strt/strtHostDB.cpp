@@ -418,7 +418,7 @@ strtdbPopulateVehTypesTable()
 
 		if ( spec.wCountry == 0 || spec.wCountry > MAX_COUNTRIES )
 		{
-			LogAbort("illegal weapon spec %s", weapPrintSpecC(&spec));
+			LogAbort("illegal weapon spec " PRF_WEAPON_SPEC "", PRA_WEAPON_SPEC(spec));
 			continue;
 		}
 

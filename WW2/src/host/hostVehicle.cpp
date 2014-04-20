@@ -782,16 +782,16 @@ HostVehicle::setInCaptureBuilding(bool newValue)
 			static TeulTimeMS nextBlip = 0ULL;
 			FULL_OBJ_ID bid;
 			bid.FromKey(m_inBuilding);
-			_reportBuildingIssue(nextBlip, "p:%u c:%s v:%u client reporting 'in-capture' from unrecognized building %d.%d.%u"
-											, seats[0], vehicleData.callsign, index, bid.cell.ox, bid.cell.oy, bid.id);
+			_reportBuildingIssue(nextBlip, "p:%u c:%s v:%u client reporting 'in-capture' from unrecognized building " PRF_FULL_OBJ_ID ""
+											, seats[0], vehicleData.callsign, index, PRA_FULL_OBJ_ID(bid));
 			newValue = false;
 		}
 		else if ( m_inBuildingObject->facility == nullptr )
 		{
 			FULL_OBJ_ID bid;
 			bid.FromKey(m_inBuilding);
-			dbugLog(_FLW, "p:%u c:%s v:%u client reporting in-capture for non-strat building %d.%d.%u %s"
-											, seats[0], vehicleData.callsign, index, bid.cell.ox, bid.cell.oy, bid.id, m_inBuildingObject->name);
+			dbugLog(_FLW, "p:%u c:%s v:%u client reporting in-capture for non-strat building " PRF_FULL_OBJ_ID " %s"
+											, seats[0], vehicleData.callsign, index, PRA_FULL_OBJ_ID(bid), m_inBuildingObject->name);
 			newValue = false;
 		}
 		else if ( m_inBuildingObject->facility->m_captureBuilding != m_inBuildingObject )

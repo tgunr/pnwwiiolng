@@ -150,7 +150,7 @@ CPStruct::enemyReport(const WEAPON_SERIAL& weapon, FacilityStruct* facility)
 	UINT8 category = _effectiveCategory(weapon);
 	if ( category == 0 )
 	{
-		dbugLog(_FLD, "ews: %s doesn't register EWS", weapPrintSpecC(&weapon.spec));
+		dbugLog(_FLD, "ews: " PRF_WEAPON_SPEC " doesn't register EWS", PRA_WEAPON_SPEC(weapon.spec));
 		return false;
 	}
 	if ( category != weapon.spec.wCategory )
