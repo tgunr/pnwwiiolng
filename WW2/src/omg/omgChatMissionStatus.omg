@@ -1,4 +1,4 @@
-NAMESPACE Chat
+NAMESPACE Chat;
 
 MESSAGE MissionStatus
 {
@@ -42,10 +42,8 @@ MESSAGE MissionStatus
 	{
 		bool			active;			//! True when a FRU is active.
 		NetTimeMS		nextPlaceAvail;	//! When the next FRU can be placed.
-		IF (active) {
-			WorldPosition_m	position;	//! Absolute world co-ordinates.
-			ChatHandle	creator;		//! MSP/FRU creatore.
-		}
+		WorldPosition_m	position;	//! Absolute world co-ordinates.
+		ChatHandle	creator;		//! MSP/FRU creatore.
 
 		{{
 			//! \brief Calculate the milliseconds remaining until placement allowed.
