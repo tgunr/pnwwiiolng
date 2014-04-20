@@ -12,11 +12,9 @@ namespace Vehicle
 	///	@brief	Describes one vehicle hitting another.
 	struct Hit
 	{
-#ifdef _SUPPORT_CPP11_
 		Hit() = default;
 		Hit(const Hit& rhs) = default;
 		Hit& operator = (const Hit& rhs) = default;
-#endif
 
 		Hit(UINT32 _target) : m_shooter(0), m_target(_target), m_components(), m_timestamp(teulClock64) {}
 		Hit(ACTION_OBJECT* const a)
@@ -33,12 +31,10 @@ namespace Vehicle
 		/// @brief	Describes damage application to a given component during a hit.
 		struct Component
 		{
-#ifdef _SUPPORT_CPP11_
 			Component() = default;
 			Component(const Component& rhs) = default;
 			Component& operator = (const Component& rhs) = default;
-#endif
-			Component() {}
+
 			Component(UCHAR _compID, bool _isImportant, UCHAR _numHits, UINT64 _damage)
 				: compID(_compID), isImportant(_isImportant), NumHits(_numHits), m_damage(_damage)
 				{}
