@@ -19,5 +19,5 @@ namespace Chat
 	class	Broadcast;
 	struct	UpdateChannel;
 	struct	UserNLA;
-	class	MissionStatus;
+	struct	MissionStatus;
 }

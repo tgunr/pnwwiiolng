@@ -89,6 +89,11 @@ struct FULL_OBJ_ID
 			|  (id & 0xffff)								// 16 bits of id
 			;
 	}
+
+//tolua_end
+	void pack(struct ACTION_OBJECT* const a, SINT32 bits = 0);
+	void unpack(struct ACTION_OBJECT* const a, SINT32 bits = 0);
+//tolua_begin
 };
 
 extern const FULL_OBJ_ID nullObjID;

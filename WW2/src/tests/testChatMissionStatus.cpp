@@ -10,7 +10,7 @@
 //
 
 #include "tests/testUnits.h"
-#include "omg/omgMissionStatus.h"
+#include "omg/omgChatMissionStatus.hxx"
 
 // Test unit class.
 class ChatMissionStatus : public TestUnit

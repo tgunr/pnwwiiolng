@@ -31,7 +31,7 @@
 #include "chat/chatWaypoint.h"
 #include "include/mydbQuery.h"
 #include "miss/missionMobileSpawnWaypoint.h"
-#include "omg/omgMissionStatus.h"
+#include "omg/omgChatMissionStatus.hxx"
 #include "server/serverPeers.h"
 #include "str/stringLib.h"
 #include "teul/teulEndpointDefs.h"

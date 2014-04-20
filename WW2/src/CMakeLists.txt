@@ -146,6 +146,7 @@ MACRO(ADD_OMG_TARGET _TARGET)
 ENDMACRO()
 
 ADD_OMG_TARGET(omg/omgMissionSortieData)
+ADD_OMG_TARGET(omg/omgChatMissionStatus)
 
 IF (NOT MSVC)
 	set_target_properties(omggen PROPERTIES COMPILE_FLAGS "-O3 -march=native -mtune=native -Wno-error -Wno-all -Wno-format-security") #
@@ -643,7 +644,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 			chat/chatMissionMember.h
 		chat/chatMissions.cpp
 			chat/chatMissions.h
-		chat/chatMissionStatusPacker.cpp
+			omg/omgChatMissionStatus.hxx
 		chat/chatMotds.cpp
 			chat/chatMotds.h
 		chat/chatMultiCrew.cpp
@@ -686,6 +687,8 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 		dbse/dbseClientMessages.cpp
 			dbse/dbseClientMessages.h
 
+		omg/omgChatMissionStatus.cxx
+
 		${PCH_INCLUDE_HEADERS}
 	)
 	ADD_PCH(${CHAT_HOST_EXE})
@@ -724,7 +727,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 				host/hostPlayers.h
 					mm/mmEnums.h
 					wwii/wwiiRank.h
-					omg/omgMissionSortieData.h
+					omg/omgMissionSortieData.hxx
 					miss/missFlags.h
 						wwii/wwiiSyncVar.h
 						teul/teulNetTimeMS.h
@@ -849,7 +852,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 					mm/mmEnums.h
 					wwii/wwiiRank.h
 					weap/weapSerial.h
-					omg/omgMissionSortieData.h
+					omg/omgMissionSortieData.hxx
 					miss/missFlags.h
 						wwii/wwiiSyncVar.h
 						teul/teulNetTimeMS.h
@@ -858,6 +861,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 							teul/teulNetTimeMSPacker.h
 					inst/instDescriptor.h
 					auth/authDispatch.h
+		omg/omgMissionSortieData.cxx
 		map/mapThreads.cpp
 			map/mapThreads.h
 		miss/missActiveMission.cpp
@@ -1169,7 +1173,7 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth")
 		tests/testLocalizedMessage.cpp
 		tests/testInplaceVector.cpp
 		tests/testPackers.cpp	comm/commPackers.cpp
-		tests/testChatMissionStatus.cpp	chat/chatMissionStatusPacker.cpp wwii/wwiiServerTrackedObjectPacker.cpp
+		tests/testChatMissionStatus.cpp	wwii/wwiiServerTrackedObjectPacker.cpp omg/omgChatMissionStatus.cxx
 		tests/testHostGridCell.cpp host/hostGridCell.cpp
 		tests/testSupercellVislevelXfer.cpp
 		tests/testPersonaXfer.cpp
