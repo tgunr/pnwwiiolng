@@ -105,7 +105,7 @@ SET(OMG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/omg")
 add_custom_command(OUTPUT ${OMG_DIR}/omg.tab.cpp ${OMG_DIR}/omg.tab.h
 	PRE_BUILD
 	COMMAND	${BISON_EXE}
-	ARGS -o omg.tab.cpp --defines=omg.tab.h omg.y
+	ARGS -o omg.tab.cpp --defines=omg.tab.h --report=all omg.y
 	DEPENDS "${OMG_DIR}/omg.y"
 	MAIN_DEPENDENCY "${OMG_DIR}/omg.y"
 	COMMENT "[BISON] Building OMG"
