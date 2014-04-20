@@ -114,7 +114,7 @@ const char* _pstates[] =
 };
 
 static void
-_reportPlayerDetails(unsigned int fd, const char* /*path*/, const char* /*args*/)
+_reportPlayerDetails(SOCKET fd, const char* /*path*/, const char* /*args*/)
 {
 	char buffer[2048];
 	int len = 0;

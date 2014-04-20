@@ -41,7 +41,7 @@ namespace Teul
 		private:
 			std::mutex m_config_mutex;
 		private:
-			std::atomic<int> m_listenSock;
+			std::atomic<SOCKET> m_listenSock;
 
 		public:
 			const std::string& rootPath() const { return m_rootPath; }
@@ -58,13 +58,13 @@ namespace Teul
 				// We caused cancellation. Close the socket so that the
 				// 'accept()' loop breaks and the thread can tell it needs
 				// to terminate.
-				int socket = m_listenSock.exchange(INVALID_SOCKET);
+				SOCKET socket = m_listenSock.exchange(INVALID_SOCKET);
 				if ( socket != INVALID_SOCKET )
 					OS_CLOSESOCKET(socket);
 				std::this_thread::yield();
 			}
 		public:
-			typedef void (*VirtualFileHandler)(unsigned int /*fd*/, const char* /*path*/, const char* /*args*/);
+			typedef void (*VirtualFileHandler)(SOCKET /*fd*/, const char* /*path*/, const char* /*args*/);
 		private:
 			typedef std::unordered_map< std::string, std::pair<VirtualFileHandler /*handler*/, std::string /*description*/> > VirtualFileHandlers;
 			VirtualFileHandlers m_virtualFileHandlers;
@@ -75,10 +75,9 @@ namespace Teul
 			void addVirtualFile(std::string desc_, std::string path_, VirtualFileHandler handler_);
 
 		private:
-			void processHTTPRequest(const int fd, char* const request);
+			void processHTTPRequest(const SOCKET fd, char* const request);
 		};
 
 		extern Server s_debugServer;
 	}
 }
-

@@ -913,7 +913,7 @@ serverEnableDebugWebServer(SERVER_TYPE serverType)
 #include "revision.h"
 
 static void
-_serverReportAlive(unsigned int fd, const char* /*path*/, const char* /*args*/)
+_serverReportAlive(SOCKET fd, const char* /*path*/, const char* /*args*/)
 {
 	auto& stats = Server::myServerInfo.stats;
 

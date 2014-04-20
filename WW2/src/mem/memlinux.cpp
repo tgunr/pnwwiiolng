@@ -194,7 +194,7 @@ memFreeDebug(void* const oldPtr_, const char* const file_, const size_t line_)
 
 #if defined(MEMORY_DEBUG)
 void
-memReportJSON(unsigned int fd, const char* const /*path*/, const char* const /*args*/)
+memReportJSON(SOCKET fd, const char* const /*path*/, const char* const /*args*/)
 {
 	char buffer[132 * 200];
 	UINT32 offset = 0;
