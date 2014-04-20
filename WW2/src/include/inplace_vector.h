@@ -4,8 +4,6 @@
 # include <stdexcept>
 #endif
 
-#include <vector>
-
 // class template inplace_vector -*- C++ -*-
 // derived from std::array
 // WWII::inplace_vector
@@ -20,17 +18,17 @@ namespace WWII
    *  Sets support random access iterators.
    *
    *  @param  Tp  Type of element. Required to be a complete type.
-   *  @param  N  Number of elements.
+   *  @param  N   Number of elements.
   */
   template<typename _Tp, size_t _Nm>
     struct inplace_vector
     {
-      typedef _Tp 	    			      value_type;
-      typedef value_type&                   	      reference;
-      typedef const value_type&             	      const_reference;
-      typedef value_type*          		      iterator;
-      typedef const value_type*			      const_iterator;
-      typedef inplace_vector<_Tp, _Nm>                 self;
+	  typedef _Tp                                     value_type;
+      typedef value_type&                             reference;
+      typedef const value_type&                       const_reference;
+      typedef value_type*                             iterator;
+      typedef const value_type*		                  const_iterator;
+      typedef inplace_vector<_Tp, _Nm>                self;
       typedef std::size_t                    	      size_type;
       typedef std::ptrdiff_t                   	      difference_type;
       typedef std::reverse_iterator<iterator>	      reverse_iterator;
