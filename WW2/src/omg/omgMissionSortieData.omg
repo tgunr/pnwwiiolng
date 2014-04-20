@@ -85,5 +85,17 @@ MESSAGE TestCond
 		IF (crewHandle != 0) {
 			UINT8		crewDecal;
 		}
+		ARRAY Component[64] {
+			UINT8		id;
+			UINT8		damage;
+			IF (damage > 0) {
+				ARRAY Id[8] {
+					UINT8	idNo;
+					IF (idNo) {
+						UINT8	damage;
+					}
+				}
+			}
+		}
 	}
 };
