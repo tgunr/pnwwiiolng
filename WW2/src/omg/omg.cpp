@@ -12,6 +12,7 @@
 #include "omg.yy.h"
 #include "omg.tab.h"
 
+long long leakCount = 0;
 static const char* s_exeName;
 static std::string s_cxxFilename = "";
 static std::string s_hxxFilename = "";
@@ -39,6 +40,7 @@ static TypeMap s_typeMap {
 	{ "SINT64", "", false, "" },
 	{ "FLOAT", "", false, "" },
 	{ "DOUBLE", "", false, "" },
+	{ "bool", "", false, "" },
 	{ "FULL_OBJ_ID", "", true, "wwii/wwiiFullObjIDPacker.h" },
 	{ "WEAPON_SPEC", "", true, "weap/weapSpecPacker.h" },
 	{ "WEAPON_SERIAL", "", true, "" },
@@ -50,6 +52,7 @@ static TypeMap s_typeMap {
 	{ "PermissionMask", "", false, "" },
 	{ "playerid_t", "", false, "" },
 	{ "instanceid_t", "", false, "" },
+	{ "WorldPosition_m", "", true, "wwii/wwiiServerTrackedObject.h" },
 };
 
 static unsigned int s_msgX;					// X of messages defined in this file.
@@ -66,6 +69,7 @@ struct Node
 	,	Group
 	,	Field
 	,	Condition
+	,	Array
 	};
 
 	Node*				m_next;
@@ -75,14 +79,16 @@ struct Node
 
 	Type				m_type;
 	std::string			m_name;
+	mutable std::string	m_qualifiedName;
 
-	Node(Type type, const char* name, Node* parent)
+	Node(Type type, std::string&& name, Node* parent)
 		: m_next(nullptr)
 		, m_parent(parent)
 		, m_child(nullptr)
 		, m_lastChild(nullptr)
 		, m_type(type)
-		, m_name(name)
+		, m_name(std::move(name))
+		, m_qualifiedName("")
 	{
 		if (m_parent) {
 			if (m_parent->m_lastChild)
@@ -93,16 +99,53 @@ struct Node
 		}
 	}
 
-	virtual void Emit() const
+	Node(Type type, const char* name, Node* parent)
+		: Node(type, std::string(name), parent)
+	{}
+
+	virtual void Emit(size_t /*indentLevel*/) const
 	{
 		yyerror("Internal Error: Reached Node->Emit();\n");
 		exit(9);
 	}
 
-	virtual void EmitPack(size_t /*indent level*/) const
+	virtual void EmitPack(size_t /*indentLevel*/) const
 	{
 	}
 
+	virtual void EmitUnpack(size_t /*indentLevel*/) const
+	{
+	}
+
+	bool Contains(const char* name) const
+	{
+		for (const Node* child = m_child; child; child = child->m_next) {
+			if (child->m_name.compare(name) == 0)
+				return true;
+		}
+		return false;
+	}
+
+	bool IsOrIsChildOf(Type type) const
+	{
+		if (m_type == type)
+			return true;
+		if (m_parent == nullptr)
+			return false;
+		return m_parent->IsOrIsChildOf(type);
+	}
+
+	const std::string& GetQualifiedName() const
+	{
+		if (m_qualifiedName.empty()) {
+			m_qualifiedName = (m_parent) ? m_parent->GetQualifiedName() : s_namespace;
+			if (!m_name.empty() && m_type != Node::Type::Condition) {
+				m_qualifiedName += "::";
+				m_qualifiedName += m_name;
+			}
+		}
+		return m_qualifiedName;
+	}
 };
 
 struct Message : public Node
@@ -124,7 +167,7 @@ struct Message : public Node
 
 	void AddExtraMember(const char* type, const char* name, const char* defaultValue);
 
-	void Emit() const override;
+	void Emit(size_t /*indentLevel*/) const override;
 	void EmitConstructor() const;
 	void EmitPacker() const;
 	void EmitGroupPackers() const;
@@ -154,7 +197,7 @@ struct Group : public Node
 		}
 	}
 
-	void Emit() const override;
+	void Emit(size_t /*indentLevel*/) const override;
 };
 
 struct Field : public Node
@@ -171,24 +214,46 @@ struct Field : public Node
 	{
 	}
 
-	void Emit() const override;
-	void EmitPack(size_t indent) const override;
+	void Emit(size_t indentLevel) const override;
+	void EmitPack(size_t indentLevel) const override;
+	void EmitUnpack(size_t indentLevel) const override;
 };
 
 struct Conditional : public Node
 {
 	std::string			m_condition;
 
-	Conditional(const char* condition, Node* parent)
-		: Node(Node::Type::Condition, "if", parent)
+	Conditional(const char* keyword, const char* condition, Node* parent)
+		: Node(Node::Type::Condition, keyword, parent)
 		, m_condition(condition)
 	{
 	}
 
-	void Emit() const override;
-	void EmitPack(size_t indent) const override;
+	void Emit(size_t indentLevel) const override;
+	void EmitPack(size_t indentLevel) const override;
+	void EmitUnpack(size_t indentLevel) const override;
 };
 
+struct Array : public Node
+{
+	std::string			m_memberName;
+	std::string			m_typedef;
+	std::string			m_dimension;
+
+	Array(std::string&& structName, std::string&& typedefName, std::string&& memberName, std::string&& dimension, Node* parent)
+		: Node(Node::Type::Array, std::move(structName), parent)
+		, m_memberName(std::move(memberName))
+		, m_typedef(std::move(typedefName))
+		, m_dimension(std::move(dimension))
+	{
+	}
+
+	void Emit(size_t indentLevel) const override;
+	void EmitPack(size_t indentLevel) const override;
+	void EmitUnpack(size_t indentLevel) const override;
+
+	UINT16 GetPackBits() const;
+};
 
 static Message* s_firstMessage;
 static Message* s_lastMessage;
@@ -257,6 +322,28 @@ static const char* _getIndents(size_t indentLevel)
 	return s_indents + (MAX_INDENTS - std::min(indentLevel, MAX_INDENTS));
 }
 
+static void _endOfNode(Node::Type expectedType)
+{
+	if (s_currentNode == nullptr) {
+		yyerror("INTERNAL ERROR: currentNode is null");
+		exit(1);
+	}
+	if (s_currentNode->m_type != expectedType) {
+		yyerror("INTERNAL ERROR: node %s is not of expected type (%d != %d)", s_currentNode->m_name.c_str(), s_currentNode->m_type, expectedType);
+		exit(1);
+	}
+	
+	s_currentNode = s_currentNode->m_parent;
+}
+
+static void _checkName(const char* name)
+{
+	if (s_currentNode->m_name.compare(name) == 0 || s_currentNode->Contains(name))
+		yyfatal("Redefinition of '%s' in this scope", name);
+	if (_findTypeDef(name))
+		yyfatal("Invalid use of type name '%s' as identifier", name);
+}
+
 //////////////////////////////////////////////////////////////////////
 
 void omg_enable_debug()
@@ -311,25 +398,19 @@ void omg_start_message(const char* name)
 
 void omg_end_message()
 {
-	annotate("Completed definition of message '%s'", s_lastMessage->m_name.c_str());
-	s_currentNode = s_currentNode->m_parent;
+	annotate("end message '%s'", s_lastMessage->m_name.c_str());
+	_endOfNode(Node::Type::Message);
 }
 
 void omg_start_group(const char* name)
 {
-	for (auto node = s_currentNode; node; node = node->m_parent) {
-		if (node->m_type == Node::Type::Group) {
-			yyfatal("Cannot nest GROUPs, sorry.", name);
-		}
-	}
+	if (s_currentNode->IsOrIsChildOf(Node::Type::Group))
+		yyfatal("GROUPs may only occur at the top level of a message definition: %s", name);
 
 	if (islower(name[0]))
 		yyfatal("GROUP names must start with a capital letter ('%s')", name);
 
-	for (Node* node = s_currentNode->m_child; node; node = node->m_next) {
-		if (node->m_name == name)
-			yyfatal("Redefinition of '%s' in this scope", name);
-	}
+	_checkName(name);
 
 	if (s_lastMessage->m_numGroups >= MAX_MESSAGE_GROUPS) {
 		yyerror("MESSAGE '%s' contains more than %u GROUP definitions.", s_lastMessage->m_name.c_str(), MAX_MESSAGE_GROUPS);
@@ -349,19 +430,17 @@ void omg_start_group(const char* name)
 
 void omg_end_group()
 {
+	annotate("end group %s", s_currentNode->m_name.c_str());
+
 	if (s_currentNode->m_child == nullptr)
 		yyfatal("GROUP with empty definition, '%s'", s_currentNode->m_name.c_str());
 
-	annotate("Ended group %s", s_currentNode->m_name.c_str());
-	s_currentNode = s_currentNode->m_parent;
+	_endOfNode(Node::Type::Group);
 }
 
 void omg_start_field(const char* type, const char* name)
 {
-	for (Node* node = s_currentNode->m_child; node; node = node->m_next) {
-		if (node->m_name == name)
-			yyfatal("Redefinition of '%s' in this scope", name);
-	}
+	_checkName(name);
 
 	if (isupper(name[0]))
 		yyfatal("Field names must start with a lowercase letter ('%s')", name);
@@ -380,21 +459,67 @@ void omg_start_field(const char* type, const char* name)
 
 void omg_end_field()
 {
-	annotate("End of field");
-	s_currentNode = s_currentNode->m_parent;
+	annotate("end field %s", s_currentNode->m_name.c_str());
+	_endOfNode(Node::Type::Field);
 }
 
 void omg_start_if(const char* condition)
 {
+	if (s_currentNode->m_type == Node::Type::Group) {
+		yyerror("Can't use IF inside of a GROUP definition.");
+		exit(1);
+	}
 	annotate("if (%s) ...", condition);
-	Conditional* cond = new Conditional(condition, s_currentNode);
+	Conditional* cond = new Conditional("if", condition, s_currentNode);
 	s_currentNode = cond;
 }
 
 void omg_end_if()
 {
 	annotate("endif()");
-	s_currentNode = s_currentNode->m_parent;
+	_endOfNode(Node::Type::Condition);
+}
+
+void omg_start_array(std::string structName, std::string typedefName, std::string memberName, std::string dimension)
+{
+	if (s_currentNode->IsOrIsChildOf(Node::Type::Group))
+		yyfatal("ARRAY %s: cannot be use ARRAY inside of a GROUP definition", structName.c_str());
+
+	if (dimension[0] == '-')
+		yyfatal("Illegal ARRAY dimension: %s", dimension.c_str());
+	if (dimension[0] == '-' || isdigit(dimension[0])) {
+		long i = std::stol(dimension);
+		if (i <= 0)
+			yyfatal("Illegal ARRAY dimension: %s", dimension.c_str());
+		if (i >= (1 << 24))
+			yyfatal("ARRAY dimension exceeds 2^24: %s", dimension.c_str());
+	}
+
+	if (typedefName.empty()) {
+		typedefName = structName;
+		typedefName.push_back('s');
+	}
+
+	if (memberName.empty())
+		memberName = typedefName;
+	memberName[0] = tolower(memberName[0]);
+
+	annotate("array struct %s typedef %s member %s [%s]", structName.c_str(), typedefName.c_str(), memberName.c_str(), dimension.c_str());
+
+	_checkName(structName.c_str());
+	_checkName(typedefName.c_str());
+	_checkName(memberName.c_str());
+
+	Array* arr = new Array(std::move(structName), std::move(typedefName), std::move(memberName), std::move(dimension), s_currentNode);
+	s_currentNode = arr;
+
+	s_includes.insert("include/inplace_vector.h");
+}
+
+void omg_end_array()
+{
+	annotate("end array %s", s_currentNode->m_name.c_str());
+	_endOfNode(Node::Type::Array);
 }
 
 void omg_add_code(const char* code)
@@ -419,6 +544,16 @@ void omg_add_code(const char* code)
 	}
 }
 
+const char* omg_current_node_name()
+{
+	return s_currentNode->m_name.c_str();
+}
+
+void omg_add_include(const char* filename)
+{
+	s_includes.insert(filename);
+}
+
 //////////////////////////////////////////////////////////////////////
 
 void Message::AddExtraMember(const char* type, const char* name, const char* defaultValue)
@@ -436,8 +571,10 @@ void Message::AddExtraMember(const char* type, const char* name, const char* def
 
 //////////////////////////////////////////////////////////////////////
 
-void Message::Emit() const
+void Message::Emit(size_t indentLevel) const
 {
+	assert(indentLevel == 1);
+
 	HXX(
 		"struct %s\n"
 		"{\n"
@@ -464,7 +601,10 @@ void Message::Emit() const
 
 void Message::EmitConstructor() const
 {
-	HXX("\tpublic: %s()\n", m_name.c_str());
+	HXX(
+		"\t%s()\n"
+		, m_name.c_str()
+		);
 	char joiner = ':';
 	for (Field* field = m_extraMembers; field; field = static_cast<Field*>(field->m_next)) {
 		HXX("\t\t%c %s(%s)\n", joiner, field->m_name.c_str(), field->m_defaultValue);
@@ -493,33 +633,57 @@ void Message::EmitConstructor() const
 void Message::EmitPacker() const
 {
 	if (m_child == nullptr) {
-		HXX("\tpublic: bool packer(LOGICAL /*mode*/, ACTION_OBJECT* /*a*/, SINT32 /*size*/) { return true; }\n");
+		HXX("\tbool packer(LOGICAL /*mode*/, ACTION_OBJECT* /*a*/, SINT32 /*size*/) { return true; }\n");
 		return;
 	}
+
 	const char* fingerprint;
+	const char* param3;
 	if (IsDeltad()) {
 		EmitGroupPackers();
-		fingerprint = "packer(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack)";
+		fingerprint = "ACTION_OBJECT* const a, const TeulTimeMS& lastPack";
+		param3 = "lastPack";
 	} else {
-		fingerprint = "packer(LOGICAL mode, ACTION_OBJECT* const a, SINT32 size)";
+		fingerprint = "ACTION_OBJECT* const a, SINT32 size";
+		param3 = "size";
 	}
-	HXX("\tpublic: bool %s;\n", fingerprint);
-	CXX("bool %s%s::%s\n", s_namespaceQual.c_str(), m_name.c_str(), fingerprint);
+	HXX("\tbool packer(LOGICAL mode, %s) { return (mode == TEUL_PACK) ? pack(a, %s) : unpack(a, %s); }\n", fingerprint, param3, param3);
+	HXX("\tbool pack(%s);\n", fingerprint);
+	HXX("\tbool unpack(%s);\n", fingerprint);
+
+	CXX("bool %s::pack(%s)\n", GetQualifiedName().c_str(), fingerprint);
 	CXX("{\n");
 	for (Node* node = m_child; node; node = node->m_next) {
 		node->EmitPack(1);
 	}
 	if (m_numGroups != 0)
-		CXX("\treturn (mode == TEUL_PACK) ? _pack(a, lastPack) : _unpack(a, lastPack);\n");
+		CXX("\treturn groupPack(a, lastPack) && (a->offset >= 0);\n");
 	else
 		CXX("\treturn (a->offset >= 0);\n");
-	CXX("}\n"
+	CXX(
+		"}\n"
 		"\n"
 		);
+
+	CXX("bool %s::unpack(%s)\n", GetQualifiedName().c_str(), fingerprint);
+	CXX("{\n");
+	for (Node* node = m_child; node; node = node->m_next) {
+		node->EmitUnpack(1);
+	}
+	if (m_numGroups != 0)
+		CXX("\treturn groupUnpack(a, lastPack) && (a->offset >= 0);\n");
+	else
+		CXX("\treturn (a->offset >= 0);\n");
+	CXX(
+		"}\n"
+		"\n"
+		);
+
 }
 
 void Message::EmitGroupPackers() const
 {
+	size_t groupNo;
 	size_t groupPresenceBits = (m_numGroups & ~7) + 8;
 	const char* groupPresenceType;
 	if (groupPresenceBits <= 8)
@@ -534,50 +698,21 @@ void Message::EmitGroupPackers() const
 		yyfatal("Internal Error: %s", "group presence bits > 64");
 
 	HXX(
-		"\tpublic: enum { GroupPresenceBits = %u };\n"
-		"\tpublic: const TeulTimeMS& lastModified() const { return m_lastModified; }\n"
-		"\tprivate: bool _unpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack);\n"
-		"\tprivate: bool _pack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack);\n"
+		"\tenum { GroupPresenceBits = %u };\n"
+		"\tconst TeulTimeMS& lastModified() const { return m_lastModified; }\n"
+		"\tbool groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack);\n"
+		"\tbool groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack);\n"
 		, groupPresenceBits
 	);
 
-	// unpack delta function
+	// group pack delta function
 	CXX(
-		"bool %s%s::_unpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack)\n"
-		"{\n"
-		"\t%s groupPresence(0);\n"
-		"\ta->packer(TEUL_UNPACK, groupPresence, %" PRSizeT ");\n"
-		"\tif (groupPresence == 0)\n"
-		"\t\treturn false;\n"
-		, s_namespaceQual.c_str(), m_name.c_str()
-		, groupPresenceType
-		, groupPresenceBits
-		);
-	size_t groupNo = 0;
-	for (Node* node = m_child; node; node = node->m_next) {
-		if (node->m_type != Node::Type::Group)
-			continue;
-		Group* group = static_cast<Group*>(node);
-		CXX("\tif (groupPresence & (1 << %" PRSizeT "))\n"
-			"\t\t%s.packer(TEUL_UNPACK, a, lastPack);\n"
-			, groupNo++
-			, group->m_memberName.c_str()
-			);
-	}
-	CXX(
-		"\treturn (a->offset >= 0);\n"
-		"}\n"
-		"\n"
-		);
-
-	// pack delta function
-	CXX(
-		"bool %s%s::_pack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack)\n"
+		"bool %s::groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack)\n"
 		"{\n"
 		"\t%s groupPresence(0);\n"
 		"\tSINT32 groupPresenceOffset = a->offset;\n"
-		"\ta->packer(TEUL_PACK, groupPresence, %" PRSizeT ");\n"
-		, s_namespaceQual.c_str(), m_name.c_str()
+		"\ta->pack(groupPresence, %" PRSizeT ");\n"
+		, GetQualifiedName().c_str()
 		, groupPresenceType
 		, groupPresenceBits
 		);
@@ -586,7 +721,7 @@ void Message::EmitGroupPackers() const
 		if (node->m_type != Node::Type::Group)
 			continue;
 		Group* group = static_cast<Group*>(node);
-		CXX("\tif (%s.packer(TEUL_PACK, a, lastPack))\n"
+		CXX("\tif (%s.pack(a, lastPack))\n"
 			"\t\tgroupPresence |= (1 << %" PRSizeT ");\n"
 			, group->m_memberName.c_str()
 			, groupNo++
@@ -602,15 +737,44 @@ void Message::EmitGroupPackers() const
 		, groupPresenceType
 		, groupPresenceBits
 		);
+
+	// unpack delta function
+	CXX(
+		"bool %s::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack)\n"
+		"{\n"
+		"\t%s groupPresence(0);\n"
+		"\ta->unpack(groupPresence, %" PRSizeT ");\n"
+		"\tif (PN_LIKELY(groupPresence != 0)) {\n"
+		, GetQualifiedName().c_str()
+		, groupPresenceType
+		, groupPresenceBits
+		);
+	groupNo = 0;
+	for (Node* node = m_child; node; node = node->m_next) {
+		if (node->m_type != Node::Type::Group)
+			continue;
+		Group* group = static_cast<Group*>(node);
+		CXX("\t\tif (groupPresence & (1 << %" PRSizeT "))\n"
+			"\t\t\t%s.unpack(a, lastPack);\n"
+			, groupNo++
+			, group->m_memberName.c_str()
+			);
+	}
+	CXX(
+		"\t\treturn (a->offset >= 0);\n"
+		"\t}\n"
+		"\treturn false;\n"
+		"}\n"
+		"\n"
+		);
 }
 
 void Message::EmitExtraMembers() const
 {
 	if (!m_extraMembers)
 		return;
-	HXX("\tprotected:\n");
 	for (Field* field = m_extraMembers; field; field = static_cast<Field*>(field->m_next)) {
-		field->Emit();
+		field->Emit(1);
 	}
 	HXX("\n");
 }
@@ -619,46 +783,35 @@ void Message::EmitPublicMembers() const
 {
 	if (!m_child)
 		return;
-	HXX("\tpublic:\n");
 	for (Node* node = m_child; node; node = node->m_next) {
-		node->Emit();
+		node->Emit(1);
 	}
 }
 
 //////////////////////////////////////////////////////////////////////
 
-void Group::Emit() const
+void Group::Emit(size_t indentLevel) const
 {
-	std::string fqn(s_namespaceQual);
-	if (m_parent) {
-		fqn += m_parent->m_name;
-		fqn += "::";
+	HXX("%sstruct %s : public WWII::VarGroup\n", _getIndents(indentLevel), m_name.c_str());
+	HXX("%s{\n", _getIndents(indentLevel));
+	HXX("%s%s(TeulTimeMS& parent)\n", _getIndents(indentLevel + 1), m_name.c_str());
+	HXX("%s: VarGroup(parent)\n", _getIndents(indentLevel + 2));
+	for (const Node* child = m_child; child; child = child->m_next) {
+		HXX("%s, %s(this)\n", _getIndents(indentLevel + 2), child->m_name.c_str());
 	}
-	fqn += m_name;
+	HXX("%s{}\n", _getIndents(indentLevel + 1));
 
-	HXX(
-		"\tstruct %s : public WWII::VarGroup\n"
-		"\t{\n"
-		"\t\t%s(TeulTimeMS& parent)\n"
-		"\t\t\t: VarGroup(parent)\n"
-		, m_name.c_str()
-		, m_name.c_str()
-		);
-	for (Field* child = static_cast<Field*>(m_child); child; child = static_cast<Field*>(child->m_next)) {
-		HXX("\t\t\t, %s(this)\n", child->m_name.c_str());
-	}
-	HXX("\t\t{}\n");
+	HXX("%s%s& operator = (const %s& rhs);\n", _getIndents(indentLevel + 1), m_name.c_str(), m_name.c_str());
 
-	HXX("\t\t%s& operator = (const %s& rhs);\n", m_name.c_str(), m_name.c_str());
 	CXX(
 		"%s& %s::operator = (const %s& rhs)\n"
 		"{\n"
 		"\tm_lastModified = rhs.m_lastModified;\n"
-		, fqn.c_str()
-		, fqn.c_str()
-		, fqn.c_str()
+		, GetQualifiedName().c_str()
+		, GetQualifiedName().c_str()
+		, GetQualifiedName().c_str()
 		);
-	for (Field* child = static_cast<Field*>(m_child); child; child = static_cast<Field*>(child->m_next)) {
+	for (const Node* child = m_child; child; child = child->m_next) {
 		CXX("\t%s.operator=(rhs.%s);\n", child->m_name.c_str(), child->m_name.c_str());
 	}
 	CXX(
@@ -667,21 +820,39 @@ void Group::Emit() const
 		"\n"
 		);
 
-	HXX("\t\tvoid groupPacker(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) override;\n");
+	HXX("%svoid groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) override;\n", _getIndents(indentLevel + 1));
 	CXX(
-		"void %s::groupPacker(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)\n"
+		"void %s::groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)\n"
 		"{\n"
-		, fqn.c_str()
+		, GetQualifiedName().c_str()
 		);
 	size_t fieldNo = 0;
-	for (Field* child = static_cast<Field*>(m_child); child; child = static_cast<Field*>(child->m_next)) {
-		CXX("\t%s.packer(mode, a, lastPack, changes, %" PRSizeT ");\n", child->m_name.c_str(), fieldNo++);
+	for (const Node* child = m_child; child; child = child->m_next) {
+		CXX("\t%s.pack(a, lastPack, changes, %" PRSizeT ");\n", child->m_name.c_str(), fieldNo++);
 	}
 	CXX("}\n"
 		"\n");
 
-	for (Field* child = static_cast<Field*>(m_child); child; child = static_cast<Field*>(child->m_next)) {
-		HXX("\t\tWWII::SyncVar<%s, %" PRSizeT "> %s;\n", child->m_typeDef->DeclType().c_str(), child->m_size, child->m_name.c_str());
+	HXX("%svoid groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) override;\n", _getIndents(indentLevel + 1));
+	CXX(
+		"void %s::groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)\n"
+		"{\n"
+		, GetQualifiedName().c_str()
+		);
+	fieldNo = 0;
+	for (const Node* child = m_child; child; child = child->m_next) {
+		CXX("\t%s.unpack(a, lastPack, changes, %" PRSizeT ");\n", child->m_name.c_str(), fieldNo++);
+	}
+	CXX("}\n"
+		"\n");
+
+	for (const Node* child = m_child; child; child = child->m_next) {
+		if (child->m_type != Node::Type::Field) {
+			yyerror("INTERNAL ERROR: Group contains non-field node");
+			exit(1);
+		}
+		const Field* const field = static_cast<const Field*>(child);
+		HXX("%sWWII::SyncVar<%s, %" PRSizeT "> %s;\n", _getIndents(indentLevel + 1), field->m_typeDef->DeclType().c_str(), field->m_size, field->m_name.c_str());
 	}
 
 	if (m_extraCode.empty() == false) {
@@ -689,30 +860,35 @@ void Group::Emit() const
 		HXX("%s", m_extraCode.c_str());
 	}
 
-	HXX("\t} %s;\n", m_memberName.c_str());
-	HXX("\tconst %s& %s() const { return %s; }\n", m_name.c_str(), m_memberName.c_str() + 2, m_memberName.c_str());
-	HXX("\t%s& %s() { return %s; }\n", m_name.c_str(), m_memberName.c_str() + 2, m_memberName.c_str());
+	HXX("%s} %s;\n", _getIndents(indentLevel), m_memberName.c_str());
+	HXX("%sconst %s& %s() const { return %s; }\n", _getIndents(indentLevel), m_name.c_str(), m_memberName.c_str() + 2, m_memberName.c_str());
+	HXX("%s%s& %s() { return %s; }\n", _getIndents(indentLevel), m_name.c_str(), m_memberName.c_str() + 2, m_memberName.c_str());
 	HXX("\n");
 }
 
 //////////////////////////////////////////////////////////////////////
 
-void Field::Emit() const
+void Field::Emit(size_t indentLevel) const
 {
-	HXX("\t\t%s\t%s;\n", m_typeDef->DeclType().c_str(), m_name.c_str());
+	HXX("%s%s\t%s;\n", _getIndents(indentLevel), m_typeDef->DeclType().c_str(), m_name.c_str());
 }
 
 void Field::EmitPack(size_t indentLevel) const
 {
-	CXX("%sa->packer(mode, %s, %" PRSizeT ");\n", _getIndents(indentLevel), m_name.c_str(), m_size);
+	CXX("%sa->pack(%s, %" PRSizeT ");\n", _getIndents(indentLevel), m_name.c_str(), m_size);
+}
+
+void Field::EmitUnpack(size_t indentLevel) const
+{
+	CXX("%sa->unpack(%s, %" PRSizeT ");\n", _getIndents(indentLevel), m_name.c_str(), m_size);
 }
 
 //////////////////////////////////////////////////////////////////////
 
-void Conditional::Emit() const
+void Conditional::Emit(size_t indentLevel) const
 {
 	for (Node* node = m_child; node; node = node->m_next) {
-		node->Emit();
+		node->Emit(indentLevel);
 	}
 }
 
@@ -723,6 +899,99 @@ void Conditional::EmitPack(size_t indentLevel) const
 		child->EmitPack(indentLevel + 1);
 	}
 	CXX("%s}\n", _getIndents(indentLevel));
+}
+
+void Conditional::EmitUnpack(size_t indentLevel) const
+{
+	CXX("%s%s (%s) {\n", _getIndents(indentLevel), m_name.c_str(), m_condition.c_str());
+	for (Node* child = m_child; child; child = child->m_next) {
+		child->EmitUnpack(indentLevel + 1);
+	}
+	CXX("%s}\n", _getIndents(indentLevel));
+}
+
+//////////////////////////////////////////////////////////////////////
+
+void Array::Emit(size_t indentLevel) const
+{
+	const char* indent = _getIndents(indentLevel);
+	HXX("%sstruct %s\n", indent, m_name.c_str());
+	HXX("%s{\n", indent);
+	for (Node* child = m_child; child; child = child->m_next) {
+		child->Emit(indentLevel + 1);
+	}
+	HXX("%s\tbool pack(ACTION_OBJECT* const a, SINT32);\n", indent);
+	HXX("%s\tbool unpack(ACTION_OBJECT* const a, SINT32);\n", indent);
+	HXX("%s};\n", indent);
+	HXX("%stypedef WWII::inplace_vector<%s, %s> %s;\n", indent, m_name.c_str(), m_dimension.c_str(), m_typedef.c_str());
+	HXX("%s%s %s;\n", indent, m_typedef.c_str(), m_memberName.c_str());
+
+	CXX("bool %s::pack(ACTION_OBJECT* const a, SINT32)\n", GetQualifiedName());
+	CXX("{\n");
+	for (Node* node = m_child; node; node = node->m_next) {
+		node->EmitPack(1);
+	}
+	CXX("\treturn (a->offset >= 0);\n");
+	CXX("}\n");
+	CXX("\n");
+
+	CXX("bool %s::unpack(ACTION_OBJECT* const a, SINT32)\n", GetQualifiedName());
+	CXX("{\n");
+	for (Node* node = m_child; node; node = node->m_next) {
+		node->EmitUnpack(1);
+	}
+	CXX("\treturn (a->offset >= 0);\n");
+	CXX("}\n");
+	CXX("\n");
+}
+
+UINT16 Array::GetPackBits() const
+{
+	if (isdigit(m_dimension[0])) {
+		long value = std::stol(m_dimension);
+		if (value < (1 << 8))
+			return 8;
+		else if (value < (1 << 16))
+			return 16;
+		else if (value < (1 << 24))
+			return 24;
+		else
+			yyfatal("ARRAY dimension too large: %s", m_dimension.c_str());
+	}
+	return 16;
+}
+
+void Array::EmitPack(size_t indentLevel) const
+{
+	const char* indent = _getIndents(indentLevel);
+	UINT16 packBits = GetPackBits();
+	std::string countVar = m_name + "_count";
+	std::string iterVar = m_name + "_idx";
+
+	CXX("%sABORT_IF(%s.size() >= %s);\n", indent, m_memberName.c_str(), m_dimension.c_str());
+	CXX("%sUINT16 %s(%s.size());\n", indent, countVar.c_str(), m_memberName.c_str());
+	CXX("%sa->pack(%s, %u);\n", indent, countVar.c_str(), packBits);
+
+	CXX("%sfor (UINT32 %s = 0; %s < %s; ++%s) {\n", indent, iterVar.c_str(), iterVar.c_str(), countVar.c_str(), iterVar.c_str());
+	CXX("%s\t%s[%s].pack(a, 0);\n", indent, m_memberName.c_str(), iterVar.c_str());
+	CXX("%s}\n", indent);
+}
+
+void Array::EmitUnpack(size_t indentLevel) const
+{
+	const char* indent = _getIndents(indentLevel);
+	UINT32 packBits = GetPackBits();
+	std::string countVar = m_name + "_count";
+	std::string iterVar = m_name + "_idx";
+
+	CXX("%sUINT16 %s(0);\n", indent, countVar.c_str());
+	CXX("%sa->unpack(%s, %u);\n", indent, countVar.c_str(), packBits);
+	CXX("%sif (%s > %s) { a->offset = -EINVAL; return false; }\n", indent, countVar.c_str(), m_dimension.c_str());
+	CXX("%s%s.resize(%s);\n", indent, m_memberName.c_str(), countVar.c_str());
+
+	CXX("%sfor (UINT32 %s = 0; %s < %s; ++%s) {\n", indent, iterVar.c_str(), iterVar.c_str(), countVar.c_str(), iterVar.c_str());
+	CXX("%s\t%s[%s].unpack(a, 0);\n", indent, m_memberName.c_str(), iterVar.c_str());
+	CXX("%s}\n", indent);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -818,7 +1087,7 @@ static void _generateOutput()
 	_emitSourcePrologue();
 
 	for (const Message* message = s_firstMessage; message; message = static_cast<const Message*>(message->m_next)) {
-		message->Emit();
+		message->Emit(1);
 	}
 
 	_emitHeaderEpilog();

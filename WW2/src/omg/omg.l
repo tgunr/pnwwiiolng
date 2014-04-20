@@ -72,19 +72,25 @@ IF\ \(					{ yy_push_state(IF_COND); g_condition = ""; }
 }
 <IF_COND>\n				{ yyaddcode(yytext, g_condition); }
 <IF_COND>.				{ yyaddcode(yytext, g_condition); }
+ARRAY					return TKW_ARRAY;
 
 	/* C++ */
 ::						return TKW_CPP_SCOPE;
 
 	/* general types */
-[A-Za-z][A-Za-z0-9_]*	{ yylval.sVal = strdup(yytext); return TIDENTIFIER; }
-[0-9]+\.[0-9]+			return TDOUBLE;
-[0-9]+					return TINTEGER;
+[A-Za-z][A-Za-z0-9_]{64,}	{ yyfatal("Invalid identifier '%s'", yytext); }
+[A-Za-z][A-Za-z0-9_]*		{ yylval.sVal = strdup(yytext); return TIDENTIFIER; }
+-?[0-9]{21,}\.[0-9]\+		{ yyfatal("Invalid number '%s'", yytext); }
+-?[0-9]{21,}				{ yyfatal("Invalid number '%s'", yytext); }
+-?[0-9]\+\.[0-9]+\.			{ yyfatal("Invalid floating pointer number '%s'", yytext); }
+-?[0-9]{10,}\.[0-9]{10,}	{ yyfatal("Invalid floating pointer number '%s'", yytext); }
+-?[0-9]+\.[0-9]+			{ yylval.str = strdup(yytext); ++leakCount; return TDOUBLE; }
+-?[0-9]{1,20}				{ yylval.str = strdup(yytext); ++leakCount; return TINTEGER; }
 
 	/* quoted string */
-\"[^"+]\"				{ char* str = strdup(yytext + 1); str[strlen(str) - 1] = '\0'; yylval.sVal = str; return QUOTSTRING; }
+\"[^"+]\"				{ char* str = strdup(yytext + 1); str[strlen(str) - 1] = '\0'; yylval.str = str; ++leakCount; return QUOTSTRING; }
 
-[{};()]					{ return yytext[0]; }
+[{};()\[\]]				{ return yytext[0]; }
 
 	/* misc */
 [ \t]					/* skip whitespace */
