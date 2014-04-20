@@ -5,9 +5,9 @@ namespace WWII
 {
 
 bool
-VarGroup::packer(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPacked)
+VarGroup::pack(ACTION_OBJECT* const a, const TeulTimeMS& lastPacked)
 {
-	if ( mode == TEUL_PACK && m_lastModified < lastPacked )
+	if (m_lastModified < lastPacked)
 		return false;
 
 	// Ensure a->offset is nicely rounded.
@@ -15,18 +15,32 @@ VarGroup::packer(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPac
 
 	const SINT32 changesOffset = a->offset;
 	const SINT32 changeBits = (m_members + 7) & ~7;	// Round up to next whole byte.
-	UINT32 changes = 0;
-	a->packer(mode, changes, changeBits);
+	a->offset += changeBits;
 
-	if ( mode == TEUL_UNPACK && changes == 0 )
+	UINT32 changes = 0;
+	groupPack(a, lastPacked, changes);
+
+	teulPackUINT32(TEUL_PACK, a->packed, changesOffset, &changes, changeBits);
+
+	return (a->offset >= 0);
+}
+
+bool
+VarGroup::unpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPacked)
+{
+	// Ensure a->offset is nicely rounded.
+	a->offset = (a->offset + 7) & ~7;
+
+	const SINT32 changeBits = (m_members + 7) & ~7;	// Round up to next whole byte.
+	UINT32 changes = 0;
+	a->packer(TEUL_UNPACK, changes, changeBits);
+
+	if (changes == 0)
 		return false;
 
-	groupPacker(mode, a, lastPacked, changes);
+	groupUnpack(a, lastPacked, changes);
 
-	if ( mode == TEUL_PACK )
-		teulPackUINT32(mode, a->packed, changesOffset, &changes, changeBits);
-
-	return true;
+	return (a->offset >= 0);
 }
 
 } // namespace WWII

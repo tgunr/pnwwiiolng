@@ -85,15 +85,11 @@ namespace Teul
 
 #define DEF_PACKREF(_typename, _functor, _defSize) \
 	void packer(LOGICAL _mode, _typename& _data, SINT32 bits=_defSize) \
-	{\
-		this->offset = _functor(_mode, this->packed, this->offset, &_data, bits); \
-	}
-
-#define CAST_PACKREF(_typename, _functor, _castAs, _defSize) \
-	void packer(LOGICAL _mode, _typename& _data, SINT32 bits=_defSize) \
 	{ \
-		this->offset = _functor(_mode, this->packed, this->offset, &static_cast<_castAs>(_data), bits); \
-	}
+		this->offset = _functor(_mode, this->packed, this->offset, &_data, bits); \
+	} \
+	template<> void pack(_typename& _data, SINT32 bits) { packer(TEUL_PACK, _data, bits); } \
+	template<> void unpack(_typename& _data, SINT32 bits) { packer(TEUL_UNPACK, _data, bits); }
 
 //! Helper macro for receive actions that want to verify a live connection.
 #define REQUIRE_CLIENT_DATA()	\
@@ -133,7 +129,19 @@ struct ACTION_OBJECT
 		, endpoint(nullptr), m_client(nullptr)
 	{}
 
-	void packer(LOGICAL mode, bool& value, SINT32 size_bytes_=0);
+	void packer(LOGICAL mode, bool& value, SINT32 sb = 1) { return (mode == TEUL_PACK) ? pack(value, 0) : unpack(value, sb); }
+	void pack(bool& value, SINT32 sb = 1)
+	{
+		UCHAR i(value ? 1 : 0);
+		pack(i, sb);
+	}
+	void unpack(bool& value, SINT32 sb = 1)
+	{
+		UCHAR i(0);
+		unpack(i, sb);
+		value = (i != 0);
+	}
+
 	void packBytes(LOGICAL mode, void* byteStream, SINT32 numBytes) { this->offset = teulPackVoid(mode, this->packed, this->offset, byteStream, numBytes); }
 
 	//! @brief Check that the packed data stream has enough bytes to populate an object type.
@@ -222,6 +230,17 @@ struct ACTION_OBJECT
 	struct ENDPOINT*	endpoint;	// The endpoint (or nullptr) this is on.
 	void*			m_client;		//! Pointer to the local client info OR nullptr.
 
+	template<typename T>
+	void pack(T& _data, SINT32 bits = 0)
+	{
+		this->offset = _data.packer(TEUL_PACK, bits);
+	}
+	template<typename T>
+	void unpack(T& _data, SINT32 bits = 0)
+	{
+		this->offset = _data.packer(TEUL_UNPACK, bits);
+	}
+
 	DEF_PACKER(SINT32*, teulPackSINT32, 0)
 	DEF_PACKREF(SINT32, teulPackSINT32, 0)
 	DEF_PACKER(UINT32*, teulPackUINT32, 0)
@@ -274,6 +293,16 @@ struct Packer
 	void packer(LOGICAL mode, ACTION_OBJECT* const a, SINT32 bits=0)
 	{
 		a->packer(mode, m_value, bits);
+	}
+
+	void pack(ACTION_OBJECT* const a, SINT32 bits = 0)
+	{
+		a->pack(m_value, bits);
+	}
+
+	void unpack(ACTION_OBJECT* const a, SINT32 bits = 0)
+	{
+		a->unpack(m_value, bits);
 	}
 };
 

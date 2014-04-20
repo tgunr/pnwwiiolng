@@ -536,15 +536,6 @@ teulPackSecondsDelta(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, UINT32
 	return bitoffset;
 }
 
-void
-ACTION_OBJECT::packer(LOGICAL mode, bool& value, SINT32)
-{
-	UCHAR i = (UCHAR)value;
-	packer(mode, &i, 1);
-	if ( mode == TEUL_UNPACK )
-		value = (offset > 0 ) ? (i != 0) : false;
-}
-
 SINT32
 wwiiPackText(LOGICAL mode, UCHAR* const data, SINT32 offset, char* const text, SINT32 maxLen)
 {

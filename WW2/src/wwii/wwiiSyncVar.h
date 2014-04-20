@@ -46,10 +46,18 @@ public:
 	const TeulTimeMS& lastModified() const { return m_lastModified; }
 
 	//! Function to pack member SyncVars, implemented by derived classes.
-	virtual void groupPacker(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPacked, UINT32& changes) = 0;
+	void groupPacker(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPacked, UINT32& changes)
+	{
+		return (mode == TEUL_PACK) ? groupPack(a, lastPacked, changes) : groupUnpack(a, lastPacked, changes);
+	}
+
+	virtual void groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPacked, UINT32& changes) = 0;
+	virtual void groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPacked, UINT32& changes) = 0;
 
 	//! Function to pack self if there are any changes, otherwise returns false.
-	bool packer(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPacked);
+	bool packer(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPacked) { return (mode == TEUL_PACK) ? pack(a, lastPacked) : unpack(a, lastPacked); }
+	bool pack(ACTION_OBJECT* const a, const TeulTimeMS& lastPacked);
+	bool unpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPacked);
 };
 
 //! @class WWII::SyncVar
@@ -124,24 +132,22 @@ public:
 
 	valuetype operator!() { return !get(); }
 
-	//! Packer which only self-packs when data is modified.
-	void packer(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes, UINT32 fieldNo)
+	//! Packers which only self-pack when data is modified.
+	void pack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes, UINT32 fieldNo)
 	{
-		if ( mode == TEUL_PACK )
+		const bool hasChanged = m_lastModified >= lastPack;
+		if ( hasChanged )
 		{
-			const bool hasChanged = m_lastModified >= lastPack;
-			if ( hasChanged )
-			{
-				changes |= (1 << fieldNo);
-				m_value.packer(TEUL_PACK, a, _BitSize);
-			}
+			changes |= (1 << fieldNo);
+			m_value.pack(a, _BitSize);
 		}
-		else
-		{
-			const bool hasChanged = (changes & (1 << fieldNo)) != 0;
-			if ( hasChanged )
-				m_value.packer(TEUL_UNPACK, a, _BitSize);
-		}
+	}
+
+	void unpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes, UINT32 fieldNo)
+	{
+		const bool hasChanged = (changes & (1 << fieldNo)) != 0;
+		if ( hasChanged )
+			m_value.unpack(a, _BitSize);
 	}
 };
 
