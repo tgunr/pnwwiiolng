@@ -140,7 +140,7 @@ static const size_t LARGEST_POOLED_SIZE = NUM_DATAGRAM_SIZES * DATAGRAM_ROUNDING
 // Given a requested data size, work out the best buffer size for it
 
 template<size_t roundingValue>
-static inline size_t _roundDatagramSize(UINT32 size)
+static inline size_t _roundDatagramSize(size_t size)
 {
 	static_assert(roundingValue && (roundingValue & (roundingValue - 1)) == 0, "roundingValue must be a power of 2");
 	return ((size + sizeof(DATA_GRAM)) + (roundingValue - 1)) & ~(roundingValue - 1);

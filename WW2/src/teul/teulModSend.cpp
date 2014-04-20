@@ -157,7 +157,7 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 SINT32
 ENDPOINT::sendPacket(Teul::Packet& packet)
 {
-	const size_t packetBytes = packet.packetSizeBytes();
+	const UINT32 packetBytes = packet.packetSizeBytes();
 
 	// If there's no send queue, try and send the data directly.
 	if ( m_impl->m_sendQueue.empty() == true )

@@ -89,7 +89,7 @@ _establishListenSocket(const unsigned short port_)
 	if ( bindResult < 0 )
 	{
 		printf("uWebServer terminated: unable to bind listenSock on port %hu [%d, %d]\n", port_, bindResult, errno);
-		close(sock);
+		OS_CLOSESOCKET(sock);
 		return bindResult;
 	}
 
@@ -97,7 +97,7 @@ _establishListenSocket(const unsigned short port_)
 	if ( listenResult < 0 )
 	{
 		printf("uWebServer terminated: unable to set listen socket to listening on port %hu [%d]\n", port_, bindResult);
-		close(sock);
+		OS_CLOSESOCKET(sock);
 		return listenResult;
 	}
 
@@ -322,10 +322,10 @@ _sendPhysicalFile(const unsigned int sock, const char* const rootPath, const cha
 			char xferBuffer[4096];
 			for (;; )
 			{
-				size_t readBytes = read(filefd, xferBuffer, sizeof(xferBuffer));
+				int readBytes = read(filefd, xferBuffer, sizeof(xferBuffer));
 				if ( readBytes <= 0 )
 					break;
-				size_t wroteBytes = send(sock, xferBuffer, readBytes, 0);
+				int wroteBytes = send(sock, xferBuffer, readBytes, 0);
 				if ( wroteBytes < readBytes )
 					break;
 			}

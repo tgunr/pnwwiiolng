@@ -83,7 +83,7 @@ _reportJSONPeers(unsigned int fd, const char* /*path*/, const char* /*args*/)
 	}
 	p += sprintf(p, "]}\n");
 
-	send(fd, report, static_cast<size_t>(p - report), 0);
+	send(fd, report, int(p - report), 0);
 }
 
 //////////////////////////////////////////////////////////////////////

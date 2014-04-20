@@ -35,7 +35,7 @@ Teul::Packet::Packet(const Teul::Packet& rhs)
 	, m_address(rhs.m_address)
 	, m_port(rhs.m_port)
 {
-	const size_t newSize = rhs.packetSizeBytes();
+	const UINT32 newSize = rhs.packetSizeBytes();
 	setPacketSizeBytes(newSize);
 	memcpy(m_data, rhs.m_data, newSize);
 }
@@ -85,7 +85,7 @@ Teul::Packet&
 Teul::Packet::operator=(const Teul::Packet& rhs)
 {
 	// We can't just "borrow" the packet data, we have to duplicate it.
-	const size_t dataSize = rhs.packetSizeBytes();
+	const UINT32 dataSize = rhs.packetSizeBytes();
 	this->setPacketSizeBytes(dataSize);
 	memcpy(this->m_data, rhs.m_data, dataSize);
 	m_address = rhs.m_address;
@@ -121,7 +121,7 @@ Teul::Packet::reset()
 //////////////////////////////////////////////////////////////////////
 // Grow packet to accommodate and copy additional bytes.
 
-void Teul::Packet::append(const void* const src_, const size_t bytes_)
+void Teul::Packet::append(const void* const src_, const UINT32 bytes_)
 {
 	setPacketCapacityBytes(packetSizeBytes() + bytes_);
 	memcpy(m_data + packetSizeBytes(), src_, bytes_);
@@ -131,7 +131,7 @@ void Teul::Packet::append(const void* const src_, const size_t bytes_)
 //////////////////////////////////////////////////////////////////////
 // Return the size of the packet header.
 
-size_t
+UINT32
 Teul::Packet::headerSizeBytes()
 {
 	return sizeof(Teul::PacketHeader);
@@ -142,7 +142,7 @@ Teul::Packet::headerSizeBytes()
 // if we are writing).
 
 void
-Teul::Packet::setPacketSizeBytes(const size_t sizeBytes_)
+Teul::Packet::setPacketSizeBytes(const UINT32 sizeBytes_)
 {
 	if ( sizeBytes_ > m_capacity )
 		setPacketCapacityBytes(sizeBytes_);
@@ -154,7 +154,7 @@ Teul::Packet::setPacketSizeBytes(const size_t sizeBytes_)
 // Adjust the current packet capacity.
 
 void
-Teul::Packet::setPacketCapacityBytes(const size_t newCapacityBytes_)
+Teul::Packet::setPacketCapacityBytes(const UINT32 newCapacityBytes_)
 {
 	if ( PN_UNLIKELY(newCapacityBytes_ > Teul::MaxAllowedPacketSize_bytes) )
 		throw std::invalid_argument("Illegal packet size");
@@ -271,8 +271,8 @@ Teul::Packet::receive(ENDPOINT& endpoint_)
 // Hide the "size" field of a stream.
 
 #if defined TEUL_CRYPT_VERSION_4
-size_t
-Teul::PacketHeader::maskSizeValue(UINT32 cryptVersion, const UINT64& seed, size_t size)
+UINT32
+Teul::PacketHeader::maskSizeValue(UINT32 cryptVersion, const UINT64& seed, UINT32 size)
 {
 	if ( cryptVersion >= Teul::CryptVersion3 )
 	{

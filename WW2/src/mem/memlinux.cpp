@@ -53,12 +53,12 @@ struct Activity
 				);
 	}
 
-	size_t describeJSON(unsigned long long fileline, char* const buffer, const size_t bufferSize, const size_t offset)
+	UINT32 describeJSON(unsigned long long fileline, char* const buffer, const size_t bufferSize, const UINT32 offset)
 	{
 		const char* const file = ((const char*)(fileline >> 32));
-		const size_t line = (size_t)(fileline);
+		const UINT32 line = UINT32(fileline);
 
-		size_t printed = snprintf(buffer + offset, bufferSize - (1 + offset)
+		UINT32 printed = snprintf(buffer + offset, bufferSize - (1 + offset)
 									, "\"%s:%" PRSizeT "\":{\"allocs\":%llu,\"frees\":%llu,\"unfreed\":%llu,\"max\":%llu,\"cur\":%llu,\"la\":%llu}"
 										, file, line
 										, m_allocs
@@ -197,7 +197,7 @@ void
 memReportJSON(unsigned int fd, const char* const /*path*/, const char* const /*args*/)
 {
 	char buffer[132 * 200];
-	size_t offset = 0;
+	UINT32 offset = 0;
 
 	const TeulTimeMS cutoff = teulClock64 - (5 * 60 * 1000);
 
