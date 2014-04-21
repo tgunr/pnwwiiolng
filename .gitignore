@@ -1593,3 +1593,11 @@ WW2/src/omg/omg.yy.h
 WW2/src/omg/*.cxx
 WW2/src/omg/*.hxx
 
+WW2/src/omggen/Debug/
+WW2/src/omggen/omggen.output
+WW2/src/omggen/omggen.tab.cpp
+WW2/src/omggen/omggen.tab.h
+WW2/src/omggen/omggen.yy.cpp
+WW2/src/omggen/omggen.yy.h
+WW2/src/omggen/Release/
+WW2/src/omggen/omggen.vcxproj.user

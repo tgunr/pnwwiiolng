@@ -92,44 +92,49 @@ message(STATUS "${PN_BUILD_TYPE}/${BUILDNAME} build. Opt:${OPTIMIZATION}, MEM:${
 ######################################################################
 #### Libraries.
 
+SET(OMG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/omg")
+SET(OMGGEN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/omggen")
+
 # bison first, then flex.
 IF (WIN32)
-	SET(BISON_EXE "${CMAKE_CURRENT_SOURCE_DIR}/omg/win_bison.exe")
-	SET(FLEX_EXE "${CMAKE_CURRENT_SOURCE_DIR}/omg/win_flex.exe")
+	SET(BISON_EXE "${OMGGEN_DIR}/win_bison.exe")
+	SET(FLEX_EXE "${OMGGEN_DIR}/win_flex.exe")
 ELSE ( )
 	SET(BISON_EXE "bison")
 	SET(FLEX_EXE "flex")
 ENDIF()
 
-SET(OMG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/omg")
-add_custom_command(OUTPUT ${OMG_DIR}/omg.tab.cpp ${OMG_DIR}/omg.tab.h
+add_custom_command(OUTPUT ${OMGGEN_DIR}/omggen.tab.cpp ${OMGGEN_DIR}/omggen.tab.h
 	PRE_BUILD
 	COMMAND	${BISON_EXE}
-	ARGS -o omg.tab.cpp --defines=omg.tab.h --report=all omg.y
-	DEPENDS "${OMG_DIR}/omg.y"
-	MAIN_DEPENDENCY "${OMG_DIR}/omg.y"
-	COMMENT "[BISON] Building OMG"
-	WORKING_DIRECTORY ${OMG_DIR}
+	ARGS -o omggen.tab.cpp --defines=omggen.tab.h --report=all omggen.y
+	DEPENDS "${OMGGEN_DIR}/omggen.y"
+	MAIN_DEPENDENCY "${OMGGEN_DIR}/omggen.y"
+	COMMENT "[BISON] Building OMGGEN"
+	WORKING_DIRECTORY ${OMGGEN_DIR}
 )
-add_custom_command(OUTPUT ${OMG_DIR}/omg.yy.cpp ${OMG_DIR}/omg.yy.h
+add_custom_command(OUTPUT ${OMGGEN_DIR}/omggen.yy.cpp ${OMGGEN_DIR}/omggen.yy.h
 	PRE_BUILD
 	COMMAND ${FLEX_EXE}
-	ARGS -o omg.yy.cpp -B --nounistd --header-file=omg.yy.h omg.l
-	DEPENDS ${OMG_DIR}/omg.l ${OMG_DIR}/omg.tab.h
-	MAIN_DEPENDENCY "${OMG_DIR}/omg.l"
-	COMMENT "[FLEX] Building OMG"
-	WORKING_DIRECTORY ${OMG_DIR}
+	ARGS -o omggen.yy.cpp -B --nounistd --header-file=omggen.yy.h omggen.l
+	DEPENDS ${OMG_DIR}/omg.l ${OMGGEN_DIR}/omggen.tab.h
+	MAIN_DEPENDENCY "${OMGGEN_DIR}/omggen.l"
+	COMMENT "[FLEX] Building OMGGEN"
+	WORKING_DIRECTORY ${OMGGEN_DIR}
 )
 add_executable(omggen
-	omg/omg.tab.cpp
-		omg/omg.tab.h
-	omg/omg.yy.cpp
-		omg/omg.yy.h
-	omg/omg.cpp
-		omg/omg.h
-	omg/omg.y
-	omg/omg.l
+	omggen/omggen.tab.cpp
+		omggen/omggen.tab.h
+	omggen/omggen.yy.cpp
+		omggen/omggen.yy.h
+	omggen/omggen.cpp
+		omggen/omggen.h
+	omggen/omggen.y
+	omggen/omggen.l
 )
+IF (WIN32)
+	SET_PROPERTY(TARGET omggen PROPERTY COMPILE_DEFINITIONS __STDC_VERSION__=199901L)
+ENDIF ()
 
 MACRO(ADD_OMG_TARGET _TARGET)
 	SET(_TARGET_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${_TARGET}")
@@ -807,6 +812,8 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 			strt/strtUpdaterPack.h
 		strt/strtUpdaterSupportMessages.cpp
 			strt/strtUpdaterSupportMessages.h
+
+		omg/omgMissionSortieData.cxx
 
 		${PCH_INCLUDE_HEADERS}
 	)

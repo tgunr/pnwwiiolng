@@ -1,10 +1,8 @@
 /* Flex file */
 
 %{
-#include "omg.h"
-#include "omg.tab.h"
-#include <string>
-#include <utility>
+#include "omggen.h"
+#include "omggen.tab.h"
 
 extern YYSTYPE yylval;
 
@@ -21,6 +19,7 @@ extern void yyaddcode(const char* text, std::string& into);
 %option				stack
 %option				nounistd
 %option				never-interactive
+%option				batch
 
 %x ML_CMT
 %x IF_COND

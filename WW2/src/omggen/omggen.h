@@ -1,7 +1,23 @@
 #pragma once
 
+#include <stdarg.h>
+#include <stdint.h>
+#include <assert.h>
+#include <ctype.h>
+
+#include <stdarg.h>
+#include <vector>
+#include <set>
 #include <utility>
-#include <string>
+#include <algorithm>
+
+#if defined(_MSC_VER)
+#define strdup(...) _strdup(__VA_ARGS__)
+#define PRSizeT "u"
+#else
+#define PRSizeT "zu"
+#endif
+
 
 class TypeDef
 {
@@ -28,7 +44,7 @@ public:
 extern const char* g_currentFile;
 extern int yylineno;
 
-// Functions common to omg.cpp and the .y file.
+// Functions common to omggen.cpp and the .y file.
 void yyerror(const char* s, ...);
 void yyfatal(const char* s, const char* cause);
 void yymissing(const char* what, const char* type, const char* name);

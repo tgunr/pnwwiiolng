@@ -1,16 +1,10 @@
-#include <syscfg.h>
 // Object Model Generator v2
 
-#include <cstdio>
-#include <iostream>
-#include <string>
-#include <cstdarg>
-#include <vector>
-#include <set>
+#include "omggen.h"
+#include "omggen.yy.h"
+#include "omggen.tab.h"
 
-#include "omg.h"
-#include "omg.yy.h"
-#include "omg.tab.h"
+#include <string>
 
 long long leakCount = 0;
 static const char* s_exeName;
@@ -29,7 +23,7 @@ const char* g_currentFile = nullptr;
 enum { MAX_MESSAGE_GROUPS = 32, MAX_GROUP_FIELDS = 32 };
 
 typedef std::vector<TypeDef> TypeMap;
-static TypeMap s_typeMap {
+static TypeMap s_typeMap = {
 	{ "UINT8", "", false, "" },
 	{ "SINT8", "", false, "" },
 	{ "UINT16", "", false, "" },
@@ -252,7 +246,7 @@ struct Array : public Node
 	void EmitPack(size_t indentLevel) const override;
 	void EmitUnpack(size_t indentLevel) const override;
 
-	UINT16 GetPackBits() const;
+	uint16_t GetPackBits() const;
 };
 
 static Message* s_firstMessage;
@@ -648,10 +642,10 @@ void Message::EmitPacker() const
 		param3 = "size";
 	}
 	HXX("\tbool packer(LOGICAL mode, %s) { return (mode == TEUL_PACK) ? pack(a, %s) : unpack(a, %s); }\n", fingerprint, param3, param3);
-	HXX("\tbool pack(%s);\n", fingerprint);
+	HXX("\tbool pack(%s) const;\n", fingerprint);
 	HXX("\tbool unpack(%s);\n", fingerprint);
 
-	CXX("bool %s::pack(%s)\n", GetQualifiedName().c_str(), fingerprint);
+	CXX("bool %s::pack(%s) const\n", GetQualifiedName().c_str(), fingerprint);
 	CXX("{\n");
 	for (Node* node = m_child; node; node = node->m_next) {
 		node->EmitPack(1);
@@ -700,14 +694,14 @@ void Message::EmitGroupPackers() const
 	HXX(
 		"\tenum { GroupPresenceBits = %u };\n"
 		"\tconst TeulTimeMS& lastModified() const { return m_lastModified; }\n"
-		"\tbool groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack);\n"
+		"\tbool groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack) const;\n"
 		"\tbool groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack);\n"
 		, groupPresenceBits
 	);
 
 	// group pack delta function
 	CXX(
-		"bool %s::groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack)\n"
+		"bool %s::groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack) const\n"
 		"{\n"
 		"\t%s groupPresence(0);\n"
 		"\tSINT32 groupPresenceOffset = a->offset;\n"
@@ -820,9 +814,9 @@ void Group::Emit(size_t indentLevel) const
 		"\n"
 		);
 
-	HXX("%svoid groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) override;\n", _getIndents(indentLevel + 1));
+	HXX("%svoid groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) const override;\n", _getIndents(indentLevel + 1));
 	CXX(
-		"void %s::groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)\n"
+		"void %s::groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes) const\n"
 		"{\n"
 		, GetQualifiedName().c_str()
 		);
@@ -920,13 +914,13 @@ void Array::Emit(size_t indentLevel) const
 	for (Node* child = m_child; child; child = child->m_next) {
 		child->Emit(indentLevel + 1);
 	}
-	HXX("%s\tbool pack(ACTION_OBJECT* const a, SINT32);\n", indent);
+	HXX("%s\tbool pack(ACTION_OBJECT* const a, SINT32) const;\n", indent);
 	HXX("%s\tbool unpack(ACTION_OBJECT* const a, SINT32);\n", indent);
 	HXX("%s};\n", indent);
 	HXX("%stypedef WWII::inplace_vector<%s, %s> %s;\n", indent, m_name.c_str(), m_dimension.c_str(), m_typedef.c_str());
 	HXX("%s%s %s;\n", indent, m_typedef.c_str(), m_memberName.c_str());
 
-	CXX("bool %s::pack(ACTION_OBJECT* const a, SINT32)\n", GetQualifiedName());
+	CXX("bool %s::pack(ACTION_OBJECT* const a, SINT32) const\n", GetQualifiedName());
 	CXX("{\n");
 	for (Node* node = m_child; node; node = node->m_next) {
 		node->EmitPack(1);
@@ -945,7 +939,7 @@ void Array::Emit(size_t indentLevel) const
 	CXX("\n");
 }
 
-UINT16 Array::GetPackBits() const
+uint16_t Array::GetPackBits() const
 {
 	if (isdigit(m_dimension[0])) {
 		long value = std::stol(m_dimension);
@@ -964,7 +958,7 @@ UINT16 Array::GetPackBits() const
 void Array::EmitPack(size_t indentLevel) const
 {
 	const char* indent = _getIndents(indentLevel);
-	UINT16 packBits = GetPackBits();
+	uint16_t packBits = GetPackBits();
 	std::string countVar = m_name + "_count";
 	std::string iterVar = m_name + "_idx";
 
@@ -980,7 +974,7 @@ void Array::EmitPack(size_t indentLevel) const
 void Array::EmitUnpack(size_t indentLevel) const
 {
 	const char* indent = _getIndents(indentLevel);
-	UINT32 packBits = GetPackBits();
+	uint16_t packBits = GetPackBits();
 	std::string countVar = m_name + "_count";
 	std::string iterVar = m_name + "_idx";
 
@@ -1151,7 +1145,7 @@ static bool _getGeneratorFromArg(const char* generator, const char* arg, std::st
 	return true;
 }
 
-void NORETURN_FN usage()
+void usage()
 {
 	fprintf(stderr, "Usage: [--cxx=file] [--hxx=file] %s <input file>\n", s_exeName);
 	exit(1);

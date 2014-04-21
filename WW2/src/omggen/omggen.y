@@ -1,6 +1,6 @@
 %{
-#include "omg.yy.h"
-#include "omg.h"
+#include "omggen.yy.h"
+#include "omggen.h"
 
 #if defined(_MSC_VER)
 #pragma warning( disable : 4065 )		// Disable warning C4065: switch statement contains 'default' but no 'case' labels
