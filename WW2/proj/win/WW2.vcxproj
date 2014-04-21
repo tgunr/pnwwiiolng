@@ -935,6 +935,8 @@
     <ClInclude Include="..\..\src\math\Rand.h" />
     <ClInclude Include="..\..\src\math\SuperFastHash.h" />
     <ClInclude Include="..\..\src\ogl\GLCounter.h" />
+    <ClInclude Include="..\..\src\omg\omgChatMissionStatus.hxx" />
+    <ClInclude Include="..\..\src\omg\omgMissionSortieData.hxx" />
     <ClInclude Include="..\..\src\physics\HeightField.h" />
     <ClInclude Include="..\..\src\sys\sysmainHackNonsense.h" />
     <ClInclude Include="..\..\src\teul\teulKit.h" />
@@ -1308,7 +1310,6 @@
     <ClCompile Include="..\..\src\chat\chatHandle.cpp" />
     <ClCompile Include="..\..\src\chat\chatMissionInvite.cpp" />
     <ClCompile Include="..\..\src\chat\chatMissionMember.cpp" />
-    <ClCompile Include="..\..\src\chat\chatMissionStatusPacker.cpp" />
     <ClCompile Include="..\..\src\chat\chatMotds.cpp" />
     <ClCompile Include="..\..\src\chat\chatPackers.cpp" />
     <ClCompile Include="..\..\src\chat\chatSquadControl.cpp" />
@@ -1572,6 +1573,8 @@
     <ClCompile Include="..\..\src\ogl\oglVertexBuffer.cpp" />
     <ClCompile Include="..\..\src\ogl\States.cpp" />
     <ClCompile Include="..\..\src\ogrp\ogrpmain.cpp" />
+    <ClCompile Include="..\..\src\omg\omgChatMissionStatus.cxx" />
+    <ClCompile Include="..\..\src\omg\omgMissionSortieData.cxx" />
     <ClCompile Include="..\..\src\pa\md5c.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaReleaseSSE2SmartHeap|Win32'">
       </PrecompiledHeader>
@@ -1831,6 +1834,8 @@
     <ClCompile Include="..\..\src\scen\scenMain.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\..\src\omg\omgChatMissionStatus.omg" />
+    <None Include="..\..\src\omg\omgMissionSortieData.omg" />
     <None Include="res\cursor.cur" />
     <None Include="res\WW2.rc2" />
     <None Include="res\wwii1.ico" />
@@ -1874,6 +1879,9 @@
     </ProjectReference>
     <ProjectReference Include="..\..\..\Libraries\SpeedTree\Source\RT_StaticLib\SpeedTreeRT_StaticLib_VC9.vcxproj">
       <Project>{f86aee86-a9ca-44da-b77b-68b06489e26e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\src\omggen\omggen.vcxproj">
+      <Project>{3864753c-c3d8-4704-b538-7792402922e1}</Project>
     </ProjectReference>
     <ProjectReference Include="teulKit\teulKit.vcxproj">
       <Project>{4f492374-dc5c-47d0-ae9f-7df7a50fdecb}</Project>

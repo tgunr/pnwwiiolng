@@ -1,6 +1,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+VisualStudioVersion = 12.0.30110.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Libraries", "Libraries", "{5C4DCB4D-AE98-4D94-B17D-96AF431E58FA}"
 EndProject
@@ -45,6 +45,8 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "event", "Libraries\libevent\libevent.vcxproj", "{FE3E7329-9561-4BFC-9E1D-F4BDDBA2CBB0}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "granny2", "Libraries\granny2\projects\win32_2k13_static.vcxproj", "{88F5E6BA-BD13-4B8A-A19E-232FE3BF5C73}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "omggen", "WW2\src\omggen\omggen.vcxproj", "{3864753C-C3D8-4704-B538-7792402922E1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -297,6 +299,24 @@ Global
 		{88F5E6BA-BD13-4B8A-A19E-232FE3BF5C73}.Release|Win32.Build.0 = Release|Win32
 		{88F5E6BA-BD13-4B8A-A19E-232FE3BF5C73}.TestRelease|Win32.ActiveCfg = Release|Win32
 		{88F5E6BA-BD13-4B8A-A19E-232FE3BF5C73}.TestRelease|Win32.Build.0 = Release|Win32
+		{3864753C-C3D8-4704-B538-7792402922E1}.BetaReleaseSSE2SmartHeap|Win32.ActiveCfg = Release|Win32
+		{3864753C-C3D8-4704-B538-7792402922E1}.BetaReleaseSSE2SmartHeap|Win32.Build.0 = Release|Win32
+		{3864753C-C3D8-4704-B538-7792402922E1}.Buzzard|Win32.ActiveCfg = Release|Win32
+		{3864753C-C3D8-4704-B538-7792402922E1}.Buzzard|Win32.Build.0 = Release|Win32
+		{3864753C-C3D8-4704-B538-7792402922E1}.China|Win32.ActiveCfg = Release|Win32
+		{3864753C-C3D8-4704-B538-7792402922E1}.China|Win32.Build.0 = Release|Win32
+		{3864753C-C3D8-4704-B538-7792402922E1}.Debug|Win32.ActiveCfg = Debug|Win32
+		{3864753C-C3D8-4704-B538-7792402922E1}.Debug|Win32.Build.0 = Debug|Win32
+		{3864753C-C3D8-4704-B538-7792402922E1}.FullDebug|Win32.ActiveCfg = Debug|Win32
+		{3864753C-C3D8-4704-B538-7792402922E1}.FullDebug|Win32.Build.0 = Debug|Win32
+		{3864753C-C3D8-4704-B538-7792402922E1}.MultiClient|Win32.ActiveCfg = Release|Win32
+		{3864753C-C3D8-4704-B538-7792402922E1}.MultiClient|Win32.Build.0 = Release|Win32
+		{3864753C-C3D8-4704-B538-7792402922E1}.PublicReleaseSSE2SmartHeap|Win32.ActiveCfg = Release|Win32
+		{3864753C-C3D8-4704-B538-7792402922E1}.PublicReleaseSSE2SmartHeap|Win32.Build.0 = Release|Win32
+		{3864753C-C3D8-4704-B538-7792402922E1}.Release|Win32.ActiveCfg = Release|Win32
+		{3864753C-C3D8-4704-B538-7792402922E1}.Release|Win32.Build.0 = Release|Win32
+		{3864753C-C3D8-4704-B538-7792402922E1}.TestRelease|Win32.ActiveCfg = Release|Win32
+		{3864753C-C3D8-4704-B538-7792402922E1}.TestRelease|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -315,5 +335,6 @@ Global
 		{8ADA4575-B1EE-4A46-BBCD-DEF4CFA6E37D} = {D66FF7C5-219D-40F1-AB47-7553DE4634DE}
 		{A755190B-E034-45F3-A255-75DCEE000361} = {D66FF7C5-219D-40F1-AB47-7553DE4634DE}
 		{01A38275-B0DA-4A76-8175-487EB9B04211} = {D66FF7C5-219D-40F1-AB47-7553DE4634DE}
+		{3864753C-C3D8-4704-B538-7792402922E1} = {D66FF7C5-219D-40F1-AB47-7553DE4634DE}
 	EndGlobalSection
 EndGlobal
