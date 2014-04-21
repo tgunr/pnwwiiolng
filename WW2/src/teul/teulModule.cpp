@@ -362,7 +362,7 @@ _bindAndListen(ENDPOINT& endpoint)
 	if ( listen(endpoint.socket, MAX_ACCEPT_BACKLOG) < 0 )
 		throw Teul::OpenError("listen failed");
 
-	dbugLog(_FLD, "t:%d sock:%d listening socket", endpoint.teulIndex(), endpoint.socket);
+	dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " listening socket", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket));
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -401,7 +401,7 @@ _connectSocket(ENDPOINT& endpoint)
 		assert( endpoint.m_impl->pollSlot() < 0 );
 #endif
 
-		dbugLog(_FLD, "t:%d sock:%d connecting", endpoint.teulIndex(), endpoint.socket);
+		dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " connecting", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket));
 
 		break;
 	}
@@ -435,8 +435,9 @@ _bindDgramSocket(ENDPOINT& endpoint, sockaddr_in& sockAddr)
 	if ( getsockname(endpoint.socket, (struct sockaddr*)&sockAddr, &len) < 0 )
 		throw Teul::OpenError("getsockname() failed after bind");
 
-	dbugLog(_FLI, "t:%d sock:%d bound to fam:%u addr:%s port:%hu"
-					, endpoint.teulIndex(), endpoint.socket
+	dbugLog(_FLI, "t:%d sock:" PRF_SOCKET " bound to fam:%u addr:%s port:%hu"
+					, endpoint.teulIndex()
+					, PRA_SOCKET(endpoint.socket)
 					, sockAddr.sin_family
 					, teulGetAddress(ntohl(sockAddr.sin_addr.s_addr))
 					, sockAddr.sin_port
@@ -524,7 +525,10 @@ teulOpenConnection(const SINT32 teulIndex, const bool listening, const SINT32 ti
 		if ( err == nullptr )
 			err = "unknown";
 
-		dbugLog(_FLW, "t:%d sock:%d open error:%d [%s] %s", newEndpoint->teulIndex(), newEndpoint->socket, e.errNo, err, e.msg);
+		dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " open error:%d [%s] %s"
+					, newEndpoint->teulIndex(), PRA_SOCKET(newEndpoint->socket)
+					, e.errNo, err, e.msg
+					);
 
 		newEndpoint->doError(e.errNo);
 		newEndpoint->shutdown();

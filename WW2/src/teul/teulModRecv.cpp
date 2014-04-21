@@ -355,7 +355,7 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 		}
 
 		if ( g_logDebug )
-			dbugLog(_FLN, "sock:%d t:%d accepting connection", endpoint.teulIndex(), newSock);
+			dbugLog(_FLN, "t:%d sock:" PRF_SOCKET " accepting connection", endpoint.teulIndex(), PRA_SOCKET(newSock));
 
 		newEndpoint = teulCreateEndpoint(Teul::AnyIndex, false, endpoint.timeout, (PROTOCOL)endpoint.protocol);
 		if ( PN_UNLIKELY(newEndpoint == nullptr) )
@@ -392,12 +392,12 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 		char localIP[32];
 		teulGetAddress(newEndpoint->localAddress(), localIP, sizeof(localIP));
 
-		dbugLog(_FLN, "t:%d accepted %s:%u->%s:%u as t:%d sock:%d (li:%llu)"
+		dbugLog(_FLN, "t:%d accepted %s:%u->%s:%u as t:%d sock:" PRF_SOCKET " (li:%llu)"
 					, endpoint.teulIndex()
 					, remoteIP, newEndpoint->fromPort()
 					, localIP, newEndpoint->localAddress()
 					, newEndpoint->teulIndex()
-					, newSock
+					, PRA_SOCKET(newSock)
 					, (teulClock64 - _lastIdle)
 					);
 
@@ -672,7 +672,7 @@ _recvDatagram(ENDPOINT& endpoint)
 		}
 		while ( errorCount < 16 );
 		if ( errorCount > 2 )
-			dbugLog(_FLD, "t:%d sock:%u packets:%u errors:%u", endpoint.teulIndex(), endpoint.socket, packetsReceived, errorCount);
+			dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " packets:%u errors:%u", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), packetsReceived, errorCount);
 	}
 	else if ( endpoint.m_reliable == false )
 	{
@@ -706,7 +706,7 @@ _handleReceive(ENDPOINT& endpoint)
 	teulSyncClock();
 	const TeulTimeMS endRX = teulClock64;
 	if ( endRX - startRX > 1 )
-		dbugLog(_FLA, "STALL t:%d sock:%u. rcvDatagram interval=%llums", endpoint.teulIndex(), sock, endRX - startRX);
+		dbugLog(_FLA, "STALL t:%d sock:" PRF_SOCKET ". rcvDatagram interval=%llums", endpoint.teulIndex(), PRA_SOCKET(sock), endRX - startRX);
 #endif
 
 	if ( PN_UNLIKELY(theErr < 0) )
@@ -738,7 +738,7 @@ _handleReceive(ENDPOINT& endpoint)
 	teulSyncClock();
 	const TeulTimeMS endCB = teulClock64;
 	if ( endCB - startCB > 10 )
-		dbugLog(_FLA, "STALL t:%d sock:%u. routeCallbacks callbacks interval=%llums", endpoint.teulIndex(), sock, endCB - startCB);
+		dbugLog(_FLA, "STALL t:%d sock:" PRF_SOCKET ". routeCallbacks callbacks interval=%llums", endpoint.teulIndex(), PRA_SOCKET(sock), endCB - startCB);
 #endif
 
 	return false;
@@ -824,7 +824,7 @@ _runPollEndpoints(struct pollfd* fdArray, nfds_t maxSlots, int numSlots)
 #if defined(POLLRDHUP)
 		if ( PN_UNLIKELY((revents & POLLRDHUP) != 0) )
 		{
-			dbugLog(_FLD, "t:%d sock:%u remote disconnected", endpoint.teulIndex(), sock);
+			dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " remote disconnected", endpoint.teulIndex(), PRA_SOCKET(sock));
 			teulClose(endpoint, Teul::Closing::RemoteDisc);
 			continue;
 		}
@@ -832,7 +832,7 @@ _runPollEndpoints(struct pollfd* fdArray, nfds_t maxSlots, int numSlots)
 
 		if ( PN_UNLIKELY((revents & POLLHUP) != 0) )
 		{
-			dbugLog(_FLM, "t:%d sock:%u socket terminated", endpoint.teulIndex(), sock);
+			dbugLog(_FLM, "t:%d sock:" PRF_SOCKET " socket terminated", endpoint.teulIndex(), PRA_SOCKET(sock));
 			teulClose(endpoint, Teul::Closing::LocalDisc);
 			continue;
 		}

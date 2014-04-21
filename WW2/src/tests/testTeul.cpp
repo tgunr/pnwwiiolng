@@ -483,7 +483,7 @@ struct Role
 		static const UINT32 expectHeaderBytes = 8;
 		if ( packet.headerSizeBytes() != expectHeaderBytes )
 		{
-			printf("headerSizeBytes is %" PRSizeT "\n", packet.headerSizeBytes());
+			printf("headerSizeBytes is %u\n", packet.headerSizeBytes());
 			throw Teul::Error("Teul::Packet header size is different than expected", expectHeaderBytes);
 		}
 
@@ -553,7 +553,7 @@ struct Role
 		if ( result < 0 )
 			throw Teul::Error("Teul::Packet send failed", result);
 
-		Iprintf("Teul::Packet sent: %" PRSizeT " [%" PRSizeT " of %" PRSizeT "].\n", packet.payloadSizeBytes(), packet.packetSizeBytes(), packet.packetCapacityBytes());
+		Iprintf("Teul::Packet sent: %u [%u of %u].\n", packet.payloadSizeBytes(), packet.packetSizeBytes(), packet.packetCapacityBytes());
 	}
 
 };

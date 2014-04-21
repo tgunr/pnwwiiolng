@@ -23,6 +23,8 @@
 	#define SOCKET_ERROR -1
 	#define INVALID_SOCKET  -1
 	typedef int				SOCKET;
+	#define PRF_SOCKET "%d"
+	#define PRA_SOCKET(s) int(s)
 /*
 #if platOS == OS_FREEBSD
 	typedef SINT32 sockval_t;
@@ -32,6 +34,12 @@
 #else // platOS != OS_WIN32
 	#define socklen_t SINT32 FAR
 	#define sockval_t SINT32 FAR
+	#if defined(_WIN64)
+	# define PRF_SOCKET "%llu"
+	#else
+	# define PRF_SOCKET "%u"
+	#endif
+	#define PRA_SOCKET(s) uintptr_t(s)
 #endif
 
 #if platOS == OS_MACOS

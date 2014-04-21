@@ -117,7 +117,7 @@ add_custom_command(OUTPUT ${OMGGEN_DIR}/omggen.yy.cpp ${OMGGEN_DIR}/omggen.yy.h
 	PRE_BUILD
 	COMMAND ${FLEX_EXE}
 	ARGS -o omggen.yy.cpp -B --nounistd --header-file=omggen.yy.h omggen.l
-	DEPENDS ${OMG_DIR}/omg.l ${OMGGEN_DIR}/omggen.tab.h
+	DEPENDS ${OMGGEN_DIR}/omggen.l ${OMGGEN_DIR}/omggen.tab.h
 	MAIN_DEPENDENCY "${OMGGEN_DIR}/omggen.l"
 	COMMENT "[FLEX] Building OMGGEN"
 	WORKING_DIRECTORY ${OMGGEN_DIR}

@@ -129,7 +129,11 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 		// Socket closed.
 		if ( result == 0 )
 		{
-			dbugLog(_FLW, "t:%d sock:%u socket closed on sendto for %" PRSizeT " bytes to %u,%u [%u,%hu] attempt", teulIndex(), socket, sizeInBytes, address, port, inetAddress.sin_addr.s_addr, inetAddress.sin_port);
+			dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " socket closed on sendto for %" PRSizeT " bytes to %u,%u [%u,%hu] attempt"
+						, teulIndex(), PRA_SOCKET(socket)
+						, sizeInBytes
+						, address, port, inetAddress.sin_addr.s_addr, inetAddress.sin_port
+						);
 			teulClose(*this, Teul::Closing::Closed);
 			dbugSetErrno(Teul::Closing::Closed);
 			return -Teul::Closing::Closed;
@@ -139,7 +143,12 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 		const int err = dbugGetErrno();
 		if ( (err != EAGAIN) & (err != EINTR) & (err != EWOULDBLOCK) )
 		{
-			dbugLog(_FLW, "t:%d sock:%u send error on send %" PRSizeT " bytes to %u,%u [%u,%hu] attempt, err:%d", teulIndex(), socket, sizeInBytes, address, port, inetAddress.sin_addr.s_addr, inetAddress.sin_port, err);
+			dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " send error on send %" PRSizeT " bytes to %u,%u [%u,%hu] attempt, err:%d"
+						, teulIndex(), PRA_SOCKET(socket)
+						, sizeInBytes
+						, address, port, inetAddress.sin_addr.s_addr, inetAddress.sin_port
+						, err
+						);
 			return -ETEUL_ENOSPC_SEND_SOCKET;
 		}
 
@@ -292,13 +301,13 @@ Teul::Packet::send(ENDPOINT& endpoint)
 		// Connection closed.
 		if ( result == 0 )
 		{
-			dbugLog(_FLM, "t:%d sock:%d closed during send err:%d", endpoint.teulIndex(), endpoint.socket, dbugGetErrno());
+			dbugLog(_FLM, "t:%d sock:" PRF_SOCKET " closed during send err:%d", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), dbugGetErrno());
 		}
 		else
 		{
 			err = dbugGetErrno();
 			// Failed to send.
-			dbugLog(_FLW, "t:%d sock:%u err:%d(%d) send failed ", endpoint.teulIndex(), endpoint.socket, result, err);
+			dbugLog(_FLW, "t:%d sock:" PRF_SOCKET " err:%d(%d) send failed ", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), result, err);
 		}
 		teulClose(endpoint, Teul::Closing::SendFail);
 		return err;

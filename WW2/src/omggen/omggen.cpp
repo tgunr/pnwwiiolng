@@ -520,7 +520,6 @@ void omg_add_code(const char* code)
 {
 	annotate("adding code");
 	// trim off leading blank lines.
-	const char* ptr = code;
 	for (const char* ptr = code; *ptr && isspace(*ptr); ++ptr) {
 		if (*ptr == '\n')
 			code = ptr + 1;
@@ -920,7 +919,7 @@ void Array::Emit(size_t indentLevel) const
 	HXX("%stypedef WWII::inplace_vector<%s, %s> %s;\n", indent, m_name.c_str(), m_dimension.c_str(), m_typedef.c_str());
 	HXX("%s%s %s;\n", indent, m_typedef.c_str(), m_memberName.c_str());
 
-	CXX("bool %s::pack(ACTION_OBJECT* const a, SINT32) const\n", GetQualifiedName());
+	CXX("bool %s::pack(ACTION_OBJECT* const a, SINT32) const\n", GetQualifiedName().c_str());
 	CXX("{\n");
 	for (Node* node = m_child; node; node = node->m_next) {
 		node->EmitPack(1);
@@ -929,7 +928,7 @@ void Array::Emit(size_t indentLevel) const
 	CXX("}\n");
 	CXX("\n");
 
-	CXX("bool %s::unpack(ACTION_OBJECT* const a, SINT32)\n", GetQualifiedName());
+	CXX("bool %s::unpack(ACTION_OBJECT* const a, SINT32)\n", GetQualifiedName().c_str());
 	CXX("{\n");
 	for (Node* node = m_child; node; node = node->m_next) {
 		node->EmitUnpack(1);

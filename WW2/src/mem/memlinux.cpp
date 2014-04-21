@@ -40,9 +40,9 @@ struct Activity
 	void describe(unsigned long long fileline, char* const buffer, const size_t bufferSize)
 	{
 		const char* const file = ((const char*)(fileline >> 32));
-		const size_t line = (size_t)(fileline);
+		const UINT32 line = UINT32(fileline & 0xffffffff);
 		snprintf(buffer, bufferSize - 1
-				, "%s:%" PRSizeT " allocs:%llu frees:%llu unfreed:%llu maxAllocated:%llu curAllocated:%llu la:%llu"
+				, "%s:%u allocs:%llu frees:%llu unfreed:%llu maxAllocated:%llu curAllocated:%llu la:%llu"
 					, file, line
 					, m_allocs
 					, m_frees
@@ -56,10 +56,10 @@ struct Activity
 	UINT32 describeJSON(unsigned long long fileline, char* const buffer, const size_t bufferSize, const UINT32 offset)
 	{
 		const char* const file = ((const char*)(fileline >> 32));
-		const UINT32 line = UINT32(fileline);
+		const UINT32 line = UINT32(fileline & 0xffffffff);
 
 		UINT32 printed = snprintf(buffer + offset, bufferSize - (1 + offset)
-									, "\"%s:%" PRSizeT "\":{\"allocs\":%llu,\"frees\":%llu,\"unfreed\":%llu,\"max\":%llu,\"cur\":%llu,\"la\":%llu}"
+									, "\"%s:%u\":{\"allocs\":%llu,\"frees\":%llu,\"unfreed\":%llu,\"max\":%llu,\"cur\":%llu,\"la\":%llu}"
 										, file, line
 										, m_allocs
 										, m_frees

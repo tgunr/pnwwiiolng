@@ -137,7 +137,7 @@ ENDPOINT::doConnect()
 	}
 	else if ( protocol != PROTOCOL_UDB && protocol != PROTOCOL_CTRL )	// UDB doesn't connect.
 	{
-		dbugLog(_FLA, "t:%d sock:%u state:%u prot:%u connected NO CONNECT FN", this->teulIndex(), this->socket, this->state(), this->protocol);
+		dbugLog(_FLA, "t:%d sock:" PRF_SOCKET " state:%u prot:%u connected NO CONNECT FN", this->teulIndex(), PRA_SOCKET(this->socket), this->state(), this->protocol);
 	}
 }
 

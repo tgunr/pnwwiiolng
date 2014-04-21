@@ -181,8 +181,8 @@ static void _onRepeaterRead(struct bufferevent* bev_, void* arg_)
 	}
 
 #ifdef CONTROLLER_STATS
-	dbugLog(_FLD, "sock:%d read %" PRSizeT " bytes in %" PRSizeT " reads; wrote %" PRSizeT " bytes in %" PRSizeT " writes."
-					, srcSock
+	dbugLog(_FLD, "sock:" PRF_SOCKET " read %" PRSizeT " bytes in %" PRSizeT " reads; wrote %" PRSizeT " bytes in %" PRSizeT " writes."
+					, PRA_SOCKET(srcSock)
 					, bytesRead, numReads
 					, bytesWritten, numWrites
 					);
@@ -197,19 +197,19 @@ static void _onRepeaterError(struct bufferevent* bev_, short error_, void* arg_)
 	evutil_socket_t cliSock = *(evutil_socket_t*)arg_;
     if (error_ & BEV_EVENT_EOF)
 	{
-		dbugLog(_FLM, "sock:%" PRF_SOCKET " disconnected.", PRA_SOCKET(cliSock));
+		dbugLog(_FLM, "sock:" PRF_SOCKET " disconnected.", PRA_SOCKET(cliSock));
     }
 	else if (error_ & BEV_EVENT_ERROR)
 	{
-		dbugLog(_FLW, "sock:%" PRF_SOCKET "error:%d. disconnecting.", PRA_SOCKET(cliSock), dbugGetErrno());
+		dbugLog(_FLW, "sock:" PRF_SOCKET "error:%d. disconnecting.", PRA_SOCKET(cliSock), dbugGetErrno());
     }
 	else if (error_ & BEV_EVENT_TIMEOUT)
 	{
-		dbugLog(_FLW, "sock:%" PRF_SOCKET " timeout. disconnecting.", PRA_SOCKET(cliSock));
+		dbugLog(_FLW, "sock:" PRF_SOCKET " timeout. disconnecting.", PRA_SOCKET(cliSock));
     }
 	else
 	{
-		dbugLog(_FLW, "sock:%" PRF_SOCKET " error %d", PRA_SOCKET(cliSock), error_);
+		dbugLog(_FLW, "sock:" PRF_SOCKET " error %d", PRA_SOCKET(cliSock), error_);
 	}
 
     bufferevent_free(bev_);
@@ -240,7 +240,10 @@ static void _onRepeaterAccept(evutil_socket_t listener_, short event_, void* arg
 
 	s_clients[cliSock] = bev;
 
-	dbugLog(_FLN, "sock:%d connected from %s:%u", cliSock, teulGetAddress(ntohl(cliAddr.sin_addr.s_addr)), ntohs(cliAddr.sin_port));
+	dbugLog(_FLN, "sock:" PRF_SOCKET " connected from %s:%u"
+				, PRA_SOCKET(cliSock)
+				, teulGetAddress(ntohl(cliAddr.sin_addr.s_addr)), ntohs(cliAddr.sin_port)
+				);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -276,7 +279,7 @@ static void _onManagedProcessError(struct bufferevent* bev_, short error_, void*
 	auto it = s_processSockets.find(cliSock);
 	if ( it != s_processSockets.end() && it->second != 0ULL )
 	{
-		dbugLog(_FLI, "sock:%d process:%llu disconnecting", cliSock, it->second);
+		dbugLog(_FLI, "sock:" PRF_SOCKET " process:%llu disconnecting", PRA_SOCKET(cliSock), it->second);
 		delete (evutil_socket_t*)arg_;
 		///TODO: Tell GameProcessManager that the process went away.
 	}
@@ -333,7 +336,7 @@ static void _onManagedProcessAccept(evutil_socket_t listener_, short event_, voi
 
 	s_processSockets[cliSock] = 0ULL;
 
-	dbugLog(_FLN, "sock:%d process connected from %s:%u", cliSock, teulGetAddress(ntohl(cliAddr.sin_addr.s_addr)), ntohs(cliAddr.sin_port));
+	dbugLog(_FLN, "sock:" PRF_SOCKET " process connected from %s:%u", PRA_SOCKET(cliSock), teulGetAddress(ntohl(cliAddr.sin_addr.s_addr)), ntohs(cliAddr.sin_port));
 }
 
 ////////////////////////////////////////////////////////////////////////////////

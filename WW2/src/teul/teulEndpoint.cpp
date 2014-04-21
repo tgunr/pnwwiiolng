@@ -661,7 +661,7 @@ ENDPOINT::setRcvBufferSize(UINT32 newSize)
 	const UINT32 goalSize = (std::min(newSize, (UINT32)ENDPOINT::MaxRcvBufferSize) + chunkSize) & (~chunkMask);
 
 #if defined(DEV_BUILD)
-	dbugLog(_FLD, "t:%d sock:%d setting rcv to %dbytes", teulIndex(), socket, goalSize);
+	dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " setting rcv to %dbytes", teulIndex(), PRA_SOCKET(socket), goalSize);
 #endif
 
 	return setsockopt(socket, SOL_SOCKET, SO_RCVBUF, (const char*)&goalSize, sizeof(goalSize));
@@ -679,7 +679,7 @@ ENDPOINT::setSndBufferSize(UINT32 newSize)
 	const UINT32 goalSize = (std::min(newSize, (UINT32)ENDPOINT::MaxSndBufferSize) + chunkSize) & (~chunkMask);
 
 #if defined(DEV_BUILD)
-	dbugLog(_FLD, "t:%d sock:%d setting sndbuf to %dbytes", teulIndex(), socket, goalSize);
+	dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " setting sndbuf to %dbytes", teulIndex(), PRA_SOCKET(socket), goalSize);
 #endif
 
 	return setsockopt(socket, SOL_SOCKET, SO_SNDBUF, (const char*)&goalSize, sizeof(goalSize));
@@ -705,10 +705,10 @@ ENDPOINT::shutdown()
 	if ( this->socket != INVALID_SOCKET )
 	{
 		::shutdown(this->socket, 2);		// Shutdown both sides of the connection.
-		closesocket(this->socket);
+		OS_CLOSESOCKET(this->socket);
 
 #ifdef DEV_BUILD
-		dbugLog(_FLD, "t:%d sock:%u closed socket", this->teulIndex(), this->socket);
+		dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " closed socket", this->teulIndex(), PRA_SOCKET(this->socket));
 #endif
 
 		this->socket = INVALID_SOCKET;

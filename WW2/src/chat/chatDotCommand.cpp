@@ -644,7 +644,7 @@ DotCommandIndex::broadcastCommandListPacket()
 	}
 
 	const Chat::cmdcount_t& count = g_commandListPacket->payloadRef<Chat::cmdcount_t>(0);
-	dbugLog(_FLD, "transmitting %u /commands in %" PRSizeT "byte packets to %" PRSizeT " players.", count, g_commandListPacket->packetSizeBytes(), numEndpoints);
+	dbugLog(_FLD, "transmitting %u /commands in %u byte packets to %" PRSizeT " players.", count, g_commandListPacket->packetSizeBytes(), numEndpoints);
 	for ( size_t i = 0; i < numEndpoints; ++i )
 	{
 		g_commandListPacket->send(*endpoints[i]);
