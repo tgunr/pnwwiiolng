@@ -34,7 +34,7 @@ const char* const WWII::svnRevisionStr = SVN_REVISION_STR;
 
 namespace Chat
 {
-	class MissionStatus;
+	struct MissionStatus;
 };
 
 void clientForcedCellExit(SINT32 teulIndex, UINT32 exitCode)

@@ -35,7 +35,7 @@
 
 // WWIIOL specific.
 #include "strt/strtCPFlags.h"
-#include "omg/omgMissionStatus.h"
+#include "omg/omgChatMissionStatus.hxx"
 
 #define PPO_SPEC "vehicles/ground/groundman/ppo.xml"
 

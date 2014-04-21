@@ -175,7 +175,7 @@ public: virtual bool Run() OVERRIDE_FN
 			// same 1-byte pack.
 			a.offset = 0;
 			cms.packer(TEUL_PACK, &a, teulClock64 + 1);
-			CRITICAL( ExpectEqual( a.offset, cms.groupsChangedBits() ) );
+			CRITICAL( ExpectEqual( a.offset, cms.GroupPresenceBits ) );
 			CRITICAL( ExpectEqual( a.packed[0], 0 ) );
 
 			// But packing with the current timestamp should produce
@@ -184,7 +184,7 @@ public: virtual bool Run() OVERRIDE_FN
 				a.offset = 0;
 				cms.packer(TEUL_PACK, &a, teulClock64);
 				static const SINT32 FIELDS_CHANGED_BITS = 8;			// Only using 8 bits here.
-				const SINT32 expectedBits = cms.groupsChangedBits()		// flags indicating which groups changed
+				const SINT32 expectedBits = cms.GroupPresenceBits		// flags indicating which groups changed
 										  + FIELDS_CHANGED_BITS			// which fields changed
 										  + sizeof(cms.header().missionID()) * 8			// missionID
 										  + sizeof(cms.header().brigadeID()) * 8			// brigadeID
@@ -211,7 +211,7 @@ public: virtual bool Run() OVERRIDE_FN
 				cms.packer(TEUL_PACK, &a, teulClock64 );
 				static const SINT32 FIELDS_CHANGED_BITS = 8;
 				static const SINT32 NUM_BOOLS = 4;
-				const SINT32 expectedBits = cms.groupsChangedBits() + FIELDS_CHANGED_BITS + 1 * NUM_BOOLS;
+				const SINT32 expectedBits = cms.GroupPresenceBits + FIELDS_CHANGED_BITS + 1 * NUM_BOOLS;
 				CRITICAL( ExpectEqual( a.offset, expectedBits ) );
 			}
 
@@ -229,7 +229,7 @@ public: virtual bool Run() OVERRIDE_FN
 				static const SINT32 STATUS_NUM_BOOLS = 4;
 				static const SINT32 ROUNDING = ((STATUS_NUM_BOOLS + 7) & ~7) - STATUS_NUM_BOOLS;
 				static const SINT32 FRU_BITS = 1;
-				const SINT32 expectedBits = cms.groupsChangedBits() + FIELDS_CHANGED_BITS + 1 * STATUS_NUM_BOOLS + ROUNDING + FRU_BITS;
+				const SINT32 expectedBits = cms.GroupPresenceBits + FIELDS_CHANGED_BITS + 1 * STATUS_NUM_BOOLS + ROUNDING + FRU_BITS;
 				CRITICAL( ExpectEqual( a.offset, expectedBits ) );
 			}
 

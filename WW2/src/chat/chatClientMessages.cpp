@@ -44,7 +44,7 @@
 #include "chat/chatTimeInterval.h"
 #include "ui/uiMain.h"
 #include "ui/uiChat.h"
-#include "omg/omgMissionStatus.h"
+#include "omg/omgChatMissionStatus.hxx"
 #include "sdm/StratDB.h"
 #include "chat/chatDotCommandList.h"
 #include "client/ww2client.h"

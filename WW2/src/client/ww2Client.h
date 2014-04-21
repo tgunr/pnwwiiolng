@@ -67,7 +67,7 @@ struct ChatServerInfo;
 
 namespace Chat
 {
-	class MissionStatus;
+	struct MissionStatus;
 	class Who;
 };
 
