@@ -621,9 +621,17 @@ wwiiPackWeaponSerial(LOGICAL mode, UCHAR* const data, SINT32 offset, struct WEAP
 // New style pack function which works off of an action object
 
 void
-WEAPON_SPEC::packer(LOGICAL mode, ACTION_OBJECT* a)
+WEAPON_SPEC::pack(ACTION_OBJECT* a, SINT32) const
 {
-	a->offset = teulPackUINT16(mode, a->packed, a->offset, (UINT16*)this, 0);
+	a->pack(asUINT16(), 0);
+}
+
+void
+WEAPON_SPEC::unpack(ACTION_OBJECT* a, SINT32)
+{
+	UINT16 spec = 0;
+	a->unpack(spec, 0);
+	fromShort(spec);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -704,4 +712,26 @@ wwiiPackFullObjID(LOGICAL mode, UCHAR* const data, SINT32 offset, struct FULL_OB
 	}
 
 	return offset;
+}
+
+void FULL_OBJ_ID::pack(ACTION_OBJECT* const a, SINT32) const
+{
+	a->pack(id);
+	if (id) {
+		a->pack(cell.ox);
+		a->pack(cell.oy);
+	}
+}
+
+void FULL_OBJ_ID::unpack(ACTION_OBJECT* const a, SINT32)
+{
+	a->unpack(id);
+	cell.ox = 0;
+	cell.oy = 0;
+	objClass = 0;
+	objType = 0;
+	if (id) {
+		a->unpack(cell.ox);
+		a->unpack(cell.oy);
+	}
 }

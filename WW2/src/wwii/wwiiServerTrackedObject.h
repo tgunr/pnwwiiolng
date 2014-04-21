@@ -44,7 +44,9 @@ public:
 	WorldPosition_m() : m_x(0.0), m_y(0.0), m_z(0.0) {}
 
 public:
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	void packer(LOGICAL mode, ACTION_OBJECT* a, SINT32 = 0) { return (mode == TEUL_PACK) ? pack(a, 0) : unpack(a, 0); }
+	void pack(ACTION_OBJECT* const a, SINT32 = 0) const;
+	void unpack(ACTION_OBJECT* const a, SINT32 = 0);
 
 	WorldPosition_m& operator = (const WorldPosition_m& rhs) { memcpy(this, &rhs, sizeof(*this)); return *this; }
 
@@ -76,7 +78,9 @@ public:
 	AttitudeVector() : m_x(0.0f), m_y(0.0f), m_z(0.0f) {}
 
 public:
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	void packer(LOGICAL mode, ACTION_OBJECT* a, SINT32 = 0) { return (mode == TEUL_PACK) ? pack(a, 0) : unpack(a, 0); }
+	void pack(ACTION_OBJECT* const a, SINT32 = 0) const;
+	void unpack(ACTION_OBJECT* const a, SINT32 = 0);
 
 	AttitudeVector& operator = (const AttitudeVector& rhs) { memcpy(this, &rhs, sizeof(*this)); return *this; }
 

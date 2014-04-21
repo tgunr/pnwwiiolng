@@ -5,7 +5,7 @@ namespace WWII
 {
 
 bool
-VarGroup::pack(ACTION_OBJECT* const a, const TeulTimeMS& lastPacked)
+VarGroup::pack(ACTION_OBJECT* const a, const TeulTimeMS& lastPacked) const
 {
 	if (m_lastModified < lastPacked)
 		return false;

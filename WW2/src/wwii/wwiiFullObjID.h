@@ -91,7 +91,7 @@ struct FULL_OBJ_ID
 	}
 
 //tolua_end
-	void pack(struct ACTION_OBJECT* const a, SINT32 bits = 0);
+	void pack(struct ACTION_OBJECT* const a, SINT32 bits = 0) const;
 	void unpack(struct ACTION_OBJECT* const a, SINT32 bits = 0);
 //tolua_begin
 };

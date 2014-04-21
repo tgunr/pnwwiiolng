@@ -56,7 +56,9 @@ struct WEAPON_SPEC
 
 //tolua_end
 	//! Make network fly.
-	void packer(LOGICAL mode, ACTION_OBJECT* a);
+	void packer(LOGICAL mode, ACTION_OBJECT* a) { return (mode == TEUL_PACK) ? pack(a, 0) : unpack(a, 0); }
+	void pack(ACTION_OBJECT* a, SINT32 /*bits*/ = 0) const;
+	void unpack(ACTION_OBJECT* a, SINT32 /*bits*/ = 0);
 
 private:
 	operator UINT32() const;	//<! Use asUINT32() instead.

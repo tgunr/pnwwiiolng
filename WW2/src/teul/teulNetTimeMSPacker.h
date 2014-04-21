@@ -12,7 +12,7 @@ namespace Teul
 		{
 			return (mode == TEUL_PACK) ? pack(a, bits) : unpack(a, bits);
 		}
-		void pack(ACTION_OBJECT* const a, SINT32 bits = 0)
+		void pack(ACTION_OBJECT* const a, SINT32 bits = 0) const
 		{
 			m_value.pack(a, bits);
 		}

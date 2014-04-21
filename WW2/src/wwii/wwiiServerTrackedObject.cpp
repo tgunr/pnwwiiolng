@@ -106,8 +106,8 @@ ServerTrackedObject::packer(LOGICAL mode, ACTION_OBJECT* const a)
 		m_activated = false;
 	}
 
-	a->offset = m_attitude.packer(mode, a);
-	a->offset = m_position.packer(mode, a);
+	m_attitude.packer(mode, a);
+	m_position.packer(mode, a);
 
 	switch(m_type)
 	{

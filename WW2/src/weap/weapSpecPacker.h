@@ -14,10 +14,9 @@ template<>
 struct Packer<WEAPON_SPEC>
 {
 	WEAPON_SPEC m_value;
-	void packer(LOGICAL mode, ACTION_OBJECT* const a, SINT32 /*bits*/=0)
-	{
-		m_value.packer(mode, a);
-	}
+	void packer(LOGICAL mode, ACTION_OBJECT* const a, SINT32 /*bits*/ = 0) { return (mode == TEUL_PACK) ? pack(a, 0) : unpack(a, 0);  }
+	void pack(ACTION_OBJECT* const a, SINT32 /*bits*/ = 0) const { return m_value.pack(a, 0); }
+	void unpack(ACTION_OBJECT* const a, SINT32 /*bits*/ = 0) { return m_value.unpack(a, 0); }
 };
 
 } // namespace Teul
