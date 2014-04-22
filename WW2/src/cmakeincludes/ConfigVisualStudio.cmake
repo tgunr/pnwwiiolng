@@ -20,7 +20,11 @@ add_definitions(
 set(_LANGUAGE_FLAGS "/Zc:wchar_t /Zc:forScope /GR")
 set(_DIAGNOSTIC_FLAGS "/WX- /FR /wd4480;4800")
 set(_DEV_FLAGS "")
-set(ARCHITECTURE "/arch:SSE2")
+IF (CMAKE_BITNESS EQUAL 32)
+	SET(ARCHITECTURE "/arch:SSE2")
+ELSE ()
+	SET(ARCHITECTURE "/arch:AVX")
+ENDIF ()
 
 set(_DEBUG_FLAGS "/Zi /nologo")
 set(_LANGUAGE_FLAGS "${_LANGUAGE_FLAGS} /EHsc /fp:precise")
