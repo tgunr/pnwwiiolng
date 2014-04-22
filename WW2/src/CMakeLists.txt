@@ -1,6 +1,17 @@
 CMAKE_MINIMUM_REQUIRED (VERSION 2.6.4)
 PROJECT (GameHosts)
 
+IF (CMAKE_SIZEOF_VOID_P EQUAL 4)
+	MESSAGE(STATUS "BUILD IS 32 bit")
+	SET(CMAKE_BITNESS 32)
+ELSEIF (CMAKE_SIZEOF_VOID_P EQUAL 8)
+	MESSAGE(STATUS "BUILD IS 64 bit")
+	SET(CMAKE_BITNESS 64)
+ELSE ()
+	MESSAGE(FATAL_ERROR "CMAKE_SIZEOF_VOID_P is ${CMAKE_SIZEOF_VOID_P} which is a bit size I don't know how to handle.")
+ENDIF ( )
+MARK_AS_ADVANCED(CMAKE_BITNESS)
+
 ################################################################################
 ## Configuration.
 
