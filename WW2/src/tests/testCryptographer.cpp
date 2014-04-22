@@ -29,7 +29,7 @@ public: virtual bool TestVersion(const UINT32 version, const size_t bufSize, con
 
 			for ( size_t i = 0; i <= bufSize; ++i )
 			{
-				buf1[i] = i + 7;
+				buf1[i] = static_cast<UCHAR>((i + 7) & 0xff);
 				buf2[i] = 0;
 				buf3[i] = ~0;
 			}

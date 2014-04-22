@@ -60,7 +60,7 @@ struct VehicleRequest
 	//! Vehicle's initial flags.
 	UINT32			m_flags;
 
-	UINT32 numPlayers() const { return (m_players.empty() == false ? m_players.size() : 0); }
+	UINT32 numPlayers() const { return (m_players.empty() == false ? static_cast<UINT32>(m_players.size()) : 0); }
 	UINT32 playerNo(size_t i) const { return ( i < numPlayers() ? m_players[i] : 0 ); }
 
 	void send(const Server::ServerInfo* server);

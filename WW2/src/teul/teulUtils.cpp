@@ -148,7 +148,7 @@ namespace Teul
 // Convert an IP address and port to strings.
 
 int
-HostToAddr(const UINT32 host_, const UINT16 port_, char* const hostBuf_, const size_t hostBufLen_, char* const portBuf_, const size_t portBufLen_)
+HostToAddr(const UINT32 host_, const UINT16 port_, char* const hostBuf_, const size_t hostBufLen_, char* const portBuf_, const UINT32 portBufLen_)
 {
 	sockaddr_in sa;
 	sa.sin_addr.s_addr = host_;
@@ -161,7 +161,7 @@ HostToAddr(const UINT32 host_, const UINT16 port_, char* const hostBuf_, const s
 // Convert an IP address and port to strings.
 
 int
-HostToAddr(const struct sockaddr_in* const sa, char* const hostBuf_, const size_t hostBufLen_, char* const portBuf_, const size_t portBufLen_)
+HostToAddr(const struct sockaddr_in* const sa, char* const hostBuf_, const size_t hostBufLen_, char* const portBuf_, const UINT32 portBufLen_)
 {
 	return getnameinfo((const sockaddr*)(&sa), sizeof(sa), hostBuf_, hostBufLen_, portBuf_, portBufLen_, NI_NUMERICHOST | NI_NUMERICSERV);
 }

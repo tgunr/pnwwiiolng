@@ -135,24 +135,24 @@ static inline float strtof(const char* const src_, const char* const);
 
 #include "sys/sysWinISO.h"
 
-// Cross-platform path builder.
-template<size_t bufSize>
-size_t pathprintf(char (& buf)[bufSize], const char* lhs, const char* rhs)
-{
-	int printed = snprintf(buf, bufSize, "%s" PATH_SEPSTR "%s", lhs, rhs);
-	if ( printed != -1 && static_cast<size_t>(printed) < bufSize )
-		return static_cast<size_t>(printed);
-	buf[bufSize - 1] = 0;
-	return (bufSize - 1);
-}
-
 // snprintf wrapper
 template<size_t bufSize, typename... Args>
-size_t strprintf(char (& buf)[bufSize], const char* fmt, Args... args)
+UINT32 strprintf(char(&buf)[bufSize], const char* fmt, Args... args)
 {
+	static_assert(bufSize > 0, "Buffer too small");
+	static_assert(bufSize < size_t(1 << 31), "Buffer too large");
 	int printed = snprintf(buf, bufSize, fmt, std::forward<Args>(args)...);
-	if ( printed != -1 && static_cast<size_t>(printed) < bufSize )
-		return static_cast<size_t>(printed);
-	buf[bufSize - 1] = 0;
-	return (bufSize - 1);
+	if (PN_UNLIKELY(size_t(printed) > size_t(bufSize))) {
+		printed = static_cast<int>(bufSize - 1);
+		buf[printed - 1] = 0;
+	}
+	return static_cast<UINT32>(printed);
 }
+
+// Cross-platform path builder.
+template<size_t bufSize>
+UINT32 pathprintf(char (& buf)[bufSize], const char* lhs, const char* rhs)
+{
+	return strprintf<bufSize>(buf, "%s" PATH_SEPSTR "%s", lhs, rhs);
+}
+

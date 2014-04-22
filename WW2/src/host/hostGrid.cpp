@@ -751,6 +751,7 @@ HostVehicle::CreateWorldUpdate()
 
 	// Size-up the final list.
 	const size_t numVehicles = std::min(updateViewings.size(), maxVehiclesPerFrame);
+	ABORT_IF(numVehicles > 0xff);
 
 #if defined(ENABLE_VIS_DEBUG)
 	dbugLog(_FLIB, " final list: nv=min(%u, %u) = %u", updateViewings.size(), maxVehiclesPerFrame, numVehicles);
@@ -762,9 +763,9 @@ HostVehicle::CreateWorldUpdate()
 	memcpy(wu.viewings, &updateViewings[0], sizeof(Viewing*) * numVehicles);
 	TIMER_STOP("cwl:sortcopy");
 
-	wu.header.numVehicles = numVehicles;
+	wu.header.numVehicles = static_cast<UINT8>(numVehicles);
 
 	_dumpVisList("vis list", this->m_visList);
 
-	return numVehicles;
+	return wu.header.numVehicles;
 }

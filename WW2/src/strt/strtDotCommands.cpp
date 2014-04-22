@@ -117,7 +117,7 @@ _listSpawnables(const CPStruct* cp, OOBMessage& message)
 	}
 }
 
-static int
+static size_t
 _vectorize(char* source, std::vector<const char*>& dest, int maxArguments=100, bool translate=false)
 {
 	int arguments = 0;

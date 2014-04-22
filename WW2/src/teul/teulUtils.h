@@ -43,7 +43,7 @@ namespace Teul
 	//! @param[in] hostBufLen_ size of the host name buffer (including trailing zero).
 	//! @param[in] portBuf_ destination for the port number or nullptr if not required.
 	//! @param[in] portBufLen_ size of the port buffer (including trailing zero).
-	int HostToAddr(const UINT32 host_, const UINT16 port_, char* const hostBuf_, const size_t hostBufLen_, char* const portBuf_, const size_t portBufLen_);
+	int HostToAddr(const UINT32 host_, const UINT16 port_, char* const hostBuf_, const size_t hostBufLen_, char* const portBuf_, const UINT32 portBufLen_);
 
 	//! Convert an internet address into host name (dotted decimal notation) and port number strings.
 	//! Primary purpose is to simplify future transitions to IPv6. bufLen must be large enough
@@ -54,5 +54,5 @@ namespace Teul
 	//! @param[in] hostBufLen_ size of the host name buffer (including trailing zero).
 	//! @param[in] portBuf_ destination for the port number or nullptr if not required.
 	//! @param[in] portBufLen_ size of the port buffer (including trailing zero).
-	int	HostToAddr(const struct sockaddr_in* const sa, char* const hostBuf_, size_t hostBufLen_, char* const portBuf_, size_t portBufLen_);
+	int	HostToAddr(const struct sockaddr_in* const sa, char* const hostBuf_, size_t hostBufLen_, char* const portBuf_, UINT32 portBufLen_);
 }

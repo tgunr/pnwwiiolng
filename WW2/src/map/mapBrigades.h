@@ -33,7 +33,7 @@ public:
 
 	void activateMission() { if ( m_missions < actualMissions() ) m_missions++; updateDestinations(); }
 
-	UINT32 actualMissions() { return (m_missionList.empty() ? 0 : m_missionList.size()); }
+	UINT32 actualMissions() { return (m_missionList.empty() ? 0 : static_cast<UINT32>(m_missionList.size())); }
 
 	void addMission(Mission* const mission);
 	void addPlayer(Player* const player);

@@ -107,7 +107,7 @@ public:
 
 	bool isSystemMission() const { return missionType() == SYSTEM_MISSION; }
 
-	UINT32 numTakers() const { return (m_takers.empty()) ? 0 : m_takers.size(); }
+	UINT32 numTakers() const { return (m_takers.empty()) ? 0 : static_cast<UINT32>(m_takers.size()); }
 
 	void markForUpdate();
 
