@@ -191,7 +191,7 @@ _sendChatMissionStatus(ACTION_OBJECT* const a)
 	auto data = *(std::pair<Chat::MissionStatus*, TeulTimeMS>*)(a->localRawData);
 	Chat::MissionStatus& cms = *(data.first);
 	const TeulTimeMS& lastPack = data.second;
-	cms.packer(TEUL_PACK, a, lastPack);
+	cms.pack(a, lastPack);
 	return a->offset;
 }
 
