@@ -13,54 +13,45 @@
 SET(MYSQL_FOUND 0)
 
 IF (WIN32)
- STRING(REGEX REPLACE " *\\(x86\\)" "" ProgramFiles "$ENV{ProgramFiles}")
- STRING(REGEX REPLACE "\\+" "/" ProgramFiles "${ProgramFiles}")
- SET(ProgramFiles32 "${ProgramFiles} (x86)")
- STRING(REGEX REPLACE "\\+" "/" SystemDrive "$ENV{SystemDrive}")
-ENDIF ()
+	STRING(REGEX REPLACE "\\+" "/" SystemDrive "$ENV{SystemDrive}")
+	STRING(REGEX REPLACE "\\+" "/" ProgramFiles "$ENV{ProgramFiles}")
+	IF (CMAKE_BITNESS EQUAL 8)
+		# At time of writing: Windows cmake is built as a 32-bit binary,
+		# so it sees "Program Files (x86)" even when building 64-bit.
+		STRING(REGEX REPLACE " *\\(x86\\)" "" ProgramFiles "${ProgramFiles}")
+	ENDIF ()
 
-FIND_PATH(
-	MYSQL_INCLUDE_DIR
-	NAMES "mysql.h"
-	PATHS
-			/usr/include
-			/usr/include/mysql
-			/usr/local/include
-			/usr/local/include/mysql
-			/usr/local/mysql/include
-			"${ProgramFiles}/MySQL/MySQL Server 5.6/include"
-			"${ProgramFiles}/MySQL/MySQL Server 5.5/include"
-			"${ProgramFiles}/MySQL/MySQL Server 5.1/include"
-			"${ProgramFiles}/MySQL/MySQL Server 5.0/include"
-			"${ProgramFiles}/MySQL/MySQL Server 5/include"
-			"${ProgramFiles}/MySQL/include"
-			"${ProgramFiles32}/MySQL/MySQL Server 5.6/include"
-			"${ProgramFiles32}/MySQL/MySQL Server 5.5/include"
-			"${ProgramFiles32}/MySQL/MySQL Server 5.1/include"
-			"${ProgramFiles32}/MySQL/MySQL Server 5.0/include"
-			"${ProgramFiles32}/MySQL/MySQL Server 5/include"
-			"${ProgramFiles32}/MySQL/include"
-			"${SystemDrive}/MySQL/include"
-			"[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.6;Location]/include"
-			"[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.5;Location]/include"
-			"[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.1;Location]/include"
-			"[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.0;Location]/include"
-			"[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MySQL AB\\MySQL Server 5.6;Location]/include"
-			"[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MySQL AB\\MySQL Server 5.5;Location]/include"
-			"[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MySQL AB\\MySQL Server 5.1;Location]/include"
-			"[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MySQL AB\\MySQL Server 5.0;Location]/include"
-			"${ProgramFiles}/MySQL/*/include"
-			"${ProgramFiles32}/MySQL/*/include"
-			"${SystemDrive}/MySQL/*/include"
-			"c:/msys/local/include"
-    )
+	FIND_PATH(
+		MYSQL_INCLUDE_DIR
+		NAMES "mysql.h"
+		PATHS
+				"${ProgramFiles}/MySQL/MySQL Connector C*/include"
+				"${ProgramFiles}/MySQL/MySQL Server 5.6/include"
+				"${ProgramFiles}/MySQL/MySQL Server 5.5/include"
+				"${ProgramFiles}/MySQL/MySQL Server 5.1/include"
+				"${ProgramFiles}/MySQL/MySQL Server 5.0/include"
+				"${ProgramFiles}/MySQL/MySQL Server 5/include"
+				"${ProgramFiles}/MySQL/include"
+				"${SystemDrive}/MySQL/include"
+				"[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.6;Location]/include"
+				"[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.5;Location]/include"
+				"[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.1;Location]/include"
+				"[HKEY_LOCAL_MACHINE\\SOFTWARE\\MySQL AB\\MySQL Server 5.0;Location]/include"
+				"[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MySQL AB\\MySQL Server 5.6;Location]/include"
+				"[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MySQL AB\\MySQL Server 5.5;Location]/include"
+				"[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MySQL AB\\MySQL Server 5.1;Location]/include"
+				"[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MySQL AB\\MySQL Server 5.0;Location]/include"
+				"${ProgramFiles}/MySQL/*/include"
+				"${SystemDrive}/MySQL/*/include"
+		)
 
-IF (WIN32)
 	FIND_LIBRARY(
 		MYSQL_LIBRARIES
 		NAMES "libmysql" "mysqlclient"
 		PATHS
+			"${ProgramFiles}/MySQL/MySQL Connector C*/lib/opt"
 			"${MYSQL_INCLUDE_DIR}/../lib"
+			"${MYSQL_INCLUDE_DIR}/../lib/opt"
 			"${ProgramFiles}/MySQL/MySQL Server 5.6/lib/opt"
 			"${ProgramFiles}/MySQL/MySQL Server 5.6/lib"
 			"${ProgramFiles}/MySQL/MySQL Server 5.5/lib/opt"
@@ -73,18 +64,6 @@ IF (WIN32)
 			"${ProgramFiles}/MySQL/MySQL Server 5/lib"
 			"${ProgramFiles}/MySQL/lib/opt"
 			"${ProgramFiles}/MySQL/lib"
-			"${ProgramFiles32}/MySQL/MySQL Server 5.6/lib/opt"
-			"${ProgramFiles32}/MySQL/MySQL Server 5.6/lib"
-			"${ProgramFiles32}/MySQL/MySQL Server 5.5/lib/opt"
-			"${ProgramFiles32}/MySQL/MySQL Server 5.5/lib"
-			"${ProgramFiles32}/MySQL/MySQL Server 5.1/lib/opt"
-			"${ProgramFiles32}/MySQL/MySQL Server 5.1/lib"
-			"${ProgramFiles32}/MySQL/MySQL Server 5.0/lib/opt"
-			"${ProgramFiles32}/MySQL/MySQL Server 5.0/lib"
-			"${ProgramFiles32}/MySQL/MySQL Server 5/lib/opt"
-			"${ProgramFiles32}/MySQL/MySQL Server 5/lib"
-			"${ProgramFiles32}/MySQL/lib/opt"
-			"${ProgramFiles32}/MySQL/lib"
 			"${SystemDrive}/MySQL/lib/opt"
 			"${SystemDrive}/MySQL/lib/debug"
 			"${SystemDrive}/MySQL/lib/opt"
@@ -106,17 +85,24 @@ IF (WIN32)
 			"[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MySQL AB\\MySQL Server 5.0;Location]/lib"
 			"[HKEY_LOCAL_MACHINE\\SOFTWARE\\Wow6432Node\\MySQL AB\\MySQL Server 5.0;Location]/lib/opt"
 			"${ProgramFiles}/MySQL/* Server */lib/opt"
-			"${ProgramFiles32}/MySQL/* Server */lib/opt"
 			"${SystemDrive}/MySQL/* Server */lib/opt"
 			"${ProgramFiles}/MySQL/* Server */lib/"
-			"${ProgramFiles32}/MySQL/* Server */lib/"
 			"${SystemDrive}/MySQL/* Server */lib/"
 			"${ProgramFiles}/MySQL/* Server */lib/debug"
-			"${ProgramFiles32}/MySQL/* Server */lib/debug"
 			"${SystemDrive}/MySQL/* Server */lib/debug"
 			"c:/msys/local/include"
 	)
 ELSE ()
+	FIND_PATH(
+		MYSQL_INCLUDE_DIR
+		NAMES "mysql.h"
+		PATHS
+				/usr/include
+				/usr/include/mysql
+				/usr/local/include
+				/usr/local/include/mysql
+				/usr/local/mysql/include
+	)
 	FIND_LIBRARY(
 		MYSQL_LIBRARIES
 		NAMES mysqlclient_r mysqlclient libmysqlclient_r libmysqlclient
@@ -149,4 +135,3 @@ INCLUDE(FindPackageHandleStandardArgs)
 FIND_PACKAGE_HANDLE_STANDARD_ARGS(MySQL DEFAULT_MSG MYSQL_LIBRARIES MYSQL_INCLUDE_DIR)
 
 MARK_AS_ADVANCED(MYSQL_INCLUDE_DIR MYSQL_LIBRARIES)
-
