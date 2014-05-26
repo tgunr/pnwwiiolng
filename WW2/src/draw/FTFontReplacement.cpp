@@ -46,7 +46,6 @@ static const size_t MAX_CHAR_IN_LINE = 256;
 #include "draw/TextureFont.h"
 
 using namespace std;
-USING_EXT_NAMESPACE;
 
 extern Image* ReadDDSFile(const std::string& name);
 

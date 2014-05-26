@@ -292,12 +292,7 @@ namespace Fiod
 // We use a map of file descriptors to track memory allocations
 // for fiod files.
 
-#if platOS == OS_LINUX
 typedef std::unordered_map<SINT32, Fiod::FileState> FILE_MAP;
-#else
-typedef stdext::hash_map<SINT32, Fiod::FileState> FILE_MAP;
-#endif
-
 static FILE_MAP s_fileMap;
 
 //////////////////////////////////////////////////////////////////////
