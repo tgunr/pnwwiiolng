@@ -217,7 +217,7 @@ private:
 	bool mapFileHandleInternal();
 
 public:
-	// Accesors.
+	// Accessors.
 
 	//! Get a pointer to the first byte of the file unless we are a view.
 	const void* basePtr() const { return m_basePtr; }

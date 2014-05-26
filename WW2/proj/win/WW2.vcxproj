@@ -925,6 +925,7 @@
     <ClInclude Include="..\..\src\imap\ww2imap.h" />
     <ClInclude Include="..\..\src\dbug\dbug.h" />
     <ClInclude Include="..\..\src\include\defs.h" />
+    <ClInclude Include="..\..\src\include\io_mapped_file.h" />
     <ClInclude Include="..\..\src\include\mobileSpawnEnums.h" />
     <ClInclude Include="..\..\src\include\platforms.h" />
     <ClInclude Include="..\..\src\include\precompile_includes.h" />

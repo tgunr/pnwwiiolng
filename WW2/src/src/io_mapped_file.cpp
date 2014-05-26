@@ -1,5 +1,5 @@
 #include <syscfg.h>	// Path is project specific.
-#include "io_mapped_file.h"
+#include "include/io_mapped_file.h"
 // IO::MappedFile -- Based on SMUGL::cl_mappedfile
 // Author: Oliver "kfsone" Smith 2012 <oliver@kfs.org>
 // Redistribution and re-use fully permitted contingent on inclusion of these 3 lines in copied- or derived- works.
@@ -46,7 +46,7 @@ static inline imf_handle_t OsOpenFile(const char* filename_)
 #endif
 }
 
-// Handle the same with widecharacters.
+// Handle the same with wide characters.
 #if IO_MAP_TYPE == _IMT_WINDOWS && defined(UNICODE)
 static inline imf_handle_t OsOpenFile(const wchar_t* filename_)
 {
@@ -174,7 +174,7 @@ MappedFile::mapFileHandleInternal()
 #else
 	// Posix implementation.
 	static const int flags = 
-			  MAP_FILE 		// Compatability flag, not really required.
+			  MAP_FILE 		// Compatibility flag, not really required.
 			| MAP_SHARED	// Share buffers with any other mmappers of this file.
 			;
 	void* const ptr =

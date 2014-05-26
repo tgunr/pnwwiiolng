@@ -1644,6 +1644,9 @@
     <ClInclude Include="..\..\src\omg\omgMissionSortieData.hxx">
       <Filter>omg\Generated Headers</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\include\io_mapped_file.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\cfg\cfgData.cpp">
