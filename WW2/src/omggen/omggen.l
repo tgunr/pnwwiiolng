@@ -12,14 +12,13 @@ static std::string g_condition;
 
 extern void yyerror(const char* fmt, ...);
 extern void yyaddcode(const char* text, std::string& into);
+
+#ifdef WIN32
+#include <io.h>
+#endif
 %}
 
-%option				noyywrap
-%option				yylineno
-%option				stack
-%option				nounistd
-%option				never-interactive
-%option				batch
+%option				noyywrap yylineno stack nounistd never-interactive batch fast
 
 %x ML_CMT
 %x IF_COND
