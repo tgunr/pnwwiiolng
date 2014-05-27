@@ -1,6 +1,6 @@
 # Visual Studio on Windows.
 
-include_directories(
+INCLUDE_DIRECTORIES(
 	${CMAKE_CURRENT_SOURCE_DIR}/../include
 	${CMAKE_CURRENT_SOURCE_DIR}/../proj/win
 )
