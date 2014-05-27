@@ -4,7 +4,15 @@
 #include "omggen.yy.h"
 #include "omggen.tab.h"
 
+#include <stack>
 #include <string>
+
+#ifdef WIN32
+#define WIN32_LEAN_AND_MEAN
+#include <Windows.h>
+#undef min
+#undef max
+#endif
 
 long long leakCount = 0;
 static const char* s_exeName;
@@ -18,6 +26,7 @@ static std::string s_namespace = "";
 static std::string s_namespaceQual = "";
 static std::set<std::string> s_includes;
 
+static std::stack<std::string> s_filenames;
 const char* g_currentFile = nullptr;
 
 enum { MAX_MESSAGE_GROUPS = 32, MAX_GROUP_FIELDS = 32 };
@@ -35,18 +44,6 @@ static TypeMap s_typeMap = {
 	{ "FLOAT", "", false, "" },
 	{ "DOUBLE", "", false, "" },
 	{ "bool", "", false, "" },
-	{ "FULL_OBJ_ID", "", true, "wwii/wwiiFullObjIDPacker.h" },
-	{ "WEAPON_SPEC", "", true, "weap/weapSpecPacker.h" },
-	{ "WEAPON_SERIAL", "", true, "" },
-	{ "RANK_NO", "", false, "" },
-	{ "ChatHandle", "", false, "" },
-	{ "NetTimeMS", "Teul::NetTimeMS", false, "teul/teulNetTimeMS.h" },
-	{ "TeulTimeMS", "", false, "" },
-	{ "TeulDeltaMS", "", false, "" },
-	{ "PermissionMask", "", false, "" },
-	{ "playerid_t", "", false, "" },
-	{ "instanceid_t", "", false, "" },
-	{ "WorldPosition_m", "", true, "wwii/wwiiServerTrackedObject.h" },
 };
 
 static unsigned int s_msgX;					// X of messages defined in this file.
@@ -260,11 +257,22 @@ static Node*	s_currentNode;
 
 //////////////////////////////////////////////////////////////////////
 
+static void _reportLocation(FILE* fp)
+{
+#if defined(WIN32)
+	char fullPath[1024];
+	GetFullPathNameA(g_currentFile, sizeof(fullPath), fullPath, nullptr);
+	fprintf(fp, "%s(%u): ", fullPath, yylineno);
+#else
+	fprintf(fp, "%s:%u: ", g_currentFile, yylineno);
+#endif
+}
+
 template<typename... Args>
 void annotate(const char* fmt, Args... args)
 {
 	if (s_debug) {
-		fprintf(stdout, "%s:%u: ", g_currentFile, yylineno);
+		_reportLocation(stdout);
 		fprintf(stdout, fmt, std::forward<Args>(args)...);
 		fprintf(stdout, "\n");
 	}
@@ -272,7 +280,8 @@ void annotate(const char* fmt, Args... args)
 
 void yyerror(const char *s, ...)
 {
-	fprintf(stderr, "%s:%u: error: ", g_currentFile, yylineno);
+	_reportLocation(stderr);
+	fprintf(stderr, "error O101: ");
 	va_list ap;
 	va_start(ap, s);
 	vfprintf(stderr, s, ap);
@@ -540,6 +549,27 @@ void omg_add_code(const char* code)
 const char* omg_current_node_name()
 {
 	return s_currentNode->m_name.c_str();
+}
+
+void omg_using(const char* filename)
+{
+	FILE* fp = fopen(filename, "r");
+	if (!fp) {
+		yyfatal("Unable to open USING file \"%s\".\n", filename);
+		return;
+	}
+	yypush_buffer_state(yy_create_buffer(fp, YY_BUF_SIZE));
+	s_filenames.push(filename);
+	g_currentFile = s_filenames.top().c_str();
+}
+
+void omg_eof()
+{
+	if (s_filenames.size() > 1)
+		s_filenames.pop();
+	if (!s_filenames.empty())
+		g_currentFile = s_filenames.top().c_str();
+	yypop_buffer_state();
 }
 
 void omg_add_include(const char* filename)
@@ -1182,6 +1212,7 @@ int main(int argc, const char** argv)
 		fprintf(stderr, "ERROR: No input filename specified.\n");
 		usage();
 	}
+	s_filenames.push(g_currentFile);
 	FILE* f = fopen(g_currentFile, "r");
 	if (!f) {
 		perror(g_currentFile);

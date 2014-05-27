@@ -48,6 +48,7 @@ NAMESPACE				return TKW_NAMESPACE;
 TYPE					return TKW_TYPE;
 AS						return TKW_AS;
 BY\ +REF				return TKW_BY_REF;
+USING					return TKW_USING;
 INCLUDE					return TKW_INCLUDE;
 
 	/* statement keywords */
@@ -86,7 +87,7 @@ ARRAY					return TKW_ARRAY;
 -?[0-9]{1,20}				{ yylval.str = strdup(yytext); ++leakCount; return TINTEGER; }
 
 	/* quoted string */
-\"[^"+]\"				{ char* str = strdup(yytext + 1); str[strlen(str) - 1] = '\0'; yylval.str = str; ++leakCount; return QUOTSTRING; }
+\"(\\\\|\\\"|[^\r\n"])*\"	{ char* str = strdup(yytext + 1); str[strlen(str) - 1] = '\0'; yylval.str = str; ++leakCount; return QUOTSTRING; }
 
 [{};()\[\]]				{ return yytext[0]; }
 
@@ -94,4 +95,6 @@ ARRAY					return TKW_ARRAY;
 [ \t]					/* skip whitespace */
 \n
 
-.						{ yyerror("Unexpected string '%s'\n", yytext); yyterminate(); }
+.						{ yyfatal("Unexpected string '%s'\n", yytext); }
+
+<<EOF>>					{ omg_eof(); if (!YY_CURRENT_BUFFER) yyterminate(); }

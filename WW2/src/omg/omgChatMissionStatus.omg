@@ -1,5 +1,7 @@
 NAMESPACE Chat;
 
+USING "omg/typedefs.omg";
+
 MESSAGE MissionStatus
 {
 	GROUP Header

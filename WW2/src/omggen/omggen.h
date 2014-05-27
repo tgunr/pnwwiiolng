@@ -62,6 +62,8 @@ void omg_start_if(const char* condition);
 void omg_end_if();
 void omg_start_array(std::string structName, std::string typedefName, std::string memberName, std::string dimension);
 void omg_end_array();
+void omg_using(const char* filename);
+void omg_eof();
 void omg_add_include(const char* filename);
 
 const char* omg_current_node_name();

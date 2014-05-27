@@ -22,6 +22,7 @@
 %token			TKW_TYPE
 %token			TKW_AS
 %token			TKW_BY_REF
+%token			TKW_USING
 %token			TKW_INCLUDE
 
 // statement keywords
@@ -41,66 +42,65 @@
 
 %type <str>		include-filename
 %type <sVal>	valid-group
-%type <sVal>	valid-message
 %type <sVal>	valid-field
 %type <sVal>	typename scoped-identifier
-%type <sVal>	typedef-as
+%type <sVal>	typedef-as typedef-inc
 %type <bVal>	typedef-ref
+%type <sVal>	message-id
 %type <str>		array-typename array-typedef array-membername array-dimension
 
 %%
 
-file				:	optional-directives definitions
+file				:	directives
 					;
 
-optional-directives	:	/* empty */
-					|	directives
+directives			:	directive ';'
+					|	directives directive ';'
 					;
 
-directives			:	directive
-					|	directives directive
-					;
-
-directive			:	TKW_DEBUG ';' { omg_enable_debug(); }
-					|	TKW_DEBUG { yymissing("semicolon", "keyword", "DEBUG"); }
-					|	TKW_NAMESPACE TIDENTIFIER ';' { omg_namespace($2); }
-					|	TKW_NAMESPACE TIDENTIFIER { yymissing("semicolon", $2, "NAMESPACE"); }
-					|	TKW_NAMESPACE { yymissing("identifier", "keyword", "NAMESPACE"); }
-					|	TKW_TYPE type-definition ';'
-					|	TKW_TYPE scoped-identifier { yyfatal("TYPE declarations must specify a non-qualified typename. Use TYPE .. AS %s instead", $2); }
-					|	TKW_TYPE { yyfatal("Malformed TYPE definition", ""); }
+directive			:	debug-directive 
+					|	namespace-directive
+					|	type-directive
+					|	using-directive
 					|	include-filename { omg_add_include($1); }
+					|	message-directive
 					;
 
-type-definition		:	TIDENTIFIER typedef-as typedef-ref include-filename { omg_type_decl(TypeDef($1, $2, $3, $4)); }
-					|	TIDENTIFIER typedef-as typedef-ref { omg_type_decl(TypeDef($1, $2, $3, nullptr)); }
+debug-directive		:	TKW_DEBUG { omg_enable_debug(); }
 					;
 
-typedef-as			:	/* empty */ { $$ = nullptr; }
-					|	TKW_AS typename { $$ = $2; }
+namespace-directive	:	TKW_NAMESPACE TIDENTIFIER { omg_namespace($2); }
+					|	TKW_NAMESPACE { yymissing("identifier", "keyword", "NAMESPACE"); }
+					;
+
+type-directive		:	TKW_TYPE TIDENTIFIER typedef-as typedef-ref typedef-inc { omg_type_decl(TypeDef($2, $3, $4, $5)); }
+					|	TKW_TYPE scoped-identifier { yyfatal("TYPE declarations must specify a non-qualified typename. Use TYPE .. AS %s instead", $2); }
+					;
+
+typedef-as			:	/* empty */ { $$ = strdup(""); }
+					|	TKW_AS typename { $$ = strdup($2); }
 					;
 
 typedef-ref			:	/* empty */ { $$ = false; }
 					|	TKW_BY_REF { $$ = true; }
 					;
 
+typedef-inc			:	/* empty */ { $$ = strdup(""); }
+					|	TKW_INCLUDE QUOTSTRING { $$ = strdup($2); }
+					;
+
+using-directive		:	TKW_USING QUOTSTRING { omg_using($2); }
+					;
+
 include-filename	:	TKW_INCLUDE QUOTSTRING { $$ = strdup($2); }
 					;
 
-definitions			:	definition
-					|	definitions definition
-					;
-
-definition			:	message
-					;
-				
-message				:	valid-message ';'
-					|	valid-message { yymissing("semicolon", "MESSAGE", $1); }
-					;
-
-valid-message		:	TKW_MESSAGE TIDENTIFIER	{ omg_start_message($2); } message-body { omg_end_message(); $$ = $2; }
-					|	TKW_MESSAGE TIDENTIFIER	{ yymissing("open-brace ('{')", "MESSAGE", $2); }
+message-directive	:	message-id message-body { omg_end_message(); }
+					|	message-id { yymissing("open-brace ('{')", "MESSAGE", $1); }
 					|	TKW_MESSAGE { yymissing("identifier", "keyword", "MESSAGE"); }
+					;
+
+message-id			:	TKW_MESSAGE TIDENTIFIER	{ omg_start_message($2); $$ = strdup($2); } 
 					;
 
 message-body		:	'{' '}'

@@ -1,5 +1,7 @@
 NAMESPACE MM;
 
+USING "omg/typedefs.omg";
+
 MESSAGE SortieData
 {
 	// Describes an ongoing or completed sortie.
