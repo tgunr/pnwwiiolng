@@ -46,7 +46,7 @@ extern int yylineno;
 
 // Functions common to omggen.cpp and the .y file.
 void yyerror(const char* s, ...);
-void yyfatal(const char* s, const char* cause);
+void yyfatal(const char* s, ...);
 void yymissing(const char* what, const char* type, const char* name);
 void omg_enable_debug();
 void omg_namespace(const char* name);

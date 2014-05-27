@@ -26,7 +26,6 @@ static std::string s_namespace = "";
 static std::string s_namespaceQual = "";
 static std::set<std::string> s_includes;
 
-static std::stack<std::string> s_filenames;
 const char* g_currentFile = nullptr;
 
 enum { MAX_MESSAGE_GROUPS = 32, MAX_GROUP_FIELDS = 32 };
@@ -51,6 +50,18 @@ static unsigned int s_msgY;					// next msgY to assign.
 
 static const char s_indents[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
 static const size_t MAX_INDENTS = sizeof(s_indents) -1;
+
+struct Using
+{
+	std::string			m_filename;
+	FILE*				m_fp;
+	int					m_lineNo;
+
+	Using(const char* filename, FILE* fp, int lineNo)
+		: m_filename(filename), m_fp(fp), m_lineNo(lineNo)
+	{ }
+};
+std::stack<Using>		s_usings;
 
 struct Node
 {
@@ -289,9 +300,15 @@ void yyerror(const char *s, ...)
 	fprintf(stderr, "\n");
 }
 
-void yyfatal(const char* s, const char* reason)
+void yyfatal(const char* s, ...)
 {
-	yyerror(s, reason);
+	_reportLocation(stderr);
+	fprintf(stderr, "error F101: ");
+	va_list ap;
+	va_start(ap, s);
+	vfprintf(stderr, s, ap);
+	va_end(ap);
+	fprintf(stderr, "\n");
 	exit(1);
 }
 
@@ -558,17 +575,23 @@ void omg_using(const char* filename)
 		yyfatal("Unable to open USING file \"%s\".\n", filename);
 		return;
 	}
+	s_usings.top().m_lineNo = yylineno;
 	yypush_buffer_state(yy_create_buffer(fp, YY_BUF_SIZE));
-	s_filenames.push(filename);
-	g_currentFile = s_filenames.top().c_str();
+	s_usings.emplace(filename, fp, 0);
+	g_currentFile = s_usings.top().m_filename.c_str();
+	yylineno = 1;
 }
 
 void omg_eof()
 {
-	if (s_filenames.size() > 1)
-		s_filenames.pop();
-	if (!s_filenames.empty())
-		g_currentFile = s_filenames.top().c_str();
+	if (s_usings.size() > 1) {
+		fclose(s_usings.top().m_fp);
+		s_usings.pop();
+	}
+	if (!s_usings.empty()) {
+		g_currentFile = s_usings.top().m_filename.c_str();
+		yylineno = s_usings.top().m_lineNo;
+	}
 	yypop_buffer_state();
 }
 
@@ -1212,12 +1235,12 @@ int main(int argc, const char** argv)
 		fprintf(stderr, "ERROR: No input filename specified.\n");
 		usage();
 	}
-	s_filenames.push(g_currentFile);
 	FILE* f = fopen(g_currentFile, "r");
 	if (!f) {
 		perror(g_currentFile);
 		return 1;
 	}
+	s_usings.emplace(g_currentFile, f, 0);
 	yyrestart(f);
 	yyparse();
 	fclose(f);

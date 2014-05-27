@@ -44,7 +44,7 @@
 %type <sVal>	valid-group
 %type <sVal>	valid-field
 %type <sVal>	typename scoped-identifier
-%type <sVal>	typedef-as typedef-inc
+%type <sVal>	typedef-as typedef-inc using-directive
 %type <bVal>	typedef-ref
 %type <sVal>	message-id
 %type <str>		array-typename array-typedef array-membername array-dimension
@@ -54,14 +54,14 @@
 file				:	directives
 					;
 
-directives			:	directive ';'
-					|	directives directive ';'
+directives			:	directive
+					|	directives directive
 					;
 
-directive			:	debug-directive 
+directive			:	debug-directive
 					|	namespace-directive
 					|	type-directive
-					|	using-directive
+					|	using-directive { omg_using($1); }
 					|	include-filename { omg_add_include($1); }
 					|	message-directive
 					;
@@ -69,12 +69,35 @@ directive			:	debug-directive
 debug-directive		:	TKW_DEBUG { omg_enable_debug(); }
 					;
 
-namespace-directive	:	TKW_NAMESPACE TIDENTIFIER { omg_namespace($2); }
+namespace-directive	:	TKW_NAMESPACE TIDENTIFIER ';' { omg_namespace($2); }
+					|	TKW_NAMESPACE TIDENTIFIER { yyfatal("Missing semi-colon after '%s %s' directive.", "NAMESPACE", $2); }
 					|	TKW_NAMESPACE { yymissing("identifier", "keyword", "NAMESPACE"); }
 					;
 
-type-directive		:	TKW_TYPE TIDENTIFIER typedef-as typedef-ref typedef-inc { omg_type_decl(TypeDef($2, $3, $4, $5)); }
+type-directive		:	typedef ';'
+					|	typedef error { yyfatal("Missing semi-colon after '%s' directive.", "TYPE"); }
 					|	TKW_TYPE scoped-identifier { yyfatal("TYPE declarations must specify a non-qualified typename. Use TYPE .. AS %s instead", $2); }
+					|	TKW_TYPE { yymissing("identifier", "keyword", "TYPE"); }
+					;
+
+using-directive		:	TKW_USING QUOTSTRING ';' { $$ = strdup($2); }
+					|	TKW_USING QUOTSTRING { yyfatal("Missing semi-colon after '%s \"%s\"' directive.", "USING", $2); }
+					|	TKW_USING { yymissing("quoted filename", "keyword", "USING"); }
+					;
+
+include-filename	:	TKW_INCLUDE QUOTSTRING ';' { $$ = strdup($2); }
+					|	TKW_INCLUDE QUOTSTRING { yyfatal("Missing semi-colon after '%s \"%s\"' directive.", "INCLUDE", $2); $$ = nullptr; }
+					|	TKW_INCLUDE { yymissing("quoted filename", "keyword", "INCLUDE"); $$ = nullptr; }
+					;
+
+message-directive	:	message-id message-body ';' { omg_end_message(); }
+					|	message-id message-body { yyfatal("Missing semi-colon after '%s %s' directive.", "MESSAGE", $1); }
+					|	message-id { yymissing("open-brace ('{')", "MESSAGE", $1); }
+					|	TKW_MESSAGE { yymissing("identifier", "keyword", "MESSAGE"); }
+					;
+
+
+typedef				:	TKW_TYPE TIDENTIFIER typedef-as typedef-ref typedef-inc  { omg_type_decl(TypeDef($2, $3, $4, $5)); }
 					;
 
 typedef-as			:	/* empty */ { $$ = strdup(""); }
@@ -89,16 +112,6 @@ typedef-inc			:	/* empty */ { $$ = strdup(""); }
 					|	TKW_INCLUDE QUOTSTRING { $$ = strdup($2); }
 					;
 
-using-directive		:	TKW_USING QUOTSTRING { omg_using($2); }
-					;
-
-include-filename	:	TKW_INCLUDE QUOTSTRING { $$ = strdup($2); }
-					;
-
-message-directive	:	message-id message-body { omg_end_message(); }
-					|	message-id { yymissing("open-brace ('{')", "MESSAGE", $1); }
-					|	TKW_MESSAGE { yymissing("identifier", "keyword", "MESSAGE"); }
-					;
 
 message-id			:	TKW_MESSAGE TIDENTIFIER	{ omg_start_message($2); $$ = strdup($2); } 
 					;
