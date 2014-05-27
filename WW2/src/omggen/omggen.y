@@ -43,8 +43,7 @@
 %type <sVal>	valid-group
 %type <sVal>	valid-message
 %type <sVal>	valid-field
-%type <sVal>	qualified-type
-%type <typeDef>	type-definition
+%type <sVal>	typename scoped-identifier
 %type <sVal>	typedef-as
 %type <bVal>	typedef-ref
 %type <str>		array-typename array-typedef array-membername array-dimension
@@ -68,19 +67,21 @@ directive			:	TKW_DEBUG ';' { omg_enable_debug(); }
 					|	TKW_NAMESPACE TIDENTIFIER { yymissing("semicolon", $2, "NAMESPACE"); }
 					|	TKW_NAMESPACE { yymissing("identifier", "keyword", "NAMESPACE"); }
 					|	TKW_TYPE type-definition ';'
-					|	TKW_TYPE qualified-type { yyfatal("TYPE declarations must specify a non-qualified typename. Use TYPE .. AS %s instead", $2); }
+					|	TKW_TYPE scoped-identifier { yyfatal("TYPE declarations must specify a non-qualified typename. Use TYPE .. AS %s instead", $2); }
 					|	TKW_TYPE { yyfatal("Malformed TYPE definition", ""); }
 					|	include-filename { omg_add_include($1); }
 					;
 
 type-definition		:	TIDENTIFIER typedef-as typedef-ref include-filename { omg_type_decl(TypeDef($1, $2, $3, $4)); }
-					|	TIDENTIFIER typedef-as typedef-ref { omg_type_decl(TypeDef($1, $2, $3, "")); }
+					|	TIDENTIFIER typedef-as typedef-ref { omg_type_decl(TypeDef($1, $2, $3, nullptr)); }
 					;
 
-typedef-as			:	TKW_AS qualified-type { $$ = $2; }
+typedef-as			:	/* empty */ { $$ = nullptr; }
+					|	TKW_AS typename { $$ = $2; }
 					;
 
-typedef-ref			:	TKW_BY_REF { $$ = true; }
+typedef-ref			:	/* empty */ { $$ = false; }
+					|	TKW_BY_REF { $$ = true; }
 					;
 
 include-filename	:	TKW_INCLUDE QUOTSTRING { $$ = strdup($2); }
@@ -147,7 +148,7 @@ field				:	valid-field ';'
 					|	valid-field { yyfatal("Missing trailing semicolon after field '%s'", $1); }
 					;
 
-valid-field			:	qualified-type TIDENTIFIER { omg_start_field($1, $2); } field-opts { omg_end_field(); $$ = $2; }
+valid-field			:	typename TIDENTIFIER { omg_start_field($1, $2); } field-opts { omg_end_field(); $$ = $2; }
 					;
 
 field-opts			:	/* empty */
@@ -155,8 +156,12 @@ field-opts			:	/* empty */
 
 func				:	TCODE_FRAG { omg_add_code($1); }
 				
-qualified-type		:	TIDENTIFIER { $<sVal>$ = $<str>1; }
-					|	qualified-type TKW_CPP_SCOPE TIDENTIFIER { char* str = (char*)malloc(strlen($1) + 2 + strlen($3) + 1); sprintf(str, "%s::%s", $1, $3); $$ = str; }
+typename			:	TIDENTIFIER { $<sVal>$ = $<str>1; }
+					|	scoped-identifier
+					;
+
+scoped-identifier	:	TIDENTIFIER TKW_CPP_SCOPE TIDENTIFIER { char* str = (char*)malloc(strlen($1) + 2 + strlen($3) + 1); sprintf(str, "%s::%s", $1, $3); $$ = str; }
+					|	scoped-identifier TKW_CPP_SCOPE TIDENTIFIER { char* str = (char*)malloc(strlen($1) + 2 + strlen($3) + 1); sprintf(str, "%s::%s", $1, $3); $$ = str; }
 					;
 
 conditional-block	:	TKW_IF { omg_start_if($1); } conditional-body { omg_end_if(); }
