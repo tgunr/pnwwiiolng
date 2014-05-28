@@ -65,6 +65,9 @@ void omg_end_array();
 void omg_using(const char* filename);
 void omg_eof();
 void omg_add_include(const char* filename);
+void omg_start_enum(const char* enumName);
+void omg_end_enum();
+void omg_add_enum_value(const char* name);
 
 const char* omg_current_node_name();
 

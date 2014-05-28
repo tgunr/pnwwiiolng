@@ -691,6 +691,10 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
 				dbse/dbseTypes.h
 		dbse/dbseClientMessages.cpp
 			dbse/dbseClientMessages.h
+			dbse/dbseConstants.h
+			teul/teulBasic.h
+			wwii/wwiiCallbacks.h
+			dbse/dbseClient.h
 
 		omg/omgChatMissionStatus.cxx
 
@@ -997,6 +1001,11 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
 			chat/chatdbParser.h
 		dbse/dbseHost.cpp
 		dbse/dbseHostMessages.cpp
+			dbse/dbseConstants.h
+			dbse/dbseTypes.h
+			wwii/wwiiCallbacks.h
+			teul/teulBasic.h
+			server/serverConfigVars.h
 		wwii/wwiiSquads.cpp
 			wwii/wwiiSquads.h
 

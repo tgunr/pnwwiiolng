@@ -24,6 +24,7 @@
 %token			TKW_BY_REF
 %token			TKW_USING
 %token			TKW_INCLUDE
+%token			TKW_ENUM
 
 // statement keywords
 %token			TKW_MESSAGE TKW_GROUP
@@ -46,7 +47,7 @@
 %type <sVal>	typename scoped-identifier
 %type <sVal>	typedef-as typedef-inc using-directive
 %type <bVal>	typedef-ref
-%type <sVal>	message-id
+%type <sVal>	message-id enum-id
 %type <str>		array-typename array-typedef array-membername array-dimension
 
 %%
@@ -64,6 +65,7 @@ directive			:	debug-directive
 					|	using-directive { omg_using($1); }
 					|	include-filename { omg_add_include($1); }
 					|	message-directive
+					|	enum-directive
 					;
 
 debug-directive		:	TKW_DEBUG { omg_enable_debug(); }
@@ -93,9 +95,14 @@ include-filename	:	TKW_INCLUDE QUOTSTRING ';' { $$ = strdup($2); }
 message-directive	:	message-id message-body ';' { omg_end_message(); }
 					|	message-id message-body { yyfatal("Missing semi-colon after '%s %s' directive.", "MESSAGE", $1); }
 					|	message-id { yymissing("open-brace ('{')", "MESSAGE", $1); }
-					|	TKW_MESSAGE { yymissing("identifier", "keyword", "MESSAGE"); }
 					;
 
+enum-directive		:	enum-id '{' enum-entries '}' ';' { omg_end_enum(); }
+					|	enum-id '{' enum-entries ',' '}' ';' { omg_end_enum(); }
+					|	enum-id '{' '}' { yyfatal("Empty enumeration '%s'", $1); }
+					|	enum-id '{' { yyfatal("Mal-formed ENUM directive ('%s')", $1); }
+					|	enum-id { yyfatal("Expected open-brace ('{') after 'ENUM %s' directive.", $1); }
+					;
 
 typedef				:	TKW_TYPE TIDENTIFIER typedef-as typedef-ref typedef-inc  { omg_type_decl(TypeDef($2, $3, $4, $5)); }
 					;
@@ -113,7 +120,20 @@ typedef-inc			:	/* empty */ { $$ = strdup(""); }
 					;
 
 
+enum-id				:	TKW_ENUM TIDENTIFIER { omg_start_enum($2); $$ = strdup($2); }
+					|	TKW_ENUM { yyfatal("Expected identifier after '%s' directive.", "ENUM"); }
+					;
+
+enum-entries		:	enum-entry
+					|	enum-entries ',' enum-entry
+					;
+
+enum-entry			:	TIDENTIFIER	{ omg_add_enum_value($1); }
+					;
+
+
 message-id			:	TKW_MESSAGE TIDENTIFIER	{ omg_start_message($2); $$ = strdup($2); } 
+					|	TKW_MESSAGE { yyfatal("Expected identifier after '%s' directive.", "MESSAGE"); }
 					;
 
 message-body		:	'{' '}'

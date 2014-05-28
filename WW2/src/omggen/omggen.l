@@ -52,6 +52,7 @@ USING					return TKW_USING;
 INCLUDE					return TKW_INCLUDE;
 
 	/* statement keywords */
+ENUM					return TKW_ENUM;
 MESSAGE					return TKW_MESSAGE;
 GROUP					return TKW_GROUP;
 
@@ -89,12 +90,12 @@ ARRAY					return TKW_ARRAY;
 	/* quoted string */
 \"(\\\\|\\\"|[^\r\n"])*\"	{ char* str = strdup(yytext + 1); str[strlen(str) - 1] = '\0'; yylval.str = str; ++leakCount; return QUOTSTRING; }
 
-[{};()\[\]]				{ return yytext[0]; }
+[{};()\[\]=,]				{ return yytext[0]; }
 
 	/* misc */
-[ \t]					/* skip whitespace */
+[ \t]						/* skip whitespace */
 \n
 
-.						{ yyfatal("Unexpected string '%s'\n", yytext); }
+.							{ yyfatal("Unexpected string '%s'\n", yytext); }
 
-<<EOF>>					{ omg_eof(); if (!YY_CURRENT_BUFFER) yyterminate(); }
+<<EOF>>						{ omg_eof(); if (!YY_CURRENT_BUFFER) yyterminate(); }

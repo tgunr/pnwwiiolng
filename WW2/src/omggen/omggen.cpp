@@ -72,6 +72,8 @@ struct Node
 	,	Field
 	,	Condition
 	,	Array
+	,	Enumeration
+	,	EnumValue
 	};
 
 	Node*				m_next;
@@ -257,9 +259,36 @@ struct Array : public Node
 	uint16_t GetPackBits() const;
 };
 
+struct Enumeration : public Node
+{
+	uint32_t	m_count;
+
+	Enumeration(std::string&& enumName, Node* parent)
+		: Node(Node::Type::Enumeration, std::move(enumName), parent)
+		, m_count(0)
+	{}
+
+	void Emit(size_t indentLevel) const override;
+};
+
+struct EnumValue : public Node
+{
+	uint32_t	m_value;
+
+	EnumValue(std::string&& name, uint32_t value, Node* parent)
+		: Node(Node::Type::EnumValue, std::move(name), parent)
+		, m_value(value)
+	{
+	}
+
+	void Emit(size_t indentLevel) const override;
+};
+
 static Message* s_firstMessage;
 static Message* s_lastMessage;
 static Node*	s_currentNode;
+
+std::vector<Enumeration*> s_enumerations;
 
 //////////////////////////////////////////////////////////////////////
 
@@ -358,7 +387,7 @@ static void _endOfNode(Node::Type expectedType)
 
 static void _checkName(const char* name)
 {
-	if (s_currentNode->m_name.compare(name) == 0 || s_currentNode->Contains(name))
+	if (s_currentNode && (s_currentNode->m_name.compare(name) == 0 || s_currentNode->Contains(name)))
 		yyfatal("Redefinition of '%s' in this scope", name);
 	if (_findTypeDef(name))
 		yyfatal("Invalid use of type name '%s' as identifier", name);
@@ -453,7 +482,7 @@ void omg_end_group()
 	annotate("end group %s", s_currentNode->m_name.c_str());
 
 	if (s_currentNode->m_child == nullptr)
-		yyfatal("GROUP with empty definition, '%s'", s_currentNode->m_name.c_str());
+		yyfatal("'GROUP %s' has empty definition.", s_currentNode->m_name.c_str());
 
 	_endOfNode(Node::Type::Group);
 }
@@ -598,6 +627,46 @@ void omg_eof()
 void omg_add_include(const char* filename)
 {
 	s_includes.insert(filename);
+}
+
+void omg_start_enum(const char* enumName)
+{
+	annotate("Adding enum %s", enumName);
+
+	assert(!s_currentNode || !s_currentNode->IsOrIsChildOf(Node::Type::Enumeration));
+
+	_checkName(enumName);
+
+	if (islower(enumName[0]))
+		yyfatal("ENUM names must start with a capital letter ('%s')", enumName);
+
+	Enumeration* enumeration = new Enumeration(enumName, s_currentNode);
+	s_enumerations.push_back(enumeration);
+	s_currentNode = enumeration;
+}
+
+void omg_end_enum()
+{
+	annotate("end enum %s", s_currentNode->m_name.c_str());
+
+	if (s_currentNode->m_child == nullptr)
+		yyfatal("'ENUM %s' has empty definition.", s_currentNode->m_name.c_str());
+
+	_endOfNode(Node::Type::Enumeration);
+}
+
+void omg_add_enum_value(const char* name)
+{
+	if (islower(name[0]) && name[0] != '_')
+		yyfatal("ENUM %s value '%s' must start with a capital letter or an underscore.", s_currentNode->m_name.c_str(), name);
+
+	_checkName(name);
+
+	Enumeration* enumeration = dynamic_cast<Enumeration*>(s_currentNode);
+	assert(enumeration != nullptr);
+	EnumValue* value = new EnumValue(name, enumeration->m_count++, s_currentNode);
+
+	annotate("Adding ENUM %s value %d", s_currentNode->m_name.c_str(), name, value->m_value);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1041,6 +1110,27 @@ void Array::EmitUnpack(size_t indentLevel) const
 }
 
 //////////////////////////////////////////////////////////////////////
+
+void Enumeration::Emit(size_t indentLevel) const
+{
+	const char* indent = _getIndents(indentLevel);
+	HXX("%senum class %s\n", indent, m_name.c_str());
+	HXX("%s{\n", indent);
+	for (Node* child = m_child; child; child = child->m_next) {
+		child->Emit(indentLevel + 1);
+	}
+	HXX("%s\tMax%s\n", indent, m_name.c_str());
+	HXX("%s};\n\n", indent);
+}
+
+//////////////////////////////////////////////////////////////////////
+
+void EnumValue::Emit(size_t indentLevel) const
+{
+	HXX("%s%s,\n", _getIndents(indentLevel), m_name.c_str());
+}
+
+//////////////////////////////////////////////////////////////////////
 // Header file functions
 
 static void _emitHeaderMast()
@@ -1132,6 +1222,12 @@ static void _generateOutput()
 	_emitHeaderPrologue();
 	_emitSourcePrologue();
 
+	if (s_enumerations.empty() == false) {
+		HXX("// Enumerations\n\n");
+		for (auto enumPtr : s_enumerations) {
+			enumPtr->Emit(0);
+		}
+	}
 	for (const Message* message = s_firstMessage; message; message = static_cast<const Message*>(message->m_next)) {
 		message->Emit(1);
 	}
