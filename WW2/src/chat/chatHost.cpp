@@ -86,7 +86,6 @@
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiNetPorts.h"
 #include "wwii/wwiiServerTrackedObject.h"
-#include "wwii/wwiiString.h"
 #include "wwii/wwiiThreads.h"
 
 extern UINT32 serverGetAuthIP();

@@ -49,7 +49,6 @@
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiConfigVars.h"
 #include "wwii/wwiiIRC.h"
-#include "wwii/wwiiString.h"
 
 using namespace std;
 

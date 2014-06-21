@@ -33,7 +33,6 @@
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiHCUnits.h"
-#include "wwii/wwiiString.h"
 
 static TEUL_CALLBACK* _SEND_PERSONA_UPDATE;
 static TEUL_CALLBACK* _SEND_SERVER_INFO;

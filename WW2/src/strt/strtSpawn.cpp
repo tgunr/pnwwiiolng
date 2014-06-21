@@ -45,7 +45,6 @@
 #include "strt/strtSupply.h"
 #include "strt/strtHostLua.h"
 #include "strt/strtHCUnits.h"
-#include "wwii/wwiiString.h"
 #include "strt/strtPostListReply.h"
 #include "server/serverServerInfo.h"
 #include "wwii/wwiiServerTypeEnums.h"

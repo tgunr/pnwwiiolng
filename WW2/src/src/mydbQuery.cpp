@@ -56,7 +56,8 @@ DBRow::NextString(char* destination, size_t size)
 	if ( m_currentColumn < m_columns && size > 0 )
 	{
 		const char* source = NextColumn();
-		if ( source != nullptr ) strlcpy(destination, source, size);
+		if ( source != nullptr )
+			strlcpy(destination, source, size);
 	}
 
 	return destination;

@@ -12,7 +12,6 @@
 #include "teul/teulPackers.h"
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiPack.h"
-#include "wwii/wwiiString.h"
 
 // Map unit_id to a HCUnit
 HCUNIT_INDEX hcUnits;
@@ -53,8 +52,8 @@ HCUnit::HCUnit(UINT32 withUnit, HCUNIT_TYPE withType, UINT32 withParent
 	if ( withName == nullptr )
 		throw std::runtime_error("HCUnit with null name");			///Terminal
 
-	strlcpy(m_name, withName, sizeof(m_name));
-	strlcpy(m_shortName, nick, sizeof(m_shortName));
+	strsafecpy(m_name, withName);
+	strsafecpy(m_shortName, nick);
 	chatGetCallsign(m_callsign, withHandle);
 	lookupParent();
 	hcUnits[m_unitID] = this;

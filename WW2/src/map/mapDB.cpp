@@ -42,7 +42,6 @@
 #include "wwii/wwiiErrorTypes.h"
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiRank.h"
-#include "wwii/wwiiString.h"
 #include "wwii/wwiiThreads.h"
 
 bool activeCountries[MAX_COUNTRIES];
@@ -1361,9 +1360,9 @@ public:
 			Brigade* brigade = mapFindBrigade(bdu.m_brigadeID);
 			if (brigade != nullptr)
 			{
-				strlcpy(brigade->m_motd, bdu.m_motd, sizeof(brigade->m_motd));
-				strlcpy(brigade->m_shortName, bdu.m_shortName, sizeof(brigade->m_shortName));
-				strlcpy(brigade->m_motto, bdu.m_motto, sizeof(brigade->m_motto));
+				strsafecpy(brigade->m_motd, bdu.m_motd);
+				strsafecpy(brigade->m_shortName, bdu.m_shortName);
+				strsafecpy(brigade->m_motto, bdu.m_motto);
 				brigade->m_ownerID = bdu.m_ownerID;
 			}
 		}

@@ -2,7 +2,7 @@
 // Created: Thu May 17 14:04:31 2001
 //
 // Necessary code additions required to get bridges working in the strat
-// system.  However, due to thier hackish nature, we don't want other things
+// system.  However, due to their hackish nature, we don't want other things
 // (namely the mmHost) to use it without extreme caution
 //
 // Copyright (c) 2000 Playnet, Inc., All Rights Reserved.
@@ -22,7 +22,6 @@
 #include "strt/strtProtos.h"
 #include "strt/strtData.h"
 #include "strt/strtHack.h"
-#include "wwii/wwiiString.h"
 
 static LOGICAL _fakeStructure(CPStruct* cp);
 static std::vector<std::unique_ptr<FacilityStruct>> _fakeFacilitys;
@@ -85,7 +84,7 @@ static LOGICAL _fakeStructure(CPStruct* cp)
 
 	facility->setCountry(cp->country);
 
-	strlcpy(facility->name, cp->name, sizeof(facility->name));
+	strsafecpy(facility->name, cp->name);
 	facility->filename = cp->filename;
 	facility->m_filename = cp->m_filename;
 

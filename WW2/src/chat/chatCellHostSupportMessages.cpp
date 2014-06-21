@@ -29,7 +29,6 @@
 #include "teul/teulPacket.h"
 #include "teul/teulServer.h"
 #include "wwii/wwiiCallbacks.h"
-#include "wwii/wwiiString.h"
 
 static TEUL_CALLBACK* _XCHG_BANDWIDTH_NOTICE;
 
@@ -156,7 +155,7 @@ _recvBandwidthNotice(ACTION_OBJECT* const a)
 
 	reply.mode = player->getCurrentFramingMode();
 	reply.display = (request.mode == 255);
-	strlcpy(reply.response, framings[reply.mode].description, sizeof(reply.response));
+	strsafecpy(reply.response, framings[reply.mode].description);
 
 	teulSendTo(a->teulIndex, a->fromAddress & DIRECT_MASK, a->fromPort, _XCHG_BANDWIDTH_NOTICE, &reply);
 

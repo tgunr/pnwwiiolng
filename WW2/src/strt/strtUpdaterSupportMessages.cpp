@@ -14,7 +14,6 @@
 #include "strt/strtUpdaterPack.h"
 #include "strt/strtPack.h"
 #include "wwii/wwiiCallbacks.h"
-#include "wwii/wwiiString.h"
 #include "strt/strtTypes.h"
 
 #include "strt/strtUpdaterSupportMessages.h"

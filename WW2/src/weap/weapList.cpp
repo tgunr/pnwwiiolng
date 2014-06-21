@@ -237,7 +237,7 @@ WEAPON_SPEC weapCreateSpec(const char* weapString)
 		tempString++;
 
 		sClassLen = (SINT32)(sType - tempString);
-		strncpy(sClass, tempString,sClassLen);
+		strsafecpy(sClass, tempString);
 
 		if (! strncmp(sClass,"null",MAX_CLASS_NAME_LEN) )
 			weap.wClass = 0;
@@ -280,8 +280,7 @@ weapAssociateIndex(const char* objName, UINT32 localIndex)
 		return NULL_WEAP_SPEC;
 
 	char weapName[MAX_WEAP_NAME_LEN];
-
-	strncpy(weapName, objName, MAX_WEAP_NAME_LEN);
+	strsafecpy(weapName, objName);
 	_strlwr(weapName);
 
 	WEAPON* weapon = weapLookupWeaponByName(weapName);

@@ -88,7 +88,6 @@
 #include "wwii/wwiiServerTrackedObject.h"
 #include "wwii/wwiiServerTypeEnums.h"
 #include "wwii/wwiiSquadMsg.h"
-#include "wwii/wwiiString.h"
 #include "wwii/wwiiThreadTextQuery.h"
 
 // Raknet related

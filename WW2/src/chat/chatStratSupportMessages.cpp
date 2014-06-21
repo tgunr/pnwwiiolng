@@ -31,7 +31,6 @@
 #include "wwii/wwiiCallbacks.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiHCUnits.h"
-#include "wwii/wwiiString.h"
 #include "wwii/wwiiThreads.h"
 
 static TEUL_CALLBACK* _SEND_SCMD_RESULT;

@@ -45,7 +45,6 @@
 #include "teul/teulTime.h"
 #include "teul/teulUtils.h"
 #include "weap/weapWeapon.h"
-#include "wwii/wwiiString.h"
 
 #define STICK_DEBUG
 
@@ -275,7 +274,7 @@ void
 MissionDetail::populate(const Mission* mission, bool isCurrent, bool isLeader, UINT32 withLaunchDelay)
 {
 	MissionSynopsis::populate(mission, isCurrent, isLeader, mission->numTakers());
-	strlcpy(m_desc, mission->m_desc, sizeof(m_desc));
+	strsafecpy(m_desc, mission->m_desc);
 //	strncpy(m_desc, mission->m_desc, MISSION_DESC_LENGTH);
 //	m_desc[MISSION_DESC_LENGTH] = 0;
 	m_timeLaunch = std::max(mission->summary().timeLaunch, withLaunchDelay);

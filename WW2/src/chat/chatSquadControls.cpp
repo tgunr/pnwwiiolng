@@ -24,7 +24,6 @@
 #include "chat/chatSaveChannels.h"
 #include "teul/teulKit.h"
 #include "wwii/wwiiSquads.h"
-#include "wwii/wwiiString.h"
 #include "wwii/wwiiThreads.h"
 
 static char _originator[MAX_HANDLE_SIZE], _subject[MAX_HANDLE_SIZE];
@@ -400,7 +399,7 @@ _update(UINT32 cmd, UINT32 action, UINT32 squadID, const ChatHandle& handle, UCH
 	smu.m_prev = prev;
 	smu.m_originator = originator;
 	smu.m_coID = coID;
-	strlcpy(smu.m_text, text.c_str(), sizeof(smu.m_text));
+	strsafecpy(smu.m_text, text.c_str());
 	if ( members )
 	{
 		for ( UINT32 i = 0; i < SquadControl::CREATE_PLAYERS_REQUIRED; ++i )

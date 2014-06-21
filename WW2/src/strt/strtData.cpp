@@ -36,7 +36,6 @@
 #include "weap/weapSpawnXML.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiConfigVars.h"
-#include "wwii/wwiiString.h"
 
 extern ConfigBool cv_stratIgnoreErrors;
 extern ConfigPath cv_blitzworPath;
@@ -1865,7 +1864,7 @@ void strtInitCPStructwithCP(CPStruct& newCP, const CP& cp)
 
 	newCP.country = newCP.originalCountry = newCP.controllingCountry = (WWII_COUNTRY) cp.country;
 
-	strlcpy(newCP.name, cp.name, sizeof(newCP.name));
+	strsafecpy(newCP.name, cp.name);
 	newCP.m_filename = _filenamePool(cp.fileName);
 	newCP.filename = newCP.m_filename->c_str();
 }
@@ -1894,7 +1893,7 @@ void strtInitFacilityStructwithFACILITY(FacilityStruct& newFacility, const FACIL
 
 	newFacility.country = newFacility.originalCountry = (WWII_COUNTRY) facility.originalCountry;
 
-	strlcpy(newFacility.name, facility.name, sizeof(newFacility.name));
+	strsafecpy(newFacility.name, facility.name);
 	newFacility.m_filename = _filenamePool(facility.fileName);
 	newFacility.filename = newFacility.m_filename->c_str();
 }
@@ -1949,7 +1948,7 @@ void strtInitLinkStructwithDEPOT_LINK(LinkStruct& newLink, const DEPOT_LINK& dep
 	newLink.firebaseID = depotlink.firebaseId;
 
 	newLink.distance = depotlink.distance;
-	strlcpy(newLink.name, depotlink.name, sizeof(newLink.name));
+	strsafecpy(newLink.name, depotlink.name);
 }
 
 //This function looks up the information for a CP from
@@ -2630,7 +2629,7 @@ UINT32 g_maxCPOID = 0;
 void
 strtAddCPoid(CPStruct* newEntry, UINT16 entryNum)
 {
-	if ( entryNum > MAX_CP_LIST_OIDS )
+	if ( entryNum >= MAX_CP_LIST_OIDS )
 	{
 		dbugLog(_FLA, "Exceeded maximum CP ID number (%d vs %d)"
 						, entryNum
@@ -2665,7 +2664,7 @@ strtGetCPByOID(UINT16 uOID)
 void
 strtAddFacilityoid(FacilityStruct* newEntry, UINT16 uEntryNum)
 {
-	if ( uEntryNum > MAX_FACILITY_LIST_OIDS )
+	if ( uEntryNum >= MAX_FACILITY_LIST_OIDS )
 	{
 		dbugLog(_FLA, "Exceeded maximum Facility ID number (%d vs %d)"
 						, uEntryNum

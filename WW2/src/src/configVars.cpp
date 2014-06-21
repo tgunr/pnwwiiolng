@@ -120,9 +120,12 @@ static char* _makeNativePath(const char* const path_)
 		nativePath[--len] = 0;
 #if defined(WIN32)
 	// Perform path naturalization for Windows.
-	char* p;
-	while ( (p = strchr(nativePath, '/')) != nullptr )
-		*p = '\\';
+	char* p = nativePath;
+	while (*p) {
+		if (*p == '/')
+			*p = '\\';
+		++p;
+	}
 #endif
 	return strdup(nativePath);
 }

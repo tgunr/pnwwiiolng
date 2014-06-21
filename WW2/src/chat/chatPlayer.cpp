@@ -1333,7 +1333,7 @@ Player::SetAFK(bool goingAFK, const char* newMessage)
 	if ( !isAFK() || newMessage == nullptr )
 		m_afkMessage[0] = 0;
 	else
-		strlcpy(m_afkMessage, newMessage, sizeof(m_afkMessage));
+		strsafecpy(m_afkMessage, newMessage);
 }
 
 //////////////////////////////////////////////////////////////////////

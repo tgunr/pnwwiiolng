@@ -14,6 +14,13 @@
 #undef max
 #endif
 
+#if defined(_MSC_VER)
+# define NORETURN_FN __declspec(noreturn)
+#else
+# define NORETURN_FN __attribute__ ((noreturn))
+#endif
+
+
 long long leakCount = 0;
 static const char* s_exeName;
 static std::string s_cxxFilename = "";
@@ -1293,7 +1300,7 @@ static bool _getGeneratorFromArg(const char* generator, const char* arg, std::st
 	return true;
 }
 
-void usage()
+NORETURN_FN void usage()
 {
 	fprintf(stderr, "Usage: [--cxx=file] [--hxx=file] %s <input file>\n", s_exeName);
 	exit(1);

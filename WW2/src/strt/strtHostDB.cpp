@@ -34,7 +34,6 @@
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiHCUnits.h"
-#include "wwii/wwiiString.h"
 #include "wwii/wwiiThreads.h"
 #include "wwii/wwiiThreadText.h"
 #include "strt/strtObjectiveStats.h"

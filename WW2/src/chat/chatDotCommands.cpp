@@ -40,7 +40,6 @@
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiRank.h"
-#include "wwii/wwiiString.h"
 
 //////////////////////////////////////////////////////////////////////
 // Private variables
@@ -577,7 +576,7 @@ public:
 		// Prepare the new message
 		Chat::ClientMessage send;
 		memcpy(&send, message, sizeof(send));
-		strlcpy(send.m_message, arguments, sizeof(send.m_message));
+		strsafecpy(send.m_message, arguments);
 		send.m_radios = 1 << _radioNo;
 
 		// And send it

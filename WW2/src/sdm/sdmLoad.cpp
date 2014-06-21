@@ -56,7 +56,6 @@
 #include "dbse/dbseConnection.h"
 #include "sdm/sdmParse.h"
 #include "include/mydbQuery.h"
-#include "wwii/wwiiString.h"
 
 DBHANDLE dbh;
 extern DBCONNECTION dbConnection;
@@ -214,7 +213,7 @@ _newCPW(UINT32 uOID, SINT32 ox, SINT32 oy, SINT32 id, const char* name, WWII_COU
 	newCP->ox = ox;
 	newCP->oy = oy;
 	newCP->id = id;
-	strlcpy(newCP->name, name, sizeof(newCP->name));
+	strsafecpy(newCP->name, name);
 	newCP->owner = owner;
 	newCP->controller = controller;
 	newCP->absx = absx;
@@ -289,7 +288,7 @@ dbseLoadCP(CP* cp)
 		}
 		if ( strcmp(newCP->name, cp->name) != 0 )
 		{
-			strlcpy(newCP->name, cp->name, sizeof(newCP->name));
+			strsafecpy(newCP->name, cp->name);
 			newCP->bIsInDB = FALSE;
 		}
 	}
@@ -417,7 +416,7 @@ _newFacW(UINT32 uOID, SINT32 ox, SINT32 oy, SINT32 id, const char* name, WWII_CO
 	newFac->id = id;
 	newFac->sx = ox >> 4;
 	newFac->sy = oy >> 4;
-	strlcpy(newFac->name, name, sizeof(newFac->name));
+	strsafecpy(newFac->name, name);
 	newFac->owner = owner;
 	newFac->absx = absx;
 	newFac->absy = absy;
@@ -490,7 +489,7 @@ dbseLoadFacility(FACILITY* fac)
 		}
 		if ( strcmp(newFac->name, fac->name) != 0 )
 		{
-			strlcpy(newFac->name, fac->name, sizeof(newFac->name));
+			strsafecpy(newFac->name, fac->name);
 			newFac->bIsInDB = FALSE;
 		}
 	}

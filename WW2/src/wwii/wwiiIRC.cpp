@@ -301,7 +301,7 @@ wwiiIRCInitialize(UINT32 ip, bool plural)
 		return false;
 	}
 
-	if ( cv_ircServer.GetString() == nullptr || cv_ircServer.GetString() == nullptr )
+	if ( cv_ircServer.GetString() == nullptr || *cv_ircServer.GetString() == 0 )
 	{
 		dbugLog(_FLW, "WWII_IRC_SERVER not defined");
 		return false;
@@ -754,8 +754,10 @@ wwiiIRCMessage(const char* channel, const char* fmt, ...)
 
 	assert( channel != nullptr );
 
-	if ( fmt == nullptr )
+	if (fmt == nullptr) {
 		dbugLog(_FLW, "called wwiiIRCMessage(%s, NULL)...", channel);
+		return;
+	}
 
 	static char buffer[1202];
 	va_list args;

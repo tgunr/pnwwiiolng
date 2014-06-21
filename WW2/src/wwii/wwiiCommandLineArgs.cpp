@@ -42,8 +42,7 @@ Argument::GetDescription() const
 //////////////////////////////////////////////////////////////////////
 // Report on command line usage.
 
-static void
-_usage(const char* info)
+static void NORETURN_FN _usage(const char* info)
 {
 	printf("Usage: %s", programName);
 	for ( auto it = arguments.begin(); it != arguments.end(); ++it )
@@ -57,13 +56,13 @@ _usage(const char* info)
 //////////////////////////////////////////////////////////////////////
 // Report unknown arguments.
 
-static void _unknownArgument(const char* a)
+static void NORETURN_FN _unknownArgument(const char* a)
 {
 	printf("Unrecognized command line option '%s'.\n", a);
 	_usage(a);
 }
 
-static void _unknownArgument(char a)
+static void NORETURN_FN _unknownArgument(char a)
 {
 	char name[2] = { a, 0 };
 	_unknownArgument(name);

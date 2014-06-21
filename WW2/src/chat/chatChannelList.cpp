@@ -20,7 +20,6 @@
 #include "wwii/wwiiHash.h"
 #include "chat/chatMissions.h"
 #include "chat/chatName.h"
-#include "wwii/wwiiString.h"
 
 #include "chat/chatPlayer.h"
 #include "teul/teulTime.h"

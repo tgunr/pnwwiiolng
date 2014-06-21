@@ -144,15 +144,12 @@ wwiiReadRanks(DBHANDLE& dbh)
 void
 wwiiFreeRanks()
 {
-	UINT32 i;
-
-	for ( i = 0; i < Rank::count(); ++i )
-	{
-		if ( rankNames[i] != nullptr )
-		{
-			free(const_cast<char*>(rankNames[i]));
-			rankNames[i] = nullptr;
-		}
+	for ( size_t i = 0; i < Rank::count(); ++i ) {
+		void* name = (void*)rankNames[i];
+		if (name)
+			free(name);
 	}
+
+	rankNames.clear();
 }
 

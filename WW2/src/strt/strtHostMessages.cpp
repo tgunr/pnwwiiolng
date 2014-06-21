@@ -64,7 +64,6 @@
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiExitCodes.h"
 #include "wwii/wwiiServerTypeEnums.h"
-#include "wwii/wwiiString.h"
 
 extern ConfigPath cv_luaPath;
 

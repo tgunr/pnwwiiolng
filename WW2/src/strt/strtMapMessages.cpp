@@ -20,7 +20,6 @@
 #include "miss/missionPack.h"
 #include "miss/missionDamageEvent.h"
 #include "mm/mmSerialNumberRequest.h"
-#include "wwii/wwiiString.h"
 #include "weap/weapWeapon.h"
 
 #include "strt/strtServerTypes.h"

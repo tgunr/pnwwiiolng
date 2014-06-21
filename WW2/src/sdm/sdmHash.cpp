@@ -78,6 +78,22 @@ static bool _addBuildingToFacTable(STRAT_FACILITY_TABLE* facTable, const BUILDIN
 	return false;
 }
 
+struct BuildingsByCell
+{
+	typedef std::vector<UINT16> Cell;
+	std::vector<Cell> m_cells;
+
+	BuildingsByCell()
+	{
+		m_cells.reserve(CELLS_PER_SIDE * CELLS_PER_SIDE);
+	}
+
+	Cell& GetCell(size_t x, size_t y)
+	{
+		return m_cells[(x * CELLS_PER_SIDE) + y];
+	}
+};
+
 // Creates a cell based table with each cell containing a list of buildings in
 // that cell. In addition this function fills out the facility table.
 STRAT_BUILDING_LIST*
@@ -85,8 +101,7 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd, SINT32 numB
 {
     static const char builder[] = "builder";
 
-	STRAT_BUILDING_LIST tempTable[1 << CELL_RES_ADJUST][1 << CELL_RES_ADJUST];
-	memset(tempTable, 0, sizeof(tempTable));
+	BuildingsByCell bbc;
 
 	SINT32 sx = (bd[0].posx/SUPERCELL_SIZE_M);
 	SINT32 sy = (bd[0].posy/SUPERCELL_SIZE_M);
@@ -142,10 +157,10 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd, SINT32 numB
 		sy = (bd[i].posy / SUPERCELL_SIZE_M);
 		size_t x = ((bd[i].posx / 800) & 0x0f) >> CELL_RES_ADJUST;
 		size_t y = ((bd[i].posy / 800) & 0x0f) >> CELL_RES_ADJUST;
-		auto& cell = tempTable[x][y];
-		if (cell.numBuildings == 0)
-			cell.bid = static_cast<decltype(cell.bid)>(alloca(sizeof(cell.bid) * MAX_BUILDINGS_PER_CELL));
-		cell.bid[cell.numBuildings++] = bd[i].oid.id;
+		auto& cell = bbc.GetCell(x, y);
+		if (cell.empty())
+			cell.reserve(MAX_BUILDINGS_PER_CELL);
+		cell.push_back(bd[i].oid.id);
 //		dbugLog(_FLW,"adding building %d to pos:%d,%d sc:%d,%d cell:%d,%d"
 //					,bd[i].oid.id,bd[i].posx,bd[i].posy,sx,sy,x,y);
 	}
@@ -156,16 +171,16 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd, SINT32 numB
 	{
 		for (size_t y = 0; y < CELLS_PER_SIDE; y++)
 		{
-			auto& src = tempTable[x][y];
-			if (src.numBuildings > 0)
+			auto& src = bbc.GetCell(x, y);
+			if (!src.empty())
 			{
 				auto& dst = table[(x * CELLS_PER_SIDE) + y];
 //				Write_Debug("adding %d buildings to sc:%d,%d cell:%d,%d"
 //							,cell->numBuildings,sx,sy,x,y);
-				dst.numBuildings = src.numBuildings;
-				const size_t dataSize = sizeof(dst.bid) * src.numBuildings;
+				dst.numBuildings = src.size();
+				const size_t dataSize = sizeof(dst.bid) * dst.numBuildings;
 				dst.bid = static_cast<decltype(dst.bid)>(memAlloc(dataSize));
-				memcpy(dst.bid, src.bid, dataSize);
+				memcpy(dst.bid, src.data(), dataSize);
 			}
 		}
 	}

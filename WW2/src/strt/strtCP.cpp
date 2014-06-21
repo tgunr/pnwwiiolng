@@ -43,7 +43,6 @@
 #include "teul/teulTime.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiDBThreads.h"
-#include "wwii/wwiiString.h"
 
 #ifdef IS_STRAT_HOST
 #include "strt/strtHostDB.h"

@@ -14,7 +14,6 @@
 #include "wwii/wwiiConfig.h"
 #include "teul/teulPackers.h"
 #include "strt/strtChatTypes.h"
-#include "wwii/wwiiString.h"
 
 OOBMessage
 ::OOBMessage(UINT32 playerID, UINT32 brigadeID, const ChatHandle& handleID, const char* command, const char* arguments
