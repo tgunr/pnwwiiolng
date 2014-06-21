@@ -750,7 +750,7 @@ static const wchar_t s_wideCharacters[65535] =
 };
 
 //static const wchar_t MAX_WIDE_CHAR = 40864;
-static const int s_wideCharacterMap[65535] =
+static const int s_wideCharacterMap[65536] =
 {
 	       0,        0,        0,        0,        0,        0,        0,        0,        0,        0,
 	       0,        0,        0,        0,        0,        0,        0,        0,        0,        0,
@@ -5144,7 +5144,7 @@ chatGetCallsign(const ChatHandle& handle)
 const wchar_t*
 chatGetWideCallsign(const ChatHandle& handle)
 {
-	static const size_t NumInstances = 15;	// must be a power of 2.
+	static const size_t NumInstances = 16;	// must be a power of 2.
 	static Chat::NameW callsigns[NumInstances];
 	static std::atomic<size_t> s_instance { 0 };
 
