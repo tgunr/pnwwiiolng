@@ -141,11 +141,14 @@ UINT32 strprintf(char(&buf)[bufSize], const char* fmt, Args... args)
 {
 	static_assert(bufSize > 0, "Buffer too small");
 	static_assert(bufSize < size_t(1 << 31), "Buffer too large");
+#if platOS == OS_WIN32
+	int printed = snprintf_s(buf, bufSize, fmt, std::forward<ARGS>(ARGS)...);
+#else
 	int printed = snprintf(buf, bufSize, fmt, std::forward<Args>(args)...);
-	if (PN_UNLIKELY(size_t(printed) > size_t(bufSize))) {
-		printed = static_cast<int>(bufSize - 1);
-		buf[printed - 1] = 0;
-	}
+#if platOS == OS_MACOS
+	buf[bufSize - 1] = 0;
+#endif
+#endif
 	return static_cast<UINT32>(printed);
 }
 
