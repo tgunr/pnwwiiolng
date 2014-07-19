@@ -8,33 +8,35 @@ is_installed()
 
 if [ "${USER}" != "vagrant" ]; then
 	echo "=========================================="
-	echo "USAGE NOTE:"
+	echo "USAGE NOTE: Workstation environment detected."
 	echo "=========================================="
 	sleep 1
 	echo ""
-	echo "The preferred way to use this script is to run it from inside of a Vagrant virtualbox machine to ensure a consistent build environment."
+	echo "This script is designed with the Vagrant/VirtualBox virtual development environment (vmde) in mind. See the vagrant/linux directory for additional details."
 	echo ""
-	echo "You can obtain vagrant from http://www.vagrantup.com/ and virtualbox by typing"
-	echo " $ sudo apt-get install -y virtualbox"
+	echo "It can either install, configure and deploy a vmde for you now or it can execute in the local environment."
 	echo ""
-	echo "See the vagrant/linux directory for additional details."
-	echo "These scripts were developed to be compatible with 64-bit Linux 14.04 LTS and Linux Mint 17."
+	echo "If you need to manually install or configure vagrant, e.g. to work with a different VM provider such as VMware, you can obtain vagrant from http://www.vagrantup.com/."
 	echo ""
-	sleep 3
-	echo -n "CONTINUE RUNNING IN THE CURRENT ENVIRONMENT? [y/N] "
-	read response
-	echo
-	if [ "${response}" != "y" -a "${response}" != "Y" ] ; then
-		_want_packages="vagrant virtualbox virtualbox-dkms"
-		for pkg in ${_want_packages}; do
-			if ! is_installed $pkg ; then _missing_packages+="${pkg} " ; fi
+	sleep 5
+	if [ ! -d "devenv/linux/.vagrant" ] ; then
+		response=""
+		while [ "x${response}" != "xy" -a "x${response}" != "xn" ]; do
+			echo -n "Bring up a virtual development machine? [y/n] "
+			read response
 		done
-		if [ -z "${_missing_packages}" ] ; then
-			echo "NOTE: Required packages (${_want_packages}) are already installed."
-		else
-			sudo aptitude install ${_missing_packages}
+		if [ "${response}" = "y" ]; then
+			cd devenv/linux || die "Unable to access devenv/linux"
+			less README.txt
+			./BOOTSTRAP.sh
+			exit 0
 		fi
-		exit 0
+
+		echo -n "CONTINUE RUNNING THIS SCRIPT IN YOUR WORKSTATION ENVIRONMENT? [y/N]"
+		read response
+		if [ "${response}" != "y" ]; then
+			exit 0
+		fi
 	fi
 fi
 

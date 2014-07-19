@@ -35,6 +35,10 @@ srcDir=$(cd $(dirname $0)/../.. ; pwd -P)
 
 #################### Code
 
+echo "INFO: Checking packages"
+sudo aptitude update -y
+sudo aptitude install -y vagrant virtualbox virtualbox-dkms || die "Unable to install packages"
+
 # Generate the Vagrant file.
 
 echo "INFO: Generating Vagrantfile"
@@ -75,8 +79,11 @@ echo "INFO: If this has already been registered, you can ignore the error from v
 vagrant box add -c --provider "${PROVIDER}" "${BOXNAME}" "${BOXURL}"
 
 # Fire up the virtual machine and provision it.
-echo "INFO: Starting the virtual machine and install script"
+echo "INFO: Starting the virtual machine and provisioning script"
 vagrant up --provision --provider virtualbox --parallel
 
 
 echo "INFO: Ready to go, type 'vagrant ssh' to log in to the machine."
+echo "INFO: The '${srcDir}' directory will be shared with the virtual machine as /playnet/wwiiolng"
+echo
+
