@@ -12,7 +12,7 @@
 # You'll also need a provider: virtualbox or vmware. Default is virtualbox.
 
 if [ -d ".vagrant" ]; then
-  die "WARNING: .vagrant folder already exists. Use 'vagrant destroy' to remove it? Aborting. "
+  die "WARNING: .vagrant folder already exists. Use 'vagrant destroy ; rm -rf .vagrant' to remove it? Aborting. "
 fi
 
 #################### Configuration
