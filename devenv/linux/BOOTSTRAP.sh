@@ -83,7 +83,7 @@ echo "INFO: Starting the virtual machine and provisioning script"
 vagrant up --provision --provider virtualbox --parallel
 
 
-echo "INFO: Ready to go, type 'vagrant ssh' to log in to the machine."
+echo "INFO: Ready to go, from $(pwd) type 'vagrant ssh' to log in to the machine."
 echo "INFO: The '${srcDir}' directory will be shared with the virtual machine as /playnet/wwiiolng"
 echo
 
