@@ -40,6 +40,7 @@ if [ "${USER}" != "vagrant" ]; then
 	if [ "${response}" != "y" ]; then
 		exit 0
 	fi
+	echo ""
 
 fi
 
@@ -59,8 +60,8 @@ sudo aptitude install -y \
   echo "Package install failed - aborting."
   exit 1
 }
-
 echo ""
+
 echo "=========================================="
 echo "Step 2: Install optional packages."
 echo "=========================================="
@@ -72,8 +73,8 @@ sudo aptitude install \
 	gitk git-gui \
 	systemtap-sdt-dev \
 	subl sublime-text
-
 echo ""
+
 echo "=========================================="
 echo "Step 3: Generate make files with cmake"
 echo "=========================================="
