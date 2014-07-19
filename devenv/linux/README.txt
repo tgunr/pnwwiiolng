@@ -4,7 +4,7 @@ Linux Vagrant Setup
 Vagrant provides a means of efficiently deploying complete, custom, consistent development environments.
 
 By combining a standard baseline image ("box"), a configuration file ("Vagrantfile") and a setup
-script ("VAGRANT_PROVISION.sh"), you can quickly go from zero to a fully functional virtual dev box
+script ("vagrant_provision.sh"), you can quickly go from zero to a fully functional virtual dev box
 within two minutes.
 
 By modifying the Vagrantfile you can use the same procedure to create test or even production servers,

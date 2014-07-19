@@ -52,7 +52,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # From ${BOXURL}
   config.vm.box = '${BOXNAME}'
 
-  config.vm.provision :shell, path: 'VAGRANT_PROVISION.sh'
+  config.vm.provision :shell, path: 'vagrant_provision.sh'
 
   config.vm.synced_folder '${srcDir}', '/playnet/wwiiolng'
 
