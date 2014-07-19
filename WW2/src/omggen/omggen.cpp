@@ -669,7 +669,7 @@ void omg_add_enum_value(const char* name)
 
 	_checkName(name);
 
-	Enumeration* enumeration = dynamic_cast<Enumeration*>(s_currentNode);
+	Enumeration* enumeration = static_cast<Enumeration*>(s_currentNode);
 	assert(enumeration != nullptr);
 	EnumValue* value = new EnumValue(name, enumeration->m_count++, s_currentNode);
 
