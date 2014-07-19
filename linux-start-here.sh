@@ -8,7 +8,7 @@ is_installed()
 
 if [ "${USER}" != "vagrant" ]; then
 	echo "=========================================="
-	echo "USAGE NOTE: Workstation environment detected."
+	echo "INFO: Workstation environment detected."
 	echo "=========================================="
 	sleep 1
 	echo ""
@@ -32,14 +32,15 @@ if [ "${USER}" != "vagrant" ]; then
 
 		echo ""
 		echo "If you need to manually install or configure vagrant, e.g. to work with a different VM provider such as VMware, you can obtain vagrant from http://www.vagrantup.com/."
-		echo ""
-
-		echo -n "CONTINUE RUNNING THIS SCRIPT IN YOUR WORKSTATION ENVIRONMENT? [y/N]"
-		read response
-		if [ "${response}" != "y" ]; then
-			exit 0
-		fi
 	fi
+
+	echo ""
+	echo -n "CONTINUE RUNNING THIS SCRIPT IN YOUR WORKSTATION ENVIRONMENT? [y/N] "
+	read response
+	if [ "${response}" != "y" ]; then
+		exit 0
+	fi
+
 fi
 
 echo "=========================================="
@@ -70,7 +71,7 @@ sudo aptitude install \
 	gdb valgrind ddd \
 	gitk git-gui \
 	systemtap-sdt-dev \
-	subl
+	subl sublime-text
 
 echo ""
 echo "=========================================="
