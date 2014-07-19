@@ -1,6 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6.4)
 PROJECT(GameHosts)
 
+# This will determine bitness, amongst other things.
 INCLUDE( cmakeincludes/Platform.cmake )
 
 ################################################################################
@@ -90,7 +91,7 @@ SET(PCH_INCLUDE_HEADERS
 MESSAGE(STATUS "${PN_BUILD_TYPE}/${BUILDNAME} build. Opt:${OPTIMIZATION}, MEM:${PN_MEM_DEBUG}, STACK:${PN_STACK_PROTECT}")
 
 ######################################################################
-#### Libraries.
+#### Code Generators.
 
 SET(OMG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/omg")
 SET(OMGGEN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/omggen")
@@ -159,6 +160,9 @@ IF(NOT MSVC)
 ENDIF( )
 ADD_DEPENDENCIES(omggen ${OMG_DIR}/omg.y ${OMG_DIR}/omg.l)
 SET_PROPERTY(TARGET omggen PROPERTY FOLDER "Tools")
+
+######################################################################
+#### Libraries.
 
 ADD_LIBRARY(ircclient
 	libircclient/src/libircclient.cpp
