@@ -5,7 +5,7 @@ aptitude update -y
 echo "INFO: Installing required modules"
 aptitude install -y \
 	vim ctags cmake git \
-	gcc-4.8 g++-4.8 gcc-4.8-doc \
+	gcc-4.8 g++-4.8 gcc-4.8-doc gcc g++ \
 	libmysqlclient18 libmysqlclient-dev \
 	lua5.1 libtolua++5.1-dev \
 	ncurses-dev \
