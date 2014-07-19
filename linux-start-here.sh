@@ -32,6 +32,9 @@ if [ "${USER}" != "vagrant" ]; then
 
 		echo ""
 		echo "If you need to manually install or configure vagrant, e.g. to work with a different VM provider such as VMware, you can obtain vagrant from http://www.vagrantup.com/."
+	else
+		echo "(devenv/linux/.vagrant directory found, assuming vagrant is installed/configured)"
+		echo "(if not, run devenv/linux/BOOTSTRAP.sh)"
 	fi
 
 	echo ""
