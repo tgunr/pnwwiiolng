@@ -15,6 +15,7 @@
 #define strdup(...) _strdup(__VA_ARGS__)
 #define PRSizeT "u"
 #else
+#include <unistd.h>
 #define PRSizeT "zu"
 #endif
 
