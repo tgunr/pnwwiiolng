@@ -14,9 +14,7 @@ if [ "${USER}" != "vagrant" ]; then
 	echo ""
 	echo "This script is designed with the Vagrant/VirtualBox virtual development environment (vmde) in mind. See the vagrant/linux directory for additional details."
 	echo ""
-	echo "It can either install, configure and deploy a vmde for you now or it can execute in the local environment."
-	echo ""
-	echo "If you need to manually install or configure vagrant, e.g. to work with a different VM provider such as VMware, you can obtain vagrant from http://www.vagrantup.com/."
+	echo "It can either install, configure and deploy a vmde for you /now/ or it can execute in the local environment."
 	echo ""
 	sleep 5
 	if [ ! -d "devenv/linux/.vagrant" ] ; then
@@ -31,6 +29,10 @@ if [ "${USER}" != "vagrant" ]; then
 			./BOOTSTRAP.sh
 			exit 0
 		fi
+
+		echo ""
+		echo "If you need to manually install or configure vagrant, e.g. to work with a different VM provider such as VMware, you can obtain vagrant from http://www.vagrantup.com/."
+		echo ""
 
 		echo -n "CONTINUE RUNNING THIS SCRIPT IN YOUR WORKSTATION ENVIRONMENT? [y/N]"
 		read response
