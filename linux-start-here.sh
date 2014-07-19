@@ -54,7 +54,8 @@ echo ""
 # Install essential build packages
 sudo aptitude install -y \
 	vim ctags cmake git \
-	gcc-4.8 gcc g++-4.8 g++ gcc-4.8-doc \
+	gcc gcc-4.8 gcc g++-4.8 g++ gcc-4.8-doc \
+	bison flex \
 	libmysqlclient18 libmysqlclient-dev \
 	lua5.1 libtolua++5.1-dev \
 	ncurses-dev \
