@@ -65,7 +65,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
     vb.customize [ 'modifyvm', :id, '--memory', '${BOXMEMMB}' ]
 
-    vb.customize [ 'modifyvm', :id, '--ioapic, 'on' ]
+    vb.customize [ 'modifyvm', :id, '--ioapic', 'on' ]
     vb.customize [ 'modifyvm', :id, '--cpus', ${BOXCPUS} ]
 
   end
