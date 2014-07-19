@@ -80,7 +80,7 @@ vagrant box add -c --provider "${PROVIDER}" "${BOXNAME}" "${BOXURL}"
 
 # Fire up the virtual machine and provision it.
 echo "INFO: Starting the virtual machine and provisioning script"
-vagrant up --provision --provider virtualbox --parallel
+vagrant up --provision --provider "${PROVIDER}" --parallel
 
 
 echo "INFO: Ready to go, from $(pwd) type 'vagrant ssh' to log in to the machine."

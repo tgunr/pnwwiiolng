@@ -7,6 +7,7 @@ aptitude install -y \
 	vim ctags cmake git \
 	gcc-4.8 g++-4.8 gcc-4.8-doc gcc g++ \
 	libmysqlclient18 libmysqlclient-dev \
+	build-essential flex bison \
 	lua5.1 libtolua++5.1-dev \
 	ncurses-dev \
 	libevent-2.0-5 libevent-extra-2.0-5 libevent-pthreads-2.0-5 libevent-dev
