@@ -1580,6 +1580,7 @@ WW2/src/xml/.dirstamp
 /_UpgradeReport_Files
 /bin
 /build
+/build64
 /ipch
 /Libraries/granny2/projects/Win32_Release_Static_2k8/*.lastbuildstate
 /Libraries/granny2/projects/Win32_Release_Static_2k8/win32_2k8_static.log
@@ -1602,3 +1603,6 @@ WW2/src/omggen/omggen.yy.h
 WW2/src/omggen/Release/
 WW2/src/omggen/omggen.vcxproj.user
 Tools/ExeSum/exesum.sdf
+
+devenv/linux/.vagrant
+devenv/linux/Vagrantfile
