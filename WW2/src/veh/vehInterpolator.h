@@ -24,7 +24,6 @@ protected:
 class InterpolatorBase
 {
 public:
-
 	struct Update
 	{
 		SINT32 timestamp;
@@ -41,14 +40,13 @@ public:
 	InterpolatorBase(vehVehicle* v=0);
 	virtual ~InterpolatorBase(){}
 
-	virtual void NewPosDataUpdate(int timestamp, int frametime) = 0;
-	virtual Update const& Interpolate(int frametime) = 0;
-	virtual void Copy(vehVehicle* v, UINT32 flags) = 0;
+	virtual void NewPosDataUpdate(int timestamp_, int frametime_) = 0;
+	virtual Update const& Interpolate(int frametime_) = 0;
+	virtual void Copy(vehVehicle* v_, UINT32 flags_) = 0;
 	virtual FLOAT64 LastUpdateYaw() const { return _lastUpdateYaw; }
-	virtual void SetFlags(UINT32 flags){}
+	virtual void SetFlags(UINT32 flags_){}
 
 protected:
-
 	vehVehicle* _vehicle;
 	int _interpolatetime;
 	FLOAT64 _lastUpdateYaw;
@@ -61,10 +59,10 @@ public:
 	InfantryInterpolator(vehVehicle* v=0);
 	virtual ~InfantryInterpolator(){}
 
-	virtual void NewPosDataUpdate(int timestamp, int frametime);
-	virtual Update const& Interpolate(int frametime);
-	virtual void Copy(vehVehicle* v, UINT32 flags);
-	virtual void SetFlags(UINT32 flags){ _cur.animationFlags = flags; }
+	void NewPosDataUpdate(int timestamp_, int frametime_) override;
+	Update const& Interpolate(int frametime_) override;
+	void Copy(vehVehicle* v_, UINT32 flags_) override;
+	void SetFlags(UINT32 flags_) override { _cur.animationFlags = flags_; }
 
 	bool Rollover() const { return _rollover; }
 
@@ -94,9 +92,9 @@ public:
 	}
 	virtual ~PassThruInterpolator(){}
 
-	virtual void NewPosDataUpdate(int timestamp, int frametime);
-	virtual Update const& Interpolate(int frametime);
-	virtual void Copy(vehVehicle* v, UINT32 flags);
+	void NewPosDataUpdate(int timestamp_, int frametime_) override;
+	Update const& Interpolate(int frametime_) override;
+	void Copy(vehVehicle* v_, UINT32 flags_) override;
 
 protected:
 

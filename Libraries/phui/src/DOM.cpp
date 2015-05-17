@@ -662,11 +662,10 @@ JSBool ElementDOM::GetProperty(JSContext* ctx, int propid, jsval* val)
 
 				if(!done)
 				{
-					Control* c = dynamic_cast<Control*>(_view);
-
-					if(c)
+					auto ctrl = dynamic_cast<Control*>(_view);
+					if(ctrl)
 					{
-						len = gctx->FontAdvance(font, c->WideLabel());
+						len = gctx->FontAdvance(font, ctrl->WideLabel());
 						done = true;
 					}
 				}
@@ -1114,11 +1113,11 @@ JS_FUNCTION_DEF(ElementDOM,addrow)
 		else
 		{
 			// see if we passed in a view and use that
-			ElementDOM* dom = js::Cast<ElementDOM*>(ctx,jsobj);
+			auto elDom = js::Cast<ElementDOM*>(ctx,jsobj);
 
-			if(dom)
+			if(elDom)
 			{
-				row = dynamic_cast<View*>(dom->_view);
+				row = dynamic_cast<View*>(elDom->_view);
 				init = false; // don't need to init, its already done
 			}
 		}

@@ -1220,8 +1220,8 @@ SINT32 vehVisDamageHulkVehicle(vehVehicle* veh, LOGICAL CreateCrap)
 		// this can result in multiple bodies being created
 		if(createHulkBody)
 		{
-			HulkDamageBody* crap = new HulkDamageBody(veh, veh->VehicleObjectData->VisDamageHulkLOD);
-			if(crap) crap->Init(nullptr, nullptr, FALSE);
+			HulkDamageBody* hulk = new HulkDamageBody(veh, veh->VehicleObjectData->VisDamageHulkLOD);
+			if(hulk) hulk->Init(nullptr, nullptr, FALSE);
 
 			if(0)
 			{
@@ -1229,7 +1229,7 @@ SINT32 vehVisDamageHulkVehicle(vehVehicle* veh, LOGICAL CreateCrap)
 				FLOAT64VECTOR v1, v2;
 				Vec3d pv1, pv2;
 
-				pv1		= crap->GetPosition();
+				pv1		= hulk->GetPosition();
 				pv2		= pv1;
 				pv2.z() += 10.0f;
 

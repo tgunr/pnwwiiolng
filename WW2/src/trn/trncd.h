@@ -417,9 +417,9 @@ struct trnAutoGun
 									const unsigned int collidebits);
 	*/
 
-	extern UINT32 trnUpdateTerrainObjectLODs(UINT32 Override);
-	extern UINT32 trnSetDamageLevel(trnCDTerrainObject * TO,UINT32 DamageLevel);
-	extern UINT32 trnSetCountry(trnCDTerrainObject * TO,UINT32 Country);
+	extern UINT32 trnUpdateTerrainObjectLODs(UINT32 Override_);
+	extern UINT32 trnSetDamageLevel(trnCDTerrainObject * TO,UINT32 DamageLevel_);
+	extern UINT32 trnSetCountry(trnCDTerrainObject * TO_, UINT32 Country_);
 
 	extern UINT32 trnUpdateObjectStatus(SINT32 x, SINT32 y, UINT32 id, SINT32 country = -1, SINT32 vislevel = -1);
 

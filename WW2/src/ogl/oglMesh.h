@@ -92,7 +92,7 @@ namespace ogl
 			~StaticBuffer();		// Buffer objects are not deleted at program termination (does anyone still care?)
 
 			void			Buffer();
-			LOGICAL			AddMesh(std::vector<RawVertex>& rawVertexData, const VertexIdx* indices, VertexIdx elementCnt, MeshContext* meshContext, int bufferIdx);
+			LOGICAL			AddMesh(std::vector<RawVertex>& withRawVertexData, const VertexIdx* indices, VertexIdx elementCnt, MeshContext* meshContext, int bufferIdx);
 			void			SaveToFile(int hfile);
 
 			UINT32			GetVertexBufferName()	const	{return vbName;}

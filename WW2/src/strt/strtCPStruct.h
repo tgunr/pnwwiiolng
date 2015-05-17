@@ -274,7 +274,7 @@ public:
 
 	void setContention(bool state);
 
-	void setSide(WWII_SIDE side);
+	void setSide(WWII_SIDE);
 
 	void setSupplyCenter();
 
@@ -324,7 +324,7 @@ private:
 	// network propagation of the change
 	CP_STATUS_FLAGS _alertFlags() const { return (CP_STATUS_FLAGS)(CP_STAT_OWN_HAAC|CP_STAT_OVERRUN|CP_STAT_FALLBACK); }
 	void _changeFlags(UINT32 newFlags);
-	SCMD_RESULT _fallback(WWII_SIDE side, FALLBACK_MODE mode, UINT32 playerID);
+	SCMD_RESULT _fallback(WWII_SIDE forSide, FALLBACK_MODE mode, UINT32 playerID);
 
 	// Internal part of clearObjective
 	void _removeObjective(WWII_SIDE forSide);

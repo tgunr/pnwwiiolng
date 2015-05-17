@@ -2106,11 +2106,11 @@ UINT32 _CreateMuzzleFlash(weapAmmo const* pAmmo, OBJECT* o, const FLOAT64VECTOR*
 
 	if(pAmmo->FireVehicle)
 	{
-		vehVehicle* v = (vehVehicle*)pAmmo->FireVehicle;
+		vehVehicle* veh = (vehVehicle*)pAmmo->FireVehicle;
 
-		if(v->InUse)
+		if(veh->InUse)
 		{
-			if(v->VehicleType->Type == VEH_TYPE_PERSON && v->IsMe() && fpFPSIsAim())
+			if(veh->VehicleType->Type == VEH_TYPE_PERSON && veh->IsMe() && fpFPSIsAim())
 				scale *= 0.5f;
 			else
 				scale *= 0.75f;
