@@ -12,7 +12,7 @@ Description:
 #include "ogl/States.h"
 #include "math/Matrixf.h"
 
-typedef stdext::hash_map<std::string, glslUniformBlock*> UniformBlockList;
+using UniformBlockList = std::unordered_map<std::string, glslUniformBlock*>;
 static UniformBlockList _uniformBlockList;
 
 /*------------------------------------------------------------------------------------

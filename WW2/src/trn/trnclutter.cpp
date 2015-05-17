@@ -65,7 +65,7 @@ typedef struct tagCLUTTER
 
 unsigned int _id = 1;
 
-typedef stdext::hash_set<std::string> ClutterHash;
+using ClutterHash = std::unordered_set<std::string>;
 static ClutterHash keys;
 #define max_clutter_per_octet 64
 

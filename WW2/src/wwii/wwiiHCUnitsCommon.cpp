@@ -12,12 +12,13 @@
 #include "teul/teulPackers.h"
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiPack.h"
+#include "str/stringLib.h"
 
 // Map unit_id to a HCUnit
 HCUNIT_INDEX hcUnits;
 
 //// Short Name -> HCUnit mapping
-typedef std::map<ChatHandle, HCUnit*> HCUNIT_HANDLES;
+using HCUNIT_HANDLES = std::unordered_map<ChatHandle, HCUnit*>;
 static HCUNIT_HANDLES hcUnitsByHandle;
 
 // Pack a brigade ID

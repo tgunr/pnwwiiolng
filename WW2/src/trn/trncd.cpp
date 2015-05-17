@@ -53,8 +53,6 @@
 #include "SpatialDB.h"
 #endif
 
-USING_EXT_NAMESPACE;
-
 typedef std::map<OBJECT*, trnCDTerrainObject *> mapOBJList;
 mapOBJList mapOBJ; // All objects associated with a TO
 
@@ -83,7 +81,7 @@ static ODEQueueSet odeQueue;
 static bool _updateCollideLists = false;
 
 
-static hash_set<std::string> _buildingsWithSpawnData;
+static std::unordered_set<std::string> _buildingsWithSpawnData;
 
 // Mapping of dof names to the weapon specs allowed to spawn there.
 typedef std::map<std::string, std::vector<UINT32> > dofToWeapSpecs;
@@ -1065,16 +1063,11 @@ static UINT32 _RemoveTerrainObject(OBJECT* o)
 bool trncdSpawnDataExists(const char* buildingname)
 {
     if(!buildingname)
-    {
         return false;
-    }
-
-    hash_set<std::string>::iterator itr;
 
     // Find the spawn data associated with this building
-    itr = _buildingsWithSpawnData.find(buildingname);
-
-    return itr != _buildingsWithSpawnData.end();
+    auto itr = _buildingsWithSpawnData.find(buildingname);
+    return itr != _buildingsWithSpawnData.cend();
  }
 
 static void _findSpawnData(trnCDTerrainObject* to)
@@ -1105,12 +1098,9 @@ static void _findSpawnData(trnCDTerrainObject* to)
         str.erase(pos);
     }
 
-    hash_set<std::string>::iterator itr;
-
     // Find the spawn data associated with this building
-    itr = _buildingsWithSpawnData.find(str);
-
-    if(itr == _buildingsWithSpawnData.end())
+    auto itr = _buildingsWithSpawnData.find(str);
+    if(itr == _buildingsWithSpawnData.cend())
     {
         to->spawndata = nullptr;
     }

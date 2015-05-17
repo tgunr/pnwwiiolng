@@ -15,14 +15,10 @@
 #include "weap/weapDefs.h"					// For MAX_WEAP_CLASSES
 #include "weap/weapList.h"					// For weaponClass[]
 #include "weap/weapSpawnXML.h"				// Our header file
-#include "wwii/wwiiHash.h"					// for hash_map
+#include "wwii/wwiiHash.h"					// for unordered_map
 
 // By-building, what can spawn here.
-#if platOS == OS_LINUX
-typedef std::unordered_map<std::string, WEAPON_LIST> BUILDING_SPAWNS;
-#else
-typedef stdext::hash_map<std::string, WEAPON_LIST> BUILDING_SPAWNS;
-#endif
+using BUILDING_SPAWNS = std::unordered_map<std::string, WEAPON_LIST>;
 static BUILDING_SPAWNS s_buildingSpawns;
 
 //////////////////////////////////////////////////////////////////////

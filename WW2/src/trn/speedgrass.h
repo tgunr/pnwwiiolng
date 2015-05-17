@@ -9,7 +9,6 @@
 #include "physics/colliderQuery.h"
 
 #include "wwii/wwiiHash.h"
-USING_EXT_NAMESPACE;
 
 #if USE_STATESET
 #include "ogl/States.h"
@@ -61,7 +60,7 @@ struct Patch
     std::vector<short> indices;
 
     std::vector<Vec2f> collide;
-    stdext::hash_map<dGeomID, int> geommap;
+    std::unordered_map<dGeomID, int> geommap;
 
     int vboid;
 

@@ -20,7 +20,6 @@
 #include "mem/mem.h"
 
 using namespace std;
-USING_EXT_NAMESPACE;
 
 TextureFont::TextureFont( const char* name, int size )
 {

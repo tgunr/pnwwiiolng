@@ -20,16 +20,13 @@
 #include "ui/uiChat.h"
 #endif
 
-USING_EXT_NAMESPACE;
-
 static SINT32 numsounds;
 static SINT32 numsndused;
 
 static SOUNDCACHE g_sndCache[MINSOUNDCACHE];
 static std::queue<LPSOUNDCACHE> g_sndFree;
 
-typedef stdext::hash_map<std::string, LPSOUNDCACHE> SoundCacheHash;
-
+using SoundCacheHash = std::unordered_map<std::string, LPSOUNDCACHE>;
 static SoundCacheHash g_hashSnd;
 
 static LOGICAL g_noLog = FALSE;

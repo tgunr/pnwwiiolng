@@ -11,7 +11,6 @@ Description:
 #include "scen/ScenarioManager.h"
 #include "fio/fio.h"
 #include "wwii/wwiiHash.h"
-USING_EXT_NAMESPACE;
 
 #include <vector>
 #include <deque>
@@ -40,7 +39,7 @@ static std::vector<float> billboardTexCoords;
 
 static ref_ptr<oglVertexBuffer> vbo;
 
-typedef stdext::hash_set<unsigned int> TreeSet;
+using TreeSet = std::unordered_set<unsigned int>;
 static TreeSet activetrees;
 
 #if USE_PREALLOCATED_TREES
