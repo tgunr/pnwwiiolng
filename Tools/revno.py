@@ -1,4 +1,4 @@
-#! /bin/env -e python
+#! /bin/env python
 ##################################################
 # Script to generate a C file listing the current
 # revision of a given source repository.
