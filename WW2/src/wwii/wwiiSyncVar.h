@@ -24,13 +24,12 @@ public:
 	VarGroup(TeulTimeMS& parent) : m_lastModified(0ULL), m_parent(parent), m_members(0) {}
 	virtual ~VarGroup() {}
 
+	VarGroup& operator = (const VarGroup& rhs) = delete;	// DO NOT USE!
+
 protected:
 	TeulTimeMS	m_lastModified;
 	TeulTimeMS&	m_parent;
 	UINT32		m_members;
-
-private:
-	VarGroup& operator = (const VarGroup& rhs);	// DO NOT USE!
 
 public:
 	void setModified()
