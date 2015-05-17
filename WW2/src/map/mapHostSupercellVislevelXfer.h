@@ -20,7 +20,8 @@ private:	void* operator new(size_t);		// Prohibited: See "allocate" instead.
 			//! Associate this object with the given supercell.
 public:		void associateWith(Supercell& sc, const size_t dataSize_bytes)
 			{
-				m_size_bytes = dataSize_bytes;
+				assert(dataSize_bytes < std::numeric_limits<decltype(m_size_bytes)>::max());
+				m_size_bytes = static_cast<UINT16>(dataSize_bytes);
 				m_scx = sc.x;
 				m_scy = sc.y;
 				sc.m_xfer = this;
