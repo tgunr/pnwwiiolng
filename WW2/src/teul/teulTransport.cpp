@@ -108,19 +108,9 @@ teulGetHost(const char* address_, UINT32* host_)
 	}
 
 	UINT32 host = (*host_) = 0;
-#if platOS == OS_LINUX
-	if ( inet_aton(address_, (struct in_addr*)&host) == 0 )
+	auto ptResult = inet_pton(AF_INET, address_, (struct in_addr*)(&host));
+	if (ptResult < 1)
 		return false;
-#elif platOS == OS_WIN32
-	host = inet_addr(address_);
-	if ( host == 0 )
-		return false;
-#elif platOS == OS_MACOS
-	if ( inet_aton(address_, (struct in_addr*)&host) == 0 )
-		return false;
-#else
-	#error "fix this, man..."
-#endif
 	*host_ = ntohl(host);
 	return true;
 }
