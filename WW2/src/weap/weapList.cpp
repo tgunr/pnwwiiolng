@@ -194,7 +194,7 @@ UINT8 weapFindClassIndex(const std::string& className)
 		if (PN_UNLIKELY(weaponClass[i].active == false))
 			continue;
 		if (weaponClass[i].m_hash == hash && weaponClass[i].name == className)
-			return i;
+			return static_cast<UINT8>(i);
 	}
 	return 0;
 }
