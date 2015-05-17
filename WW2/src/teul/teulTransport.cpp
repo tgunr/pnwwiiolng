@@ -42,11 +42,7 @@ extern SINT32 teulOpenConnection(const SINT32 teulIndex, const bool listening, c
 SCHAR* teulModuleName;
 SCHAR* teulAppName;
 
-void dummyLogFn(const char* const, ...)
-{
-}
-
-void (*Teul::g_logFnPtr) (const char* const, ...) = dummyLogFn;
+Teul::LoggingFn Teul::g_logFnPtr = [](const char* const, ...) {};
 
 static bool _transportInited, _transportClosing;
 
@@ -433,7 +429,7 @@ teulInitTransport(SINT32 logType
 					, const char* name
 					, ERROR_FUNCTION* errorFnPtr
 					, void (*killFnPtr)(int)
-					, Teul::LoggingFn* const logFnPtr)
+					, Teul::LoggingFn const logFnPtr)
 {
 	if ( _transportInited )
 	{
