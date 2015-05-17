@@ -46,8 +46,6 @@
 std::vector<DAMAGE_QUEUE_ENTRY> damageQueue;
 CPStruct* _cpList;
 
-UINT32 _stratUpdateWait = 1000 / STRAT_SYNC_FREQUENCY;
-
 LOGICAL _stratAddressReceived = FALSE;
 
 static void
