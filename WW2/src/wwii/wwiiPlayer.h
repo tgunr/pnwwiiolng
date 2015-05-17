@@ -67,9 +67,9 @@ public:
 	void operator delete(void* ptr);
 
 	wwiiPlayer() : m_teulIndex(-1) {}
-private:
-	wwiiPlayer(const wwiiPlayer* rhs);
-	wwiiPlayer(const wwiiPlayer& rhs);
+	wwiiPlayer(const wwiiPlayer* rhs) = delete;
+	wwiiPlayer(const wwiiPlayer& rhs) = delete;
+
 public:
 	wwiiPlayer& operator = (const wwiiPlayer* rhs);
 	virtual ~wwiiPlayer() {}
