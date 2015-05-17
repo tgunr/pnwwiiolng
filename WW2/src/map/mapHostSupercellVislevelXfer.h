@@ -87,7 +87,7 @@ public:		static size_t calculateBytesNeededFor(const Supercell& sc)
 
 				// Partition and populate.
 				char* curPtr = (char*)allocation;
-				for ( _ItrType it = begin; it != end; ++it )
+				for ( auto it = begin; it != end; ++it )
 				{
 					Supercell& sc = it->second;
 					const size_t byteSize = calculateBytesNeededFor(sc);
@@ -99,7 +99,7 @@ public:		static size_t calculateBytesNeededFor(const Supercell& sc)
 
 					xfer->associateWith(sc, byteSize);
 
-					const size_t numObjs = sc.numObjects;
+					const auto& numObjs = sc.numObjects;
 					numBuildings += numObjs;
 					if ( numObjs > maxBuildings )
 						maxBuildings = numObjs;
