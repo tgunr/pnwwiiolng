@@ -17,8 +17,8 @@ add_definitions(
 	"-D_SECURE_SCL=0"
 )
 
-set(_LANGUAGE_FLAGS "/Zc:wchar_t /Zc:forScope /GR")
-set(_DIAGNOSTIC_FLAGS "/WX- /FR /wd4480;4800")
+set(_LANGUAGE_FLAGS "/Zc:wchar_t /Zc:forScope") # /GR
+set(_DIAGNOSTIC_FLAGS "/WX- /FR /wd4480 /wd4800")
 set(_DEV_FLAGS "")
 IF (CMAKE_BITNESS EQUAL 32)
 	SET(ARCHITECTURE "/arch:SSE2")
