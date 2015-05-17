@@ -157,7 +157,6 @@ ADD_OMG_TARGET(omg/omgChatMissionStatus)
 IF(NOT MSVC)
 	SET_TARGET_PROPERTIES(omggen PROPERTIES COMPILE_FLAGS "-O3 -march=native -mtune=native -Wno-error -Wno-all -Wno-format-security") #
 ENDIF( )
-ADD_DEPENDENCIES(omggen ${OMG_DIR}/omg.y ${OMG_DIR}/omg.l)
 SET_PROPERTY(TARGET omggen PROPERTY FOLDER "Tools")
 
 ADD_LIBRARY(ircclient
