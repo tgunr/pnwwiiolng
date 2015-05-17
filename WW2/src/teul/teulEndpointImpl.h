@@ -31,7 +31,7 @@ struct EndpointImpl
 	WWII::Cryptographer<false>	m_rxCrypt;		//!< Receiving decryptor.
 	TeulTimeMS					m_lastTickRx;	//!< When we received the last tick.
 
-	typedef std::vector<struct DATA_GRAM*> DatagramQueue;
+	using DatagramQueue = std::vector<struct DATA_GRAM*>;
 	DatagramQueue	recvQueue;
 	std::vector<Teul::Packet*> m_sendQueue;
 

@@ -9,7 +9,7 @@
 namespace Teul
 {
 
-	typedef std::function<SINT32(ACTION_OBJECT*)> ACTION_FN;
+	using ACTION_FN = std::function<SINT32(ACTION_OBJECT*)>;
 
 	struct CallbackInit
 	{
