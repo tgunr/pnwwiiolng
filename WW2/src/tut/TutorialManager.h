@@ -252,8 +252,7 @@ public:
 private:
 
 	void _resetFlags();
-	int _handleEvent(TutorialHandler& handler, ...);
-	int _handleEvent(TutorialHandler& handler, va_list& args);
+	int _handleEvent(TutorialHandler& handler, va_list* args=nullptr);
 
 	// script currently running
 	TutorialScript _current;
