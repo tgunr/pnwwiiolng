@@ -23,8 +23,8 @@ namespace Chat
 	template <class _CharType, class _Traits = name_traits<_CharType>>
 	struct BasicName : public _Traits
 	{
-		typedef _CharType value_type;
-		typedef BasicName<_CharType> self_type;
+		using value_type = _CharType;
+		using self_type = BaiscName<_CharType>;
 
 		value_type m_name[_Traits::MaxHandleSize];
 
