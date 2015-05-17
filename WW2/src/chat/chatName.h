@@ -24,7 +24,7 @@ namespace Chat
 	struct BasicName : public _Traits
 	{
 		using value_type = _CharType;
-		using self_type = BaiscName<_CharType>;
+		using self_type = BasicName<value_type>;
 
 		value_type m_name[_Traits::MaxHandleSize];
 
