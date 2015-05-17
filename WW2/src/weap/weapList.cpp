@@ -110,11 +110,7 @@ extern std::vector<std::unique_ptr<WEAPON>> g_weaponPtrs;
 WEAPON_SPAWNS g_weaponSpawns;
 
 // Weapons indexed by name
-#if platOS == OS_LINUX
 typedef std::unordered_map<std::string,WEAPON*> WEAPON_NAME_INDEX;
-#else
-typedef stdext::hash_map<std::string,WEAPON*> WEAPON_NAME_INDEX;
-#endif
 static WEAPON_NAME_INDEX weaponNameIndex;
 
 bool weapHasInitialized()
