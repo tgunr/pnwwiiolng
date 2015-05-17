@@ -979,7 +979,7 @@ void Group::Emit(size_t indentLevel) const
 
 	if (m_extraCode.empty() == false) {
 		HXX("\n");
-		HXX("%s", m_extraCode.c_str());
+		HXX("%s\n", m_extraCode.c_str());
 	}
 
 	HXX("%s} %s;\n", _getIndents(indentLevel), m_memberName.c_str());
