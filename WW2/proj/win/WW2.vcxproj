@@ -263,7 +263,7 @@
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
     </ProjectReference>
     <PreBuildEvent>
-      <Command>$(SolutionDir)/Tools/revno.py $(SolutionDir)</Command>
+      <Command>python $(SolutionDir)\Tools\revno.py $(SolutionDir)</Command>
     </PreBuildEvent>
     <PreBuildEvent>
       <Message>Generate client_revision.h</Message>
