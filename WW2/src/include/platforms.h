@@ -143,7 +143,9 @@ UINT32 strprintf(char(&buf)[bufSize], const char* fmt, Args&&... args)
 	static_assert(bufSize < size_t(1 << 31), "Buffer too large");
 #if platOS == OS_WIN32
 	int printed = snprintf(buf, bufSize, fmt, std::forward<Args>(args)...);
-	buf[bufSize - 1] = 0;
+	if (printed < 0) {
+		return bufSize;
+	}
 #else
 	int printed = snprintf(buf, bufSize, fmt, std::forward<Args>(args)...);
 #endif
