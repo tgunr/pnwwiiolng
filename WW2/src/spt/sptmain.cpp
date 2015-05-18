@@ -46,7 +46,6 @@ Description:
 #endif
 
 #include "wwii/wwiiHash.h"
-USING_EXT_NAMESPACE;
 
 #define MAX_TREE_PRIMITIVES  1000
 

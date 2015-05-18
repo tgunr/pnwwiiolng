@@ -112,7 +112,7 @@ extern open_file_writer_callback *OpenFileWriterCallback;
 
 EXPAPI GS_READ open_file_writer_callback *GetDefaultFileWriterOpenCallback(void);
 EXPAPI GS_MODIFY void SetDefaultFileWriterOpenCallback(
-    open_file_writer_callback *OpenFileWriterCallback);
+    open_file_writer_callback *OpenFileWriterCallback_);
 
 
 

@@ -1840,7 +1840,7 @@ static unsigned int findalpha4x4(unsigned short* output,const unsigned char* inp
     unsigned char counts[16];
 
     unsigned int amin,amax,atop,mmin,mmax;
-    unsigned int p,tot,d1,d2,pv;
+    unsigned int p,tot,pv;
     int i,j;
     unsigned int best,besterr,a1,a2;
     unsigned int c[8];
@@ -1955,6 +1955,7 @@ static unsigned int findalpha4x4(unsigned short* output,const unsigned char* inp
 
 
     // try one below and one over
+	unsigned int d1, d2;
     for(a1=amin;a1<=atop;a1++)
     {
         a2=1;

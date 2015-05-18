@@ -16,7 +16,7 @@
 // allocates a facility nodes for each facility and a building list for each
 // facility that is filled out when sdmCreateBuildingTable is called.
 STRAT_FACILITY_TABLE*
-sdmCreateFacilityTable(FACILITY* const fac, const size_t numFacilities, const size_t numCPs)
+sdmCreateFacilityTable(FACILITY* const fac, const SINT32 numFacilities, const SINT32 numCPs)
 {
 	// Bridges get fake facilities, so we have to look at CPs.
 	const size_t potentialFacs = numFacilities + numCPs;
@@ -25,7 +25,7 @@ sdmCreateFacilityTable(FACILITY* const fac, const size_t numFacilities, const si
 
 	const size_t HeaderNodeSize = sizeof(STRAT_FACILITY_TABLE);
 	const size_t FacilityNodeListSize = sizeof(STRAT_FACILITY_NODE) * potentialFacs;
-	const size_t BuildingTableSize = sizeof(SINT16) * MAX_BUILD_PER_FAC;
+	const size_t BuildingTableSize = sizeof(STRAT_BUILDING_LIST::bid) * MAX_BUILD_PER_FAC;
 	const size_t BuildingTableListSize = BuildingTableSize * potentialFacs;
 
 	const size_t AllocationSize = HeaderNodeSize + FacilityNodeListSize + BuildingTableListSize;

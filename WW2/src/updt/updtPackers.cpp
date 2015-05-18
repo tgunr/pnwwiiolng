@@ -596,7 +596,7 @@ static void _initVehicleHeader(VEHICLE_UPDATE_HEADER* const vupHeader, Viewing& 
 		// so that they know that gun flashed. Lousy way to do this.
 		for (SINT32 t = 0; t < MAX_GUNS; t++)
 		{
-			const size_t mask = 1 << t;
+			const size_t mask = 1ULL << t;
 			if ((vehInfo->fire.valid & mask) != 0)
 			{
 				if ( vehInfo->fire.clock64[t] > viewing.m_lastSent )

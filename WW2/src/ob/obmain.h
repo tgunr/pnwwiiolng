@@ -392,7 +392,7 @@ struct OBJECT
 	// NOP now.
 	void SyncStaticData();
 
-	void PopulateIndexes(size_t index)
+	void PopulateIndexes(UINT16 index)
 	{
 		for (auto it = ptris + index, end = ptris + numtris; it != end; ++it)
 		{

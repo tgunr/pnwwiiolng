@@ -129,7 +129,7 @@ struct ACTION_OBJECT
 		, endpoint(nullptr), m_client(nullptr)
 	{}
 
-	void packer(LOGICAL mode, bool& value, SINT32 sb = 1) { return (mode == TEUL_PACK) ? pack(value, 0) : unpack(value, sb); }
+	void packer(LOGICAL mode, bool& value, SINT32 sb = 1) { return (mode == TEUL_PACK) ? pack(value, sb) : unpack(value, sb); }
 	void packBytes(LOGICAL mode, void* byteStream, SINT32 numBytes) { this->offset = teulPackVoid(mode, this->packed, this->offset, byteStream, numBytes); }
 
 	//! @brief Check that the packed data stream has enough bytes to populate an object type.
@@ -243,13 +243,15 @@ struct ACTION_OBJECT
 
 	void pack(const bool& value, SINT32 sb = 1) 
 	{
+		assert(sb == 1 || sb == 0);
 		UCHAR i(value ? 1 : 0);
-		pack(i, sb);
+		pack(i, 1);
 	}
 	void unpack(bool& value, SINT32 sb = 1)
 	{
+		assert(sb == 1 || sb == 0);
 		UCHAR i(0);
-		unpack(i, sb);
+		unpack(i, 1);
 		value = (i != 0);
 	}
 
@@ -308,34 +310,24 @@ struct Packer
 
 //! @brief Count the highest bit number needed to describe the given value.
 //! E.g. BitCount<0>::count has a value of zero (bit 0 is the highest used).
-template<UINT32 _value>
-struct BitCount
+template<class T, typename std::enable_if_t<std::is_integral<T>::value && std::is_signed<T>::value>* = nullptr>
+constexpr static inline size_t BitCount(T _value) noexcept
 {
-	enum { count = (_value & 1) + Teul::BitCount<(_value >> 1)>::count };
-};
-
-template<>
-struct BitCount<0>
+	return 	_value < 0 ? BitCount(uint64_t(-_value), 1) : BitCount(uint64_t(_value), 1);
+}
+template<class T, typename std::enable_if_t<std::is_integral<T>::value && std::is_unsigned<T>::value>* = nullptr>
+constexpr static inline size_t BitCount(T _value) noexcept
 {
-	enum { count = 0 };
-};
-
-//! @brief Get the number of bits required to describe the given value.
-//! E.g. BitRank<0>::rank has a value of one (one bit is required).
-template<UINT32 _value>
-struct BitRank
+	return BitCount(static_cast<UINT64>(_value), 0);
+}
+constexpr static inline size_t BitCount(UINT64 _value, size_t bitNo) noexcept
 {
-	enum { rank = (_value & 1) ? 1 : Teul::BitRank<(_value >> 1)>::rank + 1 };
-};
-template<>
-struct BitRank<0>
-{
-	enum { rank = 0 };
-};
+	return _value ? BitCount(_value >> 1, bitNo + 1) : bitNo;
+}
 
 //! @brief Test if an unsigned value fits into a given number of bits.
 template<typename _Type>
-bool FitUnsignedBitValue(const _Type& value, size_t bits)
+constexpr bool FitUnsignedBitValue(const _Type& value, size_t bits) noexcept
 {
 	return ((UINT64)value >> bits) == 0ULL;
 }
@@ -343,7 +335,7 @@ bool FitUnsignedBitValue(const _Type& value, size_t bits)
 //! @brief Test if a signed value fits into a given number of bits,
 //! allowing for a sign bit.
 template<typename _Type>
-bool FitSignedBitValue(const _Type& value, size_t bits)
+bool FitSignedBitValue(const _Type& value, size_t bits) noexcept
 {
 	// Populate all the bits in "sign" with the sign bit
 	// (i.e. sign will be either all zeros or all ones).

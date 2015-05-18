@@ -65,7 +65,7 @@ public:
         UNDEFINED = 0x0
     };
 
-    typedef stdext::hash_map<std::string, struct UniformParams*> UniformList;
+    using UniformList = std::unordered_map<std::string, struct UniformParams*>;
 
     glslUniformBlock();
     glslUniformBlock(const std::string& name);

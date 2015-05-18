@@ -297,7 +297,7 @@ bool rnmainGetOnlineSetting()
 	{
 		Online = 1;
 
-		if (teulGetHost(ServerIP, &GameHost) == 0)
+		if (teulGetHost(GameServerIP, &GameHost) == 0)
 		{
 			Write_Debug("Unable to translate host address");
 			return false;
@@ -305,13 +305,13 @@ bool rnmainGetOnlineSetting()
 
 		GamePort = WWII::Net::Ports::MapHost;
 		CommType = PROTOCOL_TCP;
-		GameOTP = strtoul(ServerOTP, nullptr, 10);
+		GameOTP = strtoul(GameServerOTP, nullptr, 10);
 
 #if FRES || defined(BETA_RELEASE)
 		if(GameOTP == 0)
 		{
 			GameOTP = AUTH_BYPASS_OTP;
-			snprintf(ServerOTP, sizeof(ServerOTP)-1, "%u", GameOTP);
+			snprintf(GameServerOTP, sizeof(GameServerOTP)-1, "%u", GameOTP);
 		}
 #endif
 	}
@@ -341,7 +341,7 @@ bool rnmainGetOnlineSetting()
 				return false;
 			}
 		}
-		else if (ServerIP[0] != 0)
+		else if (GameServerIP[0] != 0)
 		{
 			Online = 1;
 
@@ -1438,23 +1438,23 @@ FILE*	stream;
 static LOGICAL _ParseCommandArgs(UINT32* host, UINT16* port, UINT16* protocol, UINT32* otp)
 {
 
-	if (ServerIP[0] == 0)
+	if (GameServerIP[0] == 0)
 		return FALSE;
-	if (ServerPort[0] == 0)
+	if (GameServerPort[0] == 0)
 		return FALSE;
-	if (ServerOTP[0] == 0)
+	if (GameServerOTP[0] == 0)
 		return FALSE;
 
-	if (teulGetHost(ServerIP, host) == 0)
+	if (teulGetHost(GameServerIP, host) == 0)
 	{
 		Write_Debug("Unable to translate host address");
 		return (FALSE);
 	}
 
-	*port = (UINT16)strtoul(ServerPort, nullptr, 10);
+	*port = (UINT16)strtoul(GameServerPort, nullptr, 10);
 	*protocol = PROTOCOL_TCP;
 
-	*otp = strtoul(ServerOTP, nullptr, 10);
+	*otp = strtoul(GameServerOTP, nullptr, 10);
 
 	return TRUE;
 

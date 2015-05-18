@@ -37,7 +37,7 @@ namespace Debug
 		ERR_DBUG					// debug level message
 	,	ERROR_TYPE_SIZE
 	};
-	typedef unsigned int ERROR_TYPE;
+	using ERROR_TYPE = unsigned int;
 }
 
 #define STD_ERR				0x0010	// mirror significant output to stderr
@@ -96,7 +96,7 @@ namespace Debug
 
 namespace Debug
 {
-typedef void  (*ERROR_HANDLER) (void);
+	using ERROR_HANDLER = void(*)(void);
 }
 
 // dbugInit: sets the current error level to ERR_INFO, opens the debug file, and initializes

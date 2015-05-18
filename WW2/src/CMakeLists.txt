@@ -1,6 +1,7 @@
 CMAKE_MINIMUM_REQUIRED(VERSION 2.6.4)
 PROJECT(GameHosts)
 
+# This will determine bitness, amongst other things.
 INCLUDE( cmakeincludes/Platform.cmake )
 
 ################################################################################
@@ -11,6 +12,7 @@ SET(CMAKE_MODULE_PATH "${CMAKE_MODULE_PATH};${CMAKE_CURRENT_SOURCE_DIR}/cmakeinc
 SET(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 SET(PROJECT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../..")
 SET(LIBRARIES_DIR "${PROJECT_DIR}/Libraries")
+SET(CMAKE_CXX_STANDARD 14)
 
 SET(AUTH_HOST_EXE "authHost")
 SET(CONTROLLER_HOST_EXE "controller")
@@ -90,7 +92,7 @@ SET(PCH_INCLUDE_HEADERS
 MESSAGE(STATUS "${PN_BUILD_TYPE}/${BUILDNAME} build. Opt:${OPTIMIZATION}, MEM:${PN_MEM_DEBUG}, STACK:${PN_STACK_PROTECT}")
 
 ######################################################################
-#### Libraries.
+#### Code Generators.
 
 SET(OMG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/omg")
 SET(OMGGEN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/omggen")
@@ -157,8 +159,10 @@ ADD_OMG_TARGET(omg/omgChatMissionStatus)
 IF(NOT MSVC)
 	SET_TARGET_PROPERTIES(omggen PROPERTIES COMPILE_FLAGS "-O3 -march=native -mtune=native -Wno-error -Wno-all -Wno-format-security") #
 ENDIF( )
-ADD_DEPENDENCIES(omggen ${OMG_DIR}/omg.y ${OMG_DIR}/omg.l)
 SET_PROPERTY(TARGET omggen PROPERTY FOLDER "Tools")
+
+######################################################################
+#### Libraries.
 
 ADD_LIBRARY(ircclient
 	libircclient/src/libircclient.cpp
@@ -1157,8 +1161,8 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
 	IF( NOT MSVC )
 		SET_PROPERTY(SOURCE ${_LUA_HOST}Lua.cc PROPERTY COMPILE_FLAGS "${COMPILE_FLAGS} -Wno-unused -Wno-unused-function")
 	ELSE( )
-		SET_PROPERTY(SOURCE ${_LUA_HOST}Lua.cc PROPERTY COMPILE_FLAGS "/W0")
-		SET_PROPERTY(SOURCE ${_LUA_HOST}Lua.cc PROPERTY COMPILE_FLAGS "/wd4480;4800;4305;4505")
+		SET_PROPERTY(SOURCE ${_LUA_HOST}Lua.cc PROPERTY COMPILE_FLAGS /W0)
+		SET_PROPERTY(SOURCE ${_LUA_HOST}Lua.cc PROPERTY COMPILE_FLAGS "/wd4480 /wd4800 /wd4305 /wd4505")
 	ENDIF( )
 	SET_PROPERTY(SOURCE ${_LUA_HOST}Lua.cc PROPERTY GENERATED true)
 	TARGET_LINK_LIBRARIES(${STRAT_HOST_EXE} libwwii ${MYSQL_LIBRARIES} teulserver ircclient ${LUA_LIBRARIES} ${TOLUAPP_LIBRARIES} )

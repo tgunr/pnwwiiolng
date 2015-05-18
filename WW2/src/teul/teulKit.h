@@ -29,7 +29,7 @@ SINT32 teulInitTransport(SINT32 logType
 						, const char* name
 						, ERROR_FUNCTION* errorFnPtr
 						, void (*killFnPtr)(int /*signo*/)
-						, Teul::LoggingFn* const logFnPtr = nullptr
+						, Teul::LoggingFn const logFnPtr=nullptr
 						);
 
 //	there are 48 local connections "built in" to the teul system, and each

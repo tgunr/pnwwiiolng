@@ -12,7 +12,6 @@
 	#define _GDI32_
 
 #define NO_DEBUG_WRITE
-#define USING_EXT_NAMESPACE using namespace stdext
 #pragma warning (disable: 4800) // shut the #$!@ up
 
 #include "include/platforms.h"
@@ -67,7 +66,6 @@ typedef void (*SYS_KEYBOARDFUNC)(UINT message, WPARAM wparam, LPARAM lparam);
 
 #include "log/log.h"
 
-#define USING_EXT_NAMESPACE using namespace stdext
 #pragma warning (disable: 4800) // shut the #$!@ up
 
 #ifndef snprintf

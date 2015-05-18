@@ -20,7 +20,8 @@ private:	void* operator new(size_t);		// Prohibited: See "allocate" instead.
 			//! Associate this object with the given supercell.
 public:		void associateWith(Supercell& sc, const size_t dataSize_bytes)
 			{
-				m_size_bytes = dataSize_bytes;
+				assert(dataSize_bytes < (size_t)std::numeric_limits<SINT32>::max());
+				m_size_bytes = static_cast<SINT32>(dataSize_bytes);
 				m_scx = sc.x;
 				m_scy = sc.y;
 				sc.m_xfer = this;
@@ -87,7 +88,7 @@ public:		static size_t calculateBytesNeededFor(const Supercell& sc)
 
 				// Partition and populate.
 				char* curPtr = (char*)allocation;
-				for ( _ItrType it = begin; it != end; ++it )
+				for ( auto it = begin; it != end; ++it )
 				{
 					Supercell& sc = it->second;
 					const size_t byteSize = calculateBytesNeededFor(sc);
@@ -99,7 +100,7 @@ public:		static size_t calculateBytesNeededFor(const Supercell& sc)
 
 					xfer->associateWith(sc, byteSize);
 
-					const size_t numObjs = sc.numObjects;
+					const auto& numObjs = sc.numObjects;
 					numBuildings += numObjs;
 					if ( numObjs > maxBuildings )
 						maxBuildings = numObjs;

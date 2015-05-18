@@ -235,7 +235,7 @@ extern UINT32 persAddHitSoundsForHitComponent(
 								FLOAT32 DamageAccrued);
 
 extern void persSetView(UINT32 type, UINT32 level);
-extern void persSetNormalView(FLOAT32 FieldOfView);
+extern void persSetNormalView(FLOAT32 FieldOfView_);
 extern void persResetHealths(void);
 extern UINT32 persSetPersonaPositionCallback(SINT32 param, UINT32 id, UINT32 detach);
 extern void persShakeHead(const char* message = nullptr);

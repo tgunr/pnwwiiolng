@@ -73,7 +73,7 @@ EXPTYPE struct texture
 };
 EXPCONST EXPGROUP(texture) extern data_type_definition TextureType[];
 
-EXPAPI GS_SAFE char const *GetTextureTypeName(int32x TextureType);
+EXPAPI GS_SAFE char const *GetTextureTypeName(int32x TextureType_);
 EXPAPI GS_SAFE char const *GetTextureEncodingName(int32x Encoding);
 
 EXPAPI GS_SAFE int32x GetRawImageSize(pixel_layout const &Layout, int32x Stride,

@@ -669,7 +669,7 @@ void omg_add_enum_value(const char* name)
 
 	_checkName(name);
 
-	Enumeration* enumeration = dynamic_cast<Enumeration*>(s_currentNode);
+	Enumeration* enumeration = static_cast<Enumeration*>(s_currentNode);
 	assert(enumeration != nullptr);
 	EnumValue* value = new EnumValue(name, enumeration->m_count++, s_currentNode);
 
@@ -831,7 +831,7 @@ void Message::EmitGroupPackers() const
 	CXX(
 		"bool %s::groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack) const\n"
 		"{\n"
-		"\t%s groupPresence(0);\n"
+		"\t%s groupPresence{0};\n"
 		"\tSINT32 groupPresenceOffset = a->offset;\n"
 		"\ta->pack(groupPresence, %" PRSizeT ");\n"
 		, GetQualifiedName().c_str()
@@ -852,7 +852,7 @@ void Message::EmitGroupPackers() const
 	CXX(
 		"\tif (groupPresence == 0)\n"
 		"\t\treturn false;\n"
-		"\ta->offset = teulPack%s(TEUL_PACK, a->packed, groupPresenceOffset, &groupPresence, %" PRSizeT ");\n"
+		"\tteulPack%s(TEUL_PACK, a->packed, groupPresenceOffset, &groupPresence, %" PRSizeT ");\n"
 		"\treturn (a->offset >= 0);\n"
 		"}\n"
 		"\n"
@@ -979,7 +979,7 @@ void Group::Emit(size_t indentLevel) const
 
 	if (m_extraCode.empty() == false) {
 		HXX("\n");
-		HXX("%s", m_extraCode.c_str());
+		HXX("%s\n", m_extraCode.c_str());
 	}
 
 	HXX("%s} %s;\n", _getIndents(indentLevel), m_memberName.c_str());

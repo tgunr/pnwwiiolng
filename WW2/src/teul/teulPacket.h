@@ -143,10 +143,6 @@ public:
 	void increaseUsedPayloadBytes(const UINT32 bytes_) { m_packetSizeBytes += bytes_; }
 	void increaseUsedPayloadBits(const UINT32 bits_) { increaseUsedPayloadBytes((bits_+7)/8); }
 
-	// Please don't use pointers.
-	private: template<typename _Type> void append(const _Type* data_);
-	private: template<typename _Type> void append(_Type* data_);
-
 	//! Allocate bytes and return a pointer to the start of those bytes.
 	//! @caution This pointer is potentially invalidated by any call
 	//! that changes capacity and causes a reallocation. Use with care.
@@ -181,6 +177,10 @@ public:
 		new (obj) Type_(std::forward<Args>(args)...);
 		return *obj;
 	}
+
+	// Please don't use pointers.
+	template<typename _Type> void append(const _Type* data_) = delete;
+	template<typename _Type> void append(_Type* data_) = delete;
 
 	//! Add a piece of data to the end of the packet.
 	public:

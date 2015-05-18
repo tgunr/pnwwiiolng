@@ -12,13 +12,7 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#if platOS == OS_WIN32
 #include <tuple>
-#include <hash_map>
-#else
-#include <tr1/tuple>
-#include <map>
-#endif
 #include <iomanip>
 
 #include "sdm/BuildTerrain.h"
@@ -142,15 +136,14 @@ static void FindClose(HANDLE& h)
 
 #endif
 
-typedef tuple<int, int, int>			StratObjId;
-typedef pair<_DEPOTLINK*, _BUILDING*>	LinkCPFdata;
-typedef pair<_WAYPOINT*, _BUILDING*>	WaypointCPFdata;
-
-typedef map<StratObjId, _CP*>				ChokepointCPFmap;
-typedef map<StratObjId, _FACILITY*>			FacilityCPFmap;
-typedef map<StratObjId, _BUILDING*>			BuildingCPFmap;
-typedef map<StratObjId, LinkCPFdata>		LinkCPFmap;
-typedef map<StratObjId, WaypointCPFdata>	WaypointCPFmap;
+using StratObjId = tuple<int, int, int>;
+using LinkCPFdata = pair<_DEPOTLINK*, _BUILDING*>;
+using WaypointCPFdata = pair<_WAYPOINT*, _BUILDING*>;
+using ChokepointCPFmap = map<StratObjId, _CP*>;
+using FacilityCPFmap = map<StratObjId, _FACILITY*>;
+using BuildingCPFmap = map<StratObjId, _BUILDING*>;
+using LinkCPFmap = map<StratObjId, LinkCPFdata>;
+using WaypointCPFmap = map<StratObjId, WaypointCPFdata>;
 
 static ChokepointCPFmap	chokepointCPFmap;
 static FacilityCPFmap	facilityCPFmap;
@@ -174,9 +167,9 @@ struct ObjectId
 	}
 };
 
-typedef map<ObjectId, BUILDING*> BuildingMap;
-typedef map<ObjectId, CP*> CPMap;
-typedef map<ObjectId, FACILITY*> FacilityMap;
+using BuildingMap = map<ObjectId, BUILDING*>;
+using CPMap = map<ObjectId, CP*>;
+using FacilityMap = map<ObjectId, FACILITY*>;
 
 struct CellStratData
 {
@@ -196,7 +189,7 @@ struct CellStratData
     }
 };
 
-typedef map<pair<int, int>, CellStratData>	CellStratMap;
+using CellStratMap = map<pair<int, int>, CellStratData>;
 static CellStratMap		cellStratMap;
 
 struct TerrainPosition
@@ -221,7 +214,7 @@ struct ModelStats
 	ModelStats() : totalInstanceCount(0), steepPlaces(0), nonPlanarCount(0)	{}
 	ModelStats(const ModelStats& draft) : totalInstanceCount(draft.totalInstanceCount), steepPlaces(draft.totalInstanceCount), nonPlanarCount(draft.totalInstanceCount)	{}
 };
-typedef map<const PoolModel*, ModelStats>	ModelStatsMap;
+using ModelStatsMap = map<const PoolModel*, ModelStats>;
 static ModelStatsMap modelStatsMap;
 
 #if platOS == OS_MACOS
@@ -245,15 +238,17 @@ static set<string>		missingModels;
 static streampos		streamUpdatePos;
 static int				sdmFilesMerged;
 
+using std::cbegin;
+using std::cend;
+
 static void MergeCPFdata()
 {
 	logFile << "Merging Strat Data...";
 
-	for(ChokepointCPFmap::iterator it = chokepointCPFmap.begin(); it != chokepointCPFmap.end(); ++it)
+	for(auto it = cbegin(chokepointCPFmap); it != cend(chokepointCPFmap); ++it)
 	{
-		_CP*	cpCPF	= it->second;
-		CP*		cpSDM	= (CP*)memAlloc(sizeof(CP));
-
+		const _CP* cpCPF = it->second;
+		CP* cpSDM = (CP*)memAlloc(sizeof(CP));
 
 		strcpy(cpSDM->fileName,	cpCPF->objname);
 		strcpy(cpSDM->name, cpCPF->name);
@@ -278,7 +273,7 @@ static void MergeCPFdata()
             cellStratData->maxStratId = cpSDM->oid.id;
 	}
 
-	for(FacilityCPFmap::iterator it = facilityCPFmap.begin(); it != facilityCPFmap.end(); ++it)
+	for(auto it = facilityCPFmap.begin(); it != facilityCPFmap.end(); ++it)
 	{
 		_FACILITY*	facCPF	= it->second;
 		FACILITY*	facSDM	= (FACILITY*)memAlloc(sizeof(FACILITY));

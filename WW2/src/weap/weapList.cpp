@@ -110,11 +110,7 @@ extern std::vector<std::unique_ptr<WEAPON>> g_weaponPtrs;
 WEAPON_SPAWNS g_weaponSpawns;
 
 // Weapons indexed by name
-#if platOS == OS_LINUX
 typedef std::unordered_map<std::string,WEAPON*> WEAPON_NAME_INDEX;
-#else
-typedef stdext::hash_map<std::string,WEAPON*> WEAPON_NAME_INDEX;
-#endif
 static WEAPON_NAME_INDEX weaponNameIndex;
 
 bool weapHasInitialized()
@@ -198,7 +194,7 @@ UINT8 weapFindClassIndex(const std::string& className)
 		if (PN_UNLIKELY(weaponClass[i].active == false))
 			continue;
 		if (weaponClass[i].m_hash == hash && weaponClass[i].name == className)
-			return i;
+			return static_cast<UINT8>(i);
 	}
 	return 0;
 }

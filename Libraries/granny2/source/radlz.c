@@ -107,23 +107,23 @@ static void scan_hashes( LZC lz, QUICKFIND * start, U32 which, U8 const* cur, U3
     {
       U8 const * cmp1;
       U8 const * cmp2;
-      U8 const * start;
+      U8 const * it;
 
-      start = quick->addr;
+      it = quick->addr;
 
       if ( quick->run_count >= lz->run )
       {
-        cmp1 = start + quick->run_count + 1;
+        cmp1 = it + quick->run_count + 1;
         cmp2 = cur + lz->run + 1;
         if ( cmp1 >= cmp2)
         {
-          start = cur - 1;
+          it = cur - 1;
           len = lz->run + 1;
         }
         else
         {
           len = lz->run + 1;
-          start = cmp1 - ( lz->run + 1 );
+          it = cmp1 - ( lz->run + 1 );
           while ( *cmp1 == *cmp2 )
           {
             ++cmp1;
@@ -190,7 +190,7 @@ static void scan_hashes( LZC lz, QUICKFIND * start, U32 which, U8 const* cur, U3
         }
 
         // cast for 64-bit
-        off = (U32)(cur - start - 1);
+        off = (U32)(cur - it - 1);
         comp = Arith_inv_probability( lz->lens[ lz->last_len ], b + 1, MAX_LENS + 1 );
         comp = Arith_combine_probabilities( comp, Arith_inv_probability( lz->offsl, GETL( off ), lz->max_offsL ) );
         comp = Arith_combine_probabilities( comp, Arith_inv_probability( lz->offst, GETT( off ), lz->offst_used ) );
@@ -201,7 +201,7 @@ static void scan_hashes( LZC lz, QUICKFIND * start, U32 which, U8 const* cur, U3
         {
           *best_comp = compb;
           *long_len = len;
-          *match = start;
+          *match = it;
           *bit_pat = b;
           if ( len >= stop_len )
             break;
@@ -210,10 +210,10 @@ static void scan_hashes( LZC lz, QUICKFIND * start, U32 which, U8 const* cur, U3
         {
           if ( compb == *best_comp )
           {
-            if ( start > ( U8* ) *match )
+            if ( it > ( U8* ) *match )
             {
               *long_len = len;
-              *match = start;
+              *match = it;
               *bit_pat = b;
               if ( len >= stop_len )
                 break;

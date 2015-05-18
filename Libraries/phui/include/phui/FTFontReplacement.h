@@ -59,14 +59,7 @@ private:
 # endif
 #endif
 
-#ifdef __GNUC__
-#include <ext/hash_map>
-#include <ext/hash_set>
-namespace stdext = ::__gnu_cxx;
-#elif defined(WIN32) || defined(WIN64)
-#include <hash_map>
-#include <hash_set>
-#endif
+#include <unordered_map>
 
 class FTFontChina : public FTFontAdaptor
 {
@@ -111,7 +104,7 @@ typedef struct ScaledCharData
     
 } ScaledCharData;
 
-typedef stdext::hash_map<int,ScaledCharData> ScaledCharDataMap;
+typedef std::unordered_map<int,ScaledCharData> ScaledCharDataMap;
 
 class FTFontWestern : public FTFontAdaptor 
 {

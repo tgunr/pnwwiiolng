@@ -82,9 +82,8 @@ public:
 			m_subscribers.clear();
 		}
 
-private:
-	Channel();
-	Channel(const Channel& rhs);
+	Channel() = delete;
+	Channel(const Channel& rhs) = delete;
 
 public:
 	ChannelID		channelID;

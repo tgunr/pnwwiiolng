@@ -20,7 +20,7 @@ Teul::NetTimeMS::pack(ACTION_OBJECT* const a, SINT32 bits /*= 0*/) const
 	else
 	{
 		bool smallValue = Teul::FitSignedBitValue(delta, SMALL_WITH_SIGN_BITS);
-		a->pack(smallValue, 0);
+		a->pack(smallValue);
 		a->pack(delta, static_cast<SINT32>(smallValue ? SMALL_WITH_SIGN_BITS : LARGE_WITH_SIGN_BITS));
 	}
 }

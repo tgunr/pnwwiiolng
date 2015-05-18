@@ -48,8 +48,7 @@ public:
 		Update(revs);
 	}
 
-private:
-	Schema& operator = ( const Schema& rhs );	// Do not use!
+	Schema& operator=(const Schema& rhs) = delete;	// Do not use!
 
 private:
 	class DBHANDLE& m_dbh;
@@ -58,4 +57,3 @@ private:
 };
 
 }
-

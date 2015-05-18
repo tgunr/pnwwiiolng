@@ -124,8 +124,7 @@ public:
 
 	virtual ~MappedFile();					// Destructor.
 
-private:
-	MappedFile(const MappedFile& rhs_);		//! @internal Do not use!
+	MappedFile(const MappedFile& rhs_) = delete;	//! @internal Do not use!
 
 public:
 	// Copying mapped files is only allowed for sub-views.
@@ -251,4 +250,3 @@ public:
 };
 
 }
-

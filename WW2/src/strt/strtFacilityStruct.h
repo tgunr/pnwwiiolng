@@ -187,7 +187,7 @@ public:
 	void recalculateCapacity();
 
 	// Change the country and save if neccessary
-	void setCountry(WWII_COUNTRY country);
+	void setCountry(WWII_COUNTRY toCountry);
 
 	// Set the open state
 	void setOpen(bool isOpen);

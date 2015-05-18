@@ -31,7 +31,7 @@ enum
 static std::set<std::string> BlockMap;
 static std::map<std::string, int> BaseID;
 
-typedef stdext::hash_map<std::string, glslUniformBlock*> UniformBlockList;
+using UniformBlockList = std::unordered_map<std::string, glslUniformBlock*>;
 static UniformBlockList _uniformBlockList;
 
 /*------------------------------------------------------------------------------------

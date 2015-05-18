@@ -758,7 +758,7 @@ struct eqstr
 };
 
 #if platOS == OS_MACOS
-typedef stdext::hash_set<const char*, stdext::hash<const char*>, eqstr> CharPSet;
+using CharPSet = std::unordered_map<const char*, std::hash<const char*>, eqstr> ;
 static CharPSet* RoadTextureNames = nullptr;
 
 static void initRoadTextureNames()
