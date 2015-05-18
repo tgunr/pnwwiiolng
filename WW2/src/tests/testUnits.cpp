@@ -226,6 +226,65 @@ TestUnit::RunTests()
 //////////////////////////////////////////////////////////////////////
 // Entry point
 
+#define TEST_BITCOUNT(val_type, value, bits)	\
+	static_assert(Teul::BitCount(val_type(value)) == bits, "BitCount(" #val_type "(" #value ")) != " #bits)
+
+TEST_BITCOUNT(uint8_t, 0, 0);
+TEST_BITCOUNT(uint8_t, 1, 1);
+TEST_BITCOUNT(uint8_t, 2, 2);
+TEST_BITCOUNT(uint8_t, 3, 2);
+TEST_BITCOUNT(uint8_t, 4, 3);
+TEST_BITCOUNT(uint8_t, 5, 3);
+TEST_BITCOUNT(uint8_t, 6, 3);
+TEST_BITCOUNT(uint8_t, 7, 3);
+TEST_BITCOUNT(uint8_t, 8, 4);
+TEST_BITCOUNT(uint8_t, 125, 7);
+TEST_BITCOUNT(uint8_t, 126, 7);
+TEST_BITCOUNT(uint8_t, 127, 7);
+TEST_BITCOUNT(uint8_t, 128, 8);
+TEST_BITCOUNT(uint8_t, 129, 8);
+TEST_BITCOUNT(uint8_t, 130, 8);
+TEST_BITCOUNT(uint8_t, 255, 8);
+
+TEST_BITCOUNT(uint32_t, 0, 0);
+TEST_BITCOUNT(uint32_t, 255, 8);
+TEST_BITCOUNT(uint32_t, 256, 9);
+TEST_BITCOUNT(uint32_t, 65534, 16);
+TEST_BITCOUNT(uint32_t, 65535, 16);
+TEST_BITCOUNT(uint32_t, 65536, 17);
+TEST_BITCOUNT(uint32_t, 65537, 17);
+TEST_BITCOUNT(uint32_t, (65536 | 256 | 31), 17);
+TEST_BITCOUNT(uint32_t, (1 << 31) | (1 << 20) | (1 << 14) | (1 << 9) | (1 << 3), 32);
+
+TEST_BITCOUNT(uint64_t, 0, 0);
+TEST_BITCOUNT(uint64_t, 1, 1);
+TEST_BITCOUNT(uint64_t, 2, 2);
+
+TEST_BITCOUNT(int8_t, 0, 1);
+TEST_BITCOUNT(int8_t, 1, 2);
+TEST_BITCOUNT(int8_t, 2, 3);
+TEST_BITCOUNT(int8_t, 3, 3);
+TEST_BITCOUNT(int8_t, 4, 4);
+TEST_BITCOUNT(int8_t, 5, 4);
+TEST_BITCOUNT(int8_t, 6, 4);
+TEST_BITCOUNT(int8_t, 7, 4);
+TEST_BITCOUNT(int8_t, 8, 5);
+TEST_BITCOUNT(int8_t, 125, 8);
+TEST_BITCOUNT(int8_t, 126, 8);
+TEST_BITCOUNT(int8_t, 127, 8);
+TEST_BITCOUNT(int8_t, -1, 2);
+TEST_BITCOUNT(int8_t, -2, 3);
+TEST_BITCOUNT(int8_t, -3, 3);
+TEST_BITCOUNT(int8_t, -4, 4);
+
+TEST_BITCOUNT(int32_t, 0, 1);
+TEST_BITCOUNT(int32_t, 1, 2);
+TEST_BITCOUNT(int32_t, -1, 2);
+
+TEST_BITCOUNT(int64_t, 0, 1);
+TEST_BITCOUNT(int64_t, 1, 2);
+TEST_BITCOUNT(int64_t, -1, 2);
+
 int
 main(int argc, char* argv[])
 {
