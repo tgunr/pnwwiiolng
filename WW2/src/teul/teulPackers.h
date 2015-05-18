@@ -310,30 +310,20 @@ struct Packer
 
 //! @brief Count the highest bit number needed to describe the given value.
 //! E.g. BitCount<0>::count has a value of zero (bit 0 is the highest used).
-template<UINT32 _value>
-struct BitCount
+template<class T, typename std::enable_if_t<std::is_integral<T>::value && std::is_signed<T>::value>* = nullptr>
+constexpr static inline size_t BitCount(T _value) noexcept
 {
-	enum { count = (_value & 1) + Teul::BitCount<(_value >> 1)>::count };
-};
-
-template<>
-struct BitCount<0>
+	return 	_value < 0 ? BitCount(uint64_t(-_value), 1) : BitCount(uint64_t(_value), 1);
+}
+template<class T, typename std::enable_if_t<std::is_integral<T>::value && std::is_unsigned<T>::value>* = nullptr>
+constexpr static inline size_t BitCount(T _value) noexcept
 {
-	enum { count = 0 };
-};
-
-//! @brief Get the number of bits required to describe the given value.
-//! E.g. BitRank<0>::rank has a value of one (one bit is required).
-template<UINT32 _value>
-struct BitRank
+	return BitCount(static_cast<UINT64>(_value), 0);
+}
+constexpr static inline size_t BitCount(UINT64 _value, size_t bitNo) noexcept
 {
-	enum { rank = (_value & 1) ? 1 : Teul::BitRank<(_value >> 1)>::rank + 1 };
-};
-template<>
-struct BitRank<0>
-{
-	enum { rank = 0 };
-};
+	return _value ? BitCount(_value >> 1, bitNo + 1) : bitNo;
+}
 
 //! @brief Test if an unsigned value fits into a given number of bits.
 template<typename _Type>
