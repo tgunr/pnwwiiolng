@@ -852,7 +852,7 @@ void Message::EmitGroupPackers() const
 	CXX(
 		"\tif (groupPresence == 0)\n"
 		"\t\treturn false;\n"
-		"\ta->offset = teulPack%s(TEUL_PACK, a->packed, groupPresenceOffset, &groupPresence, %" PRSizeT ");\n"
+		"\tteulPack%s(TEUL_PACK, a->packed, groupPresenceOffset, &groupPresence, %" PRSizeT ");\n"
 		"\treturn (a->offset >= 0);\n"
 		"}\n"
 		"\n"
