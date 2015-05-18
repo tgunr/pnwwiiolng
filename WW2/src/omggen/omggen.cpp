@@ -831,7 +831,7 @@ void Message::EmitGroupPackers() const
 	CXX(
 		"bool %s::groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack) const\n"
 		"{\n"
-		"\t%s groupPresence(0);\n"
+		"\t%s groupPresence{0};\n"
 		"\tSINT32 groupPresenceOffset = a->offset;\n"
 		"\ta->pack(groupPresence, %" PRSizeT ");\n"
 		, GetQualifiedName().c_str()
