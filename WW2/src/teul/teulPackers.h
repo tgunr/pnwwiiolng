@@ -129,7 +129,7 @@ struct ACTION_OBJECT
 		, endpoint(nullptr), m_client(nullptr)
 	{}
 
-	void packer(LOGICAL mode, bool& value, SINT32 sb = 1) { return (mode == TEUL_PACK) ? pack(value, 0) : unpack(value, sb); }
+	void packer(LOGICAL mode, bool& value, SINT32 sb = 1) { return (mode == TEUL_PACK) ? pack(value, sb) : unpack(value, sb); }
 	void packBytes(LOGICAL mode, void* byteStream, SINT32 numBytes) { this->offset = teulPackVoid(mode, this->packed, this->offset, byteStream, numBytes); }
 
 	//! @brief Check that the packed data stream has enough bytes to populate an object type.
@@ -243,13 +243,15 @@ struct ACTION_OBJECT
 
 	void pack(const bool& value, SINT32 sb = 1) 
 	{
+		assert(sb == 1 || sb == 0);
 		UCHAR i(value ? 1 : 0);
-		pack(i, sb);
+		pack(i, 1);
 	}
 	void unpack(bool& value, SINT32 sb = 1)
 	{
+		assert(sb == 1 || sb == 0);
 		UCHAR i(0);
-		unpack(i, sb);
+		unpack(i, 1);
 		value = (i != 0);
 	}
 
