@@ -327,7 +327,7 @@ constexpr static inline size_t BitCount(UINT64 _value, size_t bitNo) noexcept
 
 //! @brief Test if an unsigned value fits into a given number of bits.
 template<typename _Type>
-bool FitUnsignedBitValue(const _Type& value, size_t bits)
+constexpr bool FitUnsignedBitValue(const _Type& value, size_t bits) noexcept
 {
 	return ((UINT64)value >> bits) == 0ULL;
 }
@@ -335,7 +335,7 @@ bool FitUnsignedBitValue(const _Type& value, size_t bits)
 //! @brief Test if a signed value fits into a given number of bits,
 //! allowing for a sign bit.
 template<typename _Type>
-bool FitSignedBitValue(const _Type& value, size_t bits)
+bool FitSignedBitValue(const _Type& value, size_t bits) noexcept
 {
 	// Populate all the bits in "sign" with the sign bit
 	// (i.e. sign will be either all zeros or all ones).
