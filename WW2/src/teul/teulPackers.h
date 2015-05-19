@@ -308,45 +308,4 @@ struct Packer
 	}
 };
 
-//! @brief Count the highest bit number needed to describe the given value.
-//! E.g. BitCount<0>::count has a value of zero (bit 0 is the highest used).
-template<class T, typename std::enable_if_t<std::is_integral<T>::value && std::is_signed<T>::value>* = nullptr>
-constexpr static inline size_t BitCount(T _value) noexcept
-{
-	return 	_value < 0 ? BitCount(uint64_t(-_value), 1) : BitCount(uint64_t(_value), 1);
-}
-template<class T, typename std::enable_if_t<std::is_integral<T>::value && std::is_unsigned<T>::value>* = nullptr>
-constexpr static inline size_t BitCount(T _value) noexcept
-{
-	return BitCount(static_cast<UINT64>(_value), 0);
-}
-constexpr static inline size_t BitCount(UINT64 _value, size_t bitNo) noexcept
-{
-	return _value ? BitCount(_value >> 1, bitNo + 1) : bitNo;
-}
-
-//! @brief Test if an unsigned value fits into a given number of bits.
-template<typename _Type>
-constexpr bool FitUnsignedBitValue(const _Type& value, size_t bits) noexcept
-{
-	return ((UINT64)value >> bits) == 0ULL;
-}
-
-//! @brief Test if a signed value fits into a given number of bits,
-//! allowing for a sign bit.
-template<typename _Type>
-bool FitSignedBitValue(const _Type& value, size_t bits) noexcept
-{
-	// Populate all the bits in "sign" with the sign bit
-	// (i.e. sign will be either all zeros or all ones).
-	const UINT64 sign = ((SINT64)value >> 63);
-	// Create a mask for examining all the upper bits, from
-	// 63 to the sign bit within the size of "bits".
-	const UINT64 signMask = (~0ULL) << (bits - 1);
-	// All of the bits in "value" and "sign" should be the
-	// same; i.e. 1s for a negative value, 0s for a positive.
-	// If not, then the value is too big.
-	return ((UINT64)value & signMask) == (sign & signMask);
-}
-
 }
