@@ -12,6 +12,7 @@
 #include "teul/teulPackers.h"
 #include "teul/teulNetTimeMSPacker.h"
 #include "updt/updtVehicleHit.h"		// For Vehicle::Hit
+#include <sstream>
 
 class TestPackers : public TestUnit
 {
@@ -110,50 +111,60 @@ public:	TestPackers() : TestUnit("TestPackers") {}
 	}
 
 	template<typename _Type>
-	bool
-	TEST_FUNC(const char name[], std::vector<std::pair<_Type, size_t>>& tests)
+	bool TestPacker(_Type value, SINT32 packBits, SINT32 expectBits=0)
 	{
-		static const size_t MaxBits = 256;
-		static_assert( (sizeof(_Type) * 8) + 64 < MaxBits, "Type too large for buffer." );
+		constexpr size_t MaxBits = 256;
+		constexpr size_t SizeBits = sizeof(_Type) * 8;
+		static_assert( SizeBits < MaxBits, "Type too large for buffer." );
+		assert( packBits < SizeBits && "Too many bits for type" );
+		if (!expectBits)
+			expectBits = packBits ? packBits : sizeof(_Type) * 8;
+		auto name = typeid(_Type).name();
 
-		START_TEST_STAGE( name )
-			ACTION_OBJECT a;
-			a.packed  = (UCHAR*)alloca(MaxBits / 8);
+		ACTION_OBJECT a;
+		a.packed  = (UCHAR*)alloca(MaxBits / 8);
 
-			size_t testNo = 1;
-			for ( auto it = tests.begin(), end = tests.end(); it != end; ++it, ++testNo )
-			{
-				for ( SINT32 i = 0; i <= 64; ++i )
-				{
-					const _Type& value = it->first;
-					const SINT32 bits  = it->second;
+		std::stringstream stageName;
+		if (sizeof(_Type) > 1)
+			stageName << name << '(' << value << ')';
+		else
+			stageName << name << '(' << int(value) << ')';
+		START_SUB_STAGE( stageName.str().c_str() )
+		for ( SINT32 offset = 0; offset <= 64; ++offset )
+		{
+			char focus[128];
+			sprintf(focus, "offset %d bits %d=>%d", offset, packBits, expectBits);
+			TestFocus(focus);
 
-					char focus[128];
-					sprintf(focus, "test #%u off %d", testNo, bits);
-					TestFocus(focus);
+			memset(a.packed, 0xa5, MaxBits / 8);
 
-					memset(a.packed, 0xa5, MaxBits / 8);
+			_Type out = value;
+			_Type in  = (_Type)0;
 
-					_Type out = value;
-					_Type in  = (_Type)0;
+			a.offset = offset;
+			a.packer(TEUL_PACK, out, packBits);
+			CRITICAL( ExpectEqual( a.offset, offset + expectBits ) );
+			const SINT32 outOffset = a.offset;
 
-					a.offset = i;
-					a.packer(TEUL_PACK, out, bits);
-					CRITICAL( ExpectEqual( a.offset, i + bits ) );
-					const SINT32 outOffset = a.offset;
+			a.offset = offset;
+			a.packer(TEUL_UNPACK, in, packBits);
+			CRITICAL( ExpectEqual( a.offset, offset + expectBits ) );
+			const SINT32 inOffset = a.offset;
 
-					a.offset = i;
-					a.packer(TEUL_UNPACK, in, bits);
-					CRITICAL( ExpectEqual( a.offset, i + bits ) );
-					const SINT32 inOffset = a.offset;
-
-					ExpectEqual( outOffset, inOffset );
-					CRITICAL( ExpectEqual( out, in ) );
-				}
-			}
-		END_TEST_STAGE( name )
-
+			ExpectEqual( outOffset, inOffset );
+			CRITICAL( ExpectEqual( out, in ) );
+		}
+		END_SUB_STAGE( stageName.str().c_str())
 		return true;
+	}
+
+	template<typename T, std::enable_if_t<std::is_integral<T>::value, T> = 0>
+	void TestBitRanges(T value)
+	{
+		SINT32 min = std::is_signed<T>::value ? 2 : 1;
+		for (SINT32 bits = min; bits <= sizeof(T) / 8; ++bits) {
+			TestPacker(value & ~(~0 << bits), bits);
+		}
 	}
 
 public: virtual bool Run() OVERRIDE_FN
@@ -190,298 +201,248 @@ public: virtual bool Run() OVERRIDE_FN
 
 		START_TEST_STAGE( "Teul Packers / Varying offsets" )
 
-#ifdef GCC_4_5
-			TEST_FUNC<UCHAR>("UCHAR", {
-					{ 0, 0 }
-				,	{ 0x7f, 0 }
-				,	{ 0x80, 0 }
-				,	{ 0x81, 0 }
-				,	{ 0xff, 0 }
+			// bool
+			TestPacker<bool>(false, 0, 1);
+			TestPacker<bool>(false, 1, 1);
 
-				,	{ 0x0, 1 }
-				,	{ 0x1, 1 }
-				,	{ 0x5, 5 }
-			});
+			TestPacker<bool>(true, 0, 1);
+			TestPacker<bool>(true, 1, 1);
 
-			TEST_FUNC<SCHAR>("SCHAR", {
-				{ 0, 0 }
-			,	{ 0x7f, 0 }
-			,	{ 0x80, 0 }
-			,	{ 0x81, 0 }
-			,	{ 0xff, 0 }
+			// unsigned char
+			TestPacker<UCHAR>(0U, 0);
+			TestPacker<UCHAR>(0x7fU, 0);
+			TestPacker<UCHAR>(0x80U, 0);
+			TestPacker<UCHAR>(0x81U, 0);
+			TestPacker<UCHAR>(0xffU, 0);
 
-			,	{ 0x0, 2 }
-			,	{ 0x1, 2 }
-			,	{ -0x1, 2 }
-			});
+			TestPacker<UCHAR>(0x0U, 1);
+			TestPacker<UCHAR>(0x1U, 1);
+			TestPacker<UCHAR>(0x5U, 5);
 
-			TEST_FUNC<UINT16>("UINT16", {
-					{ 0, 0 }
-				,	{ 0xff, 0 }
-				,	{ 0x100, 0 }
-				,	{ 0x101, 0 }
-				,	{ 0x7fff, 0 }
-				,	{ 0x8000, 0 }
-				,	{ 0x8003, 0 }
-				,	{ 0xf0f0, 0 }
-				,	{ 0xffff, 0 }
-				,	{ 0, 1 }
-				,	{ 0, 3 }
-				,	{ 1, 3 }
-				,	{ 29, 7 }
-			});
+			// signed char
+			TestPacker<SCHAR>(0, 0);
+			TestPacker<SCHAR>(127, 0);
+			TestPacker<SCHAR>(-1, 0);
+			TestPacker<SCHAR>(-126, 0);
 
-			TEST_FUNC<SINT16>("SINT16", {
-					{ 0, 0 }
-				,	{ 0xff, 0 }
-				,	{ 0x100, 0 }
-				,	{ 0x101, 0 }
-				,	{ 0x7fff, 0 }
-				,	{ 0x8000, 0 }
-				,	{ 0x8003, 0 }
-				,	{ 0xf0f0, 0 }
-				,	{ 0xffff, 0 }
+			TestPacker<SCHAR>(0x0, 2);
+			TestPacker<SCHAR>(0x1, 2);
+			TestPacker<SCHAR>(-0x1, 2);
 
-				,	{ 0, 1 }
-				,	{ 1, 2 }
-				,	{ -1, 2 }
-				,	{ 0x3fff, 15 }
-				,	{ -0x3fff, 15 }
-			});
+			// unsigned 16-bit int
+			TestPacker<UINT16>(0U, 0);
+			TestPacker<UINT16>(0xffU, 0);
+			TestPacker<UINT16>(0x100U, 0);
+			TestPacker<UINT16>(0x101U, 0);
+			TestPacker<UINT16>(0x7fffU, 0);
+			TestPacker<UINT16>(0x8000U, 0);
+			TestPacker<UINT16>(0x8003U, 0);
+			TestPacker<UINT16>(0xf0f0U, 0);
+			TestPacker<UINT16>(0xffffU, 0);
+			TestPacker<UINT16>(0U, 1);
+			TestPacker<UINT16>(0U, 3);
+			TestPacker<UINT16>(1U, 3);
+			TestPacker<UINT16>(29U, 7);
 
-			TEST_FUNC<UINT32>("UINT32", {
-					{ 0, 0 }
-				,	{ 0xff, 0 }
-				,	{ 0x100, 0 }
-				,	{ 0x101, 0 }
-				,	{ 0x7fff, 0 }
-				,	{ 0x8000, 0 }
-				,	{ 0x8003, 0 }
-				,	{ 0xf0f0, 0 }
-				,	{ 0xffff, 0 }
-				,	{ 0x10000, 0 }
-				,	{ 0x100000, 0 }
-				,	{ 0x1000000, 0 }
-				,	{ 0x10000000, 0 }
-				,	{ 0x7fffffff, 0 }
-				,	{ 0x80000000, 0 }
-				,	{ 0x81234567, 0 }
-				,	{ 0xf0f0f0f0, 0 }
-				,	{ 0xffffffff, 0 }
-				,	{ 0xdeadbeef, 0 }
+			TestBitRanges<UINT16>(0x1234);
 
-				,	{ 0, 1 }
-				,	{ 1, 1 }
-				,	{ 2, 3 }
-				,	{ 0x0345678, 25 }
-			});
+			// signed 16-bit int
+			TestPacker<SINT16>(0, 0);
+			TestPacker<SINT16>(0xff, 0);
+			TestPacker<SINT16>(0x100, 0);
+			TestPacker<SINT16>(0x101, 0);
+			TestPacker<SINT16>(0x7fff, 0);
 
-			TEST_FUNC<SINT32>("SINT32", {
-					{ 0, 0 }
-				,	{ 0xff, 0 }
-				,	{ 0x100, 0 }
-				,	{ 0x101, 0 }
-				,	{ 0x7fff, 0 }
-				,	{ 0x8000, 0 }
-				,	{ 0x8003, 0 }
-				,	{ 0xf0f0, 0 }
-				,	{ 0xffff, 0 }
-				,	{ 0x10000, 0 }
-				,	{ 0x100000, 0 }
-				,	{ 0x1000000, 0 }
-				,	{ 0x10000000, 0 }
-				,	{ 0x7fffffff, 0 }
-				,	{ 0x80000000, 0 }
-				,	{ 0x81234567, 0 }
-				,	{ 0xf0f0f0f0, 0 }
-				,	{ 0xffffffff, 0 }
-				,	{ 0xdeadbeef, 0 }
+			TestPacker<SINT16>(0, 2);
+			TestPacker<SINT16>(1, 2);
+			TestPacker<SINT16>(-1, 2);
+			TestPacker<SINT16>(0x3fff, 15);
+			TestPacker<SINT16>(-0x3fff, 15);
 
-				,	{ 0, 1 }
-				,	{ 0, 2 }
-				,	{ 1, 2 }
-				,	{ -1, 2 }
-				,	{ 0xffff, 17 }
-			});
+			TestBitRanges<SINT16>(0x1234);
+			TestBitRanges<SINT16>(-0x1234);
 
-			TEST_FUNC<UINT64>("UINT64", {
-					{ 0, 0 }
-				,	{ 0xff, 0 }
-				,	{ 0x100, 0 }
-				,	{ 0x101, 0 }
-				,	{ 0x7fff, 0 }
-				,	{ 0x8000, 0 }
-				,	{ 0x8003, 0 }
-				,	{ 0xf0f0, 0 }
-				,	{ 0xffff, 0 }
-				,	{ 0x10000, 0 }
-				,	{ 0x100000, 0 }
-				,	{ 0x1000000, 0 }
-				,	{ 0x10000000, 0 }
-				,	{ 0x7fffffff, 0 }
-				,	{ 0x80000000, 0 }
-				,	{ 0x81234567, 0 }
-				,	{ 0xf0f0f0f0, 0 }
-				,	{ 0xffffffff, 0 }
-				,	{ 0xdeadbeef, 0 }
-				,	{ 0xf00dbeeffeedLL, 0 }
-				,	{ 0xfeeddeadbeeff00dLL, 0 }
+			// unsigned 32-bit int
+			TestPacker<UINT32>(0U, 0);
+			TestPacker<UINT32>(0xffU, 0);
+			TestPacker<UINT32>(0x100U, 0);
+			TestPacker<UINT32>(0x101U, 0);
+			TestPacker<UINT32>(0x7fffU, 0);
+			TestPacker<UINT32>(0x8000U, 0);
+			TestPacker<UINT32>(0x8003U, 0);
+			TestPacker<UINT32>(0xf0f0U, 0);
+			TestPacker<UINT32>(0xffffU, 0);
+			TestPacker<UINT32>(0x10000U, 0);
+			TestPacker<UINT32>(0x100000U, 0);
+			TestPacker<UINT32>(0x1000000U, 0);
+			TestPacker<UINT32>(0x10000000U, 0);
+			TestPacker<UINT32>(0x7fffffffU, 0);
+			TestPacker<UINT32>(0x80000000U, 0);
+			TestPacker<UINT32>(0x81234567U, 0);
+			TestPacker<UINT32>(0xf0f0f0f0U, 0);
+			TestPacker<UINT32>(0xffffffffU, 0);
+			TestPacker<UINT32>(0xdeadbeefU, 0);
 
-				,	{ 0x1, 1 }
-				,	{ 0xfffffff, 28 }
-			});
+			TestPacker<UINT32>(0U, 1);
+			TestPacker<UINT32>(1U, 1);
+			TestPacker<UINT32>(2U, 3);
+			TestPacker<UINT32>(0x0345678U, 25);
 
-			TEST_FUNC<SINT64>("SINT64", {
-					{ 0, 0 }
-				,	{ 0xff, 0 }
-				,	{ -0xff, 0 }
-				,	{ 0x100, 0 }
-				,	{ -0x100, 0 }
-				,	{ 0x101, 0 }
-				,	{ -0x101, 0 }
-				,	{ 0x7fff, 0 }
-				,	{ -0x7fff, 0 }
-				,	{ 0x8000, 0 }
-				,	{ -0x8000, 0 }
-				,	{ 0x8003, 0 }
-				,	{ -0x8003, 0 }
-				,	{ 0xf0f0, 0 }
-				,	{ -0xf0f0, 0 }
-				,	{ 0xffff, 0 }
-				,	{ -0xffff, 0 }
-				,	{ 0x10000, 0 }
-				,	{ -0x10000, 0 }
-				,	{ 0x100000, 0 }
-				,	{ -0x100000, 0 }
-				,	{ 0x1000000, 0 }
-				,	{ -0x1000000, 0 }
-				,	{ 0x10000000, 0 }
-				,	{ -0x10000000, 0 }
-				,	{ 0x7fffffff, 0 }
-				,	{ -0x7fffffff, 0 }
-				,	{ 0x80000000, 0 }
-				,	{ -0x80000000, 0 }
-				,	{ 0x81234567, 0 }
-				,	{ -0x81234567, 0 }
-				,	{ 0xf0f0f0f0, 0 }
-				,	{ -0xf0f0f0f0, 0 }
-				,	{ 0xffffffff, 0 }
-				,	{ -0xffffffff, 0 }
-				,	{ 0xdeadbeef, 0 }
-				,	{ -0xdeadbeef, 0 }
-				,	{ 0xf00dbeeffeedLL, 0 }
-				,	{ -0xf00dbeeffeedLL, 0 }
-				,	{ 0xfeeddeadbeeff00dLL, 0 }
-				,	{ -0xfeeddeadbeeff00dLL, 0 }
+			TestBitRanges<UINT32>(0x12345678);
 
-				,	{ 0, 1 }
-				,	{ 0, 2 }
-				,	{ 0, 31 }
-				,	{ 0, 32 }
-				,	{ 0, 33 }
-				,	{ 0, 63 }
+			// signed 32-bit int
+			TestPacker<SINT32>(0, 0);
+			TestPacker<SINT32>(0xff, 0);
+			TestPacker<SINT32>(0x101, 0);
+			TestPacker<SINT32>(0x7fff, 0);
+			TestPacker<SINT32>(0x8000, 0);
+			TestPacker<SINT32>(0x8003, 0);
+			TestPacker<SINT32>(0xf0f0, 0);
+			TestPacker<SINT32>(0xffff, 0);
+			TestPacker<SINT32>(0x7fffffff, 0);
+			TestPacker<SINT32>(0x80000000, 0);
+			TestPacker<SINT32>(0x81234567, 0);
+			TestPacker<SINT32>(0xf0f0f0f0, 0);
+			TestPacker<SINT32>(0xffffffff, 0);
+			TestPacker<SINT32>(0xdeadbeef, 0);
 
-				,	{ 1, 2 }
-				,	{ 1, 31 }
-				,	{ 1, 32 }
-				,	{ 1, 33 }
-				,	{ 1, 63 }
+			TestPacker<SINT32>(0, 2);
+			TestPacker<SINT32>(0, 2);
+			TestPacker<SINT32>(1, 2);
+			TestPacker<SINT32>(-1, 2);
+			TestPacker<SINT32>(0xffff, 17);
 
-				,	{ -1, 2 }
-				,	{ -1, 31 }
-				,	{ -1, 32 }
-				,	{ -1, 33 }
-				,	{ -1, 63 }
-			});
+			TestBitRanges<SINT32>(0x12345678);
+			TestBitRanges<SINT32>(-0x12345678);
 
-			TEST_FUNC<FLOAT32>("FLOAT32", {
-					{ 0, 0 }
-				,	{ 1, 0 }
-				,	{ -1, 0 }
-				,	{ 0.0001, 0 }
-				,	{ -0.0001, 0 }
-				,	{ 1000, 0 }
-				,	{ -1000, 0 }
-				,	{ 1000.0001, 0 }
-				,	{ -1000.0001, 0 }
-				,	{ 65535.65535, 0 }
-				,	{ -65535.65535, 0 }
-				,	{ 0xdeadbeef, 0 }
-			});
+			// unsigned 64-bit int
+			TestPacker<UINT64>(0ULL, 0);
+			TestPacker<UINT64>(0x1ULL, 1);
+			TestPacker<UINT64>(0xfffffffULL, 28);
+			TestPacker<UINT64>(0ULL, 0);
+			TestPacker<UINT64>(0xffULL, 0);
+			TestPacker<UINT64>(0x101ULL, 0);
+			TestPacker<UINT64>(0x7fffULL, 0);
+			TestPacker<UINT64>(0x8000ULL, 0);
+			TestPacker<UINT64>(0x8003ULL, 0);
+			TestPacker<UINT64>(0xf0f0ULL, 0);
+			TestPacker<UINT64>(0xffffULL, 0);
+			TestPacker<UINT64>(0x7fffffffULL, 0);
+			TestPacker<UINT64>(0x80000000ULL, 0);
+			TestPacker<UINT64>(0x81234567ULL, 0);
+			TestPacker<UINT64>(0xf0f0f0f0ULL, 0);
+			TestPacker<UINT64>(0xffffffffULL, 0);
+			TestPacker<UINT64>(0xdeadbeefULL, 0);
+			TestPacker<UINT64>(0xf00dbeeffeedULL, 0);
+			TestPacker<UINT64>(0xfeeddeadbeeff00dULL, 0);
 
-			TEST_FUNC<FLOAT64>("FLOAT64", {
-					{ 0, 0 }
-				,	{ 1, 0 }
-				,	{ -1, 0 }
-				,	{ 0.0001, 0 }
-				,	{ -0.0001, 0 }
-				,	{ 1000, 0 }
-				,	{ -1000, 0 }
-				,	{ 1000.0001, 0 }
-				,	{ -1000.0001, 0 }
-				,	{ 65535.65535, 0 }
-				,	{ -65535.65535, 0 }
-				,	{ 0xdeadbeef, 0 }
-				,	{ (1LL << 36) - 1, 0 }
-			});
-#endif
+			TestBitRanges<UINT64>(0x1234567890abcdefULL);
+			TestBitRanges<UINT64>(0x1f2e3d4c5b6a7089ULL);
+			
+			// signed 64-bit int
+			TestPacker<SINT64>(0, 0);
+			TestPacker<SINT64>(0xffLL, 0);
+			TestPacker<SINT64>(-0xffLL, 0);
+			TestPacker<SINT64>(0x100LL, 0);
+			TestPacker<SINT64>(-0x100LL, 0);
+			TestPacker<SINT64>(0x101LL, 0);
+			TestPacker<SINT64>(-0x101LL, 0);
+			TestPacker<SINT64>(0x7fffLL, 0);
+			TestPacker<SINT64>(-0x7fffLL, 0);
+			TestPacker<SINT64>(0x8000LL, 0);
+			TestPacker<SINT64>(-0x8000LL, 0);
+			TestPacker<SINT64>(0x8003LL, 0);
+			TestPacker<SINT64>(-0x8003LL, 0);
+			TestPacker<SINT64>(0xf0f0LL, 0);
+			TestPacker<SINT64>(-0xf0f0LL, 0);
+			TestPacker<SINT64>(0xffffLL, 0);
+			TestPacker<SINT64>(-0xffffLL, 0);
+			TestPacker<SINT64>(0x10000LL, 0);
+			TestPacker<SINT64>(-0x10000LL, 0);
+			TestPacker<SINT64>(0x100000LL, 0);
+			TestPacker<SINT64>(-0x100000LL, 0);
+			TestPacker<SINT64>(0x1000000LL, 0);
+			TestPacker<SINT64>(-0x1000000LL, 0);
+			TestPacker<SINT64>(0x10000000LL, 0);
+			TestPacker<SINT64>(-0x10000000LL, 0);
+			TestPacker<SINT64>(0x7fffffffLL, 0);
+			TestPacker<SINT64>(-0x7fffffffLL, 0);
+			TestPacker<SINT64>(0x80000000LL, 0);
+			TestPacker<SINT64>(-0x80000000LL, 0);
+			TestPacker<SINT64>(0x81234567LL, 0);
+			TestPacker<SINT64>(-0x81234567LL, 0);
+			TestPacker<SINT64>(0xf0f0f0f0LL, 0);
+			TestPacker<SINT64>(-0xf0f0f0f0LL, 0);
+			TestPacker<SINT64>(0xffffffffLL, 0);
+			TestPacker<SINT64>(-0xffffffffLL, 0);
+			TestPacker<SINT64>(0xdeadbeefLL, 0);
+			TestPacker<SINT64>(-0xdeadbeefLL, 0);
+			TestPacker<SINT64>(0xf00dbeeffeedLL, 0);
+			TestPacker<SINT64>(-0xf00dbeeffeedLL, 0);
+			TestPacker<SINT64>(0xfeeddeadbeeff00dLL, 0);
+			TestPacker<SINT64>(-0xfeeddeadbeeff00dLL, 0);
+
+			// can't pack a signed value in 1 bit.
+			TestPacker<SINT64>(0, 2);
+			TestPacker<SINT64>(0, 31);
+			TestPacker<SINT64>(0, 32);
+			TestPacker<SINT64>(0, 33);
+			TestPacker<SINT64>(0, 63);
+
+			TestPacker<SINT64>(1, 2);
+			TestPacker<SINT64>(1, 31);
+			TestPacker<SINT64>(1, 32);
+			TestPacker<SINT64>(1, 33);
+			TestPacker<SINT64>(1, 63);
+
+			TestPacker<SINT64>(-1, 2);
+			TestPacker<SINT64>(-1, 31);
+			TestPacker<SINT64>(-1, 32);
+			TestPacker<SINT64>(-1, 33);
+			TestPacker<SINT64>(-1, 63);
+
+			TestPacker<SINT64>(-2, 2);
+			TestPacker<SINT64>(-2, 31);
+			TestPacker<SINT64>(-2, 32);
+			TestPacker<SINT64>(-2, 33);
+			TestPacker<SINT64>(-2, 63);
+
+			TestBitRanges<SINT64>(0x1234567890abcdefLL);
+			TestBitRanges<SINT64>(0x1f2e3d4c5b6a7089LL);
+
+			TestBitRanges<SINT64>(-0x1234567890abcdefLL);
+			TestBitRanges<SINT64>(-0x1f2e3d4c5b6a7089LL);
+
+			// 32-bit float
+			TestPacker<FLOAT32>(0.0f, 0);
+			TestPacker<FLOAT32>(1.0f, 0);
+			TestPacker<FLOAT32>(-1.0f, 0);
+			TestPacker<FLOAT32>(0.0001f, 0);
+			TestPacker<FLOAT32>(-0.0001f, 0);
+			TestPacker<FLOAT32>(1000.0f, 0);
+			TestPacker<FLOAT32>(-1000.0f, 0);
+			TestPacker<FLOAT32>(1000.0001f, 0);
+			TestPacker<FLOAT32>(-1000.0001f, 0);
+			TestPacker<FLOAT32>(65535.65535f, 0);
+			TestPacker<FLOAT32>(-65535.65535f, 0);
+			TestPacker<FLOAT32>(float(0xdeadbeef), 0);
+
+			// 64-bit float
+			TestPacker<FLOAT64>(0., 0);
+			TestPacker<FLOAT64>(1., 0);
+			TestPacker<FLOAT64>(-1., 0);
+			TestPacker<FLOAT64>(0.0001, 0);
+			TestPacker<FLOAT64>(-0.0001, 0);
+			TestPacker<FLOAT64>(1000., 0);
+			TestPacker<FLOAT64>(-1000., 0);
+			TestPacker<FLOAT64>(1000.0001, 0);
+			TestPacker<FLOAT64>(-1000.0001, 0);
+			TestPacker<FLOAT64>(65535.65535, 0);
+			TestPacker<FLOAT64>(-65535.65535, 0);
+			TestPacker<FLOAT64>(0xdeadbeef, 0);
+			TestPacker<FLOAT64>((1LL << 36) - 1, 0);
 
 		END_TEST_STAGE( "Teul Packers / Varying offsets" )
-
-		START_TEST_STAGE( "Teul::FitBits Tests" )
-
-			START_SUB_STAGE( "Unsigned" )
-				for ( UINT32 i = 0; i < 64; ++i )
-				{
-					{
-						bool fit = Teul::FitUnsignedBitValue((1ULL << i) - 1, 15);
-						bool expectFit = i <= 15;
-						CRITICAL( ExpectEqual( fit, expectFit ) );
-					}
-					{
-						bool fit = Teul::FitUnsignedBitValue((1ULL << i), 15);
-						bool expectFit = i < 15;
-						CRITICAL( ExpectEqual( fit, expectFit ) );
-					}
-					{
-						bool fit = Teul::FitUnsignedBitValue((1ULL << i) + 1, 15);
-						bool expectFit = i < 15;
-						CRITICAL( ExpectEqual( fit, expectFit ) );
-					}
-				}
-			END_SUB_STAGE( "Unsigned" )
-
-			START_SUB_STAGE( "Signed" )
-				for ( UINT32 i = 1; i < 64; ++i )
-				{
-					{
-						TestFocus("-(%u - 1) for %u", 1 << i, i);
-						bool fit = Teul::FitSignedBitValue(-((1LL << i) - 1), 15);
-						bool expectFit = i <= 14;
-						CRITICAL( ExpectEqual( fit, expectFit ) );
-					}
-					{
-						TestFocus("-(%u) for %u", 1 << i, i);
-						bool fit = Teul::FitSignedBitValue(-((1LL << i)), 15);
-						bool expectFit = i <= 14;
-						CRITICAL( ExpectEqual( fit, expectFit ) );
-					}
-					{
-						TestFocus("-(%u + 1) for %u", 1 << i, i);
-						bool fit = Teul::FitSignedBitValue(-((1LL << i) + 1), 15);
-						bool expectFit = i < 14;
-						CRITICAL( ExpectEqual( fit, expectFit ) );
-					}
-				}
-				{
-					TestFocus("40 bits");
-					bool fitPositive = Teul::FitSignedBitValue((1LL << 39) - 1LL, 40);
-					CRITICAL( ExpectTrue( fitPositive ) );
-					bool fitNegative = Teul::FitSignedBitValue(-(1LL << 39), 40);
-					CRITICAL( ExpectTrue( fitNegative ) );
-				}
-			END_SUB_STAGE( "Signed" )
-		END_TEST_STAGE( "Teul::FitBits" )
 
 		START_TEST_STAGE( "Teul::Packer Tests" )
 

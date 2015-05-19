@@ -18,13 +18,13 @@
 // pack significant bytes into buffer from left justified value in network byte order
 static size_t _packBytes(size_t offset, UCHAR* const buffer, UCHAR* const value, const size_t numBytes, size_t significantBytes)
 {
-	if ( significantBytes == 0)
-		return offset;
-
-	if (significantBytes<1)
+	if (significantBytes < 1)
 	{
-		dbugWrite(_FLA,"invalid significantBytes = %d\n",significantBytes);
-		return (size_t)-EINVAL;
+		if (significantBytes != 0) {
+			dbugWrite(_FLA, "invalid significantBytes = %d\n", significantBytes);
+			return (size_t)-EINVAL;
+		}
+		return offset;
 	}
 
 	// big-endian systems use the reverse of network/stream
