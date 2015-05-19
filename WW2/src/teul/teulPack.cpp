@@ -129,7 +129,7 @@ _packBits(UCHAR* const buffer, SINT32 bitOffset, UINT32* const idata, SINT32 sig
 	// left bit align, blow off insignificant bits
 	UINT32 data = (*idata) << (numBits - significantBits);
 
-	// if the buffer isn;t byte aligned, 'or' the top bits into the buffer
+	// if the buffer isn't byte aligned, bitwise-or the top bits into the buffer
 	if (bitOffset != 0)
 	{
 		UCHAR buf[4];
