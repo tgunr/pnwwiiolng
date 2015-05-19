@@ -3,6 +3,7 @@
 #include "teul/teulPackers.h"
 #include "teul/teulTime.h"
 #include "teul/teulNetTimeMS.h"
+#include "teul/teulBits.h"
 
 // The ...DataBits() values return the total number of bits
 // to use /including/ the sizing bit and sign bits.
@@ -19,7 +20,7 @@ Teul::NetTimeMS::pack(ACTION_OBJECT* const a, SINT32 bits /*= 0*/) const
 		a->pack(delta, bits);
 	else
 	{
-		bool smallValue = Teul::FitSignedBitValue(delta, SMALL_WITH_SIGN_BITS);
+		bool smallValue = Teul::Bits::Fit(delta, SMALL_WITH_SIGN_BITS);
 		a->pack(smallValue);
 		a->pack(delta, static_cast<SINT32>(smallValue ? SMALL_WITH_SIGN_BITS : LARGE_WITH_SIGN_BITS));
 	}
@@ -34,7 +35,7 @@ Teul::NetTimeMS::unpack(ACTION_OBJECT* const a, SINT32 bits /*= 0*/)
 		a->unpack(delta, bits);
 	else
 	{
-		bool smallValue = Teul::FitSignedBitValue(delta, SMALL_WITH_SIGN_BITS);
+		bool smallValue = Teul::Bits::Fit(delta, SMALL_WITH_SIGN_BITS);
 		a->unpack(smallValue);
 		a->unpack(delta, static_cast<SINT32>(smallValue ? SMALL_WITH_SIGN_BITS : LARGE_WITH_SIGN_BITS));
 	}

@@ -207,6 +207,7 @@ ADD_LIBRARY(teulserver
 		teul/teulNetTimeMS.h
 			teul/teulNetTimeMSPacker.h
 				teul/teulNetTimeMS.h
+		teul/teulBits.h
 	teul/teulPack.cpp
 	teul/teulPacket.cpp
 		teul/teulPacket.h
