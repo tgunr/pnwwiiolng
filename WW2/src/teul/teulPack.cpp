@@ -202,6 +202,7 @@ teulPackSINT32(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, SINT32* cons
 {
 	UINT32 xdata;
 
+	assert(significantBits != 1);
 	if (significantBits < 1 || significantBits > 32)
 		significantBits = 32;
 
@@ -227,6 +228,7 @@ teulPackSINT16(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, SINT16* cons
 {
 	UINT32 xdata = (UINT32) (*idata);
 
+	assert(significantBits != 1);
 	if (significantBits < 1 || significantBits > 16)
 		significantBits = 16;
 
@@ -317,6 +319,7 @@ teulPackUINT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, UINT64* cons
 SINT32
 teulPackSINT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, SINT64* const idata, SINT32 significantBits)
 {
+	assert(significantBits != 1);
 	if (significantBits < 1 || significantBits > 64)
 		significantBits = 64;
 	SINT32 sigHighBits = (significantBits > 32) ? significantBits - 32 : 0;
@@ -427,6 +430,7 @@ teulPackFLOAT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, FLOAT64* co
 SINT32
 teulPackSCHAR(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, SCHAR* const idata, SINT32 significantBits)
 {
+	assert(significantBits != 1);
 	if (significantBits < 1 || significantBits > 8)
 		significantBits = 8;
 
