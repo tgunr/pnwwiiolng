@@ -10,7 +10,7 @@ class CryptographerTest : public TestUnit
 {
 public: CryptographerTest() : TestUnit("Cryptographer") {}
 
-public: virtual bool TestVersion(const UINT32 version, const size_t bufSize, const UINT64 startSeed)
+public: virtual bool TestVersion(const UINT32 version, const UINT16 bufSize, const UINT64 startSeed)
 		{
 			UCHAR* buf1 = static_cast<UCHAR*>(OS_ALLOCA(bufSize + 4));
 			UCHAR* buf2 = static_cast<UCHAR*>(OS_ALLOCA(bufSize + 4));
@@ -104,7 +104,7 @@ public: virtual bool Run() OVERRIDE_FN
 			{
 				for ( UINT32 version = Teul::BaseVersion; version <= (UINT32)Teul::VersionNumber; ++version )
 				{
-					for ( UINT32 sz = 4; sz < 64; ++sz )
+					for ( UINT16 sz = 4; sz < 64; ++sz )
 					{
 						if ( !TestVersion(version, sz, seeds[i]) )
 							return false;
