@@ -18,8 +18,8 @@ public: virtual ~TestUnit() {}
 protected: virtual bool Run() = 0;
 
 	//// Your class can choose to provide functions for Beginning and End of stage.
-protected: virtual void BeginStage() {}
-protected: virtual void EndStage() {}
+public: virtual void BeginStage() {}
+public: virtual void EndStage() {}
 
 	//// Helper/simulation functions.
 	// The initial teulClock64 value we're planning to use.
@@ -110,14 +110,47 @@ public: static void RunTests();
 // Defines an error that terminates this pass of the test.
 #define CRITICAL( op ) { if ( (op) == false ) return false; }
 
+struct StageRAII {
+	TestUnit* m_test;
+
+	StageRAII(TestUnit* test_)
+		: m_test(test_)
+	{
+		m_test->SaveTestFocus();
+		m_test->BeginStage();
+	}
+	~StageRAII() {
+		m_test->EndStage();
+		m_test->RestoreTestFocus();
+	}
+};
+
+struct SubStageRAII {
+	TestUnit* m_test;
+	const char* m_name;
+
+	SubStageRAII(TestUnit* test_, const char* name_)
+		: m_test(test_)
+		, m_name(name_)
+	{
+		m_test->SaveTestFocus();
+		m_test->StartSubStage(m_name);
+	}
+
+	~SubStageRAII()
+	{
+		m_test->EndSubStage();
+		m_test->RestoreTestFocus();
+	}
+};
+
 // Macros for a test scope block
 #define START_TEST_STAGE( _stage_ ) \
 	{ \
 		if ( enableTestDebug ) \
 			std::cout << "#Starting Stage " << _stage_ << std::endl; \
-		SaveTestFocus(); \
 		m_stagePasses = 0; \
-		BeginStage(); \
+		StageRAII __stageRAII(this); \
 		try {	\
 			Stage(_stage_);
 
@@ -127,22 +160,17 @@ public: static void RunTests();
 			if ( enableTestDebug ) \
 				std::cout << "#Ending Stage " << _stage_ << std::endl; \
 		} \
-		catch ( std::exception& e ) { std::cout << "FAIL: " << Name() << " " << e.what() << std::endl << Fails() << std::endl; EndSubStage(); EndStage(); RestoreTestFocus(); return false; } \
-		EndStage(); \
-		RestoreTestFocus(); \
+		catch ( std::exception& e ) { std::cout << "FAIL: " << Name() << " " << e.what() << std::endl << Fails() << std::endl; return false; } \
 	}
 
 #define START_SUB_STAGE( _substage_ )	\
 	{ \
-		SaveTestFocus(); \
-		StartSubStage(_substage_); \
+		SubStageRAII __substageRAII(this, _substage_); \
 		try {
 #define BEGIN_SUB_STAGE( _substage_ ) START_SUB_STAGE(_substage_)
 
 #define	END_SUB_STAGE( _substage_ ) \
-		EndSubStage(); } \
-		catch ( std::exception& e ) { std::cout << "FAIL: " << Name() << " " << e.what() << std::endl << Fails() << std::endl; EndSubStage(); RestoreTestFocus(); return false; } \
-		RestoreTestFocus(); \
+		} catch ( std::exception& e ) { std::cout << "FAIL: " << Name() << " " << e.what() << std::endl << Fails() << std::endl; return false; } \
 	}
 
 // Test macros
