@@ -52,9 +52,10 @@ echo "Step 1: Install required packages."
 echo "=========================================="
 echo ""
 # Install essential build packages
+sudo apt-get -q -y install aptitude
 sudo aptitude install -y \
 	vim ctags cmake git \
-	gcc gcc-4.8 gcc g++-4.8 g++ gcc-4.8-doc \
+	gcc gcc-4.9 gcc g++-4.9 g++ gcc-4.9-doc \
 	bison flex \
 	libmysqlclient18 libmysqlclient-dev \
 	lua5.1 libtolua++5.1-dev \
