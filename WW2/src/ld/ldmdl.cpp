@@ -2332,9 +2332,9 @@ void ldmdlIndexVertices(OBJECT* o)
 
                 if ( newVertex )
                 {
-				    indices.push_back(uniqueVertices.size());
+				    indices.push_back((ogl::VertexIdx)uniqueVertices.size());
 				    uniqueVertices.push_back(*crtVertex);
-                    indexer.insert( std::pair<size_t,ogl::VertexIdx>( code, uniqueVertices.size()-1) );
+                    indexer.insert( std::pair<size_t,ogl::VertexIdx>( code, (ogl::VertexIdx)uniqueVertices.size()-1) );
                 }
                 else
                 {

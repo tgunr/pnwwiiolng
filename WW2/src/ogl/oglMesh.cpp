@@ -280,10 +280,10 @@ LOGICAL StaticBuffer::AddMesh(std::vector<RawVertex>& withRawVertexData, const V
 
             if ( newVertex ) // new
 			{
-				rawIndexData.push_back( rawVertexData.size() );
+				rawIndexData.push_back( (ogl::VertexIdx)rawVertexData.size() );
 				rawVertexData.push_back( *vertx );
 
-                vertexIndexer.insert( std::pair<size_t,VertexIdx>( code, rawVertexData.size()-1) );
+                vertexIndexer.insert( std::pair<size_t,VertexIdx>( code, (VertexIdx)rawVertexData.size()-1) );
 			}
 			else
             {
