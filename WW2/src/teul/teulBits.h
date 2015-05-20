@@ -55,6 +55,13 @@ namespace Teul
 					: 0;
 		}
 
+		constexpr static inline size_t Count_impl(uint64_t _value, size_t bitsRequired) noexcept
+		{
+			return (_value >> 1)
+				? Count_impl(_value >> 1, bitsRequired + 1)
+				: bitsRequired;
+		}
+
 		//! @brief Count the highest bit number needed to describe the given value, with
 		//! a minimum of 1 bit to describe an unsigned value and 2 to describe a signed value.
 		template<class T, typename std::enable_if_t<std::is_integral<T>::value && std::is_unsigned<T>::value, T> = 0>
@@ -68,12 +75,6 @@ namespace Teul
 			return (_value < 0)
 				? Count_impl(static_cast<uint64_t>(~_value), 2)
 				: Count_impl(static_cast<uint64_t>(_value), 2);
-		}
-		constexpr static inline size_t Count_impl(uint64_t _value, size_t bitsRequired) noexcept
-		{
-			return (_value >> 1)
-				? Count_impl(_value >> 1, bitsRequired + 1)
-				: bitsRequired;
 		}
 
 		//! @brief Test whether a given numeric value would pack into a given number of bits.
