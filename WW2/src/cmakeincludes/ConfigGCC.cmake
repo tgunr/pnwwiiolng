@@ -156,4 +156,3 @@ set(CMAKE_CXX_FLAGS_MINSIZEREL "-DNDEBUG=1 -g0")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wuseless-cast")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wsuggest-attribute=const")
 #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wsuggest-attribute=noreturn")
-

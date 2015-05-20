@@ -16,7 +16,7 @@ enum { TEUL_UNPACK, TEUL_PACK };
 namespace Teul
 {
 	enum class Mode { Unpack, Pack };
-	using LoggingFn = void (*)(const char* const, ...);
+	using LoggingFn = void(*)(const char* const, ...);
 	extern LoggingFn g_logFnPtr;
 
 	static const UINT32 INVALID_INDEX = ~0U	;		//!< Value used for "Invalid Index".

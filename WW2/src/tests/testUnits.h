@@ -144,13 +144,17 @@ struct SubStageRAII {
 	}
 };
 
+#define UNIQUE_PASTE_INNER(T, N) T ## N
+#define UNIQUE_PASTE(T, N) UNIQUE_PASTE_INNER(T, N)
+#define UNIQUE_RAII(T) T UNIQUE_PASTE(__unique, __COUNTER__)
+
 // Macros for a test scope block
 #define START_TEST_STAGE( _stage_ ) \
 	{ \
 		if ( enableTestDebug ) \
 			std::cout << "#Starting Stage " << _stage_ << std::endl; \
 		m_stagePasses = 0; \
-		StageRAII __stageRAII(this); \
+		UNIQUE_RAII(StageRAII)(this); \
 		try {	\
 			Stage(_stage_);
 
@@ -165,7 +169,7 @@ struct SubStageRAII {
 
 #define START_SUB_STAGE( _substage_ )	\
 	{ \
-		SubStageRAII __substageRAII(this, _substage_); \
+		UNIQUE_RAII(SubStageRAII)(this, _substage_); \
 		try {
 #define BEGIN_SUB_STAGE( _substage_ ) START_SUB_STAGE(_substage_)
 

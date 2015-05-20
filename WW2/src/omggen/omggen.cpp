@@ -820,7 +820,7 @@ void Message::EmitGroupPackers() const
 		yyfatal("Internal Error: %s", "group presence bits > 64");
 
 	HXX(
-		"\tenum { GroupPresenceBits = %u };\n"
+		"\tenum { GroupPresenceBits = %" PRSizeT " };\n"
 		"\tconst TeulTimeMS& lastModified() const { return m_lastModified; }\n"
 		"\tbool groupPack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack) const;\n"
 		"\tbool groupUnpack(ACTION_OBJECT* const a, const TeulTimeMS& lastPack);\n"

@@ -59,6 +59,6 @@ MESSAGE MissionStatus
 	};
 
 	{{
-		static TEUL_CALLBACK* Chat::MissionStatus::Callback();
+		static TEUL_CALLBACK* Callback();
 	}}
 };
