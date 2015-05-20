@@ -10,6 +10,7 @@
 /*.sdf
 /*.suo
 /*.user
+*.vsp
 /BuildLog.htm
 /Debug
 Libraries/*.html
@@ -1586,7 +1587,12 @@ WW2/src/xml/.dirstamp
 /ipch
 /Libraries/granny2/projects/Win32_Release_Static_2k8/*.lastbuildstate
 /Libraries/granny2/projects/Win32_Release_Static_2k8/win32_2k8_static.log
-*.vsp
+/Libraries/tolua++/bin/tolua++.exe
+/Libraries/tolua++/bin/tolua++.exe
+/Libraries/tolua++/bin/tolua++.ilk
+/Libraries/tolua++/bin/tolua++.pdb
+/Libraries/tolua++/win32/*.user
+
 WW2.psess
 WW2/proj/win/WW2.sdf
 WW2/src/omg/omg.tab.cpp
