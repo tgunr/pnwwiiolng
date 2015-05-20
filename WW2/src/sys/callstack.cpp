@@ -402,7 +402,7 @@ public:
 	LPSTR m_szSymPath;
 
 #pragma pack(push,8)
-	typedef struct IMAGEHLP_MODULE64_V3 {
+	struct IMAGEHLP_MODULE64_V3 {
 		DWORD    SizeOfStruct;           // set to sizeof(IMAGEHLP_MODULE64)
 		DWORD64  BaseOfImage;            // base load address of module
 		DWORD    ImageSize;              // virtual size of the loaded module
@@ -430,7 +430,7 @@ public:
 		BOOL     Publics;                // contains public symbols
 	};
 
-	typedef struct IMAGEHLP_MODULE64_V2 {
+	struct IMAGEHLP_MODULE64_V2 {
 		DWORD    SizeOfStruct;           // set to sizeof(IMAGEHLP_MODULE64)
 		DWORD64  BaseOfImage;            // base load address of module
 		DWORD    ImageSize;              // virtual size of the loaded module
@@ -515,7 +515,7 @@ private:
 #define MAX_MODULE_NAME32 255
 #define TH32CS_SNAPMODULE   0x00000008
 #pragma pack( push, 8 )
-	typedef struct tagMODULEENTRY32
+	struct MODULEENTRY32
 	{
 		DWORD   dwSize;
 		DWORD   th32ModuleID;       // This module
@@ -527,7 +527,7 @@ private:
 		HMODULE hModule;            // The hModule of this module in th32ProcessID's context
 		char    szModule[MAX_MODULE_NAME32 + 1];
 		char    szExePath[MAX_PATH];
-	} MODULEENTRY32;
+	};
 	typedef MODULEENTRY32 *  PMODULEENTRY32;
 	typedef MODULEENTRY32 *  LPMODULEENTRY32;
 #pragma pack( pop )
