@@ -10,6 +10,51 @@ namespace Teul
 
 	namespace Bits
 	{
+		//! @brief Returns calculates number of bits in a given integral type.
+		template<typename T, std::enable_if_t<std::is_integral<T>::value, T> = 0>
+		constexpr size_t Size() noexcept
+		{
+			return sizeof(T) * 8;
+		}
+
+		//! @brief Calculates remaining bits in an integral type
+		template<typename T, std::enable_if_t<std::is_integral<T>::value, T> = 0>
+		constexpr size_t Remainder(size_t bits) noexcept
+		{
+			return bits < Size<T>() ? Size<T>() - bits : 0;
+		}
+
+		//! @brief Returns the low N bits from an integral type
+		template<typename T, std::enable_if_t<std::is_integral<T>::value, T> = 0>
+		constexpr T Low(T value, size_t bits) noexcept
+		{
+			return (bits >= Size<T>())
+				? value
+				: (bits != 0)
+					? T(value << Remainder<T>(bits)) >> (Remainder<T>(bits))
+					: 0;
+		}
+
+		template<typename T, std::enable_if_t<std::is_integral<T>::value, T> = 0>
+		constexpr T High(T value, size_t bits) noexcept
+		{
+			return (bits >= Size<T>())
+				? value
+				: (bits != 0)
+					? T(value >> Remainder<T>(bits))
+					: 0;
+		}
+
+		template<typename T, std::enable_if_t<std::is_integral<T>::value, T> = 0>
+		constexpr T High_InSitu(T value, size_t bits) noexcept
+		{
+			return (bits >= Size<T>())
+				? value
+				: (bits != 0)
+					? T(value >> Remainder<T>(bits)) << Remainder<T>(bits)
+					: 0;
+		}
+
 		//! @brief Count the highest bit number needed to describe the given value, with
 		//! a minimum of 1 bit to describe an unsigned value and 2 to describe a signed value.
 		template<class T, typename std::enable_if_t<std::is_integral<T>::value && std::is_unsigned<T>::value, T> = 0>

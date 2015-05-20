@@ -11,8 +11,22 @@ public:
 
 public: virtual bool Run() OVERRIDE_FN
 	{
+		START_TEST_STAGE( "Bits::Size" );
+
+			CRITICAL( ExpectEqual(Teul::Bits::Size<UCHAR>(), 8) );
+			CRITICAL( ExpectEqual(Teul::Bits::Size<SCHAR>(), 8) );
+			CRITICAL( ExpectEqual(Teul::Bits::Size<UINT16>(), 16) );
+			CRITICAL( ExpectEqual(Teul::Bits::Size<SINT16>(), 16) );
+			CRITICAL( ExpectEqual(Teul::Bits::Size<UINT32>(), 32) );
+			CRITICAL( ExpectEqual(Teul::Bits::Size<SINT32>(), 32) );
+			CRITICAL( ExpectEqual(Teul::Bits::Size<UINT64>(), 64) );
+			CRITICAL( ExpectEqual(Teul::Bits::Size<SINT64>(), 64) );
+
+		END_TEST_STAGE( "Bits::Size" );
+
 		TestBitsCount();
 		TestBitsFit();
+
 		return true;
 	}
 
