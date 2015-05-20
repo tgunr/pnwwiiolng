@@ -12,5 +12,5 @@ MAC:
 	to automate Mac builds and unit tests.
 
 LINUX:
-	bootstrap.sh or bootstrap.bat will configure and provision a complete Linux virtual
+	bootstrap.SH or bootstrap.bat will configure and provision a complete Linux virtual
 	dev box using Vagrant (www.vagrantup.com) and VirtualBox (www.virtualbox.org).
