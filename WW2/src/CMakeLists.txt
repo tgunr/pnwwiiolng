@@ -1188,7 +1188,6 @@ IF( NOT PN_CLUSTER STREQUAL "Auth")
 		tests/testUnits.cpp
 			tests/testUnits.h
 		tests/testTeulBits.cpp
-			tests/testTeulBits.h
 		tests/testAuthQueue.cpp auth/authClientData.cpp
 		tests/testChatHandle.cpp
 		tests/testFullObjID.cpp
