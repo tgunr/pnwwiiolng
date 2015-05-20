@@ -38,7 +38,7 @@ sdmCreateFacilityTable(FACILITY* const fac, const SINT32 numFacilities, const SI
 	table->facility = facility;
 	table->numFacilities = numFacilities;
 
-	for ( size_t i = 0; i < numFacilities; ++i )
+	for ( SINT32 i = 0; i < numFacilities; ++i )
 	{
 		facility[i].id = fac[i].oid.id;
 		facility[i].bidList.bid = (SINT16*)bidList;
