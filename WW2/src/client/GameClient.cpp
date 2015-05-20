@@ -453,20 +453,14 @@ void GameClient::ProcessChatLocalizedMessage(Chat::LocalizedMessage const& msg)
 			vehVehicle* killer = nullptr;
 			vehVehicle* me = persGetPersonaVehiclePtr();
 
-#if platOS == OS_MACOS
 			wchar_t* temp;
-#endif
 
 			// skip past the first space
 			ptr = (ptr) ? ptr + 1 : str;
 			wcscpy(ptr2, ptr);
 
 			// Determine whether the killer was friendly or not
-#if platOS == OS_MACOS
 			ptrtok = wcstok(ptr2, L" ",&temp);
-#else
-			ptrtok = wcstok(ptr2, L" ");
-#endif
 
 			// Tokenize, and the last token should be the
 			while(ptrtok != nullptr)
@@ -476,11 +470,7 @@ void GameClient::ProcessChatLocalizedMessage(Chat::LocalizedMessage const& msg)
 					break;
 
 				tokens.push_back(ptrtok);
-#if platOS == OS_MACOS
 				ptrtok = wcstok(nullptr, L" ",&temp);
-#else
-				ptrtok = wcstok(nullptr, L" "); // <----- this function is deprecated under windows, use wcstok_s on windows
-#endif
 			}
 
 			killerName = const_cast<wchar_t*>(tokens.back().c_str());   // <----- killerName is not a const, but c_str() is const
