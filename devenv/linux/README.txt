@@ -1,3 +1,12 @@
+Setting up a local Ubuntu box:
+
+ - Ubuntu Vivid required,
+ - Run "ubuntu_setup.sh",
+
+Creating a Virtual Linux dev box:
+
+ - Run BOOTSTRAP.sh,
+
 Linux Vagrant Setup
 -------------------
 

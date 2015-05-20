@@ -1,7 +1,6 @@
 #! /bin/bash
 
- die () { echo ERROR: $*; exit 1 ; }
-
+die () { echo ERROR: $*; exit 1 ; }
 
 #################### Vagrant box setup.
 #
@@ -23,14 +22,14 @@ fi
 PROVIDER=${PROVIDER:-virtualbox}
 
 # Local name for the box.
-BOXNAME=${BOXNAME:-trusty}
+BOXNAME=${BOXNAME:-vivid}
 
 # Source of the box.
-BOXURL=${BOXURL:-https://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-amd64-vagrant-disk1.box}
+BOXURL=${BOXURL:-https://cloud-images.ubuntu.com/vagrant/vivid/current/vivid-server-cloudimg-amd64-juju-vagrant-disk1.box}
 
 # Virtual machine config
 BOXCPUS=${BOXCPUS:-4}
-BOXMEMMB=${BOXMEMMB:-800}
+BOXMEMMB=${BOXMEMMB:-1280}
 srcDir=$(cd $(dirname $0)/../.. ; pwd -P)
 
 #################### Code
@@ -86,4 +85,3 @@ vagrant up --provision --provider "${PROVIDER}" --parallel
 echo "INFO: Ready to go, from $(pwd) type 'vagrant ssh' to log in to the machine."
 echo "INFO: The '${srcDir}' directory will be shared with the virtual machine as /playnet/wwiiolng"
 echo
-
