@@ -1,5 +1,6 @@
 *.pyc
 *.pyo
+*.vsp
 /*.html
 /*.idb
 /*.mdl
@@ -10,7 +11,7 @@
 /*.sdf
 /*.suo
 /*.user
-*.vsp
+.vs
 /BuildLog.htm
 /Debug
 Libraries/*.html
@@ -1592,6 +1593,8 @@ WW2/src/xml/.dirstamp
 /Libraries/tolua++/bin/tolua++.ilk
 /Libraries/tolua++/bin/tolua++.pdb
 /Libraries/tolua++/win32/*.user
+/Libraries/tolua++/win32/Debug
+/Libraries/tolua++/win32/Release
 
 WW2.psess
 WW2/proj/win/WW2.sdf
