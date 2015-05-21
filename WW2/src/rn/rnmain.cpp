@@ -1397,6 +1397,9 @@ FILE*	stream;
 
 			ptr += 1;
 
+			auto eol = strchr(ptr, '\n');
+			if (eol)
+				*eol = 0;
 			if (teulGetHost(ptr, host) == 0)
 			{
 				Write_Debug("Unable to translate host address");
