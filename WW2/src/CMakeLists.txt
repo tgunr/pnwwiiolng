@@ -1170,6 +1170,8 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
 	SET_PROPERTY(SOURCE ${_LUA_HOST}Lua.cc PROPERTY GENERATED true)
 	TARGET_LINK_LIBRARIES(${STRAT_HOST_EXE} libwwii ${MYSQL_LIBRARIES} teulserver ircclient ${LUA_LIBRARIES} ${TOLUAPP_LIBRARIES} )
 	SET_PROPERTY(TARGET ${STRAT_HOST_EXE} PROPERTY FOLDER "Hosts")
+
+    TARGET_INCLUDE_DIRECTORIES(${_LUA_HOST} PUBLIC ${LIBRARIES_DIR}/tolua++/include)
 ENDIF( )
 
 ######################################################################
