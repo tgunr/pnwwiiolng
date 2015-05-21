@@ -48,7 +48,7 @@ public:
     {
         bool operator()(const char* s1, const char* s2) const
         {
-            return strcmp(s1, s2) < 0;
+            return strcmp(s1, s2) == 0;
         }
     };
 
@@ -86,19 +86,7 @@ public:
 
     using AttribBindingList = std::unordered_map<std::string, GLuint>;
 
-#if platOS == OS_MACOS
-    struct eqs
-    {
-        bool operator()(const char* s1, const char* s2) const
-        {
-            return strcmp(s1, s2) == 0;
-        }
-    };
-
-    using UniformList = std::unordered_map<const char*, glslUniform*, std::hash<const char*>, eqs >;
-#else
-    using UniformList = std::unordered_map<const char*, glslUniform*, std::hash_compare<const char*, eqstr> >;
-#endif
+	using UniformList = std::unordered_map<const char*, glslUniform*, ConstCharHasher, eqstr>;
 
 	using UniformModifiedCountPair = std::pair<const glslUniform*, unsigned int>;
 	using LastAppliedUniformList = std::vector<UniformModifiedCountPair>;
