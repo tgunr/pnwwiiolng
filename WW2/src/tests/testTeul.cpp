@@ -153,9 +153,9 @@ struct EchoPacketHeader
 	UINT32		m_direction;		// Request or reply.
 
 	enum { tSint16 = 1, tUint16, tSint32, tUint32, tUint64, tSint64, tMax };
-	UINT32		m_type;			// What type is being used.
+	UINT32		m_type;				// What type is being used.
 
-	UINT32		m_size;			// How big the data is.
+	UINT32		m_size;				// How big the data is.
 
 	UINT16		m_count;			// Number of entries.
 
@@ -168,10 +168,13 @@ struct EchoPacketHeader
 	void packData(LOGICAL mode, ACTION_OBJECT* const a)
 	{
 		Type_* data = (Type_*)(m_data);
-		const size_t typeSize = sizeof(Type_);
+		const size_t typeSize = sizeof(Type_) * 8;
 		for ( UINT16 i = 0; i < m_count; ++i )
 		{
-			a->packer(mode, data[i], typeSize - (i % typeSize));
+			size_t packSize = typeSize - (i % typeSize);
+			if (std::is_signed<Type_>::value && packSize == 1)
+				packSize = 3;
+			a->packer(mode, data[i], packSize);
 		}
 	}
 
