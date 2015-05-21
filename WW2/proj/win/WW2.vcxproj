@@ -216,7 +216,7 @@
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <StructMemberAlignment>Default</StructMemberAlignment>
       <FunctionLevelLinking>true</FunctionLevelLinking>
-      <EnableEnhancedInstructionSet>StreamingSIMDExtensions2</EnableEnhancedInstructionSet>
+      <EnableEnhancedInstructionSet>StreamingSIMDExtensions</EnableEnhancedInstructionSet>
       <FloatingPointExceptions>false</FloatingPointExceptions>
       <RuntimeTypeInfo>true</RuntimeTypeInfo>
       <OpenMPSupport>false</OpenMPSupport>
@@ -242,13 +242,13 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SolutionDir)\WW2\lib\win\3rdParty;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
       <IgnoreSpecificDefaultLibraries>libcmtd;libcpmtd;msvcrtd;msvcprtd;msvcrt;msvcprt;vcomp;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ForceSymbolReferences>_SmartHeap_malloc;_SmartHeap_new;%(ForceSymbolReferences)</ForceSymbolReferences>
+      <ForceSymbolReferences>%(ForceSymbolReferences)</ForceSymbolReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <ProgramDatabaseFile>.\Debug/WW2.pdb</ProgramDatabaseFile>
       <GenerateMapFile>true</GenerateMapFile>
@@ -322,12 +322,12 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SolutionDir)\WW2\lib\win\3rdParty;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmtd;libcpmtd;msvcrtd;msvcprtd;msvcrt;msvcprt;vcomp;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ForceSymbolReferences>_SmartHeap_malloc;_SmartHeap_new;%(ForceSymbolReferences)</ForceSymbolReferences>
+      <ForceSymbolReferences>%(ForceSymbolReferences)</ForceSymbolReferences>
       <GenerateMapFile>true</GenerateMapFile>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -401,13 +401,13 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(Configuration).exe</OutputFile>
       <Version>0.1</Version>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SolutionDir)\WW2\lib\win\3rdParty;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmtd;libcpmtd;msvcrtd;msvcprtd;msvcrt;msvcprt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ForceSymbolReferences>_SmartHeap_malloc;_SmartHeap_new;%(ForceSymbolReferences)</ForceSymbolReferences>
+      <ForceSymbolReferences>%(ForceSymbolReferences)</ForceSymbolReferences>
       <GenerateMapFile>false</GenerateMapFile>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -477,13 +477,13 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <Version>0.1</Version>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SolutionDir)\WW2\lib\win\3rdParty;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmtd;libcpmtd;msvcrtd;msvcprtd;msvcrt;msvcprt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ForceSymbolReferences>_SmartHeap_malloc;_SmartHeap_new;%(ForceSymbolReferences)</ForceSymbolReferences>
+      <ForceSymbolReferences>%(ForceSymbolReferences)</ForceSymbolReferences>
       <GenerateMapFile>true</GenerateMapFile>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -548,7 +548,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <ShowProgress>NotSet</ShowProgress>
       <OutputFile>$(OutDir)$(ProjectName)_x86.exe</OutputFile>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -565,6 +565,7 @@
       <ImportLibrary>
       </ImportLibrary>
       <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+      <ForceSymbolReferences>%(ForceSymbolReferences)</ForceSymbolReferences>
     </Link>
     <ProjectReference>
       <LinkLibraryDependencies>true</LinkLibraryDependencies>
@@ -621,7 +622,7 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <Version>0.1</Version>
       <SuppressStartupBanner>true</SuppressStartupBanner>
@@ -692,13 +693,13 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <Version>0.1</Version>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SolutionDir)\WW2\lib\win\3rdParty;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmtd;libcpmtd;msvcrtd;msvcprtd;msvcrt;msvcprt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ForceSymbolReferences>_SmartHeap_malloc;_SmartHeap_new;%(ForceSymbolReferences)</ForceSymbolReferences>
+      <ForceSymbolReferences>%(ForceSymbolReferences)</ForceSymbolReferences>
       <GenerateMapFile>true</GenerateMapFile>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
@@ -763,13 +764,13 @@
     </ResourceCompile>
     <Link>
       <AdditionalOptions>/MACHINE:I386 %(AdditionalOptions)</AdditionalOptions>
-      <AdditionalDependencies>imm32.lib;shlW32Mt.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;vfw32.lib;odbc32.lib;odbccp32.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;tolua++.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>imm32.lib;d3d9.lib;dxguid.lib;dinput8.lib;winmm.lib;version.lib;xmlparse.lib;opengl32.lib;glu32.lib;dsound.lib;cg.lib;cgGL.lib;js.lib;libxml2_a.lib;Ws2_32.lib;WMVCORE.lib;strmiids.lib;Psapi.lib;lua51.lib;x3daudio.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
       <Version>0.1</Version>
       <SuppressStartupBanner>true</SuppressStartupBanner>
       <AdditionalLibraryDirectories>$(SolutionDir)\WW2\lib\win\3rdParty;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>libcmtd;libcpmtd;msvcrtd;msvcprtd;msvcrt;msvcprt;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
-      <ForceSymbolReferences>_SmartHeap_malloc;_SmartHeap_new;%(ForceSymbolReferences)</ForceSymbolReferences>
+      <ForceSymbolReferences>%(ForceSymbolReferences)</ForceSymbolReferences>
       <GenerateMapFile>true</GenerateMapFile>
       <SubSystem>Windows</SubSystem>
       <OptimizeReferences>true</OptimizeReferences>
