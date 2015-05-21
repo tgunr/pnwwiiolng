@@ -3,7 +3,6 @@
 #include "granny2.h"
 #include <stack>
 #include "include/systypes.h"
-#include "include/inplace_vector.h"
 //#include "gr2/gr2layer.h"
 #include "math/Vec3f.h"
 #include "mem/mem.h"
