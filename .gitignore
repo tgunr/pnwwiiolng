@@ -1598,6 +1598,8 @@ WW2/src/xml/.dirstamp
 /Libraries/tolua++/win32/Release
 /Libraries/libiconv/MSVC14/Debug
 /Libraries/libiconv/MSVC14/Release
+/Libraries/libxml2/win32/VC14/Debug
+/Libraries/libxml2/win32/VC14/Release
 
 WW2.psess
 WW2/proj/win/WW2.sdf
