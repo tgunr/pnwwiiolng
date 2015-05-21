@@ -1,6 +1,6 @@
 NAMESPACE Chat;
 
-USING "omg/typedefs.omg";
+USING "typedefs.omg";
 
 MESSAGE MissionStatus
 {

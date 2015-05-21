@@ -12,6 +12,8 @@
 #include <Windows.h>
 #undef min
 #undef max
+#include <direct.h>
+#define chdir(dirname) _chdir(dirname)
 #endif
 
 #if defined(_MSC_VER)
@@ -1300,9 +1302,27 @@ static bool _getGeneratorFromArg(const char* generator, const char* arg, std::st
 	return true;
 }
 
+static bool _getWorkingDirectoryFromArg(const char* arg)
+{
+	if (strncmp(arg, "-D", 2) != 0)
+		return false;
+	const char* dirName = arg + 2;
+	if (!*dirName || isspace(*dirName)) {
+		fprintf(stderr, "ERROR: Missing directory name after '%s' (use %spath not %s path).\n", arg, arg, arg);
+		exit(1);
+	}
+
+	if (chdir(dirName) < 0) {
+		fprintf(stderr, "ERROR: Cannot change directory to '%s'.", arg);
+		exit(1);
+	}
+
+	return true;
+}
+
 NORETURN_FN void usage()
 {
-	fprintf(stderr, "Usage: [--cxx=file] [--hxx=file] %s <input file>\n", s_exeName);
+	fprintf(stderr, "Usage: [-Dworking_directory] [--cxx=file] [--hxx=file] %s <input file>\n", s_exeName);
 	exit(1);
 }
 
@@ -1315,6 +1335,8 @@ int main(int argc, const char** argv)
 
 	for (int i = 1; i < argc; ++i) {
 		const char* arg = argv[i];
+		if (_getWorkingDirectoryFromArg(arg))
+			continue;
 		if (_getGeneratorFromArg("--cxx", arg, &s_cxxFilename))
 			continue;
 		if (_getGeneratorFromArg("--hxx", arg, &s_hxxFilename))

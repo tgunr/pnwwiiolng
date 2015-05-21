@@ -95,6 +95,7 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
+    <Import Project="WW2.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Buzzard|Win32'" Label="PropertySheets">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
@@ -1836,8 +1837,12 @@
     <ClCompile Include="..\..\src\scen\scenMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="..\..\src\omg\omgChatMissionStatus.omg" />
-    <None Include="..\..\src\omg\omgMissionSortieData.omg" />
+    <OMGGen Include="..\..\src\omg\omgChatMissionStatus.omg">
+      <FileType>Document</FileType>
+    </OMGGen>
+    <OMGGen Include="..\..\src\omg\omgMissionSortieData.omg">
+      <FileType>Document</FileType>
+    </OMGGen>
     <None Include="res\cursor.cur" />
     <None Include="res\WW2.rc2" />
     <None Include="res\wwii1.ico" />
@@ -1899,5 +1904,6 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="WW2.targets" />
   </ImportGroup>
 </Project>

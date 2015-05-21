@@ -1,6 +1,6 @@
 NAMESPACE MM;
 
-USING "omg/typedefs.omg";
+USING "typedefs.omg";
 
 MESSAGE SortieData
 {
