@@ -1,36 +1,33 @@
-# Copyright (C) 2007-2012 LuaDist.
-# Created by Peter Kapec
-# Redistribution and use of this file is allowed according to the terms of the MIT license.
-# For details see the COPYRIGHT file distributed with LuaDist.
-# Please note that the package source code is licensed under its own license.
+# Original attribution:
+## Copyright (C) 2007-2012 LuaDist.
+## Created by Peter Kapec
+## Redistribution and use of this file is allowed according to the terms of the MIT license.
+## For details see the COPYRIGHT file distributed with LuaDist.
+## Please note that the package source code is licensed under its own license.
 
-project ( toluapp C )
-cmake_minimum_required ( VERSION 2.8 )
-include ( cmake/dist.cmake )
+PROJECT ( toluapp C )
+CMAKE_MINIMUM_REQUIRED ( VERSION 2.8.3 )
+IF (CMAKE_VERBOSE_MAKEFILE)
+    INCLUDE ( cmake/dist.cmake )
+ENDIF ( )
 
-find_package ( Lua REQUIRED )
-include_directories ( include src/lib ${LUA_INCLUDE_DIR} )
+IF (NOT LUA_INCLUDE_DIR)
+    FIND_PACKAGE ( Lua51 REQUIRED )
+ENDIF ( )
+INCLUDE_DIRECTORIES ( include src/lib ${LUA_INCLUDE_DIR} )
 
 # Build lib
-file ( GLOB SRC_LIBTOLUAPP src/lib/*.c )
-if ( MSVC )
-  set ( DEF_FILE libtoluapp.def )
-endif ( )
+FILE ( GLOB SRC_LIBTOLUAPP src/lib/*.c )
 
-add_library ( toluapp_lib ${SRC_LIBTOLUAPP} ${DEF_FILE} )
-target_link_libraries ( toluapp_lib ${LUA_LIBRARIES} )
-set_target_properties ( toluapp_lib PROPERTIES OUTPUT_NAME toluapp CLEAN_DIRECT_OUTPUT 
-  1 )
+ADD_LIBRARY ( libtolua++ STATIC ${SRC_LIBTOLUAPP} )
+TARGET_LINK_LIBRARIES ( libtolua++ ${LUA_LIBRARIES} )
+SET_TARGET_PROPERTIES ( libtolua++ PROPERTIES CLEAN_DIRECT_OUTPUT 1 )
 
 # Build app
-include_directories ( src/bin )
-set ( SRC_TOLUA src/bin/tolua.c src/bin/toluabind.c )
-add_executable ( toluapp ${SRC_TOLUA} )
-target_link_libraries ( toluapp toluapp_lib ${LUA_LIBRARIES} )
+INCLUDE_DIRECTORIES ( src/bin )
+ADD_EXECUTABLE ( tolua++ src/bin/tolua.c src/bin/toluabind.c )
+TARGET_LINK_LIBRARIES ( tolua++ libtolua++ ${LUA_LIBRARIES} )
 
-# Install
-install_library ( toluapp_lib )
-install_executable ( toluapp )
-install_header ( include/ )
-install_data ( README INSTALL )
-install_doc ( doc/ )
+SET ( TOLUAPP_EXECUTABLE tolua++ PARENT_SCOPE )
+SET ( TOLUAPP_LIBRARIES libtolua++ PARENT_SCOPE )
+SET ( TOLUAPP_INCLUDE_DIR ${CMAKE_CURRENT_LIST_DIR}/tolua++ PARENT_SCOPE )
