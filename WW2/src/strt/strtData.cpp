@@ -295,7 +295,7 @@ FilenamePool g_filenamePool;
 static const std::string*
 _filenamePool(const char* filename)
 {
-	auto hash = ConstCharHasher(filename);
+	auto hash = ConstCharHasher()(filename);
 	auto& names = g_filenamePool[hash];
 	auto it = names.begin();
 	for (auto end = names.end(); it != end; ++it)
