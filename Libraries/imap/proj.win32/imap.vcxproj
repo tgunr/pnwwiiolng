@@ -367,6 +367,11 @@
     <ClInclude Include="..\include\imap.h" />
     <ClInclude Include="..\include\imapTypes.h" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\libxml2\win32\VC14\libxml2.vcxproj">
+      <Project>{1d6039f6-5078-416f-a3af-a36efc7e6a1c}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

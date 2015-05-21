@@ -11,6 +11,7 @@
 /*.sdf
 /*.suo
 /*.user
+*.vcxproj.user
 .vs
 /BuildLog.htm
 /Debug
@@ -1595,6 +1596,8 @@ WW2/src/xml/.dirstamp
 /Libraries/tolua++/win32/*.user
 /Libraries/tolua++/win32/Debug
 /Libraries/tolua++/win32/Release
+/Libraries/libiconv/MSVC14/Debug
+/Libraries/libiconv/MSVC14/Release
 
 WW2.psess
 WW2/proj/win/WW2.sdf
