@@ -1,0 +1,49 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libxml2", "libxml2.vcxproj", "{1D6039F6-5078-416F-A3AF-A36EFC7E6A1C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "runsuite", "runsuite.vcxproj", "{D841B4F7-C277-49CB-B379-8B1801C8EE35}"
+	ProjectSection(ProjectDependencies) = postProject
+		{F9C13A95-C7EB-40F3-A599-3695C1E0CF38} = {F9C13A95-C7EB-40F3-A599-3695C1E0CF38}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "iconv", "..\..\..\libiconv\MSVC14\libiconv.vcxproj", "{F9C13A95-C7EB-40F3-A599-3695C1E0CF38}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug DLL|Win32 = Debug DLL|Win32
+		Debug|Win32 = Debug|Win32
+		Release DLL|Win32 = Release DLL|Win32
+		Release|Win32 = Release|Win32
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1D6039F6-5078-416F-A3AF-A36EFC7E6A1C}.Debug DLL|Win32.ActiveCfg = Debug|Win32
+		{1D6039F6-5078-416F-A3AF-A36EFC7E6A1C}.Debug DLL|Win32.Build.0 = Debug|Win32
+		{1D6039F6-5078-416F-A3AF-A36EFC7E6A1C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{1D6039F6-5078-416F-A3AF-A36EFC7E6A1C}.Debug|Win32.Build.0 = Debug|Win32
+		{1D6039F6-5078-416F-A3AF-A36EFC7E6A1C}.Release DLL|Win32.ActiveCfg = Release|Win32
+		{1D6039F6-5078-416F-A3AF-A36EFC7E6A1C}.Release DLL|Win32.Build.0 = Release|Win32
+		{1D6039F6-5078-416F-A3AF-A36EFC7E6A1C}.Release|Win32.ActiveCfg = Release|Win32
+		{1D6039F6-5078-416F-A3AF-A36EFC7E6A1C}.Release|Win32.Build.0 = Release|Win32
+		{D841B4F7-C277-49CB-B379-8B1801C8EE35}.Debug DLL|Win32.ActiveCfg = Debug|Win32
+		{D841B4F7-C277-49CB-B379-8B1801C8EE35}.Debug DLL|Win32.Build.0 = Debug|Win32
+		{D841B4F7-C277-49CB-B379-8B1801C8EE35}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D841B4F7-C277-49CB-B379-8B1801C8EE35}.Debug|Win32.Build.0 = Debug|Win32
+		{D841B4F7-C277-49CB-B379-8B1801C8EE35}.Release DLL|Win32.ActiveCfg = Release|Win32
+		{D841B4F7-C277-49CB-B379-8B1801C8EE35}.Release DLL|Win32.Build.0 = Release|Win32
+		{D841B4F7-C277-49CB-B379-8B1801C8EE35}.Release|Win32.ActiveCfg = Release|Win32
+		{D841B4F7-C277-49CB-B379-8B1801C8EE35}.Release|Win32.Build.0 = Release|Win32
+		{F9C13A95-C7EB-40F3-A599-3695C1E0CF38}.Debug DLL|Win32.ActiveCfg = Debug DLL|Win32
+		{F9C13A95-C7EB-40F3-A599-3695C1E0CF38}.Debug DLL|Win32.Build.0 = Debug DLL|Win32
+		{F9C13A95-C7EB-40F3-A599-3695C1E0CF38}.Debug|Win32.ActiveCfg = Debug|Win32
+		{F9C13A95-C7EB-40F3-A599-3695C1E0CF38}.Debug|Win32.Build.0 = Debug|Win32
+		{F9C13A95-C7EB-40F3-A599-3695C1E0CF38}.Release DLL|Win32.ActiveCfg = Release DLL|Win32
+		{F9C13A95-C7EB-40F3-A599-3695C1E0CF38}.Release DLL|Win32.Build.0 = Release DLL|Win32
+		{F9C13A95-C7EB-40F3-A599-3695C1E0CF38}.Release|Win32.ActiveCfg = Release|Win32
+		{F9C13A95-C7EB-40F3-A599-3695C1E0CF38}.Release|Win32.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
