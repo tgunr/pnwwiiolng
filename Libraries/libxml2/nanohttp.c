@@ -1038,16 +1038,18 @@ xmlNanoHTTPConnectAttempt(struct sockaddr *addr)
 static SOCKET
 xmlNanoHTTPConnectHost(const char *host, int port)
 {
-    struct hostent *h;
+#if !defined(HAVE_GETADDRINFO) || !defined(_WIN32)
+	struct hostent *h;
+	struct in_addr ia;
+	int i;
+#endif
     struct sockaddr *addr = NULL;
-    struct in_addr ia;
     struct sockaddr_in sockin;
 
 #ifdef SUPPORT_IP6
     struct in6_addr ia6;
     struct sockaddr_in6 sockin6;
 #endif
-    int i;
     SOCKET s;
 
     memset (&sockin, 0, sizeof(sockin));
@@ -1135,12 +1137,12 @@ xmlNanoHTTPConnectHost(const char *host, int port)
 
 	    switch (h_errno) {
 		case HOST_NOT_FOUND:
-		    h_err_txt = "Authoritive host not found";
+		    h_err_txt = "Authoritative host not found";
 		    break;
 
 		case TRY_AGAIN:
 		    h_err_txt =
-			"Non-authoritive host not found or server failure.";
+			"Non-authoritative host not found or server failure.";
 		    break;
 
 		case NO_RECOVERY:
