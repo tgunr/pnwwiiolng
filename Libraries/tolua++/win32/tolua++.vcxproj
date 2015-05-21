@@ -17,6 +17,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\src\bin\tolua.c" />
+    <ClCompile Include="..\src\bin\toluabind.c" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{9557D2AE-9A8B-447E-B7F1-2A59929A4A06}</ProjectGuid>

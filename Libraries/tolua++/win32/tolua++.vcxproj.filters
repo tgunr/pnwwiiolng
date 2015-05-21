@@ -14,5 +14,8 @@
     <ClCompile Include="..\src\bin\tolua.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="..\src\bin\toluabind.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
