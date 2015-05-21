@@ -34,14 +34,18 @@ namespace std
 }
 
 // Crude hasher for const char* strings
-template<size_t BaseValue, size_t PrimeFactor>
-size_t ConstCharHasher(const char* text)
+struct ConstCharHasher
 {
-	size_t hash = BaseValue;
-	const char* it;
-	for (it = text; *it; ++it) {
-		hash = (hash << 3) ^ *it ^ (hash >> 29);
+	size_t operator()(const char* str) const noexcept
+	{
+		uint64_t hash = 0xc3a5c85c97cb3127ULL;
+		const char* it = str;
+		while (*it) {
+			hash = (hash << 3) ^ *(it++) ^ (hash >> 29);
+		}
+		hash += (it - str) * 0x1b873593;
+		return (sizeof(size_t) == 4)
+			? static_cast<size_t>(hash % 0xcc9e2d51ULL)
+			: static_cast<size_t>(hash % 0x9ae16a3b2f90404fULL);
 	}
-	hash ^= (it - text);
-	return hash % PrimeFactor;
-}
+};

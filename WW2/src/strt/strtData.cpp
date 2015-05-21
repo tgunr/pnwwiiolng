@@ -285,7 +285,7 @@ void strtAddErrorListEntry(int errorNo, const char* objectName, const char* entr
 //////////////////////////////////////////////////////////////////////
 // Filename string pool definitions
 
-typedef std::map<UINT64, std::vector<std::unique_ptr<std::string>>> FilenamePool;
+typedef std::unordered_map<UINT64, std::vector<std::unique_ptr<std::string>>> FilenamePool;
 FilenamePool g_filenamePool;
 
 //////////////////////////////////////////////////////////////////////
@@ -295,7 +295,7 @@ FilenamePool g_filenamePool;
 static const std::string*
 _filenamePool(const char* filename)
 {
-	auto hash = ConstCharHasher<0xbead0ec7, 6037>(filename);
+	auto hash = ConstCharHasher(filename);
 	auto& names = g_filenamePool[hash];
 	auto it = names.begin();
 	for (auto end = names.end(); it != end; ++it)
