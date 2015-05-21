@@ -7,7 +7,7 @@ include ( cmakeincludes/HostConfiguration.cmake )
 
 IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 	# Add a rule to build the Lua glue file
-	add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${_LUA_HOST}Lua.cc
+	ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${_LUA_HOST}Lua.cc
 		COMMAND ${TOLUAPP_EXECUTABLE}
 			-o  ${CMAKE_CURRENT_SOURCE_DIR}/${_LUA_HOST}Lua.cc
 			-n  game
@@ -18,6 +18,8 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		MAIN_DEPENDENCY hostproj/${_LUA_HOST}.pkg
 		DEPENDS
+            ${TOLUAPP_EXECUTABLE}
+            ${TOLUAPP_LIBRARIES}
 			${SourcePCH}
 			hostproj/${_LUA_HOST}.pkg
 			include/platforms.h
@@ -74,4 +76,3 @@ ELSE ( )
 	  SET_SOURCE_FILES_PROPERTIES(${_FIRST_SOURCE} PROPERTIES COMPILE_FLAGS "/Yc\"${SourcePCH}\"")
 	ENDMACRO ()
 ENDIF ( )
-
