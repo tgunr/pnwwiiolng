@@ -8,6 +8,7 @@
 // Originating Programmer: Marty "Vandal" Poulin
 
 #include <map>
+#include <array>
 
 #include "mem/mem.h"
 #include "strt/strtDTL.h"
@@ -80,17 +81,15 @@ static bool _addBuildingToFacTable(STRAT_FACILITY_TABLE* facTable, const BUILDIN
 
 struct BuildingsByCell
 {
-	typedef std::vector<UINT16> Cell;
-	std::vector<Cell> m_cells;
+	using Cell = std::vector<UINT16>;
+	using Grid = std::array<Cell, CELLS_PER_SIDE * CELLS_PER_SIDE>;
+	Grid m_grid;
 
-	BuildingsByCell()
-	{
-		m_cells.reserve(CELLS_PER_SIDE * CELLS_PER_SIDE);
-	}
+	BuildingsByCell() noexcept {}
 
-	Cell& GetCell(size_t x, size_t y)
+	Cell& GetCell(size_t x, size_t y) noexcept
 	{
-		return m_cells[(x * CELLS_PER_SIDE) + y];
+		return m_grid[(x * CELLS_PER_SIDE) + y];
 	}
 };
 
