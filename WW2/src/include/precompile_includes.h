@@ -3,6 +3,7 @@
 ////////// SYSTEM INCLUDES ONLY -- NO PLAYNET SPECIFICS
 
 #include <algorithm>
+#include <array>
 #include <cassert>
 #include <cctype>
 #include <cfloat>
