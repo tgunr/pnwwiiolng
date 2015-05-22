@@ -33,6 +33,9 @@ namespace Teul
 	//! Get the current application name.
 	const char* GetAppName();
 
+	//! Initialize Winsock networking if present.
+	void InitializeWinsock();
+
 	//! Is the transport initialized?
 	bool IsTransportInited();
 	//! Is the transport closing?

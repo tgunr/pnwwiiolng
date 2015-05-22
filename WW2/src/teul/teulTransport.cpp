@@ -386,30 +386,31 @@ _logLibEvent(int eventLevel, const char* msg)
 	dbugLog("libevent", 0, dbugLevel, "%s", msg);
 }
 
-static void
-_initializePlatform()
+void Teul::InitializeWinsock()
 {
 #if platOS == OS_WIN32
 	WSADATA wsaData;
 	WORD wVersionRequested;
-	wVersionRequested = MAKEWORD( 2, 2 );
+	wVersionRequested = MAKEWORD(2, 2);
 
 	const SINT32 err = WSAStartup(wVersionRequested, &wsaData);
-	if ( err != 0 )
-	{
-		LogAbort(_FLA, "WSAStartup failed: %d",err);
-	}
+	if (err != 0)
+		LogAbort(_FLA, "WSAStartup failed: %d", err);
 
 	// Confirm that the WinSock DLL supports 2.2.
 	// Note that if the DLL supports versions greater
 	// than 2.2 in addition to 2.2, it will still return
 	// 2.2 in wVersion since that is the version we
 	// requested.
-	if ( LOBYTE( wsaData.wVersion ) != 2 || HIBYTE( wsaData.wVersion ) != 2 )
+	if (LOBYTE(wsaData.wVersion) != 2 || HIBYTE(wsaData.wVersion) != 2)
 		LogAbort("Wrong version of winsock library.");
 	// The WinSock DLL is acceptable. Proceed.
 #endif
+}
 
+static void
+_initializeLibEvent()
+{
 	event_set_log_callback(_logLibEvent);
 
 	// Set up the configuration.
@@ -464,7 +465,8 @@ teulInitTransport(SINT32 logType
 	if ( logFnPtr )
 		Teul::g_logFnPtr = logFnPtr ;
 
-	_initializePlatform();
+	Teul::InitializeWinsock();
+	_initializeLibEvent();
 
 	teulFreeAllCallbacks();
 
