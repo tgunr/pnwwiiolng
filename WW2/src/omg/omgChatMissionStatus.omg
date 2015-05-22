@@ -23,7 +23,7 @@ MESSAGE MissionStatus
 	GROUP Origin
 	{
 		FULL_OBJ_ID		cp;				//! Spawn CP.
-		FULL_OBJ_ID		fac;			//! Spawn facility.
+		FULL_OBJ_ID		fac;			//! Spawn facility.	
 		bool			inSupply;		//! True if origin is in supply.
 	};
 

@@ -209,6 +209,13 @@ Teul::uWeb::Server::run()
 		}
 
 		int bytes = recv(newSock, buffer, sizeof(buffer) - 1, 0);
+		if (bytes < 0)
+		{
+			if (isCancelled())
+				return;
+			printf("uWebServer recv %d: errno %d", bytes, dbugGetErrno());
+			continue;
+		}
 		buffer[bytes] = 0;
 
 		try
