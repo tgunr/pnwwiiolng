@@ -136,6 +136,8 @@ _getHostIPAddresses()
 		// Only look for ethernet networks with IfOperStatusUp and a unicast address.
 		if ( curAddr->OperStatus != IfOperStatusUp || curAddr->FirstUnicastAddress == nullptr )
 			continue;
+		if ( curAddr->Flags & IP_ADAPTER_RECEIVE_ONLY )
+			continue;
 
 		switch (curAddr->IfType)
 		{
@@ -154,8 +156,11 @@ _getHostIPAddresses()
 		{
 			if (curAddr->FirstDnsServerAddress == nullptr)
 				continue;
-			if (curAddr->FirstGatewayAddress == nullptr)
-				continue;
+			if (preferredIf->FirstDnsServerAddress)
+			{
+				if (curAddr->FirstGatewayAddress == nullptr)
+					continue;
+			}
 		}
 
 		preferredIf = curAddr;
