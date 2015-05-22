@@ -551,7 +551,7 @@ namespace Teul
 			m_union.um_uint32 = Teul::GetSingleIP(newValue_);
 			if ( m_union.um_uint32 == 0 )
 			{
-				dbugLog(_FLA, "%s: invalid ip address: %s", GetName(), newValue_);
+				LogAbort("%s: invalid ip address: %s", GetName(), newValue_);
 				return;
 			}
 		}

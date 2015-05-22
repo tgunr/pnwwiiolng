@@ -161,10 +161,9 @@ static SQUAD_CONTROL_RESULT
 _processCreateComplete(const ChatHandle& /*originator*/, SQUAD_REQUEST& request, Player* player)
 {
 	bool updatedPlayer = false;
-	Player* member;
 	for ( UINT32 i = 0; i < request.control.m_players.size(); ++i )
 	{
-		member = PlayerInterface::Lookup(request.control.m_players[i]);
+		Player* member = PlayerInterface::Lookup(request.control.m_players[i]);
 		if ( member != nullptr )
 		{
 			if ( member == player )

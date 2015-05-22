@@ -104,7 +104,7 @@ static evutil_socket_t _libEventAcceptHandler(evutil_socket_t listener, short ev
 	//auto base = static_cast<event_base*>(arg);
 	socklen_t caLen = sizeof(cliAddr_);
 	evutil_socket_t cliSock = EAGAIN;
-	while ( (cliSock == EAGAIN) | (cliSock == EINTR) )
+	while ( (cliSock == EAGAIN) || (cliSock == EINTR) )
 	{
 		cliSock = accept(listener, (struct sockaddr*)&cliAddr_, &caLen);
 	};
