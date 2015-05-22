@@ -202,7 +202,7 @@ UINT8 weapFindClassIndex(const std::string& className)
 WEAPON_SPEC weapCreateSpec(const char* weapString)
 {
 	WEAPON_SPEC weap = NULL_WEAP_SPEC;
-	SINT32 wType, sClassLen;
+	SINT32 wType;
 	char sCountry[WEAP_IDENT_SIZE+1]
 		,sCategory[WEAP_IDENT_SIZE+1]
 		,sClass[MAX_CLASS_NAME_LEN]
@@ -232,8 +232,8 @@ WEAPON_SPEC weapCreateSpec(const char* weapString)
 	{
 		tempString++;
 
-		sClassLen = (SINT32)(sType - tempString);
-		strsafecpy(sClass, tempString);
+		size_t sClassLen = sType - tempString;
+		strncpy(sClass, tempString, std::min(sizeof(sClass), sClassLen));
 
 		if (! strncmp(sClass,"null",MAX_CLASS_NAME_LEN) )
 			weap.wClass = 0;
@@ -258,7 +258,7 @@ WEAPON_SPEC weapCreateSpec(const char* weapString)
 	}
 	else
 	{
-		sClassLen = (SINT32)(sType - weapString);
+		size_t sClassLen = sType - weapString;
 		strncpy(sClass, weapString, sClassLen);
 		weap.wClass = weapFindClass(sClass).wClass;
 		weap.wCategory = 0;
