@@ -39,7 +39,7 @@ MessageLoop::MessageLoop() : MessageHandler()
 	_messages = new MessageQueue;
 	_commonfilters = nullptr;
 	_preferredhandler = nullptr;
-	_currentMessage = 0;
+	_currentMessage = nullptr;
 	_parentloop = this;
 	_id = _loopid++;
 	

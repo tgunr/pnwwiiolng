@@ -390,7 +390,7 @@ void phui::js::Array::clear()
 	}
 }
 
-phui::js::Array::Element::Element(JSContext* ctx, JSObject* obj, unsigned int i, jsval v) : _ctx(ctx), _obj(obj), _i(i), _val(v), _refcount(0)
+phui::js::Array::Element::Element(JSContext* ctx, JSObject* obj, unsigned int i, jsval v) : Referenced(), _ctx(ctx), _obj(obj), _i(i), _val(v)
 {
 	JS_SetElement(_ctx, _obj, _i, &_val);
 }
@@ -403,17 +403,6 @@ phui::js::Array::Element::~Element()
 	}*/
 }
 		
-void phui::js::Array::Element::Acquire() 
-{ 
-	_refcount++; 
-}
-
-void phui::js::Array::Element::Release() 
-{ 
-	_refcount--; 
-	if (_refcount<1) delete this; 
-}
-
 static void _defaulterrorreporter(JSContext *cx, const char *message, JSErrorReport *report)
 {
 	printf("%s\n", message);

@@ -237,19 +237,16 @@ public:
 	virtual ~Array();
 	
 protected:
-	class Element
+	class Element : public Referenced
 	{
 	public:
 		Element(JSContext* ctx, JSObject* obj, unsigned int i, jsval v);
 		~Element();
-		void Acquire();
-		void Release();
 		
 		JSContext* _ctx;
 		JSObject* _obj;
 		unsigned int _i;
 		jsval _val;
-		int _refcount;
 	};
 	
 	std::vector<ref_ptr<Element> > _elems;
