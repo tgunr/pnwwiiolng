@@ -15,7 +15,7 @@ static_assert( platBuild != TEUL_SERVER, "Can't include vars.h in a server build
 #endif
 
 #ifdef  GLOBALS
-	SINT8 volatile	Copyright[]="Copyright 2012 Playnet, Inc.  All Rights Reserved";
+	const SINT8 volatile	Copyright[]="Copyright 2012 Playnet, Inc.  All Rights Reserved";
 #endif
 
 // These are configuration variables that are filled

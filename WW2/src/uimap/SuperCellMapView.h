@@ -1,5 +1,6 @@
 #pragma once
 
+#include <atomic>
 #include <vector>
 #include <list>
 #include <map>
@@ -187,7 +188,7 @@ public:
 	SuperCell(Renderer*, int scx, int scy);
 	virtual ~SuperCell() { }
 
-	volatile bool loading, loaded; // volatile since we want these from memory not in a register
+	std::atomic<bool> loading, loaded; // volatile since we want these from memory not in a register
 	int scx, scy;
 	Renderer* renderer;
 

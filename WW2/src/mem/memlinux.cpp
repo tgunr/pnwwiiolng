@@ -114,7 +114,7 @@ struct HISTORY
 		}
 	}
 
-	volatile bool m_inUse;
+	std::atomic<bool> m_inUse;
 	std::mutex m_mutex;
 
 	std::unordered_map<unsigned long long, Activity> m_data;

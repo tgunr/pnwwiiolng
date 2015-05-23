@@ -26,7 +26,7 @@
 
 static bool useIrc = true;
 static irc_session_t* ircSession;
-static volatile bool ircConnected = false;
+static std::atomic<bool> ircConnected = false;
 static std::string nick;
 const char* g_appName = "stratLoader";
 static char g_origin[80] = "private";

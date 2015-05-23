@@ -77,15 +77,15 @@ struct IRCImpl : public IRC, public PNThread
 		{}
 	virtual ~IRCImpl() {}
 
-	bool			m_initialized;
-	bool			m_active;
-	volatile bool	m_running;
-	bool			m_joined;			// Finished joining
-	irc_session_t*	m_session;
-	std::string		m_app;
-	std::string		m_nick;
-	_MODES			m_modes;
-	_CHANNELS		m_channels;
+	bool				m_initialized;
+	bool				m_active;
+	std::atomic<bool>	m_running;
+	bool				m_joined;			// Finished joining
+	irc_session_t*		m_session;
+	std::string			m_app;
+	std::string			m_nick;
+	_MODES				m_modes;
+	_CHANNELS			m_channels;
 
 	// Dot command index
 	typedef std::map<std::string, irc_dotcmd_t> DOTS;
