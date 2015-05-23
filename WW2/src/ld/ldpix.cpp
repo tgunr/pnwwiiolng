@@ -113,10 +113,6 @@ int ldpixLoadImageFileToSurface(const char* Filename, UINT32 TransparentColor, U
         piGetTextureHandle(texid, 0);
     }
 
-#pragma message("[RAMP]: Fix this please. Removing strncat causes link error against tolua++.lib")
-    char ramp[6] = {0};
-    strncat(ramp, "dweeb", 5);
-
 #ifdef TESTMAC
 //  stopcollection();
 #endif
