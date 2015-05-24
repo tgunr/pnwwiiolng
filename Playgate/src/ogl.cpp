@@ -7,6 +7,8 @@
 #include "include/infoMessages.h"
 #include <ctype.h>
 
+#pragma comment(lib, "opengl32.lib")
+
 struct OGL_EXTENSION
 {
 	char	name[48];

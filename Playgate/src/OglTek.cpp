@@ -11,6 +11,8 @@
 #include <Iphlpapi.h>
 #include "include/infoMessageTypes.h"
 
+#pragma comment(lib, "opengl32.lib")
+
 static LRESULT CALLBACK WindowProc(HWND hwnd, UINT umsg, WPARAM wParam, LPARAM lParam);
 
 HINSTANCE	hinst;
@@ -28,16 +30,19 @@ _createWindow(HINSTANCE hInstance)
 
 	hinst = hInstance;
 
+#pragma warning(push)
+#pragma warning(disable: 4302)
 	memset(&wndClass, 0, sizeof(WNDCLASS));
 	wndClass.style          = CS_HREDRAW|CS_VREDRAW|CS_OWNDC;
 	wndClass.lpfnWndProc    = WindowProc;
 	wndClass.hInstance      = hInstance;
-	wndClass.hIcon          = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_WINLOGO));
-	wndClass.hCursor        = LoadCursor(hInstance, MAKEINTRESOURCE(IDC_ARROW));
+	wndClass.hIcon          = LoadIconA(hInstance, MAKEINTRESOURCEA(IDI_WINLOGO));
+	wndClass.hCursor        = LoadCursorA(hInstance, MAKEINTRESOURCEA(IDC_ARROW));
 	wndClass.hbrBackground  = (HBRUSH)GetStockObject(BLACK_BRUSH);
 	wndClass.lpszMenuName   = nullptr;
 	wsprintf(classname, _T("OpenGLClass_%dx%dx%d"), WantedWidth, WantedHeight, WantedBpp);
 	wndClass.lpszClassName  = classname;
+#pragma warning(pop)
 
 	if (RegisterClass(&wndClass) == 0)
 	{

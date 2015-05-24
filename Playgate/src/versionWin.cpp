@@ -3,6 +3,8 @@
 #include "wwii/wwiiUTF.h"
 #include "versionWin.h"
 
+#pragma comment(lib, "Version.lib")
+
 #ifdef _UNICODE
 #define ustrcpy lstrcpyW
 #define ustrcat lstrcatW
