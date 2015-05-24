@@ -16,13 +16,13 @@ int main(int argc, const char* const argv[])
 
 	IO::MappedFile exe;
 	if (!exe.mapFile(exeName)) {
-		MessageBox(nullptr, "Unable to open ww2.exe", "FAILED", MB_ICONERROR | MB_OK);
+		MessageBox(nullptr, _T("Unable to open ww2.exe"), _T("FAILED"), MB_ICONERROR | MB_OK);
 		exit(1);
 	}
 
 	std::ofstream output("exesum.txt", std::ios::out, std::ios::trunc);
 	if (!output.good()) {
-		MessageBox(nullptr, "Unable to open exesum.txt!", "FAILED", MB_ICONERROR|MB_OK);
+		MessageBox(nullptr, _T("Unable to open exesum.txt!"), _T("FAILED"), MB_ICONERROR|MB_OK);
 		exit(2);
 	}
 
