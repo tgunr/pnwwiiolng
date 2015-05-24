@@ -133,5 +133,8 @@
     <ClInclude Include="..\..\..\include\freetype\config\ftstdlib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\include\precompile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

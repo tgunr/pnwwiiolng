@@ -238,6 +238,7 @@ _recvBrigadeListResponse(ACTION_OBJECT* const a)
 	}
 	catch (std::exception& e)
 	{
+		(void)e;
 		Write_Debug("BrigadeSummaries failed: %s", e.what());
 	}
 	return a->offset;

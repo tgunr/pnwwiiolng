@@ -54,7 +54,7 @@ public:
 	virtual void OnCursorMoved(){}
 	virtual void OnTextModified(){}
 
-	View* AsView(){ return (View*)dynamic_cast<View*>(this); }
+	virtual View* AsView() = 0;
 	void SetIMEControlled(bool ime){ _imeControl= ime; }
 	
 protected:

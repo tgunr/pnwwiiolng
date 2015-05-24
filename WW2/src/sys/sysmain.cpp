@@ -81,10 +81,6 @@ static LOGICAL abcd();
 extern HWND				myhwnd;
 #endif
 
-#ifdef SMARTHEAP_USED
-#include <smrtheap.hpp>
-#endif
-
 // Global
 LOGICAL	running;
 HANDLE	threadhandle;
@@ -981,95 +977,6 @@ void SetupFPU(bool enableExceptions)
 	configHasBeenPrinted	= true;
 }
 
-#ifdef SMARTHEAP_USED
-
-static MEM_ERROR_FN PrevErrorHandler;
-static char* emergencybuffer;
-
-MEM_BOOL MEM_CALLBACK MyErrorHandler( MEM_ERROR_INFO* errorInfo)
-{
-	delete emergencybuffer;
-
-    Write_Debug("Smartheap Reports Out Of Memory\n");
-	//MessageBox(nullptr, _T("Application is out of memory and will exit."), _T("Out Of Memory"), MB_ICONERROR|MB_OK|MB_SYSTEMMODAL);
-
-	/*
-	FILE* fp = Fio::OpenLogFile();
-    SYSTEMTIME SystemTime;
-    GetLocalTime(&SystemTime);
-
-	// be nice if we could get some info out of errorInfo, but noooooooooo
-
-
-	MEM_POOL_ENTRY entry;
-	entry.entry = nullptr;
-	size_t sumInUse=0, countInUse=0;
-	size_t sumFree=0, countFree=0;
-	size_t greaterThan20MB = 0, biggestOne=0;
-
-	MemPoolLock(MemDefaultPool);
-	while (MemPoolWalk(MemDefaultPool, &entry) == MEM_POOL_OK)
-	{
-		if ( entry.isInUse )
-		{
-			sumInUse += entry.size;
-			countInUse++;
-			if ( entry.size > 20*1024*1024 )
-			{
-				greaterThan20MB++;
-				if ( entry.size > biggestOne )
-				{
-					biggestOne = entry.size;
-				}
-			}
-		}
-		else
-		{
-			sumFree += entry.size;
-			countFree++;
-		}
-	}
-	MemPoolUnlock(MemDefaultPool);
-
-	fprintf(fp, "Application exited: out of memory on d/%d/%d %d:%02d:%02d\n",
-            SystemTime.wMonth,
-            SystemTime.wDay,
-            SystemTime.wYear,
-            SystemTime.wHour,
-            SystemTime.wMinute,
-            SystemTime.wSecond);
-
-	fprintf( fp, "sumInUse=%ld, countInUse=%ld, sumFree=%ld, countFree=%ld, greaterThan20MB=%ld, biggestOne=%ld\n",
-		sumInUse, countInUse, sumFree, countFree, greaterThan20MB, biggestOne );
-    fclose(fp);
-
-	//ExitProcess(999);
-*/
-//	throw std::runtime_error("Out of memory");		///Terminal
-	return FALSE;
-}
-
-static void initSmartHeap()
-{
-    Write_Debug("Smartheap Inited\n");
-
-	MemInitDefaultPool();
-//	PrevErrorHandler = MemSetErrorHandler(MyErrorHandler);
-	PrevErrorHandler = MemSetErrorHandler(nullptr); // make smartheap return null for out of memory errors
-
-	dbgMemSetSafetyLevel(MEM_SAFETY_DEBUG);
-
-	MemPoolSetSmallBlockSize(MemDefaultPool, 512);
-
-	MemPoolSetPageResizing(MemDefaultPool, FALSE );
-
-	emergencybuffer = new char[64*1024];
-
-	//new char[1000*1024*1024];
-}
-
-#endif
-
 //#ifndef BETA_RELEASE
 #ifdef ANTIHACK
 static const unsigned char FIRST_CHAR = '0';
@@ -1090,12 +997,12 @@ static unsigned short valueForChar( unsigned char c )
 
 static void HandleHackID()
 {
-	if (HackID[0] && ServerOTP[0] )
+	if (HackID[0] && GameServerOTP[0] )
 	{
 		size_t len = strlen(HackID);
 		if ( len == 44 )
 		{
-			unsigned long otp  = strtoul(ServerOTP, nullptr, 10);
+			unsigned long otp  = strtoul(GameServerOTP, nullptr, 10);
 			srand(otp);
 			wchar_t text[12];
 			int j=0;
@@ -1145,10 +1052,6 @@ RECT	rect;
 #ifdef DIRECT3D
 int		screenmode;
 #endif	// DIRECT3D
-
-#ifdef SMARTHEAP_USED
-	initSmartHeap();
-#endif
 
 #if platOS == OS_WIN32 && defined(PERFORMANCE_ENTER_EXIT)
 	if (GetModuleFileName(nullptr, filename, sizeof(filename)))

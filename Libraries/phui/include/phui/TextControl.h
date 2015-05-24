@@ -20,6 +20,8 @@ class TextControl : public Control, public TextContainer
 public:
 	TextControl();
 	virtual ~TextControl(); 
+
+	virtual View* AsView() override { return this; }
 		
 	virtual void DrawSelf();
 

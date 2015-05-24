@@ -11,10 +11,10 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <OMGGen>
-      <CommandLineTemplate>$(SolutionDir)$(Configuration)\omggen.exe -D%(RelativeDir) --cxx=%(Filename).cxx --hxx=%(Filename).hxx %(Filename).omg</CommandLineTemplate>
+      <CommandLineTemplate>$(BinOutDir)omggen.exe -D%(RelativeDir) --cxx=%(Filename).cxx --hxx=%(Filename).hxx %(Filename).omg</CommandLineTemplate>
       <Outputs>%(RelativeDir)%(Filename).cxx;%(RelativeDir)%(Filename).hxx</Outputs>
       <ExecutionDescription>Processing .omg files</ExecutionDescription>
-      <AdditionalDependencies>$(SolutionDir)$(Configuration)\omggen.exe;%(RelativeDir)typedefs.omg</AdditionalDependencies>
+      <AdditionalDependencies>$(BinOutDir)omggen.exe;%(RelativeDir)typedefs.omg</AdditionalDependencies>
     </OMGGen>
   </ItemDefinitionGroup>
 </Project>
