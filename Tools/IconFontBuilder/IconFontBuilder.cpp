@@ -181,7 +181,7 @@ void main()
 
 	for(int i=0; i<256; i++)
 	{
-		// Generate the grayscale pallete
+		// Generate the grayscale palette
 		palette[i].red = i; palette[i].green = i; palette[i].blue = i; palette[i].alpha = i;
 	}
 
@@ -191,8 +191,7 @@ void main()
 	fileHeader.reserved2	= 0;
 	fileHeader.offset		= sizeof(fileHeader) + sizeof(infoHeader) + sizeof(palette);
 
-	std::string	fileName = "test.bmp";
-	FILE*		fp = fopen(fileName.c_str(), "wb");;
+	FILE*		fp = fopen("test.bmp", "wb");;
 
 	fwrite(&fileHeader, sizeof(fileHeader), 1, fp);
 	fwrite(&infoHeader, sizeof(infoHeader), 1, fp);
