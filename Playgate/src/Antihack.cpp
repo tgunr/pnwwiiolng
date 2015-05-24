@@ -95,7 +95,6 @@ wstring Antihack::check()
 			IpAddr.S_un.S_addr = entry->dwRemoteAddr;
 			DWORD pid = entry->dwOwningPid;
 
-			const char*s = inet_ntoa( IpAddr );
 			// Filter the address against addresses we know.
 			// Original address is 85.17.235
 			enum { BitFlip = 129 };
