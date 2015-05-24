@@ -133,7 +133,7 @@ file_writer *GRANNY
 CreatePlatformFileWriter(char const *FileNameToOpen, bool EraseExisting)
 {
     HANDLE WinXXFileHandle =
-        CreateFile(FileNameToOpen,
+        CreateFileA(FileNameToOpen,
                    GENERIC_WRITE, 0, 0,
                    EraseExisting ? CREATE_ALWAYS : OPEN_ALWAYS,
                    FILE_ATTRIBUTE_NORMAL, 0);

@@ -92,7 +92,7 @@ CreatePlatformFileReader(char const *FileNameToOpen)
     winxx_file_reader *Reader = 0;
 
     HANDLE WinXXFileHandle =
-        CreateFile(FileNameToOpen,
+        CreateFileA(FileNameToOpen,
                    GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING,
                    FILE_ATTRIBUTE_NORMAL, 0);
     if (WinXXFileHandle != INVALID_HANDLE_VALUE)

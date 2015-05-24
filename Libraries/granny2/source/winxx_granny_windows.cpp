@@ -83,14 +83,14 @@ DWORD GRANNY
 WinXXPopMessageBox(char const* Message, char const* Title, message_box_type Type)
 {
     DWORD ThreadID;
-    MSGBOXPARAMS MessageBoxParameters;
+    MSGBOXPARAMSA MessageBoxParameters;
     MessageBoxParameters.cbSize = sizeof(MessageBoxParameters);
     MessageBoxParameters.hwndOwner = 0;
     MessageBoxParameters.hInstance = 0;
     MessageBoxParameters.lpszText = Message;
     MessageBoxParameters.lpszCaption = Title;
     MessageBoxParameters.dwStyle = MB_TASKMODAL;
-    MessageBoxParameters.lpszIcon = IDI_ERROR;
+    MessageBoxParameters.lpszIcon = (LPCSTR)IDI_ERROR;
     MessageBoxParameters.dwContextHelpId = 0;
     MessageBoxParameters.lpfnMsgBoxCallback = 0;
     MessageBoxParameters.dwLanguageId = 0;

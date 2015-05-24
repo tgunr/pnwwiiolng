@@ -24,7 +24,7 @@ DLLIsNotInWindowsPath(HANDLE DllHandle)
     bool Result = true;
 
     char DLLPath[MaximumSystemFileNameSize];
-    GetModuleFileName((HINSTANCE)DllHandle, DLLPath, SizeOf(DLLPath));
+    GetModuleFileNameA((HINSTANCE)DllHandle, DLLPath, SizeOf(DLLPath));
 
     char *DLLFileName = DLLPath;
     {for(char *Scan = DLLFileName;
@@ -38,10 +38,10 @@ DLLIsNotInWindowsPath(HANDLE DllHandle)
     }}
 
     char WindowsDirectory[MaximumSystemFileNameSize];
-    GetWindowsDirectory(WindowsDirectory, SizeOf(WindowsDirectory));
+    GetWindowsDirectoryA(WindowsDirectory, SizeOf(WindowsDirectory));
 
     char SystemDirectory[MaximumSystemFileNameSize];
-    GetSystemDirectory(SystemDirectory, SizeOf(SystemDirectory));
+    GetSystemDirectoryA(SystemDirectory, SizeOf(SystemDirectory));
 
     if(StringBeginsWithLowercase(DLLPath, WindowsDirectory) ||
        StringBeginsWithLowercase(DLLPath, SystemDirectory))
@@ -55,7 +55,7 @@ DLLIsNotInWindowsPath(HANDLE DllHandle)
                            "in a system directory.",
                            DLLFileName, DLLPath, DLLFileName);
 
-        MessageBox(0, ErrorMessage, "Fatal Granny Installation Error",
+        MessageBoxA(0, ErrorMessage, "Fatal Granny Installation Error",
                    MB_OK | MB_ICONERROR);
 
         Result = false;
