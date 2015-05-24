@@ -52,12 +52,17 @@ EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ExeSum", "Tools\ExeSum\exesum.vcxproj", "{1924ED58-2ADF-4627-A7E3-8A47661B9805}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libtolua++", "Libraries\tolua++\win32\libtolua++.vcxproj", "{71891C1A-E328-4258-AC3F-6F9698C6D8B4}"
+	ProjectSection(ProjectDependencies) = postProject
+		{D7488B96-456A-1E46-8B0B-0F698E025694} = {D7488B96-456A-1E46-8B0B-0F698E025694}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "tolua++", "Libraries\tolua++\win32\tolua++.vcxproj", "{9557D2AE-9A8B-447E-B7F1-2A59929A4A06}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libiconv", "Libraries\libiconv\MSVC14\libiconv.vcxproj", "{F9C13A95-C7EB-40F3-A599-3695C1E0CF38}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libxml2", "Libraries\libxml2\win32\VC14\libxml2.vcxproj", "{1D6039F6-5078-416F-A3AF-A36EFC7E6A1C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "lua5.1_lib", "Libraries\lua51\mak.vs2015\lua5.1_lib.vcxproj", "{D7488B96-456A-1E46-8B0B-0F698E025694}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -298,6 +303,7 @@ Global
 		{3864753C-C3D8-4704-B538-7792402922E1}.TestRelease|Win32.ActiveCfg = Release|Win32
 		{3864753C-C3D8-4704-B538-7792402922E1}.TestRelease|Win32.Build.0 = Release|Win32
 		{1924ED58-2ADF-4627-A7E3-8A47661B9805}.BetaRelease|Win32.ActiveCfg = Release|Win32
+		{1924ED58-2ADF-4627-A7E3-8A47661B9805}.BetaRelease|Win32.Build.0 = Release|Win32
 		{1924ED58-2ADF-4627-A7E3-8A47661B9805}.Buzzard|Win32.ActiveCfg = Release|Win32
 		{1924ED58-2ADF-4627-A7E3-8A47661B9805}.Buzzard|Win32.Build.0 = Release|Win32
 		{1924ED58-2ADF-4627-A7E3-8A47661B9805}.China|Win32.ActiveCfg = Release|Win32
@@ -366,6 +372,22 @@ Global
 		{1D6039F6-5078-416F-A3AF-A36EFC7E6A1C}.Release|Win32.Build.0 = Release|Win32
 		{1D6039F6-5078-416F-A3AF-A36EFC7E6A1C}.TestRelease|Win32.ActiveCfg = Release|Win32
 		{1D6039F6-5078-416F-A3AF-A36EFC7E6A1C}.TestRelease|Win32.Build.0 = Release|Win32
+		{D7488B96-456A-1E46-8B0B-0F698E025694}.BetaRelease|Win32.ActiveCfg = Release|Win32
+		{D7488B96-456A-1E46-8B0B-0F698E025694}.BetaRelease|Win32.Build.0 = Release|Win32
+		{D7488B96-456A-1E46-8B0B-0F698E025694}.Buzzard|Win32.ActiveCfg = Release|Win32
+		{D7488B96-456A-1E46-8B0B-0F698E025694}.Buzzard|Win32.Build.0 = Release|Win32
+		{D7488B96-456A-1E46-8B0B-0F698E025694}.China|Win32.ActiveCfg = Release|Win32
+		{D7488B96-456A-1E46-8B0B-0F698E025694}.China|Win32.Build.0 = Release|Win32
+		{D7488B96-456A-1E46-8B0B-0F698E025694}.Debug|Win32.ActiveCfg = Debug|Win32
+		{D7488B96-456A-1E46-8B0B-0F698E025694}.Debug|Win32.Build.0 = Debug|Win32
+		{D7488B96-456A-1E46-8B0B-0F698E025694}.FullDebug|Win32.ActiveCfg = Debug|Win32
+		{D7488B96-456A-1E46-8B0B-0F698E025694}.FullDebug|Win32.Build.0 = Debug|Win32
+		{D7488B96-456A-1E46-8B0B-0F698E025694}.MultiClient|Win32.ActiveCfg = Release|Win32
+		{D7488B96-456A-1E46-8B0B-0F698E025694}.MultiClient|Win32.Build.0 = Release|Win32
+		{D7488B96-456A-1E46-8B0B-0F698E025694}.Release|Win32.ActiveCfg = Release|Win32
+		{D7488B96-456A-1E46-8B0B-0F698E025694}.Release|Win32.Build.0 = Release|Win32
+		{D7488B96-456A-1E46-8B0B-0F698E025694}.TestRelease|Win32.ActiveCfg = Release|Win32
+		{D7488B96-456A-1E46-8B0B-0F698E025694}.TestRelease|Win32.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -390,5 +412,6 @@ Global
 		{9557D2AE-9A8B-447E-B7F1-2A59929A4A06} = {D66FF7C5-219D-40F1-AB47-7553DE4634DE}
 		{F9C13A95-C7EB-40F3-A599-3695C1E0CF38} = {5C4DCB4D-AE98-4D94-B17D-96AF431E58FA}
 		{1D6039F6-5078-416F-A3AF-A36EFC7E6A1C} = {5C4DCB4D-AE98-4D94-B17D-96AF431E58FA}
+		{D7488B96-456A-1E46-8B0B-0F698E025694} = {5C4DCB4D-AE98-4D94-B17D-96AF431E58FA}
 	EndGlobalSection
 EndGlobal
