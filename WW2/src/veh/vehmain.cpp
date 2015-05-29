@@ -4117,19 +4117,17 @@ UINT32 vehDetermineExitStatus(SINT32* ExitStatus, FULL_OBJ_ID* id)
 
 	NearBase = 0;
 	FriendlyTerritory = 0;
-	while (TO != nullptr)
+	for ( ; TO != nullptr ; TO = TO->Next)
 	{
 		if (TO->StratId == 0 && TO->StratSupercellY == 0 && TO->StratSupercellX == 0) // If no strat id, it's not a strat object, thus ignore.
-		{
-			TO = TO->Next;
 			continue;
-		}
 
 		if( TO->ObjId.objClass == CLASS_FACILITY && TO->DamageLevel != FB_CLOSED_VISLEVEL
 			&& _isSpawnableFacilityType(TO->ObjId.objType))
 		{
 			StratDB::StratObject* strat = TO->StratObj();
-			if(!strat) continue;
+			if(!strat)
+				continue;
 
 			V1 = TO->Center;
 
@@ -4227,8 +4225,6 @@ UINT32 vehDetermineExitStatus(SINT32* ExitStatus, FULL_OBJ_ID* id)
 				}
 			}
 		}
-
-		TO = TO->Next;
 	}
 
 	if(!FriendlyTerritory)
