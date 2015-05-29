@@ -2244,20 +2244,22 @@ void ShadowMap::init()
     smoctet.map->setWrap(Texture2D::WRAP_T, Texture2D::CLAMP_TO_BORDER);
     smoctet.map->setBorderColor(Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
 
-    FrameBufferObject* fbo = new FrameBufferObject;
-    fbo->setAttachment(FrameBufferObject::DEPTH_BUFFER, FrameBufferAttachment(smoctet.map.get()));
+	{
+		ref_ptr<FrameBufferObject> fbo = new FrameBufferObject;
+		fbo->setAttachment(FrameBufferObject::DEPTH_BUFFER, FrameBufferAttachment(smoctet.map.get()));
 
 #if USE_STATESET
-    smoctet.stateset = new RenderStateSet;
-    smoctet.stateset->SetRenderState(new PolygonOffset(-_polyOffset[0], -_polyOffset[1]));
-    smoctet.stateset->SetRenderState(new ColorMask(false, false, false, false));
-    smoctet.stateset->SetRenderState(new ShadeModel(GL_FLAT));
-    smoctet.stateset->SetRenderState(fbo);
-    smoctet.stateset->SetMode(GL_FOG, 0);
-    smoctet.stateset->SetMode(GL_LIGHTING, 0);
+		smoctet.stateset = new RenderStateSet;
+		smoctet.stateset->SetRenderState(new PolygonOffset(-_polyOffset[0], -_polyOffset[1]));
+		smoctet.stateset->SetRenderState(new ColorMask(false, false, false, false));
+		smoctet.stateset->SetRenderState(new ShadeModel(GL_FLAT));
+		smoctet.stateset->SetRenderState(fbo);
+		smoctet.stateset->SetMode(GL_FOG, 0);
+		smoctet.stateset->SetMode(GL_LIGHTING, 0);
 #else
-    smoctet.fbo = fbo;
+		smoctet.fbo = fbo;
 #endif
+	}
 
     _white = new Texture2D;
     _white->setTextureSize(4, 4);
@@ -2272,15 +2274,16 @@ void ShadowMap::init()
     _white->setWrap(Texture2D::WRAP_T, Texture2D::CLAMP_TO_BORDER);
     _white->setBorderColor(Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
 
-    fbo = new FrameBufferObject;
-    fbo->setAttachment(FrameBufferObject::DEPTH_BUFFER, FrameBufferAttachment(_white.get()));
+	{
+		ref_ptr<FrameBufferObject> fbo = new FrameBufferObject;
+		fbo->setAttachment(FrameBufferObject::DEPTH_BUFFER, FrameBufferAttachment(_white.get()));
 
-    // Make texture 'white'
-    fbo->apply();
-    oglSetViewport(0, 0, 4, 4);
-    glClear(GL_DEPTH_BUFFER_BIT);
-    fbo->UnApply();
-    fbo->unref();
+		// Make texture 'white'
+		fbo->apply();
+		oglSetViewport(0, 0, 4, 4);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		fbo->UnApply();
+	}
 
     oglSetViewport(0, 0, WantedWidth, WantedHeight);
 
@@ -2310,21 +2313,23 @@ void ShadowMap::init()
             _smOctet[i].map->setWrap(Texture2D::WRAP_T, Texture2D::CLAMP_TO_BORDER);
             _smOctet[i].map->setBorderColor(Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
 
-            fbo = new FrameBufferObject;
-            ref_ptr<FrameBufferAttachment> fba = new FrameBufferAttachment(_smOctet[i].map.get());
-            fbo->setAttachment(FrameBufferObject::DEPTH_BUFFER, *fba.get());
+			{
+				ref_ptr<FrameBufferObject> fbo = new FrameBufferObject;
+				ref_ptr<FrameBufferAttachment> fba = new FrameBufferAttachment(_smOctet[i].map.get());
+				fbo->setAttachment(FrameBufferObject::DEPTH_BUFFER, *(fba.get()));
 
 #if USE_STATESET
-            _smOctet[i].stateset = new RenderStateSet;
-            _smOctet[i].stateset->SetRenderState(new PolygonOffset(-_polyOffset[0], -_polyOffset[1]));
-            _smOctet[i].stateset->SetRenderState(new ColorMask(false, false, false, false));
-            _smOctet[i].stateset->SetRenderState(new ShadeModel(GL_FLAT));
-            _smOctet[i].stateset->SetRenderState(fbo);
-            _smOctet[i].stateset->SetMode(GL_FOG, 0);
-            _smOctet[i].stateset->SetMode(GL_LIGHTING, 0);
+				_smOctet[i].stateset = new RenderStateSet;
+				_smOctet[i].stateset->SetRenderState(new PolygonOffset(-_polyOffset[0], -_polyOffset[1]));
+				_smOctet[i].stateset->SetRenderState(new ColorMask(false, false, false, false));
+				_smOctet[i].stateset->SetRenderState(new ShadeModel(GL_FLAT));
+				_smOctet[i].stateset->SetRenderState(fbo);
+				_smOctet[i].stateset->SetMode(GL_FOG, 0);
+				_smOctet[i].stateset->SetMode(GL_LIGHTING, 0);
 #else
-            _smOctet[i].fbo = fbo;
+				_smOctet[i].fbo = fbo;
 #endif
+			}
         }
 
         DynShadowMap.valid = false;
@@ -2344,22 +2349,24 @@ void ShadowMap::init()
         DynShadowMap.map->setWrap(Texture2D::WRAP_T, Texture2D::CLAMP_TO_BORDER);
         DynShadowMap.map->setBorderColor(Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
 
-        fbo = new FrameBufferObject;
-        ref_ptr<FrameBufferAttachment> fba = new FrameBufferAttachment(DynShadowMap.map.get());
-        fbo->setAttachment(FrameBufferObject::DEPTH_BUFFER, *fba.get());
+		{
+			ref_ptr<FrameBufferObject> fbo = new FrameBufferObject;
+			ref_ptr<FrameBufferAttachment> fba = new FrameBufferAttachment(DynShadowMap.map.get());
+			fbo->setAttachment(FrameBufferObject::DEPTH_BUFFER, *fba.get());
 
 #if USE_STATESET
-        DynShadowMap.stateset = new RenderStateSet;
-        DynShadowMap.stateset->SetRenderState(new PolygonOffset(-_polyOffset[0], -_polyOffset[1]));
-        DynShadowMap.stateset->SetRenderState(new ColorMask(false, false, false, false));
-        DynShadowMap.stateset->SetRenderState(new ShadeModel(GL_FLAT));
-        DynShadowMap.stateset->SetRenderState(new FrontFace(GL_BACK));
-        DynShadowMap.stateset->SetRenderState(fbo);
-        DynShadowMap.stateset->SetMode(GL_FOG, 0);
-        DynShadowMap.stateset->SetMode(GL_LIGHTING, 0);
+			DynShadowMap.stateset = new RenderStateSet;
+			DynShadowMap.stateset->SetRenderState(new PolygonOffset(-_polyOffset[0], -_polyOffset[1]));
+			DynShadowMap.stateset->SetRenderState(new ColorMask(false, false, false, false));
+			DynShadowMap.stateset->SetRenderState(new ShadeModel(GL_FLAT));
+			DynShadowMap.stateset->SetRenderState(new FrontFace(GL_BACK));
+			DynShadowMap.stateset->SetRenderState(fbo);
+			DynShadowMap.stateset->SetMode(GL_FOG, 0);
+			DynShadowMap.stateset->SetMode(GL_LIGHTING, 0);
 #else
-        DynShadowMap.fbo = fbo;
+			DynShadowMap.fbo = fbo;
 #endif
+		}
 
 #if(0)
         _white = new Texture2D;
@@ -2376,19 +2383,17 @@ void ShadowMap::init()
         _white->setBorderColor(Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
 #endif
 
-        FrameBufferObject* fbo2 = new FrameBufferObject;
+		{
+			FrameBufferObject* fbo = new FrameBufferObject;
+			ref_ptr<FrameBufferAttachment> fba = new FrameBufferAttachment(_white.get());
+			fbo->setAttachment(FrameBufferObject::DEPTH_BUFFER, *fba.get());
 
-        fba = new FrameBufferAttachment(_white.get());
-        fbo2->setAttachment(FrameBufferObject::DEPTH_BUFFER, *fba.get());
-
-        // Make texture 'white'
-        fbo2->apply();
-        oglSetViewport(0, 0, 4, 4);
-        glClear(GL_DEPTH_BUFFER_BIT);
-        fbo2->UnApply();
-
-        fba->unref();
-        fbo2->unref();
+			// Make texture 'white'
+			fbo->apply();
+			oglSetViewport(0, 0, 4, 4);
+			glClear(GL_DEPTH_BUFFER_BIT);
+			fbo->UnApply();
+		}
 
         oglSetViewport(0, 0, WantedWidth, WantedHeight);
         _program = GLSL.getProgram("shadow");

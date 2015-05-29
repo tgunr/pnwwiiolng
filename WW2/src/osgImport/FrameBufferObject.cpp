@@ -535,7 +535,7 @@ void FrameBufferAttachment::attach(GLenum target, GLenum attachment_point) const
 {
     unsigned int contextID = 0;//state.getContextID();
 
-    Texture::TextureObject* tobj = 0;
+    Texture::TextureObject* tobj = nullptr;
     if(_ximpl->textureTarget.valid())
     {
         tobj = _ximpl->textureTarget->getTextureObject(contextID);
