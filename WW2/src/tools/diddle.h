@@ -85,40 +85,39 @@ public:
 
 };
 
-#define LOCAL_DIDDLE \
-__forceinline static unsigned int diddle_reflect(unsigned int ulReflect, const char cChar)           \
-{                                                                                             \
-	unsigned int ulValue = 0;                                                                 \
-	for(int iPos = 1; iPos < (cChar + 1); iPos++)                                             \
-	{                                                                                         \
-		if(ulReflect & 1)                                                                     \
-		{                                                                                     \
-			ulValue |= (1 << (cChar - iPos));                                                 \
-		}                                                                                     \
-		ulReflect >>= 1;                                                                      \
-	}                                                                                         \
-	return ulValue;                                                                           \
-}                                                                                             \
-__forceinline static unsigned int diddle_crc(const unsigned char* sData, unsigned int ulDataLength)     \
-{                                                                                             \
-    unsigned int ulTable[256];                                                                \
-	unsigned int ulPolynomial = 0x04C11DB7;                                                   \
-	for(int iCodes = 0; iCodes <= 0xFF; iCodes++)                                             \
-	{                                                                                         \
-		ulTable[iCodes] = diddle_reflect(iCodes, 8) << 24;                                    \
-		for(int iPos = 0; iPos < 8; iPos++)                                                   \
-		{                                                                                     \
-			ulTable[iCodes] = (ulTable[iCodes] << 1)                                          \
-            ^ ((ulTable[iCodes] & (1 << 31)) ? ulPolynomial : 0);                             \
-		}                                                                                     \
-		ulTable[iCodes] = diddle_reflect(ulTable[iCodes], 32);                                \
-	}                                                                                         \
-	unsigned int ulCRC = (0xffffffff);                                           \
-	while(ulDataLength--)                                                                     \
-	{                                                                                         \
-        ulCRC = (ulCRC >> 8) ^ ulTable[(ulCRC & 0xFF) ^ *sData++];                            \
-	}                                                                                         \
-	return ulCRC ^ (0xffffffff);                                                 \
+static inline unsigned int diddle_reflect(unsigned int ulReflect, const char cChar)
+{
+	unsigned int ulValue = 0;
+	for (int iPos = 1; iPos < (cChar + 1); iPos++)
+	{
+		if (ulReflect & 1)
+		{
+			ulValue |= (1 << (cChar - iPos));
+		}
+		ulReflect >>= 1;
+	}
+	return ulValue;
+}
+static inline unsigned int diddle_crc(const unsigned char* sData, unsigned int ulDataLength)
+{
+	unsigned int ulTable[256];
+	unsigned int ulPolynomial = 0x04C11DB7;
+	for (int iCodes = 0; iCodes <= 0xFF; iCodes++)
+	{
+		ulTable[iCodes] = diddle_reflect(iCodes, 8) << 24;
+		for (int iPos = 0; iPos < 8; iPos++)
+		{
+			ulTable[iCodes] = (ulTable[iCodes] << 1)
+				^ ((ulTable[iCodes] & (1 << 31)) ? ulPolynomial : 0);
+		}
+		ulTable[iCodes] = diddle_reflect(ulTable[iCodes], 32);
+	}
+	unsigned int ulCRC = (0xffffffff);
+	while (ulDataLength--)
+	{
+		ulCRC = (ulCRC >> 8) ^ ulTable[(ulCRC & 0xFF) ^ *sData++];
+	}
+	return ulCRC ^ (0xffffffff);
 }
 
 #endif

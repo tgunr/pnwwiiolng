@@ -309,8 +309,6 @@ static DWORD reportException(EXCEPTION_POINTERS * eps,
 
 #ifdef ANTIHACK
 #include "tools/diddle.h"
-
-LOCAL_DIDDLE;
 #endif
 
 static int exceptioncatcher(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow,

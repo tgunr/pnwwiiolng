@@ -37,8 +37,6 @@
 extern HideawayStorage* storage1;
 extern void* Imagebase;
 Hideaway* checksum;
-
-LOCAL_DIDDLE;
 #endif
 
 #ifdef BETA_RELEASE

@@ -6431,8 +6431,6 @@ void vehmainSpawnVehicle(VEHICLE_REPLY const* reply)
 
 #ifdef ANTIHACK
 #include "tools/diddle.h"
-
-LOCAL_DIDDLE;
 #endif
 
 static void vehmainSpawn()
