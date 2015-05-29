@@ -1068,9 +1068,10 @@ Description:
 -------------------------------------------------------------------*/
 glslProgram* OpenGLShader::getProgram(const char* name)
 {
-    if(_programs.find(name) != _programs.end())
+	auto it = _programs.find(name);
+    if(it != _programs.end())
     {
-        return _programs.find(name)->second.get();
+        return it->second.get();
     }
 
     return nullptr;
@@ -1082,9 +1083,10 @@ Description:
 -------------------------------------------------------------------*/
 glslProgram* OpenGLShader::loadProgram(const char* name, const char* vert, const char* frag)
 {
-    if(_programs.find(name) != _programs.end())
+	auto it = _programs.find(name);
+    if(it != _programs.end())
     {
-        return _programs.find(name)->second.get();
+        return it->second.get();
     }
 
     ref_ptr<glslShader> vshader;
