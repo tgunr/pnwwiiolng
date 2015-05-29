@@ -15,6 +15,9 @@
 .vs
 /BuildLog.htm
 /Debug
+/BetaRelease
+/BetaRelease/*
+/Release
 Libraries/*.html
 Libraries/*.idb
 Libraries/*.mdl
