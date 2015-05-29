@@ -659,6 +659,8 @@ bool glslNormalInit()
         // Only used for custom terrain
         shadowmaterial = new oglMaterial;
         shadowmaterial->SetShader("normalmapshadow");
+		// the client will crash on the following line if it hasn't loaded the normalmapshadow
+		// shader, which often happens if you haven't set your WorkingDir variable...
         shadowmaterial->GetProgram()->GetUniform("scale")->Set(ShadowMap::GetInstance().GetScale());
     }
 
