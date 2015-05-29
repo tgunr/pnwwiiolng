@@ -1767,16 +1767,6 @@ HostVehicle::hasConnectedPlayers() const
 //////////////////////////////////////////////////////////////////////
 // Sort the vehicle list based on next update
 
-static bool SortVehiclesByUpdateAge(const HostVehicle* lhs, const HostVehicle* rhs)
-{
-	return lhs->m_nextUpdateClock < rhs->m_nextUpdateClock;
-}
-
-static bool SortVehiclesByGridCell(const HostVehicle* lhs, const HostVehicle* rhs)
-{
-	return lhs->m_cell < rhs->m_cell;
-}
-
 static void
 _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 {
@@ -1836,13 +1826,13 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 	{
 		TIMER_START
 		dbugLog(_FLA, "%" PRSizeT " vehicles want updates, limit is %u", vehicles.size(), maxVehicles);
-		sort(vehicles.begin(), vehicles.end(), SortVehiclesByUpdateAge);
+		sort(vehicles.begin(), vehicles.end(), [](auto lhs, auto rhs) { return lhs->m_nextUpdateClock < rhs->m_nextUpdateClock; });
 		vehicles.resize(maxVehicles);
 		TIMER_STOP("gvwfu_shrink");
 	}
 
 	TIMER_START
-	sort(vehicles.begin(), vehicles.end(), SortVehiclesByGridCell);
+	sort(vehicles.begin(), vehicles.end(), [](auto lhs, auto rhs) { return lhs->m_cell < rhs->m_cell; });
 	TIMER_STOP("gvwfu_sort");
 
 	TIMER_START

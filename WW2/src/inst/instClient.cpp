@@ -78,6 +78,7 @@ _recvInstanceListing(ACTION_OBJECT* const a)
 	}
 	catch (std::exception& e)
 	{
+		(void)e;
 		///TODO: Handle exception. "e.what()" is a loggable error.
 		Write_Debug("Runtime exception processing Instance::Listing: %s", e.what());
 	}

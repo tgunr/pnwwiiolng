@@ -25,8 +25,8 @@ enum key_TYPE
 
 struct KEY
 {
-	char*		key;
-	key_TYPE	ktype;
+	const char* const	key;
+	key_TYPE			ktype;
 
 };
 
