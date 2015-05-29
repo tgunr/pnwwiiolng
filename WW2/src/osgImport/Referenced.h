@@ -35,6 +35,9 @@ public:
 
     inline Referenced& operator = (const Referenced&) { return *this; }
 
+	Referenced(Referenced&& rhs) = delete;
+	Referenced& operator = (Referenced&&) = delete;
+
     /** Increment the reference count by one, indicating that
         this object has another pointer which is referencing it.*/
     inline void ref() const;
