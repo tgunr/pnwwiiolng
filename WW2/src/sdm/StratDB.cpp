@@ -939,12 +939,9 @@ StratObject* StratDB::FindStratObject(const sdm_full_obj_id& fullid)
 		sc.load(id.sx(),id.sy());
 
 	StratObjectMap::iterator it = sc._stratobjs.find(id.lookup_id());
-	StratObject* stratobj = 0;
-
-	if(it != sc._stratobjs.end())
-		stratobj = it->second;
-
-	return stratobj;
+	if (it == sc._stratobjs.end())
+		return nullptr;
+	return it->second;
 }
 
 StratObject* StratDB::FindStratObject(const FULL_OBJ_ID& fullobjid)

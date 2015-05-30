@@ -1742,10 +1742,7 @@ _writeEventCounters()
 bool
 HostVehicle::hasConnectedPlayers() const
 {
-	if ( PN_UNLIKELY(players().empty() || crew <= 0) )
-		return false;
-
-	for ( auto it = players().begin(), end = players().end(); it != end; ++it )
+	for ( auto it = players().cbegin(), end = players().cend(); it != end; ++it )
 	{
 		if ( PN_LIKELY((*it)->teulIndex() >= 0) )
 			return true;
