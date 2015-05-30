@@ -746,35 +746,35 @@ mmProcessFEClientSpawn(Player& player, const FE_CLIENT_SPAWN& request)
 	Mission* mission = player.mission();
 	if ( mission == nullptr )
 	{
-		dbugLog(_FLA, "t:%d p:%u c:%s player attempting to spawn without mission", player.teulIndex(), player.playerID(), player.callsign());
+		PlayerLog(_FLA, player, "attempted spawn without mission");
 		player.postDenied(request.weaponSerial.spec, SPAWN_COMPLEX_DISABLED, true);
 		return false;
 	}
 
 	if ( !player.mission()->ongoing() )
 	{
-		dbugLog(_FLA, "t:%d p:%u c:%s player attempting to spawn closed mission", player.teulIndex(), player.playerID(), player.callsign());
+		PlayerLog(_FLA, player, "attemped spawn on closed mission");
 		player.postDenied(request.weaponSerial.spec, SPAWN_COMPLEX_DISABLED, true);
 		return false;
 	}
 
 	if ( !player.validMissionPacket() )
 	{
-		dbugLog(_FLA, "t:%d p:%u c:%s mission packet not ready for spawning", player.teulIndex(), player.playerID(), player.callsign());
+		PlayerLog(_FLA, player, "mission packet not ready for spawning");
 		player.postDenied(request.weaponSerial.spec, SPAWN_COMPLEX_DISABLED, true);
 		return false;
 	}
 
 	if ( _spawnDisabledByGM(player) )
 	{
-		BETALog(player.teulIndex(), "denied: arena locked");
+		PlayerLog(_FLI, player, "denied: arena locked");
 		player.postDenied(request.weaponSerial.spec, SPAWN_DISABLED_BY_GM, false);
 		return false;
 	}
 
 	if ( request.wantMobileSpawn && !mission->isMobileSpawnAvailable() )
 	{
-		BETALog(player.teulIndex(), "msp: denied: mobile spawn unavailable");
+		PlayerLog(_FLI, player, "msp: denied: mobile spawn unavailable");
 		player.postDenied(request.weaponSerial.spec, SPAWN_MOBILE_UNAVAILABLE, false);
 		return false;
 	}
@@ -782,14 +782,14 @@ mmProcessFEClientSpawn(Player& player, const FE_CLIENT_SPAWN& request)
 	if ( !player.hasAvailableVehicle()
 		|| memcmp(&request.weaponSerial.spec, &player.weapon().spec, sizeof(WEAPON_SPEC)) != 0)
 	{
-		BETALog(player.teulIndex(), "denied: no vehicle reserved here");
+		PlayerLog(_FLI, player, "denied: no vehicle reserved here");
 		player.postDenied(request.weaponSerial.spec, SPAWN_WEAPON_NOT_AT_FACILITY, true);
 		return false;
 	}
 
 	if ( !player.allowLaunch() )
 	{
-		BETALog(player.teulIndex(), "denied: launch timer");
+		PlayerLog(_FLI, player, "denied: launch timer");
 		player.postDenied(request.weaponSerial.spec, SPAWN_DELAYED, false);
 		return false;
 	}
@@ -798,7 +798,7 @@ mmProcessFEClientSpawn(Player& player, const FE_CLIENT_SPAWN& request)
 	player.m_wantMobileSpawn = request.wantMobileSpawn;
 #ifdef BETA_RELEASE
 	dbugLog(_FLD, "t:%d p:%u c:%s requested %s spawn", player.teulIndex(), player.playerID(), player.callsign()
-					, ((player.m_wantMobileSpawn)?"mobile":"normal")
+					, ((player.m_wantMobileSpawn) ? "mobile" : "normal")
 					);
 #endif
 
