@@ -263,9 +263,9 @@ hostFindVehicleLocal(UINT32 vehicleIndex)
 // server process.
 
 HostVehicle*
-hostCreateRemoteVehicle(const instanceid_t& instanceID, sortieid_t index, WEAPON_SPEC spec)
+hostCreateRemoteVehicle(const Instance::Descriptor& instance_, sortieid_t index, WEAPON_SPEC spec)
 {
-	Host::VehicleRequest vr(instanceID, index, spec);
+	Host::VehicleRequest vr(instance_.id(), index, spec);
 
 #ifdef DEBUG
 	if ( index == 0 )
@@ -299,6 +299,7 @@ hostCreateRemoteVehicle(const instanceid_t& instanceID, sortieid_t index, WEAPON
 	}
 
 	vehicle->setRemote();
+	vehicle->setInstance(instance_);
 
 	return vehicle;
 }

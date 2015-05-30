@@ -21,15 +21,15 @@ namespace Grid
 
 struct Key
 {
-	typedef SINT16 Coord;
-	typedef SINT32 CoordSq;
-	typedef UINT32 Value;
+	using Coord = int16_t;
+	using CoordSq = int32_t;
+	using Value = uint32_t;
 
-	public:	Key(Coord _x, Coord _y) : m_x(_x), m_y(_y) {}
-	public:	Coord x() const { return m_x; }
-	public:	Coord y() const { return m_y; }
-	public: bool operator == (const Grid::Key& rhs) const { return rhs.m_value == m_value; }
-	public: bool operator != (const Grid::Key& rhs) const { return rhs.m_value != m_value; }
+	public:	Key(Coord _x, Coord _y) noexcept : m_x(_x), m_y(_y) {}
+	public:	Coord x() const noexcept { return m_x; }
+	public:	Coord y() const noexcept { return m_y; }
+	public: bool operator == (const Grid::Key& rhs) const noexcept { return rhs.m_value == m_value; }
+	public: bool operator != (const Grid::Key& rhs) const noexcept { return rhs.m_value != m_value; }
 	private:
 		union
 		{
@@ -86,13 +86,13 @@ public:
 	bool expired() const { return (m_expiry > 0ULL && m_expiry < teulClock64 ); }
 
 	/// Test if the cell is in-range of a given gridkey.
-	bool inRange(const Key& rhs) const
+	bool inRange(Key rhs) const noexcept
 	{
 		Key::CoordSq xDelta = key().x() - rhs.x();
 		Key::CoordSq yDelta = key().y() - rhs.y();
 		return ((xDelta * xDelta) + (yDelta * yDelta)) <= Radius_cells2;
 	}
-	bool inRange(const Cell& rhs) const { return inRange(rhs.key()); }
+	bool inRange(const Cell& rhs) const noexcept { return inRange(rhs.key()); }
 
 	const VehicleSet& vehicles() const { return m_vehicles; }
 	const Key& key() const { return m_key; }

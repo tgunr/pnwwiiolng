@@ -222,15 +222,31 @@ Grid::PatrolExpirations()
 }
 
 //////////////////////////////////////////////////////////////////////
+// Calculate key for a particular vehicle.
+
+static Grid::Key _getKey(const HostVehicle& vehicle)
+{
+	const Grid::Key::Coord newGX = (Grid::Key::Coord)(vehicle.x_cm() / (100 * Grid::Cell::Size_m));
+	const Grid::Key::Coord newGY = (Grid::Key::Coord)(vehicle.y_cm() / (100 * Grid::Cell::Size_m));
+	return Grid::Key(newGX, newGY);
+}
+
+//////////////////////////////////////////////////////////////////////
+// Check if a vehicle is in the correct grid.
+
+bool
+HostVehicle::inCorrectGrid() const noexcept
+{
+	return m_cell && m_cell->key() == _getKey(*this);
+}
+
+//////////////////////////////////////////////////////////////////////
 // Update the location of a vehicle.
 
 bool
 HostVehicle::updateGrid()
 {
-	const Grid::Key::Coord newGX = (Grid::Key::Coord)(x_cm() / (100 * Grid::Cell::Size_m));
-	const Grid::Key::Coord newGY = (Grid::Key::Coord)(y_cm() / (100 * Grid::Cell::Size_m));
-
-	Grid::Key newKey(newGX, newGY);
+	Grid::Key newKey = _getKey(*this);
 	if ( m_cell && newKey == m_cell->key() )
 		return false;
 
@@ -238,8 +254,8 @@ HostVehicle::updateGrid()
 	removeFromGrid();
 
 	Grid::CellHash& hash = instanceHash[instID()];
-	Grid::CellXHash& xhash = hash[newGY];
-	auto it = xhash.find(newGX);
+	Grid::CellXHash& xhash = hash[newKey.y()];
+	auto it = xhash.find(newKey.x());
 	if ( it == xhash.end() )
 	{
 		// No cell exists for these coordinates: create one.
@@ -268,4 +284,3 @@ HostVehicle::removeFromGrid()
 		m_cell = nullptr;
 	}
 }
-

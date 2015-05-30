@@ -124,6 +124,7 @@ public:
 	void SendRemoveList();
 
 	// Grid functions.
+	bool inCorrectGrid() const noexcept;
 	bool updateGrid();
 	void removeFromGrid();
 

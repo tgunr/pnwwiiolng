@@ -78,7 +78,7 @@ extern UINT32 hostGetStratAddress(void);
 extern void	hostActivateVehicle(HostVehicle* newVehicle, bool checkPlayers);
 extern HostVehicle* hostFindVehicleLocal( UINT32 indexValue );
 extern SINT32 hostJoinVehicle(Player& persona, const struct VEHICLE_REQUEST& vRequest);
-extern HostVehicle* hostCreateRemoteVehicle(const instanceid_t& instanceID, sortieid_t index, WEAPON_SPEC spec);
+extern HostVehicle* hostCreateRemoteVehicle(const Instance::Descriptor& instance_, sortieid_t index, WEAPON_SPEC spec);
 extern void hostRemoveRemoteVehicle(UINT32 serial, PLAYER_EXIT_CODE exitCode);
 struct VEHICLE_UPDATE_HEADER;
 extern bool hostAddVehicleToBroadcast(HostVehicle* vehicle, VEHICLE_UPDATE_HEADER* vh);

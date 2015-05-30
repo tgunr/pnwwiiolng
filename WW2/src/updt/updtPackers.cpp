@@ -846,12 +846,9 @@ static SINT32 _getBroadcastVehicle(LOGICAL mode, UCHAR* const data, SINT32 offse
 			retval  = tempVehicle.packFirstTime(mode, data, offset);
 			if ( retval >= 0 )
 			{
-				vhold->vehicle = hostCreateRemoteVehicle(tempVehicle.m_instance.id(), vehIndex, tempVehicle.spec());
+				vhold->vehicle = hostCreateRemoteVehicle(tempVehicle.instance(), vehIndex, tempVehicle.spec());
 				if(vhold->vehicle)
-				{
 					threadLog(_FLI, "rv:%u created remote vehicle %p", vehIndex, vhold->vehicle);
-					vhold->vehicle->setInstance(tempVehicle.instance());
-				}
 			}
 			else
 			{
