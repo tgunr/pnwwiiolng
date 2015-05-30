@@ -145,15 +145,17 @@ _initializeFakeWeapons()
 	const size_t numFakes = numWeapons * g_waves;
 	s_fakes.reserve(numFakes);
 
+	dbugLog(_FLI, "Allocating %" PRSizeT " vehicles for funny farm", numFakes);
+	Host::Vehicles::AllocateArray(numFakes);
+
 	UINT32 serial = 0x3fffffff;
 	Fake entry;
-
-	WEAPON_LIST::const_iterator it = g_weaponList.cbegin();
-	for (size_t fakeNo = 0; fakeNo < numFakes; ++fakeNo, ++it)
+	WEAPON_LIST::const_iterator weapIt = g_weaponList.cbegin();
+	for (size_t fakeNo = 0; fakeNo < numFakes; ++fakeNo, ++weapIt)
 	{
-		if ( it == g_weaponList.cend() )
-			it = g_weaponList.cbegin();
-		WEAPON* weap = it->second;
+		if ( weapIt == g_weaponList.cend() )
+			weapIt = g_weaponList.cbegin();
+		const WEAPON* weap = weapIt->second;
 		HostVehicle* fake = hostCreateRemoteVehicle(Instance::g_campaign, serial, weap->spec());
 		assert(fake);
 		SHARED_VEHICLE_INFO& vi = fake->vehicleData;
