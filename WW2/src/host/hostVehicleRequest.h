@@ -16,6 +16,7 @@ namespace Server
 	class ServerInfo;
 }
 class Player;
+class HostVehicle;
 
 namespace Host
 {
@@ -24,8 +25,8 @@ namespace Host
 struct VehicleRequest
 {
 	//! MMHost constructor.
-	VehicleRequest(const instanceid_t& instanceID, const struct MM_SPAWN_GRANT_RESPONSE& grant, const class Player& commander, const class Player* const crew);
-	VehicleRequest(const instanceid_t& instanceID, sortieid_t serial, const WEAPON_SPEC& spec)
+	VehicleRequest(const instanceid_t instanceID, const struct MM_SPAWN_GRANT_RESPONSE& grant, const class Player& commander, const class Player* const crew);
+	VehicleRequest(const instanceid_t instanceID, sortieid_t serial, const WEAPON_SPEC& spec) noexcept
 		: m_instanceID(instanceID)
 		, m_weaponSerial()
 		, m_brigadeID(0)
@@ -60,8 +61,8 @@ struct VehicleRequest
 	//! Vehicle's initial flags.
 	UINT32			m_flags;
 
-	UINT32 numPlayers() const { return (m_players.empty() == false ? static_cast<UINT32>(m_players.size()) : 0); }
-	UINT32 playerNo(size_t i) const { return ( i < numPlayers() ? m_players[i] : 0 ); }
+	UINT32 numPlayers() const noexcept { return (m_players.empty() == false ? static_cast<UINT32>(m_players.size()) : 0); }
+	UINT32 playerNo(size_t i) const noexcept { return ( i < numPlayers() ? m_players[i] : 0 ); }
 
 	void send(const Server::ServerInfo* server);
 
@@ -80,7 +81,7 @@ struct VehicleRequest
 	static TEUL_CALLBACK* s_callback;
 
 	// Handle receiving a vehicle request.
-	bool execute();
+	HostVehicle* execute();
 };
 #pragma pack(pop)
 

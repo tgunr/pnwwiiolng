@@ -283,18 +283,10 @@ hostCreateRemoteVehicle(const Instance::Descriptor& instance_, sortieid_t index,
 	vr.m_weaponSerial.serial = index;
 	vr.m_weaponSerial.spec   = spec;
 
-	const bool success = vr.execute();
-	if ( success == false )
+	vehicle = vr.execute();
+	if ( !vehicle )
 	{
 		dbugLog(_FLA, "v:%u could not create remote vehicle", index);
-		return nullptr;
-	}
-
-	vehicle = hostFindVehicleLocal(index);
-
-	if ( PN_UNLIKELY(vehicle == nullptr) )
-	{
-		dbugLog(_FLA,"v:%u could not create remote vehicle is null", index);
 		return nullptr;
 	}
 
@@ -320,7 +312,7 @@ _addVehicleToHash(HostVehicle* const vehicle, sortieid_t serial)
 //////////////////////////////////////////////////////////////////////
 // Create and populate vehicle instance.
 
-bool
+HostVehicle*
 Host::VehicleRequest::execute()
 {
 	const WEAPON_SERIAL& ws = m_weaponSerial;
@@ -333,7 +325,7 @@ Host::VehicleRequest::execute()
 	if ( ws.serial == 0 )
 	{
 		dbugLog(_FLA,"illegal serial 0");
-		return false;
+		return nullptr;
 	}
 
 	// Verify the weapon data before trying to use other values
@@ -342,24 +334,21 @@ Host::VehicleRequest::execute()
 	{
 		dbugLog(_FLA,"could not find weapon definition for vehicle %u spec %u.%u.%u.%u"
 					, ws.serial, ws.spec.wCountry, ws.spec.wCategory, ws.spec.wClass, ws.spec.wType);
-		return false;
+		return nullptr;
 	}
 
 	if ( hostFindVehicleLocal(ws.serial) != nullptr )
 	{
 		dbugLog(_FLA,"vehicle %u already in use!!", ws.serial);
-		return false;
+		return nullptr;
 	}
 
 	VEHICLE_HOLDER* const vehHolder = Host::Vehicles::GetHolder(ws.serial, ws, weapon);
 	if ( vehHolder == nullptr )
-	{
-		return false;
-	}
+		return nullptr;
 
 	// Shorthand.
 	HostVehicle* const vehicle = vehHolder->vehicle;
-
 	vehicle->vehicleData.packedCallsign = m_handle;
 	chatGetCallsign(vehicle->vehicleData.callsign, m_handle);
 
@@ -384,7 +373,7 @@ Host::VehicleRequest::execute()
 			vehicle->crew++;
 	}
 
-	return true;
+	return vehicle;
 }
 
 //////////////////////////////////////////////////////////////////////

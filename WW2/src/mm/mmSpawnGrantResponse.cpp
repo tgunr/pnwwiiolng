@@ -64,7 +64,7 @@ public:
 //////////////////////////////////////////////////////////////////////
 // Constructor for a VehicleRequest
 
-Host::VehicleRequest::VehicleRequest(const instanceid_t& instanceID_, const MM_SPAWN_GRANT_RESPONSE& grant, const Player& commander, const Player* const crew)
+Host::VehicleRequest::VehicleRequest(const instanceid_t instanceID_, const MM_SPAWN_GRANT_RESPONSE& grant, const Player& commander, const Player* const crew)
 	: m_instanceID(instanceID_)
 	, m_weaponSerial(grant.weaponSerial)
 	, m_brigadeID(commander.brigadeID())
