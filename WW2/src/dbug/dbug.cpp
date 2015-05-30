@@ -673,38 +673,36 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 		return (SINT32)len;
 }
 
-// dbugLogV: Log the (already started) va_list.
-SINT32 _dbugLogV(const char* const filename, const SINT32 lineno, const UINT32 errType, const char* const fmt, va_list& args)
-{
-	SINT32 result = 0;
-	if ( PN_UNLIKELY(_logger.isInitialized() == false) )
-	{
-		if ( PN_UNLIKELY(errType == Debug::ERR_FATAL) )
-		{
-			char text[DBUG_MAX_STRING + 1];
-			vsnprintf(text, sizeof(text), fmt, args);
-			_levelHandler(errType, text);
-		}
-	}
-	else
-	{
-		if ( !(errType != Debug::ERR_FATAL && (errType & ~DBUG_FLAG_MASK) > _logger.logLevel) )
-			result = _dbugLogPrivate(TRUE, filename,lineno, errType, fmt, args);
-	}
-
-	return result;
-}
-
 // dbugLog: if the current filename, lineno or string is nullptr then it
 // sets these members.  The parameters are output as a string to the debug
 // file depending on the debug level selected and the current error type.
 SINT32 _dbugLog(const char* const filename, const SINT32 lineno, const UINT32 errType, const char* const fmt, ...)
 {
-	va_list args;
-	va_start(args, fmt);
-	const SINT32 retval = _dbugLogV(filename, lineno, errType, fmt, args);
-	va_end(args);
-	return retval;
+	SINT32 result = 0;
+	if (PN_UNLIKELY(_logger.isInitialized() == false))
+	{
+		if (PN_UNLIKELY(errType == Debug::ERR_FATAL))
+		{
+			va_list args;
+			va_start(args, fmt);
+			char text[DBUG_MAX_STRING + 1];
+			vsnprintf(text, sizeof(text), fmt, args);
+			va_end(args);
+			_levelHandler(errType, text);
+		}
+	}
+	else
+	{
+		if (!(errType != Debug::ERR_FATAL && (errType & ~DBUG_FLAG_MASK) > _logger.logLevel))
+		{
+			va_list args;
+			va_start(args, fmt);
+			result = _dbugLogPrivate(TRUE, filename, lineno, errType, fmt, args);
+			va_end(args);
+		}
+	}
+
+	return result;
 }
 
 //_dbugWrite: same as above for dbugWrite

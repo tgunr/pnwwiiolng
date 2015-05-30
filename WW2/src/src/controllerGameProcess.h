@@ -78,13 +78,11 @@ public:
 	static GameProcess* s_processStarting;
 
 public:
-	void Log(int level, const char* fmt, ...)
+	template<typename... Args>
+	void Log(int level, const char* fmt, Args&&... args)
 	{
 		dbugLog("GameProcess", 0, level | LOG_ALL_TO_STDERR, "s:%u(%s) pid:%llu ", ServerType(), ServerTypeName(), ProcessID());
-		va_list args;
-		va_start(args, fmt);
-		dbugLogV("GameProcess", 0, level | LOG_ALL_TO_STDERR | BARE_DEBUG, fmt, args);
-		va_end(args);
+		dbugLog("GameProcess", 0, level | LOG_ALL_TO_STDERR | BARE_DEBUG, fmt, std::forward<Args>(args)...);
 	}
 
 	void Log(const char* msg)

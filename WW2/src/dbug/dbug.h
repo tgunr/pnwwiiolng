@@ -132,7 +132,6 @@ int dbugGetErrno(void);
 // parameters are output as a string to the debug file depending on the debug level selected and
 // the current error type.  calls handlers.
 int _dbugLog(const char* filename, int lineno, unsigned int errType, const char* fmt, ...) __attribute__ ((format (printf,4,5)));
-int _dbugLogV(const char* filename, int lineno, unsigned int errType, const char* fmt, va_list& args);
 
 NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, unsigned int errType, const char* assertion, const char* fmt, ...);
 #define LogAbort(...) _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, nullptr, __VA_ARGS__)
@@ -145,22 +144,22 @@ NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, unsigned i
 #define ABORT_IF_EX(assertion_, ...) PN_LIKELY(!(assertion_)) ? (void)0 : _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, #assertion_, __VA_ARGS__)
 
 #ifdef DBUG_TEST
-	#define dbugLog(x,args...) printf(args)
+	template<class Args...>
+	int dbugLog(const char*, int, unsigned int, const char* fmt, Args&&... args) noexcept
+	{
+		return printf(fmt, std::forward<Args>(args)...);
+	}
 #else
 	#ifdef NO_DEBUG_LOG
 		#if platOS == OS_LINUX
 			#define dbugLog(...)
-			#define dbugLogV(...)
 		#elif platOS == OS_WIN32
 			#define dbugLog(...) _dbugLog(__VA_ARGS__)		//} Seems like this should be
-			#define dbugLogV(...) _dbugLogV(__VA_ARGS__)	//} the same as the others???
 		#elif platOS == OS_MACOS
 			#define dbugLog(...)
-			#define dbugLogV(...)
 		#endif
 	#else
-		#define dbugLog _dbugLog
-		#define dbugLogV _dbugLogV
+		#define dbugLog(...) _dbugLog(__VA_ARGS__)
 	#endif
 #endif
 
