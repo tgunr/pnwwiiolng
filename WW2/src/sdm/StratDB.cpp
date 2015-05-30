@@ -1037,7 +1037,7 @@ void supercell::AddStratData(sdm_strat_data* strat)
 {
 	_loaded = true;
 
-	sdm_lookup_id id = { (SINT16)(_sx << 4), (SINT16)(_sy << 4, 0) };
+	sdm_lookup_id id = { (SINT16)(_sx << 4), (SINT16)(_sy << 4), 0 };
 	StratObject* stratobj;
 
 	for(int i = 0; i < strat->numcps; i++)
