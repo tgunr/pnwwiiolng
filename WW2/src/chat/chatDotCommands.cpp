@@ -918,7 +918,7 @@ public:
 			mode = 255;
 		}
 
-		chatSendBandwidthNotice(player.playerID(), (UINT32)mode);
+		chatSendBandwidthNotice(player, (UINT32)mode);
 	}
 
 } dotUM;

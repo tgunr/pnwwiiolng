@@ -1096,21 +1096,26 @@ Chat::CommitProgressUpdates()
 // player ID or if the player is not on a cell host.
 
 bool
-chatSendBandwidthNotice(const playerid_t playerID, UINT32 mode)
+chatSendBandwidthNotice(const Player& player, UINT32 mode)
 {
-	PlayerStatusNode* psn = ServerInterface::PlayerStatusNodeByPlayerID(playerID);
-
-	if ( psn == nullptr || psn->m_curServer.type != CELL_HOST )
+	auto host = player.getCellHost();
+	if (host == 0) {
+		dbugLog(_FLD, "p:%u c:%s %s: not on a cell host", player.playerID(), player.callsign(), __FUNCTION__);
 		return false;
+	}
+	teulindex_t peerIdx = serverGetPeerIndex(host, CELL_HOST);
+	if (peerIdx < 0) {
+		dbugLog(_FLD, "p:%u c:%s %s: not connected to cell %08x", player.playerID(), player.callsign(), __FUNCTION__, host);
+		return false;
+	}
 
-	BANDWIDTH_CHANGE change { playerID, mode };
-	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::BANDWIDTH_NOTICE_Y), change);
-
-	if ( g_debugPersonas )
+	if (g_debugPersonas)
 		dbugLog(_FLD, "p:%u c:%s Requesting host %s give mode %u after spawning"
-						, playerID, psn->dispatch().m_callsign, teulGetAddress(psn->m_curServer.address), mode);
+			, player.playerID(), player.callsign(), host, mode);
 
-	return serverSendPacketToType(outgoing, CELL_HOST);
+	BANDWIDTH_CHANGE change{ player.playerID(), mode };
+	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::BANDWIDTH_NOTICE_Y), change);
+	return outgoing.send(peerIdx);
 }
 
 bool

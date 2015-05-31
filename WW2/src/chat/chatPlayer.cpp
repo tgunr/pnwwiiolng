@@ -1555,7 +1555,7 @@ Player::SetSpawned(bool newValue)
 		m_lastCP = chatFindProperty(originCpID());
 
 		// If they have a non-zero update mode, then update their vis mode
-		chatSendBandwidthNotice(playerID(), getPreference(CPR_UPDATE_MODE));
+		chatSendBandwidthNotice(*this, getPreference(CPR_UPDATE_MODE));
 
 		if ( m_snoopBy != nullptr )
 			chatDispatchGMMessage("SNOOP", chatMakeTempString("Snooped player %s is spawning", callsign()));
