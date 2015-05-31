@@ -30,7 +30,9 @@ struct PacketHeader;
 struct PacketId
 {
 	uint8_t	m_x, m_y;
-	template<typename T1, typename T2> PacketId(T1 callX, T2 callY) : m_x((uint8_t)callX), m_y((uint8_t)callY) {}
+
+	template<typename T1, typename T2>
+	PacketId(T1 callX, T2 callY) noexcept : m_x((uint8_t)callX), m_y((uint8_t)callY) {}
 };
 
 class Packet
