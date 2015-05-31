@@ -672,7 +672,6 @@ public:
 		if ( strcasecmp(arguments, "private") == 0 )
 		{
 			Teul::Packet outgoing(Teul::PacketId(MISSION_X, HOST_LOCK_MISSION_Y), player.missionID());
-			outgoing.setUnencrypted();
 			serverSendPacketToType(outgoing, MAP_HOST);
 			chatSetMissionOrders(player.missionID(), "Mission set to Private: No new joiners", false);
 			return;

@@ -1320,7 +1320,7 @@ Player::sendStratCommand(const char* string, const char* arguments, bool useMapT
 }
 
 //////////////////////////////////////////////////////////////////////
-// Set the AFK state and optionall the message
+// Set the AFK state and optional message
 
 void
 Player::SetAFK(bool goingAFK, const char* newMessage)

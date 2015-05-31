@@ -16,19 +16,18 @@ namespace Chat
 {
 	enum { CallbackX = 205 };
 
-	//Once again, we pick a high number that hopefully isn't taken by someone
-	//	else
+	//Once again, we pick a high number that hopefully isn't taken by someone else
 	enum
 	{
 		// 0
-		MISSION_DELETION_Y = 0,// Requests for and notifications of mission deletions
+		MISSION_DELETION_Y = 0,	// Requests for and notifications of mission deletions
 		GAME_HACKER_REPORT_Y,
 		LOCATE_USER_Y,
 		FOUND_USER_Y,
 		EXCHANGE_SCMD_Y,		// Send and receive Strat CoMmanDs
 		CMD_LIST_Y,				// List of dot commands
-		BRIGADE_MOVE_Y,		// Notice of a brigade movement
-		WHO_LIST_Y,			// Array of who messages
+		BRIGADE_MOVE_Y,			// Notice of a brigade movement
+		WHO_LIST_Y,				// Array of who messages
 		MOD_REPORT_Y,			// Mod report
 		MOBILE_SPAWN_WAYPOINT_Y,	// Mobile spawn waypoint updates
 		// 10

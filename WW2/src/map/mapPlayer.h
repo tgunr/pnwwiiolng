@@ -218,7 +218,7 @@ public:
 	// Notify chat of a persona status/whereabouts change
 	void updateChat();
 
-	// Send the latest neccessary CP updates
+	// Send the latest neccesary CP updates
 	void updateMap();
 
 	void updateMask();

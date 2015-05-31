@@ -31,8 +31,8 @@ struct ChatPermissions
 	}
 
 	PermissionMask	m_permissionMask;
-	UINT32			m_groupOID;
 	UINT32			m_lastModified;
+	UINT16			m_groupOID;
 	bool			m_enabled;
 	RANK_NO			m_limitRank[MAX_BRANCHES];
 	RANK_NO			m_limitSquadRank;
