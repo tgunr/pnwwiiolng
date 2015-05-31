@@ -293,7 +293,7 @@ serverDisconnectPeer(Server::ServerInfo* server)
 //////////////////////////////////////////////////////////////////////
 // Return the teulIndex of a connected peer or -1.
 
-SINT16
+teulindex_t
 serverGetPeerIndex(const UINT32 ip_, const SERVER_TYPE serverType_)
 {
 	const ServerConnection* const connection = _findConnectionByIP(ip_, serverType_);

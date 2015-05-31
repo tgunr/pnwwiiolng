@@ -4,7 +4,7 @@
 // Functions for accessing the server-peer indexes.
 
 //! Get the teulIndex of a peer if it has an established connection, otherwise -1.
-SINT16 serverGetPeerIndex(const UINT32 ip, const SERVER_TYPE serverType_);
+teulindex_t serverGetPeerIndex(const UINT32 ip, const SERVER_TYPE serverType_);
 
 //! Send a packet to ALL servers of a given type.
 namespace Teul { class Packet; }
