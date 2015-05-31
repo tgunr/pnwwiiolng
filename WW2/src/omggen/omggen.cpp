@@ -54,7 +54,6 @@ static TypeMap s_typeMap = {
 	{ "bool", "", false, "" },
 };
 
-static unsigned int s_msgX;					// X of messages defined in this file.
 static unsigned int s_msgY;					// next msgY to assign.
 
 static const char s_indents[] = "\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t\t";
@@ -163,7 +162,6 @@ struct Node
 
 struct Message : public Node
 {
-	unsigned int		m_x;			// X to use for this.
 	unsigned int		m_y;			// assign a Y value
 	std::string			m_code;			// additional code
 	unsigned int		m_numGroups;
@@ -171,7 +169,6 @@ struct Message : public Node
 
 	Message(const char* name)
 		: Node(Node::Type::Message, name, nullptr)
-		, m_x(s_msgX)
 		, m_y(0)
 		, m_code()
 		, m_numGroups(0)
@@ -181,6 +178,7 @@ struct Message : public Node
 	void AddExtraMember(const char* type, const char* name, const char* defaultValue);
 
 	void Emit(size_t /*indentLevel*/) const override;
+	void EmitCallbackParameters() const;
 	void EmitConstructor() const;
 	void EmitPacker() const;
 	void EmitGroupPackers() const;
@@ -420,10 +418,23 @@ void omg_type_decl(TypeDef&& typeDef)
 
 void omg_namespace(const char* name)
 {
-	annotate("Changing namespace from '%s' to '%s'", s_namespace.c_str(), name);
+	if (!s_namespace.empty())
+		yyfatal("Only one namespace definition allowed (%s)", name);
+	annotate("Setting namespace to '%s'", name);
 	s_namespace = name;
 	s_namespaceQual = name;
 	s_namespaceQual += "::";
+	s_msgY = 0;
+}
+
+void omg_start_y(int value)
+{
+	if (value < 0 || value > 255)
+		yyfatal("START_Y must be a positive value between 0 and 255.", value);
+	uint32_t msgY = static_cast<uint32_t>(value);
+	if (msgY < s_msgY)
+		yyfatal("START_Y value %u may overlap with existing assignments (value can only go up, not down).", value);
+	s_msgY = msgY;
 }
 
 void omg_start_message(const char* name)
@@ -441,7 +452,6 @@ void omg_start_message(const char* name)
 		yyfatal("MESSAGE names must start with a capital letter ('%s')", name);
 
 	Message* message = new Message(name);
-	message->m_x = s_msgX;
 	message->m_y = s_msgY++;
 
 	if (!s_firstMessage)
@@ -452,6 +462,13 @@ void omg_start_message(const char* name)
 
 	annotate("Declaring message '%s' as %u", name, s_msgY);
 	s_currentNode = message;
+
+	std::string namespacePrefix = s_namespace;
+	for (auto& it : namespacePrefix)
+		it = (char)tolower(it);
+	std::string constantsHeader = namespacePrefix + "/" + namespacePrefix + "Constants.h";
+	s_includes.insert(constantsHeader);
+	s_includes.insert("teul/teulPacket.h");
 }
 
 void omg_end_message()
@@ -705,7 +722,7 @@ void Message::Emit(size_t indentLevel) const
 		, m_name.c_str()
 		);
 
-	HXX("\tenum { MessageY = %u };\n", m_y);
+	EmitCallbackParameters();
 
 	EmitConstructor();
 	EmitPacker();
@@ -720,6 +737,22 @@ void Message::Emit(size_t indentLevel) const
 	HXX("}; // end message %s\n"
 		"\n"
 		, m_name.c_str()
+		);
+}
+
+void Message::EmitCallbackParameters() const
+{
+	HXX(
+		"\tenum { CallX = %s::CallbackX, CallY = %u };\n"
+		"\tstatic TEUL_CALLBACK* s_callback;\n"
+		"\tstatic TEUL_CALLBACK* Callback() noexcept { return s_callback; }\n"
+		"\n"
+		, s_namespace.c_str(), m_y
+		);
+	CXX(
+		"TEUL_CALLBACK* %s::s_callback;\n"
+		"\n"
+		, GetQualifiedName().c_str()
 		);
 }
 

@@ -45,6 +45,7 @@ extern void yyaddcode(const char* text, std::string& into);
 	/* declaration keywords */
 DEBUG					return TKW_DEBUG;
 NAMESPACE				return TKW_NAMESPACE;
+START-Y					return TKW_START_Y;
 TYPE					return TKW_TYPE;
 AS						return TKW_AS;
 BY\ +REF				return TKW_BY_REF;

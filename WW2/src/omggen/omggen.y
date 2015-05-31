@@ -19,6 +19,7 @@
 // declarations
 %token			TKW_DEBUG
 %token			TKW_NAMESPACE
+%token			TKW_START_Y
 %token			TKW_TYPE
 %token			TKW_AS
 %token			TKW_BY_REF
@@ -60,6 +61,7 @@ directives			:	directive
 					;
 
 directive			:	debug-directive
+					|	start-y-directive
 					|	type-directive
 					|	using-directive { omg_using($1); }
 					|	include-filename { omg_add_include($1); }
@@ -73,6 +75,12 @@ debug-directive		:	TKW_DEBUG { omg_enable_debug(); }
 namespace-directive	:	TKW_NAMESPACE TIDENTIFIER ';' { omg_namespace($2); }
 					|	TKW_NAMESPACE TIDENTIFIER { yyfatal("Missing semi-colon after '%s %s' directive.", "NAMESPACE", $2); }
 					|	TKW_NAMESPACE { yymissing("identifier", "keyword", "NAMESPACE"); }
+					;
+
+start-y-directive	:	TKW_START_Y TINTEGER ';' { omg_start_y(atoi($2)); }
+					|	TKW_START_Y TIDENTIFIER ';' { yyfatal("Expected numeric value after '%s %s' directive.", "START-Y", $2); }
+					|	TKW_START_Y TINTEGER { yyfatal("Missing semi-colon after '%s %s' directive.", "START-Y", $2); }
+					|	TKW_START_Y { yymissing("numeric value", "keyword", "START-Y"); }
 					;
 
 type-directive		:	typedef ';'

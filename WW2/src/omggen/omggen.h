@@ -51,6 +51,7 @@ void yyfatal(const char* s, ...);
 void yymissing(const char* what, const char* type, const char* name);
 void omg_enable_debug();
 void omg_namespace(const char* name);
+void omg_start_y(int value);
 void omg_type_decl(TypeDef&& typeDef);
 void omg_start_message(const char* name);
 void omg_end_message();
