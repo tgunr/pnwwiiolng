@@ -52,7 +52,7 @@
 
 %%
 
-file				:	directives
+file				:	namespace-directive directives
 					;
 
 directives			:	directive
@@ -60,7 +60,6 @@ directives			:	directive
 					;
 
 directive			:	debug-directive
-					|	namespace-directive
 					|	type-directive
 					|	using-directive { omg_using($1); }
 					|	include-filename { omg_add_include($1); }
