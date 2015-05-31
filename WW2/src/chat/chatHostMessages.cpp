@@ -646,7 +646,7 @@ chatSendLeaderChange(UINT32 missionID, UINT32 playerID, const ChatHandle& handle
 //
 
 static void
-_foundUser(Player& player, const CHAT_FOUND_USER& found, PlayerStatusNode* psn)
+_foundUser(Player& player, const CHAT_FOUND_USER& found, const PlayerStatusNode* psn)
 {
 	if ( psn == nullptr )
 	{
@@ -1219,13 +1219,14 @@ chatSendLocateUser(Player& requester, const playerid_t playerID)
 	locUser.reqConnection = requester.teulIndex();
 	locUser.playerID = playerID;			// who info is being requested of
 
-	PlayerStatusNode* psn = ServerInterface::PlayerStatusNodeByPlayerID(playerID);
-
-	if (psn && psn->m_curServer.type == CELL_HOST)
+	const PlayerStatusNode* psn = ServerInterface::PlayerStatusNodeByPlayerID(playerID);
+	const Player* player = psn ? static_cast<const Player*>(psn->localInfo) : nullptr;
+	auto cellHost = player ? player->getCellHost() : 0;
+	if (cellHost)
 	{
 		dbugLog(_FLI, "Sending chatSendLocateUser for %d to %s", playerID, teulGetAddress(psn->m_curServer.address));
 		Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::LOCATE_USER_Y), locUser);
-		SINT32 cellIndex = serverGetPeerIndex(psn->m_curServer.address, psn->m_curServer.type);
+		SINT32 cellIndex = serverGetPeerIndex(cellHost, CELL_HOST);
 		outgoing.send(cellIndex);
 	}
 	else
