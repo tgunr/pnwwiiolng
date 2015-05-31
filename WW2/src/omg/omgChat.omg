@@ -2,6 +2,8 @@ NAMESPACE Chat;
 
 USING "typedefs.omg";
 
+START-Y 100;
+
 MESSAGE MissionStatus
 {
 	GROUP Header
@@ -57,8 +59,10 @@ MESSAGE MissionStatus
 			}
 		}}
 	};
+};
 
-	{{
-		static TEUL_CALLBACK* Callback();
-	}}
+MESSAGE CellHostUpdate
+{
+	playerid_t		playerID;
+	UINT32			cellHost;
 };

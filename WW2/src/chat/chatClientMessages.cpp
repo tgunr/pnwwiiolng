@@ -44,7 +44,7 @@
 #include "chat/chatTimeInterval.h"
 #include "ui/uiMain.h"
 #include "ui/uiChat.h"
-#include "omg/omgChatMissionStatus.hxx"
+#include "omg/omgChat.hxx"
 #include "sdm/StratDB.h"
 #include "chat/chatDotCommandList.h"
 #include "client/ww2client.h"
@@ -74,7 +74,6 @@ static	TEUL_CALLBACK* _MOTD_REPLY;
 static	TEUL_CALLBACK* _RECV_LOCALIZED_MESSAGE;
 static	TEUL_CALLBACK* _SEND_LOCALITY;
 static	TEUL_CALLBACK* _SEND_RECRUITER_REQUEST;
-static	TEUL_CALLBACK* _RECV_CHAT_MISS_STATUS;
 static	TEUL_CALLBACK* _RECV_DOT_COMMAND_LIST;
 
 TEUL_CALLBACK* HoldFallVote::s_callback;
@@ -306,15 +305,10 @@ _recvMOTD_Reply(ACTION_OBJECT* const a)
 }
 
 static SINT32
-_recvChatMissionStatus(ACTION_OBJECT* const a)
+_recvChatMissionStatus(ACTION_OBJECT* const a, Chat::MissionStatus& msg)
 {
-	static Chat::MissionStatus s_cms;
-
-	s_cms.packer(TEUL_UNPACK, a, 0ULL);
-
 	///TODO:RAMP: Process the data.
-	clientProcessChatMissionStatus(a->teulIndex, &s_cms);
-
+	clientProcessChatMissionStatus(a->teulIndex, &msg);
 	return a->offset;
 }
 
@@ -717,7 +711,7 @@ chatInstallClientCallbacks(void)
 
 		REGISTER_RECEIVER(Chat::HOLD_FALL_INFO_Y, _recvHoldFallInfo);
 
-		REGISTER_RECEIVER(Chat::CHAT_MISS_STATUS_Y, _recvChatMissionStatus);
+		REGISTER_OMG_RECEIVER(Chat::MissionStatus, _recvChatMissionStatus);
 
 		REGISTER_RECEIVER(Chat::CMD_LIST_Y, _recvDotCommandList);
 

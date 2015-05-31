@@ -25,6 +25,7 @@
 #include "map/mapPersonaSummary.h"
 #include "map/mapPlayer.h"
 #include "map/mapSwingMeter.h"
+#include "omg/omgChat.hxx"
 #include "miss/missionDamageEvent.h"
 #include "miss/mission.h"
 #include "miss/missionHostMessages.h"

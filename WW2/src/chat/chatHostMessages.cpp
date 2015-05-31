@@ -115,21 +115,11 @@ static TEUL_CALLBACK*	CHAT_SEND_SPAWN_RESTRICTION;
 TEUL_CALLBACK*	CHAT_SEND_TUNE_HANDLE_ACK;
 TEUL_CALLBACK*	CHAT_SQUAD_CONTROL;
 static TEUL_CALLBACK*	CHAT_MOTD_REPLY;
-static TEUL_CALLBACK*	_XCHG_CHAT_MISSION_STATUS;
 
 ///TEMPORARY
 #include "map/mapAWS.h"
 
 static UINT32 g_messageID = 1;
-
-//////////////////////////////////////////////////////////////////////
-//
-
-TEUL_CALLBACK*
-Chat::MissionStatus::Callback()
-{
-	return _XCHG_CHAT_MISSION_STATUS;
-}
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -1617,7 +1607,7 @@ chatInstallHostCallbacks()
 		REGISTER_MSG_SENDER(Chat::MISSION_INVITE_Y, MISSION_INVITE_MSG);
 		REGISTER_SENDRECV(Chat::AWS_Y, _sendAWS, _recvAWS, AWS::callback);
 		REGISTER_SENDER(Chat::HOLD_FALL_INFO_Y, _sendHoldFallInfo, HoldFallVote::s_callback);
-		REGISTER_SENDER(Chat::CHAT_MISS_STATUS_Y, _sendChatMissionStatus, _XCHG_CHAT_MISSION_STATUS);
+		REGISTER_SENDER(Chat::CHAT_MISS_STATUS_Y, _sendChatMissionStatus, Chat::MissionStatus::s_callback);
 		REGISTER_MSG_SENDER(Chat::RECRUITER_LIST_Y, RECRUITER_LIST);
 		REGISTER_RECEIVER(Chat::RECRUITER_REQUEST_Y, _recvRecruiterRequest);
 		REGISTER_MSG(Chat::MOBILE_SPAWN_WAYPOINT_Y, MOBILE_SPAWN_WAYPOINT);

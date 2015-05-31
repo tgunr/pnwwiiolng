@@ -156,7 +156,7 @@ MACRO(ADD_OMG_TARGET _TARGET)
 ENDMACRO()
 
 ADD_OMG_TARGET(omg/omgMissionSortieData)
-ADD_OMG_TARGET(omg/omgChatMissionStatus)
+ADD_OMG_TARGET(omg/omgChat)
 
 IF(NOT MSVC)
 	SET_TARGET_PROPERTIES(omggen PROPERTIES COMPILE_FLAGS "-O3 -march=native -mtune=native -Wno-error -Wno-all -Wno-format-security") #
@@ -657,7 +657,8 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
 			chat/chatMissionMember.h
 		chat/chatMissions.cpp
 			chat/chatMissions.h
-			omg/omgChatMissionStatus.hxx
+			omg/omgChat.hxx
+				chat/chatConstants.h
 		chat/chatMotds.cpp
 			chat/chatMotds.h
 		chat/chatMultiCrew.cpp
@@ -704,7 +705,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth" )
 			wwii/wwiiCallbacks.h
 			dbse/dbseClient.h
 
-		omg/omgChatMissionStatus.cxx
+		omg/omgChat.cxx
 
 		${PCH_INCLUDE_HEADERS}
 	)
@@ -1201,7 +1202,7 @@ IF( NOT PN_CLUSTER STREQUAL "Auth")
 		tests/testLocalizedMessage.cpp
 		tests/testInplaceVector.cpp
 		tests/testPackers.cpp	comm/commPackers.cpp
-		tests/testChatMissionStatus.cpp	wwii/wwiiServerTrackedObjectPacker.cpp omg/omgChatMissionStatus.cxx
+		tests/testChatMissionStatus.cpp	wwii/wwiiServerTrackedObjectPacker.cpp omg/omgChat.cxx
 		tests/testHostGridCell.cpp host/hostGridCell.cpp
 		tests/testSupercellVislevelXfer.cpp
 		tests/testPersonaXfer.cpp

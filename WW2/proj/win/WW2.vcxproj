@@ -956,7 +956,7 @@
     <ClInclude Include="..\..\src\math\Rand.h" />
     <ClInclude Include="..\..\src\math\SuperFastHash.h" />
     <ClInclude Include="..\..\src\ogl\GLCounter.h" />
-    <ClInclude Include="..\..\src\omg\omgChatMissionStatus.hxx" />
+    <ClInclude Include="..\..\src\omg\omgChat.hxx" />
     <ClInclude Include="..\..\src\omg\omgMissionSortieData.hxx" />
     <ClInclude Include="..\..\src\physics\HeightField.h" />
     <ClInclude Include="..\..\src\sys\sysmainHackNonsense.h" />
@@ -1594,7 +1594,7 @@
     <ClCompile Include="..\..\src\ogl\oglVertexBuffer.cpp" />
     <ClCompile Include="..\..\src\ogl\States.cpp" />
     <ClCompile Include="..\..\src\ogrp\ogrpmain.cpp" />
-    <ClCompile Include="..\..\src\omg\omgChatMissionStatus.cxx" />
+    <ClCompile Include="..\..\src\omg\omgChat.cxx" />
     <ClCompile Include="..\..\src\omg\omgMissionSortieData.cxx" />
     <ClCompile Include="..\..\src\pa\md5c.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='BetaRelease|Win32'">
@@ -1855,9 +1855,7 @@
     <ClCompile Include="..\..\src\scen\scenMain.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <OMGGen Include="..\..\src\omg\omgChatMissionStatus.omg">
-      <FileType>Document</FileType>
-    </OMGGen>
+    <OMGGen Include="..\..\src\omg\omgChat.omg" />
     <OMGGen Include="..\..\src\omg\omgMissionSortieData.omg">
       <FileType>Document</FileType>
     </OMGGen>

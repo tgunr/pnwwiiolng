@@ -64,7 +64,7 @@
 #include "chat/chatBrigadeControl.h"
 #include "client/clientBrigadeControlDescriptors.h"
 #include "map/mapHCUnitLocations.h"
-#include "omg/omgChatMissionStatus.hxx"
+#include "omg/omgChat.hxx"
 #include "strt/strtEventTypes.h"
 #include "strt/strtCPFlags.h"
 

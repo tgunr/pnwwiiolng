@@ -46,6 +46,7 @@ namespace Chat
 		HOLD_FALL_INFO_Y,		// Messages about hold/fall votes
 
 		/////  ^^^ INSERT NEW CALLBACKS HERE^^^  /////
+		OMG_Y = 100,				// OMG-numbered callbacks start here
 
 		// 200
 		LOGIN_Y	=	200,	// Old callbacks I don't wanna renumber

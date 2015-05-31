@@ -49,7 +49,7 @@
 #include "map/mapBrigadeSummary.h"
 #include "map/mapMissionList.h"
 #include "map/mapSwingMeter.h"
-#include "omg/omgChatMissionStatus.hxx"
+#include "omg/omgChat.hxx"
 #include "strt/strtCaptureState.h"
 #include "strt/strtClientMessages.h"
 #include "strt/strtDTL.h"

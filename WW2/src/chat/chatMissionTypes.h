@@ -12,7 +12,7 @@
 #include "chat/chatWaypoint.h"
 #include "wwii/wwiiHash.h"
 #include "chat/chatMissionMemberUpdates.h"
-#include "omg/omgChatMissionStatus.hxx"
+#include "omg/omgChat.hxx"
 
 class Player;
 

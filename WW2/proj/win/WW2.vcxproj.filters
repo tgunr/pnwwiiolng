@@ -1638,14 +1638,14 @@
     <ClInclude Include="..\..\src\math\SuperFastHash.h">
       <Filter>math</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\src\omg\omgChatMissionStatus.hxx">
-      <Filter>omg\Generated Headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\src\omg\omgMissionSortieData.hxx">
       <Filter>omg\Generated Headers</Filter>
     </ClInclude>
     <ClInclude Include="..\..\src\include\io_mapped_file.h">
       <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\omg\omgChat.hxx">
+      <Filter>omg\Generated Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2687,10 +2687,10 @@
     <ClCompile Include="..\..\src\math\SuperFastHash.cpp">
       <Filter>math</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\omg\omgChatMissionStatus.cxx">
+    <ClCompile Include="..\..\src\omg\omgMissionSortieData.cxx">
       <Filter>omg\Generated Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\omg\omgMissionSortieData.cxx">
+    <ClCompile Include="..\..\src\omg\omgChat.cxx">
       <Filter>omg\Generated Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -2709,10 +2709,10 @@
     <ResourceCompile Include="WW2.rc" />
   </ItemGroup>
   <ItemGroup>
-    <OMGGen Include="..\..\src\omg\omgChatMissionStatus.omg">
+    <OMGGen Include="..\..\src\omg\omgMissionSortieData.omg">
       <Filter>omg\.OMG Files</Filter>
     </OMGGen>
-    <OMGGen Include="..\..\src\omg\omgMissionSortieData.omg">
+    <OMGGen Include="..\..\src\omg\omgChat.omg">
       <Filter>omg\.OMG Files</Filter>
     </OMGGen>
   </ItemGroup>
