@@ -22,9 +22,9 @@ namespace Scoring
 SINT32
 mmCellHostSupportCallbacks(void)
 {
-	BEGIN_CALLBACK_REGISTRATION(MMHost::CallbackX)
+	BEGIN_CALLBACK_REGISTRATION(MM::CallbackX)
 
-		REGISTER_RECEIVER(MMHost::WEAPONS_HANDOFF_Y, Host::VehicleRequest::_recvCallback);
+		REGISTER_RECEIVER(MM::WEAPONS_HANDOFF_Y, Host::VehicleRequest::_recvCallback);
 
 	END_CALLBACK_REGISTRATION
 }

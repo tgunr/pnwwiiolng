@@ -9,7 +9,7 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-namespace MMHost
+namespace MM
 {
 	enum { CallbackX = 227 };
 
