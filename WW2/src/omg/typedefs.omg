@@ -13,3 +13,5 @@ TYPE PermissionMask;
 TYPE playerid_t;
 TYPE instanceid_t;
 TYPE WorldPosition_m						BY REF		INCLUDE "wwii/wwiiServerTrackedObject.h";
+
+TYPE char;

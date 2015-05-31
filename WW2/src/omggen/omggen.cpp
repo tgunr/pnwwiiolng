@@ -763,28 +763,60 @@ void Message::EmitConstructor() const
 		, m_name.c_str()
 		);
 	char joiner = ':';
+	bool memberCtor = true;
 	for (Field* field = m_extraMembers; field; field = static_cast<Field*>(field->m_next)) {
 		HXX("\t\t%c %s(%s)\n", joiner, field->m_name.c_str(), field->m_defaultValue);
 		joiner = ',';
+		memberCtor = false;
 	}
 	for (Node* node = m_child; node; node = node->m_next) {
 		switch (node->m_type) {
 			case Node::Type::Group:
 				HXX("\t\t%c %s(%s)\n", joiner, static_cast<Group*>(node)->m_memberName.c_str(), "m_lastModified");
 				joiner = ',';
+				memberCtor = false;
 				break;
-			case Node::Type::Field:
-				HXX("\t\t%c %s(%s)\n", joiner, node->m_name.c_str(), static_cast<Field*>(node)->m_defaultValue);
+			case Node::Type::Field: {
+				Field* field = static_cast<Field*>(node);
+				HXX("\t\t%c %s(%s)\n", joiner, node->m_name.c_str(), field->m_defaultValue);
 				joiner = ',';
+				if (field->m_typeDef->PassByRef())
+					memberCtor = false;
 				break;
+			}
 			default:
+				memberCtor = false;
 				break;
 		}
 	}
 	HXX("\t{\n"
 		"\t}\n"
-		"\n"
 		);
+
+	if (memberCtor == true) {
+		std::string argList;
+		std::string memberInit;
+		for (Node* node = m_child; node; node = node->m_next) {
+			switch (node->m_type) {
+			case Node::Type::Field: {
+				const Field* field = static_cast<Field*>(node);
+				if (!argList.empty()) {
+					argList += ", ";
+					memberInit += ", ";
+				}
+				argList += field->m_typeDef->DeclType() + " " + field->m_name + "_";
+				memberInit += field->m_name + "{" + field->m_name + "_}";
+				break;
+			}
+			default:
+				break;
+			}
+		}
+
+		HXX("\texplicit %s(%s) noexcept : %s {}\n", m_name.c_str(), argList.c_str(), memberInit.c_str());
+	}
+
+	HXX("\n");
 }
 
 void Message::EmitPacker() const
