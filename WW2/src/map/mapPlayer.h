@@ -256,6 +256,13 @@ public:
 	const WEAPON_SERIAL& weapon() const { return m_weapon; }
 	WEAPON_SERIAL& weapon() { return m_weapon; }
 
+	//! Returns the cell they are spawned to or 0.
+	//! @seealso getCellHost()
+	UINT32 getSpawnedCellHost() const { return isSpawned() ? m_lastSpawnedTo : 0; }
+	//! Returns the cell this player is associated with (but may not be spawned on).
+	//! @seealso getSpawnedCellHost()
+	UINT32 getCellHost() const { return m_lastSpawnedTo; }
+
 	// For the scoring sortie thing.
 	void closeCurrentSortie();
 	void newSortie(UINT32 newSortieID, bool isPilot);

@@ -364,9 +364,9 @@ protected:
 	ChatHandle		m_grabbing;
 	ChatHandle		m_joinedMission;
 
-//	PermissionMask	m_permissionMask;		// Raw + group permissions
+//	PermissionMask	m_permissionMask;	// Raw + group permissions
 	PermissionMask	m_playerMask;		// The player's own 'raw' permissions
-//	PermissionMask	m_chatMask;		// Chat groups permissions
+//	PermissionMask	m_chatMask;			// Chat groups permissions
 
 	TeulTimeMS		m_lastSquadInfo_ms;	// When we last sent squad info
 public:
@@ -393,13 +393,13 @@ protected:
 public:
 	UINT32			m_lastMessageID;	// Last message ID used
 protected:
-	WWII_SIDE		m_prevSide;		// Last valid side they had
+	WWII_SIDE		m_prevSide;			// Last valid side they had
 
-	UINT32			m_goneAFK;				// Time stamp player went AFK
-	UINT32			m_lastAfkNoticeFrom;	// Last player we saw an afk notice from
+	UINT32			m_goneAFK;			// Time stamp player went AFK
+	UINT32			m_lastAfkNoticeFrom;// Last player we saw an afk notice from
 
 	UINT32			m_lastGroupRead;	// When we loaded their permissions
-	UINT32			m_joinedSquad;			// When we joined our squad
+	UINT32			m_joinedSquad;		// When we joined our squad
 
 	SINT32			m_gridX, m_gridY;
 
