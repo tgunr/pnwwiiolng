@@ -60,6 +60,13 @@
 //! Receive message to _recv<ObjType>(ACTION_OBJECT*, ObjType&)
 #define REGISTER_RECEIVEOBJ(CallY, ObjType, RecvFn) cbr.receiveObj<ObjType>(CallY, RecvFn)
 
+//! Handle OMG Objects
+#define REGISTER_OMG_RECEIVER(ObjType, RecvFn) do { \
+	if (ObjType::CallX != cbr.callX()) \
+		LogAbort("CallX mismatch"); \
+	cbr.receiveObj<ObjType>(ObjType::CallY, RecvFn); \
+} while(false)
+
 //! Terminate registration block.
 #define END_CALLBACK_REGISTRATION \
 		dbugLog(_FLI, "%s: done", __FUNCTION__); \
@@ -82,6 +89,8 @@ class CallbackRegister
 public:
 	CallbackRegister(UCHAR callX);
 	~CallbackRegister() {}
+
+	static UINT8 callX() { return sm_ci.callX; }
 
 	TEUL_CALLBACK* callback(UCHAR callY, ACTION_FN sendFn, ACTION_FN recvFn);
 	void sender(UCHAR callY, ACTION_FN sendFn, TEUL_CALLBACK*& toRef) { assert(toRef == nullptr); toRef = callback(callY, sendFn, nullptr); }
