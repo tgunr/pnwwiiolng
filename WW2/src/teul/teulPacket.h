@@ -52,8 +52,7 @@ public:
 
 	//! Construct and populate with a copy of an existing object.
 	template<typename T>
-	Packet(PacketId id, T src)
-		: Packet(id)
+	explicit Packet(PacketId id, T src) : Packet(id)
 	{
 		new ((T*)allocateBytes(sizeof(T))) T(src);
 	}
@@ -268,6 +267,17 @@ public:
 	UINT32 sentBytes() const { return m_sent; }
 	//! Increment bytes sent.
 	void sentBytes(const UINT32 bytes_) { m_sent += bytes_; }
+};
+
+template<typename T>
+struct OMGPacket : public Packet
+{
+	template<typename... Args>
+	OMGPacket(Args&&... args)
+		: Packet(PacketId(T::CallX, T::CallY))
+	{
+		new ((T*)allocateBytes(sizeof(T))) T{ std::forward<Args>(args)... };
+	}
 };
 
 }
