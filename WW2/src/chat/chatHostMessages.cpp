@@ -1251,7 +1251,7 @@ chatSendForcedDespawn(Player* player, LSTRING_ID messageID, const char* reason)
 	if ( false == player->isSpawned() )
 		return false;
 
-	const UINT32 cell = player->getCellHost(nullptr);
+	const UINT32 cell = player->getCellHost();
 	if ( 0 == cell )
 		return false;
 	const SINT32 cellIndex = serverGetPeerIndex(cell, CELL_HOST);
@@ -1482,6 +1482,22 @@ _recvLocalityUpdates(ACTION_OBJECT* const a)
 	return a->offset;
 }
 
+//////////////////////////////////////////////////////////////////////
+
+static SINT32
+_recvCellHostUpdate(ACTION_OBJECT* const a, Chat::CellHostUpdate& msg)
+{
+	if (a->m_client != nullptr)	// host only
+		return -EINVAL;
+	Player* player = PlayerInterface::Lookup(msg.playerID);
+	if (player == nullptr) {
+		dbugLog(_FLD, "t:%d ignoring cell host update for playerid %u", a->teulIndex, msg.playerID);
+		return -EINVAL;
+	}
+	player->SetCellHost(msg.cellHost);
+
+	return a->offset;
+}
 
 //////////////////////////////////////////////////////////////////////
 // Receive updates on CPs/facilities
@@ -1613,6 +1629,7 @@ chatInstallHostCallbacks()
 		REGISTER_MSG(Chat::MOBILE_SPAWN_WAYPOINT_Y, MOBILE_SPAWN_WAYPOINT);
 		REGISTER_RECEIVER(Chat::ATTACK_ORDER_Y, _recvAttackOrder);
 		REGISTER_RECEIVER(Chat::HOST_LOCALITY_UPDATES_Y, _recvLocalityUpdates);
+		REGISTER_OMG_RECEIVER(Chat::CellHostUpdate, _recvCellHostUpdate);
 
 	END_CALLBACK_REGISTRATION
 }

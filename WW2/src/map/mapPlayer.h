@@ -156,6 +156,8 @@ public:
 	const MissionPacket& missionPacket() const { return m_mp; }
 	MissionPacket& missionPacket() { return m_mp; }
 
+	void notifyChatOfCell() const;
+
 	void setRequestedCapacity(const bool state_) { m_requestedCapacity = state_; }
 	void setReceivedCapacity(const bool state_) { m_receivedCapacity = state_; }
 

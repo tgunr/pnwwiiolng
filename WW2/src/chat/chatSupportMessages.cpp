@@ -75,8 +75,10 @@ _recvRefreshPlayer(ACTION_OBJECT* const a)
 
 	dbugLog(_FLD, "received player refresh request for p:%u", playerID);
 	Player* const player = PlayerInterface::Lookup(playerID);
-	if ( player )
+	if (player) {
+		player->notifyChatOfCell();
 		player->updateChat();
+	}
 
 	return a->offset + Teul::BytesToBits(sizeof(UINT32));
 }

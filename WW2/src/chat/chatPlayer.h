@@ -110,7 +110,7 @@ public:
 	bool featureLock(const std::string& feature, UINT32 now, UINT32 duration=0);	// In chatHost.cpp
 
 	// Get the last octet of the cell host or 0 if player isn't spawned
-	UINT32 getCellHost(class PlayerStatusNode* psn=nullptr) const;
+	UINT32 getCellHost() const noexcept { return isSpawned() ? m_cellHost : 0; }
 
 	// Find the first available channel index
 	UINT32 getOpenChannelIndex(UCHAR type=NO_CHANNEL);
@@ -207,6 +207,8 @@ public:
 
 	// Change the AFK state and optionally the message
 	void SetAFK(bool to, const char* newMessage=nullptr);
+
+	void SetCellHost(UINT32 newCellHost);
 
 	void SetGMHide(bool to) { m_gmHide = to; }
 
@@ -401,6 +403,7 @@ protected:
 	UINT32			m_lastGroupRead;	// When we loaded their permissions
 	UINT32			m_joinedSquad;		// When we joined our squad
 
+	UINT32			m_cellHost;
 	SINT32			m_gridX, m_gridY;
 
 	Chat::ChannelSubscription	m_channels[MAX_CLIENT_CHANNELS];

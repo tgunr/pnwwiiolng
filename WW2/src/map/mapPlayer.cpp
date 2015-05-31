@@ -1102,6 +1102,16 @@ Player::nextLaunchTime() const
 }
 
 //////////////////////////////////////////////////////////////////////
+// Tell chat which cell host this player spawned to
+
+void
+Player::notifyChatOfCell() const
+{
+	Teul::OMGPacket<Chat::CellHostUpdate> outgoing(playerID(), getSpawnedCellHost());
+	serverSendPacketToType(outgoing, CHAT_HOST);
+}
+
+//////////////////////////////////////////////////////////////////////
 // Persona being returned to us from the cell hosts.
 
 bool
@@ -1145,6 +1155,7 @@ Player::onDespawn(SINT32 onTeulIndex)
 		dbugLog(_FLD, "t:%d p:%u c:%s not in PERS_SPAWNING, so not calculating mission results", teulIndex(), playerID(), callsign());
 	}
 
+	notifyChatOfCell();
 	updateChat();
 
 	return true;

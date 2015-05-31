@@ -274,6 +274,7 @@ _processSpawnGrantResponse(const MM_SPAWN_GRANT_RESPONSE& grant
 
 	commander->newSortie(grant.weaponSerial.serial, true);
 	commander->SetState(PERS_SPAWNING);
+	commander->notifyChatOfCell();
 	commander->updateMissionTaker(false);
 	commander->updateChat();
 
@@ -295,6 +296,7 @@ _processSpawnGrantResponse(const MM_SPAWN_GRANT_RESPONSE& grant
 		{
 			crew->newSortie(grant.weaponSerial.serial, false);
 			crew->SetState(PERS_SPAWNING);
+			crew->notifyChatOfCell();
 			crew->updateMissionTaker(false);
 			crew->updateChat();
 		}

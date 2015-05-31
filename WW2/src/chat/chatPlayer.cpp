@@ -788,23 +788,6 @@ Player::featureLock(const std::string& feature, UINT32 now, UINT32 duration)
 
 
 //////////////////////////////////////////////////////////////////////
-// Test if the specified player is spawned; returns the IP of the cell
-
-UINT32
-Player::getCellHost(PlayerStatusNode* psn) const
-{
-	if ( psn == nullptr )
-		psn = ServerInterface::PlayerStatusNodeByPlayerID(playerID());
-	if ( psn == nullptr )
-		return 0;
-
-	if ( psn->m_curServer.type == CELL_HOST )
-		return (UINT32)(psn->m_curServer.address & 0xff);
-
-	return 0;
-}
-
-//////////////////////////////////////////////////////////////////////
 // Find a free channel
 
 UINT32
@@ -1334,6 +1317,21 @@ Player::SetAFK(bool goingAFK, const char* newMessage)
 		m_afkMessage[0] = 0;
 	else
 		strsafecpy(m_afkMessage, newMessage);
+}
+
+//////////////////////////////////////////////////////////////////////
+// Update and log the cell host they've been appointed to
+
+void
+Player::SetCellHost(UINT32 newHost)
+{
+	if (newHost == m_cellHost)
+		return;
+
+	dbugLog(_FLI, "t:%d p:%u c:%s changed cell host %08x -> %08x",
+		teulIndex(), playerID(), callsign(), m_cellHost, newHost
+		);
+	m_cellHost = newHost;
 }
 
 //////////////////////////////////////////////////////////////////////
