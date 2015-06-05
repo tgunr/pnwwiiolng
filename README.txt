@@ -50,6 +50,13 @@ Lots more - I need to dig up original emails to Dana where I listed all the chan
 Work In Progress
 ================
 
+Build Everything:
+- The aim is to eliminate all static libraries from WW2\lib (3rdparty etc) to avoid build tool issues,
+- For libraries we can't eliminate (directx) we may need to make it lib32 and lib64,
+
+TCMalloc instead of SmartHeap:
+- I haven't eliminated the libexpat library (xmlparse2) which causes linker errors when trying to link with TCMalloc in a Debug Build, so for now I have simply made it so that we don't use TCMalloc in debug builds.
+
 Controller:
 - The controller currently has only limited control over processes, this needs a small amount of TLC.
 
@@ -57,3 +64,6 @@ OMG:
 I'm gradually iterating on this, but the idea is that instead of having dozens of "chatXyZMessage.h" files, you should define all your Chat messages in one .omg file.
 - OMG should generate a function that REGISTER_...s all of the objects, this requires enabling specification of client->server, server->client, client<->server, etc, properties in the .omg file,
 - OMG should generate more of the boilerplate code
+
+Mac Build:
+I haven't tried it, at all. It probably requires Clang 3.5 or something and it's probably going to be a headache for someone.
