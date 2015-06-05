@@ -14,19 +14,13 @@ public:
 	virtual ~PNThread()
 	{
 		cancel();
-		if (isRunning()) {
-			try {
-				m_thread.detach();
-			} catch (...) {
-				// pass
-			}
-		}
+		join();
 	}
 
 	void start()
 	{
 		if (!m_cancelled && !m_started.exchange(true))
-			m_thread = std::move(std::thread([=] { run(); }));
+			m_thread = std::move(std::thread([this] { run(); }));
 	}
 	//! Cancel thread and return whether or not we performed cancellation.
 	//! @return true if we changed the cancellation state.
@@ -46,11 +40,7 @@ public:
 	void join()
 	{
 		if (isRunning()) {
-			try {
-				m_thread.join();
-			} catch (...) {
-				//pass;
-			}
+			m_thread.join();
 		}
 	}
 
