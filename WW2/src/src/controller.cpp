@@ -249,7 +249,8 @@ static void _onRepeaterAccept(evutil_socket_t listener_, short event_, void* arg
 //////////////////////////////////////////////////////////////////////////
 // Process management.
 
-static std::map<evutil_socket_t /*socket*/, UINT64 /*processID*/> s_processSockets;
+static std::map<evutil_socket_t /*socket*/, UINT64 /*processID*/> s_socketToProcess;
+static std::map<UINT64 /*processID*/, evutil_socket_t /*socket*/> s_processToSocket;
 
 //////////////////////////////////////////////////////////////////////////
 // Managed process disconnecting.
@@ -276,41 +277,77 @@ static void _onManagedProcessError(struct bufferevent* bev_, short error_, void*
 
 	bufferevent_free(bev_);
 
-	auto it = s_processSockets.find(cliSock);
-	if ( it != s_processSockets.end() && it->second != 0ULL )
+	auto it = s_socketToProcess.find(cliSock);
+	if ( it != s_socketToProcess.end() && it->second != 0ULL )
 	{
-		dbugLog(_FLI, "sock:" PRF_SOCKET " process:%llu disconnecting", PRA_SOCKET(cliSock), it->second);
+		dbugLog(_FLI, "sock:" PRF_SOCKET " pid:%llu disconnecting", PRA_SOCKET(cliSock), it->second);
 		delete (evutil_socket_t*)arg_;
 		///TODO: Tell GameProcessManager that the process went away.
+		s_processToSocket.erase(it->second);
+		s_processToSocket.erase(it->first);
 	}
 }
 
 //////////////////////////////////////////////////////////////////////////
 // Receiving data from a managed process, should only happen at startup.
 
+static bool _handleIntro(evutil_socket_t srcSock, const ProcessIntroduction& intro)
+{
+	auto pit = s_processToSocket.find(intro.m_processID);
+	if (pit != s_processToSocket.end()) {
+		dbugLog(_FLW, "sock:" PRF_SOCKET " pid:%llu process already has a socket entry.", PRA_SOCKET(srcSock), intro.m_processID);
+		return false;
+	}
+	auto process = GameProcessManager::LookupGameProcess(intro.m_processID);
+	if (!process) {
+		dbugLog(_FLW, "sock:" PRF_SOCKET " pid:%llu no process entry.", PRA_SOCKET(srcSock), intro.m_processID);
+		return false;
+	}
+	if (process->ServerType() != intro.m_processType) {
+		dbugLog(_FLW, "sock:" PRF_SOCKET " pid:%llu type mismatch (expected %u got %u).",
+			PRA_SOCKET(srcSock), intro.m_processID, process->ServerType(), intro.m_processType
+		);
+		return false;
+	}
+
+	if (!process->OnStarted())
+		return false;
+	if (!process->IsRunning())
+		return false;
+
+	s_socketToProcess[srcSock] = intro.m_processID;
+	s_processToSocket[intro.m_processID] = srcSock;
+	dbugLog(_FLI, "sock:" PRF_SOCKET " pid:%llu established", PRA_SOCKET(srcSock), intro.m_processID);
+
+	return true;
+}
+
 static void _onManagedProcessRead(struct bufferevent* bev_, void* arg_)
 {
 	evutil_socket_t srcSock = *(evutil_socket_t*)arg_;
-	if ( s_processSockets.find(srcSock) != s_processSockets.end() )
-	{
-		dbugLog(_FLW, "unexpected data from managed process socket " PRF_SOCKET "", PRA_SOCKET(srcSock));
-		evutil_closesocket(srcSock);
+	auto sockIt = s_socketToProcess.find(srcSock);
+	ABORT_IF( sockIt == s_socketToProcess.end() );
+	if ( sockIt->second ) {
+		dbugLog(_FLW, "sock:" PRF_SOCKET " intro on socket we have pid for", PRA_SOCKET(srcSock));
+	} else {
+		struct evbuffer* input = bufferevent_get_input(bev_);
+		ABORT_IF(input == nullptr);
+
+		if (evbuffer_get_length(input) != sizeof(ProcessIntroduction)) {
+			dbugLog(_FLM, "length of data does not match ProcessIntroduction");
+		} else {
+			ProcessIntroduction intro;
+			int n = evbuffer_remove(input, &intro, sizeof(intro));
+
+			// We just checked if there was enough data, and there looked to be.
+			ABORT_IF(n != sizeof(intro));
+
+			if (_handleIntro(srcSock, intro))
+				return;
+		}
 	}
 
-	struct evbuffer* input = bufferevent_get_input(bev_);
-	ABORT_IF(input == nullptr);
-
-	if (evbuffer_get_length(input) < sizeof(GameProcessManager::Introduction))
-		return;
-
-	GameProcessManager::Introduction intro;
-	int n = evbuffer_remove(input, &intro, sizeof(intro));
-	// We just checked if there was enough data, and there looked to be.
-	ABORT_IF( n < 0 );
-
-	///TODO: Tell GameProcessManager that this process just connected to us.
-	//if (!GameProcessManager::OnConnected(srcSock, intro))
-	//	evutil_closesocket(srcSock);
+	evutil_closesocket(srcSock);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -331,10 +368,10 @@ static void _onManagedProcessAccept(evutil_socket_t listener_, short event_, voi
 	bufferevent_setcb(bev, _onManagedProcessRead, nullptr, _onManagedProcessError, new evutil_socket_t(cliSock));
 	bufferevent_enable(bev, EV_READ|EV_PERSIST);
 
-	const bool socketAlreadyRegistered = (s_processSockets.find(cliSock) != s_processSockets.end());
+	const bool socketAlreadyRegistered = (s_socketToProcess.find(cliSock) != s_socketToProcess.end());
 	ABORT_IF( socketAlreadyRegistered );
 
-	s_processSockets[cliSock] = 0ULL;
+	s_socketToProcess[cliSock] = 0ULL;
 
 	dbugLog(_FLN, "sock:" PRF_SOCKET " process connected from %s:%u", PRA_SOCKET(cliSock), teulGetAddress(ntohl(cliAddr.sin_addr.s_addr)), ntohs(cliAddr.sin_port));
 }

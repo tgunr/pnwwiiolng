@@ -39,6 +39,7 @@
 #include "teul/teulConnectionInstruction.h"
 #include "teul/teulConstants.h"
 #include "teul/teulEndpoint.h"
+#include "teul/teulEndpointImpl.h"
 #include "teul/teulMicroWebServer.h"
 #include "teul/teulPacket.h"
 #include "teul/teulPacketHeader.h"
@@ -83,18 +84,21 @@ public:
 
 namespace Server
 {
+	SERVER_TYPE serverType;
 	InterfaceDescription myInterface;
 	ServerInfo myServerInfo;
 	static const TeulTimeMS CheckInterval_ms = 30000ULL;
 	static const TeulTimeMS HeartbeatInterval_ms = 15000ULL;
 
-	UINT32	broadcastNet;			// Base address of the broadcast network
+	teulindex_t controllerIndex;		// Connection to controller
 
-	SINT32	broadcastIndex = -1;	// TeulIndex for broadcast packets.
-	SINT32	broadcastRxIndex = - 1;	// Where we receive broadcasts.
+	UINT32	broadcastNet;				// Base address of the broadcast network
 
-	UINT32	localHost;				// IP addr of local host
-	UINT32	broadcastHost;			// IP address of the broadcast address.
+	teulindex_t	broadcastIndex = -1;	// TeulIndex for broadcast packets.
+	teulindex_t	broadcastRxIndex = - 1;	// Where we receive broadcasts.
+
+	UINT32	localHost;					// IP addr of local host
+	UINT32	broadcastHost;				// IP address of the broadcast address.
 
 	bool	broadcastConnected = false;
 }
@@ -129,6 +133,11 @@ static SINT32 _playerDelete(PlayerStatusNode* const psn, Server::ReleaseType rel
 // move players from one server list to another and update state
 extern ERROR_FUNCTION* 	extErrorFn;
 static ENDPOINT* s_broadcastEndpoint = nullptr;
+
+// Connection to the controller process.
+
+static uint32_t s_controllerToken = 0;
+static bool s_controllerConnected = false;
 
 #if defined(SERVER_AS_ENTRY_POINT)
 UINT32 g_portOffset = 0;
@@ -1613,7 +1622,60 @@ _broadcastRxConnect(ENDPOINT& endpoint)
 	_broadcastRxConnected = true;
 }
 
-#include "teul/teulEndpointImpl.h"
+//////////////////////////////////////////////////////////////////////////
+// We connect to the controller to provide a simple tcp-based awareness
+// of whether the controller is still running. In theory we can also
+// support TCP callbacks on it but we aren't actually going to use them;
+// most of the time this connection is just there to know we're alive.
+
+#include "src/controllerGameIntro.h"
+
+static void
+_controllerConnect(ENDPOINT& endpoint)
+{
+	dbugLog(_FLD, "t:%d ip:%s:%u connected to controller", endpoint.teulIndex(), teulGetAddress(endpoint.fromAddress()), endpoint.fromPort());
+	s_controllerConnected = true;
+
+	ProcessIntroduction intro;
+#if platOS == OS_WIN32
+	intro.m_processID = GetCurrentProcessId();
+#else
+	intro.m_processID = getpid();
+#endif
+	intro.m_processType = Server::serverType;
+	intro.m_token = s_controllerToken;
+
+	auto result = endpoint.writeRaw((const char*)&intro, sizeof(intro));
+	ABORT_IF(result != sizeof(intro));
+}
+
+static void
+_controllerError(SINT32, const UCHAR* const, SINT32, const struct TEUL_CALLBACK* const, SINT32)
+{
+	dbugLog(_FLA, "error on controller connection shutting down");
+}
+
+void _connectToController()
+{
+	if (Server::serverType == CONTROLLER_HOST)
+		return;
+
+#ifdef PUBLIC_RELEASE
+	static const SINT32 controllerTimeout = 5000;
+#else
+	static const SINT32 controllerTimeout = 60000;
+#endif
+	Server::controllerIndex = teulOpenSend(INADDR_LOOPBACK, WWII::Net::Ports::ServerPeering, _controllerConnect, controllerTimeout, PROTOCOL_CTRL, _controllerError);
+
+	teulSyncClock();
+	TeulTimeMS timeout = teulClock64 + controllerTimeout;
+	while ( !s_controllerConnected && teulClock64 < timeout ) {
+		teulUpdateTransport(1);
+		teulSyncClock();
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////
 
 void
 serverOpenBroadcastIndexes()
@@ -1788,8 +1850,23 @@ void ServerBase::s_ErrorDelegate(SINT32 teulIndex_, const UCHAR* const data_, SI
 }
 #endif
 
-void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType, ERROR_FUNCTION* errorFnPtr, void(*killFnPtr)(int), int argc, const char* argv[], const std::vector<CommandLineOption>& commandLine)
+void NORETURN_FN _help(const char* argv[], const Server::CommandLineOptions& cliOptions)
 {
+	printf("Usage: %s [arguments | --help]\n", argv[0]);
+	for (size_t i = 0; i < cliOptions.size(); ++i)
+	{
+		if (cliOptions[i].wantParameter)
+			printf("  %s ARG\n", cliOptions[i].command);
+		else
+			printf("  %s\n", cliOptions[i].command);
+		printf("\t\t%s\n", cliOptions[i].help);
+	}
+	exit(0);
+}
+
+void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType, ERROR_FUNCTION* errorFnPtr, void(*killFnPtr)(int), int argc, const char* argv[], const CommandLineOptions& cliOptions)
+{
+	Server::serverType = serverType;
 	Teul::SetAppName(appName);
 
 	// Windows requires us to enable networking (WSAStartup) early on
@@ -1798,37 +1875,37 @@ void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType, ERRO
 	// Read in the environment.
 	Teul::ConfigVar::InitializeConfigVars();
 
+	CommandLineOptions allOptions = {
+		{
+			"--help", "Show this help.", false,
+			[&allOptions, argv](const char*) { _help(argv, allOptions); }
+		},
+		{
+			"--token", "Specify the controller connection token.", true,
+			[](const char* text) { s_controllerToken = strtoul(text, nullptr, 10); }
+		}
+	};
 	for (int argn = 1; argn < argc; ++argn)
 	{
 		bool found = false;
 		if (strcmp(argv[argn], "--help") == 0 || strcmp(argv[argn], "-?") == 0)
+			_help(argv, cliOptions);
+
+		for (size_t i = 0; i < cliOptions.size(); ++i)
 		{
-			printf("Usage: %s [arguments | --help]\n", argv[0]);
-			for (size_t i = 0; i < commandLine.size(); ++i)
-			{
-				if (commandLine[i].wantParameter)
-					printf("  %s ARG\n", commandLine[i].command);
-				else
-					printf("  %s\n", commandLine[i].command);
-				printf("\t\t%s\n", commandLine[i].help);
-			}
-			exit(0);
-		}
-		for (size_t i = 0; i < commandLine.size(); ++i)
-		{
-			if (strcmp(argv[argn], commandLine[i].command) != 0)
+			if (strcmp(argv[argn], cliOptions[i].command) != 0)
 				continue;
 			found = true;
 			const char* param = nullptr;
-			if (commandLine[i].wantParameter)
+			if (cliOptions[i].wantParameter)
 			{
 				if (++argn >= argc)
-					LogAbort("'%s' switch expects an argument", commandLine[i]);
+					LogAbort("'%s' switch expects an argument", cliOptions[i]);
 				param = argv[argn];
 				if (param[0] == '-')
-					LogAbort("'%s' switch expects an argument, got '%s'", commandLine[i], argv[argn]);
+					LogAbort("'%s' switch expects an argument, got '%s'", cliOptions[i], argv[argn]);
 			}
-			commandLine[i].callback(param);
+			cliOptions[i].callback(param);
 			break;
 		}
 		if (!found)
@@ -1842,6 +1919,9 @@ void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType, ERRO
 	SINT32 retval = teulInitTransport(LOG_TO_FILE, appName, errorFnPtr, killFnPtr, nullptr);
 	if (retval != 0)
 		LogAbort("Unable to initialize transport: %d", retval);
+
+	// Let the controller know we are here.
+	_connectToController();
 
 	serverEnableDebugWebServer(serverType);
 
