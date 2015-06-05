@@ -149,6 +149,11 @@ public:
 private:
 	//! Write the actual data to the socket.
 	SINT32 writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT32 port);
+
+#if defined(AS_SERVER)
+public:
+	SINT32 writeRaw(const void* const data, const size_t sizeInBytes) noexcept;
+#endif
 };
 
 

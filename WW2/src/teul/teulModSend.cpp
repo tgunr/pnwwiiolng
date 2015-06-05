@@ -101,6 +101,15 @@ teulModSendCALLBACKe(ENDPOINT& endpoint, TEUL_CALLBACK& callback)
 	return packedSizeBits;
 }
 
+#if defined(AS_SERVER)
+SINT32
+ENDPOINT::writeRaw(const void* const data, const size_t sizeInBytes) noexcept
+{
+	ABORT_IF_EX(protocol != PROTOCOL_CTRL, "ENDPOINT::sendRaw only allowed on CTRL interfaces");
+	return ::send(socket, (const char*)data, sizeInBytes, SOCK_SEND_FLAGS);
+}
+#endif
+
 //////////////////////////////////////////////////////////////////////
 // Actually write data to a socket.
 
