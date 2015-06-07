@@ -150,19 +150,19 @@ struct ACTION_OBJECT;
 namespace Teul { struct PacketHeader; class Packet; }
 
 //! Compressed player gamename/callsign.
-using ChatHandle = uint64_t;
+using ChatHandle = UINT64;
 //! Player permission mask.
-using PermissionMask = uint64_t;
+using PermissionMask = UINT64;
 //! Teul type for millisecond time.
-using TeulTimeMS = uint64_t;
+using TeulTimeMS = UINT64;
 //! Teul type for a millisecond delta (signed).
-using TeulDeltaMS = int64_t;
+using TeulDeltaMS = SINT64;
 
 //! Index for a player ID
 using playerid_t = uint32_t;
 //! Index for a sortie ID
 using sortieid_t = uint32_t;
 //! Index for an instance's unique ID
-using instanceid_t = uint64_t;
+using instanceid_t = UINT64;
 //! Index for a persona
 using personaid_t = uint32_t;
