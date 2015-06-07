@@ -346,7 +346,7 @@ _sendPlayerStatusUpdate(const PlayerStatusNode& psn)
 					, update.dispatch.m_customerID
 					, update.dispatch.m_callsign
 					, update.id
-					, update.status
+					, static_cast<int>(update.status)
 					, update.serverID
 					);
 

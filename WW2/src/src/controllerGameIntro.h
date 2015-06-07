@@ -6,8 +6,8 @@
 //! @detail Tells the controller who is attempting a connection.
 struct ProcessIntroduction
 {
-	uint64_t	m_processID;
-	uint32_t	m_processType;
-	uint32_t	m_token;
+	UINT64	m_processID;
+	UINT32	m_processType;
+	UINT32	m_token;
 };
 #pragma pack(pop)

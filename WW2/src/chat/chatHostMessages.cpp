@@ -1109,9 +1109,12 @@ chatSendBandwidthNotice(const Player& player, UINT32 mode)
 		return false;
 	}
 
-	if (g_debugPersonas)
+	if (g_debugPersonas) {
+		char hostAddr[64];
+		teulGetAddress(host, hostAddr, sizeof(hostAddr));
 		dbugLog(_FLD, "p:%u c:%s Requesting host %s give mode %u after spawning"
-			, player.playerID(), player.callsign(), host, mode);
+			, player.playerID(), player.callsign(), hostAddr, mode);
+	}
 
 	BANDWIDTH_CHANGE change{ player.playerID(), mode };
 	Teul::Packet outgoing(Teul::PacketId(Chat::CallbackX, Chat::BANDWIDTH_NOTICE_Y), change);

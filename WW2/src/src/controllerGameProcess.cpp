@@ -34,7 +34,7 @@ bool GameProcess::IsRunning() const
 	return ( result != WAIT_OBJECT_0 && result != WAIT_FAILED );
 #else
 	int status = 0;
-	auto result = waitpid(m_process, &status, WEXITED | WNOHANG);
+	auto result = waitpid(m_processID, &status, WEXITED | WNOHANG);
 	return ( result == 0 );
 #endif
 }
@@ -439,7 +439,7 @@ namespace GameProcessManager
 
 				const char* processName = processNames[starter->ServerType()];
 				processhandle_t child = 0ULL;
-				uint64_t childPid = 0ULL;
+				UINT64 childPid = 0ULL;
 				int spawnErrno = 0;
 				bool success = _spawnProcess(starter, processName, child, childPid, spawnErrno);
 				if ( success )

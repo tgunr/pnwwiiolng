@@ -96,7 +96,7 @@ dbseInit()
 			case Dbse::ConnectionStatus::Open:
 				if (!_handshakeSent)
 				{
-					dbugLog(_FLI, "t:%d dbd client connected %d", hostIndex, connected);
+					dbugLog(_FLI, "t:%d dbd client connected %d", hostIndex, static_cast<int>(connected));
 					dbseSendHandshake(hostIndex, cv_arenaID.GetUint32());
 					_handshakeSent = true;
 				}

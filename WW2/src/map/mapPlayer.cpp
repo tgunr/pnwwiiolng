@@ -1759,7 +1759,10 @@ mapCreatePlayer(SINT32 teulIndex, PlayerStatusNode* psn, const Server::PersonaXf
 {
 	const playerid_t playerID = xfer.dispatch().m_customerID;
 
-	dbugLog(_FLI, "t:%d p:%u c:%s PERS: %s (%d)", teulIndex, playerID, xfer.dispatch().m_callsign, xferReasons[(UINT32)xfer.reason()], xfer.reason());
+	dbugLog(_FLI, "t:%d p:%u c:%s PERS: %s (%d)"
+			, teulIndex, playerID, xfer.dispatch().m_callsign
+			, xferReasons[(UINT32)xfer.reason()]
+			, static_cast<int>(xfer.reason()));
 
 	try
 	{
@@ -1816,7 +1819,7 @@ mapReleasePlayer(SINT32 teulIndex, PlayerStatusNode* psn, Server::ReleaseType re
 					, ((psn)?psn->dispatch().m_customerID:0)
 					, ((psn)?psn->dispatch().m_callsign:"???")
 					, ((psn)?psn->dispatch().m_OTP:0)
-					, releaseType
+					, static_cast<int>(releaseType)
 					, Server::GetReleaseType(releaseType)
 					, psn
 					, _numTotalPlayers()
@@ -1856,11 +1859,18 @@ mapReleasePlayer(SINT32 teulIndex, PlayerStatusNode* psn, Server::ReleaseType re
 		player->SetState(PERS_EXITING);
 
 		delete player;
-		dbugLog(_FLN,"t:%d p:%u PERS: released persona for %d [%s]", teulIndex, playerID, releaseType, Server::GetReleaseType(releaseType));
+		dbugLog(_FLN,"t:%d p:%u PERS: released persona for %d [%s]"
+					, teulIndex, playerID
+					, static_cast<int>(releaseType)
+					, Server::GetReleaseType(releaseType));
 	}
 	catch (std::exception& e)
 	{
-		dbugLog(_FLA, "t:%d p:%u %s(%s#%d): %s", teulIndex, playerID, __FUNCTION__, Server::GetReleaseType(releaseType), releaseType, e.what());
+		dbugLog(_FLA, "t:%d p:%u %s(%s#%d): %s"
+					, teulIndex, playerID, __FUNCTION__
+					, Server::GetReleaseType(releaseType)
+					, static_cast<int>(releaseType)
+					, e.what());
 	}
 
 	return 0;

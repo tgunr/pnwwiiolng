@@ -5,7 +5,7 @@
 #if platOS == OS_WIN32
 using processhandle_t = HANDLE;
 #else
-using processhandle_t = uint64_t;
+using processhandle_t = UINT64;
 #endif
 
 //! Structure that encapsulates the operation of a single game server process.
@@ -87,6 +87,10 @@ public:
 	static GameProcess* s_processStarting;
 
 public:
+	void Log(int level, const char* fmt)
+	{
+		dbugLog("GameProcess", 0, level | LOG_ALL_TO_STDERR, "s:%u(%s) pid:%llu %s", ServerType(), ServerTypeName(), ProcessID(), fmt);
+	}
 	template<typename... Args>
 	void Log(int level, const char* fmt, Args&&... args)
 	{

@@ -21,7 +21,7 @@ public:
 		: x(x_), y(y_), z(z_)
 		, killedByIndex(killedByIndex_)
 		, killedByHandle(killedByHandle_)
-		, deathType(deathType_)
+		, deathType(UCHAR(deathType_))
 		, byEnvironment(byEnvironment_)
 		, deathAngle(deathAngle_)
 		, deathForce(deathForce_)
@@ -44,7 +44,7 @@ public:
 	ChatHandle		killedByHandle;		// ChatHandle of killer.
 
 	//! TROY: What do you want here? I'm not going to use any of this.
-	DeathType		deathType : 7;		// Explosion, whatever.
+	UCHAR			deathType : 7;		// Explosion, whatever.
 	UCHAR			byEnvironment : 1;	// E.g. AI killed you.
 	UCHAR			deathAngle : 4;		// Direction to die in.
 	UCHAR			deathForce : 4;		// Hint as to how much force to use.

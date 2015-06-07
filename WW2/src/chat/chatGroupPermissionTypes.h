@@ -21,8 +21,8 @@
 struct ChatPermissions
 {
 	ChatPermissions()
-		: m_permissionMask(0ULL), m_groupOID(0)
-		, m_lastModified(0), m_enabled(false), m_limitSquadRank(0)
+		: m_permissionMask(0ULL), m_lastModified(0)
+		, m_groupOID(0), m_enabled(false), m_limitSquadRank(0)
 #if platBuild == TEUL_SERVER
 		, m_vehicleGrants()
 #endif
@@ -38,7 +38,7 @@ struct ChatPermissions
 	RANK_NO			m_limitSquadRank;
 
 #if platBuild == TEUL_SERVER
-	typedef std::set<UINT16> VEHTYPES;
+	using VEHTYPES = std::set<UINT16>;
 	VEHTYPES		m_vehicleGrants;
 #endif
 

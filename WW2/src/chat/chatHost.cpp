@@ -2455,7 +2455,7 @@ _personaCreate(const Server::PersonaLogin& login, PlayerStatusNode& psn)
 	if ( g_debugPersonas )
 		dbugLog(_FLD, "t:%d p:%u c:%s -> personaCreate reason %d"
 						, psn.teulIndex, psn.dispatch().m_customerID, psn.dispatch().m_callsign
-						, login.reason()
+						, static_cast<int>(login.reason())
 						);
 
 	chatCreatePlayer(&psn, (struct Chat::PlayerInfo*) login.data.auxData);
@@ -2476,7 +2476,7 @@ _personaRelease(SINT32 teulIndex, PlayerStatusNode* psn, Server::ReleaseType rel
 					, teulIndex
 					, psn->dispatch().m_customerID
 					, psn->dispatch().m_callsign
-					, relaseType
+					, static_cast<int>(relaseType)
 					);
 
 	if ( psn->localInfo != nullptr )
@@ -2557,7 +2557,9 @@ _dataInit(void)
 static SINT32
 _serverEnterCallback(Server::ServerInfo* server, Server::Code scode)
 {
-	dbugLog(_FLN,"server %s added code %d, type %d", teulGetAddress(server->stats.address),scode, server->stats.type);
+	dbugLog(_FLN,"server %s added code %d, type %d",
+			teulGetAddress(server->stats.address),
+			static_cast<int>(scode), static_cast<int>(server->stats.type));
 
 	switch ( server->stats.type )
 	{
@@ -2577,7 +2579,9 @@ _serverEnterCallback(Server::ServerInfo* server, Server::Code scode)
 static SINT32
 _serverLeaveCallback(Server::ServerInfo* server, Server::Code scode)
 {
-	dbugLog(_FLN,"server %s left code %d, type %d",teulGetAddress(server->stats.address),scode, server->stats.type);
+	dbugLog(_FLN,"server %s left code %d, type %d",
+			teulGetAddress(server->stats.address),
+			static_cast<int>(scode), static_cast<int>(server->stats.type));
 
 	switch ( server->stats.type )
 	{
@@ -2597,7 +2601,9 @@ _serverLeaveCallback(Server::ServerInfo* server, Server::Code scode)
 static SINT32
 _serverStatusCallback(Server::ServerInfo* server, Server::Code scode)
 {
-	dbugLog(_FLN,"server %s added code %d, type %d",teulGetAddress(server->stats.address),scode, server->stats.type);
+	dbugLog(_FLN,"server %s added code %d, type %d",
+			teulGetAddress(server->stats.address),
+			static_cast<int>(scode), static_cast<int>(server->stats.type));
 	return 0;
 }
 //////////////////////////////////////////////////////////////////////

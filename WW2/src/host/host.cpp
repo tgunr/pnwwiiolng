@@ -724,7 +724,7 @@ _personaRelease(SINT32 teulIndex, PlayerStatusNode* const psn, Server::ReleaseTy
 	assert( it != g_players.end() );
 	g_players.erase(it);
 
-	dbugLog(_FLD,"t:%d p:%u c:%s releasing player type %u", player->teulIndex(), player->playerID(), player->callsign(), releaseType);
+	dbugLog(_FLD,"t:%d p:%u c:%s releasing player type %u", player->teulIndex(), player->playerID(), player->callsign(), static_cast<int>(releaseType));
 
 	if (player->exitState == 0)
 		player->exitState = PEXIT_DEAD;
@@ -1604,7 +1604,7 @@ HostVehicle::forceExit()
 static SINT32
 _serverEnterCallback(Server::ServerInfo* server, Server::Code scode)
 {
-	dbugLog(_FLN,"server %s added code %d",teulGetAddress(server->stats.address),scode);
+	dbugLog(_FLN, "server %s added code %d", teulGetAddress(server->stats.address), static_cast<int>(scode));
 	_addNewServer(server, TRUE);
 	return 0;
 }
@@ -1612,7 +1612,7 @@ _serverEnterCallback(Server::ServerInfo* server, Server::Code scode)
 static SINT32
 _serverLeaveCallback(Server::ServerInfo* server, Server::Code scode)
 {
-	dbugLog(_FLN,"server %s left code %d",teulGetAddress(server->stats.address),scode);
+	dbugLog(_FLN, "server %s left code %d", teulGetAddress(server->stats.address), static_cast<int>(scode));
 	///REVIEW: At this point we should probably remove the vehicles from this server
 	return 0;
 }
@@ -1620,8 +1620,9 @@ _serverLeaveCallback(Server::ServerInfo* server, Server::Code scode)
 static SINT32
 _serverStatusCallback(Server::ServerInfo* server, Server::Code scode)
 {
-	dbugLog(_FLN,"received server %s status changed to %d code %d"
-		, teulGetAddress(server->stats.address), server->stats.status,scode);
+	dbugLog(_FLN, "received server %s status changed to %d code %d"
+		, teulGetAddress(server->stats.address), server->stats.status
+		, static_cast<int>(scode));
 	_addNewServer(server, FALSE);
 	return 0;
 }
