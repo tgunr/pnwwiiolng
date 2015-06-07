@@ -10,7 +10,7 @@ namespace Teul
 	class TimeMS
 	{
 	private:
-		UINT64		m_clock64;
+		TeulTimeMS m_clock64;
 	public:
 		explicit TimeMS() : m_clock64(0ULL) {}
 		explicit TimeMS(const TimeMS& rhs) : m_clock64(rhs.time()) {}
@@ -33,7 +33,7 @@ namespace Teul
 		Teul::TimeMS& operator -  (const Teul::TimeMS& rhs) { m_clock64 -= rhs.time(); return *this; }
 
 	public:
-		const TeulTimeMS& time() const { return m_clock64; }
+		TeulTimeMS time() const { return m_clock64; }
 		UINT32 timePartial() const { return (UINT32)m_clock64 & 0x000fffff; }
 //		Teul::TimeMS& time(const TeulTimeMS& _clock) { m_clock64 = _clock; return *this; }
 		void makeNever() { m_clock64 = ~0ULL; }
