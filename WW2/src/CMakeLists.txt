@@ -146,7 +146,7 @@ MACRO(ADD_OMG_TARGET _TARGET)
     ADD_CUSTOM_COMMAND(
         PRE_BUILD
         OUTPUT  ${_TARGET_PREFIX}.cxx ${_TARGET_PREFIX}.hxx
-        DEPENDS omggen ${_TARGET_PREFIX}/typedefs.omg ${_TARGET_PREFIX}.omg
+        DEPENDS omggen ${_TARGET_PATH}/typedefs.omg ${_TARGET_PREFIX}.omg
         MAIN_DEPENDENCY ${_TARGET_PREFIX}.omg
         COMMENT "[OMG] ${_FILENAME}.omg"
         COMMAND omggen
@@ -1331,11 +1331,11 @@ IF( PN_CLUSTER STREQUAL "Auth" )
  SET(CPACK_PACKAGE_DESCRIPTION "'BattleGround Europe: WWII Online' stand-alone auth host.")
 ENDIF( )
 SET(CPACK_DEBIAN_PACKAGE_MAINTAINER "Oliver Smith")
-SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libopenthreads-dev(>= 2.8), lua5.1(>= 5.1.4-5), libmysqlclient16(>= 5.1.49), bash(>= 4.1), gdb(>= 7.1), nfs-common, mysql-server(>= 5.1)")
+SET(CPACK_DEBIAN_PACKAGE_DEPENDS "libopenthreads-dev(>= 2.8), lua5.1(>= 5.1.4-5), libmysqlclient16(>= 5.5.0), bash(>= 4.1), gdb(>= 7.1), nfs-common, mysql-server(>= 5.5)")
 SET(CPACK_DEBIAN_PACKAGE_DESCRIPTION "WWIIOL Game Servers")
 SET(CPACK_DEBIAN_PACKAGE_SECTION "Network")
 SET(CPACK_DEBIAN_PACKAGE_PRIORITY "Important")
-SET(CPACK_DEBIAN_PACKAGE_RECOMMENDS "vim, mysql-client(>= 5.1), python(>= 2.6.5), bzip2")
+SET(CPACK_DEBIAN_PACKAGE_RECOMMENDS "vim, mysql-client(>= 5.5), python(>= 2.6.5), bzip2")
 SET(CPACK_DEBIAN_PACKAGE_SUGGESTS "perl(>= 5.1), etckeeper, byobu")
 SET(CPACK_DEBIAN_PACKAGE_CONTROL_EXTRA "${CMAKE_CURRENT_SOURCE_DIR}/cmakeincludes/preinst;${CMAKE_CURRENT_SOURCE_DIR}/cmakeincludes/postinst;")
 
