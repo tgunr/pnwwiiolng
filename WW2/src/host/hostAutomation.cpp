@@ -196,11 +196,12 @@ hostRunFakeVehicles()
 	{
 		std::vector<std::future<Fake*>> updates;
 		updates.reserve(s_fakes.size());
+		auto lambda = [](Fake* f) {
+			f->update();
+			return (f->m_hv->inCorrectGrid()) ? (Fake*)nullptr : f;
+		};
 		for (auto& fake : s_fakes) {
-			updates.emplace_back(std::async([](Fake& fake) -> Fake* {
-				fake.update();
-				return (fake.m_hv->inCorrectGrid()) ? nullptr : &fake;
-			}, fake));
+			updates.emplace_back(std::async(lambda, &fake));
 		}
 		for (auto& result : updates) {
 			Fake* fake = result.get();
