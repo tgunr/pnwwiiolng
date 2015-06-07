@@ -30,7 +30,7 @@ typedef std::unordered_map<UINT32,_PERSONAS> _BRIGADE_PERSONAS;
 static _PERSONA_SELECTIONS _selections;
 
 static std::mutex _mutex;
-static std::atomic<UINT32> _selectionRequests = 0;
+static std::atomic<UINT32> _selectionRequests { 0 };
 
 //////////////////////////////////////////////////////////////////////
 // Save a persona selection
