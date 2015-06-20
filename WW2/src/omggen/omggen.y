@@ -53,6 +53,10 @@
 
 %%
 
+/****************************************************************************************************/
+/* Top Level definitions */
+/****************************************************************************************************/
+
 file				:	namespace-directive directives
 					;
 
@@ -69,48 +73,94 @@ directive			:	debug-directive
 					|	enum-directive
 					;
 
-debug-directive		:	TKW_DEBUG { omg_enable_debug(); }
-					;
-
+/*
+	NAMESPACE <identifier>;
+	Must be first directive in a file, specifies the scope for the output file.
+*/
 namespace-directive	:	TKW_NAMESPACE TIDENTIFIER ';' { omg_namespace($2); }
 					|	TKW_NAMESPACE TIDENTIFIER { yyfatal("Missing semi-colon after '%s %s' directive.", "NAMESPACE", $2); }
 					|	TKW_NAMESPACE { yymissing("identifier", "keyword", "NAMESPACE"); }
 					;
 
+/*
+	DEBUG;
+	optional
+	Enables debug mode during compilation.
+*/
+debug-directive		:	TKW_DEBUG { omg_enable_debug(); }
+					;
+
+/*
+	START-Y <unsigned int>;
+	optional
+	Specifies the starting offset for the Callback Ys in the file.
+*/
 start-y-directive	:	TKW_START_Y TINTEGER ';' { omg_start_y(atoi($2)); }
 					|	TKW_START_Y TIDENTIFIER ';' { yyfatal("Expected numeric value after '%s %s' directive.", "START-Y", $2); }
 					|	TKW_START_Y TINTEGER { yyfatal("Missing semi-colon after '%s %s' directive.", "START-Y", $2); }
 					|	TKW_START_Y { yymissing("numeric value", "keyword", "START-Y"); }
 					;
 
+/*
+	TYPE <identifier> [AS <typename>] [BY REF] [INCLUDE "filename"];
+	optional
+	Provides a definition of a given type.
+	AS <typename> provides the compile-time name of the type to use instead.
+	BY REF specifies that the values should be captured by reference.
+	INCLUDE "filename" indicates that "filename" should be included if the type is used.
+*/
 type-directive		:	typedef ';'
 					|	typedef error { yyfatal("Missing semi-colon after '%s' directive.", "TYPE"); }
 					|	TKW_TYPE scoped-identifier { yyfatal("TYPE declarations must specify a non-qualified typename. Use TYPE .. AS %s instead", $2); }
 					|	TKW_TYPE { yymissing("identifier", "keyword", "TYPE"); }
 					;
 
+/*
+	USING "filename";
+	optional
+	Reads definitions from another .omg file without generating exports of them.
+*/
 using-directive		:	TKW_USING QUOTSTRING ';' { $$ = strdup($2); }
 					|	TKW_USING QUOTSTRING { yyfatal("Missing semi-colon after '%s \"%s\"' directive.", "USING", $2); }
 					|	TKW_USING { yymissing("quoted filename", "keyword", "USING"); }
 					;
 
+/*
+	INCLUDE "filename";
+	optional
+	Adds an #include to the output source.
+*/
 include-filename	:	TKW_INCLUDE QUOTSTRING ';' { $$ = strdup($2); }
 					|	TKW_INCLUDE QUOTSTRING { yyfatal("Missing semi-colon after '%s \"%s\"' directive.", "INCLUDE", $2); $$ = nullptr; }
 					|	TKW_INCLUDE { yymissing("quoted filename", "keyword", "INCLUDE"); $$ = nullptr; }
 					;
 
-message-directive	:	message-id message-body ';' { omg_end_message(); }
-					|	message-id message-body { yyfatal("Missing semi-colon after '%s %s' directive.", "MESSAGE", $1); }
-					|	message-id { yymissing("open-brace ('{')", "MESSAGE", $1); }
-					;
-
+/*
+	ENUM <class name> { value [, value [, value ... ]] [,] };
+	optional
+	Declares one or more enumerations and automatically tracks max size.
+*/
 enum-directive		:	enum-id '{' enum-entries '}' ';' { omg_end_enum(); }
-					|	enum-id '{' enum-entries ',' '}' ';' { omg_end_enum(); }
 					|	enum-id '{' '}' { yyfatal("Empty enumeration '%s'", $1); }
 					|	enum-id '{' { yyfatal("Mal-formed ENUM directive ('%s')", $1); }
 					|	enum-id { yyfatal("Expected open-brace ('{') after 'ENUM %s' directive.", $1); }
 					;
 
+/*
+	MESSAGE <name> { ... };
+	optional
+	Declares a message structure.
+*/
+message-directive	:	message-id message-body ';' { omg_end_message(); }
+					|	message-id message-body { yyfatal("Missing semi-colon after '%s %s' directive.", "MESSAGE", $1); }
+					|	message-id { yymissing("open-brace ('{')", "MESSAGE", $1); }
+					;
+
+/****************************************************************************************************/
+/* Impementations of top level directives */
+/****************************************************************************************************/
+
+/* TYPE */
 typedef				:	TKW_TYPE TIDENTIFIER typedef-as typedef-ref typedef-inc  { omg_type_decl(TypeDef($2, $3, $4, $5)); }
 					;
 
@@ -127,18 +177,21 @@ typedef-inc			:	/* empty */ { $$ = strdup(""); }
 					;
 
 
+/* ENUM */
 enum-id				:	TKW_ENUM TIDENTIFIER { omg_start_enum($2); $$ = strdup($2); }
 					|	TKW_ENUM { yyfatal("Expected identifier after '%s' directive.", "ENUM"); }
 					;
 
-enum-entries		:	enum-entry
-					|	enum-entries ',' enum-entry
+enum-entries		:	enum-entries ',' enum-entry
+					|	enum-entries ','
+					|	enum-entry
 					;
 
 enum-entry			:	TIDENTIFIER	{ omg_add_enum_value($1); }
 					;
 
 
+/* MESSAGE */
 message-id			:	TKW_MESSAGE TIDENTIFIER	{ omg_start_message($2); $$ = strdup($2); } 
 					|	TKW_MESSAGE { yyfatal("Expected identifier after '%s' directive.", "MESSAGE"); }
 					;
@@ -158,16 +211,19 @@ message-stmt		:	field
 					|	func
 					;
 
+/* fields allowed in a conditional */
 conditional-stmt	:	field
 					|	array
 					|	conditional-block
 					;
 
+/* ARRAY */
 array-stmt			:	field
 					|	array
 					|	conditional-block
 					;
 
+/* GROUP */
 group-stmt			:	field
 					|	func
 					;
@@ -184,6 +240,7 @@ group-body			:	group-stmt
 					|	group-body group-stmt
 					;
 
+/* member value */
 field				:	valid-field ';'
 					|	valid-field { yyfatal("Missing trailing semicolon after field '%s'", $1); }
 					;
@@ -204,6 +261,7 @@ scoped-identifier	:	TIDENTIFIER TKW_CPP_SCOPE TIDENTIFIER { char* str = (char*)m
 					|	scoped-identifier TKW_CPP_SCOPE TIDENTIFIER { char* str = (char*)malloc(strlen($1) + 2 + strlen($3) + 1); sprintf(str, "%s::%s", $1, $3); $$ = str; }
 					;
 
+/* conditional blocks ("if") */
 conditional-block	:	TKW_IF { omg_start_if($1); } conditional-body { omg_end_if(); }
 					;
 
@@ -214,6 +272,8 @@ conditional-body	:	'{' conditional-stmts '}'
 conditional-stmts	:	conditional-stmt
 					|	conditional-stmts conditional-stmt
 					;
+
+/* ARRAY */
 
 array				:	TKW_ARRAY array-decl array-body { omg_end_array(); }
 					;
