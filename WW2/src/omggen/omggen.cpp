@@ -39,7 +39,7 @@ const char* g_currentFile = nullptr;
 
 enum { MAX_MESSAGE_GROUPS = 32, MAX_GROUP_FIELDS = 32 };
 
-typedef std::vector<TypeDef> TypeMap;
+using TypeMap = std::vector<TypeDef>;
 static TypeMap s_typeMap = {
 	{ "UINT8", "", false, "" },
 	{ "SINT8", "", false, "" },
@@ -413,7 +413,7 @@ void omg_type_decl(TypeDef&& typeDef)
 	if (_findTypeDef(typeDef.Name().c_str()))
 		yyfatal("redefinition of %s", typeDef.Name().c_str());
 	annotate("Added new type: %s", typeDef.Name().c_str());
-	s_typeMap.push_back(std::move(typeDef));
+	s_typeMap.emplace_back(std::move(typeDef));
 }
 
 void omg_namespace(const char* name)
@@ -1112,7 +1112,7 @@ void Array::Emit(size_t indentLevel) const
 	HXX("%s\tbool pack(ACTION_OBJECT* const a, SINT32) const;\n", indent);
 	HXX("%s\tbool unpack(ACTION_OBJECT* const a, SINT32);\n", indent);
 	HXX("%s};\n", indent);
-	HXX("%stypedef WWII::inplace_vector<%s, %s> %s;\n", indent, m_name.c_str(), m_dimension.c_str(), m_typedef.c_str());
+	HXX("%susing %s = WWII::inplace_vector<%s, %s>;\n", indent, m_typedef.c_str(), m_name.c_str(), m_dimension.c_str());
 	HXX("%s%s %s;\n", indent, m_typedef.c_str(), m_memberName.c_str());
 
 	CXX("bool %s::pack(ACTION_OBJECT* const a, SINT32) const\n", GetQualifiedName().c_str());
