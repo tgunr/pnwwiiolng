@@ -485,7 +485,7 @@
       <AssemblerListingLocation>$(IntDir)/Artifacts/</AssemblerListingLocation>
       <ObjectFileName>$(IntDir)/ObjFiles/</ObjectFileName>
       <ControlFlowGuard>false</ControlFlowGuard>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
     </ClCompile>
     <ResourceCompile>

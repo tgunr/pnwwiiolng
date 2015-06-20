@@ -113,7 +113,7 @@
       <PrecompiledHeaderFile>phui-precompiled-header.h</PrecompiledHeaderFile>
       <ControlFlowGuard>false</ControlFlowGuard>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
-      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <FunctionLevelLinking>false</FunctionLevelLinking>
       <CompileAsManaged>false</CompileAsManaged>
       <EnableParallelCodeGeneration>true</EnableParallelCodeGeneration>
     </ClCompile>
