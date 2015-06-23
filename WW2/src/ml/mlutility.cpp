@@ -51,14 +51,14 @@ UINT32 mlUtilityFindVarname(UINT32* VarNum,
 UINT32 mlUtilityGetVarnameAndContents(UCHAR ** Varname, UCHAR ** Varcontents,UCHAR * InputString)
 {
 	*Varname = (UCHAR*)strtok((char*)InputString,"= ");
-	if (*Varname != NULL)
+	if (*Varname != nullptr)
 	{
-		*Varcontents = (UCHAR*)strtok(NULL,"= ");
+		*Varcontents = (UCHAR*)strtok(nullptr,"= ");
 		*Varcontents = (UCHAR*)strtok((char*)*Varcontents,"\n"); // strip off the ending newline
 	}
 	else
 	{
-		*Varcontents = NULL;
+		*Varcontents = nullptr;
 	}
 
 	return 0;
@@ -68,14 +68,14 @@ UINT32 mlUtilityGetVarnameAndContents1(UCHAR ** Varname, UCHAR ** Varcontents,UC
 {
 
 	*Varname = (UCHAR*)strtok((char*)InputString,"= ");
-	if (*Varname != NULL)
+	if (*Varname != nullptr)
 	{
-		*Varcontents = (UCHAR*)strtok(NULL,"\0");
+		*Varcontents = (UCHAR*)strtok(nullptr,"\0");
 		*Varcontents = (UCHAR*)strtok((char*)*Varcontents,"\n"); // strip off the ending newline
 	}
 	else
 	{
-		*Varcontents = NULL;
+		*Varcontents = nullptr;
 	}
 
 	return 0;
@@ -94,23 +94,19 @@ UINT32 mlUtilityFindComponentByName(mlComponent** ComponentPtr,
 	UINT32 Found = 0;
 	mlComponentListIterator it;
 
+	const size_t compNameLen = strlen((const char*)ComponentName);
 	mlComponentListBegin(ComponentList, &it);
 	for(; it.comp; mlComponentListNext(&it))
 	{
-		if(strncmp((char*)ComponentName,(char*)it.comp->ComponentName, strlen((char*)ComponentName)) == 0)
+		if(strncmp((char*)ComponentName, (char*)it.comp->ComponentName, compNameLen) == 0)
 		{
 			*ComponentPtr = it.comp;
-
-			Found = 1;
-			break;
+			return 0;
 		}
 	}
 
-	if (Found == 0)
-	{
-		*ComponentPtr = NULL;
-		Write_Debug("Unable to find component called %s stated in component %s\n",ComponentName,Component->ComponentName);
-	}
+	*ComponentPtr = nullptr;
+	Write_Debug("Unable to find component called %s stated in component %s\n",ComponentName,Component->ComponentName);
 
 	return 0;
 }
@@ -134,7 +130,7 @@ UINT32 mlConvertModelAttitudeToWorldAttitude(piVECTOR * WorldAtt,piVECTOR * Mode
 piMATRIX Mat1;
 piVECTOR Att;
 
-	if (WorldAtt == NULL || ModelAtt == NULL)
+	if (WorldAtt == nullptr || ModelAtt == nullptr)
 	{
 		return 1;
 	}
@@ -293,13 +289,12 @@ FASTCOLLIDE TempCollide;
 	return 0;
 }
 
-#if !defined(USE_OSG)
 SINT32 mlUtilityGetPosAndAttFromDOF(OBJECT* dofObj, piVECTOR const* relpos, piVECTOR* pos, piVECTOR* att)
 {
-	piMATRIX const* dofmatrix2 = NULL;
+	piMATRIX const* dofmatrix2 = nullptr;
 	piMATRIX AttMat;
 
-	if(dofObj == NULL || dofObj->dof == NULL) return -1;
+	if(dofObj == nullptr || dofObj->dof == nullptr) return -1;
 	dofmatrix2 = &dofObj->dof->dofmatrix2;
 
 	if(pos)
@@ -321,7 +316,7 @@ SINT32 mlUtilityGetPosAndAttFromDOF(OBJECT* dofObj, piVECTOR const* relpos, piVE
 
 	return 0;
 }
-#endif
+
 UINT32 mlUtilityCheckLineSphereCollide(UINT32 * Collision, piVECTOR const* SphereCenter,
 									piVECTOR const* UseOldPos, piVECTOR const* UseNewPos, FLOAT32 Radius)
 {

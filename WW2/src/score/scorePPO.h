@@ -16,15 +16,15 @@ namespace Scoring
 					, m_type(ppoType_), m_subType(ppoSubType_), m_flags(ppoFlags_)
 					{}
 
-		public: UINT32 ppoID() const { return m_ppoID ; }
-		public: UINT32 type() const { return m_type ; }
-		public: UINT32 subType() const { return m_subType ; }
-		public: UINT32 flags() const { return m_flags ; }
+		public: UINT32 ppoID() const { return m_ppoID; }
+		public: UINT32 type() const { return m_type; }
+		public: UINT32 subType() const { return m_subType; }
+		public: UINT32 flags() const { return m_flags; }
 
-		protected:	UINT32	m_ppoID ;			//!< PPO's ID.
-		protected:	UINT32	m_type ;			//!< STO-type field.
-		protected:	UINT32	m_subType ;			//!< STO-subType field.
-		protected:	UINT32	m_flags ;			//!< Flags teh PPO had.
+		protected:	UINT32	m_ppoID;			//!< PPO's ID.
+		protected:	UINT32	m_type;				//!< STO-type field.
+		protected:	UINT32	m_subType;			//!< STO-subType field.
+		protected:	UINT32	m_flags;			//!< Flags teh PPO had.
 
 	END_SCORING_EVENT( )
 }

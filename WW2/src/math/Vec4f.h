@@ -150,7 +150,7 @@ class Vec4f
             return _v[0]*rhs._v[0]+
                    _v[1]*rhs._v[1]+
                    _v[2]*rhs._v[2]+
-                   _v[3]*rhs._v[3] ;
+                   _v[3]*rhs._v[3];
         }
 
         /** Multiply by scalar. */

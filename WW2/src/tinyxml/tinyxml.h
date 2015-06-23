@@ -194,7 +194,7 @@ class TiXmlBase
 	friend class TiXmlDocument;
 
 public:
-	TiXmlBase()	:	userData(0)		{}
+	TiXmlBase()	:	userData(nullptr)		{}
 	virtual ~TiXmlBase()			{}
 
 	/**	All TinyXml classes can print themselves to a filestream
@@ -352,7 +352,7 @@ protected:
 		else
 		{
 			// Not valid text.
-			return 0;
+			return nullptr;
 		}
 	}
 
@@ -690,19 +690,19 @@ public:
 	/// Returns true if this node has no children.
 	bool NoChildren() const						{ return !firstChild; }
 
-	virtual const TiXmlDocument*    ToDocument()    const { return 0; } ///< Cast to a more defined type. Will return null if not of the requested type.
-	virtual const TiXmlElement*     ToElement()     const { return 0; } ///< Cast to a more defined type. Will return null if not of the requested type.
-	virtual const TiXmlComment*     ToComment()     const { return 0; } ///< Cast to a more defined type. Will return null if not of the requested type.
-	virtual const TiXmlUnknown*     ToUnknown()     const { return 0; } ///< Cast to a more defined type. Will return null if not of the requested type.
-	virtual const TiXmlText*        ToText()        const { return 0; } ///< Cast to a more defined type. Will return null if not of the requested type.
-	virtual const TiXmlDeclaration* ToDeclaration() const { return 0; } ///< Cast to a more defined type. Will return null if not of the requested type.
+	virtual const TiXmlDocument*    ToDocument()    const { return nullptr; } ///< Cast to a more defined type. Will return null if not of the requested type.
+	virtual const TiXmlElement*     ToElement()     const { return nullptr; } ///< Cast to a more defined type. Will return null if not of the requested type.
+	virtual const TiXmlComment*     ToComment()     const { return nullptr; } ///< Cast to a more defined type. Will return null if not of the requested type.
+	virtual const TiXmlUnknown*     ToUnknown()     const { return nullptr; } ///< Cast to a more defined type. Will return null if not of the requested type.
+	virtual const TiXmlText*        ToText()        const { return nullptr; } ///< Cast to a more defined type. Will return null if not of the requested type.
+	virtual const TiXmlDeclaration* ToDeclaration() const { return nullptr; } ///< Cast to a more defined type. Will return null if not of the requested type.
 
-	virtual TiXmlDocument*          ToDocument()    { return 0; } ///< Cast to a more defined type. Will return null if not of the requested type.
-	virtual TiXmlElement*           ToElement()	    { return 0; } ///< Cast to a more defined type. Will return null if not of the requested type.
-	virtual TiXmlComment*           ToComment()     { return 0; } ///< Cast to a more defined type. Will return null if not of the requested type.
-	virtual TiXmlUnknown*           ToUnknown()	    { return 0; } ///< Cast to a more defined type. Will return null if not of the requested type.
-	virtual TiXmlText*	            ToText()        { return 0; } ///< Cast to a more defined type. Will return null if not of the requested type.
-	virtual TiXmlDeclaration*       ToDeclaration() { return 0; } ///< Cast to a more defined type. Will return null if not of the requested type.
+	virtual TiXmlDocument*          ToDocument()    { return nullptr; } ///< Cast to a more defined type. Will return null if not of the requested type.
+	virtual TiXmlElement*           ToElement()	    { return nullptr; } ///< Cast to a more defined type. Will return null if not of the requested type.
+	virtual TiXmlComment*           ToComment()     { return nullptr; } ///< Cast to a more defined type. Will return null if not of the requested type.
+	virtual TiXmlUnknown*           ToUnknown()	    { return nullptr; } ///< Cast to a more defined type. Will return null if not of the requested type.
+	virtual TiXmlText*	            ToText()        { return nullptr; } ///< Cast to a more defined type. Will return null if not of the requested type.
+	virtual TiXmlDeclaration*       ToDeclaration() { return nullptr; } ///< Cast to a more defined type. Will return null if not of the requested type.
 
 	/** Create an exact duplicate of this node and return it. The memory must be deleted
 		by the caller.
@@ -780,8 +780,8 @@ public:
 	/// Construct an empty attribute.
 	TiXmlAttribute() : TiXmlBase()
 	{
-		document = 0;
-		prev = next = 0;
+		document = nullptr;
+		prev = next = nullptr;
 	}
 
 	#ifdef TIXML_USE_STL
@@ -800,8 +800,8 @@ public:
 	{
 		name = _name;
 		value = _value;
-		document = 0;
-		prev = next = 0;
+		document = nullptr;
+		prev = next = nullptr;
 	}
 
 	const char*		Name()  const		{ return name.c_str(); }		///< Return the name of this attribute.
@@ -860,11 +860,11 @@ public:
 	/*	Attribute parsing starts: first letter of the name
 						 returns: the next char after the value end quote
 	*/
-	virtual const char* Parse( const char* p, TiXmlParsingData* data, TiXmlEncoding encoding );
+	virtual const char* Parse( const char* p, TiXmlParsingData* data, TiXmlEncoding encoding ) OVERRIDE_FN;
 
 	// Prints this Attribute to a FILE stream.
-	virtual void Print( FILE* cfile, int depth ) const {
-		Print( cfile, depth, 0 );
+	virtual void Print( FILE* cfile, int depth ) const OVERRIDE_FN {
+		Print( cfile, depth, nullptr );
 	}
 	void Print( FILE* cfile, int depth, TIXML_STRING* str ) const;
 
@@ -905,10 +905,10 @@ public:
 	void Add( TiXmlAttribute* attribute );
 	void Remove( TiXmlAttribute* attribute );
 
-	const TiXmlAttribute* First()	const	{ return ( sentinel.next == &sentinel ) ? 0 : sentinel.next; }
-	TiXmlAttribute* First()					{ return ( sentinel.next == &sentinel ) ? 0 : sentinel.next; }
-	const TiXmlAttribute* Last() const		{ return ( sentinel.prev == &sentinel ) ? 0 : sentinel.prev; }
-	TiXmlAttribute* Last()					{ return ( sentinel.prev == &sentinel ) ? 0 : sentinel.prev; }
+	const TiXmlAttribute* First()	const	{ return ( sentinel.next == &sentinel ) ? nullptr : sentinel.next; }
+	TiXmlAttribute* First()					{ return ( sentinel.next == &sentinel ) ? nullptr : sentinel.next; }
+	const TiXmlAttribute* Last() const		{ return ( sentinel.prev == &sentinel ) ? nullptr : sentinel.prev; }
+	TiXmlAttribute* Last()					{ return ( sentinel.prev == &sentinel ) ? nullptr : sentinel.prev; }
 
 	const TiXmlAttribute*	Find( const char* _name ) const;
 	TiXmlAttribute*	Find( const char* _name ) {
@@ -1053,12 +1053,12 @@ public:
 	/** Sets an attribute of name to a given value. The attribute
 		will be created if it does not exist, or changed if it does.
 	*/
-	void SetAttribute( const char * name, int value );
+	void SetAttribute( const char * name, int _value );
 
 	/** Sets an attribute of name to a given value. The attribute
 		will be created if it does not exist, or changed if it does.
 	*/
-	void SetDoubleAttribute( const char * name, double value );
+	void SetDoubleAttribute( const char * name, double _value );
 
 	/** Deletes an attribute with the given name.
 	*/
@@ -1107,21 +1107,21 @@ public:
 	const char* GetText() const;
 
 	/// Creates a new Element and returns it - the returned element is a copy.
-	virtual TiXmlNode* Clone() const;
+	virtual TiXmlNode* Clone() const OVERRIDE_FN;
 	// Print the Element to a FILE stream.
-	virtual void Print( FILE* cfile, int depth ) const;
+	virtual void Print( FILE* cfile, int depth ) const OVERRIDE_FN;
 
 	/*	Attribtue parsing starts: next char past '<'
 						 returns: next char past '>'
 	*/
-	virtual const char* Parse( const char* p, TiXmlParsingData* data, TiXmlEncoding encoding );
+	virtual const char* Parse( const char* p, TiXmlParsingData* data, TiXmlEncoding encoding ) OVERRIDE_FN;
 
-	virtual const TiXmlElement*     ToElement()     const { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
-	virtual TiXmlElement*           ToElement()	          { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
+	virtual const TiXmlElement*     ToElement()     const OVERRIDE_FN { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
+	virtual TiXmlElement*           ToElement() OVERRIDE_FN	          { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
 
 	/** Walk the XML tree visiting this node and all of its children.
 	*/
-	virtual bool Accept( TiXmlVisitor* visitor ) const;
+	virtual bool Accept( TiXmlVisitor* visitor ) const OVERRIDE_FN;
 
 protected:
 
@@ -1161,21 +1161,21 @@ public:
 	virtual ~TiXmlComment()	{}
 
 	/// Returns a copy of this Comment.
-	virtual TiXmlNode* Clone() const;
+	virtual TiXmlNode* Clone() const OVERRIDE_FN;
 	// Write this Comment to a FILE stream.
-	virtual void Print( FILE* cfile, int depth ) const;
+	virtual void Print( FILE* cfile, int depth ) const OVERRIDE_FN;
 
 	/*	Attribtue parsing starts: at the ! of the !--
 						 returns: next char past '>'
 	*/
-	virtual const char* Parse( const char* p, TiXmlParsingData* data, TiXmlEncoding encoding );
+	virtual const char* Parse( const char* p, TiXmlParsingData* data, TiXmlEncoding encoding ) OVERRIDE_FN;
 
-	virtual const TiXmlComment*  ToComment() const { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
-	virtual TiXmlComment*  ToComment() { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
+	virtual const TiXmlComment*  ToComment() const OVERRIDE_FN { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
+	virtual TiXmlComment*  ToComment() OVERRIDE_FN { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
 
 	/** Walk the XML tree visiting this node and all of its children.
 	*/
-	virtual bool Accept( TiXmlVisitor* visitor ) const;
+	virtual bool Accept( TiXmlVisitor* visitor ) const OVERRIDE_FN;
 
 protected:
 	void CopyTo( TiXmlComment* target ) const;
@@ -1224,25 +1224,25 @@ public:
 	void operator=( const TiXmlText& base )							 	{ base.CopyTo( this ); }
 
 	// Write this text object to a FILE stream.
-	virtual void Print( FILE* cfile, int depth ) const;
+	virtual void Print( FILE* cfile, int depth ) const OVERRIDE_FN;
 
 	/// Queries whether this represents text using a CDATA section.
 	bool CDATA() const				{ return cdata; }
 	/// Turns on or off a CDATA representation of text.
 	void SetCDATA( bool _cdata )	{ cdata = _cdata; }
 
-	virtual const char* Parse( const char* p, TiXmlParsingData* data, TiXmlEncoding encoding );
+	virtual const char* Parse( const char* p, TiXmlParsingData* data, TiXmlEncoding encoding ) OVERRIDE_FN;
 
-	virtual const TiXmlText* ToText() const { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
-	virtual TiXmlText*       ToText()       { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
+	virtual const TiXmlText* ToText() const OVERRIDE_FN { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
+	virtual TiXmlText*       ToText() OVERRIDE_FN       { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
 
 	/** Walk the XML tree visiting this node and all of its children.
 	*/
-	virtual bool Accept( TiXmlVisitor* content ) const;
+	virtual bool Accept( TiXmlVisitor* content ) const OVERRIDE_FN;
 
 protected :
 	///  [internal use] Creates a new Element and returns it.
-	virtual TiXmlNode* Clone() const;
+	virtual TiXmlNode* Clone() const OVERRIDE_FN;
 	void CopyTo( TiXmlText* target ) const;
 
 	bool Blank() const;	// returns true if all white space and new lines
@@ -1300,21 +1300,21 @@ public:
 	const char* Standalone() const		{ return standalone.c_str (); }
 
 	/// Creates a copy of this Declaration and returns it.
-	virtual TiXmlNode* Clone() const;
+	virtual TiXmlNode* Clone() const OVERRIDE_FN;
 	// Print this declaration to a FILE stream.
 	virtual void Print( FILE* cfile, int depth, TIXML_STRING* str ) const;
-	virtual void Print( FILE* cfile, int depth ) const {
-		Print( cfile, depth, 0 );
+	virtual void Print( FILE* cfile, int depth ) const OVERRIDE_FN {
+		Print( cfile, depth, nullptr );
 	}
 
-	virtual const char* Parse( const char* p, TiXmlParsingData* data, TiXmlEncoding encoding );
+	virtual const char* Parse( const char* p, TiXmlParsingData* data, TiXmlEncoding encoding ) OVERRIDE_FN;
 
-	virtual const TiXmlDeclaration* ToDeclaration() const { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
-	virtual TiXmlDeclaration*       ToDeclaration()       { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
+	virtual const TiXmlDeclaration* ToDeclaration() const OVERRIDE_FN { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
+	virtual TiXmlDeclaration*       ToDeclaration() OVERRIDE_FN       { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
 
 	/** Walk the XML tree visiting this node and all of its children.
 	*/
-	virtual bool Accept( TiXmlVisitor* visitor ) const;
+	virtual bool Accept( TiXmlVisitor* visitor ) const OVERRIDE_FN;
 
 protected:
 	void CopyTo( TiXmlDeclaration* target ) const;
@@ -1348,18 +1348,18 @@ public:
 	void operator=( const TiXmlUnknown& copy )										{ copy.CopyTo( this ); }
 
 	/// Creates a copy of this Unknown and returns it.
-	virtual TiXmlNode* Clone() const;
+	virtual TiXmlNode* Clone() const OVERRIDE_FN;
 	// Print this Unknown to a FILE stream.
-	virtual void Print( FILE* cfile, int depth ) const;
+	virtual void Print( FILE* cfile, int depth ) const OVERRIDE_FN;
 
-	virtual const char* Parse( const char* p, TiXmlParsingData* data, TiXmlEncoding encoding );
+	virtual const char* Parse( const char* p, TiXmlParsingData* data, TiXmlEncoding encoding ) OVERRIDE_FN;
 
-	virtual const TiXmlUnknown*     ToUnknown()     const { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
-	virtual TiXmlUnknown*           ToUnknown()	    { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
+	virtual const TiXmlUnknown*     ToUnknown()     const OVERRIDE_FN { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
+	virtual TiXmlUnknown*           ToUnknown() OVERRIDE_FN	    { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
 
 	/** Walk the XML tree visiting this node and all of its children.
 	*/
-	virtual bool Accept( TiXmlVisitor* content ) const;
+	virtual bool Accept( TiXmlVisitor* content ) const OVERRIDE_FN;
 
 protected:
 	void CopyTo( TiXmlUnknown* target ) const;
@@ -1434,7 +1434,7 @@ public:
 		method (either TIXML_ENCODING_LEGACY or TIXML_ENCODING_UTF8 will force TinyXml
 		to use that encoding, regardless of what TinyXml might otherwise try to detect.
 	*/
-	virtual const char* Parse( const char* p, TiXmlParsingData* data = 0, TiXmlEncoding encoding = TIXML_DEFAULT_ENCODING );
+	virtual const char* Parse( const char* p, TiXmlParsingData* data = nullptr, TiXmlEncoding encoding = TIXML_DEFAULT_ENCODING ) OVERRIDE_FN;
 
 	/** Get the root element -- the only top level element -- of the document.
 		In well formed XML, there should only be one. TinyXml is tolerant of
@@ -1516,20 +1516,20 @@ public:
 	//char* PrintToMemory() const;
 
 	/// Print this Document to a FILE stream.
-	virtual void Print( FILE* cfile, int depth = 0 ) const;
+	virtual void Print( FILE* cfile, int depth = 0 ) const OVERRIDE_FN;
 	// [internal use]
 	void SetError( int err, const char* errorLocation, TiXmlParsingData* prevData, TiXmlEncoding encoding );
 
-	virtual const TiXmlDocument*    ToDocument()    const { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
-	virtual TiXmlDocument*          ToDocument()          { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
+	virtual const TiXmlDocument*    ToDocument()    const OVERRIDE_FN { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
+	virtual TiXmlDocument*          ToDocument() OVERRIDE_FN          { return this; } ///< Cast to a more defined type. Will return null not of the requested type.
 
 	/** Walk the XML tree visiting this node and all of its children.
 	*/
-	virtual bool Accept( TiXmlVisitor* content ) const;
+	virtual bool Accept( TiXmlVisitor* content ) const OVERRIDE_FN;
 
 protected :
 	// [internal use]
-	virtual TiXmlNode* Clone() const;
+	virtual TiXmlNode* Clone() const OVERRIDE_FN;
 	#ifdef TIXML_USE_STL
 	virtual void StreamIn( std::istream * in, TIXML_STRING * tag );
 	#endif
@@ -1676,13 +1676,13 @@ public:
 	TiXmlNode* ToNode() const			{ return node; }
 	/** Return the handle as a TiXmlElement. This may return null.
 	*/
-	TiXmlElement* ToElement() const		{ return ( ( node && node->ToElement() ) ? node->ToElement() : 0 ); }
+	TiXmlElement* ToElement() const		{ return ( ( node && node->ToElement() ) ? node->ToElement() : nullptr ); }
 	/**	Return the handle as a TiXmlText. This may return null.
 	*/
-	TiXmlText* ToText() const			{ return ( ( node && node->ToText() ) ? node->ToText() : 0 ); }
+	TiXmlText* ToText() const			{ return ( ( node && node->ToText() ) ? node->ToText() : nullptr ); }
 	/** Return the handle as a TiXmlUnknown. This may return null.
 	*/
-	TiXmlUnknown* ToUnknown() const		{ return ( ( node && node->ToUnknown() ) ? node->ToUnknown() : 0 ); }
+	TiXmlUnknown* ToUnknown() const		{ return ( ( node && node->ToUnknown() ) ? node->ToUnknown() : nullptr ); }
 
 	/** @deprecated use ToNode.
 		Return the handle as a TiXmlNode. This may return null.
@@ -1731,21 +1731,21 @@ public:
 	TiXmlPrinter() : depth( 0 ), simpleTextPrint( false ),
 					 buffer(), indent( "    " ), lineBreak( "\n" ) {}
 
-	virtual bool VisitEnter( const TiXmlDocument& doc );
-	virtual bool VisitExit( const TiXmlDocument& doc );
+	virtual bool VisitEnter( const TiXmlDocument& doc ) OVERRIDE_FN;
+	virtual bool VisitExit( const TiXmlDocument& doc ) OVERRIDE_FN;
 
-	virtual bool VisitEnter( const TiXmlElement& element, const TiXmlAttribute* firstAttribute );
-	virtual bool VisitExit( const TiXmlElement& element );
+	virtual bool VisitEnter( const TiXmlElement& element, const TiXmlAttribute* firstAttribute ) OVERRIDE_FN;
+	virtual bool VisitExit( const TiXmlElement& element ) OVERRIDE_FN;
 
-	virtual bool Visit( const TiXmlDeclaration& declaration );
-	virtual bool Visit( const TiXmlText& text );
-	virtual bool Visit( const TiXmlComment& comment );
-	virtual bool Visit( const TiXmlUnknown& unknown );
+	virtual bool Visit( const TiXmlDeclaration& declaration ) OVERRIDE_FN;
+	virtual bool Visit( const TiXmlText& text ) OVERRIDE_FN;
+	virtual bool Visit( const TiXmlComment& comment ) OVERRIDE_FN;
+	virtual bool Visit( const TiXmlUnknown& unknown ) OVERRIDE_FN;
 
 	/** Set the indent characters for printing. By default 4 spaces
 		but tab is also useful, or null/empty string for no indentation.
 	*/
-	void SetIndent( const char* _indent )			{ indent = _indent ? _indent : "" ; }
+	void SetIndent( const char* _indent )			{ indent = _indent ? _indent : ""; }
 	/// Query the indention string.
 	const char* Indent()							{ return indent.c_str(); }
 	/** Set the line breaking string. By default set to newline (\n).

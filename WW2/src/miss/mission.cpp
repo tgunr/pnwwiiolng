@@ -8,10 +8,6 @@
 // Originating Programmer: Brian "Stick" Duelm
 
 #include "versionNo.h"
-#include "dbug/dbug.h"
-
-#include <time.h>
-#include <assert.h>
 
 #include "chat/chatBroadcast.h"
 #include "chat/chatHandle.h"
@@ -44,16 +40,16 @@
 
 #include "include/logging.h"
 
-typedef std::map<UINT32,Mission*> MissionIndex ;
+typedef std::map<UINT32,Mission*> MissionIndex;
 
-typedef std::vector<Mission*> InstanceMissions ;
-typedef std::map< instanceid_t, InstanceMissions > InstanceMissionIndex ;
+typedef std::vector<Mission*> InstanceMissions;
+typedef std::map< instanceid_t, InstanceMissions > InstanceMissionIndex;
 
-extern const std::string& sdmTranslateName(const std::string& from) ;
+extern const std::string& sdmTranslateName(const std::string& from);
 
 // Use the self-serializing SerialNumber class to
 // track mission IDs across a campaign.
-static SerialNumber missionSerial("missionid", MIN_MISSION_ID, 100, MAX_MISSION_ID) ;
+static SerialNumber missionSerial("missionid", MIN_MISSION_ID, 100, MAX_MISSION_ID);
 
 const char* _missionTypes[MAX_MISSION_TYPES] =
 {
@@ -64,18 +60,18 @@ const char* _missionTypes[MAX_MISSION_TYPES] =
 ,	"RECON"
 ,	"RESUPPLY"
 ,	"SYSTEM_MISSION"
-} ;
+};
 
 #ifdef OUTPUT_FACILITIES
 FILE * blahFile;
 #endif
 
-static WEAPON_SPEC weap_truck ;
-static WEAPON_SPEC weap_bomber ;
+static WEAPON_SPEC weap_truck;
+static WEAPON_SPEC weap_bomber;
 
-static MissionIndex g_missions ;			// Missions by ID
-static MissionIndex g_postedMissions ;		// Missions by Player
-static InstanceMissionIndex g_instanceMissionIndex ;
+static MissionIndex g_missions;			// Missions by ID
+static MissionIndex g_postedMissions;		// Missions by Player
+static InstanceMissionIndex g_instanceMissionIndex;
 
 // ------------------- private functions --------------------
 
@@ -83,19 +79,19 @@ static void
 _roomFillEntry(RoomListEntry& entry, RMLIST_ACTION action, const Player* player)
 {
 	entry.m_action = action;
-	entry.m_handle = player->chatHandle() ;
+	entry.m_handle = player->chatHandle();
 	if ( player->hasVehicle() )
 	{
 		entry.m_weapon = player->weapon().spec;
-		entry.m_serial = player->weapon().serial ;
+		entry.m_serial = player->weapon().serial;
 	}
 	else
 	{
-		entry.m_weapon = NULL_WEAP_SPEC ;
-		entry.m_serial = 0 ;
+		entry.m_weapon = NULL_WEAP_SPEC;
+		entry.m_serial = 0;
 	}
-	entry.m_flags = player->roomListFlags() ;
-	entry.m_rank = player->effectiveRank() ;
+	entry.m_flags = player->roomListFlags();
+	entry.m_rank = player->effectiveRank();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -104,62 +100,62 @@ _roomFillEntry(RoomListEntry& entry, RMLIST_ACTION action, const Player* player)
 static bool
 _validBrigadeOrigin(const HCUnit* unit, const FacilityStruct* facility)
 {
-	const CPStruct* cp = facility->cp ;
-	if ( cp == NULL )
+	const CPStruct* cp = facility->cp;
+	if ( cp == nullptr )
 	{
-		dbugLog(_FLA, "no cp") ;
-		return false ;
+		dbugLog(_FLA, "no cp");
+		return false;
 	}
 
 	if ( facility->side != unit->side() )
 	{
-		dbugLog(_FLI, "%s/%s side mismatch", facility->name, unit->name()) ;
-		return false ;
+		dbugLog(_FLI, "%s/%s side mismatch", facility->name, unit->name());
+		return false;
 	}
 
-	const CPStruct* bcp = strtGetCP(unit->homeCPID()) ;
+	const CPStruct* bcp = strtGetCP(unit->homeCPID());
 	if ( bcp )
 		dbugLog(_FLI, "XXX posting mission at %s:%s for brigade %s@%s units %" PRSizeT ":%" PRSizeT ""
 						, facility->name, cp->name
 						, unit->name(), bcp->name
-						, cp->m_units.size(), bcp->m_units.size()) ;
+						, cp->m_units.size(), bcp->m_units.size());
 	else
-		dbugLog(_FLI, "XXX can't find brigade home") ;
+		dbugLog(_FLI, "XXX can't find brigade home");
 
 	if ( unit->canUseOrigin(facility->type) == false )
 	{
-		dbugLog(_FLIB, " CANT USE ORIGIN") ;
-		return false ;
+		dbugLog(_FLIB, " CANT USE ORIGIN");
+		return false;
 	}
 
 	// We know this depot isn't in the same town as the brigade, so is it
 	// a combat depot origin?
 	if ( facility->getSupplyingUnit(unit, bcp) == 0 )
 	{
-		dbugLog(_FLIB, " NO SUP UNIT") ;
-		return false ;
+		dbugLog(_FLIB, " NO SUP UNIT");
+		return false;
 	}
 
-	return true ;
+	return true;
 }
 
 bool
 missionValidBrigadeOrigin(const FacilityStruct* facility, UINT32 brigadeID)
 {
-	if ( facility == NULL || brigadeID == 0 )
+	if ( facility == nullptr || brigadeID == 0 )
 	{
-		dbugLog(_FLA, "invalid facility/brigade lookup") ;
-		return false ;
+		dbugLog(_FLA, "invalid facility/brigade lookup");
+		return false;
 	}
 
-	const HCUnit* unit = HCUnit::Lookup(brigadeID) ;
-	if ( unit == NULL )
+	const HCUnit* unit = HCUnit::Lookup(brigadeID);
+	if ( unit == nullptr )
 	{
-		dbugLog(_FLI, "XXX can't find brigade %u", brigadeID) ;
-		return false ;
+		dbugLog(_FLI, "XXX can't find brigade %u", brigadeID);
+		return false;
 	}
 
-	return _validBrigadeOrigin(unit, facility) ;
+	return _validBrigadeOrigin(unit, facility);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -168,15 +164,15 @@ missionValidBrigadeOrigin(const FacilityStruct* facility, UINT32 brigadeID)
 void
 missionCheckOrigins(CPStruct* cp)
 {
-	assert( NULL != cp ) ;
+	assert( nullptr != cp );
 
-	Mission* current ;
-	Mission* next ;
+	Mission* current;
+	Mission* next;
 
-	for ( current = cp->m_missionsFrom ; current != NULL ; current = next )
+	for ( current = cp->m_missionsFrom; current != nullptr; current = next )
 	{
-		next = current->m_nextFromOrigin ;
-		current->checkOrigin() ;
+		next = current->m_nextFromOrigin;
+		current->checkOrigin();
 	}
 }
 
@@ -184,13 +180,13 @@ bool
 Mission::checkOrigin()
 {
 	if ( !ongoing() || !brigade() )
-		return true ;
+		return true;
 	if ( _validBrigadeOrigin(brigade(), originFac()) )
-		return true ;
-	chatSendBroadcast(Chat::_ORDERS, m_instanceID, missionID(), LSTR_ORDERS, LSTR_NO_LINK_TO_BRIGADE) ;
-	cancel() ;
+		return true;
+	chatSendBroadcast(Chat::_ORDERS, m_instanceID, missionID(), LSTR_ORDERS, LSTR_NO_LINK_TO_BRIGADE);
+	cancel();
 
-	return false ;
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -199,21 +195,21 @@ Mission::checkOrigin()
 void
 missionFirebaseDestroyed(const FacilityStruct& facility)
 {
-	const Mission* current ;
-	for ( current = facility.cp->m_missionsTo ; current != NULL ; current = current->m_nextToTarget )
+	const Mission* current;
+	for ( current = facility.cp->m_missionsTo; current != nullptr; current = current->m_nextToTarget )
 	{
 		if ( current->numTakers() <= 0 )
-			continue ;
+			continue;
 		if ( current->originFac() == &facility || current->targetFac() == &facility )
-			chatSendBroadcast(Chat::_ORDERS, current->instanceID(), current->missionID(), LSTR_ORDERS, LSTR_OBJECT_DESTROYED, facility.name) ;
+			chatSendBroadcast(Chat::_ORDERS, current->instanceID(), current->missionID(), LSTR_ORDERS, LSTR_OBJECT_DESTROYED, facility.name);
 	}
 
-	for ( current = facility.cp->m_missionsFrom ; current != NULL ; current = current->m_nextFromOrigin )
+	for ( current = facility.cp->m_missionsFrom; current != nullptr; current = current->m_nextFromOrigin )
 	{
 		if ( current->numTakers() <= 0 )
-			continue ;
+			continue;
 		if ( current->originFac() == &facility || current->targetFac() == &facility )
-			chatSendBroadcast(Chat::_ORDERS, current->instanceID(), current->missionID(), LSTR_ORDERS, LSTR_OBJECT_DESTROYED, facility.name) ;
+			chatSendBroadcast(Chat::_ORDERS, current->instanceID(), current->missionID(), LSTR_ORDERS, LSTR_OBJECT_DESTROYED, facility.name);
 	}
 }
 
@@ -224,36 +220,29 @@ missionFirebaseDestroyed(const FacilityStruct& facility)
 void
 missionRevokeMissionsFrom(const FacilityStruct& facility)
 {
-	if ( facility.cp->m_missionsTo == NULL )
-		return ;
+	if ( facility.cp->m_missionsTo == nullptr )
+		return;
 
-	Mission* current ;
-	Mission* next ;
+	Mission* current;
+	Mission* next;
 
-	for ( current = facility.cp->m_missionsFrom ; current != NULL ; current = next )
+	for ( current = facility.cp->m_missionsFrom; current != nullptr; current = next )
 	{
-		next = current->m_nextFromOrigin ;
+		next = current->m_nextFromOrigin;
 
 		if ( current->originFac()->uOID != facility.uOID )
-			continue ;
+			continue;
 		if ( current->side() != facility.side )
-			continue ;
+			continue;
 		if ( !current->ongoing() )
-			continue ;
+			continue;
 
 		if ( current->numTakers() > 0 && facility.type != FACILITY_FIREBASE )
 		{
-			chatSendBroadcast(Chat::_ORDERS, current->instanceID(), current->missionID(), LSTR_ORDERS, LSTR_BASE_CAPTURED, facility.name) ;
-
-			for ( auto it = current->m_takers.begin() ; it != current->m_takers.end() ; ++it )
-			{
-				Player* const player = it->second ;
-				if ( player != NULL && !player->isSpawned() )
-					wwiiSendDialog(player->teulIndex(), DLG_BASE_CAPTURED) ;
-			}
+			chatSendBroadcast(Chat::_ORDERS, current->instanceID(), current->missionID(), LSTR_ORDERS, LSTR_BASE_CAPTURED, facility.name);
 		}
 
-		current->cancel() ;
+		current->cancel();
 	}
 }
 
@@ -264,9 +253,9 @@ bool
 Player::ableToPost() const
 {
 	if ( brigadeID() == 0 )
-		return false ;
+		return false;
 
-	return ableToPostIn(*brigade()) ;
+	return ableToPostIn(*brigade());
 }
 
 bool
@@ -274,18 +263,18 @@ Player::ableToPostIn(const Brigade& toBrigade) const
 {
 	// If you have POST_MISSIONS permission, ahead you go
 	if ( permissions(POST_MISSIONS) )
-		return true ;
+		return true;
 
 	// If you don't have brevet posting permission,
 	// then you won't be able to post regardless
 	if ( permissions(BREVET_POSTING) == false )
-		return false ;
+		return false;
 
 	// You can't post here unless there's an officer present
 	if ( toBrigade.officers() < 1 )
-		return false ;
+		return false;
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -296,10 +285,10 @@ Player::ableToPostIn(const Brigade& toBrigade) const
 Mission::Mission(const instanceid_t& forInstanceID, const MISSION_SUMMARY& withSummary)
 	: m_takers(), m_spawner()
 {
-	dbugLog(_FLD, "ALLOC: +mission at %p in:%llu", this, forInstanceID) ;
-	memset((MISSION_C_STRUCTURE*)this, 0, sizeof(MISSION_C_STRUCTURE)) ;
-	m_instanceID = forInstanceID ;
-	m_summary = withSummary ;
+	dbugLog(_FLD, "ALLOC: +mission at %p in:%llu", this, forInstanceID);
+	memset((MISSION_C_STRUCTURE*)this, 0, sizeof(MISSION_C_STRUCTURE));
+	m_instanceID = forInstanceID;
+	m_summary = withSummary;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -308,7 +297,7 @@ Mission::Mission(const instanceid_t& forInstanceID, const MISSION_SUMMARY& withS
 static void
 _postPlayerPosting(Mission* mission)
 {
-	g_postedMissions[mission->playerID()] = mission ;
+	g_postedMissions[mission->playerID()] = mission;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -317,9 +306,9 @@ _postPlayerPosting(Mission* mission)
 static void
 _releasePlayerPosting(const Mission* mission)
 {
-	MissionIndex::iterator it = g_postedMissions.find(mission->playerID()) ;
+	MissionIndex::iterator it = g_postedMissions.find(mission->playerID());
 	if ( it != g_postedMissions.end() && it->second == mission )
-		g_postedMissions.erase(it) ;
+		g_postedMissions.erase(it);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -328,8 +317,8 @@ _releasePlayerPosting(const Mission* mission)
 Mission*
 Player::activeMission() const
 {
-	MissionIndex::iterator it = g_postedMissions.find(playerID()) ;
-	return ( it == g_postedMissions.end() ) ? NULL : it->second ;
+	MissionIndex::iterator it = g_postedMissions.find(playerID());
+	return ( it == g_postedMissions.end() ) ? nullptr : it->second;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -338,23 +327,23 @@ Player::activeMission() const
 static void
 _removeMissionFromInstanceIndex(const Mission* mission)
 {
-	InstanceMissionIndex::iterator it = g_instanceMissionIndex.find(mission->instanceID()) ;
+	InstanceMissionIndex::iterator it = g_instanceMissionIndex.find(mission->instanceID());
 	if ( it == g_instanceMissionIndex.end() )
-		return ;
+		return;
 
-	for ( size_t i = 0 ; i < it->second.size() ; ++i )
+	for ( size_t i = 0; i < it->second.size(); ++i )
 	{
 		if ( it->second[i] == mission )
 		{
-			it->second[i] = it->second.back() ;
-			it->second.pop_back() ;
-			break ;
+			it->second[i] = it->second.back();
+			it->second.pop_back();
+			break;
 		}
 	}
 
 	// If we just removed the last column, delete this row.
 	if ( it->second.empty() )
-		g_instanceMissionIndex.erase(it) ;
+		g_instanceMissionIndex.erase(it);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -368,31 +357,31 @@ Mission::~Mission()
 		dbugLog(_FLD, "m:%u posted:%d[%s] country:%d branch:%d side:%d brig:%d[%s] -REL"
 						, missionID()
 						, playerID()
-						, chatGetCallsign(m_poster)
+						, Chat::Name(m_poster).c_str()
 						, country()
 						, branch()
 						, side()
 						, (brigade()) ? brigade()->brigadeID() : 0
 						, (brigade()) ? brigade()->name() : "<none>"
-						) ;
+						);
 
-		purgeTakers() ;
-		removeFromCPLists() ;
+		purgeTakers();
+		removeFromCPLists();
 
-		if ( brigade() != NULL )
-			brigade()->removeMission(this) ;
+		if ( brigade() != nullptr )
+			brigade()->removeMission(this);
 
-		g_missions.erase(missionID()) ;
-		_releasePlayerPosting(this) ;
+		g_missions.erase(missionID());
+		_releasePlayerPosting(this);
 
 		// Tell chat it can discard waypoints
-		chatSendMissionDeletionNotice(missionID()) ;
+		chatSendMissionDeletionNotice(missionID());
 
 		// Remove from the instance list and cleanup
-		_removeMissionFromInstanceIndex(this) ;
+		_removeMissionFromInstanceIndex(this);
 	}
 
-	dbugLog(_FLD, "ALLOC: -mission at %p", this) ;
+	dbugLog(_FLD, "ALLOC: -mission at %p", this);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -403,15 +392,15 @@ Mission::activate()
 {
 	dbugLog(_FLI, "m:%u activating", missionID());
 
-	bool wasActive = m_isActive ;
+	bool wasActive = m_isActive;
 
-	m_isActive = m_isOngoing = true ;
-	m_deactivatedAt = 0 ;
+	m_isActive = m_isOngoing = true;
+	m_deactivatedAt = 0;
 
-	if ( brigade() != NULL && !isSystemMission() )
-		brigade()->activateMission() ;
+	if ( brigade() != nullptr && !isSystemMission() )
+		brigade()->activateMission();
 
-	sendLaunchUpdates(!wasActive) ;
+	sendLaunchUpdates(!wasActive);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -420,7 +409,7 @@ Mission::activate()
 BRANCH_ENUM
 Mission::branch() const
 {
-	return (NULL != brigade()) ? brigade()->branch() : BRANCH_LAND ;
+	return (nullptr != brigade()) ? brigade()->branch() : BRANCH_LAND;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -431,22 +420,22 @@ void
 Mission::deactivate()
 {
 	if ( isSystemMission() )
-		return ;
+		return;
 
 	dbugLog(_FLI, "m:%u deactivating", missionID());
 
-	bool wasActive = m_isActive ;
+	bool wasActive = m_isActive;
 
-	m_isActive = false ;
-	m_isOngoing = true ;
+	m_isActive = false;
+	m_isOngoing = true;
 
-	if ( brigade() != NULL )
-		brigade()->deactivateMission() ;
+	if ( brigade() != nullptr )
+		brigade()->deactivateMission();
 
-	m_deactivatedAt = teulTime() ;
+	m_deactivatedAt = teulTime();
 
-	bool forceUpdate = (wasActive != m_isActive) ;
-	sendLaunchUpdates(forceUpdate) ;
+	bool forceUpdate = (wasActive != m_isActive);
+	sendLaunchUpdates(forceUpdate);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -455,20 +444,20 @@ Mission::deactivate()
 bool
 Mission::addPlayer(Player* player)
 {
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
-		dbugLog(_FLA, "NULL persona in addPlayer") ;
-		return false ;
+		dbugLog(_FLA, "NULL persona in addPlayer");
+		return false;
 	}
 	if ( player->playerID() <= DEFAULT_PLAYER_ID )
 	{
 		dbugLog(_FLW, "t:%d p:%u c:%s illegal playerID", player->teulIndex(), player->playerID(), player->callsign());
-		return false ;
+		return false;
 	}
 
-	m_takers[player->playerID()] = player ;
+	m_takers[player->playerID()] = player;
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -478,28 +467,28 @@ MISSION_CODE
 Mission::accessibility(Player* player) const
 {
 	if ( !player->personaID() )
-		return MC_BRIGADE ;
+		return MC_BRIGADE;
 
 	// You can't take the mission once it's pending
 	if ( !ongoing() )
-		return MC_EXPIRED ;
+		return MC_EXPIRED;
 
 	if ( !active() && player->missionID() != missionID() && player->playerID() != playerID() )
-		return MC_EXPIRED ;
+		return MC_EXPIRED;
 
 	if ( player->brigadeID() != brigade()->brigadeID() )
-		return MC_BRIGADE ;
+		return MC_BRIGADE;
 
 	if ( player->branch() != branch() )
-		return MC_BRANCH ;
+		return MC_BRANCH;
 
-	if ( m_originFac == NULL || m_originFac->side != side() )
-		return MC_CAPTURED ;
+	if ( m_originFac == nullptr || m_originFac->side != side() )
+		return MC_CAPTURED;
 
 	if ( player->side() != side() )
-		return MC_CAPTURED ;
+		return MC_CAPTURED;
 
-	return MC_JOIN ;
+	return MC_JOIN;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -510,24 +499,24 @@ Mission::cancel()
 {
 	if ( isMobileSpawnAvailable() )
 	{
-		betaLog(_FLI, "m:%u cancel killing mobile spawn", missionID()) ;
-		deactivateMobileSpawn(MSDR_MISSION_EXPIRED) ;
+		betaLog(_FLI, "m:%u cancel killing mobile spawn", missionID());
+		deactivateMobileSpawn(MSDR_MISSION_EXPIRED);
 	}
 
 	if ( isSystemMission() )
-		return ;
+		return;
 
 	if ( active() || ongoing() )
 	{
-		dbugLog(_FLI, "m:%u being cancelled", missionID()) ;
+		dbugLog(_FLI, "m:%u being cancelled", missionID());
 
-		if ( active() && brigade() != NULL )
-			brigade()->deactivateMission() ;
+		if ( active() && brigade() != nullptr )
+			brigade()->deactivateMission();
 
-		m_isActive = m_isOngoing = false ;
-		_releasePlayerPosting(this) ;
+		m_isActive = m_isOngoing = false;
+		_releasePlayerPosting(this);
 
-		sendLaunchUpdates(true) ;
+		sendLaunchUpdates(true);
 	}
 }
 
@@ -537,45 +526,45 @@ Mission::cancel()
 void
 Mission::changeLeadership(Player* player)
 {
-	UINT32 oldLeaderID = m_playerID ;
-	_releasePlayerPosting(this) ;
+	UINT32 oldLeaderID = m_playerID;
+	_releasePlayerPosting(this);
 
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
-		player = PlayerInterface::Lookup(m_backupLeader) ;
-		if ( player == NULL || player->missionID() != missionID() || player->playerID() == playerID() )
+		player = PlayerInterface::Lookup(m_backupLeader);
+		if ( player == nullptr || player->missionID() != missionID() || player->playerID() == playerID() )
 		{
-			dbugLog(_FLD, "m:%u no new leadership, deactivating", missionID()) ;
-			deactivate() ;
+			dbugLog(_FLD, "m:%u no new leadership, deactivating", missionID());
+			deactivate();
 		}
-		return ;
+		return;
 	}
 
-	m_playerID = player->playerID() ;
-	m_poster = player->chatHandle() ;
-	chatGetCallsign(summary().callsign, player->chatHandle()) ;
+	m_playerID = player->playerID();
+	m_poster = player->chatHandle();
+	chatGetCallsign(summary().callsign, player->chatHandle());
 
 	// Ok - mission now belongs to you
-	_postPlayerPosting(this) ;
+	_postPlayerPosting(this);
 
-	player->SetPersonaMissionFlags() ;
-	player->updateMissionTaker(false) ;
-	player->updateChat() ;
+	player->SetPersonaMissionFlags();
+	player->updateMissionTaker(false);
+	player->updateChat();
 
-	player = PlayerInterface::Lookup(oldLeaderID) ;
-	if ( player != NULL && player->missionID() == missionID() )
+	player = PlayerInterface::Lookup(oldLeaderID);
+	if ( player != nullptr && player->missionID() == missionID() )
 	{
-		player->SetPersonaMissionFlags() ;
-		player->updateMissionTaker(false) ;
-		player->updateChat() ;
+		player->SetPersonaMissionFlags();
+		player->updateMissionTaker(false);
+		player->updateChat();
 	}
 
 	if ( !active() )
-		activate() ;
+		activate();
 
-	m_backupLeader = 0 ;
+	m_backupLeader = 0;
 
-	markForUpdate() ;
+	markForUpdate();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -587,65 +576,66 @@ Mission::initializeHelpers(WWII_SIDE withSide, Brigade* withBrigade)
 	if ( isValidSide(withSide) == false )
 	{
 		///TODO: Find a better way to cope with this
-		m_side = AXIS ;
+		m_side = AXIS;
 	}
 	else
-		m_side = withSide ;
+		m_side = withSide;
 
-	m_originFac = strtGetFacility(summary().origin) ;
-	if ( m_originFac != NULL )
+	m_originFac = strtGetFacility(summary().origin);
+	if ( m_originFac != nullptr )
 	{
-		summary().origin = m_originFac->fullObjID ;
-		m_originCP = m_originFac->cp ;
-	}
-	else
-	{
-		m_originCP = strtGetCPorBridge(summary().origin) ;
-		if ( m_originCP != NULL )
-			summary().origin = m_originCP->fullObjID ;
-	}
-
-	m_targetFac = strtGetFacility(summary().target) ;
-	if ( m_targetFac != NULL )
-	{
-		summary().target = m_targetFac->fullObjID ;
-		m_targetCP = m_targetFac->cp ;
+		summary().origin = m_originFac->fullObjID;
+		m_originCP = m_originFac->cp;
 	}
 	else
 	{
-		m_targetCP = strtGetCPorBridge(summary().target) ;
-		if ( m_targetCP != NULL )
-			summary().target = m_targetCP->fullObjID ;
+		m_originCP = strtGetCPorBridge(summary().origin);
+		if ( m_originCP != nullptr )
+			summary().origin = m_originCP->fullObjID;
 	}
 
-	if ( m_originCP == NULL )
+	m_targetFac = strtGetFacility(summary().target);
+	if ( m_targetFac != nullptr )
 	{
-		dbugLog(_FLA, "can't create mission with invalid origin %d.%d.%u", summary().origin.cell.ox, summary().origin.cell.oy, summary().origin.id) ;
-		return false ;
+		summary().target = m_targetFac->fullObjID;
+		m_targetCP = m_targetFac->cp;
 	}
-
-	if ( m_targetCP == NULL )
+	else
 	{
-		m_targetFac = m_originFac ;
-		m_targetCP = m_originCP ;
+		m_targetCP = strtGetCPorBridge(summary().target);
+		if ( m_targetCP != nullptr )
+			summary().target = m_targetCP->fullObjID;
 	}
 
-	dbugLog(_FLI, "Initialized Mission Helpers: origin(%d.%d.%u) = %s, target(%d.%d.%u) = %s"
-					, summary().origin.cell.ox, summary().origin.cell.oy, summary().origin.id
+	if ( m_originCP == nullptr )
+	{
+		dbugLog(_FLA, "can't create mission with invalid origin " PRF_FULL_OBJ_ID ""
+						, PRA_FULL_OBJ_ID(summary().origin));
+		return false;
+	}
+
+	if ( m_targetCP == nullptr )
+	{
+		m_targetFac = m_originFac;
+		m_targetCP = m_originCP;
+	}
+
+	dbugLog(_FLI, "Initialized Mission Helpers: origin(" PRF_FULL_OBJ_ID ") = %s, target(" PRF_FULL_OBJ_ID ") = %s"
+					, PRA_FULL_OBJ_ID(summary().origin)
 					, m_originCP->name
-					, summary().target.cell.ox, summary().target.cell.oy, summary().target.id
+					, PRA_FULL_OBJ_ID(summary().target)
 					, m_targetCP->name
-					) ;
+					);
 
-	m_linkFromTarget = m_targetCP->linkTo(m_originCP) ;
+	m_linkFromTarget = m_targetCP->linkTo(m_originCP);
 
-	m_brigadeID = withBrigade->unitID() ;
-	m_brigade = withBrigade ;
-	m_country = withBrigade->country() ;
+	m_brigadeID = withBrigade->unitID();
+	m_brigade = withBrigade;
+	m_country = withBrigade->country();
 
-	m_poster = chatGetHandle(summary().callsign) ;
+	m_poster = chatGetHandle(summary().callsign);
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -654,7 +644,7 @@ Mission::initializeHelpers(WWII_SIDE withSide, Brigade* withBrigade)
 bool
 Mission::isFrontLine() const
 {
-	return ( m_originCP != NULL && (m_originCP->isEnemyLinked() || m_originCP->isContested()) ) ;
+	return ( m_originCP != nullptr && (m_originCP->isEnemyLinked() || m_originCP->isContested()) );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -663,8 +653,8 @@ Mission::isFrontLine() const
 void
 Mission::markForUpdate()
 {
-	if ( brigade() != NULL )
-		brigade()->updateMissionList() ;
+	if ( brigade() != nullptr )
+		brigade()->updateMissionList();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -675,15 +665,15 @@ Mission::purgeTakers()
 {
 	// Any takers to remove?
 	if ( m_takers.empty() )
-		return ;
+		return;
 
-	dbugLog(_FLI, "m:%u removing all %u takers", summary().missionID, numTakers()) ;
+	dbugLog(_FLI, "m:%u removing all %u takers", summary().missionID, numTakers());
 	while ( !m_takers.empty() )
 	{
 		if ( !removePlayer(m_takers.begin()->first, false) )
 		{
-			LogAbort("mission %d: unable to remove %d from takerlist", summary().missionID, m_takers.begin()->first) ;
-			return ;
+			LogAbort("mission %d: unable to remove %d from takerlist", summary().missionID, m_takers.begin()->first);
+			return;
 		}
 	}
 }
@@ -695,25 +685,25 @@ void
 Mission::removeFromCPLists()
 {
 	if ( !m_registered )
-		return ;
+		return;
 
 	// Remove it from the CP lists
-	if ( m_nextFromOrigin != NULL )
-		m_nextFromOrigin->m_prevFromOrigin = m_prevFromOrigin ;
+	if ( m_nextFromOrigin != nullptr )
+		m_nextFromOrigin->m_prevFromOrigin = m_prevFromOrigin;
 	if ( m_prevFromOrigin )
-		m_prevFromOrigin->m_nextFromOrigin = m_nextFromOrigin ;
+		m_prevFromOrigin->m_nextFromOrigin = m_nextFromOrigin;
 	else
-		m_originCP->m_missionsFrom = m_nextFromOrigin ;
+		m_originCP->m_missionsFrom = m_nextFromOrigin;
 
 	// And the target list
 	if ( m_nextToTarget )
-		m_nextToTarget->m_prevToTarget = m_prevToTarget ;
+		m_nextToTarget->m_prevToTarget = m_prevToTarget;
 	if ( m_prevToTarget )
-		m_prevToTarget->m_nextToTarget = m_nextToTarget ;
+		m_prevToTarget->m_nextToTarget = m_nextToTarget;
 	else
-		m_targetCP->m_missionsTo = m_nextToTarget ;
+		m_targetCP->m_missionsTo = m_nextToTarget;
 
-	m_registered = false ;
+	m_registered = false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -723,55 +713,55 @@ bool
 Mission::removePlayer(UINT32 withPlayerID, bool announce)
 {
 	if ( withPlayerID == m_backupLeader )
-		m_backupLeader = 0 ;
+		m_backupLeader = 0;
 
-	PLAYER_MAP::iterator it = m_takers.find(withPlayerID) ;
+	PLAYER_MAP::iterator it = m_takers.find(withPlayerID);
 	if ( it == m_takers.end() )
 	{
-		dbugLog(_FLW, "p:%u m:%u player not on mission list to extract", withPlayerID, missionID()) ;
-		return false ;
+		dbugLog(_FLW, "p:%u m:%u player not on mission list to extract", withPlayerID, missionID());
+		return false;
 	}
 
-	Player* player = it->second ;
+	Player* player = it->second;
 
-	m_takers.erase(it) ;
+	m_takers.erase(it);
 
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
-		dbugLog(_FLA, "p:%u m:%u player has NULL persona on mission list", withPlayerID, missionID()) ;
-		return false ;
+		dbugLog(_FLA, "p:%u m:%u player has NULL persona on mission list", withPlayerID, missionID());
+		return false;
 	}
 
 	dbugLog(_FLI, "t:%d p:%u c:%s %s extracted from mission %u (%p) leaving %d members"
 					, player->teulIndex(), player->playerID(), player->callsign()
 					, ((player->isMissionLeader()) ? "LEADER" : "taker")
-					, summary().missionID, this, numTakers()) ;
+					, summary().missionID, this, numTakers());
 
 	if ( announce )
-		updateTaker(player, RMLIST_DELETE, true) ;
+		updateTaker(player, RMLIST_DELETE, true);
 
 	if ( active() && player->isMissionLeader() )
 	{
 		if ( m_takers.empty() )
-			cancel() ;
+			cancel();
 		else if ( m_backupLeader == 0 )
-			deactivate() ;
+			deactivate();
 		else
 		{
-			it = m_takers.find(m_backupLeader) ;
+			it = m_takers.find(m_backupLeader);
 			if ( it == m_takers.end() || it->second->missionID() != missionID() )
 			{
-				dbugLog(_FLI, "m:%u bl:%u is no-longer a member", missionID(), backupLeader()) ;
+				dbugLog(_FLI, "m:%u bl:%u is no-longer a member", missionID(), backupLeader());
 			}
 			else
-				changeLeadership(it->second) ;
+				changeLeadership(it->second);
 		}
 
 	}
 
-	player->unsetMission() ;
+	player->unsetMission();
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -780,57 +770,57 @@ Mission::removePlayer(UINT32 withPlayerID, bool announce)
 void
 Mission::sendLaunchUpdates(bool force)
 {
-	const bool allowMobileSpawn = isMobileSpawnAllowed() ;
+	const bool allowMobileSpawn = isMobileSpawnAllowed();
 	if ( allowMobileSpawn != summary().m_canMobileSpawn )
 	{
-		force = true ;
-		summary().m_canMobileSpawn = allowMobileSpawn ;
+		force = true;
+		summary().m_canMobileSpawn = allowMobileSpawn;
 	}
 
-	bool launchable = true ;
+	bool launchable = true;
 
 	if ( force )
-		markForUpdate() ;
+		markForUpdate();
 
 	// Use one time value throughout
-	UINT32 now = teulTime() ;
+	UINT32 now = teulTime();
 
 	// Determine whether or not the timer needs to be changed
 	if ( summary().timeLaunch != 0 )
 	{
-		UINT32 launchWindow = now ;
-		UINT32 nextLaunch = now + host_config.mission.launchCycle_s ;
+		UINT32 launchWindow = now;
+		UINT32 nextLaunch = now + host_config.mission.launchCycle_s;
 
 		// Launchable depends on whether or not the timer has lapsed
-		launchable = (summary().timeLaunch < nextLaunch) ;
+		launchable = (summary().timeLaunch < nextLaunch);
 
 		// If we're employing launch windows, adjust the launch timers as we go.
 		if ( nextLaunch > now && summary().timeLaunch < launchWindow )
-			summary().timeLaunch = nextLaunch ;
+			summary().timeLaunch = nextLaunch;
 	}
 	else
-		launchable = true ;
+		launchable = true;
 
 	if ( numTakers() == 0 )
-		return ;
+		return;
 
 	// Notify all the players on the mission list
-	const bool isActive = active() ;
-	const bool isOngoing = ongoing() ;
-	const bool hasMsp = isMobileSpawnAvailable() ;
-	const UINT32 id = missionID() ;
-	for ( auto it = m_takers.begin() ; it != m_takers.end() ; )
+	const bool isActive = active();
+	const bool isOngoing = ongoing();
+	const bool hasMsp = isMobileSpawnAvailable();
+	const UINT32 id = missionID();
+	for ( auto it = m_takers.begin(); it != m_takers.end(); )
 	{
-		Player* const player = it->second ;
-		++it ;
-		if ( player == NULL || player->isAtLobby() == false )
-			continue ;
+		Player* const player = it->second;
+		++it;
+		if ( player == nullptr || player->isAtLobby() == false )
+			continue;
 
-		bool goForLaunch = false ;
+		bool goForLaunch = false;
 		if ( player->m_nextLaunch <= (UINT32)teulTime() && launchable )
 		{
-			player->m_launchPermitted = true ;
-			goForLaunch = true ;
+			player->m_launchPermitted = true;
+			goForLaunch = true;
 
 		}
 		if ( (force | goForLaunch) )
@@ -854,36 +844,36 @@ void
 Mission::updateTaker(Player* player, RMLIST_ACTION action, bool excludeSelf)
 {
 	RoomList oneList;
-	Player* current ;
+	Player* current;
 
 	if ( numTakers() == 0 )
-		return ;
+		return;
 
-	player->updateRoomListFlags() ;
+	player->updateRoomListFlags();
 
 	oneList.m_numEntries = 1;
 	_roomFillEntry(oneList.m_entry[0], action, player);
 
-	PLAYER_MAP::iterator it ;
-	for ( it = m_takers.begin() ; it != m_takers.end() ; ++it )
+	PLAYER_MAP::iterator it;
+	for ( it = m_takers.begin(); it != m_takers.end(); ++it )
 	{
-		current = it->second ;
-		if ( current == NULL )
-			continue ;
+		current = it->second;
+		if ( current == nullptr )
+			continue;
 
 		if ( excludeSelf && current->playerID() == player->playerID() )
-			continue ;
+			continue;
 
 		if ( current->isConnected() )
 		{
 			dbugLog(_FLD, "t:%d p:%u c:%s sending mission update for %s; isSpawned:%s"
-							, current->teulIndex(), current->playerID(), current->callsign(), player->callsign(), ((oneList.m_entry[0].m_flags & RMLIST_SPAWNED) ? "yes" : "no")) ;
-			sendToClientRoomList(current->teulIndex(), oneList) ;
+							, current->teulIndex(), current->playerID(), current->callsign(), player->callsign(), ((oneList.m_entry[0].m_flags & RMLIST_SPAWNED) ? "yes" : "no"));
+			sendToClientRoomList(current->teulIndex(), oneList);
 		}
 		else
 		{
 			dbugLog(_FLD, "t:%d p:%u c:%s not connected for mission update for %s; isSpawned:%s"
-							, current->teulIndex(), current->playerID(), current->callsign(), player->callsign(), ((oneList.m_entry[0].m_flags & RMLIST_SPAWNED) ? "yes" : "no")) ;
+							, current->teulIndex(), current->playerID(), current->callsign(), player->callsign(), ((oneList.m_entry[0].m_flags & RMLIST_SPAWNED) ? "yes" : "no"));
 		}
 	}
 }
@@ -893,13 +883,13 @@ Mission::updateTaker(Player* player, RMLIST_ACTION action, bool excludeSelf)
 void
 MissionPacket::flushVolatiles()
 {
-	discardSortieData() ;
+	discardSortieData();
 
-	sortie().originFac = nullObjID ;
-	sortie().target = nullObjID ;
-	vehicle().rtbFacility = nullObjID ;
-	m_missionType = RECON ;
-	rtbReservedWeapon = NULL_WEAP_SERIAL ;
+	sortie().originFac = nullObjID;
+	sortie().target = nullObjID;
+	vehicle().rtbFacility = nullObjID;
+	m_missionType = RECON;
+	rtbReservedWeapon = NULL_WEAP_SERIAL;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -908,7 +898,7 @@ MissionPacket::flushVolatiles()
 bool
 MissionPacket::successfulDuration() const
 {
-	return (duration_s() >= MINIMUM_TIME_FOR_MISSION_SUCCESS) ;
+	return (duration_s() >= MINIMUM_TIME_FOR_MISSION_SUCCESS);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -922,71 +912,71 @@ bool
 MissionPacket::successful(const WEAPON_SPEC& weaponSpec) const
 {
 	if ( weaponSpec.wType == 0 )
-		return false ;
+		return false;
 
-	const UINT8 rtb = vehicle().rtbState() ;
+	const UINT8 rtb = vehicle().rtbState();
 	if ( m_missionType == RESUPPLY )
-		return ( rtb == RTB_SUCCESS && m_vehicleResupplied == true ) ;
+		return ( rtb == RTB_SUCCESS && m_vehicleResupplied == true );
 
 	if ( !successfulDuration() )
-		return false ;
+		return false;
 
 	if ( rtb != RTB_SUCCESS && rtb != RTB_BAIL_FRIENDLY )
-		return false ;
+		return false;
 
 	if ( scoring().kills() > 0 )
-		return true ;
+		return true;
 
 	// Vehicles that don't neccessarily get a kill
 	if ( weaponSpec.wClass == weap_bomber.wClass || weaponSpec.wClass == weap_truck.wClass )
-		return true ;
+		return true;
 
-	return false ;
+	return false;
 }
 
 // Tell players what time their mission will launch at.
 static void
 _sendTimeUpdates(UINT32 now)
 {
-	MissionIndex::iterator it ;
-	Mission* mission ;
+	MissionIndex::iterator it;
+	Mission* mission;
 
-	UINT32 timeout = now - (host_config.mission.timeOut_m * 60) ;
+	UINT32 timeout = now - (host_config.mission.timeOut_m * 60);
 
 #if defined(DEV_BUILD)
 	if ( g_logDebug )
-		betaLog(_FLD, "sendTimeUpdates") ;
+		betaLog(_FLD, "sendTimeUpdates");
 #endif
 
 	// We may delete the mission while we're iterating, so make sure
 	// the iterator iterates before we obliterate
-	for ( it = g_missions.begin() ; it != g_missions.end() ; )
+	for ( it = g_missions.begin(); it != g_missions.end(); )
 	{
-		mission = it->second ;
-		++it ;
+		mission = it->second;
+		++it;
 
 #if defined(DEV_BUILD)
 		if ( g_logDebug )
 		{
-			betaLog(_FLDB, " #%u[act:%u,og:%u,nt:%u]", mission->missionID(), mission->active(), mission->ongoing(), mission->numTakers()) ;
+			betaLog(_FLDB, " #%u[act:%u,og:%u,nt:%u]", mission->missionID(), mission->active(), mission->ongoing(), mission->numTakers());
 		}
 #endif
 
 		if ( mission->spawner().isActive() )
 		{
-			MSPAWN_RESULT result = mission->getMobileSpawnPermission() ;
+			MSPAWN_RESULT result = mission->getMobileSpawnPermission();
 			if ( result != MSDR_GRANTED )
-				mission->deactivateMobileSpawn(result) ;
+				mission->deactivateMobileSpawn(result);
 		}
 
 		if ( mission->active() )
 		{
 			if ( mission->summary().timeLaunch != 0 )
-				mission->sendLaunchUpdates(false) ;
+				mission->sendLaunchUpdates(false);
 		}
 
 		if ( mission->isSystemMission() )
-			continue ;
+			continue;
 
 		// On the event server the mission can be inactive because the
 		// mission leader hasn't yet logged in. This may present
@@ -997,14 +987,14 @@ _sendTimeUpdates(UINT32 now)
 			dbugLog(_FLI, "m:%u empty, no takers, deleting", mission->missionID());
 
 			// We're thru with this mission - so be gone!
-			delete mission ;
-			continue ;
+			delete mission;
+			continue;
 		}
 
 		if ( !mission->active() && mission->ongoing() && mission->m_deactivatedAt <= timeout )
 		{
-			dbugLog(_FLD, "m:%u inactive for %u seconds, cancelling", mission->missionID(), now - mission->m_deactivatedAt) ;
-			mission->cancel() ;
+			dbugLog(_FLD, "m:%u inactive for %u seconds, cancelling", mission->missionID(), now - mission->m_deactivatedAt);
+			mission->cancel();
 		}
 	}
 }
@@ -1017,18 +1007,18 @@ _sendTimeUpdates(UINT32 now)
 void
 checkForTimedOutMissions()
 {
-	static TeulTimeMS nextCheck = 0 ;
+	static TeulTimeMS nextCheck = 0;
 
 	if ( g_missions.empty() )
-		return ;
+		return;
 
 	if ( teulClock64 >= nextCheck )
 	{
 #if defined(DEV_BUILD)
-		dbugLog(_FLD, "%s: patrolling %" PRSizeT " missions", __FUNCTION__, g_missions.size()) ;
+		dbugLog(_FLD, "%s: patrolling %" PRSizeT " missions", __FUNCTION__, g_missions.size());
 #endif
 		_sendTimeUpdates(teulTime());
-		nextCheck = teulClock64 + 5000 ;
+		nextCheck = teulClock64 + 5000;
 	}
 }
 
@@ -1039,26 +1029,26 @@ static void
 _populateMissionDescription(Mission& mission, const char* desc)
 {
 	//make a description
-	if ( desc == NULL )
-		desc = "" ;
+	if ( desc == nullptr )
+		desc = "";
 	else
 	{
 		// Look for non-whitespace characters; if we don't find
 		// any then treat this as an empty string.
-		const char* p = desc ;
+		const char* p = desc;
 		while ( *p && WWII::BytesFromCharacter[(unsigned int)*p] == 1 && isspace(*p) )
-			++p ;
+			++p;
 		if ( *p == 0 )
-			desc = "" ;
+			desc = "";
 	}
 
 	// Size-restrained copy and size-tracking.
-	mission.m_descSize = 0 ;
+	mission.m_descSize = 0;
 	while ( *desc && mission.m_descSize < MapMiss::MISSION_DESC_LENGTH )
 	{
-		mission.m_desc[mission.m_descSize++] = *(desc++) ;
+		mission.m_desc[mission.m_descSize++] = *(desc++);
 	}
-	mission.m_desc[mission.m_descSize] = 0 ;
+	mission.m_desc[mission.m_descSize] = 0;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1078,7 +1068,7 @@ _createMission(instanceid_t instanceID
 				, bool makeAvailable
 				)
 {
-	Mission* mission = NULL ;
+	Mission* mission = nullptr;
 
 	try
 	{
@@ -1091,74 +1081,74 @@ _createMission(instanceid_t instanceID
 					);
 
 		{
-			dbugLog(_FLIB, " origin: %d.%d.%u, targ: %d.%d.%u"
-							, summary.origin.cell.ox, summary.origin.cell.oy, summary.origin.id
-							, summary.target.cell.ox, summary.target.cell.oy, summary.target.id
-							) ;
+			dbugLog(_FLIB, " origin: " PRF_FULL_OBJ_ID ", targ: " PRF_FULL_OBJ_ID ""
+							, PRA_FULL_OBJ_ID(summary.origin)
+							, PRA_FULL_OBJ_ID(summary.target)
+							);
 		}
 
 		if ( activeCountries[country] == false )
-			throw std::invalid_argument("illegal country selection") ;
+			throw std::invalid_argument("illegal country selection");
 
 		if ( creatorType != PLAYER_GENERATED && creatorType != EXTERNALLY_GENERATED )
-			throw std::invalid_argument("only PLAYER_GENERATED and EXTERNALLY_GENERATED mission types handled") ;
+			throw std::invalid_argument("only PLAYER_GENERATED and EXTERNALLY_GENERATED mission types handled");
 
 		if ( !isValidSide(side) )
-			throw std::invalid_argument("can only create missions for ALLIED or AXIS") ;
+			throw std::invalid_argument("can only create missions for ALLIED or AXIS");
 
-		if ( brigade == NULL )
-			throw std::invalid_argument("can't create mission with NULL brigade") ;
+		if ( brigade == nullptr )
+			throw std::invalid_argument("can't create mission with NULL brigade");
 
 		//set up space for the mission structure
-		mission = new Mission(instanceID, summary) ;
+		mission = new Mission(instanceID, summary);
 
 #ifdef BETA_RELEASE
-		if ( brigade == NULL )
-			LogAbort("managed to get past NULL brigade check") ;
+		if ( brigade == nullptr )
+			LogAbort("managed to get past NULL brigade check");
 #endif
 
 		if ( ! mission->initializeHelpers(side, brigade) )
-			throw std::runtime_error("unable to initialize mission helpers") ;	///Terminal
+			throw std::runtime_error("unable to initialize mission helpers");	///Terminal
 
 #ifdef BETA_RELEASE
-		if ( brigade == NULL )
-			LogAbort("stack clobber?") ;
+		if ( brigade == nullptr )
+			LogAbort("stack clobber?");
 #endif
 
 		mission->m_creationTime = postingTime;
 		mission->m_playerID = playerID;
-		mission->m_backupLeader = 0 ;
+		mission->m_backupLeader = 0;
 
 		if ( host_config.mission.minStartTime_s > 0
 			&& mission->creatorType() == PLAYER_GENERATED
 			&& mission->isFrontLine()
 			)
 		{
-			UINT32 minStart = host_config.mission.minStartTime_s + currentTime ;
+			UINT32 minStart = host_config.mission.minStartTime_s + currentTime;
 			if ( mission->summary().timeLaunch < minStart)
 			{
-				mission->summary().timeLaunch = minStart ;
+				mission->summary().timeLaunch = minStart;
 			}
 		}
 
 		//do specific things for PLAYER_GENERATED missions
 		//set the timeIn stuff
-		mission->m_deactivatedAt = mission->m_timePost = teulTime() ;
-//		mission->m_timeTimeout = mission->m_timePost + (host_config.mission.timeOut_m * 60) ;
-//		mission->m_timeRemove = mission->m_timeTimeout + (host_config.mission.expire_m * 60) ;
+		mission->m_deactivatedAt = mission->m_timePost = teulTime();
+//		mission->m_timeTimeout = mission->m_timePost + (host_config.mission.timeOut_m * 60);
+//		mission->m_timeRemove = mission->m_timeTimeout + (host_config.mission.expire_m * 60);
 
-		mission->m_isActive = makeAvailable ;
-		mission->m_isOngoing = true ;
+		mission->m_isActive = makeAvailable;
+		mission->m_isOngoing = true;
 
-		mission->m_creatorType = creatorType ;
+		mission->m_creatorType = creatorType;
 		if ( creatorType != EXTERNALLY_GENERATED || mission->missionID() == 0 )
-			mission->summary().missionID = static_cast<UINT32>(missionSerial.getNext()) ;
+			mission->summary().missionID = static_cast<UINT32>(missionSerial.getNext());
 
-		mission->registerToLists() ;
+		mission->registerToLists();
 
-		_populateMissionDescription(*mission, desc) ;
+		_populateMissionDescription(*mission, desc);
 
-		mission->summary().m_canMobileSpawn = mission->isMobileSpawnAllowed() ;
+		mission->summary().m_canMobileSpawn = mission->isMobileSpawnAllowed();
 
 		//broadcast missions
 #ifdef MULTIPLE_MISSION_HOSTS
@@ -1169,22 +1159,22 @@ _createMission(instanceid_t instanceID
 	}
 	catch (std::exception& e)
 	{
-		dbugLog(_FLA, "unable to create mission: %s", e.what()) ;
-		if ( mission != NULL )
-			delete mission ;
-		return NULL ;
+		dbugLog(_FLA, "unable to create mission: %s", e.what());
+		if ( mission != nullptr )
+			delete mission;
+		return nullptr;
 	}
 
-	return mission ;
+	return mission;
 }
 
 Mission*
 mapFindMission(UINT32 id)
 {
-	MissionIndex::iterator it = g_missions.find(id) ;
+	MissionIndex::iterator it = g_missions.find(id);
 	if ( it == g_missions.end() )
-		return NULL ;
-	return it->second ;
+		return nullptr;
+	return it->second;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1197,105 +1187,105 @@ mapFindMission(UINT32 id)
 SINT32
 missionSendMissionPostReply(MISSION_POST_REQ& request, Player* player, SINT32 connection)
 {
-	if ( player == NULL )
+	if ( player == nullptr )
 	{
 		dbugLog(_FLA, "NULL persona passed to %s()",__FUNCTION__);
 		return -EINVAL;
 	}
 
-	player->ExitMission() ;
+	player->ExitMission();
 
 	if ( g_logDebug )
 	{
 		dbugLog(_FLD, "t:%d p:%u c:%s Mission Post: "
-						"brig:%d mt:%d %d.%d.%u %d.%d.%u [%s]"
+			"brig:%d mt:%d " PRF_FULL_OBJ_ID " -> " PRF_FULL_OBJ_ID " [%s]"
 						, player->teulIndex(), player->playerID(), player->callsign()
 						, player->brigadeID()
 						, request.missionType
-						, request.origin.cell.ox, request.origin.cell.oy, request.origin.id
-						, request.target.cell.ox, request.target.cell.oy, request.target.id
+						, PRA_FULL_OBJ_ID(request.origin)
+						, PRA_FULL_OBJ_ID(request.target)
 						, request.desc
 						);
 	}
 
-	FacilityStruct* postingFacility ;
-	UINT32 now = teulTime() ;
+	FacilityStruct* postingFacility;
+	UINT32 now = teulTime();
 
 	MISSION_POST_REPLY reply;
-	static MISSION_SUMMARY summary ;
+	static MISSION_SUMMARY summary;
 
-	memset(&summary, 0, sizeof(summary)) ;
+	memset(&summary, 0, sizeof(summary));
 
-	reply.missionID = 0 ;
-	reply.reasonCode = MC_ERROR ;
-	reply.posted = FALSE ;
+	reply.missionID = 0;
+	reply.reasonCode = MC_ERROR;
+	reply.posted = FALSE;
 
-	summary.missionID = 0 ;
+	summary.missionID = 0;
 	summary.missionType = request.missionType;
-	summary.subType = request.subType ;
+	summary.subType = request.subType;
 	summary.origin = request.origin;
 	summary.target = request.target;
 	summary.timeLaunch = 0;
 
 	memcpy(summary.callsign, player->callsign(), sizeof(summary.callsign));
 
-	postingFacility = strtGetFacility(request.origin) ;
+	postingFacility = strtGetFacility(request.origin);
 
 	if ( player->hasActiveMission() )
 	{
-		player->log("Mission post denied: already has an active mission") ;
-		player->message(LSTR_MISSION_POST_DENIED, LSTR_MPD_EXISTING_MISSION) ;
-		reply.reasonCode = MC_BY_USER_EXISTS ;
+		player->log("Mission post denied: already has an active mission");
+		player->message(LSTR_MISSION_POST_DENIED, LSTR_MPD_EXISTING_MISSION);
+		reply.reasonCode = MC_BY_USER_EXISTS;
 	}
 	else if ( player->brigadeID() == 0 )
 	{
-		player->log("Mission post denied: no brigade selected") ;
-		player->message(LSTR_MISSION_POST_DENIED, LSTR_MPD_NO_BRIGADE) ;
-		reply.reasonCode = MC_BRIGADE ;
+		player->log("Mission post denied: no brigade selected");
+		player->message(LSTR_MISSION_POST_DENIED, LSTR_MPD_NO_BRIGADE);
+		reply.reasonCode = MC_BRIGADE;
 	}
 	else if ( !player->ableToPost() )
 	{
 //		if ( player->permissions(BREVET_POSTING) )
 //		{
-//			player->debug("Mission post denied", "Brigade no-longer active") ;
-//			reply.reasonCode = MC_BRIGADE_INACTIVE ;
+//			player->debug("Mission post denied", "Brigade no-longer active");
+//			reply.reasonCode = MC_BRIGADE_INACTIVE;
 //		}
 //		else
 //		{
-			player->log("Mission post denied: no post permission") ;
+			player->log("Mission post denied: no post permission");
 			if ( !player->permissions(NO_ADS) && player->realRank() >= player->maxRank() )
-				player->message(LSTR_MISSION_POST_DENIED, LSTR_MPD_RANK_AD) ;
+				player->message(LSTR_MISSION_POST_DENIED, LSTR_MPD_RANK_AD);
 			else
-				player->message(LSTR_MISSION_POST_DENIED, LSTR_MPD_RANK_NO_AD) ;
-			reply.reasonCode = MC_NO_PERMISSION ;
+				player->message(LSTR_MISSION_POST_DENIED, LSTR_MPD_RANK_NO_AD);
+			reply.reasonCode = MC_NO_PERMISSION;
 //		}
 	}
-	else if ( postingFacility == NULL )
+	else if ( postingFacility == nullptr )
 	{
-		player->log("Mission post denied: Invalid facility") ;
-		char fidBuffer[FULL_OBJ_ID::PrintLen] ;
-		player->message(LSTR_MISSION_POST_DENIED, LSTR_MPD_INVALID_FAC, weapPrintFullObjIDC(&request.origin, fidBuffer)) ;
-		reply.reasonCode = MC_ERROR ;
+		player->log("Mission post denied: Invalid facility");
+		char fidBuffer[FULL_OBJ_ID::PrintLen];
+		player->message(LSTR_MISSION_POST_DENIED, LSTR_MPD_INVALID_FAC, weapPrintFullObjIDC(&request.origin, fidBuffer));
+		reply.reasonCode = MC_ERROR;
 	}
 	else if ( postingFacility->side != player->side() || activeCountries[postingFacility->country] == false )
 	{
-		player->log("Mission post denied: Wrong facility ownership") ;
-		player->message(LSTR_MISSION_POST_DENIED, LSTR_MPD_DONT_OWN) ;
-		reply.reasonCode = MC_CAPTURED ;
+		player->log("Mission post denied: Wrong facility ownership");
+		player->message(LSTR_MISSION_POST_DENIED, LSTR_MPD_DONT_OWN);
+		reply.reasonCode = MC_CAPTURED;
 	}
 	else if ( _validBrigadeOrigin(player->brigade(), postingFacility) == false )
 	{
-		player->log("Mission post denied: Facility not usable by brigade") ;
-		player->message(LSTR_MISSION_POST_DENIED, LSTR_MPD_NON_BDE_ORIG) ;
-		reply.reasonCode = MC_BRIGADE ;
+		player->log("Mission post denied: Facility not usable by brigade");
+		player->message(LSTR_MISSION_POST_DENIED, LSTR_MPD_NON_BDE_ORIG);
+		reply.reasonCode = MC_BRIGADE;
 	}
 	else
 	{
-		player->log("Mission post approved") ;
-		player->message(LSTR_NOTE, LSTR_MISSION_POST_APPROVED) ;
+		player->log("Mission post approved");
+		player->message(LSTR_NOTE, LSTR_MISSION_POST_APPROVED);
 		// Success
-		reply.posted = TRUE ;
-		reply.reasonCode = MC_DETAIL ;
+		reply.posted = TRUE;
+		reply.reasonCode = MC_DETAIL;
 	}
 
 	//if any of the above cases matched, don't try to create, just return the
@@ -1304,18 +1294,18 @@ missionSendMissionPostReply(MISSION_POST_REQ& request, Player* player, SINT32 co
 		return sendToClientMissionPostReply(reply, connection);
 
 	//set up the mission
-	Mission* mission = _createMission(player->instance().id(), summary, player->side(), player->country(), request.desc, PLAYER_GENERATED, player->playerID(), now, now, player->brigade(), false) ;
+	Mission* mission = _createMission(player->instance().id(), summary, player->side(), player->country(), request.desc, PLAYER_GENERATED, player->playerID(), now, now, player->brigade(), false);
 
-	if ( mission == NULL )
+	if ( mission == nullptr )
 	{
 		dbugLog(_FLA, "t:%d p:%u c:%s failed to create mission", player->teulIndex(), player->playerID(), player->callsign());
 		reply.posted=FALSE;
-		reply.reasonCode = MC_ERROR ;
+		reply.reasonCode = MC_ERROR;
 	}
 	else
 	{
-		reply.missionID = mission->missionID() ;
-		reply.posted = TRUE ;
+		reply.missionID = mission->missionID();
+		reply.posted = TRUE;
 	}
 
 	return sendToClientMissionPostReply(reply, connection);
@@ -1332,8 +1322,8 @@ missInit()
 	blahFile=fopen("/tmp/facilities","w");
 #endif
 
-	weap_truck = weapCreateSpec("GV_truck.1") ;
-	weap_bomber = weapCreateSpec("AC_bomber.1") ;
+	weap_truck = weapCreateSpec("GV_truck.1");
+	weap_bomber = weapCreateSpec("AC_bomber.1");
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1344,28 +1334,28 @@ missInit()
 bool
 Player::enterMission(Mission* newMission)
 {
-	BETAInfo(teulIndex()) ;
+	BETAInfo(teulIndex());
 
-	if ( newMission == NULL )
+	if ( newMission == nullptr )
 	{
-		dbugLog(_FLA, "t:%d p:%u c:%s trying to add to NULL mission", teulIndex(), playerID(), callsign()) ;
-		return false ;
+		dbugLog(_FLA, "t:%d p:%u c:%s trying to add to NULL mission", teulIndex(), playerID(), callsign());
+		return false;
 	}
 
 	if ( hasVehicle() )
-		cancelWeapon(true) ;
+		cancelWeapon(true);
 
 	if ( !newMission->addPlayer(this) )
 	{
 		dbugLog(_FLA,"t:%d p:%u c:%s coudln't add to mission %d", teulIndex(), playerID(), callsign(), newMission->missionID());
-		return false ;
+		return false;
 	}
 
-	SetMission(newMission) ;
+	SetMission(newMission);
 
-	sendFullMissionTakerList() ;
+	sendFullMissionTakerList();
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1374,55 +1364,55 @@ Player::enterMission(Mission* newMission)
 void
 Player::sendFullMissionTakerList()
 {
-	assert( mission() != NULL ) ;
+	assert( mission() != nullptr );
 
 	// Make sure we have a clear list
-	clearMissionTakerList() ;
+	clearMissionTakerList();
 
 	// Set the room list flags
-	updateRoomListFlags() ;
+	updateRoomListFlags();
 
 	// Entry used for announcing myself to people I visit
-	RoomList myAnnouncement ;
+	RoomList myAnnouncement;
 	myAnnouncement.m_numEntries = 1;
-	_roomFillEntry(myAnnouncement.m_entry[0], RMLIST_ADD, this) ;
+	_roomFillEntry(myAnnouncement.m_entry[0], RMLIST_ADD, this);
 
 	// List of all the player's we're going to send to me
-	RoomList currentRoomList ;
-	UINT32 i = 0 ;
-	PLAYER_MAP::iterator it ;
-	for ( it = mission()->m_takers.begin() ; it != mission()->m_takers.end() ; ++it )
+	RoomList currentRoomList;
+	UINT32 i = 0;
+	PLAYER_MAP::iterator it;
+	for ( it = mission()->m_takers.begin(); it != mission()->m_takers.end(); ++it )
 	{
-		Player* const subject = it->second ;
-		if ( subject == NULL )
+		Player* const subject = it->second;
+		if ( subject == nullptr )
 			LogAbort("t:%d p:%u c:%s m:%u NULL persona in list for %u", teulIndex(), playerID(), callsign(), missionID(), it->first);
 
 		if ( i >= MAX_ROOM_LIST_ENTRIES )
 		{
-			currentRoomList.m_numEntries = i ;
+			currentRoomList.m_numEntries = i;
 			if ( sendToClientRoomList(teulIndex(), currentRoomList) < 0 )
-				dbugLog(_FLW, "sendToClientRoomList failed") ;
-			i = 0 ;
+				dbugLog(_FLW, "sendToClientRoomList failed");
+			i = 0;
 		}
 
 		// Notify other players on the list that we have joined
 		if ( subject->isConnected() && subject->playerID() != playerID() )
 		{
 			if ( sendToClientRoomList(subject->teulIndex(), myAnnouncement) < 0 )
-				dbugLog(_FLW, "sendToClientRoomList failed") ;
+				dbugLog(_FLW, "sendToClientRoomList failed");
 		}
 
 		// Now add this player to the temporary room list
 		_roomFillEntry(currentRoomList.m_entry[i], RMLIST_ADD, subject);
 
-		i++ ;
+		i++;
 	}
 
 	if ( i > 0 )
 	{
-		currentRoomList.m_numEntries = i ;
+		currentRoomList.m_numEntries = i;
 		if ( sendToClientRoomList(teulIndex(), currentRoomList) < 0 )
-			dbugLog(_FLW, "sendToClientRoomList failed") ;
+			dbugLog(_FLW, "sendToClientRoomList failed");
 	}
 }
 
@@ -1431,49 +1421,55 @@ Mission::registerToLists()
 {
 	if ( mapFindMission(missionID()) )
 	{
-		dbugLog(_FLW, "mission: %d already registered", missionID()) ;
-		return ;
+		dbugLog(_FLW, "mission: %d already registered", missionID());
+		return;
 	}
 
-	if ( m_originCP == NULL || m_targetCP == NULL )
+	if ( m_originCP == nullptr || m_targetCP == nullptr )
 	{
-		LogAbort("crap mission") ;
+		LogAbort("crap mission");
 	}
 
-	g_missions[missionID()] = this ;
+	g_missions[missionID()] = this;
 
 	if ( isSystemMission() )
-		return ;
+		return;
 
-	m_brigade->addMission(this) ;
-	markForUpdate() ;
+	m_brigade->addMission(this);
+	markForUpdate();
 
-	m_nextFromOrigin = m_originCP->m_missionsFrom ;
+	m_nextFromOrigin = m_originCP->m_missionsFrom;
 	if ( m_nextFromOrigin )
-		m_nextFromOrigin->m_prevFromOrigin = this ;
-	m_originCP->m_missionsFrom = this ;
+		m_nextFromOrigin->m_prevFromOrigin = this;
+	m_originCP->m_missionsFrom = this;
 
-	m_nextToTarget = m_targetCP->m_missionsTo ;
+	m_nextToTarget = m_targetCP->m_missionsTo;
 	if ( m_nextToTarget )
-		m_nextToTarget->m_prevToTarget = this ;
-	m_targetCP->m_missionsTo = this ;
+		m_nextToTarget->m_prevToTarget = this;
+	m_targetCP->m_missionsTo = this;
 
 	if ( creatorType() == PLAYER_GENERATED )
-		_postPlayerPosting(this) ;
+		_postPlayerPosting(this);
 
-	m_registered = true ;
+	m_registered = true;
 }
 
 SINT32 missionSendMMCapacityRequest(Player* player, CAPACITY_REQUEST_STATE tag)
 {
-	if ( player == NULL || !player->validMissionPacket() )
+	if (PN_UNLIKELY(player == nullptr || !player->validMissionPacket()))
 		return -1;
 
-	BETAInfo(player->teulIndex()) ;
+	BETAInfo(player->teulIndex());
 
-	MissionPacket& mp = player->missionPacket() ;
+	ENDPOINT* stratHost = serverPeerEndpointByType(STRAT_HOST);
+	if (PN_UNLIKELY(stratHost == nullptr)) {
+		dbugLog(_FLW, "unable to send capacity request: no strat host");
+		return -1;
+	}
 
-	SINT32 retval = -1 ;
+	MissionPacket& mp = player->missionPacket();
+
+	SINT32 retval = -1;
 	switch ( mp.m_missionType )
 	{
 	case POINT_ATTACK:
@@ -1487,7 +1483,7 @@ SINT32 missionSendMMCapacityRequest(Player* player, CAPACITY_REQUEST_STATE tag)
 						mp.sortie().target(),
 						(CODE_RTB)mp.vehicle().rtbState()
 						);
-	break ;
+	break;
 	case POINT_DEFENSE:
 	case AREA_DEFENSE:
 		//get capacity of origin
@@ -1497,20 +1493,20 @@ SINT32 missionSendMMCapacityRequest(Player* player, CAPACITY_REQUEST_STATE tag)
 						mp.sortie().originFac(),
 						(CODE_RTB)mp.vehicle().rtbState()
 						);
-	break ;
+	break;
 	default:
 		//some other mission type that we can't process
-		dbugLog(_FLW, "cap request not sent: don't know how to process mission type %u", mp.m_missionType) ;
-	break ;
+		dbugLog(_FLW, "cap request not sent: don't know how to process mission type %u", mp.m_missionType);
+	break;
 	}
 
 	if ( retval >= 0 )
 	{
-		player->setRequestedCapacity(true) ;
-		player->setReceivedCapacity(false) ;
+		player->setRequestedCapacity(true);
+		player->setReceivedCapacity(false);
 	}
 
-	return retval ;
+	return retval;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1520,78 +1516,78 @@ SINT32 missionSendMMCapacityRequest(Player* player, CAPACITY_REQUEST_STATE tag)
 Mission*
 NewMission::post()
 {
-	static MISSION_SUMMARY summary ;
-	CPStruct* launchCP = NULL ;
-	FacilityStruct* launchFac = NULL ;
-	CPStruct* targetCP = NULL ;
-	FacilityStruct* targetFac = NULL ;
-	Brigade* brigade = NULL ;
-	WWII_SIDE side = wwiiSide(country) ;
+	static MISSION_SUMMARY summary;
+	CPStruct* launchCP = nullptr;
+	FacilityStruct* launchFac = nullptr;
+	CPStruct* targetCP = nullptr;
+	FacilityStruct* targetFac = nullptr;
+	Brigade* brigade = nullptr;
+	WWII_SIDE side = wwiiSide(country);
 
 	try
 	{
-		if ( missionID > 0 && mapFindMission(missionID) != NULL )
-			throw std::domain_error("mission already posted") ;
+		if ( missionID > 0 && mapFindMission(missionID) != nullptr )
+			throw std::domain_error("mission already posted");
 
 		if ( instanceID == 0 )
-			throw std::domain_error("mission has no instance specified") ;
+			throw std::domain_error("mission has no instance specified");
 
 		// Locate the origin and target
-		launchCP = strtGetCPByOID(launchCP_oid) ;
-		if ( launchCP == NULL )
-			throw std::invalid_argument("Unable to find origin cp") ;
-		launchFac = strtGetFacilityByOID(launchFac_oid) ;
-		if ( launchFac == NULL )
-			throw std::invalid_argument("Unable to find origin facility") ;
+		launchCP = strtGetCPByOID(launchCP_oid);
+		if ( launchCP == nullptr )
+			throw std::invalid_argument("Unable to find origin cp");
+		launchFac = strtGetFacilityByOID(launchFac_oid);
+		if ( launchFac == nullptr )
+			throw std::invalid_argument("Unable to find origin facility");
 
 		if ( targetFac_oid == launchFac_oid )
 		{
-			targetCP = launchCP ;
-			targetFac = launchFac ;
+			targetCP = launchCP;
+			targetFac = launchFac;
 		}
 		else
 		{
 			if ( targetCP_oid == launchCP_oid )
-				targetCP = launchCP ;
+				targetCP = launchCP;
 			else
 			{
-				targetCP = strtGetCPByOID(targetCP_oid) ;
-				if ( targetCP == NULL )
-					throw std::invalid_argument("Unable to find target CP") ;
+				targetCP = strtGetCPByOID(targetCP_oid);
+				if ( targetCP == nullptr )
+					throw std::invalid_argument("Unable to find target CP");
 			}
 			if ( targetFac_oid == 0 )
-				targetFac = NULL ;
+				targetFac = nullptr;
 			else
 			{
-				targetFac = strtGetFacilityByOID(targetFac_oid) ;
-				if ( targetFac == NULL )
-					throw std::invalid_argument("Unable to find target facility") ;
+				targetFac = strtGetFacilityByOID(targetFac_oid);
+				if ( targetFac == nullptr )
+					throw std::invalid_argument("Unable to find target facility");
 			}
 		}
 
 		if ( launchFac->side != side || activeCountries[launchFac->country] == false )
-			throw std::domain_error("Mission/Facility country mismatch") ;
+			throw std::domain_error("Mission/Facility country mismatch");
 
-		brigade = mapFindBrigade(brigadeID) ;
-		if ( brigade == NULL )
-			throw std::domain_error("Invalid brigade ID for mission") ;
+		brigade = mapFindBrigade(brigadeID);
+		if ( brigade == nullptr )
+			throw std::domain_error("Invalid brigade ID for mission");
 
 		// Populate the summary structure
-		summary.missionID = missionID ;
-		strncpy(summary.callsign, posterCallsign, MAX_HANDLE_LEN) ;
-		summary.origin = launchFac->fullObjID ;
-		summary.target = (targetFac != NULL) ? targetFac->fullObjID : targetCP->fullObjID ;
-		summary.missionType = missionType ;
-		summary.subType = 0 ;	///TODO: Fixme
+		summary.missionID = missionID;
+		strsafecpy(summary.callsign, posterCallsign);
+		summary.origin = launchFac->fullObjID;
+		summary.target = (targetFac != nullptr) ? targetFac->fullObjID : targetCP->fullObjID;
+		summary.missionType = missionType;
+		summary.subType = 0;	///TODO: Fixme
 
-		SINT32 now = teulTime() ;
+		SINT32 now = teulTime();
 
 		if ( launchAt == 0 || launchAt <= now )
-			summary.timeLaunch = 0 ;
+			summary.timeLaunch = 0;
 		else
-			summary.timeLaunch = launchAt ;
+			summary.timeLaunch = launchAt;
 
-		Mission* mission ;
+		Mission* mission;
 		mission = _createMission(instanceID
 						, summary
 						, wwiiSide(country), country
@@ -1602,18 +1598,18 @@ NewMission::post()
 						, now
 						, brigade
 						, true
-						) ;
+						);
 
-		if ( mission != NULL )
-			mission->activate() ;
+		if ( mission != nullptr )
+			mission->activate();
 
-		return mission ;
+		return mission;
 	}
 	catch (std::exception& e)
 	{
 		dbugLog(_FLW, "mis:%d ctry:%u side:%u brig %d from %d/%d to %d/%d: %s"
-						, missionID, country, side, brigadeID, launchCP_oid, launchFac_oid, targetCP_oid, targetFac_oid, e.what()) ;
-		return NULL ;
+						, missionID, country, side, brigadeID, launchCP_oid, launchFac_oid, targetCP_oid, targetFac_oid, e.what());
+		return nullptr;
 	}
 }
 
@@ -1627,14 +1623,14 @@ void handleInboundMission(Mission* mission)
 	}
 
 #error("We need to set up the brigade etc")
-	Brigade* brigade = mapFindBrigade(mission->m_brigadeID) ;
+	Brigade* brigade = mapFindBrigade(mission->m_brigadeID);
 	if ( !mission->initializeHelpers(mission->side, brigade) )
-		return ;
+		return;
 
 	if ( mission->summary().missionID >= nextMissionID )
-		nextMissionID = mission->summary().missionID + 1 ;
+		nextMissionID = mission->summary().missionID + 1;
 	if ( nextMissionID >= maxMissionID )
-		nextMissionID = minMissionID ;
+		nextMissionID = minMissionID;
 
 	_addMissionToAllLists(mission, mission->side());
 	//well, that was easy, wasn't it?
@@ -1664,18 +1660,18 @@ missionCatchupServer(Server::ServerInfo* recipientServer)
 SINT32
 missionCancel(UINT32 missionID)
 {
-	Mission* mission = mapFindMission(missionID) ;
-	if ( mission == NULL )
+	Mission* mission = mapFindMission(missionID);
+	if ( mission == nullptr )
 	{
-		dbugLog(_FLN, "m:%u no such mission for cancellation", missionID) ;
-		return -EINVAL ;
+		dbugLog(_FLN, "m:%u no such mission for cancellation", missionID);
+		return -EINVAL;
 	}
 
-	dbugLog(_FLI, "m:%u received deletion notification for mission", missionID) ;
+	dbugLog(_FLI, "m:%u received deletion notification for mission", missionID);
 
-	mission->cancel() ;
+	mission->cancel();
 
-	return 0 ;
+	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1684,12 +1680,12 @@ missionCancel(UINT32 missionID)
 static void
 _setBackupLeader(UINT32 missionID, UINT32 playerID)
 {
-	Mission* mission = mapFindMission(missionID) ;
-	if ( mission == NULL || mission->m_backupLeader == playerID )
-		return ;
+	Mission* mission = mapFindMission(missionID);
+	if ( mission == nullptr || mission->m_backupLeader == playerID )
+		return;
 	dbugLog(_FLD, "m:%u leader:%u got backup leader change to p:%u"
-					, missionID, mission->playerID(), playerID) ;
-	mission->m_backupLeader = playerID ;
+					, missionID, mission->playerID(), playerID);
+	mission->m_backupLeader = playerID;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1700,35 +1696,35 @@ LeaderChange::process() const
 {
 	if ( m_result == _SET_BACKUP_LEADER )
 	{
-		_setBackupLeader(m_missionID, m_leaderID) ;
-		return _SUCCESS ;
+		_setBackupLeader(m_missionID, m_leaderID);
+		return _SUCCESS;
 	}
 
-	dbugLog(_FLI, "m:%u processing leader change to %s", m_missionID, chatGetCallsign(m_leaderHandle)) ;
+	dbugLog(_FLI, "m:%u processing leader change to %s", m_missionID, Chat::Name(m_leaderHandle).c_str());
 
 	// See if we know about this mission
-	Mission* const mission = mapFindMission(m_missionID) ;
-	if ( mission == NULL )
-		return _FAIL_NO_MISSION ;
+	Mission* const mission = mapFindMission(m_missionID);
+	if ( mission == nullptr )
+		return _FAIL_NO_MISSION;
 
 	if ( mission->isSystemMission() )
-		return _FAIL_NO_MISSION ;
+		return _FAIL_NO_MISSION;
 
 	// Is this guy already leading?
-	UINT32 oldLeaderID = mission->playerID() ;
-	ChatHandle oldLeaderHandle = mission->posterHandle() ;
+	UINT32 oldLeaderID = mission->playerID();
+	ChatHandle oldLeaderHandle = mission->posterHandle();
 
 	if ( oldLeaderID == m_leaderID || oldLeaderHandle == m_leaderHandle )
-		return _FAIL_IS_LEADER ;
+		return _FAIL_IS_LEADER;
 
-	Player* player = PlayerInterface::Lookup(m_leaderID) ;
-	if ( player == NULL || player->missionID() != m_missionID )
-		return _FAIL_OTHER_MISSION ;
+	Player* player = PlayerInterface::Lookup(m_leaderID);
+	if ( player == nullptr || player->missionID() != m_missionID )
+		return _FAIL_OTHER_MISSION;
 
-	mission->m_backupLeader = m_leaderID ;
-	mission->changeLeadership(player) ;
+	mission->m_backupLeader = m_leaderID;
+	mission->changeLeadership(player);
 
-	return _SUCCESS ;
+	return _SUCCESS;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1739,17 +1735,17 @@ static Mission*
 _lookupExistingInstanceMission(instanceid_t instanceID, WWII_COUNTRY forCountry, BRANCH_ENUM forBranch)
 {
 	// Start by looking for a matching mission
-	InstanceMissionIndex::iterator it = g_instanceMissionIndex.find(instanceID) ;
+	InstanceMissionIndex::iterator it = g_instanceMissionIndex.find(instanceID);
 	if ( it != g_instanceMissionIndex.end() && it->second.empty() == false )
 	{
-		for ( size_t i = 0 ; i < it->second.size() ; ++i )
+		for ( size_t i = 0; i < it->second.size(); ++i )
 		{
 			if ( it->second[i]->country() == forCountry && it->second[i]->branch() == forBranch )
-				return it->second[i] ;
+				return it->second[i];
 		}
 	}
 
-	return NULL ;
+	return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1758,77 +1754,77 @@ _lookupExistingInstanceMission(instanceid_t instanceID, WWII_COUNTRY forCountry,
 static Mission*
 _postNewInstanceMission(instanceid_t instanceID, WWII_COUNTRY forCountry, BRANCH_ENUM forBranch)
 {
-	static const char* adminCPs[MAX_COUNTRIES] = { NULL, "British Training", "British Training", "French Training", "German Training", NULL, NULL, NULL } ;
+	static const char* adminCPs[MAX_COUNTRIES] = { nullptr, "British Training", "British Training", "French Training", "German Training", nullptr, nullptr, nullptr };
 
 	try
 	{
 		if ( instanceID == Instance::_INVALID )
-			throw "Invalid instance" ;
+			throw "Invalid instance";
 
 		if ( forCountry == WWII_NO_COUNTRY || forCountry >= MAX_COUNTRIES )
-			throw "Invalid country" ;
+			throw "Invalid country";
 
-		const char* facName = adminCPs[forCountry] ;
-		if ( facName == NULL )
-			throw "Country has no adminCP entry" ;
+		const char* facName = adminCPs[forCountry];
+		if ( facName == nullptr )
+			throw "Country has no adminCP entry";
 
 		// See if we can find the training ground for this country
-		const std::string facilityName = sdmTranslateName(facName) ;
-		CPStruct* const cp = strtGetCPByName(facilityName.c_str()) ;
-		if ( cp == NULL )
-			throw "No training facility" ;
+		const std::string facilityName = sdmTranslateName(facName);
+		CPStruct* const cp = strtGetCPByName(facilityName.c_str());
+		if ( cp == nullptr )
+			throw "No training facility";
 
-		FacilityStruct* ab = cp->facilityTypeIndex[FACILITY_ARMYBASE] ;
+		FacilityStruct* ab = cp->facilityTypeIndex[FACILITY_ARMYBASE];
 		if ( !ab )
-			throw "No armybase at training facility" ;
+			throw "No armybase at training facility";
 
-		HCUNIT_INDEX::iterator it ;
-		for ( it = hcUnits.begin() ; it != hcUnits.end() ; ++it )
+		HCUNIT_INDEX::iterator it;
+		for ( it = hcUnits.begin(); it != hcUnits.end(); ++it )
 		{
 			if ( it->second->isTrainingUnit() == true && it->second->country() == forCountry && it->second->branch() == forBranch )
-				break ;
+				break;
 		}
 		if ( it == hcUnits.end() )
-			throw "No suitable HC units" ;
+			throw "No suitable HC units";
 
-		HCUnit* unit = it->second ;
+		HCUnit* unit = it->second;
 
-		dbugLog(_FLI, "in:%llu posting mission for %s at %s/%s brig#%u %s", instanceID, _countryName[forCountry], cp->name, ab->name, unit->unitID(), unit->name()) ;
+		dbugLog(_FLI, "in:%llu posting mission for %s at %s/%s brig#%u %s", instanceID, _countryName[forCountry], cp->name, ab->name, unit->unitID(), unit->name());
 
-		NewMission post ;
+		NewMission post;
 
-		post.missionID = (instanceID == Instance::_CAMPAIGN) ? forCountry : 0 ;
-		post.country = forCountry ;
-		post.brigadeID = unit->unitID() ;
-		post.missionType = SYSTEM_MISSION ;
-		post.postedByID = 1 ;
-		strcpy(post.posterCallsign, "SYSTEM") ;
-		post.postedAt = teulTime() ;
-		post.postAt = teulTime() ;
-		post.launchAt = teulTime() ;
-		post.launchCP_oid = cp->uOID ;
-		post.launchFac_oid = ab->uOID ;
-		post.targetCP_oid = cp->uOID ;
-		post.targetFac_oid = ab->uOID ;
-		post.instanceID = instanceID ;
-		sprintf(post.description, "%s system mission", _countryNameAdj[forCountry]) ;
+		post.missionID = (instanceID == Instance::_CAMPAIGN) ? forCountry : 0;
+		post.country = forCountry;
+		post.brigadeID = unit->unitID();
+		post.missionType = SYSTEM_MISSION;
+		post.postedByID = 1;
+		strcpy(post.posterCallsign, "SYSTEM");
+		post.postedAt = teulTime();
+		post.postAt = teulTime();
+		post.launchAt = teulTime();
+		post.launchCP_oid = cp->uOID;
+		post.launchFac_oid = ab->uOID;
+		post.targetCP_oid = cp->uOID;
+		post.targetFac_oid = ab->uOID;
+		post.instanceID = instanceID;
+		sprintf(post.description, "%s system mission", _countryNameAdj[forCountry]);
 
-		Mission* mission = post.post() ;
-		if ( mission != NULL )
+		Mission* mission = post.post();
+		if ( mission != nullptr )
 		{
-			InstanceMissions& index = g_instanceMissionIndex[mission->instanceID()] ;
-			index.push_back(mission) ;
+			InstanceMissions& index = g_instanceMissionIndex[mission->instanceID()];
+			index.push_back(mission);
 			if ( mission->instanceID() != 0 )
 			{
-				dbugLog(_FLD, "in:%llu now has %" PRSizeT " missions", mission->instanceID(), index.size()) ;
+				dbugLog(_FLD, "in:%llu now has %" PRSizeT " missions", mission->instanceID(), index.size());
 			}
 		}
 
-		return mission ;
+		return mission;
 	}
 	catch (const char* error)
 	{
-		LogAbort("Unable to post system mission for country:%u br:%u [%s]: %s", forCountry, forBranch, _countryNameAdj[forCountry], error) ;
+		LogAbort("Unable to post system mission for country:%u br:%u [%s]: %s", forCountry, forBranch, _countryNameAdj[forCountry], error);
 	}
 }
 
@@ -1839,11 +1835,11 @@ _postNewInstanceMission(instanceid_t instanceID, WWII_COUNTRY forCountry, BRANCH
 Mission*
 missionGetInstanceMission(instanceid_t instanceID, WWII_COUNTRY forCountry, BRANCH_ENUM forBranch)
 {
-	Mission* const mission = _lookupExistingInstanceMission(instanceID, forCountry, forBranch) ;
-	if ( mission != NULL )
-		return mission ;
+	Mission* const mission = _lookupExistingInstanceMission(instanceID, forCountry, forBranch);
+	if ( mission != nullptr )
+		return mission;
 
-	return _postNewInstanceMission(instanceID, forCountry, forBranch) ;
+	return _postNewInstanceMission(instanceID, forCountry, forBranch);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1852,54 +1848,54 @@ missionGetInstanceMission(instanceid_t instanceID, WWII_COUNTRY forCountry, BRAN
 void
 missDeleteInstanceMissions(instanceid_t instanceID)
 {
-	InstanceMissionIndex::iterator it = g_instanceMissionIndex.find(instanceID) ;
+	InstanceMissionIndex::iterator it = g_instanceMissionIndex.find(instanceID);
 	if ( it == g_instanceMissionIndex.end() )
 	{
-		betaLog(_FLD, "in:%llu has no missions to expire", instanceID) ;
-		return ;
+		betaLog(_FLD, "in:%llu has no missions to expire", instanceID);
+		return;
 	}
 
-	InstanceMissions& index = it->second ;
+	InstanceMissions& index = it->second;
 
-	betaLog(_FLD, "in:%llu deleting instance mission list (%" PRSizeT " missions)", instanceID, index.size()) ;
+	betaLog(_FLD, "in:%llu deleting instance mission list (%" PRSizeT " missions)", instanceID, index.size());
 
-	const UINT32 numMissions = index.size() ;
-	for ( UINT32 i = 0 ; i < numMissions ; ++i )
+	const UINT32 numMissions = index.size();
+	for ( UINT32 i = 0; i < numMissions; ++i )
 	{
 		// Pull the front and delete it, which will cause the
 		// destructor to swap the element with the index.back()
 		// so we can just keep popping the front off.
-		Mission* mission = index.front() ;
-		if ( mission == NULL )
+		Mission* mission = index.front();
+		if ( mission == nullptr )
 		{
-			LogAbort("in:%llu contains NULL in mission index at position %u", instanceID, i) ;
+			LogAbort("in:%llu contains NULL in mission index at position %u", instanceID, i);
 		}
 
-		betaLog(_FLD, "in:%llu m[%u]:%u", instanceID, i, mission->missionID()) ;
+		betaLog(_FLD, "in:%llu m[%u]:%u", instanceID, i, mission->missionID());
 
-		mission->deactivate() ;
-		mission->cancel() ;
+		mission->deactivate();
+		mission->cancel();
 
-		delete mission ;
+		delete mission;
 	}
 }
 
 void
 missAnnounceMissionsToChat()
 {
-	for ( MissionIndex::iterator it = g_missions.begin() ; it != g_missions.end() ; ++it )
+	for ( MissionIndex::iterator it = g_missions.begin(); it != g_missions.end(); ++it )
 	{
 		// Send the mobile spawn STO so that they don't become invisible.
-		(it->second)->announceMobileSpawnSTO() ;
+		(it->second)->announceMobileSpawnSTO();
 	}
 }
 
 void
 missCancelAllMobileSpawns()
 {
-	for ( MissionIndex::iterator it = g_missions.begin() ; it != g_missions.end() ; ++it )
+	for ( MissionIndex::iterator it = g_missions.begin(); it != g_missions.end(); ++it )
 	{
-		(it->second)->deactivateMobileSpawn(MSDR_DISPLACED) ;
+		(it->second)->deactivateMobileSpawn(MSDR_DISPLACED);
 	}
 }
 

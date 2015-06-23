@@ -412,7 +412,7 @@ void TextureRectangle::copyTexImage2D(int x, int y, int width, int height )
 
 
     // remove any previously assigned images as these are nolonger valid.
-    _image = NULL;
+    _image = nullptr;
 
     // switch off mip-mapping.
     //

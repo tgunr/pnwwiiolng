@@ -5,11 +5,6 @@
 
 #include "fio/fio.h"
 
-#include <stdio.h>
-#include <assert.h>
-#include <string.h>
-#include <stdlib.h>
-
 /****************************************************************************
  *
  * Follows is code extracted from the simage library.  Original Authors:
@@ -270,7 +265,7 @@ int* numComponents_ret)
     if (readsize != 18)
     {
         tgaerror = ERR_READ;
-        return NULL;
+        return nullptr;
     }
 
     type = header[2];
@@ -286,13 +281,13 @@ int* numComponents_ret)
         (depth < 2 || depth > 4))
     {
         tgaerror = ERR_UNSUPPORTED;
-        return NULL;
+        return nullptr;
     }
 
     if (header[0])               /* skip identification field */
         fioSeek(fd, header[0], fioSEEK_CUR);
 
-    colormap = NULL;
+    colormap = nullptr;
     if (header[1] == 1)          /* there is a colormap */
     {
         int len = getInt16(&header[5]);
@@ -377,7 +372,7 @@ int* numComponents_ret)
             fioSeek(fd, pos, fioSEEK_SET);
 
             buf = new unsigned char [size];
-            if (buf == NULL)
+            if (buf == nullptr)
             {
                 tgaerror = ERR_MEM;
                 break;
@@ -412,7 +407,7 @@ int* numComponents_ret)
     if (tgaerror)
     {
         if (buffer) delete [] buffer;
-        return NULL;
+        return nullptr;
     }
 
     *width_ret = width;
@@ -465,7 +460,7 @@ int headerlen)
 
 Image* ReadTGAFile(const std::string& name)
 {
-    unsigned char* imageData = NULL;
+    unsigned char* imageData = nullptr;
     int width_ret;
     int height_ret;
     int numComponents_ret;
@@ -478,15 +473,15 @@ Image* ReadTGAFile(const std::string& name)
     if(fd < 0)
     {
         Write_Debug("[ReadTGAFile] cannot load %s image", name.c_str());
-        return NULL;
+        return nullptr;
     }
 
     imageData = simage_tga_load(fd,&width_ret,&height_ret,&numComponents_ret);
 
-    if(imageData == NULL)
+    if(imageData == nullptr)
     {
         Write_Debug("[ReadTGAFile] cannot open %s", name.c_str());
-        return NULL;
+        return nullptr;
     }
 
 	fioClose(fd);
@@ -530,14 +525,14 @@ class ReaderWriterTGA : public osgDB::ReaderWriter
 
         ReadResult readTGAStream(std::istream& fin) const
         {
-            unsigned char* imageData = NULL;
+            unsigned char* imageData = nullptr;
             int width_ret;
             int height_ret;
             int numComponents_ret;
 
             imageData = simage_tga_load(fin,&width_ret,&height_ret,&numComponents_ret);
 
-            if (imageData==NULL) return ReadResult::FILE_NOT_HANDLED;
+            if (imageData==nullptr) return ReadResult::FILE_NOT_HANDLED;
 
             int s = width_ret;
             int t = height_ret;
@@ -565,17 +560,17 @@ class ReaderWriterTGA : public osgDB::ReaderWriter
 
         }
 
-        virtual ReadResult readObject(std::istream& fin,const osgDB::ReaderWriter::Options* options =NULL) const
+        virtual ReadResult readObject(std::istream& fin,const osgDB::ReaderWriter::Options* options =nullptr) const
         {
             return readImage(fin, options);
         }
 
-        virtual ReadResult readObject(const std::string& file, const osgDB::ReaderWriter::Options* options =NULL) const
+        virtual ReadResult readObject(const std::string& file, const osgDB::ReaderWriter::Options* options =nullptr) const
         {
             return readImage(file, options);
         }
 
-        virtual ReadResult readImage(std::istream& fin,const Options* =NULL) const
+        virtual ReadResult readImage(std::istream& fin,const Options* =nullptr) const
         {
             return readTGAStream(fin);
         }

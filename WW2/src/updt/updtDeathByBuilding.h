@@ -16,11 +16,11 @@
 class DeathByBuilding
 {
 public:
-	DeathByBuilding(ACTION_OBJECT* /*a*/=NULL) { }
+	DeathByBuilding(ACTION_OBJECT* /*a*/=nullptr) { }
 	~DeathByBuilding() {}
 
 public:
-	SINT32 packer(LOGICAL /*mode*/, ACTION_OBJECT* a) { return a->offset ; }
-} ;
+	SINT32 packer(LOGICAL /*mode*/, ACTION_OBJECT* a) { return a->offset; }
+};
 
-typedef teul_network_object<DeathByBuilding> DEATH_BY_BUILDING ;
+typedef teul_network_object<DeathByBuilding> DEATH_BY_BUILDING;

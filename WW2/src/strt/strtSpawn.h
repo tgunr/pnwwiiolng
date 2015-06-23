@@ -35,21 +35,21 @@
 // The end of the weapon delivery window
 #define DEFAULT_WEAPON_DELIVERY_TIME		(60 * 60)	// 60 minutes
 
-class CPStruct ;
-class FacilityStruct ;
-struct MM_POST_REQUEST ;
-struct MM_POST_ACCEPT ;
-struct MM_POST_DENY ;
-struct MM_JOIN_REQUEST ;
-struct MM_JOIN_ACCEPT ;
-struct MM_JOIN_DENY ;
-struct POSTED_WEAPON ;
-struct MM_SPAWN_GRANT_REQUEST ;
-struct MM_SPAWN_GRANT_RESPONSE ;
-struct MM_POST_INFO_UPDATE ;
-struct MM_POST_INFO_REQUEST ;
-struct MM_POST_INFO_RESPONSE ;
-struct MM_SPAWN_CANCEL ;
+class CPStruct;
+class FacilityStruct;
+struct MM_POST_REQUEST;
+struct MM_POST_ACCEPT;
+struct MM_POST_DENY;
+struct MM_JOIN_REQUEST;
+struct MM_JOIN_ACCEPT;
+struct MM_JOIN_DENY;
+struct POSTED_WEAPON;
+struct MM_SPAWN_GRANT_REQUEST;
+struct MM_SPAWN_GRANT_RESPONSE;
+struct MM_POST_INFO_UPDATE;
+struct MM_POST_INFO_REQUEST;
+struct MM_POST_INFO_RESPONSE;
+struct MM_SPAWN_CANCEL;
 
 //Initializes the spawning system from filename
 extern void strtInitSpawn();
@@ -90,6 +90,6 @@ extern LOGICAL strtProcessSpawnCancel(MM_SPAWN_CANCEL* spawnCancel);
 //This function expires weapons that have been spawned longer than X hours
 extern void strtExpireSpawnedWeapons();
 
-extern UINT32 strtFallback(CPStruct* cp, WWII_SIDE issuer, FALLBACK_MODE execute, UINT32 playerID) ;
+extern UINT32 strtFallback(CPStruct* cp, WWII_SIDE issuer, FALLBACK_MODE execute, UINT32 playerID);
 
 //tolua_end

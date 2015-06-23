@@ -1,8 +1,8 @@
 #include "math/SuperFastHash.h"
-#include <stdlib.h>
-#include <stdint.h>
 #include <inttypes.h>
-#include <stdio.h>
+#include <cstdlib>
+#include <cstdint>
+#include <cstdio>
 
 #undef get16bits
 #if (defined(__GNUC__) && defined(__i386__)) || defined(__WATCOMC__) \
@@ -43,7 +43,7 @@ unsigned int SuperFastHashIncremental (const char * data, int len, unsigned int 
 	uint32_t tmp;
 	int rem;
 
-	if (len <= 0 || data == NULL) return 0;
+	if (len <= 0 || data == nullptr) return 0;
 
 	rem = len & 3;
 	len >>= 2;

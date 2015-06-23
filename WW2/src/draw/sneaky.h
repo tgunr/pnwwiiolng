@@ -35,7 +35,7 @@ private:
     }
 
 public:
-    AltPointer():ptr(NULL)
+    AltPointer():ptr(nullptr)
     {
     }
 
@@ -48,7 +48,7 @@ public:
 
     inline T* get()
     {
-        return ptr==NULL ? NULL : recover();
+        return ptr==nullptr ? nullptr : recover();
     }
 
     inline void set( T* p )
@@ -58,7 +58,7 @@ public:
 
     inline T& operator*()
     {
-        assert(ptr!=NULL);
+        assert(ptr!=nullptr);
         return *recover();
     }
 

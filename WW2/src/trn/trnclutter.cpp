@@ -65,7 +65,7 @@ typedef struct tagCLUTTER
 
 unsigned int _id = 1;
 
-typedef stdext::hash_set<std::string> ClutterHash;
+using ClutterHash = std::unordered_set<std::string>;
 static ClutterHash keys;
 #define max_clutter_per_octet 64
 
@@ -354,7 +354,7 @@ static UINT32 _RepopulateArray(void)
 
     const mlVehicleData* data = persGetPersonaModelDataPtr();
 
-    if(data == NULL)
+    if(data == nullptr)
         return 0;
 
     Vec3d pos(data->VehiclePos);
@@ -458,11 +458,11 @@ static bool _CollideAndSetupClutter(CLUTTER * Clutter,SINT32 PosX, SINT32 PosY, 
 	P2 = P1;
 	P2.z = 10000.0;
 
-    trnCDTerrainObject* to = NULL;
+    trnCDTerrainObject* to = nullptr;
 
 	TexId = -1;
 	memset(&CollisionList[0],0,sizeof(FASTCOLLIDE)*32);
-	if (VehicleData != NULL)
+	if (VehicleData != nullptr)
 	{
 		NumCollides = 32;
 		CollideListPtr = CollisionList;
@@ -490,7 +490,7 @@ static bool _CollideAndSetupClutter(CLUTTER * Clutter,SINT32 PosX, SINT32 PosY, 
 		if (NumCollides == 0)
 		{
 			memset(&collision, 0, sizeof(collision));
-			collision.object   = NULL;
+			collision.object   = nullptr;
 			collision.oldpos.x = P1.x;
 			collision.oldpos.y = P1.y;
 			collision.oldpos.z = P1.z;
@@ -528,7 +528,7 @@ static bool _CollideAndSetupClutter(CLUTTER * Clutter,SINT32 PosX, SINT32 PosY, 
 
 			if (Found == 1)
 			{
-				if (CollisionList[i].CollideObject != NULL)
+				if (CollisionList[i].CollideObject != nullptr)
 				{
                     to = CollisionList[i].TO;
 
@@ -546,7 +546,7 @@ static bool _CollideAndSetupClutter(CLUTTER * Clutter,SINT32 PosX, SINT32 PosY, 
 			else
 			{
 				memset(&collision, 0, sizeof(collision));
-				collision.object   = NULL;
+				collision.object   = nullptr;
 				collision.oldpos.x = P1.x;
 				collision.oldpos.y = P1.y;
 				collision.oldpos.z = P1.z;

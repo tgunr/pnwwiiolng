@@ -204,9 +204,9 @@ static void createMeshTextures(gr2MeshData* data, bool wantNormals);
 static SINT32 createTexture(granny_texture* texture);
 static void loadTextures(granny_file_info* fileInfo, const char* path);
 
-static const char* getBaseName(const char* path, const char* prePath = NULL);
+static const char* getBaseName(const char* path, const char* prePath = nullptr);
 
-static granny_file_info* getFileInfo(const char* basename, SINT32 useCache, granny_file** file = NULL);
+static granny_file_info* getFileInfo(const char* basename, SINT32 useCache, granny_file** file = nullptr);
 static void gr2Error(granny_log_message_type type, granny_log_message_origin origin, char const* file, granny_int32x line, char const* error, void* userData);
 static gr2AnimationBlend* gr2LoadBlendedAnimationXML(SCHAR* blendfile, SINT32 boneCount);
 static gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount);
@@ -223,7 +223,7 @@ struct TextureReplacement
 {
     std::map<std::string, std::vector<std::string> > fromto;
 
-} ;
+};
 
 static std::map<std::string, TextureReplacement *> _replacements;
 
@@ -253,7 +253,7 @@ static void _parseReplacements(xmlNodePtr root, TextureReplacement* r)
 {
     xmlNodePtr node = root;
 
-	for(; node != NULL; node = node->next)
+	for(; node != nullptr; node = node->next)
 	{
         if(node->type != XML_ELEMENT_NODE)
         {
@@ -277,7 +277,7 @@ static void _parseReplacements(xmlNodePtr root, TextureReplacement* r)
 
             with.clear();
 
-            for(; child != NULL; child = child->next)
+            for(; child != nullptr; child = child->next)
             {
                 if(child->type != XML_ELEMENT_NODE)
                 {
@@ -314,7 +314,7 @@ static void _properties(xmlNodePtr root)
 {
     xmlNodePtr node = root;
 
-	for(; node != NULL; node = node->next)
+	for(; node != nullptr; node = node->next)
 	{
         if(node->type != XML_ELEMENT_NODE)
         {
@@ -345,7 +345,7 @@ static void _loadReplaceXML()
 
     SCHAR* name = "gr2Data/TPS/meshes/infset/replace.xml";
 
-    xmlDocPtr doc = xmlReadFile(name, NULL, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
+    xmlDocPtr doc = xmlReadFile(name, nullptr, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
 
     if(doc)
     {
@@ -455,7 +455,7 @@ gr2Error(granny_log_message_type type, granny_log_message_origin origin, char co
 *
 */
 
-granny_file_info* findFileInCache(const char* basename, granny_file** file = NULL)
+granny_file_info* findFileInCache(const char* basename, granny_file** file = nullptr)
 {
 	GR2_FILE_CACHE::iterator found = _fileCache.find(basename);
 
@@ -468,7 +468,7 @@ granny_file_info* findFileInCache(const char* basename, granny_file** file = NUL
 	// if we're here, it's a miss
 
 	// load the file
-	granny_file_info* fileInfo = getFileInfo(basename, 0, (file) ? &(*file) : NULL);
+	granny_file_info* fileInfo = getFileInfo(basename, 0, (file) ? &(*file) : nullptr);
 
 	// add it to the cache, even if its null
 	_fileCache[basename] = fileInfo;
@@ -490,7 +490,7 @@ granny_file_info* getFileInfo(const char* basename, SINT32 useCache, granny_file
 
 	if(useCache)
 	{
-		fileInfo = findFileInCache(basename, (file) ? &(*file) : NULL);
+		fileInfo = findFileInCache(basename, (file) ? &(*file) : nullptr);
 	}
 	else
 	{
@@ -504,7 +504,7 @@ granny_file_info* getFileInfo(const char* basename, SINT32 useCache, granny_file
 		if(fileSize < 0)
 		{
 			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to size file %s (probably file not found)!", regional);
-			return NULL;
+			return nullptr;
 		}
 
 		stream = fioOpen(regional);
@@ -512,7 +512,7 @@ granny_file_info* getFileInfo(const char* basename, SINT32 useCache, granny_file
 		if(stream < 0)
 		{
 			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to open %s!", regional);
-			return NULL;
+			return nullptr;
 		}
 
 		buffer = _workBuffer(fileSize);
@@ -520,7 +520,7 @@ granny_file_info* getFileInfo(const char* basename, SINT32 useCache, granny_file
 		if(!buffer)
 		{
 			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to allocate read buffer for %s", regional);
-			return NULL;
+			return nullptr;
 		}
 
 		readSize = fioRead(stream, buffer, fileSize);
@@ -529,7 +529,7 @@ granny_file_info* getFileInfo(const char* basename, SINT32 useCache, granny_file
 		{
 			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Bytes read != bytes in file (%d != %d) in file %s", readSize, fileSize, regional);
 			memFree (buffer);
-			return NULL;
+			return nullptr;
 		}
 
 		loadedFile = GrannyReadEntireFileFromMemory(fileSize, buffer);
@@ -545,7 +545,7 @@ granny_file_info* getFileInfo(const char* basename, SINT32 useCache, granny_file
 		{
 			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to get model data out of %s!", regional);
 			GrannyFreeFile(loadedFile);
-			return NULL;
+			return nullptr;
 		}
 
 		// if we requested the granny file, return it too
@@ -567,7 +567,7 @@ void createNormalTexture(granny_texture* texture)
     }
 
     SCHAR original[64] = {0};
-    const granny_pixel_layout* layout = NULL;
+    const granny_pixel_layout* layout = nullptr;
     piSURFACEDESC pisd;
 
     memset(&pisd, 0, sizeof(piSURFACEDESC));
@@ -639,7 +639,7 @@ void createSpecularTexture(granny_texture* texture)
     }
 
     SCHAR original[64] = {0};
-    const granny_pixel_layout* layout = NULL;
+    const granny_pixel_layout* layout = nullptr;
     piSURFACEDESC pisd;
 
     memset(&pisd, 0, sizeof(piSURFACEDESC));
@@ -707,7 +707,7 @@ gr2Model* gr2LoadModel(const char* modelFile, gr2Model* wornOnModel, SINT32* bon
 {
 	// file path
 	static char			path[255+1];
-	char*				at = NULL;
+	char*				at = nullptr;
 
 	strncpy(path, modelFile, 255);
 
@@ -724,7 +724,7 @@ gr2Model* gr2LoadModel(const char* modelFile, gr2Model* wornOnModel, SINT32* bon
 	if(modelIndex < 0)
 		modelIndex = 0;
 
-	granny_file* file = NULL;
+	granny_file* file = nullptr;
 	granny_file_info* fileInfo = getFileInfo(path, TRUE, &file);
 
 	if(!fileInfo)
@@ -738,13 +738,13 @@ gr2Model* gr2LoadModel(const char* modelFile, gr2Model* wornOnModel, SINT32* bon
 	if(fileInfo->ModelCount <= 0)
 	{
 		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadModel: Model file %s doesn't contain any models .. it has %d", modelFile, fileInfo->ModelCount);
-		return NULL;
+		return nullptr;
 	}
 
 	if(modelIndex < 0 || modelIndex >= fileInfo->ModelCount)
 	{
 		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadModel: Model file %s doesn't contain a model at index %d .. it has %d models", modelFile, modelIndex, fileInfo->ModelCount);
-		return NULL;
+		return nullptr;
 	}
 
 	granny_model* grannyModel = fileInfo->Models[modelIndex];
@@ -758,7 +758,7 @@ gr2Model* gr2LoadModel(const char* modelFile, gr2Model* wornOnModel, SINT32* bon
 	if(file)
 	{
 		// cache all models and textures in this gr2 file
-		for(int mo = 0 ; mo < fileInfo->ModelCount; mo++)
+		for(int mo = 0; mo < fileInfo->ModelCount; mo++)
 		{
 			granny_model* m = fileInfo->Models[mo];
 
@@ -779,7 +779,7 @@ gr2Model* gr2LoadModel(const char* modelFile, gr2Model* wornOnModel, SINT32* bon
 
 	// if we don't want to instantiate (i.e. just load the cache) we're done, just have to set the # of bones
 	if(!instantiate)
-		return NULL;
+		return nullptr;
 
 	gr2Model* newModel = _gr2ModelPool.Pop();
 
@@ -787,7 +787,7 @@ gr2Model* gr2LoadModel(const char* modelFile, gr2Model* wornOnModel, SINT32* bon
 	{
 		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadModel: Failed to allocate memory for model %s", modelFile);
 		piExitProgram (__FILE__, __LINE__, "gr2LoadModel: Failed to allocate memory for model");
-		return NULL;
+		return nullptr;
 	}
 
 	newModel->reset();
@@ -799,7 +799,7 @@ gr2Model* gr2LoadModel(const char* modelFile, gr2Model* wornOnModel, SINT32* bon
 	{
 		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadModel: Bone count too high (%d > %d) for %s", grannyModel->Skeleton->BoneCount, MAX_GR2_BONE_COUNT, modelFile);
 		piExitProgram (__FILE__, __LINE__, "gr2LoadModel: Bonecount too high");
-		return NULL;
+		return nullptr;
 	}
 
 	newModel->GrannyInstance = GrannyInstantiateModel(grannyModel);
@@ -810,12 +810,12 @@ gr2Model* gr2LoadModel(const char* modelFile, gr2Model* wornOnModel, SINT32* bon
 
 	Write_Log (LOG_FPS, LOG_INFO, "Granny2:  Instance for %s is 0x%x", modelFile, newModel->GrannyInstance);
 
-	granny_skeleton* wornOnSkeleton = NULL;
+	granny_skeleton* wornOnSkeleton = nullptr;
 
-	if (wornOnModel == NULL)
+	if (wornOnModel == nullptr)
 	{
 		newModel->usesAnotherSkeleton = 0;
-		newModel->wornOnModel = NULL;
+		newModel->wornOnModel = nullptr;
 		wornOnSkeleton = newModel->skeleton;
 	}
 	else
@@ -842,7 +842,7 @@ gr2Model* gr2LoadModel(const char* modelFile, gr2Model* wornOnModel, SINT32* bon
 		}
 	}
 
-	newModel->attachToModel = NULL;
+	newModel->attachToModel = nullptr;
 	newModel->attachBone = 0;
 	newModel->attachToBone = 0;
 	//newModel->attachOffset = (float*)IdentityMatrix;
@@ -872,14 +872,14 @@ static SINT32 createTexture (granny_texture* grannyTexture)
 	strcpy(texname, grannyTexture->FromFileName);
 	_strlwr(texname);
 	ptr = strrchr(texname, '\\');
-	if (ptr != NULL)
+	if (ptr != nullptr)
 	{
 		ptr += 1;
 		strcpy(texname, ptr);
 	}
 
 	ptr = strrchr(texname, '.');
-	if (ptr != NULL)
+	if (ptr != nullptr)
 	{
 		*ptr = 0;
 	}
@@ -1014,7 +1014,7 @@ static void createMeshData(granny_mesh* grannyMesh, granny_skeleton* mySkeleton,
 
 	indexCount = GrannyGetMeshIndexCount(grannyMesh);
 
-	data->indexArray = NULL;
+	data->indexArray = nullptr;
 
 	if(indexCount)
 	{
@@ -1032,8 +1032,8 @@ static void createMeshData(granny_mesh* grannyMesh, granny_skeleton* mySkeleton,
     /* Now I process the vertex data. */
 	vertexCount = GrannyGetMeshVertexCount(grannyMesh);
 
-	data->vertexArray = NULL;
-    data->pngt = NULL;
+	data->vertexArray = nullptr;
+    data->pngt = nullptr;
 
 	if(vertexCount)
 		data->vertexArray = new piGVERTEX[vertexCount];
@@ -1046,7 +1046,7 @@ static void createMeshData(granny_mesh* grannyMesh, granny_skeleton* mySkeleton,
             GrannyCopyMeshVertices(grannyMesh, GrannyPNT332VertexType, data->vertexArray);
 
 		// Since the mesh is rigid, I won't	be needing a deformer.
-        data->GrannyDeformer = NULL;
+        data->GrannyDeformer = nullptr;
 	}
 	else
 	{
@@ -1110,7 +1110,7 @@ static void createMeshOld(gr2Model* model, gr2MeshData* mesh, granny_mesh* grann
 
 	indexCount = GrannyGetMeshIndexCount(grannyMesh);
 
-	mesh->indexArray = NULL;
+	mesh->indexArray = nullptr;
 
 	if(indexCount)
 	{
@@ -1128,8 +1128,8 @@ static void createMeshOld(gr2Model* model, gr2MeshData* mesh, granny_mesh* grann
     /* Now I process the vertex data. */
 	vertexCount = GrannyGetMeshVertexCount(grannyMesh);
 
-	mesh->vertexArray = NULL;
-    mesh->pngt = NULL;
+	mesh->vertexArray = nullptr;
+    mesh->pngt = nullptr;
 
 	if (vertexCount)
 	{
@@ -1146,7 +1146,7 @@ static void createMeshOld(gr2Model* model, gr2MeshData* mesh, granny_mesh* grann
 		}
 
 		// Since the mesh is rigid, I won't	be needing a deformer.
-        mesh->GrannyDeformer = NULL;
+        mesh->GrannyDeformer = nullptr;
 	}
 	else
 	{
@@ -1193,7 +1193,7 @@ gr2Animation* gr2LoadAnimation (SCHAR* animationFile, SINT32 useCache)
 	if (!fileInfo || fileInfo->AnimationCount < 1)
 	{
 		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadAnimation: Failed to load animation %s", animationFile);
-		return NULL;
+		return nullptr;
 	}
 
 //	Write_Log (LOG_FPS, LOG_INFO, "Fileinfo for animation file %s = 0x%x", animationFile, fileInfo);
@@ -1204,13 +1204,13 @@ gr2Animation* gr2LoadAnimation (SCHAR* animationFile, SINT32 useCache)
 	{
 		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadAnimation: Failed to allocate memory for animation %s", animationFile);
 		piExitProgram (__FILE__, __LINE__, "gr2LoadAnimation: Failed to allocate memory for animation");
-		return NULL;
+		return nullptr;
 	}
 
 	newAnimation->animation = fileInfo->Animations[0];
-	newAnimation->events	= NULL;
+	newAnimation->events	= nullptr;
 
-	const SCHAR* fileName = NULL;
+	const SCHAR* fileName = nullptr;
 	char* slash = strchr(animationFile, '\\');
 
 	while(slash)
@@ -1244,7 +1244,7 @@ gr2Animation* gr2LoadAnimation (SCHAR* animationFile, SINT32 useCache)
 			{
 				GR2_EVENT_LIST events;
 
-				gr2Event* newEvent = NULL;
+				gr2Event* newEvent = nullptr;
 
 		//		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadAnimation: Loading event data for animation %s", animationFile);
 
@@ -1290,7 +1290,7 @@ LOGICAL gr2AttachModel (gr2Model* model, SCHAR* attachBone, gr2Model* attachToMo
 
 	if (!model)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "NULL model passed to gr2AttachModel!");
+		Write_Log (LOG_FPS, LOG_INFO, "nullptr model passed to gr2AttachModel!");
 		return FALSE;
 	}
 
@@ -1341,7 +1341,7 @@ LOGICAL gr2AttachModelByIndex (gr2Model* model, int attachBone, gr2Model* attach
 {
 	if (!model)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "NULL model passed to gr2AttachModel!");
+		Write_Log (LOG_FPS, LOG_INFO, "nullptr model passed to gr2AttachModel!");
 		return FALSE;
 	}
 
@@ -1363,7 +1363,7 @@ void gr2AttachmentUpdate(gr2Model* model)
 
 void gr2DetachModel (gr2Model* model)
 {
-	model->attachToModel = NULL;
+	model->attachToModel = nullptr;
 	model->attachBone = 0;
 	model->attachToBone = 0;
 }
@@ -1382,20 +1382,20 @@ gr2Control* gr2PlayAnimation (gr2Model* model, gr2Animation* animation)
 
 	if (!model)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "ERROR:  NULL model passed to gr2PlayAnimation!");
-		return NULL;
+		Write_Log (LOG_FPS, LOG_INFO, "ERROR:  nullptr model passed to gr2PlayAnimation!");
+		return nullptr;
 	}
 
 	if (!animation)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "ERROR:  NULL animation passed to gr2PlayAnimation!");
-		return NULL;
+		Write_Log (LOG_FPS, LOG_INFO, "ERROR:  nullptr animation passed to gr2PlayAnimation!");
+		return nullptr;
 	}
 
 	if (!(animation->animation))
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "ERROR:  empty animation (NULL gr2 animation) passed to gr2PlayAnimation!");
-		return NULL;
+		Write_Log (LOG_FPS, LOG_INFO, "ERROR:  empty animation (nullptr gr2 animation) passed to gr2PlayAnimation!");
+		return nullptr;
 	}
 
 //	control = GrannyPlayControlledAnimation((frametime / 1000.0f), animation->animation, model->GrannyInstance);
@@ -1410,7 +1410,7 @@ gr2Control* gr2PlayAnimation (gr2Model* model, gr2Animation* animation)
     if (!newControl)
 	{
 		piExitProgram (__FILE__, __LINE__, "gr2PlayAnimation: Failed to allocate memory for animation");
-		return NULL;
+		return nullptr;
 	}
 
 	newControl->control = control;
@@ -1437,7 +1437,7 @@ LOGICAL gr2PlayBlendedAnimationFull (gr2Model* model, gr2AnimationBlend* blend, 
 	{
 		if (!blend)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "gr2PlayBlendedAnimation: NULL blend!");
+			Write_Log (LOG_FPS, LOG_INFO, "gr2PlayBlendedAnimation: nullptr blend!");
 			return FALSE;
 		}
 		if (!blend->animations[0])
@@ -1470,9 +1470,9 @@ LOGICAL gr2PlayBlendedAnimationFull (gr2Model* model, gr2AnimationBlend* blend, 
 
 	Write_Log (LOG_FPS, LOG_INFO, "gr2PlayBlendedAnimation: Starting blend 0x%x (%s) on model %s at %f", blend, blend->blendFile, model->name, (frametime/1000.0f));
 
-	granny_controlled_animation_builder* builder		= NULL;
-	granny_control	* control								= NULL;
-	gr2Control* newControl									= NULL;
+	granny_controlled_animation_builder* builder		= nullptr;
+	granny_control	* control								= nullptr;
+	gr2Control* newControl									= nullptr;
 	gr2ControlBlend* blendControl							= _gr2BlendControlPool.Pop();
 
 	if(!model->blends)
@@ -1483,8 +1483,8 @@ LOGICAL gr2PlayBlendedAnimationFull (gr2Model* model, gr2AnimationBlend* blend, 
 	blendControl->active		= TRUE;
 	blendControl->startTime		= frametime;
 	blendControl->killTime		= 0;
-	blendControl->killCallback	= NULL;
-	blendControl->killData		= NULL;
+	blendControl->killCallback	= nullptr;
+	blendControl->killData		= nullptr;
 	blendControl->modifier		= 0.0f;
 	blendControl->startWeight	= 1.0f;
 
@@ -1528,7 +1528,7 @@ LOGICAL gr2PlayBlendedAnimationFull (gr2Model* model, gr2AnimationBlend* blend, 
 // animation.  this should help with the foot-shifts
 void gr2AnimationSyncBaseLoop (gr2Model* model, gr2AnimationBlend* blend, gr2Control* inControl)
 {
-	if ((model == NULL) || (model->blends == NULL) || (inControl == NULL) || (inControl->animation == NULL))
+	if ((model == nullptr) || (model->blends == nullptr) || (inControl == nullptr) || (inControl->animation == nullptr))
 		return;
 
 	// searching by actual granny animation address .. the gr2Animation*s are unique (due to masks and such)
@@ -1566,20 +1566,20 @@ gr2ControlBlend* gr2BlendControlFindRunningBlend (gr2Model* model, gr2AnimationB
 {
 	if (!model)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlFindRunningBlend: NULL model passed");
-		return NULL;
+		Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlFindRunningBlend: nullptr model passed");
+		return nullptr;
 	}
 
 	if (!model->blends)
 	{
 		Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlFindRunningBlend: model has no blends");
-		return NULL;
+		return nullptr;
 	}
 
 	if ((!animationBlend) || (!animationBlend->animations[0])  || (!animationBlend->numBlends))
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlFindRunningBlend: NULL data passed");
-		return NULL;
+		Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlFindRunningBlend: nullptr data passed");
+		return nullptr;
 	}
 
 	GR2_BLEND_MAP::iterator found = model->blends->find(animationBlend);
@@ -1587,7 +1587,7 @@ gr2ControlBlend* gr2BlendControlFindRunningBlend (gr2Model* model, gr2AnimationB
 	if(found != model->blends->end())
 		return found->second;
 
-	return NULL;
+	return nullptr;
 }
 
 void gr2BlendControlSetMixin (gr2Model* model, gr2AnimationBlend* animationBlend)
@@ -1629,7 +1629,7 @@ void gr2BlendControlSetWeight (gr2Model* model,
 		if (animationBlend)
 			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetWeight: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetWeight: NULL animationBlend");
+			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetWeight: nullptr animationBlend");
 		*/
 
 		return;
@@ -1682,7 +1682,7 @@ void gr2BlendControlSetLastFrame (gr2Model* model, gr2AnimationBlend* animationB
 		if (animationBlend)
 			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetLastFrame: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetLastFrame: NULL animationBlend");
+			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetLastFrame: nullptr animationBlend");
 		return;
 	}
 
@@ -1702,7 +1702,7 @@ void gr2BlendControlSetLoopCount (gr2Model* model, gr2AnimationBlend* animationB
 		if (animationBlend)
 			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetLoopCount: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetLoopCount: NULL animationBlend");
+			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetLoopCount: nullptr animationBlend");
 		return;
 	}
 
@@ -1726,7 +1726,7 @@ void gr2BlendControlSetLoopCountForGrenade (gr2Model* model, gr2AnimationBlend* 
 		if (animationBlend)
 			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetLoopCountForGrenade: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetLoopCountForGrenade: NULL animationBlend");
+			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetLoopCountForGrenade: nullptr animationBlend");
 		return;
 	}
 
@@ -1748,7 +1748,7 @@ void gr2BlendControlSetSpeed(gr2Model* model, gr2AnimationBlend* animationBlend,
 		if (animationBlend)
 			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetSpeed: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetSpeed: NULL animationBlend");
+			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetSpeed: nullptr animationBlend");
 		*/
 		return;
 	}
@@ -1776,7 +1776,7 @@ void gr2BlendControlSetEaseOutDuration (gr2Model* model, gr2AnimationBlend* anim
 		if (animationBlend)
 			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetEaseOutDuration: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetEaseOutDuration: NULL animationBlend");
+			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetEaseOutDuration: nullptr animationBlend");
 		return;
 	}
 
@@ -1799,7 +1799,7 @@ void gr2BlendControlSetEaseInDuration (gr2Model* model, gr2AnimationBlend* anima
 		if (animationBlend)
 			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetEaseInDuration: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetEaseInDuration: NULL animationBlend");
+			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetEaseInDuration: nullptr animationBlend");
 		return;
 	}
 
@@ -1840,7 +1840,7 @@ void gr2BlendControlEaseOut (gr2Model* model, gr2AnimationBlend* animationBlend,
 		if (animationBlend)
 			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlEaseOut: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlEaseOut: NULL animationBlend");
+			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlEaseOut: nullptr animationBlend");
 		return;
 	}
 
@@ -1861,7 +1861,7 @@ LOGICAL gr2BlendIsComplete (gr2Model* model, gr2AnimationBlend* animationBlend)
 		if (animationBlend)
 			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendIsControlComplete: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendIsControlComplete: NULL animationBlend");
+			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendIsControlComplete: nullptr animationBlend");
 		return FALSE;
 	}
 
@@ -1892,7 +1892,7 @@ FLOAT32 gr2BlendControlCompletePercent (gr2Model* model, gr2AnimationBlend* anim
 		if (animationBlend)
 			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlCompletePercent: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlCompletePercent: NULL animationBlend");
+			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlCompletePercent: nullptr animationBlend");
 		return -1.0f;
 	}
 
@@ -1928,7 +1928,7 @@ void gr2BlendControlSetStartOffset (gr2Model* model, gr2AnimationBlend* animatio
 		if (animationBlend)
 			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetStartOffset: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetStartOffset: NULL animationBlend");
+			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetStartOffset: nullptr animationBlend");
 		return;
 	}
 
@@ -1957,7 +1957,7 @@ void gr2BlendControlSetEndOffset(gr2Model* model, gr2AnimationBlend* animationBl
 		if (animationBlend)
 			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetEndOffset: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetEndOffset: NULL animationBlend");
+			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetEndOffset: nullptr animationBlend");
 
 		return;
 	}
@@ -1988,7 +1988,6 @@ void gr2BlendControlSetEndOffset(gr2Model* model, gr2AnimationBlend* animationBl
 }
 
 
-#if !defined(USE_OSG)
 #ifdef BETA_RELEASE
 void BBoxVertex (piVECTOR* target, float* Transform, float Cx, float Cy, float Cz)
 {
@@ -2085,7 +2084,6 @@ void gr2ToggleAnimOutput (void)
 	animOutput = !animOutput;
 }
 #endif // BETA_RELEASE
-#endif // defined(USE_OSG)
 
 void gr2RenderShadowModel(gr2Model* model, bool update)
 {
@@ -2093,9 +2091,9 @@ void gr2RenderShadowModel(gr2Model* model, bool update)
         return;
 
     bool matrixchanged = false;
-    granny_matrix_4x4* CompositeBuffer = NULL;
+    granny_matrix_4x4* CompositeBuffer = nullptr;
 	piMATRIX world = IdentityMatrix;
-    gr2Mesh* mesh = NULL;
+    gr2Mesh* mesh = nullptr;
 
 	// either force it or update it if we haven't this frame
 	update = (update || model->lastDeformTime != frametime);
@@ -2119,7 +2117,7 @@ void gr2RenderShadowModel(gr2Model* model, bool update)
 			{
 				int count = GrannyGetMeshBindingBoneCount(mesh->data->GrannyBinding);
 
-				if(localScene.compositeTempBuffer == NULL)
+				if(localScene.compositeTempBuffer == nullptr)
 				{
 					localScene.compositeTempBufferSize = GrannyGetMeshBinding4x4ArraySize(mesh->data->GrannyBinding, count);
 					localScene.compositeTempBuffer = (granny_real32*)memAlloc(localScene.compositeTempBufferSize);
@@ -2268,13 +2266,13 @@ LOGICAL gr2RenderModel(gr2Model* currentModel, bool update)
 
     static LOGICAL PrevNormalMaps = -1;
 
-	granny_matrix_4x4*			CompositeBuffer = NULL;
+	granny_matrix_4x4*			CompositeBuffer = nullptr;
 	UINT32						meshIndex = 0;
-	gr2Mesh*						currentMesh = NULL;
-	SINT32*						toBoneIndices = NULL;
+	gr2Mesh*						currentMesh = nullptr;
+	SINT32*						toBoneIndices = nullptr;
 	SINT32						vertexCount = 0;
 	SINT32						groupCount = 0;
-	granny_tri_material_group*	group = NULL;
+	granny_tri_material_group*	group = nullptr;
 
     piMATRIX newMatrix = IdentityMatrix;
 	piMATRIX world = IdentityMatrix;
@@ -2298,7 +2296,7 @@ LOGICAL gr2RenderModel(gr2Model* currentModel, bool update)
 			{
 				int count = GrannyGetMeshBindingBoneCount (currentMesh->data->GrannyBinding);
 
-				if (localScene.compositeTempBuffer == NULL)
+				if (localScene.compositeTempBuffer == nullptr)
 				{
 					localScene.compositeTempBufferSize = GrannyGetMeshBinding4x4ArraySize(currentMesh->data->GrannyBinding, count);
 					localScene.compositeTempBuffer = (granny_real32*) memAlloc(localScene.compositeTempBufferSize);
@@ -2486,13 +2484,13 @@ LOGICAL gr2RenderModel(gr2Model* currentModel, bool update)
         return 1;
     }
 
-	granny_matrix_4x4*			CompositeBuffer = NULL;
+	granny_matrix_4x4*			CompositeBuffer = nullptr;
 	UINT32						meshIndex = 0;
-	gr2Mesh*						currentMesh = NULL;
-	SINT32*						toBoneIndices = NULL;
+	gr2Mesh*						currentMesh = nullptr;
+	SINT32*						toBoneIndices = nullptr;
 	SINT32						vertexCount = 0;
 	SINT32						groupCount = 0;
-	granny_tri_material_group*	group = NULL;
+	granny_tri_material_group*	group = nullptr;
 
     piMATRIX newMatrix = IdentityMatrix;
 	piMATRIX world = IdentityMatrix;
@@ -2519,7 +2517,7 @@ LOGICAL gr2RenderModel(gr2Model* currentModel, bool update)
 			{
 				int count = GrannyGetMeshBindingBoneCount (currentMesh->data->GrannyBinding);
 
-				if (localScene.compositeTempBuffer == NULL)
+				if (localScene.compositeTempBuffer == nullptr)
 				{
 					localScene.compositeTempBufferSize = GrannyGetMeshBinding4x4ArraySize(currentMesh->data->GrannyBinding, count);
 					localScene.compositeTempBuffer = (granny_real32*) memAlloc(localScene.compositeTempBufferSize);
@@ -2658,14 +2656,12 @@ LOGICAL gr2RenderModel(gr2Model* currentModel, bool update)
 
 			//vertexPtr = currentMesh->Vertices();
 
-#if !defined(USE_OSG)
             // gr2RenderModel needs cleanup
             if(currentMesh->data->drawcallback)
             {
                 currentMesh->data->drawcallback(currentMesh, indexPtr, vertexCount, group);
 		    }
 			else
-#endif
 			{
                 fpsmaterial->Apply();
 
@@ -2745,7 +2741,7 @@ void gr2FreeQueuedEvent(gr2QueuedEvent* evt)
 }
 
 /*
-static FLOAT64 gr2UpdateTwist(FLOAT64& target, FLOAT64& twist, FLOAT64& speed, FLOAT32 delta, FLOAT64 parentMove = 0, FLOAT32 snap = 0, const char* debug = NULL)
+static FLOAT64 gr2UpdateTwist(FLOAT64& target, FLOAT64& twist, FLOAT64& speed, FLOAT32 delta, FLOAT64 parentMove = 0, FLOAT32 snap = 0, const char* debug = nullptr)
 {
 	if (target != twist || parentMove)
 	{
@@ -2797,7 +2793,7 @@ static FLOAT64 gr2UpdateTwist(FLOAT64& target, FLOAT64& twist, FLOAT64& speed, F
 }
 */
 #if(0)
-static FLOAT64 gr2UpdateTwist(FLOAT64& target, FLOAT64& twist, FLOAT64& speed, FLOAT32 delta, FLOAT64 parentMove = 0, FLOAT32 snap = 0, const char* debug = NULL)
+static FLOAT64 gr2UpdateTwist(FLOAT64& target, FLOAT64& twist, FLOAT64& speed, FLOAT32 delta, FLOAT64 parentMove = 0, FLOAT32 snap = 0, const char* debug = nullptr)
 {
 	if (target != twist)
 	{
@@ -2846,7 +2842,7 @@ void gr2UpdateModelOld(gr2Model* model, bool force, bool granular)
 {
 	if(!model)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2UpdateModel: *** ERROR *** NULL MODEL");
+		Write_Log (LOG_FPS, LOG_INFO, "gr2UpdateModel: *** ERROR *** nullptr MODEL");
 		return;
 	}
 
@@ -2934,7 +2930,7 @@ void gr2UpdateModelOld(gr2Model* model, bool force, bool granular)
 		}
 		else
 		{
-			finalModelTransformAddress = NULL;
+			finalModelTransformAddress = nullptr;
 		}
 
 		GrannyBuildWorldPose(model->skeleton, 0, boneCount, localScene.SharedLocalPose, finalModelTransformAddress, model->WorldPose);
@@ -2954,7 +2950,7 @@ void gr2UpdateModel(gr2Model* model, bool force, bool granular)
 {
 	if(!model)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2UpdateModel: *** ERROR *** NULL MODEL");
+		Write_Log (LOG_FPS, LOG_INFO, "gr2UpdateModel: *** ERROR *** nullptr MODEL");
 		return;
 	}
 
@@ -3213,7 +3209,7 @@ void gr2UpdateModel(gr2Model* model, bool force, bool granular)
 			finalModelTransformAddress = (float*)model->finalModelTransform;
 		}
 		else
-			finalModelTransformAddress = NULL;
+			finalModelTransformAddress = nullptr;
 
 		/* terrainize feet; doesn't quite work
 		piVECTOR nt;
@@ -3366,7 +3362,7 @@ UINT32 gr2IsControlActive (gr2Control* gr2Control)
 {
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2IsControlActive: NULL Control");
+		piExitProgram (__FILE__, __LINE__, "gr2IsControlActive: nullptr Control");
 		return FALSE;
 	}
 
@@ -3379,7 +3375,7 @@ UINT32 gr2IsControlComplete (gr2Control* gr2Control)
 
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2IsControlComplete: NULL Control");
+		piExitProgram (__FILE__, __LINE__, "gr2IsControlComplete: nullptr Control");
 		return FALSE;
 	}
 
@@ -3398,7 +3394,7 @@ void gr2FreeAnimation (gr2Animation* anim)
 	/*
 	if (!anim)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2FreeAnimation: NULL anim");
+		piExitProgram (__FILE__, __LINE__, "gr2FreeAnimation: nullptr anim");
 	}
 	*/
 
@@ -3408,12 +3404,12 @@ void gr2FreeAnimation (gr2Animation* anim)
         if(anim->events[i])
         {
 			_gr2EventPool.Push(anim->events[i]);
-            anim->events[i] = NULL;
+            anim->events[i] = nullptr;
         }
     }
 	*/
 
-	anim->events = NULL;
+	anim->events = nullptr;
 
 	_gr2AnimationPool.Push(anim);
 }
@@ -3445,7 +3441,7 @@ void gr2StopControl (gr2Control* gr2Control, LOGICAL immediate)
 
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2FreeControl: NULL Control");
+		piExitProgram (__FILE__, __LINE__, "gr2FreeControl: nullptr Control");
 	}
 
 	if (immediate)
@@ -3519,7 +3515,7 @@ void gr2ControlSetLastFrame (gr2Control* gr2Control)
 {
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2ControlSetLastFrame: NULL Control");
+		piExitProgram (__FILE__, __LINE__, "gr2ControlSetLastFrame: nullptr Control");
 	}
 
 	GrannySetControlRawLocalClock(gr2Control->control, GrannyGetControlLocalDuration(gr2Control->control));
@@ -3529,7 +3525,7 @@ void gr2ControlSetLoopCount (gr2Control* gr2Control, SINT32 numLoops)
 {
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2ControlSetLoopCount: NULL Control");
+		piExitProgram (__FILE__, __LINE__, "gr2ControlSetLoopCount: nullptr Control");
 	}
 
 	if (numLoops)
@@ -3545,7 +3541,7 @@ void gr2ControlSetEaseInDuration (gr2Control* gr2Control, FLOAT32 time)
 {
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2ControlSetEaseInDuration: NULL Control");
+		piExitProgram (__FILE__, __LINE__, "gr2ControlSetEaseInDuration: nullptr Control");
 	}
 
 	gr2Control->easeInDuration = time;
@@ -3561,7 +3557,7 @@ void gr2ControlSetEaseOutDuration (gr2Control* gr2Control, FLOAT32 time)
 {
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2ControlSetEaseOutDuration: NULL Control");
+		piExitProgram (__FILE__, __LINE__, "gr2ControlSetEaseOutDuration: nullptr Control");
 	}
 
 	gr2Control->easeOutDuration = time;
@@ -3579,7 +3575,7 @@ void gr2ControlSetSpeed (gr2Control* gr2Control, FLOAT32 speed)
 {
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2ControlSetSpeed: NULL Control");
+		piExitProgram (__FILE__, __LINE__, "gr2ControlSetSpeed: nullptr Control");
 	}
 
 	GrannySetControlSpeed (gr2Control->control, speed);
@@ -3589,7 +3585,7 @@ void gr2ControlSetWeight (gr2Control* gr2Control, FLOAT32 weight)
 {
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2ControlSetSpeed: NULL Control");
+		piExitProgram (__FILE__, __LINE__, "gr2ControlSetSpeed: nullptr Control");
 	}
 
 	GrannySetControlWeight (gr2Control->control, weight);
@@ -3765,7 +3761,7 @@ granny_world_pose* gr2GetWorldPose(gr2Model* model)
 void gr2SetWorldPose(gr2Model* from, gr2Model* to)
 {
 	if(from && to)
-		GrannyBuildWorldPose(from->skeleton, 0, to->boneCount, localScene.SharedLocalPose, NULL, to->WorldPose);
+		GrannyBuildWorldPose(from->skeleton, 0, to->boneCount, localScene.SharedLocalPose, nullptr, to->WorldPose);
 }
 
 const char* gr2GetPath(gr2Model* model)
@@ -3902,7 +3898,7 @@ granny_real32*	gr2GetBoneTransform (gr2Model* model, SCHAR* boneName)
 
 		snprintf (crap, 255, "gr2GetBoneTransform: Bone %s not found in model %s", boneName, model->grannyModel->Name);
 		Write_Log (LOG_FPS, LOG_INFO, "%s", crap);
-		return NULL;
+		return nullptr;
 	}
 
 	return gr2GetBoneTransformByIndex(model, boneIndex);
@@ -3923,7 +3919,7 @@ granny_real32* gr2GetCompositeBoneTransform (gr2Model* model, SCHAR* boneName)
 
 		snprintf (crap, 255, "gr2GetBoneTransform: Bone %s not found in model %s", boneName, model->grannyModel->Name);
 		Write_Log (LOG_FPS, LOG_INFO, "%s", crap);
-		return NULL;
+		return nullptr;
 	}
 
 	return gr2GetCompositeBoneTransformByIndex(model, boneIndex);
@@ -3988,7 +3984,7 @@ LOGICAL gr2ModelHasMesh(gr2Model* model, const char* mesh, int* meshIndex, int* 
 {
 	if (!model) return FALSE;
 
-	gr2Mesh* currentMesh = NULL;
+	gr2Mesh* currentMesh = nullptr;
 
 	for(unsigned int m = 0; m < model->meshes.size(); m++)
 	{
@@ -4125,12 +4121,12 @@ LOGICAL gr2CollideRayWithModel (gr2Model* collisionModel, piVECTOR* rayStart, pi
 {
     unsigned int			meshIndex = 0;
     int bbIndex = 0, currentBoneIndex = 0;
-	gr2Mesh*					currentMesh = NULL;
-	granny_bone_binding*		currentBoneBinding = NULL;
+	gr2Mesh*					currentMesh = nullptr;
+	granny_bone_binding*		currentBoneBinding = nullptr;
 	// oriented bounding box mins & maxs
-	float*					OBBMin = NULL, *OBBMax = NULL;
-	float*					transform = NULL;
-	granny_world_pose*		worldPose = NULL;
+	float*					OBBMin = nullptr, *OBBMax = nullptr;
+	float*					transform = nullptr;
+	granny_world_pose*		worldPose = nullptr;
 	granny_box_intersection	intersection;
 
 	memset(&intersection, 0, sizeof(granny_box_intersection));
@@ -4274,7 +4270,7 @@ void loadTextures(granny_file_info* fileInfo, const char* path)
 		else
 		{
 			Write_Log (LOG_FPS, LOG_INFO, "whoa, what kind of texture is this?!?");
-			//return NULL;
+			//return nullptr;
 		}
 	}
 
@@ -4296,7 +4292,7 @@ const char* getBaseName(const char* path, const char* prePath)
 	// find the last directory seperator
 	char* ptr = strrchr(texname, '\\');
 
-	if(ptr != NULL)
+	if(ptr != nullptr)
 	{
 		ptr += 1;
 		strcpy(texname, ptr);
@@ -4305,7 +4301,7 @@ const char* getBaseName(const char* path, const char* prePath)
 	// find the filetype seperator and null it
 	ptr = strrchr(texname, '.');
 
-	if(ptr != NULL)
+	if(ptr != nullptr)
 		*ptr = 0;
 
 	// add in our prepay if one was specified
@@ -4357,7 +4353,7 @@ static SINT32 loadSubMaterial(granny_variant& data)
 			if(piIsTexture(texid, 0))
 			{
 				char* ptr = strrchr(texname, '.');
-				if(ptr != NULL) *ptr = 0;
+				if(ptr != nullptr) *ptr = 0;
 
 				// make sure and set our name so other models can use it to
 				piSetTextureName(texid, texname);
@@ -4392,7 +4388,7 @@ static SINT32 loadSubMaterial(granny_texture* texture)
 			if(piIsTexture(texid, 0))
 			{
 				char* ptr = strrchr(texname, '.');
-				if(ptr != NULL) *ptr = 0;
+				if(ptr != nullptr) *ptr = 0;
 
 				// make sure and set our name so other models can use it to
 				piSetTextureName(texid, texname);
@@ -4413,7 +4409,7 @@ static SINT32 loadMaterials(granny_material* material, bool& hasNormals)
 	SINT32 diffuse	= -1;
 	SINT32 normal	= -1;
 	SINT32 specular = -1;
-	char* ptr = NULL;
+	char* ptr = nullptr;
 
 	// loop over the maps in this material and load them
 	// also find the diffuse color map associated with this material
@@ -4520,8 +4516,8 @@ void createMeshTextures(gr2MeshData* data, bool wantNormals)
 
 	int textureCount = grannyMesh->MaterialBindingCount;
 
-	granny_texture* grannyTexture = NULL;
-	SCHAR* ptr = NULL;
+	granny_texture* grannyTexture = nullptr;
+	SCHAR* ptr = nullptr;
 	bool hasNormals = false;
 
 	for(int t = 0; t < textureCount; ++t)
@@ -4642,18 +4638,18 @@ gr2AnimationBlend* gr2LoadBlendedAnimation(SCHAR* blendfile, SINT32 boneCount)
 		return gr2LoadBlendedAnimationTXT(path, boneCount);
 
 	// blend file not found
-	return NULL;
+	return nullptr;
 }
 
 static SINT32 _translateBoneIndex(SINT32 bone)
 {
-	static gr2Model* oldSkeleton = NULL;
-	static gr2Model* newSkeleton = NULL;
+	static gr2Model* oldSkeleton = nullptr;
+	static gr2Model* newSkeleton = nullptr;
 
-	if(oldSkeleton == NULL)
+	if(oldSkeleton == nullptr)
 	{
-		oldSkeleton = gr2LoadModel("TPS\\troopskel", NULL, NULL, 1);
-		newSkeleton = gr2Model::Load(fpTPSSkeletonFile, NULL, NULL, 1);
+		oldSkeleton = gr2LoadModel("TPS\\troopskel", nullptr, nullptr, 1);
+		newSkeleton = gr2Model::Load(fpTPSSkeletonFile, nullptr, nullptr, 1);
 	}
 
 	if(bone < oldSkeleton->skeleton->BoneCount)
@@ -4700,7 +4696,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 	memset (loadedMasks, 0, sizeof (loadedMasks));
 
 	SINT32 blendFileID = fioOpen(blendfile);
-	if (blendFileID == -1) return NULL;
+	if (blendFileID == -1) return nullptr;
 
 	bool translateBones = true;
 	SINT32 type = gr2AnimationBlend::BASE;
@@ -4733,7 +4729,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 			}
 
 			ptr = strrchr(tString, '.');
-			if (ptr != NULL)
+			if (ptr != nullptr)
 			{
 				*ptr = 0;
 			}
@@ -4844,7 +4840,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 	if(newBlend->numBlends != numAnimFiles)
 		bool stop = true;
 
-	const SCHAR* fileName = NULL;
+	const SCHAR* fileName = nullptr;
 	char* slash = strchr(blendfile, '\\');
 
 	while(slash)
@@ -4880,7 +4876,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 	blendFileID = fioOpen(blendfile);
 	if (blendFileID == -1)
 	{
-		return NULL;
+		return nullptr;
 	}
 
 	while ((fioGetLine (blendFileID, buf, 255) != 0))
@@ -4900,7 +4896,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 			}
 
 			ptr = strrchr(tString, '.');
-			if (ptr != NULL)
+			if (ptr != nullptr)
 			{
 				*ptr = 0;
 			}
@@ -5019,7 +5015,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimationXML(SCHAR* blendfile, SINT32 boneCount
 	if(!config.Load(&userData))
 	{
 		free(newBlend);
-		return NULL;
+		return nullptr;
 	}
 
 	strncpy(newBlend->blendFile, blendfile, MAX_GR2_PATH_SIZE);
@@ -5067,8 +5063,8 @@ LOGICAL gr2RemoveAllBlendedAnimations (gr2Model* model, FLOAT32 easeOutOverrideT
 	std::vector<gr2AnimationBlend*> blendsToKill;
 #endif
 
-	gr2AnimationBlend* curBlend = NULL;
-	gr2ControlBlend* curControl = NULL;
+	gr2AnimationBlend* curBlend = nullptr;
+	gr2ControlBlend* curControl = nullptr;
 
 	for(; it != model->blends->end(); ++it)
 	{
@@ -5185,8 +5181,8 @@ LOGICAL gr2ClearBlendedAnimations(gr2Model* model)
 	GR2_BLEND_MAP::iterator it = model->blends->begin();
 	std::vector<gr2AnimationBlend*> blendsToKill;
 
-	gr2AnimationBlend* curBlend = NULL;
-	gr2ControlBlend* curControl = NULL;
+	gr2AnimationBlend* curBlend = nullptr;
+	gr2ControlBlend* curControl = nullptr;
 
 	for(; it != model->blends->end(); ++it)
 		blendsToKill.push_back(it->first);
@@ -5676,10 +5672,10 @@ void gr2ModelFindAndReplaceTexture (gr2Model* model, SINT32 origTexID, UINT32 re
 
 SINT32* gr2ModelGetLoadedTextures (gr2Model* model, SINT32* numTextures)
 {
-	return NULL;
+	return nullptr;
 	/*
 	if ((!model) || (!numTextures))
-		return NULL;
+		return nullptr;
 
 	*numTextures = model->numTextures;
 
@@ -6005,36 +6001,6 @@ FLOAT64 gr2ModelGetTorsoRotationDiff(gr2Model* model, FLOAT64 angle)
 	return 0.0f;
 }
 
- #if defined(USE_OSG)
- #include <osg/Quat>
-
-void gr2AddAxisRotationToBoneInLocalPose (granny_local_pose* pose, SINT32 boneNum, double axis[3], double angle)
-{
- 	granny_transform* boneTransform = GrannyGetLocalPoseTransform(pose, boneNum);
-
-	osg::Quat	a, b;
-	osg::Vec3d	qAxis;
-
-	qAxis.x() = axis[0];
-	qAxis.y() = axis[1];
-	qAxis.z() = axis[2];
-
-	a.x() = boneTransform->Orientation[0];
-	a.y() = boneTransform->Orientation[1];
-	a.z() = boneTransform->Orientation[2];
-	a.w() = boneTransform->Orientation[3];
-
-	b.makeRotate(angle, qAxis);
-	a *= b;
-
-	boneTransform->Orientation[0] = (granny_real32)a.x();
-	boneTransform->Orientation[1] = (granny_real32)a.y();
-	boneTransform->Orientation[2] = (granny_real32)a.z();
-	boneTransform->Orientation[3] = (granny_real32)a.w();
-}
-
- #else
-
 static piQUAT* _RotationToQuaternion(piQUAT* q, piVECTOR const* axis, double angle)
 {
 	float scale = (float)(sin(angle / 2.0f) / sqrt(axis->x * axis->x + axis->y * axis->y + axis->z * axis->z));
@@ -6086,8 +6052,6 @@ void gr2AddAxisRotationToBoneInLocalPose (granny_local_pose* pose, SINT32 boneNu
 	boneTransform->Orientation[2] = (granny_real32)a.z;
 	boneTransform->Orientation[3] = (granny_real32)a.w;
 }
-
-#endif
 
 const char* gr2GetPathFromBlend(gr2AnimationBlend* blend)
 {
@@ -6218,7 +6182,7 @@ XML_TAG_HANDLER(xmlBlendAnimTagHandler)
 	// get a pointer to the current animation address
 	gr2Animation* animation = blend->animations[blend->numBlends];
 
-	// animation will be NULL so create it
+	// animation will be nullptr so create it
 	animation = gr2LoadAnimation((SCHAR*)animFile, 1);
 
 	if(animation)
@@ -6280,783 +6244,6 @@ FLOAT64 gr2NormalizeAngle(FLOAT64& angle)
 
 	return angle;
 }
-
-
-#if defined(USE_OSG)
-void _setupForOSG(gr2Model* model, gr2Mesh* mesh)
-{
-    granny_tri_material_group* groups = NULL;
-
-    groups = GrannyGetMeshTriangleGroups(mesh->GrannyMesh);
-    int count = GrannyGetMeshTriangleGroupCount(mesh->GrannyMesh);
-    int unit = 0;
-
-    for(int q = 0; q < count; q++)
-    {
-        granny_tri_material_group* group = &groups[q];
-
-        NormalStateSet* ss = new NormalStateSet;
-
-        ss->setMode(GL_BLEND, osg::StateAttribute::OFF);
-        ss->setMode(GL_LIGHTING, osg::StateAttribute::ON);
-		ss->setMode(GL_LIGHT0, osg::StateAttribute::ON);
-
-        mesh->_ss[group->MaterialIndex] = ss;
-
-        _setupTextureOSG(model, mesh, group->MaterialIndex, ss);
-        _setupMaterialOSG(mesh, group->MaterialIndex, ss);
-    }
-}
-#endif // defined(USE_OSG)
-
-#if defined(USE_OSG)
-bool _setupTextureOSG(gr2Model* model, gr2Mesh* mesh, int i, NormalStateSet* ss)
-{
-    if(mesh->GrannyMesh->MaterialBindingCount == 0)
-    {
-        return false;
-    }
-
-    granny_texture* gt = NULL;
-    gt = GrannyGetMaterialTextureByType(mesh->GrannyMesh->MaterialBindings[i].Material, GrannyDiffuseColorTexture);
-
-    if(!gt)
-    {
-        return false;
-    }
-
-    std::map<std::string, osg::Texture2D*>::iterator itr;
-	std::map<std::string, osg::Texture2D*>::iterator itr2;
-
-    std::string name = gt->FromFileName;
-    int ext = name.rfind('.');
-    name = name.substr(0, ext);
-
-    // Get original texture
-    itr = model->_locals.find(name);
-
-    // Assign it to the mesh
-    if(itr != model->_locals.end())
-    {
-        // Assign local texture to unit 0
-		ss->setTextureAttributeAndModes(0, itr->second, osg::StateAttribute::ON);
-
-        // Determine if this texture has a normal
-        itr2 = model->_normals.find(itr->first + "_normal");
-
-        if(itr2 != model->_normals.end())
-        {
-            // If this is null, these vertices have no deformation requirements.
-            // I.E., no GrannyDeformer.
-            if(!mesh->pngt)
-            {
-                int vertexCount = (int)GrannyGetMeshVertexCount(mesh->GrannyMesh);
-
-                mesh->pngt = new piTVERTEX[vertexCount];
-                memset(mesh->pngt, 0, sizeof(piTVERTEX) * vertexCount);
-                GrannyCopyMeshVertices(mesh->GrannyMesh, GrannyPNGT3332VertexType, mesh->pngt);
-            }
-
-            // Initialize shader stuff
-            ss->fpssetup();
-
-            // Normals get assigned to unit 1
-            ss->setTextureAttributeAndModes(1, itr2->second, osg::StateAttribute::ON);
-
-            // Determine if this texture has a spec map. Only true if normal mapped.
-            itr2 = model->_specular.find(itr->first + "_spec");
-
-            if(itr2 != model->_specular.end())
-            {
-                // Specular gets assigned to unit 2
-                ss->setTextureAttributeAndModes(2, itr2->second, osg::StateAttribute::ON);
-            }
-            else
-            {
-                static osg::*_ptr<osg::Texture2D> _white;
-
-                if(!_white.valid())
-                {
-                    _white = new osg::Texture2D;
-
-                    osg::Image* img = osgDB::readImageFile("default_spec.dds");
-
-                    _white->setImage(img);
-                }
-
-                ss->setTextureAttributeAndModes(2, _white.get(), osg::StateAttribute::ON);
-            }
-        }
-    }
-
-    return true;
-}
-#endif // defined(USE_OSG)
-
-#if defined(USE_OSG)
-void _setupMaterialOSG(gr2Mesh* mesh, int i, NormalStateSet* ss)
-{
-    if(mesh->GrannyMesh->MaterialBindingCount == 0)
-    {
-        return;
-    }
-
-    granny_mesh* gm = mesh->GrannyMesh;
-
-    MATERIAL* materials;
-    piGetMaterials(&materials);
-
-#if USE_GRANNY_MATERIAL
-
-    granny_data_type_definition MaterialParametersType[] =
-    {
-        {GrannyReal32Member, "Ambient Color", 0, 3},
-        {GrannyReal32Member, "Diffuse Color", 0, 3},
-        {GrannyReal32Member, "Specular Color", 0, 3},
-        {GrannyReal32Member, "Emission Color", 0, 3},
-        {GrannyReal32Member, "Shininess", 0, 1},
-        {GrannyReal32Member, "Shininess Strength", 0, 1},
-        {GrannyEndMember}
-    };
-
-    gr2Material material;
-    GrannyConvertSingleObject(gm->MaterialBindings[i].Material->ExtendedData.Type,
-						      gm->MaterialBindings[i].Material->ExtendedData.Object,
-						      MaterialParametersType,
-                              &material);
-
-    osg::*_ptr<osg::Material> mat = new osg::Material;
-
-    osg::Vec4 diffuse = osg::Vec4(material.diffuse[0], material.diffuse[1], material.diffuse[2], 1.0);
-    mat->setDiffuse(osg::Material::FRONT_AND_BACK, diffuse);
-
-    osg::Vec4 ambient = osg::Vec4(material.ambient[0], material.ambient[1], material.ambient[2], 1.0);
-    mat->setAmbient(osg::Material::FRONT_AND_BACK, ambient);
-
-    osg::Vec4 specular = osg::Vec4(material.specular[0], material.specular[1], material.specular[2], 1.0);
-    mat->setSpecular(osg::Material::FRONT_AND_BACK, specular);
-
-    osg::Vec4 emissive = osg::Vec4(material.emissive[0], material.emissive[1], material.emissive[2], 1.0);
-    mat->setEmission(osg::Material::FRONT_AND_BACK, emissive);
-
-    float shininess = material.shininess * 100.0f;
-    mat->setShininess(osg::Material::FRONT_AND_BACK, shininess);
-
-    ss->setAttribute(mat.get(), osg::StateAttribute::ON);
-
-#else
-    std::string name = gm->MaterialBindings[i].Material->Name;
-    // HACK we came up with to use same materials with different textures
-    // (See Toto)
-    SINT32 pos = name.find('*');
-
-    if(pos != std::string::npos)
-    {
-        name[pos] = 0;
-    }
-
-    int matid = piFindMaterialName(name.c_str());
-
-    if(piIsMaterial(matid))
-    {
-        osg::*_ptr<osg::Material> mat = new osg::Material;
-
-        piCOLORVALUE* cv = &materials[matid].material.diffuse;
-        mat->setDiffuse(osg::Material::FRONT_AND_BACK, osg::Vec4(cv->r, cv->g, cv->r, cv->a));
-
-        cv = &materials[matid].material.ambient;
-        mat->setAmbient(osg::Material::FRONT_AND_BACK, osg::Vec4(cv->r, cv->g, cv->r, cv->a));
-
-        cv = &materials[matid].material.specular;
-        mat->setSpecular(osg::Material::FRONT_AND_BACK, osg::Vec4(cv->r, cv->g, cv->r, cv->a));
-
-        cv = &materials[matid].material.emissive;
-        mat->setEmission(osg::Material::FRONT_AND_BACK, osg::Vec4(cv->r, cv->g, cv->r, cv->a));
-
-        float shininess = materials[matid].material.power;
-        mat->setShininess(osg::Material::FRONT_AND_BACK, shininess);
-
-        ss->setAttribute(mat.get(), osg::StateAttribute::ON);
-    }
-
-#endif // USE_GRANNY_MATERIAL
-}
-#endif // defined(USE_OSG)
-
-#if defined(USE_OSG)
-#ifdef BETA_RELEASE
-void _drawTangent(granny_tri_material_group* group, short* indices, gr2Mesh* mesh)
-{
-    glBegin(GL_LINES);
-
-	oglSetRenderState(oglRENDERSTATE_COLOR4F, piRGBA(0, 0, 1, 1));
-
-    for(int i = 0; i < group->TriCount * 3; i++)
-    {
-        osg::Vec3 p1 = osg::Vec3(mesh->pngt[indices[i]].x,
-                                 mesh->pngt[indices[i]].y,
-                                 mesh->pngt[indices[i]].z);
-
-        osg::Vec3 p2 = p1;
-        p2.x() += mesh->pngt[indices[i]].tx * 0.025;
-        p2.y() += mesh->pngt[indices[i]].ty * 0.025;
-        p2.z() += mesh->pngt[indices[i]].tz * 0.025;
-
-        glVertex3f(p1.x(), p1.y(), p1.z());
-        glVertex3f(p2.x(), p2.y(), p2.z());
-    }
-
-    glEnd();
-}
-#endif
-#endif
-
-#if defined(USE_OSG)
-inline void _renderMeshOSG(gr2Mesh* mesh, osg::State& state)
-{
-    if(!mesh->active)
-    {
-        return;
-    }
-
-    granny_tri_material_group* group = NULL;
-    int count;
-
-    group = GrannyGetMeshTriangleGroups(mesh->GrannyMesh);
-	count = GrannyGetMeshTriangleGroupCount(mesh->GrannyMesh);
-
-    std::map<int, NormalStateSet*>::iterator itr;
-
-    for(int i = 0; i < count; i++)
-    {
-        itr = mesh->_ss.find(group->MaterialIndex);
-
-        if(itr == mesh->_ss.end())
-        {
-            ++group;
-            continue;
-        }
-
-        // Update shader stuff
-        itr->second->fpsudate();
-
-        state.pushStateSet(itr->second);
-        state.apply();
-
-        short* indexPtr = mesh->indexArray;
-        indexPtr += 3 * group->TriFirst;
-
-		piGVERTEX* vertexPtr = mesh->vertexArray;
-
-        // Fix when tangent vertices are correct. The exporter is outputting
-        // 0 vectors in some instances.
-        if(mesh->pngt)
-        {
-            state.setVertexPointer(3, GL_FLOAT, sizeof(piTVERTEX), &mesh->pngt->x);
-            state.setNormalPointer(GL_FLOAT, sizeof(piTVERTEX), &mesh->pngt->nx);
-            state.setTexCoordPointer(0, 2, GL_FLOAT, sizeof(piTVERTEX), &mesh->pngt->tu);
-
-            if(g_wantNormalMaps)
-            {
-                // Tangent data
-                state.setTexCoordPointer(1, 3, GL_FLOAT, sizeof(piTVERTEX), &mesh->pngt->tx);
-            }
-
-			GLCounter::instance().call_glDrawElements(GL_TRIANGLES, 3 * group->TriCount, GL_UNSIGNED_SHORT, indexPtr);
-
-#ifdef BETA_RELEASE
-            static bool drawtangent = false;
-
-            if(drawtangent)
-            {
-                _drawTangent(group, indexPtr, mesh);
-            }
-#endif
-        }
-        else if(vertexPtr)
-        {
-            state.setVertexPointer(3, GL_FLOAT, sizeof(piGVERTEX), &vertexPtr->x);
-            state.setNormalPointer(GL_FLOAT, sizeof(piGVERTEX), &vertexPtr->nx);
-            state.setTexCoordPointer(0, 2, GL_FLOAT, sizeof(piGVERTEX), &vertexPtr->tu);
-            state.disableTexCoordPointer(1);
-
-			GLCounter::instance().call_glDrawElements(GL_TRIANGLES, 3 * group->TriCount, GL_UNSIGNED_SHORT, indexPtr);
-        }
-
-        state.popStateSet();
-
-        ++group;
-	}
-}
-#endif // defined(USE_OSG)
-
-#if defined(USE_OSG)
-bool gr2RenderModelOSG(gr2Model* model, osg::State& state)
-{
-    if(!model->active)
-    {
-        return true;
-    }
-
-    granny_matrix_4x4* matrix = NULL;
-    int* toBoneIndices = NULL;
-    int vertexCount = 0;
-
-	for(int q = 0; q < model->meshCount; ++q)
-	{
-        gr2Mesh* mesh = &model->Meshes[q];
-
-		if(!mesh->active)
-        {
-			continue;
-        }
-
-		// wearing code here
-		if(model->usesAnotherSkeleton)
-		{
-			int count = GrannyGetMeshBindingBoneCount(mesh->GrannyBinding);
-
-			if(localScene.compositeTempBuffer == NULL)
-			{
-				localScene.compositeTempBufferSize = GrannyGetMeshBinding4x4ArraySize(mesh->GrannyBinding, count);
-				localScene.compositeTempBuffer = (granny_real32*) memAlloc(localScene.compositeTempBufferSize);
-			}
-			else if(localScene.compositeTempBufferSize < GrannyGetMeshBinding4x4ArraySize(mesh->GrannyBinding, count))
-			{
-				memFree (localScene.compositeTempBuffer);
-
-				localScene.compositeTempBufferSize = GrannyGetMeshBinding4x4ArraySize(mesh->GrannyBinding, count);
-				localScene.compositeTempBuffer = (granny_real32*) memAlloc(localScene.compositeTempBufferSize);
-			}
-
-			GrannyBuildMeshBinding4x4Array(mesh->GrannyBinding,
-				                           model->wornOnModel->WorldPose,
-				                           0,
-				                           count,
-				                           localScene.compositeTempBuffer);
-
-			matrix = (granny_matrix_4x4*)localScene.compositeTempBuffer;
-		}
-		else // nothing else is worn
-		{
-			matrix = GrannyGetWorldPoseComposite4x4Array(model->WorldPose);
-		}
-
-		// Then, I de*erence the index table that maps mesh bone indices
-		// to bone indices in the model.
-		toBoneIndices = (int*)GrannyGetMeshBindingToBoneIndices(mesh->GrannyBinding);
-
-		// Next I load the mesh's vertex buffer, or deform
-		// into a temporary buffer and load that, depending on
-		// whether the mesh is rigid or not.
-		vertexCount = (int)GrannyGetMeshVertexCount(mesh->GrannyMesh);
-
-        if(vertexCount <= 0)
-        {
-            Write_Debug("[gr2RenderModel] *** VERTEX COUNT IS ZERO for %s ***", model->name);
-            continue;
-        }
-
-		if(mesh->rigidMesh)
-		{
-// FIXME!   This needs to be &CompositeBuffer[0] but I'm nervous to change it until it's necessary
-			granny_matrix_4x4* transform = &matrix[toBoneIndices[0]];
-
-			glPushMatrix();
-			glMultMatrixf((float*)transform);
-		}
-		else if(mesh->GrannyDeformer)
-		{
-            if(mesh->pngt)
-            {
-				GrannyDeformVertices(mesh->GrannyDeformer,
-					                 0,
-					                (float*)matrix,
-					                 vertexCount,
-					                 GrannyGetMeshVertices(mesh->GrannyMesh),
-                                     mesh->pngt);
-            }
-            else
-            {
-                GrannyDeformVertices(mesh->GrannyDeformer,
-				                     0,
-					                (float*)matrix,
-					                 vertexCount,
-					                 GrannyGetMeshVertices(mesh->GrannyMesh),
-					                 mesh->vertexArray);
-            }
-		}
-		else
-		{
-			// If we got here, we had a bad mesh (the CreateMesh call
-			// should've popped up an error message announcing this
-			// earlier), so we skip it.
-			continue;
-		}
-
-	    _renderMeshOSG(mesh, state);
-
-		if(mesh->rigidMesh)
-        {
-			glPopMatrix();
-        }
-	}
-
-    return true;
-}
-#endif // defined(USE_OSG)
-
-#if defined(USE_OSG)
-bool createTextureOSG(gr2Model* model, granny_texture* gt, int type)
-{
-    if(!gt)
-    {
-        return false;
-    }
-
-    int w = gt->Width;
-    int h = gt->Height;
-
-    unsigned char* data = new unsigned char[3 * w * h];
-
-    GrannyCopyTextureImage(gt, 0, 0, GrannyRGB888PixelFormat, w, h, w * 3, data);
-
-    osg::Image* img = new osg::Image;
-    img->setImage(w, h, 1, 3, GL_RGB, GL_UNSIGNED_BYTE, data, osg::Image::USE_NEW_DELETE);
-
-    osg::Texture2D* tex = new osg::Texture2D;
-    tex->setImage(img);
-
-    switch(type)
-    {
-    case 1:
-        {
-            std::string str = gt->FromFileName;
-
-            int ext = str.rfind('.');
-
-            if(ext != std::string::npos)
-            {
-                str = str.substr(0, ext);
-            }
-
-            model->_locals[str] = tex;
-
-            break;
-        }
-    case 2:
-        {
-            std::string str = gt->FromFileName;
-
-            int ext = str.rfind('.');
-
-            if(ext != std::string::npos)
-            {
-                str = str.substr(0, ext);
-            }
-
-            model->_normals[str] = tex;
-
-            break;
-        }
-    case 3:
-        {
-            std::string str = gt->FromFileName;
-
-            int ext = str.rfind('.');
-
-            if(ext != std::string::npos)
-            {
-                str = str.substr(0, ext);
-            }
-
-            model->_specular[str] = tex;
-
-            break;
-        }
-    }
-
-    return true;
-}
-#endif // defined(USE_OSG)
-
-#if defined(USE_OSG)
-static void createMeshOSG(gr2Model* model, granny_model* grannymodel, int index, granny_skeleton* wornOnSkeleton)
-{
-	SINT32 indexCount;
-	SINT32 vertexCount;
-	SINT16* localIndexArray = NULL;
-
-    gr2Mesh* mesh = &model->Meshes[index];
-    granny_mesh* grannyMesh = grannymodel->MeshBindings[index].Mesh;
-    granny_skeleton* mySkeleton = model->skeleton;
-
-	mesh->GrannyMesh = grannyMesh;
-
-	mesh->GrannyBinding = GrannyNewMeshBinding(grannyMesh, mySkeleton, wornOnSkeleton);
-
-	mesh->rigidMesh = 0;
-	mesh->active = 1;
-
-	indexCount = GrannyGetMeshIndexCount(grannyMesh);
-
-	mesh->indexArray = NULL;
-
-	if(indexCount)
-	{
-		mesh->indexArray = new short[indexCount];
-
-		/* ... and I copy them in.  The GrannyCopyMeshIndices routine
-		can do arbitrary bytes-per-index conversion, so the 2 just says
-		"make sure it's 2-byte (16-bit) indices".  If it was stored
-		in the file as 16-bit indices, it's a block copy, but if it wasn't,
-		it does index-by-index conversion. */
-
-		GrannyCopyMeshIndices(grannyMesh, 2, mesh->indexArray);
-	}
-
-    /* Now I process the vertex data. */
-	vertexCount = GrannyGetMeshVertexCount(grannyMesh);
-
-	mesh->vertexArray = NULL;
-    mesh->pngt = NULL;
-
-	if(vertexCount)
-	{
-		mesh->vertexArray = new piGVERTEX[vertexCount];
-	}
-
-	if(GrannyMeshIsRigid(grannyMesh))
-	{
-		mesh->rigidMesh = 1;
-
-		if (vertexCount)
-		{
-            GrannyCopyMeshVertices(grannyMesh, GrannyPNT332VertexType, mesh->vertexArray);
-		}
-
-		// Since the mesh is rigid, I won't	be needing a deformer.
-        mesh->GrannyDeformer = NULL;
-	}
-	else
-	{
-        mesh->GrannyDeformer = GrannyNewMeshDeformer(GrannyGetMeshVertexType(grannyMesh), GrannyPNGT3332VertexType, GrannyDeformPositionNormalTangent
-#if GRANNY_VERSION(2,7)
-			,GrannyDontAllowUncopiedTail
-#endif
-            );
-
-        if(!mesh->GrannyDeformer)
-        {
-            // No tangent data
-        mesh->GrannyDeformer = GrannyNewMeshDeformer(GrannyGetMeshVertexType(grannyMesh), GrannyPNT332VertexType, GrannyDeformPositionNormal
-#if GRANNY_VERSION(2,7)
-			,GrannyDontAllowUncopiedTail
-#endif
-            );
-        }
-        else
-        {
-            //Has tangent data for normal mapping
-            mesh->pngt = new piTVERTEX[vertexCount];
-        }
-
-        if(!mesh->GrannyDeformer)
-		{
-			Write_Log(LOG_FPS, LOG_INFO, "Granny didn't find a matching deformer for the vertex format used by mesh \"%s\".  This mesh won't be rendered properly.",
-				grannyMesh->Name);
-		}
-	}
-
-    _setupForOSG(model, mesh);
-}
-#endif // defined(USE_OSG)
-
-#if defined(USE_OSG)
-gr2Model* gr2LoadModelOSG(const char* modelFile,
-                          gr2Model* wornOnModel,
-                          int* boneCount,
-                          int instantiate,
-                          int modelIndex)
-{
-    granny_file_info* fileInfo;
-    gr2Model* newModel;
-    granny_skeleton* wornOnSkeleton;
-    granny_model* grannyModel;
-
-    static char path[255+1];
-    char* at = NULL;
-
-    strncpy(path, modelFile, 255);
-
-    at = strchr(path, '@');
-
-	if(at)
-	{
-        *at = 0;
-
-        if(modelIndex < 0)
-        {
-            modelIndex = atoi(++at);
-        }
-	}
-
-    modelIndex = modelIndex < 0 ? 0 : modelIndex;
-
-    granny_texture* normals[GR2_MAX_TEXTURES_PER_MODEL];
-    granny_texture* specular[GR2_MAX_TEXTURES_PER_MODEL];
-    granny_texture* locals[GR2_MAX_TEXTURES_PER_MODEL];
-
-    int specularcount = 0;
-    int normalcount = 0;
-    int localcount = 0;
-
-    fileInfo = getFileInfo(path, TRUE);
-
-    if(!fileInfo)
-    {
-        char errMsg[255];
-        sprintf (errMsg, "gr2LoadModel: failed to load model %s", modelFile);
-        piExitProgram (__FILE__, __LINE__, errMsg);
-    }
-
-	// sanity check
-	if(fileInfo->TextureCount > GR2_MAX_TEXTURES_PER_MODEL)
-	{
-		piExitProgram (__FILE__, __LINE__, "gr2LoadModel: Too many textures in model");
-	}
-
-	for(int i = 0; i < fileInfo->TextureCount; i++)
-	{
-		if((fileInfo->Textures[i]->TextureType == GrannyColorMapTextureType) && (fileInfo->Textures[i]->ImageCount == 1))
-		{
-            if(strstr(fileInfo->Textures[i]->FromFileName, "_normal"))
-            {
-                normals[normalcount++] = fileInfo->Textures[i];
-                continue;
-            }
-
-            if(strstr(fileInfo->Textures[i]->FromFileName, "_spec"))
-            {
-                specular[specularcount++] = fileInfo->Textures[i];
-                continue;
-            }
-
-            locals[localcount++] = fileInfo->Textures[i];
-		}
-		else
-		{
-            Write_Log (LOG_FPS, LOG_INFO, "ERROR: whoa, what kind of texture is this?!?");
-			return NULL;
-		}
-	}
-
-    if(fileInfo->ModelCount <= 0)
-	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadModel: Model file %s doesn't contain any models .. it has %d", modelFile, fileInfo->ModelCount);
-		return NULL;
-	}
-
-	if(modelIndex < 0 || modelIndex >= fileInfo->ModelCount)
-	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadModel: Model file %s doesn't contain a model at index %d .. it has %d models", modelFile, modelIndex, fileInfo->ModelCount);
-		return NULL;
-	}
-
-	if(boneCount)
-    {
-		*boneCount = fileInfo->Skeletons[modelIndex]->BoneCount;
-    }
-
-	// if we don't want to instantiate (i.e. just load the cache) we're done, just have to set the # of bones
-	if(!instantiate)
-	{
-		return NULL;
-	}
-
-	grannyModel = fileInfo->Models[modelIndex];
-
-	newModel = _getgr2Model();
-
-	if(!newModel)
-	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadModel: Failed to allocate memory for model %s", modelFile);
-		piExitProgram (__FILE__, __LINE__, "gr2LoadModel: Failed to allocate memory for model");
-		return NULL;
-	}
-
-    for(SINT32 r = 0; r < localcount; r++)
-    {
-        createTextureOSG(newModel, locals[r], 1);
-    }
-
-    for(SINT32 j = 0; j < normalcount; j++)
-    {
-        createTextureOSG(newModel, normals[j], 2);
-    }
-
-    for(SINT32 q = 0; q < specularcount; q++)
-    {
-        createTextureOSG(newModel, specular[q], 3);
-    }
-
-	newModel->name = modelFile;
-
-	newModel->grannyModel = grannyModel;
-
-	if(grannyModel->Skeleton->BoneCount > MAX_GR2_BONE_COUNT)
-	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2LoadModel: Bone count too high (%d > %d) for %s", grannyModel->Skeleton->BoneCount, MAX_GR2_BONE_COUNT, modelFile);
-		piExitProgram (__FILE__, __LINE__, "gr2LoadModel: Bonecount too high");
-		return NULL;
-	}
-
-	newModel->GrannyInstance = GrannyInstantiateModel(grannyModel);
-	newModel->WorldPose = GrannyNewWorldPose(grannyModel->Skeleton->BoneCount);
-	newModel->skeleton = GrannyGetSourceSkeleton(newModel->GrannyInstance);
-	newModel->boneCount = newModel->skeleton->BoneCount;
-	newModel->active = 1;
-
-	Write_Log (LOG_FPS, LOG_INFO, "Granny2:  Instance for %s is 0x%x", modelFile, newModel->GrannyInstance);
-
-	if(wornOnModel == NULL)
-	{
-		newModel->usesAnotherSkeleton = 0;
-		newModel->wornOnModel = NULL;
-		wornOnSkeleton = newModel->skeleton;
-	}
-	else
-	{
-		newModel->usesAnotherSkeleton = 1;
-		newModel->wornOnModel = wornOnModel;
-		wornOnSkeleton = wornOnModel->skeleton;
-	}
-
-	/* Now, I loop through all the meshes in the model and process
-	them. */
-	newModel->meshCount = grannyModel->MeshBindingCount;
-
-	if(newModel->meshCount)
-	{
-		newModel->Meshes = new gr2Mesh[newModel->meshCount];
-
-		for(int w = 0; w < newModel->meshCount; w++)
-		{
-			createMeshOSG(newModel, grannyModel, w, wornOnSkeleton);
-		}
-	}
-	else
-	{
-		newModel->Meshes = NULL;
-	}
-
-	newModel->attachToModel = NULL;
-	newModel->attachBone = 0;
-	newModel->attachToBone = 0;
-
-	return newModel;
-}
-#endif // defined(USE_OSG)
 
 #ifdef GR2_BLEND_EDITOR
 gr2Event* gr2GetNewEvent(gr2Animation* anim)

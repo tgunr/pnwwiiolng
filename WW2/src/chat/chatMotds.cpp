@@ -19,17 +19,17 @@
 SINT32
 MOTD_REQUEST::packer(LOGICAL mode, ACTION_OBJECT* a)
 {
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, &type, 8) ;
-	return a->offset ;
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, &type, 8);
+	return a->offset;
 }
 
 SINT32
 MOTD_REPLY::packer(LOGICAL mode, ACTION_OBJECT* a)
 {
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, &type, 8) ;
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, &added, 0) ;
-	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &poster, 0) ;
-	a->offset = wwiiPackString(mode, a->packed, a->offset, message, _MAX_LENGTH) ;
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, &type, 8);
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, &added, 0);
+	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &poster, 0);
+	a->offset = wwiiPackString(mode, a->packed, a->offset, message, _MAX_LENGTH);
 
-	return a->offset ;
+	return a->offset;
 }

@@ -7,37 +7,24 @@
 //
 // Originating Programmer: Eric Hall
 
-enum CONNECTION_STATUS
+namespace Dbse
 {
-	CONNECT_NONE,
-	CONNECT_BAD,
-	CONNECT_OPEN,
-	CONNECT_REFUSE,
-	CONNECT_ACCEPT,
-	CONNECT_DROPPED
-};
+	enum class ConnectionStatus
+	{
+		None,
+		Bad,
+		Open,
+		Refuse,
+		Accept,
+		Dropped
+	};
 
-struct DBSE_HANDSHAKE
-{
-	enum { CurrentVersion = 1 };
-	DBSE_HANDSHAKE(UINT32 arenaID_) : m_version(CurrentVersion), m_arenaID(arenaID_), m_status(CONNECT_NONE) {}
-	UINT32				m_version;
-	UINT32				m_arenaID;
-	CONNECTION_STATUS 	m_status;
-};
-
-enum DBSE_RANK
-{
-	DBSE_PRIMARY = 0,
-	DBSE_SECONDARY,
-	DBSE_SLAVE,
-	DBSE_REDIRECT,
-	DBSE_MAX_RANK
-};
-
-enum
-{
-	SUCCESS = 0,
-	FAIL_VERSION,
-	FAIL_CONNECT
-};
+	struct Handshake
+	{
+		enum { CurrentVersion = 1 };
+		Handshake(UINT32 arenaID) : m_version(CurrentVersion), m_arenaID(arenaID), m_status(ConnectionStatus::None) {}
+		UINT32				m_version;
+		UINT32				m_arenaID;
+		ConnectionStatus 	m_status;
+	};
+}

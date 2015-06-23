@@ -9,8 +9,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "dbug/dbug.h"
-
 #include <mysql.h>
 
 #include "map/mapPlayer.h"
@@ -32,7 +30,7 @@ typedef std::unordered_map<UINT32,_PERSONAS> _BRIGADE_PERSONAS;
 static _PERSONA_SELECTIONS _selections;
 
 static std::mutex _mutex;
-static volatile UINT32 _selectionRequests = 0;
+static std::atomic<UINT32> _selectionRequests { 0 };
 
 //////////////////////////////////////////////////////////////////////
 // Save a persona selection
@@ -99,7 +97,7 @@ _saveSelections(DB::handle_t* conn)
 
 			// Iterate across the personas registered to this brigade,
 
-			for ( pit = it->second.begin(); ; ++pit )
+			for ( pit = it->second.begin();; ++pit )
 			{
 				bool isLast = (pit == it->second.end());
 				// If we fill up buf execute the query and proceed.
@@ -120,8 +118,8 @@ _saveSelections(DB::handle_t* conn)
 
 				// Add a new persona or start filling buf up from scratch
 				if ( offset == 0 )
-					offset = snprintf(buf, _BUF_SIZE,
-								"UPDATE LOW_PRIORITY wwii_persona SET modified = NOW(), brigade_id = %u WHERE personaID IN (%u"
+					offset = strprintf(buf
+								, "UPDATE LOW_PRIORITY wwii_persona SET modified = NOW(), brigade_id = %u WHERE personaID IN (%u"
 									, (UINT32)(it->first)
 									, *pit);
 				else
@@ -142,7 +140,7 @@ void
 PersonaSelectionThread::run()
 {
 	DB::handle_t* conn = threadsOpenDBConnection(true);
-	if ( conn == NULL )
+	if ( conn == nullptr )
 	{
 		LogAbort("spt: Unable to open database connection");
 	}

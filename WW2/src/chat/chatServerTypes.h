@@ -17,8 +17,9 @@
 //
 //	I'm sure that makes no sense, so read the design doc
 
-class Player ;
+class Player;
 #include "chat/chatPlayerInfo.h"
+#include "str/stringLib.h"	// for strsafecpy
 
 #pragma pack(push, 1)
 namespace Chat
@@ -30,21 +31,21 @@ namespace Chat
 			, m_handle(handle_)
 			, m_null(0)
 			{
-				strncpy(m_problem, problem_, sizeof(m_problem)) ;
+				strsafecpy(m_problem, problem_);
 			}
-		KickNotice() : m_playerID(0), m_handle(0ULL), m_null(0) { m_problem[0] = 0 ; }
+		KickNotice() : m_playerID(0), m_handle(0ULL), m_null(0) { m_problem[0] = 0; }
 
-		playerid_t	m_playerID ;
-		ChatHandle	m_handle ;
-		char		m_problem[201] ;
-		char		m_null ;
-	} ;
+		playerid_t	m_playerID;
+		ChatHandle	m_handle;
+		char		m_problem[201];
+		char		m_null;
+	};
 
 	struct PlayerMove
 	{
-		playerid_t	m_playerID ;
-		SINT32		m_x, m_y, m_z ;
-	} ;
+		playerid_t	m_playerID;
+		SINT32		m_x, m_y, m_z;
+	};
 }
 #pragma pack(pop)
 

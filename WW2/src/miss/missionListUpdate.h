@@ -10,6 +10,6 @@
 
 #include "teul/teulNetworkMsg.h"
 
-class MissionListUpdateMsg : public teul_empty_msg {} ;
-typedef teul_network_msg<MissionListUpdateMsg> MISSION_LIST_UPDATE ;
+class MissionListUpdateMsg : public teul_empty_msg {};
+typedef teul_network_msg<MissionListUpdateMsg> MISSION_LIST_UPDATE;
 

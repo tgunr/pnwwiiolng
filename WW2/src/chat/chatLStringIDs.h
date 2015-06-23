@@ -608,6 +608,6 @@ enum LSTRING_ID
 ,	LSTR_ASSIST_AWARD				// Assist on {1} (killed by {2}).
 
 ,	MAX_LSTRING_IDS
-} ;
+};
 
 //tolua_end

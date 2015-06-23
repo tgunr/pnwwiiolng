@@ -145,7 +145,7 @@ from within one of YourSubClassedXMLLoader's functions
 #define XML_IS_NODETYPE(n, t) (!stricmp((const char*)(n)->name, t))
 #define XML_DEFAULT_HANDLER "_DEFAULT_"
 #define MAX_XML_TRIM_SIZE 1024
-#define XML_TAG_HANDLER(handler) bool handler(xmlNode* node, bool first = true, void* userData = NULL)
+#define XML_TAG_HANDLER(handler) bool handler(xmlNode* node, bool first = true, void* userData = nullptr)
 
 /********* types ************/
 
@@ -163,8 +163,8 @@ enum XML_DATA_TYPE
 /********* declares ************/
 
 const char* xmlTrimString(const char* value);
-bool xmlGetNodeValue(xmlNode* node, XML_DATA_TYPE type, void* value, const char* attribute = NULL);
-const char* xmlGetStringFromNode(xmlNode* node, const char* attribute = NULL);
+bool xmlGetNodeValue(xmlNode* node, XML_DATA_TYPE type, void* value, const char* attribute = nullptr);
+const char* xmlGetStringFromNode(xmlNode* node, const char* attribute = nullptr);
 void xmlRegisterUIFIO();
 
 /********* classes ************/
@@ -178,7 +178,7 @@ private:
 	template<class U>
 	struct TAG_HANDLER
 	{
-		TAG_HANDLER(U* o = NULL, FN f = NULL) : object(o), func(f){}
+		TAG_HANDLER(U* o = nullptr, FN f = nullptr) : object(o), func(f){}
 		bool IsValid(){ return (object && func); }
 
 		U* object;
@@ -206,23 +206,23 @@ public:
 	void SetHandlerReturnScope(HANDLER_RETURN_SCOPE scope);
 
 	// handler management
-	virtual void AddDefaultHandler(FN handler, T* object = NULL);
-	virtual void AddHandler(const char* tagname, FN handler, T* object = NULL);
+	virtual void AddDefaultHandler(FN handler, T* object = nullptr);
+	virtual void AddHandler(const char* tagname, FN handler, T* object = nullptr);
 
 	// parses the xml doc and starts processing nodes; primary
 	// entry into the load process
-	virtual bool Load(void* userData = NULL);
+	virtual bool Load(void* userData = nullptr);
 
 	// primary worker; recursively called on each node starting with
 	// the root node from Load(); can be called externally
-	virtual bool Process(xmlNode* node, void* userData = NULL);
+	virtual bool Process(xmlNode* node, void* userData = nullptr);
 
 	// processes children; can be called by Process or by a user defined
 	// handler if the handler wants to take over processing in order to
 	// pass in its own userData
-	virtual bool ProcessChildren(xmlNode* node, void* userData = NULL);
+	virtual bool ProcessChildren(xmlNode* node, void* userData = nullptr);
 
-	// accessors; returns NULL if Load() hasn't been called yet
+	// accessors; returns nullptr if Load() hasn't been called yet
 	// or if there was a problem parsing the xml doc
 	virtual const xmlDoc* GetDoc() const;
 	virtual const xmlNode* GetRootNode() const;
@@ -260,7 +260,7 @@ XMLLoader2<T>::XMLLoader2() :
 	_handlerReturnScope(NODE),
 	_complete(false),
 	_path(""),
-	_xmlDoc(NULL),
+	_xmlDoc(nullptr),
 	_uiFio(false)
 {
 	fioXmlRegisterInputCallbacks();
@@ -272,7 +272,7 @@ XMLLoader2<T>::XMLLoader2(const char* path, int flags, bool uiFio) :
 	_handlerReturnScope(NODE),
 	_complete(false),
 	_path(path),
-	_xmlDoc(NULL),
+	_xmlDoc(nullptr),
 	_uiFio(uiFio)
 {
 	if(_uiFio)
@@ -329,7 +329,7 @@ bool XMLLoader2<T>::Load(void* userData)
 
 	if(_path.size())
 	{
-		_xmlDoc = xmlReadFile(_path.c_str(), NULL, _flags);
+		_xmlDoc = xmlReadFile(_path.c_str(), nullptr, _flags);
 
 		if(_xmlDoc)
 		{
@@ -358,7 +358,7 @@ const xmlNode* XMLLoader2<T>::GetRootNode() const
 	if(_xmlDoc)
 		return xmlDocGetRootElement(_xmlDoc);
 
-    return NULL;
+    return nullptr;
 }
 
 template<class T>
@@ -442,7 +442,7 @@ void XMLLoader2<T>::Reset()
 	// reset the private data
 	_path = "";
 	_flags = XML_DEFAULT_FLAGS;
-	_xmlDoc = NULL;
+	_xmlDoc = nullptr;
 	_complete = false;
 	_handlers.clear();
 }

@@ -26,7 +26,7 @@ enum SIDE_MESSAGE_TYPE
 	SM_UNDEFINED = 0
 ,	SM_SIDE							// Pure and simple side message
 ,	SM_HC							// High command message
-} ;
+};
 
 // Sub channels of the SIDE channel
 enum SIDE_SUB_CHANNEL
@@ -36,7 +36,7 @@ enum SIDE_SUB_CHANNEL
 ,	SIDE_SUB_HELP
 ,	SIDE_SUB_OPS
 ,	MAX_SIDE_SUB
-} ;
+};
 
 //tolua_end
 

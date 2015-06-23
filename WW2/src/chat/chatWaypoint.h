@@ -14,7 +14,7 @@
 // tolua_begin
 enum WP_TYPE
 {
-	WPT_INVALID						// Unintialized/invalid
+	WPT_INVALID						// Uninitialized/invalid
 ,	WPT_MARKER						// Purely informational
 ,	WPT_RALLY						// Gather
 ,	WPT_ENEMY						// Enemy contact
@@ -32,7 +32,7 @@ enum WP_TYPE
 ,	WPT_FAI							// friendly ai
 ,	WPT_DEATH						// death
 ,	MAX_WPT_TYPES
-} ;
+};
 
 enum
 {
@@ -46,22 +46,22 @@ enum
 ,	WTP_ENEMY_DANGER
 ,	WTP_ENEMY_UNKNOWN				// question mark; enemy type unknown
 ,	WTP_ENEMY_MORTAR				// Mortar barrage icon; aka "Aim mortars here"
-} ;
+};
 // tolua_end
 
 enum
 {
 	WPT_MS_LOCATION					// Where the MS is at
 ,	WPT_MS_REQUEST					// Where the ML would like the MS at
-} ;
+};
 
 // Max length of a waypoint's text
-static const UINT32 MAX_WP_NOTE_LENGTH = 128 ;
+static const UINT32 MAX_WP_NOTE_LENGTH = 128;
 
 // How many bits are required to communicate waypoint handle at 6 bits a character; try to byte align
-static const UINT32 MAX_WP_HANDLE_LEN = MAX_HANDLE_LEN ;
-static const UINT32 MAX_WP_HANDLE_BITS = GAME_HANDLE_BITS ;
-static const UINT32 CONTACT_REPORT_LIFETIME_S = 7 * 60 ;		// 7 minutes
+static const UINT32 MAX_WP_HANDLE_LEN = MAX_HANDLE_LEN;
+static const UINT32 MAX_WP_HANDLE_BITS = GAME_HANDLE_BITS;
+static const UINT32 CONTACT_REPORT_LIFETIME_S = 7 * 60;		// 7 minutes
 
 class Waypoint
 {
@@ -78,8 +78,8 @@ public:
 		, m_posted((whenPosted) ? whenPosted: (UINT32)teulTime())
 		, m_shared(true)
 		{
-			strncpy(m_notes, withNotes, MAX_WP_NOTE_LENGTH) ;
-			m_notes[MAX_WP_NOTE_LENGTH] = 0 ;
+			strncpy(m_notes, withNotes, MAX_WP_NOTE_LENGTH);
+			m_notes[MAX_WP_NOTE_LENGTH] = 0;
 		}
 
 	Waypoint()
@@ -93,7 +93,7 @@ public:
 		, m_posted((UINT32)teulTime())
 		, m_shared(true)
 		{
-			m_notes[0] = 0 ;
+			m_notes[0] = 0;
 		}
 
 	// Network constructor
@@ -108,7 +108,7 @@ public:
 		, m_posted((UINT32)teulTime())
 		, m_shared(true)
 		{
-			a->offset = packer(TEUL_UNPACK, a) ;
+			a->offset = packer(TEUL_UNPACK, a);
 		}
 
 	// Destructor
@@ -116,20 +116,20 @@ public:
 
 	//Operators
 public:
-	bool operator == (const Waypoint& rhs) const ;
+	bool operator == (const Waypoint& rhs) const;
 
 	// Functions
 public:
 	// Pack and unpack routine
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) ;
-	void setPosted(UINT32 postedTime) { m_local = false ; m_posted = postedTime ; }
-	void setHandle(const ChatHandle& toHandle) { m_handle = toHandle ; }
-	void setShared(bool toShared) { m_shared = toShared ; }
+	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+	void setPosted(UINT32 postedTime) { m_local = false; m_posted = postedTime; }
+	void setHandle(const ChatHandle& toHandle) { m_handle = toHandle; }
+	void setShared(bool toShared) { m_shared = toShared; }
 
 	// 'true' if anyone can post this type
 	bool leaderOnlyPosting() const
 	{
-		return ( !((type() == WPT_ENEMY) | (type() == WPT_AMMO)) ) ;
+		return ( !((type() == WPT_ENEMY) | (type() == WPT_AMMO)) );
 	}
 
 	// 'true' if this waypoint should not be retained by the host
@@ -137,33 +137,33 @@ public:
 	// notice of the waypoint afterwards though)
 	bool isTransient() const
 	{
-		return ( type() == WPT_AMMO ) ;
+		return ( type() == WPT_AMMO );
 	}
 
 	// Host functions
-	void processIncomingFrom(class Player* player) ;
+	void processIncomingFrom(class Player* player);
 
 	// Accessors
 public:
-	UINT32 local() const { return m_local ; }
-	const ChatHandle& handle() const { return m_handle ; }
-	const ChatHandle& playerHandle() const { return m_playerHandle ; }
-	WP_TYPE type() const { return m_type ; }
-	UINT32 subType() const { return m_subType ; }
-	SINT32 x() const { return m_x ; }
-	SINT32 y() const { return m_y ; }
-	UINT32 posted() const { return m_posted ; }
-	const char* notes() const { return m_notes ; }
-	UINT32 shared() const { return m_shared ; }
+	UINT32 local() const { return m_local; }
+	const ChatHandle& handle() const { return m_handle; }
+	const ChatHandle& playerHandle() const { return m_playerHandle; }
+	WP_TYPE type() const { return m_type; }
+	UINT32 subType() const { return m_subType; }
+	SINT32 x() const { return m_x; }
+	SINT32 y() const { return m_y; }
+	UINT32 posted() const { return m_posted; }
+	const char* notes() const { return m_notes; }
+	UINT32 shared() const { return m_shared; }
 
 protected:
-	bool		m_local ;			// FALSE: Host sent it to me and manages it
-	ChatHandle	m_handle ;			// "handle" of the waypoint
-	ChatHandle	m_playerHandle ;	// "chatHandle" of the poster
-	WP_TYPE		m_type ;
-	UINT32		m_subType ;			// type-specific extended info
-	SINT32		m_x, m_y ;			// Co-ordinates
-	UINT32		m_posted ;			// Time it was posted
-	char		m_notes[MAX_WP_NOTE_LENGTH+1] ;
+	bool		m_local;			// FALSE: Host sent it to me and manages it
+	ChatHandle	m_handle;			// "handle" of the waypoint
+	ChatHandle	m_playerHandle;		// "chatHandle" of the poster
+	WP_TYPE		m_type;
+	UINT32		m_subType;			// type-specific extended info
+	SINT32		m_x, m_y;			// Co-ordinates
+	UINT32		m_posted;			// Time it was posted
+	char		m_notes[MAX_WP_NOTE_LENGTH+1];
 	bool		m_shared	;		// do we shared this waypoint with others?
-} ;
+};

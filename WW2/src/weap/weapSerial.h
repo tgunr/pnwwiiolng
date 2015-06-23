@@ -18,22 +18,25 @@ struct WEAPON_SERIAL
 	FULL_OBJ_ID		source;		// source spawn location
 	UINT32			serial;		// serial number
 	WEAPON_SPEC		spec;		// specific type of weapon
-} ;
+};
 
-extern const WEAPON_SERIAL NULL_WEAP_SERIAL ;
+extern const WEAPON_SERIAL NULL_WEAP_SERIAL;
+
+//tolua_end
+
+#define PRF_WEAPON_SERIAL "%u@(" PRF_FULL_OBJ_ID ") " PRF_WEAPON_SPEC ""
+#define PRA_WEAPON_SERIAL(s) (s).serial, PRA_FULL_OBJ_ID((s).source), PRA_WEAPON_SPEC((s).spec)
 
 static inline const char* weapPrintSerialC(const WEAPON_SERIAL* weap)
 {
-	static char buffer[128];
-
-	if (weap == NULL)
+	if (PN_UNLIKELY(weap == nullptr))
 		return "<nullSER>";
 
-	sprintf(buffer, "Serial: %u Source: %hd.%hd.%hu Spec: %s"
+	static char buffer[128];
+	sprintf(buffer, "Serial: %u Source: %hd.%hd.%hu Spec: " PRF_WEAPON_SPEC ""
 				, weap->serial
 				, weap->source.cell.ox, weap->source.cell.oy, weap->source.id
-				, weapPrintSpecC(&(weap->spec)));
+				, PRA_WEAPON_SPEC(weap->spec)
+				);
 	return buffer;
 }
-
-//tolua_end

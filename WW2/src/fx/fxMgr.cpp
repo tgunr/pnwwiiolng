@@ -39,7 +39,7 @@ static piMATRIX g_matView;
 
 static piVECTOR g_vecWind;
 
-static FXSORT* g_lpSort = NULL;
+static FXSORT* g_lpSort = nullptr;
 
 static SINT32 g_iMatID = -1;
 static SINT32 g_iSortCount = 0;
@@ -49,7 +49,7 @@ struct FXDRAWFUNC
 {
     LOGICAL (*pFn)(SINT32 iIndex);
 
-} ;
+};
 
 static FXDRAWFUNC g_pfnDrawFunc[NUMBER_OF_FXTYPES];
 
@@ -92,7 +92,7 @@ LOGICAL fxMgrInit()
 
     g_lpSort = (FXSORT*)memAlloc(sizeof(FXSORT) * DEF_MAX_EFFECTS);
 
-    if(g_lpSort == NULL)
+    if(g_lpSort == nullptr)
         return FALSE;
 
 //	Uneccessary -- memAlloc = calloc
@@ -190,7 +190,7 @@ LOGICAL fxMgrDraw(LOGICAL beforesorted)
 {
     fxMgrSetLight();
 
-    if(g_lpSort == NULL)
+    if(g_lpSort == nullptr)
         return FALSE;
 
     fxBltDraw();
@@ -198,7 +198,7 @@ LOGICAL fxMgrDraw(LOGICAL beforesorted)
 /*
     for(SINT32 i = 0; i < g_iSortCount; i++)
     {
-        if(g_pfnDrawFunc[g_lpSort[i].type].pFn != NULL)
+        if(g_pfnDrawFunc[g_lpSort[i].type].pFn != nullptr)
         {
             g_pfnDrawFunc[g_lpSort[i].type].pFn(g_lpSort[i].index);
         }
@@ -215,7 +215,7 @@ LOGICAL fxMgrDraw(LOGICAL beforesorted)
 {
     fxMgrSetLight();
 
-    if(g_lpSort == NULL)
+    if(g_lpSort == nullptr)
         return FALSE;
 
     fxUtlSetTexture();
@@ -225,7 +225,7 @@ LOGICAL fxMgrDraw(LOGICAL beforesorted)
 
     for(SINT32 i = 0; i < g_iSortCount; i++)
     {
-        if(g_pfnDrawFunc[g_lpSort[i].type].pFn != NULL)
+        if(g_pfnDrawFunc[g_lpSort[i].type].pFn != nullptr)
         {
             g_pfnDrawFunc[g_lpSort[i].type].pFn(g_lpSort[i].index);
         }
@@ -361,7 +361,7 @@ LOGICAL fxMgrKill()
     if(g_lpSort)
     {
         memFree(g_lpSort);
-        g_lpSort = NULL;
+        g_lpSort = nullptr;
     }
 
     Write_Log(LOG_OLD, LOG_INFO, "[fxMgrKill]");
@@ -375,7 +375,7 @@ LOGICAL fxMgrKill()
 /////////////////////////////////////////////////
 LOGICAL fxMgrDetach(OBJECT* lpObj)
 {
-    if(lpObj == NULL) return FALSE;
+    if(lpObj == nullptr) return FALSE;
 
     if(!(lpObj->flag2 & OBJECT_HAS_FX))
         return FALSE;
@@ -404,7 +404,7 @@ LOGICAL fxMgrDetach(OBJECT* lpObj)
 /////////////////////////////////////////////////
 void fxMgrDetachAmmo(void const* pAmmo)
 {
-    if(pAmmo == NULL) return;
+    if(pAmmo == nullptr) return;
 
     if(bSoundEnable)
     {
@@ -420,8 +420,8 @@ void fxMgrDetachAmmo(void const* pAmmo)
 //////////////////////////////////////////////////////////////////////
 void fxMgrSetLight()
 {
-    static LIGHT* s = NULL;
-    static LIGHT* m = NULL;
+    static LIGHT* s = nullptr;
+    static LIGHT* m = nullptr;
 
     if(!s)
     {

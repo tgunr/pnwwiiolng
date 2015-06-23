@@ -62,13 +62,6 @@
 
 #include "libxml/tree.h"
 
-#if platOS == OS_WIN32
-#include <unordered_map>
-#define UNORDERED_MAP std::unordered_map
-#else
-#define UNORDERED_MAP stdext::hash_map
-#endif
-
 bool _ingamemapon	= false;
 bool _ingamemaplock = false;
 
@@ -147,7 +140,7 @@ private:
 
 
 //static std::map<std::string, trnobjtextureinfo> _trnobjtexturemap;
-static UNORDERED_MAP<std::string, trnobjtextureinfo> _trnobjtexturemap;
+static std::unordered_map<std::string, trnobjtextureinfo> _trnobjtexturemap;
 
 static FULL_OBJ_ID _facOrigin, _missionTarget;
 
@@ -354,7 +347,7 @@ void uiMapHideIngameMap(bool close)
 	{
 		_mapchild->Hide();
 		_mapchild->Close();
-		_mapchild = NULL;
+		_mapchild = nullptr;
 	}
 
 	_mapchild = uiViewport()->FindView("report");
@@ -362,7 +355,7 @@ void uiMapHideIngameMap(bool close)
 	{
 		_mapchild->Hide();
 		_mapchild->Close();
-		_mapchild = NULL;
+		_mapchild = nullptr;
 	}
 
 	_mapchild = uiViewport()->FindView("waypoint");
@@ -370,7 +363,7 @@ void uiMapHideIngameMap(bool close)
 	{
 		_mapchild->Hide();
 		_mapchild->Close();
-		_mapchild = NULL;
+		_mapchild = nullptr;
 	}
 
 	_mapchild = uiViewport()->FindView("mapcontext");
@@ -378,7 +371,7 @@ void uiMapHideIngameMap(bool close)
 	{
 		_mapchild->Hide();
 		_mapchild->Close();
-		_mapchild = NULL;
+		_mapchild = nullptr;
 	}
 
 	if(_ingamemap)
@@ -390,7 +383,7 @@ void uiMapHideIngameMap(bool close)
 		if(close || fioQuery() == ISDIRECTORY)
 		{
 			_ingamemap->Close();
-			_ingamemap = NULL;
+			_ingamemap = nullptr;
 		}
 	}
 
@@ -655,7 +648,7 @@ static int get_rendered_octet_icon(IconMapRenderer* r, const char* name, float u
 
 static int get_terrain_data(int sx, int sy, sdm_replacement_octet_data* data)
 {
-	return get_sdm_data(sx,sy, NULL, data);
+	return get_sdm_data(sx,sy, nullptr, data);
 }
 
 /************************************************************************************************
@@ -986,7 +979,7 @@ bool MapMessageFilter::Filter(phui::Message* msg, phui::MessageHandler** target,
 
 //			strtRequestCPFacilitiesUpdate(PlayerClient()->MapConnection(), fullid);
 			///TODO: strtRequestCPFacilitiesUpdate is no-longer required.
-//			assert( "TROY: Fix Me" == NULL ) ;
+//			assert( "TROY: Fix Me" == nullptr );
 		}
 		break;
 		*/
@@ -1075,7 +1068,7 @@ void uiMapAddLayer(SuperCellMapView* mapview, xmlNode* node)
 
 		xmlChar* id = xmlGetProp(node, (xmlChar*)"id");
 
-		SuperCellMapView::Renderer* r = NULL;
+		SuperCellMapView::Renderer* r = nullptr;
 		if(!strcmp((char*)type, "texture") && !scenarioActive)
 		{
 			MapTextureRenderer* mtr = new MapTextureRenderer;
@@ -1435,9 +1428,8 @@ void uiMapProcessPlayerEventToMap(const char* mapname, ChatHandle handle, MAP_PL
 	}
 
 	SuperCellMapView::RendererList list = map->RenderList();
-	SuperCellMapView::RendererList::iterator it = list.begin();
 
-	for(; it != list.end(); ++it)
+	for(auto it = list.begin(), end = list.end(); it != end; ++it)
 	{
 		PlayerLayer* pl = dynamic_cast<PlayerLayer*>(it->ptr());
 
@@ -1446,9 +1438,8 @@ void uiMapProcessPlayerEventToMap(const char* mapname, ChatHandle handle, MAP_PL
 //		SuperCellMapView::MapObjectList* objects = pl->MapObjects();
 
 		PlayerLayer::VehicleMap& vehicles = pl->_vehicles;
-		PlayerLayer::VehicleMap::iterator vit = vehicles.begin();
 
-		for(; vit != vehicles.end(); vit++)
+		for(auto vit = vehicles.begin(), vend = vehicles.end(); vit != vend; vit++)
 		{
 			if(vit->second.ptr()->_handle == handle)
 			{

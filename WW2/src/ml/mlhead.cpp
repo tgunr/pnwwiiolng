@@ -15,10 +15,6 @@
 #include "fp/fpFPS.h"
 #include "tut/TutorialManager.h"
 
-#ifdef DOROTHY
-#include "gr2/gr2Main.h"
-#endif
-
 /************************************************************************************************
 	mlHead
 *************************************************************************************************/
@@ -54,7 +50,7 @@ struct mlHeadAttitude
 	SINT32 leftRight;
 	SINT32 upDown;
 	SINT32 enabled;
-} ;
+};
 
 static SINT32 _curView = 0;
 static LOGICAL _mouseLook;
@@ -261,7 +257,7 @@ UINT32 mlGetHeadPos(FLOAT64VECTOR* Displacement, FLOAT64ATT* AttChange,
 	static FLOAT64VECTOR _LastVel;
 	static FLOAT64 _LastTime;
 
-	if (VehicleData == NULL)
+	if (VehicleData == nullptr)
 	{
 		return 0;
 	}
@@ -486,10 +482,6 @@ UINT32 mlMouseLook(SINT32 param, UINT32 functionNum, UINT32 data)
 
 	if (pVehicle && pVehicle->VehicleType->Type == VEH_TYPE_PERSON)
 		return fpFPSControlInput (param, functionNum, data);
-#ifdef DOROTHY
-	else if (pVehicle && pVehicle->VehicleType->Type == VEH_TYPE_MECH)
-		return gr2ProcessControlInputs(param, functionNum, data);
-#endif
 
 	if(!_mouseLook) return 0;
 

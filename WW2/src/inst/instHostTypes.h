@@ -8,8 +8,8 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-typedef std::map<Instance::Descriptor, Instance::HostInstance*> HOST_INSTANCES ;
-extern HOST_INSTANCES g_hostInstances ;
+typedef std::map<Instance::Descriptor, Instance::HostInstance*> HOST_INSTANCES;
+extern HOST_INSTANCES g_hostInstances;
 
-typedef std::map<instanceid_t, Instance::HostInstance*> INSTANCE_UIDS ;
-extern INSTANCE_UIDS g_hostInstanceUIDs ;
+typedef std::map<instanceid_t, Instance::HostInstance*> INSTANCE_UIDS;
+extern INSTANCE_UIDS g_hostInstanceUIDs;

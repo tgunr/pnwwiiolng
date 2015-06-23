@@ -10,8 +10,8 @@
 
 namespace Instance
 {
-	extern  SINT32 InstallHostCallbacks() ;
+	extern  SINT32 InstallHostCallbacks();
 	// Save the population counts periodically to database, only intended to be called
 	// by one of the host processes.
-	extern	void RecordPopulations() ;
+	extern	void RecordPopulations();
 }

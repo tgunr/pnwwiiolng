@@ -14,14 +14,14 @@ namespace Map
 	struct DirectSpawn
 	{
 		// Location they want to spawn at
-		FLOAT64VECTOR	m_location ;
+		FLOAT64VECTOR	m_location;
 		// Weapon the user wants
-		WEAPON_SPEC		m_weapon ;
+		WEAPON_SPEC		m_weapon;
 		// Do they want to use the custom location
-		bool			m_useLocation ;
+		bool			m_useLocation;
 
-		SINT32 packer(LOGICAL mode, struct ACTION_OBJECT* a) ;
-	} ;
+		SINT32 packer(LOGICAL mode, struct ACTION_OBJECT* a);
+	};
 #pragma pack(pop)
 }
 

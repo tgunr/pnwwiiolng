@@ -6,11 +6,9 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "dbug/dbug.h"
-
 #include "chat/chatTrainers.h"
 
-static TRAINERS s_trainers ;
+static TRAINERS s_trainers;
 
 //////////////////////////////////////////////////////////////////////
 // Add a trainer to the list if they aren't already in it
@@ -19,15 +17,15 @@ static void
 _addTrainer(const playerid_t playerID)
 {
 	// Find the spot that you should be at
-	TRAINERS::iterator it = s_trainers.lower_bound(playerID) ;
+	TRAINERS::iterator it = s_trainers.lower_bound(playerID);
 
 	// Nothing to do if you already have an entry in here
 	if ( it != s_trainers.end() && *it == playerID )
-		return ;
+		return;
 
-	s_trainers.insert(it, playerID) ;
+	s_trainers.insert(it, playerID);
 
-	dbugLog(_FLI, "p:%u added to trainer list (%" PRSizeT " total)", playerID, s_trainers.size()) ;
+	dbugLog(_FLI, "p:%u added to trainer list (%" PRSizeT " total)", playerID, s_trainers.size());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -36,15 +34,15 @@ _addTrainer(const playerid_t playerID)
 static void
 _removeTrainer(const playerid_t playerID)
 {
-	TRAINERS::iterator it = s_trainers.find(playerID) ;
+	TRAINERS::iterator it = s_trainers.find(playerID);
 
 	// Are you in the list?
 	if ( it == s_trainers.end() || *it != playerID )
-		return ;
+		return;
 
-	s_trainers.erase(it) ;
+	s_trainers.erase(it);
 
-	dbugLog(_FLI, "p:%u removed from trainer list (%" PRSizeT " total)", playerID, s_trainers.size()) ;
+	dbugLog(_FLI, "p:%u removed from trainer list (%" PRSizeT " total)", playerID, s_trainers.size());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -55,9 +53,9 @@ void
 chatUpdateTrainerStatus(const playerid_t playerID, bool isTrainer)
 {
 	if ( isTrainer )
-		_addTrainer(playerID) ;
+		_addTrainer(playerID);
 	else
-		_removeTrainer(playerID) ;
+		_removeTrainer(playerID);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -66,5 +64,5 @@ chatUpdateTrainerStatus(const playerid_t playerID, bool isTrainer)
 const TRAINERS&
 chatGetTrainers()
 {
-	return s_trainers ;
+	return s_trainers;
 }

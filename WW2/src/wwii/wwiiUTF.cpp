@@ -36,13 +36,10 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include <assert.h>
-#include <ctype.h>
-
 #include "wwii/wwiiUTF.h"				// Our header file
 
-typedef unsigned long UTF32 ;
-typedef unsigned char UTF8 ;
+typedef unsigned long UTF32;
+typedef unsigned char UTF8;
 
 static const int halfShift	= 10; /* used for shifting by 10 bits */
 
@@ -53,8 +50,8 @@ static const UTF32 halfMask	= 0x3FFUL;
 #define UNI_SUR_HIGH_END	(UTF32)0xDBFF
 #define UNI_SUR_LOW_START	(UTF32)0xDC00
 #define UNI_SUR_LOW_END		(UTF32)0xDFFF
-static const unsigned long UNI_MAX_BMP = 0x0000FFFF ;
-//static const unsigned long UNI_MAX_UTF32 = 0x7FFFFFFF ;
+static const unsigned long UNI_MAX_BMP = 0x0000FFFF;
+//static const unsigned long UNI_MAX_UTF32 = 0x7FFFFFFF;
 
 /* --------------------------------------------------------------------- */
 
@@ -104,20 +101,19 @@ static const UTF8 firstByteMark[7] = { 0x00, 0x00, 0xC0, 0xE0, 0xF0, 0xF8, 0xFC 
 bool
 WWII::ConvertChars(const wchar_t* source, char* target, size_t sizeofTarget_InBytes)
 {
-	assert( source != NULL ) ;
-	assert( target != NULL ) ;
-	assert( (void*)source != (void*)target ) ;
+	assert( source != nullptr );
+	assert( target != nullptr );
 
-	const size_t targetEntries = sizeofTarget_InBytes / sizeof(*target) - 1 ;
-	assert( targetEntries > 0 ) ;
+	const size_t targetEntries = sizeofTarget_InBytes / sizeof(*target) - 1;
+	assert( targetEntries > 0 );
 
-	const char* const targetEnd = target + targetEntries ;
+	const char* const targetEnd = target + targetEntries;
 
-	*target = 0 ;
+	*target = 0;
 
 	while ( *source && target < targetEnd )
 	{
-		UTF32 ch = (UTF32)*(source++) ;
+		UTF32 ch = (UTF32)*(source++);
 		unsigned short bytesToWrite = 0;
 		static const UTF32 byteMask = 0xBF;
 		static const UTF32 byteMark = 0x80;
@@ -127,7 +123,7 @@ WWII::ConvertChars(const wchar_t* source, char* target, size_t sizeofTarget_InBy
 			UTF32 ch2 = *source;
 			if ( ch2 == 0 )
 			{
-				return false ;
+				return false;
 			}
 			if ( ch2 >= UNI_SUR_LOW_START && ch2 <= UNI_SUR_LOW_END )
 			{
@@ -137,13 +133,13 @@ WWII::ConvertChars(const wchar_t* source, char* target, size_t sizeofTarget_InBy
 		}
 		/* Figure out how many bytes the result will require */
 		if (ch < (UTF32)0x80)
-			bytesToWrite = 1 ;
+			bytesToWrite = 1;
 		else if (ch < (UTF32)0x800)
-			bytesToWrite = 2 ;
+			bytesToWrite = 2;
 		else if (ch < (UTF32)0x10000)
-			bytesToWrite = 3 ;
+			bytesToWrite = 3;
 		else if (ch < (UTF32)0x200000)
-			bytesToWrite = 4 ;
+			bytesToWrite = 4;
 		else
 		{
 			bytesToWrite = 2;
@@ -152,7 +148,7 @@ WWII::ConvertChars(const wchar_t* source, char* target, size_t sizeofTarget_InBy
 
 		target += bytesToWrite;
 		if (target >= targetEnd)
-			return false ;
+			return false;
 		switch (bytesToWrite)
 		{	/* note: everything falls through. */
 			case 4:	*(--target) = (UTF8)((ch | byteMark) & byteMask); ch >>= 6;
@@ -161,10 +157,10 @@ WWII::ConvertChars(const wchar_t* source, char* target, size_t sizeofTarget_InBy
 			case 1:	*(--target) = (UTF8)( ch | firstByteMark[bytesToWrite]);
 		}
 		target += bytesToWrite;
-		*target = 0 ;
+		*target = 0;
 	}
 
-	return true ;
+	return true;
 }
 
 /* --------------------------------------------------------------------- */
@@ -183,9 +179,9 @@ WWII::ConvertChars(const wchar_t* source, char* target, size_t sizeofTarget_InBy
 bool
 WWII::IsLegalUTF8(const char* const source)
 {
-	const int length = WWII::BytesFromCharacter[(UTF8)*source] ;
+	const int length = WWII::BytesFromCharacter[(UTF8)*source];
 	UTF8 a;
-	const UTF8* srcptr = (UTF8*)(source + length) ;
+	const UTF8* srcptr = reinterpret_cast<const UTF8*>(source + length);
 	switch (length)
 	{
 		default: return false;
@@ -203,7 +199,7 @@ WWII::IsLegalUTF8(const char* const source)
 			}
    		case 1: if ((UTF8)*source >= 0x80 && (UTF8)*source < 0xC2) return false;
 			if ((UTF8)*source > 0xF4) return false;
-		break ;
+		break;
 	}
 	return true;
 }
@@ -216,18 +212,18 @@ WWII::IsLegalUTF8(const char* const source)
 bool
 WWII::SkipWhitespace(const char*& source)
 {
-	assert( source != NULL ) ;
+	assert( source != nullptr );
 
 	while ( *source )
 	{
 		if ( false == IsLegalUTF8(source) )
-			return false ;
-		unsigned int length = WWII::BytesFromCharacter[(UTF8)*source] ;
+			return false;
+		unsigned int length = WWII::BytesFromCharacter[(UTF8)*source];
 		if ( length > 1 || !isspace(*source) )
-			return true ;
-		source += length ;
+			return true;
+		source += length;
 	}
-	return true ;
+	return true;
 }
 
 /* --------------------------------------------------------------------- */
@@ -235,15 +231,14 @@ WWII::SkipWhitespace(const char*& source)
 bool
 WWII::ConvertChars(const char* source, wchar_t* target, size_t sizeofTarget_InBytes)
 {
-	assert( source != NULL ) ;
-	assert( target != NULL ) ;
-	assert( (void*)source != (void*)target ) ;
+	assert( source != nullptr );
+	assert( target != nullptr );
 
-	const size_t targetEntries = sizeofTarget_InBytes / sizeof(*target) - 1 ;
-	assert( targetEntries > 0 ) ;
+	const size_t targetEntries = sizeofTarget_InBytes / sizeof(*target) - 1;
+	assert( targetEntries > 0 );
 
-	*target = 0 ;
-	const wchar_t* const targetEnd = target + targetEntries ;
+	*target = 0;
+	const wchar_t* const targetEnd = target + targetEntries;
 
 	while ( *source && target < targetEnd )
 	{
@@ -251,7 +246,7 @@ WWII::ConvertChars(const char* source, wchar_t* target, size_t sizeofTarget_InBy
 
 		/* Do this check whether lenient or strict */
 		if ( false == IsLegalUTF8(source) )
-			return false ;
+			return false;
 
 		UTF32 ch = 0;
 		/*
@@ -269,26 +264,26 @@ WWII::ConvertChars(const char* source, wchar_t* target, size_t sizeofTarget_InBy
 		if (ch <= UNI_MAX_BMP)
 		{ /* Target is a character <= 0xFFFF */
 		    *target++ = (wchar_t)ch;	/* normal case */
-			*target = 0 ;
+			*target = 0;
 		}
 		else if (ch > WWII::UNI_MAX_WCHAR)
 		{
 			*target++ = WWII::UNI_REPLACEMENT_CHAR;
-			*target = 0 ;
+			*target = 0;
 		}
 		else
 		{
 			/* target is a character in range 0xFFFF - 0x10FFFF. */
 			if (target + 1 >= targetEnd)
-				return true ;
+				return true;
 			ch -= halfBase;
 			*target++ = (wchar_t)((ch >> halfShift) + UNI_SUR_HIGH_START);
 			*target++ = (wchar_t)((ch & halfMask) + UNI_SUR_LOW_START);
-			*target = 0 ;
+			*target = 0;
 		}
 	}
 
-	return true ;
+	return true;
 }
 
 /* ---------------------------------------------------------------------

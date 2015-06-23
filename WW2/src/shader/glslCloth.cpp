@@ -52,11 +52,11 @@ void InitFlags(OBJECT* o, Flags& flags)
     // If terrain object, get DOF parameters.
     if(o->flag2 & OBJECT_TERRAIN_OBJECT)
     {
-        ogrpParseDOFParameters(o, NULL, 0, 0);
+        ogrpParseDOFParameters(o, nullptr, 0, 0);
     }
 
-    OBJECT* dof1 = NULL;
-    OBJECT* dof2 = NULL;
+    OBJECT* dof1 = nullptr;
+    OBJECT* dof2 = nullptr;
 
     obmainFindComment(&dof1, o, "origin1");
     obmainFindComment(&dof2, o, "origin2");
@@ -128,7 +128,7 @@ static inline void draw(OBJECT* o)
                     (float*)o->RenderPositions().ptr,
                     (float*)o->RenderNormals().ptr,
                     (float*)o->RenderTexCoords().ptr,
-                    NULL,
+                    nullptr,
                     (unsigned short*)o->ptris,
                     sizeof(piUNIFIED_VERTEX),
                     o->numverts,

@@ -9,9 +9,9 @@
 namespace Teul
 {
 	// Teul::Module callbacks.
-	namespace Module { enum { CallbackX = 0 } ; }
+	namespace Module { enum { CallbackX = 0 }; }
 	// reserved a special row for callbacks that are system but must be remote
-	namespace Serv { enum { CallbackX = 166 } ; }
+	namespace Serv { enum { CallbackX = 166 }; }
 }
 
 // Teul::Module callbacks.

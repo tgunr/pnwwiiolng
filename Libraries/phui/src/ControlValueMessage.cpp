@@ -1,7 +1,5 @@
 #include "phui-precompiled-header.h"
 
-#include <stdio.h>
-
 #include "phui/View.h"
 #include "phui/Control.h"
 #include "phui/Message.h"

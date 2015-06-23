@@ -83,7 +83,7 @@ enum MT_OPCODES
 
 	NUM_MT_OPCODES
 
-} ;
+};
 
 struct MULTITEXTURE
 {

@@ -2,7 +2,7 @@
 
 #include "phui/Javascript.h"
 
-namespace StratDB { class StratObject ; }
+namespace StratDB { class StratObject; }
 
 /************************************************************************************************
 	jsPosition
@@ -13,7 +13,7 @@ class SuperCellMapView;
 class jsPosition : public phui::js::Object
 {
 public:
-	jsPosition(float x=0, float y=0, SuperCellMapView* mv = NULL);
+	jsPosition(float x=0, float y=0, SuperCellMapView* mv = nullptr);
 
 	JS_CLASS_DATA;
 	enum {LON_PROP, LAT_PROP, SX_PROP, SY_PROP, X_PROP, Y_PROP};

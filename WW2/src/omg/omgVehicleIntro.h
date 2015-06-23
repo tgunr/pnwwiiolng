@@ -31,30 +31,30 @@ class Intro
 		}
 
 	//! User implemented: somewhere to provide a reference to the Teul Callback for this object.
-	public: static TEUL_CALLBACK* Callback(void) ;
+	public: static TEUL_CALLBACK* Callback(void);
 
 	///! User implemented: Routine for serializing/deserializing this data.
-	public: bool packer(LOGICAL mode, ACTION_OBJECT* const a, SINT32 size) ;
+	public: bool packer(LOGICAL mode, ACTION_OBJECT* const a, SINT32 size);
 
 	// Members
 
 	//! Game-name given to this vehicle.
-	ChatHandle handle ;
+	ChatHandle handle;
 	//! Squad name (or 0) for the vehicle.
-	ChatHandle squadHandle ;
+	ChatHandle squadHandle;
 	//! Host's unique index for this vehicle.
-	UINT32 hostIndex ;
+	UINT32 hostIndex;
 	//! Squad ID (or 0) for the vehicle.
-	UINT32 squadID ;
+	UINT32 squadID;
 	//! Type of vehicle.
-	WEAPON_SPEC weaponSpec ;
+	WEAPON_SPEC weaponSpec;
 	//! Brigade vehicle belongs to.
-	UINT32 brigadeID ;
+	UINT32 brigadeID;
 	//! Player-selected decal, or 0.
-	UINT8 decal ;
+	UINT8 decal;
 	//! Owner's rank.
-	RANK_NO rank ;
-} ; // class Intro
+	RANK_NO rank;
+}; // class Intro
 
 } // namespace Vehicle
 

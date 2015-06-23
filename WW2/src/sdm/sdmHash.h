@@ -28,19 +28,19 @@ struct STRAT_BUILDING
 	SINT16	bid;
 	UCHAR	owner;
 	UCHAR	level;
-} ;
+};
 
 struct STRAT_BUILDING_HASH
 {
 	SINT32 maxBldID;						// max bid in the array
 	STRAT_BUILDING* building;			// pointer to an array of buildings
-} ;
+};
 
 struct STRAT_BUILDING_ARRAY
 {
 	SINT32 maxBldID;						// max bid in the array
 	STRAT_BUILDING building[60000];			// pointer to an array of buildings
-} ;
+};
 
 
 struct STRAT_BUILDING_LIST
@@ -50,41 +50,41 @@ struct STRAT_BUILDING_LIST
 
 	static void destroy(STRAT_BUILDING_LIST* list)
 	{
-		if ( list == NULL )
-			return ;
+		if ( list == nullptr )
+			return;
 
-		for ( size_t x = 0 ; x < (size_t)CELLS_PER_SIDE ; ++x )
+		for ( size_t x = 0; x < (size_t)CELLS_PER_SIDE; ++x )
 		{
-			for ( size_t y = 0 ; y < (size_t)CELLS_PER_SIDE ; ++y )
+			for ( size_t y = 0; y < (size_t)CELLS_PER_SIDE; ++y )
 			{
-				STRAT_BUILDING_LIST* cell = &list[(x * CELLS_PER_SIDE) + y] ;
-				if ( cell->bid != NULL )
+				STRAT_BUILDING_LIST* cell = &list[(x * CELLS_PER_SIDE) + y];
+				if ( cell->bid != nullptr )
 				{
-					memFree(cell->bid) ;
-					cell->bid = NULL ;
+					memFree(cell->bid);
+					cell->bid = nullptr;
 				}
 			}
 		}
 
-		memFree(list) ;
+		memFree(list);
 	}
-} ;
+};
 
 struct STRAT_FACILITY_NODE
 {
 	SINT16	id;							// id of facility
 	STRAT_BUILDING_LIST	bidList;		// building id list that belong to facility
-} ;
+};
 
 struct STRAT_FACILITY_TABLE
 {
 	STRAT_FACILITY_NODE* facility;		// points to an allocated array of facility nodes
 	SINT32				numFacilities;	// number of facilities
-} ;
+};
 
 // allocates a facility nodes for each facility and a building list for each
 // facility that is filled out when sdmCreateBuildingTable is called.
-extern STRAT_FACILITY_TABLE* sdmCreateFacilityTable(FACILITY* const fac, const size_t numFacilities, const size_t numCPs);
+extern STRAT_FACILITY_TABLE* sdmCreateFacilityTable(FACILITY* const fac, const SINT32 numFacilities, const SINT32 numCPs);
 
 // returns the building list fro the given facility id from the facility table
 // null if no found
@@ -99,7 +99,7 @@ extern STRAT_BUILDING_LIST* sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTabl
 													, BUILDING* bd
 													, SINT32 numBuildings
 													, STRAT_BUILDING_HASH* bldHash
-													, UINT32* errors = NULL
+													, UINT32* errors = nullptr
 													);
 
 // x,y are the base octet address of the cell
@@ -120,4 +120,4 @@ static inline STRAT_BUILDING_LIST* sdmGetCellList(STRAT_BUILDING_LIST* table, SI
 	return &table[(x * CELLS_PER_SIDE) + y];
 }
 
-extern void strtDataErrorParentFacility(const char* buildingName, const char* filename, SINT32 scx, SINT32 scy, UINT16 bid, UINT16 bno, UINT16 fid) ;
+extern void strtDataErrorParentFacility(const char* buildingName, const char* filename, SINT32 scx, SINT32 scy, UINT16 bid, UINT16 bno, UINT16 fid);

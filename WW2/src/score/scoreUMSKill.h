@@ -17,8 +17,8 @@ namespace Scoring
 			: EventType(Type, shooter_, stoUID_)
 		{}
 
-		public: const LhsType& shooter() const { return lhs() ; }
-		public: const RhsType& stoUID() const { return rhs() ; }
+		public: const LhsType& shooter() const { return lhs(); }
+		public: const RhsType& stoUID() const { return rhs(); }
 
 	END_SCORING_EVENT( )
 }

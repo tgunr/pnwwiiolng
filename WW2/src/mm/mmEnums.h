@@ -15,7 +15,7 @@ enum CAPACITY_REQUEST_STATE
 
 	CAPACITY_BEFORE_MISSION = 0,
 	CAPACITY_AFTER_MISSION
-} ;
+};
 
 enum MISSION_TYPE
 {
@@ -27,9 +27,9 @@ enum MISSION_TYPE
 	RESUPPLY,		//5
 	SYSTEM_MISSION,	//6
 	MAX_MISSION_TYPES
-} ;
+};
 
-extern const char* _missionTypes[MAX_MISSION_TYPES] ;
+extern const char* _missionTypes[MAX_MISSION_TYPES];
 
 // MISSION_CODES
 //
@@ -48,7 +48,7 @@ enum MISSION_CODE
 	MC_BRIGADE,						// Doesn't belong to your brigade
 	MC_BRANCH,						// Doesn't belong to your branch
 	MC_BRIGADE_INACTIVE				// No officers present to allow posting
-} ;
+};
 
 // Result codes from attempting to load a persona
 enum PERSONA_LOAD_STATUS
@@ -57,8 +57,8 @@ enum PERSONA_LOAD_STATUS
 ,	PLS_LOCKED			// Persona is locked
 ,	PLS_MISSING			// No such persona
 ,	PLS_ERROR			// Failed
-} ;
+};
 
-static const UINT32 MIN_MISSION_ID = 10000U ;
-static const UINT32 MAX_MISSION_ID = 4000000000U ;	// Just shy of 2^32
+static const UINT32 MIN_MISSION_ID = 10000U;
+static const UINT32 MAX_MISSION_ID = 4000000000U;	// Just shy of 2^32
 

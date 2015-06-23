@@ -27,8 +27,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "dbug/dbug.h"							// For host "dbugLog" access
-
 #include <libircclient.h>
 #include <libirc_rfcnumeric.h>
 #include <signal.h>
@@ -73,21 +71,21 @@ struct IRCImpl : public IRC, public PNThread
 	IRCImpl()
 		:  PNThread()
 		, m_initialized(false), m_active(false), m_running(false), m_joined(false)
-		, m_session(NULL)
+		, m_session(nullptr)
 		, m_app(""), m_nick("")
 		, m_modes(), m_channels()
 		{}
 	virtual ~IRCImpl() {}
 
-	bool			m_initialized;
-	bool			m_active;
-	volatile bool	m_running;
-	bool			m_joined;			// Finished joining
-	irc_session_t*	m_session;
-	std::string		m_app;
-	std::string		m_nick;
-	_MODES			m_modes;
-	_CHANNELS		m_channels;
+	bool				m_initialized;
+	bool				m_active;
+	std::atomic<bool>	m_running;
+	bool				m_joined;			// Finished joining
+	irc_session_t*		m_session;
+	std::string			m_app;
+	std::string			m_nick;
+	_MODES				m_modes;
+	_CHANNELS			m_channels;
 
 	// Dot command index
 	typedef std::map<std::string, irc_dotcmd_t> DOTS;
@@ -95,14 +93,14 @@ struct IRCImpl : public IRC, public PNThread
 
 	std::set<std::string>	m_ignores;
 
-	virtual bool ignoring(const char* channel) const
+	virtual bool ignoring(const char* channel) const OVERRIDE_FN
 	{
 		char realName[128];
 		return ( m_ignores.find(_getChannelName(channel, realName, sizeof(realName))) != m_ignores.end() );
 	}
-	virtual const std::string& nick() const { return m_nick; }
+	virtual const std::string& nick() const OVERRIDE_FN { return m_nick; }
 
-	virtual void run();
+	virtual void run() OVERRIDE_FN;
 };
 
 irc_callbacks_t ircCallbacks;
@@ -167,7 +165,7 @@ IRCImpl::run()
 static void
 _terminate(const char* reason)
 {
-	if ( irc.m_session == NULL || irc.m_active == false || irc.m_running == false )
+	if ( irc.m_session == nullptr || irc.m_active == false || irc.m_running == false )
 		return;
 
 	irc.m_running = false;
@@ -198,7 +196,7 @@ _ircSigHandler(int signo)
 {
 	char buffer[100];
 	const char* format = "*** PROCESS CRASHED: %s ***";
-	const char* sigName = NULL;
+	const char* sigName = nullptr;
 	switch ( signo )
 	{
 	case SIGINT:	format = "Shutdown [%s]"; sigName = "sigint"; break;
@@ -214,7 +212,7 @@ _ircSigHandler(int signo)
 	default: break;
 	}
 
-	if ( sigName != NULL )
+	if ( sigName != nullptr )
 		sprintf(buffer, format, sigName);
 	else
 		sprintf(buffer, "*** PROCESS CRASHED with signal %d ***", signo);
@@ -224,7 +222,7 @@ _ircSigHandler(int signo)
 	if ( signo >= 0 && signo < MaxSignals )
 	{
 		SignalHandler handler = oldActions[signo].sa_handler;
-		if ( handler != NULL && handler != SIG_IGN && handler != SIG_DFL )
+		if ( handler != nullptr && handler != SIG_IGN && handler != SIG_DFL )
 			handler(signo);
 	}
 }
@@ -241,7 +239,7 @@ _setSig(int signum)
 	sigfillset(&sa.sa_mask);
 	sa.sa_flags = SA_RESETHAND;
 
-	struct sigaction* oldact = (signum >= 0 and signum < MaxSignals) ? &oldActions[signum] : NULL;
+	struct sigaction* oldact = (signum >= 0 and signum < MaxSignals) ? &oldActions[signum] : nullptr;
 	sigaction(signum, &sa, oldact);
 #else
 	oldActions[signum].sa_handler = signal(signum, _ircSigHandler);
@@ -264,7 +262,7 @@ _shutdown()
 static const char*
 _getChannelName(const char* const channel, char* const into, size_t intoSize)
 {
-	assert( channel != NULL );
+	assert( channel != nullptr );
 
 	const char* src = channel;
 	char* dst = into;
@@ -297,13 +295,13 @@ wwiiIRCInitialize(UINT32 ip, bool plural)
 	if ( irc.m_initialized )
 		LogAbort("Tried to reinitialize IRC");
 
-	if ( cv_clusterName.GetString() == NULL )
+	if ( cv_clusterName.GetString() == nullptr )
 	{
 		dbugLog(_FLA, "WWII_CLUSTER not defined");
 		return false;
 	}
 
-	if ( cv_ircServer.GetString() == NULL || cv_ircServer.GetString() == 0 )
+	if ( cv_ircServer.GetString() == nullptr || *cv_ircServer.GetString() == 0 )
 	{
 		dbugLog(_FLW, "WWII_IRC_SERVER not defined");
 		return false;
@@ -350,7 +348,7 @@ wwiiIRCInitialize(UINT32 ip, bool plural)
 	// Cluster server notices
 	sprintf(buf, "#%s-sys", cv_clusterName.GetString());
 	char title[256];
-	snprintf(title, 255, "CRS, GM and System messages from %s servers", cv_clusterName.GetString());
+	strprintf(title, "CRS, GM and System messages from %s servers", cv_clusterName.GetString());
 	wwiiIRCAddInitialChannel(buf, "-nt", title);
 
 	// Initial modes
@@ -469,7 +467,7 @@ _joinChannel(irc_session_t* session, _CHANNELS::iterator it)
 	threadLog(_FLI, "IRC: Attempting to join %s", chan.m_channel.c_str());
 
 	chan.m_newChannel = true;
-	irc_cmd_join(session, chan.m_channel.c_str(), 0);
+	irc_cmd_join(session, chan.m_channel.c_str(), nullptr);
 }
 
 void
@@ -620,7 +618,7 @@ wwiiIRCDefaultNumeric(irc_session_t * session, unsigned int event, const char* o
 	const char* nick = params[0];
 	const char* channel = params[1];
 
-	if ( channel == NULL || channel[0] != '#' || irc.m_nick.compare(nick) != 0 )
+	if ( channel == nullptr || channel[0] != '#' || irc.m_nick.compare(nick) != 0 )
 		return;
 
 	_CHANNELS::iterator it = irc.m_channels.find(channel);
@@ -663,7 +661,7 @@ wwiiIRCDefaultNumeric(irc_session_t * session, unsigned int event, const char* o
 bool
 wwiiIRCActivate(bool includeSigHup)
 {
-	if ( cv_ircServer.GetString() == NULL || *cv_ircServer.GetString() == 0 )
+	if ( cv_ircServer.GetString() == nullptr || *cv_ircServer.GetString() == 0 )
 	{
 		dbugLog(_FLA, "IRC: disabled");
 		return true;
@@ -676,7 +674,7 @@ wwiiIRCActivate(bool includeSigHup)
 	}
 
 	irc.m_session = irc_create_session(&ircCallbacks);
-	if ( irc.m_session == NULL )
+	if ( irc.m_session == nullptr )
 	{
 		dbugLog(_FLA, "IRC: Unable to create session");
 		return false;
@@ -724,7 +722,7 @@ wwiiIRCActivate(bool includeSigHup)
 void
 wwiiIRCTerminate(const char* reason)
 {
-	if ( reason == NULL )
+	if ( reason == nullptr )
 		reason = "Terminated";
 	_terminate(reason);
 }
@@ -735,8 +733,8 @@ wwiiIRCTerminate(const char* reason)
 void
 wwiiIRCChannelMessage(const char* channel, const char* message)
 {
-	assert( channel != NULL );
-	assert( message != NULL );
+	assert( channel != nullptr );
+	assert( message != nullptr );
 
 	if ( irc.m_running )
 	{
@@ -754,10 +752,12 @@ wwiiIRCMessage(const char* channel, const char* fmt, ...)
 	if ( irc.m_running == false )
 		return;
 
-	assert( channel != NULL );
+	assert( channel != nullptr );
 
-	if ( fmt == NULL )
+	if (fmt == nullptr) {
 		dbugLog(_FLW, "called wwiiIRCMessage(%s, NULL)...", channel);
+		return;
+	}
 
 	static char buffer[1202];
 	va_list args;
@@ -779,8 +779,8 @@ wwiiIRCMessage(const char* channel, const char* fmt, ...)
 void
 wwiiIRCChannelNotice(const char* channel, const char* message)
 {
-	assert( channel != NULL );
-	assert( message != NULL );
+	assert( channel != nullptr );
+	assert( message != nullptr );
 
 	if ( irc.m_running )
 	{
@@ -795,9 +795,9 @@ wwiiIRCChannelNotice(const char* channel, const char* message)
 void
 wwiiIRCRegisterCommand(const char* name, irc_dotcmd_t function)
 {
-	assert( name != NULL );
+	assert( name != nullptr );
 
-	if ( function != NULL )
+	if ( function != nullptr )
 	{
 		dbugLog(_FLI, "IRC: Registering .%s", name);
 		irc.m_dots[name] = function;
@@ -825,7 +825,7 @@ namespace Host
 	ABORT_IF(withInput == nullptr);
 	const char* src = withInput;
 	char terminator = ' ';
-	const char* arguments = NULL;
+	const char* arguments = nullptr;
 	do
 	{
 		if ( src[0] == '"' || src[0] == '\'' )
@@ -835,7 +835,7 @@ namespace Host
 		}
 
 		const char* space = strchr(src, terminator);
-		if ( space == NULL )
+		if ( space == nullptr )
 		{
 			args.push_back(src);
 			break;
@@ -851,7 +851,7 @@ namespace Host
 			++src;
 		}
 
-		if ( arguments == NULL )
+		if ( arguments == nullptr )
 			arguments = src;
 	}
 	while ( *src );

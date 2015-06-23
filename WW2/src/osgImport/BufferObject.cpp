@@ -11,11 +11,6 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * OpenSceneGraph Public License for more details.
 */
-#include <stdio.h>
-#include <math.h>
-#include <float.h>
-#include <map>
-
 #include "osgImport/BufferObject.h"
 #include "osgImport/Image.h"
 #include "osgImport/ref_ptr.h"
@@ -135,7 +130,7 @@ void PixelBufferObject::compileBuffer() const
 
         glGenBuffersARB(1, &pbo);
         glBindBufferARB(_target, pbo);
-        glBufferDataARB(_target, _totalSize, NULL, _usage);
+        glBufferDataARB(_target, _totalSize, nullptr, _usage);
 
     }
     else
@@ -146,7 +141,7 @@ void PixelBufferObject::compileBuffer() const
         {
             // resize PBO.
             _totalSize = image->getTotalSizeInBytes();
-            glBufferDataARB(_target, _totalSize, NULL, _usage);
+            glBufferDataARB(_target, _totalSize, nullptr, _usage);
         }
     }
 
@@ -199,7 +194,7 @@ void PixelDataBufferObject::compileBuffer() const
     }
 
     glBindBufferARB(_target, pbo);
-    glBufferDataARB(_target, _bufferData.dataSize, NULL, _usage);
+    glBufferDataARB(_target, _bufferData.dataSize, nullptr, _usage);
     glBindBufferARB(_target, 0);
 
     _compiledList[contextID] = 1;

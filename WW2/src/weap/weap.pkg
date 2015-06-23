@@ -1,7 +1,7 @@
-$#include "systypes.h"
-$#include "weapType.h"
+$#include "include/systypes.h"
+$#include "weap/weapType.h"
 
-$pfile "..\\lua\\include.pkg"
+$pfile "lua/include.pkg"
 
 module weapon
 {

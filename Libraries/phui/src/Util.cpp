@@ -1,9 +1,7 @@
 #include "phui-precompiled-header.h"
 
-#include <stdio.h>
 #include <fcntl.h>
 #include <sys/stat.h>
-#include <string.h>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -268,11 +266,11 @@ const wchar_t* phui::utf8_to_utf16(const unsigned char* val)
 {
 	const UTF8* valptr = (const UTF8*)val;
 
-	static wchar_t wval[8][8192] ;
-	static int instance = 0 ;
+	static wchar_t wval[8][8192];
+	static int instance = 0;
 
 	// make sure we're within the bounds of the array
-	instance = instance & 7 ;
+	instance = instance & 7;
 
 	// grab the current instance
 	wchar_t *wvalptr = wval[instance];
@@ -295,11 +293,11 @@ const wchar_t* phui::utf8_to_utf16(const unsigned char* val)
 
 const wchar_t* phui::utf8_to_utf16(const unsigned char* val)
 {
-	static wchar_t wval[8][CONVERT_SIZE+1] ;
-	static int instance = 0 ;
+	static wchar_t wval[8][CONVERT_SIZE+1];
+	static int instance = 0;
 
 	// make sure we're within the bounds of the array
-	instance = instance & 7 ;
+	instance = instance & 7;
 
 	// grab the current instance
 	wchar_t* wptr = wval[instance];
@@ -319,10 +317,10 @@ const wchar_t* phui::utf8_to_utf16(const unsigned char* val)
 const unsigned char* phui::utf16_to_utf8(const wchar_t* wptr)
 {
 	static unsigned char val[8][CONVERT_SIZE+1];
-	static int instance = 0 ;
+	static int instance = 0;
 	
 	// make sure we're within the bounds of the array
-	instance = instance & 7 ;
+	instance = instance & 7;
 	
 	// grab the current instance
 	unsigned char* ptr = val[instance];

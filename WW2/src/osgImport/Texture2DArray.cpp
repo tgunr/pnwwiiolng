@@ -269,7 +269,7 @@ void Texture2DArray::apply() const
         else
         {
             // Override compressed source format with safe GL_RGBA value which not generate error
-            // We can safely do this as source format is not important when source data is NULL
+            // We can safely do this as source format is not important when source data is nullptr
             //if( isCompressedInternalFormat( sourceFormat ) )
             if(sourceFormat != GL_RGB)
                 sourceFormat = GL_RGBA;
@@ -326,7 +326,7 @@ void Texture2DArray::apply() const
             {
                 if (_images[n].valid() && _images[n]->getDataVariance()==STATIC)
                 {
-                    non_const_this->_images[n] = NULL;
+                    non_const_this->_images[n] = nullptr;
                 }
             }
         }
@@ -603,7 +603,7 @@ void Texture2DArray::allocateMipmap() const
                                        _textureDepth,
                                        _borderWidth,
                                        size,
-                                       NULL);
+                                       nullptr);
             }
             else
             {
@@ -616,7 +616,7 @@ void Texture2DArray::allocateMipmap() const
                                   _borderWidth,
                                   safeSourceFormat,
                                   _sourceType ? _sourceType : GL_UNSIGNED_BYTE,
-                                  NULL);
+                                  nullptr);
             }
 
             width >>= 1;

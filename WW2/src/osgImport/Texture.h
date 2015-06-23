@@ -640,7 +640,7 @@ class Texture : public Referenced
 
         /** Gets the extension for the specified context. Creates the
           * Extensions object for that context if it doesn't exist.
-          * Returns NULL if the Extensions object for the context doesn't
+          * Returns nullptr if the Extensions object for the context doesn't
           * exist and the createIfNotInitalized flag is false. */
         static Extensions* getExtensions(unsigned int contextID,bool createIfNotInitalized);
 

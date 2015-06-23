@@ -1,8 +1,8 @@
-$pfile "..\\lua\\include.pkg"
+$pfile "lua/include.pkg"
 
 module input
 {
-	$cfile "iac.h"
-	$cfile "ww2func.h"
-	$cfile "ww2imap.h"
+	$cfile "imap/iac.h"
+	$cfile "imap/ww2func.h"
+	$cfile "imap/ww2imap.h"
 }

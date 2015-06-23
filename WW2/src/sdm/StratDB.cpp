@@ -34,7 +34,7 @@ static bool operator < (const sdm_lookup_id& a, const sdm_lookup_id& b)
 
 typedef std::pair<int,int> supercell_id;
 typedef std::map<sdm_lookup_id, StratObject*> StratObjectMap;
-typedef std::vector<StratObject*> BuildingList ;
+typedef std::vector<StratObject*> BuildingList;
 
 struct supercell
 {
@@ -60,7 +60,7 @@ public:
 	StratObjectMap _stratobjs;
 
 protected:
-	std::vector<StratObject*> _buildings ;
+	std::vector<StratObject*> _buildings;
 };
 
 typedef std::map<supercell_id, supercell> SuperCellMap;
@@ -245,12 +245,12 @@ StratObjList& StratDB::BuildingsInOctet(const int scx, const int scy, const int 
 void strtApplySuperCellVisLevels(const SupercellVislevelXfer& xfer)
 {
 	// Look up which supercell this xfer is for.
-	const SINT16 scx = xfer.scx() ;
-	const SINT16 scy = xfer.scy() ;
+	const SINT16 scx = xfer.scx();
+	const SINT16 scy = xfer.scy();
 
-	supercell& sc = _scmap[supercell_id(scx, scy)] ;
+	supercell& sc = _scmap[supercell_id(scx, scy)];
 
-	if(!sc._loaded) sc.load(scx, scy) ;
+	if(!sc._loaded) sc.load(scx, scy);
 
 	// temp object to pass the data down
 	Strat::EventData ed;
@@ -341,8 +341,8 @@ void StratDB::InitDisplayNames()
 			///FIXME: This is likely to crash in a bad way,
 			///FIXME: replace with a sscanf or something.
             char* t1 = strtok(s,"|");
-            int t2 = atoi(strtok(NULL,"|"));
-            int t3 = atoi(strtok(NULL,"|"));
+            int t2 = atoi(strtok(nullptr,"|"));
+            int t3 = atoi(strtok(nullptr,"|"));
 
             DisplayNameMap::iterator it = _nameMap.find(t1);
 
@@ -355,7 +355,7 @@ void StratDB::InitDisplayNames()
     if(text)
     {
         memFree(text);
-        text = NULL;
+        text = nullptr;
     }
 }
 
@@ -590,8 +590,8 @@ StratObject::ChildList StratObject::ChildStratObjects() const
 
 unsigned int StratObject::FindBestUnit(int s, int c, int b) const
 {
-	HCUnit* best = NULL;
-	HCUnit* unit = NULL;
+	HCUnit* best = nullptr;
+	HCUnit* unit = nullptr;
 
 	for(int i = 0; i < (int)_units.size(); ++i)
 	{
@@ -663,13 +663,13 @@ static bool SortUnitsByDivision(const UINT32& lhs, const UINT32& rhs)
 		return true;
 
 	if(lu->parent() == ru->parent())
-		return (strcoll(lu->name(), ru->name()) < 0) ;
+		return (strcoll(lu->name(), ru->name()) < 0);
 
 	if(lu->isDivision() && ru->isBrigade())
-		return (strcoll(lu->name(), ru->parent()->name()) < 0) ;
+		return (strcoll(lu->name(), ru->parent()->name()) < 0);
 	if(ru->isDivision() && lu->isBrigade())
-		return strcoll(lu->parent()->name(), ru->name()) < 0 ;
-	return strcoll(lu->name(), ru->name()) < 0 ;
+		return strcoll(lu->parent()->name(), ru->name()) < 0;
+	return strcoll(lu->name(), ru->name()) < 0;
 }
 
 void StratObject::AddUnit(unsigned int id)
@@ -753,7 +753,7 @@ bool StratObject::IsDeepWaterPort() const
 	StratDB::StratObject* cp = (StratDB::StratObject*)this;
 
 	// make sure we're operating on the CP
-	while(cp != NULL && cp->StratClass() != SDM_CLASS_CP)
+	while(cp != nullptr && cp->StratClass() != SDM_CLASS_CP)
 		cp = cp->ParentStratObject();
 
 	if(!cp)
@@ -795,7 +795,7 @@ bool StratObject::IsRelated(const FULL_OBJ_ID& id) const
 
 bool StratObject::IsRelated(const StratDB::StratObject* strat) const
 {
-	if(strat == NULL)
+	if(strat == nullptr)
 		return false;
 
 	StratDB::StratObject* myCP = (StratClass() == SDM_CLASS_CP) ?
@@ -806,13 +806,13 @@ bool StratObject::IsRelated(const StratDB::StratObject* strat) const
 										(StratDB::StratObject*)strat:
 										strat->ParentStratObject();
 
-	while(myCP != NULL && myCP->StratClass() != SDM_CLASS_CP)
+	while(myCP != nullptr && myCP->StratClass() != SDM_CLASS_CP)
 		myCP = myCP->ParentStratObject();
 
-	while(targetCP != NULL && targetCP->StratClass() != SDM_CLASS_CP)
+	while(targetCP != nullptr && targetCP->StratClass() != SDM_CLASS_CP)
 		targetCP = targetCP->ParentStratObject();
 
-	return (myCP != NULL && targetCP == myCP) ? true: false;
+	return (myCP != nullptr && targetCP == myCP) ? true: false;
 }
 
 
@@ -864,7 +864,7 @@ bool StratObject::GetAreaXY(int& ax, int& ay)
 	ay = strat->PosY();
 	int count = 1;
 
-	StratDB::StratObject::ChildList const& children = strat->ChildStratObjects() ;
+	StratDB::StratObject::ChildList const& children = strat->ChildStratObjects();
 	StratDB::StratObject::ChildList::const_iterator it;
 
 	for(it = children.begin() ; it != children.end() ; ++it)
@@ -906,7 +906,7 @@ const wchar_t* StratObject::DisplayName() const
 
 unsigned int StratObject::StratFlags(bool filter) const
 {
-	return (filter) ? clientStrtFilterFlags((WWII_SIDE)Side(), _stratflags) : _stratflags ;
+	return (filter) ? clientStrtFilterFlags((WWII_SIDE)Side(), _stratflags) : _stratflags;
 }
 
 /************************************************************************************************
@@ -939,12 +939,9 @@ StratObject* StratDB::FindStratObject(const sdm_full_obj_id& fullid)
 		sc.load(id.sx(),id.sy());
 
 	StratObjectMap::iterator it = sc._stratobjs.find(id.lookup_id());
-	StratObject* stratobj = 0;
-
-	if(it != sc._stratobjs.end())
-		stratobj = it->second;
-
-	return stratobj;
+	if (it == sc._stratobjs.end())
+		return nullptr;
+	return it->second;
 }
 
 StratObject* StratDB::FindStratObject(const FULL_OBJ_ID& fullobjid)
@@ -954,7 +951,7 @@ StratObject* StratDB::FindStratObject(const FULL_OBJ_ID& fullobjid)
 
 StratObject* StratDB::FindStratObject(const char* cp, const char* fac)
 {
-	StratObject* found = NULL;
+	StratObject* found = nullptr;
 
 	StratObjList list;
 	AllCPsInWorld(list);
@@ -1037,7 +1034,7 @@ void supercell::AddStratData(sdm_strat_data* strat)
 {
 	_loaded = true;
 
-	sdm_lookup_id id = { _sx << 4, _sy << 4, 0 };
+	sdm_lookup_id id = { (SINT16)(_sx << 4), (SINT16)(_sy << 4), 0 };
 	StratObject* stratobj;
 
 	for(int i = 0; i < strat->numcps; i++)
@@ -1054,7 +1051,7 @@ void supercell::AddStratData(sdm_strat_data* strat)
 		stratobj->SetIndex(i);
 	}
 
-	_buildings.resize(strat->numblds) ;
+	_buildings.resize(strat->numblds);
 	for(int i = 0; i < strat->numblds; i++)
 	{
 		id.id = strat->building[i].oid.id;

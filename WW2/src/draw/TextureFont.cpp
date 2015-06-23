@@ -20,7 +20,6 @@
 #include "mem/mem.h"
 
 using namespace std;
-USING_EXT_NAMESPACE;
 
 TextureFont::TextureFont( const char* name, int size )
 {
@@ -74,7 +73,7 @@ TextureFont::TextureFont( const char* name, int size )
     if(text)
     {
         memFree(text);
-        text = NULL;
+        text = nullptr;
     }
 }
 

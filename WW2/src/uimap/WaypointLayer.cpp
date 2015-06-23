@@ -488,7 +488,7 @@ void WaypointMapObject::Over(SuperCellMapView* mv, int state)
 				char dbuff[8];
 				double dist = -1.0;
 				vehVehicle* player = persGetPersonaVehiclePtr();
-				if(player != NULL)
+				if(player != nullptr)
 				dist = player->DistanceTo((double)_waypoint.x(), (double)_waypoint.y(), player->ModelData->VehiclePos.z);
 
 				// Build mouseover distance string

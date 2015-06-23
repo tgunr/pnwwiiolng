@@ -178,7 +178,7 @@ public:
 	virtual void SetCompositionString(const std::wstring& composition);
 	virtual void SetResultString(const std::wstring& result);
 	virtual void SetReadingString(const std::wstring& reading);
-	virtual void SetCandidateList(long index, const std::vector<std::wstring>* list = NULL, int selected = 0);
+	virtual void SetCandidateList(long index, const std::vector<std::wstring>* list = nullptr, int selected = 0);
 	virtual void ResetControl(bool updateui);
 
 	virtual void SetState(IME_STATE s){ state = s; }

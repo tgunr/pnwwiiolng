@@ -32,7 +32,7 @@ public:
 	virtual UINT CancelLocID() const ;
 	virtual UINT HintLocID() const ;
 
-	CBDialog(UINT nIDTemplate, CWnd* pParent = NULL);   // standard constructor
+	CBDialog(UINT nIDTemplate, CWnd* pParent = nullptr);   // standard constructor
 
 // Dialog Data
 	//{{AFX_DATA(CBDialog)	

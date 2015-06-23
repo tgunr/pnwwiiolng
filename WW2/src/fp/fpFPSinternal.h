@@ -207,7 +207,7 @@ extern LOGICAL				fpFPSWeaponStateCheck (fpsWeaponStates* newState);
 extern void				fpFPSWeaponChange (SINT32 weaponNumber, SINT32 override);
 extern UINT32				fpFPSCheckNewPose(fpFPSPoses poseToCheck);
 extern LOGICAL				fpFPSRideUnrideVehicle ();
-extern LOGICAL				fpFPSSit(SINT32 Param, vehVehicle* rideVehicle = NULL);
+extern LOGICAL				fpFPSSit(SINT32 Param, vehVehicle* rideVehicle = nullptr);
 extern LOGICAL				fpFPSIsWeaponSwitchOK (SINT32 weaponNumber);
 extern void				fpFPSWeaponAutoSwitch();
 extern LOGICAL				fpFPSGetFirePoint (OBJECT* pObject, piMATRIX* pMatrix, bool visual);

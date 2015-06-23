@@ -1,8 +1,7 @@
 #pragma once
 
 #include "pi/pi.h"
-#include "mem/mem.h"
-struct LISTHEADER ;
+struct LISTHEADER;
 
 #define MINOBJECTS				96000
 
@@ -200,7 +199,7 @@ struct OBJECTSTATICDOF
 	piVECTOR			dofcurscale;	// DOF Current Scale
 	piVECTOR			dofincscale;	// DOF Scale Increment
 
-} ;
+};
 
 struct OBJECTDOF
 {
@@ -216,32 +215,7 @@ struct OBJECTDOF
 	piMATRIX			dofposmatrix;	// DOF position matrix
 	UINT32				dofflags;		// DOF Flags
 
-} ;
-
-#if defined(USE_OSG)
-
-struct OBJECT
-{
-	UINT32				flags, flag2;
-	gr2AnimTrooper*		animModel;
-	piMATRIX			mat, matint;
-	void*				osgNode;
-	struct OBJECT*	child;
-
-#ifdef __cplusplus
-
-	OBJECT() : flags(0), flag2(0), animModel(0), osgNode(0), child(0)
-	{
-	}
-
-	~OBJECT()
-	{
-	}
-#endif
-
-} ;
-
-#else
+};
 
 //#ifdef DEBUG_WW2
 //#define NEW_OBJECT_MEM 1
@@ -375,7 +349,7 @@ struct OBJECT
 	otherwise the original immutable data.
 
 	Static - This is a special case for objects that were not created from the pool, which therefore
-	can have modifiable "original" vertex data. This function will return NULL if the object
+	can have modifiable "original" vertex data. This function will return nullptr if the object
 	was created from the pool.
 */
 #ifdef __cplusplus
@@ -417,6 +391,18 @@ struct OBJECT
 
 	// NOP now.
 	void SyncStaticData();
+
+	void PopulateIndexes(UINT16 index)
+	{
+		for (auto it = ptris + index, end = ptris + numtris; it != end; ++it)
+		{
+			// Funky useless indices
+			it->v1 = index++;
+			it->v2 = index++;
+			it->v3 = index++;
+		}
+	}
+
 #endif // __cplusplus
 
 	// treat these are private to obmain/obpool (although there is some outside code that does
@@ -442,9 +428,8 @@ struct OBJECT
 #ifdef SPATIAL_DB
     void*           sdbInfo;
 #endif
-} ;
+};
 
-#endif
 typedef OBJECT DOFOBJECT;
 typedef OBJECT LODOBJECT;
 typedef OBJECT GROUPOBJECT;

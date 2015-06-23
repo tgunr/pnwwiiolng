@@ -159,10 +159,10 @@ public:
 
 				char* flag = strtok((char*)value.c_str(),",");
 
-				while(flag != NULL)
+				while(flag != nullptr)
 				{
 					spec->buildFlags |= (1<<(UINT32)atoi(flag));
-					flag = strtok(NULL, ",");
+					flag = strtok(nullptr, ",");
 				}
 			}
 			else if(!stricmp(name.c_str(), "avoidflags"))
@@ -171,10 +171,10 @@ public:
 
 				char* flag = strtok((char*)value.c_str(),",");
 
-				while(flag != NULL)
+				while(flag != nullptr)
 				{
 					spec->avoidFlags |= (1<<(UINT32)atoi(flag));
-					flag = strtok(NULL, ",");
+					flag = strtok(nullptr, ",");
 				}
 			}
 			else if(!stricmp(name.c_str(), "surfaceflags"))
@@ -183,10 +183,10 @@ public:
 
 				char* flag = strtok((char*)value.c_str(),",");
 
-				while(flag != NULL)
+				while(flag != nullptr)
 				{
 					spec->surfaceFlags |= (1<<(UINT32)atoi(flag));
-					flag = strtok(NULL, ",");
+					flag = strtok(nullptr, ",");
 				}
 			}
 			else if(!stricmp(name.c_str(), "allowinterior"))
@@ -209,10 +209,10 @@ public:
 
 				char* texture = strtok((char*)value.c_str(),",");
 
-				while(texture != NULL)
+				while(texture != nullptr)
 				{
 					spec->badTextures.push_back(texture);
-					texture = strtok(NULL, ",");
+					texture = strtok(nullptr, ",");
 				}
 			}
 			else if(!stricmp(name.c_str(), "oktextures"))
@@ -221,10 +221,10 @@ public:
 
 				char* texture = strtok((char*)value.c_str(),",");
 
-				while(texture != NULL)
+				while(texture != nullptr)
 				{
 					spec->okTextures.push_back(texture);
-					texture = strtok(NULL, ",");
+					texture = strtok(nullptr, ",");
 				}
 			}
 			else if(!stricmp(name.c_str(), "maxspeed"))
@@ -255,7 +255,7 @@ public:
 	PPOSpec defaults;
 };
 
-namespace phui { class View ; }
+namespace phui { class View; }
 
 struct PlayerPlacedObject
 {
@@ -320,4 +320,4 @@ extern bool fpPPOUpdate();
 extern void fpPPOKill();
 extern void fpPPOCancel();
 extern void fpPPOAlert(const char* key, ...);
-extern void fpPPOAlert(const wchar_t* message = NULL);
+extern void fpPPOAlert(const wchar_t* message = nullptr);

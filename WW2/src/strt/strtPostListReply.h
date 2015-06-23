@@ -16,11 +16,11 @@ struct PostListReply
 		: m_action(action), m_customerID(customerID), m_facilityOID(facilityOID)
 		{}
 
-	static SINT32 Process(ACTION_OBJECT* const a) ;
+	static SINT32 Process(ACTION_OBJECT* const a);
 
 	COMMANDED_WEAPON_ACTION m_action;
 	UINT32					m_customerID;
 	UINT16					m_facilityOID;
 	// Followed by a bunch of MM_POSTED_WEAPON entries.
-} ;
+};
 

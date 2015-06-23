@@ -13,7 +13,6 @@
 
 #include <libircclient.h>
 #include <sys/stat.h>
-#include <memory>
 
 #include "sdm/sdmLoad.h"
 #include "teul/teulTime.h"
@@ -27,7 +26,7 @@
 
 static bool useIrc = true;
 static irc_session_t* ircSession;
-static volatile bool ircConnected = false;
+static std::atomic<bool> ircConnected { false };
 static std::string nick;
 const char* g_appName = "stratLoader";
 static char g_origin[80] = "private";
@@ -45,23 +44,21 @@ public:
 		, m_session(static_cast<irc_session_t*>(s))
 	{}
 
-	virtual void run()
+	virtual void run() OVERRIDE_FN
 	{
 		irc_run(m_session);
 	}
 
-	virtual int cancel()
+	virtual void onCancel() OVERRIDE_FN
 	{
 		irc_session_t* session = m_session;
 		m_session = nullptr;
 
 		irc_disconnect(session);
 		std::this_thread::sleep_for(std::chrono::milliseconds(50));
-
-		return PNThread::cancel();
 	}
 
-	~IrcThread()
+	virtual ~IrcThread()
 	{
 		if ( m_session != nullptr )
 			irc_disconnect(m_session);

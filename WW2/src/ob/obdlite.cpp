@@ -27,7 +27,7 @@ LOGICAL obdliteInit(void)
 	numdynalites = 0;
 	availdynalites = MINDYNALITES;
 	dynalites = (DYNALITE*)memAlloc(availdynalites * sizeof(LIGHT));
-	if (dynalites == NULL)
+	if (dynalites == nullptr)
 	{
 		return(FALSE);
 	}
@@ -42,7 +42,7 @@ LOGICAL obdliteInit(void)
 
 int obdliteGetLights(DYNALITE** lplite)
 {
-	if (lplite == NULL)
+	if (lplite == nullptr)
 	{
 		return(-1);
 	}
@@ -54,10 +54,10 @@ int obdliteGetLights(DYNALITE** lplite)
 
 void obdliteKill(void)
 {
-	if (dynalites != NULL)
+	if (dynalites != nullptr)
 	{
 		memFree(dynalites);
-		dynalites = NULL;
+		dynalites = nullptr;
 	}
 
     numdynalites = 0;
@@ -77,7 +77,7 @@ int   i;
 		}
 	}
 
-	return(NULL);
+	return(nullptr);
 }
 
 LOGICAL obdliteAddDynaLite(LIGHT* light, DYNALITE_UPDATE updfunc)
@@ -216,7 +216,7 @@ int   i;
 
 	for (i=0 ; i < numdynalites ; i++)
 	{
-		if (dynalites[i].updfunc != NULL)
+		if (dynalites[i].updfunc != nullptr)
 		{
 			dynalites[i].updfunc(&dynalites[i].light);
 		}

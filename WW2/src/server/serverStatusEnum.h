@@ -7,6 +7,6 @@ enum Status : UINT32
 	SERVER_INITIALIZING,
 	SERVER_ACCEPTING,
 	SERVER_FULL
-} ;
+};
 }
 

@@ -108,9 +108,6 @@ public:
 	JS_FUNCTION(joininstance); // simply joins the instance without any persona changes
 	JS_FUNCTION(isavailable);
 	JS_FUNCTION(ismissionleader);
-#ifdef DOROTHY
-	JS_FUNCTION(selectteam);
-#endif
 
 	enum{ 	COUNTRY_PROP, BRANCH_PROP, HANDLE_PROP,
 			MISSIONS_PROP, SPAWNABLE_VEHICLES_PROP, WEAPONCOUNTER_PROP, PERSONAS_PROP,
@@ -455,7 +452,7 @@ public:
 
 private:
 
-	CHATWHO_TIMEFRAME getJoinedSquad(UINT32 joined, UINT32& numUnits) const ;
+	CHATWHO_TIMEFRAME getJoinedSquad(UINT32 joined, UINT32& numUnits) const;
 };
 
 class jsPoll : public phui::js::Object

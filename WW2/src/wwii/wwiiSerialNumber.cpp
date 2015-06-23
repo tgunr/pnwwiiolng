@@ -13,33 +13,33 @@
 #include "wwii/wwiiThreads.h"
 #include "include/mydbQuery.h"
 
-extern DBHANDLE dbh ;
+extern DBHANDLE dbh;
 
 SerialNumber::serialno_t
 SerialNumber::getNext()
 {
-	bool isFirst = false ;
+	bool isFirst = false;
 
     if ( m_counter == 0 )
     {
         try
         {
-			isFirst = true ;
+			isFirst = true;
 
-            DBQuery q(dbh, "SELECT last_serial FROM wwii_serial_numbers WHERE resource = '%s'", m_name) ;
+            DBQuery q(dbh, "SELECT last_serial FROM wwii_serial_numbers WHERE resource = '%s'", m_name);
             if ( q.Rows() && q.FetchRow() )
             {
-                m_counter = (serialno_t)q.Row().NextUINT64() + m_interval ;
-				dbugLog(_FLI, "SerialNumber(%s) starting from %llu", m_name, (UINT64)m_counter) ;
+                m_counter = (serialno_t)q.Row().NextUINT64() + m_interval;
+				dbugLog(_FLI, "SerialNumber(%s) starting from %llu", m_name, (UINT64)m_counter);
             }
 			else
 			{
-				dbugLog(_FLI, "SerialNumber(%s) starting from default (%llu)", m_name, (UINT64)m_minimum) ;
+				dbugLog(_FLI, "SerialNumber(%s) starting from default (%llu)", m_name, (UINT64)m_minimum);
 			}
         }
         catch (std::exception& e)
         {
-            LogAbort("Unable to get initial %s number: %s", m_name, e.what()) ;
+            LogAbort("Unable to get initial %s number: %s", m_name, e.what());
         }
     }
 
@@ -48,11 +48,11 @@ SerialNumber::getNext()
         DBThread::Do(DBThread::Default
 						, "REPLACE INTO wwii_serial_numbers (resource, last_serial) VALUES ('%s', %llu)"
                             , m_name, m_counter
-							) ;
+							);
     }
-	++m_counter ;
+	++m_counter;
 	if ( m_maximum > 0 && ( m_counter >= m_maximum || m_counter <= m_minimum ) )
-		m_counter = m_minimum ;
+		m_counter = m_minimum;
 
-    return m_counter ;
+    return m_counter;
 }

@@ -20,7 +20,7 @@ namespace Instance
 {
 
 // Used to track the current listing request, for some reason.
-UINT32 Listing::s_listingID = 0 ;
+UINT32 Listing::s_listingID = 0;
 
 //////////////////////////////////////////////////////////////////////
 // Network constructor for a Descriptor
@@ -28,7 +28,7 @@ UINT32 Listing::s_listingID = 0 ;
 Descriptor::Descriptor(ACTION_OBJECT* const a)
 	: m_id(0ULL), m_handle(0ULL), m_category(0), m_type(0)
 {
-	this->packer(TEUL_UNPACK, a) ;
+	this->packer(TEUL_UNPACK, a);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -37,12 +37,12 @@ Descriptor::Descriptor(ACTION_OBJECT* const a)
 SINT32
 Descriptor::packer(LOGICAL mode, ACTION_OBJECT* a)
 {
-	a->packer(mode, &m_category) ;
-	a->packer(mode, &m_type) ;
-	a->packer(mode, &m_handle) ;
-	a->packer(mode, &m_id) ;
+	a->packer(mode, &m_category);
+	a->packer(mode, &m_type);
+	a->packer(mode, &m_handle);
+	a->packer(mode, &m_id);
 
-	return a->offset ;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -51,16 +51,16 @@ Descriptor::packer(LOGICAL mode, ACTION_OBJECT* a)
 SINT32
 BasicStatus::packer(const unsigned int mode, ACTION_OBJECT* const a)
 {
-	m_descriptor.packer(mode, a) ;
-	a->packer(mode, (void*)&m_count[0], sizeof(m_count)) ;
-	a->packSecondsDelta(mode, m_createdAt, 24) ;
-	a->packSecondsDelta(mode, m_startedAt, 24) ;
-	a->packer(mode, m_hasPassword) ;		//}
-	a->packer(mode, m_gameTime_m, 11) ;		//}
-	a->packer(mode, m_capacity, 12) ;		//} 24 bits
-	a->packer(mode, (UINT32*)&m_state, 8) ;
+	m_descriptor.packer(mode, a);
+	a->packer(mode, (void*)&m_count[0], sizeof(m_count));
+	a->packSecondsDelta(mode, m_createdAt, 24);
+	a->packSecondsDelta(mode, m_startedAt, 24);
+	a->packer(mode, m_hasPassword);		//}
+	a->packer(mode, m_gameTime_m, 11);		//}
+	a->packer(mode, m_capacity, 12);		//} 24 bits
+	a->packer(mode, (UINT32*)&m_state, 8);
 
-	return a->offset ;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -68,7 +68,7 @@ BasicStatus::packer(const unsigned int mode, ACTION_OBJECT* const a)
 
 ClientStatus::ClientStatus(ACTION_OBJECT* const a)
 {
-	this->packer(TEUL_UNPACK, a) ;
+	this->packer(TEUL_UNPACK, a);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -77,11 +77,11 @@ ClientStatus::ClientStatus(ACTION_OBJECT* const a)
 SINT32
 ClientStatus::packer(const unsigned int mode, ACTION_OBJECT* const a)
 {
-	BasicStatus::packer(mode, a) ;
+	BasicStatus::packer(mode, a);
 
-	a->packer(mode, &m_squadMates, 16) ;
+	a->packer(mode, &m_squadMates, 16);
 
-	return a->offset ;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -91,7 +91,7 @@ Listing::Listing(ACTION_OBJECT* const a)
 	: m_results(), m_requestID(0), m_result(_BAD_DATA), m_complete(false)
 {
 	if ( packer(TEUL_UNPACK, a) > 0 )
-		m_complete = true ;
+		m_complete = true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -100,30 +100,30 @@ Listing::Listing(ACTION_OBJECT* const a)
 SINT32
 Listing::packer(LOGICAL mode, ACTION_OBJECT* const a)
 {
-	a->packer(mode, &m_requestID) ;
-	a->packer(mode, &m_result, 8) ;
+	a->packer(mode, &m_requestID);
+	a->packer(mode, &m_result, 8);
 
 	if ( m_result != _SUCCESS )
 	{
-		m_results.clear() ;
-		return a->offset ;
+		m_results.clear();
+		return a->offset;
 	}
 
-	UINT32 numResults = (UINT32)m_results.size() ;
-	a->packer(mode, &numResults, 16) ;
+	UINT32 numResults = (UINT32)m_results.size();
+	a->packer(mode, &numResults, 16);
 	if ( mode == TEUL_UNPACK )
 	{
 		m_results.clear();
-		m_results.resize(numResults) ;
+		m_results.resize(numResults);
 	}
 
 	// Now unpack all of the results
-	for ( UINT32 i = 0 ; i < numResults ; ++i )
+	for ( UINT32 i = 0; i < numResults; ++i )
 	{
-		m_results[i].packer(mode, a) ;
+		m_results[i].packer(mode, a);
 	}
 
-	return a->offset ;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -132,7 +132,7 @@ Listing::packer(LOGICAL mode, ACTION_OBJECT* const a)
 ListingRequest::ListingRequest(ACTION_OBJECT* const a)
 	: m_requestID(0), m_descriptor()
 {
-	this->packer(TEUL_UNPACK, a) ;
+	this->packer(TEUL_UNPACK, a);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -141,9 +141,9 @@ ListingRequest::ListingRequest(ACTION_OBJECT* const a)
 SINT32
 ListingRequest::packer(LOGICAL mode, ACTION_OBJECT* const a)
 {
-	a->packer(mode, &m_requestID) ;
-	m_descriptor.packer(mode, a) ;
-	return a->offset ;
+	a->packer(mode, &m_requestID);
+	m_descriptor.packer(mode, a);
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -151,7 +151,7 @@ ListingRequest::packer(LOGICAL mode, ACTION_OBJECT* const a)
 
 Result::Result(ACTION_OBJECT* const a)
 {
-	this->packer(TEUL_UNPACK, a) ;
+	this->packer(TEUL_UNPACK, a);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -160,9 +160,9 @@ Result::Result(ACTION_OBJECT* const a)
 SINT32
 Result::packer(LOGICAL mode, ACTION_OBJECT* const a)
 {
-	a->packer(mode, (UINT32*)(&m_status), 8) ;
-	m_descriptor.packer(mode, a) ;
-	return a->offset ;
+	a->packer(mode, (UINT32*)(&m_status), 8);
+	m_descriptor.packer(mode, a);
+	return a->offset;
 }
 
 }

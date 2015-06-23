@@ -43,24 +43,24 @@ namespace Instance
 			{}
 
 	protected:
-		Descriptor		m_descriptor ;				// Starts with only category+type populate
+		Descriptor		m_descriptor;				// Starts with only category+type populate
 
 	public:
-		std::string		m_internalDescription ;		// Internal-use-only description of the scenario
+		std::string		m_internalDescription;		// Internal-use-only description of the scenario
 
-		UINT16 			m_capacity ;				// When created, capacity defaults to this
-		UINT16			m_activationCapacity ;		// If population reaches this, countdown starts
-		UINT16			m_minCapacity ;				// Minimum capacity an instantiation can have.
-		UINT16			m_maxCapacity ;				// Maximum capacity an instantiation can have.
+		UINT16 			m_capacity;					// When created, capacity defaults to this
+		UINT16			m_activationCapacity;		// If population reaches this, countdown starts
+		UINT16			m_minCapacity;				// Minimum capacity an instantiation can have.
+		UINT16			m_maxCapacity;				// Maximum capacity an instantiation can have.
 
-		UINT16			m_activationTime_s ;		// Time from exceeding minCapacity to countdown start
-		UINT16			m_runTime_m ;				// Minutes scenario can run for
-		UINT16			m_offerTime_m ;				// Minutes to continue offering for after activation
+		UINT16			m_activationTime_s;			// Time from exceeding minCapacity to countdown start
+		UINT16			m_runTime_m;				// Minutes scenario can run for
+		UINT16			m_offerTime_m;				// Minutes to continue offering for after activation
 
-		UINT16 			m_gameTime_m ;				// Lock game time to this time
-		UINT8			m_minRank ;					// Minimum rank to enter
-		UINT8			m_maxRank ;					// Max rank to enter
+		UINT16 			m_gameTime_m;				// Lock game time to this time
+		UINT8			m_minRank;					// Minimum rank to enter
+		UINT8			m_maxRank;					// Max rank to enter
 
-		bool			m_autoCreate : 1 ;			// true = create new instances when capacities are full
-	} ;
+		bool			m_autoCreate : 1;			// true = create new instances when capacities are full
+	};
 }

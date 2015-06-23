@@ -8,6 +8,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-extern void mapThreadsSetup() ;
-extern void mapThreadsEnable() ;
-extern void mapThreadsShutdown() ;
+extern void mapThreadsSetup();
+extern void mapThreadsEnable();
+extern void mapThreadsShutdown();

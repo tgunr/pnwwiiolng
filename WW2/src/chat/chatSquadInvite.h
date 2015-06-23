@@ -13,18 +13,18 @@
 class SquadInvite
 {
 public:
-	static const UINT32 EXPIRY_MS = 3 * 60 * 1000 ;
+	static const UINT32 EXPIRY_MS = 3 * 60 * 1000;
 
 	SquadInvite(UINT32 squadID=0, const ChatHandle& from=0LL, RANK_NO rank=0)
 		: m_squadID(squadID), m_from(from), m_expires(teulClock64 + EXPIRY_MS), m_rank(rank) {}
 	~SquadInvite() {}
 
-	bool expired() const { return (teulClock64 >= m_expires) ; }
-	bool isCreation() const { return (m_squadID == 0) ; }
+	bool expired() const { return (teulClock64 >= m_expires); }
+	bool isCreation() const { return (m_squadID == 0); }
 
 public:
-	UINT32			m_squadID ;
-	ChatHandle		m_from ;
-	TeulTimeMS		m_expires ;				// Milisecond timestamp
-	RANK_NO			m_rank ;
-} ;
+	UINT32			m_squadID;
+	ChatHandle		m_from;
+	TeulTimeMS		m_expires;				// Milisecond timestamp
+	RANK_NO			m_rank;
+};

@@ -15,28 +15,40 @@
 //////////////////////////////////////////////////////////////////////
 // Pack routines for server tracked objects.
 
-SINT32
-WorldPosition_m::packer(LOGICAL mode, ACTION_OBJECT* const a)
+void
+WorldPosition_m::pack(ACTION_OBJECT* const a, SINT32) const
 {
-	a->offset = teulPackFLOAT64(mode, a->packed, a->offset, &m_x, 0) ;
-	a->offset = teulPackFLOAT64(mode, a->packed, a->offset, &m_y, 0) ;
-	FLOAT32 toZ = (FLOAT32)m_z ;
-	a->offset = teulPackFLOAT32(mode, a->packed, a->offset, &toZ, 0) ;
-	if ( mode == TEUL_UNPACK )
-		m_z = (FLOAT64)toZ ;
+	a->pack(m_x, 0);
+	a->pack(m_y, 0);
+	FLOAT32 z32bit = FLOAT32(m_z);
+	a->pack(z32bit, 0);
+}
 
-	return a->offset ;
+void
+WorldPosition_m::unpack(ACTION_OBJECT* const a, SINT32)
+{
+	a->unpack(m_x, 0);
+	a->unpack(m_y, 0);
+	FLOAT32 z32bit = 0;
+	a->unpack(z32bit, 0);
+	m_z = FLOAT64(z32bit);
 }
 
 //////////////////////////////////////////////////////////////////////
 // Pack routine
 
-SINT32
-AttitudeVector::packer(LOGICAL mode, ACTION_OBJECT* const a)
+void
+AttitudeVector::pack(ACTION_OBJECT* const a, SINT32) const
 {
-	a->offset = teulPackFLOAT32(mode, a->packed, a->offset, &m_x, 0) ;
-	a->offset = teulPackFLOAT32(mode, a->packed, a->offset, &m_y, 0) ;
-	a->offset = teulPackFLOAT32(mode, a->packed, a->offset, &m_z, 0) ;
-	return a->offset ;
+	a->pack(m_x, 0);
+	a->pack(m_y, 0);
+	a->pack(m_z, 0);
 }
 
+void
+AttitudeVector::unpack(ACTION_OBJECT* const a, SINT32)
+{
+	a->unpack(m_x, 0);
+	a->unpack(m_y, 0);
+	a->unpack(m_z, 0);
+}

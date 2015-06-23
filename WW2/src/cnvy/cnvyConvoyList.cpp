@@ -11,72 +11,52 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include <stdlib.h>
-
 #include "teul/teulCLList.h"
-#include "strt/strtServerTypes.h"
-#include "cnvy/cnvyConvoyList.h"
+#include "cnvy/cnvyMain.h"
 
 //Creates an spawn vehicle list of numItems size
 CONVOYSTRUCT* cnvyCreateConvoyList(UINT32 numItems)
 {
-CONVOYSTRUCT* list;
-UINT32 i;
+	ABORT_IF(numItems == 0);
 
-	if (numItems == 0)
-		return NULL;
-
-	list = (CONVOYSTRUCT*)listInitCList(numItems, sizeof(CONVOYSTRUCT));
-
-	//Order the list
-	for (i=0; i<numItems; i++)
-	{
-		list[i].nextEvent= i;
-	}
-
-	return list;
+	return (CONVOYSTRUCT*)listInitCList(numItems, sizeof(CONVOYSTRUCT));
 }
 
 //Removes the first item from an convoyList
 CONVOYSTRUCT* cnvyRemoveFirstConvoy(CONVOYSTRUCT** convoyList)
 {
-CONVOYSTRUCT* current = NULL;
-
-	current = (CONVOYSTRUCT*) listPopItem((LISTHEADER **) convoyList);
-
-	return current;
+	return (CONVOYSTRUCT*) listPopItem((LISTHEADER **) convoyList);
 }
 
 //Inserts a nextEvent into the convoyList
 LOGICAL cnvyInsertConvoy(CONVOYSTRUCT** convoyList, CONVOYSTRUCT* convoy)
 {
-CONVOYSTRUCT * current;
-	if ((convoyList == NULL) || (convoy == NULL))
+	if ((convoyList == nullptr) || (convoy == nullptr))
 		return FALSE;
 
-	if ((*convoyList) == NULL)
+	if ((*convoyList) == nullptr)
 	{
 		//Its the first convoy
 		*convoyList = convoy;
 	}
-	else if ((*convoyList)->nextEvent >= convoy->nextEvent)
+	else if ((*convoyList)->arrivalTime >= convoy->arrivalTime)
 	{
 		//Belongs at the head of the list
 		listPushItem((LISTHEADER **) convoyList, (LISTHEADER*) convoy);
 	}
-	else if ((*convoyList)->prev->nextEvent < convoy->nextEvent)
+	else if ((*convoyList)->prev->arrivalTime < convoy->arrivalTime)
 	{
 		//Belongs at the end of the list
 		listAddItemAfter((LISTHEADER **) convoyList, (LISTHEADER*) (*convoyList)->prev, (LISTHEADER*) convoy);
 	}
 	else
 	{
-		current = *convoyList;
+		CONVOYSTRUCT* current = *convoyList;
 
 		//Find the spot where it belongs on the list
-		while ((current!=NULL) && (current->nextEvent < convoy->nextEvent))
-			current=current->next;
-		if (current!=NULL)
+		while ((current != nullptr) && (current->arrivalTime < convoy->arrivalTime))
+			current = current->next;
+		if (current != nullptr)
 			listAddItemBefore((LISTHEADER**) convoyList, (LISTHEADER*) current, (LISTHEADER*) convoy);
 	}
 
@@ -86,42 +66,10 @@ CONVOYSTRUCT * current;
 //Deletes a nextEvent from the convoyList
 CONVOYSTRUCT* cnvyDeleteConvoy(CONVOYSTRUCT** convoyList, CONVOYSTRUCT* convoy)
 {
-	if ((convoyList == NULL) || (*convoyList == NULL) || (convoy == NULL))
-		return NULL;
+	if ((convoyList == nullptr) || (*convoyList == nullptr) || (convoy == nullptr))
+		return nullptr;
 
 	listExtractItem((LISTHEADER **) convoyList, (LISTHEADER*) convoy);
 
 	return convoy;
 }
-
-//Finds someone in the convoy list
-CONVOYSTRUCT* cnvyFindConvoy(CONVOYSTRUCT* convoyList, UINT16 nextEvent)
-{
-CONVOYSTRUCT* current;
-
-	current = convoyList;
-
-	while ((current != NULL) && (current->nextEvent != nextEvent))
-		current = current->next;
-
-	if ((current!=NULL) && (current->nextEvent == nextEvent))
-		return current;
-	else
-		return NULL;
-}
-
-//Prints an convoy list
-LOGICAL cnvyPrintConvoys(CONVOYSTRUCT* convoyList)
-{
-CONVOYSTRUCT* current;
-
-	current = convoyList;
-	while (current != NULL)
-	{
-		fprintf(stderr,"convoy: 0x%x\n",current->nextEvent);
-		current = current->next;
-	}
-
-	return TRUE;
-}
-

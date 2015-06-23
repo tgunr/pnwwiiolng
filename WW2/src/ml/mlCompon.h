@@ -95,20 +95,20 @@ struct mlComponent
 
 	LOGICAL isPak38_6lb_57mm;
 
-} ;
+};
 
 struct mlComponentList
 {
 	UINT32 NumComponents;
-	mlComponent* Components;
-} ;
+	mlComponent Components[1];
+};
 
 struct mlComponentListIterator
 {
-	mlComponentList const* List;
+	mlComponentList* List;
 	int idx;
 	mlComponent* comp;
-} ;
+};
 
 typedef std::vector<mlComponent*> mlComponentVector;
 
@@ -127,7 +127,7 @@ extern UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
 									   UINT32 VehicleTypeNum,
 									   void*  VehicleMasterPtr);
 
-extern UINT32 mlcomponFreeComponentData(mlComponentList* ComponentList);
+extern UINT32 mlcomponFreeComponentList(mlComponentList* ComponentList);
 
 extern UINT32 mlFindComponent(mlComponent** ComponentPtr,
 								mlComponentList* ComponentList, UCHAR* ComponentName);
@@ -139,6 +139,6 @@ extern UINT32 mlcomponReadDamageComponents(mlComponentList** ComponentList,
 								   UINT32 VehicleTypeNum,
 								   void* VehicleMasterPtr);
 
-extern void mlComponentListBegin(mlComponentList const*, mlComponentListIterator*);
+extern void mlComponentListBegin(mlComponentList*, mlComponentListIterator*);
 extern void mlComponentListNext(mlComponentListIterator*);
 

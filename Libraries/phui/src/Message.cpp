@@ -2,7 +2,6 @@
 
 #include <string>
 #include <map>
-#include <stdio.h>
 
 #include "phui/Message.h"
 
@@ -519,7 +518,7 @@ void Message::MakeEmpty()
 	mImp->hash.erase(mImp->hash.begin(), mImp->hash.end());
 	
 	delete mImp;
-	mImp = NULL;
+	mImp = nullptr;
 }
 
 /*************************************************************************************************
@@ -528,7 +527,7 @@ void Message::MakeEmpty()
 
 bool Message::IsEmpty()
 {
-	return (mImp == NULL || mImp->hash.size() == 0);
+	return (mImp == nullptr || mImp->hash.size() == 0);
 }
 
 

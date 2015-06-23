@@ -26,7 +26,7 @@ static int _particletex = -1;
 static int _particleid = 1;
 
 #if(0)
-static Particle2* chunk = NULL;
+static Particle2* chunk = nullptr;
 #endif
 
 /*----------------------------------------------------------------------
@@ -38,7 +38,7 @@ ParticleMgr::ParticleMgr() :
     _particleindex(0),
     _killMyself(false),
     _particlemgrInit(false),
-    _pgm(NULL)
+    _pgm(nullptr)
 {
 }
 
@@ -328,7 +328,7 @@ void ParticleMgr::setupparticle(const ParticleEffect* fx,
     {
         for(unsigned int q = 0; q < fx->attachedtransforms.size(); q++)
         {
-            TransformEffect* te = TransformEffect::AddEffect(fx->attachedtransforms[q].c_str(), n, 0, NULL);
+            TransformEffect* te = TransformEffect::AddEffect(fx->attachedtransforms[q].c_str(), n, 0, nullptr);
 
             if(te)
             {
@@ -648,7 +648,7 @@ void ParticleMgr::setupparticle(const ParticleEffect* fx,
         {
             for(unsigned int q = 0; q < fx->attachedtransforms.size(); q++)
             {
-                TransformEffect* te = TransformEffect::AddEffect(fx->attachedtransforms[q].c_str(), n, 0, NULL);
+                TransformEffect* te = TransformEffect::AddEffect(fx->attachedtransforms[q].c_str(), n, 0, nullptr);
 
                 if(te)
                 {
@@ -956,7 +956,7 @@ void ParticleMgr::setupsurfaceparticle(const ParticleEffect* fx,
         {
             for(unsigned int q = 0; q < fx->attachedtransforms.size(); q++)
             {
-                TransformEffect* te = TransformEffect::AddEffect(fx->attachedtransforms[q].c_str(), n, 0, NULL);
+                TransformEffect* te = TransformEffect::AddEffect(fx->attachedtransforms[q].c_str(), n, 0, nullptr);
 
                 if(te)
                 {
@@ -1220,12 +1220,12 @@ Particle2* ParticleMgr::createparticle(const char* tex)
     int texid = FxGet().getTextureId(tex);
 
     if(texid == -1)
-        return NULL;
+        return nullptr;
 
     Particle2* p = getparticle();
 
     if(!p)
-        return NULL;
+        return nullptr;
 
     p->_textureindex = texid;
 
@@ -1477,7 +1477,7 @@ Description:
 -----------------------------------------------------------------------*/
 Particle2 *ParticleMgr::getparticle()
 {
-    Particle2 *p = NULL;
+    Particle2 *p = nullptr;
 
     if(_freeparticle.empty())
     {
@@ -1528,8 +1528,8 @@ Description:
 -----------------------------------------------------------------------*/
 static void GetLightColor(Vec4f& c)
 {
-    static LIGHT *s = NULL;
-    static LIGHT *m = NULL;
+    static LIGHT *s = nullptr;
+    static LIGHT *m = nullptr;
 
     if(!s)
     {

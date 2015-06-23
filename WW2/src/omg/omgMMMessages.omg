@@ -1,0 +1,220 @@
+///TODO:OMG: How to decide to make a structure #pragma pack()d and Packetable?
+///TODO:OMG: How do that that in the face of conditionals?
+
+NAMESPACE MM;	// Map/mission
+
+USING "typedefs.omg";
+
+START-Y 0;		// For some reason, they're all numbered 200+ in mmConstants.h
+
+MESSAGE SortieData		[[ host->client ]]
+{
+	// Describes an ongoing or completed sortie.
+
+	GROUP Sortie
+	{
+		UINT32			sortieID;
+		NetTimeMS		spawned_ms;
+		NetTimeMS		despawned_ms;
+		FULL_OBJ_ID		originFac;
+		FULL_OBJ_ID		target;
+		UINT32			flags;
+	};
+  
+	GROUP Vehicle
+	{
+		WEAPON_SPEC		weaponSpec;
+		RANK_NO			effectiveRank;
+		UINT8			rtbState;
+		UINT8			decal; // of the player leading the sortie
+		ChatHandle		killedBy;
+		FULL_OBJ_ID		rtbFacility;
+	};
+  
+	GROUP Location
+	{
+		SINT32			x;
+		SINT32			y;
+		SINT32			z;
+		UINT32			riding;
+		FULL_OBJ_ID		nearCP;
+	};
+
+	GROUP Scoring
+	{
+		UINT32			hits;
+		UINT16			kills;
+		UINT16			captures;
+		UINT16			defends;
+		UINT16			aiKills;
+		UINT16			aiRepairs;
+		UINT16			bridgeKills;
+		UINT16			bridgeRepairs;
+
+		UINT16			factoryKills;
+		UINT16			firebaseKills;
+		UINT16			resupplies;
+		UINT16			resuppliesScored;
+		UINT16			guardingKills;
+		UINT16			cappingKills;
+		UINT16			umsKills;
+		UINT16			guardingPoints;
+
+		UINT32			spawnees;
+		UINT16			uniqueHits;
+		UINT16			vehtypesHit;
+		UINT16			points;
+		UINT16			assists;
+	};
+  
+//  GROUP Reservation
+//  {
+//      bool isReserved;
+//      FULL_OBJ_ID facility;
+//  };
+
+	{{
+		UINT32 sortieID() const { return sortie().sortieID(); }
+		TeulTimeMS duration_ms() const { return sortie().despawned_ms() - sortie().spawned_ms(); }
+		UINT32 duration_s() const { return UINT32(duration_ms() / 1000U); }
+	}}
+};
+
+/////////////////////////////////////////////////////////////////////////////////
+// Vehicle reservation/spawning
+/////////////////////////////////////////////////////////////////////////////////
+
+// client requesting host reserve a weapon
+MESSAGE PostRequest		[[ client->host ]]
+{
+	FULL_OBJ_ID			facility;
+	WEAPON_SPEC			weapon;
+	bool				immediateSpawn;
+};
+
+// host notifying client that a vehicle has been reserved.
+MESSAGE PostAccept		[[ host->client ]]
+{
+	WEAPON_SERIAL		serial;
+	SINT16				portal;
+	bool				newVehicle;
+	bool				mobileSpawnAvailable;
+};
+
+// host notifying client that a reservation was cancelled.
+MESSAGE PostCancel		[[ host->client ]]
+{
+	FULL_OBJ_ID			facility;
+	WEAPON_SERIAL		serial;
+};
+
+// host notifying client that a reservation was denied.
+MESSAGE PostDeny			[[ host->client ]]
+{
+	WEAPON_SPEC			weapon;
+	UINT32				reasonCode;
+	bool				loseWeapon;
+};
+
+// client requesting host provide list of vehicles at a facility.
+MESSAGE PostListRequest		[[ client->host ]]
+{
+	FULL_OBJ_ID			facility;
+};
+
+// host providing list of vehicles reserved at a facility.
+MESSAGE PostListResponse	[[ host->client ]]
+{
+	FULL_OBJ_ID			facility;
+	ARRAY Weapon[4096] {	///TODO:OMG: Support constant literals.
+		ENUM WeaponAction { Add, Delete };
+		WeaponAction	action;
+		ChatHandle		handle;
+		WEAPON_SERIAL	serial;
+	};
+};
+
+// client requesting host make the vehicle crewable or not
+MESSAGE EnableCrewing		[[ client->host ]]
+{
+	WEAPON_SERIAL		serial;
+	bool				enable;
+};
+
+// client requesting a position as crew on a posted vehicle
+MESSAGE CrewPositionRequest	[[ client->host ]]
+{
+	WEAPON_SERIAL		serial;
+	bool				joining;	// false: cancel previous request
+};
+
+// host asking vehicle owner to allow a player to become crew
+// if a crew person bails on you, a message with joining = false will be sent.
+MESSAGE CrewApprovalRequest [[ host->client ]]
+{
+	ChatHandle			requester;
+	WEAPON_SERIAL		serial;
+	UINT32				requestID;	// host's way of tracking which request this is
+	bool				joining;	// false: cancel/leaving
+};
+
+// client notifying host of owner's approval/rejection of crew
+MESSAGE CrewApprovalResponse [[ client->host ]]
+{
+	UINT32				requestID;
+	bool				granted;	// false for rejected
+};
+
+// host notifying client of the result of a crew position request
+MESSAGE CrewPositionResponse [[ host->client ]]
+{
+	ENUM Status {
+		Error,
+		Accepted,		// the owner requested and you are attached
+		Rejected,		// the owner denied your request
+		TimedOut,		// the owner did not respond
+		Full,			// the vehicle is already full
+		Unavailable		// the vehicle is no-longer posted
+	};
+
+	WEAPON_SERIAL		serial;
+	Status				status;
+
+	if (status == Status::Accepted) {
+		SINT16			portal;
+		UINT32			commander;	///TODO:OMG: Is this a sortie or player id?
+		UINT32			missionID;
+		UINT32			crew;		///TODO:OMG: What?
+	}
+};
+
+// client requesting host allow posted vehicle spawn
+MESSAGE SpawnRequest		[[ client->host ]]
+{
+	WEAPON_SERIAL		serial;
+	bool				wantMobileSpawn;
+};
+
+// host notifying client that it should spawn
+// Making this a 'MESSAGE' would be complicated.
+MESSAGE SpawnNotify			[[ host->client ]]
+{
+	ENUM Status {
+		Error,
+		Granted,
+		TimedOut,
+		Cancelled,
+		OriginUnavailable,						// facility closed/msp destroyed,
+		SpawningDisabled,						// arena locked
+	};
+	WEAPON_SERIAL		serial;					// what you're spawning.
+	Status				status;
+	if (status == Granted) {
+		sortieid_t			spawnVehicleID;		// non-zero when spawning at another vehicle
+		FLOAT64				x, y, z;
+		UCHAR				decal;
+		bool				isHighCommander;
+		bool				isBuilder;
+		bool				isMissionLeader;
+	}
+};

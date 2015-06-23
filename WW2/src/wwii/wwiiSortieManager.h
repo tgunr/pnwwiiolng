@@ -8,21 +8,19 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include <vector>
-
 class SortieManager
 {
 public:
 	SortieManager(const char* set, const char* where) : m_set(set), m_where(where) {}
 
-	void AddSortie(const sortieid_t sortieID) { m_pending.push_back(sortieID) ; }
-	bool Commit() ;
+	void AddSortie(const sortieid_t sortieID) { m_pending.push_back(sortieID); }
+	bool Commit();
 
 private:
-	const char*	m_set ;
-	const char*	m_where ;
+	const char*	m_set;
+	const char*	m_where;
 
-	typedef std::vector<sortieid_t> SORTIES ;
-	SORTIES		m_pending ;
-} ;
+	typedef std::vector<sortieid_t> SORTIES;
+	SORTIES		m_pending;
+};
 

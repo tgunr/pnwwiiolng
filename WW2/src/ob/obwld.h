@@ -12,7 +12,7 @@
 		char	flagname[32];
 		UINT32	flagval;
 
-	} ;
+	};
 
 #else
 
@@ -27,14 +27,14 @@
 		ARG_QUOTED,
 		MAX_ARG_TYPES
 
-	} ;
+	};
 
 	struct CONSTANT_VALUE
 	{
 		char	flagname[32];
 		UINT32	flagval;
 
-	} ;
+	};
 
   struct FUNCARGS
   {
@@ -42,7 +42,7 @@
     UINT32 dvalue;
     float fvalue;
 
-  } ;
+  };
 
 #include "parse/parseIO.h"
 #endif

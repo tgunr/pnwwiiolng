@@ -39,15 +39,15 @@ public:
 	//! Assignment operator
 	Viewing& operator=(const Viewing& rhs)
 	{
-		memcpy(this, &rhs, sizeof(*this)) ;
-		return *this ;
+		memcpy(this, &rhs, sizeof(*this));
+		return *this;
 	}
 
 	//! Less-than operator for STL containers, compares priorities.
-	bool operator < (const Viewing& rhs) const { return m_priority < rhs.m_priority ; }
+	bool operator < (const Viewing& rhs) const { return m_priority < rhs.m_priority; }
 
 	//! SortieID of this sortie.
-	sortieid_t sortieID() const { return m_index ; }
+	sortieid_t sortieID() const { return m_index; }
 
 	// We take a pointer to a vehicle structure and the index
 	// that the vehicle had when we saw it. This assumes that
@@ -56,32 +56,32 @@ public:
 	// has retained the same vehicle number (index) between
 	// our observations.
 
-	const HostVehicle&	m_vehicle ;				//!< Vehicle we are viewing.
-	sortieid_t			m_index ;				//!< Index of vehicle at last view.
+	const HostVehicle&	m_vehicle;				//!< Vehicle we are viewing.
+	sortieid_t			m_index;				//!< Index of vehicle at last view.
 
-	TeulTimeMS			m_lastSent ;			//!< Timestamp of last send.
+	TeulTimeMS			m_lastSent;				//!< Timestamp of last send.
 
-	SINT64				m_priority ;			//!< Rating of how urgently needs updating.
+	SINT64				m_priority;				//!< Rating of how urgently needs updating.
 
 	// Vehicle bits
-	UINT32				m_fireMask ;			//!< Which turrets are firing.
-	UINT32				m_visBits ;				//!< Visible damage states.
-	UINT16				m_stateFlags0 ;			//!< Animation state flags.
-	UINT16				m_stateFlags1 ;			//!< Animation state flags.
-	UINT16				m_turretsPending ;		//!< Turrets that need updates.
-	UINT16				m_oneTimeBits ;			//!< Per-sortie bits.
-	UINT16				m_seatNumber ;			//!< Position on the vehicle.
-	UINT32				m_rideIndex ;			//!< Vehicle we're riding.
+	UINT32				m_fireMask;				//!< Which turrets are firing.
+	UINT32				m_visBits;				//!< Visible damage states.
+	UINT16				m_stateFlags0;			//!< Animation state flags.
+	UINT16				m_stateFlags1;			//!< Animation state flags.
+	UINT16				m_turretsPending;		//!< Turrets that need updates.
+	UINT16				m_oneTimeBits;			//!< Per-sortie bits.
+	UINT16				m_seatNumber;			//!< Position on the vehicle.
+	UINT32				m_rideIndex;			//!< Vehicle we're riding.
 
-	bool				m_hideCallsign : 1 ;	//!< Whether callsign needs special hiding.
-	bool				m_oneTimeBitsChanged : 1 ;	//!< Perhaps 'onetimebits' doesn't cut it any more.
+	bool				m_hideCallsign : 1;		//!< Whether callsign needs special hiding.
+	bool				m_oneTimeBitsChanged : 1;	//!< Perhaps 'onetimebits' doesn't cut it any more.
 
-	VEHICLE_POSITION	m_position ;			//!< Position last time viewed.
-//	Vector				m_attitude ;			//!< Orientation.
-//	Vector				m_velocity ;			//!< Speed + Direction of movement.
-//	Vector				m_accel ;				//!< Acceleration.
-} ;
+	VEHICLE_POSITION	m_position;				//!< Position last time viewed.
+//	Vector				m_attitude;				//!< Orientation.
+//	Vector				m_velocity;				//!< Speed + Direction of movement.
+//	Vector				m_accel;				//!< Acceleration.
+};
 
 #include <vector>
-typedef std::vector<Viewing> Viewings ;
+typedef std::vector<Viewing> Viewings;
 

@@ -5,7 +5,6 @@
 #include "auth/authClientData.h"
 #include "auth/authQueue.h"
 #include "auth/authTypes.h"
-#include <assert.h>
 
 #define USE_LOGIN_QUEUES
 
@@ -15,12 +14,12 @@
 Auth::ClientData::~ClientData()
 {
 	if ( isQueued )
-		RemoveFromQueue(false) ;
+		RemoveFromQueue(false);
 
-	if ( m_launchRequest != NULL )
+	if ( m_launchRequest != nullptr )
 	{
-		delete m_launchRequest ;
-		m_launchRequest = NULL ;
+		delete m_launchRequest;
+		m_launchRequest = nullptr;
 	}
 }
 
@@ -32,19 +31,19 @@ Auth::ClientData::AddToQueue(const APP_LAUNCH_REQ& request)
 {
 #if defined(USE_LOGIN_QUEUES)
 	// Make sure we don't get double-queued.
-	RemoveFromQueue(false) ;
+	RemoveFromQueue(false);
 
 	// Add us into the queue.
-	Auth::Queue::AddPlayer((UINT32)request.arenaID, this, isPremium) ;
+	Auth::Queue::AddPlayer((UINT32)request.arenaID, this, isPremium);
 
 	// Mark us as being queued
-	isQueued = true ;
+	isQueued = true;
 
 	// Take a copy of the request
-	if ( m_launchRequest == NULL )
-		m_launchRequest = new APP_LAUNCH_REQ(request) ;
+	if ( m_launchRequest == nullptr )
+		m_launchRequest = new APP_LAUNCH_REQ(request);
 	else
-		*m_launchRequest = request ;
+		*m_launchRequest = request;
 #endif // USE_LOGIN_QUEUES
 }
 
@@ -56,13 +55,13 @@ Auth::ClientData::RemoveFromQueue(bool enteredGame)
 {
 #if defined(USE_LOGIN_QUEUES)
 	if ( isQueued == false )
-		return ;
+		return;
 
-	assert( m_launchRequest != NULL ) ;
+	assert( m_launchRequest != nullptr );
 
-	Auth::Queue::RemovePlayer((UINT32)m_launchRequest->arenaID, this, isPremium, enteredGame) ;
+	Auth::Queue::RemovePlayer((UINT32)m_launchRequest->arenaID, this, isPremium, enteredGame);
 
-	isQueued = false ;
+	isQueued = false;
 #endif // USE_LOGIN_QUEUES
 }
 

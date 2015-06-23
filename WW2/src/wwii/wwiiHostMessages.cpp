@@ -24,22 +24,15 @@
 #endif
 
 static TEUL_CALLBACK*	_SEND_ACTIVATE;
-static TEUL_CALLBACK*	_SEND_DIALOG ;
 
-extern void mapUserAbortedApp(Player* player) ;
-extern void hostUserAbortedApp(Player* player) ;
+extern void mapUserAbortedApp(Player* player);
+extern void hostUserAbortedApp(Player* player);
 
 static SINT32
 _sendWWII_ACTIVATE(ACTION_OBJECT* const a)
 {
-	WWII_ACTIVATE* activate = (WWII_ACTIVATE*)(a->localRawData) ;
-	return activate->packer(TEUL_PACK, a) ;
-}
-
-static SINT32
-_sendWWII_DIALOG(ACTION_OBJECT* const a)
-{
-	return teulPackUINT32(TEUL_PACK, a->packed, a->offset, (UINT32*)(a->localRawData), 8) ;
+	WWII_ACTIVATE* activate = (WWII_ACTIVATE*)(a->localRawData);
+	return activate->packer(TEUL_PACK, a);
 }
 
 static SINT32 _recvWWII_ERROR_INFO(ACTION_OBJECT* const a)
@@ -50,7 +43,7 @@ static SINT32 _recvWWII_ERROR_INFO(ACTION_OBJECT* const a)
 
 #if defined(IS_MAP_HOST)
 	{
-		Player* player = (Player*)ServerInterface::LookupByTeulIndex(a->teulIndex) ;
+		Player* player = (Player*)ServerInterface::LookupByTeulIndex(a->teulIndex);
 		if ( player )
 			mapSaveErrorInfo(*player, info);
 	}
@@ -60,41 +53,33 @@ static SINT32 _recvWWII_ERROR_INFO(ACTION_OBJECT* const a)
 
 static SINT32 _recvAbortedApp(ACTION_OBJECT* const a)
 {
-	Player* player = (Player*)ServerInterface::LookupByTeulIndex(a->teulIndex) ;
-	if ( player == NULL )
+	Player* player = (Player*)ServerInterface::LookupByTeulIndex(a->teulIndex);
+	if ( player == nullptr )
 	{
-		dbugLog(_FLW, "t:%d got abortedApp message from unregistered teulIndex", a->teulIndex) ;
-		teulClose(a->teulIndex, Teul::Closing::AbortedApp) ;
-		return -EINVAL ;
+		dbugLog(_FLW, "t:%d got abortedApp message from unregistered teulIndex", a->teulIndex);
+		teulClose(a->teulIndex, Teul::Closing::AbortedApp);
+		return -EINVAL;
 	}
 
 #if defined(IS_MAP_HOST)
-	mapUserAbortedApp(player) ;
+	mapUserAbortedApp(player);
 #elif defined(IS_CELL_HOST)
-	hostUserAbortedApp(player) ;
+	hostUserAbortedApp(player);
 #else
-	dbugLog(_FLW, "t:%d sent us a USER_ABORTED_APP that we weren't expecting") ;
+	dbugLog(_FLW, "t:%d sent us a USER_ABORTED_APP that we weren't expecting");
 #endif
 
-	return a->offset ;
+	return a->offset;
 }
 
 SINT32
 wwiiHostInstallCallbacks(void)
 {
 	BEGIN_CALLBACK_REGISTRATION(WWII_X)
-		REGISTER_SENDER(WWII_ACTIVATE_Y, _sendWWII_ACTIVATE, _SEND_ACTIVATE) ;
-		REGISTER_SENDER(WWII_DIALOG_Y, _sendWWII_DIALOG, _SEND_DIALOG) ;
-
-		REGISTER_RECEIVER(WWII_ERROR_INFO_Y, _recvWWII_ERROR_INFO) ;
-		REGISTER_RECEIVER(WWII_USER_ABORTED_APP_Y, _recvAbortedApp) ;
+		REGISTER_SENDER(WWII_ACTIVATE_Y, _sendWWII_ACTIVATE, _SEND_ACTIVATE);
+		REGISTER_RECEIVER(WWII_ERROR_INFO_Y, _recvWWII_ERROR_INFO);
+		REGISTER_RECEIVER(WWII_USER_ABORTED_APP_Y, _recvAbortedApp);
 	END_CALLBACK_REGISTRATION
-}
-
-SINT32
-wwiiSendDialog(SINT32 connection, /*WWII_DIALOG*/ UINT32 dialog)
-{
-	return teulSend(connection, _SEND_DIALOG, &dialog) ;
 }
 
 SINT32 wwiiSendActivate(SINT32 connection, WWII_ACTIVATE* const activate)

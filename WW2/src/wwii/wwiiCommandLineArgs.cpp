@@ -1,10 +1,9 @@
 #include <syscfg.h> // Path is project specific.
 #include "wwii/wwiiCommandLineArgs.h"
-#include <vector>
 
-static const char* programName ;
-typedef std::vector<Argument> Arguments ;
-static Arguments arguments ;
+static const char* programName;
+typedef std::vector<Argument> Arguments;
+static Arguments arguments;
 
 //////////////////////////////////////////////////////////////////////
 // Generate a textual description of a command line argument.
@@ -12,62 +11,61 @@ static Arguments arguments ;
 std::string
 Argument::GetDescription() const
 {
-	std::string description = "" ;
+	std::string description = "";
 
 	if ( flag )
 	{
-		description += '-' ;
-		description += flag ;
+		description += '-';
+		description += flag;
 		if ( option )
-			description += '|' ;
+			description += '|';
 	}
 
 	if ( option )
 	{
-		description += "--" ;
-		description += option ;
+		description += "--";
+		description += option;
 	}
 
 	if ( valueName )
 	{
 		if ( description.empty() == false )
-			description += ' ' ;
-		description += '<' ;
-		description += valueName ;
-		description += '>' ;
+			description += ' ';
+		description += '<';
+		description += valueName;
+		description += '>';
 	}
 
-	return description ;
+	return description;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Report on command line usage.
 
-static void
-_usage(const char* info)
+static void NORETURN_FN _usage(const char* info)
 {
-	printf("Usage: %s", programName) ;
-	for ( auto it = arguments.begin() ; it != arguments.end() ; ++it )
+	printf("Usage: %s", programName);
+	for ( auto it = arguments.begin(); it != arguments.end(); ++it )
 	{
-		printf(" [%s]", (*it).GetDescription().c_str()) ;
+		printf(" [%s]", (*it).GetDescription().c_str());
 	}
-	printf("\n") ;
-	exit((info == NULL) ? 0 : -1) ;
+	printf("\n");
+	exit((info == nullptr) ? 0 : -1);
 }
 
 //////////////////////////////////////////////////////////////////////
 // Report unknown arguments.
 
-static void _unknownArgument(const char* a)
+static void NORETURN_FN _unknownArgument(const char* a)
 {
-	printf("Unrecognized command line option '%s'.\n", a) ;
-	_usage(a) ;
+	printf("Unrecognized command line option '%s'.\n", a);
+	_usage(a);
 }
 
-static void _unknownArgument(char a)
+static void NORETURN_FN _unknownArgument(char a)
 {
-	char name[2] = { a, 0 } ;
-	_unknownArgument(name) ;
+	char name[2] = { a, 0 };
+	_unknownArgument(name);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -75,14 +73,14 @@ static void _unknownArgument(char a)
 
 static Argument* _getArgument(char a)
 {
-	for ( auto it = arguments.begin() ; it != arguments.end() ; ++it )
+	for ( auto it = arguments.begin(); it != arguments.end(); ++it )
 	{
 		if ( (*it).flag == a )
-			return &(*it) ;
+			return &(*it);
 	}
 	if ( a == '?' || a == 'h' )
-		_usage(NULL) ;
-	return NULL ;
+		_usage(nullptr);
+	return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -90,17 +88,17 @@ static Argument* _getArgument(char a)
 
 static Argument* _getArgument(const char* const a)
 {
-	const char* const option = a + 2 ;		// Skip the '--'.
-	for ( auto it = arguments.begin() ; it != arguments.end() ; ++it )
+	const char* const option = a + 2;		// Skip the '--'.
+	for ( auto it = arguments.begin(); it != arguments.end(); ++it )
 	{
-		if ( (*it).option == NULL )
-			continue ;
+		if ( (*it).option == nullptr )
+			continue;
 		if ( strcmp((*it).option, option) == 0 )
-			return &(*it) ;
+			return &(*it);
 	}
 	if ( strcmp(a, "help") == 0 )
-		_usage(NULL) ;
-	return NULL ;
+		_usage(nullptr);
+	return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -108,8 +106,8 @@ static Argument* _getArgument(const char* const a)
 
 static void _missingValue(Argument* arg)
 {
-	printf("Command line option %s expects a value (%s).\n", arg->GetDescription().c_str(), arg->valueName) ;
-	_usage(arg->valueName) ;
+	printf("Command line option %s expects a value (%s).\n", arg->GetDescription().c_str(), arg->valueName);
+	_usage(arg->valueName);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -118,21 +116,21 @@ static void _missingValue(Argument* arg)
 
 static void _getRequiredArgument(const char* value, size_t position)
 {
-	for ( auto it = arguments.begin() ; it != arguments.end() ; ++it )
+	for ( auto it = arguments.begin(); it != arguments.end(); ++it )
 	{
 		if ( (*it).IsRequired() == false )
-			continue ;
+			continue;
 		if ( position > 0 )
 		{
-			--position ;
-			continue ;
+			--position;
+			continue;
 		}
-		(*it).handler(value) ;
-		return ;
+		(*it).handler(value);
+		return;
 	}
 
-	printf("Unrecognized/unexpected command line argument '%s'.\n", value) ;
-	_usage(value) ;
+	printf("Unrecognized/unexpected command line argument '%s'.\n", value);
+	_usage(value);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -141,15 +139,15 @@ static void _getRequiredArgument(const char* value, size_t position)
 void
 Argument::Add(char flag, const char* const name, const char* const valueName, void (*handler)(const char*))
 {
-	Argument addition = { flag, name, valueName, handler } ;
-	arguments.push_back(addition) ;
+	Argument addition = { flag, name, valueName, handler };
+	arguments.push_back(addition);
 }
 
 void
 Argument::Add(const char* const valueName, void (*handler)(const char*))
 {
-	Argument addition = { 0, NULL, valueName, handler } ;
-	arguments.push_back(addition) ;
+	Argument addition = { 0, nullptr, valueName, handler };
+	arguments.push_back(addition);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -158,70 +156,70 @@ Argument::Add(const char* const valueName, void (*handler)(const char*))
 void
 Argument::ProcessCommandLine(size_t argc, char* const argv[])
 {
-	programName = argv[0] ;
+	programName = argv[0];
 
-	size_t requiredArg = 0 ;
+	size_t requiredArg = 0;
 
-	for ( size_t i = 1 ; i < argc ; ++i )
+	for ( size_t i = 1; i < argc; ++i )
 	{
 		if ( argv[i][0] != '-' )
 		{
-			_getRequiredArgument(argv[i], requiredArg++) ;
-			continue ;
+			_getRequiredArgument(argv[i], requiredArg++);
+			continue;
 		}
 
 		if ( argv[i][1] == '-' )
 		{
-			char* value = strchr(argv[i], '=') ;
-			if ( value != NULL )
-				*(value++) = 0 ;
-			Argument* arg = _getArgument(argv[i]) ;
-			if ( arg == NULL )
-				_unknownArgument(argv[i]) ;
+			char* value = strchr(argv[i], '=');
+			if ( value != nullptr )
+				*(value++) = 0;
+			Argument* arg = _getArgument(argv[i]);
+			if ( arg == nullptr )
+				_unknownArgument(argv[i]);
 
 			if ( arg->valueName )
 			{
-				if ( value == NULL )
+				if ( value == nullptr )
 				{
 					if ( (i + 1) >= argc )
-						_missingValue(arg) ;
-					value = argv[++i] ;
+						_missingValue(arg);
+					value = argv[++i];
 				}
 			}
 			else if ( value )
 			{
-				printf("Command line option %s does not expect a value [%s].\n", arg->GetDescription().c_str(), value) ;
+				printf("Command line option %s does not expect a value [%s].\n", arg->GetDescription().c_str(), value);
 			}
 
-			arg->handler(value) ;
+			arg->handler(value);
 		}
 		else
 		{
 			// One or more switches.
-			size_t switchList = i ;
-			for ( size_t a = 1 ; argv[switchList][a] != 0 ; ++a )
+			size_t switchList = i;
+			for ( size_t a = 1; argv[switchList][a] != 0; ++a )
 			{
-				Argument* arg = _getArgument(argv[switchList][a]) ;
-				if ( arg == NULL )
-					_unknownArgument(argv[switchList][a]) ;
+				Argument* arg = _getArgument(argv[switchList][a]);
+				if ( arg == nullptr )
+					_unknownArgument(argv[switchList][a]);
 				if ( arg->valueName )
 				{
 					if ( ++i >= (size_t)argc || argv[i][0] == '-' )
-						_missingValue(arg) ;
-					arg->handler(argv[i]) ;
+						_missingValue(arg);
+					arg->handler(argv[i]);
 				}
 				else
-					arg->handler(NULL) ;
+					arg->handler(nullptr);
 			}
 		}
 	}
 
-	for ( auto it = arguments.begin() ; it != arguments.end() ; ++it )
+	for ( auto it = arguments.begin(); it != arguments.end(); ++it )
 	{
 		if ( (*it).IsRequired() && requiredArg-- == 0 )
 		{
-			printf("Missing command line argument %s.\n", (*it).valueName) ;
-			_usage((*it).valueName) ;
+			printf("Missing command line argument %s.\n", (*it).valueName);
+			_usage((*it).valueName);
 		}
 	}
 }

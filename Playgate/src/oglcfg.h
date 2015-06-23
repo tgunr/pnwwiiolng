@@ -4,9 +4,6 @@
 #define _OGL_CFG_H
 
 #include <windows.h>
-#include <stdio.h>
-
-#include "dbug/dbug.h"
 
 #include "gl/gl.h"
 #include "gl/glext.h"

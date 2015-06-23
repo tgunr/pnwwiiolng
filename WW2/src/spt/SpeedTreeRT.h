@@ -226,7 +226,7 @@ public:
                     const float*        m_pCoords;              // 4 sets of (x,y,z,0) coords (16 floats total)
 
                     // cluster mesh
-                    const SMesh*        m_pMesh;                // mesh leaf data (no mesh if NULL, use leaf cards)
+                    const SMesh*        m_pMesh;                // mesh leaf data (no mesh if nullptr, use leaf cards)
                     float               m_fMeshScale;           // each LOD may be successively scaled
                 };
 
@@ -355,7 +355,7 @@ public:
             const char**            m_pBillboardMaps;           // filename = m_pBillboardMaps[ETextureLayers]
 
             // self-shadow
-            const char*             m_pSelfShadowMap;           // only one map per tree, or NULL if none
+            const char*             m_pSelfShadowMap;           // only one map per tree, or nullptr if none
         };
 
 

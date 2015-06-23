@@ -16,8 +16,8 @@ extern SINT32 strtPackSyncCPs(LOGICAL mode, UCHAR* message, SINT32 offset, struc
 extern SINT32 strtPackSyncFacilities(LOGICAL mode, UCHAR* message, SINT32 offset, struct STRT_SYNC_FACILITIES* object, SINT32 size);
 extern SINT32 strtPackSyncBuildings(LOGICAL mode, UCHAR* message, SINT32 offset, struct STRT_SYNC_BUILDINGS* object, SINT32 size);
 
-extern void* strtGetStaticPacketBuffer() ;
-extern struct STRT_SYNC_CPS& strtGetSyncCPs() ;
-extern struct STRT_SYNC_FACILITIES& strtGetSyncFacilities() ;
-extern struct STRT_SYNC_BUILDINGS& strtGetSyncBuildings() ;
+extern void* strtGetStaticPacketBuffer();
+extern struct STRT_SYNC_CPS& strtGetSyncCPs();
+extern struct STRT_SYNC_FACILITIES& strtGetSyncFacilities();
+extern struct STRT_SYNC_BUILDINGS& strtGetSyncBuildings();
 

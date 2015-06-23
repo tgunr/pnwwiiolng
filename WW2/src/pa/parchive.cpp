@@ -126,12 +126,12 @@ void paFree(paFILE* pf)
     if(pf->toc)
     {
         free(pf->toc);
-        pf->toc = NULL;
+        pf->toc = nullptr;
     }
 
 	for(i = 0; i < PA_MAX_ARC; i++)
 	{
-		if(pf->arc[i].f != NULL)
+		if(pf->arc[i].f != nullptr)
 		{
 	 		paClose(pf, i);
 		}
@@ -150,7 +150,7 @@ int	paOpen(paFILE* pf, const char* archivename, const char* mode)
 
 	for(i = 0; i < PA_MAX_ARC; i++)
 	{
-		if(pf->arc[i].f == NULL)
+		if(pf->arc[i].f == nullptr)
 		{
 			pf->arc[i].f = fopen(archivename, mode);
 
@@ -159,7 +159,7 @@ int	paOpen(paFILE* pf, const char* archivename, const char* mode)
       fcntl(pf->arc[i].f->_file,F_NOCACHE);
 #endif
        */
-			if(pf->arc[i].f != NULL)
+			if(pf->arc[i].f != nullptr)
 			{
 				strncpy(pf->arc[i].name, archivename, PA_MAX_NAME);
 				pf->updatetoc = 1;
@@ -183,7 +183,7 @@ void paClose(paFILE* pf, int archiveIdx)
 		if(pf->arc[archiveIdx].updatemd5)
 			update_arc_md5(pf->arc[archiveIdx].f);
 
-		if(pf->arc[archiveIdx].f != NULL)
+		if(pf->arc[archiveIdx].f != nullptr)
 			fclose(pf->arc[archiveIdx].f);
 
 		memset(&pf->arc[archiveIdx], 0x0, sizeof(parc));
@@ -195,21 +195,21 @@ void paClose(paFILE* pf, int archiveIdx)
 	paFetchMember
 *************************************************************************************************/
 
-int paFetchMember(paFILE* pf, const char* membername, unsigned char** data, int* len)
+int paFetchMember(paFILE* pf, const char* membername, unsigned char** data, size_t* len)
 {
 	char name[PA_MAX_NAME+1];
 	paTOC* member;
 //	int validityCheckFailed = 0;
 //	unsigned int crc = 0;
 
-	if(data) *data = NULL;
+	if(data) *data = nullptr;
 	if(len) *len = -1;
 
 	// create toc
-	if(pf->updatetoc || pf->toc == NULL)
+	if(pf->updatetoc || pf->toc == nullptr)
 		paUpdateTOC(pf);
 
-	if(pf->toc == NULL) return -1;
+	if(pf->toc == nullptr) return -1;
 
 	pf->updatetoc = 0;
 
@@ -232,9 +232,8 @@ int paFetchMember(paFILE* pf, const char* membername, unsigned char** data, int*
 
 				fread(srcMD5, 1, 16, member->pa->f);
 
-				*data = (unsigned char*)calloc(member->filelen, 1);
-
-				if(*data == NULL)
+				*data = (unsigned char*)calloc(member->filelen + 1, 1);
+				if(*data == nullptr)
 				{
 					return -1;
 				}
@@ -264,14 +263,14 @@ int paAppendmember(paFILE* pf, const char* membername, const unsigned char* memb
 {
 	int i;
 	int encrypt = 1;
-	unsigned char* cryptdata = NULL;
+	unsigned char* cryptdata = nullptr;
 	const unsigned char* writedata;
 	int writelen;
 	paMemberHead memberhead;
 	parcHead archead;
 	FILE* f = pf->arc[0].f;
 
-	if(pf->arc[0].f == NULL) return -1;
+	if(pf->arc[0].f == nullptr) return -1;
 
 	memset(&memberhead, 0x0, sizeof(memberhead));
 	memset(&archead, 0x0, sizeof(archead));
@@ -370,7 +369,7 @@ static int paUpdateTOC(paFILE* pf)
 	totaltoc = 0;
 	for(i = 0, tocidx = 0; i < PA_MAX_ARC; i++)
 	{
-		if(pf->arc[i].f != NULL)
+		if(pf->arc[i].f != nullptr)
 		{
 			if(create_toc(&pf->arc[i], &toc[tocidx], &numtoc[tocidx]) == 0)
 			{
@@ -419,11 +418,11 @@ static int create_toc(parc* pa, paTOC** toc, int* numtoc)
 	int maxtoc = PA_TOC_SIZE;
 	int i;
 
-	*toc = NULL;
+	*toc = nullptr;
 	*numtoc = 0;
 
 	*toc = (paTOC*)calloc(maxtoc, sizeof(paTOC));
-	if(toc == NULL) return -1;
+	if(toc == nullptr) return -1;
 #ifdef PRINT_TOC_ENTRIES
   printf("---------- %s ------------\n",pa->name);
 #endif
@@ -436,7 +435,7 @@ static int create_toc(parc* pa, paTOC** toc, int* numtoc)
 			if(i >= maxtoc)
 			{
 				paTOC* newtoc = (paTOC*)calloc(maxtoc + PA_TOC_SIZE, sizeof(paTOC));
-				if(newtoc == NULL) break;
+				if(newtoc == nullptr) break;
 
 				memcpy(newtoc, *toc, sizeof(paTOC) * maxtoc);
 
@@ -519,7 +518,7 @@ static void fix_path_name(char* name)
             if((name[i] == '/') &&  (name[i-1] == '/'))
             {
                 // nuking slash by doing nothing
-                ;
+               ;
             }
             else
             {
@@ -546,7 +545,7 @@ static int rijndaelcrypt(unsigned char* block, int size, int direction, int salt
 {
 	unsigned char* out_block;
 
-	setrijndaelkey(NULL, salt, direction);
+	setrijndaelkey(nullptr, salt, direction);
 
 	out_block = (unsigned char*)calloc(size, 1);
 
@@ -612,11 +611,11 @@ int i;
 
 	if(!cipherInitialized)
 	{
-	 	cipherInit(&ci, MODE_ECB, NULL);
+	 	cipherInit(&ci, MODE_ECB, nullptr);
 		cipherInitialized = 1;
 	}
 
-	if(k == NULL) // for unknown keys
+	if(k == nullptr) // for unknown keys
 	{
 		thekey[0] = 0x647ebd31;
 		thekey[1] = 0x35c0949c;
@@ -807,7 +806,7 @@ unsigned int crc32(unsigned int old_crc, const unsigned char* in_comming, int in
 unsigned int crc; 	// Our internal crc variable
 int i;
 
-	if (in_comming == NULL)
+	if (in_comming == nullptr)
 		return(0);
 
 	if(in_size <= 0)
@@ -866,7 +865,7 @@ static int validity_check(paTOC* member, unsigned char* data, unsigned char* src
 		snprintf(str, 255, "Validity check on archive %s failed",  member->pa->name);
 
 		piExitProgram(__FILE__, __LINE__, str);
-		*data = NULL;
+		*data = nullptr;
 */
 	}
 
@@ -879,7 +878,7 @@ static int validity_check(paTOC* member, unsigned char* data, unsigned char* src
 		x = 1;
 		y = 0;
 		x =  x / y; //ctd
-		*data = NULL;
+		*data = nullptr;
 */
 	}
 

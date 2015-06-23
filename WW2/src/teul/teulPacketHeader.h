@@ -12,29 +12,36 @@ namespace Teul
 	struct PacketHeader
 	{
 	public:
-		typedef	unsigned char	tag_t ;		// Used for the tag.
-		typedef	unsigned short	tick_t ;	// Tick transport.
-		typedef	unsigned char	callxy_t ;	// For callback X/Y values.
+		typedef	unsigned char	tag_t;		// Used for the tag.
+		typedef	unsigned short	tick_t;	// Tick transport.
+		typedef	unsigned char	callxy_t;	// For callback X/Y values.
 	public:
 		//// Unencrypted
 		//! Byte used to identify start of a packet.
-		UCHAR		m_prefix[3] ;
-		UINT32 packetType() const { return m_prefix[0] >> 4 ; }
-		void packetType(UINT32 type_) { m_prefix[0] = ((UCHAR)type_ << 4) | (m_prefix[0] & 0x0f) ; }
-		UINT32 packetSizeBytes() const { return ((m_prefix[0] & 0x0f) << 16) | (m_prefix[1] << 8) | (m_prefix[2]) ; }
-		void packetSizeBytes(UINT32 size_) { m_prefix[0] = (m_prefix[0] & 0xf0) | ((size_ >> 16) & 0x0f) ; m_prefix[1] = (size_ >> 8) & 0xff ; m_prefix[2] = size_ & 0xff ; }
+		UCHAR		m_prefix[3];
+		UINT32 packetType() const { return m_prefix[0] >> 4; }
+		void packetType(UINT32 type_) { m_prefix[0] = ((UCHAR)type_ << 4) | (m_prefix[0] & 0x0f); }
+		UINT32 packetSizeBytes() const { return ((m_prefix[0] & 0x0f) << 16) | (m_prefix[1] << 8) | (m_prefix[2]); }
+		void packetSizeBytes(UINT32 size_)
+		{
+			// preserve the upper 4 bits of [0] which represent the packet type,
+			// but completely replace the lower four bits
+			m_prefix[0] = (m_prefix[0] & 0xf0) | ((size_ >> 16) & 0x0f);
+			m_prefix[1] = (size_ >> 8) & 0xff;
+			m_prefix[2] = size_ & 0xff;
+		}
 
 		/// Encrypted
 		//! ID of this packet.
-		tag_t		m_tag ;		// CAUTION: Do not move; teulModRecv depends on it.
+		tag_t		m_tag;		// CAUTION: Do not move; teulModRecv depends on it.
 		//! To make the header an even 8 bytes...
-		tick_t		m_tick ;
+		tick_t		m_tick;
 
 		//! X value of the callback used.
-		callxy_t	m_callX ;
+		callxy_t	m_callX;
 		//! Y value of the callback used.
-		callxy_t	m_callY ;
-	} ;
+		callxy_t	m_callY;
+	};
 #pragma pack(pop)
 }
 

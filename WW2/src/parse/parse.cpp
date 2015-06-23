@@ -17,36 +17,35 @@ const BASE_ARG_TYPES charAllow[] = {T_CHAR, T_ZERO};
 const BASE_ARG_TYPES stringAllow[] = {T_STRING, T_CHAR, T_ZERO, T_INT};
 const BASE_ARG_TYPES emptyAllow[] = {T_EMPTY};
 
-const BASE_ARG_TYPES* baseAllow[] = {NULL
+const BASE_ARG_TYPES* baseAllow[] = {nullptr
 									,intAllow
 									,floatAllow
 									,charAllow
 									,stringAllow
 									,emptyAllow
-									,NULL};
+									,nullptr};
 
 ARG_KEY* parseGetArgKey(UCHAR* strIn)
 {
-static UINT32 tmpUint32;
-UINT16	tmpUint16;
-UINT8	tmpUint8;
-SINT32	tmpSint32;
-SINT16	tmpSint16;
-SINT8	tmpSint8;
+	static UINT32 tmpUint32;
+	UINT16	tmpUint16;
+	UINT8	tmpUint8;
+	SINT32	tmpSint32;
+	SINT16	tmpSint16;
+	SINT8	tmpSint8;
 
-FLOAT32	tmpFloat32;
-SCHAR*	str = (SCHAR*) strIn;
-SCHAR*	endPoint;
-SCHAR**	endPointP = &endPoint;
-SINT8	isNegative = 0;
-static	ARG_KEY tt = {0,0,0,0,0,0,0};
+	FLOAT32	tmpFloat32;
+	SCHAR*	str = (SCHAR*) strIn;
+	SCHAR*	endPoint;
+	SINT8	isNegative = 0;
+	static	ARG_KEY tt = {nullptr,0,0,0,0,0,0};
 
 	dbugSetErrno(0);
 
-	if(str==NULL)
+	if(str==nullptr)
 	{
 		dbugSetErrno(EINVAL);
-		return (NULL);
+		return (nullptr);
 	}
 
 	tt.svalue = str;
@@ -55,13 +54,13 @@ static	ARG_KEY tt = {0,0,0,0,0,0,0};
 	if ( *str == '-')
 		tt.isNegative = TRUE;
 
-	tmpUint32 = (UINT32)strtoul(str, endPointP,10);
+	tmpUint32 = (UINT32)strtoul(str, &endPoint,10);
 
 	if (dbugGetErrno() != 0 || endPoint == str || *endPoint != 0)
 	{
 		tmpSint32 = 0;
 
-		tmpFloat32 = (FLOAT32)strtod(str,endPointP);
+		tmpFloat32 = (FLOAT32)strtod(str, &endPoint);
 		if (dbugGetErrno() != 0 || endPoint == str || *endPoint != 0)
 		{
 
@@ -88,7 +87,6 @@ static	ARG_KEY tt = {0,0,0,0,0,0,0};
 
 		if ( isNegative )
 		{
-
 			tmpSint8 = (SINT8) tmpSint32;
 			tmpSint16 = (SINT16) tmpSint32;
 
@@ -113,18 +111,16 @@ static	ARG_KEY tt = {0,0,0,0,0,0,0};
 				tt.numBytes = 4;
 		}
 
-		tmpFloat32 = (FLOAT32)strtod(str,endPointP);
-
+		tmpFloat32 = (FLOAT32)strtod(str, &endPoint);
 	}
 
 	tt.fvalue = tmpFloat32;
 	tt.dvalue = tmpSint32;
 
-	if (strlen(str) == 0)
+	if (str[0] == 0)
 		tt.baseType = T_EMPTY;
 
 	return (&tt);
-
 }
 
 static inline SINT32 _fillParamInt(UCHAR* /*arg*/, UCHAR* target, EXT_ARG_TYPES thisType, ARG_KEY* argSpec)
@@ -203,11 +199,11 @@ const BASE_ARG_TYPES* specAllow;
 SINT32 i;
 
 	if ( spec == T_STRING )
-		return TRUE ;
+		return TRUE;
 
 	specAllow = baseAllow[spec];
 
-	for ( i = 0; specAllow[i] != 0 ; i++)
+	for ( i = 0; specAllow[i] != 0; i++)
 	{
 		if (specAllow[i] == arg)
 			return (TRUE);
@@ -216,11 +212,9 @@ SINT32 i;
 	return (FALSE);
 }
 
-LOGICAL parseValidArgs(ARG_SPEC* argSpec, FUNCARGS* args, SINT32 numArgs, const char* section, SINT32 lineNum)
+bool parseValidArgs(ARG_SPEC* argSpec, FUNCARGS* args, SINT32 numArgs, const char* section, SINT32 lineNum)
 {
-SINT32 i;
-
-	for ( i = 0; i < numArgs; i++)
+	for (SINT32 i = 0; i < numArgs; i++)
 	{
 		if (! parseCmpBaseType(argSpec[i].baseType, (BASE_ARG_TYPES)args[i].baseType) )
 		{
@@ -231,7 +225,7 @@ SINT32 i;
 			Write_Debug("missing or bad parmeter (%d) type %d, value (%s) to type %d, section %s"
 						,i,args[i].baseType,args[i].svalue,argSpec[i].baseType,section);
 #endif
-			return (FALSE);
+			return false;
 		}
 		if (args[i].numBytes > argSpec[i].maxArgBytes)
 		{
@@ -241,12 +235,11 @@ SINT32 i;
 #else
 			Write_Debug("parameter too long in blitzWor");
 #endif
-			return (FALSE);
+			return false;
 		}
 	}
 
-	return TRUE;
-
+	return true;
 }
 
 SINT32 parseFillKeys(ARG_KEY_HEAD* keyList, ARG_KEY_HEAD* defaultList, ARG_LIST* argList, SINT32 offset)
@@ -261,7 +254,7 @@ ARG_KEY* argKey, *fargs, *defs;
 	nargs = argList->numArgs - offset;
 
 	// fill out the fargs array
-	for (i=0 ; i < nargs ; i++)
+	for (i=0; i < nargs; i++)
 	{
 		argKey = parseGetArgKey((UCHAR*)argList->arg[i+offset]);
 
@@ -278,13 +271,13 @@ ARG_KEY* argKey, *fargs, *defs;
 
 	if (defaultList->numKeys > 0 && nargs < defaultList->numKeys)
 	{
-		for ( i=nargs ; i < defaultList->numKeys ; i++ )
+		for ( i=nargs; i < defaultList->numKeys; i++ )
 			fargs[i] = defs[i];
 	}
 
 	nargs = (nargs > defaultList->numKeys) ? nargs : defaultList->numKeys;
 
-	for (i=nargs ; i < MAX_ARGS ; i++)
+	for (i=nargs; i < MAX_ARGS; i++)
 	{
 		fargs[i].svalue = "\0";
 		fargs[i].dvalue = 0;
@@ -311,8 +304,8 @@ SINT32	len, retval;
 
 	et.error = -EINVAL;
 
-	if ( destination == NULL
-		|| paramString == NULL
+	if ( destination == nullptr
+		|| paramString == nullptr
 		|| minParams < 0
 		|| minParams > (maxParams = (SINT32)strlen((char*)paramString)) )
 		return (et);
@@ -320,7 +313,7 @@ SINT32	len, retval;
 	target = destination;
 
 	et.error = EMPTY_LINE;
-	if (list == NULL)
+	if (list == nullptr)
 		return (et);
 
 	et.error = -EINVAL;
@@ -352,7 +345,7 @@ SINT32	len, retval;
 			if (len > 1)
 				return (et);
 			*((UCHAR * )target) = *arg;
-			target = (UCHAR*)target + 1 ;
+			target = (UCHAR*)target + 1;
 		default:
 			if (argKey->baseType == T_INT)
 			{
@@ -364,7 +357,7 @@ SINT32	len, retval;
 
 				// I know it doesn't look as efficient as target += blah,
 				// but the compiler will make it that way.
-				target = (UCHAR*)target + retval ;
+				target = (UCHAR*)target + retval;
 			}
 			else if (argKey->baseType == T_FLOAT)
 			{

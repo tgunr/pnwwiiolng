@@ -10,6 +10,6 @@
 //CONNECTION_STATUS connected;
 //UINT32	theHost;
 //install database client general callbacks
-extern SINT32 dbseInstallClientCallbacks(void);
+SINT32 dbseInstallClientCallbacks(void);
 
-extern SINT32 dbseSendHandshake(SINT32 teulIndex, UINT32 arena);
+SINT32 dbseSendHandshake(SINT32 teulIndex, UINT32 arena);

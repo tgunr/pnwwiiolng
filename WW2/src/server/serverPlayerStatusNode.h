@@ -9,9 +9,9 @@
 
 #include "auth/authDispatch.h"
 #include "server/serverPersonaXferData.h"
-#include "server/serverPlayerStatusEnum.h"
-#include "server/serverServerSummaryEnum.h"
 #include "teul/teulTimeMS.h"
+
+namespace Server { enum class PlayerStatus; }
 
 class PlayerStatusNode
 {
@@ -19,12 +19,19 @@ public:
 	PlayerStatusNode() {}
 	~PlayerStatusNode() {}
 
-	Auth::Dispatch& dispatch() { return data.dispatch ; }
-	const Auth::Dispatch& dispatch() const { return data.dispatch ; }
+	Auth::Dispatch& dispatch() { return data.dispatch; }
+	const Auth::Dispatch& dispatch() const { return data.dispatch; }
 
-	void takeAuthorityForThisPlayer() ;
+	void takeAuthorityForThisPlayer();
 
 public:
+	struct ServerSummary
+	{
+		UINT64			id;		// mac address of eth0 + pid
+		UINT32			address;
+		SERVER_TYPE		type;
+	};
+
 	playerid_t		id;			// playerid
 	SINT32			teulIndex;
 	UINT32			host;
@@ -32,14 +39,14 @@ public:
 	UINT32			logins;
 	Server::PlayerStatus			status;
 	Server::Transfer::XferReason	xferState;
-	SERVER_SUMMARY	curServer;
+	ServerSummary	m_curServer;
 
-	Server::PersonaXferData	data ;
+	Server::PersonaXferData	data;
 
 	Teul::TimeMS	timeStamp;
 	void*			localInfo;
 	void*			sessionInfo;
 
-	UINT32			serviceID ;
-} ;
+	UINT32			serviceID;
+};
 

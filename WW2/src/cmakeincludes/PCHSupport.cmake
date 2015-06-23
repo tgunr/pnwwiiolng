@@ -7,7 +7,7 @@ include ( cmakeincludes/HostConfiguration.cmake )
 
 IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 	# Add a rule to build the Lua glue file
-	add_custom_command(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${_LUA_HOST}Lua.cc
+	ADD_CUSTOM_COMMAND(OUTPUT ${CMAKE_CURRENT_SOURCE_DIR}/${_LUA_HOST}Lua.cc
 		COMMAND ${TOLUAPP_EXECUTABLE}
 			-o  ${CMAKE_CURRENT_SOURCE_DIR}/${_LUA_HOST}Lua.cc
 			-n  game
@@ -18,6 +18,8 @@ IF ( NOT PN_CLUSTER STREQUAL "Auth" )
 		WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 		MAIN_DEPENDENCY hostproj/${_LUA_HOST}.pkg
 		DEPENDS
+            ${TOLUAPP_EXECUTABLE}
+            ${TOLUAPP_LIBRARIES}
 			${SourcePCH}
 			hostproj/${_LUA_HOST}.pkg
 			include/platforms.h
@@ -36,14 +38,18 @@ ENDIF( )
 CONFIGURE_FILE( ${CMAKE_CURRENT_SOURCE_DIR}/hostproj/revision.h.in ${CMAKE_CURRENT_SOURCE_DIR}/hostproj/revision.h )
 
 IF (NOT MSVC)
-	SET(BinaryPCH "${SourcePCH}.gch")
-	STRING(TOUPPER "CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE}" _flags_name)
+	SET(BinaryPCH ${SourcePCH}.gch)
+	SET_DIRECTORY_PROPERTIES(PROPERTIES ADDITIONAL_MAKE_CLEAN_FILES ${BinaryPCH})
+
+	STRING(TOUPPER CMAKE_CXX_FLAGS_${CMAKE_BUILD_TYPE} _flags_name)
 	SET(_pchFlags ${CMAKE_CXX_FLAGS})
 	LIST(APPEND _pchFlags ${${_flags_name}})
+
 	GET_DIRECTORY_PROPERTY(_pchIncludePaths INCLUDE_DIRECTORIES)
 	FOREACH (_inc ${_pchIncludePaths})
 		LIST(APPEND _pchFlags "-I" ${_inc})
 	ENDFOREACH()
+
 	GET_DIRECTORY_PROPERTY(_pchDefines DEFINITIONS)
 	LIST(APPEND _pchFlags ${_pchDefines})
 	SEPARATE_ARGUMENTS(_pchFlags)
@@ -55,9 +61,11 @@ IF (NOT MSVC)
 			IMPLICIT_DEPENDS CXX ${SourcePCH}
 			DEPENDS ${SourcePCH}
 	)
-	add_custom_target(generate_precompiled DEPENDS "${BinaryPCH}")
+
+	ADD_CUSTOM_TARGET(precompiled_header DEPENDS ${BinaryPCH})
+
 	MACRO(ADD_PCH _TARGET)
-	 add_dependencies(${_TARGET} ${BinaryPCH} generate_precompiled)
+	 ADD_DEPENDENCIES(${_TARGET} precompiled_header)
 	ENDMACRO()
 ELSE ( )
 	MACRO(ADD_PCH _TARGET)
@@ -68,4 +76,3 @@ ELSE ( )
 	  SET_SOURCE_FILES_PROPERTIES(${_FIRST_SOURCE} PROPERTIES COMPILE_FLAGS "/Yc\"${SourcePCH}\"")
 	ENDMACRO ()
 ENDIF ( )
-

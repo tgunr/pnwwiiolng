@@ -838,12 +838,12 @@ ResortTrackGroup(track_group &Group)
         // It's far too easy to pick a string remapping that gets duplicate values!
         // Even this checking doesn't guarantee that you don't have duplicates
         // across your entire world, but hey - better than nothing.
-        {for(int32x TrackIndex = 1;
-            TrackIndex < Group.TransformTrackCount;
-            ++TrackIndex)
+        {for(int CheckTrackIndex = 1;
+            CheckTrackIndex < Group.TransformTrackCount;
+            ++CheckTrackIndex)
         {
-            transform_track &Track1 = Group.TransformTracks[TrackIndex];
-            transform_track &Track2 = Group.TransformTracks[TrackIndex-1];
+            transform_track &Track1 = Group.TransformTracks[CheckTrackIndex];
+            transform_track &Track2 = Group.TransformTracks[CheckTrackIndex -1];
             if ( Track1.Name == Track2.Name )
             {
                 Log1(WarningLogMessage, NameMapLogMessage,

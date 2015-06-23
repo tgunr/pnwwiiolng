@@ -1,10 +1,5 @@
 #include "phui-precompiled-header.h"
 
-#include <stdio.h>
-#include <stdlib.h>
-#include <wchar.h>
-#include <math.h>
-
 #include "phui/Slider.h"
 #include "phui/GraphicsContext.h"
 #include "phui/UIMessages.h"
@@ -86,7 +81,7 @@ void Slider::DrawSelf()
 	float x,y;
 	float box[8];
 	float disabledColor[4];
-	float* color = NULL;
+	float* color = nullptr;
 
 	disabledColor[0] = disabledColor[1] = disabledColor[2] = disabledColor[3] = .8f;
 	

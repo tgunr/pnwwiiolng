@@ -563,6 +563,7 @@
     FT_Pos     y_delta = hints->y_delta;
     FT_Memory  memory  = hints->memory;
 
+	(void)get_inflections;
 
     hints->num_points   = 0;
     hints->num_contours = 0;

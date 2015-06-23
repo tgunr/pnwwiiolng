@@ -11,7 +11,7 @@
 
 #include "teul/teulPackers.h"
 
-class Mission ;
+class Mission;
 
 // Packet for describing a new mission to be created
 // these are primarily created externally
@@ -30,42 +30,42 @@ public:
 			memset(description, 0, sizeof(description));
 		}
 
-	NewMission(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a) ; }
+	NewMission(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* const a) { return teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this)) ; }
+	SINT32 packer(LOGICAL mode, ACTION_OBJECT* const a) { return teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this)); }
 
-	Mission* post() ;					// execution function if appropriate
+	Mission* post();					// execution function if appropriate
 
 	//// Member fields ////
 public:
 	// ID of the missions
-	UINT32	missionID ;
+	UINT32	missionID;
 	// Country and side
-	WWII_COUNTRY	country ;
-	UINT32	brigadeID ;
+	WWII_COUNTRY	country;
+	UINT32	brigadeID;
 	// Type of mission
-	UINT32	missionType ;
+	UINT32	missionType;
 	// Who posted it (playerID)
-	UINT32	postedByID ;
-	char	posterCallsign[MAX_HANDLE_SIZE] ;
+	UINT32	postedByID;
+	char	posterCallsign[MAX_HANDLE_SIZE];
 	// When it was posted
-	SINT32	postedAt ;
+	SINT32	postedAt;
 	// When the mission is to be posted on the host
-	SINT32	postAt ;
+	SINT32	postAt;
 	// When the mission should launch
-	SINT32	launchAt ;
+	SINT32	launchAt;
 	// Launch CP and Facility
-	UINT16	launchCP_oid ;
-	UINT16	launchFac_oid ;
+	UINT16	launchCP_oid;
+	UINT16	launchFac_oid;
 	// Target CP and Facility
-	UINT16	targetCP_oid ;
-	UINT16	targetFac_oid ;
+	UINT16	targetCP_oid;
+	UINT16	targetFac_oid;
 	// Description of the mission
-	SCHAR	description[EXTM_DESCRIPTION_LEN+1] ;
+	SCHAR	description[EXTM_DESCRIPTION_LEN+1];
 	// Mission priority
-	UCHAR	priority ;
+	UCHAR	priority;
 	// Vehicle for the mission
-	WEAPON_SPEC	weapon ;
-	instanceid_t instanceID ;
-} ;
+	WEAPON_SPEC	weapon;
+	instanceid_t instanceID;
+};
 

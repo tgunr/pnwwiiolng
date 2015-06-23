@@ -5,11 +5,7 @@
 struct DECAL_SPEC
 {
 	int category;
-#if defined(USE_OSG)
-    osg::Texture2D* texture;
-#else
 	int texture;
-#endif
 	int row;
 	int col;
 
@@ -54,7 +50,7 @@ public:
 
 			spec.shortname.clear();
 
-            const char* p = NULL;
+            const char* p = nullptr;
 			xmlGetNodeValue(node, XML_DATA_STRING, &p, "id");
             spec.shortname = p;
 
@@ -78,11 +74,7 @@ public:
 
 			// set some defaults
 			decal.category	= -1;
-#if defined(USE_OSG)
-            decal.texture   = NULL;
-#else
 			decal.texture	= -1;
-#endif
 			decal.row		= -1;
 			decal.col		= -1;
 
@@ -114,12 +106,8 @@ public:
                 decal.category = weapFindCategory("in_").wCategory;
             }
 
-#if defined(USE_OSG)
-            decal.texture = osgTextureManagerLoad2D(texture.c_str());
-#else
 			// lookup the texture id
 			decal.texture = ldddsLoadDDSTexture(texture.c_str(), GL_TEXTURE_2D, 0);
-#endif
 			// only use it if it looks valid
 			if(decal.IsValid())
 				spec->decals.push_back(decal);

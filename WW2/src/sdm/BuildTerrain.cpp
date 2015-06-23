@@ -12,18 +12,11 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#if platOS == OS_WIN32
 #include <tuple>
-#include <hash_map>
-#else
-#include <tr1/tuple>
-#include <map>
-#endif
 #include <iomanip>
 
 #include "sdm/BuildTerrain.h"
 #include "include/systypes.h"
-#include "dbug/dbug.h"
 #include "strt/strtDTL.h"
 #include "pi/piogl.h"
 #include "sdm/uistrat.h"
@@ -93,7 +86,7 @@ static bool findNextMatchingEntry( HANDLE&h, WIN32_FIND_DATAA* finddata )
   do
   {
     finddata->ent = readdir(h.dir);
-    if ( finddata->ent == NULL )
+    if ( finddata->ent == nullptr )
     {
       return false;
     }
@@ -109,7 +102,7 @@ static HANDLE FindFirstFileA(const char*pattern, WIN32_FIND_DATAA* finddata)
   HANDLE h;
 
   char* slash = strrchr( pattern, '/' );
-  *slash = NULL;
+  *slash = nullptr;
   strcpy( slash+2, h.pattern ); // skip *
 
   h.dir = opendir(pattern);
@@ -143,15 +136,14 @@ static void FindClose(HANDLE& h)
 
 #endif
 
-typedef tuple<int, int, int>			StratObjId;
-typedef pair<_DEPOTLINK*, _BUILDING*>	LinkCPFdata;
-typedef pair<_WAYPOINT*, _BUILDING*>	WaypointCPFdata;
-
-typedef map<StratObjId, _CP*>				ChokepointCPFmap;
-typedef map<StratObjId, _FACILITY*>			FacilityCPFmap;
-typedef map<StratObjId, _BUILDING*>			BuildingCPFmap;
-typedef map<StratObjId, LinkCPFdata>		LinkCPFmap;
-typedef map<StratObjId, WaypointCPFdata>	WaypointCPFmap;
+using StratObjId = tuple<int, int, int>;
+using LinkCPFdata = pair<_DEPOTLINK*, _BUILDING*>;
+using WaypointCPFdata = pair<_WAYPOINT*, _BUILDING*>;
+using ChokepointCPFmap = map<StratObjId, _CP*>;
+using FacilityCPFmap = map<StratObjId, _FACILITY*>;
+using BuildingCPFmap = map<StratObjId, _BUILDING*>;
+using LinkCPFmap = map<StratObjId, LinkCPFdata>;
+using WaypointCPFmap = map<StratObjId, WaypointCPFdata>;
 
 static ChokepointCPFmap	chokepointCPFmap;
 static FacilityCPFmap	facilityCPFmap;
@@ -175,9 +167,9 @@ struct ObjectId
 	}
 };
 
-typedef map<ObjectId, BUILDING*> BuildingMap;
-typedef map<ObjectId, CP*> CPMap;
-typedef map<ObjectId, FACILITY*> FacilityMap;
+using BuildingMap = map<ObjectId, BUILDING*>;
+using CPMap = map<ObjectId, CP*>;
+using FacilityMap = map<ObjectId, FACILITY*>;
 
 struct CellStratData
 {
@@ -197,7 +189,7 @@ struct CellStratData
     }
 };
 
-typedef map<pair<int, int>, CellStratData>	CellStratMap;
+using CellStratMap = map<pair<int, int>, CellStratData>;
 static CellStratMap		cellStratMap;
 
 struct TerrainPosition
@@ -222,7 +214,7 @@ struct ModelStats
 	ModelStats() : totalInstanceCount(0), steepPlaces(0), nonPlanarCount(0)	{}
 	ModelStats(const ModelStats& draft) : totalInstanceCount(draft.totalInstanceCount), steepPlaces(draft.totalInstanceCount), nonPlanarCount(draft.totalInstanceCount)	{}
 };
-typedef map<const PoolModel*, ModelStats>	ModelStatsMap;
+using ModelStatsMap = map<const PoolModel*, ModelStats>;
 static ModelStatsMap modelStatsMap;
 
 #if platOS == OS_MACOS
@@ -246,15 +238,17 @@ static set<string>		missingModels;
 static streampos		streamUpdatePos;
 static int				sdmFilesMerged;
 
+using std::cbegin;
+using std::cend;
+
 static void MergeCPFdata()
 {
 	logFile << "Merging Strat Data...";
 
-	for(ChokepointCPFmap::iterator it = chokepointCPFmap.begin(); it != chokepointCPFmap.end(); ++it)
+	for(auto it = cbegin(chokepointCPFmap); it != cend(chokepointCPFmap); ++it)
 	{
-		_CP*	cpCPF	= it->second;
-		CP*		cpSDM	= (CP*)memAlloc(sizeof(CP));
-
+		const _CP* cpCPF = it->second;
+		CP* cpSDM = (CP*)memAlloc(sizeof(CP));
 
 		strcpy(cpSDM->fileName,	cpCPF->objname);
 		strcpy(cpSDM->name, cpCPF->name);
@@ -279,7 +273,7 @@ static void MergeCPFdata()
             cellStratData->maxStratId = cpSDM->oid.id;
 	}
 
-	for(FacilityCPFmap::iterator it = facilityCPFmap.begin(); it != facilityCPFmap.end(); ++it)
+	for(auto it = facilityCPFmap.begin(); it != facilityCPFmap.end(); ++it)
 	{
 		_FACILITY*	facCPF	= it->second;
 		FACILITY*	facSDM	= (FACILITY*)memAlloc(sizeof(FACILITY));
@@ -304,7 +298,7 @@ static void MergeCPFdata()
 		facSDM->originalSide	= facCPF->side;
 		facSDM->originalCountry	= facCPF->country;
 		facSDM->stratFlags		= (UINT8)facCPF->flags;
-		facSDM->cpid.Populate(cpCPF->second, cpCPF->second->cpid.id, CLASS_CP, cpCPF->second->ctype) ;
+		facSDM->cpid.Populate(cpCPF->second, cpCPF->second->cpid.id, CLASS_CP, cpCPF->second->ctype);
 
 		CellStratData*	cellStratData = &cellStratMap[pair<int, int>(facCPF->fid.scx, facCPF->fid.scy)];
 		if(cellStratData->facilities.insert(pair<ObjectId, FACILITY*>(ObjectId(facSDM->posx, facSDM->posy, facSDM->fileName), facSDM)).second == false)
@@ -370,7 +364,7 @@ static void MergeCPFdata()
 		FacilityCPFmap::iterator	facMapIt = facilityCPFmap.find(StratObjId(linkCPF->fbid.scx, linkCPF->fbid.scy, linkCPF->fbid.id));
 		if(facMapIt != facilityCPFmap.end())
 		{
-			linkSDM->firebaseId.Populate(facMapIt->second, facMapIt->second->fid.id, CLASS_FACILITY, facMapIt->second->ftype) ;
+			linkSDM->firebaseId.Populate(facMapIt->second, facMapIt->second->fid.id, CLASS_FACILITY, facMapIt->second->ftype);
 		}
 		else
 		{
@@ -385,7 +379,7 @@ static void MergeCPFdata()
 			piExitProgram (__FILE__, __LINE__, "As described in terrainBuildLog.txt.");
 		}
 
-		linkSDM->startDepotId.Populate(startBldCPF->second, linkCPF->lbid.id, CLASS_BUILDING, startBldCPF->second->btype) ;
+		linkSDM->startDepotId.Populate(startBldCPF->second, linkCPF->lbid.id, CLASS_BUILDING, startBldCPF->second->btype);
 
 		BuildingCPFmap::iterator	endBldCPF	= buildingCPFmap.find(StratObjId(linkCPF->bid.scx, linkCPF->bid.scy, linkCPF->bid.id));
 		if(endBldCPF == buildingCPFmap.end())
@@ -393,7 +387,7 @@ static void MergeCPFdata()
 			logFile << endl << "fatal error: link(" << linkCPF->lid.scx << "," << linkCPF->lid.scy << "," << linkCPF->lid.id << ") refers to inexistent end depot!" << endl;
 			piExitProgram (__FILE__, __LINE__, "As described in terrainBuildLog.txt.");
 		}
-		linkSDM->endDepotId.Populate(endBldCPF->second, endBldCPF->second->bid.id, CLASS_BUILDING, endBldCPF->second->btype) ;
+		linkSDM->endDepotId.Populate(endBldCPF->second, endBldCPF->second->bid.id, CLASS_BUILDING, endBldCPF->second->btype);
 
 		if(linkCPF->waypoint)
 		{
@@ -447,9 +441,9 @@ static void MergeCPFdata()
 
 		wptSDM->posx				= wptCPF->posx;
 		wptSDM->posy				= wptCPF->posy;
-		if(wptCPF->next != NULL)
+		if(wptCPF->next != nullptr)
 		{
-			wptSDM->nextpt.Populate(wptCPF->next, wptCPF->next->wpid.id, CLASS_WAYPOINT, 0) ;
+			wptSDM->nextpt.Populate(wptCPF->next, wptCPF->next->wpid.id, CLASS_WAYPOINT, 0);
 			FLOAT64	dx = (FLOAT64)wptCPF->next->posx - (FLOAT64)wptSDM->posx;
 			FLOAT64	dy = (FLOAT64)wptCPF->next->posy - (FLOAT64)wptSDM->posy;
 			wptSDM->distance = (SINT32)sqrt(dx * dx + dy * dy);
@@ -470,13 +464,13 @@ static void MergeCPFdata()
 				piExitProgram (__FILE__, __LINE__, "As described in terrainBuildLog.txt.");
 			}
 
-			wptSDM->nextpt.Populate(bldIt->second, linkIt->second.first->lid.id, CLASS_LINK, 0) ;
+			wptSDM->nextpt.Populate(bldIt->second, linkIt->second.first->lid.id, CLASS_LINK, 0);
 			FLOAT64 dx = (FLOAT64)bldIt->second->posx - (FLOAT64)wptCPF->posx;
 			FLOAT64 dy = (FLOAT64)bldIt->second->posy - (FLOAT64)wptCPF->posy;
 			wptSDM->distance = (SINT32)sqrt(dx * dx + dy * dy);
 		}
 
-		wptSDM->lid.Populate(it->second.second, wptCPF->lid.id, CLASS_LINK, 0) ;
+		wptSDM->lid.Populate(it->second.second, wptCPF->lid.id, CLASS_LINK, 0);
 		wptSDM->serial			= wptCPF->serial;
 		wptSDM->stratFlags		= (UINT8)wptCPF->flags;
 
@@ -495,9 +489,9 @@ char*			ptr;
 int				i;
 bool			quoted;
 
-	if (buffer == NULL)
+	if (buffer == nullptr)
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
 	ptr = buffer;
@@ -561,14 +555,14 @@ static void LoadStratFile(const char* fileName)
 
 
 	hfile = fopen(fileName, "rb");
-	if (hfile == NULL)	return;
+	if (hfile == nullptr)	return;
 
 	Write_Debug("Loading CPF file %s", fileName);
 	do
 	{
 		if (feof(hfile))	break;
 		ptr = fgets(buffer, 255, hfile);
-		if (ptr == NULL)	continue;
+		if (ptr == nullptr)	continue;
 		if (buffer[0] == '#' ||	strncmp(buffer, "//", 2) == 0)	continue;
 
 		if (strncmp(buffer, "CP", 2) == 0)
@@ -729,7 +723,7 @@ static void LoadStratFile(const char* fileName)
 	}
 	while (TRUE);
 
-	if (pcp != NULL)
+	if (pcp != nullptr)
 	{
 		pcp->next = pcplist;
 		pcplist = pcp;
@@ -1764,7 +1758,7 @@ void TerrainObjectSafeDelete(SuperCellTerrainData::TerrainObject* to)
     if(to->instance && to->instance->rootObject)
     {
         obpoolFreeObjectCallback(to->instance->rootObject);
-        to->instance->rootObject = NULL;
+        to->instance->rootObject = nullptr;
     }
 
     ToDeleteTerrainObjects::iterator itr = TerrainObjectsToDelete.find(to);
@@ -2066,7 +2060,7 @@ void SuperCellTerrainData::PlaceTerrain()
     if(planes)
     {
         delete [] planes;
-        planes = NULL;
+        planes = nullptr;
     }
 }
 
@@ -2305,7 +2299,7 @@ void SuperCellTerrainData::PlaceTerrainObjects(int pass)
 
                 if(needcollider && object->instance)
                 {
-                    OBJECT* o = NULL;
+                    OBJECT* o = nullptr;
 
                     trnFindCollisionObject(&o, object->instance->rootObject);
 
@@ -2361,9 +2355,9 @@ void SuperCellTerrainData::Preprocess()
 		assert(editListCnt == 0);
 
 #if !WANT_NON_REPLACEMENT_TILES
-		for(int octetX=0; octetX < SUPERCELL_OCTETS_Y ; octetX++)
+		for(int octetX=0; octetX < SUPERCELL_OCTETS_Y; octetX++)
 		{
-			for(int octetY=0; octetY < SUPERCELL_OCTETS_X ; octetY++)
+			for(int octetY=0; octetY < SUPERCELL_OCTETS_X; octetY++)
 			{
 				Octet*	octet			= &octets[octetX][octetY];
 				Matrixf	worldTransform	= Matrixf::translate(worldOrigin + Vec3f((octetX+0.5f)*800.0f, (octetY+0.5f)*800.0f, 0.0f));
@@ -2441,7 +2435,7 @@ void SuperCellTerrainData::Preprocess()
 SuperCellTerrainData::SuperCellTerrainData(int cellX, int cellY, const Vec3f& offset)
 	:	supercellX(cellX),
 		supercellY(cellY),
-        newHeightMap(NULL),
+        newHeightMap(nullptr),
 		cellPhysicsSpace(dHashSpaceCreate(worldPhysicsSpace)),
 		octets()
 {
@@ -2608,7 +2602,7 @@ SuperCellTerrainData::SuperCellTerrainData(int cellX, int cellY, const Vec3f& of
     ldmdlCalcSurfaceNormals(o);
     ldmdlGetBounds(o);
 
-    cellHeightMap->instance = NULL;
+    cellHeightMap->instance = nullptr;
     newHeightMap = o;
 
     // Create plane equations for terrain placement
@@ -2642,9 +2636,9 @@ SuperCellTerrainData::SuperCellTerrainData(int cellX, int cellY, const Vec3f& of
 #endif
 
     // Initialize the octet physics spaces
-	for(int octetX=0; octetX < SUPERCELL_OCTETS_Y ; octetX++)
+	for(int octetX=0; octetX < SUPERCELL_OCTETS_Y; octetX++)
 	{
-		for(int octetY=0; octetY < SUPERCELL_OCTETS_X ; octetY++)
+		for(int octetY=0; octetY < SUPERCELL_OCTETS_X; octetY++)
 		{
 			octets[octetX][octetY].replacementTile = 0;
 			octets[octetX][octetY].octetPhysicsSpace = dHashSpaceCreate(cellPhysicsSpace);
@@ -2666,8 +2660,8 @@ SuperCellTerrainData::~SuperCellTerrainData()
                 if(octet->replacementTile->instance->rootObject)
                 {
                     obpoolFreeObjectCallback(octet->replacementTile->instance->rootObject);
-                    octet->replacementTile->instance->rootObject = NULL;
-                    octet->replacementTile->instance = NULL;
+                    octet->replacementTile->instance->rootObject = nullptr;
+                    octet->replacementTile->instance = nullptr;
                 }
             }
 
@@ -2694,7 +2688,7 @@ SuperCellTerrainData::~SuperCellTerrainData()
         }
 
         TerrainObjectSafeDelete(cellHeightMap);
-        cellHeightMap = NULL;
+        cellHeightMap = nullptr;
     }
 
     if(newHeightMap)
@@ -2705,7 +2699,7 @@ SuperCellTerrainData::~SuperCellTerrainData()
     if(planes)
     {
         delete [] planes;
-        planes = NULL;
+        planes = nullptr;
     }
 
     bushclutterdata.erase(bushclutterdata.begin(), bushclutterdata.end());
@@ -2905,9 +2899,9 @@ void BuildTerrain(bool mergeAll, short cellX, short cellY)
 #if platOS == OS_WIN32
                 MSG msg;
                 // May want to alt-tab out while building....
-                while(PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
+                while(PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE))
                 {
-                    if(GetMessage(&msg, NULL, 0, 0))
+                    if(GetMessage(&msg, nullptr, 0, 0))
                     {
                         TranslateMessage(&msg);
                         DispatchMessage(&msg);

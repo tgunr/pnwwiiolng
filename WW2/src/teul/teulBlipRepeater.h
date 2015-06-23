@@ -15,8 +15,8 @@ namespace Teul
 // maximum of once per time period specified in the constructor.
 //
 // Typical usage:
-//   static TeulTimeMS BLIP_INTERVAL_MS = 5 * 1000 ; // 5 second intervals
-//   static Teul::BlipRepeater nextBlip(BLIP_INTERVAL_MS) ;
+//   static TeulTimeMS BLIP_INTERVAL_MS = 5 * 1000; // 5 second intervals
+//   static Teul::BlipRepeater nextBlip(BLIP_INTERVAL_MS);
 //   if ( nextBlip )
 //   {
 //     // some work to do every 5 seconds
@@ -26,19 +26,18 @@ class BlipRepeater
 {
 public:
 	BlipRepeater(TeulTimeMS interval) : m_interval(interval), m_nextBlip(0LL) {}
-	bool operator()() { return bool() ; }
-	operator bool()
+	bool Ready()
 	{
 		if ( teulClock64 < m_nextBlip )
-			return false ;
-		m_nextBlip = teulClock64 + m_interval ;
-		return true ;
+			return false;
+		m_nextBlip = teulClock64 + m_interval;
+		return true;
 	}
 
 private:
-	TeulTimeMS	m_interval ;
-	TeulTimeMS	m_nextBlip ;
-} ;
+	TeulTimeMS	m_interval;
+	TeulTimeMS	m_nextBlip;
+};
 
 }
 

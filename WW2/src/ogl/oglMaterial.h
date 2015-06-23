@@ -78,7 +78,7 @@ public:
     inline void SetShader(const std::string name)
     {
         shadername = name;
-        program = NULL;
+        program = nullptr;
         wantshader = true;
     }
 
@@ -90,7 +90,7 @@ public:
 
     inline bool HasShader()
     {
-        return !shadername.empty() || program != NULL;
+        return !shadername.empty() || program != nullptr;
     }
 
     inline int GetTexture(int unit)

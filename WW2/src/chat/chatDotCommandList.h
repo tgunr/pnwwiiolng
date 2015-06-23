@@ -9,43 +9,43 @@
 
 namespace Chat
 {
-	typedef unsigned short cmdcount_t ;
+	typedef unsigned short cmdcount_t;
 
 	struct HostCommand
 	{
-		UCHAR			playnetOnly ;	// 0 for normal users, 1 for playnet only
-		std::string 	command ;		// The command itself.
-		SINT32			usage ;			// usage help (lstr id)
-		SINT32			detail ;		// more detailed help (lstr id)
-	} ;
+		UCHAR			playnetOnly;	// 0 for normal users, 1 for playnet only
+		std::string 	command;		// The command itself.
+		SINT32			usage;			// usage help (lstr id)
+		SINT32			detail;			// more detailed help (lstr id)
+	};
 
-	typedef std::vector<HostCommand> HostCommands ;
+	typedef std::vector<HostCommand> HostCommands;
 
 	static inline HostCommands GetHostCommandsFromStream(const UCHAR* source)
 	{
-		HostCommands cmdList ;
+		HostCommands cmdList;
 
 		// Starts with a command count.
-		const cmdcount_t& numCommands = *(cmdcount_t*)source ;
-		source += sizeof(numCommands) ;
+		const cmdcount_t& numCommands = *(const cmdcount_t*)source;
+		source += sizeof(numCommands);
 
-		cmdList.resize(numCommands) ;
+		cmdList.resize(numCommands);
 
-		for ( size_t i = 0 ; i < numCommands ; ++i )
+		for ( size_t i = 0; i < numCommands; ++i )
 		{
-			HostCommand& cur = cmdList[i] ;
-			cur.playnetOnly = Teul::ExtractAndAdvance<const UCHAR>(source) ;
+			HostCommand& cur = cmdList[i];
+			cur.playnetOnly = Teul::ExtractAndAdvance<const UCHAR>(source);
 
-			cur.command = (char*)source ;
+			cur.command = reinterpret_cast<const char*>(source);
 			// Size (bytes) plus zero.
-			source += cur.command.size() + 1 ;
+			source += cur.command.size() + 1;
 
-			cur.usage = Teul::ExtractAndAdvance<SINT16>(source) ;
-			cur.detail = Teul::ExtractAndAdvance<SINT16>(source) ;
+			cur.usage = Teul::ExtractAndAdvance<SINT16>(source);
+			cur.detail = Teul::ExtractAndAdvance<SINT16>(source);
 		}
 
-		return cmdList ;
+		return cmdList;
 	}
 
-	extern HostCommands g_hostDotCommands ;
+	extern HostCommands g_hostDotCommands;
 }

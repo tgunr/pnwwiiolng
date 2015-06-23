@@ -46,7 +46,7 @@ public:
 	void SetParentMenu(ContextMenu* parent){ _parentmenu = parent; }
 	void SetLastOverMenu(ContextMenu* lastover){ _lastovermenu = lastover; }
 	ContextMenu* GetRootMenu(){ return (_rootmenu) ? _rootmenu: (ContextMenu*)this; }
-	ContextMenu* GetParentMenu(){ return (_parentmenu) ? dynamic_cast<ContextMenu*>(_parentmenu): NULL; }
+	ContextMenu* GetParentMenu(){ return (_parentmenu) ? dynamic_cast<ContextMenu*>(_parentmenu): nullptr; }
 	ContextMenu* GetLastOverMenu(){ return _lastovermenu; }
 	MenuItems* GetSubMenus(){ return _submenus; }
 	

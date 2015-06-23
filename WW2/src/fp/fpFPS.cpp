@@ -69,21 +69,7 @@
 #undef TESTING_SCOPE
 //#define TESTING
 
-#if defined(USE_OSG)
-#include "osgFX/fxSound.h"
-#include "osgPlayer/playerMain.h"
-#include "osgPlayer/Player.h"
-#include "osgStub/vehStub.h"
-#include "infantryNode.h"
-#include "osgInfantry/ClientInfantryController.h"
-#else
 #include "fx/fxSnd.h"
-#endif
-
-#if defined(USE_OSG)
-#undef PI
-#define PI osg::PI
-#endif
 
 static float WEAPON_LAG_VMAX		= 6.0f; // max from center
 static float WEAPON_LAG_HMAX		= 6.0f; // max from center
@@ -446,15 +432,10 @@ static UINT32 _ppoCheck = 0;
 // how steep a hill are we going UP
 static FLOAT32 _steepness = 0.0f;
 
-static ScenarioVolume* _volumeCollider = NULL;
-static trnCDTerrainObject* _lastCollision = NULL;
+static ScenarioVolume* _volumeCollider = nullptr;
+static trnCDTerrainObject* _lastCollision = nullptr;
 
-#if defined(USE_OSG)
-static int _checkdeploy(int direction, int plane = 1); // 1 = xy (horiz), 2 = zy (vert)
-static void _updateOverlays();
-#else
 static bool _candeploy(int direction);
-#endif
 static void _calculateConvergenceAngle(int weaponIndex = -1); // 0 - 9
 static void _selectBestAmmo(SINT32 weaponNumber, weapWeapon* weapon);
 static void _updateFPSColliders();
@@ -481,19 +462,19 @@ static piVECTOR _leftp1,_leftp2;
 fpPersonData* fpGetFPPersonDataPtr()
 {
 	mlVehicleData* vehicleData = persGetPersonaModelDataPtr();
-	return (vehicleData) ? (fpPersonData*) vehicleData->PersonData : NULL;
+	return (vehicleData) ? (fpPersonData*) vehicleData->PersonData : nullptr;
 }
 
 // Save a call to persGetPersonaModelDataPtr if you already have this pointer
 fpPersonData* fpGetFPPersonDataPtr(mlVehicleData* fromVehicleData)
 {
-	assert(fromVehicleData != NULL);
+	assert(fromVehicleData != nullptr);
 	return (fpPersonData*)(fromVehicleData->PersonData);
 }
 
 void fpFPSInit(vehVehicle*vehicle)
 {
-	SCHAR*		pPtr = NULL;
+	SCHAR*		pPtr = nullptr;
 
 	SINT32		countryID;
 
@@ -516,7 +497,7 @@ void fpFPSInit(vehVehicle*vehicle)
 	aimVertAngle = 0.0;
 	aimVertAngleOffset = 0.0;
 
-	currentGameWeapon = NULL;
+	currentGameWeapon = nullptr;
 
 	persClearGunsights();
 	// Load Binoculars
@@ -539,7 +520,7 @@ void fpFPSInit(vehVehicle*vehicle)
 	memset (secondaryModels, 0, sizeof (secondaryModels));
 	memset (auxModels, 0, sizeof (auxModels));
 	memset (legsModels, 0, sizeof (legsModels));
-	armTexModel = NULL;
+	armTexModel = nullptr;
 	memset (weapDefaultAnim, 0, sizeof (weapDefaultAnim));
 	memset (weapEmptyDefaultAnim, 0, sizeof (weapEmptyDefaultAnim));
 	memset (clipDefaultAnim, 0, sizeof (clipDefaultAnim));
@@ -558,14 +539,14 @@ void fpFPSInit(vehVehicle*vehicle)
 
 	if (isParatroop)
 	{
-		fpsTrooper.isParatroop = TRUE ;
+		fpsTrooper.isParatroop = TRUE;
 		fpsTrooper.parachuteWorn = TRUE;
 		fpsTrooper.parachuteOpen = FALSE;
 		fpsTrooper.parachuteOKToOpen = FALSE;
 	}
 	else
 	{
-		fpsTrooper.isParatroop = FALSE ;
+		fpsTrooper.isParatroop = FALSE;
 		fpsTrooper.parachuteWorn = FALSE;
 		fpsTrooper.parachuteOpen = FALSE;
 		fpsTrooper.parachuteOKToOpen = FALSE;
@@ -734,10 +715,10 @@ void fpFPSInit(vehVehicle*vehicle)
 	prevPose = FPS_POSITION_STAND;
 	currentEyeHeight = fpFPSGetEyeAdjust(FPS_POSITION_STAND);
 
-	currSkelControl		= NULL;
-	currWeapControl		= NULL;
-	currClipControl		= NULL;
-	currRGCupControl	= NULL;
+	currSkelControl		= nullptr;
+	currWeapControl		= nullptr;
+	currClipControl		= nullptr;
+	currRGCupControl	= nullptr;
 
 	mouseLookOn = 0;
 	_collider.Reset();
@@ -875,25 +856,15 @@ LOGICAL fpFPSLoadModels (vehVehicle*vehicle)
 	// ok, now do the FPS specific stuff
 	fpFPSInit(vehicle);
 
-#if defined(USE_OSG)
-	skeletonModel = gr2LoadModelOSG(skel_model, NULL, NULL, 1);
-	armsModels[currentArms] = gr2LoadModelOSG(arm_models[currentArms], skeletonModel, NULL, 1);
-	legsModels[currentArms] = gr2LoadModelOSG(leg_models[currentArms], NULL, NULL, 1);
-#else
-	skeletonModel = gr2Model::Load(skel_model, NULL, NULL, 1);
-	armsModels[currentArms] = gr2Model::Load(arm_models[currentArms], skeletonModel, NULL, 1);
-	legsModels[currentArms] = gr2Model::Load(leg_models[currentArms], NULL, NULL, 1);
-#endif
+	skeletonModel = gr2Model::Load(skel_model, nullptr, nullptr, 1);
+	armsModels[currentArms] = gr2Model::Load(arm_models[currentArms], skeletonModel, nullptr, 1);
+	legsModels[currentArms] = gr2Model::Load(leg_models[currentArms], nullptr, nullptr, 1);
 
 	if (default_arms_tex_names[currentArms])
 	{
 		SINT32		baseArmTexID, replacementArmTexID;
 
-#if defined(USE_OSG)
-		armTexModel = gr2LoadModelOSG(replacement_arms_file, NULL, NULL, 1);
-#else
-		armTexModel = gr2Model::Load(replacement_arms_file, NULL, NULL, 1);
-#endif
+		armTexModel = gr2Model::Load(replacement_arms_file, nullptr, nullptr, 1);
 
 		baseArmTexID = piGetNamedTexture (default_arms_tex_names[currentArms]);
 		replacementArmTexID = piGetNamedTexture (replacement_arms_tex_names[currentArms]);
@@ -920,12 +891,8 @@ LOGICAL fpFPSLoadModels (vehVehicle*vehicle)
 		if (fpsWeapons[weaponID].weaponModel)
 		{
 			//int modelIndex = (strstr(fpsWeapons[weaponID].weaponModel, "gunmesh-g30")) ? 1: 0;
-#if defined(USE_OSG)
-            weaponModels[weaponID] = gr2LoadModelOSG(fpsWeapons[weaponID].weaponModel, NULL, NULL, 1); //, modelIndex
-#else
-            weaponModels[weaponID] = gr2Model::Load(fpsWeapons[weaponID].weaponModel, NULL, NULL, 1); //, modelIndex
-#endif
-            gr2ModelSetEventHandler(weaponModels[weaponID], (OBJECT*)NULL, gr2AnimHandleEvent);
+            weaponModels[weaponID] = gr2Model::Load(fpsWeapons[weaponID].weaponModel, nullptr, nullptr, 1); //, modelIndex
+            gr2ModelSetEventHandler(weaponModels[weaponID], (OBJECT*)nullptr, gr2AnimHandleEvent);
 
 			// hide any hidden meshes
 			if(fpsWeapons[weaponID].hiddenMeshes)
@@ -934,21 +901,17 @@ LOGICAL fpFPSLoadModels (vehVehicle*vehicle)
 				strncpy(line, fpsWeapons[weaponID].hiddenMeshes, 128);
 
 				char* meshName = strtok(line," ,");
-				while(meshName != NULL)
+				while(meshName != nullptr)
 				{
 					gr2SetMeshActiveByName(weaponModels[weaponID], meshName, false);
-					meshName = strtok(NULL, " ,");
+					meshName = strtok(nullptr, " ,");
 				}
 			}
 		}
 
 		if (fpsWeapons[weaponID].clipModel)
 		{
-#if defined(USE_OSG)
-			secondaryModels[weaponID] = gr2LoadModelOSG(fpsWeapons[weaponID].clipModel, NULL, NULL, 1);
-#else
-			secondaryModels[weaponID] = gr2Model::Load(fpsWeapons[weaponID].clipModel, NULL, NULL, 1);
-#endif
+			secondaryModels[weaponID] = gr2Model::Load(fpsWeapons[weaponID].clipModel, nullptr, nullptr, 1);
         }
 
 		for (j=0; j < FPS_NUM_AUX_MODELS; j++)
@@ -956,11 +919,7 @@ LOGICAL fpFPSLoadModels (vehVehicle*vehicle)
 			if (fpsWeapons[weaponID].auxModel[j])
 			{
 				// model index?
-#if defined(USE_OSG)
-				auxModels[weaponID][j] = gr2LoadModelOSG(fpsWeapons[weaponID].auxModel[j], NULL, NULL, 1);
-#else
-				auxModels[weaponID][j] = gr2Model::Load(fpsWeapons[weaponID].auxModel[j], NULL, NULL, 1);
-#endif
+				auxModels[weaponID][j] = gr2Model::Load(fpsWeapons[weaponID].auxModel[j], nullptr, nullptr, 1);
                 gr2SetModelActive(auxModels[weaponID][j], false);
 			}
 		}
@@ -1011,7 +970,7 @@ LOGICAL fpFPSLoadModels (vehVehicle*vehicle)
 	{
 		auxModel[i] = auxModels[currentWeaponModel][i];
 	}
-	legsModel = NULL;
+	legsModel = nullptr;
 
 	if (fpsWeapons[currentWeaponModel].sniperGunSight)
 	{
@@ -1216,7 +1175,7 @@ static fpsWeaponStates _determineNextRifleState()
 fpsWeaponStates fpFPSDetermineNextState ()
 {
 	mlVehicleData*	vehicleData = persGetPersonaModelDataPtr();
-	assert( vehicleData != NULL );
+	assert( vehicleData != nullptr );
 
 	fpsWeaponStates	newState;
 	UINT32			animationStateFlags;
@@ -1332,7 +1291,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 	// no sprinting while doing the stuff specified in the nosprint mask
 	if ((stateFlags & STATE_NOSPRINT_MASK) && (stateFlags & STATE_MOVE_FAST))
 	{
-		stateFlags &= ~(STATE_MOVE_FAST | STATE_NO_ARM_SWAY) ;
+		stateFlags &= ~(STATE_MOVE_FAST | STATE_NO_ARM_SWAY);
 		stateFlags |= STATE_MOVE_SLOW;
 	}
 
@@ -1340,8 +1299,8 @@ fpsWeaponStates fpFPSDetermineNextState ()
 	if ((stateFlags & STATE_SWIMMING) && !(stateFlags & STATE_SIT))
 	{
 		// Flags we need to remove
-		static const UINT32 _FLAGS_TO_REMOVE = STATE_EYE_STAND | STATE_EYE_CROUCH | STATE_AIM ;
-		static const UINT32 _FLAGS_TO_ADD = STATE_EYE_PRONE | STATE_RELAXED ;
+		static const UINT32 _FLAGS_TO_REMOVE = STATE_EYE_STAND | STATE_EYE_CROUCH | STATE_AIM;
+		static const UINT32 _FLAGS_TO_ADD = STATE_EYE_PRONE | STATE_RELAXED;
 
 		if (stateFlags & STATE_MOVE_FAST)
 		{
@@ -1499,7 +1458,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 	// special handling for sprint
 	if (stateFlags & STATE_MOVE_FAST)
 	{
-		persGetHealthStats(NULL, &currentATP, NULL, NULL);
+		persGetHealthStats(nullptr, &currentATP, nullptr, nullptr);
 
 		// if we're sprinting already, let them burn down to atpSprintMinimum ..
 		// don't let them start sprinting, though, until they're at atpSprintAllowAgain
@@ -1701,7 +1660,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 				}
 			}
 
-			fpPPOSet(NULL);
+			fpPPOSet(nullptr);
 
 			if (fpsTrooper.weaponPositionModel[fpsTrooper.nextWeaponNumber] != BINOCS)
 			{
@@ -2618,26 +2577,26 @@ LOGICAL fpFPSCleanupAnimationState ()
 	if (currClipControl)
 	{
 		gr2FreeControl (currClipControl);
-		currClipControl = NULL;
+		currClipControl = nullptr;
 	}
 
 	if (currWeapControl)
 	{
 		gr2FreeControl (currWeapControl);
-		currWeapControl = NULL;
+		currWeapControl = nullptr;
 		gr2UpdateBlendEvents(weapModel);
 	}
 
 	if (currSkelControl)
 	{
 		gr2FreeControl (currSkelControl);
-		currSkelControl = NULL;
+		currSkelControl = nullptr;
 	}
 
 	if(currRGCupControl)
 	{
 		gr2FreeControl(currRGCupControl);
-		currRGCupControl = NULL;
+		currRGCupControl = nullptr;
 	}
 
 	return TRUE;
@@ -2714,11 +2673,7 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 
                     if(fpsWeapons[weapon].reload2Sound)
                     {
-#if defined(USE_OSG)
-                        fxSoundPlayHeadSound(fpsWeapons[weapon].reload2Sound, finite_sound, sound_high);
-#else
-                        fpFPSfxPlayNormalSound(fpsWeapons[weapon].reload2Sound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, NULL, persGetPersonaVehicleObjectDataPtr());
-#endif
+                        fpFPSfxPlayNormalSound(fpsWeapons[weapon].reload2Sound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, nullptr, persGetPersonaVehicleObjectDataPtr());
                     }
 
 				    repeatCount = 1;
@@ -2730,11 +2685,7 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 
                     if(fpsWeapons[weapon].reload3Sound)
                     {
-#if defined(USE_OSG)
-                        fxSoundPlayHeadSound(fpsWeapons[weapon].reload3Sound, finite_sound, sound_high);
-#else
-                        fpFPSfxPlayNormalSound(fpsWeapons[weapon].reload3Sound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, NULL, persGetPersonaVehicleObjectDataPtr());
-#endif
+                        fpFPSfxPlayNormalSound(fpsWeapons[weapon].reload3Sound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, nullptr, persGetPersonaVehicleObjectDataPtr());
                     }
 
                     repeatCount = 1;
@@ -2753,11 +2704,7 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 
 				if (fpsWeapons[currentWeaponModel].reload2Sound)
 				{
-#if defined(USE_OSG)
-                    fxSoundPlayHeadSound(fpsWeapons[currentWeaponModel].reload2Sound, finite_sound, sound_high);
-#else
-					fpFPSfxPlayNormalSound (fpsWeapons[currentWeaponModel].reload2Sound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, NULL, persGetPersonaVehicleObjectDataPtr());
-#endif
+					fpFPSfxPlayNormalSound (fpsWeapons[currentWeaponModel].reload2Sound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, nullptr, persGetPersonaVehicleObjectDataPtr());
 				}
 
 				repeatCount = 1;
@@ -2768,11 +2715,7 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 
 				if (fpsWeapons[currentWeaponModel].reload3Sound)
 				{
-#if defined(USE_OSG)
-                    fxSoundPlayHeadSound(fpsWeapons[currentWeaponModel].reload3Sound, finite_sound, sound_high);
-#else
-					fpFPSfxPlayNormalSound (fpsWeapons[currentWeaponModel].reload3Sound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, NULL, persGetPersonaVehicleObjectDataPtr());
-#endif
+					fpFPSfxPlayNormalSound (fpsWeapons[currentWeaponModel].reload3Sound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, nullptr, persGetPersonaVehicleObjectDataPtr());
                 }
 
 				repeatCount = 1;
@@ -2870,11 +2813,7 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 				SCHAR* reloadSound = fpsWeapons[currentWeaponModel].reloadSound;
 				if (reloadSound)
 				{
-#if defined(USE_OSG)
-                    fxSoundPlayHeadSound(reloadSound, finite_sound, sound_high);
-#else
-					fpFPSfxPlayNormalSound (reloadSound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, NULL, persGetPersonaVehicleObjectDataPtr());
-#endif
+					fpFPSfxPlayNormalSound (reloadSound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, nullptr, persGetPersonaVehicleObjectDataPtr());
 				}
 			}
 			else
@@ -2980,7 +2919,7 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 	}
 	else
 	{
-		currClipControl = NULL;
+		currClipControl = nullptr;
 	}
 
 	if (currClipControl)
@@ -3033,7 +2972,7 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 	}
 	else
 	{
-		currWeapControl = NULL;
+		currWeapControl = nullptr;
 		gr2UpdateBlendEvents(weapModel);
 	}
 
@@ -3096,7 +3035,7 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
 	}
 	else
 	{
-		currSkelControl = NULL;
+		currSkelControl = nullptr;
 	}
 
 	if (currSkelControl)
@@ -3871,7 +3810,7 @@ FLOAT32 fpFPSGetBulletDispersion()
 	speed = (FLOAT32) (mathExactVectorLength(&(pVehicleData->VehicleVel)));
 	speedFactor = std::min(1.0f, (fpsWeapons[currentWeaponModel].speedMultiplier * speed * speed * speed));
 
-	persGetHealthStats(NULL, &currentATP, NULL, NULL);
+	persGetHealthStats(nullptr, &currentATP, nullptr, nullptr);
 
 	// at 100%, 0% extra error
 	// at 90%, 23% extra error
@@ -4013,7 +3952,7 @@ void fpFPSGetWobble(FLOAT32* horizWobble, FLOAT32* vertWobble, FLOAT32*	horizAng
 	}
 
 	deltaTime = (frametime - lastCalcTime) / 1000.0f;
-	persGetHealthStats(NULL, &currentATP, NULL, NULL);
+	persGetHealthStats(nullptr, &currentATP, nullptr, nullptr);
 
 	bool aiming = (stateFlags & STATE_AIM);
 
@@ -4022,12 +3961,8 @@ void fpFPSGetWobble(FLOAT32* horizWobble, FLOAT32* vertWobble, FLOAT32*	horizAng
 	{
 		if ((totalAimTime == 0) && (fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_AUTO_RIFLE || ((fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_RIFLE) && (!(fpsWeapons[currentWeaponModel].auxEnable[FPS_AUX_RGCUP])))))
 		{
-#if defined(USE_OSG)
-            fxSoundPlayHeadSound(fpsTrooper.aimBreathSound, finite_sound, sound_high);
-#else
 			if(!persIsTired())
-				fpsTrooper.breathSoundID = fpFPSfxPlayNormalSound (fpsTrooper.aimBreathSound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, NULL, persGetPersonaVehicleObjectDataPtr());
-#endif
+				fpsTrooper.breathSoundID = fpFPSfxPlayNormalSound (fpsTrooper.aimBreathSound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, nullptr, persGetPersonaVehicleObjectDataPtr());
 		}
 
 		totalAimTime += deltaTime;
@@ -4058,11 +3993,7 @@ void fpFPSGetWobble(FLOAT32* horizWobble, FLOAT32* vertWobble, FLOAT32*	horizAng
 	{
         if(fpsTrooper.breathSoundID > 0)
         {
-#if defined(USE_OSG)
-            fxSoundStopSound(fpsTrooper.breathSoundID);
-#else
             fxSndStopSound(fpsTrooper.breathSoundID);
-#endif
             fpsTrooper.breathSoundID = 0;
         }
 
@@ -4434,7 +4365,7 @@ AmmoTrajectory* fpFPSGetTrajectory()
 	static AmmoTrajectory _trajectory;
 
     if(!fpFPSCanProjectGrenade())
-        return NULL;
+        return nullptr;
 
 	if(frametime <= lastUpdate)
 		return &_trajectory;
@@ -4630,7 +4561,7 @@ LOGICAL fpFPSUpdatePerson(mlVehicleData* pVehicleData, FLOAT64 deltaTime)
 	// handle movement
 	movementStateFlags = stateFlags & STATE_MOVEMENT_MASK;
 
-	persGetHealthStats(NULL, &currentATP, NULL, NULL);
+	persGetHealthStats(nullptr, &currentATP, nullptr, nullptr);
 
 	if (stateFlags & STATE_WALK)
 		forwardSpeedValue = FPS_SPEED_WALK;
@@ -5096,11 +5027,11 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 	bool prone = (fpFPSGetPlayerPose() == POSE_PRONE);
 
 	vehVehicle* player = persGetPersonaVehiclePtr();
-	if(player == NULL) return;
+	if(player == nullptr) return;
 
 	UINT32 newCollisionFlags = 0;
-	StratDB::StratObject* captureStrat = NULL;
-	StratDB::StratObject* nofireStrat = NULL;
+	StratDB::StratObject* captureStrat = nullptr;
+	StratDB::StratObject* nofireStrat = nullptr;
 
 	// setup rays
 	Vec3d up				= Vec3d(0,0,1.0f);
@@ -5126,7 +5057,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 	_collider.groundHit.x	= pos.x();
 	_collider.groundHit.y	= pos.y();
 	_collider.groundHit.z	= pos.z();
-	_collider.objectHit		= NULL;
+	_collider.objectHit		= nullptr;
 
 	// convert to the physical world
 	pos = physicsGameToPhysical(pos);
@@ -5150,8 +5081,8 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 	FLOAT32 wadeZ = -10000;
 	FLOAT32 wading = 0;
 
-	ScenarioVolume* currentVolume = NULL;
-	trnCDTerrainObject* currentTO = NULL;
+	ScenarioVolume* currentVolume = nullptr;
+	trnCDTerrainObject* currentTO = nullptr;
 
 	// resuse dir to indicate our normalized velocity vector in the xy plane
 	dir.z() = 0;
@@ -5193,8 +5124,8 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 		{
 			// get all collisions and loop over them for inspection
 			const colliderQuery::CollisionList& hits = collider->getCollisions();
-			const colliderQuery::Collision* best = NULL;
-			const colliderQuery::Collision* walk = NULL;
+			const colliderQuery::Collision* best = nullptr;
+			const colliderQuery::Collision* walk = nullptr;
 
 			tHitCount += hits.size();
 
@@ -5287,13 +5218,13 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 						if(!nofireStrat && colliderIsType(categoryBits, COLLIDER_NOFIRE) && fabs(hit.pos.z() - myZ) <= 1.0f)
 						{
 							trnCDTerrainObject* TO = colliderSpaceData<trnCDTerrainObject>(hit.g2);
-							nofireStrat	= (TO) ? TO->StratObj() : NULL;
+							nofireStrat	= (TO) ? TO->StratObj() : nullptr;
 						}
 
 						if(!captureStrat && colliderIsType(categoryBits, COLLIDER_CAPTURE) && fabs(hit.pos.z() - myZ) <= 1.0f)
 						{
 							trnCDTerrainObject* TO = colliderSpaceData<trnCDTerrainObject>(hit.g2);
-							captureStrat = (TO) ? TO->StratObj() : NULL;
+							captureStrat = (TO) ? TO->StratObj() : nullptr;
 						}
 					}
 					break;
@@ -5417,7 +5348,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 						// throw this contact out?
 						if(throwOut)
 						{
-							colliderDebugContact(hit.pos, normal, colorBLACKALPHA, NULL, depth);
+							colliderDebugContact(hit.pos, normal, colorBLACKALPHA, nullptr, depth);
 							continue;
 						}
 						else
@@ -5455,13 +5386,13 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 							// debug it
 							if(klass == dRayClass)
 							{
-								colliderDebugContact(hit.pos, normal, colorBLUEALPHA, NULL, depth);
-								//colliderDebugContact(hit.pos, thisPush, colorCYANALPHA, NULL, hit.depth);
+								colliderDebugContact(hit.pos, normal, colorBLUEALPHA, nullptr, depth);
+								//colliderDebugContact(hit.pos, thisPush, colorCYANALPHA, nullptr, hit.depth);
 							}
 							else
 							{
-								colliderDebugContact(hit.pos, normal, colorREDALPHA, NULL, depth);
-								//colliderDebugContact(hit.pos, thisPush, colorMAGENTAALPHA, NULL, hit.depth);
+								colliderDebugContact(hit.pos, normal, colorREDALPHA, nullptr, depth);
+								//colliderDebugContact(hit.pos, thisPush, colorMAGENTAALPHA, nullptr, hit.depth);
 							}
 
 							if(false && lastNormal.length2())
@@ -5587,7 +5518,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 		{
 			ServerTrackedObject* sto = wwiiGetSTO(_ppoLastHit);
 
-			if(sto != NULL && sto->type() == ServerTrackedObject::_PPO)
+			if(sto != nullptr && sto->type() == ServerTrackedObject::_PPO)
 			{
 				PlayerPlacedSTO* ppo = dynamic_cast<PlayerPlacedSTO*>(sto);
 				ppo->leave();
@@ -5600,7 +5531,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 		{
 			ServerTrackedObject* sto = wwiiGetSTO(ppoHit);
 
-			if(sto != NULL && sto->type() == ServerTrackedObject::_PPO)
+			if(sto != nullptr && sto->type() == ServerTrackedObject::_PPO)
 			{
 				PlayerPlacedSTO* ppo = dynamic_cast<PlayerPlacedSTO*>(sto);
 				ppo->enter();
@@ -5627,7 +5558,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 #endif
 
 	/*
-	static StratDB::StratObject* lastNofireStrat = NULL;
+	static StratDB::StratObject* lastNofireStrat = nullptr;
 
 	if(lastNofireStrat != nofireStrat)
 	{
@@ -5723,11 +5654,11 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 	noFire = false;
 
 	vehVehicle* player = persGetPersonaVehiclePtr();
-	if(player == NULL) return;
+	if(player == nullptr) return;
 
 	UINT32 newCollisionFlags = 0;
-	StratDB::StratObject* captureStrat = NULL;
-	StratDB::StratObject* nofireStrat = NULL;
+	StratDB::StratObject* captureStrat = nullptr;
+	StratDB::StratObject* nofireStrat = nullptr;
 
 	// setup rays
 	Vec3d velocity			= Vec3d(player->ModelData->VehicleVel);
@@ -5741,12 +5672,12 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 	collider.groundHit.x	= pos.x();
 	collider.groundHit.y	= pos.y();
 	collider.groundHit.z	= badZ;
-	collider.objectHit		= NULL;
+	collider.objectHit		= nullptr;
 
 	// convert to the physical world
 	pos = physicsGameToPhysical(pos);
 
-	colliderQuery::dGeomList& geoms = collider.geoms() ;
+	colliderQuery::dGeomList& geoms = collider.geoms();
 
 	dMatrix3 dAttitude;
 	MatrixTodMatrix(attitude, dAttitude);
@@ -5780,7 +5711,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 	bool recentRider = (fpsTrooper.lastUnrideTime && ((frametime - fpsTrooper.lastUnrideTime) <= 3000));
 	bool considerVehicles = !recentRider;
 
-	UINT32 ceilingFlags = (considerVehicles) ? COLLIDER_MANMADE_MASK|COLLIDER_DRIVABLE_MASK : COLLIDER_MANMADE_MASK ;
+	UINT32 ceilingFlags = (considerVehicles) ? COLLIDER_MANMADE_MASK|COLLIDER_DRIVABLE_MASK : COLLIDER_MANMADE_MASK;
 
 	Vec3d up = Vec3d(0, 0, 1.0f);
 	float ceiling = (float)collideRay(ceilingFlags, .75f, pos, up, true);
@@ -5845,8 +5776,8 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 	{
 		// get all collisions and loop over them for inspection
 		const colliderQuery::CollisionList& hits = collider.getCollisions();
-		const colliderQuery::Collision* best = NULL;
-		const colliderQuery::Collision* walk = NULL;
+		const colliderQuery::Collision* best = nullptr;
+		const colliderQuery::Collision* walk = nullptr;
 
 		tHitCount += (int)hits.size();
 
@@ -5908,13 +5839,13 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 					if(!nofireStrat && colliderIsType(category2, COLLIDER_NOFIRE) && fabs(hit.pos.z() - myZ) <= 1.0f)
 					{
 						trnCDTerrainObject* TO = colliderSpaceData<trnCDTerrainObject>(hit.g2);
-						nofireStrat	= (TO) ? TO->StratObj() : NULL;
+						nofireStrat	= (TO) ? TO->StratObj() : nullptr;
 					}
 
 					if(!captureStrat && colliderIsType(category2, COLLIDER_CAPTURE) && fabs(hit.pos.z() - myZ) <= 1.0f)
 					{
 						trnCDTerrainObject* TO = colliderSpaceData<trnCDTerrainObject>(hit.g2);
-						captureStrat = (TO) ? TO->StratObj() : NULL;
+						captureStrat = (TO) ? TO->StratObj() : nullptr;
 					}
 				}
 
@@ -5996,7 +5927,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 				// throw out contacts with normals in the direction of our velocity
 				if(angle > .1)
 				{
-					colliderDebugContact(hit, colorBLACKALPHA, NULL, hit.depth);
+					colliderDebugContact(hit, colorBLACKALPHA, nullptr, hit.depth);
 					continue;
 				}
 				else
@@ -6027,11 +5958,11 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 
 					// red in front, magenta in back
 					if(hit.g1 == collider.geom(5))
-						colliderDebugContact(hit, colorREDALPHA, NULL, hit.depth);
+						colliderDebugContact(hit, colorREDALPHA, nullptr, hit.depth);
 					else if(hit.g1 == collider.geom(6))
-						colliderDebugContact(hit, colorMAGENTAALPHA, NULL, hit.depth);
+						colliderDebugContact(hit, colorMAGENTAALPHA, nullptr, hit.depth);
 					else
-						colliderDebugContact(hit, colorBLUEALPHA, NULL, hit.depth);
+						colliderDebugContact(hit, colorBLUEALPHA, nullptr, hit.depth);
 				}
 
 				//pcount++;
@@ -6101,7 +6032,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 		{
 			ServerTrackedObject* sto = wwiiGetSTO(_ppoLastHit);
 
-			if(sto != NULL && sto->type() == ServerTrackedObject::_PPO)
+			if(sto != nullptr && sto->type() == ServerTrackedObject::_PPO)
 			{
 				PlayerPlacedSTO* ppo = dynamic_cast<PlayerPlacedSTO*>(sto);
 				ppo->leave();
@@ -6112,7 +6043,7 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 		{
 			ServerTrackedObject* sto = wwiiGetSTO(ppoHit);
 
-			if(sto != NULL && sto->type() == ServerTrackedObject::_PPO)
+			if(sto != nullptr && sto->type() == ServerTrackedObject::_PPO)
 			{
 				PlayerPlacedSTO* ppo = dynamic_cast<PlayerPlacedSTO*>(sto);
 				ppo->enter();
@@ -6259,18 +6190,6 @@ LOGICAL fpFPSUpdate ()
 	// DEG
 	int changed = fpFPSUpdateState();
 
-#if defined(USE_OSG)
-	// update our models if we're in another viewmode; this ensures
-	// everything keeps getting updated because normalview updating
-	// happens at the draw call, but if we're in another viewmode,
-	// the models aren't drawn and hence updated, so we do it here
-	if(playerGetPlayer()->GetViewMode() != Player::NORMALVIEW)
-		fpFPSUpdateModels();
-
-	// update our overlays as needed
-	_updateOverlays();
-#endif
-
 	if(gEZMode && EZ_MGR)
 	{
 		FLOAT32 hl = (FLOAT32)fabs(horizWeaponLag / WEAPON_LAG_HMAX);
@@ -6284,7 +6203,7 @@ LOGICAL fpFPSUpdate ()
 		return (FALSE);
 
 	// go ahead and update the eye here too
-	fpFPSGetEyeMatrix (NULL);
+	fpFPSGetEyeMatrix (nullptr);
 
 	// Handle Weapon Firing
 	fpFPSWeaponFire(persGetPersonaModelDataPtr());
@@ -6821,7 +6740,7 @@ static bool _poseCheck()
 
 			// grab current level
 			FLOAT32 currentATP = 0;
-			persGetHealthStats(NULL, &currentATP, NULL, NULL);
+			persGetHealthStats(nullptr, &currentATP, nullptr, nullptr);
 
 			// calculate hit
 			poseChangeATPEffect = _atpHit * severity * delta;
@@ -6860,7 +6779,7 @@ static bool _toProneCheck()
 		return false;
 
 	vehVehicle* player = persGetPersonaVehiclePtr();
-	if(player == NULL) return false;
+	if(player == nullptr) return false;
 
 	// which way are we moving
 	Vec3d dir = Vec3d(player->ModelData->VehicleVel);
@@ -6932,7 +6851,7 @@ static bool _toPoseCheck2(int pose)
 	if(!_poseCheck())
 		return false;
 
-	FPSCollider* collider = NULL;
+	FPSCollider* collider = nullptr;
 
 	// check colliders
 	switch(pose)
@@ -6949,7 +6868,7 @@ static bool _toPoseCheck2(int pose)
 	bool prone = (fpFPSGetPlayerPose() == POSE_PRONE);
 
 	vehVehicle* player = persGetPersonaVehiclePtr();
-	if(player == NULL) return false;
+	if(player == nullptr) return false;
 
 	// setup rays
 	Vec3d up				= Vec3d(0,0,1.0f);
@@ -7029,13 +6948,13 @@ static bool _toPoseCheck2(int pose)
 				if(fabs(normal.z()) >= .9f)
 					throwOut = true;
 
-				colliderDebugContact(hit.pos, normal, colorBLACKALPHA, NULL, hit.depth);
+				colliderDebugContact(hit.pos, normal, colorBLACKALPHA, nullptr, hit.depth);
 
 				// throw this contact out?
 				if(throwOut)
 					continue;
 
-				colliderDebugContact(hit.pos, normal, colorREDALPHA, NULL, hit.depth);
+				colliderDebugContact(hit.pos, normal, colorREDALPHA, nullptr, hit.depth);
 
 				// we hit something so bail
 				return false;
@@ -7808,177 +7727,6 @@ static void fpFPSHorizAxisLook (SINT32 param, UINT32 data)
 //	Write_Log (LOG_FPS, LOG_INFO, "HorizAxisParam = %d", param);
 }
 
-#if defined(USE_OSG)
-static void fpFPSAxisRotation (SINT32 param, UINT32 id)
-{
-	mlVehicleData*	pVehicleData = persGetPersonaModelDataPtr();
-
-	if (param)
-	{
-		if (id == IMAP_ASX_FP_TORSO_VERTICAL_AXIS)
-		{
-			static FLOAT64 lastDeployAngle;
-			FLOAT32 maxUpAngle, maxDownAngle;
-			FLOAT64	angleChange = param * fpsTrooper.mouseGranularity * fpsTrooper.vertGranularityMultiplier;
-
-			// this is because when we're sitting, our rotations are in the coordinate system of the
-			// vehicle, and we need to flip this to get there
-			// aka .. fixme, yuck
-			if (stateFlags & STATE_SIT)
-				angleChange = -angleChange;
-
-			fpFPSGetEyeUpDownRange(&maxUpAngle, &maxDownAngle);
-
-			if(HAS_ALL_BITS(stateFlags, STATE_DEPLOYED | STATE_EYE_PRONE) && fpsWeapons[currentWeaponModel].staticDeploy)
-			{
-				fpFPSSetVerticalDeployedPosition (aimVerticalDeployedPosition - param);
-				// this handles everything that needs to be handled, so we can return and skip a few instructions
-				return;
-			}
-			else
-			{
-				aimVertAngle += angleChange;
-
-				fpFPSAddWeaponLag(AROUND_X, -angleChange);
-
-				if (aimVertAngle > maxDownAngle)
-					aimVertAngle = maxDownAngle;
-				else if (aimVertAngle < maxUpAngle)
-					aimVertAngle = maxUpAngle;
-
-                bool deployed = (stateFlags & (STATE_DEPLOYED | STATE_EYE_PRONE)) == STATE_DEPLOYED;
-
-				if(deployed)
-				{
-					int ok = _checkdeploy(param, 2);
-
-					if(ok)
-					{
-						if(ok == 1)
-							lastDeployAngle = aimVertAngle;
-					}
-					else
-					{
-						aimVertAngle = lastDeployAngle;
-					}
-				}
-
-				fpFPSAdjustTurretElevation (pVehicleData, maxUpAngle, maxDownAngle);
-			}
-		}
-		else if (id == IMAP_ASX_FP_TORSO_HORIZONTAL_AXIS)
-		{
-			if(fpsWeapons[currentWeaponModel].staticDeploy &&
-               stateFlags & STATE_DEPLOYED &&
-               stateFlags & STATE_EYE_PRONE)
-			{
-				fpFPSSetHorizontalDeployedPosition (aimHorizontalDeployedPosition + param);
-			}
-			else
-			{
-				static FLOAT64 lastDeployYaw = 0;
-
-				FLOAT64		rotationSpeed;
-				FLOAT64		deltaTime;
-				FLOAT64		maxRotationSpeed;
-
-				rotationSpeed = param * fpsTrooper.mouseGranularity;
-				deltaTime = ((frametime - lastframetime)/1000.0);
-
-				if (param < 0)
-					rotationSpeed *= -1.0;
-
-				if ((stateFlags & STATE_TURN_LEFT) || (stateFlags & STATE_TURN_RIGHT))
-				{
-					maxRotationSpeed = fpsTrooper.maxRotationSpeed - fpsTrooper.keyRotationSpeed;
-				}
-				else
-				{
-					maxRotationSpeed = fpsTrooper.maxRotationSpeed;
-				}
-
-				//rotationSpeed = (rotationSpeed > maxRotationSpeed) ? maxRotationSpeed * deltaTime: rotationSpeed * deltaTime;
-				if ((rotationSpeed/deltaTime) > maxRotationSpeed)
-					rotationSpeed = maxRotationSpeed * deltaTime;
-
-				if (param < 0)
-					rotationSpeed *= -1.0;
-
-				fpFPSAddWeaponLag(AROUND_Z, -rotationSpeed);
-
-				/*
-                bool deployed = !(stateFlags & STATE_EYE_PRONE) &&
-                                 (stateFlags & STATE_DEPLOYED) &&
-                                 fpsWeapons[currentWeaponModel].deployPivotBone;
-				*/
-
-                bool deployed = !(stateFlags & STATE_EYE_PRONE) &&
-                                 (stateFlags & STATE_DEPLOYED);
-
-				deployed = (currentWeaponModel == BINOCS) ?
-							(deployed && fpsWeapons[lastWeaponModel].deployPivotBone):
-							(deployed && fpsWeapons[currentWeaponModel].deployPivotBone);
-
-				int ok = 1;
-
-				if(deployed)
-				{
-					ok = _checkdeploy(param, 1);
-
-					/*
-					if(ok)
-					{
-						if(ok == 1)
-							lastDeployYaw = pVehicleData->LastVehicleAtt.Yaw;
-					}
-					else
-					{
-						//pVehicleData->VehicleAtt.Yaw = lastDeployYaw;
-						//pVehicleData->LastVehicleAtt.Yaw = lastDeployYaw;
-					}
-					*/
-
-				}
-
-                if(ok)
-				{
-				    // granularity converts to degrees, so multiplier needed for yaw, which is in radians
-				    pVehicleData->VehicleAtt.Yaw -= rotationSpeed*PI/180.0;
-
-				    // Make sure we don't go past the bounds of the Yaw
-				    while(pVehicleData->VehicleAtt.Yaw > PI)
-				    {
-					    pVehicleData->VehicleAtt.Yaw -= 2 * PI;
-				    }
-
-				    while(pVehicleData->VehicleAtt.Yaw < -PI)
-				    {
-					    pVehicleData->VehicleAtt.Yaw += 2 * PI;
-				    }
-
-					if(ok == 1) lastDeployYaw = pVehicleData->VehicleAtt.Yaw;
-                }
-			}
-		}
-
-		if(pVehicleData->VehicleMasterPtr->RideVehicleHostIndex > 0)
-		{
-			vehVehicle* FPSRideVehicle = vehFindVehicle(pVehicleData->VehicleMasterPtr->RideVehicleHostIndex);
-			if(FPSRideVehicle)
-				fpSaveRelRidePos(FPSRideVehicle, pVehicleData->VehicleMasterPtr);
-		}
-	}
-	else
-	{
-#ifdef TESTING
-		if (id == IMAP_ASX_FP_TORSO_VERTICAL_AXIS)
-			int i = 0;
-		else if (id == IMAP_ASX_FP_TORSO_HORIZONTAL_AXIS)
-			int i = 0;
-#endif //TESTING
-	}
-}
-#else
 static void fpFPSAxisRotation (SINT32 param, UINT32 id)
 {
 	mlVehicleData*	pVehicleData = persGetPersonaModelDataPtr();
@@ -8159,7 +7907,6 @@ static void fpFPSAxisRotation (SINT32 param, UINT32 id)
 #endif
 	}
 }
-#endif
 
 LOGICAL	fpFPSUpdateInfantry(FLOAT64 DeltaTime)
 {
@@ -8182,9 +7929,6 @@ void fpFPSGetInfantryData(fpFPSInfantryData& modelData)
 
 UINT32 fpFPSCheckNewPose(fpFPSPoses poseToCheck)
 {
-#if defined(USE_OSG)
-	return 0; // implement
-#else
 	if(gCustomTerrain)
 	{
 		return 0;
@@ -8193,10 +7937,9 @@ UINT32 fpFPSCheckNewPose(fpFPSPoses poseToCheck)
 	{
 		//	Write_Log (LOG_FPS, LOG_INFO, "Checking pose %d", poseToCheck);
 		mlVehicleData*	vehicleData = persGetPersonaModelDataPtr();
-		FLOAT64VECTOR	zeroVel = { 0, 0, 0 } ;
+		FLOAT64VECTOR	zeroVel = { 0, 0, 0 };
 		return (mlDetermineInfantryCollisions(vehicleData, &zeroVel, (UINT32)poseToCheck, FALSE));
 	}
-#endif
 }
 
 void fpFPSDeployChange ()
@@ -8321,21 +8064,7 @@ LOGICAL fpFPSHandleControls ()
 	{
 		fireState = FIRE_OFF;
 	}
-#if FRES
-	if ((currentWeaponModel == RPG7))
-	{
-		if (aimState != AIM_ON)
-		{
-			controlStateFlags &= ~FPS_FIRE;
-			fireState = FIRE_OFF;
-		}
-		controlStateFlags &= ~FPS_LEAN_RIGHT;
-		controlStateFlags &= ~FPS_LEAN_LEFT;
 
-
-	}
-
-#endif
 	if (controlStateFlags & FPS_STRAFE_RIGHT)
 	{
 		// right strafe gets priority this way
@@ -8979,7 +8708,7 @@ void fpFPSFireResupply (mlVehicleData* pVehicleData, FLOAT64VECTOR* pFirePos, pi
 	V2.y = (FLOAT32)(endPos.y - WorldOriginOffset.y);
 	V2.z = (FLOAT32)(endPos.z);
 
-	if (trncdCollideWithVehiclesAndTerrain(&V1, &V2, NULL, NULL, NULL, &collideVehicle, NULL, FALSE, FALSE, TRUE) == TRUE)
+	if (trncdCollideWithVehiclesAndTerrain(&V1, &V2, nullptr, nullptr, nullptr, &collideVehicle, nullptr, FALSE, FALSE, TRUE) == TRUE)
 	{
 		// check to see if we poked an infantry of the same country
 		if ((collideVehicle) && (playerVehicle->Side == collideVehicle->Side) && (collideVehicle->VehicleType->Type == VEH_TYPE_PERSON))
@@ -9003,37 +8732,30 @@ void fpFPSFireResupply (mlVehicleData* pVehicleData, FLOAT64VECTOR* pFirePos, pi
 
 static bool _isValidRepairTarget(const trnCDTerrainObject* TO)
 {
-	if ( NULL == TO )
-		return false ;
+	if ( nullptr == TO )
+		return false;
 
 	// Bridges are valid, but we ought to check for a defend objective.
 	// FIXME - check for objective here
 	// need the new strat db to be loaded for this
 	if ( TO->ObjId.objClass == CLASS_CP && TO->ObjId.objType == CP_BRIDGE )
-		return true ;
+		return true;
 
 	// You can also repair auto-gunners
 	if ( TO->ObjId.objClass == CLASS_BUILDING && TO->ObjId.objType == BUILDING_AUTOGUNNER )
 	{
 		// It must be destroyed
 		if ( TO->DamageLevel < 1 )
-			return false ;
-
-		vehVehicle*playerVehicle = persGetPersonaVehiclePtr() ;
-		// And it oughta be friendly
-#if defined(USE_OSG)
-		if(NULL == playerVehicle || wwiiSide(TO->Country) != (WWII_SIDE)playerVehicle->Side)
-        {
 			return false;
-        }
-#else
-		if ( NULL == playerVehicle || wwiiSide(TO->Country) != (WWII_SIDE)playerVehicle->GetSide() )
-			return false ;
-#endif
-		return true ;
+
+		vehVehicle*playerVehicle = persGetPersonaVehiclePtr();
+		// And it oughta be friendly
+		if ( nullptr == playerVehicle || wwiiSide(TO->Country) != (WWII_SIDE)playerVehicle->GetSide() )
+			return false;
+		return true;
 	}
 
-	return false ;
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -9045,7 +8767,7 @@ void fpFPSFireBridgeRepair (mlVehicleData* pVehicleData, FLOAT64VECTOR* pFirePos
 	FLOAT64VECTOR	WorldOriginOffset;
 	FLOAT64VECTOR	projVel;		// unit vector in Y
 	piVECTOR		V1, V2;
-	trnCDTerrainObject* TO = NULL;
+	trnCDTerrainObject* TO = nullptr;
 
 	trnGetWorldOriginOffset(&WorldOriginOffset);
 
@@ -9075,17 +8797,15 @@ void fpFPSFireBridgeRepair (mlVehicleData* pVehicleData, FLOAT64VECTOR* pFirePos
 	V2.y = (FLOAT32)(endPos.y - WorldOriginOffset.y);
 	V2.z = (FLOAT32)(endPos.z);
 
-	if (trncdCollideWithVehiclesAndTerrain(&V1, &V2, NULL, NULL, NULL, NULL, &TO, FALSE, FALSE, TRUE) == TRUE)
+	if (trncdCollideWithVehiclesAndTerrain(&V1, &V2, nullptr, nullptr, nullptr, nullptr, &TO, FALSE, FALSE, TRUE) == TRUE)
 	{
 		if ( _isValidRepairTarget(TO) )
 		{
 			// does this need to make use of oversupply?
 			--currentGameWeapon->NumRoundsAmmoLeft[currentGameWeapon->AmmoTypeInUse];
 			fpFPSFireRound (currentGameWeapon, pFireAtt);
-#if !defined(USE_OSG)
 			Write_Log (LOG_FPS, LOG_INFO, "Repair Bridge <0x%x>, name >%s<!", TO, TO->TerrainMasterObject->name);
-#endif
-			vehApplyDamageToObject(fpFPSGetBridgeRepair(), TO, NULL, NULL);
+			vehApplyDamageToObject(fpFPSGetBridgeRepair(), TO, nullptr, nullptr);
 		}
 	}
 
@@ -9153,8 +8873,8 @@ LOGICAL fpFPSWeaponFire (mlVehicleData* pVehicleData)
 {
 	if (fpFPSStateOKToFire())
 	{
-		OBJECT*			pObject = NULL;
-		vehVehicle*		pVehicle = NULL;
+		OBJECT*			pObject = nullptr;
+		vehVehicle*		pVehicle = nullptr;
 
 		FLOAT64VECTOR	EmptyVector = {0, 0, 0}; // For placeholder vectors, etc.
 		FLOAT64VECTOR	RecoilVector = {0, 0, 0};
@@ -9164,7 +8884,7 @@ LOGICAL fpFPSWeaponFire (mlVehicleData* pVehicleData)
 		FLOAT64VECTOR	FlashPositionVector = {0, 0, 0};
 		FLOAT64VECTOR	MuzzlePositionVector = {0, 0, 0}; // for relative muzzle flash positioning (if needed be)
 		SINT32			weaponNumber = 0;
-		SINT32			FireType = 0, SoundType = 0, TempID = 0, *pSoundID = NULL;
+		SINT32			FireType = 0, SoundType = 0, TempID = 0, *pSoundID = nullptr;
 
 		pObject = pVehicleData->VehicleObjectData->PlaneObject;
 
@@ -9267,7 +8987,7 @@ LOGICAL fpFPSWeaponFire (mlVehicleData* pVehicleData)
 			fpFPSFireBridgeRepair (pVehicleData, &FirePositionVector, &FireAttitudeMatrix);
 			//fpsTrooper.firedWeapon = 1;
 		}
-		else if (pVehicle != NULL)
+		else if (pVehicle != nullptr)
 		{
 			UINT32 fired = weapFireWeapon(&RecoilVector,
 							  currentGameWeapon,
@@ -9279,41 +8999,29 @@ LOGICAL fpFPSWeaponFire (mlVehicleData* pVehicleData)
 							  1,
 							  0,
 							  flags,
-							  NULL,
+							  nullptr,
 							  &MuzzlePositionVector,
-							  NULL,
+							  nullptr,
 							  pVehicle);
 
-			if (currentGameWeapon->WeaponType != NULL)
+			if (currentGameWeapon->WeaponType != nullptr)
 			{
 				FireType = currentGameWeapon->WeaponType->FireType;
 
-#if defined(USE_OSG)
-                if(1)
-#else
 				if(((RecoilVector.x * RecoilVector.x) > 0.00001 ||
 					(RecoilVector.y * RecoilVector.y) > 0.00001 ||
 					(RecoilVector.z * RecoilVector.z) > 0.00001))
-#endif
 				{
 					//pVehicleData->MountIsFiring[0] = TRUE;
 
 					if (FireType == WEAP_FIRETYPE_SINGLESHOT)
 					{
-#if defined(USE_OSG)
-                        SoundType = finite_sound;
-#else
 						SoundType = TYPE_FINITE_SOUND;
-#endif
 						pSoundID = &TempID;
 					}
 					else
 					{
-#if defined(USE_OSG)
-                        SoundType = infinite_sound;
-#else
 						SoundType = TYPE_INFINITE_SOUND;
-#endif
 						pSoundID = &fpsTrooper.autoWeaponFireSoundId;
 					}
 
@@ -9321,45 +9029,27 @@ LOGICAL fpFPSWeaponFire (mlVehicleData* pVehicleData)
 					{
                         if(currentGameWeapon->WeaponType->IsPlacedWeapon)
                         {
-#if defined(USE_OSG)
-                            osg::Vec3d pos = osg::Vec3d(FlashPositionVector.x, FlashPositionVector.y, FlashPositionVector.z);
-                            osg::Group* o = ((osg::Node*)pObject->osgNode)->asGroup();
-                            fxSoundPlayObjectSound((char*)pVehicle->VehicleType->MountSounds[weaponNumber],
-                                                   pos,
-                                                   finite_sound,
-                                                   sound_mandatory,
-                                                   1,
-                                                   4,
-                                                   o);
-#else
                             fxSndAddFiniteObjectSound((char*)pVehicle->VehicleType->MountSounds[weaponNumber],
                                                       IDE_FP_PRIORITY_MANDATORY,
                                                       2,
                                                       20,
                                                       FlashPositionVector,
                                                       pObject);
-#endif
                         }
                         else
                         {
-#if defined(USE_OSG)
-                            *pSoundID = fxSoundPlayHeadSound((char*)pVehicle->VehicleType->MountSounds[weaponNumber],
-                                                             SoundType,
-                                                             sound_mandatory);
-#else
 						    *pSoundID = fpFPSfxPlayFireSound ((SCHAR*)pVehicle->VehicleType->MountSounds[weaponNumber],
                                                              IDE_FP_PRIORITY_MANDATORY,
                                                              SoundType,
                                                              &FlashPositionVector,
                                                              pObject);
-#endif
                         }
 
                         if(fired && pObject && pObject->animModel)
                         {
                             if(pObject->animModel->currentWeaponType == TPS_WEAPONTYPE_ROCKET)
                             {
-								TransformEffect* te = NULL;
+								TransformEffect* te = nullptr;
                                 piMATRIX m = IdentityMatrix;
                                 gr2AnimGetBoneMatrix(pObject, &m, "alt_firepoint");
 
@@ -9379,7 +9069,7 @@ LOGICAL fpFPSWeaponFire (mlVehicleData* pVehicleData)
 
 									Matrixd mat(m);
 
-									te = TransformEffect::AddEffect("bazookabackflash", Vec3f(dir), 0, NULL);
+									te = TransformEffect::AddEffect("bazookabackflash", Vec3f(dir), 0, nullptr);
 
 									if(te)
 									{
@@ -9398,9 +9088,9 @@ LOGICAL fpFPSWeaponFire (mlVehicleData* pVehicleData)
 								}
 
                                 if(pObject->animModel->weaponArray[pObject->animModel->currentWeapon] == PIAT)
-			                        te = TransformEffect::AddEffect("muzzlesmoke", Vec3f(0, 0, 0), 0, NULL);
+			                        te = TransformEffect::AddEffect("muzzlesmoke", Vec3f(0, 0, 0), 0, nullptr);
                                 else
-			                        te = TransformEffect::AddEffect("bazookafrontflash", Vec3f(0, 0, 0), 0, NULL);
+			                        te = TransformEffect::AddEffect("bazookafrontflash", Vec3f(0, 0, 0), 0, nullptr);
 
 			                    if(te)
 			                    {
@@ -9438,11 +9128,7 @@ LOGICAL fpFPSWeaponFire (mlVehicleData* pVehicleData)
 						{
 							if (fpsTrooper.autoWeaponFireSoundId != 0)
 							{
-#if defined(USE_OSG)
-                                fxSoundStopSound(fpsTrooper.autoWeaponFireSoundId);
-#else
 								fxSndStopSound(fpsTrooper.autoWeaponFireSoundId);
-#endif
 								fpsTrooper.autoWeaponFireSoundId = 0;
 							}
 						}
@@ -9455,11 +9141,7 @@ LOGICAL fpFPSWeaponFire (mlVehicleData* pVehicleData)
 					{
 						if (fpsTrooper.autoWeaponFireSoundId != 0)
 						{
-#if defined(USE_OSG)
-                            fxSoundStopSoundDelayed(fpsTrooper.autoWeaponFireSoundId, 1);
-#else
 							fxSndStopSoundDelayed(fpsTrooper.autoWeaponFireSoundId, 1);
-#endif
                             fpsTrooper.autoWeaponFireSoundId = 0;
 						}
 					}
@@ -9503,11 +9185,7 @@ LOGICAL fpFPSWeaponFire (mlVehicleData* pVehicleData)
 	{
 		if (fpsTrooper.autoWeaponFireSoundId != 0)
 		{
-#if defined(USE_OSG)
-            fxSoundStopSound(fpsTrooper.autoWeaponFireSoundId);
-#else
 			fxSndStopSound(fpsTrooper.autoWeaponFireSoundId);
-#endif
 			fpsTrooper.autoWeaponFireSoundId = 0;
 		}
 		fpsTrooper.autoWeaponFireSoundId = 0;
@@ -9658,7 +9336,7 @@ void fpFPSFireRound (weapWeapon* weapon, piMATRIX* fireAtt, void* FireVehicle)
 	// garand's distinctive ping sound
 	if(currentWeaponModel == M1GARAND && fpsWeapons[currentWeaponModel].clipBullets == 0)
 	{
-		SINT32 id = fpFPSfxPlayNormalSound("sounds/troop/garandping.wav", IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, NULL, persGetPersonaVehicleObjectDataPtr());
+		SINT32 id = fpFPSfxPlayNormalSound("sounds/troop/garandping.wav", IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, nullptr, persGetPersonaVehicleObjectDataPtr());
 		if(id > -1) fxSndSetVolume(id, 2.0f);
 	}
 
@@ -9797,11 +9475,7 @@ void fpFPSRecycle ()
 
 	if (fpsWeapons[currentWeaponModel].recycleSound)
 	{
-#if defined(USE_OSG)
-        fxSoundPlayHeadSound(fpsWeapons[currentWeaponModel].recycleSound, finite_sound, sound_high);
-#else
-		fpFPSfxPlayNormalSound (fpsWeapons[currentWeaponModel].recycleSound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, NULL, persGetPersonaVehicleObjectDataPtr());
-#endif
+		fpFPSfxPlayNormalSound (fpsWeapons[currentWeaponModel].recycleSound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, nullptr, persGetPersonaVehicleObjectDataPtr());
     }
 
 	if (currentWeaponModel == BOYSMK1)
@@ -9884,7 +9558,7 @@ void fpFPSReload (weapWeapon* weapon)
 
 	assert (currentGameWeapon == weapon);
 
-	SCHAR* reloadSound = NULL;
+	SCHAR* reloadSound = nullptr;
 
 	if (fpsWeapons[currentWeaponModel].auxEnable[FPS_AUX_RGCUP])
 		reloadSound = fpsWeapons[currentWeaponModel].rgReloadSound;
@@ -9893,11 +9567,7 @@ void fpFPSReload (weapWeapon* weapon)
 
 	if (reloadSound)
 	{
-#if defined(USE_OSG)
-        fxSoundPlayHeadSound(reloadSound, finite_sound, sound_high);
-#else
-		fpFPSfxPlayNormalSound (reloadSound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, NULL, persGetPersonaVehicleObjectDataPtr());
-#endif
+		fpFPSfxPlayNormalSound (reloadSound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, nullptr, persGetPersonaVehicleObjectDataPtr());
     }
 }
 
@@ -10243,7 +9913,7 @@ static void _standFlags(UINT32& pFlags, fpFPSWeaponData& weapon, UINT32 poseFlag
 	}
 
 	//////// point
-	UINT32 pointFlag = (poseFlag == TPS_POSETYPE_STAND) ? TPS_POINTTYPE_RELAXED : TPS_POINTTYPE_READY ;
+	UINT32 pointFlag = (poseFlag == TPS_POSETYPE_STAND) ? TPS_POINTTYPE_RELAXED : TPS_POINTTYPE_READY;
 
 	if(poseFlag == TPS_POSETYPE_STAND && weapon.weaponType == FPS_WEAPONTYPE_ROCKET && moveFlag > TPS_MOVETYPE_STILL)
 	{
@@ -10777,19 +10447,19 @@ void fpFPSKill ()
 		if (weapDefaultAnim[i])
 		{
 			gr2FreeAnimation (weapDefaultAnim[i]);
-			weapDefaultAnim[i] = NULL;
+			weapDefaultAnim[i] = nullptr;
 		}
 
 		if (weapEmptyDefaultAnim[i])
 		{
 			gr2FreeAnimation (weapEmptyDefaultAnim[i]);
-			weapEmptyDefaultAnim[i] = NULL;
+			weapEmptyDefaultAnim[i] = nullptr;
 		}
 
 		if (clipDefaultAnim[i])
 		{
 			gr2FreeAnimation (clipDefaultAnim[i]);
-			clipDefaultAnim[i] = NULL;
+			clipDefaultAnim[i] = nullptr;
 		}
 
 		for (j=0; j < NUM_WEAP_STATES; j++)
@@ -10803,34 +10473,34 @@ void fpFPSKill ()
 			if (clipAnims[i][j])
 				gr2FreeAnimation (clipAnims[i][j]);
 
-			armsAnims[i][j] = NULL;
-			weapAnims[i][j] = NULL;
-			clipAnims[i][j] = NULL;
+			armsAnims[i][j] = nullptr;
+			weapAnims[i][j] = nullptr;
+			clipAnims[i][j] = nullptr;
 		}
 	}
 
 	gr2FreeModel (skeletonModel);
-	skeletonModel = NULL;
+	skeletonModel = nullptr;
 
 	for (i=0; i < NUM_INFANTRY_TYPES; i++)
 	{
 		if (armsModels[i])
 		{
 			gr2FreeModel (armsModels[i]);
-			armsModels[i] = NULL;
+			armsModels[i] = nullptr;
 		}
 
 		if (legsModels[i])
 		{
 			gr2FreeModel (legsModels[i]);
-			legsModels[i] = NULL;
+			legsModels[i] = nullptr;
 		}
 	}
 
 	if (armTexModel)
 	{
 		gr2FreeModel (armTexModel);
-		armTexModel = NULL;
+		armTexModel = nullptr;
 	}
 
 	for (i=0; i < NUM_WEAPONS; i++)
@@ -10838,13 +10508,13 @@ void fpFPSKill ()
 		if (weaponModels[i])
 		{
 			gr2FreeModel (weaponModels[i]);
-			weaponModels[i] = NULL;
+			weaponModels[i] = nullptr;
 		}
 
 		if (secondaryModels[i])
 		{
 			gr2FreeModel (secondaryModels[i]);
-			secondaryModels[i] = NULL;
+			secondaryModels[i] = nullptr;
 		}
 
 		for(int j = 0; j < FPS_NUM_AUX_MODELS; j++)
@@ -10852,32 +10522,24 @@ void fpFPSKill ()
 			if(auxModels[i][j])
 			{
 				gr2FreeModel (auxModels[i][j]);
-				auxModels[i][j] = NULL;
+				auxModels[i][j] = nullptr;
 			}
 		}
 	}
 
 	if (fpsTrooper.movementSoundID != 0)
 	{
-#if defined(USE_OSG)
-        fxSoundStopSound(fpsTrooper.movementSoundID);
-#else
 		fxSndStopSound(fpsTrooper.movementSoundID);
-#endif
 		fpsTrooper.movementSoundID = 0;
 	}
 
 	if (fpsTrooper.autoWeaponFireSoundId != 0)
 	{
-#if defined(USE_OSG)
-        fxSoundStopSound(fpsTrooper.autoWeaponFireSoundId);
-#else
 		fxSndStopSound(fpsTrooper.autoWeaponFireSoundId);
-#endif
 		fpsTrooper.autoWeaponFireSoundId = 0;
 	}
 
-	currentGameWeapon = NULL;
+	currentGameWeapon = nullptr;
 
 	fpsTrooper.initialized = FALSE;
 }
@@ -11050,23 +10712,21 @@ LOGICAL fpFPSGetHUDAmmoData (HUD_AMMO_DATA type, SINT32* data)
 LOGICAL fpFPSRideUnrideVehicle ()
 {
 	mlVehicleData*	vehicleData = persGetPersonaModelDataPtr();
-	if (vehicleData == NULL)
+	if (vehicleData == nullptr)
 	{
 		return FALSE;
 	}
-	if (vehicleData->VehicleMasterPtr == NULL)
+	if (vehicleData->VehicleMasterPtr == nullptr)
 	{
 		return FALSE;
 	}
 
 	vehVehicle*		vehicle = (vehVehicle*)(vehicleData->VehicleMasterPtr);;
-	vehVehicle*		FPSRideVehicle = NULL;
+	vehVehicle*		FPSRideVehicle = nullptr;
 	FLOAT64			speed;
 	FLOAT32			damage;
 
-#if !defined(USE_OSG)
-	vehVehicle*currentVehicle = NULL;
-#endif
+	vehVehicle*currentVehicle = nullptr;
 
 #if 0
 	if (stateFlags & STATE_SIT)
@@ -11081,7 +10741,7 @@ LOGICAL fpFPSRideUnrideVehicle ()
 		FPSRideVehicle = vehFindVehicle(vehicle->RideVehicleHostIndex);
 
 		// check for vehicle poofing on us .. if so, act like we jumped off
-		if(FPSRideVehicle == NULL)
+		if(FPSRideVehicle == nullptr)
 		{
 			FLOAT64VECTOR& pos = vehicle->ModelData->VehiclePos;
 			const FLOAT32 rayLength = 10.0f;
@@ -11104,7 +10764,7 @@ LOGICAL fpFPSRideUnrideVehicle ()
 	}
 
 	// if we're riding a vehicle, jump off
-	if (FPSRideVehicle != NULL && vehicle->RideSeatNum != VEH_TROOPER_ON_DECK_RIDE_SEAT)
+	if (FPSRideVehicle != nullptr && vehicle->RideSeatNum != VEH_TROOPER_ON_DECK_RIDE_SEAT)
 	{
 		// special handling for airplanes
 		if (FPSRideVehicle->VehicleType->Type == VEH_TYPE_AIR)
@@ -11211,16 +10871,15 @@ LOGICAL fpFPSRideUnrideVehicle ()
 	// 2 conditions:  FPS must be within radii of the vehicle, and
 	//   target vehicle cannot be moving faster than 1m/s when boarding
 
-#if !defined(USE_OSG)
 	vehGetVehicleHead(&currentVehicle);
-	FPSRideVehicle = NULL;
+	FPSRideVehicle = nullptr;
 
     for(;currentVehicle; currentVehicle = currentVehicle->getNext())
 	{
 		UINT32 i;
 
 		if (currentVehicle == vehicle) continue;
-		if (currentVehicle->VehicleObjectData == NULL) continue;
+		if (currentVehicle->VehicleObjectData == nullptr) continue;
 		if (currentVehicle->VehicleObjectData->NumFPSSeats == 0) continue;
 		if (currentVehicle->Side != vehicle->Side) continue;
         if (currentVehicle->isSTO()) continue;
@@ -11232,7 +10891,7 @@ LOGICAL fpFPSRideUnrideVehicle ()
 		for(i = 0; i < currentVehicle->VehicleObjectData->NumFPSSeats; i++)
 		{
 			OBJECT* RideObject = currentVehicle->VehicleObjectData->FPSSeats[i];
-			if(RideObject == NULL) break;
+			if(RideObject == nullptr) break;
 			FLOAT64VECTOR TrooperPos = {0,0,0}, RidePos, DeltaVec;
 			FLOAT64VECTOR WorldOriginOffset;
 
@@ -11295,7 +10954,7 @@ LOGICAL fpFPSRideUnrideVehicle ()
 			}
 		}
 	}
-#endif
+
 	if (vehicle->RideVehicleHostIndex > 0 && vehicle->RideSeatNum != VEH_TROOPER_ON_DECK_RIDE_SEAT)
 	{
 		fpsTrooper.parachuteOKToOpen = FALSE;
@@ -11391,7 +11050,7 @@ LOGICAL fpFPSSit(SINT32 Param, vehVehicle* rideVehicle)
 
 		if (legsModel)
 			gr2DetachModel (legsModel);
-		legsModel = NULL;
+		legsModel = nullptr;
 
 		targetPose = FPS_POSITION_STAND;
 		// this is added to fix a sit until we have all the set states. DEG
@@ -11409,7 +11068,7 @@ LOGICAL fpFPSSit(SINT32 Param, vehVehicle* rideVehicle)
 			{
 				case VEH_TYPE_AIR:
 				{
-					OBJECT* exit = NULL;
+					OBJECT* exit = nullptr;
 
 					offset.x = -2.0f;
 					offset.y = -4.0f;
@@ -11417,7 +11076,7 @@ LOGICAL fpFPSSit(SINT32 Param, vehVehicle* rideVehicle)
 					for(size_t i = 0; i < rideVehicle->VehicleObjectData->NumFPSSeats; i++)
 					{
 						OBJECT* seat = rideVehicle->VehicleObjectData->FPSSeats[i];
-						if(seat == NULL) continue;
+						if(seat == nullptr) continue;
 
 						if(!exit || (exit->dof->dofmatrix2._41 <= 0 && seat->dof->dofmatrix2._42 < exit->dof->dofmatrix2._42))
 							exit = seat;
@@ -11503,7 +11162,7 @@ LOGICAL fpFPSGetATPGain(FLOAT32* pATPGain, FLOAT32 deltaTime)
 	else
 		forwardSpeedValue = FPS_SPEED_TROT;
 
-	persGetHealthStats(NULL, &currentATP, NULL, NULL);
+	persGetHealthStats(nullptr, &currentATP, nullptr, nullptr);
 
 	currentSpeed = currentForwardVectorLength * currentForwardVectorLength +
 		currentStrafeVectorLength * currentStrafeVectorLength;
@@ -11769,14 +11428,14 @@ LOGICAL fpFPSIsWalking()
 	return (stateFlags & STATE_WALK);
 }
 
-LOGICAL fpFPSIsDead()
+bool fpFPSIsDead()
 {
-	return (stateFlags & STATE_DEAD);
+	return ((stateFlags & STATE_DEAD) != 0);
 }
 
-LOGICAL fpFPSIsNoFireZone()
+bool fpFPSIsNoFireZone()
 {
-	return (LOGICAL)noFire;
+	return noFire;
 }
 
 LOGICAL fpFPSIsCaptureZone(bool deathCheck)
@@ -11897,7 +11556,7 @@ LOGICAL fpFPSIsObjectFPS (OBJECT* pObject)
 
 LOGICAL fpFPSIsTrooperSitting (OBJECT* pObject)
 {
-	// passing in NULL means I already know I'm a fps object
+	// passing in nullptr means I already know I'm a fps object
 	if (!pObject || fpFPSIsObjectFPS(pObject))
 	{
 		if (fpFPSGetPlayerPose() == POSE_SIT)
@@ -11957,9 +11616,6 @@ void fpFPSDrawGunsight (void)
 
                     break;
                 }
-#if FRES
-			case AIM_SMG:
-#endif
             case AIM:
                 {
                     if(!startSniperDelay)
@@ -12068,9 +11724,6 @@ void fpFPSDrawGunsight (void)
 
                     break;
                 }
-#if FRES
-			case AIM_SMG:
-#endif
             case AIM:
                 {
                     if(!startSniperDelay)
@@ -12170,9 +11823,9 @@ UINT32 fpFPSVehicleCollideCheckNeeded()
 
 void fpFPSHitBuilderObject(const StratDB::StratObject* pStatue)
 {
-	if(pStatue == NULL) return;
+	if(pStatue == nullptr) return;
 
-    if(currentBuilderObject == NULL)
+    if(currentBuilderObject == nullptr)
         fpFPSResetBuilderPosition();
 
 	currentBuilderObject = pStatue;
@@ -12181,8 +11834,8 @@ void fpFPSHitBuilderObject(const StratDB::StratObject* pStatue)
 
 void fpFPSBuilderEnd()
 {
-    currentBuilderObject = NULL;
-    uiShowBuilderInfo(NULL, false);
+    currentBuilderObject = nullptr;
+    uiShowBuilderInfo(nullptr, false);
 }
 
 void fpFPSResetBuilderPosition()
@@ -12268,7 +11921,7 @@ void fpFPSStartEmote (SCHAR* emote, SCHAR* handle, LOGICAL force)
 	}
 
 	vehVehicle* playerVehicle = persGetPersonaVehiclePtr();
-	append = NULL;
+	append = nullptr;
 
 	// ID the emote
 	for (i=0; i < TPS_COMBATEMOTE_NUM_TYPES; i++)
@@ -12349,10 +12002,10 @@ void fpFPSStartEmote (SCHAR* emote, SCHAR* handle, LOGICAL force)
 				Write_Log(LOG_FPS, LOG_INFO, "Invalid handle passed to dressdown!");
 				return;
 			}
-			ChatHandle target = chatGetHandle(handle) ;
+			ChatHandle target = chatGetHandle(handle);
 			if(!target)
 			{
-				Write_Log(LOG_FPS, LOG_INFO, "Handle is not a real handle") ;
+				Write_Log(LOG_FPS, LOG_INFO, "Handle is not a real handle");
 				return;
 			}
 
@@ -12408,11 +12061,11 @@ void fpFPSStartEmote (SCHAR* emote, SCHAR* handle, LOGICAL force)
 
 	if (newEmoteType == TPS_EMOTETYPE_FULLBODY)
 	{
-		rnmainListEmoteText (IDE_LANG_UI, FPS_BODYEMOTE_OFFSET + i, colorGREENALPHA, NULL, append);
+		rnmainListEmoteText (IDE_LANG_UI, FPS_BODYEMOTE_OFFSET + i, colorGREENALPHA, nullptr, append);
 	}
 	else
 	{
-		rnmainListEmoteText (IDE_LANG_UI, FPS_COMBATEMOTE_OFFSET + i, colorGREENALPHA, NULL, append);
+		rnmainListEmoteText (IDE_LANG_UI, FPS_COMBATEMOTE_OFFSET + i, colorGREENALPHA, nullptr, append);
 	}
 
 	// set the global stuff so determineNextState can figure things out
@@ -12459,7 +12112,7 @@ void fpFPSResupplySelf(vehVehicle*vehicle)
 {
 	if (!vehicle)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "NULL vehicle tried to resupply me?!!");
+		Write_Log (LOG_FPS, LOG_INFO, "nullptr vehicle tried to resupply me?!!");
 		return;
 	}
 
@@ -12576,11 +12229,7 @@ LOGICAL fpsCheckDeploy(bool doShake)
 			retVal = FALSE;
 		else if(!(stateFlags & (STATE_EYE_PRONE | STATE_DEPLOYED)))
         {
-#if defined(USE_OSG)
-			retVal = (fpsWeapons[currentWeaponModel].weaponType != FPS_WEAPONTYPE_LTMORTAR) ? _checkdeploy(0): FALSE;
-#else
 			retVal = (fpsWeapons[currentWeaponModel].weaponType != FPS_WEAPONTYPE_LTMORTAR) ? _candeploy(0): FALSE;
-#endif
         }
         else if (!(stateFlags & STATE_DEPLOYED))
         {
@@ -12645,24 +12294,11 @@ SINT32 fpFPSPlaySound (SCHAR* sound)
 	if (!sound)
 		return -1;
 
-#if defined(USE_OSG)
-    return fxSoundPlayHeadSound(sound, finite_sound, sound_high);
-#else
-	return (fpFPSfxPlayNormalSound (sound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, NULL, persGetPersonaVehicleObjectDataPtr()));
-#endif
+	return (fpFPSfxPlayNormalSound (sound, IDE_FP_PRIORITY_HIGH, TYPE_FINITE_SOUND, nullptr, persGetPersonaVehicleObjectDataPtr()));
 }
 
 SINT32 fpFPSGetAmmoTypeNum (bool forType)
 {
-#if FRES
-	if(currentWeaponModel == RPG7)
-	{
-         return 1;
-	}
-
-    return 0;
-#endif
-
 	// this should go away and simply be the last return statement
 	/*
     if((stateFlags & STATE_DEPLOYED) && (fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_RIFLE) && (fpsWeapons[currentWeaponModel].auxEnable[FPS_AUX_RGCUP]))
@@ -12689,13 +12325,6 @@ SINT32 fpFPSGetAmmoTypeNumByWeapon (SINT32 weaponType, weapWeapon* weapon)
 		return 1;
 	else
 	*/
-#if FRES
-		if (currentWeaponModel == RPG7)
-		{
-			return 1;
-		}
-		else
-#endif
 
 	if(weapon)
 		return weapon->AmmoTypeInUse;
@@ -12768,13 +12397,6 @@ void fpFPSGetEyeUpDownRange(FLOAT32* upAngle, FLOAT32* downAngle)
 	}
 
 
-#if defined(USE_OSG)
-	// these angles are reversed in OSG so we swap and sign flip them
-	FLOAT32 temp = maxUpAngle;
-	maxUpAngle		= maxDownAngle * -1;
-	maxDownAngle	= temp * -1;
-#endif
-
 	*upAngle = maxUpAngle;
 	*downAngle = maxDownAngle;
 }
@@ -12785,7 +12407,7 @@ void fpFPSSetInfantrySurfaceID (SINT32 surfaceID, struct trnCDTerrainObject* TO)
 
 	fpsTrooper.currentSurfaceID = surfaceID;
 
-	trnCDTerrainObject* lastEnteredTO = NULL;
+	trnCDTerrainObject* lastEnteredTO = nullptr;
 
 	// override with vehmain's idea of the last entered TO if we found one
 	if(vehmainLastEntered(&lastEnteredTO))
@@ -12802,7 +12424,7 @@ void fpFPSSetInfantrySurfaceID (SINT32 surfaceID, struct trnCDTerrainObject* TO)
 	if (!TO)
 	{
 		// terra non firma? :)
-		fpsTrooper.lastTO = NULL;
+		fpsTrooper.lastTO = nullptr;
 		fpsTrooper.lastTODamageLevel = 0;
 	}
 	else if (fpsTrooper.lastTO != TO)
@@ -13017,7 +12639,7 @@ void fpFPSSightAdjust (SINT32 sightParam)
 	{
 		char tString[255];
 		sprintf (tString, "%.0dm", fpsWeapons[currentWeaponModel].getSightDist());
-		rnmainListEmoteText (IDE_LANG_UI, 9000, colorWHITEALPHA, NULL, tString);
+		rnmainListEmoteText (IDE_LANG_UI, 9000, colorWHITEALPHA, nullptr, tString);
 	}
 	*/
 
@@ -13039,7 +12661,7 @@ FLOAT32	fpFPSGetRedScreenMinAlpha()
 
 bool fpFPSOnBridge()
 {
-    if(fpsTrooper.lastTO == NULL)
+    if(fpsTrooper.lastTO == nullptr)
     {
         return false;
     }
@@ -13273,8 +12895,8 @@ void fpFPSControlBlockReset()
 // have to be sitting on a plane to trigger this emote
 LOGICAL fpFPSOkToJumpEmote()
 {
-	fpPersonData*	pPersonData = NULL;
-	vehVehicle*		FPSRideVehicle = NULL;
+	fpPersonData*	pPersonData = nullptr;
+	vehVehicle*		FPSRideVehicle = nullptr;
 
 	mlVehicleData*	pVehicleData = persGetPersonaModelDataPtr();
 	if (pVehicleData)
@@ -13297,7 +12919,7 @@ LOGICAL fpFPSOkToJumpEmote()
 	if(pPlayerVehicle->RideVehicleHostIndex > 0)
 		FPSRideVehicle = vehFindVehicle(pPlayerVehicle->RideVehicleHostIndex);
 
-	if (FPSRideVehicle == NULL)
+	if (FPSRideVehicle == nullptr)
 		return FALSE;
 
 	if (FPSRideVehicle->VehicleType->Type != VEH_TYPE_AIR)
@@ -13431,7 +13053,7 @@ UINT32 fpFPSGetHighlightedWeaponType()
 	fpsWeaponTypes weaponType = fpsTrooper.weaponPositionModel[fpsTrooper.highlightedWeaponNumber];
 
 	/*
-	SINT32 ammoTypeNum = fpFPSGetAmmoTypeNumByWeapon((SINT32)weaponType, NULL);
+	SINT32 ammoTypeNum = fpFPSGetAmmoTypeNumByWeapon((SINT32)weaponType, nullptr);
 
 	if (ammoTypeNum == 0)
 	{
@@ -13441,10 +13063,6 @@ UINT32 fpFPSGetHighlightedWeaponType()
 			weaponType = LEBEL;
 		else if (weaponType == RG_MILLS)
 			weaponType = ENFIELD;
-#if FRES
-		else if (weaponType == RPG7)
-			weaponType = RPG7;
-#endif
 	}
 	*/
 
@@ -13497,362 +13115,6 @@ void _fpsdrawline(piMATRIX& world)
     piPopMatrix(WORLD_MATRIX);
 }
 #endif
-
-#if defined(USE_OSG)
-
-static inline void _getdeployboundry(ClientInfantryController* controller,
-									  double& l,
-                                      double& r,
-									  osg::Vec3d& startPoint)
-{
-	VehicleBase* vehBase = playerGetVehicle();
-
-	// start off by rotating to the left
-	osg::Matrix rotate = osg::Matrix::rotate(DEG_TO_RAD(4),0,0,1);
-	osg::Vec3d endPoint(0, 1, 0);
-
-	// check 80 degrees to the left
-    for(int i = 0; i < 20; i++)
-    {
-		// adjust my direction vector
-		endPoint = rotate * endPoint;
-
-        if(controller->CheckLineCollision(startPoint, endPoint, 1.0f, COLLIDER_DEPLOY_MASK))
-            break; // we hit something
-    }
-
-	// rotate it to our current attitude
-	endPoint = vehBase->Attitude() * endPoint;
-
-	// save the new left
-	l = RAD_TO_DEG(atan2(endPoint.x(), endPoint.y()));
-
-	// reset endpoint
-	endPoint.set(0, 1, 0);
-
-	// rotate to the right now
-	rotate = osg::Matrix::rotate(-DEG_TO_RAD(4),0,0,1);
-
-	// check 80 degrees to the right
-    for(int i = 0; i < 20; i++)
-    {
-		// adjust my direction vector
-		endPoint = rotate * endPoint;
-
-        if(controller->CheckLineCollision(startPoint, endPoint, 1.0f, COLLIDER_DEPLOY_MASK))
-            break; // we hit something
-    }
-
-	// rotate it to our current attitude
-	endPoint = vehBase->Attitude() * endPoint;
-
-	// save the new right
-	r = RAD_TO_DEG(atan2(endPoint.x(), endPoint.y()));
-
-	// convert it back to radians
-	l = DEG_TO_RAD(l);
-	r = DEG_TO_RAD(r);
-}
-
-static inline bool _checkdeploy2(int direction, int plane)
-{
-	/*
-	static int horizHeading = 0;
-	static int vertHeading = 0;
-	static int horizBlock = 0;
-	static int vertBlock = 0;
-
-	VehicleBase* vehBase = playerGetVehicle();
-	if(!vehBase) return false;
-
-	ClientInfantryController* controller = dynamic_cast<ClientInfantryController*>(vehBase->GetController());
-	if(!controller) return false;
-
-	if(!direction)
-	{
-		osg::Vec3d endPoint(0,1,0); // forward
-		osg::Vec3d startPoint(0, 0, (TROOPER_STAND_EYE_HEIGHT + currentEyeHeight));
-
-		double deployOffset = 18.0f * 0.0254f;
-
-		// drop the z down
-		startPoint.z() -= deployOffset;
-
-		// if we don't have a ledge, can't deploy
-		if(!controller->CheckLineCollision(startPoint, endPoint, 1.0f, COLLIDER_DEPLOY_MASK))
-			return false;
-
-		// move the start back up
-		startPoint.z() += deployOffset + .1f * 2.0f;
-
-		// if we have an obstruction here, can't deploy
-		if(controller->CheckLineCollision(startPoint, endPoint, 1.0f, COLLIDER_DEPLOY_MASK))
-			return false;
-
-		return true;
-	}
-
-	bool hit = controller->CheckDeploy();
-	int heading = (direction / abs(direction));
-
-	if(hit)
-		bool stop = true;
-
-	if(plane == 1)	// horizontal
-	{
-		horizHeading	= heading;
-		horizBlock		= (hit) ? heading: 0;
-
-		if(!horizBlock || horizBlock != heading)
-			return true;
-	}
-	else			// vertical
-	{
-		vertHeading = heading;
-		vertBlock	= (hit) ? heading: 0;
-
-		if(!vertBlock || vertBlock != heading)
-			return true;
-	}
-	*/
-
-	return false;
-}
-
-static inline int _checkdeploy(int direction, int plane)
-{
-	static int horizBlock = 0;
-	static int vertBlock = 0;
-	static int horizHeading = 0;
-	static int vertHeading = 0;
-
-	VehicleBase* vehBase = playerGetVehicle();
-	if(!vehBase) return 0;
-
-	ClientInfantryController* controller = dynamic_cast<ClientInfantryController*>(vehBase->GetController());
-	if(!controller) return 0;
-
-	osg::Vec3d endPoint(0,1,0); // forward
-	osg::Vec3d startPoint(0, 0, (TROOPER_STAND_EYE_HEIGHT + currentEyeHeight));
-
-	double ledgeOffset = 18.0f * 0.0254f;
-
-	// drop the z down
-	startPoint.z() -= ledgeOffset;
-
-    // if we don't have a ledge, can't deploy
-	// only check on the initial test and when in
-	// the horizontal plane
-    float onLedge = controller->CheckLineCollision(startPoint, endPoint, 1.0f, COLLIDER_DEPLOY_MASK);
-
-	// move the start back up for further tests
-	startPoint.z() += ledgeOffset + .1f * 2.0f;
-
-	if(direction)
-	{
-		// grab our firepoint; has our current eye rotation
-		osg::*Matrix* firepoint = vehBase->asInfantry()->GetFirePoint();
-
-		endPoint = firepoint->getRotate() * endPoint;
-		startPoint += vehBase->Position();
-
-		float hit	= collideRay(COLLIDER_DEPLOY_MASK, 1.0f, startPoint, endPoint);
-		int dir		= (direction / abs(direction));
-
-		if(hit || !onLedge)
-			bool stop = true;
-
-		int& heading	= (plane == 1) ? horizHeading: vertHeading;
-		int& block		= (plane == 1) ? horizBlock: vertBlock;
-
-		heading	= dir;
-		block	= (!hit && onLedge) ? 0: (!block) ? heading: block;
-
-		return (!block) ? 1: (block != heading) ? 2: 0;
-	}
-
-	// reset blocks
-	horizBlock = vertBlock = 0;
-	horizHeading = vertHeading = 0;
-
-	if(!onLedge)
-		return 0;
-
-	// if we have an obstruction here, can't deploy
-    if(controller->CheckLineCollision(startPoint, endPoint, 1.0f, COLLIDER_DEPLOY_MASK))
-        return 0;
-
-    return 1;
-}
-
-static inline bool _checkdeploy3(int direction, int plane)
-{
-	/*
-	static FLOAT64 lastVertAngle = 0;
-	static FLOAT64 lastHorizAngle = 0;
-	static int horizBlock = 0;
-	static int vertBlock = 0;
-	static int horizHeading = 0;
-	static int vertHeading = 0;
-
-	VehicleBase* vehBase = playerGetVehicle();
-	if(!vehBase) return false;
-
-	osg::Vec3d endPoint(0,1,0); // forward
-	osg::Vec3d startPoint(0, 0, (TROOPER_STAND_EYE_HEIGHT + currentEyeHeight));
-
-	if(direction)
-	{
-		// grab our firepoint; has our current eye rotation
-		osg::*Matrix* firepoint = vehBase->asInfantry()->GetFirePoint();
-
-		endPoint = firepoint->getRotate() * endPoint;
-		startPoint += vehBase->Position();
-
-		float hit = collideRay(COLLIDER_DEPLOY_MASK, 1.0f, startPoint, endPoint);
-		int heading = (direction / abs(direction));
-
-		if(hit)
-			bool stop = true;
-
-		if(plane == 1)	// horizontal
-		{
-			horizHeading	= heading;
-			horizBlock		= (hit) ? heading: 0;
-
-			if(!horizBlock || horizBlock != heading)
-			{
-				if(vertHeading)
-					_checkdeploy(vertHeading, 2);
-
-				lastHorizAngle = vehStubGet(vehBase)->ModelData->VehicleAtt.Yaw;
-				return true;
-			}
-		}
-		else			// vertical
-		{
-			vertHeading = heading;
-			vertBlock	= (hit) ? heading: 0;
-
-			if(!vertBlock || vertBlock != heading)
-			{
-				if(horizHeading)
-					_checkdeploy(horizHeading, 1);
-
-				lastVertAngle = aimVertAngle;
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	ClientInfantryController* controller = dynamic_cast<ClientInfantryController*>(vehBase->GetController());
-	if(!controller) return false;
-
-	// reset blocks
-	lastHorizAngle = lastVertAngle = 0;
-	horizBlock = vertBlock = 0;
-	horizHeading = vertHeading = 0;
-
-	double deployOffset = 18.0f * 0.0254f;
-
-	// drop the z down
-	startPoint.z() -= deployOffset;
-
-    // if we don't have a ledge, can't deploy
-    if(!controller->CheckLineCollision(startPoint, endPoint, 1.0f, COLLIDER_DEPLOY_MASK))
-        return false;
-
-	// move the start back up
-	startPoint.z() += deployOffset + .1f * 2.0f;
-
-	// if we have an obstruction here, can't deploy
-    if(controller->CheckLineCollision(startPoint, endPoint, 1.0f, COLLIDER_DEPLOY_MASK))
-        return false;
-	*/
-
-	/*
-    // if direction != 0, we have already calculated the boundries.
-    if(direction != 0)
-    {
-		endPoint = vehBase->Attitude() * endPoint;
-		double angle = atan2(endPoint.x(), endPoint.y());
-		int heading = (direction / abs(direction));
-
-		if(left <= PI && right >= 0 && angle <= left && angle >= right)
-		{
-			blockDir = 0;
-		}
-		else if(left >= -PI && right <= 0 && angle <= left && angle >= right)
-		{
-			blockDir = 0;
-		}
-		else if(left < 0 && right > 0 && (angle <= left || angle >= right))
-		{
-			blockDir = 0;
-		}
-		else if(left > 0 && right < 0 && (angle <= left && angle >= right))
-		{
-			blockDir = 0;
-		}
-		else if(!blockDir)
-		{
-			blockDir = heading;
-		}
-
-		return (!blockDir || blockDir != heading) ? true: false;
-    }
-
-	ClientInfantryController* controller = dynamic_cast<ClientInfantryController*>(vehBase->GetController());
-	if(!controller) return false;
-
-	// reset boundaries
-	left = right = 0;
-	blockDir = 0;
-
-	// 12 inches
-	double deployOffset = 18.0f * 0.0254f;
-
-	// chest high
-	osg::Vec3d startPoint(0, 0, (TROOPER_STAND_EYE_HEIGHT + currentEyeHeight) - deployOffset);
-
-    // Only check for obstruction for initial test
-
-    // if we don't have a ledge, can't deploy
-    if(!controller->CheckLineCollision(startPoint, endPoint, 1.0f, DEPLOY_COLLISIONS))
-        return false;
-
-	// move the start up some
-	startPoint.z() += deployOffset + .1f * 2.0f;
-
-	// if we have an obstruction here, can't deploy
-    if(controller->CheckLineCollision(startPoint, endPoint, 1.0f, DEPLOY_COLLISIONS))
-        return false;
-
-	// directly in front is clear and we have a ledge, lets get the boundaries
-    _getdeployboundry(controller, left, right, startPoint);
-	*/
-
-	// should check ledge for boundaries too
-	/*
-	double bl = 0, br = 0;
-
-	// bring the start point back down to the ledge
-	startPoint.set(0, 0, (TROOPER_STAND_EYE_HEIGHT + currentEyeHeight) - deployOffset);
-
-	_getdeployboundry(controller, bl, br, startPoint);
-
-	left	= (bl > left) ? bl: left;
-	right	= (br < right) ? br: right;
-
-	return true;
-	*/
-
-    return false;
-}
-
-#else
 
 static inline void _getdeployboundry(double& s,
                                       double& e,
@@ -14177,8 +13439,6 @@ static inline bool _candeploy(int direction)
     return true;
 }
 
-#endif
-
 
 FLOAT32 fpFPSGetGrenadeThrowPower()
 {
@@ -14489,7 +13749,7 @@ dGeomID _createFPSCapsuleTest(dSpaceID space, double length, double radius, doub
 
 void _updateFPSColliders()
 {
-	_collider.collider = NULL;
+	_collider.collider = nullptr;
 
 	switch(fpFPSGetPlayerPose())
 	{
@@ -14554,7 +13814,7 @@ FPSCollider::FPSCollider() : colliderQuery()
 void FPSCollider::Update(double deltaTime)
 {
 	vehVehicle* player = persGetPersonaVehiclePtr();
-	if(player == NULL) return;
+	if(player == nullptr) return;
 
 	// setup rays
 	Vec3d pos				= Vec3d(player->ModelData->VehiclePos);
@@ -14563,7 +13823,7 @@ void FPSCollider::Update(double deltaTime)
 	// convert to the physical world
 	pos = physicsGameToPhysical(pos);
 
-	colliderQuery::dGeomList& colliders = geoms() ;
+	colliderQuery::dGeomList& colliders = geoms();
 
 	dMatrix3 dAttitude;
 	MatrixTodMatrix(attitude, dAttitude);
@@ -14785,109 +14045,6 @@ void _updateWeaponLag(float deltaTime)
 
 	horizWeaponLagAcc = vertWeaponLagAcc = 0.0f;
 }
-
-#if defined(USE_OSG)
-void _updateOverlays()
-{
-    static SINT32 startSniperDelay = 0;
-	static SINT32 startSniperEndDelay = 0;
-
-	Player* player = playerGetPlayer();
-	if(!player) return;
-
-	// default us to normal view always
-	player->SetViewMode(Player::NORMALVIEW);
-
-	mlVehicleData*	vehicleData = persGetPersonaModelDataPtr();
-
-	if ( !(stateFlags & (STATE_WEAPON_SWITCHING|STATE_SIT)) &&
-		 !(vehicleData->PersonData->Flags & fpFLAGS_FORCE_EXTERNAL) &&
-		 !persIsInDeathCam() )
-	{
-		if (currentWeaponModel == BINOCS)
-			player->SetViewMode(Player::BINOCSVIEW);
-
-		if(fpsWeapons[currentWeaponModel].sniperScope)
-		{
-            switch(currentFPSstate)
-            {
-            case AIM_FIRE:
-            case STAND_FIRE:
-            case CROUCH_FIRE:
-            case PRONE_FIRE:
-                {
-                    if(scopeUp)
-                    {
-                        showArms = FALSE;
-				        showGun = FALSE;
-				        showClip = FALSE;
-
-						player->SetViewMode(Player::SCOPEVIEW);
-                    }
-
-                    break;
-                }
-            case AIM:
-                {
-                    if(!startSniperDelay)
-                    {
-                        startSniperDelay = frametime;
-                    }
-
-                    SINT32 delay = frametime - startSniperDelay;
-                    FLOAT32 delayseconds = (FLOAT32)delay * 0.001f;
-
-                    if(delayseconds >= fpsWeapons[currentWeaponModel].sniperScopeDelay)
-				    {
-					    showArms = FALSE;
-					    showGun = FALSE;
-					    showClip = FALSE;
-
-                        player->SetViewMode(Player::SCOPEVIEW);
-
-                        scopeUp = TRUE;
-				    }
-
-                    break;
-                }
-            default:
-                {
-
-					if (startSniperDelay && (fpsWeapons[currentWeaponModel].sniperScopeEndDelay))
-					{
-                      if(!startSniperEndDelay)
-					  {
-						startSniperEndDelay = frametime;
-                      }
-                      SINT32 delay = frametime - startSniperEndDelay;
-                      FLOAT32 delayseconds = (FLOAT32)delay * 0.001f;
-
-                      if(delayseconds >= fpsWeapons[currentWeaponModel].sniperScopeEndDelay)
-				      {
-					    scopeUp = FALSE;
-						showArms = TRUE;
-						showGun = TRUE;
-						showClip = TRUE;
-                        startSniperEndDelay = 0;
-                        startSniperDelay = 0;
-				     }
-
-					}
-					else
-					{
-						startSniperDelay = 0;
-                        startSniperEndDelay = 0;
-						scopeUp = FALSE;
-						showArms = TRUE;
-						showGun = TRUE;
-						showClip = TRUE;
-					}
-                }
-            } // switch
-		}// if sniper
-	}
-}
-#endif
 
 #ifdef BETA_RELEASE
 void fpFPSSetAnimationSpeed(float speed)

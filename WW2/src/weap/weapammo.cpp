@@ -59,10 +59,6 @@
 #include "fx/TransformEffect.h"
 #include "trn/trnvars.h"
 
-#ifdef DOROTHY
-#include "gr2/gr2Main.h"
-#endif
-
 #define USE_FX2 1
 
 #define GREN_STAT_MODEL 1
@@ -314,7 +310,7 @@ UINT32 weapFindAmmoTypeByName(weapAmmoType ** AmmoType,UCHAR * VarContents)
 {
 	UINT32 i;
 
-    if ( AmmoType == NULL )
+    if ( AmmoType == nullptr )
     {
         return 0;
     }
@@ -330,7 +326,7 @@ UINT32 weapFindAmmoTypeByName(weapAmmoType ** AmmoType,UCHAR * VarContents)
 
 	Write_Log(LOG_WEAP,LOG_WARN,"Cannot find ammo type %s",VarContents);
 
-	*AmmoType = NULL;
+	*AmmoType = nullptr;
 
 	return 0;
 }
@@ -339,19 +335,18 @@ UINT32 _ReadAmmoTypes(void)
 {
 	int AmmoListFile = 0;
 	int CurrentAmmoFile = 0;
-    UCHAR FileName[300] = "";
-    UCHAR Buffer[256] = "";
-	UCHAR* VarName = NULL;
-	UCHAR* VarContents = NULL;
+    UCHAR FileName[300];
+    UCHAR Buffer[256];
+	UCHAR* VarName = nullptr;
+	UCHAR* VarContents = nullptr;
 	UINT32 VarNum = 0;
 	UINT32 CurrentPos = 0;
-	weapAmmoType* AmmoType = NULL;
+	weapAmmoType* AmmoType = nullptr;
 	UINT32 i = 0;
 
-#if defined(USE_OSG)
-#else
+	FileName[0] = Buffer[0] = 0;
+
 	OBJECT * Object;
-#endif
 
 logTimerBeginMacro();
 	_NumAmmoTypes = 0;
@@ -412,7 +407,7 @@ logTimerBeginMacro();
 
 				mlUtilityGetVarnameAndContents(&VarName,&VarContents,Buffer);
 
-				if (VarName == NULL || VarContents == NULL)
+				if (VarName == nullptr || VarContents == nullptr)
 				{
 					continue;
 				}
@@ -456,8 +451,6 @@ logTimerBeginMacro();
                         AmmoType->TracerScale = (FLOAT32)atof((char*)VarContents);
                         break;
 					case WEAP_AMMOVAR_OBJECT:
-#if defined(USE_OSG)
-#else
 						if (strcmp((char*)VarContents,"bullet1") == 0)
 						{
 							AmmoType->UseParticlesForTracer = 1;
@@ -469,7 +462,7 @@ logTimerBeginMacro();
 							Object = obmgrCreateModelInstance((char*)VarContents);
 
 						}
-						if (Object != NULL)
+						if (Object != nullptr)
 						{
 							AmmoType->Object = Object;
 							sprintf(Object->name,"%s%dat",VarContents,CurrentPos); // ensure unique name
@@ -488,7 +481,7 @@ logTimerBeginMacro();
                                     {
                                         if(!(o->flags & OBJECT_NOTOBJECT))
                                         {
-                                            o->drawcallback = NULL;
+                                            o->drawcallback = nullptr;
                                         }
 
                                         Apply(o->child);
@@ -501,7 +494,6 @@ logTimerBeginMacro();
                             SetNull setnull;
                             setnull.Apply(Object);
                          }
-#endif
 						break;
 					case WEAP_AMMOVAR_EXPLOSIVEENERGY:
 						AmmoType->ExplosiveEnergy = (FLOAT32)atof((char*)VarContents);
@@ -695,20 +687,6 @@ logTimerEndMacro();
 	return 0;
 }
 
-#if defined(USE_OSG)
-
-/************************************************************************************************
-	weapAmmoInit
-*************************************************************************************************/
-
-UINT32 weapAmmoInit(void)
-{
-	return _ReadAmmoTypes();
-}
-
-
-#else
-
 /************************************************************************************************
 	weapammo
 *************************************************************************************************/
@@ -790,7 +768,7 @@ UINT32 weapAmmoInit(void)
 	// add all the vehicles on the vehicle list to the free list
 	for(i = 0;i < WEAP_AMMO_MAXNUM_AMMO; i++)
 		_AddToFreeList(&_Ammo[i]);
-	if(_WeapRoundObject == NULL)
+	if(_WeapRoundObject == nullptr)
 	{
 		if(!obmgrCreateModelInstance("tracker"))
 		{
@@ -799,7 +777,7 @@ UINT32 weapAmmoInit(void)
 		else
 		{
 			_WeapRoundObject = obmainFindNamedObject("tracker");
-			if (_WeapRoundObject->child != NULL)
+			if (_WeapRoundObject->child != nullptr)
 			{
 				_WeapRoundObject->child->flags |= OBJECT_USEMATRIX | OBJECT_USERDRAW;
 				_WeapRoundObject->child->drawcallback = _DisplayWeaponsInFlight;
@@ -815,7 +793,7 @@ UINT32 weapAmmoInit(void)
 	}
 
 	_TorpedoWake = obmgrCreateModelInstance("torpedo1");
-	if (_TorpedoWake != NULL)
+	if (_TorpedoWake != nullptr)
 	{
 		strcpy(_TorpedoWake->name,"torpedowake");
 
@@ -841,15 +819,15 @@ UINT32 weapAmmoInit(void)
 
 UINT32 weapAmmoKill(void)
 {
-	weapAmmo * CurrentAmmo = NULL;
-    weapAmmo* NextAmmo = NULL;
-	weapAmmoType * AmmoType = NULL;
+	weapAmmo * CurrentAmmo = nullptr;
+    weapAmmo* NextAmmo = nullptr;
+	weapAmmoType * AmmoType = nullptr;
 	UINT32 i;
 
 	_NumTracerFX = 0;
 	piFreeMipTextures(_TracerTexId);
 
-	for (CurrentAmmo = _AmmoHead.Next;  CurrentAmmo != NULL;)
+	for (CurrentAmmo = _AmmoHead.Next;  CurrentAmmo != nullptr;)
 	{
 		NextAmmo = CurrentAmmo->Next;
 		_KillAmmo(CurrentAmmo);
@@ -860,26 +838,26 @@ UINT32 weapAmmoKill(void)
 	{
 		AmmoType = &_AmmoTypeList[i];
 
-		if (AmmoType->Object != NULL)
+		if (AmmoType->Object != nullptr)
 		{
 			ogrpFreeObjectTree(AmmoType->Object);
-			AmmoType->Object = NULL;
+			AmmoType->Object = nullptr;
 		}
 	}
-	if (_WeapRoundObject != NULL)
+	if (_WeapRoundObject != nullptr)
 	{
 		ogrpFreeObjectTree(_WeapRoundObject);
-		_WeapRoundObject = NULL;
+		_WeapRoundObject = nullptr;
 	}
-	if (_AmmoTypeList != NULL)
+	if (_AmmoTypeList != nullptr)
 	{
 		memFree(_AmmoTypeList);
-		_AmmoTypeList = NULL;
+		_AmmoTypeList = nullptr;
 	}
-	if (_TorpedoWake != NULL)
+	if (_TorpedoWake != nullptr)
 	{
 		ogrpFreeObjectTree(_TorpedoWake);
-		_TorpedoWake = NULL;
+		_TorpedoWake = nullptr;
 	}
 
     weapfxKill();
@@ -893,10 +871,10 @@ UINT32 weapAmmoKill(void)
 
 UINT32 weapAmmoKillAllAmmo(void)
 {
-	weapAmmo* Ammo = NULL;
-	weapAmmo* NextAmmo = NULL;
+	weapAmmo* Ammo = nullptr;
+	weapAmmo* NextAmmo = nullptr;
 
-	for(Ammo = _AmmoHead.Next; Ammo != NULL;)
+	for(Ammo = _AmmoHead.Next; Ammo != nullptr;)
 	{
 		NextAmmo = Ammo->Next;
 		_KillAmmo(Ammo);
@@ -908,15 +886,15 @@ UINT32 weapAmmoKillAllAmmo(void)
 
 void weapAmmoClearVehicle(vehVehicle* v)
 {
-	weapAmmo* Ammo = NULL;
-	weapAmmo* NextAmmo = NULL;
+	weapAmmo* Ammo = nullptr;
+	weapAmmo* NextAmmo = nullptr;
 
-	for(Ammo = _AmmoHead.Next; Ammo != NULL;)
+	for(Ammo = _AmmoHead.Next; Ammo != nullptr;)
 	{
 		NextAmmo = Ammo->Next;
 		if ( Ammo->AttachedToVehicle == v )
     {
-      Ammo->AttachedToVehicle = NULL;
+      Ammo->AttachedToVehicle = nullptr;
     }
 		Ammo = NextAmmo;
 	}
@@ -928,13 +906,13 @@ void weapAmmoClearVehicle(vehVehicle* v)
 
 UINT32 weapAmmoObjectCeasingToExist(OBJECT * Object)
 {
-	weapAmmo* Ammo = NULL;
-	weapAmmo* NextAmmo = NULL;
+	weapAmmo* Ammo = nullptr;
+	weapAmmo* NextAmmo = nullptr;
 
-	for(Ammo = _AmmoHead.Next; Ammo != NULL;)
+	for(Ammo = _AmmoHead.Next; Ammo != nullptr;)
 	{
 		NextAmmo = Ammo->Next;
-		if (Ammo->AttachedObject != NULL && Ammo->AttachedObject == Object)
+		if (Ammo->AttachedObject != nullptr && Ammo->AttachedObject == Object)
 			_KillAmmo(Ammo);
 		Ammo = NextAmmo;
 	}
@@ -983,15 +961,15 @@ FLOAT32 weapAmmoGetFuzeInterval(void)
 
 UINT32 weapUpdate(void)
 {
-	weapAmmo* CurrentAmmo = NULL;
-    weapAmmo* NextAmmo = NULL;
+	weapAmmo* CurrentAmmo = nullptr;
+    weapAmmo* NextAmmo = nullptr;
 
 	logTimerBeginMacro();
 
-	if (_AmmoHead.Next != NULL)
+	if (_AmmoHead.Next != nullptr)
 	{
 		for (CurrentAmmo = _AmmoHead.Next;
-			 CurrentAmmo != NULL;)
+			 CurrentAmmo != nullptr;)
 		{
 			NextAmmo = CurrentAmmo->Next; // save next pointer in case ammo is deleted when updated
 
@@ -1207,9 +1185,9 @@ UINT32 weapUpdateVehicleHitmap(vehVehicle* Vehicle)
 	if(Vehicle->LastHitmapUpdateTime == frametime) return 0; // hitmap is up-to-date
 	Vehicle->LastHitmapUpdateTime = frametime;
 
-	if (Vehicle->VehicleObjectData == NULL) return 0;
+	if (Vehicle->VehicleObjectData == nullptr) return 0;
 
-	if (Vehicle->VehicleObjectData->CollideExternObject != NULL)
+	if (Vehicle->VehicleObjectData->CollideExternObject != nullptr)
 	{
 		ObjectFlag2State s(Vehicle->VehicleObjectData->CollideExternObject);
 		Vehicle->VehicleObjectData->CollideExternObject->flag2 &= ~OBJECT_DONT_UPDATE;
@@ -1224,7 +1202,7 @@ UINT32 weapUpdateVehicleHitmap(vehVehicle* Vehicle)
 								  &Vehicle->PosData.RenderAtt);
 	}
 
-	if (Vehicle->VehicleObjectData->CollideInternObject != NULL)
+	if (Vehicle->VehicleObjectData->CollideInternObject != nullptr)
 	{
 		ObjectFlag2State s(Vehicle->VehicleObjectData->CollideInternObject);
 		Vehicle->VehicleObjectData->CollideInternObject->flag2 &= ~OBJECT_DONT_UPDATE;
@@ -1240,7 +1218,7 @@ UINT32 weapUpdateVehicleHitmap(vehVehicle* Vehicle)
 
 	}
 
-	if (Vehicle->VehicleObjectData->CollideWalkObject != NULL)
+	if (Vehicle->VehicleObjectData->CollideWalkObject != nullptr)
 	{
 		ObjectFlag2State s(Vehicle->VehicleObjectData->CollideWalkObject);
 		Vehicle->VehicleObjectData->CollideWalkObject->flag2 &= ~OBJECT_DONT_UPDATE;
@@ -1255,7 +1233,7 @@ UINT32 weapUpdateVehicleHitmap(vehVehicle* Vehicle)
 							  &Vehicle->PosData.RenderAtt);
 	}
 
-	if (Vehicle->VehicleObjectData->HitBox != NULL)
+	if (Vehicle->VehicleObjectData->HitBox != nullptr)
 	{
 		ObjectFlag2State s(Vehicle->VehicleObjectData->HitBox);
 		Vehicle->VehicleObjectData->HitBox->flag2 &=  ~OBJECT_DONT_UPDATE;
@@ -1288,7 +1266,7 @@ UINT32 weapAmmoSetRoundPos(piVECTOR* Pos)
 	Mat1._42 = -(FLOAT32)(Pos->y - playdir.y * 1.1);
 	Mat1._43 = -(FLOAT32)(Pos->z - playdir.z * 1.1);
 
-	ogrpMoveAndRotateSubObject(_WeapRoundObject,&Mat1,&Mat1,0);
+	ogrpMoveAndRotateSubObject(_WeapRoundObject,&Mat1,&Mat1);
 
 	return 0;
 }
@@ -1316,7 +1294,7 @@ LOGICAL weapDrawTracers(void)
 	UINT32 Color = 0;
 	SINT32 i;
 	FLOAT32 ScaleLen = 0;
-	piLVERTEX* pVertices = NULL;
+	piLVERTEX* pVertices = nullptr;
 
 	if(_NumTracerFX == 0) return TRUE;
 
@@ -1599,7 +1577,7 @@ public:
 			trnCDTerrainObject* TO = colliderSpaceData<trnCDTerrainObject>(_thisContact);
 			if(!TO) return;
 
-            if ( TO->TerrainMasterObject->modelInstance == NULL )
+            if ( TO->TerrainMasterObject->modelInstance == nullptr )
             {
                 return;
             }
@@ -1649,9 +1627,9 @@ public:
 
 		if(object && _IsWater(object))
 		{
-            TransformEffect* te = NULL;
+            TransformEffect* te = nullptr;
 
-            te = TransformEffect::AddEffect("watersplash", Vec3f(0, 0, -1), 0, NULL);
+            te = TransformEffect::AddEffect("watersplash", Vec3f(0, 0, -1), 0, nullptr);
 
             if(te)
             {
@@ -1893,7 +1871,7 @@ static LOGICAL _UpdateGrenade(weapAmmo* Ammo)
 		}
 		else
 		{
-			weapfxAmmoExplosion(Ammo, &Position, NULL, 0);
+			weapfxAmmoExplosion(Ammo, &Position, nullptr, 0);
 
 			_DoExplosionShrapnel(Ammo, &Position, &Ammo->Velocity, frametime / 1000.0);
 			_DoExplosionConcussion(Ammo, &Position, FALSE);
@@ -1930,7 +1908,7 @@ UINT32 weapFireRound(FLOAT64VECTOR* RecoilForce,
 	}
 	*/
 
-	weapAmmo* Ammo = NULL;
+	weapAmmo* Ammo = nullptr;
     FLOAT64VECTOR ProjVel = {0, 0, 0};
 	FLOAT64 Impulse = 0;
 
@@ -2104,9 +2082,9 @@ UINT32 weapPlaceRoundOnObject(piVECTOR * CollidePnt,
 								void*  Vehicle,
 								void*  TO)
 {
-	weapAmmo * Ammo = NULL;
+	weapAmmo * Ammo = nullptr;
 
-	if(AmmoType == NULL)
+	if(AmmoType == nullptr)
         return 1;
 
     if(CollideObject)
@@ -2118,7 +2096,7 @@ UINT32 weapPlaceRoundOnObject(piVECTOR * CollidePnt,
 
 	_GetNewAmmo(&Ammo);
 
-	if(Ammo == NULL)
+	if(Ammo == nullptr)
         return 3;
 
 	Ammo->LaunchTime = LaunchTime;
@@ -2156,8 +2134,8 @@ UINT32 weapCollideWithHitmapObject(FASTCOLLIDE ** CollisionList,
 										UINT32 DontIgnoreBackface,
 										UINT32 DontCheckSibs)
 {
-	OBJECT* Object1 = NULL;
-    OBJECT* Object2 = NULL;
+	OBJECT* Object1 = nullptr;
+    OBJECT* Object2 = nullptr;
 	FLOAT32 mnx = 0;
     FLOAT32 mny = 0;
     FLOAT32 mnz = 0;
@@ -2171,7 +2149,7 @@ UINT32 weapCollideWithHitmapObject(FASTCOLLIDE ** CollisionList,
 
     piMATRIX MatInv = IdentityMatrix;
 
-	if (CurrentObject == NULL) return 0;
+	if (CurrentObject == nullptr) return 0;
 
 	Object1 = CurrentObject;
 
@@ -2226,7 +2204,7 @@ UINT32 weapCollideWithHitmapObject(FASTCOLLIDE ** CollisionList,
 															      NumCollisionSlotsLeft,
 															      Object2,
 															      TopObject,
-															      NULL,
+															      nullptr,
 															      &OldPnt2,
 															      &NewPnt2,
 															      DontIgnoreBackface);
@@ -2264,7 +2242,7 @@ UINT32 weapCollideWithHitmapObject(FASTCOLLIDE ** CollisionList,
 															      NumCollisionSlotsLeft,
 															      Object2,
 															      TopObject,
-															      NULL,
+															      nullptr,
 															      &OldPnt2,
 															      &NewPnt2,
 															      DontIgnoreBackface);
@@ -2276,10 +2254,10 @@ UINT32 weapCollideWithHitmapObject(FASTCOLLIDE ** CollisionList,
 					}
 				}
 				Object2 = Object2->attached;
-			} while (Object2 != NULL);
+			} while (Object2 != nullptr);
 		}
 
-		if (Object1->child != NULL)
+		if (Object1->child != nullptr)
 		{
 			weapCollideWithHitmapObject(CollisionList,
 									  NumCollisionSlotsLeft,
@@ -2293,7 +2271,7 @@ UINT32 weapCollideWithHitmapObject(FASTCOLLIDE ** CollisionList,
 
 		Object1 = Object1->sibling;
 
-	} while (Object1 != NULL && DontCheckSibs == 0);
+	} while (Object1 != nullptr && DontCheckSibs == 0);
 
 
 
@@ -2316,7 +2294,7 @@ UINT32 weapCollideRoundWithVehicles(FASTCOLLIDE ** CollideListPtr,
 								 UINT32 UseHitBoxInstead,
 								 SINT32 Side)
 {
-	vehVehicle*		CurrentVehicle = NULL;
+	vehVehicle*		CurrentVehicle = nullptr;
 	vehGetVehicleHead(&CurrentVehicle);
 	vehVehicle*		PlayerVehicle = persGetPersonaVehiclePtr();
     piVECTOR		UseOldPos = {0, 0, 0};
@@ -2326,7 +2304,7 @@ UINT32 weapCollideRoundWithVehicles(FASTCOLLIDE ** CollideListPtr,
     piVECTOR		SphereCenter = {0, 0, 0};
 	UINT32			Collision = 0;
 	piMATRIX		InvMat = IdentityMatrix;
-	FASTCOLLIDE*		TempCollideListPtr = NULL;
+	FASTCOLLIDE*		TempCollideListPtr = nullptr;
 	UINT32			TempNum = 0;
 	UINT32			i = 0;
 	SINT32			collisionOccurred = 0;
@@ -2348,7 +2326,7 @@ UINT32 weapCollideRoundWithVehicles(FASTCOLLIDE ** CollideListPtr,
 	{
 		if ((CanHitPlayer == 0) && (CurrentVehicle == PlayerVehicle)) continue;
 		if ((CheckOnlyPlayer != 0) && (CurrentVehicle != PlayerVehicle)) continue;
-		if (CurrentVehicle->VehicleObjectData == NULL) continue;
+		if (CurrentVehicle->VehicleObjectData == nullptr) continue;
 		if (Side > 0 && Side == CurrentVehicle->Side && CurrentVehicle != PlayerVehicle) continue;
 
 		// give 20 seconds after a clone is spawned where you don't collide
@@ -2361,7 +2339,7 @@ UINT32 weapCollideRoundWithVehicles(FASTCOLLIDE ** CollideListPtr,
 		// adjust old position
 		DeltaTime = (FLOAT32)(OldPosTime - frametime / 1000.0);
 
-		if (CurrentVehicle == PlayerVehicle && PlayerVehicle->ModelData != NULL)
+		if (CurrentVehicle == PlayerVehicle && PlayerVehicle->ModelData != nullptr)
 		{
 			DeltaPos.x = (FLOAT32)(CurrentVehicle->ModelData->VehicleRealVel.x * DeltaTime);
 			DeltaPos.y = (FLOAT32)(CurrentVehicle->ModelData->VehicleRealVel.y * DeltaTime);
@@ -2391,46 +2369,6 @@ UINT32 weapCollideRoundWithVehicles(FASTCOLLIDE ** CollideListPtr,
 
 		if (Collision != 0)
 		{
-#ifdef DOROTHY
-			if (CurrentVehicle->VehicleObjectData->PlaneObject->flag3 & OBJECT_IS_GR2VEHICLE)
-			{
-				// gr2 vehicles don't collide like regular vehicles
-				if (UseHitBoxInstead) continue;
-
-				collisionOccurred = gr2DoWeaponCollision(CurrentVehicle, &UseOldPos, &UseNewPos, (SINT32*)&location, &CollisionPnt);
-
-				CollisionPnt.z = -CollisionPnt.z;
-
-				if (collisionOccurred)
-				{
-					mathSubVectors(&TempVec,&UseNewPos,&UseOldPos);
-					Dist1 = mathExactVectorLength(&TempVec);
-					TempVec = CollisionPnt;
-					math3dVectorMultiply(&TempVec,&TempVec,
-										&CurrentVehicle->VehicleObjectData->PlaneObject->mat);
-					mathSubVectors(&TempVec,&TempVec,&UseOldPos);
-					Dist2 = mathExactVectorLength(&TempVec);
-					if (Dist2 < Dist1 &&
-						*NumCollisionSlotsLeft > 0)
-					{
-						TempCollideListPtr = *CollideListPtr;
-						TempCollideListPtr->Flags |= _AMMOCD_FLAG_ISPERSONA;
-						TempCollideListPtr->CollideObject = CurrentVehicle->VehicleObjectData->PlaneObject;
-						TempCollideListPtr->TopLevelObject = (OBJECT*)CurrentVehicle;
-						TempCollideListPtr->CollideTime = (FLOAT32)(Dist2 / Dist1);
-						TempCollideListPtr->CollidePnt = CollisionPnt;
-						math3dInvertMatrix(&InvMat,&CurrentVehicle->VehicleObjectData->PlaneObject->mat);
-						math3dVectorMultiply(&TempCollideListPtr->OldPos,&UseOldPos,&InvMat);
-						math3dVectorMultiply(&TempCollideListPtr->NewPos,&UseNewPos,&InvMat);
-						TempCollideListPtr->Alpha = 1.0f;
-						TempCollideListPtr->PolyNum = location;
-						(*CollideListPtr)++;
-						(*NumCollisionSlotsLeft)--;
-					}
-				}
-			}
-			else
-#endif
 			if (CurrentVehicle->VehicleObjectData->PlaneObject->flag2 & OBJECT_ANIMATION)
 			{
 				// infantry don't collide like regular vehicles
@@ -2662,14 +2600,14 @@ static UINT32 _ReadBallisticChart(void)
 
 static UINT32 _GetNewAmmo(weapAmmo ** AmmoPtr)
 {
-weapAmmo * Ammo = NULL;
-weapAmmo * TempPtr1 = NULL,*TempPtr2 = NULL;
+weapAmmo * Ammo = nullptr;
+weapAmmo * TempPtr1 = nullptr,*TempPtr2 = nullptr;
 
-	if(AmmoPtr == NULL) return 1;
+	if(AmmoPtr == nullptr) return 1;
 
-	*AmmoPtr = NULL;
+	*AmmoPtr = nullptr;
 
-	if (_AmmoFree.Next == NULL)
+	if (_AmmoFree.Next == nullptr)
 	{
 		Write_Log(LOG_WEAP,LOG_WARN,"Ammo free list empty");
 		return 1;
@@ -2701,7 +2639,7 @@ weapAmmo * TempPtr1 = NULL,*TempPtr2 = NULL;
 
 static UINT32 _KillAmmo(weapAmmo * Ammo)
 {
-	if (Ammo == NULL)
+	if (Ammo == nullptr)
 		return 0;
 
     Ammo->inuse = false;
@@ -2728,11 +2666,11 @@ static UINT32 _KillAmmo(weapAmmo * Ammo)
 
 static UINT32 _AddToFreeList(weapAmmo * Ammo)
 {
-	if(Ammo == NULL) return 1;
+	if(Ammo == nullptr) return 1;
 
 	Ammo->Prev = &_AmmoFree;
 	Ammo->Next = _AmmoFree.Next;
-	if (_AmmoFree.Next != NULL)
+	if (_AmmoFree.Next != nullptr)
 		_AmmoFree.Next->Prev = Ammo;
 	_AmmoFree.Next = Ammo;
 
@@ -2745,14 +2683,14 @@ static UINT32 _AddToFreeList(weapAmmo * Ammo)
 
 static UINT32 _RemoveFromList(weapAmmo * Ammo)
 {
-	if (Ammo == NULL) return 1;
+	if (Ammo == nullptr) return 1;
 
-	if (Ammo->Next != NULL)
+	if (Ammo->Next != nullptr)
 		Ammo->Next->Prev = Ammo->Prev;
-	if (Ammo->Prev != NULL)
+	if (Ammo->Prev != nullptr)
 		Ammo->Prev->Next = Ammo->Next;
 
-	Ammo->Prev = Ammo->Next = NULL;
+	Ammo->Prev = Ammo->Next = nullptr;
 
 	return 0;
 }
@@ -2763,12 +2701,12 @@ static UINT32 _RemoveFromList(weapAmmo * Ammo)
 
 static UINT32 _AddToListHead(weapAmmo * Ammo)
 {
-	if(Ammo == NULL) return 1;
+	if(Ammo == nullptr) return 1;
 
 	Ammo->Prev = &_AmmoHead;
 	Ammo->Next = _AmmoHead.Next;
 
-	if (_AmmoHead.Next != NULL)
+	if (_AmmoHead.Next != nullptr)
 		_AmmoHead.Next->Prev = Ammo;
 
 	_AmmoHead.Next = Ammo;
@@ -2787,12 +2725,12 @@ static bool _DisplayWeaponsInFlight(OBJECT * DummyObject)
     if(!obdrawIsRenderPass(RENDER_SCENE))
         return TRUE;
 
-	weapAmmo* CurrentAmmo = NULL;
-    weapAmmo* NextAmmo = NULL;
+	weapAmmo* CurrentAmmo = nullptr;
+    weapAmmo* NextAmmo = nullptr;
 
-	if (_AmmoHead.Next != NULL)
+	if (_AmmoHead.Next != nullptr)
 	{
-		for (CurrentAmmo = _AmmoHead.Next; CurrentAmmo != NULL;)
+		for (CurrentAmmo = _AmmoHead.Next; CurrentAmmo != nullptr;)
 		{
 			NextAmmo = CurrentAmmo->Next;
 
@@ -2820,7 +2758,7 @@ static UINT32 _UpdateProjectileDisplay(weapAmmo * Ammo)
 	FLOAT32 Scale = 0;
     FLOAT64VECTOR Vec = {0, 0, 0};
 	FLOAT32 DeltaTime = 0;
-	OBJECT* AmmoDisplayObject = NULL;
+	OBJECT* AmmoDisplayObject = nullptr;
 
 	// check for object
 	if(!Ammo || !Ammo->AmmoType || !Ammo->AmmoType->Object) return 0;
@@ -2921,21 +2859,21 @@ static UINT32 _UpdateProjectileDisplay(weapAmmo * Ammo)
         if(Ammo->SoundID == 0)
             weapfxTorpedo(Ammo);
 
-		AmmoDisplayObject = NULL;
+		AmmoDisplayObject = nullptr;
     }
 	else
 		AmmoDisplayObject = Ammo->AmmoType->Object;
 
 	if(AmmoDisplayObject)
 	{
-		ogrpMoveAndRotateSubObject(AmmoDisplayObject, &Mat, &Mat,0);
+		ogrpMoveAndRotateSubObject(AmmoDisplayObject, &Mat, &Mat);
 		piSetRenderStageState(0, piTSS_MIPFILTER, piTFP_NONE);
 
 		_DisplayObject(AmmoDisplayObject);
 		piSetRenderStageState(0, piTSS_MIPFILTER, TextureMipFilter);
 
 		Mat = IdentityMatrix;
-		ogrpMoveAndRotateSubObject(AmmoDisplayObject,&Mat,&Mat,0);
+		ogrpMoveAndRotateSubObject(AmmoDisplayObject,&Mat,&Mat);
 	}
 
 	return 0;
@@ -2948,12 +2886,12 @@ static UINT32 _UpdateProjectileDisplay(weapAmmo * Ammo)
 
 UINT32 _StretchObject(OBJECT* Object,FLOAT32 Stretch)
 {
-	OBJECT * Object1 = NULL;
+	OBJECT * Object1 = nullptr;
 	UINT32 i = 0;
 
-	if(Object == NULL) return 0;
+	if(Object == nullptr) return 0;
 
-	for (Object1 = Object;Object1 != NULL; Object1 = Object1->attached)
+	for (Object1 = Object;Object1 != nullptr; Object1 = Object1->attached)
 	{
 		piVectorConstPtr ip = Object1->ImmutablePositions();
 		piVectorPtr mp = Object1->MutablePositions();
@@ -2965,10 +2903,10 @@ UINT32 _StretchObject(OBJECT* Object,FLOAT32 Stretch)
 
 	}
 
-	if (Object->child != NULL)
+	if (Object->child != nullptr)
 		_StretchObject(Object->child,Stretch);
 
-	if (Object->sibling != NULL)
+	if (Object->sibling != nullptr)
 		_StretchObject(Object->sibling,Stretch);
 
 	return 0;
@@ -2981,10 +2919,10 @@ UINT32 _StretchObject(OBJECT* Object,FLOAT32 Stretch)
 
 static UINT32 _DisplayObject(OBJECT* Object)
 {
-	OBJECT* ObjAtt = NULL;
-    OBJECT* ObjSib = NULL;
+	OBJECT* ObjAtt = nullptr;
+    OBJECT* ObjSib = nullptr;
 
-	if(Object == NULL) return 0;
+	if(Object == nullptr) return 0;
 
 	ObjSib = Object;
 
@@ -3002,14 +2940,14 @@ static UINT32 _DisplayObject(OBJECT* Object)
 				}
 				ObjAtt = ObjAtt->attached;
 			}
-			while (ObjAtt != NULL);
+			while (ObjAtt != nullptr);
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 			_DisplayObject(ObjSib->child);
 
 		ObjSib = ObjSib->sibling;
-	}while (ObjSib != NULL);
+	}while (ObjSib != nullptr);
 
 	return 0;
 }
@@ -3431,9 +3369,9 @@ static UINT32 _DoImprovedShrapnel(weapAmmo* Ammo, FLOAT64VECTOR const* InPos, FL
 	FLOAT32				avgMass = 0;
 	FLOAT64VECTOR		PrevPos;
 	FLOAT32				PC = 0;
-	vehVehicle*			CurrentVehicle = NULL;
+	vehVehicle*			CurrentVehicle = nullptr;
 	vehVehicle*			PlayerVehicle = persGetPersonaVehiclePtr();
-	trnAutoGun*			AG = NULL;
+	trnAutoGun*			AG = nullptr;
 	UINT32				maxNumShrapnel = 0;
 	shrapTarget			shrapTargetInfo;
 	std::list<shrapTarget>	shrapList;
@@ -3481,9 +3419,9 @@ static UINT32 _DoImprovedShrapnel(weapAmmo* Ammo, FLOAT64VECTOR const* InPos, FL
 	vehGetVehicleHead(&CurrentVehicle);
 	for(;CurrentVehicle; CurrentVehicle = CurrentVehicle->getNext())
 	{
-		if (CurrentVehicle->VehicleObjectData == NULL) continue;
+		if (CurrentVehicle->VehicleObjectData == nullptr) continue;
 
-		if (CurrentVehicle == PlayerVehicle && PlayerVehicle->ModelData != NULL)
+		if (CurrentVehicle == PlayerVehicle && PlayerVehicle->ModelData != nullptr)
 		{
 			shrapTargetInfo.targetPos = CurrentVehicle->ModelData->RenderPos;
 		}
@@ -3502,13 +3440,6 @@ static UINT32 _DoImprovedShrapnel(weapAmmo* Ammo, FLOAT64VECTOR const* InPos, FL
 			shrapTargetInfo.radius = shrapTargetInfo.radius/2;
 			shrapTargetInfo.targetPos.z += shrapTargetInfo.radius;
 		}
-#ifdef DOROTHY
- 		else if(CurrentVehicle->VehicleType->Type == VEH_TYPE_MECH)
-		{
-			shrapTargetInfo.radius = shrapTargetInfo.radius/2;
-			shrapTargetInfo.targetPos.z += shrapTargetInfo.radius;
-		}
-#endif
 
 		shrapList.push_back(shrapTargetInfo);
 	}
@@ -3797,12 +3728,12 @@ static UINT32 _TraverseHitTreeAndApplyConcussionDamage(weapAmmo* Ammo, vehVehicl
 														const FLOAT64& Energy, piVECTOR* Epicenter, SINT32 Counter, UINT32 UseSibs,
 														LOGICAL ExplosionInternal, LOGICAL ComponentInternal)
 {
-	OBJECT * ObjSib = NULL;
+	OBJECT * ObjSib = nullptr;
     piVECTOR Pos = {0, 0, 0};
 	FLOAT64 Damage = 0;
 	FLOAT32 Dist = 0;
 
-	if (CurrentObject == NULL) return 0;
+	if (CurrentObject == nullptr) return 0;
 
 	ObjSib = CurrentObject;
 
@@ -3854,9 +3785,9 @@ static UINT32 _TraverseHitTreeAndApplyConcussionDamage(weapAmmo* Ammo, vehVehicl
 static UINT32 _DoExplosionConcussion(weapAmmo* Ammo, FLOAT64VECTOR const* InPos, LOGICAL Internal)
 {
 	mlVehicleData * PlayerModelData = persGetPersonaModelDataPtr();
-	trnCDTerrainObject * TOHead = NULL;
-	trnCDTerrainObject * TO = NULL;
-	trnCDTerrainObject ** UseTO = NULL;
+	trnCDTerrainObject * TOHead = nullptr;
+	trnCDTerrainObject * TO = nullptr;
+	trnCDTerrainObject ** UseTO = nullptr;
 	FLOAT64 Energy = 0;
 	FLOAT64 TempNum = 0;
 	FLOAT64 MaxDistSqr = 0;
@@ -3864,10 +3795,10 @@ static UINT32 _DoExplosionConcussion(weapAmmo* Ammo, FLOAT64VECTOR const* InPos,
 	piVECTOR TempVec = {0, 0, 0};
 	FLOAT64 Damage = 0;
     piVECTOR Pos = {0, 0, 0},Epicenter = {0, 0, 0};
-	vehVehicle* CurrentVehicle = NULL;
-	vehVehicle* PlayerVehicle = NULL;
+	vehVehicle* CurrentVehicle = nullptr;
+	vehVehicle* PlayerVehicle = nullptr;
 	FASTCOLLIDE CollideList[_MAX_NUM_OF_COLLISIONS];
-	FASTCOLLIDE * CollideListPtr = NULL;
+	FASTCOLLIDE * CollideListPtr = nullptr;
 	UINT32 TempCDNum = 0;
 	SINT32 NumCollides = 0;
 	SINT32 MaxNumInList = 0;
@@ -3876,9 +3807,6 @@ static UINT32 _DoExplosionConcussion(weapAmmo* Ammo, FLOAT64VECTOR const* InPos,
 	PlayerVehicle = persGetPersonaVehiclePtr();
 
     // Leave here to guarantee visible concussion effect
-#ifdef DOROTHY
-	if(PlayerVehicle && PlayerVehicle->VehicleType->Type != VEH_TYPE_MECH)
-#endif
 	{
 		persSetConcussionEffect(Ammo);
 	}
@@ -3910,7 +3838,7 @@ static UINT32 _DoExplosionConcussion(weapAmmo* Ammo, FLOAT64VECTOR const* InPos,
 
 	if (!(Ammo->Flags & WEAP_AMMOFLAG_DONTCHECKGROUNDOBJECTS))
 	{
-		for (TO = TOHead;TO != NULL;)
+		for (TO = TOHead;TO != nullptr;)
 		{
 			if (TO->StratId == 0 && !TO->IsSTO())
 			{
@@ -3963,22 +3891,22 @@ static UINT32 _DoExplosionConcussion(weapAmmo* Ammo, FLOAT64VECTOR const* InPos,
 			// OGS->Ramp: If AutoGun is NOT null and ... other stuff
 			if (TO->ObjId.objClass != CLASS_BUILDING ||
 				TO->ObjId.objType != BUILDING_CAPTURE &&
-				TO->TrnAutoGun == NULL)
+				TO->TrnAutoGun == nullptr)
 			{
-				weapAmmoApplyDamageToObject(Ammo, Damage, TO, NULL);
+				weapAmmoApplyDamageToObject(Ammo, Damage, TO, nullptr);
 			}
 
 			// OGS->Ramp: If AutoGun is NOT null and ... other stuff
 			if (TO->ObjId.objClass != CLASS_BUILDING ||
 				TO->ObjId.objType != BUILDING_CAPTURE &&
-				TO->TrnAutoGun != NULL)
+				TO->TrnAutoGun != nullptr)
 			{
 				trnAutoGun* AG;
 				piVECTOR P1;
 
 				AG = TO->TrnAutoGun;
 
-                if(AG != NULL)
+                if(AG != nullptr)
                 {
                     // check for LOS
 				    P1.x = (FLOAT32)(AG->Pos.x + AG->EyePos.x - WorldOriginOffset.x);
@@ -3987,7 +3915,7 @@ static UINT32 _DoExplosionConcussion(weapAmmo* Ammo, FLOAT64VECTOR const* InPos,
 
 				     // if direct line to view point, then apply damage
 				    if(!(Ammo->Flags & WEAP_AMMOFLAG_DONT_SEND_DAMAGE) && !trncdCollideDownMediumList(&Epicenter,&P1))
-					    weapAmmoApplyDamageToObject(Ammo, Damage, TO, NULL);
+					    weapAmmoApplyDamageToObject(Ammo, Damage, TO, nullptr);
                 }
 			}
 
@@ -4005,9 +3933,9 @@ static UINT32 _DoExplosionConcussion(weapAmmo* Ammo, FLOAT64VECTOR const* InPos,
 	if (!(Ammo->Flags & WEAP_AMMOFLAG_DONTCHECKVEHICLES))
 	{
 		vehGetVehicleHead(&CurrentVehicle);
-		while (CurrentVehicle != NULL)
+		while (CurrentVehicle != nullptr)
 		{
-			if (CurrentVehicle->VehicleObjectData == NULL)
+			if (CurrentVehicle->VehicleObjectData == nullptr)
 			{
 				CurrentVehicle = CurrentVehicle->getNext();
 				continue;
@@ -4038,16 +3966,10 @@ static UINT32 _DoExplosionConcussion(weapAmmo* Ammo, FLOAT64VECTOR const* InPos,
 			{
 				Pos.z -= 1.0f; // FPS center is at the feet, need to adjust for this
 			}
-#ifdef DOROTHY
-			else if (CurrentVehicle->VehicleType->Type == VEH_TYPE_MECH)
-			{
-				Pos.z -= 3.0f; // FPS center is at the feet, need to adjust for this
-			}
-#endif
 
-			if (Ammo->VehicleData == NULL)
+			if (Ammo->VehicleData == nullptr)
 			{
-				if (PlayerModelData == NULL)
+				if (PlayerModelData == nullptr)
 				{
 					break;
 				}
@@ -4181,42 +4103,6 @@ static UINT32 _DoExplosionConcussion(weapAmmo* Ammo, FLOAT64VECTOR const* InPos,
 					weapAmmoApplyDamageToVehicleComponent(Ammo, CurrentVehicle, 29, Damage, Ammo->Id);	// leg
 				}
 			}
-#ifdef DOROTHY
-			else if (CurrentVehicle->VehicleType->Type == VEH_TYPE_MECH)
-			{
-				/*
-				mathSubVectors(&TempVec,&Pos,&Epicenter);
-				TempNum = (FLOAT32)mathExactVectorLength(&TempVec);
-				if (TempNum < 0.01f)
-				{
-					TempNum = 0.01f;
-				}
-				TempNum *= 95.0f;
-
-				Damage = Energy / (TempNum * TempNum);
-				if (Damage > Energy)
-				{
-					Damage = Energy;
-				}
-
-				// modify the resulting damage by the fps concussion mod
-				Damage *= fpFPSGetConcussionMod();
-
-				if (Damage > 10.0f)
-				{
-					Write_Log(LOG_WEAP, LOG_INFO, "WEAP Concussion to %s(%s) at %.1fm",
-								CurrentVehicle->VehicleType->Id, CurrentVehicle->Handle, (FLOAT32)mathExactVectorLength(&TempVec));
-//					for (i=0;i<4;i++)
-//						weapAmmoApplyDamageToVehicleComponent(Ammo, CurrentVehicle, i+1, Damage, Ammo->Id);
-					// replace one hack with another
-					weapAmmoApplyDamageToVehicleComponent(Ammo, CurrentVehicle, 5, Damage, Ammo->Id);	// head
-					weapAmmoApplyDamageToVehicleComponent(Ammo, CurrentVehicle, 1, Damage, Ammo->Id);	// torso
-					weapAmmoApplyDamageToVehicleComponent(Ammo, CurrentVehicle, 20, Damage, Ammo->Id);	// arms
-					weapAmmoApplyDamageToVehicleComponent(Ammo, CurrentVehicle, 29, Damage, Ammo->Id);	// leg
-				}
-				*/
-			}
-#endif
 			else
 			{
 				weapUpdateVehicleHitmap(CurrentVehicle);
@@ -4440,9 +4326,9 @@ static LOGICAL _DoAmmoFuzeCheck(weapAmmo* Ammo, piVECTOR const* OldPos,  piVECTO
 
 	if(!Ammo->AmmoType->IsSmokeGrenade)
 	{
-		weapfxAmmoExplosion(Ammo, &Pos, NULL, 0);
+		weapfxAmmoExplosion(Ammo, &Pos, nullptr, 0);
 		_DoExplosionShrapnel(Ammo, &Pos, &Ammo->Velocity, DetontateTime);
-		_DoExplosionConcussion(Ammo, &Pos, Ammo->LastVehicleHit != NULL);
+		_DoExplosionConcussion(Ammo, &Pos, Ammo->LastVehicleHit != nullptr);
 	}
 
 	return TRUE;
@@ -4656,7 +4542,7 @@ static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
         piVECTOR v2 = {0, 0, 0};
         piVECTOR v3 = {0, 0, 0};
 
-        // ptris NULL for FPS.
+        // ptris nullptr for FPS.
         if(Collision->Flags & _AMMOCD_FLAG_ISPERSONA)
         {
             v1 = Collision->CollidePnt;
@@ -4778,12 +4664,12 @@ static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 static LOGICAL _DoTerrainCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVECTOR const* OldPos, piVECTOR const* NewPos,
 									 FLOAT64 DeltaTime,  FLOAT64 CurrentTime)
 {
-	trnCDTerrainObject* TO = NULL;
+	trnCDTerrainObject* TO = nullptr;
 	FLOAT64 KE = 0;
     FLOAT64VECTOR CollidePos = {0, 0, 0};
 	FLOAT64 AmmoSpeed = 0, AmmoCollideTime = 0;
 
-	Ammo->LastVehicleHit = NULL;
+	Ammo->LastVehicleHit = nullptr;
 
 	if(Collision->Alpha < 0.5) return FALSE;
 
@@ -4792,7 +4678,7 @@ static LOGICAL _DoTerrainCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
         return FALSE;
     }
 
-	TO = (Collision->TopLevelObject && Collision->TopLevelObject->child) ? (trnCDTerrainObject*)Collision->TopLevelObject->child->lpspare : NULL;
+	TO = (Collision->TopLevelObject && Collision->TopLevelObject->child) ? (trnCDTerrainObject*)Collision->TopLevelObject->child->lpspare : nullptr;
 
 	if(TO && TO->DamageLevel == FB_CLOSED_VISLEVEL)  // cannot collide with invisible objects
 		return FALSE;
@@ -4819,7 +4705,7 @@ static LOGICAL _DoTerrainCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 		// weapon explosion fx
 		if(!(Ammo->AmmoType->SubType == WEAPAMMO_SUBTYPE_TORPEDO && !Ammo->TorpedoIsRunning)) // don't want the torp to explode just yet
 		{
-			weapfxAmmoHit(Ammo, Collision, OldPos, NewPos, NULL, 0, 0);
+			weapfxAmmoHit(Ammo, Collision, OldPos, NewPos, nullptr, 0, 0);
 		}
 	}
 
@@ -4844,12 +4730,12 @@ static LOGICAL _DoTerrainCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 		if(TO->StratId != 0 && (TO->ObjId.objClass != CLASS_BUILDING || TO->ObjId.objType != BUILDING_CAPTURE) )
 		{
 			weapAmmoApplyDamageToObject(Ammo, (FLOAT32)KE,
-				TO, Ammo->VehicleData ? (vehVehicle*)Ammo->VehicleData->VehicleMasterPtr : NULL);
+				TO, Ammo->VehicleData ? (vehVehicle*)Ammo->VehicleData->VehicleMasterPtr : nullptr);
 		}
 		else if(TO->IsSTO())
 		{
 			weapAmmoApplyDamageToObject(Ammo, (FLOAT32)KE,
-				TO, Ammo->VehicleData ? (vehVehicle*)Ammo->VehicleData->VehicleMasterPtr : NULL);
+				TO, Ammo->VehicleData ? (vehVehicle*)Ammo->VehicleData->VehicleMasterPtr : nullptr);
 		}
 
 		// alert the manager we hit something
@@ -4937,7 +4823,7 @@ static UINT32 _GetProjectileCollisions(weapAmmo* Ammo, UINT32 Flags, FASTCOLLIDE
  	UINT32 NumCollisions = 0;
  	UINT32 PrevNumCollisions = 0, CollisionSlotsLeft = 0;
 	UINT32 i = 0;
-	FASTCOLLIDE*  CollideListPtr = NULL;
+	FASTCOLLIDE*  CollideListPtr = nullptr;
 
 //	Write_Log(LOG_WEAP, LOG_INFO, "WEAP %s(%d) .. Oldpos (%f, %f, %f)  Newpos (%f, %f, %f)",  Ammo->AmmoType->Name, Ammo->Id,
 //								OldPos->x, OldPos->y, OldPos->z, NewPos->x, NewPos->y, NewPos->z);
@@ -5025,7 +4911,7 @@ static SINT32 _AmmoTerrainCollideList(weapAmmo* Ammo, UINT32 Flags, trnCDTerrain
 	mlVehicleData* VehicleData = (Ammo && Ammo->VehicleData) ? Ammo->VehicleData : persGetPersonaModelDataPtr();
 	SINT32 trnCollideListSize = 0;
 
-	*trnCollideList = NULL;
+	*trnCollideList = nullptr;
 
 	if(VehicleData)
 	{
@@ -5054,7 +4940,7 @@ UINT32 _CollideRoundWithAutoguns(FASTCOLLIDE ** CollideListPtr,
 								 FLOAT64 OldPosTime,
 								 FLOAT64 NewPosTime)
 {
-	trnAutoGun * AG = NULL;
+	trnAutoGun * AG = nullptr;
     piVECTOR SphereCenter = {0, 0, 0};
 	FLOAT32 Radius = 0;
 	UINT32 Collision = 0;
@@ -5065,7 +4951,7 @@ UINT32 _CollideRoundWithAutoguns(FASTCOLLIDE ** CollideListPtr,
 
 	Radius = 5.0;
 
-	while (AG != NULL)
+	while (AG != nullptr)
 	{
 		SphereCenter.x = (FLOAT32)(AG->Pos.x - WorldOriginOffset.x);
 		SphereCenter.y = (FLOAT32)(AG->Pos.y - WorldOriginOffset.y);
@@ -5198,7 +5084,7 @@ static UINT32 _CheckLineSphereCollide(UINT32 * Collision, piVECTOR const* Sphere
 
 static LOGICAL _IsWater(OBJECT* lpObj)
 {
-    if(lpObj == NULL)  return FALSE;
+    if(lpObj == nullptr)  return FALSE;
 
     if(lpObj->collider && colliderIsType(lpObj->collider->getCategoryMask(), COLLIDER_TRN_WATER))
     {
@@ -5211,7 +5097,7 @@ static LOGICAL _IsWater(OBJECT* lpObj)
     }
 
     FLOAT32 fRollCoef = 0.0f;
-    mlGetObjectBumpinessAndFriction(NULL, NULL, NULL, NULL, &fRollCoef, NULL, lpObj);
+    mlGetObjectBumpinessAndFriction(nullptr, nullptr, nullptr, nullptr, &fRollCoef, nullptr, lpObj);
 
     vehVehicle*pVehicle = persGetPersonaVehiclePtr();
     if(pVehicle && pVehicle->VehicleType)
@@ -5246,7 +5132,7 @@ static SINT32 _UpdateProjectile(weapAmmo * Ammo)
 	if(!Ammo || !Ammo->AmmoType) return -1;
 
 	CurrentTime = (FLOAT64)frametime/1000.0;
-	Ammo->LastVehicleHit = NULL;
+	Ammo->LastVehicleHit = nullptr;
 
 	// sto rounds can come in anytime throughout their lifetime
 	const FLOAT64 SANITY_DELTA = ((Ammo->Flags & WEAP_AMMOFLAG_IS_GHOSTROUND) && Ammo->AmmoType->UseGhostRoundSTO) ?
@@ -5391,7 +5277,7 @@ static LOGICAL _UpdateAttachedProjectile(weapAmmo* Ammo)
 {
 	LOGICAL KillAmmo = FALSE;
     piVECTOR Temp32Vec = {0, 0, 0};
-	vehVehicle* Vehicle = NULL;
+	vehVehicle* Vehicle = nullptr;
 	FLOAT64 CurrentTime = 0, DeltaTime = 0;
 
 	CurrentTime = (FLOAT64)(frametime)/1000.0;
@@ -5427,7 +5313,7 @@ static LOGICAL _UpdateAttachedProjectile(weapAmmo* Ammo)
 
 	if((CurrentTime + DeltaTime - Ammo->LaunchTime > Ammo->AmmoType->FuzeTime) &&  Ammo->AmmoType->FuzeTime > 0)
 	{
-		weapfxAmmoExplosion(Ammo, &Ammo->Position, NULL, 0);
+		weapfxAmmoExplosion(Ammo, &Ammo->Position, nullptr, 0);
 
 		_DoExplosionShrapnel(Ammo, &Ammo->Position, &Ammo->Velocity, frametime / 1000.0);
 		_DoExplosionConcussion(Ammo, &Ammo->Position, FALSE);
@@ -5474,7 +5360,7 @@ static LOGICAL _UpdateTorpedoProjectile(weapAmmo* Ammo)
         else
         {
             // Set off explosion if torpedo hits land
-		    weapfxAmmoExplosion(Ammo, &Ammo->Position, NULL, 0);
+		    weapfxAmmoExplosion(Ammo, &Ammo->Position, nullptr, 0);
 
             if(Ammo->iParticleID > 0)
             {
@@ -5525,7 +5411,7 @@ static LOGICAL _UpdateTorpedoProjectile(weapAmmo* Ammo)
 static LOGICAL _StickTorpedoToWater(weapAmmo* Ammo)
 {
 	LOGICAL KillAmmo = FALSE;
-	OBJECT* CollideObject = NULL;
+	OBJECT* CollideObject = nullptr;
     piVECTOR CollidePos = {0, 0, 0};
     FLOAT64VECTOR WorldCollidePos = {0, 0, 0};
     piVECTOR V1 = {0, 0, 0},V2 = {0, 0, 0};
@@ -5535,7 +5421,7 @@ static LOGICAL _StickTorpedoToWater(weapAmmo* Ammo)
 	V1.z = (FLOAT32)(Ammo->Position.z - WorldOriginOffset.z); V1.z = -V1.z;
 	V2 = V1; V2.z += 10000.0; V1.z -= 10000.0;
 
-	trncdCollideWithVehiclesAndTerrain(&V1,&V2,&CollidePos,&CollideObject,NULL,NULL,NULL,FALSE,TRUE, FALSE);
+	trncdCollideWithVehiclesAndTerrain(&V1,&V2,&CollidePos,&CollideObject,nullptr,nullptr,nullptr,FALSE,TRUE, FALSE);
 
 	if(CollideObject)
 	{
@@ -5550,7 +5436,6 @@ static LOGICAL _StickTorpedoToWater(weapAmmo* Ammo)
 	return KillAmmo;
 }
 
-#endif
 
 #define AVERAGE_STO_LAG 350
 

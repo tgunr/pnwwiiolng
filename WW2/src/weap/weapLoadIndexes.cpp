@@ -6,7 +6,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "dbug/dbug.h"
 #include "include/mydbQuery.h"
 #include "weap/weapList.h"					// For weapAddWeaponIndex
 #include "wwii/wwiiThreadTextQuery.h"
@@ -22,29 +21,28 @@ static const char QRY_SAVE_VEHICLES[] =
 void
 weapSaveVehicleTypes()
 {
-	ThreadTextQuery qry(DBThread::Default, QRY_SAVE_VEHICLES, "") ;
-	char buf[256] ;
+	ThreadTextQuery qry(DBThread::Default, QRY_SAVE_VEHICLES, "");
+	char buf[256];
 
-	WEAPON_LIST::iterator it ;
-	for ( it = g_weaponList.begin() ; it != g_weaponList.end() ; ++it )
+	for ( auto it = g_weaponList.begin(), end = g_weaponList.end(); it != end; ++it )
 	{
-		WEAPON& weap = *it->second ;
-		const WEAPON_SPEC& spec = it->first ;
+		WEAPON& weap = *it->second;
+		const WEAPON_SPEC& spec = it->first;
 		if ( (UINT32)spec.wCountry > (UINT32)MAX_COUNTRIES )
 		{
-			LogAbort("illegal weapon spec (country): %u.%u.%u.%u", spec.wCountry, spec.wCategory, spec.wClass, spec.wType) ;
+			LogAbort("illegal weapon spec (country): %u.%u.%u.%u", spec.wCountry, spec.wCategory, spec.wClass, spec.wType);
 		}
 
-		snprintf(buf, sizeof(buf), "(%u,%u,%u,%u,\"%s\",%u,\"%s\",NOW())"
+		strprintf(buf, "(%u,%u,%u,%u,\"%s\",%u,\"%s\",NOW())"
 					, spec.wCountry, spec.wCategory, spec.wClass, spec.wType
 					, weap.name
 					, weap.value
 					, weap.name
-					) ;
-		qry.addEntry(buf) ;
+					);
+		qry.addEntry(buf);
 	}
 
-	qry.commit(0) ;
+	qry.commit(0);
 }
 
 void
@@ -56,36 +54,36 @@ weapLoadIndexes(DB::handle_t* conn)
 				", v.current_rank, v.next_cycle_rank"
 			" FROM wwiionline.wwii_vehtype v"
 			" WHERE v.in_service=1"
-	) ;
+	);
 	if ( !query.HasRows() )
 	{
-		dbugLog(_FLA, "vehtype table appears to be empty") ;
-		return ;
+		dbugLog(_FLA, "vehtype table appears to be empty");
+		return;
 	}
 
-	UINT32 campaignReady = 1, access = 0, nextAccess = 0 ;
-	UINT8 wCountry, wCategory, wClass, wType ;
-	char fullName[128] ;
-	UINT32 oid ;
+	UINT32 campaignReady = 1, access = 0, nextAccess = 0;
+	UINT8 wCountry, wCategory, wClass, wType;
+	char fullName[128];
+	UINT32 oid;
 
 	while ( query.FetchRow() )
 	{
-		DBRow& row = query.Row() ;
+		DBRow& row = query.Row();
 
-		wCountry = row.NextUInt() ;
-		wCategory = row.NextUInt() ;
-		wClass = row.NextUInt() ;
-		wType = row.NextUInt() ;
+		wCountry = row.NextUInt();
+		wCategory = row.NextUInt();
+		wClass = row.NextUInt();
+		wType = row.NextUInt();
 
-		row.NextString(fullName, sizeof(fullName)) ;
-		oid = row.NextUInt() ;
+		row.NextString(fullName, sizeof(fullName));
+		oid = row.NextUInt();
 
-		campaignReady = row.NextUInt() ;
-		access = row.NextUInt() ;
-		nextAccess = row.NextUInt() ;
+		campaignReady = row.NextUInt();
+		access = row.NextUInt();
+		nextAccess = row.NextUInt();
 
-		WEAPON_SPEC spec(wCountry, wCategory, wClass, wType) ;
-		WEAPON* const weap = weapLookup(spec) ;
+		WEAPON_SPEC spec(wCountry, wCategory, wClass, wType);
+		WEAPON* const weap = weapLookup(spec);
 
 #ifdef DEV_BUILD
 		dbugLog(__FILE__, __LINE__, (weap ? Debug::ERR_DBUG : Debug::ERR_WARN)
@@ -96,25 +94,25 @@ weapLoadIndexes(DB::handle_t* conn)
 						, access, nextAccess
 						, weap
 						, (weap ? weap->fullName : "UNRECOGNIZED")
-						) ;
+						);
 #endif
 
-		if ( weap == NULL )
-			continue ;
+		if ( weap == nullptr )
+			continue;
 
-		weap->m_localIndex = oid ;
-		strncpy(weap->fullName, fullName, sizeof(weap->fullName)) ;
+		weap->m_localIndex = oid;
+		strncpy(weap->fullName, fullName, sizeof(weap->fullName));
 
-		weapAddWeaponIndex(weap) ;
+		weapAddWeaponIndex(weap);
 
 		if ( campaignReady )
 		{
-			weap->m_access = access ;
-			weap->m_nextAccess = nextAccess ;
+			weap->m_access = access;
+			weap->m_nextAccess = nextAccess;
 		}
 		else
 		{
-			weap->m_modified = true ;
+			weap->m_modified = true;
 		}
 	}
 }

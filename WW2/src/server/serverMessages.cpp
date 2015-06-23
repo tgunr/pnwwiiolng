@@ -34,7 +34,7 @@ TEUL_CALLBACK*			CLUSTER_SHUTDOWN_CB;
 // move players from one server list to another and update state
 extern SINT32 serverUpdatePlayer(const Server::PlayerStatusUpdate* const update);
 
-extern ERROR_FUNCTION* 	extErrorFn;
+extern ERROR_FUNCTION*	extErrorFn;
 
 static SINT32
 _recvPlayerUpdate(ACTION_OBJECT* const a)
@@ -42,10 +42,10 @@ _recvPlayerUpdate(ACTION_OBJECT* const a)
 	if ( Server::myServerInfo.flags & Server::SVRFLAG_IGNORE_PSTAT )
 		return a->offset;
 
-	if ( a->canRead<Server::PlayerStatusUpdate>() == false )
-		return -EINVAL ;
+	if ( PN_UNLIKELY(a->canRead<Server::PlayerStatusUpdate>() == false) )
+		return -EINVAL;
 
-	Server::PlayerStatusUpdate& update = a->read<Server::PlayerStatusUpdate>() ;
+	Server::PlayerStatusUpdate& update = a->read<Server::PlayerStatusUpdate>();
 
 	dbugLog(_FLD, "p:%u c:%s received update %d source %s from address %s status %d server %llu "
 				,update.dispatch.m_customerID
@@ -53,7 +53,8 @@ _recvPlayerUpdate(ACTION_OBJECT* const a)
 				,update.id
 				,teulGetAddress(update.source)
 				,teulGetAddress(a->fromAddress)
-				,update.status,update.serverID);
+				,static_cast<int>(update.status)
+                ,update.serverID);
 
 	serverUpdatePlayer(&update);
 
@@ -68,17 +69,16 @@ _recvHeartBeat(ACTION_OBJECT* const a)
 	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &heartBeat, sizeof(heartBeat));
 
 	dbugWrite(_FLI,"received heartbeat from %s", teulGetAddress(heartBeat.address));
-	heartBeat.process() ;
+	heartBeat.process();
 
 	return a->offset;
-
 }
 
 static SINT32
 _recvPersonaExit(ACTION_OBJECT* const a)
 {
-	Server::PersonaExit persExit ;
-	persExit.packer(TEUL_UNPACK, a) ;
+	Server::PersonaExit persExit;
+	persExit.packer(TEUL_UNPACK, a);
 
 	dbugLog(_FLI, "t:%d p:%u c:%s otp:%u received personaExit ip:%s from %s"
 				, a->teulIndex
@@ -89,7 +89,7 @@ _recvPersonaExit(ACTION_OBJECT* const a)
 				, teulGetAddress(a->fromAddress)
 				);
 
-	persExit.onReceive(a->teulIndex) ;
+	persExit.onReceive(a->teulIndex);
 
 	return a->offset;
 }
@@ -97,11 +97,11 @@ _recvPersonaExit(ACTION_OBJECT* const a)
 static SINT32
 _recvClusterDown(ACTION_OBJECT* const a)
 {
-	dbugLog(_FLW, "t:%d received Cluster Down command", a->teulIndex) ;
+	dbugLog(_FLW, "t:%d received Cluster Down command", a->teulIndex);
 	///TODO: Move this to the controller or signal myself to shutdown, anything
 	///but invoking an external command!
-	system(PN_PLAYNET_PATH PATH_SEPSTR "bin" PATH_SEPSTR "stophost") ;
-	return -EINVAL ;
+	system(PN_PLAYNET_PATH PATH_SEPSTR "bin" PATH_SEPSTR "stophost");
+	return -EINVAL;
 }
 
 static SINT32
@@ -138,36 +138,36 @@ static SINT32
 _sendPersonaExit(ACTION_OBJECT* const a)
 {
 	Server::PersonaExit* persExit = (Server::PersonaExit*)a->localRawData;
-	persExit->packer(TEUL_PACK, a) ;
+	persExit->packer(TEUL_PACK, a);
 	return a->offset;
 }
 
 static SINT32
 _sendClusterDown(ACTION_OBJECT* const a)
 {
-	return a->offset ;
+	return a->offset;
 }
 
 static SINT32
 _sendPlayerMirror(ACTION_OBJECT* const a)
 {
 	Server::PersonaMirror* const mirror = (Server::PersonaMirror*)a->localRawData;
-	mirror->packer(TEUL_PACK, a) ;
+	mirror->packer(TEUL_PACK, a);
 	return a->offset;
 }
 
 static SINT32
 _recvPlayerMirror(ACTION_OBJECT* const a)
 {
-	char auxBuffer[Teul::MaxPacket] ;
-	Server::PersonaMirror mirror(auxBuffer) ;
-	mirror.packer(TEUL_UNPACK, a) ;
-	Server::PersonaMirrorReply reply(mirror) ;
+	char auxBuffer[Teul::MaxPacket];
+	Server::PersonaMirror mirror(auxBuffer);
+	mirror.packer(TEUL_UNPACK, a);
+	Server::PersonaMirrorReply reply(mirror);
 
 	if ( g_logDebug )
 	{
-		char remoteServerAddress[64] ;
-		teulGetAddress(a->fromAddress, remoteServerAddress, sizeof(remoteServerAddress)) ;
+		char remoteServerAddress[64];
+		teulGetAddress(a->fromAddress, remoteServerAddress, sizeof(remoteServerAddress));
 		dbugLog(_FLI, "xfer:%llu(%s) p:%u c:%s otp:%u received player mirror for ip:%s"
 					, mirror.xferID()
 					, remoteServerAddress
@@ -178,11 +178,11 @@ _recvPlayerMirror(ACTION_OBJECT* const a)
 					);
 	}
 
-	const SINT32 result = mirror.onReceive(a->teulIndex) ;
+	const SINT32 result = mirror.onReceive(a->teulIndex);
 
-	reply.resultCode = (result >= 0) ? 0 : -EINVAL ;
+	reply.resultCode = (result >= 0) ? 0 : -EINVAL;
 
-	teulSendTo(a->teulIndex, a->fromAddress, (UINT16)a->fromPort, PLAYER_MIRROR_REPLY_CB, &reply) ;
+	teulSendTo(a->teulIndex, a->fromAddress, (UINT16)a->fromPort, PLAYER_MIRROR_REPLY_CB, &reply);
 
 	return a->offset;
 }
@@ -190,55 +190,55 @@ _recvPlayerMirror(ACTION_OBJECT* const a)
 static SINT32
 _sendPlayerMirrorReply(ACTION_OBJECT* const a)
 {
-	Server::PersonaMirrorReply* reply = (Server::PersonaMirrorReply*)(a->localRawData) ;
-	reply->packer(TEUL_PACK, a) ;
-	return a->offset ;
+	Server::PersonaMirrorReply* reply = (Server::PersonaMirrorReply*)(a->localRawData);
+	reply->packer(TEUL_PACK, a);
+	return a->offset;
 }
 
 static SINT32
 _recvPlayerMirrorReply(ACTION_OBJECT* const a)
 {
-	Server::PersonaMirrorReply reply ;
-	reply.packer(TEUL_UNPACK, a) ;
-	reply.onReceive(a->teulIndex) ;
-	return a->offset ;
+	Server::PersonaMirrorReply reply;
+	reply.packer(TEUL_UNPACK, a);
+	reply.onReceive(a->teulIndex);
+	return a->offset;
 }
 
 static SINT32
 _recvHostConfig(ACTION_OBJECT* const a)
 {
-	if ( a->sizeInBytes() != sizeof(host_config) )
+	if ( PN_UNLIKELY(a->sizeInBytes() != sizeof(host_config)) )
 	{
-		dbugLog(_FLA, "broadcast host configuration size mismatch: rx:%" PRSizeT ", expected:%" PRSizeT "", (size_t)a->sizeInBytes(), sizeof(host_config)) ;
-		return -EINVAL ;
+		dbugLog(_FLA, "broadcast host configuration size mismatch: rx:%" PRSizeT ", expected:%" PRSizeT "", (size_t)a->sizeInBytes(), sizeof(host_config));
+		return -EINVAL;
 	}
 
-	auto& newConfig = a->read<WWII_CONFIG>() ;
-	host_config = newConfig ;
+	auto& newConfig = a->read<WWII_CONFIG>();
+	host_config = newConfig;
 
-	dbugLog(_FLD, "received host configuration broadcast") ;
+	dbugLog(_FLD, "received host configuration broadcast");
 
-	return a->offset ;
+	return a->offset;
 }
 
 SINT32
 serverInitCallbacks(void)
 {
 	BEGIN_CALLBACK_REGISTRATION(Teul::Serv::CallbackX)
-		REGISTER_SENDRECV(PLAYER_MIRROR_Y, _sendPlayerMirror, _recvPlayerMirror, PLAYER_MIRROR_CB) ;
-		PLAYER_MIRROR_CB->error = _persXferError ;
+		REGISTER_SENDRECV(PLAYER_MIRROR_Y, _sendPlayerMirror, _recvPlayerMirror, PLAYER_MIRROR_CB);
+		PLAYER_MIRROR_CB->error = _persXferError;
 
-		REGISTER_SENDRECV(PLAYER_MIRROR_REPLY_Y, _sendPlayerMirrorReply, _recvPlayerMirrorReply, PLAYER_MIRROR_REPLY_CB) ;
+		REGISTER_SENDRECV(PLAYER_MIRROR_REPLY_Y, _sendPlayerMirrorReply, _recvPlayerMirrorReply, PLAYER_MIRROR_REPLY_CB);
 
-		REGISTER_SENDRECV(SERV_HEARTBEAT_Y, _sendHeartBeat, _recvHeartBeat, SERVER_HEARTBEAT_CB) ;
+		REGISTER_SENDRECV(SERV_HEARTBEAT_Y, _sendHeartBeat, _recvHeartBeat, SERVER_HEARTBEAT_CB);
 
-		REGISTER_SENDRECV(CLUSTER_SHUTDOWN_Y, _sendClusterDown, _recvClusterDown, CLUSTER_SHUTDOWN_CB) ;
+		REGISTER_SENDRECV(CLUSTER_SHUTDOWN_Y, _sendClusterDown, _recvClusterDown, CLUSTER_SHUTDOWN_CB);
 
-		REGISTER_SENDRECV(PLAYER_EXIT_Y, _sendPersonaExit, _recvPersonaExit, PERSONA_EXIT_CB) ;
+		REGISTER_SENDRECV(PLAYER_EXIT_Y, _sendPersonaExit, _recvPersonaExit, PERSONA_EXIT_CB);
 
-		REGISTER_RECEIVER(PLAYER_UPDATE_Y, _recvPlayerUpdate) ;
+		REGISTER_RECEIVER(PLAYER_UPDATE_Y, _recvPlayerUpdate);
 
-		REGISTER_RECEIVER(HOST_CONFIG_Y, _recvHostConfig) ;
+		REGISTER_RECEIVER(HOST_CONFIG_Y, _recvHostConfig);
 
 	END_CALLBACK_REGISTRATION
 }

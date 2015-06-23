@@ -34,27 +34,26 @@ struct vers_manifest
     SCHAR		ftpURL[URL_STRING_MAX+1];
     SCHAR		ftpDir[URL_STRING_MAX+1];
     SCHAR		ftpFile[URL_STRING_MAX+1];
-} ;
+};
 
-namespace Auth { struct Dispatch ; struct ClientData ; }
-struct APP_LAUNCH_REQ ;
-struct APP_LAUNCH ;
-struct GAME ;
-struct PLAY_COMPUTER_INFO ;
+namespace Auth { struct Dispatch; struct ClientData; }
+struct APP_LAUNCH_REQ;
+struct APP_LAUNCH;
+struct GAME;
+struct PLAY_COMPUTER_INFO;
 
-extern void authInitDB(void);
-extern void authResetConnectInfo(UINT32 gameID);
+void authInitDB(void);
+void authResetConnectInfo(UINT32 gameID);
 
 //Validates a user against the database, and fills out the game cookie
 //	if they are a good user
-//extern LOGICAL authValidateUser(APP_LAUNCH_REQ* request, Auth::Dispatch * gamecookie);
-extern UINT32 authValidateUser(SINT32 teulIndex, const APP_LAUNCH_REQ& request, Auth::Dispatch& gamecookie, const Auth::ClientData& cdata);
+UINT32 authValidateUser(SINT32 teulIndex, const APP_LAUNCH_REQ& request, Auth::Dispatch& gamecookie, const Auth::ClientData& cdata);
 
 // Inserts otp records int ot the authOTP table to be used by
 // our ftp servers for authenication.
-extern void authDBInsertOTP(const APP_LAUNCH& launch, const APP_LAUNCH_REQ& request, const char* dir);
-extern LOGICAL authInitGameEntry(GAME& gameEntry);
-extern void authInitApps(void);
+void authDBInsertOTP(const APP_LAUNCH& launch, const APP_LAUNCH_REQ& request, const char* dir);
+bool authInitGameEntry(GAME& gameEntry);
+void authInitApps(void);
 
 //
 // Search for a match between the encoded 'needle'
@@ -64,21 +63,21 @@ extern void authInitApps(void);
 struct vers_manifest* matchversion(UINT32 needle, SINT32 appid, UINT32 platform);
 
 // Save a computer info packet arriving on a connection
-extern LOGICAL authdbStoreComputerInfo(const Auth::ClientData& data, const PLAY_COMPUTER_INFO& pci) ;
+void authdbStoreComputerInfo(const Auth::ClientData& data, const PLAY_COMPUTER_INFO& pci);
 
 // Get a checksum from the database
-extern LOGICAL authdbGetFileMD5(const UINT32 appID, const UINT32 platform, const char* filename, char* buffer, UINT32 bufLen) ;
+bool authdbGetFileMD5(const UINT32 appID, const UINT32 platform, const char* filename, char* buffer, UINT32 bufLen);
 
-extern void authdbSaveLastOTP(UINT64 otp) ;
-extern UINT32 authdbGetLastOTP() ;
+void authdbSaveLastOTP(UINT64 otp);
+UINT32 authdbGetLastOTP();
 
-extern void authdbLogBadPlayername(UINT32 ip, const std::string& username, std::string reason) ;
+void authdbLogBadPlayername(UINT32 ip, const std::string& username, std::string reason);
 
-extern void authdbUpdateArenaStatus(UINT32 arenaID, SINT32 lock, UINT32 players) ;
+void authdbUpdateArenaStatus(UINT32 arenaID, SINT32 lock, UINT32 players);
 
-extern void authdbReadArenaAliases() ;
+void authdbReadArenaAliases();
 
 // Get the name of an arena or NULL.
-extern const char* authdbGetArenaAlias(UINT32 arenaID) ;
+const char* authdbGetArenaAlias(UINT32 arenaID);
 
-extern void authdbSaveLogins() ;
+void authdbSaveLogins();

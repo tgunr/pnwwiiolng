@@ -11,11 +11,6 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include "dbug/dbug.h"
-
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "wwii/wwiiCallbacks.h"
 #include "teul/teulBasic.h"
 #include "strt/strtConstants.h"
@@ -25,7 +20,6 @@
 #include "miss/missionPack.h"
 #include "miss/missionDamageEvent.h"
 #include "mm/mmSerialNumberRequest.h"
-#include "wwii/wwiiString.h"
 #include "weap/weapWeapon.h"
 
 #include "strt/strtServerTypes.h"
@@ -71,26 +65,25 @@ static SINT32 _recvMMPostAccept(ACTION_OBJECT* const a)
 
 	if ( g_logDebug )
 	{
-		dbugLog(_FLD,"c:%u postAccept %d.%d.%u %s %d %d"
+		dbugLog(_FLD,"c:%u postAccept " PRF_WEAPON_SERIAL " %d %d"
 						, postAccept.customerID
-						, postAccept.weaponSerial.source.cell.ox, postAccept.weaponSerial.source.cell.oy, postAccept.weaponSerial.source.id
-						, weapPrintSpecC(&postAccept.weaponSerial.spec)
+						, PRA_WEAPON_SERIAL(postAccept.weaponSerial)
 						, postAccept.portal
-						, postAccept.immediateSpawn) ;
+						, postAccept.immediateSpawn);
 	}
 	//if (postAccept.portal == 0)
 		//postAccept.portal = 1;
 
-	Player* player = PlayerInterface::Lookup(postAccept.customerID) ;
-	if ( player != NULL )
+	Player* player = PlayerInterface::Lookup(postAccept.customerID);
+	if ( player != nullptr )
 	{
 		mmProcessPostAccept(*player, postAccept, MM_ACCEPT_NEW);
-		return a->offset ;
+		return a->offset;
 	}
 
 
-	dbugLog(_FLA, "t:%d unknown persona, ignoring", a->teulIndex) ;
-	return -EINVAL ;
+	dbugLog(_FLA, "t:%d unknown persona, ignoring", a->teulIndex);
+	return -EINVAL;
 }
 
 static SINT32
@@ -283,7 +276,7 @@ MM_CREW_BAILED crewBailed;
 	a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, &crewBailed, sizeof(MM_CREW_BAILED));
 
 #ifdef DEBUG
-	dbugLog(_FLD, "cmdr:%u crew:%u crew bailed", crewBailed.comanderID, crewBailed.crewID) ;
+	dbugLog(_FLD, "cmdr:%u crew:%u crew bailed", crewBailed.comanderID, crewBailed.crewID);
 #endif
 
 #ifndef STRAT_CLIENT
@@ -309,8 +302,8 @@ static SINT32 _recvMMFacilityCapacityResponse(ACTION_OBJECT* const a)
 	dbugLog(_FLD, "capacity: %d totalRPs: %d", response.capacity, response.totalRPs);
 #else
 
-	Player* player = PlayerInterface::Lookup(response.customerID) ;
-	if ( player == NULL )
+	Player* player = PlayerInterface::Lookup(response.customerID);
+	if ( player == nullptr )
 	{
 		dbugLog(_FLA, "%s(%u): null persona", __FUNCTION__, response.customerID);
 		return -EINVAL;
@@ -320,13 +313,13 @@ static SINT32 _recvMMFacilityCapacityResponse(ACTION_OBJECT* const a)
 	dbugLog(_FLD, "t:%d p:%u c:%s tag %d fac.cap: %d rps: %d"
 					, player->teulIndex(), player->playerID(), player->callsign()
 					, response.tag, response.capacity, response.totalRPs
-					) ;
+					);
 #endif
 
 	switch(response.tag)
 	{
 		case CAPACITY_AFTER_MISSION:
-			player->processCapacityResponse(response.rtbFacility, response.rtbReservedWeapon, response.vehicleDelivered) ;
+			player->processCapacityResponse(response.rtbFacility, response.rtbReservedWeapon, response.vehicleDelivered);
 		break;
 
 		case CAPACITY_BEFORE_MISSION:
@@ -342,7 +335,7 @@ static SINT32 _recvMMFacilityCapacityResponse(ACTION_OBJECT* const a)
 		default:
 			dbugLog(_FLW, "unrecognized missCap response.tag %d for %s"
 							, response.tag
-							, player->callsign()) ;
+							, player->callsign());
 			break;
 	}
 #endif
@@ -362,9 +355,9 @@ strtSendMMPostRequest(SINT32 connection, UINT32 customerID, const char* callsign
 	SINT32 retval;
 
 	postRequest.customerID = customerID;
-	postRequest.handle = chatGetHandle(callsign) ;
+	postRequest.handle = chatGetHandle(callsign);
 	postRequest.missionID = missionID;
-	postRequest.brigadeID = brigadeID ;
+	postRequest.brigadeID = brigadeID;
 	postRequest.permMask = permMask;
 	postRequest.facility = facility;
 	postRequest.weapon = weapon;
@@ -388,8 +381,8 @@ strtSendMMPostListRequest(SINT32 connection, UINT32 customerID, const char* call
 	postListRequest.crewID = customerID;
 	postListRequest.missionID = missionID;
 	postListRequest.facility = facility;
-	postListRequest.crewHandle = chatGetHandle(callsign) ;
-	postListRequest.brigadeID = brigadeID ;
+	postListRequest.crewHandle = chatGetHandle(callsign);
+	postListRequest.brigadeID = brigadeID;
 
 	retval = teulSend(connection, _SEND_MM_POST_LIST, &postListRequest);
 
@@ -448,12 +441,12 @@ strtSendMMSpawnGrantRequest(SINT32 connection, const WEAPON_SERIAL& weaponSerial
 	MM_SPAWN_GRANT_REQUEST spawnGrantRequest;
 
 	spawnGrantRequest.weaponSerial = weaponSerial;
-	spawnGrantRequest.playerID = player.playerID() ;
-	spawnGrantRequest.missionID = 0 ;
+	spawnGrantRequest.playerID = player.playerID();
+	spawnGrantRequest.missionID = 0;
 
 	if ( player.validMissionPacket() )
 	{
-		dbugLog(_FLI, "t:%d p:%u c:%s spawnGrantRequest m:%u br:%u v:%u %s at %d.%d.%u"
+		dbugLog(_FLI, "t:%d p:%u c:%s spawnGrantRequest m:%u br:%u v:%u %s at " PRF_FULL_OBJ_ID ""
 						, player.teulIndex()
 						, player.playerID()
 						, player.callsign()
@@ -461,23 +454,23 @@ strtSendMMSpawnGrantRequest(SINT32 connection, const WEAPON_SERIAL& weaponSerial
 						, player.brigadeID()
 						, spawnGrantRequest.weaponSerial.serial
 						, weapPrintName(&spawnGrantRequest.weaponSerial.spec)
-						, spawnGrantRequest.weaponSerial.source.cell.ox, spawnGrantRequest.weaponSerial.source.cell.oy, spawnGrantRequest.weaponSerial.source.id
-						) ;
+						, PRA_FULL_OBJ_ID(spawnGrantRequest.weaponSerial.source)
+						);
 
-		spawnGrantRequest.missionID = player.missionID() ;
+		spawnGrantRequest.missionID = player.missionID();
 
 		if(player.missionPacket().m_missionType == POINT_ATTACK ||
 			player.missionPacket().m_missionType == AREA_ATTACK ||
 			player.missionPacket().m_missionType == RESUPPLY)
 		{
 			//get capacity of target
-			spawnGrantRequest.facility = player.missionPacket().sortie().target() ;
+			spawnGrantRequest.facility = player.missionPacket().sortie().target();
 		}
 		else if(player.missionPacket().m_missionType == POINT_DEFENSE ||
 			player.missionPacket().m_missionType == AREA_DEFENSE)
 		{
 			//get capacity of origin
-			spawnGrantRequest.facility = player.missionPacket().sortie().originFac() ;
+			spawnGrantRequest.facility = player.missionPacket().sortie().originFac();
 		}
 		else
 		{
@@ -494,7 +487,7 @@ strtSendMMSpawnGrantRequest(SINT32 connection, const WEAPON_SERIAL& weaponSerial
 
 	if (retval < 0)
 	{
-		dbugLog(_FLI, "t:%d p:%u c:%s failed to send spawn grant request", player.teulIndex(), player.playerID(), player.callsign()) ;
+		dbugLog(_FLI, "t:%d p:%u c:%s failed to send spawn grant request", player.teulIndex(), player.playerID(), player.callsign());
 		return retval;
 	}
 
@@ -508,7 +501,7 @@ strtSendMMPostInfoRequest(SINT32 connection, UINT32 crewID, const WEAPON_SERIAL&
 
 	postInfoRequest.customerID = crewID;
 	postInfoRequest.weaponSerial = weaponSerial;
-	postInfoRequest.handle = handle ;
+	postInfoRequest.handle = handle;
 	postInfoRequest.join = join;
 
 	return teulSend(connection, _XCHG_MM_POST_INFO, &postInfoRequest);
@@ -521,7 +514,7 @@ SINT32 strtSendMMJoinListRequest(SINT32 connection, UINT32 crewID, const WEAPON_
 
 	postInfoRequest.customerID = crewID;
 	postInfoRequest.weaponSerial = weaponSerial;
-	postInfoRequest.handle = handle ;
+	postInfoRequest.handle = handle;
 	postInfoRequest.join = join;
 
 	retval = teulSend(connection, _XCHG_MM_JOIN_LIST, &postInfoRequest);
@@ -577,16 +570,16 @@ SINT32 strtSendMMCapacityRequest(SINT32 connection, UINT32 tag, UINT32 missionID
 	capacityRequest.missionID = missionID;
 	capacityRequest.customerID = customerID;
 	capacityRequest.facility = facility;
-	capacityRequest.rtb = rtb ;
+	capacityRequest.rtb = rtb;
 
 	if ( g_logDebug )
 	{
-		dbugLog(_FLD,"capacityRequest: %u:%u:%u @ %d.%d.%u code:%u"
+		dbugLog(_FLD, "capacityRequest: %u:%u:%u @ " PRF_FULL_OBJ_ID " code:%u"
 					, capacityRequest.tag, capacityRequest.missionID
 					, capacityRequest.customerID
-					, capacityRequest.facility.cell.ox, capacityRequest.facility.cell.oy, capacityRequest.facility.id
+					, PRA_FULL_OBJ_ID(capacityRequest.facility)
 					, capacityRequest.rtb
-					) ;
+					);
 	}
 
 	retval = teulSend(connection, _XCHG_MM_FACILITY_CAPACITY, &capacityRequest);
@@ -603,29 +596,29 @@ SINT32 strtSendMMCapacityRequest(SINT32 connection, UINT32 tag, UINT32 missionID
 static SINT32
 _recvMissionDamageEvent(ACTION_OBJECT* const a)
 {
-	if ( a->m_client != NULL || a->canRead<MissionDamageEvent>() == false )
-		return -EINVAL ;
+	if ( a->m_client != nullptr || a->canRead<MissionDamageEvent>() == false )
+		return -EINVAL;
 
-	auto& incoming = a->read<MissionDamageEvent>() ;
+	auto& incoming = a->read<MissionDamageEvent>();
 
 	// Can we find this player?
-	Player* player = PlayerInterface::Lookup(incoming.m_playerID) ;
-	if ( player == NULL )
+	Player* player = PlayerInterface::Lookup(incoming.m_playerID);
+	if ( player == nullptr )
 	{
-		dbugLog(_FLI, "t:%d p:%u received mde for non-existant (logged out?) player", a->teulIndex, incoming.m_playerID) ;
-		return -EINVAL ;
+		dbugLog(_FLI, "t:%d p:%u received mde for non-existant (logged out?) player", a->teulIndex, incoming.m_playerID);
+		return -EINVAL;
 	}
 
 	// Can we find their sortie?
 	if ( player->weapon().serial != incoming.m_sortieID )
 	{
-		dbugLog(_FLI, "t:%d p:%u c:%s mde has arrived too late", a->teulIndex, player->playerID(), player->callsign()) ;
-		return -EINVAL ;
+		dbugLog(_FLI, "t:%d p:%u c:%s mde has arrived too late", a->teulIndex, player->playerID(), player->callsign());
+		return -EINVAL;
 	}
 
-	player->addStratHit(incoming) ;
+	player->addStratHit(incoming);
 
-	return 0 ;
+	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -635,29 +628,29 @@ strtInstallMapCallbacks(void)
 {
 	BEGIN_CALLBACK_REGISTRATION(Strat::CallbackX)
 
-		REGISTER_SENDRECV(STRT_MM_POST_INFO_Y, _sendMMPostInfoRequest, _recvMMPostInfoResponse, _XCHG_MM_POST_INFO) ;
-		REGISTER_SENDRECV(STRT_MM_POST_LIST_Y, _sendMMPostListReq, PostListReply::Process, _SEND_MM_POST_LIST) ;
-		REGISTER_SENDRECV(STRT_MM_SPAWN_GRANT_Y, _sendMMSpawnGrantRequest, _recvMMSpawnGrantResponse, _XCHG_MM_SPAWN_GRANT) ;
-		REGISTER_SENDRECV(STRT_MM_CAPACITY_Y, _sendMMFacilityCapacityRequest, _recvMMFacilityCapacityResponse, _XCHG_MM_FACILITY_CAPACITY) ;
-		REGISTER_SENDRECV(STRT_MM_JOIN_LIST_Y, _sendMMJoinListRequest, _recvMMJoinListResponse, _XCHG_MM_JOIN_LIST) ;
-		REGISTER_SENDRECV(STRT_MM_LEAVE_LIST_Y, _sendMMLeaveListRequest, _recvMMLeaveListResponse, _XCHG_MM_LEAVE_LIST) ;
+		REGISTER_SENDRECV(STRT_MM_POST_INFO_Y, _sendMMPostInfoRequest, _recvMMPostInfoResponse, _XCHG_MM_POST_INFO);
+		REGISTER_SENDRECV(STRT_MM_POST_LIST_Y, _sendMMPostListReq, PostListReply::Process, _SEND_MM_POST_LIST);
+		REGISTER_SENDRECV(STRT_MM_SPAWN_GRANT_Y, _sendMMSpawnGrantRequest, _recvMMSpawnGrantResponse, _XCHG_MM_SPAWN_GRANT);
+		REGISTER_SENDRECV(STRT_MM_CAPACITY_Y, _sendMMFacilityCapacityRequest, _recvMMFacilityCapacityResponse, _XCHG_MM_FACILITY_CAPACITY);
+		REGISTER_SENDRECV(STRT_MM_JOIN_LIST_Y, _sendMMJoinListRequest, _recvMMJoinListResponse, _XCHG_MM_JOIN_LIST);
+		REGISTER_SENDRECV(STRT_MM_LEAVE_LIST_Y, _sendMMLeaveListRequest, _recvMMLeaveListResponse, _XCHG_MM_LEAVE_LIST);
 
-		REGISTER_SENDER(STRT_MM_POST_REQ_Y, _sendMMPostReq, _SEND_MM_POST_REQ) ;
-		REGISTER_SENDER(STRT_MM_POST_CANCEL_Y, _sendMMPostCancel, _SEND_MM_POST_CANCEL) ;
-		REGISTER_SENDER(STRT_MM_SPAWN_CANCEL_Y, _sendMMSpawnCancel, _SEND_MM_SPAWN_CANCEL) ;
-		REGISTER_SENDER(STRT_MM_POST_INFO_UPDATE_Y, _sendMMPostInfoUpdate, _SEND_MM_POST_INFO_UPDATE) ;
-		REGISTER_SENDER(STRT_MM_JOIN_REQ_Y, _sendMMJoinReq, _SEND_MM_JOIN_REQ) ;
+		REGISTER_SENDER(STRT_MM_POST_REQ_Y, _sendMMPostReq, _SEND_MM_POST_REQ);
+		REGISTER_SENDER(STRT_MM_POST_CANCEL_Y, _sendMMPostCancel, _SEND_MM_POST_CANCEL);
+		REGISTER_SENDER(STRT_MM_SPAWN_CANCEL_Y, _sendMMSpawnCancel, _SEND_MM_SPAWN_CANCEL);
+		REGISTER_SENDER(STRT_MM_POST_INFO_UPDATE_Y, _sendMMPostInfoUpdate, _SEND_MM_POST_INFO_UPDATE);
+		REGISTER_SENDER(STRT_MM_JOIN_REQ_Y, _sendMMJoinReq, _SEND_MM_JOIN_REQ);
 
-		REGISTER_RECEIVER(STRT_MM_POST_ACCEPT_Y, _recvMMPostAccept) ;
-		REGISTER_RECEIVER(STRT_MM_POST_DENY_Y, _recvMMPostDeny) ;
-		REGISTER_RECEIVER(STRT_MM_JOIN_ACCEPT_Y, _recvMMJoinAccept) ;
-		REGISTER_RECEIVER(STRT_MM_JOIN_DENY_Y, _recvMMJoinDeny) ;
-		REGISTER_RECEIVER(STRT_MM_POST_EXPIRED_Y, _recvMMPostExpired) ;
-		REGISTER_RECEIVER(STRT_MM_CREW_BAILED_Y, _recvMMCrewBailed) ;
+		REGISTER_RECEIVER(STRT_MM_POST_ACCEPT_Y, _recvMMPostAccept);
+		REGISTER_RECEIVER(STRT_MM_POST_DENY_Y, _recvMMPostDeny);
+		REGISTER_RECEIVER(STRT_MM_JOIN_ACCEPT_Y, _recvMMJoinAccept);
+		REGISTER_RECEIVER(STRT_MM_JOIN_DENY_Y, _recvMMJoinDeny);
+		REGISTER_RECEIVER(STRT_MM_POST_EXPIRED_Y, _recvMMPostExpired);
+		REGISTER_RECEIVER(STRT_MM_CREW_BAILED_Y, _recvMMCrewBailed);
 
-		REGISTER_RECEIVER(STRT_MM_DAMAGE_EVENT_Y, _recvMissionDamageEvent) ;
+		REGISTER_RECEIVER(STRT_MM_DAMAGE_EVENT_Y, _recvMissionDamageEvent);
 
-		REGISTER_MSG(STRT_MM_SERIAL_REQUEST_Y, SERIAL_NUMBER_REQUEST) ;
+		REGISTER_MSG(STRT_MM_SERIAL_REQUEST_Y, SERIAL_NUMBER_REQUEST);
 
 	END_CALLBACK_REGISTRATION
 }

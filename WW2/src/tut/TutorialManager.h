@@ -200,7 +200,7 @@ public:
 	// script interface
 
 	// id of the tutorial and script to run
-	bool Start(const char* id, const char* script = NULL);
+	bool Start(const char* id, const char* script = nullptr);
 
 	// stops the current tutorial
 	bool Stop(bool delayed = true);
@@ -252,8 +252,7 @@ public:
 private:
 
 	void _resetFlags();
-	int _handleEvent(TutorialHandler& handler, ...);
-	int _handleEvent(TutorialHandler& handler, va_list& args);
+	int _handleEvent(TutorialHandler& handler, va_list* args=nullptr);
 
 	// script currently running
 	TutorialScript _current;

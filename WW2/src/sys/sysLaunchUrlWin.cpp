@@ -36,7 +36,7 @@ LOGICAL syslaunchurl(const char* url, LOGICAL local)
 		destination = url;
 	}
 
-	if(ShellExecuteA(NULL, "open", destination.c_str(), NULL, NULL, SW_SHOWNORMAL))
+	if(ShellExecuteA(nullptr, "open", destination.c_str(), nullptr, nullptr, SW_SHOWNORMAL))
 	{
 		ShowWindow(myhwnd, SW_MINIMIZE);
 		return 1;

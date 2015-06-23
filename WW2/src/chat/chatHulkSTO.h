@@ -14,18 +14,18 @@
 class HulkSTO : public ServerSTO
 {
 public:
-	HulkSTO(UINT16 subType, const WorldPosition_m& position, const AttitudeVector& attitude, const class Player* originator) ;
-	HulkSTO(ACTION_OBJECT* const a) ;
-	virtual const char* typeName() const { return "hulk" ; }
+	HulkSTO(UINT16 subType, const WorldPosition_m& position, const AttitudeVector& attitude, const class Player* originator);
+	HulkSTO(ACTION_OBJECT* const a);
+	virtual const char* typeName() const OVERRIDE_FN { return "hulk"; }
 
 public:
-	virtual bool applyJoules(const SINT64& joules, class Player* player=NULL) ;
+	virtual bool applyJoules(const SINT64& joules, class Player* player=nullptr) OVERRIDE_FN;
 
 public:
-	const STODamage& damage() const { return m_damage ; }
-	STODamage& damage() { return m_damage ; }
+	const STODamage& damage() const { return m_damage; }
+	STODamage& damage() { return m_damage; }
 
 private:
-	STODamage	m_damage ;					//!< Track damage done.
-} ;
+	STODamage	m_damage;					//!< Track damage done.
+};
 

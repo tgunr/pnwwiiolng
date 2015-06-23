@@ -11,14 +11,12 @@
 #include "ui/uiUTF.h"
 #include "veh/vehAnimEnum.h"
 
-#if !defined(USE_OSG)
 #include "weap/weapons.h"
 #include "veh/vehanim.h"
 #include "ml/mlutility.h"
 
 static void _vehxmlParseMass(vehType*, xmlNodePtr);
 static void _ReadFlatFiles(vehType*);
-#endif
 
 static void _vehxmlParseInclude(vehType*, xmlNodePtr, bool override);
 
@@ -54,9 +52,6 @@ int vehtypeInit()
 	_vehtypenames["air"] = VEH_TYPE_AIR;
 	_vehtypenames["ground"] = VEH_TYPE_GROUND;
 	_vehtypenames["sea"] = VEH_TYPE_SEA;
-#ifdef DOROTHY
-	_vehtypenames["mech"] = VEH_TYPE_MECH;
-#endif
 
 	xmlDocPtr doc = vehxmlLoad("vehicles.xml", _vehxmlopen, (xmlInputReadCallback)fioRead, (xmlInputCloseCallback)fioClose);
 	if(!doc) return -1;
@@ -94,10 +89,7 @@ int vehtypeInit()
 		{
 		}
 		_ReadInfoText(vehtype);
-#if !defined(USE_OSG)
 		_ReadFlatFiles(vehtype);
-#endif
-
 	}
 
 	xmlFreeDoc(doc);
@@ -123,7 +115,7 @@ vehType const* vehtypeGetByIndex(UINT32 i)
 	if(i < _VehicleList.size())
 		return &_VehicleList[i];
 
-	return NULL;
+	return nullptr;
 }
 
 /************************************************************************************************
@@ -149,7 +141,7 @@ vehType const* vehTypeGetBySpec(WEAPON_SPEC spec)
 			return &_VehicleList[i];
 	}
 
-	 return NULL;
+	 return nullptr;
 }
 
 vehType const* vehTypeGetById(const char* Id)
@@ -162,7 +154,7 @@ vehType const* vehTypeGetById(const char* Id)
 			return &_VehicleList[i];
 	}
 
-	 return NULL;
+	 return nullptr;
 }
 
 /************************************************************************************************
@@ -257,21 +249,14 @@ static void _vehxmllParseVehicle(vehType* vehtype, xmlNodePtr vehnode, bool over
 	{
 		if(node->type != XML_ELEMENT_NODE) continue;
 
-#if defined(USE_OSG)
-		std::map<std::string, vehTypeXMLHandler>::iterator it = _xmlHandlers.find((char*)node->name);
-		if(it != _xmlHandlers.end())
-			it->second(vehtype, node);
-#endif
 		if (xmlStrcmp((xmlChar*)"include", node->name) == 0)
 		{ 	// this will go away when all files are xml-ized, for now, we get the file names for the non-xml files
 			_vehxmlParseInclude(vehtype, node, override);
 		}
-#if !defined(USE_OSG)
 		else if (xmlStrcmp((xmlChar*)"masses", node->name) == 0)
 		{
 			_vehxmlParseMass(vehtype, node);
 		}
-#endif
 	}
 }
 
@@ -403,7 +388,6 @@ static void _vehxmlParseInclude(vehType* vehtype, xmlNodePtr incnode, bool overr
 			if(vehtype->ModelFile[0] == '\0' || override)
 				strncpy((char*)vehtype->ModelFile, (char*)filename, 63);
 		}
-#if !defined(USE_OSG)
 		else if(strcmp(ext, ".control") == 0) // ControlFile .control
 		{
 			if(vehtype->ControlFile[0] == '\0' || override)
@@ -431,82 +415,10 @@ static void _vehxmlParseInclude(vehType* vehtype, xmlNodePtr incnode, bool overr
 		}else
 		{
 		}
-#endif
 	}
 
 	xmlFree(filename);
 }
-#if !defined(USE_OSG)
-
-#ifdef IM_A_RETARD_WHO_CANT_USE_ML_UTILITY
-UINT32 mlUtilityFindVarname(UINT32* VarNum,
-							const UCHAR* VarName,
-							const UCHAR* VehicleTypeVarNames,
-							UINT32 VarNameSize,
-							UINT32 MaxNames)
-{
-	const UCHAR* VehicleVarName = VehicleTypeVarNames;
-	UINT32 i;
-
-	while (*VarName == ' ' || *VarName == '=')
-		VarName++;
-
-	// Default value we may return is 0
-	*VarNum = 0;
-
-	if (*VarName == 0)
-		return 0;
-
-	VehicleVarName = VehicleTypeVarNames;
-
-	for (i=0;i<MaxNames;i++, VehicleVarName += VarNameSize)
-	{
-		if (strcasecmp((char*)VarName, (char*)VehicleVarName) == 0)
-		{
-			*VarNum = i;
-			return 0;
-		}
-	}
-
-	///QUERY: If there's no match, just return 0? That doesn't seem smart.
-	/// Since it effectively means the same as matching the first entry.
-
-	return 0;
-}
-
-UINT32 mlUtilityGetVarnameAndContents(UCHAR ** Varname, UCHAR ** Varcontents,UCHAR * InputString)
-{
-	*Varname = (UCHAR*)strtok((char*)InputString,"= ");
-	if (*Varname != NULL)
-	{
-		*Varcontents = (UCHAR*)strtok(NULL,"= ");
-		*Varcontents = (UCHAR*)strtok((char*)*Varcontents,"\n"); // strip off the ending newline
-	}
-	else
-	{
-		*Varcontents = NULL;
-	}
-
-	return 0;
-}
-
-UINT32 mlUtilityGetVarnameAndContents1(UCHAR ** Varname, UCHAR ** Varcontents,UCHAR * InputString)
-{
-
-	*Varname = (UCHAR*)strtok((char*)InputString,"= ");
-	if (*Varname != NULL)
-	{
-		*Varcontents = (UCHAR*)strtok(NULL,"\0");
-		*Varcontents = (UCHAR*)strtok((char*)*Varcontents,"\n"); // strip off the ending newline
-	}
-	else
-	{
-		*Varcontents = NULL;
-	}
-
-	return 0;
-}
-#endif
 
 static void _vehxmlParseMass(vehType* vehtype, xmlNodePtr massnode)
 {
@@ -638,7 +550,7 @@ static UINT32 _ReadSoundFile(vehType* CurrentVehicle, UCHAR* ModelDirectory, UCH
 	UCHAR* VarContents;
 	SINT32 Num;
 
-	if (CurrentVehicle == NULL || ModelDirectory == NULL || InVarContents == NULL)
+	if (CurrentVehicle == nullptr || ModelDirectory == nullptr || InVarContents == nullptr)
 		return 0;
 
 	sprintf((char*)FileName,"vehicles\\%s\\%s",ModelDirectory,InVarContents);
@@ -662,7 +574,7 @@ static UINT32 _ReadSoundFile(vehType* CurrentVehicle, UCHAR* ModelDirectory, UCH
 
 		mlUtilityGetVarnameAndContents(&VarName,&VarContents,Buffer);
 
-		if (VarName == NULL || VarContents == NULL)
+		if (VarName == nullptr || VarContents == nullptr)
 		{
 			if (strcmp((char*)VarName,"newspeedrange") == 0)
 			{
@@ -766,7 +678,7 @@ SINT32 TempNum;
 UCHAR* VarName;
 UCHAR* VarContents;
 
-	if (CurrentVehicle == NULL || ModelDirectory == NULL || InVarContents == NULL)
+	if (CurrentVehicle == nullptr || ModelDirectory == nullptr || InVarContents == nullptr)
 	{
 		return 0;
 	}
@@ -801,7 +713,7 @@ UCHAR* VarContents;
 
 		mlUtilityGetVarnameAndContents(&VarName,&VarContents,Buffer);
 
-		if (VarName == NULL || VarContents == NULL)
+		if (VarName == nullptr || VarContents == nullptr)
 		{
 			continue;
 		}
@@ -862,7 +774,7 @@ UCHAR* VarContents;
 		{
 			CurrentWeapon++;
 			weapFindWeaponTypeByName(&(CurrentVehicle->Loadout[Loadout].WeaponTypes[CurrentMount][CurrentWeapon]),VarContents);
-			if (CurrentVehicle->Loadout[Loadout].WeaponTypes[CurrentMount][CurrentWeapon] == NULL)
+			if (CurrentVehicle->Loadout[Loadout].WeaponTypes[CurrentMount][CurrentWeapon] == nullptr)
 			{
 				Write_Debug("Unrecognized weapon %s, in mount %d, loadout %d",
 							VarContents,
@@ -893,7 +805,7 @@ UCHAR* VarContents;
 
         if(strcmp((SCHAR*)VarName, "shockdust") == 0)
         {
-            CurrentVehicle->Loadout[Loadout].WeaponTypes[CurrentMount][CurrentWeapon]->bShockDust = (LOGICAL)strtoul((SCHAR*)VarContents, NULL, 10);
+            CurrentVehicle->Loadout[Loadout].WeaponTypes[CurrentMount][CurrentWeapon]->bShockDust = (LOGICAL)strtoul((SCHAR*)VarContents, nullptr, 10);
 			continue;
 		}
 
@@ -975,7 +887,7 @@ UCHAR _BombsightTypeNames[3][32] =
 	"germlotfec7b"
 };
 
-	if (CurrentVehicle == NULL || ModelDirectory == NULL || InVarContents == NULL)
+	if (CurrentVehicle == nullptr || ModelDirectory == nullptr || InVarContents == nullptr)
 	{
 		return 0;
 	}
@@ -1009,7 +921,7 @@ UCHAR _BombsightTypeNames[3][32] =
 
 		mlUtilityGetVarnameAndContents1(&VarName,&VarContents,Buffer);
 
-		if (VarName == NULL || VarContents == NULL)
+		if (VarName == nullptr || VarContents == nullptr)
 		{
 			continue;
 		}
@@ -1024,7 +936,7 @@ UCHAR _BombsightTypeNames[3][32] =
 		SINT32 Pos,Pos1;
 
 			mlUtilityGetVarnameAndContents1(&VarName,&VarContents,VarContents);
-			if (VarName == NULL || VarContents == NULL)
+			if (VarName == nullptr || VarContents == nullptr)
 			{
 				continue;
 			}
@@ -1225,7 +1137,7 @@ UCHAR FileName[128];
 UCHAR* VarName;
 UCHAR* VarContents1;
 
-	if (CurrentVehicle == NULL || ModelDirectory == NULL || VarContents == NULL)
+	if (CurrentVehicle == nullptr || ModelDirectory == nullptr || VarContents == nullptr)
 	{
 		return 0;
 	}
@@ -1308,34 +1220,34 @@ UCHAR* VarContents1;
 
 			BufferPtr = (UCHAR*)strtok((char*)Buffer,",");
 			strcpy((char*)CurrentVehicle->DamageObjects[CurrentVehicle->NumDamageObjects],(char*)Buffer);
-			BufferPtr = (UCHAR*)strtok(NULL,",");
-			if (BufferPtr != NULL)
+			BufferPtr = (UCHAR*)strtok(nullptr,",");
+			if (BufferPtr != nullptr)
 			{
 				CurrentVehicle->DamageArmorThickness[CurrentVehicle->NumDamageObjects] =
 							(FLOAT32)(atof((char*)BufferPtr) / 1000.0); // thickness is in mm, need it in meters
 
-				BufferPtr = (UCHAR*)strtok(NULL,",");
+				BufferPtr = (UCHAR*)strtok(nullptr,",");
 
-				if (BufferPtr != NULL)
+				if (BufferPtr != nullptr)
 				{
 					CurrentVehicle->DamageFaceHardness[CurrentVehicle->NumDamageObjects] =
 								(FLOAT32)atof((char*)BufferPtr);
 
-					BufferPtr = (UCHAR*)strtok(NULL,",");
+					BufferPtr = (UCHAR*)strtok(nullptr,",");
 
-					if (BufferPtr != NULL)
+					if (BufferPtr != nullptr)
 					{
 						CurrentVehicle->DamageAverageHardness[CurrentVehicle->NumDamageObjects] =
 									(FLOAT32)atof((char*)BufferPtr);
 
-						BufferPtr = (UCHAR*)strtok(NULL,",");
-						if (BufferPtr != NULL)
+						BufferPtr = (UCHAR*)strtok(nullptr,",");
+						if (BufferPtr != nullptr)
 						{
 							CurrentVehicle->DamageConcussionResistance[CurrentVehicle->NumDamageObjects] =
 											atoi((char*)BufferPtr);
 
-							BufferPtr = (UCHAR*)strtok(NULL,",");
-							if(BufferPtr != NULL)
+							BufferPtr = (UCHAR*)strtok(nullptr,",");
+							if(BufferPtr != nullptr)
 							{
 								CurrentVehicle->DamageThreshold[CurrentVehicle->NumDamageObjects] =
 											(FLOAT32)atof((char*)BufferPtr);
@@ -1364,7 +1276,7 @@ static UINT32 _ReadStateFile(vehType* CurrentVehicle,  UCHAR* ModelDirectory,  U
 	UCHAR * VarContents;
 	SINT32 VisDamCount;
 
-	if (CurrentVehicle == NULL || ModelDirectory == NULL || VarContentsIn == NULL) return 0;
+	if (CurrentVehicle == nullptr || ModelDirectory == nullptr || VarContentsIn == nullptr) return 0;
 
 	StateNum = 0;
 	VisDamCount = 0;
@@ -1384,10 +1296,10 @@ static UINT32 _ReadStateFile(vehType* CurrentVehicle,  UCHAR* ModelDirectory,  U
 			continue;
 		}
 
-		VarName = NULL;
+		VarName = nullptr;
 		mlUtilityGetVarnameAndContents1(&VarName,&VarContents,Buffer);
 
-		if (VarName == NULL || VarContents == NULL)
+		if (VarName == nullptr || VarContents == nullptr)
 		{
 			continue;
 		}
@@ -1398,25 +1310,25 @@ static UINT32 _ReadStateFile(vehType* CurrentVehicle,  UCHAR* ModelDirectory,  U
 		{
 			StateType->StateType = VehAnim::STATE_TYPE_DOF;
 
-			VarName = NULL;
+			VarName = nullptr;
 			mlUtilityGetVarnameAndContents1(&VarName,&VarContents,VarContents);
-			if (VarName == NULL || VarContents == NULL)
+			if (VarName == nullptr || VarContents == nullptr)
 			{
 				continue;
 			}
 			StateType->MultiCrewPos = atoi((char*)VarName);
 
-			VarName = NULL;
+			VarName = nullptr;
 			mlUtilityGetVarnameAndContents1(&VarName,&VarContents,VarContents);
-			if (VarName == NULL || VarContents == NULL)
+			if (VarName == nullptr || VarContents == nullptr)
 			{
 				continue;
 			}
 			strcpy((char*)StateType->Name,(char*)VarName);
 
-			VarName = NULL;
+			VarName = nullptr;
 			mlUtilityGetVarnameAndContents1(&VarName,&VarContents,VarContents);
-			if (VarName == NULL)
+			if (VarName == nullptr)
 			{
 				continue;
 			}
@@ -1424,7 +1336,7 @@ static UINT32 _ReadStateFile(vehType* CurrentVehicle,  UCHAR* ModelDirectory,  U
 			if (strcmp((char*)VarName,"gear") == 0)
 			{
 				StateType->StateSubType = VehAnim::STATE_SUBTYPE_GEAR;
-				if (VarContents == NULL)
+				if (VarContents == nullptr)
 				{
 					continue;
 				}
@@ -1432,7 +1344,7 @@ static UINT32 _ReadStateFile(vehType* CurrentVehicle,  UCHAR* ModelDirectory,  U
 			}
 			else if (strcmp((char*)VarName,"flap") == 0)
 			{
-				if (VarContents == NULL)
+				if (VarContents == nullptr)
 				{
 					continue;
 				}
@@ -1443,7 +1355,7 @@ static UINT32 _ReadStateFile(vehType* CurrentVehicle,  UCHAR* ModelDirectory,  U
 			}
 			else if (strcmp((char*)VarName,"prop") == 0)
 			{
-				if (VarContents == NULL)
+				if (VarContents == nullptr)
 				{
 					continue;
 				}
@@ -1452,7 +1364,7 @@ static UINT32 _ReadStateFile(vehType* CurrentVehicle,  UCHAR* ModelDirectory,  U
 			}
 			else if (strcmp((char*)VarName,"canopy") == 0)
 			{
-				if (VarContents == NULL)
+				if (VarContents == nullptr)
 				{
 					continue;
 				}
@@ -1461,7 +1373,7 @@ static UINT32 _ReadStateFile(vehType* CurrentVehicle,  UCHAR* ModelDirectory,  U
 			}
 			else if (strcmp((char*)VarName,"hatch") == 0)
 			{
-				if (VarContents == NULL)
+				if (VarContents == nullptr)
 				{
 					continue;
 				}
@@ -1470,7 +1382,7 @@ static UINT32 _ReadStateFile(vehType* CurrentVehicle,  UCHAR* ModelDirectory,  U
 			}
 			else if (strcmp((char*)VarName,"bombbaydoor") == 0)
 			{
-				if (VarContents == NULL)
+				if (VarContents == nullptr)
 				{
 					continue;
 				}
@@ -1479,7 +1391,7 @@ static UINT32 _ReadStateFile(vehType* CurrentVehicle,  UCHAR* ModelDirectory,  U
 			}
 			else if (strcmp((char*)VarName,"divebrake") == 0)
 			{
-				if (VarContents == NULL)
+				if (VarContents == nullptr)
 				{
 					continue;
 				}
@@ -1498,36 +1410,36 @@ static UINT32 _ReadStateFile(vehType* CurrentVehicle,  UCHAR* ModelDirectory,  U
 		{
 			StateType->StateType = VehAnim::STATE_TYPE_SMOKE;
 
-			VarName = NULL;
+			VarName = nullptr;
 			mlUtilityGetVarnameAndContents1(&VarName,&VarContents,VarContents);
-			if (VarName == NULL || VarContents == NULL)
+			if (VarName == nullptr || VarContents == nullptr)
 			{
 				continue;
 			}
 			StateType->MultiCrewPos = atoi((char*)VarName);
 
-			VarName = NULL;
+			VarName = nullptr;
 			mlUtilityGetVarnameAndContents1(&VarName,&VarContents,VarContents);
-			if (VarName == NULL || VarContents == NULL)
+			if (VarName == nullptr || VarContents == nullptr)
 			{
 				continue;
 			}
 			strcpy((char*)StateType->Name,(char*)VarName);
 
-			VarName = NULL;
+			VarName = nullptr;
 			mlUtilityGetVarnameAndContents1(&VarName,&VarContents,VarContents);
 
-			if (VarName == NULL)
+			if (VarName == nullptr)
 			{
 				continue;
 			}
 
 			strcpy((char*)StateType->Emitter,(char*)VarName);
 
-			VarName = NULL;
+			VarName = nullptr;
 			mlUtilityGetVarnameAndContents1(&VarName,&VarContents,VarContents);
 
-			if (VarName == NULL)
+			if (VarName == nullptr)
 			{
 				continue;
 			}
@@ -1585,9 +1497,9 @@ static UINT32 _ReadStateFile(vehType* CurrentVehicle,  UCHAR* ModelDirectory,  U
 		}
 		else if (strcmp((char*)VarName,"sound") == 0)
 		{
-			VarName = NULL;
+			VarName = nullptr;
 			mlUtilityGetVarnameAndContents1(&VarName,&VarContents,VarContents);
-			if (VarName == NULL || VarContents == NULL)
+			if (VarName == nullptr || VarContents == nullptr)
 			{
 				continue;
 			}
@@ -1595,7 +1507,7 @@ static UINT32 _ReadStateFile(vehType* CurrentVehicle,  UCHAR* ModelDirectory,  U
 			StateType->MultiCrewPos = atoi((char*)VarName);
 
 			mlUtilityGetVarnameAndContents1(&VarName,&VarContents,VarContents);
-			if (VarName == NULL || VarContents == NULL)
+			if (VarName == nullptr || VarContents == nullptr)
 			{
 				continue;
 			}
@@ -1603,7 +1515,7 @@ static UINT32 _ReadStateFile(vehType* CurrentVehicle,  UCHAR* ModelDirectory,  U
 			strcpy((char*)StateType->Name,(char*)VarName);
 
 			mlUtilityGetVarnameAndContents1(&VarName,&VarContents,VarContents);
-			if (VarName == NULL)
+			if (VarName == nullptr)
 			{
 				continue;
 			}
@@ -1611,7 +1523,7 @@ static UINT32 _ReadStateFile(vehType* CurrentVehicle,  UCHAR* ModelDirectory,  U
 			StateType->StateType = VehAnim::STATE_TYPE_SOUND;
 			if (strcmp((char*)VarName,"enginesound") == 0)
 			{
-				if (VarContents == NULL)
+				if (VarContents == nullptr)
 				{
 					continue;
 				}
@@ -1630,17 +1542,17 @@ static UINT32 _ReadStateFile(vehType* CurrentVehicle,  UCHAR* ModelDirectory,  U
 		else if (strcmp((char*)VarName,"effect") == 0)
 		{
 			StateType->StateType = VehAnim::STATE_TYPE_EFFECT;
-			VarName = NULL;
+			VarName = nullptr;
 
 			mlUtilityGetVarnameAndContents1(&VarName,&VarContents,VarContents);
-			if (VarName == NULL || VarContents == NULL)
+			if (VarName == nullptr || VarContents == nullptr)
 			{
 				continue;
 			}
 			StateType->MultiCrewPos = atoi((char*)VarName);
 
 			mlUtilityGetVarnameAndContents1(&VarName,&VarContents,VarContents);
-			if (VarName == NULL || VarContents == NULL)
+			if (VarName == nullptr || VarContents == nullptr)
 			{
 				continue;
 			}
@@ -1661,7 +1573,7 @@ static UINT32 _ReadStateFile(vehType* CurrentVehicle,  UCHAR* ModelDirectory,  U
 		}else if (!strcmp((char*)VarName,"visdamage")) // visible damage states
 		{
 			StateType->StateType = VehAnim::STATE_TYPE_VISDAMAGE;
-			VarName = NULL;
+			VarName = nullptr;
 
 			mlUtilityGetVarnameAndContents1(&VarName, &VarContents, VarContents);
 			if(VarName)
@@ -1771,6 +1683,3 @@ static void _ReadFlatFiles(vehType* vehtype)
 		}
 	}
 }
-
-#endif
-

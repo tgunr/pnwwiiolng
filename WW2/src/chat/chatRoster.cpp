@@ -114,7 +114,7 @@ _scriptClient(SCHAR* string)
 		_pause() ;
 	}
 
-	if ( string == NULL || *string == 0 )
+	if ( string == nullptr || *string == 0 )
 		return ;
 
 	// 2 character string = set country
@@ -261,6 +261,9 @@ _openNumClients(UINT32 host, UINT32 port)
 int
 main(int argc, char* argv[])
 {
+	Teul::SetAppName("chatClient");
+	Teul::ConfigVar::InitializeConfigVars();
+
 	SINT32 retval;
 	SCHAR hostAddress[1024], hostPort[1024];
 	UINT32 i;
@@ -274,7 +277,7 @@ main(int argc, char* argv[])
 	chatReadHostLocFile() ;
 
 	program = strrchr(argv[0], '/') ;
-	if ( program == NULL )
+	if ( program == nullptr )
 		program = argv[0] ;
 	else
 		program = program + 1 ;
@@ -341,7 +344,7 @@ main(int argc, char* argv[])
 		port = (UINT32)atol(hostPort);
 	}
 
-	teulInitTransport(LOG_OFF, "./chatRoster", _errorFunction);
+	teulInitTransport(LOG_OFF, "./chatRoster", _errorFunction, nullptr);
 	dbugSetWriteLevel((Debug::ERROR_TYPE)(Debug::ERR_NOTE));
 	dbugSetLogLevel((Debug::ERROR_TYPE)(Debug::ERR_NOTE));
 

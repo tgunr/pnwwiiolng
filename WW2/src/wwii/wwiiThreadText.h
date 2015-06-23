@@ -7,7 +7,7 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-static const UINT32 TEXT_POOL_SIZE = 4095 ;
-extern char* threadsAllocText() ;
-extern char* threadsPrintf(const char* fmt, ...) ;
-extern void threadsFreeText(char* text) ;
+static const UINT32 TEXT_POOL_SIZE = 4095;
+extern char* threadsAllocText();
+extern char* threadsPrintf(const char* fmt, ...);
+extern void threadsFreeText(char* text);

@@ -13,8 +13,8 @@
 struct JoinRequestNode
 {
 	//CL linked list stuff
-	JoinRequestNode* prev ;
-	JoinRequestNode* next ;
+	JoinRequestNode* prev;
+	JoinRequestNode* next;
 
 	UINT32	joinRequestID;	//The "key" to our little list
 							//	every joinrequest has an ID that is used
@@ -29,7 +29,7 @@ struct JoinRequestNode
 
 	class Player* poster;   //Pointer back to the poster, just
 									//	in case we need it
-} ;
+};
 
 enum MM_VEH_STATE
 {
@@ -48,7 +48,7 @@ enum MM_VEH_STATE
 	MM_VEH_JOINED,
 	MM_VEH_PRERESERVED
 ///CAVEAT: Add new states in the appropriate section
-} ;
+};
 
 enum MM_PERS_STATE
 {
@@ -59,5 +59,5 @@ enum MM_PERS_STATE
 ,	PERS_SPAWNING				// Player has gone to cell host
 ,	PERS_DEBRIEFING				// Back from cell host
 ,	PERS_EXITING
-} ;
+};
 

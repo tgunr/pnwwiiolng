@@ -1,10 +1,5 @@
 #include "phui-precompiled-header.h"
 
-#include <wchar.h>
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-
 #include "phui/Checkbox.h"
 #include "phui/GraphicsContext.h"
 #include "phui/UIMessages.h"

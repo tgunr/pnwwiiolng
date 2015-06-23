@@ -18,7 +18,7 @@ USING_GRANNY_NAMESPACE;
 static void
 DeleteFileProxy(char const *FileName)
 {
-    DeleteFile(FileName);
+    DeleteFileA(FileName);
 }
 
 inline DWORD
@@ -31,9 +31,9 @@ GetFileSizeProxy(HANDLE WinXXFileHandle, DWORD *HighSize)
 #undef GetFileSize
 
 static bool
-WinXXFindFile(char const * const FileName, WIN32_FIND_DATA &Data)
+WinXXFindFile(char const * const FileName, WIN32_FIND_DATAA &Data)
 {
-    HANDLE Handle = FindFirstFile(FileName, &Data);
+    HANDLE Handle = FindFirstFileA(FileName, &Data);
     if(Handle != INVALID_HANDLE_VALUE)
     {
         FindClose(Handle);
@@ -50,7 +50,7 @@ GetTemporaryDirectory(void)
 
     if (TempDirectoryBuffer[0] == '\0')
     {
-        GetTempPath(sizeof(TempDirectoryBuffer) - 1, TempDirectoryBuffer);
+        GetTempPathA(sizeof(TempDirectoryBuffer) - 1, TempDirectoryBuffer);
         {for(char *Replace = TempDirectoryBuffer;
              *Replace;
              ++Replace)
@@ -76,7 +76,7 @@ GetFileSize(char const *FileName)
 {
     int32x FileSize = 0;
 
-    WIN32_FIND_DATA Data;
+    WIN32_FIND_DATAA Data;
     if(WinXXFindFile(FileName, Data))
     {
         DWORD HighSize = Data.nFileSizeHigh;

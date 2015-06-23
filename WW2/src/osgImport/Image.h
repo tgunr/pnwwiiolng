@@ -113,7 +113,7 @@ class Image : public Referenced
           * a 3D image from a stack 2D images.
           * If this Image is empty then image data is created to
           * accomodate the source image in its offset position.
-          * If source is NULL then no operation happens, this Image is left unchanged.
+          * If source is nullptr then no operation happens, this Image is left unchanged.
         */
         void copySubImage(int s_offset,int t_offset,int r_offset, Image* source);
 
@@ -189,13 +189,13 @@ class Image : public Referenced
 
         inline unsigned char* data(int column, int row=0,int image=0)
         {
-            if (!_data) return NULL;
+            if (!_data) return nullptr;
             return _data+(column*getPixelSizeInBits())/8+row*getRowSizeInBytes()+image*getImageSizeInBytes();
         }
 
         inline const unsigned char* data(int column, int row=0,int image=0) const
         {
-            if (!_data) return NULL;
+            if (!_data) return nullptr;
             return _data+(column*getPixelSizeInBits())/8+row*getRowSizeInBytes()+image*getImageSizeInBytes();
         }
 

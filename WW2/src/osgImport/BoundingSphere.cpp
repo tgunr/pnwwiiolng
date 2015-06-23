@@ -130,7 +130,7 @@ void BoundingSphere::expandBy(const BoundingSphere& sh)
     //
     // Computing those two points is ugly - so we'll use similar triangles
     float new_radius = (_radius + d + sh.radius() ) * 0.5f;
-    float ratio = ( new_radius - _radius ) / d ;
+    float ratio = ( new_radius - _radius ) / d;
 
     _center[0] += ( sh.center()[0] - _center[0] ) * ratio;
     _center[1] += ( sh.center()[1] - _center[1] ) * ratio;

@@ -21,28 +21,28 @@ public:
 		{}
 	WeaponsReturn(ACTION_OBJECT* const a)
 	{
-		a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, this, sizeof(*this)) ;
+		a->offset = teulPackVoid(TEUL_UNPACK, a->packed, a->offset, this, sizeof(*this));
 	}
 	~WeaponsReturn() {}
 
 	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a)
 	{
-		return (a->offset = teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this))) ;
+		return (a->offset = teulPackVoid(mode, a->packed, a->offset, this, sizeof(*this)));
 	}
 
-	void process() const ;
+	void process() const;
 
 public:
 	// Which vehicle is being returned
-	UINT32				m_sortieID ;
+	UINT32				m_sortieID;
 	// Where in the world they are rtbing
-	FULL_OBJ_ID			m_rtbFacility ;
-	VEHICLE_POSITION	m_position ;
+	FULL_OBJ_ID			m_rtbFacility;
+	VEHICLE_POSITION	m_position;
 	// What state where they in?
-	UINT32				m_exitCode ;
-	bool				m_isVehicleDead ;
-	bool				m_hasBeenHit ;
-	bool				m_rtbPromoted ;
-	bool				m_resupplyMission ;
-} ;
+	UINT32				m_exitCode;
+	bool				m_isVehicleDead;
+	bool				m_hasBeenHit;
+	bool				m_rtbPromoted;
+	bool				m_resupplyMission;
+};
 

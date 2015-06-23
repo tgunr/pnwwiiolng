@@ -7,6 +7,8 @@
 #include "include/infoMessages.h"
 #include <ctype.h>
 
+#pragma comment(lib, "opengl32.lib")
+
 struct OGL_EXTENSION
 {
 	char	name[48];
@@ -236,7 +238,7 @@ static OGL_EXTENSION	ogl_extension[]=
 			{"GL_NV_texture_shader3", &gNV_texture_shader3},
 			{"GL_NV_vertex_program1_1", &gNV_vertex_program1_1},
 			{"GL_NV_multisample_filter_hint", &gNV_multisample_filter_hint},
-			{"", NULL}	// Last in array
+			{"", nullptr}	// Last in array
 		};
 
 static void DisplayLastError(void)
@@ -246,12 +248,12 @@ static void DisplayLastError(void)
 	FormatMessage(	FORMAT_MESSAGE_ALLOCATE_BUFFER | 
 					FORMAT_MESSAGE_FROM_SYSTEM | 
 					FORMAT_MESSAGE_IGNORE_INSERTS,
-					NULL,
+					nullptr,
 					GetLastError(),
 					MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // Default language
 					(LPTSTR) &lpMsgBuf,
 					0,
-					NULL);
+					nullptr);
 
 	// Display the string
 	Write_Debug((char*)lpMsgBuf);
@@ -271,26 +273,26 @@ static BOOL ParseExtensions(const char *tp, PLAY_OGL_EXTENSIONS *ext)
 {
 	int i = 0;
 	char* token;
-	char* tpCopy ;
+	char* tpCopy;
 
 	memset(ext,0,sizeof(PLAY_OGL_EXTENSIONS));
 	ext->numExtensions = 0;
 
 	// We don't know for a fact that 'tp' is writable. So lets assume it
 	// isn't, and take a copy of it
-	tpCopy = _strdup(tp) ;
-	if ( tpCopy == NULL )
+	tpCopy = _strdup(tp);
+	if ( tpCopy == nullptr )
 	{
-		Write_Debug("Unable to allocate copy of the token string") ;
-		return FALSE ;
+		Write_Debug("Unable to allocate copy of the token string");
+		return FALSE;
 	}
 
-	char* context = NULL;
+	char* context = nullptr;
 	for (token = strtok_s( tpCopy, " ", &context );
-		token != NULL;
-		token = strtok_s( NULL, " ", &context ))
+		token != nullptr;
+		token = strtok_s( nullptr, " ", &context ))
 	{
-		for (i=0 ; ogl_extension[i].pflag != NULL ; i++)
+		for (i=0; ogl_extension[i].pflag != nullptr; i++)
 		{
 			if (strcmp(ogl_extension[i].name, token) == 0)
 			{
@@ -299,7 +301,7 @@ static BOOL ParseExtensions(const char *tp, PLAY_OGL_EXTENSIONS *ext)
 
 					ext->numExtensions += 1;
 					if ( i >= MAX_OGL_EXTENSIONS )
-						Write_Debug("  Extensions > %d not supported (%d)", MAX_OGL_EXTENSIONS, i) ;
+						Write_Debug("  Extensions > %d not supported (%d)", MAX_OGL_EXTENSIONS, i);
 					else
 						setOglBit(ext->bitmap,i);
 					break;
@@ -307,9 +309,9 @@ static BOOL ParseExtensions(const char *tp, PLAY_OGL_EXTENSIONS *ext)
 		}
 	}
 
-	Write_Debug(" upto %d extensions available", ext->numExtensions) ;
+	Write_Debug(" upto %d extensions available", ext->numExtensions);
 
-	free(tpCopy) ;
+	free(tpCopy);
 
 	return(TRUE);
 }
@@ -318,28 +320,28 @@ static BOOL ParseExtensions(const char *tp, PLAY_OGL_EXTENSIONS *ext)
 UINT32 ConvertVersion(char* verstring)
 {
 	UINT32 lvernum = 0;
-	UINT32 numbers[4] = { 0, 0, 0 } ;
-	int dots ;
-	char* p ;
+	UINT32 numbers[4] = { 0, 0, 0 };
+	int dots;
+	char* p;
 
 	// No version string or its null, then give up
 	if ( !verstring || *verstring == 0 )
-		return lvernum ;
+		return lvernum;
 
-	p = verstring ;
+	p = verstring;
 	// Iterate across the version subs
 	// and extract each of the numeric digits into a 'quad'
-	for ( dots = 0 ; dots < 4 ; dots++ )
+	for ( dots = 0; dots < 4; dots++ )
 	{
 		while ( isdigit((unsigned char)*p) )
 		{
-			numbers[dots] *= 10 ;
-			numbers[dots] += *p - '0' ;
-			p++ ;
+			numbers[dots] *= 10;
+			numbers[dots] += *p - '0';
+			p++;
 		}
 		if ( *p != '.' )
-			break ;
-		p++ ;
+			break;
+		p++;
 	}
 
 	// How many dots did we get?
@@ -347,27 +349,27 @@ UINT32 ConvertVersion(char* verstring)
 	{
 		case 0:
 			// Split a large number into 4 quads
-			return numbers[0] ;
-		break ;
+			return numbers[0];
+		break;
 		case 1:
-			return (UINT32)(((numbers[0] & 0xffff) << 16) | (numbers[1] & 0x0ffff)) ;
-		break ;
+			return (UINT32)(((numbers[0] & 0xffff) << 16) | (numbers[1] & 0x0ffff));
+		break;
 		case 2:
 			return (UINT32)(
 							((numbers[0] & 0xff) << 24)
 							|((numbers[1] & 0xff) << 16)
 							|(((numbers[2]>>8) & 0xff) << 8)
 							|(numbers[2] & 0xff)
-							) ;
-		break ;
+							);
+		break;
 		default:
 			return (UINT32)(
 							((numbers[0] & 0xff) << 24)
 							|((numbers[1] & 0xff) << 16)
 							|((numbers[2] & 0xff) << 8)
 							|(numbers[3] & 0xff)
-							) ;
-		break ;
+							);
+		break;
 	}
 }
 
@@ -408,19 +410,19 @@ int			numcomps, *comps;
 
 	// Extract data from OpenGL
 	tp = (char*)glGetString(GL_VENDOR);
-	if (tp != NULL)
+	if (tp != nullptr)
 	{
 		strncpy(info->vendor, tp, MAX_OGL_VENDOR_NAME);
 		Write_Debug("Vendor:    %s", tp);
-//		strncpy(info->vendor,"*BETA*",MAX_OGL_VENDOR_NAME) ;		// Uncomment when testing
+//		strncpy(info->vendor,"*BETA*",MAX_OGL_VENDOR_NAME);		// Uncomment when testing
 	}
 	else
-		Write_Debug("No OGL Vendor available") ;
+		Write_Debug("No OGL Vendor available");
 
 	info->oglVersion = 0;
 
 	tp = (char*)glGetString(GL_VERSION);
-	if (tp != NULL)
+	if (tp != nullptr)
 	{
 		info->oglVersion = ConvertVersion(tp);
 		Write_Debug("Version:   %s [%u]", tp, info->oglVersion);
@@ -433,7 +435,7 @@ int			numcomps, *comps;
 
 
 	tp = (char*)glGetString(GL_RENDERER);
-	if (tp != NULL)
+	if (tp != nullptr)
 	{
 		Write_Debug("Renderer:  %s", tp);
 		info->cardName[MAX_OGL_CARD_NAME] = 0;
@@ -441,7 +443,7 @@ int			numcomps, *comps;
 	}
 
 	tp = (char*)glGetString(GL_EXTENSIONS);
-	if (tp != NULL)
+	if (tp != nullptr)
 	{
 		if (!ParseExtensions(tp, &info->extension))
 		{
@@ -450,7 +452,7 @@ int			numcomps, *comps;
 		}
 	}
 	else
-		Write_Debug("No GL_EXTENSIONS data to parse") ;
+		Write_Debug("No GL_EXTENSIONS data to parse");
 
 	glGetIntegerv(GL_MAX_LIGHTS, (GLint*)&gMaxLights);
 
@@ -489,7 +491,7 @@ int			numcomps, *comps;
 		{
 			comps = (int*)malloc(numcomps * sizeof(int));
 			glGetIntegerv(GL_COMPRESSED_TEXTURE_FORMATS_ARB, (GLint*)comps);
-			for (i=0 ; i < numcomps ; i++)
+			for (i=0; i < numcomps; i++)
 			{
 				if (i<MAX_COMPRESSED_TEXTURE)
 				{
@@ -530,13 +532,13 @@ int			numcomps, *comps;
 			{
 				info->compTextures.num = MAX_COMPRESSED_TEXTURE;
 			}
-			Write_Debug("Compressed Textures: %d", info->compTextures.num) ;
+			Write_Debug("Compressed Textures: %d", info->compTextures.num);
 
 			free(comps);
 		}
 	}
 	else
-		Write_Debug("Compressed textures not supported") ;
+		Write_Debug("Compressed textures not supported");
 
 #ifdef NOT_USED
 
@@ -568,15 +570,15 @@ BOOL oglBegin(HWND hwnd, PIXEL_FORMAT_DESC *pixinfo)
 PIXELFORMATDESCRIPTOR	pfd;
 
 	// Already begun
-	if (myhrc != NULL)
+	if (myhrc != nullptr)
 	{
 		return(TRUE);
 	}
 
-	if (myhdc == NULL)
+	if (myhdc == nullptr)
 	{
 		myhdc = GetDC(hwnd);
-		if (myhdc == NULL)
+		if (myhdc == nullptr)
 		{
 			Write_Debug("Failed to GetDC");
 			return(FALSE);
@@ -587,18 +589,18 @@ PIXELFORMATDESCRIPTOR	pfd;
 	if (!ddpChooseScreenFormat(myhdc, &pfd, pixinfo))
 	{
 		ReleaseDC(hwnd, myhdc);
-		myhdc = NULL;
+		myhdc = nullptr;
 		return(FALSE);
 	}
 
 	// Create the rendering context
 	myhrc = wglCreateContext(myhdc);
-	if (myhrc == NULL)
+	if (myhrc == nullptr)
 	{
 		DisplayLastError();
 		Write_Debug("Could not create the rendering context");
 		ReleaseDC(hwnd, myhdc);
-		myhdc = NULL;
+		myhdc = nullptr;
 		return(FALSE);
 	}
 
@@ -607,7 +609,7 @@ PIXELFORMATDESCRIPTOR	pfd;
 	{
 		Write_Debug("Could not make the rendering context current");
 		ReleaseDC(hwnd, myhdc);
-		myhdc = NULL;
+		myhdc = nullptr;
 		return(FALSE);
 	}
 
@@ -618,15 +620,15 @@ void oglEnd(void)
 {
 	if (myhdc && myhrc)
 	{
-		wglMakeCurrent(myhdc, NULL);
+		wglMakeCurrent(myhdc, nullptr);
 		wglDeleteContext(myhrc);
-		myhrc = NULL;
+		myhrc = nullptr;
 	}
 
 	if (myhdc)
 	{
 		ReleaseDC(myhwnd, myhdc);
-		myhdc = NULL;
+		myhdc = nullptr;
 	}
 }
 
@@ -636,7 +638,7 @@ void	Write_Debug(char *str, ...)
 char		buf[2048];
 va_list		marker;
 
-	if (str == NULL)
+	if (str == nullptr)
 		return;
 
 	va_start(marker, str);

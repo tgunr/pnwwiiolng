@@ -148,7 +148,7 @@ void GenerateIcons::MakeAtlas()
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2048, 2048, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL); CHECK_ERR
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, 2048, 2048, 0, GL_RGBA, GL_UNSIGNED_BYTE, nullptr); CHECK_ERR
 
   glGenFramebuffersEXT(1, &fbo); CHECK_ERR
   glBindFramebufferEXT(GL_FRAMEBUFFER_EXT, fbo ); CHECK_ERR
@@ -292,7 +292,7 @@ void GenerateIcons::MakeAtlas()
 
   char* path = GEN_DIR"icons.raw";
   FILE*	cf = fopen(path, "wb");
-  if ( cf == NULL )
+  if ( cf == nullptr )
   {
     printf("File Error: %d\n",errno );
   }
@@ -306,7 +306,7 @@ void GenerateIcons::MakeAtlas()
   {
     path = GEN_DIR"icons.xy";
     cf = fopen(path, "w");
-    if ( cf == NULL )
+    if ( cf == nullptr )
     {
       printf("File Error: %d\n",errno );
     }
@@ -319,7 +319,7 @@ void GenerateIcons::MakeAtlas()
 
   path = GEN_DIR"icons.atlas";
   cf = fopen(path, "w");
-  if ( cf == NULL )
+  if ( cf == nullptr )
   {
     printf("File Error: %d\n",errno );
   }
@@ -593,7 +593,7 @@ bool GenerateIcons::wantModel(UINT32 mt)
   (
     mt == ModelTypes::TERRAIN_TILE
    )
-  ;
+ ;
 }
 
 /*---------------------------------------------------------------------------

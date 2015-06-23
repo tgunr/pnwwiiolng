@@ -14,6 +14,6 @@ namespace Map
 	// Installs our callbacks
 	extern SINT32 HostInstallCallbacks(void);
 
-	extern void BroadcastSwingMeter() ;
+	extern void BroadcastSwingMeter();
 }
 

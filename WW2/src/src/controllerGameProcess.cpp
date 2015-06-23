@@ -8,7 +8,6 @@
 #include <sys/wait.h>
 #endif
 
-#include "dbug/dbug.h"
 #include "teul/teulTime.h"
 #include "src/controllerGameProcess.h"
 
@@ -25,15 +24,17 @@ static std::list<GameProcess> s_processes;
 //////////////////////////////////////////////////////////////////////
 // Helper to determine if a process is currently running.
 
-static bool _processStillRunning(UINT64 process_)
+bool GameProcess::IsRunning() const
 {
+	if (!m_processID)
+		return false;
 #if platOS == OS_WIN32
 	// Check if the process is still running.
-	auto result = WaitForSingleObject((HANDLE)process_, 0);
+	auto result = WaitForSingleObject(m_processHandle, 0);
 	return ( result != WAIT_OBJECT_0 && result != WAIT_FAILED );
 #else
 	int status = 0;
-	auto result = waitpid(process_, &status, WEXITED | WNOHANG);
+	auto result = waitpid(m_processID, &status, WEXITED | WNOHANG);
 	return ( result == 0 );
 #endif
 }
@@ -47,9 +48,13 @@ GameProcess::GameProcess(SERVER_TYPE type_)
 	, m_wantRunning(false)
 	, m_startSent(0ULL)
 	, m_started(0ULL)
-	, m_process(0ULL)
+#if platOS == OS_WIN32
+	, m_processHandle(0ULL)
+#endif
+	, m_processID(0ULL)
 	, m_stopSent(0ULL)
 	, m_stopped(0ULL)
+	, m_launchAttempts(0)
 {
 }
 
@@ -70,7 +75,7 @@ void GameProcess::RequestStart()
 // it will succeed in startup, just that we've done everything that
 // we needed to do to get the OS to run the executable.
 
-void GameProcess::OnStarting(UINT64 process_)
+void GameProcess::OnStarting(processhandle_t processHandle_, UINT64 processID_)
 {
 	ABORT_IF( StartSent() );
 	ABORT_IF( Running() );
@@ -80,7 +85,10 @@ void GameProcess::OnStarting(UINT64 process_)
 	teulSyncClock();
 	m_startSent = teulClock64;
 	m_stopped = 0ULL;
-	m_process = process_;
+#if platOS == OS_WIN32
+	m_processHandle = processHandle_;
+#endif
+	m_processID = processID_;
 	s_processStarting = this;
 	++m_launchAttempts;
 
@@ -90,12 +98,10 @@ void GameProcess::OnStarting(UINT64 process_)
 //////////////////////////////////////////////////////////////////////
 // Handle the process having launched and registered itself with us.
 
-void GameProcess::OnStarted(UINT64 processID_)
+bool GameProcess::OnStarted()
 {
-	ABORT_IF( !StartSent() );
-	ABORT_IF( Running() );
-	ABORT_IF( ProcessID() != processID_ );
-	ABORT_IF( s_processStarting != this );
+	if (!StartSent() || Running() || s_processStarting != this)
+		return false;
 
 	teulSyncClock();
 	Log(Debug::ERR_NOTE, "started (attempt %u, took %llums)", m_launchAttempts, (teulClock64 - m_startSent));
@@ -104,6 +110,8 @@ void GameProcess::OnStarted(UINT64 processID_)
 	m_stopped = 0ULL;
 	s_processStarting = nullptr;
 	m_launchAttempts = 0;
+
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -155,10 +163,12 @@ void GameProcess::OnStopped()
 	m_stopSent = 0ULL;
 	m_started = 0ULL;
 #if platOS == OS_WIN32
-	if ( m_process != 0ULL )
-		CloseHandle(Process());
+	if ( m_processHandle != 0ULL ) {
+		CloseHandle(m_processHandle);
+		m_processHandle = 0ULL;
+	}
 #endif
-	m_process = 0ULL;
+	m_processID = 0ULL;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -170,13 +180,15 @@ void GameProcess::Kill()
 		return;
 	Log(Debug::ERR_NOTE, "kill");
 #if platOS == OS_WIN32
-	TerminateProcess(Process(), 1);
-	CloseHandle(Process());
-	m_process = 0ULL;
+	if (m_processHandle) {
+		TerminateProcess(m_processHandle, 1);
+		CloseHandle(m_processHandle);
+		m_processHandle = 0ULL;
+	}
 #else
-	kill(Process(), SIGKILL);
-	m_process = 0ULL;
+	kill(m_processID, SIGKILL);
 #endif
+	m_processID = 0ULL;
 	OnStopped();
 }
 
@@ -205,7 +217,7 @@ bool GameProcess::CheckStatus()
 
 	if ( StartSent() )
 	{
-		if ( ! _processStillRunning(ProcessID()) )
+		if ( ! IsRunning() )
 		{
 			Log("process stopped");
 			OnStopped();
@@ -285,13 +297,13 @@ static void _getCurrentProcessPath(char (& processPath)[MAX_PATH])
 	strncpy(processPath, g_argv0, sizeof(processPath) - 1);
 #endif
 	char* endCharacter = strrchr(processPath, PATH_SEPARATOR);
-	if ( endCharacter != NULL )
+	if ( endCharacter != nullptr )
 		*(endCharacter) = 0;
 	else
 		strncpy(processPath, ".", sizeof(processPath) - 1);
 }
 
-static bool _spawnProcess(GameProcess* const starter_, const char* const processName_, UINT64& process_, UINT64& pid_, int errno_)
+static bool _spawnProcess(GameProcess* const starter_, const char* const processName_, processhandle_t& process_, UINT64& pid_, int errno_)
 {
 	char processPath[MAX_PATH];
 	processPath[sizeof(processPath) - 1] = 0;
@@ -313,7 +325,7 @@ static bool _spawnProcess(GameProcess* const starter_, const char* const process
 	if ( CreateProcessA(processPath, cmdLine, nullptr, nullptr, FALSE, CREATE_NEW_CONSOLE, nullptr, pwd, &sinf, &pinf) == TRUE )
 	{
 		CloseHandle(pinf.hThread);
-		process_ = (UINT64)pinf.hProcess;
+		process_ = (processhandle_t)pinf.hProcess;
 		pid_ = pinf.dwProcessId;
 		return true;
 	}
@@ -366,7 +378,7 @@ namespace GameProcessManager
 	void AddServer(SERVER_TYPE type_)
 	{
 		ABORT_IF(static_cast<UINT32>(type_) >= MAX_SERVER_TYPE);
-		auto it = std::find_if(s_processes.begin(), s_processes.end(), [=](const GameProcess& proc_) { return proc_.ServerType() == type_; });
+		auto it = std::find_if(s_processes.cbegin(), s_processes.cend(), [type_](const GameProcess& proc_) { return proc_.ServerType() == type_; });
 		if ( it == s_processes.end() )
 		{
 			dbugLog(_FLI, "adding %s server to process management list.\n", g_serverTypes[type_]);
@@ -378,11 +390,18 @@ namespace GameProcessManager
 	void RemoveServer(SERVER_TYPE type_)
 	{
 		ABORT_IF(static_cast<UINT32>(type_) >= MAX_SERVER_TYPE);
-		auto it = std::find_if(s_processes.begin(), s_processes.end(), [=](const GameProcess& proc_) { return proc_.ServerType() == type_; });
+		auto it = std::find_if(s_processes.begin(), s_processes.end(), [type_](const GameProcess& proc_) { return proc_.ServerType() == type_; });
 		if ( it == s_processes.end() )
 			return;
 		GameProcess& proc = (*it);
 		proc.RequestDiscontinue();
+	}
+
+	// Find a server by its processID.
+	GameProcess* LookupGameProcess(uint64_t processID_)
+	{
+		auto it = std::find_if(s_processes.begin(), s_processes.end(), [processID_](const GameProcess& proc_) { return proc_.ProcessID() == processID_; });
+		return (it != s_processes.cend()) ? &(*it) : nullptr;
 	}
 
 	// Check up on all processes.
@@ -399,7 +418,7 @@ namespace GameProcessManager
 		// Remember if we thought a process was starting before we checked statuses.
 		bool wasStarting = (GameProcess::s_processStarting != nullptr);
 		GameProcess* starter = nullptr;
-		for ( auto it = s_processes.begin() ; it != s_processes.end() ; )
+		for ( auto it = s_processes.begin(); it != s_processes.end(); )
 		{
 			auto& proc = (*(it++));
 			if ( proc.CheckStatus() )
@@ -416,16 +435,17 @@ namespace GameProcessManager
 			{
 				///TODO: Make the host names match their app names,
 				/// e.g. right now cell host logs to wwii_host.X.log but the executable is hostd.
-				static const char* processNames[MAX_SERVER_TYPE] = { nullptr, "authHost" EXE_SUFFIX, "dbd" EXE_SUFFIX, "stratd" EXE_SUFFIX, "chatd" EXE_SUFFIX, "mmhostd" EXE_SUFFIX, "pingHost" EXE_SUFFIX, "hostd" EXE_SUFFIX, nullptr };
+				static const char* processNames[MAX_SERVER_TYPE] = { nullptr, "authHost" EXE_SUFFIX, "dbd" EXE_SUFFIX, "stratd" EXE_SUFFIX, "chatd" EXE_SUFFIX, "mmhostd" EXE_SUFFIX, "hostd" EXE_SUFFIX, nullptr };
 
 				const char* processName = processNames[starter->ServerType()];
-				UINT64 child = 0ULL, childPid = 0ULL;
+				processhandle_t child = 0ULL;
+				UINT64 childPid = 0ULL;
 				int spawnErrno = 0;
 				bool success = _spawnProcess(starter, processName, child, childPid, spawnErrno);
 				if ( success )
 				{
 					dbugLog(_FLI, "%s server started %s child %llu (pid %llu)", starter->ServerTypeName(), processName, child, childPid);
-					starter->OnStarting(child);
+					starter->OnStarting(child, childPid);
 					return true;
 				}
 				dbugLog(_FLA, "failed to start %s: %u", processName, spawnErrno);
@@ -443,7 +463,7 @@ namespace GameProcessManager
 	void Shutdown()
 	{
 		// Ask all processes to stop.
-		for ( auto it = s_processes.begin() ; it != s_processes.end() ; ++it )
+		for ( auto it = s_processes.begin(); it != s_processes.end(); ++it )
 		{
 			auto& proc = *(it++);
 			proc.RequestDiscontinue();
@@ -462,7 +482,7 @@ namespace GameProcessManager
 		if ( s_processes.empty() == false )
 		{
 			fprintf(stderr, "killing lingering processes.\n");
-			for ( auto it = s_processes.begin() ; it != s_processes.end() ; )
+			for ( auto it = s_processes.begin(); it != s_processes.end(); )
 			{
 				auto& proc = *(it++);
 				proc.Log(Debug::ERR_ABORT, "still running at shutdown, terminating.");

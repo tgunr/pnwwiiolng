@@ -15,18 +15,11 @@
 #include "osgImport/BoundingBox.h"
 #include "trn/trnMain.h"
 
-#if defined(USE_OSG)
-#include <osg/Vec3d>
-#include "osgPlayer/playerMain.h"
-#include "osgVehicle/VehicleBase.h"
-#include "osgSDM/SDMTerrainModelNode.h"
-#else
 #include "math/mathvect.h"
 #include "pers/persmain.h"
 #include "veh/vehmain.h"
 #include "trn/trncd.h"
 #include "ob/obmain.h"
-#endif
 
 // defines
 
@@ -58,7 +51,7 @@ bool TutorialHandler::Handle(TUT_EVENT_TYPE t) const
 *************************************************************************************************/
 
 TutorialManager::TutorialManager() :
-	_tutorial(NULL),
+	_tutorial(nullptr),
 	_eventFlags(0),
 	_nextUpdate(0),
 	_stop(false),
@@ -98,11 +91,7 @@ void TutorialManager::Update()
 	{
 		if(WantsEvent(TUTORIAL_UPDATE_EVENTS))
 		{
-#if defined(USE_OSG)
-			VehicleBase* vehicle = NULL;
-#else
-			vehVehicle* vehicle = NULL;
-#endif
+			vehVehicle* vehicle = nullptr;
 
 			it = _eventHandlers.begin();
 
@@ -129,12 +118,6 @@ void TutorialManager::Update()
 
 						if(vehicle)
 						{
-#if defined(USE_OSG)
-							const osg::Vec3d& vpos	= vehicle->Position();
-							const osg::Vec3d lpos	= osg::Vec3d(handler.data.l.x,handler.data.l.y,handler.data.l.z);
-							osg::Vec3d diff			= vpos - lpos;
-							TUT_HANDLER_STATE state	= (diff.length() <= (double)handler.data.l.d) ? THS_EVENT_IN: THS_EVENT_OUT;
-#else
 							// old game style of calculating the location
 							Vec3d myPos		= Vec3d(vehicle->ModelData->VehiclePos);
 							Vec3d& dataPos  = handler.data.l.coords.at(0);
@@ -143,7 +126,6 @@ void TutorialManager::Update()
 
 							//mathSubVectors(&diff, &vehicle->ModelData->VehiclePos, &location);
 							TUT_HANDLER_STATE state	= (diff.length2() <= length2) ? THS_EVENT_IN: THS_EVENT_OUT;
-#endif
 
 							if(state != handler.state)
 							{
@@ -246,7 +228,7 @@ void TutorialManager::Update()
 
 bool TutorialManager::IsActive() const
 {
-	return (_tutorial != NULL);
+	return (_tutorial != nullptr);
 }
 
 bool TutorialManager::WantsEvent(UINT32 eventType)
@@ -282,7 +264,7 @@ void TutorialManager::DoEvent(UINT32 eventType, ...)
 			{
 				handler.state = THS_EVENT_IN;
 				va_start(args, eventType);
-				_handleEvent(handler, args);
+				_handleEvent(handler, &args);
 				va_end(args);
 			}
 		}
@@ -366,7 +348,7 @@ bool TutorialManager::Stop(bool delayed)
 		// reset it
 		_current.Reset();
 
-		_tutorial	= NULL;
+		_tutorial	= nullptr;
 		_eventFlags	= 0;
 		_stop		= false;
 
@@ -386,7 +368,7 @@ TutorialHandler* TutorialManager::FindHandler(const char* name)
 	if(found != _eventHandlers.end())
 		return &found->second;
 
-	return NULL;
+	return nullptr;
 }
 
 TutorialHandler* TutorialManager::AddHandler(UINT32 eventType, const char* callback, const char* name)
@@ -409,7 +391,7 @@ TutorialHandler* TutorialManager::AddHandler(UINT32 eventType, const char* callb
 
 		// init out callback (c) and scope (s) strings
 		const char* c = buffer;
-		const char* s = NULL;
+		const char* s = nullptr;
 
 		if(point)
 		{
@@ -441,7 +423,7 @@ TutorialHandler* TutorialManager::AddHandler(UINT32 eventType, const char* callb
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 TutorialHandler* TutorialManager::AddTimedHandler(const char* callback, const char* name, int duration)
@@ -615,17 +597,7 @@ void TutorialManager::_resetFlags()
 		_eventFlags |= it->second.eventType;
 }
 
-int TutorialManager::_handleEvent(TutorialHandler& handler, ...)
-{
-	va_list args;
-	va_start(args, handler);
-	int result = _handleEvent(handler, args);
-	va_end(args);
-
-	return result;
-}
-
-int TutorialManager::_handleEvent(TutorialHandler& handler, va_list& args)
+int TutorialManager::_handleEvent(TutorialHandler& handler, va_list* args)
 {
 	int nargs	= 1;
 	int keep	= 0;
@@ -652,31 +624,33 @@ int TutorialManager::_handleEvent(TutorialHandler& handler, va_list& args)
 
 	tolua_pushusertype(_tutorial, (void*)&handler, "TutorialHandler");
 
-	switch(handler.eventType)
+	if (args)
 	{
+		switch (handler.eventType)
+		{
 		case TUT_EVENT_SET:		// name/value pair
 		{
-			lua_pushstring(_tutorial, va_arg(args,const char*));
-			lua_pushstring(_tutorial, va_arg(args,const char*));
+			lua_pushstring(_tutorial, va_arg(*args, const char*));
+			lua_pushstring(_tutorial, va_arg(*args, const char*));
 			nargs = 3;
 		}
 		break;
 		case TUT_EVENT_MESSAGE:		// arbitrary string message
 		{
-			lua_pushstring(_tutorial, va_arg(args,const char*));
+			lua_pushstring(_tutorial, va_arg(*args, const char*));
 			nargs = 2;
 		}
 		break;
 		case TUT_EVENT_CHAT:		// chat sending
 		{
-			lua_pushstring(_tutorial, va_arg(args,const char*));
+			lua_pushstring(_tutorial, va_arg(*args, const char*));
 			nargs = 2;
 		}
 		break;
 		case TUT_EVENT_CHANNEL:		// chat channel tuning
 		{
-			unsigned char radio		= *(va_arg(args,unsigned char*));
-			unsigned int channel	= *(va_arg(args,unsigned int*));
+			unsigned char radio = *(va_arg(*args, unsigned char*));
+			unsigned int channel = *(va_arg(*args, unsigned int*));
 
 			lua_pushinteger(_tutorial, (int)radio);
 			lua_pushinteger(_tutorial, (int)channel);
@@ -685,103 +659,91 @@ int TutorialManager::_handleEvent(TutorialHandler& handler, va_list& args)
 		break;
 		case TUT_EVENT_KEY:			// iac code, state and count
 		{
-			lua_pushinteger(_tutorial, *(va_arg(args,unsigned int*)));
-			lua_pushinteger(_tutorial, *(va_arg(args,unsigned int*)));
-			lua_pushinteger(_tutorial, *(va_arg(args,int*)));
+			lua_pushinteger(_tutorial, *(va_arg(*args, unsigned int*)));
+			lua_pushinteger(_tutorial, *(va_arg(*args, unsigned int*)));
+			lua_pushinteger(_tutorial, *(va_arg(*args, int*)));
 			nargs = 4;
 		}
 		break;
 		case TUT_EVENT_INPUT:			// function code and param
 		{
-			lua_pushinteger(_tutorial, *(va_arg(args,unsigned int*)));
-			lua_pushinteger(_tutorial, *(va_arg(args,int*)));
+			lua_pushinteger(_tutorial, *(va_arg(*args, unsigned int*)));
+			lua_pushinteger(_tutorial, *(va_arg(*args, int*)));
 			nargs = 3;
 		}
 		break;
 		case TUT_EVENT_WEAPON_SWITCH:	// game weapon type and fps weapon type
 		{
-			tolua_pushusertype(_tutorial, va_arg(args,weaponType*), "weaponType");
-			lua_pushinteger(_tutorial, *(va_arg(args,int*)));
+			tolua_pushusertype(_tutorial, va_arg(*args, weaponType*), "weaponType");
+			lua_pushinteger(_tutorial, *(va_arg(*args, int*)));
 			nargs = 3;
 		}
 		break;
 		case TUT_EVENT_STATE_TROOP:		// fps weapon state and fps weapon type
 		{
-			lua_pushinteger(_tutorial, *(va_arg(args,int*)));
-			lua_pushinteger(_tutorial, *(va_arg(args,int*)));
+			lua_pushinteger(_tutorial, *(va_arg(*args, int*)));
+			lua_pushinteger(_tutorial, *(va_arg(*args, int*)));
 			nargs = 3;
 		}
 		break;
 		case TUT_EVENT_FPS_POSE:		// fps pose type
 		{
-			lua_pushinteger(_tutorial, *(va_arg(args,int*)));
+			lua_pushinteger(_tutorial, *(va_arg(*args, int*)));
 			nargs = 2;
 		}
 		break;
 		case TUT_EVENT_ENTER:				// strat building entered
 		case TUT_EVENT_LEAVE:				// strat building left
 		{
-			tolua_pushusertype(_tutorial, va_arg(args,StratDB::StratObject*), "StratDB::StratObject");
+			tolua_pushusertype(_tutorial, va_arg(*args, StratDB::StratObject*), "StratDB::StratObject");
 			nargs = 2;
 		}
 		break;
 		case TUT_EVENT_WEAPON_FIRE:			// fired weapon type
 		{
-			tolua_pushusertype(_tutorial, va_arg(args,weaponType*), "weaponType");
+			tolua_pushusertype(_tutorial, va_arg(*args, weaponType*), "weaponType");
 			nargs = 2;
 		}
 		break;
 		case TUT_EVENT_HIT:					// terrain object shot
 		{
-#if defined(USE_OSG)
-			tolua_pushusertype(_tutorial, va_arg(args,SDMTerrainModelNode*), "SDMTerrainModelNode"); // trn cd object
-#else
-			tolua_pushusertype(_tutorial, va_arg(args,trnCDTerrainObject*), "trnCDTerrainObject"); // trn cd object
-			tolua_pushusertype(_tutorial, va_arg(args,OBJECT*), "OBJECT"); // collision object
-#endif
-			lua_pushnumber(_tutorial, *(va_arg(args,double*))); // x
-			lua_pushnumber(_tutorial, *(va_arg(args,double*))); // y
-			lua_pushnumber(_tutorial, *(va_arg(args,double*))); // z
-#if defined(USE_OSG)
-			nargs = 5;
-#else
+			tolua_pushusertype(_tutorial, va_arg(*args, trnCDTerrainObject*), "trnCDTerrainObject"); // trn cd object
+			tolua_pushusertype(_tutorial, va_arg(*args, OBJECT*), "OBJECT"); // collision object
+			lua_pushnumber(_tutorial, *(va_arg(*args, double*))); // x
+			lua_pushnumber(_tutorial, *(va_arg(*args, double*))); // y
+			lua_pushnumber(_tutorial, *(va_arg(*args, double*))); // z
 			nargs = 6;
-#endif
 		}
 		break;
 		case TUT_EVENT_COLLISION:			// terrain object collided with
 		{
-#if defined(USE_OSG)
-			tolua_pushusertype(_tutorial, va_arg(args,SDMTerrainModelNode*), "SDMTerrainModelNode");
-#else
-			tolua_pushusertype(_tutorial, va_arg(args,trnCDTerrainObject*), "trnCDTerrainObject");
-#endif
+			tolua_pushusertype(_tutorial, va_arg(*args, trnCDTerrainObject*), "trnCDTerrainObject");
 			nargs = 2;
 		}
 		break;
 		case TUT_EVENT_LOCATION:			// true = in range; false = out of range
 		{
-			lua_pushboolean(_tutorial, (handler.state == THS_EVENT_IN) ? 1: 0);
+			lua_pushboolean(_tutorial, (handler.state == THS_EVENT_IN) ? 1 : 0);
 			nargs = 2;
 		}
 		break;
 		case TUT_EVENT_UI_POPUP:			// true = ok; false = cancel
 		case TUT_EVENT_UI_READY:			// true = ready; false = not ready
 		{
-			lua_pushboolean(_tutorial, *(va_arg(args,int*)));
+			lua_pushboolean(_tutorial, *(va_arg(*args, int*)));
 			nargs = 2;
 		}
 		break;
 		case TUT_EVENT_MAP:					// number representing map event subtype
 		{
-			lua_pushinteger(_tutorial, *(va_arg(args,int*)));
+			lua_pushinteger(_tutorial, *(va_arg(*args, int*)));
 			nargs = 2;
 		}
 		break;
 		case TUT_EVENT_DAMAGE:					// terrain object shot
 		{
-			lua_pushnumber(_tutorial, *(va_arg(args,double*))); // x
-			tolua_pushusertype(_tutorial, va_arg(args,vehVehicle*), "vehVehicle"); // vehicle object
+			lua_pushnumber(_tutorial, *(va_arg(*args, double*))); // x
+			tolua_pushusertype(_tutorial, va_arg(*args, vehVehicle*), "vehVehicle"); // vehicle object
 			nargs = 3;
 		}
 		break;
@@ -790,6 +752,7 @@ int TutorialManager::_handleEvent(TutorialHandler& handler, va_list& args)
 			// no arguments for default handled events
 		}
 		break;
+		}
 	}
 
 	if(lua_pcall(_tutorial, nargs, 1, 0) == 0) // call the handler's callback

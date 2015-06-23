@@ -14,21 +14,20 @@ enum { CHAT_X = 205 };
 
 namespace Chat
 {
-	enum { CallbackX = 205 } ;
+	enum { CallbackX = 205 };
 
-	//Once again, we pick a high number that hopefully isn't taken by someone
-	//	else
+	//Once again, we pick a high number that hopefully isn't taken by someone else
 	enum
 	{
 		// 0
-		MISSION_DELETION_Y = 0,// Requests for and notifications of mission deletions
+		MISSION_DELETION_Y = 0,	// Requests for and notifications of mission deletions
 		GAME_HACKER_REPORT_Y,
 		LOCATE_USER_Y,
 		FOUND_USER_Y,
 		EXCHANGE_SCMD_Y,		// Send and receive Strat CoMmanDs
 		CMD_LIST_Y,				// List of dot commands
-		BRIGADE_MOVE_Y,		// Notice of a brigade movement
-		WHO_LIST_Y,			// Array of who messages
+		BRIGADE_MOVE_Y,			// Notice of a brigade movement
+		WHO_LIST_Y,				// Array of who messages
 		MOD_REPORT_Y,			// Mod report
 		MOBILE_SPAWN_WAYPOINT_Y,	// Mobile spawn waypoint updates
 		// 10
@@ -46,6 +45,7 @@ namespace Chat
 		HOLD_FALL_INFO_Y,		// Messages about hold/fall votes
 
 		/////  ^^^ INSERT NEW CALLBACKS HERE^^^  /////
+		OMG_Y = 100,				// OMG-numbered callbacks start here
 
 		// 200
 		LOGIN_Y	=	200,	// Old callbacks I don't wanna renumber

@@ -58,19 +58,19 @@ SmokeGrenadeSTO::~SmokeGrenadeSTO()
     if(te)
     {
         te->kill();
-        te = NULL;
+        te = nullptr;
     }
 
     if(_stosoundpopID > 0)
     {
-        fxSndSetKillCallback(_stosoundpopID, NULL);
+        fxSndSetKillCallback(_stosoundpopID, nullptr);
         fxSndStopSoundDelayed(_stosoundpopID, 1);
         _stosoundpopID = 0;
     }
 
     if(_stosoundfizzID > 0)
     {
-        fxSndSetKillCallback(_stosoundfizzID, NULL);
+        fxSndSetKillCallback(_stosoundfizzID, nullptr);
         fxSndStopSoundDelayed(_stosoundfizzID, 1);
         _stosoundfizzID = 0;
     }
@@ -104,7 +104,7 @@ void SmokeGrenadeSTO::deactivate()
     if(te)
     {
         te->kill();
-        te = NULL;
+        te = nullptr;
     }
 
     if(_stosoundpopID > 0)
@@ -163,7 +163,7 @@ bool SmokeGrenadeSTO::createSmokeGrenade()
 	dir.y = -dir.y;
 	dir.z = -dir.z;
 
-    te = TransformEffect::AddEffect("smokegrenade", Vec3f(dir), timeRemaining(), NULL);
+    te = TransformEffect::AddEffect("smokegrenade", Vec3f(dir), timeRemaining(), nullptr);
 
     if(te)
     {
@@ -220,7 +220,7 @@ bool SmokeGrenadeSTO::createSmokeGrenade()
 	// create a visual model
 	if(m_flags)
 	{
-		const char* modelPath = NULL;
+		const char* modelPath = nullptr;
 
 		if(m_flags & BRITISH)
 			modelPath = "TPS\\meshes\\uk_gren_smk\\uk_gren_smk";

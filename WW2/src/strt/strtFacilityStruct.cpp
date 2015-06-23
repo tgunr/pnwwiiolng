@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Created: Wed Dec 14 18:52:52 CST 2005
 //
 // Common member functions of strtFacilityStruct
@@ -8,10 +7,6 @@
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-//
-
-
-#include <assert.h>
 
 #include "strt/strtCaptureState.h"
 #include "strt/strtCPStruct.h"
@@ -26,20 +21,20 @@
 
 FacilityStruct::~FacilityStruct()
 {
-	WEAPON_ENTRIES::iterator it ;
+	WEAPON_ENTRIES::iterator it;
 
 	if ( m_joinList )
 	{
-		delete m_joinList ;
-		m_joinList = NULL ;
+		delete m_joinList;
+		m_joinList = nullptr;
 	}
 
-	for ( it = m_weaponEntries.begin() ; it != m_weaponEntries.end() ; ++it )
+	for ( it = m_weaponEntries.begin(); it != m_weaponEntries.end(); ++it )
 	{
 		if ( it->second )
 		{
-			delete it->second ;
-			it->second = NULL ;
+			delete it->second;
+			it->second = nullptr;
 		}
 	}
 }
@@ -51,12 +46,12 @@ bool
 FacilityStruct::isCapturable() const
 {
 	if ( canBeCaptured() == false )
-		return false ;
+		return false;
 	if ( CP().isObjective() == false )
-		return false ;
+		return false;
 	if ( isMilitaryFacility() && CP().isContested() == false )
-		return false ;
-	return true ;
+		return false;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -67,33 +62,33 @@ FacilityStruct::getSupplyingUnit(const HCUnit* brigade, const CPStruct* brigadeH
 {
 	// Ensure facility side matches brigade; then we can shortcut to that.
 	if ( side != brigade->side() )
-		return 0 ;
+		return 0;
 
 	if ( cp->spawningEnabledFor(side) == false && type != FACILITY_DEPOT )
-		return 0 ;
+		return 0;
 
 	// You can only use firebases when spawning your brigade or divisional equipment.
 	if ( type == FACILITY_FIREBASE && (brigade->isBrigade() == false || brigade->movementType() != BRANCH_LAND) )
-		return 0 ;
+		return 0;
 
 	// If the CP is here, then its definitely the supplying unit.
 	if ( cp == brigadeHomeCP )
-		return brigade->unitID() ;
+		return brigade->unitID();
 
 	// If the division is in this town, then it is the supplying unit.
 	if ( brigade->parent() && brigade->parent()->homeCPID() == cp->fullObjID )
-		return brigade->parentID() ;
+		return brigade->parentID();
 
 	if ( type == FACILITY_DEPOT && brigade->movementType() == BRANCH_LAND )
 	{
-		const FacilityStruct* supplyFac = supplyingFacility(*brigade, false, true) ;
-		if ( supplyFac == NULL )
-			return 0 ;
+		const FacilityStruct* supplyFac = supplyingFacility(*brigade, false, true);
+		if ( supplyFac == nullptr )
+			return 0;
 		if ( supplyFac->cp == brigadeHomeCP )
-			return brigade->unitID() ;
+			return brigade->unitID();
 	}
 
-	return 0 ;
+	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -102,7 +97,7 @@ FacilityStruct::getSupplyingUnit(const HCUnit* brigade, const CPStruct* brigadeH
 bool
 FacilityStruct::isRDPFactory() const
 {
-	return type == FACILITY_FACTORY && cp && cp->m_isSupplyCenter ;
+	return type == FACILITY_FACTORY && cp && cp->m_isSupplyCenter;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -111,18 +106,18 @@ FacilityStruct::isRDPFactory() const
 void
 FacilityStruct::setOpen(bool toOpen)
 {
-	UINT32 newFlags = flags & ~CP_STAT_OPEN ;
+	UINT32 newFlags = flags & ~CP_STAT_OPEN;
 	if ( toOpen )
-		newFlags |= CP_STAT_OPEN ;
+		newFlags |= CP_STAT_OPEN;
 	if ( open == toOpen && flags == newFlags )
-		return ;
+		return;
 
-	open = toOpen ;
-	flags = newFlags ;
+	open = toOpen;
+	flags = newFlags;
 
 #ifdef IS_STRAT_HOST
-	strtSaveFacility(this) ;
-	strtQueueFacilityStatus(this) ;
+	strtSaveFacility(this);
+	strtQueueFacilityStatus(this);
 #endif
 }
 
@@ -133,16 +128,16 @@ FacilityStruct::setOpen(bool toOpen)
 void
 FacilityStruct::setCountry(WWII_COUNTRY newCountry)
 {
-	WWII_SIDE newSide = wwiiSide(newCountry) ;
+	WWII_SIDE newSide = wwiiSide(newCountry);
 	if ( country == newCountry && side == newSide )
-		return ;
+		return;
 
-	country = newCountry ;
-	side = newSide ;
+	country = newCountry;
+	side = newSide;
 
 #ifdef IS_STRAT_HOST
-	strtSaveFacility(this) ;
-	strtQueueFacilityStatus(this) ;
+	strtSaveFacility(this);
+	strtQueueFacilityStatus(this);
 #endif
 }
 
@@ -153,10 +148,10 @@ bool
 FacilityStruct::canFollowSupplyLink() const
 {
 	if ( type != FACILITY_DEPOT || !host_config.supply.nomanDepots )
-		return false ;
+		return false;
 	if ( cp->numUnits() > 0 )
-		return false ;
-	return ( cp->isDefendObjective(side) ) ;
+		return false;
+	return ( cp->isDefendObjective(side) );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -170,70 +165,70 @@ FacilityStruct::supplyingFacility(const HCUnit& forUnit, bool ignoreDepot, bool 
 	case FACILITY_ARMYBASE:
 	case FACILITY_NAVALBASE:
 	case FACILITY_AIRBASE:
-		assert( armyBase != NULL ) ;
+		assert( armyBase != nullptr );
 
 		if ( armyBase->canABSupply(forUnit.side()) == false )
-			return NULL ;
+			return nullptr;
 
 		// Is the unit here?
 		if ( forUnit.homeCPID() != cp->fullObjID )
-			return NULL ;
+			return nullptr;
 
-		return armyBase ;
-	break ;
+		return armyBase;
+	break;
 
 	case FACILITY_FIREBASE:
-		assert( armyBase != NULL ) ;
+		assert( armyBase != nullptr );
 
 		if ( isOpen() == false )
-			return NULL ;
+			return nullptr;
 
 		if ( side != forUnit.side() )
-			return NULL ;
+			return nullptr;
 
-		return armyBase->supplyingFacility(forUnit, false) ;
-	break ;
+		return armyBase->supplyingFacility(forUnit, false);
+	break;
 
 	case FACILITY_DEPOT:
-		assert( armyBase != NULL ) ;
+		assert( armyBase != nullptr );
 
 		if ( !ignoreDepot && (side != forUnit.side() || isOpen() == false) )
-			return NULL ;
+			return nullptr;
 
 		// Check local ABs if we own and control this town.
 		if ( cp->side == forUnit.side() && cp->controllingSide == forUnit.side() )
 		{
-			FacilityStruct* const sourceAB = findLocalAB(forUnit.side()) ;
+			FacilityStruct* const sourceAB = findLocalAB(forUnit.side());
 			if ( sourceAB && this->canFollowSupplyLink() == false )
 			{
-				return sourceAB->supplyingFacility(forUnit, false, false) ;
+				return sourceAB->supplyingFacility(forUnit, false, false);
 			}
 		}
 
 		// Don't follow links if we have units here.
 		if ( followLinks == false )
-			return NULL ;
+			return nullptr;
 
 		//// I haven't found an armybase here, so I need to follow the link
 		//// that this depot sits on to see if I am connected to the
 		//// location of my brigade/division.
 
 		// Do we have links?
-		if ( m_incomingLink == NULL )
-			return NULL ;
+		if ( m_incomingLink == nullptr )
+			return nullptr;
 
 		if ( m_incomingLink->hasEnemyFirebase(forUnit.side()) )
-			return NULL ;
+			return nullptr;
 
 		if ( forUnit.homeCPID() != m_incomingLink->startDepot->cp->fullObjID )
-			return NULL ;
+			return nullptr;
 
-		return m_incomingLink->startDepot->supplyingFacility(forUnit, false, false) ;
-	break ;
+		return m_incomingLink->startDepot->supplyingFacility(forUnit, false, false);
+	break;
 
 	default:
-		return NULL ;
-	break ;
+		return nullptr;
+	break;
 	}
 }
 
@@ -244,7 +239,7 @@ FacilityStruct::supplyingFacility(const HCUnit& forUnit, bool ignoreDepot, bool 
 bool
 FacilityStruct::canABSupply(WWII_SIDE forSide) const
 {
-	return ( this != NULL && isOpen() == true && side == forSide && cp->side == forSide ) ;
+	return ( this != nullptr && isOpen() == true && side == forSide && cp->side == forSide );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -254,9 +249,9 @@ void
 FacilityStruct::setCaptureDisabled()
 {
 	if ( false == canBeCaptured() )
-		return ;
+		return;
 
-	_setCaptureState(_CAP_DISABLED, 0) ;
+	_setCaptureState(_CAP_DISABLED, 0);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -266,21 +261,21 @@ void
 FacilityStruct::setCapturePending()
 {
 	if ( false == this->isCapturable() )
-		return this->setCaptureDisabled() ;
+		return this->setCaptureDisabled();
 	if ( this->m_captureStage == _CAP_PENDING )
-		return ;
+		return;
 
 	// If capture is currently enabled, we will be using
 	// a short rebuild time. Otherwise we will be using
 	// the extended rebuild time.
-	bool fromCaptureEnabled = this->isCaptureEnabled() ;
-	UINT32 rebuildDelay_s = (fromCaptureEnabled ? host_config.capture.rebuildTime_s : (host_config.capture.start_m * 60)) ;
+	bool fromCaptureEnabled = this->isCaptureEnabled();
+	UINT32 rebuildDelay_s = (fromCaptureEnabled ? host_config.capture.rebuildTime_s : (host_config.capture.start_m * 60));
 
 	// Minimum 10s rebuild delay.
-	static const UINT32 minimumDelay_s = 15 ;
-	rebuildDelay_s = std::max(rebuildDelay_s, minimumDelay_s) ;
+	static const UINT32 minimumDelay_s = 15;
+	rebuildDelay_s = std::max(rebuildDelay_s, minimumDelay_s);
 
-	_setCaptureState(_CAP_PENDING, rebuildDelay_s) ;
+	_setCaptureState(_CAP_PENDING, rebuildDelay_s);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -290,16 +285,16 @@ void
 FacilityStruct::setCaptureEnabled()
 {
 	if ( false == this->isCapturable() )
-		return this->setCaptureDisabled() ;
+		return this->setCaptureDisabled();
 
 	// Special case for military facilities.
 	if ( this->isMilitaryFacility() )
 	{
 		if ( this->isCapturePending() == false )
-			return this->setCapturePending() ;
+			return this->setCapturePending();
 	}
 
-	_setCaptureState(_CAP_ENABLED, 0) ;
+	_setCaptureState(_CAP_ENABLED, 0);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -311,21 +306,21 @@ FacilityStruct::getCaptureRemaining() const
 	switch ( m_captureStage )
 	{
 	case _CAP_DISABLED:
-		return 100 ;
-	break ;
+		return 100;
+	break;
 	case _CAP_PENDING:
 		{
-			UINT32 timeOut = m_captureStateChanged + m_captureCounter ;
-			return (UINT16)( timeOut > teulTime() ? timeOut - teulTime() : 0 ) ;
+			UINT32 timeOut = m_captureStateChanged + m_captureCounter;
+			return (UINT16)( timeOut > teulTime() ? timeOut - teulTime() : 0 );
 		}
-	break ;
+	break;
 	case _CAP_ENABLED:
-		return (UINT16)100 - std::min(m_captureCounter, (UINT16)100) ;
-	break ;
+		return (UINT16)100 - std::min(m_captureCounter, (UINT16)100);
+	break;
 	default:
-	break ;
+	break;
 	}
-	return 100 ;
+	return 100;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -339,33 +334,33 @@ CaptureState::populate(const class FacilityStruct* facility
 					)
 {
 	// Is this a capture?
-	const bool enemyFacility = ((UINT32)forSide != (UINT32)facility->side) ;
+	const bool enemyFacility = ((UINT32)forSide != (UINT32)facility->side);
 
-	m_stage = (rate < 100 ? (Stage)facility->m_captureStage : CapCaptured) ;
+	m_stage = (rate < 100 ? (Stage)facility->m_captureStage : CapCaptured);
 
 	switch ( m_stage )
 	{
 	case CapPending:
-		m_counter = facility->getCaptureRemaining() ;
-	break ;
+		m_counter = facility->getCaptureRemaining();
+	break;
 	case CapEnabled:
 		if ( enemyFacility )
-			m_counter = facility->m_captureCounter ;
+			m_counter = facility->m_captureCounter;
 		else
-			m_counter = 100 - facility->m_captureCounter ;
-	break ;
+			m_counter = 100 - facility->m_captureCounter;
+	break;
 	default:
-		m_counter = 0 ;
-	break ;
+		m_counter = 0;
+	break;
 	}
 
 	// If we own the facility, then rate is inverted.
-	m_rate = (enemyFacility ? rate : -rate) ;
+	m_rate = (enemyFacility ? rate : -rate);
 
-	m_spawnable = spawnable ;
+	m_spawnable = spawnable;
 
-	m_fidKey = facility->m_captureBuilding->fullObjID.Key() ;
-	m_forSide = forSide ;
+	m_fidKey = facility->m_captureBuilding->fullObjID.Key();
+	m_forSide = forSide;
 }
 
 #ifdef IS_STRAT_HOST
@@ -376,8 +371,8 @@ CaptureState::populate(const class FacilityStruct* facility
 WeaponEntry*
 FacilityStruct::weaponEntry(const WEAPON_SPEC& weapon) const
 {
-	WEAPON_ENTRIES::const_iterator it = m_weaponEntries.find(weapon) ;
-	return ( it != m_weaponEntries.end() ) ? (it->second) : NULL ;
+	WEAPON_ENTRIES::const_iterator it = m_weaponEntries.find(weapon);
+	return ( it != m_weaponEntries.end() ) ? (it->second) : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -390,14 +385,14 @@ void
 FacilityStruct::addWeaponSpawner(const WEAPON& weapon, const ObjectStruct& object)
 {
 	// Do we need to create a weapon entry for this
-	WeaponEntry* entry = weaponEntry(weapon.spec()) ;
-	if ( entry != NULL )
-		entry->addSpawner(object) ;
+	WeaponEntry* entry = weaponEntry(weapon.spec());
+	if ( entry != nullptr )
+		entry->addSpawner(object);
 	else
 	{
 		// Need to create a weapon entry
-		entry = new WeaponEntry(weapon, object) ;
-		m_weaponEntries[weapon.spec()] = entry ;
+		entry = new WeaponEntry(weapon, object);
+		m_weaponEntries[weapon.spec()] = entry;
 	}
 }
 #endif

@@ -7,11 +7,8 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include <vector>
-#include <string>
-
-struct SERVER ;
-struct APP_LAUNCH_REQ ;
+struct SERVER;
+struct APP_LAUNCH_REQ;
 
 namespace Auth
 {
@@ -20,7 +17,7 @@ struct ClientData
 {
 	ClientData(SINT32 _teulIndex, UINT32 _platform, UINT32 _address
 				, UINT32 _oVersion, const char* _username, const char* _password)
-		: server(NULL)
+		: server(nullptr)
 		, teulIndex(_teulIndex)
 		, platform(_platform)
 		, address(_address)
@@ -32,24 +29,24 @@ struct ClientData
 		, appVersion(0)
 		, m_username(_username), m_password(_password)
 		, m_subscribedArenaIDs()
-		, m_launchRequest(NULL)
+		, m_launchRequest(nullptr)
 		, isPlaynet(false)
 		, isPremium(false)
 		, isQueued(false)
 		{}
 
-	~ClientData() ;
+	~ClientData();
 
 public:
-	void AddToQueue(const APP_LAUNCH_REQ& request) ;
-	void RemoveFromQueue(bool enteredGame) ;
+	void AddToQueue(const APP_LAUNCH_REQ& request);
+	void RemoveFromQueue(bool enteredGame);
 
 public:
 	SERVER*	server;
 	SINT32	teulIndex;
 	UINT32	platform;
 	UINT32	address;			// address of the remote host
-	UINT32	oVersion ;
+	UINT32	oVersion;
 	SINT32	customerID;			// customer ID of client
 	SINT32	arenaID;
 	UINT32	sessionID;
@@ -57,11 +54,11 @@ public:
 	UINT32	appVersion;			//Min Version of the app required
 	std::string	m_username;
 	std::string	m_password;
-	std::vector<UCHAR> m_subscribedArenaIDs ;	// Arenas this user has access to
-	APP_LAUNCH_REQ* m_launchRequest ;
-	bool	isPlaynet : 1 ;		// Staff account?
-	bool	isPremium : 1 ;		// Paying subscription?
-	bool	isQueued : 1 ;		// Player is queued
-} ;
+	std::vector<UCHAR> m_subscribedArenaIDs;	// Arenas this user has access to
+	APP_LAUNCH_REQ* m_launchRequest;
+	bool	isPlaynet : 1;		// Staff account?
+	bool	isPremium : 1;		// Paying subscription?
+	bool	isQueued : 1;		// Player is queued
+};
 
 }

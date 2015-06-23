@@ -143,69 +143,64 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
 								   UINT32 VehicleTypeNum,
 								   void* VehicleMasterPtr)
 {
-	SINT32 ComponentListFile = -1;
-	UCHAR Buffer[256];
-	UCHAR * BufferPos;
-	UCHAR UseFileName[128];
-	SINT32 NumComponents;
-	UINT32 VarNum;
-	UCHAR * VarName;
-	UCHAR * VarContents;
-	SINT32 ComponentListPos;
-	mlComponent * CurrentComponent;
-
-	if(ComponentListFilename == NULL || *ComponentListFilename == '\0') return 1;
+	*ComponentList = nullptr;
+	if (ComponentListFilename == nullptr || *ComponentListFilename == '\0')
+		return 1;
 
 #ifdef PRINT_COMPONENTS
 	printf("%s\n", ComponentListFilename);
 #endif
 
-	strcpy((char*)UseFileName,(char*)DirName);
+	UCHAR UseFileName[128];
+	strcpy((char*)UseFileName, (char*)DirName);
 	strcat((char*)UseFileName,"\\");
 	strcat((char*)UseFileName,(char*)ComponentListFilename);
 
-	if(fioAccess((char*)UseFileName))
-		ComponentListFile = fioOpen((char*)UseFileName);
-
+	SINT32 ComponentListFile = fioOpen((char*)UseFileName);
 	if (ComponentListFile < 0)
 	{
-		*ComponentList = NULL;
 		return 1;
 	}
 
-	NumComponents = 0;
-	while (fioGetLine(ComponentListFile,(char*)Buffer,255) != 0)
+	const void *fileData;
+	size_t fileSize = fioMap(ComponentListFile, fileData);
+	if (fileSize <= 0)
 	{
-		if (Buffer[0] == '[')
-		{
-			NumComponents++;
-		}
-	}
-
-	fioClose(ComponentListFile);
-
-	ComponentListFile = fioOpen((char*)UseFileName);
-
-	if (ComponentListFile == -1)
-	{
-		*ComponentList = NULL;
+		fioClose(ComponentListFile);
 		return 1;
 	}
 
-	*ComponentList = (mlComponentList*)memAlloc(sizeof(mlComponentList));
-	memset(*ComponentList,0,sizeof(mlComponentList));
-	(*ComponentList)->Components =  (mlComponent*)memAlloc(NumComponents * sizeof(mlComponent));
-	memset((*ComponentList)->Components,0,NumComponents * sizeof(mlComponent));
+	size_t NumComponents = 0;
+	for (const char* cur = static_cast<const char*>(fileData);;)
+	{
+		if (*cur == '[')
+			++NumComponents;
+		cur = strchr(cur, '\n');
+		if (!cur)
+			break;
+		++cur;
+	}
+	if (NumComponents == 0)
+	{
+		fioClose(ComponentListFile);
+		return 1;
+	}
+
+	*ComponentList = (mlComponentList*)memCalloc(sizeof(mlComponentList) + NumComponents * sizeof(mlComponent), 1);
 	(*ComponentList)->NumComponents = NumComponents;
 
-	ComponentListPos = -1;
+	SINT32 ComponentListPos = -1;
+	UCHAR Buffer[256];
+	UCHAR * BufferPos;
+	UINT32 VarNum;
+	UCHAR * VarName;
+	UCHAR * VarContents;
+	mlComponent * CurrentComponent;
 
-	while (fioGetLine(ComponentListFile,(char*)Buffer,255) != 0)
+	while (fioGetLine(ComponentListFile, (char*)Buffer, 255) != 0)
 	{
 		if (Buffer[0] == '#')
-		{
 			continue;
-		}
 
 		if (Buffer[0] == '[')
 		{
@@ -234,7 +229,7 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
 
 			mlUtilityGetVarnameAndContents(&VarName,&VarContents,Buffer);
 
-			if (VarName == NULL || VarContents == NULL)
+			if (VarName == nullptr || VarContents == nullptr)
 			{
 				continue;
 			}
@@ -310,25 +305,15 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
                                 if(CurrentComponent->SpecialData)
                                 {
                                     delete (mlWeaponMount*)CurrentComponent->SpecialData;
-                                    CurrentComponent->SpecialData = NULL;
+                                    CurrentComponent->SpecialData = nullptr;
                                 }
                             }
-#if defined(USE_OSG)
-                            else if(CurrentComponent->Type == ML_COMPONENT_GEAR)
-                            {
-                                if(CurrentComponent->SpecialData)
-                                {
-                                    delete (mlGearComponentData*)CurrentComponent->SpecialData;
-                                    CurrentComponent->SpecialData = NULL;
-                                }
-                            }
-#endif
                             else
                             {
                                 if(CurrentComponent->SpecialData)
                                 {
                                     memFree(CurrentComponent->SpecialData);
-                                    CurrentComponent->SpecialData = NULL;
+                                    CurrentComponent->SpecialData = nullptr;
                                 }
                             }
 
@@ -345,12 +330,8 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
 									break;
 
 								case ML_COMPONENT_GEAR:
-#if defined(USE_OSG)
-									CurrentComponent->SpecialData = new mlGearComponentData;
-#else
 										CurrentComponent->SpecialData = memAlloc(sizeof(mlGearComponentData));
 										memset(CurrentComponent->SpecialData, 0, sizeof(mlGearComponentData));
-#endif
 									break;
 								case ML_COMPONENT_WEAPONMOUNT:
 										CurrentComponent->SpecialData = new mlWeaponMount;//memAlloc(sizeof(mlWeaponMount));
@@ -365,7 +346,7 @@ UINT32 mlcomponReadComponentFile(mlComponentList** ComponentList,
                                     }
 								break;
 								default:
-									CurrentComponent->SpecialData = NULL;
+									CurrentComponent->SpecialData = nullptr;
 								break;
 
 							}
@@ -625,9 +606,9 @@ UINT32 mlFindComponent(mlComponent** ComponentPtr,
 {
 	UINT32 i;
 
-	if(ComponentPtr == NULL) return 1;
-	*ComponentPtr = NULL;
-	if(ComponentList == NULL ||  ComponentName == NULL) return 1;
+	if(ComponentPtr == nullptr) return 1;
+	*ComponentPtr = nullptr;
+	if(ComponentList == nullptr ||  ComponentName == nullptr) return 1;
 
 	for (i = 0; i < ComponentList->NumComponents; i++)
 	{
@@ -642,41 +623,31 @@ UINT32 mlFindComponent(mlComponent** ComponentPtr,
 }
 
 /************************************************************************************************
-	mlcomponFreeComponentData
+	mlcomponFreeComponentList
 *************************************************************************************************/
 
-UINT32 mlcomponFreeComponentData(mlComponentList* ComponentList)
+UINT32 mlcomponFreeComponentList(mlComponentList* ComponentList)
 {
-	UINT32 i;
-
-	if (ComponentList->Components != NULL)
+	if (ComponentList->Components != nullptr)
 	{
-		for (i=0;i<ComponentList->NumComponents;i++)
+		for (size_t i=0;i<ComponentList->NumComponents;i++)
 		{
-			if (ComponentList->Components[i].SpecialData != NULL)
+			if (ComponentList->Components[i].SpecialData != nullptr)
 			{
 				if (ComponentList->Components[i].Type == ML_COMPONENT_WEAPONMOUNT)
 				{
 //					hackRemoveProtectedBlock(ComponentList->Components[i].SpecialData);
 					delete (mlWeaponMount*)ComponentList->Components[i].SpecialData;
 				}
-#if defined(USE_OSG)
-				else if(ComponentList->Components[i].Type == ML_COMPONENT_GEAR)
-				{
-					delete (mlGearComponentData*)ComponentList->Components[i].SpecialData;
-				}
-#endif
 				else
 				{
 					memFree(ComponentList->Components[i].SpecialData);
 				}
 			}
-			ComponentList->Components[i].SpecialData = NULL;
 		}
 
-		memFree(ComponentList->Components);
 	}
-	ComponentList->NumComponents = 0;
+	memFree(ComponentList);
 
 	return 0;
 }
@@ -691,55 +662,54 @@ UINT32 mlcomponReadDamageComponents(mlComponentList** ComponentList,
 								   UINT32 VehicleTypeNum,
 								   void* VehicleMasterPtr)
 {
-	SINT32 ComponentListFile = -1;
 	UCHAR Buffer[256];
 	UCHAR * BufferPos;
 	UCHAR UseFileName[128];
-	SINT32 NumComponents;
 	UINT32 VarNum;
 	UCHAR * VarName;
 	UCHAR * VarContents;
 	SINT32 ComponentListPos;
 	mlComponent * CurrentComponent;
 
-	if(ComponentListFilename == NULL || *ComponentListFilename == '\0') return 1;
+	*ComponentList = nullptr;
+	if(ComponentListFilename == nullptr || *ComponentListFilename == '\0')
+		return 1;
 
 	strcpy((char*)UseFileName,(char*)DirName);
 	strcat((char*)UseFileName,"\\");
 	strcat((char*)UseFileName,(char*)ComponentListFilename);
 
-	if(fioAccess((char*)UseFileName))
-		ComponentListFile = fioOpen((char*)UseFileName);
-
+	SINT32 ComponentListFile = fioOpen((char*)UseFileName);
 	if (ComponentListFile < 0)
 	{
-		*ComponentList = NULL;
 		return 1;
 	}
 
-	NumComponents = 0;
-	while (fioGetLine(ComponentListFile,(char*)Buffer,255) != 0)
+	const void *fileData;
+	size_t fileSize = fioMap(ComponentListFile, fileData);
+	if (fileSize <= 0)
 	{
-		if (Buffer[0] == '[')
-			NumComponents++;
-	}
-
-	fioClose(ComponentListFile);
-
-	ComponentListFile = fioOpen((char*)UseFileName);
-
-    //printf("cmp file:%s\n",UseFileName);
-
-	if (ComponentListFile == -1)
-	{
-		*ComponentList = NULL;
+		fioClose(ComponentListFile);
 		return 1;
 	}
 
-	*ComponentList =  (mlComponentList*)memAlloc(sizeof(mlComponentList));
-	memset(*ComponentList,0,sizeof(mlComponentList));
-	(*ComponentList)->Components =  (mlComponent*)memAlloc(NumComponents * sizeof(mlComponent));
-	memset((*ComponentList)->Components,0,NumComponents * sizeof(mlComponent));
+	size_t NumComponents = 0;
+	for (const char* cur = static_cast<const char*>(fileData);;)
+	{
+		if (*cur == '[')
+			++NumComponents;
+		cur = strchr(cur, '\n');
+		if (!cur)
+			break;
+		++cur;
+	}
+	if (NumComponents == 0)
+	{
+		fioClose(ComponentListFile);
+		return 1;
+	}
+
+	*ComponentList =  (mlComponentList*)memCalloc(sizeof(mlComponentList) + NumComponents * sizeof(mlComponent), 1);
 	(*ComponentList)->NumComponents = NumComponents;
 
 	ComponentListPos = -1;
@@ -772,7 +742,7 @@ UINT32 mlcomponReadDamageComponents(mlComponentList** ComponentList,
 
 			mlUtilityGetVarnameAndContents(&VarName,&VarContents,Buffer);
 
-			if (VarName == NULL || VarContents == NULL)
+			if (VarName == nullptr || VarContents == nullptr)
 				continue;
 
             const char* nnn = (const char*) UseFileName;
@@ -830,12 +800,11 @@ UINT32 mlcomponReadDamageComponents(mlComponentList** ComponentList,
 
                     break;
 
-#if !defined(USE_OSG) // move out of cmp
+				// move out of cmp
 				case ML_VEHICLEMASS_HACK:
 					if(VehicleMasterPtr) // horrid hack for concussion resistance hack
 						((vehType*)VehicleMasterPtr)->VehicleRealMass = (float)atof((char*)VarContents);
 				break;
-#endif
 			}
 		}
 	}
@@ -848,7 +817,7 @@ UINT32 mlcomponReadDamageComponents(mlComponentList** ComponentList,
 	mlComponentListBegin
 *************************************************************************************************/
 
-void mlComponentListBegin(mlComponentList const* List, mlComponentListIterator* it)
+void mlComponentListBegin(mlComponentList* List, mlComponentListIterator* it)
 {
 	it->List = List;
 	it->idx = 0;
@@ -861,7 +830,7 @@ void mlComponentListBegin(mlComponentList const* List, mlComponentListIterator* 
 
 void mlComponentListNext(mlComponentListIterator* it)
 {
-	it->comp = NULL;
+	it->comp = nullptr;
 
 	for(; it->idx < (int)it->List->NumComponents; it->idx++)
 	{

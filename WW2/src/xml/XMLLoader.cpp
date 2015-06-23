@@ -15,7 +15,7 @@ XMLLoader::XMLLoader() :
 	_handlerReturnScope(NODE),
 	_complete(false),
 	_path(""),
-	_xmlDoc(NULL)
+	_xmlDoc(nullptr)
 {
 	fioXmlRegisterInputCallbacks();
 }
@@ -25,7 +25,7 @@ XMLLoader::XMLLoader(const char* path, xmlTagHandler def, int flags) :
 	_handlerReturnScope(NODE),
 	_complete(false),
 	_path(path),
-	_xmlDoc(NULL)
+	_xmlDoc(nullptr)
 {
 	if(def)
 		AddDefaultHandler(def);
@@ -71,7 +71,7 @@ bool XMLLoader::Load(void* userData)
 
 	if(_path.size())
 	{
-		_xmlDoc = xmlReadFile(_path.c_str(), NULL, _flags);
+		_xmlDoc = xmlReadFile(_path.c_str(), nullptr, _flags);
 
 		if(_xmlDoc)
 		{
@@ -98,7 +98,7 @@ const xmlNode* XMLLoader::GetRootNode() const
 	if(_xmlDoc)
 		return xmlDocGetRootElement(_xmlDoc);
 
-    return NULL;
+    return nullptr;
 }
 
 bool XMLLoader::Process(xmlNode* node, void* userData)
@@ -107,7 +107,7 @@ bool XMLLoader::Process(xmlNode* node, void* userData)
 		return true; // don't process this node, but continue the processing
 
 	// handler for this tag
-	xmlTagHandler handler = NULL;
+	xmlTagHandler handler = nullptr;
 
 	// what to return on fail
 	bool returnOnFalse = (_handlerReturnScope == NODE);
@@ -165,7 +165,7 @@ void XMLLoader::Reset()
 	// reset the private data
 	_path = "";
 	_flags = XML_PARSE_DTDLOAD | XML_PARSE_RECOVER;
-	_xmlDoc = NULL;
+	_xmlDoc = nullptr;
 	_complete = false;
 	_handlers.clear();
 }

@@ -15,7 +15,7 @@
 SINT32 packCompInfoReq(LOGICAL mode, UCHAR* data, SINT32 offset, COMPUTER_INFO_REQ* object, SINT32 /*size*/)
 {
 
-	if (object == NULL)
+	if (object == nullptr)
 		return 0;
 
 	offset = teulPackUINT16(mode,data,offset,&object->size,0);

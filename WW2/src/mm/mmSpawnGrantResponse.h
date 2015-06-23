@@ -12,5 +12,5 @@
 extern LOGICAL mmProcessSpawnGrantResponse(const struct MM_SPAWN_GRANT_RESPONSE& spawnGrant);
 
 //Request for a fake (command line client) spawn trigger
-extern void mmFakeSpawnGrantResponse(class Player* player, UINT32 serialNumber) ;
+extern void mmFakeSpawnGrantResponse(class Player* player, UINT32 serialNumber);
 

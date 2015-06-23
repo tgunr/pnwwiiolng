@@ -28,7 +28,7 @@ enum ENUM_PRIORITY
     IDE_FP_PRIORITY_MANDATORY,
     IDE_MAX_NUMBER_PRIORITES
 
-} ;
+};
 
 #define DEF_PLAYTYPE_WORLD  -101
 #define DEF_PLAYTYPE_HEAD   -102
@@ -91,11 +91,7 @@ struct FXSOUND
 
 };
 
-#if defined(USE_OSG)
-void fxSndUpdate();
-#else
 LOGICAL fxSndUpdate();
-#endif
 
 /*------------------------------------------------------------------
                             3D PROTOTYPES
@@ -165,7 +161,7 @@ extern void fxSndSetPlayType(SINT32 iID, SINT32 iPlayType);
 extern void fxSndSetPosition(SINT32 iID, FLOAT64 x, FLOAT64 y, FLOAT64 z);
 extern void fxSndSetPriority(SINT32 iID, ENUM_PRIORITY enumPriority);
 extern void fxSndSetSoundLoop(SINT32 iID, LOGICAL bIsInfinite);
-extern void fxSndSetSoundName(SINT32 iID, SCHAR szName[]);
+extern void fxSndSetSoundName(SINT32 iID, const char* szName);
 extern void fxSndSetSoundType(SINT32 iID, SINT32 iType);
 extern void fxSndSetVolume(SINT32 iID, FLOAT32 fVolume);
 extern void fxSndDetachSnd(OBJECT* lpKey);

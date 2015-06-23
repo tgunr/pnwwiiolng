@@ -83,7 +83,7 @@ LOGICAL fxSndKill()
 
     FXSOUND* B = g_activeHead.next;
     FXSOUND* E = &g_activeTail;
-    FXSOUND* FREE = NULL;
+    FXSOUND* FREE = nullptr;
 
     if(!B)
         return TRUE;
@@ -152,7 +152,7 @@ inline FXSOUND* _findSound(SINT32 id)
 {
     SINT32 index = id - 1;
 
-    if(index < 0 || index >= SOUND_ARRAY_SIZE) return NULL;
+    if(index < 0 || index >= SOUND_ARRAY_SIZE) return nullptr;
 
     return &Sounds[index];
 }
@@ -463,7 +463,7 @@ LOGICAL fxSndCalculateVolume(FXSOUND* s)
         s->volume = 0.0f;
     }
 
-    if(s->s != NULL && (s->volume != s->oldVolume))
+    if(s->s != nullptr && (s->volume != s->oldVolume))
     {
         s->oldVolume = s->volume;
         sndsSetVolume(s->s, s->volume);
@@ -490,11 +490,7 @@ LOGICAL fxSndSetListenerPosAndVel()
 
     persGetPlayerVelocity(&vecVel);
 
-#ifdef DOROTHY
-    if(persIsPersonaVehicleType(VEH_TYPE_PERSON) || persIsPersonaVehicleType(VEH_TYPE_MECH))
-#else
 	if(persIsPersonaVehicleType(VEH_TYPE_PERSON))
-#endif
     {
         // Even our velocities are turned around. This makes direct sound
         // pitch correctly. This was discovered by working on 2D sounds.
@@ -509,24 +505,6 @@ LOGICAL fxSndSetListenerPosAndVel()
     sndsSetListener3DVel(&vecVel, DEF_DEFERRED);
     sndsSetListener3DPos(&vecPos, DEF_DEFERRED);
 
-#if FRES
-	piVECTOR up = {0,0,-1};
-	piVECTOR vecFront = {0,1,0};
-
-	vehVehicle* Vehicle = persGetPersonaVehiclePtr();
-	if(Vehicle && Vehicle->ModelData)
-	{
-		math3dMultiplyRotation(&vecFront, &vecFront, &Vehicle->ModelData->VehicleAttMat);
-		vecFront.z = -vecFront.z; // ah yes random z-flip
-	}
-#if platOS != OS_WIN32
-    vecFront.x = -vecFront.x;
-    vecFront.y = -vecFront.y;
-    vecFront.z = -vecFront.z;
-#endif
-
-	sndsSetOrientation(&vecFront, &up, DEF_DEFERRED);
-#else
     piVECTOR vecFront = playdir;
 
 #if(platOS != OS_WIN32)
@@ -540,7 +518,6 @@ LOGICAL fxSndSetListenerPosAndVel()
 #else
 	sndsSetOrientation(&vecFront, &playup, DEF_DEFERRED);
 #endif // XAUDIO
-#endif
     logTimerEndMacro();
 
     return TRUE;
@@ -566,7 +543,7 @@ LOGICAL fxSndUpdate()
     FXSOUND* B = g_activeHead.next;
     FXSOUND* E = &g_activeTail;
 
-    FXSOUND* s = NULL;
+    FXSOUND* s = nullptr;
 
     for(; B != E; B = B->next)
     {
@@ -641,7 +618,7 @@ LOGICAL fxSndUpdate()
 ////////////////////////////////////////////////////////
 LOGICAL _startSound(FXSOUND* s)
 {
-    if(s->s == NULL)
+    if(s->s == nullptr)
         return FALSE;
 
 #if !XAUDIO
@@ -724,7 +701,7 @@ LOGICAL fxSndLoadSound(FXSOUND* s)
 
     s->s = sndsLoadSound(&sndsCreate);
 
-    if(s->s == NULL)
+    if(s->s == nullptr)
     {
         return FALSE;
     }
@@ -770,7 +747,7 @@ LOGICAL fxSndAddToEmptyChannel(FXSOUND* lpSnd)
 
     for(q = 0; q < num; q++)
     {
-        if(Channels[q] == NULL)
+        if(Channels[q] == nullptr)
         {
             lpSnd->onchannel = TRUE;
             lpSnd->channelIndex = (UINT32)q;
@@ -887,7 +864,7 @@ LOGICAL fxSndSetSoundVelocity(FXSOUND* lpSnd)
         weapAmmo* lpAmmo = (weapAmmo*)lpSnd->pAmmo;
         piVECTOR vecVel;
 
-        if(lpAmmo == NULL)
+        if(lpAmmo == nullptr)
             return FALSE;
 
         vecVel.x = (FLOAT32) lpAmmo->Velocity.x;
@@ -937,7 +914,7 @@ LOGICAL fxSndGetSoundPos(FXSOUND* lpSnd, piVECTOR* pVec)
         FLOAT64VECTOR pos;
         weapAmmo* lpAmmo = (weapAmmo*)lpSnd->pAmmo;
 
-        if(lpAmmo == NULL)
+        if(lpAmmo == nullptr)
             return FALSE;
 
         pos = lpAmmo->Position;
@@ -951,7 +928,7 @@ LOGICAL fxSndGetSoundPos(FXSOUND* lpSnd, piVECTOR* pVec)
     {
         FLOAT64VECTOR pos;
 
-        if(lpSnd->o == NULL)
+        if(lpSnd->o == nullptr)
             return FALSE;
 
         std::multimap<OBJECT*, SINT32>::iterator I = mappedObjects.find(lpSnd->o);
@@ -1004,7 +981,7 @@ LOGICAL fxSndSetSoundPosition(FXSOUND* lpSnd)
 /////////////////////////////////////////////////////////
 void fxSndDetachSnd(OBJECT* lpKey)
 {
-    if(lpKey == NULL) return;
+    if(lpKey == nullptr) return;
     if(!(lpKey->flag2 & OBJECT_HAS_FX)) return;
     if(mappedObjects.empty()) return;
 
@@ -1026,7 +1003,7 @@ void fxSndDetachSnd(OBJECT* lpKey)
 
     for(UINT32 u = 0; u < removeList.size(); u++)
     {
-        Sounds[removeList[u] - 1].o = NULL;
+        Sounds[removeList[u] - 1].o = nullptr;
         _freeSound(removeList[u]);
     }
 }
@@ -1037,7 +1014,7 @@ void fxSndDetachSnd(OBJECT* lpKey)
 //////////////////////////////////////////////////////////////////////
 void fxSndDetachAmmo(void const* pAmmo)
 {
-    if(pAmmo == NULL) return;
+    if(pAmmo == nullptr) return;
 
     weapAmmo* lpAmmo = (weapAmmo*)pAmmo;
 
@@ -1092,7 +1069,7 @@ void fxSndChangeVolume(SINT32 id, FLOAT32 newvolume)
 //////////////////////////////////////////////////
 void _freeSound(SINT32 id)
 {
-	FXSOUND* sound = NULL;
+	FXSOUND* sound = nullptr;
 
     SINT32 index = id - 1;
 
@@ -1100,7 +1077,7 @@ void _freeSound(SINT32 id)
 
     sound = &Sounds[index];
 
-    if(sound->s != NULL)
+    if(sound->s != nullptr)
     {
         sndsStopSound(sound->s);
 
@@ -1216,7 +1193,7 @@ LOGICAL fxSndFreeChannel(FXSOUND* s)
     if(s->channelIndex >= (SINT32)num)
         return FALSE;
 
-    Channels[s->channelIndex] = NULL;
+    Channels[s->channelIndex] = nullptr;
 
     return TRUE;
 }
@@ -1227,7 +1204,7 @@ LOGICAL fxSndFreeChannel(FXSOUND* s)
 ////////////////////////////////////////
 LOGICAL fxSndSoundFreeCallback(FXSOUND* lpSnd)
 {
-    if(lpSnd->pFn == NULL)
+    if(lpSnd->pFn == nullptr)
         return FALSE;
 
     lpSnd->pFn(lpSnd->killData);
@@ -1241,11 +1218,11 @@ LOGICAL fxSndSoundFreeCallback(FXSOUND* lpSnd)
 ////////////////////////////////////////
 LOGICAL fxSndSoundFreeSound(FXSOUND* lpSnd)
 {
-    if(lpSnd->s == NULL)
+    if(lpSnd->s == nullptr)
         return FALSE;
 
     sndsFreeSound(lpSnd->s);
-    lpSnd->s = NULL;
+    lpSnd->s = nullptr;
 
     return TRUE;
 }
@@ -1355,7 +1332,7 @@ SINT32 fxSndGetNewSound()
 
     FXSOUND* s = _getNewSound();
 
-    if(s == NULL)
+    if(s == nullptr)
         return -1;
 
     // To prevent freeing more than once
@@ -1381,7 +1358,7 @@ LOGICAL _calculateVolumeAndPan(FXSOUND* s)
     {
         s->pan = 50;
 
-        if(s->s != NULL)
+        if(s->s != nullptr)
         {
             if(s->Flags & SOUND_NO_OVERALL)
             {
@@ -1476,13 +1453,13 @@ LOGICAL _calculateVolumeAndPan(FXSOUND* s)
 //////////////////////////////////////////////////////
 FXSOUND* _getNewSound()
 {
-	FXSOUND* sound = NULL;
+	FXSOUND* sound = nullptr;
 
-    if(g_freeHead.next == NULL)
-        return NULL;
+    if(g_freeHead.next == nullptr)
+        return nullptr;
 
     if(g_freeHead.next == &g_freeTail)
-        return NULL;
+        return nullptr;
 
     sound = g_freeHead.next;
     FXSOUND* n = sound->next;
@@ -1490,8 +1467,8 @@ FXSOUND* _getNewSound()
     g_freeHead.next = n;
     n->prev = &g_freeHead;
 
-    sound->next = NULL;
-    sound->prev = NULL;
+    sound->next = nullptr;
+    sound->prev = nullptr;
 
     _addToActiveList(sound);
 
@@ -1549,8 +1526,8 @@ void _releaseActiveSound(FXSOUND* s)
     p->next = n;
     n->prev = p;
 
-    s->next = NULL;
-    s->prev = NULL;
+    s->next = nullptr;
+    s->prev = nullptr;
 }
 
 //////////////////////////////////////////////////////
@@ -1589,7 +1566,7 @@ LOGICAL fxSndStopVehicleSounds(vehVehicle*pVehicle)
 {
     SINT32 i, j;
 
-    if(pVehicle == NULL)
+    if(pVehicle == nullptr)
         return FALSE;
 
     for(i = 0; i < ML_MAX_ENGINES; i++)
@@ -1696,7 +1673,7 @@ void fxSndSetEmitterObject(SINT32 id, OBJECT* o)
     }
     else
     {
-        sound->o = NULL;
+        sound->o = nullptr;
     }
 }
 
@@ -1836,15 +1813,14 @@ void fxSndSetCreateTime(SINT32 id, SINT32 iTime)
 // Function: fxSndSetSoundName
 // Description:
 //////////////////////////////////////////////////////////
-void fxSndSetSoundName(SINT32 id, SCHAR* soundName)
+void fxSndSetSoundName(SINT32 id, const char* soundName)
 {
-    if(!soundName) return;
-
-	FXSOUND* sound = _findSound(id);
-
-	if(!sound) return;
-
-    strncpy(sound->szName, soundName, MAX_SND_NAME_LENGTH - 1);
+	if (soundName)
+	{
+		FXSOUND* sound = _findSound(id);
+		if (sound)
+			strncpy(sound->szName, soundName, MAX_SND_NAME_LENGTH - 1);
+	}
 }
 
 //////////////////////////////////////////////////////////

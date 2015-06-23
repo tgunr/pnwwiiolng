@@ -78,14 +78,14 @@ struct snSound
 	SINT32			line;
 	SINT8			file[SND_CHECK_FILE_LENGTH+1];
 #endif
-} ;
+};
 
 struct SNDSCREATE
 {
     SCHAR* pszName;
     LOGICAL bIs3D;
     bool loop;
-} ;
+};
 
 struct SOUNDCACHE
 {
@@ -98,5 +98,5 @@ struct SOUNDCACHE
 	SINT8		file[SND_CHECK_FILE_LENGTH+1];
 #endif
 
-} ;
+};
 

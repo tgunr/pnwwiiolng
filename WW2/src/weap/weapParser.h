@@ -8,11 +8,11 @@
 // Originating Programmer: Brian "Stick" Duelm
 
 // read all of the countries in the weapCountries.cvs file
-// into weaponClass. Also records indexes for weapCountryIndex;
+// into weaponClasses. Also records indexes for weapCountryIndex;
 extern bool weapParseCountry(char* countryfile);
 
 // read all of the classes from the weapClasses.cvs file
-// into weaponClass.
+// into weaponClasses.
 extern bool weapParseClasses(char* classesfile);
 
 // reads all the weapon types out of the XX_XX_weap.cvs
@@ -21,5 +21,5 @@ extern bool weapParseClasses(char* classesfile);
 extern bool weapParseWeapons(char* weapfile, SINT32 country, SINT32 category);
 
 // read the default file associated with weapSpec
-// and attatch to weapHash or weapCatDefaults.
+// and attach to weapHash or weapCatDefaults.
 extern bool weapParseSpawn(char* weapfile, SINT32 country, SINT32 category);

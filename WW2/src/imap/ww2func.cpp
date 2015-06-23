@@ -21,7 +21,7 @@ struct functionEntry
 	unsigned int flags;
 	int headerLocID;
 	int ezLevel;
-} ;
+};
 
 enum
 {
@@ -97,18 +97,10 @@ static const functionEntry functionTable[] =
 	{IMAP_TMP_CHANGE_FOV,						"changefov",					236,			0,	WW2_FUNC_GENERAL, 	0, WW2_FUNC_HEADER_EXTERNAL, -1},
 	{IMAP_TMP_CHANGE_FOV_UP,					"changefovup",					-1,				0,	0, 					0, WW2_FUNC_HEADER_EXTERNAL, -1},
 	{IMAP_TMP_CHANGE_FOV_DOWN,					"changefovdown",				-1,				0,	0, 					0, WW2_FUNC_HEADER_EXTERNAL, -1},
-	/* Interferes with slewin and slewout - remnant from DOROTHY?
-	{IMAP_HOLD_ZOOMIN,							"zoomin",						316,			0,	WW2_FUNC_GENERAL, 	0, WW2_FUNC_HEADER_EXTERNAL},
-	{IMAP_HOLD_ZOOMOUT,							"zoomout",						317,			0,	WW2_FUNC_GENERAL, 	0, WW2_FUNC_HEADER_EXTERNAL},
-	*/
 	{IMAP_HOLD_FP_FORWARD,						"fpforward",					261,			0,	WW2_FUNC_PERSON, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
 	{IMAP_HOLD_FP_BACKWARD,						"fpbackward",					262,			0,	WW2_FUNC_PERSON, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
 	{IMAP_HOLD_FP_STRAFE_LEFT,					"fpstrafeleft",					270,			0,	WW2_FUNC_PERSON, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
 	{IMAP_HOLD_FP_STRAFE_RIGHT,					"fpstraferight",				269,			0,	WW2_FUNC_PERSON, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	/* Deprecated after 1.33
-	{IMAP_HOLD_FP_LEAN_LEFT,					"fpleanleft",					301,			0,	WW2_FUNC_PERSON, 0, WW2_FUNC_HEADER_MOVEMENT},
-	{IMAP_HOLD_FP_LEAN_RIGHT,					"fpleanright",					300,			0,	WW2_FUNC_PERSON, 0, WW2_FUNC_HEADER_MOVEMENT},
-	*/
 	{IMAP_HOLD_FP_CROUCH,						"fpcrouch",						263,			0,	WW2_FUNC_PERSON, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
 	{IMAP_HOLD_FP_PRONE,						"fpprone",						259,			0,	WW2_FUNC_PERSON, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
 	{IMAP_HOLD_FP_SPRINT,						"fpfast",						264,			0,	WW2_FUNC_PERSON, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
@@ -270,56 +262,6 @@ static const functionEntry functionTable[] =
 	*/
 	{IMAP_HOLD_FP_CE_AMMO,						"fpceammo",						1004,			0,	WW2_FUNC_PERSON, 0, WW2_FUNC_HEADER_EMOTE, -1},
 
-#if defined(USE_OSG)
-	{IMAP_BUZZARD_FORWARD,	 				"buzzforward",							0,			0,	0, 	0, 0, -1},
-	{IMAP_BUZZARD_BACK,	 					"buzzback",								0,			0,	0, 	0, 0, -1},
-	{IMAP_BUZZARD_LEFT,	 					"buzzleft",								0,			0,	0, 	0, 0, -1},
-	{IMAP_BUZZARD_RIGHT,	 				"buzzright",							0,			0,	0, 	0, 0, -1},
-	{IMAP_BUZZARD_UP,	 					"buzzup",								0,			0,	0, 	0, 0, -1},
-	{IMAP_BUZZARD_DOWN,	 					"buzzdown",								0,			0,	0, 	0, 0, -1},
-	{IMAP_BUZZARD_PITCH_UP,	 				"buzzpitchup",							0,			0,	0, 	0, 0, -1},
-	{IMAP_BUZZARD_PITCH_DOWN,	 			"buzzpitchdown",						0,			0,	0, 	0, 0, -1},
-	{IMAP_BUZZARD_YAW_LEFT,	 				"buzzyawleft",							0,			0,	0, 	0, 0, -1},
-	{IMAP_BUZZARD_YAW_RIGHT,	 			"buzzyawright",							0,			0,	0, 	0, 0, -1},
-	{IMAP_BUZZARD_SPEED1,	 				"buzzspeed1",							0,			0,	0, 	0, 0, -1},
-	{IMAP_BUZZARD_SPEED2,	 				"buzzspeed2",							0,			0,	0, 	0, 0, -1},
-	{IMAP_BUZZARD_SPEED3,	 				"buzzspeed3",							0,			0,	0, 	0, 0, -1},
-#endif
-
-#ifdef DOROTHY
-	{IMAP_MECH_FORWARD,						"mechforward",							3000,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_BACKWARD,					"mechbackward",							3001,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_FORWARD_AUTO,				"mechforwardauto",						3002,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_TURBO,						"mechturbo",							3003,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_CROUCH,						"mechcrouch",							3004,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_JUMP,						"mechjump",								3005,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-
-	{IMAP_MECH_FREELOOK,					"mechfreelook",							3006,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_CAM_TRAVERSE,				"mechcamtraverse",						3007,		1,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_CAM_ELEVATE,					"mechcamelevate",						3008,		1,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_ZOOM_LEVEL,					"mechzoomlevel",						3009,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_ACTIVATE1,					"mechactivate1",						3010,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_ACTIVATE2,					"mechactivate2",						3011,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_ACTIVEUP,					"mechactiveup",							3012,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_ACTIVEDOWN,					"mechactivedown",						3013,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_TARGET,						"mechtarget",							3014,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_SLOW,						"mechslow",								3015,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_SLOT0,						"mechslot0",							3016,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_SLOT1,						"mechslot1",							3017,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_SLOT2,						"mechslot2",							3018,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_SLOT3,						"mechslot3",							3019,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_SLOT4,						"mechslot4",							3020,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_SLOT5,						"mechslot5",							3021,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_SLOT6,						"mechslot6",							3022,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_SLOT7,						"mechslot7",							3023,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_SLOT8,						"mechslot8",							3024,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_SLOT9,						"mechslot9",							3025,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_TRAVEL_MODE,					"mechtravelmode",						3026,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_TARGET_ENEMY,				"mechtargetenemy",						3027,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_TARGET_FRIENDLY,				"mechtargetfriendly",					3028,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-	{IMAP_MECH_TARGET_CLEAR,				"mechtargetclear",						3029,		0,	WW2_FUNC_GROUND, 0, WW2_FUNC_HEADER_MOVEMENT, -1},
-#endif
-
 	{IMAP_EZ_MOVE,							"ezmove",								4000,			1,	WW2_FUNC_GENERAL, WW2_FUNC_SYMMETRIC_AXIS | WW2_FUNC_USE_ONRELEASE | WW2_FUNC_KEYMAPFORIDIOTS_AXIS_ABS_0_100, WW2_FUNC_HEADER_EZ, 2},
 	{IMAP_EZ_TURN,							"ezturn",								4001,			1,	WW2_FUNC_GENERAL, WW2_FUNC_SYMMETRIC_AXIS | WW2_FUNC_USE_ONRELEASE | WW2_FUNC_KEYMAPFORIDIOTS_AXIS_ABS_0_100, WW2_FUNC_HEADER_EZ, 2},
 	{IMAP_EZ_ACTION1,						"ezaction1",							4002,			0,	WW2_FUNC_GENERAL, 0, WW2_FUNC_HEADER_EZ, 2},
@@ -334,7 +276,7 @@ static const functionEntry functionTable[] =
 	{IMAP_NO_FUNCTION,"",0,0,0,-1}, // end
 };
 
-static void (*localized_string) (const char*, int, char*, int) = NULL;
+static void (*localized_string) (const char*, int, char*, int) = nullptr;
 
 static int get_function_index_from_name(const char* language, const char* name);
 static int get_function_index_from_code(unsigned int functionCode);
@@ -350,7 +292,7 @@ void ww2funcName(unsigned int functionCode, char* name, int maxlen)
 	name[0] = '\0';
 
 	if(i > -1)
-		localized_string(NULL, functionTable[i].locID, name, maxlen);
+		localized_string(nullptr, functionTable[i].locID, name, maxlen);
 }
 
 const char* ww2GetFuncName(unsigned int functionCode)

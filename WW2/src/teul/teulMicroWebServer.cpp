@@ -43,35 +43,35 @@ struct WebError
 		, m_error(error_)
 		{}
 
-	unsigned int m_code ;
-	std::string m_error ;
-} ;
+	unsigned int m_code;
+	std::string m_error;
+};
 
 //////////////////////////////////////////////////////////////////////
 // Send a resource list.
 
 void
-_sendString200(const int fd, const std::string& content)
+_sendString200(const SOCKET fd, const std::string& content)
 {
-	static const char ok200[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: text/application-json\r\nContent-Language: en\r\nContent-Encoding: UTF-8\r\nContent-Length: %" PRSizeT "\r\n\r\n%s\n" ;
-	char* buf = new char[sizeof(ok200) + content.length() + 1] ;
-	int bytes = sprintf(buf, ok200, content.length() + 1, content.c_str()) ;
-	send(fd, buf, bytes, 0) ;
+	static const char ok200[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: text/application-json\r\nContent-Language: en\r\nContent-Encoding: UTF-8\r\nContent-Length: %" PRSizeT "\r\n\r\n%s\n";
+	char* buf = new char[sizeof(ok200) + content.length() + 1];
+	int bytes = sprintf(buf, ok200, content.length() + 1, content.c_str());
+	send(fd, buf, bytes, 0);
 	delete [] buf;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Tear up the listen socket.
 
-static unsigned int
+static SOCKET
 _establishListenSocket(const unsigned short port_)
 {
 	// Tear up the basic socket object.
-	const int sock = socket(AF_INET, SOCK_STREAM, 0) ;
-	if ( sock < 0 )
+	const SOCKET sock = socket(AF_INET, SOCK_STREAM, 0);
+	if ( sock == INVALID_SOCKET )
 	{
-		printf("uWebServer terminated: unable to open listenSock [%d, %d]\n", sock, errno) ;
-		return sock ;
+		printf("uWebServer terminated: unable to open listenSock [%d, %d]\n", sock, errno);
+		return sock;
 	}
 
 	// Allow re-use of the socket so server down/up doesn't cause a problem.
@@ -80,32 +80,32 @@ _establishListenSocket(const unsigned short port_)
 
 	// Describe our end of the socket we want:
 	//  IPv4 (AF_INET), all addresses (INADDR_ANY) and the specified port.
-	sockaddr_in addr ;
-	addr.sin_family = AF_INET ;
-	addr.sin_addr.s_addr = INADDR_ANY ;
-	addr.sin_port = htons(port_) ;
+	sockaddr_in addr;
+	addr.sin_family = AF_INET;
+	addr.sin_addr.s_addr = INADDR_ANY;
+	addr.sin_port = htons(port_);
 
-	const int bindResult = bind(sock, (struct sockaddr*)&addr, sizeof(addr)) ;
+	const int bindResult = bind(sock, (struct sockaddr*)&addr, sizeof(addr));
 	if ( bindResult < 0 )
 	{
-		printf("uWebServer terminated: unable to bind listenSock on port %hu [%d, %d]\n", port_, bindResult, errno) ;
-		close(sock) ;
-		return bindResult ;
+		printf("uWebServer terminated: unable to bind listenSock on port %hu [%d, %d]\n", port_, bindResult, errno);
+		OS_CLOSESOCKET(sock);
+		return bindResult;
 	}
 
-	const int listenResult = listen(sock, 16) ;
+	const int listenResult = listen(sock, 16);
 	if ( listenResult < 0 )
 	{
-		printf("uWebServer terminated: unable to set listen socket to listening on port %hu [%d]\n", port_, bindResult) ;
-		close(sock) ;
-		return listenResult ;
+		printf("uWebServer terminated: unable to set listen socket to listening on port %hu [%d]\n", port_, bindResult);
+		OS_CLOSESOCKET(sock);
+		return listenResult;
 	}
 
 	evutil_make_listen_socket_reuseable(sock);
 
-	printf("uWebServer socket:%u listening on port %hu\n", sock, port_) ;
+	printf("uWebServer socket:%u listening on port %u\n", sock, port_);
 
-	return sock ;
+	return sock;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -114,116 +114,124 @@ _establishListenSocket(const unsigned short port_)
 static size_t
 _parseHTTPRequest(char* const source, char*& method, char*& path, char*& lastDot, char*& args)
 {
-	args = NULL ;
+	args = nullptr;
 
 	// Skip leading white space.
-	char* ptr = source ;
+	char* ptr = source;
 	while ( *ptr && isspace(*ptr) )
-		++ptr ;
+		++ptr;
 
 	if ( *ptr == 0 )
-		throw WebError(400, "Bad request (missing method)") ;
+		throw WebError(400, "Bad request (missing method)");
 
 	// This marks the start of the method.
-	method = ptr ;
+	method = ptr;
 
 	// Advance to the next whitespace.
 	while ( *ptr && !isspace(*ptr) )
-		++ptr ;
+		++ptr;
 	if ( *ptr == 0 )
-		throw WebError(400, "Bad request (missing path)") ;
+		throw WebError(400, "Bad request (missing path)");
 
 	// Skip the whitespace.
 	while ( *ptr && isspace(*ptr) )
-		*(ptr++) = 0 ;
+		*(ptr++) = 0;
 
 	// We only support the "GET" method.
 	if ( strcasecmp(method, "GET") != 0 )
-		throw WebError(405, "Bad request (unsupported method)") ;
+		throw WebError(405, "Bad request (unsupported method)");
 
 	// Method needs to be followed by a path.
 	if ( *ptr == 0 )
-		throw WebError(400, "Bad request (missing path)") ;
+		throw WebError(400, "Bad request (missing path)");
 
 	// Record the start of the path.
-	path = ptr ;
+	path = ptr;
 	if ( *path != '/' )
-		throw WebError(400, "Bad request (illegal path)") ;
+		throw WebError(400, "Bad request (illegal path)");
 
 	if ( path[1] == 0 || isspace(path[1]) )
-		strcpy(path, "/index.html") ;
+		strcpy(path, "/index.html");
 
 	// It's also the last place we saw a dot, in a way.
-	lastDot = ptr ;
+	lastDot = ptr;
 	while ( *ptr && !isspace(*ptr) )
 	{
 		// Don't allow dots after paths.
-		if ( *ptr == '/' && ((*(ptr+1) == '.') | (*(ptr+1) == '\\')) )
-			throw WebError(403, "Interesting path") ;
+		if ( PN_UNLIKELY(*ptr == '/' && ((*(ptr+1) == '.') | (*(ptr+1) == '\\'))) )
+			throw WebError(403, "Interesting path");
 		if ( *ptr == '?' )
 		{
-			args = ptr + 1 ;
-			break ;
+			args = ptr + 1;
+			break;
 		}
 		if ( *ptr == '.' )
-			lastDot = ptr ;
-		++ptr ;
+			lastDot = ptr;
+		++ptr;
 	}
 
-	*ptr = 0 ;
+	*ptr = 0;
 
-	size_t pathLen = (size_t)(ptr - path) ;
+	size_t pathLen = (size_t)(ptr - path);
 	if ( pathLen > 255 )
 	{
-		path[255] = 0 ;
-		pathLen = 255 ;
+		path[255] = 0;
+		pathLen = 255;
 	}
 
-	return pathLen ;
+	return pathLen;
 }
 
 void
 Teul::uWeb::Server::run()
 {
-	const int listenSock = _establishListenSocket(port()) ;
+	m_listenSock = _establishListenSocket(port());
+	if (m_listenSock == INVALID_SOCKET)
+		return;
 
-	char buffer[4096] ;
-	sockaddr_in addr ;
+	char buffer[4096];
+	sockaddr_in addr;
 
-	for ( ; ; )
+	for ( ; !isCancelled(); )
 	{
 		// Make sure we're not providing a denial of service to the host by using all the CPU.
 		std::this_thread::yield();
 
-		socklen_t sockLen = sizeof(addr) ;
-		const int newSock = accept(listenSock, (struct sockaddr*)&addr, &sockLen) ;
+		socklen_t sockLen = sizeof(addr);
+		const SOCKET newSock = accept(m_listenSock, (struct sockaddr*)&addr, &sockLen);
 		if ( newSock < 0 )
 		{
-			printf("uWebServer error on accept: %d (%d)\n", newSock, errno) ;
-			continue ;
+			if (isCancelled())
+				return;
+
+			printf("uWebServer error on accept: %d (%d)\n", newSock, errno);
+			continue;
 		}
 
-		int bytes = recv(newSock, buffer, sizeof(buffer) - 1, 0) ;
-		buffer[bytes] = 0 ;
+		int bytes = recv(newSock, buffer, sizeof(buffer) - 1, 0);
+		if (bytes < 0)
+		{
+			if (isCancelled())
+				return;
+			printf("uWebServer recv %d: errno %d", bytes, dbugGetErrno());
+			continue;
+		}
+		buffer[bytes] = 0;
 
 		try
 		{
-			processHTTPRequest(newSock, buffer) ;
+			processHTTPRequest(newSock, buffer);
 		}
 		catch (WebError& e)
 		{
-			static const char errFmt[] = "HTTP/1.1 %u %s\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: text/html\r\nContent-Language: en\r\nAllow: GET\r\n\r\n<html><head><title>%u %s</title></head><body><h1>ERROR %u: %s</h1></body></html>\r\n\r\n" ;
-			char* myBuf = new char[sizeof(errFmt) + e.m_error.size() * 3 + 32] ;
-			const int len = sprintf(myBuf, errFmt, e.m_code, e.m_error.c_str(), e.m_code, e.m_error.c_str(), e.m_code, e.m_error.c_str()) ;
-			send(newSock, myBuf, len, 0) ;
+			static const char errFmt[] = "HTTP/1.1 %u %s\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: text/html\r\nContent-Language: en\r\nAllow: GET\r\n\r\n<html><head><title>%u %s</title></head><body><h1>ERROR %u: %s</h1></body></html>\r\n\r\n";
+			char* myBuf = new char[sizeof(errFmt) + e.m_error.size() * 3 + 32];
+			const int len = sprintf(myBuf, errFmt, e.m_code, e.m_error.c_str(), e.m_code, e.m_error.c_str(), e.m_code, e.m_error.c_str());
+			send(newSock, myBuf, len, 0);
 			delete [] myBuf;
 		}
 
-#if platOS == OS_WIN32
-		closesocket(newSock);
-#else
-		close(newSock) ;
-#endif
+		OS_CLOSESOCKET(newSock);
 	}
 }
 
@@ -231,14 +239,14 @@ Teul::uWeb::Server::run()
 // Call the handler for a path.
 
 static void
-_callHandler(const unsigned int sock, Teul::uWeb::Server::VirtualFileHandler handler, const char* const path, const char* const args, Teul::uWeb::Server* server)
+_callHandler(const SOCKET sock, Teul::uWeb::Server::VirtualFileHandler handler, const char* const path, const char* const args, Teul::uWeb::Server* /*server*/)
 {
 	// Write the HTTP header first
-	static const char ok200[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: text/javascript\r\nContent-Language: en\r\nContent-Encoding: UTF-8\r\n\r\n" ;
-	send(sock, ok200, sizeof(ok200) - 1, 0) ;
+	static const char ok200[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: text/javascript\r\nContent-Language: en\r\nContent-Encoding: UTF-8\r\n\r\n";
+	send(sock, ok200, sizeof(ok200) - 1, 0);
 
 	// Call the handler to write the content.
-	(handler)(sock, path, args) ;
+	(handler)(sock, path, args);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -248,43 +256,43 @@ static const char*
 _getContentTypeFor(const char* const fileExt)
 {
 	if ( strcmp(fileExt, ".js") == 0 )
-		return "text/javascript" ;
+		return "text/javascript";
 	else if ( strcmp(fileExt, ".json") == 0 )
-		return "text/application-json" ;
+		return "text/application-json";
 	else if ( strcmp(fileExt, ".html") == 0 )
-		return "text/html" ;
+		return "text/html";
 	else if ( strcmp(fileExt, ".css") == 0 )
-		return "text/css" ;
+		return "text/css";
 	else if ( strcmp(fileExt, ".xml") == 0 )
-		return "text/xml" ;
+		return "text/xml";
 	else if ( strcmp(fileExt, ".txt") == 0 )
-		return "text/plain" ;
-	return "application/octet-stream" ;
+		return "text/plain";
+	return "application/octet-stream";
 }
 
 //////////////////////////////////////////////////////////////////////
-// Try and locate a physial file to be sent to the requestee.
+// Try and locate a physical file to be sent to the requestee.
 
 static bool
-_sendPhysicalFile(const unsigned int sock, const char* const rootPath, const char* const path, const char* const lastDot)
+_sendPhysicalFile(const SOCKET sock, const char* const rootPath, const char* const path, const char* const lastDot)
 {
-	int dirfd = -1, filefd = -1 ;
-	struct stat statBuf ;
+	int dirfd = -1, filefd = -1;
+	struct stat statBuf;
 
-	bool success = false ;
+	bool success = false;
 
 	try
 	{
 #if defined(HAVE_OPENAT)
 		// Check for the base directory.
-		dirfd = open(rootPath, O_RDONLY | O_DIRECTORY) ;
+		dirfd = open(rootPath, O_RDONLY | O_DIRECTORY);
 		if ( dirfd < 0 )
-			throw "Missing root" ;
+			throw "Missing root";
 
 		// Can we open the file?
-		filefd = openat(dirfd, path + 1, O_RDONLY) ;
+		filefd = openat(dirfd, path + 1, O_RDONLY);
 		if ( filefd < 0 )
-			throw "Not found" ;
+			throw "Not found";
 #else
 		std::string filepath = rootPath;
 		if ( path[0] != '/' && path[0] != '\\' )
@@ -303,35 +311,35 @@ _sendPhysicalFile(const unsigned int sock, const char* const rootPath, const cha
 		// Stat the file so we can get it's size, use the
 		// information available in the fd entry tho.
 		if ( fstat(filefd, &statBuf) < 0 )
-			throw "Inaccessible file" ;
+			throw "Inaccessible file";
 
-		static const char ok200[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: %s\r\nContent-Language: en\r\nContent-Encoding: UTF-8\r\nContent-Length: %llu\r\n\r\n" ;
-		char myBuf[sizeof(ok200) + 128] ;
+		static const char ok200[] = "HTTP/1.1 200 OK\r\nAccess-Control-Allow-Origin: *\r\nContent-Type: %s\r\nContent-Language: en\r\nContent-Encoding: UTF-8\r\nContent-Length: %llu\r\n\r\n";
+		char myBuf[sizeof(ok200) + 128];
 
-		const char* contentType = _getContentTypeFor(lastDot) ;
+		const char* contentType = _getContentTypeFor(lastDot);
 
-		int len = sprintf(myBuf, ok200, contentType, (UINT64)statBuf.st_size) ;
+		int len = sprintf(myBuf, ok200, contentType, (UINT64)statBuf.st_size);
 		if ( send(sock, myBuf, len, 0) > 0 )
 		{
 #if defined(HAVE_SYS_SENDFILE_H) && HAVE_SYS_SENDFILE_H == 1
 			// The first write might fail, if it does we don't care
 			// but we don't need to try and send the second.
-			sendfile(sock, filefd, NULL, statBuf.st_size) ;
+			sendfile(sock, filefd, nullptr, statBuf.st_size);
 #else
-			char xferBuffer[4096] ;
-			for ( ; ; )
+			char xferBuffer[4096];
+			for (;; )
 			{
-				size_t readBytes = read(filefd, xferBuffer, sizeof(xferBuffer)) ;
+				int readBytes = read(filefd, xferBuffer, sizeof(xferBuffer));
 				if ( readBytes <= 0 )
-					break ;
-				size_t wroteBytes = send(sock, xferBuffer, readBytes, 0) ;
+					break;
+				int wroteBytes = send(sock, xferBuffer, readBytes, 0);
 				if ( wroteBytes < readBytes )
-					break ;
+					break;
 			}
 #endif
 		}
 
-		success = true ;
+		success = true;
 
 		char flushBuffer[] = "\r\n";
 		send(sock, flushBuffer, sizeof(flushBuffer) - 1, 0);
@@ -339,56 +347,56 @@ _sendPhysicalFile(const unsigned int sock, const char* const rootPath, const cha
 	}
 	catch ( const char* error )
 	{
-		printf("file:%s %s\n", path + 1, error) ;
-		success = false ;
+		printf("file:%s %s\n", path + 1, error);
+		success = false;
 	}
 
 	if ( filefd >= 0 )
-		close(filefd) ;
+		close(filefd);
 	if ( dirfd >= 0 )
-		close(dirfd) ;
+		close(dirfd);
 
-	return success ;
+	return success;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Process a HTTP request from a given fd.
 
 void
-Teul::uWeb::Server::processHTTPRequest(const int sock, char* const request)
+Teul::uWeb::Server::processHTTPRequest(const SOCKET sock, char* const request)
 {
-	char* method = NULL ;
-	char* path = NULL ;
-	char* lastDot = NULL ;
-	char* args = NULL ;
+	char* method = nullptr;
+	char* path = nullptr;
+	char* lastDot = nullptr;
+	char* args = nullptr;
 
-	_parseHTTPRequest(request, /*in*/ method, /*in*/ path, /*in*/ lastDot, /*in*/ args) ;
+	_parseHTTPRequest(request, /*in*/ method, /*in*/ path, /*in*/ lastDot, /*in*/ args);
 
 	// Is there a function registered to handle this request?
-	VirtualFileHandler handler = NULL ;
+	VirtualFileHandler handler = nullptr;
 	{
-		std::lock_guard<std::mutex> lock(m_config_mutex) ;
-		auto it = m_virtualFileHandlers.find(path) ;
+		std::lock_guard<std::mutex> lock(m_config_mutex);
+		auto it = m_virtualFileHandlers.find(path);
 		if ( it != m_virtualFileHandlers.end() )
-			handler = it->second.first ;
+			handler = it->second.first;
 	}
 
-	if ( handler != NULL )
+	if ( handler != nullptr )
 	{
-		_callHandler(sock, handler, path, args, this) ;
-		return ;
+		_callHandler(sock, handler, path, args, this);
+		return;
 	}
 
 	if ( _sendPhysicalFile(sock, rootPath().c_str(), path, lastDot) == true )
-		return ;
+		return;
 
 	if ( strcmp(path, "/index.json") == 0 )
 	{
-		_sendString200(sock, m_resourceList) ;
-		return ;
+		_sendString200(sock, m_resourceList);
+		return;
 	}
 
-	throw WebError(404, "File not found") ;
+	throw WebError(404, "File not found");
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -398,20 +406,20 @@ void
 Teul::uWeb::Server::addVirtualFile(std::string desc_, std::string path_, VirtualFileHandler handler_)
 {
 	// '{"url":"<url>","desc":"<desc>"}]
-	const size_t bufLen = 9 + path_.length() + 10 + desc_.length() + 2 + 2 + 1 ;
-	char* buffer = new char[bufLen] ;
-	snprintf(buffer, bufLen - 1, "{\"url\":\"%s\",\"desc\":\"%s\"}]", path_.c_str(), desc_.c_str()) ;
+	const size_t bufLen = 9 + path_.length() + 10 + desc_.length() + 2 + 2 + 1;
+	char* buffer = new char[bufLen];
+	snprintf(buffer, bufLen - 1, "{\"url\":\"%s\",\"desc\":\"%s\"}]", path_.c_str(), desc_.c_str());
 
-	std::lock_guard<std::mutex> lock(m_config_mutex) ;
-	m_virtualFileHandlers[path_] = std::make_pair(handler_, desc_) ;
+	std::lock_guard<std::mutex> lock(m_config_mutex);
+	m_virtualFileHandlers[path_] = std::make_pair(handler_, desc_);
 
 	// Replace the ']' at the end of the list with a comma.
-	m_resourceList.erase(m_resourceList.end() - 1) ;
+	m_resourceList.erase(m_resourceList.end() - 1);
 	if ( m_resourceList.length() > 1 )
-		m_resourceList.append(",") ;
+		m_resourceList.append(",");
 
-	m_resourceList.append(buffer) ;
+	m_resourceList.append(buffer);
 
-	delete [] buffer ;
+	delete [] buffer;
 }
 

@@ -74,10 +74,6 @@
 #include "ez/EZManager.h"
 #include "veh/vehAnimEnum.h"
 
-#ifdef DOROTHY
-#include "gr2/gr2Main.h"
-#endif
-
 #ifdef GR2_BLEND_EDITOR
 #include "gr2/gr2Anim.h"
 #endif
@@ -626,40 +622,39 @@ UINT32 mlKillVehicleData(mlVehicleData * VehicleData)
 UINT32 _ClearVehicleData(mlVehicleData * VehicleData)
 {
 
-	if (VehicleData->AirfoilList != NULL)
+	if (VehicleData->AirfoilList != nullptr)
 	{
 		mlfoilsFreeAirfoilData(VehicleData->AirfoilList);
 		memFree(VehicleData->AirfoilList);
-		VehicleData->AirfoilList = NULL;
+		VehicleData->AirfoilList = nullptr;
 	}
-	if (VehicleData->EngineList != NULL)
+	if (VehicleData->EngineList != nullptr)
 	{
 		mlengineFreeEngineData(VehicleData->EngineList);
 		memFree(VehicleData->EngineList);
-		VehicleData->EngineList = NULL;
+		VehicleData->EngineList = nullptr;
 	}
-	if (VehicleData->ComponentList != NULL)
+	if (VehicleData->ComponentList != nullptr)
 	{
-		mlcomponFreeComponentData(VehicleData->ComponentList);
-		memFree(VehicleData->ComponentList);
-		VehicleData->ComponentList = NULL;
+		mlcomponFreeComponentList(VehicleData->ComponentList);
+		VehicleData->ComponentList = nullptr;
 	}
 
 	VehicleData->NumCageCollideLines = 0;
-	if (VehicleData->CageLineV1 != NULL)
+	if (VehicleData->CageLineV1 != nullptr)
 	{
 		memFree(VehicleData->CageLineV1);
-		VehicleData->CageLineV1 = NULL;
+		VehicleData->CageLineV1 = nullptr;
 	}
-	if (VehicleData->CageLineV2 != NULL)
+	if (VehicleData->CageLineV2 != nullptr)
 	{
 		memFree(VehicleData->CageLineV2);
-		VehicleData->CageLineV2 = NULL;
+		VehicleData->CageLineV2 = nullptr;
 	}
-	if (VehicleData->CageLineObject != NULL)
+	if (VehicleData->CageLineObject != nullptr)
 	{
 		memFree(VehicleData->CageLineObject);
-		VehicleData->CageLineObject = NULL;
+		VehicleData->CageLineObject = nullptr;
 	}
 
 	memset(VehicleData,0,sizeof(mlVehicleData));
@@ -674,7 +669,7 @@ UINT32 _ShutDownSoundsAndFx(mlVehicleData* VehicleData)
 	mlEngineComponentData * EngineComponentData;
 	mlWeaponMount * Mount;
 
-	if (VehicleData == NULL || VehicleData->ComponentList == NULL)
+	if (VehicleData == nullptr || VehicleData->ComponentList == nullptr)
 		return 1;
 
 	mlComponentList* compList = VehicleData->ComponentList;
@@ -787,7 +782,7 @@ UINT32 mlReadVehicleFile(mlVehicleData * VehicleData,
 
 		mlUtilityGetVarnameAndContents(&VarName,&VarContents,Buffer);
 
-		if (VarName == NULL || VarContents == NULL)
+		if (VarName == nullptr || VarContents == nullptr)
 		{
 			continue;
 		}
@@ -1004,7 +999,7 @@ UINT32 mlReadVehicleFile(mlVehicleData * VehicleData,
 		_ReadPositionFile(VehicleData,(SCHAR*)PositionFileName,(SCHAR*)DirName);
 
 	// update weapon mount numbers
-	if (VehicleData->ComponentList != NULL)
+	if (VehicleData->ComponentList != nullptr)
 	{
 		mlComponentListIterator it;
 
@@ -1012,13 +1007,13 @@ UINT32 mlReadVehicleFile(mlVehicleData * VehicleData,
 		for(; it.comp; mlComponentListNext(&it))
 		{
 			Component = it.comp;
-			if (Component != NULL)
+			if (Component != nullptr)
 			{
 				if (Component->Type == ML_COMPONENT_WEAPONMOUNT)
 				{
 					Mount = (mlWeaponMount*)Component->SpecialData;
 //					hackUnlockBlock(Mount);
-					if (Mount != NULL)
+					if (Mount != nullptr)
 					{
 						Mount->MountSerialNum = VehicleData->NumberOfWeaponMounts;
 						VehicleData->NumberOfWeaponMounts++;
@@ -1030,7 +1025,7 @@ UINT32 mlReadVehicleFile(mlVehicleData * VehicleData,
 	}
 
 	VehicleData->LastVehicleUpdateTime = 0;
- 	if(VehicleData->VehicleMasterPtr == NULL || VehicleData->VehicleMasterPtr->VehicleType->Type != VEH_TYPE_SEA)
+ 	if(VehicleData->VehicleMasterPtr == nullptr || VehicleData->VehicleMasterPtr->VehicleType->Type != VEH_TYPE_SEA)
 		persResetGunsightAdjust(0);
 	else
 		persResetGunsightAdjust(1/8.0f); // since we now use for turret convergence
@@ -1044,7 +1039,7 @@ UINT32 mlCalcVehicleMass(mlVehicleData* VehicleData)
 	FLOAT64 TotalMass;
 	mlComponentListIterator it;
 
-	if (VehicleData == NULL || VehicleData->ComponentList == NULL)
+	if (VehicleData == nullptr || VehicleData->ComponentList == nullptr)
 		return 1;
 
 	TotalMass = 0;
@@ -1066,7 +1061,7 @@ UINT32 mlSetVehicleComponentsRelativePos(mlVehicleData* VehicleData)
 	mlComponent* CurrentComponent;
 	mlComponentListIterator it;
 
-	if (VehicleData == NULL || VehicleData->ComponentList == NULL)
+	if (VehicleData == nullptr || VehicleData->ComponentList == nullptr)
 		return 1;
 
 	mlComponentListBegin(VehicleData->ComponentList, &it);
@@ -1095,7 +1090,7 @@ UINT32 mlCalcVehicleCenterOfMass(mlVehicleData* VehicleData)
 	FLOAT64VECTOR Pos;
 	mlComponentListIterator it;
 
-	if (VehicleData == NULL || VehicleData->ComponentList == NULL)
+	if (VehicleData == nullptr || VehicleData->ComponentList == nullptr)
 		return 1;
 
 	TotalMass = 0;
@@ -1156,7 +1151,7 @@ UINT32 mlCalcVehicleRotationalInertia(mlVehicleData* VehicleData)
 	FLOAT64VECTOR Pos;
 	mlComponentListIterator it;
 
-	if (VehicleData == NULL || VehicleData->ComponentList == NULL)
+	if (VehicleData == nullptr || VehicleData->ComponentList == nullptr)
 		return 1;
 
 	Inertia.Roll = Inertia.Pitch = Inertia.Yaw = 0;
@@ -1244,69 +1239,18 @@ void _checkForTornados(mlVehicleData* data)
 	TornadoCheckAtt(data->VehicleTorque, data->LastVehicleTorque);
 }
 
-#if defined(FRES)
-static bool _DoFRESRide(mlVehicleData* VehicleData)
-{
-	VehicleData->VehicleMasterPtr->RideVehicleHostIndex = 0;
-
-	int position = vehFRESCameraPosition();
-	if(position < 1) return false;
-
-	vehVehicle* fresVeh = vehFRESParentVehicle();
-	if(!fresVeh || !fresVeh->VehicleObjectData || !fresVeh->VehicleObjectData->PlaneObject) return false;
-
-	if(position >  fresVeh->VehicleType->NumFRESCameras
-	|| fresVeh->VehicleType->NumFRESCameras < 1
-	|| fresVeh->VehicleType->NumFRESCameras > VEH_MAX_CREW_POSITIONS)  return false;
-
-	persSetNormalView(fresVeh->VehicleType->Cameras[position-1].fov);
-
-	VehicleData->VehicleMasterPtr->RideVehicleHostIndex = fresVeh->VehicleHostIndex; // ensure fresVeh stays on our update list
-
-	FRESCameraInfo& info = fresVeh->VehicleType->Cameras[position-1];
-
-	FLOAT64VECTOR pos;
-	mathVectorMultiply64(&pos,&info.pos,&fresVeh->PosData.AttMat);
-	mathAddVectors(&pos, &fresVeh->PosData.RenderPos, &pos);
-
-	// my god it's full of needless complexity!
-	piMATRIX AttMat;
-	piVECTOR Att = {(float)info.att.Pitch, (float)info.att.Roll, (float)info.att.Yaw};
-	mathEul_ToMatrix(&AttMat,EulOrdXYZs,&Att);
-	math3dMatrixMultiply(&AttMat,  &AttMat, &fresVeh->PosData.AttMat);
-	mathEul_FromMatrix(&Att, &AttMat,EulOrdXYZs);
-	FLOAT64ATT Att64 = {Att.y,Att.x,Att.z};
-
-	VehicleData->VehicleRealAtt = Att64;
-
-	VehicleData->VehiclePos = pos;
-	VehicleData->RenderPos = VehicleData->VehiclePos;
-	VehicleData->RenderAtt = VehicleData->VehicleRealAtt;
-
-	VehicleData->VehicleMasterPtr->PosData.RenderPos = VehicleData->VehiclePos;
-	VehicleData->VehicleMasterPtr->PosData.RenderAtt = VehicleData->VehicleRealAtt;
-
-	VehicleData->VehicleMasterPtr->PosData.Pos = VehicleData->VehiclePos;
-	VehicleData->VehicleMasterPtr->PosData.Att = VehicleData->VehicleRealAtt;
-
-	VehicleData->VehicleAtt   = VehicleData->VehicleRealAtt;
-
-	return true;
-}
-#endif
-
 UINT32 mlUpdateVehicle(mlVehicleData* VehicleData)
 {
     FLOAT64ATT AngularMomentum = {0, 0, 0};
 	UINT32 NumTics = 0;
 	UINT32 i,j;
 	SINT32 TicTime = 0;
-	mlComponent * Component = NULL;
+	mlComponent * Component = nullptr;
 	FLOAT64VECTOR TempVec = {0, 0, 0};
 	piVECTOR TempPiVec = {0, 0, 0};
 	FLOAT64VECTOR SavedVehicleForce = {0, 0, 0};
 	FLOAT64VECTOR TempNormForceSum = {0, 0, 0};
-	vehVehicle* VehiclePtr = NULL;
+	vehVehicle* VehiclePtr = nullptr;
 	FLOAT64 DeltaTime = 0;
 	mlComponentListIterator it;
 
@@ -1361,9 +1305,6 @@ UINT32 mlUpdateVehicle(mlVehicleData* VehicleData)
 #ifdef ENABLE_FLOATERS
 	if(SuperFloat || playerVehicle->VehicleType->Type == VEH_TYPE_FLOATER)
 	{
-#if defined(FRES)
-		if(_DoFRESRide(VehicleData)) return 0;
-#endif
 		_DoEyeOperations(VehicleData);
 		// update the terrain object collider bounding box list
 		_UpdateBBoxList(VehicleData);
@@ -1408,11 +1349,7 @@ UINT32 mlUpdateVehicle(mlVehicleData* VehicleData)
 		VehicleData->CollisionSide = VehiclePtr->Side;
 	}
 
-#ifdef DOROTHY
-	if (VehicleData->ComponentList != NULL || VehiclePtr->VehicleType->Type == VEH_TYPE_PERSON || VehiclePtr->VehicleType->Type == VEH_TYPE_MECH)
-#else
-	if (VehicleData->ComponentList != NULL || VehiclePtr->VehicleType->Type == VEH_TYPE_PERSON)
-#endif
+	if (VehicleData->ComponentList != nullptr || VehiclePtr->VehicleType->Type == VEH_TYPE_PERSON)
 	{
 		IsFirstTic = TRUE;
 
@@ -1456,7 +1393,7 @@ UINT32 mlUpdateVehicle(mlVehicleData* VehicleData)
 
 			VehicleData->GroupAmmoCount = -1;
 			VehicleData->MaxGroupAmmoCount = 0;
-			VehicleData->BombSightAmmoType = NULL;
+			VehicleData->BombSightAmmoType = nullptr;
 
 			// calculate old rotational momentum
 			// first recalculate rotational inertia to remove any mass changes from the rotational
@@ -1523,12 +1460,6 @@ UINT32 mlUpdateVehicle(mlVehicleData* VehicleData)
 			{
 				mlInfantryUpdate(VehicleData, TicTime);
 			}
-#ifdef DOROTHY
-			else if(VehicleData->VehicleMasterPtr->VehicleType->Type == VEH_TYPE_MECH)
-			{
-				gr2UpdateVehicle(VehicleData->VehicleMasterPtr, TicTime);
-			}
-#endif
 			else
 			{
 				// Pass 0 is for non-contact point stuff
@@ -1558,9 +1489,9 @@ UINT32 mlUpdateVehicle(mlVehicleData* VehicleData)
                 mlengineNoDupsOff();
 
 
-				if (VehicleData->VehicleObjectData != NULL)
+				if (VehicleData->VehicleObjectData != nullptr)
 				{
-					if (VehicleData->VehicleObjectData->LineCollideObject != NULL)
+					if (VehicleData->VehicleObjectData->LineCollideObject != nullptr)
 					{
 						if (VehicleData->MultiCrewPos < 2)
 						{
@@ -1593,9 +1524,9 @@ UINT32 mlUpdateVehicle(mlVehicleData* VehicleData)
 									&TempNormForceSum);
 				}
 
-				if (VehicleData->VehicleObjectData != NULL)
+				if (VehicleData->VehicleObjectData != nullptr)
 				{
-					if (VehicleData->VehicleObjectData->LineCollideObject != NULL)
+					if (VehicleData->VehicleObjectData->LineCollideObject != nullptr)
 					{
 
 						if (VehicleData->MultiCrewPos < 2)
@@ -1810,7 +1741,7 @@ UINT32 mlUpdateVehicle(mlVehicleData* VehicleData)
 			VehicleData->ReverseToggle = 0;
 
 			// smoothing nonsense
-			if (VehicleData->VehicleMasterPtr != NULL)
+			if (VehicleData->VehicleMasterPtr != nullptr)
 				vehUpdatePositionInfo((vehVehicle*)VehicleData->VehicleMasterPtr);
 
 			// check for position switch or ordinance cycle and weapon groups active
@@ -3057,7 +2988,7 @@ static UINT32 _UpdateAirfoilComponent(mlComponent* Component, mlVehicleData* Veh
 	FLOAT64 FlapPosition = 0;
 	UINT32 PolyNum = 0;
     piVECTOR CollidePnt = {0, 0, 0};
-	OBJECT * CollideObject = NULL;
+	OBJECT * CollideObject = nullptr;
     piVECTOR OldPos = {0, 0, 0},NewPos = {0, 0, 0};
 	FLOAT64VECTOR TempVec = {0, 0, 0},TempVec1 = {0, 0, 0};
 	FLOAT64VECTOR WorldOffsetOrigin = {0, 0, 0};
@@ -3105,7 +3036,7 @@ static UINT32 _UpdateAirfoilComponent(mlComponent* Component, mlVehicleData* Veh
 
 	if(foilActive)
 	{
-		OBJECT* TempObj = VehicleData->VehicleObjectData ? VehicleData->VehicleObjectData->PlaneObject : NULL;
+		OBJECT* TempObj = VehicleData->VehicleObjectData ? VehicleData->VehicleObjectData->PlaneObject : nullptr;
 		FLOAT64ATT Torque = {0, 0, 0};
 		FLOAT64VECTOR Force = {0, 0, 0};
 		FLOAT64VECTOR RelativePoint = {0, 0, 0};
@@ -3244,7 +3175,7 @@ static UINT32 _UpdateAirfoilComponent(mlComponent* Component, mlVehicleData* Veh
 						if(Component->CurrentDamage < MAX_DAMAGE)
 							Component->CurrentDamage += DRAG_DAMAGE * DeltaTime / 1000.0;
 
-						if(AirfoilComponentData->DamageComponent == NULL)
+						if(AirfoilComponentData->DamageComponent == nullptr)
 						{// find it if we haven't already
 							mlComponentListIterator it;
 							mlComponentListBegin(VehicleData->ComponentList, &it);
@@ -3366,20 +3297,20 @@ static UINT32 _UpdateWeaponMount(mlComponent * Component,
 FLOAT64ATT Torque  = {0, 0, 0};
 FLOAT64VECTOR Force  = {0, 0, 0};
 UINT32 PrimaryIsFiring = 0,SecondaryIsFiring = 0;
-OBJECT * TempObj = NULL;
+OBJECT * TempObj = nullptr;
 UINT32 MountFired = 0;
-mlWeaponMount * Mount = NULL;
-weapWeapon * Weapon = NULL;
-vehVehicle* Vehicle = NULL;
+mlWeaponMount * Mount = nullptr;
+weapWeapon * Weapon = nullptr;
+vehVehicle* Vehicle = nullptr;
 UINT32 Position = 0;
 
-	if (VehicleData->VehicleObjectData == NULL)
+	if (VehicleData->VehicleObjectData == nullptr)
 	{
-		TempObj = NULL;
+		TempObj = nullptr;
 	}
 	else
 	{
-		if (VehicleData->VehicleObjectData->HitMap == NULL)
+		if (VehicleData->VehicleObjectData->HitMap == nullptr)
 		{
 			TempObj = VehicleData->VehicleObjectData->PlaneObject;
 		}
@@ -3412,7 +3343,7 @@ UINT32 Position = 0;
 		if (MountFired != 0)
 		{
 
-			if (Mount != NULL)
+			if (Mount != nullptr)
 			{
 				VehicleData->MountIsFiring[Mount->MountNum-1] = TRUE;
 
@@ -3420,7 +3351,7 @@ UINT32 Position = 0;
 		}
 
 		// firemask specified what weapons the host vehicle update system may fire
-		if (Vehicle != NULL)
+		if (Vehicle != nullptr)
 		{
 			if (VehicleData->MultiCrewPos != 0 &&
 				VehicleData->MultiCrewPos != Vehicle->VehicleType->MultiCrewPos[Mount->PositionNum])
@@ -3450,7 +3381,7 @@ UINT32 Position = 0;
 			Mount->TriggerType == ML_TRIGGERTYPE_BOTH) &&
 			Mount->PositionNum == Position)
 		{
-			if (Mount->Weapons[0].WeaponType != NULL)
+			if (Mount->Weapons[0].WeaponType != nullptr)
 			{
 				Weapon = &Mount->Weapons[0];
 
@@ -3473,7 +3404,7 @@ UINT32 Position = 0;
 			Mount->TriggerType == ML_TRIGGERTYPE_BOTH) &&
 			Mount->PositionNum == Position)
 		{
-			if (Mount->Weapons[0].WeaponType != NULL)
+			if (Mount->Weapons[0].WeaponType != nullptr)
 			{
 				Weapon = &Mount->Weapons[0];
 				VehicleData->CurrentSecondaryAmmoCount = Weapon->NumRoundsAmmoLeft[Weapon->AmmoTypeInUse];
@@ -3489,7 +3420,7 @@ UINT32 Position = 0;
 					VehicleData->CurrentSecondaryAmmoCount -= VehicleData->SecondaryClipCount * Weapon->WeaponType->NumRoundsInClip;
 				}
 
-				if (VehicleData->BombSightAmmoType == NULL)
+				if (VehicleData->BombSightAmmoType == nullptr)
 				{
 					if (VehicleData->OrdnanceSelected + 1 == Mount->SelectorNum)
 					{
@@ -3506,7 +3437,7 @@ UINT32 Position = 0;
 					VehicleData->OrdnanceSelected + 1 == Mount->SelectorNum)
 				{
 					Weapon = &Mount->Weapons[0];
-					if (Weapon != NULL)
+					if (Weapon != nullptr)
 					{
 						mlAddToGroupAmmoCount(Weapon->NumRoundsAmmoLeft[0],
 											Weapon->NumTotalRounds[0]);
@@ -3704,7 +3635,7 @@ LOGICAL ForceApplied = 0;
 		return 0;
 	}
 
-	if (VehicleData->VehicleObjectData == NULL)
+	if (VehicleData->VehicleObjectData == nullptr)
 	{
 		return 0;
 	}
@@ -3764,7 +3695,7 @@ LOGICAL ForceApplied = 0;
 		{
 		OBJECT * TempObj;
 
-			if (VehicleData->VehicleObjectData->HitMap != NULL)
+			if (VehicleData->VehicleObjectData->HitMap != nullptr)
 			{
 				TempObj = VehicleData->VehicleObjectData->HitMap;
 			}
@@ -3826,8 +3757,8 @@ static UINT32 _UpdateTowBar(mlComponent * Component,
 	FLOAT64VECTOR Force = {0, 0, 0};
 	FLOAT64VECTOR DeltaVec = {0, 0, 0};
 	piVECTOR TempVec = {0, 0, 0};
-	OBJECT* TowTarget = NULL;
-	vehVehicle* CurrentVehicle = NULL;
+	OBJECT* TowTarget = nullptr;
+	vehVehicle* CurrentVehicle = nullptr;
 	FLOAT64VECTOR WorldOriginOffset = {0, 0, 0};
 	FLOAT64VECTOR HitchPos = {0, 0, 0},AttachPos = {0, 0, 0};
 
@@ -3836,7 +3767,7 @@ static UINT32 _UpdateTowBar(mlComponent * Component,
 	if (VehicleData->TowBarEnabled)
 	{
 		Force.x = Force.y = Force.z = 0.0;
-		TowTarget = NULL;
+		TowTarget = nullptr;
 		trnGetWorldOriginOffset(&WorldOriginOffset);
 
 		mathVectorMultiply64(&AttachPos,&Component->CurrentRelativePos,&VehicleData->VehicleAttMat);
@@ -3856,7 +3787,7 @@ static UINT32 _UpdateTowBar(mlComponent * Component,
 		{
 			mathSubVectors(&DeltaVec,&CurrentVehicle->PosData.Pos,&AttachPos);
 			TowTarget = CurrentVehicle->VehicleObjectData->TowObject;
-			if (TowTarget != NULL)
+			if (TowTarget != nullptr)
 			{
 
 				TempVec.x = TowTarget->dof->dofmatrix2._41;
@@ -3902,7 +3833,7 @@ FLOAT64ATT Torque = {0, 0, 0};
 FLOAT64VECTOR Force = {0, 0, 0};
 FLOAT64 Alt = 0;
 FLOAT64 ThrottlePos = 0;
-mlEngineComponentData * EngineData = NULL;
+mlEngineComponentData * EngineData = nullptr;
 UCHAR s[32];
 
 	// first calculate velocity of the component relative to the world
@@ -3948,10 +3879,10 @@ UCHAR s[32];
 		}
 	}
 
-	if (EngineData != NULL)
+	if (EngineData != nullptr)
 	{
 		if (EngineData->SubType == ML_ENGINE_SUBTYPE_ENGINE &&
-			EngineData->EngineData != NULL)
+			EngineData->EngineData != nullptr)
 		{
 			sprintf((char*)s,"exhaustsmoke%u",EngineData->EngineNumber);
 
@@ -3991,7 +3922,7 @@ UCHAR s[32];
 				_CheckForSecondaryVehicleKill (VehicleData, Component);
 			}
 
-		}else if (EngineData->SubType == ML_ENGINE_SUBTYPE_PROPELLOR && EngineData->EngineData != NULL)
+		}else if (EngineData->SubType == ML_ENGINE_SUBTYPE_PROPELLOR && EngineData->EngineData != nullptr)
 		{
 			VehicleData->AnimationData.PropFailed[EngineData->EngineNumber-1] = Component->ComponentFailed;
 		}
@@ -4614,7 +4545,7 @@ mlEngineComponentData* mlGetEngine(mlVehicleData* VehicleData, SINT32 EngineNumb
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 // pass -1 if you want to know if any engine is on
@@ -4758,7 +4689,7 @@ UINT32 mlGetStarterOnInfo(mlVehicleData* VehicleData, UINT32 * StarterOn,UINT32 
 				EngineHasFuel = FALSE;
 				for (j=0;j<ML_MAX_FUEL_TANKS_PER_ENGINE;j++)
 				{
-					if (Engine->FuelTankComponent[j] != NULL)
+					if (Engine->FuelTankComponent[j] != nullptr)
 					{
 						TankData = (mlEngineComponentData*)Engine->FuelTankComponent[j]->SpecialData;
 						if (TankData->CurrentTankContents > 0.0)
@@ -4991,15 +4922,15 @@ typedef std::vector<Temp_Info> TEMP_VECTOR;
 
 static UINT32 _UpdateTerrainCollideLists(mlVehicleData* VehicleData, UINT32 ForceRecalc)
 {
-	if (VehicleData == NULL)
+	if (VehicleData == nullptr)
 		return 0;
 
-	trnCDTerrainObject* TO = NULL;
+	trnCDTerrainObject* TO = nullptr;
 	FLOAT64VECTOR Vec1;
 	piVECTOR PosVec;
 	FLOAT64 Dist1 = 0.0f;
 	UINT32 Pos = 0;
-	OBJECT* TempObj = NULL;
+	OBJECT* TempObj = nullptr;
 	LOGICAL IgnoreZ = FALSE;
 	WEAPON_SPEC Spec;
 	WEAPON_SPEC SpecType;
@@ -5037,7 +4968,7 @@ static UINT32 _UpdateTerrainCollideLists(mlVehicleData* VehicleData, UINT32 Forc
 
     UINT32 type = 0;
 
-    WEAPON_SPEC* s = NULL;
+    WEAPON_SPEC* s = nullptr;
 	UINT32 vtype = VEH_TYPE_NONE;
 
     if(v)
@@ -5136,7 +5067,7 @@ static UINT32 _UpdateTerrainCollideLists(mlVehicleData* VehicleData, UINT32 Forc
 	trncdGetTOHead(&TO);
 
 	// need to change this to a sorted list
-	while (TO != NULL)
+	while (TO != nullptr)
 	{
 #ifdef TO_COLLIDE_LIST_DEBUG
 		totalTOs++;
@@ -5149,7 +5080,7 @@ static UINT32 _UpdateTerrainCollideLists(mlVehicleData* VehicleData, UINT32 Forc
 		// find an object with a matrix
 		TempObj = TO->TerrainObject;//->child;
 
-		while (TempObj != NULL && TempObj->flags & OBJECT_NOTOBJECT)
+		while (TempObj != nullptr && TempObj->flags & OBJECT_NOTOBJECT)
 		{
 			TempObj = TempObj->child;
 		}
@@ -5184,7 +5115,7 @@ static UINT32 _UpdateTerrainCollideLists(mlVehicleData* VehicleData, UINT32 Forc
 				odeBlanks++;
 #endif
 
-		if (TempObj != NULL)
+		if (TempObj != nullptr)
 		{
 			PosVec = TO->Center;
 			PosVec.z = -PosVec.z;
@@ -5429,7 +5360,7 @@ static UINT32 _UpdateTerrainCollideLists(mlVehicleData* VehicleData, UINT32 Forc
 		TERRAIN_DETAIL* td = &trndtl[i];
 		//FLOAT64VECTOR pos = {(td->scx+.5)*SUPERCELL_SIZE_M,(td->scy+.5)*SUPERCELL_SIZE_M,0};
 
-		for(int j=0 ; j < MAX_TERRAIN_TEXTURES; j++)
+		for(int j=0; j < MAX_TERRAIN_TEXTURES; j++)
 		{
 			OBJECT* lpobj=td->nonreplacementtiles[j];
 
@@ -5494,9 +5425,6 @@ SINT32 _radioStatic(trnCDTerrainObject* t)
         {
         case VEH_TYPE_FLOATER:
         case VEH_TYPE_PERSON:
-#ifdef DOROTHY
-		case VEH_TYPE_MECH:
-#endif
         case VEH_TYPE_GROUND:
             {
                 SINT32 ID = fxSndGetNewSound();
@@ -5535,13 +5463,13 @@ SINT32 _radioStatic(trnCDTerrainObject* t)
 
 UINT32 mlCheckRemovedObjectOnCollisionList(trnCDTerrainObject * TO)
 {
-	if (TO == NULL)
+	if (TO == nullptr)
 	{
 		return 0;
 	}
 
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-	if (VehicleData == NULL) return 0;
+	if (VehicleData == nullptr) return 0;
 
 	if(TO->uFlags & TRN_OBJECT_ONMEDIUMLIST)
 		_RefreshList = TRUE;
@@ -5552,7 +5480,7 @@ UINT32 mlCheckRemovedObjectOnCollisionList(trnCDTerrainObject * TO)
 UINT32 mlCheckForCollisionListUpdate(bool force)
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-	if (VehicleData == NULL)
+	if (VehicleData == nullptr)
 	{
 		return 0;
 	}
@@ -5584,14 +5512,14 @@ UINT32 i;
 		return 0;
 	}
 
-	if (ObjectData == NULL)
+	if (ObjectData == nullptr)
 	{
 		return 0;
 	}
 
 	LineCollideObject = ObjectData->LineCollideObject;
 
-	if (LineCollideObject == NULL)
+	if (LineCollideObject == nullptr)
 	{
 		return 0;
 	}
@@ -5638,7 +5566,7 @@ OBJECT * MasterObject;
 	Force.x = Force.y = Force.z = 0;
 	ForceArm.x = ForceArm.y = ForceArm.z = 0;
 
-	if (CollidePnt == NULL)
+	if (CollidePnt == nullptr)
 	{
 		return 0;
 	}
@@ -5735,11 +5663,11 @@ UINT32 mlCheckSpecificObjectForLineCollision1(mlVehicleData * VehicleData,
 													LOGICAL IsSpike)
 {
 FASTCOLLIDE CollisionList[32];
-FASTCOLLIDE * CollideListPtr = NULL;
+FASTCOLLIDE * CollideListPtr = nullptr;
 UINT32 TempNum = 0;
 UINT32 NumCollides = 0;
 UINT32 CollideNum = 0;
-OBJECT * ColObj = NULL;
+OBJECT * ColObj = nullptr;
 FLOAT32 Length = 0.0f;
 piVECTOR ForceDir = {0, 0, 0};
 FLOAT64VECTOR Force = {0, 0, 0};
@@ -5779,7 +5707,7 @@ FLOAT64 ConstantForce = 0.0f;
 FLOAT64 SpringCo = 0.0f,ShockCo = 0.0f;
 FLOAT64 ContactDeltaLength = 0.0f;
 FLOAT64VECTOR TempContact = {0, 0, 0};
-vehVehicle* Vehicle = NULL;
+vehVehicle* Vehicle = nullptr;
 LOGICAL IsSeaVehicle = 0;
 UINT32 i = 0;
 
@@ -5788,7 +5716,7 @@ UINT32 i = 0;
 	{
 		*InLength = 0.0;
 
-		if (Object == NULL)
+		if (Object == nullptr)
 			return 0;
 
 		if (!(Object->flags & OBJECT_DOF))
@@ -5950,12 +5878,12 @@ if(VehicleObjectAnalysis && DisplayCollideLines && IsFirstTic) // Vehicle line c
 		else
 			IsSeaVehicle = FALSE;
 
-		mlGetObjectBumpinessAndFriction(	NULL,
-											NULL,
-											NULL,
-											NULL,
+		mlGetObjectBumpinessAndFriction(	nullptr,
+											nullptr,
+											nullptr,
+											nullptr,
 											RollFrictionCo,
-											NULL,
+											nullptr,
 											CollisionList[CollideNum].CollideObject);
 
 		while (CollideNum < NumCollides && (CollisionList[CollideNum].Alpha < 0.5 ||
@@ -5964,12 +5892,12 @@ if(VehicleObjectAnalysis && DisplayCollideLines && IsFirstTic) // Vehicle line c
 			CollideNum++;
 			if (CollideNum < NumCollides && IsSeaVehicle)
 			{
-				mlGetObjectBumpinessAndFriction(NULL,
-												NULL,
-												NULL,
-												NULL,
+				mlGetObjectBumpinessAndFriction(nullptr,
+												nullptr,
+												nullptr,
+												nullptr,
 												RollFrictionCo,
-												NULL,
+												nullptr,
 												CollisionList[CollideNum].CollideObject);
 			}
 		}
@@ -5983,19 +5911,19 @@ if(VehicleObjectAnalysis && DisplayCollideLines && IsFirstTic) // Vehicle line c
 
 		ColObj = CollisionList[CollideNum].CollideObject;
 
-		if(ColObj == NULL)
+		if(ColObj == nullptr)
 		{
-			Write_Log(LOG_VEHICLE, LOG_WARN, "mlCheckSpecificObjectForLineCollision1 NULL collide object!");
+			Write_Log(LOG_VEHICLE, LOG_WARN, "mlCheckSpecificObjectForLineCollision1 nullptr collide object!");
 			return 0;
 		}
 
 		// determine bumpiness
 		mlGetObjectBumpinessAndFriction(BumpDensity, // dummy var
 									   BumpHeight, // dummy var
-									   NULL,
+									   nullptr,
 									   DynamicFriction,
-									   NULL,
-									   NULL,
+									   nullptr,
+									   nullptr,
 									   ColObj);
 		if(IsSpike)
 			*DynamicFriction = 1;
@@ -6352,7 +6280,7 @@ static SINT32 LastUpdateTime;
 	// check to see if we've moved too far between frames
 	ForceRecalc = 0;
 
-	if (VehicleData != NULL && frametime != LastUpdateTime)
+	if (VehicleData != nullptr && frametime != LastUpdateTime)
 	{
 		mathSubVectors(&DeltaVec,&VehicleData->VehiclePos,&VehicleData->VehicleLastPos);
 		DeltaVec.z = 0.0;
@@ -6398,7 +6326,7 @@ UINT32 First;
 UINT32 TempNum;
 
 
-	if (VehicleObjectData != NULL)
+	if (VehicleObjectData != nullptr)
 	{
 		bbox[0] = VehicleObjectData->BBox1;
 		bbox[1] = VehicleObjectData->BBox2;
@@ -6512,12 +6440,12 @@ UINT32 TempNum;
 	{
 		TO = TOList[Count];
 
-		if (TO == NULL)
+		if (TO == nullptr)
 		{
 			break;
 		}
 
-		if (TO->TerrainObject == NULL || TO->DamageLevel == FB_CLOSED_VISLEVEL)
+		if (TO->TerrainObject == nullptr || TO->DamageLevel == FB_CLOSED_VISLEVEL)
 		{
             Count++;
 			continue;
@@ -6570,7 +6498,7 @@ UINT32 TempNum;
 					(mxz > bbox[0].z &&
 					 mxz < bbox[1].z))
 				{
-					if (TO->CollisionObject->child != NULL &&
+					if (TO->CollisionObject->child != nullptr &&
 						TO->DamageLevel != FB_CLOSED_VISLEVEL)
 					{
 						if (TO->DamageLevel == 0)
@@ -6622,7 +6550,7 @@ UINT32 First;
 piMATRIX MatInv;
 UINT32 Intersects;
 
-	if (Obj == NULL)
+	if (Obj == nullptr)
 	{
 		return 0;
 	}
@@ -6737,11 +6665,11 @@ UINT32 Intersects;
 
 				ObjAtt = ObjAtt->attached;
 			}
-			while (ObjAtt != NULL && *TrnCDPos < MaxTrnCDPos);
+			while (ObjAtt != nullptr && *TrnCDPos < MaxTrnCDPos);
 
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_DetermineIfBoundingBoxIntersects(TrnCDPos,
 											  MaxTrnCDPos,
@@ -6754,7 +6682,7 @@ UINT32 Intersects;
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL && *TrnCDPos < MaxTrnCDPos);
+	while (ObjSib != nullptr && *TrnCDPos < MaxTrnCDPos);
 
 	return 0;
 }
@@ -6796,7 +6724,7 @@ UINT32 _ReadBumpAndFrictionTable(void)
 		Position++;
 
 		BufferPtr = (UCHAR*)strtok((char*)Buffer,",");
-		if (BufferPtr == NULL)
+		if (BufferPtr == nullptr)
 		{
 			continue;
 		}
@@ -6806,76 +6734,76 @@ UINT32 _ReadBumpAndFrictionTable(void)
         _hashBAF[(const char*)_BAFData[Position].Name] = &_BAFData[Position];
         //--
 
-		BufferPtr = (UCHAR*)strtok(NULL,",");
-		if (BufferPtr == NULL)
+		BufferPtr = (UCHAR*)strtok(nullptr,",");
+		if (BufferPtr == nullptr)
 		{
 			continue;
 		}
 		_BAFData[Position].BumpDensity = (FLOAT32)atof((char*)BufferPtr);
 
-		BufferPtr = (UCHAR*)strtok(NULL,",");
-		if (BufferPtr == NULL)
+		BufferPtr = (UCHAR*)strtok(nullptr,",");
+		if (BufferPtr == nullptr)
 		{
 			continue;
 		}
 		_BAFData[Position].BumpHeight = (FLOAT32)atof((char*)BufferPtr);
 
-		BufferPtr = (UCHAR*)strtok(NULL,",");
-		if (BufferPtr == NULL)
+		BufferPtr = (UCHAR*)strtok(nullptr,",");
+		if (BufferPtr == nullptr)
 		{
 			continue;
 		}
 		_BAFData[Position].StaticFriction = (FLOAT32)atof((char*)BufferPtr);
 
-		BufferPtr = (UCHAR*)strtok(NULL,",");
-		if (BufferPtr == NULL)
+		BufferPtr = (UCHAR*)strtok(nullptr,",");
+		if (BufferPtr == nullptr)
 		{
 			continue;
 		}
 		_BAFData[Position].DynamicFriction = (FLOAT32)atof((char*)BufferPtr);
 
-		BufferPtr = (UCHAR*)strtok(NULL,",");
-		if (BufferPtr == NULL)
+		BufferPtr = (UCHAR*)strtok(nullptr,",");
+		if (BufferPtr == nullptr)
 		{
 			_BAFData[Position].RollCoefficientMult = 1.0;
 			continue;
 		}
 		_BAFData[Position].RollCoefficientMult = (FLOAT32)atof((char*)BufferPtr);
 //
-		BufferPtr = (UCHAR*)strtok(NULL,",");
-		if (BufferPtr == NULL)
+		BufferPtr = (UCHAR*)strtok(nullptr,",");
+		if (BufferPtr == nullptr)
 		{
 			_BAFData[Position].GroundClutterType[0] = 0;
 			continue;
 		}
 		_BAFData[Position].GroundClutterType[0] = atoi((char*)BufferPtr);
 
-		BufferPtr = (UCHAR*)strtok(NULL,",");
-		if (BufferPtr == NULL)
+		BufferPtr = (UCHAR*)strtok(nullptr,",");
+		if (BufferPtr == nullptr)
 		{
 			_BAFData[Position].GroundClutterType[1] = 0;
 			continue;
 		}
 		_BAFData[Position].GroundClutterType[1] = atoi((char*)BufferPtr);
 
-		BufferPtr = (UCHAR*)strtok(NULL,",");
-		if (BufferPtr == NULL)
+		BufferPtr = (UCHAR*)strtok(nullptr,",");
+		if (BufferPtr == nullptr)
 		{
 			_BAFData[Position].GroundClutterType[2] = 0;
 			continue;
 		}
 		_BAFData[Position].GroundClutterType[2] = atoi((char*)BufferPtr);
 
-		BufferPtr = (UCHAR*)strtok(NULL,",");
-		if (BufferPtr == NULL)
+		BufferPtr = (UCHAR*)strtok(nullptr,",");
+		if (BufferPtr == nullptr)
 		{
 			_BAFData[Position].GroundClutterWidth = 1.0f;
 			continue;
 		}
 		_BAFData[Position].GroundClutterWidth = (FLOAT32)atof((char*)BufferPtr);
 
-		BufferPtr = (UCHAR*)strtok(NULL,",");
-		if (BufferPtr == NULL)
+		BufferPtr = (UCHAR*)strtok(nullptr,",");
+		if (BufferPtr == nullptr)
 		{
 			_BAFData[Position].GroundClutterHeight = 1.0f;
 			continue;
@@ -6883,69 +6811,69 @@ UINT32 _ReadBumpAndFrictionTable(void)
 		_BAFData[Position].GroundClutterHeight = (FLOAT32)atof((char*)BufferPtr);
 //
 
-		BufferPtr = (UCHAR*)strtok(NULL,",");
-		if (BufferPtr == NULL)
+		BufferPtr = (UCHAR*)strtok(nullptr,",");
+		if (BufferPtr == nullptr)
 		{
 			continue;
 		}
 		sscanf((SCHAR*)BufferPtr,"%s,",(SCHAR*)_BAFData[Position].HitSoundEffect[0]);
 
-		BufferPtr = (UCHAR*)strtok(NULL,",");
-		if (BufferPtr == NULL)
+		BufferPtr = (UCHAR*)strtok(nullptr,",");
+		if (BufferPtr == nullptr)
 		{
 			continue;
 		}
 		sscanf((SCHAR*)BufferPtr,"%s,",(SCHAR*)_BAFData[Position].HitSoundEffect[1]);
 
-		BufferPtr = (UCHAR*)strtok(NULL,",");
-		if (BufferPtr == NULL)
+		BufferPtr = (UCHAR*)strtok(nullptr,",");
+		if (BufferPtr == nullptr)
 		{
 			continue;
 		}
 		sscanf((SCHAR*)BufferPtr,"%s,",(SCHAR*)_BAFData[Position].HitSoundEffect[2]);
 
-		BufferPtr = (UCHAR*)strtok(NULL,",");
-		if (BufferPtr == NULL)
+		BufferPtr = (UCHAR*)strtok(nullptr,",");
+		if (BufferPtr == nullptr)
 		{
 			_BAFData[Position].MinHitEffectVolume = 1.0;
 			continue;
 		}
 		_BAFData[Position].MinHitEffectVolume = (FLOAT32)atof((char*)BufferPtr);
 
-		BufferPtr = (UCHAR*)strtok(NULL,",");
-		if (BufferPtr == NULL)
+		BufferPtr = (UCHAR*)strtok(nullptr,",");
+		if (BufferPtr == nullptr)
 		{
 			_BAFData[Position].MaxVolumeEnergy = 1.0;
 			continue;
 		}
 		_BAFData[Position].MaxVolumeEnergy = (FLOAT32)atof((char*)BufferPtr);
 
-		BufferPtr = (UCHAR*)strtok(NULL,",");
-		if (BufferPtr == NULL)
+		BufferPtr = (UCHAR*)strtok(nullptr,",");
+		if (BufferPtr == nullptr)
 		{
 			_BAFData[Position].HitSpriteNum[0] = 0;
 			continue;
 		}
 		_BAFData[Position].HitSpriteNum[0] = atoi((char*)BufferPtr);
 
-		BufferPtr = (UCHAR*)strtok(NULL,",");
-		if (BufferPtr == NULL)
+		BufferPtr = (UCHAR*)strtok(nullptr,",");
+		if (BufferPtr == nullptr)
 		{
 			_BAFData[Position].HitSpriteNum[1] = 0;
 			continue;
 		}
 		_BAFData[Position].HitSpriteNum[1] = atoi((char*)BufferPtr);
 
-		BufferPtr = (UCHAR*)strtok(NULL,",");
-		if (BufferPtr == NULL)
+		BufferPtr = (UCHAR*)strtok(nullptr,",");
+		if (BufferPtr == nullptr)
 		{
 			_BAFData[Position].HitSpriteNum[2] = 0;
 			continue;
 		}
 		_BAFData[Position].HitSpriteNum[2] = atoi((char*)BufferPtr);
 
-		BufferPtr = (UCHAR*)strtok(NULL,",");
-		if (BufferPtr == NULL)
+		BufferPtr = (UCHAR*)strtok(nullptr,",");
+		if (BufferPtr == nullptr)
 		{
 			_BAFData[Position].InfSurfaceID = 0;
 			continue;
@@ -6959,9 +6887,9 @@ UINT32 _ReadBumpAndFrictionTable(void)
 
         for(SINT32 q = 0; q < 5; q++)
         {
-            BufferPtr = (UCHAR*)strtok(NULL, ",");
+            BufferPtr = (UCHAR*)strtok(nullptr, ",");
 
-            if(BufferPtr == NULL)
+            if(BufferPtr == nullptr)
             {
                 _BAFData[Position].RadialClutter[q] = 0;
             }
@@ -6971,8 +6899,8 @@ UINT32 _ReadBumpAndFrictionTable(void)
             }
         }
 
-		BufferPtr = (UCHAR*)strtok(NULL,",");
-		if(BufferPtr == NULL)
+		BufferPtr = (UCHAR*)strtok(nullptr,",");
+		if(BufferPtr == nullptr)
 		{
 			_BAFData[Position].GroundClutterDensity = 1;
 			continue;
@@ -7005,12 +6933,12 @@ UINT32 mlGetGroundClutterStuff(SINT32* ClutterType1,
 							   SINT32* ClutterDensity,
 							   const SINT8 * TextureName)
 {
-	if (ClutterType1 == NULL ||
-		ClutterType2 == NULL ||
-		ClutterType3 == NULL ||
-		ClutterWidth == NULL ||
-		ClutterHeight == NULL ||
-		TextureName == NULL)
+	if (ClutterType1 == nullptr ||
+		ClutterType2 == nullptr ||
+		ClutterType3 == nullptr ||
+		ClutterWidth == nullptr ||
+		ClutterHeight == nullptr ||
+		TextureName == nullptr)
 	{
 		return 1;
 	}
@@ -7018,7 +6946,7 @@ UINT32 mlGetGroundClutterStuff(SINT32* ClutterType1,
     std::map<std::string, BumpAndFrictionData*>::iterator hashFind;
 
     SCHAR szCopy[32];
-    SCHAR* p = NULL;
+    SCHAR* p = nullptr;
 
     strncpy(szCopy, TextureName, 31);
 
@@ -7027,7 +6955,7 @@ UINT32 mlGetGroundClutterStuff(SINT32* ClutterType1,
 
     if(p) *p = 0;
 
-    SCHAR* p2 = NULL;
+    SCHAR* p2 = nullptr;
     p = szCopy;
     p2 = p;
 
@@ -7069,7 +6997,7 @@ UINT32 mlGetRadialClutterStuff(SINT32 iClutter[5], const SCHAR szTextureName[])
     std::map<std::string, BumpAndFrictionData*>::iterator hashFind;
 
     SCHAR szCopy[32];
-    SCHAR* p = NULL;
+    SCHAR* p = nullptr;
 
     strncpy(szCopy, szTextureName, 31);
 
@@ -7078,7 +7006,7 @@ UINT32 mlGetRadialClutterStuff(SINT32 iClutter[5], const SCHAR szTextureName[])
 
     if(p) *p = 0;
 
-    SCHAR* p2 = NULL;
+    SCHAR* p2 = nullptr;
     p = szCopy;
     p2 = p;
 
@@ -7119,10 +7047,10 @@ UINT32 mlGetHitSpriteNumbers(SINT32* Sprite1,
                              SINT32* Sprite3,
                              const SINT8 * TextureName)
 {
-	if (Sprite1 == NULL ||
-        Sprite2 == NULL ||
-        Sprite3 == NULL ||
-        TextureName == NULL)
+	if (Sprite1 == nullptr ||
+        Sprite2 == nullptr ||
+        Sprite3 == nullptr ||
+        TextureName == nullptr)
 	{
 		return 1;
 	}
@@ -7130,7 +7058,7 @@ UINT32 mlGetHitSpriteNumbers(SINT32* Sprite1,
     std::map<std::string, BumpAndFrictionData*>::iterator hashFind;
 
     SCHAR szCopy[32];
-    SCHAR* p = NULL;
+    SCHAR* p = nullptr;
 
     strncpy(szCopy, TextureName, 31);
 
@@ -7139,7 +7067,7 @@ UINT32 mlGetHitSpriteNumbers(SINT32* Sprite1,
 
     if(p) *p = 0;
 
-    SCHAR* p2 = NULL;
+    SCHAR* p2 = nullptr;
     p = szCopy;
     p2 = p;
 
@@ -7178,10 +7106,10 @@ UINT32 mlGetRandomHitSound(SINT8 ** HitSoundName,
 						   FLOAT32 * MaxVolumeEnergy,
 						   const SINT8 * TextureName)
 {
-	if (HitSoundName == NULL ||
-        TextureName == NULL ||
-        MinVolume == NULL ||
-        MaxVolumeEnergy == NULL)
+	if (HitSoundName == nullptr ||
+        TextureName == nullptr ||
+        MinVolume == nullptr ||
+        MaxVolumeEnergy == nullptr)
 	{
 		return 1;
 	}
@@ -7191,7 +7119,7 @@ UINT32 mlGetRandomHitSound(SINT8 ** HitSoundName,
     UINT32 i = (UINT32)(mathGetChaoticNumber()) % 3;
 
     SCHAR szCopy[32];
-    SCHAR* p = NULL;
+    SCHAR* p = nullptr;
 
     strncpy(szCopy, TextureName, 31);
 
@@ -7200,7 +7128,7 @@ UINT32 mlGetRandomHitSound(SINT8 ** HitSoundName,
 
     if(p) *p = 0;
 
-    SCHAR* p2 = NULL;
+    SCHAR* p2 = nullptr;
     p = szCopy;
     p2 = p;
 
@@ -7261,17 +7189,17 @@ UINT32 mlGetObjectBumpinessAndFriction(FLOAT32 * BumpDensity,
 {
 	LOGICAL		usingDefaultSurface = FALSE;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 1;
 	}
 
-    UCHAR * StringPtr = NULL;
+    UCHAR * StringPtr = nullptr;
 	if(!obmainValidateObject(Object)) return 1;
 
-	if(Object->texname == NULL || Object->texname[0] == '\0')
+	if(Object->texname == nullptr || Object->texname[0] == '\0')
 	{
-		if(Object->matname == NULL || Object->matname[0] == '\0')
+		if(Object->matname == nullptr || Object->matname[0] == '\0')
 		{
 			// Do nothing
 		}
@@ -7304,9 +7232,9 @@ UINT32 mlGetObjectBumpinessAndFriction(FLOAT32 * BumpDensity,
 
     std::map<std::string, BumpAndFrictionData*>::iterator hashFind;
 
-    BumpAndFrictionData* lpBAFData = NULL;
+    BumpAndFrictionData* lpBAFData = nullptr;
 
-    if(StringPtr == NULL)
+    if(StringPtr == nullptr)
     {
 		usingDefaultSurface = TRUE;
 
@@ -7360,7 +7288,7 @@ UINT32 mlGetObjectBumpinessAndFriction(FLOAT32 * BumpDensity,
 			*InfSurfID = lpBAFData->InfSurfaceID;
 	}
 
-	if (Vehicle != NULL && Vehicle->VehicleType != NULL)
+	if (Vehicle != nullptr && Vehicle->VehicleType != nullptr)
 	{
 		if (Vehicle->VehicleType->Type == VEH_TYPE_SEA)
 		{
@@ -7420,7 +7348,7 @@ void _SoundStopped(void* data)
 {
     SINT32* pID = (SINT32*)data;
 
-    if(pID == NULL)
+    if(pID == nullptr)
         return;
 
     *pID = -1;
@@ -7441,7 +7369,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 	//UINT32 Count = 100;
 	piMATRIX AttMat = IdentityMatrix;
 	piVECTOR Att;
-	OBJECT* SpawnPtr = NULL;
+	OBJECT* SpawnPtr = nullptr;
 
 	//uiConsoleprintf("SCENARIO: Vehicle reset pos called!");
 
@@ -7468,11 +7396,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
                 SpawnLocId = 8;
             else if(Vehicle->VehicleType->Type == VEH_TYPE_AIR)
                 SpawnLocId = 3;
-#ifdef DOROTHY
-			else if(Vehicle->VehicleType->Type == VEH_TYPE_GROUND || Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-#else
             else if(Vehicle->VehicleType->Type == VEH_TYPE_GROUND)
-#endif
                 SpawnLocId = 7;
             else if(Vehicle->VehicleType->Type == VEH_TYPE_SEA)
                 SpawnLocId = 21;
@@ -7490,11 +7414,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
                 SpawnLocId = 288;
             else if(Vehicle->VehicleType->Type == VEH_TYPE_AIR)
                 SpawnLocId = 286;
-#ifdef DOROTHY
-			else if(Vehicle->VehicleType->Type == VEH_TYPE_GROUND || Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-#else
             else if(Vehicle->VehicleType->Type == VEH_TYPE_GROUND)
-#endif
                 SpawnLocId = 289;
             else if(Vehicle->VehicleType->Type == VEH_TYPE_SEA)
                 SpawnLocId = 300;
@@ -7514,11 +7434,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
                     SpawnLocId = 288;
                 else if(Vehicle->VehicleType->Type == VEH_TYPE_AIR)
                     SpawnLocId = 286;
-#ifdef DOROTHY
-				else if(Vehicle->VehicleType->Type == VEH_TYPE_GROUND || Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-#else
 				else if(Vehicle->VehicleType->Type == VEH_TYPE_GROUND)
-#endif
                     SpawnLocId = 289;
                 else if(Vehicle->VehicleType->Type == VEH_TYPE_SEA)
                     SpawnLocId = 300;
@@ -7539,11 +7455,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
             SpawnLocId = 288;
         else if(Vehicle->VehicleType->Type == VEH_TYPE_AIR)
             SpawnLocId = 286;
-#ifdef DOROTHY
-		else if(Vehicle->VehicleType->Type == VEH_TYPE_GROUND || Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-#else
         else if(Vehicle->VehicleType->Type == VEH_TYPE_GROUND)
-#endif
             SpawnLocId = 289;
         else if(Vehicle->VehicleType->Type == VEH_TYPE_SEA)
             SpawnLocId = 300;
@@ -7800,7 +7712,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
                               SpawnNumber - 1,
                               Vehicle->VehicleType->WeaponSpec);
 
-			if (SpawnPtr == NULL)
+			if (SpawnPtr == nullptr)
 			{
 				char s[128];
 
@@ -7827,7 +7739,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 		}
 #endif
 }
-	if (VehicleData->VehicleObjectData != NULL)
+	if (VehicleData->VehicleObjectData != nullptr)
 	{
 		Pos.z += WorldOffsetOrigin.z - VehicleData->VehicleObjectData->LowestPoint;
 	}
@@ -7894,7 +7806,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 			vehAnimChangeVehicleStateByName(Vehicle, (UCHAR*)"gearstate", TRUE);
 
 			StateAnims = &Vehicle->StateAnimation;
-			if (StateAnims != NULL)
+			if (StateAnims != nullptr)
 			{
 				StateAnims->GearDOFVar = 1.0f;
 				StateAnims->GearPos = 1.0f;
@@ -8083,8 +7995,8 @@ UINT32 _UpdateVehicleSounds(mlVehicleData * VehicleData)
         VehicleData->StallSoundStarted = 0;
 
 	if (VehicleData->StallSoundStarted == 0 &&
-		VehicleData->VehicleObjectData != NULL &&
-		VehicleData->VehicleObjectData->PlaneObject != NULL &&
+		VehicleData->VehicleObjectData != nullptr &&
+		VehicleData->VehicleObjectData->PlaneObject != nullptr &&
 		VehicleData->StallSound[0])
 	{
 		Pos.x = Pos.y = Pos.z = 0.0;
@@ -8303,36 +8215,19 @@ UINT32 _UpdateVehicleSounds(mlVehicleData * VehicleData)
 
 UINT32 mlDetermineVehicleCollisions(mlVehicleData * VehicleData, FLOAT64 DeltaTime)
 {
-piVECTOR TempPos;
-OBJECT * HitBox;
-FLOAT64VECTOR WorldOffsetOrigin;
-UINT32 i;
-piVECTOR V1,V2;
-
-SINT32 T1,T2;
-
-
-	if (VehicleData == NULL)
-	{
+	if (PN_UNLIKELY(VehicleData == nullptr || VehicleData->VehicleObjectData == nullptr))
 		return 0;
-	}
-	if (VehicleData->VehicleObjectData == NULL)
-	{
+	OBJECT* HitBox = VehicleData->VehicleObjectData->HitBox;
+	if (PN_UNLIKELY(HitBox == nullptr || HitBox->child == nullptr))
 		return 0;
-	}
-	if (VehicleData->VehicleObjectData->HitBox == NULL)
-	{
-		return 0;
-	}
 
-	HitBox = VehicleData->VehicleObjectData->HitBox;
+	piVECTOR TempPos;
+	FLOAT64VECTOR WorldOffsetOrigin;
+	UINT32 i;
+	piVECTOR V1,V2;
 
-	if (HitBox->child == NULL)
-	{
-		return 0;
-	}
-
-	T1 = piReadTimeStamp32();
+	SINT32 T1 = piReadTimeStamp32();
+	SINT32 T2;
 
 	trnGetWorldOriginOffset(&WorldOffsetOrigin);
 	WorldOffsetOrigin.z = -WorldOffsetOrigin.z;
@@ -8383,13 +8278,13 @@ static UINT32 _DoVehicleCollision(mlVehicleData* VehicleData, FLOAT64 DeltaTime,
 	piVECTOR Norm = {0, 0, 0};
 	piVECTOR TempPos = {0, 0, 0};
 	FASTCOLLIDE CollisionList[NUM_COLLISION_SLOTS];
-	FASTCOLLIDE* CollideListPtr = NULL;
+	FASTCOLLIDE* CollideListPtr = nullptr;
 	UINT32 NumCollides = 0;
 	UINT32 CollideNum = 0;
 	LOGICAL RetVal = 0;
 	piMATRIX TempMat = IdentityMatrix;
 	FLOAT32 RollFrictionCo = 0;
-	vehVehicle* Vehicle = NULL;
+	vehVehicle* Vehicle = nullptr;
 	UINT32 collisionSlotsLeft = 0;
 	UINT32 i = 0;
 
@@ -8483,8 +8378,8 @@ static UINT32 _DoVehicleCollision(mlVehicleData* VehicleData, FLOAT64 DeltaTime,
 
 		if(Vehicle->VehicleType->Type == VEH_TYPE_SEA)
 		{
-			mlGetObjectBumpinessAndFriction(NULL, NULL, NULL, NULL,
-											&RollFrictionCo, NULL, CollisionList[CollideNum].CollideObject);
+			mlGetObjectBumpinessAndFriction(nullptr, nullptr, nullptr, nullptr,
+											&RollFrictionCo, nullptr, CollisionList[CollideNum].CollideObject);
 
 			if(RollFrictionCo <= 0.99f || RollFrictionCo >= 1.01f)
 				break;
@@ -8662,12 +8557,12 @@ static UINT32 _DoODEVehicleCollision(mlVehicleData* VehicleData, FLOAT64 DeltaTi
 			// in the direction of our velocity
 			if(angle < 0)
 			{
-				colliderDebugContact(hit.pos, normal, colorBLACKALPHA, NULL, hit.depth);
+				colliderDebugContact(hit.pos, normal, colorBLACKALPHA, nullptr, hit.depth);
 				continue;
 			}
 			else
 			{
-				colliderDebugContact(hit.pos, normal, colorREDALPHA, NULL, hit.depth);
+				colliderDebugContact(hit.pos, normal, colorREDALPHA, nullptr, hit.depth);
 			}
 
 			Norm.x = hit.normal.x();
@@ -8759,17 +8654,17 @@ static UINT32 _ReadPositionFile(mlVehicleData * VehicleData,SINT8 * PositionFile
 	mlPositionData * CrewData;
 	SINT32 TempNum;
 
-	if (VehicleData == NULL)
+	if (VehicleData == nullptr)
 	{
 		return 1;
 	}
 
-	if (PositionFileName == NULL)
+	if (PositionFileName == nullptr)
 	{
 		return 1;
 	}
 
-	if (DirName == NULL)
+	if (DirName == nullptr)
 	{
 		return 1;
 	}
@@ -8805,19 +8700,19 @@ static UINT32 _ReadPositionFile(mlVehicleData * VehicleData,SINT8 * PositionFile
 				continue;
 			}
 
-			VarName = VarContents = NULL;
+			VarName = VarContents = nullptr;
 			mlUtilityGetVarnameAndContents1(&VarName,&VarContents,Buffer);
 
-			if (VarContents == NULL)
+			if (VarContents == nullptr)
 			{
 				Write_Debug("Weapon grouping message has no parameters");
 				continue;
 			}
 
-			VarName = NULL;
+			VarName = nullptr;
 			mlUtilityGetVarnameAndContents1(&VarName,&VarContents,VarContents);
 
-			if (VarContents == NULL)
+			if (VarContents == nullptr)
 			{
 				Write_Debug("Weapon grouping message has insufficient parameters");
 				continue;
@@ -8836,9 +8731,9 @@ static UINT32 _ReadPositionFile(mlVehicleData * VehicleData,SINT8 * PositionFile
 			continue;
 		}
 
-		VarName = VarContents = NULL;
+		VarName = VarContents = nullptr;
 		mlUtilityGetVarnameAndContents(&VarName,&VarContents,Buffer);
-		if (VarName == NULL || VarContents == NULL)
+		if (VarName == nullptr || VarContents == nullptr)
 		{
 			continue;
 		}
@@ -8929,8 +8824,8 @@ static SINT32 mlVehicleHandleTurretConvergence(mlVehicleData* VehicleData)
 	{
 		piMATRIX mat;
 		OBJECT* FireDirectorObj = VehicleData->VehicleObjectData->FireDirectorObj[i];
-		if(FireDirectorObj == NULL) continue;
-		if(FireDirectorObj->dof == NULL || FireDirectorObj->child == NULL) break; // should be a DOF object
+		if(FireDirectorObj == nullptr) continue;
+		if(FireDirectorObj->dof == nullptr || FireDirectorObj->child == nullptr) break; // should be a DOF object
 
 		// Fire Director position and direction
 		mat = IdentityMatrix;
@@ -8965,7 +8860,7 @@ static SINT32 mlVehicleHandleTurretConvergence(mlVehicleData* VehicleData)
 		for(int j = 0; j < VEH_MAX_MOUNTS; j++)
 		{
 			OBJECT* TurretConvObj = VehicleData->VehicleObjectData->TurretConvObj[i][j];
-			if(	TurretConvObj == NULL || TurretConvObj->dof == NULL)  break;
+			if(	TurretConvObj == nullptr || TurretConvObj->dof == nullptr)  break;
 
 			// Turret position and direction (inexplicable matrix foo ahead)
 			mat = IdentityMatrix;
@@ -9126,14 +9021,14 @@ SINT32 mlVehicleUpdateRide(mlVehicleRef VehicleData)
 
 static LOGICAL mlSafeToUnhoist(vehVehicle* Vehicle)
 {
-	OBJECT* CollideObject = NULL;
+	OBJECT* CollideObject = nullptr;
 	piVECTOR V1,V2;
  	FLOAT32 Height = 0;
 	FLOAT64VECTOR WorldOriginOffset;
 	FLOAT64VECTOR Pos;
 	piVECTOR CollidePos;
 	FLOAT32 RollCoefficient;
-	if(Vehicle->ModelData == NULL) return 0;
+	if(Vehicle->ModelData == nullptr) return 0;
 
 	trnGetWorldOriginOffset(&WorldOriginOffset);
 	Pos = (Vehicle->ModelData) ? Vehicle->ModelData->AdjustedForCGPos : Vehicle->PosData.RenderPos;
@@ -9143,7 +9038,7 @@ static LOGICAL mlSafeToUnhoist(vehVehicle* Vehicle)
 	V1.z = (FLOAT32)(Pos.z - WorldOriginOffset.z); V1.z = -V1.z;
 	V2 = V1; V2.z += 10000.0; V1.z -= 10000.0;
 
-	trncdCollideWithVehiclesAndTerrain(&V1,&V2,&CollidePos,&CollideObject,NULL,NULL,NULL,FALSE,TRUE, FALSE);
+	trncdCollideWithVehiclesAndTerrain(&V1,&V2,&CollidePos,&CollideObject,nullptr,nullptr,nullptr,FALSE,TRUE, FALSE);
 
 	if(CollideObject)
 	{
@@ -9157,7 +9052,7 @@ static LOGICAL mlSafeToUnhoist(vehVehicle* Vehicle)
 			Height += Vehicle->VehicleObjectData->LowestPoint;
 
 		Height += (FLOAT32)CollidePos.z;
-		mlGetObjectBumpinessAndFriction(NULL, NULL, NULL, NULL, &RollCoefficient, NULL, CollideObject);
+		mlGetObjectBumpinessAndFriction(nullptr, nullptr, nullptr, nullptr, &RollCoefficient, nullptr, CollideObject);
 	}
 
 	return  (Height < MAX_UNHOIST_Z && !(RollCoefficient > 198.999f && RollCoefficient < 199.001f));
@@ -9202,11 +9097,11 @@ SINT32 mlVehicleToggleHoist(mlVehicleRef VehicleData)
 		for(;CurrentVehicle; CurrentVehicle = CurrentVehicle->getNext())
 		{
 			if (CurrentVehicle == PlayerVehicle) continue;
-			if (CurrentVehicle->VehicleObjectData == NULL) continue;
+			if (CurrentVehicle->VehicleObjectData == nullptr) continue;
 			if (CurrentVehicle->Side != PlayerVehicle->Side) continue;
 
 			OBJECT* Object = CurrentVehicle->VehicleObjectData->HoistObject;
-			if (Object != NULL)
+			if (Object != nullptr)
 			{
 				piVECTOR TempVec;
 				TempVec.x = Object->dof->dofmatrix2._41;
@@ -9288,7 +9183,7 @@ static vehVehicle* mlFindShipUnderVehicle(vehVehicle* Vehicle)
 	NewPos = OldPos; NewPos.z += 100;
 	draw3dLineDebug(&OldPos,&NewPos,colorYELLOWALPHA);
 
-	vehVehicle* CurrentVehicle = NULL;
+	vehVehicle* CurrentVehicle = nullptr;
 	vehGetVehicleHead(&CurrentVehicle);
 
 	for(;CurrentVehicle; CurrentVehicle = CurrentVehicle->getNext())
@@ -9296,13 +9191,13 @@ static vehVehicle* mlFindShipUnderVehicle(vehVehicle* Vehicle)
 		if (CurrentVehicle == Vehicle) continue;
 		if (CurrentVehicle->VehicleType->Type != VEH_TYPE_SEA) continue;
 		if (CurrentVehicle->Side != Vehicle->Side) continue;
-		if (CurrentVehicle->VehicleObjectData == NULL) continue;
+		if (CurrentVehicle->VehicleObjectData == nullptr) continue;
 
 		if(mlCollideWithVehicle(CurrentVehicle, &OldPos, &NewPos, FALSE))
 			return CurrentVehicle;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /************************************************************************************************
@@ -9324,7 +9219,7 @@ SINT32 mlVehicleRideTransport(mlVehicleRef VehicleData)
 	// OK if we got here then we need to determine if we're gonna try to ride or fall off
 	RideVehicle = mlFindShipUnderVehicle(VehicleData->VehicleMasterPtr);
 
-	if(RideVehicle == NULL)
+	if(RideVehicle == nullptr)
 	{// detach
 		mlVehicleToggleHoist(VehicleData);
 		return 0;
@@ -9337,12 +9232,12 @@ SINT32 mlVehicleRideTransport(mlVehicleRef VehicleData)
 		FLOAT64VECTOR WorldOriginOffset;
 		trnGetWorldOriginOffset(&WorldOriginOffset);
 
-		if(RideVehicle->VehicleObjectData == NULL) return 0;
+		if(RideVehicle->VehicleObjectData == nullptr) return 0;
 
 		for(UINT32 i = 0; i < RideVehicle->VehicleObjectData->NumVehSeats; i++)
 		{
 			OBJECT* Object = RideVehicle->VehicleObjectData->VehSeats[i];
-			if (Object != NULL)
+			if (Object != nullptr)
 			{
 				piVECTOR TempVec;
 				TempVec.x = Object->dof->dofmatrix2._41;
@@ -9412,7 +9307,7 @@ static SINT32 mlHoistCollisions(vehVehicle* Vehicle)
 
 	// programmatic vertical lines
 	HoistObject = Vehicle->VehicleObjectData->HoistObject;
-	if(Vehicle->VehicleObjectData == NULL) return 0;
+	if(Vehicle->VehicleObjectData == nullptr) return 0;
 
 	if (HoistObject)
 	{
@@ -9438,9 +9333,9 @@ static SINT32 mlHoistCollisions(vehVehicle* Vehicle)
 		{
 			Vehicle->ModelData->TurretTraverseRate[Vehicle->ModelData->HoistTurretNum-1] = Vehicle->ModelData->LastHoistRate;
 
-			if(HoistedVehicle == NULL)
+			if(HoistedVehicle == nullptr)
 			{
-				vehVehicle* CollideVehicle = mlHoistCollideRoundWithVehicles(NULL, &OldPos, &NewPos);
+				vehVehicle* CollideVehicle = mlHoistCollideRoundWithVehicles(nullptr, &OldPos, &NewPos);
 				if(CollideVehicle)
 				{
 					if(-OldPos.z < CollideVehicle->PosData.RenderPos.z + CollideVehicle->VehicleObjectData->HighestPoint - WorldOriginOffset.z)
@@ -9632,7 +9527,7 @@ static LOGICAL mlHoistCollideRoundWithWorld(vehVehicle* Vehicle, OBJECT* Hitmap,
 
 	// collide with vehicles
 	if(!Collided)
-		Collided = (mlHoistCollideRoundWithVehicles(Vehicle, OldPos, NewPos) != NULL);
+		Collided = (mlHoistCollideRoundWithVehicles(Vehicle, OldPos, NewPos) != nullptr);
 
 	// collide with terrain
 	if(!Collided)
@@ -9679,7 +9574,7 @@ static LOGICAL mlHoistCollideRoundWithHitmap(OBJECT* hitmap, piVECTOR const* Old
 	UINT32 NumCollisionSlotsLeft = 32;
 
 	weapCollideWithHitmapObject(&CollisionListPtr, &NumCollisionSlotsLeft,  hitmap,
-								NULL, OldPos, NewPos,  1, 1);
+								nullptr, OldPos, NewPos,  1, 1);
 
 	return (NumCollisionSlotsLeft != 32);
 }
@@ -9690,7 +9585,7 @@ static LOGICAL mlHoistCollideRoundWithHitmap(OBJECT* hitmap, piVECTOR const* Old
 
 static vehVehicle* mlHoistCollideRoundWithVehicles(vehVehicle* IgnoreVehicle, piVECTOR const* OldPos, piVECTOR const* NewPos)
 {
-	vehVehicle* CurrentVehicle = NULL;
+	vehVehicle* CurrentVehicle = nullptr;
 	vehVehicle* PlayerVehicle = persGetPersonaVehiclePtr();
 	vehGetVehicleHead(&CurrentVehicle);
 
@@ -9699,10 +9594,7 @@ static vehVehicle* mlHoistCollideRoundWithVehicles(vehVehicle* IgnoreVehicle, pi
 		if (CurrentVehicle == PlayerVehicle) continue;
 		if (CurrentVehicle == IgnoreVehicle) continue;
 		if (CurrentVehicle->VehicleType->Type == VEH_TYPE_PERSON) continue;
-#ifdef DOROTHY
-		if (CurrentVehicle->VehicleType->Type == VEH_TYPE_MECH) continue;
-#endif
-		if (CurrentVehicle->VehicleObjectData == NULL) continue;
+		if (CurrentVehicle->VehicleObjectData == nullptr) continue;
 
 		if (CurrentVehicle->RideVehicleHostIndex == PlayerVehicle->VehicleHostIndex && CurrentVehicle->RideSeatNum == VEH_HOIST_RIDE_SEAT)
 			continue;
@@ -9711,7 +9603,7 @@ static vehVehicle* mlHoistCollideRoundWithVehicles(vehVehicle* IgnoreVehicle, pi
 			return CurrentVehicle;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /************************************************************************************************
@@ -9741,7 +9633,7 @@ static LOGICAL mlCollideWithVehicle(vehVehicle* CurrentVehicle, piVECTOR const* 
 	//	weapUpdateVehicleHitmap(CurrentVehicle);
 		weapCollideWithHitmapObject(&CollisionListPtr, &NumCollisionSlotsLeft,
 									UseHitbox ? CurrentVehicle->VehicleObjectData->HitBox : CurrentVehicle->VehicleObjectData->CollideExternObject,
-									NULL, OldPos, NewPos, 1,1);
+									nullptr, OldPos, NewPos, 1,1);
 	}
 
 	return (NumCollisionSlotsLeft != 32);
@@ -9805,7 +9697,7 @@ static UINT32 _HandleVehicleAnalysisStuff(mlVehicleData* VehicleData)
 			_CurrentHitmapObjectDisplay = 0;
 			if (_CurrentLOD < ML_MAX_LODS - 1)
 			{
-				if (VehicleData->VehicleObjectData->LODObjects[_CurrentLOD+1] != NULL)
+				if (VehicleData->VehicleObjectData->LODObjects[_CurrentLOD+1] != nullptr)
 					_CurrentLOD++;
 			}
 			VisualStateChange = 1;
@@ -9892,7 +9784,7 @@ static UINT32 _HandleVehicleAnalysisStuff(mlVehicleData* VehicleData)
 		for(; Vehicle; Vehicle = Vehicle->getNext())
 		{
 			ObjectData = Vehicle->VehicleObjectData;
-			if(ObjectData == NULL)
+			if(ObjectData == nullptr)
 				continue;
 
 	//		weapUpdateVehicleHitmap(Vehicle);
@@ -9902,19 +9794,19 @@ static UINT32 _HandleVehicleAnalysisStuff(mlVehicleData* VehicleData)
 			for (i=0;i<ML_MAX_LODS;i++)
 			{
 				Object = ObjectData->LODObjects[i];
-				if (Object != NULL)
+				if (Object != nullptr)
 				{
 					while (Object->flags & OBJECT_NOTOBJECT)
 					{
 						Object = Object->child;
-						if (Object == NULL)
+						if (Object == nullptr)
 							break;
 					}
 				}
 
 				if (i == _CurrentLOD && _CurrentHitmapDisplay == 0 && _CurrentHitmapObjectDisplay == 0)
 				{
-					if (Object != NULL && Object->flag2)
+					if (Object != nullptr && Object->flag2)
 					{
 						Object->minlod = 0.0f;
 						Object->maxlod = 100000000.0f;
@@ -9922,7 +9814,7 @@ static UINT32 _HandleVehicleAnalysisStuff(mlVehicleData* VehicleData)
 				}
 				else
 				{
-					if (Object != NULL)
+					if (Object != nullptr)
 					{
 						Object->minlod = 0.0f;
 						Object->maxlod = 0.0f;
@@ -9931,19 +9823,19 @@ static UINT32 _HandleVehicleAnalysisStuff(mlVehicleData* VehicleData)
 			}
 
 			Object = ObjectData->LoadoutLODObject;
-			if (Object != NULL)
+			if (Object != nullptr)
 			{
 				while (Object->flags & OBJECT_NOTOBJECT)
 				{
 					Object = Object->child;
-					if (Object == NULL)
+					if (Object == nullptr)
 						break;
 				}
 			}
 
 			if (_CurrentLOD == 0 && _CurrentHitmapDisplay == 0 && _CurrentHitmapObjectDisplay == 0)
 			{
-				if (Object != NULL && Object->flag2)
+				if (Object != nullptr && Object->flag2)
 				{
 					Object->minlod = 0.0f;
 					Object->maxlod = 100000000.0f;
@@ -9951,7 +9843,7 @@ static UINT32 _HandleVehicleAnalysisStuff(mlVehicleData* VehicleData)
 			}
 			else
 			{
-				if (Object != NULL)
+				if (Object != nullptr)
 				{
 					Object->minlod = 0.0f;
 					Object->maxlod = 0.0f;
@@ -9962,35 +9854,35 @@ static UINT32 _HandleVehicleAnalysisStuff(mlVehicleData* VehicleData)
 			// handle hitmap visuals
 			if (_CurrentHitmapDisplay == 1 || _CurrentHitmapDisplay == 3)
 			{
-				if (ObjectData->CollideInternObject != NULL)
+				if (ObjectData->CollideInternObject != nullptr)
 					ogrpShowObjectAndSubtree(ObjectData->CollideInternObject);
 			}
 			else
 			{
-				if (ObjectData->CollideExternObject != NULL)
+				if (ObjectData->CollideExternObject != nullptr)
 					ogrpHideObjectAndSubtree(ObjectData->CollideInternObject);
 			}
 			if (_CurrentHitmapDisplay == 2 || _CurrentHitmapDisplay == 3)
 			{
-				if (ObjectData->CollideInternObject != NULL)
+				if (ObjectData->CollideInternObject != nullptr)
 					ogrpShowObjectAndSubtree(ObjectData->CollideExternObject);
 			}
 			else
 			{
-				if (ObjectData->CollideExternObject != NULL)
+				if (ObjectData->CollideExternObject != nullptr)
 					ogrpHideObjectAndSubtree(ObjectData->CollideExternObject);
 			}
 
 			if (_CurrentHitmapObjectDisplay != 0)
 			{
-				if (ObjectData->CollideInternObject != NULL)
+				if (ObjectData->CollideInternObject != nullptr)
 					ogrpShowObjectAndSubtree(ObjectData->CollideInternObject);
-				if (ObjectData->CollideInternObject != NULL)
+				if (ObjectData->CollideInternObject != nullptr)
 					ogrpShowObjectAndSubtree(ObjectData->CollideExternObject);
 			}
 
 			// setup color-coding;
-			if (ObjectData->CollideInternObject != NULL)
+			if (ObjectData->CollideInternObject != nullptr)
 			{
 				if (_CurrentHitmapDisplay == 3)
 				{
@@ -10003,7 +9895,7 @@ static UINT32 _HandleVehicleAnalysisStuff(mlVehicleData* VehicleData)
 													Vehicle, _CurrentHitmapObjectDisplay);
 				}
 			}
-			if (ObjectData->CollideExternObject != NULL)
+			if (ObjectData->CollideExternObject != nullptr)
 			{
 				_TraverseAndSetupColorCoding(ObjectData->CollideExternObject->child, 1,
 												Vehicle, _CurrentHitmapObjectDisplay);
@@ -10029,7 +9921,7 @@ UINT32 Color;
 UINT32 Red,Green,Blue,Alpha;
 UINT32 i;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -10146,17 +10038,17 @@ UINT32 i;
 
 				ObjAtt = ObjAtt->attached;
 			}
-			while (ObjAtt != NULL);
+			while (ObjAtt != nullptr);
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_TraverseAndSetupColorCoding(ObjSib->child,UseAlpha,Vehicle,CurrentHitmapObjectDisplay);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 
 
@@ -10280,17 +10172,17 @@ OBJECT * Object;
 SINT32	InfSurfaceID;
 trnCDTerrainObject*	TO;
 
-	if (VehicleData == NULL)
+	if (VehicleData == nullptr)
 	{
 		// no vehicle data is an error, we can't tell, so return false
 		return FALSE;
 	}
 
-	if (onWater == NULL)
+	if (onWater == nullptr)
 		// bad pointer is an error, we can't tell, so return false
 		return FALSE;
 
-	TO = NULL;
+	TO = nullptr;
 
 	trnGetWorldOriginOffset(&WorldOriginOffset);
 
@@ -10303,7 +10195,7 @@ trnCDTerrainObject*	TO;
 	V1.z -= 0.25f;
 
     trncdIgnoreTreeCollide(TRUE);
-    LOGICAL collided = trncdCollideWithVehiclesAndTerrain(&V1,&V2,NULL,&Object,NULL,NULL,&TO,FALSE,TRUE, FALSE);
+    LOGICAL collided = trncdCollideWithVehiclesAndTerrain(&V1,&V2,nullptr,&Object,nullptr,nullptr,&TO,FALSE,TRUE, FALSE);
     trncdIgnoreTreeCollide(FALSE);
 
     if(collided)
@@ -10321,7 +10213,7 @@ trnCDTerrainObject*	TO;
         }
         else
         {
-		    mlGetObjectBumpinessAndFriction(NULL,NULL,NULL,NULL,&RollCoefficientMult,&InfSurfaceID,Object);
+		    mlGetObjectBumpinessAndFriction(nullptr,nullptr,nullptr,nullptr,&RollCoefficientMult,&InfSurfaceID,Object);
         }
 
 		// just set this here, no reason not to
@@ -10564,7 +10456,7 @@ static UINT32 _DoEyeOperations(mlVehicleData* VehicleData)
 	// cooler stuff vehicle. following
 	if(*BuzzardFollowVehicle && BuzzardFollowDistance > 0)
 	{
-		vehVehicle* FollowVehicle = NULL;
+		vehVehicle* FollowVehicle = nullptr;
 		vehGetVehicleHead(&FollowVehicle);
 		while(FollowVehicle)
 		{
@@ -10767,7 +10659,7 @@ void mlCalcObjectRotationalInertia(OBJECT* obj, FLOAT64 mass, FLOAT64 I[3][3], F
 void _HandleContactDamage(vehVehicle* Vehicle)
 {
 	mlObjectData* ObjectData = Vehicle->VehicleObjectData;
-	if(ObjectData == NULL || Vehicle->ModelData == NULL) return;
+	if(ObjectData == nullptr || Vehicle->ModelData == nullptr) return;
 
 	mlComponentList* compList = Vehicle->ModelData->ComponentList;
 
@@ -10846,7 +10738,7 @@ void mlHitchVehicle(mlVehicleData* VehicleData)
 		}
 		else // hitch
 		{
-			mlComponent* Component = NULL;
+			mlComponent* Component = nullptr;
 			mlComponentListIterator it;
 			mlComponentListBegin(VehicleData->ComponentList, &it);
 			for(; it.comp; mlComponentListNext(&it))
@@ -10858,7 +10750,7 @@ void mlHitchVehicle(mlVehicleData* VehicleData)
 				}
 			}
 
-			if(Component == NULL) return;
+			if(Component == nullptr) return;
 
 			FLOAT64VECTOR HitchPos,AttachPos;
 			FLOAT64VECTOR DeltaVec;
@@ -10875,13 +10767,13 @@ void mlHitchVehicle(mlVehicleData* VehicleData)
 			mathAddVectors(&AttachPos,&AttachPos,&VehicleData->AdjustedForCGPos);
 
 			// first find a vehicle within range
-			TowTarget = NULL;
+			TowTarget = nullptr;
 			vehGetVehicleHead(&CurrentVehicle);
 
 			for(;CurrentVehicle; CurrentVehicle = CurrentVehicle->getNext())
 			{
 				if (CurrentVehicle == VehicleData->VehicleMasterPtr) continue;
-				if (CurrentVehicle->VehicleObjectData == NULL) continue;
+				if (CurrentVehicle->VehicleObjectData == nullptr) continue;
 				if (CurrentVehicle->Side != VehicleData->VehicleMasterPtr->Side)  continue;
 
 				mathSubVectors(&DeltaVec,&CurrentVehicle->PosData.Pos,&AttachPos);
@@ -10892,7 +10784,7 @@ void mlHitchVehicle(mlVehicleData* VehicleData)
 					Object = CurrentVehicle->VehicleObjectData->TowObject;
 
 					OkToContinue = 0;
-					if (Object != NULL)
+					if (Object != nullptr)
 					{
 						if (Object->dof->dofvarnum == ML_DOF_TOWPOINT_LIGHT &&
 							Component->TowType == ML_TOWTYPE_LIGHT)
@@ -10917,7 +10809,7 @@ void mlHitchVehicle(mlVehicleData* VehicleData)
 
 						if (OkToContinue == 0) continue;
 
-						if (CurrentVehicle->VehicleObjectData->TowObject != NULL)
+						if (CurrentVehicle->VehicleObjectData->TowObject != nullptr)
 						{
 							TempVec.x = Object->dof->dofmatrix2._41;
 							TempVec.y = Object->dof->dofmatrix2._42;

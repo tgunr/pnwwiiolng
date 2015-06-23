@@ -1,13 +1,13 @@
-$#include "systypes.h"
-$#include "wwiiHCUnits.h"
+$#include "include/systypes.h"
+$#include "wwii/wwiiHCUnits.h"
 
-$pfile "..\\lua\\include.pkg"
+$pfile "lua/include.pkg"
 
 module wwii
 {
-	$cfile "wwiiFullObjID.h"
-	$cfile "wwiiOwnershipEnums.h"
-	$cfile "mmEnums.h"
+	$hfile "wwii/wwiiFullObjID.h"
+	$cfile "wwii/wwiiOwnershipEnums.h"
+	$cfile "mm/mmEnums.h"
 	
 	enum HCUNIT_TYPE
 	{
@@ -15,15 +15,16 @@ module wwii
 		HCU_BRIGADE,
 		HCU_DIVISION,
 		MAX_HCUNIT_TYPES
-	} ;
+	};
 	
 	class HCUnit
 	{
-		void setHomeCPID(const FULL_OBJ_ID& newHomeCPID)
+	public:
+		void setHomeCPID(const FULL_OBJ_ID& newHomeCPID);
 		
 		// Accessors
-		UINT16 unitID();
-		UINT16 parentID();
+		UINT32 unitID();
+		UINT32 parentID();
 		HCUnit* parent();
 		WWII_COUNTRY country();
 		WWII_SIDE side();
@@ -52,9 +53,8 @@ module wwii
 		bool isParatroopUnit();
 		bool isOwner(const ChatHandle& candidate);
 		
-		static HCUnit* Lookup(UINT16 unitID);
 		static HCUnit* Lookup(UINT32 unitID);
-		static HCUnit* Lookup(const ChatHandle& handle)
+		static HCUnit* Lookup(const ChatHandle& handle);
 		static HCUnit* Lookup(const char* callsign);
 	};
 }

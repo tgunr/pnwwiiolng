@@ -34,17 +34,7 @@
 #include "ogl/GLCounter.h"
 #include "sdm/StratDB.h"
 
-#if !defined(USE_OSG)
 #include "spt/sptmain.h"
-#endif
-
-#if defined(USE_OSG)
-#include "osgStats/statsMain.h"
-#endif
-
-#ifdef DOROTHY
-#include "gr2/gr2Main.h"
-#endif
 
 #define _UPDATE_METER_TIME 15000
 #define HOST_UPDATE_INTERVAL 200
@@ -104,11 +94,6 @@ UINT32 persHUDToggleHUD(SINT32 param, UINT32 functionNum, UINT32 alwaysZero)
 	// alert the ui layer
 	uiRunScript("game.oncyclehud()");
 
-#ifdef DOROTHY
-	// let gr2 vehicles know when the HUD gets toggled
-	gr2ProcessControlInputs(param, functionNum, alwaysZero);
-#endif
-
 	return 0;
 }
 
@@ -144,10 +129,6 @@ unsigned int persHUDToggleReadout(int param, unsigned int functionCode, unsigned
 
 	TUT_MGR->DoEvent(TUT_EVENT_INPUT, &functionCode, &param);
 
-#if defined(USE_OSG)
-	statsToggle(); // this may not work with the new readout setup
-#else
-
 	// invert the global
 	_showreadout = ! _showreadout;
 
@@ -156,8 +137,6 @@ unsigned int persHUDToggleReadout(int param, unsigned int functionCode, unsigned
 
 	// alert the ui layer
 	uiRunScript("game.oncyclereadout()");
-
-#endif
 
 	return 0;
 }
@@ -192,14 +171,10 @@ void persHUDShowHUD()
 {
 	if(!_hud)
 	{
-#ifdef DOROTHY
-		_hud = uiLoadView("dorothy/hud");
-#else
 		if(SCEN_MGR->IsActive())
 			_hud = uiLoadView("scenarios/hud");
 		else
 			_hud = uiLoadView("hud");
-#endif
 	}
 
 	if(_hud && !_hud->IsVisible())
@@ -207,58 +182,6 @@ void persHUDShowHUD()
 
 	uiGC();
 }
-
-/************************************************************************************************
-	persHUDShowGameInfo
-*************************************************************************************************/
-/*
-void persHUDShowGameInfo()
-{
-#if defined(USE_OSG)
-#else
-	if(!_gameinfo)
-	{
-		_gameinfo = uiLoadView("gameinfo");
-
-		// let the ui determine the min width/height
-		_gameinfo->SetMinSize(_gameinfo->Width(), _gameinfo->Height());
-	}
-	else
-	{
-		_gameinfo->Show();
-	}
-
-	bShowInfo = TRUE;
-	uiGC();
-#endif
-}
-*/
-
-/************************************************************************************************
-	persHUDShowReadout
-*************************************************************************************************/
-/*
-void persHUDShowReadout()
-{
-#if defined(USE_OSG)
-#else
-	if(!_readout)
-	{
-		_readout = uiLoadView("readout");
-
-		// let the ui determine the min width/height
-		_readout->SetMinSize(_readout->Width(), _readout->Height());
-	}
-	else
-	{
-		_readout->Show();
-	}
-
-	_showreadout = TRUE;
-	uiGC();
-#endif
-}
-*/
 
 /************************************************************************************************
 	persHUDHideHUD
@@ -273,78 +196,22 @@ void persHUDHideHUD(bool close)
 		if(close || fioQuery() == ISDIRECTORY)
 		{
 			_hud->Close();
-			_hud = NULL;
+			_hud = nullptr;
 		}
 	}
 	uiGC();
 }
 
 /************************************************************************************************
-	persHUDSyncToCycleSetting
-*************************************************************************************************/
-/*
-void persHUDSyncToCycleSetting()
-{
-	if(HUDVisible != HUD_CYCLE_OFF)
-		persHUDShowHUD();
-	else
-		persHUDHideHUD();
-	uiGC();
-}
-*/
-
-/************************************************************************************************
-	persHUDHideReadout
-*************************************************************************************************/
-/*
-void persHUDHideReadout(bool close)
-{
-	if(!_readout) return;
-
-	_readout->Hide();
-	if(close || fioQuery() == ISDIRECTORY)
-	{
-		_readout->Close();
-		_readout = NULL;
-	}
-
-	if(!close)
-		_showreadout = FALSE;
-	uiGC();
-}
-*/
-
-/************************************************************************************************
-	persHUDHideGameInfo
-*************************************************************************************************/
-/*
-void persHUDHideGameInfo(bool close)
-{
-	if(!_gameinfo) return;
-
-	_gameinfo->Hide();
-	if(close || fioQuery() == ISDIRECTORY)
-	{
-		_gameinfo->Close();
-		_gameinfo = NULL;
-	}
-
-	if(!close)
-		bShowInfo = FALSE;
-	uiGC();
-}
-*/
-
-/************************************************************************************************
 	persHudReceivedUpdate
 *************************************************************************************************/
 
-LOGICAL persHudReceivedUpdate(void)
+void persHudReceivedUpdate(void)
 {
 	SINT32 i;
 	static SINT32 _LastUpdateTime;
 
-	if (frametime == _LastUpdateTime) return TRUE;
+	if (frametime == _LastUpdateTime) return;
 
 	if(abs(frametime - _LastUpdateTime) < HOST_UPDATE_INTERVAL)
 	{
@@ -355,8 +222,6 @@ LOGICAL persHudReceivedUpdate(void)
 	}
 
 	_LastUpdateTime = frametime;
-
-	return 0;
 }
 
 /************************************************************************************************
@@ -554,7 +419,7 @@ void GameInfoView::DrawSelf()
 	DisplayInfo
 *************************************************************************************************/
 #if platOS == OS_WIN32 && (!defined(RELEASE_CLIENT) || RELEASE_CLIENT == 0)
-	extern std::vector<std::wstring> updtGetNvHistory() ;
+	extern std::vector<std::wstring> updtGetNvHistory();
 #endif
 
 void GameInfoView::DisplayInfo()
@@ -562,8 +427,6 @@ void GameInfoView::DisplayInfo()
 	phui::GraphicsContext* ctx = GetGraphicsContext();
 	ctx->SetColor(0xdb/255.0f,0xc5/255.0f,0x00/255.0f);
 
-#if defined(USE_OSG)
-#else
 	UINT32 TOD,Hour,Min;
 	trnTODGetTimeOfDay(&TOD);
 	Hour = trnTODGetHourFromTimeOfDay(TOD);
@@ -572,7 +435,6 @@ void GameInfoView::DisplayInfo()
 	DrawString(L"%ls: %.0f rev %u\n", strings["hud.gameinfo.fps"].c_str(), gFPS, WWII::svnRevisionNo);
 #else
 	DrawString(L"%ls: %.0f\n", strings["hud.gameinfo.fps"].c_str(), gFPS);
-#endif
 	DrawString(L"%ls: %02d:%02d\n", strings["hud.gameinfo.time"].c_str(), Hour, Min);
 
 	if(persIsPersonaVehicleType(VEH_TYPE_FLOATER))
@@ -584,11 +446,11 @@ void GameInfoView::DisplayInfo()
 	DrawString(L"%ls: %ls\n", strings["hud.gameinfo.icon"].c_str(), strings[modeKey].c_str());
 
 #if defined(BETA_RELEASE)
-	DrawString(L"%ls\n", clientGetNetworkState().c_str()) ;
+	DrawString(L"%ls\n", clientGetNetworkState().c_str());
 #endif
 
 #ifdef VEHICLES_GAME_INFO
-	DrawString("%s\n", vehVehiclesGameInfo().c_str()) ;
+	DrawString("%s\n", vehVehiclesGameInfo().c_str());
 #endif
 
 #if RELEASE_CLIENT == 0
@@ -607,10 +469,8 @@ void GameInfoView::DisplayInfo()
     DrawString("DRAW CALLS: %.0f\n", GLCounter::instance().getRecentTotal());
 
 	static char txt[150];
-#if !defined(USE_OSG)
     sptGetStats(txt);
     DrawString("%s\n", txt);
-#endif
     speedgrassGetStats(txt);
     DrawString("%s\n", txt);
 #endif
@@ -618,9 +478,9 @@ void GameInfoView::DisplayInfo()
 
 #if platOS == OS_WIN32 && (!defined(RELEASE_CLIENT) || RELEASE_CLIENT == 0)
 	std::vector<std::wstring> nvHistory = updtGetNvHistory();
-	for ( auto it = nvHistory.begin() ; it != nvHistory.end() ; ++it )
+	for ( auto it = nvHistory.begin(); it != nvHistory.end(); ++it )
 	{
-		DrawString(L"%ls\n", it->c_str()) ;
+		DrawString(L"%ls\n", it->c_str());
 	}
 #endif
 }
@@ -699,8 +559,8 @@ void PersHUDManager::Update()
 	// used to adjust offscreen waypoints so they don't pile up on each other
 	SINT32 left = 0;
 	SINT32 right = 0;
-	phui::View* child = NULL;
-	phui::CSSViewDrawer* drawer = NULL;
+	phui::View* child = nullptr;
+	phui::CSSViewDrawer* drawer = nullptr;
 
 	while(it != objects.end())
 	{
@@ -886,13 +746,13 @@ FLOAT32 PersHUDManager::HUDDeath::GetPlacement(FLOAT64VECTOR& p)
 }
 
 PersHUDManager::HUDWaypoint::HUDWaypoint(FLOAT32 o) :
-	HUDObject(WAYPOINT), ui(NULL), file(NULL), voffset(o), minDistance(0.0f), useTail(true)
+	HUDObject(WAYPOINT), ui(nullptr), file(nullptr), voffset(o), minDistance(0.0f), useTail(true)
 {
 	pos.x = pos.y = pos.z = 0.0f;
 }
 
 PersHUDManager::HUDWaypoint::HUDWaypoint(const Waypoint& w, const char* f, FLOAT32 o) :
-	HUDObject(WAYPOINT), ui(NULL), file(f), voffset(o), minDistance(0.0f), useTail(true)
+	HUDObject(WAYPOINT), ui(nullptr), file(f), voffset(o), minDistance(0.0f), useTail(true)
 {
 	pos.x = (FLOAT64)w.x();
 	pos.y = (FLOAT64)w.y();
@@ -900,7 +760,7 @@ PersHUDManager::HUDWaypoint::HUDWaypoint(const Waypoint& w, const char* f, FLOAT
 }
 
 PersHUDManager::HUDWaypoint::HUDWaypoint(FLOAT64VECTOR& p, const char* f, FLOAT32 o) :
-	HUDObject(WAYPOINT), ui(NULL), file(f), voffset(o), minDistance(0.0f), useTail(true)
+	HUDObject(WAYPOINT), ui(nullptr), file(f), voffset(o), minDistance(0.0f), useTail(true)
 {
 	pos.x = p.x;
 	pos.y = p.y;
@@ -908,7 +768,7 @@ PersHUDManager::HUDWaypoint::HUDWaypoint(FLOAT64VECTOR& p, const char* f, FLOAT3
 }
 
 PersHUDManager::HUDWaypoint::HUDWaypoint(const StratDB::StratObject* strat, const char* f, FLOAT32 o, bool centerOnChildren) :
-	HUDObject(WAYPOINT), ui(NULL), file(f), voffset(o), minDistance(0.0f), useTail(true)
+	HUDObject(WAYPOINT), ui(nullptr), file(f), voffset(o), minDistance(0.0f), useTail(true)
 {
 	if(strat)
 	{
@@ -958,7 +818,7 @@ PersHUDManager::HUDWaypoint::HUDWaypoint(const StratDB::StratObject* strat, cons
 }
 
 PersHUDManager::HUDWaypoint::HUDWaypoint(const ServerTrackedObject* sto, const char* f, FLOAT32 o) :
-	HUDObject(WAYPOINT), ui(NULL), file(f), voffset(o), minDistance(0.0f), useTail(true)
+	HUDObject(WAYPOINT), ui(nullptr), file(f), voffset(o), minDistance(0.0f), useTail(true)
 {
 	if(sto)
 	{
@@ -975,7 +835,7 @@ PersHUDManager::HUDWaypoint::~HUDWaypoint()
 	if(ui)
 		ui->Close();
 
-	ui = NULL;
+	ui = nullptr;
 }
 
 bool PersHUDManager::HUDWaypoint::CreateUI(const char* file)
@@ -986,7 +846,7 @@ bool PersHUDManager::HUDWaypoint::CreateUI(const char* file)
 	if(ui)
 		ui->Close();
 
-	ui = NULL;
+	ui = nullptr;
 
 	std::string path = "widgets/hud/";
 	path += file;

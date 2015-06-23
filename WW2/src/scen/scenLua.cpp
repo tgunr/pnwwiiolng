@@ -1,7 +1,7 @@
 #include <syscfg.h> // Path is project specific.
 /*
 ** Lua binding: scen
-** Generated automatically by tolua++-1.0.92 on 09/03/11 11:16:30.
+** Generated automatically by tolua++-1.0.92 on 01/04/14 22:00:09.
 */
 
 #ifndef __cplusplus
@@ -14,7 +14,7 @@
 /* Exported function */
 TOLUA_API int  tolua_scen_open (lua_State* tolua_S);
 
-#include "ScenarioManager.h"
+#include "scen/ScenarioManager.h"
 
 /* function to release collected object via destructor */
 #ifdef __cplusplus
@@ -80,7 +80,7 @@ static int tolua_scen_scenario_ScenarioManager_new00_local(lua_State* tolua_S)
  {
   {
    ScenarioManager* tolua_ret = (ScenarioManager*)  new ScenarioManager();
-   tolua_pushusertype_and_takeownership(tolua_S,(void*)tolua_ret,"ScenarioManager");
+   tolua_pushusertype_and_takeownership(tolua_S,(void *)tolua_ret,"ScenarioManager");
   }
  }
  return 1;
@@ -383,6 +383,40 @@ static int tolua_scen_scenario_ScenarioManager_GetPlayerCount00(lua_State* tolua
 #ifndef TOLUA_RELEASE
  tolua_lerror:
  tolua_error(tolua_S,"#ferror in function 'GetPlayerCount'.",&tolua_err);
+ return 0;
+#endif
+}
+#endif //#ifndef TOLUA_DISABLE
+
+/* method: GetReadyCount of class  ScenarioManager */
+#ifndef TOLUA_DISABLE_tolua_scen_scenario_ScenarioManager_GetReadyCount00
+static int tolua_scen_scenario_ScenarioManager_GetReadyCount00(lua_State* tolua_S)
+{
+#ifndef TOLUA_RELEASE
+ tolua_Error tolua_err;
+ if (
+     !tolua_isusertype(tolua_S,1,"ScenarioManager",0,&tolua_err) ||
+     !tolua_isnumber(tolua_S,2,1,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,3,&tolua_err)
+ )
+  goto tolua_lerror;
+ else
+#endif
+ {
+  ScenarioManager* self = (ScenarioManager*)  tolua_tousertype(tolua_S,1,0);
+  int team = ((int)  tolua_tonumber(tolua_S,2,0));
+#ifndef TOLUA_RELEASE
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'GetReadyCount'",NULL);
+#endif
+  {
+   int tolua_ret = (int)  self->GetReadyCount(team);
+   tolua_pushnumber(tolua_S,(lua_Number)tolua_ret);
+  }
+ }
+ return 1;
+#ifndef TOLUA_RELEASE
+ tolua_lerror:
+ tolua_error(tolua_S,"#ferror in function 'GetReadyCount'.",&tolua_err);
  return 0;
 #endif
 }
@@ -1007,6 +1041,7 @@ TOLUA_API int tolua_scen_open (lua_State* tolua_S)
     tolua_function(tolua_S,"SetFlag",tolua_scen_scenario_ScenarioManager_SetFlag00);
     tolua_function(tolua_S,"HasFlag",tolua_scen_scenario_ScenarioManager_HasFlag00);
     tolua_function(tolua_S,"GetPlayerCount",tolua_scen_scenario_ScenarioManager_GetPlayerCount00);
+    tolua_function(tolua_S,"GetReadyCount",tolua_scen_scenario_ScenarioManager_GetReadyCount00);
     tolua_function(tolua_S,"GetRound",tolua_scen_scenario_ScenarioManager_GetRound00);
     tolua_function(tolua_S,"GetStage",tolua_scen_scenario_ScenarioManager_GetStage00);
     tolua_function(tolua_S,"SetRound",tolua_scen_scenario_ScenarioManager_SetRound00);

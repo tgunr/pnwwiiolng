@@ -1,7 +1,7 @@
 #include <syscfg.h> // Path is project specific.
 /*
 ** Lua binding: veh
-** Generated automatically by tolua++-1.0.92 on 09/03/11 11:16:31.
+** Generated automatically by tolua++-1.0.92 on 01/04/14 22:00:09.
 */
 
 #ifndef __cplusplus
@@ -39,7 +39,7 @@ static void tolua_reg_types (lua_State* tolua_S)
  tolua_usertype(tolua_S,"vehVehicle");
 }
 
-/* get function: VehicleHostIndex of class  vehVehicle*/
+/* get function: VehicleHostIndex of class  vehVehicle */
 #ifndef TOLUA_DISABLE_tolua_get_vehVehicle_unsigned_VehicleHostIndex
 static int tolua_get_vehVehicle_unsigned_VehicleHostIndex(lua_State* tolua_S)
 {
@@ -52,7 +52,7 @@ static int tolua_get_vehVehicle_unsigned_VehicleHostIndex(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: SetPosition of class  vehVehicle*/
+/* method: SetPosition of class  vehVehicle */
 #ifndef TOLUA_DISABLE_tolua_veh_vehicle_vehVehicle_SetPosition00
 static int tolua_veh_vehicle_vehVehicle_SetPosition00(lua_State* tolua_S)
 {
@@ -89,7 +89,7 @@ static int tolua_veh_vehicle_vehVehicle_SetPosition00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: SetYaw of class  vehVehicle*/
+/* method: SetYaw of class  vehVehicle */
 #ifndef TOLUA_DISABLE_tolua_veh_vehicle_vehVehicle_SetYaw00
 static int tolua_veh_vehicle_vehVehicle_SetYaw00(lua_State* tolua_S)
 {
@@ -122,7 +122,7 @@ static int tolua_veh_vehicle_vehVehicle_SetYaw00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetType of class  vehVehicle*/
+/* method: GetType of class  vehVehicle */
 #ifndef TOLUA_DISABLE_tolua_veh_vehicle_vehVehicle_GetType00
 static int tolua_veh_vehicle_vehVehicle_GetType00(lua_State* tolua_S)
 {
@@ -154,7 +154,7 @@ static int tolua_veh_vehicle_vehVehicle_GetType00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetHandle of class  vehVehicle*/
+/* method: GetHandle of class  vehVehicle */
 #ifndef TOLUA_DISABLE_tolua_veh_vehicle_vehVehicle_GetHandle00
 static int tolua_veh_vehicle_vehVehicle_GetHandle00(lua_State* tolua_S)
 {
@@ -186,7 +186,7 @@ static int tolua_veh_vehicle_vehVehicle_GetHandle00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetChatHandle of class  vehVehicle*/
+/* method: GetChatHandle of class  vehVehicle */
 #ifndef TOLUA_DISABLE_tolua_veh_vehicle_vehVehicle_GetChatHandle00
 static int tolua_veh_vehicle_vehVehicle_GetChatHandle00(lua_State* tolua_S)
 {
@@ -218,7 +218,7 @@ static int tolua_veh_vehicle_vehVehicle_GetChatHandle00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetRank of class  vehVehicle*/
+/* method: GetRank of class  vehVehicle */
 #ifndef TOLUA_DISABLE_tolua_veh_vehicle_vehVehicle_GetRank00
 static int tolua_veh_vehicle_vehVehicle_GetRank00(lua_State* tolua_S)
 {
@@ -250,7 +250,7 @@ static int tolua_veh_vehicle_vehVehicle_GetRank00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetSide of class  vehVehicle*/
+/* method: GetSide of class  vehVehicle */
 #ifndef TOLUA_DISABLE_tolua_veh_vehicle_vehVehicle_GetSide00
 static int tolua_veh_vehicle_vehVehicle_GetSide00(lua_State* tolua_S)
 {
@@ -282,7 +282,7 @@ static int tolua_veh_vehicle_vehVehicle_GetSide00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetCountry of class  vehVehicle*/
+/* method: GetCountry of class  vehVehicle */
 #ifndef TOLUA_DISABLE_tolua_veh_vehicle_vehVehicle_GetCountry00
 static int tolua_veh_vehicle_vehVehicle_GetCountry00(lua_State* tolua_S)
 {
@@ -314,7 +314,7 @@ static int tolua_veh_vehicle_vehVehicle_GetCountry00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetDecal of class  vehVehicle*/
+/* method: GetDecal of class  vehVehicle */
 #ifndef TOLUA_DISABLE_tolua_veh_vehicle_vehVehicle_GetDecal00
 static int tolua_veh_vehicle_vehVehicle_GetDecal00(lua_State* tolua_S)
 {
@@ -346,7 +346,7 @@ static int tolua_veh_vehicle_vehVehicle_GetDecal00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: DistanceTo of class  vehVehicle*/
+/* method: DistanceTo of class  vehVehicle */
 #ifndef TOLUA_DISABLE_tolua_veh_vehicle_vehVehicle_DistanceTo00
 static int tolua_veh_vehicle_vehVehicle_DistanceTo00(lua_State* tolua_S)
 {
@@ -384,7 +384,7 @@ static int tolua_veh_vehicle_vehVehicle_DistanceTo00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetYaw of class  vehVehicle*/
+/* method: GetYaw of class  vehVehicle */
 #ifndef TOLUA_DISABLE_tolua_veh_vehicle_vehVehicle_GetYaw00
 static int tolua_veh_vehicle_vehVehicle_GetYaw00(lua_State* tolua_S)
 {
@@ -416,7 +416,7 @@ static int tolua_veh_vehicle_vehVehicle_GetYaw00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetPos of class  vehVehicle*/
+/* method: GetPos of class  vehVehicle */
 #ifndef TOLUA_DISABLE_tolua_veh_vehicle_vehVehicle_GetPos00
 static int tolua_veh_vehicle_vehVehicle_GetPos00(lua_State* tolua_S)
 {
@@ -450,7 +450,7 @@ static int tolua_veh_vehicle_vehVehicle_GetPos00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetTraverse of class  vehVehicle*/
+/* method: GetTraverse of class  vehVehicle */
 #ifndef TOLUA_DISABLE_tolua_veh_vehicle_vehVehicle_GetTraverse00
 static int tolua_veh_vehicle_vehVehicle_GetTraverse00(lua_State* tolua_S)
 {
@@ -486,7 +486,7 @@ static int tolua_veh_vehicle_vehVehicle_GetTraverse00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: GetElevation of class  vehVehicle*/
+/* method: GetElevation of class  vehVehicle */
 #ifndef TOLUA_DISABLE_tolua_veh_vehicle_vehVehicle_GetElevation00
 static int tolua_veh_vehicle_vehVehicle_GetElevation00(lua_State* tolua_S)
 {
@@ -522,7 +522,7 @@ static int tolua_veh_vehicle_vehVehicle_GetElevation00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: IsMyMissLeader of class  vehVehicle*/
+/* method: IsMyMissLeader of class  vehVehicle */
 #ifndef TOLUA_DISABLE_tolua_veh_vehicle_vehVehicle_IsMyMissLeader00
 static int tolua_veh_vehicle_vehVehicle_IsMyMissLeader00(lua_State* tolua_S)
 {
@@ -554,7 +554,7 @@ static int tolua_veh_vehicle_vehVehicle_IsMyMissLeader00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: IsMissLeader of class  vehVehicle*/
+/* method: IsMissLeader of class  vehVehicle */
 #ifndef TOLUA_DISABLE_tolua_veh_vehicle_vehVehicle_IsMissLeader00
 static int tolua_veh_vehicle_vehVehicle_IsMissLeader00(lua_State* tolua_S)
 {
@@ -586,7 +586,7 @@ static int tolua_veh_vehicle_vehVehicle_IsMissLeader00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: IsMissMate of class  vehVehicle*/
+/* method: IsMissMate of class  vehVehicle */
 #ifndef TOLUA_DISABLE_tolua_veh_vehicle_vehVehicle_IsMissMate00
 static int tolua_veh_vehicle_vehVehicle_IsMissMate00(lua_State* tolua_S)
 {
@@ -618,7 +618,7 @@ static int tolua_veh_vehicle_vehVehicle_IsMissMate00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: IsSquadMate of class  vehVehicle*/
+/* method: IsSquadMate of class  vehVehicle */
 #ifndef TOLUA_DISABLE_tolua_veh_vehicle_vehVehicle_IsSquadMate00
 static int tolua_veh_vehicle_vehVehicle_IsSquadMate00(lua_State* tolua_S)
 {
@@ -650,7 +650,7 @@ static int tolua_veh_vehicle_vehVehicle_IsSquadMate00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: IsBrigMate of class  vehVehicle*/
+/* method: IsBrigMate of class  vehVehicle */
 #ifndef TOLUA_DISABLE_tolua_veh_vehicle_vehVehicle_IsBrigMate00
 static int tolua_veh_vehicle_vehVehicle_IsBrigMate00(lua_State* tolua_S)
 {
@@ -682,7 +682,7 @@ static int tolua_veh_vehicle_vehVehicle_IsBrigMate00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: IsBldr of class  vehVehicle*/
+/* method: IsBldr of class  vehVehicle */
 #ifndef TOLUA_DISABLE_tolua_veh_vehicle_vehVehicle_IsBldr00
 static int tolua_veh_vehicle_vehVehicle_IsBldr00(lua_State* tolua_S)
 {
@@ -714,7 +714,7 @@ static int tolua_veh_vehicle_vehVehicle_IsBldr00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: IsTrnr of class  vehVehicle*/
+/* method: IsTrnr of class  vehVehicle */
 #ifndef TOLUA_DISABLE_tolua_veh_vehicle_vehVehicle_IsTrnr00
 static int tolua_veh_vehicle_vehVehicle_IsTrnr00(lua_State* tolua_S)
 {
@@ -746,7 +746,7 @@ static int tolua_veh_vehicle_vehVehicle_IsTrnr00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: IsHC of class  vehVehicle*/
+/* method: IsHC of class  vehVehicle */
 #ifndef TOLUA_DISABLE_tolua_veh_vehicle_vehVehicle_IsHC00
 static int tolua_veh_vehicle_vehVehicle_IsHC00(lua_State* tolua_S)
 {
@@ -778,7 +778,7 @@ static int tolua_veh_vehicle_vehVehicle_IsHC00(lua_State* tolua_S)
 }
 #endif //#ifndef TOLUA_DISABLE
 
-/* method: IsMe of class  vehVehicle*/
+/* method: IsMe of class  vehVehicle */
 #ifndef TOLUA_DISABLE_tolua_veh_vehicle_vehVehicle_IsMe00
 static int tolua_veh_vehicle_vehVehicle_IsMe00(lua_State* tolua_S)
 {
@@ -1321,22 +1321,16 @@ static int tolua_veh_vehicle_weapCreateSpec00(lua_State* tolua_S)
 #ifndef TOLUA_RELEASE
  tolua_Error tolua_err;
  if (
-     !tolua_isnumber(tolua_S,1,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,2,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,3,0,&tolua_err) ||
-     !tolua_isnumber(tolua_S,4,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,5,&tolua_err)
+     !tolua_isstring(tolua_S,1,0,&tolua_err) ||
+     !tolua_isnoobj(tolua_S,2,&tolua_err)
  )
   goto tolua_lerror;
  else
 #endif
  {
-  int country = ((int)  tolua_tonumber(tolua_S,1,0));
-  int category = ((int)  tolua_tonumber(tolua_S,2,0));
-  int klass = ((int)  tolua_tonumber(tolua_S,3,0));
-  int type = ((int)  tolua_tonumber(tolua_S,4,0));
+  const char* weapString = ((const char*)  tolua_tostring(tolua_S,1,0));
   {
-   WEAPON_SPEC tolua_ret = (WEAPON_SPEC)  weapCreateSpec(country,category,klass,type);
+   WEAPON_SPEC tolua_ret = (WEAPON_SPEC)  weapCreateSpec(weapString);
    {
 #ifdef __cplusplus
     void* tolua_obj = new WEAPON_SPEC(tolua_ret);
@@ -1354,38 +1348,6 @@ static int tolua_veh_vehicle_weapCreateSpec00(lua_State* tolua_S)
  tolua_error(tolua_S,"#ferror in function 'weapCreateSpec'.",&tolua_err);
  return 0;
 #endif
-}
-#endif //#ifndef TOLUA_DISABLE
-
-/* function: weapCreateSpec */
-#ifndef TOLUA_DISABLE_tolua_veh_vehicle_weapCreateSpec01
-static int tolua_veh_vehicle_weapCreateSpec01(lua_State* tolua_S)
-{
- tolua_Error tolua_err;
- if (
-     !tolua_isstring(tolua_S,1,0,&tolua_err) ||
-     !tolua_isnoobj(tolua_S,2,&tolua_err)
- )
-  goto tolua_lerror;
- else
- {
-  const char* weapString = ((const char*)  tolua_tostring(tolua_S,1,0));
-  {
-   WEAPON_SPEC tolua_ret = (WEAPON_SPEC)  weapCreateSpec(weapString);
-   {
-#ifdef __cplusplus
-    void* tolua_obj = new WEAPON_SPEC(tolua_ret);
-    tolua_pushusertype_and_takeownership(tolua_S,tolua_obj,"WEAPON_SPEC");
-#else
-    void* tolua_obj = tolua_copy(tolua_S,(void*)&tolua_ret,sizeof(WEAPON_SPEC));
-    tolua_pushusertype_and_takeownership(tolua_S,tolua_obj,"WEAPON_SPEC");
-#endif
-   }
-  }
- }
- return 1;
-tolua_lerror:
- return tolua_veh_vehicle_weapCreateSpec00(tolua_S);
 }
 #endif //#ifndef TOLUA_DISABLE
 
@@ -1465,7 +1427,6 @@ TOLUA_API int tolua_veh_open (lua_State* tolua_S)
     tolua_function(tolua_S,"side",tolua_veh_vehicle_WEAPON_SPEC_side00);
    tolua_endmodule(tolua_S);
    tolua_function(tolua_S,"weapCreateSpec",tolua_veh_vehicle_weapCreateSpec00);
-   tolua_function(tolua_S,"weapCreateSpec",tolua_veh_vehicle_weapCreateSpec01);
   tolua_endmodule(tolua_S);
  tolua_endmodule(tolua_S);
  return 1;

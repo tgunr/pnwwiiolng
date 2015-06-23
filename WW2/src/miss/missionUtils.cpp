@@ -38,21 +38,21 @@ FULL_OBJ_ID fudgeFullObj(FULL_ID fullID)
 
 FULL_OBJ_ID* populateFullObjID(FULL_OBJ_ID* foid, SINT32 sx, SINT32 sy, REL_OBJ_ID roid)
 {
-	if ( foid == NULL )
+	if ( foid == nullptr )
 	{
 #ifdef DEBUG
-		dbugLog(_FLW, "called %s with NULL foid", __FUNCTION__) ;
+		dbugLog(_FLW, "called %s with null foid", __FUNCTION__);
 #endif
-		return NULL ;
+		return nullptr;
 	}
 
-	foid->cell.ox = sx << 4 ;
-	foid->cell.oy = sy << 4 ;
-	foid->id = roid.id ;
-	foid->objClass = roid.objClass ;
-	foid->objType = roid.objType ;
+	foid->cell.ox = sx << 4;
+	foid->cell.oy = sy << 4;
+	foid->id = roid.id;
+	foid->objClass = roid.objClass;
+	foid->objType = roid.objType;
 
-	return foid ;
+	return foid;
 }
 
 void printMissionSummary(MISSION_SUMMARY* summary)

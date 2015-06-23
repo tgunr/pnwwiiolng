@@ -38,7 +38,7 @@ void _killSound(void* data)
 {
     SINT32* handle = (SINT32*)data;
 
-    if(handle == NULL)
+    if(handle == nullptr)
         return;
 
     *handle = 0;
@@ -202,7 +202,7 @@ bool TerrainSTO::activate()
 #ifdef BETA_RELEASE
 	if(0)
 	{
-		char buf[150] ;
+		char buf[150];
 		sprintf(buf, "[activate] Terrain model: %s id:%d", model(), (int)uid());
 		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_BETA, LSTR_GENERIC, UTF16(buf));
 	}
@@ -282,7 +282,7 @@ bool TerrainSTO::load()
         if(!activeTerrainDetail[i])
             continue;
 
-        if(trndtl[i].terrain == NULL)
+        if(trndtl[i].terrain == nullptr)
             continue;
 
         if(trndtl[i].scx == sx && trndtl[i].scy == sy)
@@ -335,7 +335,7 @@ bool TerrainSTO::load()
 	    if(!trnopOrientSubobjects(_to, &posxyz, true))
 	    {
 		    obpoolFreeObjectCallback(_to);
-		    _to = NULL
+		    _to = nullptr
 	    }
 
         posxyz.x -= (float)WorldOriginOffset.x;
@@ -346,7 +346,7 @@ bool TerrainSTO::load()
 	preProcess();
 
 	// add a TO object
-	trncdAddTerrainObject(_to, 0, 0, 0, NULL);
+	trncdAddTerrainObject(_to, 0, 0, 0, nullptr);
 
 	postProcess();
 
@@ -365,7 +365,7 @@ bool TerrainSTO::load()
 #ifdef BETA_RELEASE
 	if(0)
 	{
-		char buf[150] ;
+		char buf[150];
 		sprintf(buf, "Added MSP terrain object %s at %.2f,%.2f,%.2f", _to->name, _to->mat._41, _to->mat._42, _to->mat._43);
 		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_BETA, LSTR_GENERIC, UTF16(buf));
 	}
@@ -381,7 +381,7 @@ bool TerrainSTO::load()
         {
             static struct FindTree ft;
 
-            ft.tree = NULL;
+            ft.tree = nullptr;
             ft.Find(_to->child);
 
             if(ft.tree)
@@ -403,7 +403,7 @@ void TerrainSTO::deactivate()
 #ifdef BETA_RELEASE
 	if(0)
 	{
-		char buf[150] ;
+		char buf[150];
 		sprintf(buf, "[deactivate] Terrain model: %s id:%d", model(), (int)uid());
 		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_BETA, LSTR_GENERIC, UTF16(buf));
 	}
@@ -412,9 +412,9 @@ void TerrainSTO::deactivate()
 	// kill terrain object
 	if(_to)
 	{
-		trncdRemoveTerrainObject(_to, 0, 0, 0, NULL);
+		trncdRemoveTerrainObject(_to, 0, 0, 0, nullptr);
 		obpoolFreeObjectCallback(_to);
-		_to = NULL;
+		_to = nullptr;
 	}
 
 	ServerTrackedObject::deactivate();

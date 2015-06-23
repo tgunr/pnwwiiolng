@@ -19,32 +19,53 @@ extern ConfigAddr cv_dbsePrimaryAddress;
 extern ConfigUint cv_dbseConnectionTimeout_ms;
 
 static SINT32 hostIndex = 0;
-static CONNECTION_STATUS connected = CONNECT_NONE;
-static LOGICAL _handshakeSent;
+static Dbse::ConnectionStatus connected = Dbse::ConnectionStatus::None;
+static bool _handshakeSent;
 static bool _dbseError = true;
 
 static SINT32 dbseOpenConnection();
 
-extern void dbseSetConnectionStatus(CONNECTION_STATUS status)
+SINT32 dbseRecvHandshake(ACTION_OBJECT* a, Dbse::Handshake& handshake)
 {
-	connected = status;
+	connected = handshake.m_status;
+	switch (connected)
+	{
+	case Dbse::ConnectionStatus::Bad:
+		dbugLog(_FLA, "dbse host version mismatch, rejected version %u", handshake.m_version);
+		break;
+
+	case Dbse::ConnectionStatus::Refuse:
+		dbugLog(_FLA, "dbse host arena mismatch, rejected arena request for arena %u", handshake.m_arenaID);
+		break;
+
+	case Dbse::ConnectionStatus::Accept:
+		dbugLog(_FLI, "db connection accepted");
+		break;
+
+	default:
+		LogAbort("ERROR: Unable to determine db connection status\n Abort!\n");
+	}
+
+	return a->offset;
 }
 
 SINT32
 dbseSend(TEUL_CALLBACK* action, void*object)
 {
-	if (connected == CONNECT_DROPPED)
-		dbseInit();
+	if (connected == Dbse::ConnectionStatus::Dropped)
+	{
+		if (!dbseInit())
+			return -EINVAL;
+	}
 
-	if (connected == CONNECT_ACCEPT)
+	if (connected == Dbse::ConnectionStatus::Accept)
 		return teulSend(hostIndex,action,object);
-	else return 0;
+	return 0;
 }
 
-SINT32
-dbseInit( )
+bool
+dbseInit()
 {
-	SINT32 returnVal = -1;
 	static bool initialized = false;
 	if (initialized == false)
 	{
@@ -55,39 +76,37 @@ dbseInit( )
 		dbseInstallClientCallbacks();
 	}
 
-//	connected = CONNECT_NONE;
+//	connected = ConnectionStatus::None;
 	hostIndex = dbseOpenConnection();
 	for ( ; ; )
 	{
 		teulUpdateTransport(30);
 		switch (connected)
 		{
-			case CONNECT_NONE:
+			case Dbse::ConnectionStatus::None:
 				continue;
-			case CONNECT_BAD:
-				returnVal = FAIL_CONNECT;
-				break;
-			case CONNECT_OPEN:
+
+			case Dbse::ConnectionStatus::Accept:
+				return true;
+
+			case Dbse::ConnectionStatus::Bad:
+			case Dbse::ConnectionStatus::Refuse:
+				return false;
+
+			case Dbse::ConnectionStatus::Open:
 				if (!_handshakeSent)
 				{
-					dbugLog(_FLI, "t:%d dbd client connected %d", hostIndex, connected);
+					dbugLog(_FLI, "t:%d dbd client connected %d", hostIndex, static_cast<int>(connected));
 					dbseSendHandshake(hostIndex, cv_arenaID.GetUint32());
-					_handshakeSent = TRUE;
+					_handshakeSent = true;
 				}
 				continue;
-			case CONNECT_REFUSE:
-				returnVal = FAIL_VERSION;
-				break;
-			case CONNECT_ACCEPT:
-				returnVal = SUCCESS;
-				break;
+
 			default:
 				dbugLog(_FLA, "Unhandled connection status in dbseInit!");
+				return false;
 		}
-		break;
 	}
-
-	return (returnVal);
 }
 
 SINT32
@@ -101,18 +120,18 @@ dbseClose()
 static void _connectFn(ENDPOINT& endpoint)
 {
 	dbugLog(_FLI, "t:%d dbd client", endpoint.teulIndex());
-	connected = CONNECT_OPEN;
+	connected = Dbse::ConnectionStatus::Open;
 }
 
-static void _errorFn (SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 error)
+static void _errorFn(SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* const /*object*/, SINT32 error)
 {
 	_dbseError = true;
     if (error == ENOTCONN)
     {
-		if (connected != CONNECT_NONE)
+		if (connected != Dbse::ConnectionStatus::None)
 		{
 			dbugLog(_FLW, "dbse connection went away");
-			connected = CONNECT_DROPPED;
+			connected = Dbse::ConnectionStatus::Dropped;
 		}
     }
 	else if ( error == ECONNREFUSED )
@@ -123,7 +142,7 @@ static void _errorFn (SINT32 teulIndex, const UCHAR* const /*data*/, SINT32 /*si
     {
 		dbugLog(_FLA, "t:%d dbse connection error %d reported.", teulIndex, error);
 		teulClose(teulIndex, Teul::Closing::DBDErr);
-		connected = CONNECT_DROPPED;
+		connected = Dbse::ConnectionStatus::Dropped;
 	}
 }
 
@@ -134,18 +153,18 @@ dbseOpenConnection()
 	static const UINT16 dbsePort = WWII::Net::Ports::Dbse;
 	dbugLog(_FLI ,"Connecting to dbse: %s:%u", dbseAddress, dbsePort);
 
-	_handshakeSent=FALSE;
+	_handshakeSent = false;
 	_dbseError = false;
 
 	const SINT32 tempIndex = teulOpenSend(cv_dbsePrimaryAddress.GetUint32(), dbsePort, _connectFn, cv_dbseConnectionTimeout_ms.GetUint32(), PROTOCOL_TCP, _errorFn);
 	if ( tempIndex < 0)
 	{
 		dbugLog(_FLA,"couldnt make dbseDaemon connection, err:%d", hostIndex);
-		_errorFn(hostIndex, NULL, 0, NULL, tempIndex);
+		_errorFn(hostIndex, nullptr, 0, nullptr, tempIndex);
 		return tempIndex;
 	}
 
-	while ( connected != CONNECT_OPEN )
+	while ( connected != Dbse::ConnectionStatus::Open )
 	{
 		teulUpdateTransport(25);
 

@@ -6,9 +6,7 @@
 // compiled library.
 //
 // Originating Programmer: Eric "Meat" Hall
-// Supporting Programmer:  Marty "Vandal" Puolin
-
-#include "dbug/dbug.h"
+// Supporting Programmer:  Marty "Vandal" Poulin
 
 #include "strt/strtData.h"
 #include "strt/strtIO.h"
@@ -31,13 +29,13 @@ typedef struct
 static inline UINT32
 _factor1k(FacilityStruct* const facility, UINT32 amount)
 {
-	return (UINT32)((FLOAT64)amount * (FLOAT64)facility->capacity / (FLOAT64)1000) ;
+	return (UINT32)((FLOAT64)amount * (FLOAT64)facility->capacity / (FLOAT64)1000);
 }
 
 // This function actually runs the internal stuff on a CP
 static SINT32 _runFacility(FacilityStruct* const currentFacility, WWII_SIDE_ACC* const sa)
 {
-	if ( currentFacility == NULL || sa == NULL)
+	if ( currentFacility == nullptr || sa == nullptr)
 		return -1;
 
 	//Check to see if facility is under contention and check to
@@ -49,17 +47,17 @@ static SINT32 _runFacility(FacilityStruct* const currentFacility, WWII_SIDE_ACC*
 			//If its a City, do city stuff
 			case FACILITY_CITY:
 				//Add the RPs to the pool for this CP
-				sa->RPsProduced += _factor1k(currentFacility, currentFacility->rpsPerUnitTime) ;
+				sa->RPsProduced += _factor1k(currentFacility, currentFacility->rpsPerUnitTime);
 				break;
 			//If its a factory, do factory stuff
 			case FACILITY_FACTORY:
-				sa->factoryMultiplier+= _factor1k(currentFacility, currentFacility->multiplier) ;
+				sa->factoryMultiplier+= _factor1k(currentFacility, currentFacility->multiplier);
 				break;
 			//If its a Depot, do depot stuff
 			case FACILITY_OMT:
 			case FACILITY_SHIPYARD:
 			case FACILITY_DEPOT:
-				sa->depotStorage += _factor1k(currentFacility, currentFacility->requestThreshold - currentFacility->storedRPs) ;
+				sa->depotStorage += _factor1k(currentFacility, currentFacility->requestThreshold - currentFacility->storedRPs);
 
 				sa->depotRPs+=currentFacility->storedRPs;
 				break;
@@ -96,7 +94,7 @@ _calcStratSystem(const SCHAR* filename, CPStruct* cpList)
 	WWII_SIDE_ACC sa;
 
 	fp = fopen(filename, "w");
-	if (fp == NULL)
+	if (fp == nullptr)
 	{
 		dbugLog(_FLN,"Filename %s invalid", filename);
 		return FALSE;
@@ -104,7 +102,7 @@ _calcStratSystem(const SCHAR* filename, CPStruct* cpList)
 
 	CPStruct* cp;
 	FacilityStruct* facility;
-	for ( cp = cpList ; cp != NULL ; cp = cp->next )
+	for ( cp = cpList; cp != nullptr; cp = cp->next )
 	{
 		if (cp->fullObjID.objType != CP_BRIDGE)
 		{
@@ -112,7 +110,7 @@ _calcStratSystem(const SCHAR* filename, CPStruct* cpList)
 			memset(&sa,0,sizeof(WWII_SIDE_ACC));
 			sa.factoryMultiplier = 1;
 
-			for ( facility = cp->facilityList ; facility != NULL ; facility = facility->next )
+			for ( facility = cp->facilityList; facility != nullptr; facility = facility->next )
 			{
 				//We don't run firebases
 				if (facility->type != FACILITY_FIREBASE)
@@ -121,7 +119,7 @@ _calcStratSystem(const SCHAR* filename, CPStruct* cpList)
 				}
 			}
 
-			sa.RPsProduced = (UINT32)(sa.RPsProduced * sa.factoryMultiplier) ;
+			sa.RPsProduced = (UINT32)(sa.RPsProduced * sa.factoryMultiplier);
 			//printout the totals
 			fprintf(fp,"CP %s\n\tRPs Produced: %u\n\tDepot Storage: %d\n\tFactory Multiplier: %5.2f\n\n",cp->name,sa.RPsProduced, sa.depotStorage, sa.factoryMultiplier);
 
@@ -136,6 +134,9 @@ _calcStratSystem(const SCHAR* filename, CPStruct* cpList)
 int
 main (int argc, char** argv)
 {
+	Teul::SetAppName(argv[0]);
+	Teul::ConfigVar::InitializeConfigVars();
+
 	static CPStruct* cpList;	//The list of free CPs
 	int level = 1;
 
@@ -159,12 +160,12 @@ main (int argc, char** argv)
 
 	//Get the starting time
 
-	cpList = strtImportStratData() ;
-	if ( cpList == NULL)
+	cpList = strtImportStratData();
+	if ( cpList == nullptr)
 	{
-		strtReportDataErrors() ;
+		strtReportDataErrors();
 		dbugLog(_FLA,"[X][X][X] Strat System would not init [X][X][X]");
-		exit(1) ;
+		exit(1);
 	}
 
 	if ( strtVerifyStratSystem(cpList, level) == false )

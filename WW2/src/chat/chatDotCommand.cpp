@@ -11,7 +11,6 @@
 
 #include <stdexcept>
 
-#include "dbug/dbug.h"
 #include "versionNo.h"
 
 #include "chat/chatDB.h"
@@ -31,11 +30,11 @@
 #include "chat/chatHostPlayerIndex.h"
 #include "chat/chatLStringErr.h"
 
-extern DBHANDLE& chatdbGetDBH() ;
+extern DBHANDLE& chatdbGetDBH();
 
-static Teul::Packet* g_commandListPacket = NULL ;
+static Teul::Packet* g_commandListPacket = nullptr;
 
-DotCommand* g_commands ;
+DotCommand* g_commands;
 
 //////////////////////////////////////////////////////////////////////
 // Add all the queued up commands to the index.
@@ -43,9 +42,9 @@ DotCommand* g_commands ;
 void
 chatRegisterDotCommands()
 {
-	for ( auto cmd = g_commands ; cmd != NULL ; cmd = cmd->m_next )
+	for ( auto cmd = g_commands; cmd != nullptr; cmd = cmd->m_next )
 	{
-		DotCommand::index()->add(cmd) ;
+		DotCommand::index()->add(cmd);
 	}
 }
 
@@ -55,7 +54,7 @@ chatRegisterDotCommands()
 bool
 DotUsage::isHidden() const
 {
-	return usage == LSTR_NONE ;
+	return usage == LSTR_NONE;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -85,12 +84,12 @@ DotCommand::DotCommand(const std::string& newCommand, const std::string& dotDesc
 	, m_description(dotDescription)
 	, m_public(false)				// Never assume its public
 	, m_playnetOnly(playnetOnly)
-	, m_next(NULL)
+	, m_next(nullptr)
 	, m_usages()
 {
-	addUsage(mask, usage, detail) ;
-	m_next = g_commands ;
-	g_commands = this ;
+	addUsage(mask, usage, detail);
+	m_next = g_commands;
+	g_commands = this;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -99,7 +98,7 @@ DotCommand::DotCommand(const std::string& newCommand, const std::string& dotDesc
 static inline LOGICAL
 _isMessageNoise(SCHAR c)
 {
-	return ( c != 0 && (UCHAR)c <= (UCHAR)' ' ) ;
+	return ( c != 0 && (UCHAR)c <= (UCHAR)' ' );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -108,54 +107,54 @@ _isMessageNoise(SCHAR c)
 int
 DotCommand::vectorize(char* source, ARGV& dest, int maxArguments, bool translate)
 {
-	int arguments = 0 ;
+	int arguments = 0;
 
 	// Remove any current entries
-	dest.clear() ;
+	dest.clear();
 	if ( *source == 0 )
-		return 0 ;
+		return 0;
 
 	while ( *source != 0 && arguments < maxArguments )
 	{
 		// Strip leading spaces from each argument
 		while ( _isMessageNoise(*source) )
-			*(source++) = 0 ;
+			*(source++) = 0;
 
 		if ( *source == 0 )
-			break ;
+			break;
 
 		if ( *source == '"' || *source == '\'' )
 		{
-			char terminator = *(source++) ;
-			dest.push_back((const char*)source) ;
-			arguments++ ;
+			char terminator = *(source++);
+			dest.push_back((const char*)source);
+			arguments++;
 
 			while ( *source != 0 && *source != terminator )
 			{
-				source += WWII::BytesFromCharacter[(unsigned char)*source] ;
+				source += WWII::BytesFromCharacter[(unsigned char)*source];
 			}
 
 			// If we found the end of the string, break it off.
 			if ( *source == terminator )
-				*(source++) = 0 ;
+				*(source++) = 0;
 
-			continue ;
+			continue;
 		}
 
 		// Add this string
-		dest.push_back((const char*)source) ;
-		arguments++ ;
+		dest.push_back((const char*)source);
+		arguments++;
 
 		while ( *source != 0 && *source != ' ' )
 		{
 			// Replace underscores with spaces after testing for space as break;
 			if ( translate && *source == '_' )
-				*source = ' ' ;
-			source += WWII::BytesFromCharacter[(unsigned char)*source] ;
+				*source = ' ';
+			source += WWII::BytesFromCharacter[(unsigned char)*source];
 		}
 	}
 
-	return (int)dest.size() ;
+	return (int)dest.size();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -173,29 +172,29 @@ DotCommand::setAvailability(char level)
 	{
 	case 'E':
 		// Everyone has access
-		dbugLog(_FLD, "%s available to everyone" , command()) ;
-		m_public = true ;
-		m_playnetOnly = false ;
-	break ;
+		dbugLog(_FLD, "%s available to everyone" , command());
+		m_public = true;
+		m_playnetOnly = false;
+	break;
 
 	case 'P':
 		// By Permission only
-		dbugLog(_FLD, "%s available by permission" , command()) ;
-		m_public = false ;
-		m_playnetOnly = false ;
-	break ;
+		dbugLog(_FLD, "%s available by permission" , command());
+		m_public = false;
+		m_playnetOnly = false;
+	break;
 
 	case 'C':
 		// CRS only
-		dbugLog(_FLD, "%s restricted to CRS by permission" , command()) ;
-		m_public = false ;
-		m_playnetOnly = true ;
-	break ;
+		dbugLog(_FLD, "%s restricted to CRS by permission" , command());
+		m_public = false;
+		m_playnetOnly = true;
+	break;
 
 	default:
-		dbugLog(_FLA, "%s has unrecognized availability level %c", command(), level) ;
-		m_public = false ;
-		m_playnetOnly = true ;
+		dbugLog(_FLA, "%s has unrecognized availability level %c", command(), level);
+		m_public = false;
+		m_playnetOnly = true;
 	}
 }
 
@@ -207,14 +206,14 @@ DotCommand::isHidden() const
 {
 	// Unless public, it needs to belong to a group.
 	if ( m_public == false && m_groups.empty() )
-		return true ;
+		return true;
 
-	for ( auto it = m_usages.begin() ; it != m_usages.end() ; ++it )
+	for ( auto it = m_usages.begin(), end = m_usages.end(); it != end; ++it )
 	{
 		if ( (*it)->isHidden() == false )
-			return false ;
+			return false;
 	}
-	return false ;
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -226,44 +225,44 @@ DotCommand::allow(Player& player) const
 {
 	// Some dot commands* require* you to be playnet
 	if ( m_playnetOnly && !player.isPlaynet() )
-		return NULL ;
+		return nullptr;
 
 	// Are group permissions required?
 	if ( !player.isManager() && !m_public )
 	{
 		// Command is not in any groups, ergo not available
 		if ( m_groups.empty() )
-			return NULL ;
+			return nullptr;
 
 		// Request the most recent group set; groups will load
 		// in the player's permissions if they're not already loaded.
-		const CHAT_GROUPS& clGroups = player.groups() ;
+		const CHAT_GROUPS& clGroups = player.groups();
 
 		// Client is not in any groups, don't bother checking
 		if ( clGroups.empty() )
-			return NULL ;
+			return nullptr;
 
 		// See if the player is in at least one of the required groups
-		CHAT_GROUPS::iterator cmdIt, cliIt ;
-		bool isIn = false ;
-		for ( cmdIt = m_groups.begin() ; isIn == false && cmdIt != m_groups.end() ; ++cmdIt )
+		CHAT_GROUPS::iterator clgIt, clgEnd = clGroups.end();
+		bool isIn = false;
+		for (auto cmdIt = m_groups.begin(), end = m_groups.end(); isIn == false && cmdIt != end; ++cmdIt)
 		{
-			cliIt = clGroups.find(*cmdIt) ;
-			if ( cliIt != clGroups.end() )
-				isIn = true ;
+			clgIt = clGroups.find(*cmdIt);
+			if ( clgIt != clgEnd )
+				isIn = true;
 		}
 
 		if ( !isIn )
-			return NULL ;
+			return nullptr;
 	}
 
-	for ( UINT32 i = 0 ; i < m_usages.size() ; i++ )
+	for ( UINT32 i = 0; i < m_usages.size(); i++ )
 	{
 		if ( m_usages[i]->mask == NO_MASK || player.permissions(m_usages[i]->mask) )
-			return m_usages[i] ;
+			return m_usages[i];
 	}
 
-	return NULL ;
+	return nullptr;
 }
 
 
@@ -273,16 +272,16 @@ DotCommand::allow(Player& player) const
 bool
 DotCommand::help(Player& player) const
 {
-	const DotUsage* commandHelp = allow(player) ;
+	const DotUsage* commandHelp = allow(player);
 
 	// Does this player have permission?
-	if ( commandHelp == NULL || commandHelp->isHidden() )
-		return false ;
+	if ( commandHelp == nullptr || commandHelp->isHidden() )
+		return false;
 
-	player.message(LSTR_USAGE, commandHelp->usage, NULL, NULL) ;
-	player.message(LSTR_DETAIL, commandHelp->detail, NULL, NULL) ;
+	player.message(LSTR_USAGE, commandHelp->usage, nullptr, nullptr);
+	player.message(LSTR_DETAIL, commandHelp->detail, nullptr, nullptr);
 
-	return true ;
+	return true;
 }
 
 // Test if the current 'command' has been locked within duration_m minutes
@@ -290,12 +289,12 @@ bool
 DotCommand::_featureLockedM(Player& player, UINT32 duration_m) const
 {
 	if ( !player.featureLock(m_command, teulTime(), duration_m * 60) )
-		return false ;
+		return false;
 
-	char mins[10+1] ;
-	snprintf(mins, sizeof(mins)-1, "%u", duration_m) ;
-	player.message(LSTR_CAUTION, LSTR_FEATURE_LOCKED, command(), mins) ;
-	return true ;
+	char mins[12+1];
+	strprintf(mins, "%u", duration_m);
+	player.message(LSTR_CAUTION, LSTR_FEATURE_LOCKED, command(), mins);
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -305,8 +304,8 @@ DotCommand::_featureLockedM(Player& player, UINT32 duration_m) const
 DotCommandIndex*
 DotCommand::index()
 {
-	static DotCommandIndex _index ;
-	return &_index ;
+	static DotCommandIndex _index;
+	return &_index;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -316,23 +315,23 @@ DotCommand::index()
 void
 DotCommandIndex::addAlias(const char* old, const char* alias)
 {
-	const DotCommand* command = lookup(old, true) ;
+	const DotCommand* command = lookup(old, true);
 
-	if ( command == NULL )
+	if ( command == nullptr )
 	{
-		dbugLog(_FLW, "Unable to find command '%s' for alias '%s'", old, alias) ;
-		return ;
+		dbugLog(_FLW, "Unable to find command '%s' for alias '%s'", old, alias);
+		return;
 	}
 
-	if ( lookup(alias, true) != NULL )
+	if ( lookup(alias, true) != nullptr )
 	{
-		dbugLog(_FLW, "Can't add alias '%s' for '%s', command already exists", alias, old) ;
-		return ;
+		dbugLog(_FLW, "Can't add alias '%s' for '%s', command already exists", alias, old);
+		return;
 	}
 
-	dbugLog(_FLI, "Added %s as alias for %s", alias, old) ;
+	dbugLog(_FLI, "Added %s as alias for %s", alias, old);
 
-	m_aliases[alias] = command ;
+	m_aliases[alias] = command;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -342,45 +341,44 @@ const DotCommand*
 DotCommandIndex::lookup(const std::string& target, bool cleanMatchOnly) const
 {
 	// Firstly, check aliases
-	DOT_ALIASES::const_iterator alias = m_aliases.find(target) ;
+	DOT_ALIASES::const_iterator alias = m_aliases.find(target);
 	if ( alias != m_aliases.end() )
-		return (alias->second) ;
+		return (alias->second);
 
-	DotCommand* last = NULL ;
-	int matches = 0 ;
-	std::vector<DotCommand*>::const_iterator i ;
+	DotCommand* last = nullptr;
+	int matches = 0;
 
-	for (i = begin() ; i != end() ; ++i)
+	for ( auto it = begin(), endIt = end(); it != endIt; ++it )
 	{
-		DotCommand* cur = *i ;
+		DotCommand* cur = *it;
 
 		// If what we typed is longer than the current command, it can't match
 		if ( target.length() > cur->m_command.length() )
-			continue ;
+			continue;
 
 		// Exact match? Return
 		if ( cur->m_command == target )
-			return cur ;
+			return cur;
 
 		// If we're not looking exclusively for clean matches...
 		if ( cleanMatchOnly || target.length() == cur->m_command.length() )
-			continue ;
+			continue;
 
 		// ...and it results in a partial match
 		if ( target.compare(cur->m_command.substr(0, target.length())) == 0 )
 		{
 			// Then remember it, but try to determine if its unique
-			last = cur ;
-			matches++ ;
+			last = cur;
+			matches++;
 		}
 	}
 
 	// They're looking for good matches, but not exact matches;
 	// if we only found one match, then return the single match.
 	if ( !cleanMatchOnly && matches == 1 )
-		return last ;
+		return last;
 
-	return NULL ;
+	return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -389,20 +387,20 @@ DotCommandIndex::lookup(const std::string& target, bool cleanMatchOnly) const
 void
 DotCommandIndex::add(DotCommand* dotCommand)
 {
-	betaLog(_FLI, "Registering dotCommand: %s", dotCommand->command()) ;
+	betaLog(_FLI, "Registering dotCommand: %s", dotCommand->command());
 
-	if ( lookup(dotCommand->m_command, TRUE) != NULL )
-		throw std::domain_error("Duplicate dot command") ;
+	if ( lookup(dotCommand->m_command, TRUE) != nullptr )
+		throw std::domain_error("Duplicate dot command");
 
 	// Insert ourselves alphabetically
-	iterator it = begin() ;
+	iterator it = begin();
 	while ( it != end() && dotCommand->m_command > (*it)->m_command )
-		++it ;
-	insert(it, dotCommand) ;
+		++it;
+	insert(it, dotCommand);
 
 	// Now add to the database incase it's not already there
-	std::string desc = dotCommand->description() ;
-	wwiiEscapeString(desc) ;
+	std::string desc = dotCommand->description();
+	wwiiEscapeString(desc);
 
 	DBThread::Do(DBThread::Default
 				, "INSERT IGNORE INTO chat_commands"
@@ -411,7 +409,7 @@ DotCommandIndex::add(DotCommand* dotCommand)
 					, dotCommand->command()
 					, desc.c_str()
 					, (dotCommand->m_playnetOnly) ? 'C' : 'P'
-				) ;
+				);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -421,12 +419,12 @@ DotCommandIndex::add(DotCommand* dotCommand)
 bool
 DotCommandIndex::helpFor(Player& player, const char* command) const
 {
-	const DotCommand* dotcmd = lookup(command) ;
+	const DotCommand* dotcmd = lookup(command);
 
 	if ( !dotcmd )
-		return false ;
+		return false;
 
-	return dotcmd->help(player) ;
+	return dotcmd->help(player);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -435,59 +433,59 @@ DotCommandIndex::helpFor(Player& player, const char* command) const
 bool
 DotCommandIndex::process(Player& player, Chat::ClientMessage* message) const
 {
-	if ( message == NULL )
+	if ( message == nullptr )
 	{
-		dbugLog(_FLW, "Tried to process NULL playerMessage") ;
-		return false ;
+		dbugLog(_FLW, "Tried to process NULL playerMessage");
+		return false;
 	}
 
 	// Record activity for posterity
 	dbugLog(_FLI, "t:%d p:%u c:%s %s"
 					, player.teulIndex(), player.playerID(), player.callsign()
 					, message->m_message
-					) ;
+					);
 
 	// Take a pointer to the first character after "."
-	Chat::CommandWithArgs input(message->m_message + 1) ;
+	Chat::CommandWithArgs input(message->m_message + 1);
 	if ( *input.Command() == 0 )
-		return false ;
+		return false;
 
 	dbugLog(_FLD,"%s sending dotCommand %s %s", player.callsign(), input.Command(), input.Args());
 
-	const DotCommand* dotCommand = lookup(input.Command()) ;
+	const DotCommand* dotCommand = lookup(input.Command());
 	if ( !dotCommand )
 	{
-		player.log(_FLI, "couldn't find /command %s, ignoring", input.Command()) ;
-		return false ;
+		player.log(_FLI, "couldn't find /command %s, ignoring", input.Command());
+		return false;
 	}
 
 	if ( !dotCommand->allow(player) )
 	{
-		player.log(_FLI, "no permissions to use /command %s, ignoring", input.Command()) ;
-		return false ;
+		player.log(_FLI, "no permissions to use /command %s, ignoring", input.Command());
+		return false;
 	}
 
 	try
 	{
 		if ( *input.Args() != 0 )
-			dotCommand->actionWith(player, message, input.Args()) ;
+			dotCommand->actionWith(player, message, input.Args());
 		else
-			dotCommand->action(player, message) ;
+			dotCommand->action(player, message);
 	}
 	catch (LSTRING_ID id)
 	{
-		player.message(LSTR_CAUTION, id, "<undef>", "<undef>") ;
+		player.message(LSTR_CAUTION, id, "<undef>", "<undef>");
 	}
 	catch (Chat::LStringErr& error)
 	{
-		player.message(LSTR_CAUTION, error.m_lstring, error.m_arg1.c_str(), error.m_arg2.c_str()) ;
+		player.message(LSTR_CAUTION, error.m_lstring, error.m_arg1.c_str(), error.m_arg2.c_str());
 	}
 	catch (std::exception& e)
 	{
-		LogAbort("fatal error: %s", e.what()) ;
+		LogAbort("fatal error: %s", e.what());
 	}
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -499,84 +497,84 @@ DotCommandIndex::readPermissions()
 {
 	// Reset all commands to Playnet availability and no groups
 	// since deletions from the permissions data are not explicit
-	dbugLog(_FLI, "Flushing old permissions [setting all chat commands to CRS only]") ;
-	for ( auto it = begin() ; it != end() ; ++it )
+	dbugLog(_FLI, "Flushing old permissions [setting all chat commands to CRS only]");
+	for ( auto it = begin(), endIt = end(); it != endIt; ++it )
 	{
-		DotCommand* dc = *it ;
-		dc->setAvailability('C') ;
-		dc->clearGroups() ;
+		DotCommand* dc = *it;
+		dc->setAvailability('C');
+		dc->clearGroups();
 	}
 
 	// Set the availabilities according to the database
-	dbugLog(_FLI, "Reading new permissions") ;
+	dbugLog(_FLI, "Reading new permissions");
 	try
 	{
-		DBQuery dbq(chatdbGetDBH(), "SELECT cc.command, cc.availability FROM chat_commands cc") ;
+		DBQuery dbq(chatdbGetDBH(), "SELECT cc.command, cc.availability FROM chat_commands cc");
 		while ( dbq.FetchRow() )
 		{
-			DBRow& row = dbq.Row() ;
+			DBRow& row = dbq.Row();
 
 			// Blank command or "." command
-			if ( row[0] == 0 || row[0][0] == '.' )
-				continue ;
+			if ( row[0] == nullptr || row[0][0] == '.' )
+				continue;
 
-			DotCommand* dc = const_cast<DotCommand*> (lookup(row[0], true)) ;
-			if ( dc == NULL )
+			DotCommand* dc = const_cast<DotCommand*> (lookup(row[0], true));
+			if ( dc == nullptr )
 			{
-				betaLog(_FLW, "chat_command %s not recognized", row[0]) ;
-				continue ;
+				betaLog(_FLW, "chat_command %s not recognized", row[0]);
+				continue;
 			}
-			dc->setAvailability(row[1][0]) ;
+			dc->setAvailability(row[1][0]);
 		}
 	}
 	catch (std::exception& e)
 	{
-		dbugLog(_FLA, "Unable to set availabilities: %s", e.what()) ;
+		dbugLog(_FLA, "Unable to set availabilities: %s", e.what());
 	}
 
 	// Now set the groups according to the database
 	try
 	{
-		UINT32 lastCmd = 0 ;
-		DotCommand* dc = NULL ;
+		UINT32 lastCmd = 0;
+		DotCommand* dc = nullptr;
 
 		DBQuery dbq(chatdbGetDBH()
 						, "SELECT cc.cmd_oid, cc.command, cgc.group_oid"
 		  					" FROM	chat_commands cc, chat_group_cmds cgc"
 		 					" WHERE	cc.cmd_oid = cgc.cmd_oid AND cc.availability != 'E'"
-							" ORDER BY cc.cmd_oid") ;
+							" ORDER BY cc.cmd_oid");
 		while ( dbq.FetchRow() )
 		{
-			DBRow& row = dbq.Row() ;
-			UINT32 cmdNo = (UINT32)atol(row[0]) ;
-			const char* cmd = row[1] ;
+			DBRow& row = dbq.Row();
+			UINT32 cmdNo = (UINT32)atol(row[0]);
+			const char* cmd = row[1];
 
 			// Find the command
 			if ( lastCmd != cmdNo )
 			{
-				lastCmd = cmdNo ;
-				dc = const_cast<DotCommand*> (lookup(cmd, true)) ;
-				if ( dc == NULL )
+				lastCmd = cmdNo;
+				dc = const_cast<DotCommand*> (lookup(cmd, true));
+				if ( dc == nullptr )
 				{
-					dbugLog(_FLD, "Ignoring unknown command '%s'", cmd) ;
-					continue ;
+					dbugLog(_FLD, "Ignoring unknown command '%s'", cmd);
+					continue;
 				}
 			}
 
 			// If we didn't know the command last time, ignore it again
-			if ( dc == NULL )
-				continue ;
+			if ( dc == nullptr )
+				continue;
 
-			dc->addGroup((UINT32)atol(row[2])) ;
+			dc->addGroup((UINT32)atol(row[2]));
 		}
 	}
 	catch (std::exception& e)
 	{
-		dbugLog(_FLA, "Unable to set chat permissions: %s", e.what()) ;
+		dbugLog(_FLA, "Unable to set chat permissions: %s", e.what());
 	}
 
-	buildCommandListPacket() ;
-	broadcastCommandListPacket() ;
+	buildCommandListPacket();
+	broadcastCommandListPacket();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -586,34 +584,34 @@ void
 DotCommandIndex::buildCommandListPacket()
 {
 	if ( g_commandListPacket )
-		delete g_commandListPacket ;
+		delete g_commandListPacket;
 
-	g_commandListPacket = new Teul::Packet(0, CHAT_X, Chat::CMD_LIST_Y) ;
-	g_commandListPacket->setUnencrypted() ;
+	g_commandListPacket = new Teul::Packet(Teul::PacketId(CHAT_X, Chat::CMD_LIST_Y));
+	g_commandListPacket->setUnencrypted();
 
-	g_commandListPacket->append((Chat::cmdcount_t)0) ;
+	g_commandListPacket->append((Chat::cmdcount_t)0);
 
 	// Rebuild the command packet.
-	for ( auto it = begin() ; it != end() ; ++it )
+	for ( auto it = begin(), endIt = end(); it != endIt; ++it )
 	{
-		const DotCommand* const dc = (*it) ;
+		const DotCommand* const dc = (*it);
 		// Skip commands that are intended to be hidden.
 		if ( dc->isHidden() || dc->usages().empty() )
-			continue ;
+			continue;
 
-		const UCHAR playnetOnly = dc->m_playnetOnly ? TRUE : FALSE ;
-		const SINT16 usage = dc->usages().front()->usage ;
-		const SINT16 detail = dc->usages().front()->detail ;
+		const UCHAR playnetOnly = dc->m_playnetOnly ? TRUE : FALSE;
+		const SINT16 usage = dc->usages().front()->usage;
+		const SINT16 detail = dc->usages().front()->detail;
 
-		g_commandListPacket->append(playnetOnly) ;
-		g_commandListPacket->append(dc->m_command.c_str(), dc->m_command.length() + 1) ;
-		g_commandListPacket->append(usage) ;
-		g_commandListPacket->append(detail) ;
+		g_commandListPacket->append(playnetOnly);
+		g_commandListPacket->append(dc->m_command.c_str(), dc->m_command.length() + 1);
+		g_commandListPacket->append(usage);
+		g_commandListPacket->append(detail);
 
-		++g_commandListPacket->payloadRef<Chat::cmdcount_t>(0) ;
+		++g_commandListPacket->payloadRef<Chat::cmdcount_t>(0);
 	}
 
-	dbugLog(_FLD, "indexed %u visible chat commands", g_commandListPacket->payloadRef<Chat::cmdcount_t>(0)) ;
+	dbugLog(_FLD, "indexed %u visible chat commands", g_commandListPacket->payloadRef<Chat::cmdcount_t>(0));
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -622,34 +620,34 @@ DotCommandIndex::buildCommandListPacket()
 void
 DotCommandIndex::broadcastCommandListPacket()
 {
-	if ( g_commandListPacket == NULL )
-		return ;
+	if ( g_commandListPacket == nullptr )
+		return;
 
 	// Send to all players.
-	std::vector<ENDPOINT*> endpoints ;
-	for ( auto it = playerIndex.begin() ; it != playerIndex.end() ; ++it )
+	std::vector<ENDPOINT*> endpoints;
+	for ( auto it = playerIndex.begin(), endIt = playerIndex.end(); it != endIt; ++it )
 	{
-		const Player* const player = it->second ;
+		const Player* const player = it->second;
 		if ( player->teulIndex() >= 0 )
 		{
-			ENDPOINT* const endpoint = teulGetEndpoint(player->teulIndex()) ;
-			if ( endpoint != NULL )
-				endpoints.push_back(endpoint) ;
+			ENDPOINT* const endpoint = teulGetEndpoint(player->teulIndex());
+			if ( endpoint != nullptr )
+				endpoints.push_back(endpoint);
 		}
 	}
 
-	const size_t numEndpoints = endpoints.size() ;
+	const size_t numEndpoints = endpoints.size();
 	if ( numEndpoints <= 0 )
 	{
-		dbugLog(_FLD, "%" PRSizeT " command permissions loaded, no players to transmit to.", size()) ;
-		return ;
+		dbugLog(_FLD, "%" PRSizeT " command permissions loaded, no players to transmit to.", size());
+		return;
 	}
 
-	const Chat::cmdcount_t& count = g_commandListPacket->payloadRef<Chat::cmdcount_t>(0) ;
-	dbugLog(_FLD, "transmitting %u /commands in %" PRSizeT "byte packets to %" PRSizeT " players.", count, g_commandListPacket->packetSizeBytes(), numEndpoints) ;
-	for ( size_t i = 0 ; i < numEndpoints ; ++i )
+	const Chat::cmdcount_t& count = g_commandListPacket->payloadRef<Chat::cmdcount_t>(0);
+	dbugLog(_FLD, "transmitting %u /commands in %u byte packets to %" PRSizeT " players.", count, g_commandListPacket->packetSizeBytes(), numEndpoints);
+	for ( size_t i = 0; i < numEndpoints; ++i )
 	{
-		g_commandListPacket->send(*endpoints[i]) ;
+		g_commandListPacket->send(*endpoints[i]);
 	}
 }
 
@@ -660,10 +658,10 @@ bool
 DotCommand::lockedFeature(Player& player, const char* activity, UINT32 interval_s, UINT32 now)
 {
 	if ( !player.featureLock(activity, now, interval_s) )
-		return false ;
+		return false;
 
-	player.message(LSTR_CAUTION, LSTR_ACTION_LIMITED, activity, chatTimeInterval(interval_s)) ;
-	return true ;
+	player.message(LSTR_CAUTION, LSTR_ACTION_LIMITED, activity, chatTimeInterval(interval_s));
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -673,20 +671,20 @@ bool
 DotCommand::genericHelp(Player& player, const char* usage, const char* detail) const
 {
 	if ( !allow(player) )
-		return false ;
+		return false;
 
 	if ( !usage && !detail )
 	{
-		player.message(LSTR_CAUTION, LSTR_NO_HELP) ;
-		return true ;
+		player.message(LSTR_CAUTION, LSTR_NO_HELP);
+		return true;
 	}
 
 	if ( usage )
-		player.message(LSTR_USAGE, LSTR_GENERIC, usage) ;
+		player.message(LSTR_USAGE, LSTR_GENERIC, usage);
 	if ( detail )
-		player.message(LSTR_DETAIL, LSTR_GENERIC, detail) ;
+		player.message(LSTR_DETAIL, LSTR_GENERIC, detail);
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -694,23 +692,23 @@ DotCommand::genericHelp(Player& player, const char* usage, const char* detail) c
 bool
 chatGetTimeInterval(Player& player, const char* timeString, UINT32& interval, const char defaultUnit)
 {
-	char type = defaultUnit ;
-	(void)sscanf(timeString, "%u%c", &interval, &type) ;
+	char type = defaultUnit;
+	(void)sscanf(timeString, "%u%c", &interval, &type);
 
 	switch ( tolower(type) )
 	{
-		case 's': /* do nothing */; break ;
-		case 'm': interval *= 60 ; break ;
-		case 'h': interval *= 60 * 60 ; break ;
-		case 'd': interval *= 24 * 60 * 60 ; break ;
+		case 's': /* do nothing */; break;
+		case 'm': interval *= 60; break;
+		case 'h': interval *= 60 * 60; break;
+		case 'd': interval *= 24 * 60 * 60; break;
 		default:
-			interval = 0 ;
-			player.message(LSTR_CAUTION, LSTR_INVALID_TIME, timeString) ;
-			return false ;
-		break ;
-	} ;
+			interval = 0;
+			player.message(LSTR_CAUTION, LSTR_INVALID_TIME, timeString);
+			return false;
+		break;
+	};
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -719,11 +717,11 @@ chatGetTimeInterval(Player& player, const char* timeString, UINT32& interval, co
 void
 chatSendCommandListPacket(const class Player* const player)
 {
-	if ( player->teulIndex() < 0 || g_commandListPacket == NULL )
-		return ;
+	if ( player->teulIndex() < 0 || g_commandListPacket == nullptr )
+		return;
 
-	ENDPOINT* const endpoint = teulGetEndpoint(player->teulIndex()) ;
+	ENDPOINT* const endpoint = teulGetEndpoint(player->teulIndex());
 	if ( endpoint )
-		g_commandListPacket->send(*endpoint) ;
+		g_commandListPacket->send(*endpoint);
 }
 

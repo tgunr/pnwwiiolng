@@ -10,22 +10,24 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include <string.h>
-#include <ctype.h>
-#include <assert.h>
-#include <wctype.h>
+#include <atomic>
+#include <cwctype>
 
 #include "chat/chatHandle.h"
+#include "chat/chatName.h"		// to ensure it gets instantiated.
 #include "wwii/wwiiUTF.h"
 
-static const int HANDLE_PLAIN_BITS = 6 ;
-static const UINT64 HANDLE_PLAIN_MASK = (1ULL << HANDLE_PLAIN_BITS) - 1 ;
-static const int HANDLE_WCHAR_BITS = 14 ;
-static const UINT64 HANDLE_WCHAR_MASK = (1ULL << HANDLE_WCHAR_BITS) - 1 ;
-static const int MAX_WIDE_HANDLE_WCHARS = 64 / HANDLE_WCHAR_BITS ;
-static const int MAX_WIDE_HANDLE_EXTRAS = 1 ;
-static const int MAX_WIDE_HANDLE_LEN = MAX_WIDE_HANDLE_WCHARS + MAX_WIDE_HANDLE_EXTRAS ;
-static const int MAX_WIDE_HANDLE_SIZE = MAX_WIDE_HANDLE_LEN + 1 ;
+Chat::Name g_chatSystem("SYSTEM");
+Chat::NameW g_chatUnknown(chatGetHandle(L"UNKNOWN"));
+
+static const int HANDLE_PLAIN_BITS = 6;
+static const UINT64 HANDLE_PLAIN_MASK = (1ULL << HANDLE_PLAIN_BITS) - 1;
+static const int HANDLE_WCHAR_BITS = 14;
+static const UINT64 HANDLE_WCHAR_MASK = (1ULL << HANDLE_WCHAR_BITS) - 1;
+static const int MAX_WIDE_HANDLE_WCHARS = 64 / HANDLE_WCHAR_BITS;
+static const int MAX_WIDE_HANDLE_EXTRAS = 1;
+static const int MAX_WIDE_HANDLE_LEN = MAX_WIDE_HANDLE_WCHARS + MAX_WIDE_HANDLE_EXTRAS;
+static const int MAX_WIDE_HANDLE_SIZE = MAX_WIDE_HANDLE_LEN + 1;
 
 //Handles can contain:
 //	upper and lowercase letters
@@ -34,7 +36,7 @@ static const int MAX_WIDE_HANDLE_SIZE = MAX_WIDE_HANDLE_LEN + 1 ;
 //Players will be allowed lowercase, underscore, and dash.
 
 // List of the characters in their compressed positions
-static const UINT32 PLAIN_CHARACTERS = 64 ;
+static const UINT32 PLAIN_CHARACTERS = 64;
 static const wchar_t s_characters[256] =
 {
 	 0, 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o',//15
@@ -55,7 +57,7 @@ static const int s_characterMap[256] = {
 /*5*/	42,	43,	44,	45,	46,	47,	48,	49,	50,	51,	52,	0,	0,	0,	0,	63,
 /*6*/	0,	1,	2,	3,	4,	5,	6,	7,	8,	9,	10,	11,	12,	13,	14,	15,
 /*7*/	16,	17,	18,	19,	20,	21,	22,	23,	24,	25,	26,	0,	0,	0,	0,	0
-} ;
+};
 
 static const wchar_t s_wideCharacters[65535] =
 {	// The latin characters we support followed by
@@ -745,10 +747,10 @@ static const wchar_t s_wideCharacters[65535] =
 	, L'\u9f2c', L'\u9f2f', L'\u9f37', L'\u9f39', L'\u9f3b', L'\u9f3d', L'\u9f3e', L'\u9f44', L'\u9f50', L'\u9f51'
 	, L'\u9f7f', L'\u9f80', L'\u9f83', L'\u9f84', L'\u9f85', L'\u9f86', L'\u9f87', L'\u9f88', L'\u9f89', L'\u9f8a'
 	, L'\u9f8b', L'\u9f8c', L'\u9f99', L'\u9f9a', L'\u9f9b', L'\u9f9f', L'\u9fa0'
-} ;
+};
 
 //static const wchar_t MAX_WIDE_CHAR = 40864;
-static const int s_wideCharacterMap[65535] =
+static const int s_wideCharacterMap[65536] =
 {
 	       0,        0,        0,        0,        0,        0,        0,        0,        0,        0,
 	       0,        0,        0,        0,        0,        0,        0,        0,        0,        0,
@@ -4837,7 +4839,7 @@ static const int s_wideCharacterMap[65535] =
 	    6817,     6818,     6819,     6820,     6821,        0,        0,        0,        0,        0,
 	       0,        0,        0,        0,        0,        0,        0,     6822,     6823,     6824,
 	       0,        0,        0,     6825,     6826,
-} ;
+};
 
 //////////////////////////////////////////////////////////////////////
 // Denote a handle as being simple characters
@@ -4845,7 +4847,7 @@ static const int s_wideCharacterMap[65535] =
 static void
 _plainHandle(ChatHandle& handle)
 {
-	handle &= ~WIDE_HANDLE_BIT ;
+	handle &= ~WIDE_HANDLE_BIT;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -4854,7 +4856,7 @@ _plainHandle(ChatHandle& handle)
 static void
 _wideHandle(ChatHandle& handle)
 {
-	handle |= WIDE_HANDLE_BIT ;
+	handle |= WIDE_HANDLE_BIT;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -4865,7 +4867,7 @@ _wideHandle(ChatHandle& handle)
 UINT16
 chatGetHandleCharacterSymbol(const wchar_t character)
 {
-	return (unsigned short int)s_wideCharacterMap[character & 0xffff] ;
+	return (unsigned short int)s_wideCharacterMap[character & 0xffff];
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -4875,67 +4877,60 @@ template<typename _CharType>
 static void
 _plainEncode(const _CharType* const callsign, ChatHandle& handle)
 {
-	size_t i ;
-	for ( i = 0 ; callsign[i] && i < MAX_HANDLE_WLEN ; ++i )
+	size_t i;
+	for ( i = 0; callsign[i] && i < MAX_HANDLE_WLEN; ++i )
 	{
-		if ( callsign[i] == 0 )
-			break ;
-		ChatHandle code = (ChatHandle)s_characterMap[callsign[i]] ;
-		if ( code == 0ULL )
+		ChatHandle code = (ChatHandle)s_characterMap[callsign[i]];
+		if ( PN_UNLIKELY(code == 0ULL) )
 		{
-			handle = 0ULL ;
-			return ;
+			handle = 0ULL;
+			return;
 		}
-		handle |= code << (i * HANDLE_PLAIN_BITS) ;
+		handle |= code << (i * HANDLE_PLAIN_BITS);
 	}
-	if ( callsign[i] )
+	if ( PN_UNLIKELY(callsign[i]) )
 	{
-		handle = 0ULL ;
-		return ;
+		handle = 0ULL;
+		return;
 	}
 
-	_plainHandle(handle) ;
+	_plainHandle(handle);
 }
 
 static void
 _wideEncode(const wchar_t* const callsign, ChatHandle& handle)
 {
-	ChatHandle code = 1 ;
-	int bits = 0 ;
-	int i ;
-	for ( i = 0 ; callsign[i] && i < MAX_WIDE_HANDLE_WCHARS ; ++i, bits += HANDLE_WCHAR_BITS )
+	ChatHandle code = 1;
+	int bits = 0;
+	size_t i;
+	for ( i = 0; callsign[i] && i < MAX_WIDE_HANDLE_WCHARS; ++i, bits += HANDLE_WCHAR_BITS )
 	{
-		if ( callsign[i] == 0 )
+		code = s_wideCharacterMap[(UINT16)(callsign[i] & 0xffff)];
+		if ( PN_UNLIKELY(code == 0) )
 		{
-			_wideHandle(handle) ;
-			return ;
+			handle = 0ULL;
+			return;
 		}
-		code = s_wideCharacterMap[(UINT16)(callsign[i] & 0xffff)] ;
-		if ( code == 0 )
-		{
-			handle = 0ULL ;
-			return ;
-		}
-		handle |= code << bits ;
+		handle |= code << bits;
 	}
 	if ( callsign[i] > 0 && callsign[i] < 0x100 )
 	{
-		code = s_characterMap[(UINT16)(callsign[i] & 0xff)] ;
-		if ( code == 0 )
+		code = s_characterMap[(UINT16)(callsign[i] & 0xff)];
+		if ( PN_UNLIKELY(code == 0) )
 		{
-			handle = 0ULL ;
-			return ;
+			handle = 0ULL;
+			return;
 		}
-		handle |= (ChatHandle)code << bits ;
-		++i ;
+		handle |= (ChatHandle)code << bits;
+		++i;
 	}
-	if ( callsign[i] )
+	if ( PN_UNLIKELY(callsign[i]) )
 	{
-		handle = 0ULL ;
-		return ;
+		handle = 0ULL;
+		return;
 	}
 
-	_wideHandle(handle) ;
+	_wideHandle(handle);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -4943,17 +4938,17 @@ _wideEncode(const wchar_t* const callsign, ChatHandle& handle)
 ChatHandle
 chatGetHandle(const char* const callsign)
 {
-	if ( callsign == NULL || *callsign == 0 )
+	if ( PN_UNLIKELY(callsign == nullptr || *callsign == 0) )
 		return 0;
 
-	ChatHandle handle = 0 ;
+	ChatHandle handle = 0;
 	if ( (unsigned char)callsign[0] <= 0x7f )
-		_plainEncode((const unsigned char*)callsign, handle) ;
+		_plainEncode((const unsigned char*)callsign, handle);
 	else
 	{
-		wchar_t wideCallsign[MAX_WIDE_HANDLE_SIZE] ;
-		WWII::ConvertChars(callsign, wideCallsign, sizeof(wideCallsign)) ;
-		_wideEncode(wideCallsign, handle) ;
+		wchar_t wideCallsign[MAX_WIDE_HANDLE_SIZE];
+		WWII::ConvertChars(callsign, wideCallsign, sizeof(wideCallsign));
+		_wideEncode(wideCallsign, handle);
 	}
 
 	return handle;
@@ -4962,17 +4957,17 @@ chatGetHandle(const char* const callsign)
 ChatHandle
 chatGetHandle(const wchar_t* const callsign)
 {
-	if ( callsign == NULL || *callsign == 0 )
+	if ( PN_UNLIKELY(callsign == nullptr || *callsign == 0) )
 		return 0;
 
-	ChatHandle handle = 0 ;
+	ChatHandle handle = 0;
 	// Wide character callsigns require that the first
 	// character be a wide character otherwise we assume
 	// plain text.
 	if ( (unsigned int)callsign[0] > (unsigned int)0x7f )
-		_wideEncode(callsign, handle) ;
+		_wideEncode(callsign, handle);
 	else
-		_plainEncode(callsign, handle) ;
+		_plainEncode(callsign, handle);
 
 	return handle;
 }
@@ -4980,180 +4975,183 @@ chatGetHandle(const wchar_t* const callsign)
 ChatHandle
 chatGetLowercaseHandle(const char* const callsign)
 {
-	if ( callsign == NULL || *callsign == 0 )
+	if ( PN_UNLIKELY(callsign == nullptr || *callsign == 0) )
 		return 0;
 
 	if ( chatIsWideCallsign(callsign) )
 	{
-		wchar_t wideCallsign[MAX_HANDLE_WSIZE] ;
-		WWII::ConvertChars(callsign, wideCallsign, sizeof(wideCallsign)) ;
-		int i ;
-		for ( i = 0 ; callsign[i] && i < MAX_WIDE_HANDLE_LEN ; ++i )
-			wideCallsign[i] = towlower(wideCallsign[i]) ;
-		wideCallsign[i] = 0 ;
-		return chatGetHandle(wideCallsign) ;
+		wchar_t wideCallsign[MAX_HANDLE_WSIZE];
+		WWII::ConvertChars(callsign, wideCallsign, sizeof(wideCallsign));
+		int i;
+		for ( i = 0; callsign[i] && i < MAX_WIDE_HANDLE_LEN; ++i )
+			wideCallsign[i] = towlower(wideCallsign[i]);
+		wideCallsign[i] = 0;
+		return chatGetHandle(wideCallsign);
 	}
 
-	char tempCallsign[MAX_HANDLE_WSIZE] ;
-	size_t i ;
-	for ( i = 0 ; callsign[i] && i < MAX_HANDLE_WLEN ; ++i )
-		tempCallsign[i] = (char)tolower(callsign[i]) ;
-	tempCallsign[i] = 0 ;
+	char tempCallsign[MAX_HANDLE_WSIZE];
+	size_t i;
+	for ( i = 0; callsign[i] && i < MAX_HANDLE_WLEN; ++i )
+		tempCallsign[i] = (char)tolower(callsign[i]);
+	tempCallsign[i] = 0;
 
-	return chatGetHandle(tempCallsign) ;
+	return chatGetHandle(tempCallsign);
 }
 
 ChatHandle
 chatGetLowercaseHandle(const wchar_t* const callsign)
 {
-	if ( callsign == NULL || *callsign == 0 )
+	if ( PN_UNLIKELY(callsign == nullptr || *callsign == 0) )
 		return 0;
 
-	wchar_t tempCallsign[MAX_HANDLE_WSIZE] ;
+	wchar_t tempCallsign[MAX_HANDLE_WSIZE];
 	size_t i = 0;
-	for ( i = 0 ; callsign[i] != 0 && i < MAX_HANDLE_WLEN ; ++i )
+	for ( i = 0; callsign[i] != 0 && i < MAX_HANDLE_WLEN; ++i )
 	{
-		tempCallsign[i] = towlower(callsign[i]) ;
+		tempCallsign[i] = towlower(callsign[i]);
 	}
 
-	tempCallsign[i] = 0 ;
+	tempCallsign[i] = 0;
 
-	return chatGetHandle(tempCallsign) ;
+	return chatGetHandle(tempCallsign);
 }
 
 ChatHandle
 chatGetLowercaseHandle(ChatHandle handle)
 {
-	ChatHandle newHandle = 0ULL ;
-	ChatHandle code = 1 ;
+	ChatHandle newHandle = 0ULL;
+	ChatHandle code = 1;
 	if ( false == chatIsWideCallsign(handle) )
 	{
-		_plainHandle(newHandle) ;
+		_plainHandle(newHandle);
 		// Simple extraction of plain handle
-		for ( size_t i = 0 ; i < MAX_HANDLE_WLEN * HANDLE_PLAIN_BITS ; i += HANDLE_PLAIN_BITS )
+		for ( size_t i = 0; i < MAX_HANDLE_WLEN * HANDLE_PLAIN_BITS; i += HANDLE_PLAIN_BITS )
 		{
-			unsigned char quad = (unsigned char)(handle & HANDLE_PLAIN_MASK) ;
-			if ( quad >= PLAIN_CHARACTERS )
-				break ;
-			code = s_characterMap[(unsigned int)tolower(s_characters[quad])] ;
+			unsigned char quad = (unsigned char)(handle & HANDLE_PLAIN_MASK);
+			if ( PN_UNLIKELY(quad >= PLAIN_CHARACTERS) )
+				break;
+			code = s_characterMap[(unsigned int)tolower(s_characters[quad])];
 			if ( code == 0 )
-				break ;
-			newHandle |= code << i ;
-			handle >>= HANDLE_PLAIN_BITS ;
+				break;
+			newHandle |= code << i;
+			handle >>= HANDLE_PLAIN_BITS;
 		}
 	}
 	else
 	{
-		_wideHandle(newHandle) ;
+		_wideHandle(newHandle);
 		// Complex extraction of wide handle
-		static const int WCHAR_BITS = MAX_WIDE_HANDLE_WCHARS * HANDLE_WCHAR_BITS ;
-		int i ;
-		for ( i = 0 ; i < WCHAR_BITS ; i += HANDLE_WCHAR_BITS )
+		static const int WCHAR_BITS = MAX_WIDE_HANDLE_WCHARS * HANDLE_WCHAR_BITS;
+		int i;
+		for ( i = 0; i < WCHAR_BITS; i += HANDLE_WCHAR_BITS )
 		{
-			unsigned short int quad = (unsigned short int)(handle & HANDLE_WCHAR_MASK) ;
-			if ( quad >= Chat::WIDE_HANDLE_CHARACTERS_SUPPORTED )
-				break ;
-			code = s_wideCharacterMap[(unsigned short int)towlower(s_wideCharacters[quad])] ;
+			unsigned short int quad = (unsigned short int)(handle & HANDLE_WCHAR_MASK);
+			if ( PN_UNLIKELY(quad >= Chat::WIDE_HANDLE_CHARACTERS_SUPPORTED) )
+				break;
+			code = s_wideCharacterMap[(unsigned short int)towlower(s_wideCharacters[quad])];
 			if ( code == 0 )
-				return newHandle ;
-			newHandle |= code << i ;
-			handle >>= HANDLE_WCHAR_BITS ;
+				return newHandle;
+			newHandle |= code << i;
+			handle >>= HANDLE_WCHAR_BITS;
 		}
 		if ( code != 0 && i == WCHAR_BITS )
 		{
-			unsigned char quad = (unsigned char)((handle >> i) & HANDLE_PLAIN_MASK) ;
+			unsigned char quad = (unsigned char)((handle >> i) & HANDLE_PLAIN_MASK);
 			if ( quad >= PLAIN_CHARACTERS )
-				return newHandle ;
-			code = s_characterMap[(unsigned char)tolower(s_characters[quad])] ;
-			newHandle |= code << i ;
+				return newHandle;
+			code = s_characterMap[(unsigned char)tolower(s_characters[quad])];
+			newHandle |= code << i;
 		}
 	}
-	return newHandle ;
+	return newHandle;
 }
 
 bool
 chatGetCallsign(char* const callsign, const ChatHandle& srcHandle)
 {
-	ChatHandle handle = (srcHandle & ~WIDE_HANDLE_BIT) ;
-	if ( handle == 0 )
+	ChatHandle handle = (srcHandle & ~WIDE_HANDLE_BIT);
+	if ( PN_UNLIKELY(handle == 0) )
 	{
-		callsign[0] = 0 ;
-		return false ;
+		callsign[0] = 0;
+		return false;
 	}
 
 	// Is it a wide handle?
 	if ( handle != srcHandle )
 	{
-		wchar_t wideCallsign[MAX_HANDLE_WSIZE] ;
-		if ( !chatGetCallsign(wideCallsign, srcHandle) )
-			return false ;
-		WWII::ConvertChars(wideCallsign, callsign, sizeof(wideCallsign)) ;
-		return true ;
+		wchar_t wideCallsign[MAX_HANDLE_WSIZE];
+		if ( PN_UNLIKELY(!chatGetCallsign(wideCallsign, srcHandle)) )
+			return false;
+		WWII::ConvertChars(wideCallsign, callsign, sizeof(wideCallsign));
+		return true;
 	}
 
-	size_t i ;
-	for ( i = 0 ; handle > 0 && i < MAX_HANDLE_WLEN ; ++i )
+	size_t i;
+	for ( i = 0; handle > 0 && i < MAX_HANDLE_WLEN; ++i )
 	{
 		callsign[i] = (char)s_characters[(handle & 0x3F)];
 		handle >>= 6;
 	}
-	callsign[i] = 0 ;
+	callsign[i] = 0;
 
-	return true ;
+	return true;
 }
 
 bool
 chatGetCallsign(wchar_t* const callsign, const ChatHandle& srcHandle)
 {
-	ChatHandle handle = (srcHandle & ~WIDE_HANDLE_BIT) ;
-	if ( handle == 0 )
+	ChatHandle handle = (srcHandle & ~WIDE_HANDLE_BIT);
+	if ( PN_UNLIKELY(handle == 0) )
 	{
-		callsign[0] = 0 ;
-		return false ;
+		callsign[0] = 0;
+		return false;
 	}
 
 	// plain will be true if the callsign consists only of plain (7-bit ascii) characters
-	bool plain = (handle == srcHandle) ;
+	bool plain = (handle == srcHandle);
 	// If the callsign is plain characters, only 6 bits are needed per character.
-	int bitsPerCharacter = (plain) ? HANDLE_PLAIN_BITS : HANDLE_WCHAR_BITS ;
+	int bitsPerCharacter = (plain) ? HANDLE_PLAIN_BITS : HANDLE_WCHAR_BITS;
 	// The character mask filters out only the lowest X bits from each value as we shift
-	unsigned int characterMask = (plain) ? (unsigned int)HANDLE_PLAIN_MASK : (unsigned int)HANDLE_WCHAR_MASK ;
+	unsigned int characterMask = (plain) ? (unsigned int)HANDLE_PLAIN_MASK : (unsigned int)HANDLE_WCHAR_MASK;
 	// We have two distinct maps of characters
-	const wchar_t* characters = (plain) ? s_characters : s_wideCharacters ;
+	const wchar_t* characters = (plain) ? s_characters : s_wideCharacters;
 
-	size_t i ;
-	for ( i = 0 ; handle > 0 && i < MAX_HANDLE_WLEN ; ++i )
+	size_t i;
+	for ( i = 0; handle > 0 && i < MAX_HANDLE_WLEN; ++i )
 	{
-		unsigned short int quad = (unsigned short int)(handle & characterMask) ;
+		unsigned short int quad = (unsigned short int)(handle & characterMask);
 		callsign[i] = characters[quad];
-		handle >>= bitsPerCharacter ;
+		handle >>= bitsPerCharacter;
 	}
-	callsign[i] = 0 ;
+	callsign[i] = 0;
 
-	return true ;
+	return true;
 }
+
 const char*
 chatGetCallsign(const ChatHandle& handle)
 {
-	static char callsign[10][MAX_HANDLE_SIZE] ;
-	static int instance = 0 ;
+	static const size_t NumInstances = 16;	// must be a power of 2.
+	static Chat::Name callsigns[NumInstances];
+	static std::atomic<size_t> s_instance { 0 };
 
-	instance = instance & 7 ;
-	chatGetCallsign(callsign[instance], handle) ;
+	const size_t instance = (s_instance++) & (NumInstances - 1);
+	callsigns[instance] = handle;
 
-	return callsign[instance++] ;
+	return callsigns[instance].c_str();
 }
 
 const wchar_t*
 chatGetWideCallsign(const ChatHandle& handle)
 {
-	static wchar_t callsign[10][MAX_HANDLE_WSIZE] ;
-	static int instance = 0 ;
+	static const size_t NumInstances = 16;	// must be a power of 2.
+	static Chat::NameW callsigns[NumInstances];
+	static std::atomic<size_t> s_instance { 0 };
 
-	instance = instance & 7 ;
-	chatGetCallsign(callsign[instance], handle) ;
+	const size_t instance = (s_instance++) & NumInstances;
+	callsigns[instance] = handle;
 
-	return callsign[instance++] ;
+	return callsigns[instance].c_str();
 }
 
 bool
@@ -5161,45 +5159,45 @@ chatIsValidHandle(ChatHandle handle)
 {
 	if ( false == chatIsWideCallsign(handle) )
 	{
-		if ( handle < ((1ULL << HANDLE_PLAIN_BITS) + (1ULL)) )
-			return false ;	// Less than 2 characters
-		if ( handle >= (1ULL << (HANDLE_PLAIN_BITS * MAX_HANDLE_WLEN)) )
-			return false ;
-		for ( size_t i = 0 ; i < MAX_HANDLE_WLEN * HANDLE_PLAIN_BITS ; i += HANDLE_PLAIN_BITS )
+		if ( PN_UNLIKELY(handle < ((1ULL << HANDLE_PLAIN_BITS) + (1ULL))) )
+			return false;	// Less than 2 characters
+		if ( PN_UNLIKELY(handle >= (1ULL << (HANDLE_PLAIN_BITS * MAX_HANDLE_WLEN))) )
+			return false;
+		for ( size_t i = 0; i < MAX_HANDLE_WLEN * HANDLE_PLAIN_BITS; i += HANDLE_PLAIN_BITS )
 		{
-			unsigned char quad = (unsigned char)(handle & HANDLE_PLAIN_MASK) ;
+			unsigned char quad = (unsigned char)(handle & HANDLE_PLAIN_MASK);
 			if ( quad == 0 )
-				return true ;
-			if ( quad >= PLAIN_CHARACTERS || s_characters[quad] == 0 )
-				return false ;
-			handle >>= HANDLE_PLAIN_BITS ;
+				return true;
+			if ( PN_UNLIKELY(quad >= PLAIN_CHARACTERS || s_characters[quad] == 0) )
+				return false;
+			handle >>= HANDLE_PLAIN_BITS;
 		}
 	}
 	else
 	{
-		const ChatHandle unmaskedHandle = handle & ~WIDE_HANDLE_BIT ;
-		if ( unmaskedHandle < PLAIN_CHARACTERS )
-			return false ;	// Less than 1 character
-		if ( unmaskedHandle >= (1ULL << ((MAX_WIDE_HANDLE_WCHARS * HANDLE_WCHAR_BITS) + HANDLE_PLAIN_BITS)) )
-			return false ;
-		static const int WCHAR_BITS = MAX_WIDE_HANDLE_WCHARS * HANDLE_WCHAR_BITS ;
-		int i ;
-		for ( i = 0 ; i < WCHAR_BITS ; i += HANDLE_WCHAR_BITS )
+		const ChatHandle unmaskedHandle = handle & ~WIDE_HANDLE_BIT;
+		if ( PN_UNLIKELY(unmaskedHandle < PLAIN_CHARACTERS) )
+			return false;	// Less than 1 character
+		if ( PN_UNLIKELY(unmaskedHandle >= (1ULL << ((MAX_WIDE_HANDLE_WCHARS * HANDLE_WCHAR_BITS) + HANDLE_PLAIN_BITS))) )
+			return false;
+		static const int WCHAR_BITS = MAX_WIDE_HANDLE_WCHARS * HANDLE_WCHAR_BITS;
+		int i;
+		for ( i = 0; i < WCHAR_BITS; i += HANDLE_WCHAR_BITS )
 		{
-			unsigned short int quad = (unsigned short int)(handle & HANDLE_WCHAR_MASK) ;
+			unsigned short int quad = (unsigned short int)(handle & HANDLE_WCHAR_MASK);
 			if ( quad == 0 )
-				return true ;
-			if ( quad >= Chat::WIDE_HANDLE_CHARACTERS_SUPPORTED || s_wideCharacters[quad] == 0 )
-				return false ;
-			handle >>= HANDLE_WCHAR_BITS ;
+				return true;
+			if ( PN_UNLIKELY(quad >= Chat::WIDE_HANDLE_CHARACTERS_SUPPORTED || s_wideCharacters[quad] == 0) )
+				return false;
+			handle >>= HANDLE_WCHAR_BITS;
 		}
-		unsigned char quad = (unsigned char)(handle & HANDLE_PLAIN_MASK) ;
+		unsigned char quad = (unsigned char)(handle & HANDLE_PLAIN_MASK);
 		if ( quad == 0 )
-			return true ;
-		if ( quad >= PLAIN_CHARACTERS || s_characters[quad] == 0 )
-			return false ;
+			return true;
+		if ( PN_UNLIKELY(quad >= PLAIN_CHARACTERS || s_characters[quad] == 0) )
+			return false;
 	}
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -5208,16 +5206,16 @@ chatIsValidHandle(ChatHandle handle)
 template<typename _CharType>
 static bool _validatePlain(const _CharType* const callsign, size_t len)
 {
-	if ( len < 2 || len > MAX_HANDLE_WLEN )
-		return false ;
+	if ( PN_UNLIKELY(len < 2 || len > MAX_HANDLE_WLEN) )
+		return false;
 
-	for ( size_t i = 0 ; i < len ; ++i )
+	for ( size_t i = 0; i < len; ++i )
 	{
-		const UINT32 character = (UINT32)callsign[i] ;
-		if ( character > 0x7f || s_characterMap[character] == 0 )
-			return false ;
+		const UINT32 character = (UINT32)callsign[i];
+		if ( PN_UNLIKELY(character > 0x7f || s_characterMap[character] == 0) )
+			return false;
 	}
-	return true ;
+	return true;
 }
 
 bool
@@ -5225,37 +5223,37 @@ chatIsValidCallsign(const char* const callsign)
 {
 	if ( true == chatIsWideCallsign(callsign) )
 	{
-		wchar_t wideSign[MAX_HANDLE_WSIZE] ;
-		WWII::ConvertChars(callsign, wideSign, sizeof(wideSign)) ;
-		return chatIsValidCallsign(wideSign) ;
+		wchar_t wideSign[MAX_HANDLE_WSIZE];
+		WWII::ConvertChars(callsign, wideSign, sizeof(wideSign));
+		return chatIsValidCallsign(wideSign);
 	}
 
-	if ( callsign[0] == '-' )
-		return false ;
+	if ( PN_UNLIKELY(callsign[0] == '-') )
+		return false;
 
-	return _validatePlain((const unsigned char*)callsign, strlen(callsign)) ;
+	return _validatePlain((const unsigned char*)callsign, strlen(callsign));
 }
 
 bool
 chatIsValidCallsign(const wchar_t* const callsign)
 {
-	if ( callsign[0] == '-' )
-		return false ;
+	if ( PN_UNLIKELY(callsign[0] == '-') )
+		return false;
 
 	if ( false == chatIsWideCallsign(callsign) )
-		return _validatePlain(callsign, wcslen(callsign)) ;
+		return _validatePlain(callsign, wcslen(callsign));
 
-	int i ;
-	for ( i = 0 ; callsign[i] != 0 && i < MAX_WIDE_HANDLE_WCHARS ; ++i )
+	int i;
+	for ( i = 0; callsign[i] != 0 && i < MAX_WIDE_HANDLE_WCHARS; ++i )
 	{
-		if ( callsign[i] >= 0xffff || s_wideCharacterMap[(unsigned short int)callsign[i]] == 0 )
-			return false ;
+		if ( PN_UNLIKELY(callsign[i] >= 0xffff || s_wideCharacterMap[(unsigned short int)callsign[i]] == 0) )
+			return false;
 	}
-	for ( ; callsign[i] != 0 && i < MAX_WIDE_HANDLE_LEN ; ++i )
+	for (; callsign[i] != 0 && i < MAX_WIDE_HANDLE_LEN; ++i )
 	{
-		if ( callsign[i] >= 0xff || s_characterMap[callsign[i]] == 0 )
-			return false ;
+		if ( PN_UNLIKELY(callsign[i] >= 0xff || s_characterMap[callsign[i]] == 0) )
+			return false;
 	}
 
-	return true ;
+	return true;
 }

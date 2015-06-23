@@ -28,7 +28,7 @@ int SetGlobalObject(Object* obj);
 Object* GlobalObject();
 void SetErrorReporter(JSErrorReporter);
 
-typedef void(*AbortHandler)(const char*) ;
+typedef void(*AbortHandler)(const char*);
 void SetAbortHandler(AbortHandler);
 
 /************************************************************************************************
@@ -40,13 +40,13 @@ class Object : public Referenced
 {
 public:
 	Object(JSClass*, JSContext*, JSObject* parent, JSFunctionSpec*, JSPropertySpec*);
-	Object(JSClass*, JSFunctionSpec* func=NULL, JSPropertySpec* prop=NULL);
+	Object(JSClass*, JSFunctionSpec* func=nullptr, JSPropertySpec* prop=nullptr);
 
-	JSScript* CompileScript(const char* script, const char* filename = NULL);
+	JSScript* CompileScript(const char* script, const char* filename = nullptr);
 	void DestroyScript(JSScript*);
 	
 	jsval RunScript(JSScript*);
-	jsval RunScript(const char* script, const char* filename = NULL);
+	jsval RunScript(const char* script, const char* filename = nullptr);
 	
 	JSBool CallFunction(const char* name, uintN argc, jsval* argv, jsval* rval);
 	
@@ -114,7 +114,7 @@ static JSPropertySpec jsproperties[];
 template<class T>
 T Cast(JSContext* ctx, JSObject* obj) 
 { 
-	if(!obj || !(OBJ_GET_CLASS(ctx, obj)->flags & JSCLASS_HAS_PRIVATE)) return NULL;
+	if(!obj || !(OBJ_GET_CLASS(ctx, obj)->flags & JSCLASS_HAS_PRIVATE)) return nullptr;
 	return dynamic_cast<T>((Object*)JS_GetPrivate(ctx,obj)); 
 }
 
@@ -123,7 +123,7 @@ T Cast(JSContext* ctx, jsval val)
 { 
 	JSObject* obj;
 	if(JSVAL_IS_NULL(val) || !JS_ValueToObject(ctx, val, &obj) || 
-		!obj || !(OBJ_GET_CLASS(ctx, obj)->flags & JSCLASS_HAS_PRIVATE) ) return NULL;
+		!obj || !(OBJ_GET_CLASS(ctx, obj)->flags & JSCLASS_HAS_PRIVATE) ) return nullptr;
 	
 	return dynamic_cast<T>((Object*)JS_GetPrivate(ctx,obj)); 
 }
@@ -139,7 +139,7 @@ public:
 			_jsobj = _ref->jsObject();
 			if(_jsobj)
 			{
-//				JS_SetParent(_ref->jsContext(), _ref->jsObject(), NULL); 
+//				JS_SetParent(_ref->jsContext(), _ref->jsObject(), nullptr); 
 				_ref->Root(&_jsobj);
 			}
 		}
@@ -176,7 +176,7 @@ public:
 				_jsobj = _ref->jsObject();
 				if(_jsobj)
 				{
-//					JS_SetParent(_ref->jsContext(), _ref->jsObject(), NULL); 
+//					JS_SetParent(_ref->jsContext(), _ref->jsObject(), nullptr); 
 					_ref->Root(&_jsobj);			
 				}
 			}
@@ -237,19 +237,16 @@ public:
 	virtual ~Array();
 	
 protected:
-	class Element
+	class Element : public Referenced
 	{
 	public:
 		Element(JSContext* ctx, JSObject* obj, unsigned int i, jsval v);
 		~Element();
-		void Acquire();
-		void Release();
 		
 		JSContext* _ctx;
 		JSObject* _obj;
 		unsigned int _i;
 		jsval _val;
-		int _refcount;
 	};
 	
 	std::vector<ref_ptr<Element> > _elems;
@@ -261,7 +258,7 @@ typedef root_ptr<Array> array_root_ptr;
 class jsval_root
 {
 public:
-	jsval_root() : _jsctx(NULL), _jsval(JSVAL_NULL){}
+	jsval_root() : _jsctx(nullptr), _jsval(JSVAL_NULL){}
 	~jsval_root() 
 	{ 
 		if(_jsctx && _jsval != JSVAL_NULL) 

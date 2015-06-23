@@ -15,7 +15,7 @@ struct iacEntry
 	unsigned int iac;
 	const char* name;
 	int locID;
-} ;
+};
 
 static const iacEntry USKeyboardTable[] =
 {
@@ -170,7 +170,7 @@ static const char* JOY_POV_NAMES[IAC_JOYSTICK_POV_POS] 	= {"n", "ne", "e", "se",
 #define snprintf _snprintf
 #endif
 
-static void (*localized_string) (const char*, int, char*, int) = NULL;
+static void (*localized_string) (const char*, int, char*, int) = nullptr;
 
 static void iac_key_name(const iacEntry* table, unsigned int iac, char* name, int maxlen, int pretty);
 static void iac_mouse_name(unsigned int iac, char* name, int maxlen, int pretty);
@@ -200,7 +200,7 @@ void iacPrettyName(unsigned int iac, char* name, int maxlen)
 
 	if(IAC_IS_KEY(iac))
 	{
-		const iacEntry* table = NULL;
+		const iacEntry* table = nullptr;
 
 		if(IAC_IS_US_KEY(iac)) table = USKeyboardTable;
 
@@ -217,7 +217,7 @@ void iacPrettyName(unsigned int iac, char* name, int maxlen)
 	}
 	else
 	{
-		localized_string(NULL, NOKEY_LOCID, name, maxlen);
+		localized_string(nullptr, NOKEY_LOCID, name, maxlen);
 	}
 }
 
@@ -231,7 +231,7 @@ void iacCommentName(unsigned int iac, char* name, int maxlen)
 
 	if(IAC_IS_KEY(iac))
 	{
-		const iacEntry* table = NULL;
+		const iacEntry* table = nullptr;
 
 		if(IAC_IS_US_KEY(iac)) table = USKeyboardTable;
 
@@ -369,7 +369,7 @@ static void iac_key_name(const iacEntry* table, unsigned int iac, char* name, in
 	if(i > -1)
 	{
 		if(pretty)
-			localized_string(NULL, table[i].locID, name, maxlen);
+			localized_string(nullptr, table[i].locID, name, maxlen);
 		else
 			localized_string("english", table[i].locID, name, maxlen);
 			//strncpy(name, table[i].name, maxlen);
@@ -389,7 +389,7 @@ static void iac_mouse_name(unsigned int iac, char* name, int maxlen, int pretty)
 	if(IAC_IS_MOUSE_AXIS(iac))
 	{
 		if(pretty)
-			localized_string(NULL, MOUSEAXIS_LOCID, formatStr, maxlen);
+			localized_string(nullptr, MOUSEAXIS_LOCID, formatStr, maxlen);
 		else
 			strncpy(formatStr, MOUSEAXIS_FORMAT, maxlen);
 
@@ -401,7 +401,7 @@ static void iac_mouse_name(unsigned int iac, char* name, int maxlen, int pretty)
 	else if(IAC_IS_MOUSE_BUTTON(iac))
 	{
 		if(pretty)
-			localized_string(NULL, MOUSEBUTTON_LOCID, formatStr, maxlen);
+			localized_string(nullptr, MOUSEBUTTON_LOCID, formatStr, maxlen);
 		else
 			strncpy(formatStr, MOUSEBUTTON_FORMAT, maxlen);
 
@@ -414,7 +414,7 @@ static void iac_mouse_name(unsigned int iac, char* name, int maxlen, int pretty)
 	{
 		if(pretty)
 		{
-			localized_string(NULL, (iac == IAC_MOUSE_WHEEL_UP) ? MOUSE_WHEEL_UP_LOCID : MOUSE_WHEEL_DOWN_LOCID,
+			localized_string(nullptr, (iac == IAC_MOUSE_WHEEL_UP) ? MOUSE_WHEEL_UP_LOCID : MOUSE_WHEEL_DOWN_LOCID,
 								name, maxlen);
 		}
 		else
@@ -475,7 +475,7 @@ static void iac_joystick_name(unsigned int iac, char* name, int maxlen, int pret
 
 		if(pretty)
 		{
-			localized_string(NULL, JOYAXIS_LOCID, formatStr, maxlen);
+			localized_string(nullptr, JOYAXIS_LOCID, formatStr, maxlen);
 			iac_format(name, maxlen, UTF16(formatStr), joynum, UTF16(joyname));
 		}
 		else
@@ -487,7 +487,7 @@ static void iac_joystick_name(unsigned int iac, char* name, int maxlen, int pret
 	{
 		if(pretty)
 		{
-			localized_string(NULL, JOYBUTTON_LOCID, formatStr, maxlen);
+			localized_string(nullptr, JOYBUTTON_LOCID, formatStr, maxlen);
 			iac_format(name, maxlen, UTF16(formatStr), joynum, idx);
 		}
 		else
@@ -501,7 +501,7 @@ static void iac_joystick_name(unsigned int iac, char* name, int maxlen, int pret
 
 		if(pretty)
 		{
-		 	localized_string(NULL, JOYPOV_LOCID, formatStr, maxlen);
+		 	localized_string(nullptr, JOYPOV_LOCID, formatStr, maxlen);
 			iac_format(name, maxlen, UTF16(formatStr), joynum, idx, UTF16(povname));
 		}
 		else
@@ -569,7 +569,8 @@ static unsigned int iac_mouse_code(const char* name)
 static unsigned int iac_joystick_code(const char* name)
 {
 	unsigned joynum = 0, idx = 0;
-	char str[16] = "";
+	char str[16];
+	str[0] = 0;
 	int i;
 
 	if(!strcmpiws(name, "trackirx"))
@@ -652,7 +653,7 @@ static int get_table_index_from_name(const iacEntry* table, const char* language
 
 	for(int i = 0; table[i].iac != 0; i++)
 	{
-		if(language == NULL)
+		if(language == nullptr)
 		{
 			if(!strcmpiws(name, table[i].name))
 				return i;

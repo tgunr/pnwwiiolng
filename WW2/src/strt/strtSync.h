@@ -11,11 +11,11 @@
 // Class for managing the synchronization queue
 
 // Add a new host to the list of servers needing to be sync'd
-extern void strtAddSyncPeer(UINT32 address) ;
+extern void strtAddSyncPeer(UINT32 address);
 
 // Remove a host from the sync list
-extern void strtRemoveSyncPeer(UINT32 address) ;
+extern void strtRemoveSyncPeer(UINT32 address);
 
 // Check the synclist for servers waiting on another supercell
-extern UINT32 strtSyncPeers() ;
+extern UINT32 strtSyncPeers();
 

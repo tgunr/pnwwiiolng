@@ -13,15 +13,15 @@
 #include "wwii/wwiiRoomLists.h"
 #include "wwii/wwiiRank.h"
 
-class Mission ;
+class Mission;
 
-extern bool activeCountries[MAX_COUNTRIES] ;
+extern bool activeCountries[MAX_COUNTRIES];
 
 #define USE_TIMEOUTS
 
-static const SINT32 NUM_CLOCK_BITS = 31 ;	// Default number of clock bits to suse
+static const SINT32 NUM_CLOCK_BITS = 31;	// Default number of clock bits to suse
 
-static const UINT32 MINIMUM_TIME_FOR_MISSION_SUCCESS = 10 * 60 ;	// 10 minutes
+static const UINT32 MINIMUM_TIME_FOR_MISSION_SUCCESS = 10 * 60;	// 10 minutes
 
 extern FLOAT32 RTBModifier[2][4];
 // Read from config { {.5, 1,1.5, 2 } , {2, 1.5, 1,.5} };

@@ -9,7 +9,6 @@
 #include "physics/colliderQuery.h"
 
 #include "wwii/wwiiHash.h"
-USING_EXT_NAMESPACE;
 
 #if USE_STATESET
 #include "ogl/States.h"
@@ -61,7 +60,7 @@ struct Patch
     std::vector<short> indices;
 
     std::vector<Vec2f> collide;
-    stdext::hash_map<dGeomID, int> geommap;
+    std::unordered_map<dGeomID, int> geommap;
 
     int vboid;
 
@@ -82,7 +81,7 @@ struct Patch
         if(collider)
         {
             delete collider;
-            collider = NULL;
+            collider = nullptr;
         }
     }
 };
@@ -140,7 +139,7 @@ struct PatchInstance
         primcount(0),
         key(0),
         splatid(-1),
-        instanceof(NULL),
+        instanceof(nullptr),
         userwanteddensity(0)
 	{
         rot.set(1, 0, 0, 0);
@@ -315,8 +314,8 @@ void speedgrassGetStats(char buff[]);
 void speedgrassRemoveAll();
 bool speedgrassRemove(const char* key);
 bool speedgrassRemove(size_t key);
-bool speedgrassAddAndCollide(const Vec3d& pos, const char* type, const char* key, float fade, trnCDTerrainObject* to = NULL, OBJECT* o = NULL);
-bool speedgrassAddAndCollide(const Vec3d& pos, const char* type, size_t key, float fade, trnCDTerrainObject* to = NULL, OBJECT* o = NULL);
+bool speedgrassAddAndCollide(const Vec3d& pos, const char* type, const char* key, float fade, trnCDTerrainObject* to = nullptr, OBJECT* o = nullptr);
+bool speedgrassAddAndCollide(const Vec3d& pos, const char* type, size_t key, float fade, trnCDTerrainObject* to = nullptr, OBJECT* o = nullptr);
 bool speedgrassAddCoverGrass(const Vec3d& pos,
                              int type = SpeedGrassDeprecated::type_grass,
                              unsigned int key = 0,

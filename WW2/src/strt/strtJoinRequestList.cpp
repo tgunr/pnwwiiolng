@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Created: Fri Apr 20 17:07:02 2001
 //
 // list management routines for JoinRequest Lists.  These lists
@@ -10,23 +9,16 @@
 // compiled library.
 //
 // Originating Programmer: Shane "Elmo" Wickson
-// Maintaining Programmer: Shane "Elmo" Wickson
 // Supporting Programmer:  Eric "Meat" Hall
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <map>
-
-#include "dbug/dbug.h"
 
 #include "strt/strtServerTypes.h"
 #include "strt/strtJoinList.h"
 #include "mem/mem.h"
-#include "cnvy/cnvyMain.h"
+//#include "cnvy/cnvyMain.h"
 #include "strt/strtHostMessages.h"
 
-typedef std::map<UINT32, WeapJoinRequestNode*> JOIN_MAP ;
-static JOIN_MAP joinMap ;
+typedef std::map<UINT32, WeapJoinRequestNode*> JOIN_MAP;
+static JOIN_MAP joinMap;
 
 //////////////////////////////////////////////////////////////////////
 // Remove all members from a join request list.
@@ -34,31 +26,31 @@ static JOIN_MAP joinMap ;
 void
 JOIN_LIST::clear(UINT32 exceptPlayerID, bool announce)
 {
-	WeapJoinRequestNode* exceptedNode = NULL ;
+	WeapJoinRequestNode* exceptedNode = nullptr;
 	while ( m_list.empty() == false )
 	{
-		WeapJoinRequestNode* node = m_list.front() ;
+		WeapJoinRequestNode* node = m_list.front();
 		if ( exceptPlayerID > 0 && node->m_playerID == exceptPlayerID )
 		{
-			exceptedNode = node ;
-			m_list[0] = m_list.back() ;
-			m_list.resize(m_list.size() - 1) ;
+			exceptedNode = node;
+			m_list[0] = m_list.back();
+			m_list.resize(m_list.size() - 1);
 		}
 		else
 		{
 			if ( announce )
-				strtSendMMJoinDeny(cnvyGetMapConnection(), node->m_playerID, MM_JOIN_FAIL_POSTER_DENIED_ACCESS);
+				strtSendMMJoinDeny(node->m_playerID, MM_JOIN_FAIL_POSTER_DENIED_ACCESS);
 			// Remember: Delete will extract the node from the list.
-			delete node ;
+			delete node;
 		}
 	}
 
-	m_list.clear() ;
+	m_list.clear();
 
-	assert( m_list.empty() ) ;
+	assert( m_list.empty() );
 
 	if ( exceptedNode )
-		m_list.push_back(exceptedNode) ;
+		m_list.push_back(exceptedNode);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -67,16 +59,16 @@ JOIN_LIST::clear(UINT32 exceptPlayerID, bool announce)
 WeapJoinRequestNode*
 WeapJoinRequestNode::Lookup(UINT32 playerID)
 {
-	JOIN_MAP::iterator it = joinMap.find(playerID) ;
-	return ( it != joinMap.end() ) ? it->second : NULL ;
+	JOIN_MAP::iterator it = joinMap.find(playerID);
+	return ( it != joinMap.end() ) ? it->second : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Ctor for WeapJoinRequestNode
 
 WeapJoinRequestNode::WeapJoinRequestNode(UINT32 playerID, const ChatHandle& handle, UINT32 missionID)
-	: prev(NULL), next(NULL)
-	, m_joinList(NULL)
+	: prev(nullptr), next(nullptr)
+	, m_joinList(nullptr)
 	, m_playerID(playerID)
 	, m_missionID(missionID)
 	, m_capacityTeulIndex(-1)
@@ -85,14 +77,14 @@ WeapJoinRequestNode::WeapJoinRequestNode(UINT32 playerID, const ChatHandle& hand
 	ABORT_IF_EX(m_playerID == 0, "attempted to create WeapJoinRequestNode with playerID of 0");
 	ABORT_IF_EX( m_handle == 0, "p:%u attempted to create WeapJoinRequestNode with handle of 0", m_playerID);
 
-	memset(&m_capacityRequest, 0, sizeof(m_capacityRequest)) ;
+	memset(&m_capacityRequest, 0, sizeof(m_capacityRequest));
 
 	if ( g_logDebug )
 	{
-		dbugLog(_FLD, "p:%u c:%s ptr:%p +ALLOC WeapJoinRequestNode", m_playerID, chatGetCallsign(m_handle), this) ;
+		dbugLog(_FLD, "p:%u c:%s ptr:%p +ALLOC WeapJoinRequestNode", m_playerID, Chat::Name(m_handle).c_str(), this);
 	}
 
-	_register() ;
+	_register();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -100,23 +92,23 @@ WeapJoinRequestNode::WeapJoinRequestNode(UINT32 playerID, const ChatHandle& hand
 
 WeapJoinRequestNode::~WeapJoinRequestNode()
 {
-	if ( m_joinList != NULL )
+	if ( m_joinList != nullptr )
 	{
 		dbugLog(_FLD, "p:%u removing node %p from list %p on dtor"
 						, m_playerID, this, this->m_joinList
-						) ;
-		m_joinList->Extract(this) ;
+						);
+		m_joinList->Extract(this);
 	}
 
-	_unregister() ;
+	_unregister();
 
 	if ( g_logDebug )
 	{
-		dbugLog(_FLD, "p:%u c:%s ptr:%p -REL", m_playerID, chatGetCallsign(m_handle), this) ;
+		dbugLog(_FLD, "p:%u c:%s ptr:%p -REL", m_playerID, Chat::Name(m_handle).c_str(), this);
 	}
 
-	m_playerID = 0 ;
-	m_handle = 0ULL ;
+	m_playerID = 0;
+	m_handle = 0ULL;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -125,14 +117,14 @@ WeapJoinRequestNode::~WeapJoinRequestNode()
 void
 WeapJoinRequestNode::_register()
 {
-	if ( WeapJoinRequestNode::Lookup(m_playerID) != NULL )
+	if ( WeapJoinRequestNode::Lookup(m_playerID) != nullptr )
 	{
-		LogAbort("p:%u c:%s attempted to allocate additional WeapJoinRequestNode", m_playerID, chatGetCallsign(m_handle)) ;
+		LogAbort("p:%u c:%s attempted to allocate additional WeapJoinRequestNode", m_playerID, Chat::Name(m_handle).c_str());
 	}
 
-	joinMap[m_playerID] = this ;
+	joinMap[m_playerID] = this;
 
-	dbugLog(_FLD, "p:%u ptr:%p +REG", m_playerID, this) ;
+	dbugLog(_FLD, "p:%u ptr:%p +REG", m_playerID, this);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -141,7 +133,7 @@ WeapJoinRequestNode::_register()
 void
 WeapJoinRequestNode::_unregister()
 {
-	JOIN_MAP::iterator it = joinMap.find(m_playerID) ;
+	JOIN_MAP::iterator it = joinMap.find(m_playerID);
 	if ( it == joinMap.end() )
 	{
 		LogAbort("p:%u ptr:%p attempt to free node twice!!", this->m_playerID, this);
@@ -149,12 +141,12 @@ WeapJoinRequestNode::_unregister()
 
 	if ( it->second != this )
 	{
-		LogAbort("p:%u ptr:%p attempting to free unmapped join node (mapped node %p)", this->m_playerID, this, it->second) ;
+		LogAbort("p:%u ptr:%p attempting to free unmapped join node (mapped node %p)", this->m_playerID, this, it->second);
 	}
 
-	joinMap.erase(it) ;
+	joinMap.erase(it);
 
-	dbugLog(_FLD, "p:%u ptr:%p -REG", m_playerID, this) ;
+	dbugLog(_FLD, "p:%u ptr:%p -REG", m_playerID, this);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -164,105 +156,105 @@ WeapJoinRequestNode::_unregister()
 bool
 WeapJoinRequestNode::AddToList(JOIN_LIST* dest)
 {
-	if ( dest == NULL )
+	if ( dest == nullptr )
 	{
-		LogAbort("p:%u c:%s ptr:%p attempted to add JRN to NULL list", m_playerID, chatGetCallsign(m_handle), this) ;
+		LogAbort("p:%u c:%s ptr:%p attempted to add JRN to NULL list", m_playerID, Chat::Name(m_handle).c_str(), this);
 	}
 
 	// if the node is currently on a list...
-	if ( m_joinList != NULL )
+	if ( m_joinList != nullptr )
 	{
 		// Already on the dest list...
 		if ( m_joinList == dest )
 		{
 			dbugLog(_FLD, "p:%u c:%s ptr:%p attempted to re-add to list %p"
-							, m_playerID, chatGetCallsign(m_handle), this, m_joinList) ;
-			return true ;
+							, m_playerID, Chat::Name(m_handle).c_str(), this, m_joinList);
+			return true;
 		}
 
-		m_joinList->Extract(this) ;
+		m_joinList->Extract(this);
 	}
 
 	dbugLog(_FLI, "p:%u c:%s ptr:%p adding to list %p type %u"
-					, m_playerID, chatGetCallsign(m_handle), this
-					, dest, dest->m_type) ;
+					, m_playerID, Chat::Name(m_handle).c_str(), this
+					, dest, dest->m_type);
 
-	dest->Add(this) ;
+	dest->Add(this);
 
-	return true ;
+	return true;
 }
 
 void
 JOIN_LIST::Add(WeapJoinRequestNode* node)
 {
-	assert( node != NULL ) ;
+	assert( node != nullptr );
 
 	try
 	{
 #ifdef DEV_BUILD
-		if ( node->m_playerID == 0 ) throw "playerID == 0" ;
-		if ( WeapJoinRequestNode::Lookup(node->m_playerID) != node ) throw "orphaned node" ;
+		if ( node->m_playerID == 0 ) throw "playerID == 0";
+		if ( WeapJoinRequestNode::Lookup(node->m_playerID) != node ) throw "orphaned node";
 #endif
-		if ( node->m_joinList == this ) throw "unecessary attempt to re-add node" ;
-		if ( node->m_joinList != NULL ) throw "node is already on another list" ;
-		for ( UINT32 i = 0 ; i < m_list.size() ; ++i )
+		if ( node->m_joinList == this ) throw "unnecessary attempt to re-add node";
+		if ( node->m_joinList != nullptr ) throw "node is already on another list";
+		for ( UINT32 i = 0; i < m_list.size(); ++i )
 		{
 			if ( m_list[i] == node || m_list[i]->m_playerID == node->m_playerID )
-				throw "attempt to re-add orphaned node" ;
+				throw "attempt to re-add orphaned node";
 		}
 
-		m_list.push_back(node) ;
-		node->m_joinList = this ;
+		m_list.push_back(node);
+		node->m_joinList = this;
 
 		if ( g_logDebug )
 			dbugLog(_FLD, "p:%u c:%s ptr:%p list:%p Added Node (%" PRSizeT ")"
-							, node->m_playerID, chatGetCallsign(node->m_handle), node, this, m_list.size()) ;
+							, node->m_playerID, Chat::Name(node->m_handle).c_str(), node, this, m_list.size());
 	}
 	catch ( const char* error )
 	{
 		LogAbort("p:%u c:%s ptr:%p list:%p njl:%p Add failed: %s"
-						, node->m_playerID, chatGetCallsign(node->m_handle), node, this, node->m_joinList, error) ;
+						, node->m_playerID, Chat::Name(node->m_handle).c_str(), node, this, node->m_joinList, error);
 	}
 }
 
 void
 JOIN_LIST::Extract(WeapJoinRequestNode* node)
 {
-	assert( node != NULL ) ;
+	assert( node != nullptr );
 
 	try
 	{
-		if ( node->m_playerID == 0 ) throw "Node has playerID 0" ;
-		if ( node->m_joinList == NULL ) throw "NULL joinList" ;
-		if ( node->m_joinList != this ) throw "Node not on this list" ;
-		if ( m_list.empty() ) throw "list is empty" ;
+		if ( node->m_playerID == 0 ) throw "Node has playerID 0";
+		if ( node->m_joinList == nullptr ) throw "NULL joinList";
+		if ( node->m_joinList != this ) throw "Node not on this list";
+		if ( m_list.empty() ) throw "list is empty";
 
-		for ( UINT32 i = 0 ; i < m_list.size() ; ++i )
+		for ( UINT32 i = 0; i < m_list.size(); ++i )
 		{
 			if ( m_list[i] != node )
 			{
 				if ( m_list[i]->m_playerID == node->m_playerID )
-					throw "Found orphaned clone" ;
-				continue ;
+					throw "Found orphaned clone";
+				continue;
 			}
 
-			node->m_joinList = NULL ;
+			node->m_joinList = nullptr;
 
 			// Swap the last node in to this slot.
-			m_list[i] = m_list.back() ;
-			m_list.resize(m_list.size() - 1) ;
+			m_list[i] = m_list.back();
+			m_list.resize(m_list.size() - 1);
 
 			if ( g_logDebug )
 				dbugLog(_FLD, "p:%u c:%s ptr:%p list:%p Removed Node [%" PRSizeT "]"
-								, node->m_playerID, chatGetCallsign(node->m_handle), node, this, m_list.size()) ;
+								, node->m_playerID, Chat::Name(node->m_handle).c_str(), node, this, m_list.size());
 
-			return ;
+			return;
 		}
 	}
 	catch ( const char* error )
 	{
 		LogAbort("p:%u c:%s ptr:%p join list extract failed from list %p: %s (njl=%p)"
-						, node->m_playerID, chatGetCallsign(node->m_handle), node, this, error, node->m_joinList) ;
+						, node->m_playerID, Chat::Name(node->m_handle).c_str(), node, this, error, node->m_joinList);
 	}
 }
 

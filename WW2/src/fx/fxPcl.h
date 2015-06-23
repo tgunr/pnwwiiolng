@@ -17,7 +17,7 @@ enum ENUMPARTICLETYPE
     IDE_PARTICLE_VAPOR_TRAIL,
     IDE_NUMBER_OF_PARTICLES
 
-} ;
+};
 
 struct FXPARTICLE
 {
@@ -88,12 +88,12 @@ struct FXPARTICLE
 struct FXINITFUNC
 {
     bool (*pFn)(FXPARTICLE* lpPcl);
-} ;
+};
 
 struct FXUPDATEFUNC
 {
     void (*pFn)(FXPARTICLE* lpPcl);
-} ;
+};
 
 ///////////////////////////
 // LOGICAL functions
@@ -132,7 +132,7 @@ extern void fxPclPushFlags(SINT32 iID, UINT32 uFlags);
 extern void fxPclSet4PtAlpha(SINT32 iID, FLOAT32 p1, FLOAT32 p2, FLOAT32 p3, FLOAT32 p4);
 extern void fxPclSet4PtScale(SINT32 iID, FLOAT32 p1, FLOAT32 p2, FLOAT32 p3, FLOAT32 p4);
 extern void fxPclSet4PtTimeOffset(SINT32 iID, FLOAT32 p1, FLOAT32 p2, FLOAT32 p3, FLOAT32 p4);
-extern void fxPclSetAmmo(SINT32 iID, void* pAmmo) ;
+extern void fxPclSetAmmo(SINT32 iID, void* pAmmo);
 extern void fxPclSetAmmoFlags(SINT32 iID, UINT32 uFlags);
 extern void fxPclSetDirection(SINT32 iID, FLOAT32 x, FLOAT32 y, FLOAT32 z);
 extern void fxPclSetDOFObject(SINT32 iID, OBJECTDOF* lpDOF);

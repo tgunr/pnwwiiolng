@@ -9,14 +9,14 @@ unsigned int language;
 const TCHAR* GetLoc(UINT id, ...)
 {
 	const int instances = 8;
-	static int instance = 0 ;
+	static int instance = 0;
 
-	static TCHAR lookup[instances][MAX_LOC_VALUE+1] ;
+	static TCHAR lookup[instances][MAX_LOC_VALUE+1];
 	static TCHAR format[MAX_LOC_VALUE+1];
 	
-	instance = instance & (instances - 1) ;
+	instance = instance & (instances - 1);
 
-	HMODULE hm = GetModuleHandle(NULL);
+	HMODULE hm = GetModuleHandle(nullptr);
 
 	// lookup the format string
 	int read = LoadString(hm, LOC(language,id), format, MAX_LOC_VALUE);
@@ -43,7 +43,7 @@ const TCHAR* GetLoc(UINT id, ...)
 		lstrcpy(lookup[instance], L"?");
 	}
 	
-	return lookup[instance++] ;
+	return lookup[instance++];
 }
 
 void LocInit()
@@ -66,9 +66,10 @@ void LocInit()
 			language = LANGUAGE_CHINESE;
 	}
 	
-	char	buffer[MAX_PARAM+1] = "" ;
+	char buffer[MAX_PARAM+1];
+	buffer[0] = 0;
 	if(!registryGetVal(g_registryKey, "Region", (LPBYTE)buffer) || buffer[0] == 0)
-		return ;
+		return;
 
 	if ( _stricmp(buffer, "china") == 0 || _stricmp(buffer, "cn") == 0 || _stricmp(buffer, "zh") == 0 )
 		language = LANGUAGE_CHINESE;

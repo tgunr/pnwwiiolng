@@ -6,13 +6,13 @@
 	cmdLineClient
 *************************************************************************************************/
 
-extern int cmdLineClientExecuteCommand(char*);
-extern int cmdLineClientExecuteCommand(int argc, char* argv[]);
+int cmdLineClientExecuteCommand(char*);
+int cmdLineClientExecuteCommand(int argc, char* argv[]);
 
-extern void cmdLineClientSetPlayerIdStart(int);
-extern void cmdLineClientSetHost(const char*);
-extern void cmdLineClientSetStartPosition(float,float,float);
+void cmdLineClientSetPlayerIdStart(int);
+void cmdLineClientSetHost(const char*);
+void cmdLineClientSetStartPosition(float,float,float);
 
-extern void cmdLineClientUpdate();
+void cmdLineClientUpdate();
 
-extern void cmdLineClientKill();
+void cmdLineClientKill();

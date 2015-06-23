@@ -54,7 +54,7 @@
 
 #define TEST_PBO    0
 
-#define BUFFER_OFFSET(i) ((char*)NULL + (i))
+#define BUFFER_OFFSET(i) ((char*)nullptr + (i))
 
 static ref_ptr<FrameBufferObject> sunfbo;
 static ref_ptr<Texture> suntex;
@@ -73,7 +73,7 @@ static ref_ptr<oglMaterial> afterflareMaterial;
 static ref_ptr<PixelDataBufferObject> pbo[MAX_PBO];
 #endif
 
-static OBJECT* g_sun = NULL;
+static OBJECT* g_sun = nullptr;
 
 //static float c_fHalfMaxBright = 0.45f;
 //static float c_fDistanceScale = 1.0f;
@@ -178,7 +178,7 @@ static float g_afColors[ ][4] =
 
 void LensFlareKill()
 {
-    sunfbo = NULL;
+    sunfbo = nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -723,7 +723,7 @@ Texture* CLensFlare::GetSunTexture()
 {
     if(!sunfbo.valid())
     {
-        return NULL;
+        return nullptr;
     }
 
     return suntex.get();

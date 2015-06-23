@@ -34,10 +34,10 @@ extern SINT32 mmSendJoinAccept(SINT32 connection, MM_POSTED_WEAPON postedWeapon)
 extern SINT32 mmSendJoinDeny(SINT32 connection, UINT32 reasonCode);
 
 //Sends a Join Permission Request to an FE
-extern SINT32 mmSendJoinPermRequest(SINT32 connection, UINT32 joinRequestID, const SCHAR* const callsign);
+extern SINT32 mmSendJoinPermRequest(SINT32 connection, UINT32 joinRequestID, const ChatHandle gameName);
 
 //Sends an FE Spawn Notify
-extern SINT32 mmSendSpawnNotify(SINT32 connection, const WEAPON_SERIAL& weaponSerial, sortieid_t spawnVehicleID, FLOAT64 x, FLOAT64 y, FLOAT64 z, UINT8 decal, bool isBuilder, bool isHighCommander, bool isMissionLeader) ;
+extern SINT32 mmSendSpawnNotify(SINT32 connection, const WEAPON_SERIAL& weaponSerial, sortieid_t spawnVehicleID, FLOAT64 x, FLOAT64 y, FLOAT64 z, UINT8 decal, bool isBuilder, bool isHighCommander, bool isMissionLeader);
 
 //Sends a crew bailed
 extern SINT32 mmSendCrewBailed(SINT32 connection, UINT32 joinRequestID, UINT32 reasonCode);

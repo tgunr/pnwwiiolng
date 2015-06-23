@@ -15,7 +15,6 @@
 #include "chat/chatHostMessages.h"
 #include "chat/chatIRCPlayer.h"
 #include "chat/chatList.h"
-#include "chat/chatMakeTempString.h"
 #include "chat/chatManagementIDs.h"
 #include "chat/chatManagementPlayer.h"
 #include "chat/chatManagementTypes.h"
@@ -31,11 +30,11 @@
 
 UINT32 _sideCount[MAX_SIDES];
 
-PLAYERS commandList ;
+PLAYERS commandList;
 
-PLAYER_INDEX playerIndex ;
-static PLAYERS s_limboPlayers ;					// Indexed by playerID tho
-PLAYERS sidePlayers[MAX_SIDES] ;
+PLAYER_INDEX playerIndex;
+static PLAYERS s_limboPlayers;					// Indexed by playerID tho
+PLAYERS sidePlayers[MAX_SIDES];
 
 static void _registerPlayer(Player* player);
 
@@ -43,13 +42,13 @@ static void _registerPlayer(Player* player);
 static bool
 _indexPlayer(Player* player)
 {
-	if ( player == NULL )
-		LogAbort("Tried to map NULL player") ;
+	if ( player == nullptr )
+		LogAbort("Tried to map NULL player");
 
-	dbugLog(_FLD, "t:%d p:%u c:%s indexing matchid:%llx", player->teulIndex(), player->playerID(), player->callsign(), player->matchHandle()) ;
+	dbugLog(_FLD, "t:%d p:%u c:%s indexing matchid:%llx", player->teulIndex(), player->playerID(), player->callsign(), player->matchHandle());
 
 	// hash_map doesn't provide lower_bound, so we can't insert-at-place
-	PLAYER_INDEX::iterator it = playerIndex.find(player->matchHandle()) ;
+	PLAYER_INDEX::iterator it = playerIndex.find(player->matchHandle());
 
 	// If it's already in the list, we may either already be registered (bug),
 	// have an empty record (bug) or be displacing a previous instance (normal)
@@ -58,31 +57,31 @@ _indexPlayer(Player* player)
 		if ( it->second == player )
 		{
 			// This isn't expected to happen
-			dbugLog(_FLW, "t:%d p:%u c:%s already in list", player->teulIndex(), player->playerID(), player->callsign()) ;
-			return true ;
+			dbugLog(_FLW, "t:%d p:%u c:%s already in list", player->teulIndex(), player->playerID(), player->callsign());
+			return true;
 		}
 
-		if ( it->second == NULL )
+		if ( it->second == nullptr )
 		{
 			// Maybe we should FLF because clearly data is garbled
-			dbugLog(_FLA, "t:%d p:%u c:%s NULL player pointer in playerIndex", player->teulIndex(), player->playerID(), player->callsign()) ;
+			dbugLog(_FLA, "t:%d p:%u c:%s NULL player pointer in playerIndex", player->teulIndex(), player->playerID(), player->callsign());
 		}
 		else
 		{
 			// If you are re-logging, this may happen
-			dbugLog(_FLN, "t:%d p:%u c:%s freeing prior instance", player->teulIndex(), player->playerID(), player->callsign()) ;
-			chatFreePlayer(it->second) ;
+			dbugLog(_FLN, "t:%d p:%u c:%s freeing prior instance", player->teulIndex(), player->playerID(), player->callsign());
+			chatFreePlayer(it->second);
 		}
 
-		it->second = player ;
+		it->second = player;
 
-		return true ;
+		return true;
 	}
 
 	// Otherwise add a new entry
-	playerIndex.insert(std::make_pair(player->matchHandle(), player)) ;
+	playerIndex.insert(std::make_pair(player->matchHandle(), player));
 
-	return true ;
+	return true;
 }
 
 void
@@ -92,7 +91,7 @@ chatInitPlayerLists(void)
 	_sideCount[AXIS] = 0;
 	_sideCount[ALLIED] = 0;
 
-	Chat::ManagementIDAllocator::Initialize() ;
+	Chat::ManagementIDAllocator::Initialize();
 }
 
 void
@@ -102,67 +101,64 @@ Player::activate(SINT32 newIndex, PlayerStatusNode* psn)
 	if ( active() )
 	{
 		if ( PlayerInterface::Lookup(matchHandle()) != this )
-			throw std::logic_error("lookup failed during reactivation") ;
+			throw std::logic_error("lookup failed during reactivation");
 
 		// Clobber the old instance
-		teulSetPersonaData(teulIndex(), NULL);
+		teulSetPersonaData(teulIndex(), nullptr);
 		chatPlayerDeactivate(this);
 		dbugLog(_FLN, "t:%d p:%u c:%s reactivated active player %p on teulIndex %d"
-						, teulIndex(), playerID(), callsign(), this, newIndex) ;
+						, teulIndex(), playerID(), callsign(), this, newIndex);
 	}
 
-	m_teulIndex = newIndex ;
+	m_teulIndex = newIndex;
 
-	s_limboPlayers.erase(this) ;
+	s_limboPlayers.erase(this);
 
-	m_active = true ;
+	m_active = true;
 
-	_indexPlayer(this) ;
+	_indexPlayer(this);
 
-	dbugLog(_FLI, "t:%d p:%u c:%s otp:%u ip:%s activating", teulIndex(), playerID(), callsign(), OTP(), teulGetAddress(dispatch().m_clientIP)) ;
+	dbugLog(_FLI, "t:%d p:%u c:%s otp:%u ip:%s activating", teulIndex(), playerID(), callsign(), OTP(), teulGetAddress(dispatch().m_clientIP));
 
 	if ( isManager() )
-		return ;
+		return;
 
-	Teul::Packet outgoing(sizeof(playerID()), CHAT_X, Chat::MAP_REFRESH_PLAYER_Y) ;
-	outgoing.append(playerID()) ;
-	serverSendPacketToType(outgoing, MAP_HOST) ;
+	Teul::Packet outgoing(Teul::PacketId(CHAT_X, Chat::MAP_REFRESH_PLAYER_Y), playerID());
+	outgoing.setUnencrypted();
+	serverSendPacketToType(outgoing, MAP_HOST);
 
 	// If they're done loading, add them to the command list
-	readGroups() ;
+	readGroups();
 
 	if ( psn )
-		psn->localInfo = this ;
+		psn->localInfo = this;
 
 	// Fetch friends and ignore lists
-	chatFetchFriendsAndIgnoreList(this) ;
-	chatRestoreChannels(this) ;
+	chatFetchFriendsAndIgnoreList(this);
+	chatRestoreChannels(this);
 
-	_recordLogin() ;
+	_recordLogin();
 }
 
-LOGICAL
-chatPlayerDeactivate(Player* player)
+void chatPlayerDeactivate(Player* player)
 {
-	if ( player == nullptr )
-		return FALSE;
+	if ( PN_UNLIKELY(player == nullptr) )
+		return;
 
 	if ( isValidSide(player->side()) )
 	{
-		betaLog(_FLI, "removing %p from %d side lists", player, player->side()) ;
-		sidePlayers[player->side()].erase(player) ;
+		betaLog(_FLI, "removing %p from %d side lists", player, player->side());
+		sidePlayers[player->side()].erase(player);
 	}
 
 	if ( !player->active() )
-		return FALSE;
+		return;
 
-	player->deactivate() ;
+	player->deactivate();
 
-	playerIndex.erase(player->matchHandle()) ;
+	playerIndex.erase(player->matchHandle());
 
-	s_limboPlayers.insert(player) ;
-
-	return TRUE;
+	s_limboPlayers.insert(player);
 }
 
 
@@ -170,31 +166,14 @@ chatPlayerDeactivate(Player* player)
 //	the player.  At this point, we match the player teulIndex up with the
 //	playerInfo we received earlier, put the handle on our main player list
 //	and take are of all the initialization and such
-LOGICAL
-chatCreatePlayer(PlayerStatusNode* psn, struct Chat::PlayerInfo* playerInfo)
+void chatCreatePlayer(PlayerStatusNode* psn, struct Chat::PlayerInfo* playerInfo)
 {
-	if (playerInfo == NULL || psn == NULL)
-	{
-		dbugLog(_FLA, "no player info, what gives?");
-#ifdef BETA_RELEASE
-		exit(0) ;
-#else
-		return FALSE;
-#endif
-	}
+	ABORT_IF(playerInfo == nullptr);
+	ABORT_IF(psn == nullptr);
 
 	// Create a new player and populate it
-	Player* player = new Player(psn, playerInfo) ;
-
-	///FIXME: Incorrect behavior; we should close and cancel out this
-	///FIXME: connection and do something to alert ourselves to the fact
-	///FIXME: that this host has run out of memory.
-
-	if ( player == NULL )
-	{
-		LogAbort("MEMORY: Failed to create new Player!") ;
-		exit(0) ;
-	}
+	Player* player = new Player(psn, playerInfo);
+	ABORT_IF(player == nullptr);
 
 	// Populate the player and add us to the limbo list.
 	_registerPlayer(player);
@@ -215,27 +194,24 @@ chatCreatePlayer(PlayerStatusNode* psn, struct Chat::PlayerInfo* playerInfo)
 		, player->callsign()
 		, player->playerID()
 		);
-
-	return TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Common management login functionality to both formats.
 
-static Player*
-_loginManagerAccount(const char* source, SINT32 teulIndex, const char* gameName)
+static Player* _loginManagerAccount(const char* source, SINT32 teulIndex, const Chat::Name& gameName)
 {
-	dbugLog(_FLI, "t:%d %s requesting name '%s'", teulIndex, source, gameName) ;
+	dbugLog(_FLI, "t:%d %s requesting name '%s'", teulIndex, source, gameName.c_str());
 
-	Player* player = new ManagementPlayer(teulIndex, gameName) ;
-	if ( player == NULL )
-		throw std::runtime_error("Out of memory for new player") ;		///Terminal
+	Player* player = new ManagementPlayer(teulIndex, gameName.c_str());
+	if ( player == nullptr )
+		throw std::runtime_error("Out of memory for new player");		///Terminal
 
 	_registerPlayer(player);
 
 	teulSetPersonaData(teulIndex, player);
 
-	return player ;
+	return player;
 }
 
 IRCPlayer::IRCPlayer(const char* nick)
@@ -243,11 +219,11 @@ IRCPlayer::IRCPlayer(const char* nick)
 	, m_lastChannel("")
 	, m_channels()
 {
-	m_gmHide = false ;
+	m_gmHide = false;
 
-	_registerPlayer(this) ;
+	_registerPlayer(this);
 
-	activate(-1, NULL) ;
+	activate(-1, nullptr);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -256,95 +232,90 @@ IRCPlayer::IRCPlayer(const char* nick)
 bool
 Chat::ManagementLogin2::Login(SINT32 teulIndex)
 {
-	static const ChatHandle autoHandle = chatGetHandle("auto") ;
+	static const ChatHandle autoHandle = chatGetHandle("auto");
+	Chat::Name gameName;
 	if ( this->m_wantHandle == autoHandle )
 	{
-		char autoName[MAX_HANDLE_SIZE] ;
-		snprintf(autoName, sizeof(autoName), "CRS-%04u", (UINT32)teulIndex) ;
-		this->m_wantHandle = chatGetHandle(autoName) ;
+		gameName.format("CRS-%04u", (UINT32)teulIndex);
+		this->m_wantHandle = gameName.Handle();
 	}
-
-	// Extract the name the user is requesting for display purposes.
-	char gameName[MAX_HANDLE_SIZE] ;
-	chatGetCallsign(gameName, this->m_wantHandle) ;
+	else
+		gameName = this->m_wantHandle;
 
 	try
 	{
 		if ( this->m_wantHandle == 0ULL )
-			throw std::domain_error("NULL gamename") ;
+			throw std::domain_error("NULL gamename");
 
-		Player* player = PlayerInterface::Lookup(this->m_wantHandle) ;
-		if ( player != NULL )
-			throw std::domain_error("name in use") ;
+		Player* player = PlayerInterface::Lookup(this->m_wantHandle);
+		if ( player != nullptr )
+			throw std::domain_error("name in use");
 
-		player = _loginManagerAccount("ManagementLogin2", teulIndex, gameName) ;
+		player = _loginManagerAccount("ManagementLogin2", teulIndex, gameName);
 
-		player->activate(teulIndex, NULL) ;
+		player->activate(teulIndex, nullptr);
 
-		player->updatePermMask() ;
+		player->updatePermMask();
 
-		return true ;
+		return true;
 	}
 	catch ( std::exception& e )
 	{
-		dbugLog(_FLA, "t:%d ManagementLogin2:%s: %s", teulIndex, gameName, e.what()) ;
+		dbugLog(_FLA, "t:%d ManagementLogin2:%s: %s", teulIndex, gameName.c_str(), e.what());
 	}
 
-	return false ;
+	return false;
 }
 
 //This is the logic that is run whenever a logout is received from the host
-extern LOGICAL
-chatLogoutPlayer(SINT32 teulIndex)
+void chatLogoutPlayer(SINT32 teulIndex)
 {
-	Player* player = PlayerInterface::Lookup(teulIndex) ;
-	return  chatFreePlayer(player);
+	Player* player = PlayerInterface::Lookup(teulIndex);
+	chatFreePlayer(player);
 }
 
 static Player*
 _findLimboPlayer(const playerid_t playerID)
 {
-	PLAYERS::iterator it ;
-	for ( it = s_limboPlayers.begin() ; it != s_limboPlayers.end() ; ++it )
+	for ( auto it = s_limboPlayers.begin(), end = s_limboPlayers.end(); it != end; ++it )
 	{
 		if ( (*it)->playerID() == playerID )
-			return static_cast<Player*>(*it) ;
+			return static_cast<Player*>(*it);
 	}
 
-	return NULL ;
+	return nullptr;
 }
 
 static void
 _registerPlayer(Player* newPlayer)
 {
-	if ( newPlayer == NULL )
+	if ( newPlayer == nullptr )
 	{
-		dbugLog(_FLA, "Tried to register a NULL player?") ;
-		return ;
+		dbugLog(_FLA, "Tried to register a NULL player?");
+		return;
 	}
 
 	Player* oldPlayer = _findLimboPlayer(newPlayer->playerID());
 	if (oldPlayer)
 	{
 		if ( oldPlayer == newPlayer )
-			LogAbort("relogin of old player") ;
+			LogAbort("relogin of old player");
 		chatFreePlayer(oldPlayer);
 	}
 
-	s_limboPlayers.insert(newPlayer) ;
+	s_limboPlayers.insert(newPlayer);
 }
 
 //This is the logic that is run whenever a logout is received from the host
-extern LOGICAL
-chatFreePlayer(Player* player)
+void chatFreePlayer(Player* player)
 {
-	if (player == NULL)
-		return FALSE;
+	if (PN_UNLIKELY(player == nullptr))
+		return;
 
-	SINT32 teulIndex ;
+	SINT32 teulIndex;
 
 	// This value is going to get clobbered, so remember it ourselves
-	teulIndex = player->teulIndex() ;
+	teulIndex = player->teulIndex();
 
 	//Handle taken/squelched
 	if ( player->inGrab() )
@@ -352,49 +323,49 @@ chatFreePlayer(Player* player)
 		dbugLog(_FLI, "takenby = %lld, grabbing = %lld"
 						, player->takenBy()
 						, player->grabbing()
-						) ;
-		chatReleaseGrab(*player) ;
+						);
+		chatReleaseGrab(*player);
 	}
 
 	if ( player->m_snoopBy )
 	{
-		chatDispatchGMMessage("INFO", chatMakeTempString("%s is no-longer snooping on %s [subject disconnected]", player->m_snoopBy->callsign(), player->callsign())) ;
-		player->m_snoopBy->m_snoopOn = NULL ;
-		player->m_snoopBy = NULL ;
+		chatDispatchGMMessage("INFO", chatMakeTempString("%s is no-longer snooping on %s [subject disconnected]", player->m_snoopBy->callsign(), player->callsign()));
+		player->m_snoopBy->m_snoopOn = nullptr;
+		player->m_snoopBy = nullptr;
 	}
 	if ( player->m_snoopOn )
 	{
-		chatDispatchGMMessage("INFO", chatMakeTempString("%s is no-longer snooping on %s [snooper disconnected]", player->callsign(), player->m_snoopOn->callsign())) ;
-		player->m_snoopOn->m_snoopBy = NULL ;
-		player->m_snoopOn = NULL ;
+		chatDispatchGMMessage("INFO", chatMakeTempString("%s is no-longer snooping on %s [snooper disconnected]", player->callsign(), player->m_snoopOn->callsign()));
+		player->m_snoopOn->m_snoopBy = nullptr;
+		player->m_snoopOn = nullptr;
 	}
 	if ( player->m_crsSnoopBy )
 	{
-		chatDispatchCRSMessage("INFO", chatMakeTempString("%s is no-longer snooping on %s [subject disconnected]", player->m_crsSnoopBy->callsign(), player->callsign())) ;
-		player->m_crsSnoopBy->m_crsSnoopOn = NULL ;
-		player->m_crsSnoopBy = NULL ;
+		chatDispatchCRSMessage("INFO", chatMakeTempString("%s is no-longer snooping on %s [subject disconnected]", player->m_crsSnoopBy->callsign(), player->callsign()));
+		player->m_crsSnoopBy->m_crsSnoopOn = nullptr;
+		player->m_crsSnoopBy = nullptr;
 	}
 	if ( player->m_crsSnoopOn )
 	{
-		chatDispatchCRSMessage("INFO", chatMakeTempString("%s is no-longer snooping on %s [snooper disconnected]", player->callsign(), player->m_crsSnoopOn->callsign())) ;
-		player->m_crsSnoopOn->m_crsSnoopBy = NULL ;
-		player->m_crsSnoopOn = NULL ;
+		chatDispatchCRSMessage("INFO", chatMakeTempString("%s is no-longer snooping on %s [snooper disconnected]", player->callsign(), player->m_crsSnoopOn->callsign()));
+		player->m_crsSnoopOn->m_crsSnoopBy = nullptr;
+		player->m_crsSnoopOn = nullptr;
 	}
 
 	// Remove them from any mission we think they are on
-	player->SetMission(0) ;
+	player->SetMission(0);
 
-//	dbugLog(_FLD,"1) alocating node %p p->%p n->%p"	, player, player->prev(), player->next());
+//	dbugLog(_FLD,"1) allocating node %p p->%p n->%p"	, player, player->prev(), player->next());
 
 	if ( player->teulIndex() >= 0 )
 	{
-		Player* other = PlayerInterface::Lookup(player->teulIndex()) ;
+		Player* other = PlayerInterface::Lookup(player->teulIndex());
 		if ( other == player )
-			teulSetPersonaData(teulIndex, NULL);
+			teulSetPersonaData(teulIndex, nullptr);
 	}
 
 	chatPlayerDeactivate(player);
-	s_limboPlayers.erase(player) ;
+	s_limboPlayers.erase(player);
 
 	dbugLog(_FLN,"t:%d p:%u c:%s received logout", teulIndex, player->playerID(), player->callsign());
 
@@ -417,22 +388,20 @@ chatFreePlayer(Player* player)
 	}
 #endif
 
-	chatSaveChannels(*player) ;
+	chatSaveChannels(*player);
 
-	player->detuneAllRadios() ;
+	player->detuneAllRadios();
 
 	//Initialize the rest of the structure
 	if ( g_debugRadios )
 	{
-		for ( SINT32 i = 0 ; i < MAX_CLIENT_CHANNELS ; ++i )
+		for ( SINT32 i = 0; i < MAX_CLIENT_CHANNELS; ++i )
 		{
-			const Chat::ChannelSubscription& cnode = player->getChannelSub(i) ;
-			assert( cnode.m_subscriber == player ) ;
-			assert( cnode.m_channel == NULL ) ;
+			const Chat::ChannelSubscription& cnode = player->getChannelSub(i);
+			assert( cnode.m_subscriber == player );
+			assert( cnode.m_channel == nullptr );
 		}
 	}
 
-	delete player ;
-
-	return TRUE;
+	delete player;
 }

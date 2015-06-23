@@ -8,38 +8,13 @@
 // Originating Programmer: Eric Hall
 
 #include "dbse/dbseConstants.h"
-#include "dbse/dbseTypes.h"
-#include "teul/teulKit.h"
+#include "teul/teulBasic.h"
 #include "wwii/wwiiCallbacks.h"
 #include "dbse/dbseClientMessages.h"
 #include "dbse/dbseClient.h"
+#include "dbse/dbseTypes.h"
 
-extern void dbseSetConnectionStatus(CONNECTION_STATUS);
-
-static SINT32 _recvHandshake(ACTION_OBJECT* const a, DBSE_HANDSHAKE& handshake)
-{
-	switch (handshake.m_status)
-	{
-	case CONNECT_BAD:
-		dbugLog(_FLA, "dbse host version mismatch, rejected version %u", handshake.m_version);
-		break;
-
-	case CONNECT_REFUSE:
-		dbugLog(_FLA, "dbse hose arena mismatch, rejected arena request for arena %u", handshake.m_arenaID);
-		break;
-
-	case CONNECT_ACCEPT:
-		dbugLog(_FLI,"db connection accepted!");
-		break;
-
-	default:
-		LogAbort("ERROR: Unable to determine db connection status\n Abort!\n");
-	}
-
-	dbseSetConnectionStatus(handshake.m_status);
-
-	return(a->offset);
-}
+SINT32 dbseRecvHandshake(ACTION_OBJECT* a, Dbse::Handshake&);
 
 // --->error functions
 
@@ -48,14 +23,14 @@ SINT32 dbseInstallClientCallbacks(void)
 {
 	BEGIN_CALLBACK_REGISTRATION(DBSE_GENERAL_X)
 
-		REGISTER_RECEIVEOBJ(DBSE_SERVER_HANDSHAKE_Y, DBSE_HANDSHAKE, _recvHandshake);
+		REGISTER_RECEIVEOBJ(DBSE_SERVER_HANDSHAKE_Y, Dbse::Handshake, dbseRecvHandshake);
 
 	END_CALLBACK_REGISTRATION
 }
 
 SINT32 dbseSendHandshake(SINT32 teulIndex, UINT32 arena)
 {
-	Teul::Packet outgoing(sizeof(DBSE_HANDSHAKE), DBSE_GENERAL_X, DBSE_CLIENT_HANDSHAKE_Y);
-	(void)CONSTRUCT_IN_PACKET(outgoing, DBSE_HANDSHAKE, arena);
+	Teul::Packet outgoing(Teul::PacketId(DBSE_GENERAL_X, DBSE_CLIENT_HANDSHAKE_Y));
+	outgoing.construct<Dbse::Handshake>(arena);
 	return outgoing.send(teulIndex);
 }

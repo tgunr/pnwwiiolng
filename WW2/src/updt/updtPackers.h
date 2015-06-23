@@ -28,12 +28,12 @@ extern SINT32 updtPushCpControlChange(struct OWNERSHIP_UPDATE* update);
 extern SINT32 updtPushCpLevelChange(struct VISLEVEL_UPDATE* update);
 
 #if platBuild == TEUL_SERVER
-class Player ;
+class Player;
 extern SINT32 updtPackEvents(LOGICAL mode, UCHAR* const message, SINT32 offset, class Player* player, SINT32 size);
 
 extern SINT32 updtPackVehicleBroadcast(LOGICAL mode, UCHAR* data, SINT32 offset, struct VEHICLE_HOLDER* vh, SINT32 size);
 #endif
 
-extern UINT32 g_framingMode ;
-extern UINT32 g_hostUpdateInterval ;	// Time in MS between host updates
-extern UINT32 m_lastPing ;
+extern UINT32 g_framingMode;
+extern UINT32 g_hostUpdateInterval;	// Time in MS between host updates
+extern UINT32 m_lastPing;

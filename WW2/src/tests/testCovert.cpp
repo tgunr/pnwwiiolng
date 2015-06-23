@@ -14,83 +14,83 @@ public:
 	{
 		START_TEST_STAGE( description )
 
-			_Type rawValue = baseValue ;
-			Covert<_Type> covert(baseValue) ;
+			_Type rawValue = baseValue;
+			Covert<_Type> covert(baseValue);
 
 			START_SUB_STAGE( "Initial equality" )
-				CRITICAL( ExpectEqual( rawValue, covert.Get() ) && ExpectEqual( rawValue, covert ) ) ;
+				CRITICAL( ExpectEqual( rawValue, covert.Get() ) && ExpectEqual( rawValue, covert ) );
 			END_SUB_STAGE( "Initial equality" )
 
 			START_SUB_STAGE( "Assignment" )
-				rawValue = baseValue * 2 ;
-				covert.Set(rawValue) ;
-				CRITICAL( ExpectEqual( rawValue, covert.Get() ) && ExpectEqual( rawValue, covert ) ) ;
-				covert.Set((_Type)0) ;
-				covert = rawValue ;
-				CRITICAL( ExpectEqual( rawValue, covert.Get() ) && ExpectEqual( rawValue, covert ) ) ;
+				rawValue = baseValue * 2;
+				covert.Set(rawValue);
+				CRITICAL( ExpectEqual( rawValue, covert.Get() ) && ExpectEqual( rawValue, covert ) );
+				covert.Set((_Type)0);
+				covert = rawValue;
+				CRITICAL( ExpectEqual( rawValue, covert.Get() ) && ExpectEqual( rawValue, covert ) );
 			END_SUB_STAGE( "Assignment" )
 
 			START_SUB_STAGE( "operator++" )
-				rawValue++ ;
-				covert++ ;
-				CRITICAL( ExpectEqual( rawValue, covert.Get() ) && ExpectEqual( rawValue, covert ) ) ;
+				rawValue++;
+				covert++;
+				CRITICAL( ExpectEqual( rawValue, covert.Get() ) && ExpectEqual( rawValue, covert ) );
 			END_SUB_STAGE( "operator++" )
 
 			START_SUB_STAGE( "operator++ 100x" )
-				for ( UINT32 i = 0 ; i < 100 ; ++i )
+				for ( UINT32 i = 0; i < 100; ++i )
 				{
-					rawValue++ ;
-					covert++ ;
+					rawValue++;
+					covert++;
 				}
-				CRITICAL( ExpectEqual( rawValue, covert.Get() ) && ExpectEqual( rawValue, covert ) ) ;
+				CRITICAL( ExpectEqual( rawValue, covert.Get() ) && ExpectEqual( rawValue, covert ) );
 			END_SUB_STAGE( "operator++ 100x" )
 
 			START_SUB_STAGE( "operator--" )
-				rawValue-- ;
-				covert-- ;
-				CRITICAL( ExpectEqual( rawValue, covert.Get() ) && ExpectEqual( rawValue, covert ) ) ;
+				rawValue--;
+				covert--;
+				CRITICAL( ExpectEqual( rawValue, covert.Get() ) && ExpectEqual( rawValue, covert ) );
 			END_SUB_STAGE( "operator--" )
 
 			START_SUB_STAGE( "operator-- 100x" )
-				for ( UINT32 i = 0 ; i < 100 ; ++i )
+				for ( UINT32 i = 0; i < 100; ++i )
 				{
-					rawValue-- ;
-					covert-- ;
+					rawValue--;
+					covert--;
 				}
-				CRITICAL( ExpectEqual( rawValue, covert.Get() ) && ExpectEqual( rawValue, covert ) ) ;
+				CRITICAL( ExpectEqual( rawValue, covert.Get() ) && ExpectEqual( rawValue, covert ) );
 			END_SUB_STAGE( "operator-- 100x" )
 
 			START_SUB_STAGE( "operator+=" )
-				rawValue += baseValue ;
-				covert += baseValue ;
-				CRITICAL( ExpectEqual( rawValue, covert.Get() ) && ExpectEqual( rawValue, covert ) ) ;
+				rawValue += baseValue;
+				covert += baseValue;
+				CRITICAL( ExpectEqual( rawValue, covert.Get() ) && ExpectEqual( rawValue, covert ) );
 			END_SUB_STAGE( "operator+=" )
 
 			START_SUB_STAGE( "operator-=" )
-				rawValue -= (_Type)5 ;
-				covert -= (_Type)5 ;
-				CRITICAL( ExpectEqual( rawValue, covert.Get() ) && ExpectEqual( rawValue, covert ) ) ;
+				rawValue -= (_Type)5;
+				covert -= (_Type)5;
+				CRITICAL( ExpectEqual( rawValue, covert.Get() ) && ExpectEqual( rawValue, covert ) );
 			END_SUB_STAGE( "operator-=" )
 
 			START_SUB_STAGE( "operator*=" )
-				rawValue *= baseValue ;
-				covert *= baseValue ;
-				CRITICAL( ExpectEqual( rawValue, covert.Get() ) && ExpectEqual( rawValue, covert ) ) ;
+				rawValue *= baseValue;
+				covert *= baseValue;
+				CRITICAL( ExpectEqual( rawValue, covert.Get() ) && ExpectEqual( rawValue, covert ) );
 			END_SUB_STAGE( "operator*=" )
 
 			START_SUB_STAGE( "operator/=" )
-				rawValue /= (_Type)2 ;
-				covert /= (_Type)2 ;
-				CRITICAL( ExpectEqual( rawValue, covert.Get() ) && ExpectEqual( rawValue, covert ) ) ;
+				rawValue /= (_Type)2;
+				covert /= (_Type)2;
+				CRITICAL( ExpectEqual( rawValue, covert.Get() ) && ExpectEqual( rawValue, covert ) );
 			END_SUB_STAGE( "operator*=" )
 
 		END_TEST_STAGE( description )
 
-		return true ;
+		return true;
 	}
 
 public:
-	virtual bool Run()
+	virtual bool Run() OVERRIDE_FN
 	{
 		if (
 			!TypeTest( "UCHAR", (UCHAR)4 ) ||
@@ -103,10 +103,10 @@ public:
 			!TypeTest( "SINT64", (SINT64)11 ) ||
 			!TypeTest( "FLOAT32", (FLOAT32)20.0 ) ||
 			!TypeTest( "FLOAT64", (FLOAT64)30.0 ) )
-			return false ;
-		return true ;
+			return false;
+		return true;
 	}
-} ;
+};
 
-static CovertTest covertTest ;
+static CovertTest covertTest;
 

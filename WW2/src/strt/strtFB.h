@@ -20,7 +20,7 @@ enum STRAT_FIREBASE_INIT_MODE
 	DB_CHECKED,
 	//Add new ones here
 	MAX_STRAT_FIREBASE_INIT_MODE
-} ;
+};
 
 //tolua_begin
 
@@ -57,7 +57,7 @@ extern void strtOpenFirebase(FacilityStruct& openingFirebase);
 extern void strtClearFirebases(LinkStruct& link);
 
 // Determine whom the new owner should be for an FB
-extern WWII_COUNTRY strtNewFBOwner(FacilityStruct& fb) ;
+extern WWII_COUNTRY strtNewFBOwner(FacilityStruct& fb);
 
 //tolua_end
 

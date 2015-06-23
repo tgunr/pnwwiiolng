@@ -11,7 +11,7 @@
 
 #include "inst/instHostInstance.h"
 
-class Player ;
+class Player;
 
 namespace Instance
 {
@@ -29,11 +29,11 @@ namespace Instance
 		// Members
 
 		//! @brief Reference to the instance we belong to.
-		private: HostInstance& m_inst ;
+		private: HostInstance& m_inst;
 		//! @brief Returns a const-reference to the instance we belong to.
-		public: const HostInstance& inst() const { return m_inst ; }
+		public: const HostInstance& inst() const { return m_inst; }
 		//! @brief Returns a reference to the instance we belong to.
-		public: HostInstance& inst() { return m_inst ; }
+		public: HostInstance& inst() { return m_inst; }
 		//! @brief Destructor.
 		public:	virtual ~HostInstanceImpl() {}
 
@@ -49,15 +49,15 @@ namespace Instance
 		public: virtual void PlayerLeaveHandler(wwiiPlayer* /*player*/) {}
 
 		//! Check a password.
-		public: virtual bool CheckPassword(const std::string& /*utf8Password*/) { return true ; }
+		public: virtual bool CheckPassword(const std::string& /*utf8Password*/) { return true; }
 		//! Assign a password.
 		public: virtual void SetPassword(const std::string& /*utf8Password*/) {}
 		//! Retrieve the current password string.
-		public: virtual const char* GetPassword() const { return "" ; }
+		public: virtual const char* GetPassword() const { return ""; }
 
 		//! Update state.
 		public: virtual void SetState(Instance::State state_) { }
-	} ;
+	};
 
 } // namespace Instance
 

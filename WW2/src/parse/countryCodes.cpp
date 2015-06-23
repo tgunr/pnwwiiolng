@@ -7,9 +7,6 @@
 //
 // Originating Programmer: Marty "Vandal" Poulin
 
-#include <string.h>
-#include <ctype.h>
-
 #include "parse/countryCodes.h"
 
 namespace Parse
@@ -30,7 +27,7 @@ namespace Parse
 Parse::COUNTRY_CODE
 findCountryCode(const char* country)
 {
-	for ( UINT32 i = 0; i < Parse::MAX_COUNTRY_CODES ; ++i )
+	for ( UINT32 i = 0; i < Parse::MAX_COUNTRY_CODES; ++i )
 	{
 		if ( strcasecmp(Parse::countryCode[i],country) == 0 )
 			return (Parse::COUNTRY_CODE)i;

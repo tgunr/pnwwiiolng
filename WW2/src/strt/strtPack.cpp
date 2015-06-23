@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Created: Tue Nov  7 16:34:36 2000
 //
 // Pack routines for the strat system
@@ -9,11 +8,7 @@
 // compiled library.
 //
 // Originating Programmer: Shane "Elmo" Wickson
-// Maintaining Programmer: Shane "Elmo" Wickson
 // Supporting Programmer:  Marty "Vandal" Poulin
-
-#include "dbug/dbug.h"
-#include <assert.h>
 
 #include "mem/mem.h"
 #include "strt/strtMapTypes.h"
@@ -98,7 +93,7 @@ strtPackOwnershipUpdate(LOGICAL mode, UCHAR* data, SINT32 offset, OWNERSHIP_UPDA
 	offset = teulPackUINT16(mode,data,offset,&(country),0);
 	object->country = (WWII_COUNTRY) country;
 
-	offset = teulPackUINT32(mode, data, offset, &(object->flags), 0) ;
+	offset = teulPackUINT32(mode, data, offset, &(object->flags), 0);
 
 	//dbugLog(_FLAB,"Ownership: %d\n\tx:%d\n\ty:%d\n\tid:%d\n\tcountry:%d\n\n",object->type, object->objectID.sx,object->objectID.sy,object->objectID.id,object->country);
 	return offset;
@@ -138,30 +133,30 @@ strtPackSyncBuildings(LOGICAL mode, UCHAR* message, SINT32 offset, STRT_SYNC_BUI
 void*
 strtGetStaticPacketBuffer()
 {
-	static char buffer[Teul::MaxPacket] ;
-	return (void*)buffer ;
+	static char buffer[Teul::MaxPacket];
+	return (void*)buffer;
 }
 
 STRT_SYNC_CPS&
 strtGetSyncCPs()
 {
-	static STRT_SYNC_CPS* buffer = (STRT_SYNC_CPS*) strtGetStaticPacketBuffer() ;
-	assert( sizeof(STRT_SYNC_CPS) <= Teul::MaxPacket ) ;
-	return *buffer ;
+	static STRT_SYNC_CPS* buffer = (STRT_SYNC_CPS*) strtGetStaticPacketBuffer();
+	assert( sizeof(STRT_SYNC_CPS) <= Teul::MaxPacket );
+	return *buffer;
 }
 
 STRT_SYNC_FACILITIES&
 strtGetSyncFacilities()
 {
-	static STRT_SYNC_FACILITIES* buffer = (STRT_SYNC_FACILITIES*) strtGetStaticPacketBuffer() ;
-	assert( sizeof(STRT_SYNC_FACILITIES) <= Teul::MaxPacket ) ;
-	return *buffer ;
+	static STRT_SYNC_FACILITIES* buffer = (STRT_SYNC_FACILITIES*) strtGetStaticPacketBuffer();
+	assert( sizeof(STRT_SYNC_FACILITIES) <= Teul::MaxPacket );
+	return *buffer;
 }
 
 STRT_SYNC_BUILDINGS&
 strtGetSyncBuildings()
 {
-	static STRT_SYNC_BUILDINGS* buffer = (STRT_SYNC_BUILDINGS*) strtGetStaticPacketBuffer() ;
-	assert( sizeof(STRT_SYNC_BUILDINGS) <= Teul::MaxPacket ) ;
-	return *buffer ;
+	static STRT_SYNC_BUILDINGS* buffer = (STRT_SYNC_BUILDINGS*) strtGetStaticPacketBuffer();
+	assert( sizeof(STRT_SYNC_BUILDINGS) <= Teul::MaxPacket );
+	return *buffer;
 }

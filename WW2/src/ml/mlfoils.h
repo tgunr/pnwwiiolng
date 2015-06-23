@@ -190,7 +190,7 @@ struct mlAirfoilAlpha
 	FLOAT32 LiftCoefficient; // force perpendicular to relative wind
 	FLOAT32 DragCoefficient; // force in direction of relative wind
 	FLOAT32 MomentCoefficient; // torque moment due to center of pressure difference on airfoil
-} ;
+};
 
 
 // since wing characteristics change for different states/reynolds numbers we
@@ -222,13 +222,13 @@ struct mlAirfoilData
 	FLOAT64 MdivPos10DegAoA; // critical mach number, 5deg AoA
 	FLOAT64 MdivNeg10DegAoA; // critical mach number, -5deg AoA
 	FLOAT64 CompressClMovement;
-} ;
+};
 
 struct mlAirfoilList
 {
 	UINT32 NumAirfoils;
 	mlAirfoilData * AirfoilData;
-} ;
+};
 
 struct mlAirfoilComponentData
 {
@@ -323,7 +323,7 @@ struct mlAirfoilComponentData
 	struct mlComponent* DamageComponent; // apply damage to this component as well (only used for gear at the moment)
 
 	FLOAT64 CenterOfLift; // percent of chord lift is applied
-} ;
+};
 
 extern FLOAT64 MachEffectsOnCoefficientOfLift[ML_MACHEFFECTS_NUM_STEPS];
 extern FLOAT64 mlMachEffectsOnCoefficientOfDrag[ML_MACHEFFECTS_NUM_STEPS];

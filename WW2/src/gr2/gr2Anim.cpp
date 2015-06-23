@@ -1,7 +1,6 @@
 #include <syscfg.h> // Path is project specific.
 
 #include "gr2/gr2anim.h"
-#include "mem/mem.h"
 #include "ob/obmain.h"
 #include "include/vars.h"
 #include "veh/vehmain.h"
@@ -50,18 +49,7 @@
 #include "fp/fpTPSKits.h"
 #include "wwii/wwiiBranchEnums.h"
 
-#if defined(USE_OSG)
-#include "osgFX/fxSound.h"
-#else
 #include "fx/fxSnd.h"
-#endif
-
-#if defined(USE_OSG)
-#include "fp/fpTPSPhysics.h"
-#include "osgStub/vehStub.h"
-#undef PI
-#define PI 3.14159265359
-#endif
 
 #define STOWED_WEAPON_POSITION 0
 #define STOWED_WEAPON_ATTACH "StowedAttach"
@@ -191,7 +179,7 @@ struct BlendSpec
 		start			= false;
 		removeWhenDone	= false;
 		allowRessurect	= true;
-		onBlendComplete	= NULL;
+		onBlendComplete	= nullptr;
 	}
 };
 
@@ -247,10 +235,6 @@ static FLOAT32 polishNear = POLISH_NEAR;
 DELAY DEATH CRAP
 ---------------------------------*/
 
-#if defined(USE_OSG)
-#undef USE_CORPSES
-#endif
-
 #ifdef USE_CORPSES
 #include "map/mapArenaDescription.h"
 #include <set>
@@ -269,11 +253,11 @@ static BlendSpec _blendSpec;
 #endif // USE_CORPSES
 
 #ifdef GR2_BLEND_EDITOR
-static phui::View* _editAnimSlider = NULL;
-static phui::View* _editModelControl = NULL;
-static gr2AnimTrooper* _editModel = NULL;
-static gr2Control* _editAnimation = NULL;
-static gr2Model* _editWeapon = NULL;
+static phui::View* _editAnimSlider = nullptr;
+static phui::View* _editModelControl = nullptr;
+static gr2AnimTrooper* _editModel = nullptr;
+static gr2Control* _editAnimation = nullptr;
+static gr2Model* _editWeapon = nullptr;
 static SINT32 _editWeaponType = 0;
 static SINT32 _editWeaponNum = 0;
 static std::vector<GR2EditBlend> _editBlends;
@@ -312,16 +296,16 @@ void gr2AnimTrooper::Reset()
 	active				= true;
 	animState			= 0;
 
-	myVehicle			= NULL;
-	skeleton			= NULL;
-	collisionModel		= NULL;
-	selfModel			= NULL;
-	chuteModel			= NULL;
+	myVehicle			= nullptr;
+	skeleton			= nullptr;
+	collisionModel		= nullptr;
+	selfModel			= nullptr;
+	chuteModel			= nullptr;
 
 	//gr2ModelAlt			model;
 	//gr2ModelAlt			weapons[MAX_NUM_FPS_WEAPONS];
 
-	kit					= NULL;
+	kit					= nullptr;
 
 	for(int i = 0; i < MAX_NUM_FPS_WEAPONS; i++)
 		weaponArray[i] = NO_WEAPON;
@@ -399,8 +383,8 @@ void gr2AnimTrooper::Reset()
 	terrainTargetZ		= 0;
 	terrainUpdate		= 0;
 
-	transition			= NULL;
-	attack				= NULL;
+	transition			= nullptr;
+	attack				= nullptr;
 
 	twist.Reset();
 
@@ -443,16 +427,16 @@ void gr2AnimTrooper::SetKit(SINT32 index, const char* vid)
 vehVehicle*gr2AnimGetVehicle (OBJECT* pObject)
 {
 	if (!pObject)
-		return NULL;
+		return nullptr;
 	if (!pObject->animModel)
-		return NULL;
+		return nullptr;
 
 	return pObject->animModel->myVehicle;
 }
 
 static void _addInfantryLODs(gr2AnimTrooper* anim, SINT32 modelIndex, SINT32 fileIndex)
 {
-	gr2Model* lastLod = NULL;
+	gr2Model* lastLod = nullptr;
 
 	for(int i = 0; i < TPS_NUM_LODS; ++i)
 	{
@@ -460,7 +444,7 @@ static void _addInfantryLODs(gr2AnimTrooper* anim, SINT32 modelIndex, SINT32 fil
 
 		if(path && *path)
 		{
-			gr2Model* lod = gr2Model::Load(path, anim->skeleton, NULL, 1);
+			gr2Model* lod = gr2Model::Load(path, anim->skeleton, nullptr, 1);
 
 			if(lod)
 			{
@@ -539,8 +523,8 @@ static void _addWeaponLODs(gr2AnimTrooper* anim)
 		UINT32 maxWeaponRange = 200;
 		UINT32 maxVisibleWeaponRange = (UINT32)(maxWeaponRange * weaponVisMod); // meters
 
-		gr2Model* lastPrimaryLod = NULL;
-		gr2Model* lastSecondaryLod = NULL;
+		gr2Model* lastPrimaryLod = nullptr;
+		gr2Model* lastSecondaryLod = nullptr;
 
 		for(int j = 0; j < TPS_NUM_LODS; j++)
 		{
@@ -549,7 +533,7 @@ static void _addWeaponLODs(gr2AnimTrooper* anim)
 
 			if(path && *path)
 			{
-				gr2Model* lod = gr2Model::Load(path, NULL, NULL, 1);
+				gr2Model* lod = gr2Model::Load(path, nullptr, nullptr, 1);
 
 				if(lod)
 				{
@@ -577,7 +561,7 @@ static void _addWeaponLODs(gr2AnimTrooper* anim)
 
 			if(path && *path)
 			{
-				gr2Model* lod = gr2Model::Load(path, NULL, NULL, 1);
+				gr2Model* lod = gr2Model::Load(path, nullptr, nullptr, 1);
 
 				if(lod)
 				{
@@ -623,7 +607,7 @@ gr2AnimTrooper* gr2AnimCreateModel (vehVehicle*vehicle, UINT32 vehicleTypeNum, O
 	newModel = _gr2TrooperPool.Pop();
 
 	// Try to avoid malloc when possible.
-	if(newModel == NULL)
+	if(PN_UNLIKELY(newModel == nullptr))
 		piExitProgram (__FILE__, __LINE__, "gr2AnimCreateModel: Failed to allocate memory for animModel");
 
 	// get everything to a default state
@@ -635,20 +619,20 @@ gr2AnimTrooper* gr2AnimCreateModel (vehVehicle*vehicle, UINT32 vehicleTypeNum, O
 	newModel->active = true;
 	newModel->animState = 0;
 
-	// always enable binos for 3rd person (duh) and pass in NULL for last resort, as we don't care
-	fpFPSDetermineTrooperLoadout (vehicle, vehicleTypeNum, 1, (SINT32*)newModel->weaponArray, &countryID, NULL, NULL);
+	// always enable binos for 3rd person (duh) and pass in nullptr for last resort, as we don't care
+	fpFPSDetermineTrooperLoadout (vehicle, vehicleTypeNum, 1, (SINT32*)newModel->weaponArray, &countryID, nullptr, nullptr);
 
-	newModel->kit= NULL;
+	newModel->kit= nullptr;
     newModel->countryID = countryID;
 
-	newModel->skeleton = gr2Model::Load(fpTPSSkeletonFile, NULL, &boneCount, 1);
+	newModel->skeleton = gr2Model::Load(fpTPSSkeletonFile, nullptr, &boneCount, 1);
 
 	// this doesn't work because COM bone isn't the root bone of the base skeleton
 	// gr2SetPositioningBone (newModel->skeleton, "COM");
 
-	newModel->collisionModel = gr2Model::Load(fpTPSDamageFile, newModel->skeleton, NULL, 1);
-	newModel->chuteModel = NULL;
-	newModel->selfModel = NULL;
+	newModel->collisionModel = gr2Model::Load(fpTPSDamageFile, newModel->skeleton, nullptr, 1);
+	newModel->chuteModel = nullptr;
+	newModel->selfModel = nullptr;
 
 	_addInfantryLODs(newModel, 0, countryID);
 
@@ -656,22 +640,22 @@ gr2AnimTrooper* gr2AnimCreateModel (vehVehicle*vehicle, UINT32 vehicleTypeNum, O
 	{
 		case BRITISH_PARA_PACK:
 		{
-			newModel->chuteModel	= gr2Model::Load(fpTPSParachuteFile, NULL, NULL, 1);
-			//newModel->selfModel		= gr2Model::Load(fpTPSInfantryMeshFiles[BRITISH_PARA_PACK_SELF][TPS_LOD_1], newModel->skeleton, NULL, 1);
+			newModel->chuteModel	= gr2Model::Load(fpTPSParachuteFile, nullptr, nullptr, 1);
+			//newModel->selfModel		= gr2Model::Load(fpTPSInfantryMeshFiles[BRITISH_PARA_PACK_SELF][TPS_LOD_1], newModel->skeleton, nullptr, 1);
 			_addInfantryLODs(newModel, 1, BRITISH_PARA_NOPACK);
 		}
 		break;
 		case FRENCH_PARA_PACK:
 		{
-			newModel->chuteModel	= gr2Model::Load(fpTPSParachuteFile, NULL, NULL, 1);
-			//newModel->selfModel		= gr2Model::Load(fpTPSInfantryMeshFiles[FRENCH_PARA_PACK_SELF][TPS_LOD_1], newModel->skeleton, NULL, 1);
+			newModel->chuteModel	= gr2Model::Load(fpTPSParachuteFile, nullptr, nullptr, 1);
+			//newModel->selfModel		= gr2Model::Load(fpTPSInfantryMeshFiles[FRENCH_PARA_PACK_SELF][TPS_LOD_1], newModel->skeleton, nullptr, 1);
 			_addInfantryLODs(newModel, 1, FRENCH_PARA_NOPACK);
 		}
 		break;
 		case GERMAN_PARA_PACK:
 		{
-			newModel->chuteModel	= gr2Model::Load(fpTPSParachuteFile, NULL, NULL, 1);
-			//newModel->selfModel		= gr2Model::Load(fpTPSInfantryMeshFiles[GERMAN_PARA_PACK_SELF][TPS_LOD_1], newModel->skeleton, NULL, 1);
+			newModel->chuteModel	= gr2Model::Load(fpTPSParachuteFile, nullptr, nullptr, 1);
+			//newModel->selfModel		= gr2Model::Load(fpTPSInfantryMeshFiles[GERMAN_PARA_PACK_SELF][TPS_LOD_1], newModel->skeleton, nullptr, 1);
 			_addInfantryLODs(newModel, 1, GERMAN_PARA_NOPACK);
 		}
 		break;
@@ -698,8 +682,8 @@ gr2AnimTrooper* gr2AnimCreateModel (vehVehicle*vehicle, UINT32 vehicleTypeNum, O
 	newModel->terrainTarget = Vec3d(0,0,-1.0f);
 	newModel->terrainTargetZ = 0;
 	newModel->twist.SetTwists(newModel->skeleton);
-	newModel->transition = NULL;
-	newModel->attack = NULL;
+	newModel->transition = nullptr;
+	newModel->attack = nullptr;
 	newModel->skeleton->lodError = 0;
 
 	if(newModel->chuteModel)
@@ -740,7 +724,6 @@ gr2AnimTrooper* gr2AnimCreateModel (vehVehicle*vehicle, UINT32 vehicleTypeNum, O
 	return newModel;
 }
 
-#if !defined(USE_OSG)
 OBJECT* gr2AnimCreateObject (vehVehicle*vehicle, UINT32 vehicleTypeNum)
 {
 	OBJECT* newObject, *childObject;
@@ -798,7 +781,6 @@ OBJECT* gr2AnimCreateObject (vehVehicle*vehicle, UINT32 vehicleTypeNum)
 
 	return newObject;
 }
-#endif
 
 // helper function!
 static void gr2AnimStartBlendedAnimation (gr2AnimTrooper* model, gr2AnimationBlend* blend, FLOAT32 easeInTime, FLOAT32 easeOutTime, bool allowResurrect = true)
@@ -1141,7 +1123,7 @@ LOGICAL gr2AnimUpdateModel (OBJECT* pObject, LOGICAL isFPS)
 		}
 
 		if(!keep)
-			model->transition = NULL;
+			model->transition = nullptr;
 	}
 
 	//gr2AnimationBlend* blend = fpTPSGetBlend(model->currentPose, model->currentMove, tpsWeaponType, model->currentMove);
@@ -1688,7 +1670,7 @@ LOGICAL gr2AnimSetModelState (OBJECT* pObject,
 									model->myVehicle->ModelData->VehiclePos:
 									model->myVehicle->PosData.Pos;
 
-			bool inFoV		= (model->myVehicle->ModelData != NULL || rnvisFOVCheck(model->myVehicle->VehicleObjectData->PlaneObject));
+			bool inFoV		= (model->myVehicle->ModelData != nullptr || rnvisFOVCheck(model->myVehicle->VehicleObjectData->PlaneObject));
 			bool ragdolled	= false;
 
 			if(inFoV && model->HasFlag(gr2AnimTrooper::CHUTE_OPEN)) // deathState != TPS_DEATH_PARA)
@@ -1704,7 +1686,7 @@ LOGICAL gr2AnimSetModelState (OBJECT* pObject,
 					v.x = v.y = v.z = 0.0f;
 
 				// add our ragdoll
-				ragdolled = (fpTPSAddRagdoll(model, -1, -1, addForce) != NULL);
+				ragdolled = (fpTPSAddRagdoll(model, -1, -1, addForce) != nullptr);
 
 				// stop any sounds
 				pObject->animModel->moveSound.Stop();
@@ -1734,7 +1716,7 @@ LOGICAL gr2AnimSetModelState (OBJECT* pObject,
 					}
 				}
 			}
-			else if(model->myVehicle->ModelData != NULL || rnvisFOVCheck(model->myVehicle->VehicleObjectData->PlaneObject))
+			else if(model->myVehicle->ModelData != nullptr || rnvisFOVCheck(model->myVehicle->VehicleObjectData->PlaneObject))
 			{
 				// add our ragdoll
 				fpTPSAddRagdoll(model, -1, -1, (model->deathState != TPS_DEATH_PARA));
@@ -1879,7 +1861,7 @@ LOGICAL gr2AnimKillObject (OBJECT* pObject)
 	*/
 
 	_freemodel(pObject->animModel);
-    pObject->animModel = NULL;
+    pObject->animModel = nullptr;
 
 	return TRUE;
 }
@@ -1891,7 +1873,7 @@ LOGICAL gr2AnimDoWeaponCollision (OBJECT* pObject, piVECTOR* startPnt, piVECTOR*
 	LOGICAL			collisionOccured = FALSE;
 	gr2AnimTrooper*	model;
 
-	if (location == NULL || pObject == NULL || startPnt == NULL || endPnt == NULL)
+	if (location == nullptr || pObject == nullptr || startPnt == nullptr || endPnt == nullptr)
 	{
 		return FALSE;
 	}
@@ -1940,12 +1922,12 @@ LOGICAL gr2AnimDoWeaponCollision (OBJECT* pObject, piVECTOR* startPnt, piVECTOR*
 
 LOGICAL gr2AnimGetCurrentWeapon (OBJECT* pObject, SINT32* weapon)
 {
-	if (pObject == NULL)
+	if (PN_UNLIKELY(pObject == nullptr))
 	{
 		return (FALSE);
 	}
 
-	if (pObject->animModel == NULL)
+	if (pObject->animModel == nullptr)
 	{
 		return (FALSE);
 	}
@@ -1957,10 +1939,10 @@ LOGICAL gr2AnimGetCurrentWeapon (OBJECT* pObject, SINT32* weapon)
 
 LOGICAL gr2AnimGetBoneMatrix (struct OBJECT* pObject, piMATRIX* pMatrix, const char* bone, bool visual)
 {
-	if((pObject == NULL) || (pObject->animModel == NULL))
+	if((pObject == nullptr) || (pObject->animModel == nullptr))
 		return(FALSE);
 
-	if(pMatrix == NULL)
+	if(pMatrix == nullptr)
 		return(FALSE);
 
 	if(pObject->animModel->currentWeapon < 0 || pObject->animModel->currentWeapon >= MAX_NUM_FPS_WEAPONS)
@@ -1970,7 +1952,7 @@ LOGICAL gr2AnimGetBoneMatrix (struct OBJECT* pObject, piMATRIX* pMatrix, const c
 
 	if (!weapModel)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2AnimGetBoneMatrix: NULL weapon model");
+		Write_Log (LOG_FPS, LOG_INFO, "gr2AnimGetBoneMatrix: nullptr weapon model");
 		return FALSE;
 	}
 
@@ -2014,7 +1996,7 @@ LOGICAL gr2AnimGetFirePointMatrixByBone(OBJECT* pObject, piMATRIX* pMatrix, bool
 
 LOGICAL gr2AnimGetFirePointMatrix(OBJECT* pObject, piMATRIX* pMatrix, bool visual)
 {
-	if ((pObject == NULL) || (pObject->animModel == NULL) || (pMatrix == NULL))
+	if ((pObject == nullptr) || (pObject->animModel == nullptr) || (pMatrix == nullptr))
 		return(FALSE);
 
 	gr2AnimTrooper* anim	= pObject->animModel;
@@ -2070,7 +2052,7 @@ LOGICAL gr2AnimGetFirePointMatrix(OBJECT* pObject, piMATRIX* pMatrix, bool visua
 			// ideally use the firepoint bone for the position
 			if(anim->currentWeapon >= 0 && anim->currentWeapon < MAX_NUM_FPS_WEAPONS)// && anim->currentLOD >= 0 && anim->currentLOD < TPS_NUM_LODS)
 			{
-				gr2Model* weapModel = NULL;
+				gr2Model* weapModel = nullptr;
 
 				/*
 				if (anim->HasFlag(gr2AnimTrooper::USE_WEAPON_MODEL))
@@ -2211,12 +2193,12 @@ LOGICAL gr2AnimGetEjectPointMatrix (OBJECT* pObject, piMATRIX* pMatrix, bool vis
 {
 	gr2Model*	weapModel;
 
-	if ((pObject == NULL) || (pObject->animModel == NULL))
+	if ((pObject == nullptr) || (pObject->animModel == nullptr))
 	{
 		return(FALSE);
 	}
 
-	if (pMatrix == NULL)
+	if (pMatrix == nullptr)
 	{
 		return(FALSE);
 	}
@@ -2236,7 +2218,7 @@ LOGICAL gr2AnimGetEjectPointMatrix (OBJECT* pObject, piMATRIX* pMatrix, bool vis
 
 	if (!weapModel)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2AnimGetEjectPointMatrix: NULL weapon model");
+		Write_Log (LOG_FPS, LOG_INFO, "gr2AnimGetEjectPointMatrix: nullptr weapon model");
 		return FALSE;
 	}
 
@@ -2264,11 +2246,7 @@ bool gr2AnimHasWeapon(gr2AnimTrooper* model, fpFPSWeaponType type)
 
 LOGICAL gr2AnimIsRagdoll(gr2AnimTrooper* model)
 {
-#if defined(USE_OSG)
-	return (model->ragdoll) ? 1: 0;
-#else
     return 0;
-#endif
 }
 
 inline void _drawThirdPersonModel(gr2AnimTrooper* model)
@@ -2348,7 +2326,7 @@ bool gr2AnimDrawCallback (OBJECT* pObject)
     bool shadowmap = obdrawIsRenderPass(RENDER_SHADOW_MAP);
 
     LOGICAL	drawTPS = TRUE, retVal = TRUE;
-	gr2AnimTrooper*	model = NULL;
+	gr2AnimTrooper*	model = nullptr;
 
     static SINT32 interiorMaterialID = -1;
     static SINT32 defaultInfantryMaterialID = -1;
@@ -2368,13 +2346,11 @@ bool gr2AnimDrawCallback (OBJECT* pObject)
 	model = pObject->animModel;
 
     // Object is inside building
-#if !defined(USE_OSG)
     if(pObject->flag3 & OBJECT_IS_INTERIOR)
     {
         oglSetActiveMaterial(interiorMaterialID);
     }
     else
-#endif
     {
         oglSetActiveMaterial(defaultInfantryMaterialID);
     }
@@ -2501,13 +2477,11 @@ bool gr2AnimDrawCallback (OBJECT* pObject)
 #endif
     }
 
-#if !defined(USE_OSG)
 #ifdef BETA_RELEASE
 	if(VehicleObjectAnalysis)
 		if (!gr2RenderDamageModel(model->collisionModel))
 			return (FALSE);
 #endif // BETA_RELEASE
-#endif // defined(USE_OSG)
 
 #ifdef DEBUG_DEPLOY_CRAP
     _fpsdrawline(pObject->mat);
@@ -2527,7 +2501,7 @@ bool gr2AnimDrawCallback (OBJECT* pObject)
     bool shadowmap = obdrawIsRenderPass(RENDER_SHADOW_MAP);
 
     LOGICAL	drawTPS = TRUE, retVal = TRUE;
-	gr2AnimTrooper*	model = NULL;
+	gr2AnimTrooper*	model = nullptr;
 
     static SINT32 interiorMaterialID = -1;
     static SINT32 defaultInfantryMaterialID = -1;
@@ -2547,13 +2521,11 @@ bool gr2AnimDrawCallback (OBJECT* pObject)
 	model = pObject->animModel;
 
     // Object is inside building
-#if !defined(USE_OSG)
     if(pObject->flag3 & OBJECT_IS_INTERIOR)
     {
         piSetActiveMaterial(interiorMaterialID);
     }
     else
-#endif
     {
         piSetActiveMaterial(defaultInfantryMaterialID);
     }
@@ -2716,13 +2688,11 @@ bool gr2AnimDrawCallback (OBJECT* pObject)
 #endif
     }
 
-#if !defined(USE_OSG)
 #ifdef BETA_RELEASE
 	if(VehicleObjectAnalysis)
 		if (!gr2RenderDamageModel(model->collisionModel))
 			return (FALSE);
 #endif // BETA_RELEASE
-#endif // defined(USE_OSG)
 
 	if (pObject->flags & OBJECT_USEMATRIX)
 	{
@@ -2959,8 +2929,8 @@ LOGICAL gr2AnimInit (void)
 	defaultAnimation = fpTPSGetBlend(TPS_POSETYPE_STAND, TPS_MOVETYPE_IDLE, TPS_WEAPONTYPE_RIFLE, TPS_POINTTYPE_RELAXED);
 
 	/*
-	helmet1 = gr2Model::Load("TPS\\meshes\\british_inf\\Kit_UK_Helmet_LOD1", NULL, NULL, 1);
-	helmet2 = gr2Model::Load("TPS\\meshes\\german_inf\\Kit_DE_Helmet_LOD1", NULL, NULL, 1);
+	helmet1 = gr2Model::Load("TPS\\meshes\\british_inf\\Kit_UK_Helmet_LOD1", nullptr, nullptr, 1);
+	helmet2 = gr2Model::Load("TPS\\meshes\\german_inf\\Kit_DE_Helmet_LOD1", nullptr, nullptr, 1);
 	*/
 
 	Write_Log (LOG_FPS, LOG_INFO, "Total bits used = %d",
@@ -3027,30 +2997,22 @@ void gr2AnimKill (void)
 
 void _freemodel(gr2AnimTrooper* model)
 {
-#if defined(USE_OSG)
-	if(model->ragdoll)
-	{
-		delete model->ragdoll;
-		model->ragdoll = NULL;
-	}
-#endif
-
     gr2FreeModel(model->skeleton);
-    model->skeleton = NULL;
+    model->skeleton = nullptr;
 
     gr2FreeModel(model->collisionModel);
-    model->collisionModel = NULL;
+    model->collisionModel = nullptr;
 
     if(model->selfModel)
     {
         gr2FreeModel(model->selfModel);
-        model->selfModel = NULL;
+        model->selfModel = nullptr;
     }
 
     if(model->chuteModel)
     {
         gr2FreeModel(model->chuteModel);
-        model->chuteModel = NULL;
+        model->chuteModel = nullptr;
     }
 
 
@@ -3065,13 +3027,13 @@ void _freemodel(gr2AnimTrooper* model)
 		if(model->model[i])
 		{
 			gr2FreeModel(model->model[i]);
-			model->model[i] = NULL;
+			model->model[i] = nullptr;
 		}
 
         if(model->trooperAltModel[i])
         {
             gr2FreeModel(model->trooperAltModel[i]);
-            model->trooperAltModel[i] = NULL;
+            model->trooperAltModel[i] = nullptr;
         }
 
 		for(int j = 0; j < MAX_NUM_FPS_WEAPONS; j++)
@@ -3079,13 +3041,13 @@ void _freemodel(gr2AnimTrooper* model)
 			if(model->weaponModels[j][i])
 			{
 				gr2FreeModel(model->weaponModels[j][i]);
-				model->weaponModels[j][i] = NULL;
+				model->weaponModels[j][i] = nullptr;
 			}
 
 			if(model->weaponAltModels[j][i])
 			{
 				gr2FreeModel(model->weaponAltModels[j][i]);
-				model->weaponAltModels[j][i] = NULL;
+				model->weaponAltModels[j][i] = nullptr;
 			}
 		}
 	}
@@ -3507,7 +3469,7 @@ void gr2AnimExpireCorpses()
         return;
 
 	std::set<Corpse*>::iterator it = _corpses.begin();
-	Corpse* dk = NULL;
+	Corpse* dk = nullptr;
 
 	for(; it != _corpses.end(); ++it)
 	{
@@ -3545,8 +3507,8 @@ bool gr2AnimDrawCorpses()
 
     float fovscale = FieldOfView / 90.0f;
 
-    Corpse* dk = NULL;
-	Corpse* oldest = NULL;
+    Corpse* dk = nullptr;
+	Corpse* oldest = nullptr;
 
     for(; itr != _corpses.end(); ++itr)
     {
@@ -3710,8 +3672,8 @@ bool gr2AnimDrawCorpses()
 
     float fovscale = FieldOfView / 90.0f;
 
-    Corpse* dk = NULL;
-	Corpse* oldest = NULL;
+    Corpse* dk = nullptr;
+	Corpse* oldest = nullptr;
 
     for(; itr != _corpses.end(); ++itr)
     {
@@ -3858,7 +3820,7 @@ Corpse* gr2AnimAddCorpse(gr2AnimTrooper* a, const char* offset, bool blood, SINT
 	gr2Model* m = a->model.GetActive();
 
 	Corpse* c = gr2AnimAddCorpse(o, m, gr2GetPath(m), offset, blood, lifeTime, material);
-	if(!c) return NULL;
+	if(!c) return nullptr;
 
 	if(c->material == -1)
 		c->material = (a->myVehicle->isInside) ? piFindMaterialName("interior") : piFindMaterialName("forest1");
@@ -3871,12 +3833,12 @@ Corpse* gr2AnimAddCorpse(gr2AnimTrooper* a, const char* offset, bool blood, SINT
 
 Corpse* gr2AnimAddCorpse(const char* modelPath, FLOAT64VECTOR& pos, piMATRIX& mat, SINT32 lifeTime, SINT32 material)
 {
-	gr2Model* model = gr2Model::Load(modelPath, NULL, NULL, 1);
-	if(!model) return NULL;
+	gr2Model* model = gr2Model::Load(modelPath, nullptr, nullptr, 1);
+	if(!model) return nullptr;
 
     // Hold off freeing trooper model for immersive effect.
     Corpse* dk = _gr2CorpsePool.Pop();
-	if(!dk) return NULL;
+	if(!dk) return nullptr;
 
 	dk->reset();
 
@@ -3894,7 +3856,7 @@ Corpse* gr2AnimAddCorpse(const char* modelPath, FLOAT64VECTOR& pos, piMATRIX& ma
 	int boneCount = gr2GetBoneCount(dk->skeleton);
 
 	// build the model's world pose
-	if(GrannyGetWorldPoseComposite4x4Array(toWorldPose) != NULL)
+	if(GrannyGetWorldPoseComposite4x4Array(toWorldPose) != nullptr)
 		GrannyBuildWorldPoseComposites(toSkeleton, 0, boneCount, toWorldPose);
 
 	// setup matrix
@@ -3924,7 +3886,7 @@ Corpse* gr2AnimAddCorpse(OBJECT* o, gr2Model* s, const char* m, const char* offs
 {
     // Hold off freeing trooper model for immersive effect.
     Corpse* dk = _gr2CorpsePool.Pop();
-	if(!dk) return NULL;
+	if(!dk) return nullptr;
 
 	dk->reset();
 
@@ -3933,8 +3895,8 @@ Corpse* gr2AnimAddCorpse(OBJECT* o, gr2Model* s, const char* m, const char* offs
 	gr2Model* skeleton = gr2GetWornOnModel(s);
 
 	// setup gr2 model
-	dk->skeleton	= gr2Model::Load(gr2GetPath(skeleton), NULL, NULL, 1);
-	dk->model		= (*m) ? gr2Model::Load(m, dk->skeleton, NULL, 1) : dk->skeleton;
+	dk->skeleton	= gr2Model::Load(gr2GetPath(skeleton), nullptr, nullptr, 1);
+	dk->model		= (*m) ? gr2Model::Load(m, dk->skeleton, nullptr, 1) : dk->skeleton;
 
 	// make this model have its own vertex buffer copy
 	dk->model->MakeMutable();
@@ -3975,7 +3937,7 @@ Corpse* gr2AnimAddCorpse(OBJECT* o, gr2Model* s, const char* m, const char* offs
 	}
 
 	// build the model's world pose
-	if(GrannyGetWorldPoseComposite4x4Array(toWorldPose) != NULL)
+	if(GrannyGetWorldPoseComposite4x4Array(toWorldPose) != nullptr)
 		GrannyBuildWorldPoseComposites(toSkeleton, 0, boneCount, toWorldPose);
 
 	//gr2SetWorldPose(skeleton, dk->skeleton);
@@ -4058,7 +4020,7 @@ Corpse* gr2AnimAddCorpse(OBJECT* o, gr2Model* s, const char* m, const char* offs
 
 Corpse* gr2AnimAddCorpse(gr2PhysicsModel* m, const char* offset, bool blood, SINT32 lifeTime, SINT32 material)
 {
-	Corpse* dk = gr2AnimAddCorpse(m->GetModelNode(), m->GetModel(), m->GetCorpse(), NULL, blood, lifeTime, material);
+	Corpse* dk = gr2AnimAddCorpse(m->GetModelNode(), m->GetModel(), m->GetCorpse(), nullptr, blood, lifeTime, material);
 
 	if(dk)
 	{
@@ -4137,8 +4099,6 @@ void gr2AnimCorpseTO(Corpse* c)
 
 extern LOGICAL gr2AnimInitShadow (OBJECT* pObject)
 {
-#if defined(USE_OSG)
-#else
 #if(1)
 	if (true || ShadowSizeSelect == 0) // disable trooper shadows for now
 	{
@@ -4151,7 +4111,7 @@ extern LOGICAL gr2AnimInitShadow (OBJECT* pObject)
 	obmgrCreateModelInstance("troopshadow");
 	pShadowObject = obmainFindNamedObject("troopshadow");
 
-	if (pShadowObject == NULL)
+	if (pShadowObject == nullptr)
 	{
 		Write_Debug("Shadow object not found for troops");
 		// no shadow, no error
@@ -4159,7 +4119,7 @@ extern LOGICAL gr2AnimInitShadow (OBJECT* pObject)
 	}
 
 	pCurrentObject = pObject;
-	while (pCurrentObject->child != NULL)
+	while (pCurrentObject->child != nullptr)
 	{
 		pCurrentObject = pCurrentObject->child;
 	}
@@ -4182,7 +4142,6 @@ extern LOGICAL gr2AnimInitShadow (OBJECT* pObject)
 	obmainMoveToNotObjectTree(pShadowObject);
 
 	strcpy(pShadowObject->name, "shadow");
-#endif
 	return TRUE;
 }
 
@@ -4334,7 +4293,7 @@ LOGICAL gr2AnimProcessAnimationFlags(OBJECT* pObject, UINT32 flags)
 	//LOGICAL attack2		= 0;
 
 	// pmm sanity check
-	if ((pObject == NULL) || (pObject->animModel == NULL))
+	if ((pObject == nullptr) || (pObject->animModel == nullptr))
 	{
 		return (FALSE);
 	}
@@ -4620,7 +4579,7 @@ void gr2AnimHandleEmotes(gr2AnimTrooper* model)
 							}
 							else
 							{
-								rnmainListEmoteText (IDE_LANG_UI, TPS_BODYEMOTE_OFFSET + emoteNum, colorGREENALPHA, prependStr, NULL);
+								rnmainListEmoteText (IDE_LANG_UI, TPS_BODYEMOTE_OFFSET + emoteNum, colorGREENALPHA, prependStr, nullptr);
 							}
 						}
 					}
@@ -4694,7 +4653,7 @@ void gr2AnimHandleEmotes(gr2AnimTrooper* model)
 						if (mathExactVectorLength2(&posDiff) <= (tpsTroopData.emoteFullBodyMaxDistance * tpsTroopData.emoteFullBodyMaxDistance))
 						{
 							swprintf (prependStr, 255, L"%ls ", chatGetWideCallsign(model->myVehicle->Chat_Handle));
-							rnmainListEmoteText (IDE_LANG_UI, TPS_COMBATEMOTE_OFFSET + emoteNum, colorGREENALPHA, prependStr, NULL);
+							rnmainListEmoteText (IDE_LANG_UI, TPS_COMBATEMOTE_OFFSET + emoteNum, colorGREENALPHA, prependStr, nullptr);
 						}
 
 						// let us handle other's emotes
@@ -4965,7 +4924,7 @@ void gr2AnimHandleTransitions(gr2AnimTrooper* model, int pose, int move, int poi
 // from current (inside object) to new state transition
 void gr2AnimHandlePoseChange(gr2AnimTrooper* model, int pose, int move, int point, int weapon)
 {
-	gr2AnimationBlend* transition = NULL;
+	gr2AnimationBlend* transition = nullptr;
 
 	FLOAT32 weight	= 4.0f;
 	FLOAT32 easeIn	= 0.1f;
@@ -5298,7 +5257,7 @@ void gr2AnimAddTwitch (OBJECT* pObject)
 // FIXME - this should probably be a structure at some point instead of just a string..
 void gr2AnimPersonalize (OBJECT* pObject, char* handle)
 {
-	gr2AnimTrooper* animModel = NULL;
+	gr2AnimTrooper* animModel = nullptr;
 
 	if((!pObject) || (!handle) || (!handle[0]) || (!pObject->animModel))
 		return;
@@ -5439,7 +5398,7 @@ void gr2AnimMemStats()
 // new sound function(s)
 const char* gr2AnimDetermineMovementSound(fpTPSPoseType pose, fpTPSMoveType move, SINT32 surfaceID, FLOAT32* halfDistance, FLOAT32* maxDistance)
 {
-	const char* retval = NULL;
+	const char* retval = nullptr;
 
 	if (pose == TPS_POSETYPE_SWIM)
 	{
@@ -5450,7 +5409,7 @@ const char* gr2AnimDetermineMovementSound(fpTPSPoseType pose, fpTPSMoveType move
 	else
 	{
 		if (surfaceID < 0 || surfaceID >= TPS_MAX_NUM_SURFACES)
-			return NULL;
+			return nullptr;
 
 		if(move == TPS_MOVETYPE_STRAFE_RIGHT || move == TPS_MOVETYPE_STRAFE_LEFT)
 			move = TPS_MOVETYPE_FORWARD;
@@ -5467,7 +5426,7 @@ void gr2AnimSoundStoppedCallback(void* callbackPtr)
 {
     gr2AnimTrooper* model = (gr2AnimTrooper*)callbackPtr;
 
-    if(model == NULL)
+    if(model == nullptr)
         return;
 
 	model->moveSound.Stop();
@@ -5569,7 +5528,7 @@ void gr2PlayFootstepSound(OBJECT* pObject, gr2Model* model, SINT32 eventID)
 
 	if(model->surfaceID >= 0)
 	{
-		SCHAR* soundName = NULL;
+		SCHAR* soundName = nullptr;
 		FLOAT32 fMin = 0;
 		FLOAT32 fMax = 0;
 
@@ -5579,7 +5538,7 @@ void gr2PlayFootstepSound(OBJECT* pObject, gr2Model* model, SINT32 eventID)
 		{
 			if(pObject->flag2 & OBJECT_ISFPS)
             {
-				fpFPSfxPlayNormalSound(soundName, IDE_FP_PRIORITY_MANDATORY, TYPE_FINITE_SOUND, NULL, pObject);
+				fpFPSfxPlayNormalSound(soundName, IDE_FP_PRIORITY_MANDATORY, TYPE_FINITE_SOUND, nullptr, pObject);
             }
 			else
             {
@@ -5739,9 +5698,6 @@ void gr2AnimExecuteEvent(OBJECT* pObject, gr2Model* model, SINT32 typeID, const 
 
 SINT32 gr2GetSurfaceIDUnderfoot(vehVehicle*vehicle, FLOAT64VECTOR* offset)
 {
-#if defined(USE_OSG)
-	return fpsTrooper.currentSurfaceID;
-#else
 	FLOAT64VECTOR	WorldOriginOffset;
 	piVECTOR		V1,V2;
 	OBJECT*			pObject;
@@ -5769,36 +5725,33 @@ SINT32 gr2GetSurfaceIDUnderfoot(vehVehicle*vehicle, FLOAT64VECTOR* offset)
 	V2.z += 1.0f;
 	V1.z -= 0.25f;
 
-#ifdef BETA_RELEASE
-	if(0)
-	{
-		FLOAT64VECTOR	pt1, pt2;
-		SINT32			id;
-		static SINT32	counter;
-		SCHAR			buf[255];
+#ifdef BETA_RELEASE_DEBUG_FOOTSTEPS
+	FLOAT64VECTOR	pt1, pt2;
+	SINT32			id;
+	static SINT32	counter;
+	SCHAR			buf[255];
 
-		if (++counter > 10)
-			counter = 0;
+	if (++counter > 10)
+		counter = 0;
 
-		sprintf (buf, "inffoot_%d", counter);
+	sprintf (buf, "inffoot_%d", counter);
 
-		math32To64Vec(&pt1, &V1); mathAddVectors(&pt1, &pt1, &WorldOriginOffset);
-		math32To64Vec(&pt2, &V2); mathAddVectors(&pt2, &pt2, &WorldOriginOffset);
+	math32To64Vec(&pt1, &V1); mathAddVectors(&pt1, &pt1, &WorldOriginOffset);
+	math32To64Vec(&pt2, &V2); mathAddVectors(&pt2, &pt2, &WorldOriginOffset);
 
-		id = draw3dSetWorldDebugLine(&pt1, &pt2, buf, colorYELLOWALPHA);
-		draw3dSetDebugObjectFlipZ(id,FALSE);
-		draw3dSetDebugObjectAlwaysOnTop(id, TRUE);
-	}
+	id = draw3dSetWorldDebugLine(&pt1, &pt2, buf, colorYELLOWALPHA);
+	draw3dSetDebugObjectFlipZ(id,FALSE);
+	draw3dSetDebugObjectAlwaysOnTop(id, TRUE);
 #endif
 
     surfID = -1;
     trncdIgnoreTreeCollide(TRUE);
 
-	if (trncdCollideWithVehiclesAndTerrain(&V1,&V2,NULL,&pObject,NULL,NULL,NULL,FALSE,TRUE, FALSE) == TRUE)
+	if (trncdCollideWithVehiclesAndTerrain(&V1,&V2,nullptr,&pObject,nullptr,nullptr,nullptr,FALSE,TRUE, FALSE) == TRUE)
 	{
 		SINT32	retval;
 
-		retval = mlGetObjectBumpinessAndFriction(NULL,NULL,NULL,NULL,NULL,&surfID,pObject);
+		retval = mlGetObjectBumpinessAndFriction(nullptr,nullptr,nullptr,nullptr,nullptr,&surfID,pObject);
 
 		if (surfID < 0)
 		{
@@ -5822,7 +5775,7 @@ SINT32 gr2GetSurfaceIDUnderfoot(vehVehicle*vehicle, FLOAT64VECTOR* offset)
 				if (pObject->texname)
 					Write_Log (LOG_FPS, LOG_INFO, "Troop foot on texture <%s>, surface ID <%d>", pObject->texname, surfID);
 				else
-					Write_Log (LOG_FPS, LOG_INFO, "Troop foot on NULL texture, surface ID <%d>", surfID);
+					Write_Log (LOG_FPS, LOG_INFO, "Troop foot on nullptr texture, surface ID <%d>", surfID);
 			}
 		}
 
@@ -5834,7 +5787,6 @@ SINT32 gr2GetSurfaceIDUnderfoot(vehVehicle*vehicle, FLOAT64VECTOR* offset)
 
     return surfID;
 
-#endif
 	return -1;
 }
 
@@ -5915,9 +5867,9 @@ bool gr2AnimFire(vehVehicle* Vehicle)
 									0,
 									1,
 									AmmoFlags,
-									NULL,
-									NULL, // weapFireWeapon
-									NULL,
+									nullptr,
+									nullptr, // weapFireWeapon
+									nullptr,
 									Vehicle);
 
 	if(fired)
@@ -5932,7 +5884,7 @@ bool gr2AnimFire(vehVehicle* Vehicle)
 
         if(model->currentWeaponType == TPS_WEAPONTYPE_ROCKET)
         {
-			TransformEffect* te = NULL;
+			TransformEffect* te = nullptr;
             piMATRIX m = IdentityMatrix;
             gr2AnimGetBoneMatrix(o, &m, "alt_firepoint");
 
@@ -5948,7 +5900,7 @@ bool gr2AnimFire(vehVehicle* Vehicle)
 
 				math3dNormalize(&dir);
 
-				te = TransformEffect::AddEffect("bazookabackflash", Vec3f(dir), 0, NULL);
+				te = TransformEffect::AddEffect("bazookabackflash", Vec3f(dir), 0, nullptr);
 
 				if(te)
 				{
@@ -5965,9 +5917,9 @@ bool gr2AnimFire(vehVehicle* Vehicle)
 			}
 
 			if(model->weaponArray[model->currentWeapon] == PIAT)
-			    te = TransformEffect::AddEffect("muzzlesmoke", Vec3f(0, 0, 0), 0, NULL);
+			    te = TransformEffect::AddEffect("muzzlesmoke", Vec3f(0, 0, 0), 0, nullptr);
             else
-			    te = TransformEffect::AddEffect("bazookafrontflash", Vec3f(0, 0, 0), 0, NULL);
+			    te = TransformEffect::AddEffect("bazookafrontflash", Vec3f(0, 0, 0), 0, nullptr);
 
 			if(te)
 			{
@@ -6176,7 +6128,7 @@ void gr2AnimStopAttackSound(vehVehicle* Vehicle, SINT32 mount)
         return;
 
 	// check for and shut down weapon sound
-	if (mount >= 0 && Vehicle->Weapons[mount][0].WeaponType != NULL)
+	if (mount >= 0 && Vehicle->Weapons[mount][0].WeaponType != nullptr)
 	{
 		if (Vehicle->Weapons[mount][0].WeaponType->FireType != WEAP_FIRETYPE_SINGLESHOT)
 		{
@@ -6695,7 +6647,7 @@ SINT32 gr2AnimGetDeathState()
 {
     OBJECT* o = persGetPersonaVehicleObjectDataPtr();
 
-	if(o != NULL && o->animModel != NULL && o->animModel->HasFlag(gr2AnimTrooper::DEAD))
+	if(o != nullptr && o->animModel != nullptr && o->animModel->HasFlag(gr2AnimTrooper::DEAD))
 		return 1;
 
     return 0;
@@ -6979,13 +6931,13 @@ void gr2AnimTrooperTwists(OBJECT* object,
 				{
 					if(model->currentMove == TPS_MOVETYPE_IDLE_AIM)
 					{
-						torsoThreshold = 20 ;
-						legsThreshold = (left) ? 55 : 70 ;
+						torsoThreshold = 20;
+						legsThreshold = (left) ? 55 : 70;
 					}
 					else
 					{
-						torsoThreshold = (left) ? 50 : 65 ;
-						legsThreshold = (left) ? 50 : 65 ;
+						torsoThreshold = (left) ? 50 : 65;
+						legsThreshold = (left) ? 50 : 65;
 					}
 				}
 
@@ -6993,7 +6945,7 @@ void gr2AnimTrooperTwists(OBJECT* object,
 
 				if(model->currentMove == TPS_MOVETYPE_IDLE_AIM || model->currentMove == TPS_MOVETYPE_TURN_AIM)
 				{
-					torsoThreshold = 5 ;
+					torsoThreshold = 5;
 					legsThreshold = 70.0f;
 				}
 
@@ -7008,7 +6960,7 @@ void gr2AnimTrooperTwists(OBJECT* object,
 				if(fabs(torsoDiff) > torsoThreshold)
 				{
 					if(left)
-						model->torsoYaw += (torsoDiff > 0) ? torsoDiff - torsoThreshold : torsoThreshold - torsoDiff ;
+						model->torsoYaw += (torsoDiff > 0) ? torsoDiff - torsoThreshold : torsoThreshold - torsoDiff;
 					else
 						model->torsoYaw += (torsoDiff > 0) ? torsoThreshold - torsoDiff : torsoDiff + torsoThreshold;
 
@@ -7118,7 +7070,7 @@ bool gr2AnimTerrainizeByCapsule(gr2AnimTrooper* model)
 	if(model->currentPose == TPS_POSETYPE_PRONE && (!model->myVehicle->ModelData || persIsCameraExternalMode()))
 	{
 		static colliderQuery collider;
-		static dGeomID shape = NULL;
+		static dGeomID shape = nullptr;
 
 		if(!shape)
 		{
@@ -7401,7 +7353,7 @@ void gr2AnimUpdate()
 
 	_nextUpdate = frametime + 25;
 
-	vehVehicle* v = NULL;
+	vehVehicle* v = nullptr;
 	vehGetVehicleHead(&v);
 
 	vehVehicle* player = persGetPersonaVehiclePtr();
@@ -7410,9 +7362,9 @@ void gr2AnimUpdate()
 	for(;v; v = v->getNext())
 	{
 		if (v->VehicleType->Type != VEH_TYPE_PERSON ||
-			v->VehicleObjectData == NULL ||
-			v->VehicleObjectData->PlaneObject == NULL ||
-		    v->VehicleObjectData->PlaneObject->animModel == NULL ||
+			v->VehicleObjectData == nullptr ||
+			v->VehicleObjectData->PlaneObject == nullptr ||
+		    v->VehicleObjectData->PlaneObject->animModel == nullptr ||
 			v->VehicleObjectData->PlaneObject->animModel->HasFlag(gr2AnimTrooper::FREE_FALL) ||
 		    v->VehicleObjectData->PlaneObject->animModel->active == false ||
 			v->isInside)
@@ -7515,13 +7467,13 @@ void gr2AnimUpdate()
 
 			rc.rays[0] = rays[cursor++];
 			rc.rays[1] = rays[cursor++];
-			rc.rays[2] = NULL;
+			rc.rays[2] = nullptr;
 
 			worldPos.set(p);
 
 			for(int p = 0; p < 2; ++p)
 			{
-				int footBone = (p == 0) ? 12 : 8 ; // left, right
+				int footBone = (p == 0) ? 12 : 8; // left, right
 
 				if(gr2GetBonePositionByIndex(model->skeleton, footBone, &tempMat))
 				{
@@ -7538,7 +7490,7 @@ void gr2AnimUpdate()
 				}
 				else
 				{
-					rc.rays[p] = NULL;
+					rc.rays[p] = nullptr;
 				}
 			}
 
@@ -7573,8 +7525,8 @@ void gr2AnimUpdate()
 				}
 
 				rc->rays[0] = rays[cursor++];
-				rc->rays[1] = NULL;
-				rc->rays[2] = NULL;
+				rc->rays[1] = nullptr;
+				rc->rays[2] = nullptr;
 
 				pos.set(p);
 				//pos.z() += 1.5f;
@@ -7594,9 +7546,9 @@ void gr2AnimUpdate()
 
 #if(0)  // Needs work
 			// add a splash
-			TransformEffect* te = NULL;
+			TransformEffect* te = nullptr;
 
-			te = TransformEffect::AddEffect("trooperswimsplash", Vec3f(0, 0, -1), 0, NULL);
+			te = TransformEffect::AddEffect("trooperswimsplash", Vec3f(0, 0, -1), 0, nullptr);
 
 			if(te)
 			{
@@ -7925,8 +7877,8 @@ void gr2AnimUpdate()
 			{
 				hits.clear();
 
-				int footBone		= (r == 0) ? 12 : 8 ; // left, right
-				FLOAT32& foot	= (r == 0) ? left : right ; // left, right
+				int footBone		= (r == 0) ? 12 : 8; // left, right
+				FLOAT32& foot	= (r == 0) ? left : right; // left, right
 
 				if(gr2GetBonePositionByIndex(model->skeleton, footBone, &tempMat))
 				{
@@ -7985,7 +7937,7 @@ void gr2AnimUpdate()
 
 						for(int i = 0; i < GetRandom(3, 6); i++)
 						{
-							TransformEffect* te = TransformEffect::AddEffect("deadtroopersplash", dir, 0, NULL);
+							TransformEffect* te = TransformEffect::AddEffect("deadtroopersplash", dir, 0, nullptr);
 
 							if(te)
 							{
@@ -8327,7 +8279,7 @@ bool gr2AnimTerrainize(gr2AnimTrooper* model)
 			static FLOAT64 idleDisplace = 1.4f;
 			static FLOAT64 moveDisplace = .6f;
 
-			FLOAT64 adjust = (model->currentMove == TPS_MOVETYPE_IDLE) ? idleDisplace : moveDisplace ;
+			FLOAT64 adjust = (model->currentMove == TPS_MOVETYPE_IDLE) ? idleDisplace : moveDisplace;
 			FLOAT64 zAdjust = -(worldPos.z() - (worldPos.z() - adjust));
 
 			// do pitch smoothing
@@ -8674,13 +8626,13 @@ void gr2AnimTwist::CalculateTurn(gr2AnimTrooper* model, FLOAT64& yaw, FLOAT64VEC
 			{
 				if(model->currentPoint == TPS_POINTTYPE_AIM)
 				{
-					torsoThreshold = 20 ;
-					legsThreshold = (left) ? 55 : 70 ;
+					torsoThreshold = 20;
+					legsThreshold = (left) ? 55 : 70;
 				}
 				else
 				{
-					torsoThreshold = (left) ? 50 : 65 ;
-					legsThreshold = (left) ? 50 : 65 ;
+					torsoThreshold = (left) ? 50 : 65;
+					legsThreshold = (left) ? 50 : 65;
 				}
 			}
 
@@ -8691,7 +8643,7 @@ void gr2AnimTwist::CalculateTurn(gr2AnimTrooper* model, FLOAT64& yaw, FLOAT64VEC
 
 			if(model->currentPoint == TPS_POINTTYPE_AIM || model->currentMove == TPS_MOVETYPE_DEPLOYED)
 			{
-				torsoThreshold = 5 ;
+				torsoThreshold = 5;
 				legsThreshold = 70.0f;
 			}
 
@@ -8706,7 +8658,7 @@ void gr2AnimTwist::CalculateTurn(gr2AnimTrooper* model, FLOAT64& yaw, FLOAT64VEC
 			if(fabs(torsoDiff) > torsoThreshold)
 			{
 				if(left)
-					torsoYaw += (torsoDiff > 0) ? torsoDiff - torsoThreshold : torsoThreshold - torsoDiff ;
+					torsoYaw += (torsoDiff > 0) ? torsoDiff - torsoThreshold : torsoThreshold - torsoDiff;
 				else
 					torsoYaw += (torsoDiff > 0) ? torsoThreshold - torsoDiff : torsoDiff + torsoThreshold;
 
@@ -9824,13 +9776,13 @@ void gr2AnimTwist::Calculate2(FLOAT64 delta, gr2AnimTrooper* model)
 				{
 					if(model->currentPoint == TPS_POINTTYPE_AIM)
 					{
-						torsoThreshold = 20 ;
-						legsThreshold = (left) ? 55 : 70 ;
+						torsoThreshold = 20;
+						legsThreshold = (left) ? 55 : 70;
 					}
 					else
 					{
-						torsoThreshold = (left) ? 50 : 65 ;
-						legsThreshold = (left) ? 50 : 65 ;
+						torsoThreshold = (left) ? 50 : 65;
+						legsThreshold = (left) ? 50 : 65;
 					}
 				}
 
@@ -9838,7 +9790,7 @@ void gr2AnimTwist::Calculate2(FLOAT64 delta, gr2AnimTrooper* model)
 
 				if(model->currentPoint == TPS_POINTTYPE_AIM || model->currentMove == TPS_MOVETYPE_DEPLOYED)
 				{
-					torsoThreshold = 5 ;
+					torsoThreshold = 5;
 					legsThreshold = 70.0f;
 				}
 
@@ -9853,7 +9805,7 @@ void gr2AnimTwist::Calculate2(FLOAT64 delta, gr2AnimTrooper* model)
 				if(fabs(torsoDiff) > torsoThreshold)
 				{
 					if(left)
-						torsoYaw += (torsoDiff > 0) ? torsoDiff - torsoThreshold : torsoThreshold - torsoDiff ;
+						torsoYaw += (torsoDiff > 0) ? torsoDiff - torsoThreshold : torsoThreshold - torsoDiff;
 					else
 						torsoYaw += (torsoDiff > 0) ? torsoThreshold - torsoDiff : torsoDiff + torsoThreshold;
 
@@ -10077,474 +10029,6 @@ void gr2AnimTwist::SetTwists(gr2Model* skeleton)
 	skeleton->AddBoneTwist(18,2);
 }
 
-#if defined(USE_OSG)
-inline void _drawThirdPersonModelOSG(gr2AnimTrooper* model, osg::State& state)
-{
-    if(model->useSelfTrooperModel)
-    {
-        gr2RenderModelOSG(model->trooperSelfModel, state);
-    }
-    else if(model->useAltTrooperModel)
-    {
-        gr2RenderModelOSG(model->trooperAltModel[model->currentLOD], state);
-	}
-    else
-    {
-        gr2RenderModelOSG(model->model[model->currentLOD], state);
-    }
-
-    if(model->useAltWeaponModel)
-    {
-        if(model->weaponAltModels[model->currentWeapon][model->currentLOD] && !model->hideGun)
-        {
-            gr2RenderModelOSG(model->weaponAltModels[model->currentWeapon][model->currentLOD], state);
-        }
-    }
-    else
-    {
-        if(model->weaponModels[model->currentWeapon][model->currentLOD] && !model->hideGun)
-        {
-            gr2RenderModelOSG(model->weaponModels[model->currentWeapon][model->currentLOD], state);
-        }
-    }
-
-    if(!model->hideChute)
-    {
-        gr2RenderModelOSG(model->chuteModel, state);
-    }
-}
-#endif // defined(USE_OSG)
-
-#if defined(USE_OSG)
-#include <osg/Material>
-bool gr2AnimDrawCallbackOSG(osg::State& state, OBJECT* o)
-{
-    bool drawTPS = true;
-    bool retVal = true;
-    gr2AnimTrooper* model = NULL;
-
-    if(!(o->flags & OBJECT_VISIBLE)) return true;
-    if(o->flags & OBJECT_SKIPDRAWING) return true;
-	if(!o->animModel || !o->animModel->active) return false;
-
-    model = o->animModel;
-
-    static osg::*_ptr<osg::Material> forest1;
-    static bool first = true;
-
-    if(first)
-    {
-        forest1 = new osg::Material;
-
-        first = false;
-        forest1->setDiffuse(osg::Material::FRONT_AND_BACK, osg::Vec4(1, 1, 1, 1));
-        forest1->setAmbient(osg::Material::FRONT_AND_BACK, osg::Vec4(0.525490, 0.525490, 0.525490, 1.0));
-        forest1->setSpecular(osg::Material::FRONT_AND_BACK, osg::Vec4(0, 0, 0, 1));
-        forest1->setEmission(osg::Material::FRONT_AND_BACK, osg::Vec4(0, 0, 0, 1));
-        forest1->setShininess(osg::Material::FRONT_AND_BACK, 0.0);
-    }
-
-    forest1->apply(state);
-
-    if(o->flags & OBJECT_USEMATRIX)
-    {
-        glPushMatrix();
-
-		// FIXME
-		// Since we are using left handed matrices and granny doesn't support them
-		// we must kludge our way around that fact
-		piMATRIX world = o->mat;
-
-        world._31 = -world._31;
-        world._32 = -world._32;
-        world._33 = -world._33;
-
-    	glMultMatrixf((GLfloat*)&world);
-    }
-
-    if(o->flag2 & OBJECT_ISFPS)
-    {
-        if(fpFPSIsExternalView() || fpFPSIsTrooperParachuteOpen())
-        {
-            fpFPSDrawOSG(state, o, false);
-        }
-        else
-        {
-            drawTPS = false;
-            fpFPSDrawOSG(state, o, true);
-        }
-    }
-
-    double finalTorsoTwist = 0;
-    double finalHeadTwist = 0;
-    double finalModelTwist = 0;
-
-    // first off .. clear any previous rotations
-    gr2ModelSetTorsoRotation(model->skeleton, 0, 0);
-    gr2ModelSetHeadRotation(model->skeleton, 0);
-    gr2ModelSetModelRotation(model->skeleton, 0);
-
-#define	ROTATE_TO_MOVE
-#ifdef	ROTATE_TO_MOVE
-
-	// force facing to velocity vector .. problems with smoother make this less good than it should be
-	// only do this for crouch and stand .. prone leave alone
-    if((model && model->myVehicle) && ((model->currentPose == TPS_POSETYPE_STAND) || (model->currentPose == TPS_POSETYPE_CROUCH)))
-    {
-        FLOAT64VECTOR vel;
-        double theta = 0;
-        double yaw = 0;
-        double diff = 0;
-        double speed = 0;
-
-        if(model->myVehicle->ModelData)
-        {
-            vel = model->myVehicle->ModelData->VehicleVel;
-            yaw = model->myVehicle->ModelData->VehicleAtt.Yaw;
-        }
-        else
-        {
-            vel = model->myVehicle->PosData.Vel;
-            vel.x = -vel.x;
-            vel.z = -vel.z;
-            yaw = model->myVehicle->PosData.Att.Yaw;
-            yaw = -yaw;
-        }
-
-        speed = mathExactVectorLength2(&vel);
-
-		if(speed > 0)
-		{
-			if(vel.x == 0)
-			{
-				if(vel.y > 0)
-                {
-                    theta = 90.0;
-                }
-				else
-                {
-                    theta = -90.0;
-                }
-			}
-			else
-            {
-				theta = -1.0 * mlRAD_TO_DEG(atan2(vel.y, vel.x)) - 270.0; // 270 was 90 with the old game (non-OSG)
-            }
-
-			yaw = mlRAD_TO_DEG(yaw);
-			diff = yaw + theta;
-
-			// normalize to -180/+180
-			while(diff * diff > 180.0 * 180.0)
-			{
-				if(diff < 0)
-                {
-					diff += 360.0;
-                }
-                else if(diff >= 0)
-                {
-					diff -= 360.0;
-                }
-			}
-
-			// ok, now we're somewhere from -180/+180 with 0 being the "center"
-			gr2AnimDetermineMotionType(model, diff);
-
-			switch(model->currentMotion)
-			{
-            case TPS_MOTION_F:
-                {
-					if(gr2AnimGunPointStraight(model))
-					{
-						if(model->currentPose == TPS_POSETYPE_STAND)
-						{
-							finalModelTwist = diff;
-							finalHeadTwist = 0;
-							finalTorsoTwist = diff;
-						}
-						else if(model->currentPose == TPS_POSETYPE_CROUCH)
-						{
-							finalModelTwist = 0;
-							finalHeadTwist = 0;
-							finalTorsoTwist = 0;
-						}
-					}
-					else
-					{
-						finalModelTwist = diff;
-						finalHeadTwist = diff;
-						finalTorsoTwist = 0;
-					}
-
-					break;
-                }
-			case TPS_MOTION_RFF:
-                {
-					if(gr2AnimGunPointStraight(model))
-					{
-						if(model->currentPose == TPS_POSETYPE_STAND)
-						{
-							finalModelTwist = diff / 2.0;
-							finalHeadTwist = 0;
-							finalTorsoTwist = diff / 2.0;
-						}
-						else if(model->currentPose == TPS_POSETYPE_CROUCH)
-						{
-							finalModelTwist = 0;
-							finalHeadTwist = 0;
-							finalTorsoTwist = 0;
-						}
-					}
-					else
-					{
-						finalModelTwist = (diff / 2.0);
-						finalHeadTwist = diff / 2.0;
-						finalTorsoTwist = 0;
-					}
-
-                    break;
-                }
-			case TPS_MOTION_RFB:
-                {
-					if(gr2AnimGunPointStraight(model))
-					{
-						if(model->currentPose == TPS_POSETYPE_STAND)
-						{
-							finalModelTwist = - (diff / 2.0);
-							finalHeadTwist = 0;
-							finalTorsoTwist = - diff / 2.0;
-						}
-						else if(model->currentPose == TPS_POSETYPE_CROUCH)
-						{
-							finalModelTwist = 0;
-							finalHeadTwist = 0;
-							finalTorsoTwist = 0;
-						}
-					}
-					else
-					{
-						finalModelTwist = - (diff / 2.0);
-						finalHeadTwist = - diff / 2.0;
-						finalTorsoTwist = 0;
-					}
-
-					if(!model->movingBackwards)
-					{
-					    gr2AnimSetModelState(o,
-                                             model->currentLOD,
-                                             model->currentPose,
-                                             TPS_MOVETYPE_BACKWARD,
-                                             model->currentPoint,
-							                 model->currentWeapon,
-                                             model->deathState,
-                                             model->emoteID,
-                                             model->useAltWeaponModel,
-                                             model->chuteOpen,
-                                             model->freeFall,
-							                 model->useAltTrooperModel);
-					}
-
-					break;
-                }
-			case TPS_MOTION_LFF:
-                {
-					if(gr2AnimGunPointStraight(model))
-					{
-						if(model->currentPose == TPS_POSETYPE_STAND)
-						{
-							finalModelTwist = diff / 2.0;
-							finalHeadTwist = 0;
-							finalTorsoTwist = diff / 2.0;
-						}
-						else if(model->currentPose == TPS_POSETYPE_CROUCH)
-						{
-							finalModelTwist = 0;
-							finalHeadTwist = 0;
-							finalTorsoTwist = 0;
-						}
-					}
-					else
-					{
-						finalModelTwist = (diff / 2.0);
-						finalHeadTwist = diff / 2.0;
-						finalTorsoTwist = 0;
-					}
-
-                    break;
-                }
-			case TPS_MOTION_LFB:
-                {
-					if(gr2AnimGunPointStraight(model))
-					{
-						if(model->currentPose == TPS_POSETYPE_STAND)
-						{
-							finalModelTwist = - (diff / 2.0);
-							finalHeadTwist = 0;
-							finalTorsoTwist = - diff / 2.0;
-						}
-						else if(model->currentPose == TPS_POSETYPE_CROUCH)
-						{
-							finalModelTwist = 0;
-							finalHeadTwist = 0;
-							finalTorsoTwist = 0;
-						}
-					}
-					else
-					{
-						finalModelTwist = - (diff / 2.0);
-						finalHeadTwist = - diff / 2.0;
-						finalTorsoTwist = 0;
-					}
-					if(!model->movingBackwards)
-					{
-						gr2AnimSetModelState(o,
-                                             model->currentLOD,
-                                             model->currentPose,
-                                             TPS_MOVETYPE_BACKWARD,
-                                             model->currentPoint,
-							                 model->currentWeapon,
-                                             model->deathState,
-                                             model->emoteID,
-                                             model->useAltWeaponModel,
-                                             model->chuteOpen,
-                                             model->freeFall,
-							                 model->useAltTrooperModel);
-					}
-
-					break;
-                }
-			case TPS_MOTION_B:
-                {
-					if(gr2AnimGunPointStraight(model))
-					{
-						if(model->currentPose == TPS_POSETYPE_STAND)
-						{
-							finalModelTwist = 180.0 + diff;
-							finalHeadTwist = 0;
-							finalTorsoTwist = 180.0 + diff;
-						}
-						else if(model->currentPose == TPS_POSETYPE_CROUCH)
-						{
-							finalModelTwist = 0;
-							finalHeadTwist = 0;
-							finalTorsoTwist = 0;
-						}
-					}
-					else
-					{
-						finalModelTwist = 180.0 + diff;
-						finalHeadTwist = 180.0 + diff;
-						finalTorsoTwist = 0;
-					}
-
-					break;
-                }
-			}
-		}
-		else
-        {
-			model->currentMotion = TPS_MOTION_F;
-        }
-	}
-#endif
-
-	if(model->headPoint == TPS_HEAD_LEFT)
-	{
-		finalHeadTwist += 45.0;
-	}
-	else if(model->headPoint == TPS_HEAD_RIGHT)
-	{
-		finalHeadTwist -= 45.0;
-	}
-
-	if(finalTorsoTwist)
-    {
-        gr2ModelSetTorsoRotation(model->skeleton, finalTorsoTwist, (model->currentPose == TPS_POSETYPE_CROUCH));
-    }
-
-	if(finalHeadTwist)
-    {
-        gr2ModelSetHeadRotation (model->skeleton, finalHeadTwist);
-    }
-
-	if(finalModelTwist)
-    {
-        gr2ModelSetModelRotation (model->skeleton, finalModelTwist);
-    }
-
-	// determine LOD, then update the appropriate models
-	gr2AnimUpdateModel(o, o->flag2 & OBJECT_ISFPS);
-
-	if(gr2AnimIsRagdoll(model))
-		model->ragdoll->Update();
-	else
-		gr2UpdateModel (model->skeleton);
-
-	gr2UpdateModel(model->collisionModel);
-
-	if(model->useSelfTrooperModel)
-    {
-		gr2UpdateModel (model->trooperSelfModel);
-    }
-    else if(model->useAltTrooperModel)
-    {
-        gr2UpdateModel(model->trooperAltModel[model->currentLOD]);
-    }
-    else
-    {
-        gr2UpdateModel(model->model[model->currentLOD]);
-    }
-
-	if(model->useAltWeaponModel)
-	{
-		if(model->weaponAltModels[model->currentWeapon][model->currentLOD])
-        {
-			gr2UpdateModel(model->weaponAltModels[model->currentWeapon][model->currentLOD]);
-        }
-    }
-	else
-	{
-		if(model->weaponModels[model->currentWeapon][model->currentLOD])
-        {
-			gr2UpdateModel(model->weaponModels[model->currentWeapon][model->currentLOD]);
-        }
-    }
-
-	if(!model->hideChute && model->chuteModel)
-	{
-		gr2UpdateModel(model->chuteModel);
-	}
-
-	if(drawTPS)
-	{
-        _drawThirdPersonModelOSG(model, state);
-	}
-
-#if !defined(USE_OSG)
-#ifdef BETA_RELEASE
-	if(VehicleObjectAnalysis)
-    {
-	    if(!gr2RenderDamageModel(model->collisionModel))
-        {
-            return false;
-        }
-    }
-#endif // BETA_RELEASE
-#endif // defined(USE_OSG)
-
-	if(o->flags & OBJECT_USEMATRIX)
-	{
-        glPopMatrix();
-	}
-
-#ifdef DEBUG_DEPLOY_CRAP
-    _fpsdrawline(o->mat);
-#endif
-
-	return true;
-}
-#endif // defined(USE_OSG)
-
 void gr2AnimSound::Init(gr2AnimTrooper* anim)
 {
 	model = anim;
@@ -10552,7 +10036,7 @@ void gr2AnimSound::Init(gr2AnimTrooper* anim)
 	move = -1;
 	ID = -1;
 	loopID = -1;
-	name = NULL;
+	name = nullptr;
 	footOKTime = 0;
 	footNextTime = 0;
 	footEventType = ANIM_EVENT_LFOOT;
@@ -10573,7 +10057,7 @@ void gr2AnimSound::Update()
 		{
 			if(loopID == -1)
 			{
-				loopID = fpFPSfxPlayNormalSound("sounds/troop/waterwalk.wav", IDE_FP_PRIORITY_MANDATORY, TYPE_INFINITE_SOUND, NULL, ob);
+				loopID = fpFPSfxPlayNormalSound("sounds/troop/waterwalk.wav", IDE_FP_PRIORITY_MANDATORY, TYPE_INFINITE_SOUND, nullptr, ob);
 				fxSndSetVolume(loopID, .75f);
 			}
 
@@ -10665,7 +10149,7 @@ void gr2AnimSound::Update()
 		{
 			if(ob->flag2 & OBJECT_ISFPS)
 			{
-				ID = fpFPSfxPlayNormalSound((SCHAR*)newSound, IDE_FP_PRIORITY_MANDATORY, TYPE_INFINITE_SOUND, NULL, ob);
+				ID = fpFPSfxPlayNormalSound((SCHAR*)newSound, IDE_FP_PRIORITY_MANDATORY, TYPE_INFINITE_SOUND, nullptr, ob);
 			}
 			else
             {
@@ -10674,7 +10158,7 @@ void gr2AnimSound::Update()
 		}
 	}
 
-	name = (ID > 0) ? newSound : NULL;
+	name = (ID > 0) ? newSound : nullptr;
 }
 
 void gr2AnimSound::Stop()
@@ -10693,7 +10177,7 @@ void gr2AnimSound::Stop()
 		fxSndStopSound(stopID);
 	}
 
-	name	= NULL;
+	name	= nullptr;
 	ID		= -1;
 	loopID	= -1;
 }
@@ -11203,15 +10687,15 @@ void killBlendEditor()
 	if(_editModel)
 		_editModel->skeleton->ClearBlends();
 
-	_editAnimation = NULL;
-	_editWeapon = NULL;
+	_editAnimation = nullptr;
+	_editWeapon = nullptr;
 	_editWeaponType = 0;
 	_editWeaponNum = 0;
-	_editModel = NULL;
+	_editModel = nullptr;
 	_editBlends.clear();
 
-	_editAnimSlider = NULL;
-	_editModelControl = NULL;
+	_editAnimSlider = nullptr;
+	_editModelControl = nullptr;
 }
 
 gr2AnimTrooper* getEditModel()
@@ -11246,12 +10730,12 @@ int addEditBlend(GR2EditBlend::TYPE stateType, GR2EditBlend::BLEND_STATES states
 			if(!eb.blend)
 			{
 				const char* key = fpTPSCreateBlendKey(states[0], states[1], states[2], states[3], (int)stateType);
-				eb.blend = gr2CreateBlendedAnimation(NULL, _editModel->skeleton->GetBoneCount());
+				eb.blend = gr2CreateBlendedAnimation(nullptr, _editModel->skeleton->GetBoneCount());
 
 				const char* finalPtr = key;
 				const char* ptr = strstr(key, "\\");
 
-				while(ptr != NULL)
+				while(ptr != nullptr)
 				{
 					finalPtr = ptr + 1;
 					ptr = strstr(finalPtr, "\\");
@@ -11370,7 +10854,7 @@ const char* getEditBlendName(GR2EditBlend::TYPE stateType, GR2EditBlend::BLEND_S
 			const char* finalPtr	= key;
 			const char* ptr = strstr(key, "\\");
 
-			while(ptr != NULL)
+			while(ptr != nullptr)
 			{
 				finalPtr = ptr + 1;
 				ptr = strstr(finalPtr, "\\");
@@ -11538,7 +11022,7 @@ void updateEditBlends()
 	{
 		et->skeleton->ClearBlends();
 
-		GR2EditBlend* selected = NULL;
+		GR2EditBlend* selected = nullptr;
 
 		for(int i = 0; i < _editBlends.size(); i++)
 		{
@@ -11574,7 +11058,7 @@ void updateEditBlends()
 		}
 
 		if(selected)
-			setEditAnimation(NULL);
+			setEditAnimation(nullptr);
 	}
 }
 
@@ -11583,7 +11067,7 @@ GR2EditBlend* getEditBlend(int index)
 	if(index >= 0 && index < _editBlends.size())
 		return &_editBlends.at(index);
 
-	return NULL;
+	return nullptr;
 }
 
 GR2EditBlend* getSelectedBlend()
@@ -11596,7 +11080,7 @@ GR2EditBlend* getSelectedBlend()
 			return &eb;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 int getEditBlendWeaponType()
@@ -11702,7 +11186,7 @@ void setEditBlendWeapon(int type)
 		gr2FreeModel(_editWeapon);
 
 		// reset it
-		_editWeapon = NULL;
+		_editWeapon = nullptr;
 		_editWeaponType = 0;
 		_editWeaponNum = 0;
 
@@ -11717,7 +11201,7 @@ void setEditBlendWeapon(int type)
 		{
 			const char* path = (const char*)fpTPSWeaponMeshFiles[_editWeaponNum][TPS_LOD_1];
 
-			_editWeapon = gr2Model::Load(path, NULL, NULL, 1);
+			_editWeapon = gr2Model::Load(path, nullptr, nullptr, 1);
 
 			if(_editWeapon)
 			{
@@ -11770,7 +11254,7 @@ void setEditAnimation(const char* path)
 	if(_editAnimation)
 	{
 		gr2FreeControl(_editAnimation);
-		_editAnimation = NULL;
+		_editAnimation = nullptr;
 	}
 
 	if(path)
@@ -11800,7 +11284,7 @@ void setEditModelOscillation(int duration)
 	if(duration >= 1000)
 	{
 		// if we're oscillating, turn off the override animation
-		setEditAnimation(NULL);
+		setEditAnimation(nullptr);
 
 		_editModelOscillationFirst		= 0;
 		_editModelOscillationSecond		= 1;

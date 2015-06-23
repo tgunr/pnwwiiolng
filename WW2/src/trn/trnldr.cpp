@@ -168,7 +168,7 @@ SINT32	river;
 
 		if (strncmp(line, "BYTEORDER", 9) == 0)
 		{
-			for (i=9 ; i < strlen(line) ; i++)
+			for (i=9; i < strlen(line); i++)
 			{
 				if (!isspace(line[i]))
 				{
@@ -181,7 +181,7 @@ SINT32	river;
 		else
 		if (strncmp(line, "LAYOUT", 6) == 0)
 		{
-			for (i=6 ; i < strlen(line) ; i++)
+			for (i=6; i < strlen(line); i++)
 			{
 				if (!isspace(line[i]))
 				{
@@ -195,7 +195,7 @@ SINT32	river;
 		else
 		if (strncmp(line, "NROWS", 5) == 0)
 		{
-			for (i=5 ; i < strlen(line) ; i++)
+			for (i=5; i < strlen(line); i++)
 			{
 				if (!isspace(line[i]))
 				{
@@ -208,7 +208,7 @@ SINT32	river;
 		else
 		if (strncmp(line, "NCOLS", 5) == 0)
 		{
-			for (i=5 ; i < strlen(line) ; i++)
+			for (i=5; i < strlen(line); i++)
 			{
 				if (!isspace(line[i]))
 				{
@@ -221,7 +221,7 @@ SINT32	river;
 		else
 		if (strncmp(line, "NBANDS", 6) == 0)
 		{
-			for (i=6 ; i < strlen(line) ; i++)
+			for (i=6; i < strlen(line); i++)
 			{
 				if (!isspace(line[i]))
 				{
@@ -234,7 +234,7 @@ SINT32	river;
 		else
 		if (strncmp(line, "NBITS", 5) == 0)
 		{
-			for (i=5 ; i < strlen(line) ; i++)
+			for (i=5; i < strlen(line); i++)
 			{
 				if (!isspace(line[i]))
 				{
@@ -247,7 +247,7 @@ SINT32	river;
 		else
 		if (strncmp(line, "BANDROWBYTES", 12) == 0)
 		{
-			for (i=12 ; i < strlen(line) ; i++)
+			for (i=12; i < strlen(line); i++)
 			{
 				if (!isspace(line[i]))
 				{
@@ -260,7 +260,7 @@ SINT32	river;
 		else
 		if (strncmp(line, "TOTALROWBYTES", 13) == 0)
 		{
-			for (i=13 ; i < strlen(line) ; i++)
+			for (i=13; i < strlen(line); i++)
 			{
 				if (!isspace(line[i]))
 				{
@@ -273,7 +273,7 @@ SINT32	river;
 		else
 		if (strncmp(line, "BANDGAPBYTES", 12) == 0)
 		{
-			for (i=12 ; i < strlen(line) ; i++)
+			for (i=12; i < strlen(line); i++)
 			{
 				if (!isspace(line[i]))
 				{
@@ -286,7 +286,7 @@ SINT32	river;
 		else
 		if (strncmp(line, "NODATA", 6) == 0)
 		{
-			for (i=6 ; i < strlen(line) ; i++)
+			for (i=6; i < strlen(line); i++)
 			{
 				if (!isspace(line[i]))
 				{
@@ -299,7 +299,7 @@ SINT32	river;
 		else
 		if (strncmp(line, "ULXMAP", 6) == 0)
 		{
-			for (i=6 ; i < strlen(line) ; i++)
+			for (i=6; i < strlen(line); i++)
 			{
 				if (!isspace(line[i]))
 				{
@@ -312,7 +312,7 @@ SINT32	river;
 		else
 		if (strncmp(line, "ULYMAP", 6) == 0)
 		{
-			for (i=6 ; i < strlen(line) ; i++)
+			for (i=6; i < strlen(line); i++)
 			{
 				if (!isspace(line[i]))
 				{
@@ -325,7 +325,7 @@ SINT32	river;
 		else
 		if (strncmp(line, "XDIM", 4) == 0)
 		{
-			for (i=4 ; i < strlen(line) ; i++)
+			for (i=4; i < strlen(line); i++)
 			{
 				if (!isspace(line[i]))
 				{
@@ -338,7 +338,7 @@ SINT32	river;
 		else
 		if (strncmp(line, "YDIM", 4) == 0)
 		{
-			for (i=4 ; i < strlen(line) ; i++)
+			for (i=4; i < strlen(line); i++)
 			{
 				if (!isspace(line[i]))
 				{
@@ -367,9 +367,9 @@ SINT32		i, j, k;
 	Write_Debug("Removing unused edit list entries");
 	if (td->trindx > SUPERCELL_OCTETS_XY)
 	{
-		for (i=0 ; i < SUPERCELL_OCTETS_XY ; i++)
+		for (i=0; i < SUPERCELL_OCTETS_XY; i++)
 		{
-			for (j=SUPERCELL_OCTETS_XY ; j < td->trindx ; j++)
+			for (j=SUPERCELL_OCTETS_XY; j < td->trindx; j++)
 			{
 				if (td->trinfo[i].txndx == (td->trinfo[j].tonum - 1) &&
 					td->trinfo[i].octet == td->trinfo[j].octnum)
@@ -393,10 +393,10 @@ SINT32		i, j, k;
 	}
 
 	Write_Debug("Ordering edit list entries");
-	for (i=0 ; i < td->tricnt ; i++)
+	for (i=0; i < td->tricnt; i++)
 	{
 		j = 0;
-		for (k=0 ; k < SUPERCELL_OCTETS_XY ; k++)
+		for (k=0; k < SUPERCELL_OCTETS_XY; k++)
 		{
 			if (td->trinfo[k].txndx == i)
 			{
@@ -420,9 +420,9 @@ SINT32			i;
 piVectorConstPtr pv;
 OBJECT*		lpatt;
 
-	while (lptop != NULL)
+	while (lptop != nullptr)
 	{
-		if (lptop->child != NULL)
+		if (lptop->child != nullptr)
 		{
 			if (!GetFullObjectBBox(lptop->child, bbox))
 			{
@@ -433,10 +433,10 @@ OBJECT*		lpatt;
 		if (!(lptop->flags & OBJECT_NOTOBJECT))
 		{
 			lpatt = lptop;
-			while (lpatt != NULL)
+			while (lpatt != nullptr)
 			{
 				pv = lptop->RenderPositions();
-				for (i=0 ; i < lptop->numverts ; i++, ++pv)
+				for (i=0; i < lptop->numverts; i++, ++pv)
 				{
 					if (pv->x < bbox[0].x)
 					{
@@ -487,13 +487,13 @@ SINT32	i;
 
 	ObjectsWereAdded = FALSE;
 
-	for (i=0 ; i < NUM_TERRAIN_RECTANGLES ; i++)
+	for (i=0; i < NUM_TERRAIN_RECTANGLES; i++)
 	{
 		memset(&trndtl[i].trnstate, 0, sizeof(TRNSTATEBLOCK));
 		trndtl[i].trnstate.state = TRN_STATE_WAIT;
 	}
 
-	for (i=0 ; i < ALT_TRN_NUMBER ; i++)
+	for (i=0; i < ALT_TRN_NUMBER; i++)
 	{
 		strcpy(filename, TERRAIN_PREPATH);
 		strcat(filename, alttexname[i]);
@@ -544,10 +544,10 @@ void trnldrKill(void)
 {
 SINT32	i;
 
-	for (i=0 ; i < NUM_TERRAIN_RECTANGLES ; i++)
+	for (i=0; i < NUM_TERRAIN_RECTANGLES; i++)
 	{
 		trnldrReleaseSupercell(i);
-		if (trndtl[i].terrain != NULL)
+		if (trndtl[i].terrain != nullptr)
 		{
   			obpoolFreeObjectCallback(trndtl[i].terrain);
 			obpoolFreeObjectCallback(trndtl[i].terrainorig);
@@ -556,7 +556,7 @@ SINT32	i;
 		}
 	}
 
-	for (i=0 ; i < ALT_TRN_NUMBER ; i++)
+	for (i=0; i < ALT_TRN_NUMBER; i++)
 	{
 		piFreeMipTextures(alttexid[i]);
 	}
@@ -573,7 +573,7 @@ SINT32 trnldrGetTLOGsForSupercell(SINT16 scx, SINT16 scy)
 {
 SINT32	i;
 
-	for (i=0 ; i < NUM_TERRAIN_RECTANGLES ; i++)
+	for (i=0; i < NUM_TERRAIN_RECTANGLES; i++)
 	{
 		if (activeTerrainDetail[i] &&
 			trndtl[i].scx == scx &&
@@ -590,19 +590,19 @@ static LOGICAL ReleaseSupercellTextureObjects(TERRAIN_DETAIL* td)
 {
 SINT32		i;
 
-	if (td == NULL)
+	if (td == nullptr)
 	{
 		return(FALSE);
 	}
 
     logTimerBeginMacro();
 
-	for (i=0 ; i < MAX_TERRAIN_TEXTURES ; i++)
+	for (i=0; i < MAX_TERRAIN_TEXTURES; i++)
 	{
-		if (td->nonreplacementtiles[i] != NULL)
+		if (td->nonreplacementtiles[i] != nullptr)
 		{
 			obpoolFreeObjectCallback(td->nonreplacementtiles[i]);
-			td->nonreplacementtiles[i] = NULL;
+			td->nonreplacementtiles[i] = nullptr;
 		}
 	}
 
@@ -621,12 +621,12 @@ TRNSTATEBLOCK*	tsb;
 	td = &trndtl[sc];
 	tsb = &td->trnstate;
 
-	for (i=tsb->varone ; i < MAX_TERRAIN_TEXTURES ; i++)
+	for (i=tsb->varone; i < MAX_TERRAIN_TEXTURES; i++)
 	{
-		if (td->nonreplacementtiles[i] != NULL)
+		if (td->nonreplacementtiles[i] != nullptr)
 		{
 			obpoolFreeObjectCallback(td->nonreplacementtiles[i]);
-			td->nonreplacementtiles[i] = NULL;
+			td->nonreplacementtiles[i] = nullptr;
 		}
 
 		tsb->varone += 1;
@@ -640,14 +640,14 @@ TRNSTATEBLOCK*	tsb;
 
 LOGICAL trnldrReleaseTerrainObject(OBJECT* lpobj, TERRAIN_DETAIL* td)
 {
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
 
     logTimerBeginMacro();
 
-	if (deletion != NULL)
+	if (deletion != nullptr)
 	{
 		switch(lpobj->modelInstance->GetModelType())
 		{
@@ -663,7 +663,7 @@ LOGICAL trnldrReleaseTerrainObject(OBJECT* lpobj, TERRAIN_DETAIL* td)
 
         int idx = 0;
 
-		deletion(lpobj, 0, 0, 0, NULL);
+		deletion(lpobj, 0, 0, 0, nullptr);
 		trnUpdateStratData(td, lpobj, -1, FALSE);
 	}
 
@@ -679,14 +679,14 @@ static LOGICAL ReleaseSupercellObjects(TERRAIN_DETAIL* td)
 SINT32		i;//, place=0;
 SINT8		filename[_MAX_PATH];
 
-	if (td == NULL)
+	if (td == nullptr)
 	{
 		return(FALSE);
 	}
 
     logTimerBeginMacro();
 
-	for (i=0 ; i < td->tobndx ; i++)
+	for (i=0; i < td->tobndx; i++)
 	{
 	SCHAR*		ptr;
 	OBJECT*	lpobj;
@@ -695,7 +695,7 @@ SINT8		filename[_MAX_PATH];
 
 		// strip off the directory subname
 		ptr = strrchr(filename,'\\');
-		if (ptr != NULL)
+		if (ptr != nullptr)
 		{
 			strcpy(filename,++ptr);
 		}
@@ -740,7 +740,7 @@ TRNSTATEBLOCK*	tsb;
 
 		// strip off the directory subname
 		ptr = strrchr(filename,'\\');
-		if (ptr != NULL)
+		if (ptr != nullptr)
 		{
 			strcpy(filename,++ptr);
 		}
@@ -770,7 +770,7 @@ piVECTOR	n, pn[SUPERCELL_SIZE_XY], *pnt;
 	h = SUPERCELL_SIZE_Y1;
 
 	pnt = pn;
-	for (i=0 ; i < SUPERCELL_SIZE_XY ; i++, pnt++)
+	for (i=0; i < SUPERCELL_SIZE_XY; i++, pnt++)
 	{
 		d = normals[i];
 
@@ -792,9 +792,9 @@ piVECTOR	n, pn[SUPERCELL_SIZE_XY], *pnt;
 	}
 
 	po = tt->StaticNormals();
-	for (i=0 ; i < h ; i+=2)
+	for (i=0; i < h; i+=2)
 	{
-		for (j=0 ; j < w ; j+=2)
+		for (j=0; j < w; j+=2)
 		{
 			// 0
 			k = SUPERCELL_SIZE_Y1 - (i + 1);
@@ -1166,7 +1166,7 @@ STRT_DTL_HEADER		sdh;
 
         td->tobndx++;
 
-		if (td->toldflags != NULL)
+		if (td->toldflags != nullptr)
 		{
 			memFree(td->toldflags);
 		}
@@ -1307,7 +1307,7 @@ STRT_DTL_HEADER		sdh;
                             pos.z = (float)((bits & 0xfff) * 0.1f) + minheight;
                             pos.z = -pos.z;
 
-                            sptAddTree(NULL, bushes[i], td, pos, true);
+                            sptAddTree(nullptr, bushes[i], td, pos, true);
                         }
                     }
                 }
@@ -1407,9 +1407,9 @@ piVertexColorPtr	psl;
 	po = tt->StaticPositions();
 	psl = tt->StaticColors();
 
-	for (i=0 ; i < h ; i+=2)
+	for (i=0; i < h; i+=2)
 	{
-		for (j=0 ; j < w ; j+=2)
+		for (j=0; j < w; j+=2)
 		{
 			// Arrange each octet into triangles
 			// 0
@@ -1529,14 +1529,14 @@ static LOGICAL DuplicateBaseSupercell(TERRAIN_DETAIL* td)
 {
     logTimerBeginMacro();
 
-    if (td->terrainorig != NULL)
+    if (td->terrainorig != nullptr)
 	{
 		obpoolFreeObjectCallback(td->terrainorig);
-		td->terrainorig = NULL;
+		td->terrainorig = nullptr;
 	}
 
 	td->terrainorig = obmainCopyObject(td->terrain);
-	if (td->terrainorig == NULL)
+	if (td->terrainorig == nullptr)
 	{
 		Write_Debug("error copying terrain object to collision terrain object");
 	}
@@ -1558,7 +1558,7 @@ SINT32		i;
 SINT32		count;
 
 	count = 0;
-	for (i=td->trindx-1 ; i >= 0 ; i--)
+	for (i=td->trindx-1; i >= 0; i--)
 	{
 		if (td->trinfo[i].txndx == txndx)
 		{
@@ -1595,12 +1595,12 @@ TERRAIN_DETAIL*	td;
 
 		po = tt->ImmutablePositions();
 
-		for (i=0 ; i < SUPERCELL_OCTETS_Y ; i++)
+		for (i=0; i < SUPERCELL_OCTETS_Y; i++)
 		{
-			for (j=0 ; j < SUPERCELL_OCTETS_X ; j++)
+			for (j=0; j < SUPERCELL_OCTETS_X; j++)
 			{
 				z = 0.0f;
-				for (k=0 ; k < NUM_VERTICES_PER_OCTET ; k++)
+				for (k=0; k < NUM_VERTICES_PER_OCTET; k++)
 				{
 					z -= po[k].z;
 				}
@@ -1660,9 +1660,9 @@ TERRAIN_DETAIL*	td;
 	}
 
 
-	for (i=0 ; i < td->tricnt ; i++)
+	for (i=0; i < td->tricnt; i++)
 	{
-		if (td->nonreplacementtiles[i] == NULL)
+		if (td->nonreplacementtiles[i] == nullptr)
 		{
 			sprintf(objname, "%s_t%d", td->terrain->name, i);
 
@@ -1733,7 +1733,7 @@ TERRAIN_DETAIL*	td;
 			// Added materials to objects based on texture names
 			strcpy(filename, td->triname[i]);
 			ptr = strrchr(filename, '.');
-			if (ptr != NULL)
+			if (ptr != nullptr)
 			{
 				// get rid of extension
 				*ptr = 0;
@@ -1800,12 +1800,12 @@ TRNSTATEBLOCK*		tsb;
 	FLOAT32		z;
 
 		po = tt->ImmutablePositions();
-		for (i=tsb->vartwo ; i < SUPERCELL_OCTETS_Y ; i++)
+		for (i=tsb->vartwo; i < SUPERCELL_OCTETS_Y; i++)
 		{
-			for (j=tsb->varthree ; j < SUPERCELL_OCTETS_X ; j++)
+			for (j=tsb->varthree; j < SUPERCELL_OCTETS_X; j++)
 			{
 				z = 0.0f;
-				for (k=0 ; k < NUM_VERTICES_PER_OCTET ; k++)
+				for (k=0; k < NUM_VERTICES_PER_OCTET; k++)
 				{
 					z -= po[k].z;
 				}
@@ -1871,9 +1871,9 @@ TRNSTATEBLOCK*		tsb;
 	}
 
 
-	for (i=tsb->vartwo ; i < td->tricnt ; i++)
+	for (i=tsb->vartwo; i < td->tricnt; i++)
 	{
-		if (td->nonreplacementtiles[i] == NULL)
+		if (td->nonreplacementtiles[i] == nullptr)
 		{
 			sprintf(objname, "%s_t%d", td->terrain->name, i);
 
@@ -1945,7 +1945,7 @@ TRNSTATEBLOCK*		tsb;
 			// Added materials to objects based on texture names
 			strcpy(filename, td->triname[i]);
 			ptr = strrchr(filename, '.');
-			if (ptr != NULL)
+			if (ptr != nullptr)
 			{
 				// get rid of extension
 				*ptr = 0;
@@ -2004,11 +2004,11 @@ SINT32		i, j;
 
     logTimerBeginMacro();
 
-	for (i=0 ; i < td->trindx ; i++)
+	for (i=0; i < td->trindx; i++)
 	{
-		for (j=0 ; j < td->tricnt ; j++)
+		for (j=0; j < td->tricnt; j++)
 		{
-			if (td->nonreplacementtiles[j] == NULL)
+			if (td->nonreplacementtiles[j] == nullptr)
 			{
 				continue;
 			}
@@ -2066,11 +2066,11 @@ static LOGICAL		trip=FALSE;
 		trip = FALSE;
 	}
 
-	for (i=tsb->varone ; i < td->trindx ; i++)
+	for (i=tsb->varone; i < td->trindx; i++)
 	{
-		for (j=0 ; j < td->tricnt ; j++)
+		for (j=0; j < td->tricnt; j++)
 		{
-			if (td->nonreplacementtiles[j] == NULL)
+			if (td->nonreplacementtiles[j] == nullptr)
 			{
 				continue;
 			}
@@ -2122,7 +2122,7 @@ static LOGICAL FindStratObject(TERRAIN_DETAIL* td, SINT8* objname, piVECTOR* pos
 	BUILDING*		pbld;		// Building
 
 	filename = strrchr(objname, '\\');
-	if (filename != NULL)
+	if (filename != nullptr)
 	{
 		filename += 1;
 	}
@@ -2147,7 +2147,7 @@ static LOGICAL FindStratObject(TERRAIN_DETAIL* td, SINT8* objname, piVECTOR* pos
 			fullid->id = pcp->oid.id;
 //			fullid->type = pcp->oid.objClass;
 			fullid->type = 0;
-			if (ObjId != NULL)
+			if (ObjId != nullptr)
 			{
 				*ObjId = pcp->oid;
 			}
@@ -2171,7 +2171,7 @@ static LOGICAL FindStratObject(TERRAIN_DETAIL* td, SINT8* objname, piVECTOR* pos
 			fullid->id = pfac->oid.id;
 //			fullid->type = pfac->oid.objClass;
 			fullid->type = 0;
-			if (ObjId != NULL)
+			if (ObjId != nullptr)
 			{
 				*ObjId = pfac->oid;
 			}
@@ -2195,7 +2195,7 @@ static LOGICAL FindStratObject(TERRAIN_DETAIL* td, SINT8* objname, piVECTOR* pos
 			fullid->id = pbld->oid.id;
 //			fullid->type = pbld->oid.objClass;
 			fullid->type = 0;
-			if (ObjId != NULL)
+			if (ObjId != nullptr)
 			{
 				*ObjId = pbld->oid;
 			}
@@ -2222,7 +2222,7 @@ static LOGICAL FindSupercellTD(SINT32 scx, SINT32 scy, TERRAIN_DETAIL** ptd)
 {
 SINT32		i;
 
-	for (i=0 ; i < NUM_TERRAIN_RECTANGLES ; i++)
+	for (i=0; i < NUM_TERRAIN_RECTANGLES; i++)
 	{
 		if (activeTerrainDetail[i] &&
 			trndtl[i].scx == scx &&
@@ -2510,9 +2510,9 @@ SINT32		i;
     logTimerBeginMacro();
 
 	obmainSnapObjectToXYGrid(td->terrain, (FLOAT32)TERRAIN_SNAPTO_GRIDSIZE, 1);
-	for (i=0 ; i < MAX_TERRAIN_TEXTURES ; i++)
+	for (i=0; i < MAX_TERRAIN_TEXTURES; i++)
 	{
-		if (td->nonreplacementtiles[i] != NULL)
+		if (td->nonreplacementtiles[i] != nullptr)
 		{
 			obmainSnapObjectToXYGrid(td->nonreplacementtiles[i], (FLOAT32)TERRAIN_SNAPTO_GRIDSIZE, 1);
 		}
@@ -2539,9 +2539,9 @@ TRNSTATEBLOCK*	tsb;
 		return(FALSE);
 	}
 
-	for (i=tsb->varone-1 ; i < MAX_TERRAIN_TEXTURES ; i++)
+	for (i=tsb->varone-1; i < MAX_TERRAIN_TEXTURES; i++)
 	{
-		if (td->nonreplacementtiles[i] != NULL)
+		if (td->nonreplacementtiles[i] != nullptr)
 		{
 			obmainSnapObjectToXYGrid(td->nonreplacementtiles[i], (FLOAT32)TERRAIN_SNAPTO_GRIDSIZE, 1);
 		}
@@ -2558,9 +2558,9 @@ static LOGICAL LoadBounds(TERRAIN_DETAIL* td)
 {
 SINT32		i;
 
-	for (i=0 ; i < MAX_TERRAIN_TEXTURES ; i++)
+	for (i=0; i < MAX_TERRAIN_TEXTURES; i++)
 	{
-		if (td->nonreplacementtiles[i] != NULL)
+		if (td->nonreplacementtiles[i] != nullptr)
 		{
 			if (td->nonreplacementtiles[i]->flags & OBJECT_VISIBLE)
 			{
@@ -2585,9 +2585,9 @@ TRNSTATEBLOCK*	tsb;
 	td = &trndtl[sc];
 	tsb = &td->trnstate;
 
-	for (i=tsb->varone ; i < MAX_TERRAIN_TEXTURES ; i++)
+	for (i=tsb->varone; i < MAX_TERRAIN_TEXTURES; i++)
 	{
-		if (td->nonreplacementtiles[i] != NULL)
+		if (td->nonreplacementtiles[i] != nullptr)
 		{
 			if (td->nonreplacementtiles[i]->flags & OBJECT_VISIBLE)
 			{
@@ -2610,9 +2610,9 @@ SINT32		i;
 
     logTimerBeginMacro();
 
-	for (i=0 ; i < MAX_TERRAIN_TEXTURES ; i++)
+	for (i=0; i < MAX_TERRAIN_TEXTURES; i++)
 	{
-		if (td->nonreplacementtiles[i] != NULL)
+		if (td->nonreplacementtiles[i] != nullptr)
 		{
 			if (strcmp(td->nonreplacementtiles[i]->texname, "null1.bmp") != 0)
 			{
@@ -2636,9 +2636,9 @@ SINT32		i;
 
     logTimerBeginMacro();
 
-	for (i=0 ; i < MAX_TERRAIN_TEXTURES ; i++)
+	for (i=0; i < MAX_TERRAIN_TEXTURES; i++)
 	{
-		if (td->nonreplacementtiles[i] != NULL)
+		if (td->nonreplacementtiles[i] != nullptr)
 		{
 			td->nonreplacementtiles[i]->flags |= OBJECT_SKIPDRAWING;
 		}
@@ -2658,9 +2658,9 @@ SINT32		i;
 
     logTimerBeginMacro();
 
-	for (i=0 ; i < MAX_TERRAIN_TEXTURES ; i++)
+	for (i=0; i < MAX_TERRAIN_TEXTURES; i++)
 	{
-		if (td->nonreplacementtiles[i] != NULL)
+		if (td->nonreplacementtiles[i] != nullptr)
 		{
 			td->nonreplacementtiles[i]->trnum = sc;
 		}
@@ -2716,7 +2716,7 @@ static LOGICAL FindObjectsInOctetSCLoading(UINT32* objnum, SINT32 sc, UINT32* ob
 
 	i = *objcnt;
 	td = &trndtl[sc];
-	for ( ; i < td->tobndx ; i++)
+	for (; i < td->tobndx; i++)
 	{
 		// 2D distance calculation
 #ifndef LOADEVERYTHING
@@ -2760,7 +2760,7 @@ TERRAIN_DETAIL*	td;
 
 	i = *reccnt;
 	j = *objcnt;
-	for ( ; i < NUM_TERRAIN_RECTANGLES ; i++)
+	for (; i < NUM_TERRAIN_RECTANGLES; i++)
 	{
 		if (!activeTerrainDetail[i])
 		{
@@ -2768,7 +2768,7 @@ TERRAIN_DETAIL*	td;
 		}
 
 		td = &trndtl[i];
-		for ( ; j < td->tobndx ; j++)
+		for (; j < td->tobndx; j++)
 		{
 			// 2D distance calculation
 			x = td->trnobj[j].pos.x - px;
@@ -2840,7 +2840,7 @@ TERRAIN_DETAIL*	td;
 
 	i = *objcnt;
 	td = &trndtl[sc];
-	for ( ; i < td->tobndx ; i++)
+	for (; i < td->tobndx; i++)
 	{
 		// 2D distance calculation
 #ifndef LOADEVERYTHING
@@ -2888,7 +2888,7 @@ TERRAIN_DETAIL*	td;
 
 	i = *reccnt;
 	j = *objcnt;
-	for ( ; i < NUM_TERRAIN_RECTANGLES ; i++)
+	for (; i < NUM_TERRAIN_RECTANGLES; i++)
 	{
 		if (!activeTerrainDetail[i])
 		{
@@ -2896,7 +2896,7 @@ TERRAIN_DETAIL*	td;
 		}
 
 		td = &trndtl[i];
-		for ( ; j < td->tobndx ; j++)
+		for (; j < td->tobndx; j++)
 		{
 			// 2D distance calculation
 			x = td->trnobj[j].pos.x - px;
@@ -2990,7 +2990,7 @@ TERRAIN_DETAIL*	td;
 				td->trnstate.varone = 0;
 			}
 
-			for (i=0 ; i < (MAX_TSB_NEXTSTATES - 1) ; i++)
+			for (i=0; i < (MAX_TSB_NEXTSTATES - 1); i++)
 			{
 				td->trnstate.nextstate[i] = td->trnstate.nextstate[i+1];
 				td->trnstate.nextscx[i] = td->trnstate.nextscx[i+1];
@@ -3245,32 +3245,32 @@ TERRAIN_DETAIL*	td;
 
 		if(td->pcp)
 			memFree(td->pcp);
-		td->pcp = NULL;
+		td->pcp = nullptr;
 		td->numCPs = 0;
 
 		if (td->numFacilities > 0)
 		{
-			memFree(td->facTable) ;
-			td->pfac = NULL;
+			memFree(td->facTable);
+			td->pfac = nullptr;
 			td->numFacilities = 0;
 		}
 
 		if (td->numBuildings > 0)
 		{
-			td->buildingTable->destroy(td->buildingTable) ;
-			td->pbld = NULL;
+			td->buildingTable->destroy(td->buildingTable);
+			td->pbld = nullptr;
 			td->numBuildings = 0;
 		}
 
 		if (td->numLinks > 0)
 		{
-			td->plink = NULL;
+			td->plink = nullptr;
 			td->numLinks = 0;
 		}
 
 		if (td->numWaypoints > 0)
 		{
-			td->pwp = NULL;
+			td->pwp = nullptr;
 			td->numWaypoints = 0;
 		}
 
@@ -3279,25 +3279,25 @@ TERRAIN_DETAIL*	td;
             sptFreeClutter(td->m_trees);
 //            delete td->m_trees;
 			_treePool.push(td->m_trees);
-            td->m_trees = NULL;
+            td->m_trees = nullptr;
         }
 
-		if ( td->bldHash.building != NULL)
+		if ( td->bldHash.building != nullptr)
 		{
 			memFree(td->bldHash.building);
-			td->bldHash.building = NULL;
+			td->bldHash.building = nullptr;
 		}
 
 		td->bldHash.maxBldID = 0;
 
-		if (td->toldflags != NULL)
+		if (td->toldflags != nullptr)
 		{
 			memFree(td->toldflags);
-			td->toldflags = NULL;
+			td->toldflags = nullptr;
 		}
 
 		trncdDTLColliderFree(td->collider);
-		td->collider = NULL;
+		td->collider = nullptr;
 
 		td->stratLoaded = FALSE;
 
@@ -3683,7 +3683,7 @@ SINT32		i;
 
 	// Only center 9 supercells can get this call
 	// so make sure the Periphery flag is clear
-	for (i=0 ; i < MAX_TSB_NEXTSTATES ; i++)
+	for (i=0; i < MAX_TSB_NEXTSTATES; i++)
 	{
 		if (trndtl[sc].trnstate.nextstate[i] == 0)
 		{
@@ -3715,7 +3715,7 @@ SINT32		i;
 	// Supercells that are just coming into existence
 	// and take one of the periphery slots only gets
 	// the first half of the data loaded
-	for (i=0 ; i < MAX_TSB_NEXTSTATES ; i++)
+	for (i=0; i < MAX_TSB_NEXTSTATES; i++)
 	{
 		if (trndtl[sc].trnstate.nextstate[i] == 0)
 		{
@@ -3747,7 +3747,7 @@ SINT32		i;
 	// Only periphery supercells that are moving to
 	// one of the center 9 supercells can get this call
 	// so make sure the Periphery flag is clear
-	for (i=0 ; i < MAX_TSB_NEXTSTATES ; i++)
+	for (i=0; i < MAX_TSB_NEXTSTATES; i++)
 	{
 		if (trndtl[sc].trnstate.nextstate[i] == 0)
 		{
@@ -3780,7 +3780,7 @@ SINT32		i;
 	// but must be completely scrapped should get this call
 	// This is probably due to a warp to another position
 	// in the world
-	for (i=0 ; i < MAX_TSB_NEXTSTATES ; i++)
+	for (i=0; i < MAX_TSB_NEXTSTATES; i++)
 	{
 		if (trndtl[sc].trnstate.nextstate[i] == 0)
 		{
@@ -3812,7 +3812,7 @@ SINT32		i;
 	// Supercells that are moving from a center supercell
 	// to an outer, periphery supercell location get
 	// this call. They become periphery objects
-	for (i=0 ; i < MAX_TSB_NEXTSTATES ; i++)
+	for (i=0; i < MAX_TSB_NEXTSTATES; i++)
 	{
 		if (trndtl[sc].trnstate.nextstate[i] == 0)
 		{
@@ -3843,7 +3843,7 @@ SINT32		i;
 
 	// Supercells that are going away need to be fully
 	// destroyed. This call finishes that destruction
-	for (i=0 ; i < MAX_TSB_NEXTSTATES ; i++)
+	for (i=0; i < MAX_TSB_NEXTSTATES; i++)
 	{
 		if (trndtl[sc].trnstate.nextstate[i] == 0)
 		{
@@ -3892,32 +3892,32 @@ TERRAIN_DETAIL*	td;
 
 	if(td->pcp)
 		memFree(td->pcp);
-	td->pcp = NULL;
+	td->pcp = nullptr;
 	td->numCPs = 0;
 
 	if (td->numFacilities > 0)
 	{
-		memFree(td->facTable) ;
-		td->pfac = NULL;
+		memFree(td->facTable);
+		td->pfac = nullptr;
 		td->numFacilities = 0;
 	}
 
 	if (td->numBuildings > 0)
 	{
-		td->buildingTable->destroy(td->buildingTable) ;
-		td->pbld = NULL;
+		td->buildingTable->destroy(td->buildingTable);
+		td->pbld = nullptr;
 		td->numBuildings = 0;
 	}
 
 	if (td->numLinks > 0)
 	{
-		td->plink = NULL;
+		td->plink = nullptr;
 		td->numLinks = 0;
 	}
 
 	if (td->numWaypoints > 0)
 	{
-		td->pwp = NULL;
+		td->pwp = nullptr;
 		td->numWaypoints = 0;
 	}
 
@@ -3927,32 +3927,32 @@ TERRAIN_DETAIL*	td;
 //        delete td->m_trees;
 
 		_treePool.push(td->m_trees);
-        td->m_trees = NULL;
+        td->m_trees = nullptr;
     }
 
 
 	td->trnstate.state = TRN_STATE_WAIT;
-	for (i=0 ; i < MAX_TSB_NEXTSTATES ; i++)
+	for (i=0; i < MAX_TSB_NEXTSTATES; i++)
 	{
 		trndtl[sc].trnstate.nextstate[i] = 0;
 	}
 
-	if ( td->bldHash.building != NULL)
+	if ( td->bldHash.building != nullptr)
 	{
 		memFree(td->bldHash.building);
-		td->bldHash.building = NULL;
+		td->bldHash.building = nullptr;
 	}
 
 	td->bldHash.maxBldID = 0;
 
-	if (td->toldflags != NULL)
+	if (td->toldflags != nullptr)
 	{
 		memFree(td->toldflags);
-		td->toldflags = NULL;
+		td->toldflags = nullptr;
 	}
 
 	trncdDTLColliderFree(td->collider);
-	td->collider = NULL;
+	td->collider = nullptr;
 
 	td->stratLoaded = FALSE;
 
@@ -3974,7 +3974,7 @@ piTexCoordPtr tex;
 
     extern LOGICAL trnwtrIsWaterTexture(SINT32);
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -3995,7 +3995,7 @@ piTexCoordPtr tex;
 
 	num = octet * NUM_VERTICES_PER_OCTET;
 	tex = lpobj->StaticTexCoords();
-	for (i=0 ; i < NUM_VERTICES_PER_OCTET ; num++, i++)
+	for (i=0; i < NUM_VERTICES_PER_OCTET; num++, i++)
 	{
 		tex[num].u	= ptuv[i].tu * widthfactor;
 		tex[num].v	= ptuv[i].tv * heightfactor;
@@ -4034,9 +4034,9 @@ void trnldrInitializeSuperCellVertices(OBJECT* tt, int scx, int scy)
 
 	ofs = 0;
 	ndx = 0;
-	for (i=0 ; i < h ; i+=2)
+	for (i=0; i < h; i+=2)
 	{
-		for (j=0 ; j < w ; j+=2)
+		for (j=0; j < w; j+=2)
 		{
 			// Arrange each octet into triangles
 			// 0
@@ -4316,7 +4316,7 @@ TERRAIN_DETAIL*	td;
 
 	td->numheightmapelements = SUPERCELL_SIZE_XY;
 	td->nmcnt = SUPERCELL_SIZE_XY;
-	for(int i=0 ; i < SUPERCELL_SIZE_XY ; i++)
+	for(int i=0; i < SUPERCELL_SIZE_XY; i++)
 	{
 		td->heightmap[i] = (SINT16)TERRAIN_NODATA;		// sea level
 		td->nm[i] = (SINT16)TERRAIN_NONORMALS;	// straight up

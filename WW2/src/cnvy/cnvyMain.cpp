@@ -11,14 +11,6 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-#include "dbug/dbug.h"
-#include <assert.h>
-#include <vector>
-#include <string>
-
-#include <stdlib.h>
-#include <time.h>
-
 #include "teul/teulKit.h"
 #include "strt/strtConstants.h"
 #include "strt/strtEventQueue.h"
@@ -31,7 +23,6 @@
 #include "strt/strtMain.h"
 #include "strt/strtCP.h"
 #include "cnvy/cnvyConvoyList.h"
-#include "strt/strtUpdateList.h"
 #include "include/wthrTime.h"
 #include "strt/strtHostMessages.h"
 #include "strt/strtSupply.h"
@@ -52,13 +43,12 @@
 #include "wwii/wwiiDBThreads.h"
 #include "wwii/wwiiDBConfig.h"
 
+#include "mem/memPool.h"
+#include "include/intrusiveList.h"
+
 // ------------------------------ Prototypes
 
-static LOGICAL _printConvoyList(CONVOYSTRUCT* convoy);
-static LOGICAL _freeManifest(MANIFESTSTRUCT* manifest);
-
-// Number of strat updates to creates
-#define STRAT_UPDATES	4096
+static Mem::Pool<STRAT_UPDATE, 4096> s_stratUpdatePool;
 
 // Macro for telling an update that it is to be returned to the free pool
 #define RETURN_UPDATE	update->updateTime = 0
@@ -70,260 +60,129 @@ static LOGICAL _freeManifest(MANIFESTSTRUCT* manifest);
 #define FACTORY_PERIOD_MINIMUM	5
 
 static UINT32 freeConvoys=MAXCONVOYS, numConvoys=0;
-static SINT32 convoyID=0, payloadID=0;
-static CONVOYSTRUCT* freeConvoyList ;
+static CONVOYSTRUCT* freeConvoyList;
 static CONVOYSTRUCT* dispatchedConvoyList;
-static STRAT_UPDATE* freeStratUpdates ;
-static STRAT_UPDATE* stratUpdateList=NULL ;
-static STRAT_UPDATE* _convoyUpdate=NULL;
+typedef IntrusiveList<STRAT_UPDATE> StratUpdateList;
+static StratUpdateList s_stratUpdateList;
+static STRAT_UPDATE* _convoyUpdate;
 
-static SINT32 _mapConnection=0;
+//////////////////////////////////////////////////////////////////////
+//Inserts a updateTime into the stratUpdatelist
 
-//These are global to the Convoy System so they can be acessed by createConvoy
-//	and such fun things
-static LOGICAL _interrupted = FALSE;
-
-static STRAT_UPDATE*
-_getFreeStratUpdate()
+static void _insertStratUpdate(STRAT_UPDATE* stratUpdate)
 {
-	STRAT_UPDATE* stratUpdate = strtRemoveFirstStratUpdate(&freeStratUpdates) ;
-	if (stratUpdate == NULL)
-	{
-		stratUpdate = strtCreateStratUpdateList(STRAT_UPDATES) ;
-		if ( stratUpdate == NULL )
-		{
-			dbugLog(_FLA, "!!! strtCreateStratUpdateList FAILED !!!") ;
-			return NULL ;
-		}
-		freeStratUpdates = stratUpdate ;
+	ABORT_IF(stratUpdate == nullptr);
 
-		stratUpdate = strtRemoveFirstStratUpdate(&freeStratUpdates);
-		if ( stratUpdate == NULL )
-		{
-			dbugLog(_FLA, "unable to retrieve first free update after create") ;
-			return NULL ;
-		}
+	if (s_stratUpdateList.empty() || s_stratUpdateList.front()->updateTime >= stratUpdate->updateTime)
+	{
+		s_stratUpdateList.push_front(stratUpdate);
+		return;
+	}
+	for (auto it = s_stratUpdateList.rbegin(), end = s_stratUpdateList.rend(); it != end; ++it)
+	{
+		if (it->updateTime > stratUpdate->updateTime)
+			continue;
+		stratUpdate->link(it->m_next);
+		return;
 	}
 
-	return stratUpdate ;
+	// if we get here, the list must be out of order.
+	LogAbort("s_stratUpdateList is out of order");
 }
 
-static void
-_releaseStratUpdate(STRAT_UPDATE* update)
+//////////////////////////////////////////////////////////////////////
+// Take an update out of the update list and release it to the pool.
+
+static void _releaseStratUpdate(STRAT_UPDATE* update)
 {
 	//Remove the update from the update list
-	strtDeleteStratUpdate(&stratUpdateList, update);
+	update->unlink();
 
 	//Zero it out and put it on the free update list
-	update->updateTime = 0 ;
-	update->data = NULL ;
+	update->updateTime = 0;
+	update->data = nullptr;
 
-	strtInsertStratUpdate(&freeStratUpdates, update);
-}
-
-//////////////////////////////////////////////////////////////////////
-//Interrupts the sleeping during convoy processing
-
-extern LOGICAL
-cnvyInterrupt(void)
-{
-	return _interrupted = TRUE;
-}
-
-//////////////////////////////////////////////////////////////////////
-//Checks the value of the interrupt flag
-
-extern LOGICAL
-cnvyInterrupted(void)
-{
-	return _interrupted;
-}
-
-//////////////////////////////////////////////////////////////////////
-//Clears the interrupt flag
-
-extern LOGICAL
-cnvyClearInterrupt(void)
-{
-	_interrupted = FALSE;
-	return TRUE;
-}
-
-//////////////////////////////////////////////////////////////////////
-//Returns the next payloadid
-
-SINT32
-getNextPayloadID()
-{
-	if (++payloadID < 0)
-		payloadID=1;
-
-	return payloadID;
-}
-
-//////////////////////////////////////////////////////////////////////
-//
-
-SINT32
-cnvyGetMapConnection(void)
-{
-	return _mapConnection;
-}
-
-//////////////////////////////////////////////////////////////////////
-//
-
-SINT32
-cnvySetMapConnection(SINT32 connection)
-{
-#ifdef DEBUG
-	dbugLog(_FLD,"setting map connection %d", connection);
-#endif
-	_mapConnection = connection;
-	return 0;
-}
-
-//////////////////////////////////////////////////////////////////////
-//
-
-PAYLOADSTRUCT*
-cnvyMakeRPPayload(UINT32 RPs)
-{
-	PAYLOADSTRUCT* tmpPayload;
-
-	//Get memory for our payload
-	tmpPayload=(PAYLOADSTRUCT*) memAlloc(sizeof(PAYLOADSTRUCT));
-
-	tmpPayload->next = NULL;
-	tmpPayload->destination = NULL;
-	tmpPayload->manifest = NULL;
-	tmpPayload->spawnpoint = NULL;
-	tmpPayload->contents = PAYLOADSTRUCT::_RPS;
-	tmpPayload->startRPs = tmpPayload->RPs = RPs;
-
-	return tmpPayload;
+	s_stratUpdatePool.Free(update);
 }
 
 //////////////////////////////////////////////////////////////////////
 //Takes a Convoy off the freeConvoylist, inits it with the information its
 //	given, then puts it on the dispatched convoy list
 
-LOGICAL
-cnvyCreateConvoy(WWII_SIDE side, WWII_COUNTRY country, LinkStruct* link, PAYLOADSTRUCT* payload)
+void cnvyCreateConvoy(WWII_SIDE side, WWII_COUNTRY country, LinkStruct* link, UINT32 rps)
 {
-	CONVOYSTRUCT* tmpConvoy=NULL;
-	STRAT_UPDATE* update;
+	CONVOYSTRUCT* newConvoy = nullptr;
 
 	//If the freeConvoyList is empty, then get some more memory for it.
-	if (freeConvoyList==NULL)
+	if (freeConvoyList == nullptr)
 	{
 		//We are out of convoys
 		freeConvoyList = cnvyCreateConvoyList(MAXCONVOYS);
 		freeConvoys = MAXCONVOYS;
 	}
 
-	tmpConvoy=cnvyRemoveFirstConvoy(&freeConvoyList);
+	newConvoy = cnvyRemoveFirstConvoy(&freeConvoyList);
 
 	//Decrement freeConvoy count
 	freeConvoys--;
 	numConvoys++;
 
-	//Now we have tmpConvoy pointing to our Convoy to populate
-	if (++convoyID < 0)
-		convoyID=0;
-	tmpConvoy->id = convoyID;
-	tmpConvoy->side = side;
-	tmpConvoy->country = country;
-	tmpConvoy->link = link;
-	tmpConvoy->payload = payload;
-	tmpConvoy->damageJoules = 0;
-	tmpConvoy->maxDamageJoules = 10;
-
-	//Point the payload back at the convoy
-	payload->convoy=tmpConvoy;
-	payload->cp=NULL;
+	newConvoy->side = side;
+	newConvoy->link = link;
+	newConvoy->numRPs = rps;
 
 	//Time calculations.  To be replaced later with an actual calculation
 	//	based on the vehicle type, etc.
-	tmpConvoy->nextEvent = tmpConvoy->arrivalTime = teulTime() + link->latency;
+	newConvoy->arrivalTime = teulTime() + link->latency;
 
-	cnvyInsertConvoy(&dispatchedConvoyList,tmpConvoy);
+	cnvyInsertConvoy(&dispatchedConvoyList,newConvoy);
 
-	if (_convoyUpdate != NULL)
+	if (_convoyUpdate != nullptr)
 	{
 		//Make sure we sleep for the least amount of seconds necessary
-		if (_convoyUpdate->updateTime > tmpConvoy->nextEvent)
+		if (_convoyUpdate->updateTime > newConvoy->arrivalTime)
 		{
-			//Pull it out of the update list
-			strtDeleteStratUpdate(&stratUpdateList, _convoyUpdate);
-
-			//Fix the time
-			_convoyUpdate->updateTime = tmpConvoy->nextEvent;
-
-			//Put it back in the list
-			strtInsertStratUpdate(&stratUpdateList, _convoyUpdate);
+			// Pull the node out, adjust the time and reposition it.
+			StratUpdateList::iterator it(_convoyUpdate->m_next), end(s_stratUpdateList.end());
+			_convoyUpdate->unlink();
+			_convoyUpdate->updateTime = newConvoy->arrivalTime;
+			while (it != end && it->updateTime < _convoyUpdate->updateTime)
+				++it;
+			_convoyUpdate->link(it);
 		}
 	}
 	else
 	{
 		//We must create a convoy update for this convoy
-		update = _getFreeStratUpdate();
-		update->type = STRAT_UPDATE_CONVOY_SYSTEM;
-		update->updateTime = tmpConvoy->nextEvent;
-		strtInsertStratUpdate(&stratUpdateList, update);
-		//Save the pointer to it, so we can find it quickly
-		_convoyUpdate = update;
+		_convoyUpdate = s_stratUpdatePool.New(newConvoy->arrivalTime, STRAT_UPDATE_CONVOY_SYSTEM);
+		_insertStratUpdate(_convoyUpdate);
 	}
 
-	//dbugLog(_FLN,"Convoy %d sent from CP %s to CP %s", tmpConvoy->id, link->startDepot->cp->name, link->endDepot->cp->name);
+	//dbugLog(_FLN,"Convoy %d sent from CP %s to CP %s", newConvoy->id, link->startDepot->cp->name, link->endDepot->cp->name);
 
 	//Set flag on link
-	link->convoy=TRUE;
-	link->startDepot->m_incomingLink->convoy=TRUE;
-
-	return TRUE;
+	link->m_convoy = true;
+	link->startDepot->m_incomingLink->m_convoy = true;
 }
 
 //////////////////////////////////////////////////////////////////////
 //Frees the convoy up and puts it on the freeConvoyList
 
-LOGICAL
-cnvyFreeConvoy(CONVOYSTRUCT* convoy)
+void cnvyFreeConvoy(CONVOYSTRUCT* convoy)
 {
-	if (convoy==NULL)
-		return FALSE;
+	if (convoy == nullptr)
+		return;
 
-	//Get rid of all the associated memory, manifests and such
-	if (convoy->payload!=NULL)
-	{
-		//We have to free the payload
-		//First, free the manifest list
-		_freeManifest(convoy->payload->manifest);
-		memFree(convoy->payload);
-		convoy->payload=NULL;
-	}
-
-	//If we are freeing the head of the dispatchedConvoy List (the most
-	//	common scenario)...
-	if (dispatchedConvoyList==convoy)
-	{
-		cnvyRemoveFirstConvoy(&dispatchedConvoyList);
-	}
-	else
-	{
-		cnvyDeleteConvoy(&dispatchedConvoyList, convoy);
-	}
+	cnvyDeleteConvoy(&dispatchedConvoyList, convoy);
 
 	//Put freed convoy at the head of the list
-	convoy->nextEvent = convoy->arrivalTime = 0;
+	convoy->arrivalTime = 0;
 	cnvyInsertConvoy(&freeConvoyList,convoy);
 
 	freeConvoys++;
 	numConvoys--;
 
 	//strtDeleteConvoy(convoy->id);
-
-	return TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -332,23 +191,16 @@ cnvyFreeConvoy(CONVOYSTRUCT* convoy)
 bool
 cnvyAddWeaponToExpireList(POSTED_WEAPON& weapon, UINT32 expireSeconds)
 {
-	STRAT_UPDATE* stratUpdate = _getFreeStratUpdate() ;
-	if ( stratUpdate == NULL )
-		return false ;
-
-	//Set the pertinant strat update information
-	stratUpdate->updateTime = teulTime() + expireSeconds ;
-	stratUpdate->type = STRAT_UPDATE_POST_EXPIRED;
-	stratUpdate->data = &weapon;
+	STRAT_UPDATE* stratUpdate = s_stratUpdatePool.New(teulTime() + expireSeconds, STRAT_UPDATE_POST_EXPIRED, 0, &weapon);
 
 	//Get a pointer back to this update so we can remove it from the
 	//	expire list whenever it is spawned
 	weapon.m_expiryUpdate = stratUpdate;
 
 	//Put it on the update list
-	strtInsertStratUpdate(&stratUpdateList, stratUpdate);
+	_insertStratUpdate(stratUpdate);
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -359,29 +211,21 @@ cnvyScheduleBrigadeReformation(UINT32 brigadeID, UINT32 delay)
 {
 	if ( brigadeID == 0 )
 	{
-		dbugLog(_FLA, "Requested brigade reformation for id 0 - invalid") ;
-		return NULL ;
+		dbugLog(_FLA, "Requested brigade reformation for id 0 - invalid");
+		return nullptr;
 	}
 
 	if ( delay <= 5 )
 	{
-		dbugLog(_FLN, "hcu:%u brigade needs routing immediately", brigadeID) ;
-		strtReformBrigade(brigadeID, NULL) ;
-		return NULL ;
+		dbugLog(_FLN, "hcu:%u brigade needs routing immediately", brigadeID);
+		strtReformBrigade(brigadeID, nullptr);
+		return nullptr;
 	}
 
-	STRAT_UPDATE* stratUpdate = _getFreeStratUpdate() ;
-	if ( stratUpdate == NULL )
-		return NULL ;
+	STRAT_UPDATE* stratUpdate = s_stratUpdatePool.New(teulTime() + delay, STRAT_REFORM_BRIGADE, brigadeID);
+	_insertStratUpdate(stratUpdate);
 
-	stratUpdate->type = STRAT_REFORM_BRIGADE ;
-	stratUpdate->updateTime = teulTime() + delay ;
-	stratUpdate->data = NULL ;
-	stratUpdate->value = brigadeID ;
-
-	strtInsertStratUpdate(&stratUpdateList, stratUpdate) ;
-
-	return stratUpdate ;
+	return stratUpdate;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -390,10 +234,10 @@ cnvyScheduleBrigadeReformation(UINT32 brigadeID, UINT32 delay)
 void
 cnvyCancelBrigadeEvent(STRAT_UPDATE* update)
 {
-	if ( update == NULL )
-		return ;
+	if ( update == nullptr )
+		return;
 
-	_releaseStratUpdate(update) ;
+	_releaseStratUpdate(update);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -402,26 +246,16 @@ cnvyCancelBrigadeEvent(STRAT_UPDATE* update)
 bool
 cnvyScheduleObjectiveExpiry(CPStruct* cp, WWII_SIDE side, UINT32 expirySeconds)
 {
-	STRAT_UPDATE* stratUpdate ;
-
-	if ( cp == NULL )
+	if ( cp == nullptr )
 	{
-		dbugLog(_FLA, "%s called with NULL cp", __FUNCTION__) ;
-		return false ;
+		dbugLog(_FLA, "%s called with NULL cp", __FUNCTION__);
+		return false;
 	}
 
-	stratUpdate = _getFreeStratUpdate() ;
-	if ( stratUpdate == NULL )
-		return false ;
+	STRAT_UPDATE* stratUpdate = s_stratUpdatePool.New(teulTime() + expirySeconds, STRAT_OBJECTIVE_EXPIRY, side, cp);
+	_insertStratUpdate(stratUpdate);
 
-	stratUpdate->type = STRAT_OBJECTIVE_EXPIRY ;
-	stratUpdate->updateTime = teulTime() + expirySeconds ;
-	stratUpdate->data = cp ;
-	stratUpdate->value = side ;
-
-	strtInsertStratUpdate(&stratUpdateList, stratUpdate) ;
-
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -432,45 +266,30 @@ cnvyRemoveWeaponFromExpireList(POSTED_WEAPON& weapon)
 {
 	//Get the update, and NULL it off the posted weapon
 	STRAT_UPDATE* stratUpdate = weapon.m_expiryUpdate;
-	if ( stratUpdate == NULL )
-		return ;
-
-	weapon.m_expiryUpdate = NULL;
-
-	//Remove the update from the update list
-	strtDeleteStratUpdate(&stratUpdateList, stratUpdate);
-
-	//Zero it out and put it on the free update list
-	stratUpdate->updateTime = 0;
-	strtInsertStratUpdate(&freeStratUpdates, stratUpdate);
+	if ( stratUpdate != nullptr )
+	{
+		weapon.m_expiryUpdate = nullptr;
+		_releaseStratUpdate(stratUpdate);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////
 // Place a factory production update in the queue
 
-LOGICAL
-cnvyBeginFactoryProduction(ObjectStruct* object, UINT32 seconds)
+void cnvyBeginFactoryProduction(ObjectStruct* object, UINT32 seconds)
 {
-	STRAT_UPDATE* stratUpdate = NULL ;
-
-	if ( object == NULL || host_config.factoryPeriod == 0 )
-		return FALSE ;
+	if ( object == nullptr || host_config.factoryPeriod == 0 )
+		return;
 
 	if ( seconds == 0 )
-		seconds = host_config.factoryPeriod ;
+		seconds = host_config.factoryPeriod;
 
 	if ( seconds < FACTORY_PERIOD_MINIMUM )
-		seconds = FACTORY_PERIOD_MINIMUM ;
+		seconds = FACTORY_PERIOD_MINIMUM;
 
-	//Set the pertinant strat update information
-	stratUpdate = _getFreeStratUpdate() ;
-	stratUpdate->updateTime = teulTime() + seconds ;
-	stratUpdate->type = STRAT_PROCESS_FACTORY ;
-	stratUpdate->data = object ;
-	stratUpdate->value = seconds ;
-	strtInsertStratUpdate(&stratUpdateList, stratUpdate) ;
-
-	return TRUE ;
+	//Set the pertinent strat update information
+	STRAT_UPDATE* stratUpdate = s_stratUpdatePool.New(teulTime() + seconds, STRAT_PROCESS_FACTORY, seconds, object);
+	_insertStratUpdate(stratUpdate);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -480,10 +299,10 @@ bool
 _expireObjective(CPStruct* cp, WWII_SIDE forSide)
 {
 	// Sanity check
-	if ( cp == NULL )
+	if ( cp == nullptr )
 	{
-		dbugLog(_FLA, "objective expiry with NULL cp") ;
-		return false ;
+		dbugLog(_FLA, "objective expiry with NULL cp");
+		return false;
 	}
 
 	// More sanity
@@ -492,8 +311,8 @@ _expireObjective(CPStruct* cp, WWII_SIDE forSide)
 		dbugLog(_FLA, "objective expiry for %s with invalid side (%d)"
 						, cp->name
 						, forSide
-						) ;
-		return false ;
+						);
+		return false;
 	}
 
 	// Make sure they didn't complete the objective
@@ -502,18 +321,18 @@ _expireObjective(CPStruct* cp, WWII_SIDE forSide)
 		dbugLog(_FLI, "%d objective for %s already withdrawn elsehow"
 						, forSide
 						, cp->name
-						) ;
-		return false ;
+						);
+		return false;
 	}
 
 	// If this is an attacker pulling the plug, due notice
 	if ( cp->isCity() && forSide == cp->attacker() && forSide != cp->side )
-		cp->announceObjectiveWithdrawl() ;
+		cp->announceObjectiveWithdrawl();
 
 	// Tell the CP to cancel this objective
-	cp->clearObjective(forSide) ;
+	cp->clearObjective(forSide);
 
-	return true ;
+	return true;
 }
 
 void
@@ -521,32 +340,32 @@ cnvyUpdateTime()
 {
 	//Set the time of the next time update
 	// Check to see if there is an hour event within 30 seconds of this event
-	const UINT32 gameTime = wthrGetGameTime() ;
-	const UINT32 gameTimeFactor = wthrGetTimeFactor() ;
-	UINT32 gameHour = (gameTime / 3600) % 24 ;
-	static UINT32 prevGameHour = 0 ;
+	const UINT32 gameTime = wthrGetGameTime();
+	const UINT32 gameTimeFactor = wthrGetTimeFactor();
+	UINT32 gameHour = (gameTime / 3600) % 24;
+	static UINT32 prevGameHour = 0;
 
 	if ( gameHour < prevGameHour )
 	{
 		// Recalculate the weather pattern when shifting out of night
-		strtStartNewDay() ;
+		strtStartNewDay();
 	}
-	prevGameHour = gameHour ;
+	prevGameHour = gameHour;
 
-	const UINT32 weatherPattern = wthrGetWeatherPattern() ;
-	const UINT32 fogPattern = wthrGetFogPattern() ;
+	const UINT32 weatherPattern = wthrGetWeatherPattern();
+	const UINT32 fogPattern = wthrGetFogPattern();
 
 	dbugLog(_FLI,"Broadcasting time update %ux%u weatherPattern %u fog %u"
 				, gameTime, gameTimeFactor, weatherPattern, fogPattern);
 
 	//Send out the time update
-	strtBroadcastTimeUpdate(gameTime, gameTimeFactor, weatherPattern, fogPattern) ;
+	strtBroadcastTimeUpdate(gameTime, gameTimeFactor, weatherPattern, fogPattern);
 }
 
 //////////////////////////////////////////////////////////////////////
 // Pull an update of the config in the background
 
-static const char* const CONFIG_UPDATE_QUERY = "SELECT variableName, value, UNIX_TIMESTAMP(lastModified) FROM `game`.`host_config` WHERE UNIX_TIMESTAMP(lastModified) > %u" ;
+static const char* const CONFIG_UPDATE_QUERY = "SELECT variableName, value, UNIX_TIMESTAMP(lastModified) FROM `game`.`host_config` WHERE UNIX_TIMESTAMP(lastModified) > %u";
 
 class ConfigUpdateQuery : public DBThreadQuery
 {
@@ -563,59 +382,66 @@ private:
 			: m_varName(varName_), m_value(value_), m_modStamp(modStamp_)
 			{}
 
-		std::string m_varName ;
-		std::string m_value ;
-		std::string m_modStamp ;
-	} ;
-	std::vector<Result> m_results ;
+		std::string m_varName;
+		std::string m_value;
+		std::string m_modStamp;
+	};
+	std::vector<Result> m_results;
 
 public:
-	virtual bool Process(const size_t numRows)
+	virtual bool Process(const size_t numRows) OVERRIDE_FN
 	{
 		if ( numRows > 0 )
 		{
 			while ( Query()->FetchRow() )
 			{
-				const DBRow& row = Query()->Row() ;
-				m_results.push_back(Result(row[0], row[1], row[2])) ;
+				const DBRow& row = Query()->Row();
+				m_results.push_back(Result(row[0], row[1], row[2]));
 			}
 		}
-		return true ;
+		return true;
 	}
 
 public:
-	virtual void Success()
+	virtual void Success() OVERRIDE_FN
 	{
-		extern bool dbUpdateWWIIConfigValue(const char* varName, const char* value, const char* modstamp) ;
+		extern bool dbUpdateWWIIConfigValue(const char* varName, const char* value, const char* modstamp);
 
-		for ( size_t i = 0 ; i < m_results.size() ; ++i )
+		for ( size_t i = 0; i < m_results.size(); ++i )
 		{
-			dbUpdateWWIIConfigValue(m_results[i].m_varName.c_str(), m_results[i].m_value.c_str(), m_results[i].m_modStamp.c_str()) ;
+			dbUpdateWWIIConfigValue(m_results[i].m_varName.c_str(), m_results[i].m_value.c_str(), m_results[i].m_modStamp.c_str());
 		}
 
-		dotApplyConfig() ;
+		dotApplyConfig();
 	}
-} ;
+};
 
 //////////////////////////////////////////////////////////////////////
 //This function processes any waiting strat updates
 
-LOGICAL
-cnvyProcessStratUpdates(UINT32 currentTime)
+void cnvyProcessStratUpdates(UINT32 currentTime)
 {
-	UINT32 nextHourEvent ;
-	UINT32 nextPolledEvent ;
+	UINT32 nextHourEvent;
+	UINT32 nextPolledEvent;
 	static UINT32 lastStratUpdate = 0;
 
 	if ( lastStratUpdate == 0)
-		lastStratUpdate = teulTime() ;
+		lastStratUpdate = teulTime();
+
+	// Check if the update list is in order.
+	for (auto it = s_stratUpdateList.begin(), end = --s_stratUpdateList.end(); it != end; ++it)
+	{
+		if (it->updateTime > it->m_next->updateTime)
+			LogAbort("stratUpdateList is messed up");
+	}
 
 	//If we have updates
-	while ((stratUpdateList !=NULL) && (currentTime >= stratUpdateList->updateTime))
+	while (!s_stratUpdateList.empty())
 	{
-		STRAT_UPDATE* update;
-
-		update = strtRemoveFirstStratUpdate(&stratUpdateList);
+		auto update = s_stratUpdateList.front();
+		if (update->updateTime > currentTime)
+			break;
+		update->unlink();
 		switch (update->type)
 		{
 		case STRAT_UPDATE_STRAT_SYSTEM:
@@ -631,9 +457,9 @@ cnvyProcessStratUpdates(UINT32 currentTime)
 			else
 			{
 				lastStratUpdate = update->updateTime = currentTime + (STRAT_INTERVAL - (currentTime - lastStratUpdate));
-				dbugLog(_FLD,"new lastStratUpdate and updateTime = %u",lastStratUpdate);
+				dbugLog(_FLD, "new lastStratUpdate and updateTime = %u", lastStratUpdate);
 			}
-			strtInsertStratUpdate(&stratUpdateList,update);
+			_insertStratUpdate(update);
 		break;
 
 		case STRAT_UPDATE_TIME:
@@ -641,61 +467,61 @@ cnvyProcessStratUpdates(UINT32 currentTime)
 			{
 #ifndef DISABLE_WEATHER
 				if ( host_config.weather.lockToPattern )
-					wthrSetWeatherPattern(host_config.weather.lockToPattern) ;
+					wthrSetWeatherPattern(host_config.weather.lockToPattern);
 				if ( host_config.weather.lockToFog )
-					wthrSetFogPattern(host_config.weather.lockToFog) ;
+					wthrSetFogPattern(host_config.weather.lockToFog);
 #endif
 
-				strtBroadcastTimeUpdate(wthrGetGameTime(), 1, wthrGetWeatherPattern(), wthrGetFogPattern()) ;
+				strtBroadcastTimeUpdate(wthrGetGameTime(), 1, wthrGetWeatherPattern(), wthrGetFogPattern());
 
-				update->updateTime = currentTime + 120 ;
-				strtInsertStratUpdate(&stratUpdateList, update) ;
+				update->updateTime = currentTime + 120;
+				_insertStratUpdate(update);
 
-				break ;
+				break;
 			}
 
-			cnvyUpdateTime() ;
+			cnvyUpdateTime();
 
-			nextHourEvent = wthrRealSecondsToHour() ;
-			nextPolledEvent = STRAT_TIME_UPDATE_FREQUENCY ;
+			nextHourEvent = wthrRealSecondsToHour();
+			nextPolledEvent = STRAT_TIME_UPDATE_FREQUENCY;
 
 			if ( nextHourEvent > 0 && nextHourEvent < nextPolledEvent )
-				nextPolledEvent = nextHourEvent ;
+				nextPolledEvent = nextHourEvent;
 
-			update->updateTime = currentTime + nextPolledEvent ;
+			update->updateTime = currentTime + nextPolledEvent;
 
-			strtInsertStratUpdate(&stratUpdateList, update);
+			_insertStratUpdate(update);
 		break;
 
 		// Events that happen on a once a minute period
 		case STRAT_MINUTE_CYCLE:
 			// Request a check of the host_config
-			(new ConfigUpdateQuery())->Queue() ;
+			(new ConfigUpdateQuery())->Queue();
 
 			// Expire spawned weapons
 			strtExpireSpawnedWeapons();
 
-			g_objectiveStats.checkLimits(currentTime) ;
+			g_objectiveStats.checkLimits(currentTime);
 
-			strtCalculateRDPOutput() ;
+			strtCalculateRDPOutput();
 
-			strtdbLoadTOETemplates() ;
+			strtdbLoadTOETemplates();
 
 			// Put me back on the queue
-			update->updateTime = currentTime + 60 ;
-			strtInsertStratUpdate(&stratUpdateList, update) ;
-		break ;
+			update->updateTime = currentTime + 60;
+			_insertStratUpdate(update);
+		break;
 
 		case STRAT_UPDATE_CONVOY_SYSTEM:
 			cnvyProcessConvoys();
 
 			//put its next update on the list
-			if (dispatchedConvoyList != NULL)
+			if (dispatchedConvoyList != nullptr)
 			{
 				//If there are convoys, then we need to reinsert this
 				//	update with an updated time
-				update->updateTime = dispatchedConvoyList->nextEvent;
-				strtInsertStratUpdate(&stratUpdateList,update);
+				update->updateTime = dispatchedConvoyList->arrivalTime;
+				_insertStratUpdate(update);
 
 				//Save the current convoyUpdate pointer
 				_convoyUpdate = update;
@@ -703,7 +529,7 @@ cnvyProcessStratUpdates(UINT32 currentTime)
 			else //We have no more convoys, so remove the update for it
 			{
 				//Let the convoy system know there aren't any updates
-				_convoyUpdate = NULL;
+				_convoyUpdate = nullptr;
 				update->updateTime = 0;
 			}
 
@@ -711,89 +537,82 @@ cnvyProcessStratUpdates(UINT32 currentTime)
 
 		case STRAT_UPDATE_POST_EXPIRED:
 
-			if ( update->data == NULL )
-				LogAbort("SUPPP has NULL data") ;
+			if ( update->data == nullptr )
+				LogAbort("SUPPP has NULL data");
 			else
 			{
-				POSTED_WEAPON& weapon = *(POSTED_WEAPON*)update->data ;
-				update->data = NULL ;
+				POSTED_WEAPON& weapon = *(POSTED_WEAPON*)update->data;
+				update->data = nullptr;
 
-				weapon.m_expiryUpdate = NULL ;
+				weapon.m_expiryUpdate = nullptr;
 				strtExpireWeapon(weapon);
 
-				RETURN_UPDATE ;
+				RETURN_UPDATE;
 			}
 		break;
 
 		case STRAT_PROCESS_FACTORY:
-			strtSaveFactoryOutput((ObjectStruct*)update->data) ;
+			strtSaveFactoryOutput((ObjectStruct*)update->data);
 
 			// Place the event back into the queue if factory output is
 			// still enabled
 			if ( host_config.factoryPeriod > 0 )
 			{
 				// Use the current factory period
-				update->value = host_config.factoryPeriod ;
+				update->value = host_config.factoryPeriod;
 				if ( update->value < FACTORY_PERIOD_MINIMUM )
-					update->value = FACTORY_PERIOD_MINIMUM ;
-				update->updateTime = currentTime + update->value ;
+					update->value = FACTORY_PERIOD_MINIMUM;
+				update->updateTime = currentTime + update->value;
 
-				strtInsertStratUpdate(&stratUpdateList, update) ;
+				_insertStratUpdate(update);
 			}
 			else
 			{
-				RETURN_UPDATE ;
+				RETURN_UPDATE;
 			}
-		break ;
+		break;
 
 		case STRAT_OBJECTIVE_EXPIRY:
 			// Do all the business
-			_expireObjective((CPStruct*)update->data, (WWII_SIDE)update->value) ;
+			_expireObjective((CPStruct*)update->data, (WWII_SIDE)update->value);
 
 			// Drop the update back onto the stack
-			RETURN_UPDATE ;
-		break ;
+			RETURN_UPDATE;
+		break;
 
 		case STRAT_REFORM_BRIGADE:
 			// Redeploy a brigade to its division
-			dbugLog(_FLI, "hcu:%u reforming brigade", (UINT32)update->value) ;
-			strtReformBrigade((UINT32)update->value, update) ;
+			dbugLog(_FLI, "hcu:%u reforming brigade", (UINT32)update->value);
+			strtReformBrigade((UINT32)update->value, update);
 
-			RETURN_UPDATE ;
-		break ;
+			RETURN_UPDATE;
+		break;
 
 		default:
-			RETURN_UPDATE ;
-		break ;
+			RETURN_UPDATE;
+		break;
 		}
 		if ( update->updateTime == 0 )
 		{
 			//Put the update back on the free update list
-			update->data = NULL;
-			strtInsertStratUpdate(&freeStratUpdates, update);
+			update->data = nullptr;
+			s_stratUpdatePool.Free(update);
 		}
 	}
-
-	if ( _interrupted )
-		cnvyClearInterrupt();
-
-	return TRUE;
 }
 
 //This function processes any waiting convoys
-void
-cnvyProcessConvoys()
+void cnvyProcessConvoys()
 {
 	//Check status of any convoys that need it
-	while ( dispatchedConvoyList !=NULL && dispatchedConvoyList->nextEvent <= teulTime() )
+	while ( dispatchedConvoyList != nullptr && dispatchedConvoyList->arrivalTime <= teulTime() )
 	{
 		strtAcceptConvoy(*dispatchedConvoyList);
 	}
 }
 
 //Initializes all the cnvy System stuff
-LOGICAL
-cnvyInit(void)
+void cnvyInit()
 {
 	STRAT_UPDATE* update;
 	UINT32 currentTime;
@@ -801,9 +620,8 @@ cnvyInit(void)
 	//Initialization stuff
 	freeConvoyList = cnvyCreateConvoyList(MAXCONVOYS);
 
-	stratUpdateList = NULL;
-	freeStratUpdates = strtCreateStratUpdateList(STRAT_UPDATES * 10);
-	_convoyUpdate = NULL ;
+	s_stratUpdatePool.Reserve(40960);
+	_convoyUpdate = nullptr;
 
 	dbugLog(_FLN,"Initializing Time System");
 	wthrInitTime();
@@ -816,70 +634,26 @@ cnvyInit(void)
 //	wthrSetTimeFactor(_timeFactor[STRAT_DAWN]);
 	// Game starts at 7.30 am
 	wthrSetGameTime(7 * 3600 + 1800);
-	strtStartNewDay() ;
+	strtStartNewDay();
 
-	currentTime = teulTime() ;
+	currentTime = teulTime();
 
 	//Setup the first strat run
 	//Once setup, this update always exists
-	update = strtRemoveFirstStratUpdate(&freeStratUpdates);
-	update->updateTime = currentTime;
-	update->type = STRAT_UPDATE_STRAT_SYSTEM;
-	strtInsertStratUpdate(&stratUpdateList, update);
+	update = s_stratUpdatePool.New(currentTime, STRAT_UPDATE_STRAT_SYSTEM);
+	_insertStratUpdate(update);
 
 	//Setup the first updateTime
 	//Once setup, this update always exists
-	update = strtRemoveFirstStratUpdate(&freeStratUpdates);
-
 	//Make sure this time update takes place* After* the first strat run
 	//Used to have to do this b/c strat controlled the time. Now I'm not
 	//	so sure why, but don't change it if it works!
-	update->updateTime = currentTime + 1 ;
-	update->type = STRAT_UPDATE_TIME;
-	strtInsertStratUpdate(&stratUpdateList, update);
+	update = s_stratUpdatePool.New(currentTime + 1, STRAT_UPDATE_TIME);
+	_insertStratUpdate(update);
 
 	// Set up the 1-minute cycle
-	update = strtRemoveFirstStratUpdate(&freeStratUpdates) ;
-	update->updateTime = currentTime + 60 ;
-	update->type = STRAT_MINUTE_CYCLE ;
-	update->data = NULL ;
-	strtInsertStratUpdate(&stratUpdateList, update) ;
+	update = s_stratUpdatePool.New(currentTime + 60, STRAT_MINUTE_CYCLE);
+	_insertStratUpdate(update);
 
-	dispatchedConvoyList=NULL;
-
-	return TRUE;
+	dispatchedConvoyList = nullptr;
 }
-
-static LOGICAL _printConvoyList(CONVOYSTRUCT* convoy)
-{
-	if (convoy!=NULL)
-	{
-		fprintf(stderr,"%p:Convoy: %d\n",convoy,convoy->id);
-		fprintf(stderr,"\tfrom: %d:%d:%d\n", convoy->link->startDepot->fullObjID.cell.ox, convoy->link->startDepot->fullObjID.cell.oy, convoy->link->startDepot->fullObjID.id);
-		fprintf(stderr,"\tto: %d:%d:%d\n", convoy->link->endDepot->fullObjID.cell.ox, convoy->link->endDepot->fullObjID.cell.oy, convoy->link->endDepot->fullObjID.id);
-		//fprintf(stderr,"\tRPs: %d\n",convoy->RPs);
-		fprintf(stderr,"\tside: %d\n",convoy->side);
-		fprintf(stderr,"\tcountry: %d\n",convoy->country);
-		fprintf(stderr,"\tnextEvent: %d\n",convoy->nextEvent);
-		fprintf(stderr,"\tarrivalTime: %d\n",convoy->arrivalTime);
-		fprintf(stderr,"\tprev: %p\n",convoy->prev);
-		fprintf(stderr,"\tnext: %p\n\n",convoy->next);
-		_printConvoyList(convoy->next);
-	}
-	return TRUE;
-}
-
-
-static LOGICAL
-_freeManifest(MANIFESTSTRUCT* manifest)
-{
-	if (manifest==NULL)
-		return FALSE;
-
-	_freeManifest(manifest->next);
-
-	memFree(manifest);
-
-	return TRUE;
-}
-

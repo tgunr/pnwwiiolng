@@ -29,7 +29,6 @@
 #include "draw/draw2d.h"
 #include "cfg/cfgLoad.h"
 #include "sn/sndsSoundControl.h"
-#include "dbug/dbug.h"
 #include "dbug/dbugExtErrors.h"
 #include "pers/pershud.h"
 #include "ml/mlCompon.h"
@@ -67,7 +66,6 @@
 #include "strt/strtClientMessages.h"
 #include "mm/mmSpawnClientMessages.h"
 #include "teul/teulKit.h"
-#include "dbug/dbug.h"
 #include "fx/FXInterface.h"
 #include "map/mapClientMessages.h"
 #include "miss/missionClientMessages.h"
@@ -98,10 +96,6 @@
 
 #ifdef MULTI_CLIENT
 #include "mc/multiClient.h"
-#endif
-
-#ifdef DOROTHY
-#include "gr2/gr2Main.h"
 #endif
 
 //#define USE_VTUNE
@@ -145,7 +139,7 @@ LOGICAL rnmainSetDefaultRenderStates(void)
     States::SetGlobalDefaultModeValue(GL_FOG, 1);
     States::SetGlobalDefaultModeValue(GL_DEPTH_TEST, 1);
 
-    States::ApplyRenderModes(NULL);
+    States::ApplyRenderModes(nullptr);
 #else
     piSetRenderState(piRENDERSTATE_SRCBLEND, SrcBlend);
     piSetRenderState(piRENDERSTATE_DESTBLEND, DestBlend);
@@ -292,9 +286,9 @@ bool rnmainGetOnlineSetting()
 	if (BypassString[0] != '\0')
 	{
 		if (BypassString[0] == 'R')
-			BypassID = strtoul(&BypassString[1], NULL, 10);
+			BypassID = strtoul(&BypassString[1], nullptr, 10);
 		else
-			BypassID = strtoul(&BypassString[0], NULL, 10);
+			BypassID = strtoul(&BypassString[0], nullptr, 10);
 	}
 	else
 		BypassID = 0;
@@ -303,21 +297,21 @@ bool rnmainGetOnlineSetting()
 	{
 		Online = 1;
 
-		if (teulGetHost(ServerIP, &GameHost) == 0)
+		if (teulGetHost(GameServerIP, &GameHost) == 0)
 		{
 			Write_Debug("Unable to translate host address");
 			return false;
 		}
 
-		GamePort = WWII::Net::Ports::MapHost ;
+		GamePort = WWII::Net::Ports::MapHost;
 		CommType = PROTOCOL_TCP;
-		GameOTP = strtoul(ServerOTP, NULL, 10);
+		GameOTP = strtoul(GameServerOTP, nullptr, 10);
 
 #if FRES || defined(BETA_RELEASE)
 		if(GameOTP == 0)
 		{
 			GameOTP = AUTH_BYPASS_OTP;
-			snprintf(ServerOTP, sizeof(ServerOTP)-1, "%u", GameOTP) ;
+			snprintf(GameServerOTP, sizeof(GameServerOTP)-1, "%u", GameOTP);
 		}
 #endif
 	}
@@ -333,7 +327,7 @@ bool rnmainGetOnlineSetting()
 			return false;
 		}
 
-		GamePort = WWII::Net::Ports::MapHost ;
+		GamePort = WWII::Net::Ports::MapHost;
 		CommType = TCP;
 		GameOTP = AUTH_BYPASS_OTP;
 #else
@@ -347,7 +341,7 @@ bool rnmainGetOnlineSetting()
 				return false;
 			}
 		}
-		else if (ServerIP[0] != 0)
+		else if (GameServerIP[0] != 0)
 		{
 			Online = 1;
 
@@ -369,7 +363,7 @@ static bool _connectClientToGameNetwork()
 {
 	try
 	{
-		UINT32 appversion = 0 ;
+		UINT32 appversion = 0;
 
 		rnlogoUpdateStatus("loading.network");
 
@@ -379,10 +373,10 @@ static bool _connectClientToGameNetwork()
 			teulSetNetworkMask(GameHost);
 
 		if ( GameClientLogin(GameHost, BypassID, GameOTP, appversion, GamePort) < 0 )
-			throw ClientNetError(-1, "connect.fail") ;
+			throw ClientNetError(-1, "connect.fail");
 
 		if ( PlayerClient()->ChatConnection() < 0 )
-			throw ClientNetError(-1, "connect.chat.fail") ;
+			throw ClientNetError(-1, "connect.chat.fail");
 	}
 	catch (ClientNetError& e)
 	{
@@ -395,7 +389,7 @@ static bool _connectClientToGameNetwork()
 		// character 0 will be a '?' if the uiLocString lookup failed
 		// this can happen if a non ui loc string was passed to the
 		// ClientNetError constructor
-		MessageBox(NULL, message.c_str(), uiLocString("connect.popup.title").c_str(), MB_OK | MB_TOPMOST);
+		MessageBox(nullptr, message.c_str(), uiLocString("connect.popup.title").c_str(), MB_OK | MB_TOPMOST);
 
 		// launch the browser with a local html page
 		// describing what to do next
@@ -570,13 +564,13 @@ LOGICAL rnmainInit(void)
 		try
 		{
 			StratDB::StratObject* strat = StratDB::FindStratObject("Antwerp");
-			HCUnit* hcUnit = new HCUnit(WWII_ENGLAND, HCU_BRIGADE, 0, WWII_ENGLAND, BRANCH_LAND, BRANCH_LAND, 9, 0, "English Training Brigade", "1.uk", 1, (strat) ? *strat->FullObjID(): nullObjID, 0, 0) ;
+			HCUnit* hcUnit = new HCUnit(WWII_ENGLAND, HCU_BRIGADE, 0, WWII_ENGLAND, BRANCH_LAND, BRANCH_LAND, 9, 0, "English Training Brigade", "1.uk", 1, (strat) ? *strat->FullObjID(): nullObjID, 0, 0);
 
 			strat = StratDB::FindStratObject("Lier");
-			hcUnit = new HCUnit(WWII_FRANCE, HCU_BRIGADE, 0, WWII_FRANCE, BRANCH_LAND, BRANCH_LAND, 9, 0, "French Training Brigade", "1.fr", 1, (strat) ? *strat->FullObjID(): nullObjID, 0, 0) ;
+			hcUnit = new HCUnit(WWII_FRANCE, HCU_BRIGADE, 0, WWII_FRANCE, BRANCH_LAND, BRANCH_LAND, 9, 0, "French Training Brigade", "1.fr", 1, (strat) ? *strat->FullObjID(): nullObjID, 0, 0);
 
 			strat = StratDB::FindStratObject("Schilde");
-			hcUnit = new HCUnit(WWII_GERMANY, HCU_BRIGADE, 0, WWII_GERMANY, BRANCH_LAND, BRANCH_LAND, 9, 0, "German Training Brigade", "1.de", 1, (strat) ? *strat->FullObjID(): nullObjID, 0, 0) ;
+			hcUnit = new HCUnit(WWII_GERMANY, HCU_BRIGADE, 0, WWII_GERMANY, BRANCH_LAND, BRANCH_LAND, 9, 0, "German Training Brigade", "1.de", 1, (strat) ? *strat->FullObjID(): nullObjID, 0, 0);
 		}
 		catch(std::runtime_error)
 		{
@@ -592,9 +586,6 @@ LOGICAL rnmainInit(void)
 
 	uiPostInit();
 
-#ifdef DOROTHY
-	uiLoadView("dorothy/main");
-#else
 	if(!Online)
 	{
 		uiLoadView("offline");
@@ -617,13 +608,8 @@ LOGICAL rnmainInit(void)
 		else
 			uiLoadView("online");
 	}
-#endif //DOROTHY
 
 	uiChatShow();
-
-#ifdef USE_GAME_ADVERTISING
-    adPreloadAds();
-#endif
 
 	// make sure devices get detected
 	// testing for now
@@ -631,10 +617,6 @@ LOGICAL rnmainInit(void)
 	dimainInit();
 	imapLoadPresets();
 	// end testing
-
-#ifdef DOROTHY
-	gr2MainInit();
-#endif
 
 #ifdef MULTI_CLIENT
 	multiClientInit();
@@ -1219,7 +1201,7 @@ DateTimeRec	time;
 
 UINT32 rnmainGetViewScaleFactor(FLOAT32 * ScaleFactor)
 {
-	if (ScaleFactor != NULL)
+	if (ScaleFactor != nullptr)
 	{
 		*ScaleFactor = _ViewScaleFactor;
 	}
@@ -1248,7 +1230,7 @@ UINT32 rnmainSetZBufferNearVal(FLOAT32 ZBufferNearVal)
 
 UINT32 rnmainGetZBufferNearVal(FLOAT32* ZBufferNearVal)
 {
-	if (ZBufferNearVal != NULL)
+	if (ZBufferNearVal != nullptr)
 	{
 		*ZBufferNearVal = _ZBufferNearVal;
 	}
@@ -1259,11 +1241,11 @@ UINT32 rnmainGetZBufferNearVal(FLOAT32* ZBufferNearVal)
 #if(0)
 static void OutputStatusMessageToFile(SINT8* File, SINT32 Line, SINT8* MessageString)
 {
-	FILE* ExitLog = Fio::OpenLogFile() ;
+	FILE* ExitLog = Fio::OpenLogFile();
 
 	Write_Debug("Status handler information...");
 
-	if (MessageString == NULL)
+	if (MessageString == nullptr)
 	{
 		if ( ExitLog )
 			fprintf(ExitLog, "No exit message!\n");
@@ -1306,7 +1288,7 @@ SINT8*	ptr, apID[64], data[64], serverIP[64], serverport[64], serverprotocol[64]
 FILE*	stream;
 
 	stream = fopen(TicketFile, "r");
-	if (stream == NULL)
+	if (stream == nullptr)
 	{
 		Online = 0;
 		return(FALSE);
@@ -1314,14 +1296,14 @@ FILE*	stream;
 
 	do
 	{
-		if (fgets(apID, 64, stream) == NULL)
+		if (fgets(apID, 64, stream) == nullptr)
 		{
 			retval = FALSE;
 			Write_Debug("Error when reading apID");
 			break;
 		}
 
-		if (fgets(data, 64, stream) == NULL)
+		if (fgets(data, 64, stream) == nullptr)
 		{
 			retval = FALSE;
 			Write_Debug("Error when reading data");
@@ -1329,7 +1311,7 @@ FILE*	stream;
 		}
 
 
-		if (fgets(serverIP, 64, stream) == NULL)
+		if (fgets(serverIP, 64, stream) == nullptr)
 		{
 			retval = FALSE;
 			Write_Debug("Error when reading serverIP");
@@ -1337,7 +1319,7 @@ FILE*	stream;
 		}
 
 		ptr = strchr(serverIP, ' ');
-		if (ptr == NULL)
+		if (ptr == nullptr)
 		{
 			retval = FALSE;
 			Write_Debug("Could not parse serverIP");
@@ -1345,9 +1327,9 @@ FILE*	stream;
 		}
 
 		ptr += 1;
-		*host = strtoul(ptr, NULL, 10);
+		*host = strtoul(ptr, nullptr, 10);
 
-		if (fgets(serverport, 64, stream) == NULL)
+		if (fgets(serverport, 64, stream) == nullptr)
 		{
 			retval = FALSE;
 			Write_Debug("Error when reading port");
@@ -1355,7 +1337,7 @@ FILE*	stream;
 		}
 
 		ptr = strchr(serverport, ' ');
-		if (ptr == NULL)
+		if (ptr == nullptr)
 		{
 			retval = FALSE;
 			Write_Debug("Could not parse port");
@@ -1363,9 +1345,9 @@ FILE*	stream;
 		}
 
 		ptr += 1;
-		*port = (UINT16)strtoul(ptr, NULL, 10);
+		*port = (UINT16)strtoul(ptr, nullptr, 10);
 
-		if (fgets(serverprotocol, 64, stream) == NULL)
+		if (fgets(serverprotocol, 64, stream) == nullptr)
 		{
 			retval = FALSE;
 			Write_Debug("Error when reading protocol");
@@ -1373,7 +1355,7 @@ FILE*	stream;
 		}
 
 		ptr = strchr(serverprotocol, ' ');
-		if (ptr == NULL)
+		if (ptr == nullptr)
 		{
 			retval = FALSE;
 			Write_Debug("Could not parse port");
@@ -1381,9 +1363,9 @@ FILE*	stream;
 		}
 
 		ptr += 1;
-		*protocol = (UINT16)strtoul(ptr, NULL, 10);
+		*protocol = (UINT16)strtoul(ptr, nullptr, 10);
 
-		if (fgets(otp, 64, stream) == NULL)
+		if (fgets(otp, 64, stream) == nullptr)
 		{
 			retval = FALSE;
 			Write_Debug("Error when reading OTP");
@@ -1391,7 +1373,7 @@ FILE*	stream;
 		}
 
 		ptr = strchr(otp, ' ');
-		if (ptr == NULL)
+		if (ptr == nullptr)
 		{
 			retval = FALSE;
 			Write_Debug("Could not parse OTP");
@@ -1399,14 +1381,14 @@ FILE*	stream;
 		}
 
 		ptr += 1;
-		*cookie = strtoul(ptr, NULL, 10);
+		*cookie = strtoul(ptr, nullptr, 10);
 
-		if (fgets(bypass, 64, stream) != NULL)
+		if (fgets(bypass, 64, stream) != nullptr)
 		{
 
 			ptr = strchr(serverIP, ' ');
 
-			if (ptr == NULL)
+			if (ptr == nullptr)
 			{
 				retval = FALSE;
 				Write_Debug("Could not parse IP");
@@ -1415,6 +1397,9 @@ FILE*	stream;
 
 			ptr += 1;
 
+			auto eol = strchr(ptr, '\n');
+			if (eol)
+				*eol = 0;
 			if (teulGetHost(ptr, host) == 0)
 			{
 				Write_Debug("Unable to translate host address");
@@ -1423,7 +1408,7 @@ FILE*	stream;
 
 			ptr = strchr(bypass, ' ');
 
-			if (ptr == NULL)
+			if (ptr == nullptr)
 			{
 				retval = FALSE;
 				Write_Debug("Could not parse BP");
@@ -1437,9 +1422,9 @@ FILE*	stream;
 			if (BypassString[0] != '\0')
 			{
 				if (BypassString[0] == 'R')
-					BypassID = strtoul(&BypassString[1], NULL, 10);
+					BypassID = strtoul(&BypassString[1], nullptr, 10);
 				else
-					BypassID = strtoul(&BypassString[0], NULL, 10);
+					BypassID = strtoul(&BypassString[0], nullptr, 10);
 			}
 			else
 				BypassID = 0;
@@ -1456,23 +1441,23 @@ FILE*	stream;
 static LOGICAL _ParseCommandArgs(UINT32* host, UINT16* port, UINT16* protocol, UINT32* otp)
 {
 
-	if (ServerIP[0] == 0)
+	if (GameServerIP[0] == 0)
 		return FALSE;
-	if (ServerPort[0] == 0)
+	if (GameServerPort[0] == 0)
 		return FALSE;
-	if (ServerOTP[0] == 0)
+	if (GameServerOTP[0] == 0)
 		return FALSE;
 
-	if (teulGetHost(ServerIP, host) == 0)
+	if (teulGetHost(GameServerIP, host) == 0)
 	{
 		Write_Debug("Unable to translate host address");
 		return (FALSE);
 	}
 
-	*port = (UINT16)strtoul(ServerPort, NULL, 10);
+	*port = (UINT16)strtoul(GameServerPort, nullptr, 10);
 	*protocol = PROTOCOL_TCP;
 
-	*otp = strtoul(ServerOTP, NULL, 10) ;
+	*otp = strtoul(GameServerOTP, nullptr, 10);
 
 	return TRUE;
 

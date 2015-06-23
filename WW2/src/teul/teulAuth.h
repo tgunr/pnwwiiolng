@@ -8,9 +8,9 @@
 
 #include "updt/loginTypes.h"
 
-typedef int APID ;
+typedef int APID;
 
-namespace Auth { struct Dispatch ; }
+namespace Auth { struct Dispatch; }
 typedef SINT32 (PLAYER_ACCEPT_FUNCTION) ( SINT32 teulIndex, Auth::Dispatch* authPersona );
 
 // This function initializes the game servers communications to the auth
@@ -40,8 +40,8 @@ SINT32 authGameInit(UINT32 gameHost, UINT16 gamePort
 //	PARAMETERS:
 //		player - the pointer to the Auth::Dispatch struct that was returned by
 //			authValidatePlayer above
-extern SINT32 authExitPlayer(const Auth::Dispatch& player, UINT32 arenaID);
+SINT32 authExitPlayer(const Auth::Dispatch& player, UINT32 arenaID);
 
 
-extern SINT32 authUpdateServerLoad(SINT32 numPlayers, UINT32 hostAddress, UINT32 arenaID);
-extern SINT32 authSetGameCapacity(SINT32 capacity, SINT32 totalPlayers, UINT32 arenaID, SINT32 lock);
+SINT32 authUpdateServerLoad(SINT32 numPlayers, UINT32 hostAddress, UINT32 arenaID);
+SINT32 authSetGameCapacity(SINT32 capacity, SINT32 totalPlayers, UINT32 arenaID, SINT32 lock);

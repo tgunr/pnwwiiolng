@@ -14,11 +14,9 @@
 // *
 // *******************************************************************************
 
-#if !defined(USE_OSG) // ...otherwise get compile errors
 #ifdef __cplusplus
 extern "C"
 {
-#endif
 #endif
 
 #pragma pack( push, npclient_h ) // Save current pack value
@@ -183,10 +181,8 @@ NPRESULT  NP_StopDataTransmission( void );
 
 NPRESULT NPClient_Init();
 
-#if !defined(USE_OSG) // ...otherwise get compile errors
 #ifdef __cplusplus
 }
-#endif
 #endif
 
 //

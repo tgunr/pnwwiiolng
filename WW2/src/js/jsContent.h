@@ -15,7 +15,7 @@ struct jsContentData : public jsAttributeMap
 	typedef std::vector<std::pair<std::string, std::string> > LinkList;
 	typedef std::vector<std::string> IncludeList;
 
-	jsContentData() : type(0), body(""), links(NULL), includes(NULL), locMap(NULL)
+	jsContentData() : type(0), body(""), links(nullptr), includes(nullptr), locMap(nullptr)
 	{
 	}
 

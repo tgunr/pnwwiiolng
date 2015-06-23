@@ -31,11 +31,11 @@ UINT32 _FindSubObjectByName(OBJECT ** ReturnObject,OBJECT * ObjectPtr, const cha
 UINT32 _FindSubObjectByDOFVar(OBJECT ** ReturnObject,OBJECT * ObjectPtr,UINT32 VarNum);
 UINT32 _FindSubObjectByDOFVarAndSubVar(OBJECT ** ReturnObject,OBJECT * ObjectPtr,UINT32 VarNum,UINT32 SubVarNum);
 static UINT32 _SetObjectAndTreeAsCockpit(OBJECT * Object);
-static UINT32 _MoveAndRotateSubObject(OBJECT * ObjectPtrOrig,
+static UINT32 _MoveAndRotateSubObject(OBJECT * ObjectPtr,
 											 piMATRIX * CurrentMatrix,
 											 piMATRIX * MatInt,
 											 piMATRIX * OriginalMatrix,
-											 UINT32 IncludeSiblings);
+											 bool IncludeSiblings);
 
 UCHAR _Buffer[256];
 
@@ -62,7 +62,7 @@ piMATRIX Matrix;
 
 	  ObjectPtr->matint = IdentityMatrix;
 
-	  ogrpMoveAndRotateSubObject(ObjectPtr,&Matrix,&Matrix,0);
+	  ogrpMoveAndRotateSubObject(ObjectPtr,&Matrix,&Matrix);
 //	obplyrUpdateThisObject(Object, &Pos, &Att);
 
 	return 0;
@@ -72,59 +72,37 @@ piMATRIX Matrix;
 // note: this routine doesn't catch siblings unless specified!
 UINT32 ogrpMoveAndRotateSubObject(OBJECT * ObjectPtr,
 									 piMATRIX * CurrentMatrix,
-									 piMATRIX * OriginalMatrix,
-									 UINT32 IncludeSiblings)
+									 piMATRIX * OriginalMatrix)
 {
-piMATRIX MatInt;
-
-	if (ObjectPtr == NULL)
-	{
+	if (PN_UNLIKELY(ObjectPtr == nullptr))
 		return 0;
-	}
 
-	MatInt = ObjectPtr->matint;
-	_MoveAndRotateSubObject(ObjectPtr,CurrentMatrix,&MatInt,OriginalMatrix,IncludeSiblings);
+	piMATRIX MatInt = ObjectPtr->matint;
+	_MoveAndRotateSubObject(ObjectPtr, CurrentMatrix, &MatInt, OriginalMatrix, false /*IncludeSiblings*/);
 
 	return 0;
 }
 
 // note: this routine doesn't catch siblings unless specified!
-static UINT32 _MoveAndRotateSubObject(OBJECT * ObjectPtrOrig,
+static UINT32 _MoveAndRotateSubObject(OBJECT * ObjectPtr,
 										 piMATRIX * CurrentMatrix,
 										 piMATRIX * MatInt,
 										 piMATRIX * OriginalMatrix,
-										 UINT32 IncludeSiblings)
+										 bool IncludeSiblings)
 {
-piMATRIX NewMatrix;
-piMATRIX LocalMatInt;
-OBJECT * ObjAtt;
-OBJECT * ObjectPtr;
-piMATRIX Matrix,CumulativeMatrix;
-piVECTOR Rot;
-FLOAT32 TempNum;
-OBJECTDOF * Dof;
-OBJECTSTATICDOF * DofStatic;
-UINT32 NotDOF;
-UINT32	DofFlags;
-
-
-	if (ObjectPtrOrig == NULL)
-	{
+	if (PN_UNLIKELY(ObjectPtr == nullptr || CurrentMatrix == nullptr))
 		return 0;
-	}
 
-	if (CurrentMatrix == NULL)
-	{
-		return 0;
-	}
-
-	if (IncludeSiblings != 0)
-	{
-		IncludeSiblings = 1;
-	}
-
-	ObjectPtr = ObjectPtrOrig;
-
+	piMATRIX NewMatrix;
+	piMATRIX LocalMatInt;
+	OBJECT * ObjAtt;
+	piMATRIX Matrix,CumulativeMatrix;
+	piVECTOR Rot;
+	FLOAT32 TempNum;
+	OBJECTDOF * Dof;
+	OBJECTSTATICDOF * DofStatic;
+	UINT32 NotDOF;
+	UINT32	DofFlags;
 
 	do
 	{
@@ -355,7 +333,7 @@ UINT32	DofFlags;
 					}
 				}
 
-				math3dMatrixMultiplyUnique(&CumulativeMatrix,&Dof->dofmatrix1,&Matrix);
+				math3dMatrixMultiplyUnique(&CumulativeMatrix, &Dof->dofmatrix1, &Matrix);
 			}
 			else
 			{
@@ -364,20 +342,20 @@ UINT32	DofFlags;
 
 			if (DofFlags & DOF_USE_DOFPOSMATRIX)
 			{
-				math3dMatrixMultiply(&CumulativeMatrix,&CumulativeMatrix,&Dof->dofposmatrix);
+				math3dMatrixMultiply(&CumulativeMatrix, &CumulativeMatrix, &Dof->dofposmatrix);
 			}
 
-			math3dMatrixMultiply(&CumulativeMatrix,&CumulativeMatrix,&Dof->dofmatrix2);
+			math3dMatrixMultiply(&CumulativeMatrix, &CumulativeMatrix, &Dof->dofmatrix2);
 
 			// voila, we should be done
-			math3dMatrixMultiplyUnique(&LocalMatInt,&CumulativeMatrix,MatInt);
-			if (OriginalMatrix != NULL)
+			math3dMatrixMultiplyUnique(&LocalMatInt, &CumulativeMatrix, MatInt);
+			if (OriginalMatrix != nullptr)
 			{
-				math3dMatrixMultiplyUnique(&NewMatrix,&LocalMatInt,OriginalMatrix);
+				math3dMatrixMultiplyUnique(&NewMatrix, &LocalMatInt, OriginalMatrix);
 			}
 			else
 			{
-				math3dMatrixMultiply(&NewMatrix,&CumulativeMatrix,&NewMatrix);
+				math3dMatrixMultiply(&NewMatrix, &CumulativeMatrix, &NewMatrix);
 			}
 
 			NotDOF = 0;
@@ -425,7 +403,7 @@ UINT32	DofFlags;
 			}
 		}
 
-		if (OriginalMatrix != NULL)
+		if (OriginalMatrix != nullptr)
 		{
 			ObjAtt = ObjectPtr;
 			do
@@ -433,12 +411,12 @@ UINT32	DofFlags;
 				ObjAtt->matint = *MatInt;
 
 				ObjAtt = ObjAtt->attached;
-			} while (ObjAtt != NULL);
+			} while (ObjAtt != nullptr);
 		}
 
 				// check for LODs
 		// if a LOD is not visible, and it's not a user-controlled vehicle
-		// don't bother updating all the submatricies
+		// don't bother updating all the sub-matricies
 		if (ObjectPtr->flags & OBJECT_LOD)
 		{
 		piVECTOR TempPos;
@@ -452,11 +430,11 @@ UINT32	DofFlags;
 			// if frame factor too low, force a relight on newly visible LODs
 			if (FrameFactor > 0.99)
 			{
-				obdrawProcessLODCallback(ObjectPtr,0,&TempPos,FALSE,0.0f,NULL);
+				obdrawProcessLODCallback(ObjectPtr, 0, &TempPos, FALSE, 0.0f, nullptr);
 			}
 			else
 			{
-				obdrawProcessLODCallback(ObjectPtr,0,&TempPos,TRUE,0.0f,NULL);
+				obdrawProcessLODCallback(ObjectPtr, 0, &TempPos, TRUE, 0.0f, nullptr);
 			}
 
 //			ObjectPtr->mat = NewMatrix;
@@ -467,7 +445,7 @@ UINT32	DofFlags;
 				!(ObjectPtr->flag2 & OBJECT_USERVEHICLE) &&
 				!(ObjectPtr->flag2 & OBJECT_SPECIAL_LOD))
 			{
-				if (IncludeSiblings == 1)
+				if (IncludeSiblings)
 				{
 					ObjectPtr = ObjectPtr->sibling;
 					continue;
@@ -486,23 +464,21 @@ UINT32	DofFlags;
 			continue;
 		}
 
-		if (ObjectPtr->child != NULL)
+		if (ObjectPtr->child != nullptr)
 		{
 			if (NotDOF == 1)
 			{
-				_MoveAndRotateSubObject(ObjectPtr->child,CurrentMatrix,MatInt,OriginalMatrix,1);
+				_MoveAndRotateSubObject(ObjectPtr->child, CurrentMatrix, MatInt, OriginalMatrix, true);
 			}
 			else
 			{
-				_MoveAndRotateSubObject(ObjectPtr->child,&NewMatrix,&LocalMatInt,OriginalMatrix,1);
+				_MoveAndRotateSubObject(ObjectPtr->child, &NewMatrix, &LocalMatInt, OriginalMatrix, true);
 			}
 		}
 
 		ObjectPtr = ObjectPtr->sibling;
 	}
-	while (ObjectPtr != NULL && IncludeSiblings == 1);
-
-
+	while (ObjectPtr != nullptr && IncludeSiblings);
 
 	return 0;
 }
@@ -511,14 +487,7 @@ UINT32	DofFlags;
 // obsolete, call obpoolFreeObjectCallback
 UINT32 ogrpFreeObjectGroup(OBJECT * ObjectPtr)
 {
-
 	obpoolFreeObjectCallback(ObjectPtr);
-
-	if (ObjectPtr == NULL)
-	{
-		return 0;
-	}
-
 	return 0;
 }
 
@@ -529,7 +498,7 @@ UINT32 ogrpSetDOFVariable(OBJECT * ObjectPtr, FLOAT32 VarContents, UINT32 CycleV
 {
 	FLOAT32 ProcessedVarContents;
 
-	if (ObjectPtr == NULL) return 1;
+	if (PN_UNLIKELY(ObjectPtr == nullptr)) return 1;
 
 	if((ObjectPtr->flags & OBJECT_DOF) && !(ObjectPtr->flag2 & OBJECT_MISSING))
 	{
@@ -712,7 +681,7 @@ OBJECTSTATICDOF * DofStatic;
 OBJECT * ObjectPtr;
 LOGICAL dofValid;
 
-	if (InObjectPtr == NULL)
+	if (PN_UNLIKELY(InObjectPtr == nullptr))
 	{
 		return 1;
 	}
@@ -826,7 +795,7 @@ LOGICAL dofValid;
 				Write_Debug("Invalid DOF data for object %s", ObjectPtr->name);
 			}
 
-			if (ObjectPtr->comment != NULL)
+			if (ObjectPtr->comment != nullptr)
 			{
 				// now parse dof parameters
 				//
@@ -1006,14 +975,14 @@ LOGICAL dofValid;
 		}
 
 
-		if (ObjectPtr->child != NULL)
+		if (ObjectPtr->child != nullptr)
 		{
 			ogrpParseDOFParameters(ObjectPtr->child,VarList,NumVars,MaxVarnameLength);
 		}
 
 		ObjectPtr = ObjectPtr->sibling;
 	}
-	while (ObjectPtr != NULL);
+	while (ObjectPtr != nullptr);
 
 
 	return 0;
@@ -1025,7 +994,7 @@ UINT32 ogrpSetObjectAndSubtreeToNotDraw(OBJECT * ObjectPtr)
 {
 OBJECT * Object;
 
-	if (ObjectPtr == NULL)
+	if (PN_UNLIKELY(ObjectPtr == nullptr))
 	{
 		return 0;
 	}
@@ -1037,12 +1006,12 @@ OBJECT * Object;
 
 	ObjectPtr->flags |= OBJECT_SKIPDRAWING;
 
-	if (ObjectPtr->child != NULL)
+	if (ObjectPtr->child != nullptr)
 	{
 		_SetObjectAndSubtreeToNotDraw(ObjectPtr->child);
 	}
 
-	for (Object = ObjectPtr->attached;Object != NULL;)
+	for (Object = ObjectPtr->attached;Object != nullptr;)
 	{
 		Object->flags |= OBJECT_SKIPDRAWING;
 
@@ -1057,26 +1026,26 @@ UINT32 _SetObjectAndSubtreeToNotDraw(OBJECT * ObjectPtr)
 {
 OBJECT * Object;
 
-	if (ObjectPtr == NULL)
+	if (PN_UNLIKELY(ObjectPtr == nullptr))
 	{
 		return 0;
 	}
 
 	ObjectPtr->flags |= OBJECT_SKIPDRAWING;
 
-	if (ObjectPtr->child != NULL)
+	if (ObjectPtr->child != nullptr)
 	{
 		_SetObjectAndSubtreeToNotDraw(ObjectPtr->child);
 	}
 
-	for (Object = ObjectPtr->attached;Object != NULL;)
+	for (Object = ObjectPtr->attached;Object != nullptr;)
 	{
 		Object->flags |= OBJECT_SKIPDRAWING;
 
 		Object = Object->attached;
 	}
 
-	if (ObjectPtr->sibling != NULL)
+	if (ObjectPtr->sibling != nullptr)
 	{
 		_SetObjectAndSubtreeToNotDraw(ObjectPtr->sibling);
 	}
@@ -1089,7 +1058,7 @@ UINT32 ogrpSetObjectAndSubtreeToDraw(OBJECT * ObjectPtr)
 {
 OBJECT * Object;
 
-	if (ObjectPtr == NULL)
+	if (PN_UNLIKELY(ObjectPtr == nullptr))
 	{
 		return 0;
 	}
@@ -1101,12 +1070,12 @@ OBJECT * Object;
 
 	ObjectPtr->flags &= ~OBJECT_SKIPDRAWING;
 
-	if (ObjectPtr->child != NULL)
+	if (ObjectPtr->child != nullptr)
 	{
 		_SetObjectAndSubtreeToDraw(ObjectPtr->child);
 	}
 
-	for (Object = ObjectPtr->attached;Object != NULL;)
+	for (Object = ObjectPtr->attached;Object != nullptr;)
 	{
 		Object->flags &= ~OBJECT_SKIPDRAWING;
 
@@ -1122,26 +1091,26 @@ UINT32 _SetObjectAndSubtreeToDraw(OBJECT * ObjectPtr)
 {
 OBJECT * Object;
 
-	if (ObjectPtr == NULL)
+	if (PN_UNLIKELY(ObjectPtr == nullptr))
 	{
 		return 0;
 	}
 
 	ObjectPtr->flags &= ~OBJECT_SKIPDRAWING;
 
-	if (ObjectPtr->child != NULL)
+	if (ObjectPtr->child != nullptr)
 	{
 		_SetObjectAndSubtreeToDraw(ObjectPtr->child);
 	}
 
-	for (Object = ObjectPtr->attached;Object != NULL;)
+	for (Object = ObjectPtr->attached;Object != nullptr;)
 	{
 		Object->flags &= ~OBJECT_SKIPDRAWING;
 
 		Object = Object->attached;
 	}
 
-	if (ObjectPtr->sibling != NULL)
+	if (ObjectPtr->sibling != nullptr)
 	{
 		_SetObjectAndSubtreeToDraw(ObjectPtr->sibling);
 	}
@@ -1155,7 +1124,7 @@ UINT32 ogrpHideObjectAndSubtree(OBJECT * ObjectPtr)
 {
 OBJECT * Object;
 
-	if (ObjectPtr == NULL)
+	if (PN_UNLIKELY(ObjectPtr == nullptr))
 	{
 		return 0;
 	}
@@ -1167,12 +1136,12 @@ OBJECT * Object;
 
 	ObjectPtr->flags &= ~OBJECT_VISIBLE;
 
-	if (ObjectPtr->child != NULL)
+	if (ObjectPtr->child != nullptr)
 	{
 		_HideObjectAndSubtree(ObjectPtr->child);
 	}
 
-	for (Object = ObjectPtr->attached;Object != NULL;)
+	for (Object = ObjectPtr->attached;Object != nullptr;)
 	{
 		Object->flags &= ~OBJECT_VISIBLE;
 
@@ -1187,26 +1156,26 @@ UINT32 _HideObjectAndSubtree(OBJECT * ObjectPtr)
 {
 OBJECT * Object;
 
-	if (ObjectPtr == NULL)
+	if (PN_UNLIKELY(ObjectPtr == nullptr))
 	{
 		return 0;
 	}
 
 	ObjectPtr->flags &= ~OBJECT_VISIBLE;
 
-	if (ObjectPtr->child != NULL)
+	if (ObjectPtr->child != nullptr)
 	{
 		_HideObjectAndSubtree(ObjectPtr->child);
 	}
 
-	for (Object = ObjectPtr->attached;Object != NULL;)
+	for (Object = ObjectPtr->attached;Object != nullptr;)
 	{
 		Object->flags &= ~OBJECT_VISIBLE;
 
 		Object = Object->attached;
 	}
 
-	if (ObjectPtr->sibling != NULL)
+	if (ObjectPtr->sibling != nullptr)
 	{
 		_HideObjectAndSubtree(ObjectPtr->sibling);
 	}
@@ -1219,7 +1188,7 @@ UINT32 ogrpShowObjectAndSubtree(OBJECT * ObjectPtr)
 {
 OBJECT * Object;
 
-	if (ObjectPtr == NULL)
+	if (PN_UNLIKELY(ObjectPtr == nullptr))
 	{
 		return 0;
 	}
@@ -1231,12 +1200,12 @@ OBJECT * Object;
 
 	ObjectPtr->flags |= OBJECT_VISIBLE;
 
-	if (ObjectPtr->child != NULL)
+	if (ObjectPtr->child != nullptr)
 	{
 		_ShowObjectAndSubtree(ObjectPtr->child);
 	}
 
-	for (Object = ObjectPtr->attached;Object != NULL;)
+	for (Object = ObjectPtr->attached;Object != nullptr;)
 	{
 		Object->flags |= OBJECT_VISIBLE;
 
@@ -1252,26 +1221,26 @@ UINT32 _ShowObjectAndSubtree(OBJECT * ObjectPtr)
 {
 OBJECT * Object;
 
-	if (ObjectPtr == NULL)
+	if (PN_UNLIKELY(ObjectPtr == nullptr))
 	{
 		return 0;
 	}
 
 	ObjectPtr->flags |= OBJECT_VISIBLE;
 
-	if (ObjectPtr->child != NULL)
+	if (ObjectPtr->child != nullptr)
 	{
 		_ShowObjectAndSubtree(ObjectPtr->child);
 	}
 
-	for (Object = ObjectPtr->attached;Object != NULL;)
+	for (Object = ObjectPtr->attached;Object != nullptr;)
 	{
 		Object->flags |= OBJECT_VISIBLE;
 
 		Object = Object->attached;
 	}
 
-	if (ObjectPtr->sibling != NULL)
+	if (ObjectPtr->sibling != nullptr)
 	{
 		_ShowObjectAndSubtree(ObjectPtr->sibling);
 	}
@@ -1282,21 +1251,21 @@ OBJECT * Object;
 
 UINT32 ogrpFindSubObjectByName(OBJECT ** ReturnObject,OBJECT * ObjectPtr, const char * Name)
 {
-	if (ObjectPtr == NULL)
+	if (PN_UNLIKELY(ObjectPtr == nullptr))
 	{
 		return 0;
 	}
 
-	if (ReturnObject == NULL)
+	if (PN_UNLIKELY(ReturnObject == nullptr))
 	{
 		return 0;
 	}
 
-	*ReturnObject = NULL;
+	*ReturnObject = nullptr;
 
 //	if (strncmp(Name,ObjectPtr->name,strlen(Name)) == 0 &&
 //		strlen(Name) == strlen(ObjectPtr->name))
-	if (ObjectPtr->name != NULL)
+	if (ObjectPtr->name != nullptr)
 	{
 		if (Name[0] == ObjectPtr->name[0])
 		{
@@ -1309,19 +1278,19 @@ UINT32 ogrpFindSubObjectByName(OBJECT ** ReturnObject,OBJECT * ObjectPtr, const 
 		}
 	}
 
-	if (ObjectPtr->child != NULL)
+	if (ObjectPtr->child != nullptr)
 	{
 		_FindSubObjectByName(ReturnObject,ObjectPtr->child,Name);
-		if ((*ReturnObject) != NULL)
+		if ((*ReturnObject) != nullptr)
 		{
 			return 0;
 		}
 	}
 
-//	if (ObjectPtr->attached != NULL)
+//	if (ObjectPtr->attached != nullptr)
 //	{
 //		_FindSubObjectByName(ReturnObject,ObjectPtr->child,Name);
-//		if ((*ReturnObject) != NULL)
+//		if ((*ReturnObject) != nullptr)
 //		{
 //			return 0;
 //		}
@@ -1334,23 +1303,23 @@ UINT32 _FindSubObjectByName(OBJECT ** ReturnObject,OBJECT * ObjectPtr, const cha
 {
 OBJECT * ObjSib;
 
-	if (ObjectPtr == NULL)
+	if (PN_UNLIKELY(ObjectPtr == nullptr))
 	{
 		return 0;
 	}
 
-	if (ReturnObject == NULL)
+	if (PN_UNLIKELY(ReturnObject == nullptr))
 	{
 		return 0;
 	}
 
-	*ReturnObject = NULL;
+	*ReturnObject = nullptr;
 
 	ObjSib = ObjectPtr;
 
 	do
 	{
-		if (ObjSib->name != NULL)
+		if (ObjSib->name != nullptr)
 		{
 			if (Name[0] == ObjSib->name[0])
 			{
@@ -1363,10 +1332,10 @@ OBJECT * ObjSib;
 			}
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_FindSubObjectByName(ReturnObject,ObjSib->child,Name);
-			if ((*ReturnObject) != NULL)
+			if ((*ReturnObject) != nullptr)
 			{
 				return 0;
 			}
@@ -1374,7 +1343,7 @@ OBJECT * ObjSib;
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 
 	return 0;
@@ -1382,17 +1351,17 @@ OBJECT * ObjSib;
 
 UINT32 ogrpFindSubObjectByDOFVarAndSubVar(OBJECT ** ReturnObject,OBJECT * ObjectPtr,UINT32 VarNum,UINT32 SubVarNum)
 {
-	if (ObjectPtr == NULL)
+	if (PN_UNLIKELY(ObjectPtr == nullptr))
 	{
 		return 0;
 	}
 
-	if (ReturnObject == NULL)
+	if (PN_UNLIKELY(ReturnObject == nullptr))
 	{
 		return 0;
 	}
 
-	*ReturnObject = NULL;
+	*ReturnObject = nullptr;
 
 	if (ObjectPtr->flags & OBJECT_DOF)
 	{
@@ -1404,10 +1373,10 @@ UINT32 ogrpFindSubObjectByDOFVarAndSubVar(OBJECT ** ReturnObject,OBJECT * Object
 		}
 	}
 
-	if (ObjectPtr->child != NULL)
+	if (ObjectPtr->child != nullptr)
 	{
 		_FindSubObjectByDOFVarAndSubVar(ReturnObject,ObjectPtr->child,VarNum,SubVarNum);
-		if ((*ReturnObject) != NULL)
+		if ((*ReturnObject) != nullptr)
 		{
 			return 0;
 		}
@@ -1421,12 +1390,12 @@ UINT32 _FindSubObjectByDOFVarAndSubVar(OBJECT ** ReturnObject,OBJECT * ObjectPtr
 {
 OBJECT* ObjSib;
 
-	if (ObjectPtr == NULL)
+	if (PN_UNLIKELY(ObjectPtr == nullptr))
 	{
 		return 0;
 	}
 
-	if (ReturnObject == NULL)
+	if (PN_UNLIKELY(ReturnObject == nullptr))
 	{
 		return 0;
 	}
@@ -1435,7 +1404,7 @@ OBJECT* ObjSib;
 
 	do
 	{
-		*ReturnObject = NULL;
+		*ReturnObject = nullptr;
 
 		if (ObjSib->flags & OBJECT_DOF)
 		{
@@ -1447,10 +1416,10 @@ OBJECT* ObjSib;
 			}
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_FindSubObjectByDOFVarAndSubVar(ReturnObject,ObjSib->child,VarNum,SubVarNum);
-			if ((*ReturnObject) != NULL)
+			if ((*ReturnObject) != nullptr)
 			{
 				return 0;
 			}
@@ -1458,7 +1427,7 @@ OBJECT* ObjSib;
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 
 	return 0;
@@ -1467,17 +1436,17 @@ OBJECT* ObjSib;
 
 UINT32 ogrpFindSubObjectByDOFVar(OBJECT ** ReturnObject,OBJECT * ObjectPtr,UINT32 VarNum)
 {
-	if (ObjectPtr == NULL)
+	if (PN_UNLIKELY(ObjectPtr == nullptr))
 	{
 		return 0;
 	}
 
-	if (ReturnObject == NULL)
+	if (PN_UNLIKELY(ReturnObject == nullptr))
 	{
 		return 0;
 	}
 
-	*ReturnObject = NULL;
+	*ReturnObject = nullptr;
 
 	if (ObjectPtr->flags & OBJECT_DOF)
 	{
@@ -1489,19 +1458,19 @@ UINT32 ogrpFindSubObjectByDOFVar(OBJECT ** ReturnObject,OBJECT * ObjectPtr,UINT3
 		}
 	}
 
-	if (ObjectPtr->child != NULL)
+	if (ObjectPtr->child != nullptr)
 	{
 		_FindSubObjectByDOFVar(ReturnObject,ObjectPtr->child,VarNum);
-		if ((*ReturnObject) != NULL)
+		if ((*ReturnObject) != nullptr)
 		{
 			return 0;
 		}
 	}
 
-//	if (ObjectPtr->attached != NULL)
+//	if (ObjectPtr->attached != nullptr)
 //	{
 //		_FindSubObjectByDOFVar(ReturnObject,ObjectPtr->child,VarNum);
-//		if ((*ReturnObject) != NULL)
+//		if ((*ReturnObject) != nullptr)
 //		{
 //			return 0;
 //		}
@@ -1515,12 +1484,12 @@ UINT32 _FindSubObjectByDOFVar(OBJECT ** ReturnObject,OBJECT * ObjectPtr,UINT32 V
 {
 OBJECT * ObjSib;
 
-	if (ObjectPtr == NULL)
+	if (PN_UNLIKELY(ObjectPtr == nullptr))
 	{
 		return 0;
 	}
 
-	if (ReturnObject == NULL)
+	if (PN_UNLIKELY(ReturnObject == nullptr))
 	{
 		return 0;
 	}
@@ -1530,7 +1499,7 @@ OBJECT * ObjSib;
 	do
 	{
 
-		*ReturnObject = NULL;
+		*ReturnObject = nullptr;
 
 		if (ObjSib->flags & OBJECT_DOF)
 		{
@@ -1542,10 +1511,10 @@ OBJECT * ObjSib;
 			}
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_FindSubObjectByDOFVar(ReturnObject,ObjSib->child,VarNum);
-			if ((*ReturnObject) != NULL)
+			if ((*ReturnObject) != nullptr)
 			{
 				return 0;
 			}
@@ -1553,7 +1522,7 @@ OBJECT * ObjSib;
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 
 	return 0;
@@ -1561,7 +1530,7 @@ OBJECT * ObjSib;
 
 static UINT32 FreeObjectTree(OBJECT * Object)
 {
-    if(Object)
+    if(PN_LIKELY(Object))
     {
 		FreeObjectTree(Object->child);
 		FreeObjectTree(Object->sibling);
@@ -1583,12 +1552,12 @@ UINT32 ogrpMakeObjectAChildOfAnotherObject(OBJECT * Parent,OBJECT * NewChild)
 {
 OBJECT * Object;
 
-	if (Parent == NULL || NewChild == NULL)
+	if (Parent == nullptr || NewChild == nullptr)
 	{
 		return 0;
 	}
 
-	if (Parent->child == NULL)
+	if (Parent->child == nullptr)
 	{
 		Parent->child = NewChild;
 		return 0;
@@ -1596,7 +1565,7 @@ OBJECT * Object;
 
 	Object = Parent->child;
 
-	while (Object->sibling != NULL)
+	while (Object->sibling != nullptr)
 	{
 		Object = Object->sibling;
 	}
@@ -1621,7 +1590,7 @@ static UINT32 _SetObjectAndTreeAsCockpit(OBJECT * Object)
 OBJECT * ObjAtt,* ObjSib;
 //UINT32 i;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -1656,17 +1625,17 @@ OBJECT * ObjAtt,* ObjSib;
 */
 			ObjAtt = ObjAtt->attached;
 		}
-		while (ObjAtt != NULL);
+		while (ObjAtt != nullptr);
 
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_SetObjectAndTreeAsCockpit(ObjSib->child);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 	return 0;
 }

@@ -2,8 +2,8 @@
 
 #include "teul/teulTime.h"
 
-namespace ww2 { class Client ; }
-struct ENDPOINT ;
+namespace ww2 { class Client; }
+struct ENDPOINT;
 
 //! @namespace Teul
 //! @brief TeulKit Networking API members.
@@ -65,7 +65,7 @@ namespace Teul
  *  "m_connected" is set to true once a TCP connection exists.
  *
  *  "m_loggedIn" is set to true once a player-level connection
- *  has been established and the conncetion is ready for client-
+ *  has been established and the connection is ready for client-
  *  level usage.
  *
  *  "m_finished" is set to true once either the connection has
@@ -86,112 +86,112 @@ namespace Teul
 //! @note In future may also contain server-specific authentication info.
 struct ServerAddr
 {
-	UINT32 m_hostIP ;			//! IPv4 address of remote hsot.
-	UINT16 m_port ;				//! Port to connect to.
-} ;
+	UINT32 m_hostIP;			//! IPv4 address of remote host.
+	UINT16 m_port;				//! Port to connect to.
+};
 
 //! @class Teul::PlayerIdent
 //! @brief Description of a player for authentication/login purposes:
 struct PlayerIdent
 {
-	playerid_t m_playerID ;		//! 0 or the playerID for auth-bypass.
-	UINT32 m_otp ;				//! One Time Password used for authentication.
-	UINT32 m_clientVersion ;	//! UINT32 representation of client version.
-} ;
+	playerid_t m_playerID;		//! 0 or the playerID for auth-bypass.
+	UINT32 m_otp;				//! One Time Password used for authentication.
+	UINT32 m_clientVersion;	//! UINT32 representation of client version.
+};
 
 class Connection
 {
 	//! Enumeration of host types.
-	public: enum HostType { Map, Chat, Cell, NumHostTypes } ;
+	public: enum HostType { Map, Chat, Cell, NumHostTypes };
 
 	//! Default constructor disallowed.
 	private: Connection() {}
 
 	//! @brief Initiate a new connection and, upon completion, automatically perform authentication.
 	//! @note On-stack construction is not allowed; must be created with operator "new".
-	public: Connection(HostType _type, const ServerAddr& _serverInfo, const PlayerIdent& _playerIdent, UINT32 _timeoutMS) ;
+	public: Connection(HostType _type, const ServerAddr& _serverInfo, const PlayerIdent& _playerIdent, UINT32 _timeoutMS);
 
 	// Set to protected to disable on-stack construction.
-	protected: virtual ~Connection() ;
+	protected: virtual ~Connection();
 
 	//////////////////////////////////////////////////////////////////////
 	//// Main operational functions.
 
 	//! @brief Start the connection (connect to host).
-	public: bool start(ww2::Client* client) ;
+	public: bool start(ww2::Client* client);
 
 	//! @brief Send authentication to host.
 	//! Should be called from within onConnect().
-	public: void login() ;
+	public: void login();
 
 	//! @brief Close up and free a connection.
-	public: virtual void close() ;
+	public: virtual void close();
 
 	//////////////////////////////////////////////////////////////////////
 	//// Event handlers.
 
 	//! @brief Per-object notification of a successful connection.
-	public: virtual void onConnect(ww2::Client* client) = 0 ;
+	public: virtual void onConnect(ww2::Client* client) = 0;
 
 	//! @brief Per-object notification of an error.
-	public: virtual void onError(ww2::Client* client, SINT32 error) ;
+	public: virtual void onError(ww2::Client* client, SINT32 error);
 
 	//! @brief Per-object notification of a successful login -- connection is now in service.
-	public: virtual void onLogin(ww2::Client* client) = 0 ;
+	public: virtual void onLogin(ww2::Client* client) = 0;
 
 	//! @brief Per-object notification of a login failure.
 	//! @param[in] client The Client responsible for this connection.
 	//! @param[in] result Negative errno code (e.g. -Teul::Errors::LoginFail_SessionValidation).
-	public: virtual void onLoginFail(ww2::Client* client, SINT32 result) = 0 ;
+	public: virtual void onLoginFail(ww2::Client* client, SINT32 result) = 0;
 
 	//////////////////////////////////////////////////////////////////////
 	// Evaluators.
 
 	//! @brief Determine if this connection is in a serviceable state.
-	public: bool isInService() const { return m_loggedIn && connected() ; }
+	public: bool isInService() const { return m_loggedIn && connected(); }
 
 	//! @brief Determine if we think this connection is connected to the server.
-	public: bool connected() const { return m_teulIndex >= 0 && m_connected == true ; }
+	public: bool connected() const { return m_teulIndex >= 0 && m_connected == true; }
 
 	//! @brief Determine if the connection has completed connection/login.
-	public: bool complete() const { return (m_finished || m_loggedIn) ; }
+	public: bool complete() const { return (m_finished || m_loggedIn); }
 
-	//! @brief Determine if the connection has decided it needs to di.
-	public: bool terminated() const { return (m_disposable) ; }
+	//! @brief Determine if the connection has decided it needs to die.
+	public: bool terminated() const { return (m_disposable); }
 
 	//! @brief Determine if the login attempt has failed.
-	public: bool hasExpired() const { return (m_started + m_timeoutMS <= teulClock64) ; }
+	public: bool hasExpired() const { return (m_started + m_timeoutMS <= teulClock64); }
 
 public:
 	//////////////////////////////////////////////////////////////////////
 	//// [INTERNAL] Service-level event handling.
 
 	//! @brief Low-level (teulKit) interception of login results; do not override.
-	public: void onLoginResult(SINT32 result) ;
+	public: void onLoginResult(SINT32 result);
 
 	//! @brief Handle a connection success and forward it to the correct object.
-	public: static void s_onConnect(ENDPOINT& endpoint) ;
+	public: static void s_onConnect(ENDPOINT& endpoint);
 
-	//! @brief Handle a connection error and forward it tothe correct object.
-	public: static void s_onError(SINT32 teulIndex, const UCHAR* data, SINT32 size, const TEUL_CALLBACK* callback, SINT32 error) ;
+	//! @brief Handle a connection error and forward it to the correct object.
+	public: static void s_onError(SINT32 teulIndex, const UCHAR* data, SINT32 size, const TEUL_CALLBACK* callback, SINT32 error);
 
 	//! @brief expire connections.
-	public: static void expire() ;
+	public: static void expire();
 
 public:
-	HostType	m_type ;		//! Which type of host attempt is for.
-	ServerAddr	m_serverAddr ;	//! IP & port of server, etc.
-	PlayerIdent	m_playerIdent ;	//! Player ID, OTP, etc.
-	TeulTimeMS	m_timeoutMS ;	//! How long to allow the connection.
+	HostType	m_type;			//! Which type of host attempt is for.
+	ServerAddr	m_serverAddr;	//! IP & port of server, etc.
+	PlayerIdent	m_playerIdent;	//! Player ID, OTP, etc.
+	TeulTimeMS	m_timeoutMS;	//! How long to allow the connection.
 
-	SINT32		m_teulIndex ;	//! TeulIndex of the connection attempting the login.
-	UINT32		m_attemptID ;	//! Client's reference for this attempt.
+	SINT32		m_teulIndex;	//! TeulIndex of the connection attempting the login.
+	UINT32		m_attemptID;	//! Client's reference for this attempt.
 
-	TeulTimeMS	m_started ;		//! When the attempt started (for timeouts).
-	bool		m_connected ;	//! True once we're connected.
-	bool		m_loggedIn ;	//! Set true once we have logged in.
-	bool		m_finished ;	//! True when we have completed, failed or timed out.
-	bool		m_disposable ;	//! Ready to be garbage collected.
+	TeulTimeMS	m_started;		//! When the attempt started (for timeouts).
+	bool		m_connected;	//! True once we're connected.
+	bool		m_loggedIn;		//! Set true once we have logged in.
+	bool		m_finished;		//! True when we have completed, failed or timed out.
+	bool		m_disposable;	//! Ready to be garbage collected.
 };
 
 } // namespace Teul

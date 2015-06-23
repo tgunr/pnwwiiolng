@@ -23,7 +23,7 @@ public:
 	}
 	virtual ~Control() {}
 	
-	virtual int Invoke(Message* msg=NULL); ///< adds "when" and "source" fields
+	virtual int Invoke(Message* msg=nullptr); ///< adds "when" and "source" fields
 	
 	void SetLabel(const char* const label) { _label = label; }
 	void SetLabel(const wchar_t* const label) { _label = label; }

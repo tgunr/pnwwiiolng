@@ -119,7 +119,7 @@ void Scenario::Init(const char* p)
 	// scenario file that this scenario was created from
 	path = p;
 
-	const char* key = NULL;
+	const char* key = nullptr;
 
 	key = Config("name");
 	if(key) name = key;
@@ -138,7 +138,7 @@ const char* Scenario::Config(const char* name)
 	if(key != end())
 		return key->second.c_str();
 
-	return NULL;
+	return nullptr;
 }
 
 bool Scenario::GetParent(jsContentData& data)
@@ -253,7 +253,7 @@ void ScenarioPlayer::Receive(const char* name, const char* value)
 // get our current weapon
 WEAPON_SPEC ScenarioPlayer::GetWeaponSpec()
 {
-	WEAPON_SPEC spec(0, 0, 0, 0) ;
+	WEAPON_SPEC spec(0, 0, 0, 0);
 
 	std::string key = GetAttribute("weapon");
 
@@ -395,8 +395,8 @@ ScenarioManager::ScenarioManager() :
 #ifdef BETA_RELEASE
 	_editMode(false),
 #endif
-	_scenario(NULL),
-	_map(NULL),
+	_scenario(nullptr),
+	_map(nullptr),
     _terrainReadyToLoad(false),
 	_scenarioIsComplete(true),
 	_objectsLoaded(false),
@@ -773,7 +773,7 @@ void ScenarioManager::UpdatePlayer(const char* callsign, const char* state, cons
 		return;
 	}
 
-	ScenarioPlayer* player = NULL;
+	ScenarioPlayer* player = nullptr;
 
 	if(found != players.end())
 		player = &found->second;
@@ -813,10 +813,10 @@ bool ScenarioManager::Stop()
 	if(_map)
 	{
 		_map->setExpired();
-		_map = NULL;
+		_map = nullptr;
 	}
 
-	_scenario = NULL;
+	_scenario = nullptr;
 
 	// kill spawn override
 	OverrideSpawner = NO_OVERRIDE;
@@ -942,7 +942,7 @@ bool ScenarioVehicleMask::IsMatch(const vehType* vtype)
 // returns the closest match to our vehicle type
 const ScenarioVehicleMask* ScenarioManager::VehicleMask(const vehType* vtype, bool best, bool spawnable)
 {
-	const ScenarioVehicleMask* match = NULL;
+	const ScenarioVehicleMask* match = nullptr;
 	UINT32 specificity = 0;
 
 	for(size_t i = 0; i < vehicles.size(); i++)
@@ -952,7 +952,7 @@ const ScenarioVehicleMask* ScenarioManager::VehicleMask(const vehType* vtype, bo
 		if(!RoundRelevant(mask))
 			continue;
 
-		if(spawnable && FindObject(mask->name.c_str(), ScenarioObject::SPAWN, true) == NULL)
+		if(spawnable && FindObject(mask->name.c_str(), ScenarioObject::SPAWN, true) == nullptr)
 			continue;
 
 		if(!mask->IsMatch(vtype))
@@ -1309,7 +1309,7 @@ ScenarioPlayer* ScenarioManager::GetPlayer(const wchar_t* callsign)
 {
 	ChatHandle handle = 0;
 
-	if(callsign == NULL)
+	if(callsign == nullptr)
 	{
 		if(!Online)
 			handle = chatGetHandle(L"offline");
@@ -1322,14 +1322,14 @@ ScenarioPlayer* ScenarioManager::GetPlayer(const wchar_t* callsign)
 	}
 
 	if(!handle)
-		return NULL;
+		return nullptr;
 
 	SCENPLAYER_MAP::iterator found = players.find(handle);
 
 	if(found != players.end())
 		return &found->second;
 
-	return NULL;
+	return nullptr;
 }
 
 int ScenarioManager::GetRound()
@@ -1491,7 +1491,7 @@ void ScenarioManager::SetVehicleIcon(vehVehicle* vehicle)
 
 bool ScenarioManager::ValidVehicle(const vehType* vtype)
 {
-	return (VehicleMask(vtype, false) != NULL);
+	return (VehicleMask(vtype, false) != nullptr);
 }
 
 const ScenarioWorldObject* ScenarioManager::VehicleSpawn(const vehType* vtype)
@@ -1517,12 +1517,12 @@ const ScenarioWorldObject* ScenarioManager::VehicleSpawn(const vehType* vtype)
 	}
 
 	// didn't find one
-	return NULL;
+	return nullptr;
 }
 
 bool ScenarioManager::IsActive() const
 {
-	return (_scenario != NULL);
+	return (_scenario != nullptr);
 }
 
 bool ScenarioManager::IsScenarioComplete() const
@@ -1538,7 +1538,7 @@ bool ScenarioManager::IsCustomTerrain() const
 // returns true is not custom terrain or we have custom terrain and its loaded
 bool ScenarioManager::IsTerrainLoaded() const
 {
-	return (IsCustomTerrain() && _map == NULL) ? false : true;
+	return (IsCustomTerrain() && _map == nullptr) ? false : true;
 }
 
 int ScenarioManager::AddObject(ScenarioObject* ob)
@@ -1652,7 +1652,7 @@ int ScenarioManager::AddContent(const char* line)
 	// this is our new object to add;
 	// content types below will set this
 	// if valid data is found
-	ScenarioObject* newOb = NULL;
+	ScenarioObject* newOb = nullptr;
 
     if(strcasecmp(cc.command, "river") == 0)
     {
@@ -2528,7 +2528,7 @@ const wchar_t* ScenarioManager::GetLoc(const char* key)
 	// try our local scenario localization table
 	if(IsActive() && key && *key)
 	{
-		const wchar_t* loc = NULL;
+		const wchar_t* loc = nullptr;
 
 		char buffer[80+1];
 		int team = GetTeam();
@@ -2558,7 +2558,7 @@ const wchar_t* ScenarioManager::GetLoc(const char* key)
 	}
 
 	// otherwise fall back to the main ui loc string lookup
-	return NULL;
+	return nullptr;
 }
 
 const char* ScenarioManager::MapName()
@@ -2646,7 +2646,7 @@ bool ScenarioManager::CreateAmmo(const char* name, Vec3d& position, Vec3d& dir)
 
 	FLOAT64VECTOR zero = {0,0,0};
 	FLOAT64VECTOR Pos = {0,0,0};
-	weapAmmoType* AmmoType = NULL;
+	weapAmmoType* AmmoType = nullptr;
 	piMATRIX FireAtt = IdentityMatrix;
 
 	weapFindAmmoTypeByName(&AmmoType, (UCHAR*)name);
@@ -2669,7 +2669,7 @@ bool ScenarioManager::CreateAmmo(const char* name, Vec3d& position, Vec3d& dir)
 	}
 
 	// fire our round
-	weapFireRound(&zero, AmmoType, &Pos, &zero, &FireAtt, frametime/ 1000,  Flags, NULL, &Pos, 0, NULL);
+	weapFireRound(&zero, AmmoType, &Pos, &zero, &FireAtt, frametime/ 1000,  Flags, nullptr, &Pos, 0, nullptr);
 
 	return true;
 }
@@ -2757,7 +2757,7 @@ bool ScenarioManager::CreateEmitter(ScenarioObject* ob)
 	//	return false;
 
 	const Vec3f n = Vec3f(0, 0, -1);
-	TransformEffect* te = TransformEffect::AddEffect(emitter->data.c_str(), n, -1, NULL);
+	TransformEffect* te = TransformEffect::AddEffect(emitter->data.c_str(), n, -1, nullptr);
 
 	if(te)
 	{
@@ -3255,7 +3255,7 @@ void ScenarioManager::LoadTerrain()
 	}
 
 	if(persIsPersonaVehicleType(VEH_TYPE_PERSON))
-		fpFPSAreaChecks(NULL, 0.0f, true);
+		fpFPSAreaChecks(nullptr, 0.0f, true);
 
 	// setup any terrain objects that require the terrain to be created first
 	LoadObjects(ScenarioObject::ON_TERRAIN_LOADED);
@@ -3384,7 +3384,7 @@ bool ScenarioManager::SaveContent(const char* path)
 
 void ScenarioManager::RunObject(const char* name, int load)
 {
-	RunObject(name, load, NULL);
+	RunObject(name, load, nullptr);
 }
 
 void ScenarioManager::RunObject(const char* name, int load, const char* data)
@@ -3405,7 +3405,7 @@ void ScenarioManager::RunObject(const char* name, int load, const char* data)
 
 void ScenarioManager::RunObject(ScenarioObject::TYPE type, int load)
 {
-	RunObject(type, load, NULL);
+	RunObject(type, load, nullptr);
 }
 
 void ScenarioManager::RunObject(ScenarioObject::TYPE type, int load, const char* data)
@@ -3862,7 +3862,7 @@ void ScenarioManager::LoadObject(ScenarioObject* ob, UINT32 loadFlags, const cha
 			if(!volume) return;
 
 			Vec3d& dim = volume->dimensions;
-			dGeomID geom = NULL;
+			dGeomID geom = nullptr;
 
 			switch(volume->shape)
 			{
@@ -3972,7 +3972,7 @@ void ScenarioManager::UnloadObject(ScenarioObject* ob)
 					}
 				}
 
-				ob->resource = NULL;
+				ob->resource = nullptr;
 			}
 		}
 		break;
@@ -3982,7 +3982,7 @@ void ScenarioManager::UnloadObject(ScenarioObject* ob)
 			{
 				TransformEffect* effect = static_cast<TransformEffect*>(ob->resource);
 				if(effect) effect->kill();
-				ob->resource = NULL;
+				ob->resource = nullptr;
 			}
 		}
 		break;
@@ -4003,7 +4003,7 @@ void ScenarioManager::UnloadObject(ScenarioObject* ob)
 		case ScenarioObject::LOCATION:
 		{
 			TUT_MGR->RemoveHandler(ob->data.c_str());
-			ob->resource = NULL;
+			ob->resource = nullptr;
 		}
 		break;
 		case ScenarioObject::BOUNDARY:
@@ -4026,7 +4026,7 @@ void ScenarioManager::UnloadObject(ScenarioObject* ob)
 			if(ob->resource)
 				dGeomDestroy((dGeomID)ob->resource);
 
-			ob->resource = NULL;
+			ob->resource = nullptr;
 		}
 		break;
 		case ScenarioObject::VOLUME:
@@ -4036,7 +4036,7 @@ void ScenarioManager::UnloadObject(ScenarioObject* ob)
 			if(ob->resource)
 				dGeomDestroy((dGeomID)ob->resource);
 
-			ob->resource = NULL;
+			ob->resource = nullptr;
 		}
 		break;
 		case ScenarioObject::WAYPOINT:
@@ -4062,7 +4062,7 @@ void ScenarioManager::UnloadObject(ScenarioObject* ob)
 			}
 
 			// reset our ptr
-			ob->resource = NULL;
+			ob->resource = nullptr;
 		}
 		break;
 		case ScenarioObject::HANDLER:
@@ -4124,7 +4124,7 @@ ScenarioObject* ScenarioManager::FindObject(const char* name, ScenarioObject::TY
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void ScenarioManager::LoadObjects(UINT32 loadFlags)
@@ -4162,7 +4162,7 @@ ScenarioArea* ScenarioManager::FindArea(const char* name)
 			return dynamic_cast<ScenarioArea*>(ob);
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 void ScenarioManager::LoadAreas()
@@ -4192,7 +4192,7 @@ void ScenarioManager::LoadContent()
 	jsContentData mapPack;
 
 	// look up our mappack content data
-	if(_scenario->GetParent(mapPack) && mapPack.includes != NULL)
+	if(_scenario->GetParent(mapPack) && mapPack.includes != nullptr)
 	{
 		std::string content;
 
@@ -4317,7 +4317,7 @@ void ScenarioManager::RunEvent(ScenarioEvent* evt)
 				if(sound && sound->id == -1)
 				{
 					evt->nextEvent = frametime + evt->eventInterval;
-					evt->resource = NULL;
+					evt->resource = nullptr;
 				}
 			}
 			break;
@@ -4338,7 +4338,7 @@ void ScenarioManager::RunEvent(ScenarioEvent* evt)
 				{
 					// we're done
 					evt->nextEvent = frametime + evt->eventInterval;
-					evt->resource = NULL;
+					evt->resource = nullptr;
 					evt->run = -1;
 					fx->position.set(0, 0, 0);
 				}
@@ -4363,7 +4363,7 @@ void ScenarioManager::RunEvent(ScenarioEvent* evt)
 				{
 					// we're done
 					evt->nextEvent = frametime + evt->eventInterval;
-					evt->resource = NULL;
+					evt->resource = nullptr;
 					evt->run = -1;
 					fp->Update(false);
 				}
@@ -4392,7 +4392,7 @@ void ScenarioManager::RunEvent(ScenarioEvent* evt)
 				{
 					// we're done
 					evt->nextEvent = frametime + evt->eventInterval;
-					evt->resource = NULL;
+					evt->resource = nullptr;
 					evt->run = -1;
 				}
 				else
@@ -4420,7 +4420,7 @@ void ScenarioManager::RunEvent(ScenarioEvent* evt)
 				{
 					// we're done
 					evt->nextEvent = frametime + evt->eventInterval;
-					evt->resource = NULL;
+					evt->resource = nullptr;
 					evt->run = -1;
 				}
 				else
@@ -4444,7 +4444,7 @@ void ScenarioManager::RunEvent(ScenarioEvent* evt)
 			break;
 			default:
 				evt->nextEvent = frametime + evt->eventInterval;
-				evt->resource = NULL;
+				evt->resource = nullptr;
 				evt->run = -1;
 			break;
 		}
@@ -4563,7 +4563,7 @@ void ScenarioManager::SetTerrain(const char* name)
 		if(_map)
 			_map->setExpired();
 
-		_map = NULL;
+		_map = nullptr;
 
 		LoadTerrain();
 	}
@@ -4765,8 +4765,8 @@ void ScenarioFPSFX::DoFX()
 		if(!hits.empty())
 		{
 			const colliderQuery::Collision& hit = hits.at(0);
-			const char* fx = NULL;
-			const char* sound = NULL;
+			const char* fx = nullptr;
+			const char* sound = nullptr;
 
 			position = physicsPhysicalToGame(hit.pos);
 
@@ -4844,7 +4844,7 @@ void ScenarioFPSFX::DoFX()
 				Vec3d n = hit.normal;
 				n.z() = -n.z();
 
-				TransformEffect* te = TransformEffect::AddEffect(fx, n, 0, NULL);
+				TransformEffect* te = TransformEffect::AddEffect(fx, n, 0, nullptr);
 
 				if(te)
 				{
@@ -4915,7 +4915,7 @@ void ScenarioFirepoint::Update(bool firing)
 		}
 
 		// save which vehicle we are managing this run
-		resource = NULL;
+		resource = nullptr;
 	}
 
 	/*

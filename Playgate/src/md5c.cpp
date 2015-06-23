@@ -368,10 +368,10 @@ void getMD5FromString (char *string, unsigned char *digest)
 int getMD5FromFile (char *filename, unsigned char *digest)
 {
 	if ( !filename || !digest )
-		return FALSE ;
+		return FALSE;
 
-	FILE	*file = NULL;
-	if ( fopen_s(&file, filename, "rb") != 0 || NULL == file )
+	FILE	*file = nullptr;
+	if ( fopen_s(&file, filename, "rb") != 0 || nullptr == file )
 		return FALSE;
 
 	MD5_CTX	context;

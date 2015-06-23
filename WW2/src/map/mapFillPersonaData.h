@@ -8,5 +8,5 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-extern void mapFillPersonaData(const class Player* player) ;
+extern void mapFillPersonaData(const class Player* player);
 

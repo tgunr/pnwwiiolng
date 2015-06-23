@@ -67,7 +67,7 @@ piVECTOR	  faces[6][4]={{{-1, 1, 1},
     lstrcpy(texname, tname);
 
     lpobj = obmainGetNewObject();
-    if (lpobj == NULL)
+    if (lpobj == nullptr)
     {
       return(FALSE);
     }

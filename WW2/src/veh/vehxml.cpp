@@ -27,7 +27,7 @@ xmlDocPtr vehxmlLoad(const char* name, xmlInputOpenCallback openfn, xmlInputRead
 {
 	xmlRegisterInputCallbacks(xmlinputmatch, openfn, readfn, closefn);
 
-	xmlDocPtr doc = xmlReadFile(name, NULL, XML_PARSE_RECOVER);
+	xmlDocPtr doc = xmlReadFile(name, nullptr, XML_PARSE_RECOVER);
 	if(doc)
 		vehxmlExpandVehicleNodes(doc);
 
@@ -73,7 +73,7 @@ static void vehxmlExpandVehicleNodes(xmlDocPtr doc)
 
 static void vehxmlAddVehicleFile(xmlDocPtr doc, xmlNodePtr parentnode, const char* filename)
 {
-	xmlDocPtr vehdoc = xmlReadFile(filename, NULL, XML_PARSE_RECOVER);
+	xmlDocPtr vehdoc = xmlReadFile(filename, nullptr, XML_PARSE_RECOVER);
 	if(!vehdoc) return;
 
 	xmlChar* vehid = xmlGetProp(parentnode, (xmlChar*)"id");
@@ -116,8 +116,8 @@ static void vehxmlAddVehicleFile(xmlDocPtr doc, xmlNodePtr parentnode, const cha
 static void vehxmlExpandIncludeNode(xmlNodePtr parentnode, xmlNodePtr node, const char* dir)
 {
 	xmlChar* xfile = xmlGetProp(node, (xmlChar*)"file");
-	xmlDocPtr includedoc = NULL;
-	xmlNodePtr includenode = NULL;
+	xmlDocPtr includedoc = nullptr;
+	xmlNodePtr includenode = nullptr;
 
 	std::string filename = dir;
 	if(xfile)
@@ -133,11 +133,9 @@ static void vehxmlExpandIncludeNode(xmlNodePtr parentnode, xmlNodePtr node, cons
 			filename += (char*)xfile;
 		}
 
-#if !defined(USE_OSG)
 // so we can xmlify stuff for OSG without worrying about old code
 		if(filename.find(".mass.xml") != std::string::npos)
-#endif
-		includedoc = xmlReadFile(filename.c_str(), NULL, XML_PARSE_RECOVER);
+		includedoc = xmlReadFile(filename.c_str(), nullptr, XML_PARSE_RECOVER);
 		xmlFree(xfile);
 	}
 

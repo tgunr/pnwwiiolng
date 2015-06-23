@@ -57,7 +57,7 @@ enum ENUM_TERRAIN_COLOR
 
     MAX_TERRAIN_COLORS
 
-} ;
+};
 
 	extern LOGICAL trnskyInit(SINT8* name, SINT32 mesh, FLOAT32 scale);
 	extern LOGICAL trnskyUpdate(void);

@@ -246,7 +246,7 @@ void ogl::SetVertexAttribPointer(unsigned int index,
                                  const GLvoid* ptr)
 {
     static int crtSize[MAX_VERTEX_ATTRIBUTES] = {-1};
-    static unsigned int crtType[MAX_VERTEX_ATTRIBUTES] = {-1};
+    static unsigned int crtType[MAX_VERTEX_ATTRIBUTES] = {0xffffffff};
     static int crtStride[MAX_VERTEX_ATTRIBUTES] = {-1};
 
     UpdateArrayBufferContext();

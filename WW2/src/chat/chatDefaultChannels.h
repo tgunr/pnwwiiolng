@@ -23,6 +23,6 @@ namespace Chat
 	,		SQUAD_CHANNEL
 	,		SIDE_OPS_CHANNEL
 	,		SIDE_HELP_CHANNEL
-	} ;
+	};
 }
 

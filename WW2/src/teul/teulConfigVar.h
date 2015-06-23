@@ -1,6 +1,5 @@
 #pragma once
 
-#include "dbug/dbug.h"			// For LogAbort
 #include "str/strdupptr.h"
 
 enum ConfigVarType
@@ -74,6 +73,15 @@ namespace Teul
 		static bool LoadedOSConfig();
 		//! Will be true if we loaded either defaults file.
 		static bool LoadedConfig() { return LoadedGeneralConfig() || LoadedOSConfig(); }
+
+		//! Dump current config vars to stdout and exit.
+		static void PrintCurrentVars();
+
+		//! Generate a default config file to specified filename and exit.
+		static void Generate(const char* filename_);
+
+		//! Check that all required variables are set.
+		static void CheckConfiguration();
 
 	protected:
 		void Initialize();

@@ -26,7 +26,7 @@
 
 struct AAStatus
 {
-	static const UINT32 _SAVE_INTERVAL = 120 ;	// Save once every 2 minutes
+	static const UINT32 _SAVE_INTERVAL = 120;	// Save once every 2 minutes
 	AAStatus(UINT32 priorPlayedTime)
 		: m_priorPlayedTime(priorPlayedTime)
 		, m_state(0)
@@ -34,14 +34,14 @@ struct AAStatus
 		, m_nextSaveTime(teulTime() + _SAVE_INTERVAL)
 		, m_playedHours(0)
 		{}
-	UINT32		m_priorPlayedTime ;
-	UINT32		m_state ;
-	UINT32		m_lastNotice ;
-	UINT32		m_nextSaveTime ;
-	UINT16		m_playedHours ;
-} ;
+	UINT32		m_priorPlayedTime;
+	UINT32		m_state;
+	UINT32		m_lastNotice;
+	UINT32		m_nextSaveTime;
+	UINT16		m_playedHours;
+};
 
-static PLAYERS g_minors ;
+static PLAYERS g_minors;
 
 //////////////////////////////////////////////////////////////////////
 // Save the status of a player
@@ -49,23 +49,23 @@ static PLAYERS g_minors ;
 static void _saveMinorUsage(Player* player)
 {
 	// Save their accrued time
-	const UINT32 played = player->m_antiAddiction->m_priorPlayedTime ;
+	const UINT32 played = player->m_antiAddiction->m_priorPlayedTime;
 	if ( played > 0 || (player->timeIn > 0 && teulTime() > player->timeIn) )
 	{
-		UINT32 accumulated = (teulTime() - player->timeIn) + played ;
+		UINT32 accumulated = (teulTime() - player->timeIn) + played;
 		DBThread::Do(DBThread::Default
 			, "REPLACE INTO wwii.minor_usage (`playerid`,`seconds`,`expires`)"
 				"VALUES(%u,%u,DATE_ADD(NOW(), INTERVAL %u MINUTE))"
 				, player->playerID()
 				, accumulated
 				, AntiAddiction::SLEEP_HOURS * host_config.arena.minutesPerAAHour
-		) ;
+		);
 
-		player->m_antiAddiction->m_nextSaveTime = teulTime() + AAStatus::_SAVE_INTERVAL ;
+		player->m_antiAddiction->m_nextSaveTime = teulTime() + AAStatus::_SAVE_INTERVAL;
 
 		dbugLog(_FLD, "t:%d p:%u c:%s saving accumulated played time %u seconds"
 						, player->teulIndex(), player->playerID(), player->callsign()
-						, accumulated) ;
+						, accumulated);
 	}
 }
 
@@ -75,19 +75,19 @@ static void _saveMinorUsage(Player* player)
 void
 mmAddMinor(Player* player, UINT32 priorPlayedTime)
 {
-	assert( player != NULL ) ;
-	assert( player->m_antiAddiction == NULL ) ;
+	assert( player != nullptr );
+	assert( player->m_antiAddiction == nullptr );
 
-	player->m_antiAddiction = new AAStatus(priorPlayedTime) ;
-	assert( player->m_antiAddiction != NULL ) ;
+	player->m_antiAddiction = new AAStatus(priorPlayedTime);
+	assert( player->m_antiAddiction != nullptr );
 
-	player->m_implementAntiAddiction = false ;
+	player->m_implementAntiAddiction = false;
 
-	g_minors.insert(player) ;
+	g_minors.insert(player);
 
 	dbugLog(_FLD, "t:%d p:%u c:%s added to minor's list now %" PRSizeT ""
 					, player->teulIndex(), player->playerID(), player->callsign(), g_minors.size()
-			) ;
+			);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -96,20 +96,20 @@ mmAddMinor(Player* player, UINT32 priorPlayedTime)
 void
 mmRemoveMinor(Player* player)
 {
-	assert( player != NULL ) ;
+	assert( player != nullptr );
 
-	assert( player->m_antiAddiction != NULL ) ;
+	assert( player->m_antiAddiction != nullptr );
 
-	_saveMinorUsage(player) ;
+	_saveMinorUsage(player);
 
-	delete player->m_antiAddiction ;
-	player->m_antiAddiction = NULL ;
+	delete player->m_antiAddiction;
+	player->m_antiAddiction = nullptr;
 
-	g_minors.erase(player) ;
+	g_minors.erase(player);
 
 	dbugLog(_FLD, "t:%d p:%u c:%s removed from minor's list now %" PRSizeT ""
 					, player->teulIndex(), player->playerID(), player->callsign(), g_minors.size()
-			) ;
+			);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -118,30 +118,30 @@ mmRemoveMinor(Player* player)
 static bool
 _penaltyTime(Player* player, AAStatus* status, bool newHour)
 {
-	static const UINT32 _WARNING_INTERVAL = (UINT32)(60 * host_config.arena.minutesPerAAHour * AntiAddiction::TIRED_WARNING_INTERVAL) ;
+	static const UINT32 _WARNING_INTERVAL = (UINT32)(60 * host_config.arena.minutesPerAAHour * AntiAddiction::TIRED_WARNING_INTERVAL);
 	if ( status->m_state != AntiAddiction::_PENALTY_TIME || newHour )
 	{
-		DEV_LOG(_FLIB, " first notice") ;
+		DEV_LOG(_FLIB, " first notice");
 		// First notice
-		chatSendLocalizedMessage(player->playerID(), LSTR_WARNING, LSTR_ANTI_ADDICTION_PENALTY) ;
-		status->m_state = AntiAddiction::_PENALTY_TIME ;
-		status->m_lastNotice = teulTime() ;
-		return true ;
+		chatSendLocalizedMessage(player->playerID(), LSTR_WARNING, LSTR_ANTI_ADDICTION_PENALTY);
+		status->m_state = AntiAddiction::_PENALTY_TIME;
+		status->m_lastNotice = teulTime();
+		return true;
 	}
 	else if ( teulTime() > status->m_lastNotice + _WARNING_INTERVAL )
 	{
-		DEV_LOG(_FLIB, " repeat notice") ;
+		DEV_LOG(_FLIB, " repeat notice");
 		// Repeat notice
-		chatSendLocalizedMessage(player->playerID(), LSTR_WARNING, LSTR_ANTI_ADDICTION_PENALTY) ;
-		status->m_lastNotice = teulTime() ;
-		return true ;
+		chatSendLocalizedMessage(player->playerID(), LSTR_WARNING, LSTR_ANTI_ADDICTION_PENALTY);
+		status->m_lastNotice = teulTime();
+		return true;
 	}
 	else
 	{
-		DEV_LOG(_FLIB, " already warned") ;
+		DEV_LOG(_FLIB, " already warned");
 	}
 
-	return false ;
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -150,22 +150,22 @@ _penaltyTime(Player* player, AAStatus* status, bool newHour)
 static bool
 _tiredTime(Player* player, AAStatus* status, bool newHour)
 {
-	int messageID = LSTR_ANTI_ADDICTION_HOUR1 + (status->m_playedHours - 1) ;
+	int messageID = LSTR_ANTI_ADDICTION_HOUR1 + (status->m_playedHours - 1);
 	if ( status->m_state != AntiAddiction::_TIRED_TIME  || newHour )
 	{
-		DEV_LOG(_FLIB, " notifying") ;
+		DEV_LOG(_FLIB, " notifying");
 		// First notice
-		chatSendLocalizedMessage(player->playerID(), LSTR_CAUTION, (LSTRING_ID)messageID) ;
-		status->m_state = AntiAddiction::_TIRED_TIME ;
-		status->m_lastNotice = teulTime() ;
-		return true ;
+		chatSendLocalizedMessage(player->playerID(), LSTR_CAUTION, (LSTRING_ID)messageID);
+		status->m_state = AntiAddiction::_TIRED_TIME;
+		status->m_lastNotice = teulTime();
+		return true;
 	}
 	else
 	{
-		DEV_LOG(_FLIB, " no notice required") ;
+		DEV_LOG(_FLIB, " no notice required");
 	}
 
-	return false ;
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -174,70 +174,70 @@ _tiredTime(Player* player, AAStatus* status, bool newHour)
 void
 mmCheckAddictionTimers()
 {
-	DEV_LOG(_FLI, __FUNCTION__) ;
+	DEV_LOG(_FLI, __FUNCTION__);
 
 	// Clear out any old usages.
-	static TeulTimeMS nextDelete = 0ULL ;
+	static TeulTimeMS nextDelete = 0ULL;
 	if ( teulClock64 > nextDelete )
 	{
-		DBThread::Do(DBThread::Default, "DELETE FROM wwii.minor_usage WHERE expires <= NOW()") ;
-		nextDelete = teulClock64 + (60 * 1000) ;
+		DBThread::Do(DBThread::Default, "DELETE FROM wwii.minor_usage WHERE expires <= NOW()");
+		nextDelete = teulClock64 + (60 * 1000);
 	}
 
 	if ( host_config.arena.minutesPerAAHour == 0 )
-		return ;
+		return;
 
-	PLAYERS::iterator it = g_minors.begin() ;
+	PLAYERS::iterator it = g_minors.begin();
 	while ( it != g_minors.end() )
 	{
-		Player* player = static_cast<Player*>(*it) ;
-		AAStatus* status = player->m_antiAddiction ;
+		Player* player = static_cast<Player*>(*it);
+		AAStatus* status = player->m_antiAddiction;
 
-		assert( status != NULL ) ;
+		assert( status != nullptr );
 
-		++it ;
+		++it;
 
-		DEV_LOG(_FLI, "t:%d p:%u c:%s minor check: ", player->teulIndex(), player->playerID(), player->callsign()) ;
+		DEV_LOG(_FLI, "t:%d p:%u c:%s minor check: ", player->teulIndex(), player->playerID(), player->callsign());
 
 		if ( player->timeIn == 0 )
 		{
-			DEV_LOG(_FLIB, "not logged in yet (%u <= %u)", player->timeIn, teulTime()) ;
-			continue ;
+			DEV_LOG(_FLIB, "not logged in yet (%u <= %u)", player->timeIn, teulTime());
+			continue;
 		}
 
-		UINT32 playedHours = (status->m_priorPlayedTime + teulTime() - player->timeIn) / (60 * host_config.arena.minutesPerAAHour) ;
+		UINT32 playedHours = (status->m_priorPlayedTime + teulTime() - player->timeIn) / (60 * host_config.arena.minutesPerAAHour);
 
-		bool newHour = (playedHours > status->m_playedHours) ;
-		status->m_playedHours = playedHours ;
+		bool newHour = (playedHours > status->m_playedHours);
+		status->m_playedHours = playedHours;
 
-		bool stateChanged = false ;
+		bool stateChanged = false;
 		if ( playedHours >= AntiAddiction::PENALTY_HOUR )
 		{
-			DEV_LOG(_FLIB, "penalty time") ;
-			stateChanged = _penaltyTime(player, status, newHour) ;
+			DEV_LOG(_FLIB, "penalty time");
+			stateChanged = _penaltyTime(player, status, newHour);
 		}
 		else if ( playedHours >= AntiAddiction::TIRED_HOUR )
 		{
-			DEV_LOG(_FLIB, "tired time") ;
-			stateChanged = _tiredTime(player, status, newHour) ;
+			DEV_LOG(_FLIB, "tired time");
+			stateChanged = _tiredTime(player, status, newHour);
 		}
 		else
 		{
 			if ( newHour )
 			{
-				int noticeID = LSTR_ANTI_ADDICTION_HOUR1 + (playedHours - 1) ;
-				chatSendLocalizedMessage(player->playerID(), LSTR_NOTE, (LSTRING_ID)noticeID) ;
+				int noticeID = LSTR_ANTI_ADDICTION_HOUR1 + (playedHours - 1);
+				chatSendLocalizedMessage(player->playerID(), LSTR_NOTE, (LSTRING_ID)noticeID);
 			}
 
-			DEV_LOG(_FLIB, "regular time") ;
+			DEV_LOG(_FLIB, "regular time");
 		}
 
-		status->m_playedHours = playedHours ;
+		status->m_playedHours = playedHours;
 
 		if ( stateChanged || teulTime() >= status->m_nextSaveTime )
 		{
-			DEV_LOG(_FLIB, " saving") ;
-			_saveMinorUsage(player) ;
+			DEV_LOG(_FLIB, " saving");
+			_saveMinorUsage(player);
 		}
 	}
 }
@@ -248,17 +248,17 @@ mmCheckAddictionTimers()
 FLOAT32
 mmAntiAddictionScoringMultiplier(const Player* player)
 {
-	assert( NULL != player ) ;
+	assert( nullptr != player );
 
 	// Setting minutes-per-hour to zero disables anti-addiction systems.
 	if ( host_config.arena.minutesPerAAHour == 0 )
-		return 1.0 ;
+		return 1.0;
 
-	const AAStatus* const status = player->m_antiAddiction ;
-	if ( NULL == status || status->m_state <= AntiAddiction::_STANDARD_TIME )
-		return 1.0 ;
+	const AAStatus* const status = player->m_antiAddiction;
+	if ( nullptr == status || status->m_state <= AntiAddiction::_STANDARD_TIME )
+		return 1.0;
 	if ( status->m_state == AntiAddiction::_TIRED_TIME )
-		return 0.5 ;
-	return 0 ;
+		return 0.5;
+	return 0;
 }
 

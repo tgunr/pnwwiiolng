@@ -56,4 +56,3 @@ IF ( NOT CHINA )
 ELSE ( )
 	set(CMAKE_INSTALL_PREFIX "/playnet/builds/china/binary/wwiiol" CACHE FILEPATH "Installation directory" FORCE)
 ENDIF ( )
-

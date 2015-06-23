@@ -47,7 +47,7 @@ const double _eco_a = (1072693248L - 60801L);
 /////////////////////////////////////////////////////////
 LOGICAL mathGetChaoticSeed(CHAOTICSEED* lpSeed)
 {
-    if(lpSeed == NULL)
+    if(lpSeed == nullptr)
         return FALSE;
 
     *lpSeed = g_chaoticSeed;
@@ -63,7 +63,7 @@ LOGICAL mathSetChaoticSeed(CHAOTICSEED* lpSeed)
 {
     memset(&g_chaoticSeed, 0, sizeof(CHAOTICSEED));
 
-    if(lpSeed == NULL)
+    if(lpSeed == nullptr)
         return FALSE;
 
 	g_chaoticSeed = *lpSeed;
@@ -260,8 +260,8 @@ INLINE void mathFloatToInt(SINT32* int_pointer, FLOAT32 f)
 //////////////////////////////////////////////////////////////////////
 void mathVectorToYAxis(piVECTOR* lpInV, piMATRIX* lpOutMatrix)
 {
-    if(lpInV == NULL) return;
-    if(lpOutMatrix == NULL) return;
+    if(lpInV == nullptr) return;
+    if(lpOutMatrix == nullptr) return;
 
     piVECTOR n = *lpInV;
     piMATRIX matOrient = IdentityMatrix;
@@ -333,8 +333,8 @@ void mathVectorToYAxis(piVECTOR* lpInV, piMATRIX* lpOutMatrix)
 //////////////////////////////////////////////////////////////////////
 void mathVectorToZAxis(piVECTOR* lpInV, piMATRIX* lpOutMatrix)
 {
-    if(lpInV == NULL) return;
-    if(lpOutMatrix == NULL) return;
+    if(lpInV == nullptr) return;
+    if(lpOutMatrix == nullptr) return;
 
     piVECTOR n = *lpInV;
     piMATRIX matOrient = IdentityMatrix;

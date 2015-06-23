@@ -112,8 +112,8 @@ SINT32 rntextGetTexId(SINT32 iFont)
 
 #include "draw/fontadaptor.h"
 
-static FontAdaptor* iconfontAdaptor = NULL;
-static FontAdaptor* gunsightfontAdaptor = NULL;
+static FontAdaptor* iconfontAdaptor = nullptr;
+static FontAdaptor* gunsightfontAdaptor = nullptr;
 
 static int westernGetHeight(int f)
 {
@@ -153,7 +153,7 @@ static SINT32 westernGetStringWidth(const WCHAR*s, SINT32 f)
 static LOGICAL western3DString(const WCHAR* pszText, UINT32 uColor, SINT32 f, piLVERTEX* plVertices, SINT32 iNumVertices)
 {
     FontAdaptor* fa = (f == 1) ? gunsightfontAdaptor : iconfontAdaptor;
-    return fa->get3DString(pszText, uColor, plVertices, iNumVertices) ;
+    return fa->get3DString(pszText, uColor, plVertices, iNumVertices);
 }
 
 static SINT32 westernGetTexId(SINT32 f)
@@ -289,12 +289,12 @@ static LOGICAL china3DString(const WCHAR* pszText,
     FLOAT32 x = 0.0f;
     FLOAT32 y = (FLOAT32)rntextGetHeight(iFont);
 
-    CHARLAYOUT* pCharLayout = NULL;
+    CHARLAYOUT* pCharLayout = nullptr;
 
-    if(pVertices == NULL)
+    if(pVertices == nullptr)
         return FALSE;
 
-    if(pszText == NULL)
+    if(pszText == nullptr)
         return FALSE;
 
     if(iNumVertices == 0)
@@ -309,7 +309,7 @@ static LOGICAL china3DString(const WCHAR* pszText,
 
         pCharLayout = &FontLayout.CharLayout[c];
 
-        if(pCharLayout == NULL)
+        if(pCharLayout == nullptr)
             return FALSE;
 
         fWidth = (FLOAT32)pCharLayout->width;
@@ -559,7 +559,7 @@ static int chinaColorTextToTexture(SINT32 iTexID,
 	SINT32 iCharWidth = 0;
 	LOGICAL bDone = FALSE;
 	LOGICAL bFirstTime = TRUE;
-	CHARLAYOUT* pCharLayout = NULL;
+	CHARLAYOUT* pCharLayout = nullptr;
 	piSURFACEDESC piWork;
 
 	memset(&piWork, 0, sizeof(piSURFACEDESC));
@@ -586,7 +586,7 @@ static int chinaColorTextToTexture(SINT32 iTexID,
 
 		pCharLayout = &FontLayout.CharLayout[iCharacter];
 
-        if(pCharLayout == NULL)
+        if(pCharLayout == nullptr)
             return 0;
 
         iWidth -= pCharLayout->width;

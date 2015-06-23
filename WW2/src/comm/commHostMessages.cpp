@@ -11,6 +11,7 @@
 #include "chat/chatCellTypes.h"
 #include "chat/chatConstants.h"
 #include "chat/chatLStringIDs.h"
+#include "chat/chatName.h"
 #include "chat/chatServerTypes.h"
 #include "chat/chatSupportRPCMessages.h"
 #include "comm/commConstants.h"
@@ -65,24 +66,24 @@ static TEUL_CALLBACK*		_GRANT_VEHICLE_JOIN;
 static TEUL_CALLBACK*		_CLIENT_HIT;
 static TEUL_CALLBACK*		_ACTIVATE_CLIENT;
 static TEUL_CALLBACK*		_PLAYER_EXIT;
-static TEUL_CALLBACK*		_XFER_RESUPPLY_ISSUE ;
-static TEUL_CALLBACK*		_SEND_MOVE ;
+static TEUL_CALLBACK*		_XFER_RESUPPLY_ISSUE;
+static TEUL_CALLBACK*		_SEND_MOVE;
 
-static TEUL_CALLBACK*		_SEND_CAPTURE_STATE ;
+static TEUL_CALLBACK*		_SEND_CAPTURE_STATE;
 
-TEUL_CALLBACK*		Host::TimeUpdate::Callback = NULL ;
+TEUL_CALLBACK*		Host::TimeUpdate::Callback = nullptr;
 
 UCHAR commCookieString[] = AUTH_SEQ;
 
 static void _expireTurretBits(struct TURRET_STRUCT* turret);
 static void _expireFireBits(struct FIRE_STRUCT* fire, UINT16 fireMask);
 
-static PLAYER_EXIT _playerExit ;
+static PLAYER_EXIT _playerExit;
 
 #ifdef BETA_RELEASE
-static bool g_enablePacketSizeRecording = true ;
+static bool g_enablePacketSizeRecording = true;
 #else
-static bool g_enablePacketSizeRecording = false ;
+static bool g_enablePacketSizeRecording = false;
 #endif
 
 //////////////////////////////////////////////////////////////////////
@@ -91,16 +92,16 @@ static bool g_enablePacketSizeRecording = false ;
 SINT32
 commSendPlayerExit(SINT32 teulIndex, PLAYER_DESTINATION destination, PLAYER_EXIT_CODE exitCode, const FULL_OBJ_ID& facility)
 {
-	dbugLog(_FLN,"t:%d sending player exit %d dest %d to %d.%d.%u"
+	dbugLog(_FLN, "t:%d sending player exit %d dest %d to " PRF_FULL_OBJ_ID ""
 				, teulIndex
 				, destination
 				, exitCode
-				, facility.cell.ox, facility.cell.oy, facility.id
+				, PRA_FULL_OBJ_ID(facility)
 				);
 
 	_playerExit.destination = destination;
-	_playerExit.exitCode = exitCode ;
-	_playerExit.facility = facility ;
+	_playerExit.exitCode = exitCode;
+	_playerExit.facility = facility;
 
 	return teulSend(teulIndex, _PLAYER_EXIT, &_playerExit);
 }
@@ -111,19 +112,19 @@ commSendPlayerExit(SINT32 teulIndex, PLAYER_DESTINATION destination, PLAYER_EXIT
 static void
 _badPlayer(Player& player, const SCHAR* problem, bool alert)
 {
-	const SCHAR* callsign = "*unknown*" ;
+	const SCHAR* callsign = "*unknown*";
 
 	// Find out who we are dealing with
-	PlayerStatusNode* psn = ServerInterface::PlayerStatusNodeByPlayerID(player.playerID()) ;
-	if ( psn != NULL )
-		callsign = psn->dispatch().m_callsign ;
+	PlayerStatusNode* psn = ServerInterface::PlayerStatusNodeByPlayerID(player.playerID());
+	if ( psn != nullptr )
+		callsign = psn->dispatch().m_callsign;
 
-	dbugLog(_FLW, "t:%d p:%u c:%s *** Kicking: %s", player.teulIndex(), player.playerID(), callsign, problem) ;
+	dbugLog(_FLW, "t:%d p:%u c:%s *** Kicking: %s", player.teulIndex(), player.playerID(), callsign, problem);
 
 	if ( alert )
-		chatSendKickNotice(player.playerID(), callsign, problem) ;
+		chatSendKickNotice(player.playerID(), callsign, problem);
 
-	commSendPlayerExit(player.teulIndex(), PDEST_EXIT, PEXIT_DEAD, nullObjID) ;
+	commSendPlayerExit(player.teulIndex(), PDEST_EXIT, PEXIT_DEAD, nullObjID);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -134,8 +135,8 @@ commForcePlayerExit(Player& player, const char* reason, bool alert)
 {
 	if ( player.m_timeToLive == 0 )
 	{
-		_badPlayer(player, reason, alert) ;
-		player.m_timeToLive = 100 + (rand() % 100) ;
+		_badPlayer(player, reason, alert);
+		player.m_timeToLive = 100 + (rand() % 100);
 	}
 }
 
@@ -146,13 +147,13 @@ void
 commDropPlayer(Player& player, const bool ignoredPriorKick)
 {
 	if ( ignoredPriorKick )
-		_badPlayer(player, "*ignored prior kick message", true) ;
+		_badPlayer(player, "*ignored prior kick message", true);
 
-	_playerExit.destination = PDEST_EXIT ;
-	_playerExit.exitCode = PEXIT_DEAD ;
-	_playerExit.facility = nullObjID ;
+	_playerExit.destination = PDEST_EXIT;
+	_playerExit.exitCode = PEXIT_DEAD;
+	_playerExit.facility = nullObjID;
 
-	hostPlayerLeave(player, _playerExit) ;
+	hostPlayerLeave(player, _playerExit);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -161,9 +162,9 @@ commDropPlayer(Player& player, const bool ignoredPriorKick)
 static SINT32
 _sendClientVehicleHit(ACTION_OBJECT* const a)
 {
-	Vehicle::Hit* const hit = (Vehicle::Hit*)(a->localRawData) ;
-	hit->packer(TEUL_PACK, a) ;
-	return a->offset ;
+	Vehicle::Hit* const hit = (Vehicle::Hit*)(a->localRawData);
+	hit->packer(TEUL_PACK, a);
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -192,21 +193,21 @@ static void
 _expireFireBits(FIRE_STRUCT* const fire, UINT16 fireMask)
 {
 	UINT16 tmpMask, i;
-	const TeulTimeMS bestBefore = teulClock64 - 2000 ;
+	const TeulTimeMS bestBefore = teulClock64 - 2000;
 
 	for (tmpMask = 1 , i = 0; i < MAX_GUNS; i++, tmpMask <<= 1)
 	{
 		if (tmpMask & fireMask)
 		{
 			// if we get a new on state
-			fire->masterClock64 = fire->clock64[i] = teulClock64 ;
+			fire->masterClock64 = fire->clock64[i] = teulClock64;
 		}
 		else if ( (fire->valid & tmpMask) && fire->clock64[i] <= bestBefore )
 		{
 			// if the fire times out clear the valid bit
-			fireMask &= ~tmpMask ;
+			fireMask &= ~tmpMask;
 			fire->valid &= ~tmpMask;
-			fire->masterClock64 = teulClock64 ;
+			fire->masterClock64 = teulClock64;
 		}
 	}
 
@@ -223,7 +224,7 @@ static void
 _expireTurretBits(struct TURRET_STRUCT* turret)
 {
 	UINT32 mask, i;
-	const TeulTimeMS bestBefore = teulClock64 - 3000 ;
+	const TeulTimeMS bestBefore = teulClock64 - 3000;
 
 	for ( mask = 1, i = 0; i < MAX_TURRETS; i++, mask <<= 1 )
 	{
@@ -231,10 +232,10 @@ _expireTurretBits(struct TURRET_STRUCT* turret)
 		{
 #ifdef NEVER
 			dbugLog(_FLDB,"turret invalid: %x mask %x",turret->valid, tmpMask);
-			dbugLog(_FLDB,"turret invalid: %d, stamp %x now %x",i, turret->timeStamp[i], teulClockBits(16));
+			dbugLog(_FLDB,"turret invalid: %d, stamp %llu now %llu",i, turret->timeStamp[i], teulClock64);
 #endif
 			turret->valid &= ~mask;
-			turret->clock64[i] = teulClock64 ;
+			turret->clock64[i] = teulClock64;
 		}
 	}
 }
@@ -247,32 +248,32 @@ commRecvVehicleUpdate(UINT32 serverAddress, const UCHAR* const buffer)
 {
 	if ( Server::myServerInfo.stats.status == Server::SERVER_LOGIN )
 	{
-		dbugLog(_FLD, "ignoring broadcastupdate during SERVER_LOGIN") ;
-		return ;
+		dbugLog(_FLD, "ignoring broadcastupdate during SERVER_LOGIN");
+		return;
 	}
 
-	static TeulTimeMS nextBlip = teulClock64 + 10000 ;
-	static UINT32 tallyUpdates = 0 ;
-	++tallyUpdates ;
+	static TeulTimeMS nextBlip = teulClock64 + 10000;
+	static UINT32 tallyUpdates = 0;
+	++tallyUpdates;
 	if ( teulClock64 >= nextBlip )
 	{
 		if ( tallyUpdates > 0 )
-			dbugLog(_FLI, "vehicle broadcasts received: %u", tallyUpdates) ;
-		tallyUpdates = 0 ;
-		nextBlip = teulClock64 + 10000 ;
+			dbugLog(_FLI, "vehicle broadcasts received: %u", tallyUpdates);
+		tallyUpdates = 0;
+		nextBlip = teulClock64 + 10000;
 	}
 
 	static VEHICLE_HOLDER vh;
-	vh.vehicle = NULL ;
+	vh.vehicle = nullptr;
 	SINT32 result = updtPackVehicleBroadcast(TEUL_UNPACK, const_cast<UCHAR*>(buffer), 0, &vh, 0);
 
 	if (!vh.vehicle)
-		return ;
+		return;
 
 	if ( result < 0 )
 	{
 		dbugLog(_FLA, "couldnt unpack broadcast retval %d", result);
-		return ;
+		return;
 	}
 
 	vh.vehicle->serverAddress = serverAddress;
@@ -283,9 +284,9 @@ commRecvVehicleUpdate(UINT32 serverAddress, const UCHAR* const buffer)
 	if ( vh.vehicle->isActive() == false )
 		hostActivateVehicle(vh.vehicle, false);
 	else
-		vh.vehicle->updateGrid() ;
+		vh.vehicle->updateGrid();
 
-	vh.vehicle->lastRX = teulClock64 ;
+	vh.vehicle->lastRX = teulClock64;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -307,9 +308,9 @@ _sendPlayerExit(ACTION_OBJECT* const a)
 static SINT32
 _recvPlayerExit(ACTION_OBJECT* const a)
 {
-	REQUIRE_CLIENT_DATA_AS(Player, player) ;
+	REQUIRE_CLIENT_DATA_AS(Player, player);
 	PLAYER_EXIT pe;
-	memset(&pe, 0, sizeof(pe)) ;
+	memset(&pe, 0, sizeof(pe));
 
 	a->offset = commPackPlayerExit(TEUL_UNPACK, a->packed, a->offset, &pe, 0);
 
@@ -326,54 +327,50 @@ _recvPlayerExit(ACTION_OBJECT* const a)
 static SINT32
 _recvVehicleJoinRequest(ACTION_OBJECT* const a)
 {
-	REQUIRE_CLIENT_DATA_AS(Player, player) ;
+	REQUIRE_CLIENT_DATA_AS(Player, player);
 	if ( player.m_hasExited )
 	{
-		teulClose(a->teulIndex, Teul::Closing::VJRExited) ;
-		return 0 ;
+		teulClose(a->teulIndex, Teul::Closing::VJRExited);
+		return 0;
 	}
 
 	VEHICLE_REQUEST localVehicleRequest;
 	a->offset = commPackVEHICLE_REQUEST(TEUL_UNPACK, a->packed, a->offset, &localVehicleRequest, 0);
 
-	dbugLog(_FLD, "t:%d p:%u v:%u st:%d joinReq %s %s"
+	dbugLog(_FLD, "t:%d p:%u v:%u st:%d joinReq %s " PRF_WEAPON_SPEC ""
 				, a->teulIndex
 				, player.playerID()
 				, localVehicleRequest.weapon.serial
 				, localVehicleRequest.station
 				, weapPrintName(&localVehicleRequest.weapon.spec)
-				, weapPrintSpecC(&localVehicleRequest.weapon.spec)
-				) ;
+				, PRA_WEAPON_SPEC(localVehicleRequest.weapon.spec)
+				);
 
 	const SINT32 vIndex = hostJoinVehicle(player, localVehicleRequest);
-	if ( (vIndex < 0) | (player.vehicle == NULL) )
+	if ( (vIndex < 0) | (player.vehicle == nullptr) )
 	{
 		dbugLog(_FLW, "t:%d p:%u v:%i FAILED TO JOIN VEHICLE"
 						, a->teulIndex
 						, player.playerID()
 						, localVehicleRequest.weapon.serial
-						) ;
+						);
 	}
 	else
 	{
-		HostVehicle* const vehicle = player.vehicle ;
+		HostVehicle* const vehicle = player.vehicle;
 		VEHICLE_REPLY vReply;
 
-		vReply.timeStamp = vehicle->vehicleData.timeStamp;
-		vReply.hostIndex = vehicle->index ;
-		vReply.spec = vehicle->spec() ;
-		vReply.source = vehicle->serial().source ;
+		vReply.hostIndex = vehicle->index;
+		vReply.spec = vehicle->spec();
+		vReply.source = vehicle->serial().source;
 	  	vReply.station = player.station;
 
 		// index of this vehicle on this persons
 	 	vReply.persVehicleIndex = (UCHAR) vIndex;
 
-	 	// tell up sucessful
-	 	vReply.replyCode = 0;
+	 	vReply.rankLevel = player.effectiveRank();
 
-	 	vReply.rankLevel = player.effectiveRank() ;
-
-	 	// only send postitve replies the FE cant handle it otherwise
+	 	// only send positive replies the FE cant handle it otherwise
 		const SINT32 retval = teulSend(a->teulIndex, _GRANT_VEHICLE_JOIN, &vReply);
 		if ( retval >= 0 )
 		{
@@ -382,20 +379,20 @@ _recvVehicleJoinRequest(ACTION_OBJECT* const a)
 							, player.playerID()
 							, vReply.hostIndex
 	  						, vReply.station
-							) ;
-			return a->offset ;
+							);
+			return a->offset;
 		}
 
 		dbugLog(_FLA, "t:%d p:%u v:%i couldn't send _GRANT_VEHICLE_JOIN"
 					, a->teulIndex
 					, player.playerID()
 					, vReply.hostIndex
-					) ;
+					);
 	}
 
-	commSendPlayerExit(a->teulIndex, PDEST_MAP, PEXIT_DEAD, nullObjID) ;
+	commSendPlayerExit(a->teulIndex, PDEST_MAP, PEXIT_DEAD, nullObjID);
 
-	return -EINVAL ;
+	return -EINVAL;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -404,40 +401,40 @@ _recvVehicleJoinRequest(ACTION_OBJECT* const a)
 static void
 _recordPacketSize(UINT32 size)
 {
-	static UINT32 maxSize = 0 ;
-	static UINT32 minSize = 0 ;
-	typedef std::map<SINT32,UINT32> SIZES ;
-	static SIZES sizes ;
-	static UINT32 packets = 0 ;
-	static UINT64 totalBits = 0LL ;
+	static UINT32 maxSize = 0;
+	static UINT32 minSize = 0;
+	typedef std::map<SINT32,UINT32> SIZES;
+	static SIZES sizes;
+	static UINT32 packets = 0;
+	static UINT64 totalBits = 0LL;
 
 	if ( size > maxSize )
-		maxSize = size ;
+		maxSize = size;
 	if ( minSize == 0 || size < minSize )
-		minSize = size ;
+		minSize = size;
 
-	totalBits += size ;
+	totalBits += size;
 
-	++sizes[size] ;
-	++packets ;
+	++sizes[size];
+	++packets;
 
-	static UINT32 nextLog = teulTime() + 5 ;
+	static UINT32 nextLog = teulTime() + 5;
 	if ( (packets & 4095) != 0 || teulTime() < nextLog )
-		return ;
+		return;
 
-	UINT32 mean = 0 ;
-	for ( SIZES::iterator it = sizes.begin() ; it != sizes.end() ; ++it )
+	UINT32 mean = 0;
+	for ( auto it = sizes.begin(), end = sizes.end(); it != end; ++it )
 	{
 		if ( mean == 0 || it->second >= sizes[mean] )
-			mean = it->first ;
+			mean = it->first;
 	}
 
-	UINT32 avg = (UINT32)(totalBits / packets) ;
+	UINT32 avg = (UINT32)(totalBits / packets);
 
 	dbugLog(_FLI, "rps[%u] bits minSize=%u avgSize=%u meanSize=%u maxSize=%u totalBits=%llu"
-				, packets, minSize, avg, mean, maxSize, totalBits) ;
+				, packets, minSize, avg, mean, maxSize, totalBits);
 
-	nextLog = teulTime() + 30 ;
+	nextLog = teulTime() + 30;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -452,12 +449,12 @@ Player::awsCheck()
 		if ( vehicle->isMoving() == false )
 		{
 #ifdef BETA_RELEASE
-			message(LSTR_BETA, LSTR_GENERIC, "Off AWS") ;
+			message(LSTR_BETA, LSTR_GENERIC, "Off AWS");
 #endif
-			m_onAWS = false ;
-			m_awsTrigger = 0 ;
+			m_onAWS = false;
+			m_awsTrigger = 0;
 		}
-		return ;
+		return;
 	}
 
 	// Once you start moving, we mark you for AWS but you are still inside
@@ -467,60 +464,61 @@ Player::awsCheck()
 		if ( vehicle->isMoving() == false )
 		{
 #ifdef BETA_RELEASE
-			message(LSTR_BETA, LSTR_GENERIC, "AWS Cancelled") ;
+			message(LSTR_BETA, LSTR_GENERIC, "AWS Cancelled");
 #endif
-			m_awsTrigger = 0 ;
-			return ;
+			m_awsTrigger = 0;
+			return;
 		}
 
 		if ( m_awsTrigger <= teulTime() )
 		{
 #ifdef BETA_RELEASE
-			message(LSTR_BETA, LSTR_GENERIC, "On AWS") ;
+			message(LSTR_BETA, LSTR_GENERIC, "On AWS");
 #endif
-			m_onAWS = true ;
-			vehicle->m_nextLocUpdate = 1ULL ;
+			m_onAWS = true;
+			vehicle->m_nextLocUpdate = 1ULL;
 		}
-		return ;
+		return;
 	}
 
 	if ( teulTime() < m_nextVelocityCheck )
-		return ;
+		return;
 
 	if ( vehicle->isReallyActive() == false )
-		return ;
+		return;
 
 	if ( vehicle->exitState != PEXIT_UNINITIALIZED || exitState != PEXIT_UNINITIALIZED )
-		return ;
+		return;
 
 	if ( station != UPDT_LONE && station != UPDT_CONTROL )
-		return ;
+		return;
 
-	const FLOAT32 vX = (FLOAT32)vehicle->vehicleData.velocity.velX / 50.0f ;
-	const FLOAT32 vY = (FLOAT32)vehicle->vehicleData.velocity.velY / 50.0f ;
-	const FLOAT32 vZ = (FLOAT32)vehicle->vehicleData.velocity.velZ / 50.0f ;
-	const FLOAT32 vel = (vX * vX) + (vY * vY) + (vZ + vZ) ;
+	const FLOAT32 vX = (FLOAT32)vehicle->vehicleData.velocity.velX / 50.0f;
+	const FLOAT32 vY = (FLOAT32)vehicle->vehicleData.velocity.velY / 50.0f;
+	const FLOAT32 vZ = (FLOAT32)vehicle->vehicleData.velocity.velZ / 50.0f;
+	const FLOAT32 vel = (vX * vX) + (vY * vY) + (vZ + vZ);
 
-	static const FLOAT32 MPH_TO_MS = 0.44704f ;
-	static const FLOAT32 DESIRED_TRIP_SPEED_MS = 75 * MPH_TO_MS ;
-	static const FLOAT32 VEL_SQUARE_TRIP = DESIRED_TRIP_SPEED_MS * DESIRED_TRIP_SPEED_MS ;
+	static const FLOAT32 MPH_TO_MS = 0.44704f;
+	static const FLOAT32 DESIRED_TRIP_SPEED_MS = 75 * MPH_TO_MS;
+	static const FLOAT32 VEL_SQUARE_TRIP = DESIRED_TRIP_SPEED_MS * DESIRED_TRIP_SPEED_MS;
 
 	if ( vel < VEL_SQUARE_TRIP )
 	{
-		m_nextVelocityCheck = teulTime() + 1 ;
-		return ;
+		m_nextVelocityCheck = teulTime() + 1;
+		return;
 	}
 
 #ifdef BETA_RELEASE
-	char vOver[80] = "" ;
+	char vOver[80];
+	vOver[0] = '\0';
 	if ( vel >= VEL_SQUARE_TRIP )
-		snprintf(vOver, 79, "AWS Candidate (vel=%3.2fms/%3.2fMph)", sqrt(vel), sqrt(vel) / MPH_TO_MS) ;
+		strprintf(vOver, "AWS Candidate (vel=%3.2fms/%3.2fMph)", sqrt(vel), sqrt(vel) / MPH_TO_MS);
 	else
-		snprintf(vOver, 79, "UNEXPECTED AWS Trip!") ;
-	message(LSTR_BETA, LSTR_GENERIC, vOver) ;
+		strsafecpy(vOver, "UNEXPECTED AWS Trip!");
+	message(LSTR_BETA, LSTR_GENERIC, vOver);
 #endif
 
-	m_awsTrigger = teulTime() + host_config.update.awsGracePeriod_s ;
+	m_awsTrigger = teulTime() + host_config.update.awsGracePeriod_s;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -529,8 +527,8 @@ Player::awsCheck()
 SINT32
 commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* const message, const SINT32 startOffset, const bool isFromTeul)
 {
-	PlayerStatusNode* psn = ServerInterface::PlayerStatusNodeByPlayerID(player->playerID()) ;
-	if ( psn == NULL)
+	PlayerStatusNode* psn = ServerInterface::PlayerStatusNodeByPlayerID(player->playerID());
+	if ( psn == nullptr)
 	{
 		dbugLog(_FLA,"t:%d _recvUpdateInfo: invalid player", teulIndex);
 		return -EINVAL;
@@ -539,15 +537,15 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 	if ( teulIndex >= 0 && player->teulIndex() != teulIndex )
 	{
 		dbugLog(_FLA,"t:%d p:%u c:%s _recvUpdateInfo: player index mismatch (%d)"
-						, teulIndex, player->playerID(), player->callsign(), player->teulIndex()) ;
-		return -EINVAL ;
+						, teulIndex, player->playerID(), player->callsign(), player->teulIndex());
+		return -EINVAL;
 	}
 
 	if ( player->m_hasExited )
 	{
 		dbugLog(_FLM, "t:%d p:%u c:%s received update from player post-exit (lagged data?)"
-						, teulIndex, player->playerID(), player->callsign()) ;
-		return -EINVAL ;
+						, teulIndex, player->playerID(), player->callsign());
+		return -EINVAL;
 	}
 
 	// We need someplace to extract the data.
@@ -558,7 +556,7 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 	vh.player = player;
 	vh.vehInfo = &vehInfo;
 
-	const SINT32 offset = updtPackSHARED_VEHICLE_INFO(TEUL_UNPACK, message, startOffset, &vh, 0) ;
+	const SINT32 offset = updtPackSHARED_VEHICLE_INFO(TEUL_UNPACK, message, startOffset, &vh, 0);
 	if ( offset < 0 )
 	{
 		dbugLog(_FLA,"t:%d p:%u c:%s illegal return val from updtPackVehicleInfo %d"
@@ -567,7 +565,7 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 	}
 
 	HostVehicle* const vref = hostFindVehicleLocal(vh.vehInfo->index);
-	if (vref == NULL)
+	if (vref == nullptr)
 	{
 		dbugLog(_FLA,"t:%d p:%u c:%s v:%u_recvUpdateInfo: ERROR (3)"
 					, player->teulIndex(), player->playerID(), player->callsign(), vehInfo.index);
@@ -584,13 +582,13 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 	else if ( player->station == UPDT_OTHER && (vh.present & PR_POSITION) )
 	{
 		dbugLog(_FLA, "t:%d p:%u c:%s v:%u st:%u ILLEGAL: Positions info not allowed for other than control player"
-						, player->teulIndex(), player->playerID(), player->callsign(), vref->index, player->station) ;
+						, player->teulIndex(), player->playerID(), player->callsign(), vref->index, player->station);
 	}
 
 	if ( g_enablePacketSizeRecording )
-		_recordPacketSize((UINT32)(offset - startOffset)) ;
+		_recordPacketSize((UINT32)(offset - startOffset));
 
-	player->m_updatesSinceRX = 0 ;
+	player->m_updatesSinceRX = 0;
 
 	_expireFireBits( &(vh.vehInfo->fire), vh.fireMask);
 #ifdef TEST_FIRING_BUG
@@ -601,7 +599,7 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 						, vh.vehInfo->fire.clock64[1]
 						, vh.vehInfo->fire.clock64[2]
 						, vh.vehInfo->fire.clock64[3]
-						) ;
+						);
 #endif
 	_expireTurretBits( &(vh.vehInfo->turret) );
 
@@ -611,7 +609,7 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 	{
 		dbugLog(_FLD, "t:%d p:%u c:%s v:%i received dead from vehicle"
 					, player->teulIndex(), player->playerID(), player->callsign(), vref->index);
-		vref->setCrewDead() ;
+		vref->setCrewDead();
 	}
 	else if ( (vref->timeOfDeath) & (vref->state == VEH_DEAD) & (teulTime() - vref->timeOfDeath >= DEATH_TIMEOUT) )
 	{
@@ -627,8 +625,8 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 	if ( (vref->vehicleData.globalFlags & VEHG_KILLED) == 0 && (vh.present & PR_KILLED) )
 	{
 		dbugLog(_FLD, "t:%d p:%u c:%s v:%i received killed from vehicle"
-					, player->teulIndex(), player->playerID(), player->callsign(), vref->index) ;
-		vref->setVehicleKilled(0) ;
+					, player->teulIndex(), player->playerID(), player->callsign(), vref->index);
+		vref->setVehicleKilled(0);
 	}
 
 	if (player->active == FALSE)
@@ -641,32 +639,32 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 	if ( vref->isActive() == false )
 	{
 		hostActivateVehicle(vref, true);
-		vh.present = (PRESENT_FLAGS)(vh.present | PRX_FIRST_TIME) ;
+		vh.present = (PRESENT_FLAGS)(vh.present | PRX_FIRST_TIME);
 	}
 	else
 	{
 		// We've gone active, but have we been marked as really active yet?
 		if ( vref->isReallyActive() == false && vref->shouldBeReallyActive() )
 		{
-			vref->setReallyActive(true) ;
+			vref->setReallyActive(true);
 			dbugLog(_FLD, "t:%d p:%u c:%s v:%u really activating vehicle"
 						, player->teulIndex(), player->playerID(), player->callsign(), vref->index);
 		}
 
 		if ( player->station == UPDT_LONE || player->station == UPDT_CONTROL )
-			vref->updateGrid() ;
+			vref->updateGrid();
 	}
 
-	vref->lastRX = teulClock64 ;
+	vref->lastRX = teulClock64;
 
 	// If the client sends us visBits from a trooper, it indicates that they are
 	// trying to resupply someone; use the data and clear it.
 	if ( (vh.present & PR_VEH_VIS) && vref->spec().wCategory == _INFANTRY && vref->vehicleData.visBits != 0 )
 	{
-		vref->issueResupply(player, vref->vehicleData.visBits) ;
+		vref->issueResupply(player, vref->vehicleData.visBits);
 		// Clear it out again
-		vref->vehicleData.visBits = 0 ;
-		vh.present &= ~PR_VEH_VIS ;
+		vref->vehicleData.visBits = 0;
+		vh.present &= ~PR_VEH_VIS;
 	}
 
 	// If the vehicle is marked "really" active and we're counting packets...
@@ -674,8 +672,8 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 	{
 		if ( player->m_timeToLive == 0 )
 		{
-			dbugLog(_FLW, "*** ILLEGAL CHECKSUM EJECTION for %s %d conn %d - KILLING", player->callsign(), player->playerID(), player->m_numConnects) ;
-			commForcePlayerExit(*player, "Invalid chient", true) ;
+			dbugLog(_FLW, "*** ILLEGAL CHECKSUM EJECTION for %s %d conn %d - KILLING", player->callsign(), player->playerID(), player->m_numConnects);
+			commForcePlayerExit(*player, "Invalid chient", true);
 		}
 	}
 
@@ -684,38 +682,38 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 	{
 		// Tell the despawn timer whether or not they are currently
 		// requesting a despawn timer.
-		bool wantTimerOn = (bool)(vh.present & PRX_DESPAWN_TIMER) ;
-		vref->setDespawnTimer(wantTimerOn) ;
+		bool wantTimerOn = (bool)(vh.present & PRX_DESPAWN_TIMER);
+		vref->setDespawnTimer(wantTimerOn);
 
-		player->changeFPSBuilding(vref->vehicleData.fpsBuildingID, vref->vehicleData.fpsInCaptureBuilding) ;
+		player->changeFPSBuilding(vref->vehicleData.fpsBuildingID, vref->vehicleData.fpsInCaptureBuilding);
 		if ( vref->spec().wCategory == _INFANTRY )
-			vref->checkCapture() ;
+			vref->checkCapture();
 	}
 
 #ifdef NEW_BCODE
 	if ( player->station == UPDT_OTHER )
-		vh.present &= ~PR_FROM_CONTROLLER ;
+		vh.present &= ~PR_FROM_CONTROLLER;
 	else
 	{
-		vh.present |= PR_FROM_CONTROLLER ;
+		vh.present |= PR_FROM_CONTROLLER;
 	}
 
 	hostAddVehicleToBroadcast(vref, &vh);
 #endif
 
-	player->processUpdateValues(vh.updateNo, vh.updatePrime) ;
+	player->processUpdateValues(vh.updateNo, vh.updatePrime);
 
-	player->m_hasSentUpdate = isFromTeul ;
+	player->m_hasSentUpdate = isFromTeul;
 
 	if ( player->instance().isCampaign() && vref->spec().wCategory == _AIRCRAFT )
 	{
-		player->awsCheck() ;
+		player->awsCheck();
 	}
 
 	if ( teulPackUINT64(TEUL_UNPACK, message, offset, &player->m_lastTimeRx, 0) > offset )
-		player->m_lastTimeRxed = teulClock64 ;
+		player->m_lastTimeRxed = teulClock64;
 
-	return offset ;
+	return offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -724,16 +722,16 @@ commRecvPeriodicUpdate(const SINT32 teulIndex, Player* const player, UCHAR* cons
 static SINT32
 _recvUpdateInfo(ACTION_OBJECT* const a)
 {
-	Player* const player = (Player*)teulGetPersonaData(a->teulIndex) ;
-	if ( player == NULL)
+	Player* const player = (Player*)teulGetPersonaData(a->teulIndex);
+	if ( player == nullptr)
 	{
 		dbugLog(_FLA,"t:%d _recvUpdateInfo: invalid player", a->teulIndex);
-		commSendPlayerExit(a->teulIndex, PDEST_MAP, PEXIT_DEAD, nullObjID) ;
+		commSendPlayerExit(a->teulIndex, PDEST_MAP, PEXIT_DEAD, nullObjID);
 		teulClose(a->teulIndex, Teul::Closing::RUINoPersona);
 		return 0;
 	}
 
-	return commRecvPeriodicUpdate(a->teulIndex, player, a->packed, a->offset, true) ;
+	return commRecvPeriodicUpdate(a->teulIndex, player, a->packed, a->offset, true);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -742,43 +740,40 @@ _recvUpdateInfo(ACTION_OBJECT* const a)
 static bool
 _forwardHitsToRemoteServer(const HostVehicle& vehicle, const SINT32 bits, const char* const source)
 {
-	const SINT32 cellIndex = serverGetPeerIndex(vehicle.serverAddress, CELL_HOST) ;
+	const SINT32 cellIndex = serverGetPeerIndex(vehicle.serverAddress, CELL_HOST);
 	if ( cellIndex < 0 )
-		return false ;
+		return false;
 
-	const size_t bytes = Teul::BitsToBytes(bits) ;
-	Teul::Packet outgoing(bytes, Comm::CallbackX, HOST_HIT_FWD_Y) ;
-	outgoing.setUnencrypted() ;
-	outgoing.append(source, bytes) ;
-	const SINT32 result = outgoing.send(cellIndex) ;
+	const size_t bytes = Teul::BitsToBytes(bits);
+	Teul::Packet outgoing(Teul::PacketId(Comm::CallbackX, HOST_HIT_FWD_Y), source, bytes);
+	outgoing.setUnencrypted();
+	const SINT32 result = outgoing.send(cellIndex);
 	if ( result < 0 )
 	{
 		dbugLog(_FLA, "v:%u failed sending apply hit to t:%d cell %x: %d", vehicle.index, cellIndex, vehicle.serverAddress, result);
-		return false ;
+		return false;
 	}
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
-// Given the details of a hit packet, notify the scorig process.
+// Given the details of a hit packet, notify the scoring process.
 
 static void
 _sendScoringHitEvent(const HostVehicle& victim, const HostVehicle& shooter, const UINT32 numComponentsHit, const UINT64& joules)
 {
-	Scoring::Packet<Scoring::Hit> packet ;
-	Scoring::Actor actTarget(&victim) ;
-	Scoring::Actor actShooter(&shooter) ;
+	Scoring::Packet<Scoring::Hit> packet;
+	Scoring::Actor actTarget(&victim);
+	Scoring::Actor actShooter(&shooter);
 
-	Teul::Packet outgoing(0, Scoring::CallbackX, Scoring::EVENT_Y) ;
-	CONSTRUCT_IN_PACKET(outgoing, Scoring::Hit, actTarget, actShooter, numComponentsHit, joules) ;
-	outgoing.setUnencrypted() ;
+	dbugLog(_FLD, "sending hit event [p:%u]->[p:%u] to map host", actShooter.playerID(), actTarget.playerID());
 
-	dbugLog(_FLD, "sending hit event [p:%u]->[p:%u] to map host", actShooter.playerID(), actTarget.playerID()) ;
+	Teul::Packet outgoing(Teul::PacketId(Scoring::CallbackX, Scoring::EVENT_Y));
+	outgoing.construct<Scoring::Hit>(actTarget, actShooter, numComponentsHit, joules);
+	outgoing.setUnencrypted();
 	if ( !serverSendPacketToType(outgoing, MAP_HOST) )
-	{
-		LogAbort("failed to send hit message") ;
-	}
+		LogAbort("failed to send hit message");
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -789,17 +784,17 @@ _applyDamageRestrictions(Vehicle::Hit& hit, unsigned char* const source)
 {
 	// Check if there's anything to do.
 	if ( host_config.arena.limitedDamage == 0 )
-		return ;
+		return;
 
 	// Limit to one component.
-	hit.m_components.resize(1) ;
+	hit.m_components.resize(1);
 
 	// And limit that to 1 joule.
-	hit.m_components.front().m_damage = 1 ;
+	hit.m_components.front().m_damage = 1;
 
 	// Re-pack the damage.
-	ACTION_OBJECT a(source, 0) ;
-	hit.packer(TEUL_PACK, &a) ;
+	ACTION_OBJECT a(source, 0);
+	hit.packer(TEUL_PACK, &a);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -813,17 +808,17 @@ _processVehicleHit(Vehicle::Hit& hit, Player* const shooter, const SINT32 fromTe
 	if ( (host_config.arena.lock & AL_KILL) || hit.m_components.empty() )
 	{
 		/* IGNORE */
-		return true ;
+		return true;
 	}
 
 	HostVehicle* const vTarget = hostFindVehicleLocal(hit.m_target);
-	if ( vTarget == NULL)
+	if ( vTarget == nullptr)
 	{
 		dbugLog(_FLW, "cant apply hit, unknown m_target %u, may have already despawned",hit.m_target);
-		return true ;
+		return true;
 	}
 
-	//const bool isFromPlayer = (shooter != NULL) ;
+	//const bool isFromPlayer = (shooter != NULL);
 	if ( hit.m_shooter == 0 )
 	{
 		// actually its always 0 right now but player should be non NULL
@@ -833,79 +828,79 @@ _processVehicleHit(Vehicle::Hit& hit, Player* const shooter, const SINT32 fromTe
 	HostVehicle* const vShooter = hostFindVehicleLocal(hit.m_shooter);
 	if ( vShooter == nullptr )
 	{
-		dbugLog(_FLW, "v:%u cant apply hit, unknown m_shooter %u, may have already despawned", hit.m_target, hit.m_shooter) ;
-		return false ;
+		dbugLog(_FLW, "v:%u cant apply hit, unknown m_shooter %u, may have already despawned", hit.m_target, hit.m_shooter);
+		return false;
 	}
 
 	if ( hit.m_components.size() > VEH_MAX_OBJ_HIT )
 	{
-		return false ;
+		return false;
 	}
 
 	if ( vTarget->isRemote() == true )
 	{
-		vTarget->m_lastHitTime = teulClock64 ;
+		vTarget->m_lastHitTime = teulClock64;
 
-		teulPackUINT32(TEUL_PACK, (UCHAR*)source, 0, &hit.m_shooter, 0) ;
+		teulPackUINT32(TEUL_PACK, (UCHAR*)source, 0, &hit.m_shooter, 0);
 
-		return _forwardHitsToRemoteServer(*vTarget, bits, (const char*)source) ;
+		return _forwardHitsToRemoteServer(*vTarget, bits, (const char*)source);
 	}
 
-	_applyDamageRestrictions(hit, source) ;
+	_applyDamageRestrictions(hit, source);
 
-	VEH_HIT vHit ;
-	const size_t numComponents = hit.m_components.size() ;
-	vHit.numComponents = numComponents ;
+	VEH_HIT vHit;
+	const size_t numComponents = hit.m_components.size();
+	vHit.numComponents = numComponents;
 	vHit.shooter = hit.m_shooter;
 	vHit.target = hit.m_target;
 
-	UINT64 totalDamageJ = 0LL ;
+	UINT64 totalDamageJ = 0LL;
 
-	for ( size_t i = 0; i < numComponents ; i++ )
+	for ( size_t i = 0; i < numComponents; i++ )
 	{
-		const Vehicle::Hit::Component& comp = hit.m_components[i] ;
+		const Vehicle::Hit::Component& comp = hit.m_components[i];
 		vHit.compHit[i].compID = comp.compID;
 		vHit.compHit[i].numHits = comp.NumHits;
 		vHit.compHit[i].damage = comp.m_damage;
 		vHit.compHit[i].priority = comp.isImportant;
 		if ( comp.isImportant )
-			totalDamageJ += comp.m_damage ;
+			totalDamageJ += comp.m_damage;
 	}
 
-	_sendScoringHitEvent(*vTarget, *vShooter, vHit.numComponents, totalDamageJ) ;
+	_sendScoringHitEvent(*vTarget, *vShooter, vHit.numComponents, totalDamageJ);
 
 	// We're done processing the packet for ourselves, now we have to
 	// send it on to the victim vehicle.
-	const size_t hitBytes = Teul::BitsToBytes(bits) ;
+	const size_t hitBytes = Teul::BitsToBytes(bits);
 
 	// Tread carefully with the iterators because teulSend might
 	// delete the player.
-	PLAYER_LIST::iterator it = vTarget->players().begin() ;
+	PLAYER_LIST::iterator it = vTarget->players().begin();
 	while ( it != vTarget->players().end () )
 	{
-		Player* const thePlayer = *it ;
-		++it ;
-		if ( thePlayer == NULL || thePlayer->teulIndex() < 0 )
+		Player* const thePlayer = *it;
+		++it;
+		if ( thePlayer == nullptr || thePlayer->teulIndex() < 0 )
 			continue;
 
 		if ( host_config.kills.reportDamage )
 		{
-			static char buffer[512] ;
+			static char buffer[512];
 			sprintf(buffer, "INCOMING: %lld joules of damage %s %s"
 							, totalDamageJ
 							, (vShooter->isRemote()) ? "from [alt-cell]" : "from [same cell]"
 							, vShooter->callsign()
-							) ;
-			thePlayer->message(LSTR_BETA, LSTR_GENERIC, buffer) ;
+							);
+			thePlayer->message(LSTR_BETA, LSTR_GENERIC, buffer);
 		}
 
-		Teul::Packet forward(hitBytes, Comm::CallbackX, HOST_HIT_Y) ;
-		forward.append(source, hitBytes) ;
+		Teul::Packet forward(Teul::PacketId(Comm::CallbackX, HOST_HIT_Y), source, hitBytes);
+		forward.append(source, hitBytes);
 		if ( forward.send(thePlayer->teulIndex()) < 0)
 			threadLog(_FLA, "v:%u couldn't send hit %u(%d)", hit.m_shooter, hit.m_target, thePlayer->teulIndex());
 	}
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -914,21 +909,21 @@ _processVehicleHit(Vehicle::Hit& hit, Player* const shooter, const SINT32 fromTe
 SINT32
 commProcessApplyHit(ACTION_OBJECT* const a)
 {
-	Vehicle::Hit hit(a) ;
+	Vehicle::Hit hit(a);
 	if ( a->offset < 0 )
 	{
-		dbugLog(_FLA, "t:%d sent invalid VEHICLE_HIT", a->teulIndex) ;
-		return -EINVAL ;
+		dbugLog(_FLA, "t:%d sent invalid VEHICLE_HIT", a->teulIndex);
+		return -EINVAL;
 	}
 	if ( hit.m_shooter == 0 )
 	{
-		dbugLog(_FLA, "t:%d sent us invalid VEHICLE_HIT (shooter==0)", a->teulIndex) ;
-		return -EINVAL ;
+		dbugLog(_FLA, "t:%d sent us invalid VEHICLE_HIT (shooter==0)", a->teulIndex);
+		return -EINVAL;
 	}
 
-	_processVehicleHit(hit, NULL, a->teulIndex, a->packed, a->sizeInBits()) ;
+	_processVehicleHit(hit, nullptr, a->teulIndex, a->packed, a->sizeInBits());
 
-	return a->offset + a->sizeInBits() ;
+	return a->offset + a->sizeInBits();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -937,7 +932,7 @@ commProcessApplyHit(ACTION_OBJECT* const a)
 static SINT32
 _recvClientVehicleHit(ACTION_OBJECT* const a)
 {
-	Vehicle::Hit hit(a) ;
+	Vehicle::Hit hit(a);
 	if ( a->offset < 0 )
 	{
 		dbugLog(_FLA, "t:%d couldnt unpack Vehicle::Hit message", a->teulIndex);
@@ -945,11 +940,11 @@ _recvClientVehicleHit(ACTION_OBJECT* const a)
 	}
 
 	Player* const shooter = (Player*)teulGetPersonaData(a->teulIndex);
-	if ( shooter == NULL || shooter->vehicle == NULL )
+	if ( shooter == nullptr || shooter->vehicle == nullptr )
 	{
 		dbugLog(_FLW, "t:%d suspicious looking vehicleHit - non-local player from non-broadcast source", a->teulIndex);
-		commSendPlayerExit(a->teulIndex, PDEST_MAP, PEXIT_DEAD, nullObjID) ;
-		return false ;
+		commSendPlayerExit(a->teulIndex, PDEST_MAP, PEXIT_DEAD, nullObjID);
+		return false;
 	}
 
 	///TODO: Make sure this player is actually responsible for this vehicle?
@@ -958,24 +953,24 @@ _recvClientVehicleHit(ACTION_OBJECT* const a)
 	if ( hit.m_shooter == 0 )
 	{
 		dbugLog(_FLA, "t:%d p:%u c:%s no vehicle to process hit from"
-						, a->teulIndex, shooter->playerID(), shooter->vehicle->callsign()) ;
-		return false ;
+						, a->teulIndex, shooter->playerID(), shooter->vehicle->callsign());
+		return false;
 	}
 	// Put the shooter back into the data.
-	teulPackUINT32(TEUL_PACK, a->packed, 0, &hit.m_shooter, 0) ;
+	teulPackUINT32(TEUL_PACK, a->packed, 0, &hit.m_shooter, 0);
 
 	if ( (host_config.arena.checksums || shooter->m_flags.canEject) && shooter->m_flags.checksumsDirty )
 	{
 		threadLog(_FLW, "t:%d p:%u c:%s discarded damage messages: dirty checksum"
-						, a->teulIndex, shooter->playerID(), shooter->vehicle->callsign()) ;
-		return true ;
+						, a->teulIndex, shooter->playerID(), shooter->vehicle->callsign());
+		return true;
 	}
 
 	if ( shooter->m_hasExited )
 	{
 		threadLog(_FLM, "t:%d p:%u c:%s discarded damage messages: vehicle is exiting"
-						, a->teulIndex, shooter->playerID(), shooter->vehicle->callsign()) ;
-		return true ;
+						, a->teulIndex, shooter->playerID(), shooter->vehicle->callsign());
+		return true;
 	}
 
 	if ( shooter->m_updatesSinceRX > 3 * FE_UPDATES_PER_SECOND )
@@ -984,12 +979,12 @@ _recvClientVehicleHit(ACTION_OBJECT* const a)
 						, shooter->teulIndex()
 						, shooter->playerID()
 						, shooter->m_updatesSinceRX
-						) ;
+						);
 	}
 
 	if ( !_processVehicleHit(hit, shooter, a->teulIndex, a->packed, a->offset) )
-		return -EINVAL ;
-	return a->offset ;
+		return -EINVAL;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -998,9 +993,9 @@ _recvClientVehicleHit(ACTION_OBJECT* const a)
 struct ClientResupplyIssue
 {
 	ClientResupplyIssue(sortieid_t fromSerial, const ChatHandle& fromHandle) : m_fromSerial(fromSerial), m_fromHandle(fromHandle) {}
-	UINT32		m_fromSerial ;
-	ChatHandle	m_fromHandle ;
-} ;
+	UINT32		m_fromSerial;
+	ChatHandle	m_fromHandle;
+};
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -1008,16 +1003,16 @@ struct ClientResupplyIssue
 void
 commSendClientResupplyIssue(HostVehicle* vehicle, sortieid_t fromSerial, const ChatHandle& fromHandle)
 {
-	assert( vehicle->isRemote() == false ) ;
+	assert( vehicle->isRemote() == false );
 
-	ClientResupplyIssue outgoing(fromSerial, fromHandle) ;
-	PLAYER_LIST::iterator it = vehicle->players().begin() ;
+	ClientResupplyIssue outgoing(fromSerial, fromHandle);
+	PLAYER_LIST::iterator it = vehicle->players().begin();
 	while ( it != vehicle->players().end() )
 	{
-		Player* player = *it ;
-		++it ;
+		Player* player = *it;
+		++it;
 		if ( player->teulIndex() >= 0 )
-			teulSend(player->teulIndex(), _XFER_RESUPPLY_ISSUE, &outgoing) ;
+			teulSend(player->teulIndex(), _XFER_RESUPPLY_ISSUE, &outgoing);
 	}
 }
 
@@ -1027,10 +1022,10 @@ commSendClientResupplyIssue(HostVehicle* vehicle, sortieid_t fromSerial, const C
 static SINT32
 _sendResupplyIssue(ACTION_OBJECT* const a)
 {
-	ClientResupplyIssue* issue = (ClientResupplyIssue*)a->localRawData ;
-	a->offset = teulPackUINT32(TEUL_PACK, a->packed, a->offset, &issue->m_fromSerial, 0) ;
-	a->offset = wwiiPackHandle(TEUL_PACK, a->packed, a->offset, &issue->m_fromHandle, 0) ;
-	return a->offset ;
+	ClientResupplyIssue* issue = (ClientResupplyIssue*)a->localRawData;
+	a->offset = teulPackUINT32(TEUL_PACK, a->packed, a->offset, &issue->m_fromSerial, 0);
+	a->offset = wwiiPackHandle(TEUL_PACK, a->packed, a->offset, &issue->m_fromHandle, 0);
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1040,9 +1035,9 @@ SINT32
 commSendMove(SINT32 teulIndex, const Chat::PlayerMove& move)
 {
 	if ( teulIndex < 0 )
-		return -EINVAL ;
-	dbugLog(_FLI, "t:%d sending move -> %d/%d/%d", teulIndex, move.m_x, move.m_y, move.m_z) ;
-	return teulSend(teulIndex, _SEND_MOVE, (void*)&move) ;
+		return -EINVAL;
+	dbugLog(_FLI, "t:%d sending move -> %d/%d/%d", teulIndex, move.m_x, move.m_y, move.m_z);
+	return teulSend(teulIndex, _SEND_MOVE, (void*)&move);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1051,26 +1046,26 @@ commSendMove(SINT32 teulIndex, const Chat::PlayerMove& move)
 static SINT32
 _recvDespawned(ACTION_OBJECT* const a)
 {
-	const playerid_t playerID = a->read<playerid_t>() ;
-	Player* const player = (Player*)ServerInterface::LookupByPlayerID(playerID) ;
-	if ( player == NULL )
-		return a->offset ;
+	const playerid_t playerID = a->read<playerid_t>();
+	Player* const player = (Player*)ServerInterface::LookupByPlayerID(playerID);
+	if ( player == nullptr )
+		return a->offset;
 
-	_playerExit.destination = PDEST_MAP ;
-	_playerExit.exitCode = PEXIT_DEAD ;
-	_playerExit.facility = nullObjID ;
+	_playerExit.destination = PDEST_MAP;
+	_playerExit.exitCode = PEXIT_DEAD;
+	_playerExit.facility = nullObjID;
 
 	dbugLog(_FLM, "t:%d p:%u c:%s v:%u received despawn-player instruction from mmhost"
 					, player->teulIndex(), player->playerID(), player->callsign()
-					, player->sortieID()) ;
+					, player->sortieID());
 
 #ifdef BETA_RELEASE
-	player->message(LSTR_CAUTION, LSTR_GENERIC, "Sortie being terminated by map-host 'despawned' signal rather than client confirmation.") ;
+	player->message(LSTR_CAUTION, LSTR_GENERIC, "Sortie being terminated by map-host 'despawned' signal rather than client confirmation.");
 #endif
 
-	hostPlayerLeave(*player, _playerExit) ;
+	hostPlayerLeave(*player, _playerExit);
 
-	return a->offset ;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1079,30 +1074,30 @@ _recvDespawned(ACTION_OBJECT* const a)
 static SINT32
 _recvKillNotice(ACTION_OBJECT* const a)
 {
-	REQUIRE_CLIENT_DATA_AS(Player, player) ;
-	auto& killerID = a->read<sortieid_t>() ;
+	REQUIRE_CLIENT_DATA_AS(Player, player);
+	auto& killerID = a->read<sortieid_t>();
 
 	if ( player.vehicle )
 	{
 #ifdef DEV_BUILD
-		dbugLog(_FLD, "t:%d p:%u c:%s receiving kill notice [%u]", a->teulIndex, player.playerID(), player.callsign(), killerID) ;	///TODO:134:REMOVE
+		dbugLog(_FLD, "t:%d p:%u c:%s receiving kill notice [%u]", a->teulIndex, player.playerID(), player.callsign(), killerID);	///TODO:134:REMOVE
 #endif
-		player.vehicle->setVehicleKilled(killerID) ;
+		player.vehicle->setVehicleKilled(killerID);
 	}
 
-	return a->offset ;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
 //
 
-extern UINT32 hostReceiveVehicleUpdates(const unsigned char* const input, const UINT32 bytes, const UINT32 fromAddr) ;
+extern UINT32 hostReceiveVehicleUpdates(const unsigned char* const input, const UINT32 bytes, const UINT32 fromAddr);
 
 static SINT32
 _recvVehicleBcast(ACTION_OBJECT* const a)
 {
-	hostReceiveVehicleUpdates((const unsigned char*)a->packed, (UINT32)a->sizeInBytes(), a->fromAddress) ;
-	return 0 ;
+	hostReceiveVehicleUpdates((const unsigned char*)a->packed, (UINT32)a->sizeInBytes(), a->fromAddress);
+	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1111,11 +1106,11 @@ _recvVehicleBcast(ACTION_OBJECT* const a)
 static SINT32
 _sendMove(ACTION_OBJECT* const a)
 {
-	Chat::PlayerMove* pos = (Chat::PlayerMove*)(a->localRawData) ;
-	a->offset = teulPackSINT32(TEUL_PACK, a->packed, a->offset, &(pos->m_x), 0) ;
-	a->offset = teulPackSINT32(TEUL_PACK, a->packed, a->offset, &(pos->m_y), 0) ;
-	a->offset = teulPackSINT32(TEUL_PACK, a->packed, a->offset, &(pos->m_z), 0) ;
-	return a->offset ;
+	Chat::PlayerMove* pos = (Chat::PlayerMove*)(a->localRawData);
+	a->offset = teulPackSINT32(TEUL_PACK, a->packed, a->offset, &(pos->m_x), 0);
+	a->offset = teulPackSINT32(TEUL_PACK, a->packed, a->offset, &(pos->m_y), 0);
+	a->offset = teulPackSINT32(TEUL_PACK, a->packed, a->offset, &(pos->m_z), 0);
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1124,26 +1119,26 @@ _sendMove(ACTION_OBJECT* const a)
 static SINT32
 _recvMovePlayer(ACTION_OBJECT* const a)
 {
-	if ( a->m_client != NULL )
+	if ( a->m_client != nullptr )
 	{
-		threadLog(_FLW, "t:%d unexpected player move from player", a->teulIndex) ;
-		return -EINVAL ;
+		threadLog(_FLW, "t:%d unexpected player move from player", a->teulIndex);
+		return -EINVAL;
 	}
-	auto& incoming = a->read<Chat::PlayerMove>() ;
-	Player* player = static_cast<Player*>(ServerInterface::LookupByPlayerID(incoming.m_playerID)) ;
-	if ( player == NULL || player->teulIndex() < 0 || player->vehicle == NULL )
+	auto& incoming = a->read<Chat::PlayerMove>();
+	Player* player = static_cast<Player*>(ServerInterface::LookupByPlayerID(incoming.m_playerID));
+	if ( player == nullptr || player->teulIndex() < 0 || player->vehicle == nullptr )
 	{
-		threadLog(_FLD, "p:%u ignoring move request", incoming.m_playerID) ;
-		return a->offset ;
+		threadLog(_FLD, "p:%u ignoring move request", incoming.m_playerID);
+		return a->offset;
 	}
 
 	threadLog(_FLD, "t:%d p:%u c:%s v:%u moving player to %d/%d/%d"
 					, player->teulIndex(), incoming.m_playerID, player->callsign(), player->vehicle->index
-					, incoming.m_x, incoming.m_y, incoming.m_z) ;
+					, incoming.m_x, incoming.m_y, incoming.m_z);
 
-	commSendMove(player->teulIndex(), incoming) ;
+	commSendMove(player->teulIndex(), incoming);
 
-	return a->offset ;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1152,21 +1147,21 @@ _recvMovePlayer(ACTION_OBJECT* const a)
 static SINT32
 _recvForceDespawn(ACTION_OBJECT* const a)
 {
-	if ( a->m_client != NULL )
+	if ( a->m_client != nullptr )
 	{
-		dbugLog(_FLW, "t:%d received unexpected force despawn from player", a->teulIndex) ;
-		return -EINVAL ;
+		dbugLog(_FLW, "t:%d received unexpected force despawn from player", a->teulIndex);
+		return -EINVAL;
 	}
-	auto& playerID = a->read<playerid_t>() ;
-	Player* player = static_cast<Player*>(ServerInterface::LookupByPlayerID(playerID)) ;
-	if ( player == NULL )
-		return a->offset ;
-	threadLog(_FLD, "p:%u c:%s v:%u received force-despawn instruction", player->playerID(), player->callsign(), player->sortieID()) ;
+	auto& playerID = a->read<playerid_t>();
+	Player* player = static_cast<Player*>(ServerInterface::LookupByPlayerID(playerID));
+	if ( player == nullptr )
+		return a->offset;
+	threadLog(_FLD, "p:%u c:%s v:%u received force-despawn instruction", player->playerID(), player->callsign(), player->sortieID());
 
-	PLAYER_EXIT pe = { PDEST_MAP, PEXIT_RTB, nullObjID } ;
-	hostPlayerLeave(*player, pe) ;
+	PLAYER_EXIT pe = { PDEST_MAP, PEXIT_RTB, nullObjID };
+	hostPlayerLeave(*player, pe);
 
-	return a->offset ;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1175,9 +1170,9 @@ _recvForceDespawn(ACTION_OBJECT* const a)
 static SINT32
 _sendCaptureState(ACTION_OBJECT* const a)
 {
-	CaptureState* const capState = (CaptureState*)(a->localRawData) ;
-	capState->packer(TEUL_PACK, a) ;
-	return a->offset ;
+	CaptureState* const capState = (CaptureState*)(a->localRawData);
+	capState->packer(TEUL_PACK, a);
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1186,9 +1181,9 @@ _sendCaptureState(ACTION_OBJECT* const a)
 SINT32
 Host::TimeUpdate::SendFunction(ACTION_OBJECT* const a)
 {
-	Host::TimeUpdate* const update = (Host::TimeUpdate*)(a->localRawData) ;
-	update->packer(TEUL_PACK, a) ;
-	return a->offset ;
+	Host::TimeUpdate* const update = (Host::TimeUpdate*)(a->localRawData);
+	update->packer(TEUL_PACK, a);
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1197,8 +1192,8 @@ Host::TimeUpdate::SendFunction(ACTION_OBJECT* const a)
 void
 Host::TimeUpdate::Send(SINT32 teulIndex)
 {
-	Host::TimeUpdate update(wthrGetGameTime(), wthrGetTimeFactor(), wthrGetWeatherPattern(), wthrGetFogPattern()) ;
-	teulSend(teulIndex, Host::TimeUpdate::Callback, &update) ;
+	Host::TimeUpdate update(wthrGetGameTime(), wthrGetTimeFactor(), wthrGetWeatherPattern(), wthrGetFogPattern());
+	teulSend(teulIndex, Host::TimeUpdate::Callback, &update);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1208,15 +1203,15 @@ void
 HostVehicle::sendCaptureState(const CaptureState& capState)
 {
 	if ( isActive() == false )
-		return ;
+		return;
 	if ( isInCaptureBuilding() == WWII_NO_SIDE )
-		return ;
+		return;
 
-	Player* player = activeCommander() ;
-	if ( player == NULL || player->teulIndex() < 0 )
-		return ;
+	Player* player = activeCommander();
+	if ( player == nullptr || player->teulIndex() < 0 )
+		return;
 
-	teulSend(player->teulIndex(), _SEND_CAPTURE_STATE, (void*)&capState) ;
+	teulSend(player->teulIndex(), _SEND_CAPTURE_STATE, (void*)&capState);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1226,17 +1221,17 @@ static SINT32
 _recvCaptureScore(ACTION_OBJECT* const a)
 {
 	if ( a->canRead<CaptureScore>() == false )
-		return -EINVAL ;
-	if ( a->m_client != NULL )
-		return -EINVAL ;
+		return -EINVAL;
+	if ( a->m_client != nullptr )
+		return -EINVAL;
 
-	auto& incoming = a->read<CaptureScore>() ;
+	auto& incoming = a->read<CaptureScore>();
 	threadLog(_FLI, "capscore: recvd bld:%d,%d:%u side:%u"
 					, incoming.m_fullObjID.cell.ox, incoming.m_fullObjID.cell.oy, incoming.m_fullObjID.id
-					, incoming.m_side) ;
-	hostGiveCaptureScoreToPlayers(incoming.m_fullObjID, incoming.m_side) ;
+					, incoming.m_side);
+	hostGiveCaptureScoreToPlayers(incoming.m_fullObjID, incoming.m_side);
 
-	return a->offset ;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1248,20 +1243,20 @@ _recvCaptureState(ACTION_OBJECT* const a)
 {
 	if ( a->canRead<CaptureState>() == false )
 	{
-		dbugLog(_FLA, "t:%d sent capture state we can't read", a->teulIndex) ;
-		return -EINVAL ;
+		dbugLog(_FLA, "t:%d sent capture state we can't read", a->teulIndex);
+		return -EINVAL;
 	}
-	if ( a->m_client != NULL )
+	if ( a->m_client != nullptr )
 	{
-		dbugLog(_FLA, "t:%d sending us capture state, naughty naughty", a->teulIndex) ;
-		return -EINVAL ;
+		dbugLog(_FLA, "t:%d sending us capture state, naughty naughty", a->teulIndex);
+		return -EINVAL;
 	}
 
-	auto& incoming = a->read<CaptureState>() ;
+	auto& incoming = a->read<CaptureState>();
 
-	hostSendCaptureStatesToOccupants(incoming) ;
+	hostSendCaptureStatesToOccupants(incoming);
 
-	return a->offset ;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1270,42 +1265,42 @@ _recvCaptureState(ACTION_OBJECT* const a)
 static SINT32
 _recvResupplyIssue(ACTION_OBJECT* const a)
 {
-	if ( a->m_client != NULL || a->canRead<HostResupplyIssue>() == false )
-		return -EINVAL ;
+	if ( a->m_client != nullptr || a->canRead<HostResupplyIssue>() == false )
+		return -EINVAL;
 
-	auto& incoming = a->read<HostResupplyIssue>() ;
-	HostVehicle* const vehicle = hostFindVehicleLocal(incoming.m_toSerial) ;
-	if ( vehicle == NULL )
+	auto& incoming = a->read<HostResupplyIssue>();
+	HostVehicle* const vehicle = hostFindVehicleLocal(incoming.m_toSerial);
+	if ( vehicle == nullptr )
 	{
-		dbugLog(_FLI, "rv:%u v:%u received resupply message for NULL vehicle (too late?)", incoming.m_fromSerial, incoming.m_toSerial) ;
-		return a->offset ;
+		dbugLog(_FLI, "rv:%u v:%u received resupply message for NULL vehicle (too late?)", incoming.m_fromSerial, incoming.m_toSerial);
+		return a->offset;
 	}
 	if ( vehicle->isRemote() )
 	{
-		dbugLog(_FLA, "rv:%u v:%u received resupply message for REMOTE VEHICLE", incoming.m_fromSerial, incoming.m_toSerial) ;
-		return a->offset ;
+		dbugLog(_FLA, "rv:%u v:%u received resupply message for REMOTE VEHICLE", incoming.m_fromSerial, incoming.m_toSerial);
+		return a->offset;
 	}
 
-	vehicle->acceptResupply(incoming.m_fromSerial, incoming.m_fromHandle, NULL, a->endpoint->fromAddress()) ;
+	vehicle->acceptResupply(incoming.m_fromSerial, incoming.m_fromHandle, nullptr, a->endpoint->fromAddress());
 
-	return a->offset ;
+	return a->offset;
 }
 
 static SINT32
 _recvResupplyAccepted(ACTION_OBJECT* const a)
 {
-	if ( a->m_client != NULL || a->canRead<HostResupplyAccepted>() == false )
-		return -EINVAL ;
+	if ( a->m_client != nullptr || a->canRead<HostResupplyAccepted>() == false )
+		return -EINVAL;
 
-	auto& incoming = a->read<HostResupplyAccepted>() ;
-	HostVehicle* vehicle = hostFindVehicleLocal(incoming.m_supplierID) ;
-	if ( vehicle == NULL || vehicle->isRemote() == true )
-		return a->offset ;
+	auto& incoming = a->read<HostResupplyAccepted>();
+	HostVehicle* vehicle = hostFindVehicleLocal(incoming.m_supplierID);
+	if ( vehicle == nullptr || vehicle->isRemote() == true )
+		return a->offset;
 	if ( g_logDebug )
-		dbugLog(_FLD, "v:%u supply to %s acknowledged", incoming.m_supplierID, chatGetCallsign(incoming.m_recipient)) ;
-	vehicle->scoreResupply(incoming.m_recipient) ;
+		dbugLog(_FLD, "v:%u supply to %s acknowledged", incoming.m_supplierID, Chat::Name(incoming.m_recipient).c_str());
+	vehicle->scoreResupply(incoming.m_recipient);
 
-	return a->offset ;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -1316,13 +1311,13 @@ _registerInterHostCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Host::CallbackX)
 
-		REGISTER_RECEIVER((UCHAR)Host::Callbacks::MovePlayer_Y, _recvMovePlayer) ;
-		REGISTER_RECEIVER((UCHAR)Host::Callbacks::ForceDespawn_Y, _recvForceDespawn) ;
+		REGISTER_RECEIVER((UCHAR)Host::Callbacks::MovePlayer_Y, _recvMovePlayer);
+		REGISTER_RECEIVER((UCHAR)Host::Callbacks::ForceDespawn_Y, _recvForceDespawn);
 
-		REGISTER_RECEIVER((UCHAR)Host::Callbacks::CaptureScore_Y, _recvCaptureScore) ;
-		REGISTER_RECEIVER((UCHAR)Host::Callbacks::CaptureState_Y, _recvCaptureState) ;
-		REGISTER_RECEIVER((UCHAR)Host::Callbacks::ResupplyIssue_Y, _recvResupplyIssue) ;
-		REGISTER_RECEIVER((UCHAR)Host::Callbacks::ResupplyAccepted_Y, _recvResupplyAccepted) ;
+		REGISTER_RECEIVER((UCHAR)Host::Callbacks::CaptureScore_Y, _recvCaptureScore);
+		REGISTER_RECEIVER((UCHAR)Host::Callbacks::CaptureState_Y, _recvCaptureState);
+		REGISTER_RECEIVER((UCHAR)Host::Callbacks::ResupplyIssue_Y, _recvResupplyIssue);
+		REGISTER_RECEIVER((UCHAR)Host::Callbacks::ResupplyAccepted_Y, _recvResupplyAccepted);
 
 	END_CALLBACK_REGISTRATION
 }
@@ -1335,34 +1330,34 @@ _registerClientCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Comm::CallbackX)
 
-		REGISTER_SENDER(GRANT_VEHICLE_JOIN_Y, _sendGrantVehicleJoin, _GRANT_VEHICLE_JOIN) ;
-		REGISTER_SENDER(ACTIVATE_CLIENT_Y, _sendClientActivate, _ACTIVATE_CLIENT) ;
-		REGISTER_SENDER(RESUPPLY_ISSUE_Y, _sendResupplyIssue, _XFER_RESUPPLY_ISSUE) ;
+		REGISTER_SENDER(GRANT_VEHICLE_JOIN_Y, _sendGrantVehicleJoin, _GRANT_VEHICLE_JOIN);
+		REGISTER_SENDER(ACTIVATE_CLIENT_Y, _sendClientActivate, _ACTIVATE_CLIENT);
+		REGISTER_SENDER(RESUPPLY_ISSUE_Y, _sendResupplyIssue, _XFER_RESUPPLY_ISSUE);
 
-		REGISTER_RECEIVER(VEH_JOIN_REQUEST_Y, _recvVehicleJoinRequest) ;
-		REGISTER_RECEIVER(UPDATE_Y, _recvUpdateInfo) ;
+		REGISTER_RECEIVER(VEH_JOIN_REQUEST_Y, _recvVehicleJoinRequest);
+		REGISTER_RECEIVER(UPDATE_Y, _recvUpdateInfo);
 
-		REGISTER_SENDRECV(CLIENT_HIT_Y, _sendClientVehicleHit, _recvClientVehicleHit, _CLIENT_HIT) ;
-		REGISTER_SENDRECV(PLAYER_EXIT_Y, _sendPlayerExit, _recvPlayerExit, _PLAYER_EXIT) ;
+		REGISTER_SENDRECV(CLIENT_HIT_Y, _sendClientVehicleHit, _recvClientVehicleHit, _CLIENT_HIT);
+		REGISTER_SENDRECV(PLAYER_EXIT_Y, _sendPlayerExit, _recvPlayerExit, _PLAYER_EXIT);
 
-		REGISTER_MSG_SENDER(DEATH_BY_BUILDING_Y, DEATH_BY_BUILDING) ;
+		REGISTER_MSG_SENDER(DEATH_BY_BUILDING_Y, DEATH_BY_BUILDING);
 
-		REGISTER_RECEIVER(KILL_NOTICE_Y, _recvKillNotice) ;
+		REGISTER_RECEIVER(KILL_NOTICE_Y, _recvKillNotice);
 
-		REGISTER_SENDER(MOVE_Y, _sendMove, _SEND_MOVE) ;
+		REGISTER_SENDER(MOVE_Y, _sendMove, _SEND_MOVE);
 
-		REGISTER_RECEIVER(DESPAWNED_Y, _recvDespawned) ;
+		REGISTER_RECEIVER(DESPAWNED_Y, _recvDespawned);
 
-		REGISTER_RECEIVER(BCAST_VEH_UPDATE_Y, _recvVehicleBcast) ;
+		REGISTER_RECEIVER(BCAST_VEH_UPDATE_Y, _recvVehicleBcast);
 
-		REGISTER_SENDER(CAPTURE_STATE_Y, _sendCaptureState, _SEND_CAPTURE_STATE) ;
+		REGISTER_SENDER(CAPTURE_STATE_Y, _sendCaptureState, _SEND_CAPTURE_STATE);
 
-		extern SINT32 cellVehicleRemoval(ACTION_OBJECT* const a) ;
-		REGISTER_RECEIVER(BCAST_VEH_REMOVE_Y, cellVehicleRemoval) ;
+		extern SINT32 cellVehicleRemoval(ACTION_OBJECT* const a);
+		REGISTER_RECEIVER(BCAST_VEH_REMOVE_Y, cellVehicleRemoval);
 
-		REGISTER_SENDER(GAME_TIME_UPDATE_Y, Host::TimeUpdate::SendFunction, Host::TimeUpdate::Callback) ;
+		REGISTER_SENDER(GAME_TIME_UPDATE_Y, Host::TimeUpdate::SendFunction, Host::TimeUpdate::Callback);
 
-		REGISTER_RECEIVER(HOST_HIT_FWD_Y, commProcessApplyHit) ;
+		REGISTER_RECEIVER(HOST_HIT_FWD_Y, commProcessApplyHit);
 
 	END_CALLBACK_REGISTRATION
 }
@@ -1373,7 +1368,7 @@ _registerClientCallbacks()
 SINT32
 commInstallHostCallbacks(void)
 {
-	SINT32 retval ;
+	SINT32 retval;
 
 	if ( (retval = commPackInit()) < 0)
 		return retval;
@@ -1381,9 +1376,9 @@ commInstallHostCallbacks(void)
 	if ( (retval = updtPackInit()) < 0)
 		return retval;
 
-	_registerClientCallbacks() ;
-	_registerInterHostCallbacks() ;
-	wwiiRegisterPlayerMessageCallback() ;
+	_registerClientCallbacks();
+	_registerInterHostCallbacks();
+	wwiiRegisterPlayerMessageCallback();
 
 	dbugLog(_FLNS, "installed commHostCallbacks");
 
@@ -1396,34 +1391,34 @@ commInstallHostCallbacks(void)
 void
 hostSendResupplyIssue(UINT32 cellIP, const sortieid_t& toSerial, const sortieid_t& fromSerial, const ChatHandle& fromHandle)
 {
-	assert( cellIP != 0 ) ;
-	assert( toSerial != 0 ) ;
-	assert( fromSerial != 0 ) ;
-	assert( fromHandle != 0LL ) ;
+	assert( cellIP != 0 );
+	assert( toSerial != 0 );
+	assert( fromSerial != 0 );
+	assert( fromHandle != 0LL );
 
-	const SINT32 cellIndex = serverGetPeerIndex(cellIP, CELL_HOST) ;
+	const SINT32 cellIndex = serverGetPeerIndex(cellIP, CELL_HOST);
 	if ( cellIndex < 0 )
-		return ;
+		return;
 
-	Teul::Packet outgoing(0, Host::CallbackX, (UCHAR)Host::Callbacks::ResupplyIssue_Y) ;
-	CONSTRUCT_IN_PACKET(outgoing, HostResupplyIssue, toSerial, fromSerial, fromHandle) ;
-	outgoing.send(cellIndex) ;
+	Teul::Packet outgoing(Teul::PacketId(Host::CallbackX, (UCHAR)Host::Callbacks::ResupplyIssue_Y));
+	outgoing.construct<HostResupplyIssue>(toSerial, fromSerial, fromHandle);
+	outgoing.send(cellIndex);
 }
 
 //////////////////////////////////////////////////////////////////////
-// Acknowledgement that someone received resupply
+// Acknowledgment that someone received resupply
 
 void
 hostSendResupplyAccepted(UINT32 cellIP, const sortieid_t& sendTo, const ChatHandle& byHandle)
 {
-	assert(cellIP != 0) ;
+	assert(cellIP != 0);
 
-	const SINT32 cellIndex = serverGetPeerIndex(cellIP, CELL_HOST) ;
+	const SINT32 cellIndex = serverGetPeerIndex(cellIP, CELL_HOST);
 	if ( cellIndex < 0 )
-		return ;
+		return;
 
-	Teul::Packet outgoing(0, Host::CallbackX, (UCHAR)Host::Callbacks::ResupplyAccepted_Y) ;
-	CONSTRUCT_IN_PACKET(outgoing, HostResupplyAccepted, sendTo, byHandle) ;
-	outgoing.send(cellIndex) ;
+	Teul::Packet outgoing(Teul::PacketId(Host::CallbackX, (UCHAR)Host::Callbacks::ResupplyAccepted_Y));
+	outgoing.construct<HostResupplyAccepted>(sendTo, byHandle);
+	outgoing.send(cellIndex);
 }
 

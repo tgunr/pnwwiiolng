@@ -17,7 +17,7 @@ class Message;
 class MessageHandler
 {
 public:
-	MessageHandler() : _parentloop(0ULL), _name(0ULL), _filters(0ULL), _nexthandler(0ULL) {}
+	MessageHandler() : _parentloop(nullptr), _name(nullptr), _filters(nullptr), _nexthandler(nullptr) {}
 	virtual ~MessageHandler();
 
 	MessageLoop* ParentLoop() const { return _parentloop; }

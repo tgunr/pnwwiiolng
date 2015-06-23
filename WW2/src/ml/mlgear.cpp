@@ -28,19 +28,6 @@
 #include "draw/draw3d.h"
 #include "math/mathnum.h"
 
-#if defined(USE_OSG)
-#include <osgSim/DOFTransform>
-#include "osgVehicle/VehicleBase.h"
-#include "osg/Interpolate.h"
-#include "osgTerrain/terrainMain.h"
-#include "colliderMain.h"
-#include "osgTools/debugTools.h"
-#include "osgPhysics/osgODE.h"
-#include "osgCollider/colliderSurface.h"
-#include "osgVehicle/vehicleSpawn.h"
-using namespace osg; // damn PI
-#endif
-
 static UINT32 _HandleCastor(mlGearComponentData * GearData,
 							   FLOAT64 WheelMass,
 							   FLOAT64VECTOR* GearSumForce,
@@ -63,11 +50,7 @@ static UINT32 _DetermineGearCollision(FLOAT64VECTOR * ReturnForce,
 									  FLOAT64 WheelRadius,
 									  FLOAT64* WheelRotationSpeed,
 									  FLOAT64 WheelRotationalInertia,
-#if defined(USE_OSG)
-									 void*  ContactPointDOF,
-#else
 									  OBJECT * ContactPointDOF,
-#endif
 									  FLOAT64 DeltaTime,
 									  piMATRIX const* VehicleAttMat,
 									  mlGearComponentData * GearData,
@@ -93,19 +76,6 @@ static UINT32 _DetermineGearCollision(FLOAT64VECTOR * ReturnForce,
 									mlVehicleData const* VehicleData,
 									mlComponent const* Component);
 
-#if defined(USE_OSG)
-static UINT32 _DeterminePointCollision(FLOAT64* NormalDepth,
-										FLOAT64VECTOR* NormalVector,
-										FLOAT32* StaticFriction,
-										FLOAT32* DynamicFriction,
-										FLOAT32 * BumpDensity,
-										FLOAT32 * BumpHeight,
-										FLOAT32 * RollCoefficientMult,
-										FLOAT64 CollideLength,
-										mlGearComponentData const* GearData,
-										mlVehicleData const* VehicleData);
-
-#else
 static UINT32 _DeterminePointCollision(FLOAT64 * NormalDepth,
 										FLOAT64VECTOR * NormalVector,
 										piMATRIX const* ContactPointAttMat,
@@ -128,11 +98,6 @@ static UINT32 _DeterminePointCollision(FLOAT64 * NormalDepth,
 										mlGearComponentData const* GearData,
 										LOGICAL LimitLength,
 										mlVehicleData const* VehicleData);
-#endif
-
-#if(0)
-static UINT32 _GenerateSeededRandom(UINT32* Return,UINT32 Seed);
-#endif
 
 UINT32 NumTris;
 UINT32 NumObjs;
@@ -195,7 +160,7 @@ UINT32 mlgearSetComponentSubtype(void*  SpecialData, char * SubType)
 {
 mlGearComponentData * ComponentData;
 
-	if (SpecialData == NULL || SubType == NULL)
+	if (SpecialData == nullptr || SubType == nullptr)
 	{
 		return 1;
 	}
@@ -220,9 +185,9 @@ UINT32 mlgearAddSpecialVariable(void*  SpecialData,
 mlGearComponentData * ComponentData;
 UINT32 VarNum;
 
-	if (SpecialData == NULL ||
-		VarName == NULL ||
-		VarContents == NULL)
+	if (SpecialData == nullptr ||
+		VarName == nullptr ||
+		VarContents == nullptr)
 	{
 		return 1;
 	}
@@ -340,7 +305,7 @@ UINT32 mlUpdateGearComponent(FLOAT64VECTOR * Force, // OUT
 							void*  InVehicleData)
 {
 piMATRIX Matrix1 = IdentityMatrix,Matrix2 = IdentityMatrix;
-mlGearComponentData * GearData = NULL,*DriveWheel = NULL;
+mlGearComponentData * GearData = nullptr,*DriveWheel = nullptr;
 FLOAT64VECTOR GearSumForce = {0, 0, 0};
 FLOAT64VECTOR TempForce = {0, 0, 0};
 FLOAT64VECTOR ComponentVel = {0, 0, 0};
@@ -356,11 +321,11 @@ mlVehicleData * VehicleData;
 	Force->x = Force->y = Force->z = 0;
 	Torque->Roll = Torque->Pitch = Torque->Yaw = 0;
 
-	if (Component == NULL) return 0;
+	if (Component == nullptr) return 0;
 	if (_DisableCollisions != 0) return 0;
 
 	GearData = (mlGearComponentData*)(Component->SpecialData);
-	if (GearData == NULL) return 0;
+	if (GearData == nullptr) return 0;
 
 
 // determine damage to gear
@@ -394,7 +359,7 @@ mlVehicleData * VehicleData;
 	{
 		// hack for boats and cheese
 		vehVehicle*Vehicle = persGetPersonaVehiclePtr();
-		if (Vehicle != NULL && Vehicle->VehicleType->Type == VEH_TYPE_SEA && Vehicle->ModelData != NULL)
+		if (Vehicle != nullptr && Vehicle->VehicleType->Type == VEH_TYPE_SEA && Vehicle->ModelData != nullptr)
 		{
 			if (Component->CurrentDamage > Component->DamageLevels[3])
 			{
@@ -414,10 +379,10 @@ mlVehicleData * VehicleData;
 	// first extract the position of the contact point right now in the universe
 	if (PassNum == 0)
 	{
-		if (GearData->ContactPoint == NULL)
+		if (GearData->ContactPoint == nullptr)
 		{
 			if (GearData->Subtype == ML_GEAR_SUBTYPE_TRACK_ROADWHEEL &&
-				GearData->DriveWheelComponent != NULL)
+				GearData->DriveWheelComponent != nullptr)
 			{
 				DriveWheel = (mlGearComponentData*)GearData->DriveWheelComponent->SpecialData;
 				mlUpdateWheelSpeed(GearData->GearNum - 1,
@@ -426,49 +391,6 @@ mlVehicleData * VehicleData;
 			return 0;
 		}
 
-#if defined(USE_OSG)
-	    // doesn't take into account relative dof transforms
-	    dGeomID contactdof = (dGeomID)GearData->ContactPoint;
-
-        osg::Vec3d start, end;
-	    osgGeomRayGet(dGeomTransformGetGeom(contactdof), start, end);
-
-	    GearData->ContactPointCoords.x = start.x();
-	    GearData->ContactPointCoords.y = start.y();
-	    GearData->ContactPointCoords.z = start.z();
-
-        // wstrut DOF
-		osgSim::DOFTransform* shockdof = (osgSim::DOFTransform*)GearData->ShockDOF;
-
-        if(shockdof)
-        {
-            // Attempt to mimic what is happening with non-osg. Have no idea what
-            // is happening here, but this makes it work.
-
-            // See ogrpmain (_MoveAndRotateSubObject)
-            osg::Vec3d v = shockdof->getMaxTranslate() - shockdof->getMinTranslate();
-            v *= GearData->LastCompression;
-            v += shockdof->getMinTranslate();
-
-            osg::Matrix m;
-
-            m(3, 0) = v.x();
-            m(3, 1) = v.y();
-            m(3, 2) = v.z();
-
-            osg::Matrix mat1 = shockdof->getInversePutMatrix();
-            osg::Matrix mat2 = shockdof->getPutMatrix();
-
-            // Make cumulative matrix for this dof (???)
-            osg::Matrix cumulative;
-            cumulative = mat1 * m;
-            cumulative = cumulative * mat2;
-
-	        GearData->ContactPointCoords.x = start.x() + cumulative(3, 0);
-	        GearData->ContactPointCoords.y = start.y() + cumulative(3, 1);
-	        GearData->ContactPointCoords.z = start.z() + cumulative(3, 2);
-        }
-#else
 		OBJECT* ContactPoint = GearData->ContactPoint;
 		Matrix1 = IdentityMatrix;
 		Matrix1._41 = ContactPoint->dof->dofmatrix2._41;
@@ -477,7 +399,6 @@ mlVehicleData * VehicleData;
 		Matrix2 = ContactPoint->matint;
 		math3dMatrixMultiply(&Matrix1,&Matrix1,&Matrix2);
 		mlUtilityGetModelPositionFromObjectMatrix( &GearData->ContactPointCoords,&Matrix1);
-#endif
 		// calculate contact point velocity
 		TempVec1 = GearData->ContactPointCoords;
 		TempPiVec.x = -(FLOAT32)(VehicleAttVel->Pitch * 0.001);
@@ -567,7 +488,7 @@ mlVehicleData * VehicleData;
 							CollisionsOff,
 							VehicleData,
 							Component);
-	if (PassNum == 1 && GearData->ContactPoint != NULL)
+	if (PassNum == 1 && GearData->ContactPoint != nullptr)
 	{
 		// wheel rotation speed is in radians, for the gauges it needs to be in rps
 		mlUpdateWheelSpeed(GearData->GearNum - 1,-GearData->WheelRotationSpeed / PI / 2);
@@ -607,14 +528,13 @@ static UINT32 _HandleCastor(mlGearComponentData * GearData,
 							   FLOAT64 DeltaTime,
 							   piMATRIX const*VehicleAttMat)
 {
-	if (GearData->CastorDOF == NULL) return 0;
-	if (GearData->ContactPoint == NULL) return 0;
+	if (GearData->CastorDOF == nullptr) return 0;
+	if (GearData->ContactPoint == nullptr) return 0;
 
 	GearData->LastCastorYaw = 0.0;
 
 	mlUpdateCastorAttitude(GearData->GearNum-1, GearData->LastCastorYaw / PI);
 
-#if !defined(USE_OSG)
 	piMATRIX Matrix1,Matrix2;
 
     Matrix2 = GearData->CastorDOF->matint;
@@ -622,11 +542,7 @@ static UINT32 _HandleCastor(mlGearComponentData * GearData,
 	Matrix1 = GearData->CastorDOF->mat;
 	math3dMatrixMultiply(&Matrix2,&Matrix2,&Matrix1);
 	ogrpSetDOFVariable(GearData->CastorDOF, (FLOAT32)GearData->LastCastorYaw / PI, 0, 1);
-	ogrpMoveAndRotateSubObject(GearData->CastorDOF,
-								 &Matrix1,
-								 &Matrix2,
-								 0);
-#endif
+	ogrpMoveAndRotateSubObject(GearData->CastorDOF, &Matrix1, &Matrix2);
 	return 0;
 }
 
@@ -652,11 +568,11 @@ static UINT32 _HandleGearStrut(mlGearComponentData * GearData,
 
     vehVehicle* Vehicle = persGetPersonaVehiclePtr();
 
-	if (GearData->ShockDOF != NULL)
+	if (GearData->ShockDOF != nullptr)
 	{
 		// hack for boats and cheese
 			StrengthAdjust = 1.0;
-		if (Vehicle != NULL && Vehicle->VehicleType->Type == VEH_TYPE_SEA && Vehicle->ModelData != NULL)
+		if (Vehicle != nullptr && Vehicle->VehicleType->Type == VEH_TYPE_SEA && Vehicle->ModelData != nullptr)
 		{
 			StrengthAdjust = Component->DamageLevels[3];
 			if (StrengthAdjust > 0.001)
@@ -689,18 +605,6 @@ static UINT32 _HandleGearStrut(mlGearComponentData * GearData,
 			}
 		}
 
-
-
-#if defined(USE_OSG)
-		osgSim::DOFTransform* shockdof = (osgSim::DOFTransform*)GearData->ShockDOF;
-		osg::Matrix attmat;
-		Vehicle->vehicle->Attitude().get(attmat);
-		osg::Matrix shockmat = shockdof->getInversePutMatrix();
-		shockmat(3,0) = shockmat(3,1) = shockmat(3,2) =
-		shockmat(0,3) = shockmat(1,3) = shockmat(2,3) = 0;
-
-		CompressionForceBase = (attmat * shockmat * osg::Vec3d(0,0,1)) * osg::Vec3d(GearSumForce->x,GearSumForce->y,GearSumForce->z);
-#else
 		FLOAT64VECTOR TempVec1,TempVec2;
 		piMATRIX Matrix1;
 
@@ -714,7 +618,6 @@ static UINT32 _HandleGearStrut(mlGearComponentData * GearData,
 		mathVectorMultiply64(&TempVec2,&TempVec2,&Matrix1);
 
 		CompressionForceBase = mathVectDotProduct(&TempVec2,&TempVec1);
-#endif
 		TimeDelta = DeltaTime / 1000.0 / STRUT_NUM_LOOPS;
 
 		for (i=0;i<STRUT_NUM_LOOPS;i++)
@@ -730,7 +633,7 @@ static UINT32 _HandleGearStrut(mlGearComponentData * GearData,
 
 
 			// added hack for boats and cheese
-			if (Vehicle != NULL && Vehicle->VehicleType->Type == VEH_TYPE_SEA)
+			if (Vehicle != nullptr && Vehicle->VehicleType->Type == VEH_TYPE_SEA)
 			{
 
 			}
@@ -783,18 +686,13 @@ static UINT32 _HandleGearStrut(mlGearComponentData * GearData,
 			GearData->LastCompressionForce = CompressionForce;
 		}
 		mlUpdateStrutCompression(GearData->GearNum - 1, Compression);
-#if !defined(USE_OSG)
 		piMATRIX Matrix2 = GearData->ShockDOF->matint;
 		math3dInvertMatrix(&Matrix2,&Matrix2);
 		Matrix1 = GearData->ShockDOF->mat;
 		math3dMatrixMultiply(&Matrix2,&Matrix2,&Matrix1);
 		ogrpSetDOFVariable(GearData->ShockDOF, (FLOAT32)Compression, 0, 1);
-		ogrpMoveAndRotateSubObject(GearData->ShockDOF,
-									 &Matrix1,
-									 &Matrix2,
-									 0);
+		ogrpMoveAndRotateSubObject(GearData->ShockDOF, &Matrix1, &Matrix2);
 
-#endif
 		}
 
 
@@ -816,11 +714,7 @@ static UINT32 _DetermineGearCollision(FLOAT64VECTOR * ReturnForce, // OUT
 									  FLOAT64 WheelRadius,
 									  FLOAT64* WheelRotationSpeed,
 									  FLOAT64 WheelRotationalInertia,
-#if defined(USE_OSG)
-									 void*  ContactPointDOF,
-#else
 									  OBJECT * ContactPointDOF,
-#endif
 									  FLOAT64 DeltaTime,
 									  piMATRIX const* VehicleAttMat,
 									  mlGearComponentData * GearData, // OUT
@@ -846,7 +740,7 @@ static UINT32 _DetermineGearCollision(FLOAT64VECTOR * ReturnForce, // OUT
 									mlVehicleData const* VehicleData,
 									mlComponent const* Component)
 {
-	if (ContactPointDOF == NULL)
+	if (ContactPointDOF == nullptr)
 	{
 		ReturnForce->x = ReturnForce->y = ReturnForce->z = 0;
 		return 0;
@@ -868,7 +762,7 @@ static UINT32 _DetermineGearCollision(FLOAT64VECTOR * ReturnForce, // OUT
 	FLOAT64 WheelRotationForce = 0.0f;
 	FLOAT64 BrakeForce = 0.0f;
 	FLOAT64 EffectiveBrakeForce = 0.0f;
-	mlGearComponentData * DriveWheel = NULL;
+	mlGearComponentData * DriveWheel = nullptr;
 	FLOAT64 RotationalInertia = 0.0f;
 	FLOAT64 OneOverRotationalInertia = 0.0f;
 	UINT32 NumLoops = 0;
@@ -893,40 +787,12 @@ static UINT32 _DetermineGearCollision(FLOAT64VECTOR * ReturnForce, // OUT
 
 	piMATRIX InvContactPointAttMat = IdentityMatrix;
 
-#if defined(USE_OSG)
-    dGeomID dof = (dGeomID)(ContactPointDOF);
-
-    osg::Matrixd m;
-    // Get cumulative matrix for this dof
-    osgGeomGetRotationMatrix(dof, m);
-
-    piMATRIX ContactPointAttMat;
-    ContactPointAttMat._11 = m(0, 0);
-    ContactPointAttMat._12 = m(0, 1);
-    ContactPointAttMat._13 = m(0, 2);
-    ContactPointAttMat._14 = m(0, 3);
-    ContactPointAttMat._21 = m(1, 0);
-    ContactPointAttMat._22 = m(1, 1);
-    ContactPointAttMat._23 = m(1, 2);
-    ContactPointAttMat._24 = m(1, 3);
-    ContactPointAttMat._31 = m(2, 0);
-    ContactPointAttMat._32 = m(2, 1);
-    ContactPointAttMat._33 = m(2, 2);
-    ContactPointAttMat._34 = m(2, 3);
-    ContactPointAttMat._41 = m(3, 0);
-    ContactPointAttMat._42 = m(3, 1);
-    ContactPointAttMat._43 = m(3, 2);
-    ContactPointAttMat._44 = m(3, 3);
-
- 	math3dInvert2(&InvContactPointAttMat, &ContactPointAttMat);
-#else
 	piMATRIX ContactPointAttMat = IdentityMatrix;
 	math3dMatrixMultiply(&ContactPointAttMat, &(ContactPointDOF->dof->dofmatrix2), &(ContactPointDOF->matint));
 	ContactPointAttMat._41 = ContactPointAttMat._42 = ContactPointAttMat._43 = 0;
 	mlUtilityConvertMatrixToModelReference(&ContactPointAttMat,&ContactPointAttMat);
 	math3dMatrixMultiply(&ContactPointAttMat,&ContactPointAttMat,VehicleAttMat);
 	math3dInvert2(&InvContactPointAttMat,&ContactPointAttMat);
-#endif
 
 	if (PassNum == 0)
 	{
@@ -938,18 +804,6 @@ static UINT32 _DetermineGearCollision(FLOAT64VECTOR * ReturnForce, // OUT
 		{
 			CollideLength = WheelRadius;
 		}
-#if defined(USE_OSG)
-		_DeterminePointCollision(&NormalDepth,
-								 &NormalVector,
-								 StaticFriction,
-								 DynamicFriction,
-								 BumpDensity,
-								 BumpHeight,
-								 RollCoefficientMult,
-								 CollideLength,
-								 GearData,
-								 VehicleData);
-#else
 		_DeterminePointCollision(&NormalDepth,
 								 &NormalVector,
 								 &ContactPointAttMat,
@@ -972,7 +826,6 @@ static UINT32 _DetermineGearCollision(FLOAT64VECTOR * ReturnForce, // OUT
 								 GearData,
 								VehicleData->VehicleMasterPtr->VehicleType->Type != VEH_TYPE_SEA,
 								VehicleData);
-#endif
 		if(VehicleData->VehicleMasterPtr->VehicleType->Type != VEH_TYPE_SEA && *RollCoefficientMult > 198.999f && *RollCoefficientMult < 199.001f)
 		{
 			ReturnForce->x = ReturnForce->y = ReturnForce->z = 0;
@@ -982,7 +835,7 @@ static UINT32 _DetermineGearCollision(FLOAT64VECTOR * ReturnForce, // OUT
 
 		{
 			vehVehicle* Vehicle = persGetPersonaVehiclePtr();
-			if (Vehicle != NULL && Vehicle->VehicleType->Type == VEH_TYPE_SEA)
+			if (Vehicle != nullptr && Vehicle->VehicleType->Type == VEH_TYPE_SEA)
 			{
 
 			}
@@ -1136,10 +989,10 @@ static UINT32 _DetermineGearCollision(FLOAT64VECTOR * ReturnForce, // OUT
 		StaticFrictionVec.y = -ForceUnit.y * L1;
 		StaticFrictionVec.z = -ForceUnit.z * L1;
 
-		DriveWheel = NULL;
+		DriveWheel = nullptr;
 		if (GearData->Subtype == ML_GEAR_SUBTYPE_TRACK_ROADWHEEL)
 		{
-			if (GearData->DriveWheelComponent != NULL)
+			if (GearData->DriveWheelComponent != nullptr)
 			{
 				DriveWheel = (mlGearComponentData*)GearData->DriveWheelComponent->SpecialData;
 			}
@@ -1147,7 +1000,7 @@ static UINT32 _DetermineGearCollision(FLOAT64VECTOR * ReturnForce, // OUT
 
 		RollCoefficient = 0.02;
 
-		if (DriveWheel != NULL)
+		if (DriveWheel != nullptr)
 		{
 			if (DriveWheel->RollCoefficient != 0.0)
 			{
@@ -1235,7 +1088,7 @@ static UINT32 _DetermineGearCollision(FLOAT64VECTOR * ReturnForce, // OUT
 
 		{
 			vehVehicle* Vehicle = persGetPersonaVehiclePtr();
-			if (Vehicle != NULL && Vehicle->VehicleType->Type == VEH_TYPE_SEA)
+			if (Vehicle != nullptr && Vehicle->VehicleType->Type == VEH_TYPE_SEA)
 			{
 
 			}
@@ -1322,7 +1175,7 @@ static UINT32 _DetermineGearCollision(FLOAT64VECTOR * ReturnForce, // OUT
 
 			// factor in wheels
 			Vely = NormalVel.y;
-			if (GearData->Subtype == ML_GEAR_SUBTYPE_TRACK_ROADWHEEL && DriveWheel != NULL)
+			if (GearData->Subtype == ML_GEAR_SUBTYPE_TRACK_ROADWHEEL && DriveWheel != nullptr)
 			{
 				Vely -= DriveWheel->WheelRadius * DriveWheel->WheelRotationSpeed;
 			}
@@ -1432,7 +1285,7 @@ static UINT32 _DetermineGearCollision(FLOAT64VECTOR * ReturnForce, // OUT
 			WheelRotationalForceSum -= WheelRotationForce;
 
 
-			if (GearData->Subtype != ML_GEAR_SUBTYPE_TRACK_ROADWHEEL || DriveWheel == NULL)
+			if (GearData->Subtype != ML_GEAR_SUBTYPE_TRACK_ROADWHEEL || DriveWheel == nullptr)
 			{
 				NewWheelSpeed = *WheelRotationSpeed + WheelRotationForce * WheelRadius * OneOverRotationalInertia *
 								DeltaTime * 0.001 * OneOverNumLoops;
@@ -1482,7 +1335,7 @@ static UINT32 _DetermineGearCollision(FLOAT64VECTOR * ReturnForce, // OUT
 //			NormalForce.y = 0;
 		}
 
-		if (GearData->Subtype == ML_GEAR_SUBTYPE_TRACK_ROADWHEEL && DriveWheel != NULL)
+		if (GearData->Subtype == ML_GEAR_SUBTYPE_TRACK_ROADWHEEL && DriveWheel != nullptr)
 		{
 
 			DriveWheel->TrackCumulativeFrictionForce += WheelRotationalForceSum / NumLoops;
@@ -1536,57 +1389,6 @@ static UINT32 _DetermineGearCollision(FLOAT64VECTOR * ReturnForce, // OUT
 
 // NormalDepth is the depth into the surface the contact point is
 // NormalVector is the normal vector to the surface, scaled to a unit vector
-#if defined(USE_OSG)
-
-static UINT32 _DeterminePointCollision(FLOAT64* NormalDepth,
-										FLOAT64VECTOR* NormalVector,
-										FLOAT32* StaticFriction,
-										FLOAT32* DynamicFriction,
-										FLOAT32 * BumpDensity,
-										FLOAT32 * BumpHeight,
-										FLOAT32 * RollCoefficientMult,
-										FLOAT64 CollideLength,
-										mlGearComponentData const* GearData,
-										mlVehicleData const* VehicleData)
-{
-	*NormalDepth = 1;
-
-	NormalVector->x = 0;
-    NormalVector->y = 0;
-    NormalVector->z = 1;
-
-	colliderQuery::CollisionList collisions;
-	VehicleData->VehicleObjectData->vehicleCollider->getCollisions((dGeomID)GearData->ContactPoint, collisions, true);
-
-    if(!collisions.empty())
-	{
-        // Since our collisions now go ground up, take the last one
-        unsigned int q = collisions.size() - 1;
-
-        NormalVector->x = collisions[q].normal.x();
-		NormalVector->y = collisions[q].normal.y();
-		NormalVector->z = collisions[q].normal.z();
-
-		*NormalDepth = -collisions[q].depth;
-
-        colliderGeom* geom = (colliderGeom*)dGeomGetData(collisions[q].g2);
-
-        if(geom)
-        {
-            getBumpinessAndFriction(geom->surface().c_str(),
-                                    BumpDensity,
-                                    BumpHeight,
-                                    StaticFriction,
-                                    DynamicFriction,
-                                    RollCoefficientMult,
-                                    NULL);
-        }
-    }
-
-	return 0;
-}
-
-#else
 static UINT32 _DeterminePointCollision(FLOAT64 * NormalDepth, // OUT
 										FLOAT64VECTOR * NormalVector, // OUT
 										piMATRIX const* ContactPointAttMat,
@@ -1769,7 +1571,7 @@ static int Count;
 
 	if (*RollCoefficientMult > 198.99 && *RollCoefficientMult < 199.01)
 	{
-		if (!(Vehicle != NULL && Vehicle->VehicleType->Type != VEH_TYPE_GROUND))
+		if (!(Vehicle != nullptr && Vehicle->VehicleType->Type != VEH_TYPE_GROUND))
 		{
 			RetVal = 0;
 		}
@@ -1778,7 +1580,7 @@ static int Count;
 
 	{
 		// sinking hack
-		if (Vehicle != NULL && Vehicle->VehicleType->Type == VEH_TYPE_SEA)
+		if (Vehicle != nullptr && Vehicle->VehicleType->Type == VEH_TYPE_SEA)
 		{
 			if (GearData->LastCompression > 0.9f)
 			{
@@ -1804,7 +1606,7 @@ static int Count;
 
 
 		// compute normal
-		if (CollideObject == NULL)
+		if (CollideObject == nullptr)
 		{
 			NormalVector->x = NormalVector->y = 0;
 			NormalVector->z = 1.0;
@@ -1823,7 +1625,7 @@ static int Count;
 										   StaticFriction,
 										   DynamicFriction,
 										   RollCoefficientMult,
-										   NULL,
+										   nullptr,
 										   CollideObject,
 										   TRUE);
 		}
@@ -1831,7 +1633,6 @@ static int Count;
 	}
 	return 0;
 }
-#endif
 
 #include "trn/trnvars.h"
 UINT32 mlgearDetermineHeightVariance(FLOAT64* HeightVariance,

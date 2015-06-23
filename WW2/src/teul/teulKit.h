@@ -13,10 +13,6 @@
 //! @details TeulKit is PlayNet Inc's proprietary networking/callback stack.
 namespace Teul { }
 
-#if platOS != OS_LINUX
-# include <string.h>
-#endif
-
 #include "teul/teulEnums.h"
 #include "teul/teulBasic.h"
 #include "teul/teulFuncTypes.h"
@@ -29,11 +25,12 @@ namespace Teul { }
 //	errorFnPtr is for the user error routine, use null if not required.
 //	killFnPtr is the function that is called for cleanup when teul encounters
 //	an unrecoverable error.
-extern SINT32 teulInitTransport(SINT32 logType
-							, const char* name
-							, ERROR_FUNCTION* errorFnPtr
-							, Teul::LoggingFn* const logFnPtr = NULL
-							);
+SINT32 teulInitTransport(SINT32 logType
+						, const char* name
+						, ERROR_FUNCTION* errorFnPtr
+						, void (*killFnPtr)(int /*signo*/)
+						, Teul::LoggingFn const logFnPtr=nullptr
+						);
 
 //	there are 48 local connections "built in" to the teul system, and each
 //	is referred to by number (starting with 0).
@@ -42,15 +39,15 @@ extern SINT32 teulInitTransport(SINT32 logType
 // installed.
 // [acceptFnPtr] is an optional ptr to callback function which is called when
 // a connection is made to the listening socket, and hence a new connection
-// is created.  pass NULL if you do not want this notification
+// is created.  pass nullptr if you do not want this notification
 // [timeout] is a timeout for this connection in ms for this connection (0 uses default).
 // [protocol] is the protocol for this connection (TCP, UDP, etc).
 // returns the teulIndex associated with this connection.
-extern SINT32 teulOpenListen(const UINT16 portNumber
-						, CONNECT_FUNCTION* acceptFnPtr
-						, const SINT32 timeout, const PROTOCOL protocol
-						, ERROR_FUNCTION* errorFnPtr
-						);
+SINT32 teulOpenListen(const UINT16 portNumber
+					, CONNECT_FUNCTION* acceptFnPtr
+					, const SINT32 timeout, const PROTOCOL protocol
+					, ERROR_FUNCTION* errorFnPtr
+					);
 
 //! \brief Opens ports for all of the addresses allocated to the host's primary network interface.
 //! Assumes that all callbacks have been properly installed.
@@ -59,7 +56,7 @@ extern SINT32 teulOpenListen(const UINT16 portNumber
 //! \param[in] timeout millisecond period after which the connection is dropped if we can't talk to it.
 //! \param[in] errorFnPtr function to call when an error occurs on this interface.
 //! \return true if all opens were successful, otherwise false. 
-extern bool teulOpenListenInterface(const UINT16 portNumber
+bool teulOpenListenInterface(const UINT16 portNumber
 						, CONNECT_FUNCTION* acceptFnPtr
 						, const SINT32 timeout
 						, ERROR_FUNCTION* errorFnPtr
@@ -69,8 +66,8 @@ extern bool teulOpenListenInterface(const UINT16 portNumber
 // installed.  returns the number of the teulIndex associated with this
 // connection acceptFnPtr is an optional ptr to callback function which is
 // called when a connection is made to the listening socket, and hence a new
-// connection is created.  pass NULL if you do not want this notification
-extern SINT32 teulOpenListenHost(const UINT32 ipAddress
+// connection is created.  pass nullptr if you do not want this notification
+SINT32 teulOpenListenHost(const UINT32 ipAddress
 						, const UINT16 portNumber
 						, CONNECT_FUNCTION* acceptFnPtr
 						, const SINT32 timeout
@@ -83,12 +80,12 @@ extern SINT32 teulOpenListenHost(const UINT32 ipAddress
 //  returned as [A].[B].[C].[D] = (A<<24) + (B<<16) + (C<<8) + D;
 // [connectFnPtr] is an optional ptr to callback function which is called when
 // a connection is established to the destination socket, and hence a new connection
-// is created.  pass NULL if you do not want this notification.
+// is created.  pass nullptr if you do not want this notification.
 // [timeout] is a timeout for this connection in ms for this connection (0 uses default).
 // [protocol] is the protocol for this connection (TCP, UDP, etc).
 // returns the teulIndex associated with this connection.
-extern SINT32 teulOpenSend(UINT32 Host, const UINT16 portNumber
-						, CONNECT_FUNCTION* connectFnPtr
-						, const SINT32 timeout, const PROTOCOL protocol
-						, ERROR_FUNCTION* errorFnPtr);
+SINT32 teulOpenSend(UINT32 Host, const UINT16 portNumber
+					, CONNECT_FUNCTION* connectFnPtr
+					, const SINT32 timeout, const PROTOCOL protocol
+					, ERROR_FUNCTION* errorFnPtr);
 

@@ -1,5 +1,5 @@
 #include <syscfg.h> // Path is project specific.
-// This module provides circular linked list managment routines.
+// This module provides circular linked list management routines.
 //
 // Copyright 1999 Playnet Inc, All rights reserved
 // Not to be distributed in API form except as part of a compiled
@@ -7,8 +7,6 @@
 //
 // Originating Programmer: Martin Poulin
 // Supporting Programmer: Russell Mirabelli
-
-#include "dbug/dbug.h"
 
 #include "mem/mem.h"
 #include "list/listCL.h"
@@ -27,25 +25,30 @@ static void breakHere(void)
 static inline LOGICAL
 _listAddItemAfter(LISTHEADER** list, LISTHEADER* inpoint, LISTHEADER* node)
 {
-	try
+	const char* reason = nullptr;
+	if ( PN_UNLIKELY(list == nullptr) )
+		reason = "NULL list";
+	else if ( PN_UNLIKELY(node == nullptr) ) 
+		reason = "NULL node";
+	else if ( PN_UNLIKELY(inpoint == nullptr) )
+		reason = "NULL inpoint";
+	else if ( PN_UNLIKELY(*list == nullptr) )
+		reason = "empty list";
+	else if ( PN_UNLIKELY(node == inpoint) )
+		reason = "node == inpoint";
+	else if ( PN_UNLIKELY(inpoint->next == node) )
+		reason = "node already inplace";
+	else if ( PN_UNLIKELY(inpoint->prev == node) )
+		reason = "node already present";
+	if ( PN_UNLIKELY(reason != nullptr) )
 	{
-		if ( list == NULL ) throw "NULL list" ;
-		if ( node == NULL ) throw "NULL node" ;
-		if ( inpoint == NULL ) throw "NULL inpoint" ;
-		if ( *list == NULL ) throw "empty list" ;
-		if ( node == inpoint ) throw "node == inpoint" ;
-		if ( inpoint->next == node ) throw "node already inplace" ;
-		if ( inpoint->prev == node ) throw "node already present" ;
-	}
-	catch ( const char* error )
-	{
-		dbugLog(_FLX, "can't add item %p after node %p to list %p: %s", node, inpoint, list, error) ;
-		return FALSE ;
+		dbugLog(_FLX, "can't add item %p after node %p to list %p: %s", node, inpoint, list, reason);
+		return FALSE;
 	}
 
 	node->next = inpoint->next;
 
-	if (inpoint->next != NULL)
+	if (inpoint->next != nullptr)
 		inpoint->next->prev = node;			// insert into list
 	else
 		(*list)->prev = node;
@@ -59,31 +62,35 @@ _listAddItemAfter(LISTHEADER** list, LISTHEADER* inpoint, LISTHEADER* node)
 static inline LOGICAL
 _listAddItemBefore(LISTHEADER** list, LISTHEADER* inpoint, LISTHEADER* node)
 {
-	try
+	const char* reason = nullptr;
+	if (PN_UNLIKELY(list == nullptr))
+		reason = "NULL list";
+	else if (PN_UNLIKELY(node == nullptr))
+		reason = "NULL node";
+	else if (PN_UNLIKELY(inpoint == nullptr))
+		reason = "NULL inpoint";
+	else if (PN_UNLIKELY(*list == nullptr))
+		reason = "empty list";
+	else if (PN_UNLIKELY(node == inpoint))
+		reason = "node == inpoint";
+	else if (PN_UNLIKELY(inpoint->next == node))
+		reason = "node already inplace";
+	else if (PN_UNLIKELY(inpoint->prev == node))
+		reason = "node already present";
+	if (PN_UNLIKELY(reason != nullptr))
 	{
-		if ( list == NULL ) throw "NULL list" ;
-		if ( node == NULL ) throw "NULL node" ;
-		if ( inpoint == NULL ) throw "NULL inpoint" ;
-		if ( *list == NULL ) throw "empty list" ;
-		if ( node == inpoint ) throw "node == inpoint" ;
-		if ( inpoint->prev == node ) throw "node already inplace" ;
-		if ( inpoint->next == node ) throw "node already present" ;
-		if ( inpoint->prev == NULL ) throw "NULL prev" ;
-	}
-	catch ( const char* error )
-	{
-		dbugLog(_FLX, "can't add item %p before node %p to list %p: %s", node, inpoint, list, error) ;
-		return FALSE ;
+		dbugLog(_FLX, "can't add item %p before node %p to list %p: %s", node, inpoint, list, reason);
+		return FALSE;
 	}
 
-	if (*list == NULL || *list == inpoint)
+	if (*list == nullptr || *list == inpoint)
 		return listCLPushItem(list, node);
 
 	node->next = inpoint;
 	node->prev = inpoint->prev;
 	inpoint->prev = node;
 
-	if (node->prev->next != NULL)
+	if (node->prev->next != nullptr)
 		node->prev->next = node;
 	else
 		*list = node;
@@ -94,19 +101,19 @@ _listAddItemBefore(LISTHEADER** list, LISTHEADER* inpoint, LISTHEADER* node)
 LISTHEADER*
 listCLPopItem( LISTHEADER** list )
 {
-	LISTHEADER* newNode = *list ;
+	LISTHEADER* newNode = *list;
 
-	if (newNode != NULL)
+	if (newNode != nullptr)
 	{
 		*list = newNode->next;
 
-		if (newNode->next != NULL)
+		if (newNode->next != nullptr)
 		{
 			newNode->next->prev = newNode->prev;
 		}
 
 		newNode->prev = newNode;
-		newNode->next = NULL;
+		newNode->next = nullptr;
 	}
 
 	return newNode;
@@ -115,28 +122,29 @@ listCLPopItem( LISTHEADER** list )
 LOGICAL
 listCLPushItem(LISTHEADER** list, LISTHEADER* node)
 {
-	try
+	const char* reason = nullptr;
+	if ( PN_UNLIKELY(list == nullptr) )
+		reason = "NULL list";
+	else if ( PN_UNLIKELY(node == nullptr) )
+		reason = "NULL node";
+	else if ( PN_UNLIKELY(node == *list) )
+		reason = "already in list";
+	if ( PN_UNLIKELY(reason != nullptr) )
 	{
-		if ( list == NULL ) throw "NULL list" ;
-		if ( node == NULL ) throw "NULL node" ;
-		if ( node == *list ) throw "already in list" ;
-	}
-	catch ( const char* error )
-	{
-		dbugLog(_FLX, "can't add item %p to list %p: %s", node, list, error) ;
-		return FALSE ;
+		dbugLog(_FLX, "can't add item %p to list %p: %s", node, list, reason);
+		return FALSE;
 	}
 
-	if ( node->prev != NULL && node->prev->next == node )
+	if ( node->prev != nullptr && node->prev->next == node )
 	{
 		dbugLog(_FLX,"illegal pointer chain node %p list %p!",node,list);
 		return FALSE;
 	}
 
 	node->prev = node;
-	node->next = NULL;
+	node->next = nullptr;
 
-	if ( (node->next = (*list) ) != NULL)
+	if ( (node->next = (*list) ) != nullptr)
 	{
 		node->prev = (*list)->prev;
 		(*list)->prev = node;
@@ -156,9 +164,9 @@ listCLPushItem(LISTHEADER** list, LISTHEADER* node)
 
 LOGICAL listCLAppendList(LISTHEADER** dest, LISTHEADER** source)
 {
-LISTHEADER* temp;
+	LISTHEADER* temp;
 
-	if (dest == NULL ||  source == NULL )
+	if (dest == nullptr ||  source == nullptr )
 	{
 		dbugLog(_FLX,"invalid params to listCLAppendList dest %p  source %p "
 					, dest, source);
@@ -166,25 +174,22 @@ LISTHEADER* temp;
 	}
 
 	// dont append null lists
-	if (*source == NULL)
+	if (*source == nullptr)
 		return FALSE;
 
 	// destination is empty just copy the pointer
-	if (*dest == NULL)
+	if (*dest == nullptr)
 		*dest = *source;
 
-	if ((*dest)->prev == NULL || (*source)->prev == NULL)
-	{
-		dbugLog(_FLX, "illegal NULL prev pointer for dest %p or source %p"
-			, (*dest)->prev, (*source)->prev);
-	}
+	if (PN_UNLIKELY((*dest)->prev == nullptr || (*source)->prev == nullptr))
+		LogAbort("Illegal null prev pointer for dest %p or source %p", (*dest)->prev, (*source)->prev);
 
 	temp = (*dest)->prev;
 	(*dest)->prev->next = (*source);
 	(*dest)->prev = (*source)->prev;
 	(*source)->prev = temp;
 
-	*source = NULL;
+	*source = nullptr;
 
 	return TRUE;
 }
@@ -192,19 +197,20 @@ LISTHEADER* temp;
 LOGICAL
 listCLPushItemEnd(LISTHEADER** list, LISTHEADER* node)
 {
-	try
+	const char* reason = nullptr;
+	if ( PN_UNLIKELY(list == nullptr) ) 
+		reason = "NULL list";
+	else if ( PN_UNLIKELY(node == nullptr) )
+		reason = "NULL node";
+	else if ( PN_UNLIKELY(node == *list) ) 
+		reason = "already in list";
+	if ( PN_UNLIKELY(reason != nullptr) )
 	{
-		if ( list == NULL ) throw "NULL list" ;
-		if ( node == NULL ) throw "NULL node" ;
-		if ( node == *list ) throw "already in list" ;
-	}
-	catch ( const char* error )
-	{
-		dbugLog(_FLX, "can't add item %p to list %p: %s", node, list, error) ;
-		return FALSE ;
+		dbugLog(_FLX, "can't add item %p to list %p: %s", node, list, reason);
+		return FALSE;
 	}
 
-	if (*list == NULL)
+	if (*list == nullptr)
 		return listCLPushItem( list, node);
 	else
 		return _listAddItemAfter(list,(*list)->prev,node);
@@ -213,40 +219,43 @@ listCLPushItemEnd(LISTHEADER** list, LISTHEADER* node)
 LISTHEADER
 *listCLExtractItem(LISTHEADER** list, LISTHEADER* node)
 {
-	try
+	const char* reason = nullptr;
+	if ( PN_UNLIKELY(list == nullptr) )
+		reason = "NULL list";
+	else if ( PN_UNLIKELY(*list == nullptr) )
+		reason = "*NULL list";
+	else if ( PN_UNLIKELY(node == nullptr) ) 
+		reason = "NULL item";
+	else if ( PN_UNLIKELY(node->prev == nullptr) ) 
+		reason = "NULL prev";
+	else if ( *list != node )
 	{
-		if ( list == NULL ) throw "NULL list" ;
-		if ( *list == NULL ) throw "*NULL list" ;
-		if ( node == NULL ) throw "NULL item" ;
-		if ( node->prev == NULL ) throw "NULL prev" ;
-
-		if ( *list != node )
-		{
-			if ( node->prev == node ) throw "invalid backref" ;
-			if ( node->prev->next == NULL ) throw "invalid fwdref" ;
-		}
+		if ( PN_UNLIKELY(node->prev == node) )
+			reason = "invalid backref";
+		if ( PN_UNLIKELY(node->prev->next == nullptr) ) 
+			reason = "invalid fwdref";
 	}
-	catch ( const char* error )
+	if ( PN_UNLIKELY(reason != nullptr) )
 	{
-		dbugLog(_FLX, "cant extract item %p to list %p: %s", node, list, error) ;
-		return NULL;
+		dbugLog(_FLX, "cant extract item %p to list %p: %s", node, list, reason);
+		return nullptr;
 	}
 
 	// This shouldn't be happening, but somehow, somewhere, it is.
 	if ( node->next == node )
-		node->next = NULL ;
+		node->next = nullptr;
 
-	if (node->prev->next == NULL || *list == node)
+	if (node->prev->next == nullptr || *list == node)
 	{
 		*list = node->next;
-		if (*list != NULL)
+		if (*list != nullptr)
 			(*list)->prev = node->prev;
 	}
 	else
 	{
 		node->prev->next = node->next;
 
-		if (node->next != NULL)
+		if (node->next != nullptr)
 			node->next->prev = node->prev;
 		else
 			(*list)->prev = node->prev;
@@ -254,7 +263,7 @@ LISTHEADER
 
 
 	node->prev = node;
-	node->next = NULL;
+	node->next = nullptr;
 
 	return node;
 }
@@ -272,7 +281,7 @@ LOGICAL listCLAddItemBefore( LISTHEADER** list, LISTHEADER* inpoint, LISTHEADER*
 
 LOGICAL listCLMoveItemAfter(LISTHEADER* inpoint, LISTHEADER* node)
 {
-	if (inpoint == NULL || node == NULL || inpoint == node)
+	if ( PN_UNLIKELY(inpoint == nullptr || node == nullptr || inpoint == node) )
 	{
 		dbugLog(_FLX, "cant move item %p after node %p",node,inpoint);
 		return FALSE;
@@ -291,7 +300,7 @@ LOGICAL listCLMoveItemAfter(LISTHEADER* inpoint, LISTHEADER* node)
 
 LOGICAL listCLMoveItemBefore(LISTHEADER* inpoint, LISTHEADER* node)
 {
-	if (inpoint == NULL || node == NULL || inpoint == node)
+	if ( PN_UNLIKELY(inpoint == nullptr || node == nullptr || inpoint == node) )
 	{
 		dbugLog(_FLX, "cant move item %p before node %p",node,inpoint);
 		return FALSE;
@@ -314,24 +323,24 @@ void* listCLInit( SINT32 numitems, size_t itemsize )
 int   i;
 LISTHEADER*  part, *nextPart;
 
-	if ( numitems <= 0 || itemsize <= 0)
+	if ( PN_UNLIKELY(numitems <= 0 || itemsize <= 0) )
 	{
 		dbugLog(_FLX, "illegal params num %d size %" PRSizeT "",numitems,itemsize);
 		return(FALSE);
 	}
 
 	LISTHEADER* free = (LISTHEADER*)memCalloc(itemsize, numitems);
-	if (free == NULL)
+	if ( PN_UNLIKELY(free == nullptr))
 	{
 		dbugLog(_FLX,"couldnt allocate memory for new list!!!");
-		return NULL;
+		return nullptr;
 	}
 
 	part = free;
 	part->prev = part;
-	part->next = NULL;					// make the list circular
+	part->next = nullptr;				// make the list circular
 
-	for (i = 1 ; i < numitems ; ++i)		// init and add the rest of the nodes
+	for (i = 1; i < numitems; ++i)		// init and add the rest of the nodes
 	{
 		nextPart = (LISTHEADER*)((char*)part + itemsize);
 		_listAddItemAfter(&free, part, nextPart);
@@ -352,17 +361,17 @@ LISTHEADER*  part, *nextPart, *list;
 		return(FALSE);
 	}
 
-	if (free == NULL)
+	if ( PN_UNLIKELY(free == nullptr) )
 	{
 		dbugLog(_FLX,"NULL memory for new list!!!");
-		return NULL;
+		return nullptr;
 	}
 
 	list = part = (LISTHEADER*)free;
 	part->prev = part;
-	part->next = NULL;					// make the list circular
+	part->next = nullptr;				// make the list circular
 
-	for (i = 1 ; i < numitems ; ++i)		// init and add the rest of the nodes
+	for (i = 1; i < numitems; ++i)		// init and add the rest of the nodes
 	{
 		nextPart = (LISTHEADER*)((char*)part + itemsize);
 		_listAddItemAfter(&list, part, nextPart);

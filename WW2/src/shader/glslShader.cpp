@@ -163,9 +163,9 @@ void glslShader::CompileShader()
     }
     temp.push_back( 0 );
     const char* s = &temp[0];
-    glShaderSource(_shaderhandle, 1, &s, NULL);
+    glShaderSource(_shaderhandle, 1, &s, nullptr);
 #else
-    glShaderSource(_shaderhandle, 1, &sourceText, NULL);
+    glShaderSource(_shaderhandle, 1, &sourceText, nullptr);
 #endif
 
     glCompileShader(_shaderhandle);

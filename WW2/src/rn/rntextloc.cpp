@@ -42,7 +42,7 @@ LOGICAL rntextLocInit()
     int i;
     SINT32 hHandle = -1;
     UINT32 uColor;
-   // LOCCHARLAYOUT* lpInfo = NULL;
+   // LOCCHARLAYOUT* lpInfo = nullptr;
 
 	g_bInitialized = TRUE;
 
@@ -167,12 +167,12 @@ LOGICAL rntextLoc3DString(UCHAR* pStr,
     FLOAT32 x = 0.0f;
     FLOAT32 y = (FLOAT32)rntextLocGetHeight(enumFont);
 
-    LOCCHARLAYOUT* lpInfo = NULL;
+    LOCCHARLAYOUT* lpInfo = nullptr;
 
-    if(lpVert == NULL)
+    if(lpVert == nullptr)
         return FALSE;
 
-    if(pStr == NULL)
+    if(pStr == nullptr)
         return FALSE;
 
     for(i = 0; i < iLength; i++)
@@ -182,7 +182,7 @@ LOGICAL rntextLoc3DString(UCHAR* pStr,
 
         lpInfo = rntextLocGetLayout(enumFont, pStr[i]);
 
-        if(lpInfo == NULL)
+        if(lpInfo == nullptr)
             return FALSE;
 
         lpVert[i].iTexID = g_iTextIDS[enumFont];
@@ -293,7 +293,7 @@ SINT32 rntextLocOutput2d(SCHAR* pStr,
 
     static piTLVERTEX tlVert[128];
     static piINDICES Indices[64];
-    LOCCHARLAYOUT* lpInfo = NULL;
+    LOCCHARLAYOUT* lpInfo = nullptr;
 
 #ifdef DIRECT3D
 	FLOAT32 x = (FLOAT32)iXin - 0.5f;
@@ -326,7 +326,7 @@ SINT32 rntextLocOutput2d(SCHAR* pStr,
     {
         lpInfo = rntextLocGetLayout(enumFont, pStr[i]);
 
-        if(lpInfo == NULL)
+        if(lpInfo == nullptr)
         {
 	        piSetRenderStageState(0, piTSS_MINFILTER, TextureMinFilter);
 	        piSetRenderStageState(0, piTSS_MAGFILTER, TextureMagFilter);
@@ -450,9 +450,9 @@ LOGICAL rntextLoc3DRender(LOCCHAR* lpVert, SINT32 iLength)
     piDisableTexture();
     piDisableMaterial();
 
-    if(lpVert == NULL)
+    if(lpVert == nullptr)
     {
-        Write_Debug("[rntextLoc3DRender] ***** lpVert == NULL *****");
+        Write_Debug("[rntextLoc3DRender] ***** lpVert == nullptr *****");
         return FALSE;
     }
 

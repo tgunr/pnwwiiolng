@@ -19,9 +19,9 @@
 
 //	------------------------------	Declarations
 
-static TEUL_CALLBACK* _XCHG_LISTING ;
-static TEUL_CALLBACK* _XCHG_SELECT ;
-static TEUL_CALLBACK* _XCHG_CREATE ;
+static TEUL_CALLBACK* _XCHG_LISTING;
+static TEUL_CALLBACK* _XCHG_SELECT;
+static TEUL_CALLBACK* _XCHG_CREATE;
 
 namespace Instance
 {
@@ -32,8 +32,8 @@ namespace Instance
 SINT32
 _sendListingRequest(ACTION_OBJECT* const a)
 {
-	a->offset = ((Instance::ListingRequest*)(a->localRawData))->packer(TEUL_PACK, a) ;
-	return a->offset ;
+	a->offset = ((Instance::ListingRequest*)(a->localRawData))->packer(TEUL_PACK, a);
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -42,8 +42,8 @@ _sendListingRequest(ACTION_OBJECT* const a)
 SINT32
 _sendSelect(ACTION_OBJECT* const a)
 {
-	a->offset = ((Instance::Descriptor*)(a->localRawData))->packer(TEUL_PACK, a) ;
-	return a->offset ;
+	a->offset = ((Instance::Descriptor*)(a->localRawData))->packer(TEUL_PACK, a);
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -52,8 +52,8 @@ _sendSelect(ACTION_OBJECT* const a)
 SINT32
 _sendCreate(ACTION_OBJECT* const a)
 {
-	a->offset = ((Instance::Descriptor*)(a->localRawData))->packer(TEUL_PACK, a) ;
-	return a->offset ;
+	a->offset = ((Instance::Descriptor*)(a->localRawData))->packer(TEUL_PACK, a);
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -78,8 +78,9 @@ _recvInstanceListing(ACTION_OBJECT* const a)
 	}
 	catch (std::exception& e)
 	{
+		(void)e;
 		///TODO: Handle exception. "e.what()" is a loggable error.
-		Write_Debug("Runtime exception processing Instance::Listing: %s", e.what()) ;
+		Write_Debug("Runtime exception processing Instance::Listing: %s", e.what());
 	}
 
 	if(list.isComplete())
@@ -90,10 +91,10 @@ _recvInstanceListing(ACTION_OBJECT* const a)
 	else
 	{
 		ww2::Client* client = ww2::Client::FromTeulIndex(a->teulIndex);
-		if(client) client->ProcessInstanceList(NULL);
+		if(client) client->ProcessInstanceList(nullptr);
 	}
 
-	return a->offset ;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -102,7 +103,7 @@ _recvInstanceListing(ACTION_OBJECT* const a)
 SINT32
 _recvSelect(ACTION_OBJECT* const a)
 {
-	Instance::Result result(a) ;
+	Instance::Result result(a);
 
 	if ( result.status() != Instance::_SUCCESS )
 	{
@@ -115,7 +116,7 @@ _recvSelect(ACTION_OBJECT* const a)
 		if(client) client->ProcessInstanceResult(result);
 	}
 
-	return a->offset ;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -124,7 +125,7 @@ _recvSelect(ACTION_OBJECT* const a)
 SINT32
 _recvCreate(ACTION_OBJECT* const a)
 {
-	Instance::Result result(a) ;
+	Instance::Result result(a);
 
 	if ( result.status() != Instance::_SUCCESS )
 	{
@@ -137,7 +138,7 @@ _recvCreate(ACTION_OBJECT* const a)
 		if(client) client->ProcessInstanceResult(result);
 	}
 
-	return a->offset ;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -147,9 +148,9 @@ _recvCreate(ACTION_OBJECT* const a)
 bool
 RequestListing(const Instance::Descriptor& query, SINT32 mapConnection)
 {
-	UINT32 requestID = Instance::Listing::getNextRequestID() ;
-	Instance::ListingRequest request(requestID, query) ;
-	return ( teulSend(mapConnection, _XCHG_LISTING, &request) >= 0 ) ;
+	UINT32 requestID = Instance::Listing::getNextRequestID();
+	Instance::ListingRequest request(requestID, query);
+	return ( teulSend(mapConnection, _XCHG_LISTING, &request) >= 0 );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -159,8 +160,8 @@ bool
 RequestListing(UINT32 instCategory, UINT32 instType, const UINT64& instOwner, SINT32 mapConnection)
 {
 	// Form the parameters into a descriptor
-	Instance::Descriptor query(instCategory, instType, instOwner) ;
-	return RequestListing(query, mapConnection) ;
+	Instance::Descriptor query(instCategory, instType, instOwner);
+	return RequestListing(query, mapConnection);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -171,14 +172,14 @@ RequestListing(UINT32 instCategory, UINT32 instType, const UINT64& instOwner, SI
 bool
 RequestSelect(const Instance::Descriptor& instance, SINT32 mapConnection)
 {
-	return ( teulSend(mapConnection, _XCHG_SELECT, (Instance::Descriptor*)&instance) >= 0 ) ;
+	return ( teulSend(mapConnection, _XCHG_SELECT, (Instance::Descriptor*)&instance) >= 0 );
 }
 
 bool
 RequestSelect(UINT32 instCategory, UINT32 instType, const UINT64& instOwner, const instanceid_t& id, SINT32 mapConnection)
 {
-	Instance::Descriptor instance(instCategory, instType, instOwner, id) ;
-	return RequestSelect(instance, mapConnection) ;
+	Instance::Descriptor instance(instCategory, instType, instOwner, id);
+	return RequestSelect(instance, mapConnection);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -188,14 +189,14 @@ RequestSelect(UINT32 instCategory, UINT32 instType, const UINT64& instOwner, con
 bool
 RequestCreate(const Instance::Descriptor& instance, SINT32 mapConnection)
 {
-	return ( teulSend(mapConnection, _XCHG_CREATE, (Instance::Descriptor*)&instance) >= 0 ) ;
+	return ( teulSend(mapConnection, _XCHG_CREATE, (Instance::Descriptor*)&instance) >= 0 );
 }
 
 bool
 RequestCreate(UINT32 instCategory, UINT32 instType, const UINT64& instOwner, SINT32 mapConnection)
 {
-	Instance::Descriptor instance(instCategory, instType, instOwner) ;
-	return RequestCreate(instance, mapConnection) ;
+	Instance::Descriptor instance(instCategory, instType, instOwner);
+	return RequestCreate(instance, mapConnection);
 }
 
 bool ClientListing::receive() const
@@ -215,9 +216,9 @@ SINT32
 InstallClientCallbacks(void)
 {
 	BEGIN_CALLBACK_REGISTRATION(Instance::INST_X)
-		REGISTER_SENDRECV(Instance::INST_XCHG_LISTING_Y, _sendListingRequest, _recvInstanceListing, _XCHG_LISTING) ;
-		REGISTER_SENDRECV(Instance::INST_XCHG_SELECT_Y, _sendSelect, _recvSelect, _XCHG_SELECT) ;
-		REGISTER_SENDRECV(Instance::INST_XCHG_CREATE_Y, _sendCreate, _recvCreate, _XCHG_CREATE) ;
+		REGISTER_SENDRECV(Instance::INST_XCHG_LISTING_Y, _sendListingRequest, _recvInstanceListing, _XCHG_LISTING);
+		REGISTER_SENDRECV(Instance::INST_XCHG_SELECT_Y, _sendSelect, _recvSelect, _XCHG_SELECT);
+		REGISTER_SENDRECV(Instance::INST_XCHG_CREATE_Y, _sendCreate, _recvCreate, _XCHG_CREATE);
 	END_CALLBACK_REGISTRATION
 }
 

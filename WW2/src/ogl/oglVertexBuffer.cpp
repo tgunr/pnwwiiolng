@@ -153,7 +153,7 @@ oglVertexBuffer::oglVertexBuffer() :
     StaticBufferID(0),
     DynamicBufferID(0),
     IndiceID(0),
-	BufferSegment(NULL)
+	BufferSegment(nullptr)
 {
 }
 
@@ -166,7 +166,7 @@ oglVertexBuffer::~oglVertexBuffer()
     if(BufferSegment)
         memFree(BufferSegment);
 
-    BufferSegment = NULL;
+    BufferSegment = nullptr;
 
     for(unsigned int i = 0; i < buffers.size(); i++)
     {
@@ -653,7 +653,7 @@ void oglVertexBuffer::UpdateBuffer(const GLvoid* data, int id)
             ArrayBufferBind::Bind(db.abo);
 
             // Avoid sync issues with glBufferSubDataARB
-            glBufferDataARB(GL_ARRAY_BUFFER_ARB, db.bytesize, NULL, GL_DYNAMIC_DRAW_ARB);
+            glBufferDataARB(GL_ARRAY_BUFFER_ARB, db.bytesize, nullptr, GL_DYNAMIC_DRAW_ARB);
             glBufferDataARB(GL_ARRAY_BUFFER_ARB, db.bytesize, data, GL_DYNAMIC_DRAW_ARB);
 
 		    break;
@@ -1073,10 +1073,10 @@ Description:
 ------------------------------------------------------------------------*/
 void oglVertexBuffer::Apply(struct gr2MeshData* node, bool isstatic, int mode)
 {
-#define Offset(type, member) ((unsigned int)&(((type*)NULL)->member))
+#define Offset(type, member) ((unsigned int)&(((type*)nullptr)->member))
 
     int groupcount = 0;
-    granny_tri_material_group* group = NULL;
+    granny_tri_material_group* group = nullptr;
 
     if(node->is_normal)
     {

@@ -36,7 +36,7 @@ public:
 	virtual void Update();
 	virtual void EndStep();
 	virtual void Deactivate();
-	virtual bool ProcessFlag(unsigned int flag, physicsObject* o = NULL);
+	virtual bool ProcessFlag(unsigned int flag, physicsObject* o = nullptr);
 	virtual void OnUnattach(gr2PhysicsModel* m);
 
 private:
@@ -60,10 +60,10 @@ public:
 	virtual void InitPose(gr2Model* poseModel);
 	virtual void OnExpire(gr2PhysicsModel::DRAW_STATE& state);
 	virtual void OnRemove();
-	virtual bool ProcessFlag(unsigned int flag, physicsObject* o = NULL);
+	virtual bool ProcessFlag(unsigned int flag, physicsObject* o = nullptr);
 
 	// initialize this ragdoll weapon to the trooper ragdoll's weapon
-	void AnimInit(gr2AnimTrooper* anim, fpTPSRagdoll* owner = NULL, const Vec3d* force = 0, const WeaponShape* collider = 0);
+	void AnimInit(gr2AnimTrooper* anim, fpTPSRagdoll* owner = nullptr, const Vec3d* force = 0, const WeaponShape* collider = 0);
 
 private:
 
@@ -83,10 +83,10 @@ public:
 	virtual void InitPose(gr2Model* poseModel);
 	virtual void OnExpire(gr2PhysicsModel::DRAW_STATE& state);
 	virtual void OnRemove();
-	virtual bool ProcessFlag(unsigned int flag, physicsObject* o = NULL);
+	virtual bool ProcessFlag(unsigned int flag, physicsObject* o = nullptr);
 
 	// initialize this ragdoll weapon to the trooper ragdoll's weapon
-	void AnimInit(gr2AnimTrooper* anim, fpTPSRagdoll* owner = NULL, const Vec3d* force = 0, const WeaponShape* collider = 0);
+	void AnimInit(gr2AnimTrooper* anim, fpTPSRagdoll* owner = nullptr, const Vec3d* force = 0, const WeaponShape* collider = 0);
 
 private:
 

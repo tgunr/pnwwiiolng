@@ -81,7 +81,7 @@ public:
     {
         if(i >= _emitters.size())
         {
-            return NULL;
+            return nullptr;
         }
 
         return _emitters[i];

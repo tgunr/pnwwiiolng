@@ -11,8 +11,8 @@
 
 #include "wwii/wwiiAuditDB.h"				// Our header file
 
-typedef ConditionQueue<char*> AUDIT_QUEUE ;
-static AUDIT_QUEUE auditQueue ;
+typedef ConditionQueue<char*> AUDIT_QUEUE;
+static AUDIT_QUEUE auditQueue;
 
 //////////////////////////////////////////////////////////////////////
 // Audit DB thread function
@@ -20,39 +20,39 @@ static AUDIT_QUEUE auditQueue ;
 static void*
 _auditDBThreadFn(void* p)
 {
-	DB::thread_t* conn = NULL ;
-	threadLog(_FLI, "auditThread active") ;
-	char statement[TEXT_POOL_SIZE+1] ;
+	DB::thread_t* conn = NULL;
+	threadLog(_FLI, "auditThread active");
+	char statement[TEXT_POOL_SIZE+1];
 
 	while ( 1 )
 	{
 		try
 		{
-			statement[0] = 0 ;
+			statement[0] = 0;
 			if ( !auditQueue.tryGetnext(statement) )
 			{
-				sleep(1) ;
-				continue ;
+				sleep(1);
+				continue;
 			}
 			if ( conn == NULL )
-				conn = threadsOpenDBConnection(true, "audit") ;
+				conn = threadsOpenDBConnection(true, "audit");
 			if ( conn == NULL )
-				throw std::logic_error("Unable to open database connection") ;
+				throw std::logic_error("Unable to open database connection");
 
-			DBQuery q(conn, statement) ;
+			DBQuery q(conn, statement);
 		}
 		catch ( std::exception& e )
 		{
-			threadLog(_FLA, "statusThread: %s", e.what()) ;
+			threadLog(_FLA, "statusThread: %s", e.what());
 			if ( conn )
 			{
-				mysql_close(conn) ;
-				conn = NULL ;
+				mysql_close(conn);
+				conn = NULL;
 			}
-			sleep(5) ;
+			sleep(5);
 		}
 	}
-	return p ;
+	return p;
 }
 
 //////////////////////////////////////////////////////////////////////

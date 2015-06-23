@@ -103,7 +103,7 @@ extern void			gr2BlendControlResurrect (gr2Model* model, gr2AnimationBlend* anim
 extern FLOAT32		gr2BlendControlGetTime(gr2Model* model, gr2AnimationBlend* animationBlend);
 
 // NOTE: gr2BlendControlRemoveWhenDone assumes you're calling it right as the animation is started
-extern void			gr2BlendControlRemoveWhenDone(gr2Model* model, gr2AnimationBlend* animationBlend, CONTROL_CALLBACK c = NULL, void* data = NULL);
+extern void			gr2BlendControlRemoveWhenDone(gr2Model* model, gr2AnimationBlend* animationBlend, CONTROL_CALLBACK c = nullptr, void* data = nullptr);
 extern FLOAT32		gr2BlendGetBaseLength(gr2AnimationBlend* animationBlend);
 extern FLOAT32		gr2BlendGetLength(gr2AnimationBlend* animationBlend);
 extern FLOAT32		gr2BlendGetAnimLength(gr2AnimationBlend* animationBlend, UINT32 index = 0);
@@ -119,11 +119,6 @@ extern void			gr2ControlSetSpeed (gr2Control* gr2Control, FLOAT32 speed);
 extern void			gr2ControlSetWeight (gr2Control* gr2Control, FLOAT32 weight);
 extern UINT32		gr2IsControlActive (gr2Control* gr2Control);
 extern UINT32		gr2IsControlComplete (gr2Control* gr2Control);
-
-#if defined(USE_OSG)
-extern bool gr2RenderModelOSG(gr2Model* model, osg::State& state);
-extern gr2Model* gr2LoadModelOSG(const char* modelFile, gr2Model* wornOnModel, SINT32* boneCount, SINT32 instantiate, int modelIndex = -1);
-#endif
 
 extern LOGICAL		gr2RenderModel(gr2Model* model, bool update = false);
 extern void			gr2RenderShadowModel(gr2Model* model, bool update = false);
@@ -188,7 +183,7 @@ extern LOGICAL		gr2CollideRayWithModel (gr2Model* collisionModel, piVECTOR* rayS
 extern void			gr2SetPositioningBone (gr2Model* model, SCHAR* boneName);
 
 // note .. set easeOutOverrideTime to -1 if you want to use the default ease out time
-extern LOGICAL		gr2RemoveAllBlendedAnimations (gr2Model* model, FLOAT32 easeOutOverrideTime, gr2AnimationBlend* blend = NULL);
+extern LOGICAL		gr2RemoveAllBlendedAnimations (gr2Model* model, FLOAT32 easeOutOverrideTime, gr2AnimationBlend* blend = nullptr);
 extern LOGICAL		gr2ClearBlendedAnimations (gr2Model* model);
 extern LOGICAL		gr2BlendIsComplete (gr2Model* model, gr2AnimationBlend* animationBlend);
 extern FLOAT32		gr2BlendControlCompletePercent (gr2Model* model, gr2AnimationBlend* animationBlend);

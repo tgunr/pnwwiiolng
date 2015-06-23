@@ -19,26 +19,26 @@ struct TimeUpdate
 		, rain(_rain)
 		{}
 	TimeUpdate() : gametime(0), factor(0), weather(0), rain(0) {}
-	TimeUpdate(ACTION_OBJECT* const a) { packer(TEUL_UNPACK, a) ; }
+	TimeUpdate(ACTION_OBJECT* const a) { packer(TEUL_UNPACK, a); }
 
 	void packer(LOGICAL mode, ACTION_OBJECT* const a)
 	{
-		a->packer(mode, gametime) ;
-		a->packer(mode, factor) ;
-		a->packer(mode, weather) ;
-		a->packer(mode, rain) ;
+		a->packer(mode, gametime);
+		a->packer(mode, factor);
+		a->packer(mode, weather);
+		a->packer(mode, rain);
 	}
 
-	UINT16	gametime ;
-	UINT8	factor ;
-	UINT8	weather ;
-	UINT8	rain ;
+	UINT16	gametime;
+	UINT8	factor;
+	UINT8	weather;
+	UINT8	rain;
 
-	static TEUL_CALLBACK* Callback ;
-	static SINT32 SendFunction(ACTION_OBJECT* const a) ;
-	static void Send(SINT32 teulIndex) ;
-	void Broadcast() ;
-} ;
+	static TEUL_CALLBACK* Callback;
+	static SINT32 SendFunction(ACTION_OBJECT* const a);
+	static void Send(SINT32 teulIndex);
+	void Broadcast();
+};
 
 }
 #pragma pack(pop)

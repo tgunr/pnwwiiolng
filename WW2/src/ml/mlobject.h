@@ -10,64 +10,15 @@ struct mlObjectTrackSection
 	UINT32 LinkToVertex[ML_MAX_TRACK_VERTICES][2];
 	UINT32 NumVertices;
 
-} ;
+};
 
 struct mlObjectTrackAnimation
 {
 	struct OBJECT * TrackAnimationObject;
 	UINT32 TrackNum;
 	FLOAT32 TrackMoveRate;
-} ;
-
-
-#if defined(USE_OSG)
-#include <vector>
-#include <map>
-
-class colliderQuery;
-
-struct mlObjectCollidePnt
-{
-	mlObjectCollidePnt() { memset(this,0x0,sizeof(mlObjectCollidePnt)); }
-
-	FLOAT64VECTOR RatioForce; // for internal contact point use
-	FLOAT64VECTOR LastContactPnt;
-	FLOAT64VECTOR Force; // the force velocity of the contact object
-	FLOAT64VECTOR ForceDir;
-	FLOAT64VECTOR ForceArm; // the force arm of the contact object
-	FLOAT64VECTOR SlideVel; // the slide velocity of the contact object
-	FLOAT64  ShockDisplacement; // the impact shock contact point displacement
-	FLOAT64  ShockVel; // the current velocity of the contact point relative to vehicle
-	FLOAT64 Length;
-	FLOAT32  FrictionCo; // the saved collision point friction coefficient
-	FLOAT32  RollFrictionCo;
-	FLOAT32  BumpDensity; // the saved collision point bump density
-	FLOAT32  BumpHeight; // the saved collision point bump height
-	LOGICAL IsSpike;
-	struct dxGeom* lineColliderGeom;
-    char name[32];
-} ;
-
-struct mlObjectData
-{
-	struct OBJECT* PlaneObject;
-	struct OBJECT* HitMap;
-
-	UINT32 NumCollideObjects;
-	std::vector<mlObjectCollidePnt> CollidePntList;
-
-	colliderQuery* vehicleCollider;
-
-	mlObjectData() : PlaneObject(0), HitMap(0), NumCollideObjects(0), CollidePntList(0), vehicleCollider(0)
-	{
-	}
-
-	~mlObjectData()
-	{
-	}
 };
 
-#else
 
 struct mlObjectCollidePnt
 {
@@ -88,7 +39,7 @@ struct mlObjectCollidePnt
 	FLOAT64 Length;
 	char VisDamage[32];
 	LOGICAL IsSpike;
-} ;
+};
 
 
 struct mlObjectData
@@ -193,7 +144,6 @@ struct mlObjectData
 	static mlObjectData* Get();
 	static void Release(mlObjectData* object);
 };
-#endif
 
 typedef void (*mlForEachCallback)(struct OBJECT*, void*);
 struct vehVehicle;

@@ -10,5 +10,5 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 #include <list>
-typedef std::map<playerid_t, class Player*> PLAYER_MAP  ;
-typedef std::list<class Player*> PLAYER_LIST ;
+typedef std::map<playerid_t, class Player*> PLAYER_MAP;
+typedef std::list<class Player*> PLAYER_LIST;

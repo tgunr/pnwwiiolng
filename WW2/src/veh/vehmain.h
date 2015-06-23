@@ -17,10 +17,8 @@
 #include "include/mobileSpawnEnums.h"	// For MSPAWN_RESULT
 #include "draw/sneaky.h"
 
-#if !USE_OSG
 #include "physics/physicsMain.h"
 #include "veh/vehInterpolator.h"
-#endif
 /************************************************************************************************
 	vehmain
 *************************************************************************************************/
@@ -210,7 +208,7 @@ struct vehanimVehicleStateAnimations
 	FLOAT32 LastMainGunSmokeLevel;
 	FLOAT32 MainGunSmokeLevel;
 	FLOAT32 CockpitSmokeLevel;
-} ;
+};
 
 struct vehVehiclePositionData
 {
@@ -272,7 +270,7 @@ struct vehVehiclePositionData
 	UINT32 animationFlags;
 
 	FLOAT64VECTOR Pos;
-} ;
+};
 
 
 /************************************************************************************************
@@ -299,73 +297,11 @@ struct vehDamageQue
 
 	FLOAT64	DamageAccrued	[VEH_MAX_DAMAGE_OBJECTS+1];	// Vehicle Damage
 	FLOAT64	Damage		[VEH_MAX_BUILDINGS_HIT];		// Building Damage
-} ;
+};
 
 /************************************************************************************************
 	vehVehicle
 *************************************************************************************************/
-#if defined(USE_OSG)
-class VehicleBase;
-
-struct vehVehicle
-{
-	vehVehicle* Next;
-	vehVehicle* Prev;
-
-	UINT32	VehicleHostIndex;
-	vehType const*	VehicleType;
-
-	LOGICAL	VehicleIsSquaddie:1;
-	LOGICAL	IsCommander:1;
-	LOGICAL IsBuilder:1;
-	LOGICAL SameBrigade:1;
-	LOGICAL	SameMission:1;
-	LOGICAL	IsMissionLeader:1;
-	LOGICAL	IsMyMissionLeader:1;
-	LOGICAL	IsTrainer:1;
-	UCHAR   persDecal:8;
-
-	UCHAR 	Handle[MAX_HANDLE_SIZE]; // SIZE includes null byte
-	UCHAR 	SquadHandle[MAX_HANDLE_SIZE];
-
-	UINT16	Rank;
-	SINT32	Country;
-	SINT32	Side;
-
-	UINT32	RideSeatNum;
-	UINT32	RideVehicleHostIndex;
-	UINT32 	LoadoutNum;
-
-	SINT32 iFXVehicleID;
-
-	REL_OBJ_ID fpsBuildingID;   // ID of building FPS is in/on.
-
-	ChatHandle	ChatHandle;
-
-	FLOAT32 EngineIdleVolume;
-	FLOAT32 EnginePowerVolume;
-
-	weapWeapon Weapons			[VEH_MAX_MOUNTS][VEH_MAX_WEAPONS_PER_MOUNT];
-	LOGICAL	MountIsFiring		[VEH_MAX_MOUNTS];
-	mlVehicleData* 	ModelData;
-	mlObjectData* 	VehicleObjectData;
-	vehVehiclePositionData PosData;
-	vehanimVehicleStateAnimations StateAnimation;
-	vehDamageQue DamageQue;
-
-	VehicleBase* vehicle;
-
-	vehVehicle();
-	~vehVehicle();
-
-bool isHulked() const { return false; }
-bool isSTO() const {return (SINT32)VehicleHostIndex < 0;}
-
-};
-
-
-#else
-
 struct vehVehicle
 {
 	weapWeapon Weapons			[VEH_MAX_MOUNTS][VEH_MAX_WEAPONS_PER_MOUNT];
@@ -472,9 +408,7 @@ struct vehVehicle
 	SINT32 deployedTimeout;
 	SINT32 interiorCheck;
 
-#if !defined(USE_OSG)
 	dSpaceID spaceID;
-#endif
 
 	UCHAR 	Handle[MAX_HANDLE_SIZE]; // SIZE includes null byte
 	UCHAR 	SquadHandle[MAX_HANDLE_SIZE];
@@ -542,107 +476,107 @@ struct vehVehicle
 
 private:
 	// Prevent copy ctor/operator
-	vehVehicle(const vehVehicle&) ;
-	vehVehicle& operator=(const vehVehicle&) ;
+	vehVehicle(const vehVehicle&);
+	vehVehicle& operator=(const vehVehicle&);
 #endif
 };
 
-#endif
 
 /************************************************************************************************
 	vehmain
 *************************************************************************************************/
 
-extern UINT32 	vehInit(void);
-extern UINT32 	vehKill(void);
+UINT32 	vehInit(void);
+UINT32 	vehKill(void);
 
 //void vehmainInitModelInstance(OBJECT* root);
 
-extern UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZero);
+UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZero);
 
-extern UINT32 	vehCreateNewVehicle(vehVehicle**, UINT32 HostIndex, SINT32 VehicleType, ChatHandle ch = 0);
-extern UINT32 	vehSetVehicleToUserControlled(vehVehicle*,SINT32 MultiCrewPos);
-extern UINT32 	vehKillVehicle(vehVehicle*);
+UINT32 	vehCreateNewVehicle(vehVehicle**, UINT32 HostIndex, SINT32 VehicleType, ChatHandle ch = 0);
+UINT32 	vehSetVehicleToUserControlled(vehVehicle*,SINT32 MultiCrewPos);
+UINT32 	vehKillVehicle(vehVehicle*);
 
-extern UINT32 	vehUpdatePositionInfo(vehVehicle*);
-extern UINT32	vehApplyDamageToVehicleComponent(vehVehicle* InVehicle, UINT32 ComponentNum, FLOAT64 Energy, UINT32 Counter, weapAmmo* Ammo = NULL);
-extern UINT32	vehGetHitmapComponentThickness(FLOAT64* Thickness,vehVehicle* Vehicle, UINT32 PartNum);
-extern UINT32	vehFindHitmapObjectNumByName(UINT32* ComponentNum, UCHAR* ComponentName, UINT32 VehicleNum);
+UINT32 	vehUpdatePositionInfo(vehVehicle*);
+UINT32	vehApplyDamageToVehicleComponent(vehVehicle* InVehicle, UINT32 ComponentNum, FLOAT64 Energy, UINT32 Counter, weapAmmo* Ammo = nullptr);
+UINT32	vehGetHitmapComponentThickness(FLOAT64* Thickness,vehVehicle* Vehicle, UINT32 PartNum);
+UINT32	vehFindHitmapObjectNumByName(UINT32* ComponentNum, UCHAR* ComponentName, UINT32 VehicleNum);
 
-extern UINT32	vehUpdate(void);
-namespace Vehicle { struct Hit ; }
-extern UINT32 	vehProcessVehicleHit(const Vehicle::Hit&);
-extern UINT32 	vehAdjustAnimationTime(void);
+UINT32	vehUpdate(void);
+namespace Vehicle { struct Hit; }
+UINT32 	vehProcessVehicleHit(const Vehicle::Hit&);
+UINT32 	vehAdjustAnimationTime(void);
 
-extern UINT32 		vehGetVehicleHead(vehVehicle**);
-extern vehVehicle*	vehFindVehicle(UINT32 HostIndex);
-extern vehVehicle*	vehFindVehicleByChatHandle(const ChatHandle& chathandle);
-extern LOGICAL vehValid(vehVehicle*);
-extern LOGICAL vehVehicleInList(vehVehicle*);
-extern int vehVehicleSpawned(const vehType* vtype, bool onlyPlayers = true); // how many of this vehicle type is spawned
+UINT32 		vehGetVehicleHead(vehVehicle**);
+vehVehicle*	vehFindVehicle(UINT32 HostIndex);
+vehVehicle*	vehFindVehicleByChatHandle(const ChatHandle& chathandle);
+LOGICAL vehValid(vehVehicle*);
+LOGICAL vehVehicleInList(vehVehicle*);
+int vehVehicleSpawned(const vehType* vtype, bool onlyPlayers = true); // how many of this vehicle type is spawned
 
-extern vehInertiaComponent const* vehFindInertiaComponent(vehType*, const char* name);
-extern vehanimVehicleStateType const* vehFindStateByName(vehType*, const char* name);
+vehInertiaComponent const* vehFindInertiaComponent(vehType*, const char* name);
+vehanimVehicleStateType const* vehFindStateByName(vehType*, const char* name);
 
 // shouldn't be here
-extern UINT32 vehApplyDamageToObject(const FLOAT64& Energy, struct trnCDTerrainObject*, vehVehicle* InShooterVehicle, struct weapAmmo* Ammo);
+UINT32 vehApplyDamageToObject(const FLOAT64& Energy, struct trnCDTerrainObject*, vehVehicle* InShooterVehicle, struct weapAmmo* Ammo);
 
-extern UINT32 	vehExitVehicle(SINT32 Param,UINT32 Id,UINT32 Detach);
-extern UINT32 	vehExitVehicleTrigger(SINT32 Param, UINT32 Id, UINT32 Detach);
+UINT32 	vehExitVehicle(SINT32 Param,UINT32 Id,UINT32 Detach);
+UINT32 	vehExitVehicleTrigger(SINT32 Param, UINT32 Id, UINT32 Detach);
 
-extern SINT32 	vehAttachToRidePoint(vehVehicle*);
-extern vehVehicle*	vehFindRidingVehicle(UINT32 RideVehicleHostIndex, UINT32 RideSeatNum, UINT32 VehicleType);
+SINT32 	vehAttachToRidePoint(vehVehicle*);
+vehVehicle*	vehFindRidingVehicle(UINT32 RideVehicleHostIndex, UINT32 RideSeatNum, UINT32 VehicleType);
 
 // Infantry resupply point
 //bool vehmainDropInfantryResupplyPoint();
-extern PlayerPlacedObject* vehmainFRUBuild();
+PlayerPlacedObject* vehmainFRUBuild();
 //bool vehmainIRPCheck();
-extern bool vehmainFRUExecute();
+bool vehmainFRUExecute();
 
 // Mobile spawn
-extern SINT32 vehmainDeployVehicleForMobileSpawn();
-extern void vehHandleMobileSpawnUpdate(MSPAWN_RESULT enumResult);
-extern void vehmainUndeployVehicleForMobileSpawn();
+SINT32 vehmainDeployVehicleForMobileSpawn();
+void vehHandleMobileSpawnUpdate(MSPAWN_RESULT enumResult);
+void vehmainUndeployVehicleForMobileSpawn();
 
-extern LOGICAL vehmainIsMobileSpawn(); // am I the mobile spawn?
-extern LOGICAL vehmainCanSTO();
+LOGICAL vehmainIsMobileSpawn(); // am I the mobile spawn?
+LOGICAL vehmainCanSTO();
 
 // vehicle sto tutorial support
-extern UINT32 vehmainAddSTO(const vehType* type, double x, double y, double z, float att, bool relative = false, const char* icon = ""); // utf8 icon
-extern UINT32 vehmainAddSTO(const char* type, double x, double y, double z, float att, bool relative = false, const char* icon = ""); // utf8 icon
-extern bool vehmainRemoveSTO(UINT32 id);
+UINT32 vehmainAddSTO(const vehType* type, double x, double y, double z, float att, bool relative = false, const char* icon = ""); // utf8 icon
+UINT32 vehmainAddSTO(const char* type, double x, double y, double z, float att, bool relative = false, const char* icon = ""); // utf8 icon
+bool vehmainRemoveSTO(UINT32 id);
 
-extern void vehmainReportCache(int& rcount, int &fcount, bool update = true);
-extern void vehmainClearVehicleCache();
-extern bool vehmainIsVehicleCached(ChatHandle ch);
+void vehmainReportCache(int& rcount, int &fcount, bool update = true);
+void vehmainClearVehicleCache();
+bool vehmainIsVehicleCached(ChatHandle ch);
 //bool vehmainCachePrintDiff();
 
-extern LOGICAL vehmainIsDeploying();
-extern LOGICAL vehmainIsDeployed();
-extern LOGICAL vehmainIsUndeploying();
-extern LOGICAL vehmainIsUndeployed();
+LOGICAL vehmainIsDeploying();
+LOGICAL vehmainIsDeployed();
+LOGICAL vehmainIsUndeploying();
+LOGICAL vehmainIsUndeployed();
 
-extern LOGICAL vehmainIsOverSupplied(vehVehicle* vehicle);
-extern SINT32 vehmainRequestAmmo(const char* input = NULL); // sends a "I need ammo" message to everyone on mission
+LOGICAL vehmainIsOverSupplied(vehVehicle* vehicle);
+SINT32 vehmainRequestAmmo(const char* input = nullptr); // sends a "I need ammo" message to everyone on mission
 
-extern LOGICAL vehmainWaitingOnLogoutTimer();
-extern void vehmainBailout(BailoutSTO* pilot = NULL);
-extern LOGICAL vehmainHasBailedOut();
+LOGICAL vehmainWaitingOnLogoutTimer();
+void vehmainBailout(BailoutSTO* pilot = nullptr);
+LOGICAL vehmainHasBailedOut();
 
 UINT32 vehmainDetermineKiller();
 UINT32 vehmainDeterminePlinkKiller();
 UINT32 vehmainDetermineComponentKiller(mlComponent* killComponent);
 void vehmainSpawnVehicle(VEHICLE_REPLY const*);
 
-extern UINT32 vehDetermineExitStatus(SINT32* ExitStatus, FULL_OBJ_ID* id);
-extern void vehmainCreateODECollider(vehVehicle* vehicle);
+UINT32 vehDetermineExitStatus(SINT32* ExitStatus, FULL_OBJ_ID* id);
+void vehmainCreateODECollider(vehVehicle* vehicle);
 namespace StratDB { class StratObject; }
-extern StratDB::StratObject* vehmainLastEntered(trnCDTerrainObject** TO = NULL);
-extern ChatHandle vehLastInfantryDamaged();
+StratDB::StratObject* vehmainLastEntered(trnCDTerrainObject** TO = nullptr);
+ChatHandle vehLastInfantryDamaged();
 
 #ifdef VEHICLES_GAME_INFO
-extern std::string& vehVehiclesGameInfo();
-extern void vehSaveLastWorldUpdate(WORLD_UPDATE& wu);
-extern const char* vehGetHistoryStringFor(const UINT32 vehicleIndex, char* const into, size_t intoSize_bytes);
-extern void vehRecordVehicleUpdate(const UINT32 vehicleIndex);
+std::string& vehVehiclesGameInfo();
+void vehSaveLastWorldUpdate(WORLD_UPDATE& wu);
+const char* vehGetHistoryStringFor(const UINT32 vehicleIndex, char* const into, size_t intoSize_bytes);
+void vehRecordVehicleUpdate(const UINT32 vehicleIndex);
+
 #endif

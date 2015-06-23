@@ -100,17 +100,17 @@ static UINT32					MultiTextureTransparentColor;
 static MULTITEXTURE*			MultiTextureInfo;
 static SINT32					NumMultiTextures;
 
-static Covert<LOGICAL> g_drawObjectTriangles(FALSE) ;
-static Covert<LOGICAL> g_drawObjectNormals(FALSE) ;
-static Covert<LOGICAL> _drawCollisionNormals(FALSE) ;
-static Covert<LOGICAL> _drawboundingbox(FALSE) ;
-static Covert<LOGICAL> _drawTObox(FALSE) ;
+static Covert<LOGICAL> g_drawObjectTriangles(FALSE);
+static Covert<LOGICAL> g_drawObjectNormals(FALSE);
+static Covert<LOGICAL> _drawCollisionNormals(FALSE);
+static Covert<LOGICAL> _drawboundingbox(FALSE);
+static Covert<LOGICAL> _drawTObox(FALSE);
 static Covert<bool> _drawHeightMap(false);
 static Covert<LOGICAL> _drawCollisionObjects(FALSE);
 
-static Covert<bool> _unsorteddraw(true) ;
-static Covert<bool> _sorteddraw(true) ;
-static Covert<bool> _cockpitsorteddraw(true) ;
+static Covert<bool> _unsorteddraw(true);
+static Covert<bool> _sorteddraw(true);
+static Covert<bool> _cockpitsorteddraw(true);
 static Covert<bool> _cockpitunsorteddraw = true;
 static Covert<bool> _multitexturedraw = true;
 
@@ -235,7 +235,7 @@ void obdrawWireframeObject(OBJECT* lpobj, UINT32 color)
 int   i, numtris;
 piINDICES*	pt;
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return;
 	}
@@ -244,9 +244,9 @@ piINDICES*	pt;
 	piVectorConstPtr rpos = lpobj->RenderPositions();
 	pt = lpobj->ptris;
 
-	if (rpos.ptr == NULL || pt == NULL) return;
+	if (rpos.ptr == nullptr || pt == nullptr) return;
 
-	for (i=0 ; i < numtris ; i++)
+	for (i=0; i < numtris; i++)
 	{
 		draw3dLine(&rpos[pt[i].v1], &rpos[pt[i].v2], color);
 		draw3dLine(&rpos[pt[i].v2], &rpos[pt[i].v3], color);
@@ -738,19 +738,19 @@ static LOGICAL InitMultiTexture(void)
 {
 SINT32		i;
 
-	if (MultiTextureInfo != NULL)
+	if (MultiTextureInfo != nullptr)
 	{
 		Write_Debug("MultiTextureInfo structure pointer has already been initialized");
 		return(FALSE);
 	}
 
 	MultiTextureInfo = (MULTITEXTURE*)memAlloc(MAX_MULTITEXTURES * sizeof(MULTITEXTURE));
-	if (MultiTextureInfo == NULL)
+	if (MultiTextureInfo == nullptr)
 	{
 		return(FALSE);
 	}
 
-	for (i=0 ; i < MAX_MULTITEXTURES ; i++)
+	for (i=0; i < MAX_MULTITEXTURES; i++)
 	{
 		MultiTextureInfo[i].MultiTextureId = -1;
 		MultiTextureInfo[i].MultiMaterialId = -1;
@@ -768,21 +768,21 @@ static void KillMultiTexture(void)
 {
 SINT32		i;
 
-	if (MultiTextureInfo == NULL)
+	if (MultiTextureInfo == nullptr)
 	{
 		return;
 	}
 
-	for (i=0 ; i < MAX_MULTITEXTURES ; i++)
+	for (i=0; i < MAX_MULTITEXTURES; i++)
 	{
 		piFreeMipTextures(MultiTextureInfo[i].MultiTextureId);
 		piFreeMaterial(MultiTextureInfo[i].MultiMaterialId);
 	}
 
-	if (MultiTextureInfo != NULL)
+	if (MultiTextureInfo != nullptr)
 	{
 		memFree(MultiTextureInfo);
-		MultiTextureInfo = NULL;
+		MultiTextureInfo = nullptr;
 	}
 }
 
@@ -790,7 +790,7 @@ LOGICAL obdrawSetMultiTexture(const char* BaseTexture, const char* MultiTexture,
 {
 SINT32		i, j, btid, mtid;
 
-	if (MultiTextureInfo == NULL)
+	if (MultiTextureInfo == nullptr)
 	{
 		Write_Debug("MultiTextureInfo structure pointer has not been initialized");
 		return(FALSE);
@@ -875,7 +875,7 @@ SINT32		i, j, btid, mtid;
 		btid = mtid = -1;
 	}
 
-	for (i=0 ; i < NumMultiTextures ; i++)
+	for (i=0; i < NumMultiTextures; i++)
 	{
 		if (btid == MultiTextureInfo[i].BaseTextureId &&
 			mtid == MultiTextureInfo[i].MultiTextureId)
@@ -884,7 +884,7 @@ SINT32		i, j, btid, mtid;
 		}
 	}
 
-	for (i=0 ; i < NumMultiTextures ; i++)
+	for (i=0; i < NumMultiTextures; i++)
 	{
 		if (btid < MultiTextureInfo[i].BaseTextureId)
 		{
@@ -917,9 +917,9 @@ SINT32		i, j, btid, mtid;
 	}
 	else
 	{
-        TEXTURE* lpTex = NULL;
+        TEXTURE* lpTex = nullptr;
 
-		for (j=NumMultiTextures ; j > i ; j--)
+		for (j=NumMultiTextures; j > i; j--)
 		{
 			MultiTextureInfo[j] = MultiTextureInfo[j-1];
 
@@ -960,12 +960,12 @@ LOGICAL obdrawFindMultiTextureByName(SINT8* BaseTexture, SINT32* MTOffset)
 {
 SINT32		i;
 
-	if (MultiTextureInfo == NULL)
+	if (MultiTextureInfo == nullptr)
 	{
 		return(FALSE);
 	}
 
-	for (i=0 ; i < NumMultiTextures ; i++)
+	for (i=0; i < NumMultiTextures; i++)
 	{
 		if (BaseTexture[0] == MultiTextureInfo[i].MultiTextureName[0])
 		{
@@ -982,12 +982,12 @@ SINT32		i;
 
 LOGICAL obdrawFindMultiTextureById(SINT32 BaseId, SINT32* MTOffset)
 {
-    if(MultiTextureInfo == NULL)
+    if(MultiTextureInfo == nullptr)
         return FALSE;
 
     TEXTURE* lpTex = piGetTextureData(BaseId);
 
-    if(lpTex == NULL)
+    if(lpTex == nullptr)
         return FALSE;
 
     SINT32 i = lpTex->multiTextureInfoID - 1;
@@ -1002,12 +1002,12 @@ LOGICAL obdrawFindMultiTextureById(SINT32 BaseId, SINT32* MTOffset)
 
 SINT32 obdrawGetMultiTextureOpcode(SINT32 BaseId, SINT32* MTOffset)
 {
-    if(MultiTextureInfo == NULL)
+    if(MultiTextureInfo == nullptr)
         return MT_NORMAL;
 
     TEXTURE* lpTex = piGetTextureData(BaseId);
 
-    if(lpTex == NULL)
+    if(lpTex == nullptr)
         return MT_NORMAL;
 
     SINT32 i = lpTex->multiTextureInfoID - 1;
@@ -1025,7 +1025,7 @@ SINT32 obdrawGetMultiTextureOpcode(SINT32 BaseId, SINT32* MTOffset)
 
 LOGICAL obdrawGetMultiTextureInfo(MULTITEXTURE** retMultiTextureInfo, SINT32* retNumMultiTextures)
 {
-	if (MultiTextureInfo == NULL)
+	if (MultiTextureInfo == nullptr)
 	{
 		return(FALSE);
 	}
@@ -1384,7 +1384,7 @@ LOGICAL obdrawUpdateDOT3ColorPoint(OBJECT* lpobj)
 										0.0, 0.0, 1.0, 0.0,
  										0.0, 0.0, 0.0, 1.0};
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -1402,7 +1402,7 @@ LOGICAL obdrawUpdateDOT3ColorPoint(OBJECT* lpobj)
 	// convert from eye space to object space
 	math3dMultiplyRotation(&lpOS, &lpES, &modelViewMatrixInverse);
 
-	for (i=0 ; i < lpobj->numverts ; i++)
+	for (i=0; i < lpobj->numverts; i++)
 	{
 		lv.x = lpOS.x - pverts[i].x;
 		lv.y = lpOS.y - pverts[i].y;
@@ -1437,7 +1437,7 @@ LOGICAL obdrawUpdateDOT3ColorDirectional(OBJECT* lpobj)
 										0.0, 0.0, 1.0, 0.0,
  										0.0, 0.0, 0.0, 1.0};
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -1461,7 +1461,7 @@ LOGICAL obdrawUpdateDOT3ColorDirectional(OBJECT* lpobj)
 
 	pcolors = lpobj->MutableColors();
 
-	for (i=0 ; i < lpobj->numverts ; i++)
+	for (i=0; i < lpobj->numverts; i++)
 	{
 		pcolors[i].color = color;
 	}
@@ -1731,7 +1731,7 @@ static bool _initWaterRefractionFBO()
 static void InitShaderForAndrew()
 {
     // This setup has been offloaded to a file in ca2.
-    glslProgram* pgm = GLSL.loadProgram("multitexture", NULL, NULL);
+    glslProgram* pgm = GLSL.loadProgram("multitexture", nullptr, nullptr);
 
     pgm->AddShader(GLSL.loadFragmentShader("fx/shaders/GLSL/utility/fogutility.frag").get());
     pgm->AddShader(GLSL.loadFragmentShader("fx/shaders/GLSL/utility/lightutility.frag").get());
@@ -1907,10 +1907,10 @@ LOGICAL obdrawInit(void)
 
     obdrawSetRenderPass(RENDER_SCENE);
 
-	_UnsortedExternalDrawCallback = NULL;
-	_SortedExternalDrawCallback = NULL;
-	_UnsortedInternalDrawCallback = NULL;
-	_SortedInternalDrawCallback = NULL;
+	_UnsortedExternalDrawCallback = nullptr;
+	_SortedExternalDrawCallback = nullptr;
+	_UnsortedInternalDrawCallback = nullptr;
+	_SortedInternalDrawCallback = nullptr;
 
     _initWaterReflectionFBO();
     _initSurfaceFBO();
@@ -1944,7 +1944,7 @@ void obdrawKill(void)
         while(_surfaceFBO->referenceCount() > 1)
             _surfaceFBO->unref();
 
-        _surfaceFBO = NULL;
+        _surfaceFBO = nullptr;
     }
 
     if(_refractionFBO.valid())
@@ -1952,7 +1952,7 @@ void obdrawKill(void)
         while(_refractionFBO->referenceCount() > 1)
             _refractionFBO->unref();
 
-        _refractionFBO = NULL;
+        _refractionFBO = nullptr;
     }
 
     if(_reflectionFBO.valid())
@@ -1960,7 +1960,7 @@ void obdrawKill(void)
         while(_reflectionFBO->referenceCount() > 1)
             _reflectionFBO->unref();
 
-        _reflectionFBO = NULL;
+        _reflectionFBO = nullptr;
     }
 
     while(_reflectionRTT->referenceCount() > 1)
@@ -1969,8 +1969,8 @@ void obdrawKill(void)
     while(_surfaceRTT->referenceCount() > 1)
         _surfaceRTT->unref();
 
-    _surfaceRTT = NULL;
-    _reflectionRTT = NULL;
+    _surfaceRTT = nullptr;
+    _reflectionRTT = nullptr;
 
     KillMultiTexture();
 	obcsKill();
@@ -2337,10 +2337,10 @@ static void RenderMultiTexture()
     if(bin.empty())
         return;
 
-    OBJECT* o = NULL;
-    OBJECT* last = NULL;
+    OBJECT* o = nullptr;
+    OBJECT* last = nullptr;
 
-    const RenderStateSet* old = NULL;
+    const RenderStateSet* old = nullptr;
 
     const unsigned int size = bin.size();
 
@@ -2403,10 +2403,10 @@ static void RenderMultiTexture()
     if(bin.empty())
         return;
 
-    OBJECT* o = NULL;
-    OBJECT* last = NULL;
+    OBJECT* o = nullptr;
+    OBJECT* last = nullptr;
 
-    const oglMaterial* old = NULL;
+    const oglMaterial* old = nullptr;
 
 #if DEBUG_WW2
     int count = 0;
@@ -2487,10 +2487,10 @@ static void RenderOpaqueBin()
     if(bin.empty())
         return;
 
-    OBJECT* o = NULL;
-    OBJECT* last = NULL;
+    OBJECT* o = nullptr;
+    OBJECT* last = nullptr;
 
-    const RenderStateSet* old = NULL;
+    const RenderStateSet* old = nullptr;
 
     const unsigned int size = bin.size();
 
@@ -2555,15 +2555,15 @@ static void RenderOpaqueBin()
     if(bin.empty())
         return;
 
-    OBJECT* o = NULL;
-    OBJECT* last = NULL;
+    OBJECT* o = nullptr;
+    OBJECT* last = nullptr;
 
 #if DEBUG_WW2
     int count = 0;
     int same = 0;
 #endif
 
-    const oglMaterial* old = NULL;
+    const oglMaterial* old = nullptr;
 
     const unsigned int size = bin.size();
 
@@ -2640,10 +2640,10 @@ static void RenderTransparentBin()
 
     obcsGetTransparentBin(bin);
 
-    OBJECT* o = NULL;
+    OBJECT* o = nullptr;
 
-    const RenderStateSet* old = NULL;
-    OBJECT* last = NULL;
+    const RenderStateSet* old = nullptr;
+    OBJECT* last = nullptr;
 
     const unsigned int size = bin.size();
 
@@ -2658,7 +2658,7 @@ static void RenderTransparentBin()
         {
             if(DrawFxSystem(o->distsqr))
             {
-                old = NULL;
+                old = nullptr;
             }
 
             bool success = o->drawcallback(o);
@@ -2678,7 +2678,7 @@ static void RenderTransparentBin()
 
         if(DrawFxSystem(o->distsqr))
         {
-            old = NULL;
+            old = nullptr;
         }
 
         if(o->material && old != o->material)
@@ -2714,7 +2714,7 @@ static void RenderTransparentBin()
 
     obcsGetTransparentBin(bin);
 
-    OBJECT* o = NULL;
+    OBJECT* o = nullptr;
 
     //fxMgrDraw(true);
 
@@ -2723,8 +2723,8 @@ static void RenderTransparentBin()
     int same = 0;
 #endif
 
-    const oglMaterial* old = NULL;
-    OBJECT* last = NULL;
+    const oglMaterial* old = nullptr;
+    OBJECT* last = nullptr;
 
     const unsigned int size = bin.size();
     oglSetRenderState(oglRENDERSTATE_ZWRITEENABLE, 0);
@@ -2744,7 +2744,7 @@ static void RenderTransparentBin()
         {
             if(DrawFxSystem(o->distsqr))
             {
-                old = NULL;
+                old = nullptr;
             }
 
             bool success = o->drawcallback(o);
@@ -2764,7 +2764,7 @@ static void RenderTransparentBin()
 
         if(DrawFxSystem(o->distsqr))
         {
-            old = NULL;
+            old = nullptr;
         }
 
         if(o->material && old != o->material)
@@ -2812,8 +2812,8 @@ static void RenderOpaqueCockpitBin()
 
     obcsGetOpaqueCockpitBin(bin);
 
-    const RenderStateSet* old = NULL;
-    OBJECT* last = NULL;
+    const RenderStateSet* old = nullptr;
+    OBJECT* last = nullptr;
     OBJECT* o;
 
     const unsigned int size = bin.size();
@@ -2875,8 +2875,8 @@ static void RenderOpaqueCockpitBin()
     int same = 0;
 #endif
 
-    const oglMaterial* old = NULL;
-    OBJECT* last = NULL;
+    const oglMaterial* old = nullptr;
+    OBJECT* last = nullptr;
     OBJECT* o;
 
     const unsigned int size = bin.size();
@@ -2942,10 +2942,10 @@ static void RenderTransparentCockpitBin()
 
     obcsGetTransparentCockpitBin(bin);
 
-    OBJECT* o = NULL;
+    OBJECT* o = nullptr;
 
-    const RenderStateSet* old = NULL;
-    OBJECT* last = NULL;
+    const RenderStateSet* old = nullptr;
+    OBJECT* last = nullptr;
 
     const unsigned int size = bin.size();
 
@@ -3002,14 +3002,14 @@ static void RenderTransparentCockpitBin()
 
     obcsGetTransparentCockpitBin(bin);
 
-    OBJECT* o = NULL;
+    OBJECT* o = nullptr;
 
 #ifdef DEBUG_WW2
     int same = 0;
 #endif
 
-    const oglMaterial* old = NULL;
-    OBJECT* last = NULL;
+    const oglMaterial* old = nullptr;
+    OBJECT* last = nullptr;
 
     const unsigned int size = bin.size();
 
@@ -3184,7 +3184,7 @@ Description:
 -------------------------------------------------------------------------*/
 void obdrawObjects()
 {
-    LISTHEADER* list = NULL;
+    LISTHEADER* list = nullptr;
 
     if(interiorMaterial == -1)
         interiorMaterial = piFindMaterialName("interior");
@@ -3295,8 +3295,8 @@ LOGICAL obdrawObjectsDeprecated()
 LOGICAL obdrawObjectsDeprecated()
 {
     LOGICAL retval = TRUE;
-    OBJECT* lpobjorig = NULL;
-    LISTHEADER* lplist = NULL;
+    OBJECT* lpobjorig = nullptr;
+    LISTHEADER* lplist = nullptr;
 
     if(interiorMaterial == -1)
         interiorMaterial = piFindMaterialName("interior");
@@ -3504,13 +3504,13 @@ static inline void _unsetStates(OBJECT* o)
 #if USE_STATESET
 inline void _drawObject(OBJECT* o)
 {
-    static OBJECT* oldObject = NULL;
-    static RenderStateSet* oldmaterial = NULL;
+    static OBJECT* oldObject = nullptr;
+    static RenderStateSet* oldmaterial = nullptr;
 
     if(!o)
     {
-        oldmaterial = NULL;
-        oldObject = NULL;
+        oldmaterial = nullptr;
+        oldObject = nullptr;
         return;
     }
 
@@ -3578,13 +3578,13 @@ inline void _drawObject(OBJECT* o)
 #else
 inline void _drawObject(OBJECT* o)
 {
-    static OBJECT* oldObject = NULL;
-    static oglMaterial* oldmaterial = NULL;
+    static OBJECT* oldObject = nullptr;
+    static oglMaterial* oldmaterial = nullptr;
 
     if(!o)
     {
-        oldmaterial = NULL;
-        oldObject = NULL;
+        oldmaterial = nullptr;
+        oldObject = nullptr;
         return;
     }
 
@@ -3680,8 +3680,8 @@ static inline void _drawUnsorted()
     if(bin.empty())
         return;
 
-    OBJECT* o = NULL;
-    const RenderStateSet* old = NULL;
+    OBJECT* o = nullptr;
+    const RenderStateSet* old = nullptr;
 
     int same = 0;
 
@@ -3811,15 +3811,15 @@ static inline void _drawUnsorted()
         return;
 
     // Reset change detection
-    _drawObject(NULL);
+    _drawObject(nullptr);
 
     piSetRenderState(piRENDERSTATE_ALPHABLENDENABLE, FALSE);
 
-    OBJECT* o = NULL;
-    OBJECT* last = NULL;
+    OBJECT* o = nullptr;
+    OBJECT* last = nullptr;
     SINT32 oldLevel = 0;
 
-    const oglMaterial* old = NULL;
+    const oglMaterial* old = nullptr;
 
     const unsigned int size = bin.size();
 
@@ -3925,9 +3925,9 @@ static inline void _drawUnsortedCockpitDepth()
     std::vector<OBJECT*> bin;
 
     obcsGetOpaqueCockpitBin(bin);
-    _drawObject(NULL);
+    _drawObject(nullptr);
 
-    OBJECT* o = NULL;
+    OBJECT* o = nullptr;
 
     const unsigned int size = bin.size();
 
@@ -3960,9 +3960,9 @@ static inline void _drawUnsortedCockpit()
     std::vector<OBJECT*> bin;
 
     obcsGetOpaqueCockpitBin(bin);
-    _drawObject(NULL);
+    _drawObject(nullptr);
 
-    OBJECT* o = NULL;
+    OBJECT* o = nullptr;
 
     const unsigned int size = bin.size();
 
@@ -3994,14 +3994,14 @@ static inline void _drawUnsortedCockpit()
     obcsGetOpaqueCockpitBin(bin);
 
     // Reset change detection
-    _drawObject(NULL);
+    _drawObject(nullptr);
 
     piMATRIX wm = *piGetWorldMatrix();
     piMATRIX vm = *piGetViewMatrix();
 
     piSetViewMatrix(piGetCockpitViewMatrix());
 
-    OBJECT* o = NULL;
+    OBJECT* o = nullptr;
     SINT32 oldLevel = 0;
 
     piSetRenderState(piRENDERSTATE_ALPHABLENDENABLE, FALSE);
@@ -4068,11 +4068,11 @@ static inline void _drawSorted()
 
     obcsGetTransparentBin(bin);
 
-    OBJECT* o = NULL;
+    OBJECT* o = nullptr;
 
     fxMgrDraw(true);
 
-    _drawObject(NULL);
+    _drawObject(nullptr);
 
     const unsigned int size = bin.size();
 
@@ -4087,7 +4087,7 @@ static inline void _drawSorted()
         if(o->distsqr > 0 && !(o->flags & OBJECT_DYNASHADOW))
         {
             if(DrawFxSystemDeprecated(o->distsqr))
-                _drawObject(NULL);
+                _drawObject(nullptr);
         }
 
         _drawObject(o);
@@ -4117,10 +4117,10 @@ static inline void _drawSorted()
 #endif
 
     // Reset change detection
-    _drawObject(NULL);
+    _drawObject(nullptr);
 
-    OBJECT* o = NULL;
-    OBJECT* last = NULL;
+    OBJECT* o = nullptr;
+    OBJECT* last = nullptr;
 
     fxMgrDraw(true);
 
@@ -4144,7 +4144,7 @@ static inline void _drawSorted()
     {
         o = bin[i];
 #else
-    for(ul; ul != NULL; ul = obcsGetNextOnList(ul))
+    for(ul; ul != nullptr; ul = obcsGetNextOnList(ul))
     {
         o = ul->part;
 #endif
@@ -4158,7 +4158,7 @@ static inline void _drawSorted()
             {
                 // All because we can't render sorted objects correctly...with zwrite off!
                 // Reset states otherwise clouds are fubar'd
-                _drawObject(NULL);
+                _drawObject(nullptr);
             }
         }
 
@@ -4196,9 +4196,9 @@ inline void _drawSortedCockpit()
     obcsGetTransparentCockpitBin(bin);
 
     // Reset change detection
-    _drawObject(NULL);
+    _drawObject(nullptr);
 
-    OBJECT* o = NULL;
+    OBJECT* o = nullptr;
 
     const unsigned int size = bin.size();
 
@@ -4230,13 +4230,13 @@ inline void _drawSortedCockpit()
     obcsGetTransparentCockpitBin(bin);
 
     // Reset change detection
-    _drawObject(NULL);
+    _drawObject(nullptr);
 
     piMATRIX vm = *piGetViewMatrix();
 
     piSetViewMatrix(piGetCockpitViewMatrix());
 
-    OBJECT* o = NULL;
+    OBJECT* o = nullptr;
 
     piSetRenderState(piRENDERSTATE_ALPHABLENDENABLE, piALPHABLENDENABLE_DEFAULT);
 
@@ -4318,7 +4318,7 @@ inline void DrawShadowCockpitReceivers()
 
     SORTHEADER* ul = obcsGetUnsortedCockpitList();
 
-    for(; ul != NULL; ul = obcsGetPrevOnList(ul))
+    for(; ul != nullptr; ul = obcsGetPrevOnList(ul))
     {
         o = ul->part;
 
@@ -4481,7 +4481,7 @@ inline void DrawShadowReceivers()
 
     piVECTOR* ptr;
 
-    OBJECT* old = NULL;
+    OBJECT* old = nullptr;
     piVECTOR p;
 
     for(; itr != octets.end(); ++itr)
@@ -4624,7 +4624,7 @@ inline void DrawShadowReceivers()
 
     unsigned int continueflag3 = (OBJECT_IS_INTERIOR | OBJECT_CLOUDS | OBJECT_RAINCLOUDS);
 
-    for(ul; ul != NULL; ul = obcsGetNextOnList(ul))
+    for(ul; ul != nullptr; ul = obcsGetNextOnList(ul))
     {
         o = ul->part;
 
@@ -4686,7 +4686,7 @@ inline void _drawMultiTextureDepth()
     if(bin.empty())
         return;
 
-    OBJECT* o = NULL;
+    OBJECT* o = nullptr;
 
     depthpass->Apply();
 
@@ -4723,9 +4723,9 @@ inline void _drawMultiTexture()
     if(bin.empty())
         return;
 
-    OBJECT* o = NULL;
+    OBJECT* o = nullptr;
 
-    const RenderStateSet* old = NULL;
+    const RenderStateSet* old = nullptr;
 
     const unsigned int size = bin.size();
 
@@ -4813,14 +4813,14 @@ inline void _drawMultiTexture()
         return;
 
     // Reset change detection
-    _drawObject(NULL);
+    _drawObject(nullptr);
 
     piSetRenderState(piRENDERSTATE_ALPHABLENDENABLE, FALSE);
 
-    OBJECT* o = NULL;
-    OBJECT* last = NULL;
+    OBJECT* o = nullptr;
+    OBJECT* last = nullptr;
 
-    const oglMaterial* old = NULL;
+    const oglMaterial* old = nullptr;
 
     const unsigned int size = bin.size();
 
@@ -4909,15 +4909,15 @@ void obdrawDrawWaterRefraction()
     SORTHEADER* ul = obcsGetUnsortedList();
 
     // Reset change detection
-    _drawObject(NULL);
+    _drawObject(nullptr);
     oglSetWorldMatrix(&IdentityMatrix);
 
-    OBJECT* o = NULL;
+    OBJECT* o = nullptr;
 
     oglPushRenderState(oglRENDERSTATE_ALPHABLENDENABLE);
     oglSetRenderState(oglRENDERSTATE_ALPHABLENDENABLE, FALSE);
 
-    for(; ul != NULL; ul = obcsGetNextOnList(ul))
+    for(; ul != nullptr; ul = obcsGetNextOnList(ul))
     {
         o = ul->part;
 
@@ -5152,7 +5152,7 @@ LOGICAL _drawDeprecatedPath()
 
     piClearTargets(piCLEAR_ZBUFFER);
 
-	if (_UnsortedInternalDrawCallback != NULL)
+	if (_UnsortedInternalDrawCallback != nullptr)
 	{
 		if (_UnsortedInternalDrawCallback(TRUE) == FALSE)
 		{
@@ -5163,7 +5163,7 @@ LOGICAL _drawDeprecatedPath()
     logTimerCallVoid(_drawUnsortedCockpit);
     //logTimerCallVoid(gr2DrawTrooperBin);
 
-    if (_UnsortedInternalDrawCallback != NULL)
+    if (_UnsortedInternalDrawCallback != nullptr)
 	{
 		if (_UnsortedInternalDrawCallback(FALSE) == FALSE)
 		{
@@ -5176,7 +5176,7 @@ LOGICAL _drawDeprecatedPath()
         logTimerCallVoid(DrawShadowCockpitReceivers);
     }
 
-	if (_SortedInternalDrawCallback != NULL)
+	if (_SortedInternalDrawCallback != nullptr)
 	{
 		if (_SortedInternalDrawCallback(TRUE) == FALSE)
 		{
@@ -5186,7 +5186,7 @@ LOGICAL _drawDeprecatedPath()
 
     logTimerCallVoid(_drawSortedCockpit);
 
-    if (_SortedInternalDrawCallback != NULL)
+    if (_SortedInternalDrawCallback != nullptr)
 	{
 		if (_SortedInternalDrawCallback(FALSE) == FALSE)
 		{
@@ -5316,7 +5316,7 @@ piMATRIX		mat,mat1;
 		piSetRenderState(piRENDERSTATE_FOGENABLE, FALSE);
 	}
 
-	textype = obdrawGetMultiTextureOpcode(lpobj->texid, NULL);
+	textype = obdrawGetMultiTextureOpcode(lpobj->texid, nullptr);
 	if (textype == MT_SINGLEPASS)
 	{
 		// Single-pass
@@ -5389,7 +5389,7 @@ piMATRIX		mat,mat1;
 	}
 
 	if (lpobj->flag2 & OBJECT_USESDECAL &&
-		lpobj->shadow != NULL &&
+		lpobj->shadow != nullptr &&
 		!(lpobj->flags & OBJECT_DYNASHADOW))
 	{
 		// texture selection and mipmapping
@@ -5603,7 +5603,7 @@ piVECTOR	pp, pos;
 OBJECT * 	lplodtopobject;
 FLOAT32		ratio;
 
-	if (LODChanged != NULL)
+	if (LODChanged != nullptr)
 	{
 		*LODChanged = FALSE;
 	}
@@ -5617,7 +5617,7 @@ FLOAT32		ratio;
 	while (lplod->flags & OBJECT_NOTOBJECT)
 	{
 		lplod = lplod->child;
-		if (lplod == NULL)
+		if (lplod == nullptr)
 		{
 			return(FALSE);
 		}
@@ -5725,7 +5725,7 @@ FLOAT32		ratio;
 
 			obAdjustObjectTreeVisListStatus(lplodtopobject,0);
 
-			if (LODChanged != NULL)
+			if (LODChanged != nullptr)
 			{
 				*LODChanged = TRUE;
 			}
@@ -5743,7 +5743,7 @@ FLOAT32		ratio;
 
 			obAdjustObjectTreeVisListStatus(lplodtopobject,0);
 
-			if (LODChanged != NULL)
+			if (LODChanged != nullptr)
 			{
 				*LODChanged = TRUE;
 			}
@@ -5758,12 +5758,12 @@ LOGICAL obAdjustObjectTreeVisListStatus(OBJECT * Object, UINT32 IncludeSibs)
 OBJECT * ObjSib;
 OBJECT * ObjAtt;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return(TRUE);
 	}
 
-	if(Object->next == NULL && Object->prev == NULL) return TRUE;
+	if(Object->next == nullptr && Object->prev == nullptr) return TRUE;
 
 	ObjSib = Object;
 
@@ -5786,7 +5786,7 @@ OBJECT * ObjAtt;
 
 					ObjAtt = ObjAtt->attached;
 				}
-				while (ObjAtt != NULL);
+				while (ObjAtt != nullptr);
 			}
 			else
 			{
@@ -5797,19 +5797,19 @@ OBJECT * ObjAtt;
 
 					ObjAtt = ObjAtt->attached;
 				}
-				while (ObjAtt != NULL);
+				while (ObjAtt != nullptr);
 			}
 		}
 
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			obAdjustObjectTreeVisListStatus(ObjSib->child,1);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL && IncludeSibs != 0);
+	while (ObjSib != nullptr && IncludeSibs != 0);
 
 	return(TRUE);
 }
@@ -5853,7 +5853,7 @@ static UINT32	lasttod;
 	}
 
 	lpobj = (OBJECT*)lplist->next;
-	for ( ; lpobj ; lpobj=lpobj->next)
+	for (; lpobj; lpobj=lpobj->next)
 	{
 		// only operate on selected objects
 		if (!(lpobj->flag2 & OBJECT_TERRAIN_OBJECT))
@@ -5867,7 +5867,7 @@ static UINT32	lasttod;
         }
 
 		lpsort = obcsGetNextSortItem();
-		if (lpsort == NULL)
+		if (lpsort == nullptr)
 		{
 			break;
 		}
@@ -5912,7 +5912,7 @@ UINT32 obdrawDrawTreeSiblings(OBJECT* pObject)
 	OBJECT* pObjSib;
 	OBJECT* pObjAtt;
 
-	if(pObject == NULL)
+	if(pObject == nullptr)
 	{
 		return 0;
 	}
@@ -5936,17 +5936,17 @@ UINT32 obdrawDrawTreeSiblings(OBJECT* pObject)
 
 				pObjAtt = pObjAtt->attached;
 			}
-			while(pObjAtt != NULL);
+			while(pObjAtt != nullptr);
 		}
 
-		if(pObjSib->child != NULL)
+		if(pObjSib->child != nullptr)
 		{
 			obdrawDrawTreeSiblings(pObjSib->child);
 		}
 
 		pObjSib = pObjSib->sibling;
 	}
-	while(pObjSib != NULL);
+	while(pObjSib != nullptr);
 
 	return 0;
 }
@@ -5956,7 +5956,7 @@ UINT32 obdrawDrawTree(OBJECT* pObject)
 	OBJECT* pObjSib;
 	OBJECT* pObjAtt;
 
-	if(pObject == NULL)
+	if(pObject == nullptr)
 	{
 		return 0;
 	}
@@ -5977,10 +5977,10 @@ UINT32 obdrawDrawTree(OBJECT* pObject)
 
 				pObjAtt = pObjAtt->attached;
 			}
-			while(pObjAtt != NULL);
+			while(pObjAtt != nullptr);
 		}
 
-		if(pObjSib->child != NULL)
+		if(pObjSib->child != nullptr)
 		{
 			obdrawDrawTreeSiblings(pObjSib->child);
 		}
@@ -5992,7 +5992,7 @@ UINT32 obdrawDrawTree(OBJECT* pObject)
 
 LOGICAL obdrawInstallDrawCallback(USERDRAWFUNC FuncPtr,UINT32 FuncNum)
 {
-	if (FuncPtr == NULL)
+	if (FuncPtr == nullptr)
 	{
 		return FALSE;
 	}
@@ -6119,7 +6119,7 @@ bool obdrawDrawBuildingShadowCasters(int sx,
         if(!o)
             continue;
 
-        OBJECT* shadow = NULL;
+        OBJECT* shadow = nullptr;
 
         if(!o->shadow)
         {

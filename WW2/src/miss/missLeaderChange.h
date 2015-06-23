@@ -19,20 +19,20 @@ public:
 	,	_FAIL_IS_LEADER
 	,	_FAIL_OTHER_MISSION
 	,	_SET_BACKUP_LEADER
-	} ;
+	};
 	LeaderChange(UINT32 missionID=0, UINT32 leaderID=0, const ChatHandle& leaderHandle=0LL, const ChatHandle& requester=0LL, Status result=_SUCCESS)
 		: m_missionID(missionID), m_leaderID(leaderID), m_leaderHandle(leaderHandle), m_requester(requester), m_result(_SUCCESS) {}
 	~LeaderChange() {}
 
 public:
-	UINT32 process() const ;
+	UINT32 process() const;
 
 public:
-	UINT32		m_missionID ;
-	UINT32		m_leaderID ;
-	ChatHandle	m_leaderHandle ;
-	ChatHandle	m_requester ;
-	UINT32		m_result ;
-} ;
+	UINT32		m_missionID;
+	UINT32		m_leaderID;
+	ChatHandle	m_leaderHandle;
+	ChatHandle	m_requester;
+	UINT32		m_result;
+};
 #pragma pack(pop)
 

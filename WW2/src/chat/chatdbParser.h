@@ -7,10 +7,10 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-struct SquadMemberUpdate ;
+struct SquadMemberUpdate;
 
 // Process a request for squad info
-extern void chatdbSquadInfo(SINT32 teulIndex, UINT32 squadID, bool sendMembers) ;
+void chatdbSquadInfo(SINT32 teulIndex, UINT32 squadID, bool sendMembers);
 
-extern void chatdbSquadMemberUpdate(SINT32 teulIndex, SquadMemberUpdate& update) ;
+void chatdbSquadMemberUpdate(SINT32 teulIndex, SquadMemberUpdate& update);
 

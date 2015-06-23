@@ -74,7 +74,7 @@ struct weapAmmo
 	piMATRIX FireAtt; // Used for torpedo to stay in same direction
 
 	FLOAT32 VarFuzeInterval;
-} ;
+};
 
 struct AmmoTrajectory
 {

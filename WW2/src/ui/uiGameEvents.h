@@ -41,6 +41,6 @@ enum
 };
 
 // used to call game events from other files
-extern int uiGameEvent(int e, const char* args = NULL, ...);
+extern int uiGameEvent(int e, const char* args = nullptr, ...);
 extern int uiGameEvent(jsval* argv, int argc);
 extern int uiGameEvent(int e, int argc, ...); // assumes variable args are wide strings

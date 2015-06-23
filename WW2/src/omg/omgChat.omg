@@ -1,0 +1,68 @@
+NAMESPACE Chat;
+
+USING "typedefs.omg";
+
+START-Y 100;
+
+MESSAGE MissionStatus
+{
+	GROUP Header
+	{
+		UINT32			missionID;		//! Server ID for this mission (unique per campaign)
+		UINT16			brigadeID;		//! ID of HCUnit mission belongs to.
+		ChatHandle		poster;			//! Original mission poster.
+		NetTimeMS		postedTime_ms;	//! Timestamp of mission creation.
+	};
+
+	GROUP Status
+	{
+		bool			isOpen;			//! Whether mission is currently accepting new takers.
+		bool			isOngoing;		//! Whether mission is waiting for people to leave.
+		bool			hasMobileSpawn;	//!	True when mission has an active mobile spawn.
+		bool			canMobileSpawn;	//!	True when mission is capable of hosting a mobile spawn.
+	};
+
+	GROUP Origin
+	{
+		FULL_OBJ_ID		cp;				//! Spawn CP.
+		FULL_OBJ_ID		fac;			//! Spawn facility.	
+		bool			inSupply;		//! True if origin is in supply.
+	};
+
+	GROUP Target
+	{
+		FULL_OBJ_ID		cp;				//! Target CP.
+		FULL_OBJ_ID		fac;			//! Target facility (if applicable).
+		bool			originLink;		//! True when there is a link from origin to target.
+	};
+
+	GROUP Lead
+	{
+		ChatHandle		current;		//! Current leader.
+		ChatHandle		backup;			//! Backup leader.
+	};
+
+	GROUP FRU
+	{
+		bool			active;			//! True when a FRU is active.
+		NetTimeMS		nextPlaceAvail;	//! When the next FRU can be placed.
+		WorldPosition_m	position;	//! Absolute world co-ordinates.
+		ChatHandle	creator;		//! MSP/FRU creatore.
+
+		{{
+			//! \brief Calculate the milliseconds remaining until placement allowed.
+			//! \returns 0 to indicate "now", otherwise a positive number of milliseconds.
+			TeulTimeMS cooldownRemaining() const
+			{
+				SINT64 cooldown = (SINT64)nextPlaceAvail() - (SINT64)teulClock64;
+				return (cooldown > 0) ? (TeulTimeMS)cooldown : (TeulTimeMS)0ULL;
+			}
+		}}
+	};
+};
+
+MESSAGE CellHostUpdate
+{
+	playerid_t		playerID;
+	UINT32			cellHost;
+};

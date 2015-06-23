@@ -17,14 +17,9 @@
 
 enum
 {
-	WWII_DIALOG_Y = 1,
-	WWII_BUTTON_REPLY_Y,
+	WWII_ERROR_INFO_Y = 1,
+	WWII_USER_ABORTED_APP_Y,
 	WWII_ACTIVATE_Y,
-	WWII_ERROR_INFO_Y,
-	_WWII_UNUSED_1_Y,
-	WWII_ADDRESS_LIST_Y,
-	WWII_PING_Y,
-	WWII_USER_ABORTED_APP_Y
 };
 
 // Determination of the different infantry types
@@ -43,14 +38,14 @@ enum WWII_INF_TYPE
 ,	_INF_SNIPER	= 12
 ,	_INF_MORTAR	= 13
 ,	MAX_WWII_INF_TYPES
-} ;
+};
 
 //Used for a number of FRONT_END requests, probably needs to move to a more central location
 struct SUPER_CELL
 {
 	SINT16 sx;
 	SINT16 sy;
-} ;
+};
 
 //tolua_end
 
@@ -58,10 +53,10 @@ struct SUPER_CELL
 struct FULL_ID
 {
 	SINT16	sx;			// supercell coordinates start at the center of the map
-	SINT16	sy;			// and therfore must be signed.
+	SINT16	sy;			// and therefore must be signed.
 	UINT16	id;
 	UINT16	type;
-} ;
+};
 
 // supercell relative id
 struct REL_OBJ_ID
@@ -70,14 +65,6 @@ struct REL_OBJ_ID
 	SINT8		objClass;
 	SINT8		objType;
 
-} ;
+};
 
-enum WWII_DIALOG
-{
-	DLG_INVALID = 0,
-	DLG_BASE_CAPTURED,
-	MAX_DIALOGS
-} ;
-
-struct FULL_OBJ_ID ;
-
+struct FULL_OBJ_ID;

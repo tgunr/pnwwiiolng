@@ -10,13 +10,8 @@
 // Originating Programmer: Oliver "kfsone" Smith
 //
 
-#include "dbug/dbug.h"							// For host "dbugLog" access
-
-#include <assert.h>
-#include <vector>
-#include <math.h>
-
 #include "chat/chatHandle.h"
+#include "chat/chatName.h"
 #include "strt/strtCPStruct.h"
 #include "strt/strtTOE.h"
 #include "strt/strtHCUnits.h"
@@ -25,14 +20,14 @@
 #include "wwii/wwiiConfig.h"
 #include "include/mydbQuery.h"
 
-extern DBHANDLE dbh ;
+extern DBHANDLE dbh;
 
 // TOE templates.
-TOE_TEMPLATES toeTemplates ;
+TOE_TEMPLATES toeTemplates;
 
 // TOE_::WeaponInstances that need saving and the original number of units
-typedef std::vector< std::pair<TOE_::WeaponInstance*,UINT16> > TOE_SAVE_LIST ;
-TOE_SAVE_LIST toeSaveList ;
+typedef std::vector< std::pair<TOE_::WeaponInstance*,UINT16> > TOE_SAVE_LIST;
+TOE_SAVE_LIST toeSaveList;
 
 //////////////////////////////////////////////////////////////////////
 // Lookup a TOE_::TemplateHeader by ID or handle
@@ -40,15 +35,15 @@ TOE_SAVE_LIST toeSaveList ;
 TOE_::TemplateHeader*
 TOE_::TemplateHeader::Lookup(const char* id)
 {
-	TOE_TEMPLATES::iterator it = toeTemplates.find(chatGetHandle(id)) ;
-	return (it != toeTemplates.end()) ? &it->second : NULL ;
+	TOE_TEMPLATES::iterator it = toeTemplates.find(chatGetHandle(id));
+	return (it != toeTemplates.end()) ? &it->second : nullptr;
 }
 
 TOE_::TemplateHeader*
 TOE_::TemplateHeader::Lookup(const ChatHandle& handle)
 {
-	TOE_TEMPLATES::iterator it = toeTemplates.find(handle) ;
-	return (it != toeTemplates.end()) ? &it->second : NULL ;
+	TOE_TEMPLATES::iterator it = toeTemplates.find(handle);
+	return (it != toeTemplates.end()) ? &it->second : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -58,14 +53,15 @@ void
 TOE_::TemplateHeader::initialize(const ChatHandle& withHandle, const char* withName, UINT32 withCountry, UINT32 withBranch)
 {
 	// If ID isn't null, we're already initialized
-	assert( m_handle == 0LL ) ;
+	assert( m_handle == 0LL );
 
-	dbugLog(_FLI, "toe:%s(%llu) c:%u b:%u %s", chatGetCallsign(withHandle), withHandle, withCountry, withBranch, withName) ;
+	Chat::Name newName(withHandle);
+	dbugLog(_FLI, "toe:%s(%llu) c:%u b:%u %s", newName.c_str(), withHandle, withCountry, withBranch, withName);
 
-	m_handle = withHandle ;
-	m_name = withName ;
-	m_country = withCountry ;
-	m_branch = withBranch ;
+	m_handle = withHandle;
+	m_name = withName;
+	m_country = withCountry;
+	m_branch = withBranch;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -74,13 +70,14 @@ TOE_::TemplateHeader::initialize(const ChatHandle& withHandle, const char* withN
 void
 TOE_::TemplateHeader::setName(const char* newName)
 {
-	assert( newName != NULL ) ;
+	assert( newName != nullptr );
 	if ( name().compare(newName) == 0 )
-		return ;
+		return;
 
-	dbugLog(_FLI, "toe:%s(%llu) new name: %s", chatGetCallsign(handle()), handle(), newName) ;
+	Chat::Name oldName(handle());
+	dbugLog(_FLI, "toe:%s(%llu) new name: %s", oldName.c_str(), handle(), newName);
 
-	m_name = newName ;
+	m_name = newName;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -89,61 +86,60 @@ TOE_::TemplateHeader::setName(const char* newName)
 void
 TOE_::TemplateHeader::updateWeapon(const WEAPON_SPEC& spec, UINT16 capacity, UCHAR access, UINT16 resupplyTime_m)
 {
-	TOE_WEAPONS::iterator it = m_weapons.lower_bound(spec) ;
-	bool newWeapon = false ;
+	TOE_WEAPONS::iterator it = m_weapons.lower_bound(spec);
+	bool newWeapon = false;
 
 	// Is this a new entry?
 	if ( it == m_weapons.end() || it->first != spec )
 	{
-		const WEAPON* weapon = weapLookup(spec) ;
-		if ( weapon == NULL )
-			LogAbort("toe:%s(%llu) wanted unknown weapon spec %s"
-							, chatGetCallsign(handle()), handle(), weapPrintSpecC(&spec)) ;
+		Chat::Name toeName(handle());
+		const WEAPON* weapon = weapLookup(spec);
+		if ( weapon == nullptr )
+			LogAbort("toe:%s(%llu) wanted unknown weapon spec " PRF_WEAPON_SPEC ""
+							, toeName.c_str(), handle(), PRA_WEAPON_SPEC(spec));
 
-		dbugLog(_FLI, "toe:%s(%llu) adding %s(%s) capacity %u"
-						, chatGetCallsign(handle()), handle()
+		dbugLog(_FLI, "toe:%s(%llu) adding %s(" PRF_WEAPON_SPEC ") capacity %u"
+						, toeName.c_str(), handle()
 						, weapon->name
-						, weapPrintSpecC(&spec)
+						, PRA_WEAPON_SPEC(spec)
 						, capacity
-						) ;
+						);
 
-		it = m_weapons.insert(it, std::make_pair(spec, TOE_::WeaponTemplate(*weapon))) ;
-		newWeapon = true ;
+		it = m_weapons.insert(it, std::make_pair(spec, TOE_::WeaponTemplate(*weapon)));
+		newWeapon = true;
 	}
 
-	TOE_::WeaponTemplate& weaponTemplate = it->second ;
+	TOE_::WeaponTemplate& weaponTemplate = it->second;
 
 	// Remember what capacity was
-	UINT32 oldCapacity = weaponTemplate.capacity() ;
+	UINT32 oldCapacity = weaponTemplate.capacity();
 
 	// Update the fields
-	weaponTemplate.setCapacity(capacity) ;
-//	weaponTemplate.setAccess(access) ;
-	weaponTemplate.setResupplyTime(resupplyTime_m) ;
+	weaponTemplate.setCapacity(capacity);
+//	weaponTemplate.setAccess(access);
+	weaponTemplate.setResupplyTime(resupplyTime_m);
 
 	// Adjust our total capacity value
 	if ( m_totalCapacity > oldCapacity )
-		m_totalCapacity -= oldCapacity ;
-	else m_totalCapacity = 0 ;
-	m_totalCapacity += capacity ;
+		m_totalCapacity -= oldCapacity;
+	else m_totalCapacity = 0;
+	m_totalCapacity += capacity;
 
 	// If we increased the capacity, we may need to provide additional vehicles
 	if ( capacity > oldCapacity && m_subscribers.empty() == false )
 	{
-		UINT32 increase = capacity - oldCapacity ;
-		SUBSCRIBERS::iterator sit ;
-
-		for ( sit = m_subscribers.begin() ; sit != m_subscribers.end() ; ++sit )
+		UINT32 increase = capacity - oldCapacity;
+		for ( auto sit = m_subscribers.begin(), end = m_subscribers.end(); sit != end; ++sit )
 		{
-			StratHCUnit* unit = *sit ;
-			assert( unit != NULL ) ;
+			StratHCUnit* unit = *sit;
+			assert( unit != nullptr );
 			if ( newWeapon )
-				unit->addTOEInstance(weaponTemplate) ;
+				unit->addTOEInstance(weaponTemplate);
 			if ( (*sit)->offMap() || (*sit)->homeCP()->isSupplied() == false )
-				continue ;
+				continue;
 			// Inject this many vehicles into the unit's spawn list,
 			// false = don't allow overstocking.
-			(*sit)->depositWeapons(spec, increase, false, NULL) ;
+			(*sit)->depositWeapons(spec, increase, false, nullptr);
 		}
 	}
 }
@@ -154,17 +150,16 @@ TOE_::TemplateHeader::updateWeapon(const WEAPON_SPEC& spec, UINT16 capacity, UCH
 void
 TOE_::TemplateHeader::subscribe(StratHCUnit* unit, TOE& toe)
 {
-	assert( unit != NULL ) ;
-	assert( m_subscribers.find(unit) == m_subscribers.end() ) ;
-	assert( toe.empty() ) ;
+	assert( unit != nullptr );
+	assert( m_subscribers.find(unit) == m_subscribers.end() );
+	assert( toe.empty() );
 
-	m_subscribers.insert(unit) ;
+	m_subscribers.insert(unit);
 
 	// Ensure that the HCUnit has all of the weapons in this template
-	TOE_WEAPONS::const_iterator it ;
-	for ( it = m_weapons.begin() ; it != m_weapons.end() ; ++it )
+	for ( auto it = m_weapons.begin(), end = m_weapons.end(); it != end; ++it )
 	{
-		unit->addTOEInstance(it->second) ;
+		unit->addTOEInstance(it->second);
 	}
 }
 
@@ -174,11 +169,11 @@ TOE_::TemplateHeader::subscribe(StratHCUnit* unit, TOE& toe)
 void
 TOE_::TemplateHeader::unsubscribe(StratHCUnit* unit, TOE& toe)
 {
-	assert( m_subscribers.find(unit) != m_subscribers.end() ) ;
+	assert( m_subscribers.find(unit) != m_subscribers.end() );
 
-	m_subscribers.erase(unit) ;
+	m_subscribers.erase(unit);
 
-	toe.clear() ;
+	toe.clear();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -188,7 +183,7 @@ TOE_::TemplateHeader::unsubscribe(StratHCUnit* unit, TOE& toe)
 UINT32
 TOE_::WeaponTemplate::resupplyTime() const
 {
-	return (UINT32)(( m_resupplyTime_m > 0 ) ? m_resupplyTime_m : host_config.supply.resupplyTime_m) * 60 ;
+	return (UINT32)(( m_resupplyTime_m > 0 ) ? m_resupplyTime_m : host_config.supply.resupplyTime_m) * 60;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -198,23 +193,23 @@ UINT32
 TOE_::WeaponInstance::overstockCapacity() const
 {
 	if ( capacity() == 0 )
-		return 0 ;
+		return 0;
 
 	// Get percentage expressed as, e.g. 110%
-	UINT32 limit = (UINT32)(host_config.supply.overstockLimit + 100) ;
+	UINT32 limit = (UINT32)(host_config.supply.overstockLimit + 100);
 	if ( limit <= 100 )
-		return (UINT32)capacity() ;
+		return (UINT32)capacity();
 
 	// Get percentage as an actual number of units
-	limit = (UINT32)ceilf((FLOAT32)(capacity() * limit) / 100.0f) ;
+	limit = (UINT32)ceilf((FLOAT32)(capacity() * limit) / 100.0f);
 	if ( limit <= 0 )
 		limit = 1;
 
 	// Client only supports 3 digits, so do we (missionPack.cpp:WEAP_COUNT_MAX_XMIT)
 	if ( limit > 999 )
-		limit = 999 ;
+		limit = 999;
 
-	return limit ;
+	return limit;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -223,18 +218,18 @@ TOE_::WeaponInstance::overstockCapacity() const
 bool TOE_::WeaponInstance::setPresent(UINT16 nowPresent)
 {
 	if ( nowPresent == present() )
-		return false ;
+		return false;
 
 	// Queue this entry for saving.
 	if ( !m_modified && weapon().isSupplied() && host_config.supply.enabled )
 	{
-		toeSaveList.push_back(std::make_pair(this, saveable())) ;
-		m_modified = true ;
+		toeSaveList.push_back(std::make_pair(this, saveable()));
+		m_modified = true;
 	}
 
-	m_present = nowPresent ;
+	m_present = nowPresent;
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -244,7 +239,7 @@ bool TOE_::WeaponInstance::setPresent(UINT16 nowPresent)
 UINT16
 TOE_::WeaponInstance::throttleCapacity() const
 {
-	return (UINT16)ceilf((float)capacity() * (float)host_config.throttle.percentage / 100.0f) ;
+	return (UINT16)ceilf((float)capacity() * (float)host_config.throttle.percentage / 100.0f);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -253,20 +248,20 @@ TOE_::WeaponInstance::throttleCapacity() const
 void
 strtLoadTOEWeaponTemplateHeader(const char* id, const char* name, UINT32 country, UINT32 branch)
 {
-	assert( id != NULL ) ;
+	assert( id != nullptr );
 
-	ChatHandle handle = chatGetHandle(id) ;
+	ChatHandle handle = chatGetHandle(id);
 	if ( handle == 0LL )
-		LogAbort("Illegal TOE Template %s", id) ;
+		LogAbort("Illegal TOE Template %s", id);
 
 	// Find or create an entry for this template
-	TOE_::TemplateHeader& header = toeTemplates[handle] ;
+	TOE_::TemplateHeader& header = toeTemplates[handle];
 
 	// Is it a new header?
 	if ( header.handle() == 0LL )
-		header.initialize(handle, name, country, branch) ;
+		header.initialize(handle, name, country, branch);
 	else
-		header.setName(name) ;
+		header.setName(name);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -275,18 +270,18 @@ strtLoadTOEWeaponTemplateHeader(const char* id, const char* name, UINT32 country
 void
 strtLoadTOEWeaponInstance(const char* id, const WEAPON_SPEC& spec, UINT16 capacity, UCHAR access, UINT16 resupplyTime_m)
 {
-	assert( id != NULL ) ;
+	assert( id != nullptr );
 
-	ChatHandle handle = chatGetHandle(id) ;
+	ChatHandle handle = chatGetHandle(id);
 	if ( handle == 0LL )
-		LogAbort("Illegal TOE Template %s", id) ;
+		LogAbort("Illegal TOE Template %s", id);
 
-	TOE_TEMPLATES::iterator it = toeTemplates.find(handle) ;
+	TOE_TEMPLATES::iterator it = toeTemplates.find(handle);
 	if ( it == toeTemplates.end() )
-		LogAbort("Got weapons for unrecognized TOE Template %s", id) ;
+		LogAbort("Got weapons for unrecognized TOE Template %s", id);
 
-	TOE_::TemplateHeader& header = it->second ;
-	header.updateWeapon(spec, capacity, access, resupplyTime_m) ;
+	TOE_::TemplateHeader& header = it->second;
+	header.updateWeapon(spec, capacity, access, resupplyTime_m);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -298,16 +293,16 @@ TOE_::WeaponInstance::saveText(UINT32& len, char* buffer) const
 	// If we've filled the buffer,
 	if ( len >= TEXT_POOL_SIZE - 30 )
 	{
-		DBSimpleQuery(dbh, buffer) ;
-		len = 0 ;
+		DBSimpleQuery(dbh, buffer);
+		len = 0;
 	}
-	const char* format ;
+	const char* format;
 	if ( len == 0  )
-		format = "REPLACE INTO toe.supply(unit_id,vehtype_oid,present)VALUES(%u,%u,%u)" ;
+		format = "REPLACE INTO toe.supply(unit_id,vehtype_oid,present)VALUES(%u,%u,%u)";
 	else
-		format = ",(%u,%u,%u)" ;
+		format = ",(%u,%u,%u)";
 
-	len += sprintf(buffer + len, format, m_unit.unitID(), weapon().localIndex(), saveable()) ;
+	len += sprintf(buffer + len, format, m_unit.unitID(), weapon().localIndex(), saveable());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -318,27 +313,26 @@ void
 strtSaveTOESupplies()
 {
 	if ( toeSaveList.empty() )
-		return ;
+		return;
 
 	// Get a big hunka-chunka-memory
-	char buffer[TEXT_POOL_SIZE+1] ;
+	char buffer[TEXT_POOL_SIZE+1];
 
-	UINT32 len = 0 ;
-	TOE_SAVE_LIST::iterator it ;
-	for ( it = toeSaveList.begin() ; it != toeSaveList.end() ; ++it )
+	UINT32 len = 0;
+	for (auto it = toeSaveList.begin(), end = toeSaveList.end(); it != end; ++it)
 	{
-		TOE_::WeaponInstance& entry = *it->first ;
+		TOE_::WeaponInstance& entry = *it->first;
 
 		// Ignore entries that have gotten reset since they were queued.
 		if ( entry.saveable() != it->second )
-			entry.saveText(len, buffer) ;
+			entry.saveText(len, buffer);
 
-		entry.m_modified = false ;
+		entry.m_modified = false;
 	}
 
 	if ( len > 0 )
-		DBSimpleQuery(dbh, buffer) ;
+		DBSimpleQuery(dbh, buffer);
 
-	toeSaveList.clear() ;
+	toeSaveList.clear();
 }
 

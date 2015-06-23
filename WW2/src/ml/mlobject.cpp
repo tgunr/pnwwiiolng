@@ -42,10 +42,6 @@
 #include "ogl/States.h"
 #endif
 
-#ifdef DOROTHY
-#include "gr2/gr2Main.h"
-#endif
-
 struct ReflectorSight
 {
     bool flip;
@@ -54,7 +50,7 @@ struct ReflectorSight
 	piVECTOR up, right,front;
 	piVECTOR center;
 	OBJECT* gviewObj;
-} ;
+};
 
 ReflectorSight _ReflectorSights[ML_MAX_CREW_POSITIONS];
 
@@ -126,7 +122,7 @@ static LOGICAL _CreateVehicleShadow(OBJECT* lpgrp)
 OBJECT*	lpobj;
 
 	lpobj = obmainFindChildFromObject(lpgrp, "shadow");
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		Write_Debug("Shadow object not found in model %s", lpgrp->name);
 		// no shadow, no error
@@ -163,7 +159,7 @@ SINT8* ptr, LocalObjectName[256];
 static UINT32 Counter = 0;
 
 
-	if (ObjectData == NULL || ObjectName == NULL)
+	if (ObjectData == nullptr || ObjectName == nullptr)
 	{
 		return 1;
 	}
@@ -173,11 +169,11 @@ static UINT32 Counter = 0;
 		return 1;
 	}
 
-	Object = NULL;
+	Object = nullptr;
 
 	lstrcpy(LocalObjectName, (char*)ObjectName);
 	ptr = strrchr(LocalObjectName, '\\');
-	if (ptr != NULL)
+	if (ptr != nullptr)
 	{
 		ptr += 1;
 		lstrcpy(LocalObjectName, ptr);
@@ -188,12 +184,6 @@ static UINT32 Counter = 0;
 	{
 		Object = gr2AnimCreateObject(Vehicle, Vehicle->VehicleType->VehicleTypeNum);
 	}
-#ifdef DOROTHY
-	else if (Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-	{
-		Object = gr2CreateVehicleObject(Vehicle, Vehicle->VehicleType->VehicleTypeNum);
-	}
-#endif
 	else
 	{
 		if(!obmgrCreateModelInstance((char*)ObjectName))
@@ -203,7 +193,7 @@ static UINT32 Counter = 0;
 
 		lstrcpy(LocalObjectName, (char*)ObjectName);
 		ptr = strrchr(LocalObjectName, '\\');
-		if (ptr != NULL)
+		if (ptr != nullptr)
 		{
 			ptr += 1;
 			lstrcpy(LocalObjectName, ptr);
@@ -211,7 +201,7 @@ static UINT32 Counter = 0;
 
 		Object = obmainFindNamedObject((char*)LocalObjectName);
 
-		if (Object == NULL)
+		if (Object == nullptr)
 		{
 			return 1;
 		}
@@ -243,7 +233,7 @@ static UINT32 Counter = 0;
 	snprintf(Object->name, 32, "%s%dml",LocalObjectName,Counter++);
 	(*ObjectData) = mlObjectData::Get();
 
-    if (*ObjectData == NULL)
+    if (*ObjectData == nullptr)
 	{
         // This looks bad...will probably cause a crash somewhere
 		obpoolFreeObjectCallback(Object);
@@ -267,7 +257,7 @@ static UINT32 _FindAndSetupHideUnhideObjects(mlObjectData* ObjectData, OBJECT* O
 	SINT8* CommentStr;
 	SINT32 idx;
 
-	if (Object == NULL || ObjectData == NULL) return 0;
+	if (Object == nullptr || ObjectData == nullptr) return 0;
 
 	for (ObjSib = Object; ObjSib; ObjSib = ObjSib->sibling)
 	{
@@ -344,7 +334,7 @@ static UINT32 _FindAndSetupFPSSeats(mlObjectData * ObjectData,
 {
 OBJECT * ObjSib;
 
-	if (CurrentObject == NULL)
+	if (CurrentObject == nullptr)
 	{
 		return 0;
 	}
@@ -371,7 +361,7 @@ OBJECT * ObjSib;
 			}
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_FindAndSetupFPSSeats(ObjectData,
 									ObjSib->child,
@@ -385,7 +375,7 @@ OBJECT * ObjSib;
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL && ScanSiblings == TRUE);
+	while (ObjSib != nullptr && ScanSiblings == TRUE);
 
 	return 0;
 }
@@ -396,7 +386,7 @@ static UINT32 _FindAndSetupVehicleSeats(mlObjectData * ObjectData,
 {
 OBJECT * ObjSib;
 
-	if (CurrentObject == NULL)
+	if (CurrentObject == nullptr)
 	{
 		return 0;
 	}
@@ -423,7 +413,7 @@ OBJECT * ObjSib;
 			}
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_FindAndSetupVehicleSeats(ObjectData,
 									ObjSib->child,
@@ -437,7 +427,7 @@ OBJECT * ObjSib;
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL && ScanSiblings == TRUE);
+	while (ObjSib != nullptr && ScanSiblings == TRUE);
 
 	return 0;
 }
@@ -447,7 +437,7 @@ UINT32 mlForEachSubObject(OBJECT* Object, mlForEachCallback callback, void* data
 {
 	OBJECT* ObjSib;
 
-	if(Object == NULL) return 0;
+	if(Object == nullptr) return 0;
 
 	ObjSib = Object;
 
@@ -455,7 +445,7 @@ UINT32 mlForEachSubObject(OBJECT* Object, mlForEachCallback callback, void* data
 	{
 		callback(ObjSib, data);
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 			mlForEachSubObject(ObjSib->child, callback, data, 1);
 
 		ObjSib = ObjSib->sibling;
@@ -469,12 +459,12 @@ static UINT32 _FindAllWheelRadius(OBJECT * lpobj,mlObjectData * ObjectData)
 SINT8* CommentStr;
 FLOAT32 TempNum;
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return 0;
 	}
 
-	if (ObjectData == NULL)
+	if (ObjectData == nullptr)
 	{
 		return 0;
 	}
@@ -488,7 +478,7 @@ FLOAT32 TempNum;
 		}
 	}
 
-	if (lpobj->child != NULL)
+	if (lpobj->child != nullptr)
 	{
 		_FindAllWheelRadiusInSubTree(lpobj->child,ObjectData);
 
@@ -503,12 +493,12 @@ OBJECT * ObjSib;
 SINT8* CommentStr;
 FLOAT32 TempNum;
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return 0;
 	}
 
-	if (ObjectData == NULL)
+	if (ObjectData == nullptr)
 	{
 		return 0;
 	}
@@ -526,7 +516,7 @@ FLOAT32 TempNum;
 			}
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_FindAllWheelRadiusInSubTree(ObjSib->child,ObjectData);
 
@@ -534,7 +524,7 @@ FLOAT32 TempNum;
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 	return 0;
 }
@@ -546,12 +536,12 @@ OBJECT * ObjectPtr;
 
 UCHAR s[32];
 
-	if (ObjectData == NULL)
+	if (ObjectData == nullptr)
 	{
 		return 1;
 	}
 
-	if (ObjectData->PlaneObject == NULL)
+	if (ObjectData->PlaneObject == nullptr)
 	{
 		return 1;
 	}
@@ -560,15 +550,15 @@ UCHAR s[32];
 	{
 		sprintf((char*)s,"lod%d",i+1);
 
-		ObjectPtr = NULL;
+		ObjectPtr = nullptr;
 		ogrpFindSubObjectByName(&ObjectPtr,ObjectData->PlaneObject,(char*)s);
 
 		ObjectData->LODObjects[i] = ObjectPtr;
-		if (ObjectPtr != NULL)
+		if (ObjectPtr != nullptr)
 		{
 			while (ObjectPtr->flags & OBJECT_NOTOBJECT)
 			{
-				if (ObjectPtr->child == NULL)
+				if (ObjectPtr->child == nullptr)
 				{
 					Write_Debug("No object under %s in vehicle object %s",s,ObjectData->PlaneObject->name);
 					break;
@@ -608,15 +598,15 @@ UCHAR s[32];
 	}
 
 	// find weapon loadout lod
-	ObjectPtr = NULL;
+	ObjectPtr = nullptr;
 	ogrpFindSubObjectByName(&ObjectPtr,ObjectData->PlaneObject,"lodloadout");
 
 	ObjectData->LoadoutLODObject = ObjectPtr;
-	if (ObjectPtr != NULL)
+	if (ObjectPtr != nullptr)
 	{
 		while (ObjectPtr->flags & OBJECT_NOTOBJECT)
 		{
-			if (ObjectPtr->child == NULL)
+			if (ObjectPtr->child == nullptr)
 			{
 				Write_Debug("No object under lodloadout in vehicle object %s",ObjectData->PlaneObject->name);
 				break;
@@ -650,7 +640,7 @@ UINT32 mlMoveAndRotateObject(OBJECT * Object,FLOAT64VECTOR * InPos,FLOAT64ATT * 
 	Pos.y = (float)(TempPos.y) * ScaleFactor;
 	Pos.z = -(float)(TempPos.z) * ScaleFactor;
 
-	if (InAtt != NULL)
+	if (InAtt != nullptr)
 	{
 		Att.x = -(float)InAtt->Pitch;
 		Att.y = -(float)InAtt->Roll;
@@ -677,46 +667,46 @@ UINT32 mlobjectKillVehicleObject(mlObjectData ** ObjectData)
 	if ((*ObjectData)->HitMap)
 		fxMgrDetach((*ObjectData)->HitMap);
 
-	if ((*ObjectData)->WheelRadius != NULL)
+	if ((*ObjectData)->WheelRadius != nullptr)
 	{
 		memFree((*ObjectData)->WheelRadius);
-		(*ObjectData)->WheelRadius = NULL;
+		(*ObjectData)->WheelRadius = nullptr;
 	}
 
-	if ((*ObjectData)->PlaneObject != NULL)
+	if ((*ObjectData)->PlaneObject != nullptr)
 	{
 		ogrpFreeObjectTree((*ObjectData)->PlaneObject);
-		(*ObjectData)->PlaneObject = NULL;
+		(*ObjectData)->PlaneObject = nullptr;
 	}
 
-	if ((*ObjectData)->TrackSection != NULL)
+	if ((*ObjectData)->TrackSection != nullptr)
 	{
 		memFree((*ObjectData)->TrackSection);
-		(*ObjectData)->TrackSection = NULL;
+		(*ObjectData)->TrackSection = nullptr;
 	}
 
-	if ((*ObjectData)->TrackAnimation != NULL)
+	if ((*ObjectData)->TrackAnimation != nullptr)
 	{
 		memFree((*ObjectData)->TrackAnimation);
-		(*ObjectData)->TrackAnimation = NULL;
+		(*ObjectData)->TrackAnimation = nullptr;
 	}
 
-	if ((*ObjectData)->CollidePntList != NULL)
+	if ((*ObjectData)->CollidePntList != nullptr)
 	{
 		memFree((*ObjectData)->CollidePntList);
-		(*ObjectData)->CollidePntList = NULL;
+		(*ObjectData)->CollidePntList = nullptr;
 	}
 
-	if ((*ObjectData)->HoistCollidePntList != NULL)
+	if ((*ObjectData)->HoistCollidePntList != nullptr)
 	{
 		memFree((*ObjectData)->HoistCollidePntList);
-		(*ObjectData)->HoistCollidePntList = NULL;
+		(*ObjectData)->HoistCollidePntList = nullptr;
 	}
 
-	if ((*ObjectData) != NULL)
+	if ((*ObjectData) != nullptr)
 	{
 		mlObjectData::Release(*ObjectData);
-		*ObjectData = NULL;
+		*ObjectData = nullptr;
 	}
 
 	return 0;
@@ -731,7 +721,7 @@ UCHAR s[64];
 
 	// hide external object
 	ogrpFindSubObjectByName(&Object,BaseObject,"extern");
-	if (Object != NULL)
+	if (Object != nullptr)
 	{
 		ogrpHideObjectAndSubtree(Object);
 	}
@@ -740,17 +730,17 @@ UCHAR s[64];
 	ogrpFindSubObjectByName(&Object,BaseObject,"vcpit");
 	ogrpHideObjectAndSubtree(Object);
 
-	if (Object != NULL)
+	if (Object != nullptr)
 	{
 		sprintf((char*)s,"posit%d",Position);
 		ogrpFindSubObjectByName(&Object1,Object,(char*)s);
-		if (Object1 == NULL || Object->child == NULL)
+		if (Object1 == nullptr || Object->child == nullptr)
 		{
 			ogrpShowObjectAndSubtree(Object);
 		}
 		else
 		{
-			for (Object2 = Object->child;Object2 != NULL;)
+			for (Object2 = Object->child;Object2 != nullptr;)
 			{
 				_ShowTreeFromOneObjectToAnother(Object2,Object1);
 				Object2 = Object2->sibling;
@@ -762,7 +752,7 @@ UCHAR s[64];
 	// just to be sure
 //	ogrpFindSubObjectByName(&Object,BaseObject,"both");
 
-//	if (Object != NULL)
+//	if (Object != nullptr)
 //	{
 //		ogrpSetObjectAndSubtreeToDraw(Object);
 //	}
@@ -774,11 +764,11 @@ static UINT32 _ShowTreeFromOneObjectToAnother(OBJECT * CurrentObject, OBJECT * S
 {
 OBJECT* ObjSib;
 
-	if (CurrentObject == NULL)
+	if (CurrentObject == nullptr)
 	{
 		return 0;
 	}
-	if (CurrentObject->child == NULL)
+	if (CurrentObject->child == nullptr)
 	{
 		return 0;
 	}
@@ -787,7 +777,7 @@ OBJECT* ObjSib;
 
 	do
 	{
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			if(_FindSubObjectInSubTree(ObjSib->child,SearchObject) == 1)
 			{
@@ -798,7 +788,7 @@ OBJECT* ObjSib;
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 	return 0;
 }
@@ -816,7 +806,7 @@ OBJECT * ObjSib;
 			return 1;
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			if (_FindSubObjectInSubTree(ObjSib->child,SearchObject) == 1)
 			{
@@ -826,7 +816,7 @@ OBJECT * ObjSib;
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 	return 0;
 }
@@ -837,12 +827,12 @@ UINT32 mlObjectSetExternObject(OBJECT * BaseObject)
 
 	// show external object
 	ogrpFindSubObjectByName(&Object,BaseObject,"extern");
-	if (Object != NULL)
+	if (Object != nullptr)
 		ogrpShowObjectAndSubtree(Object);
 
 	// now hide the in-plane object
 	ogrpFindSubObjectByName(&Object,BaseObject,"vcpit");
-	if (Object != NULL)
+	if (Object != nullptr)
 		ogrpHideObjectAndSubtree(Object);
 
 	return 0;
@@ -851,7 +841,7 @@ UINT32 mlObjectSetExternObject(OBJECT * BaseObject)
 static LOGICAL _TurretConvergenceCallback(OBJECT* obj, UINT32 user)
 {
 	mlObjectData* VehicleObjectData = (mlObjectData*)user;
-	char* ptr = NULL;
+	char* ptr = nullptr;
 	int turretnum = 0, turretsubnum = 0;
 
 	obmainFindCrackedCommentFirstPart(&ptr, obj->comment, "ttraverseconverge");
@@ -874,7 +864,7 @@ static LOGICAL _TurretConvergenceCallback(OBJECT* obj, UINT32 user)
 static LOGICAL _FireDirectorCallback(OBJECT* obj, UINT32 user)
 {
 	mlObjectData* VehicleObjectData = (mlObjectData*)user;
-	char* ptr = NULL;
+	char* ptr = nullptr;
 	int turretnum = 0;
 
 	obmainFindCrackedCommentFirstPart(&ptr, obj->comment, "firedirector");
@@ -907,16 +897,16 @@ UINT32 mlSetModelSpecialPoints(void*  InVehicleData,mlObjectData * VehicleObject
 	mlComponentListIterator it;
 
 	VehicleData = (mlVehicleData*)InVehicleData;
-	if (VehicleData == NULL) return 0;
+	if (VehicleData == nullptr) return 0;
 
-	VehicleData->VehicleObjectData = NULL;
-	if (VehicleObjectData == NULL) return 0;
+	VehicleData->VehicleObjectData = nullptr;
+	if (VehicleObjectData == nullptr) return 0;
 
 	Object = VehicleObjectData->PlaneObject;
-	if (Object == NULL) return 0;
+	if (Object == nullptr) return 0;
 
 	VehicleData->VehicleObjectData = VehicleObjectData;
-	if (VehicleData->ComponentList == NULL) return 0;
+	if (VehicleData->ComponentList == nullptr) return 0;
 
 	mlComponentListBegin(VehicleData->ComponentList, &it);
 	for(; it.comp; mlComponentListNext(&it))
@@ -945,7 +935,7 @@ UINT32 mlSetModelSpecialPoints(void*  InVehicleData,mlObjectData * VehicleObject
 	}
 
 	// handle cage collider stuff
-	if (VehicleObjectData->HitBox != NULL)
+	if (VehicleObjectData->HitBox != nullptr)
 	{
 		NumCageLines = 0;
 		memset(CageLineObject,0,sizeof(OBJECT*) * MAX_CAGE_LINES);
@@ -956,7 +946,7 @@ UINT32 mlSetModelSpecialPoints(void*  InVehicleData,mlObjectData * VehicleObject
 		{
 			for (j=i+1;j<NumCageLines;j++)
 			{
-				if (CageLineObject[j] == NULL)
+				if (CageLineObject[j] == nullptr)
 				{
 					continue;
 				}
@@ -984,7 +974,7 @@ UINT32 mlSetModelSpecialPoints(void*  InVehicleData,mlObjectData * VehicleObject
 
 				if (Same == 1)
 				{
-					CageLineObject[j] = NULL;
+					CageLineObject[j] = nullptr;
 				}
 			}
 		}
@@ -992,7 +982,7 @@ UINT32 mlSetModelSpecialPoints(void*  InVehicleData,mlObjectData * VehicleObject
 
 		for (i=0;i<NumCageLines;i++)
 		{
-			if (CageLineObject[i] != NULL)
+			if (CageLineObject[i] != nullptr)
 			{
 				Count++;
 			}
@@ -1006,7 +996,7 @@ UINT32 mlSetModelSpecialPoints(void*  InVehicleData,mlObjectData * VehicleObject
 		Count = 0;
 		for (i=0;i<NumCageLines;i++)
 		{
-			if (CageLineObject[i] != NULL)
+			if (CageLineObject[i] != nullptr)
 			{
 				VehicleData->CageLineV1[Count] = CageLineV1[i];
 				VehicleData->CageLineV2[Count] = CageLineV2[i];
@@ -1062,7 +1052,7 @@ OBJECT * ObjSib;
 OBJECT * ObjAtt;
 UINT32 i;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -1102,11 +1092,11 @@ UINT32 i;
 
 				ObjAtt = ObjAtt->attached;
 			}
-			while (ObjAtt != NULL);
+			while (ObjAtt != nullptr);
 		}
 
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_CountAndSetupCageLines(NumCageLines,
 									CageLineV1,
@@ -1118,7 +1108,7 @@ UINT32 i;
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL && IncludeSibs != 0);
+	while (ObjSib != nullptr && IncludeSibs != 0);
 
 	return 0;
 }
@@ -1148,7 +1138,7 @@ OBJECT * AttachPnt;
 
 	// first find the mount itself, bail if we can't find it
 	ogrpFindSubObjectByName(&Mount->MountObject,Object,(char*)Mount->MountName);
-	if (Mount->MountObject == NULL)
+	if (Mount->MountObject == nullptr)
 	{
 		Write_Debug("Unable to find weapon mount %s",Mount->MountName);
 //		hackLockBlock(Mount);
@@ -1204,7 +1194,7 @@ OBJECT * LODObject;
 
 	// find the shock DOF, if it exists
 	ogrpFindSubObjectByName(&LODObject,Object,"lod1");
-	if (LODObject == NULL)
+	if (LODObject == nullptr)
 	{
 		LODObject = Object;
 	}
@@ -1227,7 +1217,7 @@ vehLoadout const* Loadout;
 piMATRIX Mat;
 UINT32 LoadoutNum = 0;
 
-	if (VehicleType == NULL)
+	if (VehicleType == nullptr)
 	{
 		Write_Debug("Vehicle exists with no vehicletype!");
 
@@ -1238,12 +1228,12 @@ UINT32 LoadoutNum = 0;
 
 	for (i=0;i<VEH_MAX_MOUNTS;i++)
 	{
-		if (Loadout->WeaponTypes[i][LoadoutNum] != NULL)
+		if (Loadout->WeaponTypes[i][LoadoutNum] != nullptr)
 		{
 			ogrpFindSubObjectByName(&MountObject,MasterObj,
 				(char*)Loadout->MountObject[i]);
 
-			if (MountObject == NULL)
+			if (MountObject == nullptr)
 			{
 				Write_Debug("Unable to find %s in %s",
 							Loadout->MountObject[i],
@@ -1253,11 +1243,11 @@ UINT32 LoadoutNum = 0;
 			{
 				for (j=0;j<VEH_MAX_WEAPONS_PER_MOUNT;j++)
 				{
-					if (Loadout->WeaponTypes[i][j] != NULL)
+					if (Loadout->WeaponTypes[i][j] != nullptr)
 					{
 						// first priority is to locate a connection point, no connection point, no weapon
 						ogrpFindSubObjectByDOFVarAndSubVar(&AttachPnt,MountObject,ML_DOF_CONNECT,j);
-						if (AttachPnt == NULL)
+						if (AttachPnt == nullptr)
 						{
 							Write_Debug("Connection point %d for mount %s doesn't exist",
 								j+1,
@@ -1317,7 +1307,7 @@ mlObjectTrackAnimation * TrackAnimation;
 	if (*Count == 0)
 	{
 		// no track sections
-		*TrackSectionList = NULL;
+		*TrackSectionList = nullptr;
 	}
 	else
 	{
@@ -1333,7 +1323,7 @@ mlObjectTrackAnimation * TrackAnimation;
 	_CountTrackAnimations(AnimCount,Object);
 	if (*AnimCount == 0)
 	{
-		*TrackAnimationList = NULL;
+		*TrackAnimationList = nullptr;
 	}
 	else
 	{
@@ -1352,7 +1342,7 @@ static UINT32 _CountTrackAnimations(UINT32 * Count, OBJECT * Object)
 UCHAR* CommentStr;
 OBJECT* ObjSib;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -1366,14 +1356,14 @@ OBJECT* ObjSib;
 			(*Count)++;
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_CountTrackAnimations(Count,ObjSib->child);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 	return 0;
 }
@@ -1383,7 +1373,7 @@ static UINT32 _CountTrackSections(UINT32 * Count, OBJECT * Object)
 UCHAR* CommentStr;
 OBJECT* ObjSib;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -1397,14 +1387,14 @@ OBJECT* ObjSib;
 			(*Count)++;
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_CountTrackSections(Count,ObjSib->child);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 	return 0;
 }
@@ -1416,7 +1406,7 @@ static UINT32 _SetupTrackAnimations(mlObjectTrackAnimation ** TrackAnimation,
 UCHAR* CommentStr;
 OBJECT * ObjSib;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -1437,14 +1427,14 @@ OBJECT * ObjSib;
 			(*TrackAnimation)++;
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_SetupTrackAnimations(TrackAnimation,ObjSib->child,OriginalObject);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 	return 0;
 }
@@ -1457,7 +1447,7 @@ UCHAR* CommentStr;
 UCHAR LinkObject[32];
 OBJECT * ObjSib;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -1480,14 +1470,14 @@ OBJECT * ObjSib;
 			}
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_SetupTracks(TrackSection,ObjSib->child,OriginalObject);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 	return 0;
 }
@@ -1512,7 +1502,7 @@ piVECTOR TempVec;
 	// first find the link object
 	ogrpFindSubObjectByName(&LinkObjectPtr,OriginalObject,(char*)LinkObject);
 
-	if (LinkObjectPtr == NULL)
+	if (LinkObjectPtr == nullptr)
 	{
 		return 0;
 	}
@@ -1569,7 +1559,7 @@ piVECTOR TempVec;
 static UINT32 _FindAllContactPoints(OBJECT ** ObjectPtrArray,UINT32* Index,UINT32 * NumLeft,UINT32 GearNum,OBJECT * Object)
 {
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -1589,12 +1579,12 @@ static UINT32 _FindAllContactPoints(OBJECT ** ObjectPtrArray,UINT32* Index,UINT3
 		}
 	}
 
-	if (Object->child != NULL)
+	if (Object->child != nullptr)
 	{
 		_FindAllContactPoints(ObjectPtrArray,Index,NumLeft,GearNum,Object->child);
 	}
 
-	if (Object->sibling != NULL)
+	if (Object->sibling != nullptr)
 	{
 		_FindAllContactPoints(ObjectPtrArray,Index,NumLeft,GearNum,Object->sibling);
 	}
@@ -1608,7 +1598,7 @@ static UINT32 _RelocateObject(OBJECT * Object,piMATRIX * Mat)
 UINT32 j;
 OBJECT * Object1;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -1620,7 +1610,7 @@ OBJECT * Object1;
 		// adjust dof matrices
 		math3dInvertMatrix(&InvMat,Mat);
 
-		if (Object->dof != NULL)
+		if (Object->dof != nullptr)
 		{
 			math3dMatrixMultiply(&Object->dof->dofmatrix1,&InvMat,&Object->dof->dofmatrix1);
 			math3dMatrixMultiply(&Object->dof->dofmatrix2,&Object->dof->dofmatrix2,Mat);
@@ -1629,7 +1619,7 @@ OBJECT * Object1;
 	else if(!(Object->flags & OBJECT_NOTOBJECT))
 	{
 		// adjust object's vertecies
-		for (Object1 = Object;Object1 != NULL;Object1 = Object1->attached)
+		for (Object1 = Object;Object1 != nullptr;Object1 = Object1->attached)
 		{
 			piVectorPtr pos = Object1->MutablePositions();
 
@@ -1641,11 +1631,11 @@ OBJECT * Object1;
 		}
 	}
 
-	if (Object->child != NULL)
+	if (Object->child != nullptr)
 	{
 		_RelocateObject(Object->child,Mat);
 	}
-	if (Object->sibling != NULL)
+	if (Object->sibling != nullptr)
 	{
 		_RelocateObject(Object->sibling,Mat);
 	}
@@ -1664,7 +1654,7 @@ UINT32 i;
 FLOAT32 DistSqr;
 piVectorConstPtr Vert;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -1696,17 +1686,17 @@ piVectorConstPtr Vert;
 
 			ObjectAtt = ObjectAtt->attached;
 		}
-		while (ObjectAtt != NULL);
+		while (ObjectAtt != nullptr);
 
 
-		if (ObjectSib->child != NULL)
+		if (ObjectSib->child != nullptr)
 		{
 			_CalculateObjectTreeRadius(Radius,ObjectSib->child,1);
 		}
 
 		ObjectSib = ObjectSib->sibling;
 	}
-	while (ObjectSib != NULL && IncludeSibs != 0);
+	while (ObjectSib != nullptr && IncludeSibs != 0);
 
 
 	return 0;
@@ -1716,14 +1706,14 @@ UINT32 mlApplyVelocityToObject(OBJECT * PlaneObject,FLOAT64VECTOR * Vel)
 {
 OBJECT * UseObject;
 
-	if (PlaneObject == NULL)
+	if (PlaneObject == nullptr)
 	{
 		return 0;
 	}
 
 	UseObject = PlaneObject;
 
-	while (UseObject->child != NULL)
+	while (UseObject->child != nullptr)
 	{
 		UseObject = UseObject->child;
 	}
@@ -1741,10 +1731,10 @@ UINT32 mlProcessContactPointObject(mlObjectData* ObjectData)
 	mlObjectCollidePnt* CurrentCollidePnt;
 	OBJECT* LineCollideObject;
 
-	if (ObjectData == NULL) return 1;
+	if (ObjectData == nullptr) return 1;
 
 	LineCollideObject = ObjectData->LineCollideObject;
-	if (LineCollideObject == NULL) return 0;
+	if (LineCollideObject == nullptr) return 0;
 
 	NumCollideObjects = 0;
 	_CountLineCollideSubObjects(&NumCollideObjects,LineCollideObject->child);
@@ -1790,11 +1780,11 @@ static UINT32 _CountLineCollideSubObjects(UINT32 * Count, OBJECT * Object)
 {
 OBJECT * ObjSib;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
-	if (Count == NULL)
+	if (Count == nullptr)
 	{
 		return 1;
 	}
@@ -1809,7 +1799,7 @@ OBJECT * ObjSib;
 			(*Count)++;
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_CountLineCollideSubObjects(Count,ObjSib->child);
 		}
@@ -1817,7 +1807,7 @@ OBJECT * ObjSib;
 		ObjSib = ObjSib->sibling;
 
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 	return 0;
 }
@@ -1826,12 +1816,12 @@ static UINT32 _SetupCollisionObjects(mlObjectCollidePnt ** CurrentCollidePnt,OBJ
 {
 OBJECT * ObjSib;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
 
-	if (CurrentCollidePnt == NULL)
+	if (CurrentCollidePnt == nullptr)
 	{
 		return 1;
 	}
@@ -1846,7 +1836,7 @@ OBJECT * ObjSib;
 		{
 			(*CurrentCollidePnt)->CollideObject = ObjSib;
 
-			char* str = NULL;
+			char* str = nullptr;
 
 			if(obmainFindCommentFirstPartName(&str, ObjSib->comment, "visdamage=") && str)
 			{
@@ -1870,7 +1860,7 @@ OBJECT * ObjSib;
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 	return 0;
 }
@@ -1880,7 +1870,7 @@ static UINT32 _FindAndSetupReflectorSightObjects(OBJECT * Object)
 OBJECT * ObjAtt;
 SCHAR * RetPtr;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -1906,9 +1896,9 @@ SCHAR * RetPtr;
 		}
 		ObjAtt = ObjAtt->attached;
 	}
-	while (ObjAtt != NULL);
+	while (ObjAtt != nullptr);
 
-	if (Object->child != NULL)
+	if (Object->child != nullptr)
 	{
 		_FindAndSetupReflectorSightSubObjects(Object->child);
 	}
@@ -1921,7 +1911,7 @@ static UINT32 _FindAndSetupReflectorSightSubObjects(OBJECT * Object)
 OBJECT * ObjAtt,*ObjSib;
 SCHAR * RetPtr;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -1946,16 +1936,16 @@ SCHAR * RetPtr;
 
 			ObjAtt = ObjAtt->attached;
 		}
-		while (ObjAtt != NULL);
+		while (ObjAtt != nullptr);
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_FindAndSetupReflectorSightSubObjects(ObjSib->child);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 	return 0;
 }
@@ -1964,7 +1954,7 @@ static void _InitReflectorSight(OBJECT* Object, int crewpos)
 {
 	OBJECT* PlaneObject = persGetPersonaVehicleObjectDataPtr();
 
-	OBJECT* gviewObj = NULL;
+	OBJECT* gviewObj = nullptr;
 	char name[32];
 	snprintf(name, 31, "gview%d", crewpos+1);
 	ogrpFindSubObjectByName(&gviewObj,PlaneObject,name);
@@ -2147,7 +2137,7 @@ static UINT32 _HideAllGunsights(OBJECT * Object)
 {
 OBJECT * ObjSib;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -2164,13 +2154,13 @@ OBJECT * ObjSib;
 			continue;
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_HideAllGunsights(ObjSib->child);
 		}
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 	return 0;
 }
@@ -2179,7 +2169,7 @@ static UINT32 _IncrementObjectLayer(OBJECT * Object)
 {
 OBJECT * ObjAtt;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -2197,10 +2187,10 @@ OBJECT * ObjAtt;
 
 			ObjAtt = ObjAtt->attached;
 		}
-		while (ObjAtt != NULL);
+		while (ObjAtt != nullptr);
 	}
 
-	if (Object->child != NULL)
+	if (Object->child != nullptr)
 	{
 		_IncrementSubObjectLayer(Object->child);
 	}
@@ -2213,7 +2203,7 @@ static UINT32 _IncrementSubObjectLayer(OBJECT * Object)
 OBJECT * ObjAtt;
 OBJECT * ObjSib;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -2235,17 +2225,17 @@ OBJECT * ObjSib;
 
 				ObjAtt = ObjAtt->attached;
 			}
-			while (ObjAtt != NULL);
+			while (ObjAtt != nullptr);
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_IncrementSubObjectLayer(ObjSib->child);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 	return 0;
 }
@@ -2255,8 +2245,8 @@ UINT32 mlDrawProps(void)
 {
 	vehVehicle* PlayerVehicle = persGetPersonaVehiclePtr();
 
-	if (PlayerVehicle == NULL ||
-		PlayerVehicle->VehicleObjectData == NULL ||
+	if (PlayerVehicle == nullptr ||
+		PlayerVehicle->VehicleObjectData == nullptr ||
         PlayerVehicle->VehicleType->Type != VEH_TYPE_AIR)
 	{
 		return 0;
@@ -2285,7 +2275,7 @@ static UINT32 _DisplayObjectTree(OBJECT * Object,UINT32 IncludeSibs)
 OBJECT * ObjAtt;
 OBJECT * ObjSib;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -2314,17 +2304,17 @@ OBJECT * ObjSib;
 
 				ObjAtt = ObjAtt->attached;
 			}
-			while (ObjAtt != NULL);
+			while (ObjAtt != nullptr);
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_DisplayObjectTree(ObjSib->child,1);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL && IncludeSibs != 0);
+	while (ObjSib != nullptr && IncludeSibs != 0);
 
 
 	return 0;
@@ -2335,7 +2325,7 @@ static UINT32 _FindLowestHighestPoints(OBJECT* Object,FLOAT32* LowestPoint, FLOA
 OBJECT * ObjSib, *ObjAtt;
 UINT32 i;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -2366,19 +2356,19 @@ UINT32 i;
 
 				ObjAtt = ObjAtt->attached;
 			}
-			while (ObjAtt != NULL);
+			while (ObjAtt != nullptr);
 
 
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_FindLowestHighestPoints(ObjSib->child,LowestPoint,HighestPoint);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 
 
@@ -2407,9 +2397,9 @@ UCHAR * DamageObjectList = (UCHAR*)&VehicleType->DamageObjects[0][0];
 
 	// find lowest point in the non-cockpit areas
 
-	Object = NULL;
+	Object = nullptr;
 	ogrpFindSubObjectByName(&Object,(*ObjectData)->PlaneObject,"lod1");
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		Write_Debug("Cannot find LOD1, using entire object for lowest point check");
 		Object = (*ObjectData)->PlaneObject;
@@ -2420,13 +2410,6 @@ UCHAR * DamageObjectList = (UCHAR*)&VehicleType->DamageObjects[0][0];
 		(*ObjectData)->LowestPoint = 0.0f;
 		(*ObjectData)->HighestPoint = 2.0f;
 	}
-#ifdef DOROTHY
-	else if(VehicleType->Type == VEH_TYPE_MECH)
-	{
-		(*ObjectData)->LowestPoint = 0.0f;
-		(*ObjectData)->HighestPoint = 10.0f;
-	}
-#endif
 	else
 	{
 		(*ObjectData)->LowestPoint = -10000.0f; // z's are ass backwards
@@ -2440,7 +2423,7 @@ UCHAR * DamageObjectList = (UCHAR*)&VehicleType->DamageObjects[0][0];
 	ogrpFindSubObjectByName(&Object,(*ObjectData)->PlaneObject,"vcpit");
 
 
-	if (Object != NULL && LoadCockpit == TRUE)
+	if (Object != nullptr && LoadCockpit == TRUE)
 	{
 		// import cockpit, if necessary and desired
 		strcpy((char*)s,(char*)ObjectName);
@@ -2452,19 +2435,19 @@ UCHAR * DamageObjectList = (UCHAR*)&VehicleType->DamageObjects[0][0];
 		{
 			lstrcpy(LocalObjectName, (char*)s);
 			ptr = strrchr(LocalObjectName, '\\');
-			if (ptr != NULL)
+			if (ptr != nullptr)
 			{
 				ptr += 1;
 				lstrcpy(LocalObjectName, ptr);
 			}
 
 			Object1 = obmainFindNamedObject(LocalObjectName);
-			if (Object1 != NULL)
+			if (Object1 != nullptr)
 			{
 				sprintf((char*)s1,"%s%d",LocalObjectName,Counter++);
 				strcpy(Object1->name,(char*)s1);
 
-				if (Object->child == NULL)
+				if (Object->child == nullptr)
 				{
 					Object->child = Object1;
 				}
@@ -2472,7 +2455,7 @@ UCHAR * DamageObjectList = (UCHAR*)&VehicleType->DamageObjects[0][0];
 				{
 					Object2 = Object->child;
 
-					while (Object2->sibling != NULL)
+					while (Object2->sibling != nullptr)
 					{
 						Object2 = Object2->sibling;
 					}
@@ -2508,7 +2491,7 @@ UCHAR * DamageObjectList = (UCHAR*)&VehicleType->DamageObjects[0][0];
 						Object);
 
 	// find the collision objects
-	Object = NULL;
+	Object = nullptr;
 	ogrpFindSubObjectByName(&Object,(*ObjectData)->PlaneObject,"linecollider");
 	(*ObjectData)->LineCollideObject = Object;
 
@@ -2517,24 +2500,24 @@ UCHAR * DamageObjectList = (UCHAR*)&VehicleType->DamageObjects[0][0];
 
 	mlProcessContactPointObject(*ObjectData);
 
-	Object = NULL;
+	Object = nullptr;
 	ogrpFindSubObjectByName(&Object,(*ObjectData)->PlaneObject,"hitbox");
 	(*ObjectData)->HitBox = Object;
 
-	Object = NULL;
+	Object = nullptr;
 	ogrpFindSubObjectByName(&Object,(*ObjectData)->PlaneObject,"hitmap");
 	(*ObjectData)->HitMap = Object;
-	if (Object != NULL)
+	if (Object != nullptr)
 	{
-		Object1 = NULL;
+		Object1 = nullptr;
 		ogrpFindSubObjectByName(&Object1,Object,"inside");
 		(*ObjectData)->CollideInternObject = Object1;
 
-		Object1 = NULL;
+		Object1 = nullptr;
 		ogrpFindSubObjectByName(&Object1,Object,"outside");
 		(*ObjectData)->CollideExternObject = Object1;
 
-		Object1 = NULL;
+		Object1 = nullptr;
 		ogrpFindSubObjectByName(&Object1,Object,"walk");
 		{
 			(*ObjectData)->CollideWalkObject = Object1;
@@ -2548,63 +2531,57 @@ UCHAR * DamageObjectList = (UCHAR*)&VehicleType->DamageObjects[0][0];
 	}
 	else
 	{
-		(*ObjectData)->CollideInternObject = NULL;
-		(*ObjectData)->CollideExternObject = NULL;
+		(*ObjectData)->CollideInternObject = nullptr;
+		(*ObjectData)->CollideExternObject = nullptr;
 		(*ObjectData)->Radius = 0.0;
 		if ((*ObjectData)->PlaneObject->flag2 & OBJECT_ANIMATION)
 		{
 			(*ObjectData)->Radius = 3.0;
 		}
 
-#ifdef DOROTHY
-		if ((*ObjectData)->PlaneObject->flag3 & OBJECT_IS_GR2VEHICLE)
-		{
-			(*ObjectData)->Radius = 10.0;
-		}
-#endif
 	}
 
 
-	Object = NULL;
+	Object = nullptr;
 	ogrpFindSubObjectByName(&Object,(*ObjectData)->PlaneObject,"efx");
-	if (Object != NULL)
+	if (Object != nullptr)
 	{
 		(*ObjectData)->EffectsObject = Object;
 	}
 	else
 	{
-		(*ObjectData)->EffectsObject = NULL;
+		(*ObjectData)->EffectsObject = nullptr;
 	}
 
 	DamageObjectListPtr = DamageObjectList;
 	for (i=1;i<=NumDamageObjects;i++)
 	{
 		Found = 0;
-		if ((*ObjectData)->CollideExternObject != NULL)
+		if ((*ObjectData)->CollideExternObject != nullptr)
 		{
 			ogrpFindSubObjectByName(&Object,
 								(*ObjectData)->CollideExternObject,
 								(char*)DamageObjectListPtr);
 
-			if (Object != NULL)
+			if (Object != nullptr)
 			{
 				Found = 1;
 			}
 		}
-		if (Found == 0 && (*ObjectData)->CollideInternObject != NULL)
+		if (Found == 0 && (*ObjectData)->CollideInternObject != nullptr)
 		{
 			ogrpFindSubObjectByName(&Object,
 								(*ObjectData)->CollideInternObject,
 								(char*)DamageObjectListPtr);
 
-			if (Object != NULL)
+			if (Object != nullptr)
 			{
 				Found = 1;
 			}
 		}
 		if (Found == 1)
 		{
-			for (TempObject = Object;TempObject != NULL;TempObject = TempObject->attached)
+			for (TempObject = Object;TempObject != nullptr;TempObject = TempObject->attached)
 			{
 				TempObject->trnum = i; // using trnum for damage ID number
 			}
@@ -2622,7 +2599,7 @@ UCHAR * DamageObjectList = (UCHAR*)&VehicleType->DamageObjects[0][0];
 	// we hide all the non-visible objects to ensure they don't get sorted
 	ogrpFindSubObjectByName(&Object,(*ObjectData)->PlaneObject,"lodc");
 
-	if (Object != NULL)
+	if (Object != nullptr)
 	{
 		ogrpHideObjectAndSubtree(Object);
 
@@ -2635,20 +2612,20 @@ UCHAR * DamageObjectList = (UCHAR*)&VehicleType->DamageObjects[0][0];
 if(!VehicleObjectAnalysis)
 {
 #endif
-	if ((*ObjectData)->CollideInternObject != NULL)
+	if ((*ObjectData)->CollideInternObject != nullptr)
 		(*ObjectData)->CollideInternObject->flag2 |= OBJECT_DONT_UPDATE;
 
-	if ((*ObjectData)->CollideExternObject != NULL)
+	if ((*ObjectData)->CollideExternObject != nullptr)
 		(*ObjectData)->CollideExternObject->flag2 |= OBJECT_DONT_UPDATE;
 
 #ifdef BETA_RELEASE
 }
 #endif
 
-	if ((*ObjectData)->CollideWalkObject != NULL)
+	if ((*ObjectData)->CollideWalkObject != nullptr)
 		(*ObjectData)->CollideWalkObject->flag2 |= OBJECT_DONT_UPDATE;
 
-	if ((*ObjectData)->LineCollideObject != NULL)
+	if ((*ObjectData)->LineCollideObject != nullptr)
 		(*ObjectData)->LineCollideObject->flag2 |= OBJECT_DONT_UPDATE;
 
 	// set up all reflector gunsight objects
@@ -2664,7 +2641,7 @@ if(!VehicleObjectAnalysis)
 	memset((*ObjectData)->WheelRadius,0,sizeof(FLOAT32)*ML_MAX_GEARNUM);
 	_FindAllWheelRadius((*ObjectData)->PlaneObject,(*ObjectData));
 
-	if ((*ObjectData)->LoadoutLODObject != NULL)
+	if ((*ObjectData)->LoadoutLODObject != nullptr)
 	{
 		ogrpShowObjectAndSubtree((*ObjectData)->LoadoutLODObject);
 
@@ -2674,13 +2651,13 @@ if(!VehicleObjectAnalysis)
 
 	// towing stuff
 	ogrpFindSubObjectByDOFVar(&((*ObjectData)->TowObject),(*ObjectData)->PlaneObject,ML_DOF_TOWPOINT_HEAVY);
-	if ((*ObjectData)->TowObject == NULL)
+	if ((*ObjectData)->TowObject == nullptr)
 	{
 		ogrpFindSubObjectByDOFVar(&((*ObjectData)->TowObject),(*ObjectData)->PlaneObject,ML_DOF_TOWPOINT_MEDIUM);
-		if ((*ObjectData)->TowObject == NULL)
+		if ((*ObjectData)->TowObject == nullptr)
 		{
 			ogrpFindSubObjectByDOFVar(&((*ObjectData)->TowObject),(*ObjectData)->PlaneObject,ML_DOF_TOWPOINT_LIGHT);
-			if ((*ObjectData)->TowObject != NULL)
+			if ((*ObjectData)->TowObject != nullptr)
 			{
 				(*ObjectData)->TowType = ML_TOWTYPE_LIGHT;
 			}
@@ -2706,7 +2683,7 @@ if(!VehicleObjectAnalysis)
 	// label all objects as vehicle objects
 	obmainSetFlag2InThisTree((*ObjectData)->PlaneObject,OBJECT_IS_PARTOF_VEHICLE);
 
-	(*ObjectData)->ShadowObject = NULL;
+	(*ObjectData)->ShadowObject = nullptr;
 	(*ObjectData)->ShadowObject = obmainFindChildFromObject((*ObjectData)->PlaneObject, "shadow");
 
 	// hoist

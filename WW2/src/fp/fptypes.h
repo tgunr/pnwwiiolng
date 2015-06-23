@@ -24,4 +24,4 @@ struct fpPersonData
 
 	// Animation Info to be transmitted
 	UINT32			AnimationFlags;
-} ;
+};

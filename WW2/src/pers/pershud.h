@@ -7,7 +7,7 @@
 
 class Waypoint;
 class ServerTrackedObject;
-namespace StratDB { class StratObject ; }
+namespace StratDB { class StratObject; }
 
 /************************************************************************************************
 	persHUD
@@ -22,19 +22,19 @@ enum
 	HUD_CYCLE_INVALID	// invalid hud cycle setting
 };
 
-extern UINT32 persHUDToggleHUD(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZero);
-extern UINT32 persHUDToggleGameInfo(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZero);
-extern UINT32 persHUDToggleReadout(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZero);
+UINT32 persHUDToggleHUD(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZero);
+UINT32 persHUDToggleGameInfo(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZero);
+UINT32 persHUDToggleReadout(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZero);
 // tolua_end
 
-extern LOGICAL persHudReceivedUpdate(void);
+void persHudReceivedUpdate(void);
 
 // tolua_begin
 // used by the tutorial system to control hud behavior
-extern void persHUDLock(bool l);
-extern UINT32 persHUDResetHUD(SINT32 param, UINT32 functionNum, UINT32 alwaysZero);
-extern void persHUDShowHUD();
-extern void persHUDHideHUD(bool close=false);
+void persHUDLock(bool l);
+UINT32 persHUDResetHUD(SINT32 param, UINT32 functionNum, UINT32 alwaysZero);
+void persHUDShowHUD();
+void persHUDHideHUD(bool close=false);
 // tolua_end
 
 //void persHUDSyncToCycleSetting();

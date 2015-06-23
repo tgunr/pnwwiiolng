@@ -1,11 +1,5 @@
 #include "phui-precompiled-header.h"
 
-#include <wchar.h>
-#include <vector>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
-
 #include "phui/TabView.h"
 #include "phui/GraphicsContext.h"
 #include "phui/UIMessages.h"
@@ -171,7 +165,7 @@ void TabView::MinSize(float* w, float* h)
 	
 	View* v;
 	float maxviewwidth = 0, maxviewheight = 0;
-	for(int i = 0; (v = ChildAt(i)) != NULL; i++)
+	for(int i = 0; (v = ChildAt(i)) != nullptr; i++)
 	{
 		float pw, ph;
 		v->MinSize(&pw, &ph);
@@ -402,7 +396,7 @@ TabView::Tab* TabView::GetTab(View* child)
 		}
 	}	
 	
-	return NULL;
+	return nullptr;
 }
 
 bool TabView::TabPressed() const

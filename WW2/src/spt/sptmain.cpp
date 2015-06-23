@@ -46,7 +46,6 @@ Description:
 #endif
 
 #include "wwii/wwiiHash.h"
-USING_EXT_NAMESPACE;
 
 #define MAX_TREE_PRIMITIVES  1000
 
@@ -86,11 +85,11 @@ class FakeVector
 {
 private:
 	enum { GrowthRate = 128 } ;	// Grow in units of 128. MUST BE POWER OF 2.
-	enum { GrowthMask = GrowthRate - 1 } ;
+	enum { GrowthMask = GrowthRate - 1 };
 public:
     FakeVector() : _size(0), _data(0), _capacity(0)
 	{
-		reserve(1024) ;
+		reserve(1024);
 	}
     ~FakeVector()
     {
@@ -107,7 +106,7 @@ public:
         if(_data)
         {
             memFree(_data);
-            _data = NULL;
+            _data = nullptr;
         }
 	}
 
@@ -164,7 +163,7 @@ static std::vector<Tree*> threeD[MAX_TREE_TYPES];
 static std::vector<Tree*> bblist[MAX_TREE_TYPES];
 static std::vector<int> dotcommands;
 
-static colliderQuery* TreeCollider = NULL;
+static colliderQuery* TreeCollider = nullptr;
 
 static FakeVector<float> billboards[MAX_TREE_TYPES];
 static FakeVector<float> horizbillboards[MAX_TREE_TYPES];
@@ -197,7 +196,7 @@ static bool nocull = false;
 static bool cullnecessary = false;
 static bool firsttime = true;
 
-static CSpeedWind* speedwind = NULL;
+static CSpeedWind* speedwind = nullptr;
 
 const int numRotations = 12;
 static int rotations[numRotations] = {0, 30, 60, 90, 120, 150, 180, 210, 240, 270, 300, 330};
@@ -275,7 +274,7 @@ static void InitBillboardUniforms(glslProgram* pgm)
     std::vector<float>::const_iterator itr = texcoords.begin();
 
     int element = 0;
-    glslUniform* uniform = NULL;
+    glslUniform* uniform = nullptr;
 
     uniform = pgm->GetUniform("table1");
 
@@ -346,7 +345,7 @@ static void CreateBillboardUniformsOn(int pass)
     std::vector<float>::const_iterator itr = texcoords.begin();
 
     int element = 0;
-    glslUniform* uniform = NULL;
+    glslUniform* uniform = nullptr;
 
     uniform = pgm->GetUniform("table1");
     uniform->SetOneTimeApply(true);
@@ -578,7 +577,7 @@ Description:
 ---------------------------------------------------------------------*/
 inline static bool Octetcull(TERRAIN_DETAIL* t, int r, int c, unsigned int& mask)
 {
-    if(t->m_trees == NULL)
+    if(t->m_trees == nullptr)
     {
         return true;
     }
@@ -1014,7 +1013,7 @@ static void CullTrees()
         if(!activeTerrainDetail[i])
             continue;
 
-        if(trndtl[i].terrain == NULL)
+        if(trndtl[i].terrain == nullptr)
             continue;
 
         if(!(trndtl[i].terrain->flags & OBJECT_VISIBLE))
@@ -1108,8 +1107,8 @@ inline static void UpdateBillboardData(int pass)
     pgm->GetUniform("tangent")->Set(Vec3f(t[0], t[1],  t[2]));
 
     // Set view to be from light source
-    static LIGHT* sun = NULL;
-    static LIGHT* moon = NULL;
+    static LIGHT* sun = nullptr;
+    static LIGHT* moon = nullptr;
 
     if(!sun)
         sun = obdliteFindDynaLight("sun");
@@ -1190,8 +1189,8 @@ inline static void UpdateBillboardDataDeprecated(int pass)
     }
 
     // Set view to be from light source
-    static LIGHT* sun = NULL;
-    static LIGHT* moon = NULL;
+    static LIGHT* sun = nullptr;
+    static LIGHT* moon = nullptr;
 
     if(!sun)
         sun = obdliteFindDynaLight("sun");
@@ -2095,7 +2094,7 @@ Description: Draw collision cylinder objects for debugging
 ---------------------------------------------------------------------*/
 void drawCollisionCylinders()
 {
-    CTree* basetree = NULL;
+    CTree* basetree = nullptr;
     unsigned int size = treeDataGetBaseSize();
     GLUquadric* obj = gluNewQuadric();
 
@@ -2190,7 +2189,7 @@ Description:
 ---------------------------------------------------------------------*/
 void drawBoundBox()
 {
-    CTree* basetree = NULL;
+    CTree* basetree = nullptr;
     unsigned int size = treeDataGetBaseSize();
 
     oglSetWorldMatrix(&IdentityMatrix);
@@ -2715,13 +2714,13 @@ void sptExitApp()
         if(!activeTerrainDetail[i])
             continue;
 
-        if(trndtl[i].terrain == NULL)
+        if(trndtl[i].terrain == nullptr)
             continue;
 
         if(!(trndtl[i].terrain->flags & OBJECT_VISIBLE))
             continue;
 
-        if ( trndtl[i].m_trees != NULL )
+        if ( trndtl[i].m_trees != nullptr )
         {
             sptFreeTrees(trndtl[i].m_trees);
         }
@@ -2765,13 +2764,13 @@ void sptExitApp()
     if(TreeCollider)
     {
         delete TreeCollider;
-        TreeCollider = NULL;
+        TreeCollider = nullptr;
     }
 
     if(speedwind)
     {
         delete speedwind;
-        speedwind = NULL;
+        speedwind = nullptr;
     }
 }
 
@@ -2790,7 +2789,7 @@ bool sptCollideWithTree(unsigned int address,
     if(!tree)
         return false;
 
-    if(tree->o == NULL)
+    if(tree->o == nullptr)
         return false;
 
     if(IS_BUSH(tree->isbush_isclutter_base))
@@ -2949,7 +2948,7 @@ bool sptCollide(const piVECTOR& pt1, const piVECTOR& pt2, FASTCOLLIDE** list, un
     {
         colliderQuery::CollisionList& collisions = TreeCollider->getCollisions();
 
-        collidelist->CollideObject = NULL;
+        collidelist->CollideObject = nullptr;
         collidelist->CollideTime = (float)collisions[0].depth;
         collidelist->Alpha = 1.0f;
         collidelist->Flags = ODE_TREE_COLLISION;
@@ -3174,7 +3173,7 @@ void sptAddCluster(OBJECT* o, int* types/*[256]*/)
         x += WorldOriginOffset.x;
         y += WorldOriginOffset.y;
 
-        TERRAIN_DETAIL* dtl = NULL;
+        TERRAIN_DETAIL* dtl = nullptr;
 
         // First find the supercell and then determine the row/colum of our octet
         int sx = (int)(x / SDM_SUPERCELL_SIZE);
@@ -3572,7 +3571,7 @@ unsigned int sptAddTreeCommand(int base, const Vec3f& pos, bool FromHeightMap, f
 
     Vec3d worldpos;
 
-    TERRAIN_DETAIL* dtl = NULL;
+    TERRAIN_DETAIL* dtl = nullptr;
 
     for(int i = 0; i < NUM_TERRAIN_RECTANGLES; i++)
 	{
@@ -3624,7 +3623,7 @@ unsigned int sptAddTreeCommand(int base, const Vec3f& pos, bool FromHeightMap, f
 
  	    dtl->terrain->flags |= OBJECT_VISIBLE;
 
-        id = sptAddTree(NULL, base, dtl, pp);
+        id = sptAddTree(nullptr, base, dtl, pp);
 
         dotcommands.push_back(id);
 
@@ -3638,7 +3637,7 @@ unsigned int sptAddTreeCommand(int base, const Vec3f& pos, bool FromHeightMap, f
         pp.y = pos.y() + WorldOriginOffset.y;
         pp.z = pos.z();
 
-        id = sptAddTree(NULL, base, dtl, pp);
+        id = sptAddTree(nullptr, base, dtl, pp);
 
         worldpos.set(pp);
         dotcommands.push_back(id);
@@ -3794,7 +3793,7 @@ unsigned int sptAddTree(OBJECT* o,
 #endif
     Tree* tree = treeDataGetFreeTree();
 
-    if(tree == NULL || !dtl)
+    if(tree == nullptr || !dtl)
         return 0;
 
     treeClampBaseIfNecessary(base);

@@ -10,11 +10,11 @@
 
 #include "chat/chatSquadControlResults.h"
 
-class SquadControl ;
-class Player ;
+class SquadControl;
+class Player;
 
-extern void chatProcessSquadCreateRequest(SquadControl&, Player* player) ;
-extern SQUAD_CONTROL_RESULT chatProcessSquadCreateReply(bool created, const ChatHandle& originator, Player* player);
-extern bool chatExpireSquadCreates() ;
-extern SQUAD_CONTROL_RESULT chatSquadAcceptCreateInvite(Player* player, Player* sender) ;
-extern void chatSquadDeclineCreateInvite(Player* player, Player* sender) ;
+void chatProcessSquadCreateRequest(SquadControl&, Player* player);
+SQUAD_CONTROL_RESULT chatProcessSquadCreateReply(bool created, const ChatHandle& originator, Player* player);
+bool chatExpireSquadCreates();
+SQUAD_CONTROL_RESULT chatSquadAcceptCreateInvite(Player* player, Player* sender);
+void chatSquadDeclineCreateInvite(Player* player, Player* sender);

@@ -30,7 +30,7 @@ enum
 ,	CHATDB_SQUAD_MEMBERS_Y
 ,	CHATDB_SQUAD_REQUEST_Y
 ,	CHATDB_SQUAD_MEMBER_UPDATE_Y
-} ;
+};
 
 //Parser Return Codes
 enum {

@@ -40,21 +40,21 @@ MobileSpawn::activate(
 	, UINT32 vehicleID
 	)
 {
-	betaLog(_FLD, "msp: m:%u p:%u c:%s sto:%u activating", mission->missionID(), player->playerID(), player->callsign(), stoUID) ;
+	betaLog(_FLD, "msp: m:%u p:%u c:%s sto:%u activating", mission->missionID(), player->playerID(), player->callsign(), stoUID);
 
-	m_active = true ;
+	m_active = true;
 
-	m_playerID = player->playerID() ;
-	chatGetCallsign(m_callsign, player->chatHandle()) ;
-	m_handle = player->matchHandle() ;
-	m_stoUID = stoUID ;
-	m_x = x ;
-	m_y = y ;
-	m_z = z ;
+	m_playerID = player->playerID();
+	chatGetCallsign(m_callsign, player->chatHandle());
+	m_handle = player->matchHandle();
+	m_stoUID = stoUID;
+	m_x = x;
+	m_y = y;
+	m_z = z;
 
-	m_vehicleID = vehicleID ;
+	m_vehicleID = vehicleID;
 
-	m_spawnees.clear() ;
+	m_spawnees.clear();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -63,19 +63,19 @@ MobileSpawn::activate(
 void
 MobileSpawn::deactivate(MSPAWN_RESULT reason, UINT32 missionID)
 {
-	MobileSpawnWaypoint wp(missionID, m_playerID, m_handle, m_x, m_y, m_z, false, m_stoUID, reason) ;
-	chatSendMissionMobileSpawnWaypoint(wp) ;
+	MobileSpawnWaypoint wp(missionID, m_playerID, m_handle, m_x, m_y, m_z, false, m_stoUID, reason);
+	chatSendMissionMobileSpawnWaypoint(wp);
 
-	dbugLog(_FLI, "msp: m:%u p:%u sto:%u deactivating", missionID, m_playerID, m_stoUID) ;
+	dbugLog(_FLI, "msp: m:%u p:%u sto:%u deactivating", missionID, m_playerID, m_stoUID);
 
 	// Clear the instance specific data, but retain the positional data.
-	m_playerID = 0 ;
-	m_callsign[0] = 0 ;
-	m_handle = 0LL ;
+	m_playerID = 0;
+	m_callsign[0] = 0;
+	m_handle = 0LL;
 
-	m_active = false ;
+	m_active = false;
 
-	m_spawnees.clear() ;
+	m_spawnees.clear();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -86,24 +86,24 @@ void
 MobileSpawn::incrementSpawnees(const playerid_t forPlayer) const
 {
 	if ( m_playerID == 0 )
-		return ;
+		return;
 
 	// Check the spawnees list to see if this guy has
 	// spawned through you recently
-	SPAWNEES::iterator it = m_spawnees.find(forPlayer) ;
+	SPAWNEES::iterator it = m_spawnees.find(forPlayer);
 	if ( it != m_spawnees.end() )
 	{
-		static const UINT32 SPAWNEE_INTERVAL = 3 * 60 ;
+		static const UINT32 SPAWNEE_INTERVAL = 3 * 60;
 		if ( it->second >= teulTime() - SPAWNEE_INTERVAL )
-			return ;
+			return;
 	}
 
 	// You are either new or more than INTERVAL secs ago
-	Player* const player = PlayerInterface::Lookup(m_playerID) ;
-	if ( player != NULL )
+	Player* const player = PlayerInterface::Lookup(m_playerID);
+	if ( player != nullptr )
 	{
-		player->addMobileSpawnee() ;
-		m_spawnees[forPlayer] = teulTime() ;
+		player->addMobileSpawnee();
+		m_spawnees[forPlayer] = teulTime();
 	}
 }
 
@@ -113,24 +113,24 @@ MobileSpawn::incrementSpawnees(const playerid_t forPlayer) const
 bool
 Mission::activateMobileSpawn(Player* const player, UINT32 stoUID, FLOAT64 x, FLOAT64 y, FLOAT64 z)
 {
-	bool wasActive = spawner().isActive() ;
+	bool wasActive = spawner().isActive();
 
 	// - Activate the spawner
-	spawner().activate(this, player, stoUID, x, y, z) ;
+	spawner().activate(this, player, stoUID, x, y, z);
 
 	if ( !wasActive )
 	{
-		if ( brigade() != NULL )
-			++(brigade()->m_mobileSpawns) ;
+		if ( brigade() != nullptr )
+			++(brigade()->m_mobileSpawns);
 	}
 
 	// Notify all of the listeners
-	summary().mobileSpawnAvailable = true ;
-	sendLaunchUpdates(true) ;
+	summary().mobileSpawnAvailable = true;
+	sendLaunchUpdates(true);
 
-	announceMobileSpawnSTO() ;
+	announceMobileSpawnSTO();
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -140,7 +140,7 @@ void
 Mission::announceMobileSpawnSTO() const
 {
 	if ( spawner().isActive() == false )
-		return ;
+		return;
 	MobileSpawnWaypoint wp(missionID()
 							, spawner().m_playerID
 							, spawner().m_handle
@@ -150,8 +150,8 @@ Mission::announceMobileSpawnSTO() const
 							, true
 							, spawner().m_stoUID
 							, MSDR_GRANTED
-							) ;
-	chatSendMissionMobileSpawnWaypoint(wp) ;
+							);
+	chatSendMissionMobileSpawnWaypoint(wp);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -162,23 +162,23 @@ Mission::deactivateMobileSpawn(MSPAWN_RESULT reason)
 {
 	// Nothing to do if we're already deactivated
 	if ( !spawner().m_active )
-		return ;
+		return;
 
 	// - Update the mission summary
 	dbugLog(_FLI, "msp: deactivating %u(%s) from mission %u reason %d"
 					, spawner().m_playerID, spawner().m_callsign
 					, missionID()
-					, reason) ;
+					, reason);
 
-	if ( brigade() != NULL )
-		--(brigade()->m_mobileSpawns) ;
+	if ( brigade() != nullptr )
+		--(brigade()->m_mobileSpawns);
 
 	/// - Send a timer update to all our listners
-	summary().mobileSpawnAvailable = false ;
-	sendLaunchUpdates(true) ;
+	summary().mobileSpawnAvailable = false;
+	sendLaunchUpdates(true);
 
 	// - Finally deactivate the mobile spawn itself
-	spawner().deactivate(reason, missionID()) ;
+	spawner().deactivate(reason, missionID());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -187,14 +187,14 @@ Mission::deactivateMobileSpawn(MSPAWN_RESULT reason)
 static inline bool
 _isIncomingEnemyFirebase(FacilityStruct* fb, CPStruct* cp, WWII_SIDE forSide)
 {
-	if ( fb == NULL ) return false ;
-	if ( fb->type != FACILITY_FIREBASE ) return false ;
-	if ( !fb->isOpen() ) return false ;
-	if ( fb->side == WWII_NO_SIDE || fb->side == forSide ) return false ;
-	if ( fb->link == NULL ) return false ;
-	if ( fb->link->endDepot == NULL ) return false ;
-	if ( fb->link->endDepot->cp != cp ) return false ;
-	return true ;
+	if ( fb == nullptr ) return false;
+	if ( fb->type != FACILITY_FIREBASE ) return false;
+	if ( !fb->isOpen() ) return false;
+	if ( fb->side == WWII_NO_SIDE || fb->side == forSide ) return false;
+	if ( fb->link == nullptr ) return false;
+	if ( fb->link->endDepot == nullptr ) return false;
+	if ( fb->link->endDepot->cp != cp ) return false;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -205,17 +205,17 @@ MSPAWN_RESULT
 Mission::getMobileSpawnPermission() const
 {
 	if ( !ongoing() )
-		return MSDR_MISSION_EXPIRED ;
+		return MSDR_MISSION_EXPIRED;
 
 	///RULE: OWNER
 	// Must own the origin facility
-	if ( m_originFac == NULL || m_originFac->side != m_side )
+	if ( m_originFac == nullptr || m_originFac->side != m_side )
 	{
-		threadLog(_FLD, "msp: m#%d no-longer origin owner", missionID()) ;
-		return MSDR_OWNER ;
+		threadLog(_FLD, "msp: m#%d no-longer origin owner", missionID());
+		return MSDR_OWNER;
 	}
 
-	bool offense = ( m_originCP != m_targetCP && !_isIncomingEnemyFirebase(m_targetFac, m_originCP, m_side) ) ;
+	bool offense = ( m_originCP != m_targetCP && !_isIncomingEnemyFirebase(m_targetFac, m_originCP, m_side) );
 
 	// Only apply the full set of rules when the target CP is
 	// not the origin CP and the target facility is not an
@@ -224,21 +224,21 @@ Mission::getMobileSpawnPermission() const
 	{
 		///RULE: LINK
 		// Must be a link between non-same cp
-		if ( m_linkFromTarget == NULL )
+		if ( m_linkFromTarget == nullptr )
 		{
 			threadLog(_FLD, "msp: m#%d no link from %s to %s"
 							, missionID()
 							, m_originCP->name
 							, m_targetCP->name
-							) ;
-			return MSDR_LINK ;
+							);
+			return MSDR_LINK;
 		}
 	}
 
 	if ( m_targetFac && m_targetFac->type == FACILITY_FIREBASE && !m_targetFac->isOpen() )
 	{
-		threadLog(_FLD, "msp: denied: firebase %s is destroyed", m_targetFac->name) ;
-		return MSDR_TARGET_DESTROYED ;
+		threadLog(_FLD, "msp: denied: firebase %s is destroyed", m_targetFac->name);
+		return MSDR_TARGET_DESTROYED;
 	}
 
 	if ( offense )
@@ -251,8 +251,8 @@ Mission::getMobileSpawnPermission() const
 							, missionID()
 							, m_originCP->name
 							, m_targetCP->name
-							) ;
-			return MSDR_VLINK ;
+							);
+			return MSDR_VLINK;
 		}
 
 		///RULE: EOC
@@ -269,12 +269,12 @@ Mission::getMobileSpawnPermission() const
 							, m_targetCP->name
 							, m_targetCP->side
 							, m_targetCP->controllingSide
-							) ;
-			return MSDR_EOC ;
+							);
+			return MSDR_EOC;
 		}
 	}
 
-	return MSDR_GRANTED ;
+	return MSDR_GRANTED;
 }
 
 static const char* const msdrResults[MSPAWN_RESULT_MAX][2] =
@@ -305,7 +305,7 @@ static const char* const msdrResults[MSPAWN_RESULT_MAX][2] =
 ,	{ "msdr_target_destroyed", "Target firebase has been destroyed or closed due to brigade movements" }
 ,	{ "msdr_target_invalid", "Invalid target" }
 ,	{ "msdr_invalid_state", "Invalid state" }
-} ;
+};
 #include "chat/chatLStringIDs.h"
 
 //////////////////////////////////////////////////////////////////////
@@ -314,45 +314,44 @@ static const char* const msdrResults[MSPAWN_RESULT_MAX][2] =
 void
 missAddMobileSpawn(UINT32 missionID, const playerid_t playerID, const ChatHandle& handle, const FLOAT64& x, const FLOAT64& y, const FLOAT64& z, UINT32 stoUID)
 {
-	MSPAWN_RESULT error = MSDR_FAILED ;
+	MSPAWN_RESULT error = MSDR_FAILED;
 	try
 	{
-		Mission* const mission = mapFindMission(missionID) ;
-		if ( mission == NULL )
-			throw std::domain_error("Unknown mission") ;
-		Player* const player = PlayerInterface::Lookup(playerID) ;
-		if ( player == NULL )
-			throw std::domain_error("Unknown player") ;
+		Mission* const mission = mapFindMission(missionID);
+		if ( mission == nullptr )
+			throw std::domain_error("Unknown mission");
+		Player* const player = PlayerInterface::Lookup(playerID);
+		if ( player == nullptr )
+			throw std::domain_error("Unknown player");
 
-		error = mission->getMobileSpawnPermission() ;
-		dbugLog(_FLI, "m:%u p:%u c:%s sto:%u msp @ %0.3g/%0.3g/%0.3g result:%u", missionID, player->playerID(), player->callsign(), stoUID, x, y, z, error) ;
+		error = mission->getMobileSpawnPermission();
+		dbugLog(_FLI, "m:%u p:%u c:%s sto:%u msp @ %0.3g/%0.3g/%0.3g result:%u", missionID, player->playerID(), player->callsign(), stoUID, x, y, z, error);
 
 		if ( error != MSDR_GRANTED )
 		{
 			if ( mission->spawner().isActive() )
-				mission->deactivateMobileSpawn(MSDR_DISPLACED) ;
+				mission->deactivateMobileSpawn(MSDR_DISPLACED);
 
-			std::string reason = "msp placement refused: " ;
+			std::string reason = "msp placement refused: ";
 			if ( error > 0 && error < MSPAWN_RESULT_MAX )
 			{
-				player->message(LSTR_ERROR, LSTR_LABELLED_GENERIC, "FRU/MSP placement failed", msdrResults[error][1]) ;
-				reason += msdrResults[error][0] ;
+				player->message(LSTR_ERROR, LSTR_LABELLED_GENERIC, "FRU/MSP placement failed", msdrResults[error][1]);
+				reason += msdrResults[error][0];
 			}
 			else
-				reason += "BAD MSDR_RESULT!" ;
-			throw std::domain_error(reason) ;
+				reason += "BAD MSDR_RESULT!";
+			throw std::domain_error(reason);
 		}
 
-		mission->activateMobileSpawn(player, stoUID, x, y, z) ;
+		mission->activateMobileSpawn(player, stoUID, x, y, z);
 	}
 	catch ( std::domain_error& e )
 	{
-		char callsign[MAX_HANDLE_LEN] ;
-		chatGetCallsign(callsign, handle) ;
-		dbugLog(_FLA, "m:%u p:%u c:%s sto:%u unable to add mobile spawn: %s", missionID, playerID, callsign, stoUID, e.what()) ;
+		Chat::Name callsign(handle);
+		dbugLog(_FLA, "m:%u p:%u c:%s sto:%u unable to add mobile spawn: %s", missionID, playerID, callsign.c_str(), stoUID, e.what());
 
-		MobileSpawnWaypoint wp(missionID, playerID, handle, x, y, z, false, stoUID, error) ;
-		chatSendMissionMobileSpawnWaypoint(wp) ;
+		MobileSpawnWaypoint wp(missionID, playerID, handle, x, y, z, false, stoUID, error);
+		chatSendMissionMobileSpawnWaypoint(wp);
 	}
 }
 
@@ -362,25 +361,25 @@ missAddMobileSpawn(UINT32 missionID, const playerid_t playerID, const ChatHandle
 void
 missMobileSpawnCancel(UINT32 missionID, const ChatHandle& handle, SINT32 x, SINT32 y)
 {
-	Mission* mission = mapFindMission(missionID) ;
-	if ( mission == NULL )
+	Mission* mission = mapFindMission(missionID);
+	if ( mission == nullptr )
 	{
-		dbugLog(_FLM, "m:%u no such mission for msp cancel", missionID) ;
-		return ;
+		dbugLog(_FLM, "m:%u no such mission for msp cancel", missionID);
+		return;
 	}
 
 	// Race-condition check
 	if ( !mission->spawner().isActive() )
 	{
-		dbugLog(_FLM, "m:%u msp isn't active", missionID) ;
-		return ;
+		dbugLog(_FLM, "m:%u msp isn't active", missionID);
+		return;
 	}
 
 	if ( chatGetLowercaseHandle(mission->spawner().m_handle) != chatGetLowercaseHandle(handle) )
 	{
-		dbugLog(_FLW, "msp: handle mismatch") ;
-		return ;
+		dbugLog(_FLW, "msp: handle mismatch");
+		return;
 	}
 
-	mission->deactivateMobileSpawn(MSDR_DISPLACED) ;
+	mission->deactivateMobileSpawn(MSDR_DISPLACED);
 }

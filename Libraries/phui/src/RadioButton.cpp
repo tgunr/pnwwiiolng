@@ -1,9 +1,5 @@
 #include "phui-precompiled-header.h"
 
-#include <wchar.h>
-#include <stdlib.h>
-#include <stdio.h>
-
 #include "phui/RadioButton.h"
 #include "phui/GraphicsContext.h"
 #include "phui/UIMessages.h"
@@ -144,7 +140,7 @@ void RadioButton::TurnOffOtherRadioButtons()
 	if(parent)
 	{
 		View* v;
-		for(int i = 0; (v = parent->ChildAt(i)) != NULL; i++)
+		for(int i = 0; (v = parent->ChildAt(i)) != nullptr; i++)
 		{
 			RadioButton* btn = dynamic_cast<RadioButton*>(v);
 			if(btn && btn != this)
@@ -215,7 +211,7 @@ RadioButton* RadioGroup::RadioButtonAt(unsigned int idx) const
 			radiocount++;
 		}
 	}
-	return NULL;
+	return nullptr;
 }
 
 /************************************************************************************************
@@ -257,7 +253,7 @@ void RadioGroup::SelectRadioButton(unsigned int i)
 
 void RadioGroup::SetRadioGroupView(View* v)
 {
-	if(v == NULL) 
+	if(v == nullptr) 
 	{
 		_groupview = this;
 	}else

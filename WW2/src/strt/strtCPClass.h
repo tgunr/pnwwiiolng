@@ -11,6 +11,6 @@
 //tolua_begin
 // Initiate the map-wide supply link sets, propogating outward
 // from the supply centers
-extern bool strtBuildSupplyChains(bool force=false) ;
+extern bool strtBuildSupplyChains(bool force=false);
 //tolua_end
 

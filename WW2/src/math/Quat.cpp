@@ -289,7 +289,7 @@ void Quat::getRotate( value_type& angle, value_type& x, value_type& y, value_typ
 void Quat::slerp( value_type t, const Quat& from, const Quat& to )
 {
     const double epsilon = 0.00001;
-    double omega, cosomega, sinomega, scale_from, scale_to ;
+    double omega, cosomega, sinomega, scale_from, scale_to;
 
     Quat quatTo(to);
     // this is a dot product
@@ -304,11 +304,11 @@ void Quat::slerp( value_type t, const Quat& from, const Quat& to )
 
     if( (1.0 - cosomega) > epsilon )
     {
-        omega= acos(cosomega) ;  // 0 <= omega <= Pi (see man acos)
-        sinomega = sin(omega) ;  // this sinomega should always be +ve so
+        omega= acos(cosomega);  // 0 <= omega <= Pi (see man acos)
+        sinomega = sin(omega);  // this sinomega should always be +ve so
         // could try sinomega=sqrt(1-cosomega*cosomega) to avoid a sin()?
-        scale_from = sin((1.0-t)*omega)/sinomega ;
-        scale_to = sin(t*omega)/sinomega ;
+        scale_from = sin((1.0-t)*omega)/sinomega;
+        scale_to = sin(t*omega)/sinomega;
     }
     else
     {
@@ -317,8 +317,8 @@ void Quat::slerp( value_type t, const Quat& from, const Quat& to )
            we can use simple linear interpolation - no need
            to worry about the "spherical" interpolation
            -------------------------------------------------- */
-        scale_from = 1.0 - t ;
-        scale_to = t ;
+        scale_from = 1.0 - t;
+        scale_to = t;
     }
 
     *this = (from*scale_from) + (quatTo*scale_to);

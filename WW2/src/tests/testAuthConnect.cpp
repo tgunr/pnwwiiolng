@@ -18,15 +18,15 @@
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiUTF.h"
 
-using namespace std ;
+using namespace std;
 
-bool connected = false ;
-bool error = false ;
+bool connected = false;
+bool error = false;
 
 static void
 _connectFn(ENDPOINT& /*endpoint*/)
 {
-	connected = true ;
+	connected = true;
 }
 
 static void
@@ -34,49 +34,49 @@ _errorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALL
 {
 	if ( errorNo == ENOTCONN )
 	{
-		return ;
+		return;
 	}
-	fprintf(stderr, "%llu got error %d attempting connection\n", teulClock64, errorNo) ;
-	error = true ;
+	fprintf(stderr, "%llu got error %d attempting connection\n", teulClock64, errorNo);
+	error = true;
 }
 
 //
 static int
 _runTest(UINT32 address)
 {
-	connected = error = false ;
+	connected = error = false;
 
-	SINT32 teulIndex = teulOpenSend(address, WWII::Net::Ports::AuthHost, _connectFn, 60000, PROTOCOL_TCP, _errorFn) ;
+	SINT32 teulIndex = teulOpenSend(address, WWII::Net::Ports::AuthHost, _connectFn, 60000, PROTOCOL_TCP, _errorFn);
 	if ( teulIndex < 0 )
 	{
-		fprintf(stderr, "connection refused\n") ;
-		return -1 ;
+		fprintf(stderr, "connection refused\n");
+		return -1;
 	}
 
-	teulSyncClock() ;
-	TeulTimeMS cutoff = teulClock64 + 30000 ;
-	printf("%llu starting\n", teulClock64) ;
+	teulSyncClock();
+	TeulTimeMS cutoff = teulClock64 + 30000;
+	printf("%llu starting\n", teulClock64);
 	while ( !connected && !error && teulClock64 < cutoff )
 	{
-		teulUpdateTransport(5) ;
+		teulUpdateTransport(5);
 	}
 
-	teulClose(teulIndex) ;
+	teulClose(teulIndex);
 
 	if ( error )
-		return -1 ;
+		return -1;
 
 	if ( !connected )
 	{
-		assert( teulClock64 >= cutoff ) ;
-		fprintf(stderr, "connection attempt timed out\n") ;
-		return -3 ;
+		assert( teulClock64 >= cutoff );
+		fprintf(stderr, "connection attempt timed out\n");
+		return -3;
 	}
 
-	teulSyncClock() ;
-	printf("%llu success.\n", teulClock64) ;
+	teulSyncClock();
+	printf("%llu success.\n", teulClock64);
 
-	return 0 ;
+	return 0;
 }
 
 
@@ -85,26 +85,23 @@ main(int argc, char* argv[])
 {
 	Teul::ConfigVar::InitializeConfigVars();
 
-	teulInitTransport(LOG_TO_FILE, "./testAuthConnect", NULL) ;
+	teulInitTransport(LOG_TO_FILE, "./testAuthConnect", nullptr, nullptr);
 
-	teulSyncClock() ;
+	teulSyncClock();
 
-	dbugSetLogLevel(Debug::ERR_DBUG) ;
+	dbugSetLogLevel(Debug::ERR_DBUG);
 
-	UINT32* const address = teulGetHostByName("auth.playnet.com") ;
-	if ( address == NULL )
+	UINT32 address = Teul::GetSingleIP("auth.playnet.com");
+	if ( address == 0 )
 	{
-		fprintf(stderr, "failed to resolve auth.playnet.com\n") ;
-		return -2 ;
+		fprintf(stderr, "failed to resolve auth.playnet.com\n");
+		return -2;
 	}
 
-	for ( UINT32 i = 0 ; i < 10 ; ++i )
-	{
-		int result = _runTest(*address) ;
-		if ( result < 0 )
-			return result ;
-	}
+	int result = _runTest(address);
+	if ( result < 0 )
+		return result;
 
-	return 0 ;
+	return 0;
 }
 

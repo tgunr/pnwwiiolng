@@ -214,5 +214,8 @@
     <ClInclude Include="..\SourceCode\EvalKey_Source\SpeedTreeKeyUtility.h">
       <Filter>EvalKey_Source</Filter>
     </ClInclude>
+    <ClInclude Include="..\SourceCode\precompile.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

@@ -8,14 +8,13 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "dbug/dbug.h"
-
 #include "wwii/wwiiHCUnits.h"
 #include "include/mydbQuery.h"
 #include "chat/chatHandle.h"
+#include "chat/chatName.h"
 #include "dbse/dbseHandle.h"
 
-extern DBHANDLE dbh ;
+extern DBHANDLE dbh;
 
 #if defined(IS_MAP_HOST)
 # include "map/mapBrigades.h"
@@ -66,82 +65,82 @@ wwiiReadHCUnits()
 {
 	try
 	{
-		DBQuery q(dbh, QRY_SELECT_HCUNITS) ;
+		DBQuery q(dbh, QRY_SELECT_HCUNITS);
 		if ( q.Rows() == 0 )
-			throw std::domain_error("No HC units matching query") ;
+			throw std::domain_error("No HC units matching query");
 
-		UINT32 unitID = 0, parentID = 0 ;
-		HCUNIT_TYPE typeID ;
-		WWII_COUNTRY countryID ;
-		BRANCH_ENUM branchID ;
-		BRANCH_ENUM movementType ;
-		const char* name ;
-		UINT8 rank ;
-		FULL_OBJ_ID homeCP = nullObjID ;
-		ChatHandle owner ;
-		RANK_NO ownerRank ;
-		ChatHandle handle ;
-		UINT32 startCpOID, fallbackCpOID ;
-		UINT32 nextMove ;
-		const char* nick ;
-		const char* toeTemplate ;
-		UINT32 lastMoved ;
-		ChatHandle lastMovedBy ;
-		UCHAR unitClass ;
+		UINT32 unitID = 0, parentID = 0;
+		HCUNIT_TYPE typeID;
+		WWII_COUNTRY countryID;
+		BRANCH_ENUM branchID;
+		BRANCH_ENUM movementType;
+		const char* name;
+		UINT8 rank;
+		FULL_OBJ_ID homeCP = nullObjID;
+		ChatHandle owner;
+		RANK_NO ownerRank;
+		ChatHandle handle;
+		UINT32 startCpOID, fallbackCpOID;
+		UINT32 nextMove;
+		const char* nick;
+		const char* toeTemplate;
+		UINT32 lastMoved;
+		ChatHandle lastMovedBy;
+		UCHAR unitClass;
 
 
 		while (q.FetchRow())
 		{
-			DBRow& row = q.Row() ;
+			DBRow& row = q.Row();
 
-			unitID = row.NextUInt() ;
-			parentID = row.NextUInt() ;
-			countryID = (WWII_COUNTRY)row.NextUInt() ;
-			branchID = (BRANCH_ENUM)row.NextUInt() ;
-			name = row.NextColumn() ;
-			typeID = (HCUNIT_TYPE)row.NextUInt() ;
-			rank = (UINT8)row.NextUInt() ;
-			homeCP.cell.ox = (SINT16)row.NextSInt() ;
-			homeCP.cell.oy = (SINT16)row.NextSInt() ;
-			homeCP.id = (UINT16)row.NextUInt() ;
-			owner = chatGetHandle(row.NextColumn()) ;
-			ownerRank = (UCHAR)row.NextUInt() ;
-			handle = chatGetLowercaseHandle(row.NextColumn()) ;
-			startCpOID = row.NextUInt() ;
-			nextMove = row.NextUInt() ;
-			nick = row.NextColumn() ;
-			toeTemplate = row.NextColumn() ;
-			movementType = (BRANCH_ENUM)row.NextUInt() ;
-			fallbackCpOID = row.NextUInt() ;
-			lastMoved = row.NextUInt() ;
-			lastMovedBy = chatGetHandle(row.NextColumn()) ;
-			unitClass = (UCHAR)row.NextUInt() ;
+			unitID = row.NextUInt();
+			parentID = row.NextUInt();
+			countryID = (WWII_COUNTRY)row.NextUInt();
+			branchID = (BRANCH_ENUM)row.NextUInt();
+			name = row.NextColumn();
+			typeID = (HCUNIT_TYPE)row.NextUInt();
+			rank = (UINT8)row.NextUInt();
+			homeCP.cell.ox = (SINT16)row.NextSInt();
+			homeCP.cell.oy = (SINT16)row.NextSInt();
+			homeCP.id = (UINT16)row.NextUInt();
+			owner = chatGetHandle(row.NextColumn());
+			ownerRank = (UCHAR)row.NextUInt();
+			handle = chatGetLowercaseHandle(row.NextColumn());
+			startCpOID = row.NextUInt();
+			nextMove = row.NextUInt();
+			nick = row.NextColumn();
+			toeTemplate = row.NextColumn();
+			movementType = (BRANCH_ENUM)row.NextUInt();
+			fallbackCpOID = row.NextUInt();
+			lastMoved = row.NextUInt();
+			lastMovedBy = chatGetHandle(row.NextColumn());
+			unitClass = (UCHAR)row.NextUInt();
 
-			if ( nick == NULL )
+			if ( nick == nullptr )
 			{
-				dbugLog(_FLD, "hcu:%u(%s) unit has no nickname", unitID, name) ;
-				nick = name ;
+				dbugLog(_FLD, "hcu:%u(%s) unit has no nickname", unitID, name);
+				nick = name;
 			}
 
-			if ( unitID == 0 ) throw std::domain_error("HCUnit list contains unit with NULL or 0 unitID") ;
-			if ( countryID == 0 ) throw std::domain_error("HCUnit list contains unit with NULL or 0 countryID") ;
-			if ( branchID == 0 ) throw std::domain_error("HCUnit list contains unit with NULL or 0 branchID") ;
-			if ( movementType >= MAX_BRANCHES ) throw std::domain_error("HCUnit list contains unit with illegal movementType") ;
+			if ( unitID == 0 ) throw std::domain_error("HCUnit list contains unit with NULL or 0 unitID");
+			if ( countryID == 0 ) throw std::domain_error("HCUnit list contains unit with NULL or 0 countryID");
+			if ( branchID == 0 ) throw std::domain_error("HCUnit list contains unit with NULL or 0 branchID");
+			if ( movementType >= MAX_BRANCHES ) throw std::domain_error("HCUnit list contains unit with illegal movementType");
 			if ( movementType == 0 )
-				movementType = branchID ;
-			if ( name == NULL ) throw std::domain_error("HCUnit list contains unit with NULL or empty name") ;
+				movementType = branchID;
+			if ( name == nullptr ) throw std::domain_error("HCUnit list contains unit with NULL or empty name");
 
 			if ( typeID > MAX_HCUNIT_TYPES )
-				typeID = HCU_GENERIC ;
+				typeID = HCU_GENERIC;
 
 			//// Objects are all self-registering, so we call new and leave
 			//// them alone, this is not a memory leak.
-			HCUnit* newUnit ;
+			HCUnit* newUnit;
 
 			if ( typeID != HCU_BRIGADE && typeID != HCU_DIVISION )
 			{
-				homeCP = nullObjID ;
-				startCpOID = 0 ;
+				homeCP = nullObjID;
+				startCpOID = 0;
 			}
 
 			switch ( typeID )
@@ -149,8 +148,8 @@ wwiiReadHCUnits()
 				case HCU_BRIGADE:
 #if defined(IS_MAP_HOST)
 				// On the map host we have more detailed types for some sub-types
-					newUnit = (HCUnit*)(new Brigade(unitID, parentID, countryID, branchID, movementType, unitClass, handle, name, nick, rank, homeCP, owner, ownerRank)) ;
-				break ;
+					newUnit = (HCUnit*)(new Brigade(unitID, parentID, countryID, branchID, movementType, unitClass, handle, name, nick, rank, homeCP, owner, ownerRank));
+				break;
 #elif defined(IS_STRAT_HOST)
 				// Fallthru, treat brigade & division the same
 #else
@@ -158,30 +157,31 @@ wwiiReadHCUnits()
 #endif
 				case HCU_DIVISION:
 #ifdef IS_STRAT_HOST
-					newUnit = (HCUnit*)(new StratHCUnit(unitID, typeID, parentID, countryID, branchID, movementType, unitClass, handle, name, nick, rank, homeCP, owner, ownerRank, startCpOID, fallbackCpOID, lastMoved, lastMovedBy, nextMove, toeTemplate)) ;
-				break ;
+					newUnit = (HCUnit*)(new StratHCUnit(unitID, typeID, parentID, countryID, branchID, movementType, unitClass, handle, name, nick, rank, homeCP, owner, ownerRank, startCpOID, fallbackCpOID, lastMoved, lastMovedBy, nextMove, toeTemplate));
+				break;
 #else
 				// Fallthru
 #endif
 
 				case HCU_GENERIC:
 				default:
-					newUnit = new HCUnit(unitID, typeID, parentID, countryID, branchID, movementType, unitClass, handle, name, nick, rank, homeCP, owner, ownerRank) ;
-				break ;
+					newUnit = new HCUnit(unitID, typeID, parentID, countryID, branchID, movementType, unitClass, handle, name, nick, rank, homeCP, owner, ownerRank);
+				break;
 			}
 
+			Chat::Name lastMovedByName(lastMovedBy);
 			dbugLog(_FLD, "hcu:%u start:%u fall:%u nm:%u temp:%s lmb:%s lm:%u %p +ALLOC"
-					, unitID, startCpOID, fallbackCpOID, nextMove, toeTemplate, chatGetCallsign(lastMovedBy), lastMoved
-					, newUnit) ;
+					, unitID, startCpOID, fallbackCpOID, nextMove, toeTemplate, lastMovedByName.c_str(), lastMoved
+					, newUnit);
 		}
 
-		dbugLog(_FLI, "read %u hcunits", static_cast<UINT32>(hcUnits.size())) ;
+		dbugLog(_FLI, "read %u hcunits", static_cast<UINT32>(hcUnits.size()));
 
-		return true ;
+		return true;
 	}
 	catch (std::exception& e)
 	{
-		LogAbort("%s: %s", __FUNCTION__, e.what()) ;
+		LogAbort("%s: %s", __FUNCTION__, e.what());
 	}
 }
 

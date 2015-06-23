@@ -10,6 +10,7 @@
 
 #include "chat/chatLocalizedMessage.h"
 #include "chat/chatModReport.h"
+#include "chat/chatName.h"
 #include "chat/chatSupportRPCMessages.h"
 #include "comm/commHostMessages.h"
 #include "comm/commTypes.h"
@@ -39,7 +40,7 @@
 #include "wwii/wwiiIRC.h"
 #include "wwii/wwiiThreads.h"
 
-std::map<ChatHandle, HostVehicle*> g_vehicleLookup ;
+std::map<ChatHandle, HostVehicle*> g_vehicleLookup;
 
 //////////////////////////////////////////////////////////////////////
 // Look up a vehicle by it's chat handle.
@@ -47,8 +48,8 @@ std::map<ChatHandle, HostVehicle*> g_vehicleLookup ;
 HostVehicle*
 HostVehicle::Lookup(const ChatHandle& handle)
 {
-	auto it = g_vehicleLookup.find(handle) ;
-	return ( it != g_vehicleLookup.end() ? it->second : NULL ) ;
+	auto it = g_vehicleLookup.find(handle);
+	return ( it != g_vehicleLookup.end() ? it->second : nullptr );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -57,19 +58,19 @@ HostVehicle::Lookup(const ChatHandle& handle)
 void
 HostVehicleImpl::reset()
 {
-	m_players.clear() ;
-	memset(&m_locality, 0, sizeof(m_locality)) ;
-	m_nearCP = NULL ;
+	m_players.clear();
+	memset(&m_locality, 0, sizeof(m_locality));
+	m_nearCP = nullptr;
 
-	m_resupplies.clear() ;
+	m_resupplies.clear();
 
-	m_lastResupplier = 0 ;
+	m_lastResupplier = 0;
 
-	m_stopped = 0 ;
+	m_stopped = 0;
 
-	m_captureActive = false ;
-	m_lastCaptureFacility = 0 ;
-	resetCaptureTick() ;
+	m_captureActive = false;
+	m_lastCaptureFacility = 0;
+	resetCaptureTick();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -79,11 +80,11 @@ HostVehicleImpl::reset()
 void
 HostVehicleImpl::resetCaptureTick()
 {
-	TeulTimeMS tickInterval = (TeulTimeMS)host_config.capture.tickInterval_s * 1000 ;
+	TeulTimeMS tickInterval = (TeulTimeMS)host_config.capture.tickInterval_s * 1000;
 	// We need some kind of minimum interval, I chose 250ms.
 	if ( tickInterval == 0 )
-		tickInterval = 250 ;
-	m_nextCaptureTick = teulClock64 + tickInterval ;
+		tickInterval = 250;
+	m_nextCaptureTick = teulClock64 + tickInterval;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -93,7 +94,7 @@ HostVehicleImpl::~HostVehicleImpl()
 {
 	if ( !m_players.empty() )
 	{
-		dbugLog(_FLW, "Deleting vehicle with non-empty player list") ;
+		dbugLog(_FLW, "Deleting vehicle with non-empty player list");
 	}
 }
 
@@ -104,13 +105,13 @@ HostVehicleImpl::~HostVehicleImpl()
 SINT32
 _getCaptureProgress(const HostVehicle& vehicle)
 {
-	if ( vehicle.m_isInCaptureBuilding == false || vehicle.m_inBuildingObject == NULL )
-		return -1 ;
-	const FacilityStruct* const facility = vehicle.m_inBuildingObject->facility ;
-	if ( facility == NULL || facility->isCaptureEnabled() == false )
-		return -1 ;
+	if ( vehicle.m_isInCaptureBuilding == false || vehicle.m_inBuildingObject == nullptr )
+		return -1;
+	const FacilityStruct* const facility = vehicle.m_inBuildingObject->facility;
+	if ( facility == nullptr || facility->isCaptureEnabled() == false )
+		return -1;
 
-	return facility->m_captureCounter ;
+	return facility->m_captureCounter;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -123,52 +124,52 @@ void
 HostVehicle::checkLocality(Teul::Packet& packet)
 {
 #ifdef DEV_BUILD
-	assert( isRemote() == false ) ;
+	assert( isRemote() == false );
 #endif
 
 	if ( (m_nextLocUpdate > teulClock64) | (m_despawnTimerActive == true) | (isActive() == false) | (m_impl->m_players.empty() == true) )
-		return ;
+		return;
 	if ( exitState != PEXIT_UNINITIALIZED )
-		return ;
+		return;
 
-	bool firstUpdate = (m_nextLocUpdate == 0LL) ;
+	bool firstUpdate = (m_nextLocUpdate == 0LL);
 
 	// Interval for sending movement updates
-	static const TeulTimeMS _UPDATE_INTERVAL_MS = 1000 ;
-	m_nextLocUpdate = teulClock64 + _UPDATE_INTERVAL_MS ;
+	static const TeulTimeMS _UPDATE_INTERVAL_MS = 1000;
+	m_nextLocUpdate = teulClock64 + _UPDATE_INTERVAL_MS;
 
 	// Check if the position has moved but not trivially.
-	const FLOAT32 x_m = (FLOAT32)x_cm() / 100 ;
-	const FLOAT32 y_m = (FLOAT32)y_cm() / 100 ;
-	const FLOAT32 z_m = (FLOAT32)z_cm() / 100 - 2000 ;
+	const FLOAT32 x_m = (FLOAT32)x_cm() / 100;
+	const FLOAT32 y_m = (FLOAT32)y_cm() / 100;
+	const FLOAT32 z_m = (FLOAT32)z_cm() / 100 - 2000;
 
-	LocalityUpdate& loc = m_impl->m_locality ;
+	LocalityUpdate& loc = m_impl->m_locality;
 	const bool posChanged = (
 			firstUpdate
 			|| x_m != loc.m_x
 			|| y_m != loc.m_y
-			) ;
+			);
 
-	const SINT32 captureProgress = _getCaptureProgress(*this) ;
+	const SINT32 captureProgress = _getCaptureProgress(*this);
 	const bool bldgChanged = (
 			firstUpdate
 			|| m_isInCaptureBuilding != loc.m_inCaptureBldg
 			|| captureProgress != loc.m_progress
-			) ;
+			);
 
 	if ( !posChanged && !bldgChanged && z_m == loc.m_z )
-		return ;
+		return;
 
 	// Default changed to whether or not we're doing our first update
-	loc.m_cpChanged = firstUpdate ;
+	loc.m_cpChanged = firstUpdate;
 
 	if ( posChanged )
 	{
-		CPStruct* nearestCP = NULL ;
+		CPStruct* nearestCP = nullptr;
 		if ( m_inBuildingObject && m_inBuildingObject->facility )
-			nearestCP = m_inBuildingObject->facility->cp ;
-		if ( nearestCP == NULL )
-			nearestCP = strtFindClosestCP((SINT32)x_m, (SINT32)y_m) ;
+			nearestCP = m_inBuildingObject->facility->cp;
+		if ( nearestCP == nullptr )
+			nearestCP = strtFindClosestCP((SINT32)x_m, (SINT32)y_m);
 
 		if ( firstUpdate || nearestCP != m_impl->m_nearCP )
 		{
@@ -177,61 +178,60 @@ HostVehicle::checkLocality(Teul::Packet& packet)
 				threadLog(_FLD, "v:%u c:%s approaching area of %s"
 							, index
 							, callsign()
-							, nearestCP->name) ;
+							, nearestCP->name);
 			else if ( m_impl->m_nearCP )
 				threadLog(_FLD, "v:%u c:%s departing area of %s"
 							, index
 							, callsign()
-							, m_impl->m_nearCP->name) ;
+							, m_impl->m_nearCP->name);
 			else
 				threadLog(_FLD, "v:%u c:%s spawned in the wilds"
 							, index
 							, callsign()
-							) ;
+							);
 #endif
-			m_impl->m_nearCP = nearestCP ;
-			loc.m_cpChanged = true ;
-			loc.m_nearCP = nearestCP ? nearestCP->fullObjID : nullObjID ;
+			m_impl->m_nearCP = nearestCP;
+			loc.m_cpChanged = true;
+			loc.m_nearCP = nearestCP ? nearestCP->fullObjID : nullObjID;
 		}
 	}
 	if ( bldgChanged )
 	{
-		loc.m_inCaptureBldg = m_isInCaptureBuilding ;
+		loc.m_inCaptureBldg = m_isInCaptureBuilding;
 		if ( loc.m_inCaptureBldg )
 		{
-			loc.m_captureFac = m_inBuildingObject->facility->fullObjID ;
-			loc.m_progress = captureProgress ;
+			loc.m_captureFac = m_inBuildingObject->facility->fullObjID;
+			loc.m_progress = captureProgress;
 		}
 		else
 		{
-			loc.m_captureFac = nullObjID ;
-			loc.m_progress = -1 ;
+			loc.m_captureFac = nullObjID;
+			loc.m_progress = -1;
 		}
 	}
 
 	if ( posChanged )
 	{
-		loc.m_x = x_m ;
-		loc.m_y = y_m ;
+		loc.m_x = x_m;
+		loc.m_y = y_m;
 	}
-	loc.m_z = z_m ;
-	loc.m_riding = vehicleData.rideIndex ;
-	loc.m_onAWS = false ;
+	loc.m_z = z_m;
+	loc.m_riding = vehicleData.rideIndex;
+	loc.m_onAWS = false;
 
-	PLAYER_LIST::iterator it ;
-	for ( it = m_impl->m_players.begin() ; it != m_impl->m_players.end() ; ++it )
+	for ( auto it = m_impl->m_players.begin(), end = m_impl->m_players.end(); it != end; ++it )
 	{
-		Player* player = *it ;
+		Player* player = *it;
 		if ( player->exitState != 0 )
-			continue ;
+			continue;
 
-		loc.m_lastPing = 0 ;
+		loc.m_lastPing = 0;
 
 		if ( player->m_onAWS == true )
-			loc.m_onAWS = true ;
+			loc.m_onAWS = true;
 
-		loc.m_playerID = player->playerID() ;
-		packet.append(loc) ;
+		loc.m_playerID = player->playerID();
+		packet.append(loc);
 	}
 }
 
@@ -241,45 +241,45 @@ HostVehicle::checkLocality(Teul::Packet& packet)
 void
 HostVehicle::initialize(VEHICLE_HOLDER* const _holder, HostVehicleImpl* const _impl, UINT32 vehicleID, const WEAPON_SERIAL& ws, const WEAPON* weapon)
 {
-	memset(this, 0, sizeof(*this)) ;
+	memset(this, 0, sizeof(*this));
 
-	m_holder = _holder ;
-	m_impl = _impl ;
-	m_impl->reset() ;
-	vehicleData.m_vehicle = this ;
+	m_holder = _holder;
+	m_impl = _impl;
+	m_impl->reset();
+	vehicleData.m_vehicle = this;
 
-	index = vehicleID ;
-	state = VEH_RESERVED ;
-	serial() = ws ;
-	m_bias = weapon->bias ;
+	index = vehicleID;
+	state = VEH_RESERVED;
+	serial() = ws;
+	m_bias = weapon->bias;
 	friendlyBias = weapon->m_friendlyBias;
 	enemyBias = weapon->m_enemyBias;
 
-	m_side = (WWII_SIDE)ws.spec.side() ;
+	m_side = (WWII_SIDE)ws.spec.side();
 	vehicleData.country = ws.spec.wCountry;
-	vehicleData.side = side() ;
-	m_holder->timeStamp = teulClock() ;
-	m_spawnTime = teulTime() ;
-	m_cell = NULL ;
+	vehicleData.side = side();
+	m_holder->timeStamp = teulClock();
+	m_spawnTime = teulTime();
+	m_cell = nullptr;
 
-//	m_nextUpdateClock = ~0ULL ;
+//	m_nextUpdateClock = ~0ULL;
 
-	static const WEAPON_SPEC buzzardSpec = weapFindWeaponByName("uk_buzzard") ;
-	static const WEAPON_SPEC skullSpec = weapFindWeaponByName("uk_skull") ;
+	static const WEAPON_SPEC buzzardSpec = weapFindWeaponByName("uk_buzzard");
+	static const WEAPON_SPEC skullSpec = weapFindWeaponByName("uk_skull");
 	m_isBuzzard = ( serial().spec.wCategory == buzzardSpec.wCategory && serial().spec.wClass == buzzardSpec.wClass
-					&& (serial().spec.wType == buzzardSpec.wType || serial().spec.wType == skullSpec.wType) ) ;
+					&& (serial().spec.wType == buzzardSpec.wType || serial().spec.wType == skullSpec.wType) );
 
-	static const WEAPON_SPEC fighterSpec = weapCreateSpec("AC_fighter.0") ;	///THREAD UNSAFE
-	m_isFighter = ( serial().spec.wCategory == fighterSpec.wCategory && serial().spec.wClass == fighterSpec.wClass ) ;
+	static const WEAPON_SPEC fighterSpec = weapCreateSpec("AC_fighter.0");	///THREAD UNSAFE
+	m_isFighter = ( serial().spec.wCategory == fighterSpec.wCategory && serial().spec.wClass == fighterSpec.wClass );
 
-	m_maxLod_cm2 = weapon->maxLod_cm2 ;
+	m_maxLod_cm2 = weapon->maxLod_cm2;
 
-//	syncTime = 0 ;
+//	syncTime = 0;
 
 	// Set the update framing context
-	selectBestFramingMode() ;
+	selectBestFramingMode();
 
-	g_vehicleLookup[chatHandle()] = this ;
+	g_vehicleLookup[chatHandle()] = this;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -290,29 +290,29 @@ HostVehicle::acceptResupply(UINT32 fromSerial, const ChatHandle& fromHandle, Hos
 {
 	if ( players().empty() )
 	{
-		dbugLog(_FLD, "v:%u no players to receive resupply", index) ;
-		return ;
+		dbugLog(_FLD, "v:%u no players to receive resupply", index);
+		return;
 	}
 
 	// Remember the last people to resupply me.
-	m_impl->m_lastResupplier = fromSerial ;
+	m_impl->m_lastResupplier = fromSerial;
 
 	if ( g_logDebug )
 	{
-		Player* vehCommander = activeCommander() ;
-		UINT32 id = (vehCommander != NULL) ? vehCommander->playerID() : 0 ;
+		Player* vehCommander = activeCommander();
+		UINT32 id = (vehCommander != nullptr) ? vehCommander->playerID() : 0;
 		dbugLog(_FLD, "p:%u c:%s v:%u accepting resupply from %s"
 						, id, callsign(), index
-						, chatGetCallsign(fromHandle)
-						) ;
+						, Chat::Name(fromHandle).c_str()
+						);
 	}
 
-	commSendClientResupplyIssue(this, fromSerial, fromHandle) ;
+	commSendClientResupplyIssue(this, fromSerial, fromHandle);
 
 	if ( fromAddress != 0 )
-		hostSendResupplyAccepted(fromAddress, fromSerial, vehicleData.packedCallsign) ;
-	else if ( fromVehicle != NULL )
-		fromVehicle->scoreResupply(vehicleData.packedCallsign) ;
+		hostSendResupplyAccepted(fromAddress, fromSerial, vehicleData.packedCallsign);
+	else if ( fromVehicle != nullptr )
+		fromVehicle->scoreResupply(vehicleData.packedCallsign);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -322,34 +322,34 @@ HostVehicle::acceptResupply(UINT32 fromSerial, const ChatHandle& fromHandle, Hos
 void
 HostVehicle::attachControllingPlayer(const Player& player)
 {
-	assert( isRemote() == false ) ;
+	assert( isRemote() == false );
 
 	dbugLog(_FLI, "t:%d p:%u c:%s attaching controller to v:%u spec:%u.%u.%u.%u sq:%u in:%u.%u.%llu.%llu"
 					, player.teulIndex(), player.playerID(), player.callsign(), index
 					, spec().wCountry, spec().wCategory, spec().wClass, spec().wType
 					, player.squadID()
 					, player.instance().category(), player.instance().type(), player.instance().handle(), player.instance().id()
-					) ;
+					);
 
 	// Clone this player's name.
-	vehicleData.packedCallsign = player.chatHandle() ;
-	chatGetCallsign(vehicleData.callsign, vehicleData.packedCallsign) ;
+	vehicleData.packedCallsign = player.chatHandle();
+	chatGetCallsign(vehicleData.callsign, vehicleData.packedCallsign);
 
 	// Transfer me to the instance.
-	setInstance(player.instance()) ;
+	setInstance(player.instance());
 
 	///TODO:134: Assign sortie properties from the mission packet.
 
 	// Copy other attributes.
-	vehicleData.rank = player.effectiveRank() ;
-	vehicleData.squad = player.squadID() ;
-	vehicleData.squadHandle = player.squadHandle() ;
-	vehicleData.brigadeID = player.brigadeID() ;
-	m_missionID = player.missionID() ;
-	m_flags = player.m_flags ;
+	vehicleData.rank = player.effectiveRank();
+	vehicleData.squad = player.squadID();
+	vehicleData.squadHandle = player.squadHandle();
+	vehicleData.brigadeID = player.brigadeID();
+	m_missionID = player.missionID();
+	m_flags = player.m_flags;
 
 	// Reset the update framing for this vehicle
-	selectBestFramingMode() ;
+	selectBestFramingMode();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -358,8 +358,8 @@ HostVehicle::attachControllingPlayer(const Player& player)
 bool
 HostVehicle::canSeeHiddenBuzzards() const
 {
-	const Player* const cmdr = commander() ;
-	return ( cmdr != NULL && cmdr->isEffectiveGM() == true ) ;
+	const Player* const cmdr = commander();
+	return ( cmdr != nullptr && cmdr->isEffectiveGM() == true );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -368,29 +368,29 @@ HostVehicle::canSeeHiddenBuzzards() const
 Player*
 HostVehicle::activeCommander() const
 {
-	PLAYER_LIST::const_iterator it ;
-	for ( it = players().begin() ; it != players().end() ; ++it )
+	PLAYER_LIST::const_iterator it;
+	for ( it = players().begin(); it != players().end(); ++it )
 	{
-		Player* player = (*it) ;
-		if ( player != NULL && player->teulIndex() >= 0 && player->active && player->station != UPDT_OTHER )
-			return player ;
+		Player* player = (*it);
+		if ( player != nullptr && player->teulIndex() >= 0 && player->active && player->station != UPDT_OTHER )
+			return player;
 	}
 
-	return NULL ;
+	return nullptr;
 }
 
 Player*
 HostVehicle::commander() const
 {
-	PLAYER_LIST::const_iterator it ;
-	for ( it = players().begin() ; it != players().end() ; ++it )
+	PLAYER_LIST::const_iterator it;
+	for ( it = players().begin(); it != players().end(); ++it )
 	{
-		Player* player = (*it) ;
-		if ( player != NULL && player->station != UPDT_OTHER )
-			return player ;
+		Player* player = (*it);
+		if ( player != nullptr && player->station != UPDT_OTHER )
+			return player;
 	}
 
-	return NULL ;
+	return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -401,54 +401,54 @@ _despawnTimeLimit(const WEAPON_SPEC& spec, bool isInBuilding)
 {
 	// Arena sets zero despawn time.
 	if ( host_config.isArenaOpen() == false )
-		return 0 ;
+		return 0;
 
-	UINT32 baseDespawnTime = host_config.arena.despawnTime_s ;
+	UINT32 baseDespawnTime = host_config.arena.despawnTime_s;
 	if ( baseDespawnTime == 0 )
-		return baseDespawnTime ;
+		return baseDespawnTime;
 
 	WEAPON* weapon = weapLookup(spec);
-	if ( weapon != NULL && weapon->access() >= 8 )
+	if ( weapon != nullptr && weapon->access() >= 8 )
 	{
 		// System vehicles can instantly despawn
-		return 1 ;
+		return 1;
 	}
 
 	// Halve despawn time for people in buildings
 	if ( isInBuilding )
-		baseDespawnTime = (baseDespawnTime + 1) / 2 ;
+		baseDespawnTime = (baseDespawnTime + 1) / 2;
 
-	return baseDespawnTime ;
+	return baseDespawnTime;
 }
 
 DespawnTimer&
 HostVehicle::despawnTime() const
 {
-	static DespawnTimer timer ;
-	timer.reset() ;
+	static DespawnTimer timer;
+	timer.reset();
 
 	///CAVEAT: Non-campaign players and dead troopers despawn upon hitting 'ESC"
 	if ( instance().isCampaign() == false || (state == VEH_DEAD && spec().wCategory == _INFANTRY) )
 	{
-		timer.m_despawn = 0 ;
-		return timer ;
+		timer.m_despawn = 0;
+		return timer;
 	}
 
 	// Timer must be non-zero for us to respond
 	if ( !m_despawnTimerActive )
-		return timer ;
+		return timer;
 
 	// Return the number of ms
-	TeulDeltaMS elapsed = (teulClock64 - m_despawnStarted) / 1000 ;
+	TeulDeltaMS elapsed = (teulClock64 - m_despawnStarted) / 1000;
 
-	TeulDeltaMS despawnRemaining = _despawnTimeLimit(spec(), isInBuilding()) - elapsed ;
-	TeulDeltaMS promoteRemaining = host_config.despawnPromotionTime_s - elapsed ;
+	TeulDeltaMS despawnRemaining = _despawnTimeLimit(spec(), isInBuilding()) - elapsed;
+	TeulDeltaMS promoteRemaining = host_config.despawnPromotionTime_s - elapsed;
 
-	timer.m_despawn = (SINT32)((despawnRemaining > 0) ? despawnRemaining : 0) ;
+	timer.m_despawn = (SINT32)((despawnRemaining > 0) ? despawnRemaining : 0);
 	if ( host_config.despawnPromotionTime_s > 0 && state != VEH_DEAD )
-		timer.m_promotion = (SINT32)((promoteRemaining > 0) ? promoteRemaining : 0) ;
+		timer.m_promotion = (SINT32)((promoteRemaining > 0) ? promoteRemaining : 0);
 
-	return timer ;
+	return timer;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -457,33 +457,33 @@ HostVehicle::despawnTime() const
 void
 HostVehicle::issueResupply(const Player* const player, UINT32 toSerial)
 {
-	assert( toSerial != 0 ) ;
+	assert( toSerial != 0 );
 	if ( toSerial == index )
 	{
 		dbugLog(_FLW, "t:%d p:%u c:%s v:%u attempting to resupply themself!"
-						, player->teulIndex(), player->playerID(), player->callsign(), index) ;
-		Chat::SendModReport(player->matchHandle(), Chat::ModResupply) ;
+						, player->teulIndex(), player->playerID(), player->callsign(), index);
+		Chat::SendModReport(player->matchHandle(), Chat::ModResupply);
 	}
 
-	HostVehicle* toVehicle = hostFindVehicleLocal(toSerial) ;
-	if ( toVehicle == NULL )
+	HostVehicle* toVehicle = hostFindVehicleLocal(toSerial);
+	if ( toVehicle == nullptr )
 	{
 		dbugLog(_FLI, "t:%d p:%u c:%s v:%u invalid vehicle %u (gone away?)"
-						, player->teulIndex(), player->playerID(), player->callsign(), index, toSerial) ;
-		return ;
+						, player->teulIndex(), player->playerID(), player->callsign(), index, toSerial);
+		return;
 	}
 
 	if ( toVehicle->isRemote() == true )
 	{
 		dbugLog(_FLI, "t:%d p:%u c:%s v:%u forwarding resupply #%u to cell %u"
-						, player->teulIndex(), player->playerID(), player->callsign(), index, toSerial, toVehicle->serverAddress & 255) ;
-		hostSendResupplyIssue(toVehicle->serverAddress, toSerial, index, player->chatHandle()) ;
+						, player->teulIndex(), player->playerID(), player->callsign(), index, toSerial, toVehicle->serverAddress & 255);
+		hostSendResupplyIssue(toVehicle->serverAddress, toSerial, index, player->chatHandle());
 	}
 	else
 	{
 		dbugLog(_FLI, "t:%d p:%u c:%s v:%u handing resupply to %u"
-						, player->teulIndex(), player->playerID(), player->callsign(), index, toSerial) ;
-		toVehicle->acceptResupply(index, player->chatHandle(), this, 0) ;
+						, player->teulIndex(), player->playerID(), player->callsign(), index, toSerial);
+		toVehicle->acceptResupply(index, player->chatHandle(), this, 0);
 	}
 }
 
@@ -494,7 +494,7 @@ UINT32
 HostVehicle::maxVisibleVehicles() const
 {
 	// Start with what their update mode allows.
-	return framings[framingMode].maxVehicles ;
+	return framings[framingMode].maxVehicles;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -502,12 +502,12 @@ HostVehicle::maxVisibleVehicles() const
 
 const PLAYER_LIST& HostVehicle::players() const
 {
-	return m_impl->m_players ;
+	return m_impl->m_players;
 }
 
 PLAYER_LIST& HostVehicle::players()
 {
-	return m_impl->m_players ;
+	return m_impl->m_players;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -516,14 +516,14 @@ PLAYER_LIST& HostVehicle::players()
 void
 HostVehicle::scoreResupply(const ChatHandle& ofHandle)
 {
-	for ( auto pit = players().begin() ; pit != players().end() ; ++pit )
+	for ( auto pit = players().begin(); pit != players().end(); ++pit )
 	{
-		const Player* const player = *pit ;
-		Scoring::Packet<Scoring::Resupply> packet ;
-		Scoring::Actor actSupplier(this, player) ;
-		Scoring::Resupply evtResup(actSupplier, ofHandle) ;
-		packet.setData(evtResup) ;
-		serverSendPacketToType(packet, MAP_HOST) ;
+		const Player* const player = *pit;
+		Scoring::Packet<Scoring::Resupply> packet;
+		Scoring::Actor actSupplier(this, player);
+		Scoring::Resupply evtResup(actSupplier, ofHandle);
+		packet.setData(evtResup);
+		serverSendPacketToType(packet, MAP_HOST);
 	}
 }
 
@@ -533,11 +533,11 @@ HostVehicle::scoreResupply(const ChatHandle& ofHandle)
 void
 HostVehicle::setCrewDead()
 {
-	state = VEH_DEAD ;
-	vehicleData.globalFlags |= VEHG_DEAD ;
-	timeOfDeath = teulTime() ;
+	state = VEH_DEAD;
+	vehicleData.globalFlags |= VEHG_DEAD;
+	timeOfDeath = teulTime();
 
-	interruptCapture() ;
+	interruptCapture();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -547,19 +547,19 @@ HostVehicle::setDespawnTimer(bool wantOn)
 {
 	if ( wantOn && !m_despawnTimerActive )
 	{
-		m_despawnStarted = teulClock64 ;
+		m_despawnStarted = teulClock64;
 	}
 	if ( wantOn != m_despawnTimerActive )
 	{
-		m_despawnTimerActive = wantOn ;
+		m_despawnTimerActive = wantOn;
 #ifdef BETA_RELEASE
 		dbugLog(_FLI, "v:%u c:%s %s despawn timer"
 						, index
 						, callsign()
 						, (m_despawnTimerActive ? "starting" : "stopping")
-						) ;
+						);
 #endif
-		interruptCapture() ;
+		interruptCapture();
 	}
 }
 
@@ -572,20 +572,20 @@ HostVehicle::interruptCapture()
 	if ( m_impl->m_captureActive )
 	{
 		threadLog(_FLD, "p:%u c:%s v:%u interrupting capture"
-						, seats[0], callsign(), index) ;
+						, seats[0], callsign(), index);
 
 		// Determine which status to send.
-		Strat::CaptureContributionEvent::Status status = Strat::CaptureContributionEvent::Interrupted ;
+		Strat::CaptureContributionEvent::Status status = Strat::CaptureContributionEvent::Interrupted;
 
 		if ( state == VEH_DEAD )
-			status = Strat::CaptureContributionEvent::Killed ;
+			status = Strat::CaptureContributionEvent::Killed;
 		else if ( m_isInCaptureBuilding == false )
-			status = Strat::CaptureContributionEvent::Left ;
+			status = Strat::CaptureContributionEvent::Left;
 
-		sendCaptureContribution(activeCommander(), status) ;
+		sendCaptureContribution(activeCommander(), status);
 	}
 	else
-		m_impl->resetCaptureTick() ;
+		m_impl->resetCaptureTick();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -597,8 +597,8 @@ HostVehicle::setInstance(const Instance::Descriptor& _instance)
 	if ( g_logDebug )
 		dbugLog(_FLI, "v:%u setting instance %u.%u.%llu.%llu"
 					, index
-					, _instance.category(), _instance.type(), _instance.handle(), _instance.id()) ;
-	m_instance = _instance ;
+					, _instance.category(), _instance.type(), _instance.handle(), _instance.id());
+	m_instance = _instance;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -608,15 +608,15 @@ bool
 HostVehicle::getHideCallsign(const HostVehicle* const viewer) const
 {
 	if ( this == viewer )
-		return false ;
+		return false;
 	if ( this->isBuzzard() == false || viewer->isBuzzard() == true )
-		return false ;
+		return false;
 
-	const Player* const player = viewer->activeCommander() ;
-	if ( player != NULL && player->stationID == UPDT_LONE && (player->permissions(IS_PLAYNET | GAME_MANAGER)) )
-		return false ;
+	const Player* const player = viewer->activeCommander();
+	if ( player != nullptr && player->stationID == UPDT_LONE && (player->permissions(IS_PLAYNET | GAME_MANAGER)) )
+		return false;
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -625,39 +625,39 @@ HostVehicle::getHideCallsign(const HostVehicle* const viewer) const
 UINT32
 HostVehicle::getOneTimeBitsFor(const HostVehicle* const viewer) const
 {
-	UINT32 oneTimeBits = 0 ;
+	UINT32 oneTimeBits = 0;
 
-	const bool hideCallsign = getHideCallsign(viewer) ;
+	const bool hideCallsign = getHideCallsign(viewer);
 	if ( (viewer->side() == side() && hideCallsign == false) || viewer->isBuzzard() )
 	{
 		if ( squadID() > 0 && squadID() == viewer->squadID() )
-			oneTimeBits |= OTB_IN_SQUAD ;
+			oneTimeBits |= OTB_IN_SQUAD;
 	}
 	if ( viewer->side() == side() )
 	{
 		if ( brigadeID() > 0 && brigadeID() == viewer->brigadeID() )
-			oneTimeBits |= OTB_IN_BRIGADE ;
+			oneTimeBits |= OTB_IN_BRIGADE;
 		if ( missionID() > 0 && missionID() == viewer->missionID() )
-			oneTimeBits |= OTB_IN_MISSION ;
+			oneTimeBits |= OTB_IN_MISSION;
 	}
 
-	const Player* const cmdr = commander() ;
+	const Player* const cmdr = commander();
 	if ( cmdr )
 	{
 		if ( cmdr->isTrainer() )
-			oneTimeBits |= OTB_TRAINER ;
+			oneTimeBits |= OTB_TRAINER;
 		if ( cmdr->isMissionLeader() )
-			oneTimeBits |= OTB_MISSION_LEADER ;
+			oneTimeBits |= OTB_MISSION_LEADER;
 		if ( cmdr->isBuilder() )
-			oneTimeBits |= OTB_BUILDER ;
+			oneTimeBits |= OTB_BUILDER;
 		if ( cmdr->isOfficer() )
-			oneTimeBits |= OTB_HIGH_COMMAND ;
+			oneTimeBits |= OTB_HIGH_COMMAND;
 	}
 
 	if ( vehicleData.decal > 0 )
-		oneTimeBits |= OTB_USE_DECALS ;
+		oneTimeBits |= OTB_USE_DECALS;
 
-	return oneTimeBits ;
+	return oneTimeBits;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -668,38 +668,38 @@ HostVehicle::setVehicleKilled(sortieid_t bySortieID)
 {
 	if ( (vehicleData.globalFlags & VEHG_KILLED) != 0 )
 	{
-		return false ;
+		return false;
 	}
 
-	vehicleData.globalFlags |= VEHG_KILLED ;
+	vehicleData.globalFlags |= VEHG_KILLED;
 
 	if ( (bySortieID != 0) & (m_killedBySortieID == 0) )
 	{
-		m_killedBySortieID = bySortieID ;
+		m_killedBySortieID = bySortieID;
 	}
 
-	Scoring::Packet<Scoring::Death> packet ;
-	Scoring::Actor actVictim(this) ;
-	Scoring::Actor actShooter ;
-	actShooter.setSortie(m_killedBySortieID, NULL_WEAP_SPEC, false) ;
+	Scoring::Packet<Scoring::Death> packet;
+	Scoring::Actor actVictim(this);
+	Scoring::Actor actShooter;
+	actShooter.setSortie(m_killedBySortieID, NULL_WEAP_SPEC, false);
 	if ( m_killedBySortieID != 0 )
 	{
-		const HostVehicle* const killer = hostFindVehicleLocal(m_killedBySortieID) ;
-		if ( killer != NULL )
+		const HostVehicle* const killer = hostFindVehicleLocal(m_killedBySortieID);
+		if ( killer != nullptr )
 		{
-			actShooter = Scoring::Actor(killer) ;
+			actShooter = Scoring::Actor(killer);
 		}
 	}
 
-	Scoring::Death evtDeath(actVictim, actShooter, x_cm(), y_cm(), z_cm()) ;
-	packet.setData(evtDeath) ;
+	Scoring::Death evtDeath(actVictim, actShooter, x_cm(), y_cm(), z_cm());
+	packet.setData(evtDeath);
 
 	if ( !serverSendPacketToType(packet, MAP_HOST) )
 	{
-		dbugLog(_FLA, "unable to send kill message to map host") ;
+		dbugLog(_FLA, "unable to send kill message to map host");
 	}
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -711,12 +711,12 @@ HostVehicle::isMoving() const
 	if ( vehicleData.velocity.velX != 0 || vehicleData.velocity.velY != 0	|| vehicleData.velocity.velZ != 0 )
 	{
 		// 5 seconds to be considered at a stop.
-		m_impl->m_stopped = teulTime() + 5 ;
-		return true ;
+		m_impl->m_stopped = teulTime() + 5;
+		return true;
 	}
 	else
 	{
-		return ( teulTime() < m_impl->m_stopped ) ;
+		return ( teulTime() < m_impl->m_stopped );
 	}
 }
 
@@ -726,41 +726,41 @@ HostVehicle::isMoving() const
 WWII_SIDE
 HostVehicle::isInCaptureBuilding() const
 {
-	if ( !m_inBuilding || !m_isInCaptureBuilding || m_inBuildingObject == NULL || m_inBuildingObject->m_isCaptureBuilding == false )
-		return WWII_NO_SIDE ;
+	if ( !m_inBuilding || !m_isInCaptureBuilding || m_inBuildingObject == nullptr || m_inBuildingObject->m_isCaptureBuilding == false )
+		return WWII_NO_SIDE;
 
-	if ( m_inBuildingObject->facility == NULL )
+	if ( m_inBuildingObject->facility == nullptr )
 	{
-		dbugLog(_FLA, "XXX capture building object isn't tied into strat") ;
-		return WWII_NO_SIDE ;
+		dbugLog(_FLA, "XXX capture building object isn't tied into strat");
+		return WWII_NO_SIDE;
 	}
 
 	if ( m_inBuildingObject->facility->canBeCaptured() == false )
-		return WWII_NO_SIDE ;
+		return WWII_NO_SIDE;
 
-	return m_inBuildingObject->m_side ;
+	return m_inBuildingObject->m_side;
 }
 
 static void
-_reportBuildingIssue(TeulTimeMS& nextBlip, const char* const fmt, ...) __attribute__ ((format (printf,2,3))) ;
+_reportBuildingIssue(TeulTimeMS& nextBlip, const char* const fmt, ...) __attribute__ ((format (printf,2,3)));
 
 static void
 _reportBuildingIssue(TeulTimeMS& nextBlip, const char* const fmt, ...)
 {
-	assert( fmt != NULL ) ;
+	assert( fmt != nullptr );
 	if ( nextBlip > teulClock64 )
-		return ;
+		return;
 
-	char error[512] ;
-	va_list args ;
-	va_start(args, fmt) ;
-	vsnprintf(error, sizeof(error)-1, fmt, args) ;
-	va_end(args) ;
+	char error[512];
+	va_list args;
+	va_start(args, fmt);
+	vsnprintf(error, sizeof(error)-1, fmt, args);
+	va_end(args);
 
-	dbugLog(_FLA, "%s", error) ;
-	chatSendAdminMessage("%s", error) ;
+	dbugLog(_FLA, "%s", error);
+	chatSendAdminMessage("%s", error);
 
-	nextBlip = teulClock64 + 5000 ;
+	nextBlip = teulClock64 + 5000;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -769,65 +769,65 @@ _reportBuildingIssue(TeulTimeMS& nextBlip, const char* const fmt, ...)
 void
 HostVehicle::setInCaptureBuilding(bool newValue)
 {
-	if ( newValue == true && m_inBuildingObject == NULL )
+	if ( newValue == true && m_inBuildingObject == nullptr )
 	{
 		if ( m_inBuilding == 0ULL )
 		{
-			static TeulTimeMS nextBlip = 0ULL ;
-			_reportBuildingIssue(nextBlip, "p:%u c:%s v:%u client reporting 'in-capture' with a null building ID", seats[0], vehicleData.callsign, index) ;
-			newValue = false ;
+			static TeulTimeMS nextBlip = 0ULL;
+			_reportBuildingIssue(nextBlip, "p:%u c:%s v:%u client reporting 'in-capture' with a null building ID", seats[0], vehicleData.callsign, index);
+			newValue = false;
 		}
-		else if ( m_inBuildingObject == NULL )
+		else if ( m_inBuildingObject == nullptr )
 		{
-			static TeulTimeMS nextBlip = 0ULL ;
-			FULL_OBJ_ID bid ;
-			bid.FromKey(m_inBuilding) ;
-			_reportBuildingIssue(nextBlip, "p:%u c:%s v:%u client reporting 'in-capture' from unrecognized building %d.%d.%u"
-											, seats[0], vehicleData.callsign, index, bid.cell.ox, bid.cell.oy, bid.id) ;
-			newValue = false ;
+			static TeulTimeMS nextBlip = 0ULL;
+			FULL_OBJ_ID bid;
+			bid.FromKey(m_inBuilding);
+			_reportBuildingIssue(nextBlip, "p:%u c:%s v:%u client reporting 'in-capture' from unrecognized building " PRF_FULL_OBJ_ID ""
+											, seats[0], vehicleData.callsign, index, PRA_FULL_OBJ_ID(bid));
+			newValue = false;
 		}
-		else if ( m_inBuildingObject->facility == NULL )
+		else if ( m_inBuildingObject->facility == nullptr )
 		{
-			FULL_OBJ_ID bid ;
-			bid.FromKey(m_inBuilding) ;
-			dbugLog(_FLW, "p:%u c:%s v:%u client reporting in-capture for non-strat building %d.%d.%u %s"
-											, seats[0], vehicleData.callsign, index, bid.cell.ox, bid.cell.oy, bid.id, m_inBuildingObject->name) ;
-			newValue = false ;
+			FULL_OBJ_ID bid;
+			bid.FromKey(m_inBuilding);
+			dbugLog(_FLW, "p:%u c:%s v:%u client reporting in-capture for non-strat building " PRF_FULL_OBJ_ID " %s"
+											, seats[0], vehicleData.callsign, index, PRA_FULL_OBJ_ID(bid), m_inBuildingObject->name);
+			newValue = false;
 		}
 		else if ( m_inBuildingObject->facility->m_captureBuilding != m_inBuildingObject )
 		{
-			static TeulTimeMS nextBlip = 0ULL ;
-			const FacilityStruct* const fac = m_inBuildingObject->facility ;
-			const ObjectStruct* const obj = fac->m_captureBuilding ;
+			static TeulTimeMS nextBlip = 0ULL;
+			const FacilityStruct* const fac = m_inBuildingObject->facility;
+			const ObjectStruct* const obj = fac->m_captureBuilding;
 			_reportBuildingIssue(nextBlip, "p:%u c:%s v:%u client reporting in-capture for non-capture building. inbldg:%s (%d,%d.%u), fac:%s (%d,%d.%u), capbldg:%s (%d,%d.%u)"
 											, seats[0], vehicleData.callsign, index
 											, m_inBuildingObject->name, m_inBuildingObject->fullObjID.cell.ox, m_inBuildingObject->fullObjID.cell.oy, m_inBuildingObject->fullObjID.id
 											, fac->name, fac->fullObjID.cell.ox, fac->fullObjID.cell.oy, fac->fullObjID.id
 											, obj->name, obj->fullObjID.cell.ox, obj->fullObjID.cell.oy, obj->fullObjID.id
-											) ;
-			newValue = false ;
+											);
+			newValue = false;
 		}
 	}
 
 	if ( m_isInCaptureBuilding != newValue )
 	{
-		m_isInCaptureBuilding = newValue ;
-		interruptCapture() ;
+		m_isInCaptureBuilding = newValue;
+		interruptCapture();
 
 		// Did we just enter a building?
-		if ( m_isInCaptureBuilding && m_inBuildingObject->facility != NULL )
+		if ( m_isInCaptureBuilding && m_inBuildingObject->facility != nullptr )
 		{
 #ifdef BETA_RELEASE
-			message(LSTR_BETA, LSTR_GENERIC, "Entered capture building") ;
+			message(LSTR_BETA, LSTR_GENERIC, "Entered capture building");
 #endif
 			dbugLog(_FLD, "p:%u c:%s v:%u entered %s cap bldg"
 							, seats[0], callsign(), index
 							, m_inBuildingObject->facility->name
-							) ;
+							);
 			// Send them a CaptureState message.
-			CaptureState capState ;
-			capState.populate(m_inBuildingObject->facility, side(), 0, false) ;
-			sendCaptureState(capState) ;
+			CaptureState capState;
+			capState.populate(m_inBuildingObject->facility, side(), 0, false);
+			sendCaptureState(capState);
 		}
 	}
 }
@@ -838,14 +838,14 @@ HostVehicle::setInCaptureBuilding(bool newValue)
 void
 HostVehicle::sendCaptureContribution(Player* const player, UINT32 status)
 {
-	if ( player == NULL || host_config.isArenaLocked(AL_CAPTURE) )
-		return ;
+	if ( player == nullptr || host_config.isArenaLocked(AL_CAPTURE) )
+		return;
 
 	if ( m_inBuildingObject )
-		m_impl->m_lastCaptureFacility = m_inBuildingObject->facility->uOID ;
-	UINT32 facilityOID = m_impl->m_lastCaptureFacility ;
+		m_impl->m_lastCaptureFacility = m_inBuildingObject->facility->uOID;
+	UINT32 facilityOID = m_impl->m_lastCaptureFacility;
 	if ( !m_inBuildingObject )
-		m_impl->m_lastCaptureFacility = 0 ;
+		m_impl->m_lastCaptureFacility = 0;
 
 	if ( facilityOID == 0 )
 	{
@@ -853,14 +853,14 @@ HostVehicle::sendCaptureContribution(Player* const player, UINT32 status)
 		{
 			threadLog(_FLD, "p:%u c:%s v:%u 0 facilityID for capture"
 							, seats[0], callsign(), index
-							) ;
+							);
 		}
-		return ;
+		return;
 	}
 
 	// Tell the strat host to contribute this guy to the capture
-	Teul::Packet outgoing(0, Strat::CallbackX, STRT_CAPTURE_CONTRIB_Y) ;
-	CONSTRUCT_IN_PACKET(outgoing, Strat::CaptureContributionEvent, 
+	Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_CAPTURE_CONTRIB_Y));
+	outgoing.construct<Strat::CaptureContributionEvent>(
 							(Strat::CaptureContributionEvent::Status)status
 							,	facilityOID
 							,	player->chatHandle()
@@ -868,18 +868,18 @@ HostVehicle::sendCaptureContribution(Player* const player, UINT32 status)
 							,	index
 							,	player->missionID()
 							,	player->brigadeID()
-						) ;
-	serverSendPacketToType(outgoing, STRAT_HOST) ;
+						);
+	serverSendPacketToType(outgoing, STRAT_HOST);
 	threadLog(_FLD, "p:%u c:%s v:%u 0 sending cap contrib for %s"
 				, seats[0], callsign(), index
 				, m_inBuildingObject && m_inBuildingObject->facility
 					? m_inBuildingObject->facility->name
 					: "UNKNOWN!"
-				) ;
+				);
 
-	m_impl->m_captureActive = ( status == Strat::CaptureContributionEvent::Active ) ;
+	m_impl->m_captureActive = ( status == Strat::CaptureContributionEvent::Active );
 
-	m_impl->resetCaptureTick() ;
+	m_impl->resetCaptureTick();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -891,65 +891,65 @@ HostVehicle::checkCapture()
 	// Must be in a capturable building, and the client must think
 	// they are in a qualifying part of the building
 	if ( isInCaptureBuilding() == WWII_NO_SIDE )
-		return ;
+		return;
 
 	// No contribution if you are dead or have the despawn timer up.
 	if ( state == VEH_DEAD || m_despawnTimerActive )
-		return ;
+		return;
 
-	Player* const player = activeCommander() ;
-	if ( player == NULL )
-		return ;
+	Player* const player = activeCommander();
+	if ( player == nullptr )
+		return;
 
 	// Must have the "CAN_CAPTURE" permission to capture stuff.
 	if ( player->permissions(CAN_CAPTURE) == false )
-		return ;
+		return;
 
 	// Constrain frequency of contributions
 	if ( m_impl->m_nextCaptureTick > teulClock64 )
-		return ;
+		return;
 
 	// Have we been told the building is capturable?
-	FacilityStruct& fac = *m_inBuildingObject->facility ;
+	FacilityStruct& fac = *m_inBuildingObject->facility;
 	switch ( fac.m_captureStage )
 	{
 	case FacilityStruct::_CAP_DISABLED:
 #ifdef CLOSED_BETA
-//		player->message(LSTR_BETA, LSTR_GENERIC, "Facility is not currently capturable") ;
+//		player->message(LSTR_BETA, LSTR_GENERIC, "Facility is not currently capturable");
 #endif
-	break ;
+	break;
 
 	case FacilityStruct::_CAP_PENDING:
 #ifdef BETA_RELEASE
-//		player->messagef(LSTR_BETA, LSTR_GENERIC, "Facility is not capturable for another %u seconds", fac.getCaptureRemaining()) ;
+//		player->messagef(LSTR_BETA, LSTR_GENERIC, "Facility is not capturable for another %u seconds", fac.getCaptureRemaining());
 #endif
 		if ( m_inBuildingObject->facility->getCaptureRemaining() > 0 )
 		{
-			CaptureState capState ;
-			capState.populate(m_inBuildingObject->facility, side(), 0, false) ;
-			sendCaptureState(capState) ;
+			CaptureState capState;
+			capState.populate(m_inBuildingObject->facility, side(), 0, false);
+			sendCaptureState(capState);
 		}
-	break ;
+	break;
 
 	case FacilityStruct::_CAP_ENABLED:
 	{
 #ifdef CLOSED_BETA
-//		player->messagef(LSTR_BETA, LSTR_GENERIC, "Facility is at ~%u%%, sending capture contribution", fac.m_captureCounter) ;
+//		player->messagef(LSTR_BETA, LSTR_GENERIC, "Facility is at ~%u%%, sending capture contribution", fac.m_captureCounter);
 #endif
-		sendCaptureContribution(player, Strat::CaptureContributionEvent::Active) ;
+		sendCaptureContribution(player, Strat::CaptureContributionEvent::Active);
 
-		return ;
+		return;
 	}
-	break ;
+	break;
 
 	default:
 #ifdef BETA_RELEASE
-		player->message(LSTR_BETA, LSTR_GENERIC, "Facility in unknown capture state, not attempting capture submission") ;
+		player->message(LSTR_BETA, LSTR_GENERIC, "Facility in unknown capture state, not attempting capture submission");
 #endif
-	break ;
+	break;
 	}
 
-	interruptCapture() ;
+	interruptCapture();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -958,14 +958,14 @@ HostVehicle::checkCapture()
 bool
 HostVehicle::message(int prefix, int msgid, const char* const t1, const char* const t2) const
 {
-	Chat::LocalizedMessage lmsg(prefix, msgid, t1, t2) ;
-	PLAYER_LIST::const_iterator pit ;
-	for ( pit = players().begin() ; pit != players().end() ; ++pit )
+	Chat::LocalizedMessage lmsg(prefix, msgid, t1, t2);
+	PLAYER_LIST::const_iterator pit;
+	for ( pit = players().begin(); pit != players().end(); ++pit )
 	{
 		if ( *pit )
-			(*pit)->message(lmsg) ;
+			(*pit)->message(lmsg);
 	}
-	return true ;
+	return true;
 }
 
 namespace Host { namespace Vehicles {
@@ -975,15 +975,15 @@ namespace Host { namespace Vehicles {
 // keep all 3 together in memory.
 struct FullVehicle
 {
-	VEHICLE_HOLDER	holder ;
-	HostVehicle		vehicle ;
-	HostVehicleImpl	impl ;
-} ;
+	VEHICLE_HOLDER	holder;
+	HostVehicle		vehicle;
+	HostVehicleImpl	impl;
+};
 
 // The free list.
-typedef std::vector<FullVehicle*> FREE_VEHICLES ;
-static FREE_VEHICLES _freeVehicles ;
-static std::vector<FullVehicle*> _allocations ;
+typedef std::vector<FullVehicle*> FREE_VEHICLES;
+static FREE_VEHICLES _freeVehicles;
+static std::vector<FullVehicle*> _allocations;
 
 	//////////////////////////////////////////////////////////////////////
 	// Allocate an array of FullVehicles.
@@ -991,26 +991,26 @@ static std::vector<FullVehicle*> _allocations ;
 	void
 	AllocateArray(UINT32 num)
 	{
-		FullVehicle* const data = new FullVehicle[num] ;
-		_allocations.push_back(data) ;
+		FullVehicle* const data = new FullVehicle[num];
+		_allocations.push_back(data);
 
-		_freeVehicles.resize(_freeVehicles.size() + num) ;
-		for ( UINT32 i = 0 ; i < num ; ++i )
+		_freeVehicles.resize(_freeVehicles.size() + num);
+		for ( UINT32 i = 0; i < num; ++i )
 		{
-			FullVehicle& entry = data[i] ;
+			FullVehicle& entry = data[i];
 
 /*
-			memset(&entry.holder, 0, sizeof(entry.holder) ;
-			entry.holder.vehicle = &entry.vehicle ;
-			entry.vehicle.holder = &entry.holder ;
-			entry.impl.m_vehicle = &entry.vehicle ;
+			memset(&entry.holder, 0, sizeof(entry.holder);
+			entry.holder.vehicle = &entry.vehicle;
+			entry.vehicle.holder = &entry.holder;
+			entry.impl.m_vehicle = &entry.vehicle;
 */
 
 /*
-			entry.vehicle.prev = &entry.vehicle ;
+			entry.vehicle.prev = &entry.vehicle;
 */
 
-			_freeVehicles[_freeVehicles.size() - (i + 1)] = &entry ;
+			_freeVehicles[_freeVehicles.size() - (i + 1)] = &entry;
 		}
 	}
 
@@ -1020,11 +1020,11 @@ static std::vector<FullVehicle*> _allocations ;
 	void
 	FreeArray()
 	{
-		for ( auto it = _allocations.begin() ; it != _allocations.end() ; ++it )
+		for ( auto it = _allocations.begin(); it != _allocations.end(); ++it )
 		{
-			delete [] *it ;
+			delete [] *it;
 		}
-		_allocations.clear() ;
+		_allocations.clear();
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -1036,17 +1036,17 @@ static std::vector<FullVehicle*> _allocations ;
 		// Get the last entry.
 		while ( _freeVehicles.empty() == true )
 		{
-			AllocateArray(256) ;
+			AllocateArray(256);
 		}
-		FullVehicle* const entry = _freeVehicles.back() ;
-		_freeVehicles.pop_back() ;
+		FullVehicle* const entry = _freeVehicles.back();
+		_freeVehicles.pop_back();
 
-		memset(&entry->holder, 0, sizeof(entry->holder)) ;
-		entry->holder.vehicle = &entry->vehicle ;
+		memset(&entry->holder, 0, sizeof(entry->holder));
+		entry->holder.vehicle = &entry->vehicle;
 
-		entry->vehicle.initialize(&entry->holder, &entry->impl, index, ws, weapon) ;
+		entry->vehicle.initialize(&entry->holder, &entry->impl, index, ws, weapon);
 
-		return &entry->holder ;
+		return &entry->holder;
 	}
 
 	//////////////////////////////////////////////////////////////////////
@@ -1055,7 +1055,7 @@ static std::vector<FullVehicle*> _allocations ;
 	void
 	FreeHolder(VEHICLE_HOLDER* const holder)
 	{
-		_freeVehicles.push_back((FullVehicle*)holder) ;
+		_freeVehicles.push_back((FullVehicle*)holder);
 	}
 
 } }

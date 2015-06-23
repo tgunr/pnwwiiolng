@@ -10,9 +10,9 @@
 // Originating Programmer: Shane "Elmo" Wickson
 
 //Processes the mmHosts request for the "health" of a facility
-struct MM_CAPACITY_REQUEST ;
-struct MM_CAPACITY_RESPONSE ;
-struct FULL_OBJ_ID ;
+struct MM_CAPACITY_REQUEST;
+struct MM_CAPACITY_RESPONSE;
+struct FULL_OBJ_ID;
 
 extern SINT32 strtProcessCapacityRequest
 	( const MM_CAPACITY_REQUEST& capacityRequest

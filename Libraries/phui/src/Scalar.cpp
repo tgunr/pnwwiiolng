@@ -1,9 +1,6 @@
 #include "phui-precompiled-header.h"
 
-#include <string.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <stdarg.h>
+#include <cstdarg>
 
 #include "phui/Scalar.h"
 #include "phui/Util.h"
@@ -235,7 +232,7 @@ bool Scalar::Bool() const
 		break;
 		
 		case PointerT:
-			b = (_value.p != NULL);
+			b = (_value.p != nullptr);
 		break;
 		
 		case StringT:
@@ -352,7 +349,7 @@ long Scalar::Long() const
 		break;
 		
 		case WideStringT:
-			l = (long)wcstol(_wstr.c_str(),NULL,10);
+			l = (long)wcstol(_wstr.c_str(),nullptr,10);
 		break;
 
 		default:
@@ -411,7 +408,7 @@ double Scalar::Double() const
 		break;
 		
 		case WideStringT:
-			d = (double)wcstof(_wstr.c_str(),NULL);
+			d = (double)wcstof(_wstr.c_str(),nullptr);
 		break;
 
 		default:
@@ -969,23 +966,23 @@ Scalar& Scalar::Set(const wchar_t* wstr)
 		break;
 		
 		case ShortT:
-			_value.s = (short)wcstol(wstr,NULL,10);
+			_value.s = (short)wcstol(wstr,nullptr,10);
 		break;
 
 		case LongT:
-			_value.l = (long)wcstol(wstr,NULL,10);
+			_value.l = (long)wcstol(wstr,nullptr,10);
 		break;
 		
 		case FloatT:
-			_value.f = (float)wcstol(wstr,NULL,10);
+			_value.f = (float)wcstol(wstr,nullptr,10);
 		break;
 		
 		case DoubleT:
-			_value.d = (double)wcstol(wstr,NULL,10);
+			_value.d = (double)wcstol(wstr,nullptr,10);
 		break;
 		
 		case PointerT:
-			_value.p = (void*)wcstol(wstr,NULL,10);
+			_value.p = (void*)wcstol(wstr,nullptr,10);
 		break;
 		
 		case StringT:

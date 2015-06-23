@@ -535,7 +535,7 @@ void FrameBufferAttachment::attach(GLenum target, GLenum attachment_point) const
 {
     unsigned int contextID = 0;//state.getContextID();
 
-    Texture::TextureObject* tobj = 0;
+    Texture::TextureObject* tobj = nullptr;
     if(_ximpl->textureTarget.valid())
     {
         tobj = _ximpl->textureTarget->getTextureObject(contextID);
@@ -594,7 +594,7 @@ void FrameBufferKill()
     if(s_deletedFrameBufferObjectCache)
         delete s_deletedFrameBufferObjectCache;
 
-    s_deletedFrameBufferObjectCache = NULL;
+    s_deletedFrameBufferObjectCache = nullptr;
 }
 
 void FrameBufferObject::deleteFrameBufferObject(unsigned int contextID, GLuint rb)

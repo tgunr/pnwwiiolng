@@ -20,7 +20,7 @@ struct UiSounds
 
     SINT32 ID;
 	SCHAR callback[32];
-} ;
+};
 
 static UiSounds sounds[MAX_UI_SOUNDS];
 static UiSounds freeH;
@@ -78,8 +78,8 @@ static void _releaseSound(UiSounds* s)
     if(p) p->next = n;
     if(n) n->prev = p;
 
-    s->next = NULL;
-    s->prev = NULL;
+    s->next = nullptr;
+    s->prev = nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -98,7 +98,7 @@ static void _freeSound(UiSounds* s)
     s->next = n;
     n->prev = s;
 
-	s->s = NULL;
+	s->s = nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////

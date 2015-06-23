@@ -2,7 +2,7 @@
 // Created: Tue Jan 28 20:00:08 2001
 //
 // All the routines for reading in the weap files
-// to create and access the weapon heirarchies.
+// to create and access the weapon hierarchies.
 //
 // Copyright (c) 2000 Playnet, Inc., All Rights Reserved.
 // Not to be distributed in API form except as part of a
@@ -25,7 +25,7 @@
 
 #define WEAP_IDENT_SIZE 3
 
-static LOGICAL g_weaponListIsInitialized = FALSE;
+static bool g_weaponListIsInitialized;
 
 typedef std::map<UINT32, WEAPON*> WEAPON_INDEXES;
 static WEAPON_INDEXES s_weaponIndexes;
@@ -100,23 +100,20 @@ SINT16	weapCountryIndex[Parse::MAX_COUNTRY_CODES];
 
 // If you ever have to look up a class name.
 WEAPON_CLASS weaponClass[MAX_WEAP_CLASSES];
+size_t g_maxWeaponClass = 0;
 
 // All known weapons
 WEAPON_LIST g_weaponList;
+extern std::vector<std::unique_ptr<WEAPON>> g_weaponPtrs;
 
 // Weapon Category tables
 WEAPON_SPAWNS g_weaponSpawns;
 
 // Weapons indexed by name
-#if platOS == OS_LINUX
 typedef std::unordered_map<std::string,WEAPON*> WEAPON_NAME_INDEX;
-#else
-typedef stdext::hash_map<std::string,WEAPON*> WEAPON_NAME_INDEX;
-#endif
 static WEAPON_NAME_INDEX weaponNameIndex;
 
-LOGICAL
-weapHasInitialized()
+bool weapHasInitialized()
 {
 	return g_weaponListIsInitialized;
 }
@@ -127,7 +124,7 @@ SINT32 i;
 
 	for( i = 1; i < MAX_SIDES; i++ )
 	{
-		if ( !strcasecmp(wwii_side[i],side) )
+		if ( !strcasecmp(wwii_side[i], side) )
 			return (WWII_SIDE)i;
 	}
 
@@ -189,38 +186,23 @@ weapFindCategory(const char* weapCat)
 	return weap;
 }
 
-WEAPON_SPEC
-weapFindClass(const char* weapClass)
+UINT8 weapFindClassIndex(const std::string& className)
 {
-	WEAPON_SPEC weap = NULL_WEAP_SPEC;
-	for ( UINT32 i = 1; i < MAX_WEAP_CLASSES; i++ )
+	UINT32 hash = WEAPON_CLASS::GetHash(className);
+	for ( size_t i = 1; i <= g_maxWeaponClass; ++i )
 	{
-		if ( strcasecmp((char*)weaponClass[i].name,weapClass) == 0 )
-		{
-			weap.wClass = i;
-			break;
-		}
+		if (PN_UNLIKELY(weaponClass[i].active == false))
+			continue;
+		if (weaponClass[i].m_hash == hash && weaponClass[i].name == className)
+			return static_cast<UINT8>(i);
 	}
-
-	return weap;
-}
-
-WEAPON_SPEC weapCreateSpec(UINT32 country, UINT32 category, UINT32 klass, UINT32 type)
-{
-	WEAPON_SPEC weap = NULL_WEAP_SPEC;
-
-	weap.wCountry	= (UINT8)country;
-	weap.wCategory	= (UINT8)category;
-	weap.wClass		= (UINT8)klass;
-	weap.wType		= (UINT8)type;
-
-	return weap;
+	return 0;
 }
 
 WEAPON_SPEC weapCreateSpec(const char* weapString)
 {
 	WEAPON_SPEC weap = NULL_WEAP_SPEC;
-	SINT32 wType, sClassLen;
+	SINT32 wType;
 	char sCountry[WEAP_IDENT_SIZE+1]
 		,sCategory[WEAP_IDENT_SIZE+1]
 		,sClass[MAX_CLASS_NAME_LEN]
@@ -228,7 +210,7 @@ WEAPON_SPEC weapCreateSpec(const char* weapString)
 
 	const char* const sType = strstr(weapString, ".");
 
-	if (sType == NULL || sType < weapString )
+	if (sType == nullptr || sType < weapString )
 		return NULL_WEAP_SPEC;
 
 	wType = (SINT32)atol(sType+1);
@@ -246,12 +228,12 @@ WEAPON_SPEC weapCreateSpec(const char* weapString)
 	memset(sCountry,0,WEAP_IDENT_SIZE+1);
 	memset(sCategory,0,WEAP_IDENT_SIZE+1);
 
-	if (tempString != NULL)
+	if (tempString != nullptr)
 	{
 		tempString++;
 
-		sClassLen = (SINT32)(sType - tempString);
-		strncpy(sClass, tempString,sClassLen);
+		size_t sClassLen = sType - tempString;
+		strncpy(sClass, tempString, std::min(sizeof(sClass), sClassLen));
 
 		if (! strncmp(sClass,"null",MAX_CLASS_NAME_LEN) )
 			weap.wClass = 0;
@@ -276,7 +258,7 @@ WEAPON_SPEC weapCreateSpec(const char* weapString)
 	}
 	else
 	{
-		sClassLen = (SINT32)(sType - weapString);
+		size_t sClassLen = sType - weapString;
 		strncpy(sClass, weapString, sClassLen);
 		weap.wClass = weapFindClass(sClass).wClass;
 		weap.wCategory = 0;
@@ -290,16 +272,15 @@ WEAPON_SPEC weapCreateSpec(const char* weapString)
 WEAPON_SPEC
 weapAssociateIndex(const char* objName, UINT32 localIndex)
 {
-	if ( objName == NULL )
+	if ( objName == nullptr )
 		return NULL_WEAP_SPEC;
 
 	char weapName[MAX_WEAP_NAME_LEN];
-
-	strncpy(weapName, objName, MAX_WEAP_NAME_LEN);
+	strsafecpy(weapName, objName);
 	_strlwr(weapName);
 
 	WEAPON* weapon = weapLookupWeaponByName(weapName);
-	if ( weapon == NULL )
+	if ( weapon == nullptr )
 	{
 #ifdef FRONT_END
 		Write_Debug("weapon %s not defined li:%u", weapName, localIndex);
@@ -321,8 +302,7 @@ weapAddWeaponIndex(WEAPON* weapon)
 	s_weaponIndexes[weapon->m_localIndex] = weapon;
 }
 
-LOGICAL
-weapListInit(const char* theaterPath)
+bool weapListInit(const char* theaterPath)
 {
 	SINT32 country,category;
 	char importFile[PN_MAX_PATH];
@@ -330,21 +310,20 @@ weapListInit(const char* theaterPath)
 	memset(weapCountryIndex, 0, sizeof(weapCountryIndex));
 	g_weaponList.clear();
 	g_weaponSpawns.clear();
+	g_weaponPtrs.clear();
 
-	atexit(weapListKill);
-
-	snprintf(importFile, PN_MAX_PATH, SUB_PATH("%s", "%s"), theaterPath, "weapCountry.csv");
+	strprintf(importFile, SUB_PATH("%s", "%s"), theaterPath, "weapCountry.csv");
 	if ( ! weapParseCountry(importFile))
 	{
 		dbugLog(_FLA, "couldnt parse countries file (%s)", importFile);
-		return FALSE;
+		return false;
 	}
 
-	snprintf(importFile, PN_MAX_PATH, SUB_PATH("%s", "%s"), theaterPath, "weapClasses.csv");
+	strprintf(importFile, SUB_PATH("%s", "%s"), theaterPath, "weapClasses.csv");
 	if ( ! weapParseClasses(importFile))
 	{
 		dbugLog(_FLA, "couldnt parse class file (%s)", importFile);
-		return FALSE;
+		return false;
 	}
 
 	for ( country = 1; country < MAX_COUNTRIES; country++)
@@ -354,7 +333,7 @@ weapListInit(const char* theaterPath)
 
 		for ( category = 1; category < MAX_WEAP_CATEGORY; category++)
 		{
-			snprintf(importFile,PN_MAX_PATH, "%s" PATH_SEPSTR "%s%s%s"
+			strprintf(importFile, "%s" PATH_SEPSTR "%s%s%s"
 					, theaterPath, Parse::countryCode[weaponCountry[country].code], wwii_category[category], "weap.csv");
 //#define LIVE_DANGEROUS
 
@@ -362,7 +341,7 @@ weapListInit(const char* theaterPath)
 			{
 				dbugLog(_FLA,"couldn't parse %u.%u weapons file (%s)", country, category, importFile);
 #ifndef LIVE_DANGEROUS
-				return (FALSE);
+				return false;
 #endif
 			}
 		}
@@ -375,32 +354,28 @@ weapListInit(const char* theaterPath)
 
 		for ( category = 1; category < MAX_WEAP_CATEGORY; category++)
 		{
-			snprintf(importFile, PN_MAX_PATH, "%s" PATH_SEPSTR "%s%s%s"
+			strprintf(importFile, "%s" PATH_SEPSTR "%s%s%s"
 					, theaterPath, Parse::countryCode[weaponCountry[country].code], wwii_category[category], "spawn.csv");
 			if ( ! weapParseSpawn(importFile, country, category) && category != _MUNITIONS )
 			{
 				dbugLog(_FLA,"couldn't parse spawn file for %s",importFile);
 #ifndef LIVE_DANGEROUS
-				return (FALSE);
+				return false;
 #endif
 			}
 		}
 	}
 
-	return TRUE;
+	g_weaponListIsInitialized = true;
+
+	return true;
 }
 
 void weapListKill(void)
 {
-	// Delete all the WEAPON's we allocated
-	WEAPON_LIST::iterator it;
-	for ( it = g_weaponList.begin(); it != g_weaponList.end(); ++it )
-	{
-		if ( it->second != NULL )
-			delete it->second;
-	}
 	g_weaponList.clear();
 	g_weaponSpawns.clear();
+	g_weaponPtrs.clear();
 }
 
 #if platOS != OS_WIN32
@@ -411,11 +386,11 @@ void weapListKill(void)
 const WEAPON_SPEC&
 weapFindWeaponByName(const char* name)
 {
-	if ( name == NULL || *name == 0 )
+	if ( name == nullptr || *name == 0 )
 		return NULL_WEAP_SPEC;
 
 	WEAPON_NAME_INDEX::iterator it = weaponNameIndex.find(name);
-	if ( it == weaponNameIndex.end() || it->second == NULL )
+	if ( it == weaponNameIndex.end() || it->second == nullptr )
 		return NULL_WEAP_SPEC;
 	return it->second->spec();
 }
@@ -423,25 +398,25 @@ weapFindWeaponByName(const char* name)
 WEAPON*
 weapLookupWeaponByName(const char* name)
 {
-	if ( name == NULL || *name == 0 )
-		return NULL;
+	if ( name == nullptr || *name == 0 )
+		return nullptr;
 
 	WEAPON_NAME_INDEX::iterator it = weaponNameIndex.find(name);
-	return ( it != weaponNameIndex.end() ) ? it->second : NULL;
+	return ( it != weaponNameIndex.end() ) ? it->second : nullptr;
 }
 
 WEAPON*
 weapLookupWeaponByIndex(UINT32 localIndex)
 {
 	WEAPON_INDEXES::iterator it = s_weaponIndexes.find(localIndex);
-	return ( it != s_weaponIndexes.end() ? it->second : NULL );
+	return ( it != s_weaponIndexes.end() ? it->second : nullptr );
 }
 
 // Lookup the weapon with the fast index
 WEAPON* weapLookup(const WEAPON_SPEC& spec)
 {
 	WEAPON_LIST::iterator it = g_weaponList.find(spec);
-	return ( it != g_weaponList.end() ) ? it->second : NULL;
+	return ( it != g_weaponList.end() ) ? it->second : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -450,7 +425,7 @@ WEAPON* weapLookup(const WEAPON_SPEC& spec)
 static SINT16
 _getAccessValue(const char* key)
 {
-	if ( key == NULL || *key == 0 )
+	if ( key == nullptr || *key == 0 )
 		return 0;
 	if ( isdigit(*key) )
 		return atoi(key);
@@ -484,7 +459,7 @@ WEAPON::WEAPON(const WEAPON_SPEC& withSpec
 
 	memset(bias, 0, sizeof(bias));
 
-	if ( weapLookupWeaponByName(name) != NULL )
+	if ( weapLookupWeaponByName(name) != nullptr )
 		throw std::runtime_error("multiple definitions of vehicle");		///Terminal
 
 	weaponNameIndex[name] = this;

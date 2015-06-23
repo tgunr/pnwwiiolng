@@ -97,7 +97,7 @@ struct mlAnimation
 
 	UINT32 LastAnimationTime;
 
-} ;
+};
 
 struct mlPositionData
 {
@@ -125,7 +125,7 @@ struct mlPositionData
 	LOGICAL SetBombbayDoor[ML_MAX_CREW_POSITIONS];
 	LOGICAL BombbayDoorState[ML_MAX_CREW_POSITIONS];
 
-} ;
+};
 
 struct ptkBody;
 
@@ -135,7 +135,7 @@ struct mlBuoyancyData
 	FLOAT64 x,y;
 	FLOAT64 top, bottom;
 	FLOAT64 width, len;
-} ;
+};
 
 struct fpPersonData;
 
@@ -531,7 +531,7 @@ extern UINT32 mlGetFlapPosition(FLOAT64 * ReturnVal,mlVehicleData * VehicleData)
 extern mlEngineComponentData* mlGetEngine(mlVehicleData* VehicleData, SINT32 EngineNumber = -1);
 extern UINT32 mlGetEnginesOn(mlVehicleData* VehicleData, SINT32 EngineNumber = -1);
 extern UINT32 mlGetEngineRPMs(mlVehicleData* VehicleData, SINT32 EngineNumber = -1);
-extern UINT32 mlGetNumGears(mlVehicleData* VehicleData, UINT32* current = NULL);
+extern UINT32 mlGetNumGears(mlVehicleData* VehicleData, UINT32* current = nullptr);
 
 extern UINT32 mlUpdateVehicle(mlVehicleData* VehicleData);
 
@@ -725,7 +725,7 @@ extern UINT32 mlDetermineInfantryCollisions(mlVehicleData*	VehicleData,
 											UINT32			poseToCheck,
 											UINT32			vehicleCollideCheck,
 											UINT32			Flags = 0,
-											vehVehicle**	collideVehicle = NULL);
+											vehVehicle**	collideVehicle = nullptr);
 
 extern UINT32 mlInfantryUpdate(mlVehicleData* VehicleData, SINT32 TicTime);
 extern SINT32 mlInfantryInsideVehicleCheck (mlVehicleData* pVehicleData, piVECTOR* eyePoint);

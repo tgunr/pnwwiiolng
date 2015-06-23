@@ -54,12 +54,12 @@ extern char* luaARGS(int i);
 
 // execute some lua code
 // from a file; fio aware
-extern bool luaRunScript(const char* fileName, lua_State* L = NULL);
+extern bool luaRunScript(const char* fileName, lua_State* L = nullptr);
 
 // from a string buffer
-extern bool luaRunObject(const char* name, const char* object, lua_State* L = NULL);
+extern bool luaRunObject(const char* name, const char* object, lua_State* L = nullptr);
 
-// run a code snippet; pass NULL for the state to run in the global state
+// run a code snippet; pass nullptr for the state to run in the global state
 extern bool __luaRunCode(lua_State* L, const char* code, const char* caller);
 #define luaRunCode(l,c) __luaRunCode(l,c,__FUNCTION__)
 
@@ -72,8 +72,8 @@ extern SCRIPT_RESULTS& luaResults();
 // if its the default VM, starts it if needed
 extern lua_State* luaGetVM(bool defaultVM = true);
 
-// stop a interpreter; pass NULL for the global VM
-extern bool luaStopVM(lua_State* L = NULL);
+// stop a interpreter; pass nullptr for the global VM
+extern bool luaStopVM(lua_State* L = nullptr);
 
 // Set the context
 extern void luaSetContext(const char* func);

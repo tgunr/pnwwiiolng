@@ -20,8 +20,8 @@ using namespace phui;
 
 CtxMenu::CtxMenu(): Caption()
 {
-	_parentmenu = NULL;
-	_submenus = NULL;
+	_parentmenu = nullptr;
+	_submenus = nullptr;
 	_acceptsmouseclick = _isWindow = true;
 	_isVisible = _open = false;
 	_hindent = _vindent = 0;

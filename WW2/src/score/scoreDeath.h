@@ -24,13 +24,13 @@ namespace Scoring
 				, m_deadX(deadX_), m_deadY(deadY_), m_deadZ(deadZ_)
 		{}
 
-		protected:	SINT32	m_deadX ;
-		protected:	SINT32	m_deadY ;
-		protected:	SINT32	m_deadZ ;
+		protected:	SINT32	m_deadX;
+		protected:	SINT32	m_deadY;
+		protected:	SINT32	m_deadZ;
 
-		public: SINT32 deadX() const { return m_deadX ; }
-		public: SINT32 deadY() const { return m_deadY ; }
-		public: SINT32 deadZ() const { return m_deadZ ; }
+		public: SINT32 deadX() const { return m_deadX; }
+		public: SINT32 deadY() const { return m_deadY; }
+		public: SINT32 deadZ() const { return m_deadZ; }
 
 	END_SCORING_EVENT( )
 }

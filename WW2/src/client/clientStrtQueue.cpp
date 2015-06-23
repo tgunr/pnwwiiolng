@@ -5,7 +5,6 @@
 #include "trn/trnmain.h"
 #include "client/client.h"
 #include "client/GameClient.h"
-#include "mem/mem.h"
 #include "trn/trncd.h"
 #include "trn/trnvars.h"
 #include "strt/strtEventTypes.h"
@@ -18,13 +17,13 @@
 *************************************************************************************************/
 
 // Map of most recent vis level vs super-cell specific building ID.
-//typedef std::map< UINT32 /* Building ID */, Strat::EventData /* strat info */ > BuildingStatus ;
+//typedef std::map< UINT32 /* Building ID */, Strat::EventData /* strat info */ > BuildingStatus;
 
 // Map of supercell <-> BuildingStatus map.
-//typedef std::map< std::pair<int /*scx*/, int /*scy*/>, BuildingStatus > CellBuildingStatus ;
+//typedef std::map< std::pair<int /*scx*/, int /*scy*/>, BuildingStatus > CellBuildingStatus;
 
 //! All pending entities.
-//static CellBuildingStatus _statusMap ;
+//static CellBuildingStatus _statusMap;
 
 
 /************************************************************************************************
@@ -33,7 +32,7 @@
 /*
 static void _applyBuildingStatus(TERRAIN_DETAIL* const td, UINT32 bldgId, SINT32 owner, SINT32 level)
 {
-	trnSetStratData(td, bldgId, owner, level) ;
+	trnSetStratData(td, bldgId, owner, level);
 }
 */
 
@@ -43,12 +42,12 @@ static void _applyBuildingStatus(TERRAIN_DETAIL* const td, UINT32 bldgId, SINT32
 /*
 static void _applyCellStatus(TERRAIN_DETAIL* td, const BuildingStatus& cell)
 {
-	for ( BuildingStatus::const_iterator it = cell.begin() ; it != cell.end() ; ++it )
+	for ( BuildingStatus::const_iterator it = cell.begin(); it != cell.end(); ++it )
 	{
-		const UINT32 bldgId				= it->first ;
+		const UINT32 bldgId				= it->first;
 		const Strat::EventData& data	= it->second;
 
-		_applyBuildingStatus(td, bldgId, data.owner, data.level) ;
+		_applyBuildingStatus(td, bldgId, data.owner, data.level);
 	}
 }
 */
@@ -60,11 +59,11 @@ void clientStrtUpdateBuildings(TERRAIN_DETAIL* td)
 
 	for(int i = 0; i < td->numBuildings; i++)
 	{
-		fid.cell.ox		= td->scx << 4 ;
-		fid.cell.oy		= td->scy << 4 ;
-		fid.id			= td->pbld[i].oid.id ;
-		fid.objClass	= td->pbld[i].oid.objClass ;
-		fid.objType		= td->pbld[i].oid.objType ;
+		fid.cell.ox		= td->scx << 4;
+		fid.cell.oy		= td->scy << 4;
+		fid.id			= td->pbld[i].oid.id;
+		fid.objClass	= td->pbld[i].oid.objClass;
+		fid.objType		= td->pbld[i].oid.objType;
 
 		StratDB::StratObject* building = StratDB::FindStratObject(fid);
 		if(!building) continue;
@@ -87,15 +86,15 @@ void clientStrtQueueUpdate()
 
 	while ( it != _statusMap.end() )
 	{
-		const CellBuildingStatus::iterator cur = it ;
-		++it ;
+		const CellBuildingStatus::iterator cur = it;
+		++it;
 
 		TERRAIN_DETAIL* td = trnGetTerainDetail(cur->first.first, cur->first.second);
 		if(!td) continue;
 
 		_applyCellStatus(td, cur->second);
 
-		_statusMap.erase(cur) ;
+		_statusMap.erase(cur);
 	}
 }
 */
@@ -106,7 +105,7 @@ void clientStrtQueueUpdate()
 /*
 void clientStrtQueueReleaseSupercell(int sx, int sy)
 {
-	_statusMap.erase( std::make_pair(sx, sy) ) ;
+	_statusMap.erase( std::make_pair(sx, sy) );
 }
 */
 
@@ -116,14 +115,14 @@ void clientStrtQueueReleaseSupercell(int sx, int sy)
 /*
 void clientStrtCopyQuedData(TERRAIN_DETAIL* td)
 {
-	if(td == NULL) return;
+	if(td == nullptr) return;
 
 	CellBuildingStatus::iterator it =  _statusMap.find(std::make_pair(td->scx,td->scy));
 	if(it == _statusMap.end()) return;
 
-	_applyCellStatus(td, it->second) ;
+	_applyCellStatus(td, it->second);
 
-	_statusMap.erase(it) ;
+	_statusMap.erase(it);
 }
 */
 
@@ -173,27 +172,27 @@ UINT32 clientStrtFilterFlags(WWII_SIDE side, UINT32 flags)
 	if (PlayerClient()->GetInstance().category() > 1 )
 	{
 		///TODO:INST: Really need to return instanced flags.
-		static const UINT32 instanceMask  = CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE | CP_STAT_MAKES_RDP ;
-		static const UINT32 instanceFlags = CP_STAT_OPEN | CP_STAT_IN_SUPPLY ;
-		return (flags & instanceMask) | instanceFlags ;
+		static const UINT32 instanceMask  = CP_STAT_HAS_NAVYBASE | CP_STAT_HAS_AIRBASE | CP_STAT_MAKES_RDP;
+		static const UINT32 instanceFlags = CP_STAT_OPEN | CP_STAT_IN_SUPPLY;
+		return (flags & instanceMask) | instanceFlags;
 	}
 
-	static const UINT32 sameSideOnlyMask = ENEMY_EXCLUSION_MASK ;
+	static const UINT32 sameSideOnlyMask = ENEMY_EXCLUSION_MASK;
 
 	WWII_SIDE playerSide = wwiiSide(PlayerClient()->PersonaSelected().m_countryID);
 
 	// Build a mask of flags that this player
 	// should not be able to see.
-	UINT32 exclusionMask = 0 ;
+	UINT32 exclusionMask = 0;
 
 	if ( side != playerSide )
-		exclusionMask |= sameSideOnlyMask ;
+		exclusionMask |= sameSideOnlyMask;
 	if ( playerSide != ALLIED )
-		exclusionMask |= CP_ALLIED_OBJECTIVES ;
+		exclusionMask |= CP_ALLIED_OBJECTIVES;
 	if ( playerSide != AXIS )
-		exclusionMask |= CP_AXIS_OBJECTIVES ;
+		exclusionMask |= CP_AXIS_OBJECTIVES;
 
 	// And the flags with the inverse of the mask
 	// so as to exclude the bits present in the mask.
-	return flags & (~exclusionMask) ;
+	return flags & (~exclusionMask);
 }

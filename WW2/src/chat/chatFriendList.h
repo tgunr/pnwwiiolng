@@ -8,14 +8,14 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-typedef std::vector<const char*> ARGV ;
+typedef std::vector<const char*> ARGV;
 
 // Fetch the friends list for a player in the background
-extern void chatFetchFriendsAndIgnoreList(class Player* player) ;
+void chatFetchFriendsAndIgnoreList(class Player* player);
 
 // List the friendslist of a player in the foreground
-extern void chatFriendsList(class Player& player) ;
+void chatFriendsList(class Player& player);
 
 // Modify a player's social list; add or remove the named players
-extern void chatModifySocialList(class Player& player, ARGV& args, bool ignore) ;
+void chatModifySocialList(class Player& player, ARGV& args, bool ignore);
 

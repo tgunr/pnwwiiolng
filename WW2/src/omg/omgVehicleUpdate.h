@@ -32,20 +32,20 @@ class Update
 		}
 
 	//! User implemented: somewhere to provide a reference to the Teul Callback for this object.
-	public: static TEUL_CALLBACK* Callback(void) ;
+	public: static TEUL_CALLBACK* Callback(void);
 
 	//! Last modified time of the structure or a member var group.
-	protected: TeulTimeMS m_lastModified ;
+	protected: TeulTimeMS m_lastModified;
 
 	//! Get milisecond timestamp of last modification.
 	//! @return Local teulClock64 timestamp of the last modification of a managed member of the structure.
-	public: const TeulTimeMS& lastModified() const { return m_lastModified ; }
+	public: const TeulTimeMS& lastModified() const { return m_lastModified; }
 
 	//! How many bits required to describe number of groups changed.
-	public: UINT32 groupsChangedBits() const { return 8 ; }
+	public: UINT32 groupsChangedBits() const { return 8; }
 
 	///! User implemented: Routine for serializing/deserializing this data.
-	public: bool packer(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack) ;
+	public: bool packer(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack);
 
 	// Members
 
@@ -65,40 +65,40 @@ class Update
 			{}
 		Data& operator = (const Data& rhs)
 		{
-			m_lastModified = rhs.m_lastModified ;
-			oneTimeBits.operator=(rhs.oneTimeBits) ;
-			clientFlags1.operator=(rhs.clientFlags1) ;
-			clientFlags2.operator=(rhs.clientFlags2) ;
-			fireMask.operator=(rhs.fireMask) ;
-			ridingVeh.operator=(rhs.ridingVeh) ;
-			ridingSeat.operator=(rhs.ridingSeat) ;
-			return *this ;
+			m_lastModified = rhs.m_lastModified;
+			oneTimeBits.operator=(rhs.oneTimeBits);
+			clientFlags1.operator=(rhs.clientFlags1);
+			clientFlags2.operator=(rhs.clientFlags2);
+			fireMask.operator=(rhs.fireMask);
+			ridingVeh.operator=(rhs.ridingVeh);
+			ridingSeat.operator=(rhs.ridingSeat);
+			return *this;
 		}
 		virtual void groupPacker(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)
 		{
-			UINT32 fieldNo = 0 ;
-			oneTimeBits.packer(mode, a, lastPack, changes, fieldNo++) ;
-			clientFlags1.packer(mode, a, lastPack, changes, fieldNo++) ;
-			clientFlags2.packer(mode, a, lastPack, changes, fieldNo++) ;
-			fireMask.packer(mode, a, lastPack, changes, fieldNo++) ;
-			ridingVeh.packer(mode, a, lastPack, changes, fieldNo++) ;
-			ridingSeat.packer(mode, a, lastPack, changes, fieldNo++) ;
+			UINT32 fieldNo = 0;
+			oneTimeBits.packer(mode, a, lastPack, changes, fieldNo++);
+			clientFlags1.packer(mode, a, lastPack, changes, fieldNo++);
+			clientFlags2.packer(mode, a, lastPack, changes, fieldNo++);
+			fireMask.packer(mode, a, lastPack, changes, fieldNo++);
+			ridingVeh.packer(mode, a, lastPack, changes, fieldNo++);
+			ridingSeat.packer(mode, a, lastPack, changes, fieldNo++);
 		}
 		//! Vehicle's OneTimeBits.
-		WWII::SyncVar<UINT16,0> oneTimeBits ;
+		WWII::SyncVar<UINT16,0> oneTimeBits;
 		//! Client's vis bits.
-		WWII::SyncVar<UINT32,0> clientFlags1 ;
+		WWII::SyncVar<UINT32,0> clientFlags1;
 		//! Client's animation bits.
-		WWII::SyncVar<UINT32,0> clientFlags2 ;
+		WWII::SyncVar<UINT32,0> clientFlags2;
 		//! Turret firing mask.
-		WWII::SyncVar<UINT8,0> fireMask ;
+		WWII::SyncVar<UINT8,0> fireMask;
 		//! Host index of vehicle being ridden.
-		WWII::SyncVar<UINT32,0> ridingVeh ;
+		WWII::SyncVar<UINT32,0> ridingVeh;
 		//! Client's index for seat.
-		WWII::SyncVar<UINT8,0> ridingSeat ;
-	} m_data ;
-	const Data& data() const { return m_data ; }
-	Data& data() { return m_data ; }
+		WWII::SyncVar<UINT8,0> ridingSeat;
+	} m_data;
+	const Data& data() const { return m_data; }
+	Data& data() { return m_data; }
 
 	//! @struct Model
 	//! @brief Position, orientation and speed of the vehicle.
@@ -125,80 +125,80 @@ class Update
 			{}
 		Model& operator = (const Model& rhs)
 		{
-			m_lastModified = rhs.m_lastModified ;
-			posX.operator=(rhs.posX) ;
-			posY.operator=(rhs.posY) ;
-			posZ.operator=(rhs.posZ) ;
-			attX.operator=(rhs.attX) ;
-			attY.operator=(rhs.attY) ;
-			attZ.operator=(rhs.attZ) ;
-			velX.operator=(rhs.velX) ;
-			velY.operator=(rhs.velY) ;
-			velZ.operator=(rhs.velZ) ;
-			accX.operator=(rhs.accX) ;
-			accY.operator=(rhs.accY) ;
-			accZ.operator=(rhs.accZ) ;
-			rotX.operator=(rhs.rotX) ;
-			rotY.operator=(rhs.rotY) ;
-			rotZ.operator=(rhs.rotZ) ;
-			return *this ;
+			m_lastModified = rhs.m_lastModified;
+			posX.operator=(rhs.posX);
+			posY.operator=(rhs.posY);
+			posZ.operator=(rhs.posZ);
+			attX.operator=(rhs.attX);
+			attY.operator=(rhs.attY);
+			attZ.operator=(rhs.attZ);
+			velX.operator=(rhs.velX);
+			velY.operator=(rhs.velY);
+			velZ.operator=(rhs.velZ);
+			accX.operator=(rhs.accX);
+			accY.operator=(rhs.accY);
+			accZ.operator=(rhs.accZ);
+			rotX.operator=(rhs.rotX);
+			rotY.operator=(rhs.rotY);
+			rotZ.operator=(rhs.rotZ);
+			return *this;
 		}
 		virtual void groupPacker(LOGICAL mode, ACTION_OBJECT* const a, const TeulTimeMS& lastPack, UINT32& changes)
 		{
-			UINT32 fieldNo = 0 ;
-			posX.packer(mode, a, lastPack, changes, fieldNo++) ;
-			posY.packer(mode, a, lastPack, changes, fieldNo++) ;
-			posZ.packer(mode, a, lastPack, changes, fieldNo++) ;
-			attX.packer(mode, a, lastPack, changes, fieldNo++) ;
-			attY.packer(mode, a, lastPack, changes, fieldNo++) ;
-			attZ.packer(mode, a, lastPack, changes, fieldNo++) ;
-			velX.packer(mode, a, lastPack, changes, fieldNo++) ;
-			velY.packer(mode, a, lastPack, changes, fieldNo++) ;
-			velZ.packer(mode, a, lastPack, changes, fieldNo++) ;
-			accX.packer(mode, a, lastPack, changes, fieldNo++) ;
-			accY.packer(mode, a, lastPack, changes, fieldNo++) ;
-			accZ.packer(mode, a, lastPack, changes, fieldNo++) ;
-			rotX.packer(mode, a, lastPack, changes, fieldNo++) ;
-			rotY.packer(mode, a, lastPack, changes, fieldNo++) ;
-			rotZ.packer(mode, a, lastPack, changes, fieldNo++) ;
+			UINT32 fieldNo = 0;
+			posX.packer(mode, a, lastPack, changes, fieldNo++);
+			posY.packer(mode, a, lastPack, changes, fieldNo++);
+			posZ.packer(mode, a, lastPack, changes, fieldNo++);
+			attX.packer(mode, a, lastPack, changes, fieldNo++);
+			attY.packer(mode, a, lastPack, changes, fieldNo++);
+			attZ.packer(mode, a, lastPack, changes, fieldNo++);
+			velX.packer(mode, a, lastPack, changes, fieldNo++);
+			velY.packer(mode, a, lastPack, changes, fieldNo++);
+			velZ.packer(mode, a, lastPack, changes, fieldNo++);
+			accX.packer(mode, a, lastPack, changes, fieldNo++);
+			accY.packer(mode, a, lastPack, changes, fieldNo++);
+			accZ.packer(mode, a, lastPack, changes, fieldNo++);
+			rotX.packer(mode, a, lastPack, changes, fieldNo++);
+			rotY.packer(mode, a, lastPack, changes, fieldNo++);
+			rotZ.packer(mode, a, lastPack, changes, fieldNo++);
 		}
 		//! X position.
-		WWII::SyncVar<SINT32,0> posX ;
+		WWII::SyncVar<SINT32,0> posX;
 		//! Y position.
-		WWII::SyncVar<SINT32,0> posY ;
+		WWII::SyncVar<SINT32,0> posY;
 		//! Z position.
-		WWII::SyncVar<SINT32,0> posZ ;
+		WWII::SyncVar<SINT32,0> posZ;
 		//! X attitude.
-		WWII::SyncVar<SINT32,0> attX ;
+		WWII::SyncVar<SINT32,0> attX;
 		//! Y attitude.
-		WWII::SyncVar<SINT32,0> attY ;
+		WWII::SyncVar<SINT32,0> attY;
 		//! Z attitude.
-		WWII::SyncVar<SINT32,0> attZ ;
+		WWII::SyncVar<SINT32,0> attZ;
 		//! X velocity.
-		WWII::SyncVar<SINT32,0> velX ;
+		WWII::SyncVar<SINT32,0> velX;
 		//! Y velocity.
-		WWII::SyncVar<SINT32,0> velY ;
+		WWII::SyncVar<SINT32,0> velY;
 		//! Z velocity.
-		WWII::SyncVar<SINT32,0> velZ ;
+		WWII::SyncVar<SINT32,0> velZ;
 		//! X acceleration.
-		WWII::SyncVar<SINT32,0> accX ;
+		WWII::SyncVar<SINT32,0> accX;
 		//! Y acceleration.
-		WWII::SyncVar<SINT32,0> accY ;
+		WWII::SyncVar<SINT32,0> accY;
 		//! Z acceleration.
-		WWII::SyncVar<SINT32,0> accZ ;
+		WWII::SyncVar<SINT32,0> accZ;
 		//! Rotational X (formerly attvel).
-		WWII::SyncVar<SINT32,0> rotX ;
+		WWII::SyncVar<SINT32,0> rotX;
 		//! Rotational Y (formerly attvel).
-		WWII::SyncVar<SINT32,0> rotY ;
+		WWII::SyncVar<SINT32,0> rotY;
 		//! Rotational Z (formerly attvel).
-		WWII::SyncVar<SINT32,0> rotZ ;
-	} m_model ;
-	const Model& model() const { return m_model ; }
-	Model& model() { return m_model ; }
+		WWII::SyncVar<SINT32,0> rotZ;
+	} m_model;
+	const Model& model() const { return m_model; }
+	Model& model() { return m_model; }
 
 	//! Host's index for this vehicle.
-	UINT32 hostIndex ;
-} ; // class Update
+	UINT32 hostIndex;
+}; // class Update
 
 } // namespace Vehicle
 

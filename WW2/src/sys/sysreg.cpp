@@ -19,7 +19,7 @@ HKEY	hkey;
 		return(FALSE);
 	}
 
-	if (ERROR_SUCCESS != RegQueryValueEx(hkey, keyname, NULL, &keytype, (BYTE*)keyvalue, &keysize))
+	if (ERROR_SUCCESS != RegQueryValueEx(hkey, keyname, nullptr, &keytype, (BYTE*)keyvalue, &keysize))
 	{
 		RegCloseKey(hkey);
 
@@ -46,7 +46,7 @@ HKEY	hkey;
 		return(FALSE);
 	}
 
-	if (ERROR_SUCCESS != RegQueryValueEx(hkey, keyname, NULL, &keytype, (BYTE*)&keyvalue, &keysize))
+	if (ERROR_SUCCESS != RegQueryValueEx(hkey, keyname, nullptr, &keytype, (BYTE*)&keyvalue, &keysize))
 	{
 		RegCloseKey(hkey);
 
@@ -67,7 +67,7 @@ DWORD	disp;
 HKEY	hkey;
 
 	if (ERROR_SUCCESS != RegCreateKeyEx(HKEY_CURRENT_USER, (const TCHAR*)keyloc, 0, _T(""),
-			REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hkey, &disp))
+			REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, nullptr, &hkey, &disp))
 	{
 		return(FALSE);
 	}
@@ -91,7 +91,7 @@ DWORD	disp;
 HKEY	hkey;
 
 	if (ERROR_SUCCESS != RegCreateKeyEx(HKEY_CURRENT_USER, (const TCHAR*)keyloc, 0, _T(""),
-			REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, NULL, &hkey, &disp))
+			REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS, nullptr, &hkey, &disp))
 	{
 		return(FALSE);
 	}
@@ -121,7 +121,7 @@ HKEY	hkey;
 		return(FALSE);
 	}
 
-	if (ERROR_SUCCESS != RegQueryValueEx(hkey, keyname, NULL, &keytype, (BYTE*)&keyvalue, &keysize))
+	if (ERROR_SUCCESS != RegQueryValueEx(hkey, keyname, nullptr, &keytype, (BYTE*)&keyvalue, &keysize))
 	{
 		RegCloseKey(hkey);
 
@@ -148,7 +148,7 @@ HKEY	hkey;
 		return(FALSE);
 	}
 
-	if (ERROR_SUCCESS != RegQueryValueEx(hkey, keyname, NULL, &keytype, (BYTE*)keyvalue, &keysize))
+	if (ERROR_SUCCESS != RegQueryValueEx(hkey, keyname, nullptr, &keytype, (BYTE*)keyvalue, &keysize))
 	{
 		RegCloseKey(hkey);
 
@@ -167,15 +167,15 @@ HKEY	hkey;
 const TCHAR* sysregGetInstallValue(const TCHAR* Key)
 {
 #ifdef BETA_RELEASE
-    int appid = Auth::Apps::BETA_APP_ID ;
+    int appid = Auth::Apps::BETA_APP_ID;
 #elif PN_WW2_BUILD_NO != 255
-    int appid = Auth::Apps::BETA_APP_ID ;
+    int appid = Auth::Apps::BETA_APP_ID;
 #else
-    int appid = Auth::Apps::LIVE_APP_ID ;
+    int appid = Auth::Apps::LIVE_APP_ID;
 #endif
 
-	static TCHAR value[256+1] ;
-	value[0] = 0 ;
+	static TCHAR value[256+1];
+	value[0] = 0;
 
 	TCHAR path[256+1];
 
@@ -186,5 +186,5 @@ const TCHAR* sysregGetInstallValue(const TCHAR* Key)
 		return value;
 
 	// return it
-	return NULL;
+	return nullptr;
 }

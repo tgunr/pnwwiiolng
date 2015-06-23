@@ -9,7 +9,9 @@
 // Supporting Programmer:  Shane "Elmo" Wickson
 
 #include <sys/stat.h>
+#include <set>
 
+#include "mem/mem.h"
 #include "sdm/sdmParse.h"
 #include "fio/fio.h"
 #if defined(LIMITED_FIO) && LIMITED_FIO != 0
@@ -32,30 +34,31 @@ typedef struct
 #include "trn/trntypes.h"
 
 // Translate CP/Facility names.
-typedef std::map<const std::string,const std::string> TRANSLATIONS ;
-static TRANSLATIONS s_translations ;
+typedef std::map<const std::string,const std::string> TRANSLATIONS;
+static TRANSLATIONS s_translations;
 
 // Errors translating CPs/Facilities
-typedef std::set<std::string> TRANSLATION_FAILS ;
-static TRANSLATION_FAILS* s_cpTranslationFails, *s_facilityTranslationFails ;
-static bool s_translationsRequired = false ;
-static const char* s_translationLanguage = "en" ;
+typedef std::set<std::string> TRANSLATION_FAILS;
+static TRANSLATION_FAILS* s_cpTranslationFails, *s_facilityTranslationFails;
+static bool s_translationsRequired = false;
+static const char* s_translationLanguage = "en";
 
 #define _TFSIZE 4*sizeof(UINT16) + 2*sizeof(UINT32)
 //#undef CANTPACKSTRUCT
 static STRT_DTL_HEADER header;
-static CP*				cpList = NULL;
-static FACILITY*		facilityList = NULL;
-static BUILDING*		buildingList = NULL;
-static DEPOT_LINK*		linkList = NULL;
-static WAYPOINT*		waypointList = NULL;
+static void*			currentData = nullptr;
+static CP*				cpList = nullptr;
+static FACILITY*		facilityList = nullptr;
+static BUILDING*		buildingList = nullptr;
+static DEPOT_LINK*		linkList = nullptr;
+static WAYPOINT*		waypointList = nullptr;
 static UINT32 maxId = 0;
 static UINT16 currentCP = 0, currentFacility  = 0, currentBuilding = 0, currentLink = 0, currentWaypoint = 0;
 
 const STRT_DTL_HEADER&
 sdmGetDtlHeader()
 {
-	return header ;
+	return header;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -66,29 +69,29 @@ _getTranslationFile()
 {
 	const char* envValue = cv_stratLanguage.GetString();
 
-	static char translationFileName[128] ;
-	if ( envValue == NULL || strcmp(envValue, "en") == 0 )
+	static char translationFileName[128];
+	if ( envValue == nullptr || strcmp(envValue, "en") == 0 )
 	{
-		s_translationsRequired = false ;
-		envValue = "en" ;
+		s_translationsRequired = false;
+		envValue = "en";
 	}
 	else
 	{
-		s_translationsRequired = true ;
-		s_translationLanguage = envValue ;
+		s_translationsRequired = true;
+		s_translationLanguage = envValue;
 	}
 
-	snprintf(translationFileName, 128, "data/strat-trans.%s.txt", envValue) ;
-	fprintf(stderr, "- Using STRAT_LANGUAGE: '%s', translation file: %s\n", s_translationLanguage, translationFileName) ;
+	snprintf(translationFileName, 128, "data/strat-trans.%s.txt", envValue);
+	fprintf(stderr, "- Using STRAT_LANGUAGE: '%s', translation file: %s\n", s_translationLanguage, translationFileName);
 
-	struct stat buf ;
+	struct stat buf;
 	if ( s_translationsRequired && stat(translationFileName, &buf) != 0 )
 	{
-		fprintf(stderr, "*** strat translation file [%s] does not exist/read error\n", translationFileName) ;
-		LogAbort("strat translation file [%s] does not exist/read error", translationFileName) ;
+		fprintf(stderr, "*** strat translation file [%s] does not exist/read error\n", translationFileName);
+		LogAbort("strat translation file [%s] does not exist/read error", translationFileName);
 	}
 
-	return translationFileName ;
+	return translationFileName;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -98,61 +101,61 @@ static void
 sdmLoadTranslationList()
 {
 	if ( s_translations.empty() == false )
-		return ;
+		return;
 
-	static const char* fromFile = _getTranslationFile() ;
-	if ( fromFile == NULL )
-		return ;
+	static const char* fromFile = _getTranslationFile();
+	if ( fromFile == nullptr )
+		return;
 
-	FILE* fp = fopen(fromFile, "rb") ;
-	if ( fp == NULL )
+	FILE* fp = fopen(fromFile, "rb");
+	if ( fp == nullptr )
 	{
 		if ( s_translationsRequired )
-			LogAbort("Unable to open translation file: %s", fromFile) ;
-		return ;
+			LogAbort("Unable to open translation file: %s", fromFile);
+		return;
 	}
 
-	static const UINT32 maxLen = 500 ;
-	char readBuf[maxLen + 4 ] ;
+	static const UINT32 maxLen = 500;
+	char readBuf[maxLen + 4 ];
 
 	while ( fgets(readBuf, maxLen, fp) )
 	{
-		char* key = readBuf ;
+		char* key = readBuf;
 		while ( *key == ' ' || *key == '\t' )
-			++key ;
+			++key;
 		if ( !*key || *key == '\r' || *key == '\n' )
-			continue ;
+			continue;
 
-		char* translation = strchr(key, ',') ;
-		if ( translation == NULL )
-			continue ;
-		*(translation++) = 0 ;
+		char* translation = strchr(key, ',');
+		if ( translation == nullptr )
+			continue;
+		*(translation++) = 0;
 
 		// Chomp the trailing whitespace.
-		char* p = translation ;
+		char* p = translation;
 		while ( *p && *p != '\r' && *p != '\n' )
-			++p ;
-		*p = 0 ;
+			++p;
+		*p = 0;
 
-		std::string keyStr(key) ;
+		std::string keyStr(key);
 
 		if ( s_translations.find(keyStr) != s_translations.end() )
 		{
 			fprintf(stderr, "Duplicate translation for %s: %s vs %s\n"
 							, key
 							, s_translations[keyStr].c_str()
-							, translation) ;
+							, translation);
 			dbugLog(_FLW, "Duplicate translation for %s: %s vs %s"
 							, key
 							, s_translations[keyStr].c_str()
-							, translation) ;
-			continue ;
+							, translation);
+			continue;
 		}
 
-		s_translations.insert(std::make_pair(keyStr, translation)) ;
+		s_translations.insert(std::make_pair(keyStr, translation));
 	}
 
-	fclose(fp) ;
+	fclose(fp);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -167,52 +170,53 @@ static bool
 _applyTranslationsToName(char* name, TRANSLATION_FAILS* fails, bool basicOnly)
 {
 	// Translate all names down to ASCII-7.
-	size_t nameLen ;
-	for ( nameLen = 0 ; name[nameLen] != 0 ; ++nameLen )
+	size_t nameLen;
+	for ( nameLen = 0; name[nameLen] != 0; ++nameLen )
 	{
 		if ( (unsigned char)name[nameLen] & 0x80 )
 		{
 			switch ( (unsigned char) name[nameLen] )
 			{
-			case 0xC8: case 0xC9: case 0xCA: case 0xCB: name[nameLen] = 'E' ;
-			break ;
-			case 0xD2: case 0xD3: case 0xD4: case 0xD5: case 0xD6: name[nameLen] = 'O' ;
-			break ;
-			case 0xE0: case 0xE1: case 0xE2: case 0xE3: case 0xE4: case 0xE5: case 0xE6: name[nameLen] = 'a' ;
-			break ;
-			case 0xE8: case 0xE9: case 0xEA: case 0xEB: name[nameLen] = 'e' ;
-			break ;
-			case 0xF2: case 0xF3: case 0xF4: case 0xF5: case 0xF6: case 0xF7: case 0xF8: name[nameLen] = 'o' ;
-			break ;
-			case 0xF9: case 0xFA: case 0xFB: case 0xFC: name[nameLen] = 'u' ;
-			break ;
+			case 0xC8: case 0xC9: case 0xCA: case 0xCB: name[nameLen] = 'E';
+			break;
+			case 0xD2: case 0xD3: case 0xD4: case 0xD5: case 0xD6: name[nameLen] = 'O';
+			break;
+			case 0xE0: case 0xE1: case 0xE2: case 0xE3: case 0xE4: case 0xE5: case 0xE6: name[nameLen] = 'a';
+			break;
+			case 0xE8: case 0xE9: case 0xEA: case 0xEB: name[nameLen] = 'e';
+			break;
+			case 0xF2: case 0xF3: case 0xF4: case 0xF5: case 0xF6: case 0xF7: case 0xF8: name[nameLen] = 'o';
+			break;
+			case 0xF9: case 0xFA: case 0xFB: case 0xFC: name[nameLen] = 'u';
+			break;
 			default:
-				LogAbort("Invalid character in strat name [%c (%u)] %s", name[nameLen], (UINT32)((UCHAR)name[nameLen]), name) ;
+				LogAbort("Invalid character in strat name [%c (%u)] %s", name[nameLen], (UINT32)((UCHAR)name[nameLen]), name);
 			}
 		}
 	}
 
 	// Chomp trailing whitespaces.
-	while ( nameLen > 0 && isspace(name[nameLen - 1]) )
-		name[--nameLen] = 0 ;
+	while (nameLen > 0 && isspace(name[nameLen - 1]))
+		--nameLen;
+	name[nameLen] = 0;
 
 	// Return true if the translations table is empty.
 	if ( basicOnly == true || s_translations.empty() )
-		return true ;
+		return true;
 
 	// Lookup the ASCII-7 name in the translations table.
-	TRANSLATIONS::iterator it = s_translations.find(name) ;
+	TRANSLATIONS::iterator it = s_translations.find(name);
 	if ( it == s_translations.end() )
 	{
 		if ( fails )
-			fails->insert(name) ;
+			fails->insert(name);
 		// No match, untranslated.
-		return false ;
+		return false;
 	}
 
 	// Replace the name with the translation.
-	strcpy(name, it->second.c_str()) ;
-	return true ;
+	strcpy(name, it->second.c_str());
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -223,20 +227,20 @@ static bool
 _reportTranslationFails(const char* listType, TRANSLATION_FAILS& fails)
 {
 	if ( fails.empty() )
-		return false ;
+		return false;
 
-	TRANSLATION_FAILS::iterator it = fails.begin() ;
-	fprintf(stderr, "\n########################################\n## %s missing %s translations:\n%s", listType, s_translationLanguage, (*it).c_str()) ;
-	dbugLog(_FLA, "%s missing translations:", listType) ;
-	dbugLog(_FLA, "%s", (*it).c_str()) ;
+	TRANSLATION_FAILS::iterator it = fails.begin();
+	fprintf(stderr, "\n########################################\n## %s missing %s translations:\n%s", listType, s_translationLanguage, (*it).c_str());
+	dbugLog(_FLA, "%s missing translations:", listType);
+	dbugLog(_FLA, "%s", (*it).c_str());
 	while ( (++it) != fails.end() )
 	{
-		fprintf(stderr, ", %s", (*it).c_str()) ;
-		dbugLog(_FLAB, ", %s", (*it).c_str()) ;
+		fprintf(stderr, ", %s", (*it).c_str());
+		dbugLog(_FLAB, ", %s", (*it).c_str());
 	}
-	fprintf(stderr, "\n\n") ;
+	fprintf(stderr, "\n\n");
 
-	return true ;
+	return true;
 }
 
 static SINT32 _getTerrainFileLength(SINT32 fp );
@@ -244,20 +248,20 @@ SINT32 sdmOpenFile(const SCHAR* path, UINT16 /* mode */)
 {
 	maxId = 0;
 
-	if ( path == NULL || *path == '\0' )
+	if ( PN_UNLIKELY(path == nullptr || *path == '\0') )
 		return SDMFILE_READ_ERR;
 
-	sdmLoadTranslationList() ;
+	sdmLoadTranslationList();
 
 	int fd = fiodOpen(path);
-	if (fd <= -1)
+	if ( PN_UNLIKELY(fd <= -1) )
 		return SDMFILE_READ_ERR;
 
 	//get the starting position of cpf data
 	SINT32 sdmLength = _getTerrainFileLength(fd);
 	fiodSeek(fd, sdmLength + (SINT32)sizeof(TERRAINFILE), fioSEEK_SET);
 
-	if ( fiodRead(fd,&header,sizeof(STRT_DTL_HEADER)) != (int)sizeof(STRT_DTL_HEADER) )
+	if ( PN_UNLIKELY(fiodRead(fd,&header,sizeof(STRT_DTL_HEADER)) != (int)sizeof(STRT_DTL_HEADER)) )
 	{
 		fioClose(fd);
 		return SDMFILE_READ_ERR;
@@ -277,31 +281,48 @@ SINT32 sdmOpenFile(const SCHAR* path, UINT16 /* mode */)
 
 	if ( s_translationsRequired == true )
 	{
-		if ( s_cpTranslationFails == NULL )
-			s_cpTranslationFails = new TRANSLATION_FAILS ;
-		if ( s_facilityTranslationFails == NULL )
-			s_facilityTranslationFails = new TRANSLATION_FAILS ;
+		if ( PN_UNLIKELY(s_cpTranslationFails == nullptr) )
+			s_cpTranslationFails = new TRANSLATION_FAILS;
+		if ( PN_UNLIKELY(s_facilityTranslationFails == nullptr) )
+			s_facilityTranslationFails = new TRANSLATION_FAILS;
+	}
+
+	const size_t cpSize = header.numCPs * sizeof(CP);
+	const size_t facilitySize = header.numFacilities * sizeof(FACILITY);
+	const size_t buildingSize = header.numBuildings * sizeof(BUILDING);
+	const size_t depotSize = header.numLinks * sizeof(DEPOT_LINK);
+	const size_t waypointSize = header.numWaypoints * sizeof(WAYPOINT);
+	const size_t dataSize = cpSize + facilitySize + buildingSize + depotSize + waypointSize;
+	if ( PN_UNLIKELY(dataSize == 0) )
+	{
+		fioClose(fd);
+		return 0;
+	}
+	void* data = currentData = memAlloc(dataSize);
+
+	size_t dataRead = fioRead(fd, data, dataSize);
+	fioClose(fd);
+	if (dataRead != dataSize)
+	{
+		sdmCloseFile();
+		return SDMFILE_READ_ERR;
 	}
 
 	if (header.numCPs)
 	{
-		const size_t dataSize = header.numCPs * sizeof(CP) ;
-		cpList = (CP*)memAlloc(dataSize);
-		if ( dataSize != fioRead(fd, cpList, dataSize) )
-		{
-			fioClose(fd);
-			return SDMFILE_READ_ERR;
-		}
+		cpList = static_cast<CP*>(data);
+		data = cpList + header.numCPs;
 
 		for(SINT32 _CPindex=0; _CPindex < header.numCPs; ++_CPindex)
 		{
-			CP& cp = cpList[_CPindex] ;
+			CP& cp = cpList[_CPindex];
 
-			///OGS:06/22/07: Allow code to supercede SDM files as to
+			///OGS:06/22/07: Allow code to supersede SDM files as to
 			///which side a country indicates.
-			cp.side = wwiiSide(static_cast<WWII_COUNTRY>(cp.country)) ;
+			cp.country = wwiiAdjustedCountry(cp.country);
+			cp.side = wwiiSide(static_cast<WWII_COUNTRY>(cp.country));
 
-			_applyTranslationsToName(cp.name, s_cpTranslationFails, /*basicOnly=*/false) ;
+			_applyTranslationsToName(cp.name, s_cpTranslationFails, /*basicOnly=*/false);
 
 			maxId = (maxId >= cp.oid.id) ? maxId : cp.oid.id;
 		}
@@ -309,23 +330,19 @@ SINT32 sdmOpenFile(const SCHAR* path, UINT16 /* mode */)
 
 	if (header.numFacilities)
 	{
-		const size_t dataSize = header.numFacilities * sizeof(FACILITY);
-		facilityList = (FACILITY*)memAlloc(dataSize);
-		if ( dataSize != fioRead(fd, facilityList, dataSize) )
-		{
-			fioClose(fd);
-			return SDMFILE_READ_ERR;
-		}
+		facilityList = static_cast<FACILITY*>(data);
+		data = facilityList + header.numFacilities;
 
-		for(SINT32 _FACindex = 0; _FACindex < header.numFacilities ; ++_FACindex)
+		for(SINT32 _FACindex = 0; _FACindex < header.numFacilities; ++_FACindex)
 		{
-			FACILITY& fac = facilityList[_FACindex] ;
+			FACILITY& fac = facilityList[_FACindex];
 
-			///OGS:06/22/07: Allow code to supercede SDM files as to
+			///OGS:06/22/07: Allow code to supersede SDM files as to
 			///which side a country indicates.
-			fac.originalSide = wwiiSide(static_cast<WWII_COUNTRY>(fac.originalCountry)) ;
+			fac.originalCountry = wwiiAdjustedCountry(fac.originalCountry);
+			fac.originalSide = wwiiSide(static_cast<WWII_COUNTRY>(fac.originalCountry));
 
-			_applyTranslationsToName(fac.name, s_facilityTranslationFails, /*basicOnly=*/false) ;
+			_applyTranslationsToName(fac.name, s_facilityTranslationFails, /*basicOnly=*/false);
 
 			maxId = (maxId >= fac.oid.id) ? maxId : fac.oid.id;
 		}
@@ -333,19 +350,14 @@ SINT32 sdmOpenFile(const SCHAR* path, UINT16 /* mode */)
 
 	if (header.numBuildings)
 	{
-		const size_t dataSize = header.numBuildings * sizeof(BUILDING);
-		buildingList = (BUILDING*)memAlloc(dataSize);
-		if ( dataSize != fioRead(fd, buildingList, dataSize) )
-		{
-			fioClose(fd);
-			return SDMFILE_READ_ERR;
-		}
+		buildingList = static_cast<BUILDING*>(data);
+		data = buildingList + header.numBuildings;
 
 		for(SINT32 _BUILDindex=0; _BUILDindex < header.numBuildings; ++_BUILDindex)
 		{
-			BUILDING& building = buildingList[_BUILDindex] ;
+			BUILDING& building = buildingList[_BUILDindex];
 
-			_applyTranslationsToName(building.name, NULL, /*basicOnly=*/true) ;
+			_applyTranslationsToName(building.name, nullptr, /*basicOnly=*/true);
 
 			maxId = (maxId >= building.oid.id) ? maxId : building.oid.id;
 		}
@@ -353,19 +365,14 @@ SINT32 sdmOpenFile(const SCHAR* path, UINT16 /* mode */)
 
 	if (header.numLinks)
 	{
-		const size_t dataSize = header.numLinks * sizeof(DEPOT_LINK);
-		linkList = (DEPOT_LINK*)memAlloc(dataSize);
-		if ( dataSize != fioRead(fd, linkList, dataSize) )
-		{
-			fioClose(fd);
-			return SDMFILE_READ_ERR;
-		}
+		linkList = static_cast<DEPOT_LINK*>(data);
+		data = linkList + header.numLinks;
 
 		for(SINT32 _DEPOTindex=0; _DEPOTindex < header.numLinks; ++_DEPOTindex)
 		{
-			DEPOT_LINK& link = linkList[_DEPOTindex] ;
+			DEPOT_LINK& link = linkList[_DEPOTindex];
 
-			_applyTranslationsToName(link.name, NULL, /*basicOnly=*/true) ;
+			_applyTranslationsToName(link.name, nullptr, /*basicOnly=*/true);
 
 			maxId = (maxId >= link.oid.id) ? maxId : link.oid.id;
 		}
@@ -373,24 +380,17 @@ SINT32 sdmOpenFile(const SCHAR* path, UINT16 /* mode */)
 
 	if (header.numWaypoints)
 	{
-		const size_t dataSize = header.numWaypoints * sizeof(WAYPOINT);
-		waypointList = (WAYPOINT*)memAlloc(dataSize);
-		if ( dataSize != fioRead(fd, waypointList, dataSize) )
-		{
-			fioClose(fd);
-			return SDMFILE_READ_ERR;
-		}
+		waypointList = static_cast<WAYPOINT*>(data);
+		data = waypointList + header.numWaypoints;
 
 		for(SINT32 _WAYPOINTindex=0; _WAYPOINTindex < header.numWaypoints; ++_WAYPOINTindex)
 		{
-			WAYPOINT& waypoint = waypointList[_WAYPOINTindex] ;
+			WAYPOINT& waypoint = waypointList[_WAYPOINTindex];
 
 			maxId = (maxId >= waypoint.oid.id) ? maxId : waypoint.oid.id;
 		}
 
 	}
-
-	fioClose(fd);
 
 	return 0;
 }
@@ -403,34 +403,16 @@ SINT32 sdmCloseFile(void)
 	header.numLinks = currentLink = 0;
 	header.numWaypoints = currentWaypoint = 0;
 
-	if (cpList)
-	{
-		memFree(cpList);
-		cpList = NULL;
-	}
+	cpList = nullptr;
+	facilityList = nullptr;
+	buildingList = nullptr;
+	linkList = nullptr;
+	waypointList = nullptr;
 
-	if (facilityList)
+	if (currentData)
 	{
-		memFree(facilityList);
-		facilityList = NULL;
-	}
-
-	if (buildingList)
-	{
-		memFree(buildingList);
-		buildingList = NULL;
-	}
-
-	if (linkList)
-	{
-		memFree(linkList);
-		linkList = NULL;
-	}
-
-	if (waypointList)
-	{
-		memFree(waypointList);
-		waypointList = NULL;
+		memFree(currentData);
+		currentData = nullptr;
 	}
 
 	return 0;
@@ -442,27 +424,27 @@ SINT32 sdmCloseFile(void)
 void
 sdmFinish()
 {
-	bool failed = false ;
+	bool failed = false;
 
 	if ( s_cpTranslationFails )
 	{
 		if ( _reportTranslationFails("CPs", *s_cpTranslationFails) )
-			failed = true ;
-		delete s_cpTranslationFails ;
-		s_cpTranslationFails = NULL ;
+			failed = true;
+		delete s_cpTranslationFails;
+		s_cpTranslationFails = nullptr;
 	}
 
 	if ( s_facilityTranslationFails )
 	{
 		if ( _reportTranslationFails("Facilities", *s_facilityTranslationFails) )
-			failed = true ;
-		delete s_facilityTranslationFails  ;
-		s_facilityTranslationFails = NULL ;
+			failed = true;
+		delete s_facilityTranslationFails;
+		s_facilityTranslationFails = nullptr;
 	}
 
 	if ( failed )
 	{
-		LogAbort("Aborting due to errors") ;
+		LogAbort("Aborting due to errors");
 	}
 }
 
@@ -473,8 +455,8 @@ UINT16 sdmGetNumCP(void)
 
 CP* sdmGetNextCP(void)
 {
-	if (cpList == NULL || currentCP >= header.numCPs)
-		return NULL;
+	if (cpList == nullptr || currentCP >= header.numCPs)
+		return nullptr;
 	return &cpList[currentCP++];
 }
 
@@ -485,8 +467,8 @@ UINT16 sdmGetNumFACILITY(void)
 
 FACILITY* sdmGetNextFACILITY(void)
 {
-	if (facilityList == NULL || currentFacility >= header.numFacilities)
-		return NULL;
+	if (facilityList == nullptr || currentFacility >= header.numFacilities)
+		return nullptr;
 	return &facilityList[currentFacility++];
 }
 
@@ -502,9 +484,9 @@ UINT16 sdmGetNumBUILDING(void)
 
 BUILDING* sdmGetNextBUILDING(void)
 {
-	if (buildingList == NULL || currentBuilding >= header.numBuildings)
-		return NULL;
-	return &buildingList[currentBuilding++];
+	if (PN_LIKELY(buildingList != nullptr && currentBuilding < header.numBuildings))
+		return &buildingList[currentBuilding++];
+	return nullptr;
 }
 
 BUILDING* sdmGetBUILDINGArray(void)
@@ -519,8 +501,8 @@ UINT16 sdmGetNumDEPOT_LINK(void)
 
 DEPOT_LINK* sdmGetNextDEPOT_LINK(void)
 {
-	if (linkList == NULL || currentLink >= header.numLinks)
-		return NULL;
+	if (linkList == nullptr || currentLink >= header.numLinks)
+		return nullptr;
 	return &linkList[currentLink++];
 }
 
@@ -531,8 +513,8 @@ UINT16 sdmGetNumWAYPOINT(void)
 
 WAYPOINT* sdmGetNextWAYPOINT(void)
 {
-	if (waypointList == NULL || currentWaypoint >= header.numWaypoints)
-		return NULL;
+	if (waypointList == nullptr || currentWaypoint >= header.numWaypoints)
+		return nullptr;
 	return &waypointList[currentWaypoint++];
 }
 
@@ -558,7 +540,7 @@ SINT32 _getTerrainFileLength(SINT32  fp)
 const std::string&
 sdmTranslateName(const std::string& from)
 {
-	TRANSLATIONS::iterator it = s_translations.find(from) ;
-	return ( it == s_translations.end() ) ? from : it->second ;
+	TRANSLATIONS::iterator it = s_translations.find(from);
+	return ( it == s_translations.end() ) ? from : it->second;
 }
 

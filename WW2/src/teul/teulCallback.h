@@ -11,14 +11,14 @@
 
 namespace Teul
 {
-	struct CallbackInit ;
+	struct CallbackInit;
 
-	enum { RestrictedCallbackRange_X = 15 } ;
+	enum { RestrictedCallbackRange_X = 15 };
 }
 
-extern void teulFreeAllCallbacks(void);
+void teulFreeAllCallbacks(void);
 
-extern TEUL_CALLBACK*	teulAllocSystemCallback(Teul::CallbackInit* ci );
+TEUL_CALLBACK* teulAllocSystemCallback(Teul::CallbackInit* ci );
 
 //!	@brief Creates and installs a callback object into the matrix at location X,Y.
-extern struct TEUL_CALLBACK* teulAllocCallback(struct Teul::CallbackInit* const ci);
+TEUL_CALLBACK* teulAllocCallback(struct Teul::CallbackInit* const ci);

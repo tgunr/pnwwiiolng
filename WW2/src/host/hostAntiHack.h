@@ -16,7 +16,7 @@ public:
 		{}
 
 public:
-	TeulDeltaMS		m_lastSpeedhackDelta ;
-	UINT32			m_lastSpeedhackBlip ;
-	UINT32			m_numBlips ;
-} ;
+	TeulDeltaMS		m_lastSpeedhackDelta;
+	UINT32			m_lastSpeedhackBlip;
+	UINT32			m_numBlips;
+};

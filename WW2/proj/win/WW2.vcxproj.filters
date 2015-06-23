@@ -188,6 +188,18 @@
     <Filter Include="ez">
       <UniqueIdentifier>{b7c6d220-78bc-49b4-b25a-3bbd0a2b919a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="omg">
+      <UniqueIdentifier>{924ef35e-ec8e-4a1c-98a3-63a090201b44}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="omg\.OMG Files">
+      <UniqueIdentifier>{7e0fd77b-6ef4-4915-bf41-461e8753d630}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="omg\Generated Headers">
+      <UniqueIdentifier>{36e73825-89d4-4cbb-a34c-b19fae5fc7f8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="omg\Generated Source">
+      <UniqueIdentifier>{828d491a-a561-466c-b3c3-f0306ba21c09}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\cfg\cfgCodes.h">
@@ -1626,6 +1638,15 @@
     <ClInclude Include="..\..\src\math\SuperFastHash.h">
       <Filter>math</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\src\omg\omgMissionSortieData.hxx">
+      <Filter>omg\Generated Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\include\io_mapped_file.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\omg\omgChat.hxx">
+      <Filter>omg\Generated Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\src\cfg\cfgData.cpp">
@@ -1661,9 +1682,6 @@
     <ClCompile Include="..\..\src\chat\chatMissionMember.cpp">
       <Filter>chat</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\chat\chatMissionStatusPacker.cpp">
-      <Filter>chat</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\src\chat\chatMotds.cpp">
       <Filter>chat</Filter>
     </ClCompile>
@@ -1683,9 +1701,6 @@
       <Filter>client</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\client\clientBrigadeControl.cpp">
-      <Filter>client</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\src\client\clientConnection.cpp">
       <Filter>client</Filter>
     </ClCompile>
     <ClCompile Include="..\..\src\client\clientGlobals.cpp">
@@ -2672,6 +2687,12 @@
     <ClCompile Include="..\..\src\math\SuperFastHash.cpp">
       <Filter>math</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\src\omg\omgMissionSortieData.cxx">
+      <Filter>omg\Generated Source</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\omg\omgChat.cxx">
+      <Filter>omg\Generated Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\cursor.cur">
@@ -2686,5 +2707,13 @@
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="WW2.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <OMGGen Include="..\..\src\omg\omgMissionSortieData.omg">
+      <Filter>omg\.OMG Files</Filter>
+    </OMGGen>
+    <OMGGen Include="..\..\src\omg\omgChat.omg">
+      <Filter>omg\.OMG Files</Filter>
+    </OMGGen>
   </ItemGroup>
 </Project>

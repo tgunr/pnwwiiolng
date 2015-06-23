@@ -18,11 +18,10 @@ enum SERVER_TYPE
 	STRAT_HOST,
 	CHAT_HOST,
 	MAP_HOST,
-	PING_HOST,
 	CELL_HOST,
 	EXIT_SERVER,
 	MAX_SERVER_TYPE,
-} ;
+};
 
 extern const char* g_serverTypes[MAX_SERVER_TYPE];
 

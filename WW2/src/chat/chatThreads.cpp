@@ -17,10 +17,10 @@
 
 struct BanThread : public PNThread
 {
-	virtual void run() { chatBanQueueThread(NULL);	}
+	virtual void run() OVERRIDE_FN { chatBanQueueThread();	}
 };
-static BanThread _banThread ;
-static StatsThread _statsThread ;
+static BanThread _banThread;
+static StatsThread _statsThread;
 
 //////////////////////////////////////////////////////////////////////
 // Initialize threads
@@ -28,7 +28,7 @@ static StatsThread _statsThread ;
 void
 chatThreadsSetup()
 {
-	threadsSetup() ;
+	threadsSetup();
 	_banThread.start();
 	_statsThread.start();
 }
@@ -40,7 +40,7 @@ chatThreadsSetup()
 void
 chatThreadsEnable()
 {
-	threadsEnable() ;
+	threadsEnable();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -51,6 +51,6 @@ chatThreadsShutdown()
 {
 	_banThread.cancel();
 	_statsThread.cancel();
-	threadsShutdown() ;
+	threadsShutdown();
 }
 

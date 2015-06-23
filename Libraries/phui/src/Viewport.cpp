@@ -41,7 +41,7 @@ Viewport::Viewport(GraphicsContext* ctx, float x, float y, float width, float he
 	_dotooltips = true;
 	_tooltipmode = 0;
 	_modifiers = MODIFIER_NONE;
-	_focusCallback = NULL;
+	_focusCallback = nullptr;
 	
 	SetBackgroundColor(0,0,0,0);
 }
@@ -91,7 +91,7 @@ bool Viewport::PostMouseDown(float x, float y, int button)
 	View* v = FindViewHit(x, y, true); // within the top level window view
 	
 	if(_activemenu && v != _activemenu)
-		SetActiveMenu(NULL, NULL);
+		SetActiveMenu(nullptr, nullptr);
 	
 	if(v)
 	{
@@ -113,7 +113,7 @@ bool Viewport::PostMouseDown(float x, float y, int button)
 			focus->MakeFocus(false);
 	}
 
-	return (v != NULL);
+	return (v != nullptr);
 }
 
 /************************************************************************************************
@@ -309,7 +309,7 @@ bool Viewport::PostKeyDown(int keycode, unsigned short unicode)
 				if(t)
 				{
 					// we're pasting
-					const wchar_t* htext = UIXMLClipboard(NULL);
+					const wchar_t* htext = UIXMLClipboard(nullptr);
 					if(htext && wcslen(htext) > 0) t->InsertText(htext);
 				}
 
@@ -338,7 +338,7 @@ bool Viewport::PostKeyDown(int keycode, unsigned short unicode)
 				if(t)
 				{
 					// we're pasting
-					const wchar_t* htext = UIXMLClipboard(NULL);
+					const wchar_t* htext = UIXMLClipboard(nullptr);
 					if(htext && wcslen(htext) > 0) t->InsertText(htext);
 				}
 
@@ -355,7 +355,7 @@ bool Viewport::PostKeyDown(int keycode, unsigned short unicode)
 	msg.AddLong(UI_KEY_UNICODE, unicode);
 	ParentLoop()->PostMessage(&msg, focusView);   // send message even when there is no focusView as there may be a handler or filter
 									// that is interested in getting a key press even if nothing is focused
-	return (focusView != NULL);		// but as far as the outside world is concerned we didn't handle it
+	return (focusView != nullptr);		// but as far as the outside world is concerned we didn't handle it
 }
 
 /************************************************************************************************
@@ -387,13 +387,13 @@ bool Viewport::PostKeyUp  (int keycode, unsigned short unicode)
 	msg.AddLong(UI_KEY_UNICODE, unicode);
 	ParentLoop()->PostMessage(&msg, focusView);   // send message even when there is no focusView as there may be a handler or filter
 									// that is interested in getting a key press even if nothing is focused
-	return (focusView != NULL);		// but as far as the outside world is concerned we didn't handle it
+	return (focusView != nullptr);		// but as far as the outside world is concerned we didn't handle it
 }
 
 void Viewport::SetNextFocus()
 {
 	std::vector<View*> views;
-	View* next = NULL;
+	View* next = nullptr;
 
 	FindFocusViews(views);
 	
@@ -485,7 +485,7 @@ void Viewport::ShowToolTip(float x, float y, View *v)
 	
 	if(!_tooltipview)
 	{
-		View *tooltipbase = NULL;
+		View *tooltipbase = nullptr;
 		std::string tooltip; // a tooltip's ID is also its relative path
 		
 		tooltip = v->GetToolTipPath();
@@ -567,9 +567,9 @@ int Viewport::GetToolTipMode()
 
 void Viewport::HideToolTip()
 {
-	if(_tooltipview != NULL)
+	if(_tooltipview != nullptr)
 		_tooltipview->Hide();
 	
-	_tooltipview = NULL;
+	_tooltipview = nullptr;
 	_tooltipstart = 0;
 }

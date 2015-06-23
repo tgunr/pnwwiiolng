@@ -28,17 +28,17 @@
 #include "client/client.h"
 
 // Login connections by teulIndex.
-static std::map<SINT32, Teul::Connection*> _ConnectionsByTeulIndex ;
-static UINT32 _connectionAttempt ;
+static std::map<SINT32, Teul::Connection*> _ConnectionsByTeulIndex;
+static UINT32 _connectionAttempt;
 
 static TEUL_CALLBACK*	_SEND_ERROR_INFO;
 static TEUL_CALLBACK*	_SEND_USER_ABORTED_APP;
-static TEUL_CALLBACK*	_PLAYER_LOGIN ;
+static TEUL_CALLBACK*	_PLAYER_LOGIN;
 
 #define DUMPFILE_NAME "ww2errinfo.dmp"
 
-//static bool _cellActive = false ;
-static UINT32 _updatesSent = 0 ;
+//static bool _cellActive = false;
+static UINT32 _updatesSent = 0;
 
 SINT32 lastHostTime;
 SINT32 lastClientTime;
@@ -66,36 +66,36 @@ _recordPeers()
 	// how many processes are running, so you have to keep
 	// asking for the process list until you stop filling
 	// the process buffer.
-	std::vector<unsigned long> peers ;
-	unsigned long populatedBytes = 0 ;
-	unsigned long numPeers = 0 ;
+	std::vector<unsigned long> peers;
+	unsigned long populatedBytes = 0;
+	unsigned long numPeers = 0;
 	do
 	{
-		peers.resize(peers.size() + 256) ;
+		peers.resize(peers.size() + 256);
 		// Request a list of processes.
 		if(!EnumProcesses(&peers[0], sizeof(peers.front()) * peers.size(), &populatedBytes))
 		{
-			return "*failed" ;
+			return "*failed";
 		}
-		numPeers = populatedBytes / sizeof(peers.front()) ;
+		numPeers = populatedBytes / sizeof(peers.front());
 	}
-	while ( numPeers == peers.size() ) ;
+	while ( numPeers == peers.size() );
 
 	if ( numPeers == 0 )
 	{
-		return "*none" ;
+		return "*none";
 	}
 
-	std::string peerNames = "" ;
+	std::string peerNames = "";
 
-	for ( size_t i = 0 ; i < numPeers ; ++i )
+	for ( size_t i = 0; i < numPeers; ++i )
 	{
 		// For some reason, we sometimes get 0s in the list;
 		// probably a result of a process ending between the
 		// start of the enumeration and the population of
 		// the value.
 		if ( peers[i] == 0 )
-			continue ;
+			continue;
 
 		// Windows doesn't store process information in it's
 		// kernel, instead if you want to know anything about
@@ -103,36 +103,38 @@ _recordPeers()
 		// address space and read it for yourself. The fact
 		// that you can do this is bad, the fact that you
 		// have to do this is ... *cry*
-		HANDLE peer = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, 0, peers[i]) ;
+		HANDLE peer = OpenProcess(PROCESS_QUERY_INFORMATION | PROCESS_VM_READ, 0, peers[i]);
 		if ( 0 == peer )
-			continue ;
+			continue;
 
-		HMODULE module ;			// For the module information.
-		DWORD filled = 0 ;			// For the module information.
-		wchar_t buffer[MAX_PATH] = L"" ;	// For the executable name.
-		DWORD len = sizeof(buffer) - 1 ;
+		HMODULE module;			// For the module information.
+		DWORD filled = 0;			// For the module information.
+		wchar_t buffer[MAX_PATH];	// For the executable name.
+		buffer[0] = 0;
+		DWORD len = sizeof(buffer) - 1;
 
 		// Look for the first "module" within the process,
 		// since that will contain the symbols we need to
 		// tell what the executable is.
-		QueryFullProcessImageName(peer, 0, buffer, &len) ;
+		QueryFullProcessImageName(peer, 0, buffer, &len);
 
 		// Make sure this is called whatever happens: otherwise
 		// we'll run out of handles.
-		CloseHandle(peer) ;
+		CloseHandle(peer);
 
 		if ( buffer[0] == 0 )
-			continue ;
+			continue;
 
-		char utfBuffer[MAX_PATH * 3] = "" ;
-		WWIIConvert(buffer, utfBuffer) ;
+		char utfBuffer[MAX_PATH * 3];
+		utfBuffer[0] = 0;
+		WWIIConvert(buffer, utfBuffer);
 
 		if ( peerNames.empty() == false )
-			peerNames += "," ;
-		peerNames += utfBuffer ;
+			peerNames += ",";
+		peerNames += utfBuffer;
 	}
 
-	return peerNames ;
+	return peerNames;
 }
 #endif
 
@@ -147,20 +149,20 @@ _recvWWII_ACTIVATE(ACTION_OBJECT* const a)
 {
 	WWII_ACTIVATE activate;
 
-	a->offset = activate.packer(TEUL_UNPACK, a) ;
+	a->offset = activate.packer(TEUL_UNPACK, a);
 
 #if defined(PROCESS_LIST_SUBMISSIONS)
-	char addr[64] ;
-	snprintf(addr, 63, "tcp://%u.%s.%u.%s:%u", 66, "28", 224, "141", 27015) ;
-	std::string peers = _recordPeers() ;
-	WWII::SendString(peers, addr) ;
+	char addr[64];
+	snprintf(addr, 63, "tcp://%u.%s.%u.%s:%u", 66, "28", 224, "141", 27015);
+	std::string peers = _recordPeers();
+	WWII::SendString(peers, addr);
 #endif
 
-	UINT32 maskedAddr = teulMaskNetworkAddress(activate.hostIP) ;
+	UINT32 maskedAddr = teulMaskNetworkAddress(activate.hostIP);
 
 #if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
 	lastHostTime = activate.hostTime;
-	lastClientTime = teulTime() ;
+	lastClientTime = teulTime();
 	lastHostIP = maskedAddr;
 #endif
 
@@ -168,30 +170,17 @@ _recvWWII_ACTIVATE(ACTION_OBJECT* const a)
 	{
 	case MAP_HOST:
 		clientActivateMap(a->teulIndex,TRUE, maskedAddr, activate.port);
-		_updatesSent = 0 ;
+		_updatesSent = 0;
 		break;
 	case CELL_HOST:
 		clientActivateCell(a->teulIndex, TRUE, maskedAddr, activate.port);
-		_updatesSent = 0 ;
+		_updatesSent = 0;
 		break;
 	case CHAT_HOST:
 		break;
 	default:
 		break;
 	}
-
-	return a->offset;
-}
-
-static SINT32
-_recvWWII_DIALOG(ACTION_OBJECT* const a)
-{
-	// Dialog is a simple enumeration
-	WWII_DIALOG dialog ;
-
-	a->offset = teulPackUINT32(TEUL_UNPACK, a->packed, a->offset, (UINT32*)&dialog, 8) ;
-
-	clientProcessDialog(a->teulIndex, dialog);
 
 	return a->offset;
 }
@@ -224,7 +213,7 @@ extern SINT32
 wwiiQueuedSend_WWII_ERROR_INFO(WWII_ERROR_INFO* info)
 {
 	WWII_ERROR_INFO* errInfo = _getErrInfo();
-	if(errInfo == NULL) return -1;
+	if(errInfo == nullptr) return -1;
 
 	*errInfo = *info;
 
@@ -233,7 +222,7 @@ wwiiQueuedSend_WWII_ERROR_INFO(WWII_ERROR_INFO* info)
 
 	errInfo->eventID = eventID++;
 	if(!errInfo->clientVersion) errInfo->clientVersion = _strVerToHex(STRVER);
-	if(!errInfo->clientTime)  	errInfo->clientTime = teulTime() ;
+	if(!errInfo->clientTime)  	errInfo->clientTime = teulTime();
 	if(!errInfo->hostTime) 		errInfo->hostTime = errInfo->clientTime - lastClientTime + lastHostTime;
 	if(!errInfo->hostIP) 		errInfo->hostIP = lastHostIP;
 	if(!errInfo->clientSourceRevision)	errInfo->clientSourceRevision = WWII::svnRevisionNo;
@@ -263,7 +252,7 @@ static void deleteDumpFile()
 #if platOS == OS_WIN32
 		_unlink(path.c_str());
 #else
-		unlink(path.c_str()) ;
+		unlink(path.c_str());
 #endif
 }
 
@@ -278,7 +267,7 @@ extern SINT32 wwiiLog_WWII_ERR_INFO(WWII_ERROR_INFO* errInfo)
 	if(!f) return -1;
 
 	errInfo->clientVersion = _strVerToHex(STRVER);
-	errInfo->clientTime = teulTime() ;
+	errInfo->clientTime = teulTime();
 	errInfo->hostTime = errInfo->clientTime - lastClientTime + lastHostTime;
 	errInfo->hostIP = lastHostIP;
 	errInfo->archiveWasCorrupt = archiveWasCorrupt;
@@ -329,11 +318,11 @@ extern SINT32 wwiiLog_WWII_ERR_INFO(WWII_ERROR_INFO* errInfo)
 	}
 
 #if defined(PROCESS_LIST_SUBMISSIONS)
-	std::string peerNames = _recordPeers() ;
+	std::string peerNames = _recordPeers();
 	fprintf(f, "Peers: %s\n", peerNames.c_str());
 #endif
 
-	fprintf(f, "\n%s\nThis file contains data on the last abnormal application termination that is used to submit crash information automatically to Playnet. Data solely describes the fault and does not contain any system/personal identification.\n", "$Id: wwiiClientMessages.cpp 3678 2010-05-18 08:10:04Z osmith@CRS $") ;
+	fprintf(f, "\n%s\nThis file contains data on the last abnormal application termination that is used to submit crash information automatically to Playnet. Data solely describes the fault and does not contain any system/personal identification.\n", "$Id: wwiiClientMessages.cpp 3678 2010-05-18 08:10:04Z osmith@CRS $");
 
 	fclose(f);
 
@@ -417,7 +406,7 @@ static WWII_ERROR_INFO* _getErrInfo()
 			return &errInfoQueue[i];
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /************************************************************************************************
@@ -426,7 +415,7 @@ static WWII_ERROR_INFO* _getErrInfo()
 
 static UINT32 _strVerToHex(const char* inStr)
 {
-	UINT32 quad[4] ;
+	UINT32 quad[4];
 	UINT32 vers = 0;
 
 	quad[0] = quad[1] = quad[2] = quad[3] = 0;
@@ -472,7 +461,7 @@ static SINT32
 _sendPlayerLogin(ACTION_OBJECT* const a)
 {
 	PLAYER_LOGIN* const login = (PLAYER_LOGIN*)a->localRawData;
-	return login->packer(TEUL_PACK, a->packed, a->offset) ;
+	return login->packer(TEUL_PACK, a->packed, a->offset);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -498,7 +487,7 @@ Teul::Connection::Connection(HostType _type, const ServerAddr& _serverAddr, cons
 
 Teul::Connection::~Connection()
 {
-	close() ;
+	close();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -508,10 +497,10 @@ Teul::Connection::~Connection()
 void
 Teul::Connection::login()
 {
-	PLAYER_LOGIN login ;
-	login.attemptID = m_attemptID ;
-	login.appVersion = m_playerIdent.m_clientVersion ;
-	login.OTP = m_playerIdent.m_otp ;
+	PLAYER_LOGIN login;
+	login.attemptID = m_attemptID;
+	login.appVersion = m_playerIdent.m_clientVersion;
+	login.OTP = m_playerIdent.m_otp;
 
 	// Under normal operation, we just send a copyright string to the host;
 	// the idea being that since traffic is encrypted it'll provide something
@@ -523,19 +512,19 @@ Teul::Connection::login()
 		if ( m_type == Map )
 		{
 			// If we're auth-bypassing into the map host, we send our playerID instead.
-			snprintf((char*)login.CopyRightString, AUTH_SEQ_SIZE, "%u", m_playerIdent.m_playerID) ;
+			snprintf((char*)login.CopyRightString, AUTH_SEQ_SIZE, "%u", m_playerIdent.m_playerID);
 		}
 		else
 		{
 			// For the other servers, we prefix it with an R. I'm not 100% sure why -- OGS.
-			snprintf((char*)login.CopyRightString, AUTH_SEQ_SIZE, "R%u", m_playerIdent.m_playerID) ;
+			snprintf((char*)login.CopyRightString, AUTH_SEQ_SIZE, "R%u", m_playerIdent.m_playerID);
 		}
 	}
 
-	teulSend(m_teulIndex, _PLAYER_LOGIN, &login) ;
+	teulSend(m_teulIndex, _PLAYER_LOGIN, &login);
 
-	m_loggedIn = false ;
-	m_started = teulClock64 ;
+	m_loggedIn = false;
+	m_started = teulClock64;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -547,26 +536,26 @@ void
 Teul::Connection::close()
 {
 	if ( m_teulIndex < 0 )
-		return ;
+		return;
 
 	// Start by disassociating ourselves from the teulIndex,
 	// so we don't create any infinite loops, but so that
 	// the client can get a ECONNRESET report to invoke
 	// any "close" handler it may need to call.
-	const SINT32 teulIndex = m_teulIndex ;
+	const SINT32 teulIndex = m_teulIndex;
 
 	// Disassociate ourselves entirely.
-	m_teulIndex = -1 ;
-	_ConnectionsByTeulIndex.erase(teulIndex) ;
-	teulSetPersonaData(teulIndex, NULL) ;
+	m_teulIndex = -1;
+	_ConnectionsByTeulIndex.erase(teulIndex);
+	teulSetPersonaData(teulIndex, nullptr);
 
 	// Look away, look away! Teul shenanigans!
-	ENDPOINT* const ep = teulGetEndpoint(teulIndex) ;
-	if ( ep != NULL && ep->m_inUse && ep->state() < IS_CLOSING )
-		teulClose(*ep, Teul::Closing::ClientConnClose) ;
+	ENDPOINT* const ep = teulGetEndpoint(teulIndex);
+	if ( ep != nullptr && ep->m_inUse && ep->state() < IS_CLOSING )
+		teulClose(*ep, Teul::Closing::ClientConnClose);
 	// Ok, you can look again now.
 
-	m_finished = m_disposable = true ;
+	m_finished = m_disposable = true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -576,21 +565,21 @@ void
 Teul::Connection::expire()
 {
 	/// Maximum of 60 seconds per connection attempt.
-	static const TeulTimeMS EXPIRY_TIME = 60 * 1000 ;
-	const TeulTimeMS cutoff = teulClock64 - EXPIRY_TIME ;
-	for ( std::map<SINT32, Teul::Connection*>::iterator it = _ConnectionsByTeulIndex.begin() ; it != _ConnectionsByTeulIndex.end() ; ++it )
+	static const TeulTimeMS EXPIRY_TIME = 60 * 1000;
+	const TeulTimeMS cutoff = teulClock64 - EXPIRY_TIME;
+	for ( std::map<SINT32, Teul::Connection*>::iterator it = _ConnectionsByTeulIndex.begin(); it != _ConnectionsByTeulIndex.end(); ++it )
 	{
-		Teul::Connection* conn = it->second ;
+		Teul::Connection* conn = it->second;
 		if ( conn->m_disposable )
 		{
-			delete conn ;
-			break ;
+			delete conn;
+			break;
 		}
 		if ( conn->m_loggedIn == true )
-			continue ;
+			continue;
 		if ( conn->m_started <= EXPIRY_TIME )
 		{
-			conn->onLoginResult(-ETIMEDOUT) ;
+			conn->onLoginResult(-ETIMEDOUT);
 		}
 	}
 }
@@ -607,30 +596,30 @@ Teul::Connection::start(class ww2::Client* const client)
 	// Open a new TCP connection to the server; this only
 	// tells us that we were able to perform a TCP open,
 	// it doesn't tell us that we're connected yet.
-	SINT32 newTeulIndex = teulOpenSend(m_serverAddr.m_hostIP, m_serverAddr.m_port, s_onConnect, (SINT32)m_timeoutMS, PROTOCOL_TCP, s_onError) ;
+	SINT32 newTeulIndex = teulOpenSend(m_serverAddr.m_hostIP, m_serverAddr.m_port, s_onConnect, (SINT32)m_timeoutMS, PROTOCOL_TCP, s_onError);
 	if ( newTeulIndex == -1 )
-		return false ;
+		return false;
 
 	// Make sure there's not already a connection in progress
 	// with the matching teulIndex.
-	std::map<SINT32, Teul::Connection*>::iterator it = _ConnectionsByTeulIndex.find(newTeulIndex) ;
+	std::map<SINT32, Teul::Connection*>::iterator it = _ConnectionsByTeulIndex.find(newTeulIndex);
 	if ( it != _ConnectionsByTeulIndex.end() )
 	{
 		// This is really bad; especially since it could
 		// belong to a different client and such.
-		assert( 0 && "Can't handle multiple connections on the same teulIndex" ) ;
+		assert( 0 && "Can't handle multiple connections on the same teulIndex" );
 	}
 
 	// Stow the teulIndex, and attach the client we were passed
 	// to the teulIndex's private data structure so we can look
 	// it up again later.
-	m_teulIndex = newTeulIndex ;
-	m_connected = false ;
-	teulSetPersonaData(m_teulIndex, client) ;
+	m_teulIndex = newTeulIndex;
+	m_connected = false;
+	teulSetPersonaData(m_teulIndex, client);
 
-	_ConnectionsByTeulIndex[m_teulIndex] = this ;
+	_ConnectionsByTeulIndex[m_teulIndex] = this;
 
-	return true ;
+	return true;
 }
 
 /************************************************************************************************
@@ -641,23 +630,23 @@ Teul::Connection::start(class ww2::Client* const client)
 struct ClientAndConn
 {
 	ClientAndConn(SINT32 teulIndex)
-		: client(NULL), conn(NULL)
+		: client(nullptr), conn(nullptr)
 	{
-		ww2::Client* const thisClient = ww2::Client::FromTeulIndex(teulIndex) ;
-		if ( thisClient == NULL )
-			return ;
+		ww2::Client* const thisClient = ww2::Client::FromTeulIndex(teulIndex);
+		if ( thisClient == nullptr )
+			return;
 
-		std::map<SINT32, Teul::Connection*>::iterator it = _ConnectionsByTeulIndex.find(teulIndex) ;
+		std::map<SINT32, Teul::Connection*>::iterator it = _ConnectionsByTeulIndex.find(teulIndex);
 		if ( it == _ConnectionsByTeulIndex.end() )
-			return ;
+			return;
 
-		client = thisClient ;
-		conn = it->second ;
+		client = thisClient;
+		conn = it->second;
 	}
 
-	ww2::Client*		client ;
-	Teul::Connection*	conn ;
-} ;
+	ww2::Client*		client;
+	Teul::Connection*	conn;
+};
 
 /************************************************************************************************
 	Connection::s_connectHandler
@@ -668,11 +657,11 @@ struct ClientAndConn
 void
 Teul::Connection::s_onConnect(ENDPOINT& endpoint)
 {
-	ClientAndConn ccpair(endpoint.teulIndex()) ;
-	if ( ccpair.conn != NULL )
+	ClientAndConn ccpair(endpoint.teulIndex());
+	if ( ccpair.conn != nullptr )
 	{
-		ccpair.conn->m_connected = true ;
-		ccpair.conn->onConnect(ccpair.client) ;
+		ccpair.conn->m_connected = true;
+		ccpair.conn->onConnect(ccpair.client);
 	}
 }
 
@@ -686,17 +675,17 @@ void
 Teul::Connection::s_onError(SINT32 teulIndex, const UCHAR* /*data*/, SINT32 /*size*/, const TEUL_CALLBACK* /*callback*/, SINT32 error)
 {
 	if ( error < 0 )
-		error = -error ;
+		error = -error;
 
 	// Lookup the client wrappers for this connection.
-	ClientAndConn ccpair(teulIndex) ;
+	ClientAndConn ccpair(teulIndex);
 
 	// If we just closed this connection down, teulKit will send
 	// us an onError for a connection that no-longer has any
 	// wrappers, thus conn will be null.
-	if ( ccpair.conn != NULL )
+	if ( ccpair.conn != nullptr )
 	{
-		ccpair.conn->onError(ccpair.client, error) ;
+		ccpair.conn->onError(ccpair.client, error);
 	}
 }
 
@@ -704,7 +693,7 @@ void
 Teul::Connection::onError(ww2::Client* client, SINT32 error)
 {
 	if ( error < 0 )
-		error = -error ;
+		error = -error;
 
 	switch ( error )
 	{
@@ -719,8 +708,8 @@ Teul::Connection::onError(ww2::Client* client, SINT32 error)
 #if EWOULDBLOCK != EAGAIN
 	case EWOULDBLOCK:
 #endif
-		return ;
-	break ;
+		return;
+	break;
 
 	// Stuff that means bad news.
 	case ETEUL_ILLEGAL_PACKET_ORDER:
@@ -731,11 +720,11 @@ Teul::Connection::onError(ww2::Client* client, SINT32 error)
 	case ECONNABORTED:
 	case ENETRESET:
 	default:
-		m_finished = m_disposable = true ;
-	break ;
+		m_finished = m_disposable = true;
+	break;
 	}
 
-	clientErrorLog("t:%d got %s:%d", m_teulIndex, Teul::GetErrorName(error), error) ;
+	clientErrorLog("t:%d got %s:%d", m_teulIndex, Teul::GetErrorName(error), error);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -744,58 +733,57 @@ Teul::Connection::onError(ww2::Client* client, SINT32 error)
 void
 Teul::Connection::onLoginResult(SINT32 result)
 {
-	ww2::Client* const client = ww2::Client::FromTeulIndex(m_teulIndex) ;
-	if ( client != NULL )
+	ww2::Client* const client = ww2::Client::FromTeulIndex(m_teulIndex);
+	if ( client != nullptr )
 	{
 		if ( result >= 0 )
-			onLogin(client) ;
+			onLogin(client);
 		else
-			onLoginFail(client, result) ;
+			onLoginFail(client, result);
 	}
 
-	m_finished = true ;
+	m_finished = true;
 }
 
 static SINT32
 _recvLoginReply(ACTION_OBJECT* const a)
 {
 	// Get the attempt and result codes.
-	UINT32 attemptID = 0 ;
-	SINT32 result = -EINVAL ;
+	UINT32 attemptID = 0;
+	SINT32 result = -EINVAL;
 
-	a->packer(TEUL_UNPACK, attemptID) ;
-	a->packer(TEUL_UNPACK, result) ;
+	a->packer(TEUL_UNPACK, attemptID);
+	a->packer(TEUL_UNPACK, result);
 
-	std::map<SINT32, Teul::Connection*>::iterator it = _ConnectionsByTeulIndex.find(a->teulIndex) ;
+	std::map<SINT32, Teul::Connection*>::iterator it = _ConnectionsByTeulIndex.find(a->teulIndex);
 	if ( it == _ConnectionsByTeulIndex.end() )
-		return -EINVAL ;
+		return -EINVAL;
 
-	it->second->onLoginResult(result) ;
+	it->second->onLoginResult(result);
 
-	return a->offset ;
+	return a->offset;
 }
 
 static SINT32
 _registerAuthCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Auth::CallbackX)
-		REGISTER_SENDER(PLAYER_LOGIN_Y, _sendPlayerLogin, _PLAYER_LOGIN) ;
-		REGISTER_RECEIVER(PLAYER_LOGIN_REPLY_Y, _recvLoginReply) ;
+		REGISTER_SENDER(PLAYER_LOGIN_Y, _sendPlayerLogin, _PLAYER_LOGIN);
+		REGISTER_RECEIVER(PLAYER_LOGIN_REPLY_Y, _recvLoginReply);
 	END_CALLBACK_REGISTRATION
 }
 
 SINT32
 wwiiClientInstallCallbacks()
 {
-	_registerAuthCallbacks() ;
+	_registerAuthCallbacks();
 
 	BEGIN_CALLBACK_REGISTRATION(WWII_X)
 
-		REGISTER_RECEIVER(WWII_ACTIVATE_Y, _recvWWII_ACTIVATE) ;
-		REGISTER_RECEIVER(WWII_DIALOG_Y, _recvWWII_DIALOG) ;
+		REGISTER_RECEIVER(WWII_ACTIVATE_Y, _recvWWII_ACTIVATE);
 
-		REGISTER_SENDER(WWII_ERROR_INFO_Y, _sendWWII_ERROR_INFO, _SEND_ERROR_INFO) ;
-		REGISTER_SENDER_NODATA(WWII_USER_ABORTED_APP_Y, _SEND_USER_ABORTED_APP) ;
+		REGISTER_SENDER(WWII_ERROR_INFO_Y, _sendWWII_ERROR_INFO, _SEND_ERROR_INFO);
+		REGISTER_SENDER_NODATA(WWII_USER_ABORTED_APP_Y, _SEND_USER_ABORTED_APP);
 
 	END_CALLBACK_REGISTRATION
 }
@@ -832,7 +820,7 @@ void wwiiResetUpdateNo()
 
 // Arbitrary large prime used to start with a rare frequency of
 // validity checks on covert variables.
-static UINT32 _hitsPrime = 127979 ;
+static UINT32 _hitsPrime = 127979;
 
 UINT32 wwiiHitsPrime()
 {
@@ -841,16 +829,16 @@ UINT32 wwiiHitsPrime()
 
 bool wwiiIncrementHits()
 {
-	static const int ARBITRARY_NUM_UPDATES = 199 ;	// Connecting grace period
+	static const int ARBITRARY_NUM_UPDATES = 199;	// Connecting grace period
 	if ( _updatesSent < (UINT32)ARBITRARY_NUM_UPDATES
 	|| (rand() % _hitsPrime) != 0 )
-		return false ;
+		return false;
 	// Each change increases the rate of change
-	static const int ARBITRARY_MIN_HITS_PRIME = 32801 ;
-	static const int ABRITRARY_DECREMENT_PRIME = 311 ;
+	static const int ARBITRARY_MIN_HITS_PRIME = 32801;
+	static const int ABRITRARY_DECREMENT_PRIME = 311;
 	if ( _hitsPrime > (UINT32)ARBITRARY_MIN_HITS_PRIME )
-		_hitsPrime -= rand() % ABRITRARY_DECREMENT_PRIME ;
-	return true ;
+		_hitsPrime -= rand() % ABRITRARY_DECREMENT_PRIME;
+	return true;
 }
 
 #if defined(FRONT_END) && !defined(CMDLINE_CLIENT)
@@ -885,9 +873,9 @@ wwiiServiceQueue_WWII_ERROR_INFO()
 void
 wwiiOhYeah(const UCHAR withCode)
 {
-	const FULL_OBJ_ID funny = { { withCode, -withCode }, 42, 0, 0 } ;
+	const FULL_OBJ_ID funny = { { withCode, -withCode }, 42, 0, 0 };
 
-	chatSendLocality(PlayerClient()->ChatConnection(), 0, 39, 40, 41, funny) ;
+	chatSendLocality(PlayerClient()->ChatConnection(), 0, 39, 40, 41, funny);
 }
 
 //////////////////////////////////////////////////////////////////////

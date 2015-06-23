@@ -4,11 +4,11 @@
 #pragma pack(push, 1)
 struct ResupplyIssue
 {
-	ResupplyIssue(ACTION_OBJECT* const a) ;
+	ResupplyIssue(ACTION_OBJECT* const a);
 
-	void process() ;
+	void process();
 
-	UINT32		m_fromHostIndex ;
-	ChatHandle	m_fromHandle ;
-} ;
+	UINT32		m_fromHostIndex;
+	ChatHandle	m_fromHandle;
+};
 #pragma pack(pop)

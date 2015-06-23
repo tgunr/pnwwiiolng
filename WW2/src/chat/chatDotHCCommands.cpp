@@ -22,7 +22,6 @@
 #include "chat/chatHost.h"
 #include "chat/chatHostMessages.h"
 #include "chat/chatList.h"
-#include "chat/chatMakeTempString.h"
 #include "chat/chatPlayer.h"
 #include "chat/chatUnitMotds.h"
 #include "chat/chatWhoList.h"
@@ -39,20 +38,20 @@
 // Private variables
 
 #if defined(BETA_RELEASE)
-// static const int REPORT_TIME_LIMIT_M = 0 ;
- static const UINT32 OVERRUN_LOCK_TIME_M = 0 ;
-// static const UINT32 RESYNC_LOCK_TIME_M = 0 ;
+// static const int REPORT_TIME_LIMIT_M = 0;
+ static const UINT32 OVERRUN_LOCK_TIME_M = 0;
+// static const UINT32 RESYNC_LOCK_TIME_M = 0;
 #elif defined(PUBLIC_RELEASE)
-// static const int REPORT_TIME_LIMIT_M = 5 ;
- static const UINT32 OVERRUN_LOCK_TIME_M = 45 ;
-// static const UINT32 RESYNC_LOCK_TIME_M = 5 ;
+// static const int REPORT_TIME_LIMIT_M = 5;
+ static const UINT32 OVERRUN_LOCK_TIME_M = 45;
+// static const UINT32 RESYNC_LOCK_TIME_M = 5;
 #else
-// static const int REPORT_TIME_LIMIT_M = 5 ;
- static const UINT32 OVERRUN_LOCK_TIME_M = 5 ;
-// static const UINT32 RESYNC_LOCK_TIME_M = 1 ;
+// static const int REPORT_TIME_LIMIT_M = 5;
+ static const UINT32 OVERRUN_LOCK_TIME_M = 5;
+// static const UINT32 RESYNC_LOCK_TIME_M = 1;
 #endif
 
-// static const UCHAR PRIVATE_CHAN_ICON = 15 ;
+// static const UCHAR PRIVATE_CHAN_ICON = 15;
 
 
 //////////////////////////////////////////////////////////////////////
@@ -62,29 +61,29 @@
 void
 chatSetHCMotd(const char* callsign, const char* text, WWII_SIDE side)
 {
-	std::string prefix = "MOTD-" ;
-	prefix += callsign ;
+	std::string prefix = "MOTD-";
+	prefix += callsign;
 
-	chatDispatchHCText(side, prefix.c_str(), text) ;
+	chatDispatchHCText(side, prefix.c_str(), text);
 
-	prefix += ": " ;
+	prefix += ": ";
 
-	chatSetUnitMotd(side, prefix + text) ;
+	chatSetUnitMotd(side, prefix + text);
 }
 
 static void
 _setHCMotd(Player& player, const char* text)
 {
 	///TODO: Set a limit on how often this can be changed
-	WWII_SIDE commandSide = player.activeCommandSide() ;
+	WWII_SIDE commandSide = player.activeCommandSide();
 
 	if ( commandSide == WWII_NO_SIDE )
 	{
-		player.message(LSTR_CAUTION, LSTR_NOT_ACTIVE_HC) ;
-		return ;
+		player.message(LSTR_CAUTION, LSTR_NOT_ACTIVE_HC);
+		return;
 	}
 
-	chatSetHCMotd(player.callsign(), text, commandSide) ;
+	chatSetHCMotd(player.callsign(), text, commandSide);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -113,16 +112,16 @@ public:
 	{
 		if ( player.side() == AXIS )
 		{
-			help(player) ;
-			return ;
+			help(player);
+			return;
 		}
 
-		player.gmNote("HC", command(), arguments, NULL) ;
+		player.gmNote("HC", command(), arguments, nullptr);
 
-		Chat::Broadcast broadcast(Chat::_SIDE, Instance::_CAMPAIGN, ALLIED, LSTR_ALLIED, LSTR_LABELLED_GENERIC, player.callsign(), arguments) ;
-		broadcast.route() ;
+		Chat::Broadcast broadcast(Chat::_SIDE, Instance::_CAMPAIGN, ALLIED, LSTR_ALLIED, LSTR_LABELLED_GENERIC, player.callsign(), arguments);
+		broadcast.route();
 	}
-} dotAllied ;
+} dotAllied;
 
 //////////////////////////////////////////////////////////////////////
 // Sends a system message to only the axis players
@@ -140,16 +139,16 @@ public:
 	{
 		if ( player.side() == ALLIED )
 		{
-			help(player) ;
-			return ;
+			help(player);
+			return;
 		}
 
-		player.gmNote("HC", command(), arguments, NULL) ;
+		player.gmNote("HC", command(), arguments, nullptr);
 
-		Chat::Broadcast broadcast(Chat::_SIDE, Instance::_CAMPAIGN, AXIS, LSTR_AXIS, LSTR_LABELLED_GENERIC, player.callsign(), arguments) ;
-		broadcast.route() ;
+		Chat::Broadcast broadcast(Chat::_SIDE, Instance::_CAMPAIGN, AXIS, LSTR_AXIS, LSTR_LABELLED_GENERIC, player.callsign(), arguments);
+		broadcast.route();
 	}
-} dotAxis ;
+} dotAxis;
 
 //////////////////////////////////////////////////////////////////////
 // Hold at all costs - preliminary implementation
@@ -166,17 +165,17 @@ public:
 	{
 		if ( player.noSide() )
 		{
-			player.message(LSTR_SYSTEM, LSTR_SELECT_SIDE, NULL, NULL) ;
-			return ;
+			player.message(LSTR_SYSTEM, LSTR_SELECT_SIDE, nullptr, nullptr);
+			return;
 		}
 
 		// Can't vote more that once every 5 seconds
 		if ( DotCommand::lockedFeature(player, "vote", 5, teulTime()) )
-			return ;
+			return;
 
-		chatVetoDecision(&player, arguments) ;
+		chatVetoDecision(&player, arguments);
 	}
-} dotDelay ;
+} dotDelay;
 
 //////////////////////////////////////////////////////////////////////
 // .fallback - temporary implementation
@@ -194,35 +193,35 @@ public:
 	{
 		if ( player.noSide() )
 		{
-			player.message(LSTR_SYSTEM, LSTR_SELECT_SIDE, NULL, NULL) ;
-			return ;
+			player.message(LSTR_SYSTEM, LSTR_SELECT_SIDE, nullptr, nullptr);
+			return;
 		}
 
 		if ( !player.inFacility() )
 		{
-			player.message(LSTR_SYSTEM, LSTR_SELECT_FACILITY, command(), NULL) ;
-			return ;
+			player.message(LSTR_SYSTEM, LSTR_SELECT_FACILITY, command(), nullptr);
+			return;
 		}
 
 		if ( DotCommand::lockedFeature(player, "vote", 5, teulTime()) )
-			return ;
+			return;
 
-		chatStartFallback(&player, player.originCpID()) ;
+		chatStartFallback(&player, player.originCpID());
 	}
 	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
 	{
 		if ( player.noSide() )
 		{
-			player.message(LSTR_SYSTEM, LSTR_SELECT_SIDE, NULL, NULL) ;
-			return ;
+			player.message(LSTR_SYSTEM, LSTR_SELECT_SIDE, nullptr, nullptr);
+			return;
 		}
 
 		if ( DotCommand::lockedFeature(player, "vote", 5, teulTime()) )
-			return ;
+			return;
 
-		chatVoteFallback(&player, arguments) ;
+		chatVoteFallback(&player, arguments);
 	}
-} dotFallback ;
+} dotFallback;
 
 //////////////////////////////////////////////////////////////////////
 // List all the HC staff on a particular side
@@ -230,50 +229,50 @@ public:
 static void
 _hclistRoster(Player& player, WWII_SIDE side)
 {
-	static std::string roster ;
-	UINT32 i = 0 ;
+	static std::string roster;
+	UINT32 i = 0;
 
 	if ( side == ALLIED )
-		player.message(LSTR_NONE, LSTR_ALLIED_OFFICERS, NULL, NULL) ;
+		player.message(LSTR_NONE, LSTR_ALLIED_OFFICERS, nullptr, nullptr);
 	else if ( side == AXIS )
-		player.message(LSTR_NONE, LSTR_AXIS_OFFICERS, NULL, NULL) ;
+		player.message(LSTR_NONE, LSTR_AXIS_OFFICERS, nullptr, nullptr);
 	else
 	{
-		player.message(LSTR_NONE, LSTR_SELECT_SIDE, NULL, NULL) ;
-		return ;
+		player.message(LSTR_NONE, LSTR_SELECT_SIDE, nullptr, nullptr);
+		return;
 	}
 
 	if ( commandList.empty() )
 	{
-		player.message(LSTR_NONE, LSTR_NO_MATCHES, NULL, NULL) ;
-		return ;
+		player.message(LSTR_NONE, LSTR_NO_MATCHES, nullptr, nullptr);
+		return;
 	}
 
-	roster = "" ;
+	roster = "";
 
-	PLAYERS::iterator it ;
-	for ( it = commandList.begin() ; it != commandList.end() ; ++it )
+	PLAYERS::iterator it;
+	for ( it = commandList.begin(); it != commandList.end(); ++it )
 	{
-		Player* cur = static_cast<Player*>(*it) ;
+		Player* cur = static_cast<Player*>(*it);
 
 		if ( cur->side() != side || cur->hcOff() || !cur->isActiveOfficer() || cur->isHiddenFrom(player) )
-			continue ;
+			continue;
 
-		cur->addName(roster, ", ") ;
-		i++ ;
+		cur->addName(roster, ", ");
+		i++;
 
 		// Try not to overflow the message length buffer
 		if ( roster.length() + 12 >= MAX_MESSAGE_LENGTH )
 		{
-			player.message(LSTR_NONE, LSTR_GENERIC, roster.c_str(), NULL) ;
-			roster = "" ;
+			player.message(LSTR_NONE, LSTR_GENERIC, roster.c_str(), nullptr);
+			roster = "";
 		}
 	}
 
 	if ( i == 0 )
-		player.message(LSTR_NONE, LSTR_NO_MATCHES, NULL, NULL) ;
+		player.message(LSTR_NONE, LSTR_NO_MATCHES, nullptr, nullptr);
 	else if ( roster.length() )
-		player.message(LSTR_NONE, LSTR_GENERIC, roster.c_str(), NULL) ;
+		player.message(LSTR_NONE, LSTR_GENERIC, roster.c_str(), nullptr);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -288,43 +287,43 @@ public:
 							, LSTR_HC_USAGE, LSTR_HC_DETAIL
 							)
 	{
-		addUsage(NO_MASK, LSTR_HC_USAGE, LSTR_HC_DETAIL) ;
+		addUsage(NO_MASK, LSTR_HC_USAGE, LSTR_HC_DETAIL);
 	}
 
 	// .hc
 	virtual void action(Player& player, Chat::ClientMessage* message) const OVERRIDE_FN;
 	// .hc <message>
 	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN;
-} dotHC ;
+} dotHC;
 
 static void
 _hcRoster(Player& player, WWII_SIDE forSide)
 {
-	CHAT_WHO_LIST result(CWT_HC, 0, Teul::TCPStdPayload) ;
-	result.clear() ;
+	CHAT_WHO_LIST result(CWT_HC, 0, Teul::TCPStdPayload);
+	result.clear();
 
 	if ( commandList.empty() )
 	{
-		result.send(player.teulIndex()) ;
-		return ;
+		result.send(player.teulIndex());
+		return;
 	}
 
-	Chat::Who who ;
-	PLAYERS::iterator it ;
-	for ( it = commandList.begin() ; it != commandList.end() ; ++it )
+	Chat::Who who;
+	PLAYERS::iterator it;
+	for ( it = commandList.begin(); it != commandList.end(); ++it )
 	{
-		Player* cur = static_cast<Player*>(*it) ;
+		Player* cur = static_cast<Player*>(*it);
 
 		if ( cur->side() != forSide || cur->hcOff() || !cur->isActiveOfficer() || cur->isHiddenFrom(player) )
-			continue ;
+			continue;
 		if ( !player.activeCommandSide() && !player.isGM() && cur->noWho() )
-			continue ;
+			continue;
 
-		chatWhoPopulate(who, &player, cur, false) ;
-		result.add(who) ;
+		chatWhoPopulate(who, &player, cur, false);
+		result.add(who);
 	}
 
-	result.send(player.teulIndex()) ;
+	result.send(player.teulIndex());
 }
 
 
@@ -334,27 +333,27 @@ DotHC::action(Player& player, Chat::ClientMessage* /*message*/) const
 {
 	if ( player.isManager() )
 	{
-		_hclistRoster(player, ALLIED) ;
-		_hclistRoster(player, AXIS) ;
-		return ;
+		_hclistRoster(player, ALLIED);
+		_hclistRoster(player, AXIS);
+		return;
 	}
 
 	if ( !isValidSide(player.side()) )
 	{
-		player.message(LSTR_NONE, LSTR_SELECT_SIDE, NULL, NULL) ;
-		return ;
+		player.message(LSTR_NONE, LSTR_SELECT_SIDE, nullptr, nullptr);
+		return;
 	}
 
-	_hcRoster(player, player.side()) ;
+	_hcRoster(player, player.side());
 }
 
 static void
 _hcMessage(WWII_SIDE side, Player& player, const char* arguments)
 {
-	std::string callsign = player.callsign() ;
+	std::string callsign = player.callsign();
 	if ( !player.isActiveCommander() && player.isActiveOfficer() )
-		callsign.insert(0, "oic:") ;
-	chatDispatchHCText(side, callsign.c_str(), arguments) ;
+		callsign.insert(0, "oic:");
+	chatDispatchHCText(side, callsign.c_str(), arguments);
 }
 
 // Player has typed ".hc <something>"
@@ -363,22 +362,22 @@ DotHC::actionWith(Player& player, Chat::ClientMessage* /*message*/, char* argume
 {
 	if ( player.noSide() && player.permissions(GAME_MANAGER) )
 	{
-		chatDispatchHCText(ALLIED, player.callsign(), arguments) ;
-		chatDispatchHCText(AXIS, player.callsign(), arguments) ;
-		return ;
+		chatDispatchHCText(ALLIED, player.callsign(), arguments);
+		chatDispatchHCText(AXIS, player.callsign(), arguments);
+		return;
 	}
 	else if ( player.side() == ALLIED && player.permissions(ACTIVE_OFFICER|ALLIED_COMMAND_STAFF|IS_PLAYNET) )
 	{
-		_hcMessage(ALLIED, player, arguments) ;
-		return ;
+		_hcMessage(ALLIED, player, arguments);
+		return;
 	}
 	else if ( player.side() == AXIS && player.permissions(ACTIVE_OFFICER|AXIS_COMMAND_STAFF|IS_PLAYNET) )
 	{
-		_hcMessage(AXIS, player, arguments) ;
-		return ;
+		_hcMessage(AXIS, player, arguments);
+		return;
 	}
 
-	help(player) ;
+	help(player);
 }
 
 
@@ -395,10 +394,10 @@ public:
 
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
 	{
-		player.SetHcOff(true) ;
-		player.message(LSTR_NOTE, LSTR_HC_OFF, NULL, NULL) ;
+		player.SetHcOff(true);
+		player.message(LSTR_NOTE, LSTR_HC_OFF, nullptr, nullptr);
 	}
-} dotHCOff ;
+} dotHCOff;
 
 class DotHCOn : public DotCommand
 {
@@ -409,10 +408,10 @@ public:
 
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
 	{
-		player.SetHcOff(false) ;
-		player.message(LSTR_NOTE, LSTR_HC_ON, NULL, NULL) ;
+		player.SetHcOff(false);
+		player.message(LSTR_NOTE, LSTR_HC_ON, nullptr, nullptr);
 	}
-} dotHCOn ;
+} dotHCOn;
 
 //////////////////////////////////////////////////////////////////////
 // Simple text-list of who's on the HC channel
@@ -424,7 +423,7 @@ public:
 								, NO_MASK, LSTR_HCLIST_USAGE, LSTR_HCLIST_DETAIL
 								) { }
 	virtual void action(Player& player, Chat::ClientMessage* message) const OVERRIDE_FN;
-} dotHCList ;
+} dotHCList;
 
 // Player has typed ".hclist"
 void
@@ -432,15 +431,15 @@ DotHCList::action(Player& player, Chat::ClientMessage* /*message*/) const
 {
 	if ( player.noSide() && player.permissions(GAME_MANAGER) )
 	{
-		_hclistRoster(player, ALLIED) ;
-		_hclistRoster(player, AXIS) ;
+		_hclistRoster(player, ALLIED);
+		_hclistRoster(player, AXIS);
 	}
 	else if ( player.side() == ALLIED )
-		_hclistRoster(player, ALLIED) ;
+		_hclistRoster(player, ALLIED);
 	else if ( player.side() == AXIS )
-		_hclistRoster(player, AXIS) ;
+		_hclistRoster(player, AXIS);
 	else
-		help(player) ;
+		help(player);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -457,27 +456,27 @@ public:
 
 	virtual void action(Player& player, Chat::ClientMessage* message) const OVERRIDE_FN;
 	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN;
-} dotHold ;
+} dotHold;
 
 void
 DotHold::action(Player& player, Chat::ClientMessage* /*message*/) const
 {
 	if ( player.noSide() )
 	{
-		player.message(LSTR_SYSTEM, LSTR_SELECT_SIDE, NULL, NULL) ;
-		return ;
+		player.message(LSTR_SYSTEM, LSTR_SELECT_SIDE, nullptr, nullptr);
+		return;
 	}
 
 	if ( !player.inFacility() )
 	{
-		player.message(LSTR_SYSTEM, LSTR_SELECT_FACILITY, command(), NULL) ;
-		return ;
+		player.message(LSTR_SYSTEM, LSTR_SELECT_FACILITY, command(), nullptr);
+		return;
 	}
 
 	if ( DotCommand::lockedFeature(player, "vote", 5, teulTime()) )
-		return ;
+		return;
 
-	chatStartHold(&player, player.originCpID()) ;
+	chatStartHold(&player, player.originCpID());
 }
 
 void
@@ -485,14 +484,14 @@ DotHold::actionWith(Player& player, Chat::ClientMessage* /*message*/, char* argu
 {
 	if ( player.noSide() )
 	{
-		player.message(LSTR_SYSTEM, LSTR_SELECT_SIDE, NULL, NULL) ;
-		return ;
+		player.message(LSTR_SYSTEM, LSTR_SELECT_SIDE, nullptr, nullptr);
+		return;
 	}
 
 	if ( DotCommand::lockedFeature(player, "vote", 5, teulTime()) )
-		return ;
+		return;
 
-	chatVoteHold(&player, arguments) ;
+	chatVoteHold(&player, arguments);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -507,21 +506,21 @@ public:
 							) { }
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
 	{
-		HCUnit* brigade = HCUnit::Lookup(player.brigadeID()) ;
+		HCUnit* brigade = HCUnit::Lookup(player.brigadeID());
 		if ( !brigade )
 		{
-			player.message(LSTR_CAUTION, LSTR_NO_BRIGADE) ;
+			player.message(LSTR_CAUTION, LSTR_NO_BRIGADE);
 		}
 		else
 		{
-			Property* home = chatFindProperty(brigade->homeCPID()) ;
-			if ( home != NULL )
-				player.message(LSTR_NOTE, LSTR_LABELLED_GENERIC, brigade->name(), home->Name()) ;
+			Property* home = chatFindProperty(brigade->homeCPID());
+			if ( home != nullptr )
+				player.message(LSTR_NOTE, LSTR_LABELLED_GENERIC, brigade->name(), home->Name());
 			else
-				player.message(LSTR_NOTE, LSTR_UNIT_HAS_NO_HOME, brigade->name()) ;
+				player.message(LSTR_NOTE, LSTR_UNIT_HAS_NO_HOME, brigade->name());
 		}
 	}
-} dotHome ;
+} dotHome;
 
 //////////////////////////////////////////////////////////////////////
 // Set the HC motd
@@ -536,20 +535,20 @@ public:
 
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
 	{
-		WWII_SIDE commandSide = player.effectiveCommandSide() ;
+		WWII_SIDE commandSide = player.effectiveCommandSide();
 		if ( commandSide == ALLIED )
-			player.message(LSTR_ALLIED, LSTR_GENERIC, chatGetUnitMotd(commandSide)) ;
+			player.message(LSTR_ALLIED, LSTR_GENERIC, chatGetUnitMotd(commandSide));
 		else if ( commandSide == AXIS )
-			player.message(LSTR_AXIS, LSTR_GENERIC, chatGetUnitMotd(commandSide)) ;
+			player.message(LSTR_AXIS, LSTR_GENERIC, chatGetUnitMotd(commandSide));
 		else
-			player.message(LSTR_CAUTION, LSTR_NOT_ACTIVE_HC) ;
+			player.message(LSTR_CAUTION, LSTR_NOT_ACTIVE_HC);
 	}
 
 	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
 	{
-		_setHCMotd(player, arguments) ;
+		_setHCMotd(player, arguments);
 	}
-} dotHCMotd ;
+} dotHCMotd;
 
 //////////////////////////////////////////////////////////////////////
 // Overrun command -- Player stipulation that a base is hopelessly
@@ -562,29 +561,29 @@ class DotOverrun : public DotCommand
 public:
 	DotOverrun() : DotCommand("overrun", "Signals your town has been overrun by the enemy"
 								, NO_MASK, LSTR_OVERRUN_USAGE, LSTR_OVERRUN_DETAIL
-								) { } ;
+								) { };
 
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
 	{
 		if ( player.noSide() )
 		{
-			player.message(LSTR_SYSTEM, LSTR_SELECT_SIDE) ;
-			return ;
+			player.message(LSTR_SYSTEM, LSTR_SELECT_SIDE);
+			return;
 		}
 
 		if ( !player.inFacility() )
 		{
-			player.message(LSTR_SYSTEM, LSTR_SELECT_FACILITY, command(), NULL) ;
-			return ;
+			player.message(LSTR_SYSTEM, LSTR_SELECT_FACILITY, command(), nullptr);
+			return;
 		}
 
 		// You can only use it every so-often
 		if ( _featureLockedM(player, OVERRUN_LOCK_TIME_M) )
-			return ;
+			return;
 
-		player.sendStratCommand(command(), "", false) ;
+		player.sendStratCommand(command(), "", false);
 	}
-} dotOverrun ;
+} dotOverrun;
 
 //////////////////////////////////////////////////////////////////////
 
@@ -610,58 +609,58 @@ public:
 	virtual ~LastMoves() {}
 
 private:
-	ChatHandle	m_matchHandle ;
-	std::vector<std::string> m_results ;
+	ChatHandle	m_matchHandle;
+	std::vector<std::string> m_results;
 
 public:
-	virtual bool Process(const size_t numRows)
+	virtual bool Process(const size_t numRows) OVERRIDE_FN
 	{
 		if ( numRows <= 0 )
-			return true ;
+			return true;
 
-		std::string result ;
+		std::string result;
 		while ( Query()->FetchRow() )
 		{
-			DBRow& row = Query()->Row() ;
-			result = row[0] ;
-			result += " " ;
-			result += row[1] ;
-			result += ": " ;
-			result += row[2] ;
-			result += " -> " ;
-			result += row[3] ;
-			m_results.push_back(result) ;
+			DBRow& row = Query()->Row();
+			result = row[0];
+			result += " ";
+			result += row[1];
+			result += ": ";
+			result += row[2];
+			result += " -> ";
+			result += row[3];
+			m_results.push_back(result);
 		}
 
-		return true ;
+		return true;
 	}
 
 public:
-	virtual void Success()
+	virtual void Success() OVERRIDE_FN
 	{
-		Player* player = PlayerInterface::Lookup(m_matchHandle) ;
-		if ( player == NULL )
-			return ;
+		Player* player = PlayerInterface::Lookup(m_matchHandle);
+		if ( player == nullptr )
+			return;
 		if ( m_results.empty() == true )
 		{
-			player->message(LSTR_CAUTION, LSTR_NO_MOVES_FOUND) ;
-			return ;
+			player->message(LSTR_CAUTION, LSTR_NO_MOVES_FOUND);
+			return;
 		}
 
-		const size_t numRows = m_results.size() ;
-		for ( size_t i = 0 ; i < numRows ; ++i )
+		const size_t numRows = m_results.size();
+		for ( size_t i = 0; i < numRows; ++i )
 		{
-			player->message(LSTR_NONE, LSTR_GENERIC, m_results[i].c_str()) ;
+			player->message(LSTR_NONE, LSTR_GENERIC, m_results[i].c_str());
 		}
 	}
-	virtual void Failure()
+	virtual void Failure() OVERRIDE_FN
 	{
-		Player* player = PlayerInterface::Lookup(m_matchHandle) ;
-		if ( player == NULL ) return ;
+		Player* player = PlayerInterface::Lookup(m_matchHandle);
+		if ( player == nullptr ) return;
 
-		player->message(LSTR_CAUTION, LSTR_DB_QUERY_FAILED, "lastmoves", "Database error") ;
+		player->message(LSTR_CAUTION, LSTR_DB_QUERY_FAILED, "lastmoves", "Database error");
 	}
-} ;
+};
 
 class DotLastMoves : public DotCommand
 {
@@ -673,12 +672,12 @@ public:
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
 	{
 		if ( _featureLockedM(player, 2) )
-			return ;
+			return;
 		if ( !player.country() )
 		{
-			player.message(LSTR_CAUTION, LSTR_SELECT_SIDE) ;
-			return ;
+			player.message(LSTR_CAUTION, LSTR_SELECT_SIDE);
+			return;
 		}
-		(new LastMoves(player.matchHandle(), player.country()))->Queue() ;
-	} ;
-} dotLastMoves ;
+		(new LastMoves(player.matchHandle(), player.country()))->Queue();
+	};
+} dotLastMoves;

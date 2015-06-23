@@ -50,7 +50,7 @@ enum CP_TYPE
 	// Add new CP types here
 	MAX_CP_TYPES
 
-} ;
+};
 
 
 enum FACILITY_TYPE
@@ -68,7 +68,7 @@ enum FACILITY_TYPE
 	// Add new facility types here
 	MAX_FACILITY_TYPES
 
-} ;
+};
 
 
 enum FACTORY_SUBTYPE
@@ -83,7 +83,7 @@ enum FACTORY_SUBTYPE
 	// Add new facility subtypes here
 	MAX_FACTORY_SUBTYPES
 
-} ;
+};
 
 
 enum DEPOT_SUBTYPE
@@ -99,7 +99,7 @@ enum DEPOT_SUBTYPE
 	// Add new depot subtypes here
 	MAX_DEPOT_SUBTYPES
 
-} ;
+};
 
 
 enum OMT_SUBTYPE
@@ -111,7 +111,7 @@ enum OMT_SUBTYPE
 	// Add new facility omt subtypes here
 	MAX_OMT_SUBTYPES
 
-} ;
+};
 
 
 enum BUILDING_TYPE
@@ -125,7 +125,7 @@ enum BUILDING_TYPE
 	// Add new building types here
 	MAX_BUILDING_TYPES
 
-} ;
+};
 
 
 enum AUTOGUNNER_SUBTYPE
@@ -149,7 +149,7 @@ enum AUTOGUNNER_SUBTYPE
 	// Add new autogunner subtypes here
 	MAX_AUTOGUNNER_SUBTYPES
 
-} ;
+};
 
 //tolua_end
 enum WAYPOINT_TYPE
@@ -158,7 +158,7 @@ enum WAYPOINT_TYPE
 	WAYPOINT_BRIDGE=2,
 	// Add new waypoint types here
 	MAX_WAYPOINT_TYPES
-} ;
+};
 //tolua_begin
 
 
@@ -173,7 +173,7 @@ enum STRAT_FLAG
 	// Add new strat flags here
 	MAX_STRAT_FLAGS
 
-} ;
+};
 
 // Real data structures
 
@@ -188,7 +188,7 @@ struct STRT_DTL_HEADER
 	UINT16 reserved2;
 	UINT16 reserved3;
 
-} ;
+};
 
 //tolua_end
 
@@ -210,7 +210,7 @@ struct CP
 	SINT8		name[MAX_STRT_NAME_LENGTH];
 	SINT8		fileName[MAX_OBJNAME_LENGTH];
 
-} ;
+};
 
 
 struct FACILITY
@@ -232,7 +232,7 @@ struct FACILITY
 	SINT8		name[MAX_STRT_NAME_LENGTH];
 	SINT8		fileName[MAX_OBJNAME_LENGTH];
 
-} ;
+};
 
 struct BUILDING
 {
@@ -252,7 +252,7 @@ struct BUILDING
 	SINT8		name[MAX_STRT_NAME_LENGTH];
 	SINT8		fileName[MAX_OBJNAME_LENGTH];
 
-} ;
+};
 
 
 struct DEPOT_LINK
@@ -270,7 +270,7 @@ struct DEPOT_LINK
 
 	SINT8		name[MAX_STRT_NAME_LENGTH];
 
-} ;
+};
 
 
 struct WAYPOINT
@@ -278,7 +278,7 @@ struct WAYPOINT
 	REL_OBJ_ID	oid;				// object ID of this waypoint
 	UINT32		serial;				// supercell relative serial number
 
-	REL_OBJ_ID	pid;				// Parent object ID (to bridge?) (object attatchment)
+	REL_OBJ_ID	pid;				// Parent object ID (to bridge?) (object attachment)
 	SINT32		posx;				// X Position in supercell (in meters)
 	SINT32		posy;				// Y Position in supercell (in meters)
 
@@ -291,7 +291,7 @@ struct WAYPOINT
 
 	SINT8		stratFlags;			// general strat object flags
 
-} ;
+};
 
 #if platOS == OS_MACOS
 	#pragma options align=reset
@@ -300,4 +300,3 @@ struct WAYPOINT
 #elif platOS == OS_LINUX
 	#pragma pack(pop)
 #endif
-

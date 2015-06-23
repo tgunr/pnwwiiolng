@@ -3,6 +3,7 @@
 #include <ctype.h>
 #include <sys/stat.h>
 
+#include "mem/mem.h"
 #include "imap/imap.h"
 #include "imap/iac.h"
 #include "imap/ww2imap.h"
@@ -22,12 +23,6 @@
 #include "dip.h"
 #include "tut/TutorialManager.h"
 #include "ui/uiDotCommands.h"
-
-#if defined(USE_OSG)
-#include "uimap/uiMap.h"
-#include "osgVehicle/vehicleSpawn.h"
-#include "vehicleIcon.h"
-#endif
 
 /************************************************************************************************
 	ww2imap
@@ -78,7 +73,7 @@ struct imap_joy_calib
 
 	unsigned int iac;
 	float deadband, x, y, fullband;
-} ;
+};
 
 struct imap_axis_calib
 {
@@ -86,7 +81,7 @@ struct imap_axis_calib
 	float mouseY;
 	float aimMouseX, aimMouseY;
 	imap_joy_calib* joystick;
-} ;
+};
 
 static const char* categoryName[WW2_FUNC_NUM_CATEGORIES] =
 {
@@ -256,15 +251,6 @@ int ww2imapInit()
 	imapInstallNonRemovableControlCallback(IMAP_MOM_SHOW_GUI_CURSOR, uiImapCursorCallback);
 	imapInstallNonRemovableControlCallback(IMAP_CONTINUE_TUTORIAL, TutorialManager::Input);
 
-#if defined(USE_OSG)
-	imapInstallNonRemovableControlCallback(IMAP_TMP_EXIT_VEHICLE, vehicleSpawnImapExitVehicle);
-	imapInstallNonRemovableControlCallback(IMAP_MOM_TOGGLE_HUD, persHUDToggleHUD);
-	imapInstallNonRemovableControlCallback(IMAP_MOM_RESET_HUD, persHUDResetHUD);
-	imapInstallNonRemovableControlCallback(IMAP_SHOW_STATS, persHUDToggleReadout);
-	imapInstallNonRemovableControlCallback(IMAP_MOM_SHOW_IN_GAME_MAP, uiMapToggleIngameMap);
-	imapInstallNonRemovableControlCallback(IMAP_CYCLE_ICON_MODE, vehicleIconCycleMode);
-#endif
-
 	return IMAP_NO_ERR;
 }
 
@@ -282,8 +268,8 @@ void ww2imapKill()
 	if(funcLangTable)
 		loclLangTableFree(funcLangTable);
 
-	iacLangTable = NULL;
-	funcLangTable = NULL;
+	iacLangTable = nullptr;
+	funcLangTable = nullptr;
 	curIacLang = -1;
 	curFuncLang = -1;
 }
@@ -348,7 +334,7 @@ imap_presets* ww2imapGetPresets(int category)
 	if(category >= 0 && category < WW2_FUNC_NUM_CATEGORIES)
 		return &categoryPresets[category];
 
-	return NULL;
+	return nullptr;
 }
 
 /************************************************************************************************
@@ -373,14 +359,14 @@ int ww2imapSetKeymap(int vehtypeListIdx)
 	mouseLookX = mouseLookY = torsoX = torsoY = turretX = turretY = 0;
 
 	vehtype = vehtypeGetByIndex((UINT32)vehtypeListIdx);
-	if(vehtype == NULL) return IMAP_ERR;
+	if(vehtype == nullptr) return IMAP_ERR;
 
 	 // clear current keymaps
 	for(i = 0; i < IMAP_MAX_KEYMAPS; i++)
-		imapSetKeymap(NULL, i);
+		imapSetKeymap(nullptr, i);
 
 	ref = imapKeymapAlloc();
-	if(ref == NULL) return IMAP_MEMORY_ERR;
+	if(ref == nullptr) return IMAP_MEMORY_ERR;
 
 	// general
 	ww2KeymapLoadRef(ref, WW2_FUNC_CATEGORY_GENERAL, ALL_VEHICLES, FROM_ARCHIVE);
@@ -401,11 +387,7 @@ int ww2imapSetKeymap(int vehtypeListIdx)
 #endif
 
 	// view
-#ifdef DOROTHY
-	if(vehtype->Type != VEH_TYPE_PERSON && vehtype->Type != VEH_TYPE_MECH)
-#else
 	if(vehtype->Type != VEH_TYPE_PERSON)
-#endif
 	{
 		ww2KeymapLoadRef(ref, WW2_FUNC_CATEGORY_VIEW, ALL_VEHICLES, FROM_ARCHIVE);
 		imapSetKeymap(ref, KEYMAP_VIEW_ARCHIVE);
@@ -421,17 +403,17 @@ int ww2imapSetKeymap(int vehtypeListIdx)
 			category = WW2_FUNC_CATEGORY_AIR;
 		break;
 		case VEH_TYPE_GROUND:
-#ifdef DOROTHY
-		case VEH_TYPE_MECH:
-#endif
+		{
+			const std::string& weapClassName = weaponClass[vehtypeWeaponSpec(vehtypeListIdx).wClass].name;
 			for(i = 0; i < WW2_FUNC_NUM_CATEGORIES; i++)
 			{
-				if(!strcmp((char*)weaponClass[vehtypeWeaponSpec(vehtypeListIdx).wClass].name, categoryClassName[i]))
+				if(weapClassName ==  categoryClassName[i])
 				{
 					category = i;
 					break;
 				}
 			}
+		}
 		break;
 		case VEH_TYPE_SEA:
 			category = WW2_FUNC_CATEGORY_SEA;
@@ -483,7 +465,7 @@ int ww2imapSetKeymap(int vehtypeListIdx)
 	{
 		ww2KeymapSaveAxisCalibration(axisCalib, GLOBAL_CALIBRATION_FILENAME);
 		ww2KeymapFreeAxisCalibration(axisCalib);
-		axisCalib = NULL;
+		axisCalib = nullptr;
 	}
 
 	// set up calibration
@@ -530,62 +512,6 @@ void ww2imapAddBuzzardKeymaps()
 	idx = 0;
 	keymap.numKeys = 1;
 
-#if defined(USE_OSG)
-	keymap.keymapType = IMAP_BUTTON_KEYMAP;
-	keymap.btn.iac[0] = IAC_UP;
-	imapKeymapAdd(ref, IMAP_BUZZARD_FORWARD, &idx, &keymap);
-
-	keymap.keymapType = IMAP_BUTTON_KEYMAP;
-	keymap.btn.iac[0] = IAC_DOWN;
-	imapKeymapAdd(ref, IMAP_BUZZARD_BACK, &idx, &keymap);
-
-	keymap.keymapType = IMAP_BUTTON_KEYMAP;
-	keymap.btn.iac[0] = IAC_A;
-	imapKeymapAdd(ref, IMAP_BUZZARD_LEFT, &idx, &keymap);
-
-	keymap.keymapType = IMAP_BUTTON_KEYMAP;
-	keymap.btn.iac[0] = IAC_D;
-	imapKeymapAdd(ref, IMAP_BUZZARD_RIGHT, &idx, &keymap);
-
-	keymap.keymapType = IMAP_BUTTON_KEYMAP;
-	keymap.btn.iac[0] = IAC_F;
-	imapKeymapAdd(ref, IMAP_BUZZARD_UP, &idx, &keymap);
-
-	keymap.keymapType = IMAP_BUTTON_KEYMAP;
-	keymap.btn.iac[0] = IAC_V;
-	imapKeymapAdd(ref, IMAP_BUZZARD_DOWN, &idx, &keymap);
-
-	keymap.keymapType = IMAP_BUTTON_KEYMAP;
-	keymap.btn.iac[0] = IAC_Q;
-	imapKeymapAdd(ref, IMAP_BUZZARD_PITCH_UP, &idx, &keymap);
-
-	keymap.keymapType = IMAP_BUTTON_KEYMAP;
-	keymap.btn.iac[0] = IAC_Z;
-	imapKeymapAdd(ref, IMAP_BUZZARD_PITCH_DOWN, &idx, &keymap);
-
-	keymap.keymapType = IMAP_BUTTON_KEYMAP;
-	keymap.btn.iac[0] = IAC_LEFT;
-	imapKeymapAdd(ref, IMAP_BUZZARD_YAW_LEFT, &idx, &keymap);
-
-	keymap.keymapType = IMAP_BUTTON_KEYMAP;
-	keymap.btn.iac[0] = IAC_RIGHT;
-	imapKeymapAdd(ref, IMAP_BUZZARD_YAW_RIGHT, &idx, &keymap);
-
-	keymap.keymapType = IMAP_BUTTON_KEYMAP;
-	keymap.btn.iac[0] = IAC_LEFTALT;
-	imapKeymapAdd(ref, IMAP_BUZZARD_SPEED1, &idx, &keymap);
-
-	keymap.keymapType = IMAP_BUTTON_KEYMAP;
-	keymap.btn.iac[0] = IAC_LEFTCONTROL;
-	imapKeymapAdd(ref, IMAP_BUZZARD_SPEED2, &idx, &keymap);
-
-	keymap.keymapType = IMAP_BUTTON_KEYMAP;
-	keymap.btn.iac[0] = IAC_LEFTSHIFT;
-	imapKeymapAdd(ref, IMAP_BUZZARD_SPEED3, &idx, &keymap);
-
-	imapSetKeymap(ref, KEYMAP_VEHICLE_ARCHIVE);
-	imapSetKeymap(0, KEYMAP_VEHICLE_DISK);
-#else
 	keymap.keymapType = IMAP_AXIS_KEYMAP;
 	keymap.axis.iac = IAC_MOUSEX;
 	imapKeymapAdd(ref, IMAP_MOUSE_LOOK_X, &idx, &keymap);
@@ -603,8 +529,6 @@ void ww2imapAddBuzzardKeymaps()
 	imapKeymapAdd(ref, IMAP_TMP_CHANGE_FOV_DOWN, &idx, &keymap);
 
 	imapSetKeymap(ref, KEYMAP_VEHICLE_ARCHIVE);
-
-#endif
 
 	imapKeymapFree(ref);
 }
@@ -663,7 +587,7 @@ int ww2KeymapInit(int defaultcfml)
 		for(j = 0; j < MAX_VEHICLES; j++)
 		{
 			ref = ww2Keymap(i, j, FROM_DISK);
-			if(ref == NULL) break;
+			if(ref == nullptr) break;
 
 			ww2KeymapLoadRef(ref, i, j, FROM_DISK,defaultcfml);
 			ww2KeymapSetDirty(i, j, 0);
@@ -696,8 +620,8 @@ void ww2KeymapKill()
 			imapKeymapFree(categoryKeymap[i]);
 
 
-		archiveKeymap[i] = NULL;
-		categoryKeymap[i] = NULL;
+		archiveKeymap[i] = nullptr;
+		categoryKeymap[i] = nullptr;
 	}
 
 	for(i = 0; i < MAX_VEHICLES; i++)
@@ -705,12 +629,12 @@ void ww2KeymapKill()
 		if(vehicleKeymap[i])
 			imapKeymapFree(vehicleKeymap[i]);
 
-		vehicleKeymap[i] = NULL;
+		vehicleKeymap[i] = nullptr;
 
 		if(vehicleArchiveKeymap[i])
 			imapKeymapFree(vehicleArchiveKeymap[i]);
 
-		vehicleArchiveKeymap[i] = NULL;
+		vehicleArchiveKeymap[i] = nullptr;
 
 	}
 
@@ -718,7 +642,7 @@ void ww2KeymapKill()
 	{
 		ww2KeymapSaveAxisCalibration(axisCalib, GLOBAL_CALIBRATION_FILENAME);
 		ww2KeymapFreeAxisCalibration(axisCalib);
-		axisCalib = NULL;
+		axisCalib = nullptr;
 	}
 }
 
@@ -730,7 +654,7 @@ int ww2KeymapSet(int category, int vehicleIdx, unsigned int functionCode, unsign
 {
 	if(ww2KeymapCmp(category, vehicleIdx, functionCode, idx, keymap) == 0) return 0;
 
-	imapKeymapRef ref = NULL;
+	imapKeymapRef ref = nullptr;
 	int err = IMAP_ERR;
 
 	ref = ww2Keymap(category, vehicleIdx, FROM_DISK);
@@ -764,7 +688,7 @@ int  ww2KeymapCmp(int category, int vehicleIdx, unsigned int functionCode, unsig
 {
 	imap_keymap curkeymap;
 
-	if(ww2KeymapGet(category, vehicleIdx, functionCode, idx, keymap->keymapType, &curkeymap, NULL) == 0)
+	if(ww2KeymapGet(category, vehicleIdx, functionCode, idx, keymap->keymapType, &curkeymap, nullptr) == 0)
 	{
 		return memcmp(keymap, &curkeymap, sizeof(imap_keymap));
 	}
@@ -831,7 +755,7 @@ int ww2KeymapGet(int category, int vehicleIdx, unsigned int functionCode, unsign
 void ww2KeymapClear(int category, int vehicleIdx, unsigned int functionCode, unsigned int idx, int keymapType)
 {
 	imapKeymapRef ref = ww2Keymap(category, vehicleIdx, 0);
-	if(ref == NULL) return;
+	if(ref == nullptr) return;
 
 	imap_keymap keymap;
 	memset(&keymap, 0, sizeof(keymap));
@@ -868,14 +792,14 @@ int ww2KeymapHasKeyboardAxis(int category, int vehicleIdx, unsigned int function
 	for(i = 0; i < 4; i++)
 	{
 		imap_keymap km;
-		if(ww2KeymapGet(category, vehicleIdx, functionCode, i, IMAP_AXIS_REL_KEYMAP, &km, NULL) == 0)
+		if(ww2KeymapGet(category, vehicleIdx, functionCode, i, IMAP_AXIS_REL_KEYMAP, &km, nullptr) == 0)
 			return 1;
 	}
 
 	for(i = 0; i < 11; i++)
 	{
 		imap_keymap km;
-		if(ww2KeymapGet(category, vehicleIdx, functionCode, i, IMAP_AXIS_ABS_KEYMAP, &km, NULL) == 0)
+		if(ww2KeymapGet(category, vehicleIdx, functionCode, i, IMAP_AXIS_ABS_KEYMAP, &km, nullptr) == 0)
 			return 1;
 	}
 
@@ -993,7 +917,7 @@ int  ww2KeymapSaveAll()
 		for(j = 0; j < MAX_VEHICLES; j++)
 		{
 			imapKeymapRef ref = ww2Keymap(i, j, 0);
-			if(ref == NULL) break;
+			if(ref == nullptr) break;
 
 			if(ww2KeymapIsDirty(i,j))
 				err = ww2KeymapSaveRef(ref, i, j);
@@ -1024,7 +948,7 @@ const wchar_t* ww2KeymapVehicleName(int category, int vehicleIdx, int maxlen)
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -1128,7 +1052,7 @@ void ww2KeymapResetCalibration()
 
 		axisCalib->mouseX = DEFAULT_MOUSE_SENS;
 		axisCalib->mouseY = DEFAULT_MOUSE_SENS;
-		axisCalib->joystick = NULL;
+		axisCalib->joystick = nullptr;
 	}
 }
 
@@ -1138,10 +1062,10 @@ void ww2KeymapResetCalibration()
 
 imapKeymapRef ww2Keymap(int category, int vehicleIdx, int archive)
 {
-	imapKeymapRef* ref = NULL;
+	imapKeymapRef* ref = nullptr;
 	int idx = 0;
 
-	if(category < 0 || category >= WW2_FUNC_NUM_CATEGORIES) return NULL;
+	if(category < 0 || category >= WW2_FUNC_NUM_CATEGORIES) return nullptr;
 
 	if(vehicleIdx < 0)
 	{
@@ -1164,10 +1088,10 @@ imapKeymapRef ww2Keymap(int category, int vehicleIdx, int archive)
 		}
 	}
 
-	if(ref && *ref == NULL && idx > -1)
+	if(ref && *ref == nullptr && idx > -1)
 		*ref = imapKeymapAlloc();
 
-	return (ref) ? *ref : NULL;
+	return (ref) ? *ref : nullptr;
 }
 
 /************************************************************************************************
@@ -1223,15 +1147,12 @@ static int ww2KeymapvehtypeListIdx(int category, int vehicleIdx)
 		if(!vehtype->OnlineOnly)
 		{
 			// subclass ground vehicles
-#ifdef DOROTHY
-			if(type == VEH_TYPE_GROUND && (vehtype->Type == VEH_TYPE_GROUND || vehtype->Type == VEH_TYPE_MECH))
-#else
 			if(type == VEH_TYPE_GROUND && vehtype->Type == VEH_TYPE_GROUND)
-#endif
 			{
-				if(!strcmp((char*)weaponClass[vehtypeWeaponSpec(i).wClass].name, categoryClassName[category]))
+				if(weaponClass[vehtypeWeaponSpec(i).wClass].name == categoryClassName[category])
 					idx++;
-			}else if(vehtype->Type == (UINT32)type)
+			}
+			else if(vehtype->Type == (UINT32)type)
 			{
 				idx++;
 			}
@@ -1386,32 +1307,32 @@ static imap_axis_calib* ww2KeymapLoadAxisCalibration(const char* filename)
 				if(line[0] == '#') continue;
 
 				 // iac
-				s = strtok(line, ","); if(s == NULL) break;
-				iac =  strtoul(s, NULL, 0);
+				s = strtok(line, ","); if(s == nullptr) break;
+				iac =  strtoul(s, nullptr, 0);
 
 				// deadband or mouse sensitivity
-				s = strtok(NULL, ","); if(s == NULL) break;
+				s = strtok(nullptr, ","); if(s == nullptr) break;
 				if(iac == 0) // all mouse axes
 				{
 					calib->mouseX = calib->mouseY = (float)atof(s); continue;
 				}else if(iac == IAC_MOUSEX)
 				{
 					calib->mouseX = (float)atof(s);
-					s = strtok(NULL, ",");
+					s = strtok(nullptr, ",");
 					if(s)
 						calib->aimMouseX = calib->aimMouseY = (float)atof(s);
 					continue;
 				}else if(iac == IAC_MOUSEY)
 				{
 					calib->mouseY = (float)atof(s);
-					s = strtok(NULL, ",");
+					s = strtok(nullptr, ",");
 					if(s)
 						calib->aimMouseY = calib->aimMouseY = (float)atof(s);
 					continue;
 				}
 
 				/*
-				s = strtok(NULL, ",");
+				s = strtok(nullptr, ",");
 
 				if(s) // Separate scalar for aiming
 				{
@@ -1435,19 +1356,19 @@ static imap_axis_calib* ww2KeymapLoadAxisCalibration(const char* filename)
 
 				// deadband
 				joyCalib = ww2KeymapFindCalibration(calib, iac);
-				if(joyCalib == NULL) break;
+				if(joyCalib == nullptr) break;
 				joyCalib->deadband = (float)atof(s);
 
 				// x
-				s = strtok(NULL, ","); if(s == NULL) break;
+				s = strtok(nullptr, ","); if(s == nullptr) break;
 				joyCalib->x = (float)atof(s);
 
 				// y
-				s = strtok(NULL, ","); if(s == NULL) break;
+				s = strtok(nullptr, ","); if(s == nullptr) break;
 				joyCalib->y = (float)atof(s);
 
 				// fullband
-				s = strtok(NULL, ","); if(s == NULL) break;
+				s = strtok(nullptr, ","); if(s == nullptr) break;
 				joyCalib->fullband = (float)atof(s);
 			}
 			fioClose(fd);
@@ -1495,7 +1416,7 @@ static imap_joy_calib* ww2KeymapFindCalibration(imap_axis_calib* calib, unsigned
 		while(joyCalib)
 		{
 			if(joyCalib->iac == iac) return joyCalib;
-			if(joyCalib->next == NULL) break;
+			if(joyCalib->next == nullptr) break;
 
 			joyCalib = joyCalib->next;
 		}
@@ -1516,7 +1437,7 @@ static imap_joy_calib* ww2KeymapFindCalibration(imap_axis_calib* calib, unsigned
 		return joyCalib;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /************************************************************************************************
@@ -1870,7 +1791,7 @@ const vehType* ww2imapGetVehTypeByIndex(int category, int index)
 	if(typeIndex > -1)
 		return vehtypeGetByIndex((UINT32)typeIndex);
 
-	return NULL;
+	return nullptr;
 }
 
 void ww2imapInitIndexMap()

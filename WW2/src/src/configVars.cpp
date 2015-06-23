@@ -1,6 +1,7 @@
 #include <syscfg.h> // Path is project specific.
 // Implement all the various config values.
 
+#include "mem/mem.h"
 #include "str/strdupptr.h"
 #include "teul/teulConfigVar.h"
 
@@ -21,7 +22,7 @@ extern bool teulGetHost(const SCHAR* address, UINT32* host);
 	ConfigStr cv_##Name_ ( CVT_STRING, #Name_, Default_, EnvName_, Required_, Description_ )
 
 #define CFG_UINT(Name_, Default_, EnvName_, Description_)	\
-	ConfigUint cv_##Name_ ( CVT_UNSIGNED_INT, #Name_, Default_, EnvName_, false, Description_ )
+	ConfigUint cv_##Name_ ( CVT_UNSIGNED_INT, #Name_, Default_, EnvName_, true, Description_ )
 
 #define CFG_SINT(Name_, Default_, EnvName_, Description_)	\
 	ConfigSint cv_##Name_ ( CVT_SIGNED_INT, #Name_, Default_, EnvName_, false, Description_ )
@@ -57,20 +58,20 @@ CFG_PATH(thblitzPath, "th_blitz" PATH_SEPSTR "weapon", "THBLITZ_PATH", true, "Pa
 CFG_BOOL(stratIgnoreErrors, "0", "STRAT_IGNORE_ERRORS", "Disables sdm-loading errors from causing termination.");
 CFG_PATH(blitzworPath, "blitzWor.csv", "BLITZWOR_PATH", true, "DATA_DIR-relative path/filename for the blitzWor csv file");
 CFG_PATH(luaPath, PN_PLAYNET_PATH PATH_SEPSTR "wwiiol" PATH_SEPSTR "lua", "LUA_BASE_PATH", true, "Path to the Lua scripts.");
-CFG_PATH(defaultLogPath, NULL, "LOG_PATH", false, "Default location for log files.");
+CFG_PATH(defaultLogPath, nullptr, "LOG_PATH", false, "Default location for log files.");
 CFG_PATH(teulWebPath, PN_PLAYNET_PATH PATH_SEPSTR "wwiiol" PATH_SEPSTR "web" PATH_SEPSTR "debug", "TEUL_UWEB_PATH", true, "Path to the top-level directory for the internal web server.");
 CFG_PATH(luaRCFile, "rc.lua", "LUA_RC_FILE", true, "Name of the startup (rc) Lua script");
 CFG_PATH(luaStratlibFile, "stratlib.lua", "LUA_STRATLIB_FILE", true, "Name of the Lua strat library.");
 
 CFG_ADDR(wwiiDBAddress, nullptr, "WWII_DB_ADDRESS", true, "IP address of the MySQL Database.");
 CFG_STRING(wwiiDBDefaultSchema, "wwiionline", "WWII_DB_SCHEMA", true, "Default schema for game data.");
-CFG_ADDR(dbsePrimaryAddress, NULL, "DBSE_PRIMARY_ADDRESS", true, "IP address dbd clients will reach the dbd on.");
+CFG_ADDR(dbsePrimaryAddress, nullptr, "DBSE_PRIMARY_ADDRESS", true, "IP address dbd clients will reach the dbd on.");
 CFG_UINT(dbseConnectionTimeout_ms, "3000", "DBSE_CONNECTION_TIMEOUT_MS", "Time in miliseconds before database proxy connections timeout.");
 CFG_BOOL(mysqlCompression, "0", "MYSQL_COMPRESSION", "Enable compression when communicating with the MySQL server");
 
 CFG_STRING(clusterName, nullptr, "WWII_CLUSTER", true, "Short-name for this cluster, e.g. 'dev'");
 CFG_UINT(arenaID, nullptr, "ARENA_ID", "Numeric ID for this arena.");
-CFG_UINT(appID, NULL, "APP_ID", "App ID for this server - 1 being release, 12 being beta.");
+CFG_UINT(appID, nullptr, "APP_ID", "App ID for this server - 1 being release, 12 being beta.");
 CFG_ADDR(ircServer, "", "WWII_IRC_SERVER", false, "Address of the IRC server. If not defined, disables IRC.");
 CFG_STRING(ircPassword, "blooGit", "WWII_IRC_PASSWD", true, "Server-password for the IRC server.");
 CFG_UINT(ircPort, "6667", "WWII_IRC_PORT", "Port to connect to the IRC server on.");
@@ -78,7 +79,7 @@ CFG_STRING(authErrorUrl, "http://www.wwiionline.com/auth/errors/", "AUTH_ERROR_U
 CFG_ADDR(baseAddress, nullptr, "BASE_ADDRESS", true, "Network address (/24) for the cluster. Server's will map their last octets (x.x.x.N) into this network for inter-host communications.");
 
 CFG_ADDR(authHost, "auth.playnet.com", "AUTH_ADDRESS", true, "Host name or IP Address of the authentication server.");
-CFG_ADDR(authdbAddress, NULL, "AUTH_DB", true, "Address of the MySQL server hosting the auth database.");
+CFG_ADDR(authdbAddress, nullptr, "AUTH_DB", true, "Address of the MySQL server hosting the auth database.");
 CFG_STRING(authdbPort, "", "AUTH_DB_PORT", true, "Port of the Auth MySQL server if not default.");
 #if defined( HAPPYOO )
 CFG_STRING(authdbPassword, "m4nd0l1n", "AUTH_DB_PASSWD", true, "Password to use for the auth database.");
@@ -98,7 +99,7 @@ CFG_STRING(defaultInterface, NULL, "DEFAULT_IFACE", false, "Name of the network 
 CFG_STRING(defaultInterface, "eth0", "DEFAULT_IFACE", true, "Name of the network interface to treat as primary.");
 #endif
 
-CFG_STRING(manageProcesses, NULL, "MANAGE_PROCESSES", false, "Semi-colon separated list of processes this machine should run.");
+CFG_STRING(manageProcesses, nullptr, "MANAGE_PROCESSES", false, "Semi-colon separated list of processes this machine should run.");
 
 //////////////////////////////////////////////////////////////////////////
 // Helper for creating ensuring a string is in native path style and
@@ -112,16 +113,19 @@ static char* _makeNativePath(const char* const path_)
 
 	// Trim trailing slashes off of path names.
 	char nativePath[1024];
-	size_t len = snprintf(nativePath, sizeof(nativePath), "%s", path_);	// Get length in first pass.
+	size_t len = strprintf(nativePath, "%s", path_);	// Get length in first pass.
 	if ( len >= sizeof(nativePath) )
 		LogAbort("Invalid path: %s", path_);
 	while ( len > 0 && (nativePath[len-1] == '/' || nativePath[len-1] == '\\') )
 		nativePath[--len] = 0;
 #if defined(WIN32)
 	// Perform path naturalization for Windows.
-	char* p;
-	while ( (p = strchr(nativePath, '/')) != nullptr )
-		*p = '\\';
+	char* p = nativePath;
+	while (*p) {
+		if (*p == '/')
+			*p = '\\';
+		++p;
+	}
 #endif
 	return strdup(nativePath);
 }
@@ -129,22 +133,19 @@ static char* _makeNativePath(const char* const path_)
 ////////////////////////////////////////////////////////////////////////////////
 // Read values from the environment or configuration file.
 
-#include <vector>
-
 struct ConfigEntry
 {
 	ConfigEntry() : m_name(nullptr), m_value(nullptr) {}
-	ConfigEntry(const char* name_, const char* equals_, const char* end_)
-		: m_name(name_, static_cast<size_t>(equals_ - name_))
-		, m_value(nullptr)
+	ConfigEntry(const char* name_, const char* nameEnd_, const char* value_, const char* valueEnd_)
+		: m_name(name_, static_cast<size_t>(nameEnd_ - name_))
+		, m_value(value_, static_cast<size_t>(valueEnd_ - value_))
 	{
-		setValueFromEquals(equals_, end_);
 	}
 	StrDupPtr	m_name;
 	StrDupPtr	m_value;
-	void setValueFromEquals(const char* equals_, const char* end_)
+	void setValue(const char* value_, const char* valueEnd_)
 	{
-		m_value.copy(equals_ + 1, static_cast<size_t>(end_ - (equals_ + 1)));
+		m_value.copy(value_, static_cast<size_t>(valueEnd_ - value_));
 	}
 };
 
@@ -196,28 +197,30 @@ static void _readConfigEntriesFromFile(IO::MappedFile& file)
 			continue;
 		}
 		const char* name = cur;
-		cur = equals + 1;
-		const char* eol = strpbrk(cur, "\r\n");
+		const char* value = equals + 1;
+		if (*value == '"')
+			++value;
+		const char* eol = strpbrk(value, "\r\n\"");
 		if ( eol != nullptr )
 			cur = eol;
 		else
 			cur = eol = file.endPtr();
 
 		// Trim trailing white space.
-		while ( eol > equals && isspace(*(eol - 1)) )
+		while ( eol > value && isspace(*(eol - 1)) )
 			--eol;
 
 		auto it = configEntries.begin();
-		for ( ; it != configEntries.end(); ++it )
+		for ( auto end = configEntries.end(); it != end; ++it )
 		{
 			if ( strncasecmp(it->m_name, name, static_cast<size_t>(equals - name)) == 0 )
 			{
-				it->setValueFromEquals(equals, eol);
+				it->setValue(value, eol);
 				break;
 			}
 		}
 		if ( it == configEntries.end() )
-			configEntries.emplace_back(std::move(ConfigEntry(name, equals, eol)));
+			configEntries.emplace_back(std::move(ConfigEntry(name, equals, value, eol)));
 		file.skipline();
 	}
 }
@@ -301,7 +304,7 @@ static void _getSortedConfigVars(std::vector<Teul::ConfigVar*>& myList)
 	std::sort(myList.begin(), myList.end(), [](const Teul::ConfigVar* lhs, const Teul::ConfigVar* rhs) { return strcasecmp(rhs->GetEnvVarName(), lhs->GetEnvVarName()) > 0; });
 }
 
-void teulPrintConfigVars()
+void Teul::ConfigVar::PrintCurrentVars()
 {
 	std::vector<Teul::ConfigVar*> myList;
 	_getSortedConfigVars(myList);
@@ -321,12 +324,12 @@ void teulPrintConfigVars()
 	}
 }
 
-void teulGenerateEnvironmentCfgFile(const char* const filename_)
+void Teul::ConfigVar::Generate(const char* const filename_)
 {
 	std::vector<Teul::ConfigVar*> myList;
 	_getSortedConfigVars(myList);
 	FILE* fp = fopen(filename_, "w");
-	if ( fp == NULL )
+	if ( fp == nullptr )
 	{
 		fprintf(stderr, "Unable to create config file: %s\n", filename_);
 		exit(-1);
@@ -358,7 +361,7 @@ namespace Teul
 {
 	void ConfigVar::InitializeConfigVars()
 	{
-		for ( auto it : _getConfigVars() )
+		for (auto& it : _getConfigVars())
 		{
 			it->Initialize();
 		}
@@ -413,9 +416,15 @@ namespace Teul
 
 		if ( m_default != nullptr )
 			Set(m_default);
+	}
 
-		if ( m_required && (m_value == nullptr || (m_default == nullptr && *m_value == 0)) )
-			LogAbort("Config variable %s (%s) must be defined with a non-empty value.", GetName(), GetEnvVarName());
+	void ConfigVar::CheckConfiguration()
+	{
+		for (auto& it : _getConfigVars())
+		{
+			if (it->m_required && (it->m_value == nullptr || (it->m_default == nullptr && *it->m_value == 0)))
+				LogAbort("Config variable %s (%s) must be defined with a non-empty value.", it->GetName(), it->GetEnvVarName());
+		}
 	}
 
 	ConfigVar::~ConfigVar()
@@ -479,7 +488,7 @@ namespace Teul
 	void ConfigVar::SetUint32Value(const char* newValue_)
 	{
 		if ( newValue_ != nullptr && *newValue_ )
-			SetUint32Value(strtoul(newValue_, NULL, 10));
+			SetUint32Value(strtoul(newValue_, nullptr, 10));
 		else
 		{
 			m_initialized = true;
@@ -491,7 +500,7 @@ namespace Teul
 	void ConfigVar::SetSint32Value(const char* newValue_)
 	{
 		if ( newValue_ != nullptr && *newValue_ )
-			SetSint32Value(strtol(newValue_, NULL, 10));
+			SetSint32Value(strtol(newValue_, nullptr, 10));
 		else
 		{
 			m_initialized = true;
@@ -539,14 +548,12 @@ namespace Teul
 
 		if ( !teulGetHost(newValue_, &m_union.um_uint32) )
 		{
-			UINT32* addresses = teulGetHostByName(newValue_);
-			if ( addresses == nullptr || *addresses == 0 )
+			m_union.um_uint32 = Teul::GetSingleIP(newValue_);
+			if ( m_union.um_uint32 == 0 )
 			{
-				dbugLog(_FLA, "%s: invalid ip address: %s", GetName(), newValue_);
+				LogAbort("%s: invalid ip address: %s", GetName(), newValue_);
 				return;
 			}
-			m_union.um_uint32 = *addresses;
-			memFree(addresses);
 		}
 
 		m_value = strdup(newValue_);

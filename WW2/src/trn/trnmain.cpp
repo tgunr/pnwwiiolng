@@ -198,7 +198,7 @@ UINT16	TempNum;
 
 static UINT32 _GetChaoticNumberGeneratorSeed(_CHAOTICSEEDTYPE * Seed)
 {
-	if (Seed == NULL)
+	if (Seed == nullptr)
 	{
 		return FALSE;
 	}
@@ -210,7 +210,7 @@ static UINT32 _GetChaoticNumberGeneratorSeed(_CHAOTICSEEDTYPE * Seed)
 
 static UINT32 _SetChaoticNumberGeneratorSeed(_CHAOTICSEEDTYPE * Seed)
 {
-	if (Seed == NULL)
+	if (Seed == nullptr)
 	{
 		return FALSE;
 	}
@@ -244,7 +244,7 @@ LOGICAL trnmainGetMapName(SINT8* map)
 
 LOGICAL trnmainSetTerrainMatrix(OBJECT* lpobj)
 {
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -261,7 +261,7 @@ TERRAIN_DETAIL* trnGetTerainDetail(SINT16 scx, SINT16 scy)
 {
 SINT32 i;
 
-	for (i=0 ; i < NUM_TERRAIN_RECTANGLES ; i++)
+	for (i=0; i < NUM_TERRAIN_RECTANGLES; i++)
 	{
 		if (activeTerrainDetail[i] &&
 			trndtl[i].scx == scx &&
@@ -270,25 +270,25 @@ SINT32 i;
  //           if(trndtl[i].trnstate.state != TRN_STATE_WAIT)
 			if (trndtl[i].stratLoaded == FALSE)
 			{
-                return NULL;
+                return nullptr;
             }
 
 			return &trndtl[i];
 		}
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 LOGICAL trnGetStratData(SINT16 scx, SINT16 scy, SINT32 id, SINT32* country, SINT32* level)
 {
 	FULL_OBJ_ID fid;
 
-	fid.cell.ox		= scx << 4 ;
-	fid.cell.oy		= scy << 4 ;
-	fid.id			= id ;
-	fid.objClass	= 0 ;
-	fid.objType		= 0 ;
+	fid.cell.ox		= scx << 4;
+	fid.cell.oy		= scy << 4;
+	fid.id			= id;
+	fid.objClass	= 0;
+	fid.objType		= 0;
 
 	LOGICAL result = FALSE;
 
@@ -342,7 +342,7 @@ SINT32 trnSetStratData(TERRAIN_DETAIL* td, SINT32 bid, SINT32 country, SINT32 le
 
 			blist = sdmGetFaciltyBidList(td->facTable, (SINT16)bid);
 
-			if (blist == NULL)
+			if (blist == nullptr)
 			{
 				rnmainListText("Invalid building message");
 				Write_Debug("Invalid building message in recvWorldUpdate, "
@@ -376,12 +376,12 @@ SINT32 trnUpdateStratData(TERRAIN_DETAIL* td, OBJECT* lpobj, SINT32 bid, LOGICAL
 	if ( bid == 0)
 		return -EINVAL;
 
-	if ( td == NULL || td->bldHash.building == NULL || bid > td->bldHash.maxBldID)
+	if ( td == nullptr || td->bldHash.building == nullptr || bid > td->bldHash.maxBldID)
 		return -EINVAL;
 
 	if (bid < 0)
 	{
-		if (lpobj == NULL || loaded == TRUE)
+		if (lpobj == nullptr || loaded == TRUE)
 			return -EINVAL;
 
 		for (i = 0; i <= td->bldHash.maxBldID;i++)
@@ -412,7 +412,7 @@ SINT32 trnUpdateStratData(TERRAIN_DETAIL* td, OBJECT* lpobj, SINT32 bid, LOGICAL
 		td->bldHash.building[bid].pobj = lpobj;
 	}
 	else
-		td->bldHash.building[bid].pobj = NULL;
+		td->bldHash.building[bid].pobj = nullptr;
 
 
 	return 0;
@@ -425,8 +425,8 @@ int		i, j;
 
     trndataInit();
 
-	creation = NULL;
-	deletion = NULL;
+	creation = nullptr;
+	deletion = nullptr;
 
 	hystscx = SUPERCELL_INVALID;
 	hystscy = SUPERCELL_INVALID;
@@ -475,11 +475,11 @@ int		i, j;
 	Write_Debug("Terrain minimal horizons: %f", horizon / ScaleFactor);
 #endif
 
-	for (i=0 ; i < NUM_TERRAIN_RECTANGLES ; i++)
+	for (i=0; i < NUM_TERRAIN_RECTANGLES; i++)
 	{
 #ifdef SPATIAL_DB
-//        trndtl[i].sdbInfo = NULL;
-//        trndtl[i].sdbDatabase = NULL;
+//        trndtl[i].sdbInfo = nullptr;
+//        trndtl[i].sdbDatabase = nullptr;
 #endif
 		trndtl[i].scx = SUPERCELL_INVALID;
 		trndtl[i].scy = SUPERCELL_INVALID;
@@ -502,7 +502,7 @@ int		i, j;
 		trndtl[i].nmcnt = 0;
 		trndtl[i].tricnt = 0;
 		trndtl[i].triname[0] = (SCHAR*)memAlloc(32 * MAX_TERRAIN_TEXTURES);
-		for (j=1 ; j < MAX_TERRAIN_TEXTURES ; j++)
+		for (j=1; j < MAX_TERRAIN_TEXTURES; j++)
 		{
 			trndtl[i].triname[j] = trndtl[i].triname[j-1] + 32;
 		}
@@ -556,7 +556,7 @@ LOGICAL trnmainFindSupercell(SINT16* scx, SINT16* scy, piVECTOR* p)
 SINT16		lscx, lscy;
 FLOAT32		x, y, left, top, right, bottom;
 
-	if (p == NULL)
+	if (p == nullptr)
 	{
 		return(FALSE);
 	}
@@ -616,7 +616,7 @@ LOGICAL trnmainAddAltTexture(OBJECT** retobj, OBJECT* lpobj, SINT32 octet, SINT8
 	static SINT8		filename[_MAX_PATH];
 	static SINT8		objname[64];
 	SINT32		i, texid, tonum;
-	OBJECT*	newobj=NULL;
+	OBJECT*	newobj=nullptr;
 	TERRAIN_DETAIL*	td;
 
 	td = &trndtl[lpobj->trnum];
@@ -625,9 +625,9 @@ LOGICAL trnmainAddAltTexture(OBJECT** retobj, OBJECT* lpobj, SINT32 octet, SINT8
 		Write_Debug("Null texture object was used");
 	}
 
-	for (i=0 ; i < MAX_TERRAIN_TEXTURES ; i++)
+	for (i=0; i < MAX_TERRAIN_TEXTURES; i++)
 	{
-		if (td->nonreplacementtiles[i] != NULL)
+		if (td->nonreplacementtiles[i] != nullptr)
 		{
 			if (strcmp(td->nonreplacementtiles[i]->texname, texname) == 0)
 			{
@@ -639,9 +639,9 @@ LOGICAL trnmainAddAltTexture(OBJECT** retobj, OBJECT* lpobj, SINT32 octet, SINT8
 
 	if (i == MAX_TERRAIN_TEXTURES)
 	{
-		for (i=0 ; i < MAX_TERRAIN_TEXTURES ; i++)
+		for (i=0; i < MAX_TERRAIN_TEXTURES; i++)
 		{
-			if (td->nonreplacementtiles[i] != NULL)
+			if (td->nonreplacementtiles[i] != nullptr)
 			{
 				if (td->nonreplacementtiles[i]->numtris == 0)
 				{
@@ -653,11 +653,11 @@ LOGICAL trnmainAddAltTexture(OBJECT** retobj, OBJECT* lpobj, SINT32 octet, SINT8
 		}
 	}
 
-	if (newobj == NULL)
+	if (newobj == nullptr)
 	{
-		for (i=0 ; i < MAX_TERRAIN_TEXTURES ; i++)
+		for (i=0; i < MAX_TERRAIN_TEXTURES; i++)
 		{
-			if (td->nonreplacementtiles[i] == NULL)
+			if (td->nonreplacementtiles[i] == nullptr)
 			{
 				sprintf(objname, "%s_t%d", td->terrain->name, i);
 				if (!obmainCreateObject(&newobj, objname, MAX_TERRAIN_VERTICES, MAX_TERRAIN_TRIANGLES))
@@ -785,8 +785,8 @@ SINT32				nv, nt;
 piINDICES*			pt;
 TERRAIN_DETAIL*	td;
 
-	if (newobj == NULL ||
-		lpobj == NULL)
+	if (newobj == nullptr ||
+		lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -856,7 +856,7 @@ TERRAIN_DETAIL*	td;
 
 	piVertexColorPtr sc = newobj->StaticColors();
 
-	for (i=0 ; i < NUM_VERTICES_PER_OCTET ; i++)
+	for (i=0; i < NUM_VERTICES_PER_OCTET; i++)
 	{
 		sc[nv+i].color	= colorWHITE|colorALPHA;
 		sc[nv+i].specular	= colorALPHA;
@@ -929,7 +929,7 @@ TERRAIN_DETAIL*	td;
 	if ((lpobj->numtris - NUM_TRIANGLES_PER_OCTET) > tri)
 	{
 		nt = lpobj->numtris - NUM_TRIANGLES_PER_OCTET;
-		for (i=tri ; i < nt ; i++)
+		for (i=tri; i < nt; i++)
 		{
 			lpobj->ptris[i].v1 = lpobj->ptris[i + NUM_TRIANGLES_PER_OCTET].v1 - NUM_VERTICES_PER_OCTET;
 			lpobj->ptris[i].v2 = lpobj->ptris[i + NUM_TRIANGLES_PER_OCTET].v2 - NUM_VERTICES_PER_OCTET;
@@ -993,7 +993,7 @@ TERRAIN_DETAIL*	td;
 	if (!loading)
 	{
 		td = &trndtl[newobj->trnum];
-		for (i=0 ; i < td->tricnt ; i++)
+		for (i=0; i < td->tricnt; i++)
 		{
 			if (strcmp(td->triname[i], newobj->texname) == 0)
 			{
@@ -1033,14 +1033,14 @@ TERRAIN_DETAIL*	td;
 		num = 0;
 		td = &trndtl[lpobj->trnum];
 		lpobj = td->terrain;
-		if (lpobj != NULL)
+		if (lpobj != nullptr)
 		{
 			num += 1;
 			nv = 0;
 			nt = 0;
-			for (i=0 ; i < MAX_TERRAIN_TEXTURES ; lpobj=td->txtobj[i++])
+			for (i=0; i < MAX_TERRAIN_TEXTURES; lpobj=td->txtobj[i++])
 			{
-				if (lpobj == NULL)
+				if (lpobj == nullptr)
 				{
 					continue;
 				}
@@ -1050,7 +1050,7 @@ TERRAIN_DETAIL*	td;
 				nt += lpobj->numtris;
 			}
 
-			// Only if some objects were not NULL
+			// Only if some objects were not nullptr
 			if (num != 0)
 			{
 				if (nv < SUPERCELL_OCTETS_XY * NUM_VERTICES_PER_OCTET)
@@ -1159,7 +1159,7 @@ LOGICAL trnmainAddObject(SINT8* objname,
 	}
 
 	ptr = strrchr(objname, '\\');
-	if (ptr != NULL)
+	if (ptr != nullptr)
 	{
 		strcpy(newname, ++ptr);
 	}
@@ -1223,7 +1223,7 @@ LOGICAL trnmainAddObject(SINT8* objname,
 		trnUpdateStratData(td, newobj, StratId, TRUE);
 
 #ifdef SPATIAL_DB
-        if ( (newobj->flag3 & (OBJECT_CLOUDS|OBJECT_RAINCLOUDS)) == 0 && (strstr( objname, "SPWN" ) == NULL) ) // need way to determine SPWN objects
+        if ( (newobj->flag3 & (OBJECT_CLOUDS|OBJECT_RAINCLOUDS)) == 0 && (strstr( objname, "SPWN" ) == nullptr) ) // need way to determine SPWN objects
         {
             SDB_Box2D b;
             FLOAT32 avgz = 0.0;
@@ -1231,10 +1231,10 @@ LOGICAL trnmainAddObject(SINT8* objname,
             size_t counter = 0;
 
             OBJECT* topobj = newobj->child;
-            while ( topobj != NULL )
+            while ( topobj != nullptr )
             {
                 OBJECT* obj = topobj->child;
-                while ( obj != NULL )
+                while ( obj != nullptr )
                 {
                     trnCDTerrainObject* tto = (trnCDTerrainObject*)(obj->lpspare);
                     if ( tto )
@@ -1337,7 +1337,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 		Write_Debug("Could not find the center terrain square");
 
 #ifdef DONT_USE
-		for (i=0 ; i < NUM_TERRAIN_RECTANGLES ; i++)
+		for (i=0; i < NUM_TERRAIN_RECTANGLES; i++)
 		{
 			trndtl[i].terrain->flags &= OBJECT_SKIPDRAWING;
 			trndtl[i].scx = SUPERCELL_INVALID;
@@ -1382,7 +1382,7 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 //#endif
 		if (ForceCompleteReload != TRUE)
 		{
-			for (i=0 ; i < NUM_TERRAIN_RECTANGLES ; i++)
+			for (i=0; i < NUM_TERRAIN_RECTANGLES; i++)
 			{
 				if (trndtl[i].scx == scx && trndtl[i].scy == scy)
 				{
@@ -1840,17 +1840,17 @@ static LOGICAL RawUpdate(LOGICAL ForceCompleteReload)
 
 		if (i == NUM_TERRAIN_RECTANGLES)
 		{
-			for (i=0 ; i < NUM_TERRAIN_RECTANGLES ; i++)
+			for (i=0; i < NUM_TERRAIN_RECTANGLES; i++)
 			{
 				trnldrReleaseSupercell(i);
 			}
 		}
 
-		for (i=0 ; i < NUM_TERRAIN_RECTANGLES ; i++)
+		for (i=0; i < NUM_TERRAIN_RECTANGLES; i++)
 		{
-			for (j=0 ; j < MAX_TERRAIN_TEXTURES ; j++)
+			for (j=0; j < MAX_TERRAIN_TEXTURES; j++)
 			{
-				if (trndtl[i].nonreplacementtiles[j] != NULL)
+				if (trndtl[i].nonreplacementtiles[j] != nullptr)
 				{
 					trndtl[i].nonreplacementtiles[j]->trnum = i;
 				}
@@ -2424,7 +2424,7 @@ OBJECT*	tt;
 
 	idmm = 255.0f / (dmax - dmin);
 
-	for (i=0 ; i < NUM_TERRAIN_RECTANGLES ; i++)
+	for (i=0; i < NUM_TERRAIN_RECTANGLES; i++)
 	{
 		tt = trndtl[i].terrain;
 		if (tt->flags & OBJECT_VISIBLE)
@@ -2433,7 +2433,7 @@ OBJECT*	tt;
 			piVertexColorPtr sc = tt->StaticColors();
 
 			num = tt->numverts;
-			for (j=0 ; j < num ; j++, ++sc, ++spos)
+			for (j=0; j < num; j++, ++sc, ++spos)
 			{
 				x = spos->x - p.x;
 				y = spos->y - p.y;
@@ -2457,10 +2457,10 @@ OBJECT*	tt;
 			}
 		}
 
-		for (k=0 ; k < MAX_TERRAIN_TEXTURES ; k++)
+		for (k=0; k < MAX_TERRAIN_TEXTURES; k++)
 		{
 			tt = trndtl[i].nonreplacementtiles[k];
-			if (tt == NULL || !(tt->flags & OBJECT_VISIBLE) || tt->numtris == 0)
+			if (tt == nullptr || !(tt->flags & OBJECT_VISIBLE) || tt->numtris == 0)
 			{
 				continue;
 			}
@@ -2469,7 +2469,7 @@ OBJECT*	tt;
 			piVertexColorPtr sc = tt->StaticColors();
 
 			num = tt->numverts;
-			for (j=0 ; j < num ; j++, ++sc, ++spos)
+			for (j=0; j < num; j++, ++sc, ++spos)
 			{
 				x = spos->x - p.x;
 				y = spos->y - p.y;
@@ -2520,7 +2520,7 @@ r0x = r0y = r0freq = r1x = r1y = r1freq = 0;
 	p.z = -playpos.z;
 
 	color = piRGBA_MAKE(WATER_COLOR_RED, WATER_COLOR_GREEN, WATER_COLOR_BLUE, WATER_COLOR_ALPHA);
-	for (i=0 ; i < NUM_TERRAIN_RECTANGLES ; i++)
+	for (i=0; i < NUM_TERRAIN_RECTANGLES; i++)
 	{
 		tt = trndtl[i].terrain;
 		if (!(tt->flags & OBJECT_VISIBLE))
@@ -2536,7 +2536,7 @@ r0x = r0y = r0freq = r1x = r1y = r1freq = 0;
 		piVertexColorConstPtr ic = tt->ImmutableColors();
 
 		num = tt->numverts;
-		for (j=0 ; j < num ; j++, ++ipos, ++mpos, ++ic)
+		for (j=0; j < num; j++, ++ipos, ++mpos, ++ic)
 		{
 			if (ic->color == color)
 			{
@@ -2594,7 +2594,7 @@ bool trnmainIsReplacement(const FLOAT64VECTOR& pos)
 
     int idx = TRNINDEX(r, c);
 
-    TERRAIN_DETAIL* td = NULL;
+    TERRAIN_DETAIL* td = nullptr;
 
     for(int q = 0; q < NUM_TERRAIN_RECTANGLES; q++)
     {
@@ -2697,7 +2697,7 @@ piVECTOR	va, vb, vc;
 OBJECT*	lpobj;
 
 	lpobj = td->terrainorig;
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return;
 	}
@@ -2713,7 +2713,7 @@ OBJECT*	lpobj;
 	dmax = horizon * horizon;
 
 	piVectorConstPtr rpos = lpobj->RenderPositions();
-	for (i=0 ; i < SUPERCELL_OCTETS_X ; i++, rpos+=NUM_VERTICES_PER_OCTET)
+	for (i=0; i < SUPERCELL_OCTETS_X; i++, rpos+=NUM_VERTICES_PER_OCTET)
 	{
 		va.x = rpos[0].x;
 		va.y = rpos[0].y;
@@ -2754,7 +2754,7 @@ OBJECT*	lpobj;
 	}
 
 	rpos = lpobj->RenderPositions();
-	for (i=0 ; i < SUPERCELL_OCTETS_Y ; i++, rpos+=SUPERCELL_OCTETS_X*NUM_VERTICES_PER_OCTET)
+	for (i=0; i < SUPERCELL_OCTETS_Y; i++, rpos+=SUPERCELL_OCTETS_X*NUM_VERTICES_PER_OCTET)
 	{
 		va.x = rpos[0].x;
 		va.y = rpos[0].y;
@@ -3104,7 +3104,7 @@ static void _drawScene(OBJECT* o)
         }
     }
 
-    SINT32 texType = obdrawGetMultiTextureOpcode(o->texid, NULL);
+    SINT32 texType = obdrawGetMultiTextureOpcode(o->texid, nullptr);
 
     if(texType == MT_SINGLEPASS)
     {
@@ -3362,9 +3362,9 @@ SORTHEADER		sort;
 	{
 		if (LightingUpdate)
 		{
-			for (i=0 ; i < NUM_TERRAIN_RECTANGLES ; i++)
+			for (i=0; i < NUM_TERRAIN_RECTANGLES; i++)
 			{
-				if (trndtl[i].terrain != NULL &&
+				if (trndtl[i].terrain != nullptr &&
 					trndtl[i].terrain->flags & OBJECT_VISIBLE)
 				{
 					sort.part = trndtl[i].terrain;
@@ -3374,9 +3374,9 @@ SORTHEADER		sort;
 					}
 				}
 
-				for (j=0 ; j < MAX_TERRAIN_TEXTURES ; j++)
+				for (j=0; j < MAX_TERRAIN_TEXTURES; j++)
 				{
-					if (trndtl[i].txtobj[j] != NULL &&
+					if (trndtl[i].txtobj[j] != nullptr &&
 						trndtl[i].txtobj[j]->flags & OBJECT_VISIBLE)
 					{
 						sort.part = trndtl[i].txtobj[j];
@@ -3390,16 +3390,16 @@ SORTHEADER		sort;
 		}
 		else
 		{
-			for (i=0 ; i < NUM_TERRAIN_RECTANGLES ; i++)
+			for (i=0; i < NUM_TERRAIN_RECTANGLES; i++)
 			{
 				if (activeTerrainDetail[i] == FALSE)
 				{
 					continue;
 				}
 
-				for (j=0 ; j < MAX_TERRAIN_TEXTURES ; j++)
+				for (j=0; j < MAX_TERRAIN_TEXTURES; j++)
 				{
-					if (trndtl[i].txtobj[j] != NULL &&
+					if (trndtl[i].txtobj[j] != nullptr &&
 						trndtl[i].txtobj[j]->flags & OBJECT_VISIBLE &&
 						!(trndtl[i].txtobj[j]->flags & OBJECT_NOSPECULAR))
 					{
@@ -3422,14 +3422,14 @@ SORTHEADER		sort;
 	// Keep track of number of triangles we have drawn
 	NumDrawnTriangles = 0;
 
-	for (i=0 ; i < NUM_TERRAIN_RECTANGLES ; i++)
+	for (i=0; i < NUM_TERRAIN_RECTANGLES; i++)
 	{
 		if (activeTerrainDetail[i] == FALSE)
 		{
 			continue;
 		}
 
-		if (trndtl[i].terrain != NULL &&
+		if (trndtl[i].terrain != nullptr &&
 			trndtl[i].terrain->flags & OBJECT_VISIBLE)
 		{
             if(trndtl[i].terrain->numtris > 0)
@@ -3445,9 +3445,9 @@ SORTHEADER		sort;
             }
 		}
 
-		for (j=0 ; j < MAX_TERRAIN_TEXTURES ; j++)
+		for (j=0; j < MAX_TERRAIN_TEXTURES; j++)
 		{
-			if (trndtl[i].nonreplacementtiles[j] != NULL)
+			if (trndtl[i].nonreplacementtiles[j] != nullptr)
 			{
 				if (trndtl[i].nonreplacementtiles[j]->flags & OBJECT_VISIBLE)
 				{
@@ -3512,7 +3512,7 @@ int		i;
 
 	trnldrKill();
 
-	for (i=0 ; i < _CurrentImportObjectCount ; i++)
+	for (i=0; i < _CurrentImportObjectCount; i++)
 	{
 		obpoolFreeObjectCallback(_ImportObjectList[i]);
 	}
@@ -3647,11 +3647,11 @@ SINT32		i, j;
 OBJECT*	lpobj;
 piMATRIX*	lpmat;
 
-	for (i=0 ; i < NUM_TERRAIN_RECTANGLES ; i++)
+	for (i=0; i < NUM_TERRAIN_RECTANGLES; i++)
 	{
-		for (j=0 ; j < MAX_TERRAIN_TEXTURES ; j++)
+		for (j=0; j < MAX_TERRAIN_TEXTURES; j++)
 		{
-			if (trndtl[i].nonreplacementtiles[j] != NULL)
+			if (trndtl[i].nonreplacementtiles[j] != nullptr)
 			{
 				lpobj = trndtl[i].nonreplacementtiles[j];
 				lpmat = &lpobj->mat;
@@ -3670,7 +3670,7 @@ piMATRIX*	lpmat;
 			lpmat->_43 += CameraAdjustment->z;
 		}
 
-		if (trndtl[i].terrainorig != NULL &&
+		if (trndtl[i].terrainorig != nullptr &&
 			trndtl[i].terrainorig->numtris != 0)
 		{
 			lpobj = trndtl[i].terrainorig;
@@ -3782,7 +3782,7 @@ static UINT32 _ScanObjectTreeForSubstitutionObjects(OBJECT * lpobj)
 OBJECT*	ObjSib;
 UCHAR*		RetPtr;
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return 0;
 	}
@@ -3801,14 +3801,14 @@ UCHAR*		RetPtr;
 			_AddImportObject((OBJECT **)(&ObjSib->lpspare),RetPtr);
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_ScanObjectTreeForSubstitutionObjects(ObjSib->child);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 
 	return 0;
@@ -3819,14 +3819,14 @@ static UINT32 _AddImportObject(OBJECT ** ObjectPtr, UCHAR * InputString)
 UCHAR	s[64];
 SINT32	i;
 
-	*ObjectPtr = NULL;
+	*ObjectPtr = nullptr;
 
 //	sscanf((char*)InputString,"%s",(char*)s);
 	strcpy((char*)s,"crkwillow2");
 //	strcpy(s,"farmset2_barn");
 
 	// see if we already have an import object loaded
-	for (i=0 ; i < _CurrentImportObjectCount ; i++)
+	for (i=0; i < _CurrentImportObjectCount; i++)
 	{
 		if (strcmp((char*)s,_ImportObjectList[i]->name) == 0)
 		{
@@ -3873,12 +3873,12 @@ piLVERTEX*	CurrentVertex;
 UINT32		VertexCount;
 
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return (TRUE);
 	}
 
-	if (Object->lpspare == NULL)
+	if (Object->lpspare == nullptr)
 	{
 		return (TRUE);
 	}
@@ -3888,7 +3888,7 @@ UINT32		VertexCount;
 
 	piVectorConstPtr rpos = Object->RenderPositions();
 
-	for (i=0 ; i < Object->numtris ; i++)
+	for (i=0; i < Object->numtris; i++)
 	{
 		Vec = V1 =rpos[Object->ptris[i].v1];
 		math3dVectorMultiply(&Vec,&Vec,&Object->mat);
@@ -3929,9 +3929,9 @@ UINT32		VertexCount;
 	_SetChaoticNumberGeneratorSeed(&_Seed);
 
 	rpos = Object->RenderPositions();
-	for (j=0 ; j < 1 ; j++)
+	for (j=0; j < 1; j++)
 	{
-		for (i=0 ; i < Object->numtris ; i++)
+		for (i=0; i < Object->numtris; i++)
 		{
 			if (VertexCount > 500)
 			{
@@ -4005,12 +4005,12 @@ UINT32		VertexCount;
 
 	// find a texture id
 	lpobj = (OBJECT*)Object->lpspare;
-	while (lpobj != NULL && lpobj->flags & OBJECT_NOTOBJECT)
+	while (lpobj != nullptr && lpobj->flags & OBJECT_NOTOBJECT)
 	{
 		lpobj = lpobj->child;
 	}
 
-	if (VertexCount > 0 && lpobj != NULL)
+	if (VertexCount > 0 && lpobj != nullptr)
 	{
 		piSetActiveTexture(lpobj->texid, 0);
 
@@ -4031,7 +4031,7 @@ UINT32		VertexCount;
 	return (TRUE);
 
 
-	if (Object->shadow == NULL)
+	if (Object->shadow == nullptr)
 	{
 		return (TRUE);
 	}
@@ -4091,7 +4091,7 @@ static UINT32 _RenderImportObject(OBJECT * Object)
 OBJECT * ObjSib,*ObjAtt;
 int type;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -4135,17 +4135,17 @@ int type;
 
 				ObjAtt = ObjAtt->attached;
 			}
-			while (ObjAtt != NULL);
+			while (ObjAtt != nullptr);
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_RenderImportObject(ObjSib->child);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 	return 0;
 }
@@ -4193,9 +4193,9 @@ piVERTEX*	po2, pv2;
 
 	// Normalize normals between octets
 	t1 = td->terrain;
-	for (i1=0 ; i1 <= MAX_TERRAIN_TEXTURES ; t1=td->txtobj[i1++])
+	for (i1=0; i1 <= MAX_TERRAIN_TEXTURES; t1=td->txtobj[i1++])
 	{
-		if (t1 == NULL ||
+		if (t1 == nullptr ||
 			t1->flags & OBJECT_SKIPDRAWING ||
 			!(t1->flags & OBJECT_VISIBLE))
 		{
@@ -4210,12 +4210,12 @@ piVERTEX*	po2, pv2;
 		}
 
 		n1 = t1->numverts;
-		for (j1=0 ; j1 < n1 ; j1++)
+		for (j1=0; j1 < n1; j1++)
 		{
 			t2 = td->terrain;
-			for (i2=0 ; i2 <= MAX_TERRAIN_TEXTURES ; t2=td->txtobj[i2++])
+			for (i2=0; i2 <= MAX_TERRAIN_TEXTURES; t2=td->txtobj[i2++])
 			{
-				if (t2 == NULL ||
+				if (t2 == nullptr ||
 					t2->flags & OBJECT_SKIPDRAWING ||
 					!(t2->flags & OBJECT_VISIBLE))
 				{
@@ -4230,7 +4230,7 @@ piVERTEX*	po2, pv2;
 				}
 
 				n2 = t2->numverts;
-				for (j2=0 ; j2 < n2 ; j2++)
+				for (j2=0; j2 < n2; j2++)
 				{
 					if (po1[j1].x == po2[j2].x &&
 						po1[j1].y == po2[j2].y &&
@@ -4248,9 +4248,9 @@ piVERTEX*	po2, pv2;
 
 	// Normalize normals between octets
 	t1 = td->terrain;
-	for (i1=0 ; i1 <= MAX_TERRAIN_TEXTURES ; t1=td->txtobj[i1++])
+	for (i1=0; i1 <= MAX_TERRAIN_TEXTURES; t1=td->txtobj[i1++])
 	{
-		if (t1 == NULL ||
+		if (t1 == nullptr ||
 			t1->flags & OBJECT_SKIPDRAWING ||
 			!(t1->flags & OBJECT_VISIBLE))
 		{
@@ -4265,12 +4265,12 @@ piVERTEX*	po2, pv2;
 		}
 
 		n1 = t1->numverts;
-		for (j1=0 ; j1 < n1 ; j1++)
+		for (j1=0; j1 < n1; j1++)
 		{
 			t2 = td->terrain;
-			for (i2=0 ; i2 <= MAX_TERRAIN_TEXTURES ; t2=td->txtobj[i2++])
+			for (i2=0; i2 <= MAX_TERRAIN_TEXTURES; t2=td->txtobj[i2++])
 			{
-				if (t2 == NULL ||
+				if (t2 == nullptr ||
 					t2->flags & OBJECT_SKIPDRAWING ||
 					!(t2->flags & OBJECT_VISIBLE))
 				{
@@ -4285,7 +4285,7 @@ piVERTEX*	po2, pv2;
 				}
 
 				n2 = t2->numverts;
-				for (j2=0 ; j2 < n2 ; j2++)
+				for (j2=0; j2 < n2; j2++)
 				{
 					if (po1[j1].x == po2[j2].x &&
 						po1[j1].y == po2[j2].y &&
@@ -4313,7 +4313,7 @@ TERRAIN_DETAIL*	td;
 	{
 		td = &trndtl[i];
 
-		for (j=0 ; j < td->tricnt ; j++)
+		for (j=0; j < td->tricnt; j++)
 		{
 			if (td->txtobj[j]->flags & OBJECT_VISIBLE)
 			{
@@ -4431,7 +4431,7 @@ PLANE* trnmainGetPlaneAt(TERRAIN_DETAIL* dtl, double x, double y)
     }
 
     if(!dtl || !dtl->terrainorig)
-        return NULL;
+        return nullptr;
 
     if(!(dtl->flags & TDFLAG_PLANES_CREATED))
     {

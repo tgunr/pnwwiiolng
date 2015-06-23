@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-#if !defined(USE_OSG)
 
 #include "chat/chatBrigadeControl.h"
 #include "chat/chatClientMessages.h"
@@ -13,6 +12,7 @@
 #include "client/clientSquad.h"
 #include "client/clientSTO.h"
 #include "client/GameClient.h"
+#include "client/ww2HostState.h"
 #include "draw/draw3d.h"
 #include "fp/fpFPSdata.h"
 #include "fp/fpFPS.h"
@@ -100,8 +100,8 @@
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiServerTrackedObject.h"
 
-extern void clientErrorLog(const char* const format, ...) ;
-namespace Chat { extern HostCommands g_hostDotCommands ; }
+extern void clientErrorLog(const char* const format, ...);
+namespace Chat { extern HostCommands g_hostDotCommands; }
 
 #ifdef MAKE_HOST_TERRAIN
 #include "sdm/GenerateHostTerrain.h"
@@ -188,7 +188,7 @@ static void CollideDown(Vec3d pos, colliderQuery::CollisionList& collisions, con
 // New for ADD_DOT_COMMAND
 struct dotCmdInfo
 {
-	dotCmdInfo() : asciiFunc(NULL), wideFunc(NULL), locCmd(NULL), help(NULL), key(false)
+	dotCmdInfo() : asciiFunc(nullptr), wideFunc(nullptr), locCmd(nullptr), help(nullptr), key(false)
 	{
 	}
 
@@ -218,74 +218,74 @@ static dotCmdMap _dotCommands;
 	Return value is the number of* arguments* excluding the presumed command.
  ************************************************************************************************/
 
-typedef std::vector<std::wstring> ARGV_BASE ;
+typedef std::vector<std::wstring> ARGV_BASE;
 struct ARGV : public ARGV_BASE
 {
-	ARGV(const char* source, UINT32 maxArguments, bool fillLastArgument) ;
-	int argc ;
+	ARGV(const char* source, UINT32 maxArguments, bool fillLastArgument);
+	int argc;
 private:
 	ARGV(const ARGV& rhs) {}
-} ;
+};
 
 ARGV::ARGV(const char* utf8Source, UINT32 maxArguments, bool fillLastArgument)
 	: ARGV_BASE()
 	, argc(0)
 {
-	ARGV_BASE::clear() ;
-	if ( utf8Source == NULL )
-		return ;
+	ARGV_BASE::clear();
+	if ( utf8Source == nullptr )
+		return;
 
-	const wchar_t* source = uiUTF8toUTF16(utf8Source) ;
+	const wchar_t* source = uiUTF8toUTF16(utf8Source);
 	if ( *source == 0 )
-		return ;
+		return;
 
-	std::wstring token = L"" ;
+	std::wstring token = L"";
 
 	// Overrun the argument count because we need to check that
 	// we exhausted the arguments we were provided
 	while ( *source != 0 )
 	{
 		if ( fillLastArgument == false && this->size() > maxArguments )
-			break ;
+			break;
 
 		// Erase groups of whitespace
 		while ( *source == L' ' || *source == L'\t' )
-			++source ;
+			++source;
 
 		if ( *source == 0 )
-			break ;
+			break;
 
-		wchar_t terminator = L' ' ;
+		wchar_t terminator = L' ';
 		if ( *source == L'"' || *source == L'\'' )
 		{
 			// Grab but pass the quote character, we don't want to copy it
-			terminator = *(source++) ;
+			terminator = *(source++);
 		}
 
-		const wchar_t* start = source ;
+		const wchar_t* start = source;
 
 		while ( *source != 0 && *source != terminator )
-			++source ;
+			++source;
 
 		if ( this->size() > maxArguments && this->empty() == false )
 		{
-			this->operator[](this->size() - 1).append(L" ") ;
-			this->operator[](this->size() - 1).append(start, source - start) ;
+			this->operator[](this->size() - 1).append(L" ");
+			this->operator[](this->size() - 1).append(start, source - start);
 		}
 		else
 		{
-			token.assign(start, source - start) ;
-			this->push_back(token) ;
+			token.assign(start, source - start);
+			this->push_back(token);
 		}
 
 		// Advance past the terminator, as long as it wasn't
 		// the zero byte.
 		if ( *source )
-			++source ;
+			++source;
 	}
 
 	// Return the number of arguments resulting.
-	argc = (this->empty()) ? 0 : this->size() - 1 ;
+	argc = (this->empty()) ? 0 : this->size() - 1;
 }
 
 /************************************************************************************************
@@ -294,7 +294,8 @@ ARGV::ARGV(const char* utf8Source, UINT32 maxArguments, bool fillLastArgument)
 
 static SINT32 dot_help(const wchar_t* line)
 {
-	wchar_t cmd[DOT_COMMAND_SIZE+1] = L"";
+	wchar_t cmd[DOT_COMMAND_SIZE+1];
+	cmd[0] = 0;
 
 	int argc = swscanf(line, L"%*ls %255ls", cmd);
 	SINT32 result = DC_PASS_TO_HOST;
@@ -441,7 +442,7 @@ static SINT32 dot_conv(const wchar_t* line)
 	int argc = swscanf(line, L"%*ls %u", &range);
 
 	bool ingame = uiInGame();
-	const vehType* vtype = NULL;
+	const vehType* vtype = nullptr;
 
 	if(ingame)
 	{
@@ -526,8 +527,9 @@ static SINT32 dot_conv(const wchar_t* line)
 
 static SINT32 dot_emote(const char* line)
 {
-	char emote[256] = "";
-	char handle[256] = "";
+	char emote[256];
+	char handle[256];
+	emote[0] = handle[0] = 0;
 
 	int argc = sscanf(line, "%*s %255s %255s", emote, handle);
 
@@ -611,8 +613,8 @@ static SINT32 dot_autoleader(const char* line)
 // FEEDBACK: Bad callsign '%s'
 static SINT32 _badCallsign(const std::wstring& input)
 {
-	uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_CAUTION, LSTR_INVALID_CALLSIGN, input.c_str()) ;
-	return DC_HANDLED ;
+	uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_CAUTION, LSTR_INVALID_CALLSIGN, input.c_str());
+	return DC_HANDLED;
 }
 
 static SINT32 dot_recruit(const char* line)
@@ -620,16 +622,16 @@ static SINT32 dot_recruit(const char* line)
 	if(!Online) return DC_HANDLED;
 	if(teulClock64 < _nextsquadcommand) return DC_HANDLED;
 
-	ARGV argv(line, 1, false) ;
+	ARGV argv(line, 1, false);
 	if(argv.argc != 1)
 	{
 		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_USAGE, LSTR_GENERIC, L"/recruit <callsign>");
 		return DC_HANDLED;
 	}
 
-	ChatHandle handle = chatGetLowercaseHandle(argv[1].c_str()) ;
+	ChatHandle handle = chatGetLowercaseHandle(argv[1].c_str());
 	if ( handle == 0LL )
-		return _badCallsign(argv[1]) ;
+		return _badCallsign(argv[1]);
 
 	SquadControl control;
 	control.sendRecruit(PlayerClient()->ChatConnection(), handle);
@@ -718,18 +720,18 @@ static SINT32 dot_leave(const char* line)
 
 static SINT32 dot_create(const char* line)
 {
-	if(teulClock64 < _nextsquadcommand) return DC_HANDLED ;
+	if(teulClock64 < _nextsquadcommand) return DC_HANDLED;
 
 	std::vector<ChatHandle> players; // for future use
 
-	ARGV argv(line, 2, false) ;
+	ARGV argv(line, 2, false);
 	if ( argv.argc != 2 )
 	{
 		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_USAGE, LSTR_GENERIC, L"/create <squad callsign> <squad name>");
-		return DC_HANDLED ;
+		return DC_HANDLED;
 	}
 	ChatHandle handle = chatGetLowercaseHandle(argv[1].c_str());
-	if ( !handle ) return _badCallsign(argv[1]) ;
+	if ( !handle ) return _badCallsign(argv[1]);
 
 	SquadControl control;
 	control.sendCreate(PlayerClient()->ChatConnection(), handle, uiUTF16toUTF8(argv[2].c_str()), players);
@@ -752,19 +754,19 @@ static SINT32 dot_disband(const char* line)
 
 static SINT32 dot_remove(const char* line)
 {
-	if(teulClock64 < _nextsquadcommand) return DC_HANDLED ;
+	if(teulClock64 < _nextsquadcommand) return DC_HANDLED;
 
-	ARGV argv(line, 1, false) ;
+	ARGV argv(line, 1, false);
 	if ( argv.argc != 1 )
 	{
 		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_USAGE, LSTR_GENERIC, L"/remove <callsign>");
-		return DC_HANDLED ;
+		return DC_HANDLED;
 	}
 
-	ChatHandle handle = chatGetLowercaseHandle(argv[1].c_str()) ;
-	if ( !handle ) return _badCallsign(argv[1]) ;
+	ChatHandle handle = chatGetLowercaseHandle(argv[1].c_str());
+	if ( !handle ) return _badCallsign(argv[1]);
 
-	if ( !ConfirmCmd(line) ) return DC_HANDLED ;
+	if ( !ConfirmCmd(line) ) return DC_HANDLED;
 
 	SquadControl control;
 	control.sendKick(PlayerClient()->ChatConnection(), handle, "");
@@ -776,17 +778,17 @@ static SINT32 dot_remove(const char* line)
 
 static SINT32 dot_promote(const char* line)
 {
-	if(teulClock64 < _nextsquadcommand) return DC_HANDLED ;
+	if(teulClock64 < _nextsquadcommand) return DC_HANDLED;
 
-	ARGV argv(line, 1, false) ;
+	ARGV argv(line, 1, false);
 	if ( argv.argc != 1 )
 	{
 		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_USAGE, LSTR_GENERIC, L"/promote <callsign>");
-		return DC_HANDLED ;
+		return DC_HANDLED;
 	}
 
-	ChatHandle handle = chatGetLowercaseHandle(argv[1].c_str()) ;
-	if ( !handle ) return _badCallsign(argv[1]) ;
+	ChatHandle handle = chatGetLowercaseHandle(argv[1].c_str());
+	if ( !handle ) return _badCallsign(argv[1]);
 
 	SquadControl control;
 	control.sendPromote(PlayerClient()->ChatConnection(), handle);
@@ -797,17 +799,17 @@ static SINT32 dot_promote(const char* line)
 
 static SINT32 dot_demote(const char* line)
 {
-	if(teulClock64 < _nextsquadcommand) return DC_HANDLED ;
+	if(teulClock64 < _nextsquadcommand) return DC_HANDLED;
 
-	ARGV argv(line, 1, false) ;
+	ARGV argv(line, 1, false);
 	if ( argv.argc != 1 )
 	{
 		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_USAGE, LSTR_GENERIC, L"/demote <callsign>");
-		return DC_HANDLED ;
+		return DC_HANDLED;
 	}
 
-	ChatHandle handle = chatGetLowercaseHandle(argv[1].c_str()) ;
-	if ( !handle ) return _badCallsign(argv[1]) ;
+	ChatHandle handle = chatGetLowercaseHandle(argv[1].c_str());
+	if ( !handle ) return _badCallsign(argv[1]);
 
 	SquadControl control;
 	control.sendDemote(PlayerClient()->ChatConnection(), handle);
@@ -818,19 +820,19 @@ static SINT32 dot_demote(const char* line)
 
 static SINT32 dot_resign(const char* line)
 {
-	if(teulClock64 < _nextsquadcommand) return DC_HANDLED ;
+	if(teulClock64 < _nextsquadcommand) return DC_HANDLED;
 
-	ARGV argv(line, 1, false) ;
+	ARGV argv(line, 1, false);
 	if ( argv.argc != 1 )
 	{
 		uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_USAGE, LSTR_GENERIC, L"/resign <replacement co callsign>");
-		return DC_HANDLED ;
+		return DC_HANDLED;
 	}
 
-	ChatHandle handle = chatGetLowercaseHandle(argv[1].c_str()) ;
-	if ( !handle ) return _badCallsign(argv[1]) ;
+	ChatHandle handle = chatGetLowercaseHandle(argv[1].c_str());
+	if ( !handle ) return _badCallsign(argv[1]);
 
-	if ( !ConfirmCmd(line) ) return DC_HANDLED ;
+	if ( !ConfirmCmd(line) ) return DC_HANDLED;
 
 	SquadControl control;
 	control.sendResign(PlayerClient()->ChatConnection(), handle);
@@ -844,17 +846,17 @@ static SINT32 dot_resign(const char* line)
 // FEEDBACK: Unknown brigade '%s'
 static SINT32 _unknownBrigade(const std::wstring& input)
 {
-	uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_CAUTION, LSTR_UNKNOWN_UNIT, input.c_str()) ;
-	return DC_HANDLED ;
+	uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_CAUTION, LSTR_UNKNOWN_UNIT, input.c_str());
+	return DC_HANDLED;
 }
 
 static HCUnit* _lookupUnit(const std::wstring& name)
 {
-	ChatHandle handle = chatGetLowercaseHandle(name.c_str()) ;
+	ChatHandle handle = chatGetLowercaseHandle(name.c_str());
 	HCUnit* unit = HCUnit::Lookup(handle);
-	if ( unit == NULL )
-		_unknownBrigade(name) ;
-	return unit ;
+	if ( unit == nullptr )
+		_unknownBrigade(name);
+	return unit;
 }
 
 // FEEDBACK:
@@ -862,74 +864,74 @@ static HCUnit* _lookupUnit(const std::wstring& name)
 // DETAIL: Explanation
 static SINT32 _commandUsage(LSTRING_ID usageId, LSTRING_ID detailId)
 {
-	uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_USAGE, usageId) ;
-	uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_DETAIL, detailId) ;
-	return DC_HANDLED ;
+	uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_USAGE, usageId);
+	uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_DETAIL, detailId);
+	return DC_HANDLED;
 }
 
 static SINT32 dot_oicvolunteer(const char* line)
 {
 	if(!Online)	return DC_HANDLED;
 
-	ARGV argv(line, 1, false) ;
+	ARGV argv(line, 1, false);
 	if(argv.argc != 1)
 		return _commandUsage(LSTR_OICVOL_USAGE, LSTR_OICVOL_DETAIL);
 
-	HCUnit* unit = _lookupUnit(argv[1]) ;
-	if ( unit == NULL )
-		return DC_HANDLED ;
+	HCUnit* unit = _lookupUnit(argv[1]);
+	if ( unit == nullptr )
+		return DC_HANDLED;
 
 	BrigadeControlRequest control;
 	control.volunteerOIC(PlayerClient()->ChatConnection(), unit->unitID());
 
-	return DC_HANDLED ;
+	return DC_HANDLED;
 }
 
 static SINT32 dot_oicnominate(const char* line)
 {
 	if(!Online)	return DC_HANDLED;
 
-	ARGV argv(line, 2, false) ;
+	ARGV argv(line, 2, false);
 
 	if(argv.argc != 2)
-		return _commandUsage(LSTR_OICNOM_USAGE, LSTR_OICNOM_DETAIL) ;
+		return _commandUsage(LSTR_OICNOM_USAGE, LSTR_OICNOM_DETAIL);
 
-	HCUnit* unit = _lookupUnit(argv[1]) ;
-	if ( unit == NULL )
-		return DC_HANDLED ;
+	HCUnit* unit = _lookupUnit(argv[1]);
+	if ( unit == nullptr )
+		return DC_HANDLED;
 	if ( chatIsValidCallsign(argv[2].c_str()) == false )
 	{
-		return _badCallsign(argv[2]) ;
+		return _badCallsign(argv[2]);
 	}
 	ChatHandle handle = chatGetLowercaseHandle(argv[2].c_str());
 	if ( handle == 0LL )
 	{
-		return _badCallsign(argv[2]) ;
+		return _badCallsign(argv[2]);
 	}
 
 	BrigadeControlRequest control;
-	control.nominateOIC(PlayerClient()->ChatConnection(), unit->unitID(), handle) ;
+	control.nominateOIC(PlayerClient()->ChatConnection(), unit->unitID(), handle);
 
-	return DC_HANDLED ;
+	return DC_HANDLED;
 }
 
 static SINT32 dot_oicveto(const char* line)
 {
 	if(!Online)	return DC_HANDLED;
 
-	ARGV argv(line, 2, false) ;
+	ARGV argv(line, 2, false);
 	if ( argv.argc != 2 )
-		return _commandUsage(LSTR_OICVETO_USAGE, LSTR_OICVETO_DETAIL) ;
+		return _commandUsage(LSTR_OICVETO_USAGE, LSTR_OICVETO_DETAIL);
 
-	HCUnit* unit = _lookupUnit(argv[1]) ;
-	if ( unit == NULL )
-		return DC_HANDLED ;
+	HCUnit* unit = _lookupUnit(argv[1]);
+	if ( unit == nullptr )
+		return DC_HANDLED;
 
 	if ( chatIsValidCallsign(argv[2].c_str()) )
-		return _badCallsign(argv[2]) ;
-	ChatHandle handle = chatGetLowercaseHandle(argv[2].c_str()) ;
+		return _badCallsign(argv[2]);
+	ChatHandle handle = chatGetLowercaseHandle(argv[2].c_str());
 	if ( handle == 0LL )
-		return _badCallsign(argv[2]) ;
+		return _badCallsign(argv[2]);
 
 	BrigadeControlRequest control;
 	control.vetoOIC(PlayerClient()->ChatConnection(), unit->unitID(), handle);
@@ -941,12 +943,12 @@ static SINT32 dot_oicresign(const char* line)
 {
 	if(!Online)	return DC_HANDLED;
 
-	ARGV argv(line, 1, false) ;
+	ARGV argv(line, 1, false);
 	if ( argv.argc != 1 )
-		return _commandUsage(LSTR_OICRES_USAGE, LSTR_OICRES_DETAIL) ;
-	HCUnit* unit = _lookupUnit(argv[1]) ;
-	if ( unit == NULL )
-		return DC_HANDLED ;
+		return _commandUsage(LSTR_OICRES_USAGE, LSTR_OICRES_DETAIL);
+	HCUnit* unit = _lookupUnit(argv[1]);
+	if ( unit == nullptr )
+		return DC_HANDLED;
 
 	BrigadeControlRequest control;
 	control.resignOIC(PlayerClient()->ChatConnection(), unit->unitID());
@@ -981,19 +983,19 @@ static SINT32 dot_oicremove(const char* line)
 {
 	if(!Online)	return DC_HANDLED;
 
-	ARGV argv(line, 2, false) ;
+	ARGV argv(line, 2, false);
 	if ( argv.argc != 2 )
-		return _commandUsage(LSTR_OICREM_USAGE, LSTR_OICREM_DETAIL) ;
+		return _commandUsage(LSTR_OICREM_USAGE, LSTR_OICREM_DETAIL);
 
-	HCUnit* unit = _lookupUnit(argv[1]) ;
-	if ( unit == NULL )
-		return DC_HANDLED ;
+	HCUnit* unit = _lookupUnit(argv[1]);
+	if ( unit == nullptr )
+		return DC_HANDLED;
 
 	if ( !chatIsValidCallsign(argv[2].c_str()) )
-		return _badCallsign(argv[2]) ;
-	ChatHandle handle = chatGetLowercaseHandle(argv[2].c_str()) ;
+		return _badCallsign(argv[2]);
+	ChatHandle handle = chatGetLowercaseHandle(argv[2].c_str());
 	if ( !handle )
-		return _badCallsign(argv[2]) ;
+		return _badCallsign(argv[2]);
 
 	BrigadeControlRequest control;
 	if(handle == chatGetLowercaseHandle(PlayerClient()->Personas().m_callsign))
@@ -1241,7 +1243,7 @@ static SINT32 dot_spawn(const char* line)
 	}
 
 	vehType const* vehtype = vehTypeGetById(id);
-	if(vehtype == NULL)
+	if(vehtype == nullptr)
 	{
 		uiChatPrintLine("Invalid vehicle id specified!");
 		return DC_HANDLED;
@@ -1359,7 +1361,7 @@ static SINT32 dot_vspawn(const char* line)
         if(endpos > (int)strpos)
         {
 			// 'atol' will process all numeric digits and then stop.
-			numveh = atol(str.c_str() + strpos) ;
+			numveh = atol(str.c_str() + strpos);
         }
     }
 	*/
@@ -1387,7 +1389,7 @@ static SINT32 dot_vspawn(const char* line)
 
 	for(int i = 0; i < (int)vehtypeCount(); i++)
 	{
-        vehType const* vehtype = NULL;
+        vehType const* vehtype = nullptr;
 
         vehtype = vehtypeGetByIndex(i);
 
@@ -1844,7 +1846,7 @@ static void CollideDown(Vec3d pos, colliderQuery::CollisionList& collisions, con
     {
         colliderQuery::CollisionList& c = collider.getCollisions();
 
-        dGeomID current = NULL;
+        dGeomID current = nullptr;
 
         for(unsigned int i = 0; i < c.size(); i++)
         {
@@ -1909,7 +1911,7 @@ static SINT32 dot_allinf(const char*)
 		"-para-lmg",
 		"-para-eng",
 		"-para-snpr",
-		NULL,
+		nullptr,
 		"-para-atr",
 		"-para-mrtr"
 	};
@@ -2483,7 +2485,7 @@ static SINT32 dot_wttest(const char* line)
 static SINT32 dot_hitmap(const char* line)
 {
 	char vehname[256] = "", valid[32] = "";
-	int i, all, validhit,validcmp ;
+	int i, all, validhit,validcmp;
 
 	int argc = sscanf(line, "%*s %200s %31s", vehname, valid);
 	if(argc < 1) return DC_ERROR;
@@ -2610,7 +2612,7 @@ static SINT32 dot_inertia(const char* line)
 	{
 		if(!strcmp((char*)vehtypeGetByIndex(i)->Id, vehname))
 		{
-			OBJECT* PlaneObject = NULL, *massobj, *obj;
+			OBJECT* PlaneObject = nullptr, *massobj, *obj;
 			FILE* f;
 			char filename[256] = "\0";
 
@@ -2626,7 +2628,7 @@ static SINT32 dot_inertia(const char* line)
 
 			if(f)
 			{
-				obj = NULL;
+				obj = nullptr;
 				ogrpFindSubObjectByName(&massobj, PlaneObject,"lodc");
 				if(massobj)
 					ogrpFindSubObjectByName(&massobj, massobj,"mass");
@@ -2635,7 +2637,7 @@ static SINT32 dot_inertia(const char* line)
 
 				while(obj)
 				{
-					_CalcInertia(obj, f, TRUE, NULL, NULL, NULL);
+					_CalcInertia(obj, f, TRUE, nullptr, nullptr, nullptr);
 					obj = obj->sibling;
 				}
 				fprintf(f, "\n</masses>\n");
@@ -2655,7 +2657,7 @@ static SINT32 dot_inertia(const char* line)
 static SINT32 dot_exhaust(const char* line)
 {
     vehVehicle*pVeh = persGetPersonaVehiclePtr();
-	if(pVeh == NULL) return DC_ERROR;
+	if(pVeh == nullptr) return DC_ERROR;
 
     SCHAR szBuff[64];
     SINT32 i;
@@ -2667,7 +2669,7 @@ static SINT32 dot_exhaust(const char* line)
 
     for(i = 0; i < ML_MAX_ENGINES; i++)
     {
-        if(pVeh->StateAnimation.ExhaustSmokeEmitter[i] != NULL)
+        if(pVeh->StateAnimation.ExhaustSmokeEmitter[i] != nullptr)
         {
             pVeh->StateAnimation.ExhaustSmokeOn[i] = bOn;
         }
@@ -2868,10 +2870,10 @@ static SINT32 dot_hulkall(const char* line)
     {
         int id = *itr;
 
-        vehVehicle*veh = NULL;
+        vehVehicle*veh = nullptr;
         vehGetVehicleHead(&veh);
 
-        for(; veh != NULL; veh = veh->getNext())
+        for(; veh != nullptr; veh = veh->getNext())
         {
             if(veh->VehicleNum == -id)
             {
@@ -2935,10 +2937,10 @@ static SINT32 dot_hulk(const char* line)
 
     int id = atol(p);
 
-    vehVehicle*veh = NULL;
+    vehVehicle*veh = nullptr;
     vehGetVehicleHead(&veh);
 
-    for(; veh != NULL; veh = veh->getNext())
+    for(; veh != nullptr; veh = veh->getNext())
     {
         if(veh->VehicleNum == -id)
         {
@@ -3170,7 +3172,7 @@ static SINT32 dot_movevehicle(const char* line)
 
     std::set<int>::iterator find = vehicles.find(id);
 
-    vehVehicle*veh = NULL;
+    vehVehicle*veh = nullptr;
 
     if(find != vehicles.end())
     {
@@ -3489,14 +3491,14 @@ static int dot_duplicate(const char* line)
 
     veh->VehicleHostIndex;
 
-    vehVehicle* list = NULL;
+    vehVehicle* list = nullptr;
 
     vehGetVehicleHead(&list);
 
     uiChatPrintLine("Check for duplicate vehicle ids");
     bool found = false;
 
-    for(; list != NULL; list = list->getNext())
+    for(; list != nullptr; list = list->getNext())
     {
         if(list->IsMe())
             continue;
@@ -3568,7 +3570,7 @@ static int dot_bailout(const char* line)
     WorldPosition_m position(pos.x, pos.y, pos.z);
 	AttitudeVector attitude(0, 0, (FLOAT32)yaw);
 
-	const char* vid = NULL;
+	const char* vid = nullptr;
 
 	switch(country)
 	{
@@ -3586,7 +3588,7 @@ static int dot_bailout(const char* line)
 			break;
 	}
 
-	if(vid == NULL)
+	if(vid == nullptr)
 		return DC_HANDLED;
 
 	const vehType* vt = vehTypeGetById(vid);
@@ -3624,7 +3626,7 @@ static int dot_wtfamistandingon(const char* line)
         return DC_HANDLED;
     }
 
-    dGeomID current = NULL;
+    dGeomID current = nullptr;
 
     uiChatPrintLine("BEGIN");
 
@@ -3956,7 +3958,7 @@ static int dot_damagevehicle(const char* line)
 }
 
 // Spawn a building at 0,0,0
-static OBJECT* buildingobj = NULL;
+static OBJECT* buildingobj = nullptr;
 
 static SINT32 dot_tspawn(const char* input)
 {
@@ -3966,8 +3968,8 @@ static SINT32 dot_tspawn(const char* input)
     std::vector<omap::iterator> remove;
 
 	int							modelType		= 0;
-	static OBJECT*				masterInstance	= NULL;
-	PoolModel*					masterModel		= NULL;
+	static OBJECT*				masterInstance	= nullptr;
+	PoolModel*					masterModel		= nullptr;
 	piMATRIX					transform		= IdentityMatrix;
 	unsigned int				subModelIndex	= 0;
 
@@ -3987,7 +3989,7 @@ static SINT32 dot_tspawn(const char* input)
 			{
 				if((*itr)->modelInstance->GetModelType() != ModelTypes::TERRAIN_TILE)
 				{
-					trncdRemoveTerrainObject(*itr, 0, 0, 0, NULL);
+					trncdRemoveTerrainObject(*itr, 0, 0, 0, nullptr);
 					obpoolFreeObjectCallback(*itr);
 					remove.push_back(itr);
 				}
@@ -3998,7 +4000,7 @@ static SINT32 dot_tspawn(const char* input)
                 instances.erase(remove[i]);
             }
 
-            buildingobj = NULL;
+            buildingobj = nullptr;
 		    trndtl[12].terrain->flag2 &= ~OBJECT_VISIBLE;
 	    }
     }
@@ -4009,11 +4011,11 @@ static SINT32 dot_tspawn(const char* input)
 
 	    for(; itr != instances.end(); ++itr)
 	    {
-	        trncdRemoveTerrainObject(*itr, 0, 0, 0, NULL);
+	        trncdRemoveTerrainObject(*itr, 0, 0, 0, nullptr);
 	        obpoolFreeObjectCallback(*itr);
 	    }
 		instances.clear();
-        buildingobj = NULL;
+        buildingobj = nullptr;
 		trndtl[12].terrain->flag2 &= ~OBJECT_VISIBLE;
 	}
 #endif
@@ -4108,7 +4110,7 @@ static SINT32 dot_tspawn(const char* input)
         if(!activeTerrainDetail[i])
             continue;
 
-        if(trndtl[i].terrain == NULL)
+        if(trndtl[i].terrain == nullptr)
             continue;
 
         if(trndtl[i].scx == sx && trndtl[i].scy == sy)
@@ -4171,7 +4173,7 @@ static SINT32 dot_tspawn(const char* input)
             posxyz.y -= (float)WorldOriginOffset.y;
 	    }
 
-		trncdAddTerrainObject(buildingobj, 0, 0, 0, NULL);
+		trncdAddTerrainObject(buildingobj, 0, 0, 0, nullptr);
 
 		OBJECT* o = buildingobj->child;
 
@@ -4668,7 +4670,7 @@ static SINT32 dot_bdamage(const char* input)
 
     if(damage == 0)
     {
-        dot_reset(NULL);
+        dot_reset(nullptr);
     }
 
     rnmainListText("damage at %d", damage);
@@ -4936,7 +4938,7 @@ static SINT32 dot_set(const char* line)
 {
 	vehVehicle*veh = persGetPersonaVehiclePtr();
 	mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
-	if(veh == NULL || VehicleData == NULL) return DC_ERROR;
+	if(veh == nullptr || VehicleData == nullptr) return DC_ERROR;
 
 	char cmd[16];
 	FLOAT32 x,y,z;
@@ -4964,7 +4966,7 @@ static SINT32 dot_set(const char* line)
 static SINT32 dot_mvcmp(const char* line)
 {
 	mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
-	if(VehicleData == NULL) return DC_ERROR;
+	if(VehicleData == nullptr) return DC_ERROR;
 	FLOAT32 x,y,z;
 	int argc;
 	mlComponentListIterator it;
@@ -5040,7 +5042,7 @@ SINT32 dot_vehstats(const char* line)
 	for(i = 0; i < (int)vehtypeCount(); i++)
 	{
 		vehType const* vehtype;
-		OBJECT* PlaneObject = NULL;
+		OBJECT* PlaneObject = nullptr;
 		mlObjectData objdata;
 		FLOAT64VECTOR pos = {0,0,0};
 		FLOAT64ATT att = {0,0,0};
@@ -5081,7 +5083,7 @@ static SINT32 dot_slomo(const char* line)
 
 static SINT32 dot_rank(const char* line)
 {
-	vehVehicle*_VehicleHead = NULL, *CurrentVehicle;
+	vehVehicle*_VehicleHead = nullptr, *CurrentVehicle;
 	UINT32 Rank;
 	char handle[16];
 
@@ -5108,9 +5110,9 @@ static SINT32 dot_rank(const char* line)
 static SINT32 dot_ride(const char* line)
 {
 	vehVehicle*PlayerVehicle = persGetPersonaVehiclePtr();
-	if(PlayerVehicle == NULL) return DC_ERROR;
+	if(PlayerVehicle == nullptr) return DC_ERROR;
 
-	vehVehicle*_VehicleHead = NULL, *CurrentVehicle;
+	vehVehicle*_VehicleHead = nullptr, *CurrentVehicle;
 	char handle[16] = "";
 	UINT32 seatnum = 0;
 	UINT32 RideVehicleHostIndex = 0;
@@ -5328,7 +5330,7 @@ static void _PrintHitmap(OBJECT* obj, void* fp)
 
 void _PrintVehHitmap(vehType const* vehtype )
 {
-	OBJECT* PlaneObject = NULL, *hitmap, *obj;
+	OBJECT* PlaneObject = nullptr, *hitmap, *obj;
 	FILE* f;
 	char filename[256] = "\0";
 
@@ -5376,7 +5378,7 @@ typedef struct
 
 static void _ValidateVehHit(vehType const* vehtype)
 {
-	OBJECT* PlaneObject = NULL, *hitmap, *obj;
+	OBJECT* PlaneObject = nullptr, *hitmap, *obj;
 	char str[256] = "\0";
 	hitmapNameList list;
 	int fd, i;
@@ -5695,9 +5697,9 @@ static SINT32 dot_profileflight(const char* args)
 		return DC_HANDLED;
 	}
 
-	ARGV argv(args, 2, true) ;
+	ARGV argv(args, 2, true);
 	// First argument is our function name
-	const wchar_t* profileName = (argv.argc > 1) ? argv[1].c_str() : L"default" ;
+	const wchar_t* profileName = (argv.argc > 1) ? argv[1].c_str() : L"default";
 
 	rnmainListText("Started %ls profiling for the duration of %.1f minute(s) ...", profileName, profilingDurationInMinutes);
 	dot_move("move N51.13.00 E4.11.00 100");
@@ -6018,7 +6020,7 @@ static SINT32 dot_trntex(const char* line)
 	mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
 	if(!VehicleData) return DC_ERROR;
 
-	OBJECT* CollideObject = NULL;
+	OBJECT* CollideObject = nullptr;
 	piVECTOR V1,V2;
 	FLOAT64VECTOR WorldOriginOffset;
 
@@ -6027,7 +6029,7 @@ static SINT32 dot_trntex(const char* line)
 	V1.y = (FLOAT32)(VehicleData->VehiclePos.y - WorldOriginOffset.y);
 	V2 = V1; V2.z = 10000; V1.z = -10000;
 
-	trncdCollideWithVehiclesAndTerrain(&V1,&V2,NULL,&CollideObject,NULL,NULL,NULL,FALSE,TRUE, FALSE);
+	trncdCollideWithVehiclesAndTerrain(&V1,&V2,nullptr,&CollideObject,nullptr,nullptr,nullptr,FALSE,TRUE, FALSE);
 
 	if(CollideObject)
 		uiChatPrintLine("Texture: %s", CollideObject->texname);
@@ -6052,7 +6054,7 @@ static LOGICAL _CollideRoundWithTerrain(FASTCOLLIDE** CollideListPtr,  UINT32* N
 	if(trnopCollide(OldPos,NewPos,&CollidePnt,&CollideObject,&PolyNum) != 0)
 	{
 		(*CollideListPtr)[0].CollideObject = CollideObject;
-		(*CollideListPtr)[0].TopLevelObject = NULL;
+		(*CollideListPtr)[0].TopLevelObject = nullptr;
 		(*CollideListPtr)[0].PolyNum = PolyNum;
 		(*CollideListPtr)[0].CollideTime = 0;// this apparently isn't time but the t param of the collision point on the between old and new pos
 		(*CollideListPtr)[0].CollidePnt = CollidePnt;
@@ -6164,12 +6166,12 @@ static SINT32 dot_tps(const char* line)
 
     int id = -atol(buff);
 
-    vehVehicle*head = NULL;
-    vehVehicle*v = NULL;
+    vehVehicle*head = nullptr;
+    vehVehicle*v = nullptr;
 
     vehGetVehicleHead(&head);
 
-    for(; head != NULL; head = head->getNext())
+    for(; head != nullptr; head = head->getNext())
     {
         if(head->VehicleNum == id)
         {
@@ -6487,7 +6489,7 @@ static int dot_effect(const char* line)
         return 0;
     }
 
-    TransformEffect* te = NULL;
+    TransformEffect* te = nullptr;
 
     int lifetime = 0;
     Vec3d pos;
@@ -6544,7 +6546,7 @@ static int dot_effect(const char* line)
     }
     else
     {
-        te = TransformEffect::AddEffect(effect, n, lifetime, NULL);
+        te = TransformEffect::AddEffect(effect, n, lifetime, nullptr);
     }
 
     if(te)
@@ -6609,7 +6611,7 @@ static int dot_fire(const char* line)
 	AttVec.z = DEG_TO_RAD(traverse);
 	mathEul_ToMatrix(&FireAtt,EulOrdXYZs,&AttVec);
 
-	weapFireRound(&Recoil, AmmoType, &Pos, &Vel, &FireAtt, frametime/ 1000,  Flags, NULL, &Pos, 0, NULL);
+	weapFireRound(&Recoil, AmmoType, &Pos, &Vel, &FireAtt, frametime/ 1000,  Flags, nullptr, &Pos, 0, nullptr);
 
 	strncpy(LastAmmoName, AmmoName,63);
 	lastX = x; lastY = y; lastZ = z;
@@ -6632,7 +6634,7 @@ static int dot_float(const char* line)
 		{
 			if(veh->VehicleType->Type == VEH_TYPE_PERSON)
 			{
-				fpFPSAreaChecks(NULL, 0.0, true);
+				fpFPSAreaChecks(nullptr, 0.0, true);
 
 				if(fpsTrooper.parachuteWorn)
 				{
@@ -6685,7 +6687,7 @@ static int dot_ai(const char* line)
 static int dot_gizmo(const char* line)
 {
 	mlVehicleData* Vehicle = persGetPersonaModelDataPtr();
-	if(Vehicle == NULL) return DC_ERROR;
+	if(Vehicle == nullptr) return DC_ERROR;
 
 	int argc;
 	char subcmd[32] = "", state[32];
@@ -6794,7 +6796,7 @@ static int dot_aion(const char* line)
 static SINT32 dot_dev(const char* line)
 {
 	const char* p = strchr(line, ' ');
-	if(p == NULL)
+	if(p == nullptr)
 	{
 		uiChatPrintLine("/dev <weapon name>");
 		return DC_HANDLED;
@@ -6876,7 +6878,7 @@ static SINT32 dot_blendeditor(const char* line)
 	else
 	{
 		const char* p = strchr(line, ' ');
-		if(p == NULL || (p + 1) == NULL || !strlen(p + 1))
+		if(p == nullptr || (p + 1) == nullptr || !strlen(p + 1))
 		{
 			uiLoadView("blendeditselect");
 			//uiChatPrintLine("/blendedit <vid>");
@@ -7022,18 +7024,18 @@ static SINT32 dot_kit(const char* line)
 
 static SINT32 dot_time(const char* line)
 {
-	if (strchr(line, ' ') != NULL) return DC_PASS_TO_HOST;
+	if (strchr(line, ' ') != nullptr) return DC_PASS_TO_HOST;
 
 	// Grab the formatted "ctime" and remove the trailing eol
-	time_t now = time(NULL);
-	wchar_t myTime[31] ;
+	time_t now = time(nullptr);
+	wchar_t myTime[31];
 #if platOS == OS_WIN32
-	wcsftime(myTime, 30, L"%a %b %d %X %Y", localtime_r(&now, NULL)) ;
+	wcsftime(myTime, 30, L"%a %b %d %X %Y", localtime_r(&now, nullptr));
 #else
-  struct tm tmStruct ;
-	wcsftime(myTime, 30, L"%a %b %d %X %Y", localtime_r(&now, &tmStruct)) ;
+  struct tm tmStruct;
+	wcsftime(myTime, 30, L"%a %b %d %X %Y", localtime_r(&now, &tmStruct));
 #endif
-	uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_NOTE, LSTR_LOCAL_TIME, myTime) ;
+	uiChatPrintLineMessageLoc(IDE_LANG_HOST, LSTR_NOTE, LSTR_LOCAL_TIME, myTime);
 
 	return DC_PASS_TO_HOST;
 }
@@ -7087,7 +7089,7 @@ static SINT32 dot_invites(const char* line)
 static int dot_lognote(const char* line)
 {
 	clientErrorLog("USER NOTE: %s", line);
-	uiChatPrintLine("Logged: %s", line) ;
+	uiChatPrintLine("Logged: %s", line);
 
 	return DC_HANDLED;
 }
@@ -7232,7 +7234,7 @@ static int dot_vcache(const char* line)
 #if defined(BETA_RELEASE)
 static int dot_vcount(const char* line)
 {
-	vehVehicle*_VehicleHead = NULL, *CurrentVehicle;
+	vehVehicle*_VehicleHead = nullptr, *CurrentVehicle;
 
 	char handle[16];
 	strcpy(handle, "unknown");
@@ -7316,23 +7318,23 @@ static int dot_texinfo(const char* line)
       char* s = "OTHER";
       switch(format)
       {
-        case GL_ALPHA8_EXT:                      s= "GL_ALPHA8_EXT"                    ;
+        case GL_ALPHA8_EXT:                      s= "GL_ALPHA8_EXT"                  ;
           break;
-        case GL_LUMINANCE8_EXT:                  s= "GL_LUMINANCE8_EXT"                ;
+        case GL_LUMINANCE8_EXT:                  s= "GL_LUMINANCE8_EXT"              ;
           break;
-        case GL_RGB8_EXT:                        s= "GL_RGB8_EXT"                      ; bytes=3;
+        case GL_RGB8_EXT:                        s= "GL_RGB8_EXT"                     ; bytes=3;
           break;
-        case GL_RGBA8_EXT:                       s= "GL_RGBA8_EXT"                     ; bytes=4;
+        case GL_RGBA8_EXT:                       s= "GL_RGBA8_EXT"                    ; bytes=4;
           break;
-        case GL_DEPTH_COMPONENT16_SGIX:          s= "GL_DEPTH_COMPONENT16_SGIX"        ;
+        case GL_DEPTH_COMPONENT16_SGIX:          s= "GL_DEPTH_COMPONENT16_SGIX"      ;
           break;
-        case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:    s= "GL_COMPRESSED_RGB_S3TC_DXT1_EXT"  ; bytes=3;
+        case GL_COMPRESSED_RGB_S3TC_DXT1_EXT:    s= "GL_COMPRESSED_RGB_S3TC_DXT1_EXT" ; bytes=3;
           break;
-        case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:   s= "GL_COMPRESSED_RGBA_S3TC_DXT1_EXT" ; bytes=4;
+        case GL_COMPRESSED_RGBA_S3TC_DXT1_EXT:   s= "GL_COMPRESSED_RGBA_S3TC_DXT1_EXT"; bytes=4;
           break;
-        case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:   s= "GL_COMPRESSED_RGBA_S3TC_DXT3_EXT" ; bytes=4;
+        case GL_COMPRESSED_RGBA_S3TC_DXT3_EXT:   s= "GL_COMPRESSED_RGBA_S3TC_DXT3_EXT"; bytes=4;
           break;
-        case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:   s= "GL_COMPRESSED_RGBA_S3TC_DXT5_EXT" ; bytes=4;
+        case GL_COMPRESSED_RGBA_S3TC_DXT5_EXT:   s= "GL_COMPRESSED_RGBA_S3TC_DXT5_EXT"; bytes=4;
           break;
       }
 #if platOS == OS_MACOS
@@ -7418,10 +7420,10 @@ static int dot_vehprint(const char* line)
 
 	if(sscanf(line, "%*s %10s %32s", callsign, key) == 2)
 	{
-		vehVehicle* v = NULL;
+		vehVehicle* v = nullptr;
 		vehGetVehicleHead(&v);
 
-		for(; v != NULL; v = v->getNext())
+		for(; v != nullptr; v = v->getNext())
 		{
 			if(stricmp(callsign, (const char*)v->Handle) == 0)
 				break;
@@ -7441,7 +7443,7 @@ static int dot_vehprint(const char* line)
 			if(stats.fp)
 			{
 				fprintf(stats.fp, "Vehicle flag stats for %s\n", v->Handle);
-				OBJECT* top = NULL;
+				OBJECT* top = nullptr;
 
 				ogrpFindSubObjectByName(&top, PlaneObject,"visdamage");
 				if(top)
@@ -7636,8 +7638,8 @@ void uiDotCommandAdd(const char* cmdName, dotCmdFunctionA ascii, bool key)
 	dotCmdInfo info;
 
 	info.asciiFunc	= ascii;
-	info.locCmd		= NULL;
-	info.help		= NULL;
+	info.locCmd		= nullptr;
+	info.help		= nullptr;
     info.key		= key;
 
 	// convert it to a wide string for easy lookup later
@@ -7651,8 +7653,8 @@ void uiDotCommandAdd(const char* cmdName, dotCmdFunctionW wide, bool key)
 	dotCmdInfo info;
 
 	info.wideFunc	= wide;
-	info.locCmd		= NULL;
-	info.help		= NULL;
+	info.locCmd		= nullptr;
+	info.help		= nullptr;
     info.key		= key;
 
 	// convert it to a wide string for easy lookup later
@@ -7671,7 +7673,7 @@ int uiDotCommand(const wchar_t* line)
 		return DC_PASS_TO_HOST;
 
 	wchar_t cmd[DOT_COMMAND_SIZE+1] = L"";
-	wchar_t* pcmd = NULL;
+	wchar_t* pcmd = nullptr;
 	int result = DC_PASS_TO_HOST;
 
 	if(swscanf(line, L"%255ls", cmd) == 0)
@@ -8200,8 +8202,8 @@ void uiDotCommandsInitLoc()
 
 		const std::wstring& loc = uiLocString(locKey.c_str());
 
-		it->second.locCmd	= NULL;
-		it->second.help	= NULL;
+		it->second.locCmd	= nullptr;
+		it->second.help	= nullptr;
 
 		if(loc.size() && loc[0] != L'?')
 			it->second.locCmd = loc.c_str();
@@ -8255,182 +8257,7 @@ static SINT32 FRESCamCmd(const char* line)
 }
 #endif
 
-#else // !defined(USE_OSG)
 
-#include <string>
-#include <map>
-#include <vector>
-#include <algorithm>
-
-#include "phui/Util.h"
-#include "ui/uiDotCommands.h"
-#include "ui/uiMain.h"
-
-struct dotCmdInfo
-{
-	dotCmdInfo() : func(0) {}
-	dotCmdFunction func;
-};
-
-enum UI_COMMAND_TYPE
-{
-	UICT_PLAIN = 0,
-	UICT_SLASH,
-	UICT_DOT
-};
-
-typedef std::map<std::string, dotCmdInfo> dotCmdMap;
-static dotCmdMap _dotCommands;
-
-void uiDotCommandsInitLoc()
-{
-}
-
-void uiDotCommandAdd(const char* cmdName, dotCmdFunction func)
-{
-	dotCmdInfo info;
-	info.func = func;
-	_dotCommands[cmdName] = info;
-}
-
-int uiDotCommand(const wchar_t* line)
-{
-	return uiDotCommand(uiUTF16toUTF8(line));
-}
-
-int uiDotCommand(const char* line)
-{
-	char cmd[256] = "";
-	int result = 1;
-	if(!line || (line[0] != '.' && line[0] != '/')) return 1;
-
-	sscanf(line, "%255s", cmd);
-
-	dotCmdMap::iterator it = _dotCommands.find(cmd+1);
-	if(it != _dotCommands.end())
-		result = it->second.func(line+1);
-
-    return result;
-}
-
-void uiClearSquadCommandTimeout() {}
-
-// previous version of function was causing a CTD when you hit TAB in chat (OSG version)
-const wchar_t* uiDotCommandMatch(const wchar_t* search, bool again)
-{
-	static unsigned int possiblesIndex = 0; // our current possible index
-	static std::vector<std::wstring> possibles; // possible matches
-	static int commandType = UICT_PLAIN; // what we last searched for
-	static std::wstring match = L"";
-
-	match = L"";
-
-	if(again && possibles.size())
-	{
-		++possiblesIndex;
-
-		if(possiblesIndex >= possibles.size())
-			possiblesIndex = 0;
-
-		match = possibles[possiblesIndex];
-		match += L" ";
-	}
-	else
-	{
-		match = search;
-
-		commandType = UICT_PLAIN;
-		possiblesIndex = 0;
-		possibles.clear();
-
-		if(match.size() > 1 && (match[0] == '/' || match[0] == '.'))
-		{
-			commandType = (match[0] == '/') ? UICT_SLASH: UICT_DOT;
-			match.erase(match.begin()); // get rid of the / or .
-
-			unsigned int matchSize = (unsigned int)match.size();
-
-			if(matchSize)
-			{
-				dotCmdMap::iterator it = _dotCommands.begin();
-
-				for(; it != _dotCommands.end(); ++it)
-				{
-					dotCmdInfo& info = it->second;
-
-					// only auto-complete debug commands if they have
-					// a keyfile
-					// OSG dot commands don't have a keyfile requirement right now
-					//if(DOT_COMMANDS[i].needsKey && !HasKeyFile)
-					//	continue;
-
-					const wchar_t* command = uiUTF8toUTF16(it->first.c_str());
-					unsigned int cmdSize = (unsigned int)wcslen(command);
-
-					if(cmdSize < matchSize) // worth taking a look?
-						continue;
-
-					unsigned int matchedSize = 0;
-
-					for(unsigned int s = 0; s < matchSize; s++)
-					{
-						if(tolower(match[s]) != tolower(command[s]))
-							break;
-
-						++matchedSize;
-					}
-
-					if(matchedSize == matchSize)
-						possibles.push_back(command);
-				}
-			}
-
-			// we found some matches, use the best (asc)
-			if(possibles.size())
-			{
-				// sort possibles in alphabetical order
-				std::sort(possibles.begin(), possibles.end());
-
-				match = possibles[possiblesIndex];
-				match += L" ";
-			}
-		}
-	}
-
-	switch(commandType)
-	{
-		case UICT_SLASH:
-			match.insert(0, L"/");
-			break;
-		case UICT_DOT:
-			match.insert(0, L".");
-			break;
-		default:
-			// do nothing
-			break;
-	}
-
-	return match.c_str();
-}
-
-bool uiDotCommandFormat(const char* message)
-{
-	if(message[0] != '.' && message[0] != '/') return false;
-	if(message[0] == message[1] || message[1] == 0 || message[1] == ' ') return false;
-	if(message[2] == '!') return false;	// so /s! works
-	return true;
-}
-
-bool uiDotCommandFormat(const wchar_t* message)
-{
-	if(message[0] != L'.' && message[0] != L'/') return false;
-	if(message[0] == message[1] || message[1] == 0 || message[1] == L' ') return false;
-	if(message[2] == L'!') return false;	// so /s! works
-	return true;
-}
-
-
-#endif
 
 #if FRES
 

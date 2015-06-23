@@ -10,17 +10,17 @@
 
 #include "chat/chatGroupsType.h"
 
-struct ChatPermissions ;
-extern const ChatPermissions* chatGroupPermissionsForGroups(const CHAT_GROUPS& groups) ;
+struct ChatPermissions;
+const ChatPermissions* chatGroupPermissionsForGroups(const CHAT_GROUPS& groups);
 
 // Load/update the master table of chat group permissions
-void chatReadGroupPermissions() ;
+void chatReadGroupPermissions();
 
 // House keeping wrapper for chatReadGroupPermissions
-bool chatHousekeepGroupPermissions() ;
+bool chatHousekeepGroupPermissions();
 
 // Read a comma-separated list of groups into a CHAT_GROUPS structure
-void chatReadGroups(const char* commandSeparatedList, CHAT_GROUPS& into) ;
+void chatReadGroups(const char* commandSeparatedList, CHAT_GROUPS& into);
 
-extern const ChatPermissions nullChatPermissions ;
+extern const ChatPermissions nullChatPermissions;
 

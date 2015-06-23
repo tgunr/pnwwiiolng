@@ -10,6 +10,7 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
+#include "mem/mem.h"
 #include "mm/mmConstants.h"
 #include "mm/mmSpawnTypes.h"
 #include "mm/mmPack.h"
@@ -31,7 +32,7 @@ static TEUL_CALLBACK* MM_SEND_FE_POST_CANCEL;
 static TEUL_CALLBACK* MM_SEND_FE_JOIN_PERM_KILL;
 static TEUL_CALLBACK* MM_SEND_FE_CLIENT_SPAWN;
 static TEUL_CALLBACK* _SEND_DIRECT_SPAWN;
-static TEUL_CALLBACK* _SEND_DO_DESPAWN ;
+static TEUL_CALLBACK* _SEND_DO_DESPAWN;
 
 static SINT32 _sendFEPostRequest(ACTION_OBJECT* const a)
 {
@@ -75,7 +76,7 @@ static SINT32 _sendFEClientSpawn(ACTION_OBJECT* const a)
 
 static SINT32 _sendDirectSpawn(ACTION_OBJECT* const a)
 {
-	return ((Map::DirectSpawn*)(a->localRawData))->packer(TEUL_PACK, a) ;
+	return ((Map::DirectSpawn*)(a->localRawData))->packer(TEUL_PACK, a);
 }
 
 
@@ -124,7 +125,7 @@ UINT32 i;
 #endif
 
 	postListResponse.numWeapons = 0;
-	postListResponse.commandedWeapon = NULL;
+	postListResponse.commandedWeapon = nullptr;
 
 	a->offset = mmPackFEPostListResponse(TEUL_UNPACK, a->packed, a->offset, &(postListResponse), 0);
 
@@ -152,7 +153,7 @@ postListResponse.numWeapons);
 
 	clientProcessPostList(a->teulIndex, &postListResponse);
 
-	if (postListResponse.commandedWeapon!= NULL)
+	if (postListResponse.commandedWeapon!= nullptr)
 		memFree(postListResponse.commandedWeapon);
 
 	return a->offset;
@@ -317,7 +318,7 @@ mmSendClientSpawn(SINT32 connection, const WEAPON_SERIAL& weaponSerial, LOGICAL 
 	FE_CLIENT_SPAWN clientSpawn;
 
 	clientSpawn.weaponSerial = weaponSerial;
-	clientSpawn.wantMobileSpawn = wantMobileSpawn ;
+	clientSpawn.wantMobileSpawn = wantMobileSpawn;
 
 	return teulSend(connection, MM_SEND_FE_CLIENT_SPAWN, &clientSpawn);
 }
@@ -326,51 +327,51 @@ mmSendClientSpawn(SINT32 connection, const WEAPON_SERIAL& weaponSerial, LOGICAL 
 SINT32
 mmSendDirectSpawn(SINT32 connection, const WEAPON_SPEC& weapon, const FLOAT64VECTOR* location)
 {
-	Map::DirectSpawn request ;
-	request.m_weapon = weapon ;
-	request.m_useLocation = (location) ? true: false ;
-	request.m_location = (location) ? *location: FLOAT64VECTOR() ;
-	return teulSend(connection, _SEND_DIRECT_SPAWN, &request) ;
+	Map::DirectSpawn request;
+	request.m_weapon = weapon;
+	request.m_useLocation = (location) ? true: false;
+	request.m_location = (location) ? *location: FLOAT64VECTOR();
+	return teulSend(connection, _SEND_DIRECT_SPAWN, &request);
 }
 
 /*
 void
 MapHostConnection::doDespawned()
 {
-	teulSend(m_teulIndex, _SEND_DO_DESPAWN, this) ;
+	teulSend(m_teulIndex, _SEND_DO_DESPAWN, this);
 }
 */
 
 void mmSendDespawn(Teul::Connection* conn)
 {
 	//uiChatPrintLineColor(colorORANGEALPHA, L"Sending client mm despawn!");
-	teulSend(conn->m_teulIndex, _SEND_DO_DESPAWN, conn) ;
+	teulSend(conn->m_teulIndex, _SEND_DO_DESPAWN, conn);
 }
 
 SINT32
 mmClientInstallCallbacks(void)
 {
-	BEGIN_CALLBACK_REGISTRATION(MMHost::CallbackX)
+	BEGIN_CALLBACK_REGISTRATION(MM::CallbackX)
 
-		REGISTER_SENDER(MMHost::FE_POST_REQ_Y, _sendFEPostRequest, MM_SEND_FE_POST_REQ) ;
-		REGISTER_RECEIVER(MMHost::FE_POST_ACCEPT_Y, _recvFEPostAccept) ;
-		REGISTER_RECEIVER(MMHost::FE_POST_DENY_Y, _recvFEPostDeny) ;
-		REGISTER_RECEIVER(MMHost::FE_POST_EXPIRED_Y, _recvFEPostExpired) ;
-		REGISTER_SENDER(MMHost::FE_POST_LIST_REQ_Y, _sendFEPostListRequest, MM_SEND_FE_POST_LIST_REQ) ;
-		REGISTER_RECEIVER(MMHost::FE_POST_LIST_RESPONSE_Y, _recvFEPostListResponse) ;
-		REGISTER_SENDER(MMHost::FE_JOIN_REQ_Y, _sendFEJoinRequest, MM_SEND_FE_JOIN_REQ) ;
-		REGISTER_RECEIVER(MMHost::FE_JOIN_ACCEPT_Y, _recvFEJoinAccept) ;
-		REGISTER_RECEIVER(MMHost::FE_JOIN_DENY_Y, _recvFEJoinDeny) ;
-		REGISTER_RECEIVER(MMHost::FE_JOIN_PERM_REQUEST_Y, _recvFEJoinPermRequest) ;
-		REGISTER_SENDER(MMHost::FE_CREW_ACCEPT_Y, _sendFECrewAccept, MM_SEND_FE_CREW_ACCEPT) ;
-		REGISTER_SENDER(MMHost::FE_CREW_REQUEST_Y, _sendFECrewRequest, MM_SEND_FE_CREW_REQ) ;
-		REGISTER_SENDER(MMHost::FE_JOIN_PERM_KILL_Y, _sendFEJoinPermKill, MM_SEND_FE_JOIN_PERM_KILL) ;
-		REGISTER_SENDER(MMHost::FE_POST_CANCEL_Y, _sendFEPostCancel, MM_SEND_FE_POST_CANCEL) ;
-		REGISTER_SENDER(MMHost::FE_CLIENT_SPAWN_Y, _sendFEClientSpawn, MM_SEND_FE_CLIENT_SPAWN) ;
-		REGISTER_RECEIVER(MMHost::FE_SPAWN_NOTIFY_Y, _recvFESpawnNotify) ;
-		REGISTER_RECEIVER(MMHost::FE_CREW_BAILED_Y, _recvFECrewBailed) ;
-		REGISTER_SENDER(MMHost::DIRECT_SPAWN_Y, _sendDirectSpawn, _SEND_DIRECT_SPAWN) ;
-		REGISTER_SENDER_NODATA(MMHost::DO_DESPAWN_Y, _SEND_DO_DESPAWN) ;
+		REGISTER_SENDER(MM::FE_POST_REQ_Y, _sendFEPostRequest, MM_SEND_FE_POST_REQ);
+		REGISTER_RECEIVER(MM::FE_POST_ACCEPT_Y, _recvFEPostAccept);
+		REGISTER_RECEIVER(MM::FE_POST_DENY_Y, _recvFEPostDeny);
+		REGISTER_RECEIVER(MM::FE_POST_EXPIRED_Y, _recvFEPostExpired);
+		REGISTER_SENDER(MM::FE_POST_LIST_REQ_Y, _sendFEPostListRequest, MM_SEND_FE_POST_LIST_REQ);
+		REGISTER_RECEIVER(MM::FE_POST_LIST_RESPONSE_Y, _recvFEPostListResponse);
+		REGISTER_SENDER(MM::FE_JOIN_REQ_Y, _sendFEJoinRequest, MM_SEND_FE_JOIN_REQ);
+		REGISTER_RECEIVER(MM::FE_JOIN_ACCEPT_Y, _recvFEJoinAccept);
+		REGISTER_RECEIVER(MM::FE_JOIN_DENY_Y, _recvFEJoinDeny);
+		REGISTER_RECEIVER(MM::FE_JOIN_PERM_REQUEST_Y, _recvFEJoinPermRequest);
+		REGISTER_SENDER(MM::FE_CREW_ACCEPT_Y, _sendFECrewAccept, MM_SEND_FE_CREW_ACCEPT);
+		REGISTER_SENDER(MM::FE_CREW_REQUEST_Y, _sendFECrewRequest, MM_SEND_FE_CREW_REQ);
+		REGISTER_SENDER(MM::FE_JOIN_PERM_KILL_Y, _sendFEJoinPermKill, MM_SEND_FE_JOIN_PERM_KILL);
+		REGISTER_SENDER(MM::FE_POST_CANCEL_Y, _sendFEPostCancel, MM_SEND_FE_POST_CANCEL);
+		REGISTER_SENDER(MM::FE_CLIENT_SPAWN_Y, _sendFEClientSpawn, MM_SEND_FE_CLIENT_SPAWN);
+		REGISTER_RECEIVER(MM::FE_SPAWN_NOTIFY_Y, _recvFESpawnNotify);
+		REGISTER_RECEIVER(MM::FE_CREW_BAILED_Y, _recvFECrewBailed);
+		REGISTER_SENDER(MM::DIRECT_SPAWN_Y, _sendDirectSpawn, _SEND_DIRECT_SPAWN);
+		REGISTER_SENDER_NODATA(MM::DO_DESPAWN_Y, _SEND_DO_DESPAWN);
 
 	END_CALLBACK_REGISTRATION
 }

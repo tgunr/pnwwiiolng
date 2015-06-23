@@ -13,11 +13,11 @@ class CPlaygateDlg : public CBDialog
 {
 // Construction
 public:
-	CPlaygateDlg(CWnd* pParent = NULL);	// standard constructor
-	virtual ~CPlaygateDlg() ;
-	virtual UINT TitleLocID() const { return SERVSEL_TITLE ; }
-	virtual UINT OkLocID() const { return SERVSEL_OK ; }
-	virtual UINT HintLocID() const { return SERVSEL_HINT ; }
+	CPlaygateDlg(CWnd* pParent = nullptr);	// standard constructor
+	virtual ~CPlaygateDlg();
+	virtual UINT TitleLocID() const { return SERVSEL_TITLE; }
+	virtual UINT OkLocID() const { return SERVSEL_OK; }
+	virtual UINT HintLocID() const { return SERVSEL_HINT; }
 
 // Dialog Data
 	enum { IDD = IDD_PLAYGATE_DIALOG };
@@ -45,7 +45,7 @@ protected:
 public:
 	CButton m_ok;
 	CExplorer2 m_browser;
-	CListBox m_servers ;
+	CListBox m_servers;
 	afx_msg void OnDrawItem(int nIDCtl, LPDRAWITEMSTRUCT lpDrawItemStruct);
 	afx_msg void OnLbnSelchangeServerList();
 	afx_msg void OnBnClickedOk();

@@ -68,7 +68,7 @@ ShadowMap::ShadowMap():
     DynamicTexWidth(1024),
     DynamicTexHeight(1024),
     _polyOffset(1.0f, 1.0f),
-    _light(NULL),
+    _light(nullptr),
     _DynamicShadowDistance(40.0f),
     _StaticShadowDistance(800.0f),
     lastshadowcreate(0)
@@ -300,7 +300,7 @@ bool ShadowMap::FindOctetCenter(int corner)
     collide.newpos.y = y;
     collide.newpos.z = 10000.0f;
 
-    TERRAIN_DETAIL* dtl = NULL;
+    TERRAIN_DETAIL* dtl = nullptr;
 
     for(int i = 0; i < NUM_TERRAIN_RECTANGLES; i++)
 	{
@@ -632,7 +632,7 @@ void ShadowMap::RenderDynamicShadowCasters()
         return;
     }
 
-    struct LISTHEADER* list = NULL;
+    struct LISTHEADER* list = nullptr;
 	int numobjects = obmainGetObjects(&list);
 	OBJECT* o = (OBJECT*)list->next;
 
@@ -731,7 +731,7 @@ void ShadowMap::RenderDynamicShadowCasters()
         return;
     }
 
-    struct LISTHEADER* list = NULL;
+    struct LISTHEADER* list = nullptr;
 	int numobjects = obmainGetObjects(&list);
 	OBJECT* o = (OBJECT*)list->next;
 
@@ -889,7 +889,7 @@ bool ShadowMap::BeginStaticShadowMap(int corner)
     playerup = playerup ^ Vec3f(1, 0, 0);
     playerup.get(up);
 
-    oglCreateModelView(&_smOctet[corner].mv, &eye, &center, &up, NULL);
+    oglCreateModelView(&_smOctet[corner].mv, &eye, &center, &up, nullptr);
 
     // This also sets playright, playup, etc...
     rnmainSetViewMatrix2(&_smOctet[corner].mv);
@@ -989,7 +989,7 @@ bool ShadowMap::BeginStaticShadowMap(int corner)
     playerup = playerup ^ Vec3f(1, 0, 0);
     playerup.get(up);
 
-    oglCreateModelView(&_smOctet[corner].mv, &eye, &center, &up, NULL);
+    oglCreateModelView(&_smOctet[corner].mv, &eye, &center, &up, nullptr);
 
     // This also sets playright, playup, etc...
     rnmainSetViewMatrix2(&_smOctet[corner].mv);
@@ -1084,7 +1084,7 @@ bool ShadowMap::BeginDynamicShadowMap()
     playerup = playerup ^ Vec3f(1, 0, 0);
     playerup.get(up);
 
-    oglCreateModelView(&DynShadowMap.mv, &eye, &center, &up, NULL);
+    oglCreateModelView(&DynShadowMap.mv, &eye, &center, &up, nullptr);
 
     // This also sets playright, playup, etc...
     rnmainSetViewMatrix2(&DynShadowMap.mv);
@@ -1191,7 +1191,7 @@ bool ShadowMap::BeginDynamicShadowMap()
     playerup = playerup ^ Vec3f(1, 0, 0);
     playerup.get(up);
 
-    oglCreateModelView(&DynShadowMap.mv, &eye, &center, &up, NULL);
+    oglCreateModelView(&DynShadowMap.mv, &eye, &center, &up, nullptr);
 
     // This also sets playright, playup, etc...
     rnmainSetViewMatrix2(&DynShadowMap.mv);
@@ -2177,12 +2177,12 @@ void ShadowMap::Kill()
         while(_smOctet[i].fbo->referenceCount() > 1)
             _smOctet[i].fbo->unref();
 
-        _smOctet[i].fbo = NULL;
+        _smOctet[i].fbo = nullptr;
 
         while(_smOctet[i].map->referenceCount() > 1)
             _smOctet[i].map->unref();
 
-        _smOctet[i].map = NULL;
+        _smOctet[i].map = nullptr;
     }
 
     if(DynShadowMap.fbo.valid())
@@ -2190,17 +2190,17 @@ void ShadowMap::Kill()
         while(DynShadowMap.fbo->referenceCount() > 1)
             DynShadowMap.fbo->unref();
 
-        DynShadowMap.fbo = NULL;
+        DynShadowMap.fbo = nullptr;
     }
 
 #if USE_STATESET
 #else
-    DynShadowMap.map = NULL;
+    DynShadowMap.map = nullptr;
 #endif
 
 #if USE_STATESET
 #else
-    smoctet.fbo = NULL;
+    smoctet.fbo = nullptr;
 #endif
 
     if(_white.valid())
@@ -2208,11 +2208,11 @@ void ShadowMap::Kill()
         while(_white->referenceCount() > 1)
             _white->unref();
 
-        _white = NULL;
+        _white = nullptr;
     }
 
-    smoctet.map = NULL;
-    _shadowmap = NULL;
+    smoctet.map = nullptr;
+    _shadowmap = nullptr;
 }
 
 /*---------------------------------------------------------------------------
@@ -2244,20 +2244,22 @@ void ShadowMap::init()
     smoctet.map->setWrap(Texture2D::WRAP_T, Texture2D::CLAMP_TO_BORDER);
     smoctet.map->setBorderColor(Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
 
-    FrameBufferObject* fbo = new FrameBufferObject;
-    fbo->setAttachment(FrameBufferObject::DEPTH_BUFFER, FrameBufferAttachment(smoctet.map.get()));
+	{
+		ref_ptr<FrameBufferObject> fbo = new FrameBufferObject;
+		fbo->setAttachment(FrameBufferObject::DEPTH_BUFFER, FrameBufferAttachment(smoctet.map.get()));
 
 #if USE_STATESET
-    smoctet.stateset = new RenderStateSet;
-    smoctet.stateset->SetRenderState(new PolygonOffset(-_polyOffset[0], -_polyOffset[1]));
-    smoctet.stateset->SetRenderState(new ColorMask(false, false, false, false));
-    smoctet.stateset->SetRenderState(new ShadeModel(GL_FLAT));
-    smoctet.stateset->SetRenderState(fbo);
-    smoctet.stateset->SetMode(GL_FOG, 0);
-    smoctet.stateset->SetMode(GL_LIGHTING, 0);
+		smoctet.stateset = new RenderStateSet;
+		smoctet.stateset->SetRenderState(new PolygonOffset(-_polyOffset[0], -_polyOffset[1]));
+		smoctet.stateset->SetRenderState(new ColorMask(false, false, false, false));
+		smoctet.stateset->SetRenderState(new ShadeModel(GL_FLAT));
+		smoctet.stateset->SetRenderState(fbo);
+		smoctet.stateset->SetMode(GL_FOG, 0);
+		smoctet.stateset->SetMode(GL_LIGHTING, 0);
 #else
-    smoctet.fbo = fbo;
+		smoctet.fbo = fbo;
 #endif
+	}
 
     _white = new Texture2D;
     _white->setTextureSize(4, 4);
@@ -2272,15 +2274,16 @@ void ShadowMap::init()
     _white->setWrap(Texture2D::WRAP_T, Texture2D::CLAMP_TO_BORDER);
     _white->setBorderColor(Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
 
-    fbo = new FrameBufferObject;
-    fbo->setAttachment(FrameBufferObject::DEPTH_BUFFER, FrameBufferAttachment(_white.get()));
+	{
+		ref_ptr<FrameBufferObject> fbo = new FrameBufferObject;
+		fbo->setAttachment(FrameBufferObject::DEPTH_BUFFER, FrameBufferAttachment(_white.get()));
 
-    // Make texture 'white'
-    fbo->apply();
-    oglSetViewport(0, 0, 4, 4);
-    glClear(GL_DEPTH_BUFFER_BIT);
-    fbo->UnApply();
-    fbo->unref();
+		// Make texture 'white'
+		fbo->apply();
+		oglSetViewport(0, 0, 4, 4);
+		glClear(GL_DEPTH_BUFFER_BIT);
+		fbo->UnApply();
+	}
 
     oglSetViewport(0, 0, WantedWidth, WantedHeight);
 
@@ -2310,21 +2313,23 @@ void ShadowMap::init()
             _smOctet[i].map->setWrap(Texture2D::WRAP_T, Texture2D::CLAMP_TO_BORDER);
             _smOctet[i].map->setBorderColor(Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
 
-            fbo = new FrameBufferObject;
-            ref_ptr<FrameBufferAttachment> fba = new FrameBufferAttachment(_smOctet[i].map.get());
-            fbo->setAttachment(FrameBufferObject::DEPTH_BUFFER, *fba.get());
+			{
+				ref_ptr<FrameBufferObject> fbo = new FrameBufferObject;
+				ref_ptr<FrameBufferAttachment> fba = new FrameBufferAttachment(_smOctet[i].map.get());
+				fbo->setAttachment(FrameBufferObject::DEPTH_BUFFER, *(fba.get()));
 
 #if USE_STATESET
-            _smOctet[i].stateset = new RenderStateSet;
-            _smOctet[i].stateset->SetRenderState(new PolygonOffset(-_polyOffset[0], -_polyOffset[1]));
-            _smOctet[i].stateset->SetRenderState(new ColorMask(false, false, false, false));
-            _smOctet[i].stateset->SetRenderState(new ShadeModel(GL_FLAT));
-            _smOctet[i].stateset->SetRenderState(fbo);
-            _smOctet[i].stateset->SetMode(GL_FOG, 0);
-            _smOctet[i].stateset->SetMode(GL_LIGHTING, 0);
+				_smOctet[i].stateset = new RenderStateSet;
+				_smOctet[i].stateset->SetRenderState(new PolygonOffset(-_polyOffset[0], -_polyOffset[1]));
+				_smOctet[i].stateset->SetRenderState(new ColorMask(false, false, false, false));
+				_smOctet[i].stateset->SetRenderState(new ShadeModel(GL_FLAT));
+				_smOctet[i].stateset->SetRenderState(fbo);
+				_smOctet[i].stateset->SetMode(GL_FOG, 0);
+				_smOctet[i].stateset->SetMode(GL_LIGHTING, 0);
 #else
-            _smOctet[i].fbo = fbo;
+				_smOctet[i].fbo = fbo;
 #endif
+			}
         }
 
         DynShadowMap.valid = false;
@@ -2344,22 +2349,24 @@ void ShadowMap::init()
         DynShadowMap.map->setWrap(Texture2D::WRAP_T, Texture2D::CLAMP_TO_BORDER);
         DynShadowMap.map->setBorderColor(Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
 
-        fbo = new FrameBufferObject;
-        ref_ptr<FrameBufferAttachment> fba = new FrameBufferAttachment(DynShadowMap.map.get());
-        fbo->setAttachment(FrameBufferObject::DEPTH_BUFFER, *fba.get());
+		{
+			ref_ptr<FrameBufferObject> fbo = new FrameBufferObject;
+			ref_ptr<FrameBufferAttachment> fba = new FrameBufferAttachment(DynShadowMap.map.get());
+			fbo->setAttachment(FrameBufferObject::DEPTH_BUFFER, *fba.get());
 
 #if USE_STATESET
-        DynShadowMap.stateset = new RenderStateSet;
-        DynShadowMap.stateset->SetRenderState(new PolygonOffset(-_polyOffset[0], -_polyOffset[1]));
-        DynShadowMap.stateset->SetRenderState(new ColorMask(false, false, false, false));
-        DynShadowMap.stateset->SetRenderState(new ShadeModel(GL_FLAT));
-        DynShadowMap.stateset->SetRenderState(new FrontFace(GL_BACK));
-        DynShadowMap.stateset->SetRenderState(fbo);
-        DynShadowMap.stateset->SetMode(GL_FOG, 0);
-        DynShadowMap.stateset->SetMode(GL_LIGHTING, 0);
+			DynShadowMap.stateset = new RenderStateSet;
+			DynShadowMap.stateset->SetRenderState(new PolygonOffset(-_polyOffset[0], -_polyOffset[1]));
+			DynShadowMap.stateset->SetRenderState(new ColorMask(false, false, false, false));
+			DynShadowMap.stateset->SetRenderState(new ShadeModel(GL_FLAT));
+			DynShadowMap.stateset->SetRenderState(new FrontFace(GL_BACK));
+			DynShadowMap.stateset->SetRenderState(fbo);
+			DynShadowMap.stateset->SetMode(GL_FOG, 0);
+			DynShadowMap.stateset->SetMode(GL_LIGHTING, 0);
 #else
-        DynShadowMap.fbo = fbo;
+			DynShadowMap.fbo = fbo;
 #endif
+		}
 
 #if(0)
         _white = new Texture2D;
@@ -2376,19 +2383,17 @@ void ShadowMap::init()
         _white->setBorderColor(Vec4f(1.0f, 1.0f, 1.0f, 1.0f));
 #endif
 
-        FrameBufferObject* fbo2 = new FrameBufferObject;
+		{
+			FrameBufferObject* fbo = new FrameBufferObject;
+			ref_ptr<FrameBufferAttachment> fba = new FrameBufferAttachment(_white.get());
+			fbo->setAttachment(FrameBufferObject::DEPTH_BUFFER, *fba.get());
 
-        fba = new FrameBufferAttachment(_white.get());
-        fbo2->setAttachment(FrameBufferObject::DEPTH_BUFFER, *fba.get());
-
-        // Make texture 'white'
-        fbo2->apply();
-        oglSetViewport(0, 0, 4, 4);
-        glClear(GL_DEPTH_BUFFER_BIT);
-        fbo2->UnApply();
-
-        fba->unref();
-        fbo2->unref();
+			// Make texture 'white'
+			fbo->apply();
+			oglSetViewport(0, 0, 4, 4);
+			glClear(GL_DEPTH_BUFFER_BIT);
+			fbo->UnApply();
+		}
 
         oglSetViewport(0, 0, WantedWidth, WantedHeight);
         _program = GLSL.getProgram("shadow");

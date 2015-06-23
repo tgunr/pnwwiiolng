@@ -29,13 +29,13 @@ typedef bool (*ExternalCameraPivot)(piVECTOR*, piMATRIX*);
 struct persPositionDataElement {
 	UINT32	ordnanceNum;
 	UINT32	gunsightNum;
-} ;
+};
 
 struct persCommandListElement
 {
 	UCHAR CommandName[32];
 	UINT32 CommandId;
-} ;
+};
 
 struct persPersona
 {
@@ -93,7 +93,7 @@ struct persPersona
 
 	persPositionDataElement	PositionData[ML_MAX_CREW_POSITIONS];
 
-} ;
+};
 
 class persPersonaHealth
 {
@@ -105,7 +105,7 @@ public:
 		, PayAttentionToPersona(FALSE) {}
 	~persPersonaHealth() {}
 
-	void clear() ;
+	void clear();
 
 public:
 	// these are 0.0 = normal, 1.0 = dead
@@ -124,9 +124,7 @@ public:
 	Covert<FLOAT32> BloodCurrentLevel; // current blood level
 
 	Covert<UINT32> PayAttentionToPersona; // used for vehicle kill stuff
-} ;
-
-#if !defined(USE_OSG)
+};
 
 // start lua compatibility functions and types with OSG
 
@@ -148,8 +146,6 @@ Player* playerGetPlayer();
 vehVehicle* playerGetVehicle();
 // end lua compatibility
 
-#endif
-
 extern UINT32 persInit(void); // initializes the persona system
 
 extern UINT32 persKill(void); // kills the persona system
@@ -165,7 +161,7 @@ extern UINT32 persGetCameraPosAndAtt(piVECTOR * Pos,piVECTOR * Att);
 // returns the persPersona structure pointer for the player's persona
 extern persPersona* persGetPersonaDataPtr();
 
-// returns the vehVehicle the player is attached to, or NULL if not attached
+// returns the vehVehicle the player is attached to, or nullptr if not attached
 extern vehVehicle* persGetPersonaVehiclePtr();
 
 // If the persona is controlling a populated and ready vehicle,
@@ -173,7 +169,7 @@ extern vehVehicle* persGetPersonaVehiclePtr();
 extern vehVehicle* persGetPersonaPilotedOnlineVehicle();
 
 // if the player is attached to a vehicle and that vehicle has an object,
-// returns that object, otherwise NULL
+// returns that object, otherwise nullptr
 extern OBJECT* persGetPersonaVehicleObjectDataPtr();
 
 // returns the current position number of the player
@@ -187,7 +183,7 @@ extern UINT32 persSetPersonaPosition(UINT32 InPosition);
 extern UINT32 persResetPersonaSettings();
 
 // if the player is attached to a vehicle and that vehicle has model data
-// returns the model data, otherwise NULL
+// returns the model data, otherwise nullptr
 extern mlVehicleData* persGetPersonaModelDataPtr();
 
 // checks if the persona is attached to a particular vehicle
@@ -212,8 +208,6 @@ extern bool persSubmergedDeathCamera(piVECTOR* pos, piVECTOR* aim);
 
 extern UINT32 persPersonaIsCreatedOnHost(void);
 extern UINT32 persIsPersonaCreated(void);
-
-extern UINT32 persGetCockpitViewMatrix(piMATRIX * Mat);
 
 extern UINT32 persSetExternalLockedCamera(SINT32 Param,UINT32 Id,UINT32 Detach);
 extern UINT32 persSetExternalRubberBandCamera(SINT32 Param,UINT32 Id,UINT32 Detach);
@@ -240,25 +234,23 @@ extern UINT32 persAddHitSoundsForHitComponent(
 								SINT32 NumHits,
 								FLOAT32 DamageAccrued);
 
-extern LOGICAL persSetView(UINT32 type, UINT32 level);
-extern LOGICAL persSetGunsightView(FLOAT32 FieldOfView);
-extern LOGICAL persSetNormalView(FLOAT32 FieldOfView);
-extern UINT32 persResetHealths(void);
+extern void persSetView(UINT32 type, UINT32 level);
+extern void persSetNormalView(FLOAT32 FieldOfView_);
+extern void persResetHealths(void);
 extern UINT32 persSetPersonaPositionCallback(SINT32 param, UINT32 id, UINT32 detach);
-extern UINT32 persShakeHead(const char* message = NULL);
-extern UINT32 persHurtEffect(FLOAT32 amount, SINT32 duration);
-extern UINT32 persKillCrew(void);
-extern LOGICAL persAllowHUDUpdate(void);
+extern void persShakeHead(const char* message = nullptr);
+extern void persKillCrew(void);
+extern bool persAllowHUDUpdate(void);
 
-extern LOGICAL persCanVehicleExit(void);
-extern LOGICAL persIsCrewDead(void);
+extern bool persCanVehicleExit(void);
+extern bool persIsCrewDead(void);
 extern FLOAT32 persGetFogScaleMultiplier(void);
 
 extern LOGICAL persDrawGunsight(void);
 extern UINT32 persResetVehicleG(void);
 extern UINT32 persGetCrewDeadForKillScore(UINT32 Position);
 
-extern UINT32 persSetPayAttentionFlag(UINT32 Position);
+extern void persSetPayAttentionFlag(UINT32 Position);
 
 extern void persSetDeathCam(UINT32 mode = 1);
 extern LOGICAL persIsInDeathCam();
@@ -292,9 +284,9 @@ extern LOGICAL persIsTired();
 extern void persSetDeathCamForNextUpdate();
 extern void persSetExitTime(SINT32 when);
 
-extern bool persIsPersonaVehicleTank(const vehVehicle* v = NULL);
-extern bool persIsPersonaVehicleDestroyer(const vehVehicle* v = NULL);
-extern bool persIsPersonaVehicleRiverBoat(const vehVehicle* v = NULL);
-extern bool persIsPersonaVehicleTruck(const vehVehicle* v = NULL);
-extern bool persIsPersonaVehicleBomber(const vehVehicle* v = NULL);
-extern bool persIsPersonaVehicleFighter(const vehVehicle* v = NULL);
+extern bool persIsPersonaVehicleTank(const vehVehicle* v = nullptr);
+extern bool persIsPersonaVehicleDestroyer(const vehVehicle* v = nullptr);
+extern bool persIsPersonaVehicleRiverBoat(const vehVehicle* v = nullptr);
+extern bool persIsPersonaVehicleTruck(const vehVehicle* v = nullptr);
+extern bool persIsPersonaVehicleBomber(const vehVehicle* v = nullptr);
+extern bool persIsPersonaVehicleFighter(const vehVehicle* v = nullptr);

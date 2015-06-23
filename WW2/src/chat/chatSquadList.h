@@ -8,39 +8,41 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-class SquadList ;
-class Player ;
+#include "chat/chatName.h"
 
-extern SquadList* chatFindSquadList(UINT32 squadID) ;
-extern SquadList* chatFindSquadListByName(const char*) ;
-extern void chatRequestSquad(UINT32 squadID, Player* player) ;
-extern ChatHandle chatGetSquadHandle(UINT32 squadID) ;
-extern const char* chatGetSquadCallsign(UINT32 squadID) ;
-extern const char* chatGetSquadRankName(RANK_NO squadRank) ;
-extern bool chatCheckSquadLists() ;
-extern const char* chatFindSquadMotd(UINT32 squadID) ;
+class SquadList;
+class Player;
+
+SquadList* chatFindSquadList(UINT32 squadID);
+SquadList* chatFindSquadListByName(const char*);
+void chatRequestSquad(UINT32 squadID, Player* player);
+ChatHandle chatGetSquadHandle(UINT32 squadID);
+const char* chatGetSquadCallsign(UINT32 squadID);
+const char* chatGetSquadRankName(RANK_NO squadRank);
+bool chatCheckSquadLists();
+const char* chatFindSquadMotd(UINT32 squadID);
 
 // Remove a squad from the in-memory squad list tables
 // Note: doesn't remove the squad from the database
-extern void chatRemoveSquadList(UINT32 squadID) ;
+void chatRemoveSquadList(UINT32 squadID);
 
-extern void chatSquadMakeCO(Player* player, SquadList* list) ;
+void chatSquadMakeCO(Player* player, SquadList* list);
 
-extern void chatFetchSquadNames() ;
-extern void chatAddSquadName(const char* squadName) ;
-extern bool chatCheckForSquadName(const char* squadName) ;
-extern void chatRemoveSquadName(const char* squadName) ;
-extern void chatAddSquadName(const ChatHandle& handle) ;
-extern bool chatCheckForSquadName(const ChatHandle& handle) ;
-extern void chatRemoveSquadName(const ChatHandle& handle) ;
+void chatFetchSquadNames();
+void chatAddSquadName(const char* squadName);
+bool chatCheckForSquadName(const char* squadName);
+void chatRemoveSquadName(const char* squadName);
+void chatAddSquadName(const ChatHandle& handle);
+bool chatCheckForSquadName(const ChatHandle& handle);
+void chatRemoveSquadName(const ChatHandle& handle);
 
-extern void chatRenameSquad(const char* fromName, const char* toName) ;
+void chatRenameSquad(const Chat::Name& fromName, const Chat::Name& toName);
 
 // Add/remove a player from the recruiter list
-extern void chatUpdateRecruiterList(const Player* player, bool isRecruiting, class SquadList* squadList /* or NULL */) ;
+void chatUpdateRecruiterList(const Player* player, bool isRecruiting, class SquadList* squadList /* or NULL */);
 
 // Send me a list of recruiters, please
-extern void chatRequestRecruiter(Player* player, UCHAR language) ;
+void chatRequestRecruiter(Player* player, UCHAR language);
 
 //! Load a squad member list from the database.
-extern void chatRequestSquadMemberList(const UINT32 squadID) ;
+void chatRequestSquadMemberList(const UINT32 squadID);

@@ -10,7 +10,6 @@
 
 #include <vector>
 #include "wwii/wwiiHash.h"
-USING_EXT_NAMESPACE;
 
 struct ActiveVarInfo
 {
@@ -23,7 +22,7 @@ struct ActiveVarInfo
     }
 
     ActiveVarInfo(GLint l, GLenum t, GLint s) :
-        uniform(NULL),
+        uniform(nullptr),
         location(l),
         type(t),
         size(s),
@@ -49,7 +48,7 @@ public:
     {
         bool operator()(const char* s1, const char* s2) const
         {
-            return strcmp(s1, s2) < 0;
+            return strcmp(s1, s2) == 0;
         }
     };
 
@@ -83,27 +82,14 @@ public:
 
     typedef std::vector<ref_ptr<glslShader> > ShaderList;
 
-    // unordered map uses stdext::hashmap intrinsically
-    typedef stdext::hash_map<std::string, ActiveVarInfo> ActiveVarInfoMap;
+	using ActiveVarInfoMap = std::unordered_map<std::string, ActiveVarInfo>;
 
-    typedef stdext::hash_map<std::string, GLuint> AttribBindingList;
+    using AttribBindingList = std::unordered_map<std::string, GLuint>;
 
-#if platOS == OS_MACOS
-    struct eqs
-    {
-        bool operator()(const char* s1, const char* s2) const
-        {
-            return strcmp(s1, s2) == 0;
-        }
-    };
+	using UniformList = std::unordered_map<const char*, glslUniform*, ConstCharHasher, eqstr>;
 
-    typedef stdext::hash_map<const char*, glslUniform*, stdext::hash<const char*>, eqs > UniformList;
-#else
-    typedef stdext::hash_map<const char*, glslUniform*, std::hash_compare<const char*, eqstr> > UniformList;
-#endif
-
-    typedef std::pair<const glslUniform*, unsigned int> UniformModifiedCountPair;
-    typedef std::vector<UniformModifiedCountPair> LastAppliedUniformList;
+	using UniformModifiedCountPair = std::pair<const glslUniform*, unsigned int>;
+	using LastAppliedUniformList = std::vector<UniformModifiedCountPair>;
 
     const AttribBindingList& GetAttribBindingList() const {return _attribBindingList;}
 

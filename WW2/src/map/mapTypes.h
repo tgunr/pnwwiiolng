@@ -19,5 +19,5 @@ struct CP_INFO
 	FULL_OBJ_ID		cp;
 	WWII_COUNTRY	owner;
 	UINT32			cpFlags;
-} ;
+};
 

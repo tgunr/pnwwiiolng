@@ -207,9 +207,9 @@ public:
 			// grab our commands and parse them into individual slash commands
 			const char* commands = xmlGetStringFromNode(node);
 			const char* command = commands;
-			const char* end = NULL;
+			const char* end = nullptr;
 
-			while((end = strstr(command, "\n")) != NULL)
+			while((end = strstr(command, "\n")) != nullptr)
 			{
 				// null terminate the current command
 				end = '\0';
@@ -337,7 +337,7 @@ Scenario* scenMainLoad(const char* path)
 	*/
 
 	// something failed
-	return NULL;
+	return nullptr;
 }
 
 #if(0)

@@ -1,5 +1,5 @@
 #include <syscfg.h>	// Path is project specific.
-#include "io_mapped_file.h"
+#include "include/io_mapped_file.h"
 // IO::MappedFile -- Based on SMUGL::cl_mappedfile
 // Author: Oliver "kfsone" Smith 2012 <oliver@kfs.org>
 // Redistribution and re-use fully permitted contingent on inclusion of these 3 lines in copied- or derived- works.
@@ -26,7 +26,6 @@
 #endif
 
 #include <stdexcept>
-#include <string.h>
 
 // Macros to help with the whole char/wchar crap.
 static inline size_t _getLen(const char* str_) { return OsStrlen(str_); }
@@ -43,15 +42,15 @@ static inline imf_handle_t OsOpenFile(const char* filename_)
 #if IO_MAP_TYPE != _IMT_WINDOWS
 	return OS_OPEN(filename_, O_RDONLY);
 #else
-	return CreateFileA(filename_, FILE_GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+	return CreateFileA(filename_, FILE_GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
 #endif
 }
 
-// Handle the same with widecharacters.
+// Handle the same with wide characters.
 #if IO_MAP_TYPE == _IMT_WINDOWS && defined(UNICODE)
 static inline imf_handle_t OsOpenFile(const wchar_t* filename_)
 {
-	return CreateFileW(filename_, FILE_GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL);
+	return CreateFileW(filename_, FILE_GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, 0, nullptr);
 }
 #endif
 
@@ -165,21 +164,21 @@ MappedFile::mapFileHandleInternal()
 	// but then give us direct access to the buffer memory".
 #if IO_MAP_TYPE == _IMT_WINDOWS
 	// Windows implementation.
-	m_mapping = CreateFileMapping(m_handle, NULL, PAGE_READONLY, 0, 0, NULL);
-	if ( m_mapping == IMF_INVALID_HANDLE || m_mapping == NULL )
+	m_mapping = CreateFileMapping(m_handle, nullptr, PAGE_READONLY, 0, 0, nullptr);
+	if ( m_mapping == IMF_INVALID_HANDLE || m_mapping == nullptr )
 		return unmapFile();
 
-	LPVOID const ptr = MapViewOfFileEx(m_mapping, FILE_MAP_READ, 0, 0, 0, NULL);
-	if ( ptr == NULL )
+	LPVOID const ptr = MapViewOfFileEx(m_mapping, FILE_MAP_READ, 0, 0, 0, nullptr);
+	if ( ptr == nullptr )
 		return unmapFile();
 #else
 	// Posix implementation.
 	static const int flags = 
-			  MAP_FILE 		// Compatability flag, not really required.
+			  MAP_FILE 		// Compatibility flag, not really required.
 			| MAP_SHARED	// Share buffers with any other mmappers of this file.
 			;
 	void* const ptr =
-		mmap(NULL, m_size + 1, PROT_READ, flags, m_handle, 0);
+		mmap(nullptr, m_size + 1, PROT_READ, flags, m_handle, 0);
 	if ( ptr == MAP_FAILED )
 		return unmapFile();
 
@@ -240,7 +239,7 @@ MappedFile::mapFile(const wchar_t* const filename_, const wchar_t* const dirname
 bool
 MappedFile::unmapFile()
 {
-	if ( m_basePtr != NULL )
+	if ( m_basePtr != nullptr )
 	{
 #if IO_MAP_TYPE == _IMT_WINDOWS
 		UnmapViewOfFile(m_basePtr);
@@ -248,8 +247,8 @@ MappedFile::unmapFile()
 		munmap(m_basePtr, m_size + 1);
 #endif
 
-		m_basePtr = NULL;
-		m_startPtr = m_endPtr = m_currentPtr = NULL;
+		m_basePtr = nullptr;
+		m_startPtr = m_endPtr = m_currentPtr = nullptr;
 		m_size = 0;
 	}
 
@@ -286,12 +285,12 @@ MappedFile::unmapFile()
 MappedFile&
 MappedFile::operator = (const MappedFile& rhs_)
 {
-	if ( rhs_.m_basePtr != NULL )
+	if ( rhs_.m_basePtr != nullptr )
 		throw std::runtime_error("illegal mapped-file operation");
-	if ( m_basePtr != NULL )
+	if ( m_basePtr != nullptr )
 		throw std::runtime_error("illegal mapped-file overwrite operation");
 
-	m_basePtr = NULL;
+	m_basePtr = nullptr;
 	m_startPtr = rhs_.m_startPtr;
 	m_endPtr = rhs_.m_endPtr;
 	m_currentPtr = rhs_.m_currentPtr;

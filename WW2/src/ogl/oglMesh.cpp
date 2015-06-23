@@ -47,8 +47,8 @@ UINT32	ogl::VertexElementSize(UINT32 vertexType)
 StaticBuffer::StaticBuffer()
 	:	vertexSize(0),
 		vertexType(0),
-//		vbData(NULL),
-		ibData(NULL),
+//		vbData(nullptr),
+		ibData(nullptr),
 		vbName(0),
 		ibName(0)
 {
@@ -64,8 +64,8 @@ StaticBuffer::StaticBuffer()
 StaticBuffer::StaticBuffer(int hfile)
 	:	vertexSize(0),
 		vertexType(0),
-//		vbData(NULL),
-		ibData(NULL),
+//		vbData(nullptr),
+		ibData(nullptr),
 		vbName(0),
 		ibName(0)
 {
@@ -85,7 +85,7 @@ StaticBuffer::StaticBuffer(int hfile)
 	assert(vbName);
 
 	memFree(vbData);
-	vbData = NULL;
+	vbData = nullptr;
 
 
 	SINT32		indexCnt	= fioGetl(hfile);
@@ -102,7 +102,7 @@ StaticBuffer::StaticBuffer(int hfile)
 	assert(ibName);
 
 	memFree(ibData);
-	ibData = NULL;
+	ibData = nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -125,8 +125,8 @@ StaticBuffer::~StaticBuffer()
 //////////////////////////////////////////////////////////////////////
 void StaticBuffer::Buffer()
 {
-    unsigned char*	crtFinalVertexPtr	= NULL;
-    unsigned char*	crtRawVertexPtr		= NULL;
+    unsigned char*	crtFinalVertexPtr	= nullptr;
+    unsigned char*	crtRawVertexPtr		= nullptr;
 
 	if(IsBuffered()) return;
 
@@ -223,12 +223,12 @@ void StaticBuffer::Buffer()
 	if(vbData)
 	{
 		memFree(vbData);
-		vbData = NULL;
+		vbData = nullptr;
 	}
 	if(ibData)
 	{
 		memFree(ibData);
-		ibData = NULL;
+		ibData = nullptr;
 	}
 }
 
@@ -280,10 +280,10 @@ LOGICAL StaticBuffer::AddMesh(std::vector<RawVertex>& withRawVertexData, const V
 
             if ( newVertex ) // new
 			{
-				rawIndexData.push_back( rawVertexData.size() );
+				rawIndexData.push_back( (ogl::VertexIdx)rawVertexData.size() );
 				rawVertexData.push_back( *vertx );
 
-                vertexIndexer.insert( std::pair<size_t,VertexIdx>( code, rawVertexData.size()-1) );
+                vertexIndexer.insert( std::pair<size_t,VertexIdx>( code, (VertexIdx)rawVertexData.size()-1) );
 			}
 			else
             {
@@ -315,8 +315,8 @@ LOGICAL StaticBuffer::AddMesh(std::vector<RawVertex>& withRawVertexData, const V
 //////////////////////////////////////////////////////////////////////
 void StaticBuffer::SaveToFile(int hfile)
 {
-	unsigned char*	crtFinalVertexPtr	= NULL;
-	unsigned char*	crtRawVertexPtr		= NULL;
+	unsigned char*	crtFinalVertexPtr	= nullptr;
+	unsigned char*	crtRawVertexPtr		= nullptr;
 
 
 	fioPutl(hfile, rawVertexData.size());									// Count of unique vertices
@@ -415,8 +415,8 @@ void StaticBuffer::SaveToFile(int hfile)
 //	MeshContext
 //////////////////////////////////////////////////////////////////////
 MeshContext::MeshContext(int fd, const std::vector<StaticBuffer*>& staticBuffers)
-	:	modelViewMatrix(NULL),
-		staticBuffer(NULL),
+	:	modelViewMatrix(nullptr),
+		staticBuffer(nullptr),
         vao(0)
 {
 	vertexType = fioGetl(fd);
@@ -516,14 +516,14 @@ void MeshContext::Apply()
 //	MeshContext
 //////////////////////////////////////////////////////////////////////
 MeshContext::MeshContext(UINT32 withVertexType)
-	:	modelViewMatrix(NULL),
+	:	modelViewMatrix(nullptr),
 		vertexSize(0),
 		bufferHandle(-1),
 		minIdx(0),
 		maxIdx(0),
 		idxOffset(0),
 		elementCnt(0),
-		staticBuffer(NULL),
+		staticBuffer(nullptr),
         vao(0)
 {
 	this->vertexType = withVertexType;
@@ -587,7 +587,7 @@ void MeshContext::AddVertexAttribute(void* data, UINT32 attribute)
 //////////////////////////////////////////////////////////////////////
 void MeshContext::SetOGLModelViewMatrix(const piMATRIX& m)
 {
-	if((staticBuffer != NULL) && modelViewMatrix)
+	if((staticBuffer != nullptr) && modelViewMatrix)
 	{// Make sure the mesh isn't in world space already
 		oglSetWorldMatrix(modelViewMatrix);
 	}

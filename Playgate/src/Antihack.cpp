@@ -73,13 +73,13 @@ wstring Antihack::check()
 	PidMap pids;
 	getProcesses(pids);
 
-	MIB_TCPTABLE_OWNER_MODULE *tcpTable = NULL;
+	MIB_TCPTABLE_OWNER_MODULE *tcpTable = nullptr;
 	DWORD size = sizeof(MIB_TCPTABLE_OWNER_MODULE)*1;
 
 	DWORD result = ERROR_INSUFFICIENT_BUFFER;
 	do
 	{
-		if ( tcpTable == NULL ) free (tcpTable);
+		if ( tcpTable == nullptr ) free (tcpTable);
 		tcpTable = (MIB_TCPTABLE_OWNER_MODULE*)calloc( 1, size );
 		result = GetExtendedTcpTable( tcpTable, &size, false, AF_INET,
 			TCP_TABLE_OWNER_MODULE_CONNECTIONS, 0 );
@@ -95,23 +95,22 @@ wstring Antihack::check()
 			IpAddr.S_un.S_addr = entry->dwRemoteAddr;
 			DWORD pid = entry->dwOwningPid;
 
-			const char*s = inet_ntoa( IpAddr );
 			// Filter the address against addresses we know.
 			// Original address is 85.17.235
-			enum { BitFlip = 129 } ;
+			enum { BitFlip = 129 };
 #ifndef INTERNAL_TESTING
-			enum { Oct1 = BitFlip ^ 85, Oct2 = BitFlip ^ 17, Oct3 = BitFlip ^ 235 } ;
+			enum { Oct1 = BitFlip ^ 85, Oct2 = BitFlip ^ 17, Oct3 = BitFlip ^ 235 };
 #else
-			enum { Oct1 = BitFlip ^ 192, Oct2 = BitFlip ^ 168, Oct3 = BitFlip ^ 0 } ;
+			enum { Oct1 = BitFlip ^ 192, Oct2 = BitFlip ^ 168, Oct3 = BitFlip ^ 0 };
 #endif
-			long oct1 = (entry->dwRemoteAddr & 255) ^ BitFlip ;
-			long oct2 = ((entry->dwRemoteAddr >> 8) & 255) ^ BitFlip ;
-			long oct3 = ((entry->dwRemoteAddr >> 16) & 255) ^ BitFlip ;
-			long oct4 = ((entry->dwRemoteAddr >> 24) & 255) ;
+			long oct1 = (entry->dwRemoteAddr & 255) ^ BitFlip;
+			long oct2 = ((entry->dwRemoteAddr >> 8) & 255) ^ BitFlip;
+			long oct3 = ((entry->dwRemoteAddr >> 16) & 255) ^ BitFlip;
+			long oct4 = ((entry->dwRemoteAddr >> 24) & 255);
 
 			if ( oct1 == Oct1 && oct2 == Oct2 && oct3 == Oct3 )
 			{
-				wstring st = L":cfp" ;
+				wstring st = L":cfp";
 				PidMap::iterator ref = pids.find(pid);
 				if ( ref != pids.end() )
 				{
@@ -133,7 +132,7 @@ wstring Antihack::check()
 
 	wchar_t s[12];
 
-	srand((unsigned int)time(NULL));
+	srand((unsigned int)time(nullptr));
 	for ( int i=0; i<11; i++ )
 	{
 		wchar_t c = 'A'+(rand()%26);

@@ -30,7 +30,7 @@ extern SINT32 sdmOpenFile(const SCHAR* path,UINT16 mode);
 //Accessor functinos to get at data in the file.  Names should be self-describing,
 //  will comment in more detail when time permits
 
-extern const struct STRT_DTL_HEADER& sdmGetDtlHeader() ;
+extern const struct STRT_DTL_HEADER& sdmGetDtlHeader();
 
 extern UINT16 sdmGetNumCP(void);
 extern CP* sdmGetNextCP(void);
@@ -57,7 +57,6 @@ extern SINT32 sdmCloseFile(void);
 
 // Clean up after the SDM routines and exit it
 // there were any cumulatively fatal errors.
-extern void sdmFinish() ;
+extern void sdmFinish();
 
-#include <string>
-extern const std::string& sdmTranslateName(const std::string& from) ;
+extern const std::string& sdmTranslateName(const std::string& from);

@@ -10,7 +10,7 @@
 
 #include "GLCounter.h"
 
-static GLCounter* GLCounterInstance = NULL;
+static GLCounter* GLCounterInstance = nullptr;
 
 extern int ft1000msticks;
 
@@ -22,7 +22,7 @@ void GLCounterKill()
 
 GLCounter& GLCounter::instance()
 {
-    if ( GLCounterInstance == NULL )
+    if ( GLCounterInstance == nullptr )
     {
         GLCounterInstance = new GLCounter();
     }

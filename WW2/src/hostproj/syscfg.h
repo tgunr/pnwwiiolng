@@ -32,22 +32,15 @@
 #include "hostproj/versionNo.h"
 #include "versionNo.h"
 
-#if defined(HAVE_SYS_CDEFS_H)
-#include <sys/cdefs.h>
-#endif
-
-#include "include/platforms.h"
+#include "include/platforms.h"	// includes precompile_includes.h
 
 // Maximum number of active local connections allowed
 namespace Teul
 {
-	static const size_t MaxConnections = 6000 ;
-	static const size_t MaxClusterUsers = 5000 ;
+	static const size_t MaxConnections = 6000;
+	static const size_t MaxClusterUsers = 5000;
 }
 
-#include "include/precompile_includes.h"
-#include <stdlib.h>
-#include <limits.h>
 #include <signal.h>
 //#include <atomic>
 

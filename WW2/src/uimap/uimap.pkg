@@ -1,10 +1,10 @@
-$#include "uiMain.h"
+$#include "ui/uiMain.h"
 
-$pfile "..\\lua\\include.pkg"
+$pfile "lua/include.pkg"
 
 module map
 {
-	$cfile "uiMap.h"
-	$cfile "SuperCellMapView.h"
+	$cfile "uimap/uiMap.h"
+	$cfile "uimap/SuperCellMapView.h"
 }
 

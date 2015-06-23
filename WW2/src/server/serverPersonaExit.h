@@ -24,12 +24,12 @@ namespace Server
 
 		public: UINT32 exitCode;
 
-		public: virtual SINT32 onReceive(SINT32 teulIndex) ;
-		public: virtual void packer(LOGICAL mode, ACTION_OBJECT* const a)
+		public: virtual SINT32 onReceive(SINT32 teulIndex) OVERRIDE_FN;
+		public: virtual void packer(LOGICAL mode, ACTION_OBJECT* const a) OVERRIDE_FN
 		{
-			PersonaXfer::packer(mode, a) ;
-			a->packer(mode, exitCode) ;
+			PersonaXfer::packer(mode, a);
+			a->packer(mode, exitCode);
 		}
-	} ;
+	};
 
 }

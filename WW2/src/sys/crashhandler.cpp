@@ -63,7 +63,7 @@ static void addGenericInfo(std::stringstream& sstr, std::stringstream& miniInfo)
 
 	const TCHAR* pFFI;
 	GetFileVersion(&pFFI);
-	if (pFFI != NULL)
+	if (pFFI != nullptr)
 	{
 		sprintf(s, "File version: %s\n", UTF8(pFFI));
 		sstr << s;
@@ -97,7 +97,7 @@ void nonExceptionErrorReport(const SINT8* file, SINT32 line, const SINT8* messag
 
 	errInfo.data.piExitInfo.srcLine=line;
 
-	FILE* fp = Fio::OpenLogFile() ;
+	FILE* fp = Fio::OpenLogFile();
 	if ( fp )
 	{
 		fprintf( fp, sstr.str().c_str() );
@@ -309,8 +309,6 @@ static DWORD reportException(EXCEPTION_POINTERS * eps,
 
 #ifdef ANTIHACK
 #include "tools/diddle.h"
-
-LOCAL_DIDDLE;
 #endif
 
 static int exceptioncatcher(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow,
@@ -347,7 +345,7 @@ static int starter(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	}
 	__except(reportException(GetExceptionInformation(),buffer,exceptionInfo,sw,errInfo))
 	{
-		FILE* fp = Fio::OpenLogFile() ;
+		FILE* fp = Fio::OpenLogFile();
 		if ( fp )
 		{
 			fprintf( fp, buffer.c_str() );

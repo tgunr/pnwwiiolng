@@ -7,5 +7,5 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-extern SINT32 chatInstallHostManagementCallbacks();
+SINT32 chatInstallHostManagementCallbacks();
 

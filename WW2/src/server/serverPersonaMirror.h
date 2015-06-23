@@ -20,15 +20,15 @@ namespace Server
 			: PersonaXfer(XferReason::Mirror, _data, _destination)
 			{}
 		virtual ~PersonaMirror() {}
-		public: PersonaMirror(void* auxBuffer_=NULL) : PersonaXfer(Transfer::XferReason::Mirror)
+		public: PersonaMirror(void* auxBuffer_=nullptr) : PersonaXfer(Transfer::XferReason::Mirror)
 		{
-			data.auxSize = 0 ;
-			data.auxData = auxBuffer_ ;
+			data.auxSize = 0;
+			data.auxData = auxBuffer_;
 		}
-		public: virtual SINT32 onReceive(SINT32 teulIndex) ;
-		public: virtual SINT32 onComplete(SINT32 resultCode) const ;
-		public: virtual void packer(LOGICAL mode, ACTION_OBJECT* const a) { PersonaXfer::packer(mode, a) ; }
-		public: SINT32 send(const playerid_t playerID, class Server::ServerInfo* dest) ;
-	} ;
+		public: virtual SINT32 onReceive(SINT32 teulIndex) OVERRIDE_FN;
+		public: virtual SINT32 onComplete(SINT32 resultCode) const OVERRIDE_FN;
+		public: virtual void packer(LOGICAL mode, ACTION_OBJECT* const a) OVERRIDE_FN { PersonaXfer::packer(mode, a); }
+		public: SINT32 send(const playerid_t playerID, class Server::ServerInfo* dest);
+	};
 }
 

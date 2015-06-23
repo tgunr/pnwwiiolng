@@ -20,17 +20,17 @@ enum WEB_ERR
 	WEB_ERR_SUB,		// Inactive subscription
 	WEB_ERR_AUTH,		// Auth error
 	WEB_ERR_MAX
-} ;
+};
 
-extern bool authEstablishServer(SINT32 teulIndex, struct AUTH_GAME_INIT& hello);
-extern LOGICAL authProcessArenaRequest(SINT32 teulIndex, struct ARENA_REQ& request);
-extern SINT32 authLaunchRequest(SINT32 teulIndex, struct APP_LAUNCH_REQ& request);
+bool authEstablishServer(SINT32 teulIndex, struct AUTH_GAME_INIT& hello);
+void authProcessArenaRequest(SINT32 teulIndex, struct ARENA_REQ& request);
+SINT32 authLaunchRequest(SINT32 teulIndex, struct APP_LAUNCH_REQ& request);
 
-extern void handleServerLoadUpdate(const struct AUTH_SERVER_LOAD& message);
-extern void handleGameCapacityUpdate(const struct AUTH_GAME_CAPACITY& message);
+void handleServerLoadUpdate(const struct AUTH_SERVER_LOAD& message);
+void handleGameCapacityUpdate(const struct AUTH_GAME_CAPACITY& message);
 
 // Verify a specific checksum for the TOS for a given appid/platform
-extern bool authVerifyChecksum(const SINT32 teulIndex, const UINT32 appID, const UINT32 platform, const char* const checksum) ;
+bool authVerifyChecksum(const SINT32 teulIndex, const UINT32 appID, const UINT32 platform, const char* const checksum);
 
-namespace Auth { class GameList ; }
-extern Auth::GameList* authGetGameList(SINT32 teulIndex) ;
+namespace Auth { class GameList; }
+Auth::GameList* authGetGameList(SINT32 teulIndex);

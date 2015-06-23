@@ -13,14 +13,14 @@
 		GLfloat	y;
 		GLfloat	z;
 
-	} ;
+	};
 
 	struct oglLOCKED_RECT
 	{
 		int			Pitch;
 		void*		pBits;
 
-	} ;
+	};
 
 	typedef UINT32 oglMATERIALHANDLE;
 	typedef UINT32 oglTEXTUREHANDLE, *oglLPTEXTUREHANDLE;
@@ -290,7 +290,7 @@
         // If reached 255, then increase MAXRENDERSTATES in ogl.cpp
 		oglRENDERSTATE_FORCE_DWORD        = 0x7fffffff /* force 32-bit size enum */
 
-	} ;
+	};
 
 	// these new guys need to be taken care of...
 
@@ -301,7 +301,7 @@
 		oglRENDERSTATE_FOGEND			= 37,
 		oglRENDERSTATE_FOGDENSITY		= 38
 
-	} ;
+	};
 
 	enum oglBLENDOPSTATETYPES
 	{
@@ -311,7 +311,7 @@
 		oglBLENDOP_MIN              = GL_MIN,
 		oglBLENDOP_MAX              = GL_MAX
 
-	} ;
+	};
 
 	enum oglPRIMITIVETYPE
 	{
@@ -322,7 +322,7 @@
 		oglPT_TRIANGLESTRIP	= GL_TRIANGLE_STRIP,
 		oglPT_TRIANGLEFAN	= GL_TRIANGLE_FAN
 
-	} ;
+	};
 
 	// Combine RGB/ALPHA texture functions
 	enum oglTSS_COMBINE_TEXTURE
@@ -337,7 +337,7 @@
 		oglTSS_DOT3_RGB		= GL_DOT3_RGB_ARB,		// Use for RGB only
 		oglTSS_DOT3_RGBA	= GL_DOT3_RGBA_ARB		// Use for RGB only
 
-	} ;
+	};
 
 	// Source 'n' RGB/ALPHA
 	enum oglTSS_SOURCE_RGB
@@ -347,7 +347,7 @@
 		oglTSS_PRIMARY_COLOR	= GL_PRIMARY_COLOR_ARB,
 		oglTSS_PREVIOUS			= GL_PREVIOUS_ARB
 
-	} ;
+	};
 
 	// Operand 'n' RGB/ALPHA
 	enum oglTSS_OPERAND_RGB
@@ -357,7 +357,7 @@
 		oglTSS_SRC_ALPHA				= GL_SRC_ALPHA,				// Use for RGB and ALPHA
 		oglTSS_SRC_ONE_MINUS_SRC_ALPHA	= GL_ONE_MINUS_SRC_ALPHA	// Use for RGB and ALPHA
 
-	} ;
+	};
 
 	// Texture stage states combine modes
 	enum oglTEXTURESTAGESTATETYPE
@@ -386,7 +386,7 @@
         oglTSS_ENABLE_TEXCOORD_ARRAY,
         oglTSS_ENABLE_TEXTURE2D
 
-	} ;
+	};
 
 	/*
 	* Values for COLORARG1,2 and ALPHAARG1,2 texture blending operations
@@ -427,14 +427,14 @@
 		oglVT_3DVERTEX		= 4,
         oglVT_TVERTEX       = 5 // Tangent vertex
 
-	} ;
+	};
 
 	struct oglUV
 	{
 		FLOAT32   u;
 		FLOAT32   v;
 
-	} ;
+	};
 
 	struct oglUVW
 	{
@@ -442,7 +442,7 @@
 		FLOAT32   v;
 		FLOAT32   w;
 
-	} ;
+	};
 
 	struct oglTLVERTEX
 	{
@@ -455,7 +455,7 @@
 		FLOAT32		tu;             /* Texture coordinates */
 		FLOAT32		tv;
 
-	} ;
+	};
 
 	struct oglLVERTEX
 	{
@@ -468,7 +468,7 @@
 		FLOAT32		tu;            /* Texture coordinates */
 		FLOAT32		tv;
 
-	} ;
+	};
 
 	struct oglVERTEX
 	{
@@ -481,7 +481,7 @@
 		FLOAT32     tu;            /* Texture coordinates */
 		FLOAT32     tv;
 
-	} ;
+	};
 
 	struct ogl3DVERTEX
 	{
@@ -496,7 +496,7 @@
 		FLOAT32     tv;
 		FLOAT32     tw;
 
-	} ;
+	};
 
 	// "Unified" Vertex structure
 	struct oglCVERTEX
@@ -512,7 +512,7 @@
 		FLOAT32     tu;            /* Texture coordinates */
 		FLOAT32     tv;
 
-	} ;
+	};
 
 	struct oglGVERTEX
 	{
@@ -525,7 +525,7 @@
 		float     tu;            /* Texture coordinates */
 		float     tv;
 
-	} ;
+	};
 
 	struct oglTVERTEX
 	{
@@ -541,14 +541,14 @@
 		float     tu;            /* Texture coordinates */
 		float     tv;
 
-	} ;
+	};
 
 	struct oglPTRSTRIDE
 	{
 		LPVOID	pdata;
 		UINT32	stride;
 
-	} ;
+	};
 
 	#define oglMAXTEXCOORD 8
 
@@ -561,7 +561,7 @@
 		oglPTRSTRIDE	textureCoords[oglMAXTEXCOORD];
 		oglPTRSTRIDE	indices;
 
-	} ;
+	};
 
 	struct oglCOLORVALUE
 	{
@@ -570,7 +570,7 @@
 		FLOAT32		b;
 		FLOAT32		a;
 
-	} ;
+	};
 
 	struct oglMATERIAL
 	{
@@ -580,7 +580,7 @@
 		oglCOLORVALUE	Emissive;       /* Emissive color RGB */
 		FLOAT32			Power;          /* Sharpness if specular highlight */
 
-	} ;
+	};
 
 	#define INVALID_LIGHT			-1
 	#define INVALID_INDEXSOURCE		-1
@@ -634,7 +634,7 @@
 			UINT32	dwRGBAlphaBitMask;	// mask for alpha channel
 		};
 
-	} ;
+	};
 
 	// oglSURFACEDESC
 	struct oglSURFACEDESC
@@ -645,7 +645,7 @@
 		void*		Surface;			// pointer to the associated surface memory
 		oglPIXELFORMAT	PixelFormat;	// pixel format description of the surface
 
-	} ;
+	};
 
 	struct TEXTUREFORMAT
 	{
@@ -655,5 +655,5 @@
 		SINT32					red, green, blue, alpha;
 		SINT32					unused, lum, pal;
 
-	} ;
+	};
 

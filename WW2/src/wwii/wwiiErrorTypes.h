@@ -15,7 +15,7 @@ enum WWII_ERR_TYPES
 	WW_ERR_PIEXIT, // these seems to be the only ones used
 	WW_ERR_VALIDITY_CHECK,
 	WW_ERR_SYSTEM_INFO
-} ;
+};
 
 struct WWII_ERR_STRING
 {
@@ -23,7 +23,7 @@ struct WWII_ERR_STRING
 
 	SINT32	length;
 	SCHAR 	string[_MAX_LEN + 1];
-} ;
+};
 
 struct WWII_PIEXIT_INFO // these seems to be the only ones used
 {
@@ -31,7 +31,7 @@ struct WWII_PIEXIT_INFO // these seems to be the only ones used
 	SINT32 srcLine;
 	WWII_ERR_STRING srcFilename;
 	WWII_ERR_STRING errorMessage;
-} ;
+};
 
 struct WWII_EXCEPTION_INFO // these seems to be the only ones used
 {
@@ -42,7 +42,7 @@ struct WWII_EXCEPTION_INFO // these seems to be the only ones used
 	UINT32 exceptionAddr;
 	UINT32 stackAddrs[_STACK_LEN];
 	SCHAR infoText[_STR_LEN + 1];
-} ;
+};
 
 struct WWII_VALIDITY_INFO
 {
@@ -53,7 +53,7 @@ struct WWII_VALIDITY_INFO
 	WWII_ERR_STRING filename;
 	UINT32 crc;
 	UCHAR md5[_MD5_LEN + 1];
-} ;
+};
 
 struct WWII_SYSTEM_INFO
 {
@@ -63,7 +63,7 @@ struct WWII_SYSTEM_INFO
 	UINT32	packetID;	// id of info packet
 	SINT32	length;
 	SCHAR	infoText[_MAX_LEN + 1];
-} ;
+};
 
 union WWII_ERROR_DATA
 {
@@ -71,7 +71,7 @@ union WWII_ERROR_DATA
 	WWII_EXCEPTION_INFO exceptInfo;
 	WWII_VALIDITY_INFO	validityInfo;
 	WWII_SYSTEM_INFO	systemInfo;
-} ;
+};
 
 struct WWII_ERROR_INFO
 {
@@ -86,4 +86,4 @@ struct WWII_ERROR_INFO
 
 	WWII_ERROR_DATA data;
 	UINT32	clientSourceRevision;
-} ;
+};

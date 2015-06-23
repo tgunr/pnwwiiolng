@@ -37,10 +37,29 @@
 # define CONSTEXPR_FN
 #endif
 
+// borrowed from libevent.
+#if defined(__GNUC__) && __GNUC__ >= 3         /* gcc 3.0 or later */
+#define PN_UNLIKELY(p) __builtin_expect(!!(p), 0)
+#else
+#define PN_UNLIKELY(p) (p)
+#endif
+
+#if defined(__GNUC__) && __GNUC__ >= 3         /* gcc 3.0 or later */
+#define PN_LIKELY(p) __builtin_expect(!!(p), 1)
+#else
+#define PN_LIKELY(p) (p)
+#endif
+
+#if defined(_MSC_VER)
+# define PN_THREAD_LOCAL __declspec(thread)
+#else
+# define PN_THREAD_LOCAL thread_local
+#endif
+
 // Determine which version of GCC, if any, is being used,
 // and for GCC/MSVC, determine what C++0X support is
 // available.
-#ifdef __GNUC__
+#if defined(__GNUC__)
 # define GCC_VERSION ( ((__GNUC__) * 100) + (__GNUC_MINOR__) )
 # if GCC_VERSION < 400
 #	error("GCC version 4.0 or higher is required to compile this code.")
@@ -93,13 +112,13 @@
 
 #undef DBA_ENABLE_SQLITE
 
-#undef DBA_ENABLE_SQLITE
-
 #if defined(WIN32) || defined(WIN64)
 
+#if _MSC_VER < 1800	// VS2013 has this in stdlib.h
 static inline unsigned long long strtoull(const char* const src_, const char* const, unsigned int);
 static inline signed long long strtoll(const char* const src_, const char* const, unsigned int);
 static inline float strtof(const char* const src_, const char* const);
+#endif
 
 #include <io.h>
 #endif
@@ -116,31 +135,27 @@ static inline float strtof(const char* const src_, const char* const);
 
 #include "sys/sysWinISO.h"
 
-#include <stdlib.h>
-#include <stdarg.h>
-#include <stdio.h>
+// snprintf wrapper
+template<size_t bufSize, typename... Args>
+UINT32 strprintf(char(&buf)[bufSize], const char* fmt, Args&&... args)
+{
+	static_assert(bufSize > 0, "Buffer too small");
+	static_assert(bufSize < size_t(1 << 31), "Buffer too large");
+#if platOS == OS_WIN32
+	int printed = snprintf(buf, bufSize, fmt, std::forward<Args>(args)...);
+	if (printed < 0) {
+		return bufSize;
+	}
+#else
+	int printed = snprintf(buf, bufSize, fmt, std::forward<Args>(args)...);
+#endif
+	return static_cast<UINT32>(printed);
+}
 
 // Cross-platform path builder.
 template<size_t bufSize>
-size_t pathprintf(char (& buf)[bufSize], const char* lhs, const char* rhs)
+UINT32 pathprintf(char (& buf)[bufSize], const char* lhs, const char* rhs)
 {
-	int printed = snprintf(buf, bufSize, "%s" PATH_SEPSTR "%s", lhs, rhs);
-	if ( printed != -1 && static_cast<size_t>(printed) < bufSize )
-		return static_cast<size_t>(printed);
-	buf[bufSize - 1] = 0;
-	return (bufSize - 1);
+	return strprintf<bufSize>(buf, "%s" PATH_SEPSTR "%s", lhs, rhs);
 }
 
-// snprintf wrapper
-template<size_t bufSize>
-size_t strprintf(char (& buf)[bufSize], const char* fmt, ...)
-{
-	va_list list;
-	va_start(list, fmt);
-	int printed = vsnprintf(buf, bufSize, fmt, list);
-	va_end(list);
-	if ( printed != -1 && static_cast<size_t>(printed) < bufSize )
-		return static_cast<size_t>(printed);
-	buf[bufSize - 1] = 0;
-	return (bufSize - 1);
-}

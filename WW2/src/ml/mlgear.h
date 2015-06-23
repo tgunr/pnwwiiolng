@@ -70,16 +70,9 @@ struct mlGearComponentData
 
 	FLOAT64VECTOR ContactPointForce;
 
-#if defined(USE_OSG)
-	mlGearComponentData() { memset(this,0x0,sizeof(mlGearComponentData)); } // ok for now
-	void* ContactPoint;
-	void* ShockDOF;
-	void* CastorDOF;
-#else
 	struct OBJECT* ContactPoint;
 	struct OBJECT* ShockDOF;
 	struct OBJECT* CastorDOF;
-#endif
 	UINT32 NumContactPoints;
 	FLOAT64VECTOR ContactPointCoords;
 	FLOAT64VECTOR WorldContactPoint;
@@ -134,7 +127,7 @@ struct mlGearComponentData
 
 	FLOAT64VECTOR LastNormalVel;
 
-} ;
+};
 
 
 extern UINT32 mlgearSetComponentSubtype(void*  SpecialData, char * SubType);

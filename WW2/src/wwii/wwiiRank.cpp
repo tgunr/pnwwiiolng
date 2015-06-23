@@ -12,9 +12,9 @@
 #include "include/mydbQuery.h"
 
 // The table of all high command units
-Rank::RANKS Rank::s_ranks ;
-RANK_NAMES rankNames ;
-UINT32 Rank::s_max ;
+Rank::RANKS Rank::s_ranks;
+RANK_NAMES rankNames;
+UINT32 Rank::s_max;
 
 static const char* QRY_SELECT_RANKS =
 	"SELECT"
@@ -37,23 +37,23 @@ void
 Rank::add(const RANK_NO level, const Rank::TYPE type, const UINT32 points, const char* description, const PermissionMask& perm)
 {
 	if ( !valid(level) )
-		Rank::setSize(level) ;
+		Rank::setSize(level);
 
 	if ( level > s_max )
-		s_max = level ;
+		s_max = level;
 
-	if ( description == NULL )
-		description = rankNames[0] ;
+	if ( description == nullptr )
+		description = rankNames[0];
 
-	dbugLog(_FLD, "r:%d new rank: type:%d, perms:%llx, points: %d :: %s", level, type, perm, points, description) ;
+	dbugLog(_FLD, "r:%d new rank: type:%d, perms:%llx, points: %d :: %s", level, type, perm, points, description);
 
-	Rank& rank = s_ranks[level] ;
-	rank.m_level = level ;
-	rank.m_type = type ;
-	rank.m_perm = perm ;
-	rank.m_points = points ;
+	Rank& rank = s_ranks[level];
+	rank.m_level = level;
+	rank.m_type = type;
+	rank.m_perm = perm;
+	rank.m_points = points;
 
-	rankNames[level] = strdup(description) ;
+	rankNames[level] = strdup(description);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -63,20 +63,20 @@ Rank*
 Rank::next() const
 {
 	if ( level() == 0 )
-		return NULL ;
+		return nullptr;
 
 	if ( kingOfTheHill() )
-		return NULL ;
+		return nullptr;
 
-	RANK_NO nextLevel = level() + 1 ;
+	RANK_NO nextLevel = level() + 1;
 	if ( nextLevel >= s_ranks.size() )
-		return NULL ;
+		return nullptr;
 
 	// To become "if ( s_ranks[nextLevel].kingOfTheHill() )" once KOTH includes officers
 	if ( s_ranks[nextLevel].kingOfTheHill() )
-		return NULL ;
+		return nullptr;
 
-	return &s_ranks[nextLevel] ;
+	return &s_ranks[nextLevel];
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -87,14 +87,14 @@ Rank::setSize(size_t num)
 {
 	if ( num >= s_ranks.size() )
 	{
-		s_ranks.resize(num + 1) ;
-		rankNames.resize(num + 1) ;
+		s_ranks.resize(num + 1);
+		rankNames.resize(num + 1);
 	}
 
-	s_ranks[0].m_type = s_ranks[num].m_type = NO_TYPE ;
-	s_ranks[0].m_level = s_ranks[num].m_level = 0 ;
-	s_ranks[0].m_perm = s_ranks[num].m_perm = 0L ;
-	s_ranks[0].m_points = s_ranks[num].m_points = 65535 ;
+	s_ranks[0].m_type = s_ranks[num].m_type = NO_TYPE;
+	s_ranks[0].m_level = s_ranks[num].m_level = 0;
+	s_ranks[0].m_perm = s_ranks[num].m_perm = 0L;
+	s_ranks[0].m_points = s_ranks[num].m_points = 65535;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -106,35 +106,35 @@ wwiiReadRanks(DBHANDLE& dbh)
 {
 	try
 	{
-		DBQuery dbq(dbh, QRY_SELECT_RANKS) ;
+		DBQuery dbq(dbh, QRY_SELECT_RANKS);
 
-		Rank::setSize(dbq.Rows()) ;
+		Rank::setSize(dbq.Rows());
 
 		// Ranks are 1-indexed
-		for ( UINT32 i = 1 ; i <= dbq.Rows() ; ++i )
+		for ( UINT32 i = 1; i <= dbq.Rows(); ++i )
 		{
-			rankNames[i] = NULL ;
+			rankNames[i] = nullptr;
 		}
-		rankNames[0] = strdup("<none>") ;
+		rankNames[0] = strdup("<none>");
 
 		while (dbq.FetchRow())
 		{
-			DBRow& row = dbq.Row() ;
-			UINT32 level = row.NextUInt() ;
-			UINT32 type = row.NextUInt() ;
-			UINT32 points = row.NextUInt() ;
-			const char* description = row.NextColumn() ;
-			PermissionMask mask = row.NextUINT64() ;
+			DBRow& row = dbq.Row();
+			UINT32 level = row.NextUInt();
+			UINT32 type = row.NextUInt();
+			UINT32 points = row.NextUInt();
+			const char* description = row.NextColumn();
+			PermissionMask mask = row.NextUINT64();
 
 			// rankid, type, points, description, mask
-			Rank::add(level, (Rank::TYPE)type, points, description, mask) ;
+			Rank::add(level, (Rank::TYPE)type, points, description, mask);
 		}
 
-		dbugLog(_FLI, "Added %u ranks, %" PRSizeT " in list", dbq.Rows(), Rank::count()) ;
+		dbugLog(_FLI, "Added %u ranks, %" PRSizeT " in list", dbq.Rows(), Rank::count());
 	}
 	catch (std::exception &e)
 	{
-		dbugLog(_FLA, "%s: %s", __FUNCTION__, e.what()) ;
+		dbugLog(_FLA, "%s: %s", __FUNCTION__, e.what());
 	}
 }
 
@@ -144,15 +144,12 @@ wwiiReadRanks(DBHANDLE& dbh)
 void
 wwiiFreeRanks()
 {
-	UINT32 i ;
-
-	for ( i = 0 ; i < Rank::count() ; ++i )
-	{
-		if ( rankNames[i] != NULL )
-		{
-			free((void*)rankNames[i]) ;
-			rankNames[i] = NULL ;
-		}
+	for ( size_t i = 0; i < Rank::count(); ++i ) {
+		void* name = (void*)rankNames[i];
+		if (name)
+			free(name);
 	}
+
+	rankNames.clear();
 }
 

@@ -37,15 +37,15 @@ public:
 	,	_RESERVE	// Resupply/not doing anything
 	,	_ROUTED		// Off-map/routed (unavailable)
 	,	_TRANSIT	// Brigade is in transit
-	} ;
+	};
 #endif
 
 	// Get country/branch info from main brigade list
-	UINT16		m_brigade ;			// ID of the brigade
-	ChatHandle	m_officer ;			// Callsign of active OIC or NULL
-	RANK_NO		m_officerRank ;		// His rank
-	bool		m_canTakeCharge ;	// True if you can take charge of this brigade
-	bool		m_canVote ;			// Can I vote on this brigade's OIC?
-} ;
+	UINT16		m_brigade;			// ID of the brigade
+	ChatHandle	m_officer;			// Callsign of active OIC or nullptr
+	RANK_NO		m_officerRank;		// His rank
+	bool		m_canTakeCharge;	// True if you can take charge of this brigade
+	bool		m_canVote;			// Can I vote on this brigade's OIC?
+};
 #pragma pack(pop)
 

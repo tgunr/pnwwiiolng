@@ -14,7 +14,7 @@ extern SINT32	GameId;
 
 extern SINT32	frametime;
 
-struct TEUL_CALLBACK ;
+struct TEUL_CALLBACK;
 
 // All teul callback modules use a mixture of global functions and
 // global callback refs.
@@ -37,7 +37,7 @@ struct TEUL_CALLBACK ;
 //
 // refer to typedef of SHARED_VEHICLE_INFO in netTypes.h for parameters
 extern TEUL_CALLBACK*		commUPDATE;
-struct COMM_UPDATE_BUFFER { UCHAR data[1400] ; SINT32 size ; } ;
+struct COMM_UPDATE_BUFFER { UCHAR data[1400]; SINT32 size; };
 
 // sends a strat damage message to the strat updater
 // i.e. cp or building hit.. go bombs!
@@ -45,7 +45,7 @@ extern TEUL_CALLBACK*		commSTRAT_DAMAGE;
 
 // sends a simple, no-data message to the host that we are disconnecting.
 //	Usage:
-//		teulSend(Connection,commDISCONNECT,NULL);
+//		teulSend(Connection,commDISCONNECT,nullptr);
 //
 extern TEUL_CALLBACK*		commDISCONNECT;
 
@@ -56,7 +56,7 @@ extern TEUL_CALLBACK*		commDISCONNECT;
 // refer to typedef of VEHICLE_HIT in comTypes.h for parameters
 extern TEUL_CALLBACK*		commCLIENT_HIT;
 
-extern SINT32 commSendHostMessage(SINT32 connection, SINT32 identifier, SINT32 flags,
+SINT32 commSendHostMessage(SINT32 connection, SINT32 identifier, SINT32 flags,
 								  const char* message);
 // sends a text message to the host.
 // index refers to the player to whom the message is directed,
@@ -66,17 +66,17 @@ extern SINT32 commSendHostMessage(SINT32 connection, SINT32 identifier, SINT32 f
 // returns 0 if message was sent
 // returns -1 if message was not sent
 
-extern SINT32 commInstallClientCallbacks(void);
+SINT32 commInstallClientCallbacks(void);
 // installs all callbacks for client into system
 // no return value or arguments
 // should be called only once
 
-extern SINT32 commSendPlayerExit(SINT32 teulIndex, PLAYER_DESTINATION destination,	PLAYER_EXIT_CODE exitCode, FULL_OBJ_ID facility);
+SINT32 commSendPlayerExit(SINT32 teulIndex, PLAYER_DESTINATION destination,	PLAYER_EXIT_CODE exitCode, FULL_OBJ_ID facility);
 
-extern SINT32 commSendVehicleJoin(SINT32 teulIndex, VEHICLE_REQUEST* lvr);
+SINT32 commSendVehicleJoin(SINT32 teulIndex, VEHICLE_REQUEST* lvr);
 
 // Function that unpacks and processes an incoming world update
-extern SINT32 commRecvWorldUpdateData(const SINT32 teulIndex, UCHAR* const data, SINT32 offset, const SINT32 size_bytes) ;
+SINT32 commRecvWorldUpdateData(const SINT32 teulIndex, UCHAR* const data, SINT32 offset, const SINT32 size_bytes);
 
 // Notify the host that a vehicle has caused us to die
-extern void commSendKillNotice(SINT32 hostIndex, UINT32 myVehicleID, UINT32 hostVehicleID) ;
+void commSendKillNotice(SINT32 hostIndex, UINT32 myVehicleID, UINT32 hostVehicleID);

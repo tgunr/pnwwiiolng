@@ -17,7 +17,7 @@
 
 // -------------------------------------- Non-Exposed Functions
 
-class CPStruct* strtImportStratData() ;
+class CPStruct* strtImportStratData();
 
 // -------------------------------------- Exposed Functions
 //tolua_begin
@@ -33,7 +33,7 @@ extern const char* strtPrintCountry(WWII_COUNTRY country);
 extern const char* strtPrintFacilityType(FACILITY_TYPE facilityType);
 
 //create an array (using malloc) whose elements are the lines of file pointed to by stream
-void strtReleaseSupercells() ;
+void strtReleaseSupercells();
 
 //tolua_end
 

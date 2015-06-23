@@ -11,7 +11,7 @@
 class IconMapRenderer : public SuperCellMapView::Renderer
 {
 public:
-	IconMapRenderer() : GetOctetTexture(0), GetSDMData(0) {} ;
+	IconMapRenderer() : GetOctetTexture(0), GetSDMData(0) {};
 	~IconMapRenderer() {};
 
 	virtual SuperCell* NewSuperCell(Renderer*, int scx, int scy);

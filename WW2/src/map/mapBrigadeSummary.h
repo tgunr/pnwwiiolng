@@ -42,20 +42,20 @@
 #include "mm/mmEnums.h"
 #include "wwii/wwiiHCUnits.h"
 
-class Player ;
-class Brigade ;
+class Player;
+class Brigade;
 
 // Sizes
-static const size_t MAX_LANGUAGES_PER_BRIGADE = 2 ;
-static const size_t MAX_BRIGADE_NOTES_LENGTH = 400 ;
-static const size_t MAX_BRIGADE_MOTTO_LENGTH = 40 ;
+static const size_t MAX_LANGUAGES_PER_BRIGADE = 2;
+static const size_t MAX_BRIGADE_NOTES_LENGTH = 400;
+static const size_t MAX_BRIGADE_MOTTO_LENGTH = 40;
 
 // Take aprox 1078 / sizeof a packed brigade summaries
-static const UINT32 MAX_LISTED_BRIGADES = 88 ;
+static const UINT32 MAX_LISTED_BRIGADES = 88;
 
 // The highest population rank a brigade can have - semi arbitrary number,
 // but be mindful the number fits inside the number of bits we pack
-static const UINT32 MAX_POPULATION_RANK	= 9 ;
+static const UINT32 MAX_POPULATION_RANK	= 9;
 
 // Class for listing brigade select options
 class BrigadeSummary : public HCUnit
@@ -70,54 +70,54 @@ public:
 		: HCUnit(withBrigadeID, HCU_BRIGADE, withParentID, withCountryID, withBranchID, withMovementType, withUnitClass
 				, withHandle, withName, withNick, withRank, withHome, withOwner, withOwnerRank)
 		, m_active(false), m_missions(0), m_players(0), m_officers(0), m_objectiveCPID(nullObjID), m_mobileSpawns(0), m_canPostHere(false)
-		{ m_languages[0] = 0 ; }
+		{ m_languages[0] = 0; }
 
 	BrigadeSummary(UINT32 withBrigadeID=0)
 		: HCUnit(withBrigadeID, HCU_BRIGADE)
 		, m_active(false), m_missions(0), m_players(0), m_officers(0), m_objectiveCPID(nullObjID), m_mobileSpawns(0), m_canPostHere(false)
-		{ m_languages[0] = 0 ; }
+		{ m_languages[0] = 0; }
 
 	virtual ~BrigadeSummary() {}
 
 	// Create from the network
-	explicit BrigadeSummary(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a) ; }
+	explicit BrigadeSummary(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 
 	// Pack/unpack routine
-	virtual SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) ;
+	virtual SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
 
 	//// ---- Member Functions ---- ////
 
-	UINT32 brigadeID() const { return m_unitID ; }
-	bool active() const { return m_active ; }
-	UINT16 missions() const { return m_missions ; }
-	UINT16 players() const { return m_players ; }
-	UINT16 officers() const { return m_officers ; }
-	const FULL_OBJ_ID& objectiveCPID() const { return m_objectiveCPID ; }
+	UINT32 brigadeID() const { return m_unitID; }
+	bool active() const { return m_active; }
+	UINT16 missions() const { return m_missions; }
+	UINT16 players() const { return m_players; }
+	UINT16 officers() const { return m_officers; }
+	const FULL_OBJ_ID& objectiveCPID() const { return m_objectiveCPID; }
 
 	// Query: Is this brigade available for use at the moment?
-	bool isActive() const { return m_active ; }
+	bool isActive() const { return m_active; }
 
 	//// ---- Class Variables ---- ////
 public:
 		// Top N languages currently in-use in this brigade (desc order)
-	UCHAR			m_languages[MAX_LANGUAGES_PER_BRIGADE] ;
+	UCHAR			m_languages[MAX_LANGUAGES_PER_BRIGADE];
 		// Whether or not the brigade is active
-	bool			m_active ;
+	bool			m_active;
 		// Count of missions posted
-	UINT16			m_missions ;
+	UINT16			m_missions;
 		// Player population ranking (0 = best)
-	UINT16			m_players ;
+	UINT16			m_players;
 		// Number of officers online
-	UINT16			m_officers ;
+	UINT16			m_officers;
 		// Current objective
-	FULL_OBJ_ID		m_objectiveCPID ;
+	FULL_OBJ_ID		m_objectiveCPID;
 		// Number of mobile spawns?
-	UINT16			m_mobileSpawns ;
+	UINT16			m_mobileSpawns;
 		// Can I post here right now?
-	bool			m_canPostHere ;
+	bool			m_canPostHere;
 
 private:
-} ;
+};
 
 // Wrapper structure for the purposes of transport
 
@@ -125,23 +125,23 @@ class BrigadeSummaries
 {
 public:
 	BrigadeSummaries() : m_error(false), m_count(0) { }
-	BrigadeSummaries(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a) ; }
-	~BrigadeSummaries() { } ;
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) ;
+	BrigadeSummaries(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
+	~BrigadeSummaries() { };
+	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
 
 	// Send/Receive functions (defined as needed)
 	// Returns: error < 0  /  ok >= 0
-	SINT32 send(SINT32 teulIndex) ;		// host "send" function
-	SINT32 receive(SINT32 teulIndex) ;	// client/host receive function
+	SINT32 send(SINT32 teulIndex);		// host "send" function
+	SINT32 receive(SINT32 teulIndex);	// client/host receive function
 
 	// Host function to populate the summaries
-	void populate(WWII_COUNTRY country, BRANCH_ENUM branch, Player* player) ;
+	void populate(WWII_COUNTRY country, BRANCH_ENUM branch, Player* player);
 
 public:
-	LOGICAL			m_error ;							// True error occured
-	UINT32			m_count ;							// Number of summaries described
-	BrigadeSummary	m_summaries[MAX_LISTED_BRIGADES] ;	// Array of summaries
-} ;
+	LOGICAL			m_error;							// True error occured
+	UINT32			m_count;							// Number of summaries described
+	BrigadeSummary	m_summaries[MAX_LISTED_BRIGADES];	// Array of summaries
+};
 
 // More detail on a brigade
 
@@ -153,26 +153,26 @@ public:
 					, const ChatHandle& withHandle, const char* withName, const char* withNick, UINT8 withRank
 					, const FULL_OBJ_ID& withHomeCP, const ChatHandle& withOwner, RANK_NO withOwnerRank)
 		: BrigadeSummary(withBrigadeID, withParentID, withCountryID, withBranchID, withMovementType, withUnitClass, withHandle, withName, withNick, withRank, withHomeCP, withOwner, withOwnerRank)
-			{ m_motd[0] = m_motto[0] = 0 ; }
-	BrigadeDetail(UINT32 withBrigadeID=0) : BrigadeSummary(withBrigadeID) { m_motd[0] = m_motto[0] = 0 ; }
+			{ m_motd[0] = m_motto[0] = 0; }
+	BrigadeDetail(UINT32 withBrigadeID=0) : BrigadeSummary(withBrigadeID) { m_motd[0] = m_motto[0] = 0; }
 	virtual ~BrigadeDetail() {}
 
 	// Packer
-	virtual SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) ;
+	virtual SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) OVERRIDE_FN;
 
 	// Helpers
-	const FULL_OBJ_ID& homeCPID() const { return m_homeCPID ; }
-	ChatHandle officerHandle(UINT32 i) const { return ((i < officers()) ? m_officerHandles[i] : 0) ; }
-	ChatHandle officerRank(UINT32 i) const { return ((i < officers()) ? m_officerRanks[i] : 0) ; }
+	const FULL_OBJ_ID& homeCPID() const { return m_homeCPID; }
+	ChatHandle officerHandle(UINT32 i) const { return ((i < officers()) ? m_officerHandles[i] : 0); }
+	ChatHandle officerRank(UINT32 i) const { return ((i < officers()) ? m_officerRanks[i] : 0); }
 
 public:
-	static const size_t _MAX_OFFICERS = 12 ;
+	static const size_t _MAX_OFFICERS = 12;
 
-	char			m_motd[MAX_BRIGADE_NOTES_LENGTH+1] ;
-	char			m_motto[MAX_BRIGADE_MOTTO_LENGTH+1] ;
-	ChatHandle		m_officerHandles[_MAX_OFFICERS] ;
-	UCHAR			m_officerRanks[_MAX_OFFICERS] ;
-} ;
+	char			m_motd[MAX_BRIGADE_NOTES_LENGTH+1];
+	char			m_motto[MAX_BRIGADE_MOTTO_LENGTH+1];
+	ChatHandle		m_officerHandles[_MAX_OFFICERS];
+	UCHAR			m_officerRanks[_MAX_OFFICERS];
+};
 
 
 //////////////////////////////////////////////////////////////////////
@@ -187,7 +187,7 @@ enum BRIGADE_SELECT_STATUS
 ,	BRIG_MISSING				// No such brigade
 ,	BRIG_INACTIVE				// Brigade is not active
 ,	BRIG_RESTRICTED				// You don't qualify for this brigade (e.g. GM, or event brigades)
-} ;
+};
 
 class BrigadeSelection
 {
@@ -197,27 +197,27 @@ public:
 	BrigadeSelection() : m_status(BRIG_INVALID), m_detail(0) {}
 
 	// Construct from network object
-	BrigadeSelection(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a) ; } ;
+	BrigadeSelection(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); };
 
 	// Destructor
-	~BrigadeSelection() { } ;
+	~BrigadeSelection() { };
 
 	// Network exchange functions
-	SINT32 send(SINT32 teulIndex) ;
-	SINT32 receive(SINT32 teulIndex) ;
+	SINT32 send(SINT32 teulIndex);
+	SINT32 receive(SINT32 teulIndex);
 
 	// Packer
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) ;
+	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
 
 	//// ---- Member variables ---- ////
 public:
-	BRIGADE_SELECT_STATUS	m_status ;
+	BRIGADE_SELECT_STATUS	m_status;
 		// Recap of the brigade summary
-	BrigadeDetail			m_detail ;
+	BrigadeDetail			m_detail;
 
 	// Private host functions
 private:
-	SINT32 _query(Player* player, const Brigade* brigade) ;
-	SINT32 _select(Player* player, Brigade* brigade) ;
-	SINT32 _sendResult(SINT32 teulIndex, BRIGADE_SELECT_STATUS result) { m_status = result ; return send(teulIndex) ; }
-} ;
+	SINT32 _query(Player* player, const Brigade* brigade);
+	SINT32 _select(Player* player, Brigade* brigade);
+	SINT32 _sendResult(SINT32 teulIndex, BRIGADE_SELECT_STATUS result) { m_status = result; return send(teulIndex); }
+};

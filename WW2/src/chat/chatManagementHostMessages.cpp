@@ -13,12 +13,12 @@
 
 static SINT32 _recvManagementLogin2(ACTION_OBJECT* const a)
 {
-	Chat::ManagementLogin2 login ;
-	login.packer(TEUL_UNPACK, a) ;
+	Chat::ManagementLogin2 login;
+	login.packer(TEUL_UNPACK, a);
 
-	login.Login(a->teulIndex) ;
+	login.Login(a->teulIndex);
 
-	return a->offset ;
+	return a->offset;
 }
 
 SINT32
@@ -26,7 +26,7 @@ chatInstallHostManagementCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION(Chat::Management::CallbackX)
 
-		REGISTER_RECEIVER(Chat::Management::LOGIN2_Y, _recvManagementLogin2) ;
+		REGISTER_RECEIVER(Chat::Management::LOGIN2_Y, _recvManagementLogin2);
 
 	END_CALLBACK_REGISTRATION
 }

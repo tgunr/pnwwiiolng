@@ -11,8 +11,8 @@
 namespace Instance
 {
 	// Forward class declarations to save some includes.
-	class Descriptor ;
-	class BasicStatus ;
+	class Descriptor;
+	class BasicStatus;
 
 	// CATEGORIES:
 	// 	These are categories shared between the client and host only.
@@ -30,9 +30,9 @@ namespace Instance
 		// enumerate it's own instance types that do not need
 		// host support. Enumerate them in your own file please
 		// e.g.
-		//    enum { _MY_INSTANCE_TYPE = Instance::_AD_HOC, _MY_TYPE2, _MY_TYPE3 ... } ;
+		//    enum { _MY_INSTANCE_TYPE = Instance::_AD_HOC, _MY_TYPE2, _MY_TYPE3 ... };
 	,	_AD_HOC = 100
-	} ;
+	};
 
 	// Codes returned by Listing, Create and Select
 	enum ResultCodes
@@ -46,15 +46,15 @@ namespace Instance
 	,	_EXISTS					//!< (Create)   Match for your descriptor exists (where applicable)
 	,	_ID_MISMATCH			//!< (Select)   ID does not match the category/type/owner you provided
 	,	_FULL					//!< (Select)   Specified instance is full
-	} ;
+	};
 
 	// For teulKit
-	enum { INST_X = 209 } ;
+	enum { INST_X = 209 };
 	enum
 	{
 		INST_XCHG_LISTING_Y = 1
 	,	INST_XCHG_SELECT_Y
 	,	INST_XCHG_CREATE_Y
-	} ;
+	};
 }
 

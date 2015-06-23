@@ -1188,7 +1188,7 @@ again:
     {
       for( s = 0 ; s < 13 ; s++ )
       {
-        U32 size = ( sps[ i ][ s ]. max + 1 ) * 4;
+        U32 histsize = ( sps[ i ][ s ]. max + 1 ) * 4;
         sps[ i ][ s ].histogram = ( U32* ) buf;
         build_histogram( sps[ i ][ s ].addr,
                          sps[ i ][ s ].pitch,
@@ -1196,7 +1196,7 @@ again:
                          sps[ i ][ s ].height,
                          sps[ i ][ s ].max,
                          sps[ i ][ s ].histogram );
-        buf += size;
+        buf += histsize;
       }
     }
   }

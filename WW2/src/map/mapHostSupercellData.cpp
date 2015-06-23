@@ -20,9 +20,9 @@
 #include "host/hostPlayers.h"
 
 // Vector of supercells with dirty data.
-static std::vector<Supercell*> _dirtyCells ;
+static std::vector<Supercell*> _dirtyCells;
 // Amount of data this represents.
-static size_t _dirtyData ;
+static size_t _dirtyData;
 
 //////////////////////////////////////////////////////////////////////
 // Create one huge buffer of all the supercell vis level bits as a
@@ -31,49 +31,49 @@ static size_t _dirtyData ;
 class HostSupercellData
 {
 private:
-	void* m_allocation ;
-	size_t m_size ;
+	void* m_allocation;
+	size_t m_size;
 
 	// Constructor.
 public:
 	HostSupercellData()
-		: m_allocation(NULL)
+		: m_allocation(nullptr)
 		, m_size(0)
 	{
-		UINT32 numBuildings = 0, maxBuildings = 0 ;
-		std::pair<void*, size_t> result = HostSupercellVislevelXfer::allocateFor(g_supercells.begin(), g_supercells.end(), numBuildings, maxBuildings) ;
-		m_allocation = result.first ;
-		m_size = result.second ;
+		UINT32 numBuildings = 0, maxBuildings = 0;
+		std::pair<void*, size_t> result = HostSupercellVislevelXfer::allocateFor(g_supercells.begin(), g_supercells.end(), numBuildings, maxBuildings);
+		m_allocation = result.first;
+		m_size = result.second;
 
 		dbugLog(_FLI, "Created HostSupercellData: %" PRSizeT " supercells, max %u buildings in a supercell, total %u buildings requiring %" PRSizeT " bytes"
-					, g_supercells.size(), maxBuildings, numBuildings, m_size) ;
+					, g_supercells.size(), maxBuildings, numBuildings, m_size);
 	}
 
 	// Destructor.
 public:
 	~HostSupercellData()
 	{
-		if ( m_allocation != NULL )
-			memFree(m_allocation) ;
+		if ( m_allocation != nullptr )
+			memFree(m_allocation);
 	}
 
 	// Update the bits for a given building.
 public:
 	bool updateBuilding(const ObjectStruct* const obj)
 	{
-		if ( obj->supercell == NULL || obj->supercell->m_xfer == NULL )
-			return false ;
-		return obj->supercell->m_xfer->setBuildingLevel(obj->m_bid, obj->effectiveVisLevel()) ;
+		if ( obj->supercell == nullptr || obj->supercell->m_xfer == nullptr )
+			return false;
+		return obj->supercell->m_xfer->setBuildingLevel(obj->m_bid, obj->effectiveVisLevel());
 	}
 
 	// Return the size of the payload.
 public:
-	size_t size() const { return m_size ; }
+	size_t size() const { return m_size; }
 
 	// Return the data as an opaque blob.
 public:
-	const void* data() const { return m_allocation ; }
-} ;
+	const void* data() const { return m_allocation; }
+};
 
 //////////////////////////////////////////////////////////////////////
 // Wrapper for a private instance of HostSupercellData.
@@ -81,8 +81,8 @@ public:
 static HostSupercellData&
 _getHostSupercellData()
 {
-	static HostSupercellData hsd ;
-	return hsd ;
+	static HostSupercellData hsd;
+	return hsd;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -91,7 +91,7 @@ _getHostSupercellData()
 void
 mapInitializeHostSupercellData()
 {
-	_getHostSupercellData() ;
+	_getHostSupercellData();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -100,15 +100,12 @@ mapInitializeHostSupercellData()
 SINT32
 mapSendHostSupercellData(SINT32 teulIndex)
 {
-	HostSupercellData& hsd = _getHostSupercellData() ;
-	const size_t size = hsd.size() ;
+	HostSupercellData& hsd = _getHostSupercellData();
+	const size_t size = hsd.size();
 
-	Teul::Packet outgoing(size, Map::CallbackX, Map::BUILDING_VISLEVELS_Y) ;
-	outgoing.setPayloadSizeBytes(size) ;
-	memcpy(outgoing.payload(), hsd.data(), size) ;
-	dbugLog(_FLD, "t:%d sending %" PRSizeT " byte building damage level packet", teulIndex, size) ;
-
-	return outgoing.send(teulIndex) ;
+	Teul::Packet outgoing(Teul::PacketId(Map::CallbackX, Map::BUILDING_VISLEVELS_Y), hsd.data(), size);
+	dbugLog(_FLD, "t:%d sending %" PRSizeT " byte building damage level packet", teulIndex, size);
+	return outgoing.send(teulIndex);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -117,13 +114,13 @@ mapSendHostSupercellData(SINT32 teulIndex)
 void
 mapUpdateBuildingVisLevel(const ObjectStruct* const obj)
 {
-	HostSupercellData& hsd = _getHostSupercellData() ;
-	const bool updated = hsd.updateBuilding(obj) ;
+	HostSupercellData& hsd = _getHostSupercellData();
+	const bool updated = hsd.updateBuilding(obj);
 	if ( updated && obj->supercell->m_modified == false )
 	{
-		_dirtyCells.push_back(obj->supercell) ;
-		_dirtyData += obj->supercell->m_xfer->size_bytes() ;
-		obj->supercell->m_modified = true ;
+		_dirtyCells.push_back(obj->supercell);
+		_dirtyData += obj->supercell->m_xfer->size_bytes();
+		obj->supercell->m_modified = true;
 	}
 }
 
@@ -132,14 +129,14 @@ mapUpdateBuildingVisLevel(const ObjectStruct* const obj)
 
 static void _clearData()
 {
-	const size_t cells = _dirtyCells.size() ;
-	for ( size_t i = 0 ; i < cells ; ++i )
+	const size_t cells = _dirtyCells.size();
+	for ( size_t i = 0; i < cells; ++i )
 	{
-		_dirtyCells[i]->m_modified = false ;
+		_dirtyCells[i]->m_modified = false;
 	}
 
-	_dirtyCells.clear() ;
-	_dirtyData = 0 ;
+	_dirtyCells.clear();
+	_dirtyData = 0;
 }
 
 void
@@ -147,47 +144,48 @@ mapSendDirtySupercellData()
 {
 	if ( _dirtyData == 0 )
 	{
-		return ;
+		return;
 	}
 
 	if ( g_players.empty() )
 	{
-		_clearData() ;
-		return ;
+		_clearData();
+		return;
 	}
 
-	std::vector<SINT32> indexes ;
-	for ( auto it = g_players.begin() ; it != g_players.end() ; ++it )
+	std::vector<SINT32> indexes;
+	for ( auto it = g_players.begin(); it != g_players.end(); ++it )
 	{
-		Player* const player = (Player*)(*it) ;
+		Player* const player = (Player*)(*it);
 		if ( player->isConnected() && player->isSpawned() && player->instance().isCampaign() )
-			indexes.push_back(player->teulIndex()) ;
+			indexes.push_back(player->teulIndex());
 	}
 
 	if ( indexes.empty() )
 	{
-		_clearData() ;
-		return ;
+		_clearData();
+		return;
 	}
 
-	dbugLog(_FLI, "Sending %" PRSizeT " supercells to %" PRSizeT " players in %" PRSizeT " bytes", _dirtyCells.size(), indexes.size(), _dirtyData) ;
+	dbugLog(_FLI, "Sending %" PRSizeT " supercells to %" PRSizeT " players in %" PRSizeT " bytes", _dirtyCells.size(), indexes.size(), _dirtyData);
 
 	// Create a packet with all of the data.
-	Teul::Packet outgoing(_dirtyData, Map::CallbackX, Map::BUILDING_VISLEVELS_Y) ;
-	outgoing.setUnencrypted() ;
+	Teul::Packet outgoing(Teul::PacketId(Map::CallbackX, Map::BUILDING_VISLEVELS_Y));
+	outgoing.reserve(_dirtyData);
+	outgoing.setUnencrypted();
 
-	const size_t numDirtyCells = _dirtyCells.size() ;
-	for ( size_t i = 0 ; i < numDirtyCells ; ++i )
+	const size_t numDirtyCells = _dirtyCells.size();
+	for ( size_t i = 0; i < numDirtyCells; ++i )
 	{
-		Supercell* const sc = _dirtyCells[i] ;
-		outgoing.append(sc->m_xfer, sc->m_xfer->size_bytes()) ;
+		Supercell* const sc = _dirtyCells[i];
+		outgoing.append(sc->m_xfer, sc->m_xfer->size_bytes());
 	}
 
-	for ( auto it = indexes.begin() ; it != indexes.end() ; ++it )
+	for ( auto it = indexes.begin(); it != indexes.end(); ++it )
 	{
-		outgoing.send(*it) ;
+		outgoing.send(*it);
 	}
 
-	_clearData() ;
+	_clearData();
 }
 

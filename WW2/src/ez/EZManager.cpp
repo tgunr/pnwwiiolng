@@ -27,7 +27,7 @@
 #define CAMERA_THRESHOLD 1
 
 // current manager, could be null
-static EZManager* _ezMgr = NULL;
+static EZManager* _ezMgr = nullptr;
 
 // static functions
 
@@ -358,27 +358,7 @@ bool EZManager::IsCommandView(bool deathCheck)
 	return false;
 }
 
-UINT32 EZManager::OnMove(SINT32 param, UINT32 id, UINT32 extra)
-{
-	return 0;
-}
-
-UINT32 EZManager::OnTurn(SINT32 param, UINT32 id, UINT32 extra)
-{
-	return 0;
-}
-
-UINT32 EZManager::OnAction1(SINT32 param, UINT32 id,UINT32 extra)
-{
-	return 0;
-}
-
-UINT32 EZManager::OnAction2(SINT32 param, UINT32 id,UINT32 extra)
-{
-	return 0;
-}
-
-UINT32 EZManager::OnFreeLook(SINT32 param, UINT32 id,UINT32 extra)
+void EZManager::OnFreeLook(SINT32 param, UINT32 id,UINT32 extra)
 {
 	SetFlag(EZManager::FREELOOK, (param) ? true : false);
 
@@ -389,11 +369,9 @@ UINT32 EZManager::OnFreeLook(SINT32 param, UINT32 id,UINT32 extra)
 		else
 			GetCamera().Snap();
 	}
-
-	return 0;
 }
 
-UINT32 EZManager::OnCamera(SINT32 param, UINT32 id,UINT32 extra)
+void EZManager::OnCamera(SINT32 param, UINT32 id,UINT32 extra)
 {
 	static SINT32 thresholdX = 5;
 	static SINT32 thresholdY = 5;
@@ -419,8 +397,6 @@ UINT32 EZManager::OnCamera(SINT32 param, UINT32 id,UINT32 extra)
 		for(size_t i = 0; i < v.turrets.size(); i++)
 			v.turrets.at(i).tracking = true;
 	}
-
-	return 0;
 }
 
 bool EZManager::OnCamera(piVECTOR* pos, piVECTOR* aim)
@@ -643,12 +619,7 @@ bool EZManager::EasyControl(UINT32 position, const char* control)
 	return false;
 }
 
-UINT32 EZManager::OnEngine(SINT32 param, UINT32 id,UINT32 extra)
-{
-	return 0;
-}
-
-UINT32 EZManager::OnView(SINT32 param, UINT32 id,UINT32 extra)
+void EZManager::OnView(SINT32 param, UINT32 id,UINT32 extra)
 {
 	if(param && IsCommandView(true))
 	{
@@ -671,8 +642,6 @@ UINT32 EZManager::OnView(SINT32 param, UINT32 id,UINT32 extra)
 	{
 		SetFlag(EZManager::VIEW_OVERRIDE|EZManager::FREELOOK, false);
 	}
-
-	return 0;
 }
 
 SINT32 EZManager::ConstrainPosition(SINT32 position)
@@ -691,10 +660,10 @@ SINT32 EZManager::ConstrainPosition(SINT32 position)
 	return position;
 }
 
-UINT32 EZManager::OnPosition(SINT32 param, UINT32 id,UINT32 extra)
+void EZManager::OnPosition(SINT32 param, UINT32 id,UINT32 extra)
 {
 	if(!param || _positions.size() <= 1)
-		return 0;
+		return;
 
 	switch(id)
 	{
@@ -728,8 +697,6 @@ UINT32 EZManager::OnPosition(SINT32 param, UINT32 id,UINT32 extra)
 		}
 		break;
 	}
-
-	return 0;
 }
 
 bool EZManager::IsDriverDead()
@@ -799,7 +766,7 @@ void EZManager::AdjustCamera(Vec3d& camPos, Vec3d& aimPos)
 		// the closest hist to work with
 
 		const colliderQuery::CollisionList& hits = _collider.getCollisions();
-		const colliderQuery::Collision* closest = NULL;
+		const colliderQuery::Collision* closest = nullptr;
 
 		for(size_t i = 0; i < hits.size(); i++)
 		{
@@ -887,7 +854,7 @@ bool EZManager::CreateManager(vehVehicle* v)
 		}
 
 		delete _ezMgr;
-		_ezMgr = NULL;
+		_ezMgr = nullptr;
 	}
 
 	return false;
@@ -898,7 +865,7 @@ void EZManager::FreeManager()
 	if(_ezMgr)
 		delete _ezMgr;
 
-	_ezMgr = NULL;
+	_ezMgr = nullptr;
 }
 
 void EZManager::EZCamera::EZAxis::Clamp()
@@ -1048,8 +1015,8 @@ bool EZManager::EZTurret::FindMount()
 	if(mount) return true;
 	if(!vehicle) return false;
 
-	mlWeaponMount* weapMount = NULL;
-	mlComponent* component = NULL;
+	mlWeaponMount* weapMount = nullptr;
+	mlComponent* component = nullptr;
 
 	if(vehicle->ModelData->ComponentList)
 	{
@@ -1077,7 +1044,7 @@ bool EZManager::EZTurret::FindMount()
 		}
 	}
 
-	return (mount != NULL);
+	return (mount != nullptr);
 }
 
 void EZManager::EZTurret::PreUpdate()
@@ -1475,7 +1442,7 @@ void EZManager::EZTurret::Unload()
 bool EZManager::EZView::Load()
 {
 	persSetPersonaPositionCallback(1, IMAP_MOM_POSITION_1 + position, 0);
-	persSetExternalCameraAdjuster(NULL);
+	persSetExternalCameraAdjuster(nullptr);
 
 	switch(view)
 	{

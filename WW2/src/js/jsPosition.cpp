@@ -226,9 +226,9 @@ jsBoundingBox::jsBoundingBox(StratDB::StratObject const* strat)
 		leftx = rightx = strat->PosX();
 		topy = bottomy = strat->PosY();
 
-		StratDB::StratObject::ChildList const& children = strat->ChildStratObjects() ;
+		StratDB::StratObject::ChildList const& children = strat->ChildStratObjects();
 		StratDB::StratObject::ChildList::const_iterator it;
-		for(it = children.begin() ; it != children.end() ; ++it)
+		for(it = children.begin(); it != children.end(); ++it)
 		{
 			if((*it)->StratType() != SDM_FACILITY_FIREBASE)
 			{
@@ -251,7 +251,7 @@ jsBoundingBox::jsBoundingBox(jsBoundingBox* lhs, jsBoundingBox* rhs)
 			: phui::js::Object(&jsStratObject::jsclass, jsfunctions,jsproperties)
 {
 	JS_CONSTRUCTOR_LOCK;
-	if(lhs == NULL && rhs == NULL)
+	if(lhs == nullptr && rhs == nullptr)
 	{
 		topleft = new jsPosition;
 		bottomright = new jsPosition;
@@ -260,8 +260,8 @@ jsBoundingBox::jsBoundingBox(jsBoundingBox* lhs, jsBoundingBox* rhs)
 		float leftx = 0, topy = 0, rightx = 0, bottomy = 0;
 
 		// If either is null, just use the same pointer twice. I want sleep -- OGS
-		if(lhs == NULL) lhs = rhs;
-		else if(rhs == NULL) rhs = lhs;
+		if(lhs == nullptr) lhs = rhs;
+		else if(rhs == nullptr) rhs = lhs;
 
 		leftx = std::min(lhs->topleft->X(), rhs->topleft->X());
 		topy = std::max(lhs->topleft->Y(), rhs->topleft->Y());

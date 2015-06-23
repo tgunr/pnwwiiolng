@@ -74,7 +74,7 @@ oglTextureObject* oglTextureObject::GetTextureObject(const std::string& name)
         return tbos.find(name)->second.get();
     }
 
-    return NULL;
+    return nullptr;
 }
 
 /*--------------------------------------------------------------

@@ -42,7 +42,7 @@
 #include <pthread.h>
 #endif
 
-typedef UNORDERED_SET<OBJECT*> ObjectSet;
+typedef std::unordered_set<OBJECT*> ObjectSet;
 
 #if !NEW_OBJECT_MEM
 static ObjectSet objectmap;
@@ -120,55 +120,32 @@ static LOGICAL listAddTopMostOBJECTAfter(OBJECT* objectlist, OBJECT* after);
 OBJECT* obmainGetNewObjectA()
 {
 	OBJECT* lpobj = _newObject(0);
-
-	if (lpobj != NULL)
-	{
-		listAddItemAfter((LISTHEADER*)&objused, (LISTHEADER*)lpobj);
-	}else
-	{
-		Write_Debug("[obmainGetNewObject] No more storage available for objects!");
-		piExitProgram(__FILE__, __LINE__, "No more storage available for objects");
-	}
+	listAddItemAfter((LISTHEADER*)&objused, (LISTHEADER*)lpobj);
 	return lpobj;
 }
 
 OBJECT* obmainGetNewNotObjectA(UINT32 obtype)
 {
 	OBJECT* lpobj = _newObject(obtype);
-
-	if (lpobj != NULL)
-	{
-		listAddItemBefore((LISTHEADER*)&objused, (LISTHEADER*)lpobj);
-	}else
-	{
-		Write_Debug("[obmainGetNewNotObject] No more storage available for objects!");
-		piExitProgram(__FILE__, __LINE__, "No more storage available for objects");
-	}
-
+	listAddItemBefore((LISTHEADER*)&objused, (LISTHEADER*)lpobj);
 	return(lpobj);
-
 }
 
 OBJECT* obmainGetFreeObjectA()
 {
     OBJECT* o = _newObject(0);
-
-    if(o)
-    {
-		o->matid = -1;
-		o->texid = -1;
-		o->texname = "";
-		o->matname = "";
-        o->mat = IdentityMatrix;
-        o->comment = NULL;
-    }
-
+	o->matid = -1;
+	o->texid = -1;
+	o->texname = "";
+	o->matname = "";
+    o->mat = IdentityMatrix;
+    o->comment = nullptr;
     return o;
 }
 
 LOGICAL obmainFreeObjectA(OBJECT* lpobj)
 {
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 		return FALSE;
 
 #if !NEW_OBJECT_MEM
@@ -246,7 +223,7 @@ LOGICAL obmainMoveToNotObjectTree(OBJECT* lpobj)
 //		piExitProgram(__FILE__, __LINE__, "Adding object outside main thread!");
 #endif
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -272,7 +249,7 @@ LOGICAL obmainMoveToObjectTree(OBJECT* lpobj)
 //		piExitProgram(__FILE__, __LINE__, "Adding object outside main thread!");
 #endif
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -297,8 +274,8 @@ float			minrad, maxrad;
 piVECTOR	loc;
 piVECTOR	obox[2];
 
-	if (lpmain == NULL ||
-		lpobj == NULL)
+	if (lpmain == nullptr ||
+		lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -321,8 +298,8 @@ piVECTOR	obox[2];
 
 LOGICAL obmainAddChildObject(OBJECT* lpmain, OBJECT* lpobj)
 {
-	if (lpmain == NULL ||
-		lpobj == NULL)
+	if (lpmain == nullptr ||
+		lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -335,8 +312,8 @@ LOGICAL obmainAddChildObject(OBJECT* lpmain, OBJECT* lpobj)
 
 LOGICAL obmainSetObject(OBJECT* lpnew, OBJECT* lpold)
 {
-	if (lpnew == NULL ||
-		lpold == NULL)
+	if (lpnew == nullptr ||
+		lpold == nullptr)
 	{
 		return(FALSE);
 	}
@@ -405,14 +382,14 @@ void obmainFreeObjectMemory(OBJECT*  lpobj)
         if(lpobj->killcallback)
         {
             lpobj->killcallback(lpobj);
-            lpobj->killcallback = NULL;
+            lpobj->killcallback = nullptr;
         }
 
         // Special flag for memory leak issues
 		if(lpobj->freepsnorms)
 		{
 			memFree(lpobj->psnorms);
-			lpobj->psnorms = NULL;
+			lpobj->psnorms = nullptr;
             lpobj->freepsnorms = false;
 		}
 
@@ -420,7 +397,7 @@ void obmainFreeObjectMemory(OBJECT*  lpobj)
         if(lpobj->freepscdn)
 		{
 			memFree(lpobj->pscdn);
-			lpobj->pscdn = NULL;
+			lpobj->pscdn = nullptr;
             lpobj->freepscdn = false;
 		}
 
@@ -428,34 +405,34 @@ void obmainFreeObjectMemory(OBJECT*  lpobj)
 	    if(lpobj->psnorms && lpobj->psnorms != lpobj->psnorig)
 		{
 			memFree(lpobj->psnorms);
-			lpobj->psnorms = NULL;
+			lpobj->psnorms = nullptr;
 		}
 
         // Normal free for pscdn
 		if(lpobj->pscdn && lpobj->pscdn != lpobj->pscdon)
 		{
 			memFree(lpobj->pscdn);
-			lpobj->pscdn = NULL;
+			lpobj->pscdn = nullptr;
 		}
 
 		if(!(lpobj->flag2 & OBJECT_POOL))
 		{
-			if(lpobj->psnorig) 		{ memFree(lpobj->psnorig); 		lpobj->psnorig = NULL; }
-			if(lpobj->pscdon) 		{ memFree(lpobj->pscdon); 		lpobj->pscdon = NULL; }
-			if(lpobj->ptris) 		{ memFree(lpobj->ptris); 		lpobj->ptris = NULL; }
-			if(lpobj->puverts)		{ memFree(lpobj->puverts); 		lpobj->puverts = NULL; }
+			if(lpobj->psnorig) 		{ memFree(lpobj->psnorig); 		lpobj->psnorig = nullptr; }
+			if(lpobj->pscdon) 		{ memFree(lpobj->pscdon); 		lpobj->pscdon = nullptr; }
+			if(lpobj->ptris) 		{ memFree(lpobj->ptris); 		lpobj->ptris = nullptr; }
+			if(lpobj->puverts)		{ memFree(lpobj->puverts); 		lpobj->puverts = nullptr; }
 		}
 
 		if (lpobj->pverts)
         {
             memFree(lpobj->pverts);
-            lpobj->pverts = NULL;
+            lpobj->pverts = nullptr;
         }
 
 		if (lpobj->ptverts)
         {
             memFree(lpobj->ptverts);
-            lpobj->ptverts = NULL;
+            lpobj->ptverts = nullptr;
         }
 
 		// only free material and textures if not an animation
@@ -469,13 +446,13 @@ void obmainFreeObjectMemory(OBJECT*  lpobj)
 	}
 	else
 	{
-		if (lpobj->dof != NULL)
+		if (lpobj->dof != nullptr)
 		{
 			if(lpobj->dof->dofflags & DOF_FREE_MEMORY)
 			{
-				lpobj->dof->dofstatic = NULL; // Pool memory
+				lpobj->dof->dofstatic = nullptr; // Pool memory
 				memFree(lpobj->dof);
-				lpobj->dof = NULL;
+				lpobj->dof = nullptr;
 			}
 		}
 	}
@@ -496,35 +473,26 @@ void obmainFreeObjectMemory(OBJECT*  lpobj)
 
 	if (!(lpobj->flag2 & OBJECT_POOL))
 	{
-#if(0) // Uses strpool
-		if (lpobj->comment != NULL)
-		{
-            // this* IS* allocated with new!!!!
-			delete lpobj->comment; //memFree(lpobj->comment);
-			lpobj->comment = NULL;
-		}
-#else
-        lpobj->comment = NULL;
-#endif
+        lpobj->comment = nullptr;
 	}
 
-	if ((!(lpobj->flags & OBJECT_NOTOBJECT) || ((lpobj->flags & OBJECT_NOTOBJECT) == OBJECT_GROUP)) && lpobj->shadow != NULL)
+	if ((!(lpobj->flags & OBJECT_NOTOBJECT) || ((lpobj->flags & OBJECT_NOTOBJECT) == OBJECT_GROUP)) && lpobj->shadow != nullptr)
 	{
 		if (lpobj->shadow->flags & OBJECT_DYNASHADOW)
 		{
 			obmainFreeObject(lpobj->shadow);
-			lpobj->shadow = NULL;
+			lpobj->shadow = nullptr;
 		}
 	}
 
-	if (lpobj->lpspare != NULL)
+	if (lpobj->lpspare != nullptr)
 	{
 		if (lpobj->flag2 & OBJECT_ANIMATION)
 		{
-			memFree (lpobj->lpspare);
-			Write_Debug ("%%%%%%%%%%%%%%%%%Freeing allocated lpspare!");
+			Write_Debug("%%%%%%%%%%%%%%%%%Freeing allocated lpspare!");
+			memFree(lpobj->lpspare);
 
-			lpobj->lpspare = NULL;
+			lpobj->lpspare = nullptr;
 		}
 	}
 
@@ -535,19 +503,19 @@ void obmainFreeObjectMemory(OBJECT*  lpobj)
         if(it != updatecallbacks.end())
 		    updatecallbacks.erase(it);
 
-        lpobj->updatecallback = NULL;
+        lpobj->updatecallback = nullptr;
     }
 
-    lpobj->modelNode = NULL;
-    lpobj->drawcallback = NULL;
-    lpobj->cullcallback = NULL;
-	lpobj->modelInstance = NULL;
-    lpobj->collider = NULL;
+    lpobj->modelNode = nullptr;
+    lpobj->drawcallback = nullptr;
+    lpobj->cullcallback = nullptr;
+	lpobj->modelInstance = nullptr;
+    lpobj->collider = nullptr;
 
 	lpobj->flags = 0;
 	lpobj->flag2 = 0;
 
-	if (lpobj->animModel != NULL)
+	if (lpobj->animModel != nullptr)
 	{
 		gr2AnimKillObject(lpobj);
 	}
@@ -555,7 +523,7 @@ void obmainFreeObjectMemory(OBJECT*  lpobj)
     if(lpobj->meshContext)
     {
 	    delete lpobj->meshContext;
-        lpobj->meshContext = NULL;
+        lpobj->meshContext = nullptr;
     }
 
     if(lpobj->material)
@@ -566,7 +534,7 @@ void obmainFreeObjectMemory(OBJECT*  lpobj)
         }
 
         // Do not delete. This is pointing to the pool material
-        lpobj->material = NULL;
+        lpobj->material = nullptr;
     }
 
 #if NEW_OBJECT_MEM
@@ -584,7 +552,7 @@ OBJECT* obmainFindNamedObject(const char* name)
 OBJECT*    lpobj;
 
 	lpobj = (OBJECT*)topmostlist.next;
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
 		// search only the topmost objects in the list
 		if (!(lpobj->flags & OBJECT_ATTACHED))
@@ -603,7 +571,7 @@ OBJECT*    lpobj;
 
 
 	lpobj = (OBJECT*)objused.next;
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
 		// search only the topmost objects in the list
 		if (!(lpobj->flags & OBJECT_ATTACHED))
@@ -621,7 +589,7 @@ OBJECT*    lpobj;
 	}
 
 	lpobj = (OBJECT*)objused.prev;
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
 		// search only the topmost objects in the list
 		if (!(lpobj->flags & OBJECT_ATTACHED))
@@ -640,19 +608,19 @@ OBJECT*    lpobj;
 
 
 
-	return(NULL);
+	return(nullptr);
 }
 
 OBJECT* obmainFindChildObject(const char* group, const char* name)
 {
 	OBJECT* lpgrp = obmainFindNamedObject(group);
-	if (lpgrp == NULL)
+	if (lpgrp == nullptr)
 	{
 		return(FALSE);
 	}
 
 	OBJECT* lpobj = lpgrp->child;
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
 		if (lpobj->name[0] == name[0])
 		{
@@ -665,18 +633,18 @@ OBJECT* obmainFindChildObject(const char* group, const char* name)
 		lpobj = lpobj->child;
 	}
 
-	return(NULL);
+	return(nullptr);
 }
 
 OBJECT* obmainFindChildFromObject(OBJECT* lpgrp, const char* name)
 {
-	if (lpgrp == NULL)
+	if (lpgrp == nullptr)
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
 	OBJECT* lpobj = lpgrp;
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
 		if (lpobj->name[0] == name[0])
 		{
@@ -686,10 +654,10 @@ OBJECT* obmainFindChildFromObject(OBJECT* lpgrp, const char* name)
 			}
 		}
 
-		if (lpobj->child != NULL)
+		if (lpobj->child != nullptr)
 		{
 			OBJECT* lpfnd = obmainFindChildFromObject(lpobj->child, name);
-			if (lpfnd != NULL)
+			if (lpfnd != nullptr)
 			{
 				return(lpfnd);
 			}
@@ -698,21 +666,21 @@ OBJECT* obmainFindChildFromObject(OBJECT* lpgrp, const char* name)
 		lpobj = lpobj->sibling;
 	}
 
-	return(NULL);
+	return(nullptr);
 }
 
 // Does do siblings at top level!
 LOGICAL obmainSetFlagsInObjectTree(OBJECT* lpmain, UINT32 flags)
 {
-	if (lpmain == NULL)
+	if (lpmain == nullptr)
 	{
 		return(FALSE);
 	}
 
 	OBJECT* lpobj = lpmain;
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
-		if (lpobj->child != NULL)
+		if (lpobj->child != nullptr)
 		{
 			if (!obmainSetFlagsInObjectTree(lpobj->child, flags))
 			{
@@ -737,15 +705,15 @@ LOGICAL obmainSetFlagsInObjectTree(OBJECT* lpmain, UINT32 flags)
 // Does do siblings at top level!
 LOGICAL obmainClearFlagsInObjectTree(OBJECT* lpmain, UINT32 flags)
 {
-	if (lpmain == NULL)
+	if (lpmain == nullptr)
 	{
 		return(FALSE);
 	}
 
 	OBJECT* lpobj = lpmain;
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
-		if (lpobj->child != NULL)
+		if (lpobj->child != nullptr)
 		{
 			if (!obmainClearFlagsInObjectTree(lpobj->child, flags))
 			{
@@ -770,7 +738,7 @@ LOGICAL obmainClearFlagsInObjectTree(OBJECT* lpmain, UINT32 flags)
 // Does NOT do siblings at top level!
 LOGICAL obmainSetFlagsInThisTree(OBJECT* lpmain, UINT32 flags)
 {
-	if (lpmain == NULL)
+	if (lpmain == nullptr)
 	{
 		return(FALSE);
 	}
@@ -786,9 +754,9 @@ LOGICAL obmainSetFlagsInThisTree(OBJECT* lpmain, UINT32 flags)
 	lpobj->flags |= flags;
 	lpobj = lpobj->child;
 
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
-		if (lpobj->child != NULL)
+		if (lpobj->child != nullptr)
 		{
 			if (!obmainSetFlagsInObjectTree(lpobj->child, flags))
 			{
@@ -813,7 +781,7 @@ LOGICAL obmainSetFlagsInThisTree(OBJECT* lpmain, UINT32 flags)
 // Does NOT do siblings at top level!
 LOGICAL obmainClearFlagsInThisTree(OBJECT* lpmain, UINT32 flags)
 {
-	if (lpmain == NULL)
+	if (lpmain == nullptr)
 	{
 		return(FALSE);
 	}
@@ -829,9 +797,9 @@ LOGICAL obmainClearFlagsInThisTree(OBJECT* lpmain, UINT32 flags)
 	lpobj->flags &= ~flags;
 	lpobj = lpobj->child;
 
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
-		if (lpobj->child != NULL)
+		if (lpobj->child != nullptr)
 		{
 			if (!obmainClearFlagsInObjectTree(lpobj->child, flags))
 			{
@@ -856,15 +824,15 @@ LOGICAL obmainClearFlagsInThisTree(OBJECT* lpmain, UINT32 flags)
 // Does do siblings at top level!
 LOGICAL obmainSetFlag2InObjectTree(OBJECT* lpmain, UINT32 flag2)
 {
-	if (lpmain == NULL)
+	if (lpmain == nullptr)
 	{
 		return(FALSE);
 	}
 
 	OBJECT* lpobj = lpmain;
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
-		if (lpobj->child != NULL)
+		if (lpobj->child != nullptr)
 		{
 			if (!obmainSetFlag2InObjectTree(lpobj->child, flag2))
 			{
@@ -889,15 +857,15 @@ LOGICAL obmainSetFlag2InObjectTree(OBJECT* lpmain, UINT32 flag2)
 // Does do siblings at top level!
 LOGICAL obmainClearFlag2InObjectTree(OBJECT* lpmain, UINT32 flag2)
 {
-	if (lpmain == NULL)
+	if (lpmain == nullptr)
 	{
 		return(FALSE);
 	}
 
 	OBJECT* lpobj = lpmain;
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
-		if (lpobj->child != NULL)
+		if (lpobj->child != nullptr)
 		{
 			if (!obmainClearFlag2InObjectTree(lpobj->child, flag2))
 			{
@@ -922,7 +890,7 @@ LOGICAL obmainClearFlag2InObjectTree(OBJECT* lpmain, UINT32 flag2)
 // Does NOT do siblings at top level!
 LOGICAL obmainSetFlag2InThisTree(OBJECT* lpmain, UINT32 flag2)
 {
-	if (lpmain == NULL)
+	if (lpmain == nullptr)
 	{
 		return(FALSE);
 	}
@@ -938,9 +906,9 @@ LOGICAL obmainSetFlag2InThisTree(OBJECT* lpmain, UINT32 flag2)
 	lpobj->flag2 |= flag2;
 	lpobj = lpobj->child;
 
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
-		if (lpobj->child != NULL)
+		if (lpobj->child != nullptr)
 		{
 			if (!obmainSetFlag2InObjectTree(lpobj->child, flag2))
 			{
@@ -965,7 +933,7 @@ LOGICAL obmainSetFlag2InThisTree(OBJECT* lpmain, UINT32 flag2)
 // Does NOT do siblings at top level!
 LOGICAL obmainClearFlag2InThisTree(OBJECT* lpmain, UINT32 flag2)
 {
-	if (lpmain == NULL)
+	if (lpmain == nullptr)
 	{
 		return(FALSE);
 	}
@@ -981,9 +949,9 @@ LOGICAL obmainClearFlag2InThisTree(OBJECT* lpmain, UINT32 flag2)
 	lpobj->flag2 &= ~flag2;
 	lpobj = lpobj->child;
 
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
-		if (lpobj->child != NULL)
+		if (lpobj->child != nullptr)
 		{
 			if (!obmainClearFlag2InObjectTree(lpobj->child, flag2))
 			{
@@ -1009,15 +977,15 @@ LOGICAL obmainClearFlag2InThisTree(OBJECT* lpmain, UINT32 flag2)
 // Does do siblings at top level!
 LOGICAL obmainSetFlag3InObjectTree(OBJECT* lpmain, UINT32 flag3)
 {
-	if (lpmain == NULL)
+	if (lpmain == nullptr)
 	{
 		return(FALSE);
 	}
 
 	OBJECT* lpobj = lpmain;
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
-		if (lpobj->child != NULL)
+		if (lpobj->child != nullptr)
 		{
 			if (!obmainSetFlag3InObjectTree(lpobj->child, flag3))
 			{
@@ -1042,15 +1010,15 @@ LOGICAL obmainSetFlag3InObjectTree(OBJECT* lpmain, UINT32 flag3)
 // Does do siblings at top level!
 LOGICAL obmainClearFlag3InObjectTree(OBJECT* lpmain, UINT32 flag3)
 {
-	if (lpmain == NULL)
+	if (lpmain == nullptr)
 	{
 		return(FALSE);
 	}
 
 	OBJECT* lpobj = lpmain;
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
-		if (lpobj->child != NULL)
+		if (lpobj->child != nullptr)
 		{
 			if (!obmainClearFlag3InObjectTree(lpobj->child, flag3))
 			{
@@ -1075,7 +1043,7 @@ LOGICAL obmainClearFlag3InObjectTree(OBJECT* lpmain, UINT32 flag3)
 // Does NOT do siblings at top level!
 LOGICAL obmainSetFlag3InThisTree(OBJECT* lpmain, UINT32 flag3)
 {
-	if (lpmain == NULL)
+	if (lpmain == nullptr)
 	{
 		return(FALSE);
 	}
@@ -1091,9 +1059,9 @@ LOGICAL obmainSetFlag3InThisTree(OBJECT* lpmain, UINT32 flag3)
 	lpobj->flag3 |= flag3;
 	lpobj = lpobj->child;
 
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
-		if (lpobj->child != NULL)
+		if (lpobj->child != nullptr)
 		{
 			if (!obmainSetFlag3InObjectTree(lpobj->child, flag3))
 			{
@@ -1118,7 +1086,7 @@ LOGICAL obmainSetFlag3InThisTree(OBJECT* lpmain, UINT32 flag3)
 // Does NOT do siblings at top level!
 LOGICAL obmainClearFlag3InThisTree(OBJECT* lpmain, UINT32 flag3)
 {
-	if (lpmain == NULL)
+	if (lpmain == nullptr)
 	{
 		return(FALSE);
 	}
@@ -1134,9 +1102,9 @@ LOGICAL obmainClearFlag3InThisTree(OBJECT* lpmain, UINT32 flag3)
 	lpobj->flag3 &= ~flag3;
 	lpobj = lpobj->child;
 
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
-		if (lpobj->child != NULL)
+		if (lpobj->child != nullptr)
 		{
 			if (!obmainClearFlag3InObjectTree(lpobj->child, flag3))
 			{
@@ -1163,7 +1131,7 @@ OBJECT* obmainFindGroupObject(const char* name)
 OBJECT*    lpobj;
 
 	lpobj = (OBJECT*)topmostlist.next;
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
 		// search only the group objects in the list
 		if (lpobj->flags & OBJECT_GROUP)
@@ -1181,7 +1149,7 @@ OBJECT*    lpobj;
 	}
 
 	lpobj = (OBJECT*)objused.prev;
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
 		// search only the group objects in the list
 		if (lpobj->flags & OBJECT_GROUP)
@@ -1199,7 +1167,7 @@ OBJECT*    lpobj;
 	}
 
 	lpobj = (OBJECT*)objused.next;
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
 		// search only the group objects in the list
 		if (lpobj->flags & OBJECT_GROUP)
@@ -1216,7 +1184,7 @@ OBJECT*    lpobj;
 		lpobj = (OBJECT*)lpobj->next;
 	}
 
-	return(NULL);
+	return(nullptr);
 }
 
 OBJECT* obmainGetFirstTopmostObject(void)
@@ -1234,7 +1202,7 @@ OBJECT* obmainFindTopmostObject(const char* name)
 OBJECT*    lpobj;
 
 	lpobj = (OBJECT*)topmostlist.next;
-	while (lpobj != NULL)
+	while (lpobj != nullptr)
 	{
 		// search only the topmost objects in the list
 
@@ -1260,9 +1228,9 @@ OBJECT* obmainGetFirstSubobject(OBJECT* lpmain)
 {
 OBJECT*	lpobj;
 
-	if (lpmain == NULL)
+	if (lpmain == nullptr)
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
 	if (lpmain->flags & OBJECT_GROUP)
@@ -1286,9 +1254,9 @@ OBJECT*	lpobj;
 
 OBJECT* obmainGetNextSubobject(OBJECT* lpobj)
 {
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
 	return(lpobj->sibling);
@@ -1298,7 +1266,7 @@ LOGICAL obmainFindCrackedComment(SINT8** retptr, SINT8* comment, SINT8* cmp)
 {
 SINT8*	pre, *ptr;
 
-	if (comment == NULL)
+	if (comment == nullptr)
 	{
 		return(FALSE);
 	}
@@ -1331,7 +1299,7 @@ LOGICAL obmainFindCrackedCommentFirstPart(SINT8** retptr, SINT8* comment, SINT8*
 {
 	SINT8*	pre, *ptr;
 	int len;
-	if (comment == NULL)
+	if (comment == nullptr)
 	{
 		return(FALSE);
 	}
@@ -1364,7 +1332,7 @@ LOGICAL obmainFindCommentName(SINT8** retptr, SINT8* comment, SINT8* cmp)
 {
 SINT8*	pre, *ptr;
 
-	if (comment == NULL)
+	if (comment == nullptr)
 	{
 		return(FALSE);
 	}
@@ -1390,7 +1358,7 @@ SINT8*	pre, *ptr;
 		}
 
 		pre = strstr(ptr, "\r\n");
-		if (pre != NULL)
+		if (pre != nullptr)
 		{
 			ptr = pre += 2;
 		}
@@ -1407,7 +1375,7 @@ LOGICAL obmainFindCommentFirstPartName(SINT8** retptr, SINT8* comment, SINT8* cm
 {
 	SINT8*	pre, *ptr;
 
-	if (comment == NULL)
+	if (comment == nullptr)
 	{
 		return(FALSE);
 	}
@@ -1435,7 +1403,7 @@ LOGICAL obmainFindCommentFirstPartName(SINT8** retptr, SINT8* comment, SINT8* cm
 		}
 
 		pre = strstr(ptr, "\r\n");
-		if (pre != NULL)
+		if (pre != nullptr)
 		{
 			ptr = pre += 2;
 		}
@@ -1453,7 +1421,7 @@ LOGICAL obmainFindComment(OBJECT** retobj, OBJECT* lpmain, char* comment)
 SINT8*		ptr;
 OBJECT*    lpobj;
 
-	if (lpmain == NULL)
+	if (lpmain == nullptr)
 	{
 		return(FALSE);
 	}
@@ -1487,7 +1455,7 @@ LOGICAL		retval=FALSE;
 SINT8*		ptr;
 OBJECT*    lpobj;
 
-	if (lpmain == NULL)
+	if (lpmain == nullptr)
 	{
 		return(FALSE);
 	}
@@ -1521,7 +1489,7 @@ LOGICAL		retval=FALSE;
 SINT8*		ptr;
 OBJECT*    lpobj;
 
-	if (lpmain == NULL)
+	if (lpmain == nullptr)
 	{
 		return(FALSE);
 	}
@@ -1553,7 +1521,7 @@ LOGICAL obmainFindObjectLOD(OBJECT* lpmain, int lod, PROCESSCALLBACK callback)
 {
 SINT8		lodname[32];
 
-	if (lpmain == NULL)
+	if (lpmain == nullptr)
 	{
 		return(FALSE);
 	}
@@ -1572,7 +1540,7 @@ LOGICAL obmainFindObjectDamage(OBJECT* lpmain, int dmg, PROCESSCALLBACK callback
 {
 SINT8		dmgname[32];
 
-	if (lpmain == NULL)
+	if (lpmain == nullptr)
 	{
 		return(FALSE);
 	}
@@ -1589,9 +1557,9 @@ SINT8		dmgname[32];
 
 void obmainFindCallback(struct OBJECT* lpmain, FINDCALLBACK callback, void* userdata)
 {
-	OBJECT* lpobj = NULL;
+	OBJECT* lpobj = nullptr;
 
-	if (lpmain == NULL)
+	if (lpmain == nullptr)
 		return;
 
 	lpobj = lpmain;
@@ -1613,13 +1581,13 @@ LOGICAL obmainCreateObjectFull(OBJECT** newobj, char* name, int numverts, int nu
 	OBJECT*	lpobj;
 
 	lpobj = obmainGetNewObject();
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
 
 #ifdef SPATIAL_DB
-    lpobj->sdbInfo = NULL;
+    lpobj->sdbInfo = nullptr;
 #endif
 	strcpy(lpobj->name, name);
 	lpobj->flags = 0;
@@ -1638,11 +1606,11 @@ LOGICAL obmainCreateObjectFull(OBJECT** newobj, char* name, int numverts, int nu
 		lpobj->pscdn		= (piVECTOR*)memAlloc(numtris * 3 * sizeof(piVECTOR));
 
 
-		if (lpobj->ptris == NULL ||
-			lpobj->psnorms == NULL ||
-			lpobj->psnorig == NULL ||
-			lpobj->pscdon == NULL ||
-			lpobj->pscdn == NULL)
+		if (lpobj->ptris == nullptr ||
+			lpobj->psnorms == nullptr ||
+			lpobj->psnorig == nullptr ||
+			lpobj->pscdon == nullptr ||
+			lpobj->pscdn == nullptr)
 		{
 			obmainFreeObject(lpobj);
 			return(FALSE);
@@ -1652,7 +1620,7 @@ LOGICAL obmainCreateObjectFull(OBJECT** newobj, char* name, int numverts, int nu
 		{
 			lpobj->ptverts		= (piCVERTEX*)memAlloc(numtris * 3 * sizeof(piCVERTEX));
 
-            if (lpobj->ptverts == NULL)
+            if (lpobj->ptverts == nullptr)
 			{
 				obmainFreeObject(lpobj);
 				return(FALSE);
@@ -1661,12 +1629,12 @@ LOGICAL obmainCreateObjectFull(OBJECT** newobj, char* name, int numverts, int nu
 	}
 	else
 	{
-		lpobj->ptris = NULL;
-		lpobj->psnorms = NULL;
-		lpobj->psnorig = NULL;
-		lpobj->pscdon = NULL;
-		lpobj->pscdn = NULL;
-		lpobj->ptverts = NULL;
+		lpobj->ptris = nullptr;
+		lpobj->psnorms = nullptr;
+		lpobj->psnorig = nullptr;
+		lpobj->pscdon = nullptr;
+		lpobj->pscdn = nullptr;
+		lpobj->ptverts = nullptr;
 	}
 
 	lpobj->mat = IdentityMatrix;
@@ -1683,12 +1651,10 @@ LOGICAL obmainCreateObject(OBJECT** newobj, char* name, int numverts, int numtri
 
 OBJECT* obmainCopyObjectFull(OBJECT* lpcopy)
 {
-int       nv, nt;
-OBJECT*  lpobj;
+	int		nv, nt;
+	OBJECT*	lpobj;
 
-	if (lpcopy->flags & OBJECT_NOTOBJECT ||
-		lpcopy->flags & OBJECT_USERDRAW ||
-		lpcopy->flag2 & OBJECT_TOPMOST)
+	if ((lpcopy->flags & (OBJECT_NOTOBJECT | OBJECT_USERDRAW)) || (lpcopy->flag2 & OBJECT_TOPMOST))
 	{
 		lpobj = obmainGetNewNotObject(lpcopy->flags);
 	}
@@ -1697,16 +1663,16 @@ OBJECT*  lpobj;
 		lpobj = obmainGetNewObject();
 	}
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
 	memcpy(&lpobj->name, &lpcopy->name, sizeof(OBJECT) - 5 * sizeof(OBJECT*));
 	lpobj->flags |= OBJECT_COPY;
 	lpobj->flag2 &= ~OBJECT_POOL;
 
-	if (lpcopy->comment != NULL)
+	if (lpcopy->comment != nullptr)
 	{
 		lpobj->comment = (SCHAR*)memAlloc(strlen(lpcopy->comment) + 1);
 		strcpy(lpobj->comment, lpcopy->comment);
@@ -1726,7 +1692,6 @@ OBJECT*  lpobj;
 			lpobj->puverts = (piUNIFIED_VERTEX*)memAlloc(nv * sizeof(piUNIFIED_VERTEX));
 			memcpy(lpobj->puverts, lpcopy->puverts, nv * sizeof(piUNIFIED_VERTEX));
 		}
-
 
 		if(lpcopy->pverts)
 		{
@@ -1755,30 +1720,29 @@ OBJECT*  lpobj;
 			if(lpcopy->psnorig)
 			{
 				memcpy(lpobj->psnorig, lpcopy->psnorig, nt * sizeof(piVECTOR));
-				if(lpobj->psnorig != lpobj->psnorms)	memcpy(lpobj->psnorms, lpcopy->psnorms, nt * sizeof(piVECTOR));
+				if(lpobj->psnorig != lpobj->psnorms)
+					memcpy(lpobj->psnorms, lpcopy->psnorms, nt * sizeof(piVECTOR));
 			}
 			if(lpcopy->pscdon)
 			{
 				memcpy(lpobj->pscdon, lpcopy->pscdon, nt * 3 * sizeof(piVECTOR));
-				if(lpobj->pscdon != lpobj->pscdn)	memcpy(lpobj->pscdn, lpcopy->pscdn, nt * 3 * sizeof(piVECTOR));
+				if(lpobj->pscdon != lpobj->pscdn)
+					memcpy(lpobj->pscdn, lpcopy->pscdn, nt * 3 * sizeof(piVECTOR));
 			}
 		}
 
 		//if (lpcopy->flags & OBJECT_TESSELATION)
 		{
 			nt = lpcopy->numtris;
-
 			nt *= 3;
 			lpobj->ptverts = (piCVERTEX*)memAlloc(nt * sizeof(piCVERTEX));
-			if (lpobj->ptverts == NULL)
+			if (lpobj->ptverts == nullptr)
 			{
 				break;
 			}
 
-			if (lpcopy->ptverts != NULL)
-			{
+			if (lpcopy->ptverts != nullptr)
 				memcpy(lpobj->ptverts, lpcopy->ptverts, nt * sizeof(piLVERTEX));
-			}
     	}
 
 		piAddTexRef(lpobj->texid);
@@ -1789,7 +1753,7 @@ OBJECT*  lpobj;
 
 	obmainFreeObject(lpobj);
 
-	return(NULL);
+	return(nullptr);
 }
 
 OBJECT* obmainCopyObject(OBJECT* lpcopy)
@@ -1799,12 +1763,10 @@ OBJECT* obmainCopyObject(OBJECT* lpcopy)
 
 OBJECT* obmainCopyNamedObject(const char* name)
 {
-OBJECT*    lpobj;
-
-	lpobj = obmainFindNamedObject(name);
-	if (lpobj == NULL)
+	OBJECT* lpobj = obmainFindNamedObject(name);
+	if (lpobj == nullptr)
 	{
-		return(NULL);
+		return(nullptr);
 	}
 
 	return(obmainCopyObject(lpobj));
@@ -1812,7 +1774,7 @@ OBJECT*    lpobj;
 
 int obmainGetObjects(LISTHEADER** lplist)
 {
-	if (lplist == NULL)
+	if (lplist == nullptr)
 	{
 		return(-1);
 	}
@@ -1879,13 +1841,13 @@ void obmainKill(void)
 
 	Write_Debug("Objects still allocated: %d", NumObjUsed);
 
-	for(lpobj=objused.next; lpobj != NULL; lpobj=next)
+	for(lpobj=objused.next; lpobj != nullptr; lpobj=next)
 	{
 		next = lpobj->next;
 		obmainFreeObject((OBJECT*)lpobj);
 	}
 
-	for (lpobj=objused.prev; lpobj != NULL; lpobj=prev)
+	for (lpobj=objused.prev; lpobj != nullptr; lpobj=prev)
 	{
 		prev = lpobj->prev;
 		obmainFreeObject((OBJECT*)lpobj);
@@ -1894,7 +1856,7 @@ void obmainKill(void)
     OBJECT* o = topmostlist.next;
     OBJECT* free;
 
-    while(o != NULL)
+    while(o != nullptr)
     {
         free = o;
         o = o->next;
@@ -1937,14 +1899,11 @@ LOGICAL obmainUpdate(void)
 		return FALSE;
 
     // So we don't have to loop entire object list
-    ObjectSet::iterator itr = updatecallbacks.begin();
-    OBJECT* o;
-
     std::vector<OBJECT*> freelist;
 
-    for(; itr != updatecallbacks.end(); ++itr)
+    for(auto it = updatecallbacks.begin(), end = updatecallbacks.end(); it != end; ++it)
     {
-        o = *itr;
+        OBJECT* o = *it;
 
         if(!obmainValidateObject(o))
             freelist.push_back(o);
@@ -1956,8 +1915,8 @@ LOGICAL obmainUpdate(void)
 
     for(unsigned int i = 0; i < freelist.size(); i++)
     {
-        itr = updatecallbacks.find(freelist[i]);
-        updatecallbacks.erase(itr);
+        auto it = updatecallbacks.find(freelist[i]);
+        updatecallbacks.erase(it);
     }
 
 	return TRUE;
@@ -1967,7 +1926,7 @@ LOGICAL obmainSnapObjectTreeToXYGrid(OBJECT * Object,FLOAT32 GridSize,UINT32 Use
 {
 OBJECT * ObjAtt;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return (FALSE);
 	}
@@ -1980,9 +1939,9 @@ OBJECT * ObjAtt;
 
 		ObjAtt = ObjAtt->attached;
 	}
-	while (ObjAtt != NULL);
+	while (ObjAtt != nullptr);
 
-	if (Object->child != NULL)
+	if (Object->child != nullptr)
 	{
 		_SnapSubObjectTreeToXYGrid(Object->child,GridSize,UseObjectMatrix);
 	}
@@ -1994,7 +1953,7 @@ static LOGICAL _SnapSubObjectTreeToXYGrid(OBJECT * Object,FLOAT32 GridSize,UINT3
 {
 OBJECT * ObjAtt,*ObjSib;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return (FALSE);
 	}
@@ -2011,16 +1970,16 @@ OBJECT * ObjAtt,*ObjSib;
 
 			ObjAtt = ObjAtt->attached;
 		}
-		while (ObjAtt != NULL);
+		while (ObjAtt != nullptr);
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_SnapSubObjectTreeToXYGrid(ObjSib->child,GridSize,UseObjectMatrix);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 	return (TRUE);
 }
@@ -2035,7 +1994,7 @@ piMATRIX InvMat;
 FLOAT64 OneOverGridSize;
 FLOAT64VECTOR WorldOriginOffset;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return (FALSE);
 	}
@@ -2111,17 +2070,17 @@ LOGICAL obmainGetBoundingBoxMax(FLOAT32* pfLeft,
 								FLOAT32* pfMinZ,
 							    OBJECT* pObject)
 {
-	OBJECT* pObjSib = NULL;
-	OBJECT* pObjAtt = NULL;
+	OBJECT* pObjSib = nullptr;
+	OBJECT* pObjAtt = nullptr;
 
-	if(pObject == NULL)
+	if(pObject == nullptr)
 	{
 		return FALSE;
 	}
 
-	if(pfLeft == NULL || pfTop == NULL ||
-	   pfRight == NULL || pfBottom == NULL ||
-	   pfMaxZ == NULL)
+	if(pfLeft == nullptr || pfTop == nullptr ||
+	   pfRight == nullptr || pfBottom == nullptr ||
+	   pfMaxZ == nullptr)
 	{
 		return FALSE;
 	}
@@ -2129,7 +2088,7 @@ LOGICAL obmainGetBoundingBoxMax(FLOAT32* pfLeft,
 	pObjSib = pObject;
 	pObjAtt = pObject;
 
-	while(pObjAtt != NULL)
+	while(pObjAtt != nullptr)
 	{
 		if(!(pObjAtt->flags & OBJECT_NOTOBJECT) &&
             (pObjAtt->flags & OBJECT_VISIBLE) &&
@@ -2170,7 +2129,7 @@ LOGICAL obmainGetBoundingBoxMax(FLOAT32* pfLeft,
 		pObjAtt = pObjAtt->attached;
 	}
 
-	if(pObjSib->child != NULL)
+	if(pObjSib->child != nullptr)
 	{
 		if(!obmainGetBoundingBoxMaxSiblings(pfLeft,
 			   								pfTop,
@@ -2196,17 +2155,17 @@ LOGICAL obmainGetBoundingBoxMaxSiblings(FLOAT32* pfLeft,
 										FLOAT32* pfMinZ,
 									    OBJECT* pObject)
 {
-	OBJECT* pObjSib = NULL;
-	OBJECT* pObjAtt = NULL;
+	OBJECT* pObjSib = nullptr;
+	OBJECT* pObjAtt = nullptr;
 
-	if(pfLeft == NULL || pfTop == NULL ||
-	   pfRight == NULL || pfBottom == NULL ||
-	   pfMaxZ == NULL)
+	if(pfLeft == nullptr || pfTop == nullptr ||
+	   pfRight == nullptr || pfBottom == nullptr ||
+	   pfMaxZ == nullptr)
 	{
 		return FALSE;
 	}
 
-	if(pObject == NULL)
+	if(pObject == nullptr)
 	{
 		return FALSE;
 	}
@@ -2214,9 +2173,9 @@ LOGICAL obmainGetBoundingBoxMaxSiblings(FLOAT32* pfLeft,
 	pObjSib = pObject;
 	pObjAtt = pObject;
 
-	while(pObjSib != NULL)
+	while(pObjSib != nullptr)
 	{
-		while(pObjAtt != NULL)
+		while(pObjAtt != nullptr)
 		{
 		    if(!(pObjAtt->flags & OBJECT_NOTOBJECT) &&
                 (pObjAtt->flags & OBJECT_VISIBLE) &&
@@ -2257,7 +2216,7 @@ LOGICAL obmainGetBoundingBoxMaxSiblings(FLOAT32* pfLeft,
 			pObjAtt = pObjAtt->attached;
 		}
 
-		if(pObjSib->child != NULL)
+		if(pObjSib->child != nullptr)
 		{
 			if(!obmainGetBoundingBoxMaxSiblings(pfLeft,
 												pfTop,
@@ -2282,7 +2241,7 @@ UINT32 obmainRemoveSiblings(OBJECT* pObject)
 	OBJECT* pObjSib;
 	OBJECT* pObjAtt;
 
-	if(pObject == NULL)
+	if(pObject == nullptr)
 	{
 		return 0;
 	}
@@ -2299,22 +2258,22 @@ UINT32 obmainRemoveSiblings(OBJECT* pObject)
 
             if(pObjAtt)
             {
-                pObjAtt->next = NULL;
-                pObjAtt->prev = NULL;
+                pObjAtt->next = nullptr;
+                pObjAtt->prev = nullptr;
             }
 
 			pObjAtt = pObjAtt->attached;
 		}
-		while(pObjAtt != NULL);
+		while(pObjAtt != nullptr);
 
-		if(pObjSib->child != NULL)
+		if(pObjSib->child != nullptr)
 		{
 			obmainRemoveSiblings(pObjSib->child);
 		}
 
 		pObjSib = pObjSib->sibling;
 	}
-	while(pObjSib != NULL);
+	while(pObjSib != nullptr);
 
 	return 0;
 }
@@ -2341,7 +2300,7 @@ void obmainDeleteNode(OBJECT* node)
 	if(previous->attached == node)
 	{
 		if(next == attached)	previous->attached = next;
-		else	previous->attached = NULL;
+		else	previous->attached = nullptr;
 	}
 	else if(attached)
 	{
@@ -2411,7 +2370,7 @@ void obmainDeleteNodeTree(OBJECT* node)
 
 UINT32 obmainRemoveObjectTree(OBJECT* pObject)
 {
-	if(pObject == NULL)
+	if(pObject == nullptr)
 	{
 		return 0;
 	}
@@ -2425,16 +2384,16 @@ UINT32 obmainRemoveObjectTree(OBJECT* pObject)
 /*		ogs: listDeleteItem already does this
 		if(pObjAtt)
         {
-            pObjAtt->next = NULL;
-            pObjAtt->prev = NULL;
+            pObjAtt->next = nullptr;
+            pObjAtt->prev = nullptr;
         }
 */
 
 		pObjAtt = pObjAtt->attached;
 	}
-	while(pObjAtt != NULL);
+	while(pObjAtt != nullptr);
 
-	if(pObject->child != NULL)
+	if(pObject->child != nullptr)
 	{
 		obmainRemoveSiblings(pObject->child);
 	}
@@ -2444,12 +2403,12 @@ UINT32 obmainRemoveObjectTree(OBJECT* pObject)
 
 static LOGICAL _SetObjectSubTreeMatrix(OBJECT * Obj, piMATRIX * Mat)
 {
-	if (Obj == NULL)
+	if (Obj == nullptr)
 	{
 		return (TRUE);
 	}
 
-	if (Mat == NULL)
+	if (Mat == nullptr)
 	{
 		return (TRUE);
 	}
@@ -2473,16 +2432,16 @@ static LOGICAL _SetObjectSubTreeMatrix(OBJECT * Obj, piMATRIX * Mat)
 
 			ObjAtt = ObjAtt->attached;
 		}
-		while (ObjAtt != NULL);
+		while (ObjAtt != nullptr);
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_SetObjectSubTreeMatrix(ObjSib->child,Mat);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 	return (TRUE);
 }
@@ -2493,12 +2452,12 @@ LOGICAL obmainSetObjectTreeMatrix(OBJECT * Obj,piMATRIX * Mat)
 {
 OBJECT * ObjAtt;
 
-	if (Obj == NULL)
+	if (Obj == nullptr)
 	{
 		return (TRUE);
 	}
 
-	if (Mat == NULL)
+	if (Mat == nullptr)
 	{
 		return (TRUE);
 	}
@@ -2514,9 +2473,9 @@ OBJECT * ObjAtt;
 
 		ObjAtt = ObjAtt->attached;
 	}
-	while (ObjAtt != NULL);
+	while (ObjAtt != nullptr);
 
-	if (Obj->child != NULL)
+	if (Obj->child != nullptr)
 	{
 		_SetObjectSubTreeMatrix(Obj->child,Mat);
 	}
@@ -2526,7 +2485,7 @@ OBJECT * ObjAtt;
 
 OBJECT* _newObject(UINT32 obtype)
 {
-	OBJECT* lpobj  = NULL;
+	OBJECT* lpobj  = nullptr;
 
 	obtype &= OBJECT_NOTOBJECT;
 
@@ -2564,26 +2523,26 @@ OBJECT* _newObject(UINT32 obtype)
 		break;
 	}
 
-	if(lpobj)
-	{
-		lpobj->matid = -1;
-		lpobj->texid = -1;
-		lpobj->texname = "";
-		lpobj->matname = "";
-        lpobj->mat = IdentityMatrix;
-        lpobj->comment = NULL;
-		lpobj->collider = NULL;
+	if (PN_UNLIKELY(!lpobj))
+		piExitProgram(__FILE__, __LINE__, "Out of memory");
 
-        NumObjUsed++;
+	lpobj->matid = -1;
+	lpobj->texid = -1;
+	lpobj->texname = "";
+	lpobj->matname = "";
+    lpobj->mat = IdentityMatrix;
+    lpobj->comment = nullptr;
+	lpobj->collider = nullptr;
+
+    NumObjUsed++;
 
 #ifdef ANDREWTEST
     objectset.insert( lpobj );
 #endif
 
 #if !NEW_OBJECT_MEM
-        objectmap.insert(lpobj);
+	objectmap.insert(lpobj);
 #endif
-    }
 
 	return lpobj;
 }
@@ -2595,7 +2554,7 @@ const piUNIFIED_VERTEX* OBJECT::RenderData()
     else if(puverts)
         return puverts;
     else
-        return NULL;
+        return nullptr;
 }
 
 /************************************************************************************************
@@ -2701,15 +2660,15 @@ piVectorPtr OBJECT::MutablePositions()
         {
             // Can't VBO mutable data
             delete meshContext;
-            meshContext = NULL;
+            meshContext = nullptr;
         }
 
 		pverts = (piUNIFIED_VERTEX*)memAlloc(numverts * sizeof(piUNIFIED_VERTEX));
 		memcpy(pverts, puverts, numverts * sizeof(piUNIFIED_VERTEX));
 
 #ifdef ANDREWTEST
-    MutablePositions_size += numverts * sizeof(piUNIFIED_VERTEX);
-    MutablePositions_count ++;
+		MutablePositions_size += numverts * sizeof(piUNIFIED_VERTEX);
+		MutablePositions_count ++;
 #endif
 	}
 
@@ -2724,14 +2683,14 @@ piVectorPtr OBJECT::MutableNormals()
         {
             // Can't VBO mutable data
             delete meshContext;
-            meshContext = NULL;
+            meshContext = nullptr;
         }
 
         pverts = (piUNIFIED_VERTEX*)memAlloc(numverts * sizeof(piUNIFIED_VERTEX));
 		memcpy(pverts, puverts, numverts * sizeof(piUNIFIED_VERTEX));
 #ifdef ANDREWTEST
-    MutableNormals_size += numverts * sizeof(piUNIFIED_VERTEX);
-    MutableNormals_count ++;
+		MutableNormals_size += numverts * sizeof(piUNIFIED_VERTEX);
+		MutableNormals_count ++;
 #endif
 	}
 
@@ -2746,14 +2705,14 @@ piVertexColorPtr OBJECT::MutableColors()
         {
             // Can't VBO mutable data
             delete meshContext;
-            meshContext = NULL;
+            meshContext = nullptr;
         }
 
 		pverts = (piUNIFIED_VERTEX*)memAlloc(numverts * sizeof(piUNIFIED_VERTEX));
 		memcpy(pverts, puverts, numverts * sizeof(piUNIFIED_VERTEX));
 #ifdef ANDREWTEST
-    MutableColors_size += numverts * sizeof(piUNIFIED_VERTEX);
-    MutableColors_count ++;
+		MutableColors_size += numverts * sizeof(piUNIFIED_VERTEX);
+		MutableColors_count ++;
 #endif
 	}
 
@@ -2768,14 +2727,14 @@ piTexCoordPtr OBJECT::MutableTexCoords()
         {
             // Can't VBO mutable data
             delete meshContext;
-            meshContext = NULL;
+            meshContext = nullptr;
         }
 
         pverts = (piUNIFIED_VERTEX*)memAlloc(numverts * sizeof(piUNIFIED_VERTEX));
 		memcpy(pverts, puverts, numverts * sizeof(piUNIFIED_VERTEX));
 #ifdef ANDREWTEST
-    MutableTexCoords_size += numverts * sizeof(piUNIFIED_VERTEX);
-    MutableTexCoords_count ++;
+		MutableTexCoords_size += numverts * sizeof(piUNIFIED_VERTEX);
+		MutableTexCoords_count ++;
 #endif
 	}
 
@@ -2886,8 +2845,8 @@ void obmainCreateMutableSurfaceNormals(OBJECT* lpobj)
     if(!lpobj->freepsnorms && lpobj->psnorms == lpobj->psnorig)
 	{
 #ifdef ANDREWTEST
-    MutableSurfaceNormals_size += lpobj->numtris * 3 * sizeof(piVECTOR);
-    MutableSurfaceNormals_count ++;
+		MutableSurfaceNormals_size += lpobj->numtris * 3 * sizeof(piVECTOR);
+		MutableSurfaceNormals_count ++;
 #endif
 
 		lpobj->psnorms = (piVECTOR*)memAlloc(lpobj->numtris * sizeof(piVECTOR));
@@ -2906,21 +2865,21 @@ void obmainCreateMutableCollisionNormals(OBJECT* lpobj)
 {
     if(!lpobj->freepscdn && lpobj->pscdn == lpobj->pscdon)
 	{
-		lpobj->pscdn =(piVECTOR*)memAlloc(lpobj->numtris * 3 * sizeof(piVECTOR));
+		lpobj->pscdn = (piVECTOR*)memAlloc(lpobj->numtris * 3 * sizeof(piVECTOR));
 		if( !lpobj->pscdon )
         {
             lpobj->pscdon = lpobj->pscdn;
         }
 		else
         {
-            if (lpobj->pscdn!=NULL )
+            if (lpobj->pscdn!=nullptr )
             {
                 memcpy(lpobj->pscdn, lpobj->pscdon, lpobj->numtris * 3 * sizeof(piVECTOR));
             }
             else
             {
                 printf("bad pscdn\n");
-                assert(lpobj->pscdn!=NULL);
+                assert(lpobj->pscdn!=nullptr);
             }
         }
 

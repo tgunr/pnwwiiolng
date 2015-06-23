@@ -174,7 +174,7 @@ class Texture2DArray : public Texture
 
         /** Function to call to get the extension of a specified context.
           * If the Extension object for that context has not yet been created
-          * and the 'createIfNotInitalized' flag been set to false then returns NULL.
+          * and the 'createIfNotInitalized' flag been set to false then returns nullptr.
           * If 'createIfNotInitalized' is true then the Extensions object is
           * automatically created. However, in this case the extension object will
           * only be created with the graphics context associated with ContextID.

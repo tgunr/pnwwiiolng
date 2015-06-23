@@ -10,7 +10,7 @@ DWORD					numadapters;
 
 static std::vector<ADAPTERMODES *> _adaptermodes;
 
-static LPDIRECT3D9 _d3d9 = NULL;
+static LPDIRECT3D9 _d3d9 = nullptr;
 
 static int numberDrivers = 0;
 static DSOUNDDRIVERS soundDrivers[64];
@@ -35,7 +35,7 @@ DSOUNDDRIVERS* dx3dGetSoundInfo(int& numDrivers)
 {
     if(numberDrivers == 0)
     {
-	    DirectSoundEnumerate(EnumDriverCallback, NULL);
+	    DirectSoundEnumerate(EnumDriverCallback, nullptr);
     }
     else
     {
@@ -126,7 +126,7 @@ Description:
 bool dx3dinfoEnumAdaptersAndModes()
 {
     int i, j;
-    D3DADAPTER_IDENTIFIER9* identifier = NULL;
+    D3DADAPTER_IDENTIFIER9* identifier = nullptr;
 
     if(!_adaptermodes.empty())
     {
@@ -213,10 +213,10 @@ bool dx3dinfoGetAdaptersAndModes(DWORD* numadapters, std::vector<ADAPTERMODES*>&
 			return false;
 		}
 
-		if(_d3d9 != NULL)
+		if(_d3d9 != nullptr)
 		{
 			_d3d9->Release();
-			_d3d9 = NULL;
+			_d3d9 = nullptr;
 		}
 	}
 

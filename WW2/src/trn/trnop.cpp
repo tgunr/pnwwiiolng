@@ -5,7 +5,6 @@
 #include <float.h>
 #include "pi/pi.h"
 #include "include/vars.h"
-#include "mem/mem.h"
 #include "ob/obc.h"
 #include "ob/obmain.h"
 #include "ob/obdraw.h"
@@ -225,7 +224,7 @@ LOGICAL trnopConformBase(piVECTOR* rot, OBJECT* lpobj, SINT32 poly)
 {
 piVECTOR	n;
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -423,7 +422,7 @@ int			i;
 	Write_Debug("Place on ground: %s", lpobj->name);
 #endif
 
-	for (i=1 ; i < 10 ; i++)
+	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, OnGroundLOD))
 		{
@@ -448,7 +447,7 @@ int		i;
 #ifdef TERRAIN_EDITOR
 	Write_Debug("Place relative to ground: %s", lpobj->name);
 #endif
-	for (i=1 ; i < 10 ; i++)
+	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, HeightPlaceLOD))
 		{
@@ -582,7 +581,7 @@ OBJECT*	lpbase;
 	piVectorPtr objPos = lpbase->MutablePositions();
 	lpbase->flag2 &= ~OBJECT_USEBUFFERS; // should just put this in MutablePositions()
 
-	for (i=0 ; i < num ; i++, ++objPos)
+	for (i=0; i < num; i++, ++objPos)
 	{
 		if (bz1 > objPos->z &&
 			bz2 < objPos->z)
@@ -694,7 +693,7 @@ OBJECT*	lpbase, *lpnext;
 		num = lpnext->numverts;
 		piVectorConstPtr objPos = lpnext->RenderPositions();
 
-		for (i=0 ; i < num ; i++, ++objPos)
+		for (i=0; i < num; i++, ++objPos)
 		{
             if(lpnext->flag2 & OBJECT_IS_ROTATED)
             {
@@ -749,7 +748,7 @@ OBJECT*	lpbase, *lpnext;
 		piVectorPtr objPos = lpbase->MutablePositions();
 		lpbase->flag2 &= ~OBJECT_USEBUFFERS;
 
-		for (i=0 ; i < num ; i++, ++objPos)
+		for (i=0; i < num; i++, ++objPos)
 		{
 			if (bz1 > objPos->z &&
 				bz2 < objPos->z)
@@ -802,7 +801,7 @@ int			i;
 	Write_Debug("Place height conform: %s", lpobj->name);
 #endif
 
-	for (i=1 ; i < 10 ; i++)
+	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, HeightConformLOD))
 		{
@@ -832,7 +831,7 @@ SINT32		i, poly;
 	{
 		TempObjPtr = TempObjPtr->child;
 
-		if (TempObjPtr == NULL)
+		if (TempObjPtr == nullptr)
 		{
 			return (FALSE);
 		}
@@ -848,11 +847,11 @@ SINT32		i, poly;
 		poly = poly / 8 * 8; // get 1st triangle of octet
 
 		// ok place objects o1-o7
-		for (i=1 ; i < 8 ; i++)
+		for (i=1; i < 8; i++)
 		{
 			sprintf(s, "o%d", i);
 			ogrpFindSubObjectByName(&TempObjPtr, lpobj, s);
-			if (TempObjPtr != NULL)
+			if (TempObjPtr != nullptr)
 			{
 				_ParallelagramizeObject(TempObjPtr,
 									 	&OctetObject->ImmutablePositions()[OctetObject->ptris[poly+i].v1],
@@ -865,7 +864,7 @@ SINT32		i, poly;
 
 		// now place o8
 		ogrpFindSubObjectByName(&TempObjPtr, lpobj, "o8");
-		if (TempObjPtr != NULL)
+		if (TempObjPtr != nullptr)
 		{
 			_ParallelagramizeObject(TempObjPtr,
 									&OctetObject->ImmutablePositions()[OctetObject->ptris[poly].v1],
@@ -898,7 +897,7 @@ static UINT32 _ParallelagramizeObject(OBJECT * Object,
 {
 OBJECT * ObjAtt;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -912,11 +911,11 @@ OBJECT * ObjAtt;
 			_ParallelagramizeObjectToTriangle(ObjAtt,PlanePoint,Normal);
 			ObjAtt = ObjAtt->attached;;
 		}
-		while (ObjAtt != NULL);
+		while (ObjAtt != nullptr);
 
 	}
 
-	if (Object->child != NULL)
+	if (Object->child != nullptr)
 	{
 		_ParallelagramizeSubObject(Object->child,PlanePoint,Normal);
 	}
@@ -930,7 +929,7 @@ static UINT32 _ParallelagramizeSubObject(OBJECT * Object,
 {
 OBJECT * ObjAtt, * ObjSib;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -949,18 +948,18 @@ OBJECT * ObjAtt, * ObjSib;
 
 				ObjAtt = ObjAtt->attached;
 			}
-			while (ObjAtt != NULL);
+			while (ObjAtt != nullptr);
 
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_ParallelagramizeSubObject(ObjSib->child,PlanePoint,Normal);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 	return 0;
 }
@@ -976,7 +975,7 @@ static UINT32 _ParallelagramizeObjectToTriangle(OBJECT * Object,
 	FLOAT32 TempNum;
 	piMATRIX MatInv;
 
-	if (Object == NULL)
+	if (Object == nullptr)
 	{
 		return 0;
 	}
@@ -1065,7 +1064,7 @@ OBJECT*	lpbase, *lpnext;
 		lpnext->flag2 &= ~OBJECT_USEBUFFERS;
 		num = lpnext->numverts;
 		piVectorConstPtr objPos = lpnext->RenderPositions();
-		for (i=0 ; i < num ; i++, ++objPos)
+		for (i=0; i < num; i++, ++objPos)
 		{
 			// Rotate/Translate position to object space
 			math3dVectorMultiply(&pos, objPos.ptr, &lpnext->mat);
@@ -1099,7 +1098,7 @@ OBJECT*	lpbase, *lpnext;
 		piVectorPtr objPos = lpnext->MutablePositions();
 		lpnext->flag2 &= ~OBJECT_USEBUFFERS;
 
-		for (i=0 ; i < num ; i++, ++objPos)
+		for (i=0; i < num; i++, ++objPos)
 		{
 			if (bz1 > objPos->z &&
 				bz2 < objPos->z)
@@ -1144,7 +1143,7 @@ SINT32		i;
 	Write_Debug("Place bottom conform: %s", lpobj->name);
 #endif
 
-	for (i=1 ; i < 10 ; i++)
+	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, BottomConformLOD))
 		{
@@ -1185,7 +1184,7 @@ FLOAT32 TempNum;
 	{
 		o = o->child;
 
-		if (o == NULL)
+		if (o == nullptr)
 		{
 			return (FALSE);
 		}
@@ -1328,7 +1327,7 @@ static LOGICAL ConformRadialLODSub(OBJECT* lpobj)
 OBJECT * ObjAtt;
 OBJECT * ObjSib;
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return (TRUE);
 	}
@@ -1346,17 +1345,17 @@ OBJECT * ObjSib;
 
 			ObjAtt = ObjAtt->attached;
 		}
-		while (ObjAtt != NULL);
+		while (ObjAtt != nullptr);
 
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			ConformRadialLODSub(ObjSib->child);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 	return (TRUE);
 }
@@ -1365,7 +1364,7 @@ static LOGICAL ConformRadialLOD(OBJECT* lpobj, UINT32 lod)
 {
 OBJECT * ObjAtt;
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return (TRUE);
 	}
@@ -1379,9 +1378,9 @@ OBJECT * ObjAtt;
 
 		ObjAtt = ObjAtt->attached;
 	}
-	while (ObjAtt != NULL);
+	while (ObjAtt != nullptr);
 
-	if (lpobj->child != NULL)
+	if (lpobj->child != nullptr)
 	{
 		ConformRadialLODSub(lpobj->child);
 	}
@@ -1415,7 +1414,7 @@ static LOGICAL DownLODImplement(OBJECT* lpobj)
     piVECTOR retpos = {0, 0, 0};
     SINT32 poly = 0;
 
-	for (i=0 ; i < num ; i++, ++objPos)
+	for (i=0; i < num; i++, ++objPos)
 	{
 		pos = *objPos;
 
@@ -1492,7 +1491,7 @@ SINT32		i;
 	Write_Debug("Place down: %s", lpobj->name);
 #endif
 
-	for (i=1 ; i < 10 ; i++)
+	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, DownLOD))
 		{
@@ -1514,7 +1513,7 @@ SINT32		i;
 	Write_Debug("Place conform radial: %s", lpobj->name);
 #endif
 
-	for (i=1 ; i < 10 ; i++)
+	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, ConformRadialLOD))
 		{
@@ -1536,7 +1535,7 @@ piVECTOR	pos, cpos;
 	piVectorPtr objPos = lpobj->MutablePositions();
 	lpobj->flag2 &= ~OBJECT_USEBUFFERS;
 
-	for (i=0 ; i < num ; i++, ++objPos)
+	for (i=0; i < num; i++, ++objPos)
 	{
 		pos = *objPos;
 
@@ -1614,7 +1613,7 @@ SINT32		i;
 	Write_Debug("Place and rotate: %s", lpobj->name);
 #endif
 
-	for (i=1 ; i < 10 ; i++)
+	for (i=1; i < 10; i++)
 	{
 		if (!obmainFindObjectLOD(lpobj->child, i, RotateLOD))
 		{
@@ -1821,12 +1820,12 @@ SINT32 trnopHandleSpeedTree(OBJECT* group)
 	if(!g_bLoadTrees) return false;
 #endif
 
-    if(group == NULL)
+    if(group == nullptr)
     {
         return -1;
     }
 
-    OBJECT* o = NULL;
+    OBJECT* o = nullptr;
     SINT32 treeValues[256] = {0};
     SINT32 overriddenTrees[256] = {0};
     COLLISION collision;
@@ -1835,14 +1834,14 @@ SINT32 trnopHandleSpeedTree(OBJECT* group)
 
     memset(&collision, 0, sizeof(COLLISION));
 
-    if(trndtl[_superCell].m_trees == NULL)
+    if(trndtl[_superCell].m_trees == nullptr)
     {
         return 0;
     }
 
     static struct FindTree ft;
 
-    ft.tree = NULL;
+    ft.tree = nullptr;
     ft.Find(group);
 
     if(!ft.tree)
@@ -1896,9 +1895,9 @@ OBJECT*			TempObj;
 #endif
 
 	// lpobj should point to a Topmost object
-	lpsub = NULL;
+	lpsub = nullptr;
 	toplevel = 0;
-	if (lpobj->comment != NULL)
+	if (lpobj->comment != nullptr)
 	{
 		if (obmainFindCommentName(&ptr, lpobj->comment, "place"))
 		{
@@ -1910,10 +1909,10 @@ OBJECT*			TempObj;
 		}
 	}
 
-	if (lpsub == NULL)
+	if (lpsub == nullptr)
 	{
 		lpsub = obmainGetFirstSubobject(lpobj);
-		if (lpsub == NULL)
+		if (lpsub == nullptr)
 		{
 			lpsub = lpobj;
 		}
@@ -1984,12 +1983,12 @@ OBJECT*			TempObj;
 		DoGroupNormals = TRUE;
 
 		for (TempObj = lpsub;
-			TempObj != NULL && TempObj->flags & OBJECT_NOTOBJECT;
+			TempObj != nullptr && TempObj->flags & OBJECT_NOTOBJECT;
 			TempObj = TempObj->child)
 			;
 
 		// foliage material objects don't need grouped normals
-		if (TempObj != NULL)
+		if (TempObj != nullptr)
 		{
 			if (TempObj->matid == FoliageMatId)
 			{
@@ -2014,7 +2013,7 @@ OBJECT*			TempObj;
 			case OBJVAL_PLACE_ROTATE:
 			case OBJVAL_OCTET_REPLACE:
 			case OBJVAL_OCTET_CONFORMRADIAL:
-				for (i=1 ; i < 10 ; i++)
+				for (i=1; i < 10; i++)
 				{
 					if (!obmainFindObjectLOD(lpsub, i, (PROCESSCALLBACK)_UpdateGroupNormals))
 					{
@@ -2112,7 +2111,7 @@ bool trnopDynamicBase(const FLOAT64VECTOR& worldPos, // this is a reference beca
 
 			if(collider.getCollisions(rays[r], hits, false))
 			{
-				colliderQuery::Collision* hit = NULL;
+				colliderQuery::Collision* hit = nullptr;
 
 				for(unsigned int i = 0; i < hits.size(); ++i)
 				{
@@ -2199,9 +2198,9 @@ SINT32 _ParseSpeedTreeComment(SCHAR* comment, SINT32 treevalues[])
 
     if(!p1) return -1;
 
-    SCHAR szTokens[] = "=,n\0";
+    static const char* szTokens = "=,n\0";
     SCHAR begin[128];
-    SCHAR* pToken = NULL;
+    SCHAR* pToken = nullptr;
     SINT32 i = 1;
 
     strcpy(begin, p1);
@@ -2212,9 +2211,9 @@ SINT32 _ParseSpeedTreeComment(SCHAR* comment, SINT32 treevalues[])
 
     pToken = strtok(begin, szTokens);
 
-    while(pToken != NULL)
+    while(pToken != nullptr)
     {
-        pToken = strtok(NULL, szTokens);
+        pToken = strtok(nullptr, szTokens);
 
         if(pToken)
         {
@@ -2229,9 +2228,9 @@ SINT32 _ParseSpeedTreeComment(SCHAR* comment, SINT32 treevalues[])
 
 static LOGICAL _UpdateGroupNormals(OBJECT * Object, UINT32 DummyNum)
 {
-	if (Object != NULL)
+	if (Object != nullptr)
 	{
-		if (Object->child != NULL)
+		if (Object->child != nullptr)
 		{
 			trnopRecalcBoundsAndNormals(Object->child);
 		}
@@ -2259,9 +2258,9 @@ static LOGICAL _UpdateBaseGroupNormals(OBJECT * Object)
 {
 SINT32		i;
 
-	if (Object != NULL)
+	if (Object != nullptr)
 	{
-		for (i=1 ; i < 10 ; i++)
+		for (i=1; i < 10; i++)
 		{
 			if (!obmainFindObjectLOD(Object, i, (PROCESSCALLBACK)_UpdateBaseNormals))
 			{

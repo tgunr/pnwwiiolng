@@ -10,29 +10,27 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include <vector>
-
-class OOBMessage ;
-class CPStruct ;
-class FacilityStruct ;
+class OOBMessage;
+class CPStruct;
+class FacilityStruct;
 
 struct DOT_COMMANDS
 {
-	const char*	command ;
-	LOGICAL (*stub)(char* arguments, OOBMessage& message) ;
-	const char*	description ;
-} ;
-extern DOT_COMMANDS dotCommands[] ;
+	const char*	command;
+	LOGICAL (*stub)(char* arguments, OOBMessage& message);
+	const char*	description;
+};
+extern DOT_COMMANDS dotCommands[];
 
-extern std::vector<const char*> script_args ;
+extern std::vector<const char*> script_args;
 
-extern void strtProcessOOBMessage(OOBMessage& message) ;
-extern OOBMessage* script_env ;
+extern void strtProcessOOBMessage(OOBMessage& message);
+extern OOBMessage* script_env;
 
 //tolua_begin
-extern void dotApplyConfig() ;
+extern void dotApplyConfig();
 
-extern CPStruct* targeted_cp ;
-extern FacilityStruct* targeted_fac ;
+extern CPStruct* targeted_cp;
+extern FacilityStruct* targeted_fac;
 
 //tolua_end

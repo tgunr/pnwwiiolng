@@ -12,7 +12,6 @@
 #include <assert.h>
 #include <vector>
 #include "include/vars.h"
-#include "dbug/dbug.h"
 #include "fio/fio.h"
 #include "lua/luaMain.h"
 #include "tut/tutLua.h"
@@ -39,12 +38,6 @@
 #include "include/platforms.h"
 #include "fp/fpFPS.h"
 
-#if defined(USE_OSG)
-#include "osgVehicle/vehicleSpawn.h"
-#include "osgPlayer/osgPlayerLua.h"
-#include "osgVehicle/osgVehicleLua.h"
-#include "osgTerrain/osgTerrainLua.h"
-#else
 #include "pers/persLua.h"
 #include "veh/vehLua.h"
 #include "trn/trnLua.h"
@@ -52,7 +45,6 @@
 #include "ml/mltypes.h"
 #include "veh/vehtype.h"
 #include "veh/vehcomms.h"
-#endif
 
 #define LUA_GAME_LIB "game"
 #define LUA_GAME_RC "include/common.lua"
@@ -84,7 +76,7 @@ static int _luaOS(lua_State* L);
 static int _luaDead(lua_State* L);
 
 // types and locals
-std::vector<const char*> script_args ;
+std::vector<const char*> script_args;
 
 // game lib names
 static char* _gameLibs[GPT_NUM_TYPES] =
@@ -116,23 +108,23 @@ SCRIPT_RESULTS _luaOutput;
 
 static inline void _report(UINT32 level, const char* message)
 {
-	std::string output ;
+	std::string output;
 
-	if ( message == NULL )
-		return ;
+	if ( message == nullptr )
+		return;
 
 	// Save the output
 	switch (level)
 	{
-		case Debug::ERR_WARN:	output += "!: " ; break ;
-		case Debug::ERR_FATAL:	output += "<!>: " ; break ;
-		break ;
+		case Debug::ERR_WARN:	output += "!: "; break;
+		case Debug::ERR_FATAL:	output += "<!>: "; break;
+		break;
 	}
 
-	output += message ;
-	output += "\n" ;
+	output += message;
+	output += "\n";
 
-	_luaOutput.push_back(output) ;
+	_luaOutput.push_back(output);
 
 	uiChatPrintLine("LUA(%s): %s", _luaSubSystem.c_str(), output.c_str());
 	//uiConsoleprintf("LUA(%s): %s", _luaSubSystem.c_str(), output.c_str());
@@ -148,7 +140,7 @@ static inline void _report(UINT32 level, const char* message)
 
 char* luaARGS(int i)
 {
-	return ( i >= (int)script_args.size() ) ? NULL : (char*)script_args[i] ;
+	return ( i >= (int)script_args.size() ) ? nullptr : (char*)script_args[i];
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -156,9 +148,9 @@ char* luaARGS(int i)
 
 static inline bool _luaError(lua_State* L)
 {
-	error(lua_tostring(L, -1)) ;
-	lua_pop(L, 1) ;
-	return false ;
+	error(lua_tostring(L, -1));
+	lua_pop(L, 1);
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -166,26 +158,26 @@ static inline bool _luaError(lua_State* L)
 
 void _luaContext(const char* source = "?", const char* func = "?")
 {
-	_luaSource = source ;
-	_luaSubSystem = func ;
+	_luaSource = source;
+	_luaSubSystem = func;
 }
 
-static std::string _prevSource = "" ;
-static std::string _prevSub = "" ;
+static std::string _prevSource = "";
+static std::string _prevSub = "";
 
 void luaSetContext(const char* func)
 {
-	_prevSource = _luaSource ;
-	_prevSub = _luaSubSystem ;
+	_prevSource = _luaSource;
+	_prevSub = _luaSubSystem;
 
-	_luaSource = "code" ;
-	_luaSubSystem = func ;
+	_luaSource = "code";
+	_luaSubSystem = func;
 }
 
 void luaEndContext()
 {
-	_luaSource = _prevSource ;
-	_luaSubSystem = _prevSub ;
+	_luaSource = _prevSource;
+	_luaSubSystem = _prevSub;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -301,9 +293,9 @@ bool __luaRunCode(lua_State* L, const char* code, const char* function)
 
 lua_State* luaGetVM(bool defaultVM)
 {
-	if(defaultVM && _luaVM != NULL)
+	if(defaultVM && _luaVM != nullptr)
 	{
-		uiConsoleprintf("Attempted to restart active default vm") ;
+		uiConsoleprintf("Attempted to restart active default vm");
 		return _luaVM;
 	}
 
@@ -312,13 +304,13 @@ lua_State* luaGetVM(bool defaultVM)
 
 	lua_State* vm = lua_open();
 
-	if (vm == NULL)
+	if (vm == nullptr)
 	{
-		uiConsoleprintf("Unable to start lua interpreter") ;
-		return NULL;
+		uiConsoleprintf("Unable to start lua interpreter");
+		return nullptr;
 	}
 
-	// open default lubs
+	// open default libs
 	luaL_openlibs(vm);
 
 	// init tolua
@@ -346,8 +338,8 @@ lua_State* luaGetVM(bool defaultVM)
 
 bool luaStopVM(lua_State* L)
 {
-	_luaContext() ;
-	_luaOutput.clear() ;
+	_luaContext();
+	_luaOutput.clear();
 
 	uiConsoleprintf("Stopping Lua VM");
 
@@ -355,14 +347,14 @@ bool luaStopVM(lua_State* L)
 	{
 		if(_luaVM)
 		{
-			lua_close(_luaVM) ;
-			_luaVM = NULL ;
+			lua_close(_luaVM);
+			_luaVM = nullptr;
 			return true;
 		}
 	}
 	else
 	{
-		lua_close(L) ;
+		lua_close(L);
 		return true;
 	}
 
@@ -374,7 +366,7 @@ bool luaStopVM(lua_State* L)
 
 SCRIPT_RESULTS& luaResults()
 {
-	return _luaOutput ;
+	return _luaOutput;
 }
 
 int luaLoadLib(GAME_PKG_TYPE type, lua_State* L)
@@ -406,8 +398,8 @@ int luaLoadLib(GAME_PKG_TYPE type, lua_State* L)
 bool _initGameLib(lua_State* L)
 {
 	tolua_open(L);
-	tolua_module(L,NULL,0);
-	tolua_beginmodule(L,NULL);
+	tolua_module(L,nullptr,0);
+	tolua_beginmodule(L,nullptr);
 	    tolua_module(L,LUA_GAME_LIB,0);
 		tolua_beginmodule(L,LUA_GAME_LIB);
 			tolua_function(L,"LoadLib",_luaLoadLib);
@@ -484,29 +476,17 @@ int _luaSpawn(lua_State* L)
 		}
 		else
 		{
-			const vehType* vtype = NULL;
-			const StratDB::StratObject* origin = NULL;
+			const vehType* vtype = nullptr;
+			const StratDB::StratObject* origin = nullptr;
 
-			if(tolua_isusertype(L, 1, "const vehType", 0, NULL))
+			if(tolua_isusertype(L, 1, "const vehType", 0, nullptr))
 				vtype = ((const vehType*)tolua_tousertype(L, 1, 0));
 
-			if(tolua_isusertype(L, 2, "const StratDB::StratObject", 0, NULL))
+			if(tolua_isusertype(L, 2, "const StratDB::StratObject", 0, nullptr))
 				origin = ((const StratDB::StratObject*)tolua_tousertype(L, 2, 0));
 
 			if(vtype)
 			{
-#if defined(USE_OSG)
-				vehicleSpawnAtDefaultLocation(vtype->Type);
-				vehicleSpawnWithVehicle(vtype->WeaponSpec);
-
-				if(origin)
-				{
-					const StratDB::StratObject* spawner = jsGame::GetOfflineSpawn(origin, vtype->Type);
-					if(spawner) vehicleSpawnAtFacility(*spawner->FullObjID());
-				}
-
-				vehicleSpawnStartSpawn();
-#else
 				// do old game spawn stuff here
 				mlSetSpawnStuff(0, 0, -1, 1);
 
@@ -518,7 +498,6 @@ int _luaSpawn(lua_State* L)
 
 				WEAPON_SERIAL blah={0};
 				vehcommSendVehicleRequest(vtype->VehicleTypeNum, &blah);
-#endif
 
 				// call spawner
 				success = 1;
@@ -537,16 +516,16 @@ int _luaSpawnAt(lua_State* L)
 
 	if(!uiInGame())
 	{
-		const vehType* vtype = NULL;
+		const vehType* vtype = nullptr;
 		double x, y, z;
 		x = y = z = 0;
 
-		if(tolua_isusertype(L, 1, "const vehType", 0, NULL))
+		if(tolua_isusertype(L, 1, "const vehType", 0, nullptr))
 			vtype = ((const vehType*)tolua_tousertype(L, 1, 0));
 
-		if(tolua_isnumber(L, 2, 0, NULL)) x = tolua_tonumber(L, 2, 0);
-		if(tolua_isnumber(L, 3, 0, NULL)) y = tolua_tonumber(L, 3, 0);
-		if(tolua_isnumber(L, 4, 0, NULL)) z = tolua_tonumber(L, 4, 0);
+		if(tolua_isnumber(L, 2, 0, nullptr)) x = tolua_tonumber(L, 2, 0);
+		if(tolua_isnumber(L, 3, 0, nullptr)) y = tolua_tonumber(L, 3, 0);
+		if(tolua_isnumber(L, 4, 0, nullptr)) z = tolua_tonumber(L, 4, 0);
 
 		if(vtype)
 		{
@@ -583,18 +562,11 @@ int _luaSpawnAt(lua_State* L)
 			}
 			else
 			{
-#if defined(USE_OSG)
-				vehicleSpawnAtDefaultLocation(vtype->Type);
-				vehicleSpawnWithVehicle(vtype->WeaponSpec);
-				vehicleSpawnAtWorldPosition(x, y, z);
-				vehicleSpawnStartSpawn();
-#else
 				// do old game spawn stuff here
 				mlSetSpawnStuff(0, 0, -1, 1);
 				mlSetMobileSpawnStuff(0, x, y, z);
 				WEAPON_SERIAL blah={0};
 				vehcommSendVehicleRequest(vtype->VehicleTypeNum, &blah);
-#endif
 				// call spawner
 				success = 1;
 			}

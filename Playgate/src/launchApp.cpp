@@ -33,8 +33,8 @@ static TEUL_CALLBACK*  _LoginReq;
 static TEUL_CALLBACK*  _ArenaReq;
 static TEUL_CALLBACK*  _ArenaReq2;
 static TEUL_CALLBACK*  _LaunchReq;
-static TEUL_CALLBACK*  _GetGameList ;
-static TEUL_CALLBACK*  _LoginXchg ;
+static TEUL_CALLBACK*  _GetGameList;
+static TEUL_CALLBACK*  _LoginXchg;
 
 static APP_LAUNCH _AppLaunch;
 static char		_SavedRegistryKey[MAX_REG_KEY];
@@ -47,29 +47,29 @@ APP_LAUNCH  AppLaunch;
 
 bool launchOpenConnection()
 {
-	static int attempt = 0 ;
+	static int attempt = 0;
 
-	++attempt ;
+	++attempt;
 	playgate.SetStatus(GetLoc(AUTH_CONNECTING, g_authHostName, attempt), AppNote);
 
-	for ( UINT32 i = 0 ; i < g_authHosts.size() ; ++i )
+	for ( UINT32 i = 0; i < g_authHosts.size(); ++i )
 	{
 		if ( commOpenConnection(g_authHosts[i], g_authPort) )
 		{
 			playgate.SetStatus(GetLoc(AUTH_CONNECTED, g_authHostName), AppProgress);
-			return true ;
+			return true;
 		}
 	}
 
 	playgate.SetStatus(GetLoc(AUTH_NO_CONNECT, dbugGetErrno()), AppError);
 
-	return false ;
+	return false;
 }
 
 void
 Auth::LoginRequest::send()
 {
-	commSend(_LoginXchg, this) ;
+	commSend(_LoginXchg, this);
 }
 
 LOGICAL launchArenaRequest()
@@ -83,8 +83,8 @@ LOGICAL launchArenaRequest()
 	ArenaRequest.presenterVersion = g_playgateVersion;
 
 	// Username is stored as wide characters, convert to UTF8
-	loginData.GetUsernameAsUTF8(ArenaRequest.username, sizeof(ArenaRequest.username)) ;
-	loginData.GetPasswordMD5(ArenaRequest.password, MAX_PASSWORD) ;
+	loginData.GetUsernameAsUTF8(ArenaRequest.username, sizeof(ArenaRequest.username));
+	loginData.GetPasswordMD5(ArenaRequest.password, MAX_PASSWORD);
 
 	if ( commSend(_ArenaReq2, &ArenaRequest) < 0 )
 	{
@@ -101,7 +101,7 @@ static SINT32 _RecievePlayGateOk(ACTION_OBJECT *a)
 {
 	playgate.SetStatus(GetLoc(AUTH_OK));
 /*
-	if (launchGetPassword(0, NULL))
+	if (launchGetPassword(0, nullptr))
 		launchArenaRequest(loginData.m_arenaID, g_sessionID);
 */
 
@@ -114,8 +114,8 @@ APP_LAUNCH_REQ LaunchRequest;
 SINT32         NumberOfInstances;
 UINT32         CurrentVer;
 
-	loginData.GetUsernameAsUTF8(LaunchRequest.username, sizeof(LaunchRequest.username)) ;
-	loginData.GetPasswordMD5(LaunchRequest.password, sizeof(LaunchRequest.password)-1) ;
+	loginData.GetUsernameAsUTF8(LaunchRequest.username, sizeof(LaunchRequest.username));
+	loginData.GetPasswordMD5(LaunchRequest.password, sizeof(LaunchRequest.password)-1);
 
 	LaunchRequest.status = 0;
 	LaunchRequest.cdKeySize = 0;
@@ -167,27 +167,27 @@ UINT32         CurrentVer;
 
 bool launchRequestGameList()
 {
-	UINT32 dummy = 0 ;
+	UINT32 dummy = 0;
 	if ( commSend(_GetGameList, &dummy) < 0 )
 	{
 		playgate.SetStatus(GetLoc(AUTH_SERVER_FAIL), AppError);
 		return false;
 	}
 
-	return true ;
+	return true;
 }
 
 static SINT32 _RequestGameList(ACTION_OBJECT* a)
 {
-	return a->offset ;
+	return a->offset;
 }
 
 static SINT32 _ReceiveGameList(ACTION_OBJECT *a)
 {
-	Auth::g_games.packer(TEUL_UNPACK, a) ;
+	Auth::g_games.packer(TEUL_UNPACK, a);
 	if ( a->offset >= 0 )
-		Auth::g_games.process() ;
-	return a->offset ;
+		Auth::g_games.process();
+	return a->offset;
 }
 
 static SINT32 _SendArenaReq2(ACTION_OBJECT *a)
@@ -214,7 +214,7 @@ static SINT32 _SendLaunchReq(ACTION_OBJECT *a)
 
 static SINT32 _SendLoginRequest(ACTION_OBJECT* a)
 {
-	return ((Auth::LoginRequest*)a->localRawData)->packer(TEUL_PACK, a) ;
+	return ((Auth::LoginRequest*)a->localRawData)->packer(TEUL_PACK, a);
 }
 
 static SINT32 _ReceiveAppLaunch(ACTION_OBJECT *Action)
@@ -228,11 +228,11 @@ static SINT32 _ReceiveAppLaunch(ACTION_OBJECT *Action)
 		strcpy_s(_DownloadPage, AppLaunch.data);
 		playgate.PostCommand(MSG_DOWNLOAD, (UINT32)_DownloadPage);
 		_CleanUpLaunchData();
-		playgate.Quit() ;
+		playgate.Quit();
 
-		return 0 ;
+		return 0;
 
-	break ;
+	break;
 
 	case Auth::Apps::BROWSER:
 	case Auth::Apps::WEB_DOWNLOAD:
@@ -270,9 +270,9 @@ static SINT32 _ReceiveAppLaunch(ACTION_OBJECT *Action)
 
 			_CleanUpLaunchData();
 
-			playgate.Quit() ;
+			playgate.Quit();
 
-			return 0 ;
+			return 0;
 		}
 	}
 
@@ -282,7 +282,7 @@ static SINT32 _ReceiveAppLaunch(ACTION_OBJECT *Action)
 
 	_CleanUpLaunchData();
 
-	playgate.Quit() ;
+	playgate.Quit();
 
 	return 0;
 }
@@ -307,37 +307,37 @@ static SINT32 _ReceiveAppVerify(ACTION_OBJECT *Action)
 
 static SINT32 _RecvLoginReply(ACTION_OBJECT* a)
 {
-	Auth::LoginReply reply(a) ;
+	Auth::LoginReply reply(a);
 	if ( a->offset >= 0 )
-		reply.process() ;
-	return a->offset ;
+		reply.process();
+	return a->offset;
 }
 
 extern SINT32 launchInstallCallbacks(void)
 {
 	try
 	{
-		_ArenaReq = commInstallMessage(Auth::CallbackX, ARENA_REQ_Y, _SendArenaReq, NULL);
-		if ( _ArenaReq == NULL )
-			throw 1 ;
-		_ArenaReq2 = commInstallMessage(Auth::CallbackX, ARENA_REQ2_Y, _SendArenaReq2, NULL);
-		if ( _ArenaReq2 == NULL )
-			throw 2 ;
+		_ArenaReq = commInstallMessage(Auth::CallbackX, ARENA_REQ_Y, _SendArenaReq, nullptr);
+		if ( _ArenaReq == nullptr )
+			throw 1;
+		_ArenaReq2 = commInstallMessage(Auth::CallbackX, ARENA_REQ2_Y, _SendArenaReq2, nullptr);
+		if ( _ArenaReq2 == nullptr )
+			throw 2;
 		_LaunchReq = commInstallMessage(Auth::CallbackX, APP_LAUNCH_REQ_Y, _SendLaunchReq, _errorFunc);
-		if ( _LaunchReq == NULL )
-			throw 3 ;
-		if ( commInstallMessage(Auth::CallbackX, APP_LAUNCH_Y, NULL, _ReceiveAppLaunch) == NULL )
-			throw 4 ;
-		if ( commInstallMessage(Auth::CallbackX, APP_VERIFY_Y, NULL, _ReceiveAppVerify) == NULL)
-			throw 5 ;
-		if ( commInstallMessage(Auth::CallbackX, APP_PLAYGATE_OK_Y, NULL, _RecievePlayGateOk) == NULL )
-			throw 6 ;
-		_GetGameList = commInstallMessage(Auth::CallbackX, APP_XCHG_GAME_LIST_Y, _RequestGameList, _ReceiveGameList) ;
-		if ( NULL == _GetGameList )
-			throw 7 ;
-		_LoginXchg = commInstallMessage(Auth::CallbackX, AUTH_XCHG_LOGIN_Y, _SendLoginRequest, _RecvLoginReply) ;
-		if ( NULL == _LoginXchg )
-			throw 8 ;
+		if ( _LaunchReq == nullptr )
+			throw 3;
+		if ( commInstallMessage(Auth::CallbackX, APP_LAUNCH_Y, nullptr, _ReceiveAppLaunch) == nullptr )
+			throw 4;
+		if ( commInstallMessage(Auth::CallbackX, APP_VERIFY_Y, nullptr, _ReceiveAppVerify) == nullptr)
+			throw 5;
+		if ( commInstallMessage(Auth::CallbackX, APP_PLAYGATE_OK_Y, nullptr, _RecievePlayGateOk) == nullptr )
+			throw 6;
+		_GetGameList = commInstallMessage(Auth::CallbackX, APP_XCHG_GAME_LIST_Y, _RequestGameList, _ReceiveGameList);
+		if ( nullptr == _GetGameList )
+			throw 7;
+		_LoginXchg = commInstallMessage(Auth::CallbackX, AUTH_XCHG_LOGIN_Y, _SendLoginRequest, _RecvLoginReply);
+		if ( nullptr == _LoginXchg )
+			throw 8;
 	}
 	catch ( int n )
 	{

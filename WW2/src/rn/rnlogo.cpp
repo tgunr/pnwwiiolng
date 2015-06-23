@@ -19,15 +19,11 @@
 #include "phui/Message.h"
 #include "teul/teulBasic.h"
 
-#if defined(USE_OSG)
-#include "osg/osgGame.h"
-#endif
-
 /************************************************************************************************
 	rnlogo
 *************************************************************************************************/
 
-#if RELEASE_CLIENT != 0 && !defined(USE_OSG)
+#if RELEASE_CLIENT != 0
 #define DISPLAY_LOGO
 #endif
 
@@ -84,9 +80,6 @@ LOGICAL rnlogoInit(void)
 
 	LoadingScreen = 1;
 
-#ifdef DOROTHY
-	_loadingscreen = uiLoadView("dorothy/loading");
-#else
 	if(_isWidescreen())
 	{
 		_loadingscreen = uiLoadView("loadingscreen69");
@@ -96,7 +89,6 @@ LOGICAL rnlogoInit(void)
 		_loadingscreen = uiLoadView("loadingscreen43");
 	}
 
-#endif
 	if(!_loadingscreen) return FALSE;
 
 	_status = _loadingscreen->FindView("status");
@@ -139,13 +131,9 @@ LOGICAL rnlogoInit(void)
 
 LOGICAL rnlogoRender(void)
 {
-	piSetDDRender(NULL);
+	piSetDDRender(nullptr);
 
-#if defined(USE_OSG)
-	piSetD3DRender(osgGameUpdate);
-#else
 	piSetD3DRender(gmlpMainUpdate);
-#endif
 	piResetFPS();
 
     LoadingScreen = 0;
@@ -296,67 +284,6 @@ static void _displayLogo()
 	//_playStartupMovie("start0");
 	//_playStartupMovie("start");
 
-#ifndef DOROTHY
-	phui::View* splashscreen ;
-	if(_isWidescreen())	{splashscreen = uiLoadView("splashscreen69");}
-	else {splashscreen = uiLoadView("splashscreen43");}
-
-	if(splashscreen)
-	{
-		uiUpdate();
-		uiDraw();
-		piFlip();
-		UpdateGameClocks();
-
-		for(_startloadtime = frametime; _keyEntered() == false && frametime < _startloadtime + 5000; UpdateGameClocks())
-		{
-			std::this_thread::yield();
-			if (!running)
-				piExitProgram(__FILE__, __LINE__, "Exit requested during startup");
-		}
-
-		uiViewport()->RemoveChild(splashscreen);
-		delete splashscreen;
-
-		if(_isWidescreen()) {uiFreeTexture(_wideSplashScreen);}
-		else {uiFreeTexture(_stdSplashScreen);}
-	}
-#endif
-}
-#endif
-
-#if(0)
-static void _playStartupMovie(const char* filename)
-{
-	uiMovieView* movieview = new uiMovieView;
-	uiViewport()->AddChild(movieview);
-	sysMovie* movie = new sysMovie;
-	movieview->Show();
-	movieview->ResizeTo((float)WantedWidth, (float)WantedHeight);
-	movieview->SetMovie(movie);
-
-	if(movie->Load(filename))
-	{
-
-		movie->Start(frametime);
-
-		for(;;)
-		{
-			if(!movie->Playing() || _keyEntered()) break;
-
-			if (!running)
-				piExitProgram(__FILE__, __LINE__, "Exit requested during startup");
-
-			uiUpdate();
-			uiDraw();
-#if platOS == OS_MACOS
-			piFlip();
-#endif
-			UpdateGameClocks();
-		}
-	}
-	uiViewport()->RemoveChild(movieview);
-	delete movieview;
 }
 #endif
 

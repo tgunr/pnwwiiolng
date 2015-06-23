@@ -31,32 +31,32 @@ public:
 		, m_missionID(withMissionID)
 		{
 		}
-	ServerSTO(ACTION_OBJECT* const a) ;
+	ServerSTO(ACTION_OBJECT* const a);
 
 protected:
-	enum EventType { Creation, Destruction } ;
-	void _audit(EventType) ;
+	enum EventType { Creation, Destruction };
+	void _audit(EventType);
 
 public:
-	virtual bool activate() ;
-	virtual void deactivate() ;
+	virtual bool activate() OVERRIDE_FN;
+	virtual void deactivate() OVERRIDE_FN;
 
-	virtual bool applyJoules(const SINT64& /*joules*/, class Player* /*player*/=NULL) { return false ; }
+	virtual bool applyJoules(const SINT64& /*joules*/, class Player* /*player*/=nullptr) OVERRIDE_FN { return false; }
 
 	virtual void extractPlayer(const Player* /*player*/) { }
 
-	virtual const char* typeName() const { return "generic" ; }
+	virtual const char* typeName() const { return "generic"; }
 
-	virtual bool needsBroadcastRemoval() const { return lifespan() > 1 && age() < lifespan() ; }
+	virtual bool needsBroadcastRemoval() const { return lifespan() > 1 && age() < lifespan(); }
 
 public:
-	UINT32		creatorID() const { return m_creatorID ; }
-	WWII_SIDE	side() const { return m_side ; }
-	UINT32		missionID() const { return m_missionID ; }
+	UINT32		creatorID() const { return m_creatorID; }
+	WWII_SIDE	side() const { return m_side; }
+	UINT32		missionID() const { return m_missionID; }
 
 private:
-	UINT32			m_creatorID ;
-	WWII_SIDE		m_side ;
-	UINT32			m_missionID ;
-} ;
+	UINT32			m_creatorID;
+	WWII_SIDE		m_side;
+	UINT32			m_missionID;
+};
 

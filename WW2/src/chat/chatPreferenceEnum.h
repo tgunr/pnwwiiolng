@@ -25,4 +25,4 @@ enum CHAT_PREFERENCE
 // Add new entries above here
 
 ,	MAX_CHAT_PREFERENCE
-} ;
+};

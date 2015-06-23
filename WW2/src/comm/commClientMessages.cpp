@@ -40,23 +40,23 @@ TEUL_CALLBACK*				HOST_KILL;
 TEUL_CALLBACK*				commCLIENT_HIT;
 static TEUL_CALLBACK*		_PLAYER_EXIT;
 static TEUL_CALLBACK*		_REQ_JOIN_VEHICLE;
-static TEUL_CALLBACK*		_XCHG_SPAWN_DEPLOYMENT ;
+static TEUL_CALLBACK*		_XCHG_SPAWN_DEPLOYMENT;
 
 // WWIIOL specific.
 TEUL_CALLBACK*				commSTRAT_DAMAGE;
 
-SINT32 g_lastPing = -1 ;
+SINT32 g_lastPing = -1;
 
 SINT32 commSendPlayerExit(SINT32 teulIndex, PLAYER_DESTINATION destination,	PLAYER_EXIT_CODE exitCode, FULL_OBJ_ID facility)
 {
-	ENDPOINT* const endpoint = teulGetEndpoint(teulIndex) ;
+	ENDPOINT* const endpoint = teulGetEndpoint(teulIndex);
 	if ( teulIndex < 0 )
-		return -EINVAL ;
+		return -EINVAL;
 
 	// Make sure nagle is disabled so that this actually gets sent.
-	endpoint->setNagleEnabled(false) ;
+	endpoint->setNagleEnabled(false);
 
-	PLAYER_EXIT pe = { destination, exitCode, facility } ;
+	PLAYER_EXIT pe = { destination, exitCode, facility };
 	return teulSend(teulIndex, _PLAYER_EXIT, &pe);
 }
 
@@ -72,8 +72,8 @@ static SINT32 _sendVehicleJoinRequest( ACTION_OBJECT* const a )
 
 static SINT32 _sendPeriodicUpdate( ACTION_OBJECT* const a )
 {
-	COMM_UPDATE_BUFFER* const cub = (COMM_UPDATE_BUFFER*)(a->localRawData) ;
-	return teulPackVoid(TEUL_PACK, a->packed, a->offset, cub->data, cub->size) ;
+	COMM_UPDATE_BUFFER* const cub = (COMM_UPDATE_BUFFER*)(a->localRawData);
+	return teulPackVoid(TEUL_PACK, a->packed, a->offset, cub->data, cub->size);
 }
 
 static SINT32 _sendStratDamage( ACTION_OBJECT* const a )
@@ -83,9 +83,9 @@ static SINT32 _sendStratDamage( ACTION_OBJECT* const a )
 
 static SINT32 _sendClientVehicleHit(ACTION_OBJECT* const a)
 {
-	Vehicle::Hit* const hit = (Vehicle::Hit*)(a->localRawData) ;
-	hit->packer(TEUL_PACK, a) ;
-	return a->offset ;
+	Vehicle::Hit* const hit = (Vehicle::Hit*)(a->localRawData);
+	hit->packer(TEUL_PACK, a);
+	return a->offset;
 }
 
 static SINT32 _sendPlayerExit(ACTION_OBJECT* const a)
@@ -126,68 +126,64 @@ static SINT32 _recvVehicleAcknowledge( ACTION_OBJECT* const a )
 
 #include "wwii/wwiiRunningAverage.h"
 
-static RunningAverage<UINT32, 120> pingHistogram ;
-SINT32 g_averagePing = 0 ;
+static RunningAverage<UINT32, 120> pingHistogram;
+SINT32 g_averagePing = 0;
 
 SINT32 commRecvWorldUpdateData(const SINT32 teulIndex, UCHAR* const data, SINT32 offset, const SINT32 size_bytes)
 {
-	WORLD_UPDATE wu ;
-	memset(&wu, 0, sizeof(WORLD_UPDATE)) ;
+	WORLD_UPDATE wu;
+	memset(&wu, 0, sizeof(WORLD_UPDATE));
 
 	// #1 unpack the header.
-	wu.header = *(WORLD_UPDATE::Header*)(data) ;
-	offset += Teul::BytesToBits(sizeof(wu.header)) ;
+	wu.header = *(WORLD_UPDATE::Header*)(data);
+	offset += Teul::BytesToBits(sizeof(wu.header));
 
-	offset = updtPackWORLD_UPDATE(TEUL_UNPACK, data, offset, &wu, 0) ;
+	offset = updtPackWORLD_UPDATE(TEUL_UNPACK, data, offset, &wu, 0);
 
 	// Client side sanity check on the vehicle count.
 	if ( wu.header.numVehicles > MAX_VEH_PER_UPDATE )
 	{
-		clientErrorLog("badNV") ;
-		return -EINVAL ;
+		clientErrorLog("badNV");
+		return -EINVAL;
 	}
 
 	///TODO: Troy: GLOBALS MUST DIE!
 	// Note: the values are IN the World Update so you could just use that.
-	g_framingMode = wu.header.framingMode ;
-	g_hostUpdateInterval = framings[g_framingMode].updateInterval ;
+	g_framingMode = wu.header.framingMode;
+	g_hostUpdateInterval = framings[g_framingMode].updateInterval;
 
 	if ( wu.header.numVehicles > framings[g_framingMode].maxVehiclesPerFrame() )
 	{
-		clientErrorLog("badNVF") ;
-		return -EINVAL ;
+		clientErrorLog("badNVF");
+		return -EINVAL;
 	}
 
 	for(UINT32 i = 0; i < wu.header.numVehicles; i++)
 	{
-#ifdef USE_OSG
-		vehicleNetUpdateProessMsg(wu.vehUpdate[i]) ;
-#else
-		vehupdateProcessPositionUpdateMsg(&wu.vehUpdate[i]) ;
-#endif
+		vehupdateProcessPositionUpdateMsg(&wu.vehUpdate[i]);
 	}
 
 	clientWorldUpdate(teulIndex, &wu);
 
-	const size_t offInBytes = Teul::BitsToBytes(offset) ;
+	const size_t offInBytes = Teul::BitsToBytes(offset);
 	if ( offInBytes < (size_t)size_bytes )
 	{
-		TeulTimeMS& lastPing = *(UINT64*)(data + offInBytes) ;
-		teulSyncClock() ;
-		g_lastPing = std::min((UINT32)((teulClock64 - lastPing) / 2), (UINT32)1) ;
-		pingHistogram.add(g_lastPing) ;
-		g_averagePing = pingHistogram.average() ;
+		TeulTimeMS& lastPing = *(UINT64*)(data + offInBytes);
+		teulSyncClock();
+		g_lastPing = std::min((UINT32)((teulClock64 - lastPing) / 2), (UINT32)1);
+		pingHistogram.add(g_lastPing);
+		g_averagePing = pingHistogram.average();
 	}
 	else
 	{
-		g_lastPing = -1 ;
-		g_averagePing = 0 ;
+		g_lastPing = -1;
+		g_averagePing = 0;
 	}
 #ifdef VEHICLES_GAME_INFO
 	vehSaveLastWorldUpdate(wu);
 #endif
 
-	return offset ;
+	return offset;
 }
 
 static SINT32 _recvWorldUpdate( ACTION_OBJECT* const a )
@@ -196,8 +192,8 @@ static SINT32 _recvWorldUpdate( ACTION_OBJECT* const a )
 	if(Online)
 	{
 #endif
-	dbugWrite(_FLWS, "index: %d time: %d", a->teulIndex, teulClockBits(16));
-	a->offset = commRecvWorldUpdateData(a->teulIndex, a->packed, a->offset, a->sizeInBytes()) ;
+	dbugWrite(_FLWS, "index: %d time: %llu", a->teulIndex, teulClock64);
+	a->offset = commRecvWorldUpdateData(a->teulIndex, a->packed, a->offset, a->sizeInBytes());
 #ifdef MULTI_CLIENT
 	}
 #endif
@@ -206,7 +202,7 @@ static SINT32 _recvWorldUpdate( ACTION_OBJECT* const a )
 
 static SINT32 _recvHostVehicleHit( ACTION_OBJECT* const a )
 {
-	Vehicle::Hit hit(a) ;
+	Vehicle::Hit hit(a);
 
 	vehProcessVehicleHit(hit);
 
@@ -219,8 +215,8 @@ static SINT32 _recvHostVehicleHit( ACTION_OBJECT* const a )
 
 static SINT32 _recvRemoveList(ACTION_OBJECT* const a)
 {
-	WORLD_UPDATE wu ;
-	wu.packRemoveList(TEUL_UNPACK, a) ;
+	WORLD_UPDATE wu;
+	wu.packRemoveList(TEUL_UNPACK, a);
 
 	for(UINT32 i = 0; i < wu.numRemove; i++)
 	{
@@ -244,8 +240,7 @@ commSendKillNotice(SINT32 teulIndex, sortieid_t myVehicleID, sortieid_t hostVehi
 
 	lastKillReportedOnID = myVehicleID;
 
-	Teul::Packet outgoing(sizeof(sortieid_t), Comm::CallbackX, KILL_NOTICE_Y);
-	outgoing.append(hostVehicleID);
+	Teul::Packet outgoing(Teul::PacketId(Comm::CallbackX, KILL_NOTICE_Y), hostVehicleID);
 	outgoing.send(teulIndex);
 
 	vehupdateUpdate(TRUE);
@@ -262,7 +257,7 @@ DEATH_BY_BUILDING::receive(SINT32 teulIndex, DEATH_BY_BUILDING& incoming)
 	// We've been killed by the last building we were in, die die die
 	persKillCrew();
 
-	return 0 ;
+	return 0;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -271,15 +266,15 @@ DEATH_BY_BUILDING::receive(SINT32 teulIndex, DEATH_BY_BUILDING& incoming)
 static SINT32
 _recvResupplyIssue(ACTION_OBJECT* const a)
 {
-	ResupplyIssue incoming(a) ;
-	incoming.process() ;
-	return 0 ;
+	ResupplyIssue incoming(a);
+	incoming.process();
+	return 0;
 }
 
 ResupplyIssue::ResupplyIssue(ACTION_OBJECT* const a)
 {
-	a->offset = teulPackUINT32(TEUL_UNPACK, a->packed, a->offset, &m_fromHostIndex, 0) ;
-	a->offset = wwiiPackHandle(TEUL_UNPACK, a->packed, a->offset, &m_fromHandle, 0) ;
+	a->offset = teulPackUINT32(TEUL_UNPACK, a->packed, a->offset, &m_fromHostIndex, 0);
+	a->offset = wwiiPackHandle(TEUL_UNPACK, a->packed, a->offset, &m_fromHandle, 0);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -290,23 +285,23 @@ _recvMove(ACTION_OBJECT* const a)
 {
 	mlVehicleData* const VehicleData = persGetPersonaModelDataPtr();
 	if(!VehicleData)
-		return -EINVAL ;
+		return -EINVAL;
 
-	FLOAT64VECTOR pos ;
-	SINT32 value ;
+	FLOAT64VECTOR pos;
+	SINT32 value;
 
-	a->offset = teulPackSINT32(TEUL_UNPACK, a->packed, a->offset, &value, 0) ;
-	pos.x = (FLOAT64) value ;
+	a->offset = teulPackSINT32(TEUL_UNPACK, a->packed, a->offset, &value, 0);
+	pos.x = (FLOAT64) value;
 
-	a->offset = teulPackSINT32(TEUL_UNPACK, a->packed, a->offset, &value, 0) ;
-	pos.y = (FLOAT64) value ;
+	a->offset = teulPackSINT32(TEUL_UNPACK, a->packed, a->offset, &value, 0);
+	pos.y = (FLOAT64) value;
 
-	a->offset = teulPackSINT32(TEUL_UNPACK, a->packed, a->offset, &value, 0) ;
-	pos.z = (FLOAT64) value ;
+	a->offset = teulPackSINT32(TEUL_UNPACK, a->packed, a->offset, &value, 0);
+	pos.z = (FLOAT64) value;
 
 	if ( a->offset > 0 ) VehicleData->RenderPos = VehicleData->VehiclePos = pos;
 
-	return a->offset ;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -314,12 +309,12 @@ _recvMove(ACTION_OBJECT* const a)
 
 static SINT32 _recvInfDeath(ACTION_OBJECT* const a)
 {
-	REQUIRE_CLIENT_DATA_AS(ww2::Client, client) ;
-	InfDeath& death = a->read<InfDeath>() ;
+	REQUIRE_CLIENT_DATA_AS(ww2::Client, client);
+	InfDeath& death = a->read<InfDeath>();
 
 	// All yours troy :)
 
-	return a->offset ;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -330,9 +325,9 @@ InfDeath::Send(SINT32 teulIndex, const FLOAT32 x_, FLOAT32 y_, FLOAT32 z_, const
 				, const DeathType deathType_, const bool byEnvironment_, const UCHAR deathAngle_, const UCHAR deathForce_
 				)
 {
-	Teul::Packet outgoing(sizeof(InfDeath), Comm::CallbackX, INF_DEATH_Y) ;
-	CONSTRUCT_IN_PACKET(outgoing, InfDeath, x_, y_, z_, killedByIndex_, killedByHandle_, deathType_, byEnvironment_, deathAngle_, deathForce_) ;
-	return outgoing.send(teulIndex) ;
+	Teul::Packet outgoing(Teul::PacketId(Comm::CallbackX, INF_DEATH_Y));
+	outgoing.construct<InfDeath>(x_, y_, z_, killedByIndex_, killedByHandle_, deathType_, byEnvironment_, deathAngle_, deathForce_);
+	return outgoing.send(teulIndex);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -341,12 +336,12 @@ InfDeath::Send(SINT32 teulIndex, const FLOAT32 x_, FLOAT32 y_, FLOAT32 z_, const
 static SINT32
 _recvCaptureState(ACTION_OBJECT* const a)
 {
-	CaptureState incoming(a) ;
+	CaptureState incoming(a);
 
 	// let the client know about the new capture message
 	PlayerClient()->ProcessCaptureState(incoming);
 
-	return a->offset ;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -355,15 +350,15 @@ _recvCaptureState(ACTION_OBJECT* const a)
 static SINT32
 _recvStratEvents(ACTION_OBJECT* const a)
 {
-	Strat::EventPacket incoming(a) ;
+	Strat::EventPacket incoming(a);
 
 	// Do nothing unless the packer finds valid data.
 	if ( a->offset > 0 )
 	{
-		PlayerClient()->ProcessStratEventPacket(incoming) ;
+		PlayerClient()->ProcessStratEventPacket(incoming);
 	}
 
-	return a->offset ;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -373,9 +368,9 @@ _recvStratEvents(ACTION_OBJECT* const a)
 
 static SINT32 _recvGameTimeUpdate(ACTION_OBJECT* const a)
 {
-	Host::TimeUpdate update(a) ;
-	PlayerClient()->ProcessGameTimeUpdate(update) ;
-	return a->offset ;
+	Host::TimeUpdate update(a);
+	PlayerClient()->ProcessGameTimeUpdate(update);
+	return a->offset;
 }
 
 SINT32 commInstallClientCallbacks(void)
@@ -390,30 +385,30 @@ SINT32 commInstallClientCallbacks(void)
 
 	BEGIN_CALLBACK_REGISTRATION(Comm::CallbackX)
 
-		REGISTER_RECEIVER(WORLD_UPDATE_Y, _recvWorldUpdate) ;
-		REGISTER_RECEIVER(GRANT_VEHICLE_JOIN_Y, _recvVehicleAcknowledge) ;
-		REGISTER_RECEIVER(HOST_HIT_Y, _recvHostVehicleHit) ;
+		REGISTER_RECEIVER(WORLD_UPDATE_Y, _recvWorldUpdate);
+		REGISTER_RECEIVER(GRANT_VEHICLE_JOIN_Y, _recvVehicleAcknowledge);
+		REGISTER_RECEIVER(HOST_HIT_Y, _recvHostVehicleHit);
 
-		REGISTER_SENDER(VEH_JOIN_REQUEST_Y, _sendVehicleJoinRequest, _REQ_JOIN_VEHICLE) ;
-		REGISTER_SENDER(UPDATE_Y, _sendPeriodicUpdate, commUPDATE) ;
-		REGISTER_SENDER(CLIENT_HIT_Y, _sendClientVehicleHit, commCLIENT_HIT) ;
+		REGISTER_SENDER(VEH_JOIN_REQUEST_Y, _sendVehicleJoinRequest, _REQ_JOIN_VEHICLE);
+		REGISTER_SENDER(UPDATE_Y, _sendPeriodicUpdate, commUPDATE);
+		REGISTER_SENDER(CLIENT_HIT_Y, _sendClientVehicleHit, commCLIENT_HIT);
 
-		REGISTER_SENDRECV(PLAYER_EXIT_Y, _sendPlayerExit, _recvPlayerExit, _PLAYER_EXIT) ;
+		REGISTER_SENDRECV(PLAYER_EXIT_Y, _sendPlayerExit, _recvPlayerExit, _PLAYER_EXIT);
 
-		REGISTER_RECEIVER(INF_DEATH_Y, _recvInfDeath) ;
+		REGISTER_RECEIVER(INF_DEATH_Y, _recvInfDeath);
 
-		REGISTER_RECEIVER(RESUPPLY_ISSUE_Y, _recvResupplyIssue) ;
+		REGISTER_RECEIVER(RESUPPLY_ISSUE_Y, _recvResupplyIssue);
 
-		REGISTER_RECEIVER(MOVE_Y, _recvMove) ;
+		REGISTER_RECEIVER(MOVE_Y, _recvMove);
 
-		REGISTER_RECEIVER(REMOVE_LIST_Y, _recvRemoveList) ;
-		REGISTER_RECEIVER(GAME_TIME_UPDATE_Y, _recvGameTimeUpdate) ;
+		REGISTER_RECEIVER(REMOVE_LIST_Y, _recvRemoveList);
+		REGISTER_RECEIVER(GAME_TIME_UPDATE_Y, _recvGameTimeUpdate);
 
 		// WW2OL specific.
-		REGISTER_SENDER(DAMAGE_LIST_Y, _sendStratDamage, commSTRAT_DAMAGE) ;
-		REGISTER_RECEIVER(CAPTURE_STATE_Y, _recvCaptureState) ;
+		REGISTER_SENDER(DAMAGE_LIST_Y, _sendStratDamage, commSTRAT_DAMAGE);
+		REGISTER_RECEIVER(CAPTURE_STATE_Y, _recvCaptureState);
 		REGISTER_MSG_RECEIVER(DEATH_BY_BUILDING_Y, DEATH_BY_BUILDING);
-		REGISTER_RECEIVER(STRAT_EVENTS_Y, _recvStratEvents) ;
+		REGISTER_RECEIVER(STRAT_EVENTS_Y, _recvStratEvents);
 
 	END_CALLBACK_REGISTRATION
 }

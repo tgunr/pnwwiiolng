@@ -8,18 +8,20 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-class Player ;
+#include "include/pnThread.h"
+
+class Player;
 
 // The main thread function
-extern void* mmdbPersonaSelectionsThread(void*) ;
+extern void* mmdbPersonaSelectionsThread(void*);
 
 // Function that saves the brigade selection of a persona
 // NOTE: Save is not immediate and may not occur if the
 // function is called for the same persona again before
 // the save is committed to disk
-extern void mmdbSavePersonaSelection(const Player* player) ;
+extern void mmdbSavePersonaSelection(const Player* player);
 
 struct PersonaSelectionThread : public PNThread
 {
-	virtual void run();
+	virtual void run() OVERRIDE_FN;
 };

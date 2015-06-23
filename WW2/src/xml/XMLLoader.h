@@ -173,7 +173,7 @@ class XMLLoader
 public:
 	XMLLoader();
 	XMLLoader(const char* path,
-			  xmlTagHandler def = NULL,
+			  xmlTagHandler def = nullptr,
 			  int flags = XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
 	virtual ~XMLLoader();
 
@@ -195,13 +195,13 @@ public:
 
 	// parses the xml doc and starts processing nodes; primary
 	// entry into the load process
-	virtual bool Load(void* userData = NULL);
+	virtual bool Load(void* userData = nullptr);
 
 	// primary worker; recursively called on each node starting with
 	// the root node from Load(); can be called externally
-	virtual bool Process(xmlNode* node, void* userData = NULL);
+	virtual bool Process(xmlNode* node, void* userData = nullptr);
 
-	// accessors; returns NULL if Load() hasn't been called yet
+	// accessors; returns nullptr if Load() hasn't been called yet
 	// or if there was a problem parsing the xml doc
 	virtual const xmlDoc* GetDoc() const;
 	virtual const xmlNode* GetRootNode() const;

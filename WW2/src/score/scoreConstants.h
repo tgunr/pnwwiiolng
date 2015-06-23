@@ -7,12 +7,12 @@
 namespace Scoring
 {
 	//! The X value used for Scoring callbacks.
-	enum { CallbackX = 220 } ;
+	enum { CallbackX = 220 };
 
 	//! Y values of Scoring callbacks.
 	enum
 	{
 		EVENT_Y			=	1
 	,	UMS_KILL_Y
-	} ;
+	};
 }

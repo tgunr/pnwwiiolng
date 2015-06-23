@@ -9,5 +9,5 @@
 // Originating Programmer: Oliver "kfsone" Smith
 //
 
-extern void mapChargeMinutes() ;
+extern void mapChargeMinutes();
 

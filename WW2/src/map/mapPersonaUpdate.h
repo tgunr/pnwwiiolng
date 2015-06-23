@@ -23,12 +23,12 @@ public:
 	~MapPersonaUpdate() {}
 
 public:
-	ChatHandle	m_squadHandle ;
-	bool		m_isSquadUpdate ;
-	bool		m_isDecalUpdate ;
-	UINT32		m_playerID ;
-	UINT32		m_squadID ;
-	UINT32		m_decal ;
-} ;
+	ChatHandle	m_squadHandle;
+	bool		m_isSquadUpdate;
+	bool		m_isDecalUpdate;
+	UINT32		m_playerID;
+	UINT32		m_squadID;
+	UINT32		m_decal;
+};
 #pragma pack(pop)
 

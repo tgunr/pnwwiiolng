@@ -248,7 +248,7 @@ private:
 			offset(0),
             abo(0),
             bytesize(0),
-            segment(NULL),
+            segment(nullptr),
             isStatic(true),
             UsesAttribute(false)
 		{

@@ -38,7 +38,7 @@ gr2PhysicsBody::gr2PhysicsBody() :
 	physicsBodyBase(),
 	_allCollisions(0),
 	_lastCollision(0),
-	_collideJoints(NULL)
+	_collideJoints(nullptr)
 {
 }
 
@@ -81,9 +81,9 @@ bool gr2PhysicsBody::HandleContact(colliderQuery::Collision& contact)
 
 		if(!handled && !(_allCollisions & COLLIDER_TRN_WATER))
 		{
-			TransformEffect* te = NULL;
+			TransformEffect* te = nullptr;
 
-			te = TransformEffect::AddEffect("deadtroopersplash", Vec3f(0, 0, -1), 0, NULL);
+			te = TransformEffect::AddEffect("deadtroopersplash", Vec3f(0, 0, -1), 0, nullptr);
 
 			if(te)
 			{
@@ -223,7 +223,7 @@ gr2PhysicsBone::gr2PhysicsBone(gr2PhysicsModel* model,	// parent physics model
 								int axis) : 			// rotation axis 1 = x, 2 = y, 3 = z
 		gr2PhysicsBody(),
 		_model(model),
-		_parent(NULL),
+		_parent(nullptr),
 		_length((float)len),
 		_radius((float)rad),
 		_orientation((gr2PhysicsBone::ORIENTATION)orient),
@@ -551,8 +551,8 @@ void gr2PhysicsBone::BeginStep()
 		//void* g2Data = dGeomGetData(contact.g2);
 
 		/*
-		colliderGeom* hit1 = NULL;
-		colliderGeom* hit2 = NULL;
+		colliderGeom* hit1 = nullptr;
+		colliderGeom* hit2 = nullptr;
 
 		if(g1Data) hit1 = static_cast<colliderGeom*>(g1Data);
 		if(g2Data) hit2 = static_cast<colliderGeom*>(g2Data);
@@ -782,7 +782,7 @@ dGeomID gr2PhysicsBone::SetCapsuleShape(dReal mass, double angle, int axis)
 
 dGeomID gr2PhysicsBone::GetGeom(int index) const
 {
-	return (index >= 0 && index < (int)_geoms.size()) ? _geoms[index]: NULL;
+	return (index >= 0 && index < (int)_geoms.size()) ? _geoms[index]: nullptr;
 }
 
 int gr2PhysicsBone::GetShape(int index) const
@@ -793,7 +793,7 @@ int gr2PhysicsBone::GetShape(int index) const
 dJointID gr2PhysicsBone::SetJointParams(int axis, double fudge, double stiffness, double cfm, double serp, double scfm, double bounce)
 {
 	if(!_joint)
-		return NULL;
+		return nullptr;
 
 	int type = dJointGetType(_joint);
 
@@ -802,15 +802,15 @@ dJointID gr2PhysicsBone::SetJointParams(int axis, double fudge, double stiffness
 		if(axis != 0 && a != axis)
 			continue;
 
-		int paramFmax		= (a == 3 ) ? dParamFMax3 :				(a == 2) ? dParamFMax2 :		dParamFMax ;
-		int paramVel		= (a == 3 ) ? dParamVel3 :				(a == 2) ? dParamVel2 :			dParamVel ;
-		int paramFudge		= (a == 3 ) ? dParamFudgeFactor3 :		(a == 2) ? dParamFudgeFactor2 :	dParamFudgeFactor ;
-		int paramCFM		= (a == 3 ) ? dParamCFM3 :				(a == 2) ? dParamCFM2 :			dParamCFM ;
-		int paramSERP		= (a == 3 ) ? dParamStopERP3 :			(a == 2) ? dParamStopERP2 :		dParamStopERP ;
-		int paramSCFM		= (a == 3 ) ? dParamStopCFM3 :			(a == 2) ? dParamStopCFM2 :		dParamStopCFM ;
+		int paramFmax		= (a == 3 ) ? dParamFMax3 :				(a == 2) ? dParamFMax2 :		dParamFMax;
+		int paramVel		= (a == 3 ) ? dParamVel3 :				(a == 2) ? dParamVel2 :			dParamVel;
+		int paramFudge		= (a == 3 ) ? dParamFudgeFactor3 :		(a == 2) ? dParamFudgeFactor2 :	dParamFudgeFactor;
+		int paramCFM		= (a == 3 ) ? dParamCFM3 :				(a == 2) ? dParamCFM2 :			dParamCFM;
+		int paramSERP		= (a == 3 ) ? dParamStopERP3 :			(a == 2) ? dParamStopERP2 :		dParamStopERP;
+		int paramSCFM		= (a == 3 ) ? dParamStopCFM3 :			(a == 2) ? dParamStopCFM2 :		dParamStopCFM;
 
 		// setter
-		jointParam param = NULL;
+		jointParam param = nullptr;
 
 		switch(type)
 		{
@@ -1548,12 +1548,12 @@ gr2PhysicsModel::gr2PhysicsModel(int timeout) :
 	_expires(0),
 	_lastEnabledBones(0),
 	_expired(false),
-	_collider(NULL),
-	_modelNode(NULL),
-	_rootBone(NULL),
+	_collider(nullptr),
+	_modelNode(nullptr),
+	_rootBone(nullptr),
 	_allCollisions(0),
 	_lastCollision(0),
-	_attached(NULL),
+	_attached(nullptr),
 	_material(-1)
 {
 	Init(timeout);
@@ -1569,12 +1569,12 @@ gr2PhysicsModel::gr2PhysicsModel(gr2Model* model, OBJECT* ob, int timeout) :
 	_lastEnabledBones(0),
 	_expires(0),
 	_expired(false),
-	_collider(NULL),
-	_modelNode(NULL),
-	_rootBone(NULL),
+	_collider(nullptr),
+	_modelNode(nullptr),
+	_rootBone(nullptr),
 	_allCollisions(0),
 	_lastCollision(0),
-	_attached(NULL),
+	_attached(nullptr),
 	_material(-1)
 {
 	Init(timeout);
@@ -1597,7 +1597,7 @@ gr2PhysicsModel::~gr2PhysicsModel()
 	for(; it != _bones.end(); it++)
 	{
 		gr2PhysicsBone* bone = *it;
-		bone->SetOwner(NULL);
+		bone->SetOwner(nullptr);
 		bone->Expire();
 		delete bone;
 	}
@@ -1629,8 +1629,8 @@ gr2PhysicsModel::~gr2PhysicsModel()
 
 	if(_modelNode)
 	{
-		_modelNode->physicalModel = NULL;
-		_modelNode->drawcallback = NULL;
+		_modelNode->physicalModel = nullptr;
+		_modelNode->drawcallback = nullptr;
 		obpoolFreeObjectCallback(_modelNode);
 	}
 }
@@ -1731,7 +1731,7 @@ int gr2PhysicsModel::GetBoneIndex(dBodyID body)
 gr2PhysicsBone* gr2PhysicsModel::GetBone(int boneIndex)
 {
 	BoneList::iterator it = _bones.begin();
-	gr2PhysicsBone* bone = NULL;
+	gr2PhysicsBone* bone = nullptr;
 
 	for(; it != _bones.end(); it++)
 	{
@@ -1748,7 +1748,7 @@ gr2PhysicsBone* gr2PhysicsModel::GetBone(int boneIndex)
 gr2PhysicsBone* gr2PhysicsModel::GetBone(dBodyID body)
 {
 	BoneList::iterator it = _bones.begin();
-	gr2PhysicsBone* bone = NULL;
+	gr2PhysicsBone* bone = nullptr;
 
 	for(; it != _bones.end(); it++)
 	{
@@ -1765,7 +1765,7 @@ gr2PhysicsBone* gr2PhysicsModel::GetBone(dBodyID body)
 gr2PhysicsBone* gr2PhysicsModel::GetBone(const char* name)
 {
 	BoneList::iterator it = _bones.begin();
-	gr2PhysicsBone* bone = NULL;
+	gr2PhysicsBone* bone = nullptr;
 
 	for(; it != _bones.end(); it++)
 	{
@@ -1783,7 +1783,7 @@ gr2PhysicsBone* gr2PhysicsModel::GetBone(const char* name)
 gr2StaticBone* gr2PhysicsModel::GetStaticBone(int boneIndex)
 {
 	StaticBoneList::iterator it = _staticBones.begin();
-	gr2StaticBone* bone = NULL;
+	gr2StaticBone* bone = nullptr;
 
 	for(; it != _staticBones.end(); it++)
 	{
@@ -1800,7 +1800,7 @@ gr2StaticBone* gr2PhysicsModel::GetStaticBone(int boneIndex)
 gr2StaticBone* gr2PhysicsModel::GetStaticBone(const char* name)
 {
 	StaticBoneList::iterator it = _staticBones.begin();
-	gr2StaticBone* bone = NULL;
+	gr2StaticBone* bone = nullptr;
 
 	for(; it != _staticBones.end(); it++)
 	{
@@ -1820,7 +1820,7 @@ bool gr2PhysicsModel::InitSkeleton(const char* path)
 	int boneCount = 0;
 
 	// load it
-	_skeleton = gr2Model::Load(path, NULL, &boneCount, 1);
+	_skeleton = gr2Model::Load(path, nullptr, &boneCount, 1);
 
 	// update the model so we have good bone positions
 	if(_skeleton)
@@ -1866,7 +1866,7 @@ gr2PhysicsBone* gr2PhysicsModel::addCenterBone(const char* name, double mass, do
 	if(_skeleton && _skeleton->FindBone((SCHAR*)name) >= 0)
 		return addBone(new gr2CenterBone(this, name, mass, len, rad));
 
-	return NULL;
+	return nullptr;
 }
 
 gr2PhysicsBone* gr2PhysicsModel::addAxialBone(const char* name, double mass, double len, double rad)
@@ -1874,7 +1874,7 @@ gr2PhysicsBone* gr2PhysicsModel::addAxialBone(const char* name, double mass, dou
 	if(_skeleton && _skeleton->FindBone((SCHAR*)name) >= 0)
 		return addBone(new gr2AxialBone(this, name, mass, len, rad));
 
-	return NULL;
+	return nullptr;
 }
 
 gr2PhysicsBone* gr2PhysicsModel::addAxialFootBone(const char* name, double mass, double len, double rad)
@@ -1882,12 +1882,12 @@ gr2PhysicsBone* gr2PhysicsModel::addAxialFootBone(const char* name, double mass,
 	if(_skeleton && _skeleton->FindBone((SCHAR*)name) >= 0)
 		return addBone(new gr2AxialFootBone(this, name, mass, len, rad));
 
-	return NULL;
+	return nullptr;
 }
 
 gr2StaticBone* gr2PhysicsModel::addStaticBone(const char* name)
 {
-	gr2StaticBone* newBone = NULL;
+	gr2StaticBone* newBone = nullptr;
 
 	if(_skeleton && _skeleton->FindBone((SCHAR*)name) >= 0)
 	{
@@ -1903,7 +1903,7 @@ gr2PhysicsBone* gr2PhysicsModel::addMeshBone(const char* name)
 	if(_skeleton && _skeleton->FindBone((SCHAR*)name) >= 0)
 		return addBone(new gr2MeshBone(this, name));
 
-	return NULL;
+	return nullptr;
 }
 
 gr2PhysicsBone* gr2PhysicsModel::addBone(const char* name,	// bone name
@@ -1918,7 +1918,7 @@ gr2PhysicsBone* gr2PhysicsModel::addBone(const char* name,	// bone name
 	if(_skeleton && _skeleton->FindBone((SCHAR*)name) >= 0)
 		return addBone(new gr2PhysicsBone(this, name, orient, mass, len, rad, ang, axis));
 
-	return NULL;
+	return nullptr;
 }
 
 dJointID gr2PhysicsModel::addJoint(gr2PhysicsBone* from,
@@ -1935,7 +1935,7 @@ dJointID gr2PhysicsModel::addJoint(gr2PhysicsBone* from,
 									SINT32 ax3Hi)
 {
 	dWorldID world		= gr2PhysicsBody::DefaultWorld();
-	dJointID jointID	= NULL;
+	dJointID jointID	= nullptr;
 
 	switch(type)
 	{
@@ -2125,8 +2125,8 @@ void gr2PhysicsModel::UpdateBoneTransform(float* boneMat, Vec3d& pos, Matrixf& r
 /*
 dJointID gr2PhysicsBone::setJointStiffness(dJointID joint, double stiffness)
 {
-	int fmax	= (axis == 3 ) ? dParamFMax3 : (axis == 2) ? dParamFMax2 : dParamFMax ;
-	int vel	= (axis == 3 ) ? dParamVel3 : (axis == 2) ? dParamVel2 : dParamVel ;
+	int fmax	= (axis == 3 ) ? dParamFMax3 : (axis == 2) ? dParamFMax2 : dParamFMax;
+	int vel	= (axis == 3 ) ? dParamVel3 : (axis == 2) ? dParamVel2 : dParamVel;
 
 	switch(dJointGetType(joint))
 	{
@@ -2265,7 +2265,7 @@ void gr2PhysicsModel::UpdateBones()
 	}
 
 	// build the model's world pose
-	if(GrannyGetWorldPoseComposite4x4Array(WorldPose) != NULL)
+	if(GrannyGetWorldPoseComposite4x4Array(WorldPose) != nullptr)
 		GrannyBuildWorldPoseComposites(skeleton, 0, skeleton->BoneCount, WorldPose);
 
 	// debug enabled bone count
@@ -2404,7 +2404,7 @@ void gr2PhysicsModel::UpdateBones2()
 	}
 
 	// build the model's world pose
-	if(GrannyGetWorldPoseComposite4x4Array(WorldPose) != NULL)
+	if(GrannyGetWorldPoseComposite4x4Array(WorldPose) != nullptr)
 		GrannyBuildWorldPoseComposites(skeleton, 0, skeleton->BoneCount, WorldPose);
 
 	// debug enabled bone count
@@ -2663,7 +2663,7 @@ void gr2PhysicsModel::Attach(gr2PhysicsModel* m)
 
 void gr2PhysicsModel::OnAttach(gr2PhysicsModel* m)
 {
-	if(_attached == NULL)
+	if(_attached == nullptr)
 		_attached = m;
 }
 
@@ -2678,7 +2678,7 @@ void gr2PhysicsModel::Unattach()
 void gr2PhysicsModel::OnUnattach(gr2PhysicsModel* m)
 {
 	if(_attached == m)
-		_attached = NULL;
+		_attached = nullptr;
 }
 
 gr2PhysicsModel::DRAW_STATE gr2PhysicsModel::OnDraw()
@@ -3028,7 +3028,7 @@ bool gr2PhysicsModel::ProcessFlag(unsigned int f, physicsObject* o)
 				/*
 				float speed					= (float)velocity.length();
 				float mod					= (maxVel / speed);
-				GR2PhysicsBoneRef b	= NULL;
+				GR2PhysicsBoneRef b	= nullptr;
 
 				uiChatPrintLine("Damping model velocity = %.2f -> %.2f", speed, maxVel);
 
@@ -3049,12 +3049,12 @@ bool gr2PhysicsModel::ProcessFlag(unsigned int f, physicsObject* o)
 
 				bool isWater = colliderIsType(f, COLLIDER_TRN_WATER);
 
-				const char* effect = (isWater) ? "waterhit" : "shockdust" ;
-				const char* sound = (isWater) ? "sounds/grenadesplash.wav" : "sounds/troop/body/impact.wav" ;
+				const char* effect = (isWater) ? "waterhit" : "shockdust";
+				const char* sound = (isWater) ? "sounds/grenadesplash.wav" : "sounds/troop/body/impact.wav";
 
 				fxSndAddFiniteWorldSound(sound, 10, 100, IDE_TP_PRIORITY_LOW, bone->getPosition());
 
-				TransformEffect* te = TransformEffect::AddEffect(effect, Vec3f(0, 0, -1), 0, NULL);
+				TransformEffect* te = TransformEffect::AddEffect(effect, Vec3f(0, 0, -1), 0, nullptr);
 
 				if(te)
 				{
@@ -3240,7 +3240,7 @@ void gr2RigidPhysicsModel::EndStep()
 			for(unsigned int j = 0; j < _joints.size(); ++j)
 				dJointDestroy(_joints[j]);
 
-			_rootBone->SetJointID(NULL);
+			_rootBone->SetJointID(nullptr);
 			_joints.clear();
 		}
 	}
@@ -3283,7 +3283,7 @@ gr2RigidPhysicsModel::~gr2RigidPhysicsModel()
 	{
 		if(!colliderIsType(_lastCollision, COLLIDER_DRIVABLE_MASK) && cfgPrefsGetBool("app.corpses", true))
 		{
-			Corpse* c = gr2AnimAddCorpse(this, NULL, false, 30000); // , bone->getName(), false
+			Corpse* c = gr2AnimAddCorpse(this, nullptr, false, 30000); // , bone->getName(), false
 			c->shadow = false;
 		}
 	}
@@ -3568,7 +3568,7 @@ static physicsModel* _findModelByObject(physicsModel* m, void* const data)
 	if(model && model->GetModelNode() == data)
 		return model;
 
-	return NULL;
+	return nullptr;
 }
 #endif
 
@@ -3577,12 +3577,12 @@ static physicsObject* _findActiveModels(physicsObject* ob, void* const data)
 	gr2PhysicsModel* model = dynamic_cast<gr2PhysicsModel*>(ob);
 
 	if(!model)
-		return NULL;
+		return nullptr;
 
 	if(model->GetColliderFlags() & (COLLIDER_WEAPON|COLLIDER_CORPSE))
 		return model;
 
-	return NULL;
+	return nullptr;
 }
 
 void gr2PhysicsReset()
@@ -3592,7 +3592,7 @@ void gr2PhysicsReset()
 	if(physicsFindObject(list, _findActiveModels))
 	{
 		physicsObjectSet::iterator it = list.begin();
-		gr2PhysicsModel* model = NULL;
+		gr2PhysicsModel* model = nullptr;
 
 		for(; it != list.end(); ++it)
 		{
@@ -3640,12 +3640,12 @@ static physicsObject* _findWeaponModels(physicsObject* ob, void* const data)
 	gr2PhysicsModel* model = dynamic_cast<gr2PhysicsModel*>(ob);
 
 	if(!model)
-		return NULL;
+		return nullptr;
 
 	if((model->GetColliderFlags() & COLLIDER_WEAPON) > 0)
 		return model;
 
-	return NULL;
+	return nullptr;
 }
 
 void gr2PhysicsKill()
@@ -3657,7 +3657,7 @@ void gr2PhysicsKill()
 	if(physicsFindObject(list, _findWeaponModels))
 	{
 		physicsObjectSet::iterator it = list.begin();
-		gr2PhysicsModel* model = NULL;
+		gr2PhysicsModel* model = nullptr;
 
 		for(; it != list.end(); ++it)
 		{

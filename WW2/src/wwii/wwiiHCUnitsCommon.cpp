@@ -12,21 +12,21 @@
 #include "teul/teulPackers.h"
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiPack.h"
-#include "wwii/wwiiString.h"
+#include "str/stringLib.h"
 
 // Map unit_id to a HCUnit
-HCUNIT_INDEX hcUnits ;
+HCUNIT_INDEX hcUnits;
 
 //// Short Name -> HCUnit mapping
-typedef std::map<ChatHandle, HCUnit*> HCUNIT_HANDLES ;
-static HCUNIT_HANDLES hcUnitsByHandle ;
+using HCUNIT_HANDLES = std::unordered_map<ChatHandle, HCUnit*>;
+static HCUNIT_HANDLES hcUnitsByHandle;
 
 // Pack a brigade ID
 
 SINT32
 wwiiPackBrigadeID(LOGICAL mode, UCHAR* data, SINT32 offset, UINT32& brigadeID, SINT32 /*size*/)
 {
-	return teulPackUINT32(mode, data, offset, &brigadeID, 16) ;
+	return teulPackUINT32(mode, data, offset, &brigadeID, 16);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -46,23 +46,23 @@ HCUnit::HCUnit(UINT32 withUnit, HCUNIT_TYPE withType, UINT32 withParent
 	, m_rank(Rank)
 	, m_ownerRank(withOwnerRank)
 	, m_unitClass(withUnitClass)
-	, m_parent(NULL)
+	, m_parent(nullptr)
 	, m_registered(true)
 	, m_training(false)
 {
-	if ( withName == NULL )
-		throw std::runtime_error("HCUnit with NULL name") ;			///Terminal
+	if ( withName == nullptr )
+		throw std::runtime_error("HCUnit with null name");			///Terminal
 
-	strlcpy(m_name, withName, sizeof(m_name)) ;
-	strlcpy(m_shortName, nick, sizeof(m_shortName)) ;
-	chatGetCallsign(m_callsign, withHandle) ;
-	lookupParent() ;
-	hcUnits[m_unitID] = this ;
-	dbugLog(_FLI, "registered %hu->%s", m_unitID, m_callsign) ;
-	hcUnitsByHandle[withHandle] = this ;
+	strsafecpy(m_name, withName);
+	strsafecpy(m_shortName, nick);
+	chatGetCallsign(m_callsign, withHandle);
+	lookupParent();
+	hcUnits[m_unitID] = this;
+	dbugLog(_FLI, "registered %u->%s", m_unitID, m_callsign);
+	hcUnitsByHandle[withHandle] = this;
 
 	if ( home.id != 0 )
-		setHomeCPID(home) ;
+		setHomeCPID(home);
 }
 
 	// Empty constructor
@@ -74,23 +74,23 @@ HCUnit::HCUnit(UINT32 UnitID, HCUNIT_TYPE Type)
 	, m_rank(0)
 	, m_ownerRank(0LL)
 	, m_unitClass(0)
-	, m_parent(NULL)
+	, m_parent(nullptr)
 	, m_registered(false)
 	, m_training(false)
 {
-	m_callsign[0] = 'U' ;	// WTF? For consistency
-	m_callsign[1] = 'U' ;
-	m_name[0] = 'U' ;
-	m_name[1] = 0 ;
-	m_shortName[0] = 'U' ;
-	m_shortName[1] = 0 ;
+	m_callsign[0] = 'U';	// WTF? For consistency
+	m_callsign[1] = 'U';
+	m_name[0] = 'U';
+	m_name[1] = 0;
+	m_shortName[0] = 'U';
+	m_shortName[1] = 0;
 }
 
 HCUnit::HCUnit(ACTION_OBJECT* const a)
 	: m_registered(false)
 	, m_training(false)
 {
-	a->offset = packer(TEUL_UNPACK, a) ;
+	a->offset = packer(TEUL_UNPACK, a);
 }
 
 // Destructor
@@ -99,20 +99,20 @@ HCUnit::~HCUnit()
 {
 	if ( m_registered && m_unitID > 0 )
 	{
-		HCUNIT_INDEX::iterator it = hcUnits.find(m_unitID) ;
+		HCUNIT_INDEX::iterator it = hcUnits.find(m_unitID);
 		if ( it != hcUnits.end() && it->second == this )
 		{
-			dbugLog(_FLI, "unregistering %hu", m_unitID) ;
-			hcUnits.erase(it) ;
+			dbugLog(_FLI, "unregistering %u", m_unitID);
+			hcUnits.erase(it);
 		}
 	}
 	if ( m_registered && m_handle > 0 )
 	{
-		HCUNIT_HANDLES::iterator it = hcUnitsByHandle.find(m_handle) ;
+		HCUNIT_HANDLES::iterator it = hcUnitsByHandle.find(m_handle);
 		if ( it != hcUnitsByHandle.end() && it->second == this )
 		{
-			dbugLog(_FLI, "unregistering %hu handle", m_unitID) ;
-			hcUnitsByHandle.erase(it) ;
+			dbugLog(_FLI, "unregistering %u handle", m_unitID);
+			hcUnitsByHandle.erase(it);
 		}
 	}
 }
@@ -125,32 +125,32 @@ bool
 HCUnit::canUseOrigin(int facilityType) const
 {
 	if ( isTrainingUnit() )
-		return true ;
+		return true;
 	switch ( facilityType )
 	{
 	case FACILITY_AIRBASE:
 		if ( movementType() != BRANCH_AIR )
-			return false ;
-	break ;
+			return false;
+	break;
 	case FACILITY_NAVALBASE:
 		if ( movementType() != BRANCH_SEA )
-			return false ;
-	break ;
+			return false;
+	break;
 	case FACILITY_ARMYBASE:
 		if ( movementType() != branch() )
-			return false ;
-	break ;
+			return false;
+	break;
 	case FACILITY_FIREBASE:
 		if ( movementType() != BRANCH_LAND || isDivision() == true )
-			return false ;
+			return false;
 		/* PASSTHRU */
 	default:
 		// Para brigades (land+air) can only use air facilities
 		if ( movementType() == BRANCH_AIR )
-			return false ;
-	break ;
+			return false;
+	break;
 	}
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -159,33 +159,33 @@ HCUnit::canUseOrigin(int facilityType) const
 SINT32
 HCUnit::packer(LOGICAL mode, ACTION_OBJECT* a)
 {
-	a->offset = wwiiPackBrigadeID(mode, a->packed, a->offset, m_unitID) ;
-	a->offset = wwiiPackBrigadeID(mode, a->packed, a->offset, m_parentID) ;
+	a->offset = wwiiPackBrigadeID(mode, a->packed, a->offset, m_unitID);
+	a->offset = wwiiPackBrigadeID(mode, a->packed, a->offset, m_parentID);
 
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_type, 2) ;		//
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_countryID, 4) ;	// 8 bits
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_branchID, 2) ;	//
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_type, 2);		//
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_countryID, 4);	// 8 bits
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_branchID, 2);	//
 
-	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_handle, 0) ;			// 48 bits
+	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_handle, 0);			// 48 bits
 
 	if ( mode == TEUL_UNPACK )
-		chatGetCallsign(m_callsign, m_handle) ;
+		chatGetCallsign(m_callsign, m_handle);
 
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_movementType, 3) ;	// } 8 bits
-	a->offset = teulPackUCHAR(mode, a->packed, a->offset, &m_unitClass, 5) ;				// }
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_movementType, 3);	// } 8 bits
+	a->offset = teulPackUCHAR(mode, a->packed, a->offset, &m_unitClass, 5);				// }
 
-	a->offset = wwiiPackRankNo(mode, a->packed, a->offset, &m_ownerRank, 0) ;				// 8 bits
+	a->offset = wwiiPackRankNo(mode, a->packed, a->offset, &m_ownerRank, 0);				// 8 bits
 
-	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_owner, 0) ;
+	a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_owner, 0);
 		// 48 bits
 
-	a->offset = wwiiPackText(mode, a->packed, a->offset, m_name, MAX_HCUNIT_NAME_LENGTH) ;
-	a->offset = wwiiPackText(mode, a->packed, a->offset, m_shortName, MAX_BRIGADE_SHORT_LENGTH) ;
+	a->offset = wwiiPackText(mode, a->packed, a->offset, m_name, MAX_HCUNIT_NAME_LENGTH);
+	a->offset = wwiiPackText(mode, a->packed, a->offset, m_shortName, MAX_BRIGADE_SHORT_LENGTH);
 
 	if ( mode == TEUL_UNPACK && m_parentID )
-		lookupParent() ;
+		lookupParent();
 
-	return a->offset ;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -195,16 +195,16 @@ bool
 HCUnit::isBelow(UINT32 rhs) const
 {
 	if ( rhs == 0 || unitID() == rhs || m_parentID == 0 )
-		return false ;
+		return false;
 
-	HCUnit* ancestor ;
-	for ( ancestor = m_parent ; ancestor != NULL ; ancestor = ancestor->m_parent )
+	HCUnit* ancestor;
+	for ( ancestor = m_parent; ancestor != nullptr; ancestor = ancestor->m_parent )
 	{
 		if ( ancestor->unitID() == rhs )
-			return true ;
+			return true;
 	}
 
-	return false ;
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -214,10 +214,10 @@ void
 HCUnit::lookupParent()
 {
 	if ( !m_parentID || m_parentID == m_unitID )
-		m_parent = NULL ;
+		m_parent = nullptr;
 	else
-		m_parent = Lookup(m_parentID) ;
-	m_training = ( isBrigade() && m_parent == NULL && strncmp(m_callsign, "trng", 4) == 0 ) ;
+		m_parent = Lookup(m_parentID);
+	m_training = ( isBrigade() && m_parent == nullptr && strncmp(m_callsign, "trng", 4) == 0 );
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -226,8 +226,8 @@ HCUnit::lookupParent()
 HCUnit*
 HCUnit::Lookup(UINT32 unitID)
 {
-	HCUNIT_INDEX::iterator it = hcUnits.find(unitID) ;
-	return (it != hcUnits.end()) ? it->second : NULL ;
+	HCUNIT_INDEX::iterator it = hcUnits.find(unitID);
+	return (it != hcUnits.end()) ? it->second : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -236,10 +236,10 @@ HCUnit::Lookup(UINT32 unitID)
 HCUnit*
 HCUnit::Lookup(const ChatHandle handle)
 {
-	HCUNIT_HANDLES::iterator it = hcUnitsByHandle.find(handle) ;
+	HCUNIT_HANDLES::iterator it = hcUnitsByHandle.find(handle);
 	if ( it == hcUnitsByHandle.end() )
-		it = hcUnitsByHandle.find(chatGetLowercaseHandle(handle)) ;
-	return (it != hcUnitsByHandle.end()) ? it->second : NULL ;
+		it = hcUnitsByHandle.find(chatGetLowercaseHandle(handle));
+	return (it != hcUnitsByHandle.end()) ? it->second : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -247,7 +247,7 @@ HCUnit::Lookup(const ChatHandle handle)
 
 HCUnitList::HCUnitList(ACTION_OBJECT* const a)
 {
-	a->offset = packer(TEUL_UNPACK, a) ;
+	a->offset = packer(TEUL_UNPACK, a);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -256,14 +256,14 @@ HCUnitList::HCUnitList(ACTION_OBJECT* const a)
 SINT32
 HCUnitList::packer(LOGICAL mode, ACTION_OBJECT* a)
 {
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_listStart, 1) ;	//
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_listEnd, 1) ;	// 8-bits
-	a->offset = teulPackUCHAR(mode, a->packed, a->offset, &m_count, 6) ;		//
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_listStart, 1);	//
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_listEnd, 1);	// 8-bits
+	a->offset = teulPackUCHAR(mode, a->packed, a->offset, &m_count, 6);		//
 
-	for ( UINT32 i = 0 ; i < m_count && i < MAX_HCUNITS_PER_LIST ; ++i )
-		a->offset = m_units[i].packer(mode, a) ;
+	for ( UINT32 i = 0; i < m_count && i < MAX_HCUNITS_PER_LIST; ++i )
+		a->offset = m_units[i].packer(mode, a);
 
-	return a->offset ;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -272,20 +272,19 @@ HCUnitList::packer(LOGICAL mode, ACTION_OBJECT* a)
 HCUnit*
 HCUnit::GetCommandUnit(WWII_COUNTRY forCountry, BRANCH_ENUM forBranch)
 {
-	HCUNIT_INDEX::iterator it ;
-	for ( it = hcUnits.begin() ; it != hcUnits.end() ; ++it )
+	for ( auto it = hcUnits.begin(), end = hcUnits.end(); it != end; ++it )
 	{
+		if (it->second->parent() != nullptr)
+			continue;
 		// Ignore training units.
 		if ( it->second->isTrainingUnit() == true )
-			continue ;
-		if ( it->second->parent() != NULL )
-			continue ;
+			continue;
 		if ( it->second->country() != forCountry || it->second->branch() != forBranch )
-			continue ;
+			continue;
 		if ( it->second->isBrigade() || it->second->isDivision() )
-			continue ;
-		return it->second ;
+			continue;
+		return it->second;
 	}
 
-	return NULL ;
+	return nullptr;
 }

@@ -15,6 +15,7 @@
 #include "client/clientSquad.h"
 #include "client/GameClient.h"
 #include "client/ww2Client.h"
+#include "client/ww2HostState.h"
 #include "comm/commClientMessages.h"
 #include "inst/instClient.h"
 #include "inst/instDescriptor.h"
@@ -48,7 +49,7 @@
 #include "map/mapBrigadeSummary.h"
 #include "map/mapMissionList.h"
 #include "map/mapSwingMeter.h"
-#include "omg/omgMissionStatus.h"
+#include "omg/omgChat.hxx"
 #include "strt/strtCaptureState.h"
 #include "strt/strtClientMessages.h"
 #include "strt/strtDTL.h"
@@ -65,36 +66,36 @@ using namespace ww2;
 
 void clientErrorLog(const char* const fmt, ...)
 {
-	FILE* fp = Fio::OpenLogFile() ;
-	if ( fp == NULL )
-		return ;
+	FILE* fp = Fio::OpenLogFile();
+	if ( fp == nullptr )
+		return;
 
 	const time_t now = teulTime();
-	const UINT32 milis = (UINT32)(teulClock64 % 1000ULL) ;
-	char myTime[49] ;
-	char myYear[10] ;
+	const UINT32 milis = (UINT32)(teulClock64 % 1000ULL);
+	char myTime[49];
+	char myYear[10];
 #if platOS == OS_WIN32
-	tm* myTm = localtime(&now) ;
-	strftime(myTime, 48, "%a %b %d %X", myTm) ;
-	strftime(myYear, 9, "%Y", myTm) ;
+	tm* myTm = localtime(&now);
+	strftime(myTime, 48, "%a %b %d %X", myTm);
+	strftime(myYear, 9, "%Y", myTm);
 #else
-  struct tm tmStruct ;
-	strftime(myTime, 48, "%a %b %d %X", localtime_r(&now, &tmStruct)) ;
-	strftime(myYear, 9, "%Y", localtime_r(&now, &tmStruct)) ;
+  struct tm tmStruct;
+	strftime(myTime, 48, "%a %b %d %X", localtime_r(&now, &tmStruct));
+	strftime(myYear, 9, "%Y", localtime_r(&now, &tmStruct));
 #endif
     if ( myTime[0] == 0 )
-		strcpy(myTime, "unknown") ;
+		strcpy(myTime, "unknown");
 
-	fprintf(fp, "[%s.%03u %s] ", myTime, milis, myYear) ;
+	fprintf(fp, "[%s.%03u %s] ", myTime, milis, myYear);
 
-	va_list(args) ;
-	va_start(args, fmt) ;
-	vfprintf(fp, fmt, args) ;
-	va_end(args) ;
+	va_list(args);
+	va_start(args, fmt);
+	vfprintf(fp, fmt, args);
+	va_end(args);
 
-	fprintf(fp, "\n") ;
+	fprintf(fp, "\n");
 
-	fclose(fp) ;
+	fclose(fp);
 }
 
 // default player info
@@ -105,7 +106,7 @@ static Teul::PlayerIdent _defaultPlayerIdent;
 #define MessageBoxA(_X_, _err_, _title_, _Y_) fprintf(stderr, "\n%s\n\n%s\nTerminating.\n", _title_, _err_)
 #endif
 
-#define INCOMPLETE_WORK(_str_) { MessageBoxA(NULL, \
+#define INCOMPLETE_WORK(_str_) { MessageBoxA(nullptr, \
 		"###################################\n\n" \
 		"You are seeing this because of an error\n" \
 		"error for which no behavior is defined.\n\n" \
@@ -124,8 +125,8 @@ static Teul::PlayerIdent _defaultPlayerIdent;
 
 static void _yield()
 {
-	teulUpdateTransport(1) ;
-	Teul::Connection::expire() ;
+	teulUpdateTransport(1);
+	Teul::Connection::expire();
 }
 
 /************************************************************************************************
@@ -292,7 +293,7 @@ Client::Client()
 
 	// assume we're in the campaign instance
 	_classdata->instance.m_status = Instance::_SUCCESS;
-	_classdata->instances = NULL;
+	_classdata->instances = nullptr;
 
 	// clear our permissions to start with; the host will send them down
 	memset(&_classdata->permissions, 0x0, sizeof(_classdata->permissions));
@@ -333,7 +334,7 @@ Client::~Client()
 				delete state;
 			}
 
-			_classdata->connections[i] = NULL;
+			_classdata->connections[i] = nullptr;
 		}
 	}
 
@@ -344,7 +345,7 @@ Client::~Client()
         if(_classdata->connections[i])
         {
             delete _classdata->connections[i];
-            _classdata->connections[i] = NULL;
+            _classdata->connections[i] = nullptr;
         }
     }
 
@@ -359,7 +360,7 @@ Client::~Client()
 
 void ClientHostConnection::onError(Client* client, SINT32 error)
 {
-	Teul::Connection::onError(client, error) ;
+	Teul::Connection::onError(client, error);
 
 	ww2::HostState* state = client->GetHostStateByType(m_type);
 	if(!state) return;
@@ -392,7 +393,7 @@ void ClientHostConnection::onLogin(Client* const client)
 	// set our client's host state teul index
 	// also flag that we're now logged in.
 	if(state->Connect(this, HostState::CONNECTED))
-		m_loggedIn = true ;
+		m_loggedIn = true;
 	else
 		close();
 
@@ -412,7 +413,7 @@ void ClientHostConnection::onLoginFail(Client* const client, SINT32 result)
 	if(!state) return;
 
 	if ( result < 0 )
-		result = -result ;
+		result = -result;
 
 	// record any errors and reset our state data
 	// if this is a fatal error
@@ -480,31 +481,31 @@ int Client::Login(const char* hostname, short port, bool wantChat)
 SINT32
 Teul::ConnectionInstruction::receive(SINT32 teulIndex)
 {
-	clientErrorLog("tciRx ro:%u ip:%s:%u", (UINT32)role(), teulGetAddress(hostIP()), port()) ;
+	clientErrorLog("tciRx ro:%u ip:%s:%u", (UINT32)role(), teulGetAddress(hostIP()), port());
 
 	// role() will be one of Unknown, Chat() or Cell(),
 	// hostIP() will be the last octet of the IP address,
 	// port() will be the port number to connect to.
-	static const SINT32 ConnectionTimeoutMS = 30 * 1000 ;
+	static const SINT32 ConnectionTimeoutMS = 30 * 1000;
 
 	Client* const client = Client::FromTeulIndex(teulIndex);
 	if(!client)
 	{
-		clientErrorLog("tciNoClient") ;
+		clientErrorLog("tciNoClient");
 		return -EINVAL;
 	}
 
 	ww2::HostState* cellHostState = client->CellState();
 	if(!cellHostState || !cellHostState->CanConnect())
 	{
-		clientErrorLog("tciNoCell") ;
+		clientErrorLog("tciNoCell");
 		return -EINVAL;
 	}
 
 	// if we're connected, kill our current connection
 	if(cellHostState->Open())
 	{
-		clientErrorLog("*tciClose*") ;
+		clientErrorLog("*tciClose*");
 		cellHostState->Disconnect();
 	}
 
@@ -517,22 +518,22 @@ Teul::ConnectionInstruction::receive(SINT32 teulIndex)
 	const Teul::PlayerIdent* playerIdent = client->GetPlayerIdent();
 	if(!playerIdent)
 	{
-		clientErrorLog("tciNP") ;
+		clientErrorLog("tciNP");
 		return -EINVAL;
 	}
 
-	ClientHostConnection* conn = new ClientHostConnection(Teul::Connection::Cell, server, *playerIdent, 30*1000) ;
+	ClientHostConnection* conn = new ClientHostConnection(Teul::Connection::Cell, server, *playerIdent, 30*1000);
 
 	if(!conn->start(client))
 	{
-		clientErrorLog("tci!Start") ;
+		clientErrorLog("tci!Start");
 		return -EINVAL;
 	}
 
 	// wait for the connection to complete
 	if(!cellHostState->Ready(conn->m_timeoutMS + 5000))
 	{
-		clientErrorLog("tci!Rdy") ;
+		clientErrorLog("tci!Rdy");
 		return -EINVAL;
 	}
 
@@ -545,7 +546,7 @@ Teul::ConnectionInstruction::receive(SINT32 teulIndex)
 	// indicate we're connected to the cellhost
 	//client->SpawnComplete();
 
-	return 0 ;
+	return 0;
 }
 
 #include "include/vars.h"
@@ -553,19 +554,19 @@ int Client::Login(unsigned int host, short port, bool wantChat)
 {
 	if(!clientinited) return -EINVAL;
 
-	int retval = -1 ;
-	TeulTimeMS timeout = 0LL ;
+	int retval = -1;
+	TeulTimeMS timeout = 0LL;
 	static const int CONNECTION_TIMEOUT = 30 * 1000; // nobody's gonna wait more than 30 secs before force quitting
 
 	if ( port == 0 || port == 27017 )
-		port = WWII::Net::Ports::MapHost ;
+		port = WWII::Net::Ports::MapHost;
 
 	_data->wantChat = wantChat;
 	_data->ishc = false;
 
-	SetActiveHost(host, port) ;
+	SetActiveHost(host, port);
 
-	StatusMessage("loading.network.host") ;
+	StatusMessage("loading.network.host");
 
 	HostState* mapHostState = MapState();
 	if(!mapHostState) return false;
@@ -573,14 +574,14 @@ int Client::Login(unsigned int host, short port, bool wantChat)
 	Teul::ServerAddr server		= { host, port };
 	Teul::PlayerIdent& ident	= _classdata->playerIdent;
 
-	ClientHostConnection* conn = new ClientHostConnection(Teul::Connection::Map, server, ident, 30*1000) ;
-	conn->start(this) ;
+	ClientHostConnection* conn = new ClientHostConnection(Teul::Connection::Map, server, ident, 30*1000);
+	conn->start(this);
 
-	StatusMessage("loading.network.loggingin") ;
+	StatusMessage("loading.network.loggingin");
 
 	while ( conn->complete() == false )
 	{
-		_yield() ;
+		_yield();
 	}
 
 	if ( conn->m_connected == false || conn->m_loggedIn == false )
@@ -589,27 +590,27 @@ int Client::Login(unsigned int host, short port, bool wantChat)
 		{
 			if(mapHostState->retryCount > 0)
 				throw ClientNetError("connect.login.auth.reconnectfailed");
-			throw ClientNetError("connect.login.auth.failed") ;
+			throw ClientNetError("connect.login.auth.failed");
 		}
 		else
-			throw ClientNetError("connect.login.auth.timeout") ;
+			throw ClientNetError("connect.login.auth.timeout");
 	}
 
 	if(wantChat && !ChatState()->connection && !ChatState()->IsReconnecting())
 	{
-		StatusMessage("loading.network.chat") ;
+		StatusMessage("loading.network.chat");
 
 		// Wait for the Chat::ServerInfo packet to arrive.
 		// Wait for the chat server info stuff to arrive.
-		timeout = teulClock64 + CONNECTION_TIMEOUT ;
+		timeout = teulClock64 + CONNECTION_TIMEOUT;
 		while(!_data->haveChatServerInfo)
 		{
 			if ( teulClock64 >= timeout )
-				throw ClientNetError("connect.login.chat.timeout") ;
+				throw ClientNetError("connect.login.chat.timeout");
 			_yield();
 		}
 
-		dbugLog(_FLI, "connecting to chat") ;
+		dbugLog(_FLI, "connecting to chat");
 		///TODO:PERSIST: Not sure if we want to block on the attempt, but...
 		if(!ConnectToChatHost(true))
 		{
@@ -623,9 +624,9 @@ int Client::Login(unsigned int host, short port, bool wantChat)
 		}
 	}
 	else
-		dbugLog(_FLW, "not looking for chat") ;
+		dbugLog(_FLW, "not looking for chat");
 
-	StatusMessage("loading.network.complete") ;
+	StatusMessage("loading.network.complete");
 
 	SetUpdatesSent(0);
 
@@ -810,7 +811,7 @@ BrigadeControlList* Client::LookupBrigadeOIC(int brigadeID) const
 	if(_classdata->oics.find(brigadeID) != _classdata->oics.end())
 		return &_classdata->oics[brigadeID];
 
-	return NULL;
+	return nullptr;
 }
 
 /************************************************************************************************
@@ -1148,7 +1149,7 @@ const Teul::ServerAddr* Client::GetCellIdent() const
 ww2::HostState* Client::GetHostStateByIndex(int teulIndex)
 {
 	if(teulIndex < 0)
-		return NULL;
+		return nullptr;
 
 	for(int i = 0; i < Teul::Connection::NumHostTypes; i++)
 	{
@@ -1156,7 +1157,7 @@ ww2::HostState* Client::GetHostStateByIndex(int teulIndex)
 			return _classdata->connections[i];
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 ww2::HostState* Client::GetHostStateByType(int type)
@@ -1164,7 +1165,7 @@ ww2::HostState* Client::GetHostStateByType(int type)
 	if(type >= 0 && type < Teul::Connection::NumHostTypes)
 		return _classdata->connections[type];
 
-	return NULL;
+	return nullptr;
 }
 
 /************************************************************************************************
@@ -1276,7 +1277,7 @@ void Client::ProcessWaypointControl(WaypointControlMsg const&, int type, ChatHan
 				}
 			}
 		}
-		break ;
+		break;
 	}
 }
 
@@ -1522,7 +1523,7 @@ SINT32 Client::SubscriptionExpires(bool asStage) const
 	static int minutes = 35;
 
 	if(false && startTime == 0)
-		startTime = frametime + (1000 * 60 * minutes) ;
+		startTime = frametime + (1000 * 60 * minutes);
 	*/
 
 	int expires = 0;
@@ -1882,8 +1883,8 @@ unsigned int Client::MissionListUpdate() const
 *************************************************************************************************/
 void Client::SetActiveHost(unsigned int hostIP, unsigned int port)
 {
-	_data->host = hostIP ;
-	_data->port = port ;
+	_data->host = hostIP;
+	_data->port = port;
 }
 
 /************************************************************************************************
@@ -1973,7 +1974,7 @@ void Client::ProcessBrigadeSelection(BrigadeSelection const& selection)
 
 			_classdata->brigadedetail = selection;
 
-//			HCUnit* unit = HCUnit::Lookup(selection.m_detail.brigadeID()) ;
+//			HCUnit* unit = HCUnit::Lookup(selection.m_detail.brigadeID());
 //			if(unit)
 //				*unit = *(HCUnit*)(&selection.m_detail);
 
@@ -1985,7 +1986,7 @@ void Client::ProcessBrigadeSelection(BrigadeSelection const& selection)
 
 			_classdata->brigadeselected = selection;
 
-//			HCUnit* unit = HCUnit::Lookup(selection.m_detail.brigadeID()) ;
+//			HCUnit* unit = HCUnit::Lookup(selection.m_detail.brigadeID());
 //			if(unit)
 //				*unit = *(HCUnit*)(&selection.m_detail);
 
@@ -2000,13 +2001,13 @@ void Client::ProcessBrigadeSelection(BrigadeSelection const& selection)
 				}
 			}
 		}
-		break ;
+		break;
 		case BRIG_ERROR:
 		case BRIG_MISSING:
 		case BRIG_INACTIVE:
 		case BRIG_RESTRICTED:
 			_data->waitmsg[BRIGADE_SELECT_WAIT] = -1;
-		break ;
+		break;
 	}
 }
 
@@ -2076,7 +2077,7 @@ void Client::ProcessBrigadeSummaries(BrigadeSummaries const& summaries)
 
 	for(UINT32 i = 0; i < summaries.m_count; i++)
 	{
-		HCUnit* unit = HCUnit::Lookup(summaries.m_summaries[i].brigadeID()) ;
+		HCUnit* unit = HCUnit::Lookup(summaries.m_summaries[i].brigadeID());
 		if(unit)
 			*(HCUnit*)(&_classdata->brigadeList.m_summaries[i]) = *unit;
 	}
@@ -2092,8 +2093,8 @@ void Client::ProcessChatServerInfo(ChatServerInfo const& chatInfo)
 {
 	if(!_data->wantChat) return;
 
-	_data->chatServerInfo = chatInfo ;
-	_data->haveChatServerInfo = true ;
+	_data->chatServerInfo = chatInfo;
+	_data->haveChatServerInfo = true;
 
 	// update our otp
 	_classdata->playerIdent.m_otp = chatInfo.m_otp;
@@ -2126,10 +2127,10 @@ bool Client::ConnectToChatHost(bool blocking)
 	// Have to have received a ChatServerInfo packet.
 	if(!_data->haveChatServerInfo) return false;
 
-	Teul::ServerAddr server = { _data->chatServerInfo.m_ipAddress, _data->chatServerInfo.m_port } ;
+	Teul::ServerAddr server = { _data->chatServerInfo.m_ipAddress, _data->chatServerInfo.m_port };
 	Teul::PlayerIdent& ident = _classdata->playerIdent;
 
-	ClientHostConnection* const conn = new ClientHostConnection(Teul::Connection::Chat, server, ident, 30*1000) ;
+	ClientHostConnection* const conn = new ClientHostConnection(Teul::Connection::Chat, server, ident, 30*1000);
 	if(!conn->start(this))
 		return false;
 
@@ -2142,7 +2143,7 @@ bool Client::ConnectToChatHost(bool blocking)
 	{
 		if(teulClock64 >= cutoff)
 		{
-			clientErrorLog("failed connecting to chat") ;
+			clientErrorLog("failed connecting to chat");
 			return false;
 		}
 		_yield();
@@ -2169,14 +2170,14 @@ void Client::ProcessMissionPostReply(MISSION_POST_REPLY const& reply)
 
 void Client::ProcessChatWho(int type, const Chat::Who& who)
 {
-	if (!_classdata->squad.squadID()) return ;
+	if (!_classdata->squad.squadID()) return;
 	if(who.inSameSquad() && who.squadRank() > Squad::NOT_IN_SQUAD)
 	{
 		_classdata->squad.addMember(who);
-		return ;
+		return;
 	}
 	if (type == CWT_SQUAD)	// Anyone appearing in a squad list but not "in same squad" is a removal
-		_classdata->squad.removeMember(who) ;
+		_classdata->squad.removeMember(who);
 }
 
 /************************************************************************************************
@@ -2371,7 +2372,7 @@ void Client::ProcessOpinionPoll(OpinionPoll const& p)
 static void weapListCopy(FacilityWeaponList* dst , const FacilityWeaponList* src)
 {
 	memcpy(dst, src, sizeof(FacilityWeaponList));
-	assert( src->m_numWeapons < FacilityWeaponList::_MAX_WEAPONS ) ;
+	assert( src->m_numWeapons < FacilityWeaponList::_MAX_WEAPONS );
 }
 #endif
 
@@ -2521,8 +2522,8 @@ void Client::SendUpdate()
 	vupHeader.updateNo = UpdatesSent(true);
 	vupHeader.updatePrime = wwiiHitsPrime(); //_data->hitsPrime;
 
-	COMM_UPDATE_BUFFER cub ;
-	cub.size = updtPackSHARED_VEHICLE_INFO(TEUL_PACK, cub.data, 0, &vupHeader, sizeof(cub.data)) ;
+	COMM_UPDATE_BUFFER cub;
+	cub.size = updtPackSHARED_VEHICLE_INFO(TEUL_PACK, cub.data, 0, &vupHeader, sizeof(cub.data));
 	if ( cub.size >= 0 )
 	{
 		teulSend(CellConnection(),commUPDATE,&cub);
@@ -2611,7 +2612,7 @@ bool Client::SelectPersona(const PersonaSummary& persona, bool save, bool force)
 
 	if(force || !current || *current != persona)
 	{
-		current = NULL;
+		current = nullptr;
 
 		RequestPersonaSelection(persona);
 
@@ -2713,7 +2714,7 @@ const PersonaSummary* Client::GetPersona(int country, int branch) const
 			return &summary;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 // defaults to getting the saved persona
@@ -2722,7 +2723,7 @@ const PersonaSummary* Client::GetSavedPersona() const
 	if(_classdata->saved.Valid())
 		return GetPersona(_classdata->saved.country, _classdata->saved.branch);
 
-	return NULL;
+	return nullptr;
 }
 
 BrigadeSelection const& Client::BrigadeSelected() const
@@ -2907,7 +2908,7 @@ int ww2::Client::Init(int playerID, int otp, unsigned int appVersion)
 #ifdef CONNECTION_TEST_BUILD
 	static const int DBUGLOG_MODE = LOG_TO_FILE;
 #else
-	static const int DBUGLOG_MODE = LOG_OFF ;
+	static const int DBUGLOG_MODE = LOG_OFF;
 #endif
 
 	// update our default player info data
@@ -2919,7 +2920,7 @@ int ww2::Client::Init(int playerID, int otp, unsigned int appVersion)
 	// go ahead and set the player ident info in it just to make sure
 	PlayerClient()->SetPlayerIdent(playerID, otp, appVersion);
 
-	int err = teulInitTransport(DBUGLOG_MODE, "wwiiClient", errorFn, clientErrorLog);
+	int err = teulInitTransport(DBUGLOG_MODE, "wwiiClient", errorFn, nullptr, clientErrorLog);
 
 	if(err > -1)
 	{
@@ -2949,15 +2950,15 @@ void ww2::Client::Kill()
 	NetUpdate
 *************************************************************************************************/
 
-//extern void mapProcessSuperCellVislevels() ;
+//extern void mapProcessSuperCellVislevels();
 
 void ww2::Client::NetUpdate(int /*wait*/)
 {
 	if(clientinited)
 	{
 		teulUpdateTransport();
-		Teul::Connection::expire() ;
-		//mapProcessSuperCellVislevels() ;
+		Teul::Connection::expire();
+		//mapProcessSuperCellVislevels();
 	}
 }
 
@@ -3029,7 +3030,7 @@ static void errorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size, cons
 	Client* client = Client::FromTeulIndex(teulIndex);
 	if(!client)
 	{
-		clientErrorLog("t:%d err:%d transport error/no client", teulIndex, error) ;
+		clientErrorLog("t:%d err:%d transport error/no client", teulIndex, error);
 		return;
 	}
 
@@ -3039,12 +3040,12 @@ static void errorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size, cons
 	ww2::HostState* state = client->GetHostStateByIndex(teulIndex);
 	if(!state)
 	{
-		clientErrorLog("t:%d err:%d transport error/no state", teulIndex, error) ;
+		clientErrorLog("t:%d err:%d transport error/no state", teulIndex, error);
 		return;
 	}
 
 	// let the host state know about the error
-	clientErrorLog("t:%d err:%d transport error", teulIndex, error) ;
+	clientErrorLog("t:%d err:%d transport error", teulIndex, error);
 	state->OnError(state->connection, error);
 }
 
@@ -3053,7 +3054,7 @@ void Client::SendPlayerExit(int exitcode, FULL_OBJ_ID const& rtbfac)
 	if(CellState()->Connected())
 	{
 		SINT32 result = commSendPlayerExit(CellConnection(), PDEST_MAP, (PLAYER_EXIT_CODE)exitcode, rtbfac);
-		clientErrorLog("t:%d sending pEx with result: %d", CellConnection(), result) ;
+		clientErrorLog("t:%d sending pEx with result: %d", CellConnection(), result);
 		teulUpdateTransport(50);
 		//uiChatPrintLineColor(colorORANGEALPHA, L"Player exit result is %d", result);
 
@@ -3062,7 +3063,7 @@ void Client::SendPlayerExit(int exitcode, FULL_OBJ_ID const& rtbfac)
 	}
 	else
 	{
-		clientErrorLog("pEx/no cell") ;
+		clientErrorLog("pEx/no cell");
 		//uiChatPrintLineColor(colorORANGEALPHA, L"Player exit result is NOT CONNECTED");
 	}
 
@@ -3075,7 +3076,6 @@ int Client::RequestVehicleJoin(WEAPON_SERIAL const& serial, int timestamp)
 	VEHICLE_REQUEST vRequest;
 	memset(&vRequest,0,sizeof(vRequest));
 
-	vRequest.timeStamp = timestamp;
 	vRequest.weapon = serial;
 	commSendVehicleJoin(CellConnection(), &vRequest);
 
@@ -3135,7 +3135,7 @@ int Client::GetWait(MSG_WAIT msg)
 
 int Client::WaitForMessages(int timeout)
 {
-	TeulTimeMS endtime = teulClock64 + (unsigned int)timeout * 1000 ;
+	TeulTimeMS endtime = teulClock64 + (unsigned int)timeout * 1000;
 
 	int waits[MAX_MSG_WAIT];
 	memcpy(waits,_data->waitmsg,sizeof(waits));
@@ -3213,7 +3213,7 @@ void HostState::Reset()
 	if(connection)
 		connection->close();
 
-	connection = NULL;
+	connection = nullptr;
 	lastError = 0;
 	errorName = "";
 }
@@ -3297,7 +3297,7 @@ bool HostState::Ready(TeulTimeMS timeout)
 	// set our wait flag
 	SetWait();
 
-	const TeulTimeMS expires = teulClock64 + timeout ;
+	const TeulTimeMS expires = teulClock64 + timeout;
 
 	// wait for a response
 	while ( client->GetWait(wait) && connectState != ECONDITION )
@@ -3305,11 +3305,11 @@ bool HostState::Ready(TeulTimeMS timeout)
 		if ( teulClock64 >= expires )
 		{
 			Disconnect(1);
-			clientErrorLog("Connection timed out!") ;
+			clientErrorLog("Connection timed out!");
 			return false; // we timed out or other error condition
 		}
 
-		_yield() ;
+		_yield();
 	}
 
 	return true; // we didn't time out
@@ -3416,7 +3416,7 @@ const char* HostState::ErrorName(SINT32 error)
 SINT32 HostState::ErrorActions(SINT32 error)
 {
 	if ( error < 0 )
-		error = -error ;
+		error = -error;
 
 	// we should have a connection
 	// or never got connected (probably a connection failure)
@@ -3440,11 +3440,11 @@ SINT32 HostState::ErrorActions(SINT32 error)
 			// Someone forgot to register a callback properly...
 			// Ultimately this should just be LOG, but right
 			// now I'd like to see them...
-			return alREPORT | reconnectNeeded ;
+			return alREPORT | reconnectNeeded;
 		break;
 		case ETEUL_CONNECTION_STALLED:
 		case ENOTCONN:
-			return alRETRY ;
+			return alRETRY;
 		break;
 		case ETEUL_CB_REQ_DATA:
 		case ECONNREFUSED:
@@ -3530,7 +3530,7 @@ void HostState::OnError(Teul::Connection* conn, SINT32 error)
 	//	return;
 
 	if ( error < 0 )
-		error = -error ;
+		error = -error;
 
 	// remember our last error
 	lastError = error;
@@ -3656,7 +3656,7 @@ bool MapHostState::Reconnect()
 		}
 		catch (ClientNetError& e)
 		{
-			clientErrorLog( "Network connection error#%d: %s", e.Error(), e.What()) ;
+			clientErrorLog( "Network connection error#%d: %s", e.Error(), e.What());
 			// this is a failure
 			retryCount = -1;
 			//client->ConnectionError(this, HostState::alABORT);
@@ -3720,7 +3720,7 @@ bool ChatHostState::Reconnect()
 		}
 		catch (ClientNetError& e)
 		{
-			clientErrorLog( "Network error#%d: %s", e.Error(), e.What()) ;
+			clientErrorLog( "Network error#%d: %s", e.Error(), e.What());
 			retryCount = -1; // bail now
 		}
 	}
@@ -3770,13 +3770,13 @@ bool CellHostState::Reconnect()
 			return false;
 		}
 
-		ClientHostConnection* conn = new ClientHostConnection(Teul::Connection::Cell, *serverIdent, *playerIdent, 30*1000) ;
+		ClientHostConnection* conn = new ClientHostConnection(Teul::Connection::Cell, *serverIdent, *playerIdent, 30*1000);
 
 		if(conn->start(client))
 		{
 			// wait for the connection to finish one way or another
 			while ( conn->complete() == false )
-				_yield() ;
+				_yield();
 
 			// good connection!
 			if(Connected())
@@ -3890,101 +3890,101 @@ network.state.error.unknown
 static void _describeState(const wchar_t* const hostName, std::wstring& into, const HostState* const state)
 {
 	if ( into.empty() == false )
-		into += L" " ;
+		into += L" ";
 
-	into += LocOrStr(L"?network.state.hosts.", L"") ;
-	into += hostName ;
-	into += LocOrStr(L"? ", L": ") ;
+	into += LocOrStr(L"?network.state.hosts.", L"");
+	into += hostName;
+	into += LocOrStr(L"? ", L": ");
 
-	if ( state == NULL )
+	if ( state == nullptr )
 	{
-		into += LocOrStr(L"?network.state.label.nostate?", L"----") ;
-		return ;
+		into += LocOrStr(L"?network.state.label.nostate?", L"----");
+		return;
 	}
 
 	if ( state->IsReconnecting() )
 	{
-		into += LocOrStr(L"?network.state.label.reconnecting?", L"~~~~") ;
-		return ;
+		into += LocOrStr(L"?network.state.label.reconnecting?", L"~~~~");
+		return;
 	}
 
 	if ( state->Connecting() == true )
 	{
-		into += LocOrStr(L"?network.state.label.connecting?", L"++++") ;
-		return ;
+		into += LocOrStr(L"?network.state.label.connecting?", L"++++");
+		return;
 	}
 
 	if ( state->Connected() == false )
 	{
-		into += LocOrStr(L"?network.state.label.disc?", L"nocn") ;
-		return ;
+		into += LocOrStr(L"?network.state.label.disc?", L"nocn");
+		return;
 	}
 
-	SINT32 reason = 0 ;
-	TeulDeltaMS lastRx_ms = 0 ;
-	const bool success = Teul::GetEndpointStatus(state->Index(), &reason, &lastRx_ms) ;
+	SINT32 reason = 0;
+	TeulDeltaMS lastRx_ms = 0;
+	const bool success = Teul::GetEndpointStatus(state->Index(), &reason, &lastRx_ms);
 	if ( success == false )
 	{
 		if ( reason < 0 )
-			reason = -reason ;
+			reason = -reason;
 		switch ( reason )
 		{
 		case EINVAL:
-			into += LocOrStr(L"?network.state.error.einval?", L"INV!") ;
-		break ;
+			into += LocOrStr(L"?network.state.error.einval?", L"INV!");
+		break;
 		case ENOENT:
-			into += LocOrStr(L"?network.state.error.enoent?", L"BAD!") ;
-		break ;
+			into += LocOrStr(L"?network.state.error.enoent?", L"BAD!");
+		break;
 		case ECONNABORTED:
-			into += LocOrStr(L"?network.state.error.econnaborted?", L"DSC!") ;
-		break ;
+			into += LocOrStr(L"?network.state.error.econnaborted?", L"DSC!");
+		break;
 		case ENOTCONN:
-			into += LocOrStr(L"?network.state.error.enotconn?", L"NCN!") ;
-		break ;
+			into += LocOrStr(L"?network.state.error.enotconn?", L"NCN!");
+		break;
 		default:
-			into += LocOrStr(L"?network.state.error.unknown?", L"ERR!") ;
-		break ;
+			into += LocOrStr(L"?network.state.error.unknown?", L"ERR!");
+		break;
 		}
 
-		return ;
+		return;
 	}
 
 	if ( lastRx_ms <= 5000 )
-		into += LocOrStr(L"?network.state.label.ok?", L"-OK-") ;
+		into += LocOrStr(L"?network.state.label.ok?", L"-OK-");
 	else
 	{
-		wchar_t lastRx[65] ;
-		swprintf(lastRx, sizeof(lastRx) - 1, L"%3us", (UINT32)(lastRx_ms / 1000ULL)) ;
-		into += lastRx ;
+		wchar_t lastRx[65];
+		swprintf(lastRx, sizeof(lastRx) - 1, L"%3us", (UINT32)(lastRx_ms / 1000ULL));
+		into += lastRx;
 	}
 }
 
-extern SINT32 g_lastPing, g_averagePing ;
+extern SINT32 g_lastPing, g_averagePing;
 
 std::wstring clientGetNetworkState()
 {
-	Client* const client = PlayerClient() ;
-	if ( !Online || client == NULL )
-		return LocOrStr(L"?network.state.offline?", L"Network: Offline\n") ;
+	Client* const client = PlayerClient();
+	if ( !Online || client == nullptr )
+		return LocOrStr(L"?network.state.offline?", L"Network: Offline\n");
 
-	std::wstring states(L"") ;
+	std::wstring states(L"");
 
-	_describeState(L"map", states, client->MapState()) ;
-	_describeState(L"chat", states, client->ChatState()) ;
-	_describeState(L"cell", states, client->CellState()) ;
+	_describeState(L"map", states, client->MapState());
+	_describeState(L"chat", states, client->ChatState());
+	_describeState(L"cell", states, client->CellState());
 	if ( client->CellState()->Connected() && g_lastPing > 0 )
 	{
-		wchar_t ping[65] ;
-		swprintf(ping, sizeof(ping) - 1, L" Ping: %u(%u)ms", g_lastPing, g_averagePing) ;
-		states += ping ;
+		wchar_t ping[65];
+		swprintf(ping, sizeof(ping) - 1, L" Ping: %u(%u)ms", g_lastPing, g_averagePing);
+		states += ping;
 	}
 	else
 	{
-		g_lastPing = 0 ;
-		g_averagePing = 0 ;
+		g_lastPing = 0;
+		g_averagePing = 0;
 	}
 
-	states += L"\n" ;
+	states += L"\n";
 
-	return states ;
+	return states;
 }

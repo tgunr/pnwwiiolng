@@ -7,8 +7,8 @@
 template<typename Type_>
 struct XYZTuple
 {
-	typedef Type_ value_type ;
-	typedef XYZTuple<value_type> selftype ;
+	typedef Type_ value_type;
+	typedef XYZTuple<value_type> selftype;
 
 	//! Default zeroing constructor.
 	XYZTuple<Type_>() : m_x(0), m_y(0), m_z(0) {}
@@ -30,66 +30,66 @@ struct XYZTuple
 	template<typename RhsType_>
 	selftype& operator += (RhsType_& rhs_)
 	{
-		m_x += rhs_.x() ;
-		m_y += rhs_.y() ;
-		m_z += rhs_.z() ;
-		return *this ;
+		m_x += rhs_.x();
+		m_y += rhs_.y();
+		m_z += rhs_.z();
+		return *this;
 	}
 
 	//! Subtract vectors.
 	template<typename RhsType_>
 	selftype& operator -= (RhsType_& rhs_)
 	{
-		m_x -= rhs_.x() ;
-		m_y -= rhs_.y() ;
-		m_z -= rhs_.z() ;
-		return *this ;
+		m_x -= rhs_.x();
+		m_y -= rhs_.y();
+		m_z -= rhs_.z();
+		return *this;
 	}
 
 	//! Add vectors and return new.
 	template<typename RhsType_>
 	selftype operator + (RhsType_& rhs_) const
 	{
-		return XYZTuple<value_type>(x() + rhs_.x(), y() + rhs_.y(), z() + rhs_.z()) ;
+		return XYZTuple<value_type>(x() + rhs_.x(), y() + rhs_.y(), z() + rhs_.z());
 	}
 
 	//! Subtract vectors and return new.
 	template<typename RhsType_>
 	selftype operator - (RhsType_& rhs_) const
 	{
-		return XYZTuple<value_type>(x() - rhs_.x(), y() - rhs_.y(), z() - rhs_.z()) ;
+		return XYZTuple<value_type>(x() - rhs_.x(), y() - rhs_.y(), z() - rhs_.z());
 	}
 
 	//! Copy members from another vector type that implements x(), y() and z()
 	template<typename RhsType_>
 	selftype& operator = (RhsType_& rhs_)
 	{
-		m_x = rhs_.x() ;
-		m_y = rhs_.y() ;
-		m_z = rhs_.z() ;
-		return *this ;
+		m_x = rhs_.x();
+		m_y = rhs_.y();
+		m_z = rhs_.z();
+		return *this;
 	}
 
 	//! Equals operator with any other vector type that implements x(), y() and z()
 	template<typename RhsType_>
 	bool operator == (RhsType_& rhs_)
 	{
-		return ( (x() == rhs_.x()) & (y() == rhs_.y()) & (z() == rhs_.z()) ) ;
+		return ( (x() == rhs_.x()) & (y() == rhs_.y()) & (z() == rhs_.z()) );
 	}
 
 	//! Not-Equals operator with any other vector type that implements x(), y() and z()
 	template<typename RhsType_>
 	bool operator != (RhsType_& rhs_)
 	{
-		return ( (x() != rhs_.x()) | (y() != rhs_.y()) | (z() != rhs_.z()) ) ;
+		return ( (x() != rhs_.x()) | (y() != rhs_.y()) | (z() != rhs_.z()) );
 	}
 
 #pragma pack(push, 1)
-	value_type	m_x, m_y, m_z ;
-	value_type	x() const { return m_x ; }
-	value_type	y() const { return m_y ; }
-	value_type	z() const { return m_z ; }
+	value_type	m_x, m_y, m_z;
+	value_type	x() const { return m_x; }
+	value_type	y() const { return m_y; }
+	value_type	z() const { return m_z; }
 #pragma pack(pop)
-} ;
+};
 #pragma pack(pop)
 

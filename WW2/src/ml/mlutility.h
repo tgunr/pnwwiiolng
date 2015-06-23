@@ -55,7 +55,7 @@ extern UINT32 mlUtilityFindVarname(UINT32* VarNum, // return index into list
 
 // routine that goes through a component list to find
 // a component with name set to ComponentName
-// returns result in ComponentPtr, NULL if not found
+// returns result in ComponentPtr, nullptr if not found
 // no checking for invalid pointers done
 extern UINT32 mlUtilityFindComponentByName(struct mlComponent** ComponentPtr, // return compontent ptr
 											struct mlComponentList * ComponentList, // component list

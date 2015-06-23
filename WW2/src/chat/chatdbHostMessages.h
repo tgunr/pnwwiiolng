@@ -7,8 +7,8 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-struct SquadMemberUpdate ;
+struct SquadMemberUpdate;
 
-extern SINT32 chatdbInstallHostCallbacks();
-extern SINT32 chatdbSendSquadMemberUpdateResult(SINT32 teulIndex, SquadMemberUpdate& result) ;
+SINT32 chatdbInstallHostCallbacks();
+SINT32 chatdbSendSquadMemberUpdateResult(SINT32 teulIndex, SquadMemberUpdate& result);
 

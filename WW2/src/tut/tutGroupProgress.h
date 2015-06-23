@@ -11,44 +11,43 @@
 // Originating Programmer: Oliver "kfsone" Smith
 //
 
-class Player ;
+class Player;
 
 namespace Tutorial
 {
 	// The grunt that provides the per-group data
 	struct GroupProgress
 	{
-		ChatHandle		m_groupHandle ;
-		UINT64			m_flags ;
+		ChatHandle		m_groupHandle;
+		UINT64			m_flags;
 
 		GroupProgress(ChatHandle _handle=0LL, UINT64 _flags=0LL) : m_groupHandle(_handle), m_flags(_flags) {}
-		GroupProgress(ACTION_OBJECT* const a) ;
+		GroupProgress(ACTION_OBJECT* const a);
 
-		void packer(LOGICAL mode, ACTION_OBJECT* a) ;
+		void packer(LOGICAL mode, ACTION_OBJECT* a);
 
 		//// CLIENT:
 		// Send this progress to the host.
-		void send(SINT32 chatConnection) ;
+		void send(SINT32 chatConnection);
 
 		//// BOTH:
 		// Receive this progress; the client
 		// can just ignore the 'Player' argument.
-		SINT32 receive(Player* player) const ;
-	} ;
+		SINT32 receive(Player* player) const;
+	};
 }
 
 #if platBuild == TEUL_SERVER
-#include <vector>
 namespace Tutorial
 {
 	// For the host
-	typedef std::vector<GroupProgress> GroupProgressBatch ;
+	typedef std::vector<GroupProgress> GroupProgressBatch;
 }
 
 namespace Map
 {
 	// Send a batch or tutorial progress statuses to a player
-	extern void SendTutProgressBatch(SINT32 teulIndex, Tutorial::GroupProgressBatch& batch) ;
+	extern void SendTutProgressBatch(SINT32 teulIndex, Tutorial::GroupProgressBatch& batch);
 }
 #endif
 

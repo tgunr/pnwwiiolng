@@ -215,7 +215,7 @@ public:
 	const char* NextColumn()
 	{
 		if ( m_currentColumn >= m_columns )
-			return NULL;
+			return nullptr;
 		return m_row[m_currentColumn++];
 	}
 
@@ -233,42 +233,42 @@ public:
 	{
 		if ( m_currentColumn >= m_columns ) return 0;
 		const char* source = m_row[m_currentColumn++];			// Null record protection
-		return ( source != NULL ) ? (SINT32)strtol(source, NULL, 10) : 0;
+		return ( source != nullptr ) ? (SINT32)strtol(source, nullptr, 10) : 0;
 	}
 
 	UINT32 NextUInt()
 	{
 		if ( m_currentColumn >= m_columns ) return 0;
 		const char* source = m_row[m_currentColumn++];			// Null record protection
-		return ( source != NULL ) ? (UINT32)strtoul(source, NULL, 10) : 0;
+		return ( source != nullptr ) ? (UINT32)strtoul(source, nullptr, 10) : 0;
 	}
 
 	UINT64 NextUINT64()
 	{
 		if ( m_currentColumn >= m_columns ) return 0;
 		const char* source = m_row[m_currentColumn++];
-		return ( source != NULL ) ? strtoull(source, NULL, 10) : 0;
+		return ( source != nullptr ) ? strtoull(source, nullptr, 10) : 0;
 	}
 
 	SINT64 NextSINT64()
 	{
 		if ( m_currentColumn >= m_columns ) return 0;
 		const char* source = m_row[m_currentColumn++];
-		return ( source != NULL ) ? strtoll(source, NULL, 10) : 0;
+		return ( source != nullptr ) ? strtoll(source, nullptr, 10) : 0;
 	}
 
 	FLOAT32 NextFLOAT32()
 	{
 		if ( m_currentColumn >= m_columns ) return 0.0;
 		const char* source = m_row[m_currentColumn++];
-		return ( source != NULL ) ? (FLOAT32)strtof(source, NULL) : 0.0f;
+		return ( source != nullptr ) ? (FLOAT32)strtof(source, nullptr) : 0.0f;
 	}
 
 	FLOAT64 NextFLOAT64()
 	{
 		if ( m_currentColumn >= m_columns ) return 0.0;
 		const char* source = m_row[m_currentColumn++];
-		return ( source != NULL ) ? (FLOAT64)strtod(source, NULL) : 0.0;
+		return ( source != nullptr ) ? (FLOAT64)strtod(source, nullptr) : 0.0;
 	}
 
 	void NextWeaponSpec(struct WEAPON_SPEC& spec);
@@ -319,7 +319,7 @@ public:
 
 	DBRow&	Row() const
 	{
-		if ( m_row != NULL ) return const_cast<DBRow&>(*m_row);
+		if ( m_row != nullptr ) return const_cast<DBRow&>(*m_row);
 		throw std::logic_error("No row to return");
 	}
 

@@ -31,7 +31,7 @@ enum
 static std::set<std::string> BlockMap;
 static std::map<std::string, int> BaseID;
 
-typedef stdext::hash_map<std::string, glslUniformBlock*> UniformBlockList;
+using UniformBlockList = std::unordered_map<std::string, glslUniformBlock*>;
 static UniformBlockList _uniformBlockList;
 
 /*------------------------------------------------------------------------------------
@@ -274,7 +274,7 @@ void glslProgram::LinkProgram()
 
         for(int i = 0; i < blocks; i++)
         {
-            glGetActiveUniformBlockName(_programhandle, i, 256, NULL, blockname);
+            glGetActiveUniformBlockName(_programhandle, i, 256, nullptr, blockname);
 
             Write_Debug("BLOCKNAME: %s", blockname);
 
@@ -319,7 +319,7 @@ void glslProgram::LinkProgram()
 
             for(int j = 0; j < numUniforms; j++)
             {
-                glGetActiveUniformName(_programhandle, indices[j], 256, NULL, name);
+                glGetActiveUniformName(_programhandle, indices[j], 256, nullptr, name);
 
                 glGetActiveUniformsiv(_programhandle, 1, (GLuint*)&indices[j], GL_UNIFORM_OFFSET, &byteoffset);
                 glGetActiveUniformsiv(_programhandle, 1, (GLuint*)&indices[j], GL_UNIFORM_SIZE, &size);
@@ -422,7 +422,7 @@ Description:
 -------------------------------------------------------------------------------------*/
 void glslProgram::Apply(const ActiveVarInfo& info)
 {
-    if(info.uniform == NULL)
+    if(info.uniform == nullptr)
         return;
 
     logTimerBeginMacro();
@@ -571,7 +571,7 @@ Description:
 -------------------------------------------------------------------------------------*/
 void glslProgram::RemoveUniformsIfNecessary()
 {
-    glslUniform* u = NULL;
+    glslUniform* u = nullptr;
 
     std::vector<ActiveVarInfoMap::iterator> remove;
 
@@ -688,6 +688,6 @@ glslUniform* glslProgram::GetUniform(const char* name)
         return itr->second;
     }
 
-    return NULL;
+    return nullptr;
 }
 

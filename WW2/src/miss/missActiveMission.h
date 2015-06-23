@@ -15,7 +15,7 @@
 #include "mm/mmEnums.h"
 #include "teul/teulPackers.h"
 
-class Mission ;
+class Mission;
 
 class ActiveMission
 {
@@ -26,21 +26,21 @@ public:
 		, m_branchID(branch)
 		, m_brigadeID(brigade)
 			{}
-	ActiveMission(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a) ; }
+	ActiveMission(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 	~ActiveMission() {}
 
 public:
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) ;
+	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
 
 // Server only
 public:
-	SINT32 send(SINT32 teulIndex) ;
-	void populate(const Mission*) ;
+	SINT32 send(SINT32 teulIndex);
+	void populate(const Mission*);
 
 public:
-	UINT32			m_missionID ;		// 0 or ID of active mission
-	WWII_COUNTRY	m_countryID ;		// Country of mission
-	BRANCH_ENUM		m_branchID ;		// What branch
-	UINT32			m_brigadeID ;		// The brigade it's in
-} ;
+	UINT32			m_missionID;		// 0 or ID of active mission
+	WWII_COUNTRY	m_countryID;		// Country of mission
+	BRANCH_ENUM		m_branchID;		// What branch
+	UINT32			m_brigadeID;		// The brigade it's in
+};
 

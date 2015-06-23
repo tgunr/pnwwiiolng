@@ -83,38 +83,18 @@
 #include <regex>
 #include <unordered_map>
 #define RENS std
-#define UNORDERED_MAP std::unordered_map
 #else
 //#include <boost/unordered_map.hpp>
 #include <boost/regex.hpp>
 #define RENS boost
-//#define UNORDERED_MAP boost::unordered_map
 #endif
 
 #ifdef GR2_BLEND_EDITOR
 #include "veh/vehcomms.h"
 #endif
 
-#ifdef DOROTHY
-#include "mech/MechTarget.h"
-#endif
-
 #if platOS == OS_WIN32
 #include "ime/imeMain.h"
-#endif
-
-#if defined(USE_OSG)
-#include "osg/osgMain.h"
-
-#include <osg/Geode>
-#include <osg/Projection>
-#include <osg/MatrixTransform>
-#include <osg/Camera>
-#include <osgUtil/SceneView>
-
-static osg::ref_ptr<osg::Group> _uinode;
-
-static void uiInitOSG();
 #endif
 
 #include "sys/sysWinISO.h"
@@ -208,8 +188,8 @@ static bool _holddowncursor;
 static phui::View* _terminal;
 static jsGame* _jsgame;
 static phui::View* _spawnscreen;
-typedef UNORDERED_MAP<std::string, std::wstring> LocMap;
-typedef UNORDERED_MAP<std::string, std::string> InputMap;
+typedef std::unordered_map<std::string, std::wstring> LocMap;
+typedef std::unordered_map<std::string, std::string> InputMap;
 static LocMap _locstrings;	// all translation strings; language with english fallback
 static InputMap _inputkeys;	// english only keys for input device names and functions
 static void _jsabort(const char*);
@@ -221,15 +201,11 @@ static int _loctime; // last time the loc strings were loaded
 static std::string _despawnUI = "offline";
 static int _despawnTab = 0;
 static bool _despawnReset = true;
-static UIXMLCALLBACK _uiJsCallback = NULL;
+static UIXMLCALLBACK _uiJsCallback = nullptr;
 static drawIconRef _ContactIcons;
 static drawIconRef _FlagIcons;
 
-#if defined(USE_OSG)
-drawIconRef _ColorRankIcons;
-#else
 extern drawIconRef _ColorRankIcons;
-#endif
 
 /************************************************************************************************
 	uiInit
@@ -366,15 +342,10 @@ int uiInit()
 #ifdef GR2_BLEND_EDITOR
 	phui::RegisterTagWithUIXML("animscale", uiAnimWeightCreate);
 #endif
-#ifdef DOROTHY
-	phui::RegisterTagWithUIXML("mechtarget", uiMechTargetViewCreate);
-#endif
 
 	phui::SetUIXMLTextureCallback(uiGetAtlasTexture);
-#if !defined(USE_OSG)
 	phui::SetUIXMLCreateTextureCallback(uiCreateTexture);
 	phui::SetUIXMLDestroyTextureCallback(uiDestroyTexture);
-#endif
 	phui::SetUIXMLDrawerFactory(_drawfactory);
 	phui::SetUIXMLSetViewportSize(_viewport->Width(), _viewport->Height());
 	phui::SetUIXMLClipboardCallback(piinfoClipboard);
@@ -393,10 +364,6 @@ int uiInit()
 
 	_ContactIcons = drawIconLoad("ui/textures/mapvehicles");
 	_FlagIcons = drawIconLoad("ui/uidata/chat/commicons3");
-
-#if defined(USE_OSG)
-	_ColorRankIcons = drawIconLoad("ui/uidata/chat/commrank");
-#endif
 
 	_isafk = 0;
 	_isautoafk = false;
@@ -490,19 +457,19 @@ int uiKill()
 	if(_mapkeyicons)
 	{
 		drawIconKill(_mapkeyicons);
-		_mapkeyicons = NULL;
+		_mapkeyicons = nullptr;
 	}
 
     if(_ContactIcons)
     {
         drawIconKill(_ContactIcons);
-        _ContactIcons = NULL;
+        _ContactIcons = nullptr;
     }
 
     if(_FlagIcons)
     {
         drawIconKill(_FlagIcons);
-        _FlagIcons = NULL;
+        _FlagIcons = nullptr;
     }
 
 	uiChatKill();
@@ -529,10 +496,8 @@ int uiKill()
 
 void uiUpdate()
 {
-#if !defined(USE_OSG)
 	TUT_MGR->Update();
 	SCEN_MGR->Update();
-#endif
 
 	if(uiInGame())
 	{
@@ -629,7 +594,7 @@ void uiDraw()
 void uiDrawString(const char* text, UINT32 color, UINT32 size)
 {
 	phui::GraphicsContext* ctx = uiViewport()->GetGraphicsContext();
-	if(ctx == NULL) return;
+	if(ctx == nullptr) return;
 
 	//save our current state
 	//ctx->PushState();
@@ -755,7 +720,7 @@ static float lastMouseX,lastMouseY;
 							// if we hit exit again, kill the popup
 							phui::View* despawn = uiViewport()->FindView("despawn");
 
-							if(despawn != NULL)
+							if(despawn != nullptr)
 								uiRunScript(despawn, "doDespawnAction(false);");
 						}
 					}
@@ -782,7 +747,7 @@ static float lastMouseX,lastMouseY;
 
 bool uiFocused()
 {
-	return (uiFocusView() != NULL);
+	return (uiFocusView() != nullptr);
 }
 
 /************************************************************************************************
@@ -791,7 +756,7 @@ bool uiFocused()
 
 phui::View* uiFocusView()
 {
-	return (_viewport) ? _viewport->FindFocusView(): NULL;
+	return (_viewport) ? _viewport->FindFocusView(): nullptr;
 }
 
 /************************************************************************************************
@@ -1064,7 +1029,7 @@ void uiIMEMessageProc(const MSG& m)
 }
 #endif
 
-typedef UNORDERED_MAP<std::string, int> TexMapType;
+typedef std::unordered_map<std::string, int> TexMapType;
 
 static TexMapType _texmap;
 
@@ -1134,7 +1099,7 @@ void uiGameToUI()
 			phui::View* despawnUI = uiLoadView(_despawnUI.c_str());
 
 			// look up its body so we can set the tab
-			phui::View* body = (despawnUI != NULL) ? despawnUI->FindView("body"): NULL;
+			phui::View* body = (despawnUI != nullptr) ? despawnUI->FindView("body"): nullptr;
 			if(body) body->SetValue(_despawnTab);
 
 			// let everyone know I'm no longer spawned
@@ -1145,9 +1110,6 @@ void uiGameToUI()
 	{
 		training = TUT_ACTIVE;
 
-#ifdef DOROTHY
-		uiLoadView(Online ? "dorothy/aar" : "dorothy/main");
-#else
 		// make sure we're back on the campaign persona and brigade
 		if(Online && _despawnReset && !PlayerClient()->LoadSavedPersona())
 			uiSetDespawnInfo("online");
@@ -1156,14 +1118,12 @@ void uiGameToUI()
 		phui::View* despawnUI = uiLoadView(_despawnUI.c_str());
 
 		// look up its body so we can set the tab
-		phui::View* body = (despawnUI != NULL) ? despawnUI->FindView("body"): NULL;
+		phui::View* body = (despawnUI != nullptr) ? despawnUI->FindView("body"): nullptr;
 		if(body) body->SetValue(_despawnTab);
 
 		// reset if we were requested to do so
 		if(_despawnReset)
 			uiSetDespawnInfo((Online) ? "mission": "offline");
-
-#endif //DOROTHY
 	}
 
 	uiChatShow();
@@ -1247,7 +1207,7 @@ void uiGameToUI()
 			phui::View* despawnUI = uiLoadView(_despawnUI.c_str());
 
 			// look up its body so we can set the tab
-			phui::View* body = (despawnUI != NULL) ? despawnUI->FindView("body"): NULL;
+			phui::View* body = (despawnUI != nullptr) ? despawnUI->FindView("body"): nullptr;
 			if(body) body->SetValue(_despawnTab);
 		}
 	}
@@ -1282,15 +1242,10 @@ void uiUIToGameStart()
 	imapButtonInputState(1);
 	uiSetCursor(0);
 
-#ifdef DOROTHY
-	if(!_spawnscreen)
-		_spawnscreen = uiLoadView("dorothy/spawn");
-#else
 	if(SCEN_MGR->HasFlag(ScenarioManager::RESPAWN_ME) && respawnView)
 		_spawnscreen = respawnView;
 	else if(!_spawnscreen)
 		_spawnscreen = uiLoadView("spawn");
-#endif
 
 	uiUpdate();
 	uiDraw();
@@ -1361,12 +1316,9 @@ void uiUIToGameEnd()
 		_spawnscreen = 0;
 	}
 
-#if defined(USE_OSG)
-#else
 #ifdef BETA_RELEASE
 	if(SuperTroop)
 		fpFPSSetSuperTroop(SuperTroop);
-#endif
 #endif
 	uiGC();
 
@@ -1977,7 +1929,7 @@ static int openLocDTD(const char* name)
 
 void locInitStrings(bool force)
 {
-	static unsigned int lang = 0xffffffff ;
+	static unsigned int lang = 0xffffffff;
 
 	if(!force && gLanguage == lang)
 		return;
@@ -1999,7 +1951,7 @@ void locInitStrings(bool force)
 	path = "loc://ui.dtd";
 
 	// load the doc
-	pDtd = xmlParseDTD(NULL, (xmlChar*)path.c_str());
+	pDtd = xmlParseDTD(nullptr, (xmlChar*)path.c_str());
 
 	if(pDtd)
 	{
@@ -2013,7 +1965,7 @@ void locInitStrings(bool force)
 		path = "languages/english/input.dtd";
 
 		// load the doc
-		pDtd = xmlParseDTD(NULL, (xmlChar*)path.c_str());
+		pDtd = xmlParseDTD(nullptr, (xmlChar*)path.c_str());
 
 		if(pDtd)
 		{
@@ -2049,7 +2001,7 @@ void locInitStrings(bool force)
 
 static void locProcessEntity(xmlEntityPtr entity, void* locmap)
 {
-	if(locmap != NULL)
+	if(locmap != nullptr)
 	{
 		if(locmap == &_inputkeys)
 		{
@@ -2165,7 +2117,7 @@ static void locProcessName(xmlEntityPtr entity, void* nametype)
 #if defined(BETA_RELEASE)
 static int interpreter(const char* line, int argc, const char** argv, int refcon)
 {
-	phui::DOM::RunScript(_msgloop, NULL, line);
+	phui::DOM::RunScript(_msgloop, nullptr, line);
 	return 0;
 }
 #endif
@@ -2459,7 +2411,7 @@ int uiConsoleprintf(const char* text, ...)
 		if(out[out.size()  - 1] != '\n')
 			out += "\n";
 
-		Write_Log(LOG_CONSOLE, LOG_INFO, out.c_str()) ;
+		Write_Log(LOG_CONSOLE, LOG_INFO, out.c_str());
 
 		if(display) display->AddText(out.c_str());
 
@@ -2723,15 +2675,7 @@ void BarCompassView::DrawCardinalIndicator(phui::GraphicsContext* ctx, float ang
 
 float BarCompassView::GetHeading()
 {
-	float angle;
-
-#if defined(USE_OSG)
-	angle = -(float)(atan2(playdir.x, playdir.y) * 180.0f / osg::PI);
-#else
-	angle = -(float)(atan2(playdir.x, playdir.y) * 180.0f / PI);
-#endif
-
-	return angle;
+	return -(float)(atan2(playdir.x, playdir.y) * 180.0f / float(PI));
 }
 
 /************************************************************************************************
@@ -2744,11 +2688,7 @@ float BarCompassView::Theta(float barCompassWidth, float scalar)
 
 	theta = 2.0f * ( atan2( (barCompassWidth)/2, scalar ) ); // In radians, yuck
 
-#if defined(USE_OSG)
-	theta = theta * (180.0f / osg::PI);
-#else
 	theta = theta * (180.0f / PI);		// Convert theta to degrees, much better
-#endif
 
 	return theta;
 }
@@ -3136,12 +3076,7 @@ void DrawIconView::DrawSelfColor(float r, float g, float b, float alpha)
 
 void CompassView::DrawSelf()
 {
-	float angle;
-#if defined(USE_OSG)
-	angle = -(float)(atan2(playdir.x, playdir.y) * 180.0f / osg::PI);
-#else
-	angle = -(float)(atan2(playdir.x, playdir.y) * 180.0f / PI);
-#endif
+	float angle = -(float)(atan2(playdir.x, playdir.y) * 180.0f / float(PI));
 	glPushMatrix();
 	glTranslatef(_width/2, _height/2, 0);
 	glRotatef(angle, 0, 0, 1);
@@ -3845,158 +3780,3 @@ void uiGC()
 {
 	JS_GC(_jsgame->jsContext());
 }
-
-#if defined(USE_OSG)
-
-class phuiDrawable: public osg::Drawable
-{
-public:
-	phuiDrawable(phui::Viewport* v): osg::Drawable(), _viewport(v)
-	{
-		setSupportsDisplayList(false);
-	}
-	explicit phuiDrawable() : osg::Drawable(), _viewport(0) {}
-	phuiDrawable(const Drawable &copy, const osg::CopyOp &copyop=osg::CopyOp::SHALLOW_COPY) : osg::Drawable(copy, copyop), _viewport(0) {}
-
-	META_Object(ww2, phuiDrawable);
-	virtual void drawImplementation(osg::RenderInfo &ri) const
-	{
-		// OSG ascends when disabling texture units, so make sure unit 0 is active
-		// before UI draws.
-		ri.getState()->setActiveTextureUnit(0);
-
-		push_gl_state();
-		_viewport->Draw();
-		pop_gl_state();
-	}
-
-	virtual osg::BoundingBox computeBound() const
-	{
-		osg::BoundingBox _bbox;
-		_bbox.init();
-
-		_bbox._min._v[0] = _viewport->X();
-		_bbox._min._v[1] = _viewport->Y();
-		_bbox._min._v[2] = 0;
-
-		_bbox._max._v[0] = _bbox._min._v[0] + _viewport->Width();
-		_bbox._max._v[1] = _bbox._min._v[1] + _viewport->Height();
-		_bbox._max._v[2] = 0;
-
-		return _bbox;
-	}
-
-	phui::Viewport* _viewport;
-};
-
-/*
-static void uiInitOSG()
-{
-	_ColorRankIcons = drawIconLoad("ui/uidata/chat/commrank");
-
-	osg::Geode* geode = new osg::Geode;
-	geode->addDrawable(new phuiDrawable(_viewport));
-
-	osg::MatrixTransform* modelview_abs = new osg::MatrixTransform;
-	modelview_abs->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
-	modelview_abs->setMatrix(osg::Matrix::identity());
-	modelview_abs->addChild(geode);
-
-#if(0)
-	osg::Projection* proj = new osg::Projection;
-	proj->setMatrix(osg::Matrix::ortho2D(0,_viewport->Width(),0,_viewport->Height()));
-	proj->getOrCreateStateSet()->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-	proj->getOrCreateStateSet()->setMode(GL_DEPTH_TEST,osg::StateAttribute::OFF);
-	proj->getOrCreateStateSet()->setMode(GL_CLIP_PLANE0,osg::StateAttribute::ON);
-	proj->getOrCreateStateSet()->setMode(GL_CLIP_PLANE1,osg::StateAttribute::ON);
-	proj->getOrCreateStateSet()->setMode(GL_CLIP_PLANE2,osg::StateAttribute::ON);
-	proj->getOrCreateStateSet()->setMode(GL_CLIP_PLANE3,osg::StateAttribute::ON);
-	proj->getOrCreateStateSet()->setMode(GL_BLEND,osg::StateAttribute::ON);
-	proj->getOrCreateStateSet()->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
-	proj->getOrCreateStateSet()->setMode(GL_FOG, osg::StateAttribute::OFF);
-
-	proj->getOrCreateStateSet()->setRenderBinDetails(UI_RENDERBIN,"RenderBin");
-	proj->addChild(modelview_abs);
-	proj->setName("__ui__");
-
-	_uinode = proj;
-
-	osgRootNode()->addChild(proj);
-#else
-	osg::Camera* ui = new osg::Camera;
-
-	// Exclude UI from any post render filtering
-	ui->setRenderOrder(osg::Camera::POST_RENDER);
-	ui->setName("__uiCamera__");
-
-	ui->setProjectionMatrix(osg::Matrix::ortho2D(0,_viewport->Width(),0,_viewport->Height()));
-	ui->getOrCreateStateSet()->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-	ui->getOrCreateStateSet()->setMode(GL_DEPTH_TEST,osg::StateAttribute::OFF);
-	ui->getOrCreateStateSet()->setMode(GL_CLIP_PLANE0,osg::StateAttribute::ON);
-	ui->getOrCreateStateSet()->setMode(GL_CLIP_PLANE1,osg::StateAttribute::ON);
-	ui->getOrCreateStateSet()->setMode(GL_CLIP_PLANE2,osg::StateAttribute::ON);
-	ui->getOrCreateStateSet()->setMode(GL_CLIP_PLANE3,osg::StateAttribute::ON);
-	ui->getOrCreateStateSet()->setMode(GL_BLEND,osg::StateAttribute::ON);
-	ui->getOrCreateStateSet()->setMode(GL_LIGHTING,osg::StateAttribute::OFF);
-	ui->getOrCreateStateSet()->setMode(GL_FOG, osg::StateAttribute::OFF);
-	ui->setClearMask(0);
-
-	ui->addChild(modelview_abs);
-	ui->setName("__ui__");
-
-	_uinode = ui;
-
-	osgRootNode()->addChild(ui);
-#endif
-}
-*/
-
-static void uiCloseAllWindows()
-{
-// close all views except chat and terminal
-	for(unsigned int i = 0; i < uiViewport()->ChildCount();)
-	{
-		phui::View* child = uiViewport()->ChildAt(i);
-		if(child != uiChatWindow() && child != _terminal)
-		{
-			uiViewport()->RemoveChild(child);
-			delete child;
-			continue;
-		}
-		i++;
-	}
-}
-
-void uiSpawnLoadingScreen()
-{
-	if(!_spawnscreen)
-		_spawnscreen = uiLoadView("spawn");
-}
-
-void uiEnterWorld()
-{
-	uiViewport()->HideToolTip();
-	uiCloseAllWindows();
-	uiChatHide();
-	imapAxisInputState(1);
-	imapButtonInputState(1);
-	uiSetCursor(0);
-
-	_spawnscreen = 0;
-	_ingame = true;
-
-	uiChatShow();
-	persHUDShowHUD();
-
-	// let the tutorial manager know we've changed states
-	TUT_MGR->DoEvent(TUT_EVENT_SPAWN);
-
-#ifdef BETA_RELEASE
-	if(SuperTroop)
-		fpFPSSetSuperTroop(SuperTroop);
-#endif
-
-	uiGC();
-}
-
-#endif

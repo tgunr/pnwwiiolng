@@ -33,7 +33,6 @@
 #include "include/inplace_vector.h"
 #include <queue>
 #include "teul/teulBasic.h"
-#include "teul/teulDatagramPool.h"
 #include "teul/teulEndpoint.h"
 #include "teul/teulEndpointIdleList.h"
 #include "teul/teulEndpointImpl.h"
@@ -49,46 +48,47 @@
 
 static size_t _teulConnects;
 
-typedef WWII::inplace_vector<ENDPOINT, Teul::MaxConnections> ENDPOINT_ARRAY ;
-typedef WWII::inplace_vector<EndpointImpl, Teul::MaxConnections> ENDPOINT_IMPL_ARRAY ;
-ENDPOINT_ARRAY _endpoints ;
-static ENDPOINT_IMPL_ARRAY _endpointImpls ;
+typedef WWII::inplace_vector<ENDPOINT, Teul::MaxConnections> ENDPOINT_ARRAY;
+typedef WWII::inplace_vector<EndpointImpl, Teul::MaxConnections> ENDPOINT_IMPL_ARRAY;
+ENDPOINT_ARRAY _endpoints;
+static ENDPOINT_IMPL_ARRAY _endpointImpls;
 
-typedef std::vector<ENDPOINT*> ENDPOINT_VEC ;
-static ENDPOINT_VEC _deadEndpoints ;
+typedef std::vector<ENDPOINT*> ENDPOINT_VEC;
+static ENDPOINT_VEC _deadEndpoints;
 
-using namespace Teul ;
+using namespace Teul;
 namespace Teul
 {
-	ENDPOINT_LIST idleEndpoints ;
+	ENDPOINT_LIST idleEndpoints;
 }
 
-static ENDPOINT_LIST _freeEndpoints ;
+static ENDPOINT_LIST _freeEndpoints;
 
-static ERROR_FUNCTION* _endpointErrorFn ;
+static ERROR_FUNCTION* _endpointErrorFn;
+
+extern void teulReleaseDatagram(struct DATA_GRAM*);
 
 void
 teulCloseAllEndpoints(const SINT32 errorCode)
 {
-	dbugLog(_FLM, "Orderly shutdown in progress [%d].", errorCode) ;
+	dbugLog(_FLM, "Orderly shutdown in progress [%d].", errorCode);
 
-	Teul::ENDPOINT_LIST eps = idleEndpoints ;
-	Teul::ENDPOINT_LIST::iterator it ;
+	Teul::ENDPOINT_LIST eps = idleEndpoints;
 
 #if platBuild == TEUL_SERVER
 	// Make a copy.
 	if ( errorCode != 0 )
 	{
-		for ( it = eps.begin() ; it != eps.end() ; ++it )
+		for ( auto it = eps.begin(), end = eps.end(); it != end; ++it )
 		{
-			(*it)->sendError(errorCode) ;
+			(*it)->sendError(errorCode);
 		}
 	}
 #endif
-	for ( it = eps.begin() ; it != eps.end() ; ++it )
+	for ( auto it = eps.begin(), end = eps.end(); it != end; ++it )
 	{
-		if ( *it != NULL )
-			teulClose(*(*it), Teul::Closing::OrderlyShutdown) ;
+		if ( *it != nullptr )
+			teulClose(*(*it), Teul::Closing::OrderlyShutdown);
 	}
 }
 
@@ -101,9 +101,9 @@ ENDPOINT::encrypt(UCHAR* const stream, const size_t bytes)
 	if ( m_impl->m_cryptVersion >= Teul::TeulV2 )
 	{
 #ifdef DEBUG_ENCRYPTION
-		printf("Encrypt %p %d [%u] seed %llx\n", stream, bytes, m_impl->m_cryptVersion, m_impl->m_txCrypt.seed()) ;
+		printf("Encrypt %p %d [%u] seed %llx\n", stream, bytes, m_impl->m_cryptVersion, m_impl->m_txCrypt.seed());
 #endif
-		m_impl->m_txCrypt.translate(stream, bytes) ;
+		m_impl->m_txCrypt.translate(stream, bytes);
 	}
 }
 
@@ -116,9 +116,9 @@ ENDPOINT::decrypt(UCHAR* const stream, const size_t bytes)
 	if ( m_impl->m_cryptVersion >= Teul::TeulV2 )
 	{
 #ifdef DEBUG_ENCRYPTION
-		printf("Decrypt %p %d [%u] seed %llx\n", stream, bytes, m_impl->m_cryptVersion, m_impl->m_rxCrypt.seed()) ;
+		printf("Decrypt %p %d [%u] seed %llx\n", stream, bytes, m_impl->m_cryptVersion, m_impl->m_rxCrypt.seed());
 #endif
-		m_impl->m_rxCrypt.translate(stream, bytes) ;
+		m_impl->m_rxCrypt.translate(stream, bytes);
 	}
 }
 
@@ -132,19 +132,19 @@ ENDPOINT::decrypt(UCHAR* const stream, const size_t bytes)
 bool
 ENDPOINT::setNagleEnabled(bool enabled_)
 {
-	int previousValue = 0 ;
-	socklen_t argLen = sizeof(previousValue) ;
-	getsockopt(this->socket, IPPROTO_TCP, TCP_NODELAY, (char*)&previousValue, &argLen) ;
+	int previousValue = 0;
+	socklen_t argLen = sizeof(previousValue);
+	getsockopt(this->socket, IPPROTO_TCP, TCP_NODELAY, (char*)&previousValue, &argLen);
 
 	// Find the previous value of nagle.
 	// To enable nagle, set TCP_NODELAY to FALSE.
-	const int argValue = enabled_ ? 0 : 1 ;
+	const int argValue = enabled_ ? 0 : 1;
 	if ( previousValue != argValue )
 	{
-		setsockopt(this->socket, IPPROTO_TCP, TCP_NODELAY, (const char*)&argValue, sizeof(argValue)) ;
+		setsockopt(this->socket, IPPROTO_TCP, TCP_NODELAY, (const char*)&argValue, sizeof(argValue));
 	}
 
-	return (previousValue == 0) ;
+	return (previousValue == 0);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -153,17 +153,17 @@ ENDPOINT::setNagleEnabled(bool enabled_)
 ENDPOINT*
 teulGetEndpoint(const SINT32 teulIndex)
 {
-	if ( (size_t)teulIndex >= _endpoints.size() )	// Coercing to unsigned makes negative indexes very large.
+	if ( PN_UNLIKELY((size_t)teulIndex >= _endpoints.size()) )	// Coercing to unsigned makes negative indexes very large.
 	{
-		//LogAbort("t:%d endpoint index out of range (0 <= endpoint <= %" PRSizeT ")", teulIndex, _endpoints.size()) ;
-		return NULL ;
+		//LogAbort("t:%d endpoint index out of range (0 <= endpoint <= %" PRSizeT ")", teulIndex, _endpoints.size());
+		return nullptr;
 	}
 
-	ENDPOINT& endpoint = _endpoints[teulIndex] ;
-	if ( endpoint.m_inUse == false )
+	ENDPOINT& endpoint = _endpoints[teulIndex];
+	if ( PN_UNLIKELY(endpoint.m_inUse == false) )
 	{
-		dbugLog(_FLW, "t:%d endpoint not in use", teulIndex) ;
-		return NULL ;
+		dbugLog(_FLW, "t:%d endpoint not in use", teulIndex);
+		return nullptr;
 	}
 
 	return &endpoint;
@@ -175,12 +175,12 @@ teulGetEndpoint(const SINT32 teulIndex)
 ENDPOINT*
 Teul::GetConnectedEndpoint(const SINT32 teulIndex)
 {
-	ENDPOINT* const endpoint = teulGetEndpoint(teulIndex) ;
-	if ( endpoint == NULL )
-		return NULL ;
-	if ( (endpoint->state() != IS_OPEN) | (endpoint->m_closed) | (endpoint->m_connected == false) )
-		return NULL ;
-	return endpoint ;
+	ENDPOINT* const endpoint = teulGetEndpoint(teulIndex);
+	if ( PN_UNLIKELY(endpoint == nullptr) )
+		return nullptr;
+	if ( PN_UNLIKELY((endpoint->state() != IS_OPEN) | (endpoint->m_closed) | (endpoint->m_connected == false)) )
+		return nullptr;
+	return endpoint;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -188,8 +188,8 @@ Teul::GetConnectedEndpoint(const SINT32 teulIndex)
 UINT32
 teulGetEndpointLocalAddress(const SINT32 teulIndex)
 {
-	const ENDPOINT* const endpoint = teulGetEndpoint(teulIndex) ;
-	return (endpoint != NULL) ? endpoint->localAddress() : Teul::INVALID_INDEX ;
+	const ENDPOINT* const endpoint = teulGetEndpoint(teulIndex);
+	return PN_LIKELY(endpoint != nullptr) ? endpoint->localAddress() : Teul::INVALID_INDEX;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -197,8 +197,8 @@ teulGetEndpointLocalAddress(const SINT32 teulIndex)
 UINT32
 teulGetEndpointRemoteAddress(const SINT32 teulIndex)
 {
-	const ENDPOINT* const endpoint = teulGetEndpoint(teulIndex) ;
-	return (endpoint != NULL) ? endpoint->destAddress(): Teul::INVALID_INDEX ;
+	const ENDPOINT* const endpoint = teulGetEndpoint(teulIndex);
+	return PN_LIKELY(endpoint != nullptr) ? endpoint->destAddress() : Teul::INVALID_INDEX;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -207,8 +207,8 @@ teulGetEndpointRemoteAddress(const SINT32 teulIndex)
 std::pair<UINT32, UINT16>
 Teul::GetLocal(const SINT32 teulIndex)
 {
-	const ENDPOINT* const endpoint = teulGetEndpoint(teulIndex) ;
-	return (endpoint != NULL) ? std::make_pair(endpoint->localAddress(), endpoint->localPort()) : std::make_pair(Teul::INVALID_INDEX, (UINT16)-1) ;
+	const ENDPOINT* const endpoint = teulGetEndpoint(teulIndex);
+	return PN_LIKELY(endpoint != nullptr) ? std::make_pair(endpoint->localAddress(), endpoint->localPort()) : std::make_pair(Teul::INVALID_INDEX, (UINT16) - 1);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -217,8 +217,8 @@ Teul::GetLocal(const SINT32 teulIndex)
 std::pair<UINT32, UINT16>
 Teul::GetRemote(const SINT32 teulIndex)
 {
-	const ENDPOINT* const endpoint = teulGetEndpoint(teulIndex) ;
-	return (endpoint != NULL) ? std::make_pair(endpoint->destAddress(), endpoint->destPort()) : std::make_pair(Teul::INVALID_INDEX, (UINT16)-1) ;
+	const ENDPOINT* const endpoint = teulGetEndpoint(teulIndex);
+	return PN_LIKELY(endpoint != nullptr) ? std::make_pair(endpoint->destAddress(), endpoint->destPort()) : std::make_pair(Teul::INVALID_INDEX, (UINT16) - 1);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -227,14 +227,14 @@ Teul::GetRemote(const SINT32 teulIndex)
 SINT32
 teulQueryNextFreeIndex()
 {
-	teulKillDeadEndpoints() ;
+	teulKillDeadEndpoints();
 
-	if ( _freeEndpoints.empty() )
+	if ( PN_UNLIKELY(_freeEndpoints.empty()) )
 	{
-		return -ENOSPC ;
+		return -ENOSPC;
 	}
 
-	return _freeEndpoints.front()->teulIndex() ;
+	return _freeEndpoints.front()->teulIndex();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -243,37 +243,37 @@ teulQueryNextFreeIndex()
 static ENDPOINT*
 _allocEndpoint(SINT32 wantIndex)
 {
-	if ( _freeEndpoints.empty() )
+	if ( PN_UNLIKELY(_freeEndpoints.empty()) )
 	{
-		teulKillDeadEndpoints() ;
+		teulKillDeadEndpoints();
 		ABORT_IF(_freeEndpoints.empty());
 	}
 
 	if ( wantIndex < 0 )
 	{
-		ABORT_IF_EX(wantIndex != Teul::AnyIndex, "illegal new endpoint index: %d", wantIndex) ;
+		ABORT_IF_EX(wantIndex != Teul::AnyIndex, "illegal new endpoint index: %d", wantIndex);
 
-		wantIndex = _freeEndpoints.front()->teulIndex() ;
-		_freeEndpoints.pop_front() ;
+		wantIndex = _freeEndpoints.front()->teulIndex();
+		_freeEndpoints.pop_front();
 	}
 	else
 	{
-		assert( (size_t)wantIndex < _endpoints.size() ) ;
+		assert( (size_t)wantIndex < _endpoints.size() );
 
 		// In truth, this should usually be the first endpoint available.
-		ENDPOINT_LIST::iterator it = std::find(_freeEndpoints.begin(), _freeEndpoints.end(), &_endpoints[wantIndex]) ;
+		ENDPOINT_LIST::iterator it = std::find(_freeEndpoints.begin(), _freeEndpoints.end(), &_endpoints[wantIndex]);
 		ABORT_IF(it == _freeEndpoints.end());
-		_freeEndpoints.erase(it) ;
+		_freeEndpoints.erase(it);
 	}
 
-	ENDPOINT& endpoint = _endpoints[wantIndex] ;
+	ENDPOINT& endpoint = _endpoints[wantIndex];
 
 	_teulConnects++;
 
-	endpoint.m_closed = false ;
+	endpoint.m_closed = false;
 
 #ifdef DEV_BUILD
-	dbugLog(_FLD, "t:%d allocated endpoint %p", endpoint.teulIndex(), &endpoint) ;
+	dbugLog(_FLD, "t:%d allocated endpoint %p", endpoint.teulIndex(), &endpoint);
 #endif
 
 	return &endpoint;
@@ -285,17 +285,17 @@ _allocEndpoint(SINT32 wantIndex)
 static void
 _releaseEndpoint(ENDPOINT& endpoint)
 {
-	endpoint.m_closed = false ;
-	endpoint.m_impl->Reset() ;
+	endpoint.m_closed = false;
+	endpoint.m_impl->Reset();
 
 	// Remove me from the idle list.
-	idleEndpoints.remove(&endpoint) ;
+	idleEndpoints.remove(&endpoint);
 
 	// Push me onto the free list.
-	_freeEndpoints.push_back(&endpoint) ;
+	_freeEndpoints.push_back(&endpoint);
 
 #ifdef DEV_BUILD
-	dbugLog(_FLD, "t:%d pushed to freeList (%u endpoints)", endpoint.teulIndex(), _freeEndpoints.size()) ;
+	dbugLog(_FLD, "t:%d pushed to freeList (%" PRSizeT " endpoints)", endpoint.teulIndex(), _freeEndpoints.size());
 	dbugWrite(_FLN, "t:%d released", endpoint.teulIndex());
 #endif
 
@@ -310,51 +310,37 @@ teulRemoveEndpoint(ENDPOINT* inEndpoint)
 {
 	if ( ! inEndpoint->m_inUse )
 	{
-		dbugLog(_FLD, "t:%d tried to remove endpoint not in use", inEndpoint->teulIndex()) ;
+		dbugLog(_FLD, "t:%d tried to remove endpoint not in use", inEndpoint->teulIndex());
 		return;
 	}
 
 	if ( inEndpoint->m_closed == false )
 	{
-		dbugLog(_FLD, "t:%d tried to remove unclosed endpoint", inEndpoint->teulIndex()) ;
+		dbugLog(_FLD, "t:%d tried to remove unclosed endpoint", inEndpoint->teulIndex());
 		inEndpoint->doError(ECONNABORTED);
-		inEndpoint->shutdown() ;
+		inEndpoint->shutdown();
 	}
 
-	_deadEndpoints.push_back(inEndpoint) ;
+	_deadEndpoints.push_back(inEndpoint);
 }
 
 //////////////////////////////////////////////////////////////////////
-// Transfer dead enpoints to the free endpoint list.
+// Transfer dead endpoints to the free endpoint list.
 
 void
 teulKillDeadEndpoints(void)
 {
 	if ( _deadEndpoints.empty() )
 	{
-		return ;
+		return;
 	}
 
-	for ( ENDPOINT_VEC::iterator it = _deadEndpoints.begin() ; it != _deadEndpoints.end() ; ++it )
+	for ( ENDPOINT_VEC::iterator it = _deadEndpoints.begin(), end = _deadEndpoints.end(); it != end; ++it )
 	{
-		teulFreeEndpoint(*it) ;
+		teulFreeEndpoint(*it);
 	}
 
-	_deadEndpoints.clear() ;
-}
-
-//////////////////////////////////////////////////////////////////////
-// Delete any datagrams waiting on a given endpoint's queue.
-
-static void
-_freeDatagramQueue(std::vector<DATA_GRAM*>& queue)
-{
-	while ( queue.empty() == false )
-	{
-		DATA_GRAM* gram = queue.front() ;
-		teulReleaseDatagram(gram) ;
-		queue.erase(queue.begin()) ;
-	}
+	_deadEndpoints.clear();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -363,13 +349,13 @@ _freeDatagramQueue(std::vector<DATA_GRAM*>& queue)
 void
 ENDPOINT::releaseDatagram()
 {
-	if ( m_impl->m_curDatagram != NULL )
+	if ( m_impl->m_curDatagram != nullptr )
 	{
-		teulReleaseDatagram(m_impl->m_curDatagram) ;
-		m_impl->m_curDatagram = NULL ;
+		teulReleaseDatagram(m_impl->m_curDatagram);
+		m_impl->m_curDatagram = nullptr;
 	}
 	if ( m_readBufferUsed != 0 )
-		m_readBufferUsed = 0 ;
+		m_readBufferUsed = 0;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -378,31 +364,30 @@ ENDPOINT::releaseDatagram()
 void
 teulFreeEndpoint(ENDPOINT* inEndpoint)
 {
-	if (inEndpoint == NULL || (! inEndpoint->m_inUse) )
+	if (inEndpoint == nullptr || (!inEndpoint->m_inUse))
 		return;
 
 #ifdef DEV_BUILD
 	dbugLog(_FLD, "t:%d freeing endpoint %p", inEndpoint->teulIndex(), inEndpoint);
 #endif
 
-	inEndpoint->releaseDatagram() ;
+	inEndpoint->releaseDatagram();
 
-	_freeDatagramQueue(inEndpoint->m_impl->recvQueue) ;
-	inEndpoint->m_impl->Reset() ;
+	inEndpoint->m_impl->Reset();
 
-//	dbugLog(_FLD, "pushing endpoint %p to freelist", inEndpoint) ;
+//	dbugLog(_FLD, "pushing endpoint %p to freelist", inEndpoint);
 	_releaseEndpoint(*inEndpoint);
 }
 
 void
 ENDPOINT::initialize(SINT32 i)
 {
-	m_impl = &_endpointImpls[i] ;
+	m_impl = &_endpointImpls[i];
 	m_teulIndex = (SINT16)i;
 	m_inUse = false;
-	m_state = IS_DEAD ;
+	m_state = IS_DEAD;
 
-	_freeEndpoints.push_back(this) ;
+	_freeEndpoints.push_back(this);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -411,79 +396,78 @@ ENDPOINT::initialize(SINT32 i)
 void
 teulInitEndpoints(ERROR_FUNCTION* const endpointErrorFn)
 {
-	_endpointErrorFn = endpointErrorFn ;
+	_endpointErrorFn = endpointErrorFn;
 	_teulConnects = 0;
 
-	_endpoints.resize(Teul::MaxConnections) ;
-	_endpointImpls.resize(Teul::MaxConnections) ;
+	_endpoints.resize(Teul::MaxConnections);
+	_endpointImpls.resize(Teul::MaxConnections);
 
 	ABORT_IF(_endpoints.empty() == true);	// Just a sanity check really.
 
-	const size_t numConnections = _endpoints.size() ;
-	for ( size_t i = 0 ; i < numConnections ; i++)
+	const size_t numConnections = _endpoints.size();
+	for ( size_t i = 0; i < numConnections; i++)
 	{
-		_endpoints[i].initialize(i) ;
+		_endpoints[i].initialize(i);
 	}
 
 	dbugLog(_FLI, "Teul::MaxConnections %" PRSizeT " freeEndpoints %" PRSizeT " sizeof(ENDPOINT):%" PRSizeT " sizeof(ENDPOINTImpl):%" PRSizeT, Teul::MaxConnections, _endpoints.size(), sizeof(ENDPOINT), sizeof(EndpointImpl));
 
-	ABORT_IF_EX(_freeEndpoints.empty() == true, "endpointFreeList should not be empty after initialization") ;
+	ABORT_IF_EX(_freeEndpoints.empty() == true, "endpointFreeList should not be empty after initialization");
 }
 
 void
 teulCleanupEndpoints(void)
 {
-	teulKillDeadEndpoints() ;
+	teulKillDeadEndpoints();
 
 	if ( _endpoints.empty() == false )
 	{
-		const size_t numEndpoints = _endpoints.size() ;
-		for ( size_t i = 0 ; i < numEndpoints ; i++)
+		const size_t numEndpoints = _endpoints.size();
+		for ( size_t i = 0; i < numEndpoints; i++)
 		{
-			ENDPOINT& endpoint = _endpoints[i] ;
+			ENDPOINT& endpoint = _endpoints[i];
 
-			_freeDatagramQueue(endpoint.m_impl->recvQueue) ;
-			endpoint.m_impl->Reset() ;
+			endpoint.m_impl->Reset();
 
-			endpoint.releaseDatagram() ;
+			endpoint.releaseDatagram();
 		}
 	}
 
-	_freeEndpoints.clear() ;
-	_deadEndpoints.clear() ;
-	idleEndpoints.clear() ;
-	_endpoints.clear() ;
-	_endpointImpls.clear() ;
+	_freeEndpoints.clear();
+	_deadEndpoints.clear();
+	idleEndpoints.clear();
+	_endpoints.clear();
+	_endpointImpls.clear();
 }
 
 UINT32
 ENDPOINT::setTimeout(const UINT32 timeout_)
 {
-	timeout = timeout_ ;
+	timeout = timeout_;
 
 	if ( timeout == 0 || state() == IS_LISTENING || protocol == PROTOCOL_UDB || protocol == PROTOCOL_CTRL )
 	{
 		m_impl->kliveInterval = Teul::MaxKliveNeeded;
-		m_doTimeoutCheck = false ;
+		m_doTimeoutCheck = false;
 	}
 	else
 	{
-		SINT32 interval = timeout / Teul::KlivesPerTimeout ;
+		SINT32 interval = timeout / Teul::KlivesPerTimeout;
 		if ( interval < Teul::MinKliveNeeded && Teul::MinKliveNeeded < timeout )
-			interval = Teul::MinKliveNeeded ;
+			interval = Teul::MinKliveNeeded;
 		if ( interval > Teul::MaxKliveNeeded )
-			interval  = Teul::MaxKliveNeeded ;
-		m_impl->kliveInterval = (UINT16)interval ;
-		m_doTimeoutCheck = true ;
+			interval  = Teul::MaxKliveNeeded;
+		m_impl->kliveInterval = (UINT16)interval;
+		m_doTimeoutCheck = true;
 #if defined(DEBUG_CONNECTIONS)
-		dbugLog(_FLD, "t:%d timeout:%u, iv:%u, dtc:true", teulIndex(), timeout_, interval) ;
-		printf("t:%d timeout:%u, iv:%u, dtc:true\n", teulIndex(), timeout_, interval) ;
+		dbugLog(_FLD, "t:%d timeout:%u, iv:%u, dtc:true", teulIndex(), timeout_, interval);
+		printf("t:%d timeout:%u, iv:%u, dtc:true\n", teulIndex(), timeout_, interval);
 #endif
 	}
 
-	lastKliveSent.makeCurrent() ;
+	lastKliveSent.makeCurrent();
 
-	return m_impl->kliveInterval ;
+	return m_impl->kliveInterval;
 }
 
 ENDPOINT*
@@ -493,42 +477,40 @@ teulCreateEndpoint(SINT32 wantIndex
 					, const PROTOCOL protocol
 					)
 {
-	ENDPOINT* const newEndpoint = _allocEndpoint(wantIndex) ;
-	if ( newEndpoint == NULL)
+	ENDPOINT* const newEndpoint = _allocEndpoint(wantIndex);
+	if (PN_UNLIKELY(newEndpoint == nullptr))
 	{
-		dbugLog(_FLA, "_createEndpoint: could not allocate "
-			"buffer for endpoint");
-		return NULL;
+		dbugLog(_FLA, "_createEndpoint: could not allocate buffer for endpoint");
+		return nullptr;
 	}
 
 	newEndpoint->socket = INVALID_SOCKET;
 	newEndpoint->m_connected = false;
-	newEndpoint->lastDataRecv.makeCurrent() ;
-	newEndpoint->lastDataSent.makeCurrent() ;
+	newEndpoint->lastDataRecv.makeCurrent();
+	newEndpoint->lastDataSent.makeCurrent();
 
-	newEndpoint->m_impl->m_curDatagram = NULL ;
-	newEndpoint->m_readBufferUsed = 0 ;
-	newEndpoint->lastKliveSent.makeNever() ;
+	newEndpoint->m_impl->m_curDatagram = nullptr;
+	newEndpoint->m_readBufferUsed = 0;
+	newEndpoint->lastKliveSent.makeNever();
 
-	newEndpoint->m_parent = NULL;	// accept fills this out indicateing a parent
-							// connection. endpoints with parents do
-							// not send keep alives.
+	// populated in accept if we are the spawn of a listening connection.
+	newEndpoint->m_parent = nullptr;
 
 	if (timeout != 0 && timeout < Teul::MinEndpointTimeout)
 		timeout = Teul::MinEndpointTimeout;
 
-	newEndpoint->m_impl->Reset() ;
+	newEndpoint->m_impl->Reset();
 
 	newEndpoint->protocol = (UCHAR)protocol;
-	newEndpoint->m_peer = (protocol == PROTOCOL_UDB) | (protocol == PROTOCOL_CTRL) ;
+	newEndpoint->m_peer = (protocol == PROTOCOL_UDB) | (protocol == PROTOCOL_CTRL);
 
-	newEndpoint->m_state = (SCHAR)(isListening ? IS_LISTENING : IS_OPENING) ;
+	newEndpoint->m_state = (SCHAR)(isListening ? IS_LISTENING : IS_OPENING);
 
-	newEndpoint->setTimeout(timeout) ;
+	newEndpoint->setTimeout(timeout);
 
-	newEndpoint->m_created.makeCurrent() ;
-	newEndpoint->m_haveTicks = false ;
-	newEndpoint->m_tickAccumulation = 0ULL ;
+	newEndpoint->m_created.makeCurrent();
+	newEndpoint->m_haveTicks = false;
+	newEndpoint->m_tickAccumulation = 0ULL;
 
 	// allocates the packet buffers for write and reliable.
 	// initializes timeout and RTO to 1000ms and therefore defaults
@@ -541,24 +523,24 @@ teulCreateEndpoint(SINT32 wantIndex
 		case PROTOCOL_UDP:
 		case PROTOCOL_UDB:
 		case PROTOCOL_CTRL:
-			newEndpoint->fromSockAddress.sin_family = AF_INET ;
-			newEndpoint->localSockAddress.sin_family = AF_INET ;
-			newEndpoint->destSockAddress.sin_family = AF_INET ;
+			newEndpoint->fromSockAddress.sin_family = AF_INET;
+			newEndpoint->localSockAddress.sin_family = AF_INET;
+			newEndpoint->destSockAddress.sin_family = AF_INET;
 			break;
 
 		default:
 			dbugSetErrno(EINVAL);
 			dbugLog(_FLA, "error allocating endpoint, invalid protocol");
 			teulFreeEndpoint(newEndpoint);
-			return NULL;
+			return nullptr;
 			break;
 	}
 
-	newEndpoint->m_impl->m_version = Teul::VersionNumber ;
-	newEndpoint->m_impl->m_cryptVersion = (newEndpoint->protocol == PROTOCOL_TCP && !newEndpoint->m_peer) ? Teul::BaseVersion : 0x0000 ;
-	newEndpoint->m_impl->m_txCrypt.newSeed() ;
-	newEndpoint->m_impl->m_rxCrypt.setSeed(0ULL) ;
-//	newEndpoint->m_recvCrypt = newEndpoint->m_sendCrypt ;
+	newEndpoint->m_impl->m_version = Teul::VersionNumber;
+	newEndpoint->m_impl->m_cryptVersion = (newEndpoint->protocol == PROTOCOL_TCP && !newEndpoint->m_peer) ? Teul::BaseVersion : 0x0000;
+	newEndpoint->m_impl->m_txCrypt.newSeed();
+	newEndpoint->m_impl->m_rxCrypt.setSeed(0ULL);
+//	newEndpoint->m_recvCrypt = newEndpoint->m_sendCrypt;
 
 	switch (protocol)
 	{
@@ -573,7 +555,7 @@ teulCreateEndpoint(SINT32 wantIndex
 		break;
 	}
 
-	idleEndpoints.push_back(newEndpoint) ;
+	idleEndpoints.push_back(newEndpoint);
 	newEndpoint->m_inUse = true;
 
 	return newEndpoint;
@@ -586,63 +568,63 @@ const char*
 Teul::GetErrorName(SINT32 error)
 {
 	if ( error < 0 )
-		error = -error ;
+		error = -error;
 
-#define ErrorCase(__Error__) case __Error__: return #__Error__ ; break
-#define TeulErrorCase(__Error__) case Teul :: Errors :: __Error__ : return #__Error__ ; break
+#define ErrorCase(__Error__) case __Error__: return #__Error__; break
+#define TeulErrorCase(__Error__) case Teul :: Errors :: __Error__ : return #__Error__; break
 	switch ( (UINT32)error )
 	{
-	ErrorCase( EAGAIN ) ;
-	ErrorCase( EINTR ) ;
-	ErrorCase( ETEUL_UNDEF_CALLBACK ) ;
-	ErrorCase( ETEUL_ENOSPC_SEND_BUFFER ) ;
-	ErrorCase( ETEUL_ENOSPC_SEND_SOCKET ) ;
-	ErrorCase( ENETDOWN ) ;
-	ErrorCase( EPFNOSUPPORT ) ;
-	ErrorCase( EAFNOSUPPORT ) ;
-	ErrorCase( ENETUNREACH ) ;
-	ErrorCase( EADDRINUSE ) ;
-	ErrorCase( EADDRNOTAVAIL ) ;
-	ErrorCase( ENETRESET ) ;
-	ErrorCase( ECONNABORTED ) ;
-	ErrorCase( ECONNRESET ) ;
-	ErrorCase( ENOBUFS ) ;
-	ErrorCase( ENOTCONN ) ;
-	ErrorCase( ETIMEDOUT ) ;
-	ErrorCase( ECONNREFUSED ) ;
+	ErrorCase( EAGAIN );
+	ErrorCase( EINTR );
+	ErrorCase( ETEUL_UNDEF_CALLBACK );
+	ErrorCase( ETEUL_ENOSPC_SEND_BUFFER );
+	ErrorCase( ETEUL_ENOSPC_SEND_SOCKET );
+	ErrorCase( ENETDOWN );
+	ErrorCase( EPFNOSUPPORT );
+	ErrorCase( EAFNOSUPPORT );
+	ErrorCase( ENETUNREACH );
+	ErrorCase( EADDRINUSE );
+	ErrorCase( EADDRNOTAVAIL );
+	ErrorCase( ENETRESET );
+	ErrorCase( ECONNABORTED );
+	ErrorCase( ECONNRESET );
+	ErrorCase( ENOBUFS );
+	ErrorCase( ENOTCONN );
+	ErrorCase( ETIMEDOUT );
+	ErrorCase( ECONNREFUSED );
 #if EWOULDBLOCK != EAGAIN
-	ErrorCase( EWOULDBLOCK ) ;
+	ErrorCase( EWOULDBLOCK );
 #endif
 #if platOS == OS_LINUX
-	ErrorCase( ESHUTDOWN ) ;
-	ErrorCase( EHOSTDOWN ) ;
+	ErrorCase( ESHUTDOWN );
+	ErrorCase( EHOSTDOWN );
 #endif
-	ErrorCase( EHOSTUNREACH ) ;
-	ErrorCase( ETEUL_CONNECTION_STALLED ) ;
-	ErrorCase( ETEUL_CB_CONN_DEAD ) ;	// Tried to send a callback to a dead connection.
-	ErrorCase( ETEUL_CB_SEND_NULL ) ;	// Tried to send a NULL callback.
-	ErrorCase( ETEUL_SERVER_SHUTDOWN ) ;
-	ErrorCase( ETEUL_CB_REQ_DATA ) ;	// Bad receive.
+	ErrorCase( EHOSTUNREACH );
+	ErrorCase( ETEUL_CONNECTION_STALLED );
+	ErrorCase( ETEUL_CB_CONN_DEAD );	// Tried to send a callback to a dead connection.
+	ErrorCase( ETEUL_CB_SEND_NULL );	// Tried to send a null callback.
+	ErrorCase( ETEUL_SERVER_SHUTDOWN );
+	ErrorCase( ETEUL_CB_REQ_DATA );	// Bad receive.
 	case ETEUL_ILLEGAL_PACKET_ORDER:
-		return "ecorrupt" ;
-	break ;
+		return "ecorrupt";
+	break;
 
-	TeulErrorCase( LoginFail_ActivateNoLocalInfo ) ;
-	TeulErrorCase( LoginFail_ActivateFailed ) ;
-	TeulErrorCase( LoginFail_DespawnNoPlayer ) ;
-	TeulErrorCase( LoginFail_DespawnError ) ;
-	TeulErrorCase( LoginFail_ActivateNoPlayerInfo ) ;
-	TeulErrorCase( LoginFail_AcceptBadIndex ) ;
-	TeulErrorCase( LoginFail_AcceptBadTeul ) ;
-	TeulErrorCase( LoginFail_AddPlayer ) ;
-	TeulErrorCase( LoginFail_SessionValidation ) ;
-	TeulErrorCase( LoginFail_NoSession ) ;
-	TeulErrorCase( LoginFail_Client ) ;
-	TeulErrorCase( LoginFail_SessionOwn ) ;
-	TeulErrorCase( LoginFail_Validation ) ;
-	TeulErrorCase( LoginFail_Collision ) ;
+	TeulErrorCase( LoginFail_ActivateNoLocalInfo );
+	TeulErrorCase( LoginFail_ActivateFailed );
+	TeulErrorCase( LoginFail_DespawnNoPlayer );
+	TeulErrorCase( LoginFail_DespawnError );
+	TeulErrorCase( LoginFail_ActivateNoPlayerInfo );
+	TeulErrorCase( LoginFail_AcceptBadIndex );
+	TeulErrorCase( LoginFail_AcceptBadTeul );
+	TeulErrorCase( LoginFail_AddPlayer );
+	TeulErrorCase( LoginFail_SessionValidation );
+	TeulErrorCase( LoginFail_NoSession );
+	TeulErrorCase( LoginFail_Client );
+	TeulErrorCase( LoginFail_SessionOwn );
+	TeulErrorCase( LoginFail_Validation );
+	TeulErrorCase( LoginFail_Collision );
 
-	default: break ;
+	default: break;
 	}
 #undef ErrorCase
 
@@ -651,20 +633,20 @@ Teul::GetErrorName(SINT32 error)
 		switch ( error / Teul::Errors::CategoryMultiplier )
 		{
 		case Teul::Errors::PackCallbackCategory:
-			return "pkcb" ;
-		break ;
+			return "pkcb";
+		break;
 		case Teul::Errors::SendFailCategory:
-			return "txf" ;
-		break ;
+			return "txf";
+		break;
 		case Teul::Errors::PushPacketCategory:
-			return "pshp" ;
-		break ;
+			return "pshp";
+		break;
 		default:
-		break ;
+		break;
 		}
 	}
 
-	return "INTERNALERRROR" ;
+	return "INTERNALERRROR";
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -673,16 +655,16 @@ Teul::GetErrorName(SINT32 error)
 int
 ENDPOINT::setRcvBufferSize(UINT32 newSize)
 {
-	static const UINT32 chunkSize = 4096 ;		// 4Kb - must be power of 2.
-	static const UINT32 chunkMask = chunkSize - 1 ;
+	static const UINT32 chunkSize = 4096;		// 4Kb - must be power of 2.
+	static const UINT32 chunkMask = chunkSize - 1;
 
-	const UINT32 goalSize = (std::min(newSize, (UINT32)ENDPOINT::MaxRcvBufferSize) + chunkSize) & (~chunkMask) ;
+	const UINT32 goalSize = (std::min(newSize, (UINT32)ENDPOINT::MaxRcvBufferSize) + chunkSize) & (~chunkMask);
 
 #if defined(DEV_BUILD)
-	dbugLog(_FLD, "t:%d sock:%d setting rcv to %dbytes", teulIndex(), socket, goalSize) ;
+	dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " setting rcv to %dbytes", teulIndex(), PRA_SOCKET(socket), goalSize);
 #endif
 
-	return setsockopt(socket, SOL_SOCKET, SO_RCVBUF, (const char*)&goalSize, sizeof(goalSize)) ;
+	return setsockopt(socket, SOL_SOCKET, SO_RCVBUF, (const char*)&goalSize, sizeof(goalSize));
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -691,30 +673,30 @@ ENDPOINT::setRcvBufferSize(UINT32 newSize)
 int
 ENDPOINT::setSndBufferSize(UINT32 newSize)
 {
-	static const UINT32 chunkSize = 4096 ;		// 4Kb - must be power of 2.
-	static const UINT32 chunkMask = chunkSize - 1 ;
+	static const UINT32 chunkSize = 4096;		// 4Kb - must be power of 2.
+	static const UINT32 chunkMask = chunkSize - 1;
 
-	const UINT32 goalSize = (std::min(newSize, (UINT32)ENDPOINT::MaxSndBufferSize) + chunkSize) & (~chunkMask) ;
+	const UINT32 goalSize = (std::min(newSize, (UINT32)ENDPOINT::MaxSndBufferSize) + chunkSize) & (~chunkMask);
 
 #if defined(DEV_BUILD)
-	dbugLog(_FLD, "t:%d sock:%d setting sndbuf to %dbytes", teulIndex(), socket, goalSize) ;
+	dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " setting sndbuf to %dbytes", teulIndex(), PRA_SOCKET(socket), goalSize);
 #endif
 
-	return setsockopt(socket, SOL_SOCKET, SO_SNDBUF, (const char*)&goalSize, sizeof(goalSize)) ;
+	return setsockopt(socket, SOL_SOCKET, SO_SNDBUF, (const char*)&goalSize, sizeof(goalSize));
 }
 
 void
 ENDPOINT::doError(const SINT32 error, void* data)
 {
-	ERROR_FUNCTION* errorFunction = this->errorFn ;
-	if ( this->m_parent != NULL && ((state() == IS_OPENING) | (errorFunction == NULL)) )
-		errorFunction = this->m_parent->errorFn ;
+	ERROR_FUNCTION* errorFunction = this->errorFn;
+	if ( this->m_parent != nullptr && ((state() == IS_OPENING) | (errorFunction == nullptr)) )
+		errorFunction = this->m_parent->errorFn;
 
-	if ( errorFunction == NULL )
-		errorFunction = _endpointErrorFn ;
+	if ( errorFunction == nullptr )
+		errorFunction = _endpointErrorFn;
 
-	if ( errorFunction != NULL )
-		(errorFunction)(this->teulIndex(), (UCHAR*)data, 0, NULL, error) ;
+	if ( errorFunction != nullptr )
+		(errorFunction)(this->teulIndex(), (UCHAR*)data, 0, nullptr, error);
 }
 
 void
@@ -722,53 +704,53 @@ ENDPOINT::shutdown()
 {
 	if ( this->socket != INVALID_SOCKET )
 	{
-		::shutdown(this->socket, 2) ;		// Shutdown both sides of the connection.
-		closesocket(this->socket) ;
+		::shutdown(this->socket, 2);		// Shutdown both sides of the connection.
+		OS_CLOSESOCKET(this->socket);
 
 #ifdef DEV_BUILD
-		dbugLog(_FLD, "t:%d sock:%u closed socket", this->teulIndex(), this->socket) ;
+		dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " closed socket", this->teulIndex(), PRA_SOCKET(this->socket));
 #endif
 
-		this->socket = INVALID_SOCKET ;
+		this->socket = INVALID_SOCKET;
 
-		teulMRecvRemoveFromPoll(this) ;
+		teulMRecvRemoveFromPoll(*this);
 	}
 
-	this->m_closed = true ;
+	this->m_closed = true;
 }
 
 bool
 Teul::GetEndpointStatus(const SINT32 teulIndex, SINT32* const outReason, TeulDeltaMS* const outLastRx_ms)
 {
-	if ( teulIndex < 0 )
+	if ( PN_UNLIKELY(teulIndex < 0) )
 	{
-		*outReason = -EINVAL ;
-		return false ;
+		*outReason = -EINVAL;
+		return false;
 	}
 
-	ENDPOINT* const endpoint = teulGetEndpoint(teulIndex) ;
-	if ( endpoint == NULL )
+	ENDPOINT* const endpoint = teulGetEndpoint(teulIndex);
+	if ( PN_UNLIKELY(endpoint == nullptr) )
 	{
-		*outReason = -ENOENT ;
-		return false ;
+		*outReason = -ENOENT;
+		return false;
 	}
 
-	if ( endpoint->m_closed == true )
+	if ( PN_UNLIKELY(endpoint->m_closed == true) )
 	{
-		*outReason = -ECONNABORTED ;
-		return false ;
+		*outReason = -ECONNABORTED;
+		return false;
 	}
 
-	if ( endpoint->m_connected == false )
+	if ( PN_UNLIKELY(endpoint->m_connected == false) )
 	{
-		*outReason = -ENOTCONN ;
-		return false ;
+		*outReason = -ENOTCONN;
+		return false;
 	}
 
-	*outReason = 0 ;
-	*outLastRx_ms = endpoint->lastDataRecv.elapsed() ;
+	*outReason = 0;
+	*outLastRx_ms = endpoint->lastDataRecv.elapsed();
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -777,34 +759,33 @@ Teul::GetEndpointStatus(const SINT32 teulIndex, SINT32* const outReason, TeulDel
 void
 EndpointImpl::Reset()
 {
-	m_txCrypt.setSeed(0ULL) ;
-	m_rxCrypt.setSeed(0ULL) ;
-	recvTag = 0 ;
-	sentTag = 0 ;
-	assert( m_curDatagram == NULL ) ;
-	assert( recvQueue.empty() ) ;
+	m_txCrypt.setSeed(0ULL);
+	m_rxCrypt.setSeed(0ULL);
+	recvTag = 0;
+	sentTag = 0;
+	assert( m_curDatagram == nullptr );
+	for (auto it = recvQueue.begin(), end = recvQueue.end(); it != end; ++it)
+		teulReleaseDatagram(*it);
+	recvQueue.clear();
 	while ( m_sendQueue.empty() == false )
 	{
-		Teul::Packet* const pkt = m_sendQueue.front() ;
-		m_sendQueue.erase(m_sendQueue.begin()) ;
-		delete pkt ;
+		FreeFirstPacketInSendQueue();
 	}
-	m_version = 0 ;
-	m_cryptVersion = 0 ;
-	pollSlot(-1) ;
-	kliveInterval = 0 ;
-	m_lastPacketTick = 0 ;
+	m_version = 0;
+	m_cryptVersion = 0;
+	pollSlot(-1);
+	kliveInterval = 0;
+	m_lastPacketTick = 0;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Return the local address of a given endpoint.
 
-UINT32 ENDPOINT::localAddress() const { return ntohl(localSockAddress.sin_addr.s_addr) ; }
-UINT16 ENDPOINT::localPort() const { return ntohs(localSockAddress.sin_port) ; }
+UINT32 ENDPOINT::localAddress() const { return ntohl(localSockAddress.sin_addr.s_addr); }
+UINT16 ENDPOINT::localPort() const { return ntohs(localSockAddress.sin_port); }
 
-UINT32 ENDPOINT::fromAddress() const { return ntohl(fromSockAddress.sin_addr.s_addr) ; }
-UINT16 ENDPOINT::fromPort() const { return ntohs(fromSockAddress.sin_port) ; }
+UINT32 ENDPOINT::fromAddress() const { return ntohl(fromSockAddress.sin_addr.s_addr); }
+UINT16 ENDPOINT::fromPort() const { return ntohs(fromSockAddress.sin_port); }
 
-UINT32 ENDPOINT::destAddress() const { return ntohl(destSockAddress.sin_addr.s_addr) ; }
-UINT16 ENDPOINT::destPort() const { return ntohs(destSockAddress.sin_port) ; }
-
+UINT32 ENDPOINT::destAddress() const { return ntohl(destSockAddress.sin_addr.s_addr); }
+UINT16 ENDPOINT::destPort() const { return ntohs(destSockAddress.sin_port); }

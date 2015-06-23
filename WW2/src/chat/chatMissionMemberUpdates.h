@@ -11,4 +11,4 @@
 #include "teul/teulNetworkArray.h"
 #include "chat/chatMissionMember.h"
 
-typedef teul_network_array<MissionMember> MISSION_MEMBER_UPDATES ;
+typedef teul_network_array<MissionMember> MISSION_MEMBER_UPDATES;

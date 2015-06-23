@@ -11,5 +11,5 @@
 #include "chat/chatEditString.h"
 #include "teul/teulNetworkObject.h"
 
-typedef teul_network_object<EditString> EDIT_STRING_MSG ;
+typedef teul_network_object<EditString> EDIT_STRING_MSG;
 

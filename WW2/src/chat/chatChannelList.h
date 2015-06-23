@@ -9,11 +9,11 @@
 //
 // Originating Programmer: Shane "Elmo" Wickson
 
-class ChannelID ;
+class ChannelID;
 
-namespace Chat { class Channel ; }
+namespace Chat { class Channel; }
 
-extern Chat::Channel* chatCreateChannel(const ChannelID& channelID, const char* name, ChatHandle chHandle);
-extern Chat::Channel* chatFindChannel(const ChannelID& id);
-extern bool chatDestroyChannel(const ChannelID id) ;
+Chat::Channel* chatCreateChannel(const ChannelID& channelID, const char* name, ChatHandle chHandle);
+Chat::Channel* chatFindChannel(const ChannelID& id);
+bool chatDestroyChannel(const ChannelID id);
 

@@ -309,13 +309,13 @@ struct mlEngineData
 
 	FLOAT64 MaxSafeRPM; // rpm at which peak torque occurs
 
-} ;
+};
 
 struct mlEngineList
 {
 	UINT32 NumEngines;
 	mlEngineData * EngineData;
-} ;
+};
 
 struct mlEngineComponentData
 {
@@ -461,7 +461,7 @@ struct mlEngineComponentData
 
 	FLOAT64 OilInEngine; // amount of oil currently in engine (%)
 
-} ;
+};
 
 extern UINT32 mlengineFreeEngineData(mlEngineList * EngineList);
 

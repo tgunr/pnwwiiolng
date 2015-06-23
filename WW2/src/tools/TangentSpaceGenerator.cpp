@@ -44,7 +44,7 @@ void TangentSpaceGenerator::generate(piVectorConstPtr vx, // positions
 {
     unsigned int vertex_count = numverts;
 
-    if(ptris == NULL)
+    if(ptris == nullptr)
     {
         T_.assign(vertex_count, Vec4f());
         B_.assign(vertex_count, Vec4f());
@@ -98,7 +98,7 @@ void TangentSpaceGenerator::generate(piVectorConstPtr vx, // positions
     // the triangle normal's direction
     unsigned int attrib_count = 3; // 1 triangle
 
-    if(ptris != NULL)
+    if(ptris != nullptr)
     {
         attrib_count = numverts;
     }
@@ -156,7 +156,7 @@ void TangentSpaceGenerator::generate(OBJECT* geo)
 
     unsigned int vertex_count = geo->numverts;
 
-    if(geo->ptris == NULL)
+    if(geo->ptris == nullptr)
     {
         T_.assign(vertex_count, Vec4f());
         B_.assign(vertex_count, Vec4f());
@@ -210,7 +210,7 @@ void TangentSpaceGenerator::generate(OBJECT* geo)
     // the triangle normal's direction
     unsigned int attrib_count = 3; // 1 triangle
 
-    if(geo->ptris != NULL)
+    if(geo->ptris != nullptr)
     {
         attrib_count = geo->numverts;
     }

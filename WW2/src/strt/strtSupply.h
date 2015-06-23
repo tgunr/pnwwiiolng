@@ -9,22 +9,22 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-class FacilityStruct ;
+class FacilityStruct;
 
 //tolua_begin
 
 // Turn on supply debugging
-extern void strtEnableDebugSupply() ;
+extern void strtEnableDebugSupply();
 
 // Turn off supply debugging
-extern void strtDisableDebugSupply() ;
+extern void strtDisableDebugSupply();
 
 // Get the current supply debug state
-extern LOGICAL strtGetDebugSupply() ;
+extern LOGICAL strtGetDebugSupply();
 
-extern UINT32 strtGetSupplyingUnit(const FacilityStruct& facility, UINT32 brigadeID) ;
+extern UINT32 strtGetSupplyingUnit(const FacilityStruct& facility, UINT32 brigadeID);
 
 // Process the resupply queues
-extern void strtProcessResupply() ;
+extern void strtProcessResupply();
 
 //tolua_end

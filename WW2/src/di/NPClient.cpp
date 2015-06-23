@@ -38,19 +38,19 @@
 // Global Data ///////////////////////////////////////////////////////////////////
 /////////////////
 //
-PF_NP_REGISTERWINDOWHANDLE       gpfNP_RegisterWindowHandle = NULL;
-PF_NP_UNREGISTERWINDOWHANDLE     gpfNP_UnregisterWindowHandle = NULL;
-PF_NP_REGISTERPROGRAMPROFILEID   gpfNP_RegisterProgramProfileID = NULL;
-PF_NP_QUERYVERSION               gpfNP_QueryVersion = NULL;
-PF_NP_REQUESTDATA                gpfNP_RequestData = NULL;
-PF_NP_GETSIGNATURE               gpfNP_GetSignature = NULL;
-PF_NP_GETDATA                    gpfNP_GetData = NULL;
-PF_NP_STARTCURSOR                gpfNP_StartCursor = NULL;
-PF_NP_STOPCURSOR                 gpfNP_StopCursor = NULL;
-PF_NP_STARTDATATRANSMISSION      gpfNP_StartDataTransmission = NULL;
-PF_NP_STOPDATATRANSMISSION       gpfNP_StopDataTransmission = NULL;
+PF_NP_REGISTERWINDOWHANDLE       gpfNP_RegisterWindowHandle = nullptr;
+PF_NP_UNREGISTERWINDOWHANDLE     gpfNP_UnregisterWindowHandle = nullptr;
+PF_NP_REGISTERPROGRAMPROFILEID   gpfNP_RegisterProgramProfileID = nullptr;
+PF_NP_QUERYVERSION               gpfNP_QueryVersion = nullptr;
+PF_NP_REQUESTDATA                gpfNP_RequestData = nullptr;
+PF_NP_GETSIGNATURE               gpfNP_GetSignature = nullptr;
+PF_NP_GETDATA                    gpfNP_GetData = nullptr;
+PF_NP_STARTCURSOR                gpfNP_StartCursor = nullptr;
+PF_NP_STOPCURSOR                 gpfNP_StopCursor = nullptr;
+PF_NP_STARTDATATRANSMISSION      gpfNP_StartDataTransmission = nullptr;
+PF_NP_STOPDATATRANSMISSION       gpfNP_StopDataTransmission = nullptr;
 
-HMODULE ghNPClientDLL = (HMODULE)NULL;
+HMODULE ghNPClientDLL = (HMODULE)nullptr;
 
 static CString GetDllLocation();
 
@@ -62,7 +62,7 @@ NPRESULT  NP_RegisterWindowHandle( HWND hWnd  )
 {
 	NPRESULT result = NP_ERR_DLL_NOT_FOUND;
 
-	if( NULL != gpfNP_RegisterWindowHandle )
+	if( nullptr != gpfNP_RegisterWindowHandle )
 		result = (*gpfNP_RegisterWindowHandle)( hWnd );
 
 	return result;
@@ -73,7 +73,7 @@ NPRESULT  NP_UnregisterWindowHandle()
 {
 	NPRESULT result = NP_ERR_DLL_NOT_FOUND;
 
-	if( NULL != gpfNP_UnregisterWindowHandle )
+	if( nullptr != gpfNP_UnregisterWindowHandle )
 		result = (*gpfNP_UnregisterWindowHandle)();
 
 	return result;
@@ -84,7 +84,7 @@ NPRESULT  NP_RegisterProgramProfileID( unsigned short wPPID )
 {
 	NPRESULT result = NP_ERR_DLL_NOT_FOUND;
 
-	if( NULL != gpfNP_RegisterProgramProfileID )
+	if( nullptr != gpfNP_RegisterProgramProfileID )
 		result = (*gpfNP_RegisterProgramProfileID)( wPPID );
 
 	return result;
@@ -95,7 +95,7 @@ NPRESULT  NP_QueryVersion( unsigned short* pwVersion )
 {
 	NPRESULT result = NP_ERR_DLL_NOT_FOUND;
 
-	if( NULL != gpfNP_QueryVersion )
+	if( nullptr != gpfNP_QueryVersion )
 		result = (*gpfNP_QueryVersion)( pwVersion );
 
 	return result;
@@ -106,7 +106,7 @@ NPRESULT  NP_RequestData( unsigned short wDataReq )
 {
 	NPRESULT result = NP_ERR_DLL_NOT_FOUND;
 
-	if( NULL != gpfNP_RequestData )
+	if( nullptr != gpfNP_RequestData )
 		result = (*gpfNP_RequestData)( wDataReq );
 
 	return result;
@@ -116,7 +116,7 @@ NPRESULT  NP_GetSignature( SIGNATUREDATA* pSignature )
 {
 	NPRESULT result = NP_ERR_DLL_NOT_FOUND;
 
-	if( NULL != gpfNP_GetSignature )
+	if( nullptr != gpfNP_GetSignature )
 		result = (*gpfNP_GetSignature)( pSignature );
 
 	return result;
@@ -127,7 +127,7 @@ NPRESULT  NP_GetData( TRACKIRDATA* pTID )
 {
 	NPRESULT result = NP_ERR_DLL_NOT_FOUND;
 
-	if( NULL != gpfNP_GetData )
+	if( nullptr != gpfNP_GetData )
 		result = (*gpfNP_GetData)( pTID );
 
 	return result;
@@ -138,7 +138,7 @@ NPRESULT  NP_StartCursor()
 {
 	NPRESULT result = NP_ERR_DLL_NOT_FOUND;
 
-	if( NULL != gpfNP_StartCursor )
+	if( nullptr != gpfNP_StartCursor )
 		result = (*gpfNP_StartCursor)();
 
 	return result;
@@ -149,7 +149,7 @@ NPRESULT  NP_StopCursor()
 {
 	NPRESULT result = NP_ERR_DLL_NOT_FOUND;
 
-	if( NULL != gpfNP_StopCursor )
+	if( nullptr != gpfNP_StopCursor )
 		result = (*gpfNP_StopCursor)();
 
 	return result;
@@ -160,7 +160,7 @@ NPRESULT  NP_StartDataTransmission()
 {
 	NPRESULT result = NP_ERR_DLL_NOT_FOUND;
 
-	if( NULL != gpfNP_StartDataTransmission )
+	if( nullptr != gpfNP_StartDataTransmission )
 		result = (*gpfNP_StartDataTransmission)();
 
 	return result;
@@ -171,7 +171,7 @@ NPRESULT  NP_StopDataTransmission()
 {
 	NPRESULT result = NP_ERR_DLL_NOT_FOUND;
 
-	if( NULL != gpfNP_StopDataTransmission )
+	if( nullptr != gpfNP_StopDataTransmission )
 		result = (*gpfNP_StopDataTransmission)();
 
 	return result;
@@ -194,7 +194,7 @@ NPRESULT NPClient_Init()
 	csNPClientDLLFullPath += _T("NPClient.dll");
 
 	ghNPClientDLL = ::LoadLibrary( csNPClientDLLFullPath );
-	if( NULL != ghNPClientDLL )
+	if( nullptr != ghNPClientDLL )
 		{
 			// verify the dll signature
 			gpfNP_GetSignature             = (PF_NP_GETSIGNATURE)::GetProcAddress( ghNPClientDLL, "NP_GetSignature" );
@@ -249,7 +249,7 @@ NPRESULT NPClient_Init()
 static CString GetDllLocation()
 {
 	//find path to NPClient.dll
-	HKEY pKey = NULL;
+	HKEY pKey = nullptr;
 	//open the registry key
 	if (::RegOpenKeyEx(HKEY_CURRENT_USER,
 		_T("Software\\NaturalPoint\\NATURALPOINT\\NPClient Location"),
@@ -267,20 +267,20 @@ static CString GetDllLocation()
 	//first discover the size of the value
 	if (RegQueryValueEx(pKey,
 		_T("Path"),
-		NULL,
-		NULL,
-		NULL,
+		nullptr,
+		nullptr,
+		nullptr,
 		&dwSize) == ERROR_SUCCESS)
 	{
 		//allocate memory for the buffer for the value
 		szValue = (unsigned char*)malloc(dwSize);
-		if (szValue == NULL)//error
+		if (szValue == nullptr)//error
 			return "Error";
 		//now get the value
         if (RegQueryValueEx(pKey,
 			_T("Path"),
-			NULL,
-			NULL,
+			nullptr,
+			nullptr,
 			szValue,
 			&dwSize) == ERROR_SUCCESS)
 		{

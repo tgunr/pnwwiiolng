@@ -9,7 +9,7 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 // Special unit IDs
-enum { SYSTEM_MOTD_UNIT = 0, ALLIED_MOTD_UNIT = 1, AXIS_MOTD_UNIT = 2, CRS_MOTD_UNIT = 8, GM_MOTD_UNIT = 9 } ;
+enum { SYSTEM_MOTD_UNIT = 0, ALLIED_MOTD_UNIT = 1, AXIS_MOTD_UNIT = 2, CRS_MOTD_UNIT = 8, GM_MOTD_UNIT = 9 };
 
-extern void chatSetUnitMotd(UINT32 unit, const std::string& motd) ;
-extern const char* chatGetUnitMotd(UINT32 unit) ;
+void chatSetUnitMotd(UINT32 unit, const std::string& motd);
+const char* chatGetUnitMotd(UINT32 unit);

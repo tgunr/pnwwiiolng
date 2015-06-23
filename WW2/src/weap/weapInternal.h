@@ -17,7 +17,7 @@ struct WEAPON_COUNTRY
 	LOGICAL				active;		// if loaded its active
 	WWII_SIDE			side;
 	UCHAR				name[MAX_CNAME_SIZE];	// text name of country
-} ;
+};
 
 // all countries with weapons
 // If you have a county index, this is the place
@@ -26,6 +26,6 @@ extern WEAPON_COUNTRY weaponCountry[MAX_COUNTRIES];
 
 namespace Parse
 {
-	extern const SCHAR* countryCode[MAX_COUNTRY_CODES+1] ;
+	extern const SCHAR* countryCode[MAX_COUNTRY_CODES+1];
 }
 

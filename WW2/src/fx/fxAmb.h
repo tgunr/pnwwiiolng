@@ -11,7 +11,7 @@ enum ENUMFREQUENCY
     IDE_AMBIENT_FREQUENT,
     IDE_AMBIENT_INFREQUENT,
     IDE_AMBIENT_NEVER
-} ;
+};
 
 struct REGION
 {
@@ -39,7 +39,7 @@ enum ENUMDAYAMBIENT
     IDE_AMB_BIRD9,
     IDE_AMB_DAYFLY1,
     NUMBER_OF_DAY_AMBIENT
-} ;
+};
 
 // Sounds to play only during the night.
 enum ENUMNIGHTAMBIENT
@@ -50,7 +50,7 @@ enum ENUMNIGHTAMBIENT
     IDE_AMB_OWL2,
     IDE_AMB_NIGHTFLY1,
     NUMBER_OF_NIGHT_AMBIENT
-} ;
+};
 
 // Sounds that always play, even in combat.
 enum ENUMALWAYSAMBIENT
@@ -58,7 +58,7 @@ enum ENUMALWAYSAMBIENT
     IDE_AMB_WIND1,
     IDE_AMB_WIND2,
     NUMBER_OF_ALWAYS_AMBIENT
-} ;
+};
 
 // Sounds played in the city.
 enum ENUMCITYAMBIENT
@@ -66,14 +66,14 @@ enum ENUMCITYAMBIENT
     IDE_AMB_DOG1,
     IDE_AMB_DOG2,
     NUMBER_OF_CITY_AMBIENT
-} ;
+};
 
 // Sounds played near the coast.
 enum ENUMCOASTAMBIENT
 {
     IDE_AMB_WAVES,
     NUMBER_OF_COAST_AMBIENT
-} ;
+};
 
 // Sounds played near the river.
 enum ENUMRIVERAMBIENT
@@ -82,7 +82,7 @@ enum ENUMRIVERAMBIENT
     IDE_AMB_RIVERFLY1,
     IDE_AMB_RIVERFLY2,
     NUMBER_OF_RIVER_AMBIENT
-} ;
+};
 
 struct AMBIENTSOUND
 {

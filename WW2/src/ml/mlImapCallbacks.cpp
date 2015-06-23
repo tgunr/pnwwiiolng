@@ -22,17 +22,7 @@
 #include <sstream>
 #include <math.h>
 
-#if defined(USE_OSG)
-#include "osgVehicle/Vehicle.h"
-#include "osgVehicle/VehicleState.h"
-#include "osgFX/fxSound.h"
-#else
 #include "fx/fxSnd.h"
-#endif
-
-#ifdef DOROTHY
-#include "gr2/gr2Main.h"
-#endif
 
 
 //static FLOAT64 _LastAutopilotThrottlePos;
@@ -76,7 +66,7 @@ UINT32 mlAdjustFlapPosition(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
 	mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
 
-	if(VehicleData == NULL)  return 0;
+	if(VehicleData == nullptr)  return 0;
 
 //	mlAutopilotDisengage(VehicleData);
 
@@ -211,7 +201,7 @@ UINT32 mlAdjustClutch(SINT32 Param, UINT32 Id, UINT32 Detach)
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
 
-	if (VehicleData == NULL)
+	if (VehicleData == nullptr)
 	{
 		return 0;
 	}
@@ -239,15 +229,11 @@ UINT32 mlPrimaryTriggerDown(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
 	mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
 
-	if (VehicleData == NULL) return 0;
+	if (VehicleData == nullptr) return 0;
 	if (VehicleData->VehicleMasterPtr->RideVehicleHostIndex > 0) return 0;
 
 	VehicleData->PrimaryTriggerDown = Param;
 	VehicleData->PicklePrimary = Param;
-
-#ifdef DOROTHY
-	gr2ProcessControlInputs(Param, Id, Detach);
-#endif
 
 	return 0;
 }
@@ -256,15 +242,11 @@ UINT32 mlSecondaryTriggerDown(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
 	mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
 
-	if (VehicleData == NULL) return 0;
+	if (VehicleData == nullptr) return 0;
 	if (VehicleData->VehicleMasterPtr->RideVehicleHostIndex > 0) return 0;
 
 	VehicleData->SecondaryTriggerDown = Param;
 	VehicleData->PickleSecondary = Param;
-
-#ifdef DOROTHY
-	gr2ProcessControlInputs(Param, Id, Detach);
-#endif
 
 	return 0;
 }
@@ -320,10 +302,6 @@ UINT32 mlCenterBrakeFunction(SINT32 Param, UINT32 Id, UINT32 Detach)
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
 	VehicleData->BrakeForceCenter = (Param + 1000.0) / 2000.0;
 
-#ifdef DOROTHY
-	gr2ProcessControlInputs(Param, Id, Detach);
-#endif
-
 	return 0;
 }
 
@@ -331,10 +309,6 @@ UINT32 mlSteeringFunction(SINT32 Param, UINT32 Id, UINT32 Detach)
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
 	VehicleData->Steering = Param / 1000.0;
-
-#ifdef DOROTHY
-	gr2ProcessControlInputs(Param, Id, Detach);
-#endif
 
 	return 0;
 }
@@ -394,7 +368,7 @@ static void FindMinDifferenceAndDirection(FLOAT64 from, FLOAT64 to, FLOAT64* dif
 UINT32 mlTraverseTurretSpeed(SINT32 Param, UINT32 Id, UINT32 data)
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-	if (VehicleData == NULL) return 1;
+	if (VehicleData == nullptr) return 1;
 	UINT32 Position;
 	imap_callback_ext_data* extdata = (imap_callback_ext_data*)data;
 	FLOAT64 Delta, diff, dir;
@@ -412,21 +386,13 @@ UINT32 mlTraverseTurretSpeed(SINT32 Param, UINT32 Id, UINT32 data)
 			VehicleData->TurretTraverseDeltaInput[Position] = TRUE;
 
 			Delta = extdata->deltaInput / 1000.0 / 10.0;
-#if defined(USE_OSG)
-			if(VehicleData->VehicleMasterPtr->VehicleType->TurretForPosition(Position).TurretType == VEH_TURRET_TYPE_360)
-#else
 			if(VehicleData->VehicleMasterPtr->VehicleType->TurretType[Position] == VEH_TURRET_TYPE_360)
-#endif
 				Delta /= 10.0;
 
 			if(Delta > .5) Delta = .5;
 			else if(Delta < -.5) Delta = -.5;
 
-#if defined(USE_OSG)
-			switch(VehicleData->VehicleMasterPtr->VehicleType->TurretForPosition(Position).TurretType)
-#else
 			switch(VehicleData->VehicleMasterPtr->VehicleType->TurretType[Position])
-#endif
 			{
 				case VEH_TURRET_TYPE_360:
 				{
@@ -517,17 +483,13 @@ UINT32 mlTraverseTurretSpeed(SINT32 Param, UINT32 Id, UINT32 data)
 		VehicleData->TurretTraverseRate[Position] = Param / 1000.0f;
 	}
 
-#ifdef DOROTHY
-	gr2ProcessControlInputs(Param, Id, data);
-#endif
-
 	return 0;
 }
 
 UINT32 mlTraverseTurret(UINT32 Position)
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-	if (VehicleData == NULL) return 1;
+	if (VehicleData == nullptr) return 1;
 
 	VehicleData->TurretTraverseDeltaInput[Position] = TRUE;
 
@@ -582,7 +544,7 @@ UINT32 mlTraverseTurret(UINT32 Position)
 UINT32 mlElevateTurretSpeed(SINT32 Param, UINT32 Id, UINT32 data)
 {
 	mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
-	if (VehicleData == NULL) return 1;
+	if (VehicleData == nullptr) return 1;
 	UINT32 Position;
 	imap_callback_ext_data* extdata = (imap_callback_ext_data*)data;
 
@@ -635,10 +597,6 @@ UINT32 mlElevateTurretSpeed(SINT32 Param, UINT32 Id, UINT32 data)
 		VehicleData->TurretElevateRate[Position] = Param / 1000.0f;
 	}
 
-#ifdef DOROTHY
-	gr2ProcessControlInputs(Param, Id, data);
-#endif
-
 	return 0;
 }
 
@@ -676,12 +634,7 @@ UINT32 mlAdjustThrottle(SINT32 Param,UINT32 Id,UINT32 Detach)
 
 UINT32 mlAdjustGas(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
-#ifdef DOROTHY
-	if(!gr2ProcessControlInputs(Param, Id, Detach))
-		mlSetThrottlePosition((FLOAT64)(Param + 1000) / 2000);
-#else
 	mlSetThrottlePosition((FLOAT64)(Param + 1000) / 2000);
-#endif
 
 	return 0;
 }
@@ -731,7 +684,7 @@ static void _soundkill(void* data)
 {
 	SINT32* id = (SINT32*)data;
 
-	if(id == NULL)
+	if(id == nullptr)
 		return;
 
 	*id = 0;
@@ -747,16 +700,12 @@ static void _buildFRU(JSContext* ctx, UINT32 argc, jsval* argv)
 		JS_ValueToBoolean(ctx, argv[0], &build);
 
 		if(!build || !ppo->Build())
-			fpPPOSet(NULL);
+			fpPPOSet(nullptr);
 	}
 }
 
 UINT32 mlToggleBombBayDoor(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
-#if defined(USE_OSG)
-	if(Param) return 0;
-#endif
-
 	mlVehicleData* VehicleData = persGetPersonaModelDataPtr();
 	if(VehicleData->VehicleMasterPtr->RideVehicleHostIndex > 0) return 0;
 
@@ -790,7 +739,7 @@ UINT32 mlToggleBombBayDoor(SINT32 Param,UINT32 Id,UINT32 Detach)
 			else
 			{
 				fpPPOAlert();
-				fpPPOSet(NULL);
+				fpPPOSet(nullptr);
 			}
 		}
 		else
@@ -813,32 +762,12 @@ UINT32 mlToggleBombBayDoor(SINT32 Param,UINT32 Id,UINT32 Detach)
 		}
 		else
 		{
-#if defined(USE_OSG)
-			Vehicle* vehicle = VehicleData->VehicleMasterPtr->vehicle->asVehicle();
-			VehicleState* state = vehicle->FindOrCreateStateByName("bombbaydooropen");
-
-			if(state)
-			{
-				state->SetValue(1);
-			}
-#else
 			vehAnimChangeVehicleStateByName(VehicleData->VehicleMasterPtr, (UCHAR*)"bombbaydoor", TRUE);
-#endif
 		}
 	}
 	else
 	{
-#if defined(USE_OSG)
-			Vehicle* vehicle = VehicleData->VehicleMasterPtr->vehicle->asVehicle();
-			VehicleState* state = vehicle->FindOrCreateStateByName("bombbaydooropen");
-
-			if(state)
-			{
-				state->SetValue(0);
-			}
-#else
 		vehAnimChangeVehicleStateByName(VehicleData->VehicleMasterPtr, (UCHAR*)"bombbaydoor", FALSE);
-#endif
 	}
 
 	if(VehicleData->VehicleMasterPtr)
@@ -847,20 +776,10 @@ UINT32 mlToggleBombBayDoor(SINT32 Param,UINT32 Id,UINT32 Detach)
 		{
 			if(VehicleData->bombbayDoorSoundId > 0)
 			{
-#if defined(USE_OSG)
-				fxSoundStopSound(VehicleData->bombbayDoorSoundId);
-#else
 				fxSndStopSound(VehicleData->bombbayDoorSoundId);
-#endif
 				VehicleData->bombbayDoorSoundId = 0;
 			}
 
-#if defined(USE_OSG)
-			int id = fxSoundPlayHeadSound("sounds/bombbaydoor.wav", finite_sound, sound_low);
-			fxSoundSetKillCallback(id, _soundkill);
-			fxSoundSetKillData(id, &VehicleData->bombbayDoorSoundId);
-			VehicleData->bombbayDoorSoundId = id;
-#else
 			SINT32 id = fxSndGetNewSound();
 
 			if(id > 0)
@@ -879,13 +798,8 @@ UINT32 mlToggleBombBayDoor(SINT32 Param,UINT32 Id,UINT32 Detach)
 					VehicleData->bombbayDoorSoundId = id;
 				}
 			}
-#endif
 		}
 	}
-
-#ifdef DOROTHY
-	gr2ProcessControlInputs(Param, Id, Detach);
-#endif
 
 	return 0;
 }
@@ -918,10 +832,6 @@ UINT32 mlToggleAuxSight(SINT32 Param,UINT32 Id,UINT32 Detach)
 
 UINT32 mlToggleHatch(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
-#if defined(USE_OSG)
-	if(Param) return 0;
-#endif
-
 	UINT32 Position;
 	FLOAT64VECTOR TempPos;
 	UCHAR s[32];
@@ -936,9 +846,6 @@ UINT32 mlToggleHatch(SINT32 Param,UINT32 Id,UINT32 Detach)
 	{
 		if(VehicleData->CrewData.HatchSound[Position][0])
 		{
-#if defined(USE_OSG)
-			fxSoundPlayHeadSound(VehicleData->CrewData.HatchSound[Position], finite_sound, sound_medium);
-#else
 			SINT32 iID = fxSndGetNewSound();
 
 			if(iID > 0)
@@ -953,16 +860,12 @@ UINT32 mlToggleHatch(SINT32 Param,UINT32 Id,UINT32 Detach)
 
 				fxSndInitSound(iID);
 			}
-#endif
 		}
 	}
 	else
 	{
 		if(VehicleData->CrewData.HatchCloseSound[Position][0])
 		{
-#if defined(USG_OSG)
-			fxSoundPlayHeadSound(VehicleData->CrewData.HatchCloseSound[Position], finite_sound, sound_medium);
-#else
 			SINT32 iID = fxSndGetNewSound();
 
 			if(iID > 0)
@@ -977,15 +880,11 @@ UINT32 mlToggleHatch(SINT32 Param,UINT32 Id,UINT32 Detach)
 
 				fxSndInitSound(iID);
 			}
-#endif
 		}
 		else
 		{
 			if(VehicleData->CrewData.HatchSound[Position][0])
 			{
-#if defined(USE_OSG)
-				fxSoundPlayHeadSound(VehicleData->CrewData.HatchSound[Position], finite_sound, sound_medium);
-#else
 				SINT32 iID = fxSndGetNewSound();
 
 				if(iID > 0)
@@ -1000,7 +899,6 @@ UINT32 mlToggleHatch(SINT32 Param,UINT32 Id,UINT32 Detach)
 
 					fxSndInitSound(iID);
 				}
-#endif
 			}
 		}
 	}
@@ -1012,36 +910,18 @@ UINT32 mlToggleHatch(SINT32 Param,UINT32 Id,UINT32 Detach)
 
 UINT32 mlToggleCanopy(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
-#if defined(USE_OSG)
-	if(Param) return 0;
-#endif
-
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-	if(VehicleData == NULL) return 0;
+	if(VehicleData == nullptr) return 0;
 	UINT32 Position;
 	FLOAT64VECTOR TempPos;
 	FLOAT64 Speed;
-#if !defined(USE_OSG)
-	UCHAR s[32];
-#endif
 
 	persGetPersonaPosition(&Position);
-
-#if defined(USE_OSG)
-	Vehicle* vehicle = VehicleData->VehicleMasterPtr->vehicle->asVehicle();
-	VehicleAnimationState* anim = dynamic_cast<VehicleAnimationState*>(vehicle->FindStateByNameAndIndex("canopy", Position+1));
-
-	// Should not do anything if we do not have an animation for this
-	if(!anim)
-	{
-		return 0;
-	}
-#endif
 
 	if(VehicleData->CanopyJammed[Position])
 	{
 		rnmainListLocText(IDE_LANG_UI,CANOPY_JAMMED_ID);
-		_PlaySound(VehicleData, *VehicleData->CanopyJamSound ? VehicleData->CanopyJamSound : "sounds\\canopyjam.wav", NULL);
+		_PlaySound(VehicleData, *VehicleData->CanopyJamSound ? VehicleData->CanopyJamSound : "sounds\\canopyjam.wav", nullptr);
 		return 0;
 	}
 
@@ -1065,12 +945,8 @@ UINT32 mlToggleCanopy(SINT32 Param,UINT32 Id,UINT32 Detach)
 	VehicleData->CanopyOpen[Position] = !VehicleData->CanopyOpen[Position];
 //	rnmainListLocText(IDE_LANG_UI,VehicleData->CanopyOpen[Position] ? CANOPY_OPEN_ID : CANOPY_CLOSE_ID);
 
-#if defined(USE_OSG)
-	VehicleState* state = vehicle->FindOrCreateStateByNameAndIndex("canopyopen", Position+1);
-	state->SetValue(VehicleData->CanopyOpen[Position]);
-#else
-	sprintf((char*)s,"canopystate%d",Position+1);
-#endif
+	char s[32];
+	strprintf(s, "canopystate%d", Position + 1);
 
 	TempPos.x = TempPos.y = TempPos.z = 0.0f;
 	if (VehicleData->CanopyOpen[Position] == 1)
@@ -1079,20 +955,9 @@ UINT32 mlToggleCanopy(SINT32 Param,UINT32 Id,UINT32 Detach)
 		{
 			if(VehicleData->canopySoundId[Position] > 0)
 			{
-#if defined(USE_OSG)
-				fxSoundStopSound(VehicleData->canopySoundId[Position]);
-#else
 				fxSndStopSound(VehicleData->canopySoundId[Position]);
-#endif
 			}
 
-#if defined(USE_OSG)
-			int id = fxSoundPlayHeadSound(VehicleData->CrewData.CanopySound[Position], finite_sound, sound_medium);
-			VehicleData->canopySoundId[Position] = id;
-			fxSoundSetKillCallback(id, _soundkill);
-			fxSoundSetKillData(id, &VehicleData->canopySoundId[Position]);
-			VehicleData->canopySoundId[Position] = id;
-#else
 			SINT32 id = fxSndGetNewSound();
 
 			if(id > 0)
@@ -1112,7 +977,6 @@ UINT32 mlToggleCanopy(SINT32 Param,UINT32 Id,UINT32 Detach)
 					VehicleData->canopySoundId[Position] = id;
 				}
 			}
-#endif
 		}
 	}
 	else
@@ -1121,19 +985,9 @@ UINT32 mlToggleCanopy(SINT32 Param,UINT32 Id,UINT32 Detach)
 		{
 			if(VehicleData->canopySoundId[Position] > 0)
 			{
-#if defined(USE_OSG)
-				fxSoundStopSound(VehicleData->canopySoundId[Position]);
-#else
 				fxSndStopSound(VehicleData->canopySoundId[Position]);
-#endif
 			}
 
-#if defined(USE_OSG)
-			int id = fxSoundPlayHeadSound(VehicleData->CrewData.CanopyCloseSound[Position], finite_sound, sound_medium);
-			fxSoundSetKillCallback(id, _soundkill);
-			fxSoundSetKillData(id, &VehicleData->canopySoundId[Position]);
-			VehicleData->canopySoundId[Position] = id;
-#else
 			SINT32 id = fxSndGetNewSound();
 
 			if(id > 0)
@@ -1153,7 +1007,6 @@ UINT32 mlToggleCanopy(SINT32 Param,UINT32 Id,UINT32 Detach)
 					VehicleData->canopySoundId[Position] = id;
 				}
 			}
-#endif
 		}
 		else
 		{
@@ -1161,20 +1014,9 @@ UINT32 mlToggleCanopy(SINT32 Param,UINT32 Id,UINT32 Detach)
 			{
 				if(VehicleData->canopySoundId[Position] > 0)
 				{
-#if defined(USE_OSG)
-					fxSoundStopSound(VehicleData->canopySoundId[Position]);
-#else
 					fxSndStopSound(VehicleData->canopySoundId[Position]);
-#endif
 				}
 
-#if defined(USE_OSG)
-				int id = fxSoundPlayHeadSound(VehicleData->CrewData.CanopySound[Position], finite_sound, sound_medium);
-				VehicleData->canopySoundId[Position] = id;
-				fxSoundSetKillCallback(id, _soundkill);
-				fxSoundSetKillData(id, &VehicleData->canopySoundId[Position]);
-				VehicleData->canopySoundId[Position] = id;
-#else
 				SINT32 id = fxSndGetNewSound();
 
 				if(id > 0)
@@ -1194,14 +1036,11 @@ UINT32 mlToggleCanopy(SINT32 Param,UINT32 Id,UINT32 Detach)
 						VehicleData->canopySoundId[Position] = id;
 					}
 				}
-#endif
 			}
 		}
 	}
 
-#if !defined(USE_OSG)
-	vehAnimChangeVehicleStateByName((vehVehicle*)VehicleData->VehicleMasterPtr, s, VehicleData->CanopyOpen[Position]);
-#endif
+	vehAnimChangeVehicleStateByName((vehVehicle*)VehicleData->VehicleMasterPtr, (const UCHAR*)s, VehicleData->CanopyOpen[Position]);
 //	mlAutopilotDisengage(VehicleData);
 
 	return 0;
@@ -1217,10 +1056,6 @@ UINT32 mlStarterIsDepressed(SINT32 Param, UINT32 Id, UINT32 Detach)
 	VehicleData->MasterStarterOn = Param ? 1 : 0;
 //	mlAutopilotDisengage(VehicleData);
 
-#ifdef DOROTHY
-	gr2ProcessControlInputs(Param, Id, Detach);
-#endif
-
 	return 0;
 }
 
@@ -1235,9 +1070,6 @@ UINT32 mlStarterIsNotDepressed(SINT32 Param, UINT32 Id, UINT32 Detach)
 
 UINT32 mlShiftUp(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
-#if defined(USE_OSG)
-	if(Param) return 0;
-#endif
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
 
 	VehicleData->GearShift = 1;
@@ -1247,10 +1079,6 @@ UINT32 mlShiftUp(SINT32 Param,UINT32 Id,UINT32 Detach)
 
 UINT32 mlShiftDown(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
-#if defined(USE_OSG)
-	if(Param) return 0;
-#endif
-
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
 
 	VehicleData->GearShift = -1;
@@ -1297,9 +1125,6 @@ UINT32 mlToggleWepMode(SINT32 Param, UINT32 Id, UINT32 Detach)
 
 UINT32 mlReverse(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
-#if defined(USE_OSG)
-	if(Param) return 0;
-#endif
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
 
 	VehicleData->ReverseToggle = 1;
@@ -1309,7 +1134,7 @@ UINT32 mlReverse(SINT32 Param,UINT32 Id,UINT32 Detach)
 UINT32 mlToggleDiveBrakes(SINT32 Param, UINT32 Id, UINT32 Detach)
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-	if (VehicleData == NULL)
+	if (VehicleData == nullptr)
 	{
 		return 0;
 	}
@@ -1338,11 +1163,8 @@ UINT32 mlToggleDiveBrakes(SINT32 Param, UINT32 Id, UINT32 Detach)
 
 UINT32 mlToggleGear(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
-#if defined(USE_OSG)
-	if(Param) return 0;
-#endif
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-	if (VehicleData == NULL) return 0;
+	if (VehicleData == nullptr) return 0;
 
 	FLOAT64 Speed;
 
@@ -1375,7 +1197,7 @@ UINT32 mlToggleGear(SINT32 Param,UINT32 Id,UINT32 Detach)
 	if (VehicleData->GearSetting == 0.0)
 	{
 		VehicleData->GearSetting = 1.0;
-		if (VehicleData->VehicleMasterPtr != NULL)
+		if (VehicleData->VehicleMasterPtr != nullptr)
 		{
 			vehAnimChangeVehicleStateByName((vehVehicle*)VehicleData->VehicleMasterPtr, (UCHAR*)"gearstate", TRUE);
 		}
@@ -1383,7 +1205,7 @@ UINT32 mlToggleGear(SINT32 Param,UINT32 Id,UINT32 Detach)
 	}
 	else
 	{
-		if (VehicleData->VehicleMasterPtr != NULL)
+		if (VehicleData->VehicleMasterPtr != nullptr)
 		{
 			vehAnimChangeVehicleStateByName((vehVehicle*)VehicleData->VehicleMasterPtr, (UCHAR*)"gearstate", FALSE);
 		}
@@ -1411,7 +1233,7 @@ UINT32 mlToggleGear(SINT32 Param,UINT32 Id,UINT32 Detach)
 UINT32 mlToggleCowlFlaps(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-	if (VehicleData == NULL)
+	if (VehicleData == nullptr)
 	{
 		return 0;
 	}
@@ -1441,9 +1263,6 @@ UINT32 mlToggleCowlFlaps(SINT32 Param,UINT32 Id,UINT32 Detach)
 
 UINT32 mlCycleAmmo(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
-#if defined(USE_OSG)
-	if(Param) return 0;
-#endif
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
 	if (VehicleData)
 		VehicleData->CycleAmmo = 1;
@@ -1454,12 +1273,7 @@ UINT32 mlCycleAmmo(SINT32 Param,UINT32 Id,UINT32 Detach)
 
 UINT32 mlRangeFind(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
-#ifdef DOROTHY
-	if(gr2ProcessControlInputs(Param, Id, Detach))
-		return 0;
-#endif
-
-piVECTOR V1,V2;
+	piVECTOR V1,V2;
 
 	V1.x = -playpos.x;
 	V1.y = -playpos.y;
@@ -1469,15 +1283,14 @@ piVECTOR V1,V2;
 	math3dScaleVector(&V2,&V2,10000.0f);
 	mathAddVectors(&V2,&V2,&V1);
 
-
 	if (trncdCollideWithVehiclesAndTerrain(
 					&V1,
 					&V2,
-					NULL,
-					NULL,
-					NULL,
-					NULL,
-					NULL,
+					nullptr,
+					nullptr,
+					nullptr,
+					nullptr,
+					nullptr,
 					TRUE,
 					FALSE,
 					FALSE) == TRUE)
@@ -1521,16 +1334,6 @@ static void _PlaySoundFinish(void* data)
 
 static SINT32 _PlaySound(mlVehicleData* VehicleData, const char* SoundName, void* data)
 {
-#if defined(USE_OSG)
-	osg::Group* o = ((osg::Node*)VehicleData->VehicleObjectData->PlaneObject->osgNode)->asGroup();
-	int id = fxSoundPlayObjectSound(SoundName, osg::Vec3d(0, 0, 0), finite_sound, sound_high, 0, 0, o);
-
-	if(id > 0 && data)
-	{
-		fxSoundSetKillCallback(id, _PlaySoundFinish);
-		fxSoundSetKillData(id, data);
-	}
-#else
 	SINT32 id = fxSndGetNewSound();
 
 	if(id > 0)
@@ -1556,7 +1359,6 @@ static SINT32 _PlaySound(mlVehicleData* VehicleData, const char* SoundName, void
 		fxSndStopSound(id);
 		id = 0;
 	}
-#endif
 
 	return id;
 }
@@ -1573,17 +1375,13 @@ UINT32 mlToggleHoist(SINT32 Param,UINT32 Id,UINT32 Detach)
 UINT32 mlAdjustWinch(SINT32 Param,UINT32 Id,UINT32 Detach)
 {
 	mlVehicleData * VehicleData = persGetPersonaModelDataPtr();
-	if (VehicleData == NULL) return 1;
+	if (VehicleData == nullptr) return 1;
 	UINT32 Position;
 	SINT32 TurretNum;
 
 	persGetPersonaPosition(&Position);
 
-#if defined(USE_OSG)
-	TurretNum = VehicleData->VehicleMasterPtr->VehicleType->CrewPosition[Position].TurretAux;
-#else
 	TurretNum = VehicleData->VehicleMasterPtr->VehicleType->TurretAux[Position];
-#endif
 	if(TurretNum > 0)
 	{
 		VehicleData->TurretTraverseRate[TurretNum-1] = Param / 1000.0f;

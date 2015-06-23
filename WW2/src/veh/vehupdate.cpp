@@ -54,10 +54,6 @@
 #include "cfg/cfgPrefs.h"
 #include "scen/ScenarioManager.h"
 
-#ifdef DOROTHY
-#include "gr2/gr2Main.h"
-#endif
-
 #define MAX_VIS_VEHICLES 128
 
 #define TIMEOUT_MS		300000	// 30000	// 30 sec to 5 minutes
@@ -91,7 +87,7 @@ static const IconRank _SpecialRanks[] =
 	{"snail", 		SNAIL_RANK },
 	{"lindir", 		LINDIR_RANK },
 #endif
-	{NULL, 0}
+	{nullptr, 0}
 };
 
 vehVehicle* _UpdateVehicleList[MAX_VIS_VEHICLES];
@@ -119,7 +115,7 @@ UINT32 vehupdateCreatePlayerControlledVehicle(SINT32 VehicleNum,
 
 	// create the new vehicle
 	Vehicle = vehFindVehicle(Index);
-	if (Vehicle != NULL)
+	if (Vehicle != nullptr)
 		vehKillVehicle(Vehicle);
 
 	if (vehCreateNewVehicle(&Vehicle,Index, VehicleNum) == 0)
@@ -141,11 +137,7 @@ UINT32 vehupdateCreatePlayerControlledVehicle(SINT32 VehicleNum,
 
 	*Vehicle->SquadHandle = 0;
 
-#ifdef DOROTHY
-	if(Vehicle->VehicleType->Type != VEH_TYPE_PERSON && Vehicle->VehicleType->Type != VEH_TYPE_MECH)
-#else
 	if(Vehicle->VehicleType->Type != VEH_TYPE_PERSON)
-#endif
 	{
 		vehloadCreateVehicleInstance(Vehicle, TRUE);
 	}
@@ -161,7 +153,7 @@ UINT32 vehupdateCreatePlayerControlledVehicle(SINT32 VehicleNum,
 	}
 
 	vehSetVehicleToUserControlled(Vehicle,MultiCrewPos);
-	if (Vehicle->VehicleObjectData != NULL)
+	if (Vehicle->VehicleObjectData != nullptr)
 	{
 		mlSetModelSpecialPoints(Vehicle->ModelData,Vehicle->VehicleObjectData);
 
@@ -186,7 +178,7 @@ UINT32 vehupdateCreateVehicle(vehVehicle** Vehicle, SINT32 vehicleType,SINT32 Ve
 
 	if (result == 0)
 	{
-		*Vehicle = NULL;
+		*Vehicle = nullptr;
 		return 1;
 	}
 
@@ -210,14 +202,14 @@ void vehupdateInitGhostFiring(vehVehicle*Vehicle)
 	// set up weapon stuff for ghost firing
 	for(i=0;i<VEH_MAX_MOUNTS;i++)
 	{
-		MountObject = NULL;
+		MountObject = nullptr;
 		ogrpFindSubObjectByName(&MountObject,
 								Vehicle->VehicleObjectData->PlaneObject,
 								(char*)Loadout->MountObject[i]);
-		if (MountObject == NULL)
+		if (MountObject == nullptr)
 		{
 			if (Vehicle->VehicleType->Type == VEH_TYPE_PERSON &&
-				Loadout->WeaponTypes[i][0] != NULL)
+				Loadout->WeaponTypes[i][0] != nullptr)
 			{
 				weapInitializeWeapon(&Vehicle->Weapons[i][0],Loadout->WeaponTypes[i][0]);
 				Vehicle->Weapons[i][0].NumRoundsAmmoLeft[0] = -1;
@@ -226,26 +218,26 @@ void vehupdateInitGhostFiring(vehVehicle*Vehicle)
 		}
 		for(j=0;j<VEH_MAX_WEAPONS_PER_MOUNT;j++)
 		{
-			if (Loadout->WeaponTypes[i][j] != NULL)
+			if (Loadout->WeaponTypes[i][j] != nullptr)
 			{
 				weapInitializeWeapon(&Vehicle->Weapons[i][j],Loadout->WeaponTypes[i][j]);
 
 				// find fire point
-				TempObj = NULL;
+				TempObj = nullptr;
 				ogrpFindSubObjectByDOFVarAndSubVar(
 						&TempObj,
 						MountObject,
 						ML_DOF_CONNECT,
 						j);
 
-				if (TempObj != NULL)
+				if (TempObj != nullptr)
 				{
 					ogrpFindSubObjectByDOFVar(
 							&Vehicle->VehicleObjectData->WeaponFirePoints[i][j],
 							TempObj,
 							ML_DOF_FIREPOINT);
 
-					if (Vehicle->VehicleObjectData->WeaponFirePoints[i][j] != NULL)
+					if (Vehicle->VehicleObjectData->WeaponFirePoints[i][j] != nullptr)
 					{
 						Vehicle->VehicleObjectData->WeaponFirePoints[i][j]->flag2 &= ~OBJECT_DOF_USECHILDMATRIX;
 						Vehicle->Weapons[i][j].NumRoundsAmmoLeft[0] = -1;
@@ -272,7 +264,7 @@ UINT32 vehupdateCreateVehicleLoadObjectPortion(vehVehicle* Vehicle, UINT32 IsMul
 									FALSE);
 	}
 
-	if (Vehicle->VehicleObjectData != NULL)
+	if (Vehicle->VehicleObjectData != nullptr)
 	{
 		if (IsMultiCrewVehicle == 0)
 		{
@@ -290,12 +282,12 @@ UINT32 vehupdateCreateVehicleLoadObjectPortion(vehVehicle* Vehicle, UINT32 IsMul
 UINT32 vehupdateInitVehicle(vehVehicle*Vehicle)
 {
 
-	if (Vehicle == NULL)
+	if (Vehicle == nullptr)
 	{
 		return 0;
 	}
 
-	if (Vehicle->ModelData != NULL)
+	if (Vehicle->ModelData != nullptr)
 	{
 		mlResetVehiclePos(Vehicle->ModelData);
 	}
@@ -346,11 +338,11 @@ static SINT32 _LastUpdateTime = 0; // added specific initialization 5/28/01 hoss
 
 		vehGetVehicleHead(&Vehicle);
 
-		for (;Vehicle != NULL;Vehicle = Vehicle->getNext())
+		for (;Vehicle != nullptr;Vehicle = Vehicle->getNext())
 		{
 			// find the player's vehicle, if it exists
-			if (Vehicle->ModelData == NULL)
-				continue ;
+			if (Vehicle->ModelData == nullptr)
+				continue;
 
 			// if player is in the process of exitting the vehicle, stop
 			// sending updates
@@ -381,8 +373,8 @@ UINT32 vehUpdatePositionInfo(vehVehicle* Vehicle)
 	vehVehiclePositionData* PosData;
 	mlVehicleData* Data;
 
-	if (Vehicle == NULL) return 0;
-	if (Vehicle->ModelData == NULL) return 0;
+	if (Vehicle == nullptr) return 0;
+	if (Vehicle->ModelData == nullptr) return 0;
 	if (Vehicle->ModelData->MultiCrewPos > 1) return 0;
 
 	PosData = &Vehicle->PosData;
@@ -432,8 +424,8 @@ static UINT32 _ResolveAverages(vehVehicle* Vehicle)
 {
 	vehVehiclePositionData* PosData;
 
-	if (Vehicle == NULL) return 0;
-	if (Vehicle->ModelData == NULL) return 0;
+	if (Vehicle == nullptr) return 0;
+	if (Vehicle->ModelData == nullptr) return 0;
 
 	PosData = &Vehicle->PosData;
 
@@ -469,7 +461,7 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 	UINT32 TurretMask;
 	UINT32 NumTurrets;
 	SINT32 TurretNum;
-	vehVehicle* RideVehicle = NULL;
+	vehVehicle* RideVehicle = nullptr;
 
 	const bool trooper = (Vehicle.VehicleType->Type == VEH_TYPE_PERSON);
 
@@ -581,7 +573,7 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 
 	if(Data.MultiCrewPos < 2)
 	{
-		VehicleHdr.present |= PR_POSITION ;
+		VehicleHdr.present |= PR_POSITION;
 		if(Vehicle.VehicleType->NumStates > 0)
 			VehicleHdr.present |= PR_STATE0;
 		if(Vehicle.VehicleType->NumStates > 15)
@@ -591,7 +583,7 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 	}
 	else
 	{
-		VehicleHdr.present &= ~(PR_STATE0 | PR_STATE1 | PR_VEH_VIS | PR_POSITION) ;
+		VehicleHdr.present &= ~(PR_STATE0 | PR_STATE1 | PR_VEH_VIS | PR_POSITION);
 	}
 
 	// mount firing
@@ -607,17 +599,13 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 	}
 
 	VehicleHdr.fireMask = VehicleInfo.fire.state;
-	VehicleHdr.present |= PR_FIRE_FLAGS ;
+	VehicleHdr.present |= PR_FIRE_FLAGS;
 
 	// turret traverse
 	TurretMask = 0;
 	NumTurrets = 0;
 	// trooper turrets are handled differently (much simpler)
-#ifdef DOROTHY
-	if(trooper || Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-#else
 	if(trooper)
-#endif
 	{
 		for(i = 0; i <= 2; i++)
 		{
@@ -773,15 +761,6 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 		VehicleInfo.stateFlags0 = (UINT16)(animationFlags & 0xffff);
 		VehicleInfo.stateFlags1 = (UINT16)(animationFlags >> 16);
 	}
-#ifdef DOROTHY
-	else if (Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-	{
-		VehicleHdr.present |= (PR_STATE0|PR_STATE1);
-		gr2PackFlags(&VehicleHdr, &VehicleInfo);
-		//VehicleInfo.stateFlags0 = (UINT16)(Vehicle->AnimationBits & 0xffff);
-		//VehicleInfo.stateFlags1 = (UINT16)(Vehicle->AnimationBits >> 16);
-	}
-#endif
 
 	if (vehmainWaitingOnLogoutTimer())
 	{
@@ -811,13 +790,13 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 	{
 		VehicleHdr.updateNo = wwiiGetUpdateNo(true);
 		VehicleHdr.updatePrime = wwiiHitsPrime();
-		COMM_UPDATE_BUFFER cub ;
-		cub.size = updtPackSHARED_VEHICLE_INFO(TEUL_PACK, cub.data, 0, &VehicleHdr, sizeof(cub.data)) ;
+		COMM_UPDATE_BUFFER cub;
+		cub.size = updtPackSHARED_VEHICLE_INFO(TEUL_PACK, cub.data, 0, &VehicleHdr, sizeof(cub.data));
 		if ( cub.size >= 0 )
 		{
 			// Send them our teulClock64
 			teulSyncClock();
-			cub.size = teulPackUINT64(TEUL_PACK, cub.data, cub.size, &teulClock64, 0) ;
+			cub.size = teulPackUINT64(TEUL_PACK, cub.data, cub.size, &teulClock64, 0);
 			teulSend(PlayerClient()->CellConnection(),commUPDATE,&cub);
 		}
 	}
@@ -882,7 +861,7 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 	UINT32 i;
 	LOGICAL Rollover = FALSE;
 
-	if (VehicleHeader == NULL) return 0;
+	if (VehicleHeader == nullptr) return 0;
 	const SHARED_VEHICLE_INFO*VehicleInfo = &VehicleHeader->vehInfo;
 
 	Delta = (SINT16)((UINT16)VehicleInfo->posTimeStamp) - (SINT16)((UINT16)PosData->CurrentSenderUpdateTime);
@@ -897,7 +876,7 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 		for (i=0;i<16;i++)
 		{
 			// only update state bits on other multicrew players update
-			if (Vehicle->ModelData != NULL)
+			if (Vehicle->ModelData != nullptr)
 			{
 				if (Vehicle->ModelData->MultiCrewPos ==
 							Vehicle->VehicleType->StateType[i].MultiCrewPos)
@@ -917,7 +896,7 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 		for (i=16;i<32;i++)
 		{
 			// only update state bits on other multicrew players update
-			if (Vehicle->ModelData != NULL)
+			if (Vehicle->ModelData != nullptr)
 			{
 				if (Vehicle->ModelData->MultiCrewPos ==
 							Vehicle->VehicleType->StateType[i].MultiCrewPos)
@@ -933,18 +912,12 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 		}
 	}
 
-#ifdef DOROTHY
-	if (Vehicle->VehicleType->Type != VEH_TYPE_PERSON &&
-		Vehicle->VehicleType->Type != VEH_TYPE_MECH &&
-		VehicleHeader->present & PR_VEH_VIS)
-#else
 	if (Vehicle->VehicleType->Type != VEH_TYPE_PERSON && VehicleHeader->present & PR_VEH_VIS)
-#endif
 	{
 		for (i=32;i<64;i++)
 		{
 			// only update state bits on other multicrew players update
-			if (Vehicle->ModelData != NULL)
+			if (Vehicle->ModelData != nullptr)
 			{
 				if (Vehicle->ModelData->MultiCrewPos ==
 							Vehicle->VehicleType->StateType[i].MultiCrewPos)
@@ -962,7 +935,7 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 
 	// position
 	// if multicrew, only crew gets this data
-	if (!Rollover && (VehicleHeader->present & PR_POSITION) && (Vehicle->ModelData == NULL || Vehicle->ModelData->MultiCrewPos > 1))
+	if (!Rollover && (VehicleHeader->present & PR_POSITION) && (Vehicle->ModelData == nullptr || Vehicle->ModelData->MultiCrewPos > 1))
 	{
 		if (Online == 0)
 		{
@@ -1021,10 +994,6 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 
 	if (Vehicle->VehicleType && Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
 		ProcessInfantryAnimationFlags(Vehicle, VehicleHeader);
-#ifdef DOROTHY
-	else if (Vehicle->VehicleType && Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-		gr2UnpackFlags(Vehicle, VehicleHeader);
-#endif
 
 	if (!Rollover && (VehicleHeader->present & (PR_POSITION | PR_RELPOS)))
 	{
@@ -1039,9 +1008,9 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 	if ((VehicleHeader->present & (PR_POSITION | VehicleHeader->present & PR_RELPOS)) &&
 		Vehicle->VehicleType && Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
 	{
-		if (Vehicle->VehicleObjectData != NULL)
+		if (Vehicle->VehicleObjectData != nullptr)
 		{
-			if (Vehicle->VehicleObjectData->PlaneObject != NULL)
+			if (Vehicle->VehicleObjectData->PlaneObject != nullptr)
 			{
 				fpHandleProneTrooperPosition (Vehicle->VehicleObjectData->PlaneObject, PosData);
 			}
@@ -1068,7 +1037,7 @@ void vehicleRemoveVehicle(UINT32 index)
 
 	Write_Debug("v:%u removal indicated", index);
 
-	if (Vehicle != NULL)
+	if (Vehicle != nullptr)
 	{
 		//uiChatPrintLine("Removing Vehicle %s -> %u", (const char*)Vehicle->Handle, index);
 		vehKillVehicle(Vehicle);
@@ -1076,7 +1045,7 @@ void vehicleRemoveVehicle(UINT32 index)
 	/*
 	else
 	{
- 		uiChatPrintLine("Trying to remove NULL vehicle with index %u!!!", index);
+ 		uiChatPrintLine("Trying to remove nullptr vehicle with index %u!!!", index);
 	}
 	*/
 }
@@ -1154,7 +1123,7 @@ UINT32 vehupdateProcessPositionUpdateMsg(const VEHICLE_UPDATE_HEADER* VehicleHea
 
 	if (VehicleHeader->present & PR_ONE_TIME)
 	{
-		if (Vehicle != NULL && Vehicle->ModelData == NULL)
+		if (Vehicle != nullptr && Vehicle->ModelData == nullptr)
 		{
 			Vehicle->BumpedOff = 0;
 		}
@@ -1170,7 +1139,7 @@ UINT32 vehupdateProcessPositionUpdateMsg(const VEHICLE_UPDATE_HEADER* VehicleHea
 			}
 			{
 				WEAPON* weapon = weapLookup(VehicleInfo->spec());
-				if(weapon == NULL)
+				if(weapon == nullptr)
 				{
 					return 0;
 				}
@@ -1178,7 +1147,7 @@ UINT32 vehupdateProcessPositionUpdateMsg(const VEHICLE_UPDATE_HEADER* VehicleHea
 				vehupdateCreateVehicle(&Vehicle,weapon->localIndex(),0,VehicleInfo->index, ch);
 			}
 
-			if (Vehicle == NULL)
+			if (Vehicle == nullptr)
 			{
 				// we're out of vehicle slots
 				Write_Debug("Out of free vehicle slots for new vehicle");
@@ -1237,7 +1206,7 @@ lastLowUpdateTime = frametime;
 }
 #endif
 
-	if (Vehicle == NULL)
+	if (Vehicle == nullptr)
 	{
 		// vehicle doesn't exist in list
 		Write_Debug("Received an update for vehicle not being tracked, index = %d",Position);
@@ -1267,7 +1236,7 @@ lastLowUpdateTime = frametime;
 	Vehicle->PosData.LastAnyUpdateTime = VehicleInfo->timeStamp;
 
 	// if there's modeldata, it isn't updatesystem controlled
-	if (Vehicle->ModelData == NULL)
+	if (Vehicle->ModelData == nullptr)
 		Vehicle->Flags |= VEH_FLAGS_UPDATESYSTEM_CONTROLLED;
 
 	if (VehicleHeader->present & (PR_RIDING | PR_ONE_TIME))
@@ -1369,13 +1338,13 @@ lastLowUpdateTime = frametime;
 				Vehicle->MountIsFiring[i] = TRUE;
 				for (j=0;j<4;j++)
 				{
-					if (Vehicle->Weapons[i][j].WeaponType != NULL)
+					if (Vehicle->Weapons[i][j].WeaponType != nullptr)
 					{
 						if (Vehicle->Weapons[i][j].WeaponType->HideOnLastDrop == 1 &&
 							VehicleHeader->present & PR_ONE_TIME)
 						{
 							Vehicle->WeaponIsHidden[i][j] = 1;
-							if (Vehicle->VehicleObjectData && Vehicle->VehicleObjectData->WeaponConnectPoints[i][j] != NULL)
+							if (Vehicle->VehicleObjectData && Vehicle->VehicleObjectData->WeaponConnectPoints[i][j] != nullptr)
 							{
 								ogrpHideObjectAndSubtree(Vehicle->VehicleObjectData->WeaponConnectPoints[i][j]);
 							}
@@ -1393,13 +1362,9 @@ lastLowUpdateTime = frametime;
 	// turret stuff
 	// skip the first update because it contains bad data...not sure why..can't find where the client sends the bad data
 	// maybe the host data isn't init'ed correctly or something
-	if (VehicleHeader->present & PR_TURRET && Vehicle->VehicleType != NULL)// && Vehicle->PosData.LastUpdateTime)
+	if (VehicleHeader->present & PR_TURRET && Vehicle->VehicleType != nullptr)// && Vehicle->PosData.LastUpdateTime)
 	{
-#ifdef DOROTHY
-		if (Vehicle->VehicleType->Type == VEH_TYPE_PERSON || Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-#else
 		if (trooper)
-#endif
 		{
 			for (i=0; i<=2; i++)
 			{
@@ -1426,14 +1391,10 @@ lastLowUpdateTime = frametime;
 				{
 					for (i=0;i<ML_MAX_CREW_POSITIONS;i++)
 					{
-#ifdef DOROTHY
-						if ((Vehicle->VehicleType->TurretNum[i] == TurretNum + 1) || ((Vehicle->VehicleType->Type == VEH_TYPE_PERSON || Vehicle->VehicleType->Type == VEH_TYPE_MECH) && (TurretNum <= 1)))
-#else
 						if ((Vehicle->VehicleType->TurretNum[i] == TurretNum + 1) || ((trooper) && (TurretNum <= 1)))
-#endif
 						{
 							// ignore turret updates that the player controls
-							if (Vehicle->ModelData != NULL)
+							if (Vehicle->ModelData != nullptr)
 							{
 								if (Vehicle->ModelData->MultiCrewPos != 0)
 								{
@@ -1444,11 +1405,7 @@ lastLowUpdateTime = frametime;
 								}
 							}
 
-#ifdef DOROTHY
-							if (Vehicle->VehicleType->Type == VEH_TYPE_PERSON || Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-#else
 							if (trooper)
-#endif
 							{
 #if defined(TURRET_GRANULARITY)
 								Vehicle->StateAnimation.TurretTraverse[i] = ((VehicleInfo->turret.pos[TurretNum].x / TURRET_GRANULARITY) * 2.0f) - 1.0f;
@@ -1557,7 +1514,7 @@ UINT32 vehupdateUpdateVehicle(vehVehicle* Vehicle)
 	FLOAT64VECTOR			WorldOriginOffset;
 	OBJECT*					pObject;
 
-	if (Vehicle == NULL) return 0;
+	if (Vehicle == nullptr) return 0;
 	PosData = &Vehicle->PosData;
 
 #ifdef NEW_INF_PREDICTOR
@@ -1577,7 +1534,7 @@ UINT32 vehupdateUpdateVehicle(vehVehicle* Vehicle)
 	//
 	// ONLY applies to host-controlled vehicles that the player doesn't occupy
 	if (Online &&
-        Vehicle->ModelData == NULL &&
+        Vehicle->ModelData == nullptr &&
         LastUpdateTime > TIMEOUT_MS_HIDE &&
         // STO and .vspawn vehicles have negative vehicle numbers (don't want
         // to bump them off)
@@ -1590,18 +1547,14 @@ UINT32 vehupdateUpdateVehicle(vehVehicle* Vehicle)
 	Delta  = (FLOAT64)(frametime - PosData->LastPredictorUpdateTime) / 1000.0;
 	Delta1 = (FLOAT64)(frametime - PosData->LastUpdatePredictorUpdateTime) / 1000.0;
 
-	if (Vehicle->VehicleType != NULL &&
+	if (Vehicle->VehicleType != nullptr &&
 		Vehicle->VehicleType->Type == VEH_TYPE_GROUND &&
 		!Vehicle->VisDamageNoStick &&
 		(Online || !Vehicle->isSTO())) // offline STO's do not stick to ground so we can position accurately for marketing
 	{ // ground vehicles always stick to ground unless riding or hoisting
 		Vehicle->StickVehicleToGround = (Vehicle->RideVehicleHostIndex == 0);
 	}
-#ifdef DOROTHY
-	else if(Vehicle->VehicleType->Type != VEH_TYPE_MECH) // mech's handle this flag internally
-#else
 	else
-#endif
 	{
 		Vehicle->StickVehicleToGround = FALSE;
 	}
@@ -1684,11 +1637,7 @@ UINT32 vehupdateUpdateVehicle(vehVehicle* Vehicle)
 // Absolutely no idea why it works like this
 // Seems to be due to some retardation in the FPS math, but fixing it is
 // a real potential can of worms
-#ifdef DOROTHY
-if(Vehicle->VehicleType->Type == VEH_TYPE_PERSON || Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-#else
 if(Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
-#endif
 	PosData->Pos.x += -PosData->Vel.x * Delta;
 else
 	PosData->Pos.x += PosData->Vel.x * Delta;
@@ -1696,11 +1645,7 @@ else
 	PosData->Pos.y += PosData->Vel.y * Delta;
 	PosData->Pos.z += PosData->Vel.z * Delta;
 
-#ifdef DOROTHY
-if(Vehicle->VehicleType->Type == VEH_TYPE_PERSON || Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-#else
 if(Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
-#endif
 	PosData->LastUpdatePos.x += -PosData->LastUpdateVel.x * Delta1;
 else
 	PosData->LastUpdatePos.x += PosData->LastUpdateVel.x * Delta1;
@@ -1710,7 +1655,7 @@ else
 
 
 	// override position if "stuck on ground" flag set
-	if (Vehicle->StickVehicleToGround && Vehicle->VehicleObjectData != NULL)
+	if (Vehicle->StickVehicleToGround && Vehicle->VehicleObjectData != nullptr)
 	{
 	piVECTOR V1,V2;
 	SINT32 DummyNum;
@@ -1769,11 +1714,7 @@ else
 			Delta = 1.0;
 		}else
 		{
-#ifdef DOROTHY
-			if(Vehicle->VehicleType->Type == VEH_TYPE_PERSON || Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-#else
 			if(Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
-#endif
 			{
 			 	// Move the infantry to the correct position quicker.
 				//OGS- This doesn't look healthy,
@@ -1820,7 +1761,7 @@ else
 	TempPiVec.z = (FLOAT32)PosData->RenderAtt.Yaw;
 	mathEul_ToMatrix(&PosData->AttMat,EulOrdXYZs,&TempPiVec);
 
-	if (Vehicle->ModelData == NULL || Vehicle->ModelData->MultiCrewPos != 0)
+	if (Vehicle->ModelData == nullptr || Vehicle->ModelData->MultiCrewPos != 0)
 		vehUpdateWeapons(Vehicle);
 
 	PosData->LastPredictorUpdateTime = frametime;
@@ -1850,8 +1791,8 @@ else
 
 	// routine to stick fps butt in seat when riding vehicle
 	if (Vehicle->VehicleType->Type == VEH_TYPE_PERSON &&
-		Vehicle->VehicleObjectData != NULL &&
-		Vehicle->VehicleObjectData->PlaneObject != NULL)
+		Vehicle->VehicleObjectData != nullptr &&
+		Vehicle->VehicleObjectData->PlaneObject != nullptr)
 	{
 		pObject = Vehicle->VehicleObjectData->PlaneObject;
 
@@ -1872,8 +1813,8 @@ else
 					// get the self vehicle, see if we're a trooper, if we are, get my seat number, and
 					// make sure it's not the same as the one we're about to draw
 					vehVehicle*selfVehicle = persGetPersonaVehiclePtr();
-					if ((selfVehicle != NULL) &&
-						(selfVehicle->VehicleType != NULL) &&
+					if ((selfVehicle != nullptr) &&
+						(selfVehicle->VehicleType != nullptr) &&
 						(selfVehicle->VehicleType->Type == VEH_TYPE_PERSON) &&
 						(selfVehicle->RideVehicleHostIndex > 0) &&
 						(selfVehicle->RideSeatNum == Vehicle->RideSeatNum))
@@ -1985,7 +1926,7 @@ piMATRIX Mat1,Mat2,Mat3;
 
 UINT32 vehupdateDisplayVehicle(vehVehicle* Vehicle)
 {
-	if (Vehicle->VehicleObjectData == NULL || Vehicle->VehicleObjectData->PlaneObject == NULL)
+	if (Vehicle->VehicleObjectData == nullptr || Vehicle->VehicleObjectData->PlaneObject == nullptr)
 		return 0;
 
 	/*
@@ -2043,12 +1984,12 @@ SINT32			RecoilNum = 0;
     FirePointMatrix = IdentityMatrix;
     TempMatrix = IdentityMatrix;
 
-	if (Vehicle == NULL)
+	if (Vehicle == nullptr)
 	{
 		return 0;
 	}
 
-	if (Vehicle->VehicleObjectData == NULL)
+	if (Vehicle->VehicleObjectData == nullptr)
 	{
 		return 0;
 	}
@@ -2056,13 +1997,13 @@ SINT32			RecoilNum = 0;
 	trnGetWorldOriginOffset(&WorldOriginOffset);
 	WorldOriginOffset.z = -WorldOriginOffset.z;
 
-	if (Vehicle->VehicleType == NULL)
+	if (Vehicle->VehicleType == nullptr)
 	{
 		return 0;
 	}
 
 	vehVehicle* PersonaVehicle = persGetPersonaVehiclePtr();
-	if (PersonaVehicle == NULL)
+	if (PersonaVehicle == nullptr)
 	{
 		return 0;
 	}
@@ -2070,204 +2011,12 @@ SINT32			RecoilNum = 0;
 	if (Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
 		return 0;
 
-#ifdef DOROTHY
-	else if (Vehicle->VehicleType->Type == VEH_TYPE_MECH)
-	{
-		/*
-		// shut down any weapon sounds if the weapon type has changed
-		gr2AnimGetCurrentWeapon(Vehicle->VehicleObjectData->PlaneObject,&i);
-
-		// i is -1 if the trooper isn't initialized yet
-		if (i < 0)
-			return 0;
-
-		SoundNum = i;
-		if ((SINT32)(i) != Vehicle->LastFPSWeaponNum)
-		{
-			// check for and shut down weapon sound
-			if (Vehicle->Weapons[Vehicle->LastFPSWeaponNum][0].WeaponType != NULL)
-			{
-				if (Vehicle->Weapons[Vehicle->LastFPSWeaponNum][0].WeaponType->FireType != WEAP_FIRETYPE_SINGLESHOT)
-				{
-					if (Vehicle->StateAnimation.MountSoundPlaying[Vehicle->LastFPSWeaponNum] == TRUE ||
-						Vehicle->StateAnimation.MountSoundId[Vehicle->LastFPSWeaponNum] != 0)
-					{
-						SoundNum = Vehicle->VehicleType->Loadout[Vehicle->LoadoutNum].MountSoundNum[Vehicle->LastFPSWeaponNum] - 1;
-						fxSndStopSound(Vehicle->StateAnimation.MountSoundId[i]);
-						Vehicle->StateAnimation.MountSoundPlaying[Vehicle->LastFPSWeaponNum] = FALSE;
-						Vehicle->StateAnimation.MountSoundId[i] = 0;
-
-						gr2AnimStopFiringWeapon (Vehicle);
-					}
-				}
-			}
-		}
-
-		Vehicle->LastFPSWeaponNum = i;
-
-		// only handles single-shot for now
-//		if (Vehicle->MountIsFiring[0] == TRUE)
-		if (gr2AnimIsWeaponFiring (Vehicle))
-		{
-			if (Vehicle->VehicleObjectData != NULL)
-			{
-				if (Vehicle->VehicleObjectData->PlaneObject != NULL)
-				{
-					if (!gr2AnimFireWeapon(Vehicle))
-					{
-						gr2AnimGetFirePointMatrix (Vehicle->VehicleObjectData->PlaneObject, &FirePointMatrix);
-
-						FlashPositionVector.x = FirePointMatrix._41;
-						FlashPositionVector.y = FirePointMatrix._42;
-						FlashPositionVector.z = FirePointMatrix._43;
-
-						TempMatrix = FirePointMatrix;
-						TempMatrix._41 = 0;
-						TempMatrix._42 = 0;
-						TempMatrix._43 = 0;
-
-						math3dMatrixMultiply(&TempMatrix, &TempMatrix, &Vehicle->PosData.AttMat);
-						mathVectorMultiply64(&FirePositionVector, &FlashPositionVector, &Vehicle->PosData.AttMat);
-						mathAddVectors(&FirePositionVector, &FirePositionVector, &(Vehicle->PosData.RenderPos));
-
-						if(!_isnan(FirePositionVector.x) && !_isnan(FirePositionVector.y) && !_isnan(FirePositionVector.z))
-						{
-							AmmoFlags = 0;
-							AmmoFlags |= WEAP_AMMOFLAG_USE_SHORTCOLLIDELIST;
-							AmmoFlags |= WEAP_AMMOFLAG_DONT_SEND_DAMAGE;
-	//						AmmoFlags |= WEAP_AMMOFLAG_CANTHITPLAYER;
-	//						AmmoFlags |= WEAP_AMMOFLAG_DONTCHECKVEHICLES;
-							AmmoFlags |= WEAP_AMMOFLAG_TPS_WEAPON;
-
-							FireDelta = (frametime - Vehicle->PosData.LastFireTime) / 1000.0;
-							if(Vehicle->PosData.LastFireTime == 0) FireDelta = 0.0f;
-							RecoilForce.x = RecoilForce.y = RecoilForce.z = 0.0;
-
-							gr2AnimGetCurrentWeapon(Vehicle->VehicleObjectData->PlaneObject,&i);
-
-							// i is -1 if the trooper isn't initialized yet
-							if (i < 0)
-								return 0;
-
-							weapFireWeapon(&RecoilForce,
-										&(Vehicle->Weapons[i][0]),
-										&FirePositionVector,
-										&vecVehicleVel,
-										&TempMatrix,
-										FireDelta,
-										frametime / 1000.0,
-										0,
-										1,
-										AmmoFlags,
-										NULL,
-										&FirePositionVector,
-										NULL,
-										Vehicle);
-
-							// used to be fabs(x,y,z) > 0.001
-							if ((RecoilForce.x * RecoilForce.x) > 0.00001 ||
-								(RecoilForce.y * RecoilForce.y) > 0.00001 ||
-								(RecoilForce.z * RecoilForce.z) > 0.00001)
-							{
-								fpFPSEjectShell (Vehicle->VehicleObjectData->PlaneObject, &TempMatrix, FALSE);
-
-								if (Vehicle->Weapons[i][0].WeaponType->FireType != WEAP_FIRETYPE_SINGLESHOT)
-								{
-									if (Vehicle->StateAnimation.MountSoundPlaying[i] == FALSE &&
-										Vehicle->StateAnimation.MountSoundId[i] == 0)
-									{
-                                        SINT32 iID = fxSndGetNewSound();
-
-                                        if(iID > 0)
-                                        {
-                                            FLOAT32 fMin, fMax;
-
-                                            fxSndSetSoundName(iID, (SCHAR*)Vehicle->VehicleType->MountSounds[i]);
-                                            fxSndSetPriority(iID, IDE_TP_PRIORITY_HIGH);
-                                            fxSndSetSoundType(iID, TYPE_INFINITE_EXTERNAL_SOUND);
-                                            fxSndSetPitch(iID, 1.0f);
-                                            fxSndSetVolume(iID, 1.0f);
-                                            fxSndSetPosition(iID, FlashPositionVector.x, FlashPositionVector.y, FlashPositionVector.z);
-                                            fxSndSetEmitterObject(iID, Vehicle->VehicleObjectData->PlaneObject);
-                                            fxSndSetPlayType(iID, DEF_PLAYTYPE_OBJECT);
-										    fxSndPushFlags(iID, DEF_SOUND_STOPS_AMBIENCE);
-
-										    _GetSoundDistance(&fMin, &fMax, &Vehicle->VehicleType->Type);
-
-                                            fxSndSetMinDistance(iID, fMin);
-                                            fxSndSetMaxDistance(iID, fMax);
-
-                                            if(fxSndInitSound(iID))
-                                            {
-											    Vehicle->StateAnimation.MountSoundPlaying[i] = TRUE;
-											    Vehicle->StateAnimation.MountSoundId[i] = iID;
-                                            }
-										}
-									}
-								}
-								else
-								{
-                                    FLOAT32 fMin, fMax;
-
-                                    SINT32 iID = fxSndGetNewSound();
-
-                                    if(iID > 0)
-                                    {
-                                        fxSndSetSoundName(iID, (SCHAR*)Vehicle->VehicleType->MountSounds[i]);
-									    fxSndSetPriority(iID, IDE_TP_PRIORITY_HIGH);
-									    fxSndSetSoundType(iID, TYPE_FINITE_EXTERNAL_SOUND);
-									    fxSndSetPitch(iID, 1.0f);
-									    fxSndSetVolume(iID, 1.0f);
-									    fxSndSetPosition(iID, FlashPositionVector.x, FlashPositionVector.y, FlashPositionVector.z);
-									    fxSndSetEmitterObject(iID, Vehicle->VehicleObjectData->PlaneObject);
-									    fxSndSetPlayType(iID, DEF_PLAYTYPE_OBJECT);
-									    fxSndPushFlags(iID, DEF_SOUND_STOPS_AMBIENCE);
-
-									    _GetSoundDistance(&fMin, &fMax, &Vehicle->VehicleType->Type);
-
-                                        fxSndSetMinDistance(iID, fMin);
-                                        fxSndSetMaxDistance(iID, fMax);
-
-									    fxSndInitSound(iID);
-
-									    Vehicle->MountIsFiring[0] = FALSE;
-                                    }
-								}
-							}
-						}
-					}
-				}
-			}
-		}
-		else
-		{
-			// check for and shut down weapon sound
-			if (Vehicle->Weapons[i][0].WeaponType != NULL)
-			{
-				if (Vehicle->Weapons[i][0].WeaponType->FireType != WEAP_FIRETYPE_SINGLESHOT)
-				{
-					if (Vehicle->StateAnimation.MountSoundPlaying[i] == TRUE ||
-						Vehicle->StateAnimation.MountSoundId[i] != 0)
-					{
-						SoundNum = Vehicle->VehicleType->Loadout[Vehicle->LoadoutNum].MountSoundNum[i] - 1;
-						fxSndStopSoundDelayedFromStart(Vehicle->StateAnimation.MountSoundId[i]);
-						Vehicle->StateAnimation.MountSoundPlaying[i] = FALSE;
-						Vehicle->StateAnimation.MountSoundId[i] = 0;
-
-						gr2AnimStopFiringWeapon (Vehicle);
-					}
-				}
-			}
-		}
-		*/
-	}
-#endif
 	//else
 	{
 		for (i=0;i<VEH_MAX_MOUNTS;i++)
 		{
 			// ghost fire can only occur for player's vehicle if he doesn't control that position
-			if (Vehicle->ModelData != NULL)
+			if (Vehicle->ModelData != nullptr)
 			{
 				if (!(Vehicle->ModelData->FireMask & (1 << i)))
 				{
@@ -2281,7 +2030,7 @@ SINT32			RecoilNum = 0;
 			{
 				for (j=0;j<VEH_MAX_WEAPONS_PER_MOUNT;j++)
 				{
-					if (Vehicle->VehicleObjectData->WeaponFirePoints[i][j] != NULL)
+					if (Vehicle->VehicleObjectData->WeaponFirePoints[i][j] != nullptr)
 //					 && Vehicle->WeaponIsHidden[i][j] == 0)
 					{
 						// calculate fire position
@@ -2296,7 +2045,7 @@ SINT32			RecoilNum = 0;
 						mathAddVectors(&FirePos,&FirePos,&Vehicle->PosData.RenderPos);
 
 						// fire velocity
-						if (Vehicle == PersonaVehicle && PersonaVehicle->ModelData != NULL &&
+						if (Vehicle == PersonaVehicle && PersonaVehicle->ModelData != nullptr &&
 							PersonaVehicle->ModelData->MultiCrewPos < 2)
 						{
 							FireVel = PersonaVehicle->ModelData->VehicleRealVel;
@@ -2347,7 +2096,7 @@ SINT32			RecoilNum = 0;
 						if (Vehicle->Weapons[i][j].WeaponType->HideOnLastDrop == 1)
 						{
 							Vehicle->WeaponIsHidden[i][j] = 1;
-							if (Vehicle->VehicleObjectData->WeaponConnectPoints[i][j] != NULL)
+							if (Vehicle->VehicleObjectData->WeaponConnectPoints[i][j] != nullptr)
 							{
 								ogrpHideObjectAndSubtree(Vehicle->VehicleObjectData->WeaponConnectPoints[i][j]);
 							}
@@ -2364,7 +2113,7 @@ SINT32			RecoilNum = 0;
 				// if the first weapon in the mount is single-shot
 				// then we stop firing after this round
 
-				if (Vehicle->VehicleObjectData->WeaponFirePoints[i][0] != NULL)
+				if (Vehicle->VehicleObjectData->WeaponFirePoints[i][0] != nullptr)
 				{
 					if (Vehicle->Weapons[i][0].WeaponType->FireType == WEAP_FIRETYPE_SINGLESHOT)
 					{
@@ -2381,7 +2130,7 @@ SINT32			RecoilNum = 0;
 							RelativePos.z = Vehicle->VehicleObjectData->WeaponFirePoints[i][0]->dof->dofmatrix2._43;
 							mathVectorMultiply64(&RelativePos,&RelativePos,&Vehicle->VehicleObjectData->WeaponFirePoints[i][0]->matint);
 							SoundNum = Vehicle->VehicleType->Loadout[Vehicle->LoadoutNum].MountSoundNum[i] - 1;
-							if (Vehicle->VehicleObjectData->HitMap == NULL)
+							if (Vehicle->VehicleObjectData->HitMap == nullptr)
 							{
 								TempObj = Vehicle->VehicleObjectData->PlaneObject;
 							}
@@ -2389,7 +2138,7 @@ SINT32			RecoilNum = 0;
 							{
 								TempObj = Vehicle->VehicleObjectData->HitMap;
 							}
-							if (Vehicle->ModelData != NULL && SoundNum >= 0)
+							if (Vehicle->ModelData != nullptr && SoundNum >= 0)
 							{
                                 FLOAT32 fMin, fMax;
 
@@ -2438,7 +2187,7 @@ SINT32			RecoilNum = 0;
 										RelativePos.y = Vehicle->VehicleObjectData->WeaponFirePoints[i][0]->dof->dofmatrix2._42;
 										RelativePos.z = Vehicle->VehicleObjectData->WeaponFirePoints[i][0]->dof->dofmatrix2._43;
 										mathVectorMultiply64(&RelativePos,&RelativePos,&Vehicle->VehicleObjectData->WeaponFirePoints[i][0]->matint);
-										if (Vehicle->VehicleObjectData->HitMap == NULL)
+										if (Vehicle->VehicleObjectData->HitMap == nullptr)
 										{
 											TempObj = Vehicle->VehicleObjectData->PlaneObject;
 										}
@@ -2446,7 +2195,7 @@ SINT32			RecoilNum = 0;
 										{
 											TempObj = Vehicle->VehicleObjectData->HitMap;
 										}
-										if (Vehicle->ModelData != NULL && SoundNum >= 0)
+										if (Vehicle->ModelData != nullptr && SoundNum >= 0)
 										{
                                             FLOAT32 fMin, fMax;
                                             SINT32 iID = fxSndGetNewSound();
@@ -2513,7 +2262,7 @@ SINT32			RecoilNum = 0;
 			}
 			else
 			{
-				if (Vehicle->Weapons[i][0].WeaponType != NULL)
+				if (Vehicle->Weapons[i][0].WeaponType != nullptr)
 				{
 					if (Vehicle->Weapons[i][0].WeaponType->FireType != WEAP_FIRETYPE_SINGLESHOT)
 					{
@@ -2537,7 +2286,7 @@ SINT32			RecoilNum = 0;
 			if (WeaponFired == TRUE)
 			{
 				// trigger recoil
-				if (Vehicle != NULL)
+				if (Vehicle != nullptr)
 				{
 					RecoilNum = Vehicle->VehicleType->Loadout[Vehicle->LoadoutNum].RecoilNum[i]-1;
 					if (RecoilNum >= 0)
@@ -2631,7 +2380,7 @@ void _playWeaponFireSound(SCHAR* sound,
     FLOAT32 fMin, fMax;
 
     // Check if distance file exists.
-    SCHAR* p = NULL;
+    SCHAR* p = nullptr;
     static SCHAR distSound[128];
     LOGICAL hasDistant = FALSE;
   //  LOGICAL canPlayDistantSound = FALSE;
@@ -2705,9 +2454,6 @@ LOGICAL _GetSoundDistance(FLOAT32* pMin, FLOAT32* pMax, UINT32* pType)
             break;
         }
     case VEH_TYPE_GROUND:
-#ifdef DOROTHY
-	case VEH_TYPE_MECH:
-#endif
         {
             *pMax = 1609.0f;
             *pMin = 50.0f;
@@ -2804,13 +2550,13 @@ void _processBuildingDamage (vehVehicle& Vehicle)
 		damagePacket.list[i].object.objType = 0;
 
 		// used to be 4000000000.0, now 2147483647 due to change from UINT to SINT
-		SINT64 damage = (SINT64)Vehicle.DamageQue.Damage[i] ;
-		static const SINT64 cutoffJoules = 2100000000LL ;
+		SINT64 damage = (SINT64)Vehicle.DamageQue.Damage[i];
+		static const SINT64 cutoffJoules = 2100000000LL;
 		if ( damage > 0 && damage > cutoffJoules )
-			damage = cutoffJoules ;
+			damage = cutoffJoules;
 		else if ( damage < 0 && damage < -cutoffJoules )
-			damage = -cutoffJoules ;
-		damagePacket.list[i].damage = damage ;
+			damage = -cutoffJoules;
+		damagePacket.list[i].damage = damage;
 
 		Write_Debug("WEAP Sending building hit message, scx = %d, scy = %d, id = %d, damage = %lf",
 							Vehicle.DamageQue.SuperCellX[i],

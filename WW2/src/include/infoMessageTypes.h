@@ -17,7 +17,7 @@ struct COMPUTER_INFO_REQ
 {
 	UINT16 size;
 	char text[MAX_INFO_REQ_TEXT+1];
-} ;
+};
 
 struct PIXEL_FORMAT_DESC
 {
@@ -45,7 +45,7 @@ struct PIXEL_FORMAT_DESC
 	UCHAR  cDepthBits;
 	UCHAR  cStencilBits;
 
-} ;
+};
 
 #define MAX_OGL_EXTENSIONS 1024
 #define MAX_OGL_EXTN_SPACE (MAX_OGL_EXTENSIONS>>3)
@@ -54,13 +54,13 @@ struct PLAY_OGL_EXTENSIONS
 {
 	UINT16	numExtensions;
 	char	bitmap[MAX_OGL_EXTN_SPACE];
-} ;
+};
 
 
 struct PLAY_COMP_TEXTURE
 {
 	UINT32 value;
-} ;
+};
 
 #define MAX_COMPRESSED_TEXTURE 8
 
@@ -68,7 +68,7 @@ struct PLAY_COMP_TEXTURES
 {
 	UINT16				num;
 	PLAY_COMP_TEXTURE	desc[MAX_COMPRESSED_TEXTURE+1];
-} ;
+};
 
 #define MAX_OGL_VENDOR_NAME 16
 #define MAX_OGL_CARD_NAME 48
@@ -81,27 +81,27 @@ struct PLAY_OGL
 	PLAY_OGL_EXTENSIONS	extension;
 	PIXEL_FORMAT_DESC	pixelFormat;
 	PLAY_COMP_TEXTURES	compTextures;
-} ;
+};
 
 struct PLAY_DX_VERS
 {
 	LOGICAL	isInstalled;
 	UINT32	hiVersion;
 	UINT32	lowVersion;
-} ;
+};
 
 struct PLAY_DX
 {
 	int				driverVersion; // not sent yet...
 	PLAY_DX_VERS	draw;
 	PLAY_DX_VERS	d3d;
-} ;
+};
 
 struct PLAY_VIDEO
 {
 	PLAY_OGL	ogl;
 	PLAY_DX		dx;
-} ;
+};
 
 typedef UINT32   WIN_MMVERSION_;  /* major (high byte), minor (low byte) */
 
@@ -115,13 +115,13 @@ struct PLAY_MIXER_CAPS
 	SCHAR			szPname[MAX_MIX_NAME+1]; /* product name */
 	SINT32			fdwSupport;             /* misc. support bits */
 	SINT32			cDestinations;          /* count of destinations */
-} ;
+};
 
 struct PLAY_SOUND
 {
 	LOGICAL			isValid;
 	PLAY_MIXER_CAPS mixer;
-} ;
+};
 
 struct PLAY_MEM
 {
@@ -133,7 +133,7 @@ struct PLAY_MEM
 	SINT32 dwAvailPageFile;
 	SINT32 dwTotalVirtual;
 	SINT32 dwAvailVirtual;
-} ;
+};
 
 struct PLAY_COMPUTER_INFO
 {
@@ -144,8 +144,8 @@ struct PLAY_COMPUTER_INFO
 
 	UINT32				version;
 
-	UINT32 CurrentVersion() const { return 1 ; }
-} ;
+	UINT32 CurrentVersion() const { return 1; }
+};
 
 #pragma pack(pop)
 

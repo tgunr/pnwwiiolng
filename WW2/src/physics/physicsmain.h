@@ -29,8 +29,8 @@ extern Vec3d& physicsGetWorldForce(const FLOAT64VECTOR& pos, bool randFallback =
 extern void physicsAddObject(physicsObject*);
 extern void physicsRemoveObject(physicsObject*, bool now = false);
 extern void physicsRemoveAllObjects(bool includeOwned = false);
-extern physicsObject* physicsFindObject(PHYSICS_MODEL_FILTER* filter, void* const data = NULL);
-extern bool physicsFindObject(physicsObjectSet& list, PHYSICS_MODEL_FILTER* filter, void* const data = NULL);
+extern physicsObject* physicsFindObject(PHYSICS_MODEL_FILTER* filter, void* const data = nullptr);
+extern bool physicsFindObject(physicsObjectSet& list, PHYSICS_MODEL_FILTER* filter, void* const data = nullptr);
 
 extern void physicsSetStepSize(float);
 extern void physicsSetTimeMultiplier(float);
@@ -53,7 +53,7 @@ extern void physicsFreeNodeCollider(PoolNode* node);
 
 // object colliders
 extern dSpaceID physicsRecurseAndCreateObjectCollider(struct OBJECT*, dSpaceID space, unsigned int cat, unsigned int col
-											, bool siblings, bool onlyVisible, bool createSpace, void* spaceData = NULL);
+											, bool siblings, bool onlyVisible, bool createSpace, void* spaceData = nullptr);
 extern void physicsRecurseAndFreeObjectCollider(OBJECT*, bool siblings=false);
 extern void physicsRecurseAndToggleObjectCollider(OBJECT*, bool enabled, bool siblings=false);
 extern void physicsCreateObjectCollider(OBJECT*, dSpaceID, unsigned int cat, unsigned int col);

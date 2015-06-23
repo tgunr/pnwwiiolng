@@ -23,11 +23,11 @@ namespace Auth
 			, RapidAssaultBeta = 22
 			, RapidAssaultRelease = 23
 			, MAX_APPID
-		} ;
+		};
 
 		// Game configuration.
-		enum { LIVE_APP_ID = WWIIOL } ;
-		enum { BETA_APP_ID = WWIIOLBETA } ;
-		enum { PRESENTER = WWIIOL_PRESENTER } ;
+		enum { LIVE_APP_ID = WWIIOL };
+		enum { BETA_APP_ID = WWIIOLBETA };
+		enum { PRESENTER = WWIIOL_PRESENTER };
 	}
 }

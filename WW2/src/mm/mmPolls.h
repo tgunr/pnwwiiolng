@@ -8,7 +8,7 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-extern void mmFetchOpinionPolls(bool force=false) ;
+extern void mmFetchOpinionPolls(bool force=false);
 
-extern bool mmCheckOpinionPolls(class Player* player) ;
+extern bool mmCheckOpinionPolls(class Player* player);
 

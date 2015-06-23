@@ -2,6 +2,8 @@
 
 #if defined(WIN32) || defined(WIN64)
 
+#include <algorithm>
+
 // This file is just a place to define all those
 // Microsoft/ISO departure from those "evil",
 // portable, POSIX standards like "open()".
@@ -33,6 +35,7 @@
 # define OS_FILENO(...) _fileno(__VA_ARGS__)
 # define OS_ACCESS(...) _access(__VA_ARGS__)
 # define OS_WACCESS(...) _waccess(__VA_ARGS__)
+# define OS_CLOSESOCKET(...) closesocket(__VA_ARGS__)
 # ifndef stricmp
 #  define stricmp(x,y) _stricmp(x,y)
 # endif
@@ -51,24 +54,26 @@
 #define   swprintf   _snwprintf
 #define	  vswprintf	 _vsnwprintf
 
+#if _MSC_VER < 1800 // visual studio 2013 defines this in stdlib.h
 static inline unsigned long long strtoull(const char* const src_, const char* const, unsigned int)
 {
 	unsigned long long into = 0;
-	(void)sscanf(src_, "%I64u", &into) ;
-	return into ;
+	(void)sscanf(src_, "%I64u", &into);
+	return into;
 }
 static inline signed long long strtoll(const char* const src_, const char* const, unsigned int)
 {
-	signed long long into = 0 ;
-	(void)sscanf(src_, "%I64d", &into) ;
-	return into ;
+	signed long long into = 0;
+	(void)sscanf(src_, "%I64d", &into);
+	return into;
 }
 static inline float strtof(const char* const src_, const char* const)
 {
-	float into = 0 ;
-	(void)sscanf(src_, "%f", &into) ;
-	return into ;
+	float into = 0;
+	(void)sscanf(src_, "%f", &into);
+	return into;
 }
+#endif
 
 #else
 
@@ -89,5 +94,6 @@ static inline float strtof(const char* const src_, const char* const)
 # define OS_FILENO(f) fileno(f)
 # define OS_ACCESS(...) ::access(__VA_ARGS__)
 # define OS_WACCESS(...) waccess(__VA_ARGS__)
+# define OS_CLOSESOCKET(...) close(__VA_ARGS__)
 
 #endif // WIN32 || WIN64

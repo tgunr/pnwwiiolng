@@ -209,7 +209,7 @@ void glslWaterDrawBinDeprecated(bool fbodraw)
     waterdrawn = true;
 
     const unsigned int size = waterbin.size();
-    OBJECT* o = NULL;
+    OBJECT* o = nullptr;
 
     int matid;
 
@@ -349,7 +349,7 @@ void glslWaterDrawBinDeprecated(bool fbodraw)
     waterdrawn = true;
 
     const unsigned int size = waterbin.size();
-    OBJECT* o = NULL;
+    OBJECT* o = nullptr;
 
     int matid;
 
@@ -524,7 +524,7 @@ void glslWaterDrawBin()
     oglSetWorldMatrix(&IdentityMatrix);
 
     const unsigned int size = waterbin.size();
-    OBJECT* o = NULL;
+    OBJECT* o = nullptr;
 
     if(g_wantWaterReflections)
     {
@@ -549,8 +549,8 @@ void glslWaterDrawBin()
     dynamic_cast<Material*>(h2omaterial->GetRenderState(RS_MATERIAL))->SetMaterialID(matid);
     h2omaterial->Apply();
 
-    const piUNIFIED_VERTEX* old = NULL;
-    const OBJECT* last = NULL;
+    const piUNIFIED_VERTEX* old = nullptr;
+    const OBJECT* last = nullptr;
 
     for(unsigned int i = waterbin.size(); i != 0; --i)
     {
@@ -588,7 +588,7 @@ void glslWaterDrawBin()
     oglSetWorldMatrix(&IdentityMatrix);
 
     const unsigned int size = waterbin.size();
-    OBJECT* o = NULL;
+    OBJECT* o = nullptr;
 
     if(g_wantWaterReflections)
     {
@@ -613,8 +613,8 @@ void glslWaterDrawBin()
     h2omaterial->SetMaterial(matid);
     h2omaterial->Apply();
 
-    const piUNIFIED_VERTEX* old = NULL;
-    const OBJECT* last = NULL;
+    const piUNIFIED_VERTEX* old = nullptr;
+    const OBJECT* last = nullptr;
 
 #if DEBUG_WW2
     int same = 0;
@@ -777,7 +777,7 @@ static void DrawScenarioCoastEffectBin()
 
     obdrawDrawMesh(o);
 
-    States::ApplyRenderStates(NULL);
+    States::ApplyRenderStates(nullptr);
 }
 
 /*--------------------------------------------------------------------------------------
@@ -866,8 +866,8 @@ static void DrawScenarioCoastBin()
 
     oglSetWorldMatrix(&IdentityMatrix);
 
-    States::ApplyRenderStates(NULL);
-    States::ApplyRenderModes(NULL);
+    States::ApplyRenderStates(nullptr);
+    States::ApplyRenderModes(nullptr);
 }
 #else
 /*--------------------------------------------------------------------------------------

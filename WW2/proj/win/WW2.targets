@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <PropertyPageSchema
+      Include="$(MSBuildThisFileDirectory)$(MSBuildThisFileName).xml" />
+    <AvailableItemName
+      Include="OMGGen">
+      <Targets>_OMGGen</Targets>
+    </AvailableItemName>
+  </ItemGroup>
+  <UsingTask
+    TaskName="OMGGen"
+    TaskFactory="XamlTaskFactory"
+    AssemblyName="Microsoft.Build.Tasks.v4.0, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a">
+    <Task>$(MSBuildThisFileDirectory)$(MSBuildThisFileName).xml</Task>
+  </UsingTask>
+  <Target
+    Name="_OMGGen"
+    BeforeTargets="$(OMGGenBeforeTargets)"
+    AfterTargets="$(OMGGenAfterTargets)"
+    Condition="'@(OMGGen)' != ''"
+    DependsOnTargets="$(OMGGenDependsOn);ComputeOMGGenOutput"
+    Outputs="@(OMGGen-&gt;Metadata('Outputs')-&gt;Distinct())"
+    Inputs="@(OMGGen);%(OMGGen.AdditionalDependencies);$(MSBuildProjectFile)">
+    <ItemGroup
+      Condition="'@(SelectedFiles)' != ''">
+      <OMGGen
+        Remove="@(OMGGen)"
+        Condition="'%(Identity)' != '@(SelectedFiles)'" />
+    </ItemGroup>
+    <ItemGroup>
+      <OMGGen_tlog
+        Include="%(OMGGen.Outputs)"
+        Condition="'%(OMGGen.Outputs)' != '' and '%(OMGGen.ExcludedFromBuild)' != 'true'">
+        <Source>@(OMGGen, '|')</Source>
+      </OMGGen_tlog>
+    </ItemGroup>
+    <Message
+      Importance="High"
+      Text="%(OMGGen.ExecutionDescription)" />
+    <WriteLinesToFile
+      Condition="'@(OMGGen_tlog)' != '' and '%(OMGGen_tlog.ExcludedFromBuild)' != 'true'"
+      File="$(TLogLocation)$(ProjectName).write.1u.tlog"
+      Lines="^%(OMGGen_tlog.Source);@(OMGGen_tlog-&gt;'%(Fullpath)')"
+      Encoding="Unicode" />
+    <OMGGen
+      Condition="'@(OMGGen)' != '' and '%(OMGGen.ExcludedFromBuild)' != 'true'"
+      CommandLineTemplate="%(OMGGen.CommandLineTemplate)"
+      AdditionalOptions="%(OMGGen.AdditionalOptions)"
+      Inputs="@(OMGGen)" />
+  </Target>
+  <PropertyGroup>
+    <ComputeLinkInputsTargets>
+            $(ComputeLinkInputsTargets);
+            ComputeOMGGenOutput;
+          </ComputeLinkInputsTargets>
+    <ComputeLibInputsTargets>
+            $(ComputeLibInputsTargets);
+            ComputeOMGGenOutput;
+          </ComputeLibInputsTargets>
+  </PropertyGroup>
+  <Target
+    Name="ComputeOMGGenOutput"
+    Condition="'@(OMGGen)' != ''">
+    <ItemGroup>
+      <OMGGenDirsToMake
+        Condition="'@(OMGGen)' != '' and '%(OMGGen.ExcludedFromBuild)' != 'true'"
+        Include="%(OMGGen.Outputs)" />
+      <Link
+        Include="%(OMGGenDirsToMake.Identity)"
+        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
+      <Lib
+        Include="%(OMGGenDirsToMake.Identity)"
+        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
+      <ImpLib
+        Include="%(OMGGenDirsToMake.Identity)"
+        Condition="'%(Extension)'=='.obj' or '%(Extension)'=='.res' or '%(Extension)'=='.rsc' or '%(Extension)'=='.lib'" />
+    </ItemGroup>
+    <MakeDir
+      Directories="@(OMGGenDirsToMake-&gt;'%(RootDir)%(Directory)')" />
+  </Target>
+</Project>

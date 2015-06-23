@@ -28,5 +28,5 @@ enum PROTOCOL
 	PROTOCOL_TCP,			// Transport Control Protocol, reliable, stream based, extra overhead.
 	PROTOCOL_UDB,			// UDB = UDP bare, no rel, also allows broadcast
 	PROTOCOL_CTRL			// CTRL = Via the controller
-} ;
+};
 

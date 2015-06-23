@@ -36,7 +36,7 @@ Description:
 #if USE_ODE
 #define USE_SINGLE_COLLISION    0
 #define USE_RAY 0
-static colliderQuery* RainCollider = NULL;
+static colliderQuery* RainCollider = nullptr;
 #endif
 
 static bool dorain = false;
@@ -237,12 +237,12 @@ static void SetTodaysRainTimes(const int seedidx)
 			if(start > 0 || start < (int)daySeconds)
 				thundertimes.push_back((unsigned int)start / divisor);
 
-			unsigned int hour = raintimes[i] / 3600 ;
+			unsigned int hour = raintimes[i] / 3600;
 			unsigned int thunders = (hour >= 6 && hour <= 18) ? 16 : 3;
 			for(unsigned int t = 1; t < thunders; ++t)
 			{
 				if ( rainlength[i] < 120 )
-					continue ;
+					continue;
 				// Chance of an additional rumbles the rain; increasingly less likely.
 				if(WeatherRandom(0, t) == 0)
 				{
@@ -355,7 +355,7 @@ void fxWeatherInit()
     }
 
 #if(0)
-    glslProgram* pgm = GLSL.loadProgram("raindrop", NULL, NULL);
+    glslProgram* pgm = GLSL.loadProgram("raindrop", nullptr, nullptr);
 
     if(pgm)
     {
@@ -394,7 +394,7 @@ static void PrintTimeLine()
 	{
 		output += "Rain Times: ";
 
-		for ( unsigned int i = 0 ; i < raintimes.size() ; ++i )
+		for ( unsigned int i = 0; i < raintimes.size(); ++i )
 		{
 			if(i > 0)
 				output += ", ";
@@ -496,7 +496,7 @@ void fxWeatherDrawWindow(OBJECT* o)
     oglSetWorldMatrix(&o->mat);
     oglSetActiveMaterial(o->matid);
 
-    static glslProgram* rain = NULL;
+    static glslProgram* rain = nullptr;
 
     if(!rain)
         rain = GLSL.getProgram("raindrop");
@@ -526,7 +526,7 @@ static void _killcallback(Particle2* p)
         return;
 
     Vec3f n(0, 0, -1);
-    TransformEffect* te = TransformEffect::AddEffect("raingroundhit", n, 0, NULL);
+    TransformEffect* te = TransformEffect::AddEffect("raingroundhit", n, 0, nullptr);
 
     if(te)
     {
@@ -604,7 +604,7 @@ static bool _updatecallback(Particle2* p)
     dGeomSetPosition(geoms[0], pos.x(), pos.y(), pos.z());
 #endif
 
-    dGeomID current = NULL;
+    dGeomID current = nullptr;
     RainCollider->setDirty(true);
 
     if(!RainCollider->findCollisions(true))
@@ -869,7 +869,7 @@ static void _createrain(int numemissions)
         }
     }
 
-    dGeomID current = NULL;
+    dGeomID current = nullptr;
     RainCollider->setDirty(true);
 
     if(!RainCollider->findCollisions(true))
@@ -1182,7 +1182,7 @@ static void _createrain(int numemissions)
                     rainpos.x += vel.x * offset;
                     rainpos.y += vel.y * offset;
 
-                    _addparticle(rainpos, NULL);
+                    _addparticle(rainpos, nullptr);
                 }
             }
         }

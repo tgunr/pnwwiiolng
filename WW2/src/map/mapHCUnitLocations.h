@@ -19,14 +19,14 @@ public:
 	HCUnitLocation(UINT32 unitID, const FULL_OBJ_ID& fid)
 		: m_unitID(unitID), m_homeCPID(fid)
 		{}
-	HCUnitLocation(ACTION_OBJECT* const a) { packer(TEUL_UNPACK, a) ; }
+	HCUnitLocation(ACTION_OBJECT* const a) { packer(TEUL_UNPACK, a); }
 	HCUnitLocation() : m_unitID(0), m_homeCPID(nullObjID) {}
 
 	// Destructors
 	~HCUnitLocation() {}
 
 	// Shared member functions
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) ;
+	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
 
 	// host only member functions
 
@@ -34,9 +34,9 @@ public:
 
 public:
 	// Members
-	UINT32		m_unitID ;			// 16 bits	} nice round
-	FULL_OBJ_ID	m_homeCPID ;		// 48 bits	} 64 bits!
-} ;
+	UINT32		m_unitID;			// 16 bits	} nice round
+	FULL_OBJ_ID	m_homeCPID;			// 48 bits	} 64 bits!
+};
 
-typedef teul_network_array<HCUnitLocation> HC_UNIT_LOCATIONS ;
+typedef teul_network_array<HCUnitLocation> HC_UNIT_LOCATIONS;
 

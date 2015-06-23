@@ -23,31 +23,31 @@ bool
 SortieManager::Commit()
 {
 	if ( m_pending.empty() )
-		return false ;
+		return false;
 
-	static const char leadText[] = "UPDATE wwii_sortie SET %s WHERE %s AND sortie_id IN (" ;
-	static const UINT32 MAX_WRITES = (TEXT_POOL_SIZE - (sizeof(leadText) + 2)) / 12 ;
-	static char* buffer = threadsAllocText() ;
-	static char* p ;
+	static const char leadText[] = "UPDATE wwii_sortie SET %s WHERE %s AND sortie_id IN (";
+	static const UINT32 MAX_WRITES = (TEXT_POOL_SIZE - (sizeof(leadText) + 2)) / 12;
+	static char* buffer = threadsAllocText();
+	static char* p;
 
-	p = buffer + sprintf(buffer, leadText, m_set, m_where) ;
+	p = buffer + sprintf(buffer, leadText, m_set, m_where);
 
-	for ( UINT32 i = 0 ; i < m_pending.size() && i < MAX_WRITES ; ++i )
+	for ( UINT32 i = 0; i < m_pending.size() && i < MAX_WRITES; ++i )
 	{
 		if ( i > 0 )
-			*(p++) = ',' ;
-		p += sprintf(p, "%u", m_pending[i]) ;
+			*(p++) = ',';
+		p += sprintf(p, "%u", m_pending[i]);
 	}
 
-	*(p++) = ')' ;
-	*(p++) = 0 ;
+	*(p++) = ')';
+	*(p++) = 0;
 
-	threadLog(_FLD, "Updating %s/%s for %u sorties", m_set, m_where, m_pending.size()) ;
+	threadLog(_FLD, "Updating %s/%s for %u sorties", m_set, m_where, m_pending.size());
 
-	DBThread::Do(DBThread::Default, buffer) ;
+	DBThread::Do(DBThread::Default, buffer);
 
 	// We're done with all of these
-	m_pending.clear() ;
+	m_pending.clear();
 
-	return true ;
+	return true;
 }

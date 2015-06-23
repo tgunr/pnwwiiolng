@@ -18,5 +18,5 @@ struct HIT_ARRAY_NODE
 	WEAPON_SPEC	vehType;			// What type of vehicle
 	UINT16		numVehiclesHit;		// How many you fired at and hit
 	UINT16		numVehiclesKilled;	// How many you were credited kills on
-} ;
+};
 

@@ -32,7 +32,7 @@ enum WWII_SERVICE
 
 	//Add new services here
 	MAX_SERVICE
-} ;
+};
 
 //#define WWII_SIDE SIDE
 //#define WWII_MAX_COUNTRY MAX_COUNTRIES
@@ -49,7 +49,7 @@ enum WEAPON_CATEGORY
 	_INFANTRY,
 	_MUNITIONS,
 	MAX_WEAP_CATEGORY
-} ;
+};
 
 enum WEAPON_CAT_ABV
 {
@@ -59,6 +59,6 @@ enum WEAPON_CAT_ABV
 	SV_,		// _SEA_VEHICLE
 	IN_,		// _INFANTRY
 	MN_			// _MUNITIONS
-} ;
+};
 
 //tolua_end

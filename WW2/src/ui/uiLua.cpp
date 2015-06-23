@@ -1,7 +1,7 @@
 #include <syscfg.h> // Path is project specific.
 /*
 ** Lua binding: ui
-** Generated automatically by tolua++-1.0.92 on 09/03/11 11:16:31.
+** Generated automatically by tolua++-1.0.92 on 01/04/14 22:00:09.
 */
 
 #ifndef __cplusplus
@@ -540,7 +540,7 @@ static int tolua_ui_ui_phui_View_Parent00(lua_State* tolua_S)
  {
   const phui::View* self = (const phui::View*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Parent'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Parent'",nullptr);
 #endif
   {
    phui::View* tolua_ret = (phui::View*)  self->Parent();
@@ -574,7 +574,7 @@ static int tolua_ui_ui_phui_View_ChildAt00(lua_State* tolua_S)
   const phui::View* self = (const phui::View*)  tolua_tousertype(tolua_S,1,0);
   unsigned int tolua_var_7 = ((unsigned int)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ChildAt'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ChildAt'",nullptr);
 #endif
   {
    phui::View* tolua_ret = (phui::View*)  self->ChildAt(tolua_var_7);
@@ -608,7 +608,7 @@ static int tolua_ui_ui_phui_View_FindView00(lua_State* tolua_S)
   const phui::View* self = (const phui::View*)  tolua_tousertype(tolua_S,1,0);
   const char* name = ((const char*)  tolua_tostring(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'FindView'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'FindView'",nullptr);
 #endif
   {
    phui::View* tolua_ret = (phui::View*)  self->FindView(name);
@@ -642,7 +642,7 @@ static int tolua_ui_ui_phui_View_FindSibling00(lua_State* tolua_S)
   const phui::View* self = (const phui::View*)  tolua_tousertype(tolua_S,1,0);
   const char* name = ((const char*)  tolua_tostring(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'FindSibling'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'FindSibling'",nullptr);
 #endif
   {
    phui::View* tolua_ret = (phui::View*)  self->FindSibling(name);
@@ -674,7 +674,7 @@ static int tolua_ui_ui_phui_View_Width00(lua_State* tolua_S)
  {
   const phui::View* self = (const phui::View*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Width'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Width'",nullptr);
 #endif
   {
    float tolua_ret = (float)  self->Width();
@@ -706,7 +706,7 @@ static int tolua_ui_ui_phui_View_Height00(lua_State* tolua_S)
  {
   const phui::View* self = (const phui::View*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Height'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Height'",nullptr);
 #endif
   {
    float tolua_ret = (float)  self->Height();
@@ -738,7 +738,7 @@ static int tolua_ui_ui_phui_View_X00(lua_State* tolua_S)
  {
   const phui::View* self = (const phui::View*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'X'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'X'",nullptr);
 #endif
   {
    float tolua_ret = (float)  self->X();
@@ -770,7 +770,7 @@ static int tolua_ui_ui_phui_View_Y00(lua_State* tolua_S)
  {
   const phui::View* self = (const phui::View*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Y'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Y'",nullptr);
 #endif
   {
    float tolua_ret = (float)  self->Y();
@@ -802,7 +802,7 @@ static int tolua_ui_ui_phui_View_Left00(lua_State* tolua_S)
  {
   phui::View* self = (phui::View*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Left'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Left'",nullptr);
 #endif
   {
    float tolua_ret = (float)  self->Left();
@@ -834,7 +834,7 @@ static int tolua_ui_ui_phui_View_Right00(lua_State* tolua_S)
  {
   phui::View* self = (phui::View*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Right'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Right'",nullptr);
 #endif
   {
    float tolua_ret = (float)  self->Right();
@@ -866,7 +866,7 @@ static int tolua_ui_ui_phui_View_Bottom00(lua_State* tolua_S)
  {
   phui::View* self = (phui::View*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Bottom'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Bottom'",nullptr);
 #endif
   {
    float tolua_ret = (float)  self->Bottom();
@@ -898,7 +898,7 @@ static int tolua_ui_ui_phui_View_Top00(lua_State* tolua_S)
  {
   phui::View* self = (phui::View*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Top'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Top'",nullptr);
 #endif
   {
    float tolua_ret = (float)  self->Top();
@@ -932,7 +932,7 @@ static int tolua_ui_ui_phui_View_SetLeft00(lua_State* tolua_S)
   phui::View* self = (phui::View*)  tolua_tousertype(tolua_S,1,0);
   float left = ((float)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetLeft'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetLeft'",nullptr);
 #endif
   {
    self->SetLeft(left);
@@ -965,7 +965,7 @@ static int tolua_ui_ui_phui_View_SetRight00(lua_State* tolua_S)
   phui::View* self = (phui::View*)  tolua_tousertype(tolua_S,1,0);
   float right = ((float)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetRight'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetRight'",nullptr);
 #endif
   {
    self->SetRight(right);
@@ -998,7 +998,7 @@ static int tolua_ui_ui_phui_View_SetBottom00(lua_State* tolua_S)
   phui::View* self = (phui::View*)  tolua_tousertype(tolua_S,1,0);
   float bottom = ((float)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetBottom'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetBottom'",nullptr);
 #endif
   {
    self->SetBottom(bottom);
@@ -1031,7 +1031,7 @@ static int tolua_ui_ui_phui_View_SetTop00(lua_State* tolua_S)
   phui::View* self = (phui::View*)  tolua_tousertype(tolua_S,1,0);
   float top = ((float)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetTop'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetTop'",nullptr);
 #endif
   {
    self->SetTop(top);
@@ -1064,7 +1064,7 @@ static int tolua_ui_ui_phui_View_ResizeToAspect00(lua_State* tolua_S)
   phui::View* self = (phui::View*)  tolua_tousertype(tolua_S,1,0);
   int follow = ((int)  tolua_tonumber(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ResizeToAspect'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ResizeToAspect'",nullptr);
 #endif
   {
    self->ResizeToAspect(follow);
@@ -1099,7 +1099,7 @@ static int tolua_ui_ui_phui_View_ResizeTo00(lua_State* tolua_S)
   float width = ((float)  tolua_tonumber(tolua_S,2,0));
   float height = ((float)  tolua_tonumber(tolua_S,3,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ResizeTo'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ResizeTo'",nullptr);
 #endif
   {
    self->ResizeTo(width,height);
@@ -1134,7 +1134,7 @@ static int tolua_ui_ui_phui_View_ResizeBy00(lua_State* tolua_S)
   float dw = ((float)  tolua_tonumber(tolua_S,2,0));
   float dh = ((float)  tolua_tonumber(tolua_S,3,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ResizeBy'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ResizeBy'",nullptr);
 #endif
   {
    self->ResizeBy(dw,dh);
@@ -1169,7 +1169,7 @@ static int tolua_ui_ui_phui_View_MoveTo00(lua_State* tolua_S)
   float x = ((float)  tolua_tonumber(tolua_S,2,0));
   float y = ((float)  tolua_tonumber(tolua_S,3,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'MoveTo'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'MoveTo'",nullptr);
 #endif
   {
    self->MoveTo(x,y);
@@ -1204,7 +1204,7 @@ static int tolua_ui_ui_phui_View_MoveBy00(lua_State* tolua_S)
   float dx = ((float)  tolua_tonumber(tolua_S,2,0));
   float dy = ((float)  tolua_tonumber(tolua_S,3,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'MoveBy'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'MoveBy'",nullptr);
 #endif
   {
    self->MoveBy(dx,dy);
@@ -1239,7 +1239,7 @@ static int tolua_ui_ui_phui_View_ScrollTo00(lua_State* tolua_S)
   float x = ((float)  tolua_tonumber(tolua_S,2,0));
   float y = ((float)  tolua_tonumber(tolua_S,3,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ScrollTo'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ScrollTo'",nullptr);
 #endif
   {
    self->ScrollTo(x,y);
@@ -1274,7 +1274,7 @@ static int tolua_ui_ui_phui_View_ScrollBy00(lua_State* tolua_S)
   float dx = ((float)  tolua_tonumber(tolua_S,2,0));
   float dy = ((float)  tolua_tonumber(tolua_S,3,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ScrollBy'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'ScrollBy'",nullptr);
 #endif
   {
    self->ScrollBy(dx,dy);
@@ -1313,7 +1313,7 @@ static int tolua_ui_ui_phui_View_SetBackgroundColor00(lua_State* tolua_S)
   float b = ((float)  tolua_tonumber(tolua_S,4,0));
   float a = ((float)  tolua_tonumber(tolua_S,5,1.0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetBackgroundColor'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetBackgroundColor'",nullptr);
 #endif
   {
    self->SetBackgroundColor(r,g,b,a);
@@ -1352,7 +1352,7 @@ static int tolua_ui_ui_phui_View_SetBorderColor00(lua_State* tolua_S)
   float b = ((float)  tolua_tonumber(tolua_S,4,0));
   float a = ((float)  tolua_tonumber(tolua_S,5,1.0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetBorderColor'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetBorderColor'",nullptr);
 #endif
   {
    self->SetBorderColor(r,g,b,a);
@@ -1391,7 +1391,7 @@ static int tolua_ui_ui_phui_View_SetTextColor00(lua_State* tolua_S)
   float b = ((float)  tolua_tonumber(tolua_S,4,0));
   float a = ((float)  tolua_tonumber(tolua_S,5,1.0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetTextColor'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetTextColor'",nullptr);
 #endif
   {
    self->SetTextColor(r,g,b,a);
@@ -1422,7 +1422,7 @@ static int tolua_ui_ui_phui_View_Show00(lua_State* tolua_S)
  {
   phui::View* self = (phui::View*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Show'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Show'",nullptr);
 #endif
   {
    self->Show();
@@ -1453,7 +1453,7 @@ static int tolua_ui_ui_phui_View_Hide00(lua_State* tolua_S)
  {
   phui::View* self = (phui::View*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Hide'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Hide'",nullptr);
 #endif
   {
    self->Hide();
@@ -1484,7 +1484,7 @@ static int tolua_ui_ui_phui_View_IsVisible00(lua_State* tolua_S)
  {
   const phui::View* self = (const phui::View*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsVisible'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'IsVisible'",nullptr);
 #endif
   {
    bool tolua_ret = (bool)  self->IsVisible();
@@ -1518,7 +1518,7 @@ static int tolua_ui_ui_phui_View_SetEnable00(lua_State* tolua_S)
   phui::View* self = (phui::View*)  tolua_tousertype(tolua_S,1,0);
   bool enable = ((bool)  tolua_toboolean(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetEnable'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetEnable'",nullptr);
 #endif
   {
    self->SetEnable(enable);
@@ -1549,7 +1549,7 @@ static int tolua_ui_ui_phui_View_Enabled00(lua_State* tolua_S)
  {
   const phui::View* self = (const phui::View*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Enabled'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Enabled'",nullptr);
 #endif
   {
    bool tolua_ret = (bool)  self->Enabled();
@@ -1583,7 +1583,7 @@ static int tolua_ui_ui_phui_View_SetMoveOnDrag00(lua_State* tolua_S)
   phui::View* self = (phui::View*)  tolua_tousertype(tolua_S,1,0);
   bool b = ((bool)  tolua_toboolean(tolua_S,2,0));
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetMoveOnDrag'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'SetMoveOnDrag'",nullptr);
 #endif
   {
    self->SetMoveOnDrag(b);
@@ -1614,7 +1614,7 @@ static int tolua_ui_ui_phui_View_Close00(lua_State* tolua_S)
  {
   phui::View* self = (phui::View*)  tolua_tousertype(tolua_S,1,0);
 #ifndef TOLUA_RELEASE
-  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Close'",NULL);
+  if (!self) tolua_error(tolua_S,"invalid 'self' in function 'Close'",nullptr);
 #endif
   {
    self->Close();
@@ -1634,8 +1634,8 @@ TOLUA_API int tolua_ui_open (lua_State* tolua_S)
 {
  tolua_open(tolua_S);
  tolua_reg_types(tolua_S);
- tolua_module(tolua_S,NULL,0);
- tolua_beginmodule(tolua_S,NULL);
+ tolua_module(tolua_S,nullptr,0);
+ tolua_beginmodule(tolua_S,nullptr);
   tolua_module(tolua_S,"ui",0);
   tolua_beginmodule(tolua_S,"ui");
    tolua_function(tolua_S,"uiSetDespawnInfo",tolua_ui_ui_uiSetDespawnInfo00);
@@ -1672,7 +1672,7 @@ TOLUA_API int tolua_ui_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"MAX_CHANNEL_TYPES",MAX_CHANNEL_TYPES);
    tolua_module(tolua_S,"phui",0);
    tolua_beginmodule(tolua_S,"phui");
-    tolua_cclass(tolua_S,"View","phui::View","",NULL);
+    tolua_cclass(tolua_S,"View","phui::View","",nullptr);
     tolua_beginmodule(tolua_S,"View");
      tolua_function(tolua_S,"Parent",tolua_ui_ui_phui_View_Parent00);
      tolua_function(tolua_S,"ChildAt",tolua_ui_ui_phui_View_ChildAt00);

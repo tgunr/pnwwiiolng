@@ -8,14 +8,14 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-typedef std::vector<std::string> SPAM_CAN ;
+typedef std::vector<std::string> SPAM_CAN;
 
-extern SPAM_CAN theSpamCan ;
-extern UINT32 spamLoops ;
+extern SPAM_CAN theSpamCan;
+extern UINT32 spamLoops;
 
-extern TeulTimeMS nextSpamTime ;
-extern UINT32 nextSpamLine ;
-extern UINT32 spamInterval ;
+extern TeulTimeMS nextSpamTime;
+extern UINT32 nextSpamLine;
+extern UINT32 spamInterval;
 
-static const UINT32 LONG_SPAM_INTERVAL_MS   =	10 * 1000 ;	// 10 seconds long haul
-static const UINT32 SHORT_SPAM_INTERVAL_MS	=	 	 4000 ;	// 3 seconds
+static const UINT32 LONG_SPAM_INTERVAL_MS   =	10 * 1000;	// 10 seconds long haul
+static const UINT32 SHORT_SPAM_INTERVAL_MS	=	 	 4000;	// 3 seconds

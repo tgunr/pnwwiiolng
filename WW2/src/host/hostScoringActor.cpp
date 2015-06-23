@@ -18,14 +18,14 @@ Scoring::Actor::Actor(const HostVehicle* vehicle)
 	, m_balance(Scoring::Balance::Even)
 {
 	if ( vehicle->players().empty() == true )
-		return ;
+		return;
 
 	// Use the first available player as a guide.
-	const Player* const player = vehicle->players().front() ;
-	if ( player == NULL )
-		return ;
+	const Player* const player = vehicle->players().front();
+	if ( player == nullptr )
+		return;
 
-	m_playerID = player->playerID() ;
+	m_playerID = player->playerID();
 }
 
 Scoring::Actor::Actor(const HostVehicle* const vehicle, const Player* const player)

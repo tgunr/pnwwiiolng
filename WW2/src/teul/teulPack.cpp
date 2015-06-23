@@ -18,28 +18,28 @@
 // pack significant bytes into buffer from left justified value in network byte order
 static size_t _packBytes(size_t offset, UCHAR* const buffer, UCHAR* const value, const size_t numBytes, size_t significantBytes)
 {
-	if ( significantBytes == 0)
-		return offset ;
-
-	if (significantBytes<1)
+	if (significantBytes < 1)
 	{
-		dbugWrite(_FLA,"invalid significantBytes = %d\n",significantBytes);
-		return (size_t)-EINVAL;
+		if (significantBytes != 0) {
+			dbugWrite(_FLA, "invalid significantBytes = %d\n", significantBytes);
+			return (size_t)-EINVAL;
+		}
+		return offset;
 	}
 
 	// big-endian systems use the reverse of network/stream
 	// ordering. this isn't about endian-favoring, it's
-	// about the position of the signficant values.
+	// about the position of the significant values.
 
-	// value should allways come in left justified significant bytes
+	// value should always come in left justified significant bytes
 	size_t i = numBytes;
-	const size_t cutoff = offset + significantBytes ;
+	const size_t cutoff = offset + significantBytes;
 	do
 	{
 		buffer[offset++] = value[--i];
-	} while ( offset < cutoff ) ;
+	} while ( offset < cutoff );
 
-	return offset ;
+	return offset;
 }
 
 // pack significant bytes left justified into value from buffer in platform byte order
@@ -58,7 +58,7 @@ static size_t _unpackBytes(const size_t offset, UCHAR* const buffer, UCHAR* cons
 	do
 	{
 		value[i++] = buffer[offset + --j];
-	} while ( j > 0 ) ;
+	} while ( j > 0 );
 
 	return offset + significantBytes;
 }
@@ -66,7 +66,7 @@ static size_t _unpackBytes(const size_t offset, UCHAR* const buffer, UCHAR* cons
 // Note: teulPackVoid caveat: last argument is size in BYTES not bits
 SINT32 teulPackVoid(const LOGICAL mode, UCHAR* const buffer, const SINT32 bitOffset, void* const anything, SINT32 size)
 {
-	const SINT32 totalBits = bitOffset + (size<<3) ;
+	const SINT32 totalBits = bitOffset + (size<<3);
 
 	if ( bitOffset < 0 )
 	{
@@ -91,12 +91,12 @@ SINT32 teulPackVoid(const LOGICAL mode, UCHAR* const buffer, const SINT32 bitOff
 		return totalBits;
 	}
 
-	for ( UINT32 i = 0 ; i < (UINT32)size ; ++i )
+	for ( UINT32 i = 0; i < (UINT32)size; ++i )
 	{
 		teulPackUCHAR(mode, buffer, bitOffset + (i << 3), ((UCHAR*)anything) + i, 0);
 	}
 
-	return totalBits ;
+	return totalBits;
 }
 
 // generic pack for xINT32, xINT16, xCHAR, FLOAT32
@@ -111,7 +111,7 @@ _packBits(UCHAR* const buffer, SINT32 bitOffset, UINT32* const idata, SINT32 sig
 	}
 
 
-	if (buffer == NULL || idata == NULL)
+	if (buffer == nullptr || idata == nullptr)
 	{
 		dbugSetErrno(EINVAL);
 		dbugLog(_FLA, "invalid buffer %p or data %p",(UINT32*) buffer, (UINT32*) idata);
@@ -120,19 +120,19 @@ _packBits(UCHAR* const buffer, SINT32 bitOffset, UINT32* const idata, SINT32 sig
 
 	const SINT32 totalBits = bitOffset + significantBits;
 
-	SINT32 byteOffset = bitOffset / 8 ;
-	bitOffset &= 0x7 ;		// Alignment offset, no-longer full offset.
+	SINT32 byteOffset = bitOffset / 8;
+	bitOffset &= 0x7;		// Alignment offset, no-longer full offset.
 
-	const SINT32 numBytes = numBits / 8 ;
-	const SINT32 sigBytes = (significantBits+7) / 8 ;
+	const SINT32 numBytes = numBits / 8;
+	const SINT32 sigBytes = (significantBits+7) / 8;
 
 	// left bit align, blow off insignificant bits
 	UINT32 data = (*idata) << (numBits - significantBits);
 
-	// if the buffer isnt byte alligned, 'or' the top bits into the buffer
+	// if the buffer isn't byte aligned, bitwise-or the top bits into the buffer
 	if (bitOffset != 0)
 	{
-		UCHAR buf[4] ;
+		UCHAR buf[4];
 		(void)_packBytes(0, buf, (UCHAR*) &data, numBytes, sigBytes);
 
 		for (SINT32 i = 0; i < sigBytes; ++i)
@@ -176,11 +176,11 @@ _unpackBits (UCHAR* const buffer, SINT32 bitOffset, UINT32* const idata, SINT32 
 	// if the data is already byte aligned just copy it out
 	if (bitOffset != 0)
 	{
-		const int offsetCompliment = 8 - bitOffset ;
-		// not byte alligned, allign it into data...
+		const int offsetCompliment = 8 - bitOffset;
+		// not byte aligned, align it into data...
 		for (SINT32 i = 0; i < sigBytes; ++i)
 		{
-			// copy the bits from the bit offset positon into data byte alligned
+			// copy the bits from the bit offset position into data byte aligned
 			data[i] = (buffer[byteOffset++] << bitOffset) & 0xff;
 			data[i] |= (buffer[byteOffset] >> offsetCompliment) & 0xff;
 		}
@@ -191,7 +191,7 @@ _unpackBits (UCHAR* const buffer, SINT32 bitOffset, UINT32* const idata, SINT32 
 		_unpackBytes(byteOffset, buffer, (UCHAR*) idata, numBytes, sigBytes);
 
 	// right align data into idata
-	static const UINT32 UINT32_BITS = sizeof(UINT32) << 3 ;
+	static const UINT32 UINT32_BITS = sizeof(UINT32) << 3;
 	(*idata) >>= (UINT32_BITS - significantBits);
 
 	return (totalBits);
@@ -202,6 +202,7 @@ teulPackSINT32(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, SINT32* cons
 {
 	UINT32 xdata;
 
+	assert(significantBits != 1);
 	if (significantBits < 1 || significantBits > 32)
 		significantBits = 32;
 
@@ -227,6 +228,7 @@ teulPackSINT16(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, SINT16* cons
 {
 	UINT32 xdata = (UINT32) (*idata);
 
+	assert(significantBits != 1);
 	if (significantBits < 1 || significantBits > 16)
 		significantBits = 16;
 
@@ -284,31 +286,31 @@ teulPackUINT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, UINT64* cons
 {
 	if (significantBits < 1 || significantBits > 64)
 		significantBits = 64;
-	SINT32 sigHighBits = (significantBits > 32) ? significantBits - 32 : 0 ;
-	SINT32 sigLowBits = (significantBits >= 32) ? 32 : significantBits ;
+	SINT32 sigHighBits = (significantBits > 32) ? significantBits - 32 : 0;
+	SINT32 sigLowBits = (significantBits >= 32) ? 32 : significantBits;
 
 	UINT32 bits = 0;
 	if ( mode == TEUL_PACK )
 	{
 		if ( sigHighBits > 0 )
 		{
-			bits = (UINT32)((*idata) >> 32) ;
-			bitOffset = _packBits(buffer, bitOffset, &bits, sigHighBits, 32) ;
+			bits = (UINT32)((*idata) >> 32);
+			bitOffset = _packBits(buffer, bitOffset, &bits, sigHighBits, 32);
 		}
-		bits = (UINT32)((*idata) & 0xffffffff) ;
-		bitOffset = _packBits(buffer, bitOffset, &bits, sigLowBits, 32) ;
+		bits = (UINT32)((*idata) & 0xffffffff);
+		bitOffset = _packBits(buffer, bitOffset, &bits, sigLowBits, 32);
 	}
 	else
 	{
-		*idata = 0ULL ;
+		*idata = 0ULL;
 		if ( sigHighBits > 0 )
 		{
-			bitOffset = _unpackBits(buffer, bitOffset, &bits, sigHighBits, 32) ;
-			*idata = bits ;
-			*idata <<= 32 ;
+			bitOffset = _unpackBits(buffer, bitOffset, &bits, sigHighBits, 32);
+			*idata = bits;
+			*idata <<= 32;
 		}
-		bitOffset = _unpackBits(buffer, bitOffset, &bits, sigLowBits, 32) ;
-		*idata |= bits ;
+		bitOffset = _unpackBits(buffer, bitOffset, &bits, sigLowBits, 32);
+		*idata |= bits;
 	}
 
 	return bitOffset;
@@ -317,38 +319,39 @@ teulPackUINT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, UINT64* cons
 SINT32
 teulPackSINT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, SINT64* const idata, SINT32 significantBits)
 {
+	assert(significantBits != 1);
 	if (significantBits < 1 || significantBits > 64)
 		significantBits = 64;
-	SINT32 sigHighBits = (significantBits > 32) ? significantBits - 32 : 0 ;
-	SINT32 sigLowBits = (significantBits >= 32) ? 32 : significantBits ;
+	SINT32 sigHighBits = (significantBits > 32) ? significantBits - 32 : 0;
+	SINT32 sigLowBits = (significantBits >= 32) ? 32 : significantBits;
 
 	UINT32 bits = 0;
 	if ( mode == TEUL_PACK )
 	{
 		if ( sigHighBits > 0 )
 		{
-			bits = (UINT32)((*idata) >> 32) ;
-			bitOffset = _packBits(buffer, bitOffset, &bits, sigHighBits, 32) ;
+			bits = (UINT32)((*idata) >> 32);
+			bitOffset = _packBits(buffer, bitOffset, &bits, sigHighBits, 32);
 		}
-		bits = (UINT32)(*idata) ;
-		bitOffset = _packBits(buffer, bitOffset, &bits, sigLowBits, 32) ;
+		bits = (UINT32)(*idata);
+		bitOffset = _packBits(buffer, bitOffset, &bits, sigLowBits, 32);
 	}
 	else
 	{
-		UINT64 incoming = 0ULL ;
+		UINT64 incoming = 0ULL;
 		if ( sigHighBits > 0 )
 		{
-			bitOffset = _unpackBits(buffer, bitOffset, &bits, sigHighBits, 32) ;
-			incoming = bits ;
-			incoming <<= 32 ;
+			bitOffset = _unpackBits(buffer, bitOffset, &bits, sigHighBits, 32);
+			incoming = bits;
+			incoming <<= 32;
 		}
-		bitOffset = _unpackBits(buffer, bitOffset, &bits, sigLowBits, 32) ;
-		incoming |= bits ;
+		bitOffset = _unpackBits(buffer, bitOffset, &bits, sigLowBits, 32);
+		incoming |= bits;
 
 		if ( significantBits != 64 && (incoming >> (significantBits - 1)) != 0 )
-			incoming |= (~0ULL << significantBits) ;
+			incoming |= (~0ULL << significantBits);
 
-		*idata = incoming ;
+		*idata = incoming;
 	}
 
 	return bitOffset;
@@ -371,13 +374,13 @@ SINT32
 teulPackFLOAT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, FLOAT64* const idata, SINT32 significantBits)
 {
 #ifdef OMG_THIS_DOESNT_WORK_WHEN_BITOFFSET_IS_NON_ZERO
-	static const SINT32 numbytes = sizeof(FLOAT64), numBits = numbytes << 3 ;
+	static const SINT32 numbytes = sizeof(FLOAT64), numBits = numbytes << 3;
 	SINT32 totalBits = bitOffset + numBits;
 
-	SINT32 i ;
+	SINT32 i;
 
-	SINT32 byteOffset = bitOffset >> 3 ;
-	bitOffset -= byteOffset << 3 ;
+	SINT32 byteOffset = bitOffset >> 3;
+	bitOffset -= byteOffset << 3;
 
 	if (mode == TEUL_PACK)
 	{
@@ -407,10 +410,10 @@ teulPackFLOAT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, FLOAT64* co
 			_unpackBytes(byteOffset, buffer, (UCHAR*) idata, numbytes, numbytes);
 		else
 		{
-			const int offsetCompliment = 8 - bitOffset ;
+			const int offsetCompliment = 8 - bitOffset;
 			for (i = 0; i < numbytes; ++i)
 			{	// byte align the holding cell
-				data[i] = (buffer[byteOffset++] << bitOffset) ;
+				data[i] = (buffer[byteOffset++] << bitOffset);
 				data[i] |= (buffer[++byteOffset] >> offsetCompliment);
 			}
 
@@ -420,13 +423,14 @@ teulPackFLOAT64(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, FLOAT64* co
 		return (totalBits);
 	}
 #else
-	return teulPackUINT64(mode, buffer, bitOffset, (UINT64*)idata, significantBits) ;
+	return teulPackUINT64(mode, buffer, bitOffset, (UINT64*)idata, significantBits);
 #endif
 }
 
 SINT32
 teulPackSCHAR(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, SCHAR* const idata, SINT32 significantBits)
 {
+	assert(significantBits != 1);
 	if (significantBits < 1 || significantBits > 8)
 		significantBits = 8;
 
@@ -445,12 +449,12 @@ teulPackSCHAR(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, SCHAR* const 
 SINT32
 teulPackUCHAR(LOGICAL mode, UCHAR* const buffer, SINT32 bitOffset, UCHAR* const idata, SINT32 significantBits)
 {
-	SINT32 byteOffset ;
+	SINT32 byteOffset;
 
 	if (significantBits < 1 || significantBits > 8 )
 		significantBits = 8;
 
-	SINT32 totalBits = bitOffset + significantBits ;
+	SINT32 totalBits = bitOffset + significantBits;
 
 	if ( bitOffset < 0)
 	{
@@ -505,7 +509,7 @@ PLAYER_LOGIN::packer(LOGICAL mode, UCHAR* const message, SINT32 offset)
 	offset = teulPackUINT32(mode, message, offset, &this->OTP, 0);
 	offset = teulPackUINT32(mode, message, offset, &this->appVersion, 0);
 	offset = teulPackVoid(mode, message, offset, &this->CopyRightString, Len);
-	offset = teulPackUINT32(mode, message, offset, &this->attemptID, 0) ;
+	offset = teulPackUINT32(mode, message, offset, &this->attemptID, 0);
 
 	return offset;
 }
@@ -516,68 +520,59 @@ PLAYER_LOGIN::packer(LOGICAL mode, UCHAR* const message, SINT32 offset)
 void
 ACTION_OBJECT::packSecondsDelta(LOGICAL mode, UINT32& time, SINT32 sizeBits /* = 0 */)
 {
-	UINT32 delta = 0 ;
+	UINT32 delta = 0;
 	if ( mode == TEUL_PACK )
-		delta = (time >= teulClockTime) ? (time - teulClockTime) + 1 : 0 ;
-	this->packer(mode, &delta, sizeBits) ;
+		delta = (time >= teulClockTime) ? (time - teulClockTime) + 1 : 0;
+	this->packer(mode, &delta, sizeBits);
 	if ( mode == TEUL_UNPACK )
-		time = (delta > 0) ? (teulClockTime + delta - 1) : 0 ;
+		time = (delta > 0) ? (teulClockTime + delta - 1) : 0;
 }
 
 SINT32
 teulPackSecondsDelta(LOGICAL mode, UCHAR* const buffer, SINT32 bitoffset, UINT32* const timer, SINT32 size)
 {
-	UINT32 delta = 0 ;
+	UINT32 delta = 0;
 	if ( mode == TEUL_PACK )
-		delta = (*timer >= teulClockTime) ? (*timer - teulClockTime) + 1 : 0 ;
-	bitoffset = teulPackUINT32(mode, buffer, bitoffset, &delta, size) ;
+		delta = (*timer >= teulClockTime) ? (*timer - teulClockTime) + 1 : 0;
+	bitoffset = teulPackUINT32(mode, buffer, bitoffset, &delta, size);
 	if ( mode == TEUL_UNPACK )
-		*timer = (delta > 0) ? (teulClockTime + delta - 1) : 0 ;
-	return bitoffset ;
-}
-
-void
-ACTION_OBJECT::packer(LOGICAL mode, bool& value, SINT32)
-{
-	UCHAR i = (UCHAR)value ;
-	packer(mode, &i, 1) ;
-	if ( mode == TEUL_UNPACK )
-		value = (offset > 0 ) ? (i != 0) : false ;
+		*timer = (delta > 0) ? (teulClockTime + delta - 1) : 0;
+	return bitoffset;
 }
 
 SINT32
 wwiiPackText(LOGICAL mode, UCHAR* const data, SINT32 offset, char* const text, SINT32 maxLen)
 {
-	UINT32 len = 0 ;
-	UINT32 lenBits ;
+	UINT32 len = 0;
+	UINT32 lenBits;
 
 	if ( offset < 0 )
-		return -EINVAL ;
+		return -EINVAL;
 
 	if ( mode == TEUL_PACK )
 	{
-		len = (UINT32)strlen(text) ;
+		len = (UINT32)strlen(text);
 		if ( len > (UINT32)maxLen )
-			len = (UINT32)maxLen ;
+			len = (UINT32)maxLen;
 	}
 	else if ( mode == TEUL_UNPACK )
-		text[0] = 0 ;
+		text[0] = 0;
 
 	// Let MaxLen determine how many bits to use for packing the length
-	if ( maxLen == 0 || maxLen >= 65536 ) lenBits = 0 ;
-	else if ( maxLen > 255 ) lenBits = 16 ;
-	else lenBits = 8 ;
+	if ( maxLen == 0 || maxLen >= 65536 ) lenBits = 0;
+	else if ( maxLen > 255 ) lenBits = 16;
+	else lenBits = 8;
 
-	offset = teulPackUINT32(mode, data, offset, &len, lenBits) ;
+	offset = teulPackUINT32(mode, data, offset, &len, lenBits);
 	if ( offset < 0 || len > (UINT32)maxLen )
-		return -EINVAL ;
+		return -EINVAL;
 
-	offset = teulPackVoid(mode, data, offset, text, len) ;
+	offset = teulPackVoid(mode, data, offset, text, len);
 
 	if ( mode == TEUL_UNPACK )
-		text[len] = 0 ;
+		text[len] = 0;
 
-	return offset ;
+	return offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -586,36 +581,36 @@ wwiiPackText(LOGICAL mode, UCHAR* const data, SINT32 offset, char* const text, S
 Teul::ConnectionInstruction::ConnectionInstruction(ACTION_OBJECT* const a)
 	: m_role(Unknown), m_hostIP(0), m_port(0)
 {
-	packer(TEUL_UNPACK, a) ;
+	packer(TEUL_UNPACK, a);
 }
 
 SINT32
 Teul::ConnectionInstruction::packer(LOGICAL mode, ACTION_OBJECT* const a)
 {
-	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_role, 8) ;
-	a->packer(mode, m_hostIP) ;
+	a->offset = teulPackUINT32(mode, a->packed, a->offset, (UINT32*)&m_role, 8);
+	a->packer(mode, m_hostIP);
 #if platBuild == TEUL_SERVER
-	UINT32 seed = rand() ;
+	UINT32 seed = rand();
 #else
-	UINT32 seed = m_otp ^ 0xdeadbeef ;
+	UINT32 seed = m_otp ^ 0xdeadbeef;
 #endif
-	a->packer(mode, seed) ;
-	a->packer(mode, m_port) ;
-	a->packer(mode, m_otp) ;
+	a->packer(mode, seed);
+	a->packer(mode, m_port);
+	a->packer(mode, m_otp);
 #if platBuild == TEUL_SERVER
-	UINT64 key = (UINT64)teulClock64 ;
+	UINT64 key = (UINT64)teulClock64;
 #else
-	UINT64 key = 0ULL ;
+	UINT64 key = 0ULL;
 #endif
-	a->packer(mode, key) ;
+	a->packer(mode, key);
 
-	return a->offset ;
+	return a->offset;
 }
 
 SINT32
 wwiiPackWeaponSpec(LOGICAL mode, UCHAR* const data, SINT32 offset, struct WEAPON_SPEC* const object, SINT32 /*size*/)
 {
-	return teulPackUINT16(mode, data, offset, (UINT16*)object, 0) ;
+	return teulPackUINT16(mode, data, offset, (UINT16*)object, 0);
 }
 
 SINT32
@@ -630,9 +625,17 @@ wwiiPackWeaponSerial(LOGICAL mode, UCHAR* const data, SINT32 offset, struct WEAP
 // New style pack function which works off of an action object
 
 void
-WEAPON_SPEC::packer(LOGICAL mode, ACTION_OBJECT* a)
+WEAPON_SPEC::pack(ACTION_OBJECT* a, SINT32) const
 {
-	a->offset = teulPackUINT16(mode, a->packed, a->offset, (UINT16*)this, 0) ;
+	a->pack(asUINT16(), 0);
+}
+
+void
+WEAPON_SPEC::unpack(ACTION_OBJECT* a, SINT32)
+{
+	UINT16 spec = 0;
+	a->unpack(spec, 0);
+	fromShort(spec);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -642,55 +645,55 @@ SINT32
 wwiiPackString(LOGICAL mode, UCHAR* data, SINT32 offset, std::string& text, SINT32 maxLen)
 {
 	if ( offset < 0 || maxLen < 0 )
-		return -EINVAL ;
+		return -EINVAL;
 
-	static const SINT32 _BUF_SIZE = 512 ;
-	static char _buffer[_BUF_SIZE + 1] ;
-	UINT32 len = 0 ;
-	UINT32 uMaxLen = (UINT32)maxLen ;
-	UINT32 lenBits ;
+	static const SINT32 _BUF_SIZE = 512;
+	static char _buffer[_BUF_SIZE + 1];
+	UINT32 len = 0;
+	UINT32 uMaxLen = (UINT32)maxLen;
+	UINT32 lenBits;
 
 	if ( mode == TEUL_PACK )
 	{
-		len = text.empty() ? 0 : (UINT32)text.length() ;
+		len = text.empty() ? 0 : (UINT32)text.length();
 		if ( len > uMaxLen )
-			len = uMaxLen ;
+			len = uMaxLen;
 	}
 	else if ( mode == TEUL_UNPACK )
-		text = "" ;
+		text = "";
 
 	// Let MaxLen determine how many bits to use for packing the length
-	if ( uMaxLen == 0 || uMaxLen > 65536 ) lenBits = 0 ;
-	else if ( uMaxLen > 255 ) lenBits = 16 ;
-	else lenBits = 8 ;
+	if ( uMaxLen == 0 || uMaxLen > 65536 ) lenBits = 0;
+	else if ( uMaxLen > 255 ) lenBits = 16;
+	else lenBits = 8;
 
-	offset = teulPackUINT32(mode, data, offset, &len, lenBits) ;
+	offset = teulPackUINT32(mode, data, offset, &len, lenBits);
 	if ( offset < 0 || len > uMaxLen )
 	{
-		return -EILSEQ ;
+		return -EILSEQ;
 	}
 
 	if ( len > 0 )
 	{
 		if ( mode == TEUL_PACK )
 		{
-			offset = teulPackVoid(mode, data, offset, (void*)text.c_str(), len) ;
+			offset = teulPackVoid(mode, data, offset, const_cast<char*>(text.c_str()), len);
 		}
 		else
 		{
-			text.reserve(len) ;
-			for ( UINT32 pos = 0 ; pos < len ; pos += _BUF_SIZE )
+			text.reserve(len);
+			for ( UINT32 pos = 0; pos < len; pos += _BUF_SIZE )
 			{
-				SINT32 bytes = len - pos ;
-				if ( bytes > _BUF_SIZE ) bytes = _BUF_SIZE ;
-				offset = teulPackVoid(mode, data, offset, _buffer, bytes) ;
-				_buffer[bytes] = 0 ;
-				text.append(_buffer, bytes) ;
+				SINT32 bytes = len - pos;
+				if ( bytes > _BUF_SIZE ) bytes = _BUF_SIZE;
+				offset = teulPackVoid(mode, data, offset, _buffer, bytes);
+				_buffer[bytes] = 0;
+				text.append(_buffer, bytes);
 			}
 		}
 	}
 
-	return offset ;
+	return offset;
 }
 
 SINT32
@@ -704,13 +707,35 @@ wwiiPackFullObjID(LOGICAL mode, UCHAR* const data, SINT32 offset, struct FULL_OB
 	}
 	else if ( mode == TEUL_UNPACK )
 	{
-		object->cell.ox = object->cell.oy = 0 ;
+		object->cell.ox = object->cell.oy = 0;
 	}
 	if ( mode == TEUL_UNPACK )
 	{
-		object->objClass = 0 ;
-		object->objType = 0 ;
+		object->objClass = 0;
+		object->objType = 0;
 	}
 
 	return offset;
+}
+
+void FULL_OBJ_ID::pack(ACTION_OBJECT* const a, SINT32) const
+{
+	a->pack(id);
+	if (id) {
+		a->pack(cell.ox);
+		a->pack(cell.oy);
+	}
+}
+
+void FULL_OBJ_ID::unpack(ACTION_OBJECT* const a, SINT32)
+{
+	a->unpack(id);
+	cell.ox = 0;
+	cell.oy = 0;
+	objClass = 0;
+	objType = 0;
+	if (id) {
+		a->unpack(cell.ox);
+		a->unpack(cell.oy);
+	}
 }

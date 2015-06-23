@@ -52,8 +52,8 @@ void Particle2::reset()
     _velvariance.set(0, 0, 0);
     _ready = false;
     _enabled = true;
-    _killcallback = NULL;
-    _updatecallback = NULL;
+    _killcallback = nullptr;
+    _updatecallback = nullptr;
     _distance2 = 0.0f;
     _stretchscale = 0.0f;
     _currentalpha = 0.0f;

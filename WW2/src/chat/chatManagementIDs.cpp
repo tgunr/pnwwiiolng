@@ -14,24 +14,24 @@
 
 //	------------------------------	Declarations
 
-typedef std::queue<playerid_t> ID_QUEUE ;
-static ID_QUEUE freeIDs ;
+typedef std::queue<playerid_t> ID_QUEUE;
+static ID_QUEUE freeIDs;
 
-typedef std::map<playerid_t, Player*> IN_USE ;
-static IN_USE inUse ;
+typedef std::map<playerid_t, Player*> IN_USE;
+static IN_USE inUse;
 
-static const playerid_t MIN_MANAGEMENT_ID = (playerid_t) -100100 ;
-static const playerid_t MAX_MANAGEMENT_ID = (playerid_t)    -100 ;
-//static const playerid_t NUM_MANAGEMENT_IDS = MAX_MANAGEMENT_ID - MIN_MANAGEMENT_ID ;
+static const playerid_t MIN_MANAGEMENT_ID = (playerid_t) -100100;
+static const playerid_t MAX_MANAGEMENT_ID = (playerid_t)    -100;
+//static const playerid_t NUM_MANAGEMENT_IDS = MAX_MANAGEMENT_ID - MIN_MANAGEMENT_ID;
 
 //////////////////////////////////////////////////////////////////////
 // Initialize the freelist.
 
 void Chat::ManagementIDAllocator::Initialize()
 {
-	for ( playerid_t id = MIN_MANAGEMENT_ID ; id < MAX_MANAGEMENT_ID ; ++id )
+	for ( playerid_t id = MIN_MANAGEMENT_ID; id < MAX_MANAGEMENT_ID; ++id )
 	{
-		freeIDs.push(id) ;
+		freeIDs.push(id);
 	}
 }
 
@@ -42,15 +42,15 @@ playerid_t
 Chat::ManagementIDAllocator::AllocateID(Player* player)
 {
 	if ( freeIDs.empty() )
-		throw std::runtime_error("No management connections available") ;	///Terminal
+		throw std::runtime_error("No management connections available");	///Terminal
 
 	// Grab the front entry, pop it from the queue, and return it.
-	const playerid_t id = freeIDs.front() ;
-	freeIDs.pop() ;
+	const playerid_t id = freeIDs.front();
+	freeIDs.pop();
 
-	inUse[id] = player ;
+	inUse[id] = player;
 
-	return id ;
+	return id;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -59,11 +59,11 @@ Chat::ManagementIDAllocator::AllocateID(Player* player)
 void
 Chat::ManagementIDAllocator::ReleaseID(const playerid_t playerID)
 {
-	assert( playerID >= MIN_MANAGEMENT_ID && playerID <= MAX_MANAGEMENT_ID ) ;
+	assert( playerID >= MIN_MANAGEMENT_ID && playerID <= MAX_MANAGEMENT_ID );
 
-	inUse.erase(playerID) ;
+	inUse.erase(playerID);
 
-	freeIDs.push(playerID) ;
+	freeIDs.push(playerID);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -72,7 +72,7 @@ Chat::ManagementIDAllocator::ReleaseID(const playerid_t playerID)
 Player*
 Chat::ManagementIDAllocator::Lookup(const playerid_t playerID)
 {
-	IN_USE::iterator it = inUse.find(playerID) ;
-	return (it == inUse.end()) ? NULL : it->second ;
+	IN_USE::iterator it = inUse.find(playerID);
+	return (it == inUse.end()) ? nullptr : it->second;
 }
 

@@ -15,7 +15,7 @@ enum
 ,	FB_CONN_FAIL	=	404
 ,	FB_CONN_BAD		=	406
 ,	FB_CONN_GONE	=	410
-} ;
+};
 
 class ClientNetError
 {
@@ -24,10 +24,10 @@ public:
 	ClientNetError(int error, const char* what) : m_error(error), m_what(what) {}
 	virtual ~ClientNetError() {}
 
-	int Error() const { return m_error ; }
-	const char* What() const { return m_what ; }
+	int Error() const { return m_error; }
+	const char* What() const { return m_what; }
 
 private:
-	int m_error ;
-	const char* m_what ;
-} ;
+	int m_error;
+	const char* m_what;
+};

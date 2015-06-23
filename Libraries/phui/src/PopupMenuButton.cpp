@@ -1,8 +1,5 @@
 #include "phui-precompiled-header.h"
 
-#include <stdlib.h>
-#include <stdio.h>
-
 #include "phui/PopupMenuButton.h"
 #include "phui/GraphicsContext.h"
 #include "phui/Menu.h"
@@ -26,7 +23,7 @@ PopupMenuButton::PopupMenuButton()
 
 PopupMenuButton::~PopupMenuButton()
 {
-	if(_menu->Parent() == NULL)
+	if(_menu->Parent() == nullptr)
 		delete _menu;
 }
 
@@ -66,7 +63,7 @@ void PopupMenuButton::DrawSelf()
 		
 		float fontheight = ctx->FontHeight(_font);
 		float x = XMARGIN;
-		float y = (_height - fontheight) / 2.0f ;
+		float y = (_height - fontheight) / 2.0f;
 		
 		ctx->SetColor(_textcolor[0],_textcolor[1],_textcolor[2],_textcolor[3]);
 		ctx->EnableTexture();
@@ -125,7 +122,7 @@ bool PopupMenuButton::MouseMove (float x, float y, int state )
 void PopupMenuButton::PreferredSize(float* w, float* h)
 {
 	float menuheight, menuwidth;
-	if(_menu->Parent() == NULL) AddChild(_menu);
+	if(_menu->Parent() == nullptr) AddChild(_menu);
 	_menu->PreferredSize(&menuwidth,&menuheight);
 	if(_menu->Parent() == this) RemoveChild(_menu);
 	

@@ -39,7 +39,7 @@ typedef struct TreeData
 
     TreeData()
     {
-        base = NULL;
+        base = nullptr;
         nearlod = 0;
         farlod = 0;
     }
@@ -77,8 +77,8 @@ struct Tree
 
     Tree()
     {
-        octet = NULL;
-        o = NULL;
+        octet = nullptr;
+        o = nullptr;
         rot_angle = 0;
         distance = 0.0f;
         octet = 0;

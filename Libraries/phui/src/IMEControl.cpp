@@ -20,9 +20,9 @@ using namespace phui;
 *************************************************************************************************/
 
 IMEControl::IMEControl(): View(),
-	_input(NULL),
+	_input(nullptr),
 	_nativeMode(false),
-	_candList(NULL),
+	_candList(nullptr),
 	_candIndex(0),
 	_candSelection(0), 
 	_cursor(0),
@@ -154,8 +154,8 @@ void IMEControl::Deactivate(bool reset)
 	// reset everything
 	_composition = _reading = _result = L"";
 	
-	_candList			= NULL;
-	_input				= NULL;
+	_candList			= nullptr;
+	_input				= nullptr;
 	_candIndex			= 0;
 	_candSelection		= 0;
 	_cursor				= 0;

@@ -10,66 +10,57 @@
 // Originating Programmer: Shane "Elmo" Wickson
 
 #include "strt/strtProtos.h"
-struct WEAPON_SPEC ;
-class WeaponCounter ;
-struct STRAT_UPDATE ;
+struct WEAPON_SPEC;
+class WeaponCounter;
+struct STRAT_UPDATE;
+
+struct CONVOYSTRUCT
+{
+	CONVOYSTRUCT*	prev;
+	CONVOYSTRUCT*	next;
+	WWII_SIDE		side;				//AXIS or ALLIED?
+	UINT32			numRPs;
+	LinkStruct*		link;				//The link upon which its travelling
+	UINT32			arrivalTime;		//The arrival time in UNIX epoch time
+};
 
 //Initializes the convoy system
-extern LOGICAL cnvyInit(void);
+void cnvyInit(void);
 
 //This is the call the Strat System will make to create a convoy.  It takes
 //	all the information to create a convoy and moves it to the appropriate
 //	lists
-extern LOGICAL cnvyCreateConvoy(WWII_SIDE owner, WWII_COUNTRY country, LinkStruct* link, struct PAYLOADSTRUCT* payload);
+void cnvyCreateConvoy(WWII_SIDE owner, WWII_COUNTRY country, LinkStruct* link, UINT32 rps);
 
 //This will be the function that the strat System calls to free a convoy after
 //	its supplies have been transported to the depot
-extern LOGICAL cnvyFreeConvoy(struct CONVOYSTRUCT* convoy);
-
-//This function takes RPs and returns a payload for the item
-extern PAYLOADSTRUCT* cnvyMakeRPPayload(UINT32 RPs);
-
-//Get the map host connection
-extern SINT32 cnvyGetMapConnection(void);
-//Set the map connection
-extern SINT32 cnvySetMapConnection(SINT32 connection);
+void cnvyFreeConvoy(struct CONVOYSTRUCT* convoy);
 
 //tolua_begin
 //This function adds a weapon to the Expire List
-extern bool cnvyAddWeaponToExpireList(struct POSTED_WEAPON& weapon, UINT32 uExpireSeconds);
+bool cnvyAddWeaponToExpireList(struct POSTED_WEAPON& weapon, UINT32 uExpireSeconds);
 //This function removes a weapon from the Expire List
-extern void cnvyRemoveWeaponFromExpireList(struct POSTED_WEAPON& weapon);
+void cnvyRemoveWeaponFromExpireList(struct POSTED_WEAPON& weapon);
 
-// Request the begining of processing for a factory cycle
+// Request the beginning of processing for a factory cycle
 // Seconds specifies time until first processing; afterwards host_config.factoryPeriod is used
-extern LOGICAL cnvyBeginFactoryProduction(ObjectStruct* object, UINT32 seconds) ;
-
-//This function interrupts the waiting in the main convoy loop.  Its
-//	gonna be used to make sure that the incremental strat additions get
-//	processed normally
-extern LOGICAL cnvyInterrupt(void);
-
-//this checks the value of the flag
-extern LOGICAL cnvyInterrupted(void);
-
-//this resets the interrupt flag
-extern LOGICAL cnvyClearInterrupt(void);
+void cnvyBeginFactoryProduction(ObjectStruct* object, UINT32 seconds);
 
 //Various processing functions to run the whole of the convoy and
 //	strat system
 
 //This function processes convoys, if necessary
-extern void cnvyProcessConvoys();
+void cnvyProcessConvoys();
 
 //This function processes strat updates, if necessary
-extern LOGICAL cnvyProcessStratUpdates(UINT32 currentTime);
+void cnvyProcessStratUpdates(UINT32 currentTime);
 
 // Request expiry of an objective at a later time
-extern bool cnvyScheduleObjectiveExpiry(CPStruct* cp, WWII_SIDE side, UINT32 expirySeconds) ;
+bool cnvyScheduleObjectiveExpiry(CPStruct* cp, WWII_SIDE side, UINT32 expirySeconds);
 
-extern STRAT_UPDATE* cnvyScheduleBrigadeReformation(UINT32 brigadeID, UINT32 delay) ;
+STRAT_UPDATE* cnvyScheduleBrigadeReformation(UINT32 brigadeID, UINT32 delay);
 
-extern void cnvyCancelBrigadeEvent(struct STRAT_UPDATE* update) ;
+void cnvyCancelBrigadeEvent(struct STRAT_UPDATE* update);
 
-extern void cnvyUpdateTime() ;
+void cnvyUpdateTime();
 //tolua_end

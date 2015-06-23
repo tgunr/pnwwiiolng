@@ -729,7 +729,7 @@ void fpTPSDataReadTPSFile (void)
 
 		fpFPSDataGetVarnameAndContents(&varName, &varData, buf);
 
-		if ((varName == NULL) || (varData == NULL))
+		if ((varName == nullptr) || (varData == nullptr))
 			continue;
 
 		if (stricmp(buf, "toProneInTime") == 0)
@@ -794,7 +794,7 @@ void fpTPSDataInitHitLocations()
 {
 	SINT32 boneCount = 0;
 
-	gr2Model* skeleton = gr2Model::Load(fpTPSSkeletonFile, NULL, &boneCount, 1);
+	gr2Model* skeleton = gr2Model::Load(fpTPSSkeletonFile, nullptr, &boneCount, 1);
 	if(!skeleton) return;
 
 	for(int i = 0; i < boneCount; i++)
@@ -865,7 +865,7 @@ void fpTPSDataReadSurfaceFiles (void)
 
 			fpFPSDataGetVarnameAndContents(&varName, &varData, buf);
 
-			if ((varName == NULL) || (varData == NULL))
+			if ((varName == nullptr) || (varData == nullptr))
 				continue;
 
 			if (strncasecmp(buf, "fps", 3) == 0)

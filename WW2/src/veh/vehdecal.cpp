@@ -839,7 +839,7 @@ static void _setIndividualTexture(vehVehicle* veh)
 //////////////////////////////////////////////////////////////////////
 static void RemoveUnitObjects(OBJECT* o)
 {
-    OBJECT* lod = NULL;
+    OBJECT* lod = nullptr;
 
     ogrpFindSubObjectByName(&lod, (OBJECT*)o, "unit");
 
@@ -874,7 +874,7 @@ static void _setUnitTexture(vehVehicle* veh)
 
 	OBJECT* o = veh->VehicleObjectData->PlaneObject;
 
-    const HCUnit* hc = NULL;
+    const HCUnit* hc = nullptr;
 
     if(Online)
         hc = HCUnit::Lookup((UINT32)veh->unitDecal);

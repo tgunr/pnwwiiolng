@@ -103,12 +103,12 @@ dSpaceID colliderForPosition(FLOAT64VECTOR const& pos)
 dSpaceID colliderForPosition(Vec3d const& pos)
 {
 	if(_isnan(pos.x()) || _isnan(pos.y()))
-		return NULL;
+		return nullptr;
 
 	int sx = (int)(pos.x()/SDM_SUPERCELL_SIZE);
 	int sy = (int)(pos.y()/SDM_SUPERCELL_SIZE);
 
-	dSpaceID space = NULL;
+	dSpaceID space = nullptr;
 
 	// supercell 0,0 is considered scenario space now
 	if(false && !sx && !sy)
@@ -116,10 +116,10 @@ dSpaceID colliderForPosition(Vec3d const& pos)
 		const double SCENARIO_SPACE = 200.0f;
 
 		// break it down to SCENARIO_SPACExSCENARIO_SPACE chunks
-		int sx = (int)(pos.x()/SCENARIO_SPACE);
-		int sy = (int)(pos.y()/SCENARIO_SPACE);
+		int chunkSx = (int)(pos.x()/SCENARIO_SPACE);
+		int chunkSy = (int)(pos.y()/SCENARIO_SPACE);
 
-		space = _scenarioSpaceMap[std::pair<int,int>(sx,sy)];
+		space = _scenarioSpaceMap[std::pair<int,int>(chunkSx, chunkSy)];
 
 		if(space == 0)
 		{
@@ -127,8 +127,8 @@ dSpaceID colliderForPosition(Vec3d const& pos)
 			extents[0] = SCENARIO_SPACE;
 			extents[1] = SCENARIO_SPACE;
 			extents[2] = SCENARIO_SPACE;
-			center[0] = SCENARIO_SPACE * sx + SCENARIO_SPACE/2.0;
-			center[1] = SCENARIO_SPACE * sy + SCENARIO_SPACE/2.0;
+			center[0] = SCENARIO_SPACE * chunkSx + SCENARIO_SPACE/2.0;
+			center[1] = SCENARIO_SPACE * chunkSy + SCENARIO_SPACE/2.0;
 			center[2] = 0;
 
 			// create the space;
@@ -141,7 +141,7 @@ dSpaceID colliderForPosition(Vec3d const& pos)
 			colliderSetBits((dGeomID)space, 0, 0);
 
 			// save it for later use
-			_scenarioSpaceMap[std::pair<int,int>(sx,sy)] = space;
+			_scenarioSpaceMap[std::pair<int,int>(chunkSx, chunkSy)] = space;
 		}
 	}
 	else

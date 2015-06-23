@@ -9,8 +9,6 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "dbug/dbug.h"							// For host "dbugLog" access
-
 #include "chat/chatHandle.h"
 #include "chat/chatLStringIDs.h"
 #include "chat/chatPlayer.h"
@@ -44,8 +42,6 @@ static const char* QRY_REMOVE_RECRUITS =
 	" WHERE playerID in (%u"
 ;
 
-#include <vector>
-
 class ExpiredRecruitQuery : public DBThreadQuery
 {
 public:
@@ -57,116 +53,116 @@ public:
 private:
 	struct Result
 	{
-		UINT32		m_squadID ;
-		UINT32		m_playerID ;
-		ChatHandle	m_handle ;
-		char		m_days[16] ;
-	} ;
-	std::vector<Result> m_results ;
+		UINT32		m_squadID;
+		UINT32		m_playerID;
+		ChatHandle	m_handle;
+		char		m_days[16];
+	};
+	std::vector<Result> m_results;
 
 public:
-	virtual bool Process(const size_t numRows)
+	virtual bool Process(const size_t numRows) OVERRIDE_FN
 	{
 		if ( numRows <= 0 )
-			return true ;
+			return true;
 
-		Result result ;
+		Result result;
 		while ( Query()->FetchRow() )
 		{
-			DBRow& row = Query()->Row() ;
+			DBRow& row = Query()->Row();
 
-			result.m_squadID = row.NextUInt() ;
-			result.m_playerID = row.NextUInt() ;
-			result.m_handle = chatGetHandle(row.NextColumn()) ;
-			strncpy(result.m_days, row.NextColumn(), sizeof(result.m_days) - 1) ;
-			result.m_days[15] = 0 ;
-			m_results.push_back(result) ;
+			result.m_squadID = row.NextUInt();
+			result.m_playerID = row.NextUInt();
+			result.m_handle = chatGetHandle(row.NextColumn());
+			strncpy(result.m_days, row.NextColumn(), sizeof(result.m_days) - 1);
+			result.m_days[15] = 0;
+			m_results.push_back(result);
 		}
 
-		return true ;
+		return true;
 	}
 
 public:
-	virtual void Success()
+	virtual void Success() OVERRIDE_FN
 	{
 		if ( m_results.empty() == true )
-			return ;
+			return;
 
-		const size_t numRows = m_results.size() ;
-		dbugLog(_FLD, "Got list of %" PRSizeT " expired recruits", numRows) ;
+		const size_t numRows = m_results.size();
+		dbugLog(_FLD, "Got list of %" PRSizeT " expired recruits", numRows);
 
 		// See who was listed.
-		UINT32 prevSquadID = 0 ;
-		SquadList* squadList = NULL ;
-		SquadMemberEntry* entry = NULL ;
+		UINT32 prevSquadID = 0;
+		SquadList* squadList = nullptr;
+		SquadMemberEntry* entry = nullptr;
 
-		char* text = NULL ;
-		char* tp = NULL ;
+		char* text = nullptr;
+		char* tp = nullptr;
 
-		for ( size_t i = 0 ; i < numRows ; ++i )
+		for ( size_t i = 0; i < numRows; ++i )
 		{
-			const Result& result = m_results[i] ;
+			const Result& result = m_results[i];
 
 			// Read the values
 			// Avoid looking up every squad every cycle
 			if ( result.m_squadID != prevSquadID )
 			{
-				squadList = chatFindSquadList(result.m_squadID) ;
-				prevSquadID = result.m_squadID ;
+				squadList = chatFindSquadList(result.m_squadID);
+				prevSquadID = result.m_squadID;
 			}
 
 			// If we have the squad loaded, player might be online, handle nicely.
-			if ( squadList != NULL )
+			if ( squadList != nullptr )
 			{
-				entry = squadList->find(result.m_handle) ;
+				entry = squadList->find(result.m_handle);
 				if ( entry )
 				{
 					if ( entry->player() )
-						entry->player()->message(LSTR_SQUAD, LSTR_SQUAD_REMOVED_LAPSED, result.m_days, squadList->squad().shortName()) ;
-					squadList->memberLeave(true, entry, LSTR_SQUAD_RECRUIT_LAPSED, result.m_days) ;
+						entry->player()->message(LSTR_SQUAD, LSTR_SQUAD_REMOVED_LAPSED, result.m_days, squadList->squad().shortName());
+					squadList->memberLeave(true, entry, LSTR_SQUAD_RECRUIT_LAPSED, result.m_days);
 					///TODO:127: Should we continue?
-					continue ;
+					continue;
 				}
 			}
 
 			// Nobody online, so we have to do this in the background
 			if ( text == nullptr )
 			{
-				text = threadsAllocText() ;
-				tp = text + snprintf(text, TEXT_POOL_SIZE, QRY_REMOVE_RECRUITS, result.m_playerID) ;
+				text = threadsAllocText();
+				tp = text + snprintf(text, TEXT_POOL_SIZE, QRY_REMOVE_RECRUITS, result.m_playerID);
 			}
 			else
-				tp += sprintf(tp, ",%u", result.m_playerID) ;
+				tp += sprintf(tp, ",%u", result.m_playerID);
 
 			// Check for reaching the end of the buffer
 			if ( tp >= text + TEXT_POOL_SIZE - 20 )
 			{
-				strcpy(tp, ")") ;
-				DBThread::Do(DBThread::Default, text) ;
-				text = NULL ;
+				strcpy(tp, ")");
+				DBThread::Do(DBThread::Default, text);
+				text = nullptr;
 			}
 		}
 
-		if ( text != NULL )
+		if ( text != nullptr )
 		{
-			strcpy(tp, ")") ;
-			DBThread::Do(DBThread::Default, text) ;
+			strcpy(tp, ")");
+			DBThread::Do(DBThread::Default, text);
 		}
 	}
-} ;
+};
 
 void
 chatPurgeExpiredSquadRecruits()
 {
 	// Check that the configuration enables this feature
 	if ( !host_config.squad.recruitExpiry )
-		return ;
+		return;
 
 	// Check if its time for the next run
-	static Teul::BlipRepeater nextRun(5 * 60 * 1000) ;
-	if ( !nextRun )
-		return ;
+	static Teul::BlipRepeater nextRun(5 * 60 * 1000);
+	if ( !nextRun.Ready() )
+		return;
 
 	// Queue up the query in the background
-	(new ExpiredRecruitQuery())->Queue() ;
+	(new ExpiredRecruitQuery())->Queue();
 }

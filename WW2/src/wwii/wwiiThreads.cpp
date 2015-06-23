@@ -9,10 +9,7 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 #include "versionNo.h"
-#include "dbug/dbug.h"
-#include <assert.h>
 
-#include <string>
 #include <mysql.h>
 #include <signal.h>
 #include <mutex>
@@ -55,7 +52,7 @@ public:
 		PNThread::start();
 	}
 
-	virtual void run();
+	virtual void run() OVERRIDE_FN;
 };
 
 static const UINT32 NUM_HELPER_THREADS = 2;
@@ -65,7 +62,7 @@ static LOG_QUEUE logQueue;
 static size_t logQueueMax, logQueuePushes;
 static std::mutex logQueueMutex;
 
-static ConditionQueue<DBThreadQuery*> dbQueue;
+static ConditionQueue<DBThreadQuery> dbQueue;
 DBQueueThread dbThread[NUM_HELPER_THREADS];
 
 typedef std::pair<THREAD_CALLBACK*, void*> CALLBACK_INFO;
@@ -98,7 +95,7 @@ DBQueueThread::run()
 	{
 		DBThreadQuery* query = dbQueue.getNext();
 		if ( query == nullptr )
-			continue;
+			break;
 		if ( query->Execute(threadId, m_conn, &dbNo) )
 			continue;
 
@@ -117,6 +114,12 @@ DBQueueThread::run()
 		} while ( m_conn == nullptr );
 
 		threadLog(_FLW, "dbc:%u reconnected to database", threadId);
+	}
+
+	if ( m_conn )
+	{
+		threadsCloseDBConnection(m_conn);
+		m_conn = nullptr;
 	}
 }
 
@@ -177,12 +180,10 @@ threadsOpenDBConnection(bool enableAutoCommit)
 // Close database connection
 
 void
-threadsCloseDBConnection(MYSQL* conn)
+threadsCloseDBConnection(DB::handle_t* conn)
 {
-	if ( conn == nullptr )
-		return;
-
-	mysql_close(conn);
+	if ( conn != nullptr )
+		mysql_close(conn);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -236,6 +237,7 @@ threadsEnable()
 void
 threadsShutdown()
 {
+	dbQueue.destroy();
 	for ( UINT32 i = 0; i < NUM_HELPER_THREADS; ++i )
 	{
 		dbThread[i].cancel();
@@ -400,7 +402,7 @@ StatsThread::run()
 	threadLog(_FLI, "Stats thread active [thread #%u]", std::this_thread::get_id());
 
 	UINT32 count = 0;
-	for ( ; ; )
+	for (;; )
 	{
 		// sleep for 15,000 milliseconds (15 seconds).
 		for (uint32_t i = 0; i < 15 * 10; ++i) {

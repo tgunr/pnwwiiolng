@@ -2,14 +2,14 @@
 
 namespace Server
 {
-	enum Code
+	enum class Code : uint32_t
 	{
-		SCODE_ADDED = 1,
-		SCODE_EXITED,
-		SCODE_REPLACED,
-		SCODE_STATUS,
-		SCODE_DELETED,
-		SCODE_TIMED_OUT,
-		SCODE_INSERT_ERROR
-	} ;
+		Added = 1,
+		Exited,
+		Replaced,
+		Status,
+		Deleted,
+		TimedOut,
+		InsertError
+	};
 }

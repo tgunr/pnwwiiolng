@@ -3,4 +3,4 @@
 // Not to be distributed in API form except as part of a compiled library
 // under License or NDA
 
-extern LOGICAL cfgLoadGlobals(const char* ConfigName);
+LOGICAL cfgLoadGlobals(const char* ConfigName);

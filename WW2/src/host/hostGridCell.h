@@ -6,25 +6,25 @@
 // @author	Oliver 'kfs1' Smith <osmith@playnet.com>
 // @brief	Declarations and prototypes for host/hostGridCell.cpp
 
-class HostVehicle ;
+class HostVehicle;
 
 #include "wwii/wwiiHash.h"
 
 namespace Grid
 {
-	struct	Key ;			// Describes the Grid hash key.
-	class	Cell ;			// Describes a Grid Cell.
+	struct	Key;			// Describes the Grid hash key.
+	class	Cell;			// Describes a Grid Cell.
 
 	//////////////////////////////////////////////////////////////////////
 	// Constants.
 
-	static const UINT64 MAX_VIS_RANGE_M = 6000 ;
-	static const SINT64 MAX_RANGE_CM_SQ = (MAX_VIS_RANGE_M * 100) * (MAX_VIS_RANGE_M * 100) ;
+	static const UINT64 MAX_VIS_RANGE_M = 6000;
+	static const SINT64 MAX_RANGE_CM_SQ = (MAX_VIS_RANGE_M * 100) * (MAX_VIS_RANGE_M * 100);
 
 	// Entities in a particular grid node.
-	typedef std::unordered_set<HostVehicle*> VehicleSet ;
-	typedef std::unordered_set<Cell*> Cells ;
+	typedef std::unordered_set<HostVehicle*> VehicleSet;
+	typedef std::unordered_set<Cell*> Cells;
 
 	/// Patrol the grid for cells that have expired.
-	bool PatrolExpirations() ;
+	bool PatrolExpirations();
 }

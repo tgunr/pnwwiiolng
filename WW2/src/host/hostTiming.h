@@ -15,26 +15,26 @@ rdtsc(UINT64& x)
 #include <vector>
 namespace Timers
 {
-  extern std::vector< std::pair<const char*, UINT64> > timings ;
-  extern TeulTimeMS nextReport ;
+  extern std::vector< std::pair<const char*, UINT64> > timings;
+  extern TeulTimeMS nextReport;
 }
 
-#define TIMER_USE_HERE UINT64 timer_start, timer_end ;
-#define TIMER_RESET { Timers::timings.clear() ; if ( teulClock64 >= Timers::nextReport ) Timers::nextReport = 0ULL ; }
-#define TIMER_START rdtsc(timer_start) ;
-#define TIMER_STOP(_label)  rdtsc(timer_end) ; if ( Timers::nextReport == 0ULL ) Timers::timings.push_back(std::make_pair(_label, timer_end - timer_start)) ;
+#define TIMER_USE_HERE UINT64 timer_start, timer_end;
+#define TIMER_RESET { Timers::timings.clear(); if ( teulClock64 >= Timers::nextReport ) Timers::nextReport = 0ULL; }
+#define TIMER_START rdtsc(timer_start);
+#define TIMER_STOP(_label)  rdtsc(timer_end); if ( Timers::nextReport == 0ULL ) Timers::timings.push_back(std::make_pair(_label, timer_end - timer_start));
 #define TIMER_ACCUMULATOR_NAME(_label) timer_acc_##_label
-#define TIMER_ACCUMULATOR(_label) const size_t TIMER_ACCUMULATOR_NAME(_label) = Timers::timings.size() ; Timers::timings.push_back(std::make_pair(#_label, 0ULL)) ;
-#define TIMER_STOP_ADD(_label)  rdtsc(timer_end) ; Timers::timings[TIMER_ACCUMULATOR_NAME(_label)].second += (timer_end - timer_start) ;
+#define TIMER_ACCUMULATOR(_label) const size_t TIMER_ACCUMULATOR_NAME(_label) = Timers::timings.size(); Timers::timings.push_back(std::make_pair(#_label, 0ULL));
+#define TIMER_STOP_ADD(_label)  rdtsc(timer_end); Timers::timings[TIMER_ACCUMULATOR_NAME(_label)].second += (timer_end - timer_start);
 #define TIMER_REPORT(_interval) \
 	if ( Timers::nextReport == 0ULL ) \
 	{ \
-		dbugLog(_FLI, "Timers:") ; \
-		for ( size_t i = 0 ; i < Timers::timings.size() ; ++i ) \
+		dbugLog(_FLI, "Timers:"); \
+		for ( size_t i = 0; i < Timers::timings.size(); ++i ) \
 		{ \
-			dbugLog(_FLIB, " %s:%llu", Timers::timings[i].first, Timers::timings[i].second) ; \
+			dbugLog(_FLIB, " %s:%llu", Timers::timings[i].first, Timers::timings[i].second); \
 		} \
-		Timers::nextReport = teulClock64 + _interval ; \
+		Timers::nextReport = teulClock64 + _interval; \
 		TIMER_RESET \
 	}
 #else

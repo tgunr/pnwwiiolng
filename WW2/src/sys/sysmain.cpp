@@ -37,8 +37,6 @@
 extern HideawayStorage* storage1;
 extern void* Imagebase;
 Hideaway* checksum;
-
-LOCAL_DIDDLE;
 #endif
 
 #ifdef BETA_RELEASE
@@ -65,10 +63,6 @@ static LOGICAL abcd();
 //#define GLOBALS
 //#undef GLOBALS
 
-#if defined(USE_OSG)
-#include "osg/osgGame.h"
-#endif
-
 #include "fio/fioa.h"
 
 #ifdef DIRECT3D
@@ -85,10 +79,6 @@ static LOGICAL abcd();
 extern HWND				myhwnd;
 #endif
 
-#ifdef SMARTHEAP_USED
-#include <smrtheap.hpp>
-#endif
-
 // Global
 LOGICAL	running;
 HANDLE	threadhandle;
@@ -99,7 +89,7 @@ static void AddArchives();
 #define USE_REFERENCE_RASTERIZER
 #undef	USE_REFERENCE_RASTERIZER
 
-extern char RegionSuffix[] ;
+extern char RegionSuffix[];
 
 void decompressStatus (SINT32 archive_index)
 {
@@ -120,7 +110,7 @@ void GetNamedFileVersion(const TCHAR** ppFFI, const TCHAR* name)
 
 	TCHAR*        pFFI, txt[512];
 	DWORD       Nothing, VSize, Len;
-	LPVOID      pVersion=NULL;
+	LPVOID      pVersion=nullptr;
 	struct LANGANDCODEPAGE
 	{
 		WORD wLanguage;
@@ -141,7 +131,7 @@ void GetNamedFileVersion(const TCHAR** ppFFI, const TCHAR* name)
 		}
 
 		pVersion = malloc(VSize);
-		if (pVersion == NULL)
+		if (pVersion == nullptr)
 		{
 			// Severe error
 			FFI[0] = 0;
@@ -177,7 +167,7 @@ void GetNamedFileVersion(const TCHAR** ppFFI, const TCHAR* name)
 	}
 	while(FALSE);
 
-	if (pVersion != NULL)
+	if (pVersion != nullptr)
 	{
 		free(pVersion);
 	}
@@ -191,7 +181,7 @@ void GetFileVersion(const TCHAR** ppFFI)
 
 	TCHAR* pFFI, txt[512], filename[256];
 	DWORD Nothing, VSize, Len;
-	LPVOID pVersion = NULL;
+	LPVOID pVersion = nullptr;
 
 	struct LANGANDCODEPAGE
 	{
@@ -203,7 +193,7 @@ void GetFileVersion(const TCHAR** ppFFI)
 
 	do
 	{
-		if (!GetModuleFileName(NULL, filename, sizeof(filename)))
+		if (!GetModuleFileName(nullptr, filename, sizeof(filename)))
 		{
 			ustrcpy(filename, _T("Unknown"));
 		}
@@ -218,7 +208,7 @@ void GetFileVersion(const TCHAR** ppFFI)
 		}
 
 		pVersion = malloc(VSize);
-		if (pVersion == NULL)
+		if (pVersion == nullptr)
 		{
 			// Severe error
 			FFI[0] = 0;
@@ -251,7 +241,7 @@ void GetFileVersion(const TCHAR** ppFFI)
 	}
 	while(FALSE);
 
-	if (pVersion != NULL)
+	if (pVersion != nullptr)
 	{
 		free(pVersion);
 	}
@@ -269,7 +259,7 @@ int sysmainExceptionHandler(int code, EXCEPTION_POINTERS* ep)
 	SYSTEMTIME	SystemTime;
 	WWII_ERROR_INFO errInfo;
 
-    ClipCursor(NULL);
+    ClipCursor(nullptr);
 
 	memset(&errInfo, 0x0, sizeof(errInfo));
 
@@ -278,7 +268,7 @@ int sysmainExceptionHandler(int code, EXCEPTION_POINTERS* ep)
 		return(EXCEPTION_EXECUTE_HANDLER);
 	}
 
-	FILE* ExceptionLog = Fio::OpenLogFile() ;
+	FILE* ExceptionLog = Fio::OpenLogFile();
 
 	if ( ExceptionLog )
 	{
@@ -291,11 +281,11 @@ int sysmainExceptionHandler(int code, EXCEPTION_POINTERS* ep)
     TCHAR filename[256];
     memset(filename, 0, sizeof(filename));
 
-    GetModuleFileName(NULL, filename, sizeof(filename));
+    GetModuleFileName(nullptr, filename, sizeof(filename));
 	fprintf(ExceptionLog, "%s\n", UTF8(filename));
 
 	GetFileVersion(&pFFI);
-	if (pFFI != NULL)
+	if (pFFI != nullptr)
 	{
 		fprintf(ExceptionLog, "File version: %s\n", UTF8(pFFI));
 	}
@@ -447,7 +437,7 @@ int sysmainExceptionHandler(int code, EXCEPTION_POINTERS* ep)
 	fprintf(ExceptionLog, "Exception address: 0x%08x\n", ep->ExceptionRecord->ExceptionAddress);
 	Write_Debug("Exception address: 0x%08x", ep->ExceptionRecord->ExceptionAddress);
 
-	for (i=0 ; i < ep->ExceptionRecord->NumberParameters ; i+=2)
+	for (i=0; i < ep->ExceptionRecord->NumberParameters; i+=2)
 	{
 		fprintf(ExceptionLog, "Exception tried to: %s at address 0x%08x\n", ep->ExceptionRecord->ExceptionInformation[i] ? "write" : "read", ep->ExceptionRecord->ExceptionInformation[i+1]);
 		Write_Debug("Exception tried to: %s at address 0x%08x", ep->ExceptionRecord->ExceptionInformation[i] ? "write" : "read", ep->ExceptionRecord->ExceptionInformation[i+1]);
@@ -505,7 +495,7 @@ int sysmainExceptionHandler(int code, EXCEPTION_POINTERS* ep)
 	// Has subsequent exception records (if present)
 	ep->ExceptionRecord->ExceptionRecord;
 
-	fprintf(ExceptionLog, Detect::strings[1]) ;
+	fprintf(ExceptionLog, Detect::strings[1]);
 
 	fflush(ExceptionLog);
 	fclose(ExceptionLog);
@@ -617,12 +607,12 @@ BOOL				bOsVersionInfo;
 		break;
 	}
 
-	if (MajorVersion != NULL)
+	if (MajorVersion != nullptr)
 	{
 		*MajorVersion = osvi.dwMajorVersion;
 	}
 
-	if (MinorVersion != NULL)
+	if (MinorVersion != nullptr)
 	{
 		*MinorVersion = osvi.dwMinorVersion;
 	}
@@ -756,7 +746,7 @@ TCHAR        txt[512], filename[256];
 char		divisor[]="K";
 BOOL        retval=FALSE;
 DWORD       Nothing, VSize, Len, cpuspeed;
-LPVOID      pVersion=NULL;
+LPVOID      pVersion=nullptr;
 char*		pFFI;
 MEMORYSTATUS	memstat;
 struct LANGANDCODEPAGE
@@ -768,7 +758,7 @@ struct LANGANDCODEPAGE
 
 	do
 	{
-		if (!GetModuleFileName(NULL, filename, sizeof(filename)))
+		if (!GetModuleFileName(nullptr, filename, sizeof(filename)))
 		{
 			ustrcpy(filename, _T("Unknown"));
 		}
@@ -782,7 +772,7 @@ struct LANGANDCODEPAGE
 		}
 
 		pVersion = memCalloc(1, VSize);
-		if (pVersion == NULL)
+		if (pVersion == nullptr)
 		{
 			// Severe error
 			break;
@@ -828,7 +818,7 @@ struct LANGANDCODEPAGE
 	}
 	while (0);
 
-	if (pVersion != NULL)
+	if (pVersion != nullptr)
 	{
 		memFree(pVersion);
 	}
@@ -849,13 +839,13 @@ SYSTEMTIME	SystemTime;
 		return;
 	}
 
-	//FILE* ValidExitLog = Fio::OpenLogFile() ;
+	//FILE* ValidExitLog = Fio::OpenLogFile();
 
 	Write_Debug("Abort handler information...");
-    ClipCursor(NULL);
+    ClipCursor(nullptr);
 
 	GetFileVersion(&pFFI);
-	if (pFFI != NULL)
+	if (pFFI != nullptr)
 	{
 		//fprintf(ValidExitLog, "File version: %s\n", UTF8(pFFI));
 	}
@@ -985,95 +975,6 @@ void SetupFPU(bool enableExceptions)
 	configHasBeenPrinted	= true;
 }
 
-#ifdef SMARTHEAP_USED
-
-static MEM_ERROR_FN PrevErrorHandler;
-static char* emergencybuffer;
-
-MEM_BOOL MEM_CALLBACK MyErrorHandler( MEM_ERROR_INFO* errorInfo)
-{
-	delete emergencybuffer;
-
-    Write_Debug("Smartheap Reports Out Of Memory\n");
-	//MessageBox(NULL, _T("Application is out of memory and will exit."), _T("Out Of Memory"), MB_ICONERROR|MB_OK|MB_SYSTEMMODAL) ;
-
-	/*
-	FILE* fp = Fio::OpenLogFile() ;
-    SYSTEMTIME SystemTime;
-    GetLocalTime(&SystemTime);
-
-	// be nice if we could get some info out of errorInfo, but noooooooooo
-
-
-	MEM_POOL_ENTRY entry;
-	entry.entry = NULL;
-	size_t sumInUse=0, countInUse=0;
-	size_t sumFree=0, countFree=0;
-	size_t greaterThan20MB = 0, biggestOne=0;
-
-	MemPoolLock(MemDefaultPool);
-	while (MemPoolWalk(MemDefaultPool, &entry) == MEM_POOL_OK)
-	{
-		if ( entry.isInUse )
-		{
-			sumInUse += entry.size;
-			countInUse++;
-			if ( entry.size > 20*1024*1024 )
-			{
-				greaterThan20MB++;
-				if ( entry.size > biggestOne )
-				{
-					biggestOne = entry.size;
-				}
-			}
-		}
-		else
-		{
-			sumFree += entry.size;
-			countFree++;
-		}
-	}
-	MemPoolUnlock(MemDefaultPool);
-
-	fprintf(fp, "Application exited: out of memory on d/%d/%d %d:%02d:%02d\n",
-            SystemTime.wMonth,
-            SystemTime.wDay,
-            SystemTime.wYear,
-            SystemTime.wHour,
-            SystemTime.wMinute,
-            SystemTime.wSecond);
-
-	fprintf( fp, "sumInUse=%ld, countInUse=%ld, sumFree=%ld, countFree=%ld, greaterThan20MB=%ld, biggestOne=%ld\n",
-		sumInUse, countInUse, sumFree, countFree, greaterThan20MB, biggestOne );
-    fclose(fp);
-
-	//ExitProcess(999);
-*/
-//	throw std::runtime_error("Out of memory");		///Terminal
-	return FALSE;
-}
-
-static void initSmartHeap()
-{
-    Write_Debug("Smartheap Inited\n");
-
-	MemInitDefaultPool();
-//	PrevErrorHandler = MemSetErrorHandler(MyErrorHandler);
-	PrevErrorHandler = MemSetErrorHandler(NULL); // make smartheap return null for out of memory errors
-
-	dbgMemSetSafetyLevel(MEM_SAFETY_DEBUG);
-
-	MemPoolSetSmallBlockSize(MemDefaultPool, 512);
-
-	MemPoolSetPageResizing(MemDefaultPool, FALSE );
-
-	emergencybuffer = new char[64*1024];
-
-	//new char[1000*1024*1024];
-}
-
-#endif
-
 //#ifndef BETA_RELEASE
 #ifdef ANTIHACK
 static const unsigned char FIRST_CHAR = '0';
@@ -1094,14 +995,14 @@ static unsigned short valueForChar( unsigned char c )
 
 static void HandleHackID()
 {
-	if (HackID[0] && ServerOTP[0] )
+	if (HackID[0] && GameServerOTP[0] )
 	{
 		size_t len = strlen(HackID);
 		if ( len == 44 )
 		{
-			unsigned long otp  = strtoul(ServerOTP, NULL, 10);
+			unsigned long otp  = strtoul(GameServerOTP, nullptr, 10);
 			srand(otp);
-			wchar_t text[12] ;
+			wchar_t text[12];
 			int j=0;
 			for ( int i=0; i< 44; i+=4,j++ )
 			{
@@ -1118,7 +1019,7 @@ static void HandleHackID()
 				text[j] ^= rand();
 			}
 			text[j]=0;
-			if ( wcschr(text,'[')!=NULL )
+			if ( wcschr(text,'[')!=nullptr )
 			{
 				// hacker
 			}
@@ -1150,12 +1051,8 @@ RECT	rect;
 int		screenmode;
 #endif	// DIRECT3D
 
-#ifdef SMARTHEAP_USED
-	initSmartHeap();
-#endif
-
 #if platOS == OS_WIN32 && defined(PERFORMANCE_ENTER_EXIT)
-	if (GetModuleFileName(NULL, filename, sizeof(filename)))
+	if (GetModuleFileName(nullptr, filename, sizeof(filename)))
 	{
 		if (!syspeeParseMapFunction(filename))
 		{
@@ -1287,7 +1184,7 @@ int		screenmode;
 #endif
 
 #if XAUDIO
-    HRESULT hr = CoInitializeEx(NULL, COINIT_APARTMENTTHREADED);
+    HRESULT hr = CoInitializeEx(nullptr, COINIT_APARTMENTTHREADED);
 
     if(hr != S_OK)
     {
@@ -1299,11 +1196,11 @@ int		screenmode;
 	memInit();
 
 #ifdef DIRECT3D
-	dx3dinfoGetAdaptersAndModes(NULL, NULL);
+	dx3dinfoGetAdaptersAndModes(nullptr, nullptr);
 #endif	// DIRECT3D
 
 	// look up the product region (us/china)
-	_lookupProductRegion() ;
+	_lookupProductRegion();
 
 	// we then try to load wwiiol.xml variables
 	// eventually this call will replace the above call
@@ -1338,7 +1235,7 @@ int		screenmode;
 		TCHAR  HelpInfo[512];
 
 		LoadString(hInstance, IDS_HELPINFO, HelpInfo, 512);
-		MessageBox(NULL, HelpInfo, _T("WW2 Online Help"), MB_OK|MB_ICONINFORMATION);
+		MessageBox(nullptr, HelpInfo, _T("WW2 Online Help"), MB_OK|MB_ICONINFORMATION);
 		return(0);
 	}
 
@@ -1385,7 +1282,7 @@ int		screenmode;
 	// key file check
 #ifndef DEBUG_WW2
 	{
-		//__codeMangle(92783423471, 0xdf) ;	// See wwiiCovert.h wtf does this do?
+		//__codeMangle(92783423471, 0xdf);	// See wwiiCovert.h wtf does this do?
 		// OGS: It injects a double-negative branch operation across
 		// a garbage byte (0xdf) which makes the following 1kb of
 		// instructions look like a data segment to disassemblers
@@ -1437,7 +1334,7 @@ int		screenmode;
 
 #ifdef EVENT_LOG
 #if platOS == OS_WIN32
-	GetWindowsVersion(NULL, NULL);
+	GetWindowsVersion(nullptr, nullptr);
 
 	if (!DisplayInformation())
 	{
@@ -1509,14 +1406,10 @@ int		screenmode;
 #endif
 #endif
 
-#if !defined(USE_OSG)
-
 	UINT32 host = 0, otp = 0;
 	UINT16 port = 0;
 	if(rnmainGetOnlineSetting() == false)
 		return FALSE;
-
-#endif
 
 #define DONT_USE_THREAD
 #if defined(DONT_USE_THREAD) || defined(DIRECT3D)	// Use this path for a single thread environment else a multi-thread environment
@@ -1535,33 +1428,26 @@ int		screenmode;
 	ddpDrawNotActive(TRUE);
 	ddpDisableScreenSaver(TRUE);
 
-	ddpSetDDInit(NULL);//oglInit);
-	ddpSetDDRender(NULL);//rnlogoRender);
-	ddpSetDDKill(NULL);//oglKill);
+	ddpSetDDInit(nullptr);//oglInit);
+	ddpSetDDRender(nullptr);//rnlogoRender);
+	ddpSetDDKill(nullptr);//oglKill);
 
 	ddpSetD3DInit(piInit);
-#if defined(USE_OSG)
-	ddpSetD3DRender(osgGameUpdate);
-#else
 	ddpSetD3DRender(gmlpMainUpdate);
-#endif
 	ddpSetD3DKill(piKill);
 
-	if (!ddpCreateWnd(WantedX, WantedY, WantedWidth, WantedHeight, WantedBpp, WantedWindow ? DDWND_FULLWINDOW : DDWND_FULLSCREEN, NULL))
+	if (!ddpCreateWnd(WantedX, WantedY, WantedWidth, WantedHeight, WantedBpp, WantedWindow ? DDWND_FULLWINDOW : DDWND_FULLSCREEN, nullptr))
 	{
-#if defined(USE_OSG)
-#else
 		ddpKill();
-#endif
 		return(0);
 	}
 #endif	// OPENGL3D
 
 	do
 	{
-		while (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
+		while (PeekMessage(&msg, nullptr, 0, 0, PM_NOREMOVE))
 		{
-			if (GetMessage(&msg, NULL, 0, 0))
+			if (GetMessage(&msg, nullptr, 0, 0))
 			{
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
@@ -1591,7 +1477,7 @@ int		screenmode;
 	{
 		do
 		{
-			if (GetMessage(&msg, NULL, 0, 0))
+			if (GetMessage(&msg, nullptr, 0, 0))
 			{
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
@@ -1605,7 +1491,7 @@ int		screenmode;
 
 		Sleep(250);	// wait for thread to run down
 		CloseHandle(threadhandle);
-		threadhandle = NULL;
+		threadhandle = nullptr;
 	}
 
 #endif	// DONT_USE_THREAD
@@ -1626,12 +1512,9 @@ int		screenmode;
 	piKill();
 #endif
 
-#if defined(USE_OSG)
-#else
 #ifdef OPENGL3D
 	ddpKill();
 #endif	// OPENGL3D
-#endif
 
 	// teulShutdownTransport();
 
@@ -1654,8 +1537,8 @@ static LOGICAL abcd()
 {
     TCHAR szSysDir[_MAX_PATH+1];
 
-    HMODULE hModule1 = NULL;
-    HMODULE hModule2 = NULL;
+    HMODULE hModule1 = nullptr;
+    HMODULE hModule2 = nullptr;
 
 	// Get the handle to the OpenGL dll
     hModule1 = GetModuleHandle(_T("OPENGL32.dll"));
@@ -1667,7 +1550,7 @@ static LOGICAL abcd()
     hModule2 = GetModuleHandle(szSysDir);
 
     // No OpenGL in system32 directory
-    if(hModule2 == NULL)
+    if(hModule2 == nullptr)
     {
         return TRUE;
     }
@@ -1684,7 +1567,7 @@ static LOGICAL abcd()
     ustrcat(szSysDir, _T("\\KERNEL32.dll"));
 
     hModule2 = GetModuleHandle(szSysDir);
-	if(hModule2 == NULL || hModule1 != hModule2)
+	if(hModule2 == nullptr || hModule1 != hModule2)
 	{
 		return TRUE;
 	}
@@ -1725,16 +1608,6 @@ int _matherr(struct _exception* except)
 #endif // BETA_RELEASE
 #endif // USE_MATH_ERR
 
-#if defined(USE_OSG)
-void sysmainQuit(void)
-{
-	osgGameKill();
-    running = false;
-	//exit(0);
-}
-
-#else
-
 void sysmainQuit(void)
 {
 	cfgPrefsSave();
@@ -1746,7 +1619,6 @@ void sysmainQuit(void)
 		exit(0);
 #endif
 }
-#endif
 
 #ifdef DONT_USE
 void sysmainSetKeyboard(SYS_KEYBOARDFUNC NewKeyboardRoute)
@@ -1778,11 +1650,11 @@ void sysmainSetMouse(SYS_MOUSEFUNC NewMouseRoute)
 
 static void AddArchives()
 {
-	SCHAR** fileList = NULL;
+	SCHAR** fileList = nullptr;
 	SINT32 numfiles, i;
 	bool foundthem=false;
 
-	fiodGetDirFileList(NULL, &fileList, &numfiles);
+	fiodGetDirFileList(nullptr, &fileList, &numfiles);
 	if(!fileList)
 	{
 		throw std::runtime_error("Archive directory is wrong");

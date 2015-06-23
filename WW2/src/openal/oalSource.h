@@ -128,9 +128,9 @@ class BufferQueue : std::list<BufferInfo>
 
     void AppendBuffer(OALSource* thisSource, ALuint inBufferToken, OALBuffer* inBuffer, ALuint inACToken);
     ALuint RemoveQueueEntryByIndex(OALSource* thisSource, UInt32 inIndex, bool inReleaseIt);
-    UInt32 GetQueueSizeInFrames() ;
+    UInt32 GetQueueSizeInFrames();
     UInt32 GetBufferFrameCount(UInt32 inBufferIndex);
-    void SetFirstBufferOffset(UInt32 inFrameOffset) ;
+    void SetFirstBufferOffset(UInt32 inFrameOffset);
     ALuint GetBufferTokenByIndex(UInt32 inBufferIndex);
     UInt32 GetCurrentFrame(UInt32 inBufferIndex);
 
@@ -167,7 +167,7 @@ class BufferQueue : std::list<BufferInfo>
     bool Empty () const { return empty(); }
 
   private:
-    UInt32 GetPacketSize() ;
+    UInt32 GetPacketSize();
     UInt32 FrameOffsetToPacketOffset(UInt32 inFrameOffset);
 
 };

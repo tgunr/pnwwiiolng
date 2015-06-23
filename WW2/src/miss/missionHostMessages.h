@@ -17,8 +17,8 @@ extern SINT32 missionHostInstallCallbacks(void);
 extern SINT32 sendToClientMissionPostReply(MISSION_POST_REPLY reply, SINT32 connection);
 
 extern SINT32 sendToClientMissTimeUpdate(SINT32 connection, UINT32 missionID, UINT32 launchTime, bool mobileSpawnAvailable, bool isMobileSpawnAllowed, bool isActive, bool isOngoing);
-class RoomList ;
-extern SINT32 sendToClientRoomList(SINT32 connection, RoomList& roomList) ;
+class RoomList;
+extern SINT32 sendToClientRoomList(SINT32 connection, RoomList& roomList);
 
 //send a mission to everybody & their mother
 extern SINT32 mmBroadcastMission(Mission* mission);

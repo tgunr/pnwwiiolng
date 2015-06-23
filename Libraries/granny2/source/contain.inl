@@ -1351,7 +1351,7 @@ static void MakeNamePost( get_and_remove_bottom ) ( CONTAINER_NAME * sl )
 
 static void MakeNamePost( get_and_remove ) ( CONTAINER_NAME * sl, CONTAINER_ITEM_TYPE * remove_item )
 {
-  CONTAINER_ITEM_TYPE * i, * left, * right;
+  CONTAINER_ITEM_TYPE *i;
   MakeNamePostAlways( OVERLOADED_PTR ) * stack[ 32 ]; // would store 4 billion items - probably safe
   char side_stack[ 32 ];
   int stack_ptr;
@@ -1435,6 +1435,7 @@ static void MakeNamePost( get_and_remove ) ( CONTAINER_NAME * sl, CONTAINER_ITEM
   }
   #endif
 
+  CONTAINER_ITEM_TYPE *left, *right;
   left = GET_LEFT( i );
   right = GET_RIGHT( i );
 
@@ -2347,7 +2348,7 @@ CONTAINER_FUNCTION_DECORATE( CONTAINER_ITEM_TYPE * ) MakeNamePost( Previous )( C
     else
     {
 
-      CONTAINER_ITEM_TYPE * i, * last_right;
+      CONTAINER_ITEM_TYPE * last_right;
 
       i = sl->CONTAINER_ROOT_MEMBER;
 

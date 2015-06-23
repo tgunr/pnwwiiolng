@@ -10,5 +10,5 @@ enum Flags : UINT32
 	SVRFLAG_DETATCHED		= 0x00000008	// act as a detatched server that only
 											// reacts to player updates fro add and delete
 											// never be use w/ SVRFLAG_SEND_PSTAT
-} ;
+};
 }

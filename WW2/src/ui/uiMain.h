@@ -43,7 +43,7 @@ extern void uiSetDespawnInfo(const char* screen, int tab = 0, bool reset = true)
 extern bool uiInGame(); // tolua_export
 
 extern void uiJSCallback(JSContext* ctx, UINT32 argc, jsval* argv);
-extern JSBool uiCallJS(const char* function, int argc, jsval* argv, UIXMLCALLBACK callback = NULL); // arbitrarily typed arguments
+extern JSBool uiCallJS(const char* function, int argc, jsval* argv, UIXMLCALLBACK callback = nullptr); // arbitrarily typed arguments
 extern JSBool uiCallJS(const char* function, UIXMLCALLBACK callback, int argc, ...); // string arguments
 extern JSBool uiCallJS(const wchar_t* function, UIXMLCALLBACK callback, int argc, ...); // wide string arguments
 extern void uiRunScript(const char* script); // tolua_export
@@ -51,7 +51,7 @@ extern void uiRunScript(phui::View* target, const char* script); // tolua_export
 extern void uiSetCursor(int); // tolua_export
 extern void uiSetAFK(int when); // when = when we went afk in ms
 extern void uiSetAutoAFK(bool autoafk); // autoafk indicates this was an autoafk
-extern bool uiSetFontSize(unsigned int fontsize, const char* font = NULL); // set the ui font size; takes current resolution into account
+extern bool uiSetFontSize(unsigned int fontsize, const char* font = nullptr); // set the ui font size; takes current resolution into account
 extern void uiSetToolTips(bool on); // set the ui tooltips
 extern int uiIsAFK();
 extern bool uiIsAutoAFK();

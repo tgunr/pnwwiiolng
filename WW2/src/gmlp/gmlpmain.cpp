@@ -19,7 +19,6 @@
 #include "fx/FXInterface.h"
 #include "fx/fxMgr.h"
 #include "rn/rnlogo.h"
-#include "mem/mem.h"
 #include "dimain.h"
 #include "ld/ldmdl.h"
 #include "gmlp/gmlpmain.h"
@@ -138,7 +137,7 @@ static void preload_sdms()
 #if defined(_DUMP_STRAT_TRANSLATIONS)
 	StratDB::StratObjList stratlist;
 
-	FILE* report = NULL;
+	FILE* report = nullptr;
 	errno_t err = fopen_s(&report, "c:\\projects\\stratlist.txt", "w");
 
 	if(!err)
@@ -620,7 +619,7 @@ UINT32	cUsed, cUnused;
 	return 0;
 }
 
-//extern void mapProcessSuperCellVislevels() ;
+//extern void mapProcessSuperCellVislevels();
 
 // initializes stuff for the main update loop
 void _UpdateInit(void)
@@ -633,7 +632,7 @@ void _UpdateInit(void)
 
 // Voice Communications
 #if defined(ENABLE_VOICE_COMMS)
-	if(VoiceCommsOn && mgr != NULL)
+	if(VoiceCommsOn && mgr != nullptr)
 	{
 		mgr->checkvoiceconnections();
 	}

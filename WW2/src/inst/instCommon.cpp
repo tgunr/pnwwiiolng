@@ -17,10 +17,10 @@ namespace Instance
 {
 
 // The "Global" and "Private" instance descriptors.
-const Descriptor g_invalid = Descriptor(_INVALID, 0, 0, 0) ;
-const Descriptor g_campaign = Descriptor(_CAMPAIGN, 0, 0, _CAMPAIGN) ;
-const Descriptor g_tutorial = Descriptor(_TUTORIAL, 0, 0, 0) ;
-const Descriptor g_lobby = Descriptor(_SCENARIO, 0, 0, 0) ;
+const Descriptor g_invalid = Descriptor(_INVALID, 0, 0, 0);
+const Descriptor g_campaign = Descriptor(_CAMPAIGN, 0, 0, _CAMPAIGN);
+const Descriptor g_tutorial = Descriptor(_TUTORIAL, 0, 0, 0);
+const Descriptor g_lobby = Descriptor(_SCENARIO, 0, 0, 0);
 
 //////////////////////////////////////////////////////////////////////
 // Operator required for std::map etc to organize us.
@@ -28,19 +28,19 @@ const Descriptor g_lobby = Descriptor(_SCENARIO, 0, 0, 0) ;
 bool
 Descriptor::operator<(const Instance::Descriptor& rhs) const
 {
-	if ( category() < rhs.category() ) return true ;
+	if ( category() < rhs.category() ) return true;
 	if ( category() == rhs.category() )
 	{
-		if ( type() < rhs.type() ) return true ;
+		if ( type() < rhs.type() ) return true;
 		if ( type() == rhs.type() )
 		{
 			if ( handle() < rhs.handle() )
-				return true ;
+				return true;
 			if ( handle() == rhs.handle() )
-				return id() < rhs.id() ;
+				return id() < rhs.id();
 		}
 	}
-	return false ;
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -49,7 +49,7 @@ Descriptor::operator<(const Instance::Descriptor& rhs) const
 instanceid_t
 StrToInstanceID(const char* instStr)
 {
-	return strtoull(instStr, NULL, 10) ;
+	return strtoull(instStr, nullptr, 10);
 }
 
 }	// namespace Instance

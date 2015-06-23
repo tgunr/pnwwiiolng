@@ -54,6 +54,8 @@ public:
 
 	TextView();
 	virtual ~TextView();
+
+	virtual View* AsView() override { return this; }
 	
 	virtual void DrawSelf();
 

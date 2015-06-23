@@ -8,14 +8,10 @@
 //
 // Originating Programmer: Martin Poulin
 
-#include "dbug/dbug.h"
 #include "dbug/dbugInternal.h"
 
-#include <stdarg.h>
 #include <fcntl.h>
-#include <string.h>
 #include <sys/stat.h>
-#include "mem/mem.h"
 #include "include/defs.h"
 #include "teul/teulTime.h"
 #include <locale.h>
@@ -61,9 +57,9 @@ extern ConfigPath cv_defaultLogPath;
 #endif
 
 // set max file size to 50M for roll over to new log
-static const size_t MAX_FILE_SIZE = 50 * 1000 * 1024 ;
+static const size_t MAX_FILE_SIZE = 50 * 1000 * 1024;
 // Set a maximum of 5 files
-static const size_t MAX_FILE_NUM = 5 ;
+static const size_t MAX_FILE_NUM = 5;
 
 #if	platOS == OS_WIN32
 	#define vsnprintf _vsnprintf
@@ -86,26 +82,22 @@ const char* errorTypes[] = {
 	"D"		// debug level message
 };
 
-#if platBuild == TEUL_SERVER
-namespace Teul { namespace uWeb { class Server ; Server* s_debugServer = NULL ; } }
-#endif
-
 //static SINT32	theError = 0;
 static size_t _fileSize = 0;
 static void _levelHandler(UINT32 errType, const char* const text);
 
 #if defined(REPOSITORY_INFO)
-static const char _OPEN_MSG[] = "Playnet Server Log File. Rev: " REPOSITORY_INFO CARRIAGE_RETURN ;
+static const char _OPEN_MSG[] = "Playnet Server Log File. Rev: " REPOSITORY_INFO CARRIAGE_RETURN;
 #else
-static const char _OPEN_MSG[] = "DebugMessage System Open." CARRIAGE_RETURN ;
+static const char _OPEN_MSG[] = "DebugMessage System Open." CARRIAGE_RETURN;
 #endif
 
-static const char _CLOSE_MSG[] = CARRIAGE_RETURN "Debug Message System Closed." CARRIAGE_RETURN ;
+static const char _CLOSE_MSG[] = CARRIAGE_RETURN "Debug Message System Closed." CARRIAGE_RETURN;
 
 // Global boolean that controls whether or not 'D'ebug level messages will be logged.
 // Exposed globally so it can be tested before prior to performing otherwise expensive
 // message constructions.
-bool g_logDebug = true ;
+bool g_logDebug = true;
 
 #include <mutex>
 static std::mutex s_dbugInitMutex;
@@ -131,15 +123,12 @@ _dbugSetErr(SINT32 err)
 static void
 _roll(const char* const filename, const int baseNum)
 {
-	char oldName[DBUG_MAX_PATH + 1], newName[DBUG_MAX_PATH + 1] ;
+	char oldName[DBUG_MAX_PATH + 1], newName[DBUG_MAX_PATH + 1];
 
-	snprintf(oldName, DBUG_MAX_PATH, "%s.%d.log", filename, baseNum) ;
-	oldName[DBUG_MAX_PATH] = 0 ;
+	strprintf(oldName, "%s.%d.log", filename, baseNum);
+	strprintf(newName, "%s.%d.log", filename, baseNum + 1);
 
-	snprintf(newName, DBUG_MAX_PATH, "%s.%d.log", filename, baseNum + 1) ;
-	newName[DBUG_MAX_PATH] = 0 ;
-
-	rename(oldName, newName) ;
+	rename(oldName, newName);
 }
 #endif
 
@@ -149,7 +138,7 @@ _roll(const char* const filename, const int baseNum)
 static void
 _qualifyFilename(const char* filename, char* const output, const size_t outputSize)
 {
-	if ( filename == NULL || filename[0] == 0 )
+	if ( filename == nullptr || filename[0] == 0 )
 		filename = "logfile";
 
 	// Already qualified.
@@ -193,37 +182,34 @@ _openDbugFile(const char* const srcFile_)
 
 	_qualifyFilename(srcFile_, filename, sizeof(filename));
 
-	if (filename != NULL)
+	if (PN_UNLIKELY(filename != nullptr))
 	{
 		int oflags = _O_CREAT|_O_WRONLY|_O_TRUNC;
 
 #if platBuild == TEUL_SERVER
-		for ( int i = MAX_FILE_NUM ; i >= 0 ; --i )
+		for ( int i = MAX_FILE_NUM; i >= 0; --i )
 		{
-			_roll(filename, i) ;
+			_roll(filename, i);
 		}
 
 		// Delete the last file.
-		snprintf(ofn, DBUG_MAX_PATH, "%s.%" PRSizeT ".log", filename, MAX_FILE_NUM + 1) ;
-		ofn[DBUG_MAX_PATH] = 0 ;
-		unlink(ofn) ;
+		strprintf(ofn, "%s.%" PRSizeT ".log", filename, MAX_FILE_NUM + 1);
+		unlink(ofn);
 
-		snprintf(ofn, DBUG_MAX_PATH, "%s.0.log", filename);
+		strprintf(ofn, "%s.0.log", filename);
 #else
 		static UINT32 _fileNumber = 0;
-		snprintf(ofn, DBUG_MAX_PATH, "%s.%u.log", filename, _fileNumber++);
+		strprintf(ofn, "%s.%u.log", filename, _fileNumber++);
 
 		if ( _fileNumber > MAX_FILE_NUM)
 			_fileNumber = 0;
 #endif
 
-		ofn[DBUG_MAX_PATH] = 0 ;
-
 		file = OS_OPEN(ofn, oflags, PMODE);
 		_fileSize = 0;
 
 		if ( file >= 0 )
-			_fileSize += OS_WRITE(file, _OPEN_MSG, sizeof(_OPEN_MSG) - 1) ;
+			_fileSize += OS_WRITE(file, _OPEN_MSG, sizeof(_OPEN_MSG) - 1);
 	}
 	else
 		file = OS_FILENO(stderr);
@@ -240,19 +226,19 @@ _dbugOut(const SINT32		file
 			, const SINT32		logType
 			, const SINT32		// errType
 			, const SINT32		// flags
-			, const SCHAR*		outString
+			, const char*		outString
 			, const size_t		length
 			, const	bool		rollover)
 {
 	if (logType != LOG_TO_FILE || file < 0)
 		return;
 
-	size_t retval = OS_WRITE(file, (void*)outString, (unsigned long)length);
+	size_t retval = OS_WRITE(file, outString, (unsigned long)length);
 	if ( file == _stdErrFileNo )
 		return;
 
-	_fileSize += retval ;
-	if ( rollover && _fileSize >= MAX_FILE_SIZE )
+	_fileSize += retval;
+	if ( PN_UNLIKELY(rollover && _fileSize >= MAX_FILE_SIZE) )
 	{
 		OS_CLOSE(file);
 		_logger.dbugfile = _openDbugFile(_logger.program());
@@ -278,8 +264,8 @@ void DebugLogger::initialize(SINT32 logType_, Debug::ERROR_TYPE level_, SINT32 f
 	lineno = -1;
 
 	setProgram(program_);
-	setFileName(NULL);		// Don't have an open file.
-	setText(NULL);
+	setFileName(nullptr);		// Don't have an open file.
+	setText(nullptr);
 
 	initialized = true;
 }
@@ -288,7 +274,7 @@ void DebugLogger::initialize(SINT32 logType_, Debug::ERROR_TYPE level_, SINT32 f
 static void
 _handleSIGUSR2(SINT32)
 {
-	static Debug::ERROR_TYPE oldLevel = Debug::ERR_DBUG ;
+	static Debug::ERROR_TYPE oldLevel = Debug::ERR_DBUG;
 
 	//Ignore any incoming signals
 	signal(SIGUSR2, SIG_IGN);
@@ -296,14 +282,14 @@ _handleSIGUSR2(SINT32)
 	// safe as long as we dont use dbugSetLogLevel at same time elsewhere
 	if ( !g_logDebug )
 	{
-		oldLevel = _logger.logLevel ;
-		_logger.logLevel = Debug::ERR_DBUG ;
-		g_logDebug = true ;
+		oldLevel = _logger.logLevel;
+		_logger.logLevel = Debug::ERR_DBUG;
+		g_logDebug = true;
 	}
 	else if ( oldLevel != Debug::ERR_DBUG )
 	{
-		_logger.logLevel = oldLevel ;
-		g_logDebug = false ;
+		_logger.logLevel = oldLevel;
+		g_logDebug = false;
 	}
 
 	signal(SIGUSR2, _handleSIGUSR2);
@@ -315,18 +301,18 @@ _handleSIGUSR2(SINT32)
 #include <execinfo.h>
 
 // Needs to be static to avoid allocs during signal.
-static const size_t MaxBacktraceAddrs = 16 ;
-static void* backtraceAddrs[MaxBacktraceAddrs] ;
-static char  backtraceReport[128] ;
+static const size_t MaxBacktraceAddrs = 16;
+static void* backtraceAddrs[MaxBacktraceAddrs];
+static char  backtraceReport[128];
 
 //////////////////////////////////////////////////////////////////////
 // Brute-force write to log file.
 
 static void _report(const int fd, const char* const fmt, const int num)
 {
-	const int len = snprintf(backtraceReport, sizeof(backtraceReport) - 1, fmt, num) ;
+	const int len = strprintf(backtraceReport, fmt, num);
 	if ( len > 0 )
-		OS_WRITE(fd, (void*)backtraceReport, len) ;
+		OS_WRITE(fd, (void*)backtraceReport, len);
 }
 
 
@@ -336,50 +322,50 @@ static void _report(const int fd, const char* const fmt, const int num)
 void dbugDumpBacktrace(int signum)
 {
 	if ( _logger.isInitialized() == false || _logger.logType != LOG_TO_FILE )
-		return ;
-	const int fd = _logger.dbugfile ;
+		return;
+	const int fd = _logger.dbugfile;
 	if ( fd < 0 )
-		return ;
+		return;
 
 	if ( signum > 0 )
 	{
-		_report(fd, "\n\n", 0) ;
-		_report(fd, "*** Process terminating due to fatal signal #%d:\n", signum) ;
+		_report(fd, "\n\n", 0);
+		_report(fd, "*** Process terminating due to fatal signal #%d:\n", signum);
 	}
 
-	const int numAddrs = backtrace(backtraceAddrs, MaxBacktraceAddrs) ;
+	const int numAddrs = backtrace(backtraceAddrs, MaxBacktraceAddrs);
 	if ( numAddrs < 0 )
 	{
-		_report(fd, "Backtrace error: %d\n", numAddrs) ;
-		return ;
+		_report(fd, "Backtrace error: %d\n", numAddrs);
+		return;
 	}
 	if ( numAddrs == 0 )
 	{
-		_report(fd, "backtrace available.\n", 0) ;
-		return ;
+		_report(fd, "backtrace available.\n", 0);
+		return;
 	}
 
-	_report(fd, "BACKTRACE [Rev " REPOSITORY_INFO ", %u functions]:\n", numAddrs) ;
+	_report(fd, "BACKTRACE [Rev " REPOSITORY_INFO ", %u functions]:\n", numAddrs);
 
-	backtrace_symbols_fd(backtraceAddrs, numAddrs, fd) ;
+	backtrace_symbols_fd(backtraceAddrs, numAddrs, fd);
 
-	return ;
+	return;
 }
 
 static int
 _setSignal(int signum, void (*handler)(int))
 {
-	struct sigaction action ;
+	struct sigaction action;
 	// Get the pre-existing setup.
-	const int err = sigaction(signum, NULL, &action) ;
+	const int err = sigaction(signum, nullptr, &action);
 	if ( err < 0 )
-		return err ;
+		return err;
 
-	action.sa_handler = handler ;
-	sigfillset(&action.sa_mask) ;
-	action.sa_flags = SA_RESETHAND ;
+	action.sa_handler = handler;
+	sigfillset(&action.sa_mask);
+	action.sa_flags = SA_RESETHAND;
 
-	return sigaction(signum, &action, NULL) ;
+	return sigaction(signum, &action, nullptr);
 }
 #endif
 
@@ -394,13 +380,13 @@ void dbugInit(SINT32 logType, const char* const filename)
 		return;
 	s_dbugInitialized = true;
 
-	setlocale(LC_CTYPE, "") ;
+	setlocale(LC_CTYPE, "");
 
 	SINT32 file;
 	Debug::ERROR_TYPE level;
 
 	level = Debug::ERR_DBUG;
-	g_logDebug = true ;
+	g_logDebug = true;
 
 #if platOS != OS_LINUX
 	if ( logType != LOG_OFF)
@@ -422,8 +408,8 @@ void dbugInit(SINT32 logType, const char* const filename)
 	_logger.initialize(logType, level, file, filename);
 
 #if platOS == OS_LINUX
-	signal(SIGUSR2, _handleSIGUSR2) ;
-	signal(SIGPIPE, SIG_IGN) ;
+	signal(SIGUSR2, _handleSIGUSR2);
+	signal(SIGPIPE, SIG_IGN);
 
 	if ( _setSignal(SIGABRT, dbugDumpBacktrace) < 0
 		|| _setSignal(SIGILL, dbugDumpBacktrace) < 0
@@ -436,17 +422,17 @@ void dbugInit(SINT32 logType, const char* const filename)
 	}
 
 	static struct timeval tv;
-	gettimeofday(&tv, 0);
-	const TeulTimeMS newTimeMS = ((TeulTimeMS)tv.tv_sec * 1000LL) + (tv.tv_usec / 1000) ;
+	gettimeofday(&tv, nullptr);
+	const TeulTimeMS newTimeMS = ((TeulTimeMS)tv.tv_sec * 1000LL) + (tv.tv_usec / 1000);
 	if ( newTimeMS < teulClock64 )
 	{
-		teulClock64++ ;
-		tv.tv_sec = (teulClock64 / 1000LL) ;
+		teulClock64++;
+		tv.tv_sec = (teulClock64 / 1000LL);
 	}
 	else
 	{
-		teulClock64 = newTimeMS ;
-		teulClockTime = (UINT32)tv.tv_sec ;
+		teulClock64 = newTimeMS;
+		teulClockTime = (UINT32)tv.tv_sec;
 	}
 #endif
 }
@@ -454,9 +440,9 @@ void dbugInit(SINT32 logType, const char* const filename)
 // dbugClose: closes the debug file and cleans up.
 void dbugClose(void)
 {
-	g_logDebug = false ;
+	g_logDebug = false;
 	if ( _logger.isInitialized() == false )
-		return ;
+		return;
 
 	_logger.close();
 }
@@ -491,7 +477,7 @@ void dbugSetWriteLevel(Debug::ERROR_TYPE level)
 	level = (Debug::ERROR_TYPE)temp;
 
 	if ( _logger.isInitialized() == false )
-		return ;
+		return;
 
 	_logger.writeFlags = flags;
 
@@ -522,18 +508,18 @@ void dbugSetWriteLevel(Debug::ERROR_TYPE level)
 void dbugSetLogLevel(Debug::ERROR_TYPE level)
 {
 	if ( _logger.isInitialized() == false )
-		return ;
+		return;
 
 	SINT32 flags = level & DBUG_FLAG_MASK;
 	level = static_cast<Debug::ERROR_TYPE>(level & ~DBUG_FLAG_MASK);
 
 	if ( level == Debug::ERR_DBUG )
-		g_logDebug = true ;
+		g_logDebug = true;
 	else
-		g_logDebug = false ;
+		g_logDebug = false;
 
 	if ( _logger.isInitialized() == false )
-		return ;
+		return;
 
 	_logger.logFlags = flags;
 
@@ -577,7 +563,7 @@ SINT32	dbugGetErrno(void)
 #endif
 }
 
-// _dbugLogPrivate: if the current filename, lineno or string is NULL then it
+// _dbugLogPrivate: if the current filename, lineno or string is nullptr then it
 // sets these members.  The parameters are output as a string to the debug
 // file depending on the debug level selected and the current error type.
 static inline SINT32
@@ -586,9 +572,9 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 	size_t len = 0;
 	SINT32	retval = 0, flags;
 	const char* myName;
-	UINT32 minLevel ;
+	UINT32 minLevel;
 
-	if ( _logger.isInitialized() == false )
+	if ( PN_UNLIKELY(_logger.isInitialized() == false) )
 		_logger.initialize(LOG_TO_FILE,  Debug::ERR_INFO, _stdErrFileNo, "not_initialized");
 
 	_logger.isLog = isLog;
@@ -605,32 +591,35 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 	flags |= (errType & DBUG_FLAG_MASK);
 	_logger.flags = flags;
 
-	if (errType != Debug::ERR_FATAL)
+	if (PN_LIKELY(errType != Debug::ERR_FATAL))
 		_logger.errType = errType & ~DBUG_FLAG_MASK;
 	else
 		_logger.errType = errType;
 
 	_logger.err = dbugGetErrno();
 
-	if ( (_logger.errType != Debug::ERR_FATAL) && (_logger.errType > minLevel) )
+	if ( PN_LIKELY((_logger.errType != Debug::ERR_FATAL) && (_logger.errType > minLevel)) )
 		return 0;
 
-	if ( (myName = strrchr(filename,'/')) != NULL)
+	if ( (myName = strrchr(filename,'/')) != nullptr)
 		myName++;
-	else if ( (myName = strrchr(filename,'\\')) != NULL)
+	else if ( (myName = strrchr(filename,'\\')) != nullptr)
 		myName++;
 	else
 		myName = filename;
 
-	_logger.setFileName(myName) ;
+	_logger.setFileName(myName);
 	_logger.lineno = lineno;
 
 	if ( ! (flags & BARE_DEBUG) )
 	{
-		time_t now = (time_t)(teulClock64 / 1000) ;
-		struct tm tmStruct ;
-		struct tm* tm = &tmStruct ;
-		tm = localtime_r(&now, &tmStruct) ;
+		time_t now = (time_t)(teulClock64 / 1000);
+#if platOS == OS_WIN32
+		struct tm* tm = localtime(&now);
+#else
+		struct tm tmStruct;
+		struct tm* tm = localtime_r(&now, &tmStruct);
+#endif
 		len = _logger.formatText(CARRIAGE_RETURN "%s [%04u-%02u-%02u %02u:%02u.%02u.%03u %s:%u] "
 								, errorTypes[_logger.errType]
 								, tm->tm_year + 1900
@@ -642,28 +631,28 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 								, (UINT32)(teulClock64 % 1000)
 								, _logger.file()
 								, _logger.lineno);
-		_dbugOut(_logger.dbugfile, _logger.logType, _logger.errType, flags, _logger.text(), len, false) ;
+		_dbugOut(_logger.dbugfile, _logger.logType, _logger.errType, flags, _logger.text(), len, false);
 	}
 
-	const char* text = NULL ;
-	if ( fmt == NULL )
-		len = 0 ;
+	const char* text = nullptr;
+	if ( PN_UNLIKELY(fmt == nullptr) )
+		len = 0;
 	else
 	{
-		len = _logger.vformatText(fmt, args) ;
+		len = _logger.vformatText(fmt, args);
 		if ( len == (size_t)~0 )
 		{
-			text = "[ERROR]" ;
-			len = strlen(text) ;
+			text = "[ERROR]";
+			len = strlen(text);
 		}
 		else
-			text = _logger.text() ;
+			text = _logger.text();
 	}
 
-	if ( len == 0 )
+	if ( PN_UNLIKELY(len == 0) )
 	{
-		text = "[NULL]" ;
-		len = strlen(text) ;
+		text = "[nullptr]";
+		len = strlen(text);
 	}
 
 	_dbugOut(_logger.dbugfile, _logger.logType, _logger.errType, flags, text, len, true);
@@ -684,38 +673,36 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 		return (SINT32)len;
 }
 
-// dbugLogV: Log the (already started) va_list.
-SINT32 _dbugLogV(const char* const filename, const SINT32 lineno, const UINT32 errType, const char* const fmt, va_list& args)
+// dbugLog: if the current filename, lineno or string is nullptr then it
+// sets these members.  The parameters are output as a string to the debug
+// file depending on the debug level selected and the current error type.
+SINT32 _dbugLog(const char* const filename, const SINT32 lineno, const UINT32 errType, const char* const fmt, ...)
 {
 	SINT32 result = 0;
-	if ( _logger.isInitialized() == false )
+	if (PN_UNLIKELY(_logger.isInitialized() == false))
 	{
-		if ( errType == Debug::ERR_FATAL)
+		if (PN_UNLIKELY(errType == Debug::ERR_FATAL))
 		{
+			va_list args;
+			va_start(args, fmt);
 			char text[DBUG_MAX_STRING + 1];
 			vsnprintf(text, sizeof(text), fmt, args);
+			va_end(args);
 			_levelHandler(errType, text);
 		}
 	}
 	else
 	{
-		if ( !(errType != Debug::ERR_FATAL && (errType & ~DBUG_FLAG_MASK) > _logger.logLevel) )
-			result = _dbugLogPrivate(TRUE, filename,lineno, errType, fmt, args);
+		if (!(errType != Debug::ERR_FATAL && (errType & ~DBUG_FLAG_MASK) > _logger.logLevel))
+		{
+			va_list args;
+			va_start(args, fmt);
+			result = _dbugLogPrivate(TRUE, filename, lineno, errType, fmt, args);
+			va_end(args);
+		}
 	}
 
 	return result;
-}
-
-// dbugLog: if the current filename, lineno or string is NULL then it
-// sets these members.  The parameters are output as a string to the debug
-// file depending on the debug level selected and the current error type.
-SINT32 _dbugLog(const char* const filename, const SINT32 lineno, const UINT32 errType, const char* const fmt, ...)
-{
-	va_list args;
-	va_start(args, fmt);
-	const SINT32 retval = _dbugLogV(filename, lineno, errType, fmt, args);
-	va_end(args);
-	return retval;
 }
 
 //_dbugWrite: same as above for dbugWrite
@@ -734,8 +721,8 @@ SINT32 _dbugWrite(char* filename, SINT32 lineno, UINT32 errType, char* fmt, ...)
 
 void _levelHandler(UINT32 errType, const char* const text)
 {
-	if ( errType != Debug::ERR_FATAL )
-		return ;
+	if ( PN_LIKELY(errType != Debug::ERR_FATAL) )
+		return;
 
 	fprintf(stderr, "%s\n", text);
 
@@ -752,14 +739,14 @@ _LogAbort(const char* file_, unsigned int line_, unsigned int error_, const char
 	va_start(args, fmt_);
 
 #if platOS == OS_WIN32
-	if ( assertion_ == NULL || *assertion_ == 0 )
+	if ( assertion_ == nullptr || *assertion_ == 0 )
 		assertion_ = "";
 
 	const size_t roughSize = vsnprintf(_logger.m_text, sizeof(_logger.m_text), fmt_, args);
 	va_end(args);
 	const size_t maxSize = roughSize + 256 + strlen(assertion_);
 	char* message = (char*)OS_ALLOCA(maxSize * sizeof(char));
-	if ( message == nullptr )
+	if ( PN_UNLIKELY(message == nullptr) )
 	{
 		MessageBoxA(0, "OUT OF MEMORY", "OUT OF MEMORY", MB_ICONERROR | MB_OK | MB_APPLMODAL);
 		abort();
@@ -783,9 +770,9 @@ _LogAbort(const char* file_, unsigned int line_, unsigned int error_, const char
 
 	exit(error_ != 0 ? error_ : -1);
 #else
-	if ( _logger.isInitialized() )
+	if ( PN_LIKELY(_logger.isInitialized()) )
 	{
-		if ( assertion_ != NULL && *assertion_ != 0 )
+		if ( assertion_ != nullptr && *assertion_ != 0 )
 			_dbugLog(file_, line_, error_, "ASSERTION: %s", assertion_);
 		_dbugLogPrivate(FALSE, file_, line_, error_, fmt_, args);
 	}

@@ -8,9 +8,8 @@
 // Originating Programmer: Brian "Stick" Duelm
 
 extern UINT32 changeToBroadcast(UINT32 address);
-extern UINT32 mmGetAddress();
-extern SINT32 mmSendToChat(struct TEUL_CALLBACK* callback, void* data) ;
+extern SINT32 mmSendToChat(struct TEUL_CALLBACK* callback, void* data);
 
 extern SINT32 mapGetStratIndex(void);
-extern void mapSendActivate(SINT32 teulIndex, const playerid_t playerID, const char* callsign) ;
+extern void mapSendActivate(SINT32 teulIndex, const playerid_t playerID, const char* callsign);
 

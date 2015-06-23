@@ -21,44 +21,38 @@
 class DBThreadQuery
 {
 public:
-	enum { _IMMEDIATE = true, _CALLBACK = false } ;
-	enum { MaxStatementLen = 4096 } ;
+	enum { _IMMEDIATE = true, _CALLBACK = false };
+	enum { MaxStatementLen = 4096 };
 
 	DBThreadQuery(const DBThread::DBNo db_, const char* const name_, const char* const statement_, bool immediate)
-		: m_db(db_), m_name(name_), m_immediate(immediate), m_query(NULL)
+		: m_db(db_), m_name(name_), m_immediate(immediate), m_query(nullptr)
 		{
-			strcpy(m_statement, statement_) ;
+			strsafecpy(m_statement, statement_);
 		}
 
-	DBThreadQuery(const DBThread::DBNo db_, const char* const name_, bool immediate, const char* const fmt_, ...)
-		: m_db(db_), m_name(name_), m_immediate(immediate), m_query(NULL)
+	template<typename... Args>
+	DBThreadQuery(const DBThread::DBNo db_, const char* const name_, bool immediate_, const char* const fmt_, Args... args_)
+		: m_db(db_), m_name(name_), m_immediate(immediate_), m_query(nullptr)
 		{
-			va_list args ;
-			va_start(args, fmt_) ;
-			vsetStatement(args, fmt_) ;
-			va_end(args) ;
+			strprintf(m_statement, fmt_, std::forward<Args>(args_)...);
+			m_statement[MaxStatementLen] = '\0';
 		}
 	DBThreadQuery(const DBThread::DBNo db_, const char* const name_, bool immediate, va_list& args, const char* const fmt_)
-		: m_db(db_), m_name(name_), m_immediate(immediate), m_query(NULL)
+		: m_db(db_), m_name(name_), m_immediate(immediate), m_query(nullptr)
 		{
-			vsetStatement(args, fmt_) ;
+			int bytes = vsnprintf(m_statement, MaxStatementLen, fmt_, args);
+			m_statement[bytes] = 0;
 		}
 
-	void vsetStatement(va_list& args, const char* const fmt_)
-	{
-		int bytes = vsnprintf(m_statement, MaxStatementLen, fmt_, args) ;
-		m_statement[bytes] = 0 ;
-	}
-
-	virtual ~DBThreadQuery() ;
+	virtual ~DBThreadQuery();
 
 public:
-	const char* Statement() const { return m_statement ; }
-	const char* Name() const { return m_name ; }
-	DBQuery* Query() const { return m_query ; }
+	const char* Statement() const { return m_statement; }
+	const char* Name() const { return m_name; }
+	DBQuery* Query() const { return m_query; }
 
-	bool Execute(UINT32 threadNo, MYSQL* conn, DBThread::DBNo*) ;
-	void Queue() ;
+	bool Execute(UINT32 threadNo, MYSQL* conn, DBThread::DBNo*);
+	void Queue();
 
 	//! Called if query succeeds.
 	virtual void Success() {}
@@ -66,13 +60,19 @@ public:
 	virtual void Failure() {}
 	//! Called before success/failure;
 	//! after this, the query is deleted.
-	virtual bool Process(const size_t /*numRows*/) { return false ; }
+	virtual bool Process(const size_t /*numRows*/) { return false; }
+
+	template<typename... Args>
+	void Do(const DBThread::DBNo db_, const char* fmt, Args&&... args)
+	{
+		(new DBThreadQuery(db_, "DBThread::Do(q)", DBThreadQuery::_IMMEDIATE, fmt, std::forward<Args>(args)...))->Queue();
+	}
 
 protected:
-	DBThread::DBNo		m_db ;
-	const char* const	m_name ;
-	bool				m_immediate ;
-	DBQuery*			m_query ;
-	char				m_statement[MaxStatementLen + 1] ;
-} ;
+	DBThread::DBNo		m_db;
+	const char* const	m_name;
+	bool				m_immediate;
+	DBQuery*			m_query;
+	char				m_statement[MaxStatementLen + 1];
+};
 

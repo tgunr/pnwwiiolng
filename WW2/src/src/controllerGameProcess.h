@@ -1,5 +1,13 @@
 #pragma once
 
+#include "src/controllerGameIntro.h"
+
+#if platOS == OS_WIN32
+using processhandle_t = HANDLE;
+#else
+using processhandle_t = UINT64;
+#endif
+
 //! Structure that encapsulates the operation of a single game server process.
 struct GameProcess
 {
@@ -12,9 +20,10 @@ struct GameProcess
 	//! We're ready to start this process.
 	void RequestStart();
 	//! The OS has been asked to launch this process.
-	void OnStarting(UINT64 process_);
+	void OnStarting(processhandle_t processHandle_, UINT64 processID_);
 	//! We have received contact from the process, it's running.
-	void OnStarted(UINT64 processID_);
+	//! Returns: true if we expected this, false otherwise.
+	bool OnStarted();
 	//! We have decided this process should be terminated.
 	void RequestStop();
 	//! If the process is still running, send it a kill and mark it as stopped.
@@ -27,6 +36,8 @@ struct GameProcess
 	//! Check the state of the object.
 	//! @return true if the process is waiting to be started.
 	bool CheckStatus();
+
+	bool IsRunning() const;
 
 	SERVER_TYPE ServerType() const { return m_type; }
 	const char* ServerTypeName() const { return g_serverTypes[m_type]; }
@@ -41,12 +52,7 @@ struct GameProcess
 	//! Determine if the process no-longer needs to be managed.
 	bool ReadyForRemoval() const { return !Running() && !StartSent() && !Desired(); }
 
-#if platOS == OS_WIN32
-	HANDLE Process() const { return (HANDLE)m_process; }
-#else
-	pid_t Process() const { return (pid_t)m_process; }
-#endif
-	UINT64 ProcessID() const { return m_process; }
+	UINT64 ProcessID() const { return m_processID; }
 
 	TeulTimeMS TimeRunning() const { return Running() ? (teulClock64 - m_started) : ~0ULL; }
 	TeulTimeMS TimeSinceStartSent() const { return StartSent() ? (teulClock64 - m_startSent) : ~0ULL; }
@@ -64,8 +70,11 @@ private:
 	TeulTimeMS		m_startSent;
 	//! When we got confirmation the process was running.
 	TeulTimeMS		m_started;
+#if platOS == OS_WIN32
+	processhandle_t	m_processHandle;
+#endif
 	//! Process ID (linux) or Process Handle (Windows)
-	UINT64			m_process;
+	UINT64			m_processID;
 	//! When we asked the process to stop.
 	TeulTimeMS		m_stopSent;
 	//! When we got confirmation the process had stopped.
@@ -78,13 +87,15 @@ public:
 	static GameProcess* s_processStarting;
 
 public:
-	void Log(int level, const char* fmt, ...)
+	void Log(int level, const char* fmt)
+	{
+		dbugLog("GameProcess", 0, level | LOG_ALL_TO_STDERR, "s:%u(%s) pid:%llu %s", ServerType(), ServerTypeName(), ProcessID(), fmt);
+	}
+	template<typename... Args>
+	void Log(int level, const char* fmt, Args&&... args)
 	{
 		dbugLog("GameProcess", 0, level | LOG_ALL_TO_STDERR, "s:%u(%s) pid:%llu ", ServerType(), ServerTypeName(), ProcessID());
-		va_list args;
-		va_start(args, fmt);
-		dbugLogV("GameProcess", 0, level | LOG_ALL_TO_STDERR | BARE_DEBUG, fmt, args);
-		va_end(args);
+		dbugLog("GameProcess", 0, level | LOG_ALL_TO_STDERR | BARE_DEBUG, fmt, std::forward<Args>(args)...);
 	}
 
 	void Log(const char* msg)
@@ -106,22 +117,14 @@ namespace GameProcessManager
 	//! Ask the server manager to shutdown a particular server type.
 	void RemoveServer(SERVER_TYPE type_);
 
+	//! Find a process by it's process ID.
+	GameProcess* LookupGameProcess(uint64_t processID_);
+
 	//! Ask the server manager to do it's thing.
 	//! @return false when there are no processes to manage.
 	bool Heartbeat();
 
 	//! Shutdown.
 	void Shutdown();
-
-#pragma pack(push, 1)
-	//! @struct GameProcessManager::Introduction
-	//! @brief Identification message from a managed process.
-	//! @detail Tells the controller who is attempting a connection.
-	struct Introduction
-	{
-		UINT64	m_processID;
-		UINT32	m_processType;
-		UINT32	m_token;
-	};
-#pragma pack(pop)
 }
+

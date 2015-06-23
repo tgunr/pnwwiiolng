@@ -14,14 +14,14 @@
 #include "strt/strtDTL.h"
 #include "weap/weapSpec.h"
 
-extern const char* facilityTypeName[] ; // defined in weapList.c
+extern const char* facilityTypeName[]; // defined in weapList.c
 
 struct CP_PARAMS
 {
 	SINT8		filename[MAX_OBJNAME_LENGTH];
 	SINT32		ttp;			// Time to process (-1) (300 seconds)
 	SINT8		stratFlags;	// general strat object flags
-} ;
+};
 
 struct FACILITY_PARAMS
 {
@@ -34,14 +34,14 @@ struct FACILITY_PARAMS
 
 	SINT8		stratFlags;		// general strat object flags
 
-} ;
+};
 
 struct SPAWN_ABILITY
 {
 	WEAPON_SPEC	weap;		// type should allways be 0
 	SINT8		slots;		// number of vehicle slots for complex
 	SINT8		points;
-} ;
+};
 
 struct BUILDING_PARAMS
 {
@@ -56,7 +56,7 @@ struct BUILDING_PARAMS
 	SPAWN_ABILITY spawn;		// what the spawn point can spawn
 	SINT32		objectValue;	//The value of the object
 
-} ;
+};
 
 struct DEPOT_LINK_PARAMS
 {
@@ -65,4 +65,4 @@ struct DEPOT_LINK_PARAMS
 	SINT32		haulCapacity;		// capacity of hauler
 	SINT32		minCapacity;		// min capacity of link
 	SINT32		maxCapacity;		// max capacity of link
-} ;
+};

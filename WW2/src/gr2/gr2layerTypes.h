@@ -3,7 +3,6 @@
 #include "granny2.h"
 #include <stack>
 #include "include/systypes.h"
-#include "include/inplace_vector.h"
 //#include "gr2/gr2layer.h"
 #include "math/Vec3f.h"
 #include "mem/mem.h"
@@ -41,7 +40,7 @@ public:
 	// this can be used to create or delete additional resources
 	typedef void (*INSTANCE_HOOK)(HOOK, T*);
 
-	GR2_POOL(UINT32 is = 32, UINT32 bs = 32, STRATEGY s = ALLOC, INSTANCE_HOOK h = NULL) :
+	GR2_POOL(UINT32 is = 32, UINT32 bs = 32, STRATEGY s = ALLOC, INSTANCE_HOOK h = nullptr) :
 		_hook(h),
 		_strategy(s),
 		_blockSize(bs),
@@ -105,7 +104,7 @@ public:
 	void Allocate(UINT32 num)
 	{
 		// block pointer
-		T* block = NULL;
+		T* block = nullptr;
 
 		// size in bytes of our object
 		size_t size = sizeof(T);
@@ -166,7 +165,7 @@ public:
 			for(unsigned int i = 0; i < _blocks.size(); ++i)
 			{
 				delete [] _blocks[i];
-				_blocks[i] = NULL;
+				_blocks[i] = nullptr;
 			}
 		}
 		else
@@ -174,7 +173,7 @@ public:
 			for(unsigned int i = 0; i < _blocks.size(); ++i)
 			{
 				memFree(_blocks[i]);
-				_blocks[i] = NULL;
+				_blocks[i] = nullptr;
 			}
 		}
 
@@ -368,17 +367,17 @@ typedef std::vector<int> GR2_ID_LIST;
 struct gr2MeshData
 {
 	gr2MeshData() :
-		GrannyMesh(NULL),
-		GrannyBinding(NULL),
-		GrannyDeformer(NULL),
+		GrannyMesh(nullptr),
+		GrannyBinding(nullptr),
+		GrannyDeformer(nullptr),
 		rigidMesh(TRUE),
-		indexArray(NULL),
-		vertexArray(NULL),
-		pngt(NULL),
+		indexArray(nullptr),
+		vertexArray(nullptr),
+		pngt(nullptr),
         is_normal(false),
         NormalEnabled(9999),
         vboid(0),
-		drawcallback(NULL)
+		drawcallback(nullptr)
 	{
 	}
 
@@ -389,30 +388,30 @@ struct gr2MeshData
 
 	void reset()
 	{
-		drawcallback = NULL;
+		drawcallback = nullptr;
 		textureRefs.clear();
 		materialRefs.clear();
 
         if(indexArray)
             delete[] indexArray;
 
-		indexArray = NULL;
+		indexArray = nullptr;
 
         if(vertexArray)
             delete[] vertexArray;
 
-		vertexArray = NULL;
+		vertexArray = nullptr;
 
         if(GrannyBinding)
         {
             GrannyFreeMeshBinding(GrannyBinding);
-            GrannyBinding = NULL;
+            GrannyBinding = nullptr;
         }
 
         if(GrannyDeformer)
         {
             GrannyFreeMeshDeformer(GrannyDeformer);
-            GrannyDeformer = NULL;
+            GrannyDeformer = nullptr;
         }
 
         if(pngt)
@@ -421,7 +420,7 @@ struct gr2MeshData
         is_normal = false;
         NormalEnabled = 9999;
 
-		pngt = NULL;
+		pngt = nullptr;
 	}
 
 	// Granny's mesh information for this mesh
@@ -481,15 +480,11 @@ struct gr2Mesh
 	// when we last deformed this mesh
 	SINT32 lastDeform;
 
-#if defined(USE_OSG)
-    std::map<int, NormalStateSet*> _ss;
-#endif
-
     gr2Mesh()
     {
-		data = NULL;
-		vertexArray = NULL;
-		pngt = NULL;
+		data = nullptr;
+		vertexArray = nullptr;
+		pngt = nullptr;
         active = FALSE;
 		mutate = FALSE;
 		lastDeform = 0;
@@ -545,7 +540,7 @@ struct gr2Mesh
 
 	void reset()
 	{
-		data = NULL;
+		data = nullptr;
 		active = FALSE;
 		mutate = FALSE;
 		lastDeform = 0;
@@ -553,12 +548,12 @@ struct gr2Mesh
         if(vertexArray)
             delete[] vertexArray;
 
-		vertexArray = NULL;
+		vertexArray = nullptr;
 
         if(pngt)
             delete[] pngt;
 
-		pngt = NULL;
+		pngt = nullptr;
 	}
 
 #ifdef GR2_MEMORY_PAD
@@ -588,7 +583,7 @@ struct gr2Model
 	virtual void reset();
 
 	// attachments
-	LOGICAL Attach(gr2Model* toModel, SCHAR* toBone, SCHAR* fromBone = NULL);
+	LOGICAL Attach(gr2Model* toModel, SCHAR* toBone, SCHAR* fromBone = nullptr);
 	LOGICAL	Attach(gr2Model* toModel, SINT32 toBone, SINT32 fromBone = 0);
 	void Detach();
 	void UpdateAttachment();
@@ -673,7 +668,7 @@ struct gr2Model
 	void ResurrectBlend(gr2AnimationBlend* animationBlend, FLOAT32 maxEaseInTime);
 	void RemoveWhenDone(gr2AnimationBlend* animationBlend);
 	// note .. set easeOutOverrideTime to -1 if you want to use the default ease out time
-	LOGICAL RemoveAllBlends(FLOAT32 easeOutOverrideTime, gr2AnimationBlend* blend = NULL);
+	LOGICAL RemoveAllBlends(FLOAT32 easeOutOverrideTime, gr2AnimationBlend* blend = nullptr);
 	LOGICAL ClearBlends();
 	LOGICAL IsBlendComplete(gr2AnimationBlend* animationBlend);
 	FLOAT32	GetBlendCompletion(gr2AnimationBlend* animationBlend);
@@ -912,7 +907,7 @@ struct gr2AnimModel : public gr2Model
 	void ResurrectBlend(gr2AnimationBlend* animationBlend, FLOAT32 maxEaseInTime);
 	void RemoveWhenDone(gr2AnimationBlend* animationBlend);
 	// note .. set easeOutOverrideTime to -1 if you want to use the default ease out time
-	LOGICAL RemoveAllBlends(FLOAT32 easeOutOverrideTime, gr2AnimationBlend* blend = NULL);
+	LOGICAL RemoveAllBlends(FLOAT32 easeOutOverrideTime, gr2AnimationBlend* blend = nullptr);
 	LOGICAL ClearBlends();
 	LOGICAL IsBlendComplete(gr2AnimationBlend* animationBlend);
 	FLOAT32	GetBlendCompletion(gr2AnimationBlend* animationBlend);

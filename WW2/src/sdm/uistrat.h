@@ -14,7 +14,7 @@ struct FULLID
 	SINT32	scx;
 	SINT32	scy;
 	SINT32	id;
-} ;
+};
 
 #define GLOBAL_FLAG_NEW			0x8000
 #define GLOBAL_FLAG_CHANGED		0x4000
@@ -35,7 +35,7 @@ struct _CP
 	UINT32	flags;			// Link flags
 	UINT32	serial;			// Global unique serial number
 
-} ;
+};
 
 struct _FACILITY
 {
@@ -55,7 +55,7 @@ struct _FACILITY
 	UINT32	flags;			// Link flags
 	UINT32	serial;			// Global unique serial number
 
-} ;
+};
 
 struct _BUILDING
 {
@@ -74,7 +74,7 @@ struct _BUILDING
 	UINT32	flags;			// Link flags
 	UINT32	serial;			// Global unique serial number
 
-} ;
+};
 
 #define LINK_FLAG_SETOPEN		0x0001
 #define LINK_FLAG_DISABLED		0x0002
@@ -97,7 +97,7 @@ struct _DEPOTLINK
 	UINT32	flags;			// Link flags
 	UINT32	serial;			// Global unique serial number
 
-} ;
+};
 
 #define WAYPOINT_FLAG_BRIDGE	0x0001
 
@@ -114,6 +114,6 @@ struct _WAYPOINT
 	UINT32	flags;			// Waypoint flags
 	UINT32	serial;			// Global unique serial number
 
-} ;
+};
 
 #pragma pack(pop)

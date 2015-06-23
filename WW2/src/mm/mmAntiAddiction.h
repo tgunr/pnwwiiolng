@@ -9,14 +9,14 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 // Check thru the minor's list for any players who need updates.
-extern void mmCheckAddictionTimers() ;
+extern void mmCheckAddictionTimers();
 
 // Add a minor to the anti-addiction list
-extern void mmAddMinor(class Player* player, UINT32 playedTime) ;
+extern void mmAddMinor(class Player* player, UINT32 playedTime);
 
 // Remove a minor from the anti-addiction list and save their played time
-extern void mmRemoveMinor(class Player* player) ;
+extern void mmRemoveMinor(class Player* player);
 
 // Test if a player is in the penalty time
-extern FLOAT32 mmAntiAddictionScoringMultiplier(const Player* player) ;
+extern FLOAT32 mmAntiAddictionScoringMultiplier(const Player* player);
 

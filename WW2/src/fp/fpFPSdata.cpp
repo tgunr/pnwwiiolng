@@ -298,8 +298,8 @@ static void _fpFPSReadVisualLoadouts();
 
 static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 {
-	std::string weapFileName(FPS_WEAP_DATA_DIR) ;
-	weapFileName += filename ;
+	std::string weapFileName(FPS_WEAP_DATA_DIR);
+	weapFileName += filename;
 
 	const SINT32 weapDataFile = fioOpen(weapFileName.c_str());
 
@@ -317,11 +317,11 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 	{
 		if (buf[0] == '#') continue;
 
-		char* varName = NULL;
-		char* varData = NULL;
+		char* varName = nullptr;
+		char* varData = nullptr;
 		fpFPSDataGetVarnameAndContents(&varName, &varData, buf);
 
-		if (varName == NULL || varData == NULL) continue;
+		if (varName == nullptr || varData == nullptr) continue;
 
 		if (stricmp(buf, "weaponType") == 0)
 			_fpFPSDataHandleWeaponTypeString (weapon, varData);
@@ -401,7 +401,7 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 			fpsWeapons[weapon].weapDeployKneelDeployDownAngle = (FLOAT32) atof (varData);
 
 		else if (stricmp(buf, "staticDeploy") == 0)
-			fpsWeapons[weapon].staticDeploy = strtoul(varData, NULL, 10) ;
+			fpsWeapons[weapon].staticDeploy = strtoul(varData, nullptr, 10);
 		else if (stricmp(buf, "holdfire") == 0)
 			fpsWeapons[weapon].holdfire = (SINT32) atol (varData);
 		else if (stricmp(buf, "sniperGunSight") == 0)
@@ -413,7 +413,7 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 		else if (stricmp(buf, "hudIconType") == 0)
 			fpsWeapons[weapon].hudIconType = (fpFPSIconType) atol (varData);
 		else if (stricmp(buf, "ejectImmediate") == 0)
-			fpsWeapons[weapon].ejectImmediate = strtoul(varData, NULL, 10);
+			fpsWeapons[weapon].ejectImmediate = strtoul(varData, nullptr, 10);
 		else if (stricmp(buf, "clipBullets") == 0)
 			fpsWeapons[weapon].clipBullets = atol(varData);
 		else if (stricmp(buf, "reloadSound") == 0)
@@ -492,18 +492,18 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 			fpsWeapons[weapon].rgFiringAngle = (FLOAT32) atof (varData);
 
 		else if (stricmp(buf, "leanFireOK") == 0)
-			fpsWeapons[weapon].leanFireOK = strtoul(varData, NULL, 10);
+			fpsWeapons[weapon].leanFireOK = strtoul(varData, nullptr, 10);
 
 		else if (stricmp(buf, "onlyFireDeployed") == 0)
-			fpsWeapons[weapon].onlyFireDeployed = strtoul(varData, NULL, 10);
+			fpsWeapons[weapon].onlyFireDeployed = strtoul(varData, nullptr, 10);
 		else if (stricmp(buf, "suppressAim") == 0)
-			fpsWeapons[weapon].suppressAim = strtoul(varData, NULL, 10);
+			fpsWeapons[weapon].suppressAim = strtoul(varData, nullptr, 10);
 		else if (stricmp(buf, "deployPivotBone") == 0)
 			fpsWeapons[weapon].deployPivotBone = (SCHAR*) strpool (varData);
 		else if (stricmp(buf, "perBulletATP") == 0)
 			fpsWeapons[weapon].perBulletATP = (FLOAT32) atof (varData);
 		else if (stricmp(buf, "riseStopsReload") == 0)
-			fpsWeapons[weapon].riseStopsReload = strtoul(varData, NULL, 10);
+			fpsWeapons[weapon].riseStopsReload = strtoul(varData, nullptr, 10);
 		else if (stricmp(buf, "delayAfterFire") == 0)
 			fpsWeapons[weapon].delayAfterFire = (FLOAT32) atof (varData);
 
@@ -558,7 +558,7 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 
 static void _fpFPSDataHandleWeaponTypeString (fpsWeaponTypes weapon, char* typestring)
 {
-	if (typestring == NULL)
+	if (typestring == nullptr)
 		return;
 
 	int	type;
@@ -620,23 +620,23 @@ void fpFPSDataReadFPSFile()
 
 		fpFPSDataGetVarnameAndContents(&varName, &varData, buf);
 
-		if ((varName == NULL) || (varData == NULL))
+		if ((varName == nullptr) || (varData == nullptr))
 			continue;
 
 		// for easy lookup of new variable hashes
 		//if(stricmp(varName, "concussionMod") == 0)
 		//	int i = 0;
 
-		UINT64 hash = fpStringHash(buf) ;
+		UINT64 hash = fpStringHash(buf);
 
 		switch (hash)
 		{
 		case swimDisplacement_hash:
 			fpsTrooper.swimDisplacement = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case eyeRideDisplacement_hash:
 			fpsTrooper.eyeRideDisplacement = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case eyeHeights_hash:
 		{
 			sscanf(varData, "%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f,%f",
@@ -658,563 +658,563 @@ void fpFPSDataReadFPSFile()
 		/*
 		case standEyeHeightDisplacement_hash:
 			fpsTrooper.eyeHeight[FPS_POSITION_STAND] = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case crouchEyeHeightDisplacement_hash:
 			fpsTrooper.eyeHeight[FPS_POSITION_CROUCH] = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case proneEyeHeightDisplacement_hash:
 			fpsTrooper.eyeHeight[FPS_POSITION_PRONE] = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case sitEyeHeightDisplacement_hash:
 			fpsTrooper.eyeHeight[FPS_POSITION_SITTING] = (FLOAT32) atof (varData);
-		break ;
+		break;
 		*/
 		case defaultFOV_hash:
 			fpsTrooper.defaultFOV = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case FOVSpeed_hash:
 			fpsTrooper.FOVSpeed = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case forwardAccel_hash:
 			fpsTrooper.forwardAccel = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case strafeAccel_hash:
 			fpsTrooper.strafeAccel = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case stillSpeed_hash:
 			fpsTrooper.movementSpeeds[FPS_SPEED_STILL] = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case sprintSpeed_hash:
 			fpsTrooper.movementSpeeds[FPS_SPEED_SPRINT] = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case trotSpeed_hash:
 			fpsTrooper.movementSpeeds[FPS_SPEED_TROT] = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case quickSpeed_hash:
 			fpsTrooper.movementSpeeds[FPS_SPEED_QUICK] = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case walkSpeed_hash:
 			fpsTrooper.movementSpeeds[FPS_SPEED_WALK] = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case creepSpeed_hash:
 			fpsTrooper.movementSpeeds[FPS_SPEED_CREEP] = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case crawlSpeed_hash:
 			fpsTrooper.movementSpeeds[FPS_SPEED_CRAWL] = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case swimSpeed_hash:
 			fpsTrooper.movementSpeeds[FPS_SPEED_SWIM] = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case backwardsSpeed_hash:
 			fpsTrooper.movementSpeeds[FPS_SPEED_BACKWARDS] = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case backwardsCrouchSpeed_hash:
 			fpsTrooper.movementSpeeds[FPS_SPEED_BACKWARDS_CROUCH] = (FLOAT32) atof (varData);
-		break ;
+		break;
 		/*
 		case standToCrouchTime_hash:
 			fpsTrooper.transitionTimes[FPS_POSITION_STAND][FPS_POSITION_CROUCH] = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case standToProneTime_hash:
 			fpsTrooper.transitionTimes[FPS_POSITION_STAND][FPS_POSITION_PRONE] = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case crouchToStandTime_hash:
 			fpsTrooper.transitionTimes[FPS_POSITION_CROUCH][FPS_POSITION_STAND] = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case crouchToProneTime_hash:
 			fpsTrooper.transitionTimes[FPS_POSITION_CROUCH][FPS_POSITION_PRONE] = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case proneToStandTime_hash:
 			fpsTrooper.transitionTimes[FPS_POSITION_PRONE][FPS_POSITION_STAND] = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case proneToCrouchTime_hash:
 			fpsTrooper.transitionTimes[FPS_POSITION_PRONE][FPS_POSITION_CROUCH] = (FLOAT32) atof (varData);
-		break ;
+		break;
 		*/
 		case aimControl_hash:
 			fpsTrooper.aimControl = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case weaponChangeTime_hash:
 			fpsTrooper.weaponChangeTime = ((FLOAT32) atof (varData) * .75f); // speed it up a little
-		break ;
+		break;
 		case maxSafeVehicleSpeed_hash:
 			fpsTrooper.maxSafeVehicleSpeed = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case killVehicleSpeed_hash:
 			fpsTrooper.killVehicleSpeed = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case unrideJoules_hash:
 			fpsTrooper.unrideJoules = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case maxRotationSpeed_hash:
 			fpsTrooper.maxRotationSpeed = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case keyRotationSpeed_hash:
 			fpsTrooper.keyRotationSpeed = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case maxEyeUpAngle_hash:
 			fpsTrooper.maxEyeUpAngle = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case maxEyeDownAngle_hash:
 			fpsTrooper.maxEyeDownAngle = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case maxRidingEyeUpAngle_hash:
 			fpsTrooper.maxRidingEyeUpAngle = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case maxRidingEyeDownAngle_hash:
 			fpsTrooper.maxRidingEyeDownAngle = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case maxEyeAngle_hash:
 			fpsTrooper.maxHorizEyeAngle = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case minEyeMovement_hash:
 			fpsTrooper.minEyeMovement = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case eyeMoveMultiplier_hash:
 			fpsTrooper.eyeMoveMultiplier = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case vertGranularityMultiplier_hash:
 			fpsTrooper.vertGranularityMultiplier = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case deployedGranularityMultiplier_hash:
 			fpsTrooper.deployedGranularityMultiplier = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case maxProneDeployedDownAngle_hash:
 			fpsTrooper.maxProneDeployedDownAngle = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case maxProneDeployedUpAngle_hash:
 			fpsTrooper.maxProneDeployedUpAngle = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case maxProneDeployedLeftAngle_hash:
 			fpsTrooper.maxProneDeployedLeftAngle = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case maxProneDeployedRightAngle_hash:
 			fpsTrooper.maxProneDeployedRightAngle = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case proneDeployedClimbMultiplier_hash:
 			fpsTrooper.proneDeployedClimbMultiplier = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case proneDeployedHorizShiftMultiplier_hash:
 			fpsTrooper.proneDeployedHorizShiftMultiplier = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case proneDeployedVertShiftMultiplier_hash:
 			fpsTrooper.proneDeployedVertShiftMultiplier = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case atpStandStill_hash:
 			fpsTrooper.atpStandStill = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case atpStandForward_hash:
 			fpsTrooper.atpStandForward = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case atpStandBackward_hash:
 			fpsTrooper.atpStandBackward = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case atpStandForwardWalk_hash:
 			fpsTrooper.atpStandForwardWalk = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case atpStandBackwardWalk_hash:
 			fpsTrooper.atpStandBackwardWalk = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case atpStandStillRelaxed_hash:
 			fpsTrooper.atpStandStillRelaxed = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case atpStandForwardRelaxed_hash:
 			fpsTrooper.atpStandForwardRelaxed = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case atpStandBackwardRelaxed_hash:
 			fpsTrooper.atpStandBackwardRelaxed = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case atpStandForwardWalkRelaxed_hash:
 			fpsTrooper.atpStandForwardWalkRelaxed = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case atpStandBackwardWalkRelaxed_hash:
 			fpsTrooper.atpStandBackwardWalkRelaxed = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case atpStandSprint_hash:
 			fpsTrooper.atpStandSprint = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case atpCrouchStill_hash:
 			fpsTrooper.atpCrouchStill = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case atpCrouchForward_hash:
 			fpsTrooper.atpCrouchForward = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case atpCrouchStillRelaxed_hash:
 			fpsTrooper.atpCrouchStillRelaxed = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case atpCrouchForwardRelaxed_hash:
 			fpsTrooper.atpCrouchForwardRelaxed = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case atpProneStill_hash:
 			fpsTrooper.atpProneStill = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case atpProneForward_hash:
 			fpsTrooper.atpProneForward = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case atpSwimStill_hash:
 			fpsTrooper.atpSwimStill = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case atpSwimForward_hash:
 			fpsTrooper.atpSwimForward = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case atpSitStill_hash:
 			fpsTrooper.atpSitStill = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case atpSprintMinimum_hash:
 			fpsTrooper.atpSprintMinimum = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case atpSprintAllowAgain_hash:
 			fpsTrooper.atpSprintAllowAgain = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case atpBackwardMinimum_hash:
 			fpsTrooper.atpBackwardMinimum = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case atpCreepMinimum_hash:
 			fpsTrooper.atpCreepMinimum = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case atpCrawlMinimum_hash:
 			fpsTrooper.atpCrawlMinimum = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case atpSwimMinimum_hash:
 			fpsTrooper.atpSwimMinimum = (FLOAT32) atof (varData);
-		break ;
+		break;
 
         case restPulse_hash:
 			fpsTrooper.restPulse = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case maxPulse_hash:
 			fpsTrooper.maxPulse = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case maxHeartBreathMultiplier_hash:
 			fpsTrooper.maxHeartBreathMultiplier = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case timeToMaxHeartBreathMultiplier_hash:
 			fpsTrooper.timeToMaxHeartBreathMultiplier = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case maxPoseMultiplier_hash:
 			fpsTrooper.maxPoseMultiplier = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case timeToMaxPoseMultiplier_hash:
 			fpsTrooper.timeToMaxPoseMultiplier = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case rejuvTimeMultiplier_hash:
 			fpsTrooper.rejuvTimeMultiplier = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case moveMultiplier_hash:
 			fpsTrooper.moveMultiplier = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case heartMultiplier_hash:
 			fpsTrooper.heartMultiplier = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case breathMultiplier_hash:
 			fpsTrooper.breathMultiplier = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case poseMultiplier_hash:
 			fpsTrooper.poseMultiplier = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case pulseBreathRatio_hash:
 			fpsTrooper.pulseBreathRatio = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case standPoseWobbleMultiplier_hash:
 			fpsTrooper.standPoseWobbleMultiplier = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case kneelPoseWobbleMultiplier_hash:
 			fpsTrooper.kneelPoseWobbleMultiplier = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case pronePoseWobbleMultiplier_hash:
 			fpsTrooper.pronePoseWobbleMultiplier = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case minArmWobbleTime_hash:
 			fpsTrooper.minArmWobbleTime = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case maxArmWobbleTime_hash:
 			fpsTrooper.maxArmWobbleTime = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case horizWobbleAngleMultiplier_hash:
 			fpsTrooper.horizWobbleAngleMultiplier = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case vertWobbleAngleMultiplier_hash:
 			fpsTrooper.vertWobbleAngleMultiplier = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case fallFarTime_hash:
 			fpsTrooper.fallFarTime = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case fallShortTime_hash:
 			fpsTrooper.fallShortTime = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case maxWobbleAngle_hash:
 			fpsTrooper.maxWobbleAngle = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case aimBreathTime_hash:
 			fpsTrooper.aimBreathTime = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case aimStartValue_hash:
 			fpsTrooper.aimStartValue = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case bridgeDamageJoules_hash:
 			fpsTrooper.bridgeDamageJoules = (FLOAT64) atof (varData);
-		break ;
+		break;
 		case bridgeRepairJoules_hash:
 			fpsTrooper.bridgeRepairJoules = (FLOAT64) atof (varData);
-		break ;
+		break;
 		case redScreenFadeTime_hash:
 			fpsTrooper.redScreenFadeTime = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case redScreenMinAlpha_hash:
 			fpsTrooper.redScreenMinAlpha = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case concussionMod_hash:
 			fpsTrooper.concussionMod = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case parachuteDeployTime_hash:
 			fpsTrooper.parachuteDeployTime = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case parachuteWornATPMultiplier_hash:
 			fpsTrooper.parachuteWornATPMultiplier = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case paratroopATPModifier_hash:
 			fpsTrooper.paratroopATPModifier = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case parachuteFallSpeed_hash:
 			fpsTrooper.parachuteFallSpeed = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case minSafeFallDistance_hash:
 			fpsTrooper.minSafeFallDistance = (FLOAT32) atof (varData);
-		break ;
+		break;
 
 		case overSupplyRadius_hash:
 			fpsTrooper.overSupplyRadius = (FLOAT32) atof (varData);
-		break ;
+		break;
 
 		case leanLeftHoriz_hash:
 			fpsTrooper.leanLeftHoriz = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case leanLeftVert_hash:
 			fpsTrooper.leanLeftVert = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case leanRightHoriz_hash:
 			fpsTrooper.leanRightHoriz = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case leanRightVert_hash:
 			fpsTrooper.leanRightVert = (FLOAT32) atof (varData);
-		break ;
+		break;
 		case leanTime_hash:
 			fpsTrooper.leanTime = (FLOAT32) atof (varData);
-		break ;
+		break;
 
 		case thompson1928File_hash:
 			_fpFPSDataReadWeaponFile (THOMPSON, varData);
-		break ;
+		break;
 		case m1thompsonFile_hash:
 			_fpFPSDataReadWeaponFile (M1THOMPSON, varData);
-		break ;
+		break;
 		case mp40File_hash:
 			_fpFPSDataReadWeaponFile (MP40, varData);
-		break ;
+		break;
 		case masFile_hash:
 			_fpFPSDataReadWeaponFile (MAS, varData);
-		break ;
+		break;
 		case satchelFile_hash:
 			_fpFPSDataReadWeaponFile (SATCHEL, varData);
-		break ;
+		break;
 		case satchelAxFile_hash:
 			_fpFPSDataReadWeaponFile (SATCHEL_AX, varData);
-		break ;//DEG_CHANGE
+		break;//DEG_CHANGE
 		case kar98kFile_hash:
 			_fpFPSDataReadWeaponFile (KAR98K, varData);
-		break ;
+		break;
 		case kar98kSFile_hash:
 			_fpFPSDataReadWeaponFile (KAR98KS, varData);
-		break ;
+		break;
 		case enfieldFile_hash:
 			_fpFPSDataReadWeaponFile (ENFIELD, varData);
-		break ;
+		break;
 		case enfieldMk4File_hash:
 			_fpFPSDataReadWeaponFile (ENFIELDMK4, varData);
-		break ;
+		break;
 		case lebelFile_hash:
 			_fpFPSDataReadWeaponFile (LEBEL, varData);
-		break ;
+		break;
 		case mas36File_hash:
 			_fpFPSDataReadWeaponFile (MAS36, varData);
-		break ;
+		break;
 		case lebelMleFile_hash:
 			_fpFPSDataReadWeaponFile (LEBELMLE, varData);
-		break ;
+		break;
 		case m1935aFile_hash:
 			_fpFPSDataReadWeaponFile (M1935A, varData);
-		break ;
+		break;
 		case lugerFile_hash:
 			_fpFPSDataReadWeaponFile (LUGER, varData);
-		break ;
+		break;
 		case mills36mk1File_hash:
 			_fpFPSDataReadWeaponFile (MILLS36MK1, varData);
-		break ;
+		break;
         case frbangFile_hash:
 			_fpFPSDataReadWeaponFile (FRBANG, varData);
-		break ;
+		break;
 		case stigrFile_hash:
 			_fpFPSDataReadWeaponFile (STIGR, varData);
-		break ;
+		break;
 		case enfmk2File_hash:
 			_fpFPSDataReadWeaponFile (WEBLEY, varData);
-		break ;
+		break;
 		case binocsFile_hash:
 			_fpFPSDataReadWeaponFile (BINOCS, varData);
-		break ;
+		break;
 		case knife_axisFile_hash:
 			_fpFPSDataReadWeaponFile (KNIFE_AXIS, varData);
-		break ;
+		break;
 		case knife_alliedFile_hash:
 			_fpFPSDataReadWeaponFile (KNIFE_ALLIED, varData);
-		break ;
+		break;
 		case brenFile_hash:
 			_fpFPSDataReadWeaponFile (BREN, varData);
-		break ;
+		break;
 		case mg34File_hash:
 			_fpFPSDataReadWeaponFile (MG34, varData);
-		break ;
+		break;
 		case fm29File_hash:
 			_fpFPSDataReadWeaponFile (FM29, varData);
-		break ;
+		break;
 		case hgr39File_hash:
 			_fpFPSDataReadWeaponFile (HGR39, varData);
-		break ;
+		break;
 		case m18File_hash:
 			_fpFPSDataReadWeaponFile (M18, varData);
-		break ;
+		break;
 		case frsmokeFile_hash:
 			_fpFPSDataReadWeaponFile (FRSMOKE, varData);
-		break ;
+		break;
 		case buildToolFile_hash:
 			_fpFPSDataReadWeaponFile (BUILD_TOOL, varData);
-		break ;
+		break;
 
 		case m1garandFile_hash:
 			_fpFPSDataReadWeaponFile (M1GARAND, varData);
-		break ;
+		break;
 		case colt1911File_hash:
 			_fpFPSDataReadWeaponFile (COLT1911, varData);
-		break ;
+		break;
 		case springfld1903File_hash:
 			_fpFPSDataReadWeaponFile (SPRINGFIELD1903, varData);
-		break ;
+		break;
 		case bronwingbarFile_hash:
 			_fpFPSDataReadWeaponFile (BAR, varData);
-		break ;
+		break;
 		case gew43File_hash:
 			_fpFPSDataReadWeaponFile (GEW43, varData);
-		break ;
+		break;
 		case mark2File_hash:
 			_fpFPSDataReadWeaponFile (MARK2, varData);
-		break ;
+		break;
 		case ammoFile_hash:
 			_fpFPSDataReadWeaponFile (AMMO, varData);
-		break ;
+		break;
 		case g30File_hash:
 			_fpFPSDataReadWeaponFile (RG_G30, varData);
-		break ;
+		break;
 		case vbFile_hash:
 			_fpFPSDataReadWeaponFile (RG_VB, varData);
-		break ;
+		break;
 		case millsFile_hash:
 			_fpFPSDataReadWeaponFile (RG_MILLS, varData);
-		break ;
+		break;
 		case boysmk1File_hash:
 			_fpFPSDataReadWeaponFile (BOYSMK1, varData);
-		break ;
+		break;
 		case pzb39File_hash:
 			_fpFPSDataReadWeaponFile (PZB39, varData);
-		break ;
+		break;
 		case bridgeRepairFile_hash:
 			_fpFPSDataReadWeaponFile (BRIDGE_REPAIR, varData);
-		break ;
+		break;
 		case ukltmortarFile_hash:
 			_fpFPSDataReadWeaponFile (LTMORTAR_UK, varData);
-		break ;
+		break;
 		case frltmortarFile_hash:
 			_fpFPSDataReadWeaponFile (LTMORTAR_FR, varData);
-		break ;
+		break;
 		case deltmortarFile_hash:
 			_fpFPSDataReadWeaponFile (LTMORTAR_DE, varData);
-		break ;
+		break;
 
 		case bazookaFile_hash:
 			_fpFPSDataReadWeaponFile (BAZOOKA, varData);
-		break ;
+		break;
 		case pzschreckFile_hash:
 			_fpFPSDataReadWeaponFile (PZSCHRECK, varData);
-		break ;
+		break;
 
 		case piatFile_hash:
 			_fpFPSDataReadWeaponFile (PIAT, varData);
-		break ;
+		break;
 
 		case m1903a3File_hash:
 			_fpFPSDataReadWeaponFile (M1903A3, varData);
-		break ;
+		break;
 
 		case ussmokeFile_hash:
 			_fpFPSDataReadWeaponFile (USSMOKE, varData);
-		break ;
+		break;
 
 		case crawlSound_hash:
 			fpsTrooper.moveSounds[FPS_SOUND_CRAWL] = (SCHAR*) strpool (varData);
-		break ;
+		break;
 		case creepSound_hash:
 			fpsTrooper.moveSounds[FPS_SOUND_CREEP] = (SCHAR*) strpool (varData);
-		break ;
+		break;
 		case creepAimSound_hash:
 			fpsTrooper.moveSounds[FPS_SOUND_CREEP_AIM] = (SCHAR*) strpool (varData);
-		break ;
+		break;
 		case trotSound_hash:
 			fpsTrooper.moveSounds[FPS_SOUND_TROT] = (SCHAR*) strpool (varData);
-		break ;
+		break;
 		case trotAimSound_hash:
 			fpsTrooper.moveSounds[FPS_SOUND_TROT_AIM] = (SCHAR*) strpool (varData);
-		break ;
+		break;
 		case sprintSound_hash:
 			fpsTrooper.moveSounds[FPS_SOUND_SPRINT] = (SCHAR*) strpool (varData);
-		break ;
+		break;
 		case waterSound_hash:
 			fpsTrooper.moveSounds[FPS_SOUND_WATER] = (SCHAR*) strpool (varData);
-		break ;
+		break;
 		case fallNormalSound_hash:
 			fpsTrooper.moveSounds[FPS_SOUND_FALL_NORMAL] = (SCHAR*) strpool (varData);
-		break ;
+		break;
 		case fallNormalHurtSound_hash:
 			fpsTrooper.moveSounds[FPS_SOUND_FALL_NORMAL_HURT] = (SCHAR*) strpool (varData);
-		break ;
+		break;
 		case fallWaterSound_hash:
 			fpsTrooper.moveSounds[FPS_SOUND_FALL_WATER] = (SCHAR*) strpool (varData);
-		break ;
+		break;
 		case fallWaterHurtSound_hash:
 			fpsTrooper.moveSounds[FPS_SOUND_FALL_WATER_HURT] = (SCHAR*) strpool (varData);
-		break ;
+		break;
 		case aimBreathSound_hash:
 			fpsTrooper.aimBreathSound = (SCHAR*) strpool (varData);
-		break ;
+		break;
 		case fallShortSound_hash:
 			fpsTrooper.fallShortSound = (SCHAR*) strpool (varData);
-		break ;
+		break;
 		case fallFarSound_hash:
 			fpsTrooper.fallFarSound = (SCHAR*) strpool (varData);
-		break ;
+		break;
 		case paratroopFreeFallSound_hash:
 			fpsTrooper.moveSounds[FPS_SOUND_FREEFALL] = (SCHAR*) strpool (varData);
-		break ;
+		break;
 		case parachuteOpeningSound_hash:
 			fpsTrooper.parachuteOpeningSound = (SCHAR*) strpool (varData);
-		break ;
+		break;
 		case parachuteDeployedSound_hash:
 			fpsTrooper.moveSounds[FPS_SOUND_PARACHUTE_FALL] = (SCHAR*) strpool (varData);
-		break ;
+		break;
 		case paratroopLandingSound_hash:
 			fpsTrooper.paratroopLandingSound = (SCHAR*) strpool (varData);
-		break ;
+		break;
 		case paratroopLandingWaterSound_hash:
 			fpsTrooper.paratroopLandingWaterSound = (SCHAR*) strpool (varData);
-		break ;
+		break;
 		}
 	}
 
@@ -1226,9 +1226,9 @@ UINT32 fpFPSDataGetVarnameAndContents(SCHAR ** varname, SCHAR ** varcontents, SC
 {
 	*varname = strtok((char*)inputString,"=");
 
-	if (*varname != NULL)
+	if (*varname != nullptr)
 	{
-		*varcontents = strtok(NULL,"=");
+		*varcontents = strtok(nullptr,"=");
 		*varcontents = strtok((char*)*varcontents,"\n"); // strip off the ending newline
 
 		// strip off leading & trailing spaces
@@ -1242,7 +1242,7 @@ UINT32 fpFPSDataGetVarnameAndContents(SCHAR ** varname, SCHAR ** varcontents, SC
 			(*varname)[strlen(*varname)-1] = 0;
 		}
 
-		if (*varcontents != NULL)
+		if (*varcontents != nullptr)
 		{
 			while (*varcontents[0] == ' ')
 			{
@@ -1257,7 +1257,7 @@ UINT32 fpFPSDataGetVarnameAndContents(SCHAR ** varname, SCHAR ** varcontents, SC
 	}
 	else
 	{
-		*varcontents = NULL;
+		*varcontents = nullptr;
 	}
 
 
@@ -1334,7 +1334,7 @@ void fpFPSDataInit ()
 	// clear out the anim_files array
 	for (i=0; i < NUM_WEAPONS; i++)
 	{
-		fpsWeapons[i].clear() ;
+		fpsWeapons[i].clear();
 
 		weap_default[i] = "";
 		clip_default[i] = "";
@@ -2404,7 +2404,7 @@ void fpFPSDataInit ()
 	// need to remember the binocs setting, everything else gets blown away
 	binocsEnabled = fpsTrooper.binocsEnabled;
 
-	fpsTrooper.clear() ;
+	fpsTrooper.clear();
 
 	fpsTrooper.binocsEnabled = binocsEnabled;
 
@@ -2457,29 +2457,29 @@ void fpFPSDataInit ()
 
 #ifdef CACHE_FPS_DATA
 		if(fpsWeapons[i].weaponModel)
-			gr2LoadModel(fpsWeapons[i].weaponModel, NULL, NULL, 0);
+			gr2LoadModel(fpsWeapons[i].weaponModel, nullptr, nullptr, 0);
 
 		if(fpsWeapons[i].clipModel)
-			gr2LoadModel(fpsWeapons[i].clipModel, NULL, NULL, 0);
+			gr2LoadModel(fpsWeapons[i].clipModel, nullptr, nullptr, 0);
 
 		for (int j=0; j < FPS_NUM_AUX_MODELS; j++)
 		{
 			if (fpsWeapons[i].auxModel[j])
-				gr2LoadModel(fpsWeapons[i].auxModel[j], NULL, NULL, 0);
+				gr2LoadModel(fpsWeapons[i].auxModel[j], nullptr, nullptr, 0);
 		}
 #endif
 	}
 
 #ifdef CACHE_FPS_DATA
-	gr2Model* skeleton = gr2Model::Load(skel_model, NULL, NULL, 1);
+	gr2Model* skeleton = gr2Model::Load(skel_model, nullptr, nullptr, 1);
 
 	for(int i = 0; i < NUM_INFANTRY_TYPES; i++)
 	{
 		if(arm_models[i])
-			gr2LoadModel(arm_models[i], skeleton, NULL, 0);
+			gr2LoadModel(arm_models[i], skeleton, nullptr, 0);
 
 		if(leg_models[i])
-			gr2LoadModel(leg_models[i], NULL, NULL, 0);
+			gr2LoadModel(leg_models[i], nullptr, nullptr, 0);
 	}
 
 	gr2FreeModel(skeleton);
@@ -2493,7 +2493,7 @@ fpFPSTrooperLoadout* fpFPSGetTrooperLoadout(const char* id)
 	fpFPSLoadoutMap::iterator found = _loadouts.find(id);
 	if(found != _loadouts.end()) return &(found->second);
 
-	return NULL;
+	return nullptr;
 }
 
 void _fpFPSReadVisualLoadouts()

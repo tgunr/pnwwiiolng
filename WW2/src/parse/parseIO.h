@@ -25,7 +25,7 @@ struct PARSE_CALLBACK
 {
 	char            type[32];
 	PARSE_FUNCTION  function;
-} ;
+};
 
 // maximum number of load module args
 //#define MAX_LM_ARG	3

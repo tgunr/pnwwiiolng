@@ -15,21 +15,21 @@
 
 namespace Chat
 {
-	class Channel ;
-	class ChannelSubcription ;
+	class Channel;
+	class ChannelSubcription;
 }
 
-class Player ;
+class Player;
 
 enum
 {
 	AREA_CHN = MAX_CLIENT_CHANNELS,
 // Insert new "secret" channels here
 	MAX_HOST_CHANNELS
-} ;
+};
 
 // Bit mask for the area chat channel
-static const UINT32 AREA_CHN_BIT = (1 << AREA_CHN) ;
+static const UINT32 AREA_CHN_BIT = (1 << AREA_CHN);
 
 namespace Chat
 {
@@ -40,32 +40,32 @@ class ChannelSubscription
 public:
 	ChannelSubscription()
 		: m_type(NO_CHANNEL)
-		, m_channel(NULL)
-		, m_subscriber(NULL)
+		, m_channel(nullptr)
+		, m_subscriber(nullptr)
 		{}
 
-	class Chat::Channel* channel() const { return m_channel ; }
-	CHANNEL_TYPE type() const { return m_type ; }
+	class Chat::Channel* channel() const { return m_channel; }
+	CHANNEL_TYPE type() const { return m_type; }
 
 	// Channel node can be used to reserve a particular radio slot to a particular radio type
-	bool inUse() const { return (m_type > NO_CHANNEL) ; }
-	bool isPlaceHolder() const { return (inUse() && m_channel == NULL) ; }
-	bool isTuned() const { return (inUse() && m_channel != NULL) ; }
+	bool inUse() const { return (m_type > NO_CHANNEL); }
+	bool isPlaceHolder() const { return (inUse() && m_channel == nullptr); }
+	bool isTuned() const { return (inUse() && m_channel != nullptr); }
 
-	SINT32 teulIndex() const ;
+	SINT32 teulIndex() const;
 
 	//! @brief Subscribe to a specific channel.
-	public: void subscribe(CHANNEL_TYPE type_, Chat::Channel* channel_) ;
+	public: void subscribe(CHANNEL_TYPE type_, Chat::Channel* channel_);
 	//! @brief Unsubscribe from a channel.
-	public: void unsubscribe() ;
+	public: void unsubscribe();
 
 	//! What type of channel this subscription is for.
-	public:		CHANNEL_TYPE	m_type ;				//! The type of channel:
+	public:		CHANNEL_TYPE	m_type;				//! The type of channel:
 	//! Pointer to the channel this subscription is tuned to.
-	public:		Chat::Channel*	m_channel ;
+	public:		Chat::Channel*	m_channel;
 	//! Pointer to the player who owns this subscription.
-	public:		Player*			m_subscriber ;
-} ;
+	public:		Player*			m_subscriber;
+};
 
 class Channel
 {
@@ -79,38 +79,37 @@ public:
 		, m_expireAt(0)
 		, m_subscribers()
 		{
-			m_subscribers.clear() ;
+			m_subscribers.clear();
 		}
 
-private:
-	Channel() ;
-	Channel(const Channel& rhs) ;
+	Channel() = delete;
+	Channel(const Channel& rhs) = delete;
 
 public:
 	ChannelID		channelID;
-	std::string		m_name ;
-	ChatHandle		m_handle ;
+	std::string		m_name;
+	ChatHandle		m_handle;
 
 	FULL_OBJ_ID		m_cpID;	//cpID, if associated with a CP
 	UINT32			m_missionID;
-	TeulTimeMS		m_expireAt ;
+	TeulTimeMS		m_expireAt;
 
-	public:		typedef std::set<Chat::ChannelSubscription*> Subscribers ;
+	public:		typedef std::set<Chat::ChannelSubscription*> Subscribers;
 
-	public:		const Subscribers& subscribers() const { return m_subscribers ; }
+	public:		const Subscribers& subscribers() const { return m_subscribers; }
 
-	friend class Chat::ChannelSubscription ;
+	friend class Chat::ChannelSubscription;
 	//! Add cnode to the subscribers list, does not modify cnode.
-	private:	void addSubscriber(const Chat::ChannelSubscription& cnode) ;
+	private:	void addSubscriber(const Chat::ChannelSubscription& cnode);
 	//! Remove cnode from the subscribers list, does not modify cnode.
-	private:	void removeSubscriber(Chat::ChannelSubscription& cnode) ;
+	private:	void removeSubscriber(Chat::ChannelSubscription& cnode);
 
-	public:		size_t numSubscribers() const { return m_subscribers.size() ; }
+	public:		size_t numSubscribers() const { return m_subscribers.size(); }
 
-	public:		CHANNEL_TYPE type() const { return channelID.Type() ; }
+	public:		CHANNEL_TYPE type() const { return channelID.Type(); }
 
-	private:	Subscribers		m_subscribers ;		// Players tuned to channel.
-} ;
+	private:	Subscribers		m_subscribers;		// Players tuned to channel.
+};
 
 }
 

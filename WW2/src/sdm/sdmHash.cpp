@@ -7,56 +7,45 @@
 //
 // Originating Programmer: Marty "Vandal" Poulin
 
-#include "dbug/dbug.h"
-
-#include <string.h>
 #include <map>
+#include <array>
 
 #include "mem/mem.h"
 #include "strt/strtDTL.h"
 #include "sdm/sdmHash.h"
 
-// temp struct for internal preprocessing
-typedef struct
-{
-	SINT32 numBuildings;
-	SINT16	bid[MAX_BUILDINGS_PER_CELL];
-} TEMP_BUILDING_LIST;
-
-static TEMP_BUILDING_LIST _tempTable[CELLS_PER_SIDE][CELLS_PER_SIDE];
-
 // allocates a facility nodes for each facility and a building list for each
 // facility that is filled out when sdmCreateBuildingTable is called.
 STRAT_FACILITY_TABLE*
-sdmCreateFacilityTable(FACILITY* const fac, const size_t numFacilities, const size_t numCPs)
+sdmCreateFacilityTable(FACILITY* const fac, const SINT32 numFacilities, const SINT32 numCPs)
 {
 	// Bridges get fake facilities, so we have to look at CPs.
-	const size_t potentialFacs = numFacilities + numCPs ;
-	if ( (fac == NULL) | (potentialFacs <= 0) )
-		return NULL;
+	const size_t potentialFacs = numFacilities + numCPs;
+	if ( (fac == nullptr) | (potentialFacs <= 0) )
+		return nullptr;
 
-	const size_t HeaderNodeSize = sizeof(STRAT_FACILITY_TABLE) ;
-	const size_t FacilityNodeListSize = sizeof(STRAT_FACILITY_NODE) * potentialFacs ;
-	const size_t BuildingTableSize = sizeof(SINT16) * MAX_BUILD_PER_FAC ;
-	const size_t BuildingTableListSize = BuildingTableSize * potentialFacs ;
+	const size_t HeaderNodeSize = sizeof(STRAT_FACILITY_TABLE);
+	const size_t FacilityNodeListSize = sizeof(STRAT_FACILITY_NODE) * potentialFacs;
+	const size_t BuildingTableSize = sizeof(STRAT_BUILDING_LIST::bid) * MAX_BUILD_PER_FAC;
+	const size_t BuildingTableListSize = BuildingTableSize * potentialFacs;
 
-	const size_t AllocationSize = HeaderNodeSize + FacilityNodeListSize + BuildingTableListSize ;
+	const size_t AllocationSize = HeaderNodeSize + FacilityNodeListSize + BuildingTableListSize;
 
-	UCHAR* base = (UCHAR*)memCalloc(1, AllocationSize) ;
-	STRAT_FACILITY_TABLE* table = (STRAT_FACILITY_TABLE*)(base) ;
-	STRAT_FACILITY_NODE* facility = (STRAT_FACILITY_NODE*)(base + HeaderNodeSize) ;
-	UCHAR* bidList = (base + HeaderNodeSize + FacilityNodeListSize) ;
+	UCHAR* base = (UCHAR*)memCalloc(1, AllocationSize);
+	STRAT_FACILITY_TABLE* table = (STRAT_FACILITY_TABLE*)(base);
+	STRAT_FACILITY_NODE* facility = (STRAT_FACILITY_NODE*)(base + HeaderNodeSize);
+	UCHAR* bidList = (base + HeaderNodeSize + FacilityNodeListSize);
 
 	table->facility = facility;
 	table->numFacilities = numFacilities;
 
-	for ( size_t i = 0 ; i < numFacilities ; ++i )
+	for ( SINT32 i = 0; i < numFacilities; ++i )
 	{
 		facility[i].id = fac[i].oid.id;
-		facility[i].bidList.bid = (SINT16*)bidList ;
+		facility[i].bidList.bid = (SINT16*)bidList;
 		facility[i].bidList.numBuildings = 0;
 
-		bidList += BuildingTableSize ;
+		bidList += BuildingTableSize;
 	}
 
 	return table;
@@ -70,67 +59,74 @@ STRAT_BUILDING_LIST * sdmGetFaciltyBidList(STRAT_FACILITY_TABLE* facTable, SINT1
 			return &facTable->facility[i].bidList;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
-static LOGICAL _addBuildingToFacTable(STRAT_FACILITY_TABLE* facTable, const BUILDING& building)
+static bool _addBuildingToFacTable(STRAT_FACILITY_TABLE* facTable, const BUILDING& building)
 {
-	const SINT16 facID = building.pid.id ;
-	const SINT32 bid = building.oid.id ;
-	STRAT_FACILITY_NODE* fac;
-	SINT32 i;
+	const SINT16 facID = building.pid.id;
+	const SINT32 bid = building.oid.id;
 
-	for(i = 0; i < facTable->numFacilities; i++)
+	for (auto it = facTable->facility, end = it + facTable->numFacilities; it < end; ++it)
 	{
-		fac = &facTable->facility[i];
-		if (facID == fac->id)
+		if (facID == it->id)
 		{
-			fac->bidList.bid[fac->bidList.numBuildings++] = static_cast<SINT16>(bid);
-			return (TRUE);
+			it->bidList.bid[it->bidList.numBuildings++] = static_cast<SINT16>(bid);
+			return true;
 		}
 	}
 
-	return FALSE ;
+	return false;
 }
 
-// Creates a cell basesd table with each cell contatining a list of buildings in
+struct BuildingsByCell
+{
+	using Cell = std::vector<UINT16>;
+	using Grid = std::array<Cell, CELLS_PER_SIDE * CELLS_PER_SIDE>;
+	Grid m_grid;
+
+	BuildingsByCell() noexcept {}
+
+	Cell& GetCell(size_t x, size_t y) noexcept
+	{
+		return m_grid[(x * CELLS_PER_SIDE) + y];
+	}
+};
+
+// Creates a cell based table with each cell containing a list of buildings in
 // that cell. In addition this function fills out the facility table.
 STRAT_BUILDING_LIST*
-sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd,SINT32 numBuildings,STRAT_BUILDING_HASH* bldHash, UINT32* errors)
+sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd, SINT32 numBuildings, STRAT_BUILDING_HASH* bldHash, UINT32* errors)
 {
-	TEMP_BUILDING_LIST* cell;
-	STRAT_BUILDING_LIST* table, *tcell;
-	SINT32 i,x,y,sx,sy;
+    static const char builder[] = "builder";
 
-    static SCHAR builder[] = "builder";
+	BuildingsByCell bbc;
 
-	memset(_tempTable,0,sizeof(_tempTable));
-
-	sx = (bd[0].posx/SUPERCELL_SIZE_M);
-	sy = (bd[0].posy/SUPERCELL_SIZE_M);
+	SINT32 sx = (bd[0].posx/SUPERCELL_SIZE_M);
+	SINT32 sy = (bd[0].posy/SUPERCELL_SIZE_M);
 
 #ifdef SDM_DEBUG_EXTREAM
 	dbugLog(_FLW,"adding buildings to sc %d:%d",sx,sy);
 #endif
 
-	std::map<SINT16, STRAT_BUILDING> bldgMap ;
+	std::map<SINT16, STRAT_BUILDING> bldgMap;
 
-	for (i = 0; i< facTable->numFacilities; i++)
+	for (SINT32 i = 0; i< facTable->numFacilities; ++i)
 	{
-		const SINT16 bid = facTable->facility[i].id ;
-		STRAT_BUILDING& bldg = bldgMap[bid] ;
-		bldg.bid = bid ;
-		bldg.isFacility = TRUE ;
-		bldg.pobj = (void*) 1 ;	// Really?
+		const SINT16 bid = facTable->facility[i].id;
+		STRAT_BUILDING& bldg = bldgMap[bid];
+		bldg.bid = bid;
+		bldg.isFacility = TRUE;
+		bldg.pobj = (void*) 1;	// Really?
 	}
 
-	for(i=0;i<numBuildings;i++)
+	for(SINT32 i = 0; i < numBuildings; ++i)
 	{
 		if (! _addBuildingToFacTable(facTable, bd[i]))
 		{
 #if platBuild == TEUL_SERVER
-			const BUILDING& building = bd[i] ;
-			strtDataErrorParentFacility(building.name, building.fileName, sx, sy, building.oid.id, static_cast<UINT16>(i), building.pid.id) ;
+			const BUILDING& building = bd[i];
+			strtDataErrorParentFacility(building.name, building.fileName, sx, sy, building.oid.id, static_cast<UINT16>(i), building.pid.id);
 #else
 			dbugLog(_FLA,"sc:%d,%d can't find facility:%d for building:%d (%s [%s])"
 						, sx, sy
@@ -138,18 +134,19 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd,SINT32 numBu
 						, bd[i].oid.id
 						, bd[i].name
 						, bd[i].fileName
-						) ;
+						);
 #endif
-			if(errors) (*errors)++ ;
-			continue ;
+			if(errors)
+				(*errors)++;
+			continue;
 		}
 
         // HACK! for builder statues.
 		const SINT16 bid = bd[i].oid.id;
 		STRAT_BUILDING& bldg = bldgMap[bid];
 
-		bldg.bid = bid ;
-		bldg.pobj = (void*) 2 ;	// Really?
+		bldg.bid = bid;
+		bldg.pobj = (void*) 2;	// Really?
         if(!strncmp(bd[i].name, builder, 7))
         {
             bldg.isBuilder = TRUE;
@@ -157,60 +154,58 @@ sdmCreateBuildingTable(STRAT_FACILITY_TABLE* facTable, BUILDING* bd,SINT32 numBu
 
 		sx = (bd[i].posx / SUPERCELL_SIZE_M);
 		sy = (bd[i].posy / SUPERCELL_SIZE_M);
-		x = ((bd[i].posx / 800) & 0x0f) >> CELL_RES_ADJUST;
-		y = ((bd[i].posy / 800) & 0x0f) >> CELL_RES_ADJUST;
-		cell = &_tempTable[x][y];
-		cell->bid[cell->numBuildings++] = bd[i].oid.id;
+		size_t x = ((bd[i].posx / 800) & 0x0f) >> CELL_RES_ADJUST;
+		size_t y = ((bd[i].posy / 800) & 0x0f) >> CELL_RES_ADJUST;
+		auto& cell = bbc.GetCell(x, y);
+		if (cell.empty())
+			cell.reserve(MAX_BUILDINGS_PER_CELL);
+		cell.push_back(bd[i].oid.id);
 //		dbugLog(_FLW,"adding building %d to pos:%d,%d sc:%d,%d cell:%d,%d"
 //					,bd[i].oid.id,bd[i].posx,bd[i].posy,sx,sy,x,y);
 	}
 
-	table = (STRAT_BUILDING_LIST*)memAlloc(CELLS_PER_SUPER_CELL * sizeof(STRAT_BUILDING_LIST));
-	memset(table,0,(CELLS_PER_SUPER_CELL * sizeof(STRAT_BUILDING_LIST)));
+	STRAT_BUILDING_LIST* table = (STRAT_BUILDING_LIST*)memCalloc(CELLS_PER_SUPER_CELL, sizeof(STRAT_BUILDING_LIST));
 
-	for(x = 0; x < CELLS_PER_SIDE; x++)
+	for(size_t x = 0; x < CELLS_PER_SIDE; x++)
 	{
-		for(y = 0; y < CELLS_PER_SIDE;y++)
+		for (size_t y = 0; y < CELLS_PER_SIDE; y++)
 		{
-			cell = &_tempTable[x][y];
-			tcell = &table[(x * CELLS_PER_SIDE) + y];
-			if (cell->numBuildings > 0)
+			auto& src = bbc.GetCell(x, y);
+			if (!src.empty())
 			{
+				auto& dst = table[(x * CELLS_PER_SIDE) + y];
 //				Write_Debug("adding %d buildings to sc:%d,%d cell:%d,%d"
 //							,cell->numBuildings,sx,sy,x,y);
-				tcell->bid = (SINT16*)memAlloc(cell->numBuildings * sizeof(STRAT_BUILDING_LIST));
-				memcpy(tcell->bid,cell->bid,(cell->numBuildings * sizeof(STRAT_BUILDING_LIST)));
-				tcell->numBuildings = cell->numBuildings;
+				dst.numBuildings = src.size();
+				const size_t dataSize = sizeof(dst.bid) * dst.numBuildings;
+				dst.bid = static_cast<decltype(dst.bid)>(memAlloc(dataSize));
+				memcpy(dst.bid, src.data(), dataSize);
 			}
 		}
 	}
 
 	if (bldHash)
 	{
-		const size_t maxBldgId = (size_t)(bldgMap.rbegin()->first) + 1 ;
+		const size_t maxBldgId = (size_t)(bldgMap.rbegin()->first) + 1;
 
-		bldHash->maxBldID = maxBldgId ;
+		bldHash->maxBldID = maxBldgId;
 
 		bldHash->building = (STRAT_BUILDING*)memAlloc(maxBldgId * sizeof(STRAT_BUILDING));
 
-		for ( std::map<SINT16, STRAT_BUILDING>::iterator it = bldgMap.begin() ; it != bldgMap.end() ; ++it )
+		for ( auto it = bldgMap.begin(), end = bldgMap.end(); it != end; ++it )
 		{
-			bldHash->building[it->first] = it->second ;
+			bldHash->building[it->first] = it->second;
 		}
 	}
 
 #ifdef HEAVY_DEBUG
-	for(x = 0; x < CELLS_PER_SIDE; x++)
+	for(size_t x = 0; x < CELLS_PER_SIDE; x++)
 	{
-		for(y = 0; y < CELLS_PER_SIDE;y++)
+		for(size_t y = 0; y < CELLS_PER_SIDE;y++)
 		{
-			tcell = &table[(x * CELLS_PER_SIDE) + y];
-			if (tcell->numBuildings > 0)
-			{
-				Write_Debug("sucessfully added %d buildings to sc:%d,%d cell:%d,%d"
-							,tcell->numBuildings,sx,sy,x,y);
-			}
-
+			auto& cell = table[(x * CELLS_PER_SIDE) + y];
+			if (cell.numBuildings > 0)
+				Write_Debug("successfully added %d buildings to sc:%d,%d cell:%" PRSizeT ",%" PRSizeT "", cell.numBuildings, sx, sy, x, y);
 		}
 	}
 #endif

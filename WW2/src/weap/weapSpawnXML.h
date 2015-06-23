@@ -11,6 +11,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 //
 
-extern bool weapLoadSpawnXML() ;
+extern bool weapLoadSpawnXML();
 
 #endif // PN_WEAP_SPAWNXML_H

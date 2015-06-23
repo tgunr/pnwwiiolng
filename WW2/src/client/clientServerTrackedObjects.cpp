@@ -46,8 +46,8 @@ bool VehicleSTO::applyJoules(const SINT64& joules, class Player* player)
 {
 	if(joules == 0LL) return false;
 
-	STO_JOULES::array_type::iterator it ;
-	for(it = _stoJoulesPacket.data().begin() ; it != _stoJoulesPacket.data().end() ; ++it)
+	STO_JOULES::array_type::iterator it;
+	for(it = _stoJoulesPacket.data().begin(); it != _stoJoulesPacket.data().end(); ++it)
 	{
 		if(it->m_uid != uid())
 			continue;
@@ -86,25 +86,25 @@ bool VehicleSTO::applyJoules(const SINT64& joules, class Player* player)
 void TerrainSTO::enter()
 {
 	const SINT64 joules = -1;
-	applyJoules(joules, NULL);
+	applyJoules(joules, nullptr);
 }
 
 void TerrainSTO::leave()
 {
 	const SINT64 joules = 0;
-	applyJoules(joules, NULL);
+	applyJoules(joules, nullptr);
 }
 
 bool TerrainSTO::applyJoules(const SINT64& joules, class Player* player)
 {
-	STO_JOULES::array_type::iterator it ;
-	for(it = _stoJoulesPacket.data().begin() ; it != _stoJoulesPacket.data().end() ; ++it)
+	STO_JOULES::array_type::iterator it;
+	for(it = _stoJoulesPacket.data().begin(); it != _stoJoulesPacket.data().end(); ++it)
 	{
 		if(it->m_uid != uid())
 			continue;
 
 		if ( joules == 0 )
-			return true ;
+			return true;
 
 		SINT64 totalJoules = it->m_joules + joules;
 
@@ -142,11 +142,11 @@ bool TerrainSTO::applyJoules(const SINT64& joules, class Player* player)
 
 static void _removeSTO(ACTION_OBJECT* const a)
 {
-	UINT16 type = 0 ;
+	UINT16 type = 0;
 	UINT32 uid = 0;
 
 	// Extract the type
-	a->offset = wwiiPackServerTrackedObjectType(TEUL_UNPACK, a->packed, a->offset, &type, 0) ;
+	a->offset = wwiiPackServerTrackedObjectType(TEUL_UNPACK, a->packed, a->offset, &type, 0);
 
 	// Now get the actual number
 	a->offset = teulPackUINT32(TEUL_UNPACK, a->packed, a->offset, &uid, 32);
@@ -163,7 +163,7 @@ static void _removeSTO(ACTION_OBJECT* const a)
 
 bool clientReceiveServerTrackedObject(UINT16 type, ACTION_OBJECT* a)
 {
-	ServerTrackedObject* sto = NULL;
+	ServerTrackedObject* sto = nullptr;
 
 	// The type tells us which class to expand to
 	switch ( type )
@@ -181,7 +181,7 @@ bool clientReceiveServerTrackedObject(UINT16 type, ACTION_OBJECT* a)
 
 	case ServerTrackedObject::_PPO:
 	{
-		sto = new PlayerPlacedSTO(a) ;
+		sto = new PlayerPlacedSTO(a);
 	}
 	break;
 
@@ -196,7 +196,7 @@ bool clientReceiveServerTrackedObject(UINT16 type, ACTION_OBJECT* a)
 			if(sto->owner() == pv->Chat_Handle) // don't use this sto if we created it
 			{
 				delete sto;
-				sto = NULL;
+				sto = nullptr;
 			}
 			else if(pv->ModelData->MultiCrewPos > 1) // if we're a crew
 			{
@@ -222,8 +222,8 @@ bool clientReceiveServerTrackedObject(UINT16 type, ACTION_OBJECT* a)
 	break;
 
 	case ServerTrackedObject::_HULK:
-		sto = new HulkSTO(a) ;
-	break ;
+		sto = new HulkSTO(a);
+	break;
 
 	case ServerTrackedObject::_EFFECT:
 		sto = new SmokeGrenadeSTO(a);
@@ -238,7 +238,7 @@ bool clientReceiveServerTrackedObject(UINT16 type, ACTION_OBJECT* a)
 	break;
 	}
 
-	if ( sto == NULL )
+	if ( PN_UNLIKELY(sto == nullptr) )
 		return false;
 
 	switch ( ServerTrackedObject::addToIndex(sto) )

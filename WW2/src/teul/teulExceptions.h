@@ -12,30 +12,30 @@ namespace Teul
 	struct Error
 	{
 		Error(const char* const msg_, const SINT32 error_) : msg(msg_), error(error_) {}
-		const char* msg ;
-		SINT32 error ;
-	} ;
+		const char* msg;
+		SINT32 error;
+	};
 
 	//! Error specific to a teulIndex.
 	struct IndexError : public Error
 	{
 		IndexError(SINT32 teulIndex_, const char* const msg_, const SINT32 error_) : Error(msg_, error_), teulIndex(teulIndex_) {}
 		IndexError(SINT32 teulIndex_, const SINT32 error_) : Error("Error", error_), teulIndex(teulIndex_) {}
-		SINT32 teulIndex ;
-	} ;
+		SINT32 teulIndex;
+	};
 
 	//! Error that occurred at a specific iteration of a loop.
 	struct IterationError : public Error
 	{
 		IterationError(size_t iter_, const char* const msg_, const SINT32 error_) : Error(msg_, error_), iter(iter_) {}
-		size_t iter ;
-	} ;
+		size_t iter;
+	};
 
 	//! Error associated with processing a range of values.
 	//! @note The indexes should be numeric.
 	struct RangeError : public Error
 	{
 		RangeError(size_t start_, size_t end_, const char* const msg_, const SINT32 error_) : Error(msg_, error_), start(start_), end(end_) {}
-		size_t start, end ;
-	} ;
+		size_t start, end;
+	};
 }

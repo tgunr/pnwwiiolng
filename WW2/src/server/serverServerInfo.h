@@ -1,14 +1,15 @@
 #pragma once
 
+#include <set>
 #include "server/serverFlagsEnum.h"
 #include "server/serverHeartBeat.h"
 #include "wwii/wwiiServerTypeEnums.h"
 
-class PlayerStatusNode ;
+class PlayerStatusNode;
 
 namespace Server
 {
-class PersonaMirror ;
+class PersonaMirror;
 
 class ServerInfo
 {
@@ -17,27 +18,27 @@ public:
 		: stats(), flags((Server::Flags)0)
 		, m_lastRecv(0)
 		, availPlayers(0)
-		, m_players(), localInfo(NULL), exitDestType(0)
+		, m_players(), localInfo(nullptr), exitDestType(0)
 		{
 		}
 	ServerInfo(const HeartBeat& beat)
 		: stats(beat), flags((Server::Flags)0)
 		, m_lastRecv(0)
 		, availPlayers(0)
-		, m_players(), localInfo(NULL), exitDestType(0)
+		, m_players(), localInfo(nullptr), exitDestType(0)
 		{
 		}
 
-	~ServerInfo() ;
+	~ServerInfo();
 
-	SINT32 mirrorPlayer(Server::PersonaMirror* mirrorData) ;
+	SINT32 mirrorPlayer(Server::PersonaMirror* mirrorData);
 
 public:
 	HeartBeat			stats;
 	Server::Flags		flags;
 	TeulTimeMS			m_lastRecv;
 	SINT32				availPlayers;	// max players allowed on server
-	std::set<PlayerStatusNode*>	m_players ;
+	std::set<PlayerStatusNode*>	m_players;
 	void*				localInfo;		// application can store local info here
 										// it is freed with the server info.
 										// never keep a local pointer to
@@ -50,10 +51,10 @@ public:
 	//! force the sync of server information to other servers.
 	//! should be called whenever significant changes are made to the state
 	//! of the server.
-	SINT32 sync() ;
+	SINT32 sync();
 
 	//! Check if there is an open server available for this type.
-	static bool IsAvailable(const UINT16 serverType_) ;
+	static bool IsAvailable(const UINT16 serverType_);
 
 	//! Look up info about a server by its base ip address.
 	static Server::ServerInfo* GetInfo(UINT32 baseIP_, UINT16 serverType_);
@@ -65,9 +66,9 @@ public:
 	//! This function culls out all servers that are not
 	//! accepting and returns the one with the most available players.
 	static Server::ServerInfo* GetBest(UINT16 serverType_, bool allowFull=false);
-} ;
+};
 
- extern Server::ServerInfo myServerInfo ;
+ extern Server::ServerInfo myServerInfo;
 
 }
 

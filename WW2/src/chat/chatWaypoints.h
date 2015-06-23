@@ -8,8 +8,8 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-class Waypoint ;
+class Waypoint;
 
-extern void chatSetMissionWaypoint(UINT32 missionID, const Waypoint& rhs) ;
-extern void chatDeleteMissionWaypoint(UINT32 missionID, const ChatHandle& handle) ;
-extern void chatPurgeMissionWaypoints(UINT32 missionID) ;
+void chatSetMissionWaypoint(UINT32 missionID, const Waypoint& rhs);
+void chatDeleteMissionWaypoint(UINT32 missionID, const ChatHandle& handle);
+void chatPurgeMissionWaypoints(UINT32 missionID);

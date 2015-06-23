@@ -7,10 +7,6 @@
 #include "fio/fio.h"
 #include "ui/uiUTF.h"
 
-#if defined(USE_OSG)
-#include "osgStats/statsMain.h"
-#endif
-
 #if platOS == OS_WIN32
 #include "Psapi.h"
 #endif // #ifdef OS_WIN32
@@ -105,7 +101,7 @@ UINT32 Log_System_Mask(const char* system)
 
 	for(i = 0; i < 31; i++)
 	{
-		if(LOG_SYSTEM_NAMES[i] == NULL)
+		if(LOG_SYSTEM_NAMES[i] == nullptr)
 			break;
 
 		if(!strcmp(LOG_SYSTEM_NAMES[i], system))
@@ -131,7 +127,7 @@ const char* Log_System_Name(UINT32 mask)
 		mask >>= 1;
 	}
 
-	return NULL;
+	return nullptr;
 }
 
 /************************************************************************************************
@@ -171,7 +167,7 @@ void Close_Debug(void)
 #include "include/vars.h"
 
 static char					ofn[_MAX_PATH];
-static FILE*				ofp = NULL;
+static FILE*				ofp = nullptr;
 
 /************************************************************************************************
 	Open_Debug
@@ -179,7 +175,7 @@ static FILE*				ofp = NULL;
 
 LOGICAL Open_Debug(const char* filename)
 {
-	if (filename == NULL)
+	if (filename == nullptr)
 		return(FALSE);
 
     strcpy(ofn, filename);
@@ -190,12 +186,12 @@ LOGICAL Open_Debug(const char* filename)
 
 	ofp = fioUserFile(ofn, "w");
 
-	if ( ofp == NULL )
-		return FALSE ;
+	if ( ofp == nullptr )
+		return FALSE;
 
-	Write_Debug("\r\nDebug Message System Open.\r\n") ;
+	Write_Debug("\r\nDebug Message System Open.\r\n");
 
-	return TRUE ;
+	return TRUE;
 }
 
 /************************************************************************************************
@@ -204,9 +200,9 @@ LOGICAL Open_Debug(const char* filename)
 
 void Close_Debug(void)
 {
-	if ( ofp != NULL )
-		fclose(ofp) ;
-	ofp = NULL ;
+	if ( ofp != nullptr )
+		fclose(ofp);
+	ofp = nullptr;
 }
 
 /************************************************************************************************
@@ -215,8 +211,8 @@ void Close_Debug(void)
 
 static void logv(UINT32 system, SINT32 level, const char* str, va_list marker)
 {
-	if(logLevel < level || !(system & logMask) || str == NULL) return;
-	if ( ofp == NULL )
+	if(logLevel < level || !(system & logMask) || str == nullptr) return;
+	if ( ofp == nullptr )
 	{
 		vprintf(str, marker);
 		printf("\n");
@@ -235,12 +231,12 @@ static void logv(UINT32 system, SINT32 level, const char* str, va_list marker)
 		OutputDebugStringA(buf);
 		OutputDebugStringA("\r\n");
 
-		fprintf(ofp, "%s\r\n", buf) ;
+		fprintf(ofp, "%s\r\n", buf);
 		fflush(ofp);
 
 #else
-		vfprintf(ofp, str, marker) ;
-		fprintf(ofp, "\r\n") ;
+		vfprintf(ofp, str, marker);
+		fprintf(ofp, "\r\n");
 		fflush(ofp);
 #endif
 	}
@@ -267,13 +263,13 @@ struct logTimer
 	int callcount; // to handle recursion
 	SINT32 starttime;
 	SINT32 tottime[10]; // last 10 totaltimes
-} ;
+};
 
 struct logTimerStat
 {
 	const char* funcname;
 	SINT32 tottime;
-} ;
+};
 
 static logTimer logTimers[MAX_TIMERS];
 static logTimerStat sortedTimes[MAX_TIMERS];
@@ -312,7 +308,7 @@ void logTimerReset()
 
 void logTimerBegin(const char* parent, const char* child, int* timerid)
 {
-	logTimer* timer = NULL;
+	logTimer* timer = nullptr;
 
 	if(*timerid < 0)
 	{
@@ -429,7 +425,7 @@ void logTimerPrint(int maintimerid, int frameidx)
 	{
 		sortTime = &sortedTimes[i];
 
-		if(sortTime->funcname == NULL)
+		if(sortTime->funcname == nullptr)
 			break;
 
 		if(sortTime->tottime > 0)
@@ -484,10 +480,6 @@ static	std::ostringstream 	frameTimesString;
 
 void logInitProfiling(const char* const profileName, FLOAT32 profilingDuration)
 {
-#if defined(USE_OSG)
-	rnmainListText("Started %s profiling for the duration of %.1f minute(s) ...", profileName, profilingDuration);
-#endif
-
 	CurrentProfileName = STRVER;
 	CurrentProfileName.append("_");
 	CurrentProfileName.append(profileName);
@@ -532,7 +524,7 @@ static void _getSystemDetails(char* into, size_t sizeofInto)
 #endif
 
 	// snprintf/strncpy don't guarantee a null terminator
-	into[sizeofInto - 1] = 0 ;
+	into[sizeofInto - 1] = 0;
 }
 
 
@@ -557,11 +549,7 @@ void logUpdateProfiling()
 
 	if(!remainingProfilingTime) return;
 
-#if defined(USE_OSG)
-	thisFrameTime = statsGetLastFrameTime();
-#else
 	thisFrameTime	= 1000 / gLastFrameFPS;
-#endif
 	totalFramesTime += thisFrameTime;
 	totalFrameCnt++;
 	lastFramesTime += thisFrameTime;
@@ -645,7 +633,7 @@ void logUpdateProfiling()
 								, CurrentProfileName.c_str()
 								);
 			if ( written > MAX_MESSAGE_LENGTH )
-				written = MAX_MESSAGE_LENGTH ;
+				written = MAX_MESSAGE_LENGTH;
 			// snprintf doesn't guarantee it will write a trailing zero...
 			result[MAX_MESSAGE_LENGTH] = 0;
 

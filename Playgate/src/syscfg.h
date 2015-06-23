@@ -13,7 +13,7 @@
 //	------------------------------	Public Definitions
 
 #include <stdexcept>
-#include <wchar.h>
+#include <cwchar>
 
 #include "dbug/dbug.h"
 #include "dbug/dbugExtErrors.h"
@@ -23,8 +23,8 @@
 #include "wwii/wwiiCovert.h"
 #include "weap/weapDefs.h"
 #include "weap/weapSpec.h"
+#include "teul/teulBasic.h"
 #include "teul/teulClosingEnums.h"
-#include "teul/teulPackEnums.h"
 #include "teul/teulPackers.h"
 #include "teul/teulTime.h"
 #include "teul/teulKit.h"

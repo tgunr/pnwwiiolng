@@ -40,40 +40,40 @@ ChatReport::ChatReport(UINT16 category, const std::string& report, const ChatHan
 SINT32
 ChatReport::packer(LOGICAL mode, ACTION_OBJECT* a)
 {
-	a->offset = teulPackUINT16(mode, a->packed, a->offset, &m_status, 4) ;
-	a->offset = teulPackUINT16(mode, a->packed, a->offset, &m_category, 4) ;
-	wwiiPackString(mode, a->packed, a->offset, m_report, MAX_TEXT_LENGTH) ;
+	a->offset = teulPackUINT16(mode, a->packed, a->offset, &m_status, 4);
+	a->offset = teulPackUINT16(mode, a->packed, a->offset, &m_category, 4);
+	wwiiPackString(mode, a->packed, a->offset, m_report, MAX_TEXT_LENGTH);
 
 	if ( m_category == PLAYER )
-		a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_offender, 0) ;
+		a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_offender, 0);
 
 	if ( m_status > SUBMISSION )
 	{
-		a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_poster, 0) ;
-		a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_hostID, 0) ;
-		a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_time, 0) ;
-		a->offset = teulPackUINT16(mode, a->packed, a->offset, &m_country, 4) ;
-		a->offset = teulPackUINT16(mode, a->packed, a->offset, &m_branch, 4) ;
-		a->offset = wwiiPackBrigadeID(mode, a->packed, a->offset, m_brigade, 0) ;
+		a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_poster, 0);
+		a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_hostID, 0);
+		a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_time, 0);
+		a->offset = teulPackUINT16(mode, a->packed, a->offset, &m_country, 4);
+		a->offset = teulPackUINT16(mode, a->packed, a->offset, &m_branch, 4);
+		a->offset = wwiiPackBrigadeID(mode, a->packed, a->offset, m_brigade, 0);
 
 		if ( m_brigade > 0 )
 		{
-			a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_mission, 31) ;
-			a->packer(mode, m_leader) ;
-			m_weapon.packer(mode, a) ;
-			a->packer(mode, m_sortie) ;
-			a->packer(mode, m_x) ;
-			a->packer(mode, m_y) ;
-			a->packer(mode, m_z) ;
+			a->offset = teulPackUINT32(mode, a->packed, a->offset, &m_mission, 31);
+			a->packer(mode, m_leader);
+			m_weapon.packer(mode, a);
+			a->packer(mode, m_sortie);
+			a->packer(mode, m_x);
+			a->packer(mode, m_y);
+			a->packer(mode, m_z);
 		}
 
 		if ( m_status > NEW )
 		{
-			wwiiPackString(mode, a->packed, a->offset, m_notes, MAX_TEXT_LENGTH) ;
-			a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_assigned, 0) ;
+			wwiiPackString(mode, a->packed, a->offset, m_notes, MAX_TEXT_LENGTH);
+			a->offset = wwiiPackHandle(mode, a->packed, a->offset, &m_assigned, 0);
 		}
 	}
 
-	return a->offset ;
+	return a->offset;
 }
 

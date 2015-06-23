@@ -93,11 +93,11 @@ UINT32 vehInitVehicleAnimation(vehVehicle* Vehicle)
 UINT32 vehUpdateVehicleAnimation(vehVehicle* Vehicle)
 {
 	// check to see that an object exists for the vehicle
-	if (Vehicle->VehicleObjectData == NULL)
+	if (Vehicle->VehicleObjectData == nullptr)
 	{
 		return 0;
 	}
-	if (Vehicle->VehicleObjectData->PlaneObject == NULL)
+	if (Vehicle->VehicleObjectData->PlaneObject == nullptr)
 	{
 		return 0;
 	}
@@ -150,12 +150,12 @@ FLOAT32 TempNum;
 FLOAT32 MultFactor;
 
 
-	if (Vehicle == NULL)
+	if (Vehicle == nullptr)
 	{
 		return 0;
 	}
 
-	if (Vehicle->VehicleObjectData == NULL)
+	if (Vehicle->VehicleObjectData == nullptr)
 	{
 		return 0;
 	}
@@ -295,7 +295,7 @@ FLOAT32 MultFactor;
 			(Vehicle->StateAnimation.RudderDeflection + MultFactor * Vehicle->StateAnimation.LastRudderDeflection) / (1.0f + MultFactor);
 
 	// update gun recoil animations
-	if (Vehicle->ModelData == NULL)
+	if (Vehicle->ModelData == nullptr)
 	{
 		_UpdateRecoils(Vehicle);
 	}
@@ -318,12 +318,12 @@ piMATRIX Matrix;
 FLOAT32 TrackPos;
 OBJECT * Object;
 
-	if (Vehicle == NULL)
+	if (Vehicle == nullptr)
 	{
 		return 1;
 	}
 
-	if (Vehicle->VehicleObjectData == NULL)
+	if (Vehicle->VehicleObjectData == nullptr)
 	{
 		return 1;
 	}
@@ -335,8 +335,8 @@ OBJECT * Object;
 			TrackSection = &(Vehicle->VehicleObjectData->TrackSection[i]);
 
 			if (TrackSection->NumVertices == 0 ||
-				TrackSection->TrackSegment == NULL ||
-				TrackSection->TrackSegmentObjectToLinkTo == NULL)
+				TrackSection->TrackSegment == nullptr ||
+				TrackSection->TrackSegmentObjectToLinkTo == nullptr)
 			{
 				continue;
 			}
@@ -395,7 +395,7 @@ OBJECT * Object;
         // HACK: fix in version 1.27. Reverses track movement for quick fix (Ticket #97)
         TrackPos = -TrackPos;
 
-		if (Object != NULL)
+		if (Object != nullptr)
 		{
 			piTexCoordPtr mt = Object->MutableTexCoords();
 			piTexCoordConstPtr it = Object->ImmutableTexCoords();
@@ -416,12 +416,12 @@ UINT32 vehAnimResetVehicleStateAnimations(vehVehicle* Vehicle)
 UINT32 i,j;
 vehanimVehicleStateAnimations* StateAnims;
 
-	if (Vehicle == NULL)
+	if (Vehicle == nullptr)
 	{
 		return 0;
 	}
 
-	if (Vehicle->VehicleObjectData == NULL)
+	if (Vehicle->VehicleObjectData == nullptr)
 	{
 		return 0;
 	}
@@ -516,8 +516,8 @@ vehanimVehicleStateAnimations* StateAnims;
 FLOAT32 LastFlapPos,LastGearPos;
 FLOAT32 LastBombBayDoorPos;
 
-	if (Vehicle == NULL || Vehicle->VehicleType == NULL ||
-		Vehicle->VehicleObjectData  == NULL || Vehicle->VehicleObjectData->PlaneObject == NULL)
+	if (Vehicle == nullptr || Vehicle->VehicleType == nullptr ||
+		Vehicle->VehicleObjectData  == nullptr || Vehicle->VehicleObjectData->PlaneObject == nullptr)
 		return 0;
 
 	StateAnims = &Vehicle->StateAnimation;
@@ -759,20 +759,14 @@ FLOAT32 LastBombBayDoorPos;
 	_UpdateSmokes(Vehicle);
 //	_UpdateTurrets(Vehicle);
 
-	if (Vehicle->VehicleObjectData != NULL)
+	if (Vehicle->VehicleObjectData != nullptr)
 	{
 		vehAnimSetDOFObjectVals(Vehicle->VehicleObjectData->PlaneObject, StateAnims, Vehicle->VehicleType,Vehicle);
 	}
 
 	// if fps set turret elevation
-#ifdef DOROTHY
-	if((Vehicle->VehicleType->Type == VEH_TYPE_PERSON ||
-		Vehicle->VehicleType->Type == VEH_TYPE_MECH) &&
-		Vehicle->Flags & VEH_FLAGS_UPDATESYSTEM_CONTROLLED)
-#else
 	if (Vehicle->VehicleType->Type == VEH_TYPE_PERSON &&
 		Vehicle->Flags & VEH_FLAGS_UPDATESYSTEM_CONTROLLED)
-#endif
 	{
 	FLOAT32 TempNum;
 	FLOAT32 TempNum1,TempNum2;
@@ -962,7 +956,7 @@ SINT32 DofVarsubnum;
 			break;
 	}
 
-	if (Vehicle->ModelData == NULL ||
+	if (Vehicle->ModelData == nullptr ||
 		Vehicle->ModelData->MultiCrewPos != 0)
 	{
 		// hack for turret control
@@ -1032,7 +1026,7 @@ SINT32 DofVarsubnum;
 							TempNum = -1.0;
 						}
 
-						if (Vehicle->ModelData == NULL)
+						if (Vehicle->ModelData == nullptr)
 						{
 							ogrpSetDOFVariable(Object,
 												TempNum,
@@ -1055,7 +1049,7 @@ SINT32 DofVarsubnum;
 					}
 					else
 					{
-						if (Vehicle->ModelData == NULL)
+						if (Vehicle->ModelData == nullptr)
 						{
 							ogrpSetDOFVariable(Object,
 												StateAnims->LastTurretElev[TurretNum],
@@ -1168,7 +1162,7 @@ SINT32 DofVarsubnum;
 							}
 						}
 
-						if (Vehicle->ModelData == NULL)
+						if (Vehicle->ModelData == nullptr)
 						{
 							ogrpSetDOFVariable(Object,
 												TempNum,
@@ -1191,7 +1185,7 @@ SINT32 DofVarsubnum;
 					}
 					else
 					{
-						if (Vehicle->ModelData == NULL)
+						if (Vehicle->ModelData == nullptr)
 						{
 							ogrpSetDOFVariable(Object,
 												StateAnims->LastTurretTraverse[TurretNum],
@@ -1277,7 +1271,7 @@ SINT32 DofVarsubnum;
 							TempNum = -1.0;
 						}
 
-						if (Vehicle->ModelData == NULL)
+						if (Vehicle->ModelData == nullptr)
 						{
 							ogrpSetDOFVariable(Object,
 												TempNum,
@@ -1300,7 +1294,7 @@ SINT32 DofVarsubnum;
 					}
 					else
 					{
-						if (Vehicle->ModelData == NULL)
+						if (Vehicle->ModelData == nullptr)
 						{
 							ogrpSetDOFVariable(Object,
 												StateAnims->LastTurretTraverse[TurretNum],
@@ -1347,7 +1341,7 @@ UINT32 vehAnimSetDOFObjectVals(OBJECT * Object,
 		_SetDOF(Object,StateAnims,VehicleType,Vehicle);
 	}
 
-	if (Object->child != NULL)
+	if (Object->child != nullptr)
 	{
 		_SetDOFSubObjectVals(Object->child,StateAnims,VehicleType,Vehicle);
 	}
@@ -1370,7 +1364,7 @@ OBJECT * ObjSib;
 			_SetDOF(ObjSib,StateAnims,VehicleType,Vehicle);
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			// don't recurse into hidden LODs that are not special LODs and aren't user's vehicle
 
@@ -1388,7 +1382,7 @@ OBJECT * ObjSib;
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 	return 0;
 }
@@ -1397,7 +1391,7 @@ static UINT32 _SetVehicleDOFState(vehVehicle* Vehicle,
 								  vehanimVehicleStateType * StateType,
 								  LOGICAL State, LOGICAL LastState)
 {
-	if (StateType == NULL)
+	if (StateType == nullptr)
 	{
 		return 0;
 	}
@@ -1494,12 +1488,12 @@ static UINT32 _SetVehicleDOFState(vehVehicle* Vehicle,
 		case VehAnim::STATE_SUBTYPE_FUELFIRE:
 			if(State && Vehicle->ModelData) Vehicle->ModelData->HulkOnDespawn = TRUE;
 			Vehicle->StateAnimation.FuelFireOn[StateType->Data-1] = State;
-			if (Vehicle->StateAnimation.FuelFireEmitter[StateType->Data-1] == NULL)
+			if (Vehicle->StateAnimation.FuelFireEmitter[StateType->Data-1] == nullptr)
 			{
 				ogrpFindSubObjectByName(&Vehicle->StateAnimation.FuelFireEmitter[StateType->Data-1],
 										Vehicle->VehicleObjectData->EffectsObject,
 										(char*)StateType->Emitter);
-				if (Vehicle->StateAnimation.FuelFireEmitter[StateType->Data-1] == NULL)
+				if (Vehicle->StateAnimation.FuelFireEmitter[StateType->Data-1] == nullptr)
 				{
 //					Vehicle->StateAnimation.FuelFireEmitter[StateType->Data-1] = (OBJECT*)-1;
 					char s[256];
@@ -1516,12 +1510,12 @@ static UINT32 _SetVehicleDOFState(vehVehicle* Vehicle,
 			break;
 		case VehAnim::STATE_SUBTYPE_FUELLEAK:
 			Vehicle->StateAnimation.FuelLeakSmokeOn[StateType->Data-1] = State;
-			if (Vehicle->StateAnimation.FuelLeakSmokeEmitter[StateType->Data-1] == NULL)
+			if (Vehicle->StateAnimation.FuelLeakSmokeEmitter[StateType->Data-1] == nullptr)
 			{
 				ogrpFindSubObjectByName(&Vehicle->StateAnimation.FuelLeakSmokeEmitter[StateType->Data-1],
 										Vehicle->VehicleObjectData->EffectsObject,
 										(char*)StateType->Emitter);
-				if (Vehicle->StateAnimation.FuelLeakSmokeEmitter[StateType->Data-1] == NULL)
+				if (Vehicle->StateAnimation.FuelLeakSmokeEmitter[StateType->Data-1] == nullptr)
 				{
 //					Vehicle->StateAnimation.FuelLeakSmokeEmitter[StateType->Data-1] = (OBJECT*)-1;
 					char s[256];
@@ -1538,12 +1532,12 @@ static UINT32 _SetVehicleDOFState(vehVehicle* Vehicle,
 			break;
 		case VehAnim::STATE_SUBTYPE_OILLEAK:
 			Vehicle->StateAnimation.OilLeakSmokeOn[StateType->Data-1] = State;
-			if (Vehicle->StateAnimation.OilLeakSmokeEmitter[StateType->Data-1] == NULL)
+			if (Vehicle->StateAnimation.OilLeakSmokeEmitter[StateType->Data-1] == nullptr)
 			{
 				ogrpFindSubObjectByName(&Vehicle->StateAnimation.OilLeakSmokeEmitter[StateType->Data-1],
 										Vehicle->VehicleObjectData->EffectsObject,
 										(char*)StateType->Emitter);
-				if (Vehicle->StateAnimation.OilLeakSmokeEmitter[StateType->Data-1] == NULL)
+				if (Vehicle->StateAnimation.OilLeakSmokeEmitter[StateType->Data-1] == nullptr)
 				{
 //					Vehicle->StateAnimation.OilLeakSmokeEmitter[StateType->Data-1] = (OBJECT*)-1;
 					char s[256];
@@ -1564,12 +1558,12 @@ static UINT32 _SetVehicleDOFState(vehVehicle* Vehicle,
 			if (StateType->Data1 > 0)
 			{
 				Vehicle->StateAnimation.GlycolLeakSmokeOn[StateType->Data-1][StateType->Data1-1] = State;
-				if (Vehicle->StateAnimation.GlycolLeakSmokeEmitter[StateType->Data-1][StateType->Data1-1] == NULL)
+				if (Vehicle->StateAnimation.GlycolLeakSmokeEmitter[StateType->Data-1][StateType->Data1-1] == nullptr)
 				{
 					ogrpFindSubObjectByName(&Vehicle->StateAnimation.GlycolLeakSmokeEmitter[StateType->Data-1][StateType->Data1-1],
 											Vehicle->VehicleObjectData->EffectsObject,
 											(char*)StateType->Emitter);
-					if (Vehicle->StateAnimation.GlycolLeakSmokeEmitter[StateType->Data-1][StateType->Data1-1] == NULL)
+					if (Vehicle->StateAnimation.GlycolLeakSmokeEmitter[StateType->Data-1][StateType->Data1-1] == nullptr)
 					{
 //						Vehicle->StateAnimation.GlycolLeakSmokeEmitter[StateType->Data-1][StateType->Data1-1] = (OBJECT*)-1;
 						char s[256];
@@ -1589,12 +1583,12 @@ static UINT32 _SetVehicleDOFState(vehVehicle* Vehicle,
 			if(State && Vehicle->IsMe() && Vehicle->VehicleType->Type != VEH_TYPE_AIR)
 				Vehicle->ModelData->HulkOnDespawn = TRUE;
 			Vehicle->StateAnimation.EngineFireOn[StateType->Data-1] = State;
-			if (Vehicle->StateAnimation.EngineFireEmitter[StateType->Data-1] == NULL)
+			if (Vehicle->StateAnimation.EngineFireEmitter[StateType->Data-1] == nullptr)
 			{
 				ogrpFindSubObjectByName(&Vehicle->StateAnimation.EngineFireEmitter[StateType->Data-1],
 										Vehicle->VehicleObjectData->EffectsObject,
 										(char*)StateType->Emitter);
-				if (Vehicle->StateAnimation.EngineFireEmitter[StateType->Data-1] == NULL)
+				if (Vehicle->StateAnimation.EngineFireEmitter[StateType->Data-1] == nullptr)
 				{
 //					Vehicle->StateAnimation.EngineFireEmitter[StateType->Data-1] = (OBJECT*)-1;
 					char s[256];
@@ -1667,7 +1661,7 @@ UINT32 _DoExhaustState(vehVehicle*Vehicle,
                        vehanimVehicleStateType* pStateType,
                        LOGICAL bState, LOGICAL bLastState)
 {
-    vehanimVehicleStateAnimations* pAnim = NULL;
+    vehanimVehicleStateAnimations* pAnim = nullptr;
     SCHAR szDOFName[64];
     SINT32 q = pStateType->Data - 1;
 
@@ -1678,12 +1672,12 @@ UINT32 _DoExhaustState(vehVehicle*Vehicle,
     OBJECT* lpLeft = pAnim->ExhaustSmokeEmitter[q][0];
     OBJECT* lpRight = pAnim->ExhaustSmokeEmitter[q][1];
 
-    if(lpLeft == NULL)
+    if(lpLeft == nullptr)
     {
         sprintf(szDOFName, "%s", (SCHAR*)pStateType->Emitter);
 	    ogrpFindSubObjectByName(&lpLeft, Vehicle->VehicleObjectData->EffectsObject, szDOFName);
 
-        if(lpLeft == NULL)
+        if(lpLeft == nullptr)
         {
 	        SCHAR szBuff[128];
 	        SCHAR* pStr = "State %s, exhaust smoke, unable to find dof %s, Vehicle type = %s";
@@ -1701,12 +1695,12 @@ UINT32 _DoExhaustState(vehVehicle*Vehicle,
         return 0;
 	}
 
-    if(lpRight == NULL)
+    if(lpRight == nullptr)
     {
         sprintf(szDOFName, "%s", (SCHAR*)pStateType->Emitter);
 	    ogrpFindSubObjectByName(&lpRight, Vehicle->VehicleObjectData->EffectsObject, szDOFName);
 
-        if(lpRight == NULL)
+        if(lpRight == nullptr)
         {
 	        SCHAR szBuff[128];
 	        SCHAR* pStr = "State %s, exhaust smoke, unable to find dof %s, Vehicle type = %s";
@@ -1749,7 +1743,7 @@ UINT32 _DoExhaustState(vehVehicle*Vehicle,
 		{
 			if(!pAnim->ExhaustSmokeOn[q])
 			{
-				if(pAnim->ExhaustSmokeEmitter[q] != NULL)
+				if(pAnim->ExhaustSmokeEmitter[q] != nullptr)
 					pAnim->ExhaustSmokeOn[q] = 1;
 
 				vehfxCheckExhaustState(Vehicle->iFXVehicleID);
@@ -1760,7 +1754,7 @@ UINT32 _DoExhaustState(vehVehicle*Vehicle,
 	{
 		if(bState != bLastState)
 		{
-			if(pAnim->ExhaustSmokeEmitter[q] != NULL)
+			if(pAnim->ExhaustSmokeEmitter[q] != nullptr)
 				pAnim->ExhaustSmokeOn[q] = bState;
 
 			vehfxCheckExhaustState(Vehicle->iFXVehicleID);
@@ -1786,13 +1780,13 @@ UINT32 _DoWingVortexState(vehVehicle*pVeh,
 
     pVeh->StateAnimation.WingtipVortexSmokeOn[q] = bState;
 
-    if(pVeh->StateAnimation.WingtipVortexEmitter[q] == NULL)
+    if(pVeh->StateAnimation.WingtipVortexEmitter[q] == nullptr)
     {
         ogrpFindSubObjectByName(&pVeh->StateAnimation.WingtipVortexEmitter[q],
                                 pVeh->VehicleObjectData->EffectsObject,
                                 (SCHAR*)pStateType->Emitter);
 
-        if(pVeh->StateAnimation.WingtipVortexEmitter[q] == NULL)
+        if(pVeh->StateAnimation.WingtipVortexEmitter[q] == nullptr)
         {
             SCHAR s[256];
             sprintf(s, "State %s, wingtip vortex smoke, unable to find dof %s, Vehicle type = %s",
@@ -1823,7 +1817,7 @@ UINT32 _DoTreadDustState(vehVehicle*Vehicle,
                          LOGICAL bState,
                          LOGICAL bLastState)
 {
-    vehanimVehicleStateAnimations* pAnim = NULL;
+    vehanimVehicleStateAnimations* pAnim = nullptr;
     static SCHAR szDOFName[64];
     SINT32 q = pStateType->Data - 1;
 
@@ -1834,12 +1828,12 @@ UINT32 _DoTreadDustState(vehVehicle*Vehicle,
 
     OBJECT* lpEmit = pAnim->TreadDustEmitter[q];
 
-    if(lpEmit == NULL)
+    if(lpEmit == nullptr)
     {
         sprintf(szDOFName, "%s", (SCHAR*)pStateType->Emitter);
 	    ogrpFindSubObjectByName(&lpEmit, Vehicle->VehicleObjectData->EffectsObject, szDOFName);
 
-        if(lpEmit == NULL)
+        if(lpEmit == nullptr)
         {
 	        SCHAR szBuff[128];
 	        const char* pStr = "State %s, exhaust smoke, unable to find dof %s, Vehicle type = %s";
@@ -1859,7 +1853,7 @@ UINT32 _DoTreadDustState(vehVehicle*Vehicle,
 
 	if(bState != bLastState)
 	{
-        if(pAnim->TreadDustEmitter[q] != NULL)
+        if(pAnim->TreadDustEmitter[q] != nullptr)
             pAnim->TreadDustOn[q] = bState;
 	}
 
@@ -1871,7 +1865,7 @@ UINT32 vehAnimChangeVehicleStateByName(vehVehicle* Vehicle, const UCHAR* StateNa
 UCHAR StateNum;
 UINT32 i;
 
-	if (Vehicle == NULL)
+	if (Vehicle == nullptr)
 	{
 		return 0;
 	}
@@ -1894,7 +1888,7 @@ UINT32 i;
 
 	// only single-crewed vehicles or correct crewmember can change
 	// states via this function
-	if (Vehicle->ModelData != NULL)
+	if (Vehicle->ModelData != nullptr)
 	{
 		if (Vehicle->ModelData->MultiCrewPos != 0 &&
 			Vehicle->VehicleType->StateType[StateNum].MultiCrewPos !=
@@ -1929,7 +1923,7 @@ UINT32 vehAnimChangeVehicleStateByNumber(vehVehicle* Vehicle, UCHAR StateNum, LO
 {
 	// only single-crewed vehicles or correct crewmember can change
 	// states via this function
-	if (Vehicle->ModelData != NULL)
+	if (Vehicle->ModelData != nullptr)
 	{
 		if (Vehicle->ModelData->MultiCrewPos != 0 &&
 			Vehicle->VehicleType->StateType[StateNum].MultiCrewPos !=
@@ -1961,21 +1955,21 @@ static UINT32 _UpdateTurrets(vehVehicle*Vehicle)
 static UINT32 _UpdateSmokes(vehVehicle* Vehicle)
 {
     UINT32 i, j;
-    vehanimVehicleStateAnimations* StateAnims = NULL;
+    vehanimVehicleStateAnimations* StateAnims = nullptr;
     piVECTOR Pos;
     FLOAT64VECTOR UsePos;
-    OBJECT* Object = NULL;
+    OBJECT* Object = nullptr;
     FLOAT64VECTOR WorldOriginOffset;
 
-	if (Vehicle == NULL)
+	if (Vehicle == nullptr)
 	{
 		return 0;
 	}
-	if (Vehicle->VehicleObjectData == NULL)
+	if (Vehicle->VehicleObjectData == nullptr)
 	{
 		return 0;
 	}
-	if (Vehicle->VehicleObjectData->PlaneObject == NULL)
+	if (Vehicle->VehicleObjectData->PlaneObject == nullptr)
 	{
 		return 0;
 	}
@@ -2009,7 +2003,7 @@ static UINT32 _UpdateSmokes(vehVehicle* Vehicle)
 
 		if (StateAnims->EngineFireHandle[i] == 0 && StateAnims->EngineFireOn[i] != 0)
 		{
-			if (Vehicle->VehicleObjectData->HitMap == NULL)
+			if (Vehicle->VehicleObjectData->HitMap == nullptr)
 			{
 				Object = Vehicle->VehicleObjectData->PlaneObject;
 			}
@@ -2044,7 +2038,7 @@ static UINT32 _UpdateSmokes(vehVehicle* Vehicle)
 		if (StateAnims->OilLeakSmokeHandle[i] == 0 && StateAnims->OilLeakSmokeOn[i] != 0)
 		{
 			Object = StateAnims->OilLeakSmokeEmitter[i];
-			if (Object == NULL || (SINT32)Object == -1 || !(Object->flags & OBJECT_DOF))
+			if (Object == nullptr || (SINT32)Object == -1 || !(Object->flags & OBJECT_DOF))
 			{
 				Pos.x = Pos.y = Pos.z = 0.0f;
 				Object = Vehicle->VehicleObjectData->PlaneObject;
@@ -2080,7 +2074,7 @@ static UINT32 _UpdateSmokes(vehVehicle* Vehicle)
 			if (StateAnims->GlycolLeakSmokeHandle[i][j] == 0 && StateAnims->GlycolLeakSmokeOn[i][j] != 0)
 			{
 				Object = StateAnims->GlycolLeakSmokeEmitter[i][j];
-				if (Object == NULL || (SINT32)Object == -1 || !(Object->flags & OBJECT_DOF))
+				if (Object == nullptr || (SINT32)Object == -1 || !(Object->flags & OBJECT_DOF))
 				{
 					Pos.x = Pos.y = Pos.z = 0.0f;
 					Object = Vehicle->VehicleObjectData->PlaneObject;
@@ -2116,7 +2110,7 @@ static UINT32 _UpdateSmokes(vehVehicle* Vehicle)
 		// big kaboom!  But only for non-boats
         UsePos = Vehicle->PosData.RenderPos;
 
-		if (Vehicle->VehicleType != NULL)
+		if (Vehicle->VehicleType != nullptr)
 		{
 			if (Vehicle->VehicleType->Type != VEH_TYPE_SEA)
 			{
@@ -2149,7 +2143,7 @@ static UINT32 _UpdateSmokes(vehVehicle* Vehicle)
 		if (StateAnims->FuelLeakSmokeHandle[i] == 0 && StateAnims->FuelLeakSmokeOn[i] != 0)
 		{
 			Object = StateAnims->FuelLeakSmokeEmitter[i];
-			if (Object == NULL || (SINT32)Object == -1 || !(Object->flags & OBJECT_DOF))
+			if (Object == nullptr || (SINT32)Object == -1 || !(Object->flags & OBJECT_DOF))
 			{
 				Pos.x = Pos.y = Pos.z = 0.0f;
 				Object = Vehicle->VehicleObjectData->PlaneObject;
@@ -2191,7 +2185,7 @@ static UINT32 _UpdateSmokes(vehVehicle* Vehicle)
 		if (StateAnims->FuelFireHandle[i] == 0 && StateAnims->FuelFireOn[i] != 0)
 		{
 			Object = StateAnims->FuelFireEmitter[i];
-			if (Object == NULL || (SINT32)Object == -1 || !(Object->flags & OBJECT_DOF))
+			if (Object == nullptr || (SINT32)Object == -1 || !(Object->flags & OBJECT_DOF))
 			{
 				Pos.x = Pos.y = Pos.z = 0.0f;
 				Object = Vehicle->VehicleObjectData->PlaneObject;
@@ -2280,7 +2274,7 @@ void _DoPlaneCrashFX(vehVehicle*pVehicle)
 
     if(pVehicle->VehicleType->Type == VEH_TYPE_AIR)
     {
-        if(pVehicle->ModelData != NULL)
+        if(pVehicle->ModelData != nullptr)
         {
             vecVel.x = (FLOAT32)pVehicle->ModelData->LastVehicleVel.x;
             vecVel.y = (FLOAT32)pVehicle->ModelData->LastVehicleVel.y;
@@ -2390,7 +2384,7 @@ void _EngineSoundStopped(void* data)
 {
     SINT32* pID = (SINT32*)data;
 
-    if(pID == NULL)
+    if(pID == nullptr)
         return;
 
     *pID = -1;
@@ -2406,7 +2400,7 @@ static UINT32 _HandleSound(vehVehicle* Vehicle,
 	OBJECT* TempObj;
 
 	if (Vehicle->Flags & VEH_FLAGS_UPDATESYSTEM_CONTROLLED ||
-		(Vehicle->ModelData != NULL && Vehicle->ModelData->MultiCrewPos >= 2))
+		(Vehicle->ModelData != nullptr && Vehicle->ModelData->MultiCrewPos >= 2))
 	{
 		if(Vehicle->HideVehicle)
 			State = FALSE;
@@ -2414,7 +2408,7 @@ static UINT32 _HandleSound(vehVehicle* Vehicle,
 		if (StateType->StateSubType == VehAnim::STATE_SUBTYPE_ENGINESOUND)
 		{
 
-			if (Vehicle->ModelData != NULL)
+			if (Vehicle->ModelData != nullptr)
 			{
 				if (State == TRUE)
 				{
@@ -2436,7 +2430,7 @@ static UINT32 _HandleSound(vehVehicle* Vehicle,
 					if(Vehicle->VehicleType->EngineSound[i][0] != '\0' && Vehicle->StateAnimation.EngineSoundId[StateType->Data-1][i] <= 0)
 					{
 						Object = Vehicle->StateAnimation.EngineFireEmitter[StateType->Data-1];
-						if (Object == NULL || (SINT32)Object == -1 || !(Object->flags & OBJECT_DOF))
+						if (Object == nullptr || (SINT32)Object == -1 || !(Object->flags & OBJECT_DOF))
 						{
 							Pos.x = Pos.y = Pos.z = 0.0f;
 							Object = Vehicle->VehicleObjectData->PlaneObject;
@@ -2534,7 +2528,7 @@ static UINT32 _HandleSound(vehVehicle* Vehicle,
 			{
 				Pos.x = Pos.y = Pos.z = 0.0f;
 
-				if (Vehicle->VehicleObjectData->HitMap == NULL)
+				if (Vehicle->VehicleObjectData->HitMap == nullptr)
 				{
 					TempObj = Vehicle->VehicleObjectData->PlaneObject;
 				}
@@ -2581,7 +2575,7 @@ static UINT32 _HandleSound(vehVehicle* Vehicle,
 		{
             /*
             // Corn says volume is max at all times.
-			if (Vehicle->ModelData == NULL ||
+			if (Vehicle->ModelData == nullptr ||
 				Vehicle->ModelData->MultiCrewPos >= 2)
 			{
 				TempVel.x = 0.0;
@@ -2634,7 +2628,7 @@ static UINT32 _HandleSound(vehVehicle* Vehicle,
 //////////////////////////////////////////////////////////////////////
 void _Set3rdPersonVolume(vehVehicle*pVehicle, SINT32 iIndex)
 {
-    if(pVehicle == NULL) return;
+    if(pVehicle == nullptr) return;
 
     FLOAT64VECTOR vecVel = {0.0f, 0.0f, 1.0f};
     FLOAT32 fSpeed = 0.0f;
@@ -2684,7 +2678,7 @@ void _Set3rdPersonVolume(vehVehicle*pVehicle, SINT32 iIndex)
 //////////////////////////////////////////////////////////////////////
 void _Set3rdPersonPitch(vehVehicle*pVehicle, SINT32 iIndex)
 {
-    if(pVehicle == NULL) return;
+    if(pVehicle == nullptr) return;
     if(iIndex < 0) return;
 
   //  FLOAT64VECTOR vecVel = {0.0f, 0.0f, 1.0f};
@@ -2740,7 +2734,7 @@ FLOAT32 TempNum;
 SINT32 DeltaTime;
 vehLoadout * Loadout;
 
-	if (Vehicle == NULL)
+	if (Vehicle == nullptr)
 	{
 		return 0;
 	}
@@ -2780,7 +2774,7 @@ vehLoadout * Loadout;
 //////////////////////////////////////////////////////////////////////
 LOGICAL _GetSoundDistance(SINT32 iID, const UINT32* pType)
 {
-    if(pType == NULL)
+    if(pType == nullptr)
         return FALSE;
 
     switch(*pType)
@@ -2834,7 +2828,7 @@ static UINT32 _HandleVisDamage(vehVehicle* Vehicle, vehanimVehicleStateType* Sta
 
 	if(State && !LastState)
 	{
-		if(Vehicle->StateAnimation.DebrisEmitter[StateType->Data] == NULL)
+		if(Vehicle->StateAnimation.DebrisEmitter[StateType->Data] == nullptr)
 		{
 			ogrpFindSubObjectByName(&Vehicle->StateAnimation.DebrisEmitter[StateType->Data],
 									Vehicle->VehicleObjectData->EffectsObject, (char*)StateType->Emitter);
@@ -2875,7 +2869,7 @@ static UINT32 _HandleVisDamage(vehVehicle* Vehicle, vehanimVehicleStateType* Sta
                 }
             }
 
-            const vehanimVehicleStateType* p = NULL;
+            const vehanimVehicleStateType* p = nullptr;
 
             p = vehFindStateByName(Vehicle->VehicleType, "turret");
 
@@ -2890,7 +2884,7 @@ static UINT32 _HandleVisDamage(vehVehicle* Vehicle, vehanimVehicleStateType* Sta
 	}
 	else if(!State && LastState)
 	{
-		if(Vehicle->StateAnimation.DebrisEmitter[StateType->Data] == NULL)
+		if(Vehicle->StateAnimation.DebrisEmitter[StateType->Data] == nullptr)
 		{
 			ogrpFindSubObjectByName(&Vehicle->StateAnimation.DebrisEmitter[StateType->Data],
 									Vehicle->VehicleObjectData->EffectsObject, (char*)StateType->Emitter);
@@ -2931,7 +2925,7 @@ static UINT32 _HandleVisDamage(vehVehicle* Vehicle, vehanimVehicleStateType* Sta
                 }
             }
 
-            const vehanimVehicleStateType* p = NULL;
+            const vehanimVehicleStateType* p = nullptr;
 
             p = vehFindStateByName(Vehicle->VehicleType, "turret");
 

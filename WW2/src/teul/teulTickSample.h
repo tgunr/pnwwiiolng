@@ -17,13 +17,13 @@ namespace Teul
 			, playerID(0)
 			{}
 
-		TeulTimeMS	host_ms ;		//!< Time elapsed on the host.
-		TeulTimeMS	client_ms ;		//!< Time that appears to have elapsed on the client.
-		TeulDeltaMS	delta ;			//!< Discrepancy
-		double		ratio ;			//!< client_ms / host_ms .. so > 1.0 = cheat
+		TeulTimeMS	host_ms;		//!< Time elapsed on the host.
+		TeulTimeMS	client_ms;		//!< Time that appears to have elapsed on the client.
+		TeulDeltaMS	delta;			//!< Discrepancy
+		double		ratio;			//!< client_ms / host_ms .. so > 1.0 = cheat
 
-		UINT32		source ;		//!< server type enum, e.g. CHAT_HOST.
-		playerid_t	playerID ;		//!< PlayerID
-	} ;
+		UINT32		source;			//!< server type enum, e.g. CHAT_HOST.
+		playerid_t	playerID;		//!< PlayerID
+	};
 #pragma pack(pop)
 }

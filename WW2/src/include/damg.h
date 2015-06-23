@@ -17,7 +17,7 @@ struct VEH_COMP_HIT
 	UINT8		compID;
 	UINT8		priority;
 	UINT8		numHits;
-} ;
+};
 
 struct VEH_HIT
 {
@@ -26,13 +26,13 @@ struct VEH_HIT
 	UINT32	target;
 	UINT32	numComponents;
 	VEH_COMP_HIT	compHit[VEH_MAX_OBJ_HIT + 1];
-} ;
+};
 
 struct DAMAGE_NODE
 {
 	DAMAGE_NODE* prev;
 	DAMAGE_NODE* next;
 
-	Vehicle::Hit hit ;
-} ;
+	Vehicle::Hit hit;
+};
 

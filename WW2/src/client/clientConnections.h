@@ -2,7 +2,7 @@
 
 #include "teul/teulConnection.h"
 
-namespace ww2 { class Client ; };
+namespace ww2 { class Client; };
 
 ///! @file client/clientConnections.h
 ///! @brief Describes the ClientConnection, MapConnection, ChatConnection and CellConnection classes.
@@ -24,6 +24,6 @@ class ClientHostConnection : public Teul::Connection
 	protected: virtual void onError(ww2::Client* client, SINT32 error);
 
 	public: void SetError(ww2::Client* client, SINT32 error);
-} ;
+};
 
 // Map, Chat and Cell derived classes are in source control :-P

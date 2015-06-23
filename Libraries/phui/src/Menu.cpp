@@ -28,7 +28,7 @@ class Menu::MenuItemList : public std::vector<MenuItem*> {};
 void MenuItem::Draw()
 {
 	Menu* menu = ParentMenu();
-	if(menu == NULL) return;
+	if(menu == nullptr) return;
 	
 	GraphicsContext* ctx = menu->GetGraphicsContext();
 	
@@ -73,7 +73,7 @@ void MenuItem::PreferredSize(float* w, float* h)
 	*w = 0;
 	*h = 0;
 	Menu* menu = ParentMenu();
-	if(menu == NULL) return;
+	if(menu == nullptr) return;
 	
 	GraphicsContext* ctx = menu->GetGraphicsContext();
 	
@@ -85,7 +85,7 @@ void MenuItem::PreferredSize(float* w, float* h)
 	Menu
 *************************************************************************************************/
 
-Menu::Menu() : View(), _items(new MenuItemList), _ownercontrol(NULL), _selecteditem(-1)
+Menu::Menu() : View(), _items(new MenuItemList), _ownercontrol(nullptr), _selecteditem(-1)
 {
 }
 
@@ -143,9 +143,9 @@ void Menu::DrawSelf()
 
 int Menu::AddItem(MenuItem* item)
 {
-	assert( item != NULL ) ;
+	assert( item != nullptr );
 
-	if(item->ParentMenu() != NULL) return -1;
+	if(item->ParentMenu() != nullptr) return -1;
 	
 	_items->push_back(item);
 	item->_parent = this;
@@ -165,7 +165,7 @@ bool Menu::MouseDown (float x, float y, int button)
 	if(_ownercontrol && idx > -1)
 		_ownercontrol->SetValue(idx);
 		
-	ParentViewport()->SetActiveMenu(NULL, NULL);
+	ParentViewport()->SetActiveMenu(nullptr, nullptr);
 	
 	return true;
 }
@@ -205,7 +205,7 @@ unsigned int Menu::ItemCount() const
 
 MenuItem* Menu::ItemAt(unsigned int i) const
 {
-	if(i >= _items->size()) return NULL;
+	if(i >= _items->size()) return nullptr;
 	
 	return (*_items)[i];
 }

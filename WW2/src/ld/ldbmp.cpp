@@ -59,7 +59,7 @@ UINT32 bitspitch = 0;
     }
 
     newbits = ldpixConvert8To24(bitspitch, height, pal, bits);
-    if (newbits == NULL)
+    if (newbits == nullptr)
     {
       return(-1);
     }
@@ -197,7 +197,7 @@ SINT32		t1, t2, t3, t4, t5;
 	}
 
 	bi = (piBITMAPINFO*)memAlloc(length);
-	if (bi == NULL)
+	if (bi == nullptr)
 	{
 		fioClose(stream);
 		return(FALSE);
@@ -250,7 +250,7 @@ int ldbmpLoadBMPFileToSurface(const char* Filename, UINT32 TransparentColor, UIN
 {
 int   texid;
 piBITMAPINFO*  bi;
-    TEXTURE* t = NULL;
+    TEXTURE* t = nullptr;
 
 #ifdef LOAD_TIMER
 SINT32	t1, t2, t3;

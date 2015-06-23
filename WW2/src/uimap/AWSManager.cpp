@@ -216,7 +216,7 @@ AWSGrid* AWSManager::GetGrid(UINT32 index)
 {
 	// index must be on the grid
 	if(index > (AWS_COLS * AWS_ROWS))
-		return NULL;
+		return nullptr;
 
 	GridMap::iterator found = _gridMap.find(index);
 

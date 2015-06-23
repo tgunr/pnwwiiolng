@@ -34,7 +34,7 @@ const char* const WWII::svnRevisionStr = SVN_REVISION_STR;
 
 namespace Chat
 {
-	class MissionStatus;
+	struct MissionStatus;
 };
 
 void clientForcedCellExit(SINT32 teulIndex, UINT32 exitCode)
@@ -56,12 +56,12 @@ void clientActivateCell(SINT32 teulIndex, LOGICAL on, UINT32 host, UINT32 port)
 	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
 	if(client)
 	{
-		clientErrorLog("t:%d on:%u h:%u p:%u aCell", teulIndex, on, host, port) ;
+		clientErrorLog("t:%d on:%u h:%u p:%u aCell", teulIndex, on, host, port);
 		client->ActivateCell();
 	}
 	else
 	{
-		clientErrorLog("t:%d aCell/no client", teulIndex) ;
+		clientErrorLog("t:%d aCell/no client", teulIndex);
 	}
 }
 
@@ -77,12 +77,12 @@ void clientActivateMap(SINT32 teulIndex, LOGICAL on, UINT32 host, UINT32 port)
 	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
 	if(client)
 	{
-		clientErrorLog("t:%d on:%u h:%u p:%u aMap", teulIndex, on, host, port) ;
+		clientErrorLog("t:%d on:%u h:%u p:%u aMap", teulIndex, on, host, port);
 		client->ActivateMap();
 	}
 	else
 	{
-		clientErrorLog("t:%d aMap/no client", teulIndex) ;
+		clientErrorLog("t:%d aMap/no client", teulIndex);
 	}
 }
 
@@ -134,12 +134,12 @@ void clientProcessPostAccept(SINT32 teulIndex, struct FE_POST_ACCEPT* postAccept
 	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
 	if(client)
 	{
-		clientErrorLog("t:%d pAcc", teulIndex) ;
+		clientErrorLog("t:%d pAcc", teulIndex);
 		client->ProcessPostAccept(*postAccept);
 	}
 	else
 	{
-		clientErrorLog("t:%d pAcc/no client", teulIndex) ;
+		clientErrorLog("t:%d pAcc/no client", teulIndex);
 	}
 }
 
@@ -148,12 +148,12 @@ void clientProcessPostDeny(SINT32 teulIndex, struct FE_POST_DENY* postDeny)
 	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
 	if(client)
 	{
-		clientErrorLog("t:%d pDen", teulIndex) ;
+		clientErrorLog("t:%d pDen", teulIndex);
 		client->ProcessPostDeny(*postDeny);
 	}
 	else
 	{
-		clientErrorLog("t:%d pDen/no client", teulIndex) ;
+		clientErrorLog("t:%d pDen/no client", teulIndex);
 	}
 }
 
@@ -198,12 +198,12 @@ void clientProcessSpawnNotify(SINT32 teulIndex, class FESpawnNotify const& spawn
 	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
 	if(client)
 	{
-		clientErrorLog("t:%d sNot", teulIndex) ;
+		clientErrorLog("t:%d sNot", teulIndex);
 		client->ProcessSpawnNotify(spawnNotify);
 	}
 	else
 	{
-		clientErrorLog("t:%d sNot/no client", teulIndex) ;
+		clientErrorLog("t:%d sNot/no client", teulIndex);
 	}
 }
 
@@ -212,13 +212,6 @@ void clientProcessCrewBailed(SINT32 teulIndex, struct FE_CREW_BAILED* crewBailed
 	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
 	if(client)
 		client->ProcessCrewBailed(*crewBailed);
-}
-
-void clientProcessDialog(SINT32 teulIndex, int dialog)
-{
-	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
-	if(client)
-		client->ProcessDialog(dialog);
 }
 
 void clientChatProcessMotdReply(SINT32 teulIndex, const MOTD_REPLY& reply)
@@ -268,12 +261,12 @@ void clientChatProcessServerInfo(SINT32 teulIndex, const ChatServerInfo* serverI
 	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
 	if(client)
 	{
-		clientErrorLog("t:%d srvInf", teulIndex) ;
+		clientErrorLog("t:%d srvInf", teulIndex);
 		client->ProcessChatServerInfo(*serverInfo);
 	}
 	else
 	{
-		clientErrorLog("t:%d srvInf/no client", teulIndex) ;
+		clientErrorLog("t:%d srvInf/no client", teulIndex);
 	}
 }
 
@@ -290,7 +283,7 @@ SINT32 PersonaSummaries::receive(SINT32 teulIndex)
 	if(client)
 		client->ProcessPersonaSummaries(*this);
 
-	return 0 ;
+	return 0;
 }
 
 SINT32 PersonaSelection::receive(SINT32 teulIndex)
@@ -308,7 +301,7 @@ SINT32 BrigadeSummaries::receive(SINT32 teulIndex)
 	if(client)
 		client->ProcessBrigadeSummaries(*this);
 
-	return 0 ;
+	return 0;
 }
 
 SINT32 BrigadeSelection::receive(SINT32 teulIndex)
@@ -338,7 +331,7 @@ void ResupplyIssue::process()
 template <>
 SINT32 MISSION_LIST_UPDATE::receive(SINT32 teulIndex, MISSION_LIST_UPDATE& incoming)
 {
-	UINT32 brigadeID = (UINT32)incoming.key() ;
+	UINT32 brigadeID = (UINT32)incoming.key();
 
 	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
 	if(client)
@@ -356,14 +349,14 @@ SINT32 HC_UNIT_LOCATIONS::receive(SINT32 teulIndex, HC_UNIT_LOCATIONS& incoming)
 {
 	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
 	if(!client)
-		return 0 ;
+		return 0;
 
-	Write_Debug("Receiving %u incoming HC Unit Locations", incoming.size()) ;
+	Write_Debug("Receiving %u incoming HC Unit Locations", incoming.size());
 
-	for ( UINT32 i = 0 ; i < incoming.size() ; ++i )
+	for ( UINT32 i = 0; i < incoming.size(); ++i )
 		client->ProcessHCUnitLocation(incoming.data(i));
 
-	incoming.clear() ;
+	incoming.clear();
 
 	return 0;
 }
@@ -380,7 +373,7 @@ SINT32 CHAT_WHO_LIST::receive(SINT32 teulIndex, CHAT_WHO_LIST& incoming)
 
 	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
 	if(!client)
-		return 0 ;
+		return 0;
 
 	// The owner field of the incoming who list will tell us
 	// what kind of ChatWhoList this is.
@@ -390,17 +383,17 @@ SINT32 CHAT_WHO_LIST::receive(SINT32 teulIndex, CHAT_WHO_LIST& incoming)
 	// - CWT_FRIENDS = friends list
 	// - CWT_IGNORE = ignore list
 	// - CWT_HC = high command list
-	int type = (int)incoming.owner() ;
+	int type = (int)incoming.owner();
 
 	if ( incoming.empty() )
 	{
-		client->ProcessEmptyChatWhoList(type) ;
-		return 0 ;
+		client->ProcessEmptyChatWhoList(type);
+		return 0;
 	}
 
-	for ( UINT32 i = 0 ; i < incoming.size() ; ++i )
+	for ( UINT32 i = 0; i < incoming.size(); ++i )
 	{
-		client->ProcessChatWho(type, incoming.data(i)) ;
+		client->ProcessChatWho(type, incoming.data(i));
 	}
 
 	return 0;
@@ -418,16 +411,16 @@ SINT32 RECRUITER_LIST::receive(SINT32 teulIndex, RECRUITER_LIST& incoming)
 
 	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
 	if(!client)
-		return 0 ;
+		return 0;
 
 	if(!incoming.empty())
 	{
-		for ( UINT32 i = 0 ; i < incoming.size() ; ++i )
-			client->ProcessRecruiter(incoming.data(i), (i == 0)) ;
+		for ( UINT32 i = 0; i < incoming.size(); ++i )
+			client->ProcessRecruiter(incoming.data(i), (i == 0));
 	}
 	else
 	{
-		client->ProcessRecruiter(true) ;
+		client->ProcessRecruiter(true);
 	}
 
 	return 0;
@@ -449,7 +442,7 @@ template<>
 SINT32 WAYPOINT_CONTROL::receive(SINT32 teulIndex, WAYPOINT_CONTROL& incoming)
 {
 	// A control message updating the status of a waypoint or a request for a waypoint
-	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex) ;
+	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
 	if(client)
 		client->ProcessWaypointControl(incoming.data(), (int)incoming.flags(), incoming.key());
 
@@ -468,8 +461,8 @@ SINT32 WAYPOINT_XFER_ARRAY::receive(SINT32 teulIndex, WAYPOINT_XFER_ARRAY& incom
 	// when the player joins a mission that already has multiple waypoints specified
 	// leading to inconsistent waypoint clearing behavior
 
-	for ( UINT32 i = 0 ; i < incoming.size() ; ++i )
-		client->ProcessWaypoint(incoming.data(i), WPXT_POST) ;
+	for ( UINT32 i = 0; i < incoming.size(); ++i )
+		client->ProcessWaypoint(incoming.data(i), WPXT_POST);
 
 	return 0;
 }
@@ -479,11 +472,11 @@ SINT32 MISSION_MEMBER_UPDATES::receive(SINT32 teulIndex, MISSION_MEMBER_UPDATES&
 {
 	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
 	if(!client)
-		return 0 ;
+		return 0;
 
-	for ( UINT32 i = 0 ; i < incoming.size() ; ++i )
+	for ( UINT32 i = 0; i < incoming.size(); ++i )
 	{
-		client->ProcessMissionMemberUpdate(incoming.data(i)) ;
+		client->ProcessMissionMemberUpdate(incoming.data(i));
 	}
 
 	return 0;
@@ -497,12 +490,12 @@ SINT32 SQUAD_MSG::receive(SINT32 teulIndex, SQUAD_MSG& incoming)
 {
 	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
 	if(!client)
-		return 0 ;
+		return 0;
 
 	if(incoming.data().isInvite())
-		client->ProcessSquadInvite(incoming.data()) ;
+		client->ProcessSquadInvite(incoming.data());
 	else
-		client->ProcessSquad(incoming.data()) ;
+		client->ProcessSquad(incoming.data());
 
 	return 0;
 }
@@ -515,7 +508,7 @@ SINT32 SquadControlResult::receive(SINT32 teulIndex)
 	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
 	if(!client) return 0;
 
-	client->ProcessSquadControl(*this) ;
+	client->ProcessSquadControl(*this);
 
 	return 0;
 }
@@ -526,7 +519,7 @@ SINT32 SquadControlResult::receive(SINT32 teulIndex)
 template <>
 SINT32 SWING_METER_MSG::receive(SINT32 teulIndex, SWING_METER_MSG& incoming)
 {
-	const SwingMeter& meter = incoming.data() ;
+	const SwingMeter& meter = incoming.data();
 
 	// Values available:
 	//  meter.meter() = the swing value. -3 = Allied favor, +3 = axis favor
@@ -535,7 +528,7 @@ SINT32 SWING_METER_MSG::receive(SINT32 teulIndex, SWING_METER_MSG& incoming)
 	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
 
 	if(client)
-		client->ProcessSwingMeter(meter) ;
+		client->ProcessSwingMeter(meter);
 
 	return 0;
 }
@@ -549,7 +542,7 @@ SINT32 OPINION_POLL_MSG::receive(SINT32 teulIndex, OPINION_POLL_MSG& incoming)
 	OpinionPoll& poll = incoming.data();
 	// Check if this is a valid poll or an empty stub
 	if ( poll.pollID() <= 0 || poll.size() < 2 )
-		return 0 ;
+		return 0;
 
 	ww2::Client* client = ww2::Client::FromTeulIndex(teulIndex);
 	if(client)

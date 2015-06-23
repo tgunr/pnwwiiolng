@@ -59,7 +59,7 @@ SINT32 piFindBitShift(UINT32 Mask)
 {
 SINT32 i;
 
-	for (i=0, Mask=~Mask ; Mask & 1 ; Mask>>=1, i++) /* Empty */ ;
+	for (i=0, Mask=~Mask; Mask & 1; Mask>>=1, i++) /* Empty */;
 
 	return(i);
 }
@@ -225,7 +225,7 @@ LOGICAL piGetTextureMemoryDescriptor(SINT32 texid, SINT32 miplevel, piSURFACEDES
 TEXTURE*	texture;
 
 	texture = piGetTextureData(texid);
-	if (texture == NULL)
+	if (texture == nullptr)
 		return FALSE;
 
 	lppisd->Width       = texture->po2width[miplevel];
@@ -233,7 +233,7 @@ TEXTURE*	texture;
 	lppisd->Pitch       = texture->comp[miplevel] * lppisd->Width;
 	lppisd->Surface     = texture->lpsurf[miplevel];
 
-	if (lppisd->Surface == NULL)
+	if (lppisd->Surface == nullptr)
 		return FALSE;
 
 	lppisd->PixelFormat.BitCount = texture->comp[miplevel] * 8;
@@ -384,7 +384,7 @@ bool piIsMaterialInterior(int id)
 	{
 		firsttime = false;
 
-		MATERIAL* m = NULL;
+		MATERIAL* m = nullptr;
 
 		int num = oglGetMaterials(&m);
 
@@ -535,9 +535,9 @@ LOGICAL piEndScene(void)
 	return(oglEndScene());
 }
 
-LOGICAL piSetRenderState(int StateType, UINT32 State)
+void piSetRenderState(int StateType, UINT32 State)
 {
-	return(oglSetRenderState((oglRENDERSTATETYPES)StateType, State));
+	oglSetRenderState((oglRENDERSTATETYPES)StateType, State);
 }
 
 LOGICAL piDisplayRenderStates(void)
@@ -595,9 +595,9 @@ void* piGetInstance(void)
 #if platOS == OS_WIN32
 	return(ddpGetInstance());
 #elif platOS == OS_MACOS
-	return NULL;
+	return nullptr;
 #elif platOS == OS_LINUX
-	return NULL;
+	return nullptr;
 #else
 	#error "something here?"
 #endif
@@ -774,7 +774,7 @@ void piSetTextureMatrix(const piMATRIX* newtexmat)
 
 void piExitProgram(const SINT8* file, SINT32 line, const SINT8* MessageString)
 {
-	FILE* fp = Fio::OpenLogFile() ;
+	FILE* fp = Fio::OpenLogFile();
 
 #if platOS == OS_WIN32
 #ifdef CRASH_HANDLER
@@ -786,29 +786,29 @@ void piExitProgram(const SINT8* file, SINT32 line, const SINT8* MessageString)
 #if defined(DEBUG_WW2) || defined(BETA_RELEASE)
 	if(MessageString)
 	{
-		char msgFmt[] = "Application crashed and will now exit.\n\nFile: %s\nLine: %u\nMessage: %s\n" ;
-		const size_t fileNameLen = strlen(file) ;
-		const size_t msgLen = strlen(MessageString) ;
-		char* msg   = (char*)alloca(sizeof(msgFmt) + fileNameLen + msgLen + 16) ;
-		sprintf(msg, msgFmt, file, line, MessageString) ;
-		MessageBoxA(NULL, msg, "Application crash/exit", MB_ICONERROR | MB_OK) ;
+		static const char msgFmt[] = "Application crashed and will now exit.\n\nFile: %s\nLine: %u\nMessage: %s\n";
+		const size_t fileNameLen = strlen(file);
+		const size_t msgLen = strlen(MessageString);
+		char* msg   = (char*)alloca(sizeof(msgFmt) + fileNameLen + msgLen + 16);
+		sprintf(msg, msgFmt, file, line, MessageString);
+		MessageBoxA(nullptr, msg, "Application crash/exit", MB_ICONERROR | MB_OK);
 	}
 #endif
 	PostMessageA(myhwnd, WM_CLOSE, 0, 0);
 #endif
 
 #ifndef CRASH_HANDLER
-	if ( fp != NULL )
+	if ( fp != nullptr )
 		fprintf(fp, "Exited Program: file: %s, line: %d, App Version: %s\n", file, line, STRPRODUCTVER);
 	printf("Exited Program: file: %s, line: %d, App Version: %s\n", file, line, STRPRODUCTVER);
 	if(MessageString)
 	{
-		if ( fp != NULL )
+		if ( fp != nullptr )
 			fprintf(fp, "Message string: %s\n", MessageString);
 		printf("Message string: %s\n", MessageString);
 	}
-	if ( fp != NULL )
-		fclose(fp) ;
+	if ( fp != nullptr )
+		fclose(fp);
 
 #endif
 
@@ -837,7 +837,7 @@ void piReleaseIndexSource(int srcid)
 
 VERTEXSOURCE* piGetVertexData(int srcid)
 {
-	return NULL;
+	return nullptr;
 }
 
 LOGICAL piSetVertexSource(SINT32 srcid, UINT32 Stride, UINT32 FVF)
@@ -847,7 +847,7 @@ LOGICAL piSetVertexSource(SINT32 srcid, UINT32 Stride, UINT32 FVF)
 
 INDEXSOURCE* piGetIndexData(int srcid)
 {
-	return NULL;
+	return nullptr;
 }
 
 LOGICAL piSetIndexSource(SINT32 srcid, UINT32 unique)

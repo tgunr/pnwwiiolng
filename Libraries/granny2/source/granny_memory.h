@@ -132,10 +132,10 @@ EXPAPI typedef void deallocate_callback(char const *File, int32x Line,
 extern allocate_callback *AllocateCallback;
 extern deallocate_callback *DeallocateCallback;
 
-EXPAPI GS_READ void GetAllocator(allocate_callback *&AllocateCallback,
-                                 deallocate_callback *&DeallocateCallback);
-EXPAPI GS_MODIFY void SetAllocator(allocate_callback *AllocateCallback,
-                                   deallocate_callback *DeallocateCallback);
+EXPAPI GS_READ void GetAllocator(allocate_callback *&AllocateCallback_,
+                                 deallocate_callback *&DeallocateCallback_);
+EXPAPI GS_MODIFY void SetAllocator(allocate_callback *AllocateCallback_,
+                                   deallocate_callback *DeallocateCallback_);
 
 // For freeing objects allocated by the builders
 EXPAPI GS_PARAM void FreeBuilderResult(void *Result);

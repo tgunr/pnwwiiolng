@@ -34,7 +34,7 @@
 #undef SPECIAL_LOG
 
 
-static LOGICAL	MergeObjectsIfPossible(OBJECT* main, OBJECT* o);
+static bool	MergeObjectsIfPossible(OBJECT* main, OBJECT* o);
 static void		ReduceBranch(OBJECT* node, OBJECT* branchtop);
 static void		MergeObjectWithBranch(OBJECT* o, OBJECT* node);
 static LOGICAL	IsMergingBranchTopNode(OBJECT* node);
@@ -96,7 +96,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	rdcount1 = piReadTimeStamp64();
 #endif
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -222,7 +222,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	rdcount1 = piReadTimeStamp64();
 #endif
 
-	if (lpmain == NULL)
+	if (lpmain == nullptr)
 	{
 		return(FALSE);
 	}
@@ -238,7 +238,7 @@ __int64		rdcount, rdcount1, rdcount2;
 			if (num > 0)
 			{
 				piVectorConstPtr rpos = lpobj->RenderPositions();
-				for (i=0 ; i < num ; i++, ++rpos)
+				for (i=0; i < num; i++, ++rpos)
 				{
 					if (xmn > rpos->x)
 					{
@@ -280,7 +280,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	ay = ymx - (ymx - ymn) * 0.5f;
 	az = zmx - (zmx - zmn) * 0.5f;
 
-	if (loc != NULL)
+	if (loc != nullptr)
 	{
 		loc->x = ax;
 		loc->y = ay;
@@ -296,7 +296,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	zmx -= az;
 
 	// bounding box
-	if (obox != NULL)
+	if (obox != nullptr)
 	{
 		obox[0].x = xmn;
 		obox[0].y = ymn;
@@ -308,12 +308,12 @@ __int64		rdcount, rdcount1, rdcount2;
 	}
 
 	// min and max radii
-	if (minrad != NULL)
+	if (minrad != nullptr)
 	{
 		*minrad = xmn * xmn + ymn * ymn + zmn * zmn;
 	}
 
-	if (maxrad != NULL)
+	if (maxrad != nullptr)
 	{
 		*maxrad = xmx * xmx + ymx * ymx + zmx * zmx;
 	}
@@ -333,7 +333,7 @@ LOGICAL ldmdlUpdateLocation(OBJECT* lpobj)
 {
 piVECTOR		loc;
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -374,7 +374,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	pscdn  = lpobj->pscdn;
 
 	num = lpobj->numtris;
-	for (i=0 ; i < num ; i++, pt++)
+	for (i=0; i < num; i++, pt++)
 	{
 		// retrieve all three vectors numbers
 		fst = pt->v1;
@@ -472,7 +472,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	pscdn  = lpobj->pscdn;
 
 	num = lpobj->numtris;
-	for (i=0 ; i < num ; i++, pt++)
+	for (i=0; i < num; i++, pt++)
 	{
 		// retrieve all three vectors numbers
 		fst = pt->v1;
@@ -544,7 +544,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	piVectorPtr mnorm = lpobj->MutableNormals();
 
 	num = lpobj->numverts;
-	for (i=0 ; i < num ; i++, ++mnorm)
+	for (i=0; i < num; i++, ++mnorm)
 	{
 		mnorm->x = 0.0f;
 		mnorm->y = 0.0f;
@@ -554,7 +554,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	pt = lpobj->ptris;
 
 	num = lpobj->numtris;
-	for (i=0 ; i < num ; i++, pt++)
+	for (i=0; i < num; i++, pt++)
 	{
 		// retrieve all three vectors numbers
 		fst = pt->v1;
@@ -579,7 +579,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	}
 
 	num = lpobj->numverts;
-	for (i=0 ; i < num ; i++, ++mnorm)
+	for (i=0; i < num; i++, ++mnorm)
 	{
 		Normalize(mnorm.ptr);
 	}
@@ -1031,13 +1031,13 @@ __int64		rdcount, rdcount1, rdcount2;
 
 	piVectorConstPtr rpos = lpobj->RenderPositions();
 	piVectorPtr mnorm = lpobj->StaticNormals();
-	if(mnorm.ptr == NULL)
+	if(mnorm.ptr == nullptr)
 	{
 		return FALSE;
 	}
 
 	numv = lpobj->numverts;
-	for (i=0 ; i < numv ; i++, ++rpos, ++mnorm)
+	for (i=0; i < numv; i++, ++rpos, ++mnorm)
 	{
 		mnorm->x = 0.0f;
 		mnorm->y = 0.0f;
@@ -1053,7 +1053,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	pscdn  = lpobj->pscdn;
 
 	num = lpobj->numtris;
-	for (i=0 ; i < num ; i++, pt++)
+	for (i=0; i < num; i++, pt++)
 	{
 		// retrieve all three vectors numbers
 		fst = pt->v1;
@@ -1128,7 +1128,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	}
 
 	num = lpobj->numverts;
-	for (i=0 ; i < num ; i++, ++mnorm)
+	for (i=0; i < num; i++, ++mnorm)
 	{
 		Normalize(mnorm.ptr);
 	}
@@ -1165,13 +1165,13 @@ __int64		rdcount, rdcount1, rdcount2;
 
 	piVectorConstPtr rpos = lpobj->RenderPositions();
 	piVectorPtr mnorm = lpobj->MutableNormals();
-	if(mnorm.ptr == NULL)
+	if(mnorm.ptr == nullptr)
 	{
 		return FALSE;
 	}
 
 	numv = lpobj->numverts;
-	for (i=0 ; i < numv ; i++, ++mnorm)
+	for (i=0; i < numv; i++, ++mnorm)
 	{
 		mnorm->x = 0.0f;
 		mnorm->y = 0.0f;
@@ -1189,7 +1189,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	pscdn  = lpobj->pscdn;
 
 	num = lpobj->numtris;
-	for (i=0 ; i < num ; i++, pt++)
+	for (i=0; i < num; i++, pt++)
 	{
 		// retrieve all three vectors numbers
 		fst = pt->v1;
@@ -1263,7 +1263,7 @@ __int64		rdcount, rdcount1, rdcount2;
 	}
 
 	numv = lpobj->numverts;
-	for (i=0 ; i < numv ; i++, ++mnorm)
+	for (i=0; i < numv; i++, ++mnorm)
 	{
 		Normalize(mnorm.ptr);
 	}
@@ -1305,7 +1305,7 @@ __int64		rdcount, rdcount1, rdcount2;
 
 	numv = lpobj->numverts;
 	num = lpobj->numtris;
-	for (i=0 ; i < num ; i++, pt++)
+	for (i=0; i < num; i++, pt++)
 	{
 		// retrieve all three vectors numbers
 		fst = pt->v1;
@@ -1384,19 +1384,19 @@ piVECTOR*		pso;
 piVECTOR*		psn;
 piINDICES*		pt;
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
 
 	piVectorPtr snorm = lpobj->StaticNormals();
-	if (snorm.ptr == NULL)
+	if (snorm.ptr == nullptr)
 	{
 		return FALSE;
 	}
 
 	num = lpobj->numverts;
-	for (i=0 ; i < num ; i++, ++snorm)
+	for (i=0; i < num; i++, ++snorm)
 	{
 		snorm->x = -snorm->x;
 		snorm->y = -snorm->y;
@@ -1411,7 +1411,7 @@ piINDICES*		pt;
 	psn = lpobj->psnorms;
 
 	num = lpobj->numtris;
-	for (i=0 ; i < num ; i++, pt++, pso++, psn++)
+	for (i=0; i < num; i++, pt++, pso++, psn++)
 	{
 		v = pt->v2;
 		pt->v2 = pt->v3;
@@ -1430,7 +1430,7 @@ piINDICES*		pt;
 // reverse the vertex normals
 LOGICAL ldmdlReverseObjectNormals(OBJECT* lpobj)
 {
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -1440,7 +1440,7 @@ LOGICAL ldmdlReverseObjectNormals(OBJECT* lpobj)
 		ldmdlReverseNormals(lpobj);
 		lpobj = lpobj->attached;
 	}
-	while (lpobj != NULL);
+	while (lpobj != nullptr);
 
 	return(TRUE);
 }
@@ -1451,8 +1451,8 @@ static OBJECT* _reduceTrees(OBJECT* o)
 
     SINT32 tris = 0;
 
-    OBJECT* commentobjects = NULL;
-    OBJECT* head = NULL;
+    OBJECT* commentobjects = nullptr;
+    OBJECT* head = nullptr;
 
     while(sibling)
     {
@@ -1489,7 +1489,7 @@ static OBJECT* _reduceTrees(OBJECT* o)
         return o;
     }
 
-    OBJECT* newobj = NULL;
+    OBJECT* newobj = nullptr;
 
     // One triangle old object for one vertice new object
     obmainCreateObjectFull(&newobj, o->name, tris, tris);
@@ -1551,7 +1551,7 @@ static OBJECT* _reduceTrees(OBJECT* o)
 
     if(commentobjects)
     {
-        head->sibling = NULL;
+        head->sibling = nullptr;
         newobj->sibling = commentobjects;
     }
 
@@ -1760,7 +1760,7 @@ piINDICES	ndx;
 piINDICES*	pt;
 
 
-	if (lpobj == NULL)
+	if (lpobj == nullptr)
 	{
 		return(FALSE);
 	}
@@ -1784,7 +1784,7 @@ piINDICES*	pt;
 		piVectorConstPtr rpos = lpobj->RenderPositions();
 		num = lpobj->numtris;
 		pt = lpobj->ptris;
-		for (i=0 ; i < num-1 ; i++)
+		for (i=0; i < num-1; i++)
 		{
 			math3dSubtractVectors(&pv1, &rpos[pt[i].v1], &pp);
 			math3dSubtractVectors(&pv2, &rpos[pt[i].v2], &pp);
@@ -1793,7 +1793,7 @@ piINDICES*	pt;
 			math3dAddVectors(&pv1, &pv1, &pv3);
 			d1 = math3dDotProduct(&pv1, &pv1);
 
-			for (j=i+1 ; j < num ; j++)
+			for (j=i+1; j < num; j++)
 			{
 				math3dSubtractVectors(&pv1, &rpos[pt[j].v1], &pp);
 				math3dSubtractVectors(&pv2, &rpos[pt[j].v2], &pp);
@@ -1823,20 +1823,20 @@ LOGICAL _SetObjectToNoFiltering(OBJECT * Obj)
 {
 OBJECT * ObjAtt, *ObjSib;
 
-	if (Obj == NULL)
+	if (Obj == nullptr)
 	{
 		return 0;
 	}
 
 	ObjSib = Obj;
 
-	while (ObjSib != NULL)
+	while (ObjSib != nullptr)
 	{
 		if (!(ObjSib->flags & OBJECT_NOTOBJECT))
 		{
 			ObjAtt = ObjSib;
 
-			while (ObjAtt != NULL)
+			while (ObjAtt != nullptr)
 			{
 				ObjAtt->flags |= OBJECT_NOFILTER;
 
@@ -1844,7 +1844,7 @@ OBJECT * ObjAtt, *ObjSib;
 			}
 		}
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_SetObjectToNoFiltering(ObjSib->child);
 		}
@@ -1861,7 +1861,7 @@ LOGICAL ldmdlUpdateGroupFilteringAndBlendStatus(OBJECT * ObjGrp)
 OBJECT * ObjAtt;
 SINT8*		ptr;
 
-	if (ObjGrp == NULL)
+	if (ObjGrp == nullptr)
 	{
 		return (TRUE);
 	}
@@ -1881,9 +1881,9 @@ SINT8*		ptr;
 
 		ObjAtt = ObjAtt->attached;
 	}
-	while (ObjAtt != NULL);
+	while (ObjAtt != nullptr);
 
-	if (ObjGrp->child != NULL)
+	if (ObjGrp->child != nullptr)
 	{
 		_UpdateGroupFilteringAndBlendStatus(ObjGrp->child);
 	}
@@ -1897,7 +1897,7 @@ static LOGICAL _UpdateGroupFilteringAndBlendStatus(OBJECT * ObjGrp)
 OBJECT* ObjAtt,*ObjSib;
 SINT8*		ptr;
 
-	if (ObjGrp == NULL)
+	if (ObjGrp == nullptr)
 	{
 		return (TRUE);
 	}
@@ -1921,16 +1921,16 @@ SINT8*		ptr;
 
 			ObjAtt = ObjAtt->attached;
 		}
-		while (ObjAtt != NULL);
+		while (ObjAtt != nullptr);
 
-		if (ObjSib->child != NULL)
+		if (ObjSib->child != nullptr)
 		{
 			_UpdateGroupFilteringAndBlendStatus(ObjSib->child);
 		}
 
 		ObjSib = ObjSib->sibling;
 	}
-	while (ObjSib != NULL);
+	while (ObjSib != nullptr);
 
 	return (TRUE);
 }
@@ -1940,7 +1940,7 @@ LOGICAL ldmdlUpdateGroupFilteringStatus(OBJECT * ObjGrp)
 {
 SINT8*		ptr;
 
-	if (ObjGrp == NULL)
+	if (ObjGrp == nullptr)
 	{
 		return (TRUE);
 	}
@@ -1961,31 +1961,94 @@ SINT8*		ptr;
 }
 #endif
 
+//////////////////////////////////////////////////////////////////////
+// Return true if two objects can be merged.
+//////////////////////////////////////////////////////////////////////
 
+bool CanObjectsMerge(OBJECT& lhs, OBJECT& rhs)
+{
+	const bool lhsHasAlpha = (lhs.flag2 & OBJECT_HASALPHA);
+	const bool rhsHasAlpha = (rhs.flag2 & OBJECT_HASALPHA);
+
+	if (PN_LIKELY(&lhs != &rhs))
+	{
+		if (_reduceModel && (lhsHasAlpha || rhsHasAlpha))
+			return false;
+		if (lhs.matid != rhs.matid || lhs.texid != rhs.texid || lhsHasAlpha != rhsHasAlpha)
+			return false;
+		if ((lhs.flag2 & OBJECT_HIDDEN) != (rhs.flag2 & OBJECT_HIDDEN))
+			return false;
+		if ((lhs.flags & OBJECT_INDEXED) && (rhs.flags & OBJECT_INDEXED))
+			return true;
+	}
+	return false;
+}
 
 //////////////////////////////////////////////////////////////////////
 //	ldmdlReduceAttachments
 //
-//Merges all attachements to an object
+//Merges all attachments to an object
 //////////////////////////////////////////////////////////////////////
+
 void ldmdlReduceAttachments(OBJECT* node)
 {
-	if(!node) return;
+	if(PN_UNLIKELY(!node))
+		return;
 
-	OBJECT*				next			= node;
-	OBJECT*				attached		= node->attached;
-	OBJECT*				next_attached	= NULL;
-
-	while(next)
+	std::vector<OBJECT*> candidates;
+	for (OBJECT* curNode = node; curNode; curNode = curNode->attached)
 	{
-		attached = node->attached;
-		while(attached)
+		candidates.clear();
+		size_t resultNumVerts = curNode->numverts;
+		size_t resultNumTris = curNode->numtris;
+
+		// Try to consume as many nodes as we can
+		for (OBJECT* attached = curNode->attached; attached; attached = attached->attached)
 		{
-			next_attached = attached->attached;
-			MergeObjectsIfPossible(next, attached);
-			attached = next_attached;
+			if (CanObjectsMerge(*curNode, *attached))
+			{
+				candidates.push_back(attached);
+				resultNumVerts += attached->numverts;
+				resultNumTris += attached->numtris;
+			}
 		}
-		next = next->attached;
+
+		if (candidates.empty())
+			continue;
+
+		curNode->flags &= ~OBJECT_TRIANGLEFAN;
+		curNode->flags |= (OBJECT_TRIANGLELIST | OBJECT_INDEXED);
+
+		curNode->puverts = (piUNIFIED_VERTEX*)memRealloc(curNode->puverts, resultNumVerts * sizeof(piUNIFIED_VERTEX));
+		curNode->ptris = (piINDICES*)memRealloc(curNode->ptris, resultNumTris * sizeof(piINDICES));
+
+		if (curNode->psnorms != curNode->psnorig)
+			memRelease(curNode->psnorms);
+		memRelease(curNode->psnorig);
+		if (curNode->pscdn != curNode->pscdon)
+			memRelease(curNode->pscdn);
+		memRelease(curNode->pscdon);
+		memRelease(curNode->ptverts);
+
+		for (auto it = candidates.begin(), end = candidates.end(); it != end; ++it)
+		{
+			auto addVerts = (*it)->numverts;
+			memcpy(curNode->puverts + curNode->numverts, (*it)->puverts, addVerts * sizeof(piUNIFIED_VERTEX));
+			curNode->numverts += addVerts;
+			obmainDeleteNode(*it);
+		}
+
+		auto i = curNode->numtris;
+		for (auto it = curNode->ptris + i, end = curNode->ptris + resultNumTris; it != end; ++it)
+		{
+			// Funky useless indices
+			it->v1 = i++;
+			it->v2 = i++;
+			it->v3 = i++;
+		}
+
+		curNode->numtris = resultNumTris;
+		ABORT_IF(curNode->numverts != resultNumVerts);
 	}
 	return;
 }
@@ -1995,83 +2058,50 @@ void ldmdlReduceAttachments(OBJECT* node)
 //
 //Merges two objects if they are compatible
 //////////////////////////////////////////////////////////////////////
-LOGICAL MergeObjectsIfPossible(OBJECT* main, OBJECT* o)
+
+bool MergeObjectsIfPossible(OBJECT* main, OBJECT* o)
 {
-	if(!main || !o) return FALSE;
+	if (PN_UNLIKELY(!main || !o))
+		return FALSE;
 
-	UINT16				old_numverts	= main->numverts;
-	piUNIFIED_VERTEX*	old_puverts		= main->puverts;
+	if (!CanObjectsMerge(*main, *o))
+		return FALSE;
 
-    // For sorting issues, make sure both are either blended or not blended when merging
-    bool mainHasAlpha = main->flag2 & OBJECT_HASALPHA;
-    bool oHasAlpha = o->flag2 & OBJECT_HASALPHA;
+	UINT16				old_numverts = main->numverts;
+	UINT16				old_numtris = main->numtris;
 
-    // Blended objects are merged as attached objects from ldflt. Merging them again from reduceModel produces
-    // sorting anomalies. Do not merge all like blended objects from ldmdlReduceModel.
-    if(_reduceModel)
-    {
-        if(oHasAlpha || mainHasAlpha)
-        {
-            return FALSE;
-        }
-    }
+	// Append o onto main
+	main->numverts += o->numverts;
+	main->numtris += o->numtris;
 
- 	if( main != o														&&
-		main->matid == o->matid											&&
-		main->texid == o->texid											&&
-        mainHasAlpha == oHasAlpha                                       &&
-		((main->flag2 & OBJECT_HIDDEN) == (o->flag2 & OBJECT_HIDDEN))	&&
-		main->flags & OBJECT_INDEXED									&&
-		o->flags & OBJECT_INDEXED)
-	{
-		// Append o onto main
+	main->flags &= ~OBJECT_TRIANGLEFAN;
+	main->flags |= (OBJECT_TRIANGLELIST | OBJECT_INDEXED);
 
+	if(main->psnorms != main->psnorig)
+		memRelease(main->psnorms);
+	memRelease(main->psnorig);
+	if(main->pscdn != main->pscdon)
+		memRelease(main->pscdn);
+	memRelease(main->pscdon);
+	memRelease(main->ptverts);
 
-		main->numverts += o->numverts;
-		main->numtris += o->numtris;
+	main->psnorig		= nullptr;
+	main->psnorms		= nullptr;
+	main->pscdon		= nullptr;
+	main->pscdn			= nullptr;
+	main->ptverts		= nullptr;
 
-		main->flags &= ~OBJECT_TRIANGLEFAN;
-		main->flags |= OBJECT_TRIANGLELIST;
-		main->flags |= OBJECT_INDEXED;
+	main->puverts		= (piUNIFIED_VERTEX*)memRealloc(main->puverts, main->numverts * sizeof(piUNIFIED_VERTEX));
+	main->ptris			= (piINDICES*)memRealloc(main->ptris, main->numtris * sizeof(piINDICES));
 
+	memcpy(main->puverts + old_numverts, o->puverts, o->numverts*sizeof(piUNIFIED_VERTEX));
 
-		if(main->ptris)		memFree(main->ptris);
-		if(main->psnorig)	memFree(main->psnorig);
-		if(main->psnorms && main->psnorms != main->psnorig)	memFree(main->psnorms);
-		if(main->pscdon)	memFree(main->pscdon);
-		if(main->pscdn && main->pscdn != main->pscdon)		memFree(main->pscdn);
-		if(main->ptverts)	memFree(main->ptverts);
+	main->PopulateIndexes(old_numtris);
 
-		main->puverts		= NULL;
-		main->ptris			= NULL;
-		main->psnorig		= NULL;
-		main->psnorms		= NULL;
-		main->pscdon		= NULL;
-		main->pscdn			= NULL;
-		main->ptverts		= NULL;
+	obmainDeleteNode(o);
 
-		main->puverts		= (piUNIFIED_VERTEX*)memAlloc(main->numverts * sizeof(piUNIFIED_VERTEX));
-		main->ptris			= (piINDICES*)memAlloc(main->numtris * sizeof(piINDICES));
-
-		memcpy(main->puverts, old_puverts, old_numverts*sizeof(piUNIFIED_VERTEX));
-		memcpy(main->puverts + old_numverts, o->puverts, o->numverts*sizeof(piUNIFIED_VERTEX));
-		if(old_puverts) memFree(old_puverts);
-
-		piINDICES*	ptris = main->ptris;
-
-		for(int i=0 ; i < main->numtris ; i++)
-		{	// Funky useless indices
-			ptris[i].v1 = (i*3);
-			ptris[i].v2 = (i*3) + 1;
-			ptris[i].v3 = (i*3) + 2;
-		}
-
-		obmainDeleteNode(o);
-		return TRUE;
-	}
-	return FALSE;
+	return true;
 }
-
 
 //////////////////////////////////////////////////////////////////////
 //	ldmdlReduceModel
@@ -2153,7 +2183,7 @@ static void MergeObjectWithBranch(OBJECT* o, OBJECT* node)
 			if(MergeObjectsIfPossible(o, node))
 			{
 				// attached takes over sibling pointer if node is deleted
-				if(attached) sibling = NULL;
+				if(attached) sibling = nullptr;
 			}
 		}
 		if(child) MergeObjectWithBranch(o, child);
@@ -2264,16 +2294,17 @@ typedef std::multimap<size_t,ogl::VertexIdx> UniVertexIndexer;
 //////////////////////////////////////////////////////////////////////
 void ldmdlIndexVertices(OBJECT* o)
 {
-	std::vector<ogl::VertexIdx>				indices;
-	std::vector<piUNIFIED_VERTEX>			uniqueVertices;
 //	std::vector<piUNIFIED_VERTEX>::iterator	existingElement;
-	piUNIFIED_VERTEX*						crtVertex			= NULL;
-
-  UniVertexIndexer indexer;
-  ogl::VertexIdx existingElementIndex;
+	piUNIFIED_VERTEX*						crtVertex			= nullptr;
 
 	if(o->numverts)
 	{
+		UniVertexIndexer indexer;
+		ogl::VertexIdx existingElementIndex;
+		std::vector<ogl::VertexIdx>		indices;
+		std::vector<piUNIFIED_VERTEX>	uniqueVertices;
+		indices.reserve(o->numverts);
+		uniqueVertices.reserve(o->numverts);
 		crtVertex = o->puverts;
         if(o->numverts > 3 && (o->numverts % 3) == 0 && (o->numverts / 3) == o->numtris)
 		{
@@ -2301,9 +2332,9 @@ void ldmdlIndexVertices(OBJECT* o)
 
                 if ( newVertex )
                 {
-				    indices.push_back(uniqueVertices.size());
+				    indices.push_back((ogl::VertexIdx)uniqueVertices.size());
 				    uniqueVertices.push_back(*crtVertex);
-                    indexer.insert( std::pair<size_t,ogl::VertexIdx>( code, uniqueVertices.size()-1) );
+                    indexer.insert( std::pair<size_t,ogl::VertexIdx>( code, (ogl::VertexIdx)uniqueVertices.size()-1) );
                 }
                 else
                 {

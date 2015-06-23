@@ -20,7 +20,7 @@ extern int FloatToInt(float);
 #include <deque>
 
 static std::deque<Emitter*> _freeemitters;
-static Emitter* EmitterBlock = NULL;
+static Emitter* EmitterBlock = nullptr;
 
 /*------------------------------------------------------------------
 Function: EmitterMgrInit
@@ -45,7 +45,7 @@ void EmitterMgrKill()
     if(EmitterBlock)
     {
         delete[] EmitterBlock;
-        EmitterBlock = NULL;
+        EmitterBlock = nullptr;
     }
 
     _freeemitters.clear();
@@ -67,7 +67,7 @@ Description:
 -------------------------------------------------------------------*/
 Emitter* EmitterMgrGetEmitter()
 {
-    Emitter* e = NULL;
+    Emitter* e = nullptr;
 
     if(_freeemitters.empty())
     {
@@ -107,10 +107,10 @@ void Emitter::reset()
     _animindex = -1;
     _separation = 0.1f;
     _particleflags = 0;
-    _pm = NULL;
-    _particleeffect = NULL;
-    _stratobj = NULL;
-    _particle = NULL;
+    _pm = nullptr;
+    _particleeffect = nullptr;
+    _stratobj = nullptr;
+    _particle = nullptr;
 }
 
 /*------------------------------------------------------------------
@@ -132,10 +132,10 @@ void Emitter::reset(Emitterfx* e)
     _separation = 0.1f;
     _particleflags = 0;
     _animindex = -1;
-    _pm = NULL;
-    _stratobj = NULL;
-    _particleeffect = NULL;
-    _particle = NULL;
+    _pm = nullptr;
+    _stratobj = nullptr;
+    _particleeffect = nullptr;
+    _particle = nullptr;
 }
 
 /*------------------------------------------------------------------
@@ -154,14 +154,14 @@ Emitter::Emitter()
     _particleflags = 0;
     _emitterflags = 0;
 
-    _stratobj = NULL;
-    _particleeffect = NULL;
+    _stratobj = nullptr;
+    _particleeffect = nullptr;
 
     _gravitycoef = 0;
     _dragcoef = 0;
     _separation = 0;
     _animindex = -1;
-    _particle = NULL;
+    _particle = nullptr;
     _enable = false;
     _firstrun = true;
 }

@@ -16,8 +16,8 @@
 #define vsnprintf _vsnprintf
 #endif
 
-static const UINT32 DBUG_FLAG_MASK = 0xfffffff0 ;	// flags mask
-static const UINT32 DBUG_MAX_STRING = 4224 ;
+static const UINT32 DBUG_FLAG_MASK = 0xfffffff0;	// flags mask
+static const UINT32 DBUG_MAX_STRING = 4224;
 static const UINT32 DBUG_MAX_PATH = 128;
 
 class DebugLogger
@@ -36,37 +36,33 @@ public:
 		,	errType(0)
 		,	err(0)
 		,	lineno(0)
-		,	m_program(NULL), m_file(NULL)
+		,	m_program(nullptr), m_file(nullptr)
 		{
-			m_text[0] = m_text[sizeof(m_text)-1] = 0 ;
+			m_text[0] = m_text[sizeof(m_text)-1] = 0;
 		}
 
 public:
-	const char* file() const { return m_file ; }
-	const char* program() const { return m_program ; }
-	const char* text() const { return m_text ; }
+	const char* file() const { return m_file; }
+	const char* program() const { return m_program; }
+	const char* text() const { return m_text; }
 
-	void setFileName(const char* src) { m_file = src ; }
-	void setProgram(const char* src) { m_program = src ; }
-	void setText(char* src) { if ( src ) strncpy(m_text, src, DBUG_MAX_STRING) ; else m_text[0] = 0 ; m_text[DBUG_MAX_STRING-1] = 0 ; }
+	void setFileName(const char* src) { m_file = src; }
+	void setProgram(const char* src) { m_program = src; }
+	void setText(char* src) { if ( src ) strncpy(m_text, src, DBUG_MAX_STRING); else m_text[0] = 0; m_text[DBUG_MAX_STRING-1] = 0; }
 
 	int vformatText(const char* fmt, va_list args)
 	{
-		const int result = std::min(vsnprintf(m_text, DBUG_MAX_STRING, fmt, args), (int)DBUG_MAX_STRING - 1) ;
-		if ( static_cast<UINT64>(result) < DBUG_MAX_STRING )
-			m_text[result] = 0 ;
-		return result ;
+		const int len = std::min(vsnprintf(m_text, DBUG_MAX_STRING, fmt, args), (int)DBUG_MAX_STRING - 1);
+		m_text[len] = 0;
+		return len;
 	}
 
-	int formatText(const char* fmt, ...)
+	template<typename... Args>
+	int formatText(const char* fmt, Args... args)
 	{
-		int len = 0 ;
-		va_list args ;
-		va_start(args, fmt) ;
-		len = vsnprintf(m_text, DBUG_MAX_STRING, fmt, args) ;
-		va_end(args) ;
-		m_text[DBUG_MAX_STRING-1] = 0 ;
-		return len ;
+		int len = std::min(snprintf(m_text, DBUG_MAX_STRING, fmt, std::forward<Args>(args)...), (int)DBUG_MAX_STRING-1);
+		m_text[len] = 0;
+		return len;
 	}
 
 	void initialize(SINT32 logType_, Debug::ERROR_TYPE level_, SINT32 file_, const char* program_);
@@ -89,5 +85,5 @@ public:
 	SINT32		lineno;
 	const char*	m_program;
 	const char*	m_file;
-	char		m_text[DBUG_MAX_STRING + 1] ;
-} ;
+	char		m_text[DBUG_MAX_STRING + 1];
+};

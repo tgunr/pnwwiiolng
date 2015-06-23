@@ -65,7 +65,7 @@ bool xmlGetNodeValue(xmlNode* node, XML_DATA_TYPE type, void* value, const char*
 
 const char* xmlGetStringFromNode(xmlNode* node, const char* attribute)
 {
-	const char* str = NULL;
+	const char* str = nullptr;
 	return (xmlGetNodeValue(node, XML_DATA_STRING, &str, attribute)) ? str: "";
 }
 

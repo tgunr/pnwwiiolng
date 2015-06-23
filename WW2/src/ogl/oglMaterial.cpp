@@ -15,8 +15,8 @@ Description:
 ---------------------------------------------------------------------------*/
 oglMaterial::oglMaterial() :
     matid(-1),
-    program(NULL),
-    material(NULL),
+    program(nullptr),
+    material(nullptr),
     firsttime(true),
     poolmaterial(false),
     wantshader(false)
@@ -66,7 +66,7 @@ void oglMaterial::ApplyMaterial()
                     material = glslGetUniformBlock("MaterialBlock");
                 }
 
-                // Will be NULL until shader is compiled/linked
+                // Will be nullptr until shader is compiled/linked
                 if(material)
                 {
                     material->SetBlock(&mat, sizeof(piMATERIAL));

@@ -9,7 +9,6 @@
 // Originating Programmer: Oliver "kfsone" Smith
 
 #include "versionNo.h"
-#include "dbug/dbug.h"
 
 #include "include/mydbQuery.h"
 #include <mysql.h>
@@ -23,21 +22,21 @@
 static void
 _callSuccess(void* const data)
 {
-	DBThreadQuery* const q = static_cast<DBThreadQuery*>(data) ;
+	DBThreadQuery* const q = static_cast<DBThreadQuery*>(data);
 
-	q->Success() ;
+	q->Success();
 
-	delete q ;
+	delete q;
 }
 
 static void
 _callFailure(void* data)
 {
-	DBThreadQuery* const q = static_cast<DBThreadQuery*>(data) ;
+	DBThreadQuery* const q = static_cast<DBThreadQuery*>(data);
 
-	q->Failure() ;
+	q->Failure();
 
-	delete q ;
+	delete q;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -47,8 +46,8 @@ DBThreadQuery::~DBThreadQuery()
 {
 	if ( m_query )
 	{
-		delete m_query ;
-		m_query = NULL ;
+		delete m_query;
+		m_query = nullptr;
 	}
 }
 
@@ -59,21 +58,21 @@ DBThreadQuery::~DBThreadQuery()
 const char*
 _skipExclamationInStatement(const char* src_)
 {
-	const char* p = src_ ;
+	const char* p = src_;
 
 	if ( *p != '!' )
-		return src_ ;
+		return src_;
 
-	threadLog(_FLW, "QUERY WITH !: %s", src_) ;
+	threadLog(_FLW, "QUERY WITH !: %s", src_);
 
-	++p ;
+	++p;
 	while ( *p )
 	{
 		if ( *(p++) == '!' )
-			break ;
+			break;
 	}
 
-	return p ;
+	return p;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -82,77 +81,77 @@ _skipExclamationInStatement(const char* src_)
 bool
 DBThreadQuery::Execute(UINT32 threadNo, DB::handle_t* conn, DBThread::DBNo* lastDb)
 {
-	static const char* const dbName[DBThread::NumDBNos] = { "audit", "auth", "chat", "game", "player", "squad", "sys", "wwii", "wwiionline" } ;
+	static const char* const dbName[DBThread::NumDBNos] = { "audit", "auth", "chat", "game", "player", "squad", "sys", "wwii", "wwiionline" };
 
 	// To avoid various potential race conditions on who has ownership of the
 	// statement string, we need to make our own copy of the statement.
-	const char* const statement = _skipExclamationInStatement(Statement()) ;
+	const char* const statement = _skipExclamationInStatement(Statement());
 
 #ifdef DEV_BUILD
 	if ( g_logDebug )
-		threadLog(_FLD, "dbq:%u db:[%s] execute %s: q:[%s]", threadNo, dbName[m_db], Name(), statement) ;
+		threadLog(_FLD, "dbq:%u db:[%s] execute %s: q:[%s]", threadNo, dbName[m_db], Name(), statement);
 #endif
 
-	bool successful = false ;
+	bool successful = false;
 
 	try
 	{
 		// Wake the connection up if its gone to sleep or gone away
-		mysql_ping(conn) ;
+		mysql_ping(conn);
 
 		if ( m_db != *lastDb )
 		{
 			if ( mysql_select_db(conn, dbName[m_db]) != 0 )
-				throw std::invalid_argument("Error selecting database") ;
-			*lastDb = m_db ;
+				throw std::invalid_argument("Error selecting database");
+			*lastDb = m_db;
 		}
 
-		m_query = new DBQuery(conn, statement) ;
+		m_query = new DBQuery(conn, statement);
 		if ( !m_query )
-			throw std::logic_error("Failed to construct DBQuery") ;
+			throw std::logic_error("Failed to construct DBQuery");
 
 		if ( m_immediate )
-			Success() ;
+			Success();
 		else
 		{
 			// Consume the query here and now, so we can
 			// hand the reult back to the parent thread.
-			const bool processed = Process(Query()->Rows()) ;
-			delete m_query ;
-			m_query = NULL ;
+			const bool processed = Process(Query()->Rows());
+			delete m_query;
+			m_query = nullptr;
 
 			if ( processed == true )
-				threadCallback(_callSuccess, this) ;
+				threadCallback(_callSuccess, this);
 			else
-				threadCallback(_callFailure, this) ;
+				threadCallback(_callFailure, this);
 		}
 
-		successful = true ;
+		successful = true;
 	}
 	catch ( std::logic_error& e )
 	{
-		threadLog(_FLW, "dbq:%u query %s q:[%s] failed: %s", threadNo, Name(), Statement(), e.what()) ;
+		threadLog(_FLW, "dbq:%u query %s q:[%s] failed: %s", threadNo, Name(), Statement(), e.what());
 
 		if ( m_immediate )
-			Failure() ;
+			Failure();
 		else
 		{
 			if ( m_query )
 			{
-				delete m_query ;
-				m_query = NULL ;
+				delete m_query;
+				m_query = nullptr;
 			}
 
-			threadCallback(_callFailure, this) ;
+			threadCallback(_callFailure, this);
 		}
 	}
 
 	if ( m_immediate )
 	{
-		delete this ;
+		delete this;
 	}
 
-	return successful ;
+	return successful;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -163,25 +162,25 @@ bool
 ThreadTextQuery::commit(const TeulTimeMS& maxAge)
 {
 	if ( (m_length == 0) | ((maxAge) & (m_commitFrom) & (m_commitFrom + maxAge > teulClock64)) )
-		return false ;			// Buffer needs to mature for a while longer.
+		return false;			// Buffer needs to mature for a while longer.
 
 	if ( m_length + m_sufLen + 1 >= TEXT_POOL_SIZE )
-		throw std::domain_error("Too much data in ThreadTextQuery buffer to commit") ;
+		throw std::domain_error("Too much data in ThreadTextQuery buffer to commit");
 
 	// Need to add the suffix.
-	strcpy(m_statement + m_length, m_suffix) ;
+	strcpy(m_statement + m_length, m_suffix);
 
 #ifdef BETA_RELEASE
-	dbugLog(_FLD, "Committing: %s", m_statement) ;
+	dbugLog(_FLD, "Committing: %s", m_statement);
 #endif
 
 	// Dispatch to the threading environment.
-	(new DBThreadQuery(m_db, "TTQ::commit", m_statement, DBThreadQuery::_IMMEDIATE))->Queue() ;
+	(new DBThreadQuery(m_db, "TTQ::commit", m_statement, DBThreadQuery::_IMMEDIATE))->Queue();
 
-	m_length = 0LL ;
+	m_length = 0LL;
 
-	m_commitFrom = teulClock64 ;
+	m_commitFrom = teulClock64;
 
-	return true ;
+	return true;
 }
 

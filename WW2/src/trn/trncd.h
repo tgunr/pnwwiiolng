@@ -110,7 +110,7 @@ struct trnAutoGunType
 	SINT8 FireSound[MAX_COUNTRIES][64]; // sound file used for firing
 	SINT8 ReloadSound[MAX_COUNTRIES][64]; // sound file used for reloads
 
-} ;
+};
 
 typedef struct SpawnData
 {
@@ -138,7 +138,7 @@ typedef struct SpawnData
             return itr->second[index];
         }
 
-        return NULL;
+        return nullptr;
     }
 
     inline void addSpawnObject(unsigned int key, OBJECT* o)
@@ -235,7 +235,7 @@ struct trnCDTerrainObject
 
 	bool IsCollidable(UINT32 cflags);
 
-} ;
+};
 
 struct trnAutoGun
 {
@@ -306,7 +306,7 @@ struct trnAutoGun
 
 	SINT32 LastLeadCalcTime;
 
-} ;
+};
 
 	extern LOGICAL trncdCheckTerrainCollision(OBJECT* lpobj, COLLISION* collision);
 	extern LOGICAL trncdCheckTerrainDown(COLLISION* collision);
@@ -417,9 +417,9 @@ struct trnAutoGun
 									const unsigned int collidebits);
 	*/
 
-	extern UINT32 trnUpdateTerrainObjectLODs(UINT32 Override);
-	extern UINT32 trnSetDamageLevel(trnCDTerrainObject * TO,UINT32 DamageLevel);
-	extern UINT32 trnSetCountry(trnCDTerrainObject * TO,UINT32 Country);
+	extern UINT32 trnUpdateTerrainObjectLODs(UINT32 Override_);
+	extern UINT32 trnSetDamageLevel(trnCDTerrainObject * TO,UINT32 DamageLevel_);
+	extern UINT32 trnSetCountry(trnCDTerrainObject * TO_, UINT32 Country_);
 
 	extern UINT32 trnUpdateObjectStatus(SINT32 x, SINT32 y, UINT32 id, SINT32 country = -1, SINT32 vislevel = -1);
 

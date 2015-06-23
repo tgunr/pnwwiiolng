@@ -34,7 +34,7 @@ enum WWII_COUNTRY			//] Definitive list of in-game countries.
 							//+  obstruct supply.
 	// Add new countries here
 	MAX_COUNTRIES			//] Guaranteed to be greater than the highest country no.
-} ;
+};
 
 
 enum WWII_SIDE				//] Definitive list of in-game sides.
@@ -48,23 +48,23 @@ enum WWII_SIDE				//] Definitive list of in-game sides.
 							//] Players with a sidelock of NEUTRAL are banned.
 	// Add new sides here
 	MAX_SIDES				//] Guaranteed to be greater than the highest side no.
-} ;
+};
 
 static inline WWII_SIDE wwiiSide(UINT32 country)
 {
 	switch ( (WWII_COUNTRY)country )
 	{
 	case WWII_NO_COUNTRY:
-		return WWII_NO_SIDE ;
+		return WWII_NO_SIDE;
 	case WWII_ENGLAND:
 	case WWII_FRANCE:
 	case WWII_USA:
-		return ALLIED ;
+		return ALLIED;
 	case WWII_GERMANY:
 	case WWII_ITALY:
-		return AXIS ;
+		return AXIS;
 	default:
-		return NEUTRAL ;
+		return NEUTRAL;
 	}
 }
 
@@ -72,12 +72,17 @@ static inline WWII_SIDE wwiiOtherSide(UINT32 side)
 {
 	switch ( (WWII_SIDE)side )
 	{
-		case WWII_NO_SIDE: return WWII_NO_SIDE ;
-		case ALLIED: return AXIS ;
-		case AXIS: return ALLIED ;
-		default: return NEUTRAL ;
+		case WWII_NO_SIDE: return WWII_NO_SIDE;
+		case ALLIED: return AXIS;
+		case AXIS: return ALLIED;
+		default: return NEUTRAL;
 	}
 }
 
+static inline WWII_COUNTRY wwiiAdjustedCountry(UINT32 country)
+{
+	return static_cast<WWII_COUNTRY>((country < MAX_COUNTRIES) ? country : country - 2);
+}
+
 //tolua_end
-static inline bool isValidSide(WWII_SIDE n) { return (n == ALLIED || n == AXIS) ; }
+static inline bool isValidSide(WWII_SIDE n) { return (n == ALLIED || n == AXIS); }

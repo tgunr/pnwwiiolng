@@ -29,7 +29,6 @@
 #ifndef WIN32
 # define _strlwr(n) strlwr((n))
 # define _strupr(n) strupr((n))
-# define _memccpy(dest,source,byte,maxlen) memccpy(dest,source,byte,maxlen)
 # ifndef _stricmp
 #  define _stricmp(x,y) stricmp(x,y)
 # endif
@@ -55,22 +54,16 @@ extern char* strescape(char* d, const char* s, char c);
 extern size_t strnlen(const char* string, size_t maxlen);
 #endif
 
-static inline int strlencpy(char* dest, const char* source, int maxlen)
+template <size_t _DestSize>
+static inline void strsafecpy(char (&dest)[_DestSize], const char* src)
 {
-char* end;
-int len;
+	strncpy(dest, src, _DestSize - 1);
+	dest[_DestSize - 1] = 0;
+}
 
-	end = (char*)_memccpy(dest,source,'\0',maxlen);
-
-	if (end)
-	{
-		len = (int)(end-dest);
-	}
-	else
-	{
-		*(dest+maxlen) = '\0';
-		len = maxlen;
-	}
-
-	return (len-1);
+template <size_t _DestSize>
+static inline void strsafecpy(wchar_t (&dest)[_DestSize], const wchar_t* src)
+{
+	wcscpy(dest, src, _DestSize - 1);
+	dest[_DestSize - 1] = 0;
 }

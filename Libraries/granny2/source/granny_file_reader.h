@@ -56,7 +56,7 @@ EXPAPI GS_PARAM file_reader *CreatePlatformFileReader(char const *FileNameToOpen
 extern open_file_reader_callback *OpenFileReaderCallback;
 
 EXPAPI GS_READ open_file_reader_callback *GetDefaultFileReaderOpenCallback(void);
-EXPAPI GS_MODIFY void SetDefaultFileReaderOpenCallback(open_file_reader_callback *OpenFileReaderCallback);
+EXPAPI GS_MODIFY void SetDefaultFileReaderOpenCallback(open_file_reader_callback *OpenFileReaderCallback_);
 
 END_GRANNY_NAMESPACE;
 

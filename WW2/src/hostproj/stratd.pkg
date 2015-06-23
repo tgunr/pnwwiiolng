@@ -56,7 +56,7 @@ $hfile "strt/strtPostedWeaponList.h"
 $hfile "strt/strtEventQueue.h"
 $hfile "strt/strtWeaponUpdate.h"
 $hfile "strt/strtObjectiveStats.h"
-$hfile "strt/strtSupercell.h"
+$#include "strt/strtSupercell.h"
 $hfile "strt/strtObjectStruct.h"
 $hfile "strt/strtFacilityStruct.h"
 $hfile "strt/strtLinkStruct.h"
@@ -89,16 +89,16 @@ $hfile "strt/strtCPClass.h"
 
 $hfile "include/luaPkg.h"
 
-extern void print(const char* message) ;
-extern void warn(const char* message) ;
-extern void error(const char* message) ;
-extern void writeToLog(const char* file, const char* func, unsigned int line, const char* level, const char* facil, const char* message) ;
-extern char* ARGS(int i) ;
-extern void gmMessage(const char* message) ;
-extern const char* getCallsign(unsigned long long) ;
+extern void print(const char* message);
+extern void warn(const char* message);
+extern void error(const char* message);
+extern void writeToLog(const char* file, const char* func, unsigned int line, const char* level, const char* facil, const char* message);
+extern char* ARGS(int i);
+extern void gmMessage(const char* message);
+extern const char* getCallsign(unsigned long long);
 
 $#include "include/luaGlue.h"
 $#include "wwii/wwiiThreads.h"
 
-extern void dbDo(const char* msg) ;
+extern void dbDo(const char* msg);
 $#define dbDo(c) DBThread::Do(DBThread::Default, "%s", c)

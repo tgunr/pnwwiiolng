@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Created: Mon Dec 19 15:01:32 CST 2005
 //
 // Inter-server common CPStruct functions
@@ -8,11 +7,8 @@
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-//
-
 
 #include <set>
-#include <string>
 
 #include "strt/strtCPFlags.h"
 #include "strt/strtCPStruct.h"
@@ -27,15 +23,15 @@
 bool
 CPStruct::hasFacilities(UINT32 type, WWII_SIDE forSide) const
 {
-	FacilityStruct* fac = facilityTypeIndex[type] ;
-	while ( fac != NULL )
+	FacilityStruct* fac = facilityTypeIndex[type];
+	while ( fac != nullptr )
 	{
 		if ( fac->side == forSide )
-			return true ;
-		fac = fac->typeNext ;
+			return true;
+		fac = fac->typeNext;
 	}
 
-	return false ;
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -45,22 +41,21 @@ CPStruct::hasFacilities(UINT32 type, WWII_SIDE forSide) const
 LinkStruct*
 CPStruct::linkTo(const CPStruct* rhs) const
 {
-	if ( rhs == NULL || rhs == this )
-		return NULL ;
+	if ( rhs == nullptr || rhs == this )
+		return nullptr;
 
 	// Look through our facilities and find a link
-	LINKS::iterator it ;
-	for ( it = m_links.begin() ; it != m_links.end() ; ++it )
+	for ( auto it = m_links.begin(), end = m_links.end(); it != end; ++it )
 	{
-		LinkStruct* outLink = *it ;
-		if ( outLink == NULL || outLink->endDepot == NULL )
-			continue ;
+		LinkStruct* outLink = *it;
+		if ( PN_UNLIKELY(outLink == nullptr || outLink->endDepot == nullptr) )
+			continue;
 
 		if ( outLink->endDepot->cp == rhs )
-			return outLink ;
+			return outLink;
 	}
 
-	return NULL ;
+	return nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -69,7 +64,7 @@ CPStruct::linkTo(const CPStruct* rhs) const
 LinkStruct*
 CPStruct::linkTo(const FULL_OBJ_ID& rhs) const
 {
-	return linkTo(strtGetCP(rhs)) ;
+	return linkTo(strtGetCP(rhs));
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -80,19 +75,19 @@ void
 CPStruct::processFirebases(bool incoming)
 {
 	if ( numLinks <= 0 )
-		return ;
+		return;
 
-	FacilityStruct* facility ;
-	LinkStruct* fbLink ;
+	FacilityStruct* facility;
+	LinkStruct* fbLink;
 
 	for ( facility = facilityTypeIndex[FACILITY_DEPOT]
-		; facility != NULL
+		; facility != nullptr
 		; facility = facility->typeNext
 		)
 	{
-		fbLink = incoming ? facility->m_incomingLink : facility->m_outgoingLink ;
-		if ( fbLink != NULL && fbLink->firebase )
-			fbLink->processFirebases() ;
+		fbLink = incoming ? facility->m_incomingLink : facility->m_outgoingLink;
+		if ( fbLink != nullptr && fbLink->firebase )
+			fbLink->processFirebases();
 	}
 }
 #else
@@ -110,13 +105,13 @@ CPStruct::setContention(bool toState)
 {
 	if ( toState )
 	{
-		flags |= CP_STAT_CONTENTION ;
-		m_contention = true ;
+		flags |= CP_STAT_CONTENTION;
+		m_contention = true;
 	}
 	else
 	{
-		flags &= ~CP_STAT_CONTENTION ;
-		m_contention = false ;
+		flags &= ~CP_STAT_CONTENTION;
+		m_contention = false;
 	}
 }
 
@@ -128,15 +123,15 @@ CPStruct::flagsFor(WWII_SIDE forSide, const Instance::Descriptor& instance) cons
 {
 	if ( instance.isCampaign() )
 	{
-		UINT32 mask = ((side == forSide) ? (CP_STAT_OWN_HAAC|CP_STAT_OVERRUN) : 0) ;
-		if ( forSide != ALLIED ) mask |= CP_ALLIED_OBJECTIVES ;
-		if ( forSide != AXIS ) mask |= CP_AXIS_OBJECTIVES ;
-		return flags & ~mask ;
+		UINT32 mask = ((side == forSide) ? (CP_STAT_OWN_HAAC|CP_STAT_OVERRUN) : 0);
+		if ( forSide != ALLIED ) mask |= CP_ALLIED_OBJECTIVES;
+		if ( forSide != AXIS ) mask |= CP_AXIS_OBJECTIVES;
+		return flags & ~mask;
 	}
 	else
 	{
 		///TODO:INST: Really need to return instanced flags.
-		return (flags & (CP_STAT_HAS_NAVYBASE|CP_STAT_HAS_AIRBASE|CP_STAT_MAKES_RDP)) | CP_STAT_OPEN | CP_STAT_IN_SUPPLY ;
+		return (flags & (CP_STAT_HAS_NAVYBASE|CP_STAT_HAS_AIRBASE|CP_STAT_MAKES_RDP)) | CP_STAT_OPEN | CP_STAT_IN_SUPPLY;
 	}
 }
 
@@ -147,14 +142,14 @@ LinkStruct*
 CPStruct::link(UINT32 n) const
 {
 	if ( n >= m_links.size() )
-		return NULL ;
-	LINKS::iterator it = m_links.begin() ;
-	UINT32 i = 0 ;
+		return nullptr;
+	LINKS::iterator it = m_links.begin();
+	UINT32 i = 0;
 	while ( i < n ) {
-		++it ;
-		++i ;
+		++it;
+		++i;
 	}
-	return *it ;
+	return *it;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -163,7 +158,7 @@ CPStruct::link(UINT32 n) const
 void
 CPStruct::setSide(WWII_SIDE newSide)
 {
-	side = newSide ;
+	side = newSide;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -172,14 +167,14 @@ CPStruct::setSide(WWII_SIDE newSide)
 void
 CPStruct::updateFriendlyLinkStatus()
 {
-	bool isLinked = ( isBridge() == false && (numLinks < 1 || numOpenLinks >= 1) ) ;
+	bool isLinked = ( isBridge() == false && (numLinks < 1 || numOpenLinks >= 1) );
 	if ( isLinked == m_friendlyLinked )
-		return ;
+		return;
 
-	m_friendlyLinked = isLinked ;
+	m_friendlyLinked = isLinked;
 
 #ifdef IS_STRAT_HOST
-	resetRouteing() ;
+	resetRouteing();
 #endif
 }
 

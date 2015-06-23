@@ -24,7 +24,7 @@ public:
 
     SmokeGrenadeSTO(const WorldPosition_m& worldpos, const AttitudeVector& attitude, UINT32 mslifetime, UINT32 flags)
                     : ServerTrackedObject(0, _EFFECT, _STO_SMOKE_GRENADE, worldpos, attitude, flags, mslifetime)
-					, te(NULL)
+					, te(nullptr)
 					, _stosoundpopID(0)
 					, _stosoundfizzID(0)
     {
@@ -33,7 +33,7 @@ public:
     virtual ~SmokeGrenadeSTO();
 
     SmokeGrenadeSTO(ACTION_OBJECT* const a)
-    : ServerTrackedObject(a), te(NULL), _stosoundpopID(0), _stosoundfizzID(0)
+    : ServerTrackedObject(a), te(nullptr), _stosoundpopID(0), _stosoundfizzID(0)
     {
     }
 

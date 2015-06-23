@@ -12,104 +12,110 @@
 #include "host/host.h"
 #include "host/hostVehicle.h"
 #include "weap/weapList.h"
+#include <future>
 
 class Fake
 {
 public:
-	Fake() : hv(NULL), sx(0), sy(0), dist(0)
-		   , cx(0), cy(0), cz(0), radius(0), speed(0), started(0)
-		   , x(0), y(0), z(0), pitch(0), roll(0), yaw(0)
-		   , vx(0), vy(0), vz(0), ax(0), ay(0), az(0)
-		   , wx(0), wy(0), wz(0)
+	Fake() : m_hv(nullptr), m_sx(0), m_sy(0), m_dist(0)
+		   , m_cx(0), m_cy(0), m_cz(0), m_radius(0), m_speed(0), m_started(0)
+		   , m_x(0), m_y(0), m_z(0), m_pitch(0), m_roll(0), m_yaw(0)
+		   , m_vx(0), m_vy(0), m_vz(0), m_ax(0), m_ay(0), m_az(0)
+		   , m_wx(0), m_wy(0), m_wz(0)
 			{}
 
-	void reset() ;
-	void move() ;
-	void moveAircraft() ;
-	void moveOther() ;
-	void update() ;
+	void reset();
+protected:
+	void moveAircraft();
+	void moveOther();
+public:
+	void update();
 
 public:
-	HostVehicle*	hv ;
-	FLOAT64			sx, sy ;		// Deltas (speeds)
-	FLOAT64			dist ;			// Distance controller
+	HostVehicle*	m_hv;
+	FLOAT64			m_sx, m_sy;		// Deltas (speeds)
+	FLOAT64			m_dist;			// Distance controller
 
-	FLOAT64			cx, cy, cz ;
-	FLOAT64 radius ;
-	FLOAT64 speed ;
-	TeulTimeMS started ;	// teulClock64 walltime in ms
+	FLOAT64			m_cx, m_cy, m_cz;
+	FLOAT64			m_radius;
+	FLOAT64			m_speed;
+	TeulTimeMS		m_started;	// teulClock64 walltime in ms
 
-	FLOAT64	x, y, z ;
-	FLOAT64	pitch, roll, yaw ;
-	FLOAT64	vx, vy, vz ;
-	FLOAT64 ax, ay, az ;
-	FLOAT64	wx, wy, wz ;
-} ;
+	FLOAT64			m_x, m_y, m_z;
+	FLOAT64			m_pitch, m_roll, m_yaw;
+	FLOAT64			m_vx, m_vy, m_vz;
+	FLOAT64			m_ax, m_ay, m_az;
+	FLOAT64			m_wx, m_wy, m_wz;
+};
 
-typedef std::vector<Fake> FAKES ;
-static FAKES _fakes ;
+using FAKES = std::vector<Fake>;
+static FAKES s_fakes;
 
 // Eersel
-FLOAT64 g_fakeBaseX = 254900.94717361819 ;
-FLOAT64 g_fakeBaseY = 3081051.2831075168 ;
-FLOAT64 g_fakeBaseZ = 29.0 ;
+FLOAT64 g_fakeBaseX = 254885;
+FLOAT64 g_fakeBaseY = 3080999;
+FLOAT64 g_fakeBaseZ = 29;
 
-UINT32 g_fakeRange = 500 ;
-UINT32 g_fakeSpeed = 50 ;
-FLOAT64 g_fakeDensity = 12.0 ;
-FLOAT64 g_fakeAirZ = 600.0 ;
-bool g_fakeMovement = true ;
-bool g_enableFunnyFarm = false ;
-static const UINT32 g_waves = 2 ;
-UINT32 g_modify = 0 ;
+UINT32 g_fakeRange = 500;
+UINT32 g_fakeSpeed = 50;
+FLOAT64 g_fakeDensity = 12.0;
+FLOAT64 g_fakeAirZ = 600.0;
+bool g_fakeMovement = true;
+#ifdef BETA_RELEASE
+bool g_enableFunnyFarm = true;
+#else
+bool g_enableFunnyFarm = false;
+#endif
+static const UINT32 g_waves = 2;
+UINT32 g_modify = 0;
 
 void
 Fake::reset()
 {
-	UINT32 unitNo = hv->vehicleData.squad ;
+	UINT32 unitNo = m_hv->vehicleData.squad;
 
-	cx = g_fakeBaseX + (g_fakeDensity * (FLOAT64)(unitNo%16)) - 8 * g_fakeDensity ;
-	cy = g_fakeBaseY + (g_fakeDensity * (FLOAT64)(unitNo/16)) - 8 * g_fakeDensity ;
+	m_cx = g_fakeBaseX + (g_fakeDensity * (FLOAT64)(unitNo%16)) - 8 * g_fakeDensity;
+	m_cy = g_fakeBaseY + (g_fakeDensity * (FLOAT64)(unitNo/16)) - 8 * g_fakeDensity;
 
-	cz = g_fakeBaseZ ;
+	m_cz = g_fakeBaseZ;
 
-	radius = 5 + (rand() % (g_fakeRange*100))/100 ;
-	speed = 1 + (rand() % (g_fakeSpeed * 10)) / 10 ;
+	m_radius = 5 + (rand() % (g_fakeRange*100))/100;
+	m_speed = 1 + (rand() % (g_fakeSpeed * 10)) / 10;
 
 	// Bump aircraft altitude a little
-	if ( hv->spec().wCategory == _AIRCRAFT )
+	if ( m_hv->spec().wCategory == _AIRCRAFT )
 	{
-		cz += (g_fakeAirZ / 2) + (rand() % (UINT32)g_fakeAirZ*3) ;
-		radius = g_fakeRange + (rand() % (g_fakeRange*1000))/100 ;
-		speed = 75 + speed + (rand() % g_fakeSpeed) ;
+		m_cz += (g_fakeAirZ / 2) + (rand() % (UINT32)g_fakeAirZ*3);
+		m_radius = g_fakeRange + (rand() % (g_fakeRange*1000))/100;
+		m_speed = 75 + m_speed + (rand() % g_fakeSpeed);
 	}
-	else if ( hv->spec().wCategory == _INFANTRY )
-		speed /= 4 ;
-	else if ( hv->spec().wCategory == _SEA_VEHICLE )
-		radius = 250 + 2*radius + (rand() % g_fakeRange) ;
+	else if ( m_hv->spec().wCategory == _INFANTRY )
+		m_speed /= 4;
+	else if ( m_hv->spec().wCategory == _SEA_VEHICLE )
+		m_radius = 250 + 2*m_radius + (rand() % g_fakeRange);
 	else
 	{
-		radius = (radius + 10) * 2 ;
-		speed = speed + (rand() % g_fakeSpeed) ;
+		m_radius = (m_radius + 10) * 2;
+		m_speed = m_speed + (rand() % g_fakeSpeed);
 	}
 
-	speed /= 1000 ;
+	m_speed /= 1000;
 
-	x = cx ;
-	y = cy ;
-	z = cz ;
+	m_x = m_cx;
+	m_y = m_cy;
+	m_z = m_cz;
 
-	dist = 0 ;
+	m_dist = 0;
 
-	sx = cx + radius * cos(0);
-	sy = cy + radius * sin(0);
+	m_sx = m_cx + m_radius * cos(0);
+	m_sy = m_cy + m_radius * sin(0);
 
-	hv->setReallyActive(true) ;
-	hv->m_spawnTime = 0 ;
+	m_hv->setReallyActive(true);
+	m_hv->m_spawnTime = 0;
 
-	started = (TeulTimeMS) rand() ;
+	m_started = (TeulTimeMS) rand();
 
-	hv->updateGrid() ;
+	m_hv->updateGrid();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -118,13 +124,12 @@ Fake::reset()
 void
 hostResetFakePositions()
 {
-	UINT32 i ;
-	FAKES::iterator it ;
-	for ( i = 0, it = _fakes.begin() ; it != _fakes.end() ; ++it, ++i )
+	UINT32 i = 0;
+	for ( auto it = s_fakes.begin(), end = s_fakes.end(); it != end; ++it, ++i )
 	{
-		it->reset() ;
+		it->reset();
 	}
-	dbugLog(_FLI, "reset %u vehicle positions to base %f.%f.%f", i, g_fakeBaseX, g_fakeBaseY, g_fakeBaseZ) ;
+	dbugLog(_FLI, "reset %u vehicle positions to base %f.%f.%f", i, g_fakeBaseX, g_fakeBaseY, g_fakeBaseZ);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -134,38 +139,39 @@ static void
 _initializeFakeWeapons()
 {
 	if ( g_enableFunnyFarm == false )
-		return ;
+		return;
 
-	static const UINT32 _WEAPONS = g_weaponList.size() ;
-	UINT32 serial = 0x3fffffff ;
-	Fake entry ;
+	const size_t numWeapons = g_weaponList.size();
+	const size_t numFakes = numWeapons * g_waves;
+	s_fakes.reserve(numFakes);
 
-	WEAPON_LIST::iterator it = g_weaponList.begin() ;
-	for ( UINT32 wave = 0 ; wave < g_waves ; ++wave )
+	dbugLog(_FLI, "Allocating %" PRSizeT " vehicles for funny farm", numFakes);
+	Host::Vehicles::AllocateArray(numFakes);
+
+	UINT32 serial = 0x3fffffff;
+	Fake entry;
+	WEAPON_LIST::const_iterator weapIt = g_weaponList.cbegin();
+	for (size_t fakeNo = 0; fakeNo < numFakes; ++fakeNo, ++weapIt)
 	{
-		for ( UINT32 i = 0 ; i < _WEAPONS ; ++i )
-		{
-			if ( it == g_weaponList.end() )
-				it = g_weaponList.begin() ;
-			WEAPON* weap = it->second ;
-			++it ;
-			HostVehicle* fake = hostCreateRemoteVehicle(Instance::_CAMPAIGN, serial, weap->spec()) ;
-			assert(fake) ;
-			SHARED_VEHICLE_INFO& vi = fake->vehicleData ;
-			sprintf(vi.callsign, "FAKE%04zu", _fakes.size()) ;
-			vi.packedCallsign = chatGetHandle(vi.callsign) ;
-			vi.squad = i ;
-			vi.rank = (rand() % 22) + 1 ;
-			hostActivateVehicle(fake, false) ;
-			entry.hv = fake ;
-			entry.reset() ;
-			_fakes.push_back(entry) ;
+		if ( weapIt == g_weaponList.cend() )
+			weapIt = g_weaponList.cbegin();
+		const WEAPON* weap = weapIt->second;
+		HostVehicle* fake = hostCreateRemoteVehicle(Instance::g_campaign, serial, weap->spec());
+		assert(fake);
+		SHARED_VEHICLE_INFO& vi = fake->vehicleData;
+		sprintf(vi.callsign, "FAKE%04zu", s_fakes.size());
+		vi.packedCallsign = chatGetHandle(vi.callsign);
+		vi.squad = fakeNo % numWeapons;
+		vi.rank = (fakeNo % 22) + 1;
+		hostActivateVehicle(fake, false);
+		entry.m_hv = fake;
+		entry.reset();
+		s_fakes.push_back(entry);
 
-			--serial ;
-		}
+		--serial;
 	}
 
-	dbugLog(_FLI, "Created %" PRSizeT " fake vehicles", _fakes.size()) ;
+	dbugLog(_FLI, "Created %" PRSizeT " fake vehicles", s_fakes.size());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -174,22 +180,34 @@ _initializeFakeWeapons()
 void
 hostRunFakeVehicles()
 {
-	static TeulTimeMS nextRun = teulClock64 ;
+	static TeulTimeMS nextRun = teulClock64;
 	if ( teulClock64 < nextRun )
-		return ;
+		return;
 
 	// Only do this once every 150ms
 	if ( nextRun + 200 < teulClock64 )
-		nextRun = teulClock64 ;
-	nextRun = nextRun + 125 + (rand() & 63) ;
+		nextRun = teulClock64;
+	nextRun = nextRun + 125 + (rand() & 63);
 
-	if ( _fakes.empty() )
-		_initializeFakeWeapons() ;
+	if ( s_fakes.empty() )
+		_initializeFakeWeapons();
 
-	FAKES::iterator it ;
-	for ( it = _fakes.begin() ; it != _fakes.end() ; ++it )
+	if (g_fakeMovement)
 	{
-		(*it).update() ;
+		std::vector<std::future<Fake*>> updates;
+		updates.reserve(s_fakes.size());
+		auto lambda = [](Fake* f) {
+			f->update();
+			return (f->m_hv->inCorrectGrid()) ? (Fake*)nullptr : f;
+		};
+		for (auto& fake : s_fakes) {
+			updates.emplace_back(std::async(lambda, &fake));
+		}
+		for (auto& result : updates) {
+			Fake* fake = result.get();
+			if (fake)
+				fake->m_hv->updateGrid();
+		}
 	}
 }
 
@@ -200,115 +218,131 @@ hostRunFakeVehicles()
 void
 Fake::moveAircraft()
 {
-	TeulTimeMS t = teulClock64 - started;
-	FLOAT64 w = speed / radius;
+	TeulTimeMS t = teulClock64 - m_started;
+	FLOAT64 w = m_speed / m_radius;
 
-	yaw = (w * t) ;
+	m_yaw = (w * t);
 
-	x = cx + radius * cos(yaw);
-	y = cy + radius * sin(yaw);
+	m_x = m_cx + m_radius * cos(m_yaw);
+	m_y = m_cy + m_radius * sin(m_yaw);
 
-	if ( cx == sx && cy == sy )
+	if ( m_cx == m_sx && m_cy == m_sy )
 	{
-		started = teulClock64 ;
-		yaw = 0 ;
+		m_started = teulClock64;
+		m_yaw = 0;
 	}
 
-	vx = -speed * 100 * sin(yaw);
-	vy = speed * 100 * cos(yaw);
+	m_vx = -m_speed * 100 * sin(m_yaw);
+	m_vy = m_speed * 100 * cos(m_yaw);
 
-	SHARED_VEHICLE_INFO& vi = hv->vehicleData ;
+	SHARED_VEHICLE_INFO& vi = m_hv->vehicleData;
 
 //	if ( vi.squad == 1 )
 //	{
-//		dbugLog(_FLI, "t=%llu, w=%g, yaw=%g, x=%g, y=%g, vx=%g, vy=%g", t, w, yaw, x, y, vx, vy) ;
+//		dbugLog(_FLI, "t=%llu, w=%g, yaw=%g, x=%g, y=%g, vx=%g, vy=%g", t, w, yaw, x, y, vx, vy);
 //	}
 
 	// Convert to radians
-//	FLOAT64 yawR = yaw * PI / 180 ;
+//	FLOAT64 yawR = yaw * PI / 180;
 
-	vi.attitude.attZ = (SINT16)(cos(yaw) * 10000.0 + 0.5);
+	vi.attitude.attZ = (SINT16)(cos(m_yaw) * 10000.0 + 0.5);
 
-	vi.velocity.velX = (SINT16)(vx * 50.0 + 0.5);
-	vi.velocity.velY = (SINT16)(vy * 50.0 + 0.5);
+	vi.velocity.velX = (SINT16)(m_vx * 50.0 + 0.5);
+	vi.velocity.velY = (SINT16)(m_vy * 50.0 + 0.5);
 }
 
 void
-Fake::move()
+Fake::moveOther()
 {
-	if ( !g_fakeMovement )
-		return ;
+	// For now: just duplicate moveAircraft
+	TeulTimeMS t = teulClock64 - m_started;
+	FLOAT64 w = m_speed / m_radius;
 
-	moveAircraft() ;
+	m_yaw = (w * t);
 
-//	switch ( hv->spec().wCategory )
-//	{
-//	case _AIRCRAFT:
-//		moveAircraft() ;
-//	break ;
-//	default:
-//		moveOther() ;
-//	}
+	m_x = m_cx + m_radius * cos(m_yaw);
+	m_y = m_cy + m_radius * sin(m_yaw);
+
+	if (m_cx == m_sx && m_cy == m_sy)
+	{
+		m_started = teulClock64;
+		m_yaw = 0;
+	}
+
+	m_vx = -m_speed * 100 * sin(m_yaw);
+	m_vy = m_speed * 100 * cos(m_yaw);
+
+	SHARED_VEHICLE_INFO& vi = m_hv->vehicleData;
+
+	vi.attitude.attZ = (SINT16)(cos(m_yaw) * 10000.0 + 0.5);
+
+	vi.velocity.velX = (SINT16)(m_vx * 50.0 + 0.5);
+	vi.velocity.velY = (SINT16)(m_vy * 50.0 + 0.5);
 }
 
 void
 Fake::update()
 {
-	move() ;
+	switch (m_hv->spec().wCategory)
+	{
+	case _AIRCRAFT:
+		moveAircraft();
+		break;
+	default:
+		moveOther();
+	}
 
-	SHARED_VEHICLE_INFO& vi = hv->vehicleData ;
-	hv->lastRX = teulClock64 ;
-	vi.hostPosTimeStamp = teulClock64 + 1 ;
-	vi.timeStamp = teulClock() ;
-	vi.posTimeStamp = teulClock() ;
-	hv->m_holder->timeStamp = teulClock() ;
-	hv->m_holder->posTimeStamp = teulClock() ;
+	SHARED_VEHICLE_INFO& vi = m_hv->vehicleData;
+	m_hv->lastRX = teulClock64;
+	vi.hostPosTimeStamp = teulClock64 + 1;
+	vi.timeStamp = teulClock();
+	vi.posTimeStamp = teulClock();
+	m_hv->m_holder->timeStamp = teulClock();
+	m_hv->m_holder->posTimeStamp = teulClock();
 
-	vi.position.m_x = (int)(x * 100.0);
-	vi.position.m_y = (int)(y * 100.0);
-	vi.position.m_z = (int)((z + 2000.0) * 100.0);
+	vi.position.m_x = (int)(m_x * 100.0);
+	vi.position.m_y = (int)(m_y * 100.0);
+	vi.position.m_z = (int)((m_z + 2000.0) * 100.0);
+}
 
 /*
-	vi.high.attitude.attX = (SINT16)(pitch * 10000.0 + 0.5);
-	vi.high.attitude.attY = (SINT16)(roll * 10000.0 + 0.5);
-	vi.high.attitude.attZ = (SINT16)(yaw * 10000.0 + 0.5);
-	vi.low.attitude.attX = (SINT8)(pitch * 40.0 + 0.5);
-	vi.low.attitude.attY = (SINT8)(roll * 40.0 + 0.5);
-	vi.low.attitude.attZ = yaw;(SINT8)(yaw * 40.0 + 0.5);
+vi.high.attitude.attX = (SINT16)(pitch * 10000.0 + 0.5);
+vi.high.attitude.attY = (SINT16)(roll * 10000.0 + 0.5);
+vi.high.attitude.attZ = (SINT16)(yaw * 10000.0 + 0.5);
+vi.low.attitude.attX = (SINT8)(pitch * 40.0 + 0.5);
+vi.low.attitude.attY = (SINT8)(roll * 40.0 + 0.5);
+vi.low.attitude.attZ = yaw;(SINT8)(yaw * 40.0 + 0.5);
 
-	vi.high.velocity.velX = (SINT16)(vx * 50.0 + 0.5);
-	vi.high.velocity.velY = (SINT16)(vy * 50.0 + 0.5);
-	vi.high.velocity.velZ = (SINT16)(vz * 50.0 + 0.5);
-	vi.low.velocity.velX = (SINT8)(log10(fabs(vx)*0.5 + 1.0)*50.0 + 0.5);
-	vi.low.velocity.velY = (SINT8)(log10(fabs(vy)*0.5 + 1.0)*50.0 + 0.5);
-	vi.low.velocity.velZ = (SINT8)(log10(fabs(vz)*0.5 + 1.0)*50.0 + 0.5);
+vi.high.velocity.velX = (SINT16)(vx * 50.0 + 0.5);
+vi.high.velocity.velY = (SINT16)(vy * 50.0 + 0.5);
+vi.high.velocity.velZ = (SINT16)(vz * 50.0 + 0.5);
+vi.low.velocity.velX = (SINT8)(log10(fabs(vx)*0.5 + 1.0)*50.0 + 0.5);
+vi.low.velocity.velY = (SINT8)(log10(fabs(vy)*0.5 + 1.0)*50.0 + 0.5);
+vi.low.velocity.velZ = (SINT8)(log10(fabs(vz)*0.5 + 1.0)*50.0 + 0.5);
 
-	if (vx < 0.0)	vi.low.velocity.velX = -vi.low.velocity.velX;
-	if (vy < 0.0)	vi.low.velocity.velY = -vi.low.velocity.velY;
-	if (vz < 0.0)	vi.low.velocity.velZ = -vi.low.velocity.velZ;
+if (vx < 0.0)	vi.low.velocity.velX = -vi.low.velocity.velX;
+if (vy < 0.0)	vi.low.velocity.velY = -vi.low.velocity.velY;
+if (vz < 0.0)	vi.low.velocity.velZ = -vi.low.velocity.velZ;
 
-	vi.high.acceleration.accelX = (SINT16)(ax * 100.0 + 0.5);
-	vi.high.acceleration.accelY = (SINT16)(ay * 100.0 + 0.5);
-	vi.high.acceleration.accelZ = (SINT16)(az * 100.0 + 0.5);
-	vi.low.acceleration.accelX = (SINT8)(log10(fabs(ax) + 1.0)*50.0 + 0.5);
-	vi.low.acceleration.accelY = (SINT8)(log10(fabs(ay) + 1.0)*50.0 + 0.5);
-	vi.low.acceleration.accelZ = (SINT8)(log10(fabs(az) + 1.0)*50.0 + 0.5);
+vi.high.acceleration.accelX = (SINT16)(ax * 100.0 + 0.5);
+vi.high.acceleration.accelY = (SINT16)(ay * 100.0 + 0.5);
+vi.high.acceleration.accelZ = (SINT16)(az * 100.0 + 0.5);
+vi.low.acceleration.accelX = (SINT8)(log10(fabs(ax) + 1.0)*50.0 + 0.5);
+vi.low.acceleration.accelY = (SINT8)(log10(fabs(ay) + 1.0)*50.0 + 0.5);
+vi.low.acceleration.accelZ = (SINT8)(log10(fabs(az) + 1.0)*50.0 + 0.5);
 
-	if (ax < 0.0)	vi.low.acceleration.accelX = -vi.low.acceleration.accelX;
-	if (ay < 0.0)	vi.low.acceleration.accelY = -vi.low.acceleration.accelY;
-	if (az < 0.0)	vi.low.acceleration.accelZ = -vi.low.acceleration.accelZ;
+if (ax < 0.0)	vi.low.acceleration.accelX = -vi.low.acceleration.accelX;
+if (ay < 0.0)	vi.low.acceleration.accelY = -vi.low.acceleration.accelY;
+if (az < 0.0)	vi.low.acceleration.accelZ = -vi.low.acceleration.accelZ;
 
-	vi.high.rotational.velX = (SINT16)(wx * 1000.0 + 0.5);
-	vi.high.rotational.velY = (SINT16)(wy * 1000.0 + 0.5);
-	vi.high.rotational.velZ = (SINT16)(wz * 1000.0 + 0.5);
-	vi.low.rotational.velX = (SINT8)(log10(fabs(wx) * 10.0 + 1.0)*50.0 + 0.5);
-	vi.low.rotational.velY = (SINT8)(log10(fabs(wy) * 10.0 + 1.0)*50.0 + 0.5);
-	vi.low.rotational.velZ = (SINT8)(log10(fabs(wz) * 10.0 + 1.0)*50.0 + 0.5);
+vi.high.rotational.velX = (SINT16)(wx * 1000.0 + 0.5);
+vi.high.rotational.velY = (SINT16)(wy * 1000.0 + 0.5);
+vi.high.rotational.velZ = (SINT16)(wz * 1000.0 + 0.5);
+vi.low.rotational.velX = (SINT8)(log10(fabs(wx) * 10.0 + 1.0)*50.0 + 0.5);
+vi.low.rotational.velY = (SINT8)(log10(fabs(wy) * 10.0 + 1.0)*50.0 + 0.5);
+vi.low.rotational.velZ = (SINT8)(log10(fabs(wz) * 10.0 + 1.0)*50.0 + 0.5);
 
-	if (wx < 0.0)	vi.low.rotational.velX = -vi.low.rotational.velX;
-	if (wy < 0.0)	vi.low.rotational.velY = -vi.low.rotational.velY;
-	if (wz < 0.0)	vi.low.rotational.velZ = -vi.low.rotational.velZ;
+if (wx < 0.0)	vi.low.rotational.velX = -vi.low.rotational.velX;
+if (wy < 0.0)	vi.low.rotational.velY = -vi.low.rotational.velY;
+if (wz < 0.0)	vi.low.rotational.velZ = -vi.low.rotational.velZ;
 */
-
-	hv->updateGrid() ;
-}

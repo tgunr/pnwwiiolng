@@ -40,7 +40,7 @@ void SetUIXMLClipboardCallback(UIXMLClipboardCallback);
 void SetUIXMLLocalizationCallback(UIXMLLocalizationCallbackA);
 void SetUIXMLLocalizationCallback(UIXMLLocalizationCallbackW);
 
-View* LoadUIXML(const char* name, IOCallbacks const *io = NULL, View* parent = NULL);
+View* LoadUIXML(const char* name, IOCallbacks const *io = nullptr, View* parent = nullptr);
 float ScaleUIXMLValue(int type, float val, unsigned int options = View::ASPECT_SCALE, float scaler = 1.0f, float limiter = 1.0f);
 float NormUIXMLValue(int type, float val, unsigned int options = View::ASPECT_SCALE, float scaler = 1.0f, float limiter = 1.0f);
 

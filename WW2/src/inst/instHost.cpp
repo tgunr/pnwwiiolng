@@ -22,14 +22,14 @@
 #include "wwii/wwiiPlayer.h"
 #include "wwii/wwiiThreads.h"
 
-namespace Lua { extern void ProcessEventQueue() ; }
+namespace Lua { extern void ProcessEventQueue(); }
 
 //  ------------------------------  Declarations
 
-HOST_INSTANCES g_hostInstances ;
-INSTANCE_UIDS g_hostInstanceUIDs ;
+HOST_INSTANCES g_hostInstances;
+INSTANCE_UIDS g_hostInstanceUIDs;
 
-static std::mutex s_instanceMutex ;
+static std::mutex s_instanceMutex;
 
 //////////////////////////////////////////////////////////////////////
 // The HostInstanceImpl generator.
@@ -37,10 +37,10 @@ static std::mutex s_instanceMutex ;
 static Instance::HostInstanceImpl*
 _defaultHostInstanceImplFactory(Instance::HostInstance& _inst)
 {
-	return new Instance::HostInstanceImpl(_inst) ;
+	return new Instance::HostInstanceImpl(_inst);
 }
 
-Instance::HostInstanceImplFactory* Instance::s_implFactory = _defaultHostInstanceImplFactory ;
+Instance::HostInstanceImplFactory* Instance::s_implFactory = _defaultHostInstanceImplFactory;
 
 //////////////////////////////////////////////////////////////////////
 // Function to register a derived HostInstanceImpl's instead of the
@@ -49,7 +49,7 @@ Instance::HostInstanceImplFactory* Instance::s_implFactory = _defaultHostInstanc
 void
 Instance::RegisterHostInstanceImplFactory(Instance::HostInstanceImplFactory* factory)
 {
-	Instance::s_implFactory = factory ;
+	Instance::s_implFactory = factory;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -57,14 +57,14 @@ Instance::RegisterHostInstanceImplFactory(Instance::HostInstanceImplFactory* fac
 
 Instance::HostInstance::~HostInstance()
 {
-	HostInstanceImpl* himpl = m_impl ;
-	m_impl = NULL ;
-	if ( himpl == NULL )
-		return ;
+	HostInstanceImpl* himpl = m_impl;
+	m_impl = nullptr;
+	if ( himpl == nullptr )
+		return;
 
-	himpl->PreDestructionHandler() ;
+	himpl->PreDestructionHandler();
 
-	delete himpl ;
+	delete himpl;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -86,10 +86,10 @@ _getScenario(const Instance::Descriptor& descriptor)
 					, 12 * 60
 					, 0, 5
 					, true
-					) ;
-		return scenario ;
+					);
+		return scenario;
 	}
-	break ;
+	break;
 
 	case Instance::_CAMPAIGN:
 	{
@@ -101,10 +101,10 @@ _getScenario(const Instance::Descriptor& descriptor)
 					, 0
 					, 0, ~0
 					, true
-					) ;
-		return scenario ;
+					);
+		return scenario;
 	}
-	break ;
+	break;
 
 	case Instance::_SCENARIO:
 	{
@@ -116,12 +116,12 @@ _getScenario(const Instance::Descriptor& descriptor)
 					, 0
 					, 0, ~0
 					, true
-					) ;
-		return scenario ;
+					);
+		return scenario;
 	}
 
 	default:
-	break ;
+	break;
 	}
 
 	static Instance::Scenario
@@ -132,40 +132,40 @@ _getScenario(const Instance::Descriptor& descriptor)
 				, 12 * 60
 				, 0, ~0
 				, true
-				) ;
+				);
 
-	return scenario ;
+	return scenario;
 }
 
 static Instance::HostInstance*
 _getHostInstance(const Instance::Descriptor& descriptor)
 {
-	Instance::HostInstance* instance = Instance::HostInstance::LookupByUID(descriptor.id()) ;
-	if ( instance != NULL )
-		return instance ;
+	Instance::HostInstance* instance = Instance::HostInstance::LookupByUID(descriptor.id());
+	if ( instance != nullptr )
+		return instance;
 
 	// Get the data on this scenario.
-	Instance::Scenario scenario = _getScenario(descriptor) ;
+	Instance::Scenario scenario = _getScenario(descriptor);
 
 	dbugLog(_FLI, "in:%u.%u.%llu.%llu creating new %s instance with capacity %u / gametime %u:%u"
 					, descriptor.category(), descriptor.type(), descriptor.handle(), descriptor.id()
 					, scenario.m_internalDescription.c_str()
 					, scenario.m_capacity, (scenario.m_gameTime_m / 60), (scenario.m_gameTime_m % 60)
-					) ;
+					);
 
-	instance = new Instance::HostInstance(0, descriptor, scenario.m_capacity, scenario.m_gameTime_m, teulTime(), teulTime()) ;
+	instance = new Instance::HostInstance(0, descriptor, scenario.m_capacity, scenario.m_gameTime_m, teulTime(), teulTime());
 
-	g_hostInstances[descriptor] = instance ;
-	g_hostInstanceUIDs[descriptor.id()] = instance ;
+	g_hostInstances[descriptor] = instance;
+	g_hostInstanceUIDs[descriptor.id()] = instance;
 
-	return instance ;
+	return instance;
 }
 
 static Instance::HostInstance&
 _campaignInstance()
 {
-	static Instance::HostInstance& campaign = *_getHostInstance(Instance::g_campaign) ;
-	return campaign ;
+	static Instance::HostInstance& campaign = *_getHostInstance(Instance::g_campaign);
+	return campaign;
 }
 
 static void
@@ -176,12 +176,12 @@ _deleteInstance(const Instance::HostInstance* instance)
 					, instance->descriptor().type()
 					, instance->descriptor().handle()
 					, instance->descriptor().id()
-					) ;
+					);
 
-	g_hostInstances.erase(instance->descriptor()) ;
-	g_hostInstanceUIDs.erase(instance->descriptor().id()) ;
+	g_hostInstances.erase(instance->descriptor());
+	g_hostInstanceUIDs.erase(instance->descriptor().id());
 
-	delete instance ;
+	delete instance;
 }
 
 namespace Instance
@@ -190,8 +190,8 @@ namespace Instance
 HostInstance*
 HostInstance::LookupByUID(const instanceid_t& uid)
 {
-	INSTANCE_UIDS::iterator it = g_hostInstanceUIDs.find(uid) ;
-	return ( it != g_hostInstanceUIDs.end() ) ? it->second : NULL ;
+	INSTANCE_UIDS::iterator it = g_hostInstanceUIDs.find(uid);
+	return ( it != g_hostInstanceUIDs.end() ) ? it->second : nullptr;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -202,15 +202,15 @@ HostInstance::getSquadMemberCount(UINT32 squadID) const
 {
 	// Don't bother counting for someone not in a squad.
 	if ( squadID == 0 )
-		return 0 ;
+		return 0;
 
-	UINT32 members = 0 ;
-	for ( PLAYERS::const_iterator it = m_players.begin() ; it != m_players.end() ; ++it )
+	UINT32 members = 0;
+	for ( auto it = m_players.begin(), end = m_players.end(); it != end; ++it )
 	{
 		if ( (*it)->inSquad(squadID) )
-			++members ;
+			++members;
 	}
-	return members ;
+	return members;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -226,7 +226,7 @@ _adjustmentTrack(wwiiPlayer* const player, const char* const action, const HostI
 					, player->side()
 					, inst->players().size()
 					, inst->neutral(), inst->allies(), inst->axis(), inst->banned()
-					) ;
+					);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -236,13 +236,13 @@ void
 HostInstance::incrementCount(UINT8 forSide)
 {
 #if defined(DEBUG)
-	assert( forSide < MAX_SIDES ) ;
+	assert( forSide < MAX_SIDES );
 #endif
-	m_count[forSide]++ ;
+	m_count[forSide]++;
 #if defined(DEBUG)
-	assert( m_count[forSide] <= m_players.size() ) ;
-	const size_t tally = neutral() + allies() + axis() + banned() ;
-	assert( tally == m_players.size() ) ;
+	assert( m_count[forSide] <= m_players.size() );
+	const size_t tally = neutral() + allies() + axis() + banned();
+	assert( tally == m_players.size() );
 #endif
 }
 
@@ -250,13 +250,13 @@ void
 HostInstance::decrementCount(UINT8 forSide)
 {
 #if defined(DEBUG)
-	assert( forSide < MAX_SIDES ) ;
-	assert( m_count[forSide] > 0 ) ;
+	assert( forSide < MAX_SIDES );
+	assert( m_count[forSide] > 0 );
 #endif
-	m_count[forSide] -- ;
+	m_count[forSide] --;
 #if defined(DEBUG)
-	const size_t tally = neutral() + allies() + axis() + banned() ;
-	assert( tally == m_players.size() ) ;
+	const size_t tally = neutral() + allies() + axis() + banned();
+	assert( tally == m_players.size() );
 #endif
 }
 
@@ -268,19 +268,19 @@ void
 HostInstance::swapPlayerSide(wwiiPlayer* const player, UINT8 fromSide)
 {
 #if defined(DEBUG)
-	assert( fromSide < MAX_SIDES && player->side() < MAX_SIDES ) ;
-	assert( m_count[fromSide] > 0 ) ;
+	assert( fromSide < MAX_SIDES && player->side() < MAX_SIDES );
+	assert( m_count[fromSide] > 0 );
 #endif
 	{
-		std::lock_guard<std::mutex> lock(s_instanceMutex) ;
-		--m_count[fromSide] ;
-		++m_count[player->side()] ;
+		std::lock_guard<std::mutex> lock(s_instanceMutex);
+		--m_count[fromSide];
+		++m_count[player->side()];
 	}
-	_adjustmentTrack(player, "moved", this) ;
+	_adjustmentTrack(player, "moved", this);
 #if defined(DEBUG)
-	assert( m_count[player->side()] <= m_players.size() ) ;
-	const size_t tally = neutral() + allies() + axis() + banned() ;
-	assert( tally == m_players.size() ) ;
+	assert( m_count[player->side()] <= m_players.size() );
+	const size_t tally = neutral() + allies() + axis() + banned();
+	assert( tally == m_players.size() );
 #endif
 }
 
@@ -290,20 +290,20 @@ HostInstance::swapPlayerSide(wwiiPlayer* const player, UINT8 fromSide)
 bool
 HostInstance::addPlayer(wwiiPlayer* const player)
 {
-	PLAYERS::iterator it = m_players.upper_bound(player) ;
+	PLAYERS::iterator it = m_players.upper_bound(player);
 	if ( it != m_players.end() && *it == player )
-		return false ;
+		return false;
 
 	// Add me and bump the counters
 	{
-		std::lock_guard<std::mutex> lock(s_instanceMutex) ;
-		m_players.insert(it, player) ;
-		incrementCount(player->side()) ;
+		std::lock_guard<std::mutex> lock(s_instanceMutex);
+		m_players.insert(it, player);
+		incrementCount(player->side());
 	}
 
-	_adjustmentTrack(player, "added", this) ;
+	_adjustmentTrack(player, "added", this);
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -312,26 +312,26 @@ HostInstance::addPlayer(wwiiPlayer* const player)
 bool
 HostInstance::removePlayer(wwiiPlayer* const player)
 {
-	PLAYERS::iterator it = m_players.find(player) ;
+	PLAYERS::iterator it = m_players.find(player);
 	if ( it == m_players.end() )
-		return false ;
+		return false;
 
 	{
-		std::lock_guard<std::mutex> lock(s_instanceMutex) ;
-		m_players.erase(it) ;
-		decrementCount(player->side()) ;
+		std::lock_guard<std::mutex> lock(s_instanceMutex);
+		m_players.erase(it);
+		decrementCount(player->side());
 	}
 
-	_adjustmentTrack(player, "removed", this) ;
+	_adjustmentTrack(player, "removed", this);
 
 #if defined(DEBUG)
-	assert( m_players.find(player) == m_players.end() ) ;
+	assert( m_players.find(player) == m_players.end() );
 #endif
 
 	if ( m_players.empty() && descriptor().category() != Instance::_CAMPAIGN )
-		_deleteInstance(this) ;
+		_deleteInstance(this);
 
-	return true ;
+	return true;
 }
 
 } // namespace Instance
@@ -344,26 +344,26 @@ bool
 wwiiPlayer::SetInstance(const Instance::Descriptor& toInstance)
 {
 	if ( toInstance == instance() )
-		return false ;
+		return false;
 	if ( m_hostInstance )
 	{
 		// Remove player from their old instance
-		m_hostInstance->removePlayer(this) ;
+		m_hostInstance->removePlayer(this);
 	}
 
-	m_hostInstance = NULL ;
-	m_instance = Instance::g_invalid ;
-	dbugLog(_FLD, "t:%d p:%u c:%s switching to in:%u.%u.%llu.%llu", teulIndex(), playerID(), callsign(), toInstance.category(), toInstance.type(), toInstance.handle(), toInstance.id()) ;
+	m_hostInstance = nullptr;
+	m_instance = Instance::g_invalid;
+	dbugLog(_FLD, "t:%d p:%u c:%s switching to in:%u.%u.%llu.%llu", teulIndex(), playerID(), callsign(), toInstance.category(), toInstance.type(), toInstance.handle(), toInstance.id());
 
 	if ( toInstance.isValid() == true )
 	{
 		// Add player to their new instance
-		m_instance = toInstance ;
-		m_hostInstance = _getHostInstance(toInstance) ;
-		m_hostInstance->addPlayer(this) ;
+		m_instance = toInstance;
+		m_hostInstance = _getHostInstance(toInstance);
+		m_hostInstance->addPlayer(this);
 	}
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -374,23 +374,23 @@ wwiiPlayer::SetCountry(WWII_COUNTRY toCountry, WWII_SIDE toSide)
 {
 	if ( g_logDebug )
 	{
-		log(_FLD, "setCountry([%u,%u]=>[%u,%u])", country(), side(), toCountry, toSide) ;
+		log(_FLD, "setCountry([%u,%u]=>[%u,%u])", country(), side(), toCountry, toSide);
 	}
 
-	const bool swapInstanceSide = ( toSide != side() && instance().isValid() && m_hostInstance ) ;
+	const bool swapInstanceSide = ( toSide != side() && instance().isValid() && m_hostInstance );
 	if ( swapInstanceSide )
 	{
-		log(_FLD, "changing side (%u => %u)", side(), toSide) ;
-		assert( m_hostInstance->players().find(this) != m_hostInstance->players().end() ) ;
-		const WWII_SIDE fromSide = side() ;
-		m_side = toSide ;
-		m_country = toCountry ;
-		m_hostInstance->swapPlayerSide(this, fromSide) ;
-		return ;
+		log(_FLD, "changing side (%u => %u)", side(), toSide);
+		assert( m_hostInstance->players().find(this) != m_hostInstance->players().end() );
+		const WWII_SIDE fromSide = side();
+		m_side = toSide;
+		m_country = toCountry;
+		m_hostInstance->swapPlayerSide(this, fromSide);
+		return;
 	}
 
-	m_country = toCountry ;
-	m_side = toSide ;
+	m_country = toCountry;
+	m_side = toSide;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -399,7 +399,7 @@ wwiiPlayer::SetCountry(WWII_COUNTRY toCountry, WWII_SIDE toSide)
 UINT32
 instGetCampaignSideCount(UINT8 forSide)
 {
-	return _campaignInstance().count(forSide) ;
+	return _campaignInstance().count(forSide);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -408,9 +408,9 @@ instGetCampaignSideCount(UINT8 forSide)
 UINT32
 instGetInstanceTime(const Instance::Descriptor& descriptor)
 {
-	const Instance::HostInstance* instance = Instance::HostInstance::LookupByUID(descriptor.id()) ;
-	const UINT32 minuteTime = ( instance ) ? instance->gameTime_m() : 12 * 60 ;
-	return minuteTime * 60 ;
+	const Instance::HostInstance* instance = Instance::HostInstance::LookupByUID(descriptor.id());
+	const UINT32 minuteTime = ( instance ) ? instance->gameTime_m() : 12 * 60;
+	return minuteTime * 60;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -419,6 +419,6 @@ instGetInstanceTime(const Instance::Descriptor& descriptor)
 UINT32
 instGetCampaignPopulation()
 {
-	return _campaignInstance().allies() + _campaignInstance().axis() ;
+	return _campaignInstance().allies() + _campaignInstance().axis();
 }
 

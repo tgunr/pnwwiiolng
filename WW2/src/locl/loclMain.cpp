@@ -70,7 +70,7 @@ char	FileNameBuffer[MAX_PATH],
 		{
 			fioGetString(FileID, HoldMessageString, MAX_LOCALIZATION_STRING_LENGTH);
 			Token = strtok(HoldMessageString, ",");
-			if (Token == NULL)
+			if (Token == nullptr)
 			{
 				continue;
 			}
@@ -84,7 +84,7 @@ char	FileNameBuffer[MAX_PATH],
 			CountLanguageStrings++;
 		}
 
-		if(_MessageTable != NULL)
+		if(_MessageTable != nullptr)
 		{
 			return FALSE;
 		}
@@ -95,7 +95,7 @@ char	FileNameBuffer[MAX_PATH],
 
 		fioSeek(FileID, 0, fioSEEK_SET);
 
-		for(i = 0; ; )
+		for(i = 0;; )
 		{
 			if (i >= CountLanguageStrings)
 			{
@@ -104,13 +104,13 @@ char	FileNameBuffer[MAX_PATH],
 
 			fioGetString(FileID, HoldMessageString, MAX_LOCALIZATION_STRING_LENGTH);
 			Token = strtok(HoldMessageString, ",");
-			if (Token == NULL)
+			if (Token == nullptr)
 			{
 				continue;
 			}
 
 			MessageIndex = atoi(Token);
-			Token = strtok(NULL, "\n");
+			Token = strtok(nullptr, "\n");
 			_MessageTable[MessageIndex] = (SCHAR*)memAlloc(strlen(Token)+1);
 			strcpy(_MessageTable[MessageIndex], Token);
 
@@ -140,7 +140,7 @@ const WCHAR* loclGetLocalizationStringByID(SINT32 MessageID)
 	return uiLocString(IDE_LANG_CLIENT, MessageID).c_str();
 
 	/*
-	if (_MessageTable == NULL)
+	if (_MessageTable == nullptr)
 	{
 #pragma message("****** FIXME: Ramp fix this (localMain.cpp line 143)")
 		return "Get Ramp to fix this (localMain.cpp line 143)!!!";
@@ -179,11 +179,11 @@ SINT32	i;
 
     loclLangKill();
 
-	if(_MessageTable != NULL)
+	if(_MessageTable != nullptr)
 	{
 		for(i = 0; i <= HighestStringNumber; i++)
 		{
-			if(_MessageTable[i] != NULL)
+			if(_MessageTable[i] != nullptr)
 			{
 				memFree(_MessageTable[i]);
 			}
@@ -191,7 +191,7 @@ SINT32	i;
 
 		HighestStringNumber = 0;
 		memFree(_MessageTable);
-		_MessageTable = NULL;
+		_MessageTable = nullptr;
 	}
 
 	return TRUE;

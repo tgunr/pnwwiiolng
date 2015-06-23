@@ -15,7 +15,7 @@ static_assert( platBuild != TEUL_SERVER, "Can't include vars.h in a server build
 #endif
 
 #ifdef  GLOBALS
-	SINT8 volatile	Copyright[]="Copyright 2012 Playnet, Inc.  All Rights Reserved";
+	const SINT8 volatile	Copyright[]="Copyright 2012 Playnet, Inc.  All Rights Reserved";
 #endif
 
 // These are configuration variables that are filled
@@ -119,9 +119,9 @@ EXTERN SINT32			WantedMode;			// desired/actual mode
 EXTERN SINT32           WantedSide;         // User selected side from webpage.
 EXTERN SINT32			UseStaccato;		// are we using the staccato sound system?
 EXTERN SINT8			TicketFile[_MAX_PATH];
-EXTERN SINT8			ServerIP[64];		// IP of server to connect to
-EXTERN SINT8			ServerPort[64];		// Port of server to connect to
-EXTERN SINT8			ServerOTP[64];		// OTP for connecting to server
+EXTERN SINT8			GameServerIP[64];	// IP of server to connect to
+EXTERN SINT8			GameServerPort[64];	// Port of server to connect to
+EXTERN SINT8			GameServerOTP[64];	// OTP for connecting to server
 EXTERN SINT8			HackID[128];		// used for hacker detection (comes from playgate only)
 EXTERN LOGICAL			AltFont;            // testing if true use alternate UI font
 EXTERN SINT8			ServerApID[64];		// program apId

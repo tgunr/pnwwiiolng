@@ -1,7 +1,7 @@
 #include <syscfg.h> // Path is project specific.
 /*
 ** Lua binding: tut
-** Generated automatically by tolua++-1.0.92 on 09/03/11 11:16:31.
+** Generated automatically by tolua++-1.0.92 on 01/04/14 22:00:09.
 */
 
 #ifndef __cplusplus
@@ -14,7 +14,7 @@
 /* Exported function */
 TOLUA_API int  tolua_tut_open (lua_State* tolua_S);
 
-#include "TutorialManager.h"
+#include "tut/TutorialManager.h"
 
 /* function to register type */
 static void tolua_reg_types (lua_State* tolua_S)

@@ -7,7 +7,7 @@
 #include "mn/mngopt.h"
 
 // Used to build fully-qualified domain names, primarily auth.
-char RegionSuffix[512] = ".playnet.com" ;
+char RegionSuffix[512] = ".playnet.com";
 
 enum key_TYPE
 {
@@ -21,14 +21,14 @@ enum key_TYPE
 	EDOUBLE,
 	ESTRING
 
-} ;
+};
 
 struct KEY
 {
-	char*		key;
-	key_TYPE	ktype;
+	const char* const	key;
+	key_TYPE			ktype;
 
-} ;
+};
 
 //  lowercase ONLY!
 static KEY	vars[]={{"help", ENULL},
@@ -64,9 +64,9 @@ static KEY	vars[]={{"help", ENULL},
                     {"buildterrain", ENULL},
     {"o", ESTRING},
     {"altfont", ENULL},
-					{NULL, ENULL}};
+					{nullptr, ENULL}};
 
-static void*	pvars[]={&WantedHelp,
+static constexpr void*	pvars[]={&WantedHelp,
 					&WantedWidth,
 					&WantedHeight,
 					&WantedBpp,
@@ -77,9 +77,9 @@ static void*	pvars[]={&WantedHelp,
 					&UseStaccato,
 					&TicketFile,
 					&BypassString,
-					&ServerIP,
-					&ServerPort,
-					&ServerOTP,
+					&GameServerIP,
+					&GameServerPort,
+					&GameServerOTP,
 					&ServerApID,
 					&ServerProtocol,
 					&WantedUserLogEnabled,
@@ -99,28 +99,28 @@ static void*	pvars[]={&WantedHelp,
 					&g_buildTerrain,
     &HackID,
     &AltFont,
-					NULL};
+					nullptr};
 
 static char* _skipFilename(const char* ptr)
 {
 	if ( *ptr == '"' )
 	{
 		while ( *ptr == '"' )
-			++ptr ;
-		ptr = strchr(ptr, '"') ;
+			++ptr;
+		ptr = strchr(ptr, '"');
 		while ( ptr && *ptr == '"' )
-			++ptr ;
+			++ptr;
 	}
 	else
-		ptr = strchr(ptr, ' ') ;
+		ptr = strchr(ptr, ' ');
 
-	if ( ptr == NULL )
-		return NULL ;
+	if ( ptr == nullptr )
+		return nullptr;
 
 	while ( *ptr == ' ' )
-		++ptr ;
+		++ptr;
 
-	return (char*)ptr ;
+	return (char*)ptr;
 }
 
 LOGICAL mngoptParse(char* InputLine)
@@ -130,27 +130,27 @@ LOGICAL mngoptParse(char* InputLine)
 	int		i;
 
 #if platOS == OS_WIN32
-	ptr = _skipFilename(GetCommandLineA()) ;
+	ptr = _skipFilename(GetCommandLineA());
 #else
-	ptr = _skipFilename(GetCommandLine()) ;
+	ptr = _skipFilename(GetCommandLine());
 #endif
 
-	if ( ptr == NULL )
-		return TRUE ;
+	if ( ptr == nullptr )
+		return TRUE;
 	if ( *ptr != '-' && *ptr != '/' )
-		return TRUE ;
+		return TRUE;
 
-	strncpy(CommandLine, ptr, 511) ;
+	strncpy(CommandLine, ptr, 511);
 
-	ptr = CommandLine ;
+	ptr = CommandLine;
     sep[0] = *ptr;
 
     ptr = strtok(ptr, sep);
 
-	while ( ptr != NULL )
+	while ( ptr != nullptr )
 	{
 		// find end of command
-		for (i=0 ; ptr[i] ; i++)
+		for (i=0; ptr[i]; i++)
 		{
 			if (isspace(ptr[i]) ||
 				ptr[i] == ':' ||
@@ -166,7 +166,7 @@ LOGICAL mngoptParse(char* InputLine)
 
 		// trim tail of command
 		while ( isspace(ptr[i]) )
-			++i ;
+			++i;
 
 		// move to head of line
 		ptr = &ptr[i];
@@ -175,7 +175,7 @@ LOGICAL mngoptParse(char* InputLine)
 		if (ptr[0] == '"')
 		{
 			ptr += 1;
-			for (i=0 ; ptr[i] ; i++)
+			for (i=0; ptr[i]; i++)
 			{
 				if (ptr[i] == '"')
 				{
@@ -187,7 +187,7 @@ LOGICAL mngoptParse(char* InputLine)
 		}
 		else
 		{
-			for (i=0 ; ptr[i] ; i++)
+			for (i=0; ptr[i]; i++)
 			{
 				if (isspace(ptr[i]))
 				{
@@ -201,7 +201,7 @@ LOGICAL mngoptParse(char* InputLine)
 		value[i] = 0;
 
 		// search for cmd in known commands
-		for (i=0 ; vars[i].key ; i++)
+		for (i=0; vars[i].key; i++)
 		{
 			if (0 == lstrcmp(vars[i].key, cmd))
 			{
@@ -209,10 +209,10 @@ LOGICAL mngoptParse(char* InputLine)
 			}
 		}
 
-		ptr = strtok(NULL, sep);
+		ptr = strtok(nullptr, sep);
 
 		// continue if command not known
-		if (NULL == vars[i].key)
+		if (nullptr == vars[i].key)
 		{
 			Write_Debug("Unknown switch: '%s', '%s'", cmd, value);
 			continue;
@@ -242,32 +242,32 @@ LOGICAL mngoptParse(char* InputLine)
 			}
 			case EINT:
 			{
-				*(int*)pvars[i] = (int)strtol(value, NULL, 0);
+				*(int*)pvars[i] = (int)strtol(value, nullptr, 0);
 				break;
 			}
 			case EUINT:
 			{
-				*(unsigned int*)pvars[i] = (unsigned int)strtol(value, NULL, 0);
+				*(unsigned int*)pvars[i] = (unsigned int)strtol(value, nullptr, 0);
 				break;
 			}
 			case ELONG:
 			{
-				*(long*)pvars[i] = (long)strtol(value, NULL, 0);
+				*(long*)pvars[i] = (long)strtol(value, nullptr, 0);
 				break;
 			}
 			case EDWORD:
 			{
-				*(unsigned long*)pvars[i] = (unsigned long)strtoul(value, NULL, 0);
+				*(unsigned long*)pvars[i] = (unsigned long)strtoul(value, nullptr, 0);
 				break;
 			}
 			case EFLOAT:
 			{
-				*(float*)pvars[i] = (float)strtod(value, NULL);
+				*(float*)pvars[i] = (float)strtod(value, nullptr);
 				break;
 			}
 			case EDOUBLE:
 			{
-				*(double*)pvars[i] = (double)strtod(value, NULL);
+				*(double*)pvars[i] = (double)strtod(value, nullptr);
 				break;
 			}
 			case ESTRING:
@@ -282,7 +282,7 @@ LOGICAL mngoptParse(char* InputLine)
 			}
 		}
 	}
-	while (ptr != NULL);
+	while (ptr != nullptr);
 
 	return(TRUE);
 }

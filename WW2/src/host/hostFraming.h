@@ -8,5 +8,5 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-extern void hostSetUpdateFraming(class HostVehicle* vehicle, UINT32 requestedMode) ;
+extern void hostSetUpdateFraming(class HostVehicle* vehicle, UINT32 requestedMode);
 

@@ -3,7 +3,6 @@
 
 #include "chat/chatHandle.h"
 #include "wwii/wwiiUTF.h"
-#include <string>
 
 //////////////////////////////////////////////////////////////////////
 // Test if a callsign has a legal mix of utf/roman characters.
@@ -11,10 +10,10 @@
 static void
 _testCombination(const wchar_t* callsign)
 {
-	for ( int i = 1 ; callsign[i] > 0 ; ++i )
+	for ( int i = 1; callsign[i] > 0; ++i )
 	{
 		if ( (UINT32)callsign[i] > 120 )
-			throw "Roman + UTF combination not allowed" ;
+			throw "Roman + UTF combination not allowed";
 	}
 }
 
@@ -24,37 +23,37 @@ _testCombination(const wchar_t* callsign)
 static void
 _checkCharacters(const wchar_t* callsign)
 {
-	std::wstring badCharacters ;
-	UINT32 errors = 0 ;
+	std::wstring badCharacters;
+	UINT32 errors = 0;
 
-	badCharacters = L"" ;
+	badCharacters = L"";
 
-	for ( int i = 0 ; callsign[i] != 0 ; ++i )
+	for ( int i = 0; callsign[i] != 0; ++i )
 	{
-		UINT16 symbol = chatGetHandleCharacterSymbol(callsign[i]) ;
+		UINT16 symbol = chatGetHandleCharacterSymbol(callsign[i]);
 		if ( symbol != 0 )
-			continue ;
+			continue;
 
 		if ( badCharacters.empty() == false )
-			badCharacters += L", " ;
-		badCharacters += L"'" ;
-		badCharacters += callsign[i] ;
-		badCharacters += L"'" ;
+			badCharacters += L", ";
+		badCharacters += L"'";
+		badCharacters += callsign[i];
+		badCharacters += L"'";
 
-		++errors ;
+		++errors;
 	}
 
 	if ( errors == 0 )
-		return ;
+		return;
 
 	if ( errors == 1 )
-		badCharacters.insert(0, L"Invalid character: ") ;
+		badCharacters.insert(0, L"Invalid character: ");
 	else if ( errors > 1 )
-		badCharacters.insert(0, L"Invalid characters: ") ;
+		badCharacters.insert(0, L"Invalid characters: ");
 
-	static char message[512] ;
-	WWII::ConvertChars(badCharacters.c_str(), message, sizeof(message)) ;
-	throw message ;
+	static char message[512];
+	WWII::ConvertChars(badCharacters.c_str(), message, sizeof(message));
+	throw message;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -65,38 +64,38 @@ main(int argc, char* argv[])
 {
 	if ( argc < 2 || argv[1][0] == '-' )
 	{
-		printf("Usage: %s gamename1 [... gamenameN]\n", argv[0]) ;
-		printf("Tests one or more gamenames for validity\n") ;
-		exit(0) ;
+		printf("Usage: %s gamename1 [... gamenameN]\n", argv[0]);
+		printf("Tests one or more gamenames for validity\n");
+		exit(0);
 	}
 
-	for ( int i = 1 ; i < argc ; ++i )
+	for ( int i = 1; i < argc; ++i )
 	{
-		printf("Checking [%s]: ", argv[i]) ;
+		printf("Checking [%s]: ", argv[i]);
 
 		// Translate to wide characters.
-		wchar_t callsign[513] ;
-		WWII::ConvertChars(argv[i], callsign, sizeof(callsign)) ;
+		wchar_t callsign[513];
+		WWII::ConvertChars(argv[i], callsign, sizeof(callsign));
 
 		try
 		{
 			// Basic length check.
 			if ( wcslen(callsign) > (UINT32)MAX_HANDLE_WLEN )
-				throw "Too long" ;
+				throw "Too long";
 
 			// If this says it's ok, it's ok.
 			if ( chatIsValidCallsign(callsign) )
 			{
-				UINT64 handle = chatGetHandle(callsign) ;
+				UINT64 handle = chatGetHandle(callsign);
 				if ( handle == 0 )
-					throw "Does not parse" ;
+					throw "Does not parse";
 
-				const wchar_t* unpacked = chatGetWideCallsign(handle) ;
+				const wchar_t* unpacked = chatGetWideCallsign(handle);
 				if ( wcscmp(callsign, unpacked) != 0 )
-					throw "Produces truncated callsign" ;
+					throw "Produces truncated callsign";
 
-				printf("OK [%llx].\n", handle) ;
-				continue ;
+				printf("OK [%llx].\n", handle);
+				continue;
 			}
 
 			// If it starts with a roman character, it can't contain
@@ -106,26 +105,26 @@ main(int argc, char* argv[])
 				|| (callsign[0] >= '0' && callsign[0] <= '9') )
 			{
 				// Check the combination protocol.
-				_testCombination(callsign) ;
+				_testCombination(callsign);
 			}
 			else
 			{
 				if ( wcslen(callsign) > 5 )
-					throw "Too long" ;
+					throw "Too long";
 			}
 
-			_checkCharacters(callsign) ;
+			_checkCharacters(callsign);
 
-			printf("///TODO\n") ;
+			printf("///TODO\n");
 
 		}
 		catch ( const char* error )
 		{
-			printf("FAIL: %s.\n", error) ;
+			printf("FAIL: %s.\n", error);
 		}
 		catch ( ... )
 		{
-			printf("FAIL: *INTERNAL ERROR: Generated unhandled exception.\n") ;
+			printf("FAIL: *INTERNAL ERROR: Generated unhandled exception.\n");
 		}
 	}
 }

@@ -22,4 +22,4 @@ struct DAMAGE_QUEUE_ENTRY
 	WEAPON_SERIAL	weapon;			// Spec and Sortie of the weapon responsible.
 	UINT32			playerID;		// ID of the player who did the damage.
 	SINT64			damageJoules;	// Damage done.
-} ;
+};

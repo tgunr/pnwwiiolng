@@ -7,7 +7,7 @@
 //
 // Originating Programmer: Marty Poulin
 
-#include <stdarg.h>
+#include <cstdarg>
 
 #ifndef EWOULDBLOCK
 	#include	<errno.h>
@@ -36,8 +36,8 @@ namespace Debug
 		ERR_INFO,					// informational message
 		ERR_DBUG					// debug level message
 	,	ERROR_TYPE_SIZE
-	} ;
-	typedef unsigned int ERROR_TYPE ;
+	};
+	using ERROR_TYPE = unsigned int;
 }
 
 #define STD_ERR				0x0010	// mirror significant output to stderr
@@ -96,71 +96,70 @@ namespace Debug
 
 namespace Debug
 {
-typedef void  (*ERROR_HANDLER) (void);
+	using ERROR_HANDLER = void(*)(void);
 }
 
 // dbugInit: sets the current error level to ERR_INFO, opens the debug file, and initializes
 // the error object. The log type parameter of dbugInit can take any of the log facilities from
 // syslog including LOG_LOCAL0-7 or be set to LOG_TO_FILE to log
 // directly to a file only.
-extern void dbugInit(int logType, const char* filename);
+void dbugInit(int logType, const char* filename);
 
 // dbugClose: closes the debug file and cleans up.
-extern void	dbugClose(void);
+void dbugClose(void);
 
 // dbugSetLogLevel: set the current debug level for display of log messages.
-extern void	dbugSetLogLevel(Debug::ERROR_TYPE level);
+void dbugSetLogLevel(Debug::ERROR_TYPE level);
 
 // dbugSetWriteLevel: set the current debug level for display of dbug messages and interface to
 // the Microsoft debugger through the SetDebugErrorLevel function.
-extern void	dbugSetWriteLevel(Debug::ERROR_TYPE level);
+void dbugSetWriteLevel(Debug::ERROR_TYPE level);
 
 // dbugSetErrno: sets Errno. Error numbers adhere to errno.h. Under win32 "dbugWErrno.h"
 // may also be included to map windows socket errors to Unix errno.  Additional errors beyond
 // those covered in errno.h and dbugWErrno.h must be added to debugExtErrno.h and must adhere to
 // windows error code conventions to eliminate problems with compatibility.
-extern void		dbugSetErrno( int err);
+void dbugSetErrno( int err);
 
 // dbugGetErrno: returns the current error number.  Error numbers adhere to errno.h.  Under
 // win32 "dbugWErrno.h" may also be included to map windows socket errors to Unix errno.
 // Additional errors beyond those covered in errno.h and dbugWErrno.h must be added to
 // debugExtErrno.h and must adhere to windows error code conventions to eliminate problems
 // with compatibility.
-extern int		dbugGetErrno(void);
+int dbugGetErrno(void);
 
-// dbugLog: if the current filename, lineno or string is NULL then it sets these members. The
+// dbugLog: if the current filename, lineno or string is nullptr then it sets these members. The
 // parameters are output as a string to the debug file depending on the debug level selected and
 // the current error type.  calls handlers.
-extern int _dbugLog(const char* filename, int lineno, unsigned int errType, const char* fmt, ...) __attribute__ ((format (printf,4,5))) ;
-extern int _dbugLogV(const char* filename, int lineno, unsigned int errType, const char* fmt, va_list& args);
+int _dbugLog(const char* filename, int lineno, unsigned int errType, const char* fmt, ...) __attribute__ ((format (printf,4,5)));
 
-extern NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, unsigned int errType, const char* assertion, const char* fmt, ...);
-#define LogAbort(...) _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, NULL, __VA_ARGS__)
+NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, unsigned int errType, const char* assertion, const char* fmt, ...);
+#define LogAbort(...) _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, nullptr, __VA_ARGS__)
 
 // These macros assume that the condition is unlikely and try to provide the compiler an optimization hint by
 // ordering the abort as the second choice.
-#define ABORT_UNLESS(assertion_) (assertion_) ? (void)0 : (void)_LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, NULL, "Assertion: !(%s)", #assertion_)
-#define ABORT_UNLESS_EX(assertion_, ...) (assertion_) ? (void)0 : (void)_LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, #assertion_, __VA_ARGS__)
-#define ABORT_IF(assertion_) (!(assertion_)) ? (void)0 : (void)_LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, NULL, "Assertion: %s", #assertion_)
-#define ABORT_IF_EX(assertion_, ...) (!(assertion_)) ? (void)0 : (void)_LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, #assertion_, __VA_ARGS__)
+#define ABORT_UNLESS(assertion_) PN_LIKELY(!!(assertion_)) ? (void)0 : _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, nullptr, "Assertion: !(%s)", #assertion_)
+#define ABORT_UNLESS_EX(assertion_, ...) PN_LIKELY(!!(assertion_)) ? (void)0 : _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, #assertion_, __VA_ARGS__)
+#define ABORT_IF(assertion_) PN_LIKELY(!(assertion_)) ? (void)0 : _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, nullptr, "Assertion: %s", #assertion_)
+#define ABORT_IF_EX(assertion_, ...) PN_LIKELY(!(assertion_)) ? (void)0 : _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, #assertion_, __VA_ARGS__)
 
 #ifdef DBUG_TEST
-	#define dbugLog(x,args...) printf(args)
+	template<class Args...>
+	int dbugLog(const char*, int, unsigned int, const char* fmt, Args&&... args) noexcept
+	{
+		return printf(fmt, std::forward<Args>(args)...);
+	}
 #else
 	#ifdef NO_DEBUG_LOG
 		#if platOS == OS_LINUX
 			#define dbugLog(...)
-			#define dbugLogV(...)
 		#elif platOS == OS_WIN32
 			#define dbugLog(...) _dbugLog(__VA_ARGS__)		//} Seems like this should be
-			#define dbugLogV(...) _dbugLogV(__VA_ARGS__)	//} the same as the others???
 		#elif platOS == OS_MACOS
 			#define dbugLog(...)
-			#define dbugLogV(...)
 		#endif
 	#else
-		#define dbugLog _dbugLog
-		#define dbugLogV _dbugLogV
+		#define dbugLog(...) _dbugLog(__VA_ARGS__)
 	#endif
 #endif
 
@@ -185,7 +184,7 @@ extern NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, uns
 #endif
 
 // This is set to true when the dbug library is logging _FLD messages
-extern bool g_logDebug ;
+extern bool g_logDebug;
 
 #ifndef FRONT_END
 # define DEBUG_ERR(...) dbugLog(_FLA, __VA_ARGS__)
@@ -198,17 +197,17 @@ extern bool g_logDebug ;
 #if platOS== OS_WIN32
 #define WriteToConsole(...)	\
 	{	\
-		char output[4096] ;	\
-		sprintf(output, __VA_ARGS__) ;	\
-		OutputDebugStringA(output) ;	\
-		OutputDebugStringA("\n") ;		\
+		char output[4096];	\
+		sprintf(output, __VA_ARGS__);	\
+		OutputDebugStringA(output);	\
+		OutputDebugStringA("\n");		\
 	}
 #elif platOS == OS_MACOS
 #define WriteToConsole(...)	\
 	{	\
-		printf(__VA_ARGS__) ;	\
-		printf("\n") ;	\
+		printf(__VA_ARGS__);	\
+		printf("\n");	\
 	}
 #else
-#define WriteToConsole(...) dbugLog(_FLD, __VA_ARGS__) ;
+#define WriteToConsole(...) dbugLog(_FLD, __VA_ARGS__);
 #endif

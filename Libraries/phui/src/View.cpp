@@ -22,7 +22,7 @@ using namespace phui;
 
 class View::UserDataMap : public std::map<std::string, referenced_ptr> {};
 
-static View* _focusView = NULL;
+static View* _focusView = nullptr;
 /************************************************************************************************
 	View
 *************************************************************************************************/
@@ -67,7 +67,7 @@ int View::AddChild(View* view, View* before)
 {
  	if(!_children) _children = new ChildList;
 	
-	if(view->Parent() == NULL && view->ParentViewport() == NULL)
+	if(view->Parent() == nullptr && view->ParentViewport() == nullptr)
 	{		
 		_children->push_back(view);
 
@@ -130,8 +130,8 @@ void View::AttachedToWindow()
 void View::DetachedFromWindow()
 {
     _isFocus = false;
-	_graphicscontext = NULL;
-	_parentviewport = NULL;
+	_graphicscontext = nullptr;
+	_parentviewport = nullptr;
 	
     ParentLoop()->RemoveHandler(this);
     
@@ -155,7 +155,7 @@ int View::RemoveChild(View* view)
 		{
 			if(ParentLoop())
 				view->DetachedFromWindow();
-			(*it)->_parent = NULL;
+			(*it)->_parent = nullptr;
 			_children->erase(it);
 			
 			return 0;
@@ -514,7 +514,7 @@ bool View::MakeFocus(bool focus)
 {
 	Viewport* win = ParentViewport();
 
-    if(win == NULL)
+    if(win == nullptr)
 		return false;
     
     if(focus && !_isFocus)
@@ -529,7 +529,7 @@ bool View::MakeFocus(bool focus)
 	bool modified = (focus != _isFocus);
 	
 	 _isFocus = focus;
-	 _focusView = (_isFocus) ? (View*)this : NULL;
+	 _focusView = (_isFocus) ? (View*)this : nullptr;
     
 	if(modified)
 		win->OnFocusModified(_isFocus);
@@ -546,7 +546,7 @@ View* View::ChildAt(unsigned int i) const
 	if(_children && i < _children->size())
         return (*_children)[i];
 
-	return NULL;
+	return nullptr;
 }
 
 
@@ -741,7 +741,7 @@ View* View::FindView(const char* name) const
 		}	
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 /************************************************************************************************
@@ -750,7 +750,7 @@ View* View::FindView(const char* name) const
 
 View* View::FindViewHit(float x, float y, bool wincheck) const
 {
-	if(!_isVisible) return NULL;
+	if(!_isVisible) return nullptr;
 	
 	if(x >=0 && y >=0 && x <_width && y < _height)
 	{   
@@ -765,10 +765,10 @@ View* View::FindViewHit(float x, float y, bool wincheck) const
 			}
 		}
 
-		return (_acceptsmouseclick || (wincheck && _isWindow)) ? (View*)this : NULL;
+		return (_acceptsmouseclick || (wincheck && _isWindow)) ? (View*)this : nullptr;
 	}
 	
-	return NULL;
+	return nullptr;
 }
 
 /************************************************************************************************
@@ -829,7 +829,7 @@ bool View::FindView(View* v) const
 View* View::FindSibling(const char* name) const
 {	
 	View *p = _parent;
-	View *s = NULL;
+	View *s = nullptr;
 	
 	while(p && p->Parent()) p = p->Parent();
 	if(p) s = p->FindView(name);
@@ -932,10 +932,10 @@ View* View::FindFocusView() const
 {
 	if(_focusView && _focusView->IsVisible() && _focusView->IsFocus())
 		return _focusView;
-	return NULL;
+	return nullptr;
 	
 	/*
-	if(!_isVisible) return NULL;
+	if(!_isVisible) return nullptr;
 	
 	if(IsFocus()) return (View*)this;
 	
@@ -947,7 +947,7 @@ View* View::FindFocusView() const
 			return v;
 	}
 	
-	return NULL;
+	return nullptr;
 	*/
 }
 
@@ -998,7 +998,7 @@ bool View::Contains(float inx, float iny) const
 
 Viewport* View::ParentViewport() const 
 { 
-	if(_parentviewport == NULL && _parent)
+	if(_parentviewport == nullptr && _parent)
 		_parentviewport = _parent->ParentViewport();
 		
 	return _parentviewport;
@@ -1012,7 +1012,7 @@ View* View::ParentWin() const
 	if(_parent)
 		return _parent->ParentWin();
 	
-	return NULL;
+	return nullptr;
 }
 
 /************************************************************************************************
@@ -1021,7 +1021,7 @@ View* View::ParentWin() const
 
 GraphicsContext* View::GetGraphicsContext() const
 {	
-	if(_graphicscontext == NULL && _parent)
+	if(_graphicscontext == nullptr && _parent)
 		_graphicscontext = _parent->GetGraphicsContext();
 		
 	return _graphicscontext;
@@ -1033,7 +1033,7 @@ GraphicsContext* View::GetGraphicsContext() const
 
 Message* View::UserMessage() const
 {
-	if(_usermsg == NULL) _usermsg = new Message;
+	if(_usermsg == nullptr) _usermsg = new Message;
 	return _usermsg;
 }
 
@@ -1055,13 +1055,13 @@ void View::SetUserData(const char* name, Referenced* ref)
 
 Referenced* View::UserData(const char* name) const
 {
-	if(!_userdata) return NULL;
+	if(!_userdata) return nullptr;
 	
 	UserDataMap::iterator it = _userdata->find(name);
 	if(it != _userdata->end())
 		return it->second.ptr();
 		
-	return NULL;
+	return nullptr;
 }
 
 /************************************************************************************************
@@ -1421,7 +1421,7 @@ const char* View::GetSource() const
 	else if(_parent)
 		return _parent->GetSource();
 	
-	return NULL;
+	return nullptr;
 }
 /************************************************************************************************
 	SortChildrenByLayer

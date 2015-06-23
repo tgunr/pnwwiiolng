@@ -9,14 +9,14 @@
 namespace Teul
 {
 
-	typedef std::function<SINT32(ACTION_OBJECT*)> ACTION_FN;
+	using ACTION_FN = std::function<SINT32(ACTION_OBJECT*)>;
 
 	struct CallbackInit
 	{
 		CallbackInit()
 			: sendAction(nullptr)
 			, recvAction(nullptr)
-			, error(NULL)
+			, error(nullptr)
 			, callX(0), callY(0)
 		{}
 
@@ -26,6 +26,6 @@ namespace Teul
 
 		UCHAR		callX;			//! X position in the callback matrix.
 		UCHAR		callY;			//! Y position in the callback matrix.
-	} ;
+	};
 
 } // namespace Teul

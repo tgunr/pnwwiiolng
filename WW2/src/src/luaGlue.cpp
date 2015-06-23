@@ -9,22 +9,20 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
-#include "dbug/dbug.h"
-
 #include "include/luaGlue.h"
 #include "wwii/wwiiIRC.h"
 #include "teul/teulConfigVar.h"
 
-extern std::vector<const char*> script_args ;
+extern std::vector<const char*> script_args;
 
 // The Lua module open routine specified by #defines on command line
-extern int tolua_game_open(lua_State*) ;
+extern int tolua_game_open(lua_State*);
 
 // The general-purpose/default _luaVM
-lua_State* _luaVM ;					// General purpose/default _luaVM
-std::string _luaSource = "?" ;		// Current source for commands/scripts etc
-std::string _luaSubSystem = "?" ;	// Part of the source
-Lua::SCRIPT_RESULTS _luaOutput ;
+lua_State* _luaVM;					// General purpose/default _luaVM
+std::string _luaSource = "?";		// Current source for commands/scripts etc
+std::string _luaSubSystem = "?";	// Part of the source
+Lua::SCRIPT_RESULTS _luaOutput;
 
 extern ConfigPath cv_luaPath;
 extern ConfigPath cv_luaRCFile;
@@ -35,22 +33,22 @@ extern ConfigPath cv_luaRCFile;
 static inline void
 _report(UINT32 level, const char* message, const char* file = _luaSubSystem.c_str(), unsigned int lineNo = 0)
 {
-	std::string output ;
+	std::string output;
 
-	if ( message == NULL )
-		return ;
+	if ( message == nullptr )
+		return;
 
 	// Save the output
 	switch (level) {
-		case Debug::ERR_WARN:	output += "!: " ; break ;
-		case Debug::ERR_FATAL:	output += "<!>: " ; break ;
-		case Debug::ERR_ABORT: output += "ERR: " ; break ;
-		break ;
+		case Debug::ERR_WARN:	output += "!: "; break;
+		case Debug::ERR_FATAL:	output += "<!>: "; break;
+		case Debug::ERR_ABORT: output += "ERR: "; break;
+		break;
 	}
-	output += message ;
-	output += "\n" ;
+	output += message;
+	output += "\n";
 
-	_luaOutput.push_back(output) ;
+	_luaOutput.push_back(output);
 
 	if ( _luaSource.size() > 0 )
 		_dbugLog(_luaSubSystem.c_str()		// Source
@@ -59,75 +57,75 @@ _report(UINT32 level, const char* message, const char* file = _luaSubSystem.c_st
 				, "%s: %s"				// We don't want the mask parsing for %s
 				, _luaSource.c_str()	// The sub-system if specified
 				, message
-				) ;
+				);
 	else
 		_dbugLog(_luaSubSystem.c_str()
 				, 0
 				, level
 				, "%s"
-				, message) ;
+				, message);
 }
 
-extern const char* chatGetCallsign(const ChatHandle&) ;
-const char* getCallsign(unsigned long long handle) { return chatGetCallsign((ChatHandle)handle) ; }
+extern const char* chatGetCallsign(const ChatHandle&);
+const char* getCallsign(unsigned long long handle) { return chatGetCallsign((ChatHandle)handle); }
 
 //////////////////////////////////////////////////////////////////////
 // print/error/warn -- simple scripting dbugLog wrapper
 
-void print(const char* message) { _report(Debug::ERR_INFO, message) ; }
-void warn(const char* message) { _report(Debug::ERR_WARN, message) ; }
-void error(const char* message) { _report(Debug::ERR_ABORT, message) ; }
+void print(const char* message) { _report(Debug::ERR_INFO, message); }
+void warn(const char* message) { _report(Debug::ERR_WARN, message); }
+void error(const char* message) { _report(Debug::ERR_ABORT, message); }
 void writeToLog(const char* file, const char* func, unsigned int line, const char* level, const char* facil, const char* message)
 {
-	if ( ((file == NULL) | (func == NULL) | (message == NULL) | (level == NULL)) || *level == 0 )
-		return ;
+	if ( ((file == nullptr) | (func == nullptr) | (message == nullptr) | (level == nullptr)) || *level == 0 )
+		return;
 
-	char levelChar = toupper(level[0]) ;
-	UINT32 levelNo = 0 ;
+	char levelChar = toupper(level[0]);
+	UINT32 levelNo = 0;
 	switch ( levelChar )
 	{
-	case 'D': levelNo = Debug::ERR_DBUG ; break ;
-	case 'N': levelNo = Debug::ERR_NOTE ; break ;
-	case 'M': levelNo = Debug::ERR_MINOR ; break ;
-	case 'W': levelNo = Debug::ERR_WARN ; break ;
-	case 'A': levelNo = Debug::ERR_ABORT ; break ;
-	case 'F': levelNo = Debug::ERR_FATAL ; break ;
+	case 'D': levelNo = Debug::ERR_DBUG; break;
+	case 'N': levelNo = Debug::ERR_NOTE; break;
+	case 'M': levelNo = Debug::ERR_MINOR; break;
+	case 'W': levelNo = Debug::ERR_WARN; break;
+	case 'A': levelNo = Debug::ERR_ABORT; break;
+	case 'F': levelNo = Debug::ERR_FATAL; break;
 	case 'I':	/*PASSTHRU*/
-	default: levelNo = Debug::ERR_INFO ; break ;
+	default: levelNo = Debug::ERR_INFO; break;
 	}
 
-	std::string filename = facil ;
-	filename += "@" ;
-	filename += file ;
-	filename += ":" ;
-	filename += func ;
+	std::string filename = facil;
+	filename += "@";
+	filename += file;
+	filename += ":";
+	filename += func;
 
-	_dbugLog(filename.c_str(), line, levelNo, "%s", message) ;
+	_dbugLog(filename.c_str(), line, levelNo, "%s", message);
 
-	std::string output = "" ;
+	std::string output = "";
 	switch (levelNo)
 	{
-		case Debug::ERR_WARN:	output = "<W>:" ; break ;
-		case Debug::ERR_FATAL:	output = "[F]:" ; break ;
+		case Debug::ERR_WARN:	output = "<W>:"; break;
+		case Debug::ERR_FATAL:	output = "[F]:"; break;
 		default:
-			output += levelChar ;
-			output += ":" ;
-		break ;
+			output += levelChar;
+			output += ":";
+		break;
 	}
-	output += filename ;
-	output += ":" ;
-	char lineNo[22] ;
-	snprintf(lineNo, sizeof(lineNo) - 1, "%u", line) ;
-	output += lineNo ;
-	output += ": " ;
-	output += message ;
-	output += "\n" ;
-	_luaOutput.push_back(output) ;
+	output += filename;
+	output += ":";
+	char lineNo[22];
+	strprintf(lineNo, "%u", line);
+	output += lineNo;
+	output += ": ";
+	output += message;
+	output += "\n";
+	_luaOutput.push_back(output);
 }
-char* ARGS(int i) { return ( i >= (int)script_args.size() ) ? NULL : const_cast<char*>(script_args[i]) ; }
+char* ARGS(int i) { return ( i >= (int)script_args.size() ) ? nullptr : const_cast<char*>(script_args[i]); }
 
-extern bool chatSendAdminMessage(const char* fmt, ...) ;
-void gmMessage(const char* message) { chatSendAdminMessage("%s", message) ; }
+extern bool chatSendAdminMessage(const char* fmt, ...);
+void gmMessage(const char* message) { chatSendAdminMessage("%s", message); }
 
 //////////////////////////////////////////////////////////////////////
 // Various minor functions.
@@ -135,94 +133,94 @@ void gmMessage(const char* message) { chatSendAdminMessage("%s", message) ; }
 void
 _cantReadReturn(const char* fn)
 {
-	dbugLog(_FLW, "Incorrect return type to strat.%s: %s", fn, lua_tostring(_luaVM, -1)) ;
-	lua_pop(_luaVM, 1) ;
+	dbugLog(_FLW, "Incorrect return type to strat.%s: %s", fn, lua_tostring(_luaVM, -1));
+	lua_pop(_luaVM, 1);
 }
 
 bool
 _callFunction(const char* fn, int nargs)
 {
-	Lua::SetContext(fn) ;
-	bool result = (lua_pcall(_luaVM, nargs, 1, 0) != 0) ;
-	Lua::EndContext() ;
+	Lua::SetContext(fn);
+	bool result = (lua_pcall(_luaVM, nargs, 1, 0) != 0);
+	Lua::EndContext();
 
 	if ( result )
 	{
-		dbugLog(_FLW, "%s failed: %s", fn, lua_tostring(_luaVM, -1)) ;
-		lua_pop(_luaVM, 1) ;
-		return false ;
+		dbugLog(_FLW, "%s failed: %s", fn, lua_tostring(_luaVM, -1));
+		lua_pop(_luaVM, 1);
+		return false;
 	}
 
-	return true ;
+	return true;
 }
 
 void
 Lua::CallInstanceFunction(const char* func, const instanceid_t& instID, const char* data)
 {
-	lua_getglobal(_luaVM, func) ;
+	lua_getglobal(_luaVM, func);
 	if ( lua_isfunction(_luaVM, -1) != 1 )
 	{
-		dbugLog(_FLW, "no instance function: %s", func) ;
-		return ;
+		dbugLog(_FLW, "no instance function: %s", func);
+		return;
 	}
 
-	char instStr[20] ;
-	snprintf(instStr, sizeof(instStr) - 1, "%llu", instID) ;
-	lua_pushstring(_luaVM, instStr) ;
-	lua_pushstring(_luaVM, data) ;
+	char instStr[20];
+	strprintf(instStr, "%llu", instID);
+	lua_pushstring(_luaVM, instStr);
+	lua_pushstring(_luaVM, data);
 
-	_callFunction(func, 2) ;
+	_callFunction(func, 2);
 }
 
 void
 Lua::CallInstanceFunction(const char* func_, const instanceid_t& instID_, playerid_t playerID_, Instance::PlayerState* state_)
 {
-	lua_getglobal(_luaVM, func_) ;
+	lua_getglobal(_luaVM, func_);
 	if ( lua_isfunction(_luaVM, -1) != 1 )
 	{
-		dbugLog(_FLW, "no instance function: %s", func_) ;
-		return ;
+		dbugLog(_FLW, "no instance function: %s", func_);
+		return;
 	}
-	char instStr[20] ;
-	snprintf(instStr, sizeof(instStr) - 1, "%llu", instID_) ;
-	lua_pushstring(_luaVM, instStr) ;
-	tolua_pushnumber(_luaVM, (lua_Number)playerID_) ;
-	tolua_pushusertype(_luaVM, (void*)state_, "PlayerState") ;
+	char instStr[20];
+	strprintf(instStr, "%llu", instID_);
+	lua_pushstring(_luaVM, instStr);
+	tolua_pushnumber(_luaVM, (lua_Number)playerID_);
+	tolua_pushusertype(_luaVM, (void*)state_, "PlayerState");
 
-	_callFunction(func_, 3) ;
+	_callFunction(func_, 3);
 }
 
 int
 _getNumber(const char* function, int argc=0)
 {
 	if ( !_callFunction(function, argc) )
-		return 0 ;
+		return 0;
 
 	if ( !lua_isnumber(_luaVM, -1) )
 	{
-		_cantReadReturn(function) ;
-		return 0 ;
+		_cantReadReturn(function);
+		return 0;
 	}
-	int result = (int)lua_tonumber(_luaVM, -1) ;
-	lua_pop(_luaVM, 1) ;
-	return result ;
+	int result = (int)lua_tonumber(_luaVM, -1);
+	lua_pop(_luaVM, 1);
+	return result;
 }
 
 double
 _getDouble(const char* function, int argc=0)
 {
 	if ( !_callFunction(function, argc) )
-		return 0 ;
+		return 0;
 
 	if ( !lua_isnumber(_luaVM, -1) )
 	{
-		_cantReadReturn(function) ;
-		return 0 ;
+		_cantReadReturn(function);
+		return 0;
 	}
-	double result = (double)lua_tonumber(_luaVM, -1) ;
-	betaLog(_FLI, "%s returned %g", function, result) ;
-	lua_pop(_luaVM, 1) ;
-	return result ;
+	double result = (double)lua_tonumber(_luaVM, -1);
+	betaLog(_FLI, "%s returned %g", function, result);
+	lua_pop(_luaVM, 1);
+	return result;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -231,23 +229,23 @@ _getDouble(const char* function, int argc=0)
 void
 _reportLuaError(const char* stage, const char* scriptName)
 {
-	static const char* const toChannels = "-sys,#servers" ;
-	char error[512+1] ;
-	snprintf(error, 512, "*** ERROR: Unable to %s Lua script '%s'", stage, scriptName) ;
+	static const char* const toChannels = "-sys,#servers";
+	char error[512+1];
+	snprintf(error, 512, "*** ERROR: Unable to %s Lua script '%s'", stage, scriptName);
 
 	// IRC it
-	wwiiIRCChannelMessage(toChannels, error) ;
+	wwiiIRCChannelMessage(toChannels, error);
 
-	Lua::SCRIPT_RESULTS& results = Lua::Results() ;
-	for ( size_t i = 0 ; i < results.size() ; ++i )
-		wwiiIRCChannelMessage(toChannels, results[i].c_str()) ;
+	Lua::SCRIPT_RESULTS& results = Lua::Results();
+	for ( size_t i = 0; i < results.size(); ++i )
+		wwiiIRCChannelMessage(toChannels, results[i].c_str());
 
-	Lua::Results().clear() ;
+	Lua::Results().clear();
 
 	std::this_thread::sleep_for(std::chrono::seconds(1));
 
 	// Log it and shut down.
-	LogAbort("luaErr: %s", error) ;
+	LogAbort("luaErr: %s", error);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -256,24 +254,24 @@ _reportLuaError(const char* stage, const char* scriptName)
 static inline bool
 _luaError()
 {
-	error(lua_tostring(_luaVM, -1)) ;
-	lua_pop(_luaVM, 1) ;
-	return false ;
+	error(lua_tostring(_luaVM, -1));
+	lua_pop(_luaVM, 1);
+	return false;
 }
 
 static void
 _luaOpenLib(lua_State* L, const char* name, lua_CFunction fn)
 {
-	lua_pushcfunction(L, fn) ;
-	lua_pushstring(L, name) ;
-	lua_call(L, 1, 0) ;
+	lua_pushcfunction(L, fn);
+	lua_pushstring(L, name);
+	lua_call(L, 1, 0);
 }
 
 static void
 _luaOpenLibs(lua_State* L)
 {
-	luaL_openlibs(L) ;
-	_luaOpenLib(L, "debug", luaopen_debug) ;
+	luaL_openlibs(L);
+	_luaOpenLib(L, "debug", luaopen_debug);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -282,28 +280,28 @@ _luaOpenLibs(lua_State* L)
 void
 _luaContext(const char* source = "?", const char* func = "?")
 {
-	_luaSource = source ;
-	_luaSubSystem = func ;
+	_luaSource = source;
+	_luaSubSystem = func;
 }
 
-static std::string _prevSource = "" ;
-static std::string _prevSub = "" ;
+static std::string _prevSource = "";
+static std::string _prevSub = "";
 
 void
 Lua::SetContext(const char* func)
 {
-	_prevSource = _luaSource ;
-	_prevSub = _luaSubSystem ;
+	_prevSource = _luaSource;
+	_prevSub = _luaSubSystem;
 
-	_luaSource = "code" ;
-	_luaSubSystem = func ;
+	_luaSource = "code";
+	_luaSubSystem = func;
 }
 
 void
 Lua::EndContext()
 {
-	_luaSource = _prevSource ;
-	_luaSubSystem = _prevSub ;
+	_luaSource = _prevSource;
+	_luaSubSystem = _prevSub;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -312,23 +310,23 @@ Lua::EndContext()
 bool
 _executeScript(const char* script)
 {
-	_luaContext("file", script) ;	// Start context
-	_luaOutput.clear() ;
+	_luaContext("file", script);	// Start context
+	_luaOutput.clear();
 
-	bool success ;
+	bool success;
 
 	if ( luaL_loadfile(_luaVM, script) || lua_pcall(_luaVM, 0, 0, 0) )
 	{
-		dbugLog(_FLW, "%s", lua_tostring(_luaVM, -1)) ;
-		_luaError() ;
-		success = false ;
+		dbugLog(_FLW, "%s", lua_tostring(_luaVM, -1));
+		_luaError();
+		success = false;
 	}
 	else
-		success = true ;
+		success = true;
 
-	_luaContext() ;					// End of context
+	_luaContext();					// End of context
 
-	return success ;
+	return success;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -337,13 +335,13 @@ _executeScript(const char* script)
 bool
 Lua::RunScript(const char* script)
 {
-	if ( script == NULL || *script == 0 )
+	if ( script == nullptr || *script == 0 )
 	{
-		dbugLog(_FLW, "%s called with null script name", __FUNCTION__) ;
-		return false ;
+		dbugLog(_FLW, "%s called with null script name", __FUNCTION__);
+		return false;
 	}
 
-	return _executeScript(script) ;
+	return _executeScript(script);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -352,26 +350,26 @@ Lua::RunScript(const char* script)
 const char*
 _luaReader(lua_State* L, void* data, size_t* size)
 {
-	static const void* lastData = NULL ;
+	static const void* lastData = nullptr;
 	if ( data == lastData )
 	{
-		lastData = NULL ;
-		return NULL ;
+		lastData = nullptr;
+		return nullptr;
 	}
 
-	lastData = data ;
-	const std::string* str = (const std::string*)data ;
-	*size = str->length() ;
+	lastData = data;
+	const std::string* str = (const std::string*)data;
+	*size = str->length();
 
-	return str->c_str() ;
+	return str->c_str();
 }
 
 static int
 _luaWriter(lua_State* L, const void* p, size_t sz, void* ud)
 {
-	std::string* str = (std::string*)ud ;
+	std::string* str = (std::string*)ud;
 	str->append((const char*)p, sz);
-	return 0 ;
+	return 0;
 }
 
 std::string
@@ -380,20 +378,20 @@ Lua::CompileCode(std::string code, const char* name)
 
 	if ( lua_load(_luaVM, _luaReader, &code, name) != 0 )
 	{
-		_luaError() ;
-		return "" ;
+		_luaError();
+		return "";
 	}
 
-	std::string result = "" ;
+	std::string result = "";
 	if ( lua_dump(_luaVM, _luaWriter, &result) != 0 )
 	{
-		_luaError() ;
-		return "" ;
+		_luaError();
+		return "";
 	}
 
-	lua_pop(_luaVM, 1) ;
+	lua_pop(_luaVM, 1);
 
-	return result ;
+	return result;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -405,28 +403,28 @@ Lua::RunObject(const char* name, std::string& obj)
 {
 	if ( obj.size() == 0 )
 	{
-		dbugLog(_FLW, "%s called with null object", __FUNCTION__) ;
-		return false ;
+		dbugLog(_FLW, "%s called with null object", __FUNCTION__);
+		return false;
 	}
 
 	// Tell ourselves what we're executing
-	_luaContext("object", name) ;	// Start of context
-	_luaOutput.clear() ;
+	_luaContext("object", name);	// Start of context
+	_luaOutput.clear();
 
-	bool success ;
+	bool success;
 
 	if ( luaL_loadbuffer(_luaVM, obj.c_str(), obj.size(), name)
 		|| lua_pcall(_luaVM, 0, 0, 0) )
 	{
-		success = false ;
-		_luaError() ;
+		success = false;
+		_luaError();
 	}
 	else
-		success = true ;
+		success = true;
 
-	_luaContext() ;					// End of context
+	_luaContext();					// End of context
 
-	return success ;
+	return success;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -438,44 +436,44 @@ Lua::RunCode(std::string& code, const char* function)
 {
 	if ( code.size() == 0 )
 	{
-		dbugLog(_FLW, "%s called with null code", __FUNCTION__) ;
-		return false ;
+		dbugLog(_FLW, "%s called with null code", __FUNCTION__);
+		return false;
 	}
-	_luaContext("lua", function) ;	// start of context
-	_luaOutput.clear() ;
+	_luaContext("lua", function);	// start of context
+	_luaOutput.clear();
 
-	bool success ;
+	bool success;
 
 	if ( luaL_loadbuffer(_luaVM, code.c_str(), code.size(), "code")
 		|| lua_pcall(_luaVM, 0, 0, 0) )
 	{
-		success = false ;
-		_luaError() ;
+		success = false;
+		_luaError();
 	}
 	else
-		success = true ;
+		success = true;
 
-	_luaContext() ;					// end of context
+	_luaContext();					// end of context
 
-	return success ;
+	return success;
 }
 
 //////////////////////////////////////////////////////////////////////
 // Start an instance of a lua state
 
-extern const char* HostLanguage ;
+extern const char* HostLanguage;
 
 static bool
 _startInterpreter()
 {
-	_luaVM = lua_open() ;
-	if ( _luaVM == NULL )
+	_luaVM = lua_open();
+	if ( _luaVM == nullptr )
 	{
-		dbugLog(_FLA, "Unable to start lua interpreter") ;
-		return false ;
+		dbugLog(_FLA, "Unable to start lua interpreter");
+		return false;
 	}
 
-	_luaOpenLibs(_luaVM) ;
+	_luaOpenLibs(_luaVM);
 
 	lua_getglobal(_luaVM, "package");
 	lua_getfield(_luaVM, -1, "path");
@@ -488,16 +486,16 @@ _startInterpreter()
 	lua_setfield(_luaVM, -2, "path");
 	lua_pop(_luaVM, 1);
 	
-	tolua_game_open(_luaVM) ;
-	dbugLog(_FLI, "started Lua interpreter") ;
+	tolua_game_open(_luaVM);
+	dbugLog(_FLI, "started Lua interpreter");
 
 	std::string rcFile = cv_luaPath.GetString();
 	rcFile += PATH_SEPARATOR;
 	rcFile += cv_luaRCFile.GetString();
-	if ( !_executeScript(rcFile.c_str()) || _luaVM == NULL )
+	if ( !_executeScript(rcFile.c_str()) || _luaVM == nullptr )
 	{
-		dbugLog(_FLW, "startup file failed") ;
-		exit(0) ;
+		dbugLog(_FLW, "startup file failed");
+		exit(0);
 	}
 
 	rcFile = cv_luaPath.GetString();
@@ -506,12 +504,12 @@ _startInterpreter()
 	rcFile += HostLanguage;
 	rcFile += ".lua";
 
-	_executeScript(rcFile.c_str()) ;
+	_executeScript(rcFile.c_str());
 
-	_luaContext() ;
-	_luaOutput.clear() ;
+	_luaContext();
+	_luaOutput.clear();
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -520,25 +518,25 @@ _startInterpreter()
 bool
 Lua::Start(const char* const hostName)
 {
-	if ( _luaVM != NULL )
+	if ( _luaVM != nullptr )
 	{
-		dbugLog(_FLW, "Attempted to restart active global vm") ;
-		return true ;
+		dbugLog(_FLW, "Attempted to restart active global vm");
+		return true;
 	}
 
 	if ( !_startInterpreter() )
-		return false ;
+		return false;
 
-	std::string functionName = hostName ;
-	functionName += "Setup" ;
+	std::string functionName = hostName;
+	functionName += "Setup";
 
-	lua_getglobal(_luaVM, functionName.c_str()) ;
+	lua_getglobal(_luaVM, functionName.c_str());
 	if ( lua_isfunction(_luaVM, -1) != 1 )
-		return false ;
+		return false;
 
-	_callFunction(functionName.c_str(), 0) ;
+	_callFunction(functionName.c_str(), 0);
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -547,16 +545,16 @@ Lua::Start(const char* const hostName)
 bool
 Lua::Stop()
 {
-	_luaContext() ;
-	_luaOutput.clear() ;
+	_luaContext();
+	_luaOutput.clear();
 
-	if ( _luaVM == NULL )
-		return false ;
+	if ( _luaVM == nullptr )
+		return false;
 
-	lua_close(_luaVM) ;
-	_luaVM = NULL ;
+	lua_close(_luaVM);
+	_luaVM = nullptr;
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -565,33 +563,33 @@ Lua::Stop()
 Lua::SCRIPT_RESULTS&
 Lua::Results()
 {
-	return _luaOutput ;
+	return _luaOutput;
 }
 
-class HCUnit ;
-class StratHCUnit ;
-typedef std::map<UINT32, HCUnit*> HCUNIT_INDEX ;
-typedef HCUNIT_INDEX::iterator HCUIDX_ITERATOR ;
+class HCUnit;
+class StratHCUnit;
+typedef std::map<UINT32, HCUnit*> HCUNIT_INDEX;
+typedef HCUNIT_INDEX::iterator HCUIDX_ITERATOR;
 
 UINT16 getHCiID(const HCUIDX_ITERATOR* it)
 {
-	return (*it)->first ;
+	return (*it)->first;
 }
 
 HCUnit* getHCiHCUnit(const HCUIDX_ITERATOR* it)
 {
-	return (HCUnit*)(*it)->second ;
+	return (HCUnit*)(*it)->second;
 }
 
 StratHCUnit* getHCiStratHCUnit(const HCUIDX_ITERATOR* it)
 {
-	return (StratHCUnit*)(*it)->second ;
+	return (StratHCUnit*)(*it)->second;
 }
 
 HCUIDX_ITERATOR getHCiNext(const HCUIDX_ITERATOR* it)
 {
-	HCUIDX_ITERATOR next = *it ;
-	++next ;
-	return next ;
+	HCUIDX_ITERATOR next = *it;
+	++next;
+	return next;
 }
 

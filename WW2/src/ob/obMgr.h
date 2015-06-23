@@ -171,8 +171,8 @@ struct PoolModel
 	LOGICAL IsReplacementTile() const;
 	LOGICAL IsEnterable() const;
 	void		CheckModelSanity()	const;
-	bool		GetSubObjectBoundsByName(BoundingBox* bounds, const char* name, const PoolNode* o) const;
-	bool		GetSubObjectBoundsByComment(BoundingBox* bounds, const char* comment, const PoolNode* o) const;
+	bool		GetSubObjectBoundsByName(BoundingBox* bounds_, const char* name, const PoolNode* o) const;
+	bool		GetSubObjectBoundsByComment(BoundingBox* bounds_, const char* comment, const PoolNode* o) const;
 	void		GetMinLODStats(int& minNumVertices, int& minNumObjects, float& maxlodRange) const;	// Only for debugging in BuildTerrain
 };
 
@@ -212,14 +212,14 @@ struct FindByName
 {
     FindByName()
     {
-        name = NULL;
-        node = NULL;
+        name = nullptr;
+        node = nullptr;
     }
 
     void set(const char* n)
     {
         name = n;
-        node = NULL;
+        node = nullptr;
     }
 
     void find(const T* o)
@@ -248,13 +248,13 @@ struct FindByComment
 {
     FindByComment()
     {
-        comment = NULL;
-        node = NULL;
+        comment = nullptr;
+        node = nullptr;
     }
 
     void set(const char* c)
     {
-        node = NULL;
+        node = nullptr;
         comment = c;
     }
 

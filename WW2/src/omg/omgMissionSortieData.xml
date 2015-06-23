@@ -24,17 +24,13 @@
 
 	</var-group>
 
-	<var-group name='Player'>
-		<doc> <brief> Description of the player driving the sortie. </brief> </doc>
-		<member type='UINT8' name='decal' brief="Player's decal."/>
-	</var-group>
-
 	<var-group name='Vehicle'>
 		<doc> <brief> Description of the vehicle used. </brief> </doc>
 
 		<member type='WEAPON_SPEC' name='weaponSpec' brief="Vehicle used for this sortie."/>
 		<member type='RANK_NO' name='effectiveRank' brief="Rank attributed to the vehicle."/>
 		<member type='UINT8' name='rtbState' brief="Vehicle's RTB status (or 0 for not yet despawned)."/>
+    <member type='UINT8' name='decal' brief='Decal of the player leading the sortie'/>
 		<member type='ChatHandle' name='killedBy' brief="Callsign of killer or 0."/>
 		<member type='FULL_OBJ_ID' name='rtbFacility' brief="Where the vehicle is RTBing to."/>
 	</var-group>
@@ -83,25 +79,25 @@
 <!--
 	<sub-group>
 		<sub-group name='Reservation'>
-			bool isReserved ;
-			FULL_OBJ_ID facility ;
+			bool isReserved;
+			FULL_OBJ_ID facility;
 		</sub-group>
 	</sub-group>
 -->
 
 	<function return-type='UINT32' name='sortieID' const='true'>
 		<doc><brief>Returns the sortieID.</brief></doc>
-		<code>return m_sortie.sortieID() ;</code>
+		<code>return m_sortie.sortieID();</code>
 	</function>
 
 	<function return-type='UINT32' name='duration_s' const='true'>
 		<doc><brief>Returns the duration the sortie has been spawned for.</brief></doc>
-		<code>return (UINT32)(sortie().despawned_ms() - sortie().spawned_ms()) / 1000U ;</code>
+		<code>return (UINT32)(sortie().despawned_ms() - sortie().spawned_ms()) / 1000U;</code>
 	</function>
 
 	<function return-type='TeulTimeMS' name='duration_ms' const='true'>
 		<doc><brief>Returns the duration the sortie has been spawned for.</brief></doc>
-		<code>return sortie().despawned_ms() - sortie().spawned_ms() ;</code>
+		<code>return sortie().despawned_ms() - sortie().spawned_ms();</code>
 	</function>
 
 </class>

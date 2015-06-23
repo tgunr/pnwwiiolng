@@ -47,31 +47,31 @@ developer's callback routine can check the size instead.
 
 struct TEUL_CALLBACK
 {
-	ERROR_FUNCTION* error;		// Error handling function (or null).
-	UINT32		timeout;		// how long do we try to send data (zero for connection default)
-								// to delayTeimout;
-	void*		inData;		// pointer to the input object
-	void*		outData;		// pointer to the output object
-	void*		filterData;	// pointer to data filled out by a specified filter
+	ERROR_FUNCTION* error;			// Error handling function (or null).
+	UINT32		timeout;			// how long do we try to send data (zero for connection default)
+									// to delayTeimout;
+	void*		inData;				// pointer to the input object
+	void*		outData;			// pointer to the output object
+	void*		filterData;			// pointer to data filled out by a specified filter
 
 	UINT32		lastSent;
 	UINT32		xferRate;
 
-	ACTION_FN	m_sendAction;	// how to send data
-	ACTION_FN	m_recvAction;	// how to receive data
+	ACTION_FN	m_sendAction;		// how to send data
+	ACTION_FN	m_recvAction;		// how to receive data
 
 	UINT8			m_callX;		// the X and Y position in the callback matrix
 	UINT8			m_callY;		// the developer gets a pointer to obj,
 
 public:
-	ACTION_FN	sendAction() const { return m_sendAction ; }
-	ACTION_FN	recvAction() const { return m_recvAction ; }
+	ACTION_FN	sendAction() const { return m_sendAction; }
+	ACTION_FN	recvAction() const { return m_recvAction; }
 
-	const UINT8&	callX() const { return m_callX ; }
-	const UINT8&	callY() const { return m_callY ; }
+	const UINT8&	callX() const { return m_callX; }
+	const UINT8&	callY() const { return m_callY; }
 
 public:
-	static TEUL_CALLBACK*	s_callbackArray[256][256] ;
+	static TEUL_CALLBACK*	s_callbackArray[256][256];
 
 public:
 	//! @brief Lookup a callback by it's X/Y values packed as bytes in a stream.
@@ -79,13 +79,13 @@ public:
 	//! character array.  The first 2 characters of this array are the indexes
 	//! to the callback array containing the callback.  This routine
 	//! returns the public TEUL_CALLBACK* for the supplied data.
-	static TEUL_CALLBACK* Lookup(const UCHAR* const data_) { return s_callbackArray[data_[0]][data_[1]] ; }
+	static TEUL_CALLBACK* Lookup(const UCHAR* const data_) { return s_callbackArray[data_[0]][data_[1]]; }
 
 	//! @brief Lookup a callback by it's X and Y values.
-	static TEUL_CALLBACK* Lookup(const UINT8 x_, const UINT8 y_) { return s_callbackArray[x_][y_] ; }
+	static TEUL_CALLBACK* Lookup(const UINT8 x_, const UINT8 y_) { return s_callbackArray[x_][y_]; }
 
-	void Release() ;
+	void Release();
 
-	SINT32 processCallback(struct ENDPOINT& endpoint_, UCHAR* const data_, const SINT32 dataSize_bytes_) ;
-} ;
+	SINT32 processCallback(struct ENDPOINT& endpoint_, UCHAR* const data_, const SINT32 dataSize_bytes_);
+};
 

@@ -14,6 +14,6 @@ namespace Instance
 	,	Finishing				//!< Playing, but no new joins of the instance. Not implemented.
 	,	Closed					//!< Playing, but no new joins or spawns. Not implemented.
 	,	Completed				//!< No-longer playing, scored, may have spawned a follow-on.
-	} ;
+	};
 }
 //tolua_end

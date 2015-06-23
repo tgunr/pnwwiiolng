@@ -70,9 +70,7 @@ namespace Teul
 		,	PeerBadSrv		=	30202
 
 		,	ChatSrvErr		=	30300
-		,	ChatSrvRcn		=	30301
-		,	StratSrvRcn		=	30302
 		,	MapSrvClose		=	30303
-		} ;
+		};
 	}
 }

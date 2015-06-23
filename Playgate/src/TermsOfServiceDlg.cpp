@@ -10,14 +10,14 @@
 
 IMPLEMENT_DYNAMIC(CTermsOfServiceDlg, CDialog)
 
-CTermsOfServiceDlg::CTermsOfServiceDlg(CWnd* pParent /*=NULL*/)
+CTermsOfServiceDlg::CTermsOfServiceDlg(CWnd* pParent /*=nullptr*/)
 	: CBDialog(CTermsOfServiceDlg::IDD, pParent)
 {
 	//{{AFX_DATA_INIT(CTermsOfServiceDlg)
 	//}}AFX_DATA_INIT
 
-	SetBitmap(pgLoadImage(L"tos-bg.bmp")) ;
-	SetBitmapStyle(StyleCenter) ;
+	SetBitmap(pgLoadImage(L"tos-bg.bmp"));
+	SetBitmapStyle(StyleCenter);
 }
 
 CTermsOfServiceDlg::~CTermsOfServiceDlg()
@@ -43,19 +43,19 @@ END_MESSAGE_MAP()
 static DWORD CALLBACK
 _streamInCallback(DWORD dwCookie, LPBYTE pbBuff, LONG cb, LONG* pcb)
 {
-	CFile* file = (CFile*) dwCookie ;
-	*pcb = file->Read(pbBuff, cb) ;
+	CFile* file = (CFile*) dwCookie;
+	*pcb = file->Read(pbBuff, cb);
 
-	return 0 ;
+	return 0;
 }
 
 static void
 _loadTOS(CRichEditCtrl* const ctrl)
 {
-	ctrl->LimitText(64 * 1024) ;
-	ctrl->SetAutoURLDetect(1) ;
-	ctrl->SetTargetDevice(NULL, 0) ;
-	ctrl->SetWordWrapMode(WBF_WORDWRAP | WBF_WORDBREAK | WBF_LEVEL2) ;
+	ctrl->LimitText(64 * 1024);
+	ctrl->SetAutoURLDetect(1);
+	ctrl->SetTargetDevice(nullptr, 0);
+	ctrl->SetWordWrapMode(WBF_WORDWRAP | WBF_WORDBREAK | WBF_LEVEL2);
 
 	// CRichEditCtrl beeps in read only mode.
 	ctrl->SetReadOnly(FALSE); 
@@ -65,17 +65,17 @@ _loadTOS(CRichEditCtrl* const ctrl)
 
 	try
 	{
-		std::wstring filename = g_exePath + _T("\\license.rtf") ;
-		CFile cfile(filename.c_str(), CFile::modeRead) ;
-		EDITSTREAM es ;
-		es.dwCookie = (DWORD)&cfile ;
-		es.pfnCallback = _streamInCallback ;
+		std::wstring filename = g_exePath + _T("\\license.rtf");
+		CFile cfile(filename.c_str(), CFile::modeRead);
+		EDITSTREAM es;
+		es.dwCookie = (DWORD)&cfile;
+		es.pfnCallback = _streamInCallback;
 
-		ctrl->StreamIn(SF_RTF, es) ;
+		ctrl->StreamIn(SF_RTF, es);
 	}
 	catch ( ... )
 	{
-		ctrl->SetWindowText(GetLoc(ERROR_TOS)) ;
+		ctrl->SetWindowText(GetLoc(ERROR_TOS));
 	}
 }
 
@@ -89,11 +89,11 @@ void CTermsOfServiceDlg::OnEnLinkTos(NMHDR* pNMHDR, LRESULT* pResult)
 void CTermsOfServiceDlg::OnEnSetfocusTos()
 {
 	// TODO: Add your control notification handler code here
-	static bool firstTime = true ;
+	static bool firstTime = true;
 	if ( firstTime == true )
 	{
-		firstTime = false ;
-		CWnd* ctrl = GetDlgItem(IDC_TOS) ;
-		_loadTOS((CRichEditCtrl*)ctrl) ;
+		firstTime = false;
+		CWnd* ctrl = GetDlgItem(IDC_TOS);
+		_loadTOS((CRichEditCtrl*)ctrl);
 	}
 }

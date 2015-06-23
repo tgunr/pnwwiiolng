@@ -37,7 +37,7 @@ Description:
 void PostRenderKill()
 {
     postrender->kill();
-    postrender = NULL;
+    postrender = nullptr;
 }
 
 /*------------------------------------------------------------------
@@ -569,7 +569,7 @@ void PostRenderFilter::_createBlurDeprecated()
         frag = "fx/shaders/GLSL/postrender/RECT/blur.frag";
 
     // Create blur program
-    _blurPgm = GLSL.loadProgram("blur", NULL, frag);
+    _blurPgm = GLSL.loadProgram("blur", nullptr, frag);
     _blurPgm->AddShader(_postvertex.get());
 
     _blurPgm->GetOrCreateUniform("offsets", glslUniform::FLOAT_VEC2, 16);
@@ -636,7 +636,7 @@ void PostRenderFilter::_createDownSizeDeprecated()
         frag = "fx/shaders/GLSL/postrender/RECT/downsize.frag";
 
     // Create downsizing program
-    _downsizePgm = GLSL.loadProgram("downsize", NULL, frag);
+    _downsizePgm = GLSL.loadProgram("downsize", nullptr, frag);
     _downsizePgm->AddShader(_postvertex.get());
 
     // Now the uniform variables
@@ -696,7 +696,7 @@ void PostRenderFilter::_createDepthBlurDeprecated()
         frag = "fx/shaders/GLSL/postrender/RECT/depthblur.frag";
 
     // Create downsizing program
-    _depthBlurPgm = GLSL.loadProgram("depthblur", NULL, frag);
+    _depthBlurPgm = GLSL.loadProgram("depthblur", nullptr, frag);
     _depthBlurPgm->AddShader(_postvertex.get());
 
     // Now the uniform variables
@@ -761,7 +761,7 @@ void PostRenderFilter::_createFilterDeprecated()
         frag = "fx/shaders/GLSL/postrender/RECT/filter.frag";
 
     // Create downsizing program
-    _filterPgm = GLSL.loadProgram("filter", NULL, frag);
+    _filterPgm = GLSL.loadProgram("filter", nullptr, frag);
     _filterPgm->AddShader(_postvertex.get());
 
     // Now the uniform variables
@@ -819,7 +819,7 @@ void PostRenderFilter::_createFilterXDeprecated()
         frag = "fx/shaders/GLSL/postrender/RECT/filterx.frag";
 
     // Create downsizing program
-    _filterXPgm = GLSL.loadProgram("filterx", NULL, frag);
+    _filterXPgm = GLSL.loadProgram("filterx", nullptr, frag);
     _filterXPgm->AddShader(_postvertex.get());
 
     // Now the uniform variables
@@ -872,7 +872,7 @@ void PostRenderFilter::_createFilterYDeprecated()
         frag = "fx/shaders/GLSL/postrender/RECT/filtery.frag";
 
     // Create downsizing program
-    _filterYPgm = GLSL.loadProgram("filtery", NULL, frag);
+    _filterYPgm = GLSL.loadProgram("filtery", nullptr, frag);
     _filterYPgm->AddShader(_postvertex.get());
 
     // Now the uniform variables
@@ -933,7 +933,7 @@ void PostRenderFilter::_createFakeHDRDeprecated()
         frag = "fx/shaders/GLSL/postrender/RECT/fakehdr.frag";
 
     // Create downsizing program
-    _fakehdrPgm = GLSL.loadProgram("fakehdr", NULL, frag);
+    _fakehdrPgm = GLSL.loadProgram("fakehdr", nullptr, frag);
     _fakehdrPgm->AddShader(_postvertex.get());
 
     // Now the uniform variables
@@ -948,7 +948,7 @@ Description:
 -------------------------------------------------------------------*/
 void PostRenderFilter::_createFinal()
 {
-    _finalPgm = GLSL.loadProgram("final", NULL, NULL);
+    _finalPgm = GLSL.loadProgram("final", nullptr, nullptr);
 
     if(canUseTexture2D)
     {
@@ -1035,7 +1035,7 @@ void PostRenderFilter::_createBlur()
         blurfbo->setAttachment(FrameBufferObject::COLOR_BUFFER0, FrameBufferAttachment(tex));
     }
 
-    _blurPgm = GLSL.loadProgram("blur", NULL, NULL);
+    _blurPgm = GLSL.loadProgram("blur", nullptr, nullptr);
 
     if(canUseTexture2D)
     {
@@ -1110,7 +1110,7 @@ void PostRenderFilter::_createDownSize()
     _downsizeTex->setFilter(Texture::MIN_FILTER, Texture::LINEAR);
 
     // Create downsizing program
-    _downsizePgm = GLSL.loadProgram("downsize", NULL, NULL);
+    _downsizePgm = GLSL.loadProgram("downsize", nullptr, nullptr);
 
     if(canUseTexture2D)
     {
@@ -1176,7 +1176,7 @@ void PostRenderFilter::_createFilterX()
     _filterXTex->setFilter(Texture::MAG_FILTER, Texture::LINEAR);
     _filterXTex->setFilter(Texture::MIN_FILTER, Texture::LINEAR);
 
-    _filterXPgm = GLSL.loadProgram("filterx", NULL, NULL);
+    _filterXPgm = GLSL.loadProgram("filterx", nullptr, nullptr);
 
     if(canUseTexture2D)
     {
@@ -1246,7 +1246,7 @@ void PostRenderFilter::_createFilterY()
     _filterYTex->setFilter(Texture::MAG_FILTER, Texture::LINEAR);
     _filterYTex->setFilter(Texture::MIN_FILTER, Texture::LINEAR);
 
-    _filterYPgm = GLSL.loadProgram("filtery", NULL, NULL);
+    _filterYPgm = GLSL.loadProgram("filtery", nullptr, nullptr);
 
     if(canUseTexture2D)
     {
@@ -1648,7 +1648,7 @@ void PostRenderFilter::_applyFinal()
     {
         colliderQuery::CollisionList& c = collider.getCollisions();
 
-        dGeomID current = NULL;
+        dGeomID current = nullptr;
 
         for(unsigned int i = 0; i < c.size(); i++)
         {
@@ -1959,6 +1959,6 @@ void PostRenderFilter::kill()
         while(_scenetexture->referenceCount() > 1)
             _scenetexture->unref();
 
-        _scenetexture = NULL;
+        _scenetexture = nullptr;
     }
 }

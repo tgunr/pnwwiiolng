@@ -18,7 +18,7 @@ namespace Vehicle
 		,	RideRelPosBit		// Packet includes relative-to-ride position.
 		,	NewUpdateBit		// Packet describes changes since last packet.
 		,	MaxBit
-		} ;
+		};
 	}
 	namespace PresentFlags
 	{
@@ -34,7 +34,7 @@ namespace Vehicle
 		,	RideRelPos = 1 << PresentBits::RideRelPosBit
 		,	NewUpdate = 1 << PresentBits::NewUpdateBit
 		,	MaxFlag = 1 << PresentBits::MaxBit
-		} ;
+		};
 	}
 
 	static const UINT32 FirstTimePresentFlags =
@@ -55,7 +55,7 @@ namespace Vehicle
 			CrewDeadBit
 		,	VehicleDestroyedBit
 		,	DespawningBit
-		} ;
+		};
 	}
 	namespace StatusFlags
 	{
@@ -64,7 +64,7 @@ namespace Vehicle
 			CrewDead = 1 << StatusBits::CrewDeadBit
 		,	VehicleDestroyed = 1 << StatusBits::VehicleDestroyedBit
 		,	Despawning = 1 << StatusBits::DespawningBit
-		} ;
+		};
 	}
 
 	namespace HostBits
@@ -73,7 +73,7 @@ namespace Vehicle
 		{
 			FirstTimeBit
 		,	ReallyActiveBit
-		} ;
+		};
 	}
 	namespace HostFlags
 	{
@@ -81,7 +81,7 @@ namespace Vehicle
 		{
 			FirstTime = 1 << HostBits::FirstTimeBit
 		,	ReallyActive = 1 << HostBits::ReallyActiveBit
-		} ;
+		};
 	}
 }
 

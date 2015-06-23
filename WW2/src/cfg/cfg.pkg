@@ -1,6 +1,6 @@
-$pfile "..\\lua\\include.pkg"
+$pfile "lua/include.pkg"
 
 module cfg
 {
-	$cfile "cfgPrefs.h"
+	$cfile "cfg/cfgPrefs.h"
 }

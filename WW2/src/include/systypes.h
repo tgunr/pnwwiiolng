@@ -9,11 +9,6 @@
 //
 // Originating Programmer: Martin Poulin
 
-#include <stddef.h>
-#include <cstdint>
-#include <thread>
-#include <chrono>
-
 // True and False
 #ifndef TRUE
 #define TRUE 1
@@ -128,7 +123,7 @@ struct FLOAT64VECTOR
 	FLOAT64 x;
 	FLOAT64 y;
 	FLOAT64 z;
-} ;
+};
 
 struct FLOAT32VECTOR
 {
@@ -140,53 +135,34 @@ struct FLOAT64ATT
 	FLOAT64 Roll;
 	FLOAT64 Pitch;
 	FLOAT64 Yaw;
-} ;
+};
 
 struct FLOAT64QUAT
 {
 	FLOAT64 x,y,z,w;
 };
 
-typedef UINT8 RANK_NO ;
+using RANK_NO = uint8_t;
 
-typedef SINT32 teulindex_t;
+using teulindex_t = int32_t;
 
-struct ACTION_OBJECT ;
-namespace Teul { struct PacketHeader ; class Packet ; }
+struct ACTION_OBJECT;
+namespace Teul { struct PacketHeader; class Packet; }
 
 //! Compressed player gamename/callsign.
-typedef UINT64 ChatHandle ;
+using ChatHandle = UINT64;
 //! Player permission mask.
-typedef UINT64 PermissionMask ;
+using PermissionMask = UINT64;
 //! Teul type for millisecond time.
-typedef	UINT64 TeulTimeMS ;
+using TeulTimeMS = UINT64;
 //! Teul type for a millisecond delta (signed).
-typedef SINT64 TeulDeltaMS	;
+using TeulDeltaMS = SINT64;
 
 //! Index for a player ID
-typedef unsigned int playerid_t ;
+using playerid_t = uint32_t;
 //! Index for a sortie ID
-typedef unsigned int sortieid_t ;
+using sortieid_t = uint32_t;
 //! Index for an instance's unique ID
-typedef unsigned long long instanceid_t ;
-
-class PNThread
-{
-	std::thread	m_thread;
-	bool m_started;
-	bool m_cancelled;
-
-public:
-	PNThread() : m_thread(), m_started(false), m_cancelled(false) {}
-	virtual ~PNThread() {}
-
-	void start() { if(m_started) return; m_thread = std::thread([=] { run(); }); m_started = true; }
-	virtual int cancel() { m_cancelled = true; return 0; }
-	void join() { m_thread.join(); }
-
-	bool isStarted() const { return m_started; }
-	bool isRunning() const { return m_thread.joinable(); }
-	bool isCancelled() const { return m_cancelled; }
-
-	virtual void run() = 0;
-};
+using instanceid_t = UINT64;
+//! Index for a persona
+using personaid_t = uint32_t;

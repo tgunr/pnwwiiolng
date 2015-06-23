@@ -11,7 +11,7 @@
 #include "BDialog.h"
 #include "loc.h"
 
-extern CBDialog* hMainWnd ;
+extern CBDialog* hMainWnd;
 
 enum StatusType
 {
@@ -19,7 +19,7 @@ enum StatusType
 ,	AppProgress = RGB(0, 0, 255)
 ,	AppNote = RGB(0, 0, 0)
 ,	AppCaution = RGB(255, 128, 0)
-} ;
+};
 
 // CPlaygateApp:
 // See Playgate.cpp for the implementation of this class
@@ -36,26 +36,26 @@ public:
 
 // Own Functions
 	public:
-	static const TCHAR* AppName() { return GetLoc(APP_TITLE) ; }
+	static const TCHAR* AppName() { return GetLoc(APP_TITLE); }
 	void AlertOK(const TCHAR* message) const
 	{
 		if ( hMainWnd )
-			hMainWnd->MessageBox(message, AppName(), MB_OK) ;
+			hMainWnd->MessageBox(message, AppName(), MB_OK);
 	}
-	void SetStatus(const TCHAR* message, StatusType=AppNote) const ;
-	static void SetWindowText(CWnd* wnd, const char* text) ;
+	void SetStatus(const TCHAR* message, StatusType=AppNote) const;
+	static void SetWindowText(CWnd* wnd, const char* text);
 	void PostCommand(UINT32 messageID, LPARAM lParam) const
 	{
 		if ( hMainWnd )
-			hMainWnd->PostMessage(WM_COMMAND, messageID, lParam) ;
+			hMainWnd->PostMessage(WM_COMMAND, messageID, lParam);
 	}
-	void StartBrowser(std::string WebPage) ;
-	void QueueLogonAttempt() ;
-	void Quit() ;
+	void StartBrowser(std::string WebPage);
+	void QueueLogonAttempt();
+	void Quit();
 
-	void ftping(bool actively) ;
+	void ftping(bool actively);
 
-	void Launch() ;
+	void Launch();
 
 // Implementation
 
@@ -63,12 +63,12 @@ public:
 protected:
 
 public:
-	bool		m_inputAllowed : 1 ;
-	bool		m_playnet : 1 ;
-	UINT32		m_nextGameListRequest ;
-	CProgressCtrl* m_progress ;
+	bool		m_inputAllowed : 1;
+	bool		m_playnet : 1;
+	UINT32		m_nextGameListRequest;
+	CProgressCtrl* m_progress;
 };
 
 extern CPlaygateApp playgate;
-extern char g_authHostName[256] ;
-extern HBITMAP pgLoadImage(const std::wstring&) ;
+extern char g_authHostName[256];
+extern HBITMAP pgLoadImage(const std::wstring&);

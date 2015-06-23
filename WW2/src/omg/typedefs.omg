@@ -1,0 +1,17 @@
+// OMG type definitions.
+
+TYPE SERVER_TYPE										INCLUDE "wwii/wwiiServerTypeEnums.h";
+TYPE FULL_OBJ_ID							BY REF		INCLUDE "wwii/wwiiFullObjIDPacker.h";
+TYPE WEAPON_SPEC 							BY REF		INCLUDE "weap/weapSpecPacker.h";
+TYPE WEAPON_SERIAL							BY REF;
+TYPE RANK_NO;
+TYPE ChatHandle;
+TYPE NetTimeMS		AS Teul::NetTimeMS					INCLUDE "teul/teulNetTimeMS.h";
+TYPE TeulTimeMS;
+TYPE TeulDeltaMS;
+TYPE PermissionMask;
+TYPE playerid_t;
+TYPE instanceid_t;
+TYPE WorldPosition_m						BY REF		INCLUDE "wwii/wwiiServerTrackedObject.h";
+
+TYPE char;

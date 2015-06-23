@@ -84,7 +84,7 @@ public:
 		{}
 
 public:
-	virtual bool applyJoules(const SINT64& joules, class Player* player=NULL);
+	virtual bool applyJoules(const SINT64& joules, class Player* player=nullptr);
 
 	int getSTOVehicleID() const { return m_uniqueSTOvehicleID; }
 	UINT32 getVehicleTypeNum();
@@ -139,13 +139,13 @@ public:
 
 	//! Constructor for building a request instance
 	TerrainSTO(UINT32 id, UINT16 subType, const WorldPosition_m& position, const AttitudeVector& attitude, UINT16 type = _TERRAIN)
-		: ServerTrackedObject(id, type, subType, position, attitude), _modelFile(NULL), _collisionGrace(0), _to(NULL)
+		: ServerTrackedObject(id, type, subType, position, attitude), _modelFile(nullptr), _collisionGrace(0), _to(nullptr)
 	{
 	}
 
 	// Constructor for building offline arbitrary terrain models
 	TerrainSTO(const char* model, const WorldPosition_m& position, const AttitudeVector& attitude, UINT16 type = _TERRAIN)
-		: ServerTrackedObject(0, type, 0, position, attitude), _modelFile(NULL), _collisionGrace(20000), _to(NULL)
+		: ServerTrackedObject(0, type, 0, position, attitude), _modelFile(nullptr), _collisionGrace(20000), _to(nullptr)
 	{
 		_modelFile = new char[strlen(model)+1];
 		strcpy(_modelFile, model);
@@ -154,7 +154,7 @@ public:
 
 	//! Build an ums instance from a network stream
 	TerrainSTO(ACTION_OBJECT* const a)
-		: ServerTrackedObject(a), _modelFile(NULL), _collisionGrace(0), _to(NULL)
+		: ServerTrackedObject(a), _modelFile(nullptr), _collisionGrace(0), _to(nullptr)
 	{
 	}
 
@@ -163,10 +163,10 @@ public:
 		if(_modelFile)
 			delete [] _modelFile;
 
-		_modelFile = NULL;
+		_modelFile = nullptr;
 	}
 
-	virtual bool applyJoules(const SINT64& joules, class Player* player=NULL);
+	virtual bool applyJoules(const SINT64& joules, class Player* player=nullptr);
 	virtual void enter();
 	virtual void leave();
 
@@ -217,7 +217,7 @@ public:
 		{}
 
 	virtual ~PlayerPlacedSTO();
-	virtual bool applyJoules(const SINT64& joules, class Player* player = NULL);
+	virtual bool applyJoules(const SINT64& joules, class Player* player = nullptr);
 	virtual bool load();
 
 	void Sink();
@@ -278,7 +278,7 @@ public:
 	BailoutSTO(ACTION_OBJECT* const a) : VehicleSTO(a) {}
 
 	virtual ~BailoutSTO();
-	virtual bool applyJoules(const SINT64& joules, class Player* player=NULL) { return false; }  // do nothing
+	virtual bool applyJoules(const SINT64& joules, class Player* player=nullptr) { return false; }  // do nothing
 
 	void setLifeSpan(UINT32 life){ m_lifespan = life; }
 	bool isMyPilot() const;

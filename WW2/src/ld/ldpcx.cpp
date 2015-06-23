@@ -17,12 +17,12 @@ int		i, j, k, l, cb;
 
 	l = 0;
 	// reverse the rows; like a bitmap
-	for (i=height-1 ; i >= 0 ; i--)
+	for (i=height-1; i >= 0; i--)
 	{
 		// reverse colors; like a DIB
-		for (j=2 ; j >= 0 ; j--)
+		for (j=2; j >= 0; j--)
 		{
-			for (k=0 ; k < width ; k++)
+			for (k=0; k < width; k++)
 			{
 				if (l == 0)
 				{
@@ -61,7 +61,7 @@ piSURFACEDESC	pisd;
 PCXHEADER*		pfh;
 void*  bits, *inbits;
 int   stream;
-    TEXTURE* t = NULL;
+    TEXTURE* t = nullptr;
 
 	stream = fioOpen(Filename);
 	if (stream == -1)
@@ -72,7 +72,7 @@ int   stream;
 	length = fioSeek(stream, 0, fioSEEK_END);
 	fioSeek(stream, 0, fioSEEK_SET);
 	pfh = (PCXHEADER*)memAlloc(length);
-	if (pfh == NULL)
+	if (pfh == nullptr)
 	{
 		fioClose(stream);
 		return(-1);

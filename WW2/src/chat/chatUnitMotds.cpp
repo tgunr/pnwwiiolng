@@ -1,5 +1,4 @@
 #include <syscfg.h> // Path is project specific.
-//
 // Date: Wed Oct  5 14:33:48 CDT 2005
 //
 // Get/Set MOTDs for system, side and HCUnits
@@ -8,13 +7,11 @@
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
-//
 
 #include "wwii/wwiiHash.h"
-#include <string>
 
-typedef std::unordered_map<UINT32,std::string> MOTD_INDEX ;
-static MOTD_INDEX motds ;
+typedef std::unordered_map<UINT32,std::string> MOTD_INDEX;
+static MOTD_INDEX motds;
 
 //////////////////////////////////////////////////////////////////////
 // Set a particular unit's MOTD
@@ -22,7 +19,7 @@ static MOTD_INDEX motds ;
 void
 chatSetUnitMotd(UINT32 unit, const std::string& motd)
 {
-	motds[unit] = motd ;
+	motds[unit] = motd;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -31,9 +28,9 @@ chatSetUnitMotd(UINT32 unit, const std::string& motd)
 const char*
 chatGetUnitMotd(UINT32 unit)
 {
-	MOTD_INDEX::iterator it = motds.find(unit) ;
+	MOTD_INDEX::iterator it = motds.find(unit);
 	if ( it == motds.end() || it->second.empty() )
-		return NULL ;
-	return it->second.c_str() ;
+		return nullptr;
+	return it->second.c_str();
 }
 

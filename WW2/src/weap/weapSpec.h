@@ -21,7 +21,7 @@
 struct WEAPON_SPEC
 {
 	WEAPON_SPEC() : wType(0), wClass(0), wCategory(0), wCountry(0) {}
-	WEAPON_SPEC(const UINT16& rhs) { *(UINT16*)this = rhs ; }
+	WEAPON_SPEC(const UINT16& rhs) { *(UINT16*)this = rhs; }
 	WEAPON_SPEC(const WEAPON_SPEC& rhs) : wType(rhs.wType), wClass(rhs.wClass), wCategory(rhs.wCategory), wCountry(rhs.wCountry) {}
 	WEAPON_SPEC(UINT32 country_, UINT32 category_, UINT32 class_, UINT32 type_)
 		: wType((UINT8)type_), wClass((UINT8)class_), wCategory((UINT8)category_), wCountry((UINT8)country_)
@@ -49,78 +49,87 @@ struct WEAPON_SPEC
 //tolua_begin
 
 	//! But I don't want a complicated structure. Just gimme a number.
-	UINT32 asUINT32() const { return ((UINT32)wCountry << 24) | ((UINT32)wCategory << 16) | ((UINT32)wClass << 8) | (UINT32)wType ; }
-	UINT16 asUINT16() const { return *(UINT16*)this ; }
+	UINT32 asUINT32() const { return ((UINT32)wCountry << 24) | ((UINT32)wCategory << 16) | ((UINT32)wClass << 8) | (UINT32)wType; }
+	UINT16 asUINT16() const { return *(const UINT16*)this; }
 	//! Compare two weapon specs, but do it real cheap, because we do it frequently.
-	bool operator==(const WEAPON_SPEC& rhs) const { return this->asUINT16() == rhs.asUINT16() ; }
+	bool operator==(const WEAPON_SPEC& rhs) const { return this->asUINT16() == rhs.asUINT16(); }
 
 //tolua_end
 	//! Make network fly.
-	void packer(LOGICAL mode, ACTION_OBJECT* a) ;
+	void packer(LOGICAL mode, ACTION_OBJECT* a) { return (mode == TEUL_PACK) ? pack(a, 0) : unpack(a, 0); }
+	void pack(ACTION_OBJECT* a, SINT32 /*bits*/ = 0) const;
+	void unpack(ACTION_OBJECT* a, SINT32 /*bits*/ = 0);
 
 private:
-	operator UINT32() const ;	//<! Use asUINT32() instead.
-	operator SINT32() const ;	//<! Use asUINT32() instead.
-	operator UINT64() const ;	//<! Use asUINT32() instead.
-	operator SINT64() const ;	//<! Use asUINT32() instead.
-	operator UINT8() const ;	//<! Use asUINT32() instead.
-	operator SINT8() const ;	//<! Use asUINT32() instead.
+	operator UINT32() const;	//<! Use asUINT32() instead.
+	operator SINT32() const;	//<! Use asUINT32() instead.
+	operator UINT64() const;	//<! Use asUINT32() instead.
+	operator SINT64() const;	//<! Use asUINT32() instead.
+	operator UINT8() const;	//<! Use asUINT32() instead.
+	operator SINT8() const;	//<! Use asUINT32() instead.
 public:
-	operator UINT16() const { return asUINT16() ; }
+	operator UINT16() const { return asUINT16(); }
 
 	//! When 16-bits just aren't enough.
 	void fromShort(const UINT16 key)
 	{
-		*(UINT16*)this = key ;
+		*(UINT16*)this = key;
 	}
 
 	//! Because != != !(=). For some reason.
 	//! (not-equals is not-equal-to not(equals))
-	bool operator!=(const WEAPON_SPEC& rhs) const { return this->asUINT16() != rhs.asUINT16() ; }
+	bool operator!=(const WEAPON_SPEC& rhs) const { return this->asUINT16() != rhs.asUINT16(); }
 
 	//! Does this weapon spec make my ass look thin?
-	bool operator<(const WEAPON_SPEC& rhs) const { return this->asUINT16() < rhs.asUINT16() ; }
+	bool operator<(const WEAPON_SPEC& rhs) const { return this->asUINT16() < rhs.asUINT16(); }
 	//! Does this weapon spec make my ass look fat?
-	bool operator>(const WEAPON_SPEC& rhs) const { return this->asUINT16() > rhs.asUINT16() ; }
+	bool operator>(const WEAPON_SPEC& rhs) const { return this->asUINT16() > rhs.asUINT16(); }
 //tolua_begin
 
 	//! Check for a null spec.
-	bool isNull() const { return asUINT16() == 0 ; }
+	bool isNull() const { return asUINT16() == 0; }
 
-	WWII_COUNTRY country() const { return (WWII_COUNTRY)wCountry ; }
-	int side() const { return wwiiSide((WWII_COUNTRY)wCountry) ; }
-} ;
+	WWII_COUNTRY country() const { return (WWII_COUNTRY)wCountry; }
+	int side() const { return wwiiSide((WWII_COUNTRY)wCountry); }
+};
 
 extern WEAPON_SPEC NULL_WEAP_SPEC; // removed const to work with broken MW Linker
 //tolua_end
 #pragma pack(pop)
 
-#define COMPARE_SPECS(s1,s2) (*((UINT32*)&(s1)) == *((UINT32*)&(s2)))
-#define	SPEC_IS_NULL(spec) COMPARE_SPECS(spec, NULL_WEAP_SPEC)
+#define COMPARE_SPECS(s1,s2) ((s1) == (s2))
+#define	SPEC_IS_NULL(spec) (spec.isNull())
 
-//tolua_begin
-
-// find a weapon spec based on the weapon's name
-extern const WEAPON_SPEC& weapFindWeaponByName(const char* weaponName) ;
+#define PRF_WEAPON_SPEC "%u:%u:%u:%u"
+#define PRA_WEAPON_SPEC(s) (s).wCountry, (s).wCategory, (s).wClass, (s).wType
 
 static inline const char* weapPrintSpecC(const WEAPON_SPEC* spec)
 {
-	if (spec == NULL)
-		return "<null>" ;
+	if (PN_UNLIKELY(spec == nullptr))
+		return "<null>";
 
 	static char buffer[24];
-	sprintf(buffer, "%u:%u:%u:%u", (UINT8)spec->wCountry, (UINT8)spec->wCategory, (UINT8)spec->wClass, (UINT8)spec->wType);
+	sprintf(buffer, "" PRF_WEAPON_SPEC "", PRA_WEAPON_SPEC(*spec));
 
 	return buffer;
 }
 
+//tolua_begin
+
+// find a weapon spec based on the weapon's name
+extern const WEAPON_SPEC& weapFindWeaponByName(const char* weaponName);
+
 // create a spec from a string
 extern WEAPON_SPEC weapCreateSpec(const char* weapString);
 
-// create a spec from its dotted quad
-extern WEAPON_SPEC weapCreateSpec(UINT32 country, UINT32 category, UINT32 klass, UINT32 type);
+// find *just* a weapon's class number
+extern UINT8 weapFindClassIndex(const std::string& className);
 
 // turn a class string into a weap spec
-extern WEAPON_SPEC weapFindClass(const char* weapClass);
+static inline WEAPON_SPEC weapFindClass(const std::string& className)
+{
+	return WEAPON_SPEC(0, 0, weapFindClassIndex(className), 0);
+}
+
 
 //tolua_end

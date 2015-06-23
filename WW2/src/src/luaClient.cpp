@@ -33,23 +33,23 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-SINT32 serverTeulIndex ;
+SINT32 serverTeulIndex;
 
-bool g_connected = false ;
-bool g_exitAfterCommands = true ;
-bool g_waitingForResponse = false ;
-bool g_waitingForEnd = true ;
-bool g_deprepRequired = true ;
-std::string historyFile = "" ;
-std::string srcFile = "" ;
-std::string cmd = "" ;
-std::vector<std::string> g_commands ;
-bool g_interactive = false ;
-bool g_finished = false ;
-static bool g_debugMode = false ;
-bool g_enteringBlock = false ;
+bool g_connected = false;
+bool g_exitAfterCommands = true;
+bool g_waitingForResponse = false;
+bool g_waitingForEnd = true;
+bool g_deprepRequired = true;
+std::string historyFile = "";
+std::string srcFile = "";
+std::string cmd = "";
+std::vector<std::string> g_commands;
+bool g_interactive = false;
+bool g_finished = false;
+static bool g_debugMode = false;
+bool g_enteringBlock = false;
 
-static UINT32 minErrType = 0 ;
+static UINT32 minErrType = 0;
 
 //////////////////////////////////////////////////////////////////////
 // Handle shutdowns cleanly because:
@@ -59,19 +59,19 @@ static void terminate(int code)
 {
 	if ( g_deprepRequired )
 	{
-		rl_set_prompt("") ;
-		rl_clear_message() ;
-		printf("\n") ;
-		rl_deprep_terminal() ;
+		rl_set_prompt("");
+		rl_clear_message();
+		printf("\n");
+		rl_deprep_terminal();
 	}
 
-	teulCloseTransport() ;
+	teulCloseTransport();
 
-	exit(code) ;
+	exit(code);
 }
 
-static void _print(const char* const p) ;
-static void _printf(const char* const fmt, ...) ;
+static void _print(const char* const p);
+static void _printf(const char* const fmt, ...);
 
 //////////////////////////////////////////////////////////////////////
 // Report usage and terminate.
@@ -84,8 +84,8 @@ _usage()
 		"  -C command  like -c but does not exit after executing the code\n"
 		"  -f file     sends the contents of file, executes it as a script and then exits\n"
 		"  -v          verbose mode\n"
-		"  hostIP      address of the strat host to connect to\n") ;
-	terminate(1) ;
+		"  hostIP      address of the strat host to connect to\n");
+	terminate(1);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -97,17 +97,17 @@ _print(const char* const p)
 {
 	if ( g_interactive )
 	{
-		rl_save_prompt() ;
-		rl_clear_message() ;
+		rl_save_prompt();
+		rl_clear_message();
 
-		printf("\033[36m%s\033[0m\n", p) ;
+		printf("\033[36m%s\033[0m\n", p);
 
-		rl_restore_prompt() ;
-		rl_redisplay() ;
+		rl_restore_prompt();
+		rl_redisplay();
 	}
 	else
 	{
-		printf("%s\n", p) ;
+		printf("%s\n", p);
 	}
 }
 
@@ -116,19 +116,19 @@ _printf(const char* const fmt, ...)
 {
 	if ( g_interactive )
 	{
-		rl_save_prompt() ;
-		rl_clear_message() ;
+		rl_save_prompt();
+		rl_clear_message();
 	}
 
-	va_list args ;
-	va_start(args, fmt) ;
-	vprintf(fmt, args) ;
-	va_end(args) ;
+	va_list args;
+	va_start(args, fmt);
+	vprintf(fmt, args);
+	va_end(args);
 
 	if ( g_interactive )
 	{
-		rl_restore_prompt() ;
-		rl_redisplay() ;
+		rl_restore_prompt();
+		rl_redisplay();
 	}
 }
 
@@ -141,23 +141,23 @@ static bool
 _sendCmd(const std::string& command)
 {
 	if ( command.empty() )
-		return false ;
+		return false;
 
 	if ( command[0] == '#' || (command[0] == '-' && command[1] == '-') )
-		return false ;
+		return false;
 
 	if ( command.compare("quit") == 0 || command.compare("exit") == 0 )
-		terminate(0) ;
+		terminate(0);
 
-	Teul::Packet outgoing(command.length(), Host::CallbackX, (UCHAR)Host::Callbacks::LuaPacket_Y) ;
-	outgoing.setUnencrypted() ;
-	outgoing.append(command.c_str(), command.length()) ;
-	outgoing.send(serverTeulIndex) ;
+	Teul::Packet outgoing(Teul::PacketId(Host::CallbackX, Host::Callbacks::LuaPacket_Y));
+	outgoing.setUnencrypted();
+	outgoing.append(command.c_str(), command.length() + 1);
+	outgoing.send(serverTeulIndex);
 
-	g_waitingForResponse = true ;
-	g_waitingForEnd = true ;
+	g_waitingForResponse = true;
+	g_waitingForEnd = true;
 
-	return true ;
+	return true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -173,30 +173,30 @@ _sendCmd(const std::string& command)
 static void
 _processCommands(std::vector<std::string>& commands, bool exitAfterCommands)
 {
-	for ( UINT32 i = 0 ; i < commands.size() ; ++i )
+	for ( UINT32 i = 0; i < commands.size(); ++i )
 	{
 		if ( g_debugMode )
-			_printf("cmds: %s\n", commands[i].c_str()) ;
+			_printf("cmds: %s\n", commands[i].c_str());
 
 		if ( !_sendCmd(commands[i]) )
-			continue ;
+			continue;
 
-		const TeulTimeMS cutoff = teulClock64 + 10 ;
+		const TeulTimeMS cutoff = teulClock64 + 10;
 		while ( cutoff > teulClock64 && g_waitingForResponse )
 		{
-			teulUpdateTransport(5) ;
+			teulUpdateTransport(5);
 		}
 	}
 
-	TeulTimeMS cutoff = teulClock64 + ((exitAfterCommands) ? 30 : 5) * 1000 ;
+	TeulTimeMS cutoff = teulClock64 + ((exitAfterCommands) ? 30 : 5) * 1000;
 	while ( cutoff > teulClock64 && g_waitingForEnd )
 	{
-		teulUpdateTransport(5) ;
+		teulUpdateTransport(5);
 	}
 
 	if ( exitAfterCommands )
 	{
-		terminate(0) ;
+		terminate(0);
 	}
 }
 
@@ -206,48 +206,48 @@ _processCommands(std::vector<std::string>& commands, bool exitAfterCommands)
 void
 inputHandler(char* input)
 {
-	if ( input == NULL || strcmp(input, "quit") == 0 || strcmp(input, "exit") == 0 )
+	if ( input == nullptr || strcmp(input, "quit") == 0 || strcmp(input, "exit") == 0 )
 	{
-		rl_crlf() ;
-		rl_callback_handler_remove() ;
-		g_finished = true ;
-		return ;
+		rl_crlf();
+		rl_callback_handler_remove();
+		g_finished = true;
+		return;
 	}
 	while ( isspace(*input) )
-		++input ;
+		++input;
 	if ( !*input )
-		return ;
-	add_history(input) ;
-	FILE* fp = fopen(historyFile.c_str(), "a+") ;
+		return;
+	add_history(input);
+	FILE* fp = fopen(historyFile.c_str(), "a+");
 	if ( fp )
 	{
-		fprintf(fp, "%s\n", input) ;
-		fclose(fp) ;
+		fprintf(fp, "%s\n", input);
+		fclose(fp);
 	}
 
 	if ( g_enteringBlock == false && strcmp(input, "do") == 0 )
 	{
-		g_enteringBlock = true ;
-		rl_set_prompt("+ ") ;
-		rl_redisplay() ;
-		cmd = "" ;
+		g_enteringBlock = true;
+		rl_set_prompt("+ ");
+		rl_redisplay();
+		cmd = "";
 	}
 	else if ( g_enteringBlock && strcmp(input, ";") == 0 )
 	{
-		g_enteringBlock = false ;
-		rl_set_prompt("> ") ;
-		rl_redisplay() ;
+		g_enteringBlock = false;
+		rl_set_prompt("> ");
+		rl_redisplay();
 	}
 	else if ( g_enteringBlock == true )
 	{
 		if ( cmd.empty() == false )
-			cmd += "\n" ;
-		cmd += input ;
-		rl_set_prompt("+ ") ;
+			cmd += "\n";
+		cmd += input;
+		rl_set_prompt("+ ");
 	}
 	else
 	{
-		cmd = input ;
+		cmd = input;
 	}
 }
 
@@ -259,29 +259,29 @@ static void
 _readCommandsFromFile(std::istream& file)
 {
 	// Put all of the meaningful content into a single string.
-	std::string command = "" ;
-	std::string line ;
+	std::string command = "";
+	std::string line;
 	while ( file.good() )
 	{
-		line = "" ;
+		line = "";
 		if ( !getline(file, line) )
-			break ;
+			break;
 
 		// Trim leading whitespace out
-		size_t i = 0 ;
+		size_t i = 0;
 		while ( i < line.length() && isspace(line[i]) )
-			++i ;
+			++i;
 		if ( i > 0 )
-			line.erase(0, i) ;
+			line.erase(0, i);
 		// Ignore blank lines and comments
 		if ( line.empty() || line.substr(0, 2) == "--" )
-			continue ;
-		command += line + "\n" ;
+			continue;
+		command += line + "\n";
 	}
 
 	// Pop the string onto the commands stack to be sent
 	// as a single entry.
-	g_commands.push_back(command) ;
+	g_commands.push_back(command);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -295,33 +295,33 @@ _readSourceFile()
 	// You can't specify a file AND specify a -C...
 	if ( g_exitAfterCommands == false )
 	{
-		_printf("-f and -C conflict.\n") ;
-		terminate(2) ;
+		_printf("-f and -C conflict.\n");
+		terminate(2);
 	}
 
 	if ( srcFile == "-" )
 	{
-		_readCommandsFromFile(std::cin) ;
-		return ;
+		_readCommandsFromFile(std::cin);
+		return;
 	}
 
-	std::ifstream file ;
-	file.open(srcFile.c_str(), std::ifstream::in) ;
+	std::ifstream file;
+	file.open(srcFile.c_str(), std::ifstream::in);
 	if ( !file.is_open() && srcFile.find('/') == srcFile.npos )
 	{
-		srcFile.insert(0, "/lua/") ;
-		srcFile.insert(0, getenv("HOME")) ;
- 		file.open(srcFile.c_str(), std::ifstream::in) ;
+		srcFile.insert(0, "/lua/");
+		srcFile.insert(0, getenv("HOME"));
+ 		file.open(srcFile.c_str(), std::ifstream::in);
 	}
 
 	if ( !file.is_open() )
 	{
 		// Is it a filename without a path?
-		_printf("Unable to open %s\n", srcFile.c_str()) ;
-		terminate(3) ;
+		_printf("Unable to open %s\n", srcFile.c_str());
+		terminate(3);
 	}
 
-	_readCommandsFromFile(file) ;
+	_readCommandsFromFile(file);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -332,28 +332,28 @@ _readHistory()
 {
 	if ( historyFile.empty() )
 	{
-		historyFile = getenv("HOME") ;
-		historyFile += "/.lua_history" ;
+		historyFile = getenv("HOME");
+		historyFile += "/.lua_history";
 	}
 
-	std::ifstream file ;
-	std::string input ;
+	std::ifstream file;
+	std::string input;
 
-	file.open(historyFile.c_str(), std::ifstream::in) ;
+	file.open(historyFile.c_str(), std::ifstream::in);
 	if ( !file.is_open() )
-		return ;
+		return;
 
 	while ( file.good() )
 	{
 		if ( !getline(file, input) )
-			break ;
+			break;
 		if ( !input.empty() )
-			add_history(input.c_str()) ;
+			add_history(input.c_str());
 	}
 
-	file.close() ;
+	file.close();
 
-	stifle_history(1000) ;
+	stifle_history(1000);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -364,61 +364,61 @@ _getHost(std::string ipAddress)
 {
 	if ( ipAddress.empty() && g_interactive )
 	{
-		const char* name ;
-//		rl_save_prompt() ;
-//		rl_clear_message() ;
-		printf("Please select host to connect to: (d)ev, (b)eta, (t)raining, (l)ive or (q)uit.\n") ;
+		const char* name;
+//		rl_save_prompt();
+//		rl_clear_message();
+		printf("Please select host to connect to: (d)ev, (b)eta, (t)raining, (l)ive or (q)uit.\n");
 		do
 		{
-			name = readline("Host (d/b/t/l/q): ") ;
+			name = readline("Host (d/b/t/l/q): ");
 			if ( !name )
-				continue ;
+				continue;
 
-			const char* p = name ;
+			const char* p = name;
 			while ( *p && isspace(*p) )
-				++p ;
+				++p;
 			switch ( *p )
 			{
 			case 'd':
-				ipAddress = "192.168.0.61" ;
-			break ;
+				ipAddress = "192.168.0.61";
+			break;
 			case 'b':
-				ipAddress = "66.28.224.151" ;
-			break ;
+				ipAddress = "66.28.224.151";
+			break;
 			case 'l':
-				ipAddress = "66.28.224.141" ;
-			break ;
+				ipAddress = "66.28.224.141";
+			break;
 			case 'q':
 			case 'x':
-				terminate(0) ;
-			break ;
+				terminate(0);
+			break;
 			case 0:
-			break ;
+			break;
 			default:
-				printf("Unrecognized host, '%s'\n", name) ;
-			break ;
+				printf("Unrecognized host, '%s'\n", name);
+			break;
 			}
-			rl_free((void*)name) ;
+			rl_free(const_cast<char*>(name));
 		}
-		while ( ipAddress.empty() ) ;
+		while ( ipAddress.empty() );
 
-//		rl_restore_prompt() ;
-//		rl_clear_message() ;
-//		rl_set_prompt("") ;
-//		rl_clear_pending_input() ;
-//		rl_redisplay() ;
-//		rl_crlf() ;
-//		rl_reset_line_state() ;
+//		rl_restore_prompt();
+//		rl_clear_message();
+//		rl_set_prompt("");
+//		rl_clear_pending_input();
+//		rl_redisplay();
+//		rl_crlf();
+//		rl_reset_line_state();
 	}
 
-	UINT32 ip = ntohl(inet_addr(ipAddress.c_str())) ;
+	UINT32 ip = ntohl(inet_addr(ipAddress.c_str()));
 	if ( ip == 0 )
 	{
-		printf("Invalid IP address: %s\n", ipAddress.c_str()) ;
-		terminate(4) ;
+		printf("Invalid IP address: %s\n", ipAddress.c_str());
+		terminate(4);
 	}
 
-	return ip ;
+	return ip;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -431,12 +431,12 @@ _teulErrorFn(const SINT32 teulIndex, const UCHAR*, SINT32, const TEUL_CALLBACK*,
 	{
 		if ( g_finished == false )
 		{
-			_printf("Disconnected.\n") ;
+			_printf("Disconnected.\n");
 		}
-		g_connected = false ;
-		return ;
+		g_connected = false;
+		return;
 	}
-	_printf("General Teul error: t:%d e:%d", teulIndex, error) ;
+	_printf("General Teul error: t:%d e:%d", teulIndex, error);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -449,41 +449,41 @@ _teulErrorFn(const SINT32 teulIndex, const UCHAR*, SINT32, const TEUL_CALLBACK*,
 static SINT32
 _recvLuaPacket(ACTION_OBJECT* const a)
 {
-	g_waitingForResponse = false ;
-	char* text = (char*)(a->packed) ;
+	g_waitingForResponse = false;
+	char* text = (char*)(a->packed);
 
 	// When we send the commands up, we append a command to print
 	// a particular sequence that tells us all the commands were
 	// executed -- the LUA_END_SEQ.
 	if ( strncmp(text, LUA_END_SEQ, sizeof(LUA_END_SEQ)-1) == 0 )
 	{
-		g_waitingForEnd = false ;
-		return a->offset ;
+		g_waitingForEnd = false;
+		return a->offset;
 	}
-	char* p = strstr(text, LUA_END_SEQ) ;
-	if ( p != NULL )
+	char* p = strstr(text, LUA_END_SEQ);
+	if ( p != nullptr )
 	{
-		g_waitingForEnd = false ;
-		*p = 0 ;
+		g_waitingForEnd = false;
+		*p = 0;
 	}
 
-	char* z = p = text ;
+	char* z = p = text;
 	do
 	{
-		p = z ;
-		z = strchr(p, '\n') ;
+		p = z;
+		z = strchr(p, '\n');
 		if ( z )
-			*(z++) = 0 ;
+			*(z++) = 0;
 		if ( g_interactive )
 		{
-			_print((const char*)p) ;
+			_print((const char*)p);
 		}
 		else
-			_printf("%s\n", (const char*)p) ;
+			_printf("%s\n", (const char*)p);
 	}
-	while ( z != NULL && *z != 0 ) ;
+	while ( z != nullptr && *z != 0 );
 
-	return a->offset ;
+	return a->offset;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -493,7 +493,7 @@ static SINT32
 _registerCallbacks()
 {
 	BEGIN_CALLBACK_REGISTRATION((UCHAR)Host::CallbackX)
-		REGISTER_RECEIVER((UCHAR)Host::Callbacks::LuaPacket_Y, _recvLuaPacket) ;
+		REGISTER_RECEIVER((UCHAR)Host::Callbacks::LuaPacket_Y, _recvLuaPacket);
 	END_CALLBACK_REGISTRATION
 }
 
@@ -504,8 +504,8 @@ static void
 _teulConnectFn(ENDPOINT& endpoint)
 {
 	if ( g_debugMode )
-		_printf("Connected t:%d\n", endpoint.teulIndex()) ;
-	g_connected = true ;
+		_printf("Connected t:%d\n", endpoint.teulIndex());
+	g_connected = true;
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -514,97 +514,100 @@ _teulConnectFn(ENDPOINT& endpoint)
 int
 main(int argc, char* argv[])
 {
+	Teul::SetAppName("luaClient");
+	Teul::ConfigVar::InitializeConfigVars();
+
 	// Command line argument processing.
-	int arg ;
-	for ( arg = 1 ; arg < argc && argv[arg][0] == '-' ; ++arg )
+	int arg;
+	for ( arg = 1; arg < argc && argv[arg][0] == '-'; ++arg )
 	{
 		switch ( argv[arg][1] )
 		{
 		case 'C':
-			g_exitAfterCommands = false ;
+			g_exitAfterCommands = false;
 		case 'c':
 			++arg;
-			if ( arg >= argc ) _usage() ;
-			g_commands.push_back(argv[arg]) ;
-		break ;
+			if ( arg >= argc ) _usage();
+			g_commands.push_back(argv[arg]);
+		break;
 		case 'f':
-			++arg ;
-			if ( arg >= argc ) _usage() ;
-			if ( !srcFile.empty() ) _usage() ;
-			srcFile = argv[arg] ;
-		break ;
+			++arg;
+			if ( arg >= argc ) _usage();
+			if ( !srcFile.empty() ) _usage();
+			srcFile = argv[arg];
+		break;
 		case 'v':
-			g_debugMode = true ;
-		break ;
+			g_debugMode = true;
+		break;
 		case '?':
 		case 'h':
 		default:
-			_usage() ;
-		break ;
+			_usage();
+		break;
 		}
 	}
 
 	// If we stopped short of the end of the argument list, inputs are invalid.
 	if ( argc > arg + 1 )
-		_usage() ;
+		_usage();
 
-	g_interactive = ((g_commands.empty() && srcFile.empty()) || g_exitAfterCommands == false) ;
+	g_interactive = ((g_commands.empty() && srcFile.empty()) || g_exitAfterCommands == false);
 
 	if ( g_interactive )
 	{
 		// Readline provides command-line editing functionality and history capabilities.
-		rl_initialize() ;
+		rl_initialize();
 
 		// Hand posession of the terminal to readline; as of this point we should no-longer
 		// do any terminal IO ourselves (printf, etc) because it will confuse readline.
-		rl_prep_terminal(1) ;
-		g_deprepRequired = true ;
+		rl_prep_terminal(1);
+		g_deprepRequired = true;
 
-		printf("\033[1mBattleground Europe Lua client [%s %s]\033[0m\n", __DATE__, __TIME__) ;
-		rl_set_prompt("") ;
+		printf("\033[1mBattleground Europe Lua client [%s %s]\033[0m\n", __DATE__, __TIME__);
+		rl_set_prompt("");
 	}
 
 	// Check that we were supplied a numeric IP address.
 	///TODO: Allow canonical addresses.
-	UINT32 ip = _getHost((argc == arg + 1) ? argv[arg] : "") ;
-	UINT32 nip = htonl(ip) ;
+	UINT32 ip = _getHost((argc == arg + 1) ? argv[arg] : "");
+	UINT32 nip = htonl(ip);
 
 	// If the user specified a script, load it in.
 	if ( !srcFile.empty() )
-		_readSourceFile() ;
+		_readSourceFile();
 
 	if ( g_debugMode )
-		_printf("Initializing teulTransport\n") ;
+		_printf("Initializing teulTransport\n");
 
-	Teul::SetAppName("luaClient") ;
-	teulInitTransport(LOG_TO_FILE, "./luaClient", _teulErrorFn) ;
-	dbugSetLogLevel(Debug::ERR_WARN) ;
+	Teul::SetAppName("luaClient");
+	teulInitTransport(LOG_TO_FILE, "./luaClient", _teulErrorFn, nullptr);
+	dbugSetLogLevel(Debug::ERR_WARN);
 
-	_registerCallbacks() ;
+	_registerCallbacks();
 
-	minErrType = 4 ;
+	minErrType = 4;
 
 	if ( g_debugMode )
-		_printf("Connecting to host\n") ;
-	serverTeulIndex = teulOpenSend(ip, WWII::Net::Ports::LuaInterface, _teulConnectFn, 30000, PROTOCOL_TCP, _teulErrorFn) ;
+		_printf("Connecting to host\n");
+	serverTeulIndex = teulOpenSend(ip, WWII::Net::Ports::LuaInterface, _teulConnectFn, 30000, PROTOCOL_TCP, _teulErrorFn);
 	if ( serverTeulIndex < 0 )
 	{
-		_printf("Unable to connect: %d\n", serverTeulIndex) ;
-		terminate(serverTeulIndex) ;
+		_printf("Unable to connect: %d\n", serverTeulIndex);
+		terminate(serverTeulIndex);
 	}
 
 	// Give the connection time to go through
 	if ( g_debugMode )
-		_printf("Waiting on connection\n") ;
-	TeulTimeMS timeout = teulClock64 + 15 * 1000 ;
+		_printf("Waiting on connection\n");
+	TeulTimeMS timeout = teulClock64 + 15 * 1000;
 	while ( g_connected == false && teulClock64 < timeout )
 	{
-		teulUpdateTransport(5) ;
+		teulUpdateTransport(5);
 	}
 	if ( g_connected == false )
 	{
-		_printf("Failed to connect\n") ;
-		terminate(5) ;
+		_printf("Failed to connect\n");
+		terminate(5);
 	}
 
 	// g_commands is the 'command stack'; if we have content in there from -c or -C
@@ -612,61 +615,61 @@ main(int argc, char* argv[])
 	if ( g_commands.empty() == false )
 	{
 		if ( g_debugMode )
-			_printf("Processing %zu commands\n", g_commands.size()) ;
-		_processCommands(g_commands, g_exitAfterCommands) ;
+			_printf("Processing %zu commands\n", g_commands.size());
+		_processCommands(g_commands, g_exitAfterCommands);
 	}
 
-	printf("Connected to %s.\n", inet_ntoa(*(struct in_addr*)&nip)) ;
-	printf("To load a script from 'scriptname.lua', type ;scriptname\n") ;
-	printf("To enter a multi-line block type \"do\" and end the block with a \";\".\n") ;
+	printf("Connected to %s.\n", inet_ntoa(*(struct in_addr*)&nip));
+	printf("To load a script from 'scriptname.lua', type;scriptname\n");
+	printf("To enter a multi-line block type \"do\" and end the block with a \";\".\n");
 
 	// As commands are typed, we save them to a file so we can recover them next time
 	// to provide a cross-session history. We have to provide this "memory" feature.
-	_readHistory() ;
+	_readHistory();
 
-	minErrType = 5 ;
+	minErrType = 5;
 
 	// Set the readline prompt and input handler.
-	rl_callback_handler_install("> ", inputHandler) ;
+	rl_callback_handler_install("> ", inputHandler);
 
 	// File descriptions to poll and the events to watch for.
-	pollfd pfd = { STDIN_FILENO, POLLIN|POLLPRI|POLLERR|POLLHUP|POLLNVAL, 0 } ;
+	pollfd pfd = { STDIN_FILENO, POLLIN|POLLPRI|POLLERR|POLLHUP|POLLNVAL, 0 };
 
 	do
 	{
-		teulUpdateTransport(5) ;
+		teulUpdateTransport(5);
 
 		// The network connection here means we can't just say "wait on readline".
 		// This loop checks the network every 2 miliseconds (3rd argument)
 		while ( poll(&pfd, 1, 2) == 0 )
 		{
-			teulUpdateTransport() ;
+			teulUpdateTransport();
 			if ( g_connected == false )
 			{
 				if ( !g_finished )
 				{
-					_printf("host went away\n") ;
-					terminate(6) ;
+					_printf("host went away\n");
+					terminate(6);
 				}
-				break ;
+				break;
 			}
 		}
 
 		if ( pfd.revents & (POLLERR|POLLHUP|POLLNVAL) )
 		{
 			// Application being killed
-			break ;
+			break;
 		}
 
 		// Some kind of input event, read it
-		rl_callback_read_char() ;
+		rl_callback_read_char();
 
 		if ( cmd.empty() || g_enteringBlock == true )
 		{
 			// User hasn't typed anything or is entering a
 			// multi-line block, and we are only interested
 			// in completed inputs.
-			continue ;
+			continue;
 		}
 
 		// Send what they've typed upto the host; they may have
@@ -675,13 +678,13 @@ main(int argc, char* argv[])
 		// be pasting from a script or piping/redirecting script
 		// content to us and sending "-- This is a comment" to
 		// the host is a waste of bandwidth and server-side CPU.
-		_sendCmd(cmd) ;
-		cmd = "" ;
-	} while ( !g_finished ) ;
+		_sendCmd(cmd);
+		cmd = "";
+	} while ( !g_finished );
 
-	teulClose(serverTeulIndex) ;
-	teulCloseTransport() ;
+	teulClose(serverTeulIndex);
+	teulCloseTransport();
 
-	terminate(0) ;
+	terminate(0);
 }
 

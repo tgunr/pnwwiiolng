@@ -32,6 +32,7 @@
 #include "scen/ScenarioManager.h"
 #include "sys/sysmain.h"
 #include <condition_variable>
+#include "include/pnThread.h"
 
 #define SQUARE(x) ((x)*(x))
 #define PAN_SCALE_MAX 5.0f				// max scale when panning
@@ -116,9 +117,9 @@ SuperCellMapView::~SuperCellMapView()
 
 	// remove any shared filters from the main message loop
 	// map input filters are shared
-	phui::MessageFilter* filter = NULL;
+	phui::MessageFilter* filter = nullptr;
 
-	for(int i = 0; (filter = FilterAt(i)) != NULL; i++)
+	for(int i = 0; (filter = FilterAt(i)) != nullptr; i++)
 		uiMessageLoop()->RemoveMessageFilter(filter);
 
 	// keep track of how many maps are currently running
@@ -657,7 +658,7 @@ void SuperCellMapView::SetScale(float numsc)
 			pany = strat->PosY();
 			count = 1;
 
-			StratDB::StratObject::ChildList const& children = strat->ChildStratObjects() ;
+			StratDB::StratObject::ChildList const& children = strat->ChildStratObjects();
 			StratDB::StratObject::ChildList::const_iterator it;
 			for(it = children.begin() ; it != children.end() ; ++it)
 			{
@@ -680,7 +681,7 @@ void SuperCellMapView::SetScale(float numsc)
 			leftx = rightx = strat->PosX();
 			topy = bottomy = strat->PosY();
 
-			StratDB::StratObject::ChildList const& children = strat->ChildStratObjects() ;
+			StratDB::StratObject::ChildList const& children = strat->ChildStratObjects();
 			StratDB::StratObject::ChildList::const_iterator it;
 			for(it = children.begin() ; it != children.end() ; ++it)
 			{
@@ -881,7 +882,7 @@ SuperCellMapView::Renderer::LoadThread::LoadThread(Renderer* r)
 	, _done(false)
 	, _cells()
 {
-	_cells.reserve(64) ;
+	_cells.reserve(64);
 }
 
 SuperCellMapView::Renderer::LoadThread::~LoadThread()
@@ -913,11 +914,11 @@ void SuperCellMapView::Renderer::LoadThread::RemoveRendererSuperCells(SuperCellM
 	{
 		if( (*it)->renderer == r)
 		{
-			*it = _cells.back() ;
-			_cells.pop_back() ;
+			*it = _cells.back();
+			_cells.pop_back();
 		}
 		else
-			++it ;
+			++it;
 	}
 }
 
@@ -936,7 +937,7 @@ void SuperCellMapView::Renderer::LoadThread::run()
 		_cells.erase(_cells.begin());
 		lock.unlock();
 
-		if ( NULL != sc && sc->loading == true )
+		if ( nullptr != sc && sc->loading == true )
 			sc->Load();
 	}
 }

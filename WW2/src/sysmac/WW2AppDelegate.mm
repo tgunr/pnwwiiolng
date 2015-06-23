@@ -864,7 +864,7 @@ extern void sysmainAddArchives();
 {
   isConnectedToAuthenticationServer = YES;
   
-	UINT32* host = teulGetHostByName([authServer cStringUsingEncoding: NSASCIIStringEncoding]);
+	UINT32 host = Teul::GetSingleIP([authServer cStringUsingEncoding: NSASCIIStringEncoding]);
   if (host) {
     if (! isteulInitialized) {
       /*      teulInitTransport(LOG_OFF, "communicationerrorlog", 
@@ -885,7 +885,7 @@ extern void sysmainAddArchives();
                                                 repeats:YES];
     
 		
-		teulOpenSend(host[0], authPort, teulConnectCallback, 100000, TCP, teulErrorCallback);
+		teulOpenSend(host, authPort, teulConnectCallback, 100000, TCP, teulErrorCallback);
   } else {
     [self setError:[PGError errorWithDomain:PGErrorDomain
                                        code:PGErrorFailedHostLookup

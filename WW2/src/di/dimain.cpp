@@ -70,14 +70,14 @@ SINT32 j;
 
 	g_lpiac = (imap_queue_entry*)memAlloc(NUM_IAC_QUEUE_ENTRIES * sizeof(imap_queue_entry));
 
-	if(g_lpiac == NULL)
+	if(g_lpiac == nullptr)
 	{
 		return(FALSE);
 	}
 
 	g_di2iac = (UINT16*)memAlloc(MAX_IAC_CODES * sizeof(UINT16));
 
-	if(g_di2iac == NULL)
+	if(g_di2iac == nullptr)
 	{
 		return(FALSE);
 	}
@@ -104,7 +104,7 @@ SINT32 j;
 	dipSetupJoystick();
 #endif	// _DEBUG
 
-	for(i = 0 ; i < NUM_IAC_QUEUE_ENTRIES ; i++)
+	for(i = 0; i < NUM_IAC_QUEUE_ENTRIES; i++)
 	{
 		g_lastBuffer[i] = 0;
 	}
@@ -133,14 +133,14 @@ SINT32 j;
 
 	for(j = 0; j < IAC_MAX_JOYSTICKS; j++)
 	{
-		for(i = 0; i < IAC_JOYSTICK_MAX_BUTTONS ; i++)
+		for(i = 0; i < IAC_JOYSTICK_MAX_BUTTONS; i++)
 		{
 			g_lastbuttonsjs[j][i] = 0;
 		}
 	}
 
 	// zero indicates "not used"
-	for(i=0 ; i < MAX_IAC_CODES ; i++)
+	for(i=0; i < MAX_IAC_CODES; i++)
 	{
 		g_di2iac[i] = 0;
 	}
@@ -379,16 +379,16 @@ UINT32 dimainVKToIAC(UINT32 uVK)
 
 void dimainKill(void)
 {
-	if(g_lpiac != NULL)
+	if(g_lpiac != nullptr)
 	{
 		memFree(g_lpiac);
-		g_lpiac = NULL;
+		g_lpiac = nullptr;
 	}
 
-	if(g_di2iac != NULL)
+	if(g_di2iac != nullptr)
 	{
 		memFree(g_di2iac);
-		g_di2iac = NULL;
+		g_di2iac = nullptr;
 	}
 
 	dipKill();
@@ -429,7 +429,7 @@ bool dimainVKUp(UINT32 uVK, UINT32 uScanCode)
     g_keyInput[g_iKeyCount].uIac = dimainVKToIAC(uVK);
     g_keyInput[g_iKeyCount].bState = FALSE;
 
-	bool rval = (g_keyInput[g_iKeyCount].uIac) ? true : false ;
+	bool rval = (g_keyInput[g_iKeyCount].uIac) ? true : false;
 
     g_iKeyCount++;
 
@@ -452,7 +452,7 @@ bool dimainVKDown(UINT32 uVK, UINT32 uScanCode)
     g_keyInput[g_iKeyCount].uIac = dimainVKToIAC(uVK);
     g_keyInput[g_iKeyCount].bState = TRUE;
 
-	bool rval = (g_keyInput[g_iKeyCount].uIac) ? true : false ;
+	bool rval = (g_keyInput[g_iKeyCount].uIac) ? true : false;
 
     g_iKeyCount++;
 
@@ -538,7 +538,7 @@ LOGICAL dimainGetInputs(imap_queue_entry**plpiac, UINT32* pnumentries)
     DIDEVICEOBJECTDATA	od[_DIMAIN_INPUT_BUFFERSIZE];
     UINT32				pov[IAC_MAX_JOYSTICKS][4];
 
-	if(g_lpiac == NULL || g_di2iac == NULL)
+	if(g_lpiac == nullptr || g_di2iac == nullptr)
 	{
 		return FALSE;
 	}
@@ -553,7 +553,7 @@ LOGICAL dimainGetInputs(imap_queue_entry**plpiac, UINT32* pnumentries)
 	while(dipGetKeyboardData(od, (UINT32*)&count) && count != 0)
 	{
 		// Handle keyboard input
-		for(i=0 ; i < count ; i++)
+		for(i=0; i < count; i++)
 		{
 			ofs = od[i].dwOfs;
 
@@ -600,7 +600,7 @@ LOGICAL dimainGetInputs(imap_queue_entry**plpiac, UINT32* pnumentries)
 
         iWheelHistory = ms.lZ;
 
-		for(i=0 ; i < 4 ; i++)
+		for(i=0; i < 4; i++)
 		{
 			if(ms.rgbButtons[i] & 0x80)	// down
 			{
@@ -627,7 +627,7 @@ LOGICAL dimainGetInputs(imap_queue_entry**plpiac, UINT32* pnumentries)
 	///NOTE: Expects a UINT32 pointer
 	if(dipGetJoystickData(od, (UINT32*)&len))
 	{
-		for(i=0 ; i < len ; i++)
+		for(i=0; i < len; i++)
 		{
 			// Extract joystick number from data and convert data back to signed 32 bits
 			JoystickNumber = HIWORD(od[i].dwData);

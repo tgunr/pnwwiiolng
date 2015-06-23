@@ -11,27 +11,27 @@
 class PPOSTO : public ServerSTO
 {
 public:
-	PPOSTO(ACTION_OBJECT* const a) ;
+	PPOSTO(ACTION_OBJECT* const a);
 
-	virtual bool needsBroadcastRemoval() const { return true ; }
-	virtual const char* typeName() const { return "ppo" ; }
-
-public:
-	virtual bool applyJoules(const SINT64& joules, class Player* player=NULL) ;
-
-	virtual void extractPlayer(const Player* player) ;
-
-	virtual bool expired() const ;
+	virtual bool needsBroadcastRemoval() const OVERRIDE_FN { return true; }
+	virtual const char* typeName() const OVERRIDE_FN { return "ppo"; }
 
 public:
-	const STODamage& damage() const { return m_damage ; }
-	STODamage& damage() { return m_damage ; }
+	virtual bool applyJoules(const SINT64& joules, class Player* player=nullptr) OVERRIDE_FN;
+
+	virtual void extractPlayer(const Player* player) OVERRIDE_FN;
+
+	virtual bool expired() const OVERRIDE_FN;
+
+public:
+	const STODamage& damage() const { return m_damage; }
+	STODamage& damage() { return m_damage; }
 
 private:
-	STODamage		m_damage ;
+	STODamage		m_damage;
 
-	std::vector<const Player*> m_occupants ;
+	std::vector<const Player*> m_occupants;
 
-	TeulTimeMS		m_maxLife ;
-	TeulTimeMS		m_lastOccupied ;
-} ;
+	TeulTimeMS		m_maxLife;
+	TeulTimeMS		m_lastOccupied;
+};

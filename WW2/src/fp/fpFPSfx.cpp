@@ -4,7 +4,6 @@
 #include "fx/fxPcl.h"
 #include "fp/fptypes.h"
 #include "pers/persmain.h"
-#include "mem/mem.h"
 #include "ob/obpool.h"
 #include "ogrp/ogrptype.h"
 #include "math/math3d.h"
@@ -41,7 +40,7 @@ LOGICAL fpFPSfxInit()
 {
     SINT32 i;
 
-    OBJECT* o = NULL;
+    OBJECT* o = nullptr;
 
     for(i = 0; i < MAX_SHELLS; i++)
     {
@@ -98,7 +97,7 @@ bool _updateShell(OBJECT* o)
 
         o->soundID = 0;
         o->treeID = 0;
-        o->updatecallback = NULL; // Removes from obmainUpdate
+        o->updatecallback = nullptr; // Removes from obmainUpdate
         fxUtlSetMatrixInTree(o, &IdentityMatrix);
         obmainMoveToNotObjectTree(o);
 
@@ -282,7 +281,7 @@ UINT32 fpFPSfxEjectShell(piVECTOR& gundir,
 
         Vec3f n = Vec3f(ejectdir) * shellspeed;
 
-        TransformEffect* te = TransformEffect::AddEffect("shellcasing", n, 0, NULL);
+        TransformEffect* te = TransformEffect::AddEffect("shellcasing", n, 0, nullptr);
 
         if(te)
         {
@@ -300,7 +299,7 @@ UINT32 fpFPSfxEjectShell(piVECTOR& gundir,
 
 void fpFPSfxShellKillCallback(void* data)
 {
-	if(data == NULL) return
+	if(data == nullptr) return
     fxUtlSetMatrixInTree((struct OBJECT*)data, &IdentityMatrix);
     _freeshells.push_back((struct OBJECT*)data);
 }
@@ -309,7 +308,7 @@ struct OBJECT* fpFPSfxGetFreeShell()
 {
     if(_freeshells.empty())
     {
-        return NULL;
+        return nullptr;
     }
 
     struct OBJECT* o = _freeshells.front();
@@ -337,7 +336,7 @@ SINT32 fpFPSfxPlayTPSMovementSound (char* soundName, OBJECT* soundObject, FLOAT3
 {
 	SINT32	soundID;
 
-	soundID = fpFPSfxPlaySound(soundName, IDE_TP_PRIORITY_LOW, TYPE_INFINITE_EXTERNAL_SOUND, DEF_PLAYTYPE_OBJECT, NULL, soundObject, 0, fMin, fMax);
+	soundID = fpFPSfxPlaySound(soundName, IDE_TP_PRIORITY_LOW, TYPE_INFINITE_EXTERNAL_SOUND, DEF_PLAYTYPE_OBJECT, nullptr, soundObject, 0, fMin, fMax);
 
 	if (soundID > 0)
 	{
@@ -353,7 +352,7 @@ SINT32 fpFPSfxPlayTPSSingleSound (char* soundName, OBJECT* soundObject, FLOAT32 
 {
 	SINT32	soundID;
 
-	soundID = fpFPSfxPlaySound(soundName, IDE_TP_PRIORITY_LOW, TYPE_FINITE_EXTERNAL_SOUND, DEF_PLAYTYPE_OBJECT, NULL, soundObject, 0, fMin, fMax);
+	soundID = fpFPSfxPlaySound(soundName, IDE_TP_PRIORITY_LOW, TYPE_FINITE_EXTERNAL_SOUND, DEF_PLAYTYPE_OBJECT, nullptr, soundObject, 0, fMin, fMax);
 	return soundID;
 }
 
@@ -367,7 +366,7 @@ SINT32 fpFPSfxPlaySound(char* soundName, SINT32 soundPriority, SINT32 soundType,
 	}
 	else
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "NULL sound");
+		Write_Log (LOG_FPS, LOG_INFO, "nullptr sound");
         return -1;
 	}
 
@@ -396,7 +395,7 @@ SINT32 fpFPSfxPlaySound(char* soundName, SINT32 soundPriority, SINT32 soundType,
 		fxSndSetMaxDistance(iID, fMax);
 	}
 
-	if (soundPosition != NULL)
+	if (soundPosition != nullptr)
 	{
 		fxSndSetPosition(iID, soundPosition->x, soundPosition->y, soundPosition->z);
 	}
@@ -521,7 +520,7 @@ LOGICAL fpFPSUpdateSounds(OBJECT* pObject)
 		if (fpsTrooper.movementSound != FPS_SOUND_NONE)
 		{
 			if ((fpsTrooper.movementSound == FPS_SOUND_WATER) || (fpsTrooper.movementSound == FPS_SOUND_FREEFALL) || (fpsTrooper.movementSound == FPS_SOUND_PARACHUTE_FALL))
-				fpsTrooper.movementSoundID = fpFPSfxPlayNormalSound (fpsTrooper.moveSounds[fpsTrooper.movementSound], IDE_FP_PRIORITY_MANDATORY, TYPE_INFINITE_EXTERNAL_SOUND, NULL, pObject);
+				fpsTrooper.movementSoundID = fpFPSfxPlayNormalSound (fpsTrooper.moveSounds[fpsTrooper.movementSound], IDE_FP_PRIORITY_MANDATORY, TYPE_INFINITE_EXTERNAL_SOUND, nullptr, pObject);
 			else
 			{
 				SCHAR* soundName;
@@ -550,7 +549,7 @@ LOGICAL fpFPSUpdateSounds(OBJECT* pObject)
 						break;
 				}
 
-				fpsTrooper.movementSoundID = fpFPSfxPlayNormalSound (soundName, IDE_FP_PRIORITY_MANDATORY, TYPE_INFINITE_EXTERNAL_SOUND, NULL, pObject);
+				fpsTrooper.movementSoundID = fpFPSfxPlayNormalSound (soundName, IDE_FP_PRIORITY_MANDATORY, TYPE_INFINITE_EXTERNAL_SOUND, nullptr, pObject);
 			}
 		}
 	}
@@ -578,7 +577,7 @@ LOGICAL fpFPSPlayFallSound(OBJECT* pObject, SINT32 fallType)
 		break;
 	}
 
-	fpFPSfxPlayNormalSound (fpsTrooper.moveSounds[SoundNameIndex], IDE_FP_PRIORITY_MANDATORY, TYPE_FINITE_SOUND, NULL, pObject);
+	fpFPSfxPlayNormalSound (fpsTrooper.moveSounds[SoundNameIndex], IDE_FP_PRIORITY_MANDATORY, TYPE_FINITE_SOUND, nullptr, pObject);
 
 	return TRUE;
 }

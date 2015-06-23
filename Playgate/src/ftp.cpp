@@ -19,79 +19,79 @@ static HWND hwndCombo;
 static int  NextState = STATE_AUTO;
 
 static char	_fileSize[PN_MAX_PATH];
-static UINT32 iFileSize ;
+static UINT32 iFileSize;
 static char	_fileName[PN_MAX_PATH];
 static char	_localFileName[PN_MAX_PATH];
 
 static long ByteCount;
 static DWORD AppendStart;
 
-bool ftpInProgress = false ;
+bool ftpInProgress = false;
 
-static void download() ;
-static void FileCheck(const char*) ;
+static void download();
+static void FileCheck(const char*);
 
-static UINT32 s_downloadStartedTime = 0 ;
-static long   s_bytesDownloaded = -1 ;
+static UINT32 s_downloadStartedTime = 0;
+static long   s_bytesDownloaded = -1;
 
 void ftpStart()
 {
-	playgate.SetStatus(GetLoc(UPDATE_FOUND), AppProgress) ;
-	playgate.m_progress = (CProgressCtrl*)(hMainWnd->GetDlgItem(IDC_FTP_PROGRESS)) ;
+	playgate.SetStatus(GetLoc(UPDATE_FOUND), AppProgress);
+	playgate.m_progress = (CProgressCtrl*)(hMainWnd->GetDlgItem(IDC_FTP_PROGRESS));
 
-	playgate.ftping(true) ;
+	playgate.ftping(true);
 
 	AppendStart = 0;
-	ftpInProgress = true ;
+	ftpInProgress = true;
 
-	teulSyncClock() ;
-	s_downloadStartedTime = teulTime() ;
-	s_bytesDownloaded = -1 ;
+	teulSyncClock();
+	s_downloadStartedTime = teulTime();
+	s_bytesDownloaded = -1;
 }
 
 static void ftpStopped()
 {
-	hMainWnd->KillTimer('FTP') ;
+	hMainWnd->KillTimer('FTP');
 
 	fceClose(0);
 	fceRelease();
 
-	playgate.ftping(false) ;
+	playgate.ftping(false);
 
-	ftpInProgress = false ;
+	ftpInProgress = false;
 }
 
 bool ftpStop(const TCHAR* reason, UINT32 cmd, LPARAM code)
 {
 	if ( ftpInProgress == false )
-		return false ;
+		return false;
 
-	if ( NULL != reason && 0 != reason[0] )
-		playgate.SetStatus(reason) ;
+	if ( nullptr != reason && 0 != reason[0] )
+		playgate.SetStatus(reason);
 
 	if ( 0 != code )
-		playgate.PostCommand(cmd, code) ;
+		playgate.PostCommand(cmd, code);
 
-	ftpStopped() ;
+	ftpStopped();
 
-	return true ;
+	return true;
 }
 
 void ftpQuit()
 {
-	ftpStop(GetLoc(PATCH_CANCELLED), 0, 0) ;
+	ftpStop(GetLoc(PATCH_CANCELLED), 0, 0);
 }
 
 static TCHAR* _tcharString(char* src)
 {
-	static TCHAR buffer[512] ;
-	TCHAR* dst = buffer ;
+	static TCHAR buffer[512];
+	TCHAR* dst = buffer;
 	do
 	{
-		*(dst) = *(src++) ;
+		*(dst) = *(src++);
 	}
-	while ( *(dst++) != 0 ) ;
-	return buffer ;
+	while ( *(dst++) != 0 );
+	return buffer;
 }
 
 static void _ftpError(SINT32 Code)
@@ -107,137 +107,137 @@ static void _ftpError(SINT32 Code)
 	}
 	else if (iFileSize > 0)
 	{
-		ftpStop(GetLoc(FTP_FAILED), webID, (LPARAM)ERR_FTP_CONNECT) ;
+		ftpStop(GetLoc(FTP_FAILED), webID, (LPARAM)ERR_FTP_CONNECT);
 	}
 	else 
 	{
-		ftpStop(GetLoc(FTP_FAILED), webID, (LPARAM)ERR_FTP_NOPATCH) ;
+		ftpStop(GetLoc(FTP_FAILED), webID, (LPARAM)ERR_FTP_NOPATCH);
 	}
 }
 
 static FLOAT32 _getDownloadRate(long bytesReceived)
 {
-	teulSyncClock() ;
-	UINT32 secondsElapsed = teulTime() - s_downloadStartedTime ;
+	teulSyncClock();
+	UINT32 secondsElapsed = teulTime() - s_downloadStartedTime;
 	if ( bytesReceived == 0 || secondsElapsed == 0 )
-		return 0.0f ;
-	return (FLOAT32)bytesReceived / (FLOAT32)secondsElapsed ;
+		return 0.0f;
+	return (FLOAT32)bytesReceived / (FLOAT32)secondsElapsed;
 }
 
 int ftpProcess()
 {
 	if ( ftpInProgress == false )
-		return 0 ;
+		return 0;
 
-	int lastBytes, newBytes ;
-	long bytesReceived = 0 ;
+	int lastBytes, newBytes;
+	long bytesReceived = 0;
 	SINT32 Code;
 	static TCHAR statusMessage[512];
 
 	switch(NextState)
 	{
 		case STATE_IDLE:
-			return 50 ;
+			return 50;
 
 		case STATE_AUTO:
 			download();
 			if ( playgate.m_progress )
-				playgate.m_progress->SetPos(0) ;
-			return 50 ;
+				playgate.m_progress->SetPos(0);
+			return 50;
 
 		case STATE_EXECUTE:
 			fceSetInteger(0,FCE_SET_AUTO_CALL_DRIVER ,1);
-			ftpStopped() ;
+			ftpStopped();
 			if ( AppLaunch.action == APPDL_INSTALL)
 			{
 				playgate.SetStatus(GetLoc(PATCH_EXECUTE), AppProgress);
 				if ( launchApplication(_tcharString(_fileName), _T(""), g_dataPath) == false )
 				{
-					playgate.SetStatus(GetLoc(PATCH_FAILED), AppError) ;
-					return 0 ;
+					playgate.SetStatus(GetLoc(PATCH_FAILED), AppError);
+					return 0;
 				}
 				playgate.SetStatus(GetLoc(PATCH_COMPLETE), AppProgress);
-				playgate.Quit() ;
+				playgate.Quit();
 			}
 			else if (AppLaunch.action == APPDL_REPAIR)
 			{
 				/// This shouldn't happen any more...
-				hMainWnd->MessageBox(GetLoc(AUTH_BEHAVIOR), GetLoc(AUTH_ERROR), MB_ICONEXCLAMATION|MB_OK) ;
-				exit(0) ;
+				hMainWnd->MessageBox(GetLoc(AUTH_BEHAVIOR), GetLoc(AUTH_ERROR), MB_ICONEXCLAMATION|MB_OK);
+				exit(0);
 			}
-		break ;
+		break;
 
 		case STATE_DOWNLOAD:
 			NextState = STATE_IDLE;
 
 			if ( s_bytesDownloaded == -1 )
 			{
-				FileCheck(_localFileName) ;
-				s_bytesDownloaded = AppendStart ;
+				FileCheck(_localFileName);
+				s_bytesDownloaded = AppendStart;
 			}
 
-			lastBytes = fceGetInteger(0, FCE_GET_FILE_BYTES_RCVD) ;
+			lastBytes = fceGetInteger(0, FCE_GET_FILE_BYTES_RCVD);
 			// Call fceDriver a bunch of times until there are
 			// no new bytes received.
-			for( UINT32 i = 0 ; i <= 4096 ; ++i )
+			for( UINT32 i = 0; i <= 4096; ++i )
 			{
 				Code = fceDriver(0);
 				//if error returned, cleanup 
 				if ( Code < 0 ) 
 				{
-					_ftpError(Code) ;
-					return 0 ;
+					_ftpError(Code);
+					return 0;
 				}
 
 				//Download is complete
 				if ( Code == 0 )
 				{
 					NextState = STATE_CLEANUP;
-					FLOAT32 mb = (FLOAT32)ByteCount / (FLOAT32)(1024 * 1024) ;
-					//ftpStop(statusMessage, 0, 0) ;
+					FLOAT32 mb = (FLOAT32)ByteCount / (FLOAT32)(1024 * 1024);
+					//ftpStop(statusMessage, 0, 0);
 					if ( playgate.m_progress )
-						playgate.m_progress->SetPos(100) ;
-					playgate.SetStatus(GetLoc(FTP_COMPLETE, _fileName, mb), AppProgress) ;
+						playgate.m_progress->SetPos(100);
+					playgate.SetStatus(GetLoc(FTP_COMPLETE, _fileName, mb), AppProgress);
 					NextState = STATE_EXECUTE;
-					return 1 ;
+					return 1;
 				 }
 
-				newBytes = fceGetInteger(0, FCE_GET_FILE_BYTES_RCVD) ;
+				newBytes = fceGetInteger(0, FCE_GET_FILE_BYTES_RCVD);
 				if ( newBytes == lastBytes )
-					break ;
+					break;
 			}
 
 			//While still downloading, update downloaded byte count
-			bytesReceived = fceGetInteger(0, FCE_GET_FILE_BYTES_RCVD) ;
+			bytesReceived = fceGetInteger(0, FCE_GET_FILE_BYTES_RCVD);
 			ByteCount = bytesReceived + AppendStart;
 			if(ByteCount != s_bytesDownloaded && iFileSize != 0)
 			{
-				static UINT32 lastPercent = 999 ;
-				UINT32 percent = (UINT32)((FLOAT32)ByteCount * 100L / (FLOAT32)iFileSize) ;
-				FLOAT32 dlMb = (FLOAT32)ByteCount / (FLOAT32)(1024 * 1024) ;
-				FLOAT32 fsMb = (FLOAT32)iFileSize / (FLOAT32)(1024 * 1024) ;
-				FLOAT32 dlRate = _getDownloadRate(bytesReceived) ;
-				playgate.SetStatus(GetLoc(FTP_STATUS, percent, _fileName, dlMb, fsMb, dlRate), AppNote) ;
+				static UINT32 lastPercent = 999;
+				UINT32 percent = (UINT32)((FLOAT32)ByteCount * 100L / (FLOAT32)iFileSize);
+				FLOAT32 dlMb = (FLOAT32)ByteCount / (FLOAT32)(1024 * 1024);
+				FLOAT32 fsMb = (FLOAT32)iFileSize / (FLOAT32)(1024 * 1024);
+				FLOAT32 dlRate = _getDownloadRate(bytesReceived);
+				playgate.SetStatus(GetLoc(FTP_STATUS, percent, _fileName, dlMb, fsMb, dlRate), AppNote);
 				s_bytesDownloaded = ByteCount;
 				if ( playgate.m_progress && percent != lastPercent )
 				{
-					playgate.m_progress->SetPos(percent) ;
-					lastPercent = percent ;
+					playgate.m_progress->SetPos(percent);
+					lastPercent = percent;
 				}
 			}
 
-//			Sleep(0) ;
+//			Sleep(0);
 
 			NextState = STATE_DOWNLOAD;
 
-			return 10 ;
+			return 10;
 
 			break;
 
 		case STATE_CLEANUP:
 			NextState = STATE_IDLE;
-			ftpStop(NULL, 0, 0) ;
-			return 0 ;
+			ftpStop(nullptr, 0, 0);
+			return 0;
 			//NextState
 			break;
 			
@@ -246,7 +246,7 @@ int ftpProcess()
 
 	} //end NextState switch
 
-	return 50 ;
+	return 50;
 }
 
 void download()
@@ -270,13 +270,13 @@ void download()
 
 	if (AppLaunch.serverPort == 0)
 	{
-		ftpStop(NULL, MSG_DOWNLOAD, (LPARAM)ERR_FTP_NOPATCH) ;
+		ftpStop(nullptr, MSG_DOWNLOAD, (LPARAM)ERR_FTP_NOPATCH);
 		return;
 	}
 
 	if (AppLaunch.serverPort == 1)
 	{
-		ftpStop(NULL, MSG_DOWNLOAD, (LPARAM)webURL) ;
+		ftpStop(nullptr, MSG_DOWNLOAD, (LPARAM)webURL);
 		return;
 	}
 
@@ -312,15 +312,15 @@ void download()
 		fceSetInteger(0, FCE_SET_FTP_PORT , 21); 
 
 		strcpy_s(ftpURL, 255, "downloads");
-		strcat_s(ftpURL, 255, g_region.authSuffix().c_str()) ;
+		strcat_s(ftpURL, 255, g_region.authSuffix().c_str());
 	}
 
 	fnLen = strlen(_fileName);
 
 	if(! _fileName[0] ||  fnLen < 2 )
 	{
-		ftpStop(NULL, webID, (LPARAM)ERR_FTP_NOPATCH) ;
-		return ;
+		ftpStop(nullptr, webID, (LPARAM)ERR_FTP_NOPATCH);
+		return;
 	}
 
 	playgate.SetStatus(GetLoc(FTP_CONNECTING), AppProgress);
@@ -334,8 +334,8 @@ void download()
 
 	if(Code<0)
 	{
-		ftpStop(GetLoc(FTP_NO_CONNECT), webID, (LPARAM)ERR_FTP_CONNECT) ;
-		return ;
+		ftpStop(GetLoc(FTP_NO_CONNECT), webID, (LPARAM)ERR_FTP_CONNECT);
+		return;
 
 	}
 
@@ -344,7 +344,7 @@ void download()
 	Code = fceConnect(0,(LPSTR)ftpURL,(LPSTR)"anonymous", (LPSTR)pwdString);
 	if(Code<0)
 	{
-		ftpStop(GetLoc(FTP_NO_LOGIN), webID, (LPARAM)ERR_FTP_CONNECT) ;
+		ftpStop(GetLoc(FTP_NO_LOGIN), webID, (LPARAM)ERR_FTP_CONNECT);
 		return;
 	}
 
@@ -376,8 +376,8 @@ void download()
 		// File is smaller than that on the server, get rid of the local file.
 		if ( iFileSize < AppendStart )
 		{
-			_unlink(_localFileName) ;
-			AppendStart = 0 ;
+			_unlink(_localFileName);
+			AppendStart = 0;
 		}
 
 		//divide bytes by 1048576 to get mb
@@ -393,12 +393,12 @@ void download()
 
 		if(Code<0) 
 		{ 
-			ftpStop(GetLoc(FTP_FAILED), webID, (LPARAM)ERR_FTP_NOPATCH) ;
+			ftpStop(GetLoc(FTP_FAILED), webID, (LPARAM)ERR_FTP_NOPATCH);
 			return;
 		}
 		//itoa(AppendStart,_fileSize,10);
 
-		playgate.SetStatus(GetLoc(FTP_DOWNLOADING, _fileName), AppProgress) ;
+		playgate.SetStatus(GetLoc(FTP_DOWNLOADING, _fileName), AppProgress);
 	}
 }
 
@@ -411,10 +411,10 @@ static void FileCheck(const char *File2)
 	hFile = CreateFileA(File2,		// file name 
 	GENERIC_READ,                   // open for reading 
 	1,                              // Share
-	NULL,                           // no security 
+	nullptr,                           // no security 
 	OPEN_EXISTING,                  // existing file only 
 	FILE_ATTRIBUTE_NORMAL,          // normal file 
-	NULL);                          // no attr. template 
+	nullptr);                          // no attr. template 
 
 	if (hFile == INVALID_HANDLE_VALUE) 
 	{ 
@@ -423,7 +423,7 @@ static void FileCheck(const char *File2)
 	else 
 	{
 		Exists = 1;
-		AppendStart = GetFileSize(hFile,NULL);
+		AppendStart = GetFileSize(hFile,nullptr);
 		fceSetInteger(0, FCE_SET_APPEND_MODE, 1);
 		fceSetInteger(0, FCE_SET_SERVER_OFFSET, AppendStart);
 		fceSetInteger(0, FCE_SET_CLIENT_OFFSET, AppendStart);

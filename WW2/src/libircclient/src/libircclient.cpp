@@ -46,7 +46,7 @@ irc_session_t * irc_create_session (irc_callbacks_t	* callbacks)
 		return 0;
 
 	memset (session, 0, sizeof(irc_session_t));
-	session->sock = static_cast<socket_t>(-1);
+	session->sock = -1;
 
 	if ( libirc_mutex_init (&session->mutex_session)
 	|| libirc_mutex_init (&session->mutex_dcc) )
@@ -410,7 +410,7 @@ static void libirc_process_incoming_data (irc_session_t * session, int process_l
 	const char * command = 0, *prefix = 0, *params[MAX_PARAMS_ALLOWED+1];
 	int code = 0, paramindex = 0;
 
-	if ( (size_t)process_length >= (size_t)sizeof(buf) )
+	if ( (size_t)process_length >= sizeof(buf) )
 		abort(); // should be impossible
 
 	memcpy (buf, session->incoming_buf, process_length);
@@ -990,19 +990,22 @@ int irc_cmd_notice (irc_session_t * session, const char * nch, const char * text
 
 void irc_target_get_nick (const char * target, char *nick, size_t size)
 {
-	const char *p = strstr (target, "!");
-	unsigned int len;
+    if (target && nick)
+    {
+		const char *p = strstr (target, "!");
+		unsigned int len;
 
-	if ( p )
-		len = p - target;
-	else
-		len = strlen (target);
+		if ( p )
+			len = p - target;
+		else
+			len = strlen (target);
 
-	if ( len > size-1 )
-		len = size - 1;
+		if ( len > size-1 )
+			len = size - 1;
 
-	memcpy (nick, target, len);
-	nick[len] = '\0';
+		memcpy (nick, target, len);
+		nick[len] = '\0';
+	}
 }
 
 
@@ -1072,7 +1075,7 @@ void irc_disconnect (irc_session_t * session)
 	if ( session->sock >= 0 )
 		socket_close (&session->sock);
 
-	session->sock = static_cast<socket_t>(-1);
+	session->sock = -1;
 	session->state = LIBIRC_STATE_INIT;
 }
 

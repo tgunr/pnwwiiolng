@@ -9,10 +9,10 @@
 //
 // Originating Programmer: Marty "Vandal" Poulin
 
-extern struct TEUL_CALLBACK*	authARENA_REQ;
-extern struct TEUL_CALLBACK*	authAPP_LAUNCH_REQ;
+extern struct TEUL_CALLBACK* authARENA_REQ;
+extern struct TEUL_CALLBACK* authAPP_LAUNCH_REQ;
 
-extern SINT32 authLaunchApp(struct APP_LAUNCH* reply);
-extern SINT32 authVerifyApp(SINT32 teulIndex, struct APP_VERIFY* reply);
+SINT32 authLaunchApp(struct APP_LAUNCH* reply);
+SINT32 authVerifyApp(SINT32 teulIndex, struct APP_VERIFY* reply);
 
-extern SINT32 authClientInstallCallbacks();
+SINT32 authClientInstallCallbacks();

@@ -17,9 +17,12 @@
 #include "teul/teulEndpoint.h"
 #include "teul/teulTimeMS.h"
 
-#define AUTH_BYPASS	1
+#define AUTH_BYPASS 1
+#ifdef AUTH_BYPASS
+#include <atomic>
+#endif
 
-static const TeulTimeMS LoginInterval_ms = 5 * 60 * 1000 ;
+static const TeulTimeMS LoginInterval_ms = 5 * 60 * 1000;
 
 #define CONNECT_TIMEOUT	20000
 
@@ -30,18 +33,18 @@ static const TeulTimeMS LoginInterval_ms = 5 * 60 * 1000 ;
 static SINT32 _authConnection;
 static UINT32 _thisVersion;
 
-static PLAYER_ACCEPT_FUNCTION* _playerAcceptFn = NULL;
-static PLAYER_RELEASE_FUNCTION* _playerReleaseFn = NULL;
+static PLAYER_ACCEPT_FUNCTION* _playerAcceptFn = nullptr;
+static PLAYER_RELEASE_FUNCTION* _playerReleaseFn = nullptr;
 
 static LOGICAL _authIsOpen;
 
 // The complete list of all current OTPs.
-typedef UNORDERED_MAP<UINT32, OTP_NODE*> OTPS ;
-static OTPS _otps ;
+typedef std::unordered_map<UINT32, OTP_NODE*> OTPS;
+static OTPS _otps;
 // OTPs that have logged in, by customerID.
-static OTPS _custOtps ;
+static OTPS _custOtps;
 // OTPs that haven't logged in yet.
-static std::vector<OTP_NODE*> _pendingOtps ;
+static std::vector<OTP_NODE*> _pendingOtps;
 
 static ERROR_FUNCTION* _externalErrorFn;
 
@@ -51,10 +54,10 @@ static LOGICAL parentIsOpen = FALSE;
 
 static SINT32 _bypassCustomerID = 1000000;
 
-static bool _sendNotice = false ;
+static bool _sendNotice = false;
 
-static Teul::TimeMS _timeOpen(~0ULL) ;
-static Teul::TimeMS _timeDown(0ULL) ;
+static Teul::TimeMS _timeOpen(~0ULL);
+static Teul::TimeMS _timeDown(0ULL);
 
 static UINT32 _authHost;
 static UINT16 _authPort;
@@ -98,7 +101,7 @@ SINT32 authGameInit(UINT32 gameHost, UINT16 gamePort
 
 	_playerAcceptFn = acceptFn;
 
-	_sendNotice = true ;
+	_sendNotice = true;
 
 	if (  _authInited  == FALSE)
 	{
@@ -116,9 +119,9 @@ SINT32 authGameInit(UINT32 gameHost, UINT16 gamePort
 	}
 
 	if ( !useAuthServer )
-		return 0 ;
+		return 0;
 
-	_authConnection = _openSend(appID, Server::myServerInfo.stats.arenaID, hostVersion, authHost, parentPort, gameHost, gamePort, maxUsers) ;
+	_authConnection = _openSend(appID, Server::myServerInfo.stats.arenaID, hostVersion, authHost, parentPort, gameHost, gamePort, maxUsers);
 	if ( _authConnection < 0 )
 	{
 		dbugWrite(_FLA,"coulnt make Auth connection, err:%d",_authConnection);
@@ -141,7 +144,7 @@ SINT32 authGameInit(UINT32 gameHost, UINT16 gamePort
 SINT32 authExitPlayer(const Auth::Dispatch& dispatch, UINT32 arenaID)
 {
 	if ( !useAuthServer )
-		return 0 ;
+		return 0;
 
 	if ( memcmp(dispatch.m_callsign,"CRS",3) == 0 )
 		return -EINVAL;
@@ -170,10 +173,10 @@ _populateDispatch(UINT32 ipAddress, const PLAYER_LOGIN& login, const OTP_NODE* o
 static SINT32
 _processLoginData(const UINT32 ipAddress, const PLAYER_LOGIN login, const OTP_NODE* otpNode, Auth::Dispatch& dispatch)
 {
-	char otpVersion[32], loginVersion[32], thisVersion[32] ;
-	teulGetAddress(otpNode->appVersion, otpVersion, 32) ;
-	teulGetAddress(login.appVersion, loginVersion, 32) ;
-	teulGetAddress(_thisVersion, thisVersion, 32) ;
+	char otpVersion[32], loginVersion[32], thisVersion[32];
+	teulGetAddress(otpNode->appVersion, otpVersion, 32);
+	teulGetAddress(login.appVersion, loginVersion, 32);
+	teulGetAddress(_thisVersion, thisVersion, 32);
 
 	dbugLog(_FLI, "LoginData OTP:%u otpV:%s loginV:%s appV:%s crs:%s"
 				, login.OTP, otpVersion, loginVersion, thisVersion, login.CopyRightString);
@@ -183,88 +186,88 @@ _processLoginData(const UINT32 ipAddress, const PLAYER_LOGIN login, const OTP_NO
 		dbugLog(_FLWB, "version mismatch");
 		dbugLog(_FLW,"this version = %x, otp appVersion is %x, login version is %x"
 				, _thisVersion, otpNode->appVersion, login.appVersion);
-		return -Teul::Errors::LoginFail_Client ;
+		return -Teul::Errors::LoginFail_Client;
 	}
 
-	const char* crs = (const char*)login.CopyRightString ;
+	const char* crs = (const char*)login.CopyRightString;
 	if ( *crs == 'R' )
-		++crs ;
+		++crs;
 
 	if ( isdigit(*crs) )
 	{
-		UINT32 custID = (UINT32)atol(crs) ;
+		UINT32 custID = (UINT32)atol(crs);
 		if ( custID != 0 && custID != otpNode->customerID )
 		{
 			dbugLog(_FLW,"login cookie doesn't match : R%d", otpNode->customerID);
 			dbugLog(_FLW,"player sent this cookie       : %s", login.CopyRightString);
-			return -Teul::Errors::LoginFail_SessionOwn ;
+			return -Teul::Errors::LoginFail_SessionOwn;
 		}
 	}
 	else if ( memcmp(AUTH_SEQ, login.CopyRightString, AUTH_SEQ_SIZE-1) != 0)
 	{
 		dbugLog(_FLW,"login cookie doesn't match : %s",AUTH_SEQ);
 		dbugLog(_FLW,"player sent this cookie       : %s", login.CopyRightString);
-		return -Teul::Errors::LoginFail_Validation ;
+		return -Teul::Errors::LoginFail_Validation;
 	}
 
-	_populateDispatch(ipAddress, login, otpNode, dispatch) ;
+	_populateDispatch(ipAddress, login, otpNode, dispatch);
 
-	return 0 ;
+	return 0;
 }
 
 static OTP_NODE*
 _findOTP(const UINT32 OTP)
 {
-	OTPS::iterator it = _otps.find(OTP) ;
-	return ( it != _otps.end() ) ? it->second : NULL ;
+	OTPS::iterator it = _otps.find(OTP);
+	return PN_LIKELY( it != _otps.end() ) ? it->second : nullptr;
 }
 
-static OTP_NODE*
+#if defined(AUTH_BYPASS)
+static OTP_NODE *
 _findCustomer(const UINT32 customerID)
 {
-	OTPS::iterator it = _custOtps.find(customerID) ;
-	return ( it != _custOtps.end() ) ? it->second : NULL ;
+	OTPS::iterator it = _custOtps.find(customerID);
+	return PN_LIKELY( it != _custOtps.end() ) ? it->second : nullptr;
 }
 
 static void
 _processBackDoor(PLAYER_LOGIN& login, Auth::Dispatch& dispatch)
 {
-#ifdef AUTH_BYPASS
-	static SINT32 backGameCallSign = 0;
-#endif
+	static std::atomic<UINT32> backGameCallsign { 0 };
 
 	if ( memcmp(AUTH_SEQ, login.CopyRightString, AUTH_SEQ_SIZE-1) != 0 )
 	{
-		snprintf(dispatch.m_callsign, MAX_HANDLE_LEN, "STAFF%05u", backGameCallSign++);
+		strprintf(dispatch.m_callsign, "STAFF%05u", backGameCallsign++);
 
-		const char* crs = (const char*)login.CopyRightString ;
+		const char* crs = (const char*)login.CopyRightString;
 
 		if ( *crs == 'R')
 		{
-			++crs ;
+			++crs;
 
 			dispatch.m_customerID = (UINT32)atol(crs);
-			const OTP_NODE* otpNode = _findCustomer(dispatch.m_customerID) ;
-			if ( otpNode != NULL )
+			const OTP_NODE* otpNode = _findCustomer(dispatch.m_customerID);
+			if ( otpNode != nullptr )
 			{
-				login.OTP = otpNode->OTP ;
+				login.OTP = otpNode->OTP;
 				// For some reason ipAddr needs to be zero here
-				_populateDispatch(0, login, otpNode, dispatch) ;
+				_populateDispatch(0, login, otpNode, dispatch);
 			}
 		}
 
-		dispatch.m_customerID = (UINT32)atol(crs) ;
+		dispatch.m_customerID = (UINT32)atol(crs);
 	}
 	else
 	{
 		dispatch.m_customerID = _bypassCustomerID;
-		snprintf(dispatch.m_callsign, MAX_HANDLE_LEN, "CRS%07u", backGameCallSign++);
+		strprintf(dispatch.m_callsign, "CRS%07u", backGameCallsign++);
 	}
 
-	login.OTP = dispatch.m_OTP = _bypassCustomerID++ ;
+	login.OTP = dispatch.m_OTP = _bypassCustomerID++;
 	dispatch.m_clientIP = 0;
 	dispatch.m_appVersion = login.appVersion;
 }
+#endif
 
 //////////////////////////////////////////////////////////////////////
 // Checks to see if the auth server has assigned the incoming
@@ -280,27 +283,27 @@ _processBackDoor(PLAYER_LOGIN& login, Auth::Dispatch& dispatch)
 SINT32
 authValidatePlayer(const UINT32 ipAddress, PLAYER_LOGIN& login, Auth::Dispatch& dispatch)
 {
-	memset(&dispatch, 0, sizeof(dispatch)) ;
+	memset(&dispatch, 0, sizeof(dispatch));
 
-	const OTP_NODE* const otpNode = _findOTP(login.OTP) ;
-	if ( otpNode != NULL )
+	const OTP_NODE* const otpNode = _findOTP(login.OTP);
+	if ( otpNode != nullptr )
 	{
-		return _processLoginData(ipAddress, login, otpNode, dispatch) ;
+		return _processLoginData(ipAddress, login, otpNode, dispatch);
 	}
 	else
 #ifdef AUTH_BYPASS
 	if ( login.OTP == AUTH_BYPASS_OTP )
 	{
-		_processBackDoor(login, dispatch) ;
-		return 0 ;
+		_processBackDoor(login, dispatch);
+		return 0;
 	}
 	else
 #endif
 	{
-		char address[65] ;
-		teulGetAddress(ipAddress, address, sizeof(address)) ;
+		char address[65];
+		teulGetAddress(ipAddress, address, sizeof(address));
 		dbugLog(_FLM, "otp:%u ip:%s otp not registered, session probably expired", login.OTP, address);
-		return -Teul::Errors::LoginFail_NoSession ;
+		return -Teul::Errors::LoginFail_NoSession;
 	}
 }
 
@@ -317,7 +320,7 @@ authInitAccept(UINT32 appVersion
 	{
 		_thisVersion = appVersion;
 
-		const SINT32 authVal = authInstallGameCallbacks(externErrorFn) ;
+		const SINT32 authVal = authInstallGameCallbacks(externErrorFn);
 		if ( authVal < 0)
 			return authVal;
 
@@ -332,46 +335,42 @@ authInitAccept(UINT32 appVersion
 SINT32
 authAcceptPlayer(const SINT32 teulIndex, const playerid_t playerIP, PLAYER_LOGIN& loginData)
 {
-	Auth::Dispatch dispatch ;
+	Auth::Dispatch dispatch;
 
-	const SINT32 validation = authValidatePlayer(playerIP, loginData, dispatch) ;
+	const SINT32 validation = authValidatePlayer(playerIP, loginData, dispatch);
 	if ( validation < 0 )
 	{
-		dbugLog(_FLA, "t:%d p:%u c:%s ip:%s otp:%u authValidatePlayer failed [%d]", teulIndex, dispatch.m_customerID, dispatch.m_callsign, teulGetAddress(playerIP), loginData.OTP, -validation) ;
-		return validation ;
+		dbugLog(_FLA, "t:%d p:%u c:%s ip:%s otp:%u authValidatePlayer failed [%d]", teulIndex, dispatch.m_customerID, dispatch.m_callsign, teulGetAddress(playerIP), loginData.OTP, -validation);
+		return validation;
 	}
 
-	SINT32 retval;
-	OTP_NODE* otpNode;
-
-	if (_playerAcceptFn == NULL)
-		retval = -EINVAL;
-	else
+	SINT32 retval = -EINVAL;
+	if (_playerAcceptFn != nullptr)
 		retval = (_playerAcceptFn) (teulIndex, &dispatch);
 
 	if ( !useAuthServer || _sendNotice == false || retval < 0 )
 	{
-		dbugLog(_FLD, "t:%d p:%u c:%s otp:%u validated", teulIndex, dispatch.m_customerID, dispatch.m_callsign, dispatch.m_OTP) ;
-		return retval ;
+		dbugLog(_FLD, "t:%d p:%u c:%s otp:%u validated", teulIndex, dispatch.m_customerID, dispatch.m_callsign, dispatch.m_OTP);
+		return retval;
 	}
 
 	if ( memcmp(dispatch.m_callsign,"CRS",3) == 0 )
 	{
-		dbugLog(_FLD, "t:%d p:%u c:%s otp:%u staff-validated", teulIndex, dispatch.m_customerID, dispatch.m_callsign, dispatch.m_OTP) ;
-		return retval ;
+		dbugLog(_FLD, "t:%d p:%u c:%s otp:%u staff-validated", teulIndex, dispatch.m_customerID, dispatch.m_callsign, dispatch.m_OTP);
+		return retval;
 	}
 
-	otpNode = _findOTP(loginData.OTP) ;
-	if ( otpNode == NULL || otpNode->fromAuth )
+	OTP_NODE* otpNode = _findOTP(loginData.OTP);
+	if ( otpNode == nullptr || otpNode->fromAuth )
 	{
-		dbugLog(_FLD, "t:%d p:%u c:%s otp:%u non-auth validated", teulIndex, dispatch.m_customerID, dispatch.m_callsign, dispatch.m_OTP) ;
-		return retval ;
+		dbugLog(_FLD, "t:%d p:%u c:%s otp:%u non-auth validated", teulIndex, dispatch.m_customerID, dispatch.m_callsign, dispatch.m_OTP);
+		return retval;
 	}
 
 	if ( g_logDebug )
 	{
-		char playerAddress[32] ;
-		teulGetAddress(playerIP, playerAddress, sizeof(playerAddress)) ;
+		char playerAddress[32];
+		teulGetAddress(playerIP, playerAddress, sizeof(playerAddress));
 		dbugLog(_FLD, "t:%d p:%u c:%s otp:%u validated, sending auth CLIENT_ENTER ar:%u ip:%u(%s)"
 						, teulIndex
 						, dispatch.m_customerID
@@ -380,7 +379,7 @@ authAcceptPlayer(const SINT32 teulIndex, const playerid_t playerIP, PLAYER_LOGIN
 						, Server::myServerInfo.stats.arenaID
 						, playerIP
 						, playerAddress
-						) ;
+						);
 	}
 
 	authSendClientAction(_authConnection, Server::myServerInfo.stats.arenaID, dispatch.m_customerID, CLIENT_ENTER, playerIP);
@@ -392,15 +391,15 @@ void
 _authOpened(ENDPOINT& endpoint)
 {
 	_authIsOpen = TRUE;
-	_authConnection = endpoint.teulIndex() ;
+	_authConnection = endpoint.teulIndex();
 
 	if ( _timeDown.time() != 0 )
 	{
-		if ( _externalErrorFn != NULL)
-			(_externalErrorFn) (endpoint.teulIndex(),  NULL, 0, NULL, ETEUL_AUTH_RESTARTED);
+		if ( _externalErrorFn != nullptr)
+			(_externalErrorFn) (endpoint.teulIndex(),  nullptr, 0, nullptr, ETEUL_AUTH_RESTARTED);
 
 	}
-	_timeDown.makeZero() ;
+	_timeDown.makeZero();
 
 	const SINT32 retval = teulSend(_authConnection, authGAME_INIT, &game);	///TODO:Optimize.
 	if ( retval < 0 )
@@ -432,14 +431,14 @@ SINT32 _openSendParent(UINT32 parentHost, UINT16 parentPort)
 	}
 
 	teulSyncClock();
-	const TeulTimeMS startTime = teulClock64 ;
-	const TeulTimeMS cutoff = startTime + 5000 ;
+	const TeulTimeMS startTime = teulClock64;
+	const TeulTimeMS cutoff = startTime + 5000;
 	while ( parentIsOpen == false )
 	{
 		if ( teulClock64 >= cutoff )
 		{
-			dbugLog(_FLA, "couldnt open parent connection start:%llu, tc64:%llu, elapsed:%llu", startTime, teulClock64, teulClock64 - startTime) ;
-			return -EINVAL ;
+			dbugLog(_FLA, "couldnt open parent connection start:%llu, tc64:%llu, elapsed:%llu", startTime, teulClock64, teulClock64 - startTime);
+			return -EINVAL;
 		}
 		teulUpdateTransport(25);
 	}
@@ -456,14 +455,14 @@ static void _authErrorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size,
 	if ( !useAuthServer || error != ENOTCONN || !_authIsOpen )
 	{
 		dbugWrite(_FLA,"received error %d on auth connection %d",error,teulIndex);
-		if ( _externalErrorFn != NULL)
+		if ( _externalErrorFn != nullptr)
 			(_externalErrorFn) (teulIndex,  data, size, object, error);
-		return ;
+		return;
 	}
 
 	if ( _timeDown.time() == 0)
 	{
-		_timeDown.makeCurrent() ;
+		_timeDown.makeCurrent();
 	}
 
 	if ( _timeDown.elapsed() <= MAX_AUTH_DOWN_TIMEOUT )
@@ -473,8 +472,8 @@ static void _authErrorFn(SINT32 teulIndex, const UCHAR* const data, SINT32 size,
 	}
 	else
 	{
-		dbugLog(_FLA,"can't restart auth connection time down: %lld", _timeDown.elapsed()) ;
-		if ( _externalErrorFn != NULL)
+		dbugLog(_FLA,"can't restart auth connection time down: %lld", _timeDown.elapsed());
+		if ( _externalErrorFn != nullptr)
 			(_externalErrorFn) (teulIndex,  data, size, object, ETEUL_AUTH_DOWN);
 	}
 }
@@ -506,7 +505,7 @@ SINT32 _openSend(APID appID, UINT32 arenaID, UINT32 hostVersion, UINT32 authHost
 	strcpy(game.hello,"Hello!");
 
 	_authConnection = teulOpenSend(_authHost, _authPort, _authOpened, CONNECT_TIMEOUT, PROTOCOL_TCP, _authErrorFn);
-	_timeOpen.makeCurrent() ;
+	_timeOpen.makeCurrent();
 
 	if (_authConnection < 0)
 	{
@@ -515,16 +514,16 @@ SINT32 _openSend(APID appID, UINT32 arenaID, UINT32 hostVersion, UINT32 authHost
 	}
 
 	teulSyncClock();
-	const TeulTimeMS startTime = teulClock64 ;
-	static const TeulTimeMS timeout_ms = 60 * 1000 ;
-	const TeulTimeMS cutoff    = startTime + timeout_ms ;
+	const TeulTimeMS startTime = teulClock64;
+	static const TeulTimeMS timeout_ms = 60 * 1000;
+	const TeulTimeMS cutoff    = startTime + timeout_ms;
 
 	while ( ! _authIsOpen )
 	{
 		if ( teulClock64 >= cutoff )
 		{
 			dbugLog(_FLA, "couldnt open auth connection to %s after %llums", teulGetAddress(authHost), teulClock64 - startTime);
-			return -EINVAL ;
+			return -EINVAL;
 		}
 		teulUpdateTransport(1000);
 	}
@@ -540,122 +539,123 @@ OTP_NODE::OTP_NODE(Auth::Dispatch& dispatch_, bool fromAuth_)
 	, appVersion(dispatch_.m_appVersion)
 	, fromAuth(fromAuth_)
 {
-	strncpy(handle, dispatch_.m_callsign, MAX_HANDLE_LEN) ;
+	strsafecpy(handle, dispatch_.m_callsign);
 
-	assert( _otps.find(OTP) == _otps.end() ) ;
-	_otps[OTP] = this ;
+	assert( _otps.find(OTP) == _otps.end() );
+	_otps[OTP] = this;
 
 	if ( g_logDebug )
 	{
-		static const size_t MAX_IP_LEN = 64 ;
-		char ip[MAX_IP_LEN+1], version[MAX_IP_LEN] ;
-		teulGetAddress(address, ip, MAX_IP_LEN) ;
-		teulGetAddress(appVersion, version, MAX_IP_LEN) ;
-		dbugLog(_FLD, "p:%u c:%s otp:%u ptr:%p ip:%s appVersion:%s +ALLOC {%" PRSizeT ",%" PRSizeT ",%" PRSizeT "}", customerID, handle, OTP, this, ip, version, _otps.size(), _pendingOtps.size(), _custOtps.size()) ;
+		static const size_t MAX_IP_LEN = 64;
+		char ip[MAX_IP_LEN+1], version[MAX_IP_LEN];
+		teulGetAddress(address, ip, MAX_IP_LEN);
+		teulGetAddress(appVersion, version, MAX_IP_LEN);
+		dbugLog(_FLD, "p:%u c:%s otp:%u ptr:%p ip:%s appVersion:%s +ALLOC {%" PRSizeT ",%" PRSizeT ",%" PRSizeT "}", customerID, handle, OTP, this, ip, version, _otps.size(), _pendingOtps.size(), _custOtps.size());
 	}
 }
 
 static void
 _removeFromOtps(OTP_NODE* node)
 {
-	auto it = _otps.find(node->OTP) ;
+	auto it = _otps.find(node->OTP);
 	if ( it != _otps.end() && it->second == node )
-		_otps.erase(it) ;
+		_otps.erase(it);
 }
 
 static void
 _removeFromPendingOtps(OTP_NODE* node)
 {
-	auto it = std::find(_pendingOtps.begin(), _pendingOtps.end(), node) ;
+	auto it = std::find(_pendingOtps.begin(), _pendingOtps.end(), node);
 	if ( it != _pendingOtps.end() )
 	{
-		*it = _pendingOtps.back() ;
-		_pendingOtps.pop_back() ;
+		*it = _pendingOtps.back();
+		_pendingOtps.pop_back();
 	}
 }
 
 static void
 _removeFromCustomerOtps(OTP_NODE* node)
 {
-	auto it = _custOtps.find(node->customerID) ;
+	auto it = _custOtps.find(node->customerID);
 	if ( it != _custOtps.end() && it->second == node )
-		_custOtps.erase(it) ;
+		_custOtps.erase(it);
 }
 
 OTP_NODE::~OTP_NODE()
 {
-	_removeFromOtps(this) ;
-	_removeFromPendingOtps(this) ;
-	_removeFromCustomerOtps(this) ;
+	_removeFromOtps(this);
+	_removeFromPendingOtps(this);
+	_removeFromCustomerOtps(this);
 
-	static const size_t MAX_IP_LEN = 64 ;
-	char ip[MAX_IP_LEN+1], version[MAX_IP_LEN] ;
-	teulGetAddress(address, ip, MAX_IP_LEN) ;
-	teulGetAddress(appVersion, version, MAX_IP_LEN) ;
+	static const size_t MAX_IP_LEN = 64;
+	char ip[MAX_IP_LEN+1], version[MAX_IP_LEN];
+	teulGetAddress(address, ip, MAX_IP_LEN);
+	teulGetAddress(appVersion, version, MAX_IP_LEN);
 
-	dbugLog(_FLN, "p:%u c:%s otp:%u ptr:%p ip:%s appVersion:%s -REL {%" PRSizeT ",%" PRSizeT ",%" PRSizeT "}", customerID, handle, OTP, this, ip, version, _otps.size(), _pendingOtps.size(), _custOtps.size()) ;
+	dbugLog(_FLN, "p:%u c:%s otp:%u ptr:%p ip:%s appVersion:%s -REL {%" PRSizeT ",%" PRSizeT ",%" PRSizeT "}", customerID, handle, OTP, this, ip, version, _otps.size(), _pendingOtps.size(), _custOtps.size());
 }
 
 static bool
 _registerLocalDispatch(Auth::Dispatch& dispatch, const bool fromAuth)
 {
-	OTP_NODE* node = _findOTP(dispatch.m_OTP) ;
-	if ( node == NULL )
+	OTP_NODE* node = _findOTP(dispatch.m_OTP);
+	if ( node == nullptr )
 	{
-		node = new OTP_NODE(dispatch, false) ;
+		node = new OTP_NODE(dispatch, false);
 	}
 	else
 	{
 		// Transfer from pending list.
-		_removeFromPendingOtps(node) ;
-		node->fromAuth = fromAuth ;
+		_removeFromPendingOtps(node);
+		node->fromAuth = fromAuth;
 	}
 
-	dbugLog(_FLD, "p:%u otp:%u -> custOtps", node->customerID, node->OTP) ;
+	dbugLog(_FLD, "p:%u otp:%u -> custOtps", node->customerID, node->OTP);
 
-	_custOtps[dispatch.m_customerID] = node ;
+	_custOtps[dispatch.m_customerID] = node;
 
-	return true ;
+	return true;
 }
 
 static bool
 _registerNewDispatch(Auth::Dispatch& dispatch)
 {
-	OTP_NODE* node = _findOTP(dispatch.m_OTP) ;
-	if ( node != NULL )
+	OTP_NODE* node = _findOTP(dispatch.m_OTP);
+	if ( node != nullptr )
 	{
-		dbugLog(_FLW, "otp:%u duplicate Auth::Dispatch for this OTP", dispatch.m_OTP) ;
-		return false ;
+		dbugLog(_FLW, "otp:%u duplicate Auth::Dispatch for this OTP", dispatch.m_OTP);
+		return false;
 	}
 
-	node = new OTP_NODE(dispatch, true) ;
+	node = new OTP_NODE(dispatch, true);
 
-	_pendingOtps.push_back(node) ;
+	_pendingOtps.push_back(node);
 
-	dbugLog(_FLD, "p:%u otp:%u -> pendingOtps [%llu]", node->customerID, node->OTP, node->timeOut) ;
+	dbugLog(_FLD, "p:%u otp:%u -> pendingOtps [%llu]", node->customerID, node->OTP, node->timeOut);
 
-	return true ;
+	return true;
 }
 
 void
 authExpirePendingOtps()
 {
-	static TeulTimeMS nextCheck = 0ULL ;
-	if ( teulClock64 < nextCheck )
-		return ;
-	nextCheck = teulClock64 + 500 ;
+	static TeulTimeMS nextCheck = 0ULL;
+	if ( _pendingOtps.empty() || teulClock64 < nextCheck )
+		return;
+	nextCheck = teulClock64 + 500;
 
-	auto it = _pendingOtps.begin() ;
-	while ( it != _pendingOtps.end() )
+	std::vector<OTP_NODE*> expiredNodes;
+	for (auto it = _pendingOtps.begin(), end = _pendingOtps.end(); it != end; ++it)
 	{
-		OTP_NODE* node = *it ;
-		if ( node->timeOut <= teulClock64 )
-		{
-			dbugLog(_FLM, "p:%u otp:%u OTP has expired", node->customerID, node->OTP) ;
-			delete node ;
-			continue ;
-		}
-		++it ;
+		OTP_NODE* node = *it;
+		if ( node && node->timeOut <= teulClock64 )
+			expiredNodes.push_back(node);
+	}
+
+	for (auto node : expiredNodes)
+	{
+		dbugLog(_FLM, "p:%u otp:%u OTP has expired", node->customerID, node->OTP);
+		delete node;
 	}
 }
 
@@ -663,7 +663,7 @@ authExpirePendingOtps()
 bool
 authRecordDispatch(Auth::Dispatch* dispatch, bool fromAuth)
 {
-	assert( dispatch != NULL ) ;
+	ABORT_IF( dispatch == nullptr );
 
 	dbugLog(_FLD,"p:%u c:%s otp:%u ip:%s new cookie %s"
 				, dispatch->m_customerID
@@ -671,23 +671,23 @@ authRecordDispatch(Auth::Dispatch* dispatch, bool fromAuth)
 				, dispatch->m_OTP
 				, teulGetAddress(dispatch->m_clientIP)
 				, ((fromAuth) ? "from auth" : "non-auth")
-				) ;
+				);
 
 	if ( fromAuth )
-		return _registerNewDispatch(*dispatch) ;
+		return _registerNewDispatch(*dispatch);
 	else
-		return _registerLocalDispatch(*dispatch, fromAuth) ;
+		return _registerLocalDispatch(*dispatch, fromAuth);
 }
 
 SINT32 authDeleteDispatch(Auth::Dispatch* dispatch)
 {
-	assert( dispatch != NULL ) ;
+	ABORT_IF( dispatch == nullptr );
 
-	auto it = _otps.find(dispatch->m_OTP) ;
-	if ( it == _otps.end() )
-		return -ENOENT ;
+	auto it = _otps.find(dispatch->m_OTP);
+	if ( PN_UNLIKELY(it == _otps.end()) )
+		return -ENOENT;
 
-	delete it->second ;
+	delete it->second;
 
 	return 0;
 }
@@ -695,7 +695,7 @@ SINT32 authDeleteDispatch(Auth::Dispatch* dispatch)
 SINT32 authUpdateServerLoad(SINT32 numPlayers, UINT32 hostAddress, UINT32 arenaID)
 {
 	if ( !useAuthServer )
-		return 0 ;
+		return 0;
 
 	AUTH_SERVER_LOAD loadMsg;
 
@@ -703,7 +703,7 @@ SINT32 authUpdateServerLoad(SINT32 numPlayers, UINT32 hostAddress, UINT32 arenaI
 	loadMsg.hostAddress = hostAddress;
 	loadMsg.arenaID = arenaID;
 
-	const SINT32 retval = teulSend(_authConnection, authSERVER_LOAD, &loadMsg) ;
+	const SINT32 retval = teulSend(_authConnection, authSERVER_LOAD, &loadMsg);
 	if ( retval < 0 )
 	{
 #ifdef DEBUG
@@ -720,16 +720,16 @@ SINT32 authUpdateServerLoad(SINT32 numPlayers, UINT32 hostAddress, UINT32 arenaI
 SINT32 authSetGameCapacity(SINT32 capacity, SINT32 totalPlayers, UINT32 arenaID, SINT32 lock)
 {
 	if ( !useAuthServer )
-		return 0 ;
+		return 0;
 
 	AUTH_GAME_CAPACITY message;
 
 	message.capacity = capacity;
 	message.totalPlayers = totalPlayers;
 	message.arenaID = arenaID;
-	message.lock = lock ;
+	message.lock = lock;
 
-	const SINT32 retval = teulSend(_authConnection, authGAME_CAPACITY, &message) ;
+	const SINT32 retval = teulSend(_authConnection, authGAME_CAPACITY, &message);
 	if ( retval < 0 )
 	{
 #ifdef DEBUG

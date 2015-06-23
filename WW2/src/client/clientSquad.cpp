@@ -89,5 +89,5 @@ const SquadMembers& ClientSquad::members(bool reset) const
 	if(reset)
 		m_modified = false;
 
-	return m_members ;
+	return m_members;
 }

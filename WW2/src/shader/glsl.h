@@ -17,7 +17,7 @@ public:
     ref_ptr<glslShader> loadFragmentShader(const char* shader);
     ref_ptr<glslShader> loadGeometryShader(const char* shader);
 
-    glslProgram* loadProgram(const char* name, const char* v = NULL, const char* f = NULL);
+    glslProgram* loadProgram(const char* name, const char* v = nullptr, const char* f = nullptr);
     glslProgram* getProgram(const char* name);
 
     void update();
@@ -33,10 +33,10 @@ private:
 
     void _loadShaderSource(glslShader* shader, const char* file);
 
-    std::map<std::string, ref_ptr<glslProgram> > _programs;
-    std::map<std::string, ref_ptr<glslShader> > _vshaders;
-    std::map<std::string, ref_ptr<glslShader> > _fshaders;
-    std::map<std::string, ref_ptr<glslShader> > _gshaders;
+    std::unordered_map<std::string, ref_ptr<glslProgram>> _programs;
+    std::unordered_map<std::string, ref_ptr<glslShader>> _vshaders;
+    std::unordered_map<std::string, ref_ptr<glslShader>> _fshaders;
+    std::unordered_map<std::string, ref_ptr<glslShader>> _gshaders;
 };
 
 extern OpenGLShader GLSL;
@@ -53,4 +53,3 @@ extern void glslSetTextureMatrix(int unit, const Matrixf& mat);
 extern void glslKill();
 
 extern void glslLoadGlobalUniforms(glslProgram* pgm);
-

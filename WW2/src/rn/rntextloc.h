@@ -14,7 +14,7 @@ enum ENUM_WW2_FONTS
     IDE_WW2_FONT_VERDANA16,
     IDE_WW2_FONT_VERDANA24,
     NUMBER_OF_WW2_FONTS
-} ;
+};
 
 /////////////////////////
 // STRUCTURES here.
@@ -30,7 +30,7 @@ struct LOCCHARLAYOUT
     FLOAT32 v1;
     FLOAT32 v2;
 
-} ;
+};
 
 struct LOCFONTLAYOUT
 {
@@ -38,7 +38,7 @@ struct LOCFONTLAYOUT
     SINT32 iHeight;
 
     LOCCHARLAYOUT charLayout[DEF_MAX_CHAR_LAYOUT];
-} ;
+};
 
 struct LOCCHAR
 {
@@ -46,7 +46,7 @@ struct LOCCHAR
 
     SINT32 iTexID;
 
-} ;
+};
 
 /////////////////////////////
 // LOGICAL return functions

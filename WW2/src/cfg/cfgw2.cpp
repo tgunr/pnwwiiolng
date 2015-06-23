@@ -50,7 +50,7 @@ int i;
 
 	for (i = 0; i < NumValues[Type]; ++i)
 	{
-		if (((char **) Defaults[Type])[i] != NULL)
+		if (((char **) Defaults[Type])[i] != nullptr)
 		{
 			if (strcmp(Value, ((char **) Defaults[Type])[i]) == 0)
 			{
@@ -99,7 +99,7 @@ int i, KeyType;
 
 	for (i = 0; i < cfgNUM_TOTAL_PARAMS; ++i)
 	{
-		if (ppVariables[i] != NULL)	//	_MASTER_VALUE_LIST
+		if (ppVariables[i] != nullptr)	//	_MASTER_VALUE_LIST
 		{
 			KeyType = cfgParameters[i].Type;
 			switch (KeyType)
@@ -157,7 +157,7 @@ FILE*	ConfigFile;
 	// Open File
 	ConfigFile = fopen(ConfigName, "rt");
 
-	if (NULL == ConfigFile)
+	if (nullptr == ConfigFile)
 	{
 		// try up a directory if not found
 #if platOS == OS_MACOS
@@ -168,7 +168,7 @@ FILE*	ConfigFile;
 		strcat(NewName, ConfigName);
 		ConfigFile = fopen(NewName, "rt");
 
-		if (NULL == ConfigFile)
+		if (nullptr == ConfigFile)
 		{
 			return TRUE; // Can't find the file, but that doesn't phase us! We are the
 		}	             // the config parser of peace, love, and happiness
@@ -185,7 +185,7 @@ FILE*	ConfigFile;
 	}
 
 
-	while (NULL != fgets(Line,256,ConfigFile))
+	while (nullptr != fgets(Line,256,ConfigFile))
 	{
 		// Trim white-space off of begining
 		for (i = 0; (Line[i] != 0) && (isspace(Line[i])); ++i)
@@ -250,7 +250,7 @@ FILE*	ConfigFile;
 		}
 
 		// Store Values
-		if (ppVariables[KeyIndex] != NULL)
+		if (ppVariables[KeyIndex] != nullptr)
 		{
 			switch (KeyType)
 			{
@@ -344,7 +344,7 @@ void* cfgGetListItemValue(void** list, int index)
 	void* rval;
 
 
-	rval = NULL;
+	rval = nullptr;
 
 	if(index >= 0 && index < cfgNUM_TOTAL_PARAMS)
 	{

@@ -17,10 +17,10 @@ namespace Server
 	class PersonaLogin : public PersonaXfer
 	{
 		public: PersonaLogin(const Auth::Dispatch& _dispatch)
-			: PersonaXfer(XferReason::Login, _dispatch, 0, 0ULL, 0)
+			: PersonaXfer(XferReason::Login, _dispatch, 0, nullptr, 0)
 			{}
 
 		virtual ~PersonaLogin() {}
-	} ;
+	};
 }
 
