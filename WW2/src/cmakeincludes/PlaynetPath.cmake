@@ -19,8 +19,8 @@ ELSE ( )
 	SET(_PLAYNET_PATH_VAR "${_PLAYNET}")
 ENDIF ( )
 
-# The top level path must exist before we'll continue.
-IF ( NOT IS_DIRECTORY "${_PLAYNET}" )
+# For a local server, the top level path must exist before we'll continue.
+IF ( WIN32 AND NOT IS_DIRECTORY "${_PLAYNET}" )
 	MESSAGE(FATAL_ERROR "${_PLAYNET} does not exist or PN_PLAYNET_PATH is not configured.")
 ENDIF ( )
 
