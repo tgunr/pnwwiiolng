@@ -94,74 +94,76 @@ MESSAGE(STATUS "${PN_BUILD_TYPE}/${BUILDNAME} build. Opt:${OPTIMIZATION}, MEM:${
 ######################################################################
 #### Code Generators.
 
-SET(OMG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/omg")
-SET(OMGGEN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/omggen")
+IF ( WIN32 )
+	SET(OMG_DIR "${CMAKE_CURRENT_SOURCE_DIR}/omg")
+	SET(OMGGEN_DIR "${CMAKE_CURRENT_SOURCE_DIR}/omggen")
 
-# bison first, then flex.
-IF(WIN32)
-    SET(BISON_EXE "${OMGGEN_DIR}/win_bison.exe")
-    SET(FLEX_EXE "${OMGGEN_DIR}/win_flex.exe")
-ELSE( )
-    SET(BISON_EXE "bison")
-    SET(FLEX_EXE "flex")
+	# bison first, then flex.
+	IF(WIN32)
+		SET(BISON_EXE "${OMGGEN_DIR}/win_bison.exe")
+		SET(FLEX_EXE "${OMGGEN_DIR}/win_flex.exe")
+	ELSE( )
+		SET(BISON_EXE "bison")
+		SET(FLEX_EXE "flex")
+	ENDIF( )
+
+	ADD_CUSTOM_COMMAND(OUTPUT ${OMGGEN_DIR}/omggen.tab.cpp ${OMGGEN_DIR}/omggen.tab.h
+		PRE_BUILD
+		COMMAND ${BISON_EXE}
+		ARGS -o omggen.tab.cpp --defines=omggen.tab.h --report=all omggen.y
+		DEPENDS "${OMGGEN_DIR}/omggen.y"
+		MAIN_DEPENDENCY "${OMGGEN_DIR}/omggen.y"
+		COMMENT "[BISON] Building OMGGEN"
+		WORKING_DIRECTORY ${OMGGEN_DIR}
+	)
+	ADD_CUSTOM_COMMAND(OUTPUT ${OMGGEN_DIR}/omggen.yy.cpp ${OMGGEN_DIR}/omggen.yy.h
+		PRE_BUILD
+		COMMAND ${FLEX_EXE}
+		ARGS -o omggen.yy.cpp -B --nounistd --header-file=omggen.yy.h omggen.l
+		DEPENDS ${OMGGEN_DIR}/omggen.l ${OMGGEN_DIR}/omggen.tab.h
+		MAIN_DEPENDENCY "${OMGGEN_DIR}/omggen.l"
+		COMMENT "[FLEX] Building OMGGEN"
+		WORKING_DIRECTORY ${OMGGEN_DIR}
+	)
+	ADD_EXECUTABLE(omggen
+		omggen/omggen.tab.cpp
+			omggen/omggen.tab.h
+		omggen/omggen.yy.cpp
+			omggen/omggen.yy.h
+		omggen/omggen.cpp
+			omggen/omggen.h
+		omggen/omggen.y
+		omggen/omggen.l
+	)
+	IF(WIN32)
+		SET_PROPERTY(TARGET omggen PROPERTY COMPILE_DEFINITIONS __STDC_VERSION__=199901L)
+	ENDIF()
+
+	MACRO(ADD_OMG_TARGET _TARGET)
+		SET(_TARGET_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/${_TARGET}")
+		GET_FILENAME_COMPONENT(_TARGET_PREFIX ${_TARGET_PREFIX} ABSOLUTE)
+		GET_FILENAME_COMPONENT(_TARGET_PATH ${_TARGET_PREFIX}.omg DIRECTORY)
+		GET_FILENAME_COMPONENT(_FILENAME ${_TARGET_PREFIX} NAME)
+		ADD_CUSTOM_COMMAND(
+			PRE_BUILD
+			OUTPUT  ${_TARGET_PREFIX}.cxx ${_TARGET_PREFIX}.hxx
+			DEPENDS omggen ${_TARGET_PATH}/typedefs.omg ${_TARGET_PREFIX}.omg
+			MAIN_DEPENDENCY ${_TARGET_PREFIX}.omg
+			COMMENT "[OMG] ${_FILENAME}.omg"
+			COMMAND omggen
+			ARGS -D${_TARGET_PATH} --cxx=${_FILENAME}.cxx --hxx=${_FILENAME}.hxx ${_FILENAME}.omg
+			WORKING_DIRECTORY ${_TARGET_PATH}
+		)
+	ENDMACRO()
+
+	ADD_OMG_TARGET(omg/omgMissionSortieData)
+	ADD_OMG_TARGET(omg/omgChat)
+
+	IF(NOT MSVC)
+		SET_TARGET_PROPERTIES(omggen PROPERTIES COMPILE_FLAGS "-O3 -march=native -mtune=native -Wno-error -Wno-all -Wno-format-security") #
+	ENDIF( )
+	SET_PROPERTY(TARGET omggen PROPERTY FOLDER "Tools")
 ENDIF( )
-
-ADD_CUSTOM_COMMAND(OUTPUT ${OMGGEN_DIR}/omggen.tab.cpp ${OMGGEN_DIR}/omggen.tab.h
-    PRE_BUILD
-    COMMAND ${BISON_EXE}
-    ARGS -o omggen.tab.cpp --defines=omggen.tab.h --report=all omggen.y
-    DEPENDS "${OMGGEN_DIR}/omggen.y"
-    MAIN_DEPENDENCY "${OMGGEN_DIR}/omggen.y"
-    COMMENT "[BISON] Building OMGGEN"
-    WORKING_DIRECTORY ${OMGGEN_DIR}
-)
-ADD_CUSTOM_COMMAND(OUTPUT ${OMGGEN_DIR}/omggen.yy.cpp ${OMGGEN_DIR}/omggen.yy.h
-    PRE_BUILD
-    COMMAND ${FLEX_EXE}
-    ARGS -o omggen.yy.cpp -B --nounistd --header-file=omggen.yy.h omggen.l
-    DEPENDS ${OMGGEN_DIR}/omggen.l ${OMGGEN_DIR}/omggen.tab.h
-    MAIN_DEPENDENCY "${OMGGEN_DIR}/omggen.l"
-    COMMENT "[FLEX] Building OMGGEN"
-    WORKING_DIRECTORY ${OMGGEN_DIR}
-)
-ADD_EXECUTABLE(omggen
-    omggen/omggen.tab.cpp
-        omggen/omggen.tab.h
-    omggen/omggen.yy.cpp
-        omggen/omggen.yy.h
-    omggen/omggen.cpp
-        omggen/omggen.h
-    omggen/omggen.y
-    omggen/omggen.l
-)
-IF(WIN32)
-    SET_PROPERTY(TARGET omggen PROPERTY COMPILE_DEFINITIONS __STDC_VERSION__=199901L)
-ENDIF()
-
-MACRO(ADD_OMG_TARGET _TARGET)
-    SET(_TARGET_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/${_TARGET}")
-    GET_FILENAME_COMPONENT(_TARGET_PREFIX ${_TARGET_PREFIX} ABSOLUTE)
-    GET_FILENAME_COMPONENT(_TARGET_PATH ${_TARGET_PREFIX}.omg DIRECTORY)
-    GET_FILENAME_COMPONENT(_FILENAME ${_TARGET_PREFIX} NAME)
-    ADD_CUSTOM_COMMAND(
-        PRE_BUILD
-        OUTPUT  ${_TARGET_PREFIX}.cxx ${_TARGET_PREFIX}.hxx
-        DEPENDS omggen ${_TARGET_PATH}/typedefs.omg ${_TARGET_PREFIX}.omg
-        MAIN_DEPENDENCY ${_TARGET_PREFIX}.omg
-        COMMENT "[OMG] ${_FILENAME}.omg"
-        COMMAND omggen
-        ARGS -D${_TARGET_PATH} --cxx=${_FILENAME}.cxx --hxx=${_FILENAME}.hxx ${_FILENAME}.omg
-        WORKING_DIRECTORY ${_TARGET_PATH}
-    )
-ENDMACRO()
-
-ADD_OMG_TARGET(omg/omgMissionSortieData)
-ADD_OMG_TARGET(omg/omgChat)
-
-IF(NOT MSVC)
-    SET_TARGET_PROPERTIES(omggen PROPERTIES COMPILE_FLAGS "-O3 -march=native -mtune=native -Wno-error -Wno-all -Wno-format-security") #
-ENDIF( )
-SET_PROPERTY(TARGET omggen PROPERTY FOLDER "Tools")
 
 ######################################################################
 #### Libraries.
