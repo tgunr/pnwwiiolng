@@ -12,7 +12,7 @@ ENDIF ( )
 FILE(TO_CMAKE_PATH "${PN_PLAYNET_PATH}" PN_PLAYNET_PATH)
 
 # Actual installation directory may be different if, for example, building on a separate sever.
-SET(PN_INSTALL_PATH "${_PLAYNET}")
+SET(PN_INSTALL_PATH "${PN_PLAYNET_PATH}")
 
 FILE(TO_NATIVE_PATH "${PN_INSTALL_PATH}" _PLAYNET)
 IF ( WIN32 )
