@@ -16,6 +16,7 @@ Schema::Schema(DBHANDLE& dbh_, const char* const database_)
 {
 }
 
+#if 0
 static unsigned int
 _getDatabaseSchema(DBHANDLE& dbh, const char* const database)
 {
@@ -43,6 +44,7 @@ _getDatabaseSchema(DBHANDLE& dbh, const char* const database)
 
 	return 0;
 }
+#endif
 
 
 void
