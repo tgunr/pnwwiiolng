@@ -2,9 +2,9 @@
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros">
-    <BinOutDir>$(SolutionDir)$(Configuration)\Bin\</BinOutDir>
-    <LibOutDir>$(SolutionDir)$(Configuration)\Lib\</LibOutDir>
-    <IntOutDir>$(SolutionDir)$(Configuration)\Tmp\$(TargetName)\</IntOutDir>
+    <BinOutDir>$(SolutionDir)build\client\$(Configuration)\Bin\</BinOutDir>
+    <LibOutDir>$(SolutionDir)build\client\$(Configuration)\Lib\</LibOutDir>
+    <IntOutDir>$(SolutionDir)build\client\$(Configuration)\Tmp\$(TargetName)\</IntOutDir>
   </PropertyGroup>
   <PropertyGroup />
   <ItemDefinitionGroup />
