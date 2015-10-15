@@ -11,8 +11,8 @@ ELSE ( )
 ENDIF ( )
 FILE(TO_CMAKE_PATH "${PN_PLAYNET_PATH}" PN_PLAYNET_PATH)
 
-# Actual installation directory may be different if, for example, building on a separate sever.
-SET(PN_INSTALL_PATH "${PN_PLAYNET_PATH}")
+SET( PN_INSTALL_PATH "${PN_PLAYNET_PATH}" CACHE STRING "The location the build should be placed in." )
+FILE(TO_CMAKE_PATH "${PN_INSTALL_PATH}" PN_INSTALL_PATH)
 
 FILE(TO_NATIVE_PATH "${PN_INSTALL_PATH}" _PLAYNET)
 IF ( WIN32 )
