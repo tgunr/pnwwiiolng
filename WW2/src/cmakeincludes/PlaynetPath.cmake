@@ -11,7 +11,10 @@ ELSE ( )
 ENDIF ( )
 FILE(TO_CMAKE_PATH "${PN_PLAYNET_PATH}" PN_PLAYNET_PATH)
 
-FILE(TO_NATIVE_PATH "${PN_PLAYNET_PATH}" _PLAYNET)
+# Actual installation directory may be different if, for example, building on a separate sever.
+SET(PN_INSTALL_PATH "${_PLAYNET}")
+
+FILE(TO_NATIVE_PATH "${PN_INSTALL_PATH}" _PLAYNET)
 IF ( WIN32 )
 	# Make an escaped version for the config file.
 	STRING(REGEX REPLACE "\\\\" "\\\\\\\\" _PLAYNET_PATH_VAR "${_PLAYNET}") 
@@ -19,9 +22,9 @@ ELSE ( )
 	SET(_PLAYNET_PATH_VAR "${_PLAYNET}")
 ENDIF ( )
 
-# For a local server, the top level path must exist before we'll continue.
-IF ( WIN32 AND NOT IS_DIRECTORY "${_PLAYNET}" )
-	MESSAGE(FATAL_ERROR "${_PLAYNET} does not exist or PN_PLAYNET_PATH is not configured.")
+# The installation directory must exist before we'll continue.
+IF ( NOT IS_DIRECTORY "${_PLAYNET}" )
+	MESSAGE(FATAL_ERROR "${_PLAYNET} does not exist or PN_INSTALL_PATH is not configured.")
 ENDIF ( )
 
 # History:
