@@ -18,18 +18,18 @@ CallbackRegister::_error(SINT32 teulIndex, const UCHAR* const data, SINT32 size,
 	dbugLog(_FLA, "t:%d error %d in teulCallback %p data %p size %d", teulIndex, error, static_cast<const void*>(object), data, size);
 }
 
-CallbackRegister::CallbackRegister(UCHAR callX)
+CallbackRegister::CallbackRegister(UCHAR x)
 {
-	sm_ci.callX = callX;
+	sm_ci.callX = x;
 	sm_ci.error = CallbackRegister::_error;
 }
 
 TEUL_CALLBACK*
-CallbackRegister::callback(UCHAR callY, ACTION_FN sendFn, ACTION_FN recvFn)
+CallbackRegister::callback(UCHAR y, ACTION_FN sendFn, ACTION_FN recvFn)
 {
 	try
 	{
-		sm_ci.callY = callY;
+		sm_ci.callY = y;
 		sm_ci.sendAction = sendFn;
 		sm_ci.recvAction = recvFn;
 		TEUL_CALLBACK* const newRef = teulAllocCallback(&sm_ci);
@@ -42,7 +42,7 @@ CallbackRegister::callback(UCHAR callY, ACTION_FN sendFn, ACTION_FN recvFn)
 	catch (std::exception& e)
 	{
 		char buf[201];
-		strprintf(buf, "Unable to register %u/%u: %s", sm_ci.callX, callY, e.what());
+		strprintf(buf, "Unable to register %u/%u: %s", sm_ci.callX, y, e.what());
 		throw std::runtime_error(buf);	///Terminal
 	}
 }
