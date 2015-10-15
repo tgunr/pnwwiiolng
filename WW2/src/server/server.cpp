@@ -1900,10 +1900,10 @@ void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType, ERRO
 			if (cliOptions[i].wantParameter)
 			{
 				if (++argn >= argc)
-					LogAbort("'%s' switch expects an argument", cliOptions[i]);
+					LogAbort("'%s' switch expects an argument", cliOptions[i].command);
 				param = argv[argn];
 				if (param[0] == '-')
-					LogAbort("'%s' switch expects an argument, got '%s'", cliOptions[i], argv[argn]);
+					LogAbort("'%s' switch expects an argument, got '%s'", cliOptions[i].command, argv[argn]);
 			}
 			cliOptions[i].callback(param);
 			break;
