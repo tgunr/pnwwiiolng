@@ -674,8 +674,10 @@ updtPackWORLD_UPDATE(const LOGICAL mode, UCHAR* data, SINT32 offset, WORLD_UPDAT
 {
 	TIMER_USE_HERE
 
+#ifndef NDEBUG // HACK
 	ON_SERVER(  const HostVehicle* const myVehicle = wu->myVehicle  );
 	ON_SERVER(  assert( myVehicle != nullptr )  );
+#endif
 	ON_SERVER(  VEHICLE_UPDATE_HEADER vhdr  );
 
 	TIMER_ACCUMULATOR(pack_initvh);
