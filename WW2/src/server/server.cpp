@@ -1920,12 +1920,12 @@ void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType, ERRO
 	if (retval != 0)
 		LogAbort("Unable to initialize transport: %d", retval);
 
-	// Let the controller know we are here.
-	_connectToController();
-
 	serverEnableDebugWebServer(serverType);
 
 	serverInitAddresses();
+
+	if ( Server::IsBroadcastViaController() )
+		_connectToController();
 
 	dbugLog(_FLI, "%s started, compiled %s %s", appName, __DATE__, __TIME__);
 }
