@@ -52,7 +52,7 @@ ENDIF ( )
 
 # We put the host stuff in a different folder for China.
 IF ( NOT CHINA )
-	set(CMAKE_INSTALL_PREFIX "${PN_INSTALL_PATH}" CACHE FILEPATH "Installation directory")
+	set(CMAKE_INSTALL_PREFIX "${PN_INSTALL_PATH}/wwiiol" CACHE FILEPATH "Installation directory")
 ELSE ( )
 	set(CMAKE_INSTALL_PREFIX "/playnet/builds/china/binary/wwiiol" CACHE FILEPATH "Installation directory")
 ENDIF ( )
