@@ -189,25 +189,24 @@ END_MESSAGE_MAP()
 
 static bool _lookupAuthHost()
 {
-	char hostPortString[257];
-	hostPortString[0] = 0;
+	g_authPort = WWII::Net::Ports::AuthHost ;
 
-	g_authPort = WWII::Net::Ports::AuthHost;
+	bool auth_override = (g_authHostName[0] != '\0') ;
+	if ( auth_override )
+		dbugLog(_FLI, "'%s' was passed in as a command-line argument. Forcing its use as the authhost.", g_authHostName) ;
 
-	if ( !Teul::GetIPs(g_region.authSuffix().c_str(), g_authHosts) || g_authHosts.empty() )
-	{
-		strprintf(g_authHostName, "auth%s", g_region.authSuffix().c_str());
-		if ( !Teul::GetIPs(g_authHostName, g_authHosts) || g_authHosts.empty() )
-		{
+	if ( auth_override || !Teul::GetIPs(g_region.authSuffix().c_str(), g_authHosts) || g_authHosts.empty() ) {
+		if ( ! auth_override )
+			strprintf(g_authHostName, "auth%s", g_region.authSuffix().c_str());
+
+		if ( !Teul::GetIPs(g_authHostName, g_authHosts) || g_authHosts.empty() ) {
 			dbugLog(_FLW, "lookup(%s) no addresses", g_authHostName);
 			return false;
 		}
 	}
-
 	// Copy the list to a permanent home
 	dbugLog(_FLI, "lookup(%s) gave", g_authHostName);
-	for ( auto ip : g_authHosts )
-	{
+	for ( auto ip : g_authHosts ) {
 		dbugLog(_FLIB, " %s", teulGetAddress(ip));
 	}
 
