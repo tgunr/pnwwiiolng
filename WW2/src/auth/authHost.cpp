@@ -905,7 +905,10 @@ main(int argc, const char* argv[])
 	if (tcpconnection < 0)
 		LogAbort("Error allocating endpoint!");
 
-	const SINT32 gameConnection = teulOpenListen(WWII::Net::Ports::InternalAuth, _acceptGameConnection, GAME_TIMEOUT, PROTOCOL_CTRL, _gameErrorFunction);
+#if platOS == OS_WIN32
+	#error The following should use PROTOCAL_TCP, but this needs to be detected properly to avoid ugly ifdefs like this one.
+#endif
+	const SINT32 gameConnection = teulOpenListen(WWII::Net::Ports::InternalAuth, _acceptGameConnection, GAME_TIMEOUT, PROTOCOL_TCP, _gameErrorFunction);
 	if ( gameConnection < 0 )
 		LogAbort("failed to open game listening socket");
 
