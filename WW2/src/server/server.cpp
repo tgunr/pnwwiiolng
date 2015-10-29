@@ -868,6 +868,10 @@ _addServer(Server::ServerInfo* const server)
 	if ( PN_UNLIKELY(server == nullptr|| server->stats.type < 0 || server->stats.type >= MAX_SERVER_TYPE) )
 		LogAbort("Tried to add invalid server.");
 
+	// HACK: The list expects the IP to be the broadcast address, but for some reason the server is connecting
+	// with its actual address.
+	server->stats.address = Server::BroadcastMaskAddress(server->stats.address);
+
 	dbugLog(_FLD, "adding %s server on %s", g_serverTypes[server->stats.type], teulGetAddress(server->stats.address));
 
 	Server::ServerInfo* oldServer = Server::ServerInfo::GetByID(server->stats.id);
