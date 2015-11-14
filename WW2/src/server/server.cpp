@@ -1657,9 +1657,9 @@ _controllerConnect(ENDPOINT& endpoint)
 }
 
 static void
-_controllerError(SINT32, const UCHAR* const, SINT32, const struct TEUL_CALLBACK* const, SINT32)
+_controllerError(SINT32, const UCHAR* const, SINT32, const struct TEUL_CALLBACK* const, SINT32 error)
 {
-	dbugLog(_FLA, "error on controller connection shutting down");
+	dbugLog(_FLA, "Experienced %d error on controller connection.", error);
 }
 
 void _connectToController()
