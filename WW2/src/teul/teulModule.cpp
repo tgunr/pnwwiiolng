@@ -367,7 +367,7 @@ _bindAndListen(ENDPOINT& endpoint)
 	if ( listen(endpoint.socket, MAX_ACCEPT_BACKLOG) < 0 )
 		throw Teul::OpenError("listen failed");
 
-	dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " listening socket", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket));
+	dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " listening socket on %s:%u", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), teulGetAddress(endpoint.destAddress()), endpoint.destPort());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -406,7 +406,7 @@ _connectSocket(ENDPOINT& endpoint)
 		assert( endpoint.m_impl->pollSlot() < 0 );
 #endif
 
-		dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " connecting", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket));
+		dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " connecting on %s:u", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), teulGetAddress(endpoint.destAddress()), endpoint.destPort());
 
 		break;
 	}
