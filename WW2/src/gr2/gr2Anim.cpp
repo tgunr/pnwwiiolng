@@ -1952,7 +1952,7 @@ LOGICAL gr2AnimGetBoneMatrix (struct OBJECT* pObject, piMATRIX* pMatrix, const c
 
 	if (!weapModel)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2AnimGetBoneMatrix: nullptr weapon model");
+		Write_Log (LOG_FPS, LOG_INFO, "gr2AnimGetBoneMatrix: Null weapon model");
 		return FALSE;
 	}
 
@@ -2218,7 +2218,7 @@ LOGICAL gr2AnimGetEjectPointMatrix (OBJECT* pObject, piMATRIX* pMatrix, bool vis
 
 	if (!weapModel)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2AnimGetEjectPointMatrix: nullptr weapon model");
+		Write_Log (LOG_FPS, LOG_INFO, "gr2AnimGetEjectPointMatrix: Null weapon model");
 		return FALSE;
 	}
 
@@ -5775,7 +5775,7 @@ SINT32 gr2GetSurfaceIDUnderfoot(vehVehicle*vehicle, FLOAT64VECTOR* offset)
 				if (pObject->texname)
 					Write_Log (LOG_FPS, LOG_INFO, "Troop foot on texture <%s>, surface ID <%d>", pObject->texname, surfID);
 				else
-					Write_Log (LOG_FPS, LOG_INFO, "Troop foot on nullptr texture, surface ID <%d>", surfID);
+					Write_Log (LOG_FPS, LOG_INFO, "Troop foot on Null texture, surface ID <%d>", surfID);
 			}
 		}
 
@@ -5973,13 +5973,6 @@ bool gr2AnimVisualAttack(gr2AnimTrooper* model, SINT32 attack)
 		switch(model->currentWeaponType)
 		{
 			case TPS_WEAPONTYPE_GRENADE:
-			{
-				model->nextVisualAttack = frametime + 1900;
-				model->overrideTime		= model->nextVisualAttack;
-				model->overrideWeapon	= model->currentWeapon;
-				model->overridePoint	= attack;
-			}
-			break;
 			case TPS_WEAPONTYPE_KNIFE:
 			case TPS_WEAPONTYPE_LTMORTAR:
 			case TPS_WEAPONTYPE_SATCHEL:

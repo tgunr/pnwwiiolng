@@ -17,8 +17,6 @@
 #define _AMMOCD_FLAG_ISTREE                     0x00000080
 #define ODE_TREE_COLLISION                      0x00000100
 
-#define max_trajectory_steps    64
-
 class physicsBody;
 
 struct weapAmmo
@@ -76,23 +74,6 @@ struct weapAmmo
 	FLOAT32 VarFuzeInterval;
 };
 
-struct AmmoTrajectory
-{
-	void Reset()
-	{
-		points.clear();
-		fireMatrix.identity();
-		impactPosition.set(0,0,0);
-		impactNormal.set(0,0,0);
-	}
-
-	Matrixd fireMatrix;
-	Vec3d impactPosition;
-	Vec3d impactNormal;
-	std::vector<Vec3d> points;
-};
-
-
 struct vehVehicle;
 
 extern FLOAT32 G1MachChart[G1_CHART_NUM_DIVISIONS];
@@ -111,23 +92,6 @@ struct weapAmmoType* 	weapFindAmmoTypeByIndex(UINT32 i);
 void weapAmmoSetTorpedoRunDepth(FLOAT32);
 void weapAmmoSetFuzeInterval(FLOAT32);
 FLOAT32 weapAmmoGetFuzeInterval(void);
-
-// ammo is the ammo to track
-// fire pos is the position to fire from
-// fire att is a vector with positive y pointing in the direction of fire
-AmmoTrajectory& weapAmmoTrajectory(const weapAmmoType* ammo,
-								   const Matrixd& fireMat,
-								   FLOAT64 speed,
-								   FLOAT64 timeStep,
-								   SINT32 maxSteps);
-
-void weapAmmoTrajectory(AmmoTrajectory& trajectory,
-						const weapAmmoType* ammo,
-						const Matrixd& fireMat,
-						FLOAT64 speed,
-						FLOAT64 timeStep,
-						SINT32 maxSteps);
-
 
 UINT32 	weapUpdate(void);
 UINT32 	weapUpdateVehicleHitmap(struct vehVehicle* InVehicle);

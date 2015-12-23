@@ -39,8 +39,6 @@ enum fpFPSControlBlocks
 #define WADE_COLLIDER COLLIDER_TRN_WATER
 #define AREA_COLLIDER COLLIDER_STO
 
-struct AmmoTrajectory;
-
 /*
 // fps collider numbers; for tracking
 enum fpFPSColliders
@@ -274,5 +272,4 @@ extern void fpFPSGetInfantryData(fpFPSInfantryData& modelData);
 extern LOGICAL	fpFPSUpdateInfantry(FLOAT64 DeltaTime);
 
 extern FLOAT32 fpFPSGetGrenadeThrowPower();
-extern AmmoTrajectory* fpFPSGetTrajectory();
 extern bool fpFPSCanProjectGrenade();

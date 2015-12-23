@@ -1290,7 +1290,7 @@ LOGICAL gr2AttachModel (gr2Model* model, SCHAR* attachBone, gr2Model* attachToMo
 
 	if (!model)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "nullptr model passed to gr2AttachModel!");
+		Write_Log (LOG_FPS, LOG_INFO, "Null model passed to gr2AttachModel!");
 		return FALSE;
 	}
 
@@ -1341,7 +1341,7 @@ LOGICAL gr2AttachModelByIndex (gr2Model* model, int attachBone, gr2Model* attach
 {
 	if (!model)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "nullptr model passed to gr2AttachModel!");
+		Write_Log (LOG_FPS, LOG_INFO, "Null model passed to gr2AttachModel!");
 		return FALSE;
 	}
 
@@ -1382,19 +1382,19 @@ gr2Control* gr2PlayAnimation (gr2Model* model, gr2Animation* animation)
 
 	if (!model)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "ERROR:  nullptr model passed to gr2PlayAnimation!");
+		Write_Log (LOG_FPS, LOG_INFO, "ERROR:  Null model passed to gr2PlayAnimation!");
 		return nullptr;
 	}
 
 	if (!animation)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "ERROR:  nullptr animation passed to gr2PlayAnimation!");
+		Write_Log (LOG_FPS, LOG_INFO, "ERROR:  Null animation passed to gr2PlayAnimation!");
 		return nullptr;
 	}
 
 	if (!(animation->animation))
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "ERROR:  empty animation (nullptr gr2 animation) passed to gr2PlayAnimation!");
+		Write_Log (LOG_FPS, LOG_INFO, "ERROR:  Null gr2 animation passed to gr2PlayAnimation!");
 		return nullptr;
 	}
 
@@ -1437,7 +1437,7 @@ LOGICAL gr2PlayBlendedAnimationFull (gr2Model* model, gr2AnimationBlend* blend, 
 	{
 		if (!blend)
 		{
-			Write_Log (LOG_FPS, LOG_INFO, "gr2PlayBlendedAnimation: nullptr blend!");
+			Write_Log (LOG_FPS, LOG_INFO, "gr2PlayBlendedAnimation: Null blend!");
 			return FALSE;
 		}
 		if (!blend->animations[0])
@@ -1566,7 +1566,7 @@ gr2ControlBlend* gr2BlendControlFindRunningBlend (gr2Model* model, gr2AnimationB
 {
 	if (!model)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlFindRunningBlend: nullptr model passed");
+		Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlFindRunningBlend: Null model passed");
 		return nullptr;
 	}
 
@@ -1578,7 +1578,7 @@ gr2ControlBlend* gr2BlendControlFindRunningBlend (gr2Model* model, gr2AnimationB
 
 	if ((!animationBlend) || (!animationBlend->animations[0])  || (!animationBlend->numBlends))
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlFindRunningBlend: nullptr data passed");
+		Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlFindRunningBlend: Null data passed");
 		return nullptr;
 	}
 
@@ -1629,7 +1629,7 @@ void gr2BlendControlSetWeight (gr2Model* model,
 		if (animationBlend)
 			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetWeight: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetWeight: nullptr animationBlend");
+			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetWeight: Null animationBlend");
 		*/
 
 		return;
@@ -1682,7 +1682,7 @@ void gr2BlendControlSetLastFrame (gr2Model* model, gr2AnimationBlend* animationB
 		if (animationBlend)
 			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetLastFrame: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetLastFrame: nullptr animationBlend");
+			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetLastFrame: Null animationBlend");
 		return;
 	}
 
@@ -1702,7 +1702,7 @@ void gr2BlendControlSetLoopCount (gr2Model* model, gr2AnimationBlend* animationB
 		if (animationBlend)
 			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetLoopCount: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetLoopCount: nullptr animationBlend");
+			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetLoopCount: Null animationBlend");
 		return;
 	}
 
@@ -1726,7 +1726,7 @@ void gr2BlendControlSetLoopCountForGrenade (gr2Model* model, gr2AnimationBlend* 
 		if (animationBlend)
 			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetLoopCountForGrenade: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetLoopCountForGrenade: nullptr animationBlend");
+			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetLoopCountForGrenade: Null animationBlend");
 		return;
 	}
 
@@ -1748,7 +1748,7 @@ void gr2BlendControlSetSpeed(gr2Model* model, gr2AnimationBlend* animationBlend,
 		if (animationBlend)
 			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetSpeed: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetSpeed: nullptr animationBlend");
+			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetSpeed: Null animationBlend");
 		*/
 		return;
 	}
@@ -1776,7 +1776,7 @@ void gr2BlendControlSetEaseOutDuration (gr2Model* model, gr2AnimationBlend* anim
 		if (animationBlend)
 			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetEaseOutDuration: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetEaseOutDuration: nullptr animationBlend");
+			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetEaseOutDuration: Null animationBlend");
 		return;
 	}
 
@@ -1799,7 +1799,7 @@ void gr2BlendControlSetEaseInDuration (gr2Model* model, gr2AnimationBlend* anima
 		if (animationBlend)
 			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetEaseInDuration: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetEaseInDuration: nullptr animationBlend");
+			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetEaseInDuration: Null animationBlend");
 		return;
 	}
 
@@ -1840,7 +1840,7 @@ void gr2BlendControlEaseOut (gr2Model* model, gr2AnimationBlend* animationBlend,
 		if (animationBlend)
 			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlEaseOut: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlEaseOut: nullptr animationBlend");
+			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlEaseOut: Null animationBlend");
 		return;
 	}
 
@@ -1861,7 +1861,7 @@ LOGICAL gr2BlendIsComplete (gr2Model* model, gr2AnimationBlend* animationBlend)
 		if (animationBlend)
 			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendIsControlComplete: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendIsControlComplete: nullptr animationBlend");
+			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendIsControlComplete: Null animationBlend");
 		return FALSE;
 	}
 
@@ -1892,7 +1892,7 @@ FLOAT32 gr2BlendControlCompletePercent (gr2Model* model, gr2AnimationBlend* anim
 		if (animationBlend)
 			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlCompletePercent: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlCompletePercent: nullptr animationBlend");
+			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlCompletePercent: Null animationBlend");
 		return -1.0f;
 	}
 
@@ -1928,7 +1928,7 @@ void gr2BlendControlSetStartOffset (gr2Model* model, gr2AnimationBlend* animatio
 		if (animationBlend)
 			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetStartOffset: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetStartOffset: nullptr animationBlend");
+			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetStartOffset: Null animationBlend");
 		return;
 	}
 
@@ -1957,7 +1957,7 @@ void gr2BlendControlSetEndOffset(gr2Model* model, gr2AnimationBlend* animationBl
 		if (animationBlend)
 			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetEndOffset: failed to find control %s!", animationBlend->blendFile);
 		else
-			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetEndOffset: nullptr animationBlend");
+			Write_Log (LOG_FPS, LOG_INFO, "gr2BlendControlSetEndOffset: Null animationBlend");
 
 		return;
 	}
@@ -2842,7 +2842,7 @@ void gr2UpdateModelOld(gr2Model* model, bool force, bool granular)
 {
 	if(!model)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2UpdateModel: *** ERROR *** nullptr MODEL");
+		Write_Log (LOG_FPS, LOG_INFO, "gr2UpdateModel: *** ERROR *** NULL MODEL");
 		return;
 	}
 
@@ -2950,7 +2950,7 @@ void gr2UpdateModel(gr2Model* model, bool force, bool granular)
 {
 	if(!model)
 	{
-		Write_Log (LOG_FPS, LOG_INFO, "gr2UpdateModel: *** ERROR *** nullptr MODEL");
+		Write_Log (LOG_FPS, LOG_INFO, "gr2UpdateModel: *** ERROR *** NULL MODEL");
 		return;
 	}
 
@@ -3362,7 +3362,7 @@ UINT32 gr2IsControlActive (gr2Control* gr2Control)
 {
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2IsControlActive: nullptr Control");
+		piExitProgram (__FILE__, __LINE__, "gr2IsControlActive: Nullptr Control");
 		return FALSE;
 	}
 
@@ -3375,7 +3375,7 @@ UINT32 gr2IsControlComplete (gr2Control* gr2Control)
 
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2IsControlComplete: nullptr Control");
+		piExitProgram (__FILE__, __LINE__, "gr2IsControlComplete: Nullptr Control");
 		return FALSE;
 	}
 
@@ -3394,7 +3394,7 @@ void gr2FreeAnimation (gr2Animation* anim)
 	/*
 	if (!anim)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2FreeAnimation: nullptr anim");
+		piExitProgram (__FILE__, __LINE__, "gr2FreeAnimation: Nullptr anim");
 	}
 	*/
 
@@ -3441,7 +3441,7 @@ void gr2StopControl (gr2Control* gr2Control, LOGICAL immediate)
 
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2FreeControl: nullptr Control");
+		piExitProgram (__FILE__, __LINE__, "gr2FreeControl: Null Control");
 	}
 
 	if (immediate)
@@ -3515,7 +3515,7 @@ void gr2ControlSetLastFrame (gr2Control* gr2Control)
 {
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2ControlSetLastFrame: nullptr Control");
+		piExitProgram (__FILE__, __LINE__, "gr2ControlSetLastFrame: Null Control");
 	}
 
 	GrannySetControlRawLocalClock(gr2Control->control, GrannyGetControlLocalDuration(gr2Control->control));
@@ -3525,7 +3525,7 @@ void gr2ControlSetLoopCount (gr2Control* gr2Control, SINT32 numLoops)
 {
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2ControlSetLoopCount: nullptr Control");
+		piExitProgram (__FILE__, __LINE__, "gr2ControlSetLoopCount: Null Control");
 	}
 
 	if (numLoops)
@@ -3541,7 +3541,7 @@ void gr2ControlSetEaseInDuration (gr2Control* gr2Control, FLOAT32 time)
 {
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2ControlSetEaseInDuration: nullptr Control");
+		piExitProgram (__FILE__, __LINE__, "gr2ControlSetEaseInDuration: Null Control");
 	}
 
 	gr2Control->easeInDuration = time;
@@ -3557,7 +3557,7 @@ void gr2ControlSetEaseOutDuration (gr2Control* gr2Control, FLOAT32 time)
 {
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2ControlSetEaseOutDuration: nullptr Control");
+		piExitProgram (__FILE__, __LINE__, "gr2ControlSetEaseOutDuration: Null Control");
 	}
 
 	gr2Control->easeOutDuration = time;
@@ -3575,7 +3575,7 @@ void gr2ControlSetSpeed (gr2Control* gr2Control, FLOAT32 speed)
 {
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2ControlSetSpeed: nullptr Control");
+		piExitProgram (__FILE__, __LINE__, "gr2ControlSetSpeed: Null Control");
 	}
 
 	GrannySetControlSpeed (gr2Control->control, speed);
@@ -3585,7 +3585,7 @@ void gr2ControlSetWeight (gr2Control* gr2Control, FLOAT32 weight)
 {
 	if (!gr2Control)
 	{
-		piExitProgram (__FILE__, __LINE__, "gr2ControlSetSpeed: nullptr Control");
+		piExitProgram (__FILE__, __LINE__, "gr2ControlSetSpeed: Null Control");
 	}
 
 	GrannySetControlWeight (gr2Control->control, weight);

@@ -307,6 +307,7 @@ public:
 	FLOAT32				firepointZDistance;     // z distance of firepoint when firepoint is not in the model
 	FLOAT32             firepointHorizOffset;   // horizontal offset from eyepoint when firepoint is not in the model
 	FLOAT32             firepointVertOffset;    // vertical offset from eyepoint when firepoint is not in the model
+	FLOAT64             grenadeVisDelay;        // The amount of time that the grenade appears in the hand at toss.
 
 	FLOAT32				fireDelay;				// how long to wait after pressing the fire button to actually shoot
 	FLOAT32				minimumDispersion;		// minimum dispersion, in degrees, of a human firing this weapon
@@ -348,6 +349,8 @@ public:
 	SCHAR*				auxConnectToAlt[FPS_NUM_AUX_MODELS];
 	FLOAT32				auxAltConnectTime[FPS_NUM_AUX_MODELS];
 	FLOAT32				auxAltDisconnectTime[FPS_NUM_AUX_MODELS];
+
+	SINT32              grenadeDelayTime; // in ms
 
 	FLOAT32				aimVerticalCorrection;
 	FLOAT32				aimHorizontalCorrection;
