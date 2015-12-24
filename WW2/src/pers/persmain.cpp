@@ -5741,8 +5741,8 @@ bool persIsCrewDead(void)
 		if (_PersonaHealth[i].PayAttentionToPersona != 0)
 		{
 			AnyCrew = true;
-			if (_PersonaHealth[i].BrainOxyMaxLevel >= _BRAIN_STRENGTH_FULLLOSS || _PersonaHealth[i].BloodLevel >= 0.5f)
-				return false;
+			if (_PersonaHealth[i].BrainOxyMaxLevel < _BRAIN_STRENGTH_FULLLOSS && _PersonaHealth[i].BloodLevel < 0.5f)
+				return false; // At least one crew member is alive.
 		}
 	}
 
