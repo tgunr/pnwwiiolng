@@ -5913,7 +5913,7 @@ if(VehicleObjectAnalysis && DisplayCollideLines && IsFirstTic) // Vehicle line c
 
 		if(ColObj == nullptr)
 		{
-			Write_Log(LOG_VEHICLE, LOG_WARN, "mlCheckSpecificObjectForLineCollision1 nullptr collide object!");
+			Write_Log(LOG_VEHICLE, LOG_WARN, "mlCheckSpecificObjectForLineCollision1: Null collide object!");
 			return 0;
 		}
 
