@@ -16,6 +16,7 @@ Schema::Schema(DBHANDLE& dbh_, const char* const database_)
 {
 }
 
+#if 0
 static unsigned int
 _getDatabaseSchema(DBHANDLE& dbh, const char* const database)
 {
@@ -43,11 +44,13 @@ _getDatabaseSchema(DBHANDLE& dbh, const char* const database)
 
 	return 0;
 }
+#endif
 
 
 void
 Schema::Update(const DB::Revisions& history)
 {
+#if 0 // HACK: Quick & dirty removing schema updating. Should look into proper handling and/or removal of this code later.
 	const size_t latestRevision = history.size();
 	const size_t dbRevision = _getDatabaseSchema(m_dbh, m_database);
 
@@ -102,6 +105,7 @@ Schema::Update(const DB::Revisions& history)
 
 	dbugLog(_FLN, "dbschema: `%s` updated from %" PRSizeT " to revision %" PRSizeT " (%u updates)"
 					, m_database, dbRevision, latestRevision, updates);
+#endif
 }
 
 } // namespace

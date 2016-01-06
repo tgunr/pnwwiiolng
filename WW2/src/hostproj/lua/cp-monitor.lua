@@ -73,8 +73,8 @@ CPMonitor.announcementTimes =
 ,	timeInSeconds({ minutes = 5 })
 ,	timeInSeconds({ minutes = 20 })
 ,	timeInSeconds({   hours = 1 })
-,	timeInSeconds({   hours = 4 })
-,	timeInSeconds({	  hours = 8 })
+,	timeInSeconds({   hours = 3 })
+,	timeInSeconds({	  hours = 6 })
 }
 
 function CPMonitor:ProcessSurrender(lcp, actionable)

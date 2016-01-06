@@ -78,7 +78,7 @@ pocketTimeToSlowMoves_s = timeInSeconds({ hours = 1 })
 -- How long after becoming frontline + out of supply
 -- should a town surrender?
 
-pocketTimeToSurrender_s = timeInSeconds({ hours = 12 })
+pocketTimeToSurrender_s = timeInSeconds({ hours = 6 })
 
 -- How often the CPMonitor runs it's cycle (which controls
 -- the frequency with which CPs are checked for surrender)
@@ -104,7 +104,7 @@ gameAOWarnings = 10
 -- How many times to warn a second spare?
 gameAOReWarnings = 4
 -- What fraction of available AOs must be placed?
-gameAOMinimumRatio = 0.90
+gameAOMinimumRatio = 1
 gameAOMinimum = 0
 
 ----------------------------------------------------------------------
@@ -189,11 +189,34 @@ function maxCaptureObjectives (population)
    if population >= 680 then return 7 end   -- 14 total, 48 p/s/o
    if population >= 570 then return 6 end   -- 12 total, 48 p/s/o
    if population >= 460 then return 5 end   -- 10 total, 49 p/s/o
-   if population >= 350 then return 4 end   -- 8 total, 50 p/s/o
-   if population >= 240 then return 3 end   -- 6 total, 51 p/s/o
-   if population >= 130 then return 2 end   -- 4 total, 55 p/s/o
+   if population >= 280 then return 4 end   -- 8 total, 50 p/s/o
+   if population >= 190 then return 3 end   -- 6 total, 51 p/s/o
+   if population >=  85 then return 2 end   -- 4 total, 55 p/s/o
 -- return 2 -- this is for beta testing
    return 1  -- 2 total
+end
+
+function countsAsEngagement(target)
+	-- If the town has units present, it's a hard AO.
+	if target:numUnits() > 0 then return 1 end
+
+	-- If the town has at least one friendly link with a brigade present,
+	-- it's a "No Man's Land" AO.
+	for i = 0 , target.numLinks do
+		link = target:link(i)
+		cp = link.endDepot.cp
+		if target.side == cp.side then
+			if cp:numUnits() > 0 then
+				return 1
+			end
+		end
+	end
+
+	-- An exception for factory towns to avoid potential abuse.
+	if target:isSupplyCenter() then return 1 end
+
+	-- No brigade in this CP or nearby, it's a softcap.
+	return 0
 end
 
 ----------------------------------------------------------------------
@@ -209,6 +232,8 @@ function engagementObjectivesQuota(availableAOs)
   -- Note: when only one ao is available,
   -- the return value will be zero, allowing
   -- a softcap to be placed.
+
+  if availableAOs == 1 then return 1 end
   return availableAOs - 1
 end
 
@@ -217,6 +242,9 @@ end
 ----------------------------------------------------------------------
 
 function rdpPenaltyPercentage (forCountry)
+  if forCountry == USA then
+    return (rdpPenaltyPercentage(ENGLAND) + rdpPenaltyPercentage(FRANCE)) / 2
+  end
   -- 100% factory damage translates to 100% delay in resupply
   -- changed for campaign 81 BLOODY BATTLES on 03-21-2012 per DOC
   return 1.0 + factoryDamageFactor[forCountry] * 1.00

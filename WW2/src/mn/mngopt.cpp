@@ -66,7 +66,7 @@ static KEY	vars[]={{"help", ENULL},
     {"altfont", ENULL},
 					{nullptr, ENULL}};
 
-static constexpr void*	pvars[]={&WantedHelp,
+static void* const pvars[]={&WantedHelp,
 					&WantedWidth,
 					&WantedHeight,
 					&WantedBpp,

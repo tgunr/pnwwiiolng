@@ -206,7 +206,9 @@ Grid::PatrolExpirations()
 			_checkRowForExpiry(curRowIt->second);
 			if ( curRowIt->second.empty() )
 			{
+			#ifndef NDEBUG
 				size_t before = hash.size();
+			#endif
 				hash.erase(curRowIt);
 				assert( before != hash.size() );
 			}

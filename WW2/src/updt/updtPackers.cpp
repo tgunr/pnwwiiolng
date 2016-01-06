@@ -674,8 +674,7 @@ updtPackWORLD_UPDATE(const LOGICAL mode, UCHAR* data, SINT32 offset, WORLD_UPDAT
 {
 	TIMER_USE_HERE
 
-	ON_SERVER(  const HostVehicle* const myVehicle = wu->myVehicle  );
-	ON_SERVER(  assert( myVehicle != nullptr )  );
+	ON_SERVER(  assert( wu->myVehicle != nullptr )  );
 	ON_SERVER(  VEHICLE_UPDATE_HEADER vhdr  );
 
 	TIMER_ACCUMULATOR(pack_initvh);

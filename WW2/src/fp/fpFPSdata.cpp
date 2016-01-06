@@ -367,6 +367,9 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
         else if (stricmp(buf, "firepointVertOffset") == 0 || stricmp(buf, "fpZOffset") == 0)
 			fpsWeapons[weapon].firepointVertOffset = (FLOAT32) atof (varData);
 
+		else if (stricmp(buf, "grenadeVisDelay") == 0)
+			fpsWeapons[weapon].grenadeVisDelay= (FLOAT32)atof(varData);
+
 		else if (stricmp(buf, "weaponBreathMultiplier") == 0)
 			fpsWeapons[weapon].weaponBreathMultiplier = (FLOAT32) atof (varData);
 		else if (stricmp(buf, "weaponHeartMultiplier") == 0)
@@ -402,6 +405,8 @@ static void _fpFPSDataReadWeaponFile (fpsWeaponTypes weapon, char* filename)
 
 		else if (stricmp(buf, "staticDeploy") == 0)
 			fpsWeapons[weapon].staticDeploy = strtoul(varData, nullptr, 10);
+		else if (stricmp(buf, "grenadeDelayTime") == 0)
+			fpsWeapons[weapon].grenadeDelayTime = (SINT32)atol(varData);
 		else if (stricmp(buf, "holdfire") == 0)
 			fpsWeapons[weapon].holdfire = (SINT32) atol (varData);
 		else if (stricmp(buf, "sniperGunSight") == 0)
@@ -1805,10 +1810,7 @@ void fpFPSDataInit ()
 	arms_anim_files[MILLS36MK1][RELOAD] = FPS_DIR "mills36mk1\\animations\\mills36mk1-lowered(1)";
 	arms_anim_files[MILLS36MK1][STAND_FIRE] = FPS_DIR "mills36mk1\\animations\\fire\\charge-arms-mills36mk1(45)";
 		weap_anim_files[MILLS36MK1][STAND_FIRE] = FPS_DIR "mills36mk1\\animations\\fire\\charge-mills36mk1(45)";
-
-	arms_anim_files[MILLS36MK1][THROW] = FPS_DIR "mills36mk1\\animations\\fire\\arms_fire(48)";
-		weap_anim_files[MILLS36MK1][THROW] = FPS_DIR "mills36mk1\\animations\\fire\\weap_fire(48)";
-
+	arms_anim_files[MILLS36MK1][THROW] = FPS_DIR "mills36mk1\\animations\\fire\\fire-arms-mills36mk1(20)";
 	arms_anim_files[MILLS36MK1][LOWER] = FPS_DIR "mills36mk1\\animations\\mills36mk1-lowered(1)";
 	arms_anim_files[MILLS36MK1][IDLE] = FPS_DIR "mills36mk1\\animations\\mills36mk1-stand(1)";
 	arms_anim_files[MILLS36MK1][KNEEL] = FPS_DIR "mills36mk1\\animations\\mills36mk1-stand(1)";
@@ -1823,11 +1825,8 @@ void fpFPSDataInit ()
 	// FRBANG animation files
 	arms_anim_files[FRBANG][RELOAD] = FPS_DIR "frenchgrenade\\animations\\mills36mk1-lowered(1)";
 	arms_anim_files[FRBANG][STAND_FIRE] = FPS_DIR "frenchgrenade\\animations\\fire\\charge-arms-mills36mk1(45)";
-		weap_anim_files[FRBANG][STAND_FIRE] = FPS_DIR "frenchgrenade\\animations\\fire\\charge-mills36mk1(45)";
-
-	arms_anim_files[FRBANG][THROW] = FPS_DIR "frenchgrenade\\animations\\fire\\arms_fire(48)";
-		weap_anim_files[FRBANG][THROW] = FPS_DIR "frenchgrenade\\animations\\fire\\weap_fire(48)";
-
+	weap_anim_files[FRBANG][STAND_FIRE] = FPS_DIR "frenchgrenade\\animations\\fire\\charge-mills36mk1(45)";
+	arms_anim_files[FRBANG][THROW] = FPS_DIR "frenchgrenade\\animations\\fire\\fire-arms-mills36mk1(20)";
 	arms_anim_files[FRBANG][LOWER] = FPS_DIR "frenchgrenade\\animations\\mills36mk1-lowered(1)";
 	arms_anim_files[FRBANG][IDLE] = FPS_DIR "frenchgrenade\\animations\\mills36mk1-stand(1)";
 	arms_anim_files[FRBANG][KNEEL] = FPS_DIR "frenchgrenade\\animations\\mills36mk1-stand(1)";
@@ -1846,9 +1845,7 @@ void fpFPSDataInit ()
 
 	arms_anim_files[STIGR][STAND_FIRE] = FPS_DIR "stigr\\animations\\fire\\charge-arms-stigr(55)";
 
-	//arms_anim_files[STIGR][THROW] = FPS_DIR "stigr\\animations\\fire\\fire-arms-stigr(20)";
-	arms_anim_files[STIGR][THROW] = FPS_DIR "stigr\\animations\\fire\\arms_fire(48)";
-		//weap_anim_files[STIGR][THROW] = FPS_DIR "stigr\\animations\\fire\\weap_m8smoke(48)";
+	arms_anim_files[STIGR][THROW] = FPS_DIR "stigr\\animations\\fire\\fire-arms-stigr(20)";
 
 	arms_anim_files[STIGR][LOWER] = FPS_DIR "stigr\\animations\\stigr-lowered(1)";
 
@@ -1869,8 +1866,7 @@ void fpFPSDataInit ()
 
 	arms_anim_files[HGR39][STAND_FIRE] = FPS_DIR "stigr\\animations\\fire\\charge-arms-stigr(55)";
 
-	arms_anim_files[HGR39][THROW] = FPS_DIR "stigr\\animations\\fire\\arms_fire(48)";
-		//weap_anim_files[HGR39][THROW] = FPS_DIR "stigr\\animations\\fire\\weap_m8smoke(48)";
+	arms_anim_files[HGR39][THROW] = FPS_DIR "stigr\\animations\\fire\\fire-arms-stigr(20)";
 
 	arms_anim_files[HGR39][LOWER] = FPS_DIR "stigr\\animations\\stigr-lowered(1)";
 
@@ -1889,8 +1885,7 @@ void fpFPSDataInit ()
 	// M18 animation files
 	arms_anim_files[M18][RELOAD] = FPS_DIR "mills36mk1\\animations\\mills36mk1-lowered(1)";
 	arms_anim_files[M18][STAND_FIRE] = FPS_DIR "m18\\animations\\fire\\armsCharge";
-	arms_anim_files[M18][THROW] = FPS_DIR "m8smoke\\animations\\fire\\arms_m8smoke(48)";
-		weap_anim_files[M18][THROW] = FPS_DIR "m8smoke\\animations\\fire\\weap_m8smoke(48)";
+	arms_anim_files[M18][THROW] = FPS_DIR "m18\\animations\\fire\\m18_armmesh_fire(20)";
 	arms_anim_files[M18][LOWER] = FPS_DIR "mills36mk1\\animations\\mills36mk1-lowered(1)";
 	arms_anim_files[M18][IDLE] = FPS_DIR "m18\\animations\\m18_armmesh_neutral(1)";
 	arms_anim_files[M18][KNEEL] = FPS_DIR "m18\\animations\\m18_armmesh_neutral(1)";
@@ -1906,8 +1901,7 @@ void fpFPSDataInit ()
 	arms_anim_files[MARK2][RELOAD] = FPS_DIR "mills36mk1\\animations\\mills36mk1-lowered(1)";
 	arms_anim_files[MARK2][STAND_FIRE] = FPS_DIR "mk2grenade\\animations\\fire\\arms_mk2_charge(30)";
 		weap_anim_files[MARK2][STAND_FIRE] = FPS_DIR "mk2grenade\\animations\\fire\\weap_mk2_charge(30)";
-	arms_anim_files[MARK2][THROW] = FPS_DIR "mk2grenade\\animations\\fire\\arms_fire(48)";
-		weap_anim_files[MARK2][THROW] = FPS_DIR "mk2grenade\\animations\\fire\\weap_fire(48)";
+	arms_anim_files[MARK2][THROW] = FPS_DIR "m18\\animations\\fire\\m18_armmesh_fire(20)";
 	arms_anim_files[MARK2][LOWER] = FPS_DIR "mills36mk1\\animations\\mills36mk1-lowered(1)";
 	arms_anim_files[MARK2][IDLE] = FPS_DIR "m18\\animations\\m18_armmesh_neutral(1)";
 	arms_anim_files[MARK2][KNEEL] = FPS_DIR "m18\\animations\\m18_armmesh_neutral(1)";
@@ -1923,10 +1917,7 @@ void fpFPSDataInit ()
 	arms_anim_files[FRSMOKE][RELOAD] = FPS_DIR "mills36mk1\\animations\\mills36mk1-lowered(1)";
 	arms_anim_files[FRSMOKE][STAND_FIRE] = FPS_DIR "frsmoke\\animations\\fire\\armsCharge";
 	weap_anim_files[FRSMOKE][STAND_FIRE] = FPS_DIR "frsmoke\\animations\\fire\\weapCharge";
-
-	arms_anim_files[FRSMOKE][THROW] = FPS_DIR "frenchgrenade\\animations\\fire\\arms_fire(48)";
-		weap_anim_files[FRSMOKE][THROW] = FPS_DIR "frenchgrenade\\animations\\fire\\weap_fire(48)";
-
+	arms_anim_files[FRSMOKE][THROW] = FPS_DIR "m18\\animations\\fire\\m18_armmesh_fire(20)";
 	arms_anim_files[FRSMOKE][LOWER] = FPS_DIR "mills36mk1\\animations\\mills36mk1-lowered(1)";
 	arms_anim_files[FRSMOKE][IDLE] = FPS_DIR "m18\\animations\\m18_armmesh_neutral(1)";
 	arms_anim_files[FRSMOKE][KNEEL] = FPS_DIR "m18\\animations\\m18_armmesh_neutral(1)";
@@ -1940,10 +1931,9 @@ void fpFPSDataInit ()
 
 	// USSMOKE animation files
 	arms_anim_files[USSMOKE][RELOAD] = FPS_DIR "m8smoke\\animations\\arms_m8smoke_lowered(1)";
-	arms_anim_files[USSMOKE][STAND_FIRE] = FPS_DIR "m8smoke\\animations\\fire\\arms_m8smoke(48)";
-		weap_anim_files[USSMOKE][STAND_FIRE] = FPS_DIR "m8smoke\\animations\\fire\\weap_m8smoke(48)";
-	arms_anim_files[USSMOKE][THROW] = FPS_DIR "m8smoke\\animations\\fire\\arms_m8smoke(48)";
-		weap_anim_files[USSMOKE][THROW] = FPS_DIR "m8smoke\\animations\\fire\\weap_m8smoke(48)";
+	arms_anim_files[USSMOKE][STAND_FIRE] = FPS_DIR "m8smoke\\animations\\fire\\arms_m8smoke_charge(45)";
+		weap_anim_files[USSMOKE][STAND_FIRE] = FPS_DIR "m8smoke\\animations\\fire\\weap_m8smoke_charge(45)";
+	arms_anim_files[USSMOKE][THROW] = FPS_DIR "m8smoke\\animations\\fire\\arms_m8smoke_fire(25)";
 	arms_anim_files[USSMOKE][LOWER] = FPS_DIR "m8smoke\\animations\\arms_m8smoke_lowered(1)";
 	arms_anim_files[USSMOKE][IDLE] = FPS_DIR "m8smoke\\animations\\arms_m8smoke_neutral(1)";
 	arms_anim_files[USSMOKE][KNEEL] = FPS_DIR "m8smoke\\animations\\arms_m8smoke_neutral(1)";

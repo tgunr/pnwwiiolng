@@ -71,6 +71,9 @@ function _scoreAOPotential(unit, origin, link, target, country)
 	-- And we should skip anything that's an objective
 	if target:isObjective() then return 0 end
 
+	-- Never place a softcap as our sole AO.
+	if g_objectiveStats:attacks(origin.side) == 0 and not countsAsEngagement(target) then return 0 end
+
 	-- Never pick a town with heavy armor ews unless the favor is returned
 	if target:hasHeavyArmorEWS() == true and origin:hasHeavyArmorEWS() == false then return 0 end
 
@@ -349,7 +352,12 @@ function gameSpareAOCapacity (forSide)
 	if gameAOPlacements[forSide] == nil or gameAOPlacements[forSide] < teulClockTime - 30 then
 		chatSendHCMessage(forSide, LSTR_LABELLED_GENERIC, locstr('aoNotice'), stats)
 		log('D', 'autoao', stats .. " considering auto-placement")
-		_schedulePlacement(forSide, gameAONoticeDelay, gameAOWarnings)	-- false := first warning
+			local noticeDelay = gameAONoticeDelay
+			if (required - placed) == 1 then
+			-- If this is the only spare, sit quietly for an extra 15 minutes to let the HC plan.
+			noticeDelay = gameAONoticeDelay + 15
+			end	
+		_schedulePlacement(forSide, noticeDelay, gameAOWarnings)	-- false := first warning
 		return
 	end
 

@@ -392,6 +392,8 @@ void chatFreePlayer(Player* player)
 
 	player->detuneAllRadios();
 
+// HACK: Code does nothing but run an assert().
+#ifndef NDEBUG
 	//Initialize the rest of the structure
 	if ( g_debugRadios )
 	{
@@ -402,6 +404,7 @@ void chatFreePlayer(Player* player)
 			assert( cnode.m_channel == nullptr );
 		}
 	}
+#endif
 
 	delete player;
 }

@@ -11,7 +11,10 @@ ELSE ( )
 ENDIF ( )
 FILE(TO_CMAKE_PATH "${PN_PLAYNET_PATH}" PN_PLAYNET_PATH)
 
-FILE(TO_NATIVE_PATH "${PN_PLAYNET_PATH}" _PLAYNET)
+SET( PN_INSTALL_PATH "${PN_PLAYNET_PATH}" CACHE STRING "The location the build should be placed in." )
+FILE(TO_CMAKE_PATH "${PN_INSTALL_PATH}" PN_INSTALL_PATH)
+
+FILE(TO_NATIVE_PATH "${PN_INSTALL_PATH}" _PLAYNET)
 IF ( WIN32 )
 	# Make an escaped version for the config file.
 	STRING(REGEX REPLACE "\\\\" "\\\\\\\\" _PLAYNET_PATH_VAR "${_PLAYNET}") 
@@ -19,9 +22,9 @@ ELSE ( )
 	SET(_PLAYNET_PATH_VAR "${_PLAYNET}")
 ENDIF ( )
 
-# The top level path must exist before we'll continue.
+# The installation directory must exist before we'll continue.
 IF ( NOT IS_DIRECTORY "${_PLAYNET}" )
-	MESSAGE(FATAL_ERROR "${_PLAYNET} does not exist or PN_PLAYNET_PATH is not configured.")
+	MESSAGE(FATAL_ERROR "${_PLAYNET} does not exist or PN_INSTALL_PATH is not configured.")
 ENDIF ( )
 
 # History:

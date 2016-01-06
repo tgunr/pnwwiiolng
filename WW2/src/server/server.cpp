@@ -1064,10 +1064,11 @@ Server::GetReleaseType(Server::ReleaseType releaseType)
 Server::ServerInfo*
 Server::ServerInfo::GetInfo(UINT32 baseIP_, UINT16 type_)
 {
+	// Is this necessary? Original code didn't modify it->stats.address in check below...
 	auto peerIP = Server::BroadcastMaskAddress(baseIP_);
 	for ( auto& it : s_activeServerList )
 	{
-		if ( it->stats.address == peerIP && it->stats.type == type_ )
+		if (Server::BroadcastMaskAddress(it->stats.address) == peerIP && it->stats.type == type_ )
 			return it;
 	}
 	return nullptr;
@@ -1650,9 +1651,9 @@ _controllerConnect(ENDPOINT& endpoint)
 }
 
 static void
-_controllerError(SINT32, const UCHAR* const, SINT32, const struct TEUL_CALLBACK* const, SINT32)
+_controllerError(SINT32, const UCHAR* const, SINT32, const struct TEUL_CALLBACK* const, SINT32 error)
 {
-	dbugLog(_FLA, "error on controller connection shutting down");
+	dbugLog(_FLA, "Experienced %d error on controller connection.", error);
 }
 
 void _connectToController()
@@ -1900,10 +1901,10 @@ void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType, ERRO
 			if (cliOptions[i].wantParameter)
 			{
 				if (++argn >= argc)
-					LogAbort("'%s' switch expects an argument", cliOptions[i]);
+					LogAbort("'%s' switch expects an argument", cliOptions[i].command);
 				param = argv[argn];
 				if (param[0] == '-')
-					LogAbort("'%s' switch expects an argument, got '%s'", cliOptions[i], argv[argn]);
+					LogAbort("'%s' switch expects an argument, got '%s'", cliOptions[i].command, argv[argn]);
 			}
 			cliOptions[i].callback(param);
 			break;
@@ -1920,12 +1921,12 @@ void Server::InitializeProcess(const char* appName, SERVER_TYPE serverType, ERRO
 	if (retval != 0)
 		LogAbort("Unable to initialize transport: %d", retval);
 
-	// Let the controller know we are here.
-	_connectToController();
-
 	serverEnableDebugWebServer(serverType);
 
 	serverInitAddresses();
+
+	if ( Server::IsBroadcastViaController() )
+		_connectToController();
 
 	dbugLog(_FLI, "%s started, compiled %s %s", appName, __DATE__, __TIME__);
 }

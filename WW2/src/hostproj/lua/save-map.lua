@@ -39,17 +39,21 @@ function saveMapStateToFile(filename)
 end
 
 function autosaveMapState(filename)
- if host_config.arena.lock > 0 then return end
+-- if wwii_config.arena.lock > 0 then return end
  print("Saving map state to " .. filename)
  saveMapStateToFile(filename)
 end
 
 local mapfilename = "map-state"
-local mapfile = "/playnet/wwiiol/lua/"..mapfilename..".lua"
+local mapfile = "/playnet/lua/"..mapfilename..".lua"
 
 function loadMapState(filename)
  require 'map-state'
 end
 
 LuaEvent.AddRecurring(120, autosaveMapState, mapfile, 'saveMapState')
+
+function saveTheMap()
+  saveMapStateToFile(mapfile)
+end
 

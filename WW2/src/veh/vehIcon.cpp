@@ -419,25 +419,6 @@ SINT32 vehIconDrawDeprecated(void)
 	piSetRenderStageState(0, piTSS_MIPFILTER, TextureMipFilter);
 	piSetWorldMatrix(&worldMat);
 
-	bool ProjecteGrenade = fpFPSCanProjectGrenade();
-    static TransformEffect* te = nullptr;
-
-    if(ProjecteGrenade)
-    {
-        if(!te)
-        {
-            te = TransformEffect::AddTargetAim("targetaimparticle");
-        }
-    }
-    else
-    {
-        if(te)
-        {
-            te->kill();
-            te = nullptr;
-        }
-    }
-
 	return 0;
 }
 
@@ -467,27 +448,6 @@ void vehIconDraw()
 
         _DrawVehicleIcon(CurrentVehicle);
     }
-
-#if(0)
-    bool ProjecteGrenade = fpFPSCanProjectGrenade();
-    static TransformEffect* te = nullptr;
-
-    if(ProjecteGrenade)
-    {
-        if(!te)
-        {
-            te = TransformEffect::AddTargetAim("targetaimparticle");
-        }
-    }
-    else
-    {
-        if(te)
-        {
-            te->kill();
-            te = nullptr;
-        }
-    }
-#endif
 
 	PersHUDManager::HUDObjectList& deaths = HUD_MGR->GetObjects();
 
