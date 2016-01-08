@@ -570,15 +570,6 @@ _recvfromStream(ENDPOINT& endpoint)
 		const SINT32 retval = _startNewPacket(endpoint);
 		if ( retval <= 0 || endpoint.m_impl->m_curDatagram == nullptr )
 			return retval;
-
-#ifdef DEBUG_RECV_PACKET
-		{
-			const DATA_GRAM& dgram = *endpoint.m_impl->m_curDatagram;
-			dbugLog(_FLD, "t:%d RecvPacketInit [%u:%u] : %u/%u bytes",
-			        endpoint.teulIndex(), dgram.contents->m_callX, dgram.contents->m_callY,
-			        endpoint.m_readBufferUsed, dgram.m_size);
-		}
-#endif
 	}
 
 	if ( endpoint.m_readBufferUsed < endpoint.m_impl->m_curDatagram->m_size )
@@ -590,6 +581,7 @@ _recvfromStream(ENDPOINT& endpoint)
 #ifdef DEBUG_RECV_PACKET
 		{
 			const DATA_GRAM& dgram = *endpoint.m_impl->m_curDatagram;
+			// Note that the start logic above will make it so every packet starts with three bytes.
 			dbugLog(_FLD, "t:%d RecvPacket%s [%u:%u] : %u(+%d)/%u bytes",
 			        endpoint.teulIndex(), endpoint.m_readBufferUsed < dgram.m_size ? "Cont" : "End",
 			        dgram.contents->m_callX, dgram.contents->m_callY,
