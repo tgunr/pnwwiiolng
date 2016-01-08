@@ -574,9 +574,9 @@ _recvfromStream(ENDPOINT& endpoint)
 #ifdef DEBUG_RECV_PACKET
 		{
 			const DATA_GRAM& dgram = *endpoint.m_impl->m_curDatagram;
-			dbugLog(_FLD, "t:%d RecvPacketInit [%u:%u] : %d/%u bytes",
+			dbugLog(_FLD, "t:%d RecvPacketInit [%u:%u] : %u/%u bytes",
 			        endpoint.teulIndex(), dgram.contents->m_callX, dgram.contents->m_callY,
-			        retval, dgram.m_size);
+			        endpoint.m_readBufferUsed, dgram.m_size);
 		}
 #endif
 	}
@@ -590,9 +590,9 @@ _recvfromStream(ENDPOINT& endpoint)
 #ifdef DEBUG_RECV_PACKET
 		{
 			const DATA_GRAM& dgram = *endpoint.m_impl->m_curDatagram;
-			dbugLog(_FLD, "t:%d RecvPacketCont [%u:%u] : %d/%u bytes",
+			dbugLog(_FLD, "t:%d RecvPacketCont [%u:%u] : %u(+%d)/%u bytes",
 			        endpoint.teulIndex(), dgram.contents->m_callX, dgram.contents->m_callY,
-			        retval, dgram.m_size);
+			        endpoint.m_readBufferUsed, retval, dgram.m_size);
 		}
 #endif
 
