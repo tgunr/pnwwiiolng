@@ -257,7 +257,7 @@ ENDPOINT::pushSendQueue()
 			return result;
 		}
 #ifdef DEBUG_SEND_PACKET
-		dbugLog(_FLD, "t:%d, SendPacketCont [%u:%u] : %d/%u bytes",
+		dbugLog(_FLD, "t:%d SendPacketCont [%u:%u] : %d/%u bytes",
 		        teulIndex(), packet->header().m_callX, packet->header().m_callY,
 		        result, remainingBytes);
 #endif
