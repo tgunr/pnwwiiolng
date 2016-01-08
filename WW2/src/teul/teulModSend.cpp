@@ -9,6 +9,8 @@
 //
 // Originating Programmer: Martin Poulin
 
+//#define DEBUG_SEND_PACKET
+
 #include "teul/teulCallbackStruct.h"
 #include "teul/teulClosingEnums.h"
 #include "teul/teulEndpoint.h"
@@ -195,6 +197,11 @@ ENDPOINT::sendPacket(Teul::Packet& packet)
 		if ( result > 0 )
 		{
 			const size_t sent = (size_t) result;
+#ifdef DEBUG_SEND_PACKET
+			dbugLog(_FLD, "t:%d SendPacketInit [%u:%u] : %d/%u bytes",
+			        teulIndex(), packet.header().m_callX, packet.header().m_callY,
+			        result, packet.packetSizeBytes());
+#endif
 			packet.sentBytes(sent);
 			if ( packet.sentBytes() >= packetBytes )
 				return packetBytes;
@@ -249,6 +256,11 @@ ENDPOINT::pushSendQueue()
 			setWritesPending(true);
 			return result;
 		}
+#ifdef DEBUG_SEND_PACKET
+		dbugLog(_FLD, "t:%d, SendPacketCont [%u:%u] : %d/%u bytes",
+		        teulIndex(), packet->header().m_callX, packet->header().m_callY,
+		        result, remainingBytes);
+#endif
 		packet->sentBytes((size_t)result);
 		if ( packet->sentBytes() >= packet->packetSizeBytes() )
 		{
