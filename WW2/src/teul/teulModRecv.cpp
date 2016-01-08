@@ -591,8 +591,8 @@ _recvfromStream(ENDPOINT& endpoint)
 		{
 			const DATA_GRAM& dgram = *endpoint.m_impl->m_curDatagram;
 			dbugLog(_FLD, "t:%d RecvPacket%s [%u:%u] : %u(+%d)/%u bytes",
-			        endpoint.m_readBufferUsed < dgram.m_size ? "Cont" : "End",
-			        endpoint.teulIndex(), dgram.contents->m_callX, dgram.contents->m_callY,
+			        endpoint.teulIndex(), endpoint.m_readBufferUsed < dgram.m_size ? "Cont" : "End",
+			        dgram.contents->m_callX, dgram.contents->m_callY,
 			        endpoint.m_readBufferUsed, retval, dgram.m_size);
 		}
 #endif
