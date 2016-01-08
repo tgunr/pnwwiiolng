@@ -9,6 +9,8 @@
 //
 // Originating Programmer: Martin Poulin
 
+//#define DEBUG_RECV_PACKET
+
 #include "mem/mem.h"
 #include "server/serverInterfaceDescription.h"
 #include "server/serverServerInfo.h"
@@ -514,7 +516,7 @@ _startNewPacket(ENDPOINT& endpoint)
 	// in which case we should just leave it there for a bit.
 	if ( totalRead < LeadInSizeBytes )
 	{
-//		dbugLog(_FLW, "t:%d garbage short packets", endpoint.teulIndex());
+		dbugLog(_FLN, "t:%d garbage short packets, ignoring.", endpoint.teulIndex());
 //		teulClose(endpoint);
 //		return -EINVAL;
 		endpoint.m_readBufferUsed = totalRead;
@@ -568,6 +570,15 @@ _recvfromStream(ENDPOINT& endpoint)
 		const SINT32 retval = _startNewPacket(endpoint);
 		if ( retval <= 0 || endpoint.m_impl->m_curDatagram == nullptr )
 			return retval;
+
+#ifdef DEBUG_RECV_PACKET
+		{
+			const DATA_GRAM& dgram = *endpoint.m_impl->m_curDatagram;
+			dbugLog(_FLD, "t:%d RecvPacketInit [%u:%u] : %d/%u bytes",
+			        endpoint.teulIndex(), dgram.contents->m_callX, dgram.contents->m_callY,
+			        retval, dgram.m_size);
+		}
+#endif
 	}
 
 	if ( endpoint.m_readBufferUsed < endpoint.m_impl->m_curDatagram->m_size )
@@ -575,6 +586,15 @@ _recvfromStream(ENDPOINT& endpoint)
 		const SINT32 retval = _continuePacket(endpoint);
 		if ( retval <= 0 )
 			return retval;
+
+#ifdef DEBUG_RECV_PACKET
+		{
+			const DATA_GRAM& dgram = *endpoint.m_impl->m_curDatagram;
+			dbugLog(_FLD, "t:%d RecvPacketCont [%u:%u] : %d/%u bytes",
+			        endpoint.teulIndex(), dgram.contents->m_callX, dgram.contents->m_callY,
+			        retval, dgram.m_size);
+		}
+#endif
 
 		// Don't pass here until we've read all of the payload.
 		if ( endpoint.m_readBufferUsed < endpoint.m_impl->m_curDatagram->m_size )
