@@ -524,9 +524,11 @@ teulInitModCallbacks(void)
 	memset(&ci, 0, sizeof(ci));
 
 	ci.callX 		= Teul::Module::CallbackX;		// the X position in the callback matrix
+	ci.callXName	= TEUL_PACKET_NAMES ? "TMCALLBACKS_X" : "";
 	ci.error		= _errorCALLBACK;
 
 	ci.callY		= TM_RST_TOKEN_Y;				// the Y position in the callback matrix
+	ci.callYName	= TEUL_PACKET_NAMES ? "TM_RST_TOKEN_Y" : "";
 	ci.sendAction	= _actionSendRST_TOKEN;			// how to send data
 	ci.recvAction	= _actionRecvRST_TOKEN;			// how to receive data
 
@@ -535,13 +537,15 @@ teulInitModCallbacks(void)
 	// following callbacks use the errSYN_CALLBACK  error handler which closes the connetion
 	ci.error		= _errorSYN_CALLBACK;
 
-	ci.callY		= TM_SYN_TOKEN_Y;				// the Y position in the callback matrix
-	ci.sendAction	= _actionSendSYN_TOKEN;			// how to send data
+	ci.callY		= TM_SYN_TOKEN_Y;                // the Y position in the callback matrix
+	ci.callYName	= TEUL_PACKET_NAMES ? "TM_SYN_TOKEN_Y" : "";
+	ci.sendAction	= _actionSendSYN_TOKEN;            // how to send data
 	ci.recvAction	= _actionRecvSYN_TOKEN;			// how to receive data
 
 	SYN_TOKEN	= teulAllocSystemCallback( &ci );
 
 	ci.callY		= TM_SYN_ACK_TOKEN_Y;			// the Y position in the callback matrix
+	ci.callYName	= TEUL_PACKET_NAMES ? "TM_SYN_ACK_TOKEN_Y" : "";
 	ci.sendAction	= _actionSendSYN_ACK_TOKEN;		// how to send data
 	ci.recvAction	= _actionRecvSYN_ACK_TOKEN;		// how to receive data
 
@@ -549,6 +553,7 @@ teulInitModCallbacks(void)
 
 
 	ci.callY		= TM_SYN_ACK_ACK_TOKEN_Y;		// the Y position in the callback matrix
+	ci.callYName	= TEUL_PACKET_NAMES ? "TM_SYN_ACK_ACK_TOKEN_Y" : "";
 	ci.sendAction	= _actionSendSYN_ACK_TOKEN;		// how to send data
 	ci.recvAction	= _actionRecvSYN_ACK_ACK_TOKEN;	// how to receive data
 
@@ -556,6 +561,7 @@ teulInitModCallbacks(void)
 
 
 	ci.callY		= TM_FYN_TOKEN_Y;				// the Y position in the callback matrix
+	ci.callYName	= TEUL_PACKET_NAMES ? "TM_FYN_TOKEN_Y" : "";
 	ci.sendAction	= _actionSendFYN_TOKEN;			// how to send data
 	ci.recvAction	= _actionRecvFYN_TOKEN;			// how to receive data
 
@@ -563,6 +569,7 @@ teulInitModCallbacks(void)
 
 
 	ci.callY		= TM_FYN_ACK_TOKEN_Y;			// the Y position in the callback matrix
+	ci.callYName	= TEUL_PACKET_NAMES ? "TM_FYN_ACK_TOKEN_Y" : "";
 	ci.sendAction	= _actionSendFYN_ACK_TOKEN;		// how to send data
 	ci.recvAction	= _actionRecvFYN_ACK_TOKEN;		// how to receive data
 
@@ -573,6 +580,7 @@ teulInitModCallbacks(void)
 	ci.error		= _errorCALLBACK;
 
 	ci.callY		= TM_KLIVE_TOKEN_Y;				// the Y position in the callback matrix
+	ci.callYName	= TEUL_PACKET_NAMES ? "TM_KLIVE_TOKEN_Y" : "";
 	ci.sendAction	= _actionSendKLIVE_TOKEN;		// how to send data
 	ci.recvAction	= _actionRecvKLIVE_TOKEN;		// how to receive data
 
@@ -580,6 +588,7 @@ teulInitModCallbacks(void)
 
 
 	ci.callY		= TM_KLIVE_ACK_TOKEN_Y;			// the Y position in the callback matrix
+	ci.callYName	= TEUL_PACKET_NAMES ? "TM_KLIVE_ACK_TOKEN_Y" : "";
 	ci.sendAction	= _actionSendKLIVE_ACK_TOKEN;	// how to send data
 	ci.recvAction	= _actionRecvKLIVE_ACK_TOKEN;	// how to receive data
 
@@ -587,12 +596,14 @@ teulInitModCallbacks(void)
 
 	// Callback indicating a connection needs to be sent/received.
 	ci.callY		= TM_CONNECTION_INSTRUCTION_Y;
+	ci.callYName	= TEUL_PACKET_NAMES ? "TM_CONNECTION_INSTRUCTION_Y" : "";
 	ci.sendAction	= _sendConnectionInstruction;
 	ci.recvAction	= _recvConnectionInstruction;
 
 	Teul::ConnectionInstruction::s_callback = teulAllocSystemCallback( &ci );
 
 	ci.callY = TM_ERROR_Y;
+	ci.callYName = TEUL_PACKET_NAMES ? "TM_ERROR_Y" : "";
 	ci.recvAction = _recvError;
 
 	teulAllocSystemCallback( &ci );
