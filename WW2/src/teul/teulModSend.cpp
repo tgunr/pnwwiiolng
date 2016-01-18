@@ -115,12 +115,27 @@ ENDPOINT::writeRaw(const void* const data, const size_t sizeInBytes) noexcept
 }
 #endif
 
+#define MAX_BUFF   500
+
 //////////////////////////////////////////////////////////////////////
 // Actually write data to a socket.
 
 SINT32
 ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 address, const UINT32 port)
 {
+
+#ifdef TEUL_DETAIL_OUTPUT
+        unsigned char *input = (unsigned char *)data;
+        char debugBuff[MAX_BUFF];
+        for (int i = 0; i < (int)sizeInBytes && i < MAX_BUFF / 3; i++)
+        {
+                sprintf(debugBuff + (i * 3), "%02X ", input[i]);
+        }
+        debugBuff[sizeInBytes * 3] = 0;
+        dbugLog(_FLN, "Sending MSG: SourcePort %d DestPort %d IP .%d Recvd Dump:\n   %s", destPort(), fromPort(),
+                fromAddress() & 0xff, debugBuff);
+#endif
+
 	if ( protocol == PROTOCOL_TCP || protocol == PROTOCOL_CTRL )
 	{
 		return ::send(socket, (const char*)data, sizeInBytes, SOCK_SEND_FLAGS);

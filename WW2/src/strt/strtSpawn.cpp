@@ -746,6 +746,7 @@ strtProcessSpawnGrantRequest(const MM_SPAWN_GRANT_REQUEST& request, MM_SPAWN_GRA
 	// Place a spawned weapon entry and schedule a new reinforcement
 	if ( !currentWeapon->spawn() )
 	{
+		dbugLog(_FLW, "Spawn Error in currentWeapon->spawn!");
 		response.code = SPAWN_ERROR;
 		return FALSE;
 	}

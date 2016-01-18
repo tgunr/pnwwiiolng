@@ -482,6 +482,8 @@ _receiveTCP(ENDPOINT& endpoint, void* const ioData, UINT32* const ioSize, UINT32
 	return retval;
 }
 
+#define MAX_BUFF  500
+
 static SINT32
 _startNewPacket(ENDPOINT& endpoint)
 {
@@ -498,6 +500,18 @@ _startNewPacket(ENDPOINT& endpoint)
 	SINT32 retval = _receiveTCP(endpoint, leadinBuffer + endpoint.m_readBufferUsed, &readSize, &flags);
 	if ( retval <= 0 )
 		return retval;
+
+
+#ifdef TEUL_DETAIL_OUTPUT
+        char debugBuff[MAX_BUFF];
+        for (int i = 0; i < (int)readSize && i < MAX_BUFF / 3; i++)
+        {
+                sprintf(debugBuff + (i * 3), "%02X ", leadinBuffer[i]);
+        }
+        debugBuff[readSize * 3] = 0;
+        dbugLog(_FLN, "Recieving MSG: SourcePort %d DestPort %d IP .%d Recvd Dump:\n   %s", endpoint.destPort(), endpoint.fromPort(),
+                endpoint.fromAddress() & 0xff, debugBuff);
+#endif
 
 	// Verify it has valid prefix data.
 	const Teul::PacketHeader* const header = (Teul::PacketHeader*)leadinBuffer;

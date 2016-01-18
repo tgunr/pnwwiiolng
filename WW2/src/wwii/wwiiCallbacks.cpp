@@ -18,10 +18,10 @@ CallbackRegister::_error(SINT32 teulIndex, const UCHAR* const data, SINT32 size,
 	dbugLog(_FLA, "t:%d error %d in teulCallback %p data %p size %d", teulIndex, error, static_cast<const void*>(object), data, size);
 }
 
-CallbackRegister::CallbackRegister(UCHAR callX, const char * const callXName)
+CallbackRegister::CallbackRegister(UCHAR x, const char * const name)
 {
-	sm_ci.callX = callX;
-	sm_ci.callXName = callXName;
+	sm_ci.callX = x;
+	sm_ci.callXName = name;
 	sm_ci.error = CallbackRegister::_error;
 }
 
