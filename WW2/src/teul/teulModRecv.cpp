@@ -503,13 +503,15 @@ _startNewPacket(ENDPOINT& endpoint)
 
 
 #ifdef TEUL_DETAIL_OUTPUT
-        char debugBuff[MAX_BUFF];
-        for (int i = 0; i < (int)readSize && i < MAX_BUFF / 3; i++)
+        char debugBuff[MAX_BUFF+1];
+	int buffOffset=0;
+        for (int i = 0; i < (int)readSize && buffOffset < (MAX_BUFF-1); i++)
         {
-                sprintf(debugBuff + (i * 3), "%02X ", leadinBuffer[i]);
+                sprintf(debugBuff + buffOffset, "%02X ", leadinBuffer[i]);
+                buffOffset += 3;
         }
-        debugBuff[readSize * 3] = 0;
-        dbugLog(_FLN, "Recieving MSG: SourcePort %d DestPort %d IP .%d Recvd Dump:\n   %s", endpoint.destPort(), endpoint.fromPort(),
+        debugBuff[(buffOffset < MAX_BUFF)?readSize * 3:MAX_BUFF] = 0;
+        dbugLog(_FLN, "Recieving MSG: SourcePort %d DestPort %d IP .%d Recvd Dump:\n<--%s", endpoint.destPort(), endpoint.fromPort(),
                 endpoint.fromAddress() & 0xff, debugBuff);
 #endif
 
@@ -569,6 +571,21 @@ _continuePacket(ENDPOINT& endpoint)
 	{
 		return retval;
 	}
+
+#ifdef TEUL_DETAIL_OUTPUT
+        if (readSize > 0)
+  	{
+        	char debugBuff[MAX_BUFF+1];
+	        int buffOffset=0;
+       		for (int i = 0; i < (int)readSize && buffOffset < (MAX_BUFF-1); i++)
+	        {
+                	sprintf(debugBuff + buffOffset, "%02X ", readBuffer[i]);
+	                buffOffset += 3;
+        	}
+	        debugBuff[(buffOffset < MAX_BUFF)?readSize * 3:MAX_BUFF] = 0;
+	        dbugLog(_FLN, "%s", debugBuff);
+    	}
+#endif
 
 	endpoint.m_readBufferUsed += readSize;
 

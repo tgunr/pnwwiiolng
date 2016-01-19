@@ -126,13 +126,15 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 
 #ifdef TEUL_DETAIL_OUTPUT
         unsigned char *input = (unsigned char *)data;
-        char debugBuff[MAX_BUFF];
-        for (int i = 0; i < (int)sizeInBytes && i < MAX_BUFF / 3; i++)
+        char debugBuff[MAX_BUFF+1];
+        int buffOffset = 0;
+        for (int i = 0; i < (int)sizeInBytes && buffOffset < MAX_BUFF; i++)
         {
-                sprintf(debugBuff + (i * 3), "%02X ", input[i]);
+                sprintf(debugBuff + buffOffset, "%02X ", input[i]);
+          	buffOffset += 3;
         }
-        debugBuff[sizeInBytes * 3] = 0;
-        dbugLog(_FLN, "Sending MSG: SourcePort %d DestPort %d IP .%d Recvd Dump:\n   %s", destPort(), fromPort(),
+        debugBuff[(buffOffset < MAX_BUFF)?sizeInBytes * 3:MAX_BUFF] = 0;
+        dbugLog(_FLN, "Sending MSG: SourcePort %d DestPort %d IP .%d Sent Dump:\n-->%s", destPort(), fromPort(),
                 fromAddress() & 0xff, debugBuff);
 #endif
 
