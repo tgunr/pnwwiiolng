@@ -153,11 +153,12 @@ static DATA_GRAM* _getNextDatagram(size_t size)
 	assert(size > 0);
 	if (PN_UNLIKELY(size <= 0))
 		return nullptr;
-	size_t allocSize;
+
+	// frisbone // Fixes crash for packet size 16350-16384
+	size_t allocSize = _roundDatagramSize<DATAGRAM_ROUNDING>(size);
 	// Determine if the packet is in the range of sizes we try to pool.
-	if (PN_LIKELY(size <= LARGEST_POOLED_SIZE))
+	if (PN_LIKELY(allocSize <= LARGEST_POOLED_SIZE))
 	{
-		allocSize = _roundDatagramSize<DATAGRAM_ROUNDING>(size);
 		const size_t bucketNo = (allocSize / DATAGRAM_ROUNDING) - 1;
 		auto& bucket = s_freeDatagrams[bucketNo];
 		if (bucket.empty() == false)
