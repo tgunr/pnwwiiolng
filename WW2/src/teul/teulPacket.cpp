@@ -26,18 +26,23 @@ Teul::Packet::Packet(PacketId id)
 
 //////////////////////////////////////////////////////////////////////
 // Copy constructor.
+//
+// frisbone: copy constructor was not doing a proper copy.  Not much
+//           point in copying the data without the reference info too.
 
 Teul::Packet::Packet(const Teul::Packet& rhs)
 	: m_data(m_localData)
-	, m_packetSizeBytes(0)
-	, m_capacity(DefaultLocalDataSize)
-	, m_sent(0)
-	, m_address(rhs.m_address)
-	, m_port(rhs.m_port)
 {
 	const UINT32 newSize = rhs.packetSizeBytes();
 	setPacketSizeBytes(newSize);
 	memcpy(m_data, rhs.m_data, newSize);
+
+	// Steal the size counts.
+	this->m_capacity = rhs.m_capacity;
+	this->m_sent = rhs.m_sent;
+	this->m_address = rhs.m_address;
+	this->m_port = rhs.m_port;
+
 }
 
 //////////////////////////////////////////////////////////////////////
