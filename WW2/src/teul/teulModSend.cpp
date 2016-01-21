@@ -128,7 +128,7 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 	 	SINT32 retval = ::send(socket, (const char*)data, sizeInBytes, SOCK_SEND_FLAGS);
 		// frisbone // dbugLog(_FLD, "Write result %d", retval);
 		if (retval > 0)
-		        dbugOutputPacket( false, data, retval );
+		        dbugOutputPacket( (*this), false, data, retval );
 		return retval;
 	}
 
@@ -194,7 +194,7 @@ ENDPOINT::sendPacket(Teul::Packet& packet)
 {
 	const UINT32 packetBytes = packet.packetSizeBytes();
 
-	// frisbone // dbugOutputPacket( false, packet.packet(), packetBytes );
+	// frisbone // dbugOutputPacket( *this, false, packet.packet(), packetBytes );
 
 	// If there's no send queue, try and send the data directly.
 	if ( m_impl->m_sendQueue.empty() == true )

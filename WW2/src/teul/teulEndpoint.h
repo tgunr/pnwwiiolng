@@ -22,9 +22,9 @@ namespace Teul
 struct EndpointImpl;
 
 #ifdef TEUL_DETAIL_OUTPUT
-#define dbugOutputPacket( bIsRecv, bpInput, szBytes )     _dbugOutputPacket ( bIsRecv, reinterpret_cast<const uint8_t *>(bpInput), static_cast<size_t>(szBytes) );
+#define dbugOutputPacket( ep, bIsRecv, bpInput, szBytes )     ep._dbugOutputPacket ( bIsRecv, reinterpret_cast<const uint8_t *>(bpInput), static_cast<size_t>(szBytes) );
 #else
-#define dbugOutputPacket( bIsRecv, bpInput, szBytes )
+#define dbugOutputPacket( ep, bIsRecv, bpInput, szBytes )
 #endif
 
 struct 	ENDPOINT

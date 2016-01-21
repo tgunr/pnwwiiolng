@@ -166,12 +166,6 @@ static DATA_GRAM* _getNextDatagram(size_t size)
 			bucket.pop();
 			return gram;
 		}
-		else
-		{
-			// frisbone // Needed to acount for no buckets available - would drop through and cause seg fault
-			dbugLog(_FLA,"No dgram to allocate, grabbing new one @ 512 increment");
-			allocSize = _roundDatagramSize<512>(size);
-		}
 	}
 	else
 	{
@@ -518,7 +512,7 @@ _startNewPacket(ENDPOINT& endpoint)
 	const UINT32 token = header->packetType();
 	if ( token != (UINT32)Teul::Tokens::Encrypted && token != (UINT32)Teul::Tokens::Unencrypted )
 	{
-	        endpoint.dbugOutputPacket( true, leadinBuffer, readSize );
+	    dbugOutputPacket( endpoint, true, leadinBuffer, readSize );
 
 		dbugLog(_FLN, "t:%d garbage packet prefix %u", endpoint.teulIndex(), token);
 		teulClose(endpoint, Teul::Closing::Prefix);
@@ -533,7 +527,7 @@ _startNewPacket(ENDPOINT& endpoint)
 	if ( totalRead < LeadInSizeBytes )
 	{
 
-	        endpoint.dbugOutputPacket( true, leadinBuffer, readSize );
+	        dbugOutputPacket( endpoint, true, leadinBuffer, readSize );
 
 		dbugLog(_FLN, "t:%d garbage short packets, ignoring.", endpoint.teulIndex());
 		endpoint.m_readBufferUsed = totalRead;
@@ -544,7 +538,7 @@ _startNewPacket(ENDPOINT& endpoint)
 	size_t size = header->packetSizeBytes();
 	if ( size < 1 || size > Teul::MaxAllowedPacketSize_bytes )
 	{
-	        endpoint.dbugOutputPacket( true, leadinBuffer, readSize );
+	        dbugOutputPacket( endpoint, true, leadinBuffer, readSize );
 
 		dbugLog(_FLN, "t:%d invalid packet size: %" PRSizeT, endpoint.teulIndex(), size);
 		teulClose(endpoint, Teul::Closing::BadSize);
@@ -616,7 +610,7 @@ _recvfromStream(ENDPOINT& endpoint)
 		}
 	}
 
-        endpoint.dbugOutputPacket( true, endpoint.m_impl->m_curDatagram->contents, endpoint.m_readBufferUsed );
+    dbugOutputPacket( endpoint, true, endpoint.m_impl->m_curDatagram->contents, endpoint.m_readBufferUsed );
 
 	const UINT32 datagramSize = endpoint.m_impl->m_curDatagram->m_size;
 	endpoint.m_impl->recvQueue.push_back(endpoint.m_impl->m_curDatagram);
