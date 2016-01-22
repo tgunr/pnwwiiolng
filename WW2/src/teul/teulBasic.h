@@ -138,3 +138,10 @@ SINT32 teulPostCallbackError(const SINT32 teulIndex
 void teulSendError(const SINT32 teulIndex, const SINT32 errorCode);
 
 ENDPOINT* teulGetEndpoint(const SINT32 index);
+#ifndef TEUL_PACKET_NAMES
+#ifdef DEBUG_WW2
+#define TEUL_PACKET_NAMES 1
+#else
+#define TEUL_PACKET_NAMES 0
+#endif
+#endif

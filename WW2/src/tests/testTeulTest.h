@@ -54,6 +54,7 @@ TestItem::Index TestItem::s_index;
 static TestItem tRecv("recv", "Test that receive functionality works");
 static TestItem tSend("send", "Test that sending works");
 static TestItem tSendSpam("sendspam", "Test burst sending of a large number of packets");
+static TestItem tSendVariety("sendvariety", "Test sending a variety of packet sizes");
 
 static TestItem tTimeouts("timeouts", "Put delays between tests to check keepalives & timeouts", false);
 static TestItem	tDeadEp("deadep", "Dead endpoint garbage collection test");

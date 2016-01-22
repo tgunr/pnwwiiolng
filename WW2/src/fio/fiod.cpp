@@ -63,7 +63,7 @@
 #endif
 
 #ifdef RECORD_FILES
-static std::set<std::string> ReferencedFiles;
+static std::set<std::wstring> ReferencedFiles;
 
 void dumpFileRefs()
 {
@@ -74,7 +74,7 @@ void dumpFileRefs()
 	}
 }
 
-static void recordRef( std::string ref )
+static void recordRef( std::wstring ref )
 {
 	ReferencedFiles.insert(ref);
 }
@@ -375,7 +375,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 #if platOS == OS_WIN32
 		// already been converted and path separators fixed
 		fd = OS_WOPEN(widePath, O_RDONLY | O_BINARY);
-		recordRef(asciiPath);
+		recordRef(widePath);
 #else
 		fd = OS_OPEN(os_file_path(asciiPath), O_RDONLY | O_BINARY);
 		recordRef(os_file_path(asciiPath));

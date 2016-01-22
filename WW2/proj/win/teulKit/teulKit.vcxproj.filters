@@ -185,5 +185,8 @@
     <ClInclude Include="..\..\..\src\teul\teulPacket.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\src\teul\teulCallbackInit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

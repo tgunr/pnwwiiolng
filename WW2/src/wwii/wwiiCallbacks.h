@@ -2,6 +2,7 @@
 
 #include "teul/teulCallback.h"
 #include "teul/teulCallbackInit.h"
+#include "assert.h"
 
 //////////////////////////////////////////////////////////////////////
 // Macro functions for wrapping callback definitions
@@ -31,40 +32,41 @@
 
 //! Begin registration of a callback set for a given CallbackX group.
 #define BEGIN_CALLBACK_REGISTRATION(callX)	\
-	CallbackRegister cbr(callX); \
+    CallbackRegister cbr(callX, TEUL_PACKET_NAMES ? #callX : ""); \
 	try	\
 	{ \
 	dbugLog(_FLI, "%s: installing " #callX " callbacks", __FUNCTION__);
 
 //! Register a sender function.
-#define REGISTER_SENDER(y, sendFn, cb) cbr.sender(y, sendFn, cb)
+#define REGISTER_SENDER(y, sendFn, cb) cbr.sender(y, TEUL_PACKET_NAMES ? #y : "", sendFn, cb)
+
 //! Register a trivial sender that has no data.
-#define REGISTER_SENDER_NODATA(y, cb) cbr.sender(y, CallbackRegister::NoDataHandler, cb)
+#define REGISTER_SENDER_NODATA(y, cb) cbr.sender(y, TEUL_PACKET_NAMES ? #y : "", CallbackRegister::NoDataHandler, cb)
 //! Register a receiver function.
-#define	REGISTER_RECEIVER(y, recvFn) cbr.receiver(y, recvFn)
+#define REGISTER_RECEIVER(y, recvFn) cbr.receiver(y, TEUL_PACKET_NAMES ? #y : "", recvFn)
 //! Register a function with both send and receive options.
-#define	REGISTER_SENDRECV(y, sendFn, recvFn, cb) { assert(cb == nullptr); cb = cbr.callback(y, sendFn, recvFn); }
+#define REGISTER_SENDRECV(y, sendFn, recvFn, cb) { assert(cb == nullptr); cb = cbr.callback(y, TEUL_PACKET_NAMES ? #y : "", sendFn, recvFn); }
 //! Register a function with both receive and send options.
-#define	REGISTER_RECVSEND(y, recvFn, sendFn, cb) { assert(cb == nullptr); cb = cbr.callback(y, sendFn, recvFn); }
+#define REGISTER_RECVSEND(y, recvFn, sendFn, cb) { assert(cb == nullptr); cb = cbr.callback(y, TEUL_PACKET_NAMES ? #y : "", sendFn, recvFn); }
 
 //! Register a bi-directional teul_network_array.
 #define REGISTER_ARRAY(y, typeName) { assert(cb == nullptr); cb = cbr.callback(y, typeName::callbackSend, typeName::callbackRecv); }
 
 //! Register a teul_network entity sender.
-#define REGISTER_MSG_SENDER(y, typeName) cbr.sender(y, typeName::callbackSend, typeName::callback())
+#define REGISTER_MSG_SENDER(y, typeName) cbr.sender(y, TEUL_PACKET_NAMES ? #y : "", typeName::callbackSend, typeName::callback())
 //! Register a teul_network entity receiver.
-#define REGISTER_MSG_RECEIVER(y, typeName) cbr.receiver(y, typeName::callbackRecv)
+#define REGISTER_MSG_RECEIVER(y, typeName) cbr.receiver(y, TEUL_PACKET_NAMES ? #y : "", typeName::callbackRecv)
 //! Register a bi-directional teul_network entity.
-#define REGISTER_MSG(y, typeName) { assert(typeName::callback() == nullptr); typeName::callback() = cbr.callback(y, typeName::callbackSend, typeName::callbackRecv); }
+#define REGISTER_MSG(y, typeName) { assert(typeName::callback() == nullptr); typeName::callback() = cbr.callback(y, TEUL_PACKET_NAMES ? #y : "", typeName::callbackSend, typeName::callbackRecv); }
 
 //! Receive message to _recv<ObjType>(ACTION_OBJECT*, ObjType&)
-#define REGISTER_RECEIVEOBJ(CallY, ObjType, RecvFn) cbr.receiveObj<ObjType>(CallY, RecvFn)
+#define REGISTER_RECEIVEOBJ(y, ObjType, RecvFn) cbr.receiveObj<ObjType>(y, TEUL_PACKET_NAMES ? #y : "", RecvFn)
 
 //! Handle OMG Objects
 #define REGISTER_OMG_RECEIVER(ObjType, RecvFn) do { \
 	if (ObjType::CallX != cbr.callX()) \
 		LogAbort("CallX mismatch"); \
-	cbr.receiveObj<ObjType>(ObjType::CallY, RecvFn); \
+	cbr.receiveObj<ObjType>(ObjType::CallY, TEUL_PACKET_NAMES ? #ObjType : "", RecvFn); \
 } while(false)
 
 //! Terminate registration block.
@@ -87,16 +89,17 @@
 class CallbackRegister
 {
 public:
-	CallbackRegister(UCHAR callX);
+	CallbackRegister(UCHAR callX, const char * const callXName);
 	~CallbackRegister() {}
 
 	static UINT8 callX() { return sm_ci.callX; }
 
-	TEUL_CALLBACK* callback(UCHAR callY, ACTION_FN sendFn, ACTION_FN recvFn);
-	void sender(UCHAR callY, ACTION_FN sendFn, TEUL_CALLBACK*& toRef) { assert(toRef == nullptr); toRef = callback(callY, sendFn, nullptr); }
-	void receiver(UCHAR callY, ACTION_FN recvFn) { callback(callY, nullptr, recvFn); }
+	TEUL_CALLBACK* callback(UCHAR callY, const char * const callYName, ACTION_FN sendFn, ACTION_FN recvFn);
+	void sender(UCHAR callY, const char * const callYName, ACTION_FN sendFn, TEUL_CALLBACK*& toRef) { assert(toRef == nullptr); toRef = callback(callY, callYName, sendFn, nullptr); }
+	void receiver(UCHAR callY, const char * const callYName, ACTION_FN recvFn) { callback(callY, callYName, nullptr, recvFn); }
+
 	template<typename T_>
-	void receiveObj(UCHAR callY, SINT32(*recvFn)(ACTION_OBJECT*, T_&))
+	void receiveObj(UCHAR callY, const char * const callYName, SINT32(*recvFn)(ACTION_OBJECT*, T_&))
 	{
 		auto delegateFn = [=] (ACTION_OBJECT* a) -> SINT32
 		{
@@ -105,7 +108,7 @@ public:
 			T_& objInstance = a->read<T_>();
 			return recvFn(a, objInstance);
 		};
-		callback(callY, nullptr, delegateFn);
+		callback(callY, callYName, nullptr, delegateFn);
 	}
 
 	// No-op handler for sends

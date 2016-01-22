@@ -52,7 +52,7 @@
     <ClCompile>
       <Optimization>Disabled</Optimization>
       <AdditionalIncludeDirectories>$(SolutionDir)\WW2\src;$(SolutionDir)\WW2\src\teul;$(SolutionDir)\WW2\src\sys;$(SolutionDir)\Libraries;$(SolutionDir)\Libraries\libevent\include;$(SolutionDir)\Libraries\libevent\WIN32-CODE</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>DEBUG;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>TEUL_DETAIL_OUTPUT;DEBUG_WW2;DEBUG;CONNECTION_TEST_BUILD;WIN32;_LIB;_CRT_SECURE_NO_WARNINGS;platOS=OS_WIN32;_HAS_ITERATOR_DEBUGGING=0;_SECURE_SCL=0;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MinimalRebuild>true</MinimalRebuild>
       <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
       <SmallerTypeCheck>false</SmallerTypeCheck>
@@ -144,6 +144,7 @@
     <ClInclude Include="..\..\..\src\dbug\dbugWErrno.h" />
     <ClInclude Include="..\..\..\src\include\precompile_includes.h" />
     <ClInclude Include="..\..\..\src\mem\memPool.h" />
+    <ClInclude Include="..\..\..\src\teul\teulCallbackInit.h" />
     <ClInclude Include="..\..\..\src\teul\teulCallbackStruct.h" />
     <ClInclude Include="..\..\..\src\teul\teulClosingEnums.h" />
     <ClInclude Include="..\..\..\src\teul\teulEndpointIdleList.h" />

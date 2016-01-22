@@ -21,6 +21,12 @@ namespace Teul
 
 struct EndpointImpl;
 
+#ifdef TEUL_DETAIL_OUTPUT
+#define dbugOutputPacket( ep, bIsRecv, bpInput, szBytes )     ep._dbugOutputPacket ( bIsRecv, reinterpret_cast<const uint8_t *>(bpInput), static_cast<size_t>(szBytes) );
+#else
+#define dbugOutputPacket( ep, bIsRecv, bpInput, szBytes )
+#endif
+
 struct 	ENDPOINT
 {
 public:
@@ -138,6 +144,9 @@ public:
 
 	//! Decrypt an incoming stream.
 	void decrypt(UCHAR* const stream_, const size_t bytes_);
+
+	//! Format a packet for debug display
+	void _dbugOutputPacket( bool isRecv, const uint8_t *input, size_t packetBytes );
 
 	UINT32 localAddress() const;
 	UINT16 localPort() const;
