@@ -29,20 +29,21 @@ Teul::Packet::Packet(PacketId id)
 //
 // frisbone: copy constructor was not doing a proper copy.  Not much
 //           point in copying the data without the reference info too.
+// frisbone: m_packetSizeBytes and m_capacity were uninitialized and allowed resize logic to fail.
 
 Teul::Packet::Packet(const Teul::Packet& rhs)
 	: m_data(m_localData)
+	, m_packetSizeBytes(DefaultLocalDataSize)
+	, m_capacity(DefaultLocalDataSize)
 {
-	const UINT32 newSize = rhs.packetSizeBytes();
-	setPacketSizeBytes(newSize);
-	memcpy(m_data, rhs.m_data, newSize);
-
 	// Steal the size counts.
-	this->m_capacity = rhs.m_capacity;
 	this->m_sent = rhs.m_sent;
 	this->m_address = rhs.m_address;
 	this->m_port = rhs.m_port;
 
+	setPacketSizeBytes(rhs.m_packetSizeBytes);
+
+	memcpy(this->m_data, rhs.m_data, this->m_packetSizeBytes);
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -61,6 +62,7 @@ Teul::Packet::Packet(Teul::Packet&& rhs)
 		return;
 
 	this->m_data = rhs.m_data;		// Take possession of the data,
+	
 	rhs.m_data = rhs.m_localData;	// point rhs back at its local data.
 
 	// If the source is using it's local data buffer, just copy the data over
@@ -93,6 +95,7 @@ Teul::Packet::operator=(const Teul::Packet& rhs)
 	const UINT32 dataSize = rhs.packetSizeBytes();
 	this->setPacketSizeBytes(dataSize);
 	memcpy(this->m_data, rhs.m_data, dataSize);
+
 	m_address = rhs.m_address;
 	m_port = rhs.m_port;
 	m_sent = 0;
@@ -105,9 +108,12 @@ Teul::Packet::operator=(const Teul::Packet& rhs)
 
 Teul::Packet::~Packet()
 {
+	ABORT_IF(m_data==nullptr);  // frisbone // protect against nullptr
 	// Check if the data needs freeing.
 	if ( m_data != m_localData )
+	{
 		memFree(m_data);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -150,8 +156,9 @@ void
 Teul::Packet::setPacketSizeBytes(const UINT32 sizeBytes_)
 {
 	if ( sizeBytes_ > m_capacity )
+	{
 		setPacketCapacityBytes(sizeBytes_);
-
+	}	
 	m_packetSizeBytes = sizeBytes_;
 }
 
