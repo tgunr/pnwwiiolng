@@ -154,7 +154,6 @@ static DATA_GRAM* _getNextDatagram(size_t size)
 	if (PN_UNLIKELY(size <= 0))
 		return nullptr;
 
-	// frisbone // Fixes crash for packet size 16350-16384
 	size_t allocSize = _roundDatagramSize<DATAGRAM_ROUNDING>(size);
 	// Determine if the packet is in the range of sizes we try to pool.
 	if (PN_LIKELY(allocSize <= LARGEST_POOLED_SIZE))
@@ -427,28 +426,27 @@ _receiveTCP(ENDPOINT& endpoint, void* const ioData, UINT32* const ioSize, UINT32
 	{
 		*ioSize = 0;
 
-		// frisbone // did not account for all non-error responses
 		SINT32 err = 0;
 
 #if platOS != OS_WIN32
 		err = errno;
 		const bool notCompleteYet = (err == EINTR) | (err == EAGAIN) | (err == EWOULDBLOCK);
-               	if ( notCompleteYet )
+		if ( notCompleteYet )
 		{
-                        retval = -err;
+			retval = -err;
 		}
-                else
+		else
 #endif
-               {
-                       // When recv() returns 0, this indicates that the connection has closed.
-                       // TeulKit doesn't distinguish between deliberate and fault-related
-                       // closure; in both cases we notify the application of closure with
-                       // an "error"; it is then left to the application to track whether
-                       // it is important or not.
+		{
+		// When recv() returns 0, this indicates that the connection has closed.
+		// TeulKit doesn't distinguish between deliberate and fault-related
+		// closure; in both cases we notify the application of closure with
+		// an "error"; it is then left to the application to track whether
+		// it is important or not.
 
-                       err = dbugGetErrno();
-                       dbugLog(_FLN, "t:%d closing TCP socket %d end of stream (recv:0, errno:%d), time %llu"
-                                                        , endpoint.teulIndex(), thesock, err, teulClock64);
+		err = dbugGetErrno();
+		dbugLog(_FLN, "t:%d closing TCP socket %d end of stream (recv:0, errno:%d), time %llu",
+		        endpoint.teulIndex(), thesock, err, teulClock64);
 
 			// Tear down all of the teulkit abstractions over the socket and
 			// send notification to the application.
@@ -459,21 +457,17 @@ _receiveTCP(ENDPOINT& endpoint, void* const ioData, UINT32* const ioSize, UINT32
 
 	if (retval <= 0)
 	{
-		// frisbone // make check more consistant with the rest of the code
 		*ioSize = 0;
 		const SINT32 err = dbugGetErrno();
 		const bool notCompleteYet = (err == EINTR) | (err == EAGAIN) | (err == EWOULDBLOCK);
-		if ( notCompleteYet )
-		{
-		  	// This is not an error, simply means data isn't available yet
+		if ( notCompleteYet ) {
+			// This is not an error, simply means data isn't available yet
 			return -err;
-                }
-		else if ( err == ECONNREFUSED )
+		} else if ( err == ECONNREFUSED ) {
 			_connectionRefused(endpoint, err);
-		else
-		{
-			dbugLog(_FLN, " socket %d read error %d, closing index:%d, retval:%d"
-							, thesock, err, endpoint.teulIndex(), retval);
+		} else {
+			dbugLog(_FLN, " socket %d read error %d, closing index:%d, retval:%d",
+			        thesock, err, endpoint.teulIndex(), retval);
 
 			teulClose(endpoint, Teul::Closing::ReadErr);
 			dbugSetErrno(err);
@@ -481,8 +475,6 @@ _receiveTCP(ENDPOINT& endpoint, void* const ioData, UINT32* const ioSize, UINT32
 	}
 	else
 	{
-		// frisbone // dbugLog(_FLD, " _receiveTCP received %d bytes", retval);
-
 		*ioSize = retval;
 		// Got some data.
 		endpoint.lastDataRecv.makeCurrent();
@@ -503,7 +495,7 @@ _startNewPacket(ENDPOINT& endpoint)
 	UCHAR* const leadinBuffer = endpoint.m_readAheadBuffer;
 
 	UINT32 readSize = sizeof(endpoint.m_readAheadBuffer) - endpoint.m_readBufferUsed;
-	UINT32 flags = 0;			// Don't actually pull the data.
+	UINT32 flags = 0; // Don't actually pull the data.
 	SINT32 retval = _receiveTCP(endpoint, leadinBuffer + endpoint.m_readBufferUsed, &readSize, &flags);
 	if ( retval <= 0 )
 		return retval;
@@ -513,7 +505,7 @@ _startNewPacket(ENDPOINT& endpoint)
 	const UINT32 token = header->packetType();
 	if ( token != (UINT32)Teul::Tokens::Encrypted && token != (UINT32)Teul::Tokens::Unencrypted )
 	{
-	    dbugOutputPacket( endpoint, true, leadinBuffer, readSize );
+		dbugOutputPacket( endpoint, true, leadinBuffer, readSize );
 
 		dbugLog(_FLN, "t:%d garbage packet prefix %u", endpoint.teulIndex(), token);
 		teulClose(endpoint, Teul::Closing::Prefix);
@@ -527,8 +519,7 @@ _startNewPacket(ENDPOINT& endpoint)
 	// in which case we should just leave it there for a bit.
 	if ( totalRead < LeadInSizeBytes )
 	{
-
-	        dbugOutputPacket( endpoint, true, leadinBuffer, readSize );
+		dbugOutputPacket( endpoint, true, leadinBuffer, readSize );
 
 		dbugLog(_FLN, "t:%d garbage short packets, ignoring.", endpoint.teulIndex());
 		endpoint.m_readBufferUsed = totalRead;
@@ -539,7 +530,7 @@ _startNewPacket(ENDPOINT& endpoint)
 	size_t size = header->packetSizeBytes();
 	if ( size < 1 || size > Teul::MaxAllowedPacketSize_bytes )
 	{
-	        dbugOutputPacket( endpoint, true, leadinBuffer, readSize );
+		dbugOutputPacket( endpoint, true, leadinBuffer, readSize );
 
 		dbugLog(_FLN, "t:%d invalid packet size: %" PRSizeT, endpoint.teulIndex(), size);
 		teulClose(endpoint, Teul::Closing::BadSize);
@@ -713,7 +704,10 @@ _recvDatagram(ENDPOINT& endpoint)
 				++packetsReceived;
 
 		}
-		while ( errorCount < 16 && endpoint.m_impl->recvQueue.size() == 0); // frisbone // allow it to escape if nothing is queued
+		// Escape if nothing is queued.
+		while ( errorCount < 16 && endpoint.m_impl->recvQueue.size() == 0 ) {
+		}
+
 		if ( errorCount > 2 )
 			dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " packets:%u errors:%u", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), packetsReceived, errorCount);
 	}

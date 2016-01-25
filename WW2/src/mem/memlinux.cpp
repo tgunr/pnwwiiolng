@@ -177,7 +177,7 @@ memReallocDebug(void* const oldPtr_, const size_t newSize_, const char* const fi
 void
 memFreeDebug(void* const oldPtr_, const char* const file_, const size_t line_)
 {
-	ABORT_IF(oldPtr_ == nullptr);  // frisbone // no protection agains a nullptr
+	ABORT_IF(oldPtr_ == nullptr);
 	Header* header = Header::FromPointer(oldPtr_);
 	ABORT_IF(header->m_allocSize == 0);
 	if ( PN_LIKELY(s_history.m_inUse) )

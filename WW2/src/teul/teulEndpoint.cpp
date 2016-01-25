@@ -123,10 +123,10 @@ ENDPOINT::decrypt(UCHAR* const stream, const size_t bytes)
 	}
 }
 
-#define SZ_MAX_BUFF   		1600					// Largest size hex text area to display not including extra for trailer (header info)
-#define NUM_TAIL_AMT   		8					// For oversized packets, number of hex bytes to show at tail end
-#define SZ_HEX_DIG_TEXT		3					// Length of each printed hex digit - which includes a space
-#define NUM_MAX_HDR_BYTES       (SZ_MAX_BUFF / SZ_HEX_DIG_TEXT)		// Number of heading bytes that can be displayed in the buffer allotted
+#define SZ_MAX_BUFF       1600                            // Largest size hex text area to display not including extra for trailer (header info)
+#define NUM_TAIL_AMT      8                               // For oversized packets, number of hex bytes to show at tail end
+#define SZ_HEX_DIG_TEXT   3                               // Length of each printed hex digit - which includes a space
+#define NUM_MAX_HDR_BYTES (SZ_MAX_BUFF / SZ_HEX_DIG_TEXT) // Number of heading bytes that can be displayed in the buffer allotted
 
 //////////////////////////////////////////////////////////////////////
 // Format a packet for dbug display output (if configured)
@@ -135,7 +135,7 @@ ENDPOINT::_dbugOutputPacket( bool isRecv, const uint8_t *input, size_t packetByt
 {
 	static const char *STR_CONTINUATION = " ... ";
 
-        // NOTE: actual buffer is the maximu header area plus all the fixed trailer information
+	// NOTE: Actual buffer is the maximux header area plus all the fixed trailer information.
 	auto debugBuff = std::make_unique<char []>(SZ_MAX_BUFF + NUM_TAIL_AMT * SZ_HEX_DIG_TEXT + strlen(STR_CONTINUATION) + 1);
 	debugBuff[0] = 0;
 	char hex[] = { '0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F' };
@@ -144,36 +144,31 @@ ENDPOINT::_dbugOutputPacket( bool isRecv, const uint8_t *input, size_t packetByt
 	charToHex[SZ_HEX_DIG_TEXT] = 0;
 
 	size_t i = 0;
-        for ( ; i < packetBytes && i < NUM_MAX_HDR_BYTES; i++)
-        {
+	for ( ; i < packetBytes && i < NUM_MAX_HDR_BYTES; i++)
+	{
 		charToHex[0] = hex[input[i] >> 4];
 		charToHex[1] = hex[input[i] & 0xf];
 		strncat(debugBuff.get(), charToHex, sizeof(debugBuff));
-        	//frisbone// dbugLog(_FLD, "DETAIL: Byte %8d  Val %s", i, charToHex);
-        }
+	}
 
-        if (i >= NUM_MAX_HDR_BYTES)
-        {
+	if (i >= NUM_MAX_HDR_BYTES)
+	{
 		strncat(debugBuff.get(), STR_CONTINUATION, sizeof(debugBuff));
-                for ( i = NUM_TAIL_AMT; i > 0; i--)
-                {
+		for ( i = NUM_TAIL_AMT; i > 0; i--)
+		{
 			size_t backupAmt = packetBytes - i;
 			charToHex[0] = hex[input[backupAmt] >> 4];
 			charToHex[1] = hex[input[backupAmt] & 0xf];
 			strncat(debugBuff.get(), charToHex, sizeof(debugBuff));
-                }
-        }
+			}
+		}
 
 	if (!isRecv)
-	{
-        	dbugLog(_FLD, "Sending MSG (%d bytes): SourcePort %d DestPort %d IP %s Sent Dump:\n-->%s", packetBytes, destPort(), fromPort(),
-                	teulGetAddress(fromAddress()), debugBuff.get());
-	}
+		dbugLog(_FLD, "Sending MSG (%d bytes): SourcePort %d DestPort %d IP %s Sent Dump:\n-->%s",
+		        packetBytes, destPort(), fromPort(), teulGetAddress(fromAddress()), debugBuff.get());
 	else
-	{
-        	dbugLog(_FLD, "Receiving MSG (%d bytes): SourcePort %d DestPort %d IP %s Recv Dump:\n<--%s", packetBytes, destPort(), fromPort(),
-                	teulGetAddress(fromAddress()), debugBuff.get());
-	}
+		dbugLog(_FLD, "Receiving MSG (%d bytes): SourcePort %d DestPort %d IP %s Recv Dump:\n<--%s",
+		        packetBytes, destPort(), fromPort(), teulGetAddress(fromAddress()), debugBuff.get());
 }
 
 //////////////////////////////////////////////////////////////////////

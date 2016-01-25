@@ -45,6 +45,6 @@ CallbackRegister::callback(UCHAR callY, const char * const callYName, ACTION_FN 
 	{
 		char buf[201];
 		strprintf(buf, "Unable to register %u/%u: %s", sm_ci.callX, callY, e.what());
-		throw std::runtime_error(buf);	///Terminal
+		throw std::runtime_error(buf); ///Terminal
 	}
 }

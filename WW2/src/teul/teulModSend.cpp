@@ -123,12 +123,11 @@ ENDPOINT::writeData(void* const data, const size_t sizeInBytes, const UINT32 add
 
 	if ( protocol == PROTOCOL_TCP || protocol == PROTOCOL_CTRL )
 	{
-		// frisbone // dbugLog(_FLD, "Call to socket::send for PROTOCOL_TCP/CTRL");
-		// frisbone // dbugLog(_FLD, "about to send sub-packet");
+		// dbugLog(_FLD, "about to send sub-packet");
 	 	SINT32 retval = ::send(socket, (const char*)data, sizeInBytes, SOCK_SEND_FLAGS);
-		// frisbone // dbugLog(_FLD, "Write result %d", retval);
+		// dbugLog(_FLD, "Write result %d", retval);
 		if (retval > 0)
-		        dbugOutputPacket( (*this), false, data, retval );
+			dbugOutputPacket( (*this), false, data, retval );
 		return retval;
 	}
 
@@ -194,14 +193,12 @@ ENDPOINT::sendPacket(Teul::Packet& packet)
 {
 	const UINT32 packetBytes = packet.packetSizeBytes();
 
-	// frisbone // dbugOutputPacket( *this, false, packet.packet(), packetBytes );
-
 	// If there's no send queue, try and send the data directly.
 	if ( m_impl->m_sendQueue.empty() == true )
 	{
-		// frisbone // dbugLog(_FLD, "writing direct 1st time: bytesToSend = %d ", packetBytes);
-		// frisbone // dbugLog(_FLD, "start of packet address = %p", packet.packet());
-		// frisbone // dbugLog(_FLD, "address of packet obj = %p", &packet);
+		// dbugLog(_FLD, "writing direct 1st time: bytesToSend = %d ", packetBytes);
+		// dbugLog(_FLD, "start of packet address = %p", packet.packet());
+		// dbugLog(_FLD, "address of packet obj = %p", &packet);
 
 		const SINT32 result = writeData(packet.packet(), packetBytes, packet.address(), packet.port());
 		// Anything but a partial send, the sender handles.
@@ -272,10 +269,10 @@ ENDPOINT::pushSendQueue()
 		const size_t remainingBytes = packet->packetSizeBytes() - sentBytes;
 		void* data = (char*)packet->packet() + sentBytes;
 
-		// frisbone // dbugLog(_FLD, "writing off of queue: sentBytes = %d, packet->packetSizeBytes = %d, remaining = %d", sentBytes, packet->packetSizeBytes(), remainingBytes);
-		// frisbone // dbugLog(_FLD, "start of packet address = %p", packet->packet());
-		// frisbone // dbugLog(_FLD, "address of packet obj = %p", packet);
-		// frisbone // dbugLog(_FLD, "address for write to start from = %p", data);
+		// dbugLog(_FLD, "writing off of queue: sentBytes = %d, packet->packetSizeBytes = %d, remaining = %d", sentBytes, packet->packetSizeBytes(), remainingBytes);
+		// dbugLog(_FLD, "start of packet address = %p", packet->packet());
+		// dbugLog(_FLD, "address of packet obj = %p", packet);
+		// dbugLog(_FLD, "address for write to start from = %p", data);
 
 		const SINT32 result = writeData(data, remainingBytes, packet->address(), packet->port());
 		// Result will be less than sendbytes if it is an error (negative),

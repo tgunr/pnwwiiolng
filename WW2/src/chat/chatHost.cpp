@@ -2291,7 +2291,7 @@ chatHandleTickSample(const UINT32 source, Player& player, const Teul::TickSample
 	if ( lastReport > teulTime() - 60 && abs(sample.delta - lastDelta) <= 120 )
 		return;
 
-        /* According to new types list: CONTROLLER_HOST = 0U, AUTH_HOST, DBD_HOST, STRAT_HOST, CHAT_HOST, MAP_HOST, CELL_HOST  */
+	/* According to new types list: CONTROLLER_HOST = 0U, AUTH_HOST, DBD_HOST, STRAT_HOST, CHAT_HOST, MAP_HOST, CELL_HOST  */
 	static const char* const hostNames[] = { "controller", "auth", "dbd", "strat", "chat", "map", "cell", "exit", "unknown" };
 	char hostname[64];
 	char report[256];
@@ -2303,11 +2303,10 @@ chatHandleTickSample(const UINT32 source, Player& player, const Teul::TickSample
 
 	player.log(_FLW, "%s, host:%llu, client:%llu", report, sample.host_ms, sample.client_ms);
 
-	strprintf(report , "{\"src\":\"%s\",\"elapsed\":{\"host\":%llu,\"client\":%llu},\"delta\":%llu,\"ratio\",\"%0.8g\"}"
-						, hostNames[source]
-						, sample.host_ms, sample.client_ms
-						, sample.delta, sample.ratio
-						);
+	strprintf(report , "{\"src\":\"%s\",\"elapsed\":{\"host\":%llu,\"client\":%llu},\"delta\":%llu,\"ratio\",\"%0.8g\"}",
+	          hostNames[source],
+	          sample.host_ms, sample.client_ms,
+	          sample.delta, sample.ratio);
 	chatdbRecordEvent("HACK", player.callsign(), "speedhack", report, "");
 }
 

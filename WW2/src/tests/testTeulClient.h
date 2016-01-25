@@ -629,46 +629,41 @@ struct ClientRole : public Role
 	public:
 	void TestVaryingPacketSizes(const SINT32 teulIndex) 
 	{
-        	if (tSendVariety.isEnabled() == false)
-                	return;
-                size_t numMsgs = 5;
-		/* TEUL bug hunt NOTES:
-
-		 * Summary: Packet size of 11584 is largest (payload 11576) that can be sent without error
-                 */
+		if (tSendVariety.isEnabled() == false)
+			return;
+		size_t numMsgs = 5;
+		// Summary: Packet size of 11584 is largest (payload 11576) that can be sent without error
 		size_t msgSizes[] = {256, 512, 1024, 2048, 4096, 8192, 16384, 32768, 65536};
-                size_t numSizes = sizeof(msgSizes) / sizeof(size_t);
+		size_t numSizes = sizeof(msgSizes) / sizeof(size_t);
 
-                Iprintf("sending %u messages for each varing size\n", numMsgs);
+		Iprintf("sending %u messages for each varing size\n", numMsgs);
 
 		uint8_t nextChar = static_cast<uint8_t>('A');
-                Teul::Packet outgoing(Teul::PacketId(Role::Test_X, Role::Spam_Y));
-                outgoing.setUnencrypted();
-                outgoing.reserve(70000);
-                for (size_t i = 0; i < numSizes; ++i)
-                {
-	                for (size_t j = 0; j < msgSizes[i]; ++j)
-                	{
-                        	outgoing.append(nextChar);
+		Teul::Packet outgoing(Teul::PacketId(Role::Test_X, Role::Spam_Y));
+		outgoing.setUnencrypted();
+		outgoing.reserve(70000);
+		for (size_t i = 0; i < numSizes; ++i)
+		{
+			for (size_t j = 0; j < msgSizes[i]; ++j)
+			{
+				outgoing.append(nextChar);
 				if (++nextChar > static_cast<uint8_t>('Z'))
-					 nextChar = static_cast<uint8_t>('A');
-                	}
+				nextChar = static_cast<uint8_t>('A');
+			}
 
-                	Iprintf("sending %u messages for packet size %d\n", numMsgs, msgSizes[i]);
+			Iprintf("sending %u messages for packet size %d\n", numMsgs, msgSizes[i]);
 			for (size_t j = 0; j < numMsgs; ++j)
 			{
-                        	outgoing.send(teulIndex);
+				outgoing.send(teulIndex);
 			}
-                	const TeulTimeMS cutoff = teulClock64 + 250;
-	                while ( teulClock64 <= cutoff )
-       	         	{
-	                        if ( s_lastError != 0 )
-       	                        	throw Teul::Error("Unexpected s_lastError", s_lastError);
-	                        teulUpdateTransport(50);
-       	         	}
+			const TeulTimeMS cutoff = teulClock64 + 250;
+			while ( teulClock64 <= cutoff )
+			{
+				if ( s_lastError != 0 )
+					throw Teul::Error("Unexpected s_lastError", s_lastError);
+				teulUpdateTransport(50);
+			}
 		}
-
-	
 	}
 
 	public:
@@ -762,12 +757,13 @@ struct ClientRole : public Role
 		TestObjectMethod(secondIndex);
 
 		Delay();
-                
-                TestVaryingPacketSizes(m_teulIndex);
 
-                Delay();
+		TestVaryingPacketSizes(m_teulIndex);
+
+		Delay();
+
 		TestSpam(m_teulIndex, 1024, 256);
-	 	TestSpam(secondIndex, 1024, 512);
+		TestSpam(secondIndex, 1024, 512);
 		TestSpam(m_teulIndex, 1024, 4096);
 		TestSpam(secondIndex, 1024, 8192);
 		TestSpam(m_teulIndex, 1024, 16384);

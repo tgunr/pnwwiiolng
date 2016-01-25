@@ -26,10 +26,6 @@ Teul::Packet::Packet(PacketId id)
 
 //////////////////////////////////////////////////////////////////////
 // Copy constructor.
-//
-// frisbone: copy constructor was not doing a proper copy.  Not much
-//           point in copying the data without the reference info too.
-// frisbone: m_packetSizeBytes and m_capacity were uninitialized and allowed resize logic to fail.
 
 Teul::Packet::Packet(const Teul::Packet& rhs)
 	: m_data(m_localData)
@@ -108,10 +104,9 @@ Teul::Packet::operator=(const Teul::Packet& rhs)
 
 Teul::Packet::~Packet()
 {
-	ABORT_IF(m_data==nullptr);  // frisbone // protect against nullptr
+	ABORT_IF(m_data==nullptr);
 	// Check if the data needs freeing.
-	if ( m_data != m_localData )
-	{
+	if ( m_data != m_localData ) {
 		memFree(m_data);
 	}
 }

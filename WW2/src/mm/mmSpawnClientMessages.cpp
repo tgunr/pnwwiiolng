@@ -251,7 +251,7 @@ mmSendPostRequest(SINT32 connection, const FULL_OBJ_ID& facility, const WEAPON_S
 SINT32
 mmSendPostListRequest(SINT32 connection, const FULL_OBJ_ID& facility)
 {
-  FE_POST_LIST_REQUEST postListRequest;
+	FE_POST_LIST_REQUEST postListRequest;
 
 	postListRequest.facility = facility;
 
