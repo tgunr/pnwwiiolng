@@ -34,7 +34,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "imap", "Libraries\imap\proj
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ftgl_static", "Libraries\ftgl\msvc\vc8\ftgl_static.vcxproj", "{1D758EEA-59C3-46E4-BEF5-16DCCA8C0B21}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "freetype", "Libraries\freetype\builds\win32\visualc\freetype.vcxproj", "{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "freetype", "Libraries\freetype\builds\windows\vc2015\freetype.vcxproj", "{78B079BD-9FC7-4B9E-B4A6-96DA0F00248B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Playgate", "Playgate\Playgate.vcxproj", "{A755190B-E034-45F3-A255-75DCEE000361}"
 	ProjectSection(ProjectDependencies) = postProject

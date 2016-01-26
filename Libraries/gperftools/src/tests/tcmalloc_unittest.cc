@@ -1047,6 +1047,26 @@ static void TestSetNewMode() {
   tc_set_new_mode(old_mode);
 }
 
+static void TestErrno(void) {
+  void* ret;
+  if (kOSSupportsMemalign) {
+    errno = 0;
+    ret = Memalign(128, kTooBig);
+    EXPECT_EQ(NULL, ret);
+    EXPECT_EQ(ENOMEM, errno);
+  }
+
+  errno = 0;
+  ret = malloc(kTooBig);
+  EXPECT_EQ(NULL, ret);
+  EXPECT_EQ(ENOMEM, errno);
+
+  errno = 0;
+  ret = tc_malloc_skip_new_handler(kTooBig);
+  EXPECT_EQ(NULL, ret);
+  EXPECT_EQ(ENOMEM, errno);
+}
+
 static int RunAllTests(int argc, char** argv) {
   // Optional argv[1] is the seed
   AllocatorState rnd(argc > 1 ? atoi(argv[1]) : 100);
@@ -1379,6 +1399,7 @@ static int RunAllTests(int argc, char** argv) {
   TestReleaseToSystem();
   TestAggressiveDecommit();
   TestSetNewMode();
+  TestErrno();
 
   return 0;
 }

@@ -150,7 +150,6 @@ static enum bufferevent_filter_result
 be_null_filter(struct evbuffer *src, struct evbuffer *dst, ev_ssize_t lim,
 	       enum bufferevent_flush_mode state, void *ctx)
 {
-	(void)ctx;
 	(void)state;
 	if (evbuffer_remove_buffer(src, dst, lim) == 0)
 		return BEV_OK;
@@ -399,8 +398,6 @@ bufferevent_filtered_outbuf_cb(struct evbuffer *buf,
 {
 	struct bufferevent_filtered *bevf = arg;
 	struct bufferevent *bev = downcast(bevf);
-
-	(void)buf;
 
 	if (cbinfo->n_added) {
 		int processed_any = 0;
