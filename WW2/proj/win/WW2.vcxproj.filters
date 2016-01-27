@@ -2693,9 +2693,6 @@
     <ClCompile Include="..\..\src\omg\omgChat.cxx">
       <Filter>omg\Generated Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\src\wwii\wwiiCallbacks.cpp">
-      <Filter>wwii</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="res\cursor.cur">

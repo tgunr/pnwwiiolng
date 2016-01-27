@@ -1796,9 +1796,6 @@
     <ClCompile Include="..\..\src\weap\weapons.cpp" />
     <ClCompile Include="..\..\src\weap\weapParser.cpp" />
     <ClCompile Include="..\..\src\weap\weapSpec.cpp" />
-    <ClCompile Include="..\..\src\wwii\wwiiCallbacks.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="..\..\src\wwii\wwiiClientMessages.cpp" />
     <ClCompile Include="..\..\src\wwii\wwiiHCUnitsCommon.cpp" />
     <ClCompile Include="..\..\src\wwii\wwiiLua.cpp" />
