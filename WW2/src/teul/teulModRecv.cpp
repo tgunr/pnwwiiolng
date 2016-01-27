@@ -702,11 +702,7 @@ _recvDatagram(ENDPOINT& endpoint)
 			}
 			else 
 				++packetsReceived;
-
-		}
-		// Escape if nothing is queued.
-		while ( errorCount < 16 && endpoint.m_impl->recvQueue.size() == 0 ) {
-		}
+		} while ( errorCount < 16 && endpoint.m_impl->recvQueue.size() == 0 );
 
 		if ( errorCount > 2 )
 			dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " packets:%u errors:%u", endpoint.teulIndex(), PRA_SOCKET(endpoint.socket), packetsReceived, errorCount);
