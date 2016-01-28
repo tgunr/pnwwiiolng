@@ -859,7 +859,7 @@ POSTED_WEAPON::setMulticrew(bool isMulticrew)
 		MM_POSTED_WEAPON weaponMM(this->m_weaponSerial, this->m_portal, this->m_commander, this->m_missionID, this->m_crew);
 
 		Teul::Packet outgoing(Teul::PacketId(Strat::CallbackX, STRT_MM_POST_LIST_Y));
-		outgoing.reserve(sizeof(PostListReply) + sizeof(*this));
+		outgoing.reserve(sizeof(PostListReply) + sizeof(weaponMM));
 		outgoing.construct<PostListReply>(action, node->m_playerID, m_facility->uOID);
 		outgoing.append(weaponMM);
 		serverSendPacketToType(outgoing, MAP_HOST);
