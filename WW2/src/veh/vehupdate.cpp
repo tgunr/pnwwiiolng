@@ -71,6 +71,12 @@
 bool _newpredictor = true;
 int _simlowupdate = 0;
 
+#ifdef BETA_RELEASE
+UINT32 vehUpdatesSent = 0;
+UINT32 vehMcrewUpdatesRecv = 0;
+FLOAT64VECTOR vehMultiCrewAccumPerc = {0.0, 0.0, 0.0};
+#endif
+
 typedef struct
 {
 	const char* name;
@@ -334,6 +340,19 @@ static SINT32 _LastUpdateTime = 0; // added specific initialization 5/28/01 hoss
 
 	if (frametime - TempNum > 0 || ForceSend != 0)
 	{
+
+#ifdef BETA_RELEASE
+		/* Report our tracking numbers every second */
+		SINT32 Periodic = _LastUpdateTime + 1000;
+		if (frametime - Periodic > 0)
+		{
+			dbugLog(_FLI, "Position Updates Sent: %ul Recd(m-crew): %ul xDiff:%f yDiff:%f zDiff:%f",
+				vehUpdatesSent, vehMcrewUpdatesRecv, vehMultiCrewAccumPerc.x, vehMultiCrewAccumPerc.y, vehMultiCrewAccumPerc.z);
+			vehUpdatesSent = vehMcrewUpdatesRecv = 0;
+			vehMultiCrewAccumPerc.x = vehMultiCrewAccumPerc.y = vehMultiCrewAccumPerc.z = 0.0;
+		}
+#endif
+
 		_LastUpdateTime = frametime;
 
 		vehGetVehicleHead(&Vehicle);
@@ -360,7 +379,6 @@ static SINT32 _LastUpdateTime = 0; // added specific initialization 5/28/01 hoss
 			}
 
 			_SendUpdate(*Vehicle, *Vehicle->ModelData);
-
 			break;
 		}
 	}
@@ -571,7 +589,8 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 		}
 	}
 
-	if(Data.MultiCrewPos < 2)
+	/* although the vehicle defines this as UINT32 it is really an UPDT_STATION enum field and should not be hardcoded */
+	if(static_cast<UPDT_STATION>(Data.MultiCrewPos) != UPDT_OTHER)
 	{
 		VehicleHdr.present |= PR_POSITION;
 		if(Vehicle.VehicleType->NumStates > 0)
@@ -580,6 +599,11 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 			VehicleHdr.present |= PR_STATE1;
 		if(Vehicle.VehicleType->NumStates > 31)
 			VehicleHdr.present |= PR_VEH_VIS;
+
+#ifdef BETA_RELEASE
+			vehUpdatesSent++;
+#endif
+
 	}
 	else
 	{
@@ -948,6 +972,17 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 			PosData->Pos.x = VehicleInfo->position.m_x / 100.0;
 			PosData->Pos.y = VehicleInfo->position.m_y / 100.0;
 			PosData->Pos.z = VehicleInfo->position.m_z/ 100.0 - 2000.0;
+
+#ifdef BETA_RELEASE
+			/* Track how far off our predictions are off and accumulate perc diff */
+			vehMcrewUpdatesRecv++;
+			xPerc = abs(PosData->Pos.x - PosData->LastUpdatePos.x) / PosData->LastUpdatePos.x ;
+			yPerc = abs(PosData->Pos.y - PosData->LastUpdatePos.y) / PosData->LastUpdatePos.y ;
+			zPerc = abs(PosData->Pos.z - PosData->LastUpdatePos.z) / PosData->LastUpdatePos.z ;
+			vehMultiCrewAccumPerc.x += xPerc;
+			vehMultiCrewAccumPerc.y += yPerc;
+			vehMultiCrewAccumPerc.z += zPerc;
+#endif
 		}
 
 		// attitude
