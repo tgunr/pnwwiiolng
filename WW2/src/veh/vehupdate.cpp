@@ -342,14 +342,16 @@ static SINT32 _LastUpdateTime = 0; // added specific initialization 5/28/01 hoss
 	{
 
 #ifdef BETA_RELEASE
-		/* Report our tracking numbers every second */
-		SINT32 Periodic = _LastUpdateTime + 1000;
+		static SINT32 _LastReportTime = 0; // added specific initialization 5/28/01 hoss
+										   /* Report our tracking numbers every second */
+		SINT32 Periodic = _LastReportTime + 1000;
 		if (frametime - Periodic > 0)
 		{
-			dbugLog(_FLI, "Position Updates Sent: %ul Recd(m-crew): %ul xDiff:%f yDiff:%f zDiff:%f",
+			dbugLog(_FLI, "Updates Sent: %u Recd(m-crew): %u xDiff:%f yDiff:%f zDiff:%f",
 				vehUpdatesSent, vehMcrewUpdatesRecv, vehMultiCrewAccumPerc.x, vehMultiCrewAccumPerc.y, vehMultiCrewAccumPerc.z);
 			vehUpdatesSent = vehMcrewUpdatesRecv = 0;
 			vehMultiCrewAccumPerc.x = vehMultiCrewAccumPerc.y = vehMultiCrewAccumPerc.z = 0.0;
+			_LastReportTime = frametime;
 		}
 #endif
 
@@ -976,9 +978,9 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 #ifdef BETA_RELEASE
 			/* Track how far off our predictions are off and accumulate perc diff */
 			vehMcrewUpdatesRecv++;
-			xPerc = abs(PosData->Pos.x - PosData->LastUpdatePos.x) / PosData->LastUpdatePos.x ;
-			yPerc = abs(PosData->Pos.y - PosData->LastUpdatePos.y) / PosData->LastUpdatePos.y ;
-			zPerc = abs(PosData->Pos.z - PosData->LastUpdatePos.z) / PosData->LastUpdatePos.z ;
+			FLOAT64 xPerc = abs(PosData->Pos.x - PosData->LastUpdatePos.x) / PosData->LastUpdatePos.x ;
+			FLOAT64 yPerc = abs(PosData->Pos.y - PosData->LastUpdatePos.y) / PosData->LastUpdatePos.y ;
+			FLOAT64 zPerc = abs(PosData->Pos.z - PosData->LastUpdatePos.z) / PosData->LastUpdatePos.z ;
 			vehMultiCrewAccumPerc.x += xPerc;
 			vehMultiCrewAccumPerc.y += yPerc;
 			vehMultiCrewAccumPerc.z += zPerc;
