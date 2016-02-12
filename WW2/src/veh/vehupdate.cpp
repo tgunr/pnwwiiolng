@@ -976,14 +976,17 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 			PosData->Pos.z = VehicleInfo->position.m_z/ 100.0 - 2000.0;
 
 #ifdef BETA_RELEASE
-			/* Track how far off our predictions are off and accumulate perc diff */
-			vehMcrewUpdatesRecv++;
-			FLOAT64 xPerc = abs(PosData->Pos.x - PosData->LastUpdatePos.x) / PosData->LastUpdatePos.x ;
-			FLOAT64 yPerc = abs(PosData->Pos.y - PosData->LastUpdatePos.y) / PosData->LastUpdatePos.y ;
-			FLOAT64 zPerc = abs(PosData->Pos.z - PosData->LastUpdatePos.z) / PosData->LastUpdatePos.z ;
-			vehMultiCrewAccumPerc.x += xPerc;
-			vehMultiCrewAccumPerc.y += yPerc;
-			vehMultiCrewAccumPerc.z += zPerc;
+			if (Vehicle->ModelData != nullptr)
+			{
+				/* Track how far off our predictions are off and accumulate perc diff */
+				vehMcrewUpdatesRecv++;
+				FLOAT64 xPerc = abs(PosData->Pos.x - PosData->LastUpdatePos.x) / PosData->LastUpdatePos.x;
+				FLOAT64 yPerc = abs(PosData->Pos.y - PosData->LastUpdatePos.y) / PosData->LastUpdatePos.y;
+				FLOAT64 zPerc = abs(PosData->Pos.z - PosData->LastUpdatePos.z) / PosData->LastUpdatePos.z;
+				vehMultiCrewAccumPerc.x += xPerc;
+				vehMultiCrewAccumPerc.y += yPerc;
+				vehMultiCrewAccumPerc.z += zPerc;
+			}
 #endif
 		}
 
