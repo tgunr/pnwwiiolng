@@ -74,6 +74,10 @@ int _simlowupdate = 0;
 #ifdef BETA_RELEASE
 UINT32 vehUpdatesSent = 0;
 UINT32 vehMcrewUpdatesRecv = 0;
+UINT32 vehNonMcrewUpdatesRecv = 0;
+UINT32 vehMcommanderUpdatesIgn = 0;
+UINT32 worldUpdatesReceived = 0;
+UINT32 duplicateUpdatesIgnored = 0;
 FLOAT64VECTOR vehMultiCrewAccumPerc = {0.0, 0.0, 0.0};
 #endif
 
@@ -347,9 +351,11 @@ static SINT32 _LastUpdateTime = 0; // added specific initialization 5/28/01 hoss
 		SINT32 Periodic = _LastReportTime + 1000;
 		if (frametime - Periodic > 0)
 		{
-			dbugLog(_FLI, "Updates Sent: %u Recd(m-crew): %u xDiff:%f yDiff:%f zDiff:%f",
-				vehUpdatesSent, vehMcrewUpdatesRecv, vehMultiCrewAccumPerc.x, vehMultiCrewAccumPerc.y, vehMultiCrewAccumPerc.z);
-			vehUpdatesSent = vehMcrewUpdatesRecv = 0;
+			dbugLog(_FLI, "WUR: %u, DUI: %u, US: %u, MCUR: %u, MNMCUR: %u, MCUI: %u x:%f y:%f z:%f",
+				worldUpdatesReceived, duplicateUpdatesIgnored, vehUpdatesSent, vehMcrewUpdatesRecv, 
+				vehMultiCrewAccumPerc.x, vehMultiCrewAccumPerc.y, vehMultiCrewAccumPerc.z);
+			vehUpdatesSent = vehMcrewUpdatesRecv = vehNonMcrewUpdatesRecv = vehMcommanderUpdatesIgn = 0;
+			worldUpdatesReceived = duplicateUpdatesIgnored = 0;
 			vehMultiCrewAccumPerc.x = vehMultiCrewAccumPerc.y = vehMultiCrewAccumPerc.z = 0.0;
 			_LastReportTime = frametime;
 		}
@@ -961,53 +967,66 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 
 	// position
 	// if multicrew, only crew gets this data
-	if (!Rollover && (VehicleHeader->present & PR_POSITION) && (Vehicle->ModelData == nullptr || Vehicle->ModelData->MultiCrewPos > 1))
+	if (!Rollover && (VehicleHeader->present & PR_POSITION))
 	{
-		if (Online == 0)
+		if (Vehicle->ModelData == nullptr || Vehicle->ModelData->MultiCrewPos > 1)
 		{
-			PosData->Pos.x = VehicleHeader->position.m_x / 100.0;
-			PosData->Pos.y = VehicleHeader->position.m_y / 100.0;
-			PosData->Pos.z = VehicleHeader->position.m_z / 100.0 - 2000.0;
+			if (Online == 0)
+			{
+				PosData->Pos.x = VehicleHeader->position.m_x / 100.0;
+				PosData->Pos.y = VehicleHeader->position.m_y / 100.0;
+				PosData->Pos.z = VehicleHeader->position.m_z / 100.0 - 2000.0;
+			}
+			else
+			{
+				PosData->Pos.x = VehicleInfo->position.m_x / 100.0;
+				PosData->Pos.y = VehicleInfo->position.m_y / 100.0;
+				PosData->Pos.z = VehicleInfo->position.m_z / 100.0 - 2000.0;
+
+#ifdef BETA_RELEASE
+				if (Vehicle->ModelData != nullptr)
+				{
+					/* Track how far off our predictions are off and accumulate perc diff */
+					vehMcrewUpdatesRecv++;
+					FLOAT64 xPerc = abs(PosData->Pos.x - PosData->LastUpdatePos.x) / PosData->LastUpdatePos.x;
+					FLOAT64 yPerc = abs(PosData->Pos.y - PosData->LastUpdatePos.y) / PosData->LastUpdatePos.y;
+					FLOAT64 zPerc = abs(PosData->Pos.z - PosData->LastUpdatePos.z) / PosData->LastUpdatePos.z;
+					vehMultiCrewAccumPerc.x += xPerc;
+					vehMultiCrewAccumPerc.y += yPerc;
+					vehMultiCrewAccumPerc.z += zPerc;
+				}
+				else
+				{
+					vehNonMcrewUpdatesRecv++;
+				}
+#endif
+			}
+
+			// attitude
+			PosData->Att.Pitch = VehicleInfo->attitude.attX / 10000.0;
+			PosData->Att.Roll = VehicleInfo->attitude.attY / 10000.0;
+			PosData->Att.Yaw = VehicleInfo->attitude.attZ / 10000.0;
+			// velocity
+			PosData->Vel.x = VehicleInfo->velocity.velX / 50.0;
+			PosData->Vel.y = VehicleInfo->velocity.velY / 50.0;
+			PosData->Vel.z = VehicleInfo->velocity.velZ / 50.0;
+
+			// acceleration
+			PosData->Acc.x = VehicleInfo->acceleration.accelX / 100.0;
+			PosData->Acc.y = VehicleInfo->acceleration.accelY / 100.0;
+			PosData->Acc.z = VehicleInfo->acceleration.accelZ / 100.0;
+
+			// attvel
+			PosData->AttVel.Pitch = VehicleInfo->rotational.velX / 1000.0;
+			PosData->AttVel.Roll = VehicleInfo->rotational.velY / 1000.0;
+			PosData->AttVel.Yaw = VehicleInfo->rotational.velZ / 1000.0;
 		}
 		else
 		{
-			PosData->Pos.x = VehicleInfo->position.m_x / 100.0;
-			PosData->Pos.y = VehicleInfo->position.m_y / 100.0;
-			PosData->Pos.z = VehicleInfo->position.m_z/ 100.0 - 2000.0;
-
 #ifdef BETA_RELEASE
-			if (Vehicle->ModelData != nullptr)
-			{
-				/* Track how far off our predictions are off and accumulate perc diff */
-				vehMcrewUpdatesRecv++;
-				FLOAT64 xPerc = abs(PosData->Pos.x - PosData->LastUpdatePos.x) / PosData->LastUpdatePos.x;
-				FLOAT64 yPerc = abs(PosData->Pos.y - PosData->LastUpdatePos.y) / PosData->LastUpdatePos.y;
-				FLOAT64 zPerc = abs(PosData->Pos.z - PosData->LastUpdatePos.z) / PosData->LastUpdatePos.z;
-				vehMultiCrewAccumPerc.x += xPerc;
-				vehMultiCrewAccumPerc.y += yPerc;
-				vehMultiCrewAccumPerc.z += zPerc;
-			}
+			vehMcommanderUpdatesIgn++;
 #endif
 		}
-
-		// attitude
-		PosData->Att.Pitch = VehicleInfo->attitude.attX / 10000.0;
-		PosData->Att.Roll = VehicleInfo->attitude.attY / 10000.0;
-		PosData->Att.Yaw = VehicleInfo->attitude.attZ / 10000.0;
-		// velocity
-		PosData->Vel.x = VehicleInfo->velocity.velX / 50.0;
-		PosData->Vel.y = VehicleInfo->velocity.velY / 50.0;
-		PosData->Vel.z = VehicleInfo->velocity.velZ / 50.0;
-
-		// acceleration
-		PosData->Acc.x = VehicleInfo->acceleration.accelX / 100.0;
-		PosData->Acc.y = VehicleInfo->acceleration.accelY / 100.0;
-		PosData->Acc.z = VehicleInfo->acceleration.accelZ / 100.0;
-
-		// attvel
-		PosData->AttVel.Pitch = VehicleInfo->rotational.velX / 1000.0;
-		PosData->AttVel.Roll = VehicleInfo->rotational.velY / 1000.0;
-		PosData->AttVel.Yaw = VehicleInfo->rotational.velZ / 1000.0;
 	}
 
 	if (!Rollover && VehicleHeader->present & PR_RELPOS)
@@ -1148,6 +1167,10 @@ UINT32 vehupdateProcessPositionUpdateMsg(const VEHICLE_UPDATE_HEADER* VehicleHea
 	SINT32 TurretNum;
 	UINT32 i,j;
 
+#ifdef BETA_RELEASE
+	worldUpdatesReceived++;
+#endif
+
 	const SHARED_VEHICLE_INFO* const VehicleInfo = &VehicleHeader->vehInfo;
 
 	const UINT32 Position = VehicleInfo->index;
@@ -1255,6 +1278,9 @@ lastLowUpdateTime = frametime;
 
     if(VehicleInfo->timeStamp == Vehicle->PosData.LastAnyUpdateTime)
 	{
+#ifdef BETA_RELEASE
+		duplicateUpdatesIgnored++;
+#endif
 		Write_Debug("Duplicate update received for vehicle index %d (%s)", Position, Vehicle->Handle);
 		return 0;
 	}
