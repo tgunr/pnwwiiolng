@@ -393,10 +393,17 @@ static SINT32 _packVehicleHead(LOGICAL mode, UCHAR* const data, SINT32 offset, V
 	{
 		vehInfo->posTimeStamp = vehInfo->timeStamp;
 		vehInfo->hostPosTimeStamp = teulClock64;
+	} 
+	else if (mode == TEUL_UNPACK)
+	{
+#ifdef BETA_RELEASE
+		dbugLog(_FLI, "Unpacking TS garbage content: %u", vehInfo->posTimeStamp);
+#endif
+
 	}
 
 #ifdef BETA_RELEASE
-	dbugLog(_FLI, "Packing TS mode: %d, posTimeStamp = %u", mode, vehInfo->posTimeStamp);
+	dbugLog(_FLI, "Packing TS mode: %d, posTimeStamp = %u, callsign: %s", mode, vehInfo->posTimeStamp, vehInfo->callsign);
 #endif
 
 	//pack up common elements

@@ -904,18 +904,18 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 	if (Delta < 0 && !(VehicleHeader->present & PR_ONE_TIME))
 	{
 #ifdef BETA_RELEASE
-		dbugLog(_FLI, "Rollover occurred: Old TS: %u, New TS: %u, Delta: %d",
+		dbugLog(_FLI, "Rollover occurred: Old TS: %u, New TS: %u, Delta: %d, PP: %d",
 			PosData->CurrentSenderUpdateTime, VehicleInfo->posTimeStamp,
-			Delta);
+			Delta, (VehicleHeader->present & PR_POSITION));
 #endif
 		Rollover = TRUE;
 	}
 	else
 	{
 #ifdef BETA_RELEASE
-		dbugLog(_FLI, "No roll: Old TS: %u, New TS: %u, Delta: %d",
+		dbugLog(_FLI, "No roll: Old TS: %u, New TS: %u, Delta: %d, PP: %d",
 			PosData->CurrentSenderUpdateTime, VehicleInfo->posTimeStamp,
-			Delta);
+			Delta, (VehicleHeader->present & PR_POSITION));
 #endif
 
 	}
