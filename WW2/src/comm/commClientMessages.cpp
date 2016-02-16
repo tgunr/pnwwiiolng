@@ -45,6 +45,10 @@ static TEUL_CALLBACK*		_XCHG_SPAWN_DEPLOYMENT;
 // WWIIOL specific.
 TEUL_CALLBACK*				commSTRAT_DAMAGE;
 
+#ifdef BETA_RELEASE
+EXTERN UINT32   timesThru;
+#endif
+
 SINT32 g_lastPing = -1;
 
 SINT32 commSendPlayerExit(SINT32 teulIndex, PLAYER_DESTINATION destination,	PLAYER_EXIT_CODE exitCode, FULL_OBJ_ID facility)
@@ -157,6 +161,13 @@ SINT32 commRecvWorldUpdateData(const SINT32 teulIndex, UCHAR* const data, SINT32
 		clientErrorLog("badNVF");
 		return -EINVAL;
 	}
+
+#ifdef BETA_RELEASE
+	if (timesThru % 10 == 0)
+	{
+		dbugLog(_FLI, "World Update %u vehicles", wu.header.numVehicles);
+	}
+#endif
 
 	for(UINT32 i = 0; i < wu.header.numVehicles; i++)
 	{

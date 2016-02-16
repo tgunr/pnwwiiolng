@@ -395,6 +395,10 @@ static SINT32 _packVehicleHead(LOGICAL mode, UCHAR* const data, SINT32 offset, V
 		vehInfo->hostPosTimeStamp = teulClock64;
 	}
 
+#ifdef BETA_RELEASE
+	dbugLog(_FLI, "Packing TS mode: %d, posTimeStamp = %u", mode, vehInfo->posTimeStamp);
+#endif
+
 	//pack up common elements
 	offset = _packVehicleCommon(mode, data, offset, vehInfo, vupHeader->present);
 

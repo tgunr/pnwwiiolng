@@ -78,6 +78,9 @@ UINT32 vehNonMcrewUpdatesRecv = 0;
 UINT32 vehMcommanderUpdatesIgn = 0;
 UINT32 worldUpdatesReceived = 0;
 UINT32 duplicateUpdatesIgnored = 0;
+UINT32 vehNotTracked = 0;
+UINT32 timesThru = 0;
+UINT32 unexpectedErrors = 0;
 FLOAT64VECTOR vehMultiCrewAccumPerc = {0.0, 0.0, 0.0};
 #endif
 
@@ -351,13 +354,14 @@ static SINT32 _LastUpdateTime = 0; // added specific initialization 5/28/01 hoss
 		SINT32 Periodic = _LastReportTime + 1000;
 		if (frametime - Periodic > 0)
 		{
-			dbugLog(_FLI, "WUR: %u, DUI: %u, US: %u, MCUR: %u, MNMCUR: %u, MCUI: %u x:%f y:%f z:%f",
-				worldUpdatesReceived, duplicateUpdatesIgnored, vehUpdatesSent, vehMcrewUpdatesRecv, 
+			dbugLog(_FLI, "WUR: %u, VNT: %u UE: %u DUI: %u, US: %u, MCUR: %u, MNMCUR: %u, MCUI: %u x:%f y:%f z:%f",
+				worldUpdatesReceived, vehNotTracked, unexpectedErrors, duplicateUpdatesIgnored, vehUpdatesSent, vehMcrewUpdatesRecv,
 				vehMultiCrewAccumPerc.x, vehMultiCrewAccumPerc.y, vehMultiCrewAccumPerc.z);
 			vehUpdatesSent = vehMcrewUpdatesRecv = vehNonMcrewUpdatesRecv = vehMcommanderUpdatesIgn = 0;
-			worldUpdatesReceived = duplicateUpdatesIgnored = 0;
+			worldUpdatesReceived = duplicateUpdatesIgnored = vehNotTracked = unexpectedErrors = 0;
 			vehMultiCrewAccumPerc.x = vehMultiCrewAccumPerc.y = vehMultiCrewAccumPerc.z = 0.0;
 			_LastReportTime = frametime;
+			timesThru++;
 		}
 #endif
 
@@ -899,7 +903,21 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 	Delta = (SINT16)((UINT16)VehicleInfo->posTimeStamp) - (SINT16)((UINT16)PosData->CurrentSenderUpdateTime);
 	if (Delta < 0 && !(VehicleHeader->present & PR_ONE_TIME))
 	{
+#ifdef BETA_RELEASE
+		dbugLog(_FLI, "Rollover occurred: Old TS: %u, New TS: %u, Delta: %d",
+			PosData->CurrentSenderUpdateTime, VehicleInfo->posTimeStamp,
+			Delta);
+#endif
 		Rollover = TRUE;
+	}
+	else
+	{
+#ifdef BETA_RELEASE
+		dbugLog(_FLI, "No roll: Old TS: %u, New TS: %u, Delta: %d",
+			PosData->CurrentSenderUpdateTime, VehicleInfo->posTimeStamp,
+			Delta);
+#endif
+
 	}
 
 	// states
@@ -976,6 +994,10 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 				PosData->Pos.x = VehicleHeader->position.m_x / 100.0;
 				PosData->Pos.y = VehicleHeader->position.m_y / 100.0;
 				PosData->Pos.z = VehicleHeader->position.m_z / 100.0 - 2000.0;
+#ifdef BETA_RELEASE
+				dbugLog(_FLI, "Not online??");
+				unexpectedErrors++;
+#endif
 			}
 			else
 			{
@@ -1027,6 +1049,12 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 			vehMcommanderUpdatesIgn++;
 #endif
 		}
+	}
+	else if (Rollover)
+	{
+#ifdef BETA_RELEASE
+		unexpectedErrors++;
+#endif
 	}
 
 	if (!Rollover && VehicleHeader->present & PR_RELPOS)
@@ -1198,12 +1226,19 @@ UINT32 vehupdateProcessPositionUpdateMsg(const VEHICLE_UPDATE_HEADER* VehicleHea
 			{
 				Write_Debug("Invalid countries specified for vehicle %s, host index %d",VehicleInfo->callsign,
 								VehicleInfo->index);
+#ifdef BETA_RELEASE
+				unexpectedErrors++;
+#endif
 				return 0;
 			}
 			{
 				WEAPON* weapon = weapLookup(VehicleInfo->spec());
 				if(weapon == nullptr)
 				{
+					Write_Debug("Weapon not found host veh index %d", VehicleInfo->index);
+#ifdef BETA_RELEASE
+					unexpectedErrors++;
+#endif
 					return 0;
 				}
 
@@ -1214,6 +1249,9 @@ UINT32 vehupdateProcessPositionUpdateMsg(const VEHICLE_UPDATE_HEADER* VehicleHea
 			{
 				// we're out of vehicle slots
 				Write_Debug("Out of free vehicle slots for new vehicle");
+#ifdef BETA_RELEASE
+				unexpectedErrors++;
+#endif
 				return 0;
 			}
 
@@ -1272,6 +1310,9 @@ lastLowUpdateTime = frametime;
 	if (Vehicle == nullptr)
 	{
 		// vehicle doesn't exist in list
+#ifdef BETA_RELEASE
+		vehNotTracked++;
+#endif
 		Write_Debug("Received an update for vehicle not being tracked, index = %d",Position);
 		return 0;
 	}
