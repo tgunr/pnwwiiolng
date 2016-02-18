@@ -577,22 +577,31 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 	VehicleInfo.stateFlags1 = 0;
 	VehicleInfo.visBits = 0;
 
+	// set the state bits according to the vehicle configuration
+	VehicleHdr.present &= ~(PR_STATE0 | PR_STATE1 | PR_VEH_VIS | PR_POSITION);
+	VehicleHdr.present |= PR_STATE0;
+	if (Vehicle.VehicleType->NumStates > 15)
+		VehicleHdr.present |= PR_STATE1;
+	if (Vehicle.VehicleType->NumStates > 31)
+		VehicleHdr.present |= PR_VEH_VIS;
+
 	for(i = 0; i < Vehicle.VehicleType->NumStates; i++)
 	{
-		// only send bits that are relavent to the player's multicrew position
-		if (Data.MultiCrewPos != 0 && Data.MultiCrewPos != Vehicle.VehicleType->StateType[i].MultiCrewPos)
-		{
-			continue;
-		}
-
+		// always send out everything we know
 		if (Vehicle.PosData.States[i])
 		{
-			if(i >= 32)
+			if (i >= 32)
+			{
 				VehicleInfo.visBits |= 1 << (i - 32);
-			else if (i > 15 &&  i < 32)
+			}
+			else if (i > 15 && i < 32)
+			{
 				VehicleInfo.stateFlags1 |= 1 << (i - 16);
+			}
 			else
+			{
 				VehicleInfo.stateFlags0 |= 1 << i;
+			}
 		}
 	}
 
@@ -600,22 +609,11 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 	if(static_cast<UPDT_STATION>(Data.MultiCrewPos) != UPDT_OTHER)
 	{
 		VehicleHdr.present |= PR_POSITION;
-		if(Vehicle.VehicleType->NumStates > 0)
-			VehicleHdr.present |= PR_STATE0;
-		if(Vehicle.VehicleType->NumStates > 15)
-			VehicleHdr.present |= PR_STATE1;
-		if(Vehicle.VehicleType->NumStates > 31)
-			VehicleHdr.present |= PR_VEH_VIS;
-
 #ifdef BETA_RELEASE
 			vehUpdatesSent++;
 #endif
+	}
 
-	}
-	else
-	{
-		VehicleHdr.present &= ~(PR_STATE0 | PR_STATE1 | PR_VEH_VIS | PR_POSITION);
-	}
 
 	// mount firing
 	VehicleInfo.fire.state = 0;
@@ -886,10 +884,64 @@ static void ProcessInfantryAnimationFlags(vehVehicle* Vehicle, const VEHICLE_UPD
 #endif
 }
 
+/*
+This function will convert a bitField provided to update state status info within the
+PosData client data when only appropriate to do so based on ownership of the status.
+*/
+void applyStatusBits(UINT32 stateCheck, void * bitField, UINT32 offset, UINT32 numBits,
+	const VEHICLE_UPDATE_HEADER * VehicleHeader, vehVehicle * Vehicle)
+{
+	const SHARED_VEHICLE_INFO*VehicleInfo = &VehicleHeader->vehInfo;
+	vehVehiclePositionData * PosData = &Vehicle->PosData;
+
+	// first make sure this status field is present
+	if (VehicleHeader->present & stateCheck)
+	{
+
+		// go through each bit of the status field but numbered as they exist
+		// in the client vehicle state array
+		for (UINT32 i = offset; i < (offset + numBits); i++)
+		{
+
+			/*
+
+			Here we intend to only override our knowledge of status so long as we aren't in control.
+			oberservers:	by definition are never in control - they accept whatever they see
+			commanders:		only accept status that a crew member is in charge of
+			crew:			only accept status that the commander is in charge of
+
+			*/
+
+			bool okToUpdate = false;
+			if (Vehicle->ModelData != nullptr)
+			{
+				if (static_cast<UPDT_STATION>(Vehicle->ModelData->MultiCrewPos) == UPDT_OTHER &&
+					Vehicle->VehicleType->StateType[i].MultiCrewPos == UPDT_CONTROL)
+					okToUpdate = true;
+				else if (static_cast<UPDT_STATION>(Vehicle->ModelData->MultiCrewPos) == UPDT_CONTROL &&
+					Vehicle->VehicleType->StateType[i].MultiCrewPos == UPDT_OTHER)
+					okToUpdate = true;
+			}
+			else
+				okToUpdate = true;  // observer
+
+									// only update locally if there is no conflict
+			if (okToUpdate)
+			{
+				bool testBit = (numBits > 16) ?
+					(*reinterpret_cast<UINT32 *>(bitField) & 1 << (i - offset)) :
+					(*reinterpret_cast<UINT16 *>(bitField) & 1 << (i - offset));
+				if (testBit)
+					PosData->States[i] = TRUE;
+				else
+					PosData->States[i] = FALSE;
+			}
+		}
+	}
+}
+
 static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,const VEHICLE_UPDATE_HEADER * VehicleHeader)
 {
-	UINT32 i;
-
 	if (VehicleHeader == nullptr) return 0;
 	const SHARED_VEHICLE_INFO*VehicleInfo = &VehicleHeader->vehInfo;
 
@@ -940,68 +992,11 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 
 	}
 
-	// states
-	if (VehicleHeader->present & PR_STATE0)
-	{
-		for (i=0;i<16;i++)
-		{
-			// only update state bits on other multicrew players update
-			if (Vehicle->ModelData != nullptr)
-			{
-				if (Vehicle->ModelData->MultiCrewPos ==
-							Vehicle->VehicleType->StateType[i].MultiCrewPos)
-				{
-					continue;
-				}
-			}
-
-			if (VehicleInfo->stateFlags0 & 1 << i)
-				PosData->States[i] = TRUE;
-			else
-				PosData->States[i] = FALSE;
-		}
-	}
-	if (VehicleHeader->present & PR_STATE1)
-	{
-		for (i=16;i<32;i++)
-		{
-			// only update state bits on other multicrew players update
-			if (Vehicle->ModelData != nullptr)
-			{
-				if (Vehicle->ModelData->MultiCrewPos ==
-							Vehicle->VehicleType->StateType[i].MultiCrewPos)
-				{
-					continue;
-				}
-			}
-
-			if (VehicleInfo->stateFlags1 & 1 << (i - 16))
-				PosData->States[i] = TRUE;
-			else
-				PosData->States[i] = FALSE;
-		}
-	}
-
-	if (Vehicle->VehicleType->Type != VEH_TYPE_PERSON && VehicleHeader->present & PR_VEH_VIS)
-	{
-		for (i=32;i<64;i++)
-		{
-			// only update state bits on other multicrew players update
-			if (Vehicle->ModelData != nullptr)
-			{
-				if (Vehicle->ModelData->MultiCrewPos ==
-							Vehicle->VehicleType->StateType[i].MultiCrewPos)
-				{
-					continue;
-				}
-			}
-
-			if (VehicleInfo->visBits & 1 << (i - 32))
-				PosData->States[i] = TRUE;
-			else
-				PosData->States[i] = FALSE;
-		}
-	}
+	// apply status bits to each client status field as appropriate
+	applyStatusBits(PR_STATE0, (void *)&VehicleInfo->stateFlags0, 0, 16, VehicleHeader, Vehicle);
+	applyStatusBits(PR_STATE1, (void *)&VehicleInfo->stateFlags1, 16, 16, VehicleHeader, Vehicle);
+	if (Vehicle->VehicleType->Type != VEH_TYPE_PERSON)
+		applyStatusBits(PR_VEH_VIS, (void *)&VehicleInfo->visBits, 16, 32, VehicleHeader, Vehicle);
 
 	// position
 	// if multicrew, only crew gets this data
