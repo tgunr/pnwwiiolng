@@ -354,7 +354,7 @@ static SINT32 _LastUpdateTime = 0; // added specific initialization 5/28/01 hoss
 		SINT32 Periodic = _LastReportTime + 1000;
 		if (frametime - Periodic > 0)
 		{
-			dbugLog(_FLI, "WUR: %u, VNT: %u UE: %u DUI: %u, US: %u, MCUR: %u, MNMCUR: %u, MCUI: %u x:%f y:%f z:%f",
+			dbugLog(_FLI, "WUR: %u, VNT: %u UE: %u DUI: %u, US: %u, MCUR: %u, x:%f y:%f z:%f",
 				worldUpdatesReceived, vehNotTracked, unexpectedErrors, duplicateUpdatesIgnored, vehUpdatesSent, vehMcrewUpdatesRecv,
 				vehMultiCrewAccumPerc.x, vehMultiCrewAccumPerc.y, vehMultiCrewAccumPerc.z);
 			vehUpdatesSent = vehMcrewUpdatesRecv = vehNonMcrewUpdatesRecv = vehMcommanderUpdatesIgn = 0;
@@ -893,30 +893,55 @@ static void ProcessInfantryAnimationFlags(vehVehicle* Vehicle, const VEHICLE_UPD
 
 static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,const VEHICLE_UPDATE_HEADER * VehicleHeader)
 {
-	SINT16 Delta;
 	UINT32 i;
-	LOGICAL Rollover = FALSE;
 
 	if (VehicleHeader == nullptr) return 0;
 	const SHARED_VEHICLE_INFO*VehicleInfo = &VehicleHeader->vehInfo;
 
-	Delta = (SINT16)((UINT16)VehicleInfo->posTimeStamp) - (SINT16)((UINT16)PosData->CurrentSenderUpdateTime);
-	if (Delta < 0 && !(VehicleHeader->present & PR_ONE_TIME))
+	// convert 16 bit world update time to 32bit signed by first 0 extending, then converting to signed
+	SINT32 thisTS = VehicleInfo->posTimeStamp;
+
+	/*
+		Does this World update contain a position report?
+	 */
+	if (VehicleHeader->present & (PR_POSITION | PR_RELPOS))
 	{
+		/*
+			Update prediction time saving last (current frame)
+		*/
+		PosData->LastUpdateTime = PosData->CurrentUpdateTime;
+		PosData->CurrentUpdateTime = frametime;
+		SINT32 timeDiff = (thisTS - PosData->CurrentSenderUpdateTime);
+
+		/*
+			Is this a position update (not initial) and has
+			a roll-over of the 16 bit time value ocurred (roughtly every 65 seconds)?
+		 */
+		if ( timeDiff < 0
+			
+			&& !(VehicleHeader->present & PR_ONE_TIME))
+		{
+
+			/*
+				In the event of a UINT16 roll over (every 65 seconds) we want to store the previous
+				current as the last but treated as signed so its sign-extended to 32 bit and the
+				difference math works out.
+			*/
+			UINT32 prevCurrent = PosData->CurrentSenderUpdateTime;
+			PosData->LastSenderUpdateTime = static_cast<SINT16>(PosData->CurrentSenderUpdateTime);
+			PosData->CurrentSenderUpdateTime = thisTS;
+			SINT32 verifyDiff = PosData->CurrentSenderUpdateTime - PosData->LastSenderUpdateTime;
+
 #ifdef BETA_RELEASE
-		dbugLog(_FLI, "Rollover occurred: Old TS: %u, New TS: %u, Delta: %d, PP: %d",
-			PosData->CurrentSenderUpdateTime, VehicleInfo->posTimeStamp,
-			Delta, (VehicleHeader->present & PR_POSITION));
+			dbugLog(_FLI, "Rollover occurred: Old TS: %d, New Old: %d, New TS: %d, diff: %d, verifyDiff: %d",
+				prevCurrent, PosData->LastSenderUpdateTime, thisTS, timeDiff, verifyDiff);
 #endif
-		Rollover = TRUE;
-	}
-	else
-	{
-#ifdef BETA_RELEASE
-		dbugLog(_FLI, "No roll: Old TS: %u, New TS: %u, Delta: %d, PP: %d",
-			PosData->CurrentSenderUpdateTime, VehicleInfo->posTimeStamp,
-			Delta, (VehicleHeader->present & PR_POSITION));
-#endif
+		}
+		else
+		{
+			PosData->LastSenderUpdateTime = PosData->CurrentSenderUpdateTime;
+			PosData->CurrentSenderUpdateTime = thisTS;
+		}
 
 	}
 
@@ -985,7 +1010,7 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 
 	// position
 	// if multicrew, only crew gets this data
-	if (!Rollover && (VehicleHeader->present & PR_POSITION))
+	if (VehicleHeader->present & PR_POSITION)
 	{
 		if (Vehicle->ModelData == nullptr || Vehicle->ModelData->MultiCrewPos > 1)
 		{
@@ -1010,9 +1035,9 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 				{
 					/* Track how far off our predictions are off and accumulate perc diff */
 					vehMcrewUpdatesRecv++;
-					FLOAT64 xPerc = abs(PosData->Pos.x - PosData->LastUpdatePos.x) / PosData->LastUpdatePos.x;
-					FLOAT64 yPerc = abs(PosData->Pos.y - PosData->LastUpdatePos.y) / PosData->LastUpdatePos.y;
-					FLOAT64 zPerc = abs(PosData->Pos.z - PosData->LastUpdatePos.z) / PosData->LastUpdatePos.z;
+					FLOAT64 xPerc = abs(VehicleInfo->position.m_x - PosData->LastUpdatePos.x) / PosData->LastUpdatePos.x;
+					FLOAT64 yPerc = abs(VehicleInfo->position.m_y - PosData->LastUpdatePos.y) / PosData->LastUpdatePos.y;
+					FLOAT64 zPerc = abs(VehicleInfo->position.m_z - PosData->LastUpdatePos.z) / PosData->LastUpdatePos.z;
 					vehMultiCrewAccumPerc.x += xPerc;
 					vehMultiCrewAccumPerc.y += yPerc;
 					vehMultiCrewAccumPerc.z += zPerc;
@@ -1050,14 +1075,8 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 #endif
 		}
 	}
-	else if (Rollover)
-	{
-#ifdef BETA_RELEASE
-		unexpectedErrors++;
-#endif
-	}
 
-	if (!Rollover && VehicleHeader->present & PR_RELPOS)
+	if (VehicleHeader->present & PR_RELPOS)
 	{
 		Vehicle->PosData.LastRelUpdateTime = Vehicle->PosData.CurRelUpdateTime;
 		Vehicle->PosData.CurRelUpdateTime = frametime;
@@ -1081,15 +1100,6 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 
 	if (Vehicle->VehicleType && Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
 		ProcessInfantryAnimationFlags(Vehicle, VehicleHeader);
-
-	if (!Rollover && (VehicleHeader->present & (PR_POSITION | PR_RELPOS)))
-	{
-		PosData->LastSenderUpdateTime = PosData->CurrentSenderUpdateTime;
-		PosData->CurrentSenderUpdateTime = VehicleInfo->posTimeStamp;
-
-		PosData->LastUpdateTime = PosData->CurrentUpdateTime;
-		PosData->CurrentUpdateTime = frametime;
-	}
 
 
 	if ((VehicleHeader->present & (PR_POSITION | VehicleHeader->present & PR_RELPOS)) &&
@@ -1409,8 +1419,8 @@ lastLowUpdateTime = frametime;
 	}
 	else
 	{
-		Delta =	(SINT16)((SINT16)((SINT16)(Vehicle->PosData.CurrentUpdateTime) - (SINT16)(Vehicle->PosData.LastUpdateTime)) -
-				(SINT16)((SINT16)(Vehicle->PosData.CurrentSenderUpdateTime) - (SINT16)(Vehicle->PosData.LastSenderUpdateTime)));
+		Delta =	(Vehicle->PosData.CurrentUpdateTime - Vehicle->PosData.LastUpdateTime) -
+				(Vehicle->PosData.CurrentSenderUpdateTime - Vehicle->PosData.LastSenderUpdateTime);
 
 		Delta += Vehicle->PosData.LastDelta;
 
