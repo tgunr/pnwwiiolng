@@ -392,9 +392,8 @@ static SINT32 _packVehicleHead(LOGICAL mode, UCHAR* const data, SINT32 offset, V
 	if (mode == TEUL_PACK)
 	{
 #if platBuild == TEUL_SERVER
-		// if packing, ensure that we restore the timestamp based on crew/commander/solo status
-		localTimeStamp = (vupHeader->player->station != UPDT_OTHER) ?
-			vehInfo->cmdrTimeStamp : vehInfo->crewTimeStamp;
+		// if packing, only ever pack the commander's time
+		localTimeStamp = vehInfo->cmdrTimeStamp;
 #else
 		// for the client, it is save to just go ahead and store what we have
 		localTimeStamp = vehInfo->timeStamp;
@@ -414,18 +413,25 @@ static SINT32 _packVehicleHead(LOGICAL mode, UCHAR* const data, SINT32 offset, V
 		// is put back in.
 		vehInfo->hostPosTimeStamp = teulClock64;
 
-		// ensure timstamp is saved off for crew/commander/solo status independently
-		switch (vupHeader->player->station)
+		if (vupHeader != nullptr && vupHeader->player != nullptr)
 		{
-		case UPDT_LONE:
-		case UPDT_CONTROL:
-			vehInfo->cmdrTimeStamp = localTimeStamp;
-			break;
-		case UPDT_OTHER:
-			vehInfo->crewTimeStamp = localTimeStamp;
-			break;
-		default:
-			dbugLog(_FLA, "Unpacking Unexpected result - player not assigned station");
+			// ensure timstamp is saved off for crew/commander/solo status independently
+			switch (vupHeader->player->station)
+			{
+			case UPDT_LONE:
+			case UPDT_CONTROL:
+				vehInfo->cmdrTimeStamp = localTimeStamp;
+				break;
+			case UPDT_OTHER:
+				vehInfo->crewTimeStamp = localTimeStamp;
+				break;
+			default:
+				dbugLog(_FLA, "Unpacking Unexpected result - player not assigned station");
+			}
+		} 
+                else
+		{
+			dbugLog(_FLW, "Unpack - No header information (%p) and/or player", vupHeader);
 		}
 
 #else
@@ -437,10 +443,6 @@ static SINT32 _packVehicleHead(LOGICAL mode, UCHAR* const data, SINT32 offset, V
 		}
 #endif
 	}
-
-#ifdef BETA_RELEASE
-	dbugLog(_FLI, "Unpacking Mode %u, TS: %u", mode, vehInfo->timeStamp);
-#endif
 
 	//pack up common elements
 	offset = _packVehicleCommon(mode, data, offset, vehInfo, vupHeader->present);

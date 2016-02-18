@@ -126,6 +126,8 @@ UINT32 xmissionsFailed = 0;
 UINT32 vehiclesThrottled = 0;   
 UINT32 numberOfUpdatesBehind = 0;
 UINT32 lastPlayer = 0;
+UINT32 numVehiclesReported = 0;
+UINT32 timesThru = 0;
 #endif                  
 
 //ERR_NOTE
@@ -2059,6 +2061,10 @@ _sendNextUpdate(HostVehicle* const vehicle)
 
 	assert( wu.header.numVehicles <= framings[vehicle->framingMode].maxVehiclesPerFrame() );
 
+#ifdef BETA_RELEASE
+	numVehiclesReported += wu.header.numVehicles;
+#endif
+
 	// Assume 16-bytes per vehicle.
 //	TIMER_START
 	Teul::Packet packet(Teul::PacketId(Comm::CallbackX, WORLD_UPDATE_Y));
@@ -2161,6 +2167,10 @@ _sendNextUpdate(HostVehicle* const vehicle)
 				result = true;
 #ifdef BETA_RELEASE
 				vehMcrewCrewUpdatesSent++;
+				if (timesThru % 10 == 0)
+				{
+					dbugLog(_FLI, "Queued to player %u", players[i]->playerID());
+				}
 #endif
 			}
 			else
@@ -2388,22 +2398,14 @@ _runHost(void)
 		if ( teulTime() >= nextStatsReport )
 		{
 			// Report output to client stats every second
-			dbugLog(_FLI, "TV=%u, RV=%u, VS=%u, QV=%u, VR=%u, VUS=%u, VMCU=%u, PID=%u, VCRU=%u, XF=%u, VT=%u, NU=%u", 
+			dbugLog(_FLI, "TV=%u, RV=%u, VS=%u, QV=%u, VR=%u, VUS=%u, VMCU=%u, PID=%u, VCRU=%u, NVR=%u, XF=%u, VT=%u, NU=%u", 
 				totalVehicles, remoteVehicles, vehiclesSkipped, qualifiedVehicles, vehiclesReviewed, vehUpdatesSent, vehMcrewCommanderUpdatesSent, lastPlayer, 
-				vehMcrewCrewUpdatesSent, xmissionsFailed, vehiclesThrottled, numberOfUpdatesBehind); 
-			totalVehicles = 0;
-			remoteVehicles = 0;
-			vehiclesSkipped = 0;
-			qualifiedVehicles = 0;
-			vehiclesReviewed = 0;
-			vehUpdatesSent = 0;
-			vehMcrewCommanderUpdatesSent = 0;
-			vehMcrewCrewUpdatesSent = 0;
-			xmissionsFailed = 0;
-			vehiclesThrottled = 0;
-			numberOfUpdatesBehind = 0;
-			lastPlayer = 0;
+				vehMcrewCrewUpdatesSent, numVehiclesReported, xmissionsFailed, vehiclesThrottled, numberOfUpdatesBehind); 
+			totalVehicles = remoteVehicles = vehiclesSkipped = qualifiedVehicles = vehiclesReviewed = vehUpdatesSent = 0;
+			vehMcrewCommanderUpdatesSent = vehMcrewCrewUpdatesSent = xmissionsFailed = vehiclesThrottled = 0;
+			numberOfUpdatesBehind = lastPlayer = numVehiclesReported = 0;
 			nextStatsReport = teulTime() + 1;
+			timesThru++;
 		}
 #endif
 
