@@ -79,9 +79,7 @@ UINT32 vehMcommanderUpdatesIgn = 0;
 UINT32 worldUpdatesReceived = 0;
 UINT32 duplicateUpdatesIgnored = 0;
 UINT32 vehNotTracked = 0;
-UINT32 timesThru = 0;
 UINT32 unexpectedErrors = 0;
-FLOAT64VECTOR vehMultiCrewAccumPerc = {0.0, 0.0, 0.0};
 #endif
 
 typedef struct
@@ -354,14 +352,11 @@ static SINT32 _LastUpdateTime = 0; // added specific initialization 5/28/01 hoss
 		SINT32 Periodic = _LastReportTime + 1000;
 		if (frametime - Periodic > 0)
 		{
-			dbugLog(_FLI, "WUR: %u, VNT: %u UE: %u DUI: %u, US: %u, MCUR: %u, x:%f y:%f z:%f",
-				worldUpdatesReceived, vehNotTracked, unexpectedErrors, duplicateUpdatesIgnored, vehUpdatesSent, vehMcrewUpdatesRecv,
-				vehMultiCrewAccumPerc.x, vehMultiCrewAccumPerc.y, vehMultiCrewAccumPerc.z);
+			dbugLog(_FLI, "WUR: %u, VNT: %u UE: %u DUI: %u, US: %u, MCUR: %u",
+				worldUpdatesReceived, vehNotTracked, unexpectedErrors, duplicateUpdatesIgnored, vehUpdatesSent, vehMcrewUpdatesRecv);
 			vehUpdatesSent = vehMcrewUpdatesRecv = vehNonMcrewUpdatesRecv = vehMcommanderUpdatesIgn = 0;
 			worldUpdatesReceived = duplicateUpdatesIgnored = vehNotTracked = unexpectedErrors = 0;
-			vehMultiCrewAccumPerc.x = vehMultiCrewAccumPerc.y = vehMultiCrewAccumPerc.z = 0.0;
 			_LastReportTime = frametime;
-			timesThru++;
 		}
 #endif
 
@@ -1035,12 +1030,6 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 				{
 					/* Track how far off our predictions are off and accumulate perc diff */
 					vehMcrewUpdatesRecv++;
-					FLOAT64 xPerc = abs(VehicleInfo->position.m_x - PosData->LastUpdatePos.x) / PosData->LastUpdatePos.x;
-					FLOAT64 yPerc = abs(VehicleInfo->position.m_y - PosData->LastUpdatePos.y) / PosData->LastUpdatePos.y;
-					FLOAT64 zPerc = abs(VehicleInfo->position.m_z - PosData->LastUpdatePos.z) / PosData->LastUpdatePos.z;
-					vehMultiCrewAccumPerc.x += xPerc;
-					vehMultiCrewAccumPerc.y += yPerc;
-					vehMultiCrewAccumPerc.z += zPerc;
 				}
 				else
 				{
