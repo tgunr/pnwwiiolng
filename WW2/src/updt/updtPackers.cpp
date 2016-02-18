@@ -413,26 +413,10 @@ static SINT32 _packVehicleHead(LOGICAL mode, UCHAR* const data, SINT32 offset, V
 		// is put back in.
 		vehInfo->hostPosTimeStamp = teulClock64;
 
-		if (vupHeader != nullptr && vupHeader->player != nullptr)
+		if (vupHeader != nullptr && vupHeader->player != nullptr && vupHeader->player->station != UPDT_OTHER)
 		{
-			// ensure timstamp is saved off for crew/commander/solo status independently
-			switch (vupHeader->player->station)
-			{
-			case UPDT_LONE:
-			case UPDT_CONTROL:
-				vehInfo->cmdrTimeStamp = localTimeStamp;
-				break;
-			case UPDT_OTHER:
-				vehInfo->crewTimeStamp = localTimeStamp;
-				break;
-			default:
-				dbugLog(_FLA, "Unpacking Unexpected result - player not assigned station");
-			}
+			vehInfo->cmdrTimeStamp = localTimeStamp;
 		} 
-                else
-		{
-			dbugLog(_FLW, "Unpack - No header information (%p) and/or player", vupHeader);
-		}
 
 #else
 		// restore timestamp for client and update position if included

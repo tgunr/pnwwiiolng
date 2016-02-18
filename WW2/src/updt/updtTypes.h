@@ -145,8 +145,7 @@ struct SHARED_VEHICLE_INFO
 	UINT16				globalFlags;
 	UINT16				oneTimeBits;
 #if platBuild == TEUL_SERVER
-	UINT16				cmdrTimeStamp;  // On the host we need to keep track of the cmdr/host independently
-	UINT16				crewTimeStamp;
+	UINT16				cmdrTimeStamp;  // On the host we need to keep track of the commander independently
 #endif
 
 //	UCHAR				loadOut;
