@@ -352,6 +352,8 @@ static SINT32 _packONE_TIME_INFO(LOGICAL mode, UCHAR* const data, SINT32 offset,
 
 static SINT32 _packVehicleHead(LOGICAL mode, UCHAR* const data, SINT32 offset, VEHICLE_UPDATE_HEADER* const vupHeader, SINT32 presentSize, const WORLD_UPDATE* const wu)
 {
+	UINT16 localTimeStamp;  // local meaning just limited scope
+
 #if platBuild == TEUL_SERVER
 	SHARED_VEHICLE_INFO*	vehInfo = vupHeader->vehInfo;
 	if (mode == TEUL_UNPACK)
@@ -387,12 +389,43 @@ static SINT32 _packVehicleHead(LOGICAL mode, UCHAR* const data, SINT32 offset, V
 
 	offset = teulPackUINT32(mode, data, offset, &vupHeader->present, presentSize);
 
-	offset = teulPackUINT16(mode, data, offset, &vehInfo->timeStamp, 16);
-
-	if (mode == TEUL_UNPACK && (vupHeader->present & PR_POSITION) )
+	if (mode == TEUL_PACK)
 	{
-		vehInfo->posTimeStamp = vehInfo->timeStamp;
+#if platBuild == TEUL_SERVER
+		// if packing, only ever pack the commander's time
+		localTimeStamp = vehInfo->cmdrTimeStamp;
+#else
+		// for the client, it is save to just go ahead and store what we have
+		localTimeStamp = vehInfo->timeStamp;
+#endif
+	}
+
+	offset = teulPackUINT16(mode, data, offset, &localTimeStamp, 16);
+
+	// if unpacking, deal with timestamp properly
+	if (mode == TEUL_UNPACK)
+	{
+#if platBuild == TEUL_SERVER
+		// make sure this timestamp reflects last time vehicle was updated by either party
+		vehInfo->timeStamp = localTimeStamp;
+
+		// this is currently unused but only applies to the host - keep it here just in case later reference
+		// is put back in.
 		vehInfo->hostPosTimeStamp = teulClock64;
+
+		if (vupHeader != nullptr && vupHeader->player != nullptr && vupHeader->player->station != UPDT_OTHER)
+		{
+			vehInfo->cmdrTimeStamp = localTimeStamp;
+		} 
+
+#else
+		// restore timestamp for client and update position if included
+		vehInfo->timeStamp = localTimeStamp;
+		if (vupHeader->present & PR_POSITION)
+		{
+			vehInfo->posTimeStamp = vehInfo->timeStamp;
+		}
+#endif
 	}
 
 	//pack up common elements

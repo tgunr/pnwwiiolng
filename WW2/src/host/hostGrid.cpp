@@ -23,6 +23,7 @@
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiHash.h"			// For unordered map
 #include "wwii/wwiiThreads.h"
+#include "dbug/dbug.h"
 
 #include "host/hostTiming.h"
 
@@ -39,7 +40,7 @@
 #include <type_traits>
 
 #if defined(ENABLE_VIS_DEBUG)
-#define VIS_DEBUG(...) dbugLog(__VA_ARGS__
+#define VIS_DEBUG(...) dbugLog(__VA_ARGS__)
 static void
 _dumpVisListEntry(const Viewing& entry)
 {

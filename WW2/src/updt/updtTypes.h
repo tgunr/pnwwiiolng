@@ -144,6 +144,9 @@ struct SHARED_VEHICLE_INFO
 	UINT16				posTimeStamp;	//	Last time we got a position update
 	UINT16				globalFlags;
 	UINT16				oneTimeBits;
+#if platBuild == TEUL_SERVER
+	UINT16				cmdrTimeStamp;  // On the host we need to keep track of the commander independently
+#endif
 
 //	UCHAR				loadOut;
 	UCHAR				country;
