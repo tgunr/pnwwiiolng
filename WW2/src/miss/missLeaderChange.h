@@ -21,7 +21,7 @@ public:
 	,	_SET_BACKUP_LEADER
 	};
 	LeaderChange(UINT32 missionID=0, UINT32 leaderID=0, const ChatHandle& leaderHandle=0LL, const ChatHandle& requester=0LL, Status result=_SUCCESS)
-		: m_missionID(missionID), m_leaderID(leaderID), m_leaderHandle(leaderHandle), m_requester(requester), m_result(_SUCCESS) {}
+		: m_missionID(missionID), m_leaderID(leaderID), m_leaderHandle(leaderHandle), m_requester(requester), m_result(result) {}
 	~LeaderChange() {}
 
 public:
