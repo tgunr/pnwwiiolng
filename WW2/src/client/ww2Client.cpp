@@ -299,6 +299,8 @@ Client::Client()
 	memset(&_classdata->permissions, 0x0, sizeof(_classdata->permissions));
 
 	_classdata->killedByAI = false;
+	_classdata->commander = 0;
+	_classdata->missionstatus = 0;
 
 #ifdef TEMP_PERMISSIONS
 	// for testing
