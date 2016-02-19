@@ -63,7 +63,11 @@
 #include <sys/types.h>       /* for _off_t */
 #include <assert.h>
 #include <stdlib.h>          /* for rand, srand, _strtoxxx */
+
+#if defined(_MSC_VER) && _MSC_VER >= 1900
+#define _TIMESPEC_DEFINED
 #include <time.h>
+#endif
 
 /*
  * 4018: signed/unsigned mismatch is common (and ok for signed_i < unsigned_i)
@@ -437,7 +441,7 @@ inline unsigned int sleep(unsigned int seconds) {
 
 // mingw64 seems to define timespec (though mingw.org mingw doesn't),
 // protected by the _TIMESPEC_DEFINED macro.
-#if !defined(_TIMESPEC_DEFINED) && _MSC_VER < 1900
+#ifndef _TIMESPEC_DEFINED
 struct timespec {
   int tv_sec;
   int tv_nsec;
@@ -457,7 +461,7 @@ inline int nanosleep(const struct timespec *req, struct timespec *rem) {
 #endif
 
 #ifndef __MINGW32__
-#if _MSC_VER < 1800
+#if defined(_MSC_VER) && _MSC_VER < 1800
 inline long long int strtoll(const char *nptr, char **endptr, int base) {
     return _strtoi64(nptr, endptr, base);
 }

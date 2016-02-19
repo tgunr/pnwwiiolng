@@ -85,7 +85,32 @@
 #define close _close
 #define fstat _fstati64
 #define stat _stati64
+#define mode_t int
 #endif
+
+int
+evutil_open_closeonexec(const char *pathname, int flags, unsigned mode)
+{
+	int fd;
+
+#ifdef O_CLOEXEC
+	flags |= O_CLOEXEC;
+#endif
+
+	if (flags & O_CREAT)
+		fd = open(pathname, flags, (mode_t)mode);
+	else
+		fd = open(pathname, flags);
+	if (fd < 0)
+		return -1;
+
+#if !defined(O_CLOEXEC) && defined(FD_CLOEXEC)
+	if (fcntl(fd, F_SETFD, FD_CLOEXEC) < 0)
+		return -1;
+#endif
+
+	return fd;
+}
 
 /**
    Read the contents of 'filename' into a newly allocated NUL-terminated
@@ -117,7 +142,7 @@ evutil_read_file(const char *filename, char **content_out, size_t *len_out,
 		mode |= O_BINARY;
 #endif
 
-	fd = open(filename, mode);
+	fd = evutil_open_closeonexec(filename, mode, 0);
 	if (fd < 0)
 		return -1;
 	if (fstat(fd, &st) || st.st_size < 0 ||
@@ -234,7 +259,6 @@ evutil_ersatz_socketpair(int family, int type, int protocol,
 		goto tidy_up_and_fail;
 	if (size != sizeof(listen_addr))
 		goto abort_tidy_up_and_fail;
-	evutil_closesocket(listener);
 	/* Now check we are talking to ourself by matching port and host on the
 	   two sockets.	 */
 	if (getsockname(connector, (struct sockaddr *) &connect_addr, &size) == -1)
@@ -244,6 +268,7 @@ evutil_ersatz_socketpair(int family, int type, int protocol,
 		|| listen_addr.sin_addr.s_addr != connect_addr.sin_addr.s_addr
 		|| listen_addr.sin_port != connect_addr.sin_port)
 		goto abort_tidy_up_and_fail;
+	evutil_closesocket(listener);
 	fd[0] = connector;
 	fd[1] = acceptor;
 
@@ -1537,7 +1562,7 @@ evutil_vsnprintf(char *buf, size_t buflen, const char *format, va_list ap)
 	int r;
 	if (!buflen)
 		return 0;
-#ifdef _MSC_VER
+#if defined(_MSC_VER) || defined(WIN32)
 	r = _vsnprintf(buf, buflen, format, ap);
 	if (r < 0)
 		r = _vscprintf(format, ap);
@@ -2084,10 +2109,23 @@ _evutil_weakrand(void)
 #endif
 }
 
+/**
+ * Volatile pointer to memset: we use this to keep the compiler from
+ * eliminating our call to memset.
+ */
+void * (*volatile evutil_memset_volatile_)(void *, int, size_t) = memset;
+
+void
+evutil_memclear_(void *mem, size_t len)
+{
+	evutil_memset_volatile_(mem, 0, len);
+}
+
 int
 evutil_sockaddr_is_loopback(const struct sockaddr *addr)
 {
-	static const char LOOPBACK_S6[16] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1 };
+	static const char LOOPBACK_S6[16] =
+	    "\0\0\0\0\0\0\0\0\0\0\0\0\0\0\0\1";
 	if (addr->sa_family == AF_INET) {
 		struct sockaddr_in *sin = (struct sockaddr_in *)addr;
 		return (ntohl(sin->sin_addr.s_addr) & 0xff000000) == 0x7f000000;

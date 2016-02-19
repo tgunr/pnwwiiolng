@@ -1,10 +1,9 @@
-#pragma once
 /* 
- * Copyright (C) 2004-2009 Georgy Yunaev gyunaev@ulduzsoft.com
+ * Copyright (C) 2004-2012 George Yunaev gyunaev@ulduzsoft.com
  *
  * This library is free software; you can redistribute it and/or modify it 
  * under the terms of the GNU Lesser General Public License as published by 
- * the Free Software Foundation; either version 2 of the License, or (at your 
+ * the Free Software Foundation; either version 3 of the License, or (at your 
  * option) any later version.
  *
  * This library is distributed in the hope that it will be useful, but WITHOUT 
@@ -15,9 +14,9 @@
 
 /*! 
  * \file libircclient.h
- * \author Georgy Yunaev
- * \version 1.0
- * \date 09.2004
+ * \author George Yunaev
+ * \version 1.5
+ * \date 01.2012
  * \brief This file defines all prototypes and functions to use libircclient.
  *
  * libircclient is a small but powerful library, which implements client-server IRC
@@ -35,11 +34,17 @@
  * - Plain C interface and implementation (possible to use from C++ code, 
  *   obviously)
  * - Compatible with RFC 1459 and most IRC clients.
+ * - SSL support if compiled with --enable-openssl.
  * - Free, licensed under LGPL license.
  *
  * Note that to use libircclient, only libircclient.h should be included into your 
  * program. Do not include other libirc_* headers.
  */
+
+#ifndef INCLUDE_LIBIRC_H
+#define INCLUDE_LIBIRC_H
+
+#include <stdlib.h>
 
 #if !defined (WIN32)
 	#include <sys/select.h>	/* fd_set */
@@ -50,6 +55,10 @@
 		typedef int  (WSAAPI * getaddrinfo_ptr_t)  (const char *, const char* , const struct addrinfo *, struct addrinfo **);
 		typedef void (WSAAPI * freeaddrinfo_ptr_t) (struct addrinfo*);
 	#endif
+#endif
+
+#ifdef	__cplusplus
+extern "C" {
 #endif
 
 /*! \brief A libircclient IRC session.
@@ -122,14 +131,9 @@ typedef void (*irc_dcc_callback_t) (irc_session_t * session, irc_dcc_t id, int s
 
 #define IN_INCLUDE_LIBIRC_H
 #include "libirc_errors.h"
-#include "libirc_rfcnumeric.h"
 #include "libirc_events.h"
 #include "libirc_options.h"
-
-#if defined (IN_BUILDING_LIBIRC)
-	#include "libirc_session.h"
-	#include "libirc_dcc.h"
-#endif
+#undef IN_INCLUDE_LIBIRC_H
 
 
 /*!
@@ -185,8 +189,10 @@ void irc_destroy_session (irc_session_t * session);
  * \brief Initiates a connection to IRC server.
  *
  * \param session A session to initiate connections on. Must not be NULL.
- * \param server  A domain name or an IP address of the IRC server to connect 
- *                to. Must not be NULL.
+ * \param server  A domain name or an IP address of the IRC server to connect to. Cannot be NULL.
+ *                If the library is built with SSL support and the first character is hash, tries to establish the SSL connection. 
+ *                For example, the connection to "irc.example.com" is assumed to be plaintext, and connection to "#irc.example.com"
+ *                is assumed to be secured by SSL. Note that SSL will only work if the library is built with the SSL support.
  * \param port    An IRC server port, usually 6667.
  * \param server_password  An IRC server password, if the server requires it.
  *                May be NULL, in this case password will not be send to the 
@@ -230,9 +236,11 @@ int irc_connect (irc_session_t * session,
  * \brief Initiates a connection to IRC server using IPv6.
  *
  * \param session A session to initiate connections on. Must not be NULL.
- * \param server  A domain name or an IP address of the IRC server to connect 
- *                to. Must not be NULL.
- * \param port    An IRC server port, usually 6667.
+ * \param server  A domain name or an IP address of the IRC server to connect to. Cannot be NULL.
+ *                If the library is built with SSL support and the first character is hash, tries to establish the SSL connection. 
+ *                For example, the connection to "irc.example.com" is assumed to be plaintext, and connection to "#irc.example.com"
+ *                is assumed to be secured by SSL. Note that SSL will only work if the library is built with the SSL support.
+ * \param port    An IRC server port, usually 6667. 
  * \param server_password  An IRC server password, if the server requires it.
  *                May be NULL, in this case password will not be send to the 
  *                IRC server. Vast majority of IRC servers do not require passwords.
@@ -1299,6 +1307,20 @@ void irc_get_version (unsigned int * high, unsigned int * low);
  */
 void irc_set_ctx (irc_session_t * session, void * ctx);
 
+/*!
+ * \fn void irc_set_ctcp_version (irc_session_t * session, const char *version)
+ * \brief Sets the internal CTCP VERSION
+ *
+ * \param session an Initiated session.
+ * \param version the version to reply
+ *
+ * This function sets an internal user-defined version to reply on CTCP
+ * VERSION request. If none is given, a default one is provided. The parameter
+ * version is copied and can be freed by the user.
+ *
+ * \ingroup contexts
+ */
+void irc_set_ctcp_version(irc_session_t * session, const char * version);
 
 /*!
  * \fn void * irc_get_ctx (irc_session_t * session)
@@ -1470,3 +1492,8 @@ char * irc_color_convert_from_mirc (const char * message);
  */
 char * irc_color_convert_to_mirc (const char * message);
 
+#ifdef	__cplusplus
+}
+#endif
+
+#endif /* INCLUDE_LIBIRC_H */

@@ -629,9 +629,7 @@ struct _xmlSchemaType {
     const xmlChar *refPrefix; /* Deprecated; not used */
     xmlSchemaTypePtr contentTypeDef; /* Used for the simple content of complex types.
                                         Could we use @subtypes for this? */
-#ifdef LIBXML_REGEXP_ENABLED
     xmlRegexpPtr contModel; /* Holds the automaton of the content model */
-#endif
     const xmlChar *targetNamespace;
     void *attrUses;
 };
@@ -788,9 +786,7 @@ struct _xmlSchemaElement {
     const xmlChar *value; /* The original value of the value constraint. */
     struct _xmlSchemaElement *refDecl; /* This will now be used for the
                                           substitution group affiliation */
-#ifdef LIBXML_REGEXP_ENABLED
     xmlRegexpPtr contModel; /* Obsolete for WXS, maybe used for RelaxNG */
-#endif
     xmlSchemaContentType contentType;
     const xmlChar *refPrefix; /* Deprecated; not used */
     xmlSchemaValPtr defVal; /* The compiled value contraint. */
@@ -834,9 +830,7 @@ struct _xmlSchemaFacet {
     int fixed; /* XML_SCHEMAS_FACET_PRESERVE, etc. */
     int whitespace;
     xmlSchemaValPtr val; /* The compiled value */
-#ifdef LIBXML_REGEXP_ENABLED
     xmlRegexpPtr    regexp; /* The regex for patterns */
-#endif
 };
 
 /**

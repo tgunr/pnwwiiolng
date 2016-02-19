@@ -133,6 +133,9 @@ bufferevent_readcb(evutil_socket_t fd, short event, void *arg)
 	_bufferevent_incref_and_lock(bufev);
 
 	if (event == EV_TIMEOUT) {
+		/* Note that we only check for event==EV_TIMEOUT. If
+		 * event==EV_TIMEOUT|EV_READ, we can safely ignore the
+		 * timeout, since a read has occurred */
 		what |= BEV_EVENT_TIMEOUT;
 		goto error;
 	}
@@ -209,6 +212,9 @@ bufferevent_writecb(evutil_socket_t fd, short event, void *arg)
 	_bufferevent_incref_and_lock(bufev);
 
 	if (event == EV_TIMEOUT) {
+		/* Note that we only check for event==EV_TIMEOUT. If
+		 * event==EV_TIMEOUT|EV_WRITE, we can safely ignore the
+		 * timeout, since a read has occurred */
 		what |= BEV_EVENT_TIMEOUT;
 		goto error;
 	}
@@ -509,7 +515,7 @@ bufferevent_socket_get_dns_error(struct bufferevent *bev)
 
 	BEV_LOCK(bev);
 	rv = bev_p->dns_error;
-	BEV_LOCK(bev);
+	BEV_UNLOCK(bev);
 
 	return rv;
 }
@@ -530,9 +536,9 @@ bufferevent_new(evutil_socket_t fd,
     bufferevent_data_cb readcb, bufferevent_data_cb writecb,
     bufferevent_event_cb eventcb, void *cbarg)
 {
-	struct bufferevent *bufev = bufferevent_socket_new(NULL, fd, 0);
+	struct bufferevent *bufev;
 
-	if (!bufev)
+	if (!(bufev = bufferevent_socket_new(NULL, fd, 0)))
 		return NULL;
 
 	bufferevent_setcb(bufev, readcb, writecb, eventcb, cbarg);

@@ -167,9 +167,7 @@ struct _xmlRelaxNGDefine {
     xmlRelaxNGDefinePtr nextHash;       /* next define in defs/refs hash tables */
     short depth;                /* used for the cycle detection */
     short dflags;               /* define related flags */
-#ifdef LIBXML_REGEXP_ENABLED
     xmlRegexpPtr contModel;     /* a compiled content model if available */
-#endif
 };
 
 /**
@@ -249,11 +247,9 @@ struct _xmlRelaxNGParserCtxt {
 
     int idref;                  /* requires idref checking */
 
-#ifdef LIBXML_REGEXP_ENABLED
     /* used to compile content models */
     xmlAutomataPtr am;          /* the automata */
     xmlAutomataStatePtr state;  /* used to build the automata */
-#endif
 
     int crng;			/* compact syntax and other flags */
     int freedoc;		/* need to free the document */

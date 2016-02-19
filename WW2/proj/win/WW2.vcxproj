@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Choose>
     <When Condition="'$(Configuration)'!='Debug'">
@@ -1876,7 +1876,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\Libraries\freetype\builds\win32\visualc\freetype.vcxproj">
+    <ProjectReference Include="..\..\..\Libraries\freetype\builds\windows\vc2015\freetype.vcxproj">
       <Project>{78b079bd-9fc7-4b9e-b4a6-96da0f00248b}</Project>
     </ProjectReference>
     <ProjectReference Include="..\..\..\Libraries\ftgl\msvc\vc8\ftgl_static.vcxproj">

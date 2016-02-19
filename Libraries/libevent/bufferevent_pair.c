@@ -91,8 +91,8 @@ static struct bufferevent_pair *
 bufferevent_pair_elt_new(struct event_base *base,
     int options)
 {
-	struct bufferevent_pair *bufev = mm_calloc(1, sizeof(struct bufferevent_pair));
-	if (!bufev)
+	struct bufferevent_pair *bufev;
+	if (! (bufev = mm_calloc(1, sizeof(struct bufferevent_pair))))
 		return NULL;
 	if (bufferevent_init_common(&bufev->bev, base, &bufferevent_ops_pair,
 		options)) {
@@ -310,13 +310,14 @@ struct bufferevent *
 bufferevent_pair_get_partner(struct bufferevent *bev)
 {
 	struct bufferevent_pair *bev_p;
-	struct bufferevent *partner;
+	struct bufferevent *partner = NULL;
 	bev_p = upcast(bev);
 	if (! bev_p)
 		return NULL;
 
 	incref_and_lock(bev);
-	partner = downcast(bev_p->partner);
+	if (bev_p->partner)
+		partner = downcast(bev_p->partner);
 	decref_and_unlock(bev);
 	return partner;
 }

@@ -43,6 +43,12 @@
 #include <stdlib.h>
 #include <string.h>
 int
+evutil_secure_rng_set_urandom_device_file(char *fname)
+{
+	(void) fname;
+	return -1;
+}
+int
 evutil_secure_rng_init(void)
 {
 	/* call arc4random() now to force it to self-initialize */
@@ -58,10 +64,26 @@ evutil_secure_rng_global_setup_locks_(const int enable_locks)
 static void
 ev_arc4random_buf(void *buf, size_t n)
 {
-#ifdef _EVENT_HAVE_ARC4RANDOM_BUF
+#if defined(_EVENT_HAVE_ARC4RANDOM_BUF) && !defined(__APPLE__)
 	return arc4random_buf(buf, n);
 #else
 	unsigned char *b = buf;
+
+#if defined(_EVENT_HAVE_ARC4RANDOM_BUF)
+	/* OSX 10.7 introducd arc4random_buf, so if you build your program
+	 * there, you'll get surprised when older versions of OSX fail to run.
+	 * To solve this, we can check whether the function pointer is set,
+	 * and fall back otherwise.  (OSX does this using some linker
+	 * trickery.)
+	 */
+	{
+		void (*tptr)(void *,size_t) =
+		    (void (*)(void*,size_t))arc4random_buf;
+		if (tptr != NULL) {
+			return arc4random_buf(buf, n);
+		}
+	}
+#endif
 	/* Make sure that we start out with b at a 4-byte alignment; plenty
 	 * of CPUs care about this for 32-bit access. */
 	if (n >= 4 && ((ev_uintptr_t)b) & 3) {
@@ -110,6 +132,17 @@ evutil_secure_rng_global_setup_locks_(const int enable_locks)
 	return 0;
 }
 #endif
+
+int
+evutil_secure_rng_set_urandom_device_file(char *fname)
+{
+#ifdef TRY_SEED_URANDOM
+	_ARC4_LOCK();
+	arc4random_urandom_filename = fname;
+	_ARC4_UNLOCK();
+#endif
+	return 0;
+}
 
 int
 evutil_secure_rng_init(void)

@@ -3,7 +3,7 @@
 #
 
 
-# Copyright 2002, 2006 by
+# Copyright 2002-2015 by
 # David Turner, Robert Wilhelm, and Werner Lemberg.
 #
 # This file is part of the FreeType project, and may only be used, modified,
@@ -16,7 +16,7 @@
 FTMODULE_H_COMMANDS += TYPE42_DRIVER
 
 define TYPE42_DRIVER
-$(OPEN_DRIVER)t42_driver_class$(CLOSE_DRIVER)
+$(OPEN_DRIVER) FT_Driver_ClassRec, t42_driver_class $(CLOSE_DRIVER)
 $(ECHO_DRIVER)type42    $(ECHO_DRIVER_DESC)Type 42 font files with no known extension$(ECHO_DRIVER_DONE)
 endef
 

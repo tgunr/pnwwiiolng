@@ -161,6 +161,11 @@ char EVUTIL_TOLOWER(char c);
 #define EVUTIL_UPCAST(ptr, type, field)				\
 	((type *)(((char*)(ptr)) - evutil_offsetof(type, field)))
 
+/* As open(pathname, flags, mode), except that the file is always opened with
+ * the close-on-exec flag set. (And the mode argument is mandatory.)
+ */
+int evutil_open_closeonexec(const char *pathname, int flags, unsigned mode);
+
 int evutil_read_file(const char *filename, char **content_out, size_t *len_out,
     int is_binary);
 
@@ -284,6 +289,14 @@ HANDLE evutil_load_windows_system_library(const TCHAR *library_name);
 #endif
 #endif
 
+#ifdef _WIN32
+#define EV_SOCK_FMT EV_I64_FMT
+#define EV_SOCK_ARG(x) EV_I64_ARG((x))
+#else
+#define EV_SOCK_FMT "%d"
+#define EV_SOCK_ARG(x) (x)
+#endif
+
 #if defined(__STDC__) && defined(__STDC_VERSION__)
 #if (__STDC_VERSION__ >= 199901L)
 #define EV_SIZE_FMT "%zu"
@@ -306,6 +319,8 @@ HANDLE evutil_load_windows_system_library(const TCHAR *library_name);
 #define EV_SSIZE_ARG(x) EV_I64_ARG(x)
 #endif
 #endif
+
+void evutil_memclear_(void *mem, size_t len);
 
 #ifdef __cplusplus
 }
