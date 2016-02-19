@@ -113,20 +113,20 @@ namespace Host
 	#define DEF_ERR_LEVEL Debug::ERR_INFO
 #endif
 
-#ifdef BETA_RELEASE
+#ifdef DEBUG_UPDATES
 UINT32 remoteVehicles = 0;
 UINT32 vehiclesSkipped = 0;
 UINT32 totalVehicles = 0;
-UINT32 qualifiedVehicles = 0; 
-UINT32 vehiclesReviewed = 0; 
-UINT32 vehUpdatesSent = 0;      
+UINT32 qualifiedVehicles = 0;
+UINT32 vehiclesReviewed = 0;
+UINT32 vehUpdatesSent = 0;
 UINT32 vehMcrewCommanderUpdatesSent = 0;
 UINT32 vehMcrewCrewUpdatesSent = 0;
 UINT32 xmissionsFailed = 0;
-UINT32 vehiclesThrottled = 0;   
+UINT32 vehiclesThrottled = 0;
 UINT32 numberOfUpdatesBehind = 0;
 UINT32 numVehiclesReported = 0;
-#endif                  
+#endif
 
 //ERR_NOTE
 #define DEF_ERR_FLAGS	0
@@ -1787,9 +1787,8 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 	TIMER_START
 	for (auto it = _vehicleHash.begin(), end = _vehicleHash.end(); it != end;)
 	{
-
-#ifdef BETA_RELEASE
-		totalVehicles++;
+#ifdef DEBUG_UPDATES
+		++totalVehicles;
 #endif
 		HostVehicle* const vehicle = it->second;
 		++it;
@@ -1798,10 +1797,10 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 		assert( vehicle != nullptr );
 #endif
 
-		if ( vehicle->isRemote() == true )
+		if ( vehicle->isRemote() )
 		{
-#ifdef BETA_RELEASE
-			remoteVehicles++;
+#ifdef DEBUG_UPDATES
+			++remoteVehicles;
 #endif
 
 			continue;
@@ -1809,8 +1808,8 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 
 		if ( vehicle->m_nextUpdateClock > teulClock64 )
 		{
-#ifdef BETA_RELEASE
-			vehiclesSkipped++;
+#ifdef DEBUG_UPDATES
+			++vehiclesSkipped;
 #endif
 			continue;
 		}
@@ -1823,8 +1822,8 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 
 		if ( PN_LIKELY(fail == 0) )
 		{
-#ifdef BETA_RELEASE
-			qualifiedVehicles++;
+#ifdef DEBUG_UPDATES
+			++qualifiedVehicles;
 
 			if ( (!reportedLagging) & (vehicle->m_nextUpdateClock < lowend) )
 			{
@@ -1854,7 +1853,7 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 		TIMER_STOP("gvwfu_shrink");
 	}
 
-#ifdef BETA_RELEASE
+#ifdef DEBUG_UPDATES
 	vehiclesReviewed = vehicles.size();
 #endif
 
@@ -2059,7 +2058,7 @@ _sendNextUpdate(HostVehicle* const vehicle)
 
 	assert( wu.header.numVehicles <= framings[vehicle->framingMode].maxVehiclesPerFrame() );
 
-#ifdef BETA_RELEASE
+#ifdef DEBUG_UPDATES
 	numVehiclesReported += wu.header.numVehicles;
 #endif
 
@@ -2151,8 +2150,8 @@ _sendNextUpdate(HostVehicle* const vehicle)
 	if ( players.empty() == false )
 	{
 
-#ifdef BETA_RELEASE
-		vehUpdatesSent++;
+#ifdef DEBUG_UPDATES
+		++vehUpdatesSent;
 #endif
 		// Because of encryption, we can't just send the original to
 		// the crew, we have to send a copy.
@@ -2163,14 +2162,14 @@ _sendNextUpdate(HostVehicle* const vehicle)
 			if ( _sendPacket(copy, players[i], vehicle->index, pingOffset) )
 			{	
 				result = true;
-#ifdef BETA_RELEASE
-				vehMcrewCrewUpdatesSent++;
+#ifdef DEBUG_UPDATES
+				++vehMcrewCrewUpdatesSent;
 #endif
 			}
 			else
 			{
-#ifdef BETA_RELEASE
-				xmissionsFailed++;
+#ifdef DEBUG_UPDATES
+				++xmissionsFailed;
 #endif
 				updatesFailing = true;
 			}
@@ -2179,14 +2178,14 @@ _sendNextUpdate(HostVehicle* const vehicle)
 		if ( _sendPacket(*wu.packet, players[0], vehicle->index, pingOffset) )
 		{
 			result = true;
-#ifdef BETA_RELEASE
-			vehMcrewCommanderUpdatesSent++;
+#ifdef DEBUG_UPDATES
+			++vehMcrewCommanderUpdatesSent;
 #endif
 		}
 		else
 		{
-#ifdef BETA_RELEASE
-			xmissionsFailed++;
+#ifdef DEBUG_UPDATES
+			++xmissionsFailed;
 #endif
 			updatesFailing = true;
 		}
@@ -2200,8 +2199,8 @@ _sendNextUpdate(HostVehicle* const vehicle)
 	{
 		if ( updatesFailing )
 		{
-#ifdef BETA_RELEASE
-			vehiclesThrottled++;
+#ifdef DEBUG_UPDATES
+			++vehiclesThrottled;
 #endif
 
 			// Add an extra 1.5s to the next update
@@ -2209,7 +2208,7 @@ _sendNextUpdate(HostVehicle* const vehicle)
 		}
 		else if ( updatesBehind > 1 )
 		{
-#ifdef BETA_RELEASE
+#ifdef DEBUG_UPDATES
 			numberOfUpdatesBehind += updatesBehind;
 #endif
 			const UINT32 delay = updatesBehind * 25;
@@ -2386,7 +2385,7 @@ _runHost(void)
 		TIMER_STOP("updts");
 		TIMER_REPORT(250)
 
-#ifdef BETA_RELEASE
+#ifdef DEBUG_UPDATES
 		static UINT32 nextStatsReport = teulTime();
 		if ( teulTime() >= nextStatsReport )
 		{

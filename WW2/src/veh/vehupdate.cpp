@@ -71,7 +71,7 @@
 bool _newpredictor = true;
 int _simlowupdate = 0;
 
-#ifdef BETA_RELEASE
+#ifdef DEBUG_UPDATES
 UINT32 vehUpdatesSent = 0;
 UINT32 vehMcrewUpdatesRecv = 0;
 UINT32 vehNonMcrewUpdatesRecv = 0;
@@ -346,7 +346,7 @@ static SINT32 _LastUpdateTime = 0; // added specific initialization 5/28/01 hoss
 	if (frametime - TempNum > 0 || ForceSend != 0)
 	{
 
-#ifdef BETA_RELEASE
+#ifdef DEBUG_UPDATES
 		static SINT32 _LastReportTime = 0; // added specific initialization 5/28/01 hoss
 										   /* Report our tracking numbers every second */
 		SINT32 Periodic = _LastReportTime + 1000;
@@ -590,27 +590,21 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 		// always send out everything we know
 		if (Vehicle.PosData.States[i])
 		{
-			if (i >= 32)
-			{
+			if ( i >= 32 )
 				VehicleInfo.visBits |= 1 << (i - 32);
-			}
-			else if (i > 15 && i < 32)
-			{
+			else if ( i > 15 && i < 32 )
 				VehicleInfo.stateFlags1 |= 1 << (i - 16);
-			}
 			else
-			{
 				VehicleInfo.stateFlags0 |= 1 << i;
-			}
 		}
 	}
 
-	/* although the vehicle defines this as UINT32 it is really an UPDT_STATION enum field and should not be hardcoded */
+	// Although the vehicle defines this as UINT32, it is really an UPDT_STATION enum field and should not be hardcoded.
 	if(static_cast<UPDT_STATION>(Data.MultiCrewPos) != UPDT_OTHER)
 	{
 		VehicleHdr.present |= PR_POSITION;
-#ifdef BETA_RELEASE
-			vehUpdatesSent++;
+#ifdef DEBUG_UPDATES
+			++vehUpdatesSent;
 #endif
 	}
 
@@ -1009,9 +1003,9 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 				PosData->Pos.x = VehicleHeader->position.m_x / 100.0;
 				PosData->Pos.y = VehicleHeader->position.m_y / 100.0;
 				PosData->Pos.z = VehicleHeader->position.m_z / 100.0 - 2000.0;
-#ifdef BETA_RELEASE
+#ifdef DEBUG_UPDATES
 				dbugLog(_FLI, "Not online??");
-				unexpectedErrors++;
+				++unexpectedErrors;
 #endif
 			}
 			else
@@ -1020,15 +1014,15 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 				PosData->Pos.y = VehicleInfo->position.m_y / 100.0;
 				PosData->Pos.z = VehicleInfo->position.m_z / 100.0 - 2000.0;
 
-#ifdef BETA_RELEASE
+#ifdef DEBUG_UPDATES
 				if (Vehicle->ModelData != nullptr)
 				{
-					/* Track how far off our predictions are off and accumulate perc diff */
-					vehMcrewUpdatesRecv++;
+					// Track how far off our predictions are off and accumulate perc diff
+					++vehMcrewUpdatesRecv;
 				}
 				else
 				{
-					vehNonMcrewUpdatesRecv++;
+					++vehNonMcrewUpdatesRecv;
 				}
 #endif
 			}
@@ -1052,12 +1046,12 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 			PosData->AttVel.Roll = VehicleInfo->rotational.velY / 1000.0;
 			PosData->AttVel.Yaw = VehicleInfo->rotational.velZ / 1000.0;
 		}
+#ifdef DEBUG_UPDATES
 		else
 		{
-#ifdef BETA_RELEASE
 			vehMcommanderUpdatesIgn++;
-#endif
 		}
+#endif
 	}
 
 	if (VehicleHeader->present & PR_RELPOS)
@@ -1189,8 +1183,8 @@ UINT32 vehupdateProcessPositionUpdateMsg(const VEHICLE_UPDATE_HEADER* VehicleHea
 	SINT32 TurretNum;
 	UINT32 i,j;
 
-#ifdef BETA_RELEASE
-	worldUpdatesReceived++;
+#ifdef DEBUG_UPDATES
+	++worldUpdatesReceived;
 #endif
 
 	const SHARED_VEHICLE_INFO* const VehicleInfo = &VehicleHeader->vehInfo;
@@ -1220,8 +1214,8 @@ UINT32 vehupdateProcessPositionUpdateMsg(const VEHICLE_UPDATE_HEADER* VehicleHea
 			{
 				Write_Debug("Invalid countries specified for vehicle %s, host index %d",VehicleInfo->callsign,
 								VehicleInfo->index);
-#ifdef BETA_RELEASE
-				unexpectedErrors++;
+#ifdef DEBUG_UPDATES
+				++unexpectedErrors;
 #endif
 				return 0;
 			}
@@ -1230,8 +1224,8 @@ UINT32 vehupdateProcessPositionUpdateMsg(const VEHICLE_UPDATE_HEADER* VehicleHea
 				if(weapon == nullptr)
 				{
 					Write_Debug("Weapon not found host veh index %d", VehicleInfo->index);
-#ifdef BETA_RELEASE
-					unexpectedErrors++;
+#ifdef DEBUG_UPDATES
+					++unexpectedErrors;
 #endif
 					return 0;
 				}
@@ -1243,8 +1237,8 @@ UINT32 vehupdateProcessPositionUpdateMsg(const VEHICLE_UPDATE_HEADER* VehicleHea
 			{
 				// we're out of vehicle slots
 				Write_Debug("Out of free vehicle slots for new vehicle");
-#ifdef BETA_RELEASE
-				unexpectedErrors++;
+#ifdef DEBUG_UPDATES
+				++unexpectedErrors;
 #endif
 				return 0;
 			}
@@ -1267,7 +1261,7 @@ UINT32 vehupdateProcessPositionUpdateMsg(const VEHICLE_UPDATE_HEADER* VehicleHea
 			else
 				Vehicle->persDecal = 0;
 
-            Vehicle->unitDecal = VehicleInfo->brigadeID;
+			Vehicle->unitDecal = VehicleInfo->brigadeID;
 
 			// Special Rat Icon Rank stuff
 			if(isupper(Vehicle->Handle[0]))
@@ -1304,17 +1298,17 @@ lastLowUpdateTime = frametime;
 	if (Vehicle == nullptr)
 	{
 		// vehicle doesn't exist in list
-#ifdef BETA_RELEASE
-		vehNotTracked++;
+#ifdef DEBUG_UPDATES
+		++vehNotTracked;
 #endif
 		Write_Debug("Received an update for vehicle not being tracked, index = %d",Position);
 		return 0;
 	}
 
-    if(VehicleInfo->timeStamp == Vehicle->PosData.LastAnyUpdateTime)
+	if(VehicleInfo->timeStamp == Vehicle->PosData.LastAnyUpdateTime)
 	{
-#ifdef BETA_RELEASE
-		duplicateUpdatesIgnored++;
+#ifdef DEBUG_UPDATES
+		++duplicateUpdatesIgnored;
 #endif
 		Write_Debug("Duplicate update received for vehicle index %d (%s)", Position, Vehicle->Handle);
 		return 0;

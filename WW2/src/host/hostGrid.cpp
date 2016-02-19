@@ -7,7 +7,7 @@
 
 //#undef NO_DEBUG_WRITE
 #undef EXTREME_DEBUG
-//#undef ENABLE_VIS_DEBUG
+#undef ENABLE_VIS_DEBUG
 
 #include "comm/commConstants.h"
 #include "host/hostGridCellImpl.h"
