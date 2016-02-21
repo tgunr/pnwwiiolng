@@ -1780,7 +1780,7 @@ _getVehiclesWaitingForUpdates(VEHICLES& vehicles, const UINT32 maxVehicles)
 	vehicles.reserve(maxVehicles);
 	TIMER_STOP("gvwfu_alloc");
 
-#ifdef BETA_RELEASE
+#ifdef DEBUG_UPDATES
 	const TeulTimeMS lowend = teulClock64 - 100;
 	bool reportedLagging = false;
 #endif
