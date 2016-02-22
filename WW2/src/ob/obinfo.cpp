@@ -6,12 +6,13 @@
  *  Copyright 2011 Playnet Inc. All rights reserved.
  *
  */
+#include <syscfg.h> // Path is project specific.
+
 #ifdef MODEL_INFO
 
-#include <syscfg.h> // Path is project specific.
 #include <fstream>
 #include <map>
-#include "oglMaterial.h"
+#include "ogl/oglMaterial.h"
 #include "obinfo.h"
 #include "obmain.h"
 #include "obMgr.h"
