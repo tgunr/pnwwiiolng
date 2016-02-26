@@ -3,18 +3,16 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 44;
+	objectVersion = 46;
 	objects = {
 
 /* Begin PBXBuildFile section */
 		0804088E10B73B35008F3954 /* BufferObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0804088C10B73B35008F3954 /* BufferObject.cpp */; };
 		080C7EA31062F13E000A242F /* clientGlobals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0863B36E10619D66005FDF19 /* clientGlobals.cpp */; };
 		080C7EA41062F147000A242F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 08104D52103DFBE90065E0E2 /* main.m */; };
-		080C7EA51062F151000A242F /* PGDownloader.m in Sources */ = {isa = PBXBuildFile; fileRef = 08104D54103DFBE90065E0E2 /* PGDownloader.m */; };
 		080C7EA61062F161000A242F /* WW2AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 08104D60103DFBE90065E0E2 /* WW2AppDelegate.mm */; };
 		080C7EA71062F16F000A242F /* dpp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 081048DD103DCFA30065E0E2 /* dpp.mm */; };
 		080C7EA81062F17E000A242F /* diphid.mm in Sources */ = {isa = PBXBuildFile; fileRef = 081048E2103DCFBD0065E0E2 /* diphid.mm */; };
-		080C7EA91062F192000A242F /* sysMacCompat.mm in Sources */ = {isa = PBXBuildFile; fileRef = 08104D58103DFBE90065E0E2 /* sysMacCompat.mm */; };
 		080D1E091404397100ECCF00 /* teulPacket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 080D1E071404397100ECCF00 /* teulPacket.cpp */; };
 		080D1E0A1404397100ECCF00 /* teulPacket.h in Headers */ = {isa = PBXBuildFile; fileRef = 080D1E081404397100ECCF00 /* teulPacket.h */; };
 		080D20C41408371500ECCF00 /* wwiiCallbacks.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104EE9103DFE120065E0E2 /* wwiiCallbacks.cpp */; };
@@ -319,46 +317,25 @@
 		0818A91312E745AB0035C3B4 /* gr2layerTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0818A91112E745AB0035C3B4 /* gr2layerTypes.cpp */; };
 		0818A91E12E74BCB0035C3B4 /* fpTPSKits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0818A91C12E74BCB0035C3B4 /* fpTPSKits.cpp */; };
 		081B0A4713C4D70F006BE6EE /* obinfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 081B0A4613C4D70F006BE6EE /* obinfo.cpp */; };
-		0828967310694C7D0056932F /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0828966A10694C7D0056932F /* AGL.framework */; };
-		0828967510694C7D0056932F /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0828966C10694C7D0056932F /* Cocoa.framework */; };
-		0828967610694C7D0056932F /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0828966D10694C7D0056932F /* IOKit.framework */; };
-		0828967810694C7D0056932F /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0828966F10694C7D0056932F /* OpenGL.framework */; };
-		0828967910694C7D0056932F /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0828967010694C7D0056932F /* QuickTime.framework */; };
-		0828967A10694C7D0056932F /* System.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0828967110694C7D0056932F /* System.framework */; };
-		0828967B10694C7D0056932F /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0828967210694C7D0056932F /* WebKit.framework */; };
 		082A41BA143B561D0023B243 /* libmacglew.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 082A41B8143B55F60023B243 /* libmacglew.a */; };
 		082CDA171411239E00225E44 /* libcrypto.0.9.8.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 082CDA161411239E00225E44 /* libcrypto.0.9.8.dylib */; };
-		082CF7CF120222EB00A60CC2 /* CABufferList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7AF120222EB00A60CC2 /* CABufferList.cpp */; };
 		082CF7D0120222EB00A60CC2 /* CABufferList.h in Headers */ = {isa = PBXBuildFile; fileRef = 082CF7B0120222EB00A60CC2 /* CABufferList.h */; };
-		082CF7D1120222EB00A60CC2 /* CADebugger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7B1120222EB00A60CC2 /* CADebugger.cpp */; };
 		082CF7D2120222EB00A60CC2 /* CADebugger.h in Headers */ = {isa = PBXBuildFile; fileRef = 082CF7B2120222EB00A60CC2 /* CADebugger.h */; };
-		082CF7D3120222EB00A60CC2 /* CADebugMacros.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7B3120222EB00A60CC2 /* CADebugMacros.cpp */; };
 		082CF7D4120222EB00A60CC2 /* CADebugMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 082CF7B4120222EB00A60CC2 /* CADebugMacros.h */; };
-		082CF7D5120222EB00A60CC2 /* CAGuard.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7B5120222EB00A60CC2 /* CAGuard.cpp */; };
 		082CF7D6120222EB00A60CC2 /* CAGuard.h in Headers */ = {isa = PBXBuildFile; fileRef = 082CF7B6120222EB00A60CC2 /* CAGuard.h */; };
-		082CF7D7120222EB00A60CC2 /* CAHostTimeBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7B7120222EB00A60CC2 /* CAHostTimeBase.cpp */; };
 		082CF7D8120222EB00A60CC2 /* CAHostTimeBase.h in Headers */ = {isa = PBXBuildFile; fileRef = 082CF7B8120222EB00A60CC2 /* CAHostTimeBase.h */; };
 		082CF7D9120222EB00A60CC2 /* CAMath.h in Headers */ = {isa = PBXBuildFile; fileRef = 082CF7B9120222EB00A60CC2 /* CAMath.h */; };
-		082CF7DA120222EB00A60CC2 /* CAMutex.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7BA120222EB00A60CC2 /* CAMutex.cpp */; };
 		082CF7DB120222EB00A60CC2 /* CAMutex.h in Headers */ = {isa = PBXBuildFile; fileRef = 082CF7BB120222EB00A60CC2 /* CAMutex.h */; };
-		082CF7DC120222EB00A60CC2 /* CAStreamBasicDescription.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7BC120222EB00A60CC2 /* CAStreamBasicDescription.cpp */; };
 		082CF7DD120222EB00A60CC2 /* CAStreamBasicDescription.h in Headers */ = {isa = PBXBuildFile; fileRef = 082CF7BD120222EB00A60CC2 /* CAStreamBasicDescription.h */; };
 		082CF7DE120222EB00A60CC2 /* CAThreadSafeList.h in Headers */ = {isa = PBXBuildFile; fileRef = 082CF7BE120222EB00A60CC2 /* CAThreadSafeList.h */; };
 		082CF7DF120222EB00A60CC2 /* MacOSX_OALExtensions.h in Headers */ = {isa = PBXBuildFile; fileRef = 082CF7BF120222EB00A60CC2 /* MacOSX_OALExtensions.h */; };
 		082CF7E0120222EB00A60CC2 /* oalAtomicStack.h in Headers */ = {isa = PBXBuildFile; fileRef = 082CF7C0120222EB00A60CC2 /* oalAtomicStack.h */; };
-		082CF7E1120222EB00A60CC2 /* oalBuffer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7C1120222EB00A60CC2 /* oalBuffer.cpp */; };
 		082CF7E2120222EB00A60CC2 /* oalBuffer.h in Headers */ = {isa = PBXBuildFile; fileRef = 082CF7C2120222EB00A60CC2 /* oalBuffer.h */; };
-		082CF7E3120222EB00A60CC2 /* oalCaptureDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7C3120222EB00A60CC2 /* oalCaptureDevice.cpp */; };
 		082CF7E4120222EB00A60CC2 /* oalCaptureDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 082CF7C4120222EB00A60CC2 /* oalCaptureDevice.h */; };
-		082CF7E5120222EB00A60CC2 /* oalContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7C5120222EB00A60CC2 /* oalContext.cpp */; };
 		082CF7E6120222EB00A60CC2 /* oalContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 082CF7C6120222EB00A60CC2 /* oalContext.h */; };
-		082CF7E7120222EB00A60CC2 /* oalDevice.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7C7120222EB00A60CC2 /* oalDevice.cpp */; };
 		082CF7E8120222EB00A60CC2 /* oalDevice.h in Headers */ = {isa = PBXBuildFile; fileRef = 082CF7C8120222EB00A60CC2 /* oalDevice.h */; };
-		082CF7E9120222EB00A60CC2 /* oalImp.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7C9120222EB00A60CC2 /* oalImp.cpp */; };
 		082CF7EA120222EB00A60CC2 /* oalImp.h in Headers */ = {isa = PBXBuildFile; fileRef = 082CF7CA120222EB00A60CC2 /* oalImp.h */; };
-		082CF7EB120222EB00A60CC2 /* oalOSX.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7CB120222EB00A60CC2 /* oalOSX.cpp */; };
 		082CF7EC120222EB00A60CC2 /* oalOSX.h in Headers */ = {isa = PBXBuildFile; fileRef = 082CF7CC120222EB00A60CC2 /* oalOSX.h */; };
-		082CF7ED120222EB00A60CC2 /* oalSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7CD120222EB00A60CC2 /* oalSource.cpp */; };
 		082CF7EE120222EB00A60CC2 /* oalSource.h in Headers */ = {isa = PBXBuildFile; fileRef = 082CF7CE120222EB00A60CC2 /* oalSource.h */; };
 		082CF80E1202241200A60CC2 /* CoreAudio.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 082CF80D1202241200A60CC2 /* CoreAudio.framework */; };
 		082CF8161202245400A60CC2 /* AudioToolbox.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 082CF8151202245400A60CC2 /* AudioToolbox.framework */; };
@@ -368,9 +345,7 @@
 		082CF82C12022CF700A60CC2 /* CAAtomicStack.h in Headers */ = {isa = PBXBuildFile; fileRef = 082CF82512022CF700A60CC2 /* CAAtomicStack.h */; };
 		082CF82D12022CF700A60CC2 /* CAByteOrder.h in Headers */ = {isa = PBXBuildFile; fileRef = 082CF82612022CF700A60CC2 /* CAByteOrder.h */; };
 		082CF82E12022CF700A60CC2 /* CAException.h in Headers */ = {isa = PBXBuildFile; fileRef = 082CF82712022CF700A60CC2 /* CAException.h */; };
-		082CF82F12022CF700A60CC2 /* CAXException.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF82812022CF700A60CC2 /* CAXException.cpp */; };
 		082CF83012022CF700A60CC2 /* CAXException.h in Headers */ = {isa = PBXBuildFile; fileRef = 082CF82912022CF700A60CC2 /* CAXException.h */; };
-		082CF8691202338100A60CC2 /* CADebugPrintf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF8671202338100A60CC2 /* CADebugPrintf.cpp */; };
 		082CF86A1202338100A60CC2 /* CADebugPrintf.h in Headers */ = {isa = PBXBuildFile; fileRef = 082CF8681202338100A60CC2 /* CADebugPrintf.h */; };
 		0834F1331044E60600E75B52 /* syscfg.h in Headers */ = {isa = PBXBuildFile; fileRef = 0834F1321044E60600E75B52 /* syscfg.h */; };
 		0834F1521044E67100E75B52 /* teulSockConfig.h in Headers */ = {isa = PBXBuildFile; fileRef = 0834F1341044E67100E75B52 /* teulSockConfig.h */; };
@@ -395,7 +370,6 @@
 		0834F1801044E6B400E75B52 /* teulUtils.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0834F1701044E6B400E75B52 /* teulUtils.cpp */; };
 		0834F1811044E6B400E75B52 /* teulModSend.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0834F1711044E6B400E75B52 /* teulModSend.cpp */; };
 		0834F1821044E6B400E75B52 /* teulEndpoint.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0834F1721044E6B400E75B52 /* teulEndpoint.cpp */; };
-		0834F1831044E6B400E75B52 /* teulDatagramPool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0834F1731044E6B400E75B52 /* teulDatagramPool.cpp */; };
 		0834F1841044E6B400E75B52 /* teulNetTimeMS.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0834F1741044E6B400E75B52 /* teulNetTimeMS.cpp */; };
 		0834F1861044E6B400E75B52 /* teulPack.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0834F1761044E6B400E75B52 /* teulPack.cpp */; };
 		0834F1871044E6B400E75B52 /* teulModule.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0834F1771044E6B400E75B52 /* teulModule.cpp */; };
@@ -476,6 +450,15 @@
 		0DDF00AC08578C460027461D /* libjs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DDF00A508578C460027461D /* libjs.a */; };
 		0DDF012D0857934A0027461D /* proj/mac/ww2.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0DDF012C0857934A0027461D /* proj/mac/ww2.icns */; };
 		47B0EDFD0E9A85510089DCC4 /* libteulKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 47B0ED240E9A66A40089DCC4 /* libteulKit.a */; };
+		E90D969A1C6D729D00D5EC52 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96991C6D729D00D5EC52 /* WebKit.framework */; };
+		E90D969C1C6D738D00D5EC52 /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D969B1C6D738D00D5EC52 /* AGL.framework */; };
+		E90D969E1C6D753D00D5EC52 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D969D1C6D753D00D5EC52 /* Cocoa.framework */; };
+		E90D96A01C6D757400D5EC52 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D969F1C6D757400D5EC52 /* IOKit.framework */; };
+		E90D96A21C6D75E200D5EC52 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96A11C6D75E200D5EC52 /* OpenGL.framework */; };
+		E90D96A41C6D760300D5EC52 /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96A31C6D760300D5EC52 /* QuickTime.framework */; };
+		E90D96A61C6D762800D5EC52 /* System.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96A51C6D762800D5EC52 /* System.framework */; };
+		E90D96A81C6E041300D5EC52 /* HockeySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96A71C6E041300D5EC52 /* HockeySDK.framework */; };
+		E90D96AA1C6E2B0900D5EC52 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96A91C6E2B0900D5EC52 /* OpenAL.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1245,13 +1228,6 @@
 		0818A91D12E74BCB0035C3B4 /* fpTPSKits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fpTPSKits.h; sourceTree = "<group>"; };
 		081B0A4513C4D70F006BE6EE /* obinfo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = obinfo.h; sourceTree = "<group>"; };
 		081B0A4613C4D70F006BE6EE /* obinfo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = obinfo.cpp; sourceTree = "<group>"; };
-		0828966A10694C7D0056932F /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = ../../../Developer/SDKs/MacOSX10.5.sdk/System/Library/Frameworks/AGL.framework; sourceTree = SDKROOT; };
-		0828966C10694C7D0056932F /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = ../../../Developer/SDKs/MacOSX10.5.sdk/System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
-		0828966D10694C7D0056932F /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = ../../../Developer/SDKs/MacOSX10.5.sdk/System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
-		0828966F10694C7D0056932F /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = ../../../Developer/SDKs/MacOSX10.5.sdk/System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
-		0828967010694C7D0056932F /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = ../../../Developer/SDKs/MacOSX10.5.sdk/System/Library/Frameworks/QuickTime.framework; sourceTree = SDKROOT; };
-		0828967110694C7D0056932F /* System.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = System.framework; path = ../../../Developer/SDKs/MacOSX10.5.sdk/System/Library/Frameworks/System.framework; sourceTree = SDKROOT; };
-		0828967210694C7D0056932F /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = ../../../Developer/SDKs/MacOSX10.5.sdk/System/Library/Frameworks/WebKit.framework; sourceTree = SDKROOT; };
 		082899EA10697B620056932F /* dbugExtErrors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dbugExtErrors.h; sourceTree = "<group>"; };
 		082899ED10697B8F0056932F /* listCL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = listCL.h; sourceTree = "<group>"; };
 		08289DFE1069D3330056932F /* wwiiHCUnits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wwiiHCUnits.h; sourceTree = "<group>"; };
@@ -1327,7 +1303,6 @@
 		0834F1701044E6B400E75B52 /* teulUtils.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = teulUtils.cpp; path = teul/teulUtils.cpp; sourceTree = "<group>"; };
 		0834F1711044E6B400E75B52 /* teulModSend.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = teulModSend.cpp; path = teul/teulModSend.cpp; sourceTree = "<group>"; };
 		0834F1721044E6B400E75B52 /* teulEndpoint.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = teulEndpoint.cpp; path = teul/teulEndpoint.cpp; sourceTree = "<group>"; };
-		0834F1731044E6B400E75B52 /* teulDatagramPool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = teulDatagramPool.cpp; path = teul/teulDatagramPool.cpp; sourceTree = "<group>"; };
 		0834F1741044E6B400E75B52 /* teulNetTimeMS.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = teulNetTimeMS.cpp; path = teul/teulNetTimeMS.cpp; sourceTree = "<group>"; };
 		0834F1761044E6B400E75B52 /* teulPack.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = teulPack.cpp; path = teul/teulPack.cpp; sourceTree = "<group>"; };
 		0834F1771044E6B400E75B52 /* teulModule.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = teulModule.cpp; path = teul/teulModule.cpp; sourceTree = "<group>"; };
@@ -1359,225 +1334,6 @@
 		08492F7013170C5000C7F39E /* FTFontAdapted.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FTFontAdapted.cpp; sourceTree = "<group>"; };
 		084DD9B511206C070020E34F /* updtEnums.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = updtEnums.h; sourceTree = "<group>"; };
 		084DD9F81120F37F0020E34F /* mem.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mem.h; sourceTree = "<group>"; };
-		084DDADD1123B17F0020E34F /* _FindFirst.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = _FindFirst.cpp; sourceTree = "<group>"; };
-		084DDADE1123B17F0020E34F /* _FindFirst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = _FindFirst.h; sourceTree = "<group>"; };
-		084DDAE01123B17F0020E34F /* AsynchronousFileIO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AsynchronousFileIO.h; sourceTree = "<group>"; };
-		084DDAE11123B17F0020E34F /* AutopatcherPatchContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutopatcherPatchContext.h; sourceTree = "<group>"; };
-		084DDAE21123B17F0020E34F /* AutopatcherRepositoryInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutopatcherRepositoryInterface.h; sourceTree = "<group>"; };
-		084DDAE31123B17F0020E34F /* AutoRPC.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = AutoRPC.cpp; sourceTree = "<group>"; };
-		084DDAE41123B17F0020E34F /* AutoRPC.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = AutoRPC.h; sourceTree = "<group>"; };
-		084DDAE51123B17F0020E34F /* BigInt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BigInt.cpp; sourceTree = "<group>"; };
-		084DDAE61123B17F0020E34F /* BigInt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BigInt.h; sourceTree = "<group>"; };
-		084DDAE71123B17F0020E34F /* BitStream.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = BitStream.cpp; sourceTree = "<group>"; };
-		084DDAE81123B17F0020E34F /* BitStream.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BitStream.h; sourceTree = "<group>"; };
-		084DDAEA1123B17F0020E34F /* BitStream_NoTemplate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BitStream_NoTemplate.h; sourceTree = "<group>"; };
-		084DDAEB1123B17F0020E34F /* CCRakNetUDT.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CCRakNetUDT.cpp; sourceTree = "<group>"; };
-		084DDAEC1123B17F0020E34F /* CCRakNetUDT.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCRakNetUDT.h; sourceTree = "<group>"; };
-		084DDAED1123B17F0020E34F /* CheckSum.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CheckSum.cpp; sourceTree = "<group>"; };
-		084DDAEE1123B17F0020E34F /* CheckSum.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CheckSum.h; sourceTree = "<group>"; };
-		084DDAEF1123B17F0020E34F /* ClientContextStruct.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ClientContextStruct.h; sourceTree = "<group>"; };
-		084DDAF01123B17F0020E34F /* CommandParserInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CommandParserInterface.cpp; sourceTree = "<group>"; };
-		084DDAF11123B17F0020E34F /* CommandParserInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CommandParserInterface.h; sourceTree = "<group>"; };
-		084DDAF31123B17F0020E34F /* ConnectionGraph.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ConnectionGraph.cpp; sourceTree = "<group>"; };
-		084DDAF41123B17F0020E34F /* ConnectionGraph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConnectionGraph.h; sourceTree = "<group>"; };
-		084DDAF61123B17F0020E34F /* ConnectionGraph2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConnectionGraph2.h; sourceTree = "<group>"; };
-		084DDAF81123B17F0020E34F /* ConsoleServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ConsoleServer.h; sourceTree = "<group>"; };
-		084DDAF91123B17F0020E34F /* DataBlockEncryptor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DataBlockEncryptor.cpp; sourceTree = "<group>"; };
-		084DDAFA1123B17F0020E34F /* DataBlockEncryptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataBlockEncryptor.h; sourceTree = "<group>"; };
-		084DDAFB1123B17F0020E34F /* DataCompressor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DataCompressor.cpp; sourceTree = "<group>"; };
-		084DDAFC1123B17F0020E34F /* DataCompressor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DataCompressor.h; sourceTree = "<group>"; };
-		084DDAFE1123B17F0020E34F /* DirectoryDeltaTransfer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DirectoryDeltaTransfer.h; sourceTree = "<group>"; };
-		084DDAFF1123B17F0020E34F /* DS_BinarySearchTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DS_BinarySearchTree.h; sourceTree = "<group>"; };
-		084DDB001123B17F0020E34F /* DS_BPlusTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DS_BPlusTree.h; sourceTree = "<group>"; };
-		084DDB011123B17F0020E34F /* DS_BytePool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DS_BytePool.cpp; sourceTree = "<group>"; };
-		084DDB021123B17F0020E34F /* DS_BytePool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DS_BytePool.h; sourceTree = "<group>"; };
-		084DDB031123B17F0020E34F /* DS_ByteQueue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DS_ByteQueue.cpp; sourceTree = "<group>"; };
-		084DDB041123B17F0020E34F /* DS_ByteQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DS_ByteQueue.h; sourceTree = "<group>"; };
-		084DDB051123B17F0020E34F /* DS_Heap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DS_Heap.h; sourceTree = "<group>"; };
-		084DDB061123B17F0020E34F /* DS_HuffmanEncodingTree.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DS_HuffmanEncodingTree.cpp; sourceTree = "<group>"; };
-		084DDB071123B17F0020E34F /* DS_HuffmanEncodingTree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DS_HuffmanEncodingTree.h; sourceTree = "<group>"; };
-		084DDB081123B17F0020E34F /* DS_HuffmanEncodingTreeFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DS_HuffmanEncodingTreeFactory.h; sourceTree = "<group>"; };
-		084DDB091123B17F0020E34F /* DS_HuffmanEncodingTreeNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DS_HuffmanEncodingTreeNode.h; sourceTree = "<group>"; };
-		084DDB0A1123B17F0020E34F /* DS_LinkedList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DS_LinkedList.h; sourceTree = "<group>"; };
-		084DDB0B1123B17F0020E34F /* DS_List.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DS_List.h; sourceTree = "<group>"; };
-		084DDB0C1123B17F0020E34F /* DS_Map.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DS_Map.h; sourceTree = "<group>"; };
-		084DDB0D1123B17F0020E34F /* DS_MemoryPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DS_MemoryPool.h; sourceTree = "<group>"; };
-		084DDB0E1123B17F0020E34F /* DS_Multilist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DS_Multilist.h; sourceTree = "<group>"; };
-		084DDB0F1123B17F0020E34F /* DS_OrderedChannelHeap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DS_OrderedChannelHeap.h; sourceTree = "<group>"; };
-		084DDB101123B17F0020E34F /* DS_OrderedList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DS_OrderedList.h; sourceTree = "<group>"; };
-		084DDB111123B17F0020E34F /* DS_Queue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DS_Queue.h; sourceTree = "<group>"; };
-		084DDB121123B17F0020E34F /* DS_QueueLinkedList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DS_QueueLinkedList.h; sourceTree = "<group>"; };
-		084DDB131123B17F0020E34F /* DS_RangeList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DS_RangeList.h; sourceTree = "<group>"; };
-		084DDB141123B17F0020E34F /* DS_StringKeyedHash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DS_StringKeyedHash.h; sourceTree = "<group>"; };
-		084DDB151123B17F0020E34F /* DS_Table.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = DS_Table.cpp; sourceTree = "<group>"; };
-		084DDB161123B17F0020E34F /* DS_Table.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DS_Table.h; sourceTree = "<group>"; };
-		084DDB171123B17F0020E34F /* DS_ThreadsafeAllocatingQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DS_ThreadsafeAllocatingQueue.h; sourceTree = "<group>"; };
-		084DDB181123B17F0020E34F /* DS_Tree.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DS_Tree.h; sourceTree = "<group>"; };
-		084DDB191123B17F0020E34F /* DS_WeightedGraph.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = DS_WeightedGraph.h; sourceTree = "<group>"; };
-		084DDB1B1123B17F0020E34F /* EmailSender.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EmailSender.h; sourceTree = "<group>"; };
-		084DDB1C1123B17F0020E34F /* EncodeClassName.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EncodeClassName.cpp; sourceTree = "<group>"; };
-		084DDB1D1123B17F0020E34F /* EpochTimeToString.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EpochTimeToString.cpp; sourceTree = "<group>"; };
-		084DDB1E1123B17F0020E34F /* EpochTimeToString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EpochTimeToString.h; sourceTree = "<group>"; };
-		084DDB1F1123B17F0020E34F /* Export.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Export.h; sourceTree = "<group>"; };
-		084DDB201123B17F0020E34F /* ExtendedOverlappedPool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ExtendedOverlappedPool.cpp; sourceTree = "<group>"; };
-		084DDB211123B17F0020E34F /* ExtendedOverlappedPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ExtendedOverlappedPool.h; sourceTree = "<group>"; };
-		084DDB231123B17F0020E34F /* FileList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileList.h; sourceTree = "<group>"; };
-		084DDB241123B17F0020E34F /* FileListNodeContext.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileListNodeContext.h; sourceTree = "<group>"; };
-		084DDB261123B17F0020E34F /* FileListTransfer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileListTransfer.h; sourceTree = "<group>"; };
-		084DDB271123B17F0020E34F /* FileListTransferCBInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileListTransferCBInterface.h; sourceTree = "<group>"; };
-		084DDB291123B17F0020E34F /* FileOperations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FileOperations.h; sourceTree = "<group>"; };
-		084DDB2A1123B17F0020E34F /* FormatString.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FormatString.cpp; sourceTree = "<group>"; };
-		084DDB2B1123B17F0020E34F /* FormatString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FormatString.h; sourceTree = "<group>"; };
-		084DDB2D1123B17F0020E34F /* FullyConnectedMesh.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FullyConnectedMesh.h; sourceTree = "<group>"; };
-		084DDB2F1123B17F0020E34F /* FullyConnectedMesh2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FullyConnectedMesh2.h; sourceTree = "<group>"; };
-		084DDB301123B17F0020E34F /* FunctionThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = FunctionThread.cpp; sourceTree = "<group>"; };
-		084DDB311123B17F0020E34F /* FunctionThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = FunctionThread.h; sourceTree = "<group>"; };
-		084DDB321123B17F0020E34F /* Gen_RPC8.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Gen_RPC8.cpp; sourceTree = "<group>"; };
-		084DDB331123B17F0020E34F /* Gen_RPC8.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Gen_RPC8.h; sourceTree = "<group>"; };
-		084DDB341123B17F0020E34F /* GetTime.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GetTime.cpp; sourceTree = "<group>"; };
-		084DDB351123B17F0020E34F /* GetTime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GetTime.h; sourceTree = "<group>"; };
-		084DDB361123B17F0020E34F /* gettimeofday.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = gettimeofday.cpp; sourceTree = "<group>"; };
-		084DDB371123B17F0020E34F /* gettimeofday.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = gettimeofday.h; sourceTree = "<group>"; };
-		084DDB391123B17F0020E34F /* GridSectorizer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GridSectorizer.h; sourceTree = "<group>"; };
-		084DDB3B1123B17F0020E34F /* HTTPConnection.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HTTPConnection.h; sourceTree = "<group>"; };
-		084DDB3D1123B17F0020E34F /* IncrementalReadInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IncrementalReadInterface.h; sourceTree = "<group>"; };
-		084DDB3E1123B17F0020E34F /* InlineFunctor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = InlineFunctor.cpp; sourceTree = "<group>"; };
-		084DDB3F1123B17F0020E34F /* InlineFunctor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InlineFunctor.h; sourceTree = "<group>"; };
-		084DDB401123B17F0020E34F /* InternalPacket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InternalPacket.h; sourceTree = "<group>"; };
-		084DDB411123B17F0020E34F /* Itoa.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Itoa.cpp; sourceTree = "<group>"; };
-		084DDB421123B17F0020E34F /* Itoa.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Itoa.h; sourceTree = "<group>"; };
-		084DDB431123B17F0020E34F /* Kbhit.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Kbhit.h; sourceTree = "<group>"; };
-		084DDB451123B17F0020E34F /* LightweightDatabaseClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LightweightDatabaseClient.h; sourceTree = "<group>"; };
-		084DDB471123B17F0020E34F /* LightweightDatabaseCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LightweightDatabaseCommon.h; sourceTree = "<group>"; };
-		084DDB491123B17F0020E34F /* LightweightDatabaseServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LightweightDatabaseServer.h; sourceTree = "<group>"; };
-		084DDB4A1123B17F0020E34F /* LinuxStrings.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = LinuxStrings.cpp; sourceTree = "<group>"; };
-		084DDB4B1123B17F0020E34F /* LinuxStrings.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LinuxStrings.h; sourceTree = "<group>"; };
-		084DDB4D1123B17F0020E34F /* LogCommandParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = LogCommandParser.h; sourceTree = "<group>"; };
-		084DDB501123B17F0020E34F /* MessageFilter.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = MessageFilter.cpp; sourceTree = "<group>"; };
-		084DDB511123B17F0020E34F /* MessageFilter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageFilter.h; sourceTree = "<group>"; };
-		084DDB521123B17F0020E34F /* MessageIdentifiers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MessageIdentifiers.h; sourceTree = "<group>"; };
-		084DDB531123B17F0020E34F /* MTUSize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MTUSize.h; sourceTree = "<group>"; };
-		084DDB541123B17F0020E34F /* NativeTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NativeTypes.h; sourceTree = "<group>"; };
-		084DDB561123B17F0020E34F /* NatPunchthroughClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NatPunchthroughClient.h; sourceTree = "<group>"; };
-		084DDB581123B17F0020E34F /* NatPunchthroughServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NatPunchthroughServer.h; sourceTree = "<group>"; };
-		084DDB5A1123B17F0020E34F /* NatTypeDetectionClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NatTypeDetectionClient.h; sourceTree = "<group>"; };
-		084DDB5C1123B17F0020E34F /* NatTypeDetectionCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NatTypeDetectionCommon.h; sourceTree = "<group>"; };
-		084DDB5E1123B17F0020E34F /* NatTypeDetectionServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NatTypeDetectionServer.h; sourceTree = "<group>"; };
-		084DDB5F1123B17F0020E34F /* NetworkIDManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkIDManager.cpp; sourceTree = "<group>"; };
-		084DDB601123B17F0020E34F /* NetworkIDManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NetworkIDManager.h; sourceTree = "<group>"; };
-		084DDB611123B17F0020E34F /* NetworkIDObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NetworkIDObject.cpp; sourceTree = "<group>"; };
-		084DDB621123B17F0020E34F /* NetworkIDObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NetworkIDObject.h; sourceTree = "<group>"; };
-		084DDB641123B17F0020E34F /* PacketConsoleLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PacketConsoleLogger.h; sourceTree = "<group>"; };
-		084DDB661123B17F0020E34F /* PacketFileLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PacketFileLogger.h; sourceTree = "<group>"; };
-		084DDB671123B17F0020E34F /* PacketizedTCP.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PacketizedTCP.cpp; sourceTree = "<group>"; };
-		084DDB681123B17F0020E34F /* PacketizedTCP.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PacketizedTCP.h; sourceTree = "<group>"; };
-		084DDB6A1123B17F0020E34F /* PacketLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PacketLogger.h; sourceTree = "<group>"; };
-		084DDB6C1123B17F0020E34F /* PacketOutputWindowLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PacketOutputWindowLogger.h; sourceTree = "<group>"; };
-		084DDB6D1123B17F0020E34F /* PacketPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PacketPool.h; sourceTree = "<group>"; };
-		084DDB6E1123B17F0020E34F /* PacketPriority.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PacketPriority.h; sourceTree = "<group>"; };
-		084DDB6F1123B17F0020E34F /* Platform.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Platform.h; sourceTree = "<group>"; };
-		084DDB701123B17F0020E34F /* PluginInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PluginInterface.cpp; sourceTree = "<group>"; };
-		084DDB711123B17F0020E34F /* PluginInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PluginInterface.h; sourceTree = "<group>"; };
-		084DDB721123B17F0020E34F /* PluginInterface2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PluginInterface2.cpp; sourceTree = "<group>"; };
-		084DDB731123B17F0020E34F /* PluginInterface2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PluginInterface2.h; sourceTree = "<group>"; };
-		084DDB741123B17F0020E34F /* RakAlloca.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RakAlloca.h; sourceTree = "<group>"; };
-		084DDB751123B17F0020E34F /* RakAssert.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RakAssert.h; sourceTree = "<group>"; };
-		084DDB761123B17F0020E34F /* RakMemoryOverride.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RakMemoryOverride.cpp; sourceTree = "<group>"; };
-		084DDB771123B17F0020E34F /* RakMemoryOverride.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RakMemoryOverride.h; sourceTree = "<group>"; };
-		084DDB7C1123B17F0020E34F /* RakNetCommandParser.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RakNetCommandParser.cpp; sourceTree = "<group>"; };
-		084DDB7D1123B17F0020E34F /* RakNetCommandParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RakNetCommandParser.h; sourceTree = "<group>"; };
-		084DDB7E1123B17F0020E34F /* RakNetDefines.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RakNetDefines.h; sourceTree = "<group>"; };
-		084DDB7F1123B17F0020E34F /* RakNetDefinesOverrides.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RakNetDefinesOverrides.h; sourceTree = "<group>"; };
-		084DDB801123B17F0020E34F /* RakNetPCH.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RakNetPCH.h; sourceTree = "<group>"; };
-		084DDB811123B17F0020E34F /* RakNetSmartPtr.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RakNetSmartPtr.h; sourceTree = "<group>"; };
-		084DDB821123B17F0020E34F /* RakNetSocket.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RakNetSocket.cpp; sourceTree = "<group>"; };
-		084DDB831123B17F0020E34F /* RakNetSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RakNetSocket.h; sourceTree = "<group>"; };
-		084DDB841123B17F0020E34F /* RakNetStatistics.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RakNetStatistics.cpp; sourceTree = "<group>"; };
-		084DDB851123B17F0020E34F /* RakNetStatistics.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RakNetStatistics.h; sourceTree = "<group>"; };
-		084DDB861123B17F0020E34F /* RakNetTime.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RakNetTime.h; sourceTree = "<group>"; };
-		084DDB871123B17F0020E34F /* RakNetTransport.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RakNetTransport.cpp; sourceTree = "<group>"; };
-		084DDB881123B17F0020E34F /* RakNetTransport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RakNetTransport.h; sourceTree = "<group>"; };
-		084DDB891123B17F0020E34F /* RakNetTransport2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RakNetTransport2.cpp; sourceTree = "<group>"; };
-		084DDB8A1123B17F0020E34F /* RakNetTransport2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RakNetTransport2.h; sourceTree = "<group>"; };
-		084DDB8B1123B17F0020E34F /* RakNetTypes.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RakNetTypes.cpp; sourceTree = "<group>"; };
-		084DDB8C1123B17F0020E34F /* RakNetTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RakNetTypes.h; sourceTree = "<group>"; };
-		084DDB8D1123B17F0020E34F /* RakNetVersion.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RakNetVersion.h; sourceTree = "<group>"; };
-		084DDB8E1123B17F0020E34F /* RakNetworkFactory.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RakNetworkFactory.cpp; sourceTree = "<group>"; };
-		084DDB8F1123B17F0020E34F /* RakNetworkFactory.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RakNetworkFactory.h; sourceTree = "<group>"; };
-		084DDB901123B17F0020E34F /* RakPeer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RakPeer.cpp; sourceTree = "<group>"; };
-		084DDB911123B17F0020E34F /* RakPeer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RakPeer.h; sourceTree = "<group>"; };
-		084DDB921123B17F0020E34F /* RakPeerInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RakPeerInterface.h; sourceTree = "<group>"; };
-		084DDB931123B17F0020E34F /* RakSleep.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RakSleep.cpp; sourceTree = "<group>"; };
-		084DDB941123B17F0020E34F /* RakSleep.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RakSleep.h; sourceTree = "<group>"; };
-		084DDB951123B17F0020E34F /* RakString.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RakString.cpp; sourceTree = "<group>"; };
-		084DDB961123B17F0020E34F /* RakString.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RakString.h; sourceTree = "<group>"; };
-		084DDB971123B17F0020E34F /* RakThread.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RakThread.cpp; sourceTree = "<group>"; };
-		084DDB981123B17F0020E34F /* RakThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RakThread.h; sourceTree = "<group>"; };
-		084DDB991123B17F0020E34F /* Rand.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Rand.cpp; sourceTree = "<group>"; };
-		084DDB9A1123B17F0020E34F /* Rand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Rand.h; sourceTree = "<group>"; };
-		084DDB9B1123B17F0020E34F /* rdlmalloc-options.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "rdlmalloc-options.h"; sourceTree = "<group>"; };
-		084DDB9C1123B17F0020E34F /* rdlmalloc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rdlmalloc.cpp; sourceTree = "<group>"; };
-		084DDB9D1123B17F0020E34F /* rdlmalloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rdlmalloc.h; sourceTree = "<group>"; };
-		084DDB9E1123B17F0020E34F /* ReadyEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ReadyEvent.cpp; sourceTree = "<group>"; };
-		084DDB9F1123B17F0020E34F /* ReadyEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReadyEvent.h; sourceTree = "<group>"; };
-		084DDBA01123B17F0020E34F /* RefCountedObj.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RefCountedObj.h; sourceTree = "<group>"; };
-		084DDBA11123B17F0020E34F /* ReliabilityLayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ReliabilityLayer.cpp; sourceTree = "<group>"; };
-		084DDBA21123B17F0020E34F /* ReliabilityLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReliabilityLayer.h; sourceTree = "<group>"; };
-		084DDBA31123B17F0020E34F /* Replica.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Replica.h; sourceTree = "<group>"; };
-		084DDBA41123B17F0020E34F /* ReplicaEnums.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReplicaEnums.h; sourceTree = "<group>"; };
-		084DDBA61123B17F0020E34F /* ReplicaManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReplicaManager.h; sourceTree = "<group>"; };
-		084DDBA81123B17F0020E34F /* ReplicaManager2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReplicaManager2.h; sourceTree = "<group>"; };
-		084DDBAA1123B17F0020E34F /* ReplicaManager3.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ReplicaManager3.h; sourceTree = "<group>"; };
-		084DDBAB1123B17F0020E34F /* Rijndael-Boxes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "Rijndael-Boxes.h"; sourceTree = "<group>"; };
-		084DDBAD1123B17F0020E34F /* Rijndael.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Rijndael.h; sourceTree = "<group>"; };
-		084DDBAE1123B17F0020E34F /* Router.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Router.cpp; sourceTree = "<group>"; };
-		084DDBAF1123B17F0020E34F /* Router.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Router.h; sourceTree = "<group>"; };
-		084DDBB01123B17F0020E34F /* Router2.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = Router2.cpp; sourceTree = "<group>"; };
-		084DDBB11123B17F0020E34F /* Router2.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Router2.h; sourceTree = "<group>"; };
-		084DDBB21123B17F0020E34F /* RouterInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RouterInterface.h; sourceTree = "<group>"; };
-		084DDBB31123B17F0020E34F /* RPCMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RPCMap.cpp; sourceTree = "<group>"; };
-		084DDBB41123B17F0020E34F /* RPCMap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RPCMap.h; sourceTree = "<group>"; };
-		084DDBB51123B17F0020E34F /* RPCNode.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RPCNode.h; sourceTree = "<group>"; };
-		084DDBB61123B17F0020E34F /* RSACrypt.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = RSACrypt.cpp; sourceTree = "<group>"; };
-		084DDBB71123B17F0020E34F /* RSACrypt.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = RSACrypt.h; sourceTree = "<group>"; };
-		084DDBB91123B17F0020E34F /* SendToThread.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SendToThread.h; sourceTree = "<group>"; };
-		084DDBBA1123B17F0020E34F /* SHA1.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SHA1.cpp; sourceTree = "<group>"; };
-		084DDBBB1123B17F0020E34F /* SHA1.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SHA1.h; sourceTree = "<group>"; };
-		084DDBBC1123B17F0020E34F /* SignaledEvent.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SignaledEvent.cpp; sourceTree = "<group>"; };
-		084DDBBD1123B17F0020E34F /* SignaledEvent.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SignaledEvent.h; sourceTree = "<group>"; };
-		084DDBBE1123B17F0020E34F /* SimpleMutex.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SimpleMutex.cpp; sourceTree = "<group>"; };
-		084DDBBF1123B17F0020E34F /* SimpleMutex.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleMutex.h; sourceTree = "<group>"; };
-		084DDBC01123B17F0020E34F /* SimpleTCPServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SimpleTCPServer.h; sourceTree = "<group>"; };
-		084DDBC11123B17F0020E34F /* SingleProducerConsumer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SingleProducerConsumer.h; sourceTree = "<group>"; };
-		084DDBC21123B17F0020E34F /* SocketIncludes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocketIncludes.h; sourceTree = "<group>"; };
-		084DDBC31123B17F0020E34F /* SocketLayer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SocketLayer.cpp; sourceTree = "<group>"; };
-		084DDBC41123B17F0020E34F /* SocketLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SocketLayer.h; sourceTree = "<group>"; };
-		084DDBC51123B17F0020E34F /* StringCompressor.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringCompressor.cpp; sourceTree = "<group>"; };
-		084DDBC61123B17F0020E34F /* StringCompressor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringCompressor.h; sourceTree = "<group>"; };
-		084DDBC71123B17F0020E34F /* StringTable.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = StringTable.cpp; sourceTree = "<group>"; };
-		084DDBC81123B17F0020E34F /* StringTable.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = StringTable.h; sourceTree = "<group>"; };
-		084DDBCB1123B17F0020E34F /* SystemAddressList.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SystemAddressList.cpp; sourceTree = "<group>"; };
-		084DDBCC1123B17F0020E34F /* SystemAddressList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SystemAddressList.h; sourceTree = "<group>"; };
-		084DDBCE1123B17F0020E34F /* TableSerializer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TableSerializer.h; sourceTree = "<group>"; };
-		084DDBCF1123B17F0020E34F /* TCPInterface.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TCPInterface.cpp; sourceTree = "<group>"; };
-		084DDBD01123B17F0020E34F /* TCPInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TCPInterface.h; sourceTree = "<group>"; };
-		084DDBD21123B17F0020E34F /* TeamBalancer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TeamBalancer.h; sourceTree = "<group>"; };
-		084DDBD41123B17F0020E34F /* TelnetTransport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TelnetTransport.h; sourceTree = "<group>"; };
-		084DDBD51123B17F0020E34F /* ThreadPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ThreadPool.h; sourceTree = "<group>"; };
-		084DDBD71123B17F0020E34F /* ThreadsafePacketLogger.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ThreadsafePacketLogger.h; sourceTree = "<group>"; };
-		084DDBD81123B17F0020E34F /* TransportInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TransportInterface.h; sourceTree = "<group>"; };
-		084DDBD91123B17F0020E34F /* UDPForwarder.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = UDPForwarder.cpp; sourceTree = "<group>"; };
-		084DDBDA1123B17F0020E34F /* UDPForwarder.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UDPForwarder.h; sourceTree = "<group>"; };
-		084DDBDC1123B17F0020E34F /* UDPProxyClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UDPProxyClient.h; sourceTree = "<group>"; };
-		084DDBDD1123B17F0020E34F /* UDPProxyCommon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UDPProxyCommon.h; sourceTree = "<group>"; };
-		084DDBDF1123B17F0020E34F /* UDPProxyCoordinator.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UDPProxyCoordinator.h; sourceTree = "<group>"; };
-		084DDBE11123B17F0020E34F /* UDPProxyServer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = UDPProxyServer.h; sourceTree = "<group>"; };
-		084DDBE31123B17F0020E34F /* VariadicSQLParser.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VariadicSQLParser.h; sourceTree = "<group>"; };
-		084DDBE41123B17F0020E34F /* WindowsIncludes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WindowsIncludes.h; sourceTree = "<group>"; };
-		084DDBE51123B17F0020E34F /* WSAStartupSingleton.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = WSAStartupSingleton.cpp; sourceTree = "<group>"; };
-		084DDBE61123B17F0020E34F /* WSAStartupSingleton.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = WSAStartupSingleton.h; sourceTree = "<group>"; };
-		084DDC9C1123BC7D0020E34F /* rijndael.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rijndael.cpp; sourceTree = "<group>"; };
-		084DDCA01123BD0B0020E34F /* SuperFastHash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SuperFastHash.cpp; sourceTree = "<group>"; };
 		0863B34D10619AC8005FDF19 /* libphui.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libphui.a; path = lib/mac/libphui.a; sourceTree = "<group>"; };
 		0863B34E10619AC8005FDF19 /* libspeedtreemac.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libspeedtreemac.a; path = lib/mac/libspeedtreemac.a; sourceTree = "<group>"; };
 		0863B36E10619D66005FDF19 /* clientGlobals.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = clientGlobals.cpp; path = src/client/clientGlobals.cpp; sourceTree = SOURCE_ROOT; };
@@ -1596,10 +1352,6 @@
 		0894582C13073604009C0B65 /* TextureFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextureFont.h; sourceTree = "<group>"; };
 		0894582D130736F2009C0B65 /* TextureFont.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextureFont.cpp; sourceTree = "<group>"; };
 		08977DB8134CFA2000C9DCFE /* libmacosx_xcode_static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmacosx_xcode_static.a; path = lib/mac/libmacosx_xcode_static.a; sourceTree = "<group>"; };
-		08977DCD134CFAC400C9DCFE /* CCRakNetSlidingWindow.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CCRakNetSlidingWindow.h; sourceTree = "<group>"; };
-		08977DCE134CFAC400C9DCFE /* CCRakNetSlidingWindow.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CCRakNetSlidingWindow.cpp; sourceTree = "<group>"; };
-		08977DD2134CFAF700C9DCFE /* PacketFileLogger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PacketFileLogger.cpp; sourceTree = "<group>"; };
-		08977DD6134CFB1500C9DCFE /* PacketLogger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PacketLogger.cpp; sourceTree = "<group>"; };
 		08977DDC134CFB8500C9DCFE /* ScenarioManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScenarioManager.cpp; path = scen/ScenarioManager.cpp; sourceTree = "<group>"; };
 		08977DDD134CFB8500C9DCFE /* ScenarioManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScenarioManager.h; path = scen/ScenarioManager.h; sourceTree = "<group>"; };
 		08977E06134CFF6C00C9DCFE /* scenMain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scenMain.cpp; path = scen/scenMain.cpp; sourceTree = "<group>"; };
@@ -1675,7 +1427,16 @@
 		0DDF012C0857934A0027461D /* proj/mac/ww2.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = proj/mac/ww2.icns; sourceTree = "<group>"; };
 		47B0ED240E9A66A40089DCC4 /* libteulKit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libteulKit.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D0C4E960486CD37000505A6 /* proj/mac/Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = proj/mac/Info.plist; sourceTree = "<group>"; };
-		8D0C4E970486CD37000505A6 /* World War ][ Online.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "World War ][ Online.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		8D0C4E970486CD37000505A6 /* World War II Online.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "World War II Online.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		E90D96991C6D729D00D5EC52 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
+		E90D969B1C6D738D00D5EC52 /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = ../../../../../../System/Library/Frameworks/AGL.framework; sourceTree = "<group>"; };
+		E90D969D1C6D753D00D5EC52 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = ../../../../../../System/Library/Frameworks/Cocoa.framework; sourceTree = "<group>"; };
+		E90D969F1C6D757400D5EC52 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = ../../../../../../System/Library/Frameworks/IOKit.framework; sourceTree = "<group>"; };
+		E90D96A11C6D75E200D5EC52 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = ../../../../../../System/Library/Frameworks/OpenGL.framework; sourceTree = "<group>"; };
+		E90D96A31C6D760300D5EC52 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = ../../../../../../System/Library/Frameworks/QuickTime.framework; sourceTree = "<group>"; };
+		E90D96A51C6D762800D5EC52 /* System.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = System.framework; path = ../../../../../../System/Library/Frameworks/System.framework; sourceTree = "<group>"; };
+		E90D96A71C6E041300D5EC52 /* HockeySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HockeySDK.framework; path = Vendor/HockeySDK.framework; sourceTree = "<group>"; };
+		E90D96A91C6E2B0900D5EC52 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = ../../../../../../System/Library/Frameworks/OpenAL.framework; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1701,31 +1462,33 @@
 				08D5812E106310FE00177892 /* libmaclib.a in Frameworks */,
 				47B0EDFD0E9A85510089DCC4 /* libteulKit.a in Frameworks */,
 				0DDF00AA08578C460027461D /* libHIDUtilities.a in Frameworks */,
+				E90D969C1C6D738D00D5EC52 /* AGL.framework in Frameworks */,
 				0DDF00AC08578C460027461D /* libjs.a in Frameworks */,
+				E90D969A1C6D729D00D5EC52 /* WebKit.framework in Frameworks */,
 				0DBEF4410A7FD8F60094C53D /* libexpat-ww2.a in Frameworks */,
 				0863B34F10619AC8005FDF19 /* libphui.a in Frameworks */,
 				0863B35010619AC8005FDF19 /* libspeedtreemac.a in Frameworks */,
 				08DDF926106928D800720B71 /* libmacode.a in Frameworks */,
-				0828967310694C7D0056932F /* AGL.framework in Frameworks */,
-				0828967510694C7D0056932F /* Cocoa.framework in Frameworks */,
-				0828967610694C7D0056932F /* IOKit.framework in Frameworks */,
-				0828967810694C7D0056932F /* OpenGL.framework in Frameworks */,
-				0828967910694C7D0056932F /* QuickTime.framework in Frameworks */,
-				0828967A10694C7D0056932F /* System.framework in Frameworks */,
-				0828967B10694C7D0056932F /* WebKit.framework in Frameworks */,
+				E90D969E1C6D753D00D5EC52 /* Cocoa.framework in Frameworks */,
+				E90D96AA1C6E2B0900D5EC52 /* OpenAL.framework in Frameworks */,
 				08744F51107BF96D009DB5AF /* liblua5.1.a in Frameworks */,
 				08744F53107BF977009DB5AF /* libtolua++.a in Frameworks */,
 				087286DF10D1B23B00456009 /* libimapmac.a in Frameworks */,
 				082CF80E1202241200A60CC2 /* CoreAudio.framework in Frameworks */,
+				E90D96A81C6E041300D5EC52 /* HockeySDK.framework in Frameworks */,
 				082CF8161202245400A60CC2 /* AudioToolbox.framework in Frameworks */,
 				082CF81C1202248E00A60CC2 /* AudioUnit.framework in Frameworks */,
+				E90D96A21C6D75E200D5EC52 /* OpenGL.framework in Frameworks */,
 				08A4286912C937380041B628 /* libz.dylib in Frameworks */,
 				08A4286B12C9375C0041B628 /* libxml2.dylib in Frameworks */,
 				08F41C5612D39B7B0001C6F5 /* libfreetype2.a in Frameworks */,
+				E90D96A01C6D757400D5EC52 /* IOKit.framework in Frameworks */,
 				08492F5B131708E700C7F39E /* libftgl.a in Frameworks */,
 				08977DB9134CFA2000C9DCFE /* libmacosx_xcode_static.a in Frameworks */,
+				E90D96A41C6D760300D5EC52 /* QuickTime.framework in Frameworks */,
 				0898680B13A2942200D643A0 /* libboost_regex.a in Frameworks */,
 				082CDA171411239E00225E44 /* libcrypto.0.9.8.dylib in Frameworks */,
+				E90D96A61C6D762800D5EC52 /* System.framework in Frameworks */,
 				089FB52714194F2200EBEB5F /* Carbon.framework in Frameworks */,
 				082A41BA143B561D0023B243 /* libmacglew.a in Frameworks */,
 			);
@@ -2989,7 +2752,6 @@
 				0834F1701044E6B400E75B52 /* teulUtils.cpp */,
 				0834F1711044E6B400E75B52 /* teulModSend.cpp */,
 				0834F1721044E6B400E75B52 /* teulEndpoint.cpp */,
-				0834F1731044E6B400E75B52 /* teulDatagramPool.cpp */,
 				0834F1741044E6B400E75B52 /* teulNetTimeMS.cpp */,
 				0834F1761044E6B400E75B52 /* teulPack.cpp */,
 				0834F1771044E6B400E75B52 /* teulModule.cpp */,
@@ -3181,7 +2943,7 @@
 		195DF8CFFE9D517E11CA2CBB /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				8D0C4E970486CD37000505A6 /* World War ][ Online.app */,
+				8D0C4E970486CD37000505A6 /* World War II Online.app */,
 				47B0ED240E9A66A40089DCC4 /* libteulKit.a */,
 				080C7E841062F011000A242F /* libmaclib.a */,
 			);
@@ -3212,22 +2974,24 @@
 		20286C32FDCF999611CA2CEA /* lib */ = {
 			isa = PBXGroup;
 			children = (
+				E90D96A91C6E2B0900D5EC52 /* OpenAL.framework */,
+				E90D96A71C6E041300D5EC52 /* HockeySDK.framework */,
+				E90D96A51C6D762800D5EC52 /* System.framework */,
+				E90D96A31C6D760300D5EC52 /* QuickTime.framework */,
+				E90D96A11C6D75E200D5EC52 /* OpenGL.framework */,
+				E90D969F1C6D757400D5EC52 /* IOKit.framework */,
+				E90D969D1C6D753D00D5EC52 /* Cocoa.framework */,
+				E90D969B1C6D738D00D5EC52 /* AGL.framework */,
 				082A41B1143B55930023B243 /* libglew.a */,
 				082A41B8143B55F60023B243 /* libmacglew.a */,
 				0898699D13A2BB4C00D643A0 /* libotmac.a */,
 				08492F5A131708E700C7F39E /* libftgl.a */,
 				08F41C5512D39B7B0001C6F5 /* libfreetype2.a */,
-				0828966A10694C7D0056932F /* AGL.framework */,
-				0828966C10694C7D0056932F /* Cocoa.framework */,
-				0828966D10694C7D0056932F /* IOKit.framework */,
-				0828966F10694C7D0056932F /* OpenGL.framework */,
-				0828967010694C7D0056932F /* QuickTime.framework */,
-				0828967110694C7D0056932F /* System.framework */,
-				0828967210694C7D0056932F /* WebKit.framework */,
 				082CF80D1202241200A60CC2 /* CoreAudio.framework */,
 				082CF8151202245400A60CC2 /* AudioToolbox.framework */,
 				082CF81B1202248E00A60CC2 /* AudioUnit.framework */,
 				08DDF925106928D800720B71 /* libmacode.a */,
+				E90D96991C6D729D00D5EC52 /* WebKit.framework */,
 				087286DE10D1B23B00456009 /* libimapmac.a */,
 				0863B34D10619AC8005FDF19 /* libphui.a */,
 				0863B34E10619AC8005FDF19 /* libspeedtreemac.a */,
@@ -3372,7 +3136,7 @@
 			name = WW2OL;
 			productInstallPath = "$(HOME)/Applications";
 			productName = WW2OL;
-			productReference = 8D0C4E970486CD37000505A6 /* World War ][ Online.app */;
+			productReference = 8D0C4E970486CD37000505A6 /* World War II Online.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -3380,8 +3144,11 @@
 /* Begin PBXProject section */
 		20286C28FDCF999611CA2CEA /* Project object */ = {
 			isa = PBXProject;
+			attributes = {
+				LastUpgradeCheck = 0720;
+			};
 			buildConfigurationList = 0DA6CEFA0856391C00A53577 /* Build configuration list for PBXProject "WW2OL" */;
-			compatibilityVersion = "Xcode 3.0";
+			compatibilityVersion = "Xcode 3.2";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
@@ -3463,27 +3230,9 @@
 			files = (
 				080C7EA31062F13E000A242F /* clientGlobals.cpp in Sources */,
 				080C7EA41062F147000A242F /* main.m in Sources */,
-				080C7EA51062F151000A242F /* PGDownloader.m in Sources */,
 				080C7EA61062F161000A242F /* WW2AppDelegate.mm in Sources */,
 				080C7EA71062F16F000A242F /* dpp.mm in Sources */,
 				080C7EA81062F17E000A242F /* diphid.mm in Sources */,
-				080C7EA91062F192000A242F /* sysMacCompat.mm in Sources */,
-				082CF7CF120222EB00A60CC2 /* CABufferList.cpp in Sources */,
-				082CF7D1120222EB00A60CC2 /* CADebugger.cpp in Sources */,
-				082CF7D3120222EB00A60CC2 /* CADebugMacros.cpp in Sources */,
-				082CF7D5120222EB00A60CC2 /* CAGuard.cpp in Sources */,
-				082CF7D7120222EB00A60CC2 /* CAHostTimeBase.cpp in Sources */,
-				082CF7DA120222EB00A60CC2 /* CAMutex.cpp in Sources */,
-				082CF7DC120222EB00A60CC2 /* CAStreamBasicDescription.cpp in Sources */,
-				082CF7E1120222EB00A60CC2 /* oalBuffer.cpp in Sources */,
-				082CF7E3120222EB00A60CC2 /* oalCaptureDevice.cpp in Sources */,
-				082CF7E5120222EB00A60CC2 /* oalContext.cpp in Sources */,
-				082CF7E7120222EB00A60CC2 /* oalDevice.cpp in Sources */,
-				082CF7E9120222EB00A60CC2 /* oalImp.cpp in Sources */,
-				082CF7EB120222EB00A60CC2 /* oalOSX.cpp in Sources */,
-				082CF7ED120222EB00A60CC2 /* oalSource.cpp in Sources */,
-				082CF82F12022CF700A60CC2 /* CAXException.cpp in Sources */,
-				082CF8691202338100A60CC2 /* CADebugPrintf.cpp in Sources */,
 				08847D4113AFC35B00532B62 /* GLCounter.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3496,7 +3245,6 @@
 				0834F1801044E6B400E75B52 /* teulUtils.cpp in Sources */,
 				0834F1811044E6B400E75B52 /* teulModSend.cpp in Sources */,
 				0834F1821044E6B400E75B52 /* teulEndpoint.cpp in Sources */,
-				0834F1831044E6B400E75B52 /* teulDatagramPool.cpp in Sources */,
 				0834F1841044E6B400E75B52 /* teulNetTimeMS.cpp in Sources */,
 				0834F1861044E6B400E75B52 /* teulPack.cpp in Sources */,
 				0834F1871044E6B400E75B52 /* teulModule.cpp in Sources */,
@@ -3894,7 +3642,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_OPENMP_SUPPORT = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SRCROOT)/lib/mac",
+					"$(SRCROOT)/vendor",
+				);
+				GCC_VERSION = "";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRC_ROOT)/src\"",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					/usr/local/lib,
@@ -3903,7 +3662,7 @@
 				MACH_O_TYPE = staticlib;
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = maclib;
-				USER_HEADER_SEARCH_PATHS = "../Libraries/glew/include/ ../Libraries/phui/include/ src/wwii src/sysmac include/ include/js include/mac include/bt src include/lua src/auth src/teul src/include src/dbug src/weap src/chat";
+				USER_HEADER_SEARCH_PATHS = "$(inherited)";
 			};
 			name = "Beta Release";
 		};
@@ -3911,138 +3670,180 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch (*) CVS .svn *.xcodeproj *.xcode *.pbproj *.pbxproj";
+				ENABLE_TESTABILITY = NO;
+				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
+					"\"$(SRCROOT)/lib/mac\"",
+					"$(SRCROOT)/vendor",
 				);
-				GCC_DEBUGGING_SYMBOLS = full;
-				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_ENABLE_SSE3_EXTENSIONS = YES;
-				GCC_ENABLE_SUPPLEMENTAL_SSE3_INSTRUCTIONS = YES;
-				GCC_ENABLE_SYMBOL_SEPARATION = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
-				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_PFE_FILE_C_DIALECTS = "c++";
+				GCC_OPTIMIZATION_LEVEL = fast;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"APIENTRY=",
 					"_MACOSX=1",
-					"IS_BIG_ENDIAN=__BIG_ENDIAN__",
-					XP_MAC,
-					"RELEASE_CLIENT=1",
 					"platOS=OS_MACOS",
+					XP_MAC,
+					ENABLE_FLOATERS,
+					"RELEASE_CLIENT=1",
+					EVENT_LOG,
+					_OPTIONS_BELOW_THIS_LINE,
+					"TEUL_PACKET_NAMES=0",
 				);
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = 4.2;
+				GCC_UNROLL_LOOPS = NO;
+				GCC_VERSION = "";
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = NO;
+				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = NO;
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO;
 				GCC_WARN_SIGN_COMPARE = NO;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
 					"$(PNG)",
-					"$(BOOST)",
-					"$(BOOST)include",
-					"$(BOOST)boost",
-					/usr/local/include,
-					../Libraries/ft2/include,
-					../Libraries/OpenThreadsMac,
-					/usr/local/include,
+					"\"$(SRCROOT)/../Libraries/ft2/include\"",
+					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
+					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
+					"\"$(SDKROOT)/usr/include/libxml2\"",
+					"\"$(SRCROOT)/../Libraries/opende/include\"",
+					"\"$(SRCROOT)/include/Cg\"",
+					"\"$(SRCROOT)/include\"",
+					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
+					"\"$(SRCROOT)/src/math\"",
+					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
 				);
 				LIBRARY_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
-					/usr/local/lib,
+					"$(inheritied)",
+					"\"$(SRCROOT)/lib/mac\"",
 				);
 				MACH_O_TYPE = mh_execute;
-				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OBJROOT = proj/mac/build;
-				OTHER_CFLAGS = (
-					"-Wno-write-strings",
-					"-march=nocona",
-					"-mtune=generic",
-				);
-				OTHER_LDFLAGS = (
-					"-bind_at_load",
-					"-w",
-				);
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "-bind_at_load";
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = YES;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
+				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
+				SDKROOT = macosx;
 				SHARED_PRECOMPS_DIR = "$(CACHE_ROOT)/SharedPrecompiledHeaders";
+				SKIP_INSTALL = YES;
 				STRIP_STYLE = debugging;
 				SYMROOT = proj/mac/build;
-				USER_HEADER_SEARCH_PATHS = "../Libraries/ftgl/src ../Libraries/glew/include/ ../Libraries/phui/include/ include/ include/bt ../Libraries/opende/include/ include/js include/libxml include/lua include/mac src src/auth src/chat src/dbug src/include src/sysmac src/teul src/weap";
-				VALID_ARCHS = i386;
+				USER_HEADER_SEARCH_PATHS = "../Libraries/ftgl/src ../Libraries/glew/include/ ../Libraries/phui/include/ include/ include/bt ../Libraries/opende/include/ include/js include/libxml include/lua include/mac src src/auth src/chat src/dbug src/include src/sysmac src/teul src/weap ../Libraries/libxml2/include/libxml/ src/spt";
+				VALID_ARCHS = "i386 x86_64";
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wdeprecated",
+				);
 			};
 			name = Release;
 		};
 		085BD0CA110F5D560063F377 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ENABLE_OPENMP_SUPPORT = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_BOOL_CONVERSION = NO;
+				CLANG_WARN_CONSTANT_CONVERSION = NO;
+				CLANG_X86_VECTOR_INSTRUCTIONS = default;
+				COMBINE_HIDPI_IMAGES = NO;
+				COPY_PHASE_STRIP = YES;
+				ENABLE_TESTABILITY = NO;
+				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
 					"\"$(SRCROOT)/lib/mac\"",
+					"$(SRCROOT)/vendor",
+					"$(PROJECT_DIR)/Vendor",
 				);
-				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = fast;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"_MACOSX=1",
+					"platOS=OS_MACOS",
+					XP_MAC,
+					ENABLE_FLOATERS,
+					"RELEASE_CLIENT=1",
+					EVENT_LOG,
+					_OPTIONS_BELOW_THIS_LINE,
+					"TEUL_PACKET_NAMES=1",
+				);
+				GCC_UNROLL_LOOPS = YES;
+				GCC_VERSION = "";
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
+				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = proj/mac/Info.plist;
-				LD_OPENMP_FLAGS = "";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/lib/mac\"",
-					"\"$(SRCROOT)\"",
-					/usr/local/lib,
 				);
-				OTHER_LDFLAGS = (
-					"-bind_at_load",
-					"-w",
-					"-levent",
-				);
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "-bind_at_load";
 				PRELINK_LIBS = "";
-				PRODUCT_NAME = "World War ][ Online";
+				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
+				PRODUCT_NAME = "World War II Online";
+				REBUILDMDL = 0;
+				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				USER_HEADER_SEARCH_PATHS = "$(inherited)";
+				VALID_ARCHS = "i386 x86_64";
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wdeprecated",
+				);
 				WRAPPER_EXTENSION = app;
+				WW2MODS = "${PROJECT_DIR}/../ww2mods";
 			};
 			name = Release;
 		};
 		085BD0CB110F5D560063F377 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_OPENMP_SUPPORT = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SRCROOT)/lib/mac",
+					"$(SRCROOT)/vendor",
+				);
 				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PFE_FILE_C_DIALECTS = "c++";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = src/teul/syscfg.h;
+				GCC_VERSION = "";
 				GENERATE_MASTER_OBJECT_FILE = NO;
 				HEADER_SEARCH_PATHS = (
-					"$(BOOST)",
-					"$(BOOST)include",
-					"$(BOOST)boost",
-					../Libraries/OpenThreadsMac,
-					/usr/local/include,
+					"$(inherited)",
+					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
+					"\"$(SRCROOT)/../Libraries/libevent/include\"",
 				);
 				LD_OPENMP_FLAGS = "";
 				MACH_O_TYPE = staticlib;
 				OTHER_LDFLAGS = "";
 				PRELINK_LIBS = "";
 				PRODUCT_NAME = teulKit;
-				USER_HEADER_SEARCH_PATHS = "src src/teul src/include src/auth ../Libraries/libevent/include";
+				USER_HEADER_SEARCH_PATHS = "$(inherited)";
 			};
 			name = Release;
 		};
@@ -4050,7 +3851,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_OPENMP_SUPPORT = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SRCROOT)/lib/mac",
+					"$(SRCROOT)/vendor",
+				);
+				GCC_VERSION = "";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRC_ROOT)/src\"",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/lib/mac\"",
@@ -4059,7 +3871,7 @@
 				MACH_O_TYPE = staticlib;
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = maclib;
-				USER_HEADER_SEARCH_PATHS = "../Libraries/glew/include/ ../Libraries/phui/include/ src/wwii src/sysmac include/ include/js include/mac include/bt src include/lua src/auth src/teul src/include src/dbug src/weap src/chat";
+				USER_HEADER_SEARCH_PATHS = "$(inherited)";
 			};
 			name = Release;
 		};
@@ -4067,161 +3879,180 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
-				COPY_PHASE_STRIP = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch (*) CVS .svn *.xcodeproj *.xcode *.pbproj *.pbxproj";
+				ENABLE_TESTABILITY = NO;
+				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
+					"\"$(SRCROOT)/lib/mac\"",
+					"$(SRCROOT)/vendor",
 				);
-				GCC_DEBUGGING_SYMBOLS = full;
-				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_ENABLE_SSE3_EXTENSIONS = YES;
-				GCC_ENABLE_SUPPLEMENTAL_SSE3_INSTRUCTIONS = YES;
-				GCC_ENABLE_SYMBOL_SEPARATION = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PFE_FILE_C_DIALECTS = "c++";
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					RA_AND_CAMPAIGN,
-					DONT_USE_COVERT,
-					"APIENTRY=",
-					BETA_RELEASE,
-					ENABLE_FLOATERS,
-					EVENT_LOG,
-					"IS_BIG_ENDIAN=__BIG_ENDIAN__",
-					NO_PRELOAD,
-					"RELEASE_CLIENT=0",
-					"SPAWN_AT_OLD_OFFLINE=1",
-					WANT_BUZZARD_OFFLINE,
-					XP_MAC,
 					"_MACOSX=1",
 					"platOS=OS_MACOS",
+					XP_MAC,
+					ENABLE_FLOATERS,
+					"RELEASE_CLIENT=1",
+					EVENT_LOG,
 					_OPTIONS_BELOW_THIS_LINE,
-					IS_DEBUG,
-					xMODEL_INFO,
-					SUPPORT_WWO,
-					USE_SCENARIO_MAP,
-					"xANDREWTEST=1",
-					"xGENICONS=1",
-					xMAP_MATS,
-					xRECORD_FILES,
-					xSPATIAL_DB,
-					xTESTMAC,
-					MAKE_HOST_TERRAIN,
+					"TEUL_PACKET_NAMES=1",
 				);
-				GCC_VERSION = 4.2;
+				GCC_UNROLL_LOOPS = NO;
+				GCC_VERSION = "";
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
+				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = NO;
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO;
 				GCC_WARN_SIGN_COMPARE = NO;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
 					"$(PNG)",
-					"$(BOOST)",
-					"$(BOOST)include",
-					"$(BOOST)boost",
-					/usr/local/include,
-					../Libraries/ft2/include,
-					../Libraries/OpenThreadsMac,
-					/usr/local/include,
+					"\"$(SRCROOT)/../Libraries/ft2/include\"",
+					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
+					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
+					"\"$(SDKROOT)/usr/include/libxml2\"",
+					"\"$(SRCROOT)/../Libraries/opende/include\"",
+					"\"$(SRCROOT)/include/Cg\"",
+					"\"$(SRCROOT)/include\"",
+					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
+					"\"$(SRCROOT)/src/math\"",
+					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
 				);
 				LIBRARY_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
-					/usr/local/lib,
+					"$(inheritied)",
+					"\"$(SRCROOT)/lib/mac\"",
 				);
 				MACH_O_TYPE = mh_execute;
-				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OBJROOT = proj/mac/build;
-				OTHER_CFLAGS = (
-					"-Wno-write-strings",
-					"-msse",
-				);
-				OTHER_LDFLAGS = (
-					"-bind_at_load",
-					"-w",
-				);
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "-bind_at_load";
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = YES;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
+				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
+				SDKROOT = macosx;
 				SEPARATE_STRIP = NO;
 				SHARED_PRECOMPS_DIR = "$(CACHE_ROOT)/SharedPrecompiledHeaders";
 				SKIP_INSTALL = YES;
 				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = "non-global";
 				SYMROOT = proj/mac/build;
-				USER_HEADER_SEARCH_PATHS = "../Libraries/ftgl/src ../Libraries/glew/include/ ../Libraries/phui/include/ include/ include/bt ../Libraries/opende/include/ include/js include/libxml include/lua include/mac src src/auth src/chat src/dbug src/include src/sysmac src/teul src/weap";
-				VALID_ARCHS = i386;
+				USER_HEADER_SEARCH_PATHS = "../Libraries/ftgl/src ../Libraries/glew/include/ ../Libraries/phui/include/ include/ include/bt ../Libraries/opende/include/ include/js include/libxml include/lua include/mac src src/auth src/chat src/dbug src/include src/sysmac src/teul src/weap ../Libraries/libxml2/include/libxml/ src/spt";
+				VALID_ARCHS = "i386 x86_64";
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wdeprecated",
+				);
 			};
 			name = Debug;
 		};
 		085BD0CE110F5D5C0063F377 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ENABLE_OPENMP_SUPPORT = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_BOOL_CONVERSION = NO;
+				CLANG_WARN_CONSTANT_CONVERSION = NO;
+				CLANG_X86_VECTOR_INSTRUCTIONS = default;
+				COMBINE_HIDPI_IMAGES = NO;
+				COPY_PHASE_STRIP = YES;
+				ENABLE_TESTABILITY = NO;
+				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
 					"\"$(SRCROOT)/lib/mac\"",
+					"$(SRCROOT)/vendor",
+					"$(PROJECT_DIR)/Vendor",
 				);
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"_MACOSX=1",
+					"platOS=OS_MACOS",
+					XP_MAC,
+					ENABLE_FLOATERS,
+					"RELEASE_CLIENT=0",
+					EVENT_LOG,
+					_OPTIONS_BELOW_THIS_LINE,
+					"TEUL_PACKET_NAMES=1",
+				);
+				GCC_UNROLL_LOOPS = YES;
+				GCC_VERSION = "";
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
+				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = proj/mac/Info.plist;
-				LD_OPENMP_FLAGS = "";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/lib/mac\"",
-					"\"$(SRCROOT)\"",
-					/usr/local/lib,
 				);
-				OTHER_CFLAGS = (
-					"-Wno-write-strings",
-					"-msse",
-				);
-				OTHER_LDFLAGS = (
-					"-bind_at_load",
-					"-w",
-					"-levent",
-				);
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "-bind_at_load";
 				PRELINK_LIBS = "";
-				PRODUCT_NAME = "World War ][ Online";
+				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
+				PRODUCT_NAME = "World War II Online";
+				REBUILDMDL = 0;
+				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				USER_HEADER_SEARCH_PATHS = "$(inherited)";
+				VALID_ARCHS = "i386 x86_64";
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wdeprecated",
+				);
 				WRAPPER_EXTENSION = app;
+				WW2MODS = "${PROJECT_DIR}/../ww2mods";
 			};
 			name = Debug;
 		};
 		085BD0CF110F5D5C0063F377 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_OPENMP_SUPPORT = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SRCROOT)/lib/mac",
+					"$(SRCROOT)/vendor",
+				);
 				GCC_PFE_FILE_C_DIALECTS = "c++";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = src/teul/syscfg.h;
+				GCC_VERSION = "";
 				GENERATE_MASTER_OBJECT_FILE = NO;
 				HEADER_SEARCH_PATHS = (
-					"$(BOOST)",
-					"$(BOOST)include",
-					"$(BOOST)boost",
-					../Libraries/OpenThreadsMac,
-					/usr/local/include,
+					"$(inherited)",
+					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
+					"\"$(SRCROOT)/../Libraries/libevent/include\"",
 				);
 				LD_OPENMP_FLAGS = "";
 				MACH_O_TYPE = staticlib;
 				OTHER_LDFLAGS = "";
 				PRELINK_LIBS = "";
 				PRODUCT_NAME = teulKit;
-				USER_HEADER_SEARCH_PATHS = "src src/teul src/include src/auth ../Libraries/libevent/include";
+				USER_HEADER_SEARCH_PATHS = "$(inherited)";
 			};
 			name = Debug;
 		};
@@ -4229,7 +4060,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_OPENMP_SUPPORT = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SRCROOT)/lib/mac",
+					"$(SRCROOT)/vendor",
+				);
+				GCC_VERSION = "";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRC_ROOT)/src\"",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/lib/mac\"",
@@ -4238,7 +4080,7 @@
 				MACH_O_TYPE = staticlib;
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = maclib;
-				USER_HEADER_SEARCH_PATHS = "../Libraries/glew/include/ ../Libraries/phui/include/ src/wwii src/sysmac include/ include/js include/mac include/bt src include/lua src/auth src/teul src/include src/dbug src/weap src/chat";
+				USER_HEADER_SEARCH_PATHS = "$(inherited)";
 			};
 			name = Debug;
 		};
@@ -4246,151 +4088,182 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
-				COPY_PHASE_STRIP = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch (*) CVS .svn *.xcodeproj *.xcode *.pbproj *.pbxproj";
+				ENABLE_TESTABILITY = NO;
+				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
+					"\"$(SRCROOT)/lib/mac\"",
+					"$(SRCROOT)/vendor",
 				);
-				GCC_DEBUGGING_SYMBOLS = full;
-				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_ENABLE_SSE3_EXTENSIONS = YES;
-				GCC_ENABLE_SUPPLEMENTAL_SSE3_INSTRUCTIONS = YES;
-				GCC_ENABLE_SYMBOL_SEPARATION = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
-				GCC_OPTIMIZATION_LEVEL = 2;
-				GCC_PFE_FILE_C_DIALECTS = "c++";
+				GCC_OPTIMIZATION_LEVEL = fast;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"APIENTRY=",
-					BETA_RELEASE,
-					ENABLE_FLOATERS,
-					EVENT_LOG,
-					"IS_BIG_ENDIAN=__BIG_ENDIAN__",
-					NO_PRELOAD,
-					"RELEASE_CLIENT=0",
-					"SPAWN_AT_OLD_OFFLINE=1",
-					WANT_BUZZARD_OFFLINE,
-					XP_MAC,
 					"_MACOSX=1",
 					"platOS=OS_MACOS",
-					IS_DEBUG,
-					xMODEL_INFO,
-					xSUPPORT_WWO,
-					USE_SCENARIO_MAP,
+					XP_MAC,
+					ENABLE_FLOATERS,
+					"RELEASE_CLIENT=1",
+					EVENT_LOG,
+					_OPTIONS_BELOW_THIS_LINE,
+					"TEUL_PACKET_NAMES=1",
 				);
 				GCC_UNROLL_LOOPS = NO;
-				GCC_VERSION = 4.2;
+				GCC_VERSION = "";
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
+				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = NO;
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO;
 				GCC_WARN_SIGN_COMPARE = NO;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
 					"$(PNG)",
-					"$(BOOST)",
-					"$(BOOST)include",
-					"$(BOOST)boost",
-					/usr/local/include,
-					../Libraries/ft2/include,
-					../Libraries/OpenThreadsMac,
-					/usr/local/include,
+					"\"$(SRCROOT)/../Libraries/ft2/include\"",
+					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
+					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
+					"\"$(SDKROOT)/usr/include/libxml2\"",
+					"\"$(SRCROOT)/../Libraries/opende/include\"",
+					"\"$(SRCROOT)/include/Cg\"",
+					"\"$(SRCROOT)/include\"",
+					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
+					"\"$(SRCROOT)/src/math\"",
+					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
 				);
 				LIBRARY_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
-					/usr/local/lib,
+					"$(inheritied)",
+					"\"$(SRCROOT)/lib/mac\"",
 				);
 				MACH_O_TYPE = mh_execute;
-				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OBJROOT = proj/mac/build;
-				OTHER_CFLAGS = (
-					"-Wno-write-strings",
-					"-march=nocona",
-					"-mtune=generic",
-				);
-				OTHER_LDFLAGS = (
-					"-bind_at_load",
-					"-w",
-				);
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "-bind_at_load";
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = YES;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
+				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
+				SDKROOT = macosx;
 				SEPARATE_STRIP = NO;
 				SHARED_PRECOMPS_DIR = "$(CACHE_ROOT)/SharedPrecompiledHeaders";
 				SKIP_INSTALL = YES;
 				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = "non-global";
 				SYMROOT = proj/mac/build;
-				USER_HEADER_SEARCH_PATHS = "../Libraries/ftgl/src ../Libraries/glew/include/ ../Libraries/phui/include/ include/ include/bt ../Libraries/opende/include/ include/js include/libxml include/lua include/mac src src/auth src/chat src/dbug src/include src/sysmac src/teul src/weap";
-				VALID_ARCHS = i386;
+				USER_HEADER_SEARCH_PATHS = "../Libraries/ftgl/src ../Libraries/glew/include/ ../Libraries/phui/include/ include/ include/bt ../Libraries/opende/include/ include/js include/libxml include/lua include/mac src src/auth src/chat src/dbug src/include src/sysmac src/teul src/weap ../Libraries/libxml2/include/libxml/ src/spt";
+				VALID_ARCHS = "i386 x86_64";
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wdeprecated",
+				);
 			};
 			name = "Debug Optimized";
 		};
 		085BD0DF110F5F290063F377 /* Debug Optimized */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ENABLE_OPENMP_SUPPORT = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_BOOL_CONVERSION = NO;
+				CLANG_WARN_CONSTANT_CONVERSION = NO;
+				CLANG_X86_VECTOR_INSTRUCTIONS = default;
+				COMBINE_HIDPI_IMAGES = NO;
+				COPY_PHASE_STRIP = YES;
+				ENABLE_TESTABILITY = NO;
+				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
 					"\"$(SRCROOT)/lib/mac\"",
+					"$(SRCROOT)/vendor",
+					"$(PROJECT_DIR)/Vendor",
 				);
-				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = fast;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"_MACOSX=1",
+					"platOS=OS_MACOS",
+					XP_MAC,
+					ENABLE_FLOATERS,
+					"RELEASE_CLIENT=0",
+					EVENT_LOG,
+					_OPTIONS_BELOW_THIS_LINE,
+					"TEUL_PACKET_NAMES=1",
+				);
+				GCC_UNROLL_LOOPS = YES;
+				GCC_VERSION = "";
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
+				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = proj/mac/Info.plist;
-				LD_OPENMP_FLAGS = "";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/lib/mac\"",
-					"\"$(SRCROOT)\"",
-					/usr/local/lib,
 				);
-				OTHER_LDFLAGS = (
-					"-bind_at_load",
-					"-w",
-					"-levent",
-				);
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "-bind_at_load";
 				PRELINK_LIBS = "";
-				PRODUCT_NAME = "World War ][ Online";
+				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
+				PRODUCT_NAME = "World War II Online";
+				REBUILDMDL = 0;
+				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				USER_HEADER_SEARCH_PATHS = "$(inherited)";
+				VALID_ARCHS = "i386 x86_64";
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wdeprecated",
+				);
 				WRAPPER_EXTENSION = app;
+				WW2MODS = "${PROJECT_DIR}/../ww2mods";
 			};
 			name = "Debug Optimized";
 		};
 		085BD0E0110F5F290063F377 /* Debug Optimized */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_OPENMP_SUPPORT = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SRCROOT)/lib/mac",
+					"$(SRCROOT)/vendor",
+				);
 				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PFE_FILE_C_DIALECTS = "c++";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = src/teul/syscfg.h;
+				GCC_VERSION = "";
 				GENERATE_MASTER_OBJECT_FILE = NO;
 				HEADER_SEARCH_PATHS = (
-					"$(BOOST)",
-					"$(BOOST)include",
-					"$(BOOST)boost",
-					../Libraries/OpenThreadsMac,
-					/usr/local/include,
+					"$(inherited)",
+					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
+					"\"$(SRCROOT)/../Libraries/libevent/include\"",
 				);
 				LD_OPENMP_FLAGS = "";
 				MACH_O_TYPE = staticlib;
 				OTHER_LDFLAGS = "";
 				PRELINK_LIBS = "";
 				PRODUCT_NAME = teulKit;
-				USER_HEADER_SEARCH_PATHS = "src src/teul src/include src/auth ../Libraries/libevent/include";
+				USER_HEADER_SEARCH_PATHS = "$(inherited)";
 			};
 			name = "Debug Optimized";
 		};
@@ -4398,7 +4271,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_OPENMP_SUPPORT = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SRCROOT)/lib/mac",
+					"$(SRCROOT)/vendor",
+				);
+				GCC_VERSION = "";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRC_ROOT)/src\"",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/lib/mac\"",
@@ -4407,7 +4291,7 @@
 				MACH_O_TYPE = staticlib;
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = maclib;
-				USER_HEADER_SEARCH_PATHS = "../Libraries/glew/include/ ../Libraries/phui/include/ src/wwii src/sysmac include/ include/js include/mac include/bt src include/lua src/auth src/teul src/include src/dbug src/weap src/chat";
+				USER_HEADER_SEARCH_PATHS = "$(inherited)";
 			};
 			name = "Debug Optimized";
 		};
@@ -4415,28 +4299,24 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
-				COPY_PHASE_STRIP = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch (*) CVS .svn *.xcodeproj *.xcode *.pbproj *.pbxproj";
+				ENABLE_TESTABILITY = NO;
+				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
+					"\"$(SRCROOT)/lib/mac\"",
+					"$(SRCROOT)/vendor",
 				);
-				GCC_DEBUGGING_SYMBOLS = full;
-				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_ENABLE_SSE3_EXTENSIONS = YES;
-				GCC_ENABLE_SUPPLEMENTAL_SSE3_INSTRUCTIONS = YES;
-				GCC_ENABLE_SYMBOL_SEPARATION = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_PFE_FILE_C_DIALECTS = "c++";
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -4447,109 +4327,154 @@
 					BETA_RELEASE,
 					ENABLE_FLOATERS,
 					"platOS=OS_MACOS",
+					"TEUL_PACKET_NAMES=0",
 				);
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = 4.2;
+				GCC_UNROLL_LOOPS = NO;
+				GCC_VERSION = "";
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
+				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = NO;
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO;
 				GCC_WARN_SIGN_COMPARE = NO;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
 					"$(PNG)",
-					"$(BOOST)",
-					"$(BOOST)include",
-					"$(BOOST)boost",
-					/usr/local/include,
-					../Libraries/ft2/include,
-					../Libraries/OpenThreadsMac,
-					/usr/local/include,
+					"\"$(SRCROOT)/../Libraries/ft2/include\"",
+					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
+					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
+					"\"$(SDKROOT)/usr/include/libxml2\"",
+					"\"$(SRCROOT)/../Libraries/opende/include\"",
+					"\"$(SRCROOT)/include/Cg\"",
+					"\"$(SRCROOT)/include\"",
+					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
+					"\"$(SRCROOT)/src/math\"",
+					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
 				);
 				LIBRARY_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
-					/usr/local/lib,
+					"$(inheritied)",
+					"\"$(SRCROOT)/lib/mac\"",
 				);
 				MACH_O_TYPE = mh_execute;
-				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OBJROOT = proj/mac/build;
-				OTHER_CFLAGS = (
-					"-Wno-write-strings",
-					"-mtune=core2",
-				);
-				OTHER_LDFLAGS = (
-					"-bind_at_load",
-					"-w",
-				);
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "-bind_at_load";
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = YES;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
+				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
+				SDKROOT = macosx;
 				SEPARATE_STRIP = NO;
 				SHARED_PRECOMPS_DIR = "$(CACHE_ROOT)/SharedPrecompiledHeaders";
 				SKIP_INSTALL = YES;
 				STRIP_INSTALLED_PRODUCT = YES;
 				STRIP_STYLE = "non-global";
 				SYMROOT = proj/mac/build;
-				USER_HEADER_SEARCH_PATHS = "../Libraries/ftgl/src ../Libraries/glew/include/ ../Libraries/phui/include/ include/ include/bt ../Libraries/opende/include/ include/js include/libxml include/lua include/mac src src/auth src/chat src/dbug src/include src/sysmac src/teul src/weap";
-				VALID_ARCHS = i386;
+				USER_HEADER_SEARCH_PATHS = "../Libraries/ftgl/src ../Libraries/glew/include/ ../Libraries/phui/include/ include/ include/bt ../Libraries/opende/include/ include/js include/libxml include/lua include/mac src src/auth src/chat src/dbug src/include src/sysmac src/teul src/weap ../Libraries/libxml2/include/libxml/ src/spt";
+				VALID_ARCHS = "i386 x86_64";
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wdeprecated",
+				);
 			};
 			name = "Closed Beta Release";
 		};
 		088DF82E11343DC30040BC8F /* Closed Beta Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ENABLE_OPENMP_SUPPORT = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_BOOL_CONVERSION = NO;
+				CLANG_WARN_CONSTANT_CONVERSION = NO;
+				CLANG_X86_VECTOR_INSTRUCTIONS = default;
+				COMBINE_HIDPI_IMAGES = NO;
+				COPY_PHASE_STRIP = YES;
+				ENABLE_TESTABILITY = NO;
+				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
 					"\"$(SRCROOT)/lib/mac\"",
+					"$(SRCROOT)/vendor",
+					"$(PROJECT_DIR)/Vendor",
 				);
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"_MACOSX=1",
+					"IS_BIG_ENDIAN=__BIG_ENDIAN__",
+					XP_MAC,
+					"RELEASE_CLIENT=1",
+					BETA_RELEASE,
+					ENABLE_FLOATERS,
+					"platOS=OS_MACOS",
+					"TEUL_PACKET_NAMES=0",
+				);
+				GCC_UNROLL_LOOPS = YES;
+				GCC_VERSION = "";
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
+				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = proj/mac/Info.plist;
-				LD_OPENMP_FLAGS = "";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/lib/mac\"",
-					"\"$(SRCROOT)\"",
-					/usr/local/lib,
 				);
-				OTHER_LDFLAGS = (
-					"-bind_at_load",
-					"-w",
-					"-levent",
-				);
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "-bind_at_load";
 				PRELINK_LIBS = "";
-				PRODUCT_NAME = "World War ][ Online";
+				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
+				PRODUCT_NAME = "World War II Online";
+				REBUILDMDL = 0;
+				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				USER_HEADER_SEARCH_PATHS = "$(inherited)";
+				VALID_ARCHS = "i386 x86_64";
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wdeprecated",
+				);
 				WRAPPER_EXTENSION = app;
+				WW2MODS = "${PROJECT_DIR}/../ww2mods";
 			};
 			name = "Closed Beta Release";
 		};
 		088DF82F11343DC30040BC8F /* Closed Beta Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_OPENMP_SUPPORT = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SRCROOT)/lib/mac",
+					"$(SRCROOT)/vendor",
+				);
 				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PFE_FILE_C_DIALECTS = "c++";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = src/teul/syscfg.h;
+				GCC_VERSION = "";
 				GENERATE_MASTER_OBJECT_FILE = NO;
 				HEADER_SEARCH_PATHS = (
-					"$(BOOST)",
-					"$(BOOST)include",
-					"$(BOOST)boost",
-					../Libraries/OpenThreadsMac,
-					/usr/local/include,
+					"$(inherited)",
+					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
+					"\"$(SRCROOT)/../Libraries/libevent/include\"",
 				);
 				LD_OPENMP_FLAGS = "";
 				MACH_O_TYPE = staticlib;
 				OTHER_LDFLAGS = "";
 				PRELINK_LIBS = "";
 				PRODUCT_NAME = teulKit;
-				USER_HEADER_SEARCH_PATHS = "src src/teul src/include src/auth ../Libraries/libevent/include";
+				USER_HEADER_SEARCH_PATHS = "$(inherited)";
 			};
 			name = "Closed Beta Release";
 		};
@@ -4557,7 +4482,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_OPENMP_SUPPORT = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SRCROOT)/lib/mac",
+					"$(SRCROOT)/vendor",
+				);
+				GCC_VERSION = "";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRC_ROOT)/src\"",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/lib/mac\"",
@@ -4566,7 +4502,7 @@
 				MACH_O_TYPE = staticlib;
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = maclib;
-				USER_HEADER_SEARCH_PATHS = "../Libraries/glew/include/ ../Libraries/phui/include/ src/wwii src/sysmac include/ include/js include/mac include/bt src include/lua src/auth src/teul src/include src/dbug src/weap src/chat";
+				USER_HEADER_SEARCH_PATHS = "$(inherited)";
 			};
 			name = "Closed Beta Release";
 		};
@@ -4574,141 +4510,178 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
-				COPY_PHASE_STRIP = NO;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch (*) CVS .svn *.xcodeproj *.xcode *.pbproj *.pbxproj";
+				ENABLE_TESTABILITY = NO;
+				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
+					"\"$(SRCROOT)/lib/mac\"",
+					"$(SRCROOT)/vendor",
 				);
-				GCC_DEBUGGING_SYMBOLS = full;
-				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_ENABLE_SSE3_EXTENSIONS = YES;
-				GCC_ENABLE_SUPPLEMENTAL_SSE3_INSTRUCTIONS = YES;
-				GCC_ENABLE_SYMBOL_SEPARATION = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
-				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_PFE_FILE_C_DIALECTS = "c++";
+				GCC_OPTIMIZATION_LEVEL = fast;
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					"APIENTRY=",
 					"_MACOSX=1",
 					"IS_BIG_ENDIAN=__BIG_ENDIAN__",
 					XP_MAC,
 					"RELEASE_CLIENT=1",
 					"platOS=OS_MACOS",
+					"TEUL_PACKET_NAMES=0",
 				);
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = 4.2;
+				GCC_UNROLL_LOOPS = NO;
+				GCC_VERSION = "";
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = NO;
+				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = NO;
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO;
 				GCC_WARN_SIGN_COMPARE = NO;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
 					"$(PNG)",
-					"$(BOOST)",
-					"$(BOOST)include",
-					"$(BOOST)boost",
-					/usr/local/include,
-					../Libraries/ft2/include,
-					../Libraries/OpenThreadsMac,
-					/usr/local/include,
+					"\"$(SRCROOT)/../Libraries/ft2/include\"",
+					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
+					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
+					"\"$(SDKROOT)/usr/include/libxml2\"",
+					"\"$(SRCROOT)/../Libraries/opende/include\"",
+					"\"$(SRCROOT)/include/Cg\"",
+					"\"$(SRCROOT)/include\"",
+					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
+					"\"$(SRCROOT)/src/math\"",
+					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
 				);
 				LIBRARY_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
-					/usr/local/lib,
+					"$(inheritied)",
+					"\"$(SRCROOT)/lib/mac\"",
 				);
 				MACH_O_TYPE = mh_execute;
-				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OBJROOT = proj/mac/build;
-				OTHER_CFLAGS = (
-					"-Wno-write-strings",
-					"-mtune=core2",
-				);
-				OTHER_LDFLAGS = (
-					"-bind_at_load",
-					"-w",
-				);
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "-bind_at_load";
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = YES;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
+				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
+				SDKROOT = macosx;
 				SEPARATE_STRIP = NO;
 				SHARED_PRECOMPS_DIR = "$(CACHE_ROOT)/SharedPrecompiledHeaders";
 				SKIP_INSTALL = YES;
 				STRIP_INSTALLED_PRODUCT = NO;
 				STRIP_STYLE = "non-global";
 				SYMROOT = proj/mac/build;
-				USER_HEADER_SEARCH_PATHS = "../Libraries/ftgl/src ../Libraries/glew/include/ ../Libraries/phui/include/ include/ include/bt ../Libraries/opende/include/ include/js include/libxml include/lua include/mac src src/auth src/chat src/dbug src/include src/sysmac src/teul src/weap";
-				VALID_ARCHS = i386;
+				USER_HEADER_SEARCH_PATHS = "../Libraries/ftgl/src ../Libraries/glew/include/ ../Libraries/phui/include/ include/ include/bt ../Libraries/opende/include/ include/js include/libxml include/lua include/mac src src/auth src/chat src/dbug src/include src/sysmac src/teul src/weap ../Libraries/libxml2/include/libxml/ src/spt";
+				VALID_ARCHS = "i386 x86_64";
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wdeprecated",
+				);
 			};
 			name = "Release With Symbols";
 		};
 		0897A0F211B9530200F72FC0 /* Release With Symbols */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ENABLE_OPENMP_SUPPORT = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_BOOL_CONVERSION = NO;
+				CLANG_WARN_CONSTANT_CONVERSION = NO;
+				CLANG_X86_VECTOR_INSTRUCTIONS = default;
+				COMBINE_HIDPI_IMAGES = NO;
+				COPY_PHASE_STRIP = YES;
+				ENABLE_TESTABILITY = NO;
+				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
 					"\"$(SRCROOT)/lib/mac\"",
+					"$(SRCROOT)/vendor",
+					"$(PROJECT_DIR)/Vendor",
 				);
-				GCC_OPTIMIZATION_LEVEL = s;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = fast;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"_MACOSX=1",
+					"platOS=OS_MACOS",
+					XP_MAC,
+					"RELEASE_CLIENT=1",
+					"IS_BIG_ENDIAN=__BIG_ENDIAN__",
+					"TEUL_PACKET_NAMES=0",
+				);
+				GCC_UNROLL_LOOPS = YES;
+				GCC_VERSION = "";
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
+				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = proj/mac/Info.plist;
-				LD_OPENMP_FLAGS = "";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/lib/mac\"",
-					"\"$(SRCROOT)\"",
-					/usr/local/lib,
 				);
-				OTHER_LDFLAGS = (
-					"-bind_at_load",
-					"-w",
-					"-levent",
-				);
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "-bind_at_load";
 				PRELINK_LIBS = "";
-				PRODUCT_NAME = "World War ][ Online";
+				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
+				PRODUCT_NAME = "World War II Online";
+				REBUILDMDL = 0;
+				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				USER_HEADER_SEARCH_PATHS = "$(inherited)";
+				VALID_ARCHS = "i386 x86_64";
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wdeprecated",
+				);
 				WRAPPER_EXTENSION = app;
+				WW2MODS = "${PROJECT_DIR}/../ww2mods";
 			};
 			name = "Release With Symbols";
 		};
 		0897A0F311B9530200F72FC0 /* Release With Symbols */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_OPENMP_SUPPORT = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SRCROOT)/lib/mac",
+					"$(SRCROOT)/vendor",
+				);
 				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PFE_FILE_C_DIALECTS = "c++";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = src/teul/syscfg.h;
+				GCC_VERSION = "";
 				GENERATE_MASTER_OBJECT_FILE = NO;
 				HEADER_SEARCH_PATHS = (
-					"$(BOOST)",
-					"$(BOOST)include",
-					"$(BOOST)boost",
-					../Libraries/OpenThreadsMac,
-					/usr/local/include,
+					"$(inherited)",
+					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
+					"\"$(SRCROOT)/../Libraries/libevent/include\"",
 				);
 				LD_OPENMP_FLAGS = "";
 				MACH_O_TYPE = staticlib;
 				OTHER_LDFLAGS = "";
 				PRELINK_LIBS = "";
 				PRODUCT_NAME = teulKit;
-				USER_HEADER_SEARCH_PATHS = "src src/teul src/include src/auth ../Libraries/libevent/include";
+				USER_HEADER_SEARCH_PATHS = "$(inherited)";
 			};
 			name = "Release With Symbols";
 		};
@@ -4716,7 +4689,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_OPENMP_SUPPORT = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SRCROOT)/lib/mac",
+					"$(SRCROOT)/vendor",
+				);
+				GCC_VERSION = "";
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"\"$(SRC_ROOT)/src\"",
+				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/lib/mac\"",
@@ -4725,37 +4709,75 @@
 				MACH_O_TYPE = staticlib;
 				OTHER_LDFLAGS = "";
 				PRODUCT_NAME = maclib;
-				USER_HEADER_SEARCH_PATHS = "../Libraries/glew/include/ ../Libraries/phui/include/ src/wwii src/sysmac include/ include/js include/mac include/bt src include/lua src/auth src/teul src/include src/dbug src/weap src/chat";
+				USER_HEADER_SEARCH_PATHS = "$(inherited)";
 			};
 			name = "Release With Symbols";
 		};
 		0DF859190870692100A6D554 /* Beta Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ENABLE_OPENMP_SUPPORT = NO;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_WARN_BOOL_CONVERSION = NO;
+				CLANG_WARN_CONSTANT_CONVERSION = NO;
+				CLANG_X86_VECTOR_INSTRUCTIONS = default;
+				COMBINE_HIDPI_IMAGES = NO;
+				COPY_PHASE_STRIP = YES;
+				ENABLE_TESTABILITY = NO;
+				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(inherited)",
 					"\"$(SRCROOT)/lib/mac\"",
+					"$(SRCROOT)/vendor",
+					"$(PROJECT_DIR)/Vendor",
 				);
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"_MACOSX=1",
+					"platOS=OS_MACOS",
+					XP_MAC,
+					ENABLE_FLOATERS,
+					"RELEASE_CLIENT=1",
+					EVENT_LOG,
+					_OPTIONS_BELOW_THIS_LINE,
+					BETA_RELEASE,
+					xWANT_BUZZARD_OFFLINE,
+					"xIS_BIG_ENDIAN=__BIG_ENDIAN__",
+					"TEUL_PACKET_NAMES=0",
+				);
+				GCC_UNROLL_LOOPS = YES;
+				GCC_VERSION = "";
+				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
+				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
+				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = proj/mac/Info.plist;
-				LD_OPENMP_FLAGS = "";
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"\"$(SRCROOT)/lib/mac\"",
-					"\"$(SRCROOT)\"",
-					/usr/local/lib,
 				);
-				OTHER_LDFLAGS = (
-					"-bind_at_load",
-					"-w",
-					"-levent",
-				);
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "-bind_at_load";
 				PRELINK_LIBS = "";
-				PRODUCT_NAME = "World War ][ Online";
+				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
+				PRODUCT_NAME = "World War II Online";
+				REBUILDMDL = 0;
+				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				USER_HEADER_SEARCH_PATHS = "$(inherited)";
+				VALID_ARCHS = "i386 x86_64";
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wdeprecated",
+				);
 				WRAPPER_EXTENSION = app;
+				WW2MODS = "${PROJECT_DIR}/../ww2mods";
 			};
 			name = "Beta Release";
 		};
@@ -4763,111 +4785,117 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
-				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				COPY_PHASE_STRIP = YES;
 				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch (*) CVS .svn *.xcodeproj *.xcode *.pbproj *.pbxproj";
+				ENABLE_TESTABILITY = NO;
+				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
 				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
+					"\"$(SRCROOT)/lib/mac\"",
+					"$(SRCROOT)/vendor",
 				);
-				GCC_DEBUGGING_SYMBOLS = full;
-				GCC_DYNAMIC_NO_PIC = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_ENABLE_SSE3_EXTENSIONS = YES;
-				GCC_ENABLE_SUPPLEMENTAL_SSE3_INSTRUCTIONS = YES;
-				GCC_ENABLE_SYMBOL_SEPARATION = NO;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
 				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_PFE_FILE_C_DIALECTS = "c++";
 				GCC_PRECOMPILE_PREFIX_HEADER = NO;
 				GCC_PREFIX_HEADER = "";
 				GCC_PREPROCESSOR_DEFINITIONS = (
-					WANT_BUZZARD_OFFLINE,
-					xENABLE_FLOATERS,
 					"_MACOSX=1",
-					"IS_BIG_ENDIAN=__BIG_ENDIAN__",
-					XP_MAC,
-					"RELEASE_CLIENT=1",
 					"platOS=OS_MACOS",
-					xBETA_RELEASE,
-					"USE_BETA_AUTH",
+					XP_MAC,
+					ENABLE_FLOATERS,
+					"RELEASE_CLIENT=1",
+					EVENT_LOG,
+					_OPTIONS_BELOW_THIS_LINE,
+					BETA_RELEASE,
+					"TEUL_PACKET_NAMES=0",
 				);
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = 4.2;
+				GCC_UNROLL_LOOPS = NO;
+				GCC_VERSION = "";
 				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = NO;
+				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_EFFECTIVE_CPLUSPLUS_VIOLATIONS = NO;
 				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO;
 				GCC_WARN_SIGN_COMPARE = NO;
 				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
 				GCC_WARN_UNUSED_VARIABLE = NO;
 				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
 					"$(PNG)",
-					"$(BOOST)",
-					"$(BOOST)include",
-					"$(BOOST)boost",
-					/usr/local/include,
-					../Libraries/ft2/include,
-					../Libraries/OpenThreadsMac,
-					/usr/local/include,
+					"\"$(SRCROOT)/../Libraries/ft2/include\"",
+					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
+					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
+					"\"$(SDKROOT)/usr/include/libxml2\"",
+					"\"$(SRCROOT)/../Libraries/opende/include\"",
+					"\"$(SRCROOT)/include/Cg\"",
+					"\"$(SRCROOT)/include\"",
+					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
+					"\"$(SRCROOT)/src/math\"",
+					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
 				);
 				LIBRARY_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_1)",
-					/usr/local/lib,
+					"$(inheritied)",
+					"\"$(SRCROOT)/lib/mac\"",
 				);
 				MACH_O_TYPE = mh_execute;
-				MACOSX_DEPLOYMENT_TARGET = 10.5;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OBJROOT = proj/mac/build;
-				OTHER_CFLAGS = (
-					"-Wno-write-strings",
-					"-march=nocona",
-					"-mtune=generic",
-				);
-				OTHER_LDFLAGS = (
-					"-bind_at_load",
-					"-w",
-				);
+				ONLY_ACTIVE_ARCH = NO;
+				OTHER_CFLAGS = "";
+				OTHER_LDFLAGS = "-bind_at_load";
 				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = YES;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
-				SDKROOT = "$(DEVELOPER_SDK_DIR)/MacOSX10.6.sdk";
+				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
+				SDKROOT = macosx;
 				SHARED_PRECOMPS_DIR = "$(CACHE_ROOT)/SharedPrecompiledHeaders";
+				SKIP_INSTALL = YES;
 				STRIP_INSTALLED_PRODUCT = YES;
 				STRIP_STYLE = debugging;
 				SYMROOT = proj/mac/build;
-				USER_HEADER_SEARCH_PATHS = "../Libraries/ftgl/src ../Libraries/glew/include/ ../Libraries/phui/include/ include/ include/bt ../Libraries/opende/include/ include/js include/libxml include/lua include/mac src src/auth src/chat src/dbug src/include src/sysmac src/teul src/weap";
-				VALID_ARCHS = i386;
+				USER_HEADER_SEARCH_PATHS = "../Libraries/ftgl/src ../Libraries/glew/include/ ../Libraries/phui/include/ include/ include/bt ../Libraries/opende/include/ include/js include/libxml include/lua include/mac src src/auth src/chat src/dbug src/include src/sysmac src/teul src/weap ../Libraries/libxml2/include/libxml/ src/spt";
+				VALID_ARCHS = "i386 x86_64";
+				WARNING_CFLAGS = (
+					"-Wall",
+					"-Wdeprecated",
+				);
 			};
 			name = "Beta Release";
 		};
 		47B0ED280E9A66A40089DCC4 /* Beta Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				COMBINE_HIDPI_IMAGES = YES;
 				ENABLE_OPENMP_SUPPORT = NO;
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(SRCROOT)/lib/mac",
+					"$(SRCROOT)/vendor",
+				);
 				GCC_OPTIMIZATION_LEVEL = s;
 				GCC_PFE_FILE_C_DIALECTS = "c++";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = src/teul/syscfg.h;
+				GCC_VERSION = "";
 				GENERATE_MASTER_OBJECT_FILE = NO;
 				HEADER_SEARCH_PATHS = (
-					"$(BOOST)",
-					"$(BOOST)include",
-					"$(BOOST)boost",
-					../Libraries/OpenThreadsMac,
-					/usr/local/include,
+					"$(inherited)",
+					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
+					"\"$(SRCROOT)/../Libraries/libevent/include\"",
 				);
 				LD_OPENMP_FLAGS = "";
 				MACH_O_TYPE = staticlib;
 				OTHER_LDFLAGS = "";
 				PRELINK_LIBS = "";
 				PRODUCT_NAME = teulKit;
-				USER_HEADER_SEARCH_PATHS = "src src/teul src/include src/auth ../Libraries/libevent/include";
+				USER_HEADER_SEARCH_PATHS = "$(inherited)";
 			};
 			name = "Beta Release";
 		};
@@ -4885,7 +4913,7 @@
 				0897A0F411B9530200F72FC0 /* Release With Symbols */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		0DA6CEF60856391C00A53577 /* Build configuration list for PBXNativeTarget "WW2OL" */ = {
 			isa = XCConfigurationList;
@@ -4898,7 +4926,7 @@
 				0897A0F211B9530200F72FC0 /* Release With Symbols */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		0DA6CEFA0856391C00A53577 /* Build configuration list for PBXProject "WW2OL" */ = {
 			isa = XCConfigurationList;
@@ -4911,7 +4939,7 @@
 				0897A0F111B9530200F72FC0 /* Release With Symbols */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 		47B0ED290E9A66C50089DCC4 /* Build configuration list for PBXNativeTarget "teulKit" */ = {
 			isa = XCConfigurationList;
@@ -4924,7 +4952,7 @@
 				0897A0F311B9530200F72FC0 /* Release With Symbols */,
 			);
 			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
+			defaultConfigurationName = Debug;
 		};
 /* End XCConfigurationList section */
 	};

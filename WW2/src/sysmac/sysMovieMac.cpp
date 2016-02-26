@@ -1,4 +1,3 @@
-#include <syscfg.h> // Path is project specific.
 #include <Quicktime/Quicktime.h>
 #include <OpenGL/glu.h>
 #include <string>
@@ -31,7 +30,7 @@ struct sysMovie::platimp
 
 	bool playing;
 	int lasttime;
-	GLuint texid;
+	GLuint texid;			
 	MacAVI avi;
 	GWorldPtr gworld;
 	Ptr buffer;
@@ -119,7 +118,7 @@ void sysMovie::UpdateFrame(int ms)
 		{
 			frame = _platimp->lastframe;
 			_platimp->playing = false;
-		}
+		}	
 		if(frame > _platimp->curframe)
 		{
 			_platimp->curframe = frame;
@@ -130,7 +129,7 @@ void sysMovie::UpdateFrame(int ms)
 
   	Ptr buf = _platimp->avi.buffer;
  	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, _platimp->texid);
+	glBindTexture(GL_TEXTURE_2D, _platimp->texid);    
   	gluBuild2DMipmaps(GL_TEXTURE_2D,
                     GL_RGB,
                     256,
@@ -143,7 +142,7 @@ void sysMovie::UpdateFrame(int ms)
 void sysMovie::DrawFrame(float left, float bottom, float right, float top)
 {
 	glEnable(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, _platimp->texid);
+	glBindTexture(GL_TEXTURE_2D, _platimp->texid);    
 
 	glBegin(GL_QUADS);
 	glTexCoord2f(0,0);
@@ -154,7 +153,7 @@ void sysMovie::DrawFrame(float left, float bottom, float right, float top)
 	glVertex2f(right,top);
 	glTexCoord2f(0,1);
 	glVertex2f(left,top);
-	glEnd();
+	glEnd();  
 }
 
 bool sysMovie::Playing()
@@ -189,10 +188,10 @@ static bool MacOpenAVI(MacAVI* p, const char* filename, GWorldPtr gw, Ptr buffer
 	GetCurrentProcess(&psn);
 	GetProcessBundleLocation(&psn, &ref);
 	FSRefMakePath(&ref,(unsigned char*)path,4000);
-	strcat(path,"/AppData/");
-	strcat(path,filename);
+	strcat(path,"/AppData/");	
+	strcat(path,filename);	
 	err = FSPathMakeRef ((unsigned char*)path,&ref,NULL);
-	if ( err!=noErr ) return false;
+	if ( err!=noErr ) return false;	
 	err = FSGetCatalogInfo (&ref,kFSCatInfoNone, NULL, NULL,  &fs, NULL);
 	if ( err!=noErr ) return false;
 
@@ -219,16 +218,19 @@ static bool MacOpenAVI(MacAVI* p, const char* filename, GWorldPtr gw, Ptr buffer
       p->media = GetTrackMedia(t);
       p->sdh = (SampleDescriptionHandle)(NewHandle(0));
       GetMediaSampleDescription(p->media, 0, p->sdh);
-      SetMovieGWorld(p->m, gw, GetGWorldDevice(gw));
+        
+//        GDHandle GetGWorldDevice (GWorldPtr offscreenGWorld);
+
+      SetMovieGWorld(p->m, gw, NULL);
 
       Rect portRect;
 
-      GetPortBounds(gw, &portRect);
-
-      SetMovieBox(p->m, &portRect);
-      p->frameCount = MacGetFrameCount(p);
-      GoToBeginningOfMovie(p->m);
-      MacGrabAVIFrame(p, 0);
+//      GetPortBounds(gw, &portRect);
+//
+//      SetMovieBox(p->m, &portRect);
+//      p->frameCount = MacGetFrameCount(p);
+//      GoToBeginningOfMovie(p->m);
+//      MacGrabAVIFrame(p, 0);
       break;
     }
   }
@@ -317,23 +319,23 @@ static void GWorldToBuffer(GWorldPtr gw, Ptr buffer)
 {
   Ptr src, dest, srcbase;
   dest = buffer;
-  PixMapHandle pmh = GetGWorldPixMap(gw);
-  srcbase = GetPixBaseAddr(pmh);
-  SInt32 x, y;
-  SInt32 rowBytes = 0x3FFF & (**pmh).rowBytes;
-  SInt32 xMax = (**pmh).bounds.right - (**pmh).bounds.left;
-  SInt32 yMax = (**pmh).bounds.bottom - (**pmh).bounds.top;
-  srcbase += (yMax-1)*rowBytes;
-  for(y = 0; y < yMax; ++y, srcbase -= rowBytes)
-  {
-    src = srcbase;
-    for(x = 0; x < xMax; ++x, dest += 4, src += 4)
-    {
-      dest[0] = src[1];
-      dest[1] = src[2];
-      dest[2] = src[3];
-    }
-  }
+//  PixMapHandle pmh = GetGWorldPixMap(gw);
+//  srcbase = GetPixBaseAddr(pmh);
+//  SInt32 x, y;
+//  SInt32 rowBytes = 0x3FFF & (**pmh).rowBytes;
+//  SInt32 xMax = (**pmh).bounds.right - (**pmh).bounds.left;
+//  SInt32 yMax = (**pmh).bounds.bottom - (**pmh).bounds.top;
+//  srcbase += (yMax-1)*rowBytes;
+//  for(y = 0; y < yMax; ++y, srcbase -= rowBytes)
+//  {
+//    src = srcbase;
+//    for(x = 0; x < xMax; ++x, dest += 4, src += 4)
+//    {
+//      dest[0] = src[1];
+//      dest[1] = src[2];
+//      dest[2] = src[3];
+//    }
+//  }
 }
 
 // grab the frame and retun it in the buffer suitable for passing to glTexImage2D
@@ -375,17 +377,17 @@ Ptr MacGrabAVIFrame(MacAVIRef inRef, int frame)
 sysMovie::platimp::platimp(): playing(false), lasttime(0), texid(0), gworld(0), buffer(0),
 								lastframe(0),millisPerFrame(0),curframe(0)
 {
- 	memset(&avi, 0x0, sizeof(avi));
+ 	memset(&avi, 0x0, sizeof(avi)); 
 
 	Rect r = {0, 0, 256, 256};
 	buffer = NewPtr(256*256*4);
-	NewGWorld(&gworld, 32, &r, NULL, NULL, 0);
-	LockPixels(GetGWorldPixMap(gworld));
+	QTNewGWorld(&gworld, 32, &r, NULL, NULL, 0);
+//	LockPixels(GetGWorldPixMap(gworld));
 }
 
-sysMovie::platimp::~platimp()
+sysMovie::platimp::~platimp() 
 {
 	MacDisposeAVI(&avi);
 	DisposePtr(buffer);
-	DisposeGWorld(gworld);
+//	DisposeGWorld(gworld);
 }

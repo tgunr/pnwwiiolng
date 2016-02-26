@@ -1,4 +1,3 @@
-#include <syscfg.h> // Path is project specific.
 #include <OpenGL/OpenGL.h>
 
 #include "ddp.h"
@@ -12,6 +11,8 @@
 #include "rn/rnmain.h"
 #include "mem/mem.h"
 #include "dimain.h"
+#include <unistd.h>
+#include <pthread.h>
 
 #if USE_OSG
 #include "osg/osgGame.h"
@@ -41,12 +42,16 @@ void sysmainCommandLine(int argc, char** argv)
 	_argv = argv;
 
 #if RELEASE_CLIENT == 0
-	WantDataDir = 1;
 	HasKeyFile = 1;
-	WantedWindow = 1;
 #endif
 
 	mngoptParse("");
+
+#if platOS == OS_MACOS
+#if RELEASE_CLIENT == 1
+        WantedWindow = true;
+    #endif
+#endif
 }
 
 static size_t frames = 0;
@@ -54,14 +59,14 @@ static size_t frames = 0;
 pthread_t mainthread = NULL;
 
 int sysmain()
-{
+{	 
 	unlink(Fio::LogFileName()) ;
 
 	running = 1;
 
 	if(sysmainInitApp() != 0)
 	{
-		printf("App was not able to initialize!\n");
+		printf("sysmainInitApp: App was not able to initialize!\n");
 		exit(0);
 	}
 
@@ -69,31 +74,29 @@ int sysmain()
 
 	if(!piInit())
 	{
-		printf("piInit failed!\n");
-		printf("App was not able to initialize!\n");
+		printf("piInit: App was not able to initialize!\n");
 		exit(0);
 	}
 
 #if USE_OSG
 	if(!osgGameInit())
 	{
-		printf("App was not able to initialize!\n");
+		printf("osgGameInit: App was not able to initialize!\n");
 		exit(0);
 	}
-#else
+#else	
 	if(!rnmainGetOnlineSetting())
 	{
-		printf("App was not able to initialize!\n");
+		printf("rnmainGetOnlineSetting: App was not able to initialize!\n");
 		exit(0);
 	}
 
 	if(!rnmainInit())
 	{
-		printf("rnmainInit failed!\n");
-		printf("App was not able to initialize!\n");
+		printf("rnmainInit: App was not able to initialize!\n");
 		exit(0);
 	}
-#endif
+#endif		
 
     mainthread = pthread_self(); // used for debugging
 
@@ -144,14 +147,14 @@ int sysmainInitApp()
 #endif // RELEASE_CLIENT
 
 	memInit();
-	/*
-	fioSet(WantDataDir ? ISDIRECTORY : ISARCHIVE);
-	fiodSetPrepath(PREPATH);
+
+    fioSet(WantDataDir ? ISDIRECTORY : ISARCHIVE);
+	fiodSetPrepath(PREPATH);		
 
 	if(!WantDataDir)
 		sysmainAddArchives();
-	*/
-	b3DSoundEnable = 1; // always want 3D enabled with OpenAL
+
+    b3DSoundEnable = 1; // always want 3D enabled with OpenAL
 	//g_bRadialClutter = FALSE; // screwed on the mac at the moment
 
 	Enable_Log(LOG_ALL, WantedUserLogEnabled);
@@ -164,14 +167,14 @@ int sysmainInitApp()
 #endif
 	ddpSetDDRender(rnlogoRender);
 
-	if(!ddpCreateWnd(0, 0, WantedWidth, WantedHeight, 32, !WantedWindow, atoi(WantedVideoCard), WantedRefreshRate))
+	if(!ddpCreateWnd(0, 0, WantedWidth, WantedHeight, 32, !WantedWindow, atoi(WantedVideoCard), WantedRefreshRate)) 
 	{
 		printf("ddpCreateWnd failed!\n");
 		return -1;
 	}
 
 	return 0;
-}
+} 
 
 void sysmainQuit()
 {
@@ -179,7 +182,7 @@ void sysmainQuit()
 }
 
 void sysmainKillApp()
-{
+{	
 #if USE_OSG
 	osgGameKill();
 #endif
@@ -223,7 +226,6 @@ void sysmainAddArchives()
 		for(i = 0; i < numfiles; i++)
 		{
 			const char* s = fileList[i];
-			int len = strlen(s);
 			if(!strncmp(fileList[i], "playarc.w2", 10)) // old archives (will be removed soon)
 			{
 				fioaAddArchive(fileList[i]);
@@ -269,7 +271,7 @@ void sysmainAddArchives()
         fioaAddArchive(s);
         foundthem = true;
       }
-      else
+      else 
       {
         if(!strncmp(s, "playarc.w2", 10))
         {

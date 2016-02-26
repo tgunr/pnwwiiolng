@@ -538,7 +538,7 @@ class OALSource
     // buffer queue
     UInt32 GetQLength();
     UInt32 GetBuffersProcessed();
-    void SetBuffer (ALuint inBuffer, OALBuffer* inBuffer);
+    void SetBuffer (ALuint inAlBuffer, OALBuffer* inOalBuffer);
     ALuint GetBuffer ();
     void AddToQueue(ALuint inBufferToken, OALBuffer* inBuffer);
     void RemoveBuffersFromQueue(UInt32 inCount, ALuint* outBufferTokens);

@@ -1,14 +1,16 @@
-#include <syscfg.h> // Path is project specific.
 //
 // Date: Mon Jul 31 13:32:26 2000
 //
 // The code behind the messages the host will be sending to the chat server
 //
 // Copyright (c) 2000 Playnet, Inc., All Rights Reserved.
-// Not to be distributed in API form except as part of a
+// Not to be distributed in API form except as part of a 
 // compiled library.
 //
 // Originating Programmer: Marty "Vandal" Poulin
+
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "auth/authPack.h"
 #include "auth/authClientMessages.h"
@@ -76,19 +78,21 @@ void _clientRecvError(SINT32 teulIndex, const UCHAR* const data, SINT32 size, co
 //This function installs our two callbacks
 SINT32 authClientInstallCallbacks()
 {
-	BEGIN_CALLBACK_REGISTRATION(Auth::CallbackX)
+	BEGIN_CALLBACK_REGISTRATION(AUTHENTICATION_X)
 
-		// Request permission to join an arena with this version.
-		REGISTER_SENDER(ARENA_REQ_Y, _sendARENA_REQ, authARENA_REQ) ;
+		BEGIN_PAIRED_CALLBACKS()
+			// Request permission to join an arena with this version.
+			REGISTER_SENDER(ARENA_REQ_Y, _sendARENA_REQ, authARENA_REQ) ;
 
 		// Request permission to log in with this version (duplication ftw).
 		REGISTER_SENDER(APP_LAUNCH_REQ_Y, _sendAPP_LAUNCH_REQ, authAPP_LAUNCH_REQ) ;
 
+    END_PAIRED_CALLBACKS()
 		// Receive verification of app version.
-		REGISTER_RECEIVER(APP_VERIFY_Y, _recvAPP_VERIFY) ;
+		REGISTER_RECEIVER(APP_VERIFY_Y, _recvAPP_VERIFY, _APP_VERIFY) ;
 
 		// Receive launch permission.
-		REGISTER_RECEIVER(APP_LAUNCH_Y, _recvAPP_LAUNCH) ;
+		REGISTER_RECEIVER(APP_LAUNCH_Y, _recvAPP_LAUNCH, _APP_LAUNCH) ;
 
 	END_CALLBACK_REGISTRATION
 }

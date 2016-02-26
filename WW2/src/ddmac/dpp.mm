@@ -1,19 +1,11 @@
 
 #include "sysmac/syscfg.h"
-#include "pi.h"
 #include "ddp.h"
 #include "sysmain.h"
-#include "gl/glew.h"
-#include "vars.h"
-#include "uiMain.h"
-#include "cfgPrefs.h"
-#include "log.h"
-#include "GenerateHostTerrain.h"
 #include <sys/stat.h>
-
+#include "cfgPrefs.h"
 #import <Cocoa/Cocoa.h>
-#include <OpenGL/OpenGL.h>
-#include <OpenGL/CGLTypes.h>
+#include "endianess.h"
 
 EXTERN SINT32           ft10msticks;
 
@@ -25,7 +17,7 @@ static NSRect ddpRect,winRect,fullRect;
 static NSWindow* ddpWin=NULL;
 static NSOpenGLView* ddpView=NULL;
 static CGDirectDisplayID displayID;
-static CFDictionaryRef defaultMode, fullScreenMode;
+static CGDisplayModeRef defaultMode, fullScreenMode;
 static NSScreen* ddpScreen=NULL;
 
 static DDWND_DDRENDERFUNC	ddrenderfunc;
@@ -120,7 +112,7 @@ static void examineRenderer(int oglDisplayMask)
                 fullScreenAttributes = fullScreenAttrs_S;
                 windowedAttributes = windowedAttrs_S;
                 
-                NSOpenGLPixelFormatAttribute*p = fullScreenAttributes;
+                NSOpenGLPixelFormatAttribute *p = fullScreenAttributes;
                 while (*p != 0xffffffff )
                 {
                     if ( *p == 0x7fffffff )
@@ -161,7 +153,7 @@ static NSScreen* ddpGetScreen(int oglDisplayMask)
 
 void ddpHandleVsync()
 {
-	GLint params[1] = {g_enableVSync};
+	GLint params[1] = {(GLint)g_enableVSync};
     if (nsOpenGlContext!=NULL)
     {
         CGLSetParameter((CGLContextObj)[nsOpenGlContext CGLContextObj], kCGLCPSwapInterval, params);	
@@ -181,41 +173,36 @@ LOGICAL ddpCreateWnd(int x, int y, int width, int height, int inBpp, int fullscr
     
 	CGDirectDisplayID displayID = (CGDirectDisplayID)[[[ddpScreen deviceDescription] objectForKey:@"NSScreenNumber"] longValue];
     
-	defaultMode = CGDisplayCurrentMode(displayID);
+    defaultMode = CGDisplayCopyDisplayMode ( displayID );
+
+	fullScreenAttributes[NSOpenGLPFAColorSize] = (NSOpenGLPixelFormatAttribute)bpp;
+	fullScreenAttributes[NSOpenGLPFAScreenMask] = (NSOpenGLPixelFormatAttribute)CGDisplayIDToOpenGLDisplayMask(displayID);
+    fullScreenAttributes[NSOpenGLPFAFullScreen] = (NSOpenGLPixelFormatAttribute) true;
     
-	fullScreenAttributes[1] = (NSOpenGLPixelFormatAttribute)bpp;
-	fullScreenAttributes[9] = (NSOpenGLPixelFormatAttribute)CGDisplayIDToOpenGLDisplayMask(displayID);
-	windowedAttributes[1] = (NSOpenGLPixelFormatAttribute)bpp;
+	windowedAttributes[NSOpenGLPFAColorSize] = (NSOpenGLPixelFormatAttribute)bpp;
     
+    ddpView = [[NSOpenGLView alloc] initWithFrame:NSMakeRect(0, 0, width, height)
+                                      pixelFormat:[[[NSOpenGLPixelFormat alloc] initWithAttributes:windowedAttributes] autorelease]];
+    [ddpView retain];
+    context = [ddpView openGLContext];
+    if(!context) throw "Unable To Allocate OpenGL Window Context";
+    
+    NSRect screenRect = [ddpScreen frame];
+
     if ( ! fullscreen )
     {
-        height -= 20;
-        width -= 40;
-        ddpView = [[NSOpenGLView alloc] initWithFrame:NSMakeRect(0,0,width, height) 
-                                          pixelFormat:[[NSOpenGLPixelFormat alloc] initWithAttributes:windowedAttributes]];
-        [ddpView retain];
-        context = [ddpView openGLContext];
-        if(!context) throw "Unable To Allocate OpenGL Window Context";
+        winRect = NSMakeRect(screenRect.origin.x, screenRect.origin.y, screenRect.size.width, screenRect.size.height);
+        ddpWin = [[NSWindow alloc] initWithContentRect: winRect styleMask: NSBorderlessWindowMask backing: NSBackingStoreNonretained defer: NO];
+    } else {
         
-        NSRect screenRect = [ddpScreen frame];		
-        winRect = NSMakeRect(40,0,width, height);
+        winRect = NSMakeRect(0, 0, width, height);
+        ddpWin = [[NSWindow alloc] initWithContentRect: winRect styleMask: NSTitledWindowMask backing: NSBackingStoreNonretained defer: NO];
+    }
         //winRect.origin.x = screenRect.origin.x + (screenRect.size.width - winRect.size.width) / 2;
         //winRect.origin.y = screenRect.origin.y + (screenRect.size.height - winRect.size.height) / 2;
         
-        ddpWin = [[NSWindow alloc] initWithContentRect: winRect styleMask: NSTitledWindowMask backing: NSBackingStoreNonretained defer: NO];
-        [ddpWin setReleasedWhenClosed:NO];
-        [ddpWin setAcceptsMouseMovedEvents:NO];
-    }
-    else
-    {
-        fullScreenMode = CGDisplayBestModeForParametersAndRefreshRateWithProperty( displayID,
-                                                                                  bpp, width, height, refreshrate, kCGDisplayModeIsSafeForHardware, NULL);	
-        
-        NSOpenGLPixelFormat*pxx = [[NSOpenGLPixelFormat alloc] initWithAttributes:fullScreenAttributes];
-        context = [[NSOpenGLContext alloc] initWithFormat:pxx shareContext:nil];
-        
-        if(!context) throw "Unable To Allocate Fullscreen OpenGL Context";
-    }
+    [ddpWin setReleasedWhenClosed:NO];
+    [ddpWin setAcceptsMouseMovedEvents:NO];
     
     nsOpenGlContext = context;
 	
@@ -522,6 +509,24 @@ LOGICAL ddcapSave(UCHAR *bptr, UINT32 width, UINT32 height, char *bname)
 		
 		size = dib->bmiHeader.biSize + dib->bmiHeader.biSizeImage;
 		
+		NATIVE_TO_LITTLE_ENDIAN_16(bmfh.bfType);
+		NATIVE_TO_LITTLE_ENDIAN_32(bmfh.bfSize);
+		NATIVE_TO_LITTLE_ENDIAN_16(bmfh.bfReserved1);
+		NATIVE_TO_LITTLE_ENDIAN_16(bmfh.bfReserved2);
+		NATIVE_TO_LITTLE_ENDIAN_32(bmfh.bfOffBits);
+		
+		NATIVE_TO_LITTLE_ENDIAN_32(dib->bmiHeader.biSize);
+		NATIVE_TO_LITTLE_ENDIAN_32(dib->bmiHeader.biWidth);
+		NATIVE_TO_LITTLE_ENDIAN_32(dib->bmiHeader.biHeight);
+		NATIVE_TO_LITTLE_ENDIAN_16(dib->bmiHeader.biPlanes);
+		NATIVE_TO_LITTLE_ENDIAN_16(dib->bmiHeader.biBitCount);
+		NATIVE_TO_LITTLE_ENDIAN_32(dib->bmiHeader.biCompression);
+		NATIVE_TO_LITTLE_ENDIAN_32(dib->bmiHeader.biSizeImage);
+		NATIVE_TO_LITTLE_ENDIAN_32(dib->bmiHeader.biXPelsPerMeter);
+		NATIVE_TO_LITTLE_ENDIAN_32(dib->bmiHeader.biYPelsPerMeter);
+		NATIVE_TO_LITTLE_ENDIAN_32(dib->bmiHeader.biClrUsed);
+		NATIVE_TO_LITTLE_ENDIAN_32(dib->bmiHeader.biClrImportant);
+		
 		cf = fopen(bname, "wb+");
 		if(!cf) return FALSE;
 		
@@ -551,11 +556,11 @@ void sysGetMousePosition(SINT32* x, SINT32* y)
 		*y = ddpRect.size.height - pt.y;
 	}else
 	{
-        //		NSPoint pt = [NSEvent mouseLocation];
-		Point pt;
-		GetMouse(&pt);
-		*x = pt.h - ddpRect.origin.x;
-		*y = pt.v - ddpRect.origin.y;
+        NSPoint pt = [NSEvent mouseLocation];
+//		Point pt;
+//		GetMouse(&pt);
+		*x = pt.x - ddpRect.origin.x;
+		*y = pt.y - ddpRect.origin.y;
 	}
 }
 
@@ -571,9 +576,8 @@ int ddpGetHeight()
 
 void ddpHideApplication()
 {
-	CGDisplayErr err = CGReleaseAllDisplays();
-    
-    err = CGLClearDrawable( cgl_ctx );
+	CGReleaseAllDisplays();
+    CGLClearDrawable( cgl_ctx );
     
     if ( ddpWin )
     {
@@ -601,6 +605,7 @@ void ddpSetFullScreen(LOGICAL fullscreen)
 {
 	if(!canWindow && !fullscreen) return;
 	
+    CGError result;
     bool cap = true;
     cfgPrefsGetBool("app.capturealldisplays",&cap);
     
@@ -615,8 +620,8 @@ void ddpSetFullScreen(LOGICAL fullscreen)
         {
             CGDisplayCaptureWithOptions(displayID,kCGCaptureNoOptions);
         }
-        
-		CGDisplaySwitchToMode(displayID, fullScreenMode);
+
+        result = CGDisplaySetDisplayMode ( displayID, fullScreenMode, NULL );
 		CGRect displayBounds = CGDisplayBounds(displayID);
 		fullRect = NSMakeRect(displayBounds.origin.x,displayBounds.origin.y, displayBounds.size.width, displayBounds.size.height);
         
@@ -628,8 +633,8 @@ void ddpSetFullScreen(LOGICAL fullscreen)
 	}
     else
 	{
-		[nsOpenGlContext clearDrawable];
-		CGDisplaySwitchToMode(displayID, defaultMode);
+//		[nsOpenGlContext clearDrawable];
+        result = CGDisplaySetDisplayMode ( displayID, defaultMode, NULL );
 		CGReleaseAllDisplays();
         
 		[ddpWin setContentView: ddpView];
@@ -637,7 +642,10 @@ void ddpSetFullScreen(LOGICAL fullscreen)
 		ddpRect = winRect;
 	}
 	cgl_ctx = (CGLContextObj)[nsOpenGlContext CGLContextObj];
-	WantedBpp = bpp = TexBpp = CGDisplayBitsPerPixel(displayID); // deprecated in 10.6, should be 32 all the time
+    
+//    CGDisplayModeRef mode;
+//    CFStringRef modeStr = CGDisplayModeCopyPixelEncoding(mode);
+    WantedBpp = bpp = TexBpp = 32;
 	WantedWidth = ddpRect.size.width;
 	WantedHeight =  ddpRect.size.height;
     
