@@ -77,6 +77,7 @@ enum fpsWeaponTypes
 	FRSMOKE,
 	AMMO,
 	MAS36,
+	MAS40,
 	RG_G30,             // GERMAN GRENADIER
 	RG_VB,              // FRENCH GRENADIER
 	RG_MILLS,           // BRITISH GRENADIER
@@ -97,6 +98,7 @@ enum fpsWeaponTypes
 	COLT1911,
 	SPRINGFIELD1903,
 	GEW43,
+	GEW41,
 	M1THOMPSON,
 	MARK2,
 	BAZOOKA,
@@ -104,6 +106,10 @@ enum fpsWeaponTypes
 	M1903A3,
 	USSMOKE,
 	PIAT,
+	STENMK2,
+	M3A1,
+	MP34,
+	FG42G,
 	NUM_WEAPONS
 };
 // tolua_end
@@ -370,7 +376,7 @@ public:
 	FLOAT32				weaponBreathMultiplier;
 	FLOAT32				weaponPoseMultiplier;
 
-	SCHAR*				deployPivotBone;		// bone around which to pivot if deployed (nullptr if no pivot)
+	SCHAR*				deployPivotBone;		// bone around which to pivot if deployed (NULL if no pivot)
 
 	SINT32				rgFiringRules;			// enable special rules for kneeling rifle grenade firing
 	FLOAT32				rgFiringAngle;			// angle that the gun is pitched at
