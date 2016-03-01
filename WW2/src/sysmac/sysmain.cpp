@@ -221,20 +221,6 @@ void sysmainAddArchives()
 		}
 	}
 
-	if ( ! foundthem)
-	{
-		for(i = 0; i < numfiles; i++)
-		{
-			const char* s = fileList[i];
-			if(!strncmp(s, "playarc.w2", 10)) // old archives (will be removed soon)
-			{
-				fioaAddArchive(s);
-				foundthem = true;
-			}
-		}
-	}
-
-
 	if(fileList)
 	{
 		for(i = 0; i < numfiles; i++)

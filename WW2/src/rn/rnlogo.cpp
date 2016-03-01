@@ -297,9 +297,6 @@ void rnlogoSplash()
 	// force directory lookups
 	fioSet(ISDIRECTORY);
 
-	// set our prepath to our install directory
-	fiodSetPrepath((char *)".\\");
-
 	const char* texFile;
 
 	if(_isWidescreen()) texFile = _wideSplashScreen;
@@ -309,9 +306,6 @@ void rnlogoSplash()
 
 	// reset what mode we were in
 	fioSet(fioSwitch);
-
-	// set our prepath back to our data directory
-	fiodSetPrepath(PREPATH);
 
 	if(texid == -1) return;
 
