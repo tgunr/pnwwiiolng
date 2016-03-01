@@ -3,7 +3,7 @@
 //
 // Mission detail/check reply definitions
 //
-// Copyright (C) PlayNet, Inc 1999-2005 - All rights reserved.
+// Copyright (C) PlayNet, Inc 1999-2014 - All rights reserved.
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
@@ -15,7 +15,7 @@
 class MissionDetail : public MissionSynopsis
 {
 public:
-	MissionDetail() : m_result(MC_ERROR),m_timeLaunch(0),m_brigadeID(0)  { *m_desc=0; }
+	MissionDetail() : m_result(MC_ERROR),m_timeLaunch(0) { *m_desc=0; }
 	~MissionDetail() {}
 
 	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
@@ -27,7 +27,6 @@ public:
 	MISSION_CODE	m_result;			// Mission check result
 	UINT32			m_timeLaunch;		// Host unixtime of launch
 	char			m_desc[MapMiss::MISSION_DESC_LENGTH+1];
-	UINT32			m_brigadeID;		// Confirm the brigade ID
 };
 
 typedef teul_network_msg<MissionDetail> MISSION_DETAIL;

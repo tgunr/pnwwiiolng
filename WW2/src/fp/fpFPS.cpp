@@ -1611,7 +1611,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 				}
 			}
 		}
-		else if	(((stateFlags & STATE_AIM) && ((!fpsWeapons[currentWeaponModel].deployPivotBone) || currentWeaponModel == BAR)) ||
+		else if	(((stateFlags & STATE_AIM) && ((!fpsWeapons[currentWeaponModel].deployPivotBone) || currentWeaponModel == BAR || currentWeaponModel == FG42G)) ||
 				(((fpsWeapons[currentWeaponModel].deployPivotBone) && ((stateFlags & (STATE_DEPLOYED|STATE_RELOADING|STATE_LOOK_LEFT|STATE_LOOK_RIGHT|STATE_DEPLOYING|STATE_NEEDS_RECYCLE|STAT2_NEEDS_RELOAD)) == STATE_DEPLOYED))))
 		{
 //			if ((currentFPSstate == RELOAD) || (currentFPSstate == RECYCLE) || (currentFPSstate == RELOAD2) || (currentFPSstate == RELOAD3) || (currentFPSstate == THROW))
@@ -1675,18 +1675,11 @@ fpsWeaponStates fpFPSDetermineNextState ()
 
 				if(fpsWeapons[currentWeaponModel].placedObject)
 				{
-					if(PlayerClient()->IsMissionLeader() && !fpsTrooper.isParatroop)
-					{
-						vehmainFRUBuild();
-					}
-					else
-					{
-						// we piggy back on this variable to get the type (kind of a hack)
-						SINT32 type = (SINT32)currentGameWeapon->NumRoundsAmmoLeft[0];
+					// we piggy back on this variable to get the type (kind of a hack)
+					SINT32 type = (SINT32)currentGameWeapon->NumRoundsAmmoLeft[0];
 
-						// create a new ppo
-						fpPPOCreate(type);
-					}
+					// create a new ppo
+					fpPPOCreate(type);
 				}
 
 				if(fpsWeapons[currentWeaponModel].clipBullets == -1)
@@ -6872,7 +6865,7 @@ UINT32 fpFPSControlInput (SINT32 param, UINT32 id, UINT32 reserve)
 	// but for now all we want all deployable weapons like this
 	if(param && id == IMAP_HOLD_FP_GUNSIGHT && fpsWeapons[currentWeaponModel].deployPivotBone && (!gCustomTerrain || !fpsTrooper.wading))
 	{
-		// BAR can aim OR deploy - it is up to players how to map this in the keymapper
+		// BAR & FG42 can aim OR deploy - it is up to players how to map this in the keymapper
 		/*
 		deployOK = (fpsCheckDeploy(currentWeaponModel != BAR)) ? 1 : 0;
 
@@ -6882,7 +6875,7 @@ UINT32 fpFPSControlInput (SINT32 param, UINT32 id, UINT32 reserve)
 		*/
 
 		// lets see if we can deploy
-		if(deployed || (currentWeaponModel != BAR))
+		if ( deployed || (currentWeaponModel != BAR && currentWeaponModel != FG42G) )
 			id = IMAP_HOLD_FP_DEPLOY;
 	}
 
@@ -8184,6 +8177,7 @@ LOGICAL	fpFPSGetFirePoint(OBJECT* pObject, piMATRIX* pMatrix, bool visual)
 	FLOAT64 ahc = fpsWeapons[currentWeaponModel].aimHorizontalCorrection;
 	FLOAT64 avc = fpsWeapons[currentWeaponModel].aimVerticalCorrection;
 
+	// HACK: Override offsets for BAR when deployed.
 	if(currentWeaponModel == BAR && fpFPSIsDeployed())
 	{
 		static FLOAT64 barAHC = .26;
@@ -12084,7 +12078,7 @@ LOGICAL fpsCheckDeploy(bool doShake)
 		    }
         }
 
-		if (!retVal && doShake && currentWeaponModel != BAR)
+		if (!retVal && doShake && currentWeaponModel != BAR && currentWeaponModel != FG42G)
 		{
 			persShakeHead();
 		}
@@ -12118,7 +12112,7 @@ LOGICAL fpsCheckDeploy(bool doShake)
 			retVal = FALSE;
 		}
 
-		if (!retVal && doShake && currentWeaponModel != BAR)
+		if (!retVal && doShake && currentWeaponModel != BAR && currentWeaponModel != FG42G)
 		{
 			persShakeHead();
 		}

@@ -161,17 +161,23 @@ MissionSynopsis::packer(LOGICAL mode, ACTION_OBJECT* const a)
 {
 	a->packer(mode, &m_missionID, 0);
 
-	a->packer(mode, m_isCurrent);			// |
-	a->packer(mode, m_hasMobileSpawn);		// |
-	a->packer(mode, m_isOpen);				// } 8 bits
-	a->packer(mode, m_canMobileSpawn);		// |
-	a->packer(mode, &m_type, 4);			// |
+	a->packer(mode, m_isCurrent);      // |
+	a->packer(mode, m_hasMobileSpawn); // |
+	a->packer(mode, m_isOpen);         // } 8 bits
+	a->packer(mode, m_canMobileSpawn); // |
+	a->packer(mode, &m_type, 4);       // |
 
 	a->packer(mode, &m_subType, 4);
 	a->packer(mode, &m_population, 4);
 
-	a->offset = wwiiPackFullObjID(mode, a->packed, a->offset, &m_origin, 0);					// 48 bits
-	a->offset = wwiiPackFullObjID(mode, a->packed, a->offset, &m_target, 0);					// 48 bits
+	a->offset = wwiiPackFullObjID(mode, a->packed, a->offset, &m_origin, 0); // 48 bits
+	a->offset = wwiiPackFullObjID(mode, a->packed, a->offset, &m_target, 0); // 48 bits
+
+	a->offset = wwiiPackBrigadeID(mode, a->packed, a->offset, m_brigadeID, 0);
+	a->offset = wwiiPackCountry(mode, a->packed, a->offset, &m_countryID, 0);
+	// TODO: Less hard-coding numbers, more deriving them properly.
+	static_assert ( MAX_BRANCHES < 8 , "Packing code assumes branch ID fits in 3 bits." );
+	a->packer(mode, &m_branchID, 3);
 
 	a->packChatHandle(mode, &m_poster);
 
