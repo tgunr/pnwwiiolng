@@ -40,7 +40,6 @@ struct sysMovie::platimp
 };
 
 static void 	MacInitAVI();
-static void 	MacShutDownAVI();
 static bool 	MacOpenAVI(MacAVI* p, const char* filename, GWorldPtr gw, Ptr buffer);
 static SInt32	MacGetFrameCount(MacAVIRef inRef);
 static void		MacDisposeAVI(MacAVIRef inRef);
@@ -170,10 +169,6 @@ void MacInitAVI()
 	}
 }
 
-void MacShutDownAVI()
-{
-}
-
 static bool MacOpenAVI(MacAVI* p, const char* filename, GWorldPtr gw, Ptr buffer)
 {
   Movie mov = NULL;
@@ -223,8 +218,7 @@ static bool MacOpenAVI(MacAVI* p, const char* filename, GWorldPtr gw, Ptr buffer
 
       SetMovieGWorld(p->m, gw, NULL);
 
-      Rect portRect;
-
+//      Rect portRect;
 //      GetPortBounds(gw, &portRect);
 //
 //      SetMovieBox(p->m, &portRect);
@@ -317,6 +311,10 @@ void MacDisposeAVI(MacAVIRef inRef)
 // Note: the three problems could be fixed by other means at zero cost, as above
 static void GWorldToBuffer(GWorldPtr gw, Ptr buffer)
 {
+    /*
+     
+     TBD - what the heci this function suposed to do?  RIght now it does nothing
+     
   Ptr src, dest, srcbase;
   dest = buffer;
 //  PixMapHandle pmh = GetGWorldPixMap(gw);
@@ -336,6 +334,7 @@ static void GWorldToBuffer(GWorldPtr gw, Ptr buffer)
 //      dest[2] = src[3];
 //    }
 //  }
+     */
 }
 
 // grab the frame and retun it in the buffer suitable for passing to glTexImage2D

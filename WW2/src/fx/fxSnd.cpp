@@ -66,7 +66,10 @@ static void _releaseActiveSound(FXSOUND* s);
 static void _playTrailSound(FXSOUND* s);
 static void _freeSound(SINT32 ID);
 
+#if platOS == OS_WIN32
 static LOGICAL _calculateVolumeAndPan(FXSOUND* s);
+#endif
+
 static LOGICAL _playImmediateSound(FXSOUND* s);
 
 static FXSOUND* _getNewSound();
@@ -1341,6 +1344,7 @@ SINT32 fxSndGetNewSound()
     return s->ID;
 }
 
+#if platOS == OS_WIN32
 //////////////////////////////////////////////////////
 // Function: _calculateVolumeAndPan
 // Description:
@@ -1446,6 +1450,7 @@ LOGICAL _calculateVolumeAndPan(FXSOUND* s)
 
     return TRUE;
 }
+#endif
 
 //////////////////////////////////////////////////////
 // Function: _getNewSound

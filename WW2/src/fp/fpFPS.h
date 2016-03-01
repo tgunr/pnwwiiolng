@@ -178,7 +178,7 @@ extern void		fpFPSResupplySelf (struct vehVehicle*vehicle);
 extern void		fpFPSResupplySelf (const char* from); // tolua_export
 extern void		fpFPSResupplySelf (const wchar_t* from);
 extern void		fpFPSSetStandMaterial (SINT32 matid);
-extern SINT32		fpFPSPlaySound(SCHAR* sound);
+extern SINT32		fpFPSPlaySound(const SCHAR* sound);
 extern SINT32		fpFPSGetAmmoTypeNum (bool forType = false);
 extern SINT32		fpFPSGetAmmoTypeNumByWeapon (SINT32 weaponType, weapWeapon* weapon = nullptr);
 extern void		fpFPSLeanOff();
@@ -194,9 +194,9 @@ extern void fpFPSCancelPPO();
 extern void        fpFPSHitBuilderObject(const StratDB::StratObject* pStatue);
 
 extern SINT32		fpFPSfxPlayFireSound(char* soundName, SINT32 soundPriority, SINT32 soundType, FLOAT64VECTOR* soundPosition, OBJECT* soundObject);
-extern SINT32		fpFPSfxPlayNormalSound(char* soundName, SINT32 soundPriority, SINT32 soundType, FLOAT64VECTOR* soundPosition, OBJECT* soundObject);
+extern SINT32		fpFPSfxPlayNormalSound(const char* soundName, SINT32 soundPriority, SINT32 soundType, FLOAT64VECTOR* soundPosition, OBJECT* soundObject);
 extern SINT32		fpFPSfxPlayTPSMovementSound(char* soundName, OBJECT* soundObject, FLOAT32 fMin, FLOAT32 fMax, void* model, void (*pFn)(void* data));
-extern SINT32		fpFPSfxPlayTPSSingleSound(char* soundName, OBJECT* soundObject, FLOAT32 fMin, FLOAT32 fMax);
+extern SINT32		fpFPSfxPlayTPSSingleSound(const char* soundName, OBJECT* soundObject, FLOAT32 fMin, FLOAT32 fMax);
 
 extern void		fpFPSSetInfantrySurfaceID (SINT32 infSurfID, struct trnCDTerrainObject* TO);
 extern void		fpFPSSetStandingOnVehicle (LOGICAL value);

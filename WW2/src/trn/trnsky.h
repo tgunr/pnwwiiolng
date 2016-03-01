@@ -59,7 +59,7 @@ enum ENUM_TERRAIN_COLOR
 
 };
 
-	extern LOGICAL trnskyInit(SINT8* name, SINT32 mesh, FLOAT32 scale);
+	extern LOGICAL trnskyInit(const SINT8* name, SINT32 mesh, FLOAT32 scale);
 	extern LOGICAL trnskyUpdate(void);
 	extern LOGICAL trnskyDrawDeprecated(void);
     extern void trnskyDraw();

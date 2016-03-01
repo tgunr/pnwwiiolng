@@ -30,9 +30,6 @@ static FLOAT32 g_fSinTbl[360];
 static FLOAT32 g_fPI = PI;
 
 static SINT32 g_iTexID = -1;
-static SINT32 g_uvCount = 0;
-
-static piUV g_uv[MAX_UV][2];
 
 struct MATERIALPROP
 {
@@ -227,7 +224,7 @@ LOGICAL _initMaterialSounds()
                              (xmlInputReadCallback)fioRead,
                              (xmlInputCloseCallback)fioClose);
 
-    SCHAR* name = "fx/xml/materialprops.xml";
+    const SCHAR* name = "fx/xml/materialprops.xml";
 
     xmlDocPtr doc = xmlReadFile(name, nullptr, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
 
@@ -258,7 +255,7 @@ LOGICAL _initMaterialSounds()
 // Description:
 ////////////////////////////////////////////////////////
 LOGICAL fxUtlGetRandomHitSound(const SCHAR* material,
-                               SCHAR** sound,
+                               const SCHAR** sound,
                                FLOAT32* minvolume,
                                FLOAT32* maxvolumeenergy)
 {

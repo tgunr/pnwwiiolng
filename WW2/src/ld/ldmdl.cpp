@@ -60,9 +60,9 @@ normalsListItem*		normalsList;
 
 INLINE void Normalize(piVECTOR* lpa)
 {
-float inv_mod;
+    float inv_mod = lpa->x * lpa->x + lpa->y * lpa->y + lpa->z * lpa->z;
 
-	if (inv_mod = lpa->x * lpa->x + lpa->y * lpa->y + lpa->z * lpa->z)
+	if ( inv_mod > 0 )
 	{
 		lpa->x *= (inv_mod = (float)(1.0 / sqrt(inv_mod)));
 		lpa->y *= inv_mod;
@@ -80,7 +80,6 @@ INLINE void CrossProduct(piVECTOR* lpd, piVECTOR* lpa, piVECTOR* lpb)
 }
 
 static LOGICAL _UpdateGroupFilteringAndBlendStatus(OBJECT * ObjGrp);
-static LOGICAL _SetObjectToNoFiltering(OBJECT * Obj);
 
 // get the bounding elements
 LOGICAL ldmdlGetBounds(OBJECT* lpobj)
@@ -1514,8 +1513,6 @@ static OBJECT* _reduceTrees(OBJECT* o)
 
     while(sibling)
     {
-        piVectorConstPtr sibpos = sibling->ImmutablePositions();
-
         // If this has a comment, leave, since it may be for a specific tree
         if(!sibling->comment)
         {
@@ -1819,42 +1816,6 @@ piINDICES*	pt;
 }
 
 
-LOGICAL _SetObjectToNoFiltering(OBJECT * Obj)
-{
-OBJECT * ObjAtt, *ObjSib;
-
-	if (Obj == nullptr)
-	{
-		return 0;
-	}
-
-	ObjSib = Obj;
-
-	while (ObjSib != nullptr)
-	{
-		if (!(ObjSib->flags & OBJECT_NOTOBJECT))
-		{
-			ObjAtt = ObjSib;
-
-			while (ObjAtt != nullptr)
-			{
-				ObjAtt->flags |= OBJECT_NOFILTER;
-
-				ObjAtt = ObjAtt->attached;
-			}
-		}
-
-		if (ObjSib->child != nullptr)
-		{
-			_SetObjectToNoFiltering(ObjSib->child);
-		}
-
-		ObjSib = ObjSib->sibling;
-	}
-
-	return (TRUE);
-}
-
 // traverses tree, if "nofiltering" found, sets it and subtree to no filter
 LOGICAL ldmdlUpdateGroupFilteringAndBlendStatus(OBJECT * ObjGrp)
 {
@@ -1934,32 +1895,6 @@ SINT8*		ptr;
 
 	return (TRUE);
 }
-
-#ifdef OLD
-LOGICAL ldmdlUpdateGroupFilteringStatus(OBJECT * ObjGrp)
-{
-SINT8*		ptr;
-
-	if (ObjGrp == nullptr)
-	{
-		return (TRUE);
-	}
-
-	if (!obmainFindCommentName(&ptr, ObjGrp->comment, "nofiltering"))
-	{
-		return (TRUE);
-	}
-
-	// ok set entire tree to "NOFILTERING"
-
-	// Does NOT do siblings at top level!
-	obmainSetFlagsInThisTree(ObjGrp, OBJECT_NOFILTER);
-
-	//_SetObjectToNoFiltering(ObjGrp->child);
-
-	return (TRUE);
-}
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // Return true if two objects can be merged.

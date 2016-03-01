@@ -22,7 +22,7 @@
 #define NUM_ALT_TEXTURES 7
 
 static float mapverts[SDM_SUPERCELL_OCTETS_XY1][2];
-static char* alttexiconname[NUM_ALT_TEXTURES] =
+static const char* alttexiconname[NUM_ALT_TEXTURES] =
 {
 	"water1",
     "dunes1",

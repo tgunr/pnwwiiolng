@@ -87,15 +87,15 @@ SuperCellMapView::SuperCellMapView() : View(),
 	_pandirx(0),
 	_pandiry(0),
 	_panscale(0),
-	_panlength(0),
 	_startpanscale(0),
 	_stoppanscale(0),
+    _panlength(0),
 	_alpha(1.0f),
 	_pantime(0),
 	_panstop(0),
-	_panstage(0),
 	_autoscale(0),
 	_autoscaletime(0),
+    _panstage(0),
 	_objectScaleCheck(false),
 	_mapLocked(false)
 {
@@ -948,8 +948,6 @@ void SuperCellMapView::UpdatePan()
 	{
 		case 1: // scaling up
 		{
-			bool done = false;
-
 			if(_scacross < _panscale && _pantime < _panstop)
 			{
 				float panpct	= (float)(frametime - _pantime)/(float)PAN_TIME_HEIGHT;

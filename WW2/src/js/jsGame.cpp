@@ -575,8 +575,6 @@ const StratDB::StratObject* jsGame::GetOfflineSpawn(const StratDB::StratObject* 
 		}
 	}
 
-	StratDB::StratObject::ChildList::iterator itr = children.begin();
-
 	if(!Online && !spawner)
 	{
 		StratDB::StratObject::ChildList::iterator itr = children.begin();
@@ -743,7 +741,8 @@ JS_FUNCTION_DEF(jsGame, spawn)
 		}
 	}
 
-	WEAPON_SERIAL blah={0};
+    WEAPON_SERIAL blah;
+    memset(&blah, 0, sizeof(WEAPON_SERIAL));
 	vehcommSendVehicleRequest(vehtype->VehicleTypeNum,&blah);
 
 	return JS_TRUE;
@@ -787,7 +786,8 @@ JS_FUNCTION_DEF(jsGame, spawnAt)
 			// do old game spawn stuff here
 			mlSetSpawnStuff(0, 0, -1, 1);
 			mlSetMobileSpawnStuff(0, at.x, at.y, at.z, yaw);
-			WEAPON_SERIAL blah={0};
+			WEAPON_SERIAL blah;
+            memset(&blah, 0, sizeof(WEAPON_SERIAL));
 			vehcommSendVehicleRequest(vehtype->VehicleTypeNum, &blah);
 		}
 
@@ -919,7 +919,6 @@ JS_FUNCTION_DEF(jsGame, getkeymaps)
 
 	int32 category = 0;
 	int32 vehidx = -1;
-	int32 ezLevel = 1;
 
 	if(argc > 0)
 		JS_ValueToInt32(ctx, argv[0], &category);
@@ -2656,9 +2655,6 @@ JSBool jsGame::GetProperty(JSContext* ctx, int propid, jsval* val)
 	//#endif
 	#endif
 	#endif
-					if(vtype->OnlineOnly)
-						bool stop = true;
-
 					if(!vtype->OnlineOnly || fioQuery() == ISDIRECTORY || buzzardoffline)
 					{
 						jsVehtype* jstype = new jsVehtype(vtype);

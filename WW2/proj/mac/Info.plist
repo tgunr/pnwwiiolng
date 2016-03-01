@@ -22,8 +22,55 @@
 	<string>pn12</string>
 	<key>CFBundleVersion</key>
 	<string>1.35.0.0</string>
+        <key>GitShaHash</key>
+        <string></string>
+        <key>GitState</key>
+        <string></string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.simulation-games</string>
+        <key>LSMinimumSystemVersion</key>
+        <string>10.9</string>
+        <key>NSAppTransportSecurity</key>
+        <dict>
+                <key>NSExceptionDomains</key>
+                <dict>
+                        <key>battlegroundeurope.com</key>
+                        <dict>
+                                <key>NSExceptionAllowsInsecureHTTPLoads</key>
+                                <true/>
+                                <key>NSIncludesSubdomains</key>
+                                <true/>
+                        </dict>
+                        <key>battlegroundeurope.net</key>
+                        <dict>
+                                <key>NSExceptionAllowsInsecureHTTPLoads</key>
+                                <true/>
+                                <key>NSIncludesSubdomains</key>
+                                <true/>
+                        </dict>
+                        <key>knightairsoft.com</key>
+                        <dict>
+                                <key>NSIncludesSubdomains</key>
+                                <true/>
+                                <key>NSThirdPartyExceptionAllowsInsecureHTTPLoads</key>
+                                <true/>
+                        </dict>
+                        <key>wwiionline.com</key>
+                        <dict>
+                                <key>NSExceptionAllowsInsecureHTTPLoads</key>
+                                <true/>
+                                <key>NSIncludesSubdomains</key>
+                                <true/>
+                        </dict>
+                        <key>youtube.com</key>
+                        <dict>
+                                <key>NSIncludesSubdomains</key>
+                                <true/>
+                                <key>NSThirdPartyExceptionAllowsInsecureHTTPLoads</key>
+                                <true/>
+                        </dict>
+                </dict>
+        </dict>
 	<key>NSHumanReadableCopyright</key>
 	<string>Copyright © 1999-2016 Playnet, Inc.  All Rights Reserved.</string>
 	<key>NSMainNibFile</key>

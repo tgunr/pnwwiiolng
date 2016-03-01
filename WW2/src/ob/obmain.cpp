@@ -351,7 +351,7 @@ void obmainFreeObjectMemory(OBJECT*  lpobj)
                 }
                 else
                 {
-                    models.insert( std::pair<const char*,int>(mi->GetModelName(),1) );
+                    models.insert( std::pair<char*,int>(mi->GetModelName(),1) );
                 }
             }
 
@@ -1262,7 +1262,7 @@ OBJECT* obmainGetNextSubobject(OBJECT* lpobj)
 	return(lpobj->sibling);
 }
 
-LOGICAL obmainFindCrackedComment(SINT8** retptr, SINT8* comment, SINT8* cmp)
+LOGICAL obmainFindCrackedComment(SINT8** retptr, SINT8* comment, const SINT8* cmp)
 {
 SINT8*	pre, *ptr;
 
@@ -1295,7 +1295,7 @@ SINT8*	pre, *ptr;
 	return(FALSE);
 }
 
-LOGICAL obmainFindCrackedCommentFirstPart(SINT8** retptr, SINT8* comment, SINT8* cmp)
+LOGICAL obmainFindCrackedCommentFirstPart(SINT8** retptr, SINT8* comment, const SINT8* cmp)
 {
 	SINT8*	pre, *ptr;
 	int len;
@@ -1328,7 +1328,7 @@ LOGICAL obmainFindCrackedCommentFirstPart(SINT8** retptr, SINT8* comment, SINT8*
 
 	return(FALSE);
 }
-LOGICAL obmainFindCommentName(SINT8** retptr, SINT8* comment, SINT8* cmp)
+LOGICAL obmainFindCommentName(SINT8** retptr, SINT8* comment, const SINT8* cmp)
 {
 SINT8*	pre, *ptr;
 
@@ -1371,7 +1371,7 @@ SINT8*	pre, *ptr;
 	return(FALSE);
 }
 
-LOGICAL obmainFindCommentFirstPartName(SINT8** retptr, SINT8* comment, SINT8* cmp)
+LOGICAL obmainFindCommentFirstPartName(SINT8** retptr, SINT8* comment, const SINT8* cmp)
 {
 	SINT8*	pre, *ptr;
 
@@ -1416,7 +1416,7 @@ LOGICAL obmainFindCommentFirstPartName(SINT8** retptr, SINT8* comment, SINT8* cm
 	return(FALSE);
 }
 
-LOGICAL obmainFindComment(OBJECT** retobj, OBJECT* lpmain, char* comment)
+LOGICAL obmainFindComment(OBJECT** retobj, OBJECT* lpmain, const char* comment)
 {
 SINT8*		ptr;
 OBJECT*    lpobj;
@@ -1483,7 +1483,7 @@ OBJECT*    lpobj;
 	return(retval);
 }
 
-LOGICAL obmainFindCommentFirstPartCallback(OBJECT* lpmain, char* comment, UINT32 user, PROCESSCALLBACK callback)
+LOGICAL obmainFindCommentFirstPartCallback(OBJECT* lpmain, const char* comment, UINT32 user, PROCESSCALLBACK callback)
 {
 LOGICAL		retval=FALSE;
 SINT8*		ptr;
@@ -1576,7 +1576,7 @@ void obmainFindCallback(struct OBJECT* lpmain, FINDCALLBACK callback, void* user
 }
 
 
-LOGICAL obmainCreateObjectFull(OBJECT** newobj, char* name, int numverts, int numtris)
+LOGICAL obmainCreateObjectFull(OBJECT** newobj, const char* name, int numverts, int numtris)
 {
 	OBJECT*	lpobj;
 
@@ -1644,7 +1644,7 @@ LOGICAL obmainCreateObjectFull(OBJECT** newobj, char* name, int numverts, int nu
 	return(TRUE);
 }
 
-LOGICAL obmainCreateObject(OBJECT** newobj, char* name, int numverts, int numtris)
+LOGICAL obmainCreateObject(OBJECT** newobj, const char* name, int numverts, int numtris)
 {
 	return obmainCreateObjectFull(newobj, name, numverts, numtris);
 }

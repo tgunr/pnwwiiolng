@@ -1470,12 +1470,17 @@ JSBool jsClient::GetProperty(JSContext* ctx, int propid, jsval* val)
 			// only pass it back if its a new one
 			if(lastmissionresults != (int)client->LastMessageReceivedTime(ww2::Client::MISSION_RESULTS_TIME))
 			{
+                /*
+                 TODO: Send in whether or not the player was wounded into Mission Results
+                 
+                 NOTE: unsure whether code here is connected to above statement.
+                 
 				const PersonaSelection& persona = PlayerClient()->PersonaSelected();
-				// Player* player = playerGetPlayer();
-				// vehVehicle* vehicle = playerGetVehicle();
-				// vehVehicle* player = persGetPersonaVehiclePtr();
+				Player* player = playerGetPlayer();
+				vehVehicle* vehicle = playerGetVehicle();
+				vehVehicle* player = persGetPersonaVehiclePtr();
 
-				// TODO: Send in whether or not the player was wounded into Mission Results
+				 */
 
 				missionresults = new jsMissionResults(client->MissionResults());
 				lastmissionresults = client->LastMessageReceivedTime(ww2::Client::MISSION_RESULTS_TIME);
@@ -1925,6 +1930,9 @@ jsMission::jsMission(MissionDetail const& d)
 		case RESUPPLY:
 			DefineProperty("type",phui::js::ConstString( "Resupply"));
 		break;
+        default:
+            // TBD - why isn't SYSTEM_MISSION listed here?
+            break;
 	}
 
 	DefineProperty("subtype",INT_TO_JSVAL(detail.m_subType));
@@ -2134,7 +2142,7 @@ JSPropertySpec jsBrigade::jsproperties[] =
 
 jsBrigade::jsBrigade(BrigadeDetail const& d)
 			: phui::js::Object(&jsclass, jsfunctions,jsproperties)
-			, unit(0), detail(d), officernames(0), officerranks(0)
+			, unit(0), detail(d), officerranks(0), officernames(0)
 {
 	JS_CONSTRUCTOR_LOCK;
 	unit = HCUnit::Lookup(d.brigadeID());
@@ -2154,7 +2162,7 @@ jsBrigade::jsBrigade(BrigadeDetail const& d)
 
 jsBrigade::jsBrigade(BrigadeSummary const& s)
 			: phui::js::Object(&jsclass, jsfunctions,jsproperties)
-			, unit(0), officernames(0), officerranks(0)
+			, unit(0), officerranks(0), officernames(0)
 
 {
 	JS_CONSTRUCTOR_LOCK;
@@ -2176,7 +2184,7 @@ jsBrigade::jsBrigade(BrigadeSummary const& s)
 
 jsBrigade::jsBrigade(unsigned int brigadeid)
 			: phui::js::Object(&jsclass,jsfunctions,jsproperties)
-			, unit(0), officernames(0), officerranks(0)
+			, unit(0), officerranks(0), officernames(0)
 {
 	JS_CONSTRUCTOR_LOCK;
 	unit = HCUnit::Lookup(brigadeid);
@@ -4287,10 +4295,17 @@ JS_FUNCTION_DEF(jsClientState, paccess)
 
 JS_FUNCTION_DEF(jsClient, isavailable)
 {
+    
+#define AVAIL "available"
+#define INACT "inactive"
+    
 	jsPersonaSummary* summary = phui::js::Cast<jsPersonaSummary*>(ctx, argv[0]);
 	if(!summary) return JS_FALSE;
-	else if(summary->Summary().availability() == "available" || summary->Summary().availability() == "inactive") return JS_TRUE;
-	else return JS_FALSE; // "onleave", "banned", "delayed", "noswap", "arenalock", "notsubbed"
+	else if(strncmp(summary->Summary().availability(), AVAIL, strlen(AVAIL)) == 0 ||
+            strncmp(summary->Summary().availability(), INACT, strlen(INACT)) == 0)
+        return JS_TRUE;
+	else
+        return JS_FALSE; // "onleave", "banned", "delayed", "noswap", "arenalock", "notsubbed"
 }
 
 

@@ -111,9 +111,6 @@ public:
 			a->offset = packer(TEUL_UNPACK, a);
 		}
 
-	// Destructor
-	virtual ~Waypoint() {}
-
 	//Operators
 public:
 	bool operator == (const Waypoint& rhs) const;

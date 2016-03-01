@@ -134,8 +134,6 @@ void TangentSpaceGenerator::generate(piUNIFIED_VERTEX* vertices,
                                      unsigned int numtris,
                                      unsigned int flags)
 {
-    unsigned int vertex_count = numverts;
-
     piVectorConstPtr vx = piVectorConstPtr((piVECTOR*)&vertices->x, sizeof(piUNIFIED_VERTEX));
     piVectorConstPtr nx = piVectorConstPtr((piVECTOR*)&vertices->nx, sizeof(piUNIFIED_VERTEX));
     piTexCoordConstPtr tx = piTexCoordConstPtr((piUV*)&vertices->tu, sizeof(piUNIFIED_VERTEX));

@@ -125,8 +125,6 @@ LOGICAL fpTPSLoad (void)
 	{
 		for (j=0; j < TPS_NUM_LODS; j++)
 		{
-			if(j == 1)
-				bool stop = true;
 			if (fpTPSInfantryMeshFiles[i][j][0] != 0)
 			{
 //				Write_Log (LOG_FPS, LOG_INFO, "Country %d, LOD %d, loading mesh %s", i, j, fpTPSInfantryMeshFiles[i][j]);
@@ -591,22 +589,6 @@ const char* fpTPSCreateBlendKey(int pose, int move, int weap, int point, int typ
 	return strstr(key, "T");
 }
 
-static UINT32 _bitFields[12] =
-{
-	0x00000000,
-	0x00000001,
-	0x00000003,
-	0x00000007,
-	0x0000000F,
-	0x0000001F,
-	0x0000003F,
-	0x0000007F,
-	0x000000FF,
-	0x000001FF,
-	0x000003FF,
-	0x000007FF
-};
-
 UINT64 fpTPSCreateBlendID(int pose, int move, int weap, int point, int type)
 {
 	UINT64 ID = 0;
@@ -624,30 +606,6 @@ UINT64 fpTPSCreateBlendID(int pose, int move, int weap, int point, int type)
 
 	ID <<= tpsBlendPointBits;
 	ID |= point;
-
-	/*
-	// now unpack it to verify it
-	UINT64 newID = ID;
-
-	int newPoint = newID & _bitFields[tpsBlendPointBits];
-	newID >>= tpsBlendPointBits;
-
-	int newWeap = newID & _bitFields[tpsBlendWeapBits];
-	newID >>= tpsBlendWeapBits;
-
-	int newMove = newID & _bitFields[tpsBlendMoveBits];
-	newID >>= tpsBlendMoveBits;
-
-	int newPose = newID & _bitFields[tpsBlendPoseBits];
-	newID >>= tpsBlendPoseBits;
-
-	int newType = newID & _bitFields[tpsBlendTypeBits];
-
-	static UINT64 biggest = 0;
-
-	if(ID > biggest)
-		biggest = ID;
-	*/
 
 	return ID;
 }

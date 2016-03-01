@@ -77,7 +77,6 @@ public:
 		, m_active(false), m_missions(0), m_players(0), m_officers(0), m_objectiveCPID(nullObjID), m_mobileSpawns(0), m_canPostHere(false)
 		{ m_languages[0] = 0; }
 
-	virtual ~BrigadeSummary() {}
 
 	// Create from the network
 	explicit BrigadeSummary(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
@@ -126,8 +125,8 @@ class BrigadeSummaries
 public:
 	BrigadeSummaries() : m_error(false), m_count(0) { }
 	BrigadeSummaries(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
-	~BrigadeSummaries() { };
-	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
+
+    SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
 
 	// Send/Receive functions (defined as needed)
 	// Returns: error < 0  /  ok >= 0
@@ -155,7 +154,6 @@ public:
 		: BrigadeSummary(withBrigadeID, withParentID, withCountryID, withBranchID, withMovementType, withUnitClass, withHandle, withName, withNick, withRank, withHomeCP, withOwner, withOwnerRank)
 			{ m_motd[0] = m_motto[0] = 0; }
 	BrigadeDetail(UINT32 withBrigadeID=0) : BrigadeSummary(withBrigadeID) { m_motd[0] = m_motto[0] = 0; }
-	virtual ~BrigadeDetail() {}
 
 	// Packer
 	virtual SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) OVERRIDE_FN;
@@ -198,9 +196,6 @@ public:
 
 	// Construct from network object
 	BrigadeSelection(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); };
-
-	// Destructor
-	~BrigadeSelection() { };
 
 	// Network exchange functions
 	SINT32 send(SINT32 teulIndex);

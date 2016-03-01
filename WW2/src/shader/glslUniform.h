@@ -1,7 +1,12 @@
 #pragma once
 
+#include <string>
+#include <vector>
+#include <float.h>
+#include <math.h>
+
 #include "pi/pi.h"
-#include "math/vec4f.h"
+#include "vec4f.h"
 
 class Matrixf;
 class Matrixd;
@@ -75,23 +80,18 @@ public:
     };
 
     glslUniform();
-    glslUniform(Type type, const std::string& name, int numElements = 1, bool global = false);
+    glslUniform(Type type, const std::string& name, int numElements = 1);
 
     inline void dirty() {++_modifiedCount;}
 
     void SetOneTimeApply(bool flag) {_oneTimeApply = flag;}
-    void SetGlobal(bool flag) {global = flag;}
     void SetName(const std::string& name);
     void SetNumElements(unsigned int numElements);
     void AllocateDataArray();
     void Apply(GLint location) const;
-    inline bool isDirty()
+    inline bool isDirty() 
     {
         return _modifiedCount != _oldModifiedCount;
-    }
-    inline bool IsGlobal()
-    {
-        return global;
     }
     bool SetType(Type t);
     bool SetArray(std::vector<float>& array);
@@ -170,7 +170,6 @@ protected:
     mutable unsigned int _oldModifiedCount;
 
     bool _oneTimeApply;
-    bool global;
 
     std::string _name;
 

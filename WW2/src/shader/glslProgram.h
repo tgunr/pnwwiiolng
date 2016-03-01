@@ -11,18 +11,18 @@
 #include <vector>
 #include "wwii/wwiiHash.h"
 
-struct ActiveVarInfo
+struct ActiveVarInfo 
 {
     ActiveVarInfo() :
-        location(-1),
-        type(glslUniform::UNDEFINED),
+        location(-1), 
+        type(glslUniform::UNDEFINED), 
         size(-1),
         count(0)
     {
     }
 
     ActiveVarInfo(GLint l, GLenum t, GLint s) :
-        uniform(nullptr),
+        uniform(NULL),
         location(l),
         type(t),
         size(s),
@@ -44,14 +44,6 @@ public:
     glslProgram();
     virtual ~glslProgram();
 
-    struct eqstr
-    {
-        bool operator()(const char* s1, const char* s2) const
-        {
-            return strcmp(s1, s2) == 0;
-        }
-    };
-
     void DirtyProgram();
     void LinkProgram();
     void AddBindAttribLocation(const std::string& name, GLuint index);
@@ -71,7 +63,7 @@ public:
     void SetUseShininess(bool shininess) {useshininess = shininess;}
     void AddTransformFeedbackVarying(const char* p) {TransformFeedbackVaryings.push_back(p);}
 
-    void RemoveUniform(const char* name);
+    void RemoveUniform(const std::string &name);
 
     bool AddShader(glslShader* shader);
     bool GetProgramInfoLog(std::string& result) const;
@@ -82,14 +74,14 @@ public:
 
     typedef std::vector<ref_ptr<glslShader> > ShaderList;
 
-	using ActiveVarInfoMap = std::unordered_map<std::string, ActiveVarInfo>;
+    typedef std::unordered_map<std::string, ActiveVarInfo> ActiveVarInfoMap;
 
-    using AttribBindingList = std::unordered_map<std::string, GLuint>;
+    typedef std::unordered_map<std::string, GLuint> AttribBindingList;
 
-	using UniformList = std::unordered_map<const char*, glslUniform*, ConstCharHasher, eqstr>;
+    typedef std::unordered_map<std::string, glslUniform*> UniformList;
 
-	using UniformModifiedCountPair = std::pair<const glslUniform*, unsigned int>;
-	using LastAppliedUniformList = std::vector<UniformModifiedCountPair>;
+    typedef std::pair<const glslUniform*, unsigned int> UniformModifiedCountPair;
+    typedef std::vector<UniformModifiedCountPair> LastAppliedUniformList;
 
     const AttribBindingList& GetAttribBindingList() const {return _attribBindingList;}
 
@@ -100,22 +92,22 @@ public:
     inline bool UseShininess() {return useshininess;}
 
      inline GLint GetUniformLocation(const std::string& name) const
-    {
-        ActiveVarInfoMap::const_iterator itr = _uniformInfoMap.find(name);
-        return itr != _uniformInfoMap.end() ? itr->second.location : -1;
+    { 
+        ActiveVarInfoMap::const_iterator itr = _uniformInfoMap.find(name); 
+        return itr != _uniformInfoMap.end() ? itr->second.location : -1; 
     }
 
     inline GLint GetAttribLocation(const std::string& name) const
-    {
-        ActiveVarInfoMap::const_iterator itr = _attribInfoMap.find(name);
-        return itr != _attribInfoMap.end() ? itr->second.location : -1;
+    { 
+        ActiveVarInfoMap::const_iterator itr = _attribInfoMap.find(name); 
+        return itr != _attribInfoMap.end() ? itr->second.location : -1; 
     }
 
     inline const std::string& GetName() const {return _name;}
 
-    glslUniform* GetOrCreateUniform(const char* name, glslUniform::Type type, unsigned int numElements = 1);
+    glslUniform* GetOrCreateUniform(const std::string &name, glslUniform::Type type, unsigned int numElements = 1);
 
-    glslUniform* GetUniform(const char* name);
+    glslUniform* GetUniform(const std::string &name);
 
     unsigned int GetBindAttribLocation(const std::string& name);
 
@@ -149,4 +141,3 @@ protected:
     ActiveVarInfoMap _uniformInfoMap;
     ActiveVarInfoMap _attribInfoMap;
 };
-

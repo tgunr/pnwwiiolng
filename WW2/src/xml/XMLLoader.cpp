@@ -12,20 +12,20 @@
 // XMLLoader definitions
 XMLLoader::XMLLoader() :
 	_flags(XML_PARSE_DTDLOAD | XML_PARSE_RECOVER),
-	_handlerReturnScope(NODE),
 	_complete(false),
+    _xmlDoc(nullptr),
 	_path(""),
-	_xmlDoc(nullptr)
+    _handlerReturnScope(NODE)
 {
 	fioXmlRegisterInputCallbacks();
 }
 
 XMLLoader::XMLLoader(const char* path, xmlTagHandler def, int flags) :
 	_flags(flags),
-	_handlerReturnScope(NODE),
 	_complete(false),
+    _xmlDoc(nullptr),
 	_path(path),
-	_xmlDoc(nullptr)
+    _handlerReturnScope(NODE)
 {
 	if(def)
 		AddDefaultHandler(def);

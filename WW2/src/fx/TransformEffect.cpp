@@ -706,7 +706,7 @@ void ApplySpecial(struct vehVehicle* v)
 
     if(v->VehicleType->Type == VEH_TYPE_SEA)
     {
-        char* screws[2] =
+        const char* screws[2] =
         {
             "lscrew",
             "rscrew"
@@ -1866,7 +1866,7 @@ void TransformEffect::update()
             }
         }
        
-        if((_flags & REMOVE_ME_WHEN_DONE) && enablecount == 0 || _dead)
+        if(((_flags & REMOVE_ME_WHEN_DONE) && (enablecount == 0)) || _dead)
         {
             removelist.insert(this);
         }

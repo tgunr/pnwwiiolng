@@ -208,12 +208,12 @@ size_t fioaSeek(int fd, size_t offset, int from)
 			break;
 
 			case SEEK_END:
-				fioa.file[fd].marker = fioa.file[fd].datalen - offset;
+                if (fioa.file[fd].datalen >= offset)
+                    fioa.file[fd].marker = fioa.file[fd].datalen - offset;
+                else
+                    fioa.file[fd].marker = 0;
 			break;
 		}
-
-		if(fioa.file[fd].marker < 0)
-			fioa.file[fd].marker = 0;
 
 		if(fioa.file[fd].marker > fioa.file[fd].datalen)
 			fioa.file[fd].marker = fioa.file[fd].datalen;

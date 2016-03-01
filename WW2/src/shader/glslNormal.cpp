@@ -1,4 +1,3 @@
-#include <syscfg.h> // Path is project specific.
 /*--------------------------------------------------------------------------------------
 Module: glslNormal.cpp
 Description:
@@ -31,38 +30,11 @@ static ref_ptr<oglMaterial> shadowmaterial;
 #define MAX_NORMAL_PRIMITIVES   1000
 
 /*--------------------------------------------------------------------------------------
-Function: draw
-Description:
----------------------------------------------------------------------------------------*/
-static inline void draw(OBJECT* o)
-{
-    if(o->flag2 & OBJECT_USEBUFFERS)
-    {
-        if(o->meshContext && o->meshContext->IsBuffered())
-        {
-            o->meshContext->Draw();
-		}
-    }
-    else
-    {
-        piDrawScene(piPT_TRIANGLELIST,
-                    (float*)o->RenderPositions().ptr,
-                    (float*)o->RenderNormals().ptr,
-                    (float*)o->RenderTexCoords().ptr,
-                    nullptr,
-                    (unsigned short*)o->ptris,
-                    sizeof(piUNIFIED_VERTEX),
-                    o->numverts,
-                    o->numtris * 3);
-    }
-}
-
-/*--------------------------------------------------------------------------------------
 Function: drawFPS
 Description:
 ---------------------------------------------------------------------------------------*/
 static inline void drawFPS(gr2Mesh* mesh, int numverts, short* indices, int count)
-{
+{ 
     oglRenderIndexScene(oglPT_TRIANGLELIST,
                         oglVT_TVERTEX,
                         (void*)mesh->PNGT(),

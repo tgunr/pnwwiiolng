@@ -91,7 +91,6 @@ UINT32 mlUtilityFindComponentByName(mlComponent** ComponentPtr,
 									UCHAR* ComponentName,
 									mlComponent * Component)
 {
-	UINT32 Found = 0;
 	mlComponentListIterator it;
 
 	const size_t compNameLen = strlen((const char*)ComponentName);

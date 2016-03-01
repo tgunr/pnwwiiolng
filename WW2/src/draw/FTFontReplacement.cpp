@@ -119,7 +119,7 @@ FTFontWestern::FTFontWestern()
 #define FONT_WESTERN "Fonts/western"
 #define FONT_TYPEWRITER "Fonts/typewriter"
 
-char* use_font = FONT_WESTERN;
+const char* use_font = FONT_WESTERN;
 bool font_is_old_western = true;
 
 void FTFontWestern::init()

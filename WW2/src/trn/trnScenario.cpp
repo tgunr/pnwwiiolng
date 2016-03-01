@@ -420,7 +420,7 @@ public:
     {
         if(first)
         {
-            if(loadflag = LOADING_TERRAIN_TILE)
+            if(loadflag == LOADING_TERRAIN_TILE)
             {
                 TerrainTile* tt = (TerrainTile*)userData;
                 const char* s = xmlGetStringFromNode(node);
@@ -1430,7 +1430,7 @@ const char* TerrainScenario::GetMaterial(double x, double y, int id)
     float xx = (float)(x - WorldOriginOffset.x + SDM_OCTET_SIZE_2);
     float yy = (float)(y - WorldOriginOffset.y + SDM_OCTET_SIZE_2);
 
-    for(unsigned int i = tt->blends.size() - 1; i >= 0; i--)
+    for( int i = tt->blends.size() - 1; i >= 0; i--)
     {
         BlendMask& mask = *tt->blends[i];
 
@@ -1574,10 +1574,6 @@ void TerrainScenario::MaskWalkBlock(Image* img,
                 indextable >>= 2;
             }
         }
-
-        piVECTOR p = pos;
-
-        unsigned int height = 0;
 
         int r = PNRandom::random(0, 3);
         int c = PNRandom::random(0, 3);
@@ -1761,10 +1757,6 @@ void TerrainScenario::MaskWalkTexel(Image* img,
                 indextable >>= 2;
             }
         }
-
-        piVECTOR p = pos;
-
-        unsigned int height = 0;
 
         for(int r = 0; r < 4; r++)
         {
@@ -2805,7 +2797,6 @@ void TerrainScenario::LoadBuildings()
     float zoffset = 0.0f;
     bool damage = false;
     piVECTOR rot;
-    int count = 0;
 
     if(fd > 0)
     {
@@ -2819,7 +2810,7 @@ void TerrainScenario::LoadBuildings()
 
         while(fioGetString(fd, buff, 79))
         {
-            if(p = strstr(buff, "zoffset"))
+            if((p = strstr(buff, "zoffset")))
             {
                 if(strchr(p, '='))
                 {
@@ -2827,12 +2818,12 @@ void TerrainScenario::LoadBuildings()
                 }
             }
 
-            if(p = strstr(buff, "damage"))
+            if((p = strstr(buff, "damage")))
             {
                 damage = true;
             }
 
-            if(p = strstr(buff, "filename"))
+            if((p = strstr(buff, "filename")))
             {
                 if(!tspawn.empty())
                 {
@@ -2895,7 +2886,7 @@ void TerrainScenario::LoadBuildings()
                 continue;
             }
 
-            if(p = strstr(buff, "translate"))
+            if((p = strstr(buff, "translate")))
             {
                 p += 13;
                 int len = strlen(p) - 1;
@@ -2907,7 +2898,7 @@ void TerrainScenario::LoadBuildings()
                 continue;
             }
 
-            if(p = strstr(buff, "rotate"))
+            if((p = strstr(buff, "rotate")))
             {
                 p += 10;
                 int len = strlen(p) - 1;

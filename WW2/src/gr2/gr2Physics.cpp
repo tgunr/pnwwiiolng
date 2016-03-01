@@ -148,9 +148,6 @@ bool gr2PhysicsBody::HandleContact(colliderQuery::Collision& contact)
 	_allCollisions |= category;
 	_lastCollision |= category;
 
-	if(colliderIsType(category, COLLIDER_CORPSE))
-		bool stop = true;
-
 	//if(allowContact)
 	//	colliderDebugContact(contact);
 
@@ -227,11 +224,11 @@ gr2PhysicsBone::gr2PhysicsBone(gr2PhysicsModel* model,	// parent physics model
 		_length((float)len),
 		_radius((float)rad),
 		_orientation((gr2PhysicsBone::ORIENTATION)orient),
+        _offset(0),
 		_friction(4000.0f),
 		_stiffness(0),
-		_initTime(0),
 		_autoDisableTime(30000),
-		_offset(0)
+        _initTime(0)
 {
 	// temp skeleton
 	gr2Model* skeleton = _model->GetSkeleton();
@@ -327,11 +324,14 @@ void gr2PhysicsBone::Adjust(Matrixd& transform, Vec3d& offset, double angle, int
 
 	if(offset.length2())
 	{
+        /*
+          TBD -calculate our adjust position
 		Vec3d position = objTransform.getTrans();
 
-		// calculate our adjust position
-		//position = position + offset;
-
+		
+		position = position + offset;
+         */
+        
 		// re-save it
 		objTransform.setTrans(offset);
 	}
@@ -536,7 +536,6 @@ void gr2PhysicsBone::BeginStep()
 
 		if(contact.g1 == contact.g2)
 		{
-			bool stop = true;
 			continue;
 		}
 
@@ -1541,41 +1540,41 @@ bool gr2MeshBone::HandleContact(colliderQuery::Collision& contact)
 gr2PhysicsModel::gr2PhysicsModel(int timeout) :
 	_skeleton(0),
 	_model(0),
+    _material(-1),
 	_initTime(0),
 	_collideTime(0),
 	_lastUpdate(0),
+    _expires(0),
+    _expired(false),
 	_enabledBones(-1),
-	_expires(0),
 	_lastEnabledBones(0),
-	_expired(false),
+    _allCollisions(0),
+    _lastCollision(0),
 	_collider(nullptr),
 	_modelNode(nullptr),
 	_rootBone(nullptr),
-	_allCollisions(0),
-	_lastCollision(0),
-	_attached(nullptr),
-	_material(-1)
+	_attached(nullptr)
 {
 	Init(timeout);
 }
 
 gr2PhysicsModel::gr2PhysicsModel(gr2Model* model, OBJECT* ob, int timeout) :
-	_skeleton(0),
-	_model(0),
-	_initTime(0),
-	_collideTime(0),
-	_lastUpdate(0),
-	_enabledBones(-1),
-	_lastEnabledBones(0),
-	_expires(0),
-	_expired(false),
-	_collider(nullptr),
-	_modelNode(nullptr),
-	_rootBone(nullptr),
-	_allCollisions(0),
-	_lastCollision(0),
-	_attached(nullptr),
-	_material(-1)
+    _skeleton(0),
+    _model(0),
+    _material(-1),
+    _initTime(0),
+    _collideTime(0),
+    _lastUpdate(0),
+    _expires(0),
+    _expired(false),
+    _enabledBones(-1),
+    _lastEnabledBones(0),
+    _allCollisions(0),
+    _lastCollision(0),
+    _collider(nullptr),
+    _modelNode(nullptr),
+    _rootBone(nullptr),
+    _attached(nullptr)
 {
 	Init(timeout);
 	InitModel(model);
@@ -1967,8 +1966,6 @@ dJointID gr2PhysicsModel::addJoint(gr2PhysicsBone* from,
 
 	if(jointID)
 	{
-		double stiffness = 50000.0f;
-
 		// save the join ID in the from bone for later
 		from->SetJointID(jointID);
 
@@ -2023,7 +2020,14 @@ dJointID gr2PhysicsModel::addJoint(gr2PhysicsBone* from,
 					dJointSetAMotorParam(jointID, dParamLoStop3, DEG(ax3Lo));
 					dJointSetAMotorParam(jointID, dParamHiStop3, DEG(ax3Hi));
 					from->SetJointParams();
-					//from->SetStiffnessModel(10000.0f, 500.0f, 500);
+                    
+                    /*
+                      TBD - something related to stiffness we need to do here?
+                    
+                    double stiffness = 50000.0f;
+                    
+					from->SetStiffnessModel(10000.0f, 500.0f, 500);
+                     */
 				}
 			}
 			break;
@@ -2225,10 +2229,6 @@ void gr2PhysicsModel::InitPose(gr2Model* poseModel)
 			bone->SetRotation(finalTransform.getRotate());
 			bone->SetPosition(finalTransform.getTrans(), false);
 		}
-		else
-		{
-			bool stop = true;
-		}
 
 		bone->SetLinearVel(_velocity);
 	}
@@ -2242,7 +2242,6 @@ void gr2PhysicsModel::UpdateBones()
 
 	granny_skeleton* skeleton = gr2GetSkeleton(_skeleton);
 	granny_world_pose* WorldPose = gr2GetWorldPose(_skeleton);
-	granny_matrix_4x4* WorldMatrices = GrannyGetWorldPose4x4Array(WorldPose);
 
 	BoneList::iterator it = _bones.begin();
 
@@ -3144,7 +3143,6 @@ gr2RigidPhysicsModel::gr2RigidPhysicsModel(const char* path, vehVehicle* veh, Ma
 	}
 
 	piMATRIX& t			= (veh->ModelData) ? veh->ModelData->VehicleAttMat: veh->PosData.AttMat;
-	FLOAT64VECTOR& v	= (veh->ModelData) ? veh->ModelData->VehicleVel: veh->PosData.Vel;
 	FLOAT64VECTOR& p	= (veh->ModelData) ? veh->ModelData->VehiclePos: veh->PosData.Pos;
 
 	Vec3d worldPos = Vec3d(p);
@@ -3177,6 +3175,9 @@ gr2RigidPhysicsModel::gr2RigidPhysicsModel(const char* path, vehVehicle* veh, Ma
 	}
 
 	/*
+     
+     TBD - Is this code that was broken and needs to be fixed?
+     
 	boneTransform = boneTransform * _worldTransform;
 
 	// get our body world transform

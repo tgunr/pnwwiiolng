@@ -16,18 +16,10 @@ Description:
 oglMaterial::oglMaterial() :
     matid(-1),
     program(nullptr),
-    material(nullptr),
     firsttime(true),
     poolmaterial(false),
-    wantshader(false)
-{
-}
-
-/*--------------------------------------------------------------------------
-Function: oglMaterial::~oglMaterial
-Description:
----------------------------------------------------------------------------*/
-oglMaterial::~oglMaterial()
+    wantshader(false),
+    material(nullptr)
 {
 }
 

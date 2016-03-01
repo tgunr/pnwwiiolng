@@ -65,6 +65,12 @@
 #include "ez/EZVehicles.h"
 #include "fx/fxMisc.h"
 
+static void             fpFPSAxisRotation (SINT32 param, UINT32 id);
+static void             fpFPSSetHorizontalDeployedPosition (FLOAT64 newPos);
+static void             fpFPSVerticalAxisLook (SINT32 param, UINT32 data);
+static void             fpFPSHorizAxisLook (SINT32 param, UINT32 data);
+static void             fpFPSAdjustAngles (FLOAT32 deltaTime, FLOAT64 minSpeed, FLOAT64 maxSpeed, FLOAT64* xAngle, FLOAT64 xTarget);
+
 #define TESTING_SCOPE
 #undef TESTING_SCOPE
 //#define TESTING
@@ -80,7 +86,6 @@ static float WEAPON_LAG_BLEED		= 5.0f; // how much to bleed each frame
 static float WEAPON_LAG_MOVE		= 4.0f; // amount of lag when strafing and moving backwards
 static float WEAPON_LAG_JUMP		= 40.0f; // base value to calculate from
 static float WEAPON_LAG_JUMPMAX		= 3.0f; // max jump between frames
-static float WEAPON_LAG_JUMPMIN		= .001f; // min jump between frames
 
 #ifdef UNUSED
 static float WEAPON_LAG_INTERVAL	= 2.0f;
@@ -338,9 +343,6 @@ static FLOAT64			grenadeApperLapse = 0.0;
 
 static SINT32 _startDeathTimer = 0;
 
-// camera shake
-static SINT32 _shakeStop = 0;
-
 // movement controls
 // these are the modifiers for the various poses
 static fpFPSPositions	prevPose;
@@ -415,8 +417,6 @@ static FPSProneCollider _proneCollider;
 // debug stuff
 static FLOAT32			animationSpeed = 1.0f;
 
-static phui::View*		_captureview;
-
 static SINT32 fpsStartGrenadeThrowTime, fpsEndGrenadeThrowTime;
 
 #define MIN_RIDE_DISTANCE2 9
@@ -435,7 +435,6 @@ static UINT32 _ppoCheck = 0;
 static FLOAT32 _steepness = 0.0f;
 
 static ScenarioVolume* _volumeCollider = nullptr;
-static trnCDTerrainObject* _lastCollision = nullptr;
 
 static bool _candeploy(int direction);
 static void _calculateConvergenceAngle(int weaponIndex = -1); // 0 - 9
@@ -503,7 +502,7 @@ void fpFPSInit(vehVehicle*vehicle)
 
 	persClearGunsights();
 	// Load Binoculars
-    persLoadGunsight ("vehicles\\ground\\groundman\\8x30binoc.gs");
+    persLoadGunsight ((char *)"vehicles\\ground\\groundman\\8x30binoc.gs");
 	//persLoadInstGunsight("vehicles\\ground\\groundman\\4x_riflescope.gs");
 	persGunSightSetBaseFOV(fpsTrooper.defaultFOV);
 
@@ -947,9 +946,6 @@ LOGICAL fpFPSLoadModels (vehVehicle*vehicle)
 		{
 			if (arms_anim_files[weaponID][j][0] != 0)
 			{
-				if(weaponID == WEBLEY && j == RELOAD)
-					bool stop = true;
-
 				armsAnims[weaponID][j] = gr2LoadAnimation (arms_anim_files[weaponID][j], 1);
 			}
 
@@ -1169,6 +1165,9 @@ static fpsWeaponStates _determineNextRifleState()
 
             break;
         }
+    default:
+            // we only care about reload states
+            break;
     }
 
     return currentFPSstate;
@@ -2694,6 +2693,9 @@ LOGICAL fpFPSStartAnimationState (fpsWeaponTypes weapon, fpsWeaponStates state, 
                     repeatCount = 1;
                     break;
                 }
+            default:
+                // only care about reload states
+                break;
             }
         }
 		else if (fpsWeapons[weapon].weaponType == FPS_WEAPONTYPE_REVOLVER)
@@ -3632,7 +3634,6 @@ void fpFPSGetEyeMatrix (piMATRIX* pMatrix)
         if (fpsWeapons[currentWeaponModel].sniperScope)
 			tempMatrix._42 -= vertWobble;
 
-		static FLOAT32 zadjust = 0; //-.5f;
 		tempMatrix._43 -= _deployZ();
 
 		math3dMatrixMultiply(&eyeMatrix,&tempMatrix,&eyeMatrix);
@@ -4296,9 +4297,6 @@ void fpFPSMoveModel()
 		generateRotationMatrix (AROUND_Z, (horizWobbleAngle + horizWeaponLag), &tempMatrix);
 		math3dMatrixMultiply(&eyeRotation,&tempMatrix,&eyeRotation);
 
-		FLOAT64 test = aimVerticalDeployedPosition;
-		FLOAT64 test2 = AIM_VERTICAL_ANGLE;
-
 		generateRotationMatrix (AROUND_X,
 			-(-vertWobbleAngle + (AIM_VERTICAL_ANGLE + vertWeaponLag) - fpsTrooper.currentMuzzleRise),
 			&tempMatrix);
@@ -4330,9 +4328,6 @@ void fpFPSMoveModel()
 	{
 		eyePosition.y = eyeRotation._42;
 	}
-
-	if(vertShift)
-		bool stop = true;
 
 	eyePosition.z = eyeRotation._43 + fpFPSGetHeight() + (FLOAT32)vertShift;
 	//eyePosition.y += -2; // use this to see the 1st person stuff work in 3rd person
@@ -4989,8 +4984,6 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 	bool recentRider = (fpsTrooper.lastUnrideTime && ((frametime - fpsTrooper.lastUnrideTime) <= 3000));
 	bool considerVehicles = !recentRider;
 
-	Vec3d playerPos = pos;
-
 	// how much to push over this run (because of cage hits)
 	Vec3d push;
 
@@ -5054,7 +5047,6 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 
 			// push us back vector
 			Vec3d push;
-			int pcount = 0;
 
 			for(size_t i = 0; i < hits.size(); i++)
 			{
@@ -5419,12 +5411,6 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 				}
 			}
 		}
-		else if(!SuperFloat)
-		{
-			bool report = true;
-
-			//uiChatPrintLine("No ground hits detected!");
-		}
 
 		if(!cHitCount)
 			lastNormal.set(0,0,0);
@@ -5496,8 +5482,6 @@ void fpFPSAreaChecks(FLOAT64VECTOR* v, FLOAT64 DeltaTime, bool force)
 
 	if(nofireStrat)
 	{
-		const StratDB::StratObject* facility = nofireStrat;
-
 		while(nofireStrat && nofireStrat->StratClass() != SDM_CLASS_FACILITY)
 			nofireStrat = nofireStrat->ParentStratObject();
 
@@ -6390,6 +6374,9 @@ LOGICAL fpFPSIsWeaponSwitchOK (SINT32 weaponNumber)
 			if (!(stateFlags & STATE_RELAXED))
 				return FALSE;
 		*/
+        default:
+            // we want all other states to fall through, switch is allowed
+            break;
 	}
 
 	if (false && stateFlags & STATE_WEAPON_SWITCHING)
@@ -6422,7 +6409,7 @@ LOGICAL fpFPSIsWeaponSwitchOK (SINT32 weaponNumber)
 		return FALSE;
 	}
 
-	if((fpsTrooper.weaponPositionModel[weaponNumber] == BUILD_TOOL))
+	if(fpsTrooper.weaponPositionModel[weaponNumber] == BUILD_TOOL)
 	{
 		/*
 		// Don't allow PPO tool while swimming
@@ -7435,8 +7422,13 @@ static void fpFPSVerticalAxisLook (SINT32 param, UINT32 data)
 
 	imap_callback_ext_data*		extdata;
 	FLOAT32						maxUpAngle, maxDownAngle;
+    
+    /*
+     TBD = deal with turret elevation (currently commented out??)
+     
 	mlVehicleData*				pVehicleData = persGetPersonaModelDataPtr();
-
+     */
+    
 	extdata = (imap_callback_ext_data*)data;
 
 	fpFPSGetEyeUpDownRange(&maxUpAngle, &maxDownAngle);
@@ -7466,10 +7458,13 @@ static void fpFPSVerticalAxisLook (SINT32 param, UINT32 data)
 				angleChange = 0;
 		}
 
+        /*
+         
 		FLOAT64 total = mouseLookVertAngle + (AIM_VERTICAL_ANGLE) + angleChange;
 
-		//uiChatPrintLine("mlookangle = %.2f avertangle = %.2f change = %.2f total = %.2f min = %.2f max = %.2f", mouseLookVertAngle, AIM_VERTICAL_ANGLE, angleChange, total, maxDownAngle, maxUpAngle);
+		uiChatPrintLine("mlookangle = %.2f avertangle = %.2f change = %.2f total = %.2f min = %.2f max = %.2f", mouseLookVertAngle, AIM_VERTICAL_ANGLE, angleChange, total, maxDownAngle, maxUpAngle);
 
+         */
 		if (angleChange)
 		{
 			mouseLookVertAngle += angleChange;
@@ -7798,9 +7793,6 @@ LOGICAL fpFPSHandleControls ()
 		}
 	}
 	
-	if(controlStateFlags & FPS_SPRINT)
-		bool stop = true;
-
 	if (controlStateFlags & FPS_PRONE)
 	{
 		eyeState = EYE_PRONE;
@@ -8058,7 +8050,6 @@ LOGICAL fpFPSGetFireDirection(OBJECT* pObject, piMATRIX* pMatrix)
 	piMATRIX		rotMatrix = IdentityMatrix;
 	piMATRIX		firePoint = IdentityMatrix;
 	LOGICAL			fireFind = FALSE;
-	FLOAT32			horizWobble = 0, vertWobble = 0;
 	FLOAT32			horizAngle = 0, vertAngle = 0;
 
 	fireFind = gr2GetBonePosition (weapModel, "firepoint", &firePoint);
@@ -8295,6 +8286,9 @@ LOGICAL fpFPSStateWeaponReadyToFire(bool honorDelays)
             weaponReady = FALSE;
             break;
         }
+    default:
+        // all other states leave weaponReady true
+        break;
     }
 
 	if (stateFlags & STATE_NEEDS_RECYCLE)
@@ -8983,6 +8977,9 @@ LOGICAL fpFPSWeaponFire (mlVehicleData* pVehicleData)
 							case FPS_WEAPONTYPE_ROCKET:
 								fpsTrooper.tpsAttack = 1;
 							break;
+                            default:
+                                // don't care about other weapon types
+                                break;
 						}
 					}
 				}
@@ -9482,8 +9479,6 @@ void fpFPSForcedReload ()
 		persShakeHead("common.headshake.reloadstill");
 		return;
 	}
-
-	SINT32 cb = fpsWeapons[currentWeaponModel].clipBullets;
 
 	if ((fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_RIFLE) && (fpsWeapons[currentWeaponModel].auxEnable[FPS_AUX_RGCUP]))
 	{
@@ -10715,8 +10710,6 @@ LOGICAL fpFPSRideUnrideVehicle ()
 			RidePos.y = RideObject->dof->dofmatrix2._42;
 			RidePos.z = RideObject->dof->dofmatrix2._43;
 
-			FLOAT64VECTOR temp = RidePos;
-
 			mathVectorMultiply64(&RidePos, &RidePos, &RideObject->mat);
 
 			RidePos.x += WorldOriginOffset.x;
@@ -10726,7 +10719,6 @@ LOGICAL fpFPSRideUnrideVehicle ()
 
 			if(mathExactVectorLength2(&DeltaVec) < MIN_RIDE_DISTANCE2)
 			{
-				//uiChatPrintLine("Choosing seat %d at relative position %.2f,%.2f,%.2f", i, temp.x, temp.y, temp.z);
 				FPSRideVehicle = currentVehicle;
 				vehicle->RideVehicleHostIndex = FPSRideVehicle->VehicleHostIndex;
 				vehicle->RideSeatNum = i;
@@ -12131,7 +12123,7 @@ LOGICAL fpsCheckDeploy(bool doShake)
 	return retVal;
 }
 
-SINT32 fpFPSPlaySound (SCHAR* sound)
+SINT32 fpFPSPlaySound (const SCHAR* sound)
 {
 	if (!sound)
 		return -1;
@@ -13601,6 +13593,9 @@ void _updateFPSColliders()
 		case POSE_PRONE:
 			_collider.collider = &_proneCollider;
 		break;
+        default:
+            // only poses above have colliders
+            break;
 	}
 
 	//_collider.collider = &_kneelCollider;
@@ -13784,10 +13779,8 @@ void _updateWeaponLag(float deltaTime)
 	float WLA		= WEAPON_LAG_ACCEL * WMOD; // how much to lag based on mouse movement
 	float WLB		= WEAPON_LAG_BLEED * WMOD; // how much to bleed each frame
 
-	float WLM		= WEAPON_LAG_MOVE * WMOD; // amount of lag when strafing and moving backwards
 	float WLJ		= WEAPON_LAG_JUMP * WMOD; // base value to calculate from
 	float WLJMAX	= WEAPON_LAG_JUMPMAX * WMOD; // max jump between frames
-	float WLJMIN	= WEAPON_LAG_JUMPMIN * WMOD; // min jump between frames
 
 	if(horizWeaponLag || horizAvgAcc)
 	{

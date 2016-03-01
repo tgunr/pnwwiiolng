@@ -36,7 +36,7 @@ namespace Mem
 	#define memRealloc(Ptr_, NewSize_) realloc(Ptr_, NewSize_)
 	void* memAllocRelease(SINT32 allocSize);
 	void memFreeRelease(void* pointer);
-	static void* memCalloc(size_t members, size_t sz) { return calloc(members, sz); }
+    static inline void* memCalloc(size_t members, size_t sz) { return calloc(members, sz); }
 	extern void memInit(void);
 	extern void memKill(void);
 #else

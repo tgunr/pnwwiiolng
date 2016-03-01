@@ -121,8 +121,6 @@ private:
     float SunSize;
     float FlarePos[2];
     float FlareWinPos[2];
-    unsigned int SunFlareTex;
-    unsigned int SunFlareTex2;
 
         float           m_fBeforeBright, AfterBright;
         bool            m_bFlareVisible, m_bDrawFlare, m_bDrawBrightScreen;
@@ -136,7 +134,6 @@ private:
         float           afColor[4];
         float           m_fGlowBright;
         float           m_fObstructionFactor;
-        GLuint          m_uiAfterFlare;
 #ifdef USE_OCCLUSION_QUERY
         GLuint query;
         std::vector<float> sun;

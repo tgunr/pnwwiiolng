@@ -206,7 +206,7 @@ bool CTree::LoadSPTFile(const char* filename,
 
 	unsigned char* block = (unsigned char*)memAlloc(numbytes);
 
-    size_t result = fioRead(fd, block, numbytes);
+    fioRead(fd, block, numbytes);
 	fioClose(fd);
 
     if(!CSpeedTreeRT::LoadTree(block, numbytes))
@@ -805,24 +805,24 @@ void CTree::AddBranchDraw(const Tree* tree, const Vec4f& pos, const Vec4f& rot)
 
     if(tree->branchlod < b.m_nNumLods)
     {
-        if(b.m_pNumStrips[tree->branchlod] > 0)
+        if(b.m_pNumStrips[static_cast<int>(tree->branchlod)] > 0)
         {
             if(tree->branchlod < MAX_LODS)
             {
-                if(data[tree->branchlod].empty())
-                    data[tree->branchlod].resize(2048);
+                if(data[static_cast<int>(tree->branchlod)].empty())
+                    data[static_cast<int>(tree->branchlod)].resize(2048);
 
-                if(BranchCount[tree->branchlod] >= 1024)
+                if(BranchCount[static_cast<int>(tree->branchlod)] >= 1024)
                 {
                     PushBranches();
                 }
 
-                int idx = BranchCount[tree->branchlod] * 2;
+                int idx = BranchCount[static_cast<int>(tree->branchlod)] * 2;
 
-                data[tree->branchlod][idx + 0] = rot;
-                data[tree->branchlod][idx + 1] = pos;
+                data[static_cast<int>(tree->branchlod)][idx + 0] = rot;
+                data[static_cast<int>(tree->branchlod)][idx + 1] = pos;
 
-                BranchCount[tree->branchlod]++;
+                BranchCount[static_cast<int>(tree->branchlod)]++;
             }
         }
     }
@@ -845,24 +845,24 @@ void CTree::AddFrondDraw(const Tree* tree, const Vec4f& pos, const Vec4f& rot)
 
     if(tree->frondlod < f.m_nNumLods)
     {
-        if(f.m_pNumStrips[tree->frondlod] > 0)
+        if(f.m_pNumStrips[static_cast<int>(tree->frondlod)] > 0)
         {
             if(tree->frondlod < MAX_LODS)
             {
-                if(data[tree->frondlod].empty())
-                    data[tree->frondlod].resize(2048);
+                if(data[static_cast<int>(tree->frondlod)].empty())
+                    data[static_cast<int>(tree->frondlod)].resize(2048);
 
-                if(FrondCount[tree->frondlod] >= 1024)
+                if(FrondCount[static_cast<int>(tree->frondlod)] >= 1024)
                 {
                     PushFronds();
             }
 
-                int idx = FrondCount[tree->frondlod] * 2;
+                int idx = FrondCount[static_cast<int>(tree->frondlod)] * 2;
 
-                data[tree->frondlod][idx + 0] = rot;
-                data[tree->frondlod][idx + 1] = pos;
+                data[static_cast<int>(tree->frondlod)][idx + 0] = rot;
+                data[static_cast<int>(tree->frondlod)][idx + 1] = pos;
 
-                FrondCount[tree->frondlod]++;
+                FrondCount[static_cast<int>(tree->frondlod)]++;
         }
     }
 }

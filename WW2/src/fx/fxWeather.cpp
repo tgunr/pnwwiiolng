@@ -45,9 +45,7 @@ static bool rainparticleemitted = false;
 static int gridids[RainGridSize];
 static int thunderupdate = -1, nextthunderupdate = 0;
 static int rainsoundid = 0;
-static int normal = -1;
 static int NextRainTime = -1;
-static int NextThunderTime = -1;
 
 static unsigned int weatherstate = WXSTATE_CLEAR_DAY;
 static unsigned int weatherseed = 0;
@@ -536,46 +534,6 @@ static void _killcallback(Particle2* p)
     }
 }
 
-/*-----------------------------------------------------------------------------
-Function: InBounds
-Description:
------------------------------------------------------------------------------*/
-static void InBounds(Particle2* p, OBJECT* o, bool& inbounds)
-{
-    if(!o || inbounds)
-        return;
-
-    if(!(o->flags & OBJECT_NOTOBJECT))
-    {
-        piVECTOR lt, br;
-        Vec3f relpos;
-
-        p->getrelativeposition(relpos);
-
-        mathAddVectors(&lt, &o->pos, &o->bbox[0]);
-        mathAddVectors(&br, &o->pos, &o->bbox[1]);
-
-        math3dVectorMultiply(&lt, &lt, &o->mat);
-        math3dVectorMultiply(&br, &br, &o->mat);
-
-        // Check if particle is in object bound box. If so, don't display
-        if(relpos.x() > lt.x && relpos.x() < br.x)
-        {
-            if(relpos.y() > lt.y && relpos.y() < br.y)
-            {
-                if(relpos.z() > lt.z && relpos.z() < br.z)
-                {
-                    inbounds = true;
-                }
-            }
-        }
-    }
-
-    InBounds(p, o->child, inbounds);
-    InBounds(p, o->sibling, inbounds);
-    InBounds(p, o->attached, inbounds);
-}
-
 #if USE_ODE
 /*-----------------------------------------------------------------------------
 Function: _updatecallback
@@ -991,7 +949,7 @@ static void _addparticle(piVECTOR& pos, OBJECT* o)
         return;
     }
 
-    static char* part = "rain";
+    static const char* part = "rain";
     int delayoffset = 0;
 
     ParticleMgr* pm = TransformEffect::GetParticleMgr();
@@ -1028,8 +986,6 @@ static void _addparticle(piVECTOR& pos, OBJECT* o)
 
     float t = speed / 20.0f;
     t = t > 1.0f ? 1.0f : t;
-
-    Vec3d v = p->_velocity;
 
     piVECTOR vel = {0, 0, 0};
 
@@ -1073,8 +1029,6 @@ Description:
 -----------------------------------------------------------------------------*/
 static void _createrain(int numemissions)
 {
-    float height = trnskyGetAltitude();
-
     rainparticleemitted = false;
 
     // Turn off rain above this height
@@ -1082,8 +1036,6 @@ static void _createrain(int numemissions)
         return;
 
     rainparticleemitted = true;
-
-    unsigned int flags = 0;
 
     mlVehicleData* data = persGetPersonaModelDataPtr();
 
@@ -1347,7 +1299,6 @@ Description:
 inline static void _doRain()
 {
     static int lastupdate = 0;
-    static int thunderindex = -1;
 
     if(rainparticleemitted && rainsoundid == 0)
     {
@@ -1443,7 +1394,7 @@ static void ChangeWeaterState()
         trnskyChangeSetting(0, trnskyGetFogOption(), true);
     }
 
-    if(weatherstate & WXSTATE_CLOUDS | weatherstate & WXSTATE_RAIN)
+    if((weatherstate & WXSTATE_CLOUDS) || (weatherstate & WXSTATE_RAIN))
     {
         trnskyChangeSetting(2, trnskyGetFogOption(), true);
     }

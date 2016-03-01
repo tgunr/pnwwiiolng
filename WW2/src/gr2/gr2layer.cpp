@@ -208,7 +208,7 @@ static const char* getBaseName(const char* path, const char* prePath = nullptr);
 
 static granny_file_info* getFileInfo(const char* basename, SINT32 useCache, granny_file** file = nullptr);
 static void gr2Error(granny_log_message_type type, granny_log_message_origin origin, char const* file, granny_int32x line, char const* error, void* userData);
-static gr2AnimationBlend* gr2LoadBlendedAnimationXML(SCHAR* blendfile, SINT32 boneCount);
+static gr2AnimationBlend* gr2LoadBlendedAnimationXML(const SCHAR* blendfile, SINT32 boneCount);
 static gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount);
 
 static XML_TAG_HANDLER(xmlBlendTagHandler);
@@ -501,7 +501,7 @@ granny_file_info* getFileInfo(const char* basename, SINT32 useCache, granny_file
 
 		fileSize = fioFileSize(regional);
 
-		if(fileSize < 0)
+		if(static_cast<int>(fileSize) < 0)
 		{
 			Write_Log (LOG_FPS, LOG_INFO, "getFileInfo:  Failed to size file %s (probably file not found)!", regional);
 			return nullptr;
@@ -866,9 +866,6 @@ static SINT32 createTexture (granny_texture* grannyTexture)
 		Write_Log (LOG_FPS, LOG_INFO, "createTexture: Multiple MIP levels detected for image %s", grannyTexture->FromFileName);
 	}
 
-    // Or, get a proper name for the encoding
-    char const* Encoding = GrannyGetTextureEncodingName(grannyTexture->Encoding);
-
 	strcpy(texname, grannyTexture->FromFileName);
 	_strlwr(texname);
 	ptr = strrchr(texname, '\\');
@@ -1182,7 +1179,7 @@ static void createMeshOld(gr2Model* model, gr2MeshData* mesh, granny_mesh* grann
 }
 #endif
 
-gr2Animation* gr2LoadAnimation (SCHAR* animationFile, SINT32 useCache)
+gr2Animation* gr2LoadAnimation (const SCHAR* animationFile, SINT32 useCache)
 {
 	granny_file_info*	fileInfo;
 	gr2Animation*		newAnimation;
@@ -1284,7 +1281,7 @@ void gr2DoneLoadingModels (void)
 	// this is where I can close file sections I no longer need
 }
 
-LOGICAL gr2AttachModel (gr2Model* model, SCHAR* attachBone, gr2Model* attachToModel, SCHAR* attachToBone)
+LOGICAL gr2AttachModel (gr2Model* model, const SCHAR* attachBone, gr2Model* attachToModel, const SCHAR* attachToBone)
 {
 	granny_int32	boneIndex;
 
@@ -1866,7 +1863,7 @@ LOGICAL gr2BlendIsComplete (gr2Model* model, gr2AnimationBlend* animationBlend)
 	}
 
 	granny_real32	duration;
-	granny_control* control;
+	granny_control* control = nullptr;
 
 	for (int i = 0; i < animationBlend->numBlends; i++)
 	{
@@ -4010,7 +4007,7 @@ LOGICAL gr2ModelHasMesh(gr2Model* model, const char* mesh, int* meshIndex, int* 
 
 // boneName can be a partial match from the beginning
 // if exact is false; all matches are case-insensitive
-int gr2ModelFindBone (gr2Model* model, SCHAR* boneName, LOGICAL exact)
+int gr2ModelFindBone (gr2Model* model, const SCHAR* boneName, LOGICAL exact)
 {
 	int boneIndex				= -1;
 	gr2Model* skeletonModel	= gr2GetWornOnModel(model);
@@ -4409,7 +4406,6 @@ static SINT32 loadMaterials(granny_material* material, bool& hasNormals)
 	SINT32 diffuse	= -1;
 	SINT32 normal	= -1;
 	SINT32 specular = -1;
-	char* ptr = nullptr;
 
 	// loop over the maps in this material and load them
 	// also find the diffuse color map associated with this material
@@ -4516,8 +4512,6 @@ void createMeshTextures(gr2MeshData* data, bool wantNormals)
 
 	int textureCount = grannyMesh->MaterialBindingCount;
 
-	granny_texture* grannyTexture = nullptr;
-	SCHAR* ptr = nullptr;
 	bool hasNormals = false;
 
 	for(int t = 0; t < textureCount; ++t)
@@ -4610,7 +4604,7 @@ void createMeshTextures(gr2MeshData* data, bool wantNormals)
 	}
 }
 
-gr2AnimationBlend* gr2LoadBlendedAnimation(SCHAR* blendfile, SINT32 boneCount)
+gr2AnimationBlend* gr2LoadBlendedAnimation(const SCHAR* blendfile, SINT32 boneCount)
 {
 	char path[MAX_GR2_PATH_SIZE+1];
 
@@ -4837,9 +4831,6 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 	if(newBlend->numBlends > GR2_MAX_ANIMS_PER_BLEND)
 		newBlend->numBlends = GR2_MAX_ANIMS_PER_BLEND;
 
-	if(newBlend->numBlends != numAnimFiles)
-		bool stop = true;
-
 	const SCHAR* fileName = nullptr;
 	char* slash = strchr(blendfile, '\\');
 
@@ -4992,7 +4983,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimationTXT(SCHAR* blendfile, SINT32 boneCount
 }
 */
 
-gr2AnimationBlend* gr2LoadBlendedAnimationXML(SCHAR* blendfile, SINT32 boneCount)
+gr2AnimationBlend* gr2LoadBlendedAnimationXML(const SCHAR* blendfile, SINT32 boneCount)
 {
 	gr2AnimationBlend* newBlend = _gr2BlendPool.Pop();
 
@@ -5023,7 +5014,7 @@ gr2AnimationBlend* gr2LoadBlendedAnimationXML(SCHAR* blendfile, SINT32 boneCount
 	return newBlend;
 }
 
-gr2AnimationBlend* gr2CreateBlendedAnimation(SCHAR* animFile, SINT32 boneCount)
+gr2AnimationBlend* gr2CreateBlendedAnimation(const SCHAR* animFile, SINT32 boneCount)
 {
 	gr2AnimationBlend* newBlend = _gr2BlendPool.Pop();
 

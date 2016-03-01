@@ -33,7 +33,7 @@ static bool operator < (const sdm_lookup_id& a, const sdm_lookup_id& b)
 	return a.id < b.id;
 }
 
-phuiDrawString::phuiDrawString() : _displayList(0), _font(-1), _str(0), _r(-1), _g(-1), _b(-1), _a(-1)
+phuiDrawString::phuiDrawString() : _str(0), _displayList(0), _font(-1), _r(-1), _g(-1), _b(-1), _a(-1)
 {
 }
 
@@ -378,7 +378,7 @@ void FacilityMapObject::DrawSelf(SuperCellMapView* mv)
 		_cpDrawName.DrawString(ctx, mv->GetFont(), fontcolor[0],fontcolor[1],fontcolor[2], 1.0f, _cp.DisplayName());
 	}
 	ctx->DisableTexture();
-	ctx->SetColor(1,1,1,1);
+	ctx->SetColor(1,1,1,alpha);
 	glPopMatrix();
 }
 
@@ -736,6 +736,9 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 					case WWII_GERMANY:
 						_bestuniticon = _renderer->animFlagIcons[WWII_GERMANY];
 					break;
+                    default:
+                        // No other valid countries right now
+                        break;
 				}
 			}
 		}
@@ -756,8 +759,8 @@ void StratMapObject::UpdateDetails(StratDB::StratObject const* cp)
 					{
 						HCUnit* deployed = HCUnit::Lookup(units[i]);
 
-						if(deployed && deployed->unitID() == myDivision->unitID() ||
-									deployed->parentID() == myDivision->unitID())
+						if(deployed && (deployed->unitID() == myDivision->unitID() ||
+									deployed->parentID() == myDivision->unitID()))
 						{
 							_mybase = true;
 							break;
@@ -1189,6 +1192,9 @@ void CPMapObject::Over(SuperCellMapView* mv, int state)
 								case WWII_GERMANY:
 									tip += L" - DE";
 								break;
+                                default:
+                                    // Currently unrecognized country
+                                    break;
 							}
 							tip += L"\n";
 						}

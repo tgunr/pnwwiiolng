@@ -17,14 +17,20 @@
 #include "teul/teulAuth.h"
 #include "auth/authConstants.h"
 #include "auth/authTypes.h"
+#include "comm/commPlaygateMessages.h"
 
 #include "wwii/wwiiCallbacks.h"
+#include "sysmac/locIDs.h"
+#include <Carbon/Carbon.h>
 
-TEUL_CALLBACK*	authARENA_REQ;
-TEUL_CALLBACK*	authAPP_LAUNCH_REQ;
+//static TEUL_CALLBACK*	_APP_VERIFY;
+//static TEUL_CALLBACK*	_APP_LAUNCH;
 
-static TEUL_CALLBACK*	_APP_VERIFY;
-static TEUL_CALLBACK*	_APP_LAUNCH;
+static SINT32 _errorFunc(ACTION_OBJECT *Action);
+
+TEUL_CALLBACK*  authARENA_REQ;
+TEUL_CALLBACK*  authAPP_LAUNCH_REQ;
+static TEUL_CALLBACK*  _LoginXchg;
 
 static SINT32 _sendARENA_REQ(ACTION_OBJECT* const a)
 {
@@ -61,39 +67,89 @@ APP_LAUNCH app;
 	return a->offset;
 }
 
-/*
-void _clientSendError(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* object, SINT32 error)
-{
-	printf("error %d sending on index %d!\n", error, teulIndex);
-	exit(1);
-};
+//////////////////////////////////////////////////////////////////////
+// Callback invoked when a callback encounters an error.
 
-void _clientRecvError(SINT32 teulIndex, const UCHAR* const data, SINT32 size, const TEUL_CALLBACK* object, SINT32 error)
+static void
+_callbackError(
+               const SINT32 teulIndex
+               , const UCHAR* const data
+               , const SINT32 size
+               , const TEUL_CALLBACK* object
+               , const SINT32 error
+               )
 {
-	printf("error %d receiving on index %d!\n", error,teulIndex);
-	exit(1);
-};
-*/
+    /*
+     TBD - this is all just temporary to get a build going that is close to 1.34
+     
+     */
+    
+    static char errorText[500];
+    const std::pair<UINT32, UINT16>& dest = Teul::GetRemote(teulIndex);
+
+    sprintf(errorText, "ERROR: TeulIndex-%d, Address-%s, Dest-%u, Error-%d",
+            teulIndex
+            , teulGetAddress(dest.first)
+            , dest.second
+            , error);
+
+    DialogRef errorDlg;
+    DialogItemIndex itemIndex;
+    CFStringRef errorStr = CFStringRef(errorText);
+    CreateStandardAlert(kAlertNoteAlert, errorStr, NULL, NULL, &errorDlg);
+    RunStandardAlert(errorDlg, NULL, &itemIndex);
+
+}
+
+//////////////////////////////////////////////////////////////////////
+// Register a callback.
+
+TEUL_CALLBACK*
+commInstallMessage(
+                   UCHAR MessageGroup
+                   , UCHAR MessageNumber
+                   , ACTION_REF SendFunc
+                   , ACTION_REF ReceiveFunc
+                   )
+{
+    Teul::CallbackInit ci;
+    
+    ci.callX         = MessageGroup;
+    ci.callY         = MessageNumber;
+    ci.sendAction    = SendFunc;
+    ci.recvAction    = ReceiveFunc;
+    ci.error         = _callbackError;
+    
+    return (teulAllocCallback(&ci));
+}
 
 //This function installs our two callbacks
 SINT32 authClientInstallCallbacks()
 {
-	BEGIN_CALLBACK_REGISTRATION(AUTHENTICATION_X)
+    try
+    {
+        authARENA_REQ = commInstallMessage(Auth::CallbackX, ARENA_REQ_Y, _sendARENA_REQ, nullptr);
+        if ( authARENA_REQ == nullptr )
+            throw 1;
+        authAPP_LAUNCH_REQ = commInstallMessage(Auth::CallbackX, APP_LAUNCH_REQ_Y, _sendAPP_LAUNCH_REQ, _errorFunc);
+        if ( authAPP_LAUNCH_REQ == nullptr )
+            throw 3;
+        if ( commInstallMessage(Auth::CallbackX, APP_LAUNCH_Y, nullptr, _recvAPP_LAUNCH) == nullptr )
+            throw 4;
+        if ( commInstallMessage(Auth::CallbackX, APP_VERIFY_Y, nullptr, _recvAPP_VERIFY) == nullptr)
+            throw 5;
+        if ( nullptr == _LoginXchg )
+            throw 8;
+    }
+    catch ( int n )
+    {
+        return n;
+    }
 
-		BEGIN_PAIRED_CALLBACKS()
-			// Request permission to join an arena with this version.
-			REGISTER_SENDER(ARENA_REQ_Y, _sendARENA_REQ, authARENA_REQ) ;
-
-		// Request permission to log in with this version (duplication ftw).
-		REGISTER_SENDER(APP_LAUNCH_REQ_Y, _sendAPP_LAUNCH_REQ, authAPP_LAUNCH_REQ) ;
-
-    END_PAIRED_CALLBACKS()
-		// Receive verification of app version.
-		REGISTER_RECEIVER(APP_VERIFY_Y, _recvAPP_VERIFY, _APP_VERIFY) ;
-
-		// Receive launch permission.
-		REGISTER_RECEIVER(APP_LAUNCH_Y, _recvAPP_LAUNCH, _APP_LAUNCH) ;
-
-	END_CALLBACK_REGISTRATION
+    return 0;
 }
 
+static SINT32 _errorFunc(ACTION_OBJECT *Action)
+{
+    return 1;
+}

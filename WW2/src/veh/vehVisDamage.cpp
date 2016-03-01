@@ -68,10 +68,10 @@ public:
 
 	VisualDamageBody(vehVehicle* v, OBJECT* o) :
 		physicsBody(COLLIDER_DEBRIS, COLLIDER_TERRAIN_MASK),
-		veh(v),
-		obj(o),
 		next(nullptr),
 		prev(nullptr),
+        obj(o),
+        veh(v),
 		expires(frametime + CRAP_LIFETIME),
 		_allCollisions(0),
 		_lastCollision(0),
@@ -719,7 +719,7 @@ public:
 		setEnhancedCollisionCheck(false);
 		setCollisionContacts(10);
 
-		double density = 1.0f;
+		//double density = 1.0f;
 		FLOAT64VECTOR cm = {0,0,0};
 
 		// set our mass
@@ -910,8 +910,6 @@ public:
 	void KillStates()
 	{
 		return;
-
-		vehanimVehicleStateAnimations* StateAnims = &veh->StateAnimation;
 
 		for (int i=0; i < VEH_MAX_STATE_BITS; i++)
 		{
@@ -1681,7 +1679,6 @@ static LOGICAL _RemoveComponents(vehVehicle* veh, const char* visdamgroup, LOGIC
 
 static LOGICAL _AddComponents(vehVehicle* veh, const char* visdamgroup)
 {
-	LOGICAL HulkVehicle = FALSE;
 	mlComponentList* compList = veh->ModelData->ComponentList;
 	UINT32 i, j;
 

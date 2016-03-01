@@ -131,7 +131,7 @@ struct DOF
 	#pragma pack(pop)
 #endif
 
-extern LOGICAL	obpoolInit(SINT8* name);
+extern LOGICAL	obpoolInit(const SINT8* name);
 extern void 	obpoolKill(void);
 extern void obpoolUpdate();
 extern void obpoolFreeObjectFinish();

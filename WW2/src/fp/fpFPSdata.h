@@ -108,7 +108,7 @@ enum fpsWeaponTypes
 };
 // tolua_end
 
-extern SCHAR* fpFPSWeaponKeyStrings[NUM_WEAPONS];
+extern const SCHAR* fpFPSWeaponKeyStrings[NUM_WEAPONS];
 
 // tolua_begin
 enum fpsWeaponStates
@@ -165,7 +165,7 @@ enum fpFPSWeaponType
 };
 // tolua_end
 
-extern SCHAR* fpFPSWeaponTypeStrings[FPS_WEAPONTYPE_NUM_TYPES];
+extern const SCHAR* fpFPSWeaponTypeStrings[FPS_WEAPONTYPE_NUM_TYPES];
 
 // if adding an icon type, make sure to add a string to fpsData.c:hud_icons
 enum fpFPSIconType
@@ -700,19 +700,19 @@ LOGICAL					fpFPSGetHUDAmmoData(HUD_AMMO_DATA type, SINT32* data);
 UINT32					fpFPSDataGetVarnameAndContents(SCHAR ** varname, SCHAR ** varcontents, SCHAR * inputString);
 
 // data
-extern SCHAR*				skel_model;
-extern SCHAR*				arm_models[NUM_INFANTRY_TYPES];
-extern SCHAR*				leg_models[NUM_INFANTRY_TYPES];
+extern const SCHAR*				skel_model;
+extern const SCHAR*				arm_models[NUM_INFANTRY_TYPES];
+extern const SCHAR*				leg_models[NUM_INFANTRY_TYPES];
 
-extern SCHAR*				arms_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
-extern SCHAR*				weap_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
-extern SCHAR*				clip_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
-extern SCHAR*				weap_default[NUM_WEAPONS];
-extern SCHAR*				weap_empty_default[NUM_WEAPONS];
-extern SCHAR*				clip_default[NUM_WEAPONS];
-extern SCHAR*				replacement_arms_file;
-extern SCHAR*				default_arms_tex_names[NUM_INFANTRY_TYPES];
-extern SCHAR*				replacement_arms_tex_names[NUM_INFANTRY_TYPES];
+extern const SCHAR*				arms_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
+extern const SCHAR*				weap_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
+extern const SCHAR*				clip_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
+extern const SCHAR*				weap_default[NUM_WEAPONS];
+extern const SCHAR*				weap_empty_default[NUM_WEAPONS];
+extern const SCHAR*				clip_default[NUM_WEAPONS];
+extern const SCHAR*				replacement_arms_file;
+extern const SCHAR*				default_arms_tex_names[NUM_INFANTRY_TYPES];
+extern const SCHAR*				replacement_arms_tex_names[NUM_INFANTRY_TYPES];
 
 extern fpFPSTrooperData		fpsTrooper;
 extern fpFPSWeaponData		fpsWeapons[NUM_WEAPONS];

@@ -128,8 +128,8 @@ GameClient* PlayerClient()
 GameClient::GameClient() :
 	jsclient(0),
 	spawnStatus(SPAWN_DESPAWNED),
-	mobilespawnyaw(0),
-	_handlers()
+	_handlers(),
+    mobilespawnyaw(0)
 {
 }
 
@@ -426,6 +426,9 @@ void GameClient::ProcessChatLocalizedMessage(Chat::LocalizedMessage const& msg)
 				SetCurrentOrders(strings[0]);
 			}
 			break;
+            default:
+                // we don't care about other types
+                break;
 		}
 	}
 
@@ -438,7 +441,6 @@ void GameClient::ProcessChatLocalizedMessage(Chat::LocalizedMessage const& msg)
 		{
 			static const wchar_t accident = L'>';	// As in, XXX was killed by < accident? >
 			static const wchar_t period = L'.';
-			static const wchar_t rparenth = L')';	// As in, (xx hits)
 			static const wchar_t lparenth = L'(';	// As in, (xx hits)
 
 
@@ -703,7 +705,7 @@ void GameClient::ActivateMap()
 
 		if(spawnStatus == SPAWN_PENDING)
 		{
-#pragma message ("do something here?")
+#pragma message ("TBD: do something here?")
 			jsclient->RunScript("onspawnerror()");
 		}
 	}
@@ -1785,6 +1787,9 @@ bool GameClient::ReceiveServerTrackedObject(int type, ACTION_OBJECT* a)
 
 static void _editCallback(JSContext* ctx, UINT32 argc, jsval* argv)
 {
+    /* 
+     TBD - I expect something was intended here, but nothing is done currently.
+     
 	const char* type = (argc > 0) ? JS_GetStringBytes(JS_ValueToString(ctx, argv[0])) : nullptr;
 	const char* value = (argc > 1) ? JS_GetStringBytes(JS_ValueToString(ctx, argv[1])) : nullptr;
 
@@ -1794,6 +1799,7 @@ static void _editCallback(JSContext* ctx, UINT32 argc, jsval* argv)
 		// we're editing the capture lua
 		// send it to the host!
 	}
+     */
 }
 
 void GameClient::Edit(const char* type, const char* title, const char* value)

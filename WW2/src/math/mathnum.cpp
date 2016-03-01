@@ -38,8 +38,10 @@ union eco
 static union eco _eco;
 #endif
 
+#if platOS == OS_WIN32
 const double _eco_m = (1048576L/0.693147180559945309417232121458177);
 const double _eco_a = (1072693248L - 60801L);
+#endif
 
 /////////////////////////////////////////////////////////
 // Function: mathGetChaoticSeed

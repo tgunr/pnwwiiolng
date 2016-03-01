@@ -45,9 +45,8 @@ UINT32	ogl::VertexElementSize(UINT32 vertexType)
 //	StaticBuffer
 //////////////////////////////////////////////////////////////////////
 StaticBuffer::StaticBuffer()
-	:	vertexSize(0),
-		vertexType(0),
-//		vbData(nullptr),
+	:	vertexType(0),
+        vertexSize(0),
 		ibData(nullptr),
 		vbName(0),
 		ibName(0)
@@ -62,9 +61,8 @@ StaticBuffer::StaticBuffer()
 //	Creates the vertex- and index buffer against OGL, reading from a file
 //////////////////////////////////////////////////////////////////////
 StaticBuffer::StaticBuffer(int hfile)
-	:	vertexSize(0),
-		vertexType(0),
-//		vbData(nullptr),
+	:	vertexType(0),
+        vertexSize(0),
 		ibData(nullptr),
 		vbName(0),
 		ibName(0)
@@ -416,8 +414,8 @@ void StaticBuffer::SaveToFile(int hfile)
 //////////////////////////////////////////////////////////////////////
 MeshContext::MeshContext(int fd, const std::vector<StaticBuffer*>& staticBuffers)
 	:	modelViewMatrix(nullptr),
-		staticBuffer(nullptr),
-        vao(0)
+        vao(0),
+        staticBuffer(nullptr)
 {
 	vertexType = fioGetl(fd);
 	vertexSize = fioGetl(fd);
@@ -523,8 +521,8 @@ MeshContext::MeshContext(UINT32 withVertexType)
 		maxIdx(0),
 		idxOffset(0),
 		elementCnt(0),
-		staticBuffer(nullptr),
-        vao(0)
+        vao(0),
+        staticBuffer(nullptr)
 {
 	this->vertexType = withVertexType;
 	vertexSize = ogl::VertexElementSize(withVertexType);

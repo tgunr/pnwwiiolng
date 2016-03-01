@@ -3435,7 +3435,6 @@ void vehmainBailout(BailoutSTO* pilot)
 			return;
 		}
 
-		persPersona* pdata = persGetPersonaDataPtr();
 		const vehType* vt = BailoutSTO::VTYPE(Vehicle);
 
 		if(!vt)
@@ -3483,17 +3482,11 @@ void vehmainBailout(BailoutSTO* pilot)
 	// disable controls so we can fly the plane remotely
 	vehcntrlBailout();
 
-	// should disable pilot part of hitmap so pilot can no lnger be killed
-
-	//pdata->DamagePlayObject
-
 	// make sure we stop firing after bailing
 	Vehicle->ModelData->PrimaryTriggerDown		= 0;
 	Vehicle->ModelData->PicklePrimary			= 0;
 	Vehicle->ModelData->SecondaryTriggerDown	= 0;
 	Vehicle->ModelData->PickleSecondary			= 0;
-
-	//PlayerClient()->EnableDespawnTimer(true);
 
 	_bailoutTime = frametime;
 }
@@ -3871,7 +3864,6 @@ void VehicleSTO::deactivate()
 		if(persIsInDeathCam() && !SCEN_MGR->IsActive())
         {
             // Do nothing. Leave vehicles to display while in deathcam. Vehicles removed with ClearAllVehicles
-			bool stop = true;
         }
         else
         {
@@ -4008,6 +4000,9 @@ const vehType* BailoutSTO::VTYPE(vehVehicle* v)
 					case WWII_GERMANY:
 						vid = "de-para-rfl";
 						break;
+                    default:
+                        // no other valid countries
+                        break;
 				}
 			}
 			break;
@@ -4893,7 +4888,7 @@ vehInertiaComponent const* vehFindInertiaComponent(vehType* vehtype, const char*
 
 	if(!comp)
 	{
-		static vehInertiaComponent defaultcomp = { "", 1, 1, {0,0,0}, {1,0,0,0,1,0,0,0,1} };
+		static vehInertiaComponent defaultcomp = { "", 1, 1, {0,0,0}, {{1,0,0},{0,1,0},{0,0,1}} };
 		comp = &defaultcomp;
 	}
 	return comp;
@@ -5303,7 +5298,7 @@ static MSPAWN_RESULT _nearEnemyFacility(FULL_OBJ_ID& foi, int side)
 PlayerPlacedObject* vehmainFRUBuild()
 {
 	vehVehicle* veh = persGetPersonaVehiclePtr();
-	if(veh == nullptr) return false;
+	if(veh == nullptr) return nullptr;
 
 	// do we already have an msp on this misison?
 	bool hasMobileSpawn = PlayerClient()->MobileSpawnMission();
@@ -5687,6 +5682,9 @@ SINT32 _checkCurrentDeployState(vehVehicle* veh)
 			uiChatPrintLineFeedback(IDE_LANG_MOBILE, 501, false);
             return 0;
        }
+    default:
+        // undefined
+        break;
     }
     return 0;
 }
@@ -7131,7 +7129,7 @@ UINT32 vehmainCloneVehicle(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZer
 #ifdef BETA_RELEASE
 			vehicle->setDecals((SINT32)gPersDecalOverride, (SINT32)gUnitDecalOverride);
 #endif
-            int id = ServerTrackedObject::addToIndex(vehicle);
+            ServerTrackedObject::addToIndex(vehicle);
 
 			// so we can manage them via dot command
             uiDotCommandAddClone((int)vehicle->uid());

@@ -5,6 +5,12 @@
 
 #include "fio/fio.h"
 
+#include <stdio.h>
+#include <assert.h>
+#include <string.h>
+#include <stdlib.h>
+#include <ios>
+
 /****************************************************************************
  *
  * Follows is code extracted from the simage library.  Original Authors:

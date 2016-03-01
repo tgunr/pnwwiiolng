@@ -185,7 +185,6 @@ void LensFlareKill()
 //  CLensFlare::CLensFlare
 
 CLensFlare::CLensFlare( ) :
-    SunFlareTex(0),
     SunSize(0),
     m_fBeforeBright(0.0f),
     AfterBright(0.0f),

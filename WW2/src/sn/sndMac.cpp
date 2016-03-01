@@ -13,7 +13,7 @@ FILE* mDebugStream;
 OpenALAudio* audio;
 
 void soundsTest();
-void test(char* name);
+void test(const char* name);
 
 LOGICAL sndsPlatformInit(void)
 {
@@ -766,11 +766,11 @@ void soundsTest()
     test( "ui/sounds/zoominloop.wav" );
 }
 
-void test(char* name)
+void test(const char* name)
 {
     SNDSCREATE sndsCreate;
 
-    sndsCreate.pszName = name;
+    sndsCreate.pszName = (char *)name;
     sndsCreate.bIs3D = false;
 
     snSound* snd = sndsLoadSound( &sndsCreate );

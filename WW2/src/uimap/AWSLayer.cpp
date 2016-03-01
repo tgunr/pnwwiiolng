@@ -20,7 +20,6 @@
 
 AWSLayer::AWSLayer() :
 	_gridMgr(AWSManager::GetInstance()),
-	_maxLabelScale(8),
 	_refreshTime(0),
 	_refreshInterval(1000)
 {

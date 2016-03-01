@@ -88,8 +88,6 @@ static ref_ptr<Texture> _sceneDEPTH;
 static ref_ptr<RenderStateSet> depthpass;
 #endif
 
-static int white;
-
 #define OBDRAW_EVENT_LOG
 #undef OBDRAW_EVENT_LOG
 
@@ -377,8 +375,6 @@ static void DrawObjectInstanced(const OBJECT* o, int units = 0, int primcount = 
         return;
     }
 
-    int stride = sizeof(piUNIFIED_VERTEX);
-
     piSTRIDEDDATA sd;
     o->StridedRenderData(&sd);
 
@@ -415,8 +411,6 @@ static void DrawObject(const OBJECT* o, int units = 0)
         o->modelInstance->GetModel()->vbo->DrawPrimitive(0, o->modelNode->vboid);
         return;
     }
-
-    int stride = sizeof(piUNIFIED_VERTEX);
 
     piSTRIDEDDATA sd;
     o->StridedRenderData(&sd);
@@ -1379,10 +1373,10 @@ LOGICAL obdrawUpdateDOT3ColorPoint(OBJECT* lpobj)
 	piMATRIX	modelViewMatrix;
 	piMATRIX	modelViewMatrixInverse;
 
-	static piMATRIX tangentMatrix = {	1.0, 0.0, 0.0, 0.0,
+	static piMATRIX tangentMatrix = {	{1.0, 0.0, 0.0, 0.0,
 										0.0,-1.0, 0.0, 0.0,
 										0.0, 0.0, 1.0, 0.0,
- 										0.0, 0.0, 0.0, 1.0};
+ 										0.0, 0.0, 0.0, 1.0}};
 
 	if (lpobj == nullptr)
 	{
@@ -1432,10 +1426,10 @@ LOGICAL obdrawUpdateDOT3ColorDirectional(OBJECT* lpobj)
 	piMATRIX	modelViewMatrix;
 	piMATRIX	modelViewMatrixInverse;
 
-	static piMATRIX tangentMatrix = {	1.0, 0.0, 0.0, 0.0,
+	static piMATRIX tangentMatrix = {	{1.0, 0.0, 0.0, 0.0,
 										0.0,-1.0, 0.0, 0.0,
 										0.0, 0.0, 1.0, 0.0,
- 										0.0, 0.0, 0.0, 1.0};
+ 										0.0, 0.0, 0.0, 1.0}};
 
 	if (lpobj == nullptr)
 	{
@@ -3295,8 +3289,6 @@ LOGICAL obdrawObjectsDeprecated()
 LOGICAL obdrawObjectsDeprecated()
 {
     LOGICAL retval = TRUE;
-    OBJECT* lpobjorig = nullptr;
-    LISTHEADER* lplist = nullptr;
 
     if(interiorMaterial == -1)
         interiorMaterial = piFindMaterialName("interior");
@@ -4120,7 +4112,6 @@ static inline void _drawSorted()
     _drawObject(nullptr);
 
     OBJECT* o = nullptr;
-    OBJECT* last = nullptr;
 
     fxMgrDraw(true);
 
@@ -4861,9 +4852,6 @@ inline void _drawMultiTexture()
 #if !ANDREW_TEST
             if(!(o->meshContext && (o->flag2 & OBJECT_USEBUFFERS)))
             {
-                int id = o->texid;
-                int offset = 0;
-
                 // Has at least 3 textures
                 for(int unit = 1; unit < 3; unit++)
                 {

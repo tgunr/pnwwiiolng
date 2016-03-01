@@ -45,7 +45,7 @@ void sysmainCommandLine(int argc, char** argv)
 	HasKeyFile = 1;
 #endif
 
-	mngoptParse("");
+	mngoptParse((char *)"");
 
 #if platOS == OS_MACOS
 #if RELEASE_CLIENT == 1
@@ -226,9 +226,9 @@ void sysmainAddArchives()
 		for(i = 0; i < numfiles; i++)
 		{
 			const char* s = fileList[i];
-			if(!strncmp(fileList[i], "playarc.w2", 10)) // old archives (will be removed soon)
+			if(!strncmp(s, "playarc.w2", 10)) // old archives (will be removed soon)
 			{
-				fioaAddArchive(fileList[i]);
+				fioaAddArchive(s);
 				foundthem = true;
 			}
 		}

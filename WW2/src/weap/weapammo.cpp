@@ -2140,8 +2140,6 @@ UINT32 weapCollideRoundWithVehicles(FASTCOLLIDE ** CollideListPtr,
     if(!PlayerVehicle)
         return 0;
 
-	bool iAmVehicle = (PlayerVehicle->VehicleType->Type != VEH_TYPE_PERSON);
-
 	//if(!Online && PlayerVehicle->VehicleType->Type != VEH_TYPE_PERSON)
 	//	return 0; // disable vehicle collisions for non infantry offline
 
@@ -3713,16 +3711,16 @@ static UINT32 _DoExplosionConcussion(weapAmmo* Ammo, FLOAT64VECTOR const* InPos,
 
 			// OGS->Ramp: If AutoGun is NOT null and ... other stuff
 			if (TO->ObjId.objClass != CLASS_BUILDING ||
-				TO->ObjId.objType != BUILDING_CAPTURE &&
-				TO->TrnAutoGun == nullptr)
+				(TO->ObjId.objType != BUILDING_CAPTURE &&
+				TO->TrnAutoGun == nullptr))
 			{
 				weapAmmoApplyDamageToObject(Ammo, Damage, TO, nullptr);
 			}
 
 			// OGS->Ramp: If AutoGun is NOT null and ... other stuff
 			if (TO->ObjId.objClass != CLASS_BUILDING ||
-				TO->ObjId.objType != BUILDING_CAPTURE &&
-				TO->TrnAutoGun != nullptr)
+				(TO->ObjId.objType != BUILDING_CAPTURE &&
+				TO->TrnAutoGun != nullptr))
 			{
 				trnAutoGun* AG;
 				piVECTOR P1;
@@ -4422,9 +4420,13 @@ static LOGICAL _DoVehicleCollision(weapAmmo* Ammo, FASTCOLLIDE* Collision, piVEC
 	}
 
 	// commented out because it doesn't do anything
+    /*
+     TBD - I guess then we should fix it ???
+     
 //	if(Vehicle && Vehicle->ModelData && Vehicle->VehicleType->Type != VEH_TYPE_PERSON)
 //		_TransferMomentum(Vehicle->ModelData, Collision, Ammo, AmmoSpeed - ResidualSpeed);
-
+     */
+    
 	if(AmmoStopped)
 		ResidualSpeed = 0;
 

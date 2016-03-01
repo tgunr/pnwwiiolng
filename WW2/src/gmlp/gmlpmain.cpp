@@ -298,8 +298,6 @@ static void PreRenderUpdate()
     fxWeatherUpdate();
     fxMgrUpdate();
 
-    bool render = uiInGame() && (Online ? g_bVehicleAttached : TRUE);
-
     if(persIsPersonaVehicleType(VEH_TYPE_AIR))
         radclutterEnable(g_bRadialWhenFlying);
     else

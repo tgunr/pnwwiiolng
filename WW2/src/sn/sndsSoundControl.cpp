@@ -846,9 +846,6 @@ LOGICAL _sndsCalcDistanceFade(snSound* snd)
             }
         }
 #else
-        float min2 = snd->fMinDistance * snd->fMinDistance;
-        float max2 = snd->fMaxDistance * snd->fMaxDistance;
-
         FLOAT64VECTOR listner, vel, look, up, right, v;
 
 		_sndsGetListenerPos(&listner, &look, &up, &right, &vel);
@@ -863,9 +860,6 @@ LOGICAL _sndsCalcDistanceFade(snSound* snd)
             snd->volume3D = 1.0f;
         else
         {
-            float min2 = snd->fMinDistance * snd->fMinDistance;
-            float max2 = snd->fMaxDistance * snd->fMaxDistance;
-
             FLOAT64VECTOR listner, vel, look, up, right, v;
 
 		    _sndsGetListenerPos(&listner, &look, &up, &right, &vel);

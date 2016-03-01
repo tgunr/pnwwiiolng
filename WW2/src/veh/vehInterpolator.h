@@ -38,7 +38,6 @@ public:
 	};
 
 	InterpolatorBase(vehVehicle* v=0);
-	virtual ~InterpolatorBase(){}
 
 	virtual void NewPosDataUpdate(int timestamp_, int frametime_) = 0;
 	virtual Update const& Interpolate(int frametime_) = 0;
@@ -57,7 +56,6 @@ class InfantryInterpolator : public InterpolatorBase
 public:
 
 	InfantryInterpolator(vehVehicle* v=0);
-	virtual ~InfantryInterpolator(){}
 
 	void NewPosDataUpdate(int timestamp_, int frametime_) override;
 	Update const& Interpolate(int frametime_) override;

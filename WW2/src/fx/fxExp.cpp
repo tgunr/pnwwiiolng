@@ -51,7 +51,6 @@ static LOGICAL _CreateLight(SINT32 iID);
 static LOGICAL _CreatePlaneFire(SINT32 iID, OBJECT* lpObj);
 static LOGICAL _CreateShake(SINT32 iID);
 static LOGICAL _CreateShockWave(SINT32 iID);
-static LOGICAL _CreateSmokeTrail(SINT32 iID);
 static LOGICAL _CreateSparks(FLOAT64VECTOR* pPos, FLOAT32 fPOWEnergy);
 #if(0)
 static LOGICAL _CreateWaterSplash(SINT32 iID);
@@ -67,7 +66,6 @@ static LOGICAL _SatchelExp(SINT32 iID);
 static LOGICAL _UpdateShake(SINT32 iID);
 static LOGICAL _VehicleExplosion(SINT32 iID);
 
-static void _SetMaterial(SINT32 iID);
 static void _UpdateShockWave(SINT32 iID);
 
 #define USE_FX2 1
@@ -189,6 +187,9 @@ void fxExpInitExplosion(SINT32 iID)
             _SatchelExp(iID);
             break;
         }
+    default:
+        // don't care about other explosion types
+        break;
     }
 }
 
@@ -1164,7 +1165,7 @@ void fxExpUpdate()
     FXEXPLOSION* lpExp = g_expHead.next;
     FXEXPLOSION* lpTail = &g_expTail;
 
-    for(lpExp; lpExp != lpTail; lpExp = lpExp->next)
+    for(; lpExp != lpTail; lpExp = lpExp->next)
     {
         fxUtlUpdatePosition(&lpExp->vecPt, &lpExp->vecPos);
         lpExp->fDistanceSqrd = fxUtlGetDistanceSqrd(&lpExp->vecPt);
@@ -1186,7 +1187,7 @@ void fxExpGetList(void* lpExpSort, SINT32* pIndex)
     FXEXPLOSION* lpExp = g_expHead.next;
     FXEXPLOSION* lpTail = &g_expTail;
 
-    for(lpExp; lpExp != lpTail; lpExp = lpExp->next)
+    for(; lpExp != lpTail; lpExp = lpExp->next)
     {
         if(*pIndex >= DEF_MAX_EFFECTS)
             break;
@@ -1197,33 +1198,6 @@ void fxExpGetList(void* lpExpSort, SINT32* pIndex)
 
         (*pIndex)++;
     }
-}
-
-//////////////////////////////////////////////////////////////////////
-// Function: _SetMaterial
-// Description:
-//////////////////////////////////////////////////////////////////////
-void _SetMaterial(FXEXPLOSION* lpExp)
-{
-    MATERIAL* lpMat = nullptr;
-
-    piGetMaterials(&lpMat);
-
-    if(lpMat == nullptr) return;
-
-    SINT32 iMatID = fxMgrGetMaterial();
-
-    lpMat[iMatID].material.ambient.a = lpExp->piColor.a;
-    lpMat[iMatID].material.ambient.r = lpExp->piColor.r;
-    lpMat[iMatID].material.ambient.g = lpExp->piColor.g;
-    lpMat[iMatID].material.ambient.b = lpExp->piColor.b;
-
-    lpMat[iMatID].material.diffuse.a = lpExp->piColor.a;
-    lpMat[iMatID].material.diffuse.r = lpExp->piColor.r;
-    lpMat[iMatID].material.diffuse.g = lpExp->piColor.g;
-    lpMat[iMatID].material.diffuse.b = lpExp->piColor.b;
-
-    piSetActiveMaterial(iMatID);
 }
 
 //////////////////////////////////////////////////////////////////////

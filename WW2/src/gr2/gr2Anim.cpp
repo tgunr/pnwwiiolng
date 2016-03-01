@@ -246,8 +246,8 @@ DELAY DEATH CRAP
 #define CORPSE_COUNT 100
 
 static std::set<Corpse*> _corpses; // active corpses
-static int _corpsetime = CORPSE_TIME;
-static int _corpsecount = CORPSE_COUNT;
+//static int _corpsetime = CORPSE_TIME;
+//static int _corpsecount = CORPSE_COUNT;
 static BlendSpec _blendSpec;
 
 #endif // USE_CORPSES
@@ -517,6 +517,9 @@ static void _addWeaponLODs(gr2AnimTrooper* anim)
 				weaponVisMod = .1f;
 			}
 			break;
+            default:
+                // other weapon types, leave default
+                break;
 		}
 
 		// rangewe must be able to see the weapon at
@@ -552,7 +555,7 @@ static void _addWeaponLODs(gr2AnimTrooper* anim)
 					anim->weapons[i].AddModel(0, lod);
 
 					// attach it to our skeleton
-					lod->Attach(anim->skeleton, tpsWeapons[type].attachToBone);
+					lod->Attach(anim->skeleton, (SCHAR *)tpsWeapons[type].attachToBone);
 				}
 			}
 
@@ -582,7 +585,7 @@ static void _addWeaponLODs(gr2AnimTrooper* anim)
 					anim->weapons[i].AddModel(1, lod);
 
 					// attach it to our skeleton
-					lod->Attach(anim->skeleton, tpsWeapons[type].attachToBone);
+					lod->Attach(anim->skeleton, (SCHAR *)tpsWeapons[type].attachToBone);
 				}
 			}
 		}
@@ -687,7 +690,7 @@ gr2AnimTrooper* gr2AnimCreateModel (vehVehicle*vehicle, UINT32 vehicleTypeNum, O
 	newModel->skeleton->lodError = 0;
 
 	if(newModel->chuteModel)
-		newModel->chuteModel->Attach(newModel->skeleton, "Bip01 Spine1");
+		newModel->chuteModel->Attach(newModel->skeleton, (SCHAR *)"Bip01 Spine1");
 
 	if (!gr2PlayBlendedAnimation (newModel->skeleton, fpTPSBasePose))
 	{
@@ -2016,6 +2019,9 @@ LOGICAL gr2AnimGetFirePointMatrix(OBJECT* pObject, piMATRIX* pMatrix, bool visua
 			useFirePoint = true;
 		}
 		break;
+        default:
+            // all others use default of what was passed in
+            break;
 	}
 
 	if(useFirePoint) // use old fire point bone method
@@ -2123,6 +2129,9 @@ LOGICAL gr2AnimGetFirePointMatrix(OBJECT* pObject, piMATRIX* pMatrix, bool visua
 				elev += .01f;
 				trav += .08f;
 			break;
+            default:
+                // undefined country, leave alone.
+                break;
 		}
 	}
 
@@ -2620,8 +2629,8 @@ bool gr2AnimDrawCallback (OBJECT* pObject)
 			// force facing to velocity vector .. problems with smoother make this less good than it should be
 			// only do this for crouch and stand .. prone leave alone
 			if ((model) && (model->myVehicle) && ((model->currentPose == TPS_POSETYPE_STAND) ||
-												  (model->currentPose == TPS_POSETYPE_CROUCH)) ||
-												  (model->currentPose == TPS_POSETYPE_PRONE))
+												  (model->currentPose == TPS_POSETYPE_CROUCH) ||
+												  (model->currentPose == TPS_POSETYPE_PRONE)))
 			{
 				if(!model->HasFlag(gr2AnimTrooper::CHUTE_OPEN|gr2AnimTrooper::FREE_FALL))
 					resetTwists = false;
@@ -2950,6 +2959,9 @@ LOGICAL gr2AnimInit (void)
 
 #ifdef USE_CORPSES
 	/*
+     
+     TBD - is this really meant to be implemented?
+     
     ARENA_VARS::iterator itr = g_arenaDescription.find("dead_body_delay");
 
     if(itr != g_arenaDescription.end())
@@ -3138,19 +3150,11 @@ FLOAT32 _getTransitionWeight(gr2AnimTrooper* model, gr2AnimationBlend* blend, FL
     // accounting for however much time has already elapsed
     //float passed = GrannyGetControlRawLocalClock(blendControl->controls[0]->control);
 
-	float duration = gr2BlendGetBaseLength(blend);
 	float passed   = gr2BlendControlGetTime(model->skeleton, blend);
 
-	float x = blend->mod1;
 	float y = blend->mod2;
 
-    float cx = x * duration;
     float cy = y * blendControl->startWeight;
-
-	float x1 = 0.0f;
-    float x2 = cx;
-    float x3 = x2;
-    float x4 = duration;
 
     float y1 = 0;
     float y2 = cy;
@@ -3163,25 +3167,6 @@ FLOAT32 _getTransitionWeight(gr2AnimTrooper* model, gr2AnimationBlend* blend, FL
 	//SINT32 animPassed	= passed %
 
     float t = passed; //float(current) / 1000.0f; // time passed
-
-	/*
-    for(int i = 0; i <= 64; i++)
-    {
-        float x_ = (1 - t) * (1 - t) * (1 - t) * x1 +
-			        3 * t * (1 - t) * (1 - t) * x2 +
-			        3 * t * t * (1 - t) * x3 +
-			        t * t * t * x4;
-
-        float y_ = (1 - t) * (1 - t) * (1 - t) * y1 +
-		            3 * t * (1 - t) * (1 - t) * y2 +
-		            3 * t * t * (1 - t) * y3 +
-		            t * t * t * y4;
-
-		glVertex2f(x_,y_);
-
-        t += delta;
-    }
-	*/
 
     weight = (1 - t) * (1 - t) * (1 - t) * y1 +
 	          3 * t * (1 - t) * (1 - t) * y2 +
@@ -3813,10 +3798,8 @@ bool gr2AnimDrawCorpses()
 
 Corpse* gr2AnimAddCorpse(gr2AnimTrooper* a, const char* offset, bool blood, SINT32 lifeTime, SINT32 material)
 {
-	int lod = (cfgPrefsGetBool("app.corpsedetail", false)) ? TPS_LOD_2: TPS_LOD_3;
 
 	OBJECT* o = a->myVehicle->VehicleObjectData->PlaneObject;
-	//gr2Model* m = (a->HasFlag(gr2AnimTrooper::USE_ALT_MODEL)) ? a->trooperAltModel[lod] : a->model[lod];
 	gr2Model* m = a->model.GetActive();
 
 	Corpse* c = gr2AnimAddCorpse(o, m, gr2GetPath(m), offset, blood, lifeTime, material);
@@ -3852,7 +3835,6 @@ Corpse* gr2AnimAddCorpse(const char* modelPath, FLOAT64VECTOR& pos, piMATRIX& ma
 	// update gr2 bone matrices
 	granny_skeleton* toSkeleton = gr2GetSkeleton(dk->model);
 	granny_world_pose* toWorldPose = gr2GetWorldPose(dk->skeleton);
-	granny_matrix_4x4* toWorldMatrices = GrannyGetWorldPose4x4Array(toWorldPose);
 	int boneCount = gr2GetBoneCount(dk->skeleton);
 
 	// build the model's world pose
@@ -3917,7 +3899,6 @@ Corpse* gr2AnimAddCorpse(OBJECT* o, gr2Model* s, const char* m, const char* offs
 		gr2UpdateModel(dk->model, true, false);
 
 	// update gr2 bone matrices
-	granny_skeleton* fromSkeleton = gr2GetSkeleton(skeleton);
 	granny_skeleton* toSkeleton = gr2GetSkeleton(dk->skeleton);
 
 	granny_world_pose* fromWorldPose = gr2GetWorldPose(skeleton);
@@ -4151,7 +4132,9 @@ gr2AnimBitPacker::gr2AnimBitPacker(unsigned int bits)
 }
 
 gr2AnimBitPacker::gr2AnimBitPacker()
-			: useAltTrooperMesh(0)
+            : walking(0)
+            , parade(0)
+			, useAltTrooperMesh(0)
 			, chuteOpen(0)
 			, freeFall(0)
 			, altWeaponModel(0)
@@ -4161,10 +4144,8 @@ gr2AnimBitPacker::gr2AnimBitPacker()
 			, headleft(0)
 			, point(0)
 			, movement(0)
-			, pose(0)
-			, weapon(0)
-			, parade(0)
-			, walking(0)
+            , pose(0)
+            , weapon(0)
 			, attacking1(0)
 {
 }
@@ -4282,7 +4263,7 @@ LOGICAL gr2AnimProcessAnimationFlags(OBJECT* pObject, UINT32 flags)
 	SINT32	point		= 0;
 	SINT32	weapon		= 0;
 	SINT32	death		= 0;
-	SINT32	emote		= 0;
+	//SINT32	emote		= 0;
 	SINT32	altWeapon	= 0;
 	LOGICAL altTrooper	= 0;
 	LOGICAL	chuteOpen	= 0;
@@ -4789,6 +4770,9 @@ void gr2AnimHandleAttack(gr2AnimTrooper* model, int pose, int move, int point, i
 		case TPS_WEAPONTYPE_ATR:
 		case TPS_WEAPONTYPE_MAP:
 			return;
+        default:
+            // everything else we accept
+            break;
 	}
 
 	// which attack should we do?
@@ -4955,6 +4939,9 @@ void gr2AnimHandlePoseChange(gr2AnimTrooper* model, int pose, int move, int poin
 				transition = fpTPSGetBlend(TPS_POSETYPE_STAND, TPS_MOVETYPE_SPRINT, weapon, TPS_POINTTYPE_TOPRONE);
 			}
 			break;
+            default:
+                // otherwise keep defaults
+                break;
 		}
 	}
 	else if(model->currentPose == TPS_POSETYPE_CROUCH && pose == TPS_POSETYPE_PRONE)
@@ -4971,6 +4958,9 @@ void gr2AnimHandlePoseChange(gr2AnimTrooper* model, int pose, int move, int poin
 				transition = fpTPSGetBlend(TPS_POSETYPE_CROUCH, TPS_MOVETYPE_FORWARD, weapon, TPS_POINTTYPE_TOPRONE);
 			}
 			break;
+            default:
+                // otherwise keep default
+                break;
 		}
 	}
 	else if(model->currentPose == TPS_POSETYPE_PRONE && pose == TPS_POSETYPE_STAND)
@@ -5000,6 +4990,9 @@ void gr2AnimHandlePoseChange(gr2AnimTrooper* model, int pose, int move, int poin
 				speed = 2.0f;
 				transition = fpTPSGetBlend(TPS_POSETYPE_PRONE, TPS_MOVETYPE_SPRINT, weapon, TPS_POINTTYPE_TOSTAND);
 			}
+            default:
+                // otherwise keep default
+                break;
 			break;
 		}
 	}
@@ -5020,6 +5013,9 @@ void gr2AnimHandlePoseChange(gr2AnimTrooper* model, int pose, int move, int poin
 				transition = fpTPSGetBlend(TPS_POSETYPE_PRONE, TPS_MOVETYPE_FORWARD, weapon, TPS_POINTTYPE_TOCROUCH);
 			}
 			break;
+            default:
+                // otherwise keep default
+                break;
 		}
 	}
 
@@ -5493,7 +5489,7 @@ void gr2DetermineFootstepSoundData (OBJECT* pObject, SINT32 eventID, SINT32	surf
 
 	gr2AnimTrooper* model = pObject->animModel;
 
-	*soundName = "";
+	*soundName = (SCHAR *)"";
 	*fMin = 0;
 	*fMax = 0;
 
@@ -5965,10 +5961,8 @@ bool gr2AnimVisualAttack(gr2AnimTrooper* model, SINT32 attack)
 	{
 		static FLOAT32 easeIn = .1f;
 		static FLOAT32 easeOut = .1f;
-		static SINT32 loops = 1;
 		static FLOAT32 weight = 1.0f;
 		static FLOAT32 speed = 1.0f;
-		static FLOAT32 offset = 0;
 
 		switch(model->currentWeaponType)
 		{
@@ -6032,6 +6026,9 @@ bool gr2AnimAttack(gr2AnimTrooper* model)
 		case TPS_WEAPONTYPE_BUILD:
 			return false;
 		break;
+        default:
+            // everything else is allowed
+            break;
 	}
 
 	if(!Vehicle->IsFiring(0))
@@ -6279,8 +6276,10 @@ FLOAT32 gr2AnimDetermineAnimationFootspeed (gr2AnimTrooper* inmodel, fpTPSWeapon
 
 void gr2AnimDetermineMotionType(gr2AnimTrooper* model, FLOAT64 angle)
 {
+#ifdef DEBUG_MOTION
 	fpTPSMotionType startMotion = model->currentMotion;
-
+#endif
+    
 	if(angle > DMT_FORWARD && angle < DMT_BACKWARD)
 		model->strafe = TPS_MOVETYPE_STRAFE_RIGHT;
 	else if(angle < -DMT_FORWARD && angle > -DMT_BACKWARD)
@@ -7349,9 +7348,6 @@ void gr2AnimUpdate()
 	vehVehicle* v = nullptr;
 	vehGetVehicleHead(&v);
 
-	vehVehicle* player = persGetPersonaVehiclePtr();
-	FLOAT64VECTOR& ppos = player->ModelData->VehiclePos;
-
 	for(;v; v = v->getNext())
 	{
 		if (v->VehicleType->Type != VEH_TYPE_PERSON ||
@@ -7370,7 +7366,6 @@ void gr2AnimUpdate()
 		FLOAT64VECTOR& p		= (v->ModelData) ? v->ModelData->VehiclePos: v->PosData.Pos;
 		gr2AnimTrooper* model	= v->VehicleObjectData->PlaneObject->animModel;
 		FLOAT32	 distToMe		= v->VehicleObjectData->PlaneObject->distsqr;
-		bool inside				= v->isInside;
 		bool deployed			= (model->currentMove == TPS_MOVETYPE_DEPLOYED);
 
 #ifdef GR2_BLEND_EDITOR
@@ -7646,17 +7641,14 @@ void gr2AnimUpdate()
 			gr2AnimTrooper* model	= it->first;
 			vehVehicle* v			= model->myVehicle;
 			FLOAT64VECTOR& p		= (v->ModelData) ? v->ModelData->VehiclePos: v->PosData.Pos;
-			bool inside				= v->isInside;
 			RayColliders* rc		= it->second;
 
 			// is it us and are we in 1st person
 			bool isFPS = (model->myVehicle->ModelData && !persIsCameraExternalMode());
 
-			unsigned int zhits = 0;
 			int zHits				= 0;
 			float zPos			= 0;
 			float zLow			= 0;
-			bool head			= true;
 			int useRays			= rc->count;
 
 			worldPos.set(p);
@@ -7708,46 +7700,6 @@ void gr2AnimUpdate()
 
 				// smarter z adjusment; takes peaks and troughs into account
 				_smartZAdjust(zAdjust, worldPos.z(), zs, isFPS);
-
-				/*
-				int count = 0;
-				FLOAT64 diff = 0;
-				FLOAT64 lastZ = unused;
-
-				for(int i = 0; i < useRays; i++)
-				{
-					if(zs[i] != unused && lastZ != unused)
-						diff += (zs[i] - lastZ);
-
-					lastZ = zs[i];
-					count++;
-				}
-
-				if(count)
-					diff /= count;
-
-				static FLOAT64 lastDiff = 0;
-
-				if(diff != lastDiff)
-				{
-					uiChatPrintLine("Z Adjust Diff: %.2f", diff);
-					lastDiff = diff;
-				}
-
-				if(fabs(diff) > .3f)
-					zAdjust = 0;
-
-				FLOAT64 h1, h2;
-
-				for(int i = 0; i < useRays; i++)
-				{
-					if(zs[i] != unused && lastZ != unused)
-						diff += (zs[i] - lastZ);
-
-					lastZ = zs[i];
-					count++;
-				}
-				*/
 
 				// else take the average of all z's done above
 			}
@@ -7805,8 +7757,6 @@ void gr2AnimUpdate()
 			terrainize = model->terrainTarget + (diff * delta);
 			terrainize.normalize();
 
-			FLOAT64 zLowAdjust = -(worldPos.z() - zLow);
-
 			// do zAdjust smoothing
 			zAdjust = model->terrainTargetZ + ((zAdjust - model->terrainTargetZ) * delta);
 
@@ -7816,6 +7766,9 @@ void gr2AnimUpdate()
 
 			// don't allow submarining when crawling off ledges
 			/*
+             
+            FLOAT64 zLowAdjust = -(worldPos.z() - zLow);
+             
 			if(zLowAdjust && model->terrainTargetZ < zLowAdjust)
 			{
 				//uiChatPrintLine("ZLow %.2f < %.2f ... clamping!", zLowAdjust, model->terrainTargetZ);
@@ -8116,7 +8069,6 @@ bool gr2AnimTerrainize(gr2AnimTrooper* model)
 
 			unsigned int hits = 0;
 			float zPos = 0;
-			bool head = true;
 
 			// these collisions need to be optimized; no need to do them seperately
 			// actually all tps troopers who are prone could be done at once in another frame call and the model->terrainMat could be updated
@@ -8746,7 +8698,6 @@ void gr2AnimTwist::CalculateMoveLocked(gr2AnimTrooper* model, FLOAT64 angle)
 	FLOAT64 diff = angle;
 
 	FLOAT32 aimOffset	= 0;
-	bool left			= (angle < 0);
 	bool aiming			= (model->currentPoint == TPS_POINTTYPE_AIM);
 	bool ready			= (model->attacking || model->readyUntil > frametime);
 	bool reloading		= (model->currentPoint == TPS_POINTTYPE_RELOAD);
@@ -8858,6 +8809,9 @@ void gr2AnimTwist::CalculateMoveLocked(gr2AnimTrooper* model, FLOAT64 angle)
 				motion = "B";
 			}
 			break;
+            default:
+                // leave default for all others
+                break;
 		}
 	}
 
@@ -8942,9 +8896,6 @@ void gr2AnimTwist::CalculateMovePrimary(gr2AnimTrooper* model, FLOAT64 angle)
 	bool reloading		= (model->currentPoint == TPS_POINTTYPE_RELOAD);
 	bool straighten		= (model->currentMove == TPS_MOVETYPE_FALL || model->currentPose == TPS_POSETYPE_SIT);
 
-	fpTPSMotionType lastMotion = model->currentMotion;
-	fpTPSMotionType startMotion = model->currentMotion;
-
 	if(angle > DMT_FORWARD && angle < DMT_BACKWARD)
 	{
 		model->currentMotion = TPS_MOTION_SR;
@@ -8985,6 +8936,9 @@ void gr2AnimTwist::CalculateMovePrimary(gr2AnimTrooper* model, FLOAT64 angle)
 			case TPS_WEAPONTYPE_PISTOL:
 				aimOffset = 45.0f;
 			break;
+            default:
+                // leave default for others
+                break;
 		}
 	}
 
@@ -9038,6 +8992,9 @@ void gr2AnimTwist::CalculateMovePrimary(gr2AnimTrooper* model, FLOAT64 angle)
 								torsoTwistTarget = 10.0f;
 							}
 							break;
+                            default:
+                                // leave default
+                                break;
 						}
 					}
 					else if(ready && model->currentPose == TPS_POSETYPE_STAND)
@@ -9050,6 +9007,9 @@ void gr2AnimTwist::CalculateMovePrimary(gr2AnimTrooper* model, FLOAT64 angle)
 								torsoTwistTarget = 10.0f;
 							}
 							break;
+                            default:
+                                // leave default
+                                break;
 						}
 					}
 
@@ -9078,6 +9038,9 @@ void gr2AnimTwist::CalculateMovePrimary(gr2AnimTrooper* model, FLOAT64 angle)
 								torsoTwistTarget = 10.0f;
 							}
 							break;
+                            default:
+                                // leave default
+                                break;
 						}
 					}
 					else if(!left && ready && model->currentPose == TPS_POSETYPE_STAND)
@@ -9090,6 +9053,9 @@ void gr2AnimTwist::CalculateMovePrimary(gr2AnimTrooper* model, FLOAT64 angle)
 								torsoTwistTarget = -45.0f;
 							}
 							break;
+                            default:
+                                // leave default
+                                break;
 						}
 					}
 
@@ -9126,6 +9092,9 @@ void gr2AnimTwist::CalculateMovePrimary(gr2AnimTrooper* model, FLOAT64 angle)
 				motion = "B";
 			}
 			break;
+            default:
+                // leave defaults
+                break;
 		}
 	}
 
@@ -9304,6 +9273,9 @@ void gr2AnimTwist::CalculateMoveSecondary(gr2AnimTrooper* model, FLOAT64 angle)
 				motion = "B";
 			}
 			break;
+            default:
+                // leave defaults
+                break;
 		}
 	}
 
@@ -10117,13 +10089,15 @@ void gr2AnimSound::Update()
 					footNextTime = frametime + SINT32(350 * speed);
 			}
 			break;
+            default:
+                // leave defaults
+                break;
 		}
 	}
 
 	if(model->currentPose == pose && model->currentMove == move && ID > 0)
 		return;
 
-	fpTPSWeaponType	tpsWeaponType = model->currentWeaponType;
 	fpTPSPoseType soundPose = model->currentPose;
 	fpTPSMoveType soundMove = model->currentMove;
 	FLOAT32	halfDistance = 0;

@@ -194,7 +194,6 @@ public:
 					, UCHAR _decal = 0
 					, bool isHighCommander = false, bool isBuilder = false, bool isMissionleader = false);
 	FESpawnNotify(ACTION_OBJECT* const a);
-	~FESpawnNotify() {}
 	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
 
 public:

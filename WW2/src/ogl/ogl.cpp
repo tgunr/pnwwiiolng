@@ -2336,7 +2336,8 @@ static LOGICAL ParseExtensions(char* tp)
 
 static LOGICAL _internalOglInit(void)
 {
-	SINT8*		tp, *ptr;
+    SINT8*		tp;
+    const SINT8 * ptr;
 	SINT32		i, j;
 SINT32		numcomps, *comps;
 
@@ -3615,7 +3616,6 @@ void oglResetRenderStats(void)
 
 void oglGetRenderStats(UINT32* points, UINT32* lines, UINT32* triangles, UINT32* vertices)
 {
-	totprimitives;
 	*points		= totpoints;
 	*lines		= totlines;
 	*triangles	= tottriangles;
@@ -4178,8 +4178,12 @@ static UINT32 GetColorFromDXT5Block(UINT32 wanted, const GLubyte* block)
     GLubyte bit_pos = wanted;//3 * ((j&3) * 4 + (i&3));
 
     /* simple 32bit version */
-    GLuint bits_low = *block | (*++block << 8) | (*++block << 16) | (*++block << 24);
-    GLuint bits_high = *++block | (*++block << 8);
+    GLuint bits_low = *block;
+    bits_low |= (*++block << 8);
+    bits_low |= (*++block << 16);
+    bits_low |= (*++block << 24);
+    GLuint bits_high = *++block;
+    bits_high |= (*++block << 8);
 
     //GLuint bits_low = *((GLuint*)blksrc)++;
     //GLuint bits_high = *(GLuint*)blksrc;
@@ -4269,7 +4273,7 @@ LOGICAL oglGetTextureUVAlpha(UINT32* alpha, SINT32 texid, SINT32 miplevel, FLOAT
 {
 UINT8*		cptr;
 UINT16*		sptr;
-UINT32*		lptr, color;
+UINT32*		lptr, color = 0;
 SINT32		width, height, x, y, stride;
 UINT32		AlphaBits, AlphaShift, AlphaMask;
 FLOAT32		uf, vf;
@@ -4841,6 +4845,9 @@ LOGICAL oglSetRenderStageState(UINT32 stage, oglTEXTURESTAGESTATETYPE type, UINT
 
                 break;
             }
+        default:
+            // don't care about the rest.
+            break;
         }
 
         stagestates[stage][type] = state;
@@ -4874,6 +4881,9 @@ LOGICAL oglSetRenderStageState(UINT32 stage, oglTEXTURESTAGESTATETYPE type, UINT
 		    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, state);
             break;
 		}
+    default:
+        // don't care about the rest.
+        break;
 	}
 
 	if (!HandleGLError(TRUE))
@@ -4905,7 +4915,7 @@ LOGICAL oglSetColorAtTextureUV(SINT32 iTexID,
 
 SINT32 oglDuplicateRawTexture(SINT32 texid, SINT32 miplevel)
 {
-SINT32	newid, bpp, alphabits;
+SINT32	newid, bpp = 0, alphabits = 0;
 
 	if (textures[texid].comp[miplevel] == 4)
 	{

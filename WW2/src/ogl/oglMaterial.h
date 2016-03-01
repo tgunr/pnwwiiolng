@@ -9,7 +9,6 @@ class oglMaterial : public Referenced
 {
 public:
     oglMaterial();
-    virtual ~oglMaterial();
 
     inline void SetMaterial(int id)
     {

@@ -1325,6 +1325,10 @@ void cfgPrefsProcessGlobal(_cfgPARAMS key)
 				// Set me?
 				break;
 			}
+        default:
+            // nothing else applies
+            break;
+            
 
 	}
 }

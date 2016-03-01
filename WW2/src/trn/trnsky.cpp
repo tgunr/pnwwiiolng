@@ -409,7 +409,7 @@ void trnskyInitSkyBox()
     }
 }
 
-LOGICAL trnskyInit(SINT8* name, SINT32 mesh, FLOAT32 scale)
+LOGICAL trnskyInit(const SINT8* name, SINT32 mesh, FLOAT32 scale)
 {
     piVECTOR loc;
     UINT32 color;
@@ -1045,8 +1045,6 @@ static void DrawStars()
 
 	if(_SunAngle <= 5.0)
 	{
-        int idx = 0;
-
 		if(_SunAngle < -10.0)
 			alpha = 1.0;
 		else

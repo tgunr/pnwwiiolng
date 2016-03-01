@@ -628,7 +628,7 @@ UINT32 mlFindComponent(mlComponent** ComponentPtr,
 
 UINT32 mlcomponFreeComponentList(mlComponentList* ComponentList)
 {
-	if (ComponentList->Components != nullptr)
+	if (ComponentList != nullptr)
 	{
 		for (size_t i=0;i<ComponentList->NumComponents;i++)
 		{
@@ -646,8 +646,8 @@ UINT32 mlcomponFreeComponentList(mlComponentList* ComponentList)
 			}
 		}
 
+        memFree(ComponentList);
 	}
-	memFree(ComponentList);
 
 	return 0;
 }
@@ -744,10 +744,6 @@ UINT32 mlcomponReadDamageComponents(mlComponentList** ComponentList,
 
 			if (VarName == nullptr || VarContents == nullptr)
 				continue;
-
-            const char* nnn = (const char*) UseFileName;
-            const char* vvv = (const char*) VarContents;
-            const char* vn = (const char*) VarName;
 
 			mlUtilityFindVarname(&VarNum, VarName,
 								(UCHAR*)&_ComponentVarNames[0][0], 32, ML_COMPONENT_GENERIC_MAXVARS);

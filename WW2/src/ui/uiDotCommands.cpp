@@ -1376,8 +1376,10 @@ static SINT32 dot_vspawn(const char* line)
 
     SINT32 x = 0, y = 0, z = 0, rad = 10;
 
-	int fields = (strpos != str.npos) ? sscanf(buffer, "%64s -num %d %d %d %d %d", name, &numveh, &x, &y, &z, &rad):
-												sscanf(buffer, "%64s %d %d %d", name, &x, &y, &z);
+	if (strpos != str.npos)
+        sscanf(buffer, "%64s -num %d %d %d %d %d", name, &numveh, &x, &y, &z, &rad);
+    else
+        sscanf(buffer, "%64s %d %d %d", name, &x, &y, &z);
 
     pos.x = (double)x;
     pos.y = (double)y;
@@ -5758,20 +5760,6 @@ static SINT32 dot_inflod(const char* line)
 }
 
 /************************************************************************************************
-	InfLODModCmd
-*************************************************************************************************/
-
-static SINT32 dot_inflodmod(const char* line)
-{
-	if(sscanf(line, "%*s %f %f", &gTrooperLOD, &gTrooperMOD) > 0)
-		uiChatPrintLine("Setting infantry LOD mod to %.2f%% and a mod of %.2f", (gTrooperLOD * 100.0f), gTrooperMOD);
-	else
-		uiChatPrintLine("You must set a percent (0 to 1) in the 1st parameter and an optional mod in the 2nd one.");
-
-	return DC_HANDLED;
-}
-
-/************************************************************************************************
 	ScenarioCmd
 *************************************************************************************************/
 
@@ -5934,23 +5922,6 @@ static SINT32 dot_scenario(const char* line)
 	return DC_HANDLED;
 }
 #endif
-
-/************************************************************************************************
-	JavascriptCmd
-*************************************************************************************************/
-
-static SINT32 dot_js(const char* line)
-{
-	char script[255+1];
-	script[0] = 0;
-
-	sscanf(line, "%*s %255s", script);
-
-	if(script[0])
-		uiRunScript(script);
-
-	return DC_HANDLED;
-}
 
 #if platOS != OS_MACOS
 
@@ -6815,35 +6786,6 @@ static SINT32 dot_dev(const char* line)
 	return DC_HANDLED;
 }
 
-static SINT32 dot_canvas(const char* line)
-{
-	phui::View* canvas = uiViewport()->FindView("canvas");
-
-	if(canvas)
-	{
-		canvas->Close();
-	}
-	else
-	{
-		canvas = uiLoadView("canvas");
-
-		if(canvas)
-		{
-			char parent[32] = "";
-			sscanf(line, "%*s %31s", parent);
-
-			std::string script = "setParent('";
-			script += parent;
-			script += "');";
-
-			phui::DOM::ElementDOM* viewdom = dynamic_cast<phui::DOM::ElementDOM*>(canvas->UserData(DOM_VIEW_USERDATA));
-			if(viewdom) viewdom->RunScript(script.c_str());
-		}
-	}
-
-	return DC_HANDLED;
-}
-
 #endif // _DEBUG
 
 #ifdef GR2_BLEND_EDITOR
@@ -7214,7 +7156,7 @@ static int dot_vcache(const char* line)
 
 	if(sscanf(line, "%*s %u", &mode))
 	{
-		if(mode != gVCache && mode >= 0 && mode <= 2)
+		if(mode != gVCache && mode <= 2)
 			gVCache = mode;
 	}
 

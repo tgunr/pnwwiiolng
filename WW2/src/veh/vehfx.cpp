@@ -70,8 +70,8 @@ static void _BoatTrailCallback(struct FXPARTICLE* lpPcl);
 static void _BoatWakeCallback(struct FXPARTICLE* lpPcl);
 #if(0)
 static void _CreateBoatWakesAndTrails(struct FXVEHCONTAINER* lpCon, SINT32 i);
-#endif
 static void _SmokeStackKill(void* pData);
+#endif
 static void _updateTurretSound(struct FXVEHCONTAINER* lpCon);
 static void _updateTraverseSound(struct FXVEHCONTAINER* c, SINT32 i);
 static void _updateElevateSound(struct FXVEHCONTAINER* c, SINT32 i);
@@ -1993,6 +1993,8 @@ LOGICAL _CreateExhaust(FXVEHCONTAINER* lpCon, SINT32 iEngine, SINT32 iSide)
 LOGICAL _CreateSmokeStack(FXVEHCONTAINER* lpCon, SINT32 iEngine, SINT32 iSide)
 {
 #if(0)
+    
+    // TBD - smoke stack
     OBJECT* lpObj = nullptr;
 
     if(lpCon->iShipStackSmoke[iEngine][iSide] > 0)

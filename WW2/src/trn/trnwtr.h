@@ -37,7 +37,7 @@ extern SINT32 trnwtrGetTexture(SINT32& texid, SINT32& depth);
 #define USE_WATER_EFFECT
 //#undef USE_WATER_EFFECT
 
-	extern LOGICAL trnwtrInit(SINT8* name);
+	extern LOGICAL trnwtrInit(const SINT8* name);
 	extern void trnwtrKill(void);
 
 	extern LOGICAL trnwtrIsWaterTexture(SINT32 texid);

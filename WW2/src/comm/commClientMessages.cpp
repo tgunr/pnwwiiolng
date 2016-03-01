@@ -40,7 +40,6 @@ TEUL_CALLBACK*				HOST_KILL;
 TEUL_CALLBACK*				commCLIENT_HIT;
 static TEUL_CALLBACK*		_PLAYER_EXIT;
 static TEUL_CALLBACK*		_REQ_JOIN_VEHICLE;
-static TEUL_CALLBACK*		_XCHG_SPAWN_DEPLOYMENT;
 
 // WWIIOL specific.
 TEUL_CALLBACK*				commSTRAT_DAMAGE;
@@ -309,11 +308,15 @@ _recvMove(ACTION_OBJECT* const a)
 
 static SINT32 _recvInfDeath(ACTION_OBJECT* const a)
 {
+    /*
+     TBD - Do something real with this, currently its doing nothing
 	REQUIRE_CLIENT_DATA_AS(ww2::Client, client);
 	InfDeath& death = a->read<InfDeath>();
 
 	// All yours troy :)
 
+     */
+    
 	return a->offset;
 }
 

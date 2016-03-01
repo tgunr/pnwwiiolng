@@ -25,8 +25,8 @@ enum fpTPSPoseType
 	TPS_POSETYPE_SHARED = TPS_POSETYPE_NUM_TYPES
 };
 
-extern SCHAR* fpTPSPoseTypeStrings[TPS_POSETYPE_NUM_TYPES];
-extern SCHAR* fpTPSPoseKeyStrings[TPS_POSETYPE_NUM_TYPES];
+extern const SCHAR* fpTPSPoseTypeStrings[TPS_POSETYPE_NUM_TYPES];
+extern const SCHAR* fpTPSPoseKeyStrings[TPS_POSETYPE_NUM_TYPES];
 
 enum fpTPSMoveType
 {
@@ -48,8 +48,8 @@ enum fpTPSMoveType
 	TPS_MOVETYPE_SHARED = TPS_MOVETYPE_EMOTE
 };
 
-extern SCHAR* fpTPSMoveTypeStrings[TPS_MOVETYPE_NUM_TYPES];
-extern SCHAR* fpTPSMoveKeyStrings[TPS_MOVETYPE_NUM_TYPES];
+extern const SCHAR* fpTPSMoveTypeStrings[TPS_MOVETYPE_NUM_TYPES];
+extern const SCHAR* fpTPSMoveKeyStrings[TPS_MOVETYPE_NUM_TYPES];
 
 enum fpTPSWeaponType
 {
@@ -72,8 +72,8 @@ enum fpTPSWeaponType
 	TPS_WEAPONTYPE_SHARED = TPS_WEAPONTYPE_ANY
 };
 
-extern SCHAR* fpTPSWeaponTypeStrings[TPS_WEAPONTYPE_NUM_TYPES];
-extern SCHAR* fpTPSWeaponKeyStrings[TPS_WEAPONTYPE_NUM_TYPES];
+extern const SCHAR* fpTPSWeaponTypeStrings[TPS_WEAPONTYPE_NUM_TYPES];
+extern const SCHAR* fpTPSWeaponKeyStrings[TPS_WEAPONTYPE_NUM_TYPES];
 
 enum fpTPSPointType
 {
@@ -95,8 +95,8 @@ enum fpTPSPointType
 	TPS_POINTTYPE_SHARED = TPS_POINTTYPE_STOW
 };
 
-extern SCHAR* fpTPSPointTypeStrings[TPS_POINTTYPE_NUM_TYPES];
-extern SCHAR* fpTPSPointKeyStrings[TPS_POINTTYPE_NUM_TYPES];
+extern const SCHAR* fpTPSPointTypeStrings[TPS_POINTTYPE_NUM_TYPES];
+extern const SCHAR* fpTPSPointKeyStrings[TPS_POINTTYPE_NUM_TYPES];
 
 enum fpTPSMeshType
 {
@@ -240,8 +240,8 @@ enum fpTPSAttackType
 
 struct fpTPSWeaponData
 {
-	SCHAR*			attachBone;
-	SCHAR*			attachToBone;
+	const SCHAR*			attachBone;
+	const SCHAR*			attachToBone;
 	fpTPSHandType	emoteHand;
 	LOGICAL			forceWeaponDown;
 };
@@ -259,13 +259,13 @@ struct fpTPSTroopData
 	FLOAT32		emoteCombatMaxDistance;
 	FLOAT32		emoteFullBodyMaxDistance;
 
-	SCHAR*		waterSound;
+	const SCHAR*		waterSound;
 	FLOAT32		waterSoundHalfDistance;
 	FLOAT32		waterSoundMaxDistance;
 
 	FLOAT32		fireSnapUpTime, fireSnapDownTime, fireHoldTime;
 
-	SCHAR*		deathSounds[TPS_NUM_DEATHSOUNDS];
+	const SCHAR*		deathSounds[TPS_NUM_DEATHSOUNDS];
 	FLOAT32		deathSoundFMin, deathSoundFMax;
 
 };
@@ -294,18 +294,18 @@ void			fpTPSDataInit ();
 const char*		fpTPSGetTypeNameFromValue(const char* type, int value);
 int						fpTPSGetTypeIndexFromValue(const char* type, const char* name);
 
-extern SCHAR*				fpTPSDeathFiles[TPS_POSETYPE_NUM_TYPES][TPS_NUM_DEATHS];
-extern SCHAR*				fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_NUM_TYPES][TPS_HAND_NUM_TYPES][TPS_MIXINPOSE_NUM_TYPES];
-extern SCHAR*				fpTPSBodyEmoteFiles[TPS_BODYEMOTE_NUM_TYPES];
-extern SCHAR*				fpTPSBasePoseFile;
-extern SCHAR*				fpTPSCombatBlendFile;
+extern const SCHAR*				fpTPSDeathFiles[TPS_POSETYPE_NUM_TYPES][TPS_NUM_DEATHS];
+extern const SCHAR*				fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_NUM_TYPES][TPS_HAND_NUM_TYPES][TPS_MIXINPOSE_NUM_TYPES];
+extern const SCHAR*				fpTPSBodyEmoteFiles[TPS_BODYEMOTE_NUM_TYPES];
+extern const SCHAR*				fpTPSBasePoseFile;
+extern const SCHAR*				fpTPSCombatBlendFile;
 
-extern SCHAR*				fpTPSSkeletonFile;
-extern SCHAR*				fpTPSDamageFile;
-extern SCHAR*				fpTPSInfantryMeshFiles[NUM_INFANTRY_TYPES][TPS_NUM_LODS];
-extern SCHAR*				fpTPSWeaponMeshFiles[NUM_WEAPONS][TPS_NUM_LODS];
-extern SCHAR*				fpTPSWeaponMeshAltFiles[NUM_WEAPONS][TPS_NUM_LODS];
-extern SCHAR*				fpTPSParachuteFile;
+extern const SCHAR*				fpTPSSkeletonFile;
+extern const SCHAR*				fpTPSDamageFile;
+extern const SCHAR*				fpTPSInfantryMeshFiles[NUM_INFANTRY_TYPES][TPS_NUM_LODS];
+extern const SCHAR*				fpTPSWeaponMeshFiles[NUM_WEAPONS][TPS_NUM_LODS];
+extern const SCHAR*				fpTPSWeaponMeshAltFiles[NUM_WEAPONS][TPS_NUM_LODS];
+extern const SCHAR*				fpTPSParachuteFile;
 
 extern fpTPSWeaponData		tpsWeapons[TPS_WEAPONTYPE_NUM_TYPES];
 extern fpTPSTroopData		tpsTroopData;
@@ -325,11 +325,11 @@ extern FLOAT32				fpTPSBodyEmoteLengths[TPS_BODYEMOTE_NUM_TYPES];
 #define	MAX_TWITCHES_PER_POSE	5
 
 extern SINT32				fpTPSNumTwitches[TPS_POSETYPE_NUM_TYPES];
-extern SCHAR*				fpTPSTwitchFiles[TPS_POSETYPE_NUM_TYPES][MAX_TWITCHES_PER_POSE];
+extern const SCHAR*				fpTPSTwitchFiles[TPS_POSETYPE_NUM_TYPES][MAX_TWITCHES_PER_POSE];
 extern struct gr2AnimationBlend*	fpTPSTwitchBlends[TPS_POSETYPE_NUM_TYPES][MAX_TWITCHES_PER_POSE];
 
-extern SCHAR*				fpTPSCombatEmoteCmds[TPS_COMBATEMOTE_NUM_TYPES];
-extern SCHAR*				fpTPSBodyEmoteCmds[TPS_BODYEMOTE_NUM_TYPES];
+extern const SCHAR*				fpTPSCombatEmoteCmds[TPS_COMBATEMOTE_NUM_TYPES];
+extern const SCHAR*				fpTPSBodyEmoteCmds[TPS_BODYEMOTE_NUM_TYPES];
 
 // convert from fps to tps weapon type
 fpTPSWeaponType	fpTPSConvertWeaponTypes(fpFPSWeaponType type);
@@ -338,14 +338,14 @@ fpTPSWeaponClass fpTPSConvertWeaponClass(fpTPSWeaponType type);
 fpTPSBodyEmoteType fpTPSGetEmoteType(SINT32 emoteID);
 
 #define	MAX_FACES				25
-extern SCHAR*				fpTPSDefaultFaceNames[NUM_INFANTRY_TYPES];
+extern const SCHAR*				fpTPSDefaultFaceNames[NUM_INFANTRY_TYPES];
 
 #ifdef USE_NEW_DECALS
 extern SINT32				fpTPSPatchTextureIDs[NUM_INFANTRY_TYPES * 3];
-extern SCHAR*				fpTPSPatchTextureNames[NUM_INFANTRY_TYPES * 3];
+extern const SCHAR*				fpTPSPatchTextureNames[NUM_INFANTRY_TYPES * 3];
 #else
 extern SINT32				fpTPSPatchTextureIDs[NUM_INFANTRY_TYPES];
-extern SCHAR*				fpTPSPatchTextureNames[NUM_INFANTRY_TYPES];
+extern const SCHAR*				fpTPSPatchTextureNames[NUM_INFANTRY_TYPES];
 #endif
 
 extern SINT32				fpTPSDefaultFaceTexIDs[NUM_INFANTRY_TYPES];

@@ -29,7 +29,7 @@ static void fpFPSfxShellKillCallback(void* pData);
 #endif
 
 //static FLOAT64VECTOR	fpFPSSoundPositionZero;
-static SINT32 fpFPSfxPlaySound(char* soundName, SINT32 soundPriority, SINT32 soundType, SINT32 playType, FLOAT64VECTOR* soundPosition, OBJECT* soundObject, UINT32 flags, FLOAT32 fMin, FLOAT32 fMax);
+static SINT32 fpFPSfxPlaySound(const char* soundName, SINT32 soundPriority, SINT32 soundType, SINT32 playType, FLOAT64VECTOR* soundPosition, OBJECT* soundObject, UINT32 flags, FLOAT32 fMin, FLOAT32 fMax);
 
 static struct OBJECT* _shells[MAX_SHELLS];
 static std::deque<struct OBJECT*> _freeshells;
@@ -327,7 +327,7 @@ SINT32 fpFPSfxPlayFireSound (char* soundName, SINT32 soundPriority, SINT32 sound
 	return fpFPSfxPlaySound(soundName, soundPriority, soundType, DEF_PLAYTYPE_HEAD, soundPosition, soundObject, DEF_SOUND_STOPS_AMBIENCE, 0, 0);
 }
 
-SINT32 fpFPSfxPlayNormalSound (char* soundName, SINT32 soundPriority, SINT32 soundType, FLOAT64VECTOR* soundPosition, OBJECT* soundObject)
+SINT32 fpFPSfxPlayNormalSound (const char* soundName, SINT32 soundPriority, SINT32 soundType, FLOAT64VECTOR* soundPosition, OBJECT* soundObject)
 {
 	return fpFPSfxPlaySound(soundName, soundPriority, soundType, DEF_PLAYTYPE_HEAD, soundPosition, soundObject, 0, 0, 0);
 }
@@ -348,7 +348,7 @@ SINT32 fpFPSfxPlayTPSMovementSound (char* soundName, OBJECT* soundObject, FLOAT3
 		return soundID;
 }
 
-SINT32 fpFPSfxPlayTPSSingleSound (char* soundName, OBJECT* soundObject, FLOAT32 fMin, FLOAT32 fMax)
+SINT32 fpFPSfxPlayTPSSingleSound (const char* soundName, OBJECT* soundObject, FLOAT32 fMin, FLOAT32 fMax)
 {
 	SINT32	soundID;
 
@@ -358,7 +358,7 @@ SINT32 fpFPSfxPlayTPSSingleSound (char* soundName, OBJECT* soundObject, FLOAT32 
 
 // the actual "make it happen" sound call
 // returns the soundID
-SINT32 fpFPSfxPlaySound(char* soundName, SINT32 soundPriority, SINT32 soundType, SINT32 playType, FLOAT64VECTOR* soundPosition, OBJECT* soundObject, UINT32 flags, FLOAT32 fMin, FLOAT32 fMax)
+SINT32 fpFPSfxPlaySound(const char* soundName, SINT32 soundPriority, SINT32 soundType, SINT32 playType, FLOAT64VECTOR* soundPosition, OBJECT* soundObject, UINT32 flags, FLOAT32 fMin, FLOAT32 fMax)
 {
 	if (soundName)
 	{
@@ -523,7 +523,7 @@ LOGICAL fpFPSUpdateSounds(OBJECT* pObject)
 				fpsTrooper.movementSoundID = fpFPSfxPlayNormalSound (fpsTrooper.moveSounds[fpsTrooper.movementSound], IDE_FP_PRIORITY_MANDATORY, TYPE_INFINITE_EXTERNAL_SOUND, nullptr, pObject);
 			else
 			{
-				SCHAR* soundName;
+				const SCHAR* soundName;
 				switch (fpsTrooper.movementSound)
 				{
 					case FPS_SOUND_CRAWL:
@@ -549,7 +549,7 @@ LOGICAL fpFPSUpdateSounds(OBJECT* pObject)
 						break;
 				}
 
-				fpsTrooper.movementSoundID = fpFPSfxPlayNormalSound (soundName, IDE_FP_PRIORITY_MANDATORY, TYPE_INFINITE_EXTERNAL_SOUND, nullptr, pObject);
+				fpsTrooper.movementSoundID = fpFPSfxPlayNormalSound ( (char*)soundName, IDE_FP_PRIORITY_MANDATORY, TYPE_INFINITE_EXTERNAL_SOUND, nullptr, pObject);
 			}
 		}
 	}

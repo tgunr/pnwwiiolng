@@ -603,10 +603,10 @@ extern UINT32 mlToggleTailWheelLock(SINT32 Param, UINT32 Id, UINT32 Detach);
 
 extern UINT32 mlIsTailWheelLocked(void);
 
-extern UINT32 mlGetRandomHitSound(SINT8 ** HitSoundName,
+extern UINT32 mlGetRandomHitSound(const char ** HitSoundName,
 								   FLOAT32 * MinVolume,
 								   FLOAT32 * MaxVolumeEnergy,
-								   const SINT8 * TextureName);
+								   const char * TextureName);
 extern UINT32 mlGetObjectBumpinessAndFriction(FLOAT32 * BumpDensity,
 											   FLOAT32 * BumpHeight,
 											   FLOAT32 * StaticFriction,

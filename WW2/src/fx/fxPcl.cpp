@@ -39,9 +39,6 @@ static FXPARTICLE g_pclTail;
 
 static piCOLORVALUE* g_lpColor = nullptr;
 
-//static FLOAT32 g_fPi = PI;
-static FLOAT32 g_fPiOver180 = PI / 180.0f;
-
 static piMATRIX* g_lpInvertView = nullptr;
 
 static FXINITFUNC g_fxInitFuncs[IDE_NUMBER_OF_PARTICLES];
@@ -605,8 +602,6 @@ LOGICAL fxPclKill()
 //////////////////////////////////////////
 LOGICAL _FreeParticle(FXPARTICLE* pcl)
 {
-    FXPARTICLE* lpPrev = nullptr;
-
     if(pcl == nullptr)
         return FALSE;
 
@@ -2060,7 +2055,7 @@ void fxPclGetList(void* lpParticleSort, SINT32* pIndex)
     FXPARTICLE* lpPcl = g_pclHead.next;
     FXPARTICLE* lpTail = &g_pclTail;
 
-    for(lpPcl; lpPcl != lpTail; lpPcl = lpPcl->next)
+    for(; lpPcl != lpTail; lpPcl = lpPcl->next)
     {
         if(*pIndex >= DEF_MAX_EFFECTS)
             break;
@@ -2092,7 +2087,7 @@ LOGICAL fxPclDraw3D()
     std::vector<SINT32>::iterator B = g_v3Ddraw.begin();
     std::vector<SINT32>::iterator E = g_v3Ddraw.end();
 
-    for(B; B != E; ++B)
+    for(; B != E; ++B)
     {
         fxPclDraw((*B));
     }
@@ -2155,6 +2150,9 @@ LOGICAL fxPclDraw(SINT32 ID)
                 _DrawVaporTrail(lpPcl);
                 break;
             }
+        default:
+            // /don't care about other particle types
+            break;
         }
     }
 
@@ -2454,6 +2452,9 @@ LOGICAL _FreeParticleIfNecessary(FXPARTICLE* lpPcl)
 
             break;
         }
+    default:
+        // dont' care about other particle types
+        break;
     }
 
     if(lpPcl->pFnUserKill)

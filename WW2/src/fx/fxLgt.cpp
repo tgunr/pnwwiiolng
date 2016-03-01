@@ -44,7 +44,6 @@ static LOGICAL _ReleaseLight(FXLIGHTS* lpLgt);
 
 static void _InterpolateAttenuation(FXLIGHTS* lpLgt);
 static void _SetLightProperties(FXLIGHTS* lpLgt);
-static void _UpdateFlash(FXLIGHTS* lpLgt);
 static void _UpdateLight(FXLIGHTS* lpLgt);
 
 /////////////////////////////////////////////////
@@ -238,6 +237,9 @@ void fxLgtUpdate()
                 _UpdateLight(lpLgt);
                 break;
             }
+        default:
+            // don't care about other light types
+            break;
         }
     }
 }
@@ -356,6 +358,9 @@ LOGICAL fxLgtDraw(SINT32 iIndex)
             _DrawMuzzleLight(lpLgt);
             break;
         }
+    default:
+        // don't care about other light types
+            break;
     }
 
     _FreeLightIfNecessary(lpLgt);
@@ -421,6 +426,9 @@ LOGICAL _FreeLightIfNecessary(FXLIGHTS* lpLgt)
 
                 break;
             }
+        default:
+            // don't care about other light types
+            break;
         }
     }
 

@@ -40,7 +40,6 @@
 #include "trn/trncd.h"
 
 using namespace std;
-using namespace tr1;
 
 #if platOS == OS_MACOS
 
@@ -102,7 +101,7 @@ static HANDLE FindFirstFileA(const char*pattern, WIN32_FIND_DATAA* finddata)
   HANDLE h;
 
   char* slash = strrchr( pattern, '/' );
-  *slash = nullptr;
+  *slash = 0;
   strcpy( slash+2, h.pattern ); // skip *
 
   h.dir = opendir(pattern);
@@ -238,15 +237,12 @@ static set<string>		missingModels;
 static streampos		streamUpdatePos;
 static int				sdmFilesMerged;
 
-using std::cbegin;
-using std::cend;
-
 static void MergeCPFdata()
 {
 	logFile << "Merging Strat Data...";
 
-	for(auto it = cbegin(chokepointCPFmap); it != cend(chokepointCPFmap); ++it)
-	{
+    for(ChokepointCPFmap::iterator it = chokepointCPFmap.begin(); it != chokepointCPFmap.end(); ++it)
+    {
 		const _CP* cpCPF = it->second;
 		CP* cpSDM = (CP*)memAlloc(sizeof(CP));
 
@@ -939,13 +935,13 @@ SuperCellTerrainData::TerrainObject::TerrainObject(const Matrixf& worldTransform
 				:	objInfo(),
 					poolModel(0),
 					instance(0),
+                    parentSpace(octetPhysicsSpace),
+                    objectPhysicsSpace(dHashSpaceCreate(octetPhysicsSpace)),
+                    masterObject(0),
+                    placeOntoMasterObject(false),
 					stratData(),
 					position(worldTransform.getTrans()),
-					transform(worldTransform),
-					parentSpace(octetPhysicsSpace),
-					objectPhysicsSpace(dHashSpaceCreate(octetPhysicsSpace)),
-					masterObject(0),
-					placeOntoMasterObject(false)
+					transform(worldTransform)
 {
 	transform.setTrans(position.cellPosition);	// We work in local space when merging
 	transform *= cellTransform;
@@ -1306,8 +1302,6 @@ bool SuperCellTerrainData::TerrainObject::PlaceSheared()
 
 	if(!GetSurfaceContact(contact, COLLIDE_MASK, worldPhysicsSpace))
         return false;
-
-    OBJECT* o = (OBJECT*)dGeomGetData(contact.g2);
 
 	if(	poolModel->modelType != ModelTypes::TERRAIN_OBJECT	&&
 		poolModel->modelType != ModelTypes::TERRAIN_TILE)
@@ -2097,8 +2091,6 @@ void SuperCellTerrainData::PlaceClutter()
 
     std::vector<float> z;
 
-    unsigned int bits = 0;
-
     for(int c = 0; c < SDM_SUPERCELL_OCTETS_X; c++)
     {
         for(int r = 0; r < SDM_SUPERCELL_OCTETS_Y; r++)
@@ -2359,7 +2351,6 @@ void SuperCellTerrainData::Preprocess()
 		{
 			for(int octetY=0; octetY < SUPERCELL_OCTETS_X; octetY++)
 			{
-				Octet*	octet			= &octets[octetX][octetY];
 				Matrixf	worldTransform	= Matrixf::translate(worldOrigin + Vec3f((octetX+0.5f)*800.0f, (octetY+0.5f)*800.0f, 0.0f));
 
 				TerrainObject*	replacementTile = AddTerrainObject("null1", worldTransform, 0);
@@ -2379,7 +2370,6 @@ void SuperCellTerrainData::Preprocess()
 		for(octetY=0; octetY < SUPERCELL_OCTETS_Y; octetY++)
 		{
 			Octet*			octet			= &octets[octetX][octetY];
-			TerrainObject*	replacementTile	= 0;
 			string			tileName		= texNames[octet->editInfo.txndx];
 			size_t			bmpPos			= tileName.find(".bmp", 0);
 			Matrixf			worldTransform	= Matrixf::rotate(-((octet->editInfo.ortdrg*2) & 0xf) * PI / 4.0f, 0, 0, 1);
@@ -2433,11 +2423,12 @@ void SuperCellTerrainData::Preprocess()
 }
 
 SuperCellTerrainData::SuperCellTerrainData(int cellX, int cellY, const Vec3f& offset)
-	:	supercellX(cellX),
+	:	octets(),
+        supercellX(cellX),
 		supercellY(cellY),
         newHeightMap(nullptr),
-		cellPhysicsSpace(dHashSpaceCreate(worldPhysicsSpace)),
-		octets()
+		cellPhysicsSpace(dHashSpaceCreate(worldPhysicsSpace))
+
 {
 	FILE*		dtlFile;
 	char		fileName[MAX_PATH];
@@ -2470,8 +2461,6 @@ SuperCellTerrainData::SuperCellTerrainData(int cellX, int cellY, const Vec3f& of
 		fullFileName.append(dataPath + dtlCpfDir + cellName + TERRAINFILE_EXTENSION);
 		dtlFile = fopen(fullFileName.c_str(), "rb");
 
-		if(dtlFile == 0)
-			int sdf=1;
 		assert(dtlFile);
 	}
 

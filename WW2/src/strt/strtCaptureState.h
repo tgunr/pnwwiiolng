@@ -84,7 +84,6 @@ public:	CaptureState(struct ACTION_OBJECT* a)
 		, m_spawnable(false)
 		, m_rate(0)
 		{ packer(TEUL_UNPACK, a); }
-public:	~CaptureState() {}
 
 	// Network packer
 public:	void packer(LOGICAL mode, struct ACTION_OBJECT* a)

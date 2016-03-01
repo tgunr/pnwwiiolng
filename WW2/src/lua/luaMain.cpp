@@ -79,7 +79,7 @@ static int _luaDead(lua_State* L);
 std::vector<const char*> script_args;
 
 // game lib names
-static char* _gameLibs[GPT_NUM_TYPES] =
+static const char* _gameLibs[GPT_NUM_TYPES] =
 {
 	"fp",
 	"cfg",
@@ -496,7 +496,8 @@ int _luaSpawn(lua_State* L)
 					if(spawner) mlSetSpawnStuff(spawner->SupercellX(), spawner->SupercellY(), spawner->Id(), 1);
 				}
 
-				WEAPON_SERIAL blah={0};
+				WEAPON_SERIAL blah;
+                memset(&blah, 0, sizeof(WEAPON_SERIAL));
 				vehcommSendVehicleRequest(vtype->VehicleTypeNum, &blah);
 
 				// call spawner
@@ -565,7 +566,8 @@ int _luaSpawnAt(lua_State* L)
 				// do old game spawn stuff here
 				mlSetSpawnStuff(0, 0, -1, 1);
 				mlSetMobileSpawnStuff(0, x, y, z);
-				WEAPON_SERIAL blah={0};
+				WEAPON_SERIAL blah;
+                memset(&blah, 0, sizeof(WEAPON_SERIAL));
 				vehcommSendVehicleRequest(vtype->VehicleTypeNum, &blah);
 				// call spawner
 				success = 1;

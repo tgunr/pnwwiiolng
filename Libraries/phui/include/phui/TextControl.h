@@ -23,14 +23,14 @@ public:
 
 	virtual View* AsView() override { return this; }
 		
-	virtual void DrawSelf();
+	virtual void DrawSelf() override;
 
-	virtual bool KeyDown(int keycode, unsigned short unicode);
-	virtual bool KeyUp(int keycode, unsigned short unicode);
-	virtual bool MouseDown (float x, float y, int button);
+	virtual bool KeyDown(int keycode, unsigned short unicode) override;
+	virtual bool KeyUp(int keycode, unsigned short unicode) override;
+	virtual bool MouseDown (float x, float y, int button) override;
 
-	virtual void PreferredSize(float* w, float* h);
-	virtual void MinSize(float* w, float* h) { PreferredSize(w,h); } 
+	virtual void PreferredSize(float* w, float* h) override;
+	virtual void MinSize(float* w, float* h) override { PreferredSize(w,h); }
 	
 	void SetMaxLength(int l){ _maxlength = l; }
 	int GetMaxLength(){ return _maxlength; }
@@ -42,11 +42,11 @@ public:
 	void SetHistorySize(int size);
 	void SetAutoCompleteCallback(AutoCompleteCallback);
 	
-	virtual void OnCursorMoved();
-	virtual bool GetCursorXY(float& x, float& y) const;
-	virtual bool GetAnchorXY(float& x, float& y) const;
+	virtual void OnCursorMoved() override;
+	virtual bool GetCursorXY(float& x, float& y) const override;
+	virtual bool GetAnchorXY(float& x, float& y) const override;
 
-	virtual void SetValue(const phui::Scalar& v);
+	virtual void SetValue(const phui::Scalar& v) override;
 	
 	enum
 	{

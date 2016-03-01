@@ -30,8 +30,6 @@ static bool _drawBuilderMessage = false;
 static WWII_COUNTRY g_wwiiTableOwner = MAX_COUNTRIES;
 static char g_wwiiTableFacility[128];
 
-static SINT32 _messageLength = 0;
-
 typedef struct _popupmessage
 {
     bool isdrawn;

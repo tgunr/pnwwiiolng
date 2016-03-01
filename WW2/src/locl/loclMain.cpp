@@ -13,10 +13,10 @@ static SINT32	_LanguageInUse;
 static SINT32	HighestStringNumber;
 static SCHAR	_LanguageName[30];
 
-static char*		LocMissingFile = {"Missing localization file"};
+static const char*		LocMissingFile = {"Missing localization file"};
 //If you change the LocLanguageFiles, be SURE to also change
 //the loclLocalizationLanguage enums in the loclMain.h file.
-static char*		LocLanguageFiles[] =
+static const char*		LocLanguageFiles[] =
 {
 	"English",
 };

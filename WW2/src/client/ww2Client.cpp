@@ -49,7 +49,6 @@
 #include "map/mapBrigadeSummary.h"
 #include "map/mapMissionList.h"
 #include "map/mapSwingMeter.h"
-#include "omg/omgChat.hxx"
 #include "strt/strtCaptureState.h"
 #include "strt/strtClientMessages.h"
 #include "strt/strtDTL.h"
@@ -57,6 +56,7 @@
 #include "strt/strtTypes.h"
 #include "wwii/wwiiHCUnits.h"
 #include "wwii/wwiiRoomLists.h"
+#include "omg/omgChat.hxx"
 
 using namespace ww2;
 
@@ -488,7 +488,6 @@ Teul::ConnectionInstruction::receive(SINT32 teulIndex)
 	// role() will be one of Unknown, Chat() or Cell(),
 	// hostIP() will be the last octet of the IP address,
 	// port() will be the port number to connect to.
-	static const SINT32 ConnectionTimeoutMS = 30 * 1000;
 
 	Client* const client = Client::FromTeulIndex(teulIndex);
 	if(!client)
@@ -554,9 +553,10 @@ Teul::ConnectionInstruction::receive(SINT32 teulIndex)
 #include "include/vars.h"
 int Client::Login(unsigned int host, short port, bool wantChat)
 {
-	if(!clientinited) return -EINVAL;
+    int retval = -EINVAL;
+    
+	if(!clientinited) return retval;
 
-	int retval = -1;
 	TeulTimeMS timeout = 0LL;
 	static const int CONNECTION_TIMEOUT = 30 * 1000; // nobody's gonna wait more than 30 secs before force quitting
 
@@ -571,9 +571,9 @@ int Client::Login(unsigned int host, short port, bool wantChat)
 	StatusMessage("loading.network.host");
 
 	HostState* mapHostState = MapState();
-	if(!mapHostState) return false;
+	if(!mapHostState) return retval;
 
-	Teul::ServerAddr server		= { host, port };
+	Teul::ServerAddr server		= { host, static_cast<UINT16>(port) };
 	Teul::PlayerIdent& ident	= _classdata->playerIdent;
 
 	ClientHostConnection* conn = new ClientHostConnection(Teul::Connection::Map, server, ident, 30*1000);
@@ -1417,6 +1417,10 @@ void Client::ProcessLoginAttempt(bool success, SINT32 type, SINT32 result)
 
 		}
 		break;
+            
+        default:
+            // don't care about other host types.
+            break;
 	}
 }
 
@@ -2010,6 +2014,10 @@ void Client::ProcessBrigadeSelection(BrigadeSelection const& selection)
 		case BRIG_RESTRICTED:
 			_data->waitmsg[BRIGADE_SELECT_WAIT] = -1;
 		break;
+            
+        default:
+            // don't care about other BRIG status
+            break;
 	}
 }
 
@@ -2290,6 +2298,10 @@ void Client::ProcessMissionRoomListReply(RoomList const& missroomlist)
 					_classdata->missionroom.push_back(*entry);
 			}
 			break;
+                
+            default:
+                // don't care about other RMLIST commands
+                break;
 		}
 	}
 }

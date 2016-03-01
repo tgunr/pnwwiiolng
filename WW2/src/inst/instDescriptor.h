@@ -8,21 +8,22 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
+struct ACTION_OBJECT ;
+
 //! @namespace Instance
 //! @brief Components of the world-instancing system.
 
 namespace Instance
 {
-#pragma pack(push, 1)
 	//! @class Instance::Descriptor
 	//! @brief Four-part identifier for instances.
 	class Descriptor
 	{
 	public:
-		Descriptor(const UINT16 category_, const UINT16 type_, const ChatHandle& handle_=0LL, const instanceid_t& id_=0ULL)
-			: m_id(id_), m_handle(handle_), m_category(category_), m_type(type_) {}
-		Descriptor() : m_id(0LL), m_handle(0LL), m_category(0), m_type(0) {}
-		Descriptor(ACTION_OBJECT* a);
+        Descriptor(UINT32 _category, UINT32 _type, UINT64 _ownerID=0LL, UniqueID _id=0LL)
+        : m_id(_id), um_ownerID(_ownerID), m_category(_category), m_type(_type) {}
+        Descriptor() : m_id(0LL), um_ownerHandle(0LL), m_category(0), m_type(0) {}
+        Descriptor(struct ACTION_OBJECT* a) ;
 
 		bool isValid() const { return category() != 0; }
 
@@ -33,18 +34,18 @@ namespace Instance
 			return (category() == rhs.category() && ((type() == rhs.type()) | (category() == 0)));
 		}
 
-		bool operator==(const Descriptor& rhs) const
-		{
-			return isInstanceOf(rhs) && this->id() == rhs.id();
-		}
+        bool operator==(const Descriptor& rhs) const
+        {
+            return isInstanceOf(rhs) && ownerID() == rhs.ownerID() && id() == rhs.id() ;
+        }
 
 		bool operator!=(const Descriptor& rhs) const
 		{
 			return !operator==(rhs);
 		}
 
-		bool operator==(const instanceid_t& rhs) const { return this->id() == rhs; }
-		bool operator!=(const instanceid_t& rhs) const { return this->id() != rhs; }
+        bool operator==(const Instance::UniqueID& rhs) const { return id() == rhs ; }
+        bool operator!=(const Instance::UniqueID& rhs) const { return id() != rhs ; }
 
 		bool operator<(const Instance::Descriptor& rhs) const;
 
@@ -52,8 +53,9 @@ namespace Instance
 
 		UINT32 category() const { return m_category; }
 		UINT32 type() const { return m_type; }
-		const ChatHandle& handle() const { return m_handle; }
-		const instanceid_t& id() const { return m_id; }
+        const ChatHandle& handle() const { return um_ownerHandle ; }
+        const UINT64& ownerID() const { return um_ownerID ; }
+        const Instance::UniqueID& id() const { return m_id ; }
 
 		int packer(unsigned int mode, ACTION_OBJECT* a);
 
@@ -61,14 +63,20 @@ namespace Instance
 		bool hasStrat() const { return isCampaign(); }
 
 	private:
-		instanceid_t	m_id;			//!< Host-supplied, campaign-specific, unique ID.
+        UniqueID	m_id ;				//!< Host-supplied, campaign-specific, unique ID.
 
 	public:
-		ChatHandle		m_handle;
+        union
+        {
+            // Every instance belongs to someone, interpretation
+            // of this field is category/type dependent. The host
+            // doesn't read it.
+            UINT64		um_ownerID ;
+            ChatHandle	um_ownerHandle ;
+        } ;
 		UINT16			m_category;		// See Categories
 		UINT16			m_type;			// Client enumerated, per-category
 	};
-#pragma pack(pop)
 
 	// Global constants
 	extern const Descriptor g_invalid;

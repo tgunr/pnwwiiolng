@@ -22,7 +22,6 @@ Description:
 
 #define MAX_PARTICLES   40960
 
-static int _particletex = -1;
 static int _particleid = 1;
 
 #if(0)
@@ -34,11 +33,11 @@ Function: ParticleMgr::ParticleMgr
 Description:
 -----------------------------------------------------------------------*/
 ParticleMgr::ParticleMgr() :
+    _killMyself(false),
     UsingSoftParticles(g_postRenderFilter),
     _particleindex(0),
-    _killMyself(false),
-    _particlemgrInit(false),
-    _pgm(nullptr)
+    _pgm(nullptr),
+    _particlemgrInit(false)
 {
 }
 
@@ -1665,26 +1664,6 @@ void ParticleMgr::update()
     }
 }
 
-/*----------------------------------------------------------------------
-Function: _backtofront
-Description:
------------------------------------------------------------------------*/
-static int _backtofront(Particle2 *l, Particle2 *r)
-{
-    return l->_distance2 > r->_distance2;
-}
-
-#if(0)
-/*----------------------------------------------------------------------
-Function: _frontToBack
-Description:
------------------------------------------------------------------------*/
-static int _frontToBack(Particle2 *l, Particle2 *r)
-{
-    return l->_distance2 < r->_distance2;
-}
-#endif
-
 #if platOS == OS_MACOS
 
 static int _backtofront2(const void *a, const  void *b)
@@ -2046,7 +2025,6 @@ void ParticleMgr::drawsurfacedeprecated()
     bool oldglow = false;
 
     int oldmat = -1;
-    int material = -1;
 
     oglSetWorldMatrix(&IdentityMatrix);
     oglSetRenderState(oglRENDERSTATE_ALPHABLENDENABLE, TRUE);

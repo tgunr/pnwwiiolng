@@ -46,7 +46,6 @@
 static LOGICAL _UpdateGroupNormals(OBJECT * Object,UINT32 DummyNum);
 static LOGICAL _UpdateBaseGroupNormals(OBJECT * Object);
 
-static UINT32 _RecalcBoundsAndNormals(OBJECT * Object);
 static UINT32 _ParallelagramizeObjectToTriangle(OBJECT * Object,
 												const piVECTOR * PlanePoint,
 												const piVECTOR * Normal);
@@ -511,7 +510,7 @@ at its constructed height.  Uses: for "floating" objects
 static LOGICAL HeightPlaceLOD(OBJECT* lpobj, UINT32 lod)
 {
 SINT32		i, num, poly;
-FLOAT32		bz1, bz2, dz;
+FLOAT32		bz1, bz2, dz = 0.0f;
 piVECTOR	pos, cpos;
 piMATRIX	mat;
 OBJECT*	lpbase;
@@ -622,7 +621,7 @@ OBJECT*	lpbase;
 static LOGICAL HeightConformLOD(OBJECT* lpobj, UINT32 lod)
 {
 SINT32		i, num, poly;
-FLOAT32		bz1, bz2, dz, heightFromTerrain, lowestVertex;
+FLOAT32		bz1, bz2, dz = 0.0f, heightFromTerrain, lowestVertex;
 piVECTOR	pos, cpos;
 piMATRIX	mat;
 OBJECT*	lpbase, *lpnext;
@@ -1010,7 +1009,7 @@ static UINT32 _ParallelagramizeObjectToTriangle(OBJECT * Object,
 static LOGICAL BottomConformLOD(OBJECT* lpobj, UINT32 lod)
 {
 SINT32		i, num, poly;
-FLOAT32		bz1, bz2, dz;
+FLOAT32		bz1, bz2, dz = 0.0f;
 piVECTOR	pos, cpos;
 piMATRIX	mat;
 OBJECT*	lpbase, *lpnext;
@@ -1653,24 +1652,6 @@ OBJECT*	lpatt;
 }
 
 
-//////////////////////////////////////////////////////////////////////
-//	HandleSpecialSubObjects
-//////////////////////////////////////////////////////////////////////
-static void HandleSpecialSubObjects(OBJECT* o)
-{
-	#ifdef USE_NEW_GRASS
-    if(o->flag2 & OBJECT_IS_GRASS)
-    {
-        trngrassAddGrass(o);
-    }
-	#endif
-
-	if(o->child)	HandleSpecialSubObjects(o->child);
-	if(o->attached)	HandleSpecialSubObjects(o->attached);
-	if(o->sibling)	HandleSpecialSubObjects(o->sibling);
-}
-
-
 void trnopLoadTrees(LOGICAL bLoad)
 {
 #if defined(BETA_RELEASE)
@@ -1825,12 +1806,7 @@ SINT32 trnopHandleSpeedTree(OBJECT* group)
         return -1;
     }
 
-    OBJECT* o = nullptr;
-    SINT32 treeValues[256] = {0};
-    SINT32 overriddenTrees[256] = {0};
     COLLISION collision;
-
-    LOGICAL overridden = FALSE;
 
     memset(&collision, 0, sizeof(COLLISION));
 

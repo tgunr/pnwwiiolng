@@ -11,7 +11,7 @@
 #include "fio/fio.h"
 #include "trn/trnsky.h"
 #include "draw/sneaky.h"
-#include "ogl/GLCounter.h";
+#include "ogl/GLCounter.h"
 
 #include <string>
 
@@ -517,7 +517,7 @@ LOGICAL CFbo::initialize()
 
     if(!GLEW_EXT_framebuffer_object)
     {
-        SCHAR* s = "[CFbo::initialize] No frame buffer support for FBO";
+        const SCHAR* s = "[CFbo::initialize] No frame buffer support for FBO";
         Write_Log(LOG_OLD, LOG_INFO, s);
         m_supported = FALSE;
         return FALSE;
@@ -527,7 +527,7 @@ LOGICAL CFbo::initialize()
 
     if(!m_supported)
     {
-        SCHAR* s = "[CFbo::initialize] No shader support for FBO";
+        const SCHAR* s = "[CFbo::initialize] No shader support for FBO";
         Write_Log(LOG_OLD, LOG_INFO, s);
         return FALSE;
     }
@@ -536,7 +536,7 @@ LOGICAL CFbo::initialize()
 
     if(!m_fbo)
     {
-        SCHAR* s = "[CFbo::initialize] Failed to create Framebuffer Object";
+        const SCHAR* s = "[CFbo::initialize] Failed to create Framebuffer Object";
         Write_Log(LOG_OLD, LOG_INFO, s);
         m_supported = FALSE;
         return FALSE;

@@ -148,12 +148,12 @@ Function: oglVertexBuffer::oglVertexBuffer
 Description:
 ------------------------------------------------------------------------*/
 oglVertexBuffer::oglVertexBuffer() :
+    BufferSize(0),
     Valid(false),
-	BufferSize(0),
+    BufferSegment(nullptr),
     StaticBufferID(0),
     DynamicBufferID(0),
-    IndiceID(0),
-	BufferSegment(nullptr)
+    IndiceID(0)
 {
 }
 
@@ -703,8 +703,6 @@ Description:
 ------------------------------------------------------------------------*/
 void oglVertexBuffer::Buffer()
 {
-	bool isstatic = true;
-
     int vbostaticsize = 0;
     int vbodynamicsize = 0;
     int ramsize = 0;

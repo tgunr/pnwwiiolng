@@ -885,7 +885,6 @@ PosData client data when only appropriate to do so based on ownership of the sta
 void applyStatusBits(UINT32 stateCheck, void * bitField, UINT32 offset, UINT32 numBits,
 	const VEHICLE_UPDATE_HEADER * VehicleHeader, vehVehicle * Vehicle)
 {
-	const SHARED_VEHICLE_INFO*VehicleInfo = &VehicleHeader->vehInfo;
 	vehVehiclePositionData * PosData = &Vehicle->PosData;
 
 	// first make sure this status field is present
@@ -968,11 +967,15 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 				current as the last but treated as signed so its sign-extended to 32 bit and the
 				difference math works out.
 			*/
+#ifdef BETA_RELEASE
 			UINT32 prevCurrent = PosData->CurrentSenderUpdateTime;
-			PosData->LastSenderUpdateTime = static_cast<SINT16>(PosData->CurrentSenderUpdateTime);
+#endif
+            PosData->LastSenderUpdateTime = static_cast<SINT16>(PosData->CurrentSenderUpdateTime);
 			PosData->CurrentSenderUpdateTime = thisTS;
+#ifdef BETA_RELEASE
 			SINT32 verifyDiff = PosData->CurrentSenderUpdateTime - PosData->LastSenderUpdateTime;
-
+#endif
+            
 #ifdef BETA_RELEASE
 			dbugLog(_FLI, "Rollover occurred: Old TS: %d, New Old: %d, New TS: %d, diff: %d, verifyDiff: %d",
 				prevCurrent, PosData->LastSenderUpdateTime, thisTS, timeDiff, verifyDiff);
@@ -1080,8 +1083,8 @@ static UINT32 _ExtractData(vehVehiclePositionData * PosData,vehVehicle* Vehicle,
 		ProcessInfantryAnimationFlags(Vehicle, VehicleHeader);
 
 
-	if ((VehicleHeader->present & (PR_POSITION | VehicleHeader->present & PR_RELPOS)) &&
-		Vehicle->VehicleType && Vehicle->VehicleType->Type == VEH_TYPE_PERSON)
+	if (((VehicleHeader->present & PR_POSITION) | (VehicleHeader->present & PR_RELPOS)) &&
+		Vehicle->VehicleType && (Vehicle->VehicleType->Type == VEH_TYPE_PERSON))
 	{
 		if (Vehicle->VehicleObjectData != nullptr)
 		{

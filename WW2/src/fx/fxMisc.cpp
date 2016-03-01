@@ -793,8 +793,8 @@ LOGICAL fxMiscInit()
 
     _blackOut = GLSL.loadProgram("blackout", nullptr, nullptr);
 
-    char* v = "fx/shaders/GLSL/postrender/blackout.vert";
-    char* f = "fx/shaders/GLSL/postrender/blackout.frag";
+    const char* v = "fx/shaders/GLSL/postrender/blackout.vert";
+    const char* f = "fx/shaders/GLSL/postrender/blackout.frag";
 
     ref_ptr<glslShader> s1 = GLSL.loadVertexShader(v);
     ref_ptr<glslShader> s2 = GLSL.loadFragmentShader(f);

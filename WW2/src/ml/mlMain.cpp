@@ -3448,7 +3448,7 @@ UINT32 Position = 0;
 	}
 
 	// handle vehicle dead stuff
-	if (Component->CriticalSecondary != 0 || Component->CriticalPrimary != 0 && PassNum == 1)
+	if (Component->CriticalSecondary != 0 || (Component->CriticalPrimary != 0 && PassNum == 1))
 	{
 		if (Mount->WeaponJammed != 0)
 		{
@@ -3578,7 +3578,7 @@ FLOAT64 BrakeLeft = 0,BrakeRight = 0,BrakeCenter = 0;
 	}
 
 	// handle vehicle dead stuff
-	if (Component->CriticalSecondary != 0 || Component->CriticalPrimary != 0 && PassNum == 1)
+	if (Component->CriticalSecondary != 0 || (Component->CriticalPrimary != 0 && PassNum == 1))
 	{
 		if (Component->CurrentDamage >= Component->DamageLevels[3])
 		{
@@ -4929,7 +4929,6 @@ static UINT32 _UpdateTerrainCollideLists(mlVehicleData* VehicleData, UINT32 Forc
 	FLOAT64VECTOR Vec1;
 	piVECTOR PosVec;
 	FLOAT64 Dist1 = 0.0f;
-	UINT32 Pos = 0;
 	OBJECT* TempObj = nullptr;
 	LOGICAL IgnoreZ = FALSE;
 	WEAPON_SPEC Spec;
@@ -6705,7 +6704,6 @@ UINT32 _ReadBumpAndFrictionTable(void)
 		}
 	}
 
-    typedef std::pair<std::string, BumpAndFrictionData*> ins;
     std::string szStr;
 
 	Position = -1;
@@ -7101,10 +7099,10 @@ UINT32 mlGetHitSpriteNumbers(SINT32* Sprite1,
 	return 0;
 }
 
-UINT32 mlGetRandomHitSound(SINT8 ** HitSoundName,
+UINT32 mlGetRandomHitSound(const char ** HitSoundName,
 						   FLOAT32 * MinVolume,
 						   FLOAT32 * MaxVolumeEnergy,
-						   const SINT8 * TextureName)
+						   const char * TextureName)
 {
 	if (HitSoundName == nullptr ||
         TextureName == nullptr ||
@@ -8226,7 +8224,6 @@ UINT32 mlDetermineVehicleCollisions(mlVehicleData * VehicleData, FLOAT64 DeltaTi
 	UINT32 i;
 	piVECTOR V1,V2;
 
-	SINT32 T1 = piReadTimeStamp32();
 	SINT32 T2;
 
 	trnGetWorldOriginOffset(&WorldOffsetOrigin);
@@ -8490,7 +8487,6 @@ static UINT32 _DoODEVehicleCollision(mlVehicleData* VehicleData, FLOAT64 DeltaTi
     FLOAT64VECTOR DeltaVel = {0, 0, 0};
 	piVECTOR Norm = {0, 0, 0};
 	piVECTOR TempPos = {0, 0, 0};
-	piMATRIX TempMat = IdentityMatrix;
 
 	trnGetWorldOriginOffset(&WorldOffsetOrigin);
 	WorldOffsetOrigin.z = -WorldOffsetOrigin.z;
@@ -10169,7 +10165,7 @@ FLOAT64VECTOR WorldOriginOffset;
 piVECTOR V1,V2;
 FLOAT32 RollCoefficientMult;
 OBJECT * Object;
-SINT32	InfSurfaceID;
+SINT32	InfSurfaceID = 0;
 trnCDTerrainObject*	TO;
 
 	if (VehicleData == nullptr)
