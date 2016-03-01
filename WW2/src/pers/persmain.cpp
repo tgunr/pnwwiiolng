@@ -3493,21 +3493,11 @@ UINT32 persSetVehicleG(FLOAT32 VehicleG, vehVehicle* Vehicle)
 {
 	if (Vehicle == _Persona.VehicleAttached && Vehicle != nullptr)
 	{
-		_VehicleG = VehicleG;
-
-		if (_Persona.VehicleAttached->ModelData != nullptr)
-		{
-			if (_Persona.VehicleAttached->VehicleType != nullptr)
-			{
-				// if we're being towed, g is treated as 1g to keep bumpiness
-				// from killing the crew
-				if (_Persona.VehicleAttached->ModelData->TowBarEnabled == TRUE &&
-					_Persona.VehicleAttached->VehicleType->Type == VEH_TYPE_GROUND)
-				{
-					_VehicleG = 1.0;
-				}
-			}
-		}
+		// HACK: This isn't being properly accumulated for ground vehicles on rough terrain.
+		if ( _Persona.VehicleAttached->VehicleType != nullptr && _Persona.VehicleAttached->VehicleType->Type == VEH_TYPE_GROUND )
+			_VehicleG = 1.0;
+		else
+			_VehicleG = VehicleG;
 	}
 
 	return 0;
