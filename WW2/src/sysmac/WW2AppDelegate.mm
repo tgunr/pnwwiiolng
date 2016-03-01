@@ -24,8 +24,19 @@
 #include "loclApp.h"
 #include "auth/authTypes.h"
 #include "auth/authAppIDs.h"
+#include <netdb.h>
+#include <arpa/inet.h>
 
-#define PLAYGATE_VERSION 0x01010109
+//#define PLAYGATE_VERSION 0x01010109
+#define PLAYGATE_VERSION 0x00010109
+
+#define DEFAULT_AUTH_SERVER "auth.playnet.com"
+//#define DEFAULT_AUTH_SERVER "authdevng.playnet.com"
+// Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
+#define RELEASE_ARENA 1
+// Match Playgate version in auth.app_manifest table
+
+#define DEFAULT_AUTH_PORT WWII::Net::Ports::AuthHost
 
 static void xmlerrorstub (void *ctx, const char *msg, ...) {}
 static void xmlstructurederrorstub(void *userData, xmlErrorPtr error) {}
@@ -163,22 +174,21 @@ static void setupJoystick(void)
 
 static void saveJoystickCalibration()
 {
-    int i, joynum;
-    int one = 1;
-    
-    for(i = 0; i < (int)numStickElements; i++)
+    for (uint32_t i = 0; i < numStickElements; i++)
     {
-        joynum = stickElements[i].joynum;
-        if(joynum < 0 || joynum >= MAX_HID_STICKS || !sticks[joynum].calibrated) continue;
+        auto joynum = stickElements[i].joynum;
         
-        [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithInt:one]
-                                                  forKey:[NSString stringWithFormat:@"%d", sticks[joynum].identifier]];
+        if (joynum >= MAX_HID_STICKS || !sticks[joynum].calibrated) {
+            continue;
+        }
         
-        [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithLong:stickElements[i].ref->minReport]
-                                                  forKey:[NSString stringWithFormat:@"%d-%d-min", sticks[joynum].identifier, stickElements[i].pos]];
+        [[NSUserDefaults standardUserDefaults] setObject:@1 forKey:[NSString stringWithFormat:@"%lu", sticks[joynum].identifier]];
         
-        [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithLong:stickElements[i].ref->maxReport]
-                                                  forKey:[NSString stringWithFormat:@"%d-%d-max", sticks[joynum].identifier, stickElements[i].pos]];
+        [[NSUserDefaults standardUserDefaults] setObject:@(stickElements[i].ref->minReport)
+                                                  forKey:[NSString stringWithFormat:@"%lu-%d-min", sticks[joynum].identifier, stickElements[i].pos]];
+        
+        [[NSUserDefaults standardUserDefaults] setObject:@(stickElements[i].ref->maxReport)
+                                                  forKey:[NSString stringWithFormat:@"%lu-%d-max", sticks[joynum].identifier, stickElements[i].pos]];
     }
 }
 
@@ -228,14 +238,14 @@ NSString * const PGRootErrorKey = @"ROOT ERROR";
 
 @implementation PGError
 
-+ (id)errorWithError:(NSError*)rootError domain:(NSString*)domain code:(int)code userInfo:(NSDictionary*)dict
++ (instancetype)errorWithError:(NSError *)rootError domain:(NSString *)domain code:(int)code userInfo:(NSDictionary *)dict
 {
     NSMutableDictionary *udict = [dict ?: @{} mutableCopy];
-    if (rootError != nil) {
+    
+    if (rootError) {
         udict[PGRootErrorKey] = rootError;
     }
-    
-    return [self errorWithDomain:domain code:code userInfo:dict];
+    return [self errorWithDomain:domain code:code userInfo:udict];
 }
 
 - (NSString*)localizedDescription {
@@ -307,7 +317,7 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
             
         case Auth::Apps::BROWSER:
         case Auth::Apps::WEB_REDIRECT:
-            [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithCString:reply->data]]];
+            [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithUTF8String:reply->data]]];
             [gPlayGateAppDelegate setError:[PGError errorWithDomain:PGErrorDomain code:PGErrorSilent userInfo:nil]];
             [gPlayGateAppDelegate advanceState];
             break;
@@ -503,13 +513,20 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
     ((void (*)(id, SEL, id))objc_msgSend)(webView, @selector(setFrameLoadDelegate:), self);
     ((void (*)(id, SEL, BOOL))objc_msgSend)(webView, @selector(setShouldCloseWithWindow:), YES);
     
-    [self goHome:self];
+    [self goHome];
     
     [self loadUserNamePassword];
     [userNameField setDelegate:self];
     [passwordField setDelegate:self];
     
     [self updateLoginEnabled];
+    
+    authServer = [[NSString stringWithCString:DEFAULT_AUTH_SERVER encoding:NSUTF8StringEncoding] retain];
+    if (gAuthServer[0]) {
+        [authServer release];
+        authServer = [[NSString alloc] initWithUTF8String:gAuthServer];
+    }
+    authPort = DEFAULT_AUTH_PORT;
     
     NSMutableParagraphStyle *style = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
     style.alignment = NSCenterTextAlignment;
@@ -565,6 +582,10 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
 {
     if (state == WAIT_APPLE_EVT) {
 
+        if (gArena[0]) {
+            arena = [[NSString stringWithCString:(const char *)gArena encoding:NSUTF8StringEncoding] intValue];
+        }
+        
         session = 0;
         
         // Initial state advancement
@@ -778,9 +799,15 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
         case WAIT_APPLE_EVT:
             [self setPlayGateStatus:NSLocalizedString(@"Connecting to server.", @"")];
             [statusWindow makeKeyAndOrderFront:self];
-            state = WAIT_AUTH_CONNECT;
-            break;
-            
+
+            if (! isConnectedToAuthenticationServer)
+            {
+                [self connectToAuthenticationServer];
+                state = WAIT_AUTH_CONNECT;
+                break;
+            }
+            [[clang::fallthrough]];
+
         case WAIT_AUTH_CONNECT:
             [self setPlayGateStatus:NSLocalizedString(@"Getting user login information.", @"")];
             state = WAIT_USER_PASS;
@@ -813,7 +840,12 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
             // Login succeeded, save off our login credentials.
             [self saveUserNamePassword];
             
-            snprintf(GameServerIP, 63, "%u", authReply.serverIP);
+            snprintf(GameServerIP, 63, "%u.%u.%u.%u",
+                     (authReply.serverIP >> 24) & 0xff,
+                     (authReply.serverIP >> 16) & 0xff,
+                     (authReply.serverIP >> 8) & 0xff,
+                     authReply.serverIP & 0xff );
+            
             snprintf(GameServerPort, 63, "%d", authReply.serverPort);
             snprintf(GameServerOTP, 63, "%d", authReply.otp);
             [self launchGame];
@@ -895,6 +927,12 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
     launchRequest.appID = verifyInfo->appID;
     
     NSString* appVersion = [[NSString stringWithCString:STRVER encoding:NSUTF8StringEncoding] retain];
+
+    /* command line version override - not sure this is needed, but putting it in anyway */
+    if (gClientV[0]) {
+        [appVersion release];
+        appVersion = [[[NSString alloc] initWithUTF8String:gClientV] retain];
+    }
     
     if (appVersion != nil)
     {
@@ -923,6 +961,44 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
     
     teulSend(teulConnectionIndex, authAPP_LAUNCH_REQ, &launchRequest);
     return 0;
+}
+
+- (void)connectToAuthenticationServer
+{
+    isConnectedToAuthenticationServer = YES;
+    
+    struct hostent *myhost = gethostbyname(authServer.UTF8String);
+
+    if (myhost != nullptr && myhost->h_addr_list != nullptr) {
+        struct in_addr addr;
+        memcpy(&addr, myhost->h_addr_list[0], sizeof(struct in_addr));
+        UINT32 hostAddress = (UINT32)htonl(addr.s_addr);
+        
+        if (hostAddress != 0) {
+            if (! isteulInitialized) {
+                ww2::Client::Init();
+                
+#if IS_DEBUG
+                dbugSetWriteLevel(Debug::ERR_DBUG);
+                dbugSetLogLevel(Debug::ERR_DBUG);
+#else
+                dbugSetWriteLevel(Debug::ERR_ABORT);
+                dbugSetLogLevel(Debug::ERR_ABORT);
+#endif
+                authClientInstallCallbacks();
+                isteulInitialized = YES;
+            }
+            teulTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue());
+            dispatch_source_set_timer(teulTimer, DISPATCH_TIME_NOW, 0.01 * static_cast<double>(NSEC_PER_SEC), 100);
+            dispatch_source_set_event_handler(teulTimer, ^ { teulUpdateTransport(); });
+            dispatch_resume(teulTimer);
+            teulOpenSend(hostAddress, authPort, teulConnectCallback, 100000, PROTOCOL_TCP, teulErrorCallback);
+        }
+    } else {
+        [self setError:[PGError errorWithDomain:PGErrorDomain
+                                           code:PGErrorFailedHostLookup
+                                       userInfo:@{ PGErrorDataKey: authServer }]];
+    }
 }
 
 - (void)login
@@ -1145,7 +1221,6 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 {
     [playgateStatus setStringValue:status];
     [playgateStatus displayIfNeeded];
-    [NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.75]];
 }
 
 -(IBAction)doCancel:(id)sender
@@ -1246,7 +1321,7 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
         [calibrate setEnabled:NO];
     }else
     {
-        id found = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"%d",sticks[joynum].identifier]];
+        id found = [[NSUserDefaults standardUserDefaults] objectForKey:[NSString stringWithFormat:@"%lu",sticks[joynum].identifier]];
         
         [calibrate setTitle:(sticks[joynum].calibrated || found != nil) ? @"Re-Calibrate" : @"Calibrate"];
         [calibrate setEnabled:YES];
@@ -1309,7 +1384,7 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
     
     for(unsigned int i = 0; i < numSticks; i++)
     {
-        nstr = [NSString stringWithCString: sticks[i].name];
+        nstr = [NSString stringWithUTF8String: sticks[i].name];
         [joymenu addItemWithTitle: nstr];
     }
 }

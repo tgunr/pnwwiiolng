@@ -21,6 +21,7 @@ glslUniform::glslUniform() :
     _modifiedCount(0),
     _oldModifiedCount(0),
     _oneTimeApply(false),
+    global(false),
     _type(UNDEFINED)
 {
 }
@@ -29,10 +30,11 @@ glslUniform::glslUniform() :
 Function: glslUniform::Uniform()
 Description:
 -------------------------------------------------------------------------------------*/
-glslUniform::glslUniform(Type type, const std::string& name, int numElements) :
+glslUniform::glslUniform(Type type, const std::string& name, int numElements, bool isglobal) :
     _numElements(0),
     _modifiedCount(0),
     _oneTimeApply(false),
+    global(isglobal),
     _type(type)
 {
     SetName(name);

@@ -808,6 +808,7 @@ LOGICAL rnmainKill(void)
     GameClientKill();
 
 	sndsKill();
+    glslKill();
 
     Write_Log(LOG_OLD, LOG_INFO, "[rnmainKill]");
 

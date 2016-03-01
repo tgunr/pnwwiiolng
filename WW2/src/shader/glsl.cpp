@@ -383,31 +383,31 @@ static void InitGlobalUniforms()
     for(int i = 0; i < max_lights; i++)
     {
         sprintf(str, "lightsource[%d].enabled", i);
-        lightuniforms[i].enabled = new glslUniform(glslUniform::FLOAT, str, 1);
+        lightuniforms[i].enabled = new glslUniform(glslUniform::FLOAT, str, 1, true);
 
         sprintf(str, "lightsource[%d].kc", i);
-        lightuniforms[i].kc = new glslUniform(glslUniform::FLOAT, str, 1);
+        lightuniforms[i].kc = new glslUniform(glslUniform::FLOAT, str, 1, true);
 
         sprintf(str, "lightsource[%d].kl", i);
-        lightuniforms[i].kl = new glslUniform(glslUniform::FLOAT, str, 1);
+        lightuniforms[i].kl = new glslUniform(glslUniform::FLOAT, str, 1, true);
 
         sprintf(str, "lightsource[%d].kq", i);
-        lightuniforms[i].kq = new glslUniform(glslUniform::FLOAT, str, 1);
+        lightuniforms[i].kq = new glslUniform(glslUniform::FLOAT, str, 1, true);
 
         sprintf(str, "lightsource[%d].dir", i);
-        lightuniforms[i].dir = new glslUniform(glslUniform::FLOAT_VEC3, str, 1);
+        lightuniforms[i].dir = new glslUniform(glslUniform::FLOAT_VEC3, str, 1, true);
 
         sprintf(str, "lightsource[%d].pos", i);
-        lightuniforms[i].pos = new glslUniform(glslUniform::FLOAT_VEC3, str, 1);
+        lightuniforms[i].pos = new glslUniform(glslUniform::FLOAT_VEC3, str, 1, true);
 
         sprintf(str, "lightsource[%d].diffuse", i);
-        lightuniforms[i].diffuse = new glslUniform(glslUniform::FLOAT_VEC4, str, 1);
+        lightuniforms[i].diffuse = new glslUniform(glslUniform::FLOAT_VEC4, str, 1, true);
 
         sprintf(str, "lightsource[%d].specular", i);
-        lightuniforms[i].specular = new glslUniform(glslUniform::FLOAT_VEC4, str, 1);
+        lightuniforms[i].specular = new glslUniform(glslUniform::FLOAT_VEC4, str, 1, true);
 
         sprintf(str, "lightsource[%d].ambient", i);
-        lightuniforms[i].ambient = new glslUniform(glslUniform::FLOAT_VEC4, str, 1);
+        lightuniforms[i].ambient = new glslUniform(glslUniform::FLOAT_VEC4, str, 1, true);
     }
 }
 
@@ -444,6 +444,28 @@ bool glslLoadShaderXML(const char* file)
     ProgramState::Bind(0);
 
     return true;
+}
+
+/*------------------------------------------------------------------
+Function: glslKill
+Description:
+-------------------------------------------------------------------*/
+void glslKill()
+{
+    GLSL.Kill();
+
+    for(int i = 0; i < max_lights; i++)
+    {
+        delete lightuniforms[i].enabled;
+        delete lightuniforms[i].kc;
+        delete lightuniforms[i].kl;
+        delete lightuniforms[i].kq;
+        delete lightuniforms[i].dir;
+        delete lightuniforms[i].pos;
+        delete lightuniforms[i].diffuse;
+        delete lightuniforms[i].specular;
+        delete lightuniforms[i].ambient;
+    }
 }
 
 /*------------------------------------------------------------------
