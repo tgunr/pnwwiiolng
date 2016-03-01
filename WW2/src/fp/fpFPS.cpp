@@ -1675,18 +1675,11 @@ fpsWeaponStates fpFPSDetermineNextState ()
 
 				if(fpsWeapons[currentWeaponModel].placedObject)
 				{
-					if(PlayerClient()->IsMissionLeader() && !fpsTrooper.isParatroop)
-					{
-						vehmainFRUBuild();
-					}
-					else
-					{
-						// we piggy back on this variable to get the type (kind of a hack)
-						SINT32 type = (SINT32)currentGameWeapon->NumRoundsAmmoLeft[0];
+					// we piggy back on this variable to get the type (kind of a hack)
+					SINT32 type = (SINT32)currentGameWeapon->NumRoundsAmmoLeft[0];
 
-						// create a new ppo
-						fpPPOCreate(type);
-					}
+					// create a new ppo
+					fpPPOCreate(type);
 				}
 
 				if(fpsWeapons[currentWeaponModel].clipBullets == -1)
