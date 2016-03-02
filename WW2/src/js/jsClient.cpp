@@ -71,6 +71,8 @@ static const char* branches[MAX_BRANCHES] = {"none", "army", "airforce", "navy" 
 JSClass jsClient::jsclass = JS_CLASS_MACRO("client");
 JSFunctionSpec jsClient::jsfunctions[] =
 {
+	JS_FUNCTION_SPEC(jsClient, getmisscountry,1),
+	JS_FUNCTION_SPEC(jsClient, getmissbrigade,1),
 	JS_FUNCTION_SPEC(jsClient, acceptmission,1),
 	JS_FUNCTION_SPEC(jsClient, spawn,1),
 	JS_FUNCTION_SPEC(jsClient, selectpersona,1),
@@ -86,6 +88,7 @@ JSFunctionSpec jsClient::jsfunctions[] =
 	JS_FUNCTION_SPEC(jsClient, acceptcrew,1),
 	JS_FUNCTION_SPEC(jsClient, requestpersonalist,0),
 	JS_FUNCTION_SPEC(jsClient, requestmissionlist,0),
+	JS_FUNCTION_SPEC(jsClient, requestquickmissionlist,0),
 	JS_FUNCTION_SPEC(jsClient, exitmission,0),
 	JS_FUNCTION_SPEC(jsClient, cancelandexitmission,0),
 	JS_FUNCTION_SPEC(jsClient, requestbrigadedetail,1),
