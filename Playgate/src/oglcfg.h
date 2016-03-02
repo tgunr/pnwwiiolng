@@ -5,6 +5,7 @@
 
 #include <windows.h>
 
+#include "gl/glew.h"
 #include "gl/gl.h"
 #include "gl/glext.h"
 #include "gl/wglew.h"
