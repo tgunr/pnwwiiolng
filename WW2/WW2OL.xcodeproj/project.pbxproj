@@ -500,6 +500,11 @@
 		E97C76CF1C85B08900875F44 /* readme.rtf in Resources */ = {isa = PBXBuildFile; fileRef = E97C76CE1C85B08900875F44 /* readme.rtf */; };
 		E97C76D11C85B15800875F44 /* playarc.ww2 in CopyFiles */ = {isa = PBXBuildFile; fileRef = E97C76D01C85B15800875F44 /* playarc.ww2 */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		E97C76D41C85B21200875F44 /* HockeySDK.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = E97C76D31C85B21200875F44 /* HockeySDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		E97C76DA1C87AC6800875F44 /* BuildSettings.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = E97C76D51C87AC6700875F44 /* BuildSettings.xcconfig */; };
+		E97C76DB1C87AC6800875F44 /* CodeSigning.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = E97C76D61C87AC6700875F44 /* CodeSigning.xcconfig */; };
+		E97C76DC1C87AC6800875F44 /* Defines.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = E97C76D71C87AC6800875F44 /* Defines.xcconfig */; };
+		E97C76DD1C87AC6800875F44 /* SearchPaths.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = E97C76D81C87AC6800875F44 /* SearchPaths.xcconfig */; };
+		E97C76DE1C87AC6800875F44 /* Warnings.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = E97C76D91C87AC6800875F44 /* Warnings.xcconfig */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1571,6 +1576,11 @@
 		E97C76CE1C85B08900875F44 /* readme.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = readme.rtf; path = ../../ww2mods135/readme.rtf; sourceTree = "<group>"; };
 		E97C76D01C85B15800875F44 /* playarc.ww2 */ = {isa = PBXFileReference; lastKnownFileType = file; name = playarc.ww2; path = "../../../../../../Applications/World War II Online.app/Contents/MacOS/AppData/playarc.ww2"; sourceTree = "<group>"; };
 		E97C76D31C85B21200875F44 /* HockeySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HockeySDK.framework; path = Vendor/HockeySDK.framework; sourceTree = "<group>"; };
+		E97C76D51C87AC6700875F44 /* BuildSettings.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = BuildSettings.xcconfig; path = proj/mac/BuildSettings.xcconfig; sourceTree = "<group>"; };
+		E97C76D61C87AC6700875F44 /* CodeSigning.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = CodeSigning.xcconfig; path = proj/mac/CodeSigning.xcconfig; sourceTree = "<group>"; };
+		E97C76D71C87AC6800875F44 /* Defines.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Defines.xcconfig; path = proj/mac/Defines.xcconfig; sourceTree = "<group>"; };
+		E97C76D81C87AC6800875F44 /* SearchPaths.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = SearchPaths.xcconfig; path = proj/mac/SearchPaths.xcconfig; sourceTree = "<group>"; };
+		E97C76D91C87AC6800875F44 /* Warnings.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Warnings.xcconfig; path = proj/mac/Warnings.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -3100,6 +3110,7 @@
 		20286C29FDCF999611CA2CEA /* WW2OL */ = {
 			isa = PBXGroup;
 			children = (
+				E97C76DF1C87AC6D00875F44 /* Config */,
 				E97C76D31C85B21200875F44 /* HockeySDK.framework */,
 				E97C76D01C85B15800875F44 /* playarc.ww2 */,
 				E97C76CE1C85B08900875F44 /* readme.rtf */,
@@ -3235,6 +3246,18 @@
 				E97C762D1C84E36000875F44 /* libxml2.tbd */,
 			);
 			name = event;
+			sourceTree = "<group>";
+		};
+		E97C76DF1C87AC6D00875F44 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				E97C76D51C87AC6700875F44 /* BuildSettings.xcconfig */,
+				E97C76D61C87AC6700875F44 /* CodeSigning.xcconfig */,
+				E97C76D71C87AC6800875F44 /* Defines.xcconfig */,
+				E97C76D81C87AC6800875F44 /* SearchPaths.xcconfig */,
+				E97C76D91C87AC6800875F44 /* Warnings.xcconfig */,
+			);
+			name = Config;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -3432,7 +3455,12 @@
 			buildActionMask = 2147483647;
 			files = (
 				0D6E716D0AF63EAC00B3B0BD /* MainMenu.nib in Resources */,
+				E97C76DD1C87AC6800875F44 /* SearchPaths.xcconfig in Resources */,
+				E97C76DB1C87AC6800875F44 /* CodeSigning.xcconfig in Resources */,
+				E97C76DE1C87AC6800875F44 /* Warnings.xcconfig in Resources */,
 				E97C76CC1C85AFAA00875F44 /* Localizable.strings in Resources */,
+				E97C76DA1C87AC6800875F44 /* BuildSettings.xcconfig in Resources */,
+				E97C76DC1C87AC6800875F44 /* Defines.xcconfig in Resources */,
 				0DDF012D0857934A0027461D /* proj/mac/ww2.icns in Resources */,
 				E97C76CF1C85B08900875F44 /* readme.rtf in Resources */,
 			);
@@ -3971,6 +3999,7 @@
 		};
 		085BD0C9110F5D560063F377 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E97C76D51C87AC6700875F44 /* BuildSettings.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -4187,6 +4216,7 @@
 		};
 		085BD0CD110F5D5C0063F377 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E97C76D51C87AC6700875F44 /* BuildSettings.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -4402,6 +4432,7 @@
 		};
 		085BD0DE110F5F290063F377 /* Debug Optimized */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E97C76D51C87AC6700875F44 /* BuildSettings.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -4619,6 +4650,7 @@
 		};
 		088DF82D11343DC30040BC8F /* Closed Beta Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E97C76D51C87AC6700875F44 /* BuildSettings.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -4836,6 +4868,7 @@
 		};
 		0897A0F111B9530200F72FC0 /* Release With Symbols */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E97C76D51C87AC6700875F44 /* BuildSettings.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
@@ -5118,6 +5151,7 @@
 		};
 		0DF8591A0870692100A6D554 /* Beta Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = E97C76D51C87AC6700875F44 /* BuildSettings.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";

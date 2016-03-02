@@ -1,0 +1,70 @@
+//
+//  Defines.xcconfig
+//  WW2OL
+//
+//  Created by Gwynne Raskind on 10/30/15.
+//  Copyright © 2015 Playnet. All rights reserved.
+//
+
+////////////////////////////////////////////////////////////////////////////////
+// Preprocessor macros. There are lot of these.
+//
+// Due to ridiculous limitations of the xcconfig parser, the numbers following
+// each set of macros must be kept correct and synchronized when adding or
+// removing defines. The recommendation is to do what is done with, for example,
+// the GENICONS macro, and disable it by adding a prefix rather than attempting
+// to comment out the line. This is a bad solution, but it's the best one there
+// is at this time. Note that numeric macros one above the last one defined are
+// always empty, and are included only for visual consistency. Also, putting the
+// numbers in reverse order allows the "gather" settings to use a constant 01 as
+// the "final" item. (Which is actually not quite true since xcconfigs are
+// actually "two-pass" parsed, meaning that the order in which vars are defined
+// doesn't matter, but it does read more like what's intended.)
+
+// Platform
+WW2_DEFINES_Platform        = _MACOSX=1 platOS=OS_MACOS XP_MAC                      // We're on Mac, duh
+
+// Common macros in all modes
+WW2_DEFINES_Common_04       = $(WW2_DEFINES_Common_05) ENABLE_FLOATERS              // enable... whatever floaters are
+WW2_DEFINES_Common_03       = $(WW2_DEFINES_Common_04) EVENT_LOG                    // enable various logging things
+WW2_DEFINES_Common_02       = $(WW2_DEFINES_Common_03) xGENICONS=1                  // DON'T enable icon generation, whatever that is
+WW2_DEFINES_Common_01       = $(WW2_DEFINES_Common_02) xSPATIAL_DB                  // DON'T enable spatial database, whatever that is
+
+// Debug flags common to development and debug; debug is always a subset of dev
+WW2_DEFINES_Debug_03        = $(WW2_DEFINES_Debug_04) RELEASE_CLIENT=0              // not a release client
+WW2_DEFINES_Debug_02        = $(WW2_DEFINES_Debug_03) IS_DEBUG DEBUG _DEBUG
+WW2_DEFINES_Debug_01        = $(WW2_DEFINES_Debug_02) DONT_USE_COVERT               // disable bad tricks for masking memory values
+
+// Development mode
+WW2_DEFINES_Development_08  = $(WW2_DEFINES_Development_09) TEUL_DEBUG              // hey look some other debugging
+WW2_DEFINES_Development_07  = $(WW2_DEFINES_Development_08) WANT_BUZZARD_OFFLINE    // ignore online-only flag on vehicles
+WW2_DEFINES_Development_06  = $(WW2_DEFINES_Development_07) USE_SCENARIO_MAP        // some weird things in dot_tspawn
+WW2_DEFINES_Development_05  = $(WW2_DEFINES_Development_06) MODEL_INFO              // show loaded model data
+WW2_DEFINES_Development_04  = $(WW2_DEFINES_Development_05) RECORD_FILES            // track and list all referenced files on disk
+WW2_DEFINES_Development_03  = $(WW2_DEFINES_Development_04) CONNECTION_TEST_BUILD   // extra debugging of teul usage
+WW2_DEFINES_Development_02  = $(WW2_DEFINES_Development_03) DEV_BUILD               // various extra debugging
+WW2_DEFINES_Development_01  = $(WW2_DEFINES_Development_02) DEBUG_WW2               // even more debugging
+
+// Release mode
+WW2_DEFINES_Release_02      = $(WW2_DEFINES_Release_02) NDEBUG
+WW2_DEFINES_Release_01      = $(WW2_DEFINES_Release_03) RELEASE_CLIENT=1            // definitely a release client
+
+// "Gatherers"
+WW2_DEFINES_Development     = $(WW2_DEFINES_Platform) $(WW2_DEFINES_Common_01) $(WW2_DEFINES_Debug_01) $(WW2_DEFINES_Development_01)
+WW2_DEFINES_Debug           = $(WW2_DEFINES_Platform) $(WW2_DEFINES_Common_01) $(WW2_DEFINES_Debug_01)
+WW2_DEFINES_Release         = $(WW2_DEFINES_Platform) $(WW2_DEFINES_Common_01) $(WW2_DEFINES_Release_01)
+
+// Actual build setting that Xcode cares about!
+GCC_PREPROCESSOR_DEFINITIONS = $(WW2_DEFINES_$(CONFIGURATION))
+
+// Removed macros:
+//  NO_PRELOAD - not used anywhere
+//  RELEASE_ARENA - no longer used
+//  SPAWN_AT_OLD_OFFLINE - overriden by other macros
+//  SUPPORT_WWO - no .wwo files exist in the data directory
+//  _OPTIONS_BELOW_THIS_LINE - was just a marker anyway
+//  DEBUG_PATCHING - no longer used
+//  ANDREWTEST - never defined in any builds and commented out almost everywhere
+//  TESTMAC - enables an old and very broken Mac memory tester, don't want this
+//  MAKE_HOST_TERRAIN - only used for host builds
+//  IS_BIG_ENDIAN - we don't support any big-endian platforms
