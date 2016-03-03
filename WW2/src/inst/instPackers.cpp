@@ -1,3 +1,4 @@
+#include <syscfg.h>
 // Created: Tue Oct  7 16:59:22 CDT 2008
 //
 // Pack routines for instancing

@@ -1208,7 +1208,7 @@ gr2Animation* gr2LoadAnimation (const SCHAR* animationFile, SINT32 useCache)
 	newAnimation->events	= nullptr;
 
 	const SCHAR* fileName = nullptr;
-	char* slash = strchr(animationFile, '\\');
+	const char* slash = strchr(animationFile, '\\');
 
 	while(slash)
 	{

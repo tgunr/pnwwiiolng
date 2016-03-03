@@ -1,3 +1,4 @@
+#include <syscfg.h>
 /*-------------------------------------------------------------------------
 Module: glslCloth.cpp
 Description:

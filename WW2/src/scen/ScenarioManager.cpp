@@ -90,7 +90,7 @@ struct content_command
 // private variables
 #ifdef BETA_RELEASE
 std::vector<Vec3d> _editArea;
-std::vector<std::pair<char*,int> > _editLines;
+std::vector<std::pair<const char*,int> > _editLines;
 static int _lineCount = 0;
 #endif
 
@@ -4272,7 +4272,7 @@ void ScenarioManager::UnloadContent()
 #ifdef BETA_RELEASE
 	for(size_t i = 0; i < _editLines.size(); i++)
 	{
-		std::pair<char*, int>& line = _editLines.at(i);
+		std::pair<const char*, int>& line = _editLines.at(i);
 		_removeEditLine(line.first, line.second);
 	}
 
@@ -4556,7 +4556,7 @@ void ScenarioManager::SetEditMode(bool mode)
 
 		for(size_t i = 0; i < _editLines.size(); i++)
 		{
-			std::pair<char*, int>& line = _editLines.at(i);
+			std::pair<const char*, int>& line = _editLines.at(i);
 			_removeEditLine(line.first, line.second);
 		}
 

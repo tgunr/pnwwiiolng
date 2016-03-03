@@ -1,3 +1,4 @@
+#include <syscfg.h>
 /*------------------------------------------------------------------------------------
 Module: glslShader.cpp
 Description:
@@ -6,7 +7,11 @@ Description:
 #include "shader/glslShader.h"
 #include "shader/glslProgram.h"
 #include "log/log.h"
+#if platOS == OS_WIN32
+#include "spt/Random.h"
+#else
 #include "Random.h"
+#endif
 
 /*------------------------------------------------------------------------------------
 Function: glslShader::glslShader()

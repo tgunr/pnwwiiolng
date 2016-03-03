@@ -5740,6 +5740,7 @@ static SINT32 dot_follow(const char* line)
 	return DC_HANDLED;
 }
 
+#ifdef ENABLE_FLOATERS
 /************************************************************************************************
 	InfLODCmd
 *************************************************************************************************/
@@ -5758,8 +5759,26 @@ static SINT32 dot_inflod(const char* line)
 
 	return DC_HANDLED;
 }
+#endif
 
 /************************************************************************************************
+InfLODModCmd
+*************************************************************************************************/
+
+#if defined(BETA_RELEASE)
+static SINT32 dot_inflodmod(const char* line)
+{
+	if (sscanf(line, "%*s %f %f", &gTrooperLOD, &gTrooperMOD) > 0)
+		uiChatPrintLine("Setting infantry LOD mod to %.2f%% and a mod of %.2f", (gTrooperLOD * 100.0f), gTrooperMOD);
+	else
+		uiChatPrintLine("You must set a percent (0 to 1) in the 1st parameter and an optional mod in the 2nd one.");
+
+	return DC_HANDLED;
+}
+#endif
+
+/************************************************************************************************
+	else
 	ScenarioCmd
 *************************************************************************************************/
 
@@ -5918,6 +5937,26 @@ static SINT32 dot_scenario(const char* line)
 		SCEN_MGR->LoadContent();
 		SCEN_MGR->LoadObjects();
 	}
+
+	return DC_HANDLED;
+}
+#endif
+
+#ifdef BETA_RELEASE
+
+/************************************************************************************************
+	JavascriptCmd
+*************************************************************************************************/
+
+static SINT32 dot_js(const char* line)
+{
+	char script[255+1];
+	script[0] = 0;
+
+	sscanf(line, "%*s %255s", script);
+
+	if(script[0])
+		uiRunScript(script);
 
 	return DC_HANDLED;
 }
@@ -6785,6 +6824,37 @@ static SINT32 dot_dev(const char* line)
 
 	return DC_HANDLED;
 }
+
+#ifdef BETA_RELEASE
+static SINT32 dot_canvas(const char* line)
+{
+	phui::View* canvas = uiViewport()->FindView("canvas");
+
+	if(canvas)
+	{
+		canvas->Close();
+	}
+	else
+	{
+		canvas = uiLoadView("canvas");
+
+		if(canvas)
+		{
+			char parent[32] = "";
+			sscanf(line, "%*s %31s", parent);
+
+			std::string script = "setParent('";
+			script += parent;
+			script += "');";
+
+			phui::DOM::ElementDOM* viewdom = dynamic_cast<phui::DOM::ElementDOM*>(canvas->UserData(DOM_VIEW_USERDATA));
+			if(viewdom) viewdom->RunScript(script.c_str());
+		}
+	}
+
+	return DC_HANDLED;
+}
+#endif
 
 #endif // _DEBUG
 

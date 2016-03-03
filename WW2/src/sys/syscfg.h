@@ -1,6 +1,9 @@
+
 #ifndef PN_PROJECT_SYSCFG_H
 #define PN_PROJECT_SYSCFG_H 1
 // Can't use a pragma guard, because there are multiple syscfgs.
+
+#if platOS == OS_WIN32
 
 #define platBuild TEUL_CLIENT
 
@@ -9,7 +12,7 @@
 #define WIN32_LEAN_AND_MEAN
 #define FRONT_END
 
-	#define _GDI32_
+#define _GDI32_
 
 #define NO_DEBUG_WRITE
 #pragma warning (disable: 4800) // shut the #$!@ up
@@ -20,15 +23,15 @@
 #undef PostMessage
 
 // Project defines - Non-Specific
-typedef LOGICAL (*SYS_DDINITFUNC)(void);
-typedef LOGICAL (*SYS_D3DINITFUNC)(void);
-typedef LOGICAL (*SYS_DDRENDERFUNC)(void);
-typedef LOGICAL (*SYS_D3DRENDERFUNC)(void);
-typedef void (*SYS_DDKILLFUNC)(void);
-typedef void (*SYS_D3DKILLFUNC)(void);
-typedef void (*SYS_MOUSEFUNC)(UINT message, WPARAM wparam, LPARAM lparam);
-typedef void (*SYS_TIMERFUNC)(WPARAM wparam, LPARAM lparam);
-typedef void (*SYS_KEYBOARDFUNC)(UINT message, WPARAM wparam, LPARAM lparam);
+typedef LOGICAL(*SYS_DDINITFUNC)(void);
+typedef LOGICAL(*SYS_D3DINITFUNC)(void);
+typedef LOGICAL(*SYS_DDRENDERFUNC)(void);
+typedef LOGICAL(*SYS_D3DRENDERFUNC)(void);
+typedef void(*SYS_DDKILLFUNC)(void);
+typedef void(*SYS_D3DKILLFUNC)(void);
+typedef void(*SYS_MOUSEFUNC)(UINT message, WPARAM wparam, LPARAM lparam);
+typedef void(*SYS_TIMERFUNC)(WPARAM wparam, LPARAM lparam);
+typedef void(*SYS_KEYBOARDFUNC)(UINT message, WPARAM wparam, LPARAM lparam);
 
 #define MAXENUMDRIVERS		32
 #define MAXMIPLEVELS		12
@@ -52,14 +55,14 @@ typedef void (*SYS_KEYBOARDFUNC)(UINT message, WPARAM wparam, LPARAM lparam);
 
 // Project defines - DEBUG
 #ifdef _DEBUG
-	#ifndef NO_LOGGING
-		#define EVENT_LOG
-		#define EVENT_LOG_TIMES
+#ifndef NO_LOGGING
+#define EVENT_LOG
+#define EVENT_LOG_TIMES
 //		#define EVENT_LOG_EXTREME
-	#endif
-	// #define MEMORY_DEBUG_EXTREME
+#endif
+// #define MEMORY_DEBUG_EXTREME
 #elif defined(BETA_RELEASE)
-	#define EVENT_LOG
+#define EVENT_LOG
 #endif	// _DEBUG
 
 #define NO_DEBUG_WRITE
@@ -76,7 +79,7 @@ typedef void (*SYS_KEYBOARDFUNC)(UINT message, WPARAM wparam, LPARAM lparam);
 #endif
 
 #if _MSC_VER >= 1500
-	// Visual Studio 9
+// Visual Studio 9
 #else
 #ifndef vsnprintf
 #define vsnprintf _vsnprintf
@@ -145,3 +148,6 @@ typedef void (*SYS_KEYBOARDFUNC)(UINT message, WPARAM wparam, LPARAM lparam);
 #include "pi/pi.h"
 
 #endif
+
+#endif
+

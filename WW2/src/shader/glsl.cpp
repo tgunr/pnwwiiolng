@@ -1,3 +1,4 @@
+#include <syscfg.h>
 /*------------------------------------------------------------------
 Module: osgShader.cpp
 Description: Wrapper for creating vertex/frag shaders

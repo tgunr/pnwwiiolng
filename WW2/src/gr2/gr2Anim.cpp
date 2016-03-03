@@ -4263,7 +4263,9 @@ LOGICAL gr2AnimProcessAnimationFlags(OBJECT* pObject, UINT32 flags)
 	SINT32	point		= 0;
 	SINT32	weapon		= 0;
 	SINT32	death		= 0;
-	//SINT32	emote		= 0;
+#ifdef BETA_RELEASE
+	SINT32	emote		= 0;
+#endif
 	SINT32	altWeapon	= 0;
 	LOGICAL altTrooper	= 0;
 	LOGICAL	chuteOpen	= 0;

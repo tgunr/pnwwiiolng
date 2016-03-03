@@ -1665,8 +1665,7 @@ void ParticleMgr::update()
 }
 
 #if platOS == OS_MACOS
-
-static int _backtofront2(const void *a, const  void *b)
+static int _backtofront(const void *a, const  void *b)
 {
   const Particle2* l = *(const Particle2**) a;
   const Particle2* r = *(const Particle2**) b;
@@ -1680,6 +1679,11 @@ static void qsort2(void *p, size_t cnt, size_t sz, cmp_t c)
   qsort( p, cnt, sz, c);
 }
 
+#else
+static int _backtofront(Particle2 *l, Particle2 *r)
+{
+	return l->_distance2 > r->_distance2;
+}
 #endif
 
 /*----------------------------------------------------------------------
@@ -1786,7 +1790,7 @@ void ParticleMgr::cull()
 #endif
 
 #if platOS == OS_MACOS
-        qsort2( &_draw[0], _draw.size(), sizeof(Particle2*), _backtofront2 ); // avoid compiler bug (I think)
+        qsort2( &_draw[0], _draw.size(), sizeof(Particle2*), _backtofront ); // avoid compiler bug (I think)
 #else
         sort(_draw.begin(), _draw.end(), _backtofront);
 #endif

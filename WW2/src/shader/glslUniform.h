@@ -6,7 +6,12 @@
 #include <math.h>
 
 #include "pi/pi.h"
+
+#if platOS == OS_WIN32
+#include "math/Vec4f.h"
+#else
 #include "vec4f.h"
+#endif
 
 class Matrixf;
 class Matrixd;
