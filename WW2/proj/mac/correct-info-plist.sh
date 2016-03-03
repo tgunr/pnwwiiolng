@@ -20,13 +20,13 @@ echo "Commit hash: $shaHash"
 echo "Repo state: $status"
 echo "Client version: $version"
 
-INFO="${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/Contents/Info"
+INFO="${BUILT_PRODUCTS_DIR}/${WRAPPER_NAME}/Contents/Info.plist"
 
-defaults write "$INFO" GitShaHash "$shaHash"
-defaults write "$INFO" GitState "$status"
-defaults write "$INFO" CFBundleShortVersionString "$version"
-defaults write "$INFO" CFBundleVersion "$version"
+plutil -replace GitShaHash -string "$shaHash" "$INFO"
+plutil -replace GitState -string "$status" "$INFO"
+plutil -replace CFBundleShortVersionString -string "$version" "$INFO"
+plutil -replace CFBundleVersion -string "$version" "$INFO"
 
 # For some reason, defaults now forces binary plist format. Not good for an Info.plist
-plutil -convert xml1 "$INFO.plist"
+plutil -convert xml1 "$INFO"
 
