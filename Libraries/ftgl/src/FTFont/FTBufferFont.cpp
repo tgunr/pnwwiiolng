@@ -186,7 +186,7 @@ inline char *StringCopy(char const *s, int len)
 {
     if(len < 0)
     {
-        return _strdup(s);
+        return strdup(s);
     }
     else
     {
