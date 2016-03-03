@@ -2320,6 +2320,10 @@ PFNGLWINDOWPOS4SVMESAPROC __glewWindowPos4svMESA = NULL;
 PFNGLBEGINCONDITIONALRENDERNVXPROC __glewBeginConditionalRenderNVX = NULL;
 PFNGLENDCONDITIONALRENDERNVXPROC __glewEndConditionalRenderNVX = NULL;
 
+PFNGLLGPUCOPYIMAGESUBDATANVXPROC __glewLGPUCopyImageSubDataNVX = NULL;
+PFNGLLGPUINTERLOCKNVXPROC __glewLGPUInterlockNVX = NULL;
+PFNGLLGPUNAMEDBUFFERSUBDATANVXPROC __glewLGPUNamedBufferSubDataNVX = NULL;
+
 PFNGLMULTIDRAWARRAYSINDIRECTBINDLESSNVPROC __glewMultiDrawArraysIndirectBindlessNV = NULL;
 PFNGLMULTIDRAWELEMENTSINDIRECTBINDLESSNVPROC __glewMultiDrawElementsIndirectBindlessNV = NULL;
 
@@ -2342,6 +2346,24 @@ PFNGLUNIFORMHANDLEUI64VNVPROC __glewUniformHandleui64vNV = NULL;
 
 PFNGLBLENDBARRIERNVPROC __glewBlendBarrierNV = NULL;
 PFNGLBLENDPARAMETERINVPROC __glewBlendParameteriNV = NULL;
+
+PFNGLCALLCOMMANDLISTNVPROC __glewCallCommandListNV = NULL;
+PFNGLCOMMANDLISTSEGMENTSNVPROC __glewCommandListSegmentsNV = NULL;
+PFNGLCOMPILECOMMANDLISTNVPROC __glewCompileCommandListNV = NULL;
+PFNGLCREATECOMMANDLISTSNVPROC __glewCreateCommandListsNV = NULL;
+PFNGLCREATESTATESNVPROC __glewCreateStatesNV = NULL;
+PFNGLDELETECOMMANDLISTSNVPROC __glewDeleteCommandListsNV = NULL;
+PFNGLDELETESTATESNVPROC __glewDeleteStatesNV = NULL;
+PFNGLDRAWCOMMANDSADDRESSNVPROC __glewDrawCommandsAddressNV = NULL;
+PFNGLDRAWCOMMANDSNVPROC __glewDrawCommandsNV = NULL;
+PFNGLDRAWCOMMANDSSTATESADDRESSNVPROC __glewDrawCommandsStatesAddressNV = NULL;
+PFNGLDRAWCOMMANDSSTATESNVPROC __glewDrawCommandsStatesNV = NULL;
+PFNGLGETCOMMANDHEADERNVPROC __glewGetCommandHeaderNV = NULL;
+PFNGLGETSTAGEINDEXNVPROC __glewGetStageIndexNV = NULL;
+PFNGLISCOMMANDLISTNVPROC __glewIsCommandListNV = NULL;
+PFNGLISSTATENVPROC __glewIsStateNV = NULL;
+PFNGLLISTDRAWCOMMANDSSTATESCLIENTNVPROC __glewListDrawCommandsStatesClientNV = NULL;
+PFNGLSTATECAPTURENVPROC __glewStateCaptureNV = NULL;
 
 PFNGLBEGINCONDITIONALRENDERNVPROC __glewBeginConditionalRenderNV = NULL;
 PFNGLENDCONDITIONALRENDERNVPROC __glewEndConditionalRenderNV = NULL;
@@ -3375,6 +3397,7 @@ GLboolean __GLEW_KHR_robust_buffer_access_behavior = GL_FALSE;
 GLboolean __GLEW_KHR_robustness = GL_FALSE;
 GLboolean __GLEW_KHR_texture_compression_astc_hdr = GL_FALSE;
 GLboolean __GLEW_KHR_texture_compression_astc_ldr = GL_FALSE;
+GLboolean __GLEW_KHR_texture_compression_astc_sliced_3d = GL_FALSE;
 GLboolean __GLEW_KTX_buffer_region = GL_FALSE;
 GLboolean __GLEW_MESAX_texture_stack = GL_FALSE;
 GLboolean __GLEW_MESA_pack_invert = GL_FALSE;
@@ -3383,12 +3406,14 @@ GLboolean __GLEW_MESA_window_pos = GL_FALSE;
 GLboolean __GLEW_MESA_ycbcr_texture = GL_FALSE;
 GLboolean __GLEW_NVX_conditional_render = GL_FALSE;
 GLboolean __GLEW_NVX_gpu_memory_info = GL_FALSE;
+GLboolean __GLEW_NVX_linked_gpu_multicast = GL_FALSE;
 GLboolean __GLEW_NV_bindless_multi_draw_indirect = GL_FALSE;
 GLboolean __GLEW_NV_bindless_multi_draw_indirect_count = GL_FALSE;
 GLboolean __GLEW_NV_bindless_texture = GL_FALSE;
 GLboolean __GLEW_NV_blend_equation_advanced = GL_FALSE;
 GLboolean __GLEW_NV_blend_equation_advanced_coherent = GL_FALSE;
 GLboolean __GLEW_NV_blend_square = GL_FALSE;
+GLboolean __GLEW_NV_command_list = GL_FALSE;
 GLboolean __GLEW_NV_compute_program5 = GL_FALSE;
 GLboolean __GLEW_NV_conditional_render = GL_FALSE;
 GLboolean __GLEW_NV_conservative_raster = GL_FALSE;
@@ -7829,6 +7854,21 @@ static GLboolean _glewInit_GL_NVX_conditional_render (GLEW_CONTEXT_ARG_DEF_INIT)
 
 #endif /* GL_NVX_conditional_render */
 
+#ifdef GL_NVX_linked_gpu_multicast
+
+static GLboolean _glewInit_GL_NVX_linked_gpu_multicast (GLEW_CONTEXT_ARG_DEF_INIT)
+{
+  GLboolean r = GL_FALSE;
+
+  r = ((glLGPUCopyImageSubDataNVX = (PFNGLLGPUCOPYIMAGESUBDATANVXPROC)glewGetProcAddress((const GLubyte*)"glLGPUCopyImageSubDataNVX")) == NULL) || r;
+  r = ((glLGPUInterlockNVX = (PFNGLLGPUINTERLOCKNVXPROC)glewGetProcAddress((const GLubyte*)"glLGPUInterlockNVX")) == NULL) || r;
+  r = ((glLGPUNamedBufferSubDataNVX = (PFNGLLGPUNAMEDBUFFERSUBDATANVXPROC)glewGetProcAddress((const GLubyte*)"glLGPUNamedBufferSubDataNVX")) == NULL) || r;
+
+  return r;
+}
+
+#endif /* GL_NVX_linked_gpu_multicast */
+
 #ifdef GL_NV_bindless_multi_draw_indirect
 
 static GLboolean _glewInit_GL_NV_bindless_multi_draw_indirect (GLEW_CONTEXT_ARG_DEF_INIT)
@@ -7895,6 +7935,35 @@ static GLboolean _glewInit_GL_NV_blend_equation_advanced (GLEW_CONTEXT_ARG_DEF_I
 }
 
 #endif /* GL_NV_blend_equation_advanced */
+
+#ifdef GL_NV_command_list
+
+static GLboolean _glewInit_GL_NV_command_list (GLEW_CONTEXT_ARG_DEF_INIT)
+{
+  GLboolean r = GL_FALSE;
+
+  r = ((glCallCommandListNV = (PFNGLCALLCOMMANDLISTNVPROC)glewGetProcAddress((const GLubyte*)"glCallCommandListNV")) == NULL) || r;
+  r = ((glCommandListSegmentsNV = (PFNGLCOMMANDLISTSEGMENTSNVPROC)glewGetProcAddress((const GLubyte*)"glCommandListSegmentsNV")) == NULL) || r;
+  r = ((glCompileCommandListNV = (PFNGLCOMPILECOMMANDLISTNVPROC)glewGetProcAddress((const GLubyte*)"glCompileCommandListNV")) == NULL) || r;
+  r = ((glCreateCommandListsNV = (PFNGLCREATECOMMANDLISTSNVPROC)glewGetProcAddress((const GLubyte*)"glCreateCommandListsNV")) == NULL) || r;
+  r = ((glCreateStatesNV = (PFNGLCREATESTATESNVPROC)glewGetProcAddress((const GLubyte*)"glCreateStatesNV")) == NULL) || r;
+  r = ((glDeleteCommandListsNV = (PFNGLDELETECOMMANDLISTSNVPROC)glewGetProcAddress((const GLubyte*)"glDeleteCommandListsNV")) == NULL) || r;
+  r = ((glDeleteStatesNV = (PFNGLDELETESTATESNVPROC)glewGetProcAddress((const GLubyte*)"glDeleteStatesNV")) == NULL) || r;
+  r = ((glDrawCommandsAddressNV = (PFNGLDRAWCOMMANDSADDRESSNVPROC)glewGetProcAddress((const GLubyte*)"glDrawCommandsAddressNV")) == NULL) || r;
+  r = ((glDrawCommandsNV = (PFNGLDRAWCOMMANDSNVPROC)glewGetProcAddress((const GLubyte*)"glDrawCommandsNV")) == NULL) || r;
+  r = ((glDrawCommandsStatesAddressNV = (PFNGLDRAWCOMMANDSSTATESADDRESSNVPROC)glewGetProcAddress((const GLubyte*)"glDrawCommandsStatesAddressNV")) == NULL) || r;
+  r = ((glDrawCommandsStatesNV = (PFNGLDRAWCOMMANDSSTATESNVPROC)glewGetProcAddress((const GLubyte*)"glDrawCommandsStatesNV")) == NULL) || r;
+  r = ((glGetCommandHeaderNV = (PFNGLGETCOMMANDHEADERNVPROC)glewGetProcAddress((const GLubyte*)"glGetCommandHeaderNV")) == NULL) || r;
+  r = ((glGetStageIndexNV = (PFNGLGETSTAGEINDEXNVPROC)glewGetProcAddress((const GLubyte*)"glGetStageIndexNV")) == NULL) || r;
+  r = ((glIsCommandListNV = (PFNGLISCOMMANDLISTNVPROC)glewGetProcAddress((const GLubyte*)"glIsCommandListNV")) == NULL) || r;
+  r = ((glIsStateNV = (PFNGLISSTATENVPROC)glewGetProcAddress((const GLubyte*)"glIsStateNV")) == NULL) || r;
+  r = ((glListDrawCommandsStatesClientNV = (PFNGLLISTDRAWCOMMANDSSTATESCLIENTNVPROC)glewGetProcAddress((const GLubyte*)"glListDrawCommandsStatesClientNV")) == NULL) || r;
+  r = ((glStateCaptureNV = (PFNGLSTATECAPTURENVPROC)glewGetProcAddress((const GLubyte*)"glStateCaptureNV")) == NULL) || r;
+
+  return r;
+}
+
+#endif /* GL_NV_command_list */
 
 #ifdef GL_NV_conditional_render
 
@@ -10735,6 +10804,9 @@ GLenum GLEWAPIENTRY glewContextInit (GLEW_CONTEXT_ARG_DEF_LIST)
 #ifdef GL_KHR_texture_compression_astc_ldr
   GLEW_KHR_texture_compression_astc_ldr = _glewSearchExtension("GL_KHR_texture_compression_astc_ldr", extStart, extEnd);
 #endif /* GL_KHR_texture_compression_astc_ldr */
+#ifdef GL_KHR_texture_compression_astc_sliced_3d
+  GLEW_KHR_texture_compression_astc_sliced_3d = _glewSearchExtension("GL_KHR_texture_compression_astc_sliced_3d", extStart, extEnd);
+#endif /* GL_KHR_texture_compression_astc_sliced_3d */
 #ifdef GL_KTX_buffer_region
   GLEW_KTX_buffer_region = _glewSearchExtension("GL_KTX_buffer_region", extStart, extEnd);
   if (glewExperimental || GLEW_KTX_buffer_region) GLEW_KTX_buffer_region = !_glewInit_GL_KTX_buffer_region(GLEW_CONTEXT_ARG_VAR_INIT);
@@ -10763,6 +10835,10 @@ GLenum GLEWAPIENTRY glewContextInit (GLEW_CONTEXT_ARG_DEF_LIST)
 #ifdef GL_NVX_gpu_memory_info
   GLEW_NVX_gpu_memory_info = _glewSearchExtension("GL_NVX_gpu_memory_info", extStart, extEnd);
 #endif /* GL_NVX_gpu_memory_info */
+#ifdef GL_NVX_linked_gpu_multicast
+  GLEW_NVX_linked_gpu_multicast = _glewSearchExtension("GL_NVX_linked_gpu_multicast", extStart, extEnd);
+  if (glewExperimental || GLEW_NVX_linked_gpu_multicast) GLEW_NVX_linked_gpu_multicast = !_glewInit_GL_NVX_linked_gpu_multicast(GLEW_CONTEXT_ARG_VAR_INIT);
+#endif /* GL_NVX_linked_gpu_multicast */
 #ifdef GL_NV_bindless_multi_draw_indirect
   GLEW_NV_bindless_multi_draw_indirect = _glewSearchExtension("GL_NV_bindless_multi_draw_indirect", extStart, extEnd);
   if (glewExperimental || GLEW_NV_bindless_multi_draw_indirect) GLEW_NV_bindless_multi_draw_indirect = !_glewInit_GL_NV_bindless_multi_draw_indirect(GLEW_CONTEXT_ARG_VAR_INIT);
@@ -10785,6 +10861,10 @@ GLenum GLEWAPIENTRY glewContextInit (GLEW_CONTEXT_ARG_DEF_LIST)
 #ifdef GL_NV_blend_square
   GLEW_NV_blend_square = _glewSearchExtension("GL_NV_blend_square", extStart, extEnd);
 #endif /* GL_NV_blend_square */
+#ifdef GL_NV_command_list
+  GLEW_NV_command_list = _glewSearchExtension("GL_NV_command_list", extStart, extEnd);
+  if (glewExperimental || GLEW_NV_command_list) GLEW_NV_command_list = !_glewInit_GL_NV_command_list(GLEW_CONTEXT_ARG_VAR_INIT);
+#endif /* GL_NV_command_list */
 #ifdef GL_NV_compute_program5
   GLEW_NV_compute_program5 = _glewSearchExtension("GL_NV_compute_program5", extStart, extEnd);
 #endif /* GL_NV_compute_program5 */
@@ -16304,6 +16384,13 @@ GLboolean GLEWAPIENTRY glewIsSupported (const char* name)
           continue;
         }
 #endif
+#ifdef GL_KHR_texture_compression_astc_sliced_3d
+        if (_glewStrSame3(&pos, &len, (const GLubyte*)"texture_compression_astc_sliced_3d", 34))
+        {
+          ret = GLEW_KHR_texture_compression_astc_sliced_3d;
+          continue;
+        }
+#endif
       }
       if (_glewStrSame2(&pos, &len, (const GLubyte*)"KTX_", 4))
       {
@@ -16372,6 +16459,13 @@ GLboolean GLEWAPIENTRY glewIsSupported (const char* name)
           continue;
         }
 #endif
+#ifdef GL_NVX_linked_gpu_multicast
+        if (_glewStrSame3(&pos, &len, (const GLubyte*)"linked_gpu_multicast", 20))
+        {
+          ret = GLEW_NVX_linked_gpu_multicast;
+          continue;
+        }
+#endif
       }
       if (_glewStrSame2(&pos, &len, (const GLubyte*)"NV_", 3))
       {
@@ -16414,6 +16508,13 @@ GLboolean GLEWAPIENTRY glewIsSupported (const char* name)
         if (_glewStrSame3(&pos, &len, (const GLubyte*)"blend_square", 12))
         {
           ret = GLEW_NV_blend_square;
+          continue;
+        }
+#endif
+#ifdef GL_NV_command_list
+        if (_glewStrSame3(&pos, &len, (const GLubyte*)"command_list", 12))
+        {
+          ret = GLEW_NV_command_list;
           continue;
         }
 #endif
