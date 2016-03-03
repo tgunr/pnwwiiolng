@@ -149,6 +149,9 @@ IconMapRenderer::SuperCell::~SuperCell()
 
 /************************************************************************************************
 	Load
+ 
+ NOTE: This is NOT thread-safe!!!  replaceoctets has been taken off the stack and made static
+ so we don't ever want to see more than one Cell LoaderThread running!
 *************************************************************************************************/
 
 void IconMapRenderer::SuperCell::Load()
@@ -156,7 +159,7 @@ void IconMapRenderer::SuperCell::Load()
 	if(loaded) return;
 
 	sdm_dtl_data dtl;
-	sdm_replacement_octet_data replaceoctets;
+	static sdm_replacement_octet_data replaceoctets;
 	IconMapRenderer* ir = (IconMapRenderer*)renderer;
 
 	ir->GetSDMData(scx, scy, &dtl, &replaceoctets);
