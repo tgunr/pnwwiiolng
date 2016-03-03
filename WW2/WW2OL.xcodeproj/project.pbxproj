@@ -442,7 +442,7 @@
 		0DBEF4410A7FD8F60094C53D /* libexpat-ww2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DBEF4400A7FD8F60094C53D /* libexpat-ww2.a */; };
 		0DDF00AA08578C460027461D /* libHIDUtilities.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DDF00A308578C460027461D /* libHIDUtilities.a */; };
 		0DDF00AC08578C460027461D /* libjs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DDF00A508578C460027461D /* libjs.a */; };
-		0DDF012D0857934A0027461D /* proj/mac/ww2.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0DDF012C0857934A0027461D /* proj/mac/ww2.icns */; };
+		0DDF012D0857934A0027461D /* ww2.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0DDF012C0857934A0027461D /* proj/mac/ww2.icns */; };
 		47B0EDFD0E9A85510089DCC4 /* libteulKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 47B0ED240E9A66A40089DCC4 /* libteulKit.a */; };
 		E90D969A1C6D729D00D5EC52 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96991C6D729D00D5EC52 /* WebKit.framework */; };
 		E90D969C1C6D738D00D5EC52 /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D969B1C6D738D00D5EC52 /* AGL.framework */; };
@@ -1485,9 +1485,9 @@
 		0DBEF4400A7FD8F60094C53D /* libexpat-ww2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libexpat-ww2.a"; path = "lib/mac/libexpat-ww2.a"; sourceTree = SOURCE_ROOT; };
 		0DDF00A308578C460027461D /* libHIDUtilities.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libHIDUtilities.a; path = lib/mac/libHIDUtilities.a; sourceTree = SOURCE_ROOT; };
 		0DDF00A508578C460027461D /* libjs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjs.a; path = lib/mac/libjs.a; sourceTree = SOURCE_ROOT; };
-		0DDF012C0857934A0027461D /* proj/mac/ww2.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = proj/mac/ww2.icns; sourceTree = "<group>"; };
+		0DDF012C0857934A0027461D /* ww2.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = proj/mac/ww2.icns; sourceTree = "<group>"; };
 		47B0ED240E9A66A40089DCC4 /* libteulKit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libteulKit.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		8D0C4E960486CD37000505A6 /* proj/mac/Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = proj/mac/Info.plist; sourceTree = "<group>"; };
+		8D0C4E960486CD37000505A6 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = proj/mac/Info.plist; sourceTree = "<group>"; };
 		8D0C4E970486CD37000505A6 /* World War II Online.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "World War II Online.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E90D96991C6D729D00D5EC52 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		E90D969B1C6D738D00D5EC52 /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = ../../../../../../System/Library/Frameworks/AGL.framework; sourceTree = "<group>"; };
@@ -3014,11 +3014,12 @@
 			path = ez;
 			sourceTree = "<group>";
 		};
-		0D6E71630AF63EAC00B3B0BD /* proj/mac/English.lproj */ = {
+		0D6E71630AF63EAC00B3B0BD /* English.lproj */ = {
 			isa = PBXGroup;
 			children = (
 				0D6E71660AF63EAC00B3B0BD /* MainMenu.nib */,
 			);
+			name = English.lproj;
 			path = proj/mac/English.lproj;
 			sourceTree = "<group>";
 		};
@@ -3127,9 +3128,9 @@
 		20286C2CFDCF999611CA2CEA /* rsrc */ = {
 			isa = PBXGroup;
 			children = (
-				0D6E71630AF63EAC00B3B0BD /* proj/mac/English.lproj */,
-				0DDF012C0857934A0027461D /* proj/mac/ww2.icns */,
-				8D0C4E960486CD37000505A6 /* proj/mac/Info.plist */,
+				0D6E71630AF63EAC00B3B0BD /* English.lproj */,
+				0DDF012C0857934A0027461D /* ww2.icns */,
+				8D0C4E960486CD37000505A6 /* Info.plist */,
 			);
 			name = rsrc;
 			sourceTree = "<group>";
@@ -3461,8 +3462,8 @@
 				E97C76CC1C85AFAA00875F44 /* Localizable.strings in Resources */,
 				E97C76DA1C87AC6800875F44 /* BuildSettings.xcconfig in Resources */,
 				E97C76DC1C87AC6800875F44 /* Defines.xcconfig in Resources */,
-				0DDF012D0857934A0027461D /* proj/mac/ww2.icns in Resources */,
 				E97C76CF1C85B08900875F44 /* readme.rtf in Resources */,
+				0DDF012D0857934A0027461D /* ww2.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
