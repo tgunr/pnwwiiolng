@@ -6408,9 +6408,8 @@ LOGICAL fpFPSIsWeaponSwitchOK (SINT32 weaponNumber)
 	if(stateFlags & (STATE_HOLD_FIRE|STATE_FIRE_DELAYED_WEAP))
 		return FALSE;
 
-	// no weapon switch with loaded rifle grenade
-	if (fpsWeapons[currentWeaponModel].auxEnable[FPS_AUX_RGGRENADE])
-	{
+	// Cannot switch away from loaded explosive weapons (grenadiers, rockets).
+	if ( fpsWeapons[currentWeaponModel].auxEnable[FPS_AUX_RGGRENADE] || fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_ROCKET ) {
 		persShakeHead();
 		return FALSE;
 	}
