@@ -1597,8 +1597,8 @@ void fpFPSDataInit ()
 	// ENFIELD animation files
 	arms_anim_files[ENFIELD][RELOAD] = FPS_DIR "enfield\\animations\\reload\\armsmesh-enfield-reload(115)";
 	weap_anim_files[ENFIELD][RELOAD] = FPS_DIR "enfield\\animations\\reload\\enfield-reload(115)";
-	arms_anim_files[ENFIELD][RECYCLE] = FPS_DIR "enfield\\animations\\recycle\\armsmesh-enfield-recycle(60)";
-	weap_anim_files[ENFIELD][RECYCLE] = FPS_DIR "enfield\\animations\\recycle\\enfield-recycle(60)";
+	arms_anim_files[ENFIELD][RECYCLE] = FPS_DIR "enfield\\animations\\recycle\\armsmesh-enfield-recycle(30)";
+	weap_anim_files[ENFIELD][RECYCLE] = FPS_DIR "enfield\\animations\\recycle\\enfield-recycle(30)";
 	arms_anim_files[ENFIELD][STAND_FIRE] = FPS_DIR "enfield\\animations\\fire\\arms-enfield-fire(3)";
 	arms_anim_files[ENFIELD][CROUCH_FIRE] = FPS_DIR "enfield\\animations\\fire\\crouch-enfield-fire(3)";
 	arms_anim_files[ENFIELD][AIM_FIRE] = FPS_DIR "enfield\\animations\\fire\\aim-enfield-fire(3)";
