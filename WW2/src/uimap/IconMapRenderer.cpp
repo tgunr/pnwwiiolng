@@ -52,6 +52,7 @@ enum {MAX_SUPERCELL_TEXTURES = 1024};
 	unsigned int lastdrawtime;
 
     virtual void Draw(phui::GraphicsContext*);
+	// WARNING: It is not safe to call this from multiple threads.
 	virtual void Load();
 
 protected:
@@ -156,7 +157,8 @@ void IconMapRenderer::SuperCell::Load()
 	if(loaded) return;
 
 	sdm_dtl_data dtl;
-	sdm_replacement_octet_data replaceoctets;
+	// HACK: Having such a large structure on the stack was causing serious problems.
+	static sdm_replacement_octet_data replaceoctets;
 	IconMapRenderer* ir = (IconMapRenderer*)renderer;
 
 	ir->GetSDMData(scx, scy, &dtl, &replaceoctets);
