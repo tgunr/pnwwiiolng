@@ -1449,7 +1449,9 @@ fpsWeaponStates fpFPSDetermineNextState ()
 
         old = currentFPSstate;
 
-        if (fpFPSIsWeaponSwitchOK(fpsTrooper.autoswitchWeaponNumber))
+		// HACK: First check is to avoid infinite head-shaking when trying to switch from a loaded rocket launcher.
+        if ( !(fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_ROCKET && fpsWeapons[currentWeaponModel].clipBullets != 0) &&
+		     fpFPSIsWeaponSwitchOK(fpsTrooper.autoswitchWeaponNumber))
 		{
 			fpFPSWeaponChange (fpsTrooper.autoswitchWeaponNumber, 1);
 			//return currentFPSstate; // go ahead and let it drop through; this fixes a binocs zoom issue
@@ -6408,8 +6410,11 @@ LOGICAL fpFPSIsWeaponSwitchOK (SINT32 weaponNumber)
 	if(stateFlags & (STATE_HOLD_FIRE|STATE_FIRE_DELAYED_WEAP))
 		return FALSE;
 
-	// Cannot switch away from loaded explosive weapons (grenadiers, rockets).
-	if ( fpsWeapons[currentWeaponModel].auxEnable[FPS_AUX_RGGRENADE] || fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_ROCKET ) {
+	// Cannot switch away from grenadier with the cup attached
+	if ( fpsWeapons[currentWeaponModel].auxEnable[FPS_AUX_RGGRENADE] ||
+	// Cannot switch away from loaded rocket launcher
+	     (fpsWeapons[currentWeaponModel].weaponType == FPS_WEAPONTYPE_ROCKET && fpsWeapons[currentWeaponModel].clipBullets != 0) )
+	{
 		persShakeHead();
 		return FALSE;
 	}
