@@ -182,7 +182,7 @@ fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 	recordRef(widePath);
 #else
 	int fd = OS_OPEN(os_file_path(asciiPath), O_RDONLY | O_BINARY);
-	recordRef(os_file_path(asciiPath));
+	recordRef(widePath);
 #endif
 	if ( PN_UNLIKELY(fd < 0) )
 	{
@@ -380,7 +380,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 		recordRef(widePath);
 #else
 		fd = OS_OPEN(os_file_path(asciiPath), O_RDONLY | O_BINARY);
-		recordRef(os_file_path(asciiPath));
+		recordRef(widePath);
 #endif
 		if ( fd < 0 )
 			throw "open failed";

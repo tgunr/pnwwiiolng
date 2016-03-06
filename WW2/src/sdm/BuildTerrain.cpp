@@ -1579,9 +1579,7 @@ void SuperCellTerrainData::WriteToSDM()
 	fileName.append(dataPath + sdmDir + cellName + MERGEFILE_EXTENSION);
 
 #if DEBUG_WW2
-    char str[512];
-    sprintf(str, "[%d] %s\n", sdmFilesMerged, cellName.c_str());
-    OutputDebugStringA(str);
+    fprintf(stderr, "[%d] %s\n", sdmFilesMerged, cellName.c_str());
 #endif
 
     sdmFile = fopen(fileName.c_str(), "w+b");

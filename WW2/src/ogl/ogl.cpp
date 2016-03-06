@@ -505,7 +505,7 @@ LOGICAL oglTextureHasAlpha(SINT32 texid)
 }
 
 static std::map<std::string,SINT32> textureIndex;
-#ifdef BETA_RELEASE
+#ifdef MODEL_INFO
 std::map<GLuint, std::string> reverseTextureIndex;
 #endif
 
@@ -5101,7 +5101,7 @@ LOGICAL oglSetTextureName(SINT32 texid, const SINT8* name)
 
   textureIndex[str] = texid;
 
-#ifdef BETA_RELEASE
+#ifdef MODEL_INFO
   GLuint g = p->genlist;
   if ( g )
   {
