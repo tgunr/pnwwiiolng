@@ -46,37 +46,6 @@
 
 JS_BEGIN_EXTERN_C
 
-/***********************************************************************
-** FUNCTION:	JS_MALLOC()
-** DESCRIPTION:
-**   JS_NEW() allocates an untyped item of size _size from the heap.
-** INPUTS:  _size: size in bytes of item to be allocated
-** OUTPUTS:	untyped pointer to the node allocated
-** RETURN:	pointer to node or error returned from malloc().
-***********************************************************************/
-#define JS_MALLOC(_bytes) (malloc((_bytes)))
-
-/***********************************************************************
-** FUNCTION:	JS_DELETE()
-** DESCRIPTION:
-**   JS_DELETE() unallocates an object previosly allocated via JS_NEW()
-**   or JS_NEWZAP() to the heap.
-** INPUTS:	pointer to previously allocated object
-** OUTPUTS:	the referenced object is returned to the heap
-** RETURN:	void
-***********************************************************************/
-#define JS_DELETE(_ptr) { free(_ptr); (_ptr) = NULL; }
-
-/***********************************************************************
-** FUNCTION:	JS_NEW()
-** DESCRIPTION:
-**   JS_NEW() allocates an item of type _struct from the heap.
-** INPUTS:  _struct: a data type
-** OUTPUTS:	pointer to _struct
-** RETURN:	pointer to _struct or error returns from malloc().
-***********************************************************************/
-#define JS_NEW(_struct) ((_struct *) JS_MALLOC(sizeof(_struct)))
-
 #ifdef DEBUG
 
 extern JS_PUBLIC_API(void)
@@ -95,11 +64,42 @@ JS_Assert(const char *s, const char *file, JSIntn ln);
 #endif /* defined(DEBUG) */
 
 /*
+ * Compile-time assert. "condition" must be a constant expression.
+ * The macro should be used only once per source line in places where
+ * a "typedef" declaration is allowed.
+ */
+#define JS_STATIC_ASSERT(condition)                                           \
+    JS_STATIC_ASSERT_IMPL(condition, __LINE__)
+#define JS_STATIC_ASSERT_IMPL(condition, line)                                \
+    JS_STATIC_ASSERT_IMPL2(condition, line)
+#define JS_STATIC_ASSERT_IMPL2(condition, line)                               \
+    typedef int js_static_assert_line_##line[(condition) ? 1 : -1]
+
+/*
 ** Abort the process in a non-graceful manner. This will cause a core file,
 ** call to the debugger or other moral equivalent as well as causing the
 ** entire process to stop.
 */
 extern JS_PUBLIC_API(void) JS_Abort(void);
+
+#ifdef XP_UNIX
+
+typedef struct JSCallsite JSCallsite;
+
+struct JSCallsite {
+    uint32      pc;
+    char        *name;
+    const char  *library;
+    int         offset;
+    JSCallsite  *parent;
+    JSCallsite  *siblings;
+    JSCallsite  *kids;
+    void        *handy;
+};
+
+extern JSCallsite *JS_Backtrace(int skip);
+
+#endif
 
 JS_END_EXTERN_C
 
