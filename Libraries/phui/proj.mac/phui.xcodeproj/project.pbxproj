@@ -1,1 +1,668 @@
-// !$*UTF8*$!{	archiveVersion = 1;	classes = {	};	objectVersion = 45;	objects = {/* Begin PBXBuildFile section */		08C8178012B020C500818A11 /* FTFontReplacement.h in Headers */ = {isa = PBXBuildFile; fileRef = 08C8177F12B020C500818A11 /* FTFontReplacement.h */; };		0D1F958108E877F6008FF0BF /* ContextMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D1F958008E877F6008FF0BF /* ContextMenu.cpp */; };		0D31002508843A6200C3CBEA /* Button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31FFF308843A6200C3CBEA /* Button.cpp */; };		0D31002608843A6200C3CBEA /* Caption.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31FFF408843A6200C3CBEA /* Caption.cpp */; };		0D31002708843A6200C3CBEA /* Checkbox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31FFF508843A6200C3CBEA /* Checkbox.cpp */; };		0D31002808843A6200C3CBEA /* ConsoleView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31FFF608843A6200C3CBEA /* ConsoleView.cpp */; };		0D31002908843A6200C3CBEA /* Control.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31FFF708843A6200C3CBEA /* Control.cpp */; };		0D31002A08843A6200C3CBEA /* ControlValueMessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31FFF808843A6200C3CBEA /* ControlValueMessage.cpp */; };		0D31002B08843A6200C3CBEA /* ConvertUTF.c in Sources */ = {isa = PBXBuildFile; fileRef = 0D31FFF908843A6200C3CBEA /* ConvertUTF.c */; };		0D31002C08843A6200C3CBEA /* ConvertUTF.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31FFFA08843A6200C3CBEA /* ConvertUTF.h */; };		0D31002D08843A6200C3CBEA /* CSSViewDrawer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31FFFB08843A6200C3CBEA /* CSSViewDrawer.cpp */; };		0D31002E08843A6200C3CBEA /* DOM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31FFFC08843A6200C3CBEA /* DOM.cpp */; };		0D31002F08843A6200C3CBEA /* DropDownTask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31FFFD08843A6200C3CBEA /* DropDownTask.cpp */; };		0D31003008843A6200C3CBEA /* GLGraphicsContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31FFFE08843A6200C3CBEA /* GLGraphicsContext.cpp */; };		0D31003108843A6200C3CBEA /* Groupbox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31FFFF08843A6200C3CBEA /* Groupbox.cpp */; };		0D31003208843A6200C3CBEA /* ImageView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31000008843A6200C3CBEA /* ImageView.cpp */; };		0D31003308843A6200C3CBEA /* Invoker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31000108843A6200C3CBEA /* Invoker.cpp */; };		0D31003408843A6200C3CBEA /* Javascript.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31000208843A6200C3CBEA /* Javascript.cpp */; };		0D31003708843A6200C3CBEA /* ListView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31000508843A6200C3CBEA /* ListView.cpp */; };		0D31003808843A6200C3CBEA /* Menu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31000708843A6200C3CBEA /* Menu.cpp */; };		0D31003A08843A6200C3CBEA /* Message.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31000908843A6200C3CBEA /* Message.cpp */; };		0D31003B08843A6200C3CBEA /* MessageFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31000A08843A6200C3CBEA /* MessageFilter.cpp */; };		0D31003C08843A6200C3CBEA /* MessageHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31000B08843A6200C3CBEA /* MessageHandler.cpp */; };		0D31003D08843A6200C3CBEA /* MessageLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31000C08843A6200C3CBEA /* MessageLoop.cpp */; };		0D31003E08843A6200C3CBEA /* Messenger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31000D08843A6200C3CBEA /* Messenger.cpp */; };		0D31004008843A6200C3CBEA /* Periodical.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31000F08843A6200C3CBEA /* Periodical.cpp */; };		0D31004108843A6200C3CBEA /* PopupMenuButton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001008843A6200C3CBEA /* PopupMenuButton.cpp */; };		0D31004208843A6200C3CBEA /* ProgressBar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001108843A6200C3CBEA /* ProgressBar.cpp */; };		0D31004308843A6200C3CBEA /* RadioButton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001208843A6200C3CBEA /* RadioButton.cpp */; };		0D31004508843A6200C3CBEA /* Scalar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001408843A6200C3CBEA /* Scalar.cpp */; };		0D31004608843A6200C3CBEA /* Scrollbar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001508843A6200C3CBEA /* Scrollbar.cpp */; };		0D31004708843A6200C3CBEA /* Slider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001608843A6200C3CBEA /* Slider.cpp */; };		0D31004808843A6200C3CBEA /* StackView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001708843A6200C3CBEA /* StackView.cpp */; };		0D31004908843A6200C3CBEA /* StencilView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001808843A6200C3CBEA /* StencilView.cpp */; };		0D31004B08843A6200C3CBEA /* TabView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001A08843A6200C3CBEA /* TabView.cpp */; };		0D31004C08843A6200C3CBEA /* TextControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001B08843A6200C3CBEA /* TextControl.cpp */; };		0D31004D08843A6200C3CBEA /* TextView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001C08843A6200C3CBEA /* TextView.cpp */; };		0D31004E08843A6200C3CBEA /* UIXML.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001D08843A6200C3CBEA /* UIXML.cpp */; };		0D31004F08843A6200C3CBEA /* Util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001E08843A6200C3CBEA /* Util.cpp */; };		0D31005008843A6200C3CBEA /* View.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001F08843A6200C3CBEA /* View.cpp */; };		0D31005108843A6200C3CBEA /* Viewport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31002008843A6200C3CBEA /* Viewport.cpp */; };		0D31005308843A6200C3CBEA /* XMLMessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31002308843A6200C3CBEA /* XMLMessage.cpp */; };		0D31008D08843A7600C3CBEA /* Button.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31005508843A7600C3CBEA /* Button.h */; };		0D31008E08843A7600C3CBEA /* Caption.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31005608843A7600C3CBEA /* Caption.h */; };		0D31008F08843A7600C3CBEA /* Checkbox.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31005708843A7600C3CBEA /* Checkbox.h */; };		0D31009008843A7600C3CBEA /* ConsoleView.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31005808843A7600C3CBEA /* ConsoleView.h */; };		0D31009108843A7600C3CBEA /* Control.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31005908843A7600C3CBEA /* Control.h */; };		0D31009208843A7600C3CBEA /* ControlValueMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31005A08843A7600C3CBEA /* ControlValueMessage.h */; };		0D31009308843A7600C3CBEA /* CSSViewDrawer.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31005B08843A7600C3CBEA /* CSSViewDrawer.h */; };		0D31009408843A7600C3CBEA /* DOM.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31005C08843A7600C3CBEA /* DOM.h */; };		0D31009508843A7600C3CBEA /* DropDownTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31005E08843A7600C3CBEA /* DropDownTask.h */; };		0D31009608843A7600C3CBEA /* Error.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31005F08843A7600C3CBEA /* Error.h */; };		0D31009708843A7600C3CBEA /* GLGraphicsContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31006008843A7600C3CBEA /* GLGraphicsContext.h */; };		0D31009808843A7600C3CBEA /* GraphicsContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31006108843A7600C3CBEA /* GraphicsContext.h */; };		0D31009908843A7600C3CBEA /* Groupbox.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31006208843A7600C3CBEA /* Groupbox.h */; };		0D31009A08843A7600C3CBEA /* ImageView.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31006308843A7600C3CBEA /* ImageView.h */; };		0D31009B08843A7600C3CBEA /* Invoker.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31006408843A7600C3CBEA /* Invoker.h */; };		0D31009C08843A7600C3CBEA /* Javascript.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31006508843A7600C3CBEA /* Javascript.h */; };		0D31009D08843A7600C3CBEA /* KeyCodes.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31006608843A7600C3CBEA /* KeyCodes.h */; };		0D31009F08843A7600C3CBEA /* ListView.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31006808843A7600C3CBEA /* ListView.h */; };		0D3100A108843A7600C3CBEA /* Menu.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31006C08843A7600C3CBEA /* Menu.h */; };		0D3100A308843A7600C3CBEA /* Message.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31006E08843A7600C3CBEA /* Message.h */; };		0D3100A408843A7600C3CBEA /* MessageFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31006F08843A7600C3CBEA /* MessageFilter.h */; };		0D3100A508843A7600C3CBEA /* MessageHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31007008843A7600C3CBEA /* MessageHandler.h */; };		0D3100A608843A7600C3CBEA /* MessageLoop.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31007108843A7600C3CBEA /* MessageLoop.h */; };		0D3100A708843A7600C3CBEA /* Messenger.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31007208843A7600C3CBEA /* Messenger.h */; };		0D3100A908843A7600C3CBEA /* Periodical.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31007408843A7600C3CBEA /* Periodical.h */; };		0D3100AA08843A7600C3CBEA /* PopupMenuButton.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31007508843A7600C3CBEA /* PopupMenuButton.h */; };		0D3100AB08843A7600C3CBEA /* ProgressBar.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31007608843A7600C3CBEA /* ProgressBar.h */; };		0D3100AC08843A7600C3CBEA /* RadioButton.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31007708843A7600C3CBEA /* RadioButton.h */; };		0D3100AD08843A7600C3CBEA /* Referenced.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31007808843A7600C3CBEA /* Referenced.h */; };		0D3100AF08843A7600C3CBEA /* Scalar.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31007A08843A7600C3CBEA /* Scalar.h */; };		0D3100B008843A7600C3CBEA /* Scrollbar.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31007B08843A7600C3CBEA /* Scrollbar.h */; };		0D3100B108843A7600C3CBEA /* Slider.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31007C08843A7600C3CBEA /* Slider.h */; };		0D3100B208843A7600C3CBEA /* StackView.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31007D08843A7600C3CBEA /* StackView.h */; };		0D3100B308843A7600C3CBEA /* StencilView.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31007E08843A7600C3CBEA /* StencilView.h */; };		0D3100B508843A7600C3CBEA /* TabView.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31008008843A7600C3CBEA /* TabView.h */; };		0D3100B608843A7600C3CBEA /* TextControl.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31008108843A7600C3CBEA /* TextControl.h */; };		0D3100B708843A7600C3CBEA /* TextView.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31008208843A7600C3CBEA /* TextView.h */; };		0D3100B808843A7600C3CBEA /* UIMessages.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31008308843A7600C3CBEA /* UIMessages.h */; };		0D3100B908843A7600C3CBEA /* UIXML.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31008408843A7600C3CBEA /* UIXML.h */; };		0D3100BA08843A7600C3CBEA /* Util.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31008508843A7600C3CBEA /* Util.h */; };		0D3100BB08843A7600C3CBEA /* View.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31008608843A7600C3CBEA /* View.h */; };		0D3100BC08843A7600C3CBEA /* ViewDrawer.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31008708843A7600C3CBEA /* ViewDrawer.h */; };		0D3100BD08843A7600C3CBEA /* Viewport.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31008808843A7600C3CBEA /* Viewport.h */; };		0D3100BF08843A7600C3CBEA /* XMLMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31008B08843A7600C3CBEA /* XMLMessage.h */; };		0DC3C9440A7BFDE800F14BBB /* ContextMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0DC3C9430A7BFDE800F14BBB /* ContextMenu.cpp */; };		0DCEF76D0AD4636700E1D282 /* CtxMenu.h in Headers */ = {isa = PBXBuildFile; fileRef = 0DCEF76C0AD4636700E1D282 /* CtxMenu.h */; };		0DCEF7710AD4637000E1D282 /* CtxMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0DCEF7700AD4637000E1D282 /* CtxMenu.cpp */; };		0DCEF7BC0AD4643900E1D282 /* Panel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0DCEF7BB0AD4643900E1D282 /* Panel.cpp */; };		0DCEF7BE0AD4644300E1D282 /* Panel.h in Headers */ = {isa = PBXBuildFile; fileRef = 0DCEF7BD0AD4644300E1D282 /* Panel.h */; };		470B71CF0E7056BF006D9C06 /* MirrorView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 470B71CC0E7056BF006D9C06 /* MirrorView.cpp */; };		470B71D10E7056BF006D9C06 /* wwiiUTF.h in Headers */ = {isa = PBXBuildFile; fileRef = 470B71CE0E7056BF006D9C06 /* wwiiUTF.h */; };		470B71D40E70571B006D9C06 /* wwiiUTF.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 470B71D30E70571B006D9C06 /* wwiiUTF.cpp */; };		4717733D0F28E5580094DEAA /* IMEControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4717733C0F28E5580094DEAA /* IMEControl.cpp */; };		47724CCF0F86C2FC0060F743 /* TextContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 47724CCE0F86C2FC0060F743 /* TextContainer.cpp */; };/* End PBXBuildFile section *//* Begin PBXFileReference section */		08C8177F12B020C500818A11 /* FTFontReplacement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTFontReplacement.h; path = ../include/phui/FTFontReplacement.h; sourceTree = SOURCE_ROOT; };		0D1F958008E877F6008FF0BF /* ContextMenu.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ContextMenu.cpp; path = ../src/ContextMenu.cpp; sourceTree = SOURCE_ROOT; };		0D31000008843A6200C3CBEA /* ImageView.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ImageView.cpp; path = ../src/ImageView.cpp; sourceTree = SOURCE_ROOT; };		0D31000108843A6200C3CBEA /* Invoker.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Invoker.cpp; path = ../src/Invoker.cpp; sourceTree = SOURCE_ROOT; };		0D31000208843A6200C3CBEA /* Javascript.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Javascript.cpp; path = ../src/Javascript.cpp; sourceTree = SOURCE_ROOT; };		0D31000508843A6200C3CBEA /* ListView.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ListView.cpp; path = ../src/ListView.cpp; sourceTree = SOURCE_ROOT; };		0D31000708843A6200C3CBEA /* Menu.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Menu.cpp; path = ../src/Menu.cpp; sourceTree = SOURCE_ROOT; };		0D31000908843A6200C3CBEA /* Message.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Message.cpp; path = ../src/Message.cpp; sourceTree = SOURCE_ROOT; };		0D31000A08843A6200C3CBEA /* MessageFilter.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = MessageFilter.cpp; path = ../src/MessageFilter.cpp; sourceTree = SOURCE_ROOT; };		0D31000B08843A6200C3CBEA /* MessageHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = MessageHandler.cpp; path = ../src/MessageHandler.cpp; sourceTree = SOURCE_ROOT; };		0D31000C08843A6200C3CBEA /* MessageLoop.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = MessageLoop.cpp; path = ../src/MessageLoop.cpp; sourceTree = SOURCE_ROOT; };		0D31000D08843A6200C3CBEA /* Messenger.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Messenger.cpp; path = ../src/Messenger.cpp; sourceTree = SOURCE_ROOT; };		0D31000F08843A6200C3CBEA /* Periodical.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Periodical.cpp; path = ../src/Periodical.cpp; sourceTree = SOURCE_ROOT; };		0D31001008843A6200C3CBEA /* PopupMenuButton.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = PopupMenuButton.cpp; path = ../src/PopupMenuButton.cpp; sourceTree = SOURCE_ROOT; };		0D31001108843A6200C3CBEA /* ProgressBar.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ProgressBar.cpp; path = ../src/ProgressBar.cpp; sourceTree = SOURCE_ROOT; };		0D31001208843A6200C3CBEA /* RadioButton.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = RadioButton.cpp; path = ../src/RadioButton.cpp; sourceTree = SOURCE_ROOT; };		0D31001408843A6200C3CBEA /* Scalar.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Scalar.cpp; path = ../src/Scalar.cpp; sourceTree = SOURCE_ROOT; };		0D31001508843A6200C3CBEA /* Scrollbar.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Scrollbar.cpp; path = ../src/Scrollbar.cpp; sourceTree = SOURCE_ROOT; };		0D31001608843A6200C3CBEA /* Slider.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Slider.cpp; path = ../src/Slider.cpp; sourceTree = SOURCE_ROOT; };		0D31001708843A6200C3CBEA /* StackView.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = StackView.cpp; path = ../src/StackView.cpp; sourceTree = SOURCE_ROOT; };		0D31001808843A6200C3CBEA /* StencilView.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = StencilView.cpp; path = ../src/StencilView.cpp; sourceTree = SOURCE_ROOT; };		0D31001A08843A6200C3CBEA /* TabView.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = TabView.cpp; path = ../src/TabView.cpp; sourceTree = SOURCE_ROOT; };		0D31001B08843A6200C3CBEA /* TextControl.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = TextControl.cpp; path = ../src/TextControl.cpp; sourceTree = SOURCE_ROOT; };		0D31001C08843A6200C3CBEA /* TextView.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = TextView.cpp; path = ../src/TextView.cpp; sourceTree = SOURCE_ROOT; };		0D31001D08843A6200C3CBEA /* UIXML.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = UIXML.cpp; path = ../src/UIXML.cpp; sourceTree = SOURCE_ROOT; };		0D31001E08843A6200C3CBEA /* Util.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Util.cpp; path = ../src/Util.cpp; sourceTree = SOURCE_ROOT; };		0D31001F08843A6200C3CBEA /* View.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = View.cpp; path = ../src/View.cpp; sourceTree = SOURCE_ROOT; };		0D31002008843A6200C3CBEA /* Viewport.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Viewport.cpp; path = ../src/Viewport.cpp; sourceTree = SOURCE_ROOT; };		0D31002308843A6200C3CBEA /* XMLMessage.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = XMLMessage.cpp; path = ../src/XMLMessage.cpp; sourceTree = SOURCE_ROOT; };		0D31005508843A7600C3CBEA /* Button.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Button.h; path = ../include/phui/Button.h; sourceTree = SOURCE_ROOT; };		0D31005608843A7600C3CBEA /* Caption.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Caption.h; path = ../include/phui/Caption.h; sourceTree = SOURCE_ROOT; };		0D31005708843A7600C3CBEA /* Checkbox.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Checkbox.h; path = ../include/phui/Checkbox.h; sourceTree = SOURCE_ROOT; };		0D31005808843A7600C3CBEA /* ConsoleView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ConsoleView.h; path = ../include/phui/ConsoleView.h; sourceTree = SOURCE_ROOT; };		0D31005908843A7600C3CBEA /* Control.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Control.h; path = ../include/phui/Control.h; sourceTree = SOURCE_ROOT; };		0D31005A08843A7600C3CBEA /* ControlValueMessage.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ControlValueMessage.h; path = ../include/phui/ControlValueMessage.h; sourceTree = SOURCE_ROOT; };		0D31005B08843A7600C3CBEA /* CSSViewDrawer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CSSViewDrawer.h; path = ../include/phui/CSSViewDrawer.h; sourceTree = SOURCE_ROOT; };		0D31005C08843A7600C3CBEA /* DOM.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DOM.h; path = ../include/phui/DOM.h; sourceTree = SOURCE_ROOT; };		0D31005E08843A7600C3CBEA /* DropDownTask.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DropDownTask.h; path = ../include/phui/DropDownTask.h; sourceTree = SOURCE_ROOT; };		0D31005F08843A7600C3CBEA /* Error.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Error.h; path = ../include/phui/Error.h; sourceTree = SOURCE_ROOT; };		0D31006008843A7600C3CBEA /* GLGraphicsContext.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = GLGraphicsContext.h; path = ../include/phui/GLGraphicsContext.h; sourceTree = SOURCE_ROOT; };		0D31006108843A7600C3CBEA /* GraphicsContext.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = GraphicsContext.h; path = ../include/phui/GraphicsContext.h; sourceTree = SOURCE_ROOT; };		0D31006208843A7600C3CBEA /* Groupbox.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Groupbox.h; path = ../include/phui/Groupbox.h; sourceTree = SOURCE_ROOT; };		0D31006308843A7600C3CBEA /* ImageView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ImageView.h; path = ../include/phui/ImageView.h; sourceTree = SOURCE_ROOT; };		0D31006408843A7600C3CBEA /* Invoker.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Invoker.h; path = ../include/phui/Invoker.h; sourceTree = SOURCE_ROOT; };		0D31006508843A7600C3CBEA /* Javascript.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Javascript.h; path = ../include/phui/Javascript.h; sourceTree = SOURCE_ROOT; };		0D31006608843A7600C3CBEA /* KeyCodes.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = KeyCodes.h; path = ../include/phui/KeyCodes.h; sourceTree = SOURCE_ROOT; };		0D31006808843A7600C3CBEA /* ListView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ListView.h; path = ../include/phui/ListView.h; sourceTree = SOURCE_ROOT; };		0D31006C08843A7600C3CBEA /* Menu.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Menu.h; path = ../include/phui/Menu.h; sourceTree = SOURCE_ROOT; };		0D31006E08843A7600C3CBEA /* Message.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Message.h; path = ../include/phui/Message.h; sourceTree = SOURCE_ROOT; };		0D31006F08843A7600C3CBEA /* MessageFilter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MessageFilter.h; path = ../include/phui/MessageFilter.h; sourceTree = SOURCE_ROOT; };		0D31007008843A7600C3CBEA /* MessageHandler.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MessageHandler.h; path = ../include/phui/MessageHandler.h; sourceTree = SOURCE_ROOT; };		0D31007108843A7600C3CBEA /* MessageLoop.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MessageLoop.h; path = ../include/phui/MessageLoop.h; sourceTree = SOURCE_ROOT; };		0D31007208843A7600C3CBEA /* Messenger.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Messenger.h; path = ../include/phui/Messenger.h; sourceTree = SOURCE_ROOT; };		0D31007408843A7600C3CBEA /* Periodical.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Periodical.h; path = ../include/phui/Periodical.h; sourceTree = SOURCE_ROOT; };		0D31007508843A7600C3CBEA /* PopupMenuButton.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PopupMenuButton.h; path = ../include/phui/PopupMenuButton.h; sourceTree = SOURCE_ROOT; };		0D31007608843A7600C3CBEA /* ProgressBar.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ProgressBar.h; path = ../include/phui/ProgressBar.h; sourceTree = SOURCE_ROOT; };		0D31007708843A7600C3CBEA /* RadioButton.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = RadioButton.h; path = ../include/phui/RadioButton.h; sourceTree = SOURCE_ROOT; };		0D31007808843A7600C3CBEA /* Referenced.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Referenced.h; path = ../include/phui/Referenced.h; sourceTree = SOURCE_ROOT; };		0D31007A08843A7600C3CBEA /* Scalar.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Scalar.h; path = ../include/phui/Scalar.h; sourceTree = SOURCE_ROOT; };		0D31007B08843A7600C3CBEA /* Scrollbar.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Scrollbar.h; path = ../include/phui/Scrollbar.h; sourceTree = SOURCE_ROOT; };		0D31007C08843A7600C3CBEA /* Slider.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Slider.h; path = ../include/phui/Slider.h; sourceTree = SOURCE_ROOT; };		0D31007D08843A7600C3CBEA /* StackView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = StackView.h; path = ../include/phui/StackView.h; sourceTree = SOURCE_ROOT; };		0D31007E08843A7600C3CBEA /* StencilView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = StencilView.h; path = ../include/phui/StencilView.h; sourceTree = SOURCE_ROOT; };		0D31008008843A7600C3CBEA /* TabView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = TabView.h; path = ../include/phui/TabView.h; sourceTree = SOURCE_ROOT; };		0D31008108843A7600C3CBEA /* TextControl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = TextControl.h; path = ../include/phui/TextControl.h; sourceTree = SOURCE_ROOT; };		0D31008208843A7600C3CBEA /* TextView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = TextView.h; path = ../include/phui/TextView.h; sourceTree = SOURCE_ROOT; };		0D31008308843A7600C3CBEA /* UIMessages.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = UIMessages.h; path = ../include/phui/UIMessages.h; sourceTree = SOURCE_ROOT; };		0D31008408843A7600C3CBEA /* UIXML.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = UIXML.h; path = ../include/phui/UIXML.h; sourceTree = SOURCE_ROOT; };		0D31008508843A7600C3CBEA /* Util.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Util.h; path = ../include/phui/Util.h; sourceTree = SOURCE_ROOT; };		0D31008608843A7600C3CBEA /* View.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = View.h; path = ../include/phui/View.h; sourceTree = SOURCE_ROOT; };		0D31008708843A7600C3CBEA /* ViewDrawer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ViewDrawer.h; path = ../include/phui/ViewDrawer.h; sourceTree = SOURCE_ROOT; };		0D31008808843A7600C3CBEA /* Viewport.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Viewport.h; path = ../include/phui/Viewport.h; sourceTree = SOURCE_ROOT; };		0D31008B08843A7600C3CBEA /* XMLMessage.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMLMessage.h; path = ../include/phui/XMLMessage.h; sourceTree = SOURCE_ROOT; };		0D31FFF308843A6200C3CBEA /* Button.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Button.cpp; path = ../src/Button.cpp; sourceTree = SOURCE_ROOT; };		0D31FFF408843A6200C3CBEA /* Caption.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Caption.cpp; path = ../src/Caption.cpp; sourceTree = SOURCE_ROOT; };		0D31FFF508843A6200C3CBEA /* Checkbox.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Checkbox.cpp; path = ../src/Checkbox.cpp; sourceTree = SOURCE_ROOT; };		0D31FFF608843A6200C3CBEA /* ConsoleView.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ConsoleView.cpp; path = ../src/ConsoleView.cpp; sourceTree = SOURCE_ROOT; };		0D31FFF708843A6200C3CBEA /* Control.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Control.cpp; path = ../src/Control.cpp; sourceTree = SOURCE_ROOT; };		0D31FFF808843A6200C3CBEA /* ControlValueMessage.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ControlValueMessage.cpp; path = ../src/ControlValueMessage.cpp; sourceTree = SOURCE_ROOT; };		0D31FFF908843A6200C3CBEA /* ConvertUTF.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = ConvertUTF.c; path = ../src/ConvertUTF.c; sourceTree = SOURCE_ROOT; };		0D31FFFA08843A6200C3CBEA /* ConvertUTF.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ConvertUTF.h; path = ../src/ConvertUTF.h; sourceTree = SOURCE_ROOT; };		0D31FFFB08843A6200C3CBEA /* CSSViewDrawer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = CSSViewDrawer.cpp; path = ../src/CSSViewDrawer.cpp; sourceTree = SOURCE_ROOT; };		0D31FFFC08843A6200C3CBEA /* DOM.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = DOM.cpp; path = ../src/DOM.cpp; sourceTree = SOURCE_ROOT; };		0D31FFFD08843A6200C3CBEA /* DropDownTask.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = DropDownTask.cpp; path = ../src/DropDownTask.cpp; sourceTree = SOURCE_ROOT; };		0D31FFFE08843A6200C3CBEA /* GLGraphicsContext.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = GLGraphicsContext.cpp; path = ../src/GLGraphicsContext.cpp; sourceTree = SOURCE_ROOT; };		0D31FFFF08843A6200C3CBEA /* Groupbox.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Groupbox.cpp; path = ../src/Groupbox.cpp; sourceTree = SOURCE_ROOT; };		0DC3C9430A7BFDE800F14BBB /* ContextMenu.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ContextMenu.cpp; path = ../src/ContextMenu.cpp; sourceTree = SOURCE_ROOT; };		0DCEF76C0AD4636700E1D282 /* CtxMenu.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CtxMenu.h; path = ../include/phui/CtxMenu.h; sourceTree = SOURCE_ROOT; };		0DCEF7700AD4637000E1D282 /* CtxMenu.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = CtxMenu.cpp; path = ../src/CtxMenu.cpp; sourceTree = SOURCE_ROOT; };		0DCEF7BB0AD4643900E1D282 /* Panel.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Panel.cpp; path = ../src/Panel.cpp; sourceTree = SOURCE_ROOT; };		0DCEF7BD0AD4644300E1D282 /* Panel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Panel.h; path = ../include/phui/Panel.h; sourceTree = SOURCE_ROOT; };		470B71CC0E7056BF006D9C06 /* MirrorView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MirrorView.cpp; path = ../src/MirrorView.cpp; sourceTree = SOURCE_ROOT; };		470B71CE0E7056BF006D9C06 /* wwiiUTF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wwiiUTF.h; path = ../src/wwiiUTF.h; sourceTree = SOURCE_ROOT; };		470B71D30E70571B006D9C06 /* wwiiUTF.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = wwiiUTF.cpp; path = ../src/wwiiUTF.cpp; sourceTree = SOURCE_ROOT; };		4717733C0F28E5580094DEAA /* IMEControl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = IMEControl.cpp; path = ../src/IMEControl.cpp; sourceTree = SOURCE_ROOT; };		47724CCE0F86C2FC0060F743 /* TextContainer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextContainer.cpp; path = ../src/TextContainer.cpp; sourceTree = SOURCE_ROOT; };		D2AAC046055464E500DB518D /* libphui.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libphui.a; sourceTree = BUILT_PRODUCTS_DIR; };/* End PBXFileReference section *//* Begin PBXFrameworksBuildPhase section */		D289987405E68DCB004EDB86 /* Frameworks */ = {			isa = PBXFrameworksBuildPhase;			buildActionMask = 2147483647;			files = (			);			runOnlyForDeploymentPostprocessing = 0;		};/* End PBXFrameworksBuildPhase section *//* Begin PBXGroup section */		08FB7794FE84155DC02AAC07 /* phui */ = {			isa = PBXGroup;			children = (				0D31FFF008843A5200C3CBEA /* include */,				0D31FFF208843A5B00C3CBEA /* src */,				1AB674ADFE9D54B511CA2CBB /* Products */,			);			name = phui;			sourceTree = "<group>";		};		0D31FFF008843A5200C3CBEA /* include */ = {			isa = PBXGroup;			children = (				0D31FFF108843A5700C3CBEA /* phui */,			);			name = include;			sourceTree = "<group>";		};		0D31FFF108843A5700C3CBEA /* phui */ = {			isa = PBXGroup;			children = (				08C8177F12B020C500818A11 /* FTFontReplacement.h */,				0DCEF7BD0AD4644300E1D282 /* Panel.h */,				0DCEF76C0AD4636700E1D282 /* CtxMenu.h */,				0D31005508843A7600C3CBEA /* Button.h */,				0D31005608843A7600C3CBEA /* Caption.h */,				0D31005708843A7600C3CBEA /* Checkbox.h */,				0D31005808843A7600C3CBEA /* ConsoleView.h */,				0D31005908843A7600C3CBEA /* Control.h */,				0D31005A08843A7600C3CBEA /* ControlValueMessage.h */,				0D31005B08843A7600C3CBEA /* CSSViewDrawer.h */,				0D31005C08843A7600C3CBEA /* DOM.h */,				0D31005E08843A7600C3CBEA /* DropDownTask.h */,				0D31005F08843A7600C3CBEA /* Error.h */,				0D31006008843A7600C3CBEA /* GLGraphicsContext.h */,				0D31006108843A7600C3CBEA /* GraphicsContext.h */,				0D31006208843A7600C3CBEA /* Groupbox.h */,				0D31006308843A7600C3CBEA /* ImageView.h */,				0D31006408843A7600C3CBEA /* Invoker.h */,				0D31006508843A7600C3CBEA /* Javascript.h */,				0D31006608843A7600C3CBEA /* KeyCodes.h */,				0D31006808843A7600C3CBEA /* ListView.h */,				0D31006C08843A7600C3CBEA /* Menu.h */,				0D31006E08843A7600C3CBEA /* Message.h */,				0D31006F08843A7600C3CBEA /* MessageFilter.h */,				0D31007008843A7600C3CBEA /* MessageHandler.h */,				0D31007108843A7600C3CBEA /* MessageLoop.h */,				0D31007208843A7600C3CBEA /* Messenger.h */,				0D31007408843A7600C3CBEA /* Periodical.h */,				0D31007508843A7600C3CBEA /* PopupMenuButton.h */,				0D31007608843A7600C3CBEA /* ProgressBar.h */,				0D31007708843A7600C3CBEA /* RadioButton.h */,				0D31007808843A7600C3CBEA /* Referenced.h */,				0D31007A08843A7600C3CBEA /* Scalar.h */,				0D31007B08843A7600C3CBEA /* Scrollbar.h */,				0D31007C08843A7600C3CBEA /* Slider.h */,				0D31007D08843A7600C3CBEA /* StackView.h */,				0D31007E08843A7600C3CBEA /* StencilView.h */,				0D31008008843A7600C3CBEA /* TabView.h */,				0D31008108843A7600C3CBEA /* TextControl.h */,				0D31008208843A7600C3CBEA /* TextView.h */,				0D31008308843A7600C3CBEA /* UIMessages.h */,				0D31008408843A7600C3CBEA /* UIXML.h */,				0D31008508843A7600C3CBEA /* Util.h */,				0D31008608843A7600C3CBEA /* View.h */,				0D31008708843A7600C3CBEA /* ViewDrawer.h */,				0D31008808843A7600C3CBEA /* Viewport.h */,				0D31008B08843A7600C3CBEA /* XMLMessage.h */,			);			name = phui;			sourceTree = "<group>";		};		0D31FFF208843A5B00C3CBEA /* src */ = {			isa = PBXGroup;			children = (				47724CCE0F86C2FC0060F743 /* TextContainer.cpp */,				4717733C0F28E5580094DEAA /* IMEControl.cpp */,				470B71D30E70571B006D9C06 /* wwiiUTF.cpp */,				470B71CC0E7056BF006D9C06 /* MirrorView.cpp */,				470B71CE0E7056BF006D9C06 /* wwiiUTF.h */,				0DCEF7700AD4637000E1D282 /* CtxMenu.cpp */,				0DC3C9430A7BFDE800F14BBB /* ContextMenu.cpp */,				0D1F958008E877F6008FF0BF /* ContextMenu.cpp */,				0D31FFF308843A6200C3CBEA /* Button.cpp */,				0D31FFF408843A6200C3CBEA /* Caption.cpp */,				0D31FFF508843A6200C3CBEA /* Checkbox.cpp */,				0D31FFF608843A6200C3CBEA /* ConsoleView.cpp */,				0D31FFF708843A6200C3CBEA /* Control.cpp */,				0D31FFF808843A6200C3CBEA /* ControlValueMessage.cpp */,				0D31FFF908843A6200C3CBEA /* ConvertUTF.c */,				0D31FFFA08843A6200C3CBEA /* ConvertUTF.h */,				0D31FFFB08843A6200C3CBEA /* CSSViewDrawer.cpp */,				0D31FFFC08843A6200C3CBEA /* DOM.cpp */,				0D31FFFD08843A6200C3CBEA /* DropDownTask.cpp */,				0D31FFFE08843A6200C3CBEA /* GLGraphicsContext.cpp */,				0D31FFFF08843A6200C3CBEA /* Groupbox.cpp */,				0D31000008843A6200C3CBEA /* ImageView.cpp */,				0D31000108843A6200C3CBEA /* Invoker.cpp */,				0D31000208843A6200C3CBEA /* Javascript.cpp */,				0D31000508843A6200C3CBEA /* ListView.cpp */,				0D31000708843A6200C3CBEA /* Menu.cpp */,				0D31000908843A6200C3CBEA /* Message.cpp */,				0D31000A08843A6200C3CBEA /* MessageFilter.cpp */,				0D31000B08843A6200C3CBEA /* MessageHandler.cpp */,				0D31000C08843A6200C3CBEA /* MessageLoop.cpp */,				0D31000D08843A6200C3CBEA /* Messenger.cpp */,				0D31001008843A6200C3CBEA /* PopupMenuButton.cpp */,				0D31001108843A6200C3CBEA /* ProgressBar.cpp */,				0D31001208843A6200C3CBEA /* RadioButton.cpp */,				0D31001408843A6200C3CBEA /* Scalar.cpp */,				0D31000F08843A6200C3CBEA /* Periodical.cpp */,				0D31001508843A6200C3CBEA /* Scrollbar.cpp */,				0D31001608843A6200C3CBEA /* Slider.cpp */,				0D31001708843A6200C3CBEA /* StackView.cpp */,				0D31001808843A6200C3CBEA /* StencilView.cpp */,				0D31001A08843A6200C3CBEA /* TabView.cpp */,				0D31001B08843A6200C3CBEA /* TextControl.cpp */,				0D31001C08843A6200C3CBEA /* TextView.cpp */,				0D31001D08843A6200C3CBEA /* UIXML.cpp */,				0D31001E08843A6200C3CBEA /* Util.cpp */,				0D31001F08843A6200C3CBEA /* View.cpp */,				0D31002008843A6200C3CBEA /* Viewport.cpp */,				0D31002308843A6200C3CBEA /* XMLMessage.cpp */,				0DCEF7BB0AD4643900E1D282 /* Panel.cpp */,			);			name = src;			sourceTree = "<group>";		};		1AB674ADFE9D54B511CA2CBB /* Products */ = {			isa = PBXGroup;			children = (				D2AAC046055464E500DB518D /* libphui.a */,			);			name = Products;			sourceTree = "<group>";		};/* End PBXGroup section *//* Begin PBXHeadersBuildPhase section */		D2AAC043055464E500DB518D /* Headers */ = {			isa = PBXHeadersBuildPhase;			buildActionMask = 2147483647;			files = (				0D31002C08843A6200C3CBEA /* ConvertUTF.h in Headers */,				0D31008D08843A7600C3CBEA /* Button.h in Headers */,				0D31008E08843A7600C3CBEA /* Caption.h in Headers */,				0D31008F08843A7600C3CBEA /* Checkbox.h in Headers */,				0D31009008843A7600C3CBEA /* ConsoleView.h in Headers */,				0D31009108843A7600C3CBEA /* Control.h in Headers */,				0D31009208843A7600C3CBEA /* ControlValueMessage.h in Headers */,				0D31009308843A7600C3CBEA /* CSSViewDrawer.h in Headers */,				0D31009408843A7600C3CBEA /* DOM.h in Headers */,				0D31009508843A7600C3CBEA /* DropDownTask.h in Headers */,				0D31009608843A7600C3CBEA /* Error.h in Headers */,				0D31009708843A7600C3CBEA /* GLGraphicsContext.h in Headers */,				0D31009808843A7600C3CBEA /* GraphicsContext.h in Headers */,				0D31009908843A7600C3CBEA /* Groupbox.h in Headers */,				0D31009A08843A7600C3CBEA /* ImageView.h in Headers */,				0D31009B08843A7600C3CBEA /* Invoker.h in Headers */,				0D31009C08843A7600C3CBEA /* Javascript.h in Headers */,				0D31009D08843A7600C3CBEA /* KeyCodes.h in Headers */,				0D31009F08843A7600C3CBEA /* ListView.h in Headers */,				0D3100A108843A7600C3CBEA /* Menu.h in Headers */,				0D3100A308843A7600C3CBEA /* Message.h in Headers */,				0D3100A408843A7600C3CBEA /* MessageFilter.h in Headers */,				0D3100A508843A7600C3CBEA /* MessageHandler.h in Headers */,				0D3100A608843A7600C3CBEA /* MessageLoop.h in Headers */,				0D3100A708843A7600C3CBEA /* Messenger.h in Headers */,				0D3100A908843A7600C3CBEA /* Periodical.h in Headers */,				0D3100AA08843A7600C3CBEA /* PopupMenuButton.h in Headers */,				0D3100AB08843A7600C3CBEA /* ProgressBar.h in Headers */,				0D3100AC08843A7600C3CBEA /* RadioButton.h in Headers */,				0D3100AD08843A7600C3CBEA /* Referenced.h in Headers */,				0D3100AF08843A7600C3CBEA /* Scalar.h in Headers */,				0D3100B008843A7600C3CBEA /* Scrollbar.h in Headers */,				0D3100B108843A7600C3CBEA /* Slider.h in Headers */,				0D3100B208843A7600C3CBEA /* StackView.h in Headers */,				0D3100B308843A7600C3CBEA /* StencilView.h in Headers */,				0D3100B508843A7600C3CBEA /* TabView.h in Headers */,				0D3100B608843A7600C3CBEA /* TextControl.h in Headers */,				0D3100B708843A7600C3CBEA /* TextView.h in Headers */,				0D3100B808843A7600C3CBEA /* UIMessages.h in Headers */,				0D3100B908843A7600C3CBEA /* UIXML.h in Headers */,				0D3100BA08843A7600C3CBEA /* Util.h in Headers */,				0D3100BB08843A7600C3CBEA /* View.h in Headers */,				0D3100BC08843A7600C3CBEA /* ViewDrawer.h in Headers */,				0D3100BD08843A7600C3CBEA /* Viewport.h in Headers */,				0D3100BF08843A7600C3CBEA /* XMLMessage.h in Headers */,				0DCEF76D0AD4636700E1D282 /* CtxMenu.h in Headers */,				0DCEF7BE0AD4644300E1D282 /* Panel.h in Headers */,				470B71D10E7056BF006D9C06 /* wwiiUTF.h in Headers */,				08C8178012B020C500818A11 /* FTFontReplacement.h in Headers */,			);			runOnlyForDeploymentPostprocessing = 0;		};/* End PBXHeadersBuildPhase section *//* Begin PBXNativeTarget section */		D2AAC045055464E500DB518D /* phui */ = {			isa = PBXNativeTarget;			buildConfigurationList = 0D31FFE108843A1100C3CBEA /* Build configuration list for PBXNativeTarget "phui" */;			buildPhases = (				D2AAC043055464E500DB518D /* Headers */,				D2AAC044055464E500DB518D /* Sources */,				D289987405E68DCB004EDB86 /* Frameworks */,			);			buildRules = (			);			dependencies = (			);			name = phui;			productName = phui;			productReference = D2AAC046055464E500DB518D /* libphui.a */;			productType = "com.apple.product-type.library.static";		};/* End PBXNativeTarget section *//* Begin PBXProject section */		08FB7793FE84155DC02AAC07 /* Project object */ = {			isa = PBXProject;			buildConfigurationList = 0D31FFE508843A1100C3CBEA /* Build configuration list for PBXProject "phui" */;			compatibilityVersion = "Xcode 3.1";			developmentRegion = English;			hasScannedForEncodings = 1;			knownRegions = (				English,				Japanese,				French,				German,			);			mainGroup = 08FB7794FE84155DC02AAC07 /* phui */;			projectDirPath = "";			projectRoot = "";			targets = (				D2AAC045055464E500DB518D /* phui */,			);		};/* End PBXProject section *//* Begin PBXSourcesBuildPhase section */		D2AAC044055464E500DB518D /* Sources */ = {			isa = PBXSourcesBuildPhase;			buildActionMask = 2147483647;			files = (				0D31002508843A6200C3CBEA /* Button.cpp in Sources */,				0D31002608843A6200C3CBEA /* Caption.cpp in Sources */,				0D31002708843A6200C3CBEA /* Checkbox.cpp in Sources */,				0D31002808843A6200C3CBEA /* ConsoleView.cpp in Sources */,				0D31002908843A6200C3CBEA /* Control.cpp in Sources */,				0D31002A08843A6200C3CBEA /* ControlValueMessage.cpp in Sources */,				0D31002B08843A6200C3CBEA /* ConvertUTF.c in Sources */,				0D31002D08843A6200C3CBEA /* CSSViewDrawer.cpp in Sources */,				0D31002E08843A6200C3CBEA /* DOM.cpp in Sources */,				0D31002F08843A6200C3CBEA /* DropDownTask.cpp in Sources */,				0D31003008843A6200C3CBEA /* GLGraphicsContext.cpp in Sources */,				0D31003108843A6200C3CBEA /* Groupbox.cpp in Sources */,				0D31003208843A6200C3CBEA /* ImageView.cpp in Sources */,				0D31003308843A6200C3CBEA /* Invoker.cpp in Sources */,				0D31003408843A6200C3CBEA /* Javascript.cpp in Sources */,				0D31003708843A6200C3CBEA /* ListView.cpp in Sources */,				0D31003808843A6200C3CBEA /* Menu.cpp in Sources */,				0D31003A08843A6200C3CBEA /* Message.cpp in Sources */,				0D31003B08843A6200C3CBEA /* MessageFilter.cpp in Sources */,				0D31003C08843A6200C3CBEA /* MessageHandler.cpp in Sources */,				0D31003D08843A6200C3CBEA /* MessageLoop.cpp in Sources */,				0D31003E08843A6200C3CBEA /* Messenger.cpp in Sources */,				0D31004008843A6200C3CBEA /* Periodical.cpp in Sources */,				0D31004108843A6200C3CBEA /* PopupMenuButton.cpp in Sources */,				0D31004208843A6200C3CBEA /* ProgressBar.cpp in Sources */,				0D31004308843A6200C3CBEA /* RadioButton.cpp in Sources */,				0D31004508843A6200C3CBEA /* Scalar.cpp in Sources */,				0D31004608843A6200C3CBEA /* Scrollbar.cpp in Sources */,				0D31004708843A6200C3CBEA /* Slider.cpp in Sources */,				0D31004808843A6200C3CBEA /* StackView.cpp in Sources */,				0D31004908843A6200C3CBEA /* StencilView.cpp in Sources */,				0D31004B08843A6200C3CBEA /* TabView.cpp in Sources */,				0D31004C08843A6200C3CBEA /* TextControl.cpp in Sources */,				0D31004D08843A6200C3CBEA /* TextView.cpp in Sources */,				0D31004E08843A6200C3CBEA /* UIXML.cpp in Sources */,				0D31004F08843A6200C3CBEA /* Util.cpp in Sources */,				0D31005008843A6200C3CBEA /* View.cpp in Sources */,				0D31005108843A6200C3CBEA /* Viewport.cpp in Sources */,				0D31005308843A6200C3CBEA /* XMLMessage.cpp in Sources */,				0D1F958108E877F6008FF0BF /* ContextMenu.cpp in Sources */,				0DC3C9440A7BFDE800F14BBB /* ContextMenu.cpp in Sources */,				0DCEF7710AD4637000E1D282 /* CtxMenu.cpp in Sources */,				0DCEF7BC0AD4643900E1D282 /* Panel.cpp in Sources */,				470B71CF0E7056BF006D9C06 /* MirrorView.cpp in Sources */,				470B71D40E70571B006D9C06 /* wwiiUTF.cpp in Sources */,				4717733D0F28E5580094DEAA /* IMEControl.cpp in Sources */,				47724CCF0F86C2FC0060F743 /* TextContainer.cpp in Sources */,			);			runOnlyForDeploymentPostprocessing = 0;		};/* End PBXSourcesBuildPhase section *//* Begin XCBuildConfiguration section */		0D31FFE208843A1100C3CBEA /* Debug */ = {			isa = XCBuildConfiguration;			buildSettings = {				ARCHS = "$(NATIVE_ARCH)";				COPY_PHASE_STRIP = NO;				GCC_DYNAMIC_NO_PIC = NO;				GCC_ENABLE_BUILTIN_FUNCTIONS = NO;				GCC_ENABLE_FIX_AND_CONTINUE = YES;				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;				GCC_MODEL_TUNING = G5;				GCC_OPTIMIZATION_LEVEL = 0;				GCC_UNROLL_LOOPS = YES;				GCC_WARN_ABOUT_RETURN_TYPE = YES;				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;				GCC_WARN_UNUSED_VARIABLE = YES;				HEADER_SEARCH_PATHS = (					../include,					../include/js,					../include/libxml,					../../freetype/include,					../../freetype/include/freetype,					../../ftgl/src/FTGL,					../../ftgl/src,				);				INSTALL_PATH = /usr/local/lib;				LIBRARY_STYLE = STATIC;				MACOSX_DEPLOYMENT_TARGET = 10.4;				PREBINDING = NO;				PRODUCT_NAME = phui;				VALID_ARCHS = "ppc64 ppc7400 ppc970 i386 x86_64 ppc i686";				ZERO_LINK = NO;			};			name = Debug;		};		0D31FFE308843A1100C3CBEA /* Release */ = {			isa = XCBuildConfiguration;			buildSettings = {				COPY_PHASE_STRIP = YES;				GCC_AUTO_VECTORIZATION = YES;				GCC_ENABLE_BUILTIN_FUNCTIONS = NO;				GCC_ENABLE_FIX_AND_CONTINUE = NO;				GCC_ENABLE_SSE3_EXTENSIONS = YES;				GCC_ENABLE_SUPPLEMENTAL_SSE3_INSTRUCTIONS = YES;				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;				GCC_MODEL_TUNING = G5;				GCC_PREPROCESSOR_DEFINITIONS = XP_UNIX;				GCC_UNROLL_LOOPS = YES;				GCC_WARN_ABOUT_RETURN_TYPE = YES;				GCC_WARN_UNUSED_VARIABLE = YES;				HEADER_SEARCH_PATHS = (					../include,					../include/js,					../include/libxml,					../../freetype/include,					../../freetype/include/freetype,					../../ftgl/src/FTGL,					../../ftgl/src,				);				INSTALL_PATH = /usr/local/lib;				LIBRARY_STYLE = STATIC;				MACOSX_DEPLOYMENT_TARGET = 10.4;				PREBINDING = NO;				PRODUCT_NAME = phui;				VALID_ARCHS = i386;				ZERO_LINK = NO;			};			name = Release;		};		0D31FFE408843A1100C3CBEA /* Default */ = {			isa = XCBuildConfiguration;			buildSettings = {				GCC_ENABLE_BUILTIN_FUNCTIONS = NO;				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;				GCC_MODEL_TUNING = G5;				GCC_PREPROCESSOR_DEFINITIONS = XP_UNIX;				GCC_UNROLL_LOOPS = YES;				GCC_WARN_ABOUT_RETURN_TYPE = YES;				GCC_WARN_UNUSED_VARIABLE = YES;				HEADER_SEARCH_PATHS = (					../include,					../include/js,					../include/libxml,					../../freetype/include,					../../freetype/include/freetype,					../../ftgl/src/FTGL,					../../ftgl/src,				);				INSTALL_PATH = /usr/local/lib;				LIBRARY_STYLE = STATIC;				MACOSX_DEPLOYMENT_TARGET = 10.4;				PREBINDING = NO;				PRODUCT_NAME = phui;				VALID_ARCHS = "ppc64 ppc7400 ppc970 i386 x86_64 ppc i686";				ZERO_LINK = NO;			};			name = Default;		};		0D31FFE608843A1100C3CBEA /* Debug */ = {			isa = XCBuildConfiguration;			buildSettings = {				ARCHS = "$(ARCHS_STANDARD_32_BIT)";				COPY_PHASE_STRIP = NO;				GCC_C_LANGUAGE_STANDARD = gnu99;				GCC_OPTIMIZATION_LEVEL = 0;				GCC_PREPROCESSOR_DEFINITIONS = (					XP_UNIX,					SHOW_JS_ALLOCATIONS,				);				GCC_VERSION = 4.2;				HEADER_SEARCH_PATHS = "";				LIBRARY_SEARCH_PATHS = "";				MACOSX_DEPLOYMENT_TARGET = 10.5;				SDKROOT = macosx10.5;				STRIP_INSTALLED_PRODUCT = NO;				VALID_ARCHS = i386;			};			name = Debug;		};		0D31FFE708843A1100C3CBEA /* Release */ = {			isa = XCBuildConfiguration;			buildSettings = {				ARCHS = "$(ARCHS_STANDARD_32_BIT)";				COPY_PHASE_STRIP = NO;				GCC_C_LANGUAGE_STANDARD = gnu99;				GCC_MODEL_TUNING = G5;				GCC_PREPROCESSOR_DEFINITIONS = XP_UNIX;				GCC_VERSION = 4.2;				HEADER_SEARCH_PATHS = "";				LIBRARY_SEARCH_PATHS = "";				MACOSX_DEPLOYMENT_TARGET = 10.5;				ONLY_ACTIVE_ARCH = YES;				SDKROOT = macosx10.5;				STRIP_INSTALLED_PRODUCT = NO;				VALID_ARCHS = i386;			};			name = Release;		};		0D31FFE808843A1100C3CBEA /* Default */ = {			isa = XCBuildConfiguration;			buildSettings = {				ARCHS = "$(ARCHS_STANDARD_32_BIT)";				GCC_C_LANGUAGE_STANDARD = gnu99;				GCC_VERSION = 4.2;				HEADER_SEARCH_PATHS = "";				LIBRARY_SEARCH_PATHS = "";				MACOSX_DEPLOYMENT_TARGET = 10.5;				SDKROOT = macosx10.5;				VALID_ARCHS = i386;			};			name = Default;		};/* End XCBuildConfiguration section *//* Begin XCConfigurationList section */		0D31FFE108843A1100C3CBEA /* Build configuration list for PBXNativeTarget "phui" */ = {			isa = XCConfigurationList;			buildConfigurations = (				0D31FFE208843A1100C3CBEA /* Debug */,				0D31FFE308843A1100C3CBEA /* Release */,				0D31FFE408843A1100C3CBEA /* Default */,			);			defaultConfigurationIsVisible = 0;			defaultConfigurationName = Default;		};		0D31FFE508843A1100C3CBEA /* Build configuration list for PBXProject "phui" */ = {			isa = XCConfigurationList;			buildConfigurations = (				0D31FFE608843A1100C3CBEA /* Debug */,				0D31FFE708843A1100C3CBEA /* Release */,				0D31FFE808843A1100C3CBEA /* Default */,			);			defaultConfigurationIsVisible = 0;			defaultConfigurationName = Default;		};/* End XCConfigurationList section */	};	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;}
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 45;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		08C8178012B020C500818A11 /* FTFontReplacement.h in Headers */ = {isa = PBXBuildFile; fileRef = 08C8177F12B020C500818A11 /* FTFontReplacement.h */; };
+		0D1F958108E877F6008FF0BF /* ContextMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D1F958008E877F6008FF0BF /* ContextMenu.cpp */; };
+		0D31002508843A6200C3CBEA /* Button.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31FFF308843A6200C3CBEA /* Button.cpp */; };
+		0D31002608843A6200C3CBEA /* Caption.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31FFF408843A6200C3CBEA /* Caption.cpp */; };
+		0D31002708843A6200C3CBEA /* Checkbox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31FFF508843A6200C3CBEA /* Checkbox.cpp */; };
+		0D31002808843A6200C3CBEA /* ConsoleView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31FFF608843A6200C3CBEA /* ConsoleView.cpp */; };
+		0D31002908843A6200C3CBEA /* Control.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31FFF708843A6200C3CBEA /* Control.cpp */; };
+		0D31002A08843A6200C3CBEA /* ControlValueMessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31FFF808843A6200C3CBEA /* ControlValueMessage.cpp */; };
+		0D31002B08843A6200C3CBEA /* ConvertUTF.c in Sources */ = {isa = PBXBuildFile; fileRef = 0D31FFF908843A6200C3CBEA /* ConvertUTF.c */; };
+		0D31002C08843A6200C3CBEA /* ConvertUTF.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31FFFA08843A6200C3CBEA /* ConvertUTF.h */; };
+		0D31002D08843A6200C3CBEA /* CSSViewDrawer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31FFFB08843A6200C3CBEA /* CSSViewDrawer.cpp */; };
+		0D31002E08843A6200C3CBEA /* DOM.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31FFFC08843A6200C3CBEA /* DOM.cpp */; };
+		0D31002F08843A6200C3CBEA /* DropDownTask.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31FFFD08843A6200C3CBEA /* DropDownTask.cpp */; };
+		0D31003008843A6200C3CBEA /* GLGraphicsContext.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31FFFE08843A6200C3CBEA /* GLGraphicsContext.cpp */; };
+		0D31003108843A6200C3CBEA /* Groupbox.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31FFFF08843A6200C3CBEA /* Groupbox.cpp */; };
+		0D31003208843A6200C3CBEA /* ImageView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31000008843A6200C3CBEA /* ImageView.cpp */; };
+		0D31003308843A6200C3CBEA /* Invoker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31000108843A6200C3CBEA /* Invoker.cpp */; };
+		0D31003408843A6200C3CBEA /* Javascript.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31000208843A6200C3CBEA /* Javascript.cpp */; };
+		0D31003708843A6200C3CBEA /* ListView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31000508843A6200C3CBEA /* ListView.cpp */; };
+		0D31003808843A6200C3CBEA /* Menu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31000708843A6200C3CBEA /* Menu.cpp */; };
+		0D31003A08843A6200C3CBEA /* Message.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31000908843A6200C3CBEA /* Message.cpp */; };
+		0D31003B08843A6200C3CBEA /* MessageFilter.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31000A08843A6200C3CBEA /* MessageFilter.cpp */; };
+		0D31003C08843A6200C3CBEA /* MessageHandler.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31000B08843A6200C3CBEA /* MessageHandler.cpp */; };
+		0D31003D08843A6200C3CBEA /* MessageLoop.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31000C08843A6200C3CBEA /* MessageLoop.cpp */; };
+		0D31003E08843A6200C3CBEA /* Messenger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31000D08843A6200C3CBEA /* Messenger.cpp */; };
+		0D31004008843A6200C3CBEA /* Periodical.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31000F08843A6200C3CBEA /* Periodical.cpp */; };
+		0D31004108843A6200C3CBEA /* PopupMenuButton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001008843A6200C3CBEA /* PopupMenuButton.cpp */; };
+		0D31004208843A6200C3CBEA /* ProgressBar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001108843A6200C3CBEA /* ProgressBar.cpp */; };
+		0D31004308843A6200C3CBEA /* RadioButton.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001208843A6200C3CBEA /* RadioButton.cpp */; };
+		0D31004508843A6200C3CBEA /* Scalar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001408843A6200C3CBEA /* Scalar.cpp */; };
+		0D31004608843A6200C3CBEA /* Scrollbar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001508843A6200C3CBEA /* Scrollbar.cpp */; };
+		0D31004708843A6200C3CBEA /* Slider.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001608843A6200C3CBEA /* Slider.cpp */; };
+		0D31004808843A6200C3CBEA /* StackView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001708843A6200C3CBEA /* StackView.cpp */; };
+		0D31004908843A6200C3CBEA /* StencilView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001808843A6200C3CBEA /* StencilView.cpp */; };
+		0D31004B08843A6200C3CBEA /* TabView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001A08843A6200C3CBEA /* TabView.cpp */; };
+		0D31004C08843A6200C3CBEA /* TextControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001B08843A6200C3CBEA /* TextControl.cpp */; };
+		0D31004D08843A6200C3CBEA /* TextView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001C08843A6200C3CBEA /* TextView.cpp */; };
+		0D31004E08843A6200C3CBEA /* UIXML.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001D08843A6200C3CBEA /* UIXML.cpp */; };
+		0D31004F08843A6200C3CBEA /* Util.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001E08843A6200C3CBEA /* Util.cpp */; };
+		0D31005008843A6200C3CBEA /* View.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31001F08843A6200C3CBEA /* View.cpp */; };
+		0D31005108843A6200C3CBEA /* Viewport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31002008843A6200C3CBEA /* Viewport.cpp */; };
+		0D31005308843A6200C3CBEA /* XMLMessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0D31002308843A6200C3CBEA /* XMLMessage.cpp */; };
+		0D31008D08843A7600C3CBEA /* Button.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31005508843A7600C3CBEA /* Button.h */; };
+		0D31008E08843A7600C3CBEA /* Caption.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31005608843A7600C3CBEA /* Caption.h */; };
+		0D31008F08843A7600C3CBEA /* Checkbox.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31005708843A7600C3CBEA /* Checkbox.h */; };
+		0D31009008843A7600C3CBEA /* ConsoleView.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31005808843A7600C3CBEA /* ConsoleView.h */; };
+		0D31009108843A7600C3CBEA /* Control.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31005908843A7600C3CBEA /* Control.h */; };
+		0D31009208843A7600C3CBEA /* ControlValueMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31005A08843A7600C3CBEA /* ControlValueMessage.h */; };
+		0D31009308843A7600C3CBEA /* CSSViewDrawer.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31005B08843A7600C3CBEA /* CSSViewDrawer.h */; };
+		0D31009408843A7600C3CBEA /* DOM.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31005C08843A7600C3CBEA /* DOM.h */; };
+		0D31009508843A7600C3CBEA /* DropDownTask.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31005E08843A7600C3CBEA /* DropDownTask.h */; };
+		0D31009608843A7600C3CBEA /* Error.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31005F08843A7600C3CBEA /* Error.h */; };
+		0D31009708843A7600C3CBEA /* GLGraphicsContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31006008843A7600C3CBEA /* GLGraphicsContext.h */; };
+		0D31009808843A7600C3CBEA /* GraphicsContext.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31006108843A7600C3CBEA /* GraphicsContext.h */; };
+		0D31009908843A7600C3CBEA /* Groupbox.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31006208843A7600C3CBEA /* Groupbox.h */; };
+		0D31009A08843A7600C3CBEA /* ImageView.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31006308843A7600C3CBEA /* ImageView.h */; };
+		0D31009B08843A7600C3CBEA /* Invoker.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31006408843A7600C3CBEA /* Invoker.h */; };
+		0D31009C08843A7600C3CBEA /* Javascript.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31006508843A7600C3CBEA /* Javascript.h */; };
+		0D31009D08843A7600C3CBEA /* KeyCodes.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31006608843A7600C3CBEA /* KeyCodes.h */; };
+		0D31009F08843A7600C3CBEA /* ListView.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31006808843A7600C3CBEA /* ListView.h */; };
+		0D3100A108843A7600C3CBEA /* Menu.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31006C08843A7600C3CBEA /* Menu.h */; };
+		0D3100A308843A7600C3CBEA /* Message.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31006E08843A7600C3CBEA /* Message.h */; };
+		0D3100A408843A7600C3CBEA /* MessageFilter.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31006F08843A7600C3CBEA /* MessageFilter.h */; };
+		0D3100A508843A7600C3CBEA /* MessageHandler.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31007008843A7600C3CBEA /* MessageHandler.h */; };
+		0D3100A608843A7600C3CBEA /* MessageLoop.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31007108843A7600C3CBEA /* MessageLoop.h */; };
+		0D3100A708843A7600C3CBEA /* Messenger.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31007208843A7600C3CBEA /* Messenger.h */; };
+		0D3100A908843A7600C3CBEA /* Periodical.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31007408843A7600C3CBEA /* Periodical.h */; };
+		0D3100AA08843A7600C3CBEA /* PopupMenuButton.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31007508843A7600C3CBEA /* PopupMenuButton.h */; };
+		0D3100AB08843A7600C3CBEA /* ProgressBar.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31007608843A7600C3CBEA /* ProgressBar.h */; };
+		0D3100AC08843A7600C3CBEA /* RadioButton.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31007708843A7600C3CBEA /* RadioButton.h */; };
+		0D3100AD08843A7600C3CBEA /* Referenced.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31007808843A7600C3CBEA /* Referenced.h */; };
+		0D3100AF08843A7600C3CBEA /* Scalar.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31007A08843A7600C3CBEA /* Scalar.h */; };
+		0D3100B008843A7600C3CBEA /* Scrollbar.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31007B08843A7600C3CBEA /* Scrollbar.h */; };
+		0D3100B108843A7600C3CBEA /* Slider.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31007C08843A7600C3CBEA /* Slider.h */; };
+		0D3100B208843A7600C3CBEA /* StackView.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31007D08843A7600C3CBEA /* StackView.h */; };
+		0D3100B308843A7600C3CBEA /* StencilView.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31007E08843A7600C3CBEA /* StencilView.h */; };
+		0D3100B508843A7600C3CBEA /* TabView.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31008008843A7600C3CBEA /* TabView.h */; };
+		0D3100B608843A7600C3CBEA /* TextControl.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31008108843A7600C3CBEA /* TextControl.h */; };
+		0D3100B708843A7600C3CBEA /* TextView.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31008208843A7600C3CBEA /* TextView.h */; };
+		0D3100B808843A7600C3CBEA /* UIMessages.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31008308843A7600C3CBEA /* UIMessages.h */; };
+		0D3100B908843A7600C3CBEA /* UIXML.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31008408843A7600C3CBEA /* UIXML.h */; };
+		0D3100BA08843A7600C3CBEA /* Util.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31008508843A7600C3CBEA /* Util.h */; };
+		0D3100BB08843A7600C3CBEA /* View.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31008608843A7600C3CBEA /* View.h */; };
+		0D3100BC08843A7600C3CBEA /* ViewDrawer.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31008708843A7600C3CBEA /* ViewDrawer.h */; };
+		0D3100BD08843A7600C3CBEA /* Viewport.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31008808843A7600C3CBEA /* Viewport.h */; };
+		0D3100BF08843A7600C3CBEA /* XMLMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 0D31008B08843A7600C3CBEA /* XMLMessage.h */; };
+		0DC3C9440A7BFDE800F14BBB /* ContextMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0DC3C9430A7BFDE800F14BBB /* ContextMenu.cpp */; };
+		0DCEF76D0AD4636700E1D282 /* CtxMenu.h in Headers */ = {isa = PBXBuildFile; fileRef = 0DCEF76C0AD4636700E1D282 /* CtxMenu.h */; };
+		0DCEF7710AD4637000E1D282 /* CtxMenu.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0DCEF7700AD4637000E1D282 /* CtxMenu.cpp */; };
+		0DCEF7BC0AD4643900E1D282 /* Panel.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0DCEF7BB0AD4643900E1D282 /* Panel.cpp */; };
+		0DCEF7BE0AD4644300E1D282 /* Panel.h in Headers */ = {isa = PBXBuildFile; fileRef = 0DCEF7BD0AD4644300E1D282 /* Panel.h */; };
+		470B71CF0E7056BF006D9C06 /* MirrorView.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 470B71CC0E7056BF006D9C06 /* MirrorView.cpp */; };
+		470B71D10E7056BF006D9C06 /* wwiiUTF.h in Headers */ = {isa = PBXBuildFile; fileRef = 470B71CE0E7056BF006D9C06 /* wwiiUTF.h */; };
+		470B71D40E70571B006D9C06 /* wwiiUTF.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 470B71D30E70571B006D9C06 /* wwiiUTF.cpp */; };
+		4717733D0F28E5580094DEAA /* IMEControl.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4717733C0F28E5580094DEAA /* IMEControl.cpp */; };
+		47724CCF0F86C2FC0060F743 /* TextContainer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 47724CCE0F86C2FC0060F743 /* TextContainer.cpp */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		08C8177F12B020C500818A11 /* FTFontReplacement.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = FTFontReplacement.h; path = ../include/phui/FTFontReplacement.h; sourceTree = SOURCE_ROOT; };
+		0D1F958008E877F6008FF0BF /* ContextMenu.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ContextMenu.cpp; path = ../src/ContextMenu.cpp; sourceTree = SOURCE_ROOT; };
+		0D31000008843A6200C3CBEA /* ImageView.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ImageView.cpp; path = ../src/ImageView.cpp; sourceTree = SOURCE_ROOT; };
+		0D31000108843A6200C3CBEA /* Invoker.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Invoker.cpp; path = ../src/Invoker.cpp; sourceTree = SOURCE_ROOT; };
+		0D31000208843A6200C3CBEA /* Javascript.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Javascript.cpp; path = ../src/Javascript.cpp; sourceTree = SOURCE_ROOT; };
+		0D31000508843A6200C3CBEA /* ListView.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ListView.cpp; path = ../src/ListView.cpp; sourceTree = SOURCE_ROOT; };
+		0D31000708843A6200C3CBEA /* Menu.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Menu.cpp; path = ../src/Menu.cpp; sourceTree = SOURCE_ROOT; };
+		0D31000908843A6200C3CBEA /* Message.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Message.cpp; path = ../src/Message.cpp; sourceTree = SOURCE_ROOT; };
+		0D31000A08843A6200C3CBEA /* MessageFilter.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = MessageFilter.cpp; path = ../src/MessageFilter.cpp; sourceTree = SOURCE_ROOT; };
+		0D31000B08843A6200C3CBEA /* MessageHandler.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = MessageHandler.cpp; path = ../src/MessageHandler.cpp; sourceTree = SOURCE_ROOT; };
+		0D31000C08843A6200C3CBEA /* MessageLoop.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = MessageLoop.cpp; path = ../src/MessageLoop.cpp; sourceTree = SOURCE_ROOT; };
+		0D31000D08843A6200C3CBEA /* Messenger.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Messenger.cpp; path = ../src/Messenger.cpp; sourceTree = SOURCE_ROOT; };
+		0D31000F08843A6200C3CBEA /* Periodical.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Periodical.cpp; path = ../src/Periodical.cpp; sourceTree = SOURCE_ROOT; };
+		0D31001008843A6200C3CBEA /* PopupMenuButton.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = PopupMenuButton.cpp; path = ../src/PopupMenuButton.cpp; sourceTree = SOURCE_ROOT; };
+		0D31001108843A6200C3CBEA /* ProgressBar.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ProgressBar.cpp; path = ../src/ProgressBar.cpp; sourceTree = SOURCE_ROOT; };
+		0D31001208843A6200C3CBEA /* RadioButton.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = RadioButton.cpp; path = ../src/RadioButton.cpp; sourceTree = SOURCE_ROOT; };
+		0D31001408843A6200C3CBEA /* Scalar.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Scalar.cpp; path = ../src/Scalar.cpp; sourceTree = SOURCE_ROOT; };
+		0D31001508843A6200C3CBEA /* Scrollbar.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Scrollbar.cpp; path = ../src/Scrollbar.cpp; sourceTree = SOURCE_ROOT; };
+		0D31001608843A6200C3CBEA /* Slider.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Slider.cpp; path = ../src/Slider.cpp; sourceTree = SOURCE_ROOT; };
+		0D31001708843A6200C3CBEA /* StackView.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = StackView.cpp; path = ../src/StackView.cpp; sourceTree = SOURCE_ROOT; };
+		0D31001808843A6200C3CBEA /* StencilView.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = StencilView.cpp; path = ../src/StencilView.cpp; sourceTree = SOURCE_ROOT; };
+		0D31001A08843A6200C3CBEA /* TabView.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = TabView.cpp; path = ../src/TabView.cpp; sourceTree = SOURCE_ROOT; };
+		0D31001B08843A6200C3CBEA /* TextControl.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = TextControl.cpp; path = ../src/TextControl.cpp; sourceTree = SOURCE_ROOT; };
+		0D31001C08843A6200C3CBEA /* TextView.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = TextView.cpp; path = ../src/TextView.cpp; sourceTree = SOURCE_ROOT; };
+		0D31001D08843A6200C3CBEA /* UIXML.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = UIXML.cpp; path = ../src/UIXML.cpp; sourceTree = SOURCE_ROOT; };
+		0D31001E08843A6200C3CBEA /* Util.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Util.cpp; path = ../src/Util.cpp; sourceTree = SOURCE_ROOT; };
+		0D31001F08843A6200C3CBEA /* View.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = View.cpp; path = ../src/View.cpp; sourceTree = SOURCE_ROOT; };
+		0D31002008843A6200C3CBEA /* Viewport.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Viewport.cpp; path = ../src/Viewport.cpp; sourceTree = SOURCE_ROOT; };
+		0D31002308843A6200C3CBEA /* XMLMessage.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = XMLMessage.cpp; path = ../src/XMLMessage.cpp; sourceTree = SOURCE_ROOT; };
+		0D31005508843A7600C3CBEA /* Button.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Button.h; path = ../include/phui/Button.h; sourceTree = SOURCE_ROOT; };
+		0D31005608843A7600C3CBEA /* Caption.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Caption.h; path = ../include/phui/Caption.h; sourceTree = SOURCE_ROOT; };
+		0D31005708843A7600C3CBEA /* Checkbox.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Checkbox.h; path = ../include/phui/Checkbox.h; sourceTree = SOURCE_ROOT; };
+		0D31005808843A7600C3CBEA /* ConsoleView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ConsoleView.h; path = ../include/phui/ConsoleView.h; sourceTree = SOURCE_ROOT; };
+		0D31005908843A7600C3CBEA /* Control.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Control.h; path = ../include/phui/Control.h; sourceTree = SOURCE_ROOT; };
+		0D31005A08843A7600C3CBEA /* ControlValueMessage.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ControlValueMessage.h; path = ../include/phui/ControlValueMessage.h; sourceTree = SOURCE_ROOT; };
+		0D31005B08843A7600C3CBEA /* CSSViewDrawer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CSSViewDrawer.h; path = ../include/phui/CSSViewDrawer.h; sourceTree = SOURCE_ROOT; };
+		0D31005C08843A7600C3CBEA /* DOM.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DOM.h; path = ../include/phui/DOM.h; sourceTree = SOURCE_ROOT; };
+		0D31005E08843A7600C3CBEA /* DropDownTask.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = DropDownTask.h; path = ../include/phui/DropDownTask.h; sourceTree = SOURCE_ROOT; };
+		0D31005F08843A7600C3CBEA /* Error.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Error.h; path = ../include/phui/Error.h; sourceTree = SOURCE_ROOT; };
+		0D31006008843A7600C3CBEA /* GLGraphicsContext.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = GLGraphicsContext.h; path = ../include/phui/GLGraphicsContext.h; sourceTree = SOURCE_ROOT; };
+		0D31006108843A7600C3CBEA /* GraphicsContext.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = GraphicsContext.h; path = ../include/phui/GraphicsContext.h; sourceTree = SOURCE_ROOT; };
+		0D31006208843A7600C3CBEA /* Groupbox.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Groupbox.h; path = ../include/phui/Groupbox.h; sourceTree = SOURCE_ROOT; };
+		0D31006308843A7600C3CBEA /* ImageView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ImageView.h; path = ../include/phui/ImageView.h; sourceTree = SOURCE_ROOT; };
+		0D31006408843A7600C3CBEA /* Invoker.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Invoker.h; path = ../include/phui/Invoker.h; sourceTree = SOURCE_ROOT; };
+		0D31006508843A7600C3CBEA /* Javascript.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Javascript.h; path = ../include/phui/Javascript.h; sourceTree = SOURCE_ROOT; };
+		0D31006608843A7600C3CBEA /* KeyCodes.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = KeyCodes.h; path = ../include/phui/KeyCodes.h; sourceTree = SOURCE_ROOT; };
+		0D31006808843A7600C3CBEA /* ListView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ListView.h; path = ../include/phui/ListView.h; sourceTree = SOURCE_ROOT; };
+		0D31006C08843A7600C3CBEA /* Menu.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Menu.h; path = ../include/phui/Menu.h; sourceTree = SOURCE_ROOT; };
+		0D31006E08843A7600C3CBEA /* Message.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Message.h; path = ../include/phui/Message.h; sourceTree = SOURCE_ROOT; };
+		0D31006F08843A7600C3CBEA /* MessageFilter.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MessageFilter.h; path = ../include/phui/MessageFilter.h; sourceTree = SOURCE_ROOT; };
+		0D31007008843A7600C3CBEA /* MessageHandler.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MessageHandler.h; path = ../include/phui/MessageHandler.h; sourceTree = SOURCE_ROOT; };
+		0D31007108843A7600C3CBEA /* MessageLoop.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = MessageLoop.h; path = ../include/phui/MessageLoop.h; sourceTree = SOURCE_ROOT; };
+		0D31007208843A7600C3CBEA /* Messenger.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Messenger.h; path = ../include/phui/Messenger.h; sourceTree = SOURCE_ROOT; };
+		0D31007408843A7600C3CBEA /* Periodical.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Periodical.h; path = ../include/phui/Periodical.h; sourceTree = SOURCE_ROOT; };
+		0D31007508843A7600C3CBEA /* PopupMenuButton.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = PopupMenuButton.h; path = ../include/phui/PopupMenuButton.h; sourceTree = SOURCE_ROOT; };
+		0D31007608843A7600C3CBEA /* ProgressBar.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ProgressBar.h; path = ../include/phui/ProgressBar.h; sourceTree = SOURCE_ROOT; };
+		0D31007708843A7600C3CBEA /* RadioButton.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = RadioButton.h; path = ../include/phui/RadioButton.h; sourceTree = SOURCE_ROOT; };
+		0D31007808843A7600C3CBEA /* Referenced.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Referenced.h; path = ../include/phui/Referenced.h; sourceTree = SOURCE_ROOT; };
+		0D31007A08843A7600C3CBEA /* Scalar.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Scalar.h; path = ../include/phui/Scalar.h; sourceTree = SOURCE_ROOT; };
+		0D31007B08843A7600C3CBEA /* Scrollbar.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Scrollbar.h; path = ../include/phui/Scrollbar.h; sourceTree = SOURCE_ROOT; };
+		0D31007C08843A7600C3CBEA /* Slider.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Slider.h; path = ../include/phui/Slider.h; sourceTree = SOURCE_ROOT; };
+		0D31007D08843A7600C3CBEA /* StackView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = StackView.h; path = ../include/phui/StackView.h; sourceTree = SOURCE_ROOT; };
+		0D31007E08843A7600C3CBEA /* StencilView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = StencilView.h; path = ../include/phui/StencilView.h; sourceTree = SOURCE_ROOT; };
+		0D31008008843A7600C3CBEA /* TabView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = TabView.h; path = ../include/phui/TabView.h; sourceTree = SOURCE_ROOT; };
+		0D31008108843A7600C3CBEA /* TextControl.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = TextControl.h; path = ../include/phui/TextControl.h; sourceTree = SOURCE_ROOT; };
+		0D31008208843A7600C3CBEA /* TextView.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = TextView.h; path = ../include/phui/TextView.h; sourceTree = SOURCE_ROOT; };
+		0D31008308843A7600C3CBEA /* UIMessages.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = UIMessages.h; path = ../include/phui/UIMessages.h; sourceTree = SOURCE_ROOT; };
+		0D31008408843A7600C3CBEA /* UIXML.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = UIXML.h; path = ../include/phui/UIXML.h; sourceTree = SOURCE_ROOT; };
+		0D31008508843A7600C3CBEA /* Util.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Util.h; path = ../include/phui/Util.h; sourceTree = SOURCE_ROOT; };
+		0D31008608843A7600C3CBEA /* View.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = View.h; path = ../include/phui/View.h; sourceTree = SOURCE_ROOT; };
+		0D31008708843A7600C3CBEA /* ViewDrawer.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ViewDrawer.h; path = ../include/phui/ViewDrawer.h; sourceTree = SOURCE_ROOT; };
+		0D31008808843A7600C3CBEA /* Viewport.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Viewport.h; path = ../include/phui/Viewport.h; sourceTree = SOURCE_ROOT; };
+		0D31008B08843A7600C3CBEA /* XMLMessage.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = XMLMessage.h; path = ../include/phui/XMLMessage.h; sourceTree = SOURCE_ROOT; };
+		0D31FFF308843A6200C3CBEA /* Button.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Button.cpp; path = ../src/Button.cpp; sourceTree = SOURCE_ROOT; };
+		0D31FFF408843A6200C3CBEA /* Caption.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Caption.cpp; path = ../src/Caption.cpp; sourceTree = SOURCE_ROOT; };
+		0D31FFF508843A6200C3CBEA /* Checkbox.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Checkbox.cpp; path = ../src/Checkbox.cpp; sourceTree = SOURCE_ROOT; };
+		0D31FFF608843A6200C3CBEA /* ConsoleView.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ConsoleView.cpp; path = ../src/ConsoleView.cpp; sourceTree = SOURCE_ROOT; };
+		0D31FFF708843A6200C3CBEA /* Control.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Control.cpp; path = ../src/Control.cpp; sourceTree = SOURCE_ROOT; };
+		0D31FFF808843A6200C3CBEA /* ControlValueMessage.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ControlValueMessage.cpp; path = ../src/ControlValueMessage.cpp; sourceTree = SOURCE_ROOT; };
+		0D31FFF908843A6200C3CBEA /* ConvertUTF.c */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.c; name = ConvertUTF.c; path = ../src/ConvertUTF.c; sourceTree = SOURCE_ROOT; };
+		0D31FFFA08843A6200C3CBEA /* ConvertUTF.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = ConvertUTF.h; path = ../src/ConvertUTF.h; sourceTree = SOURCE_ROOT; };
+		0D31FFFB08843A6200C3CBEA /* CSSViewDrawer.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = CSSViewDrawer.cpp; path = ../src/CSSViewDrawer.cpp; sourceTree = SOURCE_ROOT; };
+		0D31FFFC08843A6200C3CBEA /* DOM.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = DOM.cpp; path = ../src/DOM.cpp; sourceTree = SOURCE_ROOT; };
+		0D31FFFD08843A6200C3CBEA /* DropDownTask.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = DropDownTask.cpp; path = ../src/DropDownTask.cpp; sourceTree = SOURCE_ROOT; };
+		0D31FFFE08843A6200C3CBEA /* GLGraphicsContext.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = GLGraphicsContext.cpp; path = ../src/GLGraphicsContext.cpp; sourceTree = SOURCE_ROOT; };
+		0D31FFFF08843A6200C3CBEA /* Groupbox.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Groupbox.cpp; path = ../src/Groupbox.cpp; sourceTree = SOURCE_ROOT; };
+		0DC3C9430A7BFDE800F14BBB /* ContextMenu.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = ContextMenu.cpp; path = ../src/ContextMenu.cpp; sourceTree = SOURCE_ROOT; };
+		0DCEF76C0AD4636700E1D282 /* CtxMenu.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = CtxMenu.h; path = ../include/phui/CtxMenu.h; sourceTree = SOURCE_ROOT; };
+		0DCEF7700AD4637000E1D282 /* CtxMenu.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = CtxMenu.cpp; path = ../src/CtxMenu.cpp; sourceTree = SOURCE_ROOT; };
+		0DCEF7BB0AD4643900E1D282 /* Panel.cpp */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.cpp.cpp; name = Panel.cpp; path = ../src/Panel.cpp; sourceTree = SOURCE_ROOT; };
+		0DCEF7BD0AD4644300E1D282 /* Panel.h */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = sourcecode.c.h; name = Panel.h; path = ../include/phui/Panel.h; sourceTree = SOURCE_ROOT; };
+		470B71CC0E7056BF006D9C06 /* MirrorView.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = MirrorView.cpp; path = ../src/MirrorView.cpp; sourceTree = SOURCE_ROOT; };
+		470B71CE0E7056BF006D9C06 /* wwiiUTF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = wwiiUTF.h; path = ../src/wwiiUTF.h; sourceTree = SOURCE_ROOT; };
+		470B71D30E70571B006D9C06 /* wwiiUTF.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = wwiiUTF.cpp; path = ../src/wwiiUTF.cpp; sourceTree = SOURCE_ROOT; };
+		4717733C0F28E5580094DEAA /* IMEControl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = IMEControl.cpp; path = ../src/IMEControl.cpp; sourceTree = SOURCE_ROOT; };
+		47724CCE0F86C2FC0060F743 /* TextContainer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = TextContainer.cpp; path = ../src/TextContainer.cpp; sourceTree = SOURCE_ROOT; };
+		D2AAC046055464E500DB518D /* libphui.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libphui.a; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D289987405E68DCB004EDB86 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		08FB7794FE84155DC02AAC07 /* phui */ = {
+			isa = PBXGroup;
+			children = (
+				0D31FFF008843A5200C3CBEA /* include */,
+				0D31FFF208843A5B00C3CBEA /* src */,
+				1AB674ADFE9D54B511CA2CBB /* Products */,
+			);
+			name = phui;
+			sourceTree = "<group>";
+		};
+		0D31FFF008843A5200C3CBEA /* include */ = {
+			isa = PBXGroup;
+			children = (
+				0D31FFF108843A5700C3CBEA /* phui */,
+			);
+			name = include;
+			sourceTree = "<group>";
+		};
+		0D31FFF108843A5700C3CBEA /* phui */ = {
+			isa = PBXGroup;
+			children = (
+				08C8177F12B020C500818A11 /* FTFontReplacement.h */,
+				0DCEF7BD0AD4644300E1D282 /* Panel.h */,
+				0DCEF76C0AD4636700E1D282 /* CtxMenu.h */,
+				0D31005508843A7600C3CBEA /* Button.h */,
+				0D31005608843A7600C3CBEA /* Caption.h */,
+				0D31005708843A7600C3CBEA /* Checkbox.h */,
+				0D31005808843A7600C3CBEA /* ConsoleView.h */,
+				0D31005908843A7600C3CBEA /* Control.h */,
+				0D31005A08843A7600C3CBEA /* ControlValueMessage.h */,
+				0D31005B08843A7600C3CBEA /* CSSViewDrawer.h */,
+				0D31005C08843A7600C3CBEA /* DOM.h */,
+				0D31005E08843A7600C3CBEA /* DropDownTask.h */,
+				0D31005F08843A7600C3CBEA /* Error.h */,
+				0D31006008843A7600C3CBEA /* GLGraphicsContext.h */,
+				0D31006108843A7600C3CBEA /* GraphicsContext.h */,
+				0D31006208843A7600C3CBEA /* Groupbox.h */,
+				0D31006308843A7600C3CBEA /* ImageView.h */,
+				0D31006408843A7600C3CBEA /* Invoker.h */,
+				0D31006508843A7600C3CBEA /* Javascript.h */,
+				0D31006608843A7600C3CBEA /* KeyCodes.h */,
+				0D31006808843A7600C3CBEA /* ListView.h */,
+				0D31006C08843A7600C3CBEA /* Menu.h */,
+				0D31006E08843A7600C3CBEA /* Message.h */,
+				0D31006F08843A7600C3CBEA /* MessageFilter.h */,
+				0D31007008843A7600C3CBEA /* MessageHandler.h */,
+				0D31007108843A7600C3CBEA /* MessageLoop.h */,
+				0D31007208843A7600C3CBEA /* Messenger.h */,
+				0D31007408843A7600C3CBEA /* Periodical.h */,
+				0D31007508843A7600C3CBEA /* PopupMenuButton.h */,
+				0D31007608843A7600C3CBEA /* ProgressBar.h */,
+				0D31007708843A7600C3CBEA /* RadioButton.h */,
+				0D31007808843A7600C3CBEA /* Referenced.h */,
+				0D31007A08843A7600C3CBEA /* Scalar.h */,
+				0D31007B08843A7600C3CBEA /* Scrollbar.h */,
+				0D31007C08843A7600C3CBEA /* Slider.h */,
+				0D31007D08843A7600C3CBEA /* StackView.h */,
+				0D31007E08843A7600C3CBEA /* StencilView.h */,
+				0D31008008843A7600C3CBEA /* TabView.h */,
+				0D31008108843A7600C3CBEA /* TextControl.h */,
+				0D31008208843A7600C3CBEA /* TextView.h */,
+				0D31008308843A7600C3CBEA /* UIMessages.h */,
+				0D31008408843A7600C3CBEA /* UIXML.h */,
+				0D31008508843A7600C3CBEA /* Util.h */,
+				0D31008608843A7600C3CBEA /* View.h */,
+				0D31008708843A7600C3CBEA /* ViewDrawer.h */,
+				0D31008808843A7600C3CBEA /* Viewport.h */,
+				0D31008B08843A7600C3CBEA /* XMLMessage.h */,
+			);
+			name = phui;
+			sourceTree = "<group>";
+		};
+		0D31FFF208843A5B00C3CBEA /* src */ = {
+			isa = PBXGroup;
+			children = (
+				47724CCE0F86C2FC0060F743 /* TextContainer.cpp */,
+				4717733C0F28E5580094DEAA /* IMEControl.cpp */,
+				470B71D30E70571B006D9C06 /* wwiiUTF.cpp */,
+				470B71CC0E7056BF006D9C06 /* MirrorView.cpp */,
+				470B71CE0E7056BF006D9C06 /* wwiiUTF.h */,
+				0DCEF7700AD4637000E1D282 /* CtxMenu.cpp */,
+				0DC3C9430A7BFDE800F14BBB /* ContextMenu.cpp */,
+				0D1F958008E877F6008FF0BF /* ContextMenu.cpp */,
+				0D31FFF308843A6200C3CBEA /* Button.cpp */,
+				0D31FFF408843A6200C3CBEA /* Caption.cpp */,
+				0D31FFF508843A6200C3CBEA /* Checkbox.cpp */,
+				0D31FFF608843A6200C3CBEA /* ConsoleView.cpp */,
+				0D31FFF708843A6200C3CBEA /* Control.cpp */,
+				0D31FFF808843A6200C3CBEA /* ControlValueMessage.cpp */,
+				0D31FFF908843A6200C3CBEA /* ConvertUTF.c */,
+				0D31FFFA08843A6200C3CBEA /* ConvertUTF.h */,
+				0D31FFFB08843A6200C3CBEA /* CSSViewDrawer.cpp */,
+				0D31FFFC08843A6200C3CBEA /* DOM.cpp */,
+				0D31FFFD08843A6200C3CBEA /* DropDownTask.cpp */,
+				0D31FFFE08843A6200C3CBEA /* GLGraphicsContext.cpp */,
+				0D31FFFF08843A6200C3CBEA /* Groupbox.cpp */,
+				0D31000008843A6200C3CBEA /* ImageView.cpp */,
+				0D31000108843A6200C3CBEA /* Invoker.cpp */,
+				0D31000208843A6200C3CBEA /* Javascript.cpp */,
+				0D31000508843A6200C3CBEA /* ListView.cpp */,
+				0D31000708843A6200C3CBEA /* Menu.cpp */,
+				0D31000908843A6200C3CBEA /* Message.cpp */,
+				0D31000A08843A6200C3CBEA /* MessageFilter.cpp */,
+				0D31000B08843A6200C3CBEA /* MessageHandler.cpp */,
+				0D31000C08843A6200C3CBEA /* MessageLoop.cpp */,
+				0D31000D08843A6200C3CBEA /* Messenger.cpp */,
+				0D31001008843A6200C3CBEA /* PopupMenuButton.cpp */,
+				0D31001108843A6200C3CBEA /* ProgressBar.cpp */,
+				0D31001208843A6200C3CBEA /* RadioButton.cpp */,
+				0D31001408843A6200C3CBEA /* Scalar.cpp */,
+				0D31000F08843A6200C3CBEA /* Periodical.cpp */,
+				0D31001508843A6200C3CBEA /* Scrollbar.cpp */,
+				0D31001608843A6200C3CBEA /* Slider.cpp */,
+				0D31001708843A6200C3CBEA /* StackView.cpp */,
+				0D31001808843A6200C3CBEA /* StencilView.cpp */,
+				0D31001A08843A6200C3CBEA /* TabView.cpp */,
+				0D31001B08843A6200C3CBEA /* TextControl.cpp */,
+				0D31001C08843A6200C3CBEA /* TextView.cpp */,
+				0D31001D08843A6200C3CBEA /* UIXML.cpp */,
+				0D31001E08843A6200C3CBEA /* Util.cpp */,
+				0D31001F08843A6200C3CBEA /* View.cpp */,
+				0D31002008843A6200C3CBEA /* Viewport.cpp */,
+				0D31002308843A6200C3CBEA /* XMLMessage.cpp */,
+				0DCEF7BB0AD4643900E1D282 /* Panel.cpp */,
+			);
+			name = src;
+			sourceTree = "<group>";
+		};
+		1AB674ADFE9D54B511CA2CBB /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D2AAC046055464E500DB518D /* libphui.a */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXHeadersBuildPhase section */
+		D2AAC043055464E500DB518D /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0D31002C08843A6200C3CBEA /* ConvertUTF.h in Headers */,
+				0D31008D08843A7600C3CBEA /* Button.h in Headers */,
+				0D31008E08843A7600C3CBEA /* Caption.h in Headers */,
+				0D31008F08843A7600C3CBEA /* Checkbox.h in Headers */,
+				0D31009008843A7600C3CBEA /* ConsoleView.h in Headers */,
+				0D31009108843A7600C3CBEA /* Control.h in Headers */,
+				0D31009208843A7600C3CBEA /* ControlValueMessage.h in Headers */,
+				0D31009308843A7600C3CBEA /* CSSViewDrawer.h in Headers */,
+				0D31009408843A7600C3CBEA /* DOM.h in Headers */,
+				0D31009508843A7600C3CBEA /* DropDownTask.h in Headers */,
+				0D31009608843A7600C3CBEA /* Error.h in Headers */,
+				0D31009708843A7600C3CBEA /* GLGraphicsContext.h in Headers */,
+				0D31009808843A7600C3CBEA /* GraphicsContext.h in Headers */,
+				0D31009908843A7600C3CBEA /* Groupbox.h in Headers */,
+				0D31009A08843A7600C3CBEA /* ImageView.h in Headers */,
+				0D31009B08843A7600C3CBEA /* Invoker.h in Headers */,
+				0D31009C08843A7600C3CBEA /* Javascript.h in Headers */,
+				0D31009D08843A7600C3CBEA /* KeyCodes.h in Headers */,
+				0D31009F08843A7600C3CBEA /* ListView.h in Headers */,
+				0D3100A108843A7600C3CBEA /* Menu.h in Headers */,
+				0D3100A308843A7600C3CBEA /* Message.h in Headers */,
+				0D3100A408843A7600C3CBEA /* MessageFilter.h in Headers */,
+				0D3100A508843A7600C3CBEA /* MessageHandler.h in Headers */,
+				0D3100A608843A7600C3CBEA /* MessageLoop.h in Headers */,
+				0D3100A708843A7600C3CBEA /* Messenger.h in Headers */,
+				0D3100A908843A7600C3CBEA /* Periodical.h in Headers */,
+				0D3100AA08843A7600C3CBEA /* PopupMenuButton.h in Headers */,
+				0D3100AB08843A7600C3CBEA /* ProgressBar.h in Headers */,
+				0D3100AC08843A7600C3CBEA /* RadioButton.h in Headers */,
+				0D3100AD08843A7600C3CBEA /* Referenced.h in Headers */,
+				0D3100AF08843A7600C3CBEA /* Scalar.h in Headers */,
+				0D3100B008843A7600C3CBEA /* Scrollbar.h in Headers */,
+				0D3100B108843A7600C3CBEA /* Slider.h in Headers */,
+				0D3100B208843A7600C3CBEA /* StackView.h in Headers */,
+				0D3100B308843A7600C3CBEA /* StencilView.h in Headers */,
+				0D3100B508843A7600C3CBEA /* TabView.h in Headers */,
+				0D3100B608843A7600C3CBEA /* TextControl.h in Headers */,
+				0D3100B708843A7600C3CBEA /* TextView.h in Headers */,
+				0D3100B808843A7600C3CBEA /* UIMessages.h in Headers */,
+				0D3100B908843A7600C3CBEA /* UIXML.h in Headers */,
+				0D3100BA08843A7600C3CBEA /* Util.h in Headers */,
+				0D3100BB08843A7600C3CBEA /* View.h in Headers */,
+				0D3100BC08843A7600C3CBEA /* ViewDrawer.h in Headers */,
+				0D3100BD08843A7600C3CBEA /* Viewport.h in Headers */,
+				0D3100BF08843A7600C3CBEA /* XMLMessage.h in Headers */,
+				0DCEF76D0AD4636700E1D282 /* CtxMenu.h in Headers */,
+				0DCEF7BE0AD4644300E1D282 /* Panel.h in Headers */,
+				470B71D10E7056BF006D9C06 /* wwiiUTF.h in Headers */,
+				08C8178012B020C500818A11 /* FTFontReplacement.h in Headers */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXHeadersBuildPhase section */
+
+/* Begin PBXNativeTarget section */
+		D2AAC045055464E500DB518D /* phui */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 0D31FFE108843A1100C3CBEA /* Build configuration list for PBXNativeTarget "phui" */;
+			buildPhases = (
+				D2AAC043055464E500DB518D /* Headers */,
+				D2AAC044055464E500DB518D /* Sources */,
+				D289987405E68DCB004EDB86 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = phui;
+			productName = phui;
+			productReference = D2AAC046055464E500DB518D /* libphui.a */;
+			productType = "com.apple.product-type.library.static";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		08FB7793FE84155DC02AAC07 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+			};
+			buildConfigurationList = 0D31FFE508843A1100C3CBEA /* Build configuration list for PBXProject "phui" */;
+			compatibilityVersion = "Xcode 3.1";
+			developmentRegion = English;
+			hasScannedForEncodings = 1;
+			knownRegions = (
+				English,
+				Japanese,
+				French,
+				German,
+			);
+			mainGroup = 08FB7794FE84155DC02AAC07 /* phui */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D2AAC045055464E500DB518D /* phui */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D2AAC044055464E500DB518D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				0D31002508843A6200C3CBEA /* Button.cpp in Sources */,
+				0D31002608843A6200C3CBEA /* Caption.cpp in Sources */,
+				0D31002708843A6200C3CBEA /* Checkbox.cpp in Sources */,
+				0D31002808843A6200C3CBEA /* ConsoleView.cpp in Sources */,
+				0D31002908843A6200C3CBEA /* Control.cpp in Sources */,
+				0D31002A08843A6200C3CBEA /* ControlValueMessage.cpp in Sources */,
+				0D31002B08843A6200C3CBEA /* ConvertUTF.c in Sources */,
+				0D31002D08843A6200C3CBEA /* CSSViewDrawer.cpp in Sources */,
+				0D31002E08843A6200C3CBEA /* DOM.cpp in Sources */,
+				0D31002F08843A6200C3CBEA /* DropDownTask.cpp in Sources */,
+				0D31003008843A6200C3CBEA /* GLGraphicsContext.cpp in Sources */,
+				0D31003108843A6200C3CBEA /* Groupbox.cpp in Sources */,
+				0D31003208843A6200C3CBEA /* ImageView.cpp in Sources */,
+				0D31003308843A6200C3CBEA /* Invoker.cpp in Sources */,
+				0D31003408843A6200C3CBEA /* Javascript.cpp in Sources */,
+				0D31003708843A6200C3CBEA /* ListView.cpp in Sources */,
+				0D31003808843A6200C3CBEA /* Menu.cpp in Sources */,
+				0D31003A08843A6200C3CBEA /* Message.cpp in Sources */,
+				0D31003B08843A6200C3CBEA /* MessageFilter.cpp in Sources */,
+				0D31003C08843A6200C3CBEA /* MessageHandler.cpp in Sources */,
+				0D31003D08843A6200C3CBEA /* MessageLoop.cpp in Sources */,
+				0D31003E08843A6200C3CBEA /* Messenger.cpp in Sources */,
+				0D31004008843A6200C3CBEA /* Periodical.cpp in Sources */,
+				0D31004108843A6200C3CBEA /* PopupMenuButton.cpp in Sources */,
+				0D31004208843A6200C3CBEA /* ProgressBar.cpp in Sources */,
+				0D31004308843A6200C3CBEA /* RadioButton.cpp in Sources */,
+				0D31004508843A6200C3CBEA /* Scalar.cpp in Sources */,
+				0D31004608843A6200C3CBEA /* Scrollbar.cpp in Sources */,
+				0D31004708843A6200C3CBEA /* Slider.cpp in Sources */,
+				0D31004808843A6200C3CBEA /* StackView.cpp in Sources */,
+				0D31004908843A6200C3CBEA /* StencilView.cpp in Sources */,
+				0D31004B08843A6200C3CBEA /* TabView.cpp in Sources */,
+				0D31004C08843A6200C3CBEA /* TextControl.cpp in Sources */,
+				0D31004D08843A6200C3CBEA /* TextView.cpp in Sources */,
+				0D31004E08843A6200C3CBEA /* UIXML.cpp in Sources */,
+				0D31004F08843A6200C3CBEA /* Util.cpp in Sources */,
+				0D31005008843A6200C3CBEA /* View.cpp in Sources */,
+				0D31005108843A6200C3CBEA /* Viewport.cpp in Sources */,
+				0D31005308843A6200C3CBEA /* XMLMessage.cpp in Sources */,
+				0D1F958108E877F6008FF0BF /* ContextMenu.cpp in Sources */,
+				0DC3C9440A7BFDE800F14BBB /* ContextMenu.cpp in Sources */,
+				0DCEF7710AD4637000E1D282 /* CtxMenu.cpp in Sources */,
+				0DCEF7BC0AD4643900E1D282 /* Panel.cpp in Sources */,
+				470B71CF0E7056BF006D9C06 /* MirrorView.cpp in Sources */,
+				470B71D40E70571B006D9C06 /* wwiiUTF.cpp in Sources */,
+				4717733D0F28E5580094DEAA /* IMEControl.cpp in Sources */,
+				47724CCF0F86C2FC0060F743 /* TextContainer.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		0D31FFE208843A1100C3CBEA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_BUILTIN_FUNCTIONS = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = YES;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_HIDDEN_VIRTUAL_FUNCTIONS = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../include,
+					../include/js,
+					../include/libxml,
+					../../freetype/include,
+					../../freetype/include/freetype,
+					../../ftgl/src/FTGL,
+					../../ftgl/src,
+				);
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = phui;
+				VALID_ARCHS = i386;
+			};
+			name = Debug;
+		};
+		0D31FFE308843A1100C3CBEA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				GCC_ENABLE_BUILTIN_FUNCTIONS = NO;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = XP_UNIX;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../include,
+					../include/js,
+					../include/libxml,
+					../../freetype/include,
+					../../freetype/include/freetype,
+					../../ftgl/src/FTGL,
+					../../ftgl/src,
+				);
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = phui;
+				VALID_ARCHS = i386;
+			};
+			name = Release;
+		};
+		0D31FFE408843A1100C3CBEA /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				GCC_ENABLE_BUILTIN_FUNCTIONS = NO;
+				GCC_GENERATE_DEBUGGING_SYMBOLS = NO;
+				GCC_PREPROCESSOR_DEFINITIONS = XP_UNIX;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				HEADER_SEARCH_PATHS = (
+					../include,
+					../include/js,
+					../include/libxml,
+					../../freetype/include,
+					../../freetype/include/freetype,
+					../../ftgl/src/FTGL,
+					../../ftgl/src,
+				);
+				INSTALL_PATH = /usr/local/lib;
+				PRODUCT_NAME = phui;
+				VALID_ARCHS = i386;
+			};
+			name = Default;
+		};
+		0D31FFE608843A1100C3CBEA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					XP_UNIX,
+					SHOW_JS_ALLOCATIONS,
+				);
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				SDKROOT = macosx;
+				STRIP_INSTALLED_PRODUCT = NO;
+				VALID_ARCHS = i386;
+			};
+			name = Debug;
+		};
+		0D31FFE708843A1100C3CBEA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				COPY_PHASE_STRIP = NO;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_PREPROCESSOR_DEFINITIONS = XP_UNIX;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				STRIP_INSTALLED_PRODUCT = NO;
+				VALID_ARCHS = i386;
+			};
+			name = Release;
+		};
+		0D31FFE808843A1100C3CBEA /* Default */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				SDKROOT = macosx;
+				VALID_ARCHS = i386;
+			};
+			name = Default;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		0D31FFE108843A1100C3CBEA /* Build configuration list for PBXNativeTarget "phui" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0D31FFE208843A1100C3CBEA /* Debug */,
+				0D31FFE308843A1100C3CBEA /* Release */,
+				0D31FFE408843A1100C3CBEA /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+		0D31FFE508843A1100C3CBEA /* Build configuration list for PBXProject "phui" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0D31FFE608843A1100C3CBEA /* Debug */,
+				0D31FFE708843A1100C3CBEA /* Release */,
+				0D31FFE808843A1100C3CBEA /* Default */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Default;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 08FB7793FE84155DC02AAC07 /* Project object */;
+}
