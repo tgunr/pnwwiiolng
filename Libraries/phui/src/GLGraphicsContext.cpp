@@ -556,7 +556,7 @@ void GLGraphicsContext::DrawRotatedTexture(TextureInfo const& info, float left, 
 	right = round(right);
 	top = round(top);
 
-	if((UINT32)orient > 3) orient = 0;
+	if((uint32_t)orient > 3) orient = 0;
 	
 	BoxVerts coords;
 	const float uv[4][8] = {	{info.uv[0],info.uv[1], info.uv[2],info.uv[3], info.uv[4],info.uv[5], info.uv[6],info.uv[7]}
