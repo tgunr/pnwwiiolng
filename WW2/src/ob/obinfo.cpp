@@ -21,11 +21,7 @@ using namespace std;
 extern std::map<GLuint, std::string> reverseTextureIndex;
 extern std::map<int,std::string> reverse_materialnames;
 
-#if platOS == OS_MACOS
-#define INFO_OUTFILE "/Users/ahwulf/tmp/models.txt"
-#else
 #define INFO_OUTFILE "models.txt"
-#endif
 
 enum is_type
 {
