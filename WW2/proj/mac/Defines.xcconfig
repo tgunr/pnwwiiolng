@@ -31,7 +31,7 @@ WW2_DEFINES_Common_02       = $(WW2_DEFINES_Common_03) xGENICONS=1              
 WW2_DEFINES_Common_01       = $(WW2_DEFINES_Common_02) xSPATIAL_DB                  // DON'T enable spatial database, whatever that is
 
 // Debug flags common to development and debug; debug is always a subset of dev
-WW2_DEFINES_Debug_03        = $(WW2_DEFINES_Debug_04) RELEASE_CLIENT=0              // not a release client
+WW2_DEFINES_Debug_03        = $(WW2_DEFINES_Debug_04) RELEASE_CLIENT=1              // not a release client
 WW2_DEFINES_Debug_02        = $(WW2_DEFINES_Debug_03) IS_DEBUG DEBUG _DEBUG
 WW2_DEFINES_Debug_01        = $(WW2_DEFINES_Debug_02) DONT_USE_COVERT               // disable bad tricks for masking memory values
 
