@@ -3951,247 +3951,56 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		080C7E881062F012000A242F /* Beta Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(SRCROOT)/vendor",
-					"$(PROJECT_DIR)/Vendor",
-				);
-				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRC_ROOT)/src\"",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"/usr/local/lib/**",
-					"$(PROJECT_DIR)/lib/mac",
-				);
-				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = maclib;
-				SEPARATE_STRIP = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-			};
-			name = "Beta Release";
-		};
 		085BD0C9110F5D560063F377 /* Release */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				DEPLOYMENT_POSTPROCESSING = YES;
-				ENABLE_TESTABILITY = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(SRCROOT)/vendor",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = fast;
-				GCC_PRECOMPILE_PREFIX_HEADER = NO;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"_MACOSX=1",
-					"platOS=OS_MACOS",
-					XP_MAC,
-					ENABLE_FLOATERS,
-					"RELEASE_CLIENT=1",
-					EVENT_LOG,
-					_OPTIONS_BELOW_THIS_LINE,
-					"TEUL_PACKET_NAMES=0",
-				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO;
-				GCC_WARN_SIGN_COMPARE = NO;
-				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
-				GCC_WARN_UNUSED_VARIABLE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PNG)",
-					"\"$(SRCROOT)/../Libraries/ft2/include\"",
-					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
-					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
-					"\"$(SDKROOT)/usr/include/libxml2\"",
-					"\"$(SRCROOT)/../Libraries/opende/include\"",
-					"\"$(SRCROOT)/include/Cg\"",
-					"\"$(SRCROOT)/include\"",
-					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
-					"\"$(SRCROOT)/src/math\"",
-					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
-					"\"$(SRCROOT)/../Libraries/ft2/include/freetype\"",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inheritied)",
-					"\"$(SRCROOT)/lib/mac\"",
-				);
-				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OBJROOT = proj/mac/build;
-				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-bind_at_load";
-				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = YES;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
 				SDKROOT = macosx;
-				SEPARATE_STRIP = NO;
-				SHARED_PRECOMPS_DIR = "$(CACHE_ROOT)/SharedPrecompiledHeaders";
 				SKIP_INSTALL = YES;
-				STRIP_STYLE = debugging;
 				SYMROOT = proj/mac/build;
-				USER_HEADER_SEARCH_PATHS = "../Libraries/ftgl/src ../Libraries/glew/include/ ../Libraries/phui/include/ include/ include/bt ../Libraries/opende/include/ include/js include/libxml include/lua include/mac src src/auth src/chat src/dbug src/include src/sysmac src/teul src/weap ../Libraries/libxml2/include/libxml/ src/spt";
 				VALID_ARCHS = i386;
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wdeprecated",
-				);
 			};
 			name = Release;
 		};
 		085BD0CA110F5D560063F377 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_WARN_BOOL_CONVERSION = NO;
-				CLANG_WARN_CONSTANT_CONVERSION = NO;
-				CLANG_X86_VECTOR_INSTRUCTIONS = default;
-				COMBINE_HIDPI_IMAGES = NO;
-				COPY_PHASE_STRIP = YES;
-				ENABLE_TESTABILITY = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(SRCROOT)/vendor",
-					"$(PROJECT_DIR)/Vendor",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = fast;
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"_MACOSX=1",
-					"platOS=OS_MACOS",
-					XP_MAC,
-					ENABLE_FLOATERS,
-					"RELEASE_CLIENT=1",
-					EVENT_LOG,
-					_OPTIONS_BELOW_THIS_LINE,
-					"TEUL_PACKET_NAMES=1",
-				);
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
-				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = proj/mac/Info.plist;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(PROJECT_DIR)/proj/mac/build/Debug",
-					"$(PROJECT_DIR)/lib/mac",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_LDFLAGS = "-bind_at_load";
-				PRELINK_LIBS = "";
+				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
 				PRODUCT_NAME = "World War II Online";
-				REBUILDMDL = 0;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-				VALID_ARCHS = "i386 x86_64";
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wdeprecated",
-				);
 				WRAPPER_EXTENSION = app;
-				WW2MODS = "${PROJECT_DIR}/../ww2mods";
 			};
 			name = Release;
 		};
 		085BD0CB110F5D560063F377 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(SRCROOT)/vendor",
-				);
-				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_PFE_FILE_C_DIALECTS = "c++";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = src/teul/syscfg.h;
-				GCC_VERSION = "";
-				GENERATE_MASTER_OBJECT_FILE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
-					"\"$(SRCROOT)/../Libraries/libevent/include\"",
-				);
-				LD_OPENMP_FLAGS = "";
 				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "";
-				PRELINK_LIBS = "";
-				PRODUCT_NAME = teulKit;
-				SEPARATE_STRIP = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
 		085BD0CC110F5D560063F377 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(SRCROOT)/vendor",
-					"$(PROJECT_DIR)/Vendor",
-				);
-				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRC_ROOT)/src\"",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/lib/mac\"/**",
-					"$(PROJECT_DIR)/lib/mac",
-				);
 				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = maclib;
-				SEPARATE_STRIP = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
@@ -4200,1397 +4009,133 @@
 			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				DEPLOYMENT_POSTPROCESSING = YES;
-				ENABLE_TESTABILITY = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(SRCROOT)/vendor",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = NO;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"_MACOSX=1",
-					"platOS=OS_MACOS",
-					XP_MAC,
-					ENABLE_FLOATERS,
-					"RELEASE_CLIENT=1",
-					EVENT_LOG,
-					_OPTIONS_BELOW_THIS_LINE,
-					"TEUL_PACKET_NAMES=1",
-				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO;
-				GCC_WARN_SIGN_COMPARE = NO;
-				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
-				GCC_WARN_UNUSED_VARIABLE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PNG)",
-					"\"$(SRCROOT)/../Libraries/ft2/include\"",
-					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
-					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
-					"\"$(SDKROOT)/usr/include/libxml2\"",
-					"\"$(SRCROOT)/../Libraries/opende/include\"",
-					"\"$(SRCROOT)/include/Cg\"",
-					"\"$(SRCROOT)/include\"",
-					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
-					"\"$(SRCROOT)/src/math\"",
-					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
-					"\"$(SRCROOT)/../Libraries/ft2/include/freetype\"",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inheritied)",
-					"\"$(SRCROOT)/lib/mac\"",
-				);
-				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OBJROOT = proj/mac/build;
-				ONLY_ACTIVE_ARCH = NO;
 				OTHER_LDFLAGS = "-bind_at_load";
-				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = YES;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
 				SDKROOT = macosx;
-				SEPARATE_STRIP = NO;
-				SHARED_PRECOMPS_DIR = "$(CACHE_ROOT)/SharedPrecompiledHeaders";
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = "non-global";
 				SYMROOT = proj/mac/build;
-				USER_HEADER_SEARCH_PATHS = "../Libraries/ftgl/src ../Libraries/glew/include/ ../Libraries/phui/include/ include/ include/bt ../Libraries/opende/include/ include/js include/libxml include/lua include/mac src src/auth src/chat src/dbug src/include src/sysmac src/teul src/weap ../Libraries/libxml2/include/libxml/ src/spt";
 				VALID_ARCHS = i386;
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wdeprecated",
-				);
 			};
 			name = Debug;
 		};
 		085BD0CE110F5D5C0063F377 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_WARN_BOOL_CONVERSION = NO;
-				CLANG_WARN_CONSTANT_CONVERSION = NO;
-				CLANG_X86_VECTOR_INSTRUCTIONS = default;
-				COMBINE_HIDPI_IMAGES = NO;
-				COPY_PHASE_STRIP = YES;
-				ENABLE_TESTABILITY = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(SRCROOT)/vendor",
-					"$(PROJECT_DIR)/Vendor",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"_MACOSX=1",
-					"platOS=OS_MACOS",
-					XP_MAC,
-					ENABLE_FLOATERS,
-					"RELEASE_CLIENT=0",
-					EVENT_LOG,
-					_OPTIONS_BELOW_THIS_LINE,
-					"TEUL_PACKET_NAMES=1",
-				);
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
-				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = proj/mac/Info.plist;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(PROJECT_DIR)/proj/mac/build/Debug",
-					"$(PROJECT_DIR)/lib/mac",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_LDFLAGS = "-bind_at_load";
-				PRELINK_LIBS = "";
+				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
 				PRODUCT_NAME = "World War II Online";
-				REBUILDMDL = 0;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-				VALID_ARCHS = "i386 x86_64";
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wdeprecated",
-				);
 				WRAPPER_EXTENSION = app;
-				WW2MODS = "${PROJECT_DIR}/../ww2mods";
 			};
 			name = Debug;
 		};
 		085BD0CF110F5D5C0063F377 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(SRCROOT)/vendor",
-				);
-				GCC_PFE_FILE_C_DIALECTS = "c++";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = src/teul/syscfg.h;
-				GCC_VERSION = "";
-				GENERATE_MASTER_OBJECT_FILE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
-					"\"$(SRCROOT)/../Libraries/libevent/include\"",
-				);
-				LD_OPENMP_FLAGS = "";
 				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "";
-				PRELINK_LIBS = "";
-				PRODUCT_NAME = teulKit;
-				SEPARATE_STRIP = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
 		};
 		085BD0D0110F5D5C0063F377 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(SRCROOT)/vendor",
-					"$(PROJECT_DIR)/Vendor",
-				);
-				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRC_ROOT)/src\"",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/lib/mac\"/**",
-					"$(PROJECT_DIR)/lib/mac",
-				);
 				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = maclib;
-				SEPARATE_STRIP = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
-		};
-		085BD0DE110F5F290063F377 /* Debug Optimized */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEPLOYMENT_POSTPROCESSING = YES;
-				ENABLE_TESTABILITY = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(SRCROOT)/vendor",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
-				GCC_OPTIMIZATION_LEVEL = fast;
-				GCC_PRECOMPILE_PREFIX_HEADER = NO;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"_MACOSX=1",
-					"platOS=OS_MACOS",
-					XP_MAC,
-					ENABLE_FLOATERS,
-					"RELEASE_CLIENT=1",
-					EVENT_LOG,
-					_OPTIONS_BELOW_THIS_LINE,
-					"TEUL_PACKET_NAMES=1",
-				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO;
-				GCC_WARN_SIGN_COMPARE = NO;
-				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
-				GCC_WARN_UNUSED_VARIABLE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PNG)",
-					"\"$(SRCROOT)/../Libraries/ft2/include\"",
-					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
-					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
-					"\"$(SDKROOT)/usr/include/libxml2\"",
-					"\"$(SRCROOT)/../Libraries/opende/include\"",
-					"\"$(SRCROOT)/include/Cg\"",
-					"\"$(SRCROOT)/include\"",
-					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
-					"\"$(SRCROOT)/src/math\"",
-					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
-					"\"$(SRCROOT)/../Libraries/ft2/include/freetype\"",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inheritied)",
-					"\"$(SRCROOT)/lib/mac\"",
-				);
-				MACH_O_TYPE = mh_execute;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				OBJROOT = proj/mac/build;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_LDFLAGS = "-bind_at_load";
-				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = YES;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
-				SDKROOT = macosx;
-				SEPARATE_STRIP = NO;
-				SHARED_PRECOMPS_DIR = "$(CACHE_ROOT)/SharedPrecompiledHeaders";
-				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = "non-global";
-				SYMROOT = proj/mac/build;
-				USER_HEADER_SEARCH_PATHS = "../Libraries/ftgl/src ../Libraries/glew/include/ ../Libraries/phui/include/ include/ include/bt ../Libraries/opende/include/ include/js include/libxml include/lua include/mac src src/auth src/chat src/dbug src/include src/sysmac src/teul src/weap ../Libraries/libxml2/include/libxml/ src/spt";
-				VALID_ARCHS = i386;
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wdeprecated",
-				);
-			};
-			name = "Debug Optimized";
-		};
-		085BD0DF110F5F290063F377 /* Debug Optimized */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_WARN_BOOL_CONVERSION = NO;
-				CLANG_WARN_CONSTANT_CONVERSION = NO;
-				CLANG_X86_VECTOR_INSTRUCTIONS = default;
-				COMBINE_HIDPI_IMAGES = NO;
-				COPY_PHASE_STRIP = YES;
-				ENABLE_TESTABILITY = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(SRCROOT)/vendor",
-					"$(PROJECT_DIR)/Vendor",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = fast;
-				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"_MACOSX=1",
-					"platOS=OS_MACOS",
-					XP_MAC,
-					ENABLE_FLOATERS,
-					"RELEASE_CLIENT=0",
-					EVENT_LOG,
-					_OPTIONS_BELOW_THIS_LINE,
-					"TEUL_PACKET_NAMES=1",
-				);
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
-				HEADER_SEARCH_PATHS = "$(inherited)";
-				INFOPLIST_FILE = proj/mac/Info.plist;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(PROJECT_DIR)/proj/mac/build/Debug",
-					"$(PROJECT_DIR)/lib/mac",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_LDFLAGS = "-bind_at_load";
-				PRELINK_LIBS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
-				PRODUCT_NAME = "World War II Online";
-				REBUILDMDL = 0;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-				VALID_ARCHS = "i386 x86_64";
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wdeprecated",
-				);
-				WRAPPER_EXTENSION = app;
-				WW2MODS = "${PROJECT_DIR}/../ww2mods";
-			};
-			name = "Debug Optimized";
-		};
-		085BD0E0110F5F290063F377 /* Debug Optimized */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(SRCROOT)/vendor",
-				);
-				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_PFE_FILE_C_DIALECTS = "c++";
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = src/teul/syscfg.h;
-				GCC_VERSION = "";
-				GENERATE_MASTER_OBJECT_FILE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
-					"\"$(SRCROOT)/../Libraries/libevent/include\"",
-				);
-				LD_OPENMP_FLAGS = "";
-				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "";
-				PRELINK_LIBS = "";
-				PRODUCT_NAME = teulKit;
-				SEPARATE_STRIP = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-			};
-			name = "Debug Optimized";
-		};
-		085BD0E1110F5F290063F377 /* Debug Optimized */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(SRCROOT)/vendor",
-					"$(PROJECT_DIR)/Vendor",
-				);
-				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRC_ROOT)/src\"",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/lib/mac\"/**",
-					"$(PROJECT_DIR)/lib/mac",
-				);
-				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = maclib;
-				SEPARATE_STRIP = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-			};
-			name = "Debug Optimized";
-		};
-		088DF82D11343DC30040BC8F /* Closed Beta Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEPLOYMENT_POSTPROCESSING = YES;
-				ENABLE_TESTABILITY = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(SRCROOT)/vendor",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
-				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_PRECOMPILE_PREFIX_HEADER = NO;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"_MACOSX=1",
-					"IS_BIG_ENDIAN=__BIG_ENDIAN__",
-					XP_MAC,
-					"RELEASE_CLIENT=1",
-					BETA_RELEASE,
-					ENABLE_FLOATERS,
-					"platOS=OS_MACOS",
-					"TEUL_PACKET_NAMES=0",
-				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO;
-				GCC_WARN_SIGN_COMPARE = NO;
-				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
-				GCC_WARN_UNUSED_VARIABLE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PNG)",
-					"\"$(SRCROOT)/../Libraries/ft2/include\"",
-					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
-					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
-					"\"$(SDKROOT)/usr/include/libxml2\"",
-					"\"$(SRCROOT)/../Libraries/opende/include\"",
-					"\"$(SRCROOT)/include/Cg\"",
-					"\"$(SRCROOT)/include\"",
-					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
-					"\"$(SRCROOT)/src/math\"",
-					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
-					"\"$(SRCROOT)/../Libraries/ft2/include/freetype\"",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inheritied)",
-					"\"$(SRCROOT)/lib/mac\"",
-				);
-				MACH_O_TYPE = mh_execute;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				OBJROOT = proj/mac/build;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_LDFLAGS = "-bind_at_load";
-				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = YES;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
-				SDKROOT = macosx;
-				SEPARATE_STRIP = NO;
-				SHARED_PRECOMPS_DIR = "$(CACHE_ROOT)/SharedPrecompiledHeaders";
-				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = YES;
-				STRIP_STYLE = "non-global";
-				SYMROOT = proj/mac/build;
-				USER_HEADER_SEARCH_PATHS = "../Libraries/ftgl/src ../Libraries/glew/include/ ../Libraries/phui/include/ include/ include/bt ../Libraries/opende/include/ include/js include/libxml include/lua include/mac src src/auth src/chat src/dbug src/include src/sysmac src/teul src/weap ../Libraries/libxml2/include/libxml/ src/spt";
-				VALID_ARCHS = i386;
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wdeprecated",
-				);
-			};
-			name = "Closed Beta Release";
-		};
-		088DF82E11343DC30040BC8F /* Closed Beta Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_WARN_BOOL_CONVERSION = NO;
-				CLANG_WARN_CONSTANT_CONVERSION = NO;
-				CLANG_X86_VECTOR_INSTRUCTIONS = default;
-				COMBINE_HIDPI_IMAGES = NO;
-				COPY_PHASE_STRIP = YES;
-				ENABLE_TESTABILITY = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(SRCROOT)/vendor",
-					"$(PROJECT_DIR)/Vendor",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"_MACOSX=1",
-					"IS_BIG_ENDIAN=__BIG_ENDIAN__",
-					XP_MAC,
-					"RELEASE_CLIENT=1",
-					BETA_RELEASE,
-					ENABLE_FLOATERS,
-					"platOS=OS_MACOS",
-					"TEUL_PACKET_NAMES=0",
-				);
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
-				HEADER_SEARCH_PATHS = "$(inherited)";
-				INFOPLIST_FILE = proj/mac/Info.plist;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(PROJECT_DIR)/proj/mac/build/Debug",
-					"$(PROJECT_DIR)/lib/mac",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_LDFLAGS = "-bind_at_load";
-				PRELINK_LIBS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
-				PRODUCT_NAME = "World War II Online";
-				REBUILDMDL = 0;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-				VALID_ARCHS = "i386 x86_64";
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wdeprecated",
-				);
-				WRAPPER_EXTENSION = app;
-				WW2MODS = "${PROJECT_DIR}/../ww2mods";
-			};
-			name = "Closed Beta Release";
-		};
-		088DF82F11343DC30040BC8F /* Closed Beta Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(SRCROOT)/vendor",
-				);
-				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_PFE_FILE_C_DIALECTS = "c++";
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = src/teul/syscfg.h;
-				GCC_VERSION = "";
-				GENERATE_MASTER_OBJECT_FILE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
-					"\"$(SRCROOT)/../Libraries/libevent/include\"",
-				);
-				LD_OPENMP_FLAGS = "";
-				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "";
-				PRELINK_LIBS = "";
-				PRODUCT_NAME = teulKit;
-				SEPARATE_STRIP = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-			};
-			name = "Closed Beta Release";
-		};
-		088DF83011343DC30040BC8F /* Closed Beta Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(SRCROOT)/vendor",
-					"$(PROJECT_DIR)/Vendor",
-				);
-				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRC_ROOT)/src\"",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/lib/mac\"/**",
-					"$(PROJECT_DIR)/lib/mac",
-				);
-				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = maclib;
-				SEPARATE_STRIP = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-			};
-			name = "Closed Beta Release";
-		};
-		0897A0F111B9530200F72FC0 /* Release With Symbols */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEPLOYMENT_POSTPROCESSING = YES;
-				ENABLE_TESTABILITY = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(SRCROOT)/vendor",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
-				GCC_OPTIMIZATION_LEVEL = fast;
-				GCC_PRECOMPILE_PREFIX_HEADER = NO;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"_MACOSX=1",
-					"IS_BIG_ENDIAN=__BIG_ENDIAN__",
-					XP_MAC,
-					"RELEASE_CLIENT=1",
-					"platOS=OS_MACOS",
-					"TEUL_PACKET_NAMES=0",
-				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO;
-				GCC_WARN_SIGN_COMPARE = NO;
-				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
-				GCC_WARN_UNUSED_VARIABLE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PNG)",
-					"\"$(SRCROOT)/../Libraries/ft2/include\"",
-					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
-					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
-					"\"$(SDKROOT)/usr/include/libxml2\"",
-					"\"$(SRCROOT)/../Libraries/opende/include\"",
-					"\"$(SRCROOT)/include/Cg\"",
-					"\"$(SRCROOT)/include\"",
-					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
-					"\"$(SRCROOT)/src/math\"",
-					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
-					"\"$(SRCROOT)/../Libraries/ft2/include/freetype\"",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inheritied)",
-					"\"$(SRCROOT)/lib/mac\"",
-				);
-				MACH_O_TYPE = mh_execute;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				OBJROOT = proj/mac/build;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_LDFLAGS = "-bind_at_load";
-				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = YES;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
-				SDKROOT = macosx;
-				SEPARATE_STRIP = NO;
-				SHARED_PRECOMPS_DIR = "$(CACHE_ROOT)/SharedPrecompiledHeaders";
-				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = "non-global";
-				SYMROOT = proj/mac/build;
-				USER_HEADER_SEARCH_PATHS = "../Libraries/ftgl/src ../Libraries/glew/include/ ../Libraries/phui/include/ include/ include/bt ../Libraries/opende/include/ include/js include/libxml include/lua include/mac src src/auth src/chat src/dbug src/include src/sysmac src/teul src/weap ../Libraries/libxml2/include/libxml/ src/spt";
-				VALID_ARCHS = i386;
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wdeprecated",
-				);
-			};
-			name = "Release With Symbols";
-		};
-		0897A0F211B9530200F72FC0 /* Release With Symbols */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_WARN_BOOL_CONVERSION = NO;
-				CLANG_WARN_CONSTANT_CONVERSION = NO;
-				CLANG_X86_VECTOR_INSTRUCTIONS = default;
-				COMBINE_HIDPI_IMAGES = NO;
-				COPY_PHASE_STRIP = YES;
-				ENABLE_TESTABILITY = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(SRCROOT)/vendor",
-					"$(PROJECT_DIR)/Vendor",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = fast;
-				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"_MACOSX=1",
-					"platOS=OS_MACOS",
-					XP_MAC,
-					"RELEASE_CLIENT=1",
-					"IS_BIG_ENDIAN=__BIG_ENDIAN__",
-					"TEUL_PACKET_NAMES=0",
-				);
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
-				HEADER_SEARCH_PATHS = "$(inherited)";
-				INFOPLIST_FILE = proj/mac/Info.plist;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(PROJECT_DIR)/proj/mac/build/Debug",
-					"$(PROJECT_DIR)/lib/mac",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_LDFLAGS = "-bind_at_load";
-				PRELINK_LIBS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
-				PRODUCT_NAME = "World War II Online";
-				REBUILDMDL = 0;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-				VALID_ARCHS = "i386 x86_64";
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wdeprecated",
-				);
-				WRAPPER_EXTENSION = app;
-				WW2MODS = "${PROJECT_DIR}/../ww2mods";
-			};
-			name = "Release With Symbols";
-		};
-		0897A0F311B9530200F72FC0 /* Release With Symbols */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(SRCROOT)/vendor",
-				);
-				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_PFE_FILE_C_DIALECTS = "c++";
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = src/teul/syscfg.h;
-				GCC_VERSION = "";
-				GENERATE_MASTER_OBJECT_FILE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
-					"\"$(SRCROOT)/../Libraries/libevent/include\"",
-				);
-				LD_OPENMP_FLAGS = "";
-				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "";
-				PRELINK_LIBS = "";
-				PRODUCT_NAME = teulKit;
-				SEPARATE_STRIP = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-			};
-			name = "Release With Symbols";
-		};
-		0897A0F411B9530200F72FC0 /* Release With Symbols */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(SRCROOT)/vendor",
-					"$(PROJECT_DIR)/Vendor",
-				);
-				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRC_ROOT)/src\"",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/lib/mac\"/**",
-					"$(PROJECT_DIR)/lib/mac",
-				);
-				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = maclib;
-				SEPARATE_STRIP = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-			};
-			name = "Release With Symbols";
-		};
-		0DF859190870692100A6D554 /* Beta Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_WARN_BOOL_CONVERSION = NO;
-				CLANG_WARN_CONSTANT_CONVERSION = NO;
-				CLANG_X86_VECTOR_INSTRUCTIONS = default;
-				COMBINE_HIDPI_IMAGES = NO;
-				COPY_PHASE_STRIP = YES;
-				ENABLE_TESTABILITY = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(SRCROOT)/vendor",
-					"$(PROJECT_DIR)/Vendor",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"_MACOSX=1",
-					"platOS=OS_MACOS",
-					XP_MAC,
-					ENABLE_FLOATERS,
-					"RELEASE_CLIENT=1",
-					EVENT_LOG,
-					_OPTIONS_BELOW_THIS_LINE,
-					BETA_RELEASE,
-					xWANT_BUZZARD_OFFLINE,
-					"xIS_BIG_ENDIAN=__BIG_ENDIAN__",
-					"TEUL_PACKET_NAMES=0",
-				);
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
-				HEADER_SEARCH_PATHS = "$(inherited)";
-				INFOPLIST_FILE = proj/mac/Info.plist;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(PROJECT_DIR)/proj/mac/build/Debug",
-					"$(PROJECT_DIR)/lib/mac",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_LDFLAGS = "-bind_at_load";
-				PRELINK_LIBS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
-				PRODUCT_NAME = "World War II Online";
-				REBUILDMDL = 0;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-				VALID_ARCHS = "i386 x86_64";
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wdeprecated",
-				);
-				WRAPPER_EXTENSION = app;
-				WW2MODS = "${PROJECT_DIR}/../ww2mods";
-			};
-			name = "Beta Release";
-		};
-		0DF8591A0870692100A6D554 /* Beta Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEPLOYMENT_POSTPROCESSING = YES;
-				ENABLE_TESTABILITY = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(SRCROOT)/vendor",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
-				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_PRECOMPILE_PREFIX_HEADER = NO;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"_MACOSX=1",
-					"platOS=OS_MACOS",
-					XP_MAC,
-					ENABLE_FLOATERS,
-					"RELEASE_CLIENT=1",
-					EVENT_LOG,
-					_OPTIONS_BELOW_THIS_LINE,
-					BETA_RELEASE,
-					"TEUL_PACKET_NAMES=0",
-				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO;
-				GCC_WARN_SIGN_COMPARE = NO;
-				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
-				GCC_WARN_UNUSED_VARIABLE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PNG)",
-					"\"$(SRCROOT)/../Libraries/ft2/include\"",
-					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
-					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
-					"\"$(SDKROOT)/usr/include/libxml2\"",
-					"\"$(SRCROOT)/../Libraries/opende/include\"",
-					"\"$(SRCROOT)/include/Cg\"",
-					"\"$(SRCROOT)/include\"",
-					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
-					"\"$(SRCROOT)/src/math\"",
-					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
-					"\"$(SRCROOT)/../Libraries/ft2/include/freetype\"",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inheritied)",
-					"\"$(SRCROOT)/lib/mac\"",
-				);
-				MACH_O_TYPE = mh_execute;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				OBJROOT = proj/mac/build;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_LDFLAGS = "-bind_at_load";
-				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = YES;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
-				SDKROOT = macosx;
-				SEPARATE_STRIP = NO;
-				SHARED_PRECOMPS_DIR = "$(CACHE_ROOT)/SharedPrecompiledHeaders";
-				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = YES;
-				STRIP_STYLE = debugging;
-				SYMROOT = proj/mac/build;
-				USER_HEADER_SEARCH_PATHS = "../Libraries/ftgl/src ../Libraries/glew/include/ ../Libraries/phui/include/ include/ include/bt ../Libraries/opende/include/ include/js include/libxml include/lua include/mac src src/auth src/chat src/dbug src/include src/sysmac src/teul src/weap ../Libraries/libxml2/include/libxml/ src/spt";
-				VALID_ARCHS = i386;
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wdeprecated",
-				);
-			};
-			name = "Beta Release";
-		};
-		47B0ED280E9A66A40089DCC4 /* Beta Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(SRCROOT)/vendor",
-				);
-				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_PFE_FILE_C_DIALECTS = "c++";
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = src/teul/syscfg.h;
-				GCC_VERSION = "";
-				GENERATE_MASTER_OBJECT_FILE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
-					"\"$(SRCROOT)/../Libraries/libevent/include\"",
-				);
-				LD_OPENMP_FLAGS = "";
-				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "";
-				PRELINK_LIBS = "";
-				PRODUCT_NAME = teulKit;
-				SEPARATE_STRIP = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-			};
-			name = "Beta Release";
-		};
-		E97C76371C8513EB00875F44 /* Beta Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
-				EXECUTABLE_PREFIX = lib;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PNG)",
-					"\"$(SYSROOT)/usr/include\"",
-					/usr/include,
-					"\"$(SRCROOT)/../Libraries/ft2/include\"",
-					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
-					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
-					"\"$(SDKROOT)/usr/include/libxml2\"",
-					"\"$(SRCROOT)/../Libraries/opende/include\"",
-					"\"$(SRCROOT)/include/Cg\"",
-					"\"$(SRCROOT)/include\"",
-					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
-					"\"$(SRCROOT)/src/math\"",
-					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
-					"\"$(SRCROOT)/../Libraries/ft2/include/freetype\"",
-					"\"$(SRCROOT)/../Libraries/libevent\"",
-					"\"$(SRCROOT)/../Libraries/libevent/include\"",
-					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
-				);
-				MACH_O_TYPE = staticlib;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				MTL_ENABLE_DEBUG_INFO = YES;
-				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Beta Release";
-		};
-		E97C76381C8513EB00875F44 /* Closed Beta Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
-				COPY_PHASE_STRIP = NO;
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				EXECUTABLE_PREFIX = lib;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PNG)",
-					"\"$(SYSROOT)/usr/include\"",
-					/usr/include,
-					"\"$(SRCROOT)/../Libraries/ft2/include\"",
-					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
-					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
-					"\"$(SDKROOT)/usr/include/libxml2\"",
-					"\"$(SRCROOT)/../Libraries/opende/include\"",
-					"\"$(SRCROOT)/include/Cg\"",
-					"\"$(SRCROOT)/include\"",
-					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
-					"\"$(SRCROOT)/src/math\"",
-					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
-					"\"$(SRCROOT)/../Libraries/ft2/include/freetype\"",
-					"\"$(SRCROOT)/../Libraries/libevent\"",
-					"\"$(SRCROOT)/../Libraries/libevent/include\"",
-					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
-				);
-				MACH_O_TYPE = staticlib;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Closed Beta Release";
 		};
 		E97C76391C8513EB00875F44 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
-				EXECUTABLE_PREFIX = lib;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					"DEBUG=1",
-				);
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PNG)",
-					"\"$(SYSROOT)/usr/include\"",
-					/usr/include,
-					"\"$(SRCROOT)/../Libraries/ft2/include\"",
-					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
-					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
-					"\"$(SDKROOT)/usr/include/libxml2\"",
-					"\"$(SRCROOT)/../Libraries/opende/include\"",
-					"\"$(SRCROOT)/include/Cg\"",
-					"\"$(SRCROOT)/include\"",
-					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
-					"\"$(SRCROOT)/src/math\"",
-					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
-					"\"$(SRCROOT)/../Libraries/ft2/include/freetype\"",
-					"\"$(SRCROOT)/../Libraries/libevent\"",
-					"\"$(SRCROOT)/../Libraries/libevent/include\"",
-					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
-				);
 				MACH_O_TYPE = staticlib;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				MTL_ENABLE_DEBUG_INFO = YES;
-				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
 		};
-		E97C763A1C8513EB00875F44 /* Debug Optimized */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
-				EXECUTABLE_PREFIX = lib;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PNG)",
-					"\"$(SYSROOT)/usr/include\"",
-					/usr/include,
-					"\"$(SRCROOT)/../Libraries/ft2/include\"",
-					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
-					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
-					"\"$(SDKROOT)/usr/include/libxml2\"",
-					"\"$(SRCROOT)/../Libraries/opende/include\"",
-					"\"$(SRCROOT)/include/Cg\"",
-					"\"$(SRCROOT)/include\"",
-					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
-					"\"$(SRCROOT)/src/math\"",
-					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
-					"\"$(SRCROOT)/../Libraries/ft2/include/freetype\"",
-					"\"$(SRCROOT)/../Libraries/libevent\"",
-					"\"$(SRCROOT)/../Libraries/libevent/include\"",
-					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
-				);
-				MACH_O_TYPE = staticlib;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				MTL_ENABLE_DEBUG_INFO = YES;
-				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Debug Optimized";
-		};
 		E97C763B1C8513EB00875F44 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
-				COPY_PHASE_STRIP = NO;
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				EXECUTABLE_PREFIX = lib;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PNG)",
-					"\"$(SYSROOT)/usr/include\"",
-					/usr/include,
-					"\"$(SRCROOT)/../Libraries/ft2/include\"",
-					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
-					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
-					"\"$(SDKROOT)/usr/include/libxml2\"",
-					"\"$(SRCROOT)/../Libraries/opende/include\"",
-					"\"$(SRCROOT)/include/Cg\"",
-					"\"$(SRCROOT)/include\"",
-					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
-					"\"$(SRCROOT)/src/math\"",
-					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
-					"\"$(SRCROOT)/../Libraries/ft2/include/freetype\"",
-					"\"$(SRCROOT)/../Libraries/libevent\"",
-					"\"$(SRCROOT)/../Libraries/libevent/include\"",
-					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
-				);
 				MACH_O_TYPE = staticlib;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
-		E97C763C1C8513EB00875F44 /* Release With Symbols */ = {
+		FA3D8BB21C8BF6D6002C5119 /* Development */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
+				ALWAYS_SEARCH_USER_PATHS = YES;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
-				COPY_PHASE_STRIP = NO;
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				EXECUTABLE_PREFIX = lib;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PNG)",
-					"\"$(SYSROOT)/usr/include\"",
-					/usr/include,
-					"\"$(SRCROOT)/../Libraries/ft2/include\"",
-					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
-					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
-					"\"$(SDKROOT)/usr/include/libxml2\"",
-					"\"$(SRCROOT)/../Libraries/opende/include\"",
-					"\"$(SRCROOT)/include/Cg\"",
-					"\"$(SRCROOT)/include\"",
-					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
-					"\"$(SRCROOT)/src/math\"",
-					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
-					"\"$(SRCROOT)/../Libraries/ft2/include/freetype\"",
-					"\"$(SRCROOT)/../Libraries/libevent\"",
-					"\"$(SRCROOT)/../Libraries/libevent/include\"",
-					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
-				);
-				MACH_O_TYPE = staticlib;
+				DEPLOYMENT_POSTPROCESSING = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				MTL_ENABLE_DEBUG_INFO = NO;
+				OBJROOT = proj/mac/build;
+				OTHER_LDFLAGS = "-bind_at_load";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SYMROOT = proj/mac/build;
+				VALID_ARCHS = i386;
+			};
+			name = Development;
+		};
+		FA3D8BB31C8BF6D6002C5119 /* Development */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
+				INFOPLIST_FILE = proj/mac/Info.plist;
+				MACH_O_TYPE = mh_execute;
+				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
+				PRODUCT_NAME = "World War II Online";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Development;
+		};
+		FA3D8BB41C8BF6D6002C5119 /* Development */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = src/teul/syscfg.h;
+				MACH_O_TYPE = staticlib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
-			name = "Release With Symbols";
+			name = Development;
+		};
+		FA3D8BB51C8BF6D6002C5119 /* Development */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				MACH_O_TYPE = staticlib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Development;
+		};
+		FA3D8BB61C8BF6D6002C5119 /* Development */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				MACH_O_TYPE = staticlib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Development;
 		};
 /* End XCBuildConfiguration section */
 
@@ -5598,12 +4143,9 @@
 		080C7E971062F021000A242F /* Build configuration list for PBXNativeTarget "maclib" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				080C7E881062F012000A242F /* Beta Release */,
-				088DF83011343DC30040BC8F /* Closed Beta Release */,
 				085BD0D0110F5D5C0063F377 /* Debug */,
-				085BD0E1110F5F290063F377 /* Debug Optimized */,
+				FA3D8BB51C8BF6D6002C5119 /* Development */,
 				085BD0CC110F5D560063F377 /* Release */,
-				0897A0F411B9530200F72FC0 /* Release With Symbols */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -5611,12 +4153,9 @@
 		0DA6CEF60856391C00A53577 /* Build configuration list for PBXNativeTarget "WW2OL" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				0DF859190870692100A6D554 /* Beta Release */,
-				088DF82E11343DC30040BC8F /* Closed Beta Release */,
 				085BD0CE110F5D5C0063F377 /* Debug */,
-				085BD0DF110F5F290063F377 /* Debug Optimized */,
+				FA3D8BB31C8BF6D6002C5119 /* Development */,
 				085BD0CA110F5D560063F377 /* Release */,
-				0897A0F211B9530200F72FC0 /* Release With Symbols */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -5624,12 +4163,9 @@
 		0DA6CEFA0856391C00A53577 /* Build configuration list for PBXProject "WW2OL" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				0DF8591A0870692100A6D554 /* Beta Release */,
-				088DF82D11343DC30040BC8F /* Closed Beta Release */,
 				085BD0CD110F5D5C0063F377 /* Debug */,
-				085BD0DE110F5F290063F377 /* Debug Optimized */,
+				FA3D8BB21C8BF6D6002C5119 /* Development */,
 				085BD0C9110F5D560063F377 /* Release */,
-				0897A0F111B9530200F72FC0 /* Release With Symbols */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -5637,12 +4173,9 @@
 		47B0ED290E9A66C50089DCC4 /* Build configuration list for PBXNativeTarget "teulKit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				47B0ED280E9A66A40089DCC4 /* Beta Release */,
-				088DF82F11343DC30040BC8F /* Closed Beta Release */,
 				085BD0CF110F5D5C0063F377 /* Debug */,
-				085BD0E0110F5F290063F377 /* Debug Optimized */,
+				FA3D8BB41C8BF6D6002C5119 /* Development */,
 				085BD0CB110F5D560063F377 /* Release */,
-				0897A0F311B9530200F72FC0 /* Release With Symbols */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -5650,12 +4183,9 @@
 		E97C76361C8513EB00875F44 /* Build configuration list for PBXNativeTarget "event" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				E97C76371C8513EB00875F44 /* Beta Release */,
-				E97C76381C8513EB00875F44 /* Closed Beta Release */,
 				E97C76391C8513EB00875F44 /* Debug */,
-				E97C763A1C8513EB00875F44 /* Debug Optimized */,
+				FA3D8BB61C8BF6D6002C5119 /* Development */,
 				E97C763B1C8513EB00875F44 /* Release */,
-				E97C763C1C8513EB00875F44 /* Release With Symbols */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

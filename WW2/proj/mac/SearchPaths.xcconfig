@@ -11,6 +11,9 @@
 // Warnings.xcconfig for information on why it looks like this.
 
 // Header search paths matching both #include <> and #include ""
+HEADER_SEARCH_PATHS_14      = $(HEADER_SEARCH_PATHS_15) "$(SRCROOT)/../Libraries/libevent/OSX-Code"
+HEADER_SEARCH_PATHS_13      = $(HEADER_SEARCH_PATHS_14) "$(SRCROOT)/../Libraries/libevent/include"
+HEADER_SEARCH_PATHS_12      = $(HEADER_SEARCH_PATHS_13) "$(SRCROOT)/../Libraries/libevent"
 HEADER_SEARCH_PATHS_11      = $(HEADER_SEARCH_PATHS_12) "$(SRCROOT)/../Libraries/tolua++/include"
 HEADER_SEARCH_PATHS_10      = $(HEADER_SEARCH_PATHS_11) "$(SRCROOT)/../Libraries/ft2/include/freetype"
 HEADER_SEARCH_PATHS_09      = $(HEADER_SEARCH_PATHS_10) "$(SRCROOT)/../Libraries/ftgl/src"
