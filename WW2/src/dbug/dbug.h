@@ -17,11 +17,6 @@
 	#include "dbug/dbugWErrno.h"
 #endif
 
-#if platOS == OS_MACOS
-	#define NO_DEBUG_LOG
-	#define NO_DEBUG_WRITE
-#endif
-
 #define  _FL __FILE__, __LINE__
 
 namespace Debug
@@ -132,6 +127,8 @@ int dbugGetErrno(void);
 // parameters are output as a string to the debug file depending on the debug level selected and
 // the current error type.  calls handlers.
 int _dbugLog(const char* filename, int lineno, unsigned int errType, const char* fmt, ...) __attribute__ ((format (printf,4,5)));
+
+SINT32 _dbugWrite(char* filename, SINT32 lineno, UINT32 errType, char* fmt, ...);
 
 NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, unsigned int errType, const char* assertion, const char* fmt, ...);
 #define LogAbort(...) _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, nullptr, __VA_ARGS__)

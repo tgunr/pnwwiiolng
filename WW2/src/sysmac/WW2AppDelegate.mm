@@ -594,6 +594,7 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
 
 - (void)sysmain:(NSTimer*)timer
 {
+    dbugInit(LOG_TO_FILE, nullptr);
     [self closeAllWindows];
     try
     {
