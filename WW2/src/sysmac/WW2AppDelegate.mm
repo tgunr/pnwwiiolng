@@ -27,8 +27,7 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 
-//#define PLAYGATE_VERSION 0x01010109
-#define PLAYGATE_VERSION 0x00010109
+#define PLAYGATE_VERSION 0x01010109
 
 #define DEFAULT_AUTH_SERVER "auth.playnet.com"
 //#define DEFAULT_AUTH_SERVER "authdevng.playnet.com"
