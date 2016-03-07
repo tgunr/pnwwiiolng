@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 47;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -438,7 +438,6 @@
 		0DBEF4410A7FD8F60094C53D /* libexpat-ww2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DBEF4400A7FD8F60094C53D /* libexpat-ww2.a */; };
 		0DDF00AA08578C460027461D /* libHIDUtilities.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DDF00A308578C460027461D /* libHIDUtilities.a */; };
 		0DDF00AC08578C460027461D /* libjs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DDF00A508578C460027461D /* libjs.a */; };
-		0DDF012D0857934A0027461D /* ww2.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0DDF012C0857934A0027461D /* ww2.icns */; };
 		47B0EDFD0E9A85510089DCC4 /* libteulKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 47B0ED240E9A66A40089DCC4 /* libteulKit.a */; };
 		E90D969A1C6D729D00D5EC52 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96991C6D729D00D5EC52 /* WebKit.framework */; };
 		E90D96A81C6E041300D5EC52 /* HockeySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96A71C6E041300D5EC52 /* HockeySDK.framework */; };
@@ -486,6 +485,7 @@
 		E97C76D11C85B15800875F44 /* playarc.ww2 in CopyFiles */ = {isa = PBXBuildFile; fileRef = E97C76D01C85B15800875F44 /* playarc.ww2 */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		E97C76D41C85B21200875F44 /* HockeySDK.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = E97C76D31C85B21200875F44 /* HockeySDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		FA05B0821C8D3E1800CDE30C /* libgranny2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA05B0811C8D3E1800CDE30C /* libgranny2.a */; };
+		FA08C0761C8D4A1F0002F4B9 /* readme.rtf in Resources */ = {isa = PBXBuildFile; fileRef = FA08C0751C8D4A1F0002F4B9 /* readme.rtf */; };
 		FA13BB171C86758600095818 /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB161C86758600095818 /* libevent.a */; };
 		FA13BB1A1C875F6800095818 /* placeholder-background.png in Resources */ = {isa = PBXBuildFile; fileRef = FA13BB181C875F6800095818 /* placeholder-background.png */; };
 		FA13BB1B1C875F6800095818 /* placeholder-title.png in Resources */ = {isa = PBXBuildFile; fileRef = FA13BB191C875F6800095818 /* placeholder-title.png */; };
@@ -1472,7 +1472,6 @@
 		0DBEF4400A7FD8F60094C53D /* libexpat-ww2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libexpat-ww2.a"; path = "lib/mac/libexpat-ww2.a"; sourceTree = SOURCE_ROOT; };
 		0DDF00A308578C460027461D /* libHIDUtilities.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libHIDUtilities.a; path = lib/mac/libHIDUtilities.a; sourceTree = SOURCE_ROOT; };
 		0DDF00A508578C460027461D /* libjs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjs.a; path = lib/mac/libjs.a; sourceTree = SOURCE_ROOT; };
-		0DDF012C0857934A0027461D /* ww2.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = ww2.icns; path = proj/mac/ww2.icns; sourceTree = "<group>"; };
 		47B0ED240E9A66A40089DCC4 /* libteulKit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libteulKit.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		8D0C4E960486CD37000505A6 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = proj/mac/Info.plist; sourceTree = "<group>"; };
 		8D0C4E970486CD37000505A6 /* World War II Online.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "World War II Online.app"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -1550,9 +1549,10 @@
 		E97C76A01C85156F00875F44 /* strlcpy.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = strlcpy.c; path = ../../Libraries/libevent/strlcpy.c; sourceTree = "<group>"; };
 		E97C76CB1C85AFAA00875F44 /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = proj/mac/English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		E97C76CD1C85AFD800875F44 /* ww2.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = ww2.icns; path = proj/mac/ww2.icns; sourceTree = "<group>"; };
-		E97C76D01C85B15800875F44 /* playarc.ww2 */ = {isa = PBXFileReference; lastKnownFileType = file; name = playarc.ww2; path = ../WW2Archives/playarc.ww2; sourceTree = SOURCE_ROOT; };
+		E97C76D01C85B15800875F44 /* playarc.ww2 */ = {isa = PBXFileReference; lastKnownFileType = text; name = playarc.ww2; path = ../WW2Archives/playarc.ww2; sourceTree = SOURCE_ROOT; };
 		E97C76D31C85B21200875F44 /* HockeySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HockeySDK.framework; path = Vendor/HockeySDK.framework; sourceTree = "<group>"; };
 		FA05B0811C8D3E1800CDE30C /* libgranny2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgranny2.a; path = lib/mac/libgranny2.a; sourceTree = "<group>"; };
+		FA08C0751C8D4A1F0002F4B9 /* readme.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; name = readme.rtf; path = ../opt/ww2mods/readme.rtf; sourceTree = "<group>"; };
 		FA13BB161C86758600095818 /* libevent.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libevent.a; path = proj/mac/build/Debug/libevent.a; sourceTree = "<group>"; };
 		FA13BB181C875F6800095818 /* placeholder-background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "placeholder-background.png"; path = "proj/mac/placeholder-background.png"; sourceTree = "<group>"; };
 		FA13BB191C875F6800095818 /* placeholder-title.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "placeholder-title.png"; path = "proj/mac/placeholder-title.png"; sourceTree = "<group>"; };
@@ -3100,9 +3100,6 @@
 			isa = PBXGroup;
 			children = (
 				FA3D8BB11C8BF5CC002C5119 /* Config */,
-				E97C76D01C85B15800875F44 /* playarc.ww2 */,
-				E97C76CD1C85AFD800875F44 /* ww2.icns */,
-				E97C76CA1C85AFAA00875F44 /* Localizable.strings */,
 				0DA6D33608563A0900A53577 /* src */,
 				20286C32FDCF999611CA2CEA /* lib */,
 				20286C2CFDCF999611CA2CEA /* rsrc */,
@@ -3114,10 +3111,13 @@
 		20286C2CFDCF999611CA2CEA /* rsrc */ = {
 			isa = PBXGroup;
 			children = (
+				FA08C0751C8D4A1F0002F4B9 /* readme.rtf */,
+				E97C76D01C85B15800875F44 /* playarc.ww2 */,
+				E97C76CD1C85AFD800875F44 /* ww2.icns */,
+				E97C76CA1C85AFAA00875F44 /* Localizable.strings */,
 				FA13BB181C875F6800095818 /* placeholder-background.png */,
 				FA13BB191C875F6800095818 /* placeholder-title.png */,
 				0D6E71630AF63EAC00B3B0BD /* English.lproj */,
-				0DDF012C0857934A0027461D /* ww2.icns */,
 				8D0C4E960486CD37000505A6 /* Info.plist */,
 			);
 			name = rsrc;
@@ -3415,7 +3415,7 @@
 				};
 			};
 			buildConfigurationList = 0DA6CEFA0856391C00A53577 /* Build configuration list for PBXProject "WW2OL" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 6.3";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
@@ -3441,12 +3441,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FA08C0761C8D4A1F0002F4B9 /* readme.rtf in Resources */,
 				0D6E716D0AF63EAC00B3B0BD /* MainMenu.nib in Resources */,
 				FA13BB1B1C875F6800095818 /* placeholder-title.png in Resources */,
 				FA13BB1A1C875F6800095818 /* placeholder-background.png in Resources */,
 				E97C76CC1C85AFAA00875F44 /* Localizable.strings in Resources */,
-				E97C76CF1C85B08900875F44 /* readme.rtf in Resources */,
-				0DDF012D0857934A0027461D /* ww2.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
