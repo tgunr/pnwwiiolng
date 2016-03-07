@@ -1078,8 +1078,6 @@
 		08104D4C103DFBA10065E0E2 /* strpool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = strpool.h; sourceTree = "<group>"; };
 		08104D51103DFBE90065E0E2 /* authClientMessages.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = authClientMessages.cpp; sourceTree = "<group>"; };
 		08104D52103DFBE90065E0E2 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		08104D53103DFBE90065E0E2 /* PGDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDownloader.h; sourceTree = "<group>"; };
-		08104D54103DFBE90065E0E2 /* PGDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDownloader.m; sourceTree = "<group>"; };
 		08104D55103DFBE90065E0E2 /* syscfg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = syscfg.h; sourceTree = "<group>"; };
 		08104D56103DFBE90065E0E2 /* sysLaunchUrl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sysLaunchUrl.h; sourceTree = "<group>"; };
 		08104D57103DFBE90065E0E2 /* sysMacCompat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sysMacCompat.h; sourceTree = "<group>"; };
@@ -2536,8 +2534,6 @@
 				0834F1D61045888700E75B52 /* sysWinISO.h */,
 				08104D51103DFBE90065E0E2 /* authClientMessages.cpp */,
 				08104D52103DFBE90065E0E2 /* main.m */,
-				08104D53103DFBE90065E0E2 /* PGDownloader.h */,
-				08104D54103DFBE90065E0E2 /* PGDownloader.m */,
 				08104D55103DFBE90065E0E2 /* syscfg.h */,
 				E97C76281C84CD0700875F44 /* locIDs.h */,
 				08104D56103DFBE90065E0E2 /* sysLaunchUrl.h */,
