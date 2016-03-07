@@ -1102,30 +1102,35 @@ private:
 		responses.push_back("That's what happens when you don't say 'please'");
 		responses.push_back("LOOK IT UP ON THE INTERNET");
 	}
+
+    static UINT32 rand_uniform(UINT32 bound)
+    {
+        // Pick a number without modulo bias
+        UINT32 r = 0x80000000UL % bound, v = 0;
+        if (bound > 1) {
+            for (UINT32 i = 0; v < r && i < 1 << 20; ++i) { v = rand(); }
+            v %= bound;
+        }
+        return v;
+    }
 public:
-	DotWTF() : DotCommand("wtf", "Pointless test command", NO_MASK, LSTR_NONE, LSTR_NONE)
+	DotWTF() : DotCommand("wtf", "Pointless command", NO_MASK, LSTR_NONE, LSTR_NONE)
 	{
 		reset();
 	}
 
 	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
 	{
-		if ( player.playerID() != 3204 )
-			action(player, message);
-		else
-		{
-			responses.push_back(arguments);
-			player.message(LSTR_NONE, LSTR_GENERIC, arguments);
-		}
+        action(player, message) ;
 	}
 
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
 	{
 		const char* str;
-		str = responses[rand() % responses.size()].c_str();
-		LSTRING_ID prefix = ( (rand() & 1023) == 0 ) ? LSTR_ERROR : LSTR_NONE;
-		if ( (rand() & 127) == 42 )
-			player.message(prefix, LSTR_LABELLED_GENERIC, "dewd", str);
+		str = responses[rand_uniform(responses.size())].c_str() ;
+		LSTRING_ID prefix = ( rand_uniform(1024) < 4 ) ? LSTR_ERROR : LSTR_NONE ;
+		if ( rand_uniform(128) == 42 )
+			player->message(prefix, LSTR_LABELLED_GENERIC, "operator", str) ;
 		else
 			player.message(prefix, LSTR_GENERIC, str);
 	}
