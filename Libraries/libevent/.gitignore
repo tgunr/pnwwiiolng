@@ -1,0 +1,14 @@
+*.la
+*.pc
+.deps
+.libs
+test/.deps
+config.h
+config.log
+config.status
+libtool
+Makefile
+stamp-h1
+include/Makefile
+sample/Makefile
+test/Makefile
