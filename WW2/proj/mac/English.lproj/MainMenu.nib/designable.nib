@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9532" systemVersion="15D21" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="9531" systemVersion="15D21" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES">
     <dependencies>
         <deployment identifier="macosx"/>
         <development version="6200" identifier="xcode"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9532"/>
-        <plugIn identifier="com.apple.WebKitIBPlugin" version="9532"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="9531"/>
+        <plugIn identifier="com.apple.WebKitIBPlugin" version="9531"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="NSApplication">
@@ -343,45 +343,28 @@
                 <outlet property="statusWindow" destination="1095" id="1110"/>
                 <outlet property="userNameField" destination="1308" id="1310"/>
                 <outlet property="webView" destination="1092" id="1108"/>
-                <outlet property="websiteLink" destination="dzQ-zs-5hL" id="0QJ-eo-I1f"/>
             </connections>
         </customObject>
         <window title="World War II Online" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="1084" userLabel="Launcher">
             <windowStyleMask key="styleMask" titled="YES" miniaturizable="YES" resizable="YES"/>
             <rect key="contentRect" x="1" y="565" width="1000" height="591"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <value key="minSize" type="size" width="750" height="300"/>
             <view key="contentView" id="1085">
                 <rect key="frame" x="0.0" y="0.0" width="1000" height="591"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
+                    <webView maintainsBackForwardList="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1092">
+                        <rect key="frame" x="0.0" y="115" width="1000" height="476"/>
+                        <webPreferences key="preferences" defaultFontSize="12" defaultFixedFontSize="12" plugInsEnabled="NO" javaEnabled="NO" javaScriptCanOpenWindowsAutomatically="NO">
+                            <nil key="identifier"/>
+                        </webPreferences>
+                    </webView>
                     <customView translatesAutoresizingMaskIntoConstraints="NO" id="uMj-z8-aMi">
                         <rect key="frame" x="0.0" y="0.0" width="1000" height="115"/>
                         <subviews>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dzQ-zs-5hL">
-                                <rect key="frame" x="147" y="35" width="229" height="19"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="225" id="cV8-21-6mq"/>
-                                </constraints>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="http://wwiionline.com" allowsEditingTextAttributes="YES" id="eos-HZ-v37">
-                                    <font key="font" metaFont="system" size="15"/>
-                                    <color key="textColor" red="0.17254902420000001" green="0.47450983520000001" blue="1" alpha="1" colorSpace="deviceRGB"/>
-                                    <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="z7h-jV-RE1">
-                                <rect key="frame" x="176" y="62" width="170" height="19"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="166" id="8V3-MR-G5S"/>
-                                </constraints>
-                                <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" alignment="center" title="Visit our Website at:" id="FvY-R2-hzj">
-                                    <font key="font" metaFont="system" size="15"/>
-                                    <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                    <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
-                                </textFieldCell>
-                            </textField>
-                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1091">
-                                <rect key="frame" x="20" y="23" width="115" height="32"/>
+                            <button verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1091">
+                                <rect key="frame" x="20" y="22" width="115" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="29" id="YA8-NO-eXc"/>
                                     <constraint firstAttribute="width" constant="115" id="ozr-Cj-ty2"/>
@@ -410,8 +393,8 @@
                                     <outlet property="nextKeyView" destination="1086" id="k3f-66-h1h"/>
                                 </connections>
                             </button>
-                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1086">
-                                <rect key="frame" x="886" y="19" width="94" height="77"/>
+                            <button verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1086">
+                                <rect key="frame" x="886" y="18" width="94" height="77"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="94" id="uSO-Fx-Y6c"/>
                                 </constraints>
@@ -427,8 +410,8 @@ DQ
                                     <outlet property="nextKeyView" destination="1089" id="lK1-lx-On0"/>
                                 </connections>
                             </button>
-                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1308">
-                                <rect key="frame" x="795" y="75" width="76" height="19"/>
+                            <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1308">
+                                <rect key="frame" x="795" y="74" width="76" height="19"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="76" id="Cnd-gp-dWm"/>
                                     <constraint firstAttribute="height" constant="19" id="h9T-Wi-d3W"/>
@@ -442,8 +425,8 @@ DQ
                                     <outlet property="nextKeyView" destination="1309" id="Pj5-lj-Yv0"/>
                                 </connections>
                             </textField>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1306">
-                                <rect key="frame" x="712" y="77" width="78" height="14"/>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1306">
+                                <rect key="frame" x="712" y="76" width="78" height="14"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="14" id="phE-PP-jnT"/>
                                     <constraint firstAttribute="width" constant="74" id="ub4-ce-eJU"/>
@@ -456,8 +439,8 @@ DQ
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1089">
-                                <rect key="frame" x="22" y="61" width="111" height="32"/>
+                            <button verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1089">
+                                <rect key="frame" x="22" y="60" width="111" height="32"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="111" id="NZI-Wq-RXn"/>
                                     <constraint firstAttribute="height" constant="29" id="dwz-L7-A3z"/>
@@ -471,8 +454,8 @@ DQ
                                     <outlet property="nextKeyView" destination="1091" id="fsR-yJ-AOb"/>
                                 </connections>
                             </button>
-                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1307">
-                                <rect key="frame" x="724" y="50" width="66" height="14"/>
+                            <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" misplaced="YES" setsMaxLayoutWidthAtFirstLayout="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1307">
+                                <rect key="frame" x="724" y="49" width="66" height="14"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="62" id="jda-xF-cPR"/>
                                     <constraint firstAttribute="height" constant="14" id="nRD-AU-SgQ"/>
@@ -483,8 +466,8 @@ DQ
                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                 </textFieldCell>
                             </textField>
-                            <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="1309" customClass="NSSecureTextField">
-                                <rect key="frame" x="795" y="48" width="76" height="19"/>
+                            <textField verticalHuggingPriority="750" misplaced="YES" translatesAutoresizingMaskIntoConstraints="NO" id="1309" customClass="NSSecureTextField">
+                                <rect key="frame" x="795" y="47" width="76" height="19"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="19" id="Htq-nI-tsS"/>
                                     <constraint firstAttribute="width" constant="76" id="mVo-no-4iQ"/>
@@ -518,21 +501,10 @@ DQ
                             <constraint firstItem="1091" firstAttribute="leading" secondItem="uMj-z8-aMi" secondAttribute="leading" constant="20" id="hHB-E8-8Nz"/>
                             <constraint firstAttribute="bottom" secondItem="1086" secondAttribute="bottom" constant="21" id="jrT-2s-VxL"/>
                             <constraint firstItem="1089" firstAttribute="top" secondItem="uMj-z8-aMi" secondAttribute="top" constant="23" id="mtk-Pv-AdL"/>
-                            <constraint firstItem="z7h-jV-RE1" firstAttribute="leading" secondItem="1089" secondAttribute="trailing" constant="45" id="nSP-BU-hTY"/>
-                            <constraint firstItem="z7h-jV-RE1" firstAttribute="top" secondItem="uMj-z8-aMi" secondAttribute="top" constant="34" id="qTY-0t-lpj"/>
-                            <constraint firstAttribute="bottom" secondItem="dzQ-zs-5hL" secondAttribute="bottom" constant="35" id="r74-yR-ef6"/>
-                            <constraint firstItem="dzQ-zs-5hL" firstAttribute="top" secondItem="z7h-jV-RE1" secondAttribute="bottom" constant="8" id="sma-il-EbM"/>
-                            <constraint firstItem="dzQ-zs-5hL" firstAttribute="leading" secondItem="uMj-z8-aMi" secondAttribute="leading" constant="149" id="tfF-in-M8w"/>
                             <constraint firstItem="1086" firstAttribute="leading" secondItem="1308" secondAttribute="trailing" constant="15" id="u5U-ze-2v9"/>
                             <constraint firstItem="1309" firstAttribute="leading" secondItem="1307" secondAttribute="trailing" constant="7" id="y9X-Xh-Gpa"/>
                         </constraints>
                     </customView>
-                    <webView maintainsBackForwardList="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1092">
-                        <rect key="frame" x="0.0" y="115" width="1000" height="476"/>
-                        <webPreferences key="preferences" defaultFontSize="12" defaultFixedFontSize="12" plugInsEnabled="NO" javaEnabled="NO" javaScriptCanOpenWindowsAutomatically="NO">
-                            <nil key="identifier"/>
-                        </webPreferences>
-                    </webView>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="trailing" secondItem="1092" secondAttribute="trailing" id="06G-SW-2tN"/>
@@ -547,12 +519,12 @@ DQ
             <connections>
                 <outlet property="initialFirstResponder" destination="1308" id="jCI-FD-Wr5"/>
             </connections>
-            <point key="canvasLocation" x="88.5" y="396.5"/>
+            <point key="canvasLocation" x="88" y="396.5"/>
         </window>
         <window title="Patch Download" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="1095" userLabel="StatusWindow">
             <windowStyleMask key="styleMask" titled="YES"/>
             <rect key="contentRect" x="9" y="962" width="373" height="174"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <value key="minSize" type="size" width="373" height="174"/>
             <value key="maxSize" type="size" width="373" height="174"/>
             <view key="contentView" id="1096">
@@ -608,7 +580,7 @@ DQ
         <window title="Settings" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" visibleAtLaunch="NO" animationBehavior="default" id="1165" userLabel="Settings">
             <windowStyleMask key="styleMask" titled="YES"/>
             <rect key="contentRect" x="213" y="698" width="442" height="391"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1280" height="777"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
             <value key="minSize" type="size" width="442" height="391"/>
             <value key="maxSize" type="size" width="442" height="391"/>
             <view key="contentView" id="1166">

@@ -3114,6 +3114,8 @@
 		20286C2CFDCF999611CA2CEA /* rsrc */ = {
 			isa = PBXGroup;
 			children = (
+				FA13BB181C875F6800095818 /* placeholder-background.png */,
+				FA13BB191C875F6800095818 /* placeholder-title.png */,
 				0D6E71630AF63EAC00B3B0BD /* English.lproj */,
 				0DDF012C0857934A0027461D /* ww2.icns */,
 				8D0C4E960486CD37000505A6 /* Info.plist */,
@@ -3440,6 +3442,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				0D6E716D0AF63EAC00B3B0BD /* MainMenu.nib in Resources */,
+				FA13BB1B1C875F6800095818 /* placeholder-title.png in Resources */,
+				FA13BB1A1C875F6800095818 /* placeholder-background.png in Resources */,
 				E97C76CC1C85AFAA00875F44 /* Localizable.strings in Resources */,
 				E97C76CF1C85B08900875F44 /* readme.rtf in Resources */,
 				0DDF012D0857934A0027461D /* ww2.icns in Resources */,

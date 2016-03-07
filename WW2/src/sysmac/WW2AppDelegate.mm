@@ -363,18 +363,113 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
 @synthesize userPassword = _userPassword;
 @synthesize patchDownloadTask = _patchDownloadTask;
 
-- (void)setAuthReply:(APP_LAUNCH *)reply
+////////////////////////////////////////////////////////////////////////////////
+// WebView magic starts here
+// Bad bad hack.
+static int staticLoadState = 0;
+
+static NSString *placeholderHTML = @""
+@"<html>"
+@"<head>"
+@"<style type=\"text/css\">"
+@"body {"
+@"    background-image: url('placeholder-background.png');\n"
+@"    background-repeat: no-repeat;\n"
+@"    background-size: 100% auto;\n"
+@"    background-position: top center;\n"
+@"    background-color: #f4f4f4;\n"
+@"}\n"
+@"div.hi { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); }\n"
+@"img { height: 90px; }\n"
+@"</style>"
+@"</head>"
+@"<body>"
+@"<div class=\"hi\">"
+@"<a href=\"http://wwiionline.com/\">"
+@"<img src=\"placeholder-title.png\"/>"
+@"</a>"
+@"</div>"
+@"</body>"
+@"</html>"
+;
+
+- (void)webView:(id)sender didFinishLoadForFrame:(id)frame
 {
-    memcpy(&authReply, reply, sizeof(APP_LAUNCH));
+    switch (staticLoadState) {
+        case 0: { // loaded the static placeholder
+            staticLoadState = 1;
+            
+            NSURLRequest *playnetHome = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://webmap.wwiionline.com/"]];
+
+            ((void (*)(id, SEL, NSURLRequest *))objc_msgSend)(frame, @selector(loadRequest:), playnetHome);
+            break;
+        }
+        case 1: // loaded the webmap
+            staticLoadState = 2;
+            ((void (*)(id, SEL, id))objc_msgSend)(sender, @selector(setFrameLoadDelegate:), nil);
+            break;
+        case 2: // should never get here
+            assert(false);
+            [[clang::fallthrough]];
+        default: // any nonsense state is even less good
+            [NSException raise:NSInternalInconsistencyException format:@"bad load state"];
+            break;
+    }
+}
+
+extern NSString *WebActionOriginalURLKey;
+
+- (void)webView:(id)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation
+        request:(NSURLRequest *)request frame:(id)frame decisionListener:(id)listener
+{
+    if (staticLoadState > 0 && ![request.URL.host isEqualToString:@"webmap.wwiionline.com"]) {
+        // Note: The use of a separate variable here is not simply for
+        // verbosity; the openURL method of NSWorkspace is marked _Nonnull, and
+        // a dictionary returns _Nullable pointers. Thus the check is necessary
+        // for safety (such that failing to apply it would, in case of a nil
+        // value, crash the program with an exception).
+        NSURL *originalURL = actionInformation[WebActionOriginalURLKey];
+        
+        if (originalURL) {
+            [[NSWorkspace sharedWorkspace] openURL:originalURL];
+        }
+        ((void (*)(id, SEL))objc_msgSend)(listener, @selector(ignore));
+    } else {
+        ((void (*)(id, SEL))objc_msgSend)(listener, @selector(use));
+    }
+}
+
+- (void)webView:(id)sender decidePolicyForNewWindowAction:(NSDictionary *)actionInformation
+        request:(NSURLRequest *)request newFrameName:(NSString *)frameName decisionListener:(id)listener
+{
+    NSURL *originalURL = actionInformation[WebActionOriginalURLKey];
+    
+    if (originalURL) {
+        [[NSWorkspace sharedWorkspace] openURL:originalURL];
+    }
+    ((void (*)(id, SEL))objc_msgSend)(listener, @selector(ignore));
 }
 
 - (void)goHome
 {
-    NSURLRequest *playnetHome = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://wwiionline.com/index.php"]];
+    staticLoadState = 0;
     
     // We can't actually import WebKit because the JSContext from phui conflicts
     id frame = ((id (*)(id, SEL))objc_msgSend)(webView, @selector(mainFrame));
-    ((void (*)(id, SEL, NSURLRequest *))objc_msgSend)(frame, @selector(loadRequest:), playnetHome);
+    
+    ((void (*)(id, SEL, id))objc_msgSend)(webView, @selector(setFrameLoadDelegate:), self);
+    ((void (*)(id, SEL, id))objc_msgSend)(webView, @selector(setPolicyDelegate:), self);
+    
+    // Put a static placeholder into the webview until the load is done.
+    ((void (*)(id, SEL, NSString *, NSURL *))objc_msgSend)(frame, @selector(loadHTMLString:baseURL:), placeholderHTML, [[NSBundle mainBundle] resourceURL]);
+}
+
+// END WebView magic
+////////////////////////////////////////////////////////////////////////////////
+
+- (void)setAuthReply:(APP_LAUNCH *)reply
+{
+    memcpy(&authReply, reply, sizeof(APP_LAUNCH));
 }
 
 - (IBAction)clearUserNameAndPassword:(id)sender
@@ -529,22 +624,9 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
     
     NSMutableParagraphStyle *style = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
     style.alignment = NSCenterTextAlignment;
-    NSAttributedString *str = [[[NSAttributedString alloc] initWithString:websiteLink.stringValue attributes:@{
-                                                                                                               NSLinkAttributeName: websiteLink.stringValue,
-                                                                                                               NSParagraphStyleAttributeName: style,
-                                                                                                               NSForegroundColorAttributeName: [NSColor blueColor],
-                                                                                                               NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle),
-                                                                                                               NSFontAttributeName: [NSFont systemFontOfSize:15.0],
-                                                                                                               }] autorelease];
-    
-    [websiteLink setAllowsEditingTextAttributes:YES];
-    [websiteLink setSelectable:YES];
-    [websiteLink addCursorRect:(NSRect){ NSZeroPoint, websiteLink.bounds.size } cursor:[NSCursor pointingHandCursor]];
-    [websiteLink setAttributedStringValue:str];
-    
     style = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
     style.alignment = NSCenterTextAlignment;
-    str = [[[NSAttributedString alloc] initWithString:playOnlineButton.title attributes:@{
+    NSAttributedString *str = [[[NSAttributedString alloc] initWithString:playOnlineButton.title attributes:@{
                                                                                           NSFontAttributeName: playOnlineButton.font,
                                                                                           NSParagraphStyleAttributeName: style,
                                                                                           NSBaselineOffsetAttributeName: @(4.0),
