@@ -21,6 +21,7 @@
 //
 // See the comments in Defines.xcconfig for a bit more info.
 
+WW2_WARNINGS_33 = $(WW2_WARNINGS_34) -Wno-cstring-format-directive              // It's okay to use %s with NSString, Apple
 WW2_WARNINGS_32 = $(WW2_WARNINGS_33) -Wno-error=c++11-narrowing                 // Don't make this a hard error, even though it should be
 WW2_WARNINGS_31 = $(WW2_WARNINGS_32) -Wno-packed                                // Yay, we're packing when we don't need to, big whoop
 WW2_WARNINGS_30 = $(WW2_WARNINGS_31) -Wno-pedantic                              // Don't be pedantic

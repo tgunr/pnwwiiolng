@@ -15,6 +15,9 @@
 -(NSMenu*)sortMenuItemsByTitle;
 @end
 
+// TODO: Remove this
+#pragma clang diagnostic ignored "-Wdirect-ivar-access"
+
 @interface WW2AppDelegate : NSObject <NSTextFieldDelegate>
 {
     IBOutlet NSPopUpButton* soundType;
@@ -162,8 +165,6 @@
 - (void)loadUserNamePassword;
 
 - (void)setLanguage;
-
-- (void)patchMounted:(NSNotification*)notification;
 
 - (void)resetSettings:(id)sender;
 

@@ -26,6 +26,7 @@
 #include "auth/authAppIDs.h"
 #include <netdb.h>
 #include <arpa/inet.h>
+#include "sysLaunchURL.h"
 
 #define PLAYGATE_VERSION 0x01010109
 
@@ -58,7 +59,7 @@ enum
     WAIT_PATCH_ABORTED
 };
 
-WW2AppDelegate* gPlayGateAppDelegate;
+static WW2AppDelegate* gPlayGateAppDelegate;
 
 extern NSString * const PGErrorDomain;
 extern NSString * const PGteulErrorDomain;
@@ -590,12 +591,11 @@ extern NSString *WebActionOriginalURLKey;
     }
     
     cfgPrefsLoad();
-    //      mngoptParse("");
     
     // Skip all the auth stuff if we already have an IP as defined by a ticket file
     if(GameServerIP[0])
     {
-        self->state = WAIT_APPLE_EVT;
+        state = WAIT_APPLE_EVT;
         [self launchOffline:self];
         return;
     }
@@ -626,11 +626,15 @@ extern NSString *WebActionOriginalURLKey;
     style.alignment = NSCenterTextAlignment;
     style = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
     style.alignment = NSCenterTextAlignment;
-    NSAttributedString *str = [[[NSAttributedString alloc] initWithString:playOnlineButton.title attributes:@{
-                                                                                          NSFontAttributeName: playOnlineButton.font,
-                                                                                          NSParagraphStyleAttributeName: style,
-                                                                                          NSBaselineOffsetAttributeName: @(4.0),
-                                                                                          }] autorelease];
+
+    NSAttributedString *str = [[[NSAttributedString alloc]
+    	initWithString:playOnlineButton.title
+        attributes:@{
+          NSFontAttributeName: (NSFont * _Nonnull)playOnlineButton.font,
+          NSParagraphStyleAttributeName: style,
+          NSBaselineOffsetAttributeName: @(4.0),
+        }]
+    autorelease];
     
     [playOnlineButton setAttributedTitle:str];
     
@@ -659,7 +663,7 @@ extern NSString *WebActionOriginalURLKey;
 }
 
 // Starts the authentication process
-- (IBAction)launchOnline:(id)sender;
+- (IBAction)launchOnline:(id)sender
 {
     if (state == WAIT_APPLE_EVT) {
 
@@ -782,7 +786,7 @@ extern NSString *WebActionOriginalURLKey;
                                           (__bridge id)kSecClass: (__bridge id)kSecClassGenericPassword,
                                           (__bridge id)kSecAttrService: [NSBundle mainBundle].bundleIdentifier,
                                           (__bridge id)kSecAttrAccount: self.userName,
-                                          (__bridge id)kSecValueData: [[passwordField stringValue] dataUsingEncoding:NSUTF8StringEncoding],
+                                          (__bridge id)kSecValueData: [[passwordField stringValue] dataUsingEncoding:NSUTF8StringEncoding] ?: [NSData data],
                                           //        (__bridge id)kSecAttrAccessible: (__bridge id)kSecAttrAccessibleWhenUnlocked,
                                           };
     
@@ -1414,15 +1418,16 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 -(IBAction)doCalibrate:(id)sender
 {
     int joynum = [sender tag];
-    id joyMenu;
+    id joyMenu = nil;
     static int i;
     
     if(joynum > -1 && joynum < MAX_HID_STICKS)
     {
         if(joynum == 1) joyMenu = joy1;
-        if(joynum == 2) joyMenu = joy2;
-        if(joynum == 3) joyMenu = joy3;
-        if(joynum == 4) joyMenu = joy4;
+        else if(joynum == 2) joyMenu = joy2;
+        else if(joynum == 3) joyMenu = joy3;
+        else if(joynum == 4) joyMenu = joy4;
+        else [NSException raise:NSInternalInconsistencyException format:@""];
         
         i = [joyMenu indexOfSelectedItem] - 1;
         
