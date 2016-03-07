@@ -999,7 +999,6 @@ private:
 		responses.push_back("whipped");
 		responses.push_back("wdwhipped");
 		responses.push_back("blame rooke");
-		responses.push_back("its tooky's fault");
 		responses.push_back("its not purdy");
 		responses.push_back("<FX> BOOM! HEADSHOT!");
 		responses.push_back("Buy more ram");
@@ -1018,13 +1017,6 @@ private:
 		responses.push_back("So don't catch five inch shells with your teeth, duh");
 		responses.push_back("Muahahahahahahahahahahahahahahaha");
 		responses.push_back("<Your journey to the pwned side is compleat, my son>");
-		responses.push_back("It makes baby jeebus cry =(");
-#ifdef BETA_RELEASE
-		responses.push_back("Jeez, don't you like have stuff to test and stuff?");
-		responses.push_back("Don't pr0n & drive");
-		responses.push_back("Female lady dogs of the night male organsuckers!! Dobodily fluidsment it!!!!");
-#endif
-		responses.push_back("PLACEHOLDER\n(for loud, angry comment by DOC not related to subject at hand)");
 		responses.push_back("YOU'RE NOT DOING IT RIGHT");
 		responses.push_back("YOU JUST DONT UNDRESTAND");
 		responses.push_back("Historically accurate: you were pwned then, you are pwned now");
@@ -1051,7 +1043,6 @@ private:
 		responses.push_back("Magic 8-ball says, Absolutely");
 		responses.push_back("Magic 8-ball says, Care to bet?");
 		responses.push_back("ftw!");
-		responses.push_back("Probably not a good time to tell you that your dog died then?");
 		responses.push_back("So not your favorite kind of surprize?");
 		responses.push_back("I guess we ought to redesign that then");
 		responses.push_back("AUDIT!");
@@ -1069,7 +1060,6 @@ private:
 		responses.push_back("Blame Hasselt for the poor quality of this wtf. It was gonna be funny until I got shot while typing it.");
 		responses.push_back("Too busy watching mercy with a machine gun?");
 		responses.push_back("Parachuting dogs should be careful where they pack their bone");
-		responses.push_back("Battleground Europe bedside manner: You're going to live a long and happy life, as long as nobody breaks wind... *polite cough*");
 		responses.push_back("Battleground Europe train announcements: Welcome to the London Underground. Trains may be in the tunnels below.");
 		responses.push_back("Could everyone just stop getting shot?");
 		responses.push_back("WTF = Willy Tee Funny?");
@@ -1078,8 +1068,6 @@ private:
 		responses.push_back("Its all sdrawkcab, em ksa uoy fi");
 		responses.push_back("Life's like a box of chocolate, Forrest. You never know when you're going to cause a CTD.");
 		responses.push_back("Connection to host lost!!!!!!!1!");
-		responses.push_back("Connection to beerz lost!!!!!!!eleventy!");
-		responses.push_back("You think you can handle wtf\?\?\?\? *KILLER* can't handle wtf!");
 		responses.push_back("''What the hell is an aluminum falcon\?\?\?''");
 		responses.push_back("''You've been flying around for two weeks trying to get a signal? You must smell like old feet wrapped in leathery, burnt bacon!");
 		responses.push_back("It wouldn't happen if you'd come to the 2007 Convention");
