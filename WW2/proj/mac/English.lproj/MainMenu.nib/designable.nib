@@ -29,16 +29,10 @@
                             <menuItem isSeparatorItem="YES" id="1518"/>
                             <menuItem title="Show Readme" id="XbJ-Gh-5NI">
                                 <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="doReadMe:" target="906" id="Hoi-aS-l05"/>
-                                </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="kK8-sP-dyX"/>
                             <menuItem title="Reset Settings" id="1519">
                                 <modifierMask key="keyEquivalentModifierMask"/>
-                                <connections>
-                                    <action selector="resetSettings:" target="906" id="1535"/>
-                                </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="1520"/>
                             <menuItem title="Services" id="1521">
