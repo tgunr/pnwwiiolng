@@ -399,7 +399,6 @@
 		08847D4213AFC35B00532B62 /* GLCounter.h in Headers */ = {isa = PBXBuildFile; fileRef = 08847D4013AFC35B00532B62 /* GLCounter.h */; };
 		088CE9951379D33600F7AE5D /* SpatialDatabase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 088CE9941379D33600F7AE5D /* SpatialDatabase.cpp */; };
 		0894582E130736F2009C0B65 /* TextureFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0894582D130736F2009C0B65 /* TextureFont.cpp */; };
-		08977DB9134CFA2000C9DCFE /* libmacosx_xcode_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 08977DB8134CFA2000C9DCFE /* libmacosx_xcode_static.a */; };
 		08977DDE134CFB8500C9DCFE /* ScenarioManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08977DDC134CFB8500C9DCFE /* ScenarioManager.cpp */; };
 		08977E08134CFF6C00C9DCFE /* scenMain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08977E06134CFF6C00C9DCFE /* scenMain.cpp */; };
 		08977E11134CFF9F00C9DCFE /* scenLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08977E0F134CFF9F00C9DCFE /* scenLua.cpp */; };
@@ -486,6 +485,7 @@
 		E97C76CC1C85AFAA00875F44 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = E97C76CA1C85AFAA00875F44 /* Localizable.strings */; };
 		E97C76D11C85B15800875F44 /* playarc.ww2 in CopyFiles */ = {isa = PBXBuildFile; fileRef = E97C76D01C85B15800875F44 /* playarc.ww2 */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		E97C76D41C85B21200875F44 /* HockeySDK.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = E97C76D31C85B21200875F44 /* HockeySDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		FA05B0821C8D3E1800CDE30C /* libgranny2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA05B0811C8D3E1800CDE30C /* libgranny2.a */; };
 		FA13BB171C86758600095818 /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB161C86758600095818 /* libevent.a */; };
 		FA13BB1A1C875F6800095818 /* placeholder-background.png in Resources */ = {isa = PBXBuildFile; fileRef = FA13BB181C875F6800095818 /* placeholder-background.png */; };
 		FA13BB1B1C875F6800095818 /* placeholder-title.png in Resources */ = {isa = PBXBuildFile; fileRef = FA13BB191C875F6800095818 /* placeholder-title.png */; };
@@ -1405,7 +1405,6 @@
 		088CE9941379D33600F7AE5D /* SpatialDatabase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SpatialDatabase.cpp; sourceTree = "<group>"; };
 		0894582C13073604009C0B65 /* TextureFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextureFont.h; sourceTree = "<group>"; };
 		0894582D130736F2009C0B65 /* TextureFont.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextureFont.cpp; sourceTree = "<group>"; };
-		08977DB8134CFA2000C9DCFE /* libmacosx_xcode_static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmacosx_xcode_static.a; path = lib/mac/libmacosx_xcode_static.a; sourceTree = "<group>"; };
 		08977DDC134CFB8500C9DCFE /* ScenarioManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScenarioManager.cpp; path = scen/ScenarioManager.cpp; sourceTree = "<group>"; };
 		08977DDD134CFB8500C9DCFE /* ScenarioManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScenarioManager.h; path = scen/ScenarioManager.h; sourceTree = "<group>"; };
 		08977E06134CFF6C00C9DCFE /* scenMain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scenMain.cpp; path = scen/scenMain.cpp; sourceTree = "<group>"; };
@@ -1555,6 +1554,7 @@
 		E97C76CD1C85AFD800875F44 /* ww2.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = ww2.icns; path = proj/mac/ww2.icns; sourceTree = "<group>"; };
 		E97C76D01C85B15800875F44 /* playarc.ww2 */ = {isa = PBXFileReference; lastKnownFileType = file; name = playarc.ww2; path = ../WW2Archives/playarc.ww2; sourceTree = SOURCE_ROOT; };
 		E97C76D31C85B21200875F44 /* HockeySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HockeySDK.framework; path = Vendor/HockeySDK.framework; sourceTree = "<group>"; };
+		FA05B0811C8D3E1800CDE30C /* libgranny2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgranny2.a; path = lib/mac/libgranny2.a; sourceTree = "<group>"; };
 		FA13BB161C86758600095818 /* libevent.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libevent.a; path = proj/mac/build/Debug/libevent.a; sourceTree = "<group>"; };
 		FA13BB181C875F6800095818 /* placeholder-background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "placeholder-background.png"; path = "proj/mac/placeholder-background.png"; sourceTree = "<group>"; };
 		FA13BB191C875F6800095818 /* placeholder-title.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "placeholder-title.png"; path = "proj/mac/placeholder-title.png"; sourceTree = "<group>"; };
@@ -1617,6 +1617,7 @@
 				E90D96A81C6E041300D5EC52 /* HockeySDK.framework in Frameworks */,
 				08D5812E106310FE00177892 /* libmaclib.a in Frameworks */,
 				47B0EDFD0E9A85510089DCC4 /* libteulKit.a in Frameworks */,
+				FA05B0821C8D3E1800CDE30C /* libgranny2.a in Frameworks */,
 				0DDF00AA08578C460027461D /* libHIDUtilities.a in Frameworks */,
 				0DDF00AC08578C460027461D /* libjs.a in Frameworks */,
 				0DBEF4410A7FD8F60094C53D /* libexpat-ww2.a in Frameworks */,
@@ -1626,7 +1627,6 @@
 				08744F51107BF96D009DB5AF /* liblua5.1.a in Frameworks */,
 				08744F53107BF977009DB5AF /* libtolua++.a in Frameworks */,
 				087286DF10D1B23B00456009 /* libimapmac.a in Frameworks */,
-				08977DB9134CFA2000C9DCFE /* libmacosx_xcode_static.a in Frameworks */,
 				08F41C5612D39B7B0001C6F5 /* libfreetype2.a in Frameworks */,
 				FA13BB511C87CF8500095818 /* libglew.a in Frameworks */,
 				08492F5B131708E700C7F39E /* libftgl.a in Frameworks */,
@@ -3128,6 +3128,7 @@
 		20286C32FDCF999611CA2CEA /* lib */ = {
 			isa = PBXGroup;
 			children = (
+				FA05B0811C8D3E1800CDE30C /* libgranny2.a */,
 				FA13BB391C87649000095818 /* AGL.framework */,
 				FA13BB3A1C87649000095818 /* Cocoa.framework */,
 				FA13BB3B1C87649000095818 /* IOKit.framework */,
@@ -3155,7 +3156,6 @@
 				0DDF00A508578C460027461D /* libjs.a */,
 				08744F50107BF96D009DB5AF /* liblua5.1.a */,
 				08744F52107BF977009DB5AF /* libtolua++.a */,
-				08977DB8134CFA2000C9DCFE /* libmacosx_xcode_static.a */,
 				FA13BB481C8764BB00095818 /* libcrypto.tbd */,
 				FA13BB491C8764BB00095818 /* libz.tbd */,
 				FA13BB4E1C87650800095818 /* libxml2.tbd */,
