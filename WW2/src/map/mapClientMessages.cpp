@@ -446,11 +446,17 @@ BrigadeSelection::send(SINT32 teulIndex)
 //////////////////////////////////////////////////////////////////////
 
 // Request a mission list
-SINT32
-MissionList::send(SINT32 teulIndex)
-{
+SINT32 MissionList::send(SINT32 teulIndex) {
 	// For now we just send a status
 	m_status = MLR_OK;
+	return teulSend(teulIndex, _XCHG_MISSION_LIST, this);
+}
+
+
+SINT32 MissionList::sendQuick(SINT32 teulIndex) {
+	// HACK: Comandeering NO_BRIGADE error message to note that we
+	// want all missions, not just those in our brigade.
+	m_status = MLR_NO_BRIGADE;
 	return teulSend(teulIndex, _XCHG_MISSION_LIST, this);
 }
 

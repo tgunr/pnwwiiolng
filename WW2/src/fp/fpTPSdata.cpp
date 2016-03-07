@@ -404,6 +404,7 @@ void fpTPSDataInit ()
 	fpTPSWeaponMeshFiles[AMMO][TPS_LOD_1] = TPS_MESH_DIR "supbox\\supbox";
 
 	fpTPSWeaponMeshFiles[MAS36][TPS_LOD_1] = TPS_MESH_DIR "mas36\\mas36";
+	fpTPSWeaponMeshFiles[MAS40][TPS_LOD_1] = TPS_MESH_DIR "mas40\\mas40";
 
 	fpTPSWeaponMeshFiles[LEBELMLE][TPS_LOD_1] = TPS_MESH_DIR "lebel\\lebelSniper";
 
@@ -449,6 +450,7 @@ void fpTPSDataInit ()
 
 	fpTPSWeaponMeshFiles[SPRINGFIELD1903][TPS_LOD_1]	= TPS_MESH_DIR "springfield\\us_weap_sniper";
 	fpTPSWeaponMeshFiles[GEW43][TPS_LOD_1]				= TPS_MESH_DIR "gewehr\\gewehr";
+	fpTPSWeaponMeshFiles[GEW41][TPS_LOD_1]				= TPS_MESH_DIR "gewehr41\\gewehr41";
 	fpTPSWeaponMeshFiles[M1903A3][TPS_LOD_1]			= TPS_MESH_DIR "springfield\\us_weap_springfield";
 
 	// mortar alt weapon files are used for placement on the back, not the deployed state model
@@ -478,6 +480,11 @@ void fpTPSDataInit ()
 	fpTPSWeaponMeshFiles[PIAT][TPS_LOD_1] = TPS_MESH_DIR "piat\\piat";
 	fpTPSWeaponMeshAltFiles[PIAT][TPS_LOD_1] = TPS_MESH_DIR "piat\\piat";
 
+	fpTPSWeaponMeshFiles[STENMK2][TPS_LOD_1]  = TPS_MESH_DIR "stenmk2\\stenmk2";
+	fpTPSWeaponMeshFiles[M3A1][TPS_LOD_1]     = TPS_MESH_DIR "m3a1\\m3a1";
+	fpTPSWeaponMeshFiles[MP34][TPS_LOD_1]     = TPS_MESH_DIR "mp34\\mp34";
+	fpTPSWeaponMeshFiles[FG42G][TPS_LOD_1]    = TPS_MESH_DIR "fg42g\\fg42g";
+	fpTPSWeaponMeshAltFiles[FG42G][TPS_LOD_1] = TPS_MESH_DIR "fg42g\\fg42g_Deployed";
 
 	// base pose
 	fpTPSBasePoseFile = TPS_BLEND_DIR "stand\\idle\\ui\\relaxed.txt";
@@ -576,6 +583,52 @@ void fpTPSDataInit ()
 
 	fpTPSNumTwitches[TPS_POSETYPE_SWIM] = 1;
 	fpTPSTwitchFiles[TPS_POSETYPE_SWIM][0] = TPS_MIXIN_DIR "twitches\\swim\\twitchswim1.txt";
+
+	// emotes
+	// combat emotes
+	/*
+	fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_DOUBLETIME][TPS_HAND_LEFT][TPS_MIXINPOSE_STAND] = TPS_COMBATEMOTES_DIR "doubletime-left.txt";
+	fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_DOUBLETIME][TPS_HAND_RIGHT][TPS_MIXINPOSE_STAND] = TPS_COMBATEMOTES_DIR "doubletime-right.txt";
+	fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_DOUBLETIME][TPS_HAND_LEFT][TPS_MIXINPOSE_PRONE] = TPS_COMBATEMOTES_DIR "prone\\doubletime-left.txt";
+	fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_DOUBLETIME][TPS_HAND_RIGHT][TPS_MIXINPOSE_PRONE] = TPS_COMBATEMOTES_DIR "prone\\doubletime-right.txt";
+
+	fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_GETDOWN][TPS_HAND_LEFT][TPS_MIXINPOSE_STAND] = TPS_COMBATEMOTES_DIR "getdown-left.txt";
+	fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_GETDOWN][TPS_HAND_RIGHT][TPS_MIXINPOSE_STAND]  = TPS_COMBATEMOTES_DIR "getdown-right.txt";
+	fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_GETDOWN][TPS_HAND_LEFT][TPS_MIXINPOSE_PRONE] = TPS_COMBATEMOTES_DIR "prone\\getdown-left.txt";
+	fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_GETDOWN][TPS_HAND_RIGHT][TPS_MIXINPOSE_PRONE]  = TPS_COMBATEMOTES_DIR "prone\\getdown-right.txt";
+
+	fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_HALT][TPS_HAND_LEFT][TPS_MIXINPOSE_STAND]  = TPS_COMBATEMOTES_DIR "haltstand-left.txt";
+	fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_HALT][TPS_HAND_RIGHT][TPS_MIXINPOSE_STAND]  = TPS_COMBATEMOTES_DIR "haltstand-right.txt";
+	fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_HALT][TPS_HAND_LEFT][TPS_MIXINPOSE_PRONE]  = TPS_COMBATEMOTES_DIR "prone\\halt-left.txt";
+	fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_HALT][TPS_HAND_RIGHT][TPS_MIXINPOSE_PRONE]  = TPS_COMBATEMOTES_DIR "prone\\halt-right.txt";
+
+	fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_MOVEOUT][TPS_HAND_LEFT][TPS_MIXINPOSE_STAND]  = TPS_COMBATEMOTES_DIR "moveout-left.txt";
+	fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_MOVEOUT][TPS_HAND_RIGHT][TPS_MIXINPOSE_STAND]  = TPS_COMBATEMOTES_DIR "moveout-right.txt";
+	fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_MOVEOUT][TPS_HAND_LEFT][TPS_MIXINPOSE_PRONE]  = TPS_COMBATEMOTES_DIR "prone\\moveout-left.txt";
+	fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_MOVEOUT][TPS_HAND_RIGHT][TPS_MIXINPOSE_PRONE]  = TPS_COMBATEMOTES_DIR "prone\\moveout-right.txt";
+
+	fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_AMMO][TPS_HAND_LEFT][TPS_MIXINPOSE_STAND]  = "";
+	fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_AMMO][TPS_HAND_RIGHT][TPS_MIXINPOSE_STAND]  = "";
+	fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_AMMO][TPS_HAND_LEFT][TPS_MIXINPOSE_PRONE]  = "";
+	fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_AMMO][TPS_HAND_RIGHT][TPS_MIXINPOSE_PRONE]  = "";
+
+	fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_JUMP][TPS_HAND_LEFT][TPS_MIXINPOSE_STAND]  = "";
+	fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_JUMP][TPS_HAND_RIGHT][TPS_MIXINPOSE_STAND]  = "";
+	fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_JUMP][TPS_HAND_LEFT][TPS_MIXINPOSE_PRONE]  = "";
+	fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_JUMP][TPS_HAND_RIGHT][TPS_MIXINPOSE_PRONE]  = "";
+
+
+	// full body emotes
+	fpTPSBodyEmoteFiles[TPS_BODYEMOTE_SALUTE_GERMAN] = TPS_BODYEMOTES_DIR "salute_german.txt";
+	fpTPSBodyEmoteFiles[TPS_BODYEMOTE_SALUTE_FRENCH] = TPS_BODYEMOTES_DIR "salute_french.txt";
+	fpTPSBodyEmoteFiles[TPS_BODYEMOTE_SALUTE_BRITISH] = TPS_BODYEMOTES_DIR "salute_british.txt";
+	fpTPSBodyEmoteFiles[TPS_BODYEMOTE_SALUTE_DEFAULT] = TPS_BODYEMOTES_DIR "salute1.txt";
+	fpTPSBodyEmoteFiles[TPS_BODYEMOTE_SURRENDER] = TPS_BODYEMOTES_DIR "monty.txt";
+	fpTPSBodyEmoteFiles[TPS_BODYEMOTE_CHEER] = TPS_BODYEMOTES_DIR "cheer1.txt";
+	fpTPSBodyEmoteFiles[TPS_BODYEMOTE_LAUGH] = TPS_BODYEMOTES_DIR "laugh1.txt";
+//	fpTPSBodyEmoteFiles[TPS_BODYEMOTE_DRESSDOWN] = TPS_BODYEMOTES_DIR "officer_chew1.txt";
+	fpTPSBodyEmoteFiles[TPS_BODYEMOTE_ATTENTION] = TPS_BODYEMOTES_DIR "attention.txt";
+	*/
 
 	// end MIXINS
 

@@ -38,18 +38,17 @@ public:
 	//// ---- Class Operators ---- ////
 	/// Default constructor.
 	MissionSynopsis()
-		: m_poster(0ULL)
-		, m_origin(nullObjID)
-		, m_target(nullObjID)
-		, m_missionID(0)
-		, m_type(RECON)
+		: m_missionID(0)
+		, m_countryID(WWII_NO_COUNTRY), m_branchID(BRANCH_NOT_USED), m_brigadeID(0)
+		, m_type(RECON), m_subType(0)
+		, m_origin(nullObjID), m_target(nullObjID)
 		, m_hasMobileSpawn(false)
 		, m_canMobileSpawn(false)
+		, m_poster(0LL)
 		, m_isCurrent(false)
 		, m_amLeader(false)
-		, m_isOpen(false)
-		, m_subType(0)
 		, m_population(0)
+		, m_isOpen(false)
 		{}
 	/// Network packer constructor.
 	MissionSynopsis(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
@@ -67,18 +66,23 @@ public:
 
 	//// ---- Class Variables ---- ////
 public:
-	ChatHandle		m_poster;			///< compressed "chatHandle" of poster.
-	FULL_OBJ_ID		m_origin;			///< Facility.
-	FULL_OBJ_ID		m_target;			///< Facility* or* CP.
-	UINT32			m_missionID;		///< Host's campaign-unique Mission ID.
-	MISSION_TYPE	m_type;				///< Main type (attack, defend, etc).
-	bool			m_hasMobileSpawn;	///< True when mobile spawn is active.
-	bool			m_canMobileSpawn;	///< True if this mission supports mobile spawning.
-	bool			m_isCurrent;		///< If you are on this mission.
-	bool			m_amLeader;			///< If you are the leader.
-	bool			m_isOpen;			///< False if the mission cannot spawn.
-	SINT8			m_subType;			///< Mission sub-type.
-	UCHAR			m_population;		///< Scaled population counter.
+	// TODO: 1.35 rearranged this, so we should probably consider memory layout.
+	UINT32       m_missionID;      ///< Host's campaign-unique Mission ID.
+	WWII_COUNTRY m_countryID;      ///< The country the mission is for.
+	BRANCH_ENUM  m_branchID;       ///< The branch the mission uses.
+	UINT32       m_brigadeID;      ///< The brigade the mission is attached to.
+
+	MISSION_TYPE m_type;           ///< Main type (attack, defend, etc).
+	SINT8        m_subType;        ///< Mission sub-type.
+	FULL_OBJ_ID  m_origin;         ///< Facility.
+	FULL_OBJ_ID  m_target;         ///< Facility* or* CP.
+	bool         m_hasMobileSpawn; ///< True when mobile spawn is active>
+	bool         m_canMobileSpawn; ///< True if this mission supports mobile spawning.
+	ChatHandle   m_poster;         ///< compressed "chatHandle" of poster.
+	bool         m_isCurrent;      ///< If you are on this mission.
+	bool         m_amLeader;       ///< If you are the leader.
+	UCHAR        m_population;     ///< Scaled population counter.
+	bool         m_isOpen;         ///< False if the mission cannot spawn.
 };
 
 // Wrapper structure for the purposes of transport
@@ -109,6 +113,9 @@ public:
 	// Returns: error < 0  /  ok >= 0
 	SINT32 send(SINT32 teulIndex);
 	SINT32 receive(SINT32 teulIndex);
+
+	/// Send quick mission list, which ignores current brigade.
+	SINT32 sendQuick(SINT32 teulIndex);
 
 	ML_RESULT		m_status;							// Status of the list
 	LOGICAL			m_listStart;						// True if this is the start of list

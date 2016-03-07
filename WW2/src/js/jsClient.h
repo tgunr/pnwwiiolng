@@ -70,6 +70,8 @@ public:
 	jsClient(ww2::Client*);
 
 	JS_CLASS_DATA;
+	JS_FUNCTION(getmisscountry);
+	JS_FUNCTION(getmissbrigade);
 	JS_FUNCTION(acceptmission);
 	JS_FUNCTION(spawn);
 	JS_FUNCTION(selectpersona);
@@ -85,6 +87,7 @@ public:
 	JS_FUNCTION(acceptcrew);
 	JS_FUNCTION(requestpersonalist);
 	JS_FUNCTION(requestmissionlist);
+	JS_FUNCTION(requestquickmissionlist);
 	JS_FUNCTION(exitmission);
 	JS_FUNCTION(cancelandexitmission);
 	JS_FUNCTION(requestbrigadedetail);

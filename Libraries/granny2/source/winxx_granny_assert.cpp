@@ -32,7 +32,7 @@ DisplayAssertion(char const * const Expression,
     if (Ignored)
         return false;
 
-    wsprintf(AssertionBuffer,
+    wsprintfA(AssertionBuffer,
              "Expression: %s\r\n"
              "File: %s\r\n"
              "Line: %d\r\n"

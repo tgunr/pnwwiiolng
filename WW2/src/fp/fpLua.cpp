@@ -730,6 +730,7 @@ TOLUA_API int tolua_fp_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"FRSMOKE",FRSMOKE);
    tolua_constant(tolua_S,"AMMO",AMMO);
    tolua_constant(tolua_S,"MAS36",MAS36);
+   tolua_constant(tolua_S,"MAS40",MAS40);
    tolua_constant(tolua_S,"RG_G30",RG_G30);
    tolua_constant(tolua_S,"RG_VB",RG_VB);
    tolua_constant(tolua_S,"RG_MILLS",RG_MILLS);
@@ -750,6 +751,7 @@ TOLUA_API int tolua_fp_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"COLT1911",COLT1911);
    tolua_constant(tolua_S,"SPRINGFIELD1903",SPRINGFIELD1903);
    tolua_constant(tolua_S,"GEW43",GEW43);
+   tolua_constant(tolua_S,"GEW41",GEW41);
    tolua_constant(tolua_S,"M1THOMPSON",M1THOMPSON);
    tolua_constant(tolua_S,"MARK2",MARK2);
    tolua_constant(tolua_S,"BAZOOKA",BAZOOKA);
@@ -757,6 +759,10 @@ TOLUA_API int tolua_fp_open (lua_State* tolua_S)
    tolua_constant(tolua_S,"M1903A3",M1903A3);
    tolua_constant(tolua_S,"USSMOKE",USSMOKE);
    tolua_constant(tolua_S,"PIAT",PIAT);
+   tolua_constant(tolua_S,"STENMK2",STENMK2);
+   tolua_constant(tolua_S,"M3A1",M3A1);
+   tolua_constant(tolua_S,"MP34",MP34);
+   tolua_constant(tolua_S,"FG42G",FG42G);
    tolua_constant(tolua_S,"NUM_WEAPONS",NUM_WEAPONS);
    tolua_constant(tolua_S,"RELOAD",RELOAD);
    tolua_constant(tolua_S,"STAND_FIRE",STAND_FIRE);
