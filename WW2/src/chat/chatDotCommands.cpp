@@ -1074,6 +1074,7 @@ private:
 		responses.push_back("ERROR: Unable to give you a wtf due to salad balancing restrictions");
 		responses.push_back("WWIIOL MiniFact: The 'waaaugh' cry of dying infantry was captured by playing one of Willy Tee's cartoons to an audience and taking the earmuffs of one of them when Wheels sang");
 		responses.push_back("Server coming down in 15 minutes for a patch.");
+		responses.push_back("Server coming down in 15 seconds for a patch.");
 		responses.push_back("Maybe they were aiming for KenneY?");
 		responses.push_back("This space left intentionally blank. Please do not refer to it as \"bilton's brain\".");
 		responses.push_back("Gameplay error detected. Please press the Any Key now to correct this issue.");
@@ -1089,6 +1090,19 @@ private:
 		responses.push_back("You mis-spelled 'I was pwned and I'm very happy about it'");
 		responses.push_back("That's what happens when you don't say 'please'");
 		responses.push_back("LOOK IT UP ON THE INTERNET");
+		responses.push_back("i am bed sorry");
+        responses.push_back("Groop, I implore thee, my foonting turling dromes");
+        responses.push_back("Do I look like Inspector Gadget to you?");
+        responses.push_back("All GM commands are logged.");
+        responses.push_back("All CRS commands are logged.");
+        responses.push_back("It's like someone with no sense of humor wrote these.");
+        responses.push_back("Does CRS even play The Game?");
+        responses.push_back("its xooms fault");
+        responses.push_back("Something broke. Quick, blame XOOM!");
+        responses.push_back("WWIOL MiniFact: This joke isn't very good");
+        responses.push_back("All glory to the HypnoToad.");
+        responses.push_back("CTD incoming in 3... 2... 1...");
+        responses.push_back("What does CTD mean again?");
 	}
 
     static UINT32 rand_uniform(UINT32 bound)
