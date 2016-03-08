@@ -5718,6 +5718,15 @@ static void _glewInfo_GL_KHR_texture_compression_astc_ldr (void)
 
 #endif /* GL_KHR_texture_compression_astc_ldr */
 
+#ifdef GL_KHR_texture_compression_astc_sliced_3d
+
+static void _glewInfo_GL_KHR_texture_compression_astc_sliced_3d (void)
+{
+  glewPrintExt("GL_KHR_texture_compression_astc_sliced_3d", GLEW_KHR_texture_compression_astc_sliced_3d, glewIsSupported("GL_KHR_texture_compression_astc_sliced_3d"), glewGetExtension("GL_KHR_texture_compression_astc_sliced_3d"));
+}
+
+#endif /* GL_KHR_texture_compression_astc_sliced_3d */
+
 #ifdef GL_KTX_buffer_region
 
 static void _glewInfo_GL_KTX_buffer_region (void)
@@ -5826,6 +5835,19 @@ static void _glewInfo_GL_NVX_gpu_memory_info (void)
 
 #endif /* GL_NVX_gpu_memory_info */
 
+#ifdef GL_NVX_linked_gpu_multicast
+
+static void _glewInfo_GL_NVX_linked_gpu_multicast (void)
+{
+  glewPrintExt("GL_NVX_linked_gpu_multicast", GLEW_NVX_linked_gpu_multicast, glewIsSupported("GL_NVX_linked_gpu_multicast"), glewGetExtension("GL_NVX_linked_gpu_multicast"));
+
+  glewInfoFunc("glLGPUCopyImageSubDataNVX", glLGPUCopyImageSubDataNVX == NULL);
+  glewInfoFunc("glLGPUInterlockNVX", glLGPUInterlockNVX == NULL);
+  glewInfoFunc("glLGPUNamedBufferSubDataNVX", glLGPUNamedBufferSubDataNVX == NULL);
+}
+
+#endif /* GL_NVX_linked_gpu_multicast */
+
 #ifdef GL_NV_bindless_multi_draw_indirect
 
 static void _glewInfo_GL_NV_bindless_multi_draw_indirect (void)
@@ -5902,6 +5924,33 @@ static void _glewInfo_GL_NV_blend_square (void)
 }
 
 #endif /* GL_NV_blend_square */
+
+#ifdef GL_NV_command_list
+
+static void _glewInfo_GL_NV_command_list (void)
+{
+  glewPrintExt("GL_NV_command_list", GLEW_NV_command_list, glewIsSupported("GL_NV_command_list"), glewGetExtension("GL_NV_command_list"));
+
+  glewInfoFunc("glCallCommandListNV", glCallCommandListNV == NULL);
+  glewInfoFunc("glCommandListSegmentsNV", glCommandListSegmentsNV == NULL);
+  glewInfoFunc("glCompileCommandListNV", glCompileCommandListNV == NULL);
+  glewInfoFunc("glCreateCommandListsNV", glCreateCommandListsNV == NULL);
+  glewInfoFunc("glCreateStatesNV", glCreateStatesNV == NULL);
+  glewInfoFunc("glDeleteCommandListsNV", glDeleteCommandListsNV == NULL);
+  glewInfoFunc("glDeleteStatesNV", glDeleteStatesNV == NULL);
+  glewInfoFunc("glDrawCommandsAddressNV", glDrawCommandsAddressNV == NULL);
+  glewInfoFunc("glDrawCommandsNV", glDrawCommandsNV == NULL);
+  glewInfoFunc("glDrawCommandsStatesAddressNV", glDrawCommandsStatesAddressNV == NULL);
+  glewInfoFunc("glDrawCommandsStatesNV", glDrawCommandsStatesNV == NULL);
+  glewInfoFunc("glGetCommandHeaderNV", glGetCommandHeaderNV == NULL);
+  glewInfoFunc("glGetStageIndexNV", glGetStageIndexNV == NULL);
+  glewInfoFunc("glIsCommandListNV", glIsCommandListNV == NULL);
+  glewInfoFunc("glIsStateNV", glIsStateNV == NULL);
+  glewInfoFunc("glListDrawCommandsStatesClientNV", glListDrawCommandsStatesClientNV == NULL);
+  glewInfoFunc("glStateCaptureNV", glStateCaptureNV == NULL);
+}
+
+#endif /* GL_NV_command_list */
 
 #ifdef GL_NV_compute_program5
 
@@ -10660,6 +10709,9 @@ static void glewInfo (void)
 #ifdef GL_KHR_texture_compression_astc_ldr
   _glewInfo_GL_KHR_texture_compression_astc_ldr();
 #endif /* GL_KHR_texture_compression_astc_ldr */
+#ifdef GL_KHR_texture_compression_astc_sliced_3d
+  _glewInfo_GL_KHR_texture_compression_astc_sliced_3d();
+#endif /* GL_KHR_texture_compression_astc_sliced_3d */
 #ifdef GL_KTX_buffer_region
   _glewInfo_GL_KTX_buffer_region();
 #endif /* GL_KTX_buffer_region */
@@ -10684,6 +10736,9 @@ static void glewInfo (void)
 #ifdef GL_NVX_gpu_memory_info
   _glewInfo_GL_NVX_gpu_memory_info();
 #endif /* GL_NVX_gpu_memory_info */
+#ifdef GL_NVX_linked_gpu_multicast
+  _glewInfo_GL_NVX_linked_gpu_multicast();
+#endif /* GL_NVX_linked_gpu_multicast */
 #ifdef GL_NV_bindless_multi_draw_indirect
   _glewInfo_GL_NV_bindless_multi_draw_indirect();
 #endif /* GL_NV_bindless_multi_draw_indirect */
@@ -10702,6 +10757,9 @@ static void glewInfo (void)
 #ifdef GL_NV_blend_square
   _glewInfo_GL_NV_blend_square();
 #endif /* GL_NV_blend_square */
+#ifdef GL_NV_command_list
+  _glewInfo_GL_NV_command_list();
+#endif /* GL_NV_command_list */
 #ifdef GL_NV_compute_program5
   _glewInfo_GL_NV_compute_program5();
 #endif /* GL_NV_compute_program5 */

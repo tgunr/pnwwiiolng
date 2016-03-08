@@ -97,6 +97,9 @@ static const IconRank _SpecialRanks[] =
 	{"frytiger", 	FT_RANK },
 	{"snail", 		SNAIL_RANK },
 	{"lindir", 		LINDIR_RANK },
+	{"xoom",        XOOM_RANK },
+	{"ohm",         OHM_RANK },
+	{"victarus",    VICTARUS_RANK },
 #endif
 	{nullptr, 0}
 };

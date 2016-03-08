@@ -24,6 +24,7 @@
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiHCUnits.h"
 #include "strt/strtFacilityStruct.h"
+#include "strt/strtCPStruct.h"
 
 #include "chat/chatSupportRPCMessages.h"
 
@@ -381,6 +382,10 @@ void
 MissionSynopsis::populate(const Mission* const mission, bool isCurrent, bool isLeader, UINT32 highestPop)
 {
 	m_missionID = mission->missionID();
+	m_countryID = mission->m_country;
+	m_branchID  = mission->m_brigade->branch();
+	m_brigadeID = mission->m_brigadeID;
+
 	m_type = mission->missionType();
 	m_subType = mission->subType();
 	m_origin = mission->summary().origin;
@@ -401,96 +406,182 @@ MissionSynopsis::populate(const Mission* const mission, bool isCurrent, bool isL
 // Receive a request for a mission list
 
 SINT32
-MissionList::receive(SINT32 teulIndex)
-{
+MissionList::receive(SINT32 teulIndex) {
 	Player* const player = PlayerInterface::Lookup(teulIndex);
 
 	m_count = 0;
 	m_listStart = m_listEnd = true;
 	m_canPost = false;
 
-	if ( player == nullptr )
-	{
+	if ( player == nullptr ) {
 		dbugLog(_FLA, "t:%d %s: no persona associated with teulIndex", teulIndex, __FUNCTION__);
 		return _sendResult(teulIndex, MLR_ERROR);
 	}
 
-	if ( player->personaID() == 0 )
-	{
-		dbugLog(_FLW, "t:%d p:%u c:%s mission list without persona selected", player->teulIndex(), player->playerID(), player->callsign());
+	if ( player->personaID() == 0 ) {
+		dbugLog(_FLW, "t:%d p:%d c:%s mission list without persona selected", player->teulIndex(), player->playerID(), player->callsign());
 		return _sendResult(teulIndex, MLR_NO_PERSONA);
 	}
 
 	Brigade* const brigade = player->brigade();
-	if ( brigade == nullptr )
-	{
-		dbugLog(_FLW, "t:%d p:%u c:%s mission list without brigade selected", player->teulIndex(), player->playerID(), player->callsign());
+	if ( m_status != MLR_NO_BRIGADE && brigade == nullptr ) {
+		dbugLog(_FLW, "t:%d p:%d c:%s mission list without brigade selected", player->teulIndex(), player->playerID(), player->callsign());
 		return _sendResult(teulIndex, MLR_NO_BRIGADE);
 	}
 
-	const Mission* const activeMission = player->activeMission();
-	if ( player->ableToPost() && activeMission == nullptr )
-		m_canPost = true;
-	m_activeMission.populate(activeMission);
+	//------
+	// TODO: Cleanup / refactor.
 
-	if ( brigade->actualMissions() == 0 )
-	{
-		player->message(LSTR_NOTE, LSTR_NO_ACTIVE_MISSIONS);
-		dbugLog(_FLD, "t:%d p:%u c:%s no missions for brigade", player->teulIndex(), player->playerID(), player->callsign());
-		return _sendResult(teulIndex, MLR_OK);
-	}
+	if ( m_status != MLR_NO_BRIGADE ) {
+		const Mission* const activeMission = player->activeMission();
+		if ( player->ableToPost() && activeMission == nullptr )
+			m_canPost = true;
+		m_activeMission.populate(activeMission);
 
-	dbugLog(_FLD, "t:%d p:%u c:%s sending list of %u/%u missions for brigade %u activeMission %u"
-					, player->teulIndex(), player->playerID(), player->callsign(), brigade->missions(), brigade->actualMissions(), brigade->brigadeID(), m_activeMission.m_missionID);
-
-	// Until we exit the for loop, we don't know if we've reached the list end
-	m_listEnd = false;
-
-	BrigadeMissions::iterator it;
-	static const UINT32 MIN_MISSION_POPULATION_SCALE = 8;
-	UINT32 highestCount = MIN_MISSION_POPULATION_SCALE + player->hostInstance()->count(brigade->side()) / 60;
-	for ( it = brigade->m_missionList.begin(); it != brigade->m_missionList.end(); ++it )
-	{
-		const Mission* const mission = (*it);
-
-		// Ignore squad missions for other squads
-		if ( mission->numTakers() > highestCount && mission->accessible(player) )
-			highestCount = mission->numTakers();
-	}
-
-	UINT32 missionCount = 0;
-	for ( it = brigade->m_missionList.begin(); it != brigade->m_missionList.end(); ++it )
-	{
-		const Mission* const mission = (*it);
-
-		// Ignore squad missions for other squads
-		if ( !mission->accessible(player) )
-			continue;
-
-		if ( m_count == MAX_MISSIONS_PER_LIST )
-		{
-			_sendResult(teulIndex, MLR_OK);
-			m_listStart = false;
-			m_count = 0;
+		if ( brigade->actualMissions() == 0 ) {
+			player->message(LSTR_NOTE, LSTR_NO_ACTIVE_MISSIONS);
+			dbugLog(_FLD, "t:%d p:%d c:%s no missions for brigade", player->teulIndex(), player->playerID(), player->callsign());
+			return _sendResult(teulIndex, MLR_OK);
 		}
 
-		bool isCurrent = (player->mission() == mission);
-		bool isLeader = (isCurrent && player->isMissionLeader());
-		m_missions[m_count].populate(mission, isCurrent, isLeader, highestCount);
+		dbugLog(_FLD, "t:%d p:%u c:%s sending list of %u/%u missions for brigade %u activeMission %u"
+		      , player->teulIndex(), player->playerID(), player->callsign(), brigade->missions(), brigade->actualMissions(), brigade->brigadeID(), m_activeMission.m_missionID);
 
-		++m_count;
-		++missionCount;
+		// Until we exit the for loop, we don't know if we've reached the list end
+		m_listEnd = false;
+
+		BrigadeMissions::iterator it;
+		static const UINT32 MIN_MISSION_POPULATION_SCALE = 8;
+		UINT32 highestCount = MIN_MISSION_POPULATION_SCALE + player->hostInstance()->count(brigade->side()) / 60;
+		for ( it = brigade->m_missionList.begin() ; it != brigade->m_missionList.end() ; ++it ) {
+			const Mission* const mission = (*it);
+
+			// Ignore squad missions for other squads
+			if ( mission->numTakers() > highestCount && mission->accessible(player) )
+				highestCount = mission->numTakers();
+		}
+
+		UINT32 missionCount = 0;
+		for ( it = brigade->m_missionList.begin() ; it != brigade->m_missionList.end() ; ++it ) {
+			const Mission* const mission = (*it);
+
+			// Ignore squad missions for other squads
+			if ( !mission->accessible(player) )
+				continue;
+
+			if ( m_count == MAX_MISSIONS_PER_LIST ) {
+				_sendResult(teulIndex, MLR_OK);
+				m_listStart = false;
+				m_count = 0;
+			}
+
+			bool isCurrent = (player->mission() == mission);
+			bool isLeader = (isCurrent && player->isMissionLeader());
+			m_missions[m_count].populate(mission, isCurrent, isLeader, highestCount);
+
+			++m_count;
+			++missionCount;
+		}
+		// Send the end of the list
+		m_listEnd = true;
+
+		if ( missionCount == 0 ) {
+			player->message(LSTR_NOTE, LSTR_NO_ACTIVE_MISSIONS);
+			dbugLog(_FLD, "t:%d p:%d c:%s no missions for brigade", player->teulIndex(), player->playerID(), player->callsign());
+		}
+
+		_sendResult(teulIndex, MLR_OK);
+	} else {
+		// Missions ranked by attractiveness.
+		// TODO: This should probably be at least partially cached.
+		std::multimap<int, const Mission*> missions;
+		UINT32 highestCount = 0;
+
+		auto add_missions = 
+		[&] (WWII_COUNTRY country, BRANCH_ENUM branch) {
+			for ( BRIGADES::const_iterator brig = g_brigades[country][branch].begin();
+			      brig != g_brigades[(size_t)country][(size_t)branch].end() ; ++brig ) {
+				for ( BrigadeMissions::const_iterator miss = (*brig)->m_missionList.begin();
+				      miss != (*brig)->m_missionList.end() ; ++miss ) {
+					const Mission* mission = *miss;
+
+					// If we can't spawn, don't bother.
+					if ( ! mission->accessible(player) && mission->accessibility(player) != MC_BRIGADE )
+						continue;
+					if ( mission->missionType() == RECON || mission->missionType() == RESUPPLY )
+						continue;
+
+					float value = static_cast<float>(mission->numTakers()) ;
+					// TODO: Move to script to be configured by producers.
+					{
+						const CPStruct* target = mission->targetCP();
+
+						// NOTE: May make FB attacks work wrong? They're probably poor
+						// choices for new players anyway...
+						if ( mission->side() != target->ControllingSide() ) {
+							// Attacking mission.
+							if ( mission->isMobileSpawnAvailable() )
+								value *= 2.0f;
+						} else {
+							value *= 1.25f; // Slight preference for defense.
+
+							if ( target->isContested() )
+								value *= 2.5f;
+						}
+
+						if ( ! target->hasHeavyInfantryEWS() )
+							value *= 0.25f;
+
+						// TODO: Big boost for missions with squadmates.
+					}
+
+					missions.insert(std::make_pair((int)value, mission)) ;
+					if ( mission->numTakers() > highestCount )
+						highestCount = mission->numTakers();
+				}
+			}
+		} ;
+
+		for ( int country = 0 ; country < MAX_COUNTRIES ; ++country ) {
+			if ( wwiiSide(country) != player->side() )
+				continue;
+			add_missions((WWII_COUNTRY)country, player->branch());
+		}
+
+		//------
+
+		const size_t max_quick_missions = 16;
+
+		UINT32 missionCount = 0;
+		for ( auto it = missions.rbegin() ; it != missions.rend() ; ++it ) {
+			if ( missionCount >= max_quick_missions )
+				break;
+
+			const Mission* const mission = it->second;
+
+			if ( m_count == MAX_MISSIONS_PER_LIST ) {
+				_sendResult(teulIndex, MLR_OK);
+				m_listStart = false;
+				m_count = 0;
+			}
+
+			bool isCurrent = (player->mission() == mission);
+			bool isLeader = (isCurrent && player->isMissionLeader());
+			m_missions[m_count].populate(mission, isCurrent, isLeader, highestCount);
+
+			++m_count;
+			++missionCount;
+		}
+		// Send the end of the list
+		m_listEnd = true;
+
+		if ( missionCount == 0 ) {
+			player->message(LSTR_NOTE, LSTR_NO_ACTIVE_MISSIONS);
+			dbugLog(_FLD, "t:%d p:%d c:%s no missions found.", player->teulIndex(), player->playerID(), player->callsign());
+		}
+
+		_sendResult(teulIndex, MLR_OK);
 	}
-	// Send the end of the list
-	m_listEnd = true;
-
-	if ( missionCount == 0 )
-	{
-		player->message(LSTR_NOTE, LSTR_NO_ACTIVE_MISSIONS);
-		dbugLog(_FLD, "t:%d p:%u c:%s no missions for brigade", player->teulIndex(), player->playerID(), player->callsign());
-	}
-
-	_sendResult(teulIndex, MLR_OK);
 
 	return 0;
 }

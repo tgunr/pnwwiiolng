@@ -3,7 +3,7 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 46;
+	objectVersion = 47;
 	objects = {
 
 /* Begin PBXBuildFile section */
@@ -314,8 +314,6 @@
 		0818A91312E745AB0035C3B4 /* gr2layerTypes.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0818A91112E745AB0035C3B4 /* gr2layerTypes.cpp */; };
 		0818A91E12E74BCB0035C3B4 /* fpTPSKits.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0818A91C12E74BCB0035C3B4 /* fpTPSKits.cpp */; };
 		081B0A4713C4D70F006BE6EE /* obinfo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 081B0A4613C4D70F006BE6EE /* obinfo.cpp */; };
-		082A41BA143B561D0023B243 /* libmacglew.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 082A41B8143B55F60023B243 /* libmacglew.a */; };
-		082CDA171411239E00225E44 /* libcrypto.0.9.8.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 082CDA161411239E00225E44 /* libcrypto.0.9.8.dylib */; };
 		082CF7D0120222EB00A60CC2 /* CABufferList.h in Headers */ = {isa = PBXBuildFile; fileRef = 082CF7B0120222EB00A60CC2 /* CABufferList.h */; };
 		082CF7D2120222EB00A60CC2 /* CADebugger.h in Headers */ = {isa = PBXBuildFile; fileRef = 082CF7B2120222EB00A60CC2 /* CADebugger.h */; };
 		082CF7D4120222EB00A60CC2 /* CADebugMacros.h in Headers */ = {isa = PBXBuildFile; fileRef = 082CF7B4120222EB00A60CC2 /* CADebugMacros.h */; };
@@ -401,7 +399,6 @@
 		08847D4213AFC35B00532B62 /* GLCounter.h in Headers */ = {isa = PBXBuildFile; fileRef = 08847D4013AFC35B00532B62 /* GLCounter.h */; };
 		088CE9951379D33600F7AE5D /* SpatialDatabase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 088CE9941379D33600F7AE5D /* SpatialDatabase.cpp */; };
 		0894582E130736F2009C0B65 /* TextureFont.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0894582D130736F2009C0B65 /* TextureFont.cpp */; };
-		08977DB9134CFA2000C9DCFE /* libmacosx_xcode_static.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 08977DB8134CFA2000C9DCFE /* libmacosx_xcode_static.a */; };
 		08977DDE134CFB8500C9DCFE /* ScenarioManager.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08977DDC134CFB8500C9DCFE /* ScenarioManager.cpp */; };
 		08977E08134CFF6C00C9DCFE /* scenMain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08977E06134CFF6C00C9DCFE /* scenMain.cpp */; };
 		08977E11134CFF9F00C9DCFE /* scenLua.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08977E0F134CFF9F00C9DCFE /* scenLua.cpp */; };
@@ -410,7 +407,6 @@
 		0898699E13A2BB4C00D643A0 /* libotmac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0898699D13A2BB4C00D643A0 /* libotmac.a */; };
 		089FB52714194F2200EBEB5F /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 089FB52614194F2200EBEB5F /* Carbon.framework */; };
 		089FEABE112C5B1200D0F32D /* GenerateIcons.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 089FEABC112C5B1200D0F32D /* GenerateIcons.cpp */; };
-		08A4286912C937380041B628 /* libz.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = 08A4286812C937380041B628 /* libz.dylib */; };
 		08A428C212C93A490041B628 /* oglTextureObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08A428C012C93A490041B628 /* oglTextureObject.cpp */; };
 		08ACEE9E122056DC0035E877 /* glslUniformBlock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08ACEE9C122056DC0035E877 /* glslUniformBlock.cpp */; };
 		08ACEEA71220574E0035E877 /* oglMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08ACEEA31220574E0035E877 /* oglMaterial.cpp */; };
@@ -442,17 +438,9 @@
 		0DBEF4410A7FD8F60094C53D /* libexpat-ww2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DBEF4400A7FD8F60094C53D /* libexpat-ww2.a */; };
 		0DDF00AA08578C460027461D /* libHIDUtilities.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DDF00A308578C460027461D /* libHIDUtilities.a */; };
 		0DDF00AC08578C460027461D /* libjs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DDF00A508578C460027461D /* libjs.a */; };
-		0DDF012D0857934A0027461D /* proj/mac/ww2.icns in Resources */ = {isa = PBXBuildFile; fileRef = 0DDF012C0857934A0027461D /* proj/mac/ww2.icns */; };
 		47B0EDFD0E9A85510089DCC4 /* libteulKit.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 47B0ED240E9A66A40089DCC4 /* libteulKit.a */; };
 		E90D969A1C6D729D00D5EC52 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96991C6D729D00D5EC52 /* WebKit.framework */; };
-		E90D969C1C6D738D00D5EC52 /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D969B1C6D738D00D5EC52 /* AGL.framework */; };
-		E90D969E1C6D753D00D5EC52 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D969D1C6D753D00D5EC52 /* Cocoa.framework */; };
-		E90D96A01C6D757400D5EC52 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D969F1C6D757400D5EC52 /* IOKit.framework */; };
-		E90D96A21C6D75E200D5EC52 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96A11C6D75E200D5EC52 /* OpenGL.framework */; };
-		E90D96A41C6D760300D5EC52 /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96A31C6D760300D5EC52 /* QuickTime.framework */; };
-		E90D96A61C6D762800D5EC52 /* System.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96A51C6D762800D5EC52 /* System.framework */; };
 		E90D96A81C6E041300D5EC52 /* HockeySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96A71C6E041300D5EC52 /* HockeySDK.framework */; };
-		E90D96AA1C6E2B0900D5EC52 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96A91C6E2B0900D5EC52 /* OpenAL.framework */; };
 		E97C76131C848D5400875F44 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 089FB52614194F2200EBEB5F /* Carbon.framework */; };
 		E97C76141C848DA000875F44 /* HockeySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96A71C6E041300D5EC52 /* HockeySDK.framework */; };
 		E97C76151C848E3100875F44 /* CABufferList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7AF120222EB00A60CC2 /* CABufferList.cpp */; };
@@ -472,8 +460,6 @@
 		E97C76231C848EBB00875F44 /* oalSource.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7CD120222EB00A60CC2 /* oalSource.cpp */; };
 		E97C76241C848F1800875F44 /* CADebugPrintf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF8671202338100A60CC2 /* CADebugPrintf.cpp */; };
 		E97C76251C84C0EE00875F44 /* sysMacCompat.mm in Sources */ = {isa = PBXBuildFile; fileRef = 08104D58103DFBE90065E0E2 /* sysMacCompat.mm */; };
-		E97C76271C84C29E00875F44 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E97C76261C84C29E00875F44 /* Security.framework */; };
-		E97C76301C85126600875F44 /* libxml2.2.dylib in Frameworks */ = {isa = PBXBuildFile; fileRef = E97C762F1C85126600875F44 /* libxml2.2.dylib */; };
 		E97C76A31C85156F00875F44 /* buffer.c in Sources */ = {isa = PBXBuildFile; fileRef = E97C76821C85156F00875F44 /* buffer.c */; };
 		E97C76A51C85156F00875F44 /* bufferevent_filter.c in Sources */ = {isa = PBXBuildFile; fileRef = E97C76841C85156F00875F44 /* bufferevent_filter.c */; };
 		E97C76A71C85156F00875F44 /* bufferevent_pair.c in Sources */ = {isa = PBXBuildFile; fileRef = E97C76861C85156F00875F44 /* bufferevent_pair.c */; };
@@ -490,21 +476,30 @@
 		E97C76BC1C85156F00875F44 /* listener.c in Sources */ = {isa = PBXBuildFile; fileRef = E97C769B1C85156F00875F44 /* listener.c */; };
 		E97C76BD1C85156F00875F44 /* log.c in Sources */ = {isa = PBXBuildFile; fileRef = E97C769C1C85156F00875F44 /* log.c */; };
 		E97C76C01C85156F00875F44 /* signal.c in Sources */ = {isa = PBXBuildFile; fileRef = E97C769F1C85156F00875F44 /* signal.c */; };
-		E97C76C21C85380900875F44 /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = E97C76351C8513EB00875F44 /* libevent.a */; };
 		E97C76C31C85394A00875F44 /* poll.c in Sources */ = {isa = PBXBuildFile; fileRef = E97C769D1C85156F00875F44 /* poll.c */; };
 		E97C76C41C85395200875F44 /* select.c in Sources */ = {isa = PBXBuildFile; fileRef = E97C769E1C85156F00875F44 /* select.c */; };
 		E97C76C51C85395700875F44 /* kqueue.c in Sources */ = {isa = PBXBuildFile; fileRef = E97C769A1C85156F00875F44 /* kqueue.c */; };
 		E97C76C61C8539BF00875F44 /* XMLLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E97C762B1C84E11A00875F44 /* XMLLoader.cpp */; };
 		E97C76C71C8539BF00875F44 /* XMLLoader2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E97C762C1C84E11A00875F44 /* XMLLoader2.cpp */; };
 		E97C76CC1C85AFAA00875F44 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = E97C76CA1C85AFAA00875F44 /* Localizable.strings */; };
-		E97C76CF1C85B08900875F44 /* readme.rtf in Resources */ = {isa = PBXBuildFile; fileRef = E97C76CE1C85B08900875F44 /* readme.rtf */; };
 		E97C76D11C85B15800875F44 /* playarc.ww2 in CopyFiles */ = {isa = PBXBuildFile; fileRef = E97C76D01C85B15800875F44 /* playarc.ww2 */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		E97C76D41C85B21200875F44 /* HockeySDK.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = E97C76D31C85B21200875F44 /* HockeySDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		E97C76DA1C87AC6800875F44 /* BuildSettings.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = E97C76D51C87AC6700875F44 /* BuildSettings.xcconfig */; };
-		E97C76DB1C87AC6800875F44 /* CodeSigning.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = E97C76D61C87AC6700875F44 /* CodeSigning.xcconfig */; };
-		E97C76DC1C87AC6800875F44 /* Defines.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = E97C76D71C87AC6800875F44 /* Defines.xcconfig */; };
-		E97C76DD1C87AC6800875F44 /* SearchPaths.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = E97C76D81C87AC6800875F44 /* SearchPaths.xcconfig */; };
-		E97C76DE1C87AC6800875F44 /* Warnings.xcconfig in Resources */ = {isa = PBXBuildFile; fileRef = E97C76D91C87AC6800875F44 /* Warnings.xcconfig */; };
+		FA05B0821C8D3E1800CDE30C /* libgranny2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA05B0811C8D3E1800CDE30C /* libgranny2.a */; };
+		FA08C0761C8D4A1F0002F4B9 /* readme.rtf in Resources */ = {isa = PBXBuildFile; fileRef = FA08C0751C8D4A1F0002F4B9 /* readme.rtf */; };
+		FA13BB171C86758600095818 /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB161C86758600095818 /* libevent.a */; };
+		FA13BB1A1C875F6800095818 /* placeholder-background.png in Resources */ = {isa = PBXBuildFile; fileRef = FA13BB181C875F6800095818 /* placeholder-background.png */; };
+		FA13BB1B1C875F6800095818 /* placeholder-title.png in Resources */ = {isa = PBXBuildFile; fileRef = FA13BB191C875F6800095818 /* placeholder-title.png */; };
+		FA13BB401C87649000095818 /* AGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB391C87649000095818 /* AGL.framework */; };
+		FA13BB411C87649000095818 /* Cocoa.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB3A1C87649000095818 /* Cocoa.framework */; };
+		FA13BB421C87649000095818 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB3B1C87649000095818 /* IOKit.framework */; };
+		FA13BB431C87649000095818 /* OpenAL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB3C1C87649000095818 /* OpenAL.framework */; };
+		FA13BB441C87649000095818 /* OpenGL.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB3D1C87649000095818 /* OpenGL.framework */; };
+		FA13BB451C87649000095818 /* QuickTime.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB3E1C87649000095818 /* QuickTime.framework */; };
+		FA13BB461C87649000095818 /* Security.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB3F1C87649000095818 /* Security.framework */; };
+		FA13BB4A1C8764BB00095818 /* libcrypto.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB481C8764BB00095818 /* libcrypto.tbd */; };
+		FA13BB4B1C8764BB00095818 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB491C8764BB00095818 /* libz.tbd */; };
+		FA13BB4F1C87650800095818 /* libxml2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB4E1C87650800095818 /* libxml2.tbd */; };
+		FA13BB511C87CF8500095818 /* libglew.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB501C87CF8500095818 /* libglew.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1083,8 +1078,6 @@
 		08104D4C103DFBA10065E0E2 /* strpool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = strpool.h; sourceTree = "<group>"; };
 		08104D51103DFBE90065E0E2 /* authClientMessages.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = authClientMessages.cpp; sourceTree = "<group>"; };
 		08104D52103DFBE90065E0E2 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		08104D53103DFBE90065E0E2 /* PGDownloader.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PGDownloader.h; sourceTree = "<group>"; };
-		08104D54103DFBE90065E0E2 /* PGDownloader.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = PGDownloader.m; sourceTree = "<group>"; };
 		08104D55103DFBE90065E0E2 /* syscfg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = syscfg.h; sourceTree = "<group>"; };
 		08104D56103DFBE90065E0E2 /* sysLaunchUrl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sysLaunchUrl.h; sourceTree = "<group>"; };
 		08104D57103DFBE90065E0E2 /* sysMacCompat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sysMacCompat.h; sourceTree = "<group>"; };
@@ -1293,9 +1286,6 @@
 		082899EA10697B620056932F /* dbugExtErrors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dbugExtErrors.h; sourceTree = "<group>"; };
 		082899ED10697B8F0056932F /* listCL.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = listCL.h; sourceTree = "<group>"; };
 		08289DFE1069D3330056932F /* wwiiHCUnits.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wwiiHCUnits.h; sourceTree = "<group>"; };
-		082A41B1143B55930023B243 /* libglew.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libglew.a; path = lib/mac/libglew.a; sourceTree = "<group>"; };
-		082A41B8143B55F60023B243 /* libmacglew.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmacglew.a; path = lib/mac/libmacglew.a; sourceTree = "<group>"; };
-		082CDA161411239E00225E44 /* libcrypto.0.9.8.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libcrypto.0.9.8.dylib; path = usr/lib/libcrypto.0.9.8.dylib; sourceTree = SDKROOT; };
 		082CF7AF120222EB00A60CC2 /* CABufferList.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CABufferList.cpp; sourceTree = "<group>"; };
 		082CF7B0120222EB00A60CC2 /* CABufferList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CABufferList.h; sourceTree = "<group>"; };
 		082CF7B1120222EB00A60CC2 /* CADebugger.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = CADebugger.cpp; sourceTree = "<group>"; };
@@ -1413,7 +1403,6 @@
 		088CE9941379D33600F7AE5D /* SpatialDatabase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SpatialDatabase.cpp; sourceTree = "<group>"; };
 		0894582C13073604009C0B65 /* TextureFont.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = TextureFont.h; sourceTree = "<group>"; };
 		0894582D130736F2009C0B65 /* TextureFont.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = TextureFont.cpp; sourceTree = "<group>"; };
-		08977DB8134CFA2000C9DCFE /* libmacosx_xcode_static.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmacosx_xcode_static.a; path = lib/mac/libmacosx_xcode_static.a; sourceTree = "<group>"; };
 		08977DDC134CFB8500C9DCFE /* ScenarioManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = ScenarioManager.cpp; path = scen/ScenarioManager.cpp; sourceTree = "<group>"; };
 		08977DDD134CFB8500C9DCFE /* ScenarioManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = ScenarioManager.h; path = scen/ScenarioManager.h; sourceTree = "<group>"; };
 		08977E06134CFF6C00C9DCFE /* scenMain.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = scenMain.cpp; path = scen/scenMain.cpp; sourceTree = "<group>"; };
@@ -1427,8 +1416,6 @@
 		089FB52614194F2200EBEB5F /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
 		089FEABC112C5B1200D0F32D /* GenerateIcons.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GenerateIcons.cpp; sourceTree = "<group>"; };
 		089FEABD112C5B1200D0F32D /* GenerateIcons.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenerateIcons.h; sourceTree = "<group>"; };
-		08A4286812C937380041B628 /* libz.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libz.dylib; path = usr/lib/libz.dylib; sourceTree = SDKROOT; };
-		08A4286A12C9375C0041B628 /* libxml2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.dylib; path = usr/lib/libxml2.dylib; sourceTree = SDKROOT; };
 		08A428C012C93A490041B628 /* oglTextureObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = oglTextureObject.cpp; sourceTree = "<group>"; };
 		08A428C112C93A490041B628 /* oglTextureObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = oglTextureObject.h; sourceTree = "<group>"; };
 		08A43F081092021000B13339 /* glplat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glplat.h; sourceTree = "<group>"; };
@@ -1485,25 +1472,14 @@
 		0DBEF4400A7FD8F60094C53D /* libexpat-ww2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libexpat-ww2.a"; path = "lib/mac/libexpat-ww2.a"; sourceTree = SOURCE_ROOT; };
 		0DDF00A308578C460027461D /* libHIDUtilities.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libHIDUtilities.a; path = lib/mac/libHIDUtilities.a; sourceTree = SOURCE_ROOT; };
 		0DDF00A508578C460027461D /* libjs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjs.a; path = lib/mac/libjs.a; sourceTree = SOURCE_ROOT; };
-		0DDF012C0857934A0027461D /* proj/mac/ww2.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; path = proj/mac/ww2.icns; sourceTree = "<group>"; };
 		47B0ED240E9A66A40089DCC4 /* libteulKit.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libteulKit.a; sourceTree = BUILT_PRODUCTS_DIR; };
-		8D0C4E960486CD37000505A6 /* proj/mac/Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist; path = proj/mac/Info.plist; sourceTree = "<group>"; };
+		8D0C4E960486CD37000505A6 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = proj/mac/Info.plist; sourceTree = "<group>"; };
 		8D0C4E970486CD37000505A6 /* World War II Online.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "World War II Online.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E90D96991C6D729D00D5EC52 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
-		E90D969B1C6D738D00D5EC52 /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = ../../../../../../System/Library/Frameworks/AGL.framework; sourceTree = "<group>"; };
-		E90D969D1C6D753D00D5EC52 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = ../../../../../../System/Library/Frameworks/Cocoa.framework; sourceTree = "<group>"; };
-		E90D969F1C6D757400D5EC52 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = ../../../../../../System/Library/Frameworks/IOKit.framework; sourceTree = "<group>"; };
-		E90D96A11C6D75E200D5EC52 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = ../../../../../../System/Library/Frameworks/OpenGL.framework; sourceTree = "<group>"; };
-		E90D96A31C6D760300D5EC52 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = ../../../../../../System/Library/Frameworks/QuickTime.framework; sourceTree = "<group>"; };
-		E90D96A51C6D762800D5EC52 /* System.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = System.framework; path = ../../../../../../System/Library/Frameworks/System.framework; sourceTree = "<group>"; };
 		E90D96A71C6E041300D5EC52 /* HockeySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HockeySDK.framework; path = Vendor/HockeySDK.framework; sourceTree = "<group>"; };
-		E90D96A91C6E2B0900D5EC52 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = ../../../../../../System/Library/Frameworks/OpenAL.framework; sourceTree = "<group>"; };
-		E97C76261C84C29E00875F44 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = ../../../../../../System/Library/Frameworks/Security.framework; sourceTree = "<group>"; };
 		E97C76281C84CD0700875F44 /* locIDs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = locIDs.h; sourceTree = "<group>"; };
 		E97C762B1C84E11A00875F44 /* XMLLoader.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XMLLoader.cpp; sourceTree = "<group>"; };
 		E97C762C1C84E11A00875F44 /* XMLLoader2.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = XMLLoader2.cpp; sourceTree = "<group>"; };
-		E97C762D1C84E36000875F44 /* libxml2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.tbd; path = usr/lib/libxml2.tbd; sourceTree = SDKROOT; };
-		E97C762F1C85126600875F44 /* libxml2.2.dylib */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.dylib"; name = libxml2.2.dylib; path = /usr/lib/libxml2.2.dylib; sourceTree = "<absolute>"; };
 		E97C76351C8513EB00875F44 /* libevent.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = libevent.a; sourceTree = BUILT_PRODUCTS_DIR; };
 		E97C763E1C85156200875F44 /* arc4random.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = arc4random.c; path = ../../Libraries/libevent/arc4random.c; sourceTree = "<group>"; };
 		E97C763F1C85156200875F44 /* buffer_iocp.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = buffer_iocp.c; path = ../../Libraries/libevent/buffer_iocp.c; sourceTree = "<group>"; };
@@ -1573,14 +1549,29 @@
 		E97C76A01C85156F00875F44 /* strlcpy.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = strlcpy.c; path = ../../Libraries/libevent/strlcpy.c; sourceTree = "<group>"; };
 		E97C76CB1C85AFAA00875F44 /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = proj/mac/English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		E97C76CD1C85AFD800875F44 /* ww2.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = ww2.icns; path = proj/mac/ww2.icns; sourceTree = "<group>"; };
-		E97C76CE1C85B08900875F44 /* readme.rtf */ = {isa = PBXFileReference; lastKnownFileType = text.rtf; name = readme.rtf; path = ../../ww2mods135/readme.rtf; sourceTree = "<group>"; };
-		E97C76D01C85B15800875F44 /* playarc.ww2 */ = {isa = PBXFileReference; lastKnownFileType = file; name = playarc.ww2; path = "../../../../../../Applications/World War II Online.app/Contents/MacOS/AppData/playarc.ww2"; sourceTree = "<group>"; };
+		E97C76D01C85B15800875F44 /* playarc.ww2 */ = {isa = PBXFileReference; lastKnownFileType = text; name = playarc.ww2; path = ../WW2Archives/playarc.ww2; sourceTree = SOURCE_ROOT; };
 		E97C76D31C85B21200875F44 /* HockeySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HockeySDK.framework; path = Vendor/HockeySDK.framework; sourceTree = "<group>"; };
-		E97C76D51C87AC6700875F44 /* BuildSettings.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = BuildSettings.xcconfig; path = proj/mac/BuildSettings.xcconfig; sourceTree = "<group>"; };
-		E97C76D61C87AC6700875F44 /* CodeSigning.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = CodeSigning.xcconfig; path = proj/mac/CodeSigning.xcconfig; sourceTree = "<group>"; };
-		E97C76D71C87AC6800875F44 /* Defines.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Defines.xcconfig; path = proj/mac/Defines.xcconfig; sourceTree = "<group>"; };
-		E97C76D81C87AC6800875F44 /* SearchPaths.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = SearchPaths.xcconfig; path = proj/mac/SearchPaths.xcconfig; sourceTree = "<group>"; };
-		E97C76D91C87AC6800875F44 /* Warnings.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Warnings.xcconfig; path = proj/mac/Warnings.xcconfig; sourceTree = "<group>"; };
+		FA05B0811C8D3E1800CDE30C /* libgranny2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgranny2.a; path = lib/mac/libgranny2.a; sourceTree = "<group>"; };
+		FA08C0751C8D4A1F0002F4B9 /* readme.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; name = readme.rtf; path = ../opt/ww2mods/readme.rtf; sourceTree = "<group>"; };
+		FA13BB161C86758600095818 /* libevent.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libevent.a; path = proj/mac/build/Debug/libevent.a; sourceTree = "<group>"; };
+		FA13BB181C875F6800095818 /* placeholder-background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "placeholder-background.png"; path = "proj/mac/placeholder-background.png"; sourceTree = "<group>"; };
+		FA13BB191C875F6800095818 /* placeholder-title.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = "placeholder-title.png"; path = "proj/mac/placeholder-title.png"; sourceTree = "<group>"; };
+		FA13BB391C87649000095818 /* AGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AGL.framework; path = System/Library/Frameworks/AGL.framework; sourceTree = SDKROOT; };
+		FA13BB3A1C87649000095818 /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = System/Library/Frameworks/Cocoa.framework; sourceTree = SDKROOT; };
+		FA13BB3B1C87649000095818 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		FA13BB3C1C87649000095818 /* OpenAL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenAL.framework; path = System/Library/Frameworks/OpenAL.framework; sourceTree = SDKROOT; };
+		FA13BB3D1C87649000095818 /* OpenGL.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = OpenGL.framework; path = System/Library/Frameworks/OpenGL.framework; sourceTree = SDKROOT; };
+		FA13BB3E1C87649000095818 /* QuickTime.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QuickTime.framework; path = System/Library/Frameworks/QuickTime.framework; sourceTree = SDKROOT; };
+		FA13BB3F1C87649000095818 /* Security.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Security.framework; path = System/Library/Frameworks/Security.framework; sourceTree = SDKROOT; };
+		FA13BB481C8764BB00095818 /* libcrypto.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libcrypto.tbd; path = usr/lib/libcrypto.tbd; sourceTree = SDKROOT; };
+		FA13BB491C8764BB00095818 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
+		FA13BB4E1C87650800095818 /* libxml2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.tbd; path = usr/lib/libxml2.tbd; sourceTree = SDKROOT; };
+		FA13BB501C87CF8500095818 /* libglew.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libglew.a; path = lib/mac/libglew.a; sourceTree = "<group>"; };
+		FA3D8BA71C8BF201002C5119 /* CodeSigning.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = CodeSigning.xcconfig; path = proj/mac/CodeSigning.xcconfig; sourceTree = "<group>"; };
+		FA3D8BA81C8BF201002C5119 /* Defines.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Defines.xcconfig; path = proj/mac/Defines.xcconfig; sourceTree = "<group>"; };
+		FA3D8BA91C8BF201002C5119 /* SearchPaths.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = SearchPaths.xcconfig; path = proj/mac/SearchPaths.xcconfig; sourceTree = "<group>"; };
+		FA3D8BAA1C8BF201002C5119 /* Warnings.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Warnings.xcconfig; path = proj/mac/Warnings.xcconfig; sourceTree = "<group>"; };
+		FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = BuildSettings.xcconfig; path = proj/mac/BuildSettings.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1605,24 +1596,26 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E97C76271C84C29E00875F44 /* Security.framework in Frameworks */,
+				FA13BB4F1C87650800095818 /* libxml2.tbd in Frameworks */,
+				FA13BB4A1C8764BB00095818 /* libcrypto.tbd in Frameworks */,
+				FA13BB4B1C8764BB00095818 /* libz.tbd in Frameworks */,
+				FA13BB401C87649000095818 /* AGL.framework in Frameworks */,
+				FA13BB411C87649000095818 /* Cocoa.framework in Frameworks */,
+				FA13BB421C87649000095818 /* IOKit.framework in Frameworks */,
+				FA13BB431C87649000095818 /* OpenAL.framework in Frameworks */,
+				FA13BB441C87649000095818 /* OpenGL.framework in Frameworks */,
+				FA13BB451C87649000095818 /* QuickTime.framework in Frameworks */,
+				FA13BB461C87649000095818 /* Security.framework in Frameworks */,
 				E90D969A1C6D729D00D5EC52 /* WebKit.framework in Frameworks */,
 				082CF80E1202241200A60CC2 /* CoreAudio.framework in Frameworks */,
 				082CF8161202245400A60CC2 /* AudioToolbox.framework in Frameworks */,
 				082CF81C1202248E00A60CC2 /* AudioUnit.framework in Frameworks */,
-				E90D969E1C6D753D00D5EC52 /* Cocoa.framework in Frameworks */,
-				E90D96A01C6D757400D5EC52 /* IOKit.framework in Frameworks */,
-				E90D96A21C6D75E200D5EC52 /* OpenGL.framework in Frameworks */,
-				E90D96A41C6D760300D5EC52 /* QuickTime.framework in Frameworks */,
-				E90D969C1C6D738D00D5EC52 /* AGL.framework in Frameworks */,
+				FA13BB171C86758600095818 /* libevent.a in Frameworks */,
 				089FB52714194F2200EBEB5F /* Carbon.framework in Frameworks */,
-				E90D96A61C6D762800D5EC52 /* System.framework in Frameworks */,
 				E90D96A81C6E041300D5EC52 /* HockeySDK.framework in Frameworks */,
-				E90D96AA1C6E2B0900D5EC52 /* OpenAL.framework in Frameworks */,
 				08D5812E106310FE00177892 /* libmaclib.a in Frameworks */,
 				47B0EDFD0E9A85510089DCC4 /* libteulKit.a in Frameworks */,
-				E97C76C21C85380900875F44 /* libevent.a in Frameworks */,
-				E97C76301C85126600875F44 /* libxml2.2.dylib in Frameworks */,
+				FA05B0821C8D3E1800CDE30C /* libgranny2.a in Frameworks */,
 				0DDF00AA08578C460027461D /* libHIDUtilities.a in Frameworks */,
 				0DDF00AC08578C460027461D /* libjs.a in Frameworks */,
 				0DBEF4410A7FD8F60094C53D /* libexpat-ww2.a in Frameworks */,
@@ -1632,12 +1625,9 @@
 				08744F51107BF96D009DB5AF /* liblua5.1.a in Frameworks */,
 				08744F53107BF977009DB5AF /* libtolua++.a in Frameworks */,
 				087286DF10D1B23B00456009 /* libimapmac.a in Frameworks */,
-				08977DB9134CFA2000C9DCFE /* libmacosx_xcode_static.a in Frameworks */,
-				08A4286912C937380041B628 /* libz.dylib in Frameworks */,
 				08F41C5612D39B7B0001C6F5 /* libfreetype2.a in Frameworks */,
+				FA13BB511C87CF8500095818 /* libglew.a in Frameworks */,
 				08492F5B131708E700C7F39E /* libftgl.a in Frameworks */,
-				082CDA171411239E00225E44 /* libcrypto.0.9.8.dylib in Frameworks */,
-				082A41BA143B561D0023B243 /* libmacglew.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -2544,8 +2534,6 @@
 				0834F1D61045888700E75B52 /* sysWinISO.h */,
 				08104D51103DFBE90065E0E2 /* authClientMessages.cpp */,
 				08104D52103DFBE90065E0E2 /* main.m */,
-				08104D53103DFBE90065E0E2 /* PGDownloader.h */,
-				08104D54103DFBE90065E0E2 /* PGDownloader.m */,
 				08104D55103DFBE90065E0E2 /* syscfg.h */,
 				E97C76281C84CD0700875F44 /* locIDs.h */,
 				08104D56103DFBE90065E0E2 /* sysLaunchUrl.h */,
@@ -3014,11 +3002,12 @@
 			path = ez;
 			sourceTree = "<group>";
 		};
-		0D6E71630AF63EAC00B3B0BD /* proj/mac/English.lproj */ = {
+		0D6E71630AF63EAC00B3B0BD /* English.lproj */ = {
 			isa = PBXGroup;
 			children = (
 				0D6E71660AF63EAC00B3B0BD /* MainMenu.nib */,
 			);
+			name = English.lproj;
 			path = proj/mac/English.lproj;
 			sourceTree = "<group>";
 		};
@@ -3110,12 +3099,7 @@
 		20286C29FDCF999611CA2CEA /* WW2OL */ = {
 			isa = PBXGroup;
 			children = (
-				E97C76DF1C87AC6D00875F44 /* Config */,
-				E97C76D31C85B21200875F44 /* HockeySDK.framework */,
-				E97C76D01C85B15800875F44 /* playarc.ww2 */,
-				E97C76CE1C85B08900875F44 /* readme.rtf */,
-				E97C76CD1C85AFD800875F44 /* ww2.icns */,
-				E97C76CA1C85AFAA00875F44 /* Localizable.strings */,
+				FA3D8BB11C8BF5CC002C5119 /* Config */,
 				0DA6D33608563A0900A53577 /* src */,
 				20286C32FDCF999611CA2CEA /* lib */,
 				20286C2CFDCF999611CA2CEA /* rsrc */,
@@ -3127,9 +3111,14 @@
 		20286C2CFDCF999611CA2CEA /* rsrc */ = {
 			isa = PBXGroup;
 			children = (
-				0D6E71630AF63EAC00B3B0BD /* proj/mac/English.lproj */,
-				0DDF012C0857934A0027461D /* proj/mac/ww2.icns */,
-				8D0C4E960486CD37000505A6 /* proj/mac/Info.plist */,
+				FA08C0751C8D4A1F0002F4B9 /* readme.rtf */,
+				E97C76D01C85B15800875F44 /* playarc.ww2 */,
+				E97C76CD1C85AFD800875F44 /* ww2.icns */,
+				E97C76CA1C85AFAA00875F44 /* Localizable.strings */,
+				FA13BB181C875F6800095818 /* placeholder-background.png */,
+				FA13BB191C875F6800095818 /* placeholder-title.png */,
+				0D6E71630AF63EAC00B3B0BD /* English.lproj */,
+				8D0C4E960486CD37000505A6 /* Info.plist */,
 			);
 			name = rsrc;
 			sourceTree = "<group>";
@@ -3137,18 +3126,18 @@
 		20286C32FDCF999611CA2CEA /* lib */ = {
 			isa = PBXGroup;
 			children = (
-				E97C76261C84C29E00875F44 /* Security.framework */,
-				E90D96A91C6E2B0900D5EC52 /* OpenAL.framework */,
+				FA05B0811C8D3E1800CDE30C /* libgranny2.a */,
+				FA13BB391C87649000095818 /* AGL.framework */,
+				FA13BB3A1C87649000095818 /* Cocoa.framework */,
+				FA13BB3B1C87649000095818 /* IOKit.framework */,
+				FA13BB3C1C87649000095818 /* OpenAL.framework */,
+				FA13BB3D1C87649000095818 /* OpenGL.framework */,
+				FA13BB3E1C87649000095818 /* QuickTime.framework */,
+				FA13BB3F1C87649000095818 /* Security.framework */,
+				E97C76D31C85B21200875F44 /* HockeySDK.framework */,
 				E90D96A71C6E041300D5EC52 /* HockeySDK.framework */,
-				E90D96A51C6D762800D5EC52 /* System.framework */,
-				E90D96A31C6D760300D5EC52 /* QuickTime.framework */,
-				E90D96A11C6D75E200D5EC52 /* OpenGL.framework */,
-				E90D969F1C6D757400D5EC52 /* IOKit.framework */,
-				E90D969D1C6D753D00D5EC52 /* Cocoa.framework */,
-				E90D969B1C6D738D00D5EC52 /* AGL.framework */,
-				082A41B1143B55930023B243 /* libglew.a */,
-				082A41B8143B55F60023B243 /* libmacglew.a */,
 				0898699D13A2BB4C00D643A0 /* libotmac.a */,
+				FA13BB501C87CF8500095818 /* libglew.a */,
 				08492F5A131708E700C7F39E /* libftgl.a */,
 				08F41C5512D39B7B0001C6F5 /* libfreetype2.a */,
 				082CF80D1202241200A60CC2 /* CoreAudio.framework */,
@@ -3157,6 +3146,7 @@
 				08DDF925106928D800720B71 /* libmacode.a */,
 				E90D96991C6D729D00D5EC52 /* WebKit.framework */,
 				087286DE10D1B23B00456009 /* libimapmac.a */,
+				FA13BB161C86758600095818 /* libevent.a */,
 				0863B34D10619AC8005FDF19 /* libphui.a */,
 				0863B34E10619AC8005FDF19 /* libspeedtreemac.a */,
 				0DBEF4400A7FD8F60094C53D /* libexpat-ww2.a */,
@@ -3164,10 +3154,9 @@
 				0DDF00A508578C460027461D /* libjs.a */,
 				08744F50107BF96D009DB5AF /* liblua5.1.a */,
 				08744F52107BF977009DB5AF /* libtolua++.a */,
-				08A4286812C937380041B628 /* libz.dylib */,
-				08A4286A12C9375C0041B628 /* libxml2.dylib */,
-				08977DB8134CFA2000C9DCFE /* libmacosx_xcode_static.a */,
-				082CDA161411239E00225E44 /* libcrypto.0.9.8.dylib */,
+				FA13BB481C8764BB00095818 /* libcrypto.tbd */,
+				FA13BB491C8764BB00095818 /* libz.tbd */,
+				FA13BB4E1C87650800095818 /* libxml2.tbd */,
 				089FB52614194F2200EBEB5F /* Carbon.framework */,
 			);
 			name = lib;
@@ -3242,20 +3231,18 @@
 				E97C765C1C85156300875F44 /* select.c */,
 				E97C765D1C85156300875F44 /* signal.c */,
 				E97C765E1C85156300875F44 /* strlcpy.c */,
-				E97C762F1C85126600875F44 /* libxml2.2.dylib */,
-				E97C762D1C84E36000875F44 /* libxml2.tbd */,
 			);
 			name = event;
 			sourceTree = "<group>";
 		};
-		E97C76DF1C87AC6D00875F44 /* Config */ = {
+		FA3D8BB11C8BF5CC002C5119 /* Config */ = {
 			isa = PBXGroup;
 			children = (
-				E97C76D51C87AC6700875F44 /* BuildSettings.xcconfig */,
-				E97C76D61C87AC6700875F44 /* CodeSigning.xcconfig */,
-				E97C76D71C87AC6800875F44 /* Defines.xcconfig */,
-				E97C76D81C87AC6800875F44 /* SearchPaths.xcconfig */,
-				E97C76D91C87AC6800875F44 /* Warnings.xcconfig */,
+				FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */,
+				FA3D8BA71C8BF201002C5119 /* CodeSigning.xcconfig */,
+				FA3D8BA81C8BF201002C5119 /* Defines.xcconfig */,
+				FA3D8BA91C8BF201002C5119 /* SearchPaths.xcconfig */,
+				FA3D8BAA1C8BF201002C5119 /* Warnings.xcconfig */,
 			);
 			name = Config;
 			sourceTree = "<group>";
@@ -3428,7 +3415,7 @@
 				};
 			};
 			buildConfigurationList = 0DA6CEFA0856391C00A53577 /* Build configuration list for PBXProject "WW2OL" */;
-			compatibilityVersion = "Xcode 3.2";
+			compatibilityVersion = "Xcode 6.3";
 			developmentRegion = English;
 			hasScannedForEncodings = 1;
 			knownRegions = (
@@ -3454,15 +3441,11 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FA08C0761C8D4A1F0002F4B9 /* readme.rtf in Resources */,
 				0D6E716D0AF63EAC00B3B0BD /* MainMenu.nib in Resources */,
-				E97C76DD1C87AC6800875F44 /* SearchPaths.xcconfig in Resources */,
-				E97C76DB1C87AC6800875F44 /* CodeSigning.xcconfig in Resources */,
-				E97C76DE1C87AC6800875F44 /* Warnings.xcconfig in Resources */,
+				FA13BB1B1C875F6800095818 /* placeholder-title.png in Resources */,
+				FA13BB1A1C875F6800095818 /* placeholder-background.png in Resources */,
 				E97C76CC1C85AFAA00875F44 /* Localizable.strings in Resources */,
-				E97C76DA1C87AC6800875F44 /* BuildSettings.xcconfig in Resources */,
-				E97C76DC1C87AC6800875F44 /* Defines.xcconfig in Resources */,
-				0DDF012D0857934A0027461D /* proj/mac/ww2.icns in Resources */,
-				E97C76CF1C85B08900875F44 /* readme.rtf in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3967,1664 +3950,203 @@
 /* End PBXVariantGroup section */
 
 /* Begin XCBuildConfiguration section */
-		080C7E881062F012000A242F /* Beta Release */ = {
+		085BD0C9110F5D560063F377 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
 				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(SRCROOT)/vendor",
-					"$(PROJECT_DIR)/Vendor",
-				);
-				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRC_ROOT)/src\"",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"/usr/local/lib/**",
-					"$(PROJECT_DIR)/lib/mac",
-				);
-				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = maclib;
-				SEPARATE_STRIP = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-			};
-			name = "Beta Release";
-		};
-		085BD0C9110F5D560063F377 /* Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = E97C76D51C87AC6700875F44 /* BuildSettings.xcconfig */;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
 				DEPLOYMENT_POSTPROCESSING = YES;
-				ENABLE_TESTABILITY = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(SRCROOT)/vendor",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = fast;
-				GCC_PRECOMPILE_PREFIX_HEADER = NO;
-				GCC_PREFIX_HEADER = "";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"_MACOSX=1",
-					"platOS=OS_MACOS",
-					XP_MAC,
-					ENABLE_FLOATERS,
-					"RELEASE_CLIENT=1",
-					EVENT_LOG,
-					_OPTIONS_BELOW_THIS_LINE,
-					"TEUL_PACKET_NAMES=0",
-				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO;
-				GCC_WARN_SIGN_COMPARE = NO;
-				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
-				GCC_WARN_UNUSED_VARIABLE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PNG)",
-					"\"$(SRCROOT)/../Libraries/ft2/include\"",
-					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
-					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
-					"\"$(SDKROOT)/usr/include/libxml2\"",
-					"\"$(SRCROOT)/../Libraries/opende/include\"",
-					"\"$(SRCROOT)/include/Cg\"",
-					"\"$(SRCROOT)/include\"",
-					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
-					"\"$(SRCROOT)/src/math\"",
-					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
-					"\"$(SRCROOT)/../Libraries/ft2/include/freetype\"",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inheritied)",
-					"\"$(SRCROOT)/lib/mac\"",
-				);
-				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OBJROOT = proj/mac/build;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "-bind_at_load";
-				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = YES;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
 				SDKROOT = macosx;
-				SEPARATE_STRIP = NO;
-				SHARED_PRECOMPS_DIR = "$(CACHE_ROOT)/SharedPrecompiledHeaders";
 				SKIP_INSTALL = YES;
-				STRIP_STYLE = debugging;
 				SYMROOT = proj/mac/build;
-				USER_HEADER_SEARCH_PATHS = "../Libraries/ftgl/src ../Libraries/glew/include/ ../Libraries/phui/include/ include/ include/bt ../Libraries/opende/include/ include/js include/libxml include/lua include/mac src src/auth src/chat src/dbug src/include src/sysmac src/teul src/weap ../Libraries/libxml2/include/libxml/ src/spt";
-				VALID_ARCHS = "i386 x86_64";
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wdeprecated",
-				);
+				VALID_ARCHS = i386;
 			};
 			name = Release;
 		};
 		085BD0CA110F5D560063F377 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_WARN_BOOL_CONVERSION = NO;
-				CLANG_WARN_CONSTANT_CONVERSION = NO;
-				CLANG_X86_VECTOR_INSTRUCTIONS = default;
-				COMBINE_HIDPI_IMAGES = NO;
-				COPY_PHASE_STRIP = YES;
-				ENABLE_TESTABILITY = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(SRCROOT)/vendor",
-					"$(PROJECT_DIR)/Vendor",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = fast;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"_MACOSX=1",
-					"platOS=OS_MACOS",
-					XP_MAC,
-					ENABLE_FLOATERS,
-					"RELEASE_CLIENT=1",
-					EVENT_LOG,
-					_OPTIONS_BELOW_THIS_LINE,
-					"TEUL_PACKET_NAMES=1",
-				);
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
-				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/lib/mac\"",
 					"$(PROJECT_DIR)/lib/mac",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "-bind_at_load";
-				PRELINK_LIBS = "";
+				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
 				PRODUCT_NAME = "World War II Online";
-				REBUILDMDL = 0;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-				VALID_ARCHS = "i386 x86_64";
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wdeprecated",
-				);
 				WRAPPER_EXTENSION = app;
-				WW2MODS = "${PROJECT_DIR}/../ww2mods";
 			};
 			name = Release;
 		};
 		085BD0CB110F5D560063F377 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(SRCROOT)/vendor",
-				);
-				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_PFE_FILE_C_DIALECTS = "c++";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = src/teul/syscfg.h;
-				GCC_VERSION = "";
-				GENERATE_MASTER_OBJECT_FILE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
-					"\"$(SRCROOT)/../Libraries/libevent/include\"",
-				);
-				LD_OPENMP_FLAGS = "";
 				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "";
-				PRELINK_LIBS = "";
-				PRODUCT_NAME = teulKit;
-				SEPARATE_STRIP = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
 		085BD0CC110F5D560063F377 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(SRCROOT)/vendor",
-					"$(PROJECT_DIR)/Vendor",
-				);
-				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRC_ROOT)/src\"",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/lib/mac\"/**",
-					"$(PROJECT_DIR)/lib/mac",
-				);
 				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = maclib;
-				SEPARATE_STRIP = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
 		085BD0CD110F5D5C0063F377 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = E97C76D51C87AC6700875F44 /* BuildSettings.xcconfig */;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
 				ALWAYS_SEARCH_USER_PATHS = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
 				DEPLOYMENT_POSTPROCESSING = YES;
-				ENABLE_TESTABILITY = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(SRCROOT)/vendor",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
 				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_PRECOMPILE_PREFIX_HEADER = NO;
-				GCC_PREFIX_HEADER = "";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"_MACOSX=1",
-					"platOS=OS_MACOS",
-					XP_MAC,
-					ENABLE_FLOATERS,
-					"RELEASE_CLIENT=1",
-					EVENT_LOG,
-					_OPTIONS_BELOW_THIS_LINE,
-					"TEUL_PACKET_NAMES=1",
-				);
 				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO;
-				GCC_WARN_SIGN_COMPARE = NO;
-				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
-				GCC_WARN_UNUSED_VARIABLE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PNG)",
-					"\"$(SRCROOT)/../Libraries/ft2/include\"",
-					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
-					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
-					"\"$(SDKROOT)/usr/include/libxml2\"",
-					"\"$(SRCROOT)/../Libraries/opende/include\"",
-					"\"$(SRCROOT)/include/Cg\"",
-					"\"$(SRCROOT)/include\"",
-					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
-					"\"$(SRCROOT)/src/math\"",
-					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
-					"\"$(SRCROOT)/../Libraries/ft2/include/freetype\"",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inheritied)",
-					"\"$(SRCROOT)/lib/mac\"",
-				);
-				MACH_O_TYPE = mh_execute;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
 				OBJROOT = proj/mac/build;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = "-bind_at_load";
-				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = YES;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
 				SDKROOT = macosx;
-				SEPARATE_STRIP = NO;
-				SHARED_PRECOMPS_DIR = "$(CACHE_ROOT)/SharedPrecompiledHeaders";
 				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = "non-global";
 				SYMROOT = proj/mac/build;
-				USER_HEADER_SEARCH_PATHS = "../Libraries/ftgl/src ../Libraries/glew/include/ ../Libraries/phui/include/ include/ include/bt ../Libraries/opende/include/ include/js include/libxml include/lua include/mac src src/auth src/chat src/dbug src/include src/sysmac src/teul src/weap ../Libraries/libxml2/include/libxml/ src/spt";
-				VALID_ARCHS = "i386 x86_64";
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wdeprecated",
-				);
+				VALID_ARCHS = i386;
 			};
 			name = Debug;
 		};
 		085BD0CE110F5D5C0063F377 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_WARN_BOOL_CONVERSION = NO;
-				CLANG_WARN_CONSTANT_CONVERSION = NO;
-				CLANG_X86_VECTOR_INSTRUCTIONS = default;
-				COMBINE_HIDPI_IMAGES = NO;
-				COPY_PHASE_STRIP = YES;
-				ENABLE_TESTABILITY = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(SRCROOT)/vendor",
-					"$(PROJECT_DIR)/Vendor",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"_MACOSX=1",
-					"platOS=OS_MACOS",
-					XP_MAC,
-					ENABLE_FLOATERS,
-					"RELEASE_CLIENT=0",
-					EVENT_LOG,
-					_OPTIONS_BELOW_THIS_LINE,
-					"TEUL_PACKET_NAMES=1",
-				);
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
-				HEADER_SEARCH_PATHS = "$(inherited)";
 				INFOPLIST_FILE = proj/mac/Info.plist;
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
-					"\"$(SRCROOT)/lib/mac\"",
 					"$(PROJECT_DIR)/lib/mac",
 				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "-bind_at_load";
-				PRELINK_LIBS = "";
+				MACH_O_TYPE = mh_execute;
 				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
 				PRODUCT_NAME = "World War II Online";
-				REBUILDMDL = 0;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-				VALID_ARCHS = "i386 x86_64";
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wdeprecated",
-				);
 				WRAPPER_EXTENSION = app;
-				WW2MODS = "${PROJECT_DIR}/../ww2mods";
 			};
 			name = Debug;
 		};
 		085BD0CF110F5D5C0063F377 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(SRCROOT)/vendor",
-				);
-				GCC_PFE_FILE_C_DIALECTS = "c++";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = src/teul/syscfg.h;
-				GCC_VERSION = "";
-				GENERATE_MASTER_OBJECT_FILE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
-					"\"$(SRCROOT)/../Libraries/libevent/include\"",
-				);
-				LD_OPENMP_FLAGS = "";
 				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "";
-				PRELINK_LIBS = "";
-				PRODUCT_NAME = teulKit;
-				SEPARATE_STRIP = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
 		};
 		085BD0D0110F5D5C0063F377 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(SRCROOT)/vendor",
-					"$(PROJECT_DIR)/Vendor",
-				);
-				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRC_ROOT)/src\"",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/lib/mac\"/**",
-					"$(PROJECT_DIR)/lib/mac",
-				);
 				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = maclib;
-				SEPARATE_STRIP = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
+				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
-		};
-		085BD0DE110F5F290063F377 /* Debug Optimized */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = E97C76D51C87AC6700875F44 /* BuildSettings.xcconfig */;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEPLOYMENT_POSTPROCESSING = YES;
-				ENABLE_TESTABILITY = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(SRCROOT)/vendor",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
-				GCC_OPTIMIZATION_LEVEL = fast;
-				GCC_PRECOMPILE_PREFIX_HEADER = NO;
-				GCC_PREFIX_HEADER = "";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"_MACOSX=1",
-					"platOS=OS_MACOS",
-					XP_MAC,
-					ENABLE_FLOATERS,
-					"RELEASE_CLIENT=1",
-					EVENT_LOG,
-					_OPTIONS_BELOW_THIS_LINE,
-					"TEUL_PACKET_NAMES=1",
-				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO;
-				GCC_WARN_SIGN_COMPARE = NO;
-				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
-				GCC_WARN_UNUSED_VARIABLE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PNG)",
-					"\"$(SRCROOT)/../Libraries/ft2/include\"",
-					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
-					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
-					"\"$(SDKROOT)/usr/include/libxml2\"",
-					"\"$(SRCROOT)/../Libraries/opende/include\"",
-					"\"$(SRCROOT)/include/Cg\"",
-					"\"$(SRCROOT)/include\"",
-					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
-					"\"$(SRCROOT)/src/math\"",
-					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
-					"\"$(SRCROOT)/../Libraries/ft2/include/freetype\"",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inheritied)",
-					"\"$(SRCROOT)/lib/mac\"",
-				);
-				MACH_O_TYPE = mh_execute;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				OBJROOT = proj/mac/build;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "-bind_at_load";
-				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = YES;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
-				SDKROOT = macosx;
-				SEPARATE_STRIP = NO;
-				SHARED_PRECOMPS_DIR = "$(CACHE_ROOT)/SharedPrecompiledHeaders";
-				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = "non-global";
-				SYMROOT = proj/mac/build;
-				USER_HEADER_SEARCH_PATHS = "../Libraries/ftgl/src ../Libraries/glew/include/ ../Libraries/phui/include/ include/ include/bt ../Libraries/opende/include/ include/js include/libxml include/lua include/mac src src/auth src/chat src/dbug src/include src/sysmac src/teul src/weap ../Libraries/libxml2/include/libxml/ src/spt";
-				VALID_ARCHS = "i386 x86_64";
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wdeprecated",
-				);
-			};
-			name = "Debug Optimized";
-		};
-		085BD0DF110F5F290063F377 /* Debug Optimized */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_WARN_BOOL_CONVERSION = NO;
-				CLANG_WARN_CONSTANT_CONVERSION = NO;
-				CLANG_X86_VECTOR_INSTRUCTIONS = default;
-				COMBINE_HIDPI_IMAGES = NO;
-				COPY_PHASE_STRIP = YES;
-				ENABLE_TESTABILITY = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(SRCROOT)/vendor",
-					"$(PROJECT_DIR)/Vendor",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = fast;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"_MACOSX=1",
-					"platOS=OS_MACOS",
-					XP_MAC,
-					ENABLE_FLOATERS,
-					"RELEASE_CLIENT=0",
-					EVENT_LOG,
-					_OPTIONS_BELOW_THIS_LINE,
-					"TEUL_PACKET_NAMES=1",
-				);
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
-				HEADER_SEARCH_PATHS = "$(inherited)";
-				INFOPLIST_FILE = proj/mac/Info.plist;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(PROJECT_DIR)/lib/mac",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "-bind_at_load";
-				PRELINK_LIBS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
-				PRODUCT_NAME = "World War II Online";
-				REBUILDMDL = 0;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-				VALID_ARCHS = "i386 x86_64";
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wdeprecated",
-				);
-				WRAPPER_EXTENSION = app;
-				WW2MODS = "${PROJECT_DIR}/../ww2mods";
-			};
-			name = "Debug Optimized";
-		};
-		085BD0E0110F5F290063F377 /* Debug Optimized */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(SRCROOT)/vendor",
-				);
-				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_PFE_FILE_C_DIALECTS = "c++";
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = src/teul/syscfg.h;
-				GCC_VERSION = "";
-				GENERATE_MASTER_OBJECT_FILE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
-					"\"$(SRCROOT)/../Libraries/libevent/include\"",
-				);
-				LD_OPENMP_FLAGS = "";
-				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "";
-				PRELINK_LIBS = "";
-				PRODUCT_NAME = teulKit;
-				SEPARATE_STRIP = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-			};
-			name = "Debug Optimized";
-		};
-		085BD0E1110F5F290063F377 /* Debug Optimized */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(SRCROOT)/vendor",
-					"$(PROJECT_DIR)/Vendor",
-				);
-				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRC_ROOT)/src\"",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/lib/mac\"/**",
-					"$(PROJECT_DIR)/lib/mac",
-				);
-				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = maclib;
-				SEPARATE_STRIP = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-			};
-			name = "Debug Optimized";
-		};
-		088DF82D11343DC30040BC8F /* Closed Beta Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = E97C76D51C87AC6700875F44 /* BuildSettings.xcconfig */;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEPLOYMENT_POSTPROCESSING = YES;
-				ENABLE_TESTABILITY = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(SRCROOT)/vendor",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
-				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_PRECOMPILE_PREFIX_HEADER = NO;
-				GCC_PREFIX_HEADER = "";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"_MACOSX=1",
-					"IS_BIG_ENDIAN=__BIG_ENDIAN__",
-					XP_MAC,
-					"RELEASE_CLIENT=1",
-					BETA_RELEASE,
-					ENABLE_FLOATERS,
-					"platOS=OS_MACOS",
-					"TEUL_PACKET_NAMES=0",
-				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO;
-				GCC_WARN_SIGN_COMPARE = NO;
-				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
-				GCC_WARN_UNUSED_VARIABLE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PNG)",
-					"\"$(SRCROOT)/../Libraries/ft2/include\"",
-					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
-					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
-					"\"$(SDKROOT)/usr/include/libxml2\"",
-					"\"$(SRCROOT)/../Libraries/opende/include\"",
-					"\"$(SRCROOT)/include/Cg\"",
-					"\"$(SRCROOT)/include\"",
-					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
-					"\"$(SRCROOT)/src/math\"",
-					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
-					"\"$(SRCROOT)/../Libraries/ft2/include/freetype\"",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inheritied)",
-					"\"$(SRCROOT)/lib/mac\"",
-				);
-				MACH_O_TYPE = mh_execute;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				OBJROOT = proj/mac/build;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "-bind_at_load";
-				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = YES;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
-				SDKROOT = macosx;
-				SEPARATE_STRIP = NO;
-				SHARED_PRECOMPS_DIR = "$(CACHE_ROOT)/SharedPrecompiledHeaders";
-				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = YES;
-				STRIP_STYLE = "non-global";
-				SYMROOT = proj/mac/build;
-				USER_HEADER_SEARCH_PATHS = "../Libraries/ftgl/src ../Libraries/glew/include/ ../Libraries/phui/include/ include/ include/bt ../Libraries/opende/include/ include/js include/libxml include/lua include/mac src src/auth src/chat src/dbug src/include src/sysmac src/teul src/weap ../Libraries/libxml2/include/libxml/ src/spt";
-				VALID_ARCHS = "i386 x86_64";
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wdeprecated",
-				);
-			};
-			name = "Closed Beta Release";
-		};
-		088DF82E11343DC30040BC8F /* Closed Beta Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_WARN_BOOL_CONVERSION = NO;
-				CLANG_WARN_CONSTANT_CONVERSION = NO;
-				CLANG_X86_VECTOR_INSTRUCTIONS = default;
-				COMBINE_HIDPI_IMAGES = NO;
-				COPY_PHASE_STRIP = YES;
-				ENABLE_TESTABILITY = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(SRCROOT)/vendor",
-					"$(PROJECT_DIR)/Vendor",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"_MACOSX=1",
-					"IS_BIG_ENDIAN=__BIG_ENDIAN__",
-					XP_MAC,
-					"RELEASE_CLIENT=1",
-					BETA_RELEASE,
-					ENABLE_FLOATERS,
-					"platOS=OS_MACOS",
-					"TEUL_PACKET_NAMES=0",
-				);
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
-				HEADER_SEARCH_PATHS = "$(inherited)";
-				INFOPLIST_FILE = proj/mac/Info.plist;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(PROJECT_DIR)/lib/mac",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "-bind_at_load";
-				PRELINK_LIBS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
-				PRODUCT_NAME = "World War II Online";
-				REBUILDMDL = 0;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-				VALID_ARCHS = "i386 x86_64";
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wdeprecated",
-				);
-				WRAPPER_EXTENSION = app;
-				WW2MODS = "${PROJECT_DIR}/../ww2mods";
-			};
-			name = "Closed Beta Release";
-		};
-		088DF82F11343DC30040BC8F /* Closed Beta Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(SRCROOT)/vendor",
-				);
-				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_PFE_FILE_C_DIALECTS = "c++";
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = src/teul/syscfg.h;
-				GCC_VERSION = "";
-				GENERATE_MASTER_OBJECT_FILE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
-					"\"$(SRCROOT)/../Libraries/libevent/include\"",
-				);
-				LD_OPENMP_FLAGS = "";
-				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "";
-				PRELINK_LIBS = "";
-				PRODUCT_NAME = teulKit;
-				SEPARATE_STRIP = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-			};
-			name = "Closed Beta Release";
-		};
-		088DF83011343DC30040BC8F /* Closed Beta Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(SRCROOT)/vendor",
-					"$(PROJECT_DIR)/Vendor",
-				);
-				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRC_ROOT)/src\"",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/lib/mac\"/**",
-					"$(PROJECT_DIR)/lib/mac",
-				);
-				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = maclib;
-				SEPARATE_STRIP = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-			};
-			name = "Closed Beta Release";
-		};
-		0897A0F111B9530200F72FC0 /* Release With Symbols */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = E97C76D51C87AC6700875F44 /* BuildSettings.xcconfig */;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEPLOYMENT_POSTPROCESSING = YES;
-				ENABLE_TESTABILITY = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(SRCROOT)/vendor",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
-				GCC_OPTIMIZATION_LEVEL = fast;
-				GCC_PRECOMPILE_PREFIX_HEADER = NO;
-				GCC_PREFIX_HEADER = "";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"_MACOSX=1",
-					"IS_BIG_ENDIAN=__BIG_ENDIAN__",
-					XP_MAC,
-					"RELEASE_CLIENT=1",
-					"platOS=OS_MACOS",
-					"TEUL_PACKET_NAMES=0",
-				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO;
-				GCC_WARN_SIGN_COMPARE = NO;
-				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
-				GCC_WARN_UNUSED_VARIABLE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PNG)",
-					"\"$(SRCROOT)/../Libraries/ft2/include\"",
-					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
-					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
-					"\"$(SDKROOT)/usr/include/libxml2\"",
-					"\"$(SRCROOT)/../Libraries/opende/include\"",
-					"\"$(SRCROOT)/include/Cg\"",
-					"\"$(SRCROOT)/include\"",
-					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
-					"\"$(SRCROOT)/src/math\"",
-					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
-					"\"$(SRCROOT)/../Libraries/ft2/include/freetype\"",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inheritied)",
-					"\"$(SRCROOT)/lib/mac\"",
-				);
-				MACH_O_TYPE = mh_execute;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				OBJROOT = proj/mac/build;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "-bind_at_load";
-				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = YES;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
-				SDKROOT = macosx;
-				SEPARATE_STRIP = NO;
-				SHARED_PRECOMPS_DIR = "$(CACHE_ROOT)/SharedPrecompiledHeaders";
-				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = NO;
-				STRIP_STYLE = "non-global";
-				SYMROOT = proj/mac/build;
-				USER_HEADER_SEARCH_PATHS = "../Libraries/ftgl/src ../Libraries/glew/include/ ../Libraries/phui/include/ include/ include/bt ../Libraries/opende/include/ include/js include/libxml include/lua include/mac src src/auth src/chat src/dbug src/include src/sysmac src/teul src/weap ../Libraries/libxml2/include/libxml/ src/spt";
-				VALID_ARCHS = "i386 x86_64";
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wdeprecated",
-				);
-			};
-			name = "Release With Symbols";
-		};
-		0897A0F211B9530200F72FC0 /* Release With Symbols */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_WARN_BOOL_CONVERSION = NO;
-				CLANG_WARN_CONSTANT_CONVERSION = NO;
-				CLANG_X86_VECTOR_INSTRUCTIONS = default;
-				COMBINE_HIDPI_IMAGES = NO;
-				COPY_PHASE_STRIP = YES;
-				ENABLE_TESTABILITY = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(SRCROOT)/vendor",
-					"$(PROJECT_DIR)/Vendor",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = fast;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"_MACOSX=1",
-					"platOS=OS_MACOS",
-					XP_MAC,
-					"RELEASE_CLIENT=1",
-					"IS_BIG_ENDIAN=__BIG_ENDIAN__",
-					"TEUL_PACKET_NAMES=0",
-				);
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
-				HEADER_SEARCH_PATHS = "$(inherited)";
-				INFOPLIST_FILE = proj/mac/Info.plist;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(PROJECT_DIR)/lib/mac",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "-bind_at_load";
-				PRELINK_LIBS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
-				PRODUCT_NAME = "World War II Online";
-				REBUILDMDL = 0;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-				VALID_ARCHS = "i386 x86_64";
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wdeprecated",
-				);
-				WRAPPER_EXTENSION = app;
-				WW2MODS = "${PROJECT_DIR}/../ww2mods";
-			};
-			name = "Release With Symbols";
-		};
-		0897A0F311B9530200F72FC0 /* Release With Symbols */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(SRCROOT)/vendor",
-				);
-				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_PFE_FILE_C_DIALECTS = "c++";
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = src/teul/syscfg.h;
-				GCC_VERSION = "";
-				GENERATE_MASTER_OBJECT_FILE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
-					"\"$(SRCROOT)/../Libraries/libevent/include\"",
-				);
-				LD_OPENMP_FLAGS = "";
-				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "";
-				PRELINK_LIBS = "";
-				PRODUCT_NAME = teulKit;
-				SEPARATE_STRIP = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-			};
-			name = "Release With Symbols";
-		};
-		0897A0F411B9530200F72FC0 /* Release With Symbols */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(SRCROOT)/vendor",
-					"$(PROJECT_DIR)/Vendor",
-				);
-				GCC_VERSION = "";
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRC_ROOT)/src\"",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/lib/mac\"/**",
-					"$(PROJECT_DIR)/lib/mac",
-				);
-				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "";
-				PRODUCT_NAME = maclib;
-				SEPARATE_STRIP = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-			};
-			name = "Release With Symbols";
-		};
-		0DF859190870692100A6D554 /* Beta Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				CLANG_WARN_BOOL_CONVERSION = NO;
-				CLANG_WARN_CONSTANT_CONVERSION = NO;
-				CLANG_X86_VECTOR_INSTRUCTIONS = default;
-				COMBINE_HIDPI_IMAGES = NO;
-				COPY_PHASE_STRIP = YES;
-				ENABLE_TESTABILITY = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(SRCROOT)/vendor",
-					"$(PROJECT_DIR)/Vendor",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"_MACOSX=1",
-					"platOS=OS_MACOS",
-					XP_MAC,
-					ENABLE_FLOATERS,
-					"RELEASE_CLIENT=1",
-					EVENT_LOG,
-					_OPTIONS_BELOW_THIS_LINE,
-					BETA_RELEASE,
-					xWANT_BUZZARD_OFFLINE,
-					"xIS_BIG_ENDIAN=__BIG_ENDIAN__",
-					"TEUL_PACKET_NAMES=0",
-				);
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
-				HEADER_SEARCH_PATHS = "$(inherited)";
-				INFOPLIST_FILE = proj/mac/Info.plist;
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(PROJECT_DIR)/lib/mac",
-				);
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "-bind_at_load";
-				PRELINK_LIBS = "";
-				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
-				PRODUCT_NAME = "World War II Online";
-				REBUILDMDL = 0;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
-				SDKROOT = macosx;
-				SKIP_INSTALL = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-				VALID_ARCHS = "i386 x86_64";
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wdeprecated",
-				);
-				WRAPPER_EXTENSION = app;
-				WW2MODS = "${PROJECT_DIR}/../ww2mods";
-			};
-			name = "Beta Release";
-		};
-		0DF8591A0870692100A6D554 /* Beta Release */ = {
-			isa = XCBuildConfiguration;
-			baseConfigurationReference = E97C76D51C87AC6700875F44 /* BuildSettings.xcconfig */;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
-				CLANG_CXX_LIBRARY = "libc++";
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				DEPLOYMENT_POSTPROCESSING = YES;
-				ENABLE_TESTABILITY = NO;
-				EXCLUDED_RECURSIVE_SEARCH_PATH_SUBDIRECTORIES = "*.nib *.lproj *.framework *.gch *.xcode* *.xcassets (*) .DS_Store CVS .svn .git .hg *.pbproj *.pbxproj";
-				FRAMEWORK_SEARCH_PATHS = (
-					"\"$(SRCROOT)/lib/mac\"",
-					"$(SRCROOT)/vendor",
-				);
-				GCC_C_LANGUAGE_STANDARD = gnu11;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				GCC_ENABLE_OBJC_EXCEPTIONS = YES;
-				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
-				GCC_INLINES_ARE_PRIVATE_EXTERN = NO;
-				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_PRECOMPILE_PREFIX_HEADER = NO;
-				GCC_PREFIX_HEADER = "";
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"_MACOSX=1",
-					"platOS=OS_MACOS",
-					XP_MAC,
-					ENABLE_FLOATERS,
-					"RELEASE_CLIENT=1",
-					EVENT_LOG,
-					_OPTIONS_BELOW_THIS_LINE,
-					BETA_RELEASE,
-					"TEUL_PACKET_NAMES=0",
-				);
-				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
-				GCC_UNROLL_LOOPS = YES;
-				GCC_VERSION = "";
-				GCC_WARN_ABOUT_DEPRECATED_FUNCTIONS = YES;
-				GCC_WARN_ABOUT_POINTER_SIGNEDNESS = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_NON_VIRTUAL_DESTRUCTOR = NO;
-				GCC_WARN_SIGN_COMPARE = NO;
-				GCC_WARN_TYPECHECK_CALLS_TO_PRINTF = YES;
-				GCC_WARN_UNUSED_VARIABLE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PNG)",
-					"\"$(SRCROOT)/../Libraries/ft2/include\"",
-					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
-					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
-					"\"$(SDKROOT)/usr/include/libxml2\"",
-					"\"$(SRCROOT)/../Libraries/opende/include\"",
-					"\"$(SRCROOT)/include/Cg\"",
-					"\"$(SRCROOT)/include\"",
-					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
-					"\"$(SRCROOT)/src/math\"",
-					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
-					"\"$(SRCROOT)/../Libraries/ft2/include/freetype\"",
-				);
-				LIBRARY_SEARCH_PATHS = (
-					"$(inheritied)",
-					"\"$(SRCROOT)/lib/mac\"",
-				);
-				MACH_O_TYPE = mh_execute;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				OBJROOT = proj/mac/build;
-				ONLY_ACTIVE_ARCH = NO;
-				OTHER_CFLAGS = "";
-				OTHER_LDFLAGS = "-bind_at_load";
-				PRECOMPS_INCLUDE_HEADERS_FROM_BUILT_PRODUCTS_DIR = YES;
-				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = NO;
-				SDKROOT = macosx;
-				SEPARATE_STRIP = NO;
-				SHARED_PRECOMPS_DIR = "$(CACHE_ROOT)/SharedPrecompiledHeaders";
-				SKIP_INSTALL = YES;
-				STRIP_INSTALLED_PRODUCT = YES;
-				STRIP_STYLE = debugging;
-				SYMROOT = proj/mac/build;
-				USER_HEADER_SEARCH_PATHS = "../Libraries/ftgl/src ../Libraries/glew/include/ ../Libraries/phui/include/ include/ include/bt ../Libraries/opende/include/ include/js include/libxml include/lua include/mac src src/auth src/chat src/dbug src/include src/sysmac src/teul src/weap ../Libraries/libxml2/include/libxml/ src/spt";
-				VALID_ARCHS = "i386 x86_64";
-				WARNING_CFLAGS = (
-					"-Wall",
-					"-Wdeprecated",
-				);
-			};
-			name = "Beta Release";
-		};
-		47B0ED280E9A66A40089DCC4 /* Beta Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = YES;
-				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
-				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
-				CLANG_CXX_LIBRARY = "libc++";
-				COMBINE_HIDPI_IMAGES = YES;
-				ENABLE_OPENMP_SUPPORT = NO;
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SRCROOT)/lib/mac",
-					"$(SRCROOT)/vendor",
-				);
-				GCC_OPTIMIZATION_LEVEL = s;
-				GCC_PFE_FILE_C_DIALECTS = "c++";
-				GCC_PRECOMPILE_PREFIX_HEADER = YES;
-				GCC_PREFIX_HEADER = src/teul/syscfg.h;
-				GCC_VERSION = "";
-				GENERATE_MASTER_OBJECT_FILE = NO;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
-					"\"$(SRCROOT)/../Libraries/libevent/include\"",
-				);
-				LD_OPENMP_FLAGS = "";
-				MACH_O_TYPE = staticlib;
-				OTHER_LDFLAGS = "";
-				PRELINK_LIBS = "";
-				PRODUCT_NAME = teulKit;
-				SEPARATE_STRIP = YES;
-				USER_HEADER_SEARCH_PATHS = "$(inherited)";
-			};
-			name = "Beta Release";
-		};
-		E97C76371C8513EB00875F44 /* Beta Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
-				EXECUTABLE_PREFIX = lib;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PNG)",
-					"\"$(SYSROOT)/usr/include\"",
-					/usr/include,
-					"\"$(SRCROOT)/../Libraries/ft2/include\"",
-					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
-					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
-					"\"$(SDKROOT)/usr/include/libxml2\"",
-					"\"$(SRCROOT)/../Libraries/opende/include\"",
-					"\"$(SRCROOT)/include/Cg\"",
-					"\"$(SRCROOT)/include\"",
-					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
-					"\"$(SRCROOT)/src/math\"",
-					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
-					"\"$(SRCROOT)/../Libraries/ft2/include/freetype\"",
-					"\"$(SRCROOT)/../Libraries/libevent\"",
-					"\"$(SRCROOT)/../Libraries/libevent/include\"",
-					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
-				);
-				MACH_O_TYPE = staticlib;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				MTL_ENABLE_DEBUG_INFO = YES;
-				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Beta Release";
-		};
-		E97C76381C8513EB00875F44 /* Closed Beta Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
-				COPY_PHASE_STRIP = NO;
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				EXECUTABLE_PREFIX = lib;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PNG)",
-					"\"$(SYSROOT)/usr/include\"",
-					/usr/include,
-					"\"$(SRCROOT)/../Libraries/ft2/include\"",
-					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
-					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
-					"\"$(SDKROOT)/usr/include/libxml2\"",
-					"\"$(SRCROOT)/../Libraries/opende/include\"",
-					"\"$(SRCROOT)/include/Cg\"",
-					"\"$(SRCROOT)/include\"",
-					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
-					"\"$(SRCROOT)/src/math\"",
-					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
-					"\"$(SRCROOT)/../Libraries/ft2/include/freetype\"",
-					"\"$(SRCROOT)/../Libraries/libevent\"",
-					"\"$(SRCROOT)/../Libraries/libevent/include\"",
-					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
-				);
-				MACH_O_TYPE = staticlib;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				MTL_ENABLE_DEBUG_INFO = NO;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Closed Beta Release";
 		};
 		E97C76391C8513EB00875F44 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
-				EXECUTABLE_PREFIX = lib;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"$(inherited)",
-					"DEBUG=1",
-				);
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PNG)",
-					"\"$(SYSROOT)/usr/include\"",
-					/usr/include,
-					"\"$(SRCROOT)/../Libraries/ft2/include\"",
-					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
-					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
-					"\"$(SDKROOT)/usr/include/libxml2\"",
-					"\"$(SRCROOT)/../Libraries/opende/include\"",
-					"\"$(SRCROOT)/include/Cg\"",
-					"\"$(SRCROOT)/include\"",
-					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
-					"\"$(SRCROOT)/src/math\"",
-					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
-					"\"$(SRCROOT)/../Libraries/ft2/include/freetype\"",
-					"\"$(SRCROOT)/../Libraries/libevent\"",
-					"\"$(SRCROOT)/../Libraries/libevent/include\"",
-					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
-				);
 				MACH_O_TYPE = staticlib;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				MTL_ENABLE_DEBUG_INFO = YES;
-				ONLY_ACTIVE_ARCH = YES;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;
 		};
-		E97C763A1C8513EB00875F44 /* Debug Optimized */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
-				COPY_PHASE_STRIP = NO;
-				DEBUG_INFORMATION_FORMAT = dwarf;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				ENABLE_TESTABILITY = YES;
-				EXECUTABLE_PREFIX = lib;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_PREPROCESSOR_DEFINITIONS = (
-					"DEBUG=1",
-					"$(inherited)",
-				);
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PNG)",
-					"\"$(SYSROOT)/usr/include\"",
-					/usr/include,
-					"\"$(SRCROOT)/../Libraries/ft2/include\"",
-					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
-					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
-					"\"$(SDKROOT)/usr/include/libxml2\"",
-					"\"$(SRCROOT)/../Libraries/opende/include\"",
-					"\"$(SRCROOT)/include/Cg\"",
-					"\"$(SRCROOT)/include\"",
-					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
-					"\"$(SRCROOT)/src/math\"",
-					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
-					"\"$(SRCROOT)/../Libraries/ft2/include/freetype\"",
-					"\"$(SRCROOT)/../Libraries/libevent\"",
-					"\"$(SRCROOT)/../Libraries/libevent/include\"",
-					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
-				);
-				MACH_O_TYPE = staticlib;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				MTL_ENABLE_DEBUG_INFO = YES;
-				ONLY_ACTIVE_ARCH = YES;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-			};
-			name = "Debug Optimized";
-		};
 		E97C763B1C8513EB00875F44 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
-				COPY_PHASE_STRIP = NO;
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				EXECUTABLE_PREFIX = lib;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PNG)",
-					"\"$(SYSROOT)/usr/include\"",
-					/usr/include,
-					"\"$(SRCROOT)/../Libraries/ft2/include\"",
-					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
-					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
-					"\"$(SDKROOT)/usr/include/libxml2\"",
-					"\"$(SRCROOT)/../Libraries/opende/include\"",
-					"\"$(SRCROOT)/include/Cg\"",
-					"\"$(SRCROOT)/include\"",
-					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
-					"\"$(SRCROOT)/src/math\"",
-					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
-					"\"$(SRCROOT)/../Libraries/ft2/include/freetype\"",
-					"\"$(SRCROOT)/../Libraries/libevent\"",
-					"\"$(SRCROOT)/../Libraries/libevent/include\"",
-					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
-				);
 				MACH_O_TYPE = staticlib;
-				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				MTL_ENABLE_DEBUG_INFO = NO;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Release;
 		};
-		E97C763C1C8513EB00875F44 /* Release With Symbols */ = {
+		FA3D8BB21C8BF6D6002C5119 /* Development */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
 			buildSettings = {
-				ALWAYS_SEARCH_USER_PATHS = NO;
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				CLANG_ENABLE_MODULES = YES;
-				CLANG_ENABLE_OBJC_ARC = YES;
-				CLANG_WARN_BOOL_CONVERSION = YES;
-				CLANG_WARN_CONSTANT_CONVERSION = YES;
-				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
-				CLANG_WARN_EMPTY_BODY = YES;
-				CLANG_WARN_ENUM_CONVERSION = YES;
-				CLANG_WARN_INT_CONVERSION = YES;
-				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
-				CLANG_WARN_UNREACHABLE_CODE = YES;
-				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
-				CODE_SIGN_IDENTITY = "-";
-				COPY_PHASE_STRIP = NO;
-				ENABLE_NS_ASSERTIONS = NO;
-				ENABLE_STRICT_OBJC_MSGSEND = YES;
-				EXECUTABLE_PREFIX = lib;
-				GCC_C_LANGUAGE_STANDARD = gnu99;
-				GCC_NO_COMMON_BLOCKS = YES;
-				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
-				GCC_WARN_UNDECLARED_SELECTOR = YES;
-				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
-				GCC_WARN_UNUSED_FUNCTION = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				HEADER_SEARCH_PATHS = (
-					"$(inherited)",
-					"$(PNG)",
-					"\"$(SYSROOT)/usr/include\"",
-					/usr/include,
-					"\"$(SRCROOT)/../Libraries/ft2/include\"",
-					"\"$(SRCROOT)/../Libraries/OpenThreadsMac\"",
-					"\"$(SRCROOT)/../Libraries/zeromq/include\"",
-					"\"$(SDKROOT)/usr/include/libxml2\"",
-					"\"$(SRCROOT)/../Libraries/opende/include\"",
-					"\"$(SRCROOT)/include/Cg\"",
-					"\"$(SRCROOT)/include\"",
-					"\"$(SRCROOT)/../Libraries/ftgl/src\"",
-					"\"$(SRCROOT)/src/math\"",
-					"\"$(SRCROOT)/../Libraries/tolua++/include\"",
-					"\"$(SRCROOT)/../Libraries/ft2/include/freetype\"",
-					"\"$(SRCROOT)/../Libraries/libevent\"",
-					"\"$(SRCROOT)/../Libraries/libevent/include\"",
-					"\"$(SRCROOT)/../Libraries/libevent/OSX-Code\"",
-				);
-				MACH_O_TYPE = staticlib;
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				DEPLOYMENT_POSTPROCESSING = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
 				MACOSX_DEPLOYMENT_TARGET = 10.9;
-				MTL_ENABLE_DEBUG_INFO = NO;
+				OBJROOT = proj/mac/build;
+				OTHER_LDFLAGS = "-bind_at_load";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SYMROOT = proj/mac/build;
+				VALID_ARCHS = i386;
+			};
+			name = Development;
+		};
+		FA3D8BB31C8BF6D6002C5119 /* Development */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
+				INFOPLIST_FILE = proj/mac/Info.plist;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/lib/mac",
+				);
+				MACH_O_TYPE = mh_execute;
+				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
+				PRODUCT_NAME = "World War II Online";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Development;
+		};
+		FA3D8BB41C8BF6D6002C5119 /* Development */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = src/teul/syscfg.h;
+				MACH_O_TYPE = staticlib;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
-			name = "Release With Symbols";
+			name = Development;
+		};
+		FA3D8BB51C8BF6D6002C5119 /* Development */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				MACH_O_TYPE = staticlib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Development;
+		};
+		FA3D8BB61C8BF6D6002C5119 /* Development */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				MACH_O_TYPE = staticlib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Development;
 		};
 /* End XCBuildConfiguration section */
 
@@ -5632,12 +4154,9 @@
 		080C7E971062F021000A242F /* Build configuration list for PBXNativeTarget "maclib" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				080C7E881062F012000A242F /* Beta Release */,
-				088DF83011343DC30040BC8F /* Closed Beta Release */,
 				085BD0D0110F5D5C0063F377 /* Debug */,
-				085BD0E1110F5F290063F377 /* Debug Optimized */,
+				FA3D8BB51C8BF6D6002C5119 /* Development */,
 				085BD0CC110F5D560063F377 /* Release */,
-				0897A0F411B9530200F72FC0 /* Release With Symbols */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -5645,12 +4164,9 @@
 		0DA6CEF60856391C00A53577 /* Build configuration list for PBXNativeTarget "WW2OL" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				0DF859190870692100A6D554 /* Beta Release */,
-				088DF82E11343DC30040BC8F /* Closed Beta Release */,
 				085BD0CE110F5D5C0063F377 /* Debug */,
-				085BD0DF110F5F290063F377 /* Debug Optimized */,
+				FA3D8BB31C8BF6D6002C5119 /* Development */,
 				085BD0CA110F5D560063F377 /* Release */,
-				0897A0F211B9530200F72FC0 /* Release With Symbols */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -5658,12 +4174,9 @@
 		0DA6CEFA0856391C00A53577 /* Build configuration list for PBXProject "WW2OL" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				0DF8591A0870692100A6D554 /* Beta Release */,
-				088DF82D11343DC30040BC8F /* Closed Beta Release */,
 				085BD0CD110F5D5C0063F377 /* Debug */,
-				085BD0DE110F5F290063F377 /* Debug Optimized */,
+				FA3D8BB21C8BF6D6002C5119 /* Development */,
 				085BD0C9110F5D560063F377 /* Release */,
-				0897A0F111B9530200F72FC0 /* Release With Symbols */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -5671,12 +4184,9 @@
 		47B0ED290E9A66C50089DCC4 /* Build configuration list for PBXNativeTarget "teulKit" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				47B0ED280E9A66A40089DCC4 /* Beta Release */,
-				088DF82F11343DC30040BC8F /* Closed Beta Release */,
 				085BD0CF110F5D5C0063F377 /* Debug */,
-				085BD0E0110F5F290063F377 /* Debug Optimized */,
+				FA3D8BB41C8BF6D6002C5119 /* Development */,
 				085BD0CB110F5D560063F377 /* Release */,
-				0897A0F311B9530200F72FC0 /* Release With Symbols */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -5684,12 +4194,9 @@
 		E97C76361C8513EB00875F44 /* Build configuration list for PBXNativeTarget "event" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				E97C76371C8513EB00875F44 /* Beta Release */,
-				E97C76381C8513EB00875F44 /* Closed Beta Release */,
 				E97C76391C8513EB00875F44 /* Debug */,
-				E97C763A1C8513EB00875F44 /* Debug Optimized */,
+				FA3D8BB61C8BF6D6002C5119 /* Development */,
 				E97C763B1C8513EB00875F44 /* Release */,
-				E97C763C1C8513EB00875F44 /* Release With Symbols */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

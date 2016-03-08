@@ -1453,11 +1453,9 @@ static bool _inTargetFacilityRange(FLOAT32 distance, SINT32 side)
 
 	bool friendly = (so->Side() == side);
 
-    if(so->StratClass() == SDM_CLASS_FACILITY)
+	if ( so->StratClass() == SDM_CLASS_FACILITY || so->StratType() == SDM_CP_BRIDGE )
 		return _checkFacilityRange(distance, so, side, friendly);
 	else if(so->StratClass() != SDM_CLASS_CP)
-		return false;
-	else if(so->StratType() == SDM_CP_BRIDGE)
 		return false;
 
 	StratDB::StratObject::ChildList cl = so->ChildStratObjects();

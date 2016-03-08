@@ -26,8 +26,8 @@
 #include "auth/authAppIDs.h"
 #include <netdb.h>
 #include <arpa/inet.h>
+#include "sysLaunchURL.h"
 
-//#define PLAYGATE_VERSION 0x01010109
 #define PLAYGATE_VERSION 0x00010109
 
 #define DEFAULT_AUTH_SERVER "auth.playnet.com"
@@ -59,7 +59,7 @@ enum
     WAIT_PATCH_ABORTED
 };
 
-WW2AppDelegate* gPlayGateAppDelegate;
+static WW2AppDelegate* gPlayGateAppDelegate;
 
 extern NSString * const PGErrorDomain;
 extern NSString * const PGteulErrorDomain;
@@ -364,18 +364,113 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
 @synthesize userPassword = _userPassword;
 @synthesize patchDownloadTask = _patchDownloadTask;
 
-- (void)setAuthReply:(APP_LAUNCH *)reply
+////////////////////////////////////////////////////////////////////////////////
+// WebView magic starts here
+// Bad bad hack.
+static int staticLoadState = 0;
+
+static NSString *placeholderHTML = @""
+@"<html>"
+@"<head>"
+@"<style type=\"text/css\">"
+@"body {"
+@"    background-image: url('placeholder-background.png');\n"
+@"    background-repeat: no-repeat;\n"
+@"    background-size: 100% auto;\n"
+@"    background-position: top center;\n"
+@"    background-color: #f4f4f4;\n"
+@"}\n"
+@"div.hi { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); }\n"
+@"img { height: 90px; }\n"
+@"</style>"
+@"</head>"
+@"<body>"
+@"<div class=\"hi\">"
+@"<a href=\"http://wwiionline.com/\">"
+@"<img src=\"placeholder-title.png\"/>"
+@"</a>"
+@"</div>"
+@"</body>"
+@"</html>"
+;
+
+- (void)webView:(id)sender didFinishLoadForFrame:(id)frame
 {
-    memcpy(&authReply, reply, sizeof(APP_LAUNCH));
+    switch (staticLoadState) {
+        case 0: { // loaded the static placeholder
+            staticLoadState = 1;
+            
+            NSURLRequest *playnetHome = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://webmap.wwiionline.com/"]];
+
+            ((void (*)(id, SEL, NSURLRequest *))objc_msgSend)(frame, @selector(loadRequest:), playnetHome);
+            break;
+        }
+        case 1: // loaded the webmap
+            staticLoadState = 2;
+            ((void (*)(id, SEL, id))objc_msgSend)(sender, @selector(setFrameLoadDelegate:), nil);
+            break;
+        case 2: // should never get here
+            assert(false);
+            [[clang::fallthrough]];
+        default: // any nonsense state is even less good
+            [NSException raise:NSInternalInconsistencyException format:@"bad load state"];
+            break;
+    }
+}
+
+extern NSString *WebActionOriginalURLKey;
+
+- (void)webView:(id)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation
+        request:(NSURLRequest *)request frame:(id)frame decisionListener:(id)listener
+{
+    if (staticLoadState > 0 && ![request.URL.host isEqualToString:@"webmap.wwiionline.com"]) {
+        // Note: The use of a separate variable here is not simply for
+        // verbosity; the openURL method of NSWorkspace is marked _Nonnull, and
+        // a dictionary returns _Nullable pointers. Thus the check is necessary
+        // for safety (such that failing to apply it would, in case of a nil
+        // value, crash the program with an exception).
+        NSURL *originalURL = actionInformation[WebActionOriginalURLKey];
+        
+        if (originalURL) {
+            [[NSWorkspace sharedWorkspace] openURL:originalURL];
+        }
+        ((void (*)(id, SEL))objc_msgSend)(listener, @selector(ignore));
+    } else {
+        ((void (*)(id, SEL))objc_msgSend)(listener, @selector(use));
+    }
+}
+
+- (void)webView:(id)sender decidePolicyForNewWindowAction:(NSDictionary *)actionInformation
+        request:(NSURLRequest *)request newFrameName:(NSString *)frameName decisionListener:(id)listener
+{
+    NSURL *originalURL = actionInformation[WebActionOriginalURLKey];
+    
+    if (originalURL) {
+        [[NSWorkspace sharedWorkspace] openURL:originalURL];
+    }
+    ((void (*)(id, SEL))objc_msgSend)(listener, @selector(ignore));
 }
 
 - (void)goHome
 {
-    NSURLRequest *playnetHome = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://wwiionline.com/index.php"]];
+    staticLoadState = 0;
     
     // We can't actually import WebKit because the JSContext from phui conflicts
     id frame = ((id (*)(id, SEL))objc_msgSend)(webView, @selector(mainFrame));
-    ((void (*)(id, SEL, NSURLRequest *))objc_msgSend)(frame, @selector(loadRequest:), playnetHome);
+    
+    ((void (*)(id, SEL, id))objc_msgSend)(webView, @selector(setFrameLoadDelegate:), self);
+    ((void (*)(id, SEL, id))objc_msgSend)(webView, @selector(setPolicyDelegate:), self);
+    
+    // Put a static placeholder into the webview until the load is done.
+    ((void (*)(id, SEL, NSString *, NSURL *))objc_msgSend)(frame, @selector(loadHTMLString:baseURL:), placeholderHTML, [[NSBundle mainBundle] resourceURL]);
+}
+
+// END WebView magic
+////////////////////////////////////////////////////////////////////////////////
+
+- (void)setAuthReply:(APP_LAUNCH *)reply
+{
+    memcpy(&authReply, reply, sizeof(APP_LAUNCH));
 }
 
 - (IBAction)clearUserNameAndPassword:(id)sender
@@ -496,12 +591,11 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
     }
     
     cfgPrefsLoad();
-    //      mngoptParse("");
     
     // Skip all the auth stuff if we already have an IP as defined by a ticket file
     if(GameServerIP[0])
     {
-        self->state = WAIT_APPLE_EVT;
+        state = WAIT_APPLE_EVT;
         [self launchOffline:self];
         return;
     }
@@ -530,26 +624,17 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
     
     NSMutableParagraphStyle *style = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
     style.alignment = NSCenterTextAlignment;
-    NSAttributedString *str = [[[NSAttributedString alloc] initWithString:websiteLink.stringValue attributes:@{
-                                                                                                               NSLinkAttributeName: websiteLink.stringValue,
-                                                                                                               NSParagraphStyleAttributeName: style,
-                                                                                                               NSForegroundColorAttributeName: [NSColor blueColor],
-                                                                                                               NSUnderlineStyleAttributeName: @(NSUnderlineStyleSingle),
-                                                                                                               NSFontAttributeName: [NSFont systemFontOfSize:15.0],
-                                                                                                               }] autorelease];
-    
-    [websiteLink setAllowsEditingTextAttributes:YES];
-    [websiteLink setSelectable:YES];
-    [websiteLink addCursorRect:(NSRect){ NSZeroPoint, websiteLink.bounds.size } cursor:[NSCursor pointingHandCursor]];
-    [websiteLink setAttributedStringValue:str];
-    
     style = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
     style.alignment = NSCenterTextAlignment;
-    str = [[[NSAttributedString alloc] initWithString:playOnlineButton.title attributes:@{
-                                                                                          NSFontAttributeName: playOnlineButton.font,
-                                                                                          NSParagraphStyleAttributeName: style,
-                                                                                          NSBaselineOffsetAttributeName: @(4.0),
-                                                                                          }] autorelease];
+
+    NSAttributedString *str = [[[NSAttributedString alloc]
+    	initWithString:playOnlineButton.title
+        attributes:@{
+          NSFontAttributeName: (NSFont * _Nonnull)playOnlineButton.font,
+          NSParagraphStyleAttributeName: style,
+          NSBaselineOffsetAttributeName: @(4.0),
+        }]
+    autorelease];
     
     [playOnlineButton setAttributedTitle:str];
     
@@ -578,7 +663,7 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
 }
 
 // Starts the authentication process
-- (IBAction)launchOnline:(id)sender;
+- (IBAction)launchOnline:(id)sender
 {
     if (state == WAIT_APPLE_EVT) {
 
@@ -595,6 +680,7 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
 
 - (void)sysmain:(NSTimer*)timer
 {
+    dbugInit(LOG_TO_FILE, nullptr);
     [self closeAllWindows];
     try
     {
@@ -700,7 +786,7 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
                                           (__bridge id)kSecClass: (__bridge id)kSecClassGenericPassword,
                                           (__bridge id)kSecAttrService: [NSBundle mainBundle].bundleIdentifier,
                                           (__bridge id)kSecAttrAccount: self.userName,
-                                          (__bridge id)kSecValueData: [[passwordField stringValue] dataUsingEncoding:NSUTF8StringEncoding],
+                                          (__bridge id)kSecValueData: [[passwordField stringValue] dataUsingEncoding:NSUTF8StringEncoding] ?: [NSData data],
                                           //        (__bridge id)kSecAttrAccessible: (__bridge id)kSecAttrAccessibleWhenUnlocked,
                                           };
     
@@ -1332,15 +1418,16 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 -(IBAction)doCalibrate:(id)sender
 {
     int joynum = [sender tag];
-    id joyMenu;
+    id joyMenu = nil;
     static int i;
     
     if(joynum > -1 && joynum < MAX_HID_STICKS)
     {
         if(joynum == 1) joyMenu = joy1;
-        if(joynum == 2) joyMenu = joy2;
-        if(joynum == 3) joyMenu = joy3;
-        if(joynum == 4) joyMenu = joy4;
+        else if(joynum == 2) joyMenu = joy2;
+        else if(joynum == 3) joyMenu = joy3;
+        else if(joynum == 4) joyMenu = joy4;
+        else [NSException raise:NSInternalInconsistencyException format:@""];
         
         i = [joyMenu indexOfSelectedItem] - 1;
         

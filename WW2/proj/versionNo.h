@@ -4,12 +4,12 @@
 #define PN_WW2_PRODUCT_NO	1
 #define PN_WW2_VERSION_NO	35
 #define PN_WW2_PATCH_NO		0
-#define PN_WW2_BUILD_NO		6
+#define PN_WW2_BUILD_NO		7
 ////////// End of don't-reformat section
 
-#define FILEVER				1,35,0,6
+#define FILEVER				1,35,0,7
 #define PRODUCTVER			1,35,0
-#define STRFILEVER			"1.35.0.6"
+#define STRFILEVER			"1.35.0.7"
 #define STRPRODUCTVER		"1.35.0"
 #define	STRVER				STRFILEVER
 #define TEULVERMIN			"1.4.0.0"

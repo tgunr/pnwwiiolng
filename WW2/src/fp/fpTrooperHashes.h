@@ -10,7 +10,7 @@
 // If the switch statement begins to complain about variable names,
 // then you will need to change the name or hash function.
 //
-// Copyright (C) PlayNet, Inc 1999-2005 - All rights reserved.
+// Copyright (C) PlayNet, Inc 1999-2014 - All rights reserved.
 // Not for redistribution.
 //
 // Originating Programmer: Oliver "kfsone" Smith
@@ -29,6 +29,7 @@ static const UINT64 hgr39File_hash = 569840ULL;
 static const UINT64 aimControl_hash = 748307ULL;
 static const UINT64 lebelFile_hash = 797936ULL;
 static const UINT64 mas36File_hash = 802544ULL;
+static const UINT64 mas40File_hash = 802032ULL;
 static const UINT64 millsFile_hash = 978928ULL;
 static const UINT64 binocsFile_hash = 1063920ULL;
 static const UINT64 lugerFile_hash = 1082096ULL;
@@ -193,11 +194,16 @@ static const UINT64 colt1911File_hash = 26186224ULL;
 static const UINT64 springfld1903File_hash = 98766393328ULL;
 static const UINT64 bronwingbarFile_hash = 1724818160ULL;
 static const UINT64 gew43File_hash = 491504ULL;
+static const UINT64 gew41File_hash = 490992ULL;
 static const UINT64 mark2File_hash = 854768ULL;
 static const UINT64 bazookaFile_hash = 2984432ULL;
 static const UINT64 pzschreckFile_hash = 376673264ULL;
 static const UINT64 m1903a3File_hash = 18446744073705927664ULL;
 static const UINT64 ussmokeFile_hash = 27135472ULL;
 static const UINT64 piatFile_hash = 283888ULL;
+static const UINT64 stenmk2File_hash = 24378096ULL ;
+static const UINT64 m3a1File_hash = 18446744073709548016ULL ;
+static const UINT64 mp34File_hash = 797680ULL ;
+static const UINT64 fg42gFile_hash = 195568ULL;
 
 static const UINT64 eyeHeights_hash = 2722382ULL;

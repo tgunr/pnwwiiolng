@@ -18,6 +18,12 @@
 #include "phui/Util.h"
 #include "phui/UIXML.h"
 
+#ifdef _WIN32
+#define snprintf _snprintf
+#else
+#define stricmp strcasecmp
+#endif
+
 using namespace phui;
 
 class View::UserDataMap : public std::map<std::string, referenced_ptr> {};

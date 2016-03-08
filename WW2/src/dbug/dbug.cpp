@@ -139,7 +139,7 @@ static void
 _qualifyFilename(const char* filename, char* const output, const size_t outputSize)
 {
 	if ( filename == nullptr || filename[0] == 0 )
-		filename = "logfile";
+        return;
 
 	// Already qualified.
 	if ( filename[0] == '.' || filename[0] == '/' || filename[0] == '\\' || filename[1] == ':')
@@ -182,7 +182,7 @@ _openDbugFile(const char* const srcFile_)
 
 	_qualifyFilename(srcFile_, filename, sizeof(filename));
 
-	if (PN_UNLIKELY(filename != nullptr))
+	if (PN_UNLIKELY(srcFile_ != nullptr))
 	{
 		int oflags = _O_CREAT|_O_WRONLY|_O_TRUNC;
 

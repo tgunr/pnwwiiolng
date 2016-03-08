@@ -71,6 +71,8 @@ static const char* branches[MAX_BRANCHES] = {"none", "army", "airforce", "navy" 
 JSClass jsClient::jsclass = JS_CLASS_MACRO("client");
 JSFunctionSpec jsClient::jsfunctions[] =
 {
+	JS_FUNCTION_SPEC(jsClient, getmisscountry,1),
+	JS_FUNCTION_SPEC(jsClient, getmissbrigade,1),
 	JS_FUNCTION_SPEC(jsClient, acceptmission,1),
 	JS_FUNCTION_SPEC(jsClient, spawn,1),
 	JS_FUNCTION_SPEC(jsClient, selectpersona,1),
@@ -86,6 +88,7 @@ JSFunctionSpec jsClient::jsfunctions[] =
 	JS_FUNCTION_SPEC(jsClient, acceptcrew,1),
 	JS_FUNCTION_SPEC(jsClient, requestpersonalist,0),
 	JS_FUNCTION_SPEC(jsClient, requestmissionlist,0),
+	JS_FUNCTION_SPEC(jsClient, requestquickmissionlist,0),
 	JS_FUNCTION_SPEC(jsClient, exitmission,0),
 	JS_FUNCTION_SPEC(jsClient, cancelandexitmission,0),
 	JS_FUNCTION_SPEC(jsClient, requestbrigadedetail,1),
@@ -201,6 +204,55 @@ jsClient::jsClient(ww2::Client* c) :
 jsClient::~jsClient()
 {
 }
+
+
+/************************************************************************************************
+	mission info retrieval
+*************************************************************************************************/
+
+JS_FUNCTION_DEF(jsClient, getmisscountry) {
+	*rval = INT_TO_JSVAL(-1);
+
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx,jsobj);
+	if ( argc < 1 ) return JS_FALSE;
+	if ( ! jsclient ) return JS_FALSE;
+
+	int32 miss_id;
+	JS_ValueToInt32(ctx, argv[0], &miss_id);
+
+	ww2::Client* client = jsclient->client;
+	for ( auto it = client->Missions().begin() ; it != client->Missions().end() ; ++it ) {
+		if ( it->m_missionID == miss_id ) {
+			*rval = INT_TO_JSVAL(it->m_countryID);
+			return JS_TRUE;
+		}
+	}
+
+	return JS_FALSE;
+}
+
+
+JS_FUNCTION_DEF(jsClient, getmissbrigade) {
+	*rval = INT_TO_JSVAL(-1);
+
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx,jsobj);
+	if ( argc < 1 ) return JS_FALSE;
+	if ( ! jsclient ) return JS_FALSE;
+
+	int32 miss_id;
+	JS_ValueToInt32(ctx, argv[0], &miss_id);
+
+	ww2::Client* client = jsclient->client;
+	for ( auto it = client->Missions().begin() ; it != client->Missions().end() ; ++it ) {
+		if ( it->m_missionID == miss_id ) {
+			*rval = INT_TO_JSVAL(it->m_brigadeID);
+			return JS_TRUE;
+		}
+	}
+
+	return JS_FALSE;
+}
+
 
 /************************************************************************************************
 	acceptmission
@@ -962,6 +1014,17 @@ JS_FUNCTION_DEF(jsClient, requestmissionlist)
 
 	jsclient->client->RequestMissionList();
 
+	return JS_TRUE;
+}
+
+
+JS_FUNCTION_DEF(jsClient, requestquickmissionlist) {
+	*rval = BOOLEAN_TO_JSVAL(JS_TRUE);
+
+	jsClient* jsclient = phui::js::Cast<jsClient*>(ctx,jsobj);
+	if ( ! jsclient ) return JS_FALSE;
+
+	jsclient->client->RequestQuickMissionList();
 	return JS_TRUE;
 }
 /************************************************************************************************

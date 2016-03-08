@@ -151,36 +151,10 @@ bool fioLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 	fioOpen
 *************************************************************************************************/
 
-#if platOS == OS_MACOS
-static void myReplace(std::string& str, const std::string& old, const std::string& nw)
-{
-  size_t pos = 0;
-  while((pos = str.find(old, pos)) != std::string::npos)
-  {
-    str.replace(pos, old.length(), nw);
-    pos += nw.length();
-  }
-}
-
-static void fixer(const char*filename, char*temp)
-{
-  std::string str(filename);
-  myReplace( str, "%5c", "/" );
-  myReplace( str, "%5C", "/" );
-  strcpy(temp, str.c_str());
-}
-
-#endif
 int fioOpen(const char* const filename)
 {
     int fd = -1;
     const char* fn = filename;
-
-#if platOS == OS_MACOS
-  char temp[PATH_MAX]; // remove the damn %5C that libxml2 puts into paths in OS 10.5 (sometimes)
-  fixer(filename,temp);
-    fn = temp;
-#endif
 
 	switch(fio_switch)
     {
