@@ -70,6 +70,14 @@
             argument = "-datadir $(SRCROOT)/../opt/ww2mods/DATA/"
             isEnabled = "YES">
          </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-authserver authdevng.playnet.com"
+            isEnabled = "YES">
+         </CommandLineArgument>
+         <CommandLineArgument
+            argument = "-arena 1"
+            isEnabled = "YES">
+         </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
