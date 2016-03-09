@@ -500,6 +500,7 @@
 		FA13BB4B1C8764BB00095818 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB491C8764BB00095818 /* libz.tbd */; };
 		FA13BB4F1C87650800095818 /* libxml2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB4E1C87650800095818 /* libxml2.tbd */; };
 		FA13BB511C87CF8500095818 /* libglew.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB501C87CF8500095818 /* libglew.a */; };
+		FA9E123C1C90CF7A000AF44A /* ww2.icns in Resources */ = {isa = PBXBuildFile; fileRef = E97C76CD1C85AFD800875F44 /* ww2.icns */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -3446,6 +3447,7 @@
 				FA13BB1B1C875F6800095818 /* placeholder-title.png in Resources */,
 				FA13BB1A1C875F6800095818 /* placeholder-background.png in Resources */,
 				E97C76CC1C85AFAA00875F44 /* Localizable.strings in Resources */,
+				FA9E123C1C90CF7A000AF44A /* ww2.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
