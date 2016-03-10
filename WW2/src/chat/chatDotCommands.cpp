@@ -999,7 +999,6 @@ private:
 		responses.push_back("whipped");
 		responses.push_back("wdwhipped");
 		responses.push_back("blame rooke");
-		responses.push_back("its tooky's fault");
 		responses.push_back("its not purdy");
 		responses.push_back("<FX> BOOM! HEADSHOT!");
 		responses.push_back("Buy more ram");
@@ -1018,13 +1017,6 @@ private:
 		responses.push_back("So don't catch five inch shells with your teeth, duh");
 		responses.push_back("Muahahahahahahahahahahahahahahaha");
 		responses.push_back("<Your journey to the pwned side is compleat, my son>");
-		responses.push_back("It makes baby jeebus cry =(");
-#ifdef BETA_RELEASE
-		responses.push_back("Jeez, don't you like have stuff to test and stuff?");
-		responses.push_back("Don't pr0n & drive");
-		responses.push_back("Female lady dogs of the night male organsuckers!! Dobodily fluidsment it!!!!");
-#endif
-		responses.push_back("PLACEHOLDER\n(for loud, angry comment by DOC not related to subject at hand)");
 		responses.push_back("YOU'RE NOT DOING IT RIGHT");
 		responses.push_back("YOU JUST DONT UNDRESTAND");
 		responses.push_back("Historically accurate: you were pwned then, you are pwned now");
@@ -1051,7 +1043,6 @@ private:
 		responses.push_back("Magic 8-ball says, Absolutely");
 		responses.push_back("Magic 8-ball says, Care to bet?");
 		responses.push_back("ftw!");
-		responses.push_back("Probably not a good time to tell you that your dog died then?");
 		responses.push_back("So not your favorite kind of surprize?");
 		responses.push_back("I guess we ought to redesign that then");
 		responses.push_back("AUDIT!");
@@ -1069,7 +1060,6 @@ private:
 		responses.push_back("Blame Hasselt for the poor quality of this wtf. It was gonna be funny until I got shot while typing it.");
 		responses.push_back("Too busy watching mercy with a machine gun?");
 		responses.push_back("Parachuting dogs should be careful where they pack their bone");
-		responses.push_back("Battleground Europe bedside manner: You're going to live a long and happy life, as long as nobody breaks wind... *polite cough*");
 		responses.push_back("Battleground Europe train announcements: Welcome to the London Underground. Trains may be in the tunnels below.");
 		responses.push_back("Could everyone just stop getting shot?");
 		responses.push_back("WTF = Willy Tee Funny?");
@@ -1078,14 +1068,13 @@ private:
 		responses.push_back("Its all sdrawkcab, em ksa uoy fi");
 		responses.push_back("Life's like a box of chocolate, Forrest. You never know when you're going to cause a CTD.");
 		responses.push_back("Connection to host lost!!!!!!!1!");
-		responses.push_back("Connection to beerz lost!!!!!!!eleventy!");
-		responses.push_back("You think you can handle wtf\?\?\?\? *KILLER* can't handle wtf!");
 		responses.push_back("''What the hell is an aluminum falcon\?\?\?''");
 		responses.push_back("''You've been flying around for two weeks trying to get a signal? You must smell like old feet wrapped in leathery, burnt bacon!");
 		responses.push_back("It wouldn't happen if you'd come to the 2007 Convention");
 		responses.push_back("ERROR: Unable to give you a wtf due to salad balancing restrictions");
 		responses.push_back("WWIIOL MiniFact: The 'waaaugh' cry of dying infantry was captured by playing one of Willy Tee's cartoons to an audience and taking the earmuffs of one of them when Wheels sang");
 		responses.push_back("Server coming down in 15 minutes for a patch.");
+		responses.push_back("Server coming down in 15 seconds for a patch.");
 		responses.push_back("Maybe they were aiming for KenneY?");
 		responses.push_back("This space left intentionally blank. Please do not refer to it as \"bilton's brain\".");
 		responses.push_back("Gameplay error detected. Please press the Any Key now to correct this issue.");
@@ -1101,31 +1090,49 @@ private:
 		responses.push_back("You mis-spelled 'I was pwned and I'm very happy about it'");
 		responses.push_back("That's what happens when you don't say 'please'");
 		responses.push_back("LOOK IT UP ON THE INTERNET");
+		responses.push_back("i am bed sorry");
+        responses.push_back("Groop, I implore thee, my foonting turling dromes");
+        responses.push_back("Do I look like Inspector Gadget to you?");
+        responses.push_back("All GM commands are logged.");
+        responses.push_back("All CRS commands are logged.");
+        responses.push_back("It's like someone with no sense of humor wrote these.");
+        responses.push_back("Does CRS even play The Game?");
+        responses.push_back("its xooms fault");
+        responses.push_back("Something broke. Quick, blame XOOM!");
+        responses.push_back("WWIOL MiniFact: This joke isn't very good");
+        responses.push_back("All glory to the HypnoToad.");
+        responses.push_back("CTD incoming in 3... 2... 1...");
+        responses.push_back("What does CTD mean again?");
 	}
+
+    static UINT32 rand_uniform(UINT32 bound)
+    {
+        // Pick a number without modulo bias
+        UINT32 r = 0x80000000UL % bound, v = 0;
+        if (bound > 1) {
+            for (UINT32 i = 0; v < r && i < 1 << 20; ++i) { v = rand(); }
+            v %= bound;
+        }
+        return v;
+    }
 public:
-	DotWTF() : DotCommand("wtf", "Pointless test command", NO_MASK, LSTR_NONE, LSTR_NONE)
+	DotWTF() : DotCommand("wtf", "Pointless command", NO_MASK, LSTR_NONE, LSTR_NONE)
 	{
 		reset();
 	}
 
 	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
 	{
-		if ( player.playerID() != 3204 )
-			action(player, message);
-		else
-		{
-			responses.push_back(arguments);
-			player.message(LSTR_NONE, LSTR_GENERIC, arguments);
-		}
+        action(player, message) ;
 	}
 
 	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
 	{
 		const char* str;
-		str = responses[rand() % responses.size()].c_str();
-		LSTRING_ID prefix = ( (rand() & 1023) == 0 ) ? LSTR_ERROR : LSTR_NONE;
-		if ( (rand() & 127) == 42 )
-			player.message(prefix, LSTR_LABELLED_GENERIC, "dewd", str);
+		str = responses[rand_uniform(responses.size())].c_str() ;
+		LSTRING_ID prefix = ( rand_uniform(1024) < 4 ) ? LSTR_ERROR : LSTR_NONE ;
+		if ( rand_uniform(128) == 42 )
+			player->message(prefix, LSTR_LABELLED_GENERIC, "operator", str) ;
 		else
 			player.message(prefix, LSTR_GENERIC, str);
 	}
