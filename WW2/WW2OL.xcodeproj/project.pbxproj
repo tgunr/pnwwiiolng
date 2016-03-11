@@ -434,7 +434,6 @@
 		08F41C5612D39B7B0001C6F5 /* libfreetype2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 08F41C5512D39B7B0001C6F5 /* libfreetype2.a */; };
 		08FA20E91598B791007B0B9A /* Rand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08FA20E51598B791007B0B9A /* Rand.cpp */; };
 		08FA20EA1598B791007B0B9A /* SuperFastHash.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08FA20E71598B791007B0B9A /* SuperFastHash.cpp */; };
-		0D6E716D0AF63EAC00B3B0BD /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = 0D6E71660AF63EAC00B3B0BD /* MainMenu.nib */; };
 		0DBEF4410A7FD8F60094C53D /* libexpat-ww2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DBEF4400A7FD8F60094C53D /* libexpat-ww2.a */; };
 		0DDF00AA08578C460027461D /* libHIDUtilities.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DDF00A308578C460027461D /* libHIDUtilities.a */; };
 		0DDF00AC08578C460027461D /* libjs.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0DDF00A508578C460027461D /* libjs.a */; };
@@ -481,7 +480,6 @@
 		E97C76C51C85395700875F44 /* kqueue.c in Sources */ = {isa = PBXBuildFile; fileRef = E97C769A1C85156F00875F44 /* kqueue.c */; };
 		E97C76C61C8539BF00875F44 /* XMLLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E97C762B1C84E11A00875F44 /* XMLLoader.cpp */; };
 		E97C76C71C8539BF00875F44 /* XMLLoader2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E97C762C1C84E11A00875F44 /* XMLLoader2.cpp */; };
-		E97C76CC1C85AFAA00875F44 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = E97C76CA1C85AFAA00875F44 /* Localizable.strings */; };
 		E97C76D11C85B15800875F44 /* playarc.ww2 in CopyFiles */ = {isa = PBXBuildFile; fileRef = E97C76D01C85B15800875F44 /* playarc.ww2 */; settings = {ATTRIBUTES = (CodeSignOnCopy, ); }; };
 		E97C76D41C85B21200875F44 /* HockeySDK.framework in CopyFiles */ = {isa = PBXBuildFile; fileRef = E97C76D31C85B21200875F44 /* HockeySDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		FA05B0821C8D3E1800CDE30C /* libgranny2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA05B0811C8D3E1800CDE30C /* libgranny2.a */; };
@@ -500,6 +498,8 @@
 		FA13BB4B1C8764BB00095818 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB491C8764BB00095818 /* libz.tbd */; };
 		FA13BB4F1C87650800095818 /* libxml2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB4E1C87650800095818 /* libxml2.tbd */; };
 		FA13BB511C87CF8500095818 /* libglew.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB501C87CF8500095818 /* libglew.a */; };
+		FA37D74F1C937F6E00013187 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = FA37D74D1C937F6E00013187 /* MainMenu.nib */; };
+		FA37D7531C937F8F00013187 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FA37D7511C937F8F00013187 /* Localizable.strings */; };
 		FA9E123C1C90CF7A000AF44A /* ww2.icns in Resources */ = {isa = PBXBuildFile; fileRef = E97C76CD1C85AFD800875F44 /* ww2.icns */; };
 /* End PBXBuildFile section */
 
@@ -1469,7 +1469,6 @@
 		08FA20E61598B791007B0B9A /* Rand.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Rand.h; sourceTree = "<group>"; };
 		08FA20E71598B791007B0B9A /* SuperFastHash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = SuperFastHash.cpp; sourceTree = "<group>"; };
 		08FA20E81598B791007B0B9A /* SuperFastHash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = SuperFastHash.h; sourceTree = "<group>"; };
-		0D6E71670AF63EAC00B3B0BD /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = MainMenu.nib; sourceTree = "<group>"; };
 		0DBEF4400A7FD8F60094C53D /* libexpat-ww2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libexpat-ww2.a"; path = "lib/mac/libexpat-ww2.a"; sourceTree = SOURCE_ROOT; };
 		0DDF00A308578C460027461D /* libHIDUtilities.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libHIDUtilities.a; path = lib/mac/libHIDUtilities.a; sourceTree = SOURCE_ROOT; };
 		0DDF00A508578C460027461D /* libjs.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libjs.a; path = lib/mac/libjs.a; sourceTree = SOURCE_ROOT; };
@@ -1548,7 +1547,6 @@
 		E97C769E1C85156F00875F44 /* select.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = select.c; path = ../../Libraries/libevent/select.c; sourceTree = "<group>"; };
 		E97C769F1C85156F00875F44 /* signal.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = signal.c; path = ../../Libraries/libevent/signal.c; sourceTree = "<group>"; };
 		E97C76A01C85156F00875F44 /* strlcpy.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = strlcpy.c; path = ../../Libraries/libevent/strlcpy.c; sourceTree = "<group>"; };
-		E97C76CB1C85AFAA00875F44 /* English */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = English; path = proj/mac/English.lproj/Localizable.strings; sourceTree = "<group>"; };
 		E97C76CD1C85AFD800875F44 /* ww2.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = ww2.icns; path = proj/mac/ww2.icns; sourceTree = "<group>"; };
 		E97C76D01C85B15800875F44 /* playarc.ww2 */ = {isa = PBXFileReference; lastKnownFileType = text; name = playarc.ww2; path = ../WW2Archives/playarc.ww2; sourceTree = SOURCE_ROOT; };
 		E97C76D31C85B21200875F44 /* HockeySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HockeySDK.framework; path = Vendor/HockeySDK.framework; sourceTree = "<group>"; };
@@ -1568,6 +1566,9 @@
 		FA13BB491C8764BB00095818 /* libz.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libz.tbd; path = usr/lib/libz.tbd; sourceTree = SDKROOT; };
 		FA13BB4E1C87650800095818 /* libxml2.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libxml2.tbd; path = usr/lib/libxml2.tbd; sourceTree = SDKROOT; };
 		FA13BB501C87CF8500095818 /* libglew.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libglew.a; path = lib/mac/libglew.a; sourceTree = "<group>"; };
+		FA37D7501C937F7100013187 /* Base */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = Base; path = proj/mac/Base.lproj/MainMenu.nib; sourceTree = "<group>"; };
+		FA37D7521C937F8F00013187 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = proj/mac/en.lproj/Localizable.strings; sourceTree = "<group>"; };
+		FA37D7551C937F9800013187 /* en */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = en; path = proj/mac/en.lproj/MainMenu.strings; sourceTree = "<group>"; };
 		FA3D8BA71C8BF201002C5119 /* CodeSigning.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = CodeSigning.xcconfig; path = proj/mac/CodeSigning.xcconfig; sourceTree = "<group>"; };
 		FA3D8BA81C8BF201002C5119 /* Defines.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Defines.xcconfig; path = proj/mac/Defines.xcconfig; sourceTree = "<group>"; };
 		FA3D8BA91C8BF201002C5119 /* SearchPaths.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = SearchPaths.xcconfig; path = proj/mac/SearchPaths.xcconfig; sourceTree = "<group>"; };
@@ -3003,15 +3004,6 @@
 			path = ez;
 			sourceTree = "<group>";
 		};
-		0D6E71630AF63EAC00B3B0BD /* English.lproj */ = {
-			isa = PBXGroup;
-			children = (
-				0D6E71660AF63EAC00B3B0BD /* MainMenu.nib */,
-			);
-			name = English.lproj;
-			path = proj/mac/English.lproj;
-			sourceTree = "<group>";
-		};
 		0DA6D33608563A0900A53577 /* src */ = {
 			isa = PBXGroup;
 			children = (
@@ -3112,13 +3104,13 @@
 		20286C2CFDCF999611CA2CEA /* rsrc */ = {
 			isa = PBXGroup;
 			children = (
+				FA37D7511C937F8F00013187 /* Localizable.strings */,
+				FA37D74D1C937F6E00013187 /* MainMenu.nib */,
 				FA08C0751C8D4A1F0002F4B9 /* readme.rtf */,
 				E97C76D01C85B15800875F44 /* playarc.ww2 */,
 				E97C76CD1C85AFD800875F44 /* ww2.icns */,
-				E97C76CA1C85AFAA00875F44 /* Localizable.strings */,
 				FA13BB181C875F6800095818 /* placeholder-background.png */,
 				FA13BB191C875F6800095818 /* placeholder-title.png */,
-				0D6E71630AF63EAC00B3B0BD /* English.lproj */,
 				8D0C4E960486CD37000505A6 /* Info.plist */,
 			);
 			name = rsrc;
@@ -3424,6 +3416,8 @@
 				Japanese,
 				French,
 				German,
+				Base,
+				en,
 			);
 			mainGroup = 20286C29FDCF999611CA2CEA /* WW2OL */;
 			projectDirPath = "";
@@ -3443,10 +3437,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				FA08C0761C8D4A1F0002F4B9 /* readme.rtf in Resources */,
-				0D6E716D0AF63EAC00B3B0BD /* MainMenu.nib in Resources */,
+				FA37D7531C937F8F00013187 /* Localizable.strings in Resources */,
 				FA13BB1B1C875F6800095818 /* placeholder-title.png in Resources */,
 				FA13BB1A1C875F6800095818 /* placeholder-background.png in Resources */,
-				E97C76CC1C85AFAA00875F44 /* Localizable.strings in Resources */,
+				FA37D74F1C937F6E00013187 /* MainMenu.nib in Resources */,
 				FA9E123C1C90CF7A000AF44A /* ww2.icns in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -3933,18 +3927,19 @@
 /* End PBXTargetDependency section */
 
 /* Begin PBXVariantGroup section */
-		0D6E71660AF63EAC00B3B0BD /* MainMenu.nib */ = {
+		FA37D74D1C937F6E00013187 /* MainMenu.nib */ = {
 			isa = PBXVariantGroup;
 			children = (
-				0D6E71670AF63EAC00B3B0BD /* English */,
+				FA37D7501C937F7100013187 /* Base */,
+				FA37D7551C937F9800013187 /* en */,
 			);
 			name = MainMenu.nib;
 			sourceTree = "<group>";
 		};
-		E97C76CA1C85AFAA00875F44 /* Localizable.strings */ = {
+		FA37D7511C937F8F00013187 /* Localizable.strings */ = {
 			isa = PBXVariantGroup;
 			children = (
-				E97C76CB1C85AFAA00875F44 /* English */,
+				FA37D7521C937F8F00013187 /* en */,
 			);
 			name = Localizable.strings;
 			sourceTree = "<group>";
