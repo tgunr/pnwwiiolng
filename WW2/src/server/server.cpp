@@ -226,7 +226,7 @@ _playerReleasePersona(SINT32 teulIndex, PlayerStatusNode* psn, UINT32 exitCode, 
 
 		if ((Server::myServerInfo.flags & Server::SVRFLAG_SEND_PSTAT)
 			&& releaseType != Server::ReleaseType::Redirected
-			&& Server::myServerInfo.exitDestType != 0 )
+			&& Server::myServerInfo.exitDestType > AUTH_HOST)
 		{
 			destination = Server::ServerInfo::GetBest(Server::myServerInfo.exitDestType);
 			_playerExitTo(destination, psn, Server::Transfer::XferReason::Exit, exitCode);
@@ -495,7 +495,7 @@ _playerRelease(SINT32 teulIndex, PlayerStatusNode* psn, UINT32 exitCode, Server:
 		// assumes player has been moved to new server before called
 		_playerReleasePersona(teulIndex, psn, exitCode, releaseType);
 
-		if ( ! ((Server::myServerInfo.flags & Server::SVRFLAG_RELOGIN) && Server::myServerInfo.exitDestType == 0 ) )
+		if ( ! ((Server::myServerInfo.flags & Server::SVRFLAG_RELOGIN) && Server::myServerInfo.exitDestType == AUTH_HOST) )
 		{
 			dbugLog(_FLD, "t:%d p:%u deleting auth after redirection", teulIndex, psn->dispatch().m_customerID);
 			_playerDeleteAuth(psn);
@@ -545,7 +545,7 @@ _playerDelete(PlayerStatusNode* const psn, Server::ReleaseType releaseType)
 		 _extractPlayerFromServer(_exitServer, psn);
 
 	// alert other servers of the players demise but only if its news
-	if ( psn->status != Server::PlayerStatus::Deleted && Server::myServerInfo.exitDestType == 0 && (Server::myServerInfo.flags & Server::SVRFLAG_SEND_PSTAT) )
+	if ( psn->status != Server::PlayerStatus::Deleted && Server::myServerInfo.exitDestType <= AUTH_HOST && (Server::myServerInfo.flags & Server::SVRFLAG_SEND_PSTAT) )
 	{
 		psn->status = Server::PlayerStatus::Deleted;
 		_sendPlayerStatusUpdate(*psn);
@@ -685,7 +685,7 @@ _playerProc(Server::PersonaXfer* const persXfer, PlayerStatusNode* const psn, bo
 
 			if ( (Server::myServerInfo.flags & Server::SVRFLAG_DETATCHED) == 0)
 			{
-				if ( Server::myServerInfo.exitDestType == 0)
+				if ( Server::myServerInfo.exitDestType == AUTH_HOST)
 				{
 					if (!_playerAddAuth(psn))
 						return _playerDestroy(psn, createComplete);
@@ -1187,8 +1187,8 @@ serverUpdate(void)
 
 	if ( teulClock64 >= _nextHeartbeat )
 	{
-		if ( (Server::myServerInfo.flags & Server::SVRFLAG_RELOGIN) && (Server::myServerInfo.exitDestType == 0 || (Server::myServerInfo.flags & Server::SVRFLAG_DETATCHED)) )
-			_timeOutPlayers();
+		if ( (Server::myServerInfo.flags & Server::SVRFLAG_RELOGIN) && (Server::myServerInfo.exitDestType == AUTH_HOST || (Server::myServerInfo.flags & Server::SVRFLAG_DETATCHED)) )
+			_timeOutPlayers(); // only one server - the mmhost - should be doing the timeouts
 
 		_timeOutXfers();
 		_sendHeartBeat();
