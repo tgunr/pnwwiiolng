@@ -13,8 +13,10 @@ public:
 	// when creating geometry you want to collide
 	colliderQuery(dSpaceID space=0, bool useDefaultCollideWithSpace=true);
 	colliderQuery(dGeomID geom, unsigned int cat, unsigned int col, dSpaceID space=0, bool useDefaultCollideWithSpace=true);
-	~colliderQuery();
+	virtual ~colliderQuery();
 
+    colliderQuery( const colliderQuery & rhs ) { }
+    
 	dGeomID addGeom(dGeomID g, unsigned int cat, unsigned int col);
 	void addGeomToCollideWith(dGeomID);
 	void setGeomToCollideWith(dGeomID);

@@ -480,7 +480,7 @@ LOGICAL trnAddAutoGun(trnCDTerrainObject * TO)
 		return FALSE;
 	}
 
-	AG->Type = &_AutoGunType[bld->subType];
+	AG->Type = &_AutoGunType[static_cast<int>(bld->subType)];
 	if (Online == 0)
 	{
         FULL_OBJ_ID foi;
@@ -683,8 +683,6 @@ LOGICAL trnUpdateAutoGuns(void)
     FLOAT64VECTOR AimPnt = {0, 0, 0};
 
     piMATRIX TempMat = IdentityMatrix;
-
-    piVECTOR Att = {0, 0, 0};
 
     UINT32 Count = 0;
 
@@ -1892,7 +1890,7 @@ static LOGICAL _DetermineOptimumAimPnt(trnAutoGun * AG, FLOAT64VECTOR * AimPnt)
 static LOGICAL _IsVehicleInLineOfSight(trnAutoGun * AG,vehVehicle* Vehicle,FLOAT32* Dist32,
 									   LOGICAL AddFudge)
 {
-    FLOAT64VECTOR Corners[9] = {0, 0, 0};
+    FLOAT64VECTOR Corners[9] = {{0, 0, 0}};
     FLOAT64VECTOR DistVec = {0, 0, 0};
     FLOAT64 Dist = 0;
     FLOAT64 TempNum = 0;

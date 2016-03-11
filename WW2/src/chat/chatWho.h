@@ -42,7 +42,6 @@ public:
 		, m_joinedSquad(0)
 		{}
 	Who(ACTION_OBJECT* const a);
-	virtual ~Who() {}
 
 public:
 	// Number of seconds in a delta

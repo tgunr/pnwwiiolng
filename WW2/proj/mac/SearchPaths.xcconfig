@@ -1,0 +1,63 @@
+//
+//  SearchPaths.xcconfig
+//  WW2OL
+//
+//  Created by Gwynne Raskind on 10/30/15.
+//  Copyright © 2015 Playnet. All rights reserved.
+//
+
+////////////////////////////////////////////////////////////////////////////////
+// Various and sundry search paths. See comments in Defines.xcconfig and
+// Warnings.xcconfig for information on why it looks like this.
+
+// Header search paths matching both #include <> and #include ""
+HEADER_SEARCH_PATHS_14      = $(HEADER_SEARCH_PATHS_15) "$(SRCROOT)/../Libraries/libevent/OSX-Code"
+HEADER_SEARCH_PATHS_13      = $(HEADER_SEARCH_PATHS_14) "$(SRCROOT)/../Libraries/libevent/include"
+HEADER_SEARCH_PATHS_12      = $(HEADER_SEARCH_PATHS_13) "$(SRCROOT)/../Libraries/libevent"
+HEADER_SEARCH_PATHS_11      = $(HEADER_SEARCH_PATHS_12) "$(SRCROOT)/../Libraries/tolua++/include"
+HEADER_SEARCH_PATHS_10      = $(HEADER_SEARCH_PATHS_11) "$(SRCROOT)/../Libraries/ft2/include/freetype"
+HEADER_SEARCH_PATHS_09      = $(HEADER_SEARCH_PATHS_10) "$(SRCROOT)/../Libraries/ftgl/src"
+HEADER_SEARCH_PATHS_08      = $(HEADER_SEARCH_PATHS_09) "$(SRCROOT)/include"
+HEADER_SEARCH_PATHS_07      = $(HEADER_SEARCH_PATHS_08) "$(SRCROOT)/../Libraries/opende/include"
+HEADER_SEARCH_PATHS_06      = $(HEADER_SEARCH_PATHS_07) "$(SDKROOT)/usr/include/libxml2"
+HEADER_SEARCH_PATHS_05      = $(HEADER_SEARCH_PATHS_06) "$(SRCROOT)/src/math"
+HEADER_SEARCH_PATHS_04      = $(HEADER_SEARCH_PATHS_05) "$(SRCROOT)/include/Cg"
+HEADER_SEARCH_PATHS_03      = $(HEADER_SEARCH_PATHS_04) "$(SRCROOT)/../Libraries/zeromq/include"
+HEADER_SEARCH_PATHS_02      = $(HEADER_SEARCH_PATHS_03) "$(SRCROOT)/../Libraries/OpenThreadsMac"
+HEADER_SEARCH_PATHS_01      = $(HEADER_SEARCH_PATHS_02) "$(SRCROOT)/../Libraries/ft2/include"
+
+HEADER_SEARCH_PATHS         = $(inherited) $(HEADER_SEARCH_PATHS_01)
+
+// Search paths that only match #include "", not #include <>
+USER_HEADER_SEARCH_PATHS_19 = $(USER_HEADER_SEARCH_PATHS_20) "$(SRCROOT)/../Libraries/libxml2/include/libxml"
+USER_HEADER_SEARCH_PATHS_18 = $(USER_HEADER_SEARCH_PATHS_19) "$(SRCROOT)/../Libraries/glew/include"
+USER_HEADER_SEARCH_PATHS_17 = $(USER_HEADER_SEARCH_PATHS_18) "$(SRCROOT)/../Libraries/phui/include"
+USER_HEADER_SEARCH_PATHS_16 = $(USER_HEADER_SEARCH_PATHS_17) "$(SRCROOT)/include/bt"
+USER_HEADER_SEARCH_PATHS_15 = $(USER_HEADER_SEARCH_PATHS_16) "$(SRCROOT)/../Libraries/opende/include"
+USER_HEADER_SEARCH_PATHS_14 = $(USER_HEADER_SEARCH_PATHS_15) "$(SRCROOT)/include/js"
+USER_HEADER_SEARCH_PATHS_13 = $(USER_HEADER_SEARCH_PATHS_14) "$(SRCROOT)/include/lua"
+USER_HEADER_SEARCH_PATHS_12 = $(USER_HEADER_SEARCH_PATHS_13) "$(SRCROOT)/include/mac"
+USER_HEADER_SEARCH_PATHS_10 = $(USER_HEADER_SEARCH_PATHS_12) "$(SRCROOT)/src"
+USER_HEADER_SEARCH_PATHS_09 = $(USER_HEADER_SEARCH_PATHS_10) "$(SRCROOT)/src/auth"
+USER_HEADER_SEARCH_PATHS_08 = $(USER_HEADER_SEARCH_PATHS_09) "$(SRCROOT)/src/chat"
+USER_HEADER_SEARCH_PATHS_07 = $(USER_HEADER_SEARCH_PATHS_08) "$(SRCROOT)/src/dbug"
+USER_HEADER_SEARCH_PATHS_06 = $(USER_HEADER_SEARCH_PATHS_07) "$(SRCROOT)/src/include"
+USER_HEADER_SEARCH_PATHS_05 = $(USER_HEADER_SEARCH_PATHS_06) "$(SRCROOT)/src/sysmac"
+USER_HEADER_SEARCH_PATHS_04 = $(USER_HEADER_SEARCH_PATHS_05) "$(SRCROOT)/src/teul"
+USER_HEADER_SEARCH_PATHS_03 = $(USER_HEADER_SEARCH_PATHS_04) "$(SRCROOT)/src/weap"
+USER_HEADER_SEARCH_PATHS_02 = $(USER_HEADER_SEARCH_PATHS_03) "$(SRCROOT)/src/spt"
+USER_HEADER_SEARCH_PATHS_01 = $(USER_HEADER_SEARCH_PATHS_02) "$(SRCROOT)/include/libxml"
+
+USER_HEADER_SEARCH_PATHS    = $(inherited) $(USER_HEADER_SEARCH_PATHS_01)
+
+// Framework search paths
+FRAMEWORK_SEARCH_PATHS_03   = $(FRAMEWORK_SEARCH_PATHS_04) "$(SRCROOT)/Vendor"
+FRAMEWORK_SEARCH_PATHS_02   = $(FRAMEWORK_SEARCH_PATHS_03) "$(SRCROOT)"
+FRAMEWORK_SEARCH_PATHS_01   = $(FRAMEWORK_SEARCH_PATHS_02) "$(SRCROOT)/lib/mac"
+
+FRAMEWORK_SEARCH_PATHS      = $(inherited) $(FRAMEWORK_SEARCH_PATHS_01)
+
+// Shared library search paths
+LIBRARY_SEARCH_PATHS_01     = $(LIBRARY_SEARCH_PATHS_02) "$(SRCROOT)/lib/mac"/**
+
+LIBRARY_SEARCH_PATHS        = $(inherited) $(LIBRARY_SEARCH_PATHS_01)

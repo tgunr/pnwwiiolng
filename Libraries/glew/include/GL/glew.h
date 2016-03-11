@@ -4023,8 +4023,8 @@ typedef void (GLAPIENTRY * PFNGLBLITNAMEDFRAMEBUFFERPROC) (GLuint readFramebuffe
 typedef GLenum (GLAPIENTRY * PFNGLCHECKNAMEDFRAMEBUFFERSTATUSPROC) (GLuint framebuffer, GLenum target);
 typedef void (GLAPIENTRY * PFNGLCLEARNAMEDBUFFERDATAPROC) (GLuint buffer, GLenum internalformat, GLenum format, GLenum type, const void *data);
 typedef void (GLAPIENTRY * PFNGLCLEARNAMEDBUFFERSUBDATAPROC) (GLuint buffer, GLenum internalformat, GLintptr offset, GLsizeiptr size, GLenum format, GLenum type, const void *data);
-typedef void (GLAPIENTRY * PFNGLCLEARNAMEDFRAMEBUFFERFIPROC) (GLuint framebuffer, GLenum buffer, GLfloat depth, GLint stencil);
-typedef void (GLAPIENTRY * PFNGLCLEARNAMEDFRAMEBUFFERFVPROC) (GLuint framebuffer, GLenum buffer, GLint drawbuffer, const GLfloat* value);
+typedef void (GLAPIENTRY * PFNGLCLEARNAMEDFRAMEBUFFERFIPROC) (GLuint framebuffer, GLenum buffer, GLint drawbuffer, GLfloat depth, GLint stencil);
+typedef void (GLAPIENTRY * PFNGLCLEARNAMEDFRAMEBUFFERFVPROC) (GLuint framebuffer, GLenum buffer, GLint drawbuffer, GLfloat* value);
 typedef void (GLAPIENTRY * PFNGLCLEARNAMEDFRAMEBUFFERIVPROC) (GLuint framebuffer, GLenum buffer, GLint drawbuffer, const GLint* value);
 typedef void (GLAPIENTRY * PFNGLCLEARNAMEDFRAMEBUFFERUIVPROC) (GLuint framebuffer, GLenum buffer, GLint drawbuffer, const GLuint* value);
 typedef void (GLAPIENTRY * PFNGLCOMPRESSEDTEXTURESUBIMAGE1DPROC) (GLuint texture, GLint level, GLint xoffset, GLsizei width, GLenum format, GLsizei imageSize, const void *data);
@@ -12202,6 +12202,15 @@ typedef void (GLAPIENTRY * PFNGLREADNPIXELSPROC) (GLint x, GLint y, GLsizei widt
 
 #endif /* GL_KHR_texture_compression_astc_ldr */
 
+/* --------------- GL_KHR_texture_compression_astc_sliced_3d --------------- */
+
+#ifndef GL_KHR_texture_compression_astc_sliced_3d
+#define GL_KHR_texture_compression_astc_sliced_3d 1
+
+#define GLEW_KHR_texture_compression_astc_sliced_3d GLEW_GET_VAR(__GLEW_KHR_texture_compression_astc_sliced_3d)
+
+#endif /* GL_KHR_texture_compression_astc_sliced_3d */
+
 /* -------------------------- GL_KTX_buffer_region ------------------------- */
 
 #ifndef GL_KTX_buffer_region
@@ -12370,6 +12379,26 @@ typedef void (GLAPIENTRY * PFNGLENDCONDITIONALRENDERNVXPROC) (void);
 
 #endif /* GL_NVX_gpu_memory_info */
 
+/* ---------------------- GL_NVX_linked_gpu_multicast ---------------------- */
+
+#ifndef GL_NVX_linked_gpu_multicast
+#define GL_NVX_linked_gpu_multicast 1
+
+#define GL_LGPU_SEPARATE_STORAGE_BIT_NVX 0x0800
+#define GL_MAX_LGPU_GPUS_NVX 0x92BA
+
+typedef void (GLAPIENTRY * PFNGLLGPUCOPYIMAGESUBDATANVXPROC) (GLuint sourceGpu, GLbitfield destinationGpuMask, GLuint srcName, GLenum srcTarget, GLint srcLevel, GLint srcX, GLint srxY, GLint srcZ, GLuint dstName, GLenum dstTarget, GLint dstLevel, GLint dstX, GLint dstY, GLint dstZ, GLsizei width, GLsizei height, GLsizei depth);
+typedef void (GLAPIENTRY * PFNGLLGPUINTERLOCKNVXPROC) (void);
+typedef void (GLAPIENTRY * PFNGLLGPUNAMEDBUFFERSUBDATANVXPROC) (GLbitfield gpuMask, GLuint buffer, GLintptr offset, GLsizeiptr size, const void *data);
+
+#define glLGPUCopyImageSubDataNVX GLEW_GET_FUN(__glewLGPUCopyImageSubDataNVX)
+#define glLGPUInterlockNVX GLEW_GET_FUN(__glewLGPUInterlockNVX)
+#define glLGPUNamedBufferSubDataNVX GLEW_GET_FUN(__glewLGPUNamedBufferSubDataNVX)
+
+#define GLEW_NVX_linked_gpu_multicast GLEW_GET_VAR(__GLEW_NVX_linked_gpu_multicast)
+
+#endif /* GL_NVX_linked_gpu_multicast */
+
 /* ------------------- GL_NV_bindless_multi_draw_indirect ------------------ */
 
 #ifndef GL_NV_bindless_multi_draw_indirect
@@ -12520,6 +12549,71 @@ typedef void (GLAPIENTRY * PFNGLBLENDPARAMETERINVPROC) (GLenum pname, GLint valu
 #define GLEW_NV_blend_square GLEW_GET_VAR(__GLEW_NV_blend_square)
 
 #endif /* GL_NV_blend_square */
+
+/* --------------------------- GL_NV_command_list -------------------------- */
+
+#ifndef GL_NV_command_list
+#define GL_NV_command_list 1
+
+#define GL_ALPHA_REF_COMMAND_NV 0x000
+#define GL_BLEND_COLOR_COMMAND_NV 0x000
+#define GL_LINE_WIDTH_COMMAND_NV 0x000
+#define GL_POLYGON_OFFSET_COMMAND_NV 0x000
+#define GL_STENCIL_REF_COMMAND_NV 0x000
+#define GL_TERMINATE_SEQUENCE_COMMAND_NV 0x0000
+#define GL_UNIFORM_ADDRESS_COMMAND_NV 0x000
+#define GL_NOP_COMMAND_NV 0x0001
+#define GL_DRAW_ELEMENTS_COMMAND_NV 0x0002
+#define GL_DRAW_ARRAYS_COMMAND_NV 0x0003
+#define GL_DRAW_ELEMENTS_STRIP_COMMAND_NV 0x0004
+#define GL_DRAW_ARRAYS_STRIP_COMMAND_NV 0x0005
+#define GL_DRAW_ELEMENTS_INSTANCED_COMMAND_NV 0x0006
+#define GL_DRAW_ARRAYS_INSTANCED_COMMAND_NV 0x0007
+#define GL_ELEMENT_ADDRESS_COMMAND_NV 0x0008
+#define GL_ATTRIBUTE_ADDRESS_COMMAND_NV 0x0009
+#define GL_VIEWPORT_COMMAND_NV 0x0010
+#define GL_SCISSOR_COMMAND_NV 0x0011
+#define GL_FRONT_FACE_COMMAND_NV 0x0012
+
+typedef void (GLAPIENTRY * PFNGLCALLCOMMANDLISTNVPROC) (GLuint list);
+typedef void (GLAPIENTRY * PFNGLCOMMANDLISTSEGMENTSNVPROC) (GLuint list, GLuint segments);
+typedef void (GLAPIENTRY * PFNGLCOMPILECOMMANDLISTNVPROC) (GLuint list);
+typedef void (GLAPIENTRY * PFNGLCREATECOMMANDLISTSNVPROC) (GLsizei n, GLuint* lists);
+typedef void (GLAPIENTRY * PFNGLCREATESTATESNVPROC) (GLsizei n, GLuint* states);
+typedef void (GLAPIENTRY * PFNGLDELETECOMMANDLISTSNVPROC) (GLsizei n, const GLuint* lists);
+typedef void (GLAPIENTRY * PFNGLDELETESTATESNVPROC) (GLsizei n, const GLuint* states);
+typedef void (GLAPIENTRY * PFNGLDRAWCOMMANDSADDRESSNVPROC) (GLenum primitiveMode, const GLuint64* indirects, const GLsizei* sizes, GLuint count);
+typedef void (GLAPIENTRY * PFNGLDRAWCOMMANDSNVPROC) (GLenum primitiveMode, GLuint buffer, const GLintptr* indirects, const GLsizei* sizes, GLuint count);
+typedef void (GLAPIENTRY * PFNGLDRAWCOMMANDSSTATESADDRESSNVPROC) (const GLuint64* indirects, const GLsizei* sizes, const GLuint* states, const GLuint* fbos, GLuint count);
+typedef void (GLAPIENTRY * PFNGLDRAWCOMMANDSSTATESNVPROC) (GLuint buffer, const GLintptr* indirects, const GLsizei* sizes, const GLuint* states, const GLuint* fbos, GLuint count);
+typedef GLuint (GLAPIENTRY * PFNGLGETCOMMANDHEADERNVPROC) (GLenum tokenID, GLuint size);
+typedef GLushort (GLAPIENTRY * PFNGLGETSTAGEINDEXNVPROC) (GLenum shadertype);
+typedef GLboolean (GLAPIENTRY * PFNGLISCOMMANDLISTNVPROC) (GLuint list);
+typedef GLboolean (GLAPIENTRY * PFNGLISSTATENVPROC) (GLuint state);
+typedef void (GLAPIENTRY * PFNGLLISTDRAWCOMMANDSSTATESCLIENTNVPROC) (GLuint list, GLuint segment, const void** indirects, const GLsizei* sizes, const GLuint* states, const GLuint* fbos, GLuint count);
+typedef void (GLAPIENTRY * PFNGLSTATECAPTURENVPROC) (GLuint state, GLenum mode);
+
+#define glCallCommandListNV GLEW_GET_FUN(__glewCallCommandListNV)
+#define glCommandListSegmentsNV GLEW_GET_FUN(__glewCommandListSegmentsNV)
+#define glCompileCommandListNV GLEW_GET_FUN(__glewCompileCommandListNV)
+#define glCreateCommandListsNV GLEW_GET_FUN(__glewCreateCommandListsNV)
+#define glCreateStatesNV GLEW_GET_FUN(__glewCreateStatesNV)
+#define glDeleteCommandListsNV GLEW_GET_FUN(__glewDeleteCommandListsNV)
+#define glDeleteStatesNV GLEW_GET_FUN(__glewDeleteStatesNV)
+#define glDrawCommandsAddressNV GLEW_GET_FUN(__glewDrawCommandsAddressNV)
+#define glDrawCommandsNV GLEW_GET_FUN(__glewDrawCommandsNV)
+#define glDrawCommandsStatesAddressNV GLEW_GET_FUN(__glewDrawCommandsStatesAddressNV)
+#define glDrawCommandsStatesNV GLEW_GET_FUN(__glewDrawCommandsStatesNV)
+#define glGetCommandHeaderNV GLEW_GET_FUN(__glewGetCommandHeaderNV)
+#define glGetStageIndexNV GLEW_GET_FUN(__glewGetStageIndexNV)
+#define glIsCommandListNV GLEW_GET_FUN(__glewIsCommandListNV)
+#define glIsStateNV GLEW_GET_FUN(__glewIsStateNV)
+#define glListDrawCommandsStatesClientNV GLEW_GET_FUN(__glewListDrawCommandsStatesClientNV)
+#define glStateCaptureNV GLEW_GET_FUN(__glewStateCaptureNV)
+
+#define GLEW_NV_command_list GLEW_GET_VAR(__GLEW_NV_command_list)
+
+#endif /* GL_NV_command_list */
 
 /* ------------------------- GL_NV_compute_program5 ------------------------ */
 
@@ -18425,6 +18519,10 @@ GLEW_FUN_EXPORT PFNGLWINDOWPOS4SVMESAPROC __glewWindowPos4svMESA;
 GLEW_FUN_EXPORT PFNGLBEGINCONDITIONALRENDERNVXPROC __glewBeginConditionalRenderNVX;
 GLEW_FUN_EXPORT PFNGLENDCONDITIONALRENDERNVXPROC __glewEndConditionalRenderNVX;
 
+GLEW_FUN_EXPORT PFNGLLGPUCOPYIMAGESUBDATANVXPROC __glewLGPUCopyImageSubDataNVX;
+GLEW_FUN_EXPORT PFNGLLGPUINTERLOCKNVXPROC __glewLGPUInterlockNVX;
+GLEW_FUN_EXPORT PFNGLLGPUNAMEDBUFFERSUBDATANVXPROC __glewLGPUNamedBufferSubDataNVX;
+
 GLEW_FUN_EXPORT PFNGLMULTIDRAWARRAYSINDIRECTBINDLESSNVPROC __glewMultiDrawArraysIndirectBindlessNV;
 GLEW_FUN_EXPORT PFNGLMULTIDRAWELEMENTSINDIRECTBINDLESSNVPROC __glewMultiDrawElementsIndirectBindlessNV;
 
@@ -18447,6 +18545,24 @@ GLEW_FUN_EXPORT PFNGLUNIFORMHANDLEUI64VNVPROC __glewUniformHandleui64vNV;
 
 GLEW_FUN_EXPORT PFNGLBLENDBARRIERNVPROC __glewBlendBarrierNV;
 GLEW_FUN_EXPORT PFNGLBLENDPARAMETERINVPROC __glewBlendParameteriNV;
+
+GLEW_FUN_EXPORT PFNGLCALLCOMMANDLISTNVPROC __glewCallCommandListNV;
+GLEW_FUN_EXPORT PFNGLCOMMANDLISTSEGMENTSNVPROC __glewCommandListSegmentsNV;
+GLEW_FUN_EXPORT PFNGLCOMPILECOMMANDLISTNVPROC __glewCompileCommandListNV;
+GLEW_FUN_EXPORT PFNGLCREATECOMMANDLISTSNVPROC __glewCreateCommandListsNV;
+GLEW_FUN_EXPORT PFNGLCREATESTATESNVPROC __glewCreateStatesNV;
+GLEW_FUN_EXPORT PFNGLDELETECOMMANDLISTSNVPROC __glewDeleteCommandListsNV;
+GLEW_FUN_EXPORT PFNGLDELETESTATESNVPROC __glewDeleteStatesNV;
+GLEW_FUN_EXPORT PFNGLDRAWCOMMANDSADDRESSNVPROC __glewDrawCommandsAddressNV;
+GLEW_FUN_EXPORT PFNGLDRAWCOMMANDSNVPROC __glewDrawCommandsNV;
+GLEW_FUN_EXPORT PFNGLDRAWCOMMANDSSTATESADDRESSNVPROC __glewDrawCommandsStatesAddressNV;
+GLEW_FUN_EXPORT PFNGLDRAWCOMMANDSSTATESNVPROC __glewDrawCommandsStatesNV;
+GLEW_FUN_EXPORT PFNGLGETCOMMANDHEADERNVPROC __glewGetCommandHeaderNV;
+GLEW_FUN_EXPORT PFNGLGETSTAGEINDEXNVPROC __glewGetStageIndexNV;
+GLEW_FUN_EXPORT PFNGLISCOMMANDLISTNVPROC __glewIsCommandListNV;
+GLEW_FUN_EXPORT PFNGLISSTATENVPROC __glewIsStateNV;
+GLEW_FUN_EXPORT PFNGLLISTDRAWCOMMANDSSTATESCLIENTNVPROC __glewListDrawCommandsStatesClientNV;
+GLEW_FUN_EXPORT PFNGLSTATECAPTURENVPROC __glewStateCaptureNV;
 
 GLEW_FUN_EXPORT PFNGLBEGINCONDITIONALRENDERNVPROC __glewBeginConditionalRenderNV;
 GLEW_FUN_EXPORT PFNGLENDCONDITIONALRENDERNVPROC __glewEndConditionalRenderNV;
@@ -19481,6 +19597,7 @@ GLEW_VAR_EXPORT GLboolean __GLEW_KHR_robust_buffer_access_behavior;
 GLEW_VAR_EXPORT GLboolean __GLEW_KHR_robustness;
 GLEW_VAR_EXPORT GLboolean __GLEW_KHR_texture_compression_astc_hdr;
 GLEW_VAR_EXPORT GLboolean __GLEW_KHR_texture_compression_astc_ldr;
+GLEW_VAR_EXPORT GLboolean __GLEW_KHR_texture_compression_astc_sliced_3d;
 GLEW_VAR_EXPORT GLboolean __GLEW_KTX_buffer_region;
 GLEW_VAR_EXPORT GLboolean __GLEW_MESAX_texture_stack;
 GLEW_VAR_EXPORT GLboolean __GLEW_MESA_pack_invert;
@@ -19489,12 +19606,14 @@ GLEW_VAR_EXPORT GLboolean __GLEW_MESA_window_pos;
 GLEW_VAR_EXPORT GLboolean __GLEW_MESA_ycbcr_texture;
 GLEW_VAR_EXPORT GLboolean __GLEW_NVX_conditional_render;
 GLEW_VAR_EXPORT GLboolean __GLEW_NVX_gpu_memory_info;
+GLEW_VAR_EXPORT GLboolean __GLEW_NVX_linked_gpu_multicast;
 GLEW_VAR_EXPORT GLboolean __GLEW_NV_bindless_multi_draw_indirect;
 GLEW_VAR_EXPORT GLboolean __GLEW_NV_bindless_multi_draw_indirect_count;
 GLEW_VAR_EXPORT GLboolean __GLEW_NV_bindless_texture;
 GLEW_VAR_EXPORT GLboolean __GLEW_NV_blend_equation_advanced;
 GLEW_VAR_EXPORT GLboolean __GLEW_NV_blend_equation_advanced_coherent;
 GLEW_VAR_EXPORT GLboolean __GLEW_NV_blend_square;
+GLEW_VAR_EXPORT GLboolean __GLEW_NV_command_list;
 GLEW_VAR_EXPORT GLboolean __GLEW_NV_compute_program5;
 GLEW_VAR_EXPORT GLboolean __GLEW_NV_conditional_render;
 GLEW_VAR_EXPORT GLboolean __GLEW_NV_conservative_raster;

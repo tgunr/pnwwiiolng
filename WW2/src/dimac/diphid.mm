@@ -659,7 +659,7 @@ void dipSendCocoaKeyboardMouseEvents()
     
     if ( cursorHidden && ((mousex<100||mousex>(ddpGetWidth()-100)) || (mousey<100||mousey>(ddpGetHeight()-100))) )
     {
-      CGPoint c = {ddpGetWidth()/2, ddpGetHeight()/2};
+      CGPoint c = {static_cast<CGFloat>(ddpGetWidth()/2), static_cast<CGFloat>(ddpGetHeight()/2)};
       CGAssociateMouseAndMouseCursorPosition(false); 
       CGSetLocalEventsSuppressionInterval(0); 
       CGWarpMouseCursorPosition(c); 

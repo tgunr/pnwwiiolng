@@ -14,7 +14,7 @@
 
 struct BrigadeControlDescriptor
 {
-	BrigadeControlDescriptor(char* l, bool me = false) :
+	BrigadeControlDescriptor(const char* l, bool me = false) :
 		label("brigade.control."),
 		arg1(L"<undef1>"),
 		arg2(L"<undef2>"),
@@ -26,7 +26,6 @@ struct BrigadeControlDescriptor
 		if(me)
 			label += ".me";
 	}
-	virtual ~BrigadeControlDescriptor() {}
 
 	void getBrigadeDescriptor(UINT32 brigadeID, std::wstring& into) const
 	{
@@ -49,7 +48,7 @@ struct BrigadeControlDescriptor
 
 struct BCD_OfficerBrigade : public BrigadeControlDescriptor
 {
-	BCD_OfficerBrigade(const BrigadeControlNotice* const bcn, char* l, bool me = false) : BrigadeControlDescriptor(l, me)
+	BCD_OfficerBrigade(const BrigadeControlNotice* const bcn, const char* l, bool me = false) : BrigadeControlDescriptor(l, me)
 	{
 		if(me)
 		{
@@ -65,7 +64,7 @@ struct BCD_OfficerBrigade : public BrigadeControlDescriptor
 
 struct BCD_OfficerSponsorBrigade : public BrigadeControlDescriptor
 {
-	BCD_OfficerSponsorBrigade(const BrigadeControlNotice* const bcn, char* l, bool me = false) : BrigadeControlDescriptor(l, me)
+	BCD_OfficerSponsorBrigade(const BrigadeControlNotice* const bcn, const char* l, bool me = false) : BrigadeControlDescriptor(l, me)
 	{
 		if(me)
 		{
@@ -85,7 +84,7 @@ struct BCD_OfficerSponsorBrigade : public BrigadeControlDescriptor
 
 struct BCD_SponsorOfficerBrigade : public BrigadeControlDescriptor
 {
-	BCD_SponsorOfficerBrigade(const BrigadeControlNotice* const bcn, char* l, bool me = false) : BrigadeControlDescriptor(l, me)
+	BCD_SponsorOfficerBrigade(const BrigadeControlNotice* const bcn, const char* l, bool me = false) : BrigadeControlDescriptor(l, me)
 	{
 		if(me)
 		{
@@ -103,7 +102,7 @@ struct BCD_SponsorOfficerBrigade : public BrigadeControlDescriptor
 
 struct BCD_SponsorBrigadeOriginTarget : public BrigadeControlDescriptor
 {
-	BCD_SponsorBrigadeOriginTarget(const BrigadeControlNotice* const bcn, char* l, bool me = false) : BrigadeControlDescriptor(l, me)
+	BCD_SponsorBrigadeOriginTarget(const BrigadeControlNotice* const bcn, const char* l, bool me = false) : BrigadeControlDescriptor(l, me)
 	{
 		StratDB::StratObject* origin = StratDB::FindStratObject(bcn->m_origin);
 		StratDB::StratObject* target = StratDB::FindStratObject(bcn->m_target);
@@ -118,7 +117,7 @@ struct BCD_SponsorBrigadeOriginTarget : public BrigadeControlDescriptor
 
 struct BCD_BrigadeOriginTarget : public BrigadeControlDescriptor
 {
-	BCD_BrigadeOriginTarget(const BrigadeControlNotice* const bcn, char* l, bool me = false) : BrigadeControlDescriptor(l, me)
+	BCD_BrigadeOriginTarget(const BrigadeControlNotice* const bcn, const char* l, bool me = false) : BrigadeControlDescriptor(l, me)
 	{
 		StratDB::StratObject* origin = StratDB::FindStratObject(bcn->m_origin);
 		StratDB::StratObject* target = StratDB::FindStratObject(bcn->m_target);
@@ -131,7 +130,7 @@ struct BCD_BrigadeOriginTarget : public BrigadeControlDescriptor
 
 struct BCD_Objective : public BrigadeControlDescriptor
 {
-	BCD_Objective(const BrigadeControlNotice* const bcn, char* l, bool me = false) : BrigadeControlDescriptor(l, me)
+	BCD_Objective(const BrigadeControlNotice* const bcn, const char* l, bool me = false) : BrigadeControlDescriptor(l, me)
 	{
 		WWII_SIDE mySide				= wwiiSide(PlayerClient()->PersonaSelected().m_countryID);
 		BrigadeControlList* oic			= PlayerClient()->LookupBrigadeOIC(bcn->m_brigadeID);
@@ -165,7 +164,7 @@ struct BCD_Objective : public BrigadeControlDescriptor
 
 struct BCD_ControlError : public BrigadeControlDescriptor
 {
-	BCD_ControlError(const BrigadeControlNotice* const bcn, char* l)
+	BCD_ControlError(const BrigadeControlNotice* const bcn, const char* l)
 		: BrigadeControlDescriptor(l, false)
 	{
 		if ( bcn->isTargettedAction() )

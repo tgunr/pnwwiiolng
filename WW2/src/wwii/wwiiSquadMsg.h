@@ -22,7 +22,6 @@ public:
 	SquadMsg(UCHAR withStatus=NO_SQUAD) : m_squad(), m_status(withStatus), m_inviter(0LL) {}
 	SquadMsg(const Squad& withSquad) : m_squad(withSquad), m_status(INFO_ONLY), m_inviter(0LL) {}
 	SquadMsg(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
-	~SquadMsg() {}
 
 public:
 	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a)

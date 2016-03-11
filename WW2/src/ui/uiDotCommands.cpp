@@ -1376,8 +1376,10 @@ static SINT32 dot_vspawn(const char* line)
 
     SINT32 x = 0, y = 0, z = 0, rad = 10;
 
-	int fields = (strpos != str.npos) ? sscanf(buffer, "%64s -num %d %d %d %d %d", name, &numveh, &x, &y, &z, &rad):
-												sscanf(buffer, "%64s %d %d %d", name, &x, &y, &z);
+	if (strpos != str.npos)
+        sscanf(buffer, "%64s -num %d %d %d %d %d", name, &numveh, &x, &y, &z, &rad);
+    else
+        sscanf(buffer, "%64s %d %d %d", name, &x, &y, &z);
 
     pos.x = (double)x;
     pos.y = (double)y;
@@ -5738,6 +5740,7 @@ static SINT32 dot_follow(const char* line)
 	return DC_HANDLED;
 }
 
+#ifdef ENABLE_FLOATERS
 /************************************************************************************************
 	InfLODCmd
 *************************************************************************************************/
@@ -5756,22 +5759,26 @@ static SINT32 dot_inflod(const char* line)
 
 	return DC_HANDLED;
 }
+#endif
 
 /************************************************************************************************
-	InfLODModCmd
+InfLODModCmd
 *************************************************************************************************/
 
+#if defined(BETA_RELEASE)
 static SINT32 dot_inflodmod(const char* line)
 {
-	if(sscanf(line, "%*s %f %f", &gTrooperLOD, &gTrooperMOD) > 0)
+	if (sscanf(line, "%*s %f %f", &gTrooperLOD, &gTrooperMOD) > 0)
 		uiChatPrintLine("Setting infantry LOD mod to %.2f%% and a mod of %.2f", (gTrooperLOD * 100.0f), gTrooperMOD);
 	else
 		uiChatPrintLine("You must set a percent (0 to 1) in the 1st parameter and an optional mod in the 2nd one.");
 
 	return DC_HANDLED;
 }
+#endif
 
 /************************************************************************************************
+	else
 	ScenarioCmd
 *************************************************************************************************/
 
@@ -5935,6 +5942,8 @@ static SINT32 dot_scenario(const char* line)
 }
 #endif
 
+#ifdef BETA_RELEASE
+
 /************************************************************************************************
 	JavascriptCmd
 *************************************************************************************************/
@@ -5951,6 +5960,7 @@ static SINT32 dot_js(const char* line)
 
 	return DC_HANDLED;
 }
+#endif
 
 #if platOS != OS_MACOS
 
@@ -6815,6 +6825,7 @@ static SINT32 dot_dev(const char* line)
 	return DC_HANDLED;
 }
 
+#ifdef BETA_RELEASE
 static SINT32 dot_canvas(const char* line)
 {
 	phui::View* canvas = uiViewport()->FindView("canvas");
@@ -6843,6 +6854,7 @@ static SINT32 dot_canvas(const char* line)
 
 	return DC_HANDLED;
 }
+#endif
 
 #endif // _DEBUG
 
@@ -7214,7 +7226,7 @@ static int dot_vcache(const char* line)
 
 	if(sscanf(line, "%*s %u", &mode))
 	{
-		if(mode != gVCache && mode >= 0 && mode <= 2)
+		if(mode != gVCache && mode <= 2)
 			gVCache = mode;
 	}
 

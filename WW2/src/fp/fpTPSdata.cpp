@@ -26,33 +26,33 @@
 #define	TPS_SURFACE_APPEND	".txt"
 #define TPS_MAX_BLEND_STATES 4
 
-SCHAR*					fpTPSDeathFiles[TPS_POSETYPE_NUM_TYPES][TPS_NUM_DEATHS];
-SCHAR*					fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_NUM_TYPES][TPS_HAND_NUM_TYPES][TPS_MIXINPOSE_NUM_TYPES];;
-SCHAR*					fpTPSBodyEmoteFiles[TPS_BODYEMOTE_NUM_TYPES];
-SCHAR*					fpTPSBasePoseFile;
-SCHAR*					fpTPSCombatBlendFile;
+const SCHAR*					fpTPSDeathFiles[TPS_POSETYPE_NUM_TYPES][TPS_NUM_DEATHS];
+const SCHAR*					fpTPSCombatEmoteFiles[TPS_COMBATEMOTE_NUM_TYPES][TPS_HAND_NUM_TYPES][TPS_MIXINPOSE_NUM_TYPES];;
+const SCHAR*					fpTPSBodyEmoteFiles[TPS_BODYEMOTE_NUM_TYPES];
+const SCHAR*					fpTPSBasePoseFile;
+const SCHAR*					fpTPSCombatBlendFile;
 
-SCHAR*					fpTPSSkeletonFile;
-SCHAR*					fpTPSDamageFile;
-SCHAR*					fpTPSInfantryMeshFiles[NUM_INFANTRY_TYPES][TPS_NUM_LODS];
-SCHAR*					fpTPSWeaponMeshFiles[NUM_WEAPONS][TPS_NUM_LODS];
-SCHAR*					fpTPSWeaponMeshAltFiles[NUM_WEAPONS][TPS_NUM_LODS];
-SCHAR*					fpTPSTwitchFiles[TPS_POSETYPE_NUM_TYPES][MAX_TWITCHES_PER_POSE];
+const SCHAR*					fpTPSSkeletonFile;
+const SCHAR*					fpTPSDamageFile;
+const SCHAR*					fpTPSInfantryMeshFiles[NUM_INFANTRY_TYPES][TPS_NUM_LODS];
+const SCHAR*					fpTPSWeaponMeshFiles[NUM_WEAPONS][TPS_NUM_LODS];
+const SCHAR*					fpTPSWeaponMeshAltFiles[NUM_WEAPONS][TPS_NUM_LODS];
+const SCHAR*					fpTPSTwitchFiles[TPS_POSETYPE_NUM_TYPES][MAX_TWITCHES_PER_POSE];
 SINT32					fpTPSNumTwitches[TPS_POSETYPE_NUM_TYPES];
 fpTPSWeaponData			tpsWeapons[TPS_WEAPONTYPE_NUM_TYPES];
 fpTPSTroopData			tpsTroopData;
 
-SCHAR*					fpTPSParachuteFile;
+const SCHAR*					fpTPSParachuteFile;
 
 fpHitLocations			fpHitMap[60];
 
-SCHAR*					fpTPSDefaultFaceNames[NUM_INFANTRY_TYPES];
+const SCHAR*					fpTPSDefaultFaceNames[NUM_INFANTRY_TYPES];
 
 #ifdef USE_NEW_DECALS
-SCHAR*					fpTPSPatchTextureNames[NUM_INFANTRY_TYPES * 3];
+const SCHAR*					fpTPSPatchTextureNames[NUM_INFANTRY_TYPES * 3];
 SINT32					fpTPSPatchTextureIDs[NUM_INFANTRY_TYPES * 3];
 #else
-SCHAR*					fpTPSPatchTextureNames[NUM_INFANTRY_TYPES];
+const SCHAR*					fpTPSPatchTextureNames[NUM_INFANTRY_TYPES];
 SINT32					fpTPSPatchTextureIDs[NUM_INFANTRY_TYPES];
 #endif
 
@@ -62,7 +62,7 @@ SINT32					fpTPSFaceTexIDs[MAX_FACES];
 
 fpTPSSurfaceData		fpTPSSurfaces[TPS_MAX_NUM_SURFACES];
 
-SCHAR* fpTPSCombatEmoteCmds[TPS_COMBATEMOTE_NUM_TYPES] =
+const SCHAR* fpTPSCombatEmoteCmds[TPS_COMBATEMOTE_NUM_TYPES] =
 {
 	"double",
 	"getdown",
@@ -72,7 +72,7 @@ SCHAR* fpTPSCombatEmoteCmds[TPS_COMBATEMOTE_NUM_TYPES] =
 	"jump"
 };
 
-SCHAR* fpTPSBodyEmoteCmds[TPS_BODYEMOTE_NUM_TYPES] =
+const SCHAR* fpTPSBodyEmoteCmds[TPS_BODYEMOTE_NUM_TYPES] =
 {
 	"salute",
 	"salute",
@@ -84,7 +84,7 @@ SCHAR* fpTPSBodyEmoteCmds[TPS_BODYEMOTE_NUM_TYPES] =
 	"attention"
 };
 
-SCHAR* fpTPSWeaponTypeStrings[TPS_WEAPONTYPE_NUM_TYPES] =
+const SCHAR* fpTPSWeaponTypeStrings[TPS_WEAPONTYPE_NUM_TYPES] =
 {
 	"TPS_WEAPONTYPE_RIFLE",
 	"TPS_WEAPONTYPE_SMG",
@@ -103,7 +103,7 @@ SCHAR* fpTPSWeaponTypeStrings[TPS_WEAPONTYPE_NUM_TYPES] =
 	"TPS_WEAPONTYPE_ANY"
 };
 
-SCHAR* fpTPSWeaponKeyStrings[TPS_WEAPONTYPE_NUM_TYPES] =
+const SCHAR* fpTPSWeaponKeyStrings[TPS_WEAPONTYPE_NUM_TYPES] =
 {
 	"rifle",
 	"smg",
@@ -122,7 +122,7 @@ SCHAR* fpTPSWeaponKeyStrings[TPS_WEAPONTYPE_NUM_TYPES] =
 	"any"
 };
 
-SCHAR* fpTPSPoseTypeStrings[TPS_POSETYPE_NUM_TYPES] =
+const SCHAR* fpTPSPoseTypeStrings[TPS_POSETYPE_NUM_TYPES] =
 {
 	"TPS_POSETYPE_STAND",
 	"TPS_POSETYPE_CROUCH",
@@ -131,7 +131,7 @@ SCHAR* fpTPSPoseTypeStrings[TPS_POSETYPE_NUM_TYPES] =
 	"TPS_POSETYPE_SWIM"
 };
 
-SCHAR* fpTPSPoseKeyStrings[TPS_POSETYPE_NUM_TYPES] =
+const SCHAR* fpTPSPoseKeyStrings[TPS_POSETYPE_NUM_TYPES] =
 {
 	"stand",
 	"crouch",
@@ -140,7 +140,7 @@ SCHAR* fpTPSPoseKeyStrings[TPS_POSETYPE_NUM_TYPES] =
 	"swim"
 };
 
-SCHAR* fpTPSMoveTypeStrings[TPS_MOVETYPE_NUM_TYPES] =
+const SCHAR* fpTPSMoveTypeStrings[TPS_MOVETYPE_NUM_TYPES] =
 {
 	"TPS_MOVETYPE_STILL",
 	"TPS_MOVETYPE_IDLE",
@@ -158,7 +158,7 @@ SCHAR* fpTPSMoveTypeStrings[TPS_MOVETYPE_NUM_TYPES] =
 	"TPS_MOVETYPE_STRAFE_RIGHT",
 };
 
-SCHAR* fpTPSMoveKeyStrings[TPS_MOVETYPE_NUM_TYPES] =
+const SCHAR* fpTPSMoveKeyStrings[TPS_MOVETYPE_NUM_TYPES] =
 {
 	"still",
 	"idle",
@@ -176,7 +176,7 @@ SCHAR* fpTPSMoveKeyStrings[TPS_MOVETYPE_NUM_TYPES] =
 	"straferight"
 };
 
-SCHAR* fpTPSPointTypeStrings[TPS_POINTTYPE_NUM_TYPES] =
+const SCHAR* fpTPSPointTypeStrings[TPS_POINTTYPE_NUM_TYPES] =
 {
 	"TPS_POINTTYPE_RELAXED",
 	"TPS_POINTTYPE_READY",
@@ -194,7 +194,7 @@ SCHAR* fpTPSPointTypeStrings[TPS_POINTTYPE_NUM_TYPES] =
 	"TPS_POINTTYPE_PARA"
 };
 
-SCHAR* fpTPSPointKeyStrings[TPS_POINTTYPE_NUM_TYPES] =
+const SCHAR* fpTPSPointKeyStrings[TPS_POINTTYPE_NUM_TYPES] =
 {
 	"relax",
 	"ready",
@@ -1148,6 +1148,9 @@ fpTPSWeaponClass fpTPSConvertWeaponClass(fpTPSWeaponType type)
 		case TPS_WEAPONTYPE_SATCHEL:
 		case TPS_WEAPONTYPE_ROCKET:
 			return CLASS_EXPLOSIVE;
+        default:
+            // ignore non-leathal types
+            break;
 	}
 
 	return CLASS_ITEM;
@@ -1173,6 +1176,9 @@ fpTPSAttackType fpTPSGetAttack(fpTPSWeaponType type)
 			return ATTACK_PLACED;
 		case TPS_WEAPONTYPE_KNIFE:
 			return ATTACK_MELEE;
+        default:
+            // ignore non-leathal types
+            break;
 	}
 
 	return ATTACK_NONE;
@@ -1209,6 +1215,9 @@ fpTPSWeaponType	fpTPSConvertWeaponTypes(fpFPSWeaponType type)
 			return TPS_WEAPONTYPE_ATR;
 		case FPS_WEAPONTYPE_ROCKET:
 			return TPS_WEAPONTYPE_ROCKET;
+        default:
+            // ignore non-leathal types
+            break;
 	}
 
 	Write_Log (LOG_FPS, LOG_INFO, "fpTPSConvertWeaponTypes: Invalid weapon type passed %d!", type);

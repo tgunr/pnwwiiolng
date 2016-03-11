@@ -354,14 +354,14 @@ Texture::Texture():
             _borderColor(0.0, 0.0, 0.0, 0.0),
             _borderWidth(0),
             _internalFormatMode(USE_IMAGE_DATA_FORMAT),
+            _internalFormatType(NORMALIZED),
             _internalFormat(0),
             _sourceFormat(0),
             _sourceType(0),
             _use_shadow_comparison(false),
             _shadow_compare_func(LEQUAL),
             _shadow_texture_mode(LUMINANCE),
-            _shadow_ambient(0),
-            _internalFormatType(NORMALIZED)
+            _shadow_ambient(0)
 {
 }
 
@@ -1005,12 +1005,12 @@ void Texture::applyTexImage2D_load(GLenum target, const Image* image, GLsizei in
 
     bool mipmappingRequired = _min_filter != LINEAR && _min_filter != NEAREST;
     bool useHardwareMipMapGeneration = mipmappingRequired && (!image->isMipmap() && isHardwareMipmapGenerationEnabled());//state));
-    bool useGluBuildMipMaps = mipmappingRequired && (!useHardwareMipMapGeneration && !image->isMipmap());
 
     unsigned char* dataMinusOffset = 0;
     unsigned char* dataPlusOffset = 0;
 
 #if(0)
+    bool useGluBuildMipMaps = mipmappingRequired && (!useHardwareMipMapGeneration && !image->isMipmap());
     const PixelBufferObject* pbo = image->getPixelBufferObject();
     if(pbo && pbo->isPBOSupported(contextID) && !needImageRescale && !useGluBuildMipMaps)
     {
@@ -1261,12 +1261,12 @@ void Texture::applyTexImage2D_subload(GLenum target, const Image* image, GLsizei
 
     bool mipmappingRequired = _min_filter != LINEAR && _min_filter != NEAREST;
     bool useHardwareMipMapGeneration = mipmappingRequired && (!image->isMipmap() && isHardwareMipmapGenerationEnabled());
-    bool useGluBuildMipMaps = mipmappingRequired && (!useHardwareMipMapGeneration && !image->isMipmap());
 
     unsigned char* dataMinusOffset = 0;
     unsigned char* dataPlusOffset = 0;
 
 #if(0)
+    bool useGluBuildMipMaps = mipmappingRequired && (!useHardwareMipMapGeneration && !image->isMipmap());
     const PixelBufferObject* pbo = image->getPixelBufferObject();
     if(pbo && pbo->isPBOSupported(contextID) && !needImageRescale && !useGluBuildMipMaps)
     {
@@ -1462,6 +1462,9 @@ void Texture::mipmapAfterTexImage(GenerateMipmapMode beforeResult) const
     case GENERATE_MIPMAP_TEX_PARAMETER:
         glTexParameteri(GL_TEXTURE_2D, GL_GENERATE_MIPMAP_SGIS, GL_FALSE);
         break;
+    default:
+        // all others ignored
+        break;
     }
 }
 
@@ -1620,7 +1623,6 @@ void Texture::Extensions::setupGLExtensions(unsigned int contextID)
     }
 
 
-    float glVersion = (float)atof( (const char*)version );
     const char* renderer = (const char*) glGetString(GL_RENDERER);
     std::string rendererString(renderer ? renderer : "");
 

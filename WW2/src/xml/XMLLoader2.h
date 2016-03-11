@@ -192,6 +192,16 @@ public:
 	XMLLoader2();
 	XMLLoader2(const char* path, int flags = XML_DEFAULT_FLAGS, bool uiFio = false);
 	virtual ~XMLLoader2();
+    
+    XMLLoader2<T>(const XMLLoader2<T> &obj) {
+        _flags = obj._flags;
+        _complete = obj._complete;
+        _uiFio = obj._uiFio;
+        _xmlDoc = obj._xmlDoc;
+        _path = obj._path;
+        _handlers = obj._handlers;
+        _handlerReturnScope = obj._handlerReturnScope;
+    }
 
 public:
 
@@ -257,11 +267,11 @@ protected:
 template<class T>
 XMLLoader2<T>::XMLLoader2() :
 	_flags(XML_DEFAULT_FLAGS),
-	_handlerReturnScope(NODE),
-	_complete(false),
-	_path(""),
-	_xmlDoc(nullptr),
-	_uiFio(false)
+    _complete(false),
+    _uiFio(false),
+    _xmlDoc(nullptr),
+    _path(""),
+	_handlerReturnScope(NODE)
 {
 	fioXmlRegisterInputCallbacks();
 }
@@ -269,11 +279,11 @@ XMLLoader2<T>::XMLLoader2() :
 template<class T>
 XMLLoader2<T>::XMLLoader2(const char* path, int flags, bool uiFio) :
 	_flags(flags),
-	_handlerReturnScope(NODE),
 	_complete(false),
-	_path(path),
+    _uiFio(uiFio),
 	_xmlDoc(nullptr),
-	_uiFio(uiFio)
+    _path(path),
+    _handlerReturnScope(NODE)
 {
 	if(_uiFio)
 		xmlRegisterUIFIO();

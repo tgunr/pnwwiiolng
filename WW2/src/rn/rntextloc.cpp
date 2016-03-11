@@ -21,13 +21,13 @@ static piSURFACEDESC g_ddText[DEF_NUM_BITMAPS];
 
 static LOGICAL g_bInitialized = FALSE;
 
-static SCHAR* g_pFontPCXNames[DEF_NUM_BITMAPS]=
+static const SCHAR* g_pFontPCXNames[DEF_NUM_BITMAPS]=
 {
     "\\fonts\\verdana\\verdana16.bmp",
     "\\fonts\\verdana\\verdana24.bmp",
 };
 
-static SCHAR* g_pFontDATNames[DEF_NUM_BITMAPS]=
+static const SCHAR* g_pFontDATNames[DEF_NUM_BITMAPS]=
 {
     "\\fonts\\verdana\\verdana16.dat",
     "\\fonts\\verdana\\verdana24.dat",

@@ -21,10 +21,9 @@
 *************************************************************************************************/
 
 CustomMapLayer::CustomMapLayer(SuperCellMapView* mv) :
-	_texid(-1),
-	_scale(8),
+    _mv(mv),
 	_firstRun(true),
-	_mv(mv)
+    _texid(-1)
 {
 	enabled = true;
 }

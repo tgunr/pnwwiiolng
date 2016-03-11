@@ -407,7 +407,6 @@ public:
 
 		const char* dir = strstr((const char*)vtype->ModelDirectory, "/");
 		const char* filename = (dir) ? dir + 1 : nullptr;
-		bool found = false;
 
 		while(dir)
 		{

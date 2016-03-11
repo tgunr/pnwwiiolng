@@ -158,6 +158,8 @@ using TeulTimeMS = UINT64;
 //! Teul type for a millisecond delta (signed).
 using TeulDeltaMS = SINT64;
 
+namespace Instance { typedef UINT64 UniqueID ; }
+
 //! Index for a player ID
 using playerid_t = uint32_t;
 //! Index for a sortie ID

@@ -628,7 +628,7 @@ bool Matrix_implementation::invert_4x3( const Matrix_implementation& mat )
        return invert_4x3(tm);
     }
 
-    register value_type r00, r01, r02,
+    value_type r00, r01, r02,
                         r10, r11, r12,
                         r20, r21, r22;
       // Copy rotation components directly into registers for speed
@@ -642,7 +642,7 @@ bool Matrix_implementation::invert_4x3( const Matrix_implementation& mat )
     _mat[0][2] = r01*r12 - r02*r11;
 
       // Compute determinant of rot from 3 elements just computed
-    register value_type one_over_det = (value_type)(1.0/(r00*_mat[0][0] + r10*_mat[0][1] + r20*_mat[0][2]));
+    value_type one_over_det = (value_type)(1.0/(r00*_mat[0][0] + r10*_mat[0][1] + r20*_mat[0][2]));
     r00 *= one_over_det; r10 *= one_over_det; r20 *= one_over_det;  // Saves on later computations
 
       // Finish computing inverse of rot

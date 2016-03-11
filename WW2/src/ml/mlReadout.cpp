@@ -369,8 +369,6 @@ void ReadoutView::DisplayAircraftReadout()
 	// Localized Strings for use in displaying flaps and gear settings
 	const wchar_t* sGear	= uiLocString("hud.readout.gear").c_str();
 	const wchar_t* sFlaps	= uiLocString("hud.readout.flaps").c_str();
-	const wchar_t* open		= uiLocString("hud.readout.open").c_str();
-	const wchar_t* closed	= uiLocString("hud.readout.closed").c_str();
 	const wchar_t* jammed	= uiLocString("hud.readout.jammed").c_str();
 
 	if(_VehicleData->GearSetting == 0.0)

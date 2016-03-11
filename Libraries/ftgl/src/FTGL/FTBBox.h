@@ -88,12 +88,6 @@ class FTGL_EXPORT FTBBox
         }
 
         /**
-         * Destructor
-         */
-        ~FTBBox()
-        {}
-
-        /**
          * Mark the bounds invalid by setting all lower dimensions greater
          * than the upper dimensions.
          */

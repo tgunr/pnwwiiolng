@@ -335,7 +335,7 @@ static void _loadLightData()
                              (xmlInputReadCallback)fioRead,
                              (xmlInputCloseCallback)fioClose);
 
-    SCHAR* name = "terrain/xml/light.xml";
+    const SCHAR* name = "terrain/xml/light.xml";
 
     xmlDocPtr doc = xmlReadFile(name, nullptr, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
 
@@ -372,7 +372,7 @@ static void _loadFogData()
                              (xmlInputReadCallback)fioRead,
                              (xmlInputCloseCallback)fioClose);
 
-    SCHAR* name = "terrain/xml/fog.xml";
+    const SCHAR* name = "terrain/xml/fog.xml";
 
     xmlDocPtr doc = xmlReadFile(name, nullptr, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
 

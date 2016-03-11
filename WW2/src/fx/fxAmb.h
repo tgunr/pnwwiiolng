@@ -104,7 +104,7 @@ extern LOGICAL fxAmbInitCity();
 extern LOGICAL fxAmbInitCoast();
 extern LOGICAL fxAmbInitDay();
 extern LOGICAL fxAmbInitNight();
-extern LOGICAL fxAmbInitRegion(REGION* lpReg, SCHAR* pFile);
+extern LOGICAL fxAmbInitRegion(REGION* lpReg, const SCHAR* pFile);
 extern LOGICAL fxAmbInitRiver();
 
 ////////////////////////////

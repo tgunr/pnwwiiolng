@@ -216,15 +216,15 @@ class EZTrooper : public EZManager
 public:
 
 	EZTrooper(vehVehicle* v) : EZManager(v),
-		_showReticle(FALSE),
 		_dispersion(1.0f),
-		_lastWeapon(-1),
-		_curReticle(0),
-		_tgtReticle(0),
-		_minReticle(0),
-		_maxReticle(0),
-		_returnRate(0),
-		_fireBump(0)
+        _curReticle(0),
+        _tgtReticle(0),
+        _minReticle(0),
+        _maxReticle(0),
+        _returnRate(0),
+        _fireBump(0),
+        _showReticle(FALSE),
+        _lastWeapon(-1)
 	{
 	}
 
@@ -245,7 +245,7 @@ public:
 	virtual void OnEngine(SINT32 param, UINT32 id, UINT32 extra) OVERRIDE_FN {}
 	virtual void OnView(SINT32 param, UINT32 id, UINT32 extra) OVERRIDE_FN {}
 	virtual void OnCamera(SINT32 param, UINT32 id, UINT32 extra) OVERRIDE_FN {}
-	virtual bool OnCamera(piVECTOR* pos, piVECTOR* aim){ return false; }
+	virtual bool OnCamera(piVECTOR* pos, piVECTOR* aim) override { return false; }
 	virtual void OnDespawn()  OVERRIDE_FN {}
 	virtual void OnSpawn() OVERRIDE_FN {}
 	virtual bool IsDriverDead() OVERRIDE_FN;

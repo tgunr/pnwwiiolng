@@ -39,23 +39,14 @@ typedef UINT32 DWORD;
 
 #define MAX_PATH _MAX_PATH
 
-#ifdef __MWERKS__
-#ifndef max
-#define max(a,b)  (((a) > (b)) ? (a) : (b))
-#endif
-#ifndef min
-#define min(a,b)  (((a) < (b)) ? (a) : (b))
-#endif
-#else
 #ifdef __cplusplus
 #include <algorithm>
 #else
 #ifndef max
-#define max(a,b)  (((a) > (b)) ? (a) : (b))
+#define max(a,b)  ({ __typeof__((a)) __a = (a); __typeof__((b)) __b = (b); __a > __b ? __a : __b; })
 #endif
 #ifndef min
-#define min(a,b)  (((a) < (b)) ? (a) : (b))
-#endif
+#define min(a,b)  ({ __typeof__((a)) __a = (a); __typeof__((b)) __b = (b); __a < __b ? __a : __b; })
 #endif
 #endif
 

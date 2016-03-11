@@ -98,12 +98,12 @@ struct TutorialHandler
 {
 	// tolua_end
 	TutorialHandler() :
-		eventType(TUT_EVENT_GENERAL),
 		name(""),
 		scope(""),
 		callback(""),
-		called(0),
-		state(THS_START)
+        eventType(TUT_EVENT_GENERAL),
+		state(THS_START),
+        called(0)
 	{
 	}
 

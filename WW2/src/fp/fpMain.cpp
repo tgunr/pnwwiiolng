@@ -48,6 +48,9 @@
 #define	TROOPER_PRONE_SHIFT_BACK_DISTANCE		0.55			// meters
 #define	Z_ADJUST_FILE "vehicles\\ground\\groundman\\zadjust.xml"
 
+/*
+ TODO - what should be done with this??
+ 
 // z-physics hackery data
 static piVECTOR _CageEdgesStand[7] = {
 {-0.125f,	 0.0f,	0.0f},
@@ -89,6 +92,7 @@ static piVECTOR	_CageEdgesProne[10] = {
 {0.0f, 0.2f, 0.0f},
 {0.0f, 0.3f, 0.0f}
 };
+ */
 
 #define fpFALL_DISTANCE_NORMAL_STUN_MIN	4
 #define fpFALL_DISTANCE_NORMAL_STUN_MAX	16
@@ -113,7 +117,6 @@ class fpAdjustLoader : public XMLLoader2<fpAdjustLoader>
 public:
 
 	fpAdjustLoader(const char* path);
-	virtual ~fpAdjustLoader(){}
 
 	// tag handlers
 	XML_TAG_HANDLER(DoTPS);
@@ -550,9 +553,6 @@ static FLOAT64 _doGravityScenario(mlVehicleData* vd, vehVehicle** walkOn, FLOAT6
 {
 	static LOGICAL fallShortSoundPlayed, fallFarSoundPlayed;
 
-	// our vehicle
-	vehVehicle* v = vd->VehicleMasterPtr;
-
 	// Initialize
 	fpPersonData* pd = (fpPersonData*)vd->PersonData;
 
@@ -757,9 +757,6 @@ static FLOAT64 _doGravityScenario(mlVehicleData* vd, vehVehicle** walkOn, FLOAT6
 static FLOAT64 _doGravityCampaign(mlVehicleData* vd, vehVehicle** walkOn, FLOAT64VECTOR& LastPos, FLOAT64 DeltaTime)
 {
 	static LOGICAL fallShortSoundPlayed, fallFarSoundPlayed;
-
-	// our vehicle
-	vehVehicle* v = vd->VehicleMasterPtr;
 
 	// Initialize
 	fpPersonData* pd = (fpPersonData*)vd->PersonData;
@@ -991,12 +988,9 @@ static LOGICAL _updatePersonScenario(mlVehicleData* pVehicleData, FLOAT64 DeltaT
 
 	fpFPSSetStandingOnVehicle(FALSE);
 
-	SINT32 i						= 0;
 	vehVehicle* FPSRideVehicle		= nullptr;
 	vehVehicle* VehicleWalkingOn	= nullptr;
 	vehVehicle* Vehicle				= pVehicleData->VehicleMasterPtr;
-	fpPersonData* pPersonData		= (fpPersonData*) pVehicleData->PersonData;
-	OBJECT* pObject					= pVehicleData->VehicleObjectData->PlaneObject;
 
 	// do some riding stuff
 	if(Vehicle->RideVehicleHostIndex > 0)
@@ -1041,7 +1035,6 @@ static LOGICAL _updatePersonScenario(mlVehicleData* pVehicleData, FLOAT64 DeltaT
 		fpFPSGetVelocity(&CurrentVelocity);
 
 		// this is our last good position
-		Vec3d LastPos = Vec3d(pVehicleData->VehiclePos);
 		FLOAT64VECTOR lpos = pVehicleData->VehiclePos;
 
 		FPSColliderData& collider = fpFPSGetCollider();
@@ -1110,15 +1103,10 @@ static LOGICAL _updatePersonCampaign(mlVehicleData* pVehicleData, FLOAT64 DeltaT
 {
 	vehVehicle* Vehicle = pVehicleData->VehicleMasterPtr;
 
-	SINT32 i = 0;
-
 	vehVehicle* FPSRideVehicle		= nullptr;
 	vehVehicle* VehicleWalkingOn	= nullptr;
 
 	// Initialize
-	fpPersonData* pPersonData = (fpPersonData*) pVehicleData->PersonData;
-	OBJECT* pObject = pVehicleData->VehicleObjectData->PlaneObject;
-
 	if (!fpFPSUpdatePerson (pVehicleData, DeltaTime))
 		return FALSE;
 
@@ -1704,7 +1692,7 @@ static LOGICAL ApplyFallEffects(OBJECT* pObject, fpPersonData* pPersonData, FLOA
 			{
 				// splat
 				Damage = 1.0;
-#pragma message("Should fallType be set to FPS_FALL_HURT?")
+#pragma message("TBD: Should fallType be set to FPS_FALL_HURT?")
 //				fallType = FPS_FALL_HURT;
 			}
 		}

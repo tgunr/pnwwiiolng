@@ -559,7 +559,6 @@ void PersHUDManager::Update()
 	// used to adjust offscreen waypoints so they don't pile up on each other
 	SINT32 left = 0;
 	SINT32 right = 0;
-	phui::View* child = nullptr;
 	phui::CSSViewDrawer* drawer = nullptr;
 
 	while(it != objects.end())
@@ -718,7 +717,7 @@ bool PersHUDManager::HUDObject::IsVisible()
 }
 
 PersHUDManager::HUDDeath::HUDDeath(ChatHandle& h, FLOAT64VECTOR& p) :
-	HUDObject(DEATH, HUD_DEATH_LIFE), handle(h), color(gIconFriendlyColor)
+	HUDObject(DEATH, HUD_DEATH_LIFE), color(gIconFriendlyColor), handle(h)
 {
 	pos = p;
 }
@@ -746,13 +745,13 @@ FLOAT32 PersHUDManager::HUDDeath::GetPlacement(FLOAT64VECTOR& p)
 }
 
 PersHUDManager::HUDWaypoint::HUDWaypoint(FLOAT32 o) :
-	HUDObject(WAYPOINT), ui(nullptr), file(nullptr), voffset(o), minDistance(0.0f), useTail(true)
+	HUDObject(WAYPOINT), useTail(true), minDistance(0.0f), voffset(o), file(nullptr), ui(nullptr)
 {
 	pos.x = pos.y = pos.z = 0.0f;
 }
 
 PersHUDManager::HUDWaypoint::HUDWaypoint(const Waypoint& w, const char* f, FLOAT32 o) :
-	HUDObject(WAYPOINT), ui(nullptr), file(f), voffset(o), minDistance(0.0f), useTail(true)
+    HUDObject(WAYPOINT), useTail(true), minDistance(0.0f), voffset(o), file(f), ui(nullptr)
 {
 	pos.x = (FLOAT64)w.x();
 	pos.y = (FLOAT64)w.y();
@@ -760,7 +759,7 @@ PersHUDManager::HUDWaypoint::HUDWaypoint(const Waypoint& w, const char* f, FLOAT
 }
 
 PersHUDManager::HUDWaypoint::HUDWaypoint(FLOAT64VECTOR& p, const char* f, FLOAT32 o) :
-	HUDObject(WAYPOINT), ui(nullptr), file(f), voffset(o), minDistance(0.0f), useTail(true)
+    HUDObject(WAYPOINT), useTail(true), minDistance(0.0f), voffset(o), file(f), ui(nullptr)
 {
 	pos.x = p.x;
 	pos.y = p.y;
@@ -768,7 +767,7 @@ PersHUDManager::HUDWaypoint::HUDWaypoint(FLOAT64VECTOR& p, const char* f, FLOAT3
 }
 
 PersHUDManager::HUDWaypoint::HUDWaypoint(const StratDB::StratObject* strat, const char* f, FLOAT32 o, bool centerOnChildren) :
-	HUDObject(WAYPOINT), ui(nullptr), file(f), voffset(o), minDistance(0.0f), useTail(true)
+    HUDObject(WAYPOINT), useTail(true), minDistance(0.0f), voffset(o), file(f), ui(nullptr)
 {
 	if(strat)
 	{
@@ -818,7 +817,7 @@ PersHUDManager::HUDWaypoint::HUDWaypoint(const StratDB::StratObject* strat, cons
 }
 
 PersHUDManager::HUDWaypoint::HUDWaypoint(const ServerTrackedObject* sto, const char* f, FLOAT32 o) :
-	HUDObject(WAYPOINT), ui(nullptr), file(f), voffset(o), minDistance(0.0f), useTail(true)
+    HUDObject(WAYPOINT), useTail(true), minDistance(0.0f), voffset(o), file(f), ui(nullptr)
 {
 	if(sto)
 	{

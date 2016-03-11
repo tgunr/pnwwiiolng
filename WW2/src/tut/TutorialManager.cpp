@@ -203,6 +203,9 @@ void TutorialManager::Update()
 						}
 					}
 					break;
+                        
+                    default:
+                        break;
 				}
 			}
 		}
@@ -790,7 +793,7 @@ bool _pointInArea(Vec3d& pos, TutorialHandler& handler)
 		Vec3d& pt1 = points.at(i);
 		Vec3d& pt2 = points.at(j);
 
-		if(pt1.y() < pos.y() && pt2.y() >= pos.y() ||  pt2.y() < pos.y() && pt1.y() >= pos.y())
+		if((pt1.y() < pos.y() && pt2.y() >= pos.y()) ||  (pt2.y() < pos.y() && pt1.y() >= pos.y()))
 		{
 			if(pt1.x() + (pos.y() - pt1.y()) / (pt2.y() - pt1.y()) * (pt2.x() - pt1.x()) < pos.x())
 			{

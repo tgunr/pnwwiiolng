@@ -22,7 +22,7 @@
 #define NUM_ALT_TEXTURES 7
 
 static float mapverts[SDM_SUPERCELL_OCTETS_XY1][2];
-static char* alttexiconname[NUM_ALT_TEXTURES] =
+static const char* alttexiconname[NUM_ALT_TEXTURES] =
 {
 	"water1",
     "dunes1",
@@ -52,7 +52,6 @@ enum {MAX_SUPERCELL_TEXTURES = 1024};
 	unsigned int lastdrawtime;
 
     virtual void Draw(phui::GraphicsContext*);
-	// WARNING: It is not safe to call this from multiple threads.
 	virtual void Load();
 
 protected:
@@ -150,6 +149,9 @@ IconMapRenderer::SuperCell::~SuperCell()
 
 /************************************************************************************************
 	Load
+ 
+ NOTE: This is NOT thread-safe!!!  replaceoctets has been taken off the stack and made static
+ so we don't ever want to see more than one Cell LoaderThread running!
 *************************************************************************************************/
 
 void IconMapRenderer::SuperCell::Load()
@@ -157,7 +159,6 @@ void IconMapRenderer::SuperCell::Load()
 	if(loaded) return;
 
 	sdm_dtl_data dtl;
-	// HACK: Having such a large structure on the stack was causing serious problems.
 	static sdm_replacement_octet_data replaceoctets;
 	IconMapRenderer* ir = (IconMapRenderer*)renderer;
 

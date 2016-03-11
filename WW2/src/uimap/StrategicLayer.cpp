@@ -248,6 +248,9 @@ HCUnit* HCLinksMapObject::GetDivision(HCUnit* unit)
 			case HCU_DIVISION:
 				return unit;
 				break;
+            default:
+                // catch GENERIC & MAX - invalid as HC unit types
+                break;
 		}
 	}
 

@@ -30,7 +30,9 @@
 
 #ifndef LIMITED_FIO
  static char* os_file_path(char* path);
+#if platBuild == TEUL_CLIENT && platOS == OS_WIN32
  static wchar_t* os_file_path(wchar_t* path);
+#endif
 #else
 # define os_file_path(x) (x)
 #endif
@@ -180,7 +182,7 @@ fiodLoad(const char* filename, char*& outPtr, unsigned int* outSize)
 	recordRef(widePath);
 #else
 	int fd = OS_OPEN(os_file_path(asciiPath), O_RDONLY | O_BINARY);
-	recordRef(os_file_path(asciiPath));
+	recordRef(widePath);
 #endif
 	if ( PN_UNLIKELY(fd < 0) )
 	{
@@ -378,7 +380,7 @@ int fiodOpen(const char* filename, bool userdir, int prereadSize)
 		recordRef(widePath);
 #else
 		fd = OS_OPEN(os_file_path(asciiPath), O_RDONLY | O_BINARY);
-		recordRef(os_file_path(asciiPath));
+		recordRef(widePath);
 #endif
 		if ( fd < 0 )
 			throw "open failed";
@@ -940,19 +942,20 @@ static char* os_file_path(char* path)
 	return path;
 }
 
+#if platBuild == TEUL_CLIENT && platOS == OS_WIN32
 static wchar_t* os_file_path(wchar_t* path)
 {
-#if platOS == OS_WIN32
 	wchar_t* s = path;
 	for(;*s;s++)
 	{
 		if(*s == WCHANGE_SEP)
 			*s = WOS_SEP;
 	}
-#endif
 
 	return path;
 }
+#endif
+
 #endif
 
 #if platOS == OS_MACOS

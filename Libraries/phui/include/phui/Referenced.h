@@ -38,8 +38,8 @@ template <class T>
 class ref_ptr
 {
 public:
-	using value_type = typename T;
-	using self_type = typename ref_ptr<value_type>;
+    using value_type = T;
+	using self_type = ref_ptr<value_type>;
 
 	constexpr ref_ptr() noexcept : _ref(nullptr) {}
 	ref_ptr(T* ref) noexcept : _ref(ref) { if(_ref) _ref->ref(); }
@@ -61,7 +61,7 @@ public:
 	
 	constexpr bool operator==(const self_type& p) const noexcept { return (_ref == p._ref); }
 	constexpr bool operator==(T* ref) const noexcept { return _ref == ref; }
-	constexpr bool operator==(self_type&& p) const noexcept { return _pref == p._ref; }
+	constexpr bool operator==(self_type&& p) const noexcept { return _ref == p._ref; }
 	constexpr T* operator->() const noexcept { return _ref; }
 	constexpr T* ptr() const noexcept { return _ref; }
 	constexpr bool valid() const { return _ref != nullptr; }

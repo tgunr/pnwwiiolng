@@ -1265,7 +1265,7 @@ UINT32 ogrpFindSubObjectByName(OBJECT ** ReturnObject,OBJECT * ObjectPtr, const 
 
 //	if (strncmp(Name,ObjectPtr->name,strlen(Name)) == 0 &&
 //		strlen(Name) == strlen(ObjectPtr->name))
-	if (ObjectPtr->name != nullptr)
+	if (ObjectPtr != nullptr)
 	{
 		if (Name[0] == ObjectPtr->name[0])
 		{
@@ -1319,7 +1319,7 @@ OBJECT * ObjSib;
 
 	do
 	{
-		if (ObjSib->name != nullptr)
+		if (ObjSib != nullptr)
 		{
 			if (Name[0] == ObjSib->name[0])
 			{
@@ -1524,20 +1524,6 @@ OBJECT * ObjSib;
 	}
 	while (ObjSib != nullptr);
 
-
-	return 0;
-}
-
-static UINT32 FreeObjectTree(OBJECT * Object)
-{
-    if(PN_LIKELY(Object))
-    {
-		FreeObjectTree(Object->child);
-		FreeObjectTree(Object->sibling);
-		FreeObjectTree(Object->attached);
-
-	    obmainFreeObject(Object);
-    }
 
 	return 0;
 }

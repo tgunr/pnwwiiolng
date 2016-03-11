@@ -778,7 +778,7 @@ LOGICAL fxBltPlayHitSound(FXBULLET* bullet)
 //////////////////////////////////////////////////////////////////////
 LOGICAL fxBltGetHitSound(FXBULLET* blt, SCHAR hitname[])
 {
-    SCHAR* hitsound = nullptr;
+    const SCHAR* hitsound = nullptr;
 
     if(blt->uAmmoSubType == WEAPAMMO_SUBTYPE_KNIFE)
 	{
@@ -797,7 +797,7 @@ LOGICAL fxBltGetHitSound(FXBULLET* blt, SCHAR hitname[])
         {
             hitsound = (char*)TerrainScenario::GetInstance().GetMaterial(blt->worldpos.x, blt->worldpos.y, blt->o->soundID);
 
-            char* sound;
+            const char* sound;
 
             if(fxUtlGetRandomHitSound(hitsound, &sound, nullptr, nullptr))
             {
@@ -876,7 +876,7 @@ bool fxBltPlaySound(FLOAT64VECTOR* pos, const OBJECT* o)
     if(!o)
         return false;
 
-    SCHAR* sound = nullptr;
+    const SCHAR* sound = nullptr;
 
     if(oglIsMaterial(o->matid))
     {
@@ -884,7 +884,7 @@ bool fxBltPlaySound(FLOAT64VECTOR* pos, const OBJECT* o)
         MATERIAL* mat;
         piGetMaterials(&mat);
 
-        fxUtlGetRandomHitSound(mat[o->matid].name,
+        fxUtlGetRandomHitSound((const char *)mat[o->matid].name,
                                &sound,
                                nullptr,
                                nullptr);
@@ -965,7 +965,7 @@ LOGICAL fxBltDraw()
 
     FXBULLET* blt;
 
-    for(B; B != E; ++B)
+    for(; B != E; ++B)
     {
         blt = (*B);
 

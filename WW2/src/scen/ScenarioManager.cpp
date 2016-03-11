@@ -388,26 +388,24 @@ FLOAT64 ScenarioPlayer::GetY()
 *************************************************************************************************/
 
 ScenarioManager::ScenarioManager() :
-	_soundUpdate(0),
-	_lastUpdate(0),
-	_playerUpdate(0),
-	_startTime(0),
 #ifdef BETA_RELEASE
 	_editMode(false),
 #endif
-	_scenario(nullptr),
-	_map(nullptr),
+    _flags(0),
+    _globalflag(GLOBAL_NONE),
+    _round(0),
+    _stage(0),
+    _offlineTeam(1),
+    _offlineRound(1),
+    _offlineStage(1),
+	_soundUpdate(0),
+	_playerUpdate(0),
+    _lastUpdate(0),
+    _updatePlayers(true),
     _terrainReadyToLoad(false),
-	_scenarioIsComplete(true),
-	_objectsLoaded(false),
-	_updatePlayers(true),
-	_flags(0),
-	_round(0),
-	_stage(0),
-	_offlineTeam(1),
-	_offlineRound(1),
-	_offlineStage(1),
-    _globalflag(GLOBAL_NONE)
+    _scenarioIsComplete(true),
+    _scenario(nullptr),
+    _map(nullptr)
 {
 	_respawnWeapon = NULL_WEAP_SPEC;
 }
@@ -1200,7 +1198,8 @@ bool ScenarioManager::Spawn(const vehType* vehtype)
 		//uiConsoleprintf("SCENARIO: Spawning at %.2f, %.2f, %.2f", &at.x, &at.y, &at.z);
 		mlSetSpawnStuff(0,0,-1,1);
 		mlSetMobileSpawnStuff(0, at.x, at.y, at.z, yaw);
-		WEAPON_SERIAL blah={0};
+		WEAPON_SERIAL blah;
+        memset(&blah, 0, sizeof(WEAPON_SERIAL));
 		vehcommSendVehicleRequest(vehtype->VehicleTypeNum,&blah);
 	}
 
@@ -1363,7 +1362,6 @@ int ScenarioManager::SetRound(int r)
 {
 	int lastRound = _round;
 	int nextRound = (r == -1) ? ++_round : r;
-	int lastStage = _stage;
 	int nextStage = (r != _round) ? 1 : _stage;
 
 	if(nextRound != lastRound)
@@ -1987,11 +1985,8 @@ int ScenarioManager::AddContent(const char* line)
 	else if(strcasecmp(cc.command, "event") == 0)
 	{
 		FLOAT32 chance			= 1.0f; // how likely each event interval to run
-		SINT32 lastEvent		= 0;
-		SINT32 nextEvent		= 0;
 		SINT32 eventInterval	= 0; // how long between events
 		SINT32 runInterval		= 0; // how long between runs
-		SINT32 run				= -1; // current run
 		SINT32 runs				= 1; // number of runs
 
 		// name,chance,einterval,rinterval,runs
@@ -3537,6 +3532,12 @@ void ScenarioManager::LoadObject(ScenarioObject* ob, UINT32 loadFlags, const cha
 
 			if(data)
 			{
+                /*
+                 TBD: Clearly someone meant to process more than just 3 pieces of data here even
+                      if it intended to be optional - but as is, its not processing more than three.
+                 
+                 OLD Code: 
+                 
 				FLOAT32 x, y, z, dx, dy, dz;
 				x = y = z = dx = dy = dz = 0.0f;
 
@@ -3546,6 +3547,15 @@ void ScenarioManager::LoadObject(ScenarioObject* ob, UINT32 loadFlags, const cha
 					position.set((double)x, (double)y, (double)z);
 				if(parsed > 3)
 					dir.set((double)dx, (double)dy, (double)dz);
+                 */
+                
+                FLOAT32 x, y, z;
+                x = y = z = 0.0f;
+                
+                int parsed = sscanf(data, "%f %f %f", &x, &y, &z);
+                
+                if(parsed == 3)
+                    position.set((double)x, (double)y, (double)z);
 			}
 
 			if(!position.length2())
@@ -3882,7 +3892,9 @@ void ScenarioManager::LoadObject(ScenarioObject* ob, UINT32 loadFlags, const cha
 				return; // unsupported type
 
 			// now we have the 2 points that make up the boundary volume
-			Vec3d front = Vec3d(0,1,0);
+            //  TBD - but only one is being used.  Why?  Is this an error in the calcualtion?
+			// Vec3d front = Vec3d(0,1,0);
+            
 			Vec3d up = Vec3d(0,0,1);
 
 			Matrixd rotate;
@@ -4074,6 +4086,10 @@ void ScenarioManager::UnloadObject(ScenarioObject* ob)
 			TUT_MGR->RunCode(code);
 		}
 		break;
+            
+            default:
+            // no actions for any other types.
+            break;
 	}
 }
 
@@ -4131,9 +4147,12 @@ void ScenarioManager::LoadObjects(UINT32 loadFlags)
 {
 	for(size_t i = 0; i < objects.size(); i++)
 	{
+        /*
+            TBD: This is currently a NOP, what was actually indended?  To call Stop()?
 		if(strcasecmp(objects[i]->name.c_str(), "riverrun") == 0)
 			bool stop = true;
-
+         */
+        
 		LoadObject(objects[i], loadFlags);
 	}
 
@@ -4183,11 +4202,16 @@ void ScenarioManager::LoadBoundaries()
 
 void ScenarioManager::LoadContent()
 {
-	bool active = IsActive();
-
+    /*
+       TBD - whenever we actually do custom maps, lol, for now - gone.
+     
+     bool active = IsActive();
+     
 	// global offset for custom maps; everything will be offset
 	Vec3d offset = (active) ? _scenario->offset : Vec3d();
-
+     
+     */
+    
 	// load our category (mappack) include if one is defined
 	jsContentData mapPack;
 
@@ -5041,12 +5065,16 @@ void ScenarioWaveObject::Update()
 		rotate.makeRotate((float)roll, 0, 1.0f, 0);
 		final = final * rotate;
 
+        /*
+          TBD - rotate it along the y, did this have an actual purpose?
+         
 		Vec3d from = Vec3d(0.0f, 1.0f, 0.0f);
 
-		// rotate it along the y
-		//rotate.makeRotate(from, position);
-		//final = final * rotate;
-
+		rotate.makeRotate(from, position);
+		final = final * rotate;
+         
+         */
+        
 		// rotate this into the object's world offsetted position
 		final = final * wd.objAtt;
 

@@ -27,15 +27,9 @@ private:
 	// list of grids currently in view
 	GridView _gridView;
 
-	// whats the max scale we'll draw labels at
-	UINT32 _maxLabelScale;
-
 	// when to request an update in ms
 	int _refreshTime;
 
 	// how between refreshes in ms
 	int _refreshInterval;
-
-	float _lastMapX;
-	float _lastMapY;
 };

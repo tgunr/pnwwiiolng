@@ -67,7 +67,7 @@ static TUV		tuvlist[4][9]={	{{0.5f, 0.5f}, {0.0f, 0.0f}, {0.0f, 0.5f}, {0.0f, 1.
 								{{0.5f, 0.5f}, {1.0f, 0.0f}, {0.5f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.5f}, {0.0f, 1.0f}, {0.5f, 1.0f}, {1.0f, 1.0f}, {1.0f, 0.5f}},
 								{{0.5f, 0.5f}, {1.0f, 1.0f}, {1.0f, 0.5f}, {1.0f, 0.0f}, {0.5f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.5f}, {0.0f, 1.0f}, {0.5f, 1.0f}},
 								{{0.5f, 0.5f}, {0.0f, 1.0f}, {0.5f, 1.0f}, {1.0f, 1.0f}, {1.0f, 0.5f}, {1.0f, 0.0f}, {0.5f, 0.0f}, {0.0f, 0.0f}, {0.0f, 0.5f}}};
-static SINT8*	alttexname[ALT_TRN_NUMBER]={
+static const SINT8*	alttexname[ALT_TRN_NUMBER]={
 											"dunes1.bmp",
 											"water1.bmp",
 											"dunes1.bmp",
@@ -413,73 +413,6 @@ SINT32		i, j, k;
 	Write_Debug("Edit list has been minimized and ordered");
 }
 
-
-static LOGICAL GetFullObjectBBox(OBJECT* lptop, piVECTOR* bbox)
-{
-SINT32			i;
-piVectorConstPtr pv;
-OBJECT*		lpatt;
-
-	while (lptop != nullptr)
-	{
-		if (lptop->child != nullptr)
-		{
-			if (!GetFullObjectBBox(lptop->child, bbox))
-			{
-				return(FALSE);
-			}
-		}
-
-		if (!(lptop->flags & OBJECT_NOTOBJECT))
-		{
-			lpatt = lptop;
-			while (lpatt != nullptr)
-			{
-				pv = lptop->RenderPositions();
-				for (i=0; i < lptop->numverts; i++, ++pv)
-				{
-					if (pv->x < bbox[0].x)
-					{
-						bbox[0].x = pv->x;
-					}
-
-					if (pv->x > bbox[1].x)
-					{
-						bbox[1].x = pv->x;
-					}
-
-					if (pv->y < bbox[0].y)
-					{
-						bbox[0].y = pv->y;
-					}
-
-					if (pv->y > bbox[1].y)
-					{
-						bbox[1].y = pv->y;
-					}
-
-					if (pv->z < bbox[0].z)
-					{
-						bbox[0].z = pv->z;
-					}
-
-					if (pv->z > bbox[1].z)
-					{
-						bbox[1].z = pv->z;
-					}
-				}
-
-				lpatt = lpatt->attached;
-			}
-		}
-
-		lptop = lptop->sibling;
-	}
-
-	return(TRUE);
-}
-
-
 LOGICAL trnldrInit(void)
 {
 SINT8	filename[MAX_PATH], mapname[64];
@@ -660,8 +593,6 @@ LOGICAL trnldrReleaseTerrainObject(OBJECT* lpobj, TERRAIN_DETAIL* td)
 
 				break;
 		}
-
-        int idx = 0;
 
 		deletion(lpobj, 0, 0, 0, nullptr);
 		trnUpdateStratData(td, lpobj, -1, FALSE);

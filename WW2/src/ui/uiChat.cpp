@@ -4,13 +4,8 @@
 #include <deque>
 
 #include <libxml/tree.h>
-#if platOS == OS_WIN32
 #include <regex>
 #define RENS std
-#else
-#include <boost/regex.hpp>
-#define RENS boost
-#endif
 
 #include "phui/KeyCodes.h"
 #include "phui/Control.h"
@@ -994,6 +989,9 @@ void uiChatGCIMessage(Chat::GCIMessage const& pgciMsg, bool alertOnly)
 			specifics = "withdrawn";
 			uiMsgNo = 519;
 		break;
+        default:
+            // no other valid game events
+            break;
 	};
 
 	if(gameEvent)

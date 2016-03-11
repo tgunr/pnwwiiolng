@@ -291,8 +291,6 @@ void RemoveClutterIfNecessary()
     p1.x() = float(veh->ModelData->VehiclePos.x - WorldOriginOffset.x);
     p1.y() = float(veh->ModelData->VehiclePos.y - WorldOriginOffset.y);
 
-    int count = 0;
-
     AttributeMap::iterator itr = active.begin();
 
     for(; itr != active.end(); ++itr)

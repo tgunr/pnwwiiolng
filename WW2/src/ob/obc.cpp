@@ -259,7 +259,7 @@ LOGICAL obcInit()
                              (xmlInputReadCallback)fioRead,
                              (xmlInputCloseCallback)fioClose);
 
-    SCHAR* name = "materials.xml";
+    const SCHAR* name = "materials.xml";
 
     xmlDocPtr doc = xmlReadFile(name, nullptr, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
 

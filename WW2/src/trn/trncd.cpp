@@ -61,7 +61,6 @@ mapOBJList mapOBJ; // All objects associated with a TO
 //#ifndef ANDREWCOLLISIONTESTS
 
 static LOGICAL g_bCheckTreeBox;
-static colliderQuery* _trnCollider = nullptr;
 
 typedef struct tagTERRAINID
 {
@@ -207,7 +206,6 @@ static UINT32 _AddStratMsgToFreeList(_StratMessageQue * StratMsg);
 static UINT32 _AddStratMsgToActiveList(_StratMessageQue * StratMsg);
 
 static SINT32 _GetDamageLevel(SINT32 visLevel);
-static UINT32 _killSound(SINT32 iID, void* data);
 
 static SINT32 _NullTexId;
 
@@ -5403,7 +5401,6 @@ UINT32 trncdInitSingleTerrainObject(trnCDTerrainObject* TO)
 UINT32 trncdAdjustTerrainObjects(piVECTOR* CameraAdjustment)
 {
 	trnCDTerrainObject* TO;
-	OBJECT*				childObj	= nullptr;
 
 	// next line should be called from the function that calls this function
 	persAdjustExternalFixedCamera(CameraAdjustment);
@@ -7289,13 +7286,11 @@ bool trncdCollideWithMouse(int sx, int sy)
 
     for(unsigned int j = 0; j < list.size(); j++)
     {
-        struct colliderQuery::Collision& c = list[j];
-
-        OBJECT* o = (OBJECT*)dGeomGetData(c.g2);
-
         // TODO: write contact point information or whatever
 // Debugging
 #if(0)
+        struct colliderQuery::Collision& c = list[j];
+        OBJECT* o = (OBJECT*)dGeomGetData(c.g2);
         uiChatPrintLine("%s", o->modelInstance ? o->modelInstance->GetModelName() : o->name);
 #endif
         // Can just use list[0], but keep loop for testing now...

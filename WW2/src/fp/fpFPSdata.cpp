@@ -38,20 +38,20 @@
 
 typedef std::map<std::string, fpFPSTrooperLoadout> fpFPSLoadoutMap;
 
-SCHAR*						arms_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
-SCHAR*						weap_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
-SCHAR*						clip_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
-SCHAR*						weap_default[NUM_WEAPONS];
-SCHAR*						weap_empty_default[NUM_WEAPONS];
-SCHAR*						clip_default[NUM_WEAPONS];
+const SCHAR*						arms_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
+const SCHAR*						weap_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
+const SCHAR*						clip_anim_files[NUM_WEAPONS][NUM_WEAP_STATES];
+const SCHAR*						weap_default[NUM_WEAPONS];
+const SCHAR*						weap_empty_default[NUM_WEAPONS];
+const SCHAR*						clip_default[NUM_WEAPONS];
 
 fpFPSWeaponData				fpsWeapons[NUM_WEAPONS];
 // moved it a bit for hacker irritation
 // fpFPSTrooperData			fpsTrooper;
 
-SCHAR* skel_model =			FPS_DIR "fullskeleton";
+const SCHAR* skel_model =			FPS_DIR "fullskeleton";
 
-SCHAR* arm_models[NUM_INFANTRY_TYPES] =
+const SCHAR* arm_models[NUM_INFANTRY_TYPES] =
 {
 	FPS_DIR "arms\\armsmesh-britinf",
 	FPS_DIR "arms\\armsmesh-germinf",
@@ -74,11 +74,11 @@ SCHAR* arm_models[NUM_INFANTRY_TYPES] =
 	FPS_DIR "arms\\armsmesh-britinf" // americans
 };
 
-SCHAR* replacement_arms_file = FPS_DIR "arms\\replacement_arms_maps";
-SCHAR* default_arms_tex_names[NUM_INFANTRY_TYPES];
-SCHAR* replacement_arms_tex_names[NUM_INFANTRY_TYPES];
+const SCHAR* replacement_arms_file = FPS_DIR "arms\\replacement_arms_maps";
+const SCHAR* default_arms_tex_names[NUM_INFANTRY_TYPES];
+const SCHAR* replacement_arms_tex_names[NUM_INFANTRY_TYPES];
 
-SCHAR* leg_models[NUM_INFANTRY_TYPES] =
+const SCHAR* leg_models[NUM_INFANTRY_TYPES] =
 {
 	FPS_DIR "legs\\brit-legs",
 	FPS_DIR "legs\\german-legs",
@@ -101,7 +101,7 @@ SCHAR* leg_models[NUM_INFANTRY_TYPES] =
 	FPS_DIR "legs\\brit-legs" // americans
 };
 
-SCHAR* hud_icons[NUM_ICONS] =
+const SCHAR* hud_icons[NUM_ICONS] =
 {
 	"hudsmg1.bmp",
 	"hudsatchel1.bmp",
@@ -120,7 +120,7 @@ SCHAR* hud_icons[NUM_ICONS] =
 	"hudltmortar1.bmp"
 };
 
-SCHAR* fpFPSWeaponKeyStrings[NUM_WEAPONS] =
+const SCHAR* fpFPSWeaponKeyStrings[NUM_WEAPONS] =
 {
 	"none",
 	"thompson",
@@ -182,7 +182,7 @@ SCHAR* fpFPSWeaponKeyStrings[NUM_WEAPONS] =
 	"fg42g",
 };
 
-SCHAR* fpFPSWeaponTypeStrings[FPS_WEAPONTYPE_NUM_TYPES] =
+const SCHAR* fpFPSWeaponTypeStrings[FPS_WEAPONTYPE_NUM_TYPES] =
 {
 	"SMG",
 	"SATCHEL",
@@ -201,7 +201,7 @@ SCHAR* fpFPSWeaponTypeStrings[FPS_WEAPONTYPE_NUM_TYPES] =
 	"ROCKET"
 };
 
-SCHAR* armTypeStrings[NUM_INFANTRY_TYPES]			=
+const SCHAR* armTypeStrings[NUM_INFANTRY_TYPES]			=
 {
 	"ukarmy",
 	"dearmy",
@@ -224,7 +224,7 @@ SCHAR* armTypeStrings[NUM_INFANTRY_TYPES]			=
 	"usarmy"
 };
 
-SCHAR* weapNameStrings[NUM_WEAPONS] =
+const SCHAR* weapNameStrings[NUM_WEAPONS] =
 {
 	(SCHAR *)"none",
 	(SCHAR *)"thompson",
@@ -618,9 +618,12 @@ void fpFPSDataReadFPSFile()
 		return;
 	}
 
-	UINT64 val1 = fpStringHash("piatFile");
 
 	/*
+     
+     TBD - is this test code??
+     
+    UINT64 val1 = fpStringHash("piatFile");
 	UINT64 val1 = fpStringHash("m1garandFile");
 	UINT64 val2 = fpStringHash("colt1911File");
 	UINT64 val3 = fpStringHash("springfld1903File");

@@ -3246,6 +3246,9 @@ void persGunsightDrawFPSScope(int type)
             _drawscope(_germanscope, 1.0f);
             break;
         }
+    default:
+        // shouldn't get here
+        break;
     }
 }
 

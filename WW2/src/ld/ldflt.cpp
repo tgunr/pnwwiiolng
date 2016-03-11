@@ -46,45 +46,44 @@ union colorstruct
 	UINT32	full;
 };
 
-static std::string s_loadError;
-
-static void FLTLoadFailure(const char* problem, const char* doing)
+struct FLTLoadFailure
 {
-	s_loadError += problem;
-	s_loadError += " on ";
-	s_loadError += doing;
-	s_loadError += '\n';
-}
+    FLTLoadFailure(const char* const problem, const char* const doing)
+    : m_problem(problem), m_doing(doing)
+    {}
+    
+    std::string m_problem, m_doing ;
+};
 
-static void FLTChunkFailure(const char* chunkType)
+struct FLTChunkFailure : public FLTLoadFailure
 {
-	s_loadError += "Unable to load FLT chunk ";
-	s_loadError += chunkType;
-	s_loadError += '\n';
-}
+    FLTChunkFailure(const char* const chunkType)
+    : FLTLoadFailure("Unable to load FLT chunk", chunkType)
+    {}
+    
+};
 
-static void FLTUnknownTexture(const char* textureName)
+struct FLTUnknownTexture : public FLTLoadFailure
 {
-	s_loadError += "Reference to missing texture ";
-	s_loadError += textureName;
-	s_loadError += '\n';
-}
+    FLTUnknownTexture(const char* const textureName)
+    : FLTLoadFailure("Reference to missing texture", textureName)
+    {}
+};
 
-static void FLTGeneralError(const char* error)
+struct FLTGeneralError
 {
-	s_loadError += error;
-	s_loadError += '\n';
-}
+    FLTGeneralError(const char* const error) : m_problem(error) {}
+    std::string m_problem ;
+};
 
-static void FLTItemFileError(const char* error, const char* item, const char* file)
+struct FLTItemFileError
 {
-	s_loadError += error;
-	s_loadError += ": id=";
-	s_loadError += item;
-	s_loadError += ": file=";
-	s_loadError += file;
-	s_loadError += '\n';
-}
+    FLTItemFileError(const char* error, const char* item, const char* file)
+        : m_error(error), m_item(item), m_file(file)
+    {}
+    
+    std::string m_error, m_item, m_file;
+};
 
 // persistent variables
 static SINT8				pathname[MAX_PATH];
@@ -2299,40 +2298,6 @@ static bool ReadPopExtension(void)
 	return true;
 }
 
-static bool DisplayTree(OBJECT* lpobj, int level)
-{
-	OBJECT*	lpatt;
-
-	if (lpobj)
-	{
-	//		Write_Debug("%s (%d)", lpobj->name, level);
-
-		lpatt = lpobj->attached;
-		while (lpatt)
-		{
-			lpatt = lpatt->attached;
-		}
-
-		if (lpobj->child)
-		{
-			if (!DisplayTree(lpobj->child, level+1))
-			{
-				return false;
-			}
-		}
-
-		if (lpobj->sibling)
-		{
-			if (!DisplayTree(lpobj->sibling, level))
-			{
-				return false;
-			}
-		}
-	}
-
-	return true;
-}
-
 #ifdef MAP_MATS
 // this doesn't work
 typedef std::map<std::string,std::string> MaterialMapper;
@@ -2385,7 +2350,6 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 {
 	SINT32 tstart = timeGetTime();
 
-	s_loadError = "";
 	memset(_textureflags2, 0, sizeof(unsigned int) * MAX_TEXTURE_REFS);
 	memset(_textureflags3, 0, sizeof(unsigned int) * MAX_TEXTURE_REFS);
 
@@ -2482,7 +2446,7 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 			break;
 
 		if ( s_chunk->next == 0 )
-			return FLTLoadFailure("Bad chunk in flt file", "read"), false;
+			throw FLTLoadFailure("Bad chunk in flt file", "read");
 
 		//	There is a bug in the later versions of the .FLT file format.
 		//	The POP_LEVEL commands at the end of a file are not endian converted.
@@ -2773,7 +2737,7 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 	{
 		FLTItemFileError("Topmost", groups[0]->name, s_conversionFile.c_str());
 		bTopmostObject = false;
-		return false;
+		return FALSE;
 	}
 
 	assert(topmostObject);
@@ -2815,14 +2779,17 @@ static OBJECT* _fltLoad(const char* const name, const float scale, const int red
 
 OBJECT* ldfltLoad(const std::string& name, float scale, int reduce)
 {
-	auto obj = _fltLoad(name.c_str(), scale, reduce);
-	if (PN_LIKELY(obj != nullptr))
-		return obj;
-
-	char error[1024];
-	strprintf(error, "Flt: %s\nError: %s", name.c_str(), s_loadError.c_str());
-	Write_Debug("%s", error);
-	piExitProgram(__FILE__, __LINE__, error);
-	return nullptr;
+    try
+    {
+        return _fltLoad(name.c_str(), scale, reduce);
+    }
+    catch (FLTLoadFailure& e)
+    {
+        char error[1024] ;
+        sprintf(error, "Flt:%s\nError: %s (%s)", name.c_str(), e.m_problem.c_str(), e.m_doing.c_str()) ;
+        Write_Debug("%s", error) ;
+        piExitProgram(__FILE__, __LINE__, error) ;
+        return NULL ;
+    }
 }
 

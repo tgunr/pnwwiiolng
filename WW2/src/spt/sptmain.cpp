@@ -87,7 +87,7 @@ private:
 	enum { GrowthRate = 128 } ;	// Grow in units of 128. MUST BE POWER OF 2.
 	enum { GrowthMask = GrowthRate - 1 };
 public:
-    FakeVector() : _size(0), _data(0), _capacity(0)
+    FakeVector() : _data(0), _size(0), _capacity(0)
 	{
 		reserve(1024);
 	}
@@ -1278,8 +1278,6 @@ inline static void sptDrawBillboardsDeprecated(int pass)
             tree->StartBillboardType();
             tree->SetAlphaRef(84.0f, CTree::TREE_BILLBOARDS);
 
-            unsigned int size = 4 * billboards[i].size() / stride;
-
             ogl::SetVertexPointer(4, GL_FLOAT, stride, &billboards[i][0]);
             ogl::SetTextureUnitCoordPointer(GL_TEXTURE0, 4, GL_FLOAT, stride, &billboards[i][4]);
             ogl::SetTextureUnitCoordPointer(GL_TEXTURE1, 3, GL_FLOAT, stride, &billboards[i][8]);
@@ -1359,8 +1357,6 @@ inline static void sptDrawHorizBillboardsDeprecated()
             CTree* tree = treeDataGetBaseTree(i);
             tree->StartHorizBillboardType();
             tree->SetAlphaRef(84.0f, CTree::HORIZ_BILLBOARDS);
-
-            unsigned int size = 4 * horizbillboards[i].size() / stride;
 
             // Position and fade
             ogl::SetVertexPointer(4, GL_FLOAT, stride, &horizbillboards[i][0]);
@@ -2683,8 +2679,6 @@ Description:
 ---------------------------------------------------------------------*/
 void sptGetStats(char stats[])
 {
-    unsigned int size = treeDataGetBaseSize();
-
     sprintf(stats,
             "TREES: Total %d Drawn %d 3D = %d 2D = %d Triangles %d",
             treeDataGetTotalTrees(),
@@ -3135,7 +3129,7 @@ void sptAddCluster(OBJECT* o, int* types/*[256]*/)
     x += WorldOriginOffset.x;
     y += WorldOriginOffset.y;
 
-    o->mat._43 = trnmainHeightAt(&trndtl[o->trnum], x, y);
+    o->mat._43 = trnmainHeightAt(&trndtl[static_cast<int>(o->trnum)], x, y);
 
     float highz = 10000.0f;
     float lowz = -10000.0f;
@@ -3269,7 +3263,7 @@ void sptAddCluster(OBJECT* o, int* types/*[256]*/)
             lowz = z;
         }
 
-        unsigned int address = sptAddTree(o, types[ii] - 1, &trndtl[o->trnum], pos64, false, changecluster);
+        unsigned int address = sptAddTree(o, types[ii] - 1, &trndtl[static_cast<int>(o->trnum)], pos64, false, changecluster);
 
         if(address == 0)
         {
@@ -3939,8 +3933,6 @@ bool sptInTreeBBox(const piVECTOR& pos, FLOAT32 altRadius)
             continue;
         }
 
-        CTree* basetree = treeDataGetBaseTree(base);
-
         for(unsigned int j = 0; j < threeD[base].size(); j++)
         {
             Tree* t = threeD[base][j];
@@ -4108,7 +4100,6 @@ void sptFreeTrees(TDTL_TREES* trees)
 
             for(; itr != octet.end(); ++itr)
             {
-                Tree* t = (Tree*)(*itr);
                 remove.push_back(*itr);
             }
 

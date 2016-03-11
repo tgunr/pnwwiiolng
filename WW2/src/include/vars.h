@@ -302,6 +302,9 @@ EXTERN UINT32			Convergence; // Global (default) Airplane gun convergence settin
 EXTERN UINT32			CurrentConv; // Current airplane gun convergence setting
 
 EXTERN FLOAT32			aimMouse;	// Aiming mouse sensitivity
+EXTERN SINT8            gAuthServer[128]; // Authentication server to be used
+EXTERN SINT8            gArena[8]; // Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
+EXTERN SINT8            gClientV[32]; // Version to submit
 
 #ifdef BETA_RELEASE
 	EXTERN LOGICAL			gCheckPlanarPlacement;

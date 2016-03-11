@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include <syscfg.h>
 /*------------------------------------------------------------------------------------
 Module: glslShader.cpp
 Description:
@@ -7,15 +7,19 @@ Description:
 #include "shader/glslShader.h"
 #include "shader/glslProgram.h"
 #include "log/log.h"
+#if platOS == OS_WIN32
 #include "spt/Random.h"
+#else
+#include "Random.h"
+#endif
 
 /*------------------------------------------------------------------------------------
 Function: glslShader::glslShader()
 Description:
 -------------------------------------------------------------------------------------*/
 glslShader::glslShader(Type type) :
-    _type(type),
     _shaderhandle(0),
+    _type(type),
     _needsCompile(false),
     _isCompiled(false)
 {
@@ -26,8 +30,8 @@ Function: glslShader::glslShader()
 Description:
 -------------------------------------------------------------------------------------*/
 glslShader::glslShader(Type type, const std::string& source) :
-    _type(type),
     _shaderhandle(0),
+    _type(type),
     _needsCompile(false),
     _isCompiled(false)
 {
@@ -164,10 +168,10 @@ void glslShader::CompileShader()
     temp.push_back( 0 );
     const char* s = &temp[0];
     glShaderSource(_shaderhandle, 1, &s, nullptr);
-#else
+#else    
     glShaderSource(_shaderhandle, 1, &sourceText, nullptr);
 #endif
-
+    
     glCompileShader(_shaderhandle);
     glGetShaderiv(_shaderhandle, GL_COMPILE_STATUS, &compiled);
 

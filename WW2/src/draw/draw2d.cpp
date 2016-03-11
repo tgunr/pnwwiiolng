@@ -252,7 +252,6 @@ LOGICAL draw2dTexture(SINT32 iTexID,
 	}
 
 	u1 = 0.0f;			// Left
-	u2 = u2;			// Right
 	v1 = 1.0f - v2;		// Bottom
 	v2 = 1.0f;			// Top
 
@@ -363,8 +362,6 @@ piTLVERTEX  Vertices[6];
 
     u1 = 0.0f;
     v1 = 0.0f;
-    u2 = u2;
-    v2 = v2;
 
 	Vertices[0].sx = sx;
 	Vertices[0].sy = sy;

@@ -660,7 +660,7 @@ FrameBufferObject::~FrameBufferObject()
 
 void FrameBufferObject::setAttachment(BufferComponent attachment_point, const FrameBufferAttachment &attachment)
 {
-    GLenum gl_attachment = convertBufferComponentToGLenum(attachment_point);
+    convertBufferComponentToGLenum(attachment_point);
     _attachments[attachment_point] = attachment;
 
     updateDrawBuffers();
@@ -686,8 +686,6 @@ void FrameBufferObject::updateDrawBuffers()
     // create textures and mipmaps before we bind the frame buffer object
     for(AttachmentMap::const_iterator i=_attachments.begin(); i!=_attachments.end(); ++i)
     {
-        const FrameBufferAttachment &fa = i->second;
-
         // setup draw buffers based on the attachment definition
         if(i->first >= COLOR_BUFFER0 && i->first <= COLOR_BUFFER15)
             _drawBuffers.push_back(convertBufferComponentToGLenum(i->first));

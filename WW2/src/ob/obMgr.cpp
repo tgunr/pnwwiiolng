@@ -51,7 +51,6 @@
 
 static int defaultSpecMap = -1;
 static int white = -1;
-static int black = -1;
 
 using namespace	ogl;
 using namespace	ogl::VertexAttributes;
@@ -227,28 +226,6 @@ ModelInstance* PoolModel::CreateInstance(const piMATRIX& transform)
 struct OBJECT* obmgrCreateModelInstance(const char* modelname)
 {
 	return obmgrCreateModelInstance(modelname, IdentityMatrix, false);
-}
-
-static inline void _findThisNameInObjectTree(OBJECT** o, OBJECT* top, const char* name)
-{
-    if(!top || *o)
-        return;
-
-    if(top->flag2 & OBJECT_SPEEDTREE)
-    {
-        if(top->name[0] && strstr(top->name, name))
-        {
-            *o = top;
-            return;
-        }
-    }
-
-    if(top->sibling)
-        _findThisNameInObjectTree(o, top->sibling, name);
-    if(top->child)
-        _findThisNameInObjectTree(o, top->child, name);
-    if(top->attached)
-        _findThisNameInObjectTree(o, top->attached, name);
 }
 
 void obmgrHandleSpecialObjects(OBJECT* o)
@@ -1239,7 +1216,7 @@ void PoolNode::load(PoolModel* model, int fd)
             material->SetMaterial(matid);
 
             // Interior objects don't get spec or normal mapped
-            if(flag2 & OBJECT_NORMALMAP | flag3 & OBJECT_SPECULARMAP)
+            if((flag2 & OBJECT_NORMALMAP) || (flag3 & OBJECT_SPECULARMAP))
             {
                 if(piIsMaterialInterior(matid))
                 {
@@ -1637,14 +1614,14 @@ OBJECT* PoolNode::createPoolInstance(ModelInstance* modelInstance, const piMATRI
 	PoolModel
 *************************************************************************************************/
 PoolModel::PoolModel(const char* path, unsigned int flags)
-	:	modelType(ModelTypes::GENERAL),
+:		node(nullptr),
+        vbo(nullptr),
+        modelType(ModelTypes::GENERAL),
 		placeMode(OBJVAL_NO_PLACEMODE),
 		propertyFlags(PropertyFlags::HOLLOW_REFERENCE),
-		node(nullptr),
+        loadFlags(flags),
         hastrees(false),
-        hasRoads(false),
-        vbo(nullptr),
-		loadFlags(flags)
+        hasRoads(false)
 {
 }
 
@@ -2071,12 +2048,12 @@ void PoolModel::RebuildMDL()
 {
 	OBJECT*						topmostObj		= nullptr;								// Topmost object of the temporary .flt object tree
 	POOLOBJHDR*					poolObjHdr		= nullptr;
-	std::string					fltPath			= directory + modelname + ".flt";
+	const std::string			fltPath			= directory + modelname + ".flt";
 	UINT32						poolOffset		= 0;
 	MODELMATERIALS				modelMaterials;
 
 
-	topmostObj = ldfltLoad(fltPath, 1, 1);
+	topmostObj = ldfltLoad(fltPath, 1.0f, 1);
 	if(!topmostObj)
 	{
 		Write_Debug("Error loading FLT file for %s", fltPath.c_str());
@@ -2299,7 +2276,7 @@ void PoolModel::CollectModelMaterials(OBJECT* o, MODELMATERIALS* modelmaterials)
 {
 	MODELMATERIALS::iterator	cur				= modelmaterials->begin();
 	MATERIAL*					globalmats		= nullptr;
-	SINT32						globalmatcnt	= piGetMaterials(&globalmats);
+	piGetMaterials(&globalmats);
 
     if(o)
     {
@@ -2885,8 +2862,8 @@ void PoolModel::GetMinLODStats(int& minNumVertices, int& minNumObjects, float& m
 //////////////////////////////////////////////////////////////////////
 ModelInstance::ModelInstance(PoolModel* pM, const piMATRIX& m)
 	:	poolModel(pM),
-		transform(m),
-		bounds(pM->bounds)
+		bounds(pM->bounds),
+        transform(m)
 {
 }
 
@@ -2986,9 +2963,6 @@ static void _CreateODEVehicleCollider(PoolModel* pm)
 static void _CreateODETerrainCollider(PoolModel* pm)
 {
 	PoolNode* root = pm->node;
-
-	if(!strcasecmp(pm->modelname.c_str(), "wbush1c"))
-		bool stop = true;
 
 	FindByComment<PoolNode> finder;
 

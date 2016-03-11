@@ -47,17 +47,17 @@ static void _normalizeAngle(FLOAT64& angle)
 *************************************************************************************************/
 
 EZManager::EZManager(vehVehicle* v) :
+    _vehicle(v),
 	_flags(0),
+    _lastUpdate(frametime),
+    _category(0),
+    _mainTurret(-1),
+    _hatchTime(750),
+    _view(0),
 	_position(0),
-	_lastUpdate(frametime),
-	_mainTurret(-1),
+    _gamePosition(-1),
 	_move(EZ_MOVE_IDLE),
-	_turn(EZ_TURN_NONE),
-	_gamePosition(-1),
-	_vehicle(v),
-	_view(0),
-	_category(0),
-	_hatchTime(750)
+	_turn(EZ_TURN_NONE)
 {
 }
 
@@ -1194,8 +1194,6 @@ void EZManager::EZTurret::PostUpdate()
 
 	if(screenPos.z() < 1.0f)
 	{
-		bool update = false;
-
 		FLOAT64 centerX = WantedWidth * .5f;
 		FLOAT64 centerY	= WantedHeight * .5f;
 

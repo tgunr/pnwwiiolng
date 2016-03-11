@@ -122,24 +122,14 @@ static _CHAOTICSEEDTYPE		_Seed;
 static _CHAOTICSEEDTYPE		_CurrentSeed;
 static OBJECT*				_ImportObjectList[MAX_IMPORT_OBJECTS];
 static SINT32				_CurrentImportObjectCount;
-static piLVERTEX			_Vertices[512];
 static SINT32				NumDrawnTriangles;
 
-//static LOGICAL			_SetTerrainMatricies(piMATRIX Mat);
-static UINT32				_UpdateTerrainOriginOffset(void);
-static UINT32				_ScanObjectTreeForSubstitutionObjects(OBJECT * lpobj);
-static UINT32				_AddImportObject(OBJECT ** ObjectPtr, UCHAR * InputString);
-static UINT32				_RenderImportObject(OBJECT * Object);
 static LOGICAL				_DrawVertices(int type, OBJECT* lpobj);
-static bool	_DisplayImportedClones(OBJECT * Object);
 
 // static prototypes
 static LOGICAL RawUpdate(LOGICAL ForceCompleteReLoad);
 LOGICAL trnmainFindSupercell(SINT16* scx, SINT16* scy, piVECTOR* p);
 static LOGICAL trnmainAdjustTerrainSections(piVECTOR* CameraAdjustment);
-
-static LOGICAL _setShaders(OBJECT* o);
-static LOGICAL _loadShaders();
 
 // Removing this causes undeclared error in BETA_RELEASE
 #ifdef BETA_RELEASE
@@ -207,19 +197,6 @@ static UINT32 _GetChaoticNumberGeneratorSeed(_CHAOTICSEEDTYPE * Seed)
 
 	return TRUE;
 }
-
-static UINT32 _SetChaoticNumberGeneratorSeed(_CHAOTICSEEDTYPE * Seed)
-{
-	if (Seed == nullptr)
-	{
-		return FALSE;
-	}
-
-	_CurrentSeed = *Seed;
-
-	return TRUE;
-}
-
 
 LOGICAL trnmainSetObjectCreationCallback(TRN_OBJECT_NOTIFY callback)
 {
@@ -610,7 +587,7 @@ FLOAT32		x, y, left, top, right, bottom;
 	return(TRUE);
 }
 
-LOGICAL trnmainAddAltTexture(OBJECT** retobj, OBJECT* lpobj, SINT32 octet, SINT8* texname)
+LOGICAL trnmainAddAltTexture(OBJECT** retobj, OBJECT* lpobj, SINT32 octet, const SINT8* texname)
 {
 	LOGICAL		load=FALSE;
 	static SINT8		filename[_MAX_PATH];
@@ -619,7 +596,7 @@ LOGICAL trnmainAddAltTexture(OBJECT** retobj, OBJECT* lpobj, SINT32 octet, SINT8
 	OBJECT*	newobj=nullptr;
 	TERRAIN_DETAIL*	td;
 
-	td = &trndtl[lpobj->trnum];
+	td = &trndtl[static_cast<int>(lpobj->trnum)];
 	if (strcmp(texname, "null1.bmp") == 0)
 	{
 		Write_Debug("Null texture object was used");
@@ -813,7 +790,7 @@ TERRAIN_DETAIL*	td;
 
 	if (!loading)
 	{
-		td = &trndtl[lpobj->trnum];
+		td = &trndtl[static_cast<int>(lpobj->trnum)];
 		if (td->trindx < 0 || td->trindx >= MAX_TERRAIN_EDIT_LIST)
 		{
 			Write_Debug("Out of edit buffer space.");
@@ -992,7 +969,7 @@ TERRAIN_DETAIL*	td;
 
 	if (!loading)
 	{
-		td = &trndtl[newobj->trnum];
+		td = &trndtl[static_cast<int>(newobj->trnum)];
 		for (i=0; i < td->tricnt; i++)
 		{
 			if (strcmp(td->triname[i], newobj->texname) == 0)
@@ -3774,380 +3751,6 @@ LOGICAL trnmainSetTerrainOriginOffset(void)
 LOGICAL trnmainWorldOriginMoved(void)
 {
 	return _WorldMoved;
-}
-
-
-static UINT32 _ScanObjectTreeForSubstitutionObjects(OBJECT * lpobj)
-{
-OBJECT*	ObjSib;
-UCHAR*		RetPtr;
-
-	if (lpobj == nullptr)
-	{
-		return 0;
-	}
-
-	ObjSib = lpobj;
-
-	do
-	{
-
-		if (obmainFindCommentName((char **)&RetPtr,ObjSib->comment,"import") == TRUE)
-		{
-			ObjSib->flags |= OBJECT_USERDRAW;
-
-			ObjSib->drawcallback = _DisplayImportedClones;
-
-			_AddImportObject((OBJECT **)(&ObjSib->lpspare),RetPtr);
-		}
-
-		if (ObjSib->child != nullptr)
-		{
-			_ScanObjectTreeForSubstitutionObjects(ObjSib->child);
-		}
-
-		ObjSib = ObjSib->sibling;
-	}
-	while (ObjSib != nullptr);
-
-
-	return 0;
-}
-
-static UINT32 _AddImportObject(OBJECT ** ObjectPtr, UCHAR * InputString)
-{
-UCHAR	s[64];
-SINT32	i;
-
-	*ObjectPtr = nullptr;
-
-//	sscanf((char*)InputString,"%s",(char*)s);
-	strcpy((char*)s,"crkwillow2");
-//	strcpy(s,"farmset2_barn");
-
-	// see if we already have an import object loaded
-	for (i=0; i < _CurrentImportObjectCount; i++)
-	{
-		if (strcmp((char*)s,_ImportObjectList[i]->name) == 0)
-		{
-			*ObjectPtr = _ImportObjectList[i];
-			return 0;
-		}
-	}
-
-	// if not check if we have space
-	if (_CurrentImportObjectCount < MAX_IMPORT_OBJECTS)
-	{
-		if(!obmgrCreateModelInstance((char*)s))
-		{
-			return 0;
-		}
-
-		_ImportObjectList[_CurrentImportObjectCount] = obmainFindNamedObject((char*)s);
-//		sprintf(_ImportObjectList[_CurrentImportObjectCount]->name,"%s_import",s);
-
-		*ObjectPtr = _ImportObjectList[_CurrentImportObjectCount];
-
-		ogrpSetObjectAndSubtreeToNotDraw(_ImportObjectList[_CurrentImportObjectCount]);
-
-		_CurrentImportObjectCount++;
-
-	}
-
-	return 0;
-}
-
-
-static bool _DisplayImportedClones(OBJECT * Object)
-{
-UINT32		i,j;
-int			texid;
-OBJECT*	lpobj;
-piMATRIX	Mat,WorldMat;
-piVECTOR	Vec, V1;
-FLOAT32		DistSqr;
-piVECTOR	pp;
-piVECTOR	TempVec,TempVec1;
-piVECTOR	Pos;
-piLVERTEX*	CurrentVertex;
-UINT32		VertexCount;
-
-
-	if (Object == nullptr)
-	{
-		return (TRUE);
-	}
-
-	if (Object->lpspare == nullptr)
-	{
-		return (TRUE);
-	}
-
-	lpobj = (OBJECT*)Object->lpspare;
-	ogrpSetObjectAndSubtreeToDraw(lpobj);
-
-	piVectorConstPtr rpos = Object->RenderPositions();
-
-	for (i=0; i < Object->numtris; i++)
-	{
-		Vec = V1 =rpos[Object->ptris[i].v1];
-		math3dVectorMultiply(&Vec,&Vec,&Object->mat);
-		pp.x = -playpos.x;
-		pp.y = -playpos.y;
-		pp.z = -playpos.z;
-		mathSubVectors(&Vec,&pp,&Vec);
-
-		DistSqr = Vec.x * Vec.x + Vec.y * Vec.y + Vec.z * Vec.z;
-
-		if (DistSqr < 500.0f * 500.0f && DistSqr > 0.0f * 0.0f)
-//		if (0)
-		{
-			Mat = IdentityMatrix;
-
-			Mat._41 = V1.x;
-			Mat._42 = V1.y;
-			Mat._43 = V1.z;
-
-			math3dMatrixMultiply(&Mat,&Mat,&Object->mat);
-
-			obmainSetObjectTreeMatrix(lpobj,&Mat);
-
-			obdrawDrawTree(lpobj);
-		}
-	}
-
-	CurrentVertex = &_Vertices[0];
-	VertexCount = 0;
-
-	WorldMat = *piGetWorldMatrix();
-
-	piSetWorldMatrix(&IdentityMatrix);
-	piSetRenderStageState(0, piTSS_MIPFILTER, piTFP_NONE);
-//	piSetRenderState(piRENDERSTATE_ZBIAS, 14);;
-	piSetRenderState(piRENDERSTATE_ZBIAS, 0);
-
-	_SetChaoticNumberGeneratorSeed(&_Seed);
-
-	rpos = Object->RenderPositions();
-	for (j=0; j < 1; j++)
-	{
-		for (i=0; i < Object->numtris; i++)
-		{
-			if (VertexCount > 500)
-			{
-				break;
-			}
-
-			Vec = V1 = rpos[Object->ptris[i].v1];
-			math3dVectorMultiply(&Vec,&Vec,&Object->mat);
-			Pos = Vec;
-	//		Pos.x += (_GetChaoticNumber()) / 65536.0f * 300.0f;
-	//		Pos.y += (_GetChaoticNumber()) / 65536.0f * 300.0f;
-
-			pp.x = -playpos.x;
-			pp.y = -playpos.y;
-			pp.z = -playpos.z;
-			mathSubVectors(&Vec,&pp,&Vec);
-
-			DistSqr = Vec.x * Vec.x + Vec.y * Vec.y + Vec.z * Vec.z;
-			math3dNormalize(&Vec);
-
-			if (DistSqr < 2000.0f * 2000.0f && DistSqr > 500.0f * 500.0f)
-			{
-	//			draw3dPoint(&Pos,colorREDALPHA);
-
-				// compute perpendicular vector
-				TempVec.x = TempVec.y = 0.0f;
-				TempVec.z = 1.0f;
-				math3dCrossProduct(&TempVec,&Vec,&TempVec);
-				TempVec.z = 0.0f;
-				math3dNormalize(&TempVec);
-
-				TempVec1 = Pos;
-				TempVec1.z += 6.5f;
-
-				*(piVECTOR*)CurrentVertex = TempVec1;
-				CurrentVertex->tu = 0.5f;
-				CurrentVertex->tv = 0.0f;
-				CurrentVertex->color = colorWHITEALPHA;
-				CurrentVertex->specular = colorALPHA100;
-				CurrentVertex++;
-
-				TempVec1 = Pos;
-				TempVec1.x += TempVec.x * 16.0f;
-				TempVec1.y += TempVec.y * 16.0f;
-				TempVec1.z -= 25.5f;
-
-				*(piVECTOR*)CurrentVertex = TempVec1;
-				CurrentVertex->tu = 1.0f;
-				CurrentVertex->tv = 1.0f;
-				CurrentVertex->color = colorWHITEALPHA;
-				CurrentVertex->specular = colorALPHA100;
-				CurrentVertex++;
-
-				TempVec1 = Pos;
-				TempVec1.x -= TempVec.x * 16.0f;
-				TempVec1.y -= TempVec.y * 16.0f;
-				TempVec1.z -= 25.5f;
-
-				*(piVECTOR*)CurrentVertex = TempVec1;
-				CurrentVertex->tu = 0.0f;
-				CurrentVertex->tv = 1.0f;
-				CurrentVertex->color = colorWHITEALPHA;
-				CurrentVertex->specular = colorALPHA100;
-				CurrentVertex++;
-
-				VertexCount += 3;
-
-			}
-		}
-	}
-
-	// find a texture id
-	lpobj = (OBJECT*)Object->lpspare;
-	while (lpobj != nullptr && lpobj->flags & OBJECT_NOTOBJECT)
-	{
-		lpobj = lpobj->child;
-	}
-
-	if (VertexCount > 0 && lpobj != nullptr)
-	{
-		piSetActiveTexture(lpobj->texid, 0);
-
-		piDisableMaterial();
-
-		if (!piRenderScene(piPT_TRIANGLELIST, piVT_LVERTEX,
-							&_Vertices, VertexCount))
-		{
-			return(FALSE);
-		}
-	}
-
-	piSetRenderStageState(0, piTSS_MIPFILTER, TextureMipFilter);
-	piSetWorldMatrix(&WorldMat);
-
-	ogrpSetObjectAndSubtreeToNotDraw(lpobj);
-
-	return (TRUE);
-
-
-	if (Object->shadow == nullptr)
-	{
-		return (TRUE);
-	}
-
-	lpobj = Object->shadow;
-
-	// some objects don't want filtering
-	if (lpobj->flags & OBJECT_NOFILTER)
-	{
-		piSetRenderStageState(0, piTSS_MINFILTER, piTFN_POINT);
-		piSetRenderStageState(0, piTSS_MAGFILTER, piTFG_POINT);
-	}
-
-	texid = lpobj->child->texid;
-	if (piIsTexture(texid, 0) &&
-		!bTexturesDisabled)
-	{
-		piSetActiveTexture(texid, 0);
-	}
-	else
-	{
-		piDisableTexture();
-	}
-
-	WorldMat = *piGetWorldMatrix();
-
-
-	rpos = Object->RenderPositions();
-	for (i=0;i<Object->numtris;i++)
-	{
-		V1 = rpos[Object->ptris[i].v1];
-
-		Mat = Object->mat;
-		Mat._41 += V1.x;
-		Mat._42 += V1.y;
-		Mat._43 += V1.z;
-
-		piSetWorldMatrix(&Mat);
-
-		_RenderImportObject(lpobj);
-	}
-
-	piSetWorldMatrix(&WorldMat);
-
-	// some objects don't want filtering
-	if (lpobj->flags & OBJECT_NOFILTER)
-	{
-		piSetRenderStageState(0, piTSS_MINFILTER, TextureMinFilter);
-		piSetRenderStageState(0, piTSS_MAGFILTER, TextureMagFilter);
-	}
-
-	return (TRUE);
-}
-
-static UINT32 _RenderImportObject(OBJECT * Object)
-{
-OBJECT * ObjSib,*ObjAtt;
-int type;
-
-	if (Object == nullptr)
-	{
-		return 0;
-	}
-
-	ObjSib = Object;
-
-	do
-	{
-		ObjAtt = ObjSib;
-
-		if (!(ObjAtt->flags & OBJECT_NOTOBJECT))
-		{
-			do
-			{
-				if (ObjAtt->flags & OBJECT_LINESTRIP)
-				{
-					type = piPT_LINESTRIP;
-				}
-				else
-				if (ObjAtt->flags & OBJECT_LINECLOSED)
-				{
-					type = piPT_LINESTRIP;
-				}
-				else
-				if (ObjAtt->flags & OBJECT_TRIANGLEFAN)
-				{
-					type = piPT_TRIANGLEFAN;
-				}
-				else
-				if (ObjAtt->flags & OBJECT_TRIANGLELIST)
-				{
-					type = piPT_TRIANGLELIST;
-				}
-				else
-				{
-					type = 0;
-				}
-
-				_DrawVertices(type, ObjAtt);
-
-
-				ObjAtt = ObjAtt->attached;
-			}
-			while (ObjAtt != nullptr);
-		}
-
-		if (ObjSib->child != nullptr)
-		{
-			_RenderImportObject(ObjSib->child);
-		}
-
-		ObjSib = ObjSib->sibling;
-	}
-	while (ObjSib != nullptr);
-
-	return 0;
 }
 
 static LOGICAL _DrawVertices(int type, OBJECT* lpobj)

@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include <syscfg.h>
 /*------------------------------------------------------------------------------------
 Module: glslUniformBlock.cpp
 Description:
@@ -65,9 +65,9 @@ Function: glslUniformBlock::glslUniformBlock()
 Description:
 -------------------------------------------------------------------------------------*/
 glslUniformBlock::glslUniformBlock() :
-    _numElements(0),
-    _dirty(false),
+    _numElements(0), 
     _ubo(0),
+    _dirty(false),
     _base(-1)
 {
 }
@@ -77,9 +77,9 @@ Function: glslUniformBlock::glslUniformBlock()
 Description:
 -------------------------------------------------------------------------------------*/
 glslUniformBlock::glslUniformBlock(const std::string& name) :
-    _numElements(0),
-    _dirty(false),
+    _numElements(0), 
     _ubo(0),
+    _dirty(false),
     _base(-1)
 {
     _name = name;
@@ -105,7 +105,6 @@ void glslUniformBlock::AddUniform(const std::string& name, int size, int byteoff
     params->size = size;
     params->offset = byteoffset;
 
-    int comp = GetTypeNumComponents((Type)type);
     GLenum e = GetInternalArrayType((Type)type);
 
     if(e == GL_FLOAT)
@@ -133,8 +132,6 @@ Description:
 -------------------------------------------------------------------------------------*/
 void glslUniformBlock::Buffer()
 {
-    UniformList::iterator itr = _uniformList.begin();
-
     // Create a buffer object
     glGenBuffers(1, &_ubo);
     glBindBuffer(GL_UNIFORM_BUFFER, _ubo);
@@ -328,7 +325,7 @@ void glslUniformBlock::SetElement(UniformParams* u, const Vec2f& v2)
     {
         UniformBufferBind::BindBufferBase(_ubo, _base);
         glBufferSubData(GL_UNIFORM_BUFFER, u->offset, 8, v2.ptr());
-
+ 
         _floatArray[idx + 0] = v2.x();
         _floatArray[idx + 1] = v2.y();
     }
@@ -616,7 +613,7 @@ Description:
 void glslUniformBlock::Set(const std::string& uniform, float f)
 {
     UniformParams* u = GetUniform(uniform);
-
+    
     if(u)
         SetElement(u, f);
 }
@@ -628,7 +625,7 @@ Description:
 void glslUniformBlock::Set(const std::string& uniform, const Vec2f& v2)
 {
     UniformParams* u = GetUniform(uniform);
-
+    
     if(u)
         SetElement(u, v2);
 }
@@ -640,7 +637,7 @@ Description:
 void glslUniformBlock::Set(const std::string& uniform, const piVECTOR& v3)
 {
     UniformParams* u = GetUniform(uniform);
-
+    
     if(u)
         SetElement(u, v3);
 }
@@ -652,7 +649,7 @@ Description:
 void glslUniformBlock::Set(const std::string& uniform, const Vec3d& v3)
 {
     UniformParams* u = GetUniform(uniform);
-
+    
     if(u)
         SetElement(u, v3);
 }
@@ -664,7 +661,7 @@ Description:
 void glslUniformBlock::Set(const std::string& uniform, const Vec3f& v3)
 {
     UniformParams* u = GetUniform(uniform);
-
+    
     if(u)
         SetElement(u, v3);
 }
@@ -676,7 +673,7 @@ Description:
 void glslUniformBlock::Set(const std::string& uniform, const Vec4d& v4)
 {
     UniformParams* u = GetUniform(uniform);
-
+    
     if(u)
         SetElement(u, v4);
 }
@@ -688,7 +685,7 @@ Description:
 void glslUniformBlock::Set(const std::string& uniform, const Vec4f& v4)
 {
     UniformParams* u = GetUniform(uniform);
-
+    
     if(u)
         SetElement(u, v4);
 }
@@ -702,7 +699,7 @@ void glslUniformBlock::SetData(const std::string& uniform, const void* data, int
     logTimerBeginMacro();
 
     UniformParams* u = GetUniform(uniform);
-
+    
     if(u)
         SetElementData(u, data, bytesize);
 
@@ -716,7 +713,7 @@ Description:
 void glslUniformBlock::Set(const std::string& uniform, const piCOLORVALUE& v4)
 {
     UniformParams* u = GetUniform(uniform);
-
+    
     if(u)
         SetElement(u, v4);
 }
@@ -728,7 +725,7 @@ Description:
 void glslUniformBlock::Set(const std::string& uniform, const piMATRIX& m4)
 {
     UniformParams* u = GetUniform(uniform);
-
+    
     if(u)
         SetElement(u, m4);
 }
@@ -740,7 +737,7 @@ Description:
 void glslUniformBlock::Set(const std::string& uniform, const piMATRIX3x3& m3)
 {
     UniformParams* u = GetUniform(uniform);
-
+    
     if(u)
         SetElement(u, m3);
 }
@@ -752,7 +749,7 @@ Description:
 void glslUniformBlock::Set(const std::string& uniform, const Matrixf& m4)
 {
     UniformParams* u = GetUniform(uniform);
-
+    
     if(u)
         SetElement(u, m4);
 }

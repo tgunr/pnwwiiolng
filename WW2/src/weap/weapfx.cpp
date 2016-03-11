@@ -79,14 +79,14 @@ static OBJECT* _GetFreeDebris();
 
 #if(0)
 static void _DebrisKillCallback(void* pData);
-#endif
 static void _FlashKillCallback(void* pData);
+static LOGICAL _OkForDebris(weapAmmo const* pAmmo, void* pVehicle);
+#endif
 static void ReleaseFlash(OBJECT* o);
 
 static LOGICAL _IsWater(OBJECT* lpObj);
 static LOGICAL _InitFlashObjs();
 static LOGICAL _InitDebrisObjs();
-static LOGICAL _OkForDebris(weapAmmo const* pAmmo, void* pVehicle);
 
 static FLOAT32 PiOver180 = 0.0f;
 
@@ -98,7 +98,7 @@ static std::deque<OBJECT*> _freeflash;
 
 void DoHitSound(FLOAT64VECTOR* Pos, FLOAT32 Energy,	const char* TextureName)
 {
-	char* HitSoundName;
+	const char* HitSoundName;
 	FLOAT32 MinVolume;
 	FLOAT32 MaxVolumeEnergy;
 	FLOAT32 Volume;
@@ -974,8 +974,8 @@ Oh god, I so didn't want to add this code, this is such a hack but at least this
 
 void _PlaySoundForKnife (FLOAT64VECTOR* Pos, SINT32 soundID)
 {
-	SCHAR*	knifeSounds[2] = {"sounds\\genericknife.wav", "sounds\\stabknife.wav"};
-	SCHAR*	useSound;
+	const SCHAR*	knifeSounds[2] = {"sounds\\genericknife.wav", "sounds\\stabknife.wav"};
+	const SCHAR*	useSound;
 
 	if (soundID < 0)
 		useSound = knifeSounds[0];
@@ -1215,7 +1215,7 @@ UINT32 weapfxAmmoHit(weapAmmo const* Ammo,
 				if(id == -1)
 					return FALSE;
 
-				SCHAR* names[3] =
+				const SCHAR* names[3] =
 				{
 					"sounds\\hitwood1.wav",
 					"sounds\\hitwood2.wav",
@@ -1729,8 +1729,6 @@ UINT32 weapfxAmmoMuzzleFlash(weapAmmo const* Ammo,
 							 const weapWeapon* weapon)
 {
 	FLOAT32 Intensity;
-	FLOAT64VECTOR ProjVel = Ammo->Velocity;
-	FLOAT64VECTOR Pos = Ammo->Position;
 	vehVehicle*pVeh = (vehVehicle*)Ammo->FireVehicle;
 
 	// Hack until all muzzle flashes are done.
@@ -1911,11 +1909,6 @@ UINT32 weapfxAmmoMuzzleFlash(weapAmmo const* Ammo,
 
 SINT32 _CreateTankGunFlash(const weapAmmo* pAmmo, OBJECT* o, const FLOAT64VECTOR* pPos)
 {
-	FLOAT32 fIntensity = 0.5f *
-						 pAmmo->AmmoType->InitVelocity *
-						 pAmmo->AmmoType->InitVelocity *
-						 pAmmo->AmmoType->ProjectileWeight;
-
 	FLOAT64VECTOR vPos = *pPos;
 
 	if(o)
@@ -2382,8 +2375,8 @@ UINT32 weapfxMountFireSound(mlWeaponMount* Mount, UINT32 i, SINT32 RoundsLeft, F
 
 	PlayType = (Mount->Weapons[i].WeaponType->FireType == WEAP_FIRETYPE_SINGLESHOT) ? TYPE_FINITE_SOUND : TYPE_INFINITE_SOUND;
 
-	if((Mount->Weapons[i].WeaponType->FireType != WEAP_FIRETYPE_SINGLESHOT ||
-		Mount->Weapons[i].NumRoundsAmmoLeft[Mount->Weapons[i].AmmoTypeInUse] != RoundsLeft &&
+	if(((Mount->Weapons[i].WeaponType->FireType != WEAP_FIRETYPE_SINGLESHOT ||
+		Mount->Weapons[i].NumRoundsAmmoLeft[Mount->Weapons[i].AmmoTypeInUse] != RoundsLeft) &&
 		strlen(Mount->WeaponSounds[i]) > 0) &&
 		RoundsLeft > 0)
 	{

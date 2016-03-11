@@ -995,16 +995,18 @@ TestRagdoll::TestRagdoll() : gr2PhysicsModel()
 		hips->SetFrictionModel(30000.0f, 20000.0f, 1000);
 	}
 
-	/********************************************************************************/
+    // setup our bone joints
+    /*
+        TBD
+     
+	//
 	// setup our joints
-	/********************************************************************************/
+	//
 
 	Vec3d xAxis = Vec3d(1.0f, 0, 0);
 	Vec3d yAxis = Vec3d(0, 1.0f, 0);
 	Vec3d zAxis = Vec3d(0, 0, 1.0f);
 
-	// setup our bone joints
-	/*
 	if(1)
 	{
 		dJointID jid = nullptr;
@@ -1157,8 +1159,8 @@ fpTPSRagdoll::fpTPSRagdoll() : gr2PhysicsModel(),
 	_delay(0),
 	_country(0),
 	_decal(-1),
-	_nextImpactSound(0),
 	_nextContactSound(0),
+    _nextImpactSound(0),
 	_weapJoint(nullptr)
 {
 	// our base skeleton
@@ -1590,13 +1592,17 @@ void fpTPSRagdoll::AddDrama(const Vec3d* force)
 		}
 	}
 
+    /*
+     TBD - additional joints
+    gr2PhysicsBone* lforearm	= GetBone("Bip01 L Forearm");
+    gr2PhysicsBone* rforearm	= GetBone("Bip01 R Forearm");
+    gr2PhysicsBone* pelvis		= GetBone("Bip01 Pelvis");
+     */
+    
 	gr2PhysicsBone* lhand		= GetBone("Bip01 L Hand");
-	gr2PhysicsBone* lforearm	= GetBone("Bip01 L Forearm");
 	gr2PhysicsBone* rhand		= GetBone("Bip01 R Hand");
-	gr2PhysicsBone* rforearm	= GetBone("Bip01 R Forearm");
 	gr2PhysicsBone* lfoot		= GetBone("Bip01 L Foot");
 	gr2PhysicsBone* rfoot		= GetBone("Bip01 R Foot");
-	gr2PhysicsBone* pelvis		= GetBone("Bip01 Pelvis");
 
 	// if we have a weapon, attach it to our hand right hand
 	if(_attached && GetRandom(0.0f, 1.0f) < .8f)
@@ -2004,7 +2010,12 @@ fpTPSWeapon::fpTPSWeapon(gr2AnimTrooper* anim, const Vec3d* force, const WeaponS
 	Init();
 
 	piMATRIX& t = (anim->myVehicle->ModelData) ? anim->myVehicle->ModelData->VehicleAttMat: anim->myVehicle->PosData.AttMat;
+    
+    /*
+     TBD - incorporate velocity?  why commented out?
+     
 	FLOAT64VECTOR& v = (anim->myVehicle->ModelData) ? anim->myVehicle->ModelData->VehicleVel: anim->myVehicle->PosData.Vel;
+     */
 	FLOAT64VECTOR& p = (anim->myVehicle->ModelData) ? anim->myVehicle->ModelData->VehiclePos: anim->myVehicle->PosData.Pos;
 
 	Vec3d worldPos;
@@ -2296,7 +2307,7 @@ bool fpTPSWeapon::ProcessFlag(unsigned int f, physicsObject* o)
 
 			if(bv.length2() >= (minVel * minVel))
 			{
-				int id = fxSndAddFiniteWorldSound("sounds/troop/body/fall6.wav",
+				fxSndAddFiniteWorldSound("sounds/troop/body/fall6.wav",
 												 0,
 												 15,
 												 IDE_TP_PRIORITY_LOW,
@@ -2376,7 +2387,12 @@ fpTPSKitObject::fpTPSKitObject(gr2AnimTrooper* anim, const Vec3d* force, const W
 	Init();
 
 	piMATRIX& t = (anim->myVehicle->ModelData) ? anim->myVehicle->ModelData->VehicleAttMat: anim->myVehicle->PosData.AttMat;
+    /*
+      TBD - incoporate velocity.  Why commented out below?
+     
 	FLOAT64VECTOR& v = (anim->myVehicle->ModelData) ? anim->myVehicle->ModelData->VehicleVel: anim->myVehicle->PosData.Vel;
+     */
+    
 	FLOAT64VECTOR& p = (anim->myVehicle->ModelData) ? anim->myVehicle->ModelData->VehiclePos: anim->myVehicle->PosData.Pos;
 
 	Vec3d worldPos;
@@ -2719,7 +2735,7 @@ bool fpTPSKitObject::ProcessFlag(unsigned int f, physicsObject* o)
 
 			if(bv.length2() >= (minVel * minVel))
 			{
-				int id = fxSndAddFiniteWorldSound("sounds/troop/body/fall6.wav",
+				fxSndAddFiniteWorldSound("sounds/troop/body/fall6.wav",
 												 0,
 												 15,
 												 IDE_TP_PRIORITY_LOW,

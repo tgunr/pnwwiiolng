@@ -149,7 +149,7 @@ void ogl::SetVertexPointer(GLint size, GLenum type, GLsizei stride, const GLvoid
 	static	GLsizei			crtStride	= 0xffffffff;
 
 	UpdateArrayBufferContext();
-	if((vertexAttributeArrayEnabled[VERTEX_ARRAY] == FALSE))
+	if(vertexAttributeArrayEnabled[VERTEX_ARRAY] == FALSE)
 	{
 		glEnableClientState(GL_VERTEX_ARRAY);
 		vertexAttributeArrayEnabled[VERTEX_ARRAY] = TRUE;
@@ -170,7 +170,7 @@ void ogl::SetNormalPointer(GLenum type, GLsizei stride, const GLvoid* pointer)
 
 
 	UpdateArrayBufferContext();
-	if((vertexAttributeArrayEnabled[NORMAL_ARRAY] == FALSE))
+	if(vertexAttributeArrayEnabled[NORMAL_ARRAY] == FALSE)
 	{
 		glEnableClientState(GL_NORMAL_ARRAY);
 		vertexAttributeArrayEnabled[NORMAL_ARRAY] = TRUE;
@@ -210,7 +210,7 @@ void ogl::SetTextureUnitCoordPointer(GLenum oglTextureUnit, GLint size, GLenum t
 			GLenum			textureUnitIndex				= oglTextureUnit - GL_TEXTURE0;
 	static	GLint			crtSize[MAX_TEXTURE_UNITS]		= {0xffff};
 	static	GLenum			crtType[MAX_TEXTURE_UNITS]		= {0xffffffff};
-	static	GLsizei			crtStride[MAX_TEXTURE_UNITS]	= {0xffffffff};
+    static	GLsizei			crtStride[MAX_TEXTURE_UNITS]	= {static_cast<GLsizei>(0xffffffff)};
 
 	assert(textureUnitIndex < MAX_TEXTURE_UNITS);
 

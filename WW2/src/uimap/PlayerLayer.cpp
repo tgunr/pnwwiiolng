@@ -234,11 +234,11 @@ void PlayerLayer::RenderSuperCells(SuperCellMapView* mv, int scx1, int scy1, int
 
  VehicleMapObject::VehicleMapObject(PlayerLayer* layer, unsigned long long handle)
 			: SuperCellMapView::MapObject()
-			, _handle(handle), _lastupdatetime(0) , _nextsquadcheck(0)
+			, _handle(handle) , _nextsquadcheck(0), _lastupdatetime(0)
 			, _x(0), _y(0), _z(0)
-			, _type(0), _class(0), _dead(false), _showinfo(false)
-			, _players(layer),  _inmissionupdate(false), _issamemission(false)
-			, _maxDraw(1000.0f)
+			, _maxDraw(1000.0f), _type(0), _class(0), _dead(false), _showinfo(false)
+			,  _inmissionupdate(false), _issamemission(false), _players(layer)
+
 {
 	*_callsign = 0;
 	*_id = 0;

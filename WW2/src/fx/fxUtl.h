@@ -7,7 +7,7 @@
 extern LOGICAL fxUtlInit();
 extern LOGICAL fxUtlTerrainCollide(FASTCOLLIDE* pFastCollision);
 extern LOGICAL fxUtlGetRandomHitSound(const SCHAR* material,
-                               SCHAR** sound,
+                               const SCHAR** sound,
                                FLOAT32* minvolume,
                                FLOAT32* maxvolumeenergy);
 

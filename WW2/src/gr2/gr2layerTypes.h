@@ -41,12 +41,12 @@ public:
 	typedef void (*INSTANCE_HOOK)(HOOK, T*);
 
 	GR2_POOL(UINT32 is = 32, UINT32 bs = 32, STRATEGY s = ALLOC, INSTANCE_HOOK h = nullptr) :
-		_hook(h),
-		_strategy(s),
-		_blockSize(bs),
-		_objectCount(0),
+        _maxout(0),
 		_inout(0),
-		_maxout(0)
+        _objectCount(0),
+        _blockSize(bs),
+        _strategy(s),
+        _hook(h)
 	{
 		if(is)
 			Allocate(is); // is = initialSize
@@ -57,6 +57,10 @@ public:
 		Free();
 	}
 
+    GR2_POOL<T>( const GR2_POOL<T> &obj ) {
+        // dummy, we don't need a copy instructor
+    }
+    
 	T* Pop(bool reset = true)
 	{
 		if(_pool.empty())
@@ -69,7 +73,7 @@ public:
 			_pool.pop();
 
 			if(reset && _strategy == ALLOC)
-				memset(poolObject, 0, sizeof(T));
+				memset((void *)poolObject, 0, sizeof(T));
 
 			if(_hook)
 				_hook(POP, poolObject);
@@ -374,10 +378,10 @@ struct gr2MeshData
 		indexArray(nullptr),
 		vertexArray(nullptr),
 		pngt(nullptr),
+		drawcallback(nullptr),
         is_normal(false),
         NormalEnabled(9999),
-        vboid(0),
-		drawcallback(nullptr)
+        vboid(0)
 	{
 	}
 

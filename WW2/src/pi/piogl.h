@@ -786,10 +786,6 @@ struct piVERTEX_COLOR
 
 };
 
-#if platOS == OS_MACOS
-#pragma cpp_extensions on // for nameless union
-#endif
-
 struct matrix_alt // for mac debugging
 {
 		FLOAT32	_11, _12, _13, _14;

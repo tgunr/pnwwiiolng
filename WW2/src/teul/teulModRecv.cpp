@@ -30,7 +30,7 @@
 #if defined(ENABLE_HOST_TIMERS)
 namespace Timers
 {
-	std::vector< std::pair< const char*, UINT64 > > timings;
+	std::vector< std::pair< char*, UINT64 > > timings;
 	TeulTimeMS nextReport = 0ULL;
 }
 #endif

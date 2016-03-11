@@ -69,16 +69,16 @@ extern gr2Model* gr2LoadModel(const char* modelFile, gr2Model* wornOnModel, SINT
 //extern gr2AnimModel* gr2LoadAnimModel(const char* modelFile, gr2Model* wornOnModel, SINT32* boneCount, SINT32 instantiate, int modelIndex = -1);
 
 // load animation
-extern gr2Animation* gr2LoadAnimation(SCHAR* animationFile, SINT32 useCache);
+extern gr2Animation* gr2LoadAnimation(const SCHAR* animationFile, SINT32 useCache);
 
-extern gr2AnimationBlend* gr2LoadBlendedAnimation(SCHAR* blendfile, SINT32 boneCount);
-extern gr2AnimationBlend* gr2CreateBlendedAnimation(SCHAR* animFile, SINT32 boneCount);
+extern gr2AnimationBlend* gr2LoadBlendedAnimation(const SCHAR* blendfile, SINT32 boneCount);
+extern gr2AnimationBlend* gr2CreateBlendedAnimation(const SCHAR* animFile, SINT32 boneCount);
 
 // this lets me do the cleanup stage (GrannyFreeFileSection) for all of the open model files, getting some memory back
 extern void			gr2DoneLoadingModels (void);
 
 // attach bone attachBone in model to attachToBone in attachToModel (ex:  attach gunbone in kar98k to handbone in arms model)
-extern LOGICAL		gr2AttachModel (gr2Model* model, SCHAR* attachBone, gr2Model* attachToModel, SCHAR* attachToBone);
+extern LOGICAL		gr2AttachModel (gr2Model* model, const SCHAR* attachBone, gr2Model* attachToModel, const SCHAR* attachToBone);
 extern LOGICAL		gr2AttachModelByIndex (gr2Model* model, int attachBone, gr2Model* attachToModel, int attachToBone);
 extern void			gr2DetachModel (gr2Model* model);
 extern void			gr2UpdateAttachment(gr2Model* model);
@@ -175,7 +175,7 @@ extern LOGICAL		gr2GetBonePositionByIndex (gr2Model* model, int boneIndex, piMAT
 extern LOGICAL		gr2GetRawBonePosition (gr2Model* model, SCHAR* boneName, piMATRIX* matrix);
 extern LOGICAL		gr2ModelHasBone (gr2Model* model, SCHAR* boneName);
 extern LOGICAL		gr2ModelHasMesh(gr2Model* model, const char* mesh, int* meshIndex, int* boneIndex);
-extern int			gr2ModelFindBone (gr2Model* model, SCHAR* boneName, LOGICAL exact = 1);
+extern int			gr2ModelFindBone (gr2Model* model, const SCHAR* boneName, LOGICAL exact = 1);
 extern int			gr2ModelFindBones (std::vector<int>& found, gr2Model* model, SCHAR* boneName, LOGICAL exact = 1);
 
 extern LOGICAL		gr2CollideRayWithModel (gr2Model* collisionModel, piVECTOR* rayStart, piVECTOR* rayNormal, SINT32* location, piVECTOR* collisionPnt);

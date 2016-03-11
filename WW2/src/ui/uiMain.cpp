@@ -79,15 +79,9 @@
 #include "ogl/States.h"
 #endif
 
-#if platOS == OS_WIN32
 #include <regex>
 #include <unordered_map>
 #define RENS std
-#else
-//#include <boost/unordered_map.hpp>
-#include <boost/regex.hpp>
-#define RENS boost
-#endif
 
 #ifdef GR2_BLEND_EDITOR
 #include "veh/vehcomms.h"
@@ -1337,8 +1331,6 @@ void uiUIToGameEnd()
 	if(EZ_MGR)
 		EZ_MGR->OnSpawn();
 
-	vehVehicle* player = persGetPersonaVehiclePtr();
-
 	/*
 	// add some waypoints
 	HUD_MGR->AddObject(new PersHUDManager::HUDWaypoint(player->ModelData->VehiclePos, "spawn"));
@@ -1357,7 +1349,7 @@ void uiUIToGameEnd()
 	*/
 
 #ifdef GR2_BLEND_EDITOR
-	//vehVehicle* player = persGetPersonaVehiclePtr();
+	vehVehicle* player = persGetPersonaVehiclePtr();
 
 	if(player)
 		player->ModelData->VehiclePos.z = 1.0f;
@@ -2742,9 +2734,6 @@ void BarCompassView::DrawBackground(float x, float y, float width, float height)
 
     piLVERTEX v[4];
     float u1, v1, u2, v2;
-
-    static float xx = 0.5f;
-    static float yy = 0.15f;
 
 	/*
     u1 = 0.25f; //s;

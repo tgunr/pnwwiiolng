@@ -68,7 +68,6 @@ class BoundBox
 
 		BoundBox(const OBJECT* o, LOGICAL singleObject);
 //		BoundBox(int fd);
-		~BoundBox()	{}
 
 //		void	SaveToFile(int hfile);
 //		void	Transform(const piMATRIX* m);

@@ -24,7 +24,6 @@ public:
 		, m_canVote(canVote_)
 	{
 	}
-	~BrigadeControlList() {}
 
 public:
 #ifdef SOON

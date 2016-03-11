@@ -388,9 +388,6 @@ void physicsBodyBase::addTorque(double x, double y, double z)
 
 void physicsBodyBase::applyForces()
 {
-	if(_force.x || _force.y || _force.z)
-		bool stop = true;
-
 	_body->addForce(_force.x,_force.y,_force.z);
 	_body->addTorque(_torque.x,_torque.y,_torque.z);
 
@@ -659,9 +656,6 @@ dGeomID physicsBody::preCheck()
 
 	const colliderQuery::Collision& hit = hits.at(0);
 
-	if(hits.size() > 1)
-		bool stop = true;
-
 	_initContact(hit);
 
 	if(handleContact(&_contact))
@@ -703,9 +697,6 @@ dGeomID physicsBody::rayCheck()
 		return nullptr;
 
 	const colliderQuery::Collision& hit = hits.at(0);
-
-	if(hits.size() > 1)
-		bool stop = true;
 
 	_initContact(hit);
 
@@ -1006,15 +997,15 @@ void physicsBody::setRestitution(float r)
 }
 
 physicsBody::physicsBody() : physicsBodyBase(),
-	_restitution(.5),
+    _speed(0),
+    collideJoints(nullptr),
+    _restitution(.5),
 	_enhancedCollisionCheck(true),
 	_collided(0),
+    _thisContact(nullptr),
 	_lastContact(nullptr),
-	_thisContact(nullptr),
 	_nextUpdate(0),
-	_speed(0),
-	_allHits(0),
-	collideJoints(nullptr)
+	_allHits(0)
 {
 	// create our model's collider
 	collider = new colliderQuery;
@@ -1028,15 +1019,15 @@ physicsBody::physicsBody() : physicsBodyBase(),
 }
 
 physicsBody::physicsBody(UINT32 cat, UINT32 col) : physicsBodyBase(),
-	_restitution(.5),
-	_enhancedCollisionCheck(true),
-	_collided(0),
-	_lastContact(nullptr),
-	_thisContact(nullptr),
-	_nextUpdate(0),
-	_speed(0),
-	_allHits(0),
-	collideJoints(nullptr)
+    _speed(0),
+    collideJoints(nullptr),
+    _restitution(.5),
+    _enhancedCollisionCheck(true),
+    _collided(0),
+    _thisContact(nullptr),
+    _lastContact(nullptr),
+    _nextUpdate(0),
+    _allHits(0)
 {
 	// create our model's collider
 	collider = new colliderQuery;
@@ -1053,15 +1044,15 @@ physicsBody::physicsBody(UINT32 cat, UINT32 col) : physicsBodyBase(),
 }
 
 physicsBody::physicsBody(dSpaceID s, UINT32 cat, UINT32 col) : physicsBodyBase(),
-	_restitution(.5),
-	_enhancedCollisionCheck(true),
-	_collided(0),
-	_lastContact(nullptr),
-	_thisContact(nullptr),
-	_nextUpdate(0),
-	_speed(0),
-	_allHits(0),
-	collideJoints(nullptr)
+    _speed(0),
+    collideJoints(nullptr),
+    _restitution(.5),
+    _enhancedCollisionCheck(true),
+    _collided(0),
+    _thisContact(nullptr),
+    _lastContact(nullptr),
+    _nextUpdate(0),
+    _allHits(0)
 {
 	// create our model's collider
 	collider = new colliderQuery(s);

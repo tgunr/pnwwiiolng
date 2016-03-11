@@ -8,6 +8,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <unistd.h>
+#include <sys/time.h>
 #include <Cocoa/Cocoa.h>
 
 extern CGrafPtr aglDraw;
@@ -40,24 +41,18 @@ extern Point* QDGlobalToLocalPoint(CGrafPtr, Point*); // compiler doesn't find t
 
 DWORD GetMillisecondTick()
 {
-	unsigned long ticks = 0;
-	
-	UnsignedWide time;
-	Microseconds(&time);
- 	ticks = (unsigned long)((*(unsigned long long*)&time)/1000);
- 	
- 	return ticks;
+	struct timeval tv;
+
+	gettimeofday(&tv, nullptr);
+    return ((tv.tv_sec * USEC_PER_SEC) + tv.tv_usec /* convert to microseconds*/) / 1000; /* convert to millis */
 }
 
 unsigned long GetTickCount(void)
 {
-	unsigned long ticks = 0;
-	
-	UnsignedWide time;
-	Microseconds(&time);
- 	ticks = (unsigned long)((*(unsigned long long*)&time)/1000);
- 	
- 	return ticks;
+	struct timeval tv;
+
+	gettimeofday(&tv, nullptr);
+    return ((tv.tv_sec * USEC_PER_SEC) + tv.tv_usec /* convert to microseconds*/) / 1000; /* convert to millis */
 }
 
 /************************************************************************************************
@@ -66,9 +61,10 @@ unsigned long GetTickCount(void)
 
 SINT32 GetMicroSeconds(void)
 {
-	UnsignedWide time;
-	Microseconds(&time);
- 	return (SINT32)(time.lo & 0x7fffffff);
+	struct timeval tv;
+
+	gettimeofday(&tv, nullptr);
+    return ((tv.tv_sec * USEC_PER_SEC) + tv.tv_usec /* convert to microseconds*/);
 }
 
 /************************************************************************************************
@@ -77,15 +73,7 @@ SINT32 GetMicroSeconds(void)
 
 void chAppDir()
 {
-	ProcessSerialNumber psn;
-	FSRef ref;
-	char path[4192];
-	
-	GetCurrentProcess(&psn);
-	GetProcessBundleLocation(&psn, &ref);
-	FSRefMakePath(&ref,(UCHAR*)path,4000);
-	strcat(path,"/AppData/");
-	chdir((char*)path);
+    chdir([[[NSBundle mainBundle].executablePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"AppData"].fileSystemRepresentation);
 }
 
 char* getPrePath()
@@ -94,10 +82,11 @@ char* getPrePath()
   
   if ( thepath == 0 )
   {
-    //NSString* wd = [[NSFileManager defaultManager]currentDirectoryPath];
+//    NSString* wd = [[NSFileManager defaultManager]currentDirectoryPath];
     
-    //thepath = "\\Users\\ahwulf\\XCode\\data131\\ww2mods\\DATA\\";
-    thepath = ".\\Data\\"; // put symnbolic link with this name pointing to the data directory in AppData
+//    thepath = "\\Users\\ahwulf\\XCode\\data131\\ww2mods\\DATA\\";
+//      thepath = ".\\Data\\"; // put symnbolic link with this name pointing to the data directory in AppData
+    return DataPath;
   }
   return thepath;
 }
@@ -108,36 +97,28 @@ char* getPrePath()
 
 const char* macPreferencesPath()
 {
-static int prefsPathLength = 4192;
-static char* prefsPath = NULL;
-	
-	if (prefsPath == NULL)
-	{
-		prefsPath = (char*)malloc(4192);
-		
-		HFSUniStr255 folderName;
-		CFStringRef str = CFSTR("ww2ol");
-		folderName.length = CFStringGetLength(str);
-		CFStringGetCharacters(str, CFRangeMake(0, folderName.length), folderName.unicode);
-		
-		OSErr err;
-		FSRef parentRef, ourRef;
-		err = FSFindFolder(kUserDomain, kPreferencesFolderType, kCreateFolder, &parentRef);
-		err = FSMakeFSRefUnicode(&parentRef,
-		      					 folderName.length, folderName.unicode, 
-								 kTextEncodingUnknown, &ourRef);
-		if (err == fnfErr) 
-		{
-			err = FSCreateDirectoryUnicode(&parentRef,
-										   folderName.length, folderName.unicode,
-										   kFSCatInfoNone, NULL, &ourRef, NULL, NULL);
-		}
-		 
-		FSRefMakePath(&ourRef, (unsigned char*)prefsPath, prefsPathLength);
-		strcat(prefsPath, macFileSeparator());
-	}
-	
-	return prefsPath;
+    static NSURL *prefsDir = nil;
+    static std::unique_ptr<char, std::function<void(void*)>> prefsFSR(nullptr, ::free);
+    static dispatch_once_t predicate = 0;
+    
+    dispatch_once(&predicate, ^ {
+        // FIXME: This is a hack to use the prefs directory. Whether this
+        // actually belongs there is debatable. Consider Application Support or
+        // even Documents instead.
+        prefsDir = [[NSFileManager defaultManager]
+        	URLForDirectory:NSLibraryDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nullptr];
+        prefsDir = [prefsDir URLByAppendingPathComponent:@"Preferences"];
+        prefsDir = [prefsDir URLByAppendingPathComponent:@"ww2ol"];
+        
+        // We're giving the prefs folder the permissions it would otherwise have
+        // gotten by default here. Would 0750 or 0700 be a better choice?
+        [[NSFileManager defaultManager] createDirectoryAtURL:prefsDir withIntermediateDirectories:YES attributes:@{
+            NSFilePosixPermissions: @(0755)
+        } error:nullptr];
+        prefsFSR.reset(strdup(prefsDir.fileSystemRepresentation));
+    });
+    
+    return prefsFSR.get();
 }
 
 /************************************************************************************************
@@ -200,12 +181,12 @@ const char* GetCommandLine()
 
 void SetMouseScalingEnabled(int enabled)
 {
-static int mouseScalingEnabled = 1;
-static NXMouseScaling mouseScaling;
-
-	NXEventHandle eventStatus;
-    
-    return;
+//static int mouseScalingEnabled = 1;
+//static NXMouseScaling mouseScaling;
+//
+//	NXEventHandle eventStatus;
+//    
+//    return;
 /*
 #if RELEASE_CLIENT == 0
 	return;

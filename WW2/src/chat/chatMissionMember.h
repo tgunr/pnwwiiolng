@@ -20,8 +20,6 @@ public:
 
 	MissionMember(ACTION_OBJECT* const a);
 
-	~MissionMember() {}						// Not designed for inheritance
-
 public:
 	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
 	bool isSpawned() const { return (m_weapon.wType != 0 && m_x != INVALID_GRID_COORD); }

@@ -824,7 +824,7 @@ int   i;
 }
 #endif
 
-LOGICAL obwldInit(char* levelfile)
+LOGICAL obwldInit(const char* levelfile)
 {
 UINT32	T1, T2;
 

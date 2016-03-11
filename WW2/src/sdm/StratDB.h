@@ -91,7 +91,6 @@ public:
 	StratObject(sdm_cp const&, int sx, int sy);
 	StratObject(sdm_facility const&, int sx, int sy);
 	StratObject(sdm_building const&, int sx, int sy);
-	virtual ~StratObject();
 
 	// Comparison operator == just compare addresses (so that nullptr ptr compares work too)
 	bool operator==(const StratObject& rhs) const { return this == &rhs; }

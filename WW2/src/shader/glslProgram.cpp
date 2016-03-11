@@ -1,4 +1,4 @@
-#include <syscfg.h> // Path is project specific.
+#include <syscfg.h>
 /*------------------------------------------------------------------------------------
 Module: glslProgram.cpp
 Description:
@@ -10,7 +10,6 @@ Description:
 #include "shader/glsl.h"
 #include "ogl/States.h"
 #include "draw/sneaky.h"
-#include "mem/mem.h"
 
 // Use for shared uniforms blocks (Add if necessary)
 enum
@@ -31,7 +30,7 @@ enum
 static std::set<std::string> BlockMap;
 static std::map<std::string, int> BaseID;
 
-using UniformBlockList = std::unordered_map<std::string, glslUniformBlock*>;
+typedef std::unordered_map<std::string, glslUniformBlock*> UniformBlockList;
 static UniformBlockList _uniformBlockList;
 
 /*------------------------------------------------------------------------------------
@@ -68,16 +67,17 @@ void glslProgramKill()
 Function: glslProgram::glslProgram()
 Description:
 -------------------------------------------------------------------------------------*/
-glslProgram::glslProgram() :
+glslProgram::glslProgram() : 
     _needsLink(true),
     _isLinked(false),
     _firsttime(true),
-    _programhandle(0),
-    useka(false),
     useke(false),
-    usekd(false),
+    useka(false),
     useks(false),
-    useshininess(false)
+    usekd(false),
+    useshininess(false),
+    _programhandle(0),
+    _uniformList()
 {
 }
 
@@ -87,13 +87,6 @@ Description:
 -------------------------------------------------------------------------------------*/
 glslProgram::~glslProgram()
 {
-    UniformList::iterator itr = _uniformList.begin();
-
-    for(; itr != _uniformList.end(); ++itr)
-    {
-        if(!itr->second->IsGlobal())
-            delete itr->second;
-    }
 }
 
 /*------------------------------------------------------------------------------------
@@ -173,12 +166,12 @@ bool glslProgram::GetProgramInfoLog(std::string& result) const
 
     if(bufLen > 1)
     {
-        GLchar* infoLog = (GLchar*)memAlloc(sizeof(GLchar) * bufLen);
+        GLchar* infoLog = new GLchar[bufLen];
         glGetProgramInfoLog(_programhandle, bufLen, &strLen, infoLog);
 
         if(strLen > 0) result = infoLog;
 
-        memFree(infoLog);
+        delete [] infoLog;
     }
 
     return strLen > 0;
@@ -204,7 +197,7 @@ void glslProgram::LinkProgram()
 
     if(!TransformFeedbackVaryings.empty())
     {
-	    glTransformFeedbackVaryings(_programhandle,
+	    glTransformFeedbackVaryings(_programhandle, 
                                     TransformFeedbackVaryings.size(),
                                     &TransformFeedbackVaryings[0],
                                     GL_INTERLEAVED_ATTRIBS);
@@ -263,7 +256,7 @@ void glslProgram::LinkProgram()
     {
         int blocks;
         glGetProgramiv(_programhandle, GL_ACTIVE_UNIFORM_BLOCKS, &blocks);
-
+        
         char blockname[256];
         char name[256];
         int base;
@@ -273,8 +266,8 @@ void glslProgram::LinkProgram()
         GLint blocksize;
 
         for(int i = 0; i < blocks; i++)
-        {
-            glGetActiveUniformBlockName(_programhandle, i, 256, nullptr, blockname);
+        {    
+            glGetActiveUniformBlockName(_programhandle, i, 256, NULL, blockname);
 
             Write_Debug("BLOCKNAME: %s", blockname);
 
@@ -286,7 +279,7 @@ void glslProgram::LinkProgram()
 
             index = glGetUniformBlockIndex(_programhandle, blockname);
             base = BaseID.find(blockname)->second;
-
+            
             // Associate base binding with this block
             glUniformBlockBinding(_programhandle, index, base);
 
@@ -309,8 +302,8 @@ void glslProgram::LinkProgram()
             u->SetBlockSize(blocksize);
 
             glGetActiveUniformBlockiv(_programhandle, index, GL_UNIFORM_BLOCK_ACTIVE_UNIFORMS, &numUniforms);
-
-            indices = (GLuint*)memAlloc(sizeof(GLuint) * numUniforms);
+            
+            indices = new GLuint[numUniforms];
             glGetActiveUniformBlockiv(_programhandle, index, GL_UNIFORM_BLOCK_ACTIVE_UNIFORM_INDICES, (GLint*)indices);
 
             GLint byteoffset;
@@ -319,7 +312,7 @@ void glslProgram::LinkProgram()
 
             for(int j = 0; j < numUniforms; j++)
             {
-                glGetActiveUniformName(_programhandle, indices[j], 256, nullptr, name);
+                glGetActiveUniformName(_programhandle, indices[j], 256, NULL, name);
 
                 glGetActiveUniformsiv(_programhandle, 1, (GLuint*)&indices[j], GL_UNIFORM_OFFSET, &byteoffset);
                 glGetActiveUniformsiv(_programhandle, 1, (GLuint*)&indices[j], GL_UNIFORM_SIZE, &size);
@@ -332,7 +325,7 @@ void glslProgram::LinkProgram()
 
             u->Buffer();
 
-            memFree(indices);
+            delete[] indices;
         }
     }
 
@@ -346,7 +339,7 @@ void glslProgram::LinkProgram()
     {
         GLint size = 0;
         GLenum type = 0;
-        GLchar* name = (GLchar*)memAlloc(sizeof(GLchar) * maxLen);
+        GLchar* name = new GLchar[maxLen];
 
         for(GLint i = 0; i < numUniforms; i++)
         {
@@ -356,7 +349,7 @@ void glslProgram::LinkProgram()
             if(loc != -1)
             {
                 // F-nvidia. Drivers do not follow GL spec.
-                // Uniform names associated with uniform blocks should have loc -1.
+                // Uniform names associated with uniform blocks should have loc -1.  
                 // Shaders will need to have block members start with "b_"
                 if(name[0] == 'b' && name[1] == '_')
                 {
@@ -376,7 +369,7 @@ void glslProgram::LinkProgram()
             }
         }
 
-        memFree(name);
+        delete [] name;
     }
 
     // Build _attribInfoMap
@@ -389,7 +382,7 @@ void glslProgram::LinkProgram()
     {
         GLint size = 0;
         GLenum type = 0;
-        GLchar* name = (GLchar*)memAlloc(sizeof(GLchar) * maxLen);
+        GLchar* name = new GLchar[maxLen];
 
         for(GLint i = 0; i < numAttrib; i++)
         {
@@ -403,8 +396,8 @@ void glslProgram::LinkProgram()
             }
         }
 
-        memFree(name);
-    }
+        delete [] name;
+    }  
 }
 
 /*------------------------------------------------------------------------------------
@@ -422,7 +415,7 @@ Description:
 -------------------------------------------------------------------------------------*/
 void glslProgram::Apply(const ActiveVarInfo& info)
 {
-    if(info.uniform == nullptr)
+    if(info.uniform == NULL)
         return;
 
     logTimerBeginMacro();
@@ -528,7 +521,7 @@ void glslProgram::Apply()
         return;
     }
 
-    if(_needsLink)
+    if(_needsLink) 
     {
         CompileGLObjects();
     }
@@ -571,7 +564,7 @@ Description:
 -------------------------------------------------------------------------------------*/
 void glslProgram::RemoveUniformsIfNecessary()
 {
-    glslUniform* u = nullptr;
+    glslUniform* u = NULL;
 
     std::vector<ActiveVarInfoMap::iterator> remove;
 
@@ -621,8 +614,8 @@ void glslProgram::ApplyUniformMap()
 Function: glslProgram::GetOrCreateUniform()
 Description:
 -------------------------------------------------------------------------------------*/
-glslUniform* glslProgram::GetOrCreateUniform(const char* name,
-                                             glslUniform::Type type,
+glslUniform* glslProgram::GetOrCreateUniform(const std::string &name,
+                                             glslUniform::Type type, 
                                              unsigned int numElements)
 {
     //Look for an appropriate uniform.
@@ -647,12 +640,12 @@ Description:
 void glslProgram::AddUniform(glslUniform* uniform)
 {
     if(uniform)
-    {
-        UniformList::iterator itr = _uniformList.find(uniform->GetName().c_str());
+    {        
+        UniformList::iterator itr = _uniformList.find(uniform->GetName());
 
         if(itr == _uniformList.end())
         {
-            _uniformList[uniform->GetName().c_str()] = uniform;
+            _uniformList[uniform->GetName()] = uniform;
         }
     }
 }
@@ -661,33 +654,29 @@ void glslProgram::AddUniform(glslUniform* uniform)
 Function: glslProgram::RemoveUniform()
 Description:
 -------------------------------------------------------------------------------------*/
-void glslProgram::RemoveUniform(const char* name)
+void glslProgram::RemoveUniform(const std::string &name)
 {
-    if(name)
-    {
-        UniformList::iterator itr = _uniformList.find(name);
+	UniformList::iterator itr = _uniformList.find(name);
 
-        if(itr != _uniformList.end())
-        {
-            delete itr->second;
-            _uniformList.erase(itr);
-        }
-    }
+	if(itr != _uniformList.end())
+	{
+		_uniformList.erase(itr);
+	}
 }
 
 /*------------------------------------------------------------------------------------
 Function: glslProgram::GetUniform()
 Description:
 -------------------------------------------------------------------------------------*/
-glslUniform* glslProgram::GetUniform(const char* name)
+glslUniform* glslProgram::GetUniform(const std::string &name)
 {
     UniformList::iterator itr = _uniformList.find(name);
 
-    if(itr!=_uniformList.end())
+    if(itr!=_uniformList.end()) 
     {
         return itr->second;
     }
 
-    return nullptr;
+    return NULL;
 }
 

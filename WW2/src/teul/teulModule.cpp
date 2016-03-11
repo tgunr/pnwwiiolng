@@ -345,7 +345,8 @@ struct OpenError
 {
 	OpenError(SINT32 errNo_, const char* const msg_) : errNo(errNo_), msg(msg_) {}
 	OpenError(const char* const msg_) : errNo(dbugGetErrno()), msg(msg_) {}
-
+    OpenError(const OpenError & rhs) : errNo(rhs.errNo), msg(rhs.msg) { }
+    
 	SINT32 errNo;
 	const char* const msg;
 

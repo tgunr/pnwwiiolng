@@ -589,18 +589,6 @@ static bool _CollideAndSetupClutter(CLUTTER * Clutter,SINT32 PosX, SINT32 PosY, 
     // Replace old bush with speedtree bush
 #ifdef USE_SPEEDTREE_FOR_CLUTTER
 
-    static SINT32 bushtypes[6] =
-    {
-        9,
-        10,
-        11,
-        18,
-        19,
-        20
-    };
-
-    SINT32 base = -1;
-
     switch(Clutter->Type)
     {
     case 9:

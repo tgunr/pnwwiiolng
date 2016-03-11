@@ -1623,3 +1623,8 @@ devenv/linux/.vagrant
 devenv/linux/Vagrantfile
 Libraries/lua51/mak.vs2015/lua5.1_lib.log
 WW2.VC.opendb
+*.lo
+*.o
+
+xcuserdata/
+

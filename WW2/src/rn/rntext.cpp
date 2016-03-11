@@ -166,12 +166,11 @@ static SINT32 westernGetTexId(SINT32 f)
 #define TEXTURE_V1_FUDGE	0.001f
 
 static LOGICAL textInitted = FALSE;
-static SCHAR* FontPCXName = "Fonts\\iconfont.bmp";
-static SCHAR* FontDATName = "Fonts\\iconfont.dat";
+static const SCHAR* FontPCXName = "Fonts\\iconfont.bmp";
+static const SCHAR* FontDATName = "Fonts\\iconfont.dat";
 
 static SINT32 FontTexID = -1;
 static FONTLAYOUT FontLayout;
-static piSURFACEDESC ddtext;
 
 static int chinaInit(void)
 {

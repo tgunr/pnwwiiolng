@@ -309,7 +309,7 @@ void loadTextureUVs()
                              (xmlInputReadCallback)fioRead,
                              (xmlInputCloseCallback)fioClose);
 
-    char* name = "fx/xml/fx_uv2.xml";
+    const char* name = "fx/xml/fx_uv2.xml";
 
     uvStringToId.clear();
     texid = 0;
@@ -1214,9 +1214,6 @@ void _parseeffectstree(xmlNodePtr root)
 
                 pe->name = (char*)s;
 
-                if(_particleeffects.find(pe->name) != _particleeffects.end())
-                    int stop = 0;
-
                 _particleeffects[pe->name] = pe;
 
                 ParseParticleElements(node->children, pe);
@@ -1240,7 +1237,7 @@ void loadeffects()
                              (xmlInputReadCallback)fioRead,
                              (xmlInputCloseCallback)fioClose);
 
-    char*name = "fx/xml/effects2.xml";
+    const char* name = "fx/xml/effects2.xml";
 
     xmlDocPtr doc = xmlReadFile(name, nullptr, XML_PARSE_DTDLOAD | XML_PARSE_RECOVER);
 

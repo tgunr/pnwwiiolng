@@ -37,7 +37,6 @@ public:
 		: m_category(withCategory), m_id(withId), m_text(withText), m_error(_NO_ERROR)
 		{}
 	EditString(ACTION_OBJECT* const a);
-	virtual ~EditString() {}
 
 	// Member functions
 public:

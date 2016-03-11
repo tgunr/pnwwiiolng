@@ -54,10 +54,10 @@ static void _displayLogo();
 static void _playStartupMovie(const char*);
 #endif
 
-static char* _wideSplashScreen = "data/screens/splashscreen69.bmp";
-static char* _stdSplashScreen = "data/screens/splashscreen43.bmp";
-static char* _wideLoadingScreen = "data/screens/loadingscreen69.bmp";
-static char* _stdLoadingScreen = "data/screens/loadingscreen43.bmp";
+static const char* _wideSplashScreen = "data/screens/splashscreen69.bmp";
+static const char* _stdSplashScreen = "data/screens/splashscreen43.bmp";
+static const char* _wideLoadingScreen = "data/screens/loadingscreen69.bmp";
+static const char* _stdLoadingScreen = "data/screens/loadingscreen43.bmp";
 
 #ifdef TESTMAC
 std::string currentLoadString;
@@ -297,10 +297,7 @@ void rnlogoSplash()
 	// force directory lookups
 	fioSet(ISDIRECTORY);
 
-	// set our prepath to our install directory
-	fiodSetPrepath(".\\");
-
-	char* texFile;
+	const char* texFile;
 
 	if(_isWidescreen()) texFile = _wideSplashScreen;
 	else texFile = _stdSplashScreen;
@@ -309,9 +306,6 @@ void rnlogoSplash()
 
 	// reset what mode we were in
 	fioSet(fioSwitch);
-
-	// set our prepath back to our data directory
-	fiodSetPrepath(PREPATH);
 
 	if(texid == -1) return;
 
