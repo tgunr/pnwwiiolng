@@ -105,9 +105,6 @@ struct PoolNode
                                const std::vector<Vec4f>& b,
                                const std::vector<Vec4f>& n,
                                PoolModel& poolModel);
-#ifdef ANDREWTEST
-    size_t calcMemoryUsage();
-#endif
 };
 
 class oglVertexBuffer;

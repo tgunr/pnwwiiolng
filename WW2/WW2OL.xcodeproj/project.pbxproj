@@ -119,7 +119,6 @@
 		08104AA6103DD3BB0065E0E2 /* Matrixd.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104A92103DD3BA0065E0E2 /* Matrixd.cpp */; };
 		08104AA7103DD3BB0065E0E2 /* Matrixf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104A94103DD3BA0065E0E2 /* Matrixf.cpp */; };
 		08104AA8103DD3BB0065E0E2 /* Quat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104A96103DD3BA0065E0E2 /* Quat.cpp */; };
-		08104AB0103DD3FD0065E0E2 /* tracealloc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104AAD103DD3FD0065E0E2 /* tracealloc.cpp */; };
 		08104AD3103DD41B0065E0E2 /* missActiveMission.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104AB2103DD41B0065E0E2 /* missActiveMission.cpp */; };
 		08104AD5103DD41B0065E0E2 /* missionClientMessages.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104AB7103DD41B0065E0E2 /* missionClientMessages.cpp */; };
 		08104AD6103DD41B0065E0E2 /* missionDetail.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104ABB103DD41B0065E0E2 /* missionDetail.cpp */; };
@@ -378,7 +377,6 @@
 		0834F1CC104585DA00E75B52 /* loclAppx.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0834F1C7104585DA00E75B52 /* loclAppx.cpp */; };
 		0834F1CD104585DA00E75B52 /* loclLang.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0834F1C8104585DA00E75B52 /* loclLang.cpp */; };
 		0834F1CE104585DA00E75B52 /* loclMain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0834F1CA104585DA00E75B52 /* loclMain.cpp */; };
-		0834F1E710458A3100E75B52 /* mem.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0834F1E510458A3100E75B52 /* mem.cpp */; };
 		0834F28210458DFA00E75B52 /* ShadowMap.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0834F28110458DFA00E75B52 /* ShadowMap.cpp */; };
 		08477139135E279F00325E43 /* trnScenario.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08477138135E279F00325E43 /* trnScenario.cpp */; };
 		08492F5B131708E700C7F39E /* libftgl.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 08492F5A131708E700C7F39E /* libftgl.a */; };
@@ -821,7 +819,6 @@
 		08104A9B103DD3BA0065E0E2 /* Vec3f.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vec3f.h; sourceTree = "<group>"; };
 		08104A9C103DD3BA0065E0E2 /* Vec4d.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vec4d.h; sourceTree = "<group>"; };
 		08104A9D103DD3BB0065E0E2 /* Vec4f.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Vec4f.h; sourceTree = "<group>"; };
-		08104AAD103DD3FD0065E0E2 /* tracealloc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tracealloc.cpp; sourceTree = "<group>"; };
 		08104AB2103DD41B0065E0E2 /* missActiveMission.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = missActiveMission.cpp; sourceTree = "<group>"; };
 		08104AB3103DD41B0065E0E2 /* missActiveMission.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = missActiveMission.h; sourceTree = "<group>"; };
 		08104AB7103DD41B0065E0E2 /* missionClientMessages.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = missionClientMessages.cpp; sourceTree = "<group>"; };
@@ -1363,7 +1360,6 @@
 		0834F1CB104585DA00E75B52 /* loclMain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = loclMain.h; sourceTree = "<group>"; };
 		0834F1D1104586AA00E75B52 /* versionNo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = versionNo.h; path = proj/versionNo.h; sourceTree = SOURCE_ROOT; };
 		0834F1D61045888700E75B52 /* sysWinISO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sysWinISO.h; path = src/sys/sysWinISO.h; sourceTree = SOURCE_ROOT; };
-		0834F1E510458A3100E75B52 /* mem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mem.cpp; sourceTree = "<group>"; };
 		0834F28110458DFA00E75B52 /* ShadowMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ShadowMap.cpp; sourceTree = "<group>"; };
 		0836DAFD1109133100AC593D /* uthash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uthash.h; sourceTree = "<group>"; };
 		0836DAFE1109133100AC593D /* utlist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utlist.h; sourceTree = "<group>"; };
@@ -2089,7 +2085,6 @@
 			isa = PBXGroup;
 			children = (
 				084DD9F81120F37F0020E34F /* mem.h */,
-				08104AAD103DD3FD0065E0E2 /* tracealloc.cpp */,
 			);
 			path = mem;
 			sourceTree = "<group>";
@@ -2915,14 +2910,6 @@
 			path = locl;
 			sourceTree = "<group>";
 		};
-		0834F1E410458A3100E75B52 /* memmac */ = {
-			isa = PBXGroup;
-			children = (
-				0834F1E510458A3100E75B52 /* mem.cpp */,
-			);
-			path = memmac;
-			sourceTree = "<group>";
-		};
 		086708D910E83D9A00E43DFB /* testmac */ = {
 			isa = PBXGroup;
 			children = (
@@ -2978,12 +2965,12 @@
 		0DA6D33608563A0900A53577 /* src */ = {
 			isa = PBXGroup;
 			children = (
+				0834F1D1104586AA00E75B52 /* versionNo.h */,
 				E97C763D1C85146A00875F44 /* event */,
 				08E5E55513E855A100A5034D /* ez */,
 				08977DDA134CFB7200C9DCFE /* scen */,
 				089FEABB112C5B1200D0F32D /* maptools */,
 				086708D910E83D9A00E43DFB /* testmac */,
-				0834F1D1104586AA00E75B52 /* versionNo.h */,
 				0810471B103DCC390065E0E2 /* cfg */,
 				0810473E103DCC7C0065E0E2 /* chat */,
 				0810485F103DCEE10065E0E2 /* client */,
@@ -3010,7 +2997,6 @@
 				08104A4A103DD3370065E0E2 /* map */,
 				08104A82103DD3BA0065E0E2 /* math */,
 				08104AA9103DD3FD0065E0E2 /* mem */,
-				0834F1E410458A3100E75B52 /* memmac */,
 				08104AB1103DD41B0065E0E2 /* miss */,
 				08104ADE103DD4890065E0E2 /* ml */,
 				08104B09103DD4C80065E0E2 /* mm */,
@@ -3609,7 +3595,6 @@
 				08104AA6103DD3BB0065E0E2 /* Matrixd.cpp in Sources */,
 				08104AA7103DD3BB0065E0E2 /* Matrixf.cpp in Sources */,
 				08104AA8103DD3BB0065E0E2 /* Quat.cpp in Sources */,
-				08104AB0103DD3FD0065E0E2 /* tracealloc.cpp in Sources */,
 				08104AD3103DD41B0065E0E2 /* missActiveMission.cpp in Sources */,
 				08104AD5103DD41B0065E0E2 /* missionClientMessages.cpp in Sources */,
 				08104AD6103DD41B0065E0E2 /* missionDetail.cpp in Sources */,
@@ -3803,7 +3788,6 @@
 				0834F1CC104585DA00E75B52 /* loclAppx.cpp in Sources */,
 				0834F1CD104585DA00E75B52 /* loclLang.cpp in Sources */,
 				0834F1CE104585DA00E75B52 /* loclMain.cpp in Sources */,
-				0834F1E710458A3100E75B52 /* mem.cpp in Sources */,
 				0834F28210458DFA00E75B52 /* ShadowMap.cpp in Sources */,
 				0804088E10B73B35008F3954 /* BufferObject.cpp in Sources */,
 				086708EC10E83D9A00E43DFB /* testmac.c in Sources */,

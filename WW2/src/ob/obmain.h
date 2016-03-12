@@ -217,12 +217,6 @@ struct OBJECTDOF
 
 };
 
-//#ifdef DEBUG_WW2
-//#define NEW_OBJECT_MEM 1
-//#else
-#define NEW_OBJECT_MEM  0
-//#endif
-
 class physicsObjectCollider;
 struct PoolModel;
 class ModelInstance;
@@ -434,28 +428,10 @@ typedef OBJECT DOFOBJECT;
 typedef OBJECT LODOBJECT;
 typedef OBJECT GROUPOBJECT;
 
-#ifdef MEMORY_DEBUG
-#define obmainGetNewObject() obmainGetNewObjectDebug(__FILE__, __LINE__)
-#define obmainGetNewNotObject(a) obmainGetNewNotObjectDebug(a, __FILE__, __LINE__)
-#define obmainGetFreeObject() obmainGetFreeObjectDebug(__FILE__, __LINE__)
-#define obmainFreeObject(a) obmainFreeObjectDebug(a, __FILE__, __LINE__)
-#else
-#define obmainGetNewObject() obmainGetNewObjectA()
-#define obmainGetNewNotObject(a) obmainGetNewNotObjectA(a)
-#define obmainGetFreeObject() obmainGetFreeObjectA()
-#define obmainFreeObject(a) obmainFreeObjectA(a)
-#endif
-
-extern struct OBJECT* obmainGetNewObjectA();
-extern struct OBJECT* obmainGetNewNotObjectA(UINT32 obtype);
-extern struct OBJECT* obmainGetFreeObjectA();
-extern LOGICAL	 obmainFreeObjectA(struct OBJECT* lpobj);
-
-extern struct OBJECT* obmainGetNewObjectDebug(char* from, int line);
-extern struct OBJECT* obmainGetNewNotObjectDebug(unsigned int type, char* from, int line);
-extern struct OBJECT* obmainGetFreeObjectDebug(char* from, int line);
-
-extern LOGICAL obmainFreeObjectDebug(OBJECT* o, char* from, int line);
+extern struct OBJECT* obmainGetNewObject();
+extern struct OBJECT* obmainGetNewNotObject(UINT32 obtype);
+extern struct OBJECT* obmainGetFreeObject();
+extern LOGICAL	 obmainFreeObject(struct OBJECT* lpobj);
 
 extern LOGICAL		obmainMoveToNotObjectTree(struct OBJECT* lpobj);
 extern LOGICAL		obmainMoveToObjectTree(struct OBJECT* lpobj);

@@ -566,15 +566,6 @@ LOGICAL gmlpMainKill(void)
 //	physicsKill(); needs to go after obmainkill
 	uiKill();
 
-#ifdef MEMORY_DEBUG_EXTREME
-UINT32	mUsed, mUnused;
-UINT32	cUsed, cUnused;
-
-	memDisplayHeap(&mUsed, &mUnused, &cUsed, &cUnused);
-	Write_Debug("Used memory: %d for %d", cUsed, mUsed);
-	Write_Debug("Unused memory: %d for %d", cUnused, mUnused);
-#endif
-
 	persBombsightKill();
 	persGunsightKill();
 

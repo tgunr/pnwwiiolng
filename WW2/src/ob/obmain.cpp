@@ -32,10 +32,6 @@
 #include "ogl/States.h"
 #endif
 
-#if NEW_OBJECT_MEM
-#define MAX_BASE_OBJECTS    40960
-#endif
-
 #include "spt/sptmain.h"
 
 #if platOS == OS_MACOS
@@ -44,17 +40,7 @@
 
 typedef std::unordered_set<OBJECT*> ObjectSet;
 
-#if !NEW_OBJECT_MEM
 static ObjectSet objectmap;
-#endif
-
-#if NEW_OBJECT_MEM
-static OBJECT freehead;
-static OBJECT freetail;
-static std::deque<OBJECT*> freechunks;
-void obmainAllocateObjects(int size);
-#endif
-
 static ObjectSet updatecallbacks;
 
 int NumObjUsed = 0;
@@ -67,71 +53,23 @@ static LOGICAL _SetObjectSubTreeMatrix(OBJECT * Obj, piMATRIX * Mat);
 static OBJECT* _newObject(UINT32 obtype);
 void obmainFreeObjectMemory(OBJECT*  lpobj);
 
-#ifdef MEMORY_DEBUG
-#include <algorithm>
-static std::map<OBJECT*, std::pair<std::string, int> > memoryDebug;
-#endif
-
-#ifdef ANDREWTEST
-#undef ANDREWTEST
-#endif
-
-#ifdef ANDREWTEST
-static std::set<OBJECT*> objectset;
-static int dumpper = true;
-#endif
-
-#if NEW_OBJECT_MEM
-static OBJECT* PopFree()
-{
-    if(freehead.next == &freetail)
-    {
-        obmainAllocateObjects(4096);
-    }
-
-    OBJECT* o = freehead.next;
-    freehead.next = o->next;
-    o->next->prev = &freehead;
-
-    memset(o, 0, sizeof(OBJECT));
-
-    o->valid = true;
-
-    return o;
-}
-
-static void PushFree(OBJECT* o)
-{
-    OBJECT* tailprev = freetail.prev;
-
-    // Push to back
-    o->next = &freetail;
-    o->prev = tailprev;
-
-    freetail.prev = o;
-    tailprev->next = o;
-
-    o->valid = false;
-}
-#endif
-
 static LOGICAL listAddTopMostOBJECTAfter(OBJECT* objectlist, OBJECT* after);
 
-OBJECT* obmainGetNewObjectA()
+OBJECT* obmainGetNewObject()
 {
 	OBJECT* lpobj = _newObject(0);
 	listAddItemAfter((LISTHEADER*)&objused, (LISTHEADER*)lpobj);
 	return lpobj;
 }
 
-OBJECT* obmainGetNewNotObjectA(UINT32 obtype)
+OBJECT* obmainGetNewNotObject(UINT32 obtype)
 {
 	OBJECT* lpobj = _newObject(obtype);
 	listAddItemBefore((LISTHEADER*)&objused, (LISTHEADER*)lpobj);
 	return(lpobj);
 }
 
-OBJECT* obmainGetFreeObjectA()
+OBJECT* obmainGetFreeObject()
 {
     OBJECT* o = _newObject(0);
 	o->matid = -1;
@@ -143,21 +81,16 @@ OBJECT* obmainGetFreeObjectA()
     return o;
 }
 
-LOGICAL obmainFreeObjectA(OBJECT* lpobj)
+LOGICAL obmainFreeObject(OBJECT* lpobj)
 {
 	if (lpobj == nullptr)
 		return FALSE;
 
-#if !NEW_OBJECT_MEM
 	ObjectSet::iterator it = objectmap.find(lpobj);
 	if(it != objectmap.end())
 		objectmap.erase(it);
     else
         return FALSE;
-#else
-    if(!lpobj->valid)
-        return FALSE;
-#endif
 
 	if(lpobj->flag2 & OBJECT_SPEEDTREE || lpobj->flag3 & OBJECT_TREE_CLUSTER)
     {
@@ -182,38 +115,6 @@ LOGICAL obmainFreeObjectA(OBJECT* lpobj)
 
 	return TRUE;
 }
-
-#ifdef MEMORY_DEBUG
-OBJECT* obmainGetNewObjectDebug(char* from, int line)
-{
-    OBJECT* o = obmainGetNewObjectA();
-    memoryDebug[o] = std::make_pair(std::string(from) + "_obmainGetNewObject", line);
-
-    return o;
-}
-
-OBJECT* obmainGetNewNotObjectDebug(unsigned int type, char* from, int line)
-{
-    OBJECT* o = obmainGetNewNotObjectA(type);
-    memoryDebug[o] = std::make_pair(std::string(from) + "_obmainGetNewNotObject", line);
-
-    return o;
-}
-
-OBJECT* obmainGetFreeObjectDebug(char* from, int line)
-{
-    OBJECT* o = obmainGetFreeObjectA();
-    memoryDebug[o] = std::make_pair(std::string(from) + "_obmainGetFreeObject", line);
-
-    return o;
-}
-
-LOGICAL obmainFreeObjectDebug(OBJECT* o, char* from, int line)
-{
-    memoryDebug.erase(o);
-    return obmainFreeObjectA(o);
-}
-#endif
 
 LOGICAL obmainMoveToNotObjectTree(OBJECT* lpobj)
 {
@@ -329,54 +230,6 @@ LOGICAL obmainSetObject(OBJECT* lpnew, OBJECT* lpold)
 
 void obmainFreeObjectMemory(OBJECT*  lpobj)
 {
-#ifdef ANDREWTEST
-    if ( dumpper && NumObjUsed > 100000 )
-    {
-        int numverts = 0;
-        int numtris = 0;
-        int poolcount = 0;
-
-        std::map<const char*,int> models;
-
-        std::set<OBJECT*>::iterator it = objectset.begin();
-        while (it!= objectset.end())
-        {
-            if ((*it)->modelInstance ) //&& (*it)->freepsnorms)
-            {
-                ModelInstance* mi = (*it)->modelInstance;
-                std::map<const char*,int>::iterator iter = models.find(mi->GetModelName());
-                if ( iter != models.end() )
-                {
-                    (*iter).second++;
-                }
-                else
-                {
-                    models.insert( std::pair<char*,int>(mi->GetModelName(),1) );
-                }
-            }
-
-            numverts += (*it)->numverts;
-            numtris += (*it)->numtris;
-
-            it++;
-        }
-
-        printf("Count: %d numverts: %d numtris: %d \n",
-               NumObjUsed, numverts, numtris
-               );
-
-        std::map<const char*,int>::iterator iter = models.begin();
-        while ( iter != models.end() )
-        {
-            printf( "%s %d\n", (*iter).first, (*iter).second );
-            iter++;
-        }
-
-        dumpper = 0;
-    }
-    objectset.erase(lpobj);
-#endif
-
 	if(!(lpobj->flags & OBJECT_NOTOBJECT))
 	{
         if(lpobj->killcallback)
@@ -537,14 +390,9 @@ void obmainFreeObjectMemory(OBJECT*  lpobj)
         lpobj->material = nullptr;
     }
 
-#if NEW_OBJECT_MEM
-    PushFree(lpobj);
-#else
-
     NumObjUsed--;
 
 	memFree(lpobj);
-#endif
 }
 
 OBJECT* obmainFindNamedObject(const char* name)
@@ -1784,29 +1632,9 @@ int obmainGetObjects(LISTHEADER** lplist)
 	return(NumObjUsed);
 }
 
-#if NEW_OBJECT_MEM
-void obmainAllocateObjects(int size)
-{
-    OBJECT* o = (OBJECT*)memAlloc(sizeof(OBJECT) * size);
-	freechunks.push_back(o);
-
-    for(int i = 0; i < size; i++)
-    {
-        PushFree(&o[i]);
-    }
-}
-#endif
-
 LOGICAL obmainInit(void)
 {
 	NumObjUsed = 0;
-
-#if NEW_OBJECT_MEM
-	freehead.next = &freetail;
-	freetail.prev = &freehead;
-
-    obmainAllocateObjects(MAX_BASE_OBJECTS);
-#endif
 
     if (!obdrawInit())
 	{
@@ -1862,31 +1690,6 @@ void obmainKill(void)
         o = o->next;
         obmainFreeObject(free);
     }
-
-#ifdef MEMORY_DEBUG
-    static std::map<OBJECT*, std::pair<std::string, int> >::iterator itr;
-
-    if(memoryDebug.empty())
-    {
-        Write_Debug("[obmainKill] NO MEMORY LEAKS DETECTED");
-    }
-
-    itr = memoryDebug.begin();
-    for(; itr != memoryDebug.end(); ++itr)
-    {
-        Write_Debug("[obmainKill] MEMORY NOT FREED: file = %s line = %d", itr->second.first.c_str(), itr->second.second);
-    }
-#endif
-
-#if NEW_OBJECT_MEM
-	while(!freechunks.empty())
-	{
-		OBJECT* o = freechunks.front();
-		freechunks.pop_front();
-
-		memFree(o);
-	}
-#endif
 
     obmgrKill();
 
@@ -2348,16 +2151,11 @@ void obmainDeleteNodeTree(OBJECT* node)
 	OBJECT*		child = node->child;
 	OBJECT*		sibling = node->sibling;
 
-#if !NEW_OBJECT_MEM
 	ObjectSet::iterator it = objectmap.find(node);
 	if(it != objectmap.end())
 		objectmap.erase(it);
     else
         return;
-#else
-    if(!node->valid)
-        return;
-#endif
 
     listDeleteOBJECT(node);
 	obmainFreeObjectMemory(node);
@@ -2491,17 +2289,6 @@ OBJECT* _newObject(UINT32 obtype)
 
 	switch(obtype)
 	{
-#if NEW_OBJECT_MEM
-		case OBJECT_DOF:
-		case OBJECT_LOD:
-		case OBJECT_GROUP:
-		case 0:
-            {
-                lpobj = PopFree();
-
-                break;
-            }
-#else
 		case OBJECT_DOF:
 			lpobj = (OBJECT*)memAlloc(sizeof(DOFOBJECT));
 		break;
@@ -2517,7 +2304,7 @@ OBJECT* _newObject(UINT32 obtype)
 		case 0:
 			lpobj = (OBJECT*)memAlloc(sizeof(OBJECT));
 		break;
-#endif
+
 		default:
 			piExitProgram(__FILE__, __LINE__, "Unexpected object flags");
 		break;
@@ -2536,13 +2323,7 @@ OBJECT* _newObject(UINT32 obtype)
 
     NumObjUsed++;
 
-#ifdef ANDREWTEST
-    objectset.insert( lpobj );
-#endif
-
-#if !NEW_OBJECT_MEM
 	objectmap.insert(lpobj);
-#endif
 
 	return lpobj;
 }
@@ -2641,17 +2422,6 @@ piTexCoordConstPtr OBJECT::ImmutableTexCoords() const
 	Mutable
 *************************************************************************************************/
 
-#ifdef ANDREWTEST
-
-size_t MutablePositions_size = 0;   size_t MutablePositions_count = 0;
-size_t MutableNormals_size = 0;     size_t MutableNormals_count = 0;
-size_t MutableColors_size = 0;      size_t MutableColors_count = 0;
-size_t MutableTexCoords_size = 0;   size_t MutableTexCoords_count = 0;
-size_t MutableCollisionNormals_size = 0;   size_t MutableCollisionNormals_count = 0;
-size_t MutableSurfaceNormals_size = 0;   size_t MutableSurfaceNormals_count = 0;
-
-#endif
-
 piVectorPtr OBJECT::MutablePositions()
 {
 	if(!pverts && numverts)
@@ -2665,11 +2435,6 @@ piVectorPtr OBJECT::MutablePositions()
 
 		pverts = (piUNIFIED_VERTEX*)memAlloc(numverts * sizeof(piUNIFIED_VERTEX));
 		memcpy(pverts, puverts, numverts * sizeof(piUNIFIED_VERTEX));
-
-#ifdef ANDREWTEST
-		MutablePositions_size += numverts * sizeof(piUNIFIED_VERTEX);
-		MutablePositions_count ++;
-#endif
 	}
 
 	return piVectorPtr((piVECTOR*)&pverts->x, sizeof(piUNIFIED_VERTEX));
@@ -2688,10 +2453,6 @@ piVectorPtr OBJECT::MutableNormals()
 
         pverts = (piUNIFIED_VERTEX*)memAlloc(numverts * sizeof(piUNIFIED_VERTEX));
 		memcpy(pverts, puverts, numverts * sizeof(piUNIFIED_VERTEX));
-#ifdef ANDREWTEST
-		MutableNormals_size += numverts * sizeof(piUNIFIED_VERTEX);
-		MutableNormals_count ++;
-#endif
 	}
 
 	return piVectorPtr((piVECTOR*)&pverts->nx, sizeof(piUNIFIED_VERTEX));
@@ -2710,10 +2471,6 @@ piVertexColorPtr OBJECT::MutableColors()
 
 		pverts = (piUNIFIED_VERTEX*)memAlloc(numverts * sizeof(piUNIFIED_VERTEX));
 		memcpy(pverts, puverts, numverts * sizeof(piUNIFIED_VERTEX));
-#ifdef ANDREWTEST
-		MutableColors_size += numverts * sizeof(piUNIFIED_VERTEX);
-		MutableColors_count ++;
-#endif
 	}
 
 	return piVertexColorPtr((piVERTEX_COLOR*)&pverts->color, sizeof(piUNIFIED_VERTEX));
@@ -2732,10 +2489,6 @@ piTexCoordPtr OBJECT::MutableTexCoords()
 
         pverts = (piUNIFIED_VERTEX*)memAlloc(numverts * sizeof(piUNIFIED_VERTEX));
 		memcpy(pverts, puverts, numverts * sizeof(piUNIFIED_VERTEX));
-#ifdef ANDREWTEST
-		MutableTexCoords_size += numverts * sizeof(piUNIFIED_VERTEX);
-		MutableTexCoords_count ++;
-#endif
 	}
 
 	return piTexCoordPtr((piUV*)&pverts->tu, sizeof(piUNIFIED_VERTEX));
@@ -2844,11 +2597,6 @@ void obmainCreateMutableSurfaceNormals(OBJECT* lpobj)
 {
     if(!lpobj->freepsnorms && lpobj->psnorms == lpobj->psnorig)
 	{
-#ifdef ANDREWTEST
-		MutableSurfaceNormals_size += lpobj->numtris * 3 * sizeof(piVECTOR);
-		MutableSurfaceNormals_count ++;
-#endif
-
 		lpobj->psnorms = (piVECTOR*)memAlloc(lpobj->numtris * sizeof(piVECTOR));
 		if(!lpobj->psnorig)	lpobj->psnorig = lpobj->psnorms;
 		else	memcpy(lpobj->psnorms, lpobj->psnorig, lpobj->numtris * sizeof(piVECTOR));
@@ -2896,9 +2644,6 @@ LOGICAL obmainValidateObject(OBJECT* lpobj)
     if(!lpobj)
         return FALSE;
 
-#if NEW_OBJECT_MEM
-    return lpobj->valid;
-#else
     // disable to see if we've fixed root cause
     LOGICAL	isValid = objectmap.find(lpobj) != objectmap.end();
 
@@ -2910,7 +2655,6 @@ LOGICAL obmainValidateObject(OBJECT* lpobj)
 #endif
 
     return (isValid);
-#endif // NEW OBJECT_MEM
 }
 
 LOGICAL obmainGetScreenBBOX(OBJECT* lpobj, float& x, float& y, float &z, float& w, float& h)

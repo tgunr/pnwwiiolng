@@ -347,29 +347,6 @@ PoolNode::~PoolNode()
     material = nullptr;
 }
 
-#ifdef ANDREWTEST
-size_t PoolNode::calcMemoryUsage()
-{
-    size_t sum = 0;
-
-    if ( sibling != nullptr ) sum += sibling->calcMemoryUsage();
-    if ( child != nullptr ) sum += child->calcMemoryUsage();
-    if ( attached != nullptr ) sum += attached->calcMemoryUsage();
-    if ( objdata != nullptr )
-    {
-        sum += sizeof(POOLOBJDATA);
-        sum += objdata->numverts * sizeof(piUNIFIED_VERTEX);
-        sum += objdata->numtris * sizeof(piINDICES);
-        if ( objdata->psnorms ) sum += objdata->numtris * sizeof(piVECTOR);
-        if ( objdata->pscdn ) sum += objdata->numtris * sizeof(piVECTOR);
-    }
-    if ( dof ) sum += sizeof(DOF);
-
-    return sum;
-}
-
-#endif
-
 static int imageLoader(const char* Filename, UINT32 TransparentColor, UINT32 Flags)
 {
     return ldpixLoadImageFileToSurface( Filename, TransparentColor, Flags );
