@@ -28,14 +28,10 @@
 #include <arpa/inet.h>
 #include "sysLaunchURL.h"
 
-#define PLAYGATE_VERSION 0x00010109
+#define PLAYGATE_VERSION 0x01010109
 
-#define DEFAULT_AUTH_SERVER "auth.playnet.com"
-//#define DEFAULT_AUTH_SERVER "authdevng.playnet.com"
-// Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
-#define RELEASE_ARENA 1
-// Match Playgate version in auth.app_manifest table
-
+//#define DEFAULT_AUTH_SERVER "auth.playnet.com"
+#define DEFAULT_AUTH_SERVER "authdevng.playnet.com"
 #define DEFAULT_AUTH_PORT WWII::Net::Ports::AuthHost
 
 static void xmlerrorstub (void *ctx, const char *msg, ...) {}
@@ -319,13 +315,12 @@ static NSString *placeholderHTML = @""
 @"    background-color: #f4f4f4;\n"
 @"}\n"
 @"div.hi { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); }\n"
-@"img { height: 90px; }\n"
 @"</style>"
 @"</head>"
 @"<body>"
 @"<div class=\"hi\">"
-@"<a href=\"http://wwiionline.com/\">"
-@"<img src=\"placeholder-title.png\"/>"
+@"<a href=\"http://www.battlegroundeurope.net/\">"
+@"<img style=\"height: 90px;\" src=\"placeholder-title.png\"/>"
 @"</a>"
 @"</div>"
 @"</body>"
@@ -579,9 +574,30 @@ extern NSString *WebActionOriginalURLKey;
     downloadBoxResizeHeight = ([downloadBox frame].size.height + 20);
     [self setShowDownloadProgress:NO];
     
+    // For now, we hardcode the available arena list instead of asking auth for it.
+    // But just so ya know, auth CAN provide it.
+    arenaLoadingIndicator.hidden = YES;
+    [arenaMenu.menu removeAllItems];
+#if DEV_BUILD
+    // Developers get a build which lets you pick an arbitrary arena ID. This
+    // bit will go away once we've implemented having auth tell us what arenas
+    // are available.
+    [arenaMenu.menu addItemWithTitle:@"LIVE (1)" action:nullptr keyEquivalent:@""].tag = 1;
+    [arenaMenu.menu addItemWithTitle:@"TRAINING (22)" action:nullptr keyEquivalent:@""].tag = 22;
+    [arenaMenu.menu addItemWithTitle:@"BETA (222)" action:nullptr keyEquivalent:@""].tag = 222;
+    [arenaMenu.menu addItemWithTitle:@"DEV (250)" action:nullptr keyEquivalent:@""].tag = 250;
+    [arenaMenu selectItemWithTag:1];
+    arenaMenu.enabled = YES;
+#else
+    // Everyone else gets a build that (for now) locks the user to the 1.35 dev
+    // server, which is apparently pretending to be arena 1 (e.g. "live").
+    [arenaMenu.menu addItemWithTitle:@"1.35 Testing" action:nullptr keyEquivalent:@""].tag = 1;
+    [arenaMenu selectItemWithTag:1];
+    arenaMenu.enabled = NO;
+#endif
+    
     // Initialize authentication process
     [self changeState:WAIT_START_UP];
-    
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification
@@ -605,7 +621,9 @@ extern NSString *WebActionOriginalURLKey;
     if (state == WAIT_APPLE_EVT) {
 
         if (gArena[0]) {
-            arena = [[NSString stringWithCString:(const char *)gArena encoding:NSUTF8StringEncoding] intValue];
+            arena = @(gArena).intValue;
+        } else {
+            arena = arenaMenu.selectedTag;
         }
         
         session = 0;

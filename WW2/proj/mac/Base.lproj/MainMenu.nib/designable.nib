@@ -417,7 +417,7 @@ DQ
                                         </buttonCell>
                                         <connections>
                                             <action selector="launchOnline:" target="906" id="1125"/>
-                                            <outlet property="nextKeyView" destination="1089" id="lK1-lx-On0"/>
+                                            <outlet property="nextKeyView" destination="1089" id="UBr-0F-gpe"/>
                                         </connections>
                                     </button>
                                 </subviews>
@@ -479,7 +479,7 @@ DQ
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                         <connections>
-                                            <outlet property="nextKeyView" destination="1294" id="Nlw-6J-pcd"/>
+                                            <outlet property="nextKeyView" destination="1294" id="0hS-rX-YLg"/>
                                         </connections>
                                     </textField>
                                     <progressIndicator wantsLayer="YES" maxValue="100" displayedWhenStopped="NO" indeterminate="YES" style="bar" translatesAutoresizingMaskIntoConstraints="NO" id="cuN-cG-tfB">
@@ -500,7 +500,7 @@ DQ
                                             <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                         </textFieldCell>
                                         <connections>
-                                            <outlet property="nextKeyView" destination="1309" id="Pj5-lj-Yv0"/>
+                                            <outlet property="nextKeyView" destination="1309" id="KCw-Ww-jkW"/>
                                         </connections>
                                     </textField>
                                     <button translatesAutoresizingMaskIntoConstraints="NO" id="1294">
@@ -514,25 +514,28 @@ DQ
                                         </buttonCell>
                                         <connections>
                                             <action selector="clearUserNameAndPassword:" target="906" id="uyy-dl-9e9"/>
-                                            <outlet property="nextKeyView" destination="1086" id="k3f-66-h1h"/>
+                                            <outlet property="nextKeyView" destination="rfe-OI-t4g" id="Yav-83-mVd"/>
                                         </connections>
                                     </button>
                                     <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="rfe-OI-t4g">
                                         <rect key="frame" x="444" y="43" width="166" height="26"/>
                                         <constraints>
-                                            <constraint firstAttribute="width" constant="160" id="L9J-0t-QIL"/>
+                                            <constraint firstAttribute="width" constant="161" id="L9J-0t-QIL"/>
                                         </constraints>
-                                        <popUpButtonCell key="cell" type="push" title="Item 1" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" pullsDown="YES" arrowPosition="arrowAtCenter" autoenablesItems="NO" id="0r7-xl-EBZ">
+                                        <popUpButtonCell key="cell" type="push" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" autoenablesItems="NO" id="0r7-xl-EBZ">
                                             <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
                                             <font key="font" metaFont="menu"/>
                                             <menu key="menu" autoenablesItems="NO" id="U20-FY-4Va">
                                                 <items>
-                                                    <menuItem title="Item 1" hidden="YES" id="O7O-d1-a0L"/>
+                                                    <menuItem title="Item 1" id="O7O-d1-a0L"/>
                                                     <menuItem title="Item 2" id="Mqk-t3-YHE"/>
                                                     <menuItem title="Item 3" id="dcR-aI-3vc"/>
                                                 </items>
                                             </menu>
                                         </popUpButtonCell>
+                                        <connections>
+                                            <outlet property="nextKeyView" destination="1086" id="hql-pF-use"/>
+                                        </connections>
                                     </popUpButton>
                                 </subviews>
                                 <constraints>

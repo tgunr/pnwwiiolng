@@ -70,26 +70,6 @@
             argument = "-datadir $(SRCROOT)/../opt/ww2mods/DATA/"
             isEnabled = "YES">
          </CommandLineArgument>
-         <CommandLineArgument
-            argument = "-authserver authdevng.playnet.com"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "-window 1"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "-width 1024"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "-height 800"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "-arena 1"
-            isEnabled = "YES">
-         </CommandLineArgument>
       </CommandLineArguments>
       <AdditionalOptions>
       </AdditionalOptions>
