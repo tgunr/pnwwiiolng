@@ -51,3 +51,7 @@ extern void fiodmkdir(const char* path);
 		return fiodRead(fd, &into, sizeof(int));
 	}
 #endif
+
+#if RECORD_FILES
+    extern void dumpFileRefs();
+#endif

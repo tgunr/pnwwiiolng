@@ -588,7 +588,6 @@ extern NSString *WebActionOriginalURLKey;
 {
     cfgPrefsSave();
 #ifdef RECORD_FILES
-    extern void dumpFileRefs();
     dumpFileRefs();
 #endif
 }
