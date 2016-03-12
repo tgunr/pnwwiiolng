@@ -358,7 +358,6 @@
 		0834F1671044E67100E75B52 /* teulHousekeeper.h in Headers */ = {isa = PBXBuildFile; fileRef = 0834F1491044E67100E75B52 /* teulHousekeeper.h */; };
 		0834F1681044E67100E75B52 /* teulPackers.h in Headers */ = {isa = PBXBuildFile; fileRef = 0834F14A1044E67100E75B52 /* teulPackers.h */; };
 		0834F16A1044E67100E75B52 /* teulCallback.h in Headers */ = {isa = PBXBuildFile; fileRef = 0834F14C1044E67100E75B52 /* teulCallback.h */; };
-		0834F16B1044E67100E75B52 /* teulDatagramPool.h in Headers */ = {isa = PBXBuildFile; fileRef = 0834F14D1044E67100E75B52 /* teulDatagramPool.h */; };
 		0834F16D1044E67100E75B52 /* teulEnums.h in Headers */ = {isa = PBXBuildFile; fileRef = 0834F14F1044E67100E75B52 /* teulEnums.h */; };
 		0834F16E1044E67100E75B52 /* teulModule.h in Headers */ = {isa = PBXBuildFile; fileRef = 0834F1501044E67100E75B52 /* teulModule.h */; };
 		0834F16F1044E67100E75B52 /* teulEndpoint.h in Headers */ = {isa = PBXBuildFile; fileRef = 0834F1511044E67100E75B52 /* teulEndpoint.h */; };
@@ -618,7 +617,6 @@
 		08104861103DCEE10065E0E2 /* client.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = client.h; sourceTree = "<group>"; };
 		08104862103DCEE10065E0E2 /* clientBrigadeControl.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = clientBrigadeControl.cpp; sourceTree = "<group>"; };
 		08104863103DCEE10065E0E2 /* clientBrigadeControlDescriptors.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = clientBrigadeControlDescriptors.h; sourceTree = "<group>"; };
-		08104864103DCEE10065E0E2 /* clientConnection.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = clientConnection.cpp; sourceTree = "<group>"; };
 		08104867103DCEE10065E0E2 /* clientNetError.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = clientNetError.h; sourceTree = "<group>"; };
 		08104868103DCEE10065E0E2 /* clientResupplyIssue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = clientResupplyIssue.h; sourceTree = "<group>"; };
 		08104869103DCEE10065E0E2 /* clientServerTrackedObjects.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = clientServerTrackedObjects.cpp; sourceTree = "<group>"; };
@@ -794,7 +792,6 @@
 		08104A5D103DD3370065E0E2 /* mapHCUnitLocations.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapHCUnitLocations.h; sourceTree = "<group>"; };
 		08104A66103DD3370065E0E2 /* mapMissionList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapMissionList.h; sourceTree = "<group>"; };
 		08104A67103DD3370065E0E2 /* mapPack.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mapPack.cpp; sourceTree = "<group>"; };
-		08104A68103DD3370065E0E2 /* mapPack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapPack.h; sourceTree = "<group>"; };
 		08104A6A103DD3370065E0E2 /* mapPersonaSummary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapPersonaSummary.h; sourceTree = "<group>"; };
 		08104A70103DD3370065E0E2 /* mapSwingMeter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapSwingMeter.h; sourceTree = "<group>"; };
 		08104A73103DD3370065E0E2 /* mapTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapTypes.h; sourceTree = "<group>"; };
@@ -1017,7 +1014,6 @@
 		08104C3B103DF9B00065E0E2 /* rntextloc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rntextloc.h; sourceTree = "<group>"; };
 		08104C3C103DF9B00065E0E2 /* rnvis.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = rnvis.cpp; sourceTree = "<group>"; };
 		08104C3D103DF9B00065E0E2 /* rnvis.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = rnvis.h; sourceTree = "<group>"; };
-		08104C44103DF9D00065E0E2 /* endianswap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = endianswap.h; sourceTree = "<group>"; };
 		08104C47103DF9D00065E0E2 /* sdm.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sdm.cpp; sourceTree = "<group>"; };
 		08104C48103DF9D00065E0E2 /* sdm.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sdm.h; sourceTree = "<group>"; };
 		08104C49103DF9D00065E0E2 /* sdmHash.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sdmHash.cpp; sourceTree = "<group>"; };
@@ -1066,10 +1062,8 @@
 		08104CD7103DFA970065E0E2 /* strtLua.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = strtLua.cpp; sourceTree = "<group>"; };
 		08104CD8103DFA970065E0E2 /* strtLua.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = strtLua.h; sourceTree = "<group>"; };
 		08104CFF103DFA970065E0E2 /* strtTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = strtTypes.h; sourceTree = "<group>"; };
-		08104D04103DFA970065E0E2 /* strtUpdaterConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = strtUpdaterConstants.h; sourceTree = "<group>"; };
 		08104D09103DFA970065E0E2 /* strtUpdaterPack.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = strtUpdaterPack.cpp; sourceTree = "<group>"; };
 		08104D0A103DFA970065E0E2 /* strtUpdaterPack.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = strtUpdaterPack.h; sourceTree = "<group>"; };
-		08104D0D103DFA970065E0E2 /* strtUpdaterTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = strtUpdaterTypes.h; sourceTree = "<group>"; };
 		08104D15103DFA970065E0E2 /* strtWOR.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = strtWOR.h; sourceTree = "<group>"; };
 		08104D47103DFBA10065E0E2 /* stringLib.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = stringLib.cpp; sourceTree = "<group>"; };
 		08104D48103DFBA10065E0E2 /* stringLib.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = stringLib.h; sourceTree = "<group>"; };
@@ -1186,7 +1180,6 @@
 		08104E62103DFD270065E0E2 /* uiSound.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uiSound.h; sourceTree = "<group>"; };
 		08104E63103DFD270065E0E2 /* uiUTF.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uiUTF.h; sourceTree = "<group>"; };
 		08104E6E103DFD480065E0E2 /* loginTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = loginTypes.h; sourceTree = "<group>"; };
-		08104E6F103DFD480065E0E2 /* updtBackChannel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = updtBackChannel.h; sourceTree = "<group>"; };
 		08104E70103DFD480065E0E2 /* updtDeathByBuilding.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = updtDeathByBuilding.h; sourceTree = "<group>"; };
 		08104E71103DFD480065E0E2 /* updtFraming.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = updtFraming.h; sourceTree = "<group>"; };
 		08104E73103DFD480065E0E2 /* updtPackers.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = updtPackers.cpp; sourceTree = "<group>"; };
@@ -1242,8 +1235,6 @@
 		08104ED3103DFDC30065E0E2 /* weapType.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = weapType.h; sourceTree = "<group>"; };
 		08104ED4103DFDC30065E0E2 /* weapWeapon.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = weapWeapon.h; sourceTree = "<group>"; };
 		08104EE3103DFE120065E0E2 /* wwiiActivate.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wwiiActivate.h; sourceTree = "<group>"; };
-		08104EE7103DFE120065E0E2 /* wwiiBackChannel.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wwiiBackChannel.cpp; sourceTree = "<group>"; };
-		08104EE8103DFE120065E0E2 /* wwiiBackChannel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wwiiBackChannel.h; sourceTree = "<group>"; };
 		08104EE9103DFE120065E0E2 /* wwiiCallbacks.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wwiiCallbacks.cpp; sourceTree = "<group>"; };
 		08104EEA103DFE120065E0E2 /* wwiiCallbacks.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wwiiCallbacks.h; sourceTree = "<group>"; };
 		08104EEB103DFE120065E0E2 /* wwiiClientMessages.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wwiiClientMessages.cpp; sourceTree = "<group>"; };
@@ -1333,12 +1324,10 @@
 		082CF8681202338100A60CC2 /* CADebugPrintf.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = CADebugPrintf.h; sourceTree = "<group>"; };
 		0834F1321044E60600E75B52 /* syscfg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = syscfg.h; sourceTree = "<group>"; };
 		0834F1341044E67100E75B52 /* teulSockConfig.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = teulSockConfig.h; path = teul/teulSockConfig.h; sourceTree = "<group>"; };
-		0834F1351044E67100E75B52 /* teulSerialize.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = teulSerialize.h; path = teul/teulSerialize.h; sourceTree = "<group>"; };
 		0834F1361044E67100E75B52 /* teulEndpointDefs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = teulEndpointDefs.h; path = teul/teulEndpointDefs.h; sourceTree = "<group>"; };
 		0834F1371044E67100E75B52 /* teulModCalls.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = teulModCalls.h; path = teul/teulModCalls.h; sourceTree = "<group>"; };
 		0834F1391044E67100E75B52 /* teulUtils.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = teulUtils.h; path = teul/teulUtils.h; sourceTree = "<group>"; };
 		0834F13A1044E67100E75B52 /* teulNetworkObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = teulNetworkObject.h; path = teul/teulNetworkObject.h; sourceTree = "<group>"; };
-		0834F13B1044E67100E75B52 /* teulTransport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = teulTransport.h; path = teul/teulTransport.h; sourceTree = "<group>"; };
 		0834F13C1044E67100E75B52 /* teulBasic.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = teulBasic.h; path = teul/teulBasic.h; sourceTree = "<group>"; };
 		0834F13D1044E67100E75B52 /* teulCLList.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = teulCLList.h; path = teul/teulCLList.h; sourceTree = "<group>"; };
 		0834F13F1044E67100E75B52 /* teulNetworkArray.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = teulNetworkArray.h; path = teul/teulNetworkArray.h; sourceTree = "<group>"; };
@@ -1349,7 +1338,6 @@
 		0834F1491044E67100E75B52 /* teulHousekeeper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = teulHousekeeper.h; path = teul/teulHousekeeper.h; sourceTree = "<group>"; };
 		0834F14A1044E67100E75B52 /* teulPackers.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = teulPackers.h; path = teul/teulPackers.h; sourceTree = "<group>"; };
 		0834F14C1044E67100E75B52 /* teulCallback.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = teulCallback.h; path = teul/teulCallback.h; sourceTree = "<group>"; };
-		0834F14D1044E67100E75B52 /* teulDatagramPool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = teulDatagramPool.h; path = teul/teulDatagramPool.h; sourceTree = "<group>"; };
 		0834F14F1044E67100E75B52 /* teulEnums.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = teulEnums.h; path = teul/teulEnums.h; sourceTree = "<group>"; };
 		0834F1501044E67100E75B52 /* teulModule.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = teulModule.h; path = teul/teulModule.h; sourceTree = "<group>"; };
 		0834F1511044E67100E75B52 /* teulEndpoint.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = teulEndpoint.h; path = teul/teulEndpoint.h; sourceTree = "<group>"; };
@@ -1360,14 +1348,12 @@
 		0834F1761044E6B400E75B52 /* teulPack.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = teulPack.cpp; path = teul/teulPack.cpp; sourceTree = "<group>"; };
 		0834F1771044E6B400E75B52 /* teulModule.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = teulModule.cpp; path = teul/teulModule.cpp; sourceTree = "<group>"; };
 		0834F1781044E6B400E75B52 /* teulTransport.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = teulTransport.cpp; path = teul/teulTransport.cpp; sourceTree = "<group>"; };
-		0834F1791044E6B400E75B52 /* teulSerialize.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = teulSerialize.cpp; path = teul/teulSerialize.cpp; sourceTree = "<group>"; };
 		0834F17B1044E6B400E75B52 /* teulCallback.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = teulCallback.cpp; path = teul/teulCallback.cpp; sourceTree = "<group>"; };
 		0834F17E1044E6B400E75B52 /* teulModCalls.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = teulModCalls.cpp; path = teul/teulModCalls.cpp; sourceTree = "<group>"; };
 		0834F17F1044E6B400E75B52 /* teulModRecv.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = teulModRecv.cpp; path = teul/teulModRecv.cpp; sourceTree = "<group>"; };
 		0834F1901044E6DA00E75B52 /* authConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = authConstants.h; path = auth/authConstants.h; sourceTree = "<group>"; };
 		0834F1921044E70400E75B52 /* dbug.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = dbug.cpp; path = dbug/dbug.cpp; sourceTree = "<group>"; };
 		0834F1941044E72D00E75B52 /* listCL.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = listCL.cpp; path = list/listCL.cpp; sourceTree = "<group>"; };
-		0834F1961044E74300E75B52 /* emem.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = emem.cpp; path = src/emem.cpp; sourceTree = "<group>"; };
 		0834F19E1044E78700E75B52 /* authPack.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = authPack.cpp; path = auth/authPack.cpp; sourceTree = "<group>"; };
 		0834F1C6104585DA00E75B52 /* loclApp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = loclApp.h; sourceTree = "<group>"; };
 		0834F1C7104585DA00E75B52 /* loclAppx.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = loclAppx.cpp; sourceTree = "<group>"; };
@@ -1461,7 +1447,6 @@
 		08E800BB13745261000F25A9 /* HeightField.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HeightField.cpp; sourceTree = "<group>"; };
 		08EBB4C6129439DD00AEDB5B /* info.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = info.cpp; sourceTree = "<group>"; };
 		08EBB4C7129439DD00AEDB5B /* info.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = info.h; sourceTree = "<group>"; };
-		08EBB4CB12943A5E00AEDB5B /* chatMissionStatusPacker.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = chatMissionStatusPacker.cpp; sourceTree = "<group>"; };
 		08EBB4D212943BE300AEDB5B /* wwiiSyncVar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wwiiSyncVar.cpp; sourceTree = "<group>"; };
 		08EBB4D312943BE300AEDB5B /* wwiiSyncVar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wwiiSyncVar.h; sourceTree = "<group>"; };
 		08F41C5512D39B7B0001C6F5 /* libfreetype2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype2.a; path = lib/mac/libfreetype2.a; sourceTree = "<group>"; };
@@ -1664,7 +1649,6 @@
 		0810473E103DCC7C0065E0E2 /* chat */ = {
 			isa = PBXGroup;
 			children = (
-				08EBB4CB12943A5E00AEDB5B /* chatMissionStatusPacker.cpp */,
 				08104741103DCC7C0065E0E2 /* chatBrigadeControl.cpp */,
 				08104742103DCC7C0065E0E2 /* chatBrigadeControl.h */,
 				08104743103DCC7C0065E0E2 /* chatBrigadeControlList.h */,
@@ -1722,7 +1706,6 @@
 				08104861103DCEE10065E0E2 /* client.h */,
 				08104862103DCEE10065E0E2 /* clientBrigadeControl.cpp */,
 				08104863103DCEE10065E0E2 /* clientBrigadeControlDescriptors.h */,
-				08104864103DCEE10065E0E2 /* clientConnection.cpp */,
 				08104867103DCEE10065E0E2 /* clientNetError.h */,
 				08104868103DCEE10065E0E2 /* clientResupplyIssue.h */,
 				08104869103DCEE10065E0E2 /* clientServerTrackedObjects.cpp */,
@@ -2058,7 +2041,6 @@
 				08104A5D103DD3370065E0E2 /* mapHCUnitLocations.h */,
 				08104A66103DD3370065E0E2 /* mapMissionList.h */,
 				08104A67103DD3370065E0E2 /* mapPack.cpp */,
-				08104A68103DD3370065E0E2 /* mapPack.h */,
 				08104A6A103DD3370065E0E2 /* mapPersonaSummary.h */,
 				08104A70103DD3370065E0E2 /* mapSwingMeter.h */,
 				08104A73103DD3370065E0E2 /* mapTypes.h */,
@@ -2425,7 +2407,6 @@
 			children = (
 				081418E912DF707B00C2F0F4 /* BuildTerrain.cpp */,
 				081418EA12DF707B00C2F0F4 /* BuildTerrain.h */,
-				08104C44103DF9D00065E0E2 /* endianswap.h */,
 				08104C47103DF9D00065E0E2 /* sdm.cpp */,
 				08104C48103DF9D00065E0E2 /* sdm.h */,
 				08104C49103DF9D00065E0E2 /* sdmHash.cpp */,
@@ -2507,10 +2488,8 @@
 				08104CD7103DFA970065E0E2 /* strtLua.cpp */,
 				08104CD8103DFA970065E0E2 /* strtLua.h */,
 				08104CFF103DFA970065E0E2 /* strtTypes.h */,
-				08104D04103DFA970065E0E2 /* strtUpdaterConstants.h */,
 				08104D09103DFA970065E0E2 /* strtUpdaterPack.cpp */,
 				08104D0A103DFA970065E0E2 /* strtUpdaterPack.h */,
-				08104D0D103DFA970065E0E2 /* strtUpdaterTypes.h */,
 				08104D15103DFA970065E0E2 /* strtWOR.h */,
 			);
 			path = strt;
@@ -2707,7 +2686,6 @@
 			children = (
 				084DD9B511206C070020E34F /* updtEnums.h */,
 				08104E6E103DFD480065E0E2 /* loginTypes.h */,
-				08104E6F103DFD480065E0E2 /* updtBackChannel.h */,
 				08104E70103DFD480065E0E2 /* updtDeathByBuilding.h */,
 				08104E71103DFD480065E0E2 /* updtFraming.h */,
 				08104E73103DFD480065E0E2 /* updtPackers.cpp */,
@@ -2789,8 +2767,6 @@
 				08CBC4581291D9EB00C0987C /* wwiiServerTrackedObjectPacker.h */,
 				08289DFE1069D3330056932F /* wwiiHCUnits.h */,
 				08104EE3103DFE120065E0E2 /* wwiiActivate.h */,
-				08104EE7103DFE120065E0E2 /* wwiiBackChannel.cpp */,
-				08104EE8103DFE120065E0E2 /* wwiiBackChannel.h */,
 				08104EE9103DFE120065E0E2 /* wwiiCallbacks.cpp */,
 				08104EEA103DFE120065E0E2 /* wwiiCallbacks.h */,
 				08104EEB103DFE120065E0E2 /* wwiiClientMessages.cpp */,
@@ -2890,7 +2866,6 @@
 				080D20A31408344100ECCF00 /* testTeul.cpp */,
 				080D1E071404397100ECCF00 /* teulPacket.cpp */,
 				080D1E081404397100ECCF00 /* teulPacket.h */,
-				0834F1961044E74300E75B52 /* emem.cpp */,
 				0834F1941044E72D00E75B52 /* listCL.cpp */,
 				0834F1921044E70400E75B52 /* dbug.cpp */,
 				0834F1901044E6DA00E75B52 /* authConstants.h */,
@@ -2901,17 +2876,14 @@
 				0834F1761044E6B400E75B52 /* teulPack.cpp */,
 				0834F1771044E6B400E75B52 /* teulModule.cpp */,
 				0834F1781044E6B400E75B52 /* teulTransport.cpp */,
-				0834F1791044E6B400E75B52 /* teulSerialize.cpp */,
 				0834F17B1044E6B400E75B52 /* teulCallback.cpp */,
 				0834F17E1044E6B400E75B52 /* teulModCalls.cpp */,
 				0834F17F1044E6B400E75B52 /* teulModRecv.cpp */,
 				0834F1341044E67100E75B52 /* teulSockConfig.h */,
-				0834F1351044E67100E75B52 /* teulSerialize.h */,
 				0834F1361044E67100E75B52 /* teulEndpointDefs.h */,
 				0834F1371044E67100E75B52 /* teulModCalls.h */,
 				0834F1391044E67100E75B52 /* teulUtils.h */,
 				0834F13A1044E67100E75B52 /* teulNetworkObject.h */,
-				0834F13B1044E67100E75B52 /* teulTransport.h */,
 				0834F13C1044E67100E75B52 /* teulBasic.h */,
 				0834F13D1044E67100E75B52 /* teulCLList.h */,
 				0834F13F1044E67100E75B52 /* teulNetworkArray.h */,
@@ -2922,7 +2894,6 @@
 				0834F1491044E67100E75B52 /* teulHousekeeper.h */,
 				0834F14A1044E67100E75B52 /* teulPackers.h */,
 				0834F14C1044E67100E75B52 /* teulCallback.h */,
-				0834F14D1044E67100E75B52 /* teulDatagramPool.h */,
 				0834F14F1044E67100E75B52 /* teulEnums.h */,
 				0834F1501044E67100E75B52 /* teulModule.h */,
 				0834F1511044E67100E75B52 /* teulEndpoint.h */,
@@ -3298,7 +3269,6 @@
 				0834F1671044E67100E75B52 /* teulHousekeeper.h in Headers */,
 				0834F1681044E67100E75B52 /* teulPackers.h in Headers */,
 				0834F16A1044E67100E75B52 /* teulCallback.h in Headers */,
-				0834F16B1044E67100E75B52 /* teulDatagramPool.h in Headers */,
 				0834F16D1044E67100E75B52 /* teulEnums.h in Headers */,
 				0834F16E1044E67100E75B52 /* teulModule.h in Headers */,
 				0834F16F1044E67100E75B52 /* teulEndpoint.h in Headers */,
