@@ -30,8 +30,8 @@
 
 #define PLAYGATE_VERSION 0x00010109
 
-#define DEFAULT_AUTH_SERVER "auth.playnet.com"
-//#define DEFAULT_AUTH_SERVER "authdevng.playnet.com"
+//#define DEFAULT_AUTH_SERVER "auth.playnet.com"
+#define DEFAULT_AUTH_SERVER "authdevng.playnet.com"
 // Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
 #define RELEASE_ARENA 1
 // Match Playgate version in auth.app_manifest table
@@ -669,6 +669,8 @@ extern NSString *WebActionOriginalURLKey;
 
         if (gArena[0]) {
             arena = [[NSString stringWithCString:(const char *)gArena encoding:NSUTF8StringEncoding] intValue];
+        } else {
+            arena = RELEASE_ARENA;
         }
         
         session = 0;
@@ -907,8 +909,16 @@ extern NSString *WebActionOriginalURLKey;
         case WAIT_USER_PASS:
             [self setPlayGateStatus:NSLocalizedString(@"Logging into server to check for updates.", @"")];
             
-            [self login];
-            state = WAIT_LOGIN;
+            if (TicketFile[0] != 0)
+            {
+                [self launchGame];
+                state = WAIT_LAUNCH;
+            }
+            else
+            {
+                [self login];
+                state = WAIT_LOGIN;
+            }
             break;
             
         case WAIT_LOGIN:
