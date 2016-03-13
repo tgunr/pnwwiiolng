@@ -8183,7 +8183,10 @@ void uiDotCommandsInit()
     ADD_DOT_COMMAND(genicons, true);
     ADD_DOT_COMMAND(gentiles, true);
 #endif
+
+#ifdef MODEL_INFO
 	ADD_DOT_COMMAND(texinfo, false);
+#endif
 
   //  ADD_DOT_COMMAND(scspawn, true);
 

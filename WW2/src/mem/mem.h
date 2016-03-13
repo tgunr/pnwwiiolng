@@ -9,13 +9,8 @@
 
 // TODO: Replace memory allocators ACROSS THE BOARD with the much smarter stuff
 // that C++11 allows. - Gadget
-#if platOS == OS_WIN32
-#define WEAK_MALLOC_ATTRIBUTE(...)
-#define STRONG_MALLOC_ATTRIBUTE(...)
-#else
 #define WEAK_MALLOC_ATTRIBUTE __attribute__((always_inline, nothrow, warn_unused_result))
 #define STRONG_MALLOC_ATTRIBUTE WEAK_MALLOC_ATTRIBUTE __attribute__((malloc))
-#endif
 
 #include <cstdlib>
 
