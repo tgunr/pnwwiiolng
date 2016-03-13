@@ -28,14 +28,10 @@
 #include <arpa/inet.h>
 #include "sysLaunchURL.h"
 
-#define PLAYGATE_VERSION 0x00010109
+#define PLAYGATE_VERSION 0x01010109
 
 //#define DEFAULT_AUTH_SERVER "auth.playnet.com"
 #define DEFAULT_AUTH_SERVER "authdevng.playnet.com"
-// Arena to use, 1 = Live, 22 = Training, 222 = Beta, 250 = Dev
-#define RELEASE_ARENA 1
-// Match Playgate version in auth.app_manifest table
-
 #define DEFAULT_AUTH_PORT WWII::Net::Ports::AuthHost
 
 static void xmlerrorstub (void *ctx, const char *msg, ...) {}
@@ -109,67 +105,44 @@ static hidStickElement stickElements[MAX_STICK_ELEMENTS];
 
 static void setupJoystick(void)
 {
-    pRecDevice pHIDDevice;
-    pRecElement pHIDElement;
-    int i = 0;
-    int idx = 0;
+    pRecDevice pHIDDevice = NULL;
+    pRecElement pHIDElement = NULL;
     
     HIDBuildDeviceList(kHIDPage_GenericDesktop, 0);
-    
-    pHIDDevice = sticks[0].dev = HIDGetFirstDevice();
-    while(pHIDDevice)
+    for (pHIDDevice = HIDGetFirstDevice(), numSticks = 0, numStickElements = 0;
+         pHIDDevice && numSticks < MAX_HID_STICKS;
+         pHIDDevice = HIDGetNextDevice(pHIDDevice), ++numSticks)
     {
-        if(pHIDDevice->usage == kHIDUsage_GD_Joystick || pHIDDevice->usage == kHIDUsage_GD_GamePad)
+        if (pHIDDevice->usage == kHIDUsage_GD_Joystick || pHIDDevice->usage == kHIDUsage_GD_GamePad)
         {
-            strcpy(sticks[idx].name, (char*)pHIDDevice->product);
-            sticks[idx].identifier = (pHIDDevice->vendorID << 16) | (pHIDDevice->productID);
+            int elementPos = 0;
             
-            idx++;
-            if(idx >= MAX_HID_STICKS) break;
-        }
-        pHIDDevice = sticks[idx].dev = HIDGetNextDevice (pHIDDevice);
-    }
-    numSticks = idx;
-    
-    for(idx = 0; idx < (int)numSticks; idx++)
-    {
-        int pos = 0;
-        pHIDDevice = sticks[idx].dev;
-        
-        if(pHIDDevice == NULL) break;
-        
-        pHIDElement = HIDGetFirstDeviceElement (pHIDDevice, kHIDElementTypeIO);
-        while(pHIDElement)
-        {
-            stickElements[i].joynum = -1;
-            if(pHIDElement->usagePage == kHIDPage_GenericDesktop)
+            sticks[numSticks].dev = pHIDDevice;
+            strlcpy(sticks[numSticks].name, (char *)pHIDDevice->product, 64);
+            sticks[numSticks].identifier = static_cast<unsigned long>((pHIDDevice->vendorID << 16) | pHIDDevice->productID);
+
+            for (pHIDElement = HIDGetFirstDeviceElement(pHIDDevice, kHIDElementTypeIO), elementPos = 0;
+                 pHIDElement && numStickElements < MAX_STICK_ELEMENTS;
+                 pHIDElement = HIDGetNextDeviceElement(pHIDElement, kHIDElementTypeIO), ++numStickElements, ++elementPos)
             {
-                switch(pHIDElement->usage)
+                stickElements[numStickElements].joynum = UINT_MAX;
+                if (pHIDElement->usagePage != kHIDPage_GenericDesktop) {
+                    continue;
+                }
+                switch (pHIDElement->usage)
                 {
-                    case kHIDUsage_GD_X:
-                    case kHIDUsage_GD_Y:
-                    case kHIDUsage_GD_Z:
+                    case kHIDUsage_GD_X: case kHIDUsage_GD_Y: case kHIDUsage_GD_Z:
+                    case kHIDUsage_GD_Rx: case kHIDUsage_GD_Ry: case kHIDUsage_GD_Rz:
                     case kHIDUsage_GD_Slider:
-                    case kHIDUsage_GD_Rx:
-                    case kHIDUsage_GD_Ry:
-                    case kHIDUsage_GD_Rz:
-                        stickElements[i].ref = pHIDElement;
-                        stickElements[i].dev = pHIDDevice;
-                        stickElements[i].joynum = idx;
-                        stickElements[i].pos = pos;
+                        stickElements[numStickElements].ref = pHIDElement;
+                        stickElements[numStickElements].dev = pHIDDevice;
+                        stickElements[numStickElements].joynum = numSticks;
+                        stickElements[numStickElements].pos = elementPos;
                         break;
                 }
             }
-            pos++;
-            i++;
-            if(i >= MAX_STICK_ELEMENTS) break;
-            
-            pHIDElement = HIDGetNextDeviceElement (pHIDElement, kHIDElementTypeIO);
         }
-        
-        if(i >= MAX_STICK_ELEMENTS) break;
     }
-    numStickElements = i;
 }
 
 static void saveJoystickCalibration()
@@ -192,97 +165,58 @@ static void saveJoystickCalibration()
     }
 }
 
-@implementation NSMenuItem (CRSSortItem)
-
--(NSComparisonResult) sortMenuItemByTitle:(NSMenuItem*)other
-{
-    return [[self title] compare:[other title] options:NSNumericSearch];
-}
+@interface NSMenu (WW2SortedItems)
+- (NSMenu *)sortMenuItemsByTitle;
 @end
 
-@implementation NSMenu (CRSSortItems)
+@implementation NSMenu (WW2SortedItems)
 
--(NSMenu*)sortMenuItemsByTitle
+- (NSMenu *)sortMenuItemsByTitle
 {
-    NSArray* menuItems =
-    [[self itemArray] sortedArrayUsingSelector:@selector(sortMenuItemByTitle:)];
+    NSArray *menuItems = [[self itemArray] sortedArrayUsingComparator:^ NSComparisonResult (NSMenuItem *obj1, NSMenuItem *obj2) {
+        return [obj2.title compare:obj1.title options:NSNumericSearch]; // reverse sort order by reversing order of params to compare
+    }];
     
-    int i;
-    for (i = [self numberOfItems] - 1; i >= 0; i--) 	// remove existing items from tail of array
-    {
-        [self removeItemAtIndex:i];
+    [self removeAllItems];
+    for (NSMenuItem *item in menuItems) {
+        [self addItem:item];
     }
-    
-    for (i = [menuItems count] - 1; i >= 0; i--) 		// reverse sort order by going backwards
-    {
-        [self addItem:[menuItems objectAtIndex:i]];
-    }
-    
     return self;
 }
 @end
 
+// Per Apple's recommendedations for error domains
+NSString * const PGErrorDomain = @"com.playnet.wwiiol.PGErrorDomain";
+NSString * const PGteulErrorDomain = @"com.playnet.wwiiol.PGteulErrorDomain";
 
-
-@interface PGError : NSError {
-}
-+ (id)errorWithError:(NSError*)rootError domain:(NSString*)domain code:(int)code userInfo:(NSDictionary*)dict;
-- (NSString*)localizedDescription;
+@interface NSError (WW2Additions)
++ (instancetype)playgateErrorWithDomain:(NSString *)domain code:(int)code userInfo:(NSDictionary *)dict rootError:(NSError *)rootError;
 @end
 
-NSString * const PGErrorDomain = @"PLAYGATE";
-NSString * const PGteulErrorDomain = @"PLAYGATE-teul";
+@implementation NSError (WW2Additions)
 
-NSString * const PGErrorDataKey = @"DATA";
-NSString * const PGRootErrorKey = @"ROOT ERROR";
-
-@implementation PGError
-
-+ (instancetype)errorWithError:(NSError *)rootError domain:(NSString *)domain code:(int)code userInfo:(NSDictionary *)dict
++ (instancetype)playgateErrorWithDomain:(NSString *)domain code:(int)code userInfo:(NSDictionary *)dict rootError:(NSError *)rootError
 {
-    NSMutableDictionary *udict = [dict ?: @{} mutableCopy];
+    NSMutableDictionary *udict = dict ? [[dict mutableCopy] autorelease] : [NSMutableDictionary dictionary];
     
     if (rootError) {
-        udict[PGRootErrorKey] = rootError;
+        udict[NSUnderlyingErrorKey] = rootError;
+    }
+    if (([domain isEqualToString:PGErrorDomain] || [domain isEqualToString:PGteulErrorDomain]) && !udict[NSLocalizedDescriptionKey]) {
+        NSString *lookup = [NSString stringWithFormat:@"%@.%d", domain.pathExtension, code]; // pathExtension is a stupid lazy hack here
+        NSString *message = [[NSBundle mainBundle] localizedStringForKey:lookup value:@"MISSING_ERROR" table:nil];
+        
+        if ([message isEqualToString:@"MISSING_ERROR"]) {
+            message = [NSString stringWithFormat:@"%@%d%@",
+            	[[NSBundle mainBundle] localizedStringForKey:message value:@"UNKNOWN ERROR: " table:nil],
+                code, rootError ? [NSString stringWithFormat:@" (%@)", rootError.localizedDescription] : @""];
+        }
+        udict[NSLocalizedDescriptionKey] = message;
     }
     return [self errorWithDomain:domain code:code userInfo:udict];
 }
 
-- (NSString*)localizedDescription {
-    NSString* description = [super localizedDescription];
-    
-    if ([PGErrorDomain isEqualToString:self.domain]) {
-        // PGErrorDomain - It is from our own error domain
-        if (self.code == PGErrorSilent) {
-            return nil;
-        }
-        
-        NSError *rootError = self.userInfo[PGRootErrorKey];
-        id errorData = self.userInfo[PGErrorDataKey];
-        NSString *errorNumber = [NSString stringWithFormat:@"ERROR_%d", self.code];
-        NSString *format = NSLocalizedString(errorNumber, @"Error from our domain, keys are ERROR#code.");
-        
-        if ([errorNumber isEqual:format]) {
-            format = NSLocalizedString(@"ERROR_0", @"Error from our domain, keys are ERROR#code.");
-        }
-        description = [NSString stringWithFormat:format, @(self.code).stringValue, rootError.localizedDescription ?: @"", errorData ?: @""];
-    } else if ([PGteulErrorDomain isEqualToString:self.domain]) {
-        // PGteulErrorDomain - It is from our teul error domain
-        NSString *errorNumber = [NSString stringWithFormat:@"teul_ERROR_%d", self.code];
-        NSString *format = NSLocalizedString(errorNumber, @"Error code returned by networking: %d");
-        
-        if ([errorNumber isEqualToString:format]) {
-            format = NSLocalizedString(@"teul_ERROR_UNKNOWN", @"Error code returned by networking: %d");
-        }
-        description = [NSString stringWithFormat:format, @(self.code).stringValue];
-    } else {
-        description = super.localizedDescription;
-    }
-    
-    return description;
-}
 @end
-
 
 static void teulConnectCallback(ENDPOINT& endpoint)
 {
@@ -318,7 +252,7 @@ SINT32 authLaunchApp(APP_LAUNCH* reply)
         case Auth::Apps::BROWSER:
         case Auth::Apps::WEB_REDIRECT:
             [[NSWorkspace sharedWorkspace] openURL:[NSURL URLWithString:[NSString stringWithUTF8String:reply->data]]];
-            [gPlayGateAppDelegate setError:[PGError errorWithDomain:PGErrorDomain code:PGErrorSilent userInfo:nil]];
+            gPlayGateAppDelegate.error = [NSError playgateErrorWithDomain:PGErrorDomain code:PGErrorSilent userInfo:nil rootError:nil];
             [gPlayGateAppDelegate advanceState];
             break;
             
@@ -381,13 +315,12 @@ static NSString *placeholderHTML = @""
 @"    background-color: #f4f4f4;\n"
 @"}\n"
 @"div.hi { position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%); }\n"
-@"img { height: 90px; }\n"
 @"</style>"
 @"</head>"
 @"<body>"
 @"<div class=\"hi\">"
-@"<a href=\"http://wwiionline.com/\">"
-@"<img src=\"placeholder-title.png\"/>"
+@"<a href=\"http://www.battlegroundeurope.net/\">"
+@"<img style=\"height: 90px;\" src=\"placeholder-title.png\"/>"
 @"</a>"
 @"</div>"
 @"</body>"
@@ -641,16 +574,36 @@ extern NSString *WebActionOriginalURLKey;
     downloadBoxResizeHeight = ([downloadBox frame].size.height + 20);
     [self setShowDownloadProgress:NO];
     
+    // For now, we hardcode the available arena list instead of asking auth for it.
+    // But just so ya know, auth CAN provide it.
+    arenaLoadingIndicator.hidden = YES;
+    [arenaMenu.menu removeAllItems];
+#if DEV_BUILD
+    // Developers get a build which lets you pick an arbitrary arena ID. This
+    // bit will go away once we've implemented having auth tell us what arenas
+    // are available.
+    [arenaMenu.menu addItemWithTitle:@"LIVE (1)" action:nullptr keyEquivalent:@""].tag = 1;
+    [arenaMenu.menu addItemWithTitle:@"TRAINING (22)" action:nullptr keyEquivalent:@""].tag = 22;
+    [arenaMenu.menu addItemWithTitle:@"BETA (222)" action:nullptr keyEquivalent:@""].tag = 222;
+    [arenaMenu.menu addItemWithTitle:@"DEV (250)" action:nullptr keyEquivalent:@""].tag = 250;
+    [arenaMenu selectItemWithTag:1];
+    arenaMenu.enabled = YES;
+#else
+    // Everyone else gets a build that (for now) locks the user to the 1.35 dev
+    // server, which is apparently pretending to be arena 1 (e.g. "live").
+    [arenaMenu.menu addItemWithTitle:@"1.35 Testing" action:nullptr keyEquivalent:@""].tag = 1;
+    [arenaMenu selectItemWithTag:1];
+    arenaMenu.enabled = NO;
+#endif
+    
     // Initialize authentication process
     [self changeState:WAIT_START_UP];
-    
 }
 
 - (void)applicationWillTerminate:(NSNotification *)aNotification
 {
     cfgPrefsSave();
 #ifdef RECORD_FILES
-    extern void dumpFileRefs();
     dumpFileRefs();
 #endif
 }
@@ -668,9 +621,9 @@ extern NSString *WebActionOriginalURLKey;
     if (state == WAIT_APPLE_EVT) {
 
         if (gArena[0]) {
-            arena = [[NSString stringWithCString:(const char *)gArena encoding:NSUTF8StringEncoding] intValue];
+            arena = @(gArena).intValue;
         } else {
-            arena = RELEASE_ARENA;
+            arena = arenaMenu.selectedTag;
         }
         
         session = 0;
@@ -684,20 +637,17 @@ extern NSString *WebActionOriginalURLKey;
 {
     dbugInit(LOG_TO_FILE, nullptr);
     [self closeAllWindows];
-    try
-    {
+
+    try {
         sysmain();
-    }catch (const ClientNetError& e)
-    {
+    } catch (const ClientNetError& e) {
         sysmainKillApp();
         CGReleaseAllDisplays();
         NSRunCriticalAlertPanel(@"Network Error", @"", @"OK", NULL,NULL);
-    }catch(const char* err)
-    {
+    } catch (const char* err) {
         CGReleaseAllDisplays();
         NSRunCriticalAlertPanel([NSString stringWithUTF8String:err] , @"", @"OK", NULL,NULL);
     }
-    
     [NSApp terminate:self];
 }
 
@@ -719,9 +669,10 @@ extern NSString *WebActionOriginalURLKey;
 - (NSArray *)allKeychainAccountNames
 {
     OSStatus result = noErr;
+    NSString *bundleID = [NSBundle mainBundle].bundleIdentifier ?: @"wwiiol";
     NSDictionary *keychainAccountsQuery = @{
                                             (__bridge id)kSecClass: (__bridge id)kSecClassGenericPassword,
-                                            (__bridge id)kSecAttrService: [NSBundle mainBundle].bundleIdentifier,
+                                            (__bridge id)kSecAttrService: bundleID,
                                             (__bridge id)kSecReturnAttributes: @YES,
                                             (__bridge id)kSecMatchLimit: (__bridge id)kSecMatchLimitAll,
                                             };
@@ -751,10 +702,12 @@ extern NSString *WebActionOriginalURLKey;
 
 - (void)removeAllKeychainEntries
 {
+    NSString *bundleID = [NSBundle mainBundle].bundleIdentifier ?: @"wwiiol";
+
     for (NSArray *account in [self allKeychainAccountNames]) {
         NSDictionary *keychainDeleteQuery = @{
                                               (__bridge id)kSecClass: (__bridge id)kSecClassGenericPassword,
-                                              (__bridge id)kSecAttrService: [NSBundle mainBundle].bundleIdentifier,
+                                              (__bridge id)kSecAttrService: bundleID,
                                               (__bridge id)kSecAttrAccount: account,
                                               (__bridge id)kSecMatchLimit: (__bridge id)kSecMatchLimitAll,
                                               };
@@ -784,11 +737,13 @@ extern NSString *WebActionOriginalURLKey;
     }
     
     OSStatus result = noErr;
+    NSString *bundleID = [NSBundle mainBundle].bundleIdentifier ?: @"wwiiol";
+    NSData *data = [passwordField.stringValue dataUsingEncoding:NSUTF8StringEncoding] ?: [NSData data];
     NSDictionary *keychainUpdateQuery = @{
                                           (__bridge id)kSecClass: (__bridge id)kSecClassGenericPassword,
-                                          (__bridge id)kSecAttrService: [NSBundle mainBundle].bundleIdentifier,
+                                          (__bridge id)kSecAttrService: bundleID,
                                           (__bridge id)kSecAttrAccount: self.userName,
-                                          (__bridge id)kSecValueData: [[passwordField stringValue] dataUsingEncoding:NSUTF8StringEncoding] ?: [NSData data],
+                                          (__bridge id)kSecValueData: data,
                                           //        (__bridge id)kSecAttrAccessible: (__bridge id)kSecAttrAccessibleWhenUnlocked,
                                           };
     
@@ -829,9 +784,10 @@ extern NSString *WebActionOriginalURLKey;
         
         // There's exactly one credential!
         OSStatus result = noErr;
+        NSString *bundleID = [NSBundle mainBundle].bundleIdentifier ?: @"wwiiol";
         NSDictionary *keychainAccountsQuery = @{
                                                 (__bridge id)kSecClass: (__bridge id)kSecClassGenericPassword,
-                                                (__bridge id)kSecAttrService: [NSBundle mainBundle].bundleIdentifier,
+                                                (__bridge id)kSecAttrService: bundleID,
                                                 (__bridge id)kSecAttrAccount: accounts[0],
                                                 (__bridge id)kSecReturnData: @YES,
                                                 (__bridge id)kSecMatchLimit: (__bridge id)kSecMatchLimitOne,
@@ -909,16 +865,8 @@ extern NSString *WebActionOriginalURLKey;
         case WAIT_USER_PASS:
             [self setPlayGateStatus:NSLocalizedString(@"Logging into server to check for updates.", @"")];
             
-            if (TicketFile[0] != 0)
-            {
-                [self launchGame];
-                state = WAIT_LAUNCH;
-            }
-            else
-            {
-                [self login];
-                state = WAIT_LOGIN;
-            }
+            [self login];
+            state = WAIT_LOGIN;
             break;
             
         case WAIT_LOGIN:
@@ -1003,7 +951,7 @@ extern NSString *WebActionOriginalURLKey;
 {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (isConnectedToAuthenticationServer) {
-            [self setError:[PGError errorWithDomain:PGteulErrorDomain code:err userInfo:nil]];
+            self.error = [NSError playgateErrorWithDomain:PGteulErrorDomain code:err userInfo:nil rootError:nil];
             [self advanceState];
         }
     });
@@ -1012,14 +960,14 @@ extern NSString *WebActionOriginalURLKey;
 - (SINT32)verifyApplication:(APP_VERIFY*)verifyInfo
 {
     APP_LAUNCH_REQ	launchRequest;
-    int vers[4] = {0,0,0,0};
+    UINT32 vers[4] = {0,0,0,0};
     
     memset(&launchRequest, 0x0, sizeof(launchRequest));
     strncpy((char *)launchRequest.username, [[self userName] cStringUsingEncoding: NSASCIIStringEncoding], sizeof(launchRequest.username)-1);
     strncpy((char *)launchRequest.password, [[self userPassword] cStringUsingEncoding: NSASCIIStringEncoding], sizeof(launchRequest.password)-1);
     launchRequest.cdKeySize = 0;
     launchRequest.arenaID = verifyInfo->arenaID;
-    launchRequest.sessionID = verifyInfo->sessionID;
+    launchRequest.sessionID = (UINT32)verifyInfo->sessionID;
     launchRequest.appID = verifyInfo->appID;
     
     NSString* appVersion = [[NSString stringWithCString:STRVER encoding:NSUTF8StringEncoding] retain];
@@ -1033,19 +981,17 @@ extern NSString *WebActionOriginalURLKey;
     if (appVersion != nil)
     {
         NSScanner* scanner = [NSScanner scannerWithString:appVersion];
-        [scanner scanInt:&vers[0]];
+        [scanner scanInt:(int *)&vers[0]];
         [scanner scanString:@"." intoString:nil];
-        [scanner scanInt:&vers[1]];
+        [scanner scanInt:(int *)&vers[1]];
         [scanner scanString:@"." intoString:nil];
-        [scanner scanInt:&vers[2]];
+        [scanner scanInt:(int *)&vers[2]];
         [scanner scanString:@"." intoString:nil];
-        [scanner scanInt:&vers[3]];
+        [scanner scanInt:(int *)&vers[3]];
         
         launchRequest.appVersion =
-        ((vers[0] & 0xFF) << 24) |
-        ((vers[1] & 0xFF) << 16) |
-        ((vers[2] & 0xFF) << 8) |
-        (vers[3] & 0xFF);
+            ((vers[0] & 0xFF) << 24) | ((vers[1] & 0xFF) << 16) |
+            ((vers[2] & 0xFF) << 8)  |  (vers[3] & 0xFF);
         
         NSString* msg = [NSString stringWithFormat:NSLocalizedString(@"Found version %ld.%ld.%ld.%ld installed.", @""),
                          vers[0], vers[1], vers[2], vers[3]];
@@ -1085,15 +1031,13 @@ extern NSString *WebActionOriginalURLKey;
                 isteulInitialized = YES;
             }
             teulTimer = dispatch_source_create(DISPATCH_SOURCE_TYPE_TIMER, 0, 0, dispatch_get_main_queue());
-            dispatch_source_set_timer(teulTimer, DISPATCH_TIME_NOW, 0.01 * static_cast<double>(NSEC_PER_SEC), 100);
+            dispatch_source_set_timer(teulTimer, DISPATCH_TIME_NOW, static_cast<uint64_t>(0.01 * static_cast<double>(NSEC_PER_SEC)), 100);
             dispatch_source_set_event_handler(teulTimer, ^ { teulUpdateTransport(); });
             dispatch_resume(teulTimer);
             teulOpenSend(hostAddress, authPort, teulConnectCallback, 100000, PROTOCOL_TCP, teulErrorCallback);
         }
     } else {
-        [self setError:[PGError errorWithDomain:PGErrorDomain
-                                           code:PGErrorFailedHostLookup
-                                       userInfo:@{ PGErrorDataKey: authServer }]];
+        self.error = [NSError playgateErrorWithDomain:PGErrorDomain code:PGErrorFailedHostLookup userInfo:nil rootError:nil];
     }
 }
 
@@ -1102,7 +1046,7 @@ extern NSString *WebActionOriginalURLKey;
     ARENA_REQ arenaRequest;
     memset(&arenaRequest, 0x0, sizeof(arenaRequest));
     arenaRequest.arenaID	= arena;
-    arenaRequest.sessionID 	= session;
+    arenaRequest.sessionID 	= static_cast<UINT32>(session);
     arenaRequest.infoOnly	= 0;
     /*
      int vers[4] = {0,0,0,0};
@@ -1196,7 +1140,7 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
     NSURL *patchFile = [patchDir URLByAppendingPathComponent:downloadTask.originalRequest.URL.lastPathComponent isDirectory:NO];
     
     if (!patchDir || !patchFile || ![[NSFileManager defaultManager] moveItemAtURL:location toURL:patchFile error:&error]) {
-        self.error = [PGError errorWithError:error domain:PGErrorDomain code:PGErrorDownloadFailed userInfo:error.userInfo];
+        self.error = [NSError playgateErrorWithDomain:PGErrorDomain code:PGErrorDownloadFailed userInfo:error.userInfo rootError:error];
     } else {
         self.patchFileURL = patchFile;
     }
@@ -1207,14 +1151,14 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 - (void)URLSession:(NSURLSession *)session task:(NSURLSessionTask *)task didCompleteWithError:(NSError *)error
 {
     if (error) {
-        self.error = [PGError errorWithError:error domain:PGErrorDomain code:PGErrorDownloadFailed userInfo:nil];
+        self.error = [NSError playgateErrorWithDomain:PGErrorDomain code:PGErrorDownloadFailed userInfo:nil rootError:error];
     }
     [self advanceState];
 }
 
 - (void)URLSession:(NSURLSession *)session didBecomeInvalidWithError:(NSError *)error
 {
-    self.error = [PGError errorWithError:error domain:PGErrorDomain code:PGErrorDownloadFailed userInfo:nil];
+    self.error = [NSError playgateErrorWithDomain:PGErrorDomain code:PGErrorDownloadFailed userInfo:nil rootError:error];
     [self advanceState];
 }
 
@@ -1224,8 +1168,7 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
     
     NSString *rawPatchURL = [[[NSString alloc]
                               initWithBytesNoCopy:&authReply.data[0]
-                              length:strnlen(&authReply.data[0],
-                                             std::min(authReply.dataSize, MAX_PARAM))
+                              length:strnlen(&authReply.data[0], std::min<size_t>(static_cast<size_t>(authReply.dataSize), MAX_PARAM))
                               encoding:NSASCIIStringEncoding
                               freeWhenDone:NO]
                              autorelease];
@@ -1358,22 +1301,22 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
     i = [joy1 indexOfSelectedItem] - 1;
     identifier = (i > -1 && i < MAX_HID_STICKS) ? sticks[i].identifier : 0;
     
-    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithLong:identifier] forKey:@"joy1"];
+    [[NSUserDefaults standardUserDefaults] setObject:@(identifier) forKey:@"joy1"];
     
     i = [joy2 indexOfSelectedItem] - 1;
     identifier = (i > -1 && i < MAX_HID_STICKS) ? sticks[i].identifier : 0;
     
-    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithLong:identifier] forKey:@"joy2"];
+    [[NSUserDefaults standardUserDefaults] setObject:@(identifier) forKey:@"joy2"];
     
     i = [joy3 indexOfSelectedItem] - 1;
     identifier = (i > -1 && i < MAX_HID_STICKS) ? sticks[i].identifier : 0;
     
-    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithLong:identifier] forKey:@"joy3"];
+    [[NSUserDefaults standardUserDefaults] setObject:@(identifier) forKey:@"joy3"];
     
     i = [joy4 indexOfSelectedItem] - 1;
     identifier = (i > -1 && i < MAX_HID_STICKS) ? sticks[i].identifier : 0;
     
-    [[NSUserDefaults standardUserDefaults] setObject:[NSNumber numberWithLong:identifier] forKey:@"joy4"];
+    [[NSUserDefaults standardUserDefaults] setObject:@(identifier) forKey:@"joy4"];
     
     [[NSUserDefaults standardUserDefaults] synchronize];
     
@@ -1488,11 +1431,11 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 
 -(void)setJoySelection:(id)joymenu joyid:(unsigned long)val
 {
-    for(unsigned int i = 0; i < numSticks; i++)
+    for (unsigned int i = 0; i < numSticks; i++)
     {
-        if(sticks[i].identifier == val)
+        if (sticks[i].identifier == val)
         {
-            [joymenu selectItemAtIndex:i+1];
+            [joymenu selectItemAtIndex:static_cast<int>(i) + 1];
             break;
         }
     }
@@ -1502,7 +1445,7 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
 
 -(IBAction)displayMenuChanged:(id)sender
 {
-    selectedMonitor = [[display selectedItem] tag];
+    selectedMonitor = static_cast<CGOpenGLDisplayMask>(display.selectedItem.tag);
     [self populateResolutionMenu];
 }
 
@@ -1563,28 +1506,20 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
          */
         
         
-        NSString* title;
-        
+        NSString* title = nil;
         boolean_t isMain = CGDisplayIsMain(displayID);
-        if (isMain)
-        {
-            title = [NSString stringWithFormat:	@"%d (Main Display)",
-                     CGDisplayUnitNumber(displayID)];
-        }
-        else
-        {
+
+        if (isMain) {
+            title = [NSString stringWithFormat:	@"%d (Main Display)", CGDisplayUnitNumber(displayID)];
+        } else {
             title = [NSString stringWithFormat:@"%d", CGDisplayUnitNumber(displayID)];
         }
         
-        NSMenuItem* menuItem = [[[NSMenuItem alloc] initWithTitle:title
-                                                           action:nil
-                                                    keyEquivalent:@""] autorelease];
+        NSMenuItem *menuItem = [[[NSMenuItem alloc] initWithTitle:title action:nil keyEquivalent:@""] autorelease];
         
-        [menuItem setTag:displayMask];
+        [menuItem setTag:static_cast<NSInteger>(displayMask)];
         [menu addItem:menuItem];
-        
-        if (isMain)
-        {
+        if (isMain) {
             selectItem = menuItem;
         }
     }
@@ -1605,16 +1540,15 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
     NSMenu* menu = [[[NSMenu alloc] initWithTitle:@"Display Resolution"] autorelease];
     NSArray* modes = (NSArray*)CGDisplayAvailableModes(CGOpenGLDisplayMaskToDisplayID(selectedMonitor));
     
-    if (modes == nil) return;
+    if (modes == nil) {
+        return;
+    }
     
-    int i, count;
-    for (i = 0, count = [modes count]; i < count; i++)
+    for (NSDictionary *mode in modes)
     {
-        NSDictionary* mode = [modes objectAtIndex:i];
-        
-        if (([[mode objectForKey:(NSString*)kCGDisplayModeIsSafeForHardware] boolValue] == YES) &&	//include only safe modes
-            ([[mode objectForKey:(NSString*)kCGDisplayModeIsTelevisionOutput] boolValue] == NO)
-            //&& ([[mode objectForKey:(NSString*)kCGDisplayModeIsStretched] boolValue] == NO)
+        if (([mode[(__bridge NSString *)kCGDisplayModeIsSafeForHardware] boolValue] == YES) &&	//include only safe modes
+            ([mode[(__bridge NSString *)kCGDisplayModeIsTelevisionOutput] boolValue] == NO)
+            //&& ([mode[(__bridge NSString *)kCGDisplayModeIsStretched] boolValue] == NO)
             ) 			//exclude streched (for now)
         {
             int bpp = [[mode objectForKey:(NSString*)kCGDisplayBitsPerPixel] intValue];
@@ -1623,116 +1557,91 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
             {
                 int width = [[mode objectForKey:(NSString*)kCGDisplayWidth] intValue];
                 int height = [[mode objectForKey:(NSString*)kCGDisplayHeight] intValue];
-                //		float ratio = (float) width /  (float) height;
+                // float ratio = (float)width / (float)height;
                 
-                NSString* title;
+                NSString *title = nil;
                 
-                //		if (fabs(ratio) > 1.35) //fudge around the ideal ratio of 1 1/3 the game expects
-                //		{
-                //			title = [NSString stringWithFormat:@"%d x %d (distorted)", width, height];
-                //		}
-                //		else
-                //		{
-                title = [NSString stringWithFormat:@"%d x %d", width, height];
-                //		}
+                // if (fabs(ratio) > 1.35) //fudge around the ideal ratio of 1 1/3 the game expects
+                // {
+                //     title = [NSString stringWithFormat:@"%d x %d (distorted)", width, height];
+                // }
+                // else
+                // {
+                    title = [NSString stringWithFormat:@"%d x %d", width, height];
+                // }
                 
                 NSMenuItem* menuItem = [menu itemWithTitle:title];
+                
                 if (menuItem == nil)
                 {
-                    menuItem = [[[NSMenuItem alloc] initWithTitle:title
-                                                           action:nil
-                                                    keyEquivalent:@""] autorelease];
+                    menuItem = [[[NSMenuItem alloc] initWithTitle:title action:nil keyEquivalent:@""] autorelease];
                     
                     [menuItem setRepresentedObject:[NSMutableArray array]];
                     [menuItem setTag:width << 16 | height];
                     [menu addItem:menuItem];
                 }
-                
                 [[menuItem representedObject] addObject:mode];
             }
         }
     }
-    
     [resolution setMenu:[menu sortMenuItemsByTitle]];
-    
     [self resolutionMenuChanged:self];
 }
 
 -(void)populateDepthMenu
 {
-    NSArray* resolutionModes = [[resolution selectedItem] representedObject];
+    NSArray *resolutionModes = resolution.selectedItem.representedObject;
     
-    if (resolutionModes == nil) return;
-    
-    int i, count;
-    NSMenuItem* menuItem;
-    
-    for (i = 0, count = [colorDepth numberOfItems]; i < count; i++)
-    {
-        menuItem = (NSMenuItem*)[colorDepth itemAtIndex:i]; // not sure why cast is needed
-        [menuItem setEnabled:NO];
-        [menuItem setRepresentedObject:nil];
+    if (resolutionModes == nil) {
+        return;
     }
-    
-    for (i = 0, count = [resolutionModes count]; i < count; i++)
+    for (NSMenuItem *menuItem in colorDepth.itemArray)
     {
-        NSDictionary* mode = [resolutionModes objectAtIndex:i];
-        int bpp = [[mode objectForKey:(NSString*)kCGDisplayBitsPerPixel] intValue];
+        menuItem.enabled = NO;
+        menuItem.representedObject = nil;
+    }
+    for (NSDictionary *mode in resolutionModes)
+    {
+        int bpp = [mode[(__bridge NSString *)kCGDisplayBitsPerPixel] intValue];
+        NSMenuItem *menuItem = [colorDepth.menu itemWithTag:bpp];
         
-        menuItem = (NSMenuItem*)[[colorDepth menu] itemWithTag:bpp]; // not sure why cast is needed
         if (menuItem != nil)
         {
-            [menuItem setEnabled:YES];
+            NSMutableArray* depthModes = menuItem.representedObject;
             
-            NSMutableArray* depthModes = [menuItem representedObject];
             if (depthModes == nil)
             {
                 depthModes = [NSMutableArray array];
-                [menuItem setRepresentedObject:depthModes];
+                menuItem.representedObject = depthModes;
             }
-            
+            menuItem.enabled = YES;
             [depthModes addObject:mode];
         }
     }
-    
     [self depthMenuChanged:self];
 }
 
 -(void)populateRefreshMenu
 {
-    NSArray* depthModes = [[colorDepth selectedItem] representedObject];
+    NSArray *depthModes = colorDepth.selectedItem.representedObject;
     
-    if (depthModes == nil) return;
+    if (depthModes == nil) {
+        return;
+    }
     
     NSMenu* menu = [[[NSMenu alloc] initWithTitle:@"Refresh Rate"] autorelease];
     
-    int i, count;
-    for (i = 0, count = [depthModes count]; i < count; i++)
+    for (NSDictionary *mode in depthModes)
     {
-        NSDictionary* mode = [depthModes objectAtIndex:i];
-        int rate = [[mode objectForKey:(NSString*)kCGDisplayRefreshRate] intValue];
+        int rate = [mode[(__bridge NSString *)kCGDisplayRefreshRate] intValue];
+        NSString *title = rate ? [NSString stringWithFormat:@"%d Hz", rate] : @"Fixed (LCD)";
+        NSMenuItem* menuItem = [[[NSMenuItem alloc] initWithTitle:title action:nil keyEquivalent:@""] autorelease];
         
-        NSString* title;
-        
-        if (rate == 0)
-        {
-            title = @"Fixed (LCD)";
-        }
-        else
-        {
-            title = [NSString stringWithFormat:@"%d Hz", rate];
-        }
-        
-        NSMenuItem* menuItem = [[[NSMenuItem alloc] initWithTitle:title
-                                                           action:nil
-                                                    keyEquivalent:@""] autorelease];
-        [menuItem setRepresentedObject:mode];
-        [menuItem setTag:rate];
+        menuItem.representedObject = mode;
+        menuItem.tag = rate;
         [menu addItem:menuItem];
     }
-    
-    [refresh setMenu:[menu sortMenuItemsByTitle]];
-    
+    refresh.menu = [menu sortMenuItemsByTitle];
     [self refreshMenuChanged:self];
 }
 
@@ -1831,7 +1740,7 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
             break;
         }
     }
-    cfgPrefsSetInt("app.language", gLanguage);
+    cfgPrefsSetInt("app.language", static_cast<int>(gLanguage));
     cfgPrefsSave();
 }
 
@@ -1894,18 +1803,18 @@ totalBytesExpectedToWrite:(int64_t)totalBytesExpectedToWrite
     [self setupJoyMenu:joy3];
     [self setupJoyMenu:joy4];
     
-    int joyid;
+    unsigned long joyid = 0;
     
-    joyid = [[NSUserDefaults standardUserDefaults] integerForKey:@"joy1"];
+    joyid = static_cast<unsigned long>([[NSUserDefaults standardUserDefaults] integerForKey:@"joy1"]);
     [self setJoySelection:joy1 joyid: joyid];
     
-    joyid = [[NSUserDefaults standardUserDefaults] integerForKey:@"joy2"];
+    joyid = static_cast<unsigned long>([[NSUserDefaults standardUserDefaults] integerForKey:@"joy2"]);
     [self setJoySelection:joy2 joyid: joyid];
     
-    joyid = [[NSUserDefaults standardUserDefaults] integerForKey:@"joy3"];
+    joyid = static_cast<unsigned long>([[NSUserDefaults standardUserDefaults] integerForKey:@"joy3"]);
     [self setJoySelection:joy3 joyid: joyid];
     
-    joyid = [[NSUserDefaults standardUserDefaults] integerForKey:@"joy4"];
+    joyid = static_cast<unsigned long>([[NSUserDefaults standardUserDefaults] integerForKey:@"joy4"]);
     [self setJoySelection:joy4 joyid: joyid];
     
     [launcherWindow beginSheet:configWindow completionHandler:^ (NSModalResponse returnCode) {

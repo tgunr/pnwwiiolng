@@ -47,7 +47,6 @@
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
       useCustomWorkingDirectory = "NO"
-      customWorkingDirectory = "$(SRCROOT)/../opt/ww2mods/"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"
       debugServiceExtension = "internal"
@@ -69,10 +68,6 @@
          </CommandLineArgument>
          <CommandLineArgument
             argument = "-datadir $(SRCROOT)/../opt/ww2mods/DATA/"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "-ticket local.tkt"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

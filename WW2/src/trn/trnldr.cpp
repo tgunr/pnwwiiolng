@@ -1266,42 +1266,6 @@ STRT_DTL_HEADER		sdh;
 	td->numoctetsdown = SUPERCELL_OCTETS_Y;
 
     logTimerEndMacro();
-#ifdef ANDREWTEST
-    // supercellloaded
-/*
-    printf("\n\nSuperCell %d, %d\n\n",td->scx, td->scy);
-
-    extern PoolMap _poolmap;
-
-    for (int i=0; i<td->tobndx; i++ )
-    {
-        SDM_ObjInfo* p = &td->trnobj[i];
-        //printf("%s: %10.2f %10.2f\n",p->objname, p->pos.x, p->pos.y);
-
-        std::string	str(p->objname);
-        std::string modelname;
-
-		size_t start = str.rfind('\\');
-		size_t end = str.rfind('.');
-
-		if(start == std::string::npos)
-		{
-			modelname = str.substr(0,end);
-		}
-		else
-		{
-			modelname = str.substr(start+1,end-start-1);
-		}
-
-        PoolMap::iterator it = _poolmap.find(modelname);
-        if ( it != _poolmap.end() )
-        {
-            PoolModel* pm = (*it).second;
-            //printf("Loading model: %s\n", modelname.c_str() );
-        }
-    }
-*/
-#endif
 	return(retval);
 }
 
@@ -2232,11 +2196,6 @@ BUILDING*			pbld;		// Building
 	return(FALSE);
 }
 
-#ifdef ANDREWTEST
-//extern void processObjects(TERRAIN_DETAIL* td, SINT32 sc);
-//#define LOADEVERYTHING
-#endif
-
 static LOGICAL LoadObjects(SINT32 sc)
 {
 	LOGICAL		KillObject;
@@ -2246,10 +2205,6 @@ static LOGICAL LoadObjects(SINT32 sc)
 	TERRAIN_DETAIL* td = &trndtl[sc];
 
     logTimerBeginMacro();
-
-#ifdef ANDREWTEST
-//    processObjects(td, sc);
-#endif
 
     FLOAT32 horizon;
     trnmainGetHorizon(&horizon);

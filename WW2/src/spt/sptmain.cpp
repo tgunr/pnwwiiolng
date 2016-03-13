@@ -3782,9 +3782,6 @@ unsigned int sptAddTree(OBJECT* o,
                         bool isclutter,
                         bool changecluster)
 {
-#ifdef ANDREWTEST
-    //return 0;
-#endif
     Tree* tree = treeDataGetFreeTree();
 
     if(tree == nullptr || !dtl)

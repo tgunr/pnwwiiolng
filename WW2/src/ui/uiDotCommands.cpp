@@ -7302,7 +7302,7 @@ static int dot_vcount(const char* line)
 }
 #endif
 
-#ifdef BETA_RELEASE
+#ifdef MODEL_INFO
 static int dot_texinfo(const char* line)
 {
   extern std::map<GLuint, std::string> reverseTextureIndex;

@@ -20,19 +20,8 @@
 #include <deque>
 #include "ogl/oglMesh.h"
 
-#if !defined(NDEBUG)
-  #define INLINE
-#else
-#if platOS == OS_MACOS
- #define INLINE inline
-#else
-  #define INLINE __forceinline
-#endif
-#endif
-
-#define SPECIAL_LOG
-#undef SPECIAL_LOG
-
+template <typename T>
+static inline void memRelease(T *&p) { memFree(reinterpret_cast<void *>(p)); p = nullptr; }
 
 static bool	MergeObjectsIfPossible(OBJECT* main, OBJECT* o);
 static void		ReduceBranch(OBJECT* node, OBJECT* branchtop);
@@ -58,7 +47,7 @@ normalsListItem*		normalsList;
 // the compiler create less assembly to implement the functions. With some limited
 // testing, this has shown to be the case.
 
-INLINE void Normalize(piVECTOR* lpa)
+inline void Normalize(piVECTOR* lpa)
 {
     float inv_mod = lpa->x * lpa->x + lpa->y * lpa->y + lpa->z * lpa->z;
 
@@ -72,7 +61,7 @@ INLINE void Normalize(piVECTOR* lpa)
 
 // This function differs from the one in math3d in that all three parameters must
 // be unique variables. Parameter lpd cannot be either of lpa or lpb.
-INLINE void CrossProduct(piVECTOR* lpd, piVECTOR* lpa, piVECTOR* lpb)
+inline void CrossProduct(piVECTOR* lpd, piVECTOR* lpa, piVECTOR* lpb)
 {
 	lpd->x = lpa->y * lpb->z - lpa->z * lpb->y;
 	lpd->y = lpa->z * lpb->x - lpa->x * lpb->z;
@@ -2220,7 +2209,7 @@ static LOGICAL IsMergableBranchTopNode(OBJECT* node)
 	return TRUE;
 }
 
-inline bool operator == (const piUNIFIED_VERTEX &a, const piUNIFIED_VERTEX &b) { return !memcmp(&a, &b, sizeof(piUNIFIED_VERTEX)); }
+inline bool operator==(const piUNIFIED_VERTEX &a, const piUNIFIED_VERTEX &b) { return !memcmp(&a, &b, sizeof(piUNIFIED_VERTEX)); }
 
 typedef std::multimap<size_t,ogl::VertexIdx> UniVertexIndexer;
 

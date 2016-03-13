@@ -69,10 +69,10 @@ static std::set<std::wstring> ReferencedFiles;
 
 void dumpFileRefs()
 {
-	printf("\n\n");
+	printf("\n\nAll referenced files:");
 	for ( auto it = ReferencedFiles.begin(), end = ReferencedFiles.end(); it != end; ++it)
 	{
-		printf("%s\n", it->c_str());
+		printf("%ls\n", it->c_str());
 	}
 }
 
