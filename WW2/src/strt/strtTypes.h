@@ -130,7 +130,7 @@ public:
     
 //tolua_begin
 
-private:
+public:
     void Copy( const WeaponCounter & rhs ) {
         capacity = rhs.capacity;
         current = rhs.current;

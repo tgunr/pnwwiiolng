@@ -1017,7 +1017,6 @@
     <ClInclude Include="..\..\SRC\math\Vec4d.h" />
     <ClInclude Include="..\..\SRC\math\Vec4f.h" />
     <ClInclude Include="..\..\src\mem\mem.h" />
-    <ClInclude Include="..\..\src\mem\memAligned.h" />
     <ClInclude Include="..\..\src\miss\missActiveMission.h" />
     <ClInclude Include="..\..\src\miss\missionClientMessages.h" />
     <ClInclude Include="..\..\src\miss\missionConstants.h" />
@@ -1542,8 +1541,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='TestRelease|Win32'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="..\..\src\mem\mem.cpp" />
-    <ClCompile Include="..\..\src\mem\tracealloc.cpp" />
     <ClCompile Include="..\..\src\miss\missActiveMission.cpp" />
     <ClCompile Include="..\..\src\miss\missionClientMessages.cpp" />
     <ClCompile Include="..\..\src\miss\missionDetail.cpp" />

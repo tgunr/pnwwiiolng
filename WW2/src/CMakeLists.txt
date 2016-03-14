@@ -178,7 +178,6 @@ ENDIF( )
 # TeulServer library - this is a baseline library that provides
 # teulKit services and the cluster's "server" API.
 ADD_LIBRARY(teulserver
-    mem/memlinux.cpp
     server/server.cpp
         server/server.h
             server/serverReleaseTypeEnum.h

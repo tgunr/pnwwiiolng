@@ -67,15 +67,6 @@
 
 #include "wwii/wwiiCovert.h"
 
-#if platOS == OS_MACOS
-#pragma dont_inline on
-#ifdef ANDREWTEST
-
-#undef NDEBUG
-#include <assert.h>
-#endif
-#endif
-
 static Covert<LOGICAL> g_trnmainDraw = TRUE;
 static Covert<LOGICAL> g_drawOctetTriangles = FALSE;
 
@@ -1076,10 +1067,6 @@ static LOGICAL SetHeight(SINT16* retd, SINT32 d)
 
 	return(TRUE);
 }
-#endif
-
-#ifdef ANDREWTEST
-size_t BoundingBoxID = 0;
 #endif
 
 LOGICAL trnmainAddObject(SINT8* objname,

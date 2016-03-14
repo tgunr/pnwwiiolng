@@ -5,16 +5,6 @@
 #include "auth/authClientMessages.h"
 #include "auth/authTypes.h"
 
-@class PGError;
-
-@interface NSMenuItem (WW2CSortItem)
--(NSComparisonResult) sortMenuItemByTitle:(NSMenuItem*)other;
-@end
-
-@interface NSMenu (WW2CSortItems)
--(NSMenu*)sortMenuItemsByTitle;
-@end
-
 // TODO: Remove this
 #pragma clang diagnostic ignored "-Wdirect-ivar-access"
 
@@ -49,7 +39,8 @@
     IBOutlet NSSecureTextField *passwordField;
     IBOutlet id webView;
     IBOutlet NSButton *playOnlineButton;
-    IBOutlet NSTextField *websiteLink;
+    IBOutlet NSPopUpButton *arenaMenu;
+    IBOutlet NSProgressIndicator *arenaLoadingIndicator;
 
     float downloadBoxResizeHeight;
     BOOL isHidingDownloadProgress;
@@ -70,14 +61,14 @@
     dispatch_source_t teulTimer;
 
     APP_LAUNCH authReply;
-    int selectedMonitor;
+    CGOpenGLDisplayMask selectedMonitor;
     NSDictionary* selectedMode;
     NSTimer* hidTimer;
     
     BOOL _passwordEntryIsInitial;
     
     NSURL *_patchFileURL;
-    PGError *_error;
+    NSError *_error;
     NSString *_userName;
     NSString *_userPassword;
     NSURLSessionDownloadTask *_patchDownloadTask;
@@ -102,7 +93,7 @@
 - (IBAction)resolutionMenuChanged:(id)sender;
 
 @property(nonatomic,retain) NSURL *patchFileURL;
-@property(nonatomic,retain) PGError *error;
+@property(nonatomic,retain) NSError *error;
 @property(nonatomic,copy) NSString *userName;
 @property(nonatomic,copy) NSString *userPassword;
 @property(nonatomic,retain) NSURLSessionDownloadTask *patchDownloadTask;

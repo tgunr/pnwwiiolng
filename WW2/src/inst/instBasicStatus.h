@@ -9,6 +9,7 @@
 //
 // Originating Programmer: Oliver "kfsone" Smith
 
+#include "inst/instStateEnums.h"
 #include "inst/instDescriptor.h"
 #include "wwii/wwiiOwnershipEnums.h"
 #include <assert.h>
@@ -20,11 +21,18 @@ namespace Instance			//tolua_export
     class BasicStatus
     {
     public:
-        BasicStatus(const Descriptor& _descriptor, UINT8 _capacity, UINT16 _gameTime_m, UINT32 _createdAt=teulClockTime, UINT32 _startedAt=0)
+        BasicStatus(const Descriptor& _descriptor, 
+			const UINT8 _capacity,
+			const UINT16 _gameTime_m,
+			const UINT32 _createdAt=teulClockTime,
+			const UINT32 _startedAt=0,
+			const Instance::State state_ = Instance::HostCtored
+			)
         : m_descriptor(_descriptor)
         , m_createdAt(_createdAt)
         , m_gameTime_m(_gameTime_m)
         , m_capacity(_capacity)
+		, m_state(state_)
         , m_startedAt(_startedAt)
         {
             m_count[WWII_NO_SIDE] = m_count[ALLIED] = m_count[AXIS] = m_count[NEUTRAL] = 0 ;
@@ -65,7 +73,8 @@ namespace Instance			//tolua_export
         UINT16		m_capacity ;			//!< How many players we expect.
         
     protected:
-        UINT16		m_count[MAX_SIDES] ;	//!< Side counts (neutral, allied, axis, locked)
+		State       m_state;                //!< Current state. @see Instance::State
+		UINT16		m_count[MAX_SIDES] ;	//!< Side counts (neutral, allied, axis, locked)
         UINT32		m_startedAt ;			//!< How long since spawning was enabled.
     } ;
 

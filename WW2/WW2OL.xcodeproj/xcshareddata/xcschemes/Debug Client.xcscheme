@@ -71,11 +71,7 @@
             isEnabled = "YES">
          </CommandLineArgument>
          <CommandLineArgument
-            argument = "-authserver authdevng.playnet.com"
-            isEnabled = "YES">
-         </CommandLineArgument>
-         <CommandLineArgument
-            argument = "-arena 1"
+            argument = "-ticket local2.tkt"
             isEnabled = "YES">
          </CommandLineArgument>
       </CommandLineArguments>

@@ -7302,7 +7302,7 @@ static int dot_vcount(const char* line)
 }
 #endif
 
-#ifdef BETA_RELEASE
+#ifdef MODEL_INFO
 static int dot_texinfo(const char* line)
 {
   extern std::map<GLuint, std::string> reverseTextureIndex;
@@ -8183,7 +8183,10 @@ void uiDotCommandsInit()
     ADD_DOT_COMMAND(genicons, true);
     ADD_DOT_COMMAND(gentiles, true);
 #endif
+
+#ifdef MODEL_INFO
 	ADD_DOT_COMMAND(texinfo, false);
+#endif
 
   //  ADD_DOT_COMMAND(scspawn, true);
 

@@ -2,6 +2,9 @@
 
 #include <syscfg.h>
 #include <math.h>
+#include <iostream>
+#include <fstream>
+#include <string>
 #include "pi/pi.h"
 #include "include/vars.h"
 #include "fio/fio.h"
@@ -1281,159 +1284,79 @@ protocol: 2
 OTP: 602544593
 */
 
+inline std::string& rtrim(std::string& s, const char* t = " \t\n\r\f\v")
+{
+    s.erase(s.find_last_not_of(t) + 1);
+    return s;
+}
+
 static LOGICAL _ParseTicketFile(UINT32* host, UINT16* port, UINT16* protocol, UINT32* cookie)
 {
-LOGICAL	retval=TRUE;
-SINT8*	ptr, apID[64], data[64], serverIP[64], serverport[64], serverprotocol[64], otp[64], bypass[64];
-FILE*	stream;
+    LOGICAL	retval=TRUE;
+    std::string apID, data, serverIP, serverport, serverprotocol, otp, bypass;
+    
+    try {
+        std::ifstream  ticketFileStream (TicketFile);
+        std::getline(ticketFileStream, apID); // ignore
+        std::getline(ticketFileStream, data); // ignore
+        std::getline(ticketFileStream, serverIP);
+        std::string temp =serverIP.substr(serverIP.find(" ")+1);
+        std::string ipAddress = rtrim(temp);
+        if (!ipAddress.empty())
+        {
+            *host = strtoul(ipAddress.c_str(), nullptr, 10);
+        }
+        std::getline(ticketFileStream, serverport);
+        std::string ipPort = serverport.substr(serverport.find(" ")+1);
+        if (!ipPort.empty())
+        {
+            *port = static_cast<UINT16>(strtoul(ipPort.c_str(), nullptr, 10));
+        }
+        std::getline(ticketFileStream, serverprotocol);
+        std::string ipProt = serverprotocol.substr(serverprotocol.find(" ")+1);
+        if (!ipProt.empty())
+        {
+            *protocol = static_cast<UINT16>(strtoul(ipProt.c_str(), nullptr, 10));
+        }
+        std::getline(ticketFileStream, otp); // cookie
+        std::string otpText = otp.substr(otp.find(" ")+1);
+        if (!otpText.empty())
+        {
+            *cookie = static_cast<UINT32>(strtoul(otpText.c_str(), nullptr, 10));
+        }
+        
+        std::getline(ticketFileStream, bypass);
+        if (!bypass.empty())
+        {
+            if (teulGetHost(ipAddress.c_str(), host) == 0)
+            {
+                Write_Debug("Unable to translate host address");
+                return (FALSE);
+            }
+            
+            std::string userId = bypass.substr(bypass.find(" ")+1);
+            if (!userId.empty())
+            {
+                strncpy(BypassString,userId.c_str(),32);
+            
+                if (BypassString[0] != '\0')
+                {
+                    if (BypassString[0] == 'R')
+                        BypassID = strtoul(&BypassString[1], nullptr, 10);
+                    else
+                        BypassID = strtoul(&BypassString[0], nullptr, 10);
+                }
+                else
+                    BypassID = 0;
+            }
 
-	stream = fopen(TicketFile, "r");
-	if (stream == nullptr)
-	{
-		Online = 0;
-		return(FALSE);
-	}
+        }
+    } catch (std::ifstream::failure e) {
+        Write_Debug( e.what());
+        retval = FALSE;
+        Online = 0;
+    }
 
-	do
-	{
-		if (fgets(apID, 64, stream) == nullptr)
-		{
-			retval = FALSE;
-			Write_Debug("Error when reading apID");
-			break;
-		}
-
-		if (fgets(data, 64, stream) == nullptr)
-		{
-			retval = FALSE;
-			Write_Debug("Error when reading data");
-			break;
-		}
-
-
-		if (fgets(serverIP, 64, stream) == nullptr)
-		{
-			retval = FALSE;
-			Write_Debug("Error when reading serverIP");
-			break;
-		}
-
-		ptr = strchr(serverIP, ' ');
-		if (ptr == nullptr)
-		{
-			retval = FALSE;
-			Write_Debug("Could not parse serverIP");
-			break;
-		}
-
-		ptr += 1;
-		*host = strtoul(ptr, nullptr, 10);
-
-		if (fgets(serverport, 64, stream) == nullptr)
-		{
-			retval = FALSE;
-			Write_Debug("Error when reading port");
-			break;
-		}
-
-		ptr = strchr(serverport, ' ');
-		if (ptr == nullptr)
-		{
-			retval = FALSE;
-			Write_Debug("Could not parse port");
-			break;
-		}
-
-		ptr += 1;
-		*port = (UINT16)strtoul(ptr, nullptr, 10);
-
-		if (fgets(serverprotocol, 64, stream) == nullptr)
-		{
-			retval = FALSE;
-			Write_Debug("Error when reading protocol");
-			break;
-		}
-
-		ptr = strchr(serverprotocol, ' ');
-		if (ptr == nullptr)
-		{
-			retval = FALSE;
-			Write_Debug("Could not parse port");
-			break;
-		}
-
-		ptr += 1;
-		*protocol = (UINT16)strtoul(ptr, nullptr, 10);
-
-		if (fgets(otp, 64, stream) == nullptr)
-		{
-			retval = FALSE;
-			Write_Debug("Error when reading OTP");
-			break;
-		}
-
-		ptr = strchr(otp, ' ');
-		if (ptr == nullptr)
-		{
-			retval = FALSE;
-			Write_Debug("Could not parse OTP");
-			break;
-		}
-
-		ptr += 1;
-		*cookie = strtoul(ptr, nullptr, 10);
-
-		if (fgets(bypass, 64, stream) != nullptr)
-		{
-
-			ptr = strchr(serverIP, ' ');
-
-			if (ptr == nullptr)
-			{
-				retval = FALSE;
-				Write_Debug("Could not parse IP");
-				break;
-			}
-
-			ptr += 1;
-
-			auto eol = strchr(ptr, '\n');
-			if (eol)
-				*eol = 0;
-			if (teulGetHost(ptr, host) == 0)
-			{
-				Write_Debug("Unable to translate host address");
-				return (FALSE);
-			}
-
-			ptr = strchr(bypass, ' ');
-
-			if (ptr == nullptr)
-			{
-				retval = FALSE;
-				Write_Debug("Could not parse BP");
-				break;
-			}
-
-			ptr += 1;
-
-			strncpy(BypassString,ptr,32);
-
-			if (BypassString[0] != '\0')
-			{
-				if (BypassString[0] == 'R')
-					BypassID = strtoul(&BypassString[1], nullptr, 10);
-				else
-					BypassID = strtoul(&BypassString[0], nullptr, 10);
-			}
-			else
-				BypassID = 0;
-
-		}
-	}
-	while (FALSE);
-
-	fclose(stream);
 
 	return(retval);
 }
