@@ -46,6 +46,15 @@
 #include "teul/teulServer.h"
 #include "wwii/wwiiConfig.h"
 #include "wwii/wwiiNetPorts.h"
+#include "teul/teulMicroWebServer.h"
+
+namespace Teul
+{
+	namespace uWeb
+	{
+		Server s_debugServer;
+	}
+}
 
 // the time that a player may be on the exit server holder
 // before he is sent back to the auth Host
