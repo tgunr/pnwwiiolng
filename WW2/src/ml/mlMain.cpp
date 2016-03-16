@@ -7359,19 +7359,9 @@ static void _expireSTO(ServerTrackedObject& sto)
 
 UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 {
-	vehanimVehicleStateAnimations* StateAnims;
-	vehVehicle* Vehicle;
-	FLOAT64VECTOR Pos;
-	piVECTOR TempPos;
-	FLOAT64VECTOR WorldOffsetOrigin;
-	//UINT32 Count = 100;
-	piMATRIX AttMat = IdentityMatrix;
-	piVECTOR Att;
-	OBJECT* SpawnPtr = nullptr;
-
 	//uiConsoleprintf("SCENARIO: Vehicle reset pos called!");
 
-	Vehicle = (vehVehicle*)(VehicleData->VehicleMasterPtr);
+	vehVehicle* Vehicle = VehicleData->VehicleMasterPtr;
 
 #ifdef BETA_RELEASE
     switch(OverrideSpawner)
@@ -7462,6 +7452,8 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
     }
 #endif
 
+	FLOAT64VECTOR Pos;
+
 	if(MobileSpawn)
 	{
 		Pos = MobileSpawnLocation;
@@ -7518,6 +7510,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
         }
     }
 
+	FLOAT64VECTOR WorldOffsetOrigin;
     trnGetWorldOriginOffset(&WorldOffsetOrigin);
 
 	if(!MobileSpawn && !SpecialOverride)
@@ -7551,6 +7544,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 
 	Write_Debug("Pos x=%lf, y=%lf, z=%lf", Pos.x, Pos.y, Pos.z);
 
+	piVECTOR TempPos;
 	TempPos.x = -(FLOAT32)(Pos.x - WorldOffsetOrigin.x);
 	TempPos.y = -(FLOAT32)(Pos.y - WorldOffsetOrigin.y);
 	TempPos.z = -(FLOAT32)(Pos.z - WorldOffsetOrigin.z);
@@ -7690,6 +7684,9 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 	Write_Debug("mlResetVehiclePos is trying to spawn at: scx=%d, scy=%d, id=%d, num=%d",
 					SpawnSuperCellX, SpawnSuperCellY, SpawnLocId, SpawnNumber);
 
+	OBJECT* SpawnPtr = nullptr;
+	piMATRIX AttMat = IdentityMatrix;
+
 	if(!MobileSpawn && !SpecialOverride)
 	{
 #ifdef BETA_RELEASE
@@ -7772,6 +7769,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 	VehicleData->AdjustedForCGPos.y = Pos.y;
 	VehicleData->LastVehicleUpdateTime = frametime;
 
+	piVECTOR Att;
 	mathEul_FromMatrix(&Att,&AttMat,EulOrdXYZr);
 
 	VehicleData->VehicleAtt.Pitch = -Att.x;
@@ -7803,7 +7801,7 @@ UINT32 mlResetVehiclePos(mlVehicleData * VehicleData)
 		{
 			vehAnimChangeVehicleStateByName(Vehicle, (UCHAR*)"gearstate", TRUE);
 
-			StateAnims = &Vehicle->StateAnimation;
+			vehanimVehicleStateAnimations* StateAnims = &Vehicle->StateAnimation;
 			if (StateAnims != nullptr)
 			{
 				StateAnims->GearDOFVar = 1.0f;
