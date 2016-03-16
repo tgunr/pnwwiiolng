@@ -3542,6 +3542,7 @@ _runHost()
 
 		chatUpdateHCUnitLocations();
 		chatCheckSpawningPlayers();
+		chatUpdateAWSSnapshot();
 		chatPatrolGridExpirations();
 
 #ifdef KICK_BANS
