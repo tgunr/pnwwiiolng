@@ -1132,7 +1132,7 @@ public:
 		str = responses[rand_uniform(responses.size())].c_str() ;
 		LSTRING_ID prefix = ( rand_uniform(1024) < 4 ) ? LSTR_ERROR : LSTR_NONE ;
 		if ( rand_uniform(128) == 42 )
-			player->message(prefix, LSTR_LABELLED_GENERIC, "operator", str) ;
+			player.message(prefix, LSTR_LABELLED_GENERIC, "operator", str) ;
 		else
 			player.message(prefix, LSTR_GENERIC, str);
 	}
