@@ -2923,6 +2923,7 @@ void ww2::Client::SetKilledByAI(bool status)
 
 int ww2::Client::Init(int playerID, int otp, unsigned int appVersion)
 {
+	char dbugFileName[21];
 	if(clientinited) return 0;
 
 #ifdef CONNECTION_TEST_BUILD
@@ -2940,7 +2941,8 @@ int ww2::Client::Init(int playerID, int otp, unsigned int appVersion)
 	// go ahead and set the player ident info in it just to make sure
 	PlayerClient()->SetPlayerIdent(playerID, otp, appVersion);
 
-	int err = teulInitTransport(DBUGLOG_MODE, "wwiiClient", errorFn, nullptr, clientErrorLog);
+	sprintf(dbugFileName, "wwiiClient.%u", playerID);
+	int err = teulInitTransport(DBUGLOG_MODE, dbugFileName, errorFn, nullptr, clientErrorLog);
 
 	if(err > -1)
 	{
