@@ -3855,6 +3855,7 @@ static UINT32 _DoExplosionConcussion(weapAmmo* Ammo, FLOAT64VECTOR const* InPos,
 
 			if ((Ammo->Flags & WEAP_AMMOFLAG_DONTCHECKVEHICLES) == 0)
 			{
+				const FLOAT64VECTOR world_offset(WorldOriginOffset);
 
 				weapCollideRoundWithVehicles(&CollideListPtr,
 										  &TempCDNum,
@@ -3864,7 +3865,7 @@ static UINT32 _DoExplosionConcussion(weapAmmo* Ammo, FLOAT64VECTOR const* InPos,
 										  frametime,
 										  !(Ammo->Flags & WEAP_AMMOFLAG_CANTHITPLAYER),
 										  Ammo->Flags & WEAP_AMMOFLAG_ONLY_CHECKPLAYER,
-										  &WorldOriginOffset,
+										  &world_offset,
 										  0,
 										  0);
 			}
@@ -4696,10 +4697,11 @@ static UINT32 _GetProjectileCollisions(weapAmmo* Ammo, UINT32 Flags, FASTCOLLIDE
 	logTimerBeginExtMacro(weapCollideRoundWithVehicles);
 	if(!(Flags & WEAP_AMMOFLAG_DONTCHECKVEHICLES))
 	{
+		const FLOAT64VECTOR world_offset(WorldOriginOffset);
 		weapCollideRoundWithVehicles(&CollideListPtr, &CollisionSlotsLeft, OldPos, NewPos,
 									  CurrentTime - DeltaTime, CurrentTime,
 									  !(Flags & WEAP_AMMOFLAG_CANTHITPLAYER), Flags & WEAP_AMMOFLAG_ONLY_CHECKPLAYER,
-									  &WorldOriginOffset, 0, 0);
+									  &world_offset, 0, 0);
 	}
 	NumCollisions = MaxCollisions - CollisionSlotsLeft;
 	for(i = PrevNumCollisions; i < NumCollisions; i++)

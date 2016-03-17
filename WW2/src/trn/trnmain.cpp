@@ -3680,6 +3680,9 @@ UINT32 trnUpdateTerrainOriginOffset(LOGICAL force)
 {
 	if (_TerrainMoved || force)
 	{
+		Write_Debug("Moving world offset: [%d:%d] + [%lf:%lf]",
+		            WorldOriginOffset.x, WorldOriginOffset.y,
+		            _CameraAdjustment.x, _CameraAdjustment.y);
 
 		mathSubVectors(&WorldOriginOffset,&WorldOriginOffset,&_CameraAdjustment);
 
