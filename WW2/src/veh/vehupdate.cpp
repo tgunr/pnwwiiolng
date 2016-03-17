@@ -627,6 +627,8 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 	VehicleHdr.fireMask = VehicleInfo.fire.state;
 	VehicleHdr.present |= PR_FIRE_FLAGS;
 
+    bool sendTurrets = (Data.HasSentUpdate >= 3);
+    
 	// turret traverse
 	TurretMask = 0;
 	NumTurrets = 0;
@@ -643,8 +645,8 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 			TurretElev[i] = (turret_t)Data.TurretElevate[i];
 #endif
 
-			if (TurretTrav[i] != Vehicle.StateAnimation.LastSendTurretTrav[i] ||
-				TurretElev[i] != Vehicle.StateAnimation.LastSendTurretElev[i])
+			if (sendTurrets && (TurretTrav[i] != Vehicle.StateAnimation.LastSendTurretTrav[i] ||
+				TurretElev[i] != Vehicle.StateAnimation.LastSendTurretElev[i]))
 			{
 //				Write_Log (LOG_FPS, LOG_INFO, "XMIT %d: %d %d", i, TurretTrav[i], TurretElev[i]);
 				//uiChatPrintLine("TURRET XMIT %d: %d %d", i, TurretTrav[i], TurretElev[i]);
@@ -706,11 +708,11 @@ static UINT32 _SendUpdate(vehVehicle& Vehicle, mlVehicleData& Data)
 #endif
 			break;
 			default:
-				continue;
+            break;
 			}
 
-			if (TurretTrav[i] != Vehicle.StateAnimation.LastSendTurretTrav[i] ||
-				TurretElev[i] != Vehicle.StateAnimation.LastSendTurretElev[i])
+			if (sendTurrets && (TurretTrav[i] != Vehicle.StateAnimation.LastSendTurretTrav[i] ||
+				TurretElev[i] != Vehicle.StateAnimation.LastSendTurretElev[i]))
 			{
 				//Write_Log (LOG_FPS, LOG_INFO, "XMIT %d: %d %d", i, TurretTrav[i], TurretElev[i]);
 				//uiChatPrintLine("TURRET XMIT %d: %d %d", i, TurretTrav[i], TurretElev[i]);
