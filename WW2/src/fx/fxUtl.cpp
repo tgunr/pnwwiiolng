@@ -885,7 +885,7 @@ FLOAT32 fxUtlGetDistanceSqrd(piVECTOR* pvecPos)
 // Function: fxUtlGetDOFDirection
 // Description: Assume DOF direction is out the Y axis.
 //////////////////////////////////////////////////////////////////////
-void fxUtlGetDOFDirection(OBJECTDOF* dof, piMATRIX* mat, piVECTOR* dir)
+void fxUtlGetDOFDirection(OBJECTDOF* dof, const piMATRIX* mat, piVECTOR* dir)
 {
     if(dof && mat)
     {
@@ -898,7 +898,7 @@ void fxUtlGetDOFDirection(OBJECTDOF* dof, piMATRIX* mat, piVECTOR* dir)
 // Function: fxUtlGetDOFPos
 // Description:
 //////////////////////////////////////////////////////////////////////
-void fxUtlGetDOFPos(OBJECTDOF* dof, piMATRIX* mat, FLOAT64VECTOR* pos)
+void fxUtlGetDOFPos(OBJECTDOF* dof, const piMATRIX* mat, FLOAT64VECTOR* pos)
 {
     if(dof && mat)
     {
