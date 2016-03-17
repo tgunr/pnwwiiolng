@@ -7384,7 +7384,6 @@ UINT32 mlResetVehiclePos(mlVehicleData* VehicleData) {
 			SpawnLocId = 21;
 		else
 			SpawnLocId = 8;
-
 		break;
 	case AREA_51_OVERRIDE:
 		SpawnSuperCellX = -25;
@@ -7438,12 +7437,12 @@ UINT32 mlResetVehiclePos(mlVehicleData* VehicleData) {
 	}
 #endif
 
-	FLOAT64VECTOR Pos;
+	FLOAT64VECTOR pos;
 
 	if ( MobileSpawn ) {
-		Pos = MobileSpawnLocation;
-		SpawnSuperCellX = (SINT32)Pos.x / SUPERCELL_SIZE_M;
-		SpawnSuperCellY = (SINT32)Pos.y / SUPERCELL_SIZE_M;
+		pos = MobileSpawnLocation;
+		SpawnSuperCellX = (int)pos.x / SUPERCELL_SIZE_M;
+		SpawnSuperCellY = (int)pos.y / SUPERCELL_SIZE_M;
 	}
 
 	bool SpecialOverride = false;
@@ -7479,26 +7478,23 @@ UINT32 mlResetVehiclePos(mlVehicleData* VehicleData) {
 		SpawnLocId = 1;
 		SpawnNumber = 1;
 
- 		Pos = MobileSpawnLocation;
-		SpawnSuperCellX = (SINT32)Pos.x / SUPERCELL_SIZE_M;
-		SpawnSuperCellY = (SINT32)Pos.y / SUPERCELL_SIZE_M;
+ 		pos = MobileSpawnLocation;
+		SpawnSuperCellX = (SINT32)pos.x / SUPERCELL_SIZE_M;
+		SpawnSuperCellY = (SINT32)pos.y / SUPERCELL_SIZE_M;
 
 		SpecialOverride = true;
 
 		break;
 	}
 
-	FLOAT64VECTOR WorldOffsetOrigin;
-	trnGetWorldOriginOffset(&WorldOffsetOrigin);
-
 	if ( ! MobileSpawn && ! SpecialOverride ) {
-		Pos.x = (SpawnSuperCellX * SUPERCELL_WIDTH + SUPERCELL_WIDTH * 0.5f);
-		Pos.y = (SpawnSuperCellY * SUPERCELL_HEIGHT + SUPERCELL_HEIGHT * 0.5f);
-		Pos.z = 0.0;
+		pos.x = (SpawnSuperCellX * SUPERCELL_WIDTH + SUPERCELL_WIDTH * 0.5f);
+		pos.y = (SpawnSuperCellY * SUPERCELL_HEIGHT + SUPERCELL_HEIGHT * 0.5f);
+		pos.z = 0.0;
 
 #ifdef BETA_RELEASE
 		if ( OverrideSpawner == NOSPAWN_OVERRIDE )
-			Pos.x = Pos.y = Pos.z = 0;
+			pos.x = pos.y = pos.z = 0;
 #endif
 	}
 
@@ -7510,18 +7506,23 @@ UINT32 mlResetVehiclePos(mlVehicleData* VehicleData) {
 		physicsSetWorldOffset(offset);
 	}
 
-	Write_Debug("Pos x=%lf, y=%lf, z=%lf", Pos.x, Pos.y, Pos.z);
+	Write_Debug("InitPos x=%lf, y=%lf, z=%lf", pos.x, pos.y, pos.z);
 
-	piVECTOR TempPos;
-	TempPos.x = -(FLOAT32)(Pos.x - WorldOffsetOrigin.x);
-	TempPos.y = -(FLOAT32)(Pos.y - WorldOffsetOrigin.y);
-	TempPos.z = -(FLOAT32)(Pos.z - WorldOffsetOrigin.z);
-	Write_Debug("TempPos x=%lf, y=%lf, z=%lf", TempPos.x, TempPos.y, TempPos.z);
+	auto sync_world_offset =
+	[&] (void) {
+		FLOAT64VECTOR world_offset;
+		trnGetWorldOriginOffset(&world_offset);
 
-	trnCheckAndAdjustCameraPositionWithOriginOffset(&TempPos);
+		piVECTOR TempPos;
+		TempPos.x = -(FLOAT32)(pos.x - world_offset.x);
+		TempPos.y = -(FLOAT32)(pos.y - world_offset.y);
+		TempPos.z = -(FLOAT32)(pos.z - world_offset.z);
+		trnCheckAndAdjustCameraPositionWithOriginOffset(&TempPos);
 
-	// move the world origin offset if necessary
-	trnUpdateTerrainOriginOffset(FALSE);
+		trnUpdateTerrainOriginOffset(FALSE);
+	};
+	// First update is so we can find the spawn.
+	sync_world_offset();
 	trnUpdateTerrainOriginOffset(FALSE); // 2nd call forces terrain to load
 
 	playpos.x = playpos.y = playpos.z = 0.0f;
@@ -7534,40 +7535,7 @@ UINT32 mlResetVehiclePos(mlVehicleData* VehicleData) {
 #ifdef BETA_RELEASE
 		if ( OverrideSpawner != NOSPAWN_OVERRIDE )
 #endif
-		if ( ! trnldrFindStratObjectPosition(SpawnSuperCellX, SpawnSuperCellY, SpawnLocId, &Pos) ) {
-			char s[128];
-			sprintf(s, "Cannot find strat spawn object for scx = %d, scy = %d, id = %d",
-				SpawnSuperCellX, SpawnSuperCellY, SpawnLocId);
-			piExitProgram(__FILE__,__LINE__,s);
-		}
-	}
-
-	TempPos.x = -(FLOAT32)(Pos.x - WorldOffsetOrigin.x);
-	TempPos.y = -(FLOAT32)(Pos.y - WorldOffsetOrigin.y);
-	TempPos.z = -(FLOAT32)(Pos.z - WorldOffsetOrigin.z);
-	Write_Debug("TempPos x=%lf, y=%lf, z=%lf", TempPos.x, TempPos.y, TempPos.z);
-
-	trnCheckAndAdjustCameraPositionWithOriginOffset(&TempPos);
-
-	trnUpdateTerrainOriginOffset(FALSE); // 2nd call forces terrain to load
-
-	playpos.x = playpos.y = playpos.z = 0.0f;
-
-	trnldrFinishUpdate();			// Terrain system is now configured to handle this
-	trnmainDoRawUpdate(FALSE);
-	trnldrFinishUpdateRelocate();
-
-#if(1)
-//////////////////////////////////////////////////////////////////////
-// One more time for final terrain adjustment. Some areas are not full adjusted
-// and results in a piExitProgram
-//////////////////////////////////////////////////////////////////////
-    trnGetWorldOriginOffset(&WorldOffsetOrigin);
-	if ( ! MobileSpawn && ! SpecialOverride ) {
-#ifdef BETA_RELEASE
-		if( OverrideSpawner != NOSPAWN_OVERRIDE )
-#endif
-		if ( ! trnldrFindStratObjectPosition(SpawnSuperCellX,  SpawnSuperCellY, SpawnLocId, &Pos) ) {
+		if ( ! trnldrFindStratObjectPosition(SpawnSuperCellX, SpawnSuperCellY, SpawnLocId, &pos) ) {
 			char s[128];
 			sprintf(s, "Cannot find strat spawn object for scx = %d, scy = %d, id = %d",
 			        SpawnSuperCellX, SpawnSuperCellY, SpawnLocId);
@@ -7575,62 +7543,14 @@ UINT32 mlResetVehiclePos(mlVehicleData* VehicleData) {
 		}
 	}
 
-	TempPos.x = -(FLOAT32)(Pos.x - WorldOffsetOrigin.x);
-	TempPos.y = -(FLOAT32)(Pos.y - WorldOffsetOrigin.y);
-	TempPos.z = -(FLOAT32)(Pos.z - WorldOffsetOrigin.z);
-	Write_Debug("TempPos x=%lf, y=%lf, z=%lf", TempPos.x, TempPos.y, TempPos.z);
+	Write_Debug("AdjPos x=%lf, y=%lf, z=%lf", pos.x, pos.y, pos.z);
 
-	trnCheckAndAdjustCameraPositionWithOriginOffset(&TempPos);
+	// Now we update with the actual position.
+	sync_world_offset();
 
-	trnUpdateTerrainOriginOffset(FALSE);
 
-	trnldrFinishUpdate();
-	trnmainDoRawUpdate(FALSE);
-	trnldrFinishUpdateRelocate();
-
-	// Force rebuild of inverse matrices because of our @#$!*#@ back-ass-wards terrain
-	// loading!!!!!
-	trnUpdateTerrainOriginOffset(TRUE);
-#endif
-
-#if(1)
-//////////////////////////////////////////////////////////////////////
-// Ticket: 6055
-// Do another update to see if this fixes the collider offset problem
-//////////////////////////////////////////////////////////////////////
-	trnGetWorldOriginOffset(&WorldOffsetOrigin);
-	if ( ! MobileSpawn && ! SpecialOverride ) {
-#ifdef BETA_RELEASE
-		if(OverrideSpawner != NOSPAWN_OVERRIDE)
-#endif
-		if ( ! trnldrFindStratObjectPosition(SpawnSuperCellX,  SpawnSuperCellY, SpawnLocId, &Pos) ) {
-			char s[128];
-			sprintf(s, "Cannot find strat spawn object for scx = %d, scy = %d, id = %d",
-			        SpawnSuperCellX, SpawnSuperCellY, SpawnLocId);
-			piExitProgram(__FILE__,__LINE__,s);
-		}
-	}
-
-	TempPos.x = -(FLOAT32)(Pos.x - WorldOffsetOrigin.x);
-	TempPos.y = -(FLOAT32)(Pos.y - WorldOffsetOrigin.y);
-	TempPos.z = -(FLOAT32)(Pos.z - WorldOffsetOrigin.z);
-	Write_Debug("TempPos x=%lf, y=%lf, z=%lf", TempPos.x, TempPos.y, TempPos.z);
-
-	trnCheckAndAdjustCameraPositionWithOriginOffset(&TempPos);
-
-	trnUpdateTerrainOriginOffset(FALSE);
-
-	trnldrFinishUpdate();
-	trnmainDoRawUpdate(FALSE);
-	trnldrFinishUpdateRelocate();
-
-	// Force rebuild of inverse matrices because of our @#$!*#@ back-ass-wards terrain
-	// loading!!!!!
-	trnUpdateTerrainOriginOffset(TRUE);
-
-#endif
-
-	trnGetWorldOriginOffset(&WorldOffsetOrigin);
+	FLOAT64VECTOR world_offset;
+	trnGetWorldOriginOffset(&world_offset);
 
 	Write_Debug("mlResetVehiclePos is trying to spawn at: scx=%d, scy=%d, id=%d, num=%d",
 	            SpawnSuperCellX, SpawnSuperCellY, SpawnLocId, SpawnNumber);
@@ -7670,43 +7590,43 @@ UINT32 mlResetVehiclePos(mlVehicleData* VehicleData) {
 		AttMat._23 = -AttMat._23;
 		AttMat._33 = -AttMat._33;
 		AttMat._43 = -AttMat._43;
-		Pos.x = AttMat._41;
-		Pos.y = AttMat._42;
-		Pos.z = AttMat._43;
+		pos.x = AttMat._41;
+		pos.y = AttMat._42;
+		pos.z = AttMat._43;
 
-		Pos.x += WorldOffsetOrigin.x;
-		Pos.y += WorldOffsetOrigin.y;
+		pos.x += world_offset.x;
+		pos.y += world_offset.y;
 #ifdef BETA_RELEASE
 		}
 #endif
 	}
 
 	if ( VehicleData->VehicleObjectData != nullptr )
-		Pos.z += WorldOffsetOrigin.z - VehicleData->VehicleObjectData->LowestPoint;
+		pos.z += world_offset.z - VehicleData->VehicleObjectData->LowestPoint;
 	else
-		Pos.z += WorldOffsetOrigin.z + 1.0f;
+		pos.z += world_offset.z + 1.0f;
 
 	if ( Vehicle && Vehicle->VehicleType && Vehicle->VehicleType->Type == VEH_TYPE_PERSON )
-		Pos.z += 1.0f;
+		pos.z += 1.0f;
 
 	if ( ! MobileSpawn && ! SpecialOverride ) {
 	// adjust height based on place mode
 #ifdef BETA_RELEASE
 		if ( OverrideSpawner != NOSPAWN_OVERRIDE )
 #endif
-		Pos.z += -(SpawnPtr->child->MutablePositions()[0].z - SpawnPtr->child->ImmutablePositions()[0].z);
+		pos.z += -(SpawnPtr->child->MutablePositions()[0].z - SpawnPtr->child->ImmutablePositions()[0].z);
 	}
 
 	AttMat._41 = AttMat._42 = AttMat._43 = 0.0f;
 
 	Write_Debug("Spawning': scx=%d, scy=%d, id=%d, num=%d", SpawnSuperCellX, SpawnSuperCellY, SpawnLocId, SpawnNumber);
-	Write_Debug("Spawn Position: x=%lf, y=%lf, z=%lf", Pos.x, Pos.y, Pos.z);
+	Write_Debug("Spawn Position: x=%lf, y=%lf, z=%lf", pos.x, pos.y, pos.z);
 
-	_TunnelResetVehiclePos(VehicleData,Pos.z);
-	VehicleData->VehiclePos.x = Pos.x;
-	VehicleData->AdjustedForCGPos.x = Pos.x;
-	VehicleData->VehiclePos.y = Pos.y;
-	VehicleData->AdjustedForCGPos.y = Pos.y;
+	_TunnelResetVehiclePos(VehicleData,pos.z);
+	VehicleData->VehiclePos.x = pos.x;
+	VehicleData->AdjustedForCGPos.x = pos.x;
+	VehicleData->VehiclePos.y = pos.y;
+	VehicleData->AdjustedForCGPos.y = pos.y;
 	VehicleData->LastVehicleUpdateTime = frametime;
 
 	piVECTOR Att;
@@ -7780,13 +7700,13 @@ UINT32 mlResetVehiclePos(mlVehicleData* VehicleData) {
 	if ( MobileSpawn && ! SpecialOverride ) {
 		// Temporary for now so Oli can test.
 		// (Eventually need to collide with short collide list)
-		if( (int)Pos.z == 1 ) {
+		if( (int)pos.z == 1 ) {
 			COLLISION c;
 
 			memset(&c, 0, sizeof(COLLISION));
 
-			c.newpos.x = (FLOAT32)(Pos.x - WorldOriginOffset.x);
-			c.newpos.y = (FLOAT32)(Pos.y - WorldOriginOffset.y);
+			c.newpos.x = (FLOAT32)(pos.x - WorldOriginOffset.x);
+			c.newpos.y = (FLOAT32)(pos.y - WorldOriginOffset.y);
 
 			c.oldpos = c.newpos;
 
@@ -7800,7 +7720,7 @@ UINT32 mlResetVehiclePos(mlVehicleData* VehicleData) {
 		}
 	}
 
-	Vec3d newSpawnPos = Vec3d(Pos);
+	Vec3d newSpawnPos = Vec3d(pos);
 	Vec3d diff = SpawnPos - newSpawnPos;
 	const Instance::Descriptor& instance = PlayerClient()->GetInstance();
 
