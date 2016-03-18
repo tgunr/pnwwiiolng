@@ -1461,6 +1461,7 @@
 		8D0C4E970486CD37000505A6 /* World War II Online.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "World War II Online.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		E90D96991C6D729D00D5EC52 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		E90D96A71C6E041300D5EC52 /* HockeySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HockeySDK.framework; path = Vendor/HockeySDK.framework; sourceTree = "<group>"; };
+		E930963A1C9AE6B100F01A0D /* updtTurrets.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = updtTurrets.h; sourceTree = "<group>"; };
 		E9320E971C95FC2C003E8048 /* local2.tkt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = local2.tkt; sourceTree = "<group>"; };
 		E9320E981C95FC2C003E8048 /* local.tkt */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; path = local.tkt; sourceTree = "<group>"; };
 		E97C76281C84CD0700875F44 /* locIDs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = locIDs.h; sourceTree = "<group>"; };
@@ -2693,6 +2694,7 @@
 				08104E73103DFD480065E0E2 /* updtPackers.cpp */,
 				08104E74103DFD480065E0E2 /* updtPackers.h */,
 				08104E77103DFD480065E0E2 /* updtTypes.h */,
+				E930963A1C9AE6B100F01A0D /* updtTurrets.h */,
 			);
 			path = updt;
 			sourceTree = "<group>";
