@@ -857,7 +857,7 @@ inline static void Treecull(TERRAIN_DETAIL* dtl, int r, int c, unsigned int mask
     unsigned int address = 0;
 
     Vec3d world;
-    world.set(WorldOriginOffset);
+    world.set((FLOAT64VECTOR)WorldOriginOffset);
 
     Vec2f dis;
     Vec3f relativepos;

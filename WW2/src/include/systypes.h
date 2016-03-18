@@ -125,6 +125,15 @@ struct FLOAT64VECTOR
 	FLOAT64 z;
 };
 
+// HACK: Need to replace the world offset, but it's referenced basically everywhere.
+// An overhaul of our godawful math code is kind of outside the scope of what I have
+// time for right now, so we'll have to settle for this.
+struct INT32VECTOR {
+	int32_t x, y, z;
+	operator FLOAT64VECTOR (void) const
+	{ return {(FLOAT64)x,(FLOAT64)y,(FLOAT64)z}; }
+};
+
 struct FLOAT32VECTOR
 {
 	FLOAT32 x, y, z;

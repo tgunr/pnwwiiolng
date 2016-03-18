@@ -17,8 +17,8 @@ extern void fxUtlApplyVelocity(piVECTOR* lpVel,
                         FLOAT32* pLastUpdate,
                         UINT32 uFlags);
 extern void fxUtlFromToRotation(piVECTOR* lpFrom, piVECTOR* lpTo, piMATRIX* lpMat);
-extern void fxUtlGetDOFDirection(OBJECTDOF* lpDOF, piMATRIX* lpMat, piVECTOR* pDir);
-extern void fxUtlGetDOFPos(OBJECTDOF* lpDOF, piMATRIX* lpMat, FLOAT64VECTOR* pPos);
+extern void fxUtlGetDOFDirection(OBJECTDOF* lpDOF, const piMATRIX* lpMat, piVECTOR* pDir);
+extern void fxUtlGetDOFPos(OBJECTDOF* lpDOF, const piMATRIX* lpMat, FLOAT64VECTOR* pPos);
 extern void fxUtlGetGroundPos(piVECTOR* pFrom, FLOAT64VECTOR* pGound);
 extern void fxUtlGetTextureUV(piUV[2], SINT32 iSpriteNum);
 extern void fxUtlGetTextureUV(piUV uv[2], const char* str);

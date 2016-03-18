@@ -1692,10 +1692,11 @@ UINT32 _UpdateVehicleObject(vehVehicle* Vehicle)
 								&VehicleData->VehicleRealAttVel,
 								VehicleData->LastVehicleUpdateTime);
 
-				// mlForwardPredict works against the fps system and causes jitters
-				// so we just assume the rednder pos is good
-				if(persIsPersonaVehicleType(VEH_TYPE_PERSON))
-					TempVec = VehicleData->RenderPos;
+				// mlForwardPredict supposedly works against the fps system, causing jitters
+				// Previously this used the RenderPos, but that wasn't initialized on the
+				// first frame, causing bad juju.
+				if ( persIsPersonaVehicleType(VEH_TYPE_PERSON) )
+					TempVec = VehicleData->VehiclePos;
 
 				VehicleData->RenderAtt = TempAtt;
 				VehicleData->RenderPos = TempVec;

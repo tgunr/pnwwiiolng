@@ -412,7 +412,7 @@ piVECTOR	d;
  * lpd = lpa * lpb
  * lpd can be equal to lpa
  */
-INLINE piVECTOR* math3dMultiplyRotation(piVECTOR* lpd, const piVECTOR* lpa, piMATRIX* lpb)
+INLINE piVECTOR* math3dMultiplyRotation(piVECTOR* lpd, const piVECTOR* lpa, const piMATRIX* lpb)
 {
 piVECTOR	d;
 
@@ -624,7 +624,7 @@ INLINE void math3dInvertMatrixComplete(piMATRIX& inverse, const piMATRIX& matrix
 /*
  * lpd = 1 / lpa
  */
-INLINE piMATRIX* math3dInvertMatrix(piMATRIX* lpd, piMATRIX* lpa)
+INLINE piMATRIX* math3dInvertMatrix(piMATRIX* lpd, const piMATRIX* lpa)
 {
 piMATRIX	d;
 

@@ -3660,45 +3660,29 @@ LOGICAL trnGetWorldOriginOffset(FLOAT64VECTOR* retWorldOriginOffset)
 // and if it is, adjust it (and the world) so that it is no longer too far
 //
 // returns a TRUE if an adjustment happened, otherwise a FALSE
-LOGICAL trnCheckAndAdjustCameraPositionWithOriginOffset(piVECTOR * CameraPos)
-{
-LOGICAL		RetVal;
-LOGICAL		PositionOk;
-piVECTOR	CameraAdjustment;
+LOGICAL trnCheckAndAdjustCameraPositionWithOriginOffset(piVECTOR* pos) {
+	_CameraAdjustment = { 0.0f, 0.0f, 0.0f };
 
-	CameraAdjustment.x = CameraAdjustment.y = CameraAdjustment.z = 0;
+	if ( fabs(pos->x) > MAX_CAMERA_OFFSET )
+		_CameraAdjustment.x = pos->x;
+	if ( fabs(pos->y) > MAX_CAMERA_OFFSET )
+		_CameraAdjustment.y = pos->y;
 
-	PositionOk = TRUE;
-
-	if (fabs(CameraPos->x) > MAX_CAMERA_OFFSET)
-	{
-		CameraAdjustment.x = CameraPos->x;
-		PositionOk = FALSE;
+	if ( _CameraAdjustment.x != 0.0f || _CameraAdjustment.y != 0.0f ) {
+		_TerrainMoved = true ;
+		return true;
 	}
 
-	if (fabs(CameraPos->y) > MAX_CAMERA_OFFSET)
-	{
-		CameraAdjustment.y = CameraPos->y;
-		PositionOk = FALSE;
-	}
-
-	RetVal = FALSE;
-	if (PositionOk == FALSE)
-	{
-		RetVal = TRUE;
-
-		_TerrainMoved = TRUE;
-
-		_CameraAdjustment = CameraAdjustment;
-	}
-
-	return RetVal;
+	return false;
 }
 
 UINT32 trnUpdateTerrainOriginOffset(LOGICAL force)
 {
 	if (_TerrainMoved || force)
 	{
+		Write_Debug("Moving world offset: [%d:%d] + [%lf:%lf]",
+		            WorldOriginOffset.x, WorldOriginOffset.y,
+		            _CameraAdjustment.x, _CameraAdjustment.y);
 
 		mathSubVectors(&WorldOriginOffset,&WorldOriginOffset,&_CameraAdjustment);
 
@@ -3709,6 +3693,8 @@ UINT32 trnUpdateTerrainOriginOffset(LOGICAL force)
 		// now adjust the terrain
 		trnmainAdjustTerrainSections(&_CameraAdjustment);
 		trncdAdjustTerrainObjects(&_CameraAdjustment);
+
+		_CameraAdjustment.x = _CameraAdjustment.y = _CameraAdjustment.z = 0.0f;
 
 		_TerrainMoved = FALSE;
 

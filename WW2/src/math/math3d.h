@@ -163,7 +163,7 @@
 	* lpd = lpa * lpb
 	* lpd can be equal to lpa
 	*/
-	extern piVECTOR* math3dMultiplyRotation(piVECTOR* lpd, const piVECTOR* lpa, piMATRIX* lpb);
+	extern piVECTOR* math3dMultiplyRotation(piVECTOR* lpd, const piVECTOR* lpa, const piMATRIX* lpb);
 
 	/*
 	* lpd = lpa * lpb
@@ -178,7 +178,7 @@
 	/*
 	* lpd = 1 / lpa
 	*/
-	extern piMATRIX* math3dInvertMatrix(piMATRIX* lpd, piMATRIX* lpa);
+	extern piMATRIX* math3dInvertMatrix(piMATRIX* lpd, const piMATRIX* lpa);
 
 	/*
 	 * -1 lpa = lpa
