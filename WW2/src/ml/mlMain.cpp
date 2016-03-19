@@ -7450,9 +7450,9 @@ UINT32 mlResetVehiclePos(mlVehicleData* VehicleData) {
 	switch ( OverrideSpawner ) {
 #if RELEASE_CLIENT
 	case BENCHANTWERP_OVERRIDE:
-		Pos.x = 211414.0f;
-		Pos.y = 3070984.0f;
-		Pos.z = 300.0f;
+		pos.x = 211414.0f;
+		pos.y = 3070984.0f;
+		pos.z = 300.0f;
 
 		SpawnSuperCellX = 211414 / SUPERCELL_SIZE_M;
 		SpawnSuperCellY = 3070984 / SUPERCELL_SIZE_M;
@@ -7461,9 +7461,9 @@ UINT32 mlResetVehiclePos(mlVehicleData* VehicleData) {
 
 		break;
 	case BENCHRAMAGEN_OVERRIDE:
-		Pos.x = 347533.33f;
-		Pos.y = 3034163.975f;
-		Pos.z = 70.0f;
+		pos.x = 347533.33f;
+		pos.y = 3034163.975f;
+		pos.z = 70.0f;
 
 		SpawnSuperCellX = 347533 / SUPERCELL_SIZE_M;
 		SpawnSuperCellY = 3034163 / SUPERCELL_SIZE_M;
