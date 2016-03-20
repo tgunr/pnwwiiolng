@@ -44,12 +44,6 @@ void sysmainCommandLine(int argc, const char** argv)
 #endif
 
 	mngoptParse((char *)"");
-
-#if platOS == OS_MACOS
-#if RELEASE_CLIENT == 1
-        WantedWindow = true;
-    #endif
-#endif
 }
 
 static size_t frames = 0;
