@@ -23,13 +23,8 @@ typedef UINT32 DWORD;
 #define HIWORD HiWord
 #define LOWORD LoWord
 
-#ifndef _MSL_USING_MW_C_HEADERS
-#undef _MAX_PATH
-#define _MAX_PATH 260
-#define cosf cos
-#define sinf sin
-#endif
 
+#define _MAX_PATH PATH_MAX
 #define MAX_PATH _MAX_PATH
 
 #ifdef __cplusplus

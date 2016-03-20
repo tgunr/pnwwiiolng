@@ -514,7 +514,6 @@ extern NSString *WebActionOriginalURLKey;
     chAppDir();
     
     fioSet(WantDataDir ? ISDIRECTORY : ISARCHIVE);
-    fiodSetPrepath(PREPATH);
     
     if(!WantDataDir) {
         extern void sysmainAddArchives();
@@ -633,7 +632,6 @@ extern NSString *WebActionOriginalURLKey;
 
 - (void)sysmain:(NSTimer*)timer
 {
-    dbugInit(LOG_TO_FILE, nullptr);
     [self closeAllWindows];
 
     try {

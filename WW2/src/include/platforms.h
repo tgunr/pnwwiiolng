@@ -2,12 +2,7 @@
 //! @file platforms.h
 //! @brief Platform-specific defines and includes.
 
-#if defined(HAVE_CONFIG_H)
-#include "config.h"
-#endif
 
-#if defined(HAVE_SYS_PARAM_H)
-#include <sys/param.h>
 #endif
 
 #ifndef platOS
@@ -71,6 +66,8 @@
 //#  pragma warning( 1 : 4702 )
 #  define NORETURN_FN __declspec(noreturn)
 # endif
+#if defined(HAVE_SYS_PARAM_H)
+#include <sys/param.h>
 #endif
 
 #endif
@@ -79,19 +76,6 @@
 #error This is a big endian platform and is unsupported.
 #endif
 
-#if defined(WIN32) || defined(WIN64)
-# ifndef NOMINMAX
-#  define NOMINMAX 1	//@ for windows.
-# endif
-# define localtime_r(x, y) localtime(x)
-# define PATH_SEPARATOR '\\'
-# define PATH_SEPSTR "\\"
-#else
-# define PATH_SEPARATOR '/'
-# define PATH_SEPSTR "/"
-#endif
-
-# define SUB_PATH(Pfx, Sfx) Pfx PATH_SEPSTR Sfx
 
 #undef DBA_ENABLE_SQLITE
 
@@ -101,17 +85,12 @@
 static inline unsigned long long strtoull(const char* const src_, const char* const, unsigned int);
 static inline signed long long strtoll(const char* const src_, const char* const, unsigned int);
 static inline float strtof(const char* const src_, const char* const);
+#ifndef NOMINMAX
+# define NOMINMAX 1	//@ for windows.
 #endif
 
 #include <io.h>
-#endif
 
-#if platOS == OS_LINUX
-# define MAX_PATH PATH_MAX
-#endif
-
-#ifndef MAXPATHLEN
-# define MAXPATHLEN MAX_PATH
 #endif
 
 #include "include/precompile_includes.h"
@@ -122,23 +101,12 @@ static inline float strtof(const char* const src_, const char* const);
 template<size_t bufSize, typename... Args>
 UINT32 strprintf(char(&buf)[bufSize], const char* fmt, Args&&... args)
 {
-	static_assert(bufSize > 0, "Buffer too small");
-	static_assert(bufSize < size_t(1 << 31), "Buffer too large");
-#if platOS == OS_WIN32
-	int printed = snprintf(buf, bufSize, fmt, std::forward<Args>(args)...);
-	if (printed < 0) {
-		return bufSize;
-	}
-#else
-	int printed = snprintf(buf, bufSize, fmt, std::forward<Args>(args)...);
-#endif
-	return static_cast<UINT32>(printed);
+    return snprintf(buf, bufSize, fmt, std::forward<Args>(args)...);
 }
 
 // Cross-platform path builder.
 template<size_t bufSize>
-UINT32 pathprintf(char (& buf)[bufSize], const char* lhs, const char* rhs)
+UINT32 pathprintf(char (&buf)[bufSize], const char* lhs, const char* rhs)
 {
-	return strprintf<bufSize>(buf, "%s" PATH_SEPSTR "%s", lhs, rhs);
+	return strprintf<bufSize>(buf, "%s\\%s", lhs, rhs);
 }
-

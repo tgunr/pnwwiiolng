@@ -162,7 +162,7 @@ int fioOpen(const char* const filename)
 		{
 			fiodSetPrepath(UserDataPath);
 			fd = fiodOpen(fn);
-			fiodSetPrepath(PREPATH);
+			fiodSetPrepath(nullptr);
 		}
 		break;
         case ISDIRECTORY:
@@ -209,7 +209,7 @@ int fioOpenWrite(const char* filename)
 		{
 			fiodSetPrepath(UserDataPath);
 			fd = fiodOpenWrite(filename);
-			fiodSetPrepath(PREPATH);
+			fiodSetPrepath(nullptr);
 		}
 		break;
 		case ISDIRECTORY:
@@ -312,7 +312,7 @@ LOGICAL fioAccess(const char* filename)
 		{
 			fiodSetPrepath(UserDataPath);
 			LOGICAL result = fiodAccess(filename);
-			fiodSetPrepath(PREPATH);
+			fiodSetPrepath(nullptr);
 			return result;
 		}
 		break;
@@ -340,7 +340,7 @@ LOGICAL fioModified(SINT32* modified, const char* filename)
 		{
 			fiodSetPrepath(UserDataPath);
 			LOGICAL result = fiodModified(modified,filename);
-			fiodSetPrepath(PREPATH);
+			fiodSetPrepath(nullptr);
 			return result;
 		}
 		break;
@@ -396,7 +396,7 @@ size_t fioFileSize(const char* name)
 		{
 			fiodSetPrepath(UserDataPath);
 			size_t size = fiodFileSize(name);
-			fiodSetPrepath(PREPATH);
+			fiodSetPrepath(nullptr);
 			return size;
 		}
 		break;

@@ -154,7 +154,11 @@ _qualifyFilename(const char* filename, char* const output, const size_t outputSi
 		if ( defaultPath && defaultPath[0] != 0 )
 		{
 			OS_MKDIR(defaultPath, 0770);
-			snprintf(output, outputSize, SUB_PATH("%s", "%s"), defaultPath, filename);
+#if platOS == OS_WIN32
+			snprintf(output, outputSize, "%s\\%s", defaultPath, filename);
+#else
+			snprintf(output, outputSize, "%s/%s", defaultPath, filename);
+#endif
 			return;
 		}
 

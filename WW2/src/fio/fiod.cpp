@@ -28,22 +28,13 @@
 # endif
 #endif
 
-#ifndef LIMITED_FIO
- static char* os_file_path(char* path);
-#if platBuild == TEUL_CLIENT && platOS == OS_WIN32
- static wchar_t* os_file_path(wchar_t* path);
-#endif
-#else
+#if LIMITED_FIO
 # define os_file_path(x) (x)
 #endif
 
 #if platBuild == TEUL_SERVER
 #include "wwii/wwiiConfigVars.h"
 # define DataPath cv_dataDir.GetString()
-#endif
-
-#ifndef _POSIX_
-# define _POSIX_
 #endif
 
 #include "wwii/wwiiUTF.h"
@@ -55,12 +46,12 @@
 #if platOS == OS_WIN32
 #define CHANGE_SEP 	'/'
 #define OS_SEP		'\\'
-#define WCHANGE_SEP 	L'/'
+#define WCHANGE_SEP L'/'
 #define WOS_SEP		L'\\'
 #else
 #define CHANGE_SEP 	'\\'
 #define OS_SEP		'/'
-#define WCHANGE_SEP 	L'\\'
+#define WCHANGE_SEP L'\\'
 #define WOS_SEP		L'/'
 #endif
 
@@ -83,6 +74,52 @@ static void recordRef( std::wstring ref )
 
 #else
 #define recordRef(x)
+#endif
+
+/************************************************************************************************
+	os_file_path
+*************************************************************************************************/
+
+template <typename ValueType>
+static std::basic_string<ValueType> safe_os_file_path(const std::basic_string<ValueType> &path)
+{
+    size_t pos = std::basic_string<ValueType>::npos;
+    std::string result = path;
+    
+    // Cheap hack: npos + 1 == 0 (size_t is unsigned so it's not UB!)
+    // Also we cheat with the knowledge that L'/' == static_cast<wchar_t>('/') etc.
+    while ((pos = result.find(static_cast<ValueType>(CHANGE_SEP), pos + 1)) != std::string::npos) {
+        result[pos] = static_cast<ValueType>(OS_SEP);
+    }
+    return result;
+}
+
+#ifndef LIMITED_FIO
+
+static char* os_file_path(char* path)
+{
+	char* s = path;
+	for(;*s;s++)
+	{
+		if(*s == CHANGE_SEP)
+			*s = OS_SEP;
+	}
+
+	return path;
+}
+
+static wchar_t* os_file_path(wchar_t* path)
+{
+	wchar_t* s = path;
+	for(;*s;s++)
+	{
+		if(*s == WCHANGE_SEP)
+			*s = WOS_SEP;
+	}
+
+	return path;
+}
+
 #endif
 
 //////////////////////////////////////////////////////////////////////
@@ -121,12 +158,6 @@ static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* wi
 
 	// think this works as char* because when we get to here we're talking about relative paths which are all ascii?
 	size_t pathLen = pathprintf(buffer, DataPath, name);
-	for ( size_t i = 0; i < pathLen; ++i )
-	{
-		if ( buffer[i] == CHANGE_SEP )
-			buffer[i] = PATH_SEPARATOR;
-	}
-
 	struct stat statBuffer;
 	retval = stat(os_file_path(buffer), &statBuffer);
 
@@ -510,6 +541,8 @@ size_t fiodFileSize(const char* name, bool userdir)
 //////////////////////////////////////////////////////////////////////
 // Returns a pointer to the path prefix
 
+static char *OriginalPrepath = nullptr;
+
 const char* fiodGetPrepath(void)
 {
 	return(DataPath);
@@ -521,12 +554,19 @@ const char* fiodGetPrepath(void)
 #ifndef LIMITED_FIO
 void fiodSetPrepath(char* newpath)
 {
-	if (newpath == nullptr)
+	if (newpath == nullptr) {
+        if (OriginalPrepath) {
+        	strlcpy(DataPath, OriginalPrepath, sizeof(DataPath));
+        }
 		return;
+    }
+    if (!OriginalPrepath) {
+        OriginalPrepath = strdup(DataPath);
+    }
 #if platBuild == TEUL_SERVER
-		cv_dataDir.SetString(newPath);
+    cv_dataDir.SetString(newPath);
 #else
-		strncpy(DataPath, newpath, sizeof(DataPath));
+    strlcpy(DataPath, newpath, sizeof(DataPath));
 #endif
 }
 #endif
@@ -848,115 +888,49 @@ void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFilesI
 	*numFilesInDir = numFiles;
 	SetCurrentDirectoryA(curWorkingDir);
 }
-#endif // platOS == OS_WIN32
 
-#if platOS == OS_MACOS
+#else
+
+static int fiodGetDirListFilter(const struct dirent *ent)
+{
+    return ent->d_type == DT_REG;
+}
+
 void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFilesInDir)
 {
-	DIR* dir;
-	struct dirent* ent;
-	int i;
-	SCHAR* fileName;
-	SCHAR** list;
-	int numFiles = 0;
-	SCHAR newWorkingDir[MAX_PATH];
-	SCHAR filePath[MAX_PATH];
-	struct stat st;
-
-	if (numFilesInDir == nullptr || fileList == nullptr)
+	if (numFilesInDir == nullptr || fileList == nullptr) {
 		return;
-
-	if (dirToSearch == nullptr)
-		sprintf(newWorkingDir, "%s", ".\\");
-	else
-		sprintf(newWorkingDir, "%s", dirToSearch);
-	dir = opendir(os_file_path(newWorkingDir));
-	if (dir == nullptr)
-		return;
-
-// Get number of files in directory
-	while ((ent = readdir(dir)) != nullptr)
-	{
-		sprintf(filePath, "%s%s%s",newWorkingDir, macFileSeparator(), ent->d_name);
-		if(!stat(os_file_path(filePath), &st) && S_ISREG(st.st_mode))
-			numFiles++;
-	}
-	rewinddir(dir);
-
-	if (numFiles == 0)
-		return;
-
-	list = (SCHAR **)memAlloc(sizeof(SCHAR*) * numFiles);
-
-	// If no memory then stop and return
-	//  Rick, Do you want to do more?
-	if (PN_UNLIKELY(list == nullptr))
-	{
-		return;
-	}
-
-// Add filenames
-	for(i = 0; i < numFiles;)
-	{
-		ent = readdir(dir);
-		if (ent == nullptr) break;
-
-		sprintf(filePath, "%s%s%s",newWorkingDir, macFileSeparator(), ent->d_name);
-		if(!stat(os_file_path(filePath), &st) && S_ISREG(st.st_mode))
-		{
-			fileName = (SCHAR*)memAlloc(strlen(ent->d_name) + 1);
-			// If no memory then stop and return
-			//  Rick, Do you want to do more?
-			if (PN_UNLIKELY(fileName == nullptr))
-			{
-				return;
-			}
-			strcpy(fileName, ent->d_name);
-			list[i] = fileName;
-			i++;
-		}
-	}
-
-	closedir(dir);
-
-	*fileList = list;
-	*numFilesInDir = numFiles;
+    }
+    
+    char *truepath = realpath(safe_os_file_path<char>(dirToSearch ?: ".").c_str(), nullptr);
+    struct dirent **entries = nullptr;
+    int nentries = 0;
+    
+    nentries = scandir(truepath, &entries, fiodGetDirListFilter, nullptr);
+    free(truepath);
+    if (nentries < 0) {
+        *fileList = nullptr;
+        *numFilesInDir = 0;
+        return;
+    }
+    
+    SCHAR **resultList = static_cast<SCHAR **>(calloc(static_cast<size_t>(nentries), sizeof(SCHAR *)));
+    
+    *numFilesInDir = nentries;
+    while (nentries--) {
+        if (asprintf(&resultList[nentries], "%s\\%s", dirToSearch, entries[nentries]->d_name) < 0) {
+            *fileList = nullptr;
+            *numFilesInDir = 0;
+            return;
+        }
+        free(entries[nentries]);
+    }
+    free(entries);
+    *fileList = resultList;
 }
+    
 #endif
 
-
-/************************************************************************************************
-	os_file_path
-*************************************************************************************************/
-
-#ifndef LIMITED_FIO
-static char* os_file_path(char* path)
-{
-	char* s = path;
-	for(;*s;s++)
-	{
-		if(*s == CHANGE_SEP)
-			*s = OS_SEP;
-	}
-
-	return path;
-}
-
-#if platBuild == TEUL_CLIENT && platOS == OS_WIN32
-static wchar_t* os_file_path(wchar_t* path)
-{
-	wchar_t* s = path;
-	for(;*s;s++)
-	{
-		if(*s == WCHANGE_SEP)
-			*s = WOS_SEP;
-	}
-
-	return path;
-}
-#endif
-
-#endif
 
 #if platOS == OS_MACOS
 
@@ -1053,7 +1027,7 @@ void fiocfgMkDir(const char* path, bool userdir)
 
 	if(userdir)
 	{
-		fiodSetPrepath(PREPATH);
+		fiodSetPrepath(nullptr);
 	}
 }
 

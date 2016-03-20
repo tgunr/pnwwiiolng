@@ -53,8 +53,7 @@ void sysmainCommandLine(int argc, char** argv)
 }
 
 static size_t frames = 0;
-
-pthread_t mainthread = NULL;
+static pthread_t mainthread = NULL;
 
 int sysmain()
 {	 
@@ -147,7 +146,6 @@ int sysmainInitApp()
 	memInit();
 
     fioSet(WantDataDir ? ISDIRECTORY : ISARCHIVE);
-	fiodSetPrepath(PREPATH);		
 
 	if(!WantDataDir)
 		sysmainAddArchives();
