@@ -4050,6 +4050,76 @@
 			};
 			name = Debug;
 		};
+		752429121C9F103A00CF8D78 /* Local */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = YES;
+				ARCHS = "$(ARCHS_STANDARD_32_BIT)";
+				DEPLOYMENT_POSTPROCESSING = YES;
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.9;
+				OBJROOT = proj/mac/build;
+				OTHER_LDFLAGS = "-bind_at_load";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				SYMROOT = proj/mac/build;
+				VALID_ARCHS = i386;
+			};
+			name = Local;
+		};
+		752429131C9F103A00CF8D78 /* Local */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				GCC_PREFIX_HEADER = src/sysmac/syscfg.h;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(WW2_DEFINES_$(CONFIGURATION))",
+					AIMING_WEAPONS,
+				);
+				INFOPLIST_FILE = proj/mac/Info.plist;
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)/lib/mac",
+				);
+				MACH_O_TYPE = mh_execute;
+				PRODUCT_BUNDLE_IDENTIFIER = com.playnet.wwiiol;
+				PRODUCT_NAME = "World War II Online";
+				WRAPPER_EXTENSION = app;
+			};
+			name = Local;
+		};
+		752429141C9F103A00CF8D78 /* Local */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				GCC_PRECOMPILE_PREFIX_HEADER = YES;
+				GCC_PREFIX_HEADER = src/teul/syscfg.h;
+				MACH_O_TYPE = staticlib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Local;
+		};
+		752429151C9F103A00CF8D78 /* Local */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				MACH_O_TYPE = staticlib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Local;
+		};
+		752429161C9F103A00CF8D78 /* Local */ = {
+			isa = XCBuildConfiguration;
+			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
+			buildSettings = {
+				MACH_O_TYPE = staticlib;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Local;
+		};
 		E97C76391C8513EB00875F44 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */;
@@ -4141,6 +4211,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				085BD0D0110F5D5C0063F377 /* Debug */,
+				752429151C9F103A00CF8D78 /* Local */,
 				FA3D8BB51C8BF6D6002C5119 /* Development */,
 				085BD0CC110F5D560063F377 /* Release */,
 			);
@@ -4151,6 +4222,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				085BD0CE110F5D5C0063F377 /* Debug */,
+				752429131C9F103A00CF8D78 /* Local */,
 				FA3D8BB31C8BF6D6002C5119 /* Development */,
 				085BD0CA110F5D560063F377 /* Release */,
 			);
@@ -4161,6 +4233,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				085BD0CD110F5D5C0063F377 /* Debug */,
+				752429121C9F103A00CF8D78 /* Local */,
 				FA3D8BB21C8BF6D6002C5119 /* Development */,
 				085BD0C9110F5D560063F377 /* Release */,
 			);
@@ -4171,6 +4244,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				085BD0CF110F5D5C0063F377 /* Debug */,
+				752429141C9F103A00CF8D78 /* Local */,
 				FA3D8BB41C8BF6D6002C5119 /* Development */,
 				085BD0CB110F5D560063F377 /* Release */,
 			);
@@ -4181,6 +4255,7 @@
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				E97C76391C8513EB00875F44 /* Debug */,
+				752429161C9F103A00CF8D78 /* Local */,
 				FA3D8BB61C8BF6D6002C5119 /* Development */,
 				E97C763B1C8513EB00875F44 /* Release */,
 			);
