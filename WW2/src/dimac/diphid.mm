@@ -537,28 +537,12 @@ LOGICAL dipSetupMouse(void)
 	return TRUE;
 }
 
-void checkIfInFront();
 void checkIfInFront()
 {
-	ProcessSerialNumber cur, front;
-	Boolean isFront;
-	
-	GetCurrentProcess(&cur);
-	GetFrontProcess(&front);
-	
-	SameProcess(&cur, &front, &isFront);
-  
-  if ( appHidden && isFront )
-  {
-    //printf("front\n");
-    lastmouseinit = FALSE;
-  }
-  if ( !appHidden && !isFront )
-  {
-    //printf("back\n");
-  }
-  
-  appHidden = !isFront;
+    appHidden = NSApp.hidden;
+    if (appHidden) {
+        lastmouseinit = FALSE;
+    }
 }
 
 LOGICAL dipGetKeyboardState(size_t bufsize, char * buffer)
