@@ -907,10 +907,10 @@ void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFilesI
     int nentries = 0;
     
     nentries = scandir(truepath, &entries, fiodGetDirListFilter, nullptr);
-    free(truepath);
     if (nentries < 0) {
         *fileList = nullptr;
         *numFilesInDir = 0;
+        free(truepath);
         return;
     }
     
@@ -918,14 +918,22 @@ void fiodGetDirFileList(SCHAR* dirToSearch, SCHAR*** fileList, SINT32* numFilesI
     
     *numFilesInDir = nentries;
     while (nentries--) {
-        if (asprintf(&resultList[nentries], "%s\\%s", dirToSearch, entries[nentries]->d_name) < 0) {
+// Hack.
+#if platOS == OS_WIN32
+const char sep = '\\';
+#else
+const char sep = '/';
+#endif
+        if (asprintf(&resultList[nentries], "%s%c%s", truepath, sep, entries[nentries]->d_name) < 0) {
             *fileList = nullptr;
             *numFilesInDir = 0;
+            free(truepath);
             return;
         }
         free(entries[nentries]);
     }
     free(entries);
+    free(truepath);
     *fileList = resultList;
 }
     
