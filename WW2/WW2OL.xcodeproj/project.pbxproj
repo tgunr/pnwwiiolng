@@ -11,7 +11,7 @@
 		080C7EA31062F13E000A242F /* clientGlobals.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 0863B36E10619D66005FDF19 /* clientGlobals.cpp */; };
 		080C7EA41062F147000A242F /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 08104D52103DFBE90065E0E2 /* main.m */; };
 		080C7EA61062F161000A242F /* WW2AppDelegate.mm in Sources */ = {isa = PBXBuildFile; fileRef = 08104D60103DFBE90065E0E2 /* WW2AppDelegate.mm */; };
-		080C7EA71062F16F000A242F /* dpp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 081048DD103DCFA30065E0E2 /* dpp.mm */; };
+		080C7EA71062F16F000A242F /* ddp.mm in Sources */ = {isa = PBXBuildFile; fileRef = 081048DD103DCFA30065E0E2 /* ddp.mm */; };
 		080C7EA81062F17E000A242F /* diphid.mm in Sources */ = {isa = PBXBuildFile; fileRef = 081048E2103DCFBD0065E0E2 /* diphid.mm */; };
 		080D1E091404397100ECCF00 /* teulPacket.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 080D1E071404397100ECCF00 /* teulPacket.cpp */; };
 		080D1E0A1404397100ECCF00 /* teulPacket.h in Headers */ = {isa = PBXBuildFile; fileRef = 080D1E081404397100ECCF00 /* teulPacket.h */; };
@@ -633,7 +633,7 @@
 		081048CE103DCF340065E0E2 /* commTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = commTypes.h; sourceTree = "<group>"; };
 		081048D6103DCF7F0065E0E2 /* dbug.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dbug.h; sourceTree = "<group>"; };
 		081048DC103DCFA30065E0E2 /* ddp.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ddp.h; sourceTree = "<group>"; };
-		081048DD103DCFA30065E0E2 /* dpp.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = dpp.mm; sourceTree = "<group>"; };
+		081048DD103DCFA30065E0E2 /* ddp.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = ddp.mm; sourceTree = "<group>"; };
 		081048E0103DCFBD0065E0E2 /* dimain.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dimain.h; sourceTree = "<group>"; };
 		081048E1103DCFBD0065E0E2 /* dip.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = dip.h; sourceTree = "<group>"; };
 		081048E2103DCFBD0065E0E2 /* diphid.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = diphid.mm; sourceTree = "<group>"; };
@@ -1735,7 +1735,7 @@
 			isa = PBXGroup;
 			children = (
 				081048DC103DCFA30065E0E2 /* ddp.h */,
-				081048DD103DCFA30065E0E2 /* dpp.mm */,
+				081048DD103DCFA30065E0E2 /* ddp.mm */,
 			);
 			path = ddmac;
 			sourceTree = "<group>";
@@ -3433,7 +3433,7 @@
 				080C7EA41062F147000A242F /* main.m in Sources */,
 				080C7EA61062F161000A242F /* WW2AppDelegate.mm in Sources */,
 				E97C76251C84C0EE00875F44 /* sysMacCompat.mm in Sources */,
-				080C7EA71062F16F000A242F /* dpp.mm in Sources */,
+				080C7EA71062F16F000A242F /* ddp.mm in Sources */,
 				080C7EA81062F17E000A242F /* diphid.mm in Sources */,
 				E97C76151C848E3100875F44 /* CABufferList.cpp in Sources */,
 				E97C76161C848E3600875F44 /* CADebugger.cpp in Sources */,
