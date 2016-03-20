@@ -35,7 +35,6 @@ typedef UINT32 DWORD;
 #define min(a,b)  ({ __typeof__((a)) __a = (a); __typeof__((b)) __b = (b); __a < __b ? __a : __b; })
 #endif
 
-void MacVideoInitializationFailed(const char* problem);
 static inline int wstrncasecmp(const wchar_t* ws1, const wchar_t* ws2, int n) { return wcsncasecmp(ws1, ws2, n); }
 static inline int wstrcasecmp(const wchar_t* ws1, const wchar_t* ws2) { return wcscasecmp(ws1, ws2); }
 
@@ -44,19 +43,17 @@ extern "C"
 {
 #endif
 
+extern void MacVideoInitializationFailed(const char* problem);
 
-unsigned long GetTickCount(void);
-void chAppDir();
-const char* macPreferencesPath();
-const char* macFileSeparator();
-const char* GetCommandLine();
+extern void chAppDir();
+extern const char *macPreferencesPath();
 
-void SetMouseScalingEnabled(int enabled);
-
-SINT32 GetMicroSeconds(void);
-DWORD GetMillisecondTick();
 extern void SetCommandLine(int argc, const char** argv);
+extern const char *GetCommandLine();
 
+extern SINT32 GetMicroSeconds(void);
+extern DWORD GetMillisecondTick();
+extern unsigned long timeGetTime(void);
 
 #ifdef __cplusplus
 }
