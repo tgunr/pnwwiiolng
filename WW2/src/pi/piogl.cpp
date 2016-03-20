@@ -622,11 +622,6 @@ SINT32 piGetWidth(void)
 	return(ddpGetWidth());
 }
 
-SINT32 piGetBPP(void)
-{
-	return(ddpGetBPP());
-}
-
 FLOAT32 piGetFPS(void)
 {
 	return(ddpGetFPS());
@@ -660,11 +655,6 @@ UINT32 piCapture(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZero)
 	}
 
 	return 1;
-}
-
-LOGICAL piUpdate(void)
-{
-	return(ddpUpdate());
 }
 
 LOGICAL piFlip(void)

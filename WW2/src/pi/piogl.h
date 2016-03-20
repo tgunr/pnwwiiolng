@@ -1434,7 +1434,6 @@ extern LOGICAL piEndScene(void);
 extern void piSetRenderState(int StateType, UINT32 State);
 extern LOGICAL piDisplayRenderStates(void);
 extern LOGICAL piSetLightState(SINT32 lightnum, UINT32 State);
-extern LOGICAL	piUpdate(void);
 extern LOGICAL	piFlip(void);
 extern LOGICAL	piSetDDRender(SYS_DDRENDERFUNC newfunc);
 extern LOGICAL	piSetD3DRender(SYS_D3DRENDERFUNC newfunc);
@@ -1462,7 +1461,6 @@ extern SINT32 piGetNewTextureID();
 extern SINT32 piGetTotalPaints(void);
 extern SINT32 piGetHeight(void);
 extern SINT32 piGetWidth(void);
-extern SINT32 piGetBPP(void);
 extern SINT32 piGetNumberVertices(void);
 extern SINT32 piGetNamedTexture(const char* name);
 extern SINT32 piGetTextureMipmapLevel(SINT32 texid);
@@ -1523,7 +1521,7 @@ extern TEXTURE* piGetTextureData2(SINT32 texid);
 extern TEXTURE3D* piGetTexture3DData(SINT32 texid);
 
 extern void piCloseProgram(void);
-extern NORETURN_FN void piExitProgram(const SINT8* file, SINT32 line, const SINT8* MessageString);
+extern void piExitProgram(const SINT8* file, SINT32 line, const SINT8* MessageString);
 
 extern piMATRIX* piGetTextureMatrix(int unit = 0);
 
