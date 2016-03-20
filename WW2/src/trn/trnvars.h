@@ -4,30 +4,14 @@
 #include "trn/trnldr.h"
 
 // Declared in trnmain.c
-#undef EXTERN
-#ifndef  GLOBALS
-#define EXTERN extern
-#else
-#define EXTERN
-#endif
-
-EXTERN LOGICAL           TerrainLightingUpdate, TerrainStable;
-EXTERN LOGICAL           loading;
-EXTERN SINT8             mapname[64];
-EXTERN SINT32            deftexid, trnlod;
-EXTERN FLOAT32           xstep, ystep, xmult, horizon;
-EXTERN TERRAIN_DETAIL    trndtl[NUM_TERRAIN_RECTANGLES];
-EXTERN INT32VECTOR       WorldOriginOffset; // the current offset from the absolute origin
-EXTERN DEMHDR            hdr;
-EXTERN TRN_OBJECT_NOTIFY creation;
-EXTERN TRN_OBJECT_NOTIFY deletion;
-
-#ifdef GLOBALS
-	EXTERN LOGICAL activeTerrainDetail[NUM_TERRAIN_RECTANGLES] = { FALSE, FALSE, FALSE, FALSE, FALSE,
-	                                                               FALSE,  TRUE,  TRUE,  TRUE, FALSE,
-	                                                               FALSE,  TRUE,  TRUE,  TRUE, FALSE,
-	                                                               FALSE,  TRUE,  TRUE,  TRUE, FALSE,
-	                                                               FALSE, FALSE, FALSE, FALSE, FALSE };
-#else
-	EXTERN LOGICAL activeTerrainDetail[NUM_TERRAIN_RECTANGLES];
-#endif
+extern LOGICAL           TerrainLightingUpdate, TerrainStable;
+extern LOGICAL           loading;
+extern SINT8             mapname[64];
+extern SINT32            deftexid, trnlod;
+extern FLOAT32           xstep, ystep, xmult, horizon;
+extern TERRAIN_DETAIL    trndtl[NUM_TERRAIN_RECTANGLES];
+extern INT32VECTOR       WorldOriginOffset; // the current offset from the absolute origin
+extern DEMHDR            hdr;
+extern TRN_OBJECT_NOTIFY creation;
+extern TRN_OBJECT_NOTIFY deletion;
+extern LOGICAL activeTerrainDetail[NUM_TERRAIN_RECTANGLES];

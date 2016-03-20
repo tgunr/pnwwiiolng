@@ -61,8 +61,6 @@ extern NSString * const PGErrorDomain;
 extern NSString * const PGteulErrorDomain;
 extern NSString * const PGErrorDataKey;
 
-extern bool appHidden;
-
 // PGErrorDomain error code constants
 enum
 {

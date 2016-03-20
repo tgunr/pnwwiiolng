@@ -146,7 +146,6 @@ SINT32 commRecvWorldUpdateData(const SINT32 teulIndex, UCHAR* const data, SINT32
 		return -EINVAL;
 	}
 
-	///TODO: Troy: GLOBALS MUST DIE!
 	// Note: the values are IN the World Update so you could just use that.
 	g_framingMode = wu.header.framingMode;
 	g_hostUpdateInterval = framings[g_framingMode].updateInterval;

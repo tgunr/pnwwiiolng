@@ -222,8 +222,6 @@ static HID_ELEMENT 	_StickElements[MAX_STICK_ELEMENTS];
 static UINT32 		_NumKeyboardElements;
 static HID_ELEMENT 	_KeyboardElements[MAX_KEYBOARD_ELEMENTS];
 
-static UINT32 lastRetry;
-
 static LOGICAL init;
 
 static LOGICAL 	_AddToQueue(UINT32 iac, SINT32 count, LOGICAL state);
@@ -244,9 +242,8 @@ static UINT32 	_vcodeToIAC(UINT32 vcode);
 static const KEYCODE_MAP_ELEM* _lookupElemByASCII(UINT32 ascii);
 static const KEYCODE_MAP_ELEM* _lookupElemByDIK(UINT32 dik);
 
-extern BOOL cursorHidden;
-extern bool appHidden;
-BOOL lastmouseinit = false;
+static bool appHidden = false;
+static bool lastmouseinit = false;
 
 LOGICAL dimainInit(void)
 {

@@ -3,10 +3,7 @@
 
 #ifdef OPENGL3D
 
-#define GLOBALS
 #include "ogl/ogl.h"
-#undef GLOBALS
-
 #include "ddp.h"
 #include "math/math3d.h"
 #include "mem/mem.h"
@@ -40,6 +37,40 @@
 #if platOS == OS_MACOS
 #include <malloc/malloc.h>
 #endif
+/************************
+VARS
+*************************/
+// Variables
+UINT32		gMaxUserClipPlanes;
+FLOAT32		gMaxPointSize;
+SINT32		gMaxLights;
+SINT32		gMaxTextureWidth;
+SINT32		gMaxTextureHeight;
+UINT32		gSquareTextures;
+LOGICAL		gRenderToTexture;
+SINT32		gMaxTextureUnits;
+LOGICAL		gTextureCompression;
+LOGICAL		gMipmapEnable;
+
+// Supported blend mode flags
+UINT32		gSupportedDstBlendModes;
+UINT32		gSupportedSrcBlendModes;
+
+// Compression function flags
+LOGICAL		gSupportDXT1;
+LOGICAL		gSupportDXT1A;
+LOGICAL		gSupportDXT3;
+LOGICAL		gSupportDXT5;
+
+// OpenGL major and minor version information
+UINT32		gOpenGLMajorVersion;
+UINT32		gOpenGLMinorVersion;
+
+// Swap interval functionality
+UINT32		gSupportSwapInterval;
+/************************
+END VARS
+*************************/
 
 enum
 {

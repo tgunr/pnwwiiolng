@@ -1,37 +1,30 @@
 #pragma once
 
-#undef EXTERN
-#ifdef GLOBALS
-	#define EXTERN
-#else
-	#define EXTERN	extern
-#endif
-
 // Variables
-EXTERN UINT32		gMaxUserClipPlanes;
-EXTERN FLOAT32		gMaxPointSize;
-EXTERN SINT32		gMaxLights;
-EXTERN SINT32		gMaxTextureWidth;
-EXTERN SINT32		gMaxTextureHeight;
-EXTERN UINT32		gSquareTextures;
-EXTERN LOGICAL		gRenderToTexture;
-EXTERN SINT32		gMaxTextureUnits;
-EXTERN LOGICAL		gTextureCompression;
-EXTERN LOGICAL		gMipmapEnable;
+extern UINT32		gMaxUserClipPlanes;
+extern FLOAT32		gMaxPointSize;
+extern SINT32		gMaxLights;
+extern SINT32		gMaxTextureWidth;
+extern SINT32		gMaxTextureHeight;
+extern UINT32		gSquareTextures;
+extern LOGICAL		gRenderToTexture;
+extern SINT32		gMaxTextureUnits;
+extern LOGICAL		gTextureCompression;
+extern LOGICAL		gMipmapEnable;
 
 // Supported blend mode flags
-EXTERN UINT32		gSupportedDstBlendModes;
-EXTERN UINT32		gSupportedSrcBlendModes;
+extern UINT32		gSupportedDstBlendModes;
+extern UINT32		gSupportedSrcBlendModes;
 
 // Compression function flags
-EXTERN LOGICAL		gSupportDXT1;
-EXTERN LOGICAL		gSupportDXT1A;
-EXTERN LOGICAL		gSupportDXT3;
-EXTERN LOGICAL		gSupportDXT5;
+extern LOGICAL		gSupportDXT1;
+extern LOGICAL		gSupportDXT1A;
+extern LOGICAL		gSupportDXT3;
+extern LOGICAL		gSupportDXT5;
 
 // OpenGL major and minor version information
-EXTERN UINT32		gOpenGLMajorVersion;
-EXTERN UINT32		gOpenGLMinorVersion;
+extern UINT32		gOpenGLMajorVersion;
+extern UINT32		gOpenGLMinorVersion;
 
 // Swap interval functionality
-EXTERN UINT32		gSupportSwapInterval;
+extern UINT32		gSupportSwapInterval;

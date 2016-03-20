@@ -18,9 +18,7 @@
 #include "osg/osgGame.h"
 #endif
 
-#define GLOBALS
-#include "include/vars.h"
-#undef GLOBALS
+//const SINT8 Copyright[] = "Copyright 2016 Playnet, Inc. All Rights Reserved";
 
 void sysmainAddArchives();
 static int sysmainInitApp();

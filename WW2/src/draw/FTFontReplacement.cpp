@@ -322,10 +322,6 @@ float FTFontWestern::Advance(const wchar_t* str)
 }
 // ------------------------------------------------------------------
 
-#if platOS == OS_MACOS
-extern pthread_t mainthread;
-#endif
-
 #define ALT_DRAW_TEXT
 
 typedef struct FLPoint { float x,y; } FLPoint;

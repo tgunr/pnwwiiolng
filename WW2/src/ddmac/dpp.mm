@@ -7,8 +7,6 @@
 #import <Cocoa/Cocoa.h>
 #include "endianess.h"
 
-EXTERN SINT32           ft10msticks;
-
 // CGLDescribeRenderer
 
 CGLContextObj cgl_ctx;
@@ -51,6 +49,8 @@ static NSOpenGLPixelFormatAttribute fullScreenAttrs[] =
 	BASE_GL_ATTRIBUTES,
 	FULLSCREEN_GL_ATTRIBUTES,
 	0,0xffffffff
+LOGICAL cursorHidden = false;
+
 };
 
 static NSOpenGLPixelFormatAttribute windowedAttrs[] = 

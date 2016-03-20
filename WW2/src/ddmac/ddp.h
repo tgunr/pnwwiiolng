@@ -3,6 +3,8 @@
 typedef LOGICAL (*DDWND_DDRENDERFUNC)(void);
 typedef LOGICAL (*DDWND_D3DRENDERFUNC)(void);
 
+extern LOGICAL cursorHidden;
+
 #ifdef __cplusplus
 extern "C"
 {

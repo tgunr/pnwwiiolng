@@ -44,10 +44,7 @@
 #include "trn/speedgrass.h"
 #include "trn/trnRadClutter.h"
 #include "sdm/StratDB.h"
-
-#define GLOBALS
 #include "trn/trnvars.h"
-#undef GLOBALS
 
 #ifdef SPATIAL_DB
 #include "SpatialDB.h"
@@ -66,6 +63,28 @@
 #endif
 
 #include "wwii/wwiiCovert.h"
+
+/***********
+START VARS
+***********/
+LOGICAL           TerrainLightingUpdate, TerrainStable;
+LOGICAL           loading;
+SINT8             mapname[64];
+SINT32            deftexid, trnlod;
+FLOAT32           xstep, ystep, xmult, horizon;
+TERRAIN_DETAIL    trndtl[NUM_TERRAIN_RECTANGLES];
+INT32VECTOR       WorldOriginOffset; // the current offset from the absolute origin
+DEMHDR            hdr;
+TRN_OBJECT_NOTIFY creation;
+TRN_OBJECT_NOTIFY deletion;
+LOGICAL activeTerrainDetail[NUM_TERRAIN_RECTANGLES] = { FALSE, FALSE, FALSE, FALSE, FALSE,
+                                                        FALSE,  TRUE,  TRUE,  TRUE, FALSE,
+                                                        FALSE,  TRUE,  TRUE,  TRUE, FALSE,
+                                                        FALSE,  TRUE,  TRUE,  TRUE, FALSE,
+                                                        FALSE, FALSE, FALSE, FALSE, FALSE };
+/***********
+END VARS
+***********/
 
 static Covert<LOGICAL> g_trnmainDraw = TRUE;
 static Covert<LOGICAL> g_drawOctetTriangles = FALSE;

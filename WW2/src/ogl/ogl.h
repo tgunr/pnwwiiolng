@@ -23,13 +23,6 @@
 
 #define MAX_TEXTURE_UNITS   7
 
-#undef EXTERN
-#ifndef  GLOBALS
-	#define EXTERN extern
-#else
-	#define EXTERN
-#endif
-
 	// Module specific variables
 	#include "ogl/oglvars.h"
 
