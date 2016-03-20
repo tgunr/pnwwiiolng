@@ -8,7 +8,7 @@ static inline bool dipKEYDOWN(const char *buffer, UINT8 key) { return (buffer[ke
 
 // macintosh virtual key definitions
 // from inside mac vol 5
-// REPLACED with definitions from Carbon/HIToolbox.h - Gadget
+// REPLACED with definitions from HIToolbox/Events.h - Gadget
 enum {
     DIK_A                    = 0x00,
     DIK_S                    = 0x01,
@@ -175,6 +175,7 @@ enum {
     DIK_APOSTROPHE = DIK_QUOTE,
     DIK_LCOMMAND = DIK_COMMAND,
     DIK_RCOMMAND = DIK_COMMAND,
+    DIK_ENTER = 0x34, // not in the Carbon headers
 };
 
 #ifdef __cplusplus
