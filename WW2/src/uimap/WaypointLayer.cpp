@@ -322,7 +322,7 @@ void WaypointMapObject::DrawSelf(SuperCellMapView* mv)
 			{
 				UINT32 color = (_waypoint.type() == WPT_FAI) ?
 									gIconFriendlyColor:
-									gIconEnemyColor;
+									colorORANGE;
 
 				float r = piRGBA_GETRED(color)/(float)0xff;
 				float g = piRGBA_GETGREEN(color)/(float)0xff;
