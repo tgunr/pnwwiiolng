@@ -197,4 +197,3 @@ int dipHasMouse(void);
 #ifdef __cplusplus
 }
 #endif
-
