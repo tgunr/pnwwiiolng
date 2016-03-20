@@ -331,7 +331,7 @@ static NSString *placeholderHTML = @""
         case 0: { // loaded the static placeholder
             staticLoadState = 1;
             
-            NSURLRequest *playnetHome = [NSURLRequest requestWithURL:[NSURL URLWithString:@"https://webmap.wwiionline.com/"]];
+            NSURLRequest *playnetHome = [NSURLRequest requestWithURL:[NSURL URLWithString:@"http://www.wwiionline.com/pgservers.html"]];
 
             ((void (*)(id, SEL, NSURLRequest *))objc_msgSend)(frame, @selector(loadRequest:), playnetHome);
             break;
@@ -354,7 +354,11 @@ extern NSString *WebActionOriginalURLKey;
 - (void)webView:(id)webView decidePolicyForNavigationAction:(NSDictionary *)actionInformation
         request:(NSURLRequest *)request frame:(id)frame decisionListener:(id)listener
 {
-    if (staticLoadState > 0 && ![request.URL.host isEqualToString:@"webmap.wwiionline.com"]) {
+    if (staticLoadState > 0 &&
+        ![request.URL.host isEqualToString:@"www.wwiionline.com"] &&
+        ![request.URL.host isEqualToString:@"www.battlegroundeurope.com"] &&
+        ![request.URL.host isEqualToString:@"www.battlegroundeurope.net"]
+    ) {
         // Note: The use of a separate variable here is not simply for
         // verbosity; the openURL method of NSWorkspace is marked _Nonnull, and
         // a dictionary returns _Nullable pointers. Thus the check is necessary
