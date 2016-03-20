@@ -10,9 +10,14 @@ typedef UINT32 DWORD;
 
 #define _isnan std::isnan
 #define _finite std::isfinite
-#define stricmp strcmpi
-#define _stricmp strcmpi
-#define timeGetTime GetTickCount
+
+// TODO: Why are there so many different names for this?
+#define stricmp strcasecmp
+#define _stricmp strcasecmp
+#define strcmpi strcasecmp
+#define strnicmp strncasecmp
+
+// TODO: REVIEW ALL USES OF THESE VERY UNSAFE FUNCTIONS
 #define lstrcpy strcpy
 #define lstrcat strcat
 #define lstrlen strlen
@@ -29,8 +34,6 @@ typedef UINT32 DWORD;
 #define max(a,b)  ({ __typeof__((a)) __a = (a); __typeof__((b)) __b = (b); __a > __b ? __a : __b; })
 #define min(a,b)  ({ __typeof__((a)) __a = (a); __typeof__((b)) __b = (b); __a < __b ? __a : __b; })
 #endif
-
-#define _T(__t_string__) L##__t_string__
 
 void MacVideoInitializationFailed(const char* problem);
 static inline int wstrncasecmp(const wchar_t* ws1, const wchar_t* ws2, int n) { return wcsncasecmp(ws1, ws2, n); }

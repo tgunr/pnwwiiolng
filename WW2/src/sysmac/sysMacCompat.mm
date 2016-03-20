@@ -76,19 +76,6 @@ void chAppDir()
     chdir([[[NSBundle mainBundle].executablePath stringByDeletingLastPathComponent] stringByAppendingPathComponent:@"AppData"].fileSystemRepresentation);
 }
 
-char* getPrePath()
-{
-  static char* thepath = 0;
-  
-  if ( thepath == 0 )
-  {
-//    NSString* wd = [[NSFileManager defaultManager]currentDirectoryPath];
-    
-//    thepath = "\\Users\\ahwulf\\XCode\\data131\\ww2mods\\DATA\\";
-//      thepath = ".\\Data\\"; // put symnbolic link with this name pointing to the data directory in AppData
-    return DataPath;
-  }
-  return thepath;
 }
 
 /************************************************************************************************
