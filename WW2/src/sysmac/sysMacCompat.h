@@ -19,10 +19,6 @@ typedef UINT32 DWORD;
 #define lstrcpyn strncpy
 #define lstrcmp strcmp
 #define wsprintf swprintf
-#define MAKELONG(a,b) (((b) << 16) | (a & 0xffff))
-#define HIWORD HiWord
-#define LOWORD LoWord
-
 
 #define _MAX_PATH PATH_MAX
 #define MAX_PATH _MAX_PATH
@@ -33,26 +29,19 @@ typedef UINT32 DWORD;
 #define max(a,b)  ({ __typeof__((a)) __a = (a); __typeof__((b)) __b = (b); __a > __b ? __a : __b; })
 #define min(a,b)  ({ __typeof__((a)) __a = (a); __typeof__((b)) __b = (b); __a < __b ? __a : __b; })
 #endif
-#endif
 
 #define _T(__t_string__) L##__t_string__
 
 void MacVideoInitializationFailed(const char* problem);
+static inline int wstrncasecmp(const wchar_t* ws1, const wchar_t* ws2, int n) { return wcsncasecmp(ws1, ws2, n); }
+static inline int wstrcasecmp(const wchar_t* ws1, const wchar_t* ws2) { return wcscasecmp(ws1, ws2); }
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-#ifdef _MSL_USING_MW_C_HEADERS
-int isascii(int c);
-void* memccpy(void* dst, const void* src, int c, size_t len);
-#endif
 
-char* strupr(char* string);
-char* strlwr(char* string);
-#define strcmpi strcasecmp
-#define strnicmp strncasecmp
 unsigned long GetTickCount(void);
 void chAppDir();
 const char* macPreferencesPath();
@@ -60,14 +49,11 @@ const char* macFileSeparator();
 void SetCommandLine(int argc, char** argv);
 const char* GetCommandLine();
 
-int wstrncasecmp(const wchar_t* ws1, const wchar_t* ws2, int n);
-int wstrcasecmp(const wchar_t* ws1, const wchar_t* ws2);
 void SetMouseScalingEnabled(int enabled);
 
 SINT32 GetMicroSeconds(void);
 DWORD GetMillisecondTick();
 
-char* getPrePath();
 
 #ifdef __cplusplus
 }

@@ -491,6 +491,35 @@ void logInitProfiling(const char* const profileName, FLOAT32 profilingDuration)
 	profilingStream << std::fixed << std::setprecision(3);
 }
 
+// The sysctl() call is mostly gone on Linux; on OS X it's the easiest way without pulling in Foundation
+#if platOS == OS_MACOS
+#include <sys/sysctl.h>
+
+enum class sctyp { tstr, ti32, ti32x, ti64, ti64x };
+static std::string to_stringx(int32_t v) { char s[32] = {0}; snprintf(s, 31, "%x", v); return std::string{ s }; }
+static std::string to_stringx(int64_t v) { char s[32] = {0}; snprintf(s, 31, "%jx", v); return std::string{ s }; }
+static std::string sysctlString(const std::string &name, sctyp datatype)
+{
+    std::unique_ptr<char[]> buf;
+    size_t sz = 0;
+    
+    if (sysctlbyname(name.c_str(), nullptr, &sz, nullptr, 0) != 0) {
+        return "<ERROR>";
+    }
+    buf = std::make_unique<char[]>(sz);
+    if (sysctlbyname(name.c_str(), buf.get(), &sz, nullptr, 0) != 0) {
+        return "<ERROR>";
+    }
+    switch (datatype) {
+        case sctyp::tstr: return std::string{ buf.get(), sz };
+        case sctyp::ti32: return std::to_string(*reinterpret_cast<int32_t *>(buf.get()));
+        case sctyp::ti32x: return to_stringx(*reinterpret_cast<int32_t *>(buf.get()));
+        case sctyp::ti64: return std::to_string(*reinterpret_cast<int64_t *>(buf.get()));
+        case sctyp::ti64x: return to_stringx(*reinterpret_cast<int64_t *>(buf.get()));
+    }
+    __builtin_unreachable();
+}
+#endif
 
 // Return a string describing characteristics of the user's system
 static void _getSystemDetails(char* into, size_t sizeofInto)
@@ -513,17 +542,18 @@ static void _getSystemDetails(char* into, size_t sizeofInto)
 	snprintf(into, sizeofInto - 1, "Win %u %x %u %s", sysInfo.dwNumberOfProcessors, cpuFlags, cpuMhz, UTF8(cpuName));
 
 	///TODO: Would be /really/ nice to add total memory and graphics card data.
-#elif platOS == OS_MACOS || platOS == OS_MACOSX
-
-	strncpy(into, "Mac", sizeofInto - 1);
-
+#elif platOS == OS_MACOS
+    snprintf(into, sizeofInto - 1, "Mac %s %s %s %s %s",
+        sysctlString("hw.ncpu", sctyp::ti32).c_str(),
+        sysctlString("machdep.cpu.feature_bits", sctyp::ti64x).c_str(), // This value isn't really very useful, this is bad even in the Windows version
+        sysctlString("hw.cpufrequency", sctyp::ti64).c_str(),
+        sysctlString("machdep.cpu.brand_string", sctyp::tstr).c_str(),
+        sysctlString("hw.memsize", sctyp::ti64).c_str()
+    );
 #else
-
-	strncpy(into, "Unknown", sizeofInto - 1);
-
+	strlcpy(into, "Linux <unimplemented>", sizeofInto);
 #endif
-
-	// snprintf/strncpy don't guarantee a null terminator
+	// snprintf doesn't guarantee a null terminator
 	into[sizeofInto - 1] = 0;
 }
 
@@ -601,9 +631,7 @@ void logUpdateProfiling()
 #endif // #ifdef OS_WIN32
 
 		profilingStream << std::endl;
-#if platOS == OS_WIN32
 		profilingStream.imbue(std::locale("US"));
-#endif
 		profilingStream << "Peak memory usage during profiling: " << processPeakMemoryUsage << " Bytes";
 		profilingStream << std::endl;	profilingStream << std::endl;
 		profilingStream << frameTimesString.str();
