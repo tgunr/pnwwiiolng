@@ -186,6 +186,7 @@ _openDbugFile(const char* const srcFile_)
 
 	_qualifyFilename(srcFile_, filename, sizeof(filename));
 
+#if !defined(DEV_BUILD) || platOS != OS_MACOS
 	if (PN_UNLIKELY(srcFile_ != nullptr))
 	{
 		int oflags = _O_CREAT|_O_WRONLY|_O_TRUNC;
@@ -214,9 +215,12 @@ _openDbugFile(const char* const srcFile_)
 
 		if ( file >= 0 )
 			_fileSize += OS_WRITE(file, _OPEN_MSG, sizeof(_OPEN_MSG) - 1);
-	}
-	else
+	} else {
 		file = OS_FILENO(stderr);
+    }
+#else
+    file = OS_FILENO(stderr);
+#endif
 
 	return file;
 }
@@ -392,9 +396,12 @@ void dbugInit(SINT32 logType, const char* const filename)
 	level = Debug::ERR_DBUG;
 	g_logDebug = true;
 
-#if platOS != OS_LINUX
-	if ( logType != LOG_OFF)
+#if defined(DEV_BUILD) && platOS == OS_MACOS
+    logType = LOG_TO_FILE;
+#elif platOS != OS_LINUX
+	if ( logType != LOG_OFF) {
 		logType = LOG_TO_FILE;
+    }
 #endif
 
 	switch(logType)

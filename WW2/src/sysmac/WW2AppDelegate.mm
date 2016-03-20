@@ -500,6 +500,8 @@ extern NSString *WebActionOriginalURLKey;
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification
 {
+    dbugInit(LOG_TO_FILE, nullptr);
+
     // Wipe out any storage of insecure user info.
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"WW2OL_UserName"];
     [[NSUserDefaults standardUserDefaults] removeObjectForKey:@"WW2OL_UserPassword"];
