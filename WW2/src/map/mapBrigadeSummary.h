@@ -195,7 +195,7 @@ public:
 	BrigadeSelection() : m_status(BRIG_INVALID), m_detail(0) {}
 
 	// Construct from network object
-	BrigadeSelection(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); };
+	BrigadeSelection(ACTION_OBJECT* const a) { a->offset = packer(TEUL_UNPACK, a); }
 
 	// Network exchange functions
 	SINT32 send(SINT32 teulIndex);
