@@ -1544,6 +1544,7 @@
 		FA3D8BA91C8BF201002C5119 /* SearchPaths.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = SearchPaths.xcconfig; path = proj/mac/SearchPaths.xcconfig; sourceTree = "<group>"; };
 		FA3D8BAA1C8BF201002C5119 /* Warnings.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Warnings.xcconfig; path = proj/mac/Warnings.xcconfig; sourceTree = "<group>"; };
 		FA3D8BAF1C8BF241002C5119 /* BuildSettings.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = BuildSettings.xcconfig; path = proj/mac/BuildSettings.xcconfig; sourceTree = "<group>"; };
+		FA56129A1C9E4E9B001FAFCB /* compiler_check.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = compiler_check.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1913,6 +1914,7 @@
 				081049D6103DD2310065E0E2 /* mobileSpawnEnums.h */,
 				081049DC103DD2310065E0E2 /* systypes.h */,
 				081049DD103DD2310065E0E2 /* vars.h */,
+				FA56129A1C9E4E9B001FAFCB /* compiler_check.h */,
 			);
 			path = include;
 			sourceTree = "<group>";

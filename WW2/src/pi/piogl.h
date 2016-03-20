@@ -114,7 +114,7 @@ static_assert( platBuild != TEUL_SERVER, "Can't include piogl.h in a server buil
 #define piSHADEMODE_DEFAULT               piSHADE_GOURAUD
 
 #define piRENDERSTATE_LINEPATTERN         piRENDERSTATE_LINEPATTERN           // line pattern
-#define piLINEPATTERN_DEFAULT             MAKELONG(0,0)
+#define piLINEPATTERN_DEFAULT             0
 
 #define piRENDERSTATE_MONOENABLE          piRENDERSTATE_MONOENABLE            // enable mono rendering
 #define piMONOENABLE_DEFAULT              FALSE
