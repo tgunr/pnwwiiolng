@@ -145,8 +145,10 @@ void ddpHandleVsync()
     }
 }
 
+/*
 // Used this commit from opensource project as guide for replacing deprecated
-// CoreGraphics functions regarding display modes. - Gadget
+// CoreGraphics functions regarding display modes. Currently unused, but
+// potentially still useful.
 // https://github.com/glfw/glfw/commit/be547da9d2ead0ee17371111a06b85d088ba47a8
 static CGDisplayModeRef CopyBestDisplayMode(CGDirectDisplayID display, int bpp, int width, int height, int refresh)
 {
@@ -200,6 +202,7 @@ static CGDisplayModeRef CopyBestDisplayMode(CGDirectDisplayID display, int bpp, 
     // If there are no matches, return the display's current mode as a fallback.
     return bestMatch ? CGDisplayModeRetain(bestMatch) : CGDisplayCopyDisplayMode(display);
 }
+*/
 
 LOGICAL ddpCreateWnd(int x, int y, int width, int height, int bpp, int fullscreen, UINT32 monitor, int refreshrate)
 {
@@ -211,7 +214,8 @@ LOGICAL ddpCreateWnd(int x, int y, int width, int height, int bpp, int fullscree
     }
     monitor = (CGDirectDisplayID)[[ddpScreen deviceDescription][@"NSScreenNumber"] longValue];
     defaultMode = CGDisplayCopyDisplayMode(monitor);
-    fullScreenMode = CopyBestDisplayMode(monitor, bpp, width, height, refreshrate);
+    // Apple says not to change the display mode. TODO: Make the back buffer differently-sized instead.
+    fullScreenMode = CGDisplayCopyDisplayMode(monitor);// CopyBestDisplayMode(monitor, bpp, width, height, refreshrate);
 
     if (!enableFSAAIfRequested(oglAttributes, monitor)) {
         fprintf(stderr, "Failed to enable FSAA\n");
@@ -226,18 +230,22 @@ LOGICAL ddpCreateWnd(int x, int y, int width, int height, int bpp, int fullscree
         throw "Unable To Allocate OpenGL Window Context";
     }
     
+    fullRect = ddpScreen.frame;
+    winRect = NSMakeRect((ddpScreen.frame.size.width) / 2 - (width / 2), (ddpScreen.frame.size.height) / 2 - (height / 2), width, height);
     if (fullscreen) {
-        winRect = NSMakeRect(0, 0, width, height);
+        ddpRect = fullRect;
     } else {
-        winRect = NSMakeRect((ddpScreen.frame.size.width) / 2 - (width / 2), (ddpScreen.frame.size.height) / 2 - (height / 2), width, height);
+        ddpRect = winRect;
     }
+    ddpRect = winRect;
 
-    ddpWin = [[NSWindow alloc] initWithContentRect:winRect
+    ddpWin = [[NSWindow alloc] initWithContentRect:ddpRect
                                styleMask:fullscreen ? NSBorderlessWindowMask : NSTitledWindowMask
                                backing:NSBackingStoreBuffered
                                defer:NO];
     ddpWin.releasedWhenClosed = NO;
     ddpWin.acceptsMouseMovedEvents = NO;
+    ddpWin.contentView = ddpView;
     nsOpenGlContext = context;
 	ddpSetFullScreen(!!fullscreen);
 	ddpHandleVsync();
@@ -270,7 +278,6 @@ LOGICAL ddpSetD3DRender(DDWND_D3DRENDERFUNC newfunc)
 
 UINT32 ddpEngine(void* param)
 {
-    //	piResetRenderStats();
 	ddpUpdate();
 	return 0;
 }
@@ -444,12 +451,15 @@ LOGICAL	ddpUpdate()
     
 	CGLSetCurrentContext(cgl_ctx);
 	
-	if(ddrenderfunc) ddrenderfunc();
-	if(d3drenderfunc) d3drenderfunc();
+	if (ddrenderfunc) {
+        ddrenderfunc();
+    }
+	if (d3drenderfunc) {
+        d3drenderfunc();
+    }
 
 #ifdef MAKE_HOST_TERRAIN
-    if ( GeneratingHostTerrain )
-    {
+    if (GeneratingHostTerrain) {
         updateGeneratingHostTerrain();
     }
 #endif
@@ -473,44 +483,24 @@ LOGICAL	ddpUpdate()
     
 	ddpFlip();
     
-	if (capture > 0)
-	{
+	if (capture > 0) {
 		if (!ddcapGrabScreen()) {
             dbugLog(_FLN, "Saving screenshot failed");
         }
 		capture--;
 	}
     
-    UINT32 points;
-    UINT32 lines;
-    UINT32 triangles;
-    UINT32 vertices;
+    UINT32 points = 0, lines = 0, triangles = 0, vertices = 0;
     
     piGetRenderStats(&points, &lines, &triangles, &vertices);
-    
     //printf("%8d: %8d %8d %8d %8d\n",totpaints, points,lines,triangles,vertices);
-    
 	return TRUE;
-}
-
-LOGICAL	ddpDrawToScreen(LPVOID lpdds)
-{
-	return FALSE;
 }
 
 void ddpCapture()
 {
-	capture++;
+	++capture;
 }
-
-void ScreenCapture(const char* name, int sx, int sy, int w, int h)
-{
-    @autoreleasepool {
-        ddcapSaveScreenRegion(sx, sy, w, h, @(name));
-    }
-}
-
-#include <Carbon/Carbon.h>
 
 void sysSetMousePosition(int x, int y)
 {
@@ -521,35 +511,30 @@ void sysGetMousePosition(SINT32* x, SINT32* y)
 	if(WantedWindow) {
 		NSPoint pt = [ddpWin mouseLocationOutsideOfEventStream];
 
-		*x = pt.x;
-		*y = ddpRect.size.height - pt.y;
+		*x = static_cast<SINT32>(pt.x);
+		*y = static_cast<SINT32>(ddpRect.size.height - pt.y);
 	} else {
         NSPoint pt = [NSEvent mouseLocation];
 
-		*x = pt.x - ddpRect.origin.x;
-		*y = pt.y - ddpRect.origin.y;
+		*x = static_cast<SINT32>(pt.x - ddpRect.origin.x);
+		*y = static_cast<SINT32>(pt.y - ddpRect.origin.y);
 	}
 }
 
 int ddpGetWidth()
 {
-	return ddpRect.size.width;
+	return static_cast<int>(ddpRect.size.width);
 }
 
 int ddpGetHeight()
 {
-	return ddpRect.size.height;
+	return static_cast<int>(ddpRect.size.height);
 }
 
 void ddpHideApplication()
 {
-	CGReleaseAllDisplays();
-    CGLClearDrawable(cgl_ctx);
-    
-    if (ddpWin) {
-        [ddpWin orderOut:ddpWin];	
-    }
-	[NSApp deactivate];
+	//CGReleaseAllDisplays();
+    //[NSApp deactivate];
 }
 
 void ddpToggleWindowedMode()
@@ -566,7 +551,19 @@ void ddpShowApplication()
 // application is activated or deactivated.
 void ddpSetFullScreen(LOGICAL fullscreen)
 {
-    CGError result = kCGErrorSuccess;
+	WantedWindow = !fullscreen;
+    ddpWin.level = fullscreen ? NSMainMenuWindowLevel + 1 : NSNormalWindowLevel; // per Apple docs
+    ddpWin.hidesOnDeactivate = !!fullscreen;
+    [ddpWin setFrame:fullscreen ? fullRect : winRect display:YES animate:NO];
+    ddpRect = ddpWin.frame;
+    [ddpWin makeKeyAndOrderFront:nil];
+	cgl_ctx = nsOpenGlContext.CGLContextObj;
+    WantedBpp = TexBpp = 32;
+	WantedWidth = static_cast<SINT32>(ddpRect.size.width);
+	WantedHeight = static_cast<SINT32>(ddpRect.size.height);
+	[nsOpenGlContext makeCurrentContext];
+
+    /*CGError result = kCGErrorSuccess;
     bool captureAll = false;
 
     if (!cfgPrefsGetBool("app.capturealldisplays", &captureAll)) {
@@ -574,9 +571,7 @@ void ddpSetFullScreen(LOGICAL fullscreen)
     }
     
     [NSMenu setMenuBarVisible:!fullscreen];
-	WantedWindow = !fullscreen;
-	if (fullscreen)
-	{
+	if (fullscreen) {
         if (captureAll) {
             result = CGCaptureAllDisplaysWithOptions(kCGCaptureNoOptions);
         } else {
@@ -594,28 +589,17 @@ void ddpSetFullScreen(LOGICAL fullscreen)
 		fullRect = NSMakeRect(displayBounds.origin.x,displayBounds.origin.y, displayBounds.size.width, displayBounds.size.height);
         
 		[ddpWin orderOut:ddpWin];
-		[ddpWin setContentView: 0];	
+		[ddpWin setContentView: 0];
 		ddpRect = fullRect;
 		[nsOpenGlContext setFullScreen];
-//		[ddpScreen setFrame: fullRect];
-	}
-    else
-	{
-//		[nsOpenGlContext clearDrawable];
+        [ddpScreen setFrame: fullRect];
+	} else {
+		[nsOpenGlContext clearDrawable];
         result = CGDisplaySetDisplayMode ( displayID, defaultMode, NULL );
 		CGReleaseAllDisplays();
         
 		[ddpWin setContentView: ddpView];
 		[ddpWin makeKeyAndOrderFront:ddpWin];
 		ddpRect = winRect;
-	}
-	cgl_ctx = (CGLContextObj)[nsOpenGlContext CGLContextObj];
-    
-//    CGDisplayModeRef mode;
-//    CFStringRef modeStr = CGDisplayModeCopyPixelEncoding(mode);
-    WantedBpp = TexBpp = 32;
-	WantedWidth = ddpRect.size.width;
-	WantedHeight =  ddpRect.size.height;
-    
-	[nsOpenGlContext makeCurrentContext];
+	}*/
 }

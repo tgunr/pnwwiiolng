@@ -748,6 +748,8 @@ static void realDipSendCocoaKeyboardMouseEvents()
             {
 				if (event.subtype == NSApplicationActivatedEventType) {
 					ddpShowApplication();
+                } else if (event.subtype == NSApplicationDeactivatedEventType) {
+                    ddpHideApplication();
                 }
                 break;
             }

@@ -1437,7 +1437,6 @@ extern LOGICAL piSetLightState(SINT32 lightnum, UINT32 State);
 extern LOGICAL	piFlip(void);
 extern LOGICAL	piSetDDRender(SYS_DDRENDERFUNC newfunc);
 extern LOGICAL	piSetD3DRender(SYS_D3DRENDERFUNC newfunc);
-extern LOGICAL	piDrawToScreen(void*  lpdds);
 extern LOGICAL	piCreateSurface(piSURFACEDESC* lppisd, void** lpdds);
 extern LOGICAL piSetCockpitViewMatrix(piMATRIX* newview);
 extern LOGICAL	piMaterialHasSpecular(SINT32 matid);

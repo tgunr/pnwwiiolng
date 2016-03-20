@@ -672,11 +672,6 @@ LOGICAL piSetD3DRender(DDWND_D3DRENDERFUNC newfunc)
 	return(ddpSetD3DRender(newfunc));
 }
 
-LOGICAL piDrawToScreen(LPVOID lpdds)
-{
-	return(ddpDrawToScreen(lpdds));
-}
-
 LOGICAL piCreateSurface(piSURFACEDESC* lppisd, void** lpdds)
 {
 	lppisd->PixelFormat.dwRBitMask = 0xff0000;
