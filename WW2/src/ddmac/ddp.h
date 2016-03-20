@@ -15,7 +15,7 @@ void	ddpKill();
 LOGICAL	ddpSetDDRender(DDWND_DDRENDERFUNC newfunc);
 LOGICAL	ddpSetD3DRender(DDWND_D3DRENDERFUNC newfunc);
 UINT32 	ddpEngine(void*);
-LOGICAL ddpCreateWnd(int x, int y, int width, int height, int bpp, int fullscreen, UINT32 monitor, int refreshrate);
+LOGICAL ddpCreateWnd(int x, int y, int width, int height, int bpp, int fullscreen, int displayMask, int refreshrate);
 LOGICAL	ddpFlip();
 LOGICAL	ddpUpdate();
 LOGICAL	ddpDrawToScreen(LPVOID lpdds);

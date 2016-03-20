@@ -75,13 +75,13 @@ static void resetOGLAttributeValue(NSOpenGLPixelFormatAttribute *attributes,
 #endif
 }
 
-static bool rendererSupportsFSAA(CGDirectDisplayID displayMask) // returns false on error
+static bool rendererSupportsFSAA(CGDirectDisplayID displayID) // returns false on error
 {
     CGLError err = kCGLNoError;
     CGLRendererInfoObj info = nullptr;
     GLint nrend = 0, value = 0;
 
-    if ((err = CGLQueryRendererInfo(CGDisplayIDToOpenGLDisplayMask(displayMask), &info, &nrend)) != kCGLNoError) {
+    if ((err = CGLQueryRendererInfo(CGDisplayIDToOpenGLDisplayMask(displayID), &info, &nrend)) != kCGLNoError) {
         // Failed to get renderer
         return false;
     }
@@ -98,7 +98,7 @@ static bool rendererSupportsFSAA(CGDirectDisplayID displayMask) // returns false
     return (value & kCGLMultisampleBit) != 0;
 }
 
-static bool enableFSAAIfRequested(NSOpenGLPixelFormatAttribute *attributes, CGDirectDisplayID oglDisplayMask)
+static bool enableFSAAIfRequested(NSOpenGLPixelFormatAttribute *attributes, CGDirectDisplayID displayID)
 {
     int fsaa_ = 0;
 
@@ -109,7 +109,7 @@ static bool enableFSAAIfRequested(NSOpenGLPixelFormatAttribute *attributes, CGDi
     
     unsigned int fsaa = static_cast<unsigned int>(fsaa_);
     
-    if (!rendererSupportsFSAA(oglDisplayMask)) {
+    if (!rendererSupportsFSAA(displayID)) {
         return false;
     }
     
@@ -211,15 +211,17 @@ static CGDisplayModeRef CopyBestDisplayMode(CGDirectDisplayID display, int bpp, 
 }
 */
 
-LOGICAL ddpCreateWnd(int x, int y, int width, int height, int bpp, int fullscreen, UINT32 monitor, int refreshrate)
+LOGICAL ddpCreateWnd(int x, int y, int width, int height, int bpp, int fullscreen, int displayMask, int refreshrate)
 {
     NSOpenGLContext *context = nil;
     
-	if (!(ddpScreen = ddpGetScreen(static_cast<int>(monitor)))) {
+	if (!(ddpScreen = ddpGetScreen(static_cast<int>(displayMask)))) {
         fprintf(stderr, "Failed to get screen for chosen display\n");
         return false;
     }
-    monitor = (CGDirectDisplayID)[[ddpScreen deviceDescription][@"NSScreenNumber"] longValue];
+    
+    CGDirectDisplayID monitor = static_cast<CGDirectDisplayID>([[ddpScreen deviceDescription][@"NSScreenNumber"] longValue]);
+    
     defaultMode = CGDisplayCopyDisplayMode(monitor);
     // Apple says not to change the display mode. TODO: Make the back buffer differently-sized instead.
     fullScreenMode = CGDisplayCopyDisplayMode(monitor);// CopyBestDisplayMode(monitor, bpp, width, height, refreshrate);
