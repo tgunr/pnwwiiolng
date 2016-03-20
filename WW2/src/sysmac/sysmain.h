@@ -10,7 +10,7 @@ int sysmain();
 void sysmainQuit(void);
 void sysGetMousePosition(int*,int*);
 void sysSetMousePosition(int, int);
-void sysmainCommandLine(int arg, char** argv);
+void sysmainCommandLine(int arg, const char** argv);
 void sysmainKillApp();
 void sysmainGetCommandLineArgs(int* argc, char*** argv);
 

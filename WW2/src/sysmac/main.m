@@ -3,16 +3,14 @@
 //  NewPlayNet
 //
 //  Created by crs on 12/8/04.
-//  Copyright __MyCompanyName__ 2004. All rights reserved.
+//  Copyright Playnet 2004. All rights reserved.
 //
 
 #import <Cocoa/Cocoa.h>
 #include "sysmain.h"
 
-int main(int argc, char *argv[])
+int main(int argc, const char * _Nonnull *argv)
 {
-  sysmainCommandLine(argc, argv);
-  int n = NSApplicationMain(argc,  (const char **) argv);
-  
-  return n;
+    sysmainCommandLine(argc, argv);
+    return NSApplicationMain(argc, argv);
 }

@@ -123,7 +123,7 @@ const char* macFileSeparator()
 
 static char cmdLine[1024];
 
-void SetCommandLine(int argc, char** argv)
+void SetCommandLine(int argc, const char** argv)
 {
 	strcat(cmdLine," ");
 

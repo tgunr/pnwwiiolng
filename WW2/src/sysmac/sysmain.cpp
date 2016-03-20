@@ -25,15 +25,15 @@ static int sysmainInitApp();
 
 int running = 0;
 static int _argc;
-static char** _argv;
+static const char** _argv;
 
 void sysmainGetCommandLineArgs(int* argc, char*** argv)
 {
 	*argc = _argc;
-	*argv = _argv;
+	*argv = const_cast<char **>(_argv);
 }
 
-void sysmainCommandLine(int argc, char** argv)
+void sysmainCommandLine(int argc, const char** argv)
 {
 	SetCommandLine(argc, argv);
 	_argc = argc;

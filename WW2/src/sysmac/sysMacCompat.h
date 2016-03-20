@@ -49,13 +49,13 @@ unsigned long GetTickCount(void);
 void chAppDir();
 const char* macPreferencesPath();
 const char* macFileSeparator();
-void SetCommandLine(int argc, char** argv);
 const char* GetCommandLine();
 
 void SetMouseScalingEnabled(int enabled);
 
 SINT32 GetMicroSeconds(void);
 DWORD GetMillisecondTick();
+extern void SetCommandLine(int argc, const char** argv);
 
 
 #ifdef __cplusplus
