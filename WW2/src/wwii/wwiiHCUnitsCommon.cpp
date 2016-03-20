@@ -261,7 +261,7 @@ HCUnitList::packer(LOGICAL mode, ACTION_OBJECT* a)
 	a->offset = teulPackUCHAR(mode, a->packed, a->offset, &m_count, 6);		//
 
 	for ( UINT32 i = 0; i < m_count && i < MAX_HCUNITS_PER_LIST; ++i )
-		a->offset = m_units[i].packer(mode, a);
+		a->offset = m_units[i]->packer(mode, a);
 
 	return a->offset;
 }

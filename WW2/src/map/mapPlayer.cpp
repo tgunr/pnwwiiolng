@@ -1996,7 +1996,7 @@ _sendHCUnitList(Player* player)
 			hcul.m_listStart = false;
 			hcul.m_count = 0;
 		}
-		hcul.m_units[hcul.m_count] = *(it->second);
+		hcul.m_units[hcul.m_count] = it->second;
 		++hcul.m_count;
 		++sent;
 	}

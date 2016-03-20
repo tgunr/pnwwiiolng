@@ -203,7 +203,11 @@ public:
 	LOGICAL			m_listStart;						// True if this is the start of list
 	LOGICAL			m_listEnd;							// True if this is the end of the list
 	UCHAR			m_count;							// Number of units described
+#if platBuild == TEUL_SERVER
+	HCUnit*			m_units[MAX_HCUNITS_PER_LIST];		// Pointers to units
+#else
 	HCUnit			m_units[MAX_HCUNITS_PER_LIST];		// Array of units
+#endif
 };
 
 #if platBuild == TEUL_SERVER
