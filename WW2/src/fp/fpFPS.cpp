@@ -1623,7 +1623,7 @@ fpsWeaponStates fpFPSDetermineNextState ()
 			else
 			{
 #if AIMING_WEAPONS
-				fpsTrooper.desiredFOV = fpsWeapons[currentWeaponModel].aimFOV/10.0f;
+				fpsTrooper.desiredFOV = fpsWeapons[currentWeaponModel].aimFOV/2.5f;
 #else
 				fpsTrooper.desiredFOV = fpsWeapons[currentWeaponModel].aimFOV;
 #endif
