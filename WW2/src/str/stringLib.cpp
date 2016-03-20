@@ -84,16 +84,3 @@ char* rmtrail(char* str)
 
 	return str;
 }
-
-char* strescape(char* d,const char* s, char c)
-{
-	char* curr = d;
-	while (*s != '\0')
-	{
-		if (*s == c)
-			*(curr++) = '\\';
-		*(curr++) = *(s++);
-	}
-	*curr = '\0';
-	return d;
-}
