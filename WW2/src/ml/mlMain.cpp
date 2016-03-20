@@ -7509,7 +7509,7 @@ UINT32 mlResetVehiclePos(mlVehicleData* VehicleData) {
 	Write_Debug("InitPos x=%lf, y=%lf, z=%lf", pos.x, pos.y, pos.z);
 
 	auto sync_world_offset =
-	[&] (void) {
+	[&] (bool force_rebuild) {
 		FLOAT64VECTOR world_offset;
 		trnGetWorldOriginOffset(&world_offset);
 
@@ -7519,16 +7519,16 @@ UINT32 mlResetVehiclePos(mlVehicleData* VehicleData) {
 		TempPos.z = -(FLOAT32)(pos.z - world_offset.z);
 		trnCheckAndAdjustCameraPositionWithOriginOffset(&TempPos);
 
-		trnUpdateTerrainOriginOffset(FALSE);
+		trnUpdateTerrainOriginOffset(force_rebuild);
 	};
 	// First update is so we can find the spawn.
-	sync_world_offset();
-	trnUpdateTerrainOriginOffset(FALSE); // 2nd call forces terrain to load
+	sync_world_offset(false);
+	trnUpdateTerrainOriginOffset(false); // 2nd call forces terrain to load
 
 	playpos.x = playpos.y = playpos.z = 0.0f;
 
 	trnldrFinishUpdate();         // Terrain system is now configured to handle this
-	trnmainDoRawUpdate(FALSE);
+	trnmainDoRawUpdate(false);
 	trnldrFinishUpdateRelocate(); // Terrain system is now configured to handle this
 
 	if ( ! MobileSpawn && ! SpecialOverride ) {
@@ -7546,7 +7546,9 @@ UINT32 mlResetVehiclePos(mlVehicleData* VehicleData) {
 	Write_Debug("AdjPos x=%lf, y=%lf, z=%lf", pos.x, pos.y, pos.z);
 
 	// Now we update with the actual position.
-	sync_world_offset();
+	// HACK: If we don't force the rebuild then vehicles sometimes fall through the ground.
+	// No idea why. This code is just a mess...
+	sync_world_offset(true);
 
 
 	FLOAT64VECTOR world_offset;
