@@ -1922,6 +1922,10 @@ FLOAT32 PlayerSunDotProduct;
 #define FADE_TIME   30000
 
 	trnTODGetTimeOfDay(&TimeOfDay);
+#ifdef AIMING_WEAPONS
+    TimeOfDay = 43200;
+#endif
+
 	trnGetWorldOriginOffset(&WorldOriginOffset);
 
 	sunelevation = (FLOAT32)(fmod(2*PI*TimeOfDay/86400,2*PI));
