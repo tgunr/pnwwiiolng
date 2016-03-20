@@ -436,6 +436,7 @@ _recvBrigadeControlList(ACTION_OBJECT* const a)
 		return -EINVAL;
 
 	const UCHAR& forCountry = a->read<UCHAR>();
+	/*const UCHAR& forBranch = */a->read<UCHAR>();
 	const PermissionMask& permissions = a->read<PermissionMask>();
 
 	const WWII_SIDE forSide = wwiiSide((WWII_COUNTRY)forCountry);
