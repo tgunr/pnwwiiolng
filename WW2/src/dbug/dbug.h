@@ -41,6 +41,7 @@ namespace Debug
 
 // always use these macro's in place of Full functions so filename and number and errType are set.
 // basic parameter macros for dbugLog
+#define _FLF _FL, Debug::ERR_FATAL
 #define _FLA _FL, Debug::ERR_ABORT
 #define _FLM _FL, Debug::ERR_MINOR
 #define _FLW _FL, Debug::ERR_WARN
@@ -49,6 +50,7 @@ namespace Debug
 #define _FLD _FL, Debug::ERR_DBUG
 
 // same as above but no extra formating
+#define _FLFB _FL, (Debug::ERR_FATAL | BARE_DEBUG)
 #define _FLAB _FL, (Debug::ERR_ABORT | BARE_DEBUG)
 #define _FLMB _FL, (Debug::ERR_MINOR | BARE_DEBUG)
 #define _FLWB _FL, (Debug::ERR_WARN | BARE_DEBUG)
@@ -57,6 +59,7 @@ namespace Debug
 #define _FLDB _FL, (Debug::ERR_DBUG | BARE_DEBUG)
 
 // make go to stderr
+#define _FLFS _FL, (Debug::ERR_FATAL | STD_ERR)
 #define _FLAS _FL, (Debug::ERR_ABORT | STD_ERR)
 #define _FLMS _FL, (Debug::ERR_MINOR | STD_ERR)
 #define _FLWS _FL, (Debug::ERR_WARN | STD_ERR)
@@ -65,6 +68,7 @@ namespace Debug
 #define _FLDS _FL, (Debug::ERR_DBUG | STD_ERR)
 
 // same as above but no extra formating
+#define _FLFSB _FL, (Debug::ERR_FATAL | STD_ERR | BARE_DEBUG)
 #define _FLASB _FL, (Debug::ERR_ABORT | STD_ERR | BARE_DEBUG)
 #define _FLMSB _FL, (Debug::ERR_MINOR | STD_ERR | BARE_DEBUG)
 #define _FLWSB _FL, (Debug::ERR_WARN | STD_ERR | BARE_DEBUG)
