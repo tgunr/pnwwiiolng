@@ -258,6 +258,16 @@ LOGICAL ddpCreateWnd(int x, int y, int width, int height, int bpp, int fullscree
 	return true;
 }
 
+static void ddpRefreshGLViewport(int w, int h)
+{
+    *oglGetProjectionMatrix() = IdentityMatrix;
+	piSetViewportDimensions(0, 0, w, h, 0.0f, 1.0f);
+	glMatrixMode(GL_MODELVIEW);
+	glLoadIdentity();
+	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+}
+
 // IMPORTANT: This is not just a setup routine! This is called every time the
 // application is activated or deactivated.
 void ddpSetFullScreen(LOGICAL fullscreen)
@@ -273,58 +283,14 @@ void ddpSetFullScreen(LOGICAL fullscreen)
 	WantedWidth = static_cast<SINT32>(ddpRect.size.width);
 	WantedHeight = static_cast<SINT32>(ddpRect.size.height);
 	[nsOpenGlContext makeCurrentContext];
-
-    /*CGError result = kCGErrorSuccess;
-    bool captureAll = false;
-
-    if (!cfgPrefsGetBool("app.capturealldisplays", &captureAll)) {
-        captureAll = false; // don't capture all by default
-    }
-    
-    [NSMenu setMenuBarVisible:!fullscreen];
-	if (fullscreen) {
-        if (captureAll) {
-            result = CGCaptureAllDisplaysWithOptions(kCGCaptureNoOptions);
-        } else {
-            result = CGDisplayCaptureWithOptions(displayID, kCGCaptureNoOptions);
-        }
-        if (result != kCGLNoError) {
-            dbugLog(_FLW, "Failed to capture display(s)! Error %d", result);
-        }
-        result = CGDisplaySetDisplayMode(displayID, fullScreenMode, nullptr);
-        if (result != kCGLNoError) {
-            dbugLog(_FLW, "Failed to set display mode! Error %d", result);
-        }
-        
-		CGRect displayBounds = CGDisplayBounds(displayID);
-		fullRect = NSMakeRect(displayBounds.origin.x,displayBounds.origin.y, displayBounds.size.width, displayBounds.size.height);
-        
-		[ddpWin orderOut:ddpWin];
-		[ddpWin setContentView: 0];
-		ddpRect = fullRect;
-		[nsOpenGlContext setFullScreen];
-        [ddpScreen setFrame: fullRect];
-	} else {
-		[nsOpenGlContext clearDrawable];
-        result = CGDisplaySetDisplayMode ( displayID, defaultMode, NULL );
-		CGReleaseAllDisplays();
-        
-		[ddpWin setContentView: ddpView];
-		[ddpWin makeKeyAndOrderFront:ddpWin];
-		ddpRect = winRect;
-	}*/
+    ddpRefreshGLViewport(WantedWidth, WantedHeight);
 }
 
 void ddpSetupGL(int w, int h)
 {
 	[nsOpenGlContext makeCurrentContext];
-    *oglGetProjectionMatrix() = IdentityMatrix;
-	piSetViewportDimensions(0, 0, w, h, 0.0f, 1.0f);
-	glMatrixMode(GL_MODELVIEW);
-	glLoadIdentity();
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glewInit();
+    ddpRefreshGLViewport(w, h);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -427,21 +393,15 @@ void ddpHideCursor(void)
 
 void sysSetMousePosition(int x, int y)
 {
+    dbugLog(_FLD, "Ignoring request to set mouse position to %d, %d", x, y);
 }
 
-void sysGetMousePosition(SINT32* x, SINT32* y)
+void sysGetMousePosition(SINT32 *x, SINT32 *y)
 {
-	if(WantedWindow) {
-		NSPoint pt = [ddpWin mouseLocationOutsideOfEventStream];
+    NSPoint pt = [ddpWin mouseLocationOutsideOfEventStream];
 
-		*x = static_cast<SINT32>(pt.x);
-		*y = static_cast<SINT32>(ddpRect.size.height - pt.y);
-	} else {
-        NSPoint pt = [NSEvent mouseLocation];
-
-		*x = static_cast<SINT32>(pt.x - ddpRect.origin.x);
-		*y = static_cast<SINT32>(pt.y - ddpRect.origin.y);
-	}
+    *x = static_cast<SINT32>(pt.x);
+    *y = static_cast<SINT32>(ddpRect.size.height - pt.y);
 }
 
 ////////////////////////////////////////////////////////////////////////////////
@@ -496,8 +456,6 @@ void ddpResetFPS()
 
 void ddpHideApplication()
 {
-	//CGReleaseAllDisplays();
-    //[NSApp deactivate];
 }
 
 void ddpShowApplication()
