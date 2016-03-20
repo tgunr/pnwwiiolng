@@ -208,7 +208,13 @@ Description:
 inline float GET_TREE_RADIUS(Tree* t)
 {
     int base = GET_BASE(t->isbush_isclutter_base);
-    return treeDataGetBaseTree(base)->GetRadius();
+    CTree* tree =treeDataGetBaseTree(base);
+    if (tree) {
+        return treeDataGetBaseTree(base)->GetRadius();
+    } else {
+        _dbugLog(_FLW, "NULL tree at index %d!", base);
+        return 0.0;
+    }
 }
 
 /*---------------------------------------------------------------------
