@@ -539,7 +539,7 @@ LOGICAL dipSetupMouse(void)
 
 void checkIfInFront()
 {
-    appHidden = NSApp.hidden;
+    appHidden = !NSApp.active;
     if (appHidden) {
         lastmouseinit = FALSE;
     }
