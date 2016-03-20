@@ -1,6 +1,5 @@
 #ifndef PN_SYSCFG_H
 #define PN_SYSCFG_H 1
-//#pragma cpp_extensions on
 
 #include <wchar.h>
 

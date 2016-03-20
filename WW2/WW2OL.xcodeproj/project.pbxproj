@@ -385,9 +385,6 @@
 		084DD9FA1120F37F0020E34F /* mem.h in Headers */ = {isa = PBXBuildFile; fileRef = 084DD9F81120F37F0020E34F /* mem.h */; };
 		0863B34F10619AC8005FDF19 /* libphui.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0863B34D10619AC8005FDF19 /* libphui.a */; };
 		0863B35010619AC8005FDF19 /* libspeedtreemac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0863B34E10619AC8005FDF19 /* libspeedtreemac.a */; };
-		086708EC10E83D9A00E43DFB /* testmac.c in Sources */ = {isa = PBXBuildFile; fileRef = 086708E010E83D9A00E43DFB /* testmac.c */; };
-		086708EE10E83D9A00E43DFB /* preloader.c in Sources */ = {isa = PBXBuildFile; fileRef = 086708E210E83D9A00E43DFB /* preloader.c */; };
-		086709C610E84BCE00E43DFB /* interceptnew.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 086709C510E84BCE00E43DFB /* interceptnew.cpp */; };
 		087286DF10D1B23B00456009 /* libimapmac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 087286DE10D1B23B00456009 /* libimapmac.a */; };
 		08744F51107BF96D009DB5AF /* liblua5.1.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 08744F50107BF96D009DB5AF /* liblua5.1.a */; };
 		08744F53107BF977009DB5AF /* libtolua++.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 08744F52107BF977009DB5AF /* libtolua++.a */; };
@@ -403,7 +400,6 @@
 		08977E1E134D007B00C9DCFE /* sneaky.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08977E1D134D007B00C9DCFE /* sneaky.cpp */; };
 		0898699E13A2BB4C00D643A0 /* libotmac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0898699D13A2BB4C00D643A0 /* libotmac.a */; };
 		089FB52714194F2200EBEB5F /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 089FB52614194F2200EBEB5F /* Carbon.framework */; };
-		089FEABE112C5B1200D0F32D /* GenerateIcons.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 089FEABC112C5B1200D0F32D /* GenerateIcons.cpp */; };
 		08A428C212C93A490041B628 /* oglTextureObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08A428C012C93A490041B628 /* oglTextureObject.cpp */; };
 		08ACEE9E122056DC0035E877 /* glslUniformBlock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08ACEE9C122056DC0035E877 /* glslUniformBlock.cpp */; };
 		08ACEEA71220574E0035E877 /* oglMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08ACEEA31220574E0035E877 /* oglMaterial.cpp */; };
@@ -414,7 +410,6 @@
 		08C817B512B0271000818A11 /* FTFontReplacement.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08C817B412B0271000818A11 /* FTFontReplacement.cpp */; };
 		08CBC4591291D9EB00C0987C /* wwiiServerTrackedObjectPacker.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08CBC4571291D9EB00C0987C /* wwiiServerTrackedObjectPacker.cpp */; };
 		08D2989413D4A82500BA4D58 /* ldwwo.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08D2989313D4A82500BA4D58 /* ldwwo.cpp */; };
-		08D5361A12B2A9EF008161DB /* trackmac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08D5361612B2A9D4008161DB /* trackmac.cpp */; };
 		08D5812E106310FE00177892 /* libmaclib.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 080C7E841062F011000A242F /* libmaclib.a */; };
 		08DA28151191F41C003D0D9C /* fxMisc.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08DA28131191F41C003D0D9C /* fxMisc.cpp */; };
 		08DDF926106928D800720B71 /* libmacode.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 08DDF925106928D800720B71 /* libmacode.a */; };
@@ -426,7 +421,6 @@
 		08E5E55E13E855A100A5034D /* EZVehicles.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08E5E55A13E855A100A5034D /* EZVehicles.cpp */; };
 		08E5E56113E855B600A5034D /* ScenarioMapRenderer.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08E5E55F13E855B600A5034D /* ScenarioMapRenderer.cpp */; };
 		08E800BC13745261000F25A9 /* HeightField.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08E800BB13745261000F25A9 /* HeightField.cpp */; };
-		08EBB4C8129439DD00AEDB5B /* info.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08EBB4C6129439DD00AEDB5B /* info.cpp */; };
 		08EBB4D412943BE300AEDB5B /* wwiiSyncVar.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08EBB4D212943BE300AEDB5B /* wwiiSyncVar.cpp */; };
 		08F41C5612D39B7B0001C6F5 /* libfreetype2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 08F41C5512D39B7B0001C6F5 /* libfreetype2.a */; };
 		08FA20E91598B791007B0B9A /* Rand.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08FA20E51598B791007B0B9A /* Rand.cpp */; };
@@ -628,7 +622,7 @@
 		08104870103DCEE10065E0E2 /* clientStrtQueue.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = clientStrtQueue.cpp; sourceTree = "<group>"; };
 		08104871103DCEE10065E0E2 /* clientStrtQueue.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = clientStrtQueue.h; sourceTree = "<group>"; };
 		08104874103DCEE10065E0E2 /* GameClient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GameClient.cpp; sourceTree = "<group>"; };
-		08104875103DCEE10065E0E2 /* GameClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GameClient.h; sourceTree = "<group>"; };
+		08104875103DCEE10065E0E2 /* GameClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = GameClient.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		08104876103DCEE10065E0E2 /* ww2Client.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ww2Client.cpp; sourceTree = "<group>"; };
 		08104877103DCEE10065E0E2 /* ww2Client.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ww2Client.h; sourceTree = "<group>"; };
 		081048C5103DCF340065E0E2 /* commClientMessages.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = commClientMessages.cpp; sourceTree = "<group>"; };
@@ -735,7 +729,7 @@
 		081049E0103DD2660065E0E2 /* instBasicStatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = instBasicStatus.h; sourceTree = "<group>"; };
 		081049E1103DD2660065E0E2 /* instClient.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = instClient.cpp; sourceTree = "<group>"; };
 		081049E2103DD2660065E0E2 /* instClient.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = instClient.h; sourceTree = "<group>"; };
-		081049E3103DD2660065E0E2 /* instClientStatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = instClientStatus.h; sourceTree = "<group>"; };
+		081049E3103DD2660065E0E2 /* instClientStatus.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = instClientStatus.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		081049E4103DD2660065E0E2 /* instCommon.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = instCommon.cpp; sourceTree = "<group>"; };
 		081049E5103DD2660065E0E2 /* instDescriptor.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = instDescriptor.h; sourceTree = "<group>"; };
 		081049EC103DD2660065E0E2 /* instListing.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = instListing.h; sourceTree = "<group>"; };
@@ -785,7 +779,7 @@
 		08104A4C103DD3370065E0E2 /* mapArenaDescription.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapArenaDescription.h; sourceTree = "<group>"; };
 		08104A4D103DD3370065E0E2 /* mapAWS.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mapAWS.cpp; sourceTree = "<group>"; };
 		08104A4E103DD3370065E0E2 /* mapAWS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapAWS.h; sourceTree = "<group>"; };
-		08104A51103DD3370065E0E2 /* mapBrigadeSummary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapBrigadeSummary.h; sourceTree = "<group>"; };
+		08104A51103DD3370065E0E2 /* mapBrigadeSummary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = mapBrigadeSummary.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		08104A54103DD3370065E0E2 /* mapClientMessages.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mapClientMessages.cpp; sourceTree = "<group>"; };
 		08104A55103DD3370065E0E2 /* mapClientMessages.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapClientMessages.h; sourceTree = "<group>"; };
 		08104A56103DD3370065E0E2 /* mapConstants.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = mapConstants.h; sourceTree = "<group>"; };
@@ -1364,8 +1358,6 @@
 		0834F1D1104586AA00E75B52 /* versionNo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = versionNo.h; path = proj/versionNo.h; sourceTree = SOURCE_ROOT; };
 		0834F1D61045888700E75B52 /* sysWinISO.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = sysWinISO.h; path = src/sys/sysWinISO.h; sourceTree = SOURCE_ROOT; };
 		0834F28110458DFA00E75B52 /* ShadowMap.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ShadowMap.cpp; sourceTree = "<group>"; };
-		0836DAFD1109133100AC593D /* uthash.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = uthash.h; sourceTree = "<group>"; };
-		0836DAFE1109133100AC593D /* utlist.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = utlist.h; sourceTree = "<group>"; };
 		08477137135E279F00325E43 /* trnScenario.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = trnScenario.h; sourceTree = "<group>"; };
 		08477138135E279F00325E43 /* trnScenario.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = trnScenario.cpp; sourceTree = "<group>"; };
 		08492F5A131708E700C7F39E /* libftgl.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libftgl.a; path = lib/mac/libftgl.a; sourceTree = "<group>"; };
@@ -1375,10 +1367,6 @@
 		0863B34D10619AC8005FDF19 /* libphui.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libphui.a; path = lib/mac/libphui.a; sourceTree = "<group>"; };
 		0863B34E10619AC8005FDF19 /* libspeedtreemac.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libspeedtreemac.a; path = lib/mac/libspeedtreemac.a; sourceTree = "<group>"; };
 		0863B36E10619D66005FDF19 /* clientGlobals.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = clientGlobals.cpp; path = src/client/clientGlobals.cpp; sourceTree = SOURCE_ROOT; };
-		086708E010E83D9A00E43DFB /* testmac.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = testmac.c; sourceTree = "<group>"; };
-		086708E210E83D9A00E43DFB /* preloader.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = preloader.c; sourceTree = "<group>"; };
-		086708E510E83D9A00E43DFB /* testmac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = testmac.h; sourceTree = "<group>"; };
-		086709C510E84BCE00E43DFB /* interceptnew.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = interceptnew.cpp; sourceTree = "<group>"; };
 		087286DE10D1B23B00456009 /* libimapmac.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libimapmac.a; path = lib/mac/libimapmac.a; sourceTree = "<group>"; };
 		08744F50107BF96D009DB5AF /* liblua5.1.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = liblua5.1.a; path = lib/mac/liblua5.1.a; sourceTree = "<group>"; };
 		08744F52107BF977009DB5AF /* libtolua++.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = "libtolua++.a"; path = "lib/mac/libtolua++.a"; sourceTree = "<group>"; };
@@ -1400,8 +1388,6 @@
 		08977E1D134D007B00C9DCFE /* sneaky.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sneaky.cpp; sourceTree = "<group>"; };
 		0898699D13A2BB4C00D643A0 /* libotmac.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libotmac.a; path = lib/mac/libotmac.a; sourceTree = "<group>"; };
 		089FB52614194F2200EBEB5F /* Carbon.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Carbon.framework; path = System/Library/Frameworks/Carbon.framework; sourceTree = SDKROOT; };
-		089FEABC112C5B1200D0F32D /* GenerateIcons.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = GenerateIcons.cpp; sourceTree = "<group>"; };
-		089FEABD112C5B1200D0F32D /* GenerateIcons.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GenerateIcons.h; sourceTree = "<group>"; };
 		08A428C012C93A490041B628 /* oglTextureObject.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = oglTextureObject.cpp; sourceTree = "<group>"; };
 		08A428C112C93A490041B628 /* oglTextureObject.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = oglTextureObject.h; sourceTree = "<group>"; };
 		08A43F081092021000B13339 /* glplat.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = glplat.h; sourceTree = "<group>"; };
@@ -1423,8 +1409,6 @@
 		08CBC4581291D9EB00C0987C /* wwiiServerTrackedObjectPacker.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wwiiServerTrackedObjectPacker.h; sourceTree = "<group>"; };
 		08D2989213D4A82500BA4D58 /* ldwwo.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ldwwo.h; sourceTree = "<group>"; };
 		08D2989313D4A82500BA4D58 /* ldwwo.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ldwwo.cpp; sourceTree = "<group>"; };
-		08D5361612B2A9D4008161DB /* trackmac.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = trackmac.cpp; sourceTree = "<group>"; };
-		08D5361712B2A9D4008161DB /* trackmac.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = trackmac.h; sourceTree = "<group>"; };
 		08DA28131191F41C003D0D9C /* fxMisc.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = fxMisc.cpp; sourceTree = "<group>"; };
 		08DA28141191F41C003D0D9C /* fxMisc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = fxMisc.h; sourceTree = "<group>"; };
 		08DDF925106928D800720B71 /* libmacode.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libmacode.a; path = lib/mac/libmacode.a; sourceTree = "<group>"; };
@@ -1439,13 +1423,11 @@
 		08E5E55813E855A100A5034D /* EZManager.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EZManager.cpp; sourceTree = "<group>"; };
 		08E5E55913E855A100A5034D /* EZManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EZManager.h; sourceTree = "<group>"; };
 		08E5E55A13E855A100A5034D /* EZVehicles.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = EZVehicles.cpp; sourceTree = "<group>"; };
-		08E5E55B13E855A100A5034D /* EZVehicles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = EZVehicles.h; sourceTree = "<group>"; };
+		08E5E55B13E855A100A5034D /* EZVehicles.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; lineEnding = 0; path = EZVehicles.h; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.objcpp; };
 		08E5E55F13E855B600A5034D /* ScenarioMapRenderer.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ScenarioMapRenderer.cpp; sourceTree = "<group>"; };
 		08E5E56013E855B600A5034D /* ScenarioMapRenderer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = ScenarioMapRenderer.h; sourceTree = "<group>"; };
 		08E800BA13745261000F25A9 /* HeightField.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = HeightField.h; sourceTree = "<group>"; };
 		08E800BB13745261000F25A9 /* HeightField.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = HeightField.cpp; sourceTree = "<group>"; };
-		08EBB4C6129439DD00AEDB5B /* info.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = info.cpp; sourceTree = "<group>"; };
-		08EBB4C7129439DD00AEDB5B /* info.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = info.h; sourceTree = "<group>"; };
 		08EBB4D212943BE300AEDB5B /* wwiiSyncVar.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = wwiiSyncVar.cpp; sourceTree = "<group>"; };
 		08EBB4D312943BE300AEDB5B /* wwiiSyncVar.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = wwiiSyncVar.h; sourceTree = "<group>"; };
 		08F41C5512D39B7B0001C6F5 /* libfreetype2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libfreetype2.a; path = lib/mac/libfreetype2.a; sourceTree = "<group>"; };
@@ -2919,23 +2901,6 @@
 			path = locl;
 			sourceTree = "<group>";
 		};
-		086708D910E83D9A00E43DFB /* testmac */ = {
-			isa = PBXGroup;
-			children = (
-				08D5361612B2A9D4008161DB /* trackmac.cpp */,
-				08D5361712B2A9D4008161DB /* trackmac.h */,
-				08EBB4C6129439DD00AEDB5B /* info.cpp */,
-				08EBB4C7129439DD00AEDB5B /* info.h */,
-				0836DAFD1109133100AC593D /* uthash.h */,
-				0836DAFE1109133100AC593D /* utlist.h */,
-				086708E210E83D9A00E43DFB /* preloader.c */,
-				086709C510E84BCE00E43DFB /* interceptnew.cpp */,
-				086708E010E83D9A00E43DFB /* testmac.c */,
-				086708E510E83D9A00E43DFB /* testmac.h */,
-			);
-			path = testmac;
-			sourceTree = "<group>";
-		};
 		08977DDA134CFB7200C9DCFE /* scen */ = {
 			isa = PBXGroup;
 			children = (
@@ -2947,15 +2912,6 @@
 				08977DDD134CFB8500C9DCFE /* ScenarioManager.h */,
 			);
 			name = scen;
-			sourceTree = "<group>";
-		};
-		089FEABB112C5B1200D0F32D /* maptools */ = {
-			isa = PBXGroup;
-			children = (
-				089FEABC112C5B1200D0F32D /* GenerateIcons.cpp */,
-				089FEABD112C5B1200D0F32D /* GenerateIcons.h */,
-			);
-			path = maptools;
 			sourceTree = "<group>";
 		};
 		08E5E55513E855A100A5034D /* ez */ = {
@@ -2978,8 +2934,6 @@
 				E97C763D1C85146A00875F44 /* event */,
 				08E5E55513E855A100A5034D /* ez */,
 				08977DDA134CFB7200C9DCFE /* scen */,
-				089FEABB112C5B1200D0F32D /* maptools */,
-				086708D910E83D9A00E43DFB /* testmac */,
 				0810471B103DCC390065E0E2 /* cfg */,
 				0810473E103DCC7C0065E0E2 /* chat */,
 				0810485F103DCEE10065E0E2 /* client */,
@@ -3825,10 +3779,6 @@
 				0834F1CE104585DA00E75B52 /* loclMain.cpp in Sources */,
 				0834F28210458DFA00E75B52 /* ShadowMap.cpp in Sources */,
 				0804088E10B73B35008F3954 /* BufferObject.cpp in Sources */,
-				086708EC10E83D9A00E43DFB /* testmac.c in Sources */,
-				086708EE10E83D9A00E43DFB /* preloader.c in Sources */,
-				086709C610E84BCE00E43DFB /* interceptnew.cpp in Sources */,
-				089FEABE112C5B1200D0F32D /* GenerateIcons.cpp in Sources */,
 				08E0EAE71178D2D2006619EC /* oglVertexBuffer.cpp in Sources */,
 				08E0EB0E117CEF8D006619EC /* physicsTypes.cpp in Sources */,
 				08DA28151191F41C003D0D9C /* fxMisc.cpp in Sources */,
@@ -3837,10 +3787,8 @@
 				08ACEEA81220574E0035E877 /* States.cpp in Sources */,
 				08ACEEAD122057A30035E877 /* fpPPO.cpp in Sources */,
 				08CBC4591291D9EB00C0987C /* wwiiServerTrackedObjectPacker.cpp in Sources */,
-				08EBB4C8129439DD00AEDB5B /* info.cpp in Sources */,
 				08EBB4D412943BE300AEDB5B /* wwiiSyncVar.cpp in Sources */,
 				08C817B512B0271000818A11 /* FTFontReplacement.cpp in Sources */,
-				08D5361A12B2A9EF008161DB /* trackmac.cpp in Sources */,
 				08A428C212C93A490041B628 /* oglTextureObject.cpp in Sources */,
 				081418EB12DF707B00C2F0F4 /* BuildTerrain.cpp in Sources */,
 				0818A91312E745AB0035C3B4 /* gr2layerTypes.cpp in Sources */,

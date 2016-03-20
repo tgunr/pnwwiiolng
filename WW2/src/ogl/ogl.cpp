@@ -34,9 +34,6 @@
 #include "sys/sysWinISO.h"	// Must be the last thing we include
 #include "ogl/GLCounter.h"
 
-#if platOS == OS_MACOS
-#include <malloc/malloc.h>
-#endif
 /************************
 VARS
 *************************/
