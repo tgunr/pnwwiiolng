@@ -3812,7 +3812,7 @@ unsigned int sptAddTree(OBJECT* o,
         SET_IS_CLUTTER(tree->isbush_isclutter_base, 0x1);
 
     unsigned int randm = (unsigned int)((int)pos.x * 7159 + (int)pos.y * 15137);
-    tree->rot_angle = randm & numRotations;
+    tree->rot_angle = randm % numRotations;
 
     // For billboards
     float radians = DEG_TO_RAD((float)rotations[tree->rot_angle]);

@@ -924,14 +924,14 @@ TERRAIN_DETAIL*	td;
 		}
 
 		nt = lpobj->numtris - tri - NUM_TRIANGLES_PER_OCTET;
-		memcpy(&lpobj->psnorig[tri],	&lpobj->psnorig[tri + NUM_TRIANGLES_PER_OCTET],			nt * sizeof(piVECTOR));
-		memcpy(&lpobj->psnorms[tri],	&lpobj->psnorms[tri + NUM_TRIANGLES_PER_OCTET],			nt * sizeof(piVECTOR));
-		memcpy(&lpobj->pscdon[tri * 3],	&lpobj->pscdon[tri * 3 + 3 * NUM_TRIANGLES_PER_OCTET],	nt * 3 * sizeof(piVECTOR));
-		memcpy(&lpobj->pscdn[tri * 3],	&lpobj->pscdn[tri * 3 + 3 * NUM_TRIANGLES_PER_OCTET],	nt * 3 * sizeof(piVECTOR));
+		memmove(&lpobj->psnorig[tri],	&lpobj->psnorig[tri + NUM_TRIANGLES_PER_OCTET],			nt * sizeof(piVECTOR));
+		memmove(&lpobj->psnorms[tri],	&lpobj->psnorms[tri + NUM_TRIANGLES_PER_OCTET],			nt * sizeof(piVECTOR));
+		memmove(&lpobj->pscdon[tri * 3],	&lpobj->pscdon[tri * 3 + 3 * NUM_TRIANGLES_PER_OCTET],	nt * 3 * sizeof(piVECTOR));
+		memmove(&lpobj->pscdn[tri * 3],	&lpobj->pscdn[tri * 3 + 3 * NUM_TRIANGLES_PER_OCTET],	nt * 3 * sizeof(piVECTOR));
 
 		nv = lpobj->numverts - ofs - NUM_VERTICES_PER_OCTET;
 
-		memcpy(&lpobj->puverts[ofs],	&lpobj->puverts[ofs + NUM_VERTICES_PER_OCTET],	nv * sizeof(piUNIFIED_VERTEX));
+		memmove(&lpobj->puverts[ofs],	&lpobj->puverts[ofs + NUM_VERTICES_PER_OCTET],	nv * sizeof(piUNIFIED_VERTEX));
 		lpobj->SyncMutableData();
 	}
 	else

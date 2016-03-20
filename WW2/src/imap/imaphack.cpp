@@ -33,8 +33,8 @@ int profile;
 static UINT32 _TimeOfDay;
 static UINT32 _RateOfTimeTravel;
 
-char buffer[256];
-char lastbuffer[256];
+char buffer[MAX_KEYS];
+char lastbuffer[MAX_KEYS];
 
 LOGICAL ProcessKeyboardInput();
 
@@ -219,14 +219,14 @@ LOGICAL ProcessKeyboardInput()
 {
 UINT32 i;
 
-	for (i=0;i<256;i++)
+	for (i=0;i<MAX_KEYS;i++)
 	{
 		lastbuffer[i] = buffer[i];
 	}
 
 	if (!dipGetKeyboardState(sizeof(buffer), buffer))
 	{
-        memset(buffer, 0, sizeof(char) * 256);
+        memset(buffer, 0, sizeof(buffer));
 
 		return(FALSE);
 	}
