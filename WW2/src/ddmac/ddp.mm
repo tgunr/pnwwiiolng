@@ -75,13 +75,13 @@ static void resetOGLAttributeValue(NSOpenGLPixelFormatAttribute *attributes,
 #endif
 }
 
-static bool rendererSupportsFSAA(GLuint displayMask) // returns false on error
+static bool rendererSupportsFSAA(CGDirectDisplayID displayMask) // returns false on error
 {
     CGLError err = kCGLNoError;
     CGLRendererInfoObj info = nullptr;
     GLint nrend = 0, value = 0;
 
-    if ((err = CGLQueryRendererInfo(displayMask, &info, &nrend)) != kCGLNoError) {
+    if ((err = CGLQueryRendererInfo(CGDisplayIDToOpenGLDisplayMask(displayMask), &info, &nrend)) != kCGLNoError) {
         // Failed to get renderer
         return false;
     }
@@ -117,14 +117,15 @@ static bool enableFSAAIfRequested(NSOpenGLPixelFormatAttribute *attributes, CGDi
     // This is a bit of a stupid hack, but it makes a bunch of code elsewhere cleaner.
     NSOpenGLPixelFormatAttribute *fsaaDisablePlaceholder = attributes, *finalTerminator = nullptr;
     
-    while (*fsaaDisablePlaceholder++) ; // Stop at first 0
-    finalTerminator = ++fsaaDisablePlaceholder;
-    while (*finalTerminator++) ; // Stop at next 0
+    while (*fsaaDisablePlaceholder++) ; // Stop after first 0
+    finalTerminator = fsaaDisablePlaceholder--; // Back up to point to first 0
+    while (*finalTerminator++) ; // Stop after next 0
+    --finalTerminator; // Back up to point to last 0.
     
     // No need to re-terminate - the final terminator is included in the memory copy.
     memmove(fsaaDisablePlaceholder, // Destination = overwrite the disable placeholder
             fsaaDisablePlaceholder + 1, // Source = first entry after the disable placeholder
-            static_cast<size_t>(finalTerminator - (fsaaDisablePlaceholder + 1)) * sizeof(NSOpenGLPixelFormatAttribute)
+            static_cast<size_t>(finalTerminator - fsaaDisablePlaceholder) * sizeof(NSOpenGLPixelFormatAttribute)
             // ^ length = number of entries covered by the distance between the source and the end
     );
     
