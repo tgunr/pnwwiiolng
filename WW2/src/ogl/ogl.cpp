@@ -337,7 +337,7 @@ void oglResize(GLsizei w, GLsizei h)
 	}
 }
 
-LOGICAL oglDrawToScreen(SINT32 texid, LOGICAL stretch)
+/*LOGICAL oglDrawToScreen(SINT32 texid, LOGICAL stretch)
 {
 LOGICAL		bRetVal = TRUE;
 FLOAT32		fLeft = 0.0f;
@@ -472,7 +472,7 @@ TEXTURE*	lpt;
 	}
 
 	return bRetVal;
-}
+}*/
 
 bool oglCanUseTexture2D(int w, int h)
 {

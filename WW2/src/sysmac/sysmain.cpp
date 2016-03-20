@@ -61,8 +61,6 @@ int sysmain()
 		exit(0);
 	}
 
-	ddpSetupGL(WantedWidth, WantedHeight);
-
 	if(!piInit())
 	{
 		printf("piInit: App was not able to initialize!\n");
@@ -162,6 +160,7 @@ int sysmainInitApp()
 		printf("ddpCreateWnd failed!\n");
 		return -1;
 	}
+	ddpSetupGL(WantedWidth, WantedHeight);
 
 	return 0;
 } 
@@ -182,7 +181,7 @@ void sysmainKillApp()
 #endif
 
 	dimainKill();
-//	ddpKill();
+    ddpKill();
 }
 
 void sysmainAddArchives()

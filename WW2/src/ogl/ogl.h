@@ -29,7 +29,7 @@
 	// Prototypes
 	extern LOGICAL oglSetupRC(void);
 	extern void	oglResize(GLsizei w, GLsizei h);
-	extern LOGICAL oglDrawToScreen(SINT32 texid, LOGICAL stretch);
+	//extern LOGICAL oglDrawToScreen(SINT32 texid, LOGICAL stretch);
 
 	extern LOGICAL	oglInit(void);
 	extern LOGICAL	oglClearPorts(piRECT rect, UINT32 targets);
