@@ -7,229 +7,251 @@
 #import <Cocoa/Cocoa.h>
 #include "endianess.h"
 
-// CGLDescribeRenderer
-
-CGLContextObj cgl_ctx;
-static NSOpenGLContext *nsOpenGlContext; //, *win_ctx, *full_ctx;
-static NSRect ddpRect,winRect,fullRect;
-static NSWindow* ddpWin=NULL;
-static NSOpenGLView* ddpView=NULL;
-static CGDirectDisplayID displayID;
-static CGDisplayModeRef defaultMode, fullScreenMode;
-static NSScreen* ddpScreen=NULL;
-
-static DDWND_DDRENDERFUNC	ddrenderfunc;
-static DDWND_D3DRENDERFUNC	d3drenderfunc;
-static LOGICAL	resetfps;
-static int		capture;
-static UINT32	totpaints;
-static UINT32	tottime;
-static int bpp;
-static bool canWindow = true;
-bool appHidden;
-
-#define BASE_GL_ATTRIBUTES \
-NSOpenGLPFADepthSize, (NSOpenGLPixelFormatAttribute)0,       \
-NSOpenGLPFAAccelerated,                                      \
-NSOpenGLPFADoubleBuffer,                                     \
-NSOpenGLPFANoRecovery,                                       \
-NSOpenGLPFAStencilSize, (NSOpenGLPixelFormatAttribute)8      
-
-#define FULLSCREEN_GL_ATTRIBUTES \
-NSOpenGLPFAFullScreen,                                       \
-NSOpenGLPFAScreenMask,(NSOpenGLPixelFormatAttribute)0        
-
-#define MULTI_GL_ATTRIBUTES \
-NSOpenGLPFASampleBuffers, 1,                                     \
-NSOpenGLPFASamples,0x7fffffff,                                           \
-NSOpenGLPFAMultisample
-
-static NSOpenGLPixelFormatAttribute fullScreenAttrs[] = 
-{	
-	BASE_GL_ATTRIBUTES,
-	FULLSCREEN_GL_ATTRIBUTES,
-	0,0xffffffff
 LOGICAL cursorHidden = false;
 
-};
+// From glplat.h (why)
+CGLContextObj cgl_ctx = nullptr;
 
-static NSOpenGLPixelFormatAttribute windowedAttrs[] = 
-{	
-	BASE_GL_ATTRIBUTES,
-	0,0xffffffff
-};
+static NSOpenGLContext *nsOpenGlContext = nil; //, *win_ctx, *full_ctx;
+static NSRect ddpRect = NSZeroRect, winRect = NSZeroRect, fullRect = NSZeroRect;
+static NSWindow *ddpWin = nil;
+static NSOpenGLView *ddpView = nil;
+static CGDirectDisplayID displayID = kCGNullDirectDisplay;
+static CGDisplayModeRef defaultMode = nullptr, fullScreenMode = nullptr;
+static NSScreen *ddpScreen = nullptr;
 
-static NSOpenGLPixelFormatAttribute fullScreenAttrs_S[] = 
-{	
-	BASE_GL_ATTRIBUTES,
-	FULLSCREEN_GL_ATTRIBUTES,
-    MULTI_GL_ATTRIBUTES,
-	0,0xffffffff
-};
+static DDWND_DDRENDERFUNC ddrenderfunc = nullptr;
+static DDWND_D3DRENDERFUNC d3drenderfunc = nullptr;
+static LOGICAL resetfps = false;
+static UINT32 capture = 0;
+static UINT32 totpaints = 0;
+static UINT32 tottime = 0;
 
-static NSOpenGLPixelFormatAttribute windowedAttrs_S[] = 
-{	
-	BASE_GL_ATTRIBUTES,
-    MULTI_GL_ATTRIBUTES,
-	0,0xffffffff
-};
+static constexpr const NSOpenGLPixelFormatAttribute placeholderAttributeValue = std::numeric_limits<NSOpenGLPixelFormatAttribute>::max();
 
-static NSOpenGLPixelFormatAttribute* fullScreenAttributes;
-static NSOpenGLPixelFormatAttribute* windowedAttributes;
-
-// hack
-@interface NSScreen (NSScreenAccess)
-- (void) setFrame:(NSRect)frame;
-@end
-
-@implementation NSScreen (NSScreenAccess)
-- (void) setFrame:(NSRect)frame;
+static NSOpenGLPixelFormatAttribute oglAttributes[] =
 {
-	_frame = frame;
-}
-@end 
+    // Explicitly request non-Core profile
+    NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersionLegacy,
+    // Request <to be determined> color buffer
+    NSOpenGLPFAColorSize, placeholderAttributeValue,
+    // Request 32-bit depth buffer
+    NSOpenGLPFADepthSize, 32,
+    // Request double-buffering
+    NSOpenGLPFADoubleBuffer,
+    // Request 8-bit stencil buffer
+    NSOpenGLPFAStencilSize, 8,
+    
+    0,
+    
+    // Request a single FSAA buffer
+    NSOpenGLPFASampleBuffers, 1,
+    // Request <to be determined> FSAA samples
+    NSOpenGLPFASamples, placeholderAttributeValue,
+    // Request multisampling enable
+    NSOpenGLPFAMultisample,
+    
+    0
+};
 
-static void examineRenderer(int oglDisplayMask)
+static void resetOGLAttributeValue(NSOpenGLPixelFormatAttribute *attributes,
+                                   NSOpenGLPixelFormatAttribute attrKey,
+                                   NSOpenGLPixelFormatAttribute attrValue)
 {
-    CGLRendererInfoObj info;
-    GLint nrend;
-    GLint value;
-    
-    fullScreenAttributes = fullScreenAttrs;
-    windowedAttributes = windowedAttrs;
-    
-    int fsaa = 0;
-    cfgPrefsGetInt("app.fsaasamples",&fsaa);
-    
-    CGLError err = CGLQueryRendererInfo(oglDisplayMask, &info, &nrend );
-    if ( err == kCGLNoError )
-    {
-        err = CGLDescribeRenderer(info, 0, kCGLRPSampleModes, &value);
-        if ( err == kCGLNoError )
-        {
-            if ( (value & kCGLMultisampleBit) && (fsaa!=0)  )
-            {
-                fullScreenAttributes = fullScreenAttrs_S;
-                windowedAttributes = windowedAttrs_S;
-                
-                NSOpenGLPixelFormatAttribute *p = fullScreenAttributes;
-                while (*p != 0xffffffff )
-                {
-                    if ( *p == 0x7fffffff )
-                    {
-                        *p = fsaa;
-                        break;
-                    }
-                    p++;
-                }
-                p = windowedAttributes;
-                while (*p != 0xffffffff )
-                {
-                    if ( *p == 0x7fffffff )
-                    {
-                        *p = fsaa;
-                        break;
-                    }
-                    p++;
-                }
-            }
+    for (NSOpenGLPixelFormatAttribute *attr = attributes; *attr; ++attr) {
+        if (*attr == attrKey && *(attr + 1) == placeholderAttributeValue) {
+            *(attr + 1) = attrValue;
+            return;
         }
     }
+#if DEBUG
+    throw "Didn't find placeholder value to reset OGL attribute";
+#endif
 }
 
-static NSScreen* ddpGetScreen(int oglDisplayMask)
+static bool rendererSupportsFSAA(GLuint displayMask) // returns false on error
 {
-	displayID = CGOpenGLDisplayMaskToDisplayID(oglDisplayMask);
+    CGLError err = kCGLNoError;
+    CGLRendererInfoObj info = nullptr;
+    GLint nrend = 0, value = 0;
+
+    if ((err = CGLQueryRendererInfo(displayMask, &info, &nrend)) != kCGLNoError) {
+        // Failed to get renderer
+        return false;
+    }
+    
+    err = CGLDescribeRenderer(info, 0, kCGLRPSampleModes, &value);
+    CGLDestroyRendererInfo(info); // Don't need it anymore.
+    
+    if (err != kCGLNoError || // Failed to get info.
+        nrend < 1 // Fail if no renderers are described.
+    ) {
+        return false;
+    }
+    
+    return (value & kCGLMultisampleBit) != 0;
+}
+
+static bool enableFSAAIfRequested(NSOpenGLPixelFormatAttribute *attributes, CGDirectDisplayID oglDisplayMask)
+{
+    int fsaa_ = 0;
+
+    if (!cfgPrefsGetInt("app.fsaasamples", &fsaa_) || fsaa_ <= 0) {
+        // If value not set or is zero, don't even bother. Not an error.
+        return true;
+    }
+    
+    unsigned int fsaa = static_cast<unsigned int>(fsaa_);
+    
+    if (!rendererSupportsFSAA(oglDisplayMask)) {
+        return false;
+    }
+    
+    // Wipe out the placeholder that keeps the FSAA attributes from being used by default.
+    // This is a bit of a stupid hack, but it makes a bunch of code elsewhere cleaner.
+    NSOpenGLPixelFormatAttribute *fsaaDisablePlaceholder = attributes, *finalTerminator = nullptr;
+    
+    while (*fsaaDisablePlaceholder++) ; // Stop at first 0
+    finalTerminator = ++fsaaDisablePlaceholder;
+    while (*finalTerminator++) ; // Stop at next 0
+    
+    // No need to re-terminate - the final terminator is included in the memory copy.
+    memmove(fsaaDisablePlaceholder, // Destination = overwrite the disable placeholder
+            fsaaDisablePlaceholder + 1, // Source = first entry after the disable placeholder
+            (finalTerminator - (fsaaDisablePlaceholder + 1)) * sizeof(NSOpenGLPixelFormatAttribute)
+            // ^ length = number of entries covered by the distance between the source and the end
+    );
+    
+    // Finally, set the sample value.
+    resetOGLAttributeValue(attributes, NSOpenGLPFASamples, fsaa);
+    return true;
+}
+
+static NSScreen *ddpGetScreen(int oglDisplayMask)
+{
+	displayID = CGOpenGLDisplayMaskToDisplayID(static_cast<CGDirectDisplayID>(oglDisplayMask));
 	
-	for(unsigned int i = 0; i < [[NSScreen screens] count]; i++)
-	{
-		NSScreen* screen = [[NSScreen screens] objectAtIndex: i];
-		if(displayID == (CGDirectDisplayID)[[[screen deviceDescription] objectForKey:@"NSScreenNumber"] longValue])
+    for (NSScreen *screen in [NSScreen screens]) {
+		if (displayID == (CGDirectDisplayID)[[screen deviceDescription][@"NSScreenNumber"] longValue])
 			return screen;
 	}
-	
 	return [NSScreen mainScreen];
 }
 
 void ddpHandleVsync()
 {
-	GLint params[1] = {(GLint)g_enableVSync};
-    if (nsOpenGlContext!=NULL)
-    {
-        CGLSetParameter((CGLContextObj)[nsOpenGlContext CGLContextObj], kCGLCPSwapInterval, params);	
+    if (nsOpenGlContext) {
+        CGLSetParameter(nsOpenGlContext.CGLContextObj, kCGLCPSwapInterval, (GLint[1]){ (GLint)g_enableVSync });
     }
 }
 
-LOGICAL ddpCreateWnd(int x, int y, int width, int height, int inBpp, int fullscreen, int monitor, int refreshrate)
+// Used this commit from opensource project as guide for replacing deprecated
+// CoreGraphics functions regarding display modes. - Gadget
+// https://github.com/glfw/glfw/commit/be547da9d2ead0ee17371111a06b85d088ba47a8
+static CGDisplayModeRef CopyBestDisplayMode(CGDirectDisplayID display, int bpp, int width, int height, int refresh)
 {
-	NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    static NSArray * const all16BitModes = @[ @IO16BitDirectPixels, @kIO16BitFloatPixels ],
+                   * const all32BitModes = @[ @IO32BitDirectPixels, @kIO32BitFloatPixels ];
     
-    NSOpenGLContext* context;
+    CGDisplayModeRef bestMatch = nullptr;
+    NSArray *allModes = CFBridgingRelease(CGDisplayCopyAllDisplayModes(display, nullptr));
     
-	ddpScreen = ddpGetScreen(monitor);
-	bpp = inBpp;
+    for (id objcModeRef in allModes) {
+        CGDisplayModeRef mode = (__bridge CGDisplayModeRef)objcModeRef;
+        uint32_t modeFlags = CGDisplayModeGetIOFlags(mode);
+        NSString *modePixelEncoding = CFBridgingRelease(CGDisplayModeCopyPixelEncoding(mode));
+        size_t modeWidth = CGDisplayModeGetWidth(mode), modeHeight = CGDisplayModeGetHeight(mode);
+        double modeRefreshRate = CGDisplayModeGetRefreshRate(mode);
+        
+        // Check if sane mode
+        if (!(modeFlags & kDisplayModeValidFlag) || !(modeFlags & kDisplayModeSafeFlag)) {
+            continue;
+        }
     
-    examineRenderer(monitor);
-    
-	CGDirectDisplayID displayID = (CGDirectDisplayID)[[[ddpScreen deviceDescription] objectForKey:@"NSScreenNumber"] longValue];
-    
-    defaultMode = CGDisplayCopyDisplayMode ( displayID );
+        // Check if color depth matches
+        if (bpp != 0 &&
+            ((bpp == 16 && ![all16BitModes containsObject:modePixelEncoding]) ||
+             (bpp == 32 && ![all32BitModes containsObject:modePixelEncoding]))
+        ) {
+            continue;
+        }
+        
+        // Check width and height - to be candidate, must be:
+        // 1) Greater than or equal to the request.
+        // 2) Less than or equal to the previous best match.
+        if (modeWidth < static_cast<size_t>(width) || modeHeight < static_cast<size_t>(height)) {
+            continue;
+        }
+        if (bestMatch && (modeWidth > CGDisplayModeGetWidth(bestMatch) || modeHeight > CGDisplayModeGetHeight(bestMatch))) {
+            continue;
+        }
+        
+        // Check refresh rate - same criteria as height and width
+        if (refresh > 0.0 && modeRefreshRate < refresh) {
+            continue;
+        }
+        if (refresh > 0.0 && bestMatch && modeRefreshRate > CGDisplayModeGetRefreshRate(bestMatch)) {
+            continue;
+        }
+        
+        // Equal to or better than previous best.
+        bestMatch = mode;
+    }
+    // If there are no matches, return the display's current mode as a fallback.
+    return bestMatch ? CGDisplayModeRetain(bestMatch) : CGDisplayCopyDisplayMode(display);
+}
 
-	fullScreenAttributes[NSOpenGLPFAColorSize] = (NSOpenGLPixelFormatAttribute)bpp;
-	fullScreenAttributes[NSOpenGLPFAScreenMask] = (NSOpenGLPixelFormatAttribute)CGDisplayIDToOpenGLDisplayMask(displayID);
-    fullScreenAttributes[NSOpenGLPFAFullScreen] = (NSOpenGLPixelFormatAttribute) true;
+LOGICAL ddpCreateWnd(int x, int y, int width, int height, int bpp, int fullscreen, UINT32 monitor, int refreshrate)
+{
+    NSOpenGLContext *context = nil;
     
-	windowedAttributes[NSOpenGLPFAColorSize] = (NSOpenGLPixelFormatAttribute)bpp;
+	if (!(ddpScreen = ddpGetScreen(static_cast<int>(monitor)))) {
+        fprintf(stderr, "Failed to get screen for chosen display\n");
+        return false;
+    }
+    monitor = (CGDirectDisplayID)[[ddpScreen deviceDescription][@"NSScreenNumber"] longValue];
+    defaultMode = CGDisplayCopyDisplayMode(monitor);
+    fullScreenMode = CopyBestDisplayMode(monitor, bpp, width, height, refreshrate);
+
+    if (!enableFSAAIfRequested(oglAttributes, monitor)) {
+        fprintf(stderr, "Failed to enable FSAA\n");
+        return false;
+    }
+    resetOGLAttributeValue(oglAttributes, NSOpenGLPFAColorSize, static_cast<NSOpenGLPixelFormatAttribute>(bpp));
     
     ddpView = [[NSOpenGLView alloc] initWithFrame:NSMakeRect(0, 0, width, height)
-                                      pixelFormat:[[[NSOpenGLPixelFormat alloc] initWithAttributes:windowedAttributes] autorelease]];
-    [ddpView retain];
-    context = [ddpView openGLContext];
-    if(!context) throw "Unable To Allocate OpenGL Window Context";
-    
-    NSRect screenRect = [ddpScreen frame];
-
-    if ( ! fullscreen )
-    {
-        winRect = NSMakeRect(screenRect.origin.x, screenRect.origin.y, screenRect.size.width, screenRect.size.height);
-        ddpWin = [[NSWindow alloc] initWithContentRect: winRect styleMask: NSBorderlessWindowMask backing: NSBackingStoreNonretained defer: NO];
-    } else {
-        
-        winRect = NSMakeRect(0, 0, width, height);
-        ddpWin = [[NSWindow alloc] initWithContentRect: winRect styleMask: NSTitledWindowMask backing: NSBackingStoreNonretained defer: NO];
+                                      pixelFormat:[[[NSOpenGLPixelFormat alloc] initWithAttributes:oglAttributes] autorelease]];
+    context = ddpView.openGLContext;
+    if (!context) {
+        throw "Unable To Allocate OpenGL Window Context";
     }
-        //winRect.origin.x = screenRect.origin.x + (screenRect.size.width - winRect.size.width) / 2;
-        //winRect.origin.y = screenRect.origin.y + (screenRect.size.height - winRect.size.height) / 2;
-        
-    [ddpWin setReleasedWhenClosed:NO];
-    [ddpWin setAcceptsMouseMovedEvents:NO];
     
+    if (fullscreen) {
+        winRect = NSMakeRect(0, 0, width, height);
+    } else {
+        winRect = NSMakeRect((ddpScreen.frame.size.width) / 2 - (width / 2), (ddpScreen.frame.size.height) / 2 - (height / 2), width, height);
+    }
+
+    ddpWin = [[NSWindow alloc] initWithContentRect:winRect
+                               styleMask:fullscreen ? NSBorderlessWindowMask : NSTitledWindowMask
+                               backing:NSBackingStoreBuffered
+                               defer:NO];
+    ddpWin.releasedWhenClosed = NO;
+    ddpWin.acceptsMouseMovedEvents = NO;
     nsOpenGlContext = context;
-	
-	[NSMenu setMenuBarVisible:NO];
-    
-	ddpSetFullScreen(fullscreen);
-	
+	ddpSetFullScreen(!!fullscreen);
 	ddpHandleVsync();
-	
-	[pool release];
-    
-	return TRUE;
+	return true;
 }
 
 void ddpSetupGL(int w, int h)
 {
 	[nsOpenGlContext makeCurrentContext];
-    
     *oglGetProjectionMatrix() = IdentityMatrix;
-    
 	piSetViewportDimensions(0, 0, w, h, 0.0f, 1.0f);
-    
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
-    
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-    
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glewInit();
 }
@@ -250,7 +272,6 @@ UINT32 ddpEngine(void* param)
 {
     //	piResetRenderStats();
 	ddpUpdate();
-    
 	return 0;
 }
 
@@ -260,18 +281,14 @@ LOGICAL	ddpFlip()
 	return TRUE;
 }
 
-BOOL cursorHidden = FALSE;
-
 void ddpShowCursor(void)
 {
-    //  [ddpWin setAcceptsMouseMovedEvents:YES];
 	[NSCursor unhide];
     cursorHidden = FALSE;
 }
 
 void ddpHideCursor(void)
 {
-    //  [ddpWin setAcceptsMouseMovedEvents:NO];
 	[NSCursor hide];
     cursorHidden = TRUE;
 }
@@ -284,17 +301,12 @@ void ddpKill()
 
 long ddpGetTotalPaints(void)
 {
-	return totpaints;
-}
-
-int	ddpGetBPP()
-{
-	return bpp;
+	return static_cast<long>(totpaints);
 }
 
 UINT32 ddpGetClockTime(UINT32 * Time)
 {
-	*Time = GetTickCount();
+	*Time = timeGetTime();
 	return 0;
 }
 
@@ -311,50 +323,124 @@ void ddpResetFPS()
 
 float ddpGetFPS()
 {
-	UINT32   ttime;
-	float   fps=0.0f;
+	float ttime = static_cast<float>(frametime) - static_cast<float>(tottime), fps = 0.0f;
     
-	ttime = (frametime - tottime);
-	if (ttime)
-	{
-		fps = (float)totpaints * 1000.0f / (float)ttime;
+	if (ttime > 0.0f) {
+		fps = static_cast<float>(ddpGetTotalPaints()) * 1000.0f / ttime;
 	}
-    
-	return(fps);
+	return fps;
 }
 
-
-LOGICAL ddcapStart()
+// Note: The following code takes advantage of the semantics of messaging nil in
+// Objective-C in several places. Do not mistake failures to check for nil for
+// lack of consideration of it's effect. For example, in the code below, only
+// "screenshotsDir" is checked for nil, even though "picturesDir" is used to
+// create it. This is okay because a nil "picturesDir" will always return nil
+// from any message; therefore checking "screenshotsDir" counts as checking
+// both at once. (Additionally, messages to nil are very very fast, so no speed
+// penalty is taken.)
+static NSURL *ddcapGenerateScreenshotURL(NSString *providedName)
 {
-	UCHAR* bitmap = (UCHAR*)malloc(ddpGetWidth() * ddpGetHeight() * 3);
+    static dispatch_once_t predicate = 0;
+    static NSURL *screenshotsDirectory = nil;
+    static NSDateFormatter *dateFormatter = nil;
+
+    // Only need to do all this setup and configuration once.
+    dispatch_once(&predicate, ^ {
+        // Find ~/Pictures
+        NSURL *picturesDir = [[NSFileManager defaultManager]
+            URLForDirectory:NSPicturesDirectory inDomain:NSUserDomainMask appropriateForURL:nil create:YES error:nullptr];
+        // Add our custom subdirectory to the URLs - TODO: Add a setting for users to configure this
+        NSURL *screenshotsDir = [picturesDir URLByAppendingPathComponent:@"WW2OL Screenshots"];
+        NSError *error = nil;
+        
+        if (!screenshotsDir) {
+            dbugLog(_FLW, "Failed to find screenshot directory");
+            return;
+        }
+        // Create the custom subdirectory if it doesn't already exist.
+        if (![[NSFileManager defaultManager] createDirectoryAtURL:screenshotsDir withIntermediateDirectories:NO attributes:nil error:&error]) {
+            // Only error if it's not 'cause the dir already exists. Checking first would be a race condition.
+            // No, it's not likely we'll encounter that race condition. That's no reason to write bad code.
+            if (![error.domain isEqualToString:NSCocoaErrorDomain] || error.code != NSFileWriteFileExistsError) {
+                dbugLog(_FLW, "Failed to create screenshot directory");
+                return;
+            }
+        }
+        screenshotsDirectory = [screenshotsDir retain];
+        
+        // Create a date formatter that includes full date and time info,
+        // doesn't return "today" etc., and uses the user's formatting settings.
+        dateFormatter = [[NSDateFormatter alloc] init];
+        [dateFormatter setDateFormat:[NSDateFormatter dateFormatFromTemplate:@"YYYY-MM-dd HH.mm.ss.SSSS" options:0 locale:[NSLocale currentLocale]]];
+        dateFormatter.doesRelativeDateFormatting = NO;
+        dateFormatter.locale = [NSLocale currentLocale];
+    });
+    
+    // The filename will be "<providedName> - <datetime>.png" ("WW2OL" is the default if no name is provided)
+    NSString *screenshotName = [NSString stringWithFormat:@"%@ - %@", providedName ?: @"WW2OL", [dateFormatter stringFromDate:[NSDate date]]];
+    
+    return [screenshotsDirectory URLByAppendingPathComponent:[screenshotName stringByAppendingPathExtension:@"png"]];
+}
+
+// Note: It is STRONGLY recommended to wrap an autorelease pool around this call.
+static bool ddcapSaveScreenRegion(GLint x, GLint y, GLsizei w, GLsizei h, NSString *name = nil)
+{
+    NSURL *screenshotURL = ddcapGenerateScreenshotURL(name); // default is just based on current time
+    
+    if (!screenshotURL) {
+        fprintf(stderr, "Error finding place to save screenshot\n");
+        return false;
+    }
+    
+    NSMutableData *bitmap = [NSMutableData dataWithLength:static_cast<NSUInteger>(4/*RGBA*/ * ddpGetWidth() * ddpGetHeight())];
 	
-	if(bitmap)
-	{
-		char picFolder[128],path[256],filename[64];
-		FSRef ref;
-		FSFindFolder(kUserDomain, kPictureDocumentsFolderType, kCreateFolder, &ref);		 
-		FSRefMakePath(&ref, (unsigned char*)picFolder, 127);
-		time_t t = time(NULL);
-		strftime(filename,63, "%F %H.%M.%S", localtime(&t));
-        
-		snprintf(path,255,"%s/WW2OL Screenshots", picFolder);
-		mkdir(path, S_IRWXU);
-		
-		snprintf(path,255,"%s/WW2OL Screenshots/%s.bmp", picFolder,filename);
-		
-		glReadPixels(0, 0, ddpGetWidth(), ddpGetHeight(), GL_RGB, GL_UNSIGNED_BYTE, bitmap);
-		ddcapSave(bitmap, ddpGetWidth(), ddpGetHeight(), path);
-        
-		free(bitmap);
-	}
-	return TRUE;
+	if (!bitmap) {
+        dbugLog(_FLA, "MEMORY ALLOCATION FAILURE!!");
+        return false;
+    }
+    
+    glReadPixels(std::min<GLint>  (x, ddpGetWidth()), std::min<GLint>  (y, ddpGetHeight()),
+                 std::min<GLsizei>(w, ddpGetWidth()), std::min<GLsizei>(h, ddpGetHeight()),
+                 GL_RGBA, GL_UNSIGNED_BYTE, bitmap.mutableBytes
+    );
+    
+    NSBitmapImageRep *imageRep = [[NSBitmapImageRep alloc]
+        initWithBitmapDataPlanes:(unsigned char *[]){ static_cast<unsigned char *>(bitmap.mutableBytes) }
+        pixelsWide:ddpGetWidth() pixelsHigh:ddpGetHeight()
+        bitsPerSample:8 samplesPerPixel:4 hasAlpha:YES isPlanar:NO colorSpaceName:NSDeviceRGBColorSpace
+        bitmapFormat:NS32BitLittleEndianBitmapFormat bytesPerRow:4 * ddpGetWidth() bitsPerPixel:32
+    ];
+    
+    if (!imageRep) {
+        dbugLog(_FLW, "Failed to read screenshot data");
+        return false;
+    }
+    
+    NSData *pngData = [imageRep representationUsingType:NSPNGFileType properties:@{ NSImageInterlaced: @NO, /* do NOT specify a gamma */ }];
+    
+    if (![pngData writeToURL:screenshotURL options:NSDataWritingWithoutOverwriting error:nullptr]) {
+        dbugLog(_FLW, "Failed to write PNG to %s", screenshotURL.path.UTF8String);
+        return false;
+    }
+    return true;
+}
+
+static LOGICAL ddcapGrabScreen()
+{
+    // Unfortunately, this is one case where we *definitely* want an
+    // autorelease pool, especially since NSApplicationMain() is not running and
+    // we therefore can't depend on the system to provide one for us.
+    @autoreleasepool {
+        return ddcapSaveScreenRegion(0, 0, ddpGetWidth(), ddpGetHeight());
+    }
 }
 
 LOGICAL	ddpUpdate()
 {
 	piResetRenderStats();
 	
-	totpaints++;
+	++totpaints;
     
 	CGLSetCurrentContext(cgl_ctx);
 	
@@ -374,7 +460,7 @@ LOGICAL	ddpUpdate()
     
 	if (resetfps)
 	{
-		tottime = frametime;
+		tottime = static_cast<UINT32>(frametime);
 		totpaints = 0;
 		ft1000mscount = ft1000msticks = 0;
 		ft500mscount = ft500msticks = 0;
@@ -389,7 +475,9 @@ LOGICAL	ddpUpdate()
     
 	if (capture > 0)
 	{
-		ddcapStart();
+		if (!ddcapGrabScreen()) {
+            dbugLog(_FLN, "Saving screenshot failed");
+        }
 		capture--;
 	}
     
@@ -417,128 +505,9 @@ void ddpCapture()
 
 void ScreenCapture(const char* name, int sx, int sy, int w, int h)
 {
-    int shotCount=0;
-    UCHAR* bitmap = (UCHAR*)memAlloc(w * h * 3);
-	char buff[128];
-    
-	if(bitmap)
-	{
-        sprintf(buff, "%s.bmp", name);    
-		glReadPixels(sx, sy, w, h, GL_RGB, GL_UNSIGNED_BYTE, bitmap);
-        GLenum err = glGetError();
-		ddcapSave(bitmap, w, h, buff);
-        
-		memFree(bitmap);
-	}
-}
-
-LOGICAL ddcapSave(UCHAR *bptr, UINT32 width, UINT32 height, char *bname)
-{
-    
-    UCHAR				*bits, *ptrin, *ptrout;
-    UINT32				i, j;
-    UINT32				size, bwidth, twidth, tsize;
-    piBITMAPINFO	*dib;
-    
-    
-	bwidth = width * 3;		// 3 bytes per pixel
-	size = bwidth * height;
-    
-	// DIBs must be DWORD aligned
-	if (3 & bwidth)
-	{
-		twidth = (bwidth + 3) & (~3);
-		tsize = twidth * height;
-	}
-	else
-	{
-		twidth = bwidth;
-		tsize = size;
-	}
-    
-	dib = (piBITMAPINFO*)malloc(tsize + sizeof(piBITMAPINFO));
-	if (!dib)
-	{
-		return(FALSE);
-	}
-    
-	dib->bmiHeader.biSize = sizeof(dib->bmiHeader);
-	dib->bmiHeader.biWidth = width;
-	dib->bmiHeader.biHeight = height;	//	top down bitmap
-	dib->bmiHeader.biPlanes = 1;
-	dib->bmiHeader.biBitCount = 24;
-	dib->bmiHeader.biCompression = BI_RGB;
-	dib->bmiHeader.biSizeImage = tsize;
-	dib->bmiHeader.biXPelsPerMeter = 0;
-	dib->bmiHeader.biYPelsPerMeter = 0;
-	dib->bmiHeader.biClrUsed = 0;
-	dib->bmiHeader.biClrImportant = 0;
-    
-	bits = (UCHAR*)dib + dib->bmiHeader.biSize;
-    
-	ptrin 	= bptr;
-	ptrout 	= bits;
-	for (i=0 ; i < height ; i++)
-	{
-		// copy a row
-		for (j=0 ; j < bwidth ; j += 3, ptrin += 3)
-		{
-			*ptrout++ = *(ptrin+2);
-			*ptrout++ = *(ptrin+1);
-			*ptrout++ = *(ptrin+0);
-		}
-        
-		// pad rest of DWORD with zeros
-		for ( ; j < twidth ; j++)
-		{
-			*ptrout++ = 0;
-		}
-	}
-    
-	// create a file from the DIB
-	if (NULL != bname)
-	{
-        piBITMAPFILEHEADER	bmfh;
-        FILE	*cf;
-        
-		bmfh.bfType = (UINT16)('B' + ('M' << 8));
-		bmfh.bfSize = sizeof(bmfh) + dib->bmiHeader.biSize + twidth * height;
-		bmfh.bfReserved1 = 0;
-		bmfh.bfReserved2 = 0;
-		bmfh.bfOffBits = sizeof(bmfh) + dib->bmiHeader.biSize;
-		
-		size = dib->bmiHeader.biSize + dib->bmiHeader.biSizeImage;
-		
-		NATIVE_TO_LITTLE_ENDIAN_16(bmfh.bfType);
-		NATIVE_TO_LITTLE_ENDIAN_32(bmfh.bfSize);
-		NATIVE_TO_LITTLE_ENDIAN_16(bmfh.bfReserved1);
-		NATIVE_TO_LITTLE_ENDIAN_16(bmfh.bfReserved2);
-		NATIVE_TO_LITTLE_ENDIAN_32(bmfh.bfOffBits);
-		
-		NATIVE_TO_LITTLE_ENDIAN_32(dib->bmiHeader.biSize);
-		NATIVE_TO_LITTLE_ENDIAN_32(dib->bmiHeader.biWidth);
-		NATIVE_TO_LITTLE_ENDIAN_32(dib->bmiHeader.biHeight);
-		NATIVE_TO_LITTLE_ENDIAN_16(dib->bmiHeader.biPlanes);
-		NATIVE_TO_LITTLE_ENDIAN_16(dib->bmiHeader.biBitCount);
-		NATIVE_TO_LITTLE_ENDIAN_32(dib->bmiHeader.biCompression);
-		NATIVE_TO_LITTLE_ENDIAN_32(dib->bmiHeader.biSizeImage);
-		NATIVE_TO_LITTLE_ENDIAN_32(dib->bmiHeader.biXPelsPerMeter);
-		NATIVE_TO_LITTLE_ENDIAN_32(dib->bmiHeader.biYPelsPerMeter);
-		NATIVE_TO_LITTLE_ENDIAN_32(dib->bmiHeader.biClrUsed);
-		NATIVE_TO_LITTLE_ENDIAN_32(dib->bmiHeader.biClrImportant);
-		
-		cf = fopen(bname, "wb+");
-		if(!cf) return FALSE;
-		
-		fwrite(&bmfh, 1, sizeof(bmfh), cf);
-		fwrite(dib, 1, size, cf);
-        
-		fclose(cf);
-	}
-    
-	free(dib);
-    
-	return(TRUE);
+    @autoreleasepool {
+        ddcapSaveScreenRegion(sx, sy, w, h, @(name));
+    }
 }
 
 #include <Carbon/Carbon.h>
@@ -549,16 +518,14 @@ void sysSetMousePosition(int x, int y)
 
 void sysGetMousePosition(SINT32* x, SINT32* y)
 {
-	if(WantedWindow)
-	{
+	if(WantedWindow) {
 		NSPoint pt = [ddpWin mouseLocationOutsideOfEventStream];
+
 		*x = pt.x;
 		*y = ddpRect.size.height - pt.y;
-	}else
-	{
+	} else {
         NSPoint pt = [NSEvent mouseLocation];
-//		Point pt;
-//		GetMouse(&pt);
+
 		*x = pt.x - ddpRect.origin.x;
 		*y = pt.y - ddpRect.origin.y;
 	}
@@ -577,18 +544,12 @@ int ddpGetHeight()
 void ddpHideApplication()
 {
 	CGReleaseAllDisplays();
-    CGLClearDrawable( cgl_ctx );
+    CGLClearDrawable(cgl_ctx);
     
-    if ( ddpWin )
-    {
+    if (ddpWin) {
         [ddpWin orderOut:ddpWin];	
     }
 	[NSApp deactivate];
-}
-
-bool ddpAppHidden()
-{
-	return appHidden;
 }
 
 void ddpToggleWindowedMode()
@@ -601,35 +562,42 @@ void ddpShowApplication()
 	ddpSetFullScreen(!WantedWindow);
 }
 
+// IMPORTANT: This is not just a setup routine! This is called every time the
+// application is activated or deactivated.
 void ddpSetFullScreen(LOGICAL fullscreen)
 {
-	if(!canWindow && !fullscreen) return;
-	
-    CGError result;
-    bool cap = true;
-    cfgPrefsGetBool("app.capturealldisplays",&cap);
-    
-	WantedWindow = !fullscreen;
-	if(fullscreen)
-	{
-        if ( cap )
-		{
-            CGCaptureAllDisplaysWithOptions(kCGCaptureNoOptions);
-        }
-        else 
-        {
-            CGDisplayCaptureWithOptions(displayID,kCGCaptureNoOptions);
-        }
+    CGError result = kCGErrorSuccess;
+    bool captureAll = false;
 
-        result = CGDisplaySetDisplayMode ( displayID, fullScreenMode, NULL );
+    if (!cfgPrefsGetBool("app.capturealldisplays", &captureAll)) {
+        captureAll = false; // don't capture all by default
+    }
+    
+    [NSMenu setMenuBarVisible:!fullscreen];
+	WantedWindow = !fullscreen;
+	if (fullscreen)
+	{
+        if (captureAll) {
+            result = CGCaptureAllDisplaysWithOptions(kCGCaptureNoOptions);
+        } else {
+            result = CGDisplayCaptureWithOptions(displayID, kCGCaptureNoOptions);
+        }
+        if (result != kCGLNoError) {
+            dbugLog(_FLW, "Failed to capture display(s)! Error %d", result);
+        }
+        result = CGDisplaySetDisplayMode(displayID, fullScreenMode, nullptr);
+        if (result != kCGLNoError) {
+            dbugLog(_FLW, "Failed to set display mode! Error %d", result);
+        }
+        
 		CGRect displayBounds = CGDisplayBounds(displayID);
 		fullRect = NSMakeRect(displayBounds.origin.x,displayBounds.origin.y, displayBounds.size.width, displayBounds.size.height);
         
-		[ddpWin orderOut: ddpWin];
+		[ddpWin orderOut:ddpWin];
 		[ddpWin setContentView: 0];	
 		ddpRect = fullRect;
 		[nsOpenGlContext setFullScreen];
-		[ddpScreen setFrame: fullRect];
+//		[ddpScreen setFrame: fullRect];
 	}
     else
 	{
@@ -645,7 +613,7 @@ void ddpSetFullScreen(LOGICAL fullscreen)
     
 //    CGDisplayModeRef mode;
 //    CFStringRef modeStr = CGDisplayModeCopyPixelEncoding(mode);
-    WantedBpp = bpp = TexBpp = 32;
+    WantedBpp = TexBpp = 32;
 	WantedWidth = ddpRect.size.width;
 	WantedHeight =  ddpRect.size.height;
     

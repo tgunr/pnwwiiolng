@@ -5,6 +5,7 @@
 #include "pi/pi.h"
 #include "include/vars.h"
 
+#include "dip.h"
 #include "ob/obmain.h"
 #include "ob/obdraw.h"
 #include "ob/obwld.h"
@@ -849,7 +850,7 @@ void _RenderDeprecated()
     const bool render = uiInGame() && (Online ? g_bVehicleAttached : TRUE);
 
 #if platOS == OS_MACOS
-	render = !ddpAppHidden();
+	//render = !ddpAppHidden();
 #endif
 
 	if(render)
@@ -1112,10 +1113,6 @@ static LOGICAL _PostInternalDrawFunc(LOGICAL IsBeforeStage)
 imap_queue_entry* imapqueue;
 UINT32 imapqueuesize;
 
-#if platOS == OS_MACOS
-void checkIfInFront();
-#endif
-
 void gmlpProcessInputs(void)
 {
 	CHAR_INPUT* input;
@@ -1125,7 +1122,7 @@ void gmlpProcessInputs(void)
 	static SINT32 afkcheck	= frametime;
 
 #if platOS == OS_MACOS
-  checkIfInFront();
+    checkIfInFront();
 #endif
 
 	dimainGetInputs(&imapqueue, &imapqueuesize);
