@@ -156,7 +156,7 @@ public:
 	BrigadeDetail(UINT32 withBrigadeID=0) : BrigadeSummary(withBrigadeID) { m_motd[0] = m_motto[0] = 0; }
 
 	// Packer
-	virtual SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) OVERRIDE_FN;
+	virtual SINT32 packer(LOGICAL mode, ACTION_OBJECT* a) override;
 
 	// Helpers
 	const FULL_OBJ_ID& homeCPID() const { return m_homeCPID; }

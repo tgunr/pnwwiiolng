@@ -50,12 +50,6 @@
 
 #include "log/log.h"
 
-#ifdef __MWERKS__
-#define USING_EXT_NAMESPACE using namespace Metrowerks
-#else
-#define USING_EXT_NAMESPACE using namespace __gnu_cxx
-#endif
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -63,7 +57,7 @@
 #include <ctype.h>
 #include <wchar.h>
 
-#if defined(__cplusplus) && !defined(GLOBALS)
+#if defined(__cplusplus)
 # include <string>
 # include <stdexcept>
 # include <vector>

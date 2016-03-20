@@ -25,17 +25,8 @@
 #define TEUL_CLIENT		0
 #define	TEUL_SERVER		1
 
-#if __cplusplus > 199711L || (defined(_MSC_VER) && _MSC_VER >= 1700)
-# define OVERRIDE_FN override
 #else
-# define OVERRIDE_FN
-#endif
 
-#if __cplusplus > 199711L || (defined(_MSC_VER) && _MSC_VER >= 1701)
-# define CONSTEXPR_FN constexpr
-#else
-# define CONSTEXPR_FN
-#endif
 
 // borrowed from libevent.
 #if defined(__GNUC__) && __GNUC__ >= 3         /* gcc 3.0 or later */
@@ -50,10 +41,6 @@
 #define PN_LIKELY(p) (p)
 #endif
 
-#if defined(_MSC_VER)
-# define PN_THREAD_LOCAL __declspec(thread)
-#else
-# define PN_THREAD_LOCAL thread_local
 #endif
 
 // Determine which version of GCC, if any, is being used,
@@ -86,10 +73,6 @@
 # endif
 #endif
 
-#if (defined(GCC_VERSION) && GCC_VERSION >= 460) || (defined(_MSC_VER) && _MSC_VER > 1600)
-# define ENUMCLASS enum class
-#else
-# define ENUMCLASS enum
 #endif
 
 #if defined(__BIG_ENDIAN__)

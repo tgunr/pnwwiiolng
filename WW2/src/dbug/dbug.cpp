@@ -732,7 +732,7 @@ void _levelHandler(UINT32 errType, const char* const text)
 //////////////////////////////////////////////////////////////////////
 // "Pretty" logging routine.
 
-void NORETURN_FN
+[[noreturn]] void
 _LogAbort(const char* file_, unsigned int line_, unsigned int error_, const char* assertion_, const char* fmt_, ...)
 {
 	va_list args;

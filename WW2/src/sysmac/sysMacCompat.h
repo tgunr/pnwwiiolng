@@ -7,15 +7,8 @@
 #include "include/sysTypes.h"
 
 typedef UINT32 DWORD;
-#if USE_OSG
-#ifdef __cplusplus
+
 #define _isnan std::isnan
-#else
-#define _isnan isnan
-#endif
-#else
-#define _isnan std::isnan
-#endif
 #define _finite std::isfinite
 #define stricmp strcmpi
 #define _stricmp strcmpi
@@ -42,10 +35,7 @@ typedef UINT32 DWORD;
 #ifdef __cplusplus
 #include <algorithm>
 #else
-#ifndef max
 #define max(a,b)  ({ __typeof__((a)) __a = (a); __typeof__((b)) __b = (b); __a > __b ? __a : __b; })
-#endif
-#ifndef min
 #define min(a,b)  ({ __typeof__((a)) __a = (a); __typeof__((b)) __b = (b); __a < __b ? __a : __b; })
 #endif
 #endif

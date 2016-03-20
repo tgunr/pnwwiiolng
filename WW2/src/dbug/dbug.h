@@ -130,7 +130,7 @@ int _dbugLog(const char* filename, int lineno, unsigned int errType, const char*
 
 SINT32 _dbugWrite(char* filename, SINT32 lineno, UINT32 errType, char* fmt, ...);
 
-NORETURN_FN void _LogAbort(const char* filename, unsigned int lineno, unsigned int errType, const char* assertion, const char* fmt, ...);
+[[noreturn]] void _LogAbort(const char* filename, unsigned int lineno, unsigned int errType, const char* assertion, const char* fmt, ...);
 #define LogAbort(...) _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, nullptr, __VA_ARGS__)
 
 // These macros assume that the condition is unlikely and try to provide the compiler an optimization hint by
