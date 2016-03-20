@@ -535,6 +535,13 @@ static NSURL *ddcapGenerateScreenshotURL(NSString *providedName)
     // The filename will be "<providedName> - <datetime>.png" ("WW2OL" is the default if no name is provided)
     NSString *screenshotName = [NSString stringWithFormat:@"%@ - %@", providedName ?: @"WW2OL", [dateFormatter stringFromDate:[NSDate date]]];
     
+    // Because NSDateFormatter's locale template may generate invalid characters
+    // for filenames, we sanitize the string. Unfortunately, Cocoa does not
+    // provide a built-in function for ensuring this, so we hardcode knowledge
+    // of OS X's filesystem peculiarities.
+    screenshotName = [screenshotName stringByReplacingOccurrencesOfString:@"/" withString:@"-"];
+    screenshotName = [screenshotName stringByReplacingOccurrencesOfString:@":" withString:@"."];
+    
     return [screenshotsDirectory URLByAppendingPathComponent:[screenshotName stringByAppendingPathExtension:@"png"]];
 }
 
