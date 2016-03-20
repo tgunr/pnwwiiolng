@@ -233,9 +233,9 @@ _playerReleasePersona(SINT32 teulIndex, PlayerStatusNode* psn, UINT32 exitCode, 
 	if ( psn->localInfo != nullptr && _releasePersonaFn )
 	{
 
-		if ((Server::myServerInfo.flags & Server::SVRFLAG_SEND_PSTAT)
-			&& releaseType != Server::ReleaseType::Redirected
-			&& Server::myServerInfo.exitDestType > AUTH_HOST)
+		if ( (Server::myServerInfo.flags & Server::SVRFLAG_SEND_PSTAT)
+		     && releaseType != Server::ReleaseType::Redirected
+		     && Server::myServerInfo.exitDestType != AUTH_HOST )
 		{
 			destination = Server::ServerInfo::GetBest(Server::myServerInfo.exitDestType);
 			_playerExitTo(destination, psn, Server::Transfer::XferReason::Exit, exitCode);
@@ -554,7 +554,7 @@ _playerDelete(PlayerStatusNode* const psn, Server::ReleaseType releaseType)
 		 _extractPlayerFromServer(_exitServer, psn);
 
 	// alert other servers of the players demise but only if its news
-	if ( psn->status != Server::PlayerStatus::Deleted && Server::myServerInfo.exitDestType <= AUTH_HOST && (Server::myServerInfo.flags & Server::SVRFLAG_SEND_PSTAT) )
+	if ( psn->status != Server::PlayerStatus::Deleted && Server::myServerInfo.exitDestType == AUTH_HOST && (Server::myServerInfo.flags & Server::SVRFLAG_SEND_PSTAT) )
 	{
 		psn->status = Server::PlayerStatus::Deleted;
 		_sendPlayerStatusUpdate(*psn);
