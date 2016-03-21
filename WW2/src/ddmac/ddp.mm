@@ -558,37 +558,14 @@ static void ddcapFlipBuffer(NSMutableData *bitmap, GLsizei w, GLsizei h)
     // For h = 4, h / 2 = 2, we will swap(0, 3), swap(1, 2)
     // For h = 5, h / 2 = 2, we will swap(0, 4), swap(1, 3)
     // For h = 6, h / 2 = 3, we will swap(0, 5), swap(1, 4), swap(2, 3)
-    // These loops SHOULD be massively parallelizable, but my skill at thinking out all the cache coherency and
-    // data dependency logic is rusty, so I'll just have to cross my fingers.
+    // These loops are massively parallelizable, so I let Clang do the dirty work for me.
     for (GLsizei row = 0; row < (h / 2); ++row) {
-        // It's difficult to tell std::swap() how to handle our raw buffer as an array of arrays. So we do the XOR trick instead
-        // and unroll the loop manually to help the compiler. Clang can do this on its own, but Duff's Device is cool. Besides,
-        // I'm flashy and a showoff - Gadget
         uint32_t *tRow = basePtr + (row * w);
         uint32_t *bRow = basePtr + ((h - row - 1) * w);
         
-        // Say, didn't I read somewhere that conventional swap is actually faster on modern processors? Oh well.
-        for (GLsizei col = 0; col < (w & ~0x7); col += 8) {
-            std::swap(tRow[col + 0], bRow[col + 0]);
-            std::swap(tRow[col + 1], bRow[col + 1]);
-            std::swap(tRow[col + 2], bRow[col + 2]);
-            std::swap(tRow[col + 3], bRow[col + 3]);
-            std::swap(tRow[col + 4], bRow[col + 4]);
-            std::swap(tRow[col + 5], bRow[col + 5]);
-            std::swap(tRow[col + 6], bRow[col + 6]);
-            std::swap(tRow[col + 7], bRow[col + 7]);
-        }
-        // This will probably confuse the prefetcher somewhat by doing the reverse order, but since no screen resolutions should
-        // fail to be even multiples of 8 anyway... (*cough* 1440x900)
-        switch (w & 0x7) {
-            case 7: std::swap(tRow[w - 1], bRow[w - 1]); [[clang::fallthrough]];
-            case 6: std::swap(tRow[w - 2], bRow[w - 2]); [[clang::fallthrough]];
-            case 5: std::swap(tRow[w - 3], bRow[w - 3]); [[clang::fallthrough]];
-            case 4: std::swap(tRow[w - 4], bRow[w - 4]); [[clang::fallthrough]];
-            case 3: std::swap(tRow[w - 5], bRow[w - 5]); [[clang::fallthrough]];
-            case 2: std::swap(tRow[w - 6], bRow[w - 6]); [[clang::fallthrough]];
-            case 1: std::swap(tRow[w - 7], bRow[w - 7]); [[clang::fallthrough]];
-            default: break;
+        #pragma clang loop vectorize(enable) vectorize_width(8)
+        for (GLsizei col = 0; col < w; ++col) {
+            std::swap(tRow[col], bRow[col]);
         }
     }
 }
