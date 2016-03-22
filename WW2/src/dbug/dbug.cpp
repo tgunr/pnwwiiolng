@@ -717,7 +717,7 @@ SINT32 _dbugLog(const char* const filename, const SINT32 lineno, const UINT32 er
 }
 
 //_dbugWrite: same as above for dbugWrite
-SINT32 _dbugWrite(char* filename, SINT32 lineno, UINT32 errType, char* fmt, ...)
+SINT32 _dbugWrite(char* filename, SINT32 lineno, UINT32 errType, const char* fmt, ...)
 {
 	va_list args;
 

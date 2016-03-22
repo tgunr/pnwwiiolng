@@ -14,6 +14,8 @@
 #define PN_LIKELY(p)   __builtin_expect(!!(p), 1)
 #define PN_UNLIKELY(p) __builtin_expect(!!(p), 0)
 #define PRSizeT "zu"
+#define FORMAT_FUN(n,m) [[gnu::format(printf,n,m)]]
+#define FORMAT_ARG(n)
 
 #else
 
@@ -21,10 +23,13 @@
 // hints. Well, such is life.
 #define PN_LIKELY(p)
 #define PN_UNLIKELY(p)
-
 // MSVC also flouts the standard with size_t format specifiers.
 #define PRSizeT "Iu"
+// And finally, it ALSO doesn't implement compiler-checked format strings like everyone else!
+#define FORMAT_FUN(n,m)
+#define FORMAT_ARG(n)   _Printf_format_string_params_(n)
 
+// Add some explicit warnings
 #pragma warning( 1 : 4505 )	// unreferenced local functions
 #pragma warning( 1 : 4101 )	// unreferenced local variables
 #pragma warning( 1 : 4102 )	// unreferenced local label
@@ -76,7 +81,7 @@ static inline struct tm *localtime_r(const time_t *t, struct tm *b) { localtime_
 template<size_t bufSize, typename... Args>
 UINT32 strprintf(char(&buf)[bufSize], const char* fmt, Args&&... args)
 {
-    return snprintf(buf, bufSize, fmt, std::forward<Args>(args)...);
+    return static_cast<UINT32>(snprintf(buf, bufSize, fmt, std::forward<Args>(args)...));
 }
 
 // Cross-platform path builder.
