@@ -51,7 +51,8 @@ extern char* rmtrail(char* str);
 template <size_t _DestSize>
 static inline void strsafecpy(char (&dest)[_DestSize], const char* src)
 {
-    strlcpy(dest, src, _DestSize);
+	strncpy(dest, src, _DestSize - 1);
+	dest[_DestSize - 1] = 0;
 }
 
 template <size_t _DestSize>

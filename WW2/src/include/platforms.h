@@ -21,8 +21,8 @@
 
 // Microsoft recommends profile-guided optimization instead of static prediction
 // hints. Well, such is life.
-#define PN_LIKELY(p)
-#define PN_UNLIKELY(p)
+#define PN_LIKELY(p) (p)
+#define PN_UNLIKELY(p) (p)
 // MSVC also flouts the standard with size_t format specifiers.
 #define PRSizeT "Iu"
 // And finally, it ALSO doesn't implement compiler-checked format strings like everyone else!
@@ -70,8 +70,8 @@
 #endif
 
 #include <io.h>
-
-static inline struct tm *localtime_r(const time_t *t, struct tm *b) { localtime_s(b, t); }
+#include <time.h>
+static inline struct tm *localtime_r(const time_t *t, struct tm *b) { localtime_s(b, t); return b; }
 #endif
 
 #include "include/precompile_includes.h"

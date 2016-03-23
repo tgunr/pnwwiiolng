@@ -39,6 +39,8 @@
 
 #include "wwii/wwiiUTF.h"
 
+#include "str/stringLib.h"
+
 #ifndef PATH_MAX
 # define PATH_MAX 1024
 #endif
@@ -556,7 +558,7 @@ void fiodSetPrepath(char* newpath)
 {
 	if (newpath == nullptr) {
         if (OriginalPrepath) {
-        	strlcpy(DataPath, OriginalPrepath, sizeof(DataPath));
+			strsafecpy(DataPath, OriginalPrepath);
         }
 		return;
     }
@@ -566,7 +568,7 @@ void fiodSetPrepath(char* newpath)
 #if platBuild == TEUL_SERVER
     cv_dataDir.SetString(newPath);
 #else
-    strlcpy(DataPath, newpath, sizeof(DataPath));
+	strsafecpy(DataPath, newpath);
 #endif
 }
 #endif

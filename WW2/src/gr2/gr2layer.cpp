@@ -48,6 +48,8 @@ static ref_ptr<RenderStateSet> depthpass;
 
 #include "fp/fpTPSdata.h"
 
+#include "str/stringLib.h"
+
 static char texname[512];
 
 #define GRANNY_VERSION(x,y) (GrannyProductMajorVersion >= x && GrannyProductMinorVersion >= y)
@@ -4290,8 +4292,8 @@ const char* getBaseName(const char* path, const char* prePath)
     if ((sepPos = name.rfind('.')) != std::string::npos) {
         name = name.substr(0, sepPos);
     }
-    name = (prePath ?: "") + name;
-    strlcpy(texname, name.c_str(), sizeof(texname));
+    name = (prePath ? prePath : "") + name;
+	strsafecpy(texname, name.c_str());
 	return texname;
 }
 
