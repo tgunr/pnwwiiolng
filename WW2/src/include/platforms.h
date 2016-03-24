@@ -99,5 +99,5 @@ UINT32 strprintf(char(&buf)[bufSize], const char* fmt, Args&&... args)
 template<size_t bufSize>
 UINT32 pathprintf(char (&buf)[bufSize], const char* lhs, const char* rhs)
 {
-	return strprintf<bufSize>(buf, "%s\\%s", lhs, rhs);
+	return strprintf<bufSize>(buf, "%s/%s", lhs, rhs);
 }

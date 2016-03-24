@@ -159,7 +159,15 @@ static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* wi
 #endif
 
 	// think this works as char* because when we get to here we're talking about relative paths which are all ascii?
-	pathprintf(buffer, DataPath, name);
+	size_t pathLen = pathprintf(buffer, DataPath, name);
+
+        // must be included for now until data list files can all be cleaned up
+        for ( size_t i = 0; i < pathLen; ++i )
+        {
+                if ( buffer[i] == '\\' )
+                        buffer[i] = '/';
+        }
+
 	struct stat statBuffer;
 	retval = stat(os_file_path(buffer), &statBuffer);
 
