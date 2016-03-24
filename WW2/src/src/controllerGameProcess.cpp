@@ -123,6 +123,9 @@ void GameProcess::RequestStop()
 		return;
 	m_wantRunning = false;
 	Log("requestStop");
+
+	// TODO: Close cleanly.
+	Kill();
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -465,8 +468,7 @@ namespace GameProcessManager
 		// Ask all processes to stop.
 		for ( auto it = s_processes.begin(); it != s_processes.end(); ++it )
 		{
-			auto& proc = *(it++);
-			proc.RequestDiscontinue();
+			it->RequestDiscontinue();
 		}
 
 		teulSyncClock();
