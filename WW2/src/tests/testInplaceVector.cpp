@@ -11,7 +11,7 @@ public:	InplaceVectorTest() : TestUnit("inplace_vector") {}
 
 public: virtual ~InplaceVectorTest() {}
 
-public:	virtual bool Run() OVERRIDE_FN;
+public:	virtual bool Run() override;
 };
 
 bool

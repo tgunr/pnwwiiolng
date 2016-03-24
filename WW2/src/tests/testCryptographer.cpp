@@ -93,7 +93,7 @@ public: virtual bool TestVersion(const UINT32 version, const UINT16 bufSize, con
 			return true;
 		}
 
-public: virtual bool Run() OVERRIDE_FN
+public: virtual bool Run() override
 		{
 			if ( !TestVersion(0, 1000, 0ULL) )
 				return false;

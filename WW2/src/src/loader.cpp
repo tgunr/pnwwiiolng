@@ -44,12 +44,12 @@ public:
 		, m_session(static_cast<irc_session_t*>(s))
 	{}
 
-	virtual void run() OVERRIDE_FN
+	virtual void run() override
 	{
 		irc_run(m_session);
 	}
 
-	virtual void onCancel() OVERRIDE_FN
+	virtual void onCancel() override
 	{
 		irc_session_t* session = m_session;
 		m_session = nullptr;
@@ -267,7 +267,7 @@ _checkDirectoryStructure()
 		return;
 	}
 
-	LogAbort("*** Unable to access or create " SUB_PATH("%s", "%s"), cv_dataDir.GetString(), cv_terrainSubdir.GetString());
+	LogAbort("*** Unable to access or create %s/%s", cv_dataDir.GetString(), cv_terrainSubdir.GetString());
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -306,13 +306,13 @@ _checkOriginFile()
 	FILE* fp = fopen(cv_originFile.GetString(), "rb");
 	if ( fp == nullptr )
 	{
-		LogAbort("Unable to access " SUB_PATH("%s", "%s")
+		LogAbort("Unable to access %s/%s"
 				, cv_dataDir.GetString(), cv_originFile.GetString());
 	}
 
 	if ( fgets(g_origin, sizeof(g_origin) - 1, fp) == nullptr )
 	{
-		LogAbort("Unable to read " SUB_PATH("%s", "%s")
+		LogAbort("Unable to read %s/%s"
 			, cv_dataDir.GetString(), cv_originFile.GetString());
 	}
 
@@ -421,7 +421,7 @@ main(int argc,char** argv)
 
 	importFile = fopen(importFileName, "r");
 	if ( importFile == nullptr )
-		LogAbort("Unable to access import file " SUB_PATH("%s", "%s"), cv_dataDir.GetString(), importFileName);
+		LogAbort("Unable to access import file %s/%s", cv_dataDir.GetString(), importFileName);
 
 	nick = cv_clusterName.GetString();
 	nick += "Loader";

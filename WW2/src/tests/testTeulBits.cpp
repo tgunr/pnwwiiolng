@@ -9,7 +9,7 @@ class TeulBitsTest : public TestUnit
 public:
 	TeulBitsTest() : TestUnit("TeulBits") {}
 
-public: virtual bool Run() OVERRIDE_FN
+public: virtual bool Run() override
 	{
 		START_TEST_STAGE( "Bits::Size" );
 

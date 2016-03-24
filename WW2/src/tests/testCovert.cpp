@@ -90,7 +90,7 @@ public:
 	}
 
 public:
-	virtual bool Run() OVERRIDE_FN
+	virtual bool Run() override
 	{
 		if (
 			!TypeTest( "UCHAR", (UCHAR)4 ) ||

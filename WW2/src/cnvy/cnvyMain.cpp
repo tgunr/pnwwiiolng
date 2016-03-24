@@ -389,7 +389,7 @@ private:
 	std::vector<Result> m_results;
 
 public:
-	virtual bool Process(const size_t numRows) OVERRIDE_FN
+	virtual bool Process(const size_t numRows) override
 	{
 		if ( numRows > 0 )
 		{
@@ -403,7 +403,7 @@ public:
 	}
 
 public:
-	virtual void Success() OVERRIDE_FN
+	virtual void Success() override
 	{
 		extern bool dbUpdateWWIIConfigValue(const char* varName, const char* value, const char* modstamp);
 

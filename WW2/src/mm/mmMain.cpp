@@ -192,7 +192,7 @@ class PersonaMirrorTo : public Server::PersonaMirror
 								);
 			}
 
-	public:	virtual SINT32 onComplete(SINT32 resultCode) const OVERRIDE_FN;
+	public:	virtual SINT32 onComplete(SINT32 resultCode) const override;
 };
 
 //////////////////////////////////////////////////////////////////////

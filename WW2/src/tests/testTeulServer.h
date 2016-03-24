@@ -126,7 +126,7 @@ struct ServerRole : public Role
 		return a->offset;
 	}
 
-	virtual int RegisterCallbacks() OVERRIDE_FN
+	virtual int RegisterCallbacks() override
 	{
 		BEGIN_CALLBACK_REGISTRATION(Role::Test_X)
 			REGISTER_RECVSEND(Role::Hello_Y, recvHello, sendHello, s_cbHello);
@@ -204,7 +204,7 @@ struct ServerRole : public Role
 	//////////////////////////////////////////////////////////////
 	// Main body of the server role.
 
-	virtual void Run() OVERRIDE_FN
+	virtual void Run() override
 	{
 		OpenListener();
 

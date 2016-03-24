@@ -159,7 +159,7 @@ static off_t _getFilePathAndSize(const char* name, bool /*userdir*/, wchar_t* wi
 #endif
 
 	// think this works as char* because when we get to here we're talking about relative paths which are all ascii?
-	size_t pathLen = pathprintf(buffer, DataPath, name);
+	pathprintf(buffer, DataPath, name);
 	struct stat statBuffer;
 	retval = stat(os_file_path(buffer), &statBuffer);
 
@@ -543,7 +543,9 @@ size_t fiodFileSize(const char* name, bool userdir)
 //////////////////////////////////////////////////////////////////////
 // Returns a pointer to the path prefix
 
+#ifndef LIMITED_FIO
 static char *OriginalPrepath = nullptr;
+#endif
 
 const char* fiodGetPrepath(void)
 {

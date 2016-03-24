@@ -47,6 +47,7 @@ extern char* stptok(const char* s, char* tok, size_t toklen, char* brk);
 #endif
 extern char* rmlead(char*);
 extern char* rmtrail(char* str);
+extern char* strescape(char* d, const char* s, char c);
 
 template <size_t _DestSize>
 static inline void strsafecpy(char (&dest)[_DestSize], const char* src)

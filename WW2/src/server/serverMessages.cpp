@@ -100,7 +100,7 @@ _recvClusterDown(ACTION_OBJECT* const a)
 	dbugLog(_FLW, "t:%d received Cluster Down command", a->teulIndex);
 	///TODO: Move this to the controller or signal myself to shutdown, anything
 	///but invoking an external command!
-	system(PN_PLAYNET_PATH PATH_SEPSTR "bin" PATH_SEPSTR "stophost");
+	system(PN_PLAYNET_PATH "/bin/stophost");
 	return -EINVAL;
 }
 

@@ -58,13 +58,13 @@ _processfile(const std::string& filename)
 
 	SINT32  retval;
 
-	char filepath[MAX_PATH+1];
-	strprintf(filepath, SUB_PATH("%s", "%s"), cv_terrainSubdir.GetString(), filename.c_str());
+	char filepath[PATH_MAX+1];
+	strprintf(filepath, "%s/%s", cv_terrainSubdir.GetString(), filename.c_str());
 
 	if ( s_verbose > 1 )
 	{
-		char fullpath[MAX_PATH+1];
-		strprintf(fullpath, SUB_PATH("%s", "%s"), cv_dataDir.GetString(), filepath);
+		char fullpath[PATH_MAX+1];
+		strprintf(fullpath, "%s/%s", cv_dataDir.GetString(), filepath);
 		fprintf(stderr, "# processing file: %s => %s (%s)\n", filename.c_str(), filepath, fullpath);
 	}
 
@@ -105,7 +105,7 @@ _processfile(const std::string& filename)
 			fprintf(stderr, "# DELETING %s\n", filename.c_str());
 		if ( s_renamesEnabled )
 		{
-			char newFilename[MAX_PATH+1];
+			char newFilename[PATH_MAX+1];
 			strprintf(newFilename, "%s.old", filepath);
 			rename(filepath, newFilename);
 		}
@@ -272,7 +272,7 @@ main(int argc, char** argv)
 	size_t files = _processDirectory();
 	if ( files <= 0 )
 	{
-		fprintf(stderr, "%s: no files processed? No .sdm files in " SUB_PATH("%s", "%s") "?\n"
+		fprintf(stderr, "%s: no files processed? No .sdm files in %s/%s ?\n"
 							, program, cv_dataDir.GetString(), cv_terrainSubdir.GetString()
 							);
 		exit(-22);

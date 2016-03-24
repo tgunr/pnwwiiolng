@@ -145,7 +145,7 @@ teulAllocSystemCallback(Teul::CallbackInit* const ci)
 	if ( PN_UNLIKELY(ci->callX >= Teul::RestrictedCallbackRange_X) )
 		LogAbort("cb:%u,%u: Invalid system callback", ci->callX, ci->callY);
 	if ( PN_UNLIKELY(ci->sendAction == nullptr && ci->recvAction == nullptr) )
-		LogAbort(_FLA, "cb:%u,%u: Invalid send/recv parameters for system callback", ci->callX, ci->callY);
+		LogAbort("cb:%u,%u: Invalid send/recv parameters for system callback", ci->callX, ci->callY);
 
 	return teulAllocCALLBACKi(ci);
 }

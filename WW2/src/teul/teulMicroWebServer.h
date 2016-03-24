@@ -49,10 +49,10 @@ namespace Teul
 			unsigned short port() const { return m_port; }
 
 		public:
-			virtual void run() OVERRIDE_FN;
+			virtual void run() override;
 
 		public:
-			virtual void onCancel() OVERRIDE_FN
+			virtual void onCancel() override
 			{
 				// If we aren't the ones cancelling the thread, do nothing.
 				// We caused cancellation. Close the socket so that the

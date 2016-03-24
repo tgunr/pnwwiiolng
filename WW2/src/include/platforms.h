@@ -9,13 +9,23 @@
 # error "Clang 3.6 or newer, GCC 4.8 or newer, or VS2015 or newer is required."
 #endif
 
-#if __is_Clang() || __is_GCC()
+#if __is_Clang()
 
 #define PN_LIKELY(p)   __builtin_expect(!!(p), 1)
 #define PN_UNLIKELY(p) __builtin_expect(!!(p), 0)
 #define PRSizeT "zu"
 #define FORMAT_FUN(n,m) [[gnu::format(printf,n,m)]]
 #define FORMAT_ARG(n)
+#define NORETURN_FN [[noreturn]]
+
+#elif __is_GCC()
+
+#define PN_LIKELY(p)   __builtin_expect(!!(p), 1)
+#define PN_UNLIKELY(p) __builtin_expect(!!(p), 0)
+#define PRSizeT "zu"
+#define FORMAT_FUN(n,m) __attribute__((format(printf,n,m)))
+#define FORMAT_ARG(n)
+#define NORETURN_FN __attribute__ ((noreturn))
 
 #else
 
@@ -28,6 +38,7 @@
 // And finally, it ALSO doesn't implement compiler-checked format strings like everyone else!
 #define FORMAT_FUN(n,m)
 #define FORMAT_ARG(n)   _Printf_format_string_params_(n)
+#define NORETURN_FN [[noreturn]]
 
 // Add some explicit warnings
 #pragma warning( 1 : 4505 )	// unreferenced local functions

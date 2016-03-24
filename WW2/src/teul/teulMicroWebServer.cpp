@@ -33,6 +33,12 @@
 # define O_BINARY 0
 #endif
 
+#if platOS == OS_WIN32
+#define PATH_SEPARATOR "\\"
+#else
+#define PATH_SEPARATOR "/"
+#endif
+
 //////////////////////////////////////////////////////////////////////
 // For throwing errors.
 
@@ -298,6 +304,7 @@ _sendPhysicalFile(const SOCKET sock, const char* const rootPath, const char* con
 		if ( path[0] != '/' && path[0] != '\\' )
 			filepath += PATH_SEPARATOR;
 		filepath += path;
+
 #if platOS == OS_WIN32
 		size_t n = 0;
 		while ( (n = filepath.find('/', n)) != filepath.npos )

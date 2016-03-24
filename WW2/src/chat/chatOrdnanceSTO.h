@@ -18,8 +18,8 @@ public:
 		{}
 	OrdnanceSTO(ACTION_OBJECT* const a);
 
-	virtual bool needsBroadcastRemoval() const OVERRIDE_FN { return false; }
-	virtual const char* typeName() const OVERRIDE_FN { return "ord"; }
+	virtual bool needsBroadcastRemoval() const override { return false; }
+	virtual const char* typeName() const override { return "ord"; }
 
 public:
 	SINT32 fromTeulIndex() const { return m_fromTeulIndex; }
