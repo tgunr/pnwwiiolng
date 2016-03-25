@@ -1860,7 +1860,7 @@ void ServerBase::s_ErrorDelegate(SINT32 teulIndex_, const UCHAR* const data_, SI
 }
 #endif
 
-void NORETURN_FN _help(const char* argv[], const Server::CommandLineOptions& cliOptions)
+NORETURN_FN void _help(const char* argv[], const Server::CommandLineOptions& cliOptions)
 {
 	printf("Usage: %s [arguments | --help]\n", argv[0]);
 	for (size_t i = 0; i < cliOptions.size(); ++i)

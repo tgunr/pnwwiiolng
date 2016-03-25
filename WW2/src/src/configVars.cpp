@@ -46,6 +46,8 @@ static const char* const s_configVarTypes[NUM_CONFIG_VAR_TYPES] =
 ,	"path"
 };
 
+#define PATH_SEPSTR "/"
+
 ////////////////////////////////////////////////////////////////////////////////
 // Variables.
 
@@ -409,7 +411,7 @@ namespace Teul
 		if ( envValue != nullptr )
 		{
 			if ( m_required == true && *envValue == 0 )
-				LogAbort("Invalid (empty) value for %s ('%s').", m_envVarName);
+				LogAbort("Invalid (empty) value for %s.", m_envVarName);
 			Set(envValue);
 			return;
 		}

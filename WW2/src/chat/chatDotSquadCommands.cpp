@@ -68,13 +68,13 @@ public:
 	DotChangeSquadName() : DotCommand("changesquadname", "Request a change of the squad's short name"
 										, SQUAD_CO, LSTR_GENERIC, LSTR_GENERIC
 										) {}
-	virtual bool help(Player& player) const OVERRIDE_FN
+	virtual bool help(Player& player) const override
 	{
 		genericHelp(player, "/changesquadname <newname>", "Request a name change for your squad.");
 		return true;
 	}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
 	{
 		if ( !player.squadID() || player.squadRank() != Squad::CO )
 		{
@@ -97,7 +97,7 @@ public:
 		///TODO: Pass to thread routines to check
 		///TODO: Add
 	}
-	virtual void action(Player& player, Chat::ClientMessage* message) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* message) const override
 	{
 		// Confirmation
 		help(player);
@@ -127,7 +127,7 @@ public:
 							, NO_MASK, LSTR_VOTECO_USAGE, LSTR_VOTECO_DETAIL
 							) {}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override
 	{
 		if ( !player.squadID() )
 		{
@@ -174,7 +174,7 @@ public:
 		player.message(LSTR_NOTE, LSTR_SQUAD_VOTE_REGISTERED);
 	}
 
-	virtual void action(Player& player, Chat::ClientMessage* message) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* message) const override
 	{
 		if ( !player.squadID() )
 		{
@@ -219,7 +219,7 @@ public:
 							, SQUAD_CO, LSTR_VOTING_USAGE, LSTR_VOTING_DETAIL
 							) {}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		if ( !player.squadID() || player.squadRank() != Squad::CO )
 		{
@@ -290,8 +290,8 @@ public:
 	DotWho() : DotCommand("who", "Display list of squad mates online"
 							, NO_MASK, LSTR_WHO_USAGE, LSTR_WHO_DETAIL
 							) { }
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN;
-	virtual void action(Player& player, Chat::ClientMessage* message) const OVERRIDE_FN;
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override;
+	virtual void action(Player& player, Chat::ClientMessage* message) const override;
 } dotWho;
 
 // Provide info on the listed players
@@ -430,14 +430,14 @@ protected:
 	Chat::Name	m_to;
 	size_t		m_affectedRows;
 
-	virtual bool Process(const size_t numRows) OVERRIDE_FN
+	virtual bool Process(const size_t numRows) override
 	{
 		m_affectedRows = Query()->AffectedRows();
 
 		return true;
 	}
 
-	virtual void Success() OVERRIDE_FN
+	virtual void Success() override
 	{
 		if (m_affectedRows == 0)
 			return Failure();
@@ -457,7 +457,7 @@ protected:
 		chatDispatchGMMessage("INFO", message);
 	}
 
-	virtual void Failure() OVERRIDE_FN
+	virtual void Failure() override
 	{
 		Player* player = PlayerInterface::Lookup(m_requester);
 		if (player == nullptr)
@@ -513,7 +513,7 @@ public:
 	{
 	}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage * /*message*/, char* arguments) const OVERRIDE_FN {
+	virtual void actionWith(Player& player, Chat::ClientMessage * /*message*/, char* arguments) const override {
 		ARGV argv;
 
 		// Usage: renamesquad <from> <to>

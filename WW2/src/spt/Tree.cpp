@@ -1302,7 +1302,7 @@ void CTree::SetupFrondGeometryDeprecated()
 
     for(int i = 0; i < fronds.m_nNumLods; i++)
     {
-        if(fronds.m_pStripLengths[i][0] == 0)
+        if(fronds.m_pNumStrips[i] == 0 || fronds.m_pStripLengths[i][0] == 0)
             continue;
 
         if(fronds.m_pNumStrips[i] == 1)
@@ -1425,7 +1425,7 @@ void CTree::SetupFrondGeometry()
 
     for(int i = 0; i < fronds.m_nNumLods; i++)
     {
-        if(fronds.m_pStripLengths[i][0] == 0)
+        if(fronds.m_pNumStrips[i] == 0 || fronds.m_pStripLengths[i][0] == 0)
             continue;
 
         if(fronds.m_pNumStrips[i] == 1)

@@ -12,8 +12,6 @@
 #include <vector>
 #include <algorithm>
 
-EXTERN LOGICAL			Online;
-
 typedef std::vector<GLuint> NameVector;
 static NameVector names;
 static const int ChunkSize=1000;

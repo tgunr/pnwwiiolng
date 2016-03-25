@@ -622,11 +622,6 @@ SINT32 piGetWidth(void)
 	return(ddpGetWidth());
 }
 
-SINT32 piGetBPP(void)
-{
-	return(ddpGetBPP());
-}
-
 FLOAT32 piGetFPS(void)
 {
 	return(ddpGetFPS());
@@ -662,11 +657,6 @@ UINT32 piCapture(SINT32 keyState, UINT32 functionNum, UINT32 alwaysZero)
 	return 1;
 }
 
-LOGICAL piUpdate(void)
-{
-	return(ddpUpdate());
-}
-
 LOGICAL piFlip(void)
 {
 	return(ddpFlip());
@@ -680,11 +670,6 @@ LOGICAL piSetDDRender(DDWND_DDRENDERFUNC newfunc)
 LOGICAL piSetD3DRender(DDWND_D3DRENDERFUNC newfunc)
 {
 	return(ddpSetD3DRender(newfunc));
-}
-
-LOGICAL piDrawToScreen(LPVOID lpdds)
-{
-	return(ddpDrawToScreen(lpdds));
 }
 
 LOGICAL piCreateSurface(piSURFACEDESC* lppisd, void** lpdds)

@@ -30,7 +30,7 @@ namespace Fio
 }
 #endif
 
-#if ! defined(LIMITED_FIO) || LIMITED_FIO == 0
+#if !LIMITED_FIO
 	enum
 	{
 		ISDIRECTORY,

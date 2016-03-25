@@ -683,7 +683,7 @@ public:
 	EGGS m_result;
 
 public:
-	virtual bool Process(const size_t numRows) OVERRIDE_FN
+	virtual bool Process(const size_t numRows) override
 	{
 		m_result.clear();
 
@@ -703,7 +703,7 @@ public:
 	}
 
 public:
-	virtual void Success() OVERRIDE_FN
+	virtual void Success() override
 	{
 		eggs = m_result;
 	}
@@ -1258,13 +1258,13 @@ public:
 		player.message(LSTR_NOTE, (!player.getPreference(CPR_AUTO_LEADER)) ? LSTR_LEADER_STATE_OFF : LSTR_LEADER_STATE_ON);
 	}
 
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		player.SetPreference(CPR_AUTO_LEADER, !player.getPreference(CPR_AUTO_LEADER));
 		_report(player);
 	}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		if ( strncasecmp("on", arguments, 2) == 0 )
 			player.SetPreference(CPR_AUTO_LEADER, TRUE);
@@ -1325,7 +1325,7 @@ public:
 				, const PermissionMask& mask, LSTRING_ID usage, LSTRING_ID detail, bool playnetOnly=false)
 				: DotCommand(newCommand, withDescription, mask, usage, detail, playnetOnly) {}
 
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		if ( !player.missionID() )
 			throw LSTR_NOT_ON_MISSION;
@@ -1376,7 +1376,7 @@ public:
 	DotGMTakeLead() : DotTakeLead("gmtakelead", "Forcibly take over the mission"
 								, NO_MASK, LSTR_TAKELEAD_USAGE, LSTR_TAKELEAD_DETAIL
 								) {}
-	virtual void action(Player& player, Chat::ClientMessage* message) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* message) const override
 	{
 		if ( player.isEffectiveGM() == false )
 			return DotTakeLead::action(player, message);
@@ -1414,12 +1414,12 @@ public:
 							, NO_MASK, LSTR_MLIST_USAGE, LSTR_MLIST_DETAIL
 							) {}
 
-	bool help(Player& player) const OVERRIDE_FN
+	bool help(Player& player) const override
 	{
 		return genericHelp(player, "/mlist", "Lists current mission members and their status");
 	}
 
-	void action(Player& player, Chat::ClientMessage* message) const OVERRIDE_FN;
+	void action(Player& player, Chat::ClientMessage* message) const override;
 } dotMList;
 
 void

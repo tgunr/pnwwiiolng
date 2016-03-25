@@ -426,7 +426,9 @@ static bool LoadShaders()
         path = "fx/xml/shaders.xml";
 
     ShaderLoader load(path.c_str());
-    load.Load();
+    if (!load.Load()) {
+        return false;
+    }
 
     ProgramState::Bind(0);
 

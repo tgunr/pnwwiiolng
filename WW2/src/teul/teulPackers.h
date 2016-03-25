@@ -239,7 +239,7 @@ struct ACTION_OBJECT
 	DEF_PACKER(FLOAT64*, teulPackFLOAT64)
 	DEF_PACKREF(FLOAT64, teulPackFLOAT64)
 
-	DEF_PACKER(void*, teulPackVoid);
+	DEF_PACKER(void*, teulPackVoid)
 
 	void pack(const bool& value, SINT32 sb = 1) 
 	{

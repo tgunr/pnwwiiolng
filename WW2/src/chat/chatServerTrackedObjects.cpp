@@ -191,7 +191,7 @@ class DotMsp : public DotCommand
 {
 public:
 	DotMsp() : DotCommand("msp", "Deploy MSP at last known location", MISSION_LEADER, LSTR_MSP_USAGE, LSTR_MSP_DETAIL) {}
-	virtual void action(Player& player, Chat::ClientMessage* message) const OVERRIDE_FN;
+	virtual void action(Player& player, Chat::ClientMessage* message) const override;
 } dotMsp;
 
 void
@@ -678,7 +678,7 @@ class DotCheckSTOs : public DotCommand
 {
 public:
 	DotCheckSTOs() : DotCommand("checkstos", "Check all current Server Tracked Objects to see if any have leaked.", NO_MASK, LSTR_CHECKSTOS_USAGE, LSTR_CHECKSTOS_DETAIL) {}
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		stoList = "";
 		wwiiForEachSTO(_checkSTO);
@@ -723,7 +723,7 @@ class DotListSTOs : public DotCommand
 {
 public:
 	DotListSTOs() : DotCommand("liststos", "List current STOs", NO_MASK, LSTR_LISTSTOS_USAGE, LSTR_LISTSTOS_DETAIL) {}
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		stoList = "";
 		wwiiForEachSTO(_dumpSTO);
@@ -797,8 +797,7 @@ void
 chatLoadPPOXML()
 {
 	std::string xmlFile = cv_dataDir.GetString();
-	xmlFile += PATH_SEPARATOR;
-	xmlFile += "ppo.xml";
+	xmlFile += "/ppo.xml";
 
 	try
 	{
@@ -868,7 +867,7 @@ class DotLoadPPOXml : public DotCommand
 {
 public:
 	DotLoadPPOXml() : DotCommand("loadppoxml", "Force reload of ppo.xml", IS_PLAYNET, LSTR_GENERIC, LSTR_GENERIC) {}
-	virtual bool help(Player& player) const OVERRIDE_FN
+	virtual bool help(Player& player) const override
 	{
 		if ( !allow(player) )
 			return false;
@@ -877,7 +876,7 @@ public:
 		return true;
 	}
 
-	virtual void action(Player& /*player*/, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& /*player*/, Chat::ClientMessage* /*message*/) const override
 	{
 		chatLoadPPOXML();
 	}

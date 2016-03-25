@@ -947,7 +947,7 @@ class DotGridSnapshot : public DotCommand
 public:
 	DotGridSnapshot() : DotCommand("gridsnapshot", "Enable/disable grid snapshot recording", NO_MASK, LSTR_GRIDSNAPSHOT_USAGE, LSTR_GRIDSNAPSHOT_DETAIL) {}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		if ( strcmp(arguments, "on") == 0 )
 		{

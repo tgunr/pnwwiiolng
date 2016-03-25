@@ -43,11 +43,11 @@ public:
 		: DotCommand(newCommand, cmdDescription, mask, usage, detail)
 		{ }
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		player.sendStratCommand(command(), arguments, true);
 	}
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		player.sendStratCommand(command(), "", true);
 	}
@@ -132,7 +132,7 @@ class DotRDP : public DotCommand
 {
 public:
 	DotRDP() : DotCommand("rdp", "Displays current RDP intel", NO_MASK, LSTR_RDP_USAGE, LSTR_RDP_DETAIL) {}
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		if ( !player.isPlaynet() && _featureLockedM(player, 1) )
 			return;
@@ -152,7 +152,7 @@ class DotSetTime : public DotCommand
 public:
 	DotSetTime() : DotCommand("settime", "Set the game time", NO_MASK, LSTR_SETTIME_USAGE, LSTR_SETTIME_DETAIL, false) {}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		if ( !player.isPlaynet() && _featureLockedM(player, 5) )
 			return;
@@ -171,7 +171,7 @@ class DotStatus : public DotPassthru
 {
 public:
 	DotStatus() : DotPassthru("status", "Display damage status of targetted FB", NO_MASK, LSTR_STATUS_USAGE, LSTR_STATUS_DETAIL) {}
-	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const OVERRIDE_FN;
+	virtual void actionWith(Player& player, Chat::ClientMessage* message, char* arguments) const override;
 } dotStatus;
 
 void

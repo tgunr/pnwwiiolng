@@ -154,7 +154,11 @@ _qualifyFilename(const char* filename, char* const output, const size_t outputSi
 		if ( defaultPath && defaultPath[0] != 0 )
 		{
 			OS_MKDIR(defaultPath, 0770);
-			snprintf(output, outputSize, SUB_PATH("%s", "%s"), defaultPath, filename);
+#if platOS == OS_WIN32
+			snprintf(output, outputSize, "%s\\%s", defaultPath, filename);
+#else
+			snprintf(output, outputSize, "%s/%s", defaultPath, filename);
+#endif
 			return;
 		}
 
@@ -182,6 +186,7 @@ _openDbugFile(const char* const srcFile_)
 
 	_qualifyFilename(srcFile_, filename, sizeof(filename));
 
+#if !defined(DEV_BUILD) || platOS != OS_MACOS
 	if (PN_UNLIKELY(srcFile_ != nullptr))
 	{
 		int oflags = _O_CREAT|_O_WRONLY|_O_TRUNC;
@@ -210,9 +215,12 @@ _openDbugFile(const char* const srcFile_)
 
 		if ( file >= 0 )
 			_fileSize += OS_WRITE(file, _OPEN_MSG, sizeof(_OPEN_MSG) - 1);
-	}
-	else
+	} else {
 		file = OS_FILENO(stderr);
+    }
+#else
+    file = OS_FILENO(stderr);
+#endif
 
 	return file;
 }
@@ -388,9 +396,12 @@ void dbugInit(SINT32 logType, const char* const filename)
 	level = Debug::ERR_DBUG;
 	g_logDebug = true;
 
-#if platOS != OS_LINUX
-	if ( logType != LOG_OFF)
+#if defined(DEV_BUILD) && platOS == OS_MACOS
+    logType = LOG_TO_FILE;
+#elif platOS != OS_LINUX
+	if ( logType != LOG_OFF) {
 		logType = LOG_TO_FILE;
+    }
 #endif
 
 	switch(logType)
@@ -706,7 +717,7 @@ SINT32 _dbugLog(const char* const filename, const SINT32 lineno, const UINT32 er
 }
 
 //_dbugWrite: same as above for dbugWrite
-SINT32 _dbugWrite(char* filename, SINT32 lineno, UINT32 errType, char* fmt, ...)
+SINT32 _dbugWrite(char* filename, SINT32 lineno, UINT32 errType, const char* fmt, ...)
 {
 	va_list args;
 
@@ -732,7 +743,7 @@ void _levelHandler(UINT32 errType, const char* const text)
 //////////////////////////////////////////////////////////////////////
 // "Pretty" logging routine.
 
-void NORETURN_FN
+[[noreturn]] void
 _LogAbort(const char* file_, unsigned int line_, unsigned int error_, const char* assertion_, const char* fmt_, ...)
 {
 	va_list args;

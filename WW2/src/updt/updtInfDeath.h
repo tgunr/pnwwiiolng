@@ -3,7 +3,7 @@
 // Originating Programmer: Oliver "kfs1" Smith
 
 //! Death Types
-ENUMCLASS DeathType
+enum class DeathType
 {
 	Falling
 ,	Shot				// Being dropped by a bullet.

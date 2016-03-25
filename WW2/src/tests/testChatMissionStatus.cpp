@@ -19,7 +19,7 @@ public: ChatMissionStatus() : TestUnit("Chat::MissionStatus") {}
 public: virtual ~ChatMissionStatus() {}
 
 	// Main body of the test.
-public: virtual bool Run() OVERRIDE_FN
+public: virtual bool Run() override
 	{
 		// Test values.
 		static const unsigned int MID = 10, BID = 577; // , SID = 42949673;

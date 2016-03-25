@@ -190,9 +190,9 @@ static const UINT32 MAX_HCUNITS_PER_LIST = 14;
 class HCUnitList
 {
 public:
-	HCUnitList() : m_listStart(true), m_listEnd(true), m_count(0) { };
+	HCUnitList() : m_listStart(true), m_listEnd(true), m_count(0) { }
 	HCUnitList(ACTION_OBJECT* const a);
-	~HCUnitList() { };
+	~HCUnitList() { }
 	SINT32 packer(LOGICAL mode, ACTION_OBJECT* a);
 
 	// Send/Receive functions (defined as needed)
@@ -203,7 +203,11 @@ public:
 	LOGICAL			m_listStart;						// True if this is the start of list
 	LOGICAL			m_listEnd;							// True if this is the end of the list
 	UCHAR			m_count;							// Number of units described
+#if platBuild == TEUL_SERVER
+	HCUnit*			m_units[MAX_HCUNITS_PER_LIST];		// Pointers to units
+#else
 	HCUnit			m_units[MAX_HCUNITS_PER_LIST];		// Array of units
+#endif
 };
 
 #if platBuild == TEUL_SERVER

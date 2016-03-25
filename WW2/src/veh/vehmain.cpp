@@ -941,8 +941,10 @@ static UINT32 _UpdateVehicleLODs(void)
 					// we're a valid lod object
 					else
 #endif
-					Object->minlod = CurrentVehicle->VehicleObjectData->SavedMinLODRange[j];
-					Object->maxlod = CurrentVehicle->VehicleObjectData->SavedMaxLODRange[j];
+                    {
+                        Object->minlod = CurrentVehicle->VehicleObjectData->SavedMinLODRange[j];
+                        Object->maxlod = CurrentVehicle->VehicleObjectData->SavedMaxLODRange[j];
+                    }
 #if(0)
                     if (j == 0)
 					{

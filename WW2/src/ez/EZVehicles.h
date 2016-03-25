@@ -24,8 +24,8 @@ public:
 	virtual ~EZGameVehicle(){}
 
 	// virtual overrides
-	virtual bool Init(const char* path) OVERRIDE_FN;
-	virtual void FrameUpdate() OVERRIDE_FN;
+	virtual bool Init(const char* path) override;
+	virtual void FrameUpdate() override;
 	virtual void UpdateEngine();
 	virtual void UpdateGears();
 
@@ -36,11 +36,11 @@ public:
 	virtual void ShiftDown();
 	virtual SINT32 ShiftTime();
 
-	virtual void OnMove(SINT32 param, UINT32 id,UINT32 extra) OVERRIDE_FN;
-	virtual void OnTurn(SINT32 param, UINT32 id, UINT32 extra) OVERRIDE_FN;
-	virtual void OnEngine(SINT32 param, UINT32 id, UINT32 extra) OVERRIDE_FN;
-	virtual void OnAction1(SINT32 param, UINT32 id, UINT32 extra) OVERRIDE_FN;
-	virtual void OnAction2(SINT32 param, UINT32 id, UINT32 extra) OVERRIDE_FN;
+	virtual void OnMove(SINT32 param, UINT32 id,UINT32 extra) override;
+	virtual void OnTurn(SINT32 param, UINT32 id, UINT32 extra) override;
+	virtual void OnEngine(SINT32 param, UINT32 id, UINT32 extra) override;
+	virtual void OnAction1(SINT32 param, UINT32 id, UINT32 extra) override;
+	virtual void OnAction2(SINT32 param, UINT32 id, UINT32 extra) override;
 
 	FLOAT32 GetGaugeData(UINT32 gauge, UINT32 subGauge = 0);
 	SINT32 GetGear();
@@ -74,7 +74,7 @@ public:
 
 	EZPlane(vehVehicle* v);
 	virtual ~EZPlane(){}
-	virtual void InstallInputCallbacks() OVERRIDE_FN;
+	virtual void InstallInputCallbacks() override;
 
 	//virtual void UpdateEngine();
 	//virtual SINT32 ShiftTime();
@@ -99,13 +99,13 @@ public:
 	bool HighGear();
 
 	// frame update
-	virtual void UpdateEngine() OVERRIDE_FN;
-	virtual void UpdateGears() OVERRIDE_FN;
-	virtual SINT32 ShiftTime() OVERRIDE_FN;
+	virtual void UpdateEngine() override;
+	virtual void UpdateGears() override;
+	virtual SINT32 ShiftTime() override;
 
 	// handle vehicle type specific data
-	virtual void SetConfig(const char* name, const char* value) OVERRIDE_FN;
-	virtual void OnTurn(SINT32 param, UINT32 id,UINT32 extra) OVERRIDE_FN;
+	virtual void SetConfig(const char* name, const char* value) override;
+	virtual void OnTurn(SINT32 param, UINT32 id,UINT32 extra) override;
 
 protected:
 
@@ -147,7 +147,7 @@ public:
 	virtual ~EZTank(){}
 
 	// input callbacks
-	virtual void OnTurn(SINT32 param, UINT32 id,UINT32 extra) OVERRIDE_FN;
+	virtual void OnTurn(SINT32 param, UINT32 id,UINT32 extra) override;
 };
 
 class EZStug : public EZTank
@@ -157,9 +157,9 @@ public:
 	EZStug(vehVehicle* v) : EZTank(v), _lastPosition(0), _quickPos(0) {}
 	virtual ~EZStug(){}
 
-	virtual void SetConfig(const char* name, const char* value) OVERRIDE_FN;
-	virtual void OnAction2(SINT32 param, UINT32 id, UINT32 extra) OVERRIDE_FN;
-	virtual void OnSpawn() OVERRIDE_FN;
+	virtual void SetConfig(const char* name, const char* value) override;
+	virtual void OnAction2(SINT32 param, UINT32 id, UINT32 extra) override;
+	virtual void OnSpawn() override;
 
 protected:
 
@@ -179,16 +179,16 @@ public:
 	EZATGun(vehVehicle* v) : EZGameVehicle(v) {}
 	virtual ~EZATGun(){}
 
-	virtual void FrameUpdate() OVERRIDE_FN;
-	virtual bool IsDriverDead() OVERRIDE_FN;
-	virtual bool IsCommanderDead() OVERRIDE_FN;
-	virtual bool IsGunnerDead() OVERRIDE_FN;
-	virtual bool IsLoaderDead() OVERRIDE_FN;
+	virtual void FrameUpdate() override;
+	virtual bool IsDriverDead() override;
+	virtual bool IsCommanderDead() override;
+	virtual bool IsGunnerDead() override;
+	virtual bool IsLoaderDead() override;
 
 	// input callbacks
-	virtual void OnMove(SINT32 param, UINT32 id, UINT32 extra) OVERRIDE_FN;
-	virtual void OnTurn(SINT32 param, UINT32 id, UINT32 extra) OVERRIDE_FN;
-	virtual void OnAction2(SINT32 param, UINT32 id, UINT32 extra) OVERRIDE_FN;
+	virtual void OnMove(SINT32 param, UINT32 id, UINT32 extra) override;
+	virtual void OnTurn(SINT32 param, UINT32 id, UINT32 extra) override;
+	virtual void OnAction2(SINT32 param, UINT32 id, UINT32 extra) override;
 };
 
 /************************************************************************************************
@@ -202,7 +202,7 @@ public:
 	EZBoat(vehVehicle* v) : EZGameVehicle(v) {}
 	virtual ~EZBoat(){}
 
-	virtual void UpdateEngine() OVERRIDE_FN;
+	virtual void UpdateEngine() override;
 
 };
 
@@ -231,27 +231,27 @@ public:
 	virtual ~EZTrooper();
 
 	// virtual overrides
-	virtual void SetConfig(const char* name, const char* value) OVERRIDE_FN;
-	virtual void FrameUpdate() OVERRIDE_FN;
-	virtual void InstallInputCallbacks() OVERRIDE_FN;
+	virtual void SetConfig(const char* name, const char* value) override;
+	virtual void FrameUpdate() override;
+	virtual void InstallInputCallbacks() override;
 
 	// override input callbacks
-	virtual void OnMove(SINT32 param, UINT32 id, UINT32 extra) OVERRIDE_FN {}
-	virtual void OnTurn(SINT32 param, UINT32 id, UINT32 extra) OVERRIDE_FN {}
-	virtual void OnAction1(SINT32 param, UINT32 id, UINT32 extra) OVERRIDE_FN {}
-	virtual void OnAction2(SINT32 param, UINT32 id, UINT32 extra) OVERRIDE_FN {}
-	virtual void OnFreeLook(SINT32 param, UINT32 id, UINT32 extra) OVERRIDE_FN {}
-	virtual void OnPosition(SINT32 param, UINT32 id, UINT32 extra) OVERRIDE_FN {}
-	virtual void OnEngine(SINT32 param, UINT32 id, UINT32 extra) OVERRIDE_FN {}
-	virtual void OnView(SINT32 param, UINT32 id, UINT32 extra) OVERRIDE_FN {}
-	virtual void OnCamera(SINT32 param, UINT32 id, UINT32 extra) OVERRIDE_FN {}
+	virtual void OnMove(SINT32 param, UINT32 id, UINT32 extra) override {}
+	virtual void OnTurn(SINT32 param, UINT32 id, UINT32 extra) override {}
+	virtual void OnAction1(SINT32 param, UINT32 id, UINT32 extra) override {}
+	virtual void OnAction2(SINT32 param, UINT32 id, UINT32 extra) override {}
+	virtual void OnFreeLook(SINT32 param, UINT32 id, UINT32 extra) override {}
+	virtual void OnPosition(SINT32 param, UINT32 id, UINT32 extra) override {}
+	virtual void OnEngine(SINT32 param, UINT32 id, UINT32 extra) override {}
+	virtual void OnView(SINT32 param, UINT32 id, UINT32 extra) override {}
+	virtual void OnCamera(SINT32 param, UINT32 id, UINT32 extra) override {}
 	virtual bool OnCamera(piVECTOR* pos, piVECTOR* aim) override { return false; }
-	virtual void OnDespawn()  OVERRIDE_FN {}
-	virtual void OnSpawn() OVERRIDE_FN {}
-	virtual bool IsDriverDead() OVERRIDE_FN;
-	virtual bool IsCommanderDead() OVERRIDE_FN;
-	virtual bool IsGunnerDead() OVERRIDE_FN;
-	virtual bool IsLoaderDead() OVERRIDE_FN;
+	virtual void OnDespawn()  override {}
+	virtual void OnSpawn() override {}
+	virtual bool IsDriverDead() override;
+	virtual bool IsCommanderDead() override;
+	virtual bool IsGunnerDead() override;
+	virtual bool IsLoaderDead() override;
 
 	FLOAT32 GetDispersionMod();
 

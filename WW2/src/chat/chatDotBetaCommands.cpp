@@ -26,7 +26,7 @@ public:
 	DotNukePersonas() : DotCommand("nukepersonas", "Ask the host to delete all your personas"
 									, NO_MASK, LSTR_NUKEPERSONAS_USAGE, LSTR_NUKEPERSONAS_DETAIL, true) {}
 
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		DBThread::Do(DBThread::Default, "DELETE FROM wwii_persona WHERE playerid = %u", player.playerID());
 		player.message(LSTR_SYSTEM, LSTR_PERSONAS_NUKED);
@@ -43,7 +43,7 @@ class DotProfRes : public DotCommand
 public:
 	DotProfRes() : DotCommand("profres", "Record the results of a /profileflight", NO_MASK, LSTR_CAUTION, LSTR_CAUTION, false) {}
 
-	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const OVERRIDE_FN
+	virtual void actionWith(Player& player, Chat::ClientMessage* /*message*/, char* arguments) const override
 	{
 		// Silently say nothing if they are not spawned as a buzzard
 		if ( player.isSpawned() == false || player.isBuzzard() == false )
@@ -159,7 +159,7 @@ public:
 	DotResetStrat() : DotCommand("resetstrat", "Forces a reset of the strat server"
 									, NO_MASK, LSTR_RESETSTRAT_USAGE, LSTR_RESETSTRAT_DETAIL, true) {}
 
-	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const OVERRIDE_FN
+	virtual void action(Player& player, Chat::ClientMessage* /*message*/) const override
 	{
 		static UINT32 lastRequest = 0;
 		static UINT32 lastRequester = 0;

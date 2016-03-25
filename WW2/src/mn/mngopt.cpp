@@ -133,7 +133,7 @@ static char* _skipFilename(const char* ptr)
 
 LOGICAL mngoptParse(char* InputLine)
 {
-	char*	ptr, sep[2]="-", CommandLine[512];
+	char*	ptr, sep[2]="-", CommandLine[2048];
 	char	cmd[256], value[256];
 	int		i;
 
@@ -148,7 +148,7 @@ LOGICAL mngoptParse(char* InputLine)
 	if ( *ptr != '-' && *ptr != '/' )
 		return TRUE;
 
-	strncpy(CommandLine, ptr, 511);
+	strncpy(CommandLine, ptr, 2047);
 
 	ptr = CommandLine;
     sep[0] = *ptr;

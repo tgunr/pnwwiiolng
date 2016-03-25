@@ -22,7 +22,7 @@ enum RMLIST_ACTION
 class RoomListEntry
 {
 public:
-	RoomListEntry() {};
+	RoomListEntry() {}
 
 	SINT32 packer(LOGICAL, ACTION_OBJECT*);
 

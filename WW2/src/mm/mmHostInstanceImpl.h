@@ -26,10 +26,10 @@ namespace Instance
 	public:	virtual ~MMHostInstanceImpl() {}
 
 		//! @brief Handle construction: create missions.
-	public: virtual void PostConstructionHandler() OVERRIDE_FN;
+	public: virtual void PostConstructionHandler() override;
 
 		//! @brief Handle destruction:
-	public: virtual void PreDestructionHandler() OVERRIDE_FN;
+	public: virtual void PreDestructionHandler() override;
 	};
 
 } // namespace
