@@ -224,7 +224,7 @@ _ircFinish(const TeulTimeMS& timeTaken)
 //////////////////////////////////////////////////////////////////////
 // Describe usage of the loader.
 
-static NORETURN_FN void
+NORETURN_FN static void
 usage()
 {
 	fprintf(stderr, "Usage: %s [-x tarfile] [-C directory] [-h dbHost] [-I] [-O] [filename]\n", g_appName);

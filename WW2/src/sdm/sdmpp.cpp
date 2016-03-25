@@ -33,7 +33,7 @@ static unsigned int s_verbose;
 //typedef std::map<int,std::string> XPATHS;
 //static XPATHS xpaths;
 
-static NORETURN_FN void
+NORETURN_FN static void
 usage(int exitCode)
 {
 	fprintf(stderr, "Usage: %s [-ofilename] [-ddirname] [-u] [-v] [-Cdir]\n"
@@ -144,9 +144,9 @@ _getListOfSDMFiles(std::vector<std::string>& into)
 	size_t slashPos;
 	while ( (slashPos = match.find('/')) != match.npos )
 	{
-		match[slashPos] = PATH_SEPARATOR;
+		match[slashPos] = '/';
 	}
-	match += PATH_SEPSTR "*.sdm";
+	match += "/*.sdm";
 
 	WIN32_FIND_DATAA data;
 	HANDLE hFind = FindFirstFileA(match.c_str(), &data);
