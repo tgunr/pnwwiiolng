@@ -1107,11 +1107,10 @@ _pollSocketsInner(const TeulTimeMS& remainder)
 		ENDPOINT& endpoint = *(*it);
 		++it;
 
-        	dbugLog(_FLD, "Interrogating endpoint");
 		const int enumErr = WSAEnumNetworkEvents(endpoint.socket, endpoint.eventObject, &eventData);
 		if ( enumErr != 0 )
 		{
-        		dbugLog(_FLD, "Aborting, error returned from WSAEnumNetworkEvents %d", enumErr);
+			dbugLog(_FLD, "Aborting, error returned from WSAEnumNetworkEvents %d", enumErr);
 			continue;
 		}
 
