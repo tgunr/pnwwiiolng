@@ -2147,7 +2147,7 @@ void drawCollisionCylinders()
 
                 mathEul_ToMatrix(&m, EulOrdXYZs, &v);
 
-                Vec3f pp = Vec3f(p[0], p[1], p[2]) * rot;
+                //Vec3f pp = Vec3f(p[0], p[1], p[2]) * rot;
 
                 Matrixf r;
                 // Flip to our coordinate system
