@@ -484,7 +484,7 @@ Player::selectPersona(UINT32 selectedID, WWII_COUNTRY countryID, BRANCH_ENUM bra
 
 		updateMap();
 
-		updateChat();
+		updateChat(true);
 
 		// If the player is accessing a persona that might need
 		// to be buddied up, check the other personas for higher
