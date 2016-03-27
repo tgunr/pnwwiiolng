@@ -184,7 +184,7 @@ public:
 
 	// If persona has been flagged with updateChat(), sends the
 	// chat host a persona update for this persona. Called automatically
-	void sendUpdateToChat();
+	void sendUpdateToChat(bool force = false);
 
 	void SetBranch(BRANCH_ENUM newBranch);
 	void SetBrigade(Brigade* newBrig);
@@ -218,7 +218,7 @@ public:
 	void unsetMission() { m_mission = nullptr; m_permissionMask &= ~MISSION_LEADER; }
 
 	// Notify chat of a persona status/whereabouts change
-	void updateChat();
+	void updateChat(bool immediate = false);
 
 	// Send the latest neccesary CP updates
 	void updateMap();
