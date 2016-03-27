@@ -11,22 +11,22 @@
 #include <sys/time.h>
 #include <Cocoa/Cocoa.h>
 
-SINT32 GetMicroSeconds(void)
+UINT64 GetMicroSeconds(void)
 {
 	struct timeval tv;
 
 	gettimeofday(&tv, nullptr);
-    return ((tv.tv_sec * USEC_PER_SEC) + tv.tv_usec /* convert to microseconds*/);
+    return ((static_cast<UINT64>(tv.tv_sec) * USEC_PER_SEC) + static_cast<UINT64>(tv.tv_usec) /* convert to microseconds*/);
 }
 
-DWORD GetMillisecondTick()
+UINT64 GetMillisecondTick()
 {
-    return static_cast<DWORD>(GetMicroSeconds()) / 1000;
+    return GetMicroSeconds() / 1000;
 }
 
-unsigned long timeGetTime(void)
+UINT32 timeGetTime(void)
 {
-    return GetMillisecondTick();
+    return static_cast<UINT32>(GetMillisecondTick());
 }
 
 void chAppDir()
