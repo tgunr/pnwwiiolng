@@ -25,13 +25,13 @@
 WW2_DEFINES_Platform        = _MACOSX=1 platOS=OS_MACOS XP_MAC XP_UNIX              // We're on Mac, duh
 
 // Common macros in all modes
-WW2_DEFINES_Common_04       = $(WW2_DEFINES_Common_05) ENABLE_FLOATERS              // enable... whatever floaters are
 WW2_DEFINES_Common_03       = $(WW2_DEFINES_Common_04) EVENT_LOG                    // enable various logging things
 WW2_DEFINES_Common_02       = $(WW2_DEFINES_Common_03) xGENICONS=1                  // DON'T enable icon generation, whatever that is
 WW2_DEFINES_Common_01       = $(WW2_DEFINES_Common_02) xSPATIAL_DB                  // DON'T enable spatial database, whatever that is
 
 // Debug flags common to development and debug; debug is always a subset of dev
-WW2_DEFINES_Debug_03        = $(WW2_DEFINES_Debug_04) RELEASE_CLIENT=1              // not a release client
+WW2_DEFINES_Debug_04        = $(WW2_DEFINES_Debug_05) ENABLE_FLOATERS               // enable buzzard etc for debug builds as well as GM
+WW2_DEFINES_Debug_03        = $(WW2_DEFINES_Debug_04) RELEASE_CLIENT=1              // not a release client, but we act like one anyway
 WW2_DEFINES_Debug_02        = $(WW2_DEFINES_Debug_03) IS_DEBUG DEBUG _DEBUG
 WW2_DEFINES_Debug_01        = $(WW2_DEFINES_Debug_02) DONT_USE_COVERT               // disable bad tricks for masking memory values
 
@@ -45,6 +45,9 @@ WW2_DEFINES_Development_03  = $(WW2_DEFINES_Development_04) CONNECTION_TEST_BUIL
 WW2_DEFINES_Development_02  = $(WW2_DEFINES_Development_03) DEV_BUILD               // various extra debugging
 WW2_DEFINES_Development_01  = $(WW2_DEFINES_Development_02) DEBUG_WW2               // even more debugging
 
+// GM mode
+WW2_DEFINES_GM_01           = $(WW2_DEFINES_GM_02) ENABLE_FLOATERS                  // enable buzzard and several other things
+
 // Release mode
 WW2_DEFINES_Release_02      = $(WW2_DEFINES_Release_02) NDEBUG
 WW2_DEFINES_Release_01      = $(WW2_DEFINES_Release_03) RELEASE_CLIENT=1            // definitely a release client
@@ -53,6 +56,7 @@ WW2_DEFINES_Release_01      = $(WW2_DEFINES_Release_03) RELEASE_CLIENT=1        
 WW2_DEFINES_Development     = $(WW2_DEFINES_Platform) $(WW2_DEFINES_Common_01) $(WW2_DEFINES_Debug_01) $(WW2_DEFINES_Development_01)
 WW2_DEFINES_Debug           = $(WW2_DEFINES_Platform) $(WW2_DEFINES_Common_01) $(WW2_DEFINES_Debug_01)
 WW2_DEFINES_Release         = $(WW2_DEFINES_Platform) $(WW2_DEFINES_Common_01) $(WW2_DEFINES_Release_01)
+WW2_DEFINES_GM              = $(WW2_DEFINES_Platform) $(WW2_DEFINES_Common_01) $(WW2_DEFINES_Release_01) $(WW2_DEFINES_GM_01)
 
 // Actual build setting that Xcode cares about!
 GCC_PREPROCESSOR_DEFINITIONS = $(WW2_DEFINES_$(CONFIGURATION))
