@@ -10130,8 +10130,7 @@ LOGICAL mlAddToGroupAmmoCount(SINT32 Count,SINT32 Total)
 
 #ifdef ENABLE_FLOATERS
 
-// more hacked stuff before the rats abandon the ship...
-static FLOAT64	profileFlightVelocity;						// double precision is so 1337!!1
+static FLOAT64	profileFlightVelocity;
 
 void mlSetProfileFlight()
 {
