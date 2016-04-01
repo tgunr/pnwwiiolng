@@ -10364,9 +10364,7 @@ static UINT32 _DoEyeOperations(mlVehicleData* VehicleData)
 
 #endif // ENABLE_FLOATERS
 
-#ifdef __MWERKS__
 #pragma mark -
-#endif
 
 // handles the magical mystery rotational co-ordinate conversion
 

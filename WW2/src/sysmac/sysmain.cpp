@@ -106,20 +106,11 @@ int sysmain()
 	return 0;
 }
 
-#ifdef TESTMAC
-//extern char recording_started;
-#endif
-
 int sysmainInitApp()
 {
-#ifdef TESTMAC
-//  recording_started = 1;
-#endif
-
 	IdentityMatrix.m[0][0] = IdentityMatrix.m[1][1] = IdentityMatrix.m[2][2] = IdentityMatrix.m[3][3] = 1.0;
 	chAppDir();
 
-#if RELEASE_CLIENT == 1
 	printf("WW2OL Started\n"); fflush(stdout);
 #ifdef BETA_RELEASE
 	{
@@ -133,7 +124,6 @@ int sysmainInitApp()
 		}
 	}
 #endif
-#endif // RELEASE_CLIENT
 
 	memInit();
 
@@ -176,9 +166,7 @@ void sysmainKillApp()
 	osgGameKill();
 #endif
 
-#if RELEASE_CLIENT == 1
 	printf("WW2OL Quit\n"); fflush(stdout);
-#endif
 
 	dimainKill();
     ddpKill();
