@@ -10144,8 +10144,8 @@ static UINT32 _DoEyeOperations(mlVehicleData* VehicleData)
 #if RELEASE_CLIENT
     switch(OverrideSpawner)
     {
-    case BENCHANTWERP_OVERRIDE:
-    case BENCHRAMAGEN_OVERRIDE:
+        case BENCHANTWERP_OVERRIDE:
+        case BENCHRAMAGEN_OVERRIDE:
         {
             return 0;
         }

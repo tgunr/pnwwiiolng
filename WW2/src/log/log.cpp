@@ -456,7 +456,7 @@ float logTimerToMs(int dt)
 #endif //#ifdef USE_LOG_TIMER
 #endif // EVENT_LOG
 
-#ifdef ENABLE_FLOATERS
+#ifdef BETA_RELEASE
 
 #include <sstream>
 #include <fstream>
@@ -693,4 +693,4 @@ void logUpdateProfiling()
 		frameTimesString.str("");
 	}
 }
-#endif	// #ifdef ENABLE_FLOATERS
+#endif // BETA_RELEASE
