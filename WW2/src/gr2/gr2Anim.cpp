@@ -823,8 +823,9 @@ LOGICAL gr2AnimUpdateModel (OBJECT* pObject, LOGICAL isFPS)
 	FLOAT32 distToMe = (model->myVehicle->ModelData) ? 0.0f : model->myVehicle->VehicleObjectData->PlaneObject->distsqr;
 
 	// FIXME
-	if (model->myVehicle && model->myVehicle->Handle && model->myVehicle->Handle[0] == 0)
-		strncpy ((char*)model->myVehicle->Handle, " ", 4);
+	if (model->myVehicle && model->myVehicle->Handle[0] == 0) {
+		strlcpy(reinterpret_cast<char *>(model->myVehicle->Handle), " ", sizeof(model->myVehicle->Handle));
+    }
 
 	//if (model->myVehicle && model->myVehicle->Handle[0] && model->SetFlag(gr2AnimTrooper::PERSONALIZED))
 	//	gr2AnimPersonalize(pObject, (char*)model->myVehicle->Handle);
