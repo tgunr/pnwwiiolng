@@ -224,7 +224,6 @@ static SINT32 _NumVehicles = 0;
 static bool _findRTBFRU(ServerTrackedObject& sto, void* cookie);
 
 #ifdef ENABLE_FLOATERS
-#undef DESPAWN_TIMER
 static SINT32	disableVehLODs;
 #endif
 
@@ -6432,10 +6431,6 @@ void vehmainSpawnVehicle(VEHICLE_REPLY const* reply)
 
 static void vehmainSpawn()
 {
-#ifdef TESTMAC
-//  spawningin();
-#endif
-
 #ifdef ANTIHACK
 	UCHAR yeahCode = Online ? (HackID[0] != 0 ? OH_YEAH_DAMNED : 0) : 0;
 	bool checksumOK = true;
@@ -6557,17 +6552,7 @@ static void vehmainSpawn()
 #endif
 
 #ifndef ENABLE_FLOATERS
-#if RELEASE_CLIENT
-    switch(OverrideSpawner)
-    {
-    case BENCHANTWERP_OVERRIDE:
-    case BENCHRAMAGEN_OVERRIDE:
-        {
-            return;
-        }
-    }
-#endif
-// Check to make absolutely sure we aren't spawning as a floater
+    // Check to make absolutely sure we aren't spawning as a floater
 	if(pVehicle && pVehicle->VehicleType && pVehicle->VehicleType->Type == VEH_TYPE_FLOATER)
 	{
   		piExitProgram(__FILE__, __LINE__, "");

@@ -1295,7 +1295,7 @@ void teulMRecvUpdatePoll(ENDPOINT& endpoint)
 {
 	endpoint.updateSocketEvents();
 #ifdef EXTREME_DEBUG
-	dbugLog(_FLD, "t:%d updating endpoint slot %d socket %d combined", endpoint.teulIndex(), endpoint.m_impl->pollSlot, endpoint.socket);
+	dbugLog(_FLD, "t:%d updating endpoint slot %d socket %d combined", endpoint.teulIndex(), endpoint.m_impl->pollSlot(), endpoint.socket);
 #endif
 }
 #else

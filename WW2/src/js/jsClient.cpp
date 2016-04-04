@@ -1797,19 +1797,17 @@ JSBool jsClient::SetProperty(JSContext* ctx, int propid, jsval* val)
 	return JS_TRUE;
 }
 
-#if !defined(ENABLE_FLOATERS)
 /************************************************************************************************
     _isRegularVehicle
 	Looks up the weapon spec and checks if it is a valid vehicle that does not require
     ENABLE_FLOATERS.
 *************************************************************************************************/
-
 static bool _isRegularVehicle(const WEAPON_SPEC& spec)
 {
 	const WEAPON* weapon = weapLookup(spec);
-	return (nullptr == weapon || weapon->isPlayerWeapon());
+
+	return !weapon || weapon->isPlayerWeapon();
 }
-#endif
 
 /************************************************************************************************
 	ProcessWeapList
@@ -1829,12 +1827,13 @@ void jsClient::ProcessWeapList()
 		if(!vehtype) continue;
 
 		WeaponCounter counter = weaplist.m_counters[i];
-#if !defined(ENABLE_FLOATERS)
-		if(false == _isRegularVehicle(weaplist.m_weapons[i]))
-		{
+
+#ifndef ENABLE_FLOATERS
+		if(false == _isRegularVehicle(weaplist.m_weapons[i])) {
 			counter.spawnable = WeaponCounter::NOT_PERMITTED;
 		}
 #endif
+
 		jsVehtype* jstype = new jsVehtype(vehtype, counter);
 		spawnablevehicles->SetElement(jstype, count);
 		weaponcounter->SetElement(new jsWeaponCounter(counter, vehtype->VehicleTypeNum, weaplist.m_levels[i]), count);

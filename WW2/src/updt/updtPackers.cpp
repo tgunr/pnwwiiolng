@@ -155,8 +155,7 @@ static SINT32 _packVehicleCommon(LOGICAL mode, UCHAR* const data, SINT32 offset,
 	return offset;
 }
 
-#if platBuild == TEUL_CLIENT && platOS == OS_WIN32 && (!defined(RELEASE_CLIENT) || RELEASE_CLIENT == 0)
-// The mac doesn't have "auto" so it doesn't get this feature.
+#if platBuild == TEUL_CLIENT && (!defined(RELEASE_CLIENT) || RELEASE_CLIENT == 0)
 # define UPDATE_HISTORY_DEBUG
 #else
 # undef UPDATE_HISTORY_DEBUG

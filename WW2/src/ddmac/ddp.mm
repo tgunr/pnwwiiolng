@@ -339,9 +339,9 @@ LOGICAL	ddpUpdate()
     }
 #endif
     
-#ifdef ENABLE_FLOATERS
+#ifdef BETA_RELEASE
 	logUpdateProfiling();
-#endif	// #ifdef BETA_RELEASE
+#endif
     
 	if (resetfps)
 	{

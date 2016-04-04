@@ -1445,7 +1445,7 @@ _diagnoseSupply(const StratHCUnit& unit, const FacilityStruct& facility, const F
 			// Start by assuming we're in self-supply mode.
 			supplyFacility = &facility;
 
-			if ( facility.m_incomingLink == nullptr && facility.m_outgoingLink == nullptr )
+			if ( facility.m_incomingLink == nullptr || facility.m_outgoingLink == nullptr )
 				return FacilityWeaponList::_CUT_BY_NO_LINKS;
 
 			// Is our mate friendly?

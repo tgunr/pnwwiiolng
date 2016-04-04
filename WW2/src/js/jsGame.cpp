@@ -2642,20 +2642,7 @@ JSBool jsGame::GetProperty(JSContext* ctx, int propid, jsval* val)
 							continue;
 					}
 
-					// respect the online only flag unless
-					// we're using a data directory
-					bool buzzardoffline = false;
-	#ifdef ENABLE_FLOATERS
-	#ifdef BETA_RELEASE
-	//#ifdef WANT_BUZZARD_OFFLINE
-					if ( ! Online )
-					{
-						buzzardoffline = true;
-					}
-	//#endif
-	#endif
-	#endif
-					if(!vtype->OnlineOnly || fioQuery() == ISDIRECTORY || buzzardoffline)
+					if(!vtype->OnlineOnly || fioQuery() == ISDIRECTORY)
 					{
 						jsVehtype* jstype = new jsVehtype(vtype);
 						spawnablevehicles->SetElement(jstype, index);

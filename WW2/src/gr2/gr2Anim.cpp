@@ -823,8 +823,9 @@ LOGICAL gr2AnimUpdateModel (OBJECT* pObject, LOGICAL isFPS)
 	FLOAT32 distToMe = (model->myVehicle->ModelData) ? 0.0f : model->myVehicle->VehicleObjectData->PlaneObject->distsqr;
 
 	// FIXME
-	if (model->myVehicle && model->myVehicle->Handle && model->myVehicle->Handle[0] == 0)
-		strncpy ((char*)model->myVehicle->Handle, " ", 4);
+	if (model->myVehicle && model->myVehicle->Handle[0] == 0) {
+		strlcpy(reinterpret_cast<char *>(model->myVehicle->Handle), " ", sizeof(model->myVehicle->Handle));
+	}
 
 	//if (model->myVehicle && model->myVehicle->Handle[0] && model->SetFlag(gr2AnimTrooper::PERSONALIZED))
 	//	gr2AnimPersonalize(pObject, (char*)model->myVehicle->Handle);
@@ -836,25 +837,18 @@ LOGICAL gr2AnimUpdateModel (OBJECT* pObject, LOGICAL isFPS)
 
 	// determine LOD
 #ifdef ENABLE_FLOATERS
-	if (LODForceValue)
-	{
+	if (LODForceValue) {
 		gr2AnimUpdateLOD(model, LODForceValue);
-	}
-	else
-	{
+	} else
 #endif
+	{
 		// FPS always sees itself at LOD1
-		if (isFPS)
-		{
+		if (isFPS) {
 			gr2AnimUpdateLOD(model, 0.0f);
-		}
-		else if(frametime >= model->nextLODCheck)
-		{
+		} else if (frametime >= model->nextLODCheck) {
 			gr2AnimUpdateLOD(model, distToMe);
 		}
-#ifdef ENABLE_FLOATERS
 	}
-#endif
 
 	// if we're dead, all we need to do is LOD .. so stop here
 	if (model->HasFlag(gr2AnimTrooper::DEAD))

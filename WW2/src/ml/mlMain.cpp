@@ -10130,8 +10130,7 @@ LOGICAL mlAddToGroupAmmoCount(SINT32 Count,SINT32 Total)
 
 #ifdef ENABLE_FLOATERS
 
-// more hacked stuff before the rats abandon the ship...
-static FLOAT64	profileFlightVelocity;						// double precision is so 1337!!1
+static FLOAT64	profileFlightVelocity;
 
 void mlSetProfileFlight()
 {
@@ -10144,8 +10143,8 @@ static UINT32 _DoEyeOperations(mlVehicleData* VehicleData)
 #if RELEASE_CLIENT
     switch(OverrideSpawner)
     {
-    case BENCHANTWERP_OVERRIDE:
-    case BENCHRAMAGEN_OVERRIDE:
+        case BENCHANTWERP_OVERRIDE:
+        case BENCHRAMAGEN_OVERRIDE:
         {
             return 0;
         }
@@ -10364,9 +10363,7 @@ static UINT32 _DoEyeOperations(mlVehicleData* VehicleData)
 
 #endif // ENABLE_FLOATERS
 
-#ifdef __MWERKS__
 #pragma mark -
-#endif
 
 // handles the magical mystery rotational co-ordinate conversion
 
