@@ -825,7 +825,7 @@ LOGICAL gr2AnimUpdateModel (OBJECT* pObject, LOGICAL isFPS)
 	// FIXME
 	if (model->myVehicle && model->myVehicle->Handle[0] == 0) {
 		strlcpy(reinterpret_cast<char *>(model->myVehicle->Handle), " ", sizeof(model->myVehicle->Handle));
-    }
+	}
 
 	//if (model->myVehicle && model->myVehicle->Handle[0] && model->SetFlag(gr2AnimTrooper::PERSONALIZED))
 	//	gr2AnimPersonalize(pObject, (char*)model->myVehicle->Handle);
