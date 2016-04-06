@@ -120,11 +120,11 @@ _aggregatePermissions(ChatPermissions& lhs, const CHAT_GROUPS& groups)
 //////////////////////////////////////////////////////////////////////
 // Given a database row, update the chat group.
 
-static const char* _GROUP_QUERY = "CALL auth.p_get_chat_group_summary()";
+static const char* _GROUP_QUERY = "CALL %s.p_get_chat_group_summary()";
 class GroupReadQuery : public DBThreadQuery
 {
 public:
-	GroupReadQuery() : DBThreadQuery(DBThread::Default, "GroupReadQuery", _GROUP_QUERY, DBThreadQuery::_CALLBACK), perms() { }
+	GroupReadQuery() : DBThreadQuery(DBThread::Default, "GroupReadQuery", DBThreadQuery::_CALLBACK, _GROUP_QUERY, cv_authdbSchema.GetString()), perms() { }
 
 private:
 	std::vector<ChatPermissions> perms;

@@ -279,7 +279,7 @@ Player::selectPlayer(const playerid_t forPlayerID)
 		startTime = teulClock64;
 #endif
 
-		DBQuery q(dbh, "CALL auth.p_get_player_details(%u,%u)", forPlayerID, Server::myServerInfo.stats.arenaID);
+		DBQuery q(dbh, "CALL %s.p_get_player_details(%u,%u)", cv_authdbSchema.GetString(), forPlayerID, Server::myServerInfo.stats.arenaID);
 
 #ifdef TIME_QUERIES
 		teulSyncClock();
@@ -557,7 +557,7 @@ bool mapFillPersonaData(Player* const player)
 	player->SetRank(0);
 
 	// Refresh information when processing a player's mission scoring packet
-	static const char QRY_SELECT_PERSONA_REFRESH[] = "CALL auth.p_persona_refresh(%u, %u)";
+	static const char QRY_SELECT_PERSONA_REFRESH[] = "CALL %s.p_persona_refresh(%u, %u)";
 
 	try
 	{
@@ -568,7 +568,7 @@ bool mapFillPersonaData(Player* const player)
 		startTime = teulClock64;
 #endif
 
-		DBQuery q(dbh, QRY_SELECT_PERSONA_REFRESH, player->personaID(), Server::myServerInfo.stats.arenaID);
+		DBQuery q(dbh, QRY_SELECT_PERSONA_REFRESH, cv_authdbSchema.GetString(), player->personaID(), Server::myServerInfo.stats.arenaID);
 
 #ifdef TIME_QUERIES
 		if ( teulClock64 - entryTime > 500 || teulClock64 - startTime > 200 )

@@ -1074,9 +1074,10 @@ public:
 	PlayerGroupQuery(const playerid_t _playerID)
 		: DBThreadQuery(DBThread::Default, "PlayerGroupQuery", DBThreadQuery::_IMMEDIATE
 							, "SELECT v.group_oid"
-								" FROM auth.v_player_active_groups v"
+								" FROM %s.v_player_active_groups v"
 								" WHERE v.playerid = %u AND v.arenaid = %u"
-									, _playerID
+									, cv_authdbSchema.GetString()
+                                    , _playerID
 									, Server::myServerInfo.stats.arenaID
 									)
 		, m_playerID(_playerID)

@@ -131,7 +131,7 @@ void authInitDB(void)
 	DB::Schema updater(dbh, "auth");
 	updater.Update(revisions);
 
-	DBSimpleQuery(dbh, "UPDATE `auth`.`auth_arenas` SET lock_state = %d, players = 0", AL_OFFLINE);
+	DBSimpleQuery(dbh, "UPDATE `%s`.`auth_arenas` SET lock_state = %d, players = 0", cv_authdbSchema.GetString(), AL_OFFLINE);
 
 	dbugLog(_FLN, "auth database ready");
 }
@@ -164,32 +164,13 @@ static std::vector<MANAGEMENT_MSG> logins;
 void
 authdbSaveLogins()
 {
-	if ( logins.empty() )
-		return;
-
-	char* statement = threadsAllocText();
-										/*  ,   (   %u   ,   %u   ,   %u   )   \0	*/
-	static const size_t EST_STATEMENT_LEN = 1 + 1 + 12 + 1 + 12 + 1 + 12 + 1 + 1;
-	char* cutoff = statement + TEXT_POOL_SIZE - EST_STATEMENT_LEN;
-
-	static const char* const prefix = "INSERT INTO `auth`.`auth_connections`(`customerID`, `arenaID`, `ip`)VALUES";
-	char* p = statement + sprintf(statement, "%s", prefix);
-	char* comma = p;
-	auto it = logins.begin();
-	while ( it != logins.end() && p < cutoff )
-	{
-		p += sprintf(p, ",(%u,%u,%u)", (UINT32)it->m_customerID, (UINT32)it->m_arenaID, (UINT32)it->m_ip);
-		++it;
+	static const char* const statement = "INSERT INTO `%s`.`auth_connections`(`customerID`, `arenaID`, `ip`) VALUES (%u,%u,%u)";
+    for (auto &msg : logins) {
+        DBThread::Do(DBThread::Auth, statement, cv_authdbSchema.GetString(), msg.m_customerID, msg.m_arenaID, msg.m_ip);
 	}
 
-	// Replace that leading comma with a space.
-	*comma = ' ';
-
-	// Dispatch the query.
-	DBThread::Do(DBThread::Auth, statement);
-
 	// Remove the logins we've accumulated.
-	logins.erase(logins.begin(), it);
+    logins.clear();
 }
 
 void
@@ -229,7 +210,8 @@ authValidateUser(SINT32 teulIndex, const APP_LAUNCH_REQ& request, Auth::Dispatch
 	wwiiEscapeString(password);
 
 	UINT32 len = strprintf(buffer
-					, "CALL `auth`.`p_authenticate_user_for_arena`('%s','%s',%u)"
+					, "CALL `%s`.`p_authenticate_user_for_arena`('%s','%s',%u)"
+                        , cv_authdbSchema.GetString()
 						, username.c_str()
 						, password.c_str()
 						, request.arenaID
@@ -332,7 +314,8 @@ Auth::LoginRequest::validate(SINT32 teulIndex, Auth::ClientData& cdata)
 	wwiiEscapeString(password);
 
 	UINT32 len = strprintf(buffer
-					, "CALL `auth`.`p_get_user_subscriptions`('%s','%s')"
+					, "CALL `%s`.`p_get_user_subscriptions`('%s','%s')"
+                        , cv_authdbSchema.GetString()
 						, username.c_str()
 						, password.c_str()
 						);
@@ -590,10 +573,10 @@ _getAppManifest()
 			sprintf(statement,
 						"SELECT old,new,platform,actionType,webURL,ftpPort,ftpProtocol,ftpURL,ftpDir,ftpFile"
 							",INET_ATON(old) AS sorter"
-							" FROM auth.app_manifest"
+							" FROM %s.app_manifest"
 							" WHERE appID = %u"
 							" ORDER BY platform, sorter"
-							, config.apps[appNum].appID);
+							, cv_authdbSchema.GetString(), config.apps[appNum].appID);
 			DBQuery q(dbh, statement);
 
 			//Build the reply
@@ -666,7 +649,7 @@ _getPlayerTable(GAME& gameEntry)
 {
 	try
 	{
-		DBQuery q(dbh, "SELECT playertable FROM `auth`.`auth_games` WHERE gameID = %u", gameEntry.gameID);
+		DBQuery q(dbh, "SELECT playertable FROM `%s`.`auth_games` WHERE gameID = %u", cv_authdbSchema.GetString(), gameEntry.gameID);
 		if ( q.HasRows() == false || q.FetchRow() == false )
 			throw std::invalid_argument("couldn't find game entry");
 
@@ -800,7 +783,7 @@ void authdbStoreComputerInfo(const Auth::ClientData& cdata, const PLAY_COMPUTER_
 		// For this to work depends on keeping the insert fields in the order
 		// they are stored in the table definition. BEWARE.
 		DBThread::Do(DBThread::Auth
-					, "INSERT INTO `auth`.`info_ogl`"
+					, "INSERT INTO `%s`.`info_ogl`"
 						" VALUES"
 						"("
 						"  '%s', '%s', %u, %u, '%s', %u, '%s'"
@@ -816,6 +799,7 @@ void authdbStoreComputerInfo(const Auth::ClientData& cdata, const PLAY_COMPUTER_
 						", %u, %u, %u, %u, %u"
 						", %llu"				// Speed
 						" )"
+                    , cv_authdbSchema.GetString()
 					, cardName
 					, vendor
 					, (UINT32)ogl.oglVersion
@@ -877,7 +861,7 @@ void authdbStoreComputerInfo(const Auth::ClientData& cdata, const PLAY_COMPUTER_
 					);
 
 		mysql_escape_string(statement, cdata.m_username.c_str(), MAX_HANDLE_LEN * 2 + 1);
-		DBSimpleQuery(dbh, "UPDATE `auth`.`auth_customer` SET `flags` = (`flags` | 2) WHERE `username` = '%s'", statement);
+		DBSimpleQuery(dbh, "UPDATE `%s`.`auth_customer` SET `flags` = (`flags` | 2) WHERE `username` = '%s'", cv_authdbSchema.GetString(), statement);
 	}
 	catch (std::exception& e)
 	{
@@ -990,7 +974,7 @@ authdbSaveLastOTP(UINT64 otp)
 {
 	try
 	{
-		DBQuery q(dbh, "REPLACE INTO `auth`.`auth_variables` (`name`, `value`) VALUES ('last_otp', %llu)", otp);
+		DBQuery q(dbh, "REPLACE INTO `%s`.`auth_variables` (`name`, `value`) VALUES ('last_otp', %llu)", cv_authdbSchema.GetString(), otp);
 		dbugLog(_FLI, "%s: saved last OTP of %llu", __FUNCTION__, otp);
 	}
 	catch (std::exception& e)
@@ -1010,7 +994,7 @@ authdbLogBadPlayername(UINT32 ip, const std::string& username, std::string reaso
 		if ( username == "blitz" )
 			return;
 		wwiiEscapeString(reason);
-		DBQuery q(dbh, "INSERT INTO `auth`.`auth_illegal_users` (`recorded`, `ip`, `username`, `reason`) VALUES (NOW(), %u, '%s', '%s')", ip, username.c_str(), reason.c_str());
+		DBQuery q(dbh, "INSERT INTO `%s`.`auth_illegal_users` (`recorded`, `ip`, `username`, `reason`) VALUES (NOW(), %u, '%s', '%s')", cv_authdbSchema.GetString(), ip, username.c_str(), reason.c_str());
 	}
 	catch ( std::exception& e )
 	{
@@ -1053,11 +1037,11 @@ authdbUpdateArenaStatus(UINT32 arenaID, SINT32 lock, UINT32 players)
 	try
 	{
 		DBQuery q(dbh
-					, "UPDATE `auth`.`auth_arenas`"
+					, "UPDATE `%s`.`auth_arenas`"
 						" SET  `lock_state` = %d"
 							  ", `players` = %u"
 						" WHERE `arenaID` = %u"
-							, lock, players, arenaID
+							, cv_authdbSchema.GetString(), lock, players, arenaID
 				);
 	}
 	catch ( std::exception& e )
@@ -1073,10 +1057,10 @@ authdbReadArenaAliases()
 	try
 	{
 		DBQuery q(dbh, "SELECT aa.arenaID, aa.alias"
-						" FROM auth.auth_arenas aa"
+						" FROM %s.auth_arenas aa"
 						" WHERE aa.controlVisible = 'visible'"
 							" AND aa.alias IS NOT NULL"
-							" AND alias <> ''");
+							" AND alias <> ''", cv_authdbSchema.GetString());
 		g_arenaAliases.clear();
 		while ( q.FetchRow() )
 		{

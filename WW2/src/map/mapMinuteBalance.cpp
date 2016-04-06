@@ -41,11 +41,9 @@ mapChargeMinutes()
 	// Get our prepared statement.
 	try
 	{
-		ThreadTextQuery balanceQry(DBThread::Auth
-									, "UPDATE auth.auth_minute_balance"
-											" SET balance=balance-1,modified=NOW()"
-											" WHERE customerid IN ("
-										, ") AND balance>0");
+        char _queryPrefix[1024] = {0};
+        snprintf(_queryPrefix, sizeof(_queryPrefix), "UPDATE %s.auth_minute_balance SET balance=balance-1, modified=NOW() WHERE customerid IN (", cv_authdbSchema.GetString());
+		ThreadTextQuery balanceQry(DBThread::Auth, _queryPrefix, ") AND balance>0");
 
 		char playerIDstr[64];
 

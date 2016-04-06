@@ -260,7 +260,7 @@ void chatdbRecordEvent(const SCHAR* category
 static inline void
 _readPermissionNames()
 {
-	DBQuery qry(dbh, "SELECT `permissionid` - 1, `description` FROM `auth`.`wwii_permissions`");
+	DBQuery qry(dbh, "SELECT `permissionid` - 1, `description` FROM `%s`.`wwii_permissions`", cv_authdbSchema.GetString());
 	if ( qry.HasRows() == false )
 		throw std::runtime_error("No rows returned from auth.wwii_permissions");	///Terminal
 	while ( qry.FetchRow() )

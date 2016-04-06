@@ -1657,8 +1657,8 @@ class QueryPlayerInfo : public DBThreadQuery
 public:
 	QueryPlayerInfo(const ChatHandle& byMatchID, const ChatHandle& handle)
 		: DBThreadQuery(DBThread::Default, "QueryPlayerInfo", DBThreadQuery::_CALLBACK
-							, "CALL auth.p_get_player_details((SELECT playerid FROM wwiionline.wwii_player WHERE callsign = '%s'), %u)"
-								, Chat::Name(handle).c_str(), Server::myServerInfo.stats.arenaID
+							, "CALL %s.p_get_player_details((SELECT playerid FROM wwiionline.wwii_player WHERE callsign = '%s'), %u)"
+								, cv_authdbSchema.GetString(), Chat::Name(handle).c_str(), Server::myServerInfo.stats.arenaID
 							)
 		, m_matchID(byMatchID)
 		, m_handle(handle)

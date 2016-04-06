@@ -25,7 +25,7 @@ static const char* QRY_SELECT_RANKS =
 		", bit_or(p.maskvalue)"
 		" FROM wwii_rank r"
 			" LEFT JOIN wwii_rank_permiss rp USING (rankid)"
-				" LEFT JOIN auth.wwii_permissions p USING (permissionid)"
+				" LEFT JOIN %s.wwii_permissions p USING (permissionid)"
 		" GROUP BY 1"
 		" ORDER BY 1 desc"
 ;
@@ -101,12 +101,14 @@ Rank::setSize(size_t num)
 // Load in the entire hierachy of HC Units in depth-descending order
 // so that we can build a complete tree in a single pass.
 
+extern ConfigStr cv_authdbSchema;
+
 void
 wwiiReadRanks(DBHANDLE& dbh)
 {
 	try
 	{
-		DBQuery dbq(dbh, QRY_SELECT_RANKS);
+		DBQuery dbq(dbh, QRY_SELECT_RANKS, cv_authdbSchema.GetString());
 
 		Rank::setSize(dbq.Rows());
 
