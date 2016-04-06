@@ -11,8 +11,6 @@
 
 #if platOS == OS_LINUX
 #define __USE_GNU 1
-#else
-#define USE_LOCAL_STRNLEN
 #endif
 
 #if platOS == OS_WIN32 && !defined(strcasecmp)

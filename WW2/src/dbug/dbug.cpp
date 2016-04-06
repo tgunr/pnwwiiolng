@@ -23,7 +23,7 @@
 #ifdef HAVE_SIGNAL_H
 # include <signal.h>
 #endif
-#if platOS == OS_LINUX
+#if AS_SERVER
 #include "hostproj/revision.h"
 #endif
 #ifdef HAVE_SYS_TIME_H
@@ -279,7 +279,7 @@ void DebugLogger::initialize(SINT32 logType_, Debug::ERROR_TYPE level_, SINT32 f
 	initialized = true;
 }
 
-#if platOS == OS_LINUX
+#if AS_SERVER
 static void
 _handleSIGUSR2(SINT32)
 {
@@ -305,7 +305,7 @@ _handleSIGUSR2(SINT32)
 }
 #endif
 
-#if platOS == OS_LINUX
+#if AS_SERVER
 
 #include <execinfo.h>
 
@@ -419,7 +419,7 @@ void dbugInit(SINT32 logType, const char* const filename)
 
 	_logger.initialize(logType, level, file, filename);
 
-#if platOS == OS_LINUX
+#if AS_SERVER
 	signal(SIGUSR2, _handleSIGUSR2);
 	signal(SIGPIPE, SIG_IGN);
 

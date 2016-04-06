@@ -48,9 +48,6 @@
 
 #if platBuild == TEUL_SERVER
 #include "server/serverInterfaceDescription.h"
-#endif
-
-#if platOS == OS_LINUX
 #include "teul/teulConfigVar.h"
 extern ConfigStr cv_defaultInterface;
 #endif
@@ -72,11 +69,11 @@ extern void teulInitEndpoints(ERROR_FUNCTION* const);
 //////////////////////////////////////////////////////////////////////
 // Retrieve a list of the IP addresses this host has on eth0.
 
-#if platBuild == TEUL_SERVER || platOS == OS_LINUX
+#if platBuild == TEUL_SERVER
 static void
 _getHostIPAddresses()
 {
-#if platOS == OS_LINUX
+#if platOS == OS_LINUX || platOS == OS_MACOS
 	static const char* primaryInterfaceName = cv_defaultInterface.GetString();
 
 	// Get a list of IPv4 network interfaces.
@@ -198,7 +195,7 @@ _getHostIPAddresses()
 
 SINT32 teulModStartup(ERROR_FUNCTION* errFnPtr)
 {
-#if platOS == OS_LINUX
+#if platBuild == TEUL_SERVER
 	signal(SIGPIPE, SIG_IGN);
 #endif
 
@@ -217,7 +214,7 @@ SINT32 teulModStartup(ERROR_FUNCTION* errFnPtr)
 	teulSyncClock();
 	lastUpdateTime = teulClock64;
 
-#if platOS == OS_LINUX || platBuild == TEUL_SERVER
+#if platBuild == TEUL_SERVER
 	_getHostIPAddresses();
 #endif
 
@@ -226,7 +223,7 @@ SINT32 teulModStartup(ERROR_FUNCTION* errFnPtr)
 
 typedef std::vector<UINT32> ADDRESS_LIST;
 
-#if platBuild == TEUL_SERVER || platOS == OS_LINUX
+#if platBuild == TEUL_SERVER
 void
 teulGetAddresses(ADDRESS_LIST& addresses)
 {
@@ -327,6 +324,9 @@ _configureEndpointSocket(ENDPOINT& endpoint)
 		// Listening sockets need to re-allow use of the address on close.
 		if ( endpoint.state() == IS_LISTENING )
 			evutil_make_listen_socket_reuseable(endpoint.socket);
+#if platOS != OS_WIN32
+        setsockopt(endpoint.socket, SOL_SOCKET, SO_NOSIGPIPE, (const int[]){ 0 }, sizeof(int));
+#endif
 	}
 	else if ( endpoint.protocol == PROTOCOL_UDB )
 	{
@@ -403,7 +403,7 @@ _connectSocket(ENDPOINT& endpoint)
 		endpoint.lastDataRecv.makeCurrent();
 		endpoint.lastDataSent.makeCurrent();
 
-#if platOS == OS_LINUX
+#if platOS == OS_LINUX || platOS == OS_MACOS
 		assert( endpoint.m_impl->pollSlot() < 0 );
 #endif
 
@@ -622,7 +622,7 @@ teulClose(ENDPOINT& inEndpoint, const UINT32 code)
 #if platOS == OS_WIN32
 	Teul::g_logFnPtr("t:%d closing code:%u", inEndpoint.teulIndex(), code);
 #endif
-#if platOS == OS_LINUX
+#if platOS == OS_LINUX || platOS == OS_MACOS
 	if ( g_logDebug )
 		dbugLog(_FLN, "t:%d closing [%u] st:%u cl:%s", inEndpoint.teulIndex(), code, inEndpoint.state(), inEndpoint.m_closed ? "yes" : "no");
 #endif
