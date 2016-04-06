@@ -51,9 +51,7 @@ extern ConfigPath cv_defaultLogPath;
 # define _O_TRUNC O_TRUNC
 #endif
 
-#if platOS == OS_MACOS
-	#define PMODE S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH
-#elif platOS == OS_WIN32
+#if platOS == OS_WIN32
 	#define PMODE (_S_IREAD | _S_IWRITE)
 #else
 	#define PMODE S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH
@@ -189,8 +187,7 @@ _openDbugFile(const char* const srcFile_)
 
 	_qualifyFilename(srcFile_, filename, sizeof(filename));
 
-#if !defined(DEV_BUILD) || platOS != OS_MACOS
-	if (PN_UNLIKELY(srcFile_ != nullptr))
+	if (PN_LIKELY(srcFile_ != nullptr))
 	{
 		int oflags = _O_CREAT|_O_WRONLY|_O_TRUNC;
 
@@ -221,9 +218,6 @@ _openDbugFile(const char* const srcFile_)
 	} else {
 		file = OS_FILENO(stderr);
     }
-#else
-    file = OS_FILENO(stderr);
-#endif
 
 	return file;
 }
@@ -399,13 +393,9 @@ void dbugInit(SINT32 logType, const char* const filename)
 	level = Debug::ERR_DBUG;
 	g_logDebug = true;
 
-#if defined(DEV_BUILD) && platOS == OS_MACOS
-    logType = LOG_TO_FILE;
-#elif platOS != OS_LINUX
 	if ( logType != LOG_OFF) {
 		logType = LOG_TO_FILE;
     }
-#endif
 
 	switch(logType)
 	{
