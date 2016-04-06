@@ -872,11 +872,13 @@ main(int argc, const char* argv[])
 	wwiiIRCAddInitialChannel("-err", "", "Authentication errors");
 	wwiiIRCAddInitialChannel("-ok", "", "Authentication approvals");
 
-	threadsSetup();
-
 	dbugLog(_FLN,"connecting to database");
 
 	authInitDB();
+
+    dbugLog(_FLN, "setting up database threads");
+    
+	threadsSetup();
 
 	dbugLog(_FLN,"installing callbacks");
 
