@@ -32,7 +32,7 @@ namespace Debug
 		ERR_DBUG					// debug level message
 	,	ERROR_TYPE_SIZE
 	};
-	using ERROR_TYPE = unsigned int;
+	using ERROR_TYPE = UINT32;
 }
 
 #define STD_ERR				0x0010	// mirror significant output to stderr
@@ -130,85 +130,49 @@ int dbugGetErrno(void);
 // dbugLog: if the current filename, lineno or string is nullptr then it sets these members. The
 // parameters are output as a string to the debug file depending on the debug level selected and
 // the current error type.  calls handlers.
-int _dbugLog(const char* filename, int lineno, unsigned int errType, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FN(4,5);
+int _dbugLog(const char* filename, int lineno, UINT32 errType, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FN(4,5);
 
+// dbugWrite: Same as dbugLog but has its own logging level. Don't know why this exists.
 SINT32 _dbugWrite(char* filename, SINT32 lineno, UINT32 errType, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FN(4,5);
 
-[[noreturn]] void _LogAbort(const char* filename, unsigned int lineno, unsigned int errType, const char* assertion, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FN(5,6);
-#define LogAbort(...) _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, nullptr, __VA_ARGS__)
+// LogAbort: Fire a ERR_FATAL and abort()
+[[noreturn]] void _LogAbort(const char* filename, unsigned int lineno, UINT32 errType, const char* assertion, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FN(5,6);
 
-// These macros assume that the condition is unlikely and try to provide the compiler an optimization hint by
-// ordering the abort as the second choice.
-#define ABORT_UNLESS(assertion_) PN_LIKELY(!!(assertion_)) ? (void)0 : _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, nullptr, "Assertion: !(%s)", #assertion_)
-#define ABORT_UNLESS_EX(assertion_, ...) PN_LIKELY(!!(assertion_)) ? (void)0 : _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, #assertion_, __VA_ARGS__)
-#define ABORT_IF(assertion_) PN_LIKELY(!(assertion_)) ? (void)0 : _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, nullptr, "Assertion: %s", #assertion_)
-#define ABORT_IF_EX(assertion_, ...) PN_LIKELY(!(assertion_)) ? (void)0 : _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, #assertion_, __VA_ARGS__)
-
-#ifdef DBUG_TEST
-	template<class Args...>
-	int dbugLog(const char*, int, unsigned int, const char* fmt, Args&&... args) noexcept
-	{
-		return printf(fmt, std::forward<Args>(args)...);
-	}
+// Disable dbugLog() and dbugWrite() if respectively requested.
+#ifdef NO_DEBUG_LOG
+    #define dbugLog(m, fmt, ...)
 #else
-	#ifdef NO_DEBUG_LOG
-		#if platOS == OS_LINUX
-			#define dbugLog(...)
-		#elif platOS == OS_WIN32
-			#define dbugLog(...) _dbugLog(__VA_ARGS__)		//} Seems like this should be
-		#elif platOS == OS_MACOS
-			#define dbugLog(...)
-		#endif
-	#else
-		#define dbugLog(...) _dbugLog(__VA_ARGS__)
-	#endif
+    #define dbugLog(m, fmt, ...) _dbugLog(m, fmt, ## __VA_ARGS__)
 #endif
 
 #ifdef NO_DEBUG_WRITE
-
-	#if platOS == OS_LINUX
-		#define dbugWrite(...)
-	#elif platOS == OS_WIN32
-		#define dbugWrite(...)
-	#elif platOS == OS_MACOS
-		#define dbugWrite(...)
-	#endif
-
+    #define dbugWrite(m, fmt, ...)
 #else
-	#define dbugWrite _dbugWrite
+	#define dbugWrite(m, fmt, ...) _dbugWrite(m, fmt, ## __VA_ARGS__)
 #endif
 
-#if defined(BETA_RELEASE) && platOS != OS_WIN32
-# define betaLog(...) dbugLog(__VA_ARGS__)
+#define LogAbort(fmt, ...) _LogAbort(_FLF, nullptr, fmt, ## __VA_ARGS__)
+
+// These macros assume that the condition is unlikely.
+#define ABORT_UNLESS_EX(assertion_, fmt, ...) do { if (PN_UNLIKELY(!(assertion_))) { _LogAbort(_FLF, #assertion_, fmt, ## __VA_ARGS__); } } while (0)
+#define ABORT_IF_EX(assertion_, fmt, ...)     do { if (PN_UNLIKELY((assertion_)))  { _LogAbort(_FLF, #assertion_, fmt, ## __VA_ARGS__); } } while (0)
+#define ABORT_UNLESS(assertion_) ABORT_UNLESS_EX(assertion_, "Failed !(%s)", #assertion_)
+#define ABORT_IF(assertion_)     ABORT_IF_EX(assertion_, "Failed %s", #assertion_)
+
+// Define betaLog()
+#if defined(BETA_RELEASE)
+    #define betaLog(m, fmt, ...) dbugLog(m, fmt, ## __VA_ARGS__)
 #else
-#  define betaLog(...)
+    #define betaLog(m, fmt, ...)
 #endif
 
 // This is set to true when the dbug library is logging _FLD messages
 extern bool g_logDebug;
 
 #ifndef FRONT_END
-# define DEBUG_ERR(...) dbugLog(_FLA, __VA_ARGS__)
-# define DEBUG_FATAL(...) LogAbort(__VA_ARGS__)
+    #define DEBUG_ERR(fmt, ...) dbugLog(_FLA, fmt, ## __VA_ARGS__)
+    #define DEBUG_FATAL(fmt, ...) LogAbort(fmt, ## __VA_ARGS__)
 #else
-# define DEBUG_ERR(...) Write_Debug(__VA_ARGS__)
-# define DEBUG_FATAL(...) Write_Log(LOG_ALL, LOG_FATAL, __VA_ARGS__)
-#endif
-
-#if platOS== OS_WIN32
-#define WriteToConsole(...)	\
-	{	\
-		char output[4096];	\
-		sprintf(output, __VA_ARGS__);	\
-		OutputDebugStringA(output);	\
-		OutputDebugStringA("\n");		\
-	}
-#elif platOS == OS_MACOS
-#define WriteToConsole(...)	\
-	{	\
-		printf(__VA_ARGS__);	\
-		printf("\n");	\
-	}
-#else
-#define WriteToConsole(...) dbugLog(_FLD, __VA_ARGS__);
+    #define DEBUG_ERR(fmt, ...) Write_Debug(fmt, ## __VA_ARGS__)
+    #define DEBUG_FATAL(fmt, ...) Write_Log(LOG_ALL, LOG_FATAL, fmt, ## __VA_ARGS__)
 #endif

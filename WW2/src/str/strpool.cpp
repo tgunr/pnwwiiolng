@@ -41,6 +41,6 @@ const char* strpool(const char* s)
 void strpoolKill()
 {
 #ifdef STRPOOL_DEBUG
-	WriteToConsole("strpool: %" PRSizeT " strings, %" PRSizeT " calls, %" PRSizeT " matches\n", strings.size(), callcount, foundcount);
+	dbugLog(_FLD, "strpool: %" PRSizeT " strings, %" PRSizeT " calls, %" PRSizeT " matches\n", strings.size(), callcount, foundcount);
 #endif
 }

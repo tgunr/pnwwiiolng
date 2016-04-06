@@ -106,28 +106,21 @@ _packSYN_TOKEN( LOGICAL mode, UCHAR* const data, SINT32 offset, struct SYN_TOKEN
 	return offset;
 }
 
-#ifdef DEBUG_CONNECTIONS
-static void
-_report(const ACTION_OBJECT* const a, const char* const txt)
+static inline void _report(const ACTION_OBJECT* const a, const char* const txt)
 {
-	WriteToConsole("t:%d[%d] %s", a->teulIndex, (a->endpoint ? a->endpoint->teulIndex() : -999), txt);
-#if platOS == OS_WIN32
-	printf("t:%d[%d] %s\n", a->teulIndex, (a->endpoint ? a->endpoint->teulIndex() : -999), txt);
+#ifdef DEBUG_CONNECTIONS
+	dbugLog(_FLD, "t:%d[%d] %s", a->teulIndex, (a->endpoint ? a->endpoint->teulIndex() : -999), txt);
 #endif
 }
 
-static void
-_status(const char* const doing, const char* const what, UINT32 version, const ENDPOINT* const endpoint)
+static inline void _status(const char* const doing, const char* const what, UINT32 version, const ENDPOINT* const endpoint)
 {
-	WriteToConsole("t:%d [%2s] [%3s] v=%04x ep->ver=%04x ep->crypt=%04x txs=%llx rxs=%16llx", endpoint->teulIndex(), doing, what, version, endpoint->m_impl->m_version, endpoint->m_impl->m_cryptVersion, endpoint->m_impl->m_txCrypt.seed(), endpoint->m_impl->m_rxCrypt.seed());
-#if platOS == OS_WIN32
-	printf("t:%d [%2s] [%3s] v=%04x ep->ver=%04x ep->crypt=%04x txs=%16llx rxs=%16llx\n", endpoint->teulIndex(), doing, what, version, endpoint->m_impl->m_version, endpoint->m_impl->m_cryptVersion, endpoint->m_impl->m_txCrypt.seed(), endpoint->m_impl->m_rxCrypt.seed());
+#ifdef DEBUG_CONNECTIONS
+	dbugLog(_FLD, "t:%d [%2s] [%3s] v=%04x ep->ver=%04x ep->crypt=%04x txs=%llx rxs=%16llx",
+            endpoint->teulIndex(), doing, what, version, endpoint->m_impl->m_version, endpoint->m_impl->m_cryptVersion,
+            endpoint->m_impl->m_txCrypt.seed(), endpoint->m_impl->m_rxCrypt.seed());
 #endif
 }
-#else
-#define _report(a, ...) (void)a;
-#define _status(...)
-#endif
 
 //////////////////////////////////////////////////////////////////////
 // Connectee (client) sends a SYN token.
