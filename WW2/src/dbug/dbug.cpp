@@ -631,7 +631,7 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 		struct tm tmStruct;
 		struct tm* tm = localtime_r(&now, &tmStruct);
 #endif
-		len = _logger.formatText(CARRIAGE_RETURN "%s [%04u-%02u-%02u %02u:%02u.%02u.%03u %s:%u] "
+		len = _logger.formatText("%s [%04u-%02u-%02u %02u:%02u.%02u.%03u %s:%u] "
 								, errorTypes[_logger.errType]
 								, tm->tm_year + 1900
 								, tm->tm_mon + 1
@@ -643,6 +643,9 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 								, _logger.file()
 								, _logger.lineno);
 		_dbugOut(_logger.dbugfile, _logger.logType, _logger.errType, flags, _logger.text(), len, false);
+        if ( ((flags & LOG_ALL_TO_STDERR) || ((flags & STD_ERR) && _logger.errType <= Debug::ERR_MINOR)) && !(flags & BARE_DEBUG) ) {
+            fprintf(stderr, "%s", _logger.text());
+        }
 	}
 
 	const char* text = nullptr;
@@ -651,29 +654,25 @@ _dbugLogPrivate(bool isLog, const char* const filename, const SINT32 lineno, con
 	else
 	{
 		len = _logger.vformatText(fmt, args);
-		if ( len == (size_t)~0 )
-		{
-			text = "[ERROR]";
+		if ( len == (size_t)~0 ) {
+			text = "[ERROR]\n";
 			len = strlen(text);
-		}
-		else
+		} else {
+            len = _logger.formatText("%s\n", _logger.text());
 			text = _logger.text();
+        }
 	}
 
 	if ( PN_UNLIKELY(len == 0) )
 	{
-		text = "[nullptr]";
+		text = "[nullptr]\n";
 		len = strlen(text);
 	}
 
 	_dbugOut(_logger.dbugfile, _logger.logType, _logger.errType, flags, text, len, true);
 
-	if ( (flags & LOG_ALL_TO_STDERR) || ((flags & STD_ERR) && _logger.errType <= Debug::ERR_MINOR) )
-	{
-		if ( flags & BARE_DEBUG )
-			printf("%s", text);
-		else
-			printf("%s%s", CARRIAGE_RETURN, text);
+	if ( (flags & LOG_ALL_TO_STDERR) || ((flags & STD_ERR) && _logger.errType <= Debug::ERR_MINOR) ) {
+        fprintf(stderr, "%s", text);
 	}
 
 	_levelHandler(_logger.errType, text);
