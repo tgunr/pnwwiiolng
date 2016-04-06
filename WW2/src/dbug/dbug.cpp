@@ -15,7 +15,9 @@
 #include "include/defs.h"
 #include "teul/teulTime.h"
 #include <locale.h>
+#if platBuild == TEUL_SERVER
 #include "wwii/wwiiThreads.h"
+#endif
 
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>
@@ -783,7 +785,9 @@ _LogAbort(const char* file_, unsigned int line_, unsigned int error_, const char
 #else
 	if ( PN_LIKELY(_logger.isInitialized()) )
 	{
+#if platBuild == TEUL_SERVER
         threadsLogging();
+#endif
 		if ( assertion_ != nullptr && *assertion_ != 0 )
 			_dbugLog(file_, line_, error_, "ASSERTION: %s", assertion_);
 		_dbugLogPrivate(FALSE, file_, line_, error_, fmt_, args);
