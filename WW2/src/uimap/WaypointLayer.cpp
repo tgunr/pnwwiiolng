@@ -383,9 +383,6 @@ void WaypointMapObject::DrawSelf(SuperCellMapView* mv)
 			}
 		break;
 		*/
-        default:
-            // Invalid type, nothing to draw
-            break;
 	}
 
 	if(texid > -1)

@@ -307,12 +307,19 @@ LOGICAL persGunsightInit(void)
 		Write_Debug("Unable to load up the basic gunsight texture map! (vehicles\\vo\\sightfov1.bmp)");
 	}
 	piAddTexRef(_GunsightFOVTexId);
-
-	_bazookascope = ldddsLoadDDSTexture2D("vehicles/vo/m9optic.dds", colorBLACK, 0);
-	_yankscope = ldddsLoadDDSTexture2D("vehicles/vo/amerscope.dds", colorBLACK, 0);
+#ifdef AIMING_WEAPONS
+	_bazookascope = ldddsLoadDDSTexture2D("vehicles/vo/m9optic.dds", colorCYAN, 0);
+	_yankscope = ldddsLoadDDSTexture2D("vehicles/vo/amerscope.dds", colorCYAN, 0);
+    _britscope = ldddsLoadDDSTexture2D("vehicles/vo/britscope.dds", colorCYAN, 0);
+    _frenchscope = ldddsLoadDDSTexture2D("vehicles/vo/frenscope.dds", colorCYAN, 0);
+    _germanscope = ldddsLoadDDSTexture2D("vehicles/vo/germscope.dds", colorCYAN, 0);
+#else
+    _bazookascope = ldddsLoadDDSTexture2D("vehicles/vo/m9optic.dds", colorBLACK, 0);
+    _yankscope = ldddsLoadDDSTexture2D("vehicles/vo/amerscope.dds", colorBLACK, 0);
     _britscope = ldddsLoadDDSTexture2D("vehicles/vo/britscope.dds", colorBLACK, 0);
     _frenchscope = ldddsLoadDDSTexture2D("vehicles/vo/frenscope.dds", colorBLACK, 0);
     _germanscope = ldddsLoadDDSTexture2D("vehicles/vo/germscope.dds", colorBLACK, 0);
+#endif
     _binocs = ldddsLoadDDSTexture2D("vehicles/vo/binos.dds", colorBLACK, 0);
 
     if(!piIsTexture(_bazookascope, 0))
@@ -1184,6 +1191,9 @@ static LOGICAL _DisplayMagLine(void*  Data)
 	if ( horizon < 1000.0f ) horizon = 1000.0f;
 
 	FLOAT32* Mag = (FLOAT32*)&Data;
+#ifdef AIMING_WEAPONS
+    *Mag = *Mag * 2.5;
+#endif
 	FLOAT32 FieldOfView = _BaseFOV / (*Mag);
 
 	if (vehicle->VehicleType->Type == VEH_TYPE_PERSON)
@@ -1323,8 +1333,11 @@ FLOAT32 Mils;
 	_TranslateCoordinatesByAngle(&V1.x,&V1.y);
 	_TranslateCoordinatesByAngle(&V2.x,&V2.y);
 
-
-	_draw3dLine(&V1,&V2,colorBLACKALPHA);
+#ifdef AIMING_WEAPONS
+	_draw3dLine(&V1,&V2,colorCYANALPHA);
+#else
+    _draw3dLine(&V1,&V2,colorBLACKALPHA);
+#endif
 
 	return TRUE;
 }
@@ -1357,7 +1370,11 @@ FLOAT32 Mils;
 		V2.y -= Mils;
 	}
 
-	_draw3dLine(&V1,&V2,colorBLACKALPHA);
+#ifdef AIMING_WEAPONS
+    _draw3dLine(&V1,&V2,colorCYANALPHA);
+#else
+    _draw3dLine(&V1,&V2,colorBLACKALPHA);
+#endif
 
 	V1.x = Ptr[2];
 	V1.y = Ptr[3];
@@ -1588,7 +1605,11 @@ FLOAT32* Ptr;
 	_TranslateCoordinatesByAngle(&V2.x,&V2.y);
 
 
-	_draw3dLine(&V1,&V2,colorBLACKALPHA);
+#ifdef AIMING_WEAPONS
+    _draw3dLine(&V1,&V2,colorCYANALPHA);
+#else
+    _draw3dLine(&V1,&V2,colorBLACKALPHA);
+#endif
 
 	return TRUE;
 }
@@ -1629,7 +1650,11 @@ FLOAT32 SaveRange;
 	_TranslateCoordinatesByAngle(&V1.x,&V1.y);
 	_TranslateCoordinatesByAngle(&V2.x,&V2.y);
 
-	_draw3dLine(&V1,&V2,colorBLACKALPHA);
+#ifdef AIMING_WEAPONS
+    _draw3dLine(&V1,&V2,colorCYANALPHA);
+#else
+    _draw3dLine(&V1,&V2,colorBLACKALPHA);
+#endif
 
 	return TRUE;
 }
@@ -1954,7 +1979,12 @@ piLVERTEX * Vertex;
 	Vertex = &(VertexList[VertexCount]);
 
 	rntext3DString(TextString,
-					colorBLACKALPHA,
+#ifdef AIMING_WEAPONS
+                   colorCYANALPHA,
+#else
+                   colorBLACKALPHA,
+#endif
+                   
 					GUNSIGHT_FONT,
 					Vertex,
 					NumVerts);

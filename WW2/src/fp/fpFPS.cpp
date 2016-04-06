@@ -3576,7 +3576,12 @@ void fpFPSGetEyeMatrix (piMATRIX* pMatrix)
 	}
 	else
 	{
-		eyeRotation = aimVertAngle - fpsTrooper.currentMuzzleRise + fpsTrooper.eyeVertOffset;
+#if AIMING_WEAPONS
+        eyeRotation = aimVertAngle + fpsTrooper.eyeVertOffset;
+#else
+        // Keep eye in line with with front sight
+        eyeRotation = aimVertAngle - fpsTrooper.currentMuzzleRise + fpsTrooper.eyeVertOffset;
+#endif
 	}
 
 	// sanity check here
@@ -4264,6 +4269,9 @@ void fpFPSMoveModel()
 	}
 	else
 	{
+#if AIMING_WEAPONS
+        horizWobblePos = vertWobblePos = horizWobbleAngle = vertWobbleAngle = 0;
+#endif
 		fpFPSGetWobble (&horizWobblePos, &vertWobblePos, &horizWobbleAngle, &vertWobbleAngle);
 	}
 
