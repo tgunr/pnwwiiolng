@@ -130,11 +130,11 @@ int dbugGetErrno(void);
 // dbugLog: if the current filename, lineno or string is nullptr then it sets these members. The
 // parameters are output as a string to the debug file depending on the debug level selected and
 // the current error type.  calls handlers.
-int _dbugLog(const char* filename, int lineno, unsigned int errType, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FUN(4,5);
+int _dbugLog(const char* filename, int lineno, unsigned int errType, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FN(4,5);
 
-SINT32 _dbugWrite(char* filename, SINT32 lineno, UINT32 errType, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FUN(4,5);
+SINT32 _dbugWrite(char* filename, SINT32 lineno, UINT32 errType, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FN(4,5);
 
-[[noreturn]] void _LogAbort(const char* filename, unsigned int lineno, unsigned int errType, const char* assertion, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FUN(5,6);
+[[noreturn]] void _LogAbort(const char* filename, unsigned int lineno, unsigned int errType, const char* assertion, FORMAT_ARG(0) const char* fmt, ...) FORMAT_FN(5,6);
 #define LogAbort(...) _LogAbort(__FILE__, __LINE__, Debug::ERR_FATAL, nullptr, __VA_ARGS__)
 
 // These macros assume that the condition is unlikely and try to provide the compiler an optimization hint by
