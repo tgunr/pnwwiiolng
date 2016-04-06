@@ -741,10 +741,8 @@ HostVehicle::isInCaptureBuilding() const
 	return m_inBuildingObject->m_side;
 }
 
-static void
-_reportBuildingIssue(TeulTimeMS& nextBlip, const char* const fmt, ...) FORMAT_FUN(2, 3);
-static void
-_reportBuildingIssue(TeulTimeMS& nextBlip, const char* const fmt, ...)
+static void _reportBuildingIssue(TeulTimeMS& nextBlip, const char* const fmt, ...) FORMAT_FN(2, 3);
+static void _reportBuildingIssue(TeulTimeMS& nextBlip, const char* const fmt, ...)
 {
 	assert( fmt != nullptr );
 	if ( nextBlip > teulClock64 )

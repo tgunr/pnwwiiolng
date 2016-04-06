@@ -14,7 +14,7 @@
 #define PN_LIKELY(p)   __builtin_expect(!!(p), 1)
 #define PN_UNLIKELY(p) __builtin_expect(!!(p), 0)
 #define PRSizeT "zu"
-#define FORMAT_FUN(n,m) [[gnu::format(printf,n,m)]]
+#define FORMAT_FN(n,m) __attribute__((format(printf,n,m)))
 #define FORMAT_ARG(n)
 #define NORETURN_FN [[noreturn]]
 
@@ -23,7 +23,7 @@
 #define PN_LIKELY(p)   __builtin_expect(!!(p), 1)
 #define PN_UNLIKELY(p) __builtin_expect(!!(p), 0)
 #define PRSizeT "zu"
-#define FORMAT_FUN(n,m) __attribute__((format(printf,n,m)))
+#define FORMAT_FN(n,m) __attribute__((format(printf,n,m)))
 #define FORMAT_ARG(n)
 #define NORETURN_FN __attribute__ ((noreturn))
 
@@ -36,7 +36,7 @@
 // MSVC also flouts the standard with size_t format specifiers.
 #define PRSizeT "Iu"
 // And finally, it ALSO doesn't implement compiler-checked format strings like everyone else!
-#define FORMAT_FUN(n,m)
+#define FORMAT_FN(n,m)
 #define FORMAT_ARG(n)   _Printf_format_string_params_(n)
 #define NORETURN_FN [[noreturn]]
 
