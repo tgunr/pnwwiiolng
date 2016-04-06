@@ -630,7 +630,7 @@ _recvfromPacketSource(ENDPOINT& endpoint)
 		if ( rxSize <= 0 )
 			break;
 
-#if platOS == OS_LINUX
+#if AS_SERVER
 		// ignore packets we broadcast..
 		if ( endpoint.protocol == PROTOCOL_UDB && (dgram->sockAddress.sin_addr.s_addr & 0xff000000) == (Server::myInterface.addr[0].naddr & 0xff000000) )
 		{

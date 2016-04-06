@@ -25,19 +25,13 @@
 #include <signal.h>
 #endif
 
-#if platOS == OS_LINUX
-#include <sys/time.h>
-#include <sys/times.h>
-#endif
-
-#if platOS == OS_MACOS
-#include <Carbon/Carbon.h>
-#include <unistd.h>
-#endif
-
 #if platOS == OS_WIN32
 #include <mmsystem.h>
 #include <sys/timeb.h>
+#else
+#include <sys/time.h>
+#include <sys/times.h>
+#include <unistd.h>
 #endif
 
 #include <atomic>
@@ -54,7 +48,7 @@ UINT32 teulClockTime;
 void
 teulSyncClock(void)
 {
-#if platOS == OS_LINUX
+#if platOS == OS_LINUX || platOS == OS_MACOS
 	struct timeval tv;
 	gettimeofday(&tv, nullptr);
 	const TeulTimeMS newTimeMS = ((TeulTimeMS)tv.tv_sec * 1000ULL) + (tv.tv_usec / 1000ULL);
@@ -74,33 +68,10 @@ teulSyncClock(void)
 
 	teulClock64 = BaseClock64 + (timeGetTime() - BaseClockTime);
 	teulClockTime = (UINT32)(teulClock64 / 1000LL);
-#elif platOS == OS_MACOS
-	UnsignedWide microTickCount;
-	Microseconds(&microTickCount);
-	teulClock64 = UnsignedWideToUInt64(microTickCount) / 1000;
-	teulClockTime = (UINT32)(teulClock64 / 1000LL);
 #else
 #pragma error("No teulSyncClock implementation for this platform")
 #endif
 }
-
-#if platOS == OS_LINUX
-void testMonotonicClock()
-{
-	struct timespec ts;
-	clock_gettime(CLOCK_MONOTONIC, &ts);
-	static uint32_t clockBase = 0;
-	static uint64_t clockBase64 = 0;
-	if (PN_UNLIKELY(clockBase == 0)) {
-		struct timeval tv;
-		gettimeofday(&tv, nullptr);
-		clockBase = tv.tv_sec - ts.tv_sec;
-		clockBase64 = uint64_t(clockBase) * 1000ULL;
-	}
-	teulClockTime = uint32_t(ts.tv_sec) + clockBase;
-	teulClock64 = clockBase64 + uint64_t(ts.tv_sec) * 1000ULL + uint64_t(ts.tv_nsec / 1000000ULL);
-}
-#endif
 
 // wrapper for inet_ntoa.
 // converts UINT32. to doted quad string.

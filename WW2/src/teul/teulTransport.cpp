@@ -227,7 +227,7 @@ SINT32 teulOpenListen(const UINT16 portNumber
 					);
 }
 
-#if platOS == OS_LINUX || platBuild == TEUL_SERVER
+#if platBuild == TEUL_SERVER
 // opens a port for listening on all address associated with the specified interface. "eth0" only!
 // Assumes that all callbacks have been properly installed.  returns -error_number or 0 on success.
 // connection acceptFnPtr is an optional ptr to callback function which is
@@ -503,7 +503,7 @@ teulUpdateTransport(const TeulTimeMS& duration_)
 
 	teulModIdle(duration_);
 
-#if platOS == OS_LINUX || platBuild == TEUL_SERVER
+#if platBuild == TEUL_SERVER
 	extern void serverUpdate(void);
 	serverUpdate();
 #endif
@@ -517,7 +517,7 @@ void teulCloseTransport(void)
 
 	_transportClosing = TRUE;
 
-#if platOS == OS_LINUX
+#if platBuild == TEUL_SERVER
 	extern void serverFree(void);
 	serverFree();
 #endif

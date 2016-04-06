@@ -25,8 +25,8 @@ UINT32 totalPacketsSent;
 UINT32 totalPacketsRecv;
 UINT32 totalPacketsXfer;
 
-#if platOS == OS_LINUX
-# define SOCK_SEND_FLAGS (MSG_DONTWAIT|MSG_NOSIGNAL)
+#if platOS == OS_LINUX || platOS == OS_MACOS
+# define SOCK_SEND_FLAGS (MSG_DONTWAIT)
 # include <sys/socket.h>
 #else
 # define SOCK_SEND_FLAGS 0

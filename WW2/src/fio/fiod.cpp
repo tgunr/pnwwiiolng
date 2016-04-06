@@ -1,10 +1,14 @@
 #include <syscfg.h> // Path is project specific.
 
+#if platOS == OS_MACOS
+#include "sysmac/sysMacCompat.h"
+#endif
+
 #include "wwii/wwiiHash.h" // does this work on linux?
 #include <map>
 #include <set>
 
-#if platOS != OS_LINUX && platBuild != TEUL_SERVER
+#if platBuild != TEUL_SERVER
 # include "pi/pi.h"
 # include "include/vars.h"
 #endif
@@ -586,12 +590,12 @@ void fiodSetPrepath(char* newpath)
 //////////////////////////////////////////////////////////////////////
 // Create a directory within prefix space
 //
-#if platOS != OS_LINUX
+#if platBuild == TEUL_CLIENT
 void fiodmkdir(const char* path)
 {
 	char fullPath[PATH_MAX];
 
-#if platOS == OS_MACOS
+#if platOS == OS_MACOS || platOS == OS_LINUX
 	strprintf(fullPath, "%s%s", macPreferencesPath(), path);
 	OS_MKDIR(os_file_path(fullPath), S_IRWXU);
 #elif platOS == OS_WIN32
