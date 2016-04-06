@@ -435,13 +435,13 @@ teulInitTransport(SINT32 logType
 {
 	if ( _transportInited )
 	{
-		dbugWrite(_FLAS, "can't initialize teul transport twice, must close first");
+		dbugWrite(_FLA, "can't initialize teul transport twice, must close first");
 		return -EINVAL;
 	}
 
 	if ( _transportClosing )
 	{
-		dbugWrite(_FLAS, "can't initialize teul transport during shutdown");
+		dbugWrite(_FLA, "can't initialize teul transport during shutdown");
 		return -EDEADLK;
 	}
 

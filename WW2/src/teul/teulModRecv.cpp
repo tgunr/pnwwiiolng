@@ -276,7 +276,7 @@ _checkConnectTCP(ENDPOINT& endpoint)
 		getsockname(sock, (struct sockaddr*)&endpoint.localSockAddress, &len);
 		assert( len == SockAddrLen );
 		endpoint.setConnected();
-		dbugWrite(_FLAS,"opening socket %d error %d len %d retval =%d", endpoint.teulIndex(), error, len, retval);
+		dbugWrite(_FLA,"opening socket %d error %d len %d retval =%d", endpoint.teulIndex(), error, len, retval);
 		retval = PN_LIKELY(SYN_TOKEN != nullptr) ? teulModSendCALLBACKe(endpoint, *SYN_TOKEN) : -EINVAL;
 		if (PN_UNLIKELY(retval < 0))
 			dbugLog(_FLA,"couldn't send to new connection %d socket %d error %d"
@@ -300,7 +300,7 @@ _checkConnectTCP(ENDPOINT& endpoint)
 				retval = PN_LIKELY(SYN_TOKEN != nullptr) ? teulModSendCALLBACKe(endpoint, *SYN_TOKEN) : -EINVAL;
 				if ( retval < 0 )
 				{
-					dbugLog(_FLAS,"couldn't send to new connection %d socket %d error %d"
+					dbugLog(_FLA,"couldn't send to new connection %d socket %d error %d"
 								, endpoint.teulIndex(), endpoint.socket, retval);
 					teulClose(endpoint, Teul::Closing::ConnSend);
 				}
@@ -319,7 +319,7 @@ _checkConnectTCP(ENDPOINT& endpoint)
 		}
 		else
 		{
-			dbugLog(_FLAS,"t:%d opening socket %d error %d len %d retval = %d", endpoint.teulIndex(), sock, error, len, retval);
+			dbugLog(_FLA,"t:%d opening socket %d error %d len %d retval = %d", endpoint.teulIndex(), sock, error, len, retval);
 			dbugSetErrno(error);
 //			return -error;
 		}
@@ -356,8 +356,7 @@ _acceptConnectTCP(ENDPOINT& endpoint)
 			continue;
 		}
 
-		if ( g_logDebug )
-			dbugLog(_FLN, "t:%d sock:" PRF_SOCKET " accepting connection", endpoint.teulIndex(), PRA_SOCKET(newSock));
+		dbugLog(_FLD, "t:%d sock:" PRF_SOCKET " accepting connection", endpoint.teulIndex(), PRA_SOCKET(newSock));
 
 		newEndpoint = teulCreateEndpoint(Teul::AnyIndex, false, endpoint.timeout, (PROTOCOL)endpoint.protocol);
 		if ( PN_UNLIKELY(newEndpoint == nullptr) )
@@ -900,7 +899,7 @@ _checkEndpointState(ENDPOINT& endpoint)
 			if ( timeSinceLastKlive >= (TeulDeltaMS)(UINT64)endpoint.m_impl->kliveInterval )
 			{
 #if defined(DEBUG_CONNECTIONS)
-				dbugLog(_FLDB, " sending klive");
+				dbugLog(_FLD, " sending klive");
 #endif
 				const bool oldNagleValue = endpoint.setNagleEnabled(false);
 				const SINT32 sendResult = PN_LIKELY(KLIVE_TOKEN != nullptr) ? teulModSendCALLBACKe(endpoint, *KLIVE_TOKEN) : -EINVAL;

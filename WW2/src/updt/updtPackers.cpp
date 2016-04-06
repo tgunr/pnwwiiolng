@@ -1085,7 +1085,7 @@ SINT32 updtPackSHARED_VEHICLE_INFO(LOGICAL mode, UCHAR* const data, SINT32 offse
 		turretHeader.vt.numTurrets = vupHeader->vt.numTurrets;
 		turretHeader.vt.turretMask = vupHeader->vt.turretMask;
 		turretHeader.vehInfo = vehInfo;
-//		dbugWrite(_FLNSB, "check mask: %x\n", turretHeader->vt.turretMask);
+//		dbugWrite(_FLN, "check mask: %x\n", turretHeader->vt.turretMask);
 		offset = _packVehicleTurrets(mode, data, offset, &turretHeader, 0);
 
 		if (mode == TEUL_UNPACK)
