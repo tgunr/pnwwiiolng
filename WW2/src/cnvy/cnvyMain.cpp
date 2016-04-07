@@ -365,7 +365,7 @@ cnvyUpdateTime()
 //////////////////////////////////////////////////////////////////////
 // Pull an update of the config in the background
 
-static const char* const CONFIG_UPDATE_QUERY = "SELECT variableName, value, UNIX_TIMESTAMP(lastModified) FROM `game`.`host_config` WHERE UNIX_TIMESTAMP(lastModified) > %u";
+static const char* const CONFIG_UPDATE_QUERY = "SELECT variableName, value, UNIX_TIMESTAMP(lastModified) FROM `wwiionline`.`wwii_config` WHERE UNIX_TIMESTAMP(lastModified) > %u";
 
 class ConfigUpdateQuery : public DBThreadQuery
 {
