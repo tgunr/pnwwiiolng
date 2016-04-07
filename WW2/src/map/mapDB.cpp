@@ -1100,7 +1100,7 @@ Player::saveMissionPacket()
 	DBThread::Do(DBThread::Default
 		, "UPDATE wwii_sortie"
 			" SET"
-				" spawn_time = IF(spawn_time IS nullptr,NOW(),spawn_time)"
+				" spawn_time = IF(spawn_time IS NULL,NOW(),spawn_time)"
 				",return_time = NOW()"
 				",rtb = %u"
 				",rtb_facility_oid = %u"
