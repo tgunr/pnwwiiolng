@@ -32,10 +32,7 @@ UINT32 timeGetTime(void)
 void chAppDir()
 {
     @autoreleasepool {
-        chdir([[[NSBundle mainBundle].executablePath
-            stringByDeletingLastPathComponent]
-            stringByAppendingPathComponent:@"AppData"].fileSystemRepresentation
-        );
+        chdir([NSBundle mainBundle].resourcePath.fileSystemRepresentation);
     }
 }
 
