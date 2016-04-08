@@ -129,7 +129,7 @@ public:
 			base0 = ((SeedType)(base[0]));
 		else
 			base1 = ((SeedType)(base[numUINT32s - 1]));
-		for ( size_t i = 0; i < numUINT32s; i += sizeof(UINT32) )
+		for ( size_t i = 0; i < numUINT32s; i++ )
 		{
 			base[i] ^= ((m_seed + i) >> (i & 31));
 		}
