@@ -594,7 +594,7 @@ extern NSString *WebActionOriginalURLKey;
 #else
     // Everyone else gets a build that (for now) locks the user to the 1.35 dev
     // server, which is apparently pretending to be arena 1 (e.g. "live").
-    [arenaMenu.menu addItemWithTitle:@"1.35 Testing" action:nullptr keyEquivalent:@""].tag = 1;
+    [arenaMenu.menu addItemWithTitle:@"1.35 Testing" action:nullptr keyEquivalent:@""].tag = 222;
     [arenaMenu selectItemWithTag:1];
     arenaMenu.enabled = NO;
 #endif
