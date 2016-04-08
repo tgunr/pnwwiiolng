@@ -433,7 +433,6 @@
 		E90D96A81C6E041300D5EC52 /* HockeySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96A71C6E041300D5EC52 /* HockeySDK.framework */; };
 		E9320E991C95FC2C003E8048 /* local2.tkt in Resources */ = {isa = PBXBuildFile; fileRef = E9320E971C95FC2C003E8048 /* local2.tkt */; };
 		E9320E9A1C95FC2C003E8048 /* local.tkt in Resources */ = {isa = PBXBuildFile; fileRef = E9320E981C95FC2C003E8048 /* local.tkt */; };
-		E97C76131C848D5400875F44 /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 089FB52614194F2200EBEB5F /* Carbon.framework */; };
 		E97C76141C848DA000875F44 /* HockeySDK.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E90D96A71C6E041300D5EC52 /* HockeySDK.framework */; };
 		E97C76151C848E3100875F44 /* CABufferList.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7AF120222EB00A60CC2 /* CABufferList.cpp */; };
 		E97C76161C848E3600875F44 /* CADebugger.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 082CF7B1120222EB00A60CC2 /* CADebugger.cpp */; };
@@ -473,7 +472,6 @@
 		E97C76C51C85395700875F44 /* kqueue.c in Sources */ = {isa = PBXBuildFile; fileRef = E97C769A1C85156F00875F44 /* kqueue.c */; };
 		E97C76C61C8539BF00875F44 /* XMLLoader.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E97C762B1C84E11A00875F44 /* XMLLoader.cpp */; };
 		E97C76C71C8539BF00875F44 /* XMLLoader2.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E97C762C1C84E11A00875F44 /* XMLLoader2.cpp */; };
-		E97C76D41C85B21200875F44 /* HockeySDK.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = E97C76D31C85B21200875F44 /* HockeySDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		FA05B0821C8D3E1800CDE30C /* libgranny2.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA05B0811C8D3E1800CDE30C /* libgranny2.a */; };
 		FA08C0761C8D4A1F0002F4B9 /* readme.rtf in Resources */ = {isa = PBXBuildFile; fileRef = FA08C0751C8D4A1F0002F4B9 /* readme.rtf */; };
 		FA13BB171C86758600095818 /* libevent.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB161C86758600095818 /* libevent.a */; };
@@ -490,6 +488,7 @@
 		FA13BB4B1C8764BB00095818 /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB491C8764BB00095818 /* libz.tbd */; };
 		FA13BB4F1C87650800095818 /* libxml2.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB4E1C87650800095818 /* libxml2.tbd */; };
 		FA13BB511C87CF8500095818 /* libglew.a in Frameworks */ = {isa = PBXBuildFile; fileRef = FA13BB501C87CF8500095818 /* libglew.a */; };
+		FA32FEAE1CB83C94000EF4C2 /* HockeySDK.framework in Copy Files */ = {isa = PBXBuildFile; fileRef = E90D96A71C6E041300D5EC52 /* HockeySDK.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		FA37D74F1C937F6E00013187 /* MainMenu.nib in Resources */ = {isa = PBXBuildFile; fileRef = FA37D74D1C937F6E00013187 /* MainMenu.nib */; };
 		FA37D7531C937F8F00013187 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = FA37D7511C937F8F00013187 /* Localizable.strings */; };
 		FA9E123C1C90CF7A000AF44A /* ww2.icns in Resources */ = {isa = PBXBuildFile; fileRef = E97C76CD1C85AFD800875F44 /* ww2.icns */; };
@@ -527,7 +526,7 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				E97C76D41C85B21200875F44 /* HockeySDK.framework in Copy Files */,
+				FA32FEAE1CB83C94000EF4C2 /* HockeySDK.framework in Copy Files */,
 			);
 			name = "Copy Files";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -1508,7 +1507,6 @@
 		E97C76A01C85156F00875F44 /* strlcpy.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = strlcpy.c; path = ../../Libraries/libevent/strlcpy.c; sourceTree = "<group>"; };
 		E97C76CD1C85AFD800875F44 /* ww2.icns */ = {isa = PBXFileReference; lastKnownFileType = image.icns; name = ww2.icns; path = proj/mac/ww2.icns; sourceTree = "<group>"; };
 		E97C76D01C85B15800875F44 /* playarc.ww2 */ = {isa = PBXFileReference; lastKnownFileType = text; name = playarc.ww2; path = ../WW2Archives/playarc.ww2; sourceTree = SOURCE_ROOT; };
-		E97C76D31C85B21200875F44 /* HockeySDK.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = HockeySDK.framework; path = Vendor/HockeySDK.framework; sourceTree = "<group>"; };
 		FA05B0811C8D3E1800CDE30C /* libgranny2.a */ = {isa = PBXFileReference; lastKnownFileType = archive.ar; name = libgranny2.a; path = lib/mac/libgranny2.a; sourceTree = "<group>"; };
 		FA08C0751C8D4A1F0002F4B9 /* readme.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; name = readme.rtf; path = ../opt/ww2mods/readme.rtf; sourceTree = "<group>"; };
 		FA08C0771C8E90E90002F4B9 /* authPlaygateTypes.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = authPlaygateTypes.h; path = src/auth/authPlaygateTypes.h; sourceTree = SOURCE_ROOT; };
@@ -1544,7 +1542,6 @@
 			files = (
 				0898699E13A2BB4C00D643A0 /* libotmac.a in Frameworks */,
 				E97C76141C848DA000875F44 /* HockeySDK.framework in Frameworks */,
-				E97C76131C848D5400875F44 /* Carbon.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -3040,7 +3037,6 @@
 				FA13BB3D1C87649000095818 /* OpenGL.framework */,
 				FA13BB3E1C87649000095818 /* QuickTime.framework */,
 				FA13BB3F1C87649000095818 /* Security.framework */,
-				E97C76D31C85B21200875F44 /* HockeySDK.framework */,
 				E90D96A71C6E041300D5EC52 /* HockeySDK.framework */,
 				0898699D13A2BB4C00D643A0 /* libotmac.a */,
 				FA13BB501C87CF8500095818 /* libglew.a */,
