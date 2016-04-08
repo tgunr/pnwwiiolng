@@ -232,7 +232,7 @@
 		08104D4D103DFBA10065E0E2 /* stringLib.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104D47103DFBA10065E0E2 /* stringLib.cpp */; };
 		08104D4E103DFBA10065E0E2 /* striws.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104D49103DFBA10065E0E2 /* striws.cpp */; };
 		08104D4F103DFBA10065E0E2 /* strpool.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104D4B103DFBA10065E0E2 /* strpool.cpp */; };
-		08104D61103DFBE90065E0E2 /* authClientMessages.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104D51103DFBE90065E0E2 /* authClientMessages.cpp */; };
+		08104D61103DFBE90065E0E2 /* authClientMessages.mm in Sources */ = {isa = PBXBuildFile; fileRef = 08104D51103DFBE90065E0E2 /* authClientMessages.mm */; };
 		08104D65103DFBE90065E0E2 /* sysmain.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104D59103DFBE90065E0E2 /* sysmain.cpp */; };
 		08104D66103DFBE90065E0E2 /* sysMovieMac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104D5C103DFBE90065E0E2 /* sysMovieMac.cpp */; };
 		08104D67103DFBE90065E0E2 /* systhreadmac.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08104D5E103DFBE90065E0E2 /* systhreadmac.cpp */; };
@@ -399,7 +399,6 @@
 		08977E19134D004300C9DCFE /* Texture2DArray.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08977E18134D004300C9DCFE /* Texture2DArray.cpp */; };
 		08977E1E134D007B00C9DCFE /* sneaky.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08977E1D134D007B00C9DCFE /* sneaky.cpp */; };
 		0898699E13A2BB4C00D643A0 /* libotmac.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 0898699D13A2BB4C00D643A0 /* libotmac.a */; };
-		089FB52714194F2200EBEB5F /* Carbon.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 089FB52614194F2200EBEB5F /* Carbon.framework */; };
 		08A428C212C93A490041B628 /* oglTextureObject.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08A428C012C93A490041B628 /* oglTextureObject.cpp */; };
 		08ACEE9E122056DC0035E877 /* glslUniformBlock.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08ACEE9C122056DC0035E877 /* glslUniformBlock.cpp */; };
 		08ACEEA71220574E0035E877 /* oglMaterial.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 08ACEEA31220574E0035E877 /* oglMaterial.cpp */; };
@@ -1054,7 +1053,7 @@
 		08104D4A103DFBA10065E0E2 /* striws.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = striws.h; sourceTree = "<group>"; };
 		08104D4B103DFBA10065E0E2 /* strpool.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = strpool.cpp; sourceTree = "<group>"; };
 		08104D4C103DFBA10065E0E2 /* strpool.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = strpool.h; sourceTree = "<group>"; };
-		08104D51103DFBE90065E0E2 /* authClientMessages.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = authClientMessages.cpp; sourceTree = "<group>"; };
+		08104D51103DFBE90065E0E2 /* authClientMessages.mm */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.objcpp; path = authClientMessages.mm; sourceTree = "<group>"; };
 		08104D52103DFBE90065E0E2 /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
 		08104D55103DFBE90065E0E2 /* syscfg.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = syscfg.h; sourceTree = "<group>"; };
 		08104D56103DFBE90065E0E2 /* sysLaunchUrl.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sysLaunchUrl.h; sourceTree = "<group>"; };
@@ -1571,7 +1570,6 @@
 				082CF8161202245400A60CC2 /* AudioToolbox.framework in Frameworks */,
 				082CF81C1202248E00A60CC2 /* AudioUnit.framework in Frameworks */,
 				FA13BB171C86758600095818 /* libevent.a in Frameworks */,
-				089FB52714194F2200EBEB5F /* Carbon.framework in Frameworks */,
 				E90D96A81C6E041300D5EC52 /* HockeySDK.framework in Frameworks */,
 				08D5812E106310FE00177892 /* libmaclib.a in Frameworks */,
 				47B0EDFD0E9A85510089DCC4 /* libteulKit.a in Frameworks */,
@@ -2487,7 +2485,7 @@
 				FA08C0771C8E90E90002F4B9 /* authPlaygateTypes.h */,
 				0863B36E10619D66005FDF19 /* clientGlobals.cpp */,
 				0834F1D61045888700E75B52 /* sysWinISO.h */,
-				08104D51103DFBE90065E0E2 /* authClientMessages.cpp */,
+				08104D51103DFBE90065E0E2 /* authClientMessages.mm */,
 				08104D52103DFBE90065E0E2 /* main.m */,
 				08104D55103DFBE90065E0E2 /* syscfg.h */,
 				E97C76281C84CD0700875F44 /* locIDs.h */,
@@ -3279,7 +3277,6 @@
 				8D0C4E8F0486CD37000505A6 /* Sources */,
 				8D0C4E910486CD37000505A6 /* Frameworks */,
 				E97C76D21C85B1FD00875F44 /* Copy Files */,
-				E9320E9E1C960065003E8048 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -3394,19 +3391,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
 			shellScript = "${SRCROOT}/proj/mac/correct-info-plist.sh";
-		};
-		E9320E9E1C960065003E8048 /* ShellScript */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "TICKET_PATH=$SRCROOT\n\nBUILD_APP_DIR=${BUILT_PRODUCTS_DIR}/${PRODUCT_NAME}.app/Contents/MacOS/AppData\n\nif [ \"$CONFIGURATION\" == \"Debug\" ]; then\ncp $TICKET_PATH/*.tkt \"$BUILD_APP_DIR/.\"\nfi";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -3685,7 +3669,7 @@
 				08104D4D103DFBA10065E0E2 /* stringLib.cpp in Sources */,
 				08104D4E103DFBA10065E0E2 /* striws.cpp in Sources */,
 				08104D4F103DFBA10065E0E2 /* strpool.cpp in Sources */,
-				08104D61103DFBE90065E0E2 /* authClientMessages.cpp in Sources */,
+				08104D61103DFBE90065E0E2 /* authClientMessages.mm in Sources */,
 				08104D65103DFBE90065E0E2 /* sysmain.cpp in Sources */,
 				08104D66103DFBE90065E0E2 /* sysMovieMac.cpp in Sources */,
 				08104D67103DFBE90065E0E2 /* systhreadmac.cpp in Sources */,
